@@ -399,6 +399,26 @@ class DLL_PUBLIC var final {
 	// CONSTRUCTORS FROM
 	////////////////////
 
+#define ALL_IN_ONE_STRING_CONSTRUCTOR
+#ifdef ALL_IN_ONE_STRING_CONSTRUCTOR
+	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S,std::string>>>
+	var(S&& fromstr)
+		: var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR) {};
+
+#else
+
+	// from std::string
+	//
+	// swig java duplicates this with var(std::string&) above
+#if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
+	var(const std::string& str1);
+	var(std::string&& str1);
+	//in c++20 but not g++ v9.3
+	//constexpr var(const std::string& str1);
+#endif
+
+#endif
+
 #ifndef SWIGJAVA
 	// constructor for char*
 	// place first before char so SWIG isnt tempted to use char to acquire strings resulting in
@@ -417,15 +437,6 @@ class DLL_PUBLIC var final {
 	//
 	//	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr1, const size_t int1);
-
-	// from std::string
-	//
-	// swig java duplicates this with var(std::string&) above
-#if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
-	var(const std::string& str1);
-	//in c++20 but not g++ v9.3
-	//constexpr var(const std::string& str1);
-#endif
 
 	// from bool
 	//

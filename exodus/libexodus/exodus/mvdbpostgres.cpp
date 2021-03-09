@@ -2146,15 +2146,22 @@ exodus_call:
 		return "";
 	}
 
-	if (fieldname.substr(-5).ucase() == "_XREF") {
+	// Multivalued or xref fields need special handling
+	///////////////////////////////////////////////////
+
+	ismv = ismv1;
+
+	// vector (for GIN or indexing/filtering multivalue fields)
+	if ((ismv1 and !forsort) || fieldname.substr(-5).ucase() == "_XREF") {
 		sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
 		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
+	}
 
-		// unnest multivalued fields into multiple output rows
-	} else if (ismv1) {
+	// unnest multivalued fields into multiple output rows
+	else if (ismv1) {
 
-		ismv = true;
+		//ismv = true;
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
 		if (sqlexpression.substr(1, 20) == "exodus_extract_date(" || sqlexpression.substr(1, 20) == "exodus_extract_time(")
@@ -2609,7 +2616,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			//var dictexpression_isarray=dictexpression.index("string_to_array(");
 			var dictexpression_isarray = dictexpression.index("_array(");
-			var dictexpression_isxref = dictexpression.index("to_tsvector(");
+			var dictexpression_isvector = dictexpression.index("to_tsvector(");
+			var dictexpression_isfulltext = dictid.substr(-5).ucase() == "_XREF";
 
 			// add the dictid expression
 			//if (dictexpression.index("exodus_call"))
@@ -2640,7 +2648,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			if (ucword == "BETWEEN" || ucword == "FROM") {
 
 				//prevent BETWEEN being used on fields
-				if (dictexpression_isxref) {
+				if (dictexpression_isvector) {
 					throw MVDBException(
 						sortselectclause ^
 						"BETWEEN x AND y/FROM x TO y ... is not currently supported for XREF");
@@ -2781,7 +2789,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			//select WITH ..._XREF uses postgres full text searching
 			//which has its own prefix and postfix rules. see below
-			if (dictexpression_isxref) {
+			if (dictexpression_isfulltext) {
 				prefix = "";
 				postfix = "";
 			}
@@ -2797,7 +2805,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			'.*vadim.*'
 			*/
 
-			if (prefix || postfix) {
+			else if (!dictexpression_isvector && (prefix || postfix)) {
 
 				//postgres match matches anything in the string unless ^ and/or $ are present
 				// so .* is not necessary in prefix and postfix
@@ -2944,59 +2952,93 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			//allow searching for text with * characters embedded
 			//otherwise interpreted as glob character?
-			if (dictexpression_isxref) {
+			if (dictexpression_isvector) {
 				value.swapper("*", "\\*");
 			}
 
 			// multiple values
 			if (value.index(FM)) {
+
 				//in full text query on multiple words,
 				//we implement that words all are required
 				//all values and words separated by spaced are used as "word stems"
 				//NB ":*" means "ending in" to postgres tsquery. see:
 				//https://www.postgresql.org/docs/10/datatype-textsearch.html
 				//"lexemes in a tsquery can be labeled with * to specify prefix matching:"
-				if (dictexpression_isxref) {
+				if (dictexpression_isvector) {
 
 					//quoted values
-					value.swapper("'" _FM_ "'", ":*|");
+					value.swapper("'" _FM_ "'", "|");
 
 					//unquoted numbers
-					value.swapper(FM_, ":*&");
+					value.swapper(FM_, "&");
+				}
 
-					//ordinary query values
-				} else
+				//ordinary query values
+				else {
+
 					//WARNING ", " is swapped in mvprogram.cpp ::select()
 					//so change there if changed here
 					value.swapper(FM_, ", ");
 
-				if (dictexpression_isxref) {
-					//done below
-				} else if (dictexpression_isarray) {
+					// no processing for arrays (why?)
+					if (dictexpression_isarray) {
+					}
+
 					//lhs is an array ("multivalues" in postgres)
 					//dont convert rhs to in() or any()
-				} else if (op == "=") {
-					op = "in";
-					value = "( " ^ value ^ " )";
-				} else if (op == "<>") {
-					op = "not in";
-					value = "( " ^ value ^ " )";
-				} else {
-					value = "ANY(ARRAY[" ^ value ^ "])";
+					else if (op == "=") {
+						op = "in";
+						value = "( " ^ value ^ " )";
+					}
+
+					// not any of
+					else if (op == "<>") {
+						op = "not in";
+						value = "( " ^ value ^ " )";
+					}
+
+					//any of
+					else {
+						value = "ANY(ARRAY[" ^ value ^ "])";
+					}
 				}
+
 			}
 
-			//full text searching
-			if (dictexpression_isxref) {
+			//full text search or mv field search
+			if (dictexpression_isvector) {
+
 				//see note on isxref in "multiple values" section above
 				op = "@@";
 
-				//use spaces to indicate search words
-				value.swapper(" ", ":*&");
+				// & separates multiple required
+				// | separates multiples alternatives
+				// 'fat & (rat | cat)'::tsquery;
 
-				//append postfix :* to every search word
-				value.swapper("&", ":*&");
-				value.splicer(-1, 0, ":*");
+				// if full text search
+				//if (dictid.substr(-5).ucase() == "_XREF") {
+				if (dictexpression_isfulltext) {
+
+					//use spaces to indicate search words
+					value.swapper(" ", ":*&");
+
+					//append postfix :* to every search word
+					//so STEV:* also finds STEVE and STEVEN
+					value.swapper("&", ":*&");
+					value.swapper("|", ":*|");
+					value.splicer(-1, 0, ":*");
+
+				}
+				//select multivalues starting "XYZ" by selecting "XYZ]"
+				else if (postfix) {
+					value.swapper("|", ":*|");
+					value.splicer(-1, 0, ":*");
+				}
+				else {
+					value.swapper("]", ":*");
+					//value.splicer(-1, 0, ":*");
+				}
 
 				//use "simple" dictionary (ie none) to allow searching for words starting with 'a'
 				//use "english" dictionary for stemming (or "simple" dictionary for none)
@@ -3925,7 +3967,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 
 	// throws if cannot find dict file or record
 	var joins = "";	   // throw away - cant index on joined fields at the moment
-	var unnests = "";  // throw away - cant index on multi-valued fields at the moment
+	var unnests = "";  // unnests are only created for ORDER BY, not indexing or selecting
 	var selects = "";
 	var ismv;
 	var forsort = false;
@@ -3934,11 +3976,11 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	// dictexpression.outputl("dictexp=");stop();
 
 	//mv fields return in unnests, not dictexpression
-	if (unnests)
-	{
-		//dictexpression = unnests.a(3);
-		unnests.convert(FM,"^").outputl("unnests=");
-	}
+	//if (unnests)
+	//{
+	//	//dictexpression = unnests.a(3);
+	//	unnests.convert(FM,"^").outputl("unnests=");
+	//}
 
 	var sql;
 
@@ -3972,7 +4014,8 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 
 	// create postgres index
 	sql = "CREATE INDEX index__" ^ filename ^ "__" ^ fieldname ^ " ON " ^ filename;
-	if (ismv || fieldname.substr(-5).lcase() == "_xref")
+	//if (ismv || fieldname.substr(-5).lcase() == "_xref")
+	if (dictexpression.index("to_tsvector("))
 		sql ^= " USING GIN";
 	sql ^= " (";
 	sql ^= dictexpression;

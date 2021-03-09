@@ -136,6 +136,12 @@ var::var(const var&& rhs) noexcept
 	// ISASSIGNED(rhs)
 }*/
 
+// ctor for char
+// use initializers since cannot fail (but could find how to init the char1)
+var::var(const char char1) noexcept
+	: var_str(1, char1),
+	  var_typ(VARTYP_STR) {}
+
 // constructor for char*
 // use initializers since cannot fail unless out of memory
 var::var(const char* cstr1)
@@ -151,13 +157,23 @@ var::var(const char* cstr1)
 	}
 }
 
-// constructor for std::string
+#ifndef ALL_IN_ONE_STRING_CONSTRUCTOR
+
+// constructor for const std::string
 // just use initializers since cannot fail unless out of memory
 var::var(const std::string& str1)
 	// this would validate all strings as being UTF8?
 	//: var_str(boost::locale::conv::utf_to_utf<char>(str1))
 	: var_str(str1),
 	  var_typ(VARTYP_STR) {}
+
+// constructor for temporary std::string
+// just use initializers since cannot fail unless out of memory
+var::var(std::string&& str1)
+	: var_str(std::move(str1)),
+	  var_typ(VARTYP_STR) {}
+
+#endif
 
 // constructor for bool
 // just use initializers since cannot fail
@@ -182,12 +198,6 @@ var::var(const long long longlong1) noexcept
 var::var(const double double1) noexcept
 	: var_dbl(double1),
 	  var_typ(VARTYP_DBL) {}
-
-// ctor for char
-// use initializers since cannot fail (but could find how to init the char1)
-var::var(const char char1) noexcept
-	: var_str(1, char1),
-	  var_typ(VARTYP_STR) {}
 
 // ctor for memory block
 // dont use initialisers and TODO protect against out of memory in expansion to string
