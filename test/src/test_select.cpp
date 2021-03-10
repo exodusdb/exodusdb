@@ -65,6 +65,11 @@ function main() {
 
 function test() {
 
+		assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
+		assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 1=") == "B");
+		assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 2=") == "C");
+		assert(!readnext(RECORD,ID,MV));
+
 	assert(select(testfilename ^ " with f1m 'AA' (SR)"));
 	assert(readnext(RECORD,ID,MV) && ID.outputl("AA 1=") == "A");
 	assert(!readnext(RECORD,ID,MV));
@@ -120,22 +125,26 @@ function test() {
 	assert(select(testfilename ^ " with f1m 'E' 'F' (SR)"));
 	assert(!readnext(RECORD,ID,MV));
 
-	//E] finds EE
-	assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
-	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 1=") == "B");
-	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 2=") == "C");
-	assert(!readnext(RECORD,ID,MV));
+	//test STARTING filter on multivalues
+	if (true) {
 
-	//A] and F] finds AA FF
-	assert(select(testfilename ^ " with f1m 'A]' 'F]' (SR)"));
-	assert(readnext(RECORD,ID,MV) && ID.outputl("A] F] 1=") == "A");
-	assert(readnext(RECORD,ID,MV) && ID.outputl("A] F] 2=") == "C");
-	assert(!readnext(RECORD,ID,MV));
+		//E] and XX finds EE
+		assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
+		assert(readnext(RECORD,ID,MV) && ID.outputl("E] XX 1=") == "B");
+		assert(readnext(RECORD,ID,MV) && ID.outputl("E] XX 2=") == "C");
+		assert(!readnext(RECORD,ID,MV));
 
-	//without A] and F] finds B only
-	assert(select(testfilename ^ " without f1m 'A]' 'F]' (SR)"));
-	assert(readnext(RECORD,ID,MV) && ID.outputl("without A] F] 1=") == "B");
-	assert(!readnext(RECORD,ID,MV));
+		//A] and F] finds AA FF
+		assert(select(testfilename ^ " with f1m 'A]' 'F]' (SR)"));
+		assert(readnext(RECORD,ID,MV) && ID.outputl("A] F] 1=") == "A");
+		assert(readnext(RECORD,ID,MV) && ID.outputl("A] F] 2=") == "C");
+		assert(!readnext(RECORD,ID,MV));
+
+		//without A] and F] finds B only
+		assert(select(testfilename ^ " without f1m 'A]' 'F]' (SR)"));
+		assert(readnext(RECORD,ID,MV) && ID.outputl("without A] F] 1=") == "B");
+		assert(!readnext(RECORD,ID,MV));
+	}
 
 	return 0;
 }

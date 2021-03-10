@@ -2585,6 +2585,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		// with dictid between x and y
 		else if (ucword == "WITH" || ucword == "WITHOUT") {
 
+			/////////////////////////////////////////////////////////
+			// Filter Stage 1 - Decide if positive or negative filter
+			/////////////////////////////////////////////////////////
+
 			var negative = ucword == "WITHOUT";
 
 			// next word must be the NOT/NO or the dictionary id
@@ -2598,6 +2602,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				// remove NOT or NO
 				word1 = getword(remaining, ucword);
 			}
+
+			//////////////////////////////////////////////////////////
+			// Filter Stage 2 - Acquire column function to be filtered
+			//////////////////////////////////////////////////////////
 
 			// skip AUTHORISED for now since too complicated to calculate in database
 			// ATM if (word1.ucase()=="AUTHORISED") { 	if
@@ -2629,6 +2637,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// word1=getword(remaining, true);
 			word1 = getword(remaining, ucword);
 
+			///////////////////////////////////////////////////////////////////////
+			// Filter Stage 3 - 2nd chance to decide if positive or negative filter
+			///////////////////////////////////////////////////////////////////////
+
 			// can negate before (and after) dictionary word
 			// eg WITH NOT/NO INVOICE_NO or WITH INVOICE_NO NOT
 			if (ucword == "NOT" || ucword == "NO") {
@@ -2638,12 +2650,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				word1 = getword(remaining, ucword);
 			}
 
-			//if (ucword=="@ID")
-			//	std::cout << "@ID";
+			/////////////////////////////////////////////////
+			// Filter Stage 4 - SIMPLE BETWEEN or FROM clause
+			/////////////////////////////////////////////////
 
-			// between x and y
-			// from x to y
-			/////////////////
+			// BETWEEN x AND y
+			// FROM x TO y
 
 			if (ucword == "BETWEEN" || ucword == "FROM") {
 
@@ -2731,27 +2743,48 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				continue;
 			}
 
-			// starting, ending, containing = like
-			/////////////////////////////////////
+			////////////////////////////////////
+			// Filter Stage 5 - ACQUIRE OPERATOR
+			////////////////////////////////////
 
+			// 1. currently using regular expression instead of SQL LIKE
+			// 2. use "BETWEEN X and XZZZZZZZ" instead of "LIKE X%"
+			//    to ensure that any postgresql btree index is used if present
+
+			var op = "";
 			var prefix = "";
 			var postfix = "";
+
+			//using regular expression logic for CONTAINING/STARTING/ENDING
+			//will be converted to tsvector logic if dictexpression_isvector
 			if (ucword == "CONTAINING" or ucword == "[]") {
 				prefix = ".*";
 				postfix = ".*";
-			} else if (ucword == "STARTING" or ucword == "]") {
-				prefix = "^";
-				postfix = ".*";
-			} else if (ucword == "ENDING" or ucword == "[") {
+				op = "=";
+				word1 = getword(remaining, ucword);
+			}
+			else if (ucword == "STARTING" or ucword == "]") {
+
+				//identical code above/below
+				if (dictexpression_isvector) {
+					prefix = "^";
+					postfix = ".*";
+				}
+				//NOT using regular expression logic for single valued fields and STARTING
+				else {
+					op = "]";
+				}
+
+				word1 = getword(remaining, ucword);
+			}
+			else if (ucword == "ENDING" or ucword == "[") {
 				prefix = ".*";
 				postfix = "$";
-			}
-			if (prefix || postfix)
+				op = "=";
 				word1 = getword(remaining, ucword);
+			}
 
 			//"normal" comparative filtering
-			////////////////////////////////
-
 			// 1) Acquire operator - or empty if not present
 
 			// convert PICK/AREV relational operators to standard SQL relational operators
@@ -2763,26 +2796,47 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			}
 
 			// capture operator is any
-			var op = "";
-			if (var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", ucword, aliasno)) {
+			if (var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", ucword)) {
 				// is an operator
 				op = ucword;
 				// get another word (or words)
 				word1 = getword(remaining, ucword);
 			}
 
+			////////////////////////////////////
+			// Filter Stage 6 - ACQUIRE VALUE(S)
+			////////////////////////////////////
+
 			//determine Pick/AREV values like "[xxx" "xxx]" and "[xxx]"
 			if (word1[1] == "'") {
+
 				if (word1[2] == "[") {
 					word1.splicer(2, 1, "");
 					prefix = ".*";
-					postfix = "$";
-				}
-				if (word1[-2] == "]") {
+
+					//CONTAINING
+					if (word1[-2] == "]") {
+						word1.splicer(-2, 1, "");
+						postfix = ".*";
+					}
+					//ENDING
+					else {
+						postfix = "$";
+					}
+
+				//STARTING
+				} else if (word1[-2] == "]") {
 					word1.splicer(-2, 1, "");
-					if (!prefix)
+
+					//identical code above/below
+					if (dictexpression_isvector) {
 						prefix = "^";
-					postfix = ".*";
+						postfix = ".*";
+					}
+					//NOT using regular expression logic for single valued fields and STARTING
+					else {
+						op = "]";
+					}
 				}
 				ucword = word1.ucase();
 			}
@@ -2795,14 +2849,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			}
 
 			/*implement using posix regular string matching
-			~ 	Matches regular expression, case sensitive 	'thomas' ~
-			'.*thomas.*'
-			~* 	Matches regular expression, case insensitive 	'thomas' ~*
-			'.*Thomas.*'
-			!~ 	Does not match regular expression, case sensitive 'thomas' !~
-			'.*Thomas.*'
-			!~* 	Does not match regular expression, case insensitive 'thomas' !~*
-			'.*vadim.*'
+				~ 	Matches regular expression, case sensitive
+					'thomas' ~ '.*thomas.*'
+				~* 	Matches regular expression, case insensitive
+					'thomas' ~* '.*Thomas.*'
+				!~ 	Does not match regular expression, case sensitive
+					'thomas' !~ '.*Thomas.*'
+				!~* Does not match regular expression, case insensitive
+					'thomas' !~* '.*vadim.*'
 			*/
 
 			else if (!dictexpression_isvector && (prefix || postfix)) {
@@ -2839,22 +2893,27 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				ucword = word1;
 			}
 
-			// 2) Acquire value(s) - or empty if not present
-
-			// word1 at this point may be empty, contain a value or the first word of an
-			// unrelated clause
-
-			// if word1 unrelated to current phrase
+			// word1 at this point may be empty, contain a value or be the first word of an unrelated clause
+			// if non-value word1 unrelated to current phrase
 			if (ucword.length() && !valuechars.index(ucword[1])) {
+
 				// push back and treat as missing value
 				// remaining[1,0]=ucword:' '
 				remaining.splicer(1, 0, ucword ^ " ");
-				// simulate no given value
+
+				// simulate no given value .. so a boolean filter like "WITH APPROVED"
 				word1 = "";
 				ucword = "";
 			}
 
 			var value = word1;
+
+			/////////////////////////////////////////////////////////////////////
+			// Filter Stage 7 - SAVE INFO FOR CALCULATED FIELDS IN STAGE 2 SELECT
+			/////////////////////////////////////////////////////////////////////
+
+			// "Calculated fields" are exodus/c++ functions that cannot be run by postgres
+			// and are done in exodus in mvprogram.cpp two pass select
 
 			// no filtering in database on calculated items
 			//save then for secondary filtering
@@ -2871,10 +2930,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 				// invert comparison if "without" or "not" for calculated fields
 				if (negative &&
-					var("= <> > < >= <= ~ ~* !~ !~* !! !").locateusing(" ", op, aliasno)) {
+					var("= <> > < >= <= ~ ~* !~ !~* !! ! ]").locateusing(" ", op, aliasno)) {
 					// op.outputl("op entered:");
 					negative = false;
-					op = var("<> = <= >= < > !~ !~* ~ ~* ! !!").field(" ", aliasno);
+					op = var("<> = <= >= < > !~ !~* ~ ~* ! !! !]").field(" ", aliasno);
 					// op.outputl("op reversed:");
 				}
 
@@ -2882,6 +2941,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//calc_fields.r(1,ncalc_fields,dictid);
 				//calc_fields.r(2,ncalc_fields,op);
 				//calc_fields.r(3,ncalc_fields,value);
+				//dictid = calc_fields.a(1,n);
+				//op     = calc_fields.a(2,n);
+				//values  = calc_fields.a(3,n);
 
 				//almost identical code for exodus_call above/below
 				var calc_fieldn;
@@ -2891,7 +2953,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				}
 				if (calc_fields.a(2, calc_fieldn))
 					throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
+
+				//save the op
 				calc_fields.r(2, calc_fieldn, op);
+
+				//save the value(s) after removing quotes and using SM to separate values instead of FM
 				calc_fields.r(3, calc_fieldn, value.unquote().swap("'" _FM_ "'", FM).convert(FM, SM));
 
 				//place holder to be removed before issuing actual sql command
@@ -2900,7 +2966,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				continue;
 			}
 
-			// missing op and value mean NOT '' or NOT 0 or NOT NULL
+			///////////////////////////////////////////////////////////
+			// Filter Stage 8 - DUMMY OP AND VALUE SAVE IF NOT PROVIDED
+			///////////////////////////////////////////////////////////
+
+			// missing op and value means NOT '' or NOT 0 or NOT NULL
 			// WITH CLIENT_TYPE
 			if (op == "" && value == "") {
 				//op = "<>";
@@ -2927,16 +2997,22 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				else
 					dictexpression = "exodus_tobool(" ^ dictexpression ^ ")";
 			}
+
 			// missing op means =
-			// WITH CLIENT_TYPE "X"
-			else if (op == "")
+			// eg WITH CLIENT_TYPE "X" .. assume missing "=" sign
+			else if (op == "") {
 				op = "=";
+			}
 
 			// missing value means error in sql
 			// WITH CLIENT_TYPE =
 			if (value == "") {
 				// value="";
 			}
+
+			///////////////////////////////////////////////////////////
+			// Filter Stage 9 - PROCESS DICTEXPRESSION, OP AND VALUE(S)
+			///////////////////////////////////////////////////////////
 
 			// op and value(s) are now set
 
@@ -2956,8 +3032,26 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				value.swapper("*", "\\*");
 			}
 
+			// special processing for STARTING]
+			// convert "STARTING 'ABC'"  to "BETWEEN 'X' AND 'XZZZZZZ'
+			// so that any btree index if present will be used. "LIKE" or REGULAR EXPRESSIONS will not use indexes
+			if (op == "]") {
+
+				var expression = "";
+				for (var& subvalue : value) {
+				    expression ^= dictexpression ^ " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
+				}
+				expression.splicer(-1, "");
+				expression.swapper(FM, " OR ");
+				value = expression;
+
+				// indicate that the dictexpression is included in the value(s)
+				op = "(";
+
+			}
+
 			// multiple values
-			if (value.index(FM)) {
+			else if (value.index(FM)) {
 
 				//in full text query on multiple words,
 				//we implement that words all are required
@@ -3032,13 +3126,13 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				}
 				//select multivalues starting "XYZ" by selecting "XYZ]"
 				else if (postfix) {
-					value.swapper("|", ":*|");
+					value.swapper("]", ":*");
+					//value.swapper("|", ":*|");
 					value.splicer(-1, 0, ":*");
 				}
-				else {
-					value.swapper("]", ":*");
-					//value.splicer(-1, 0, ":*");
-				}
+
+				value.swapper("]", ":*");
+				//value.splicer(-1, 0, ":*");
 
 				//use "simple" dictionary (ie none) to allow searching for words starting with 'a'
 				//use "english" dictionary for stemming (or "simple" dictionary for none)
@@ -3093,11 +3187,18 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				}
 			}
 
+			//////////////////////////////////////////////
+			// Filter Stage 10 - COMBINE INTO WHERE CLAUSE
+			//////////////////////////////////////////////
+
 			//negate
 			if (negative)
 				whereclause ^= " not";
 
-			whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
+			if (op == "(")
+				whereclause ^= " ( " ^ value ^ " )";
+			else
+				whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 			// whereclause.outputl("whereclause=");
 
 		}  //with/without
