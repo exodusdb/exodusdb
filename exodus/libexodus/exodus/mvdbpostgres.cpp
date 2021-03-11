@@ -2663,7 +2663,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				if (dictexpression_isvector) {
 					throw MVDBException(
 						sortselectclause ^
-						"BETWEEN x AND y/FROM x TO y ... is not currently supported for XREF");
+						" 'BETWEEN x AND y' and 'FROM x TO y' ... are not currently supported for mv or xref columns");
 				}
 
 				// get and append first value
@@ -2807,7 +2807,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// Filter Stage 6 - ACQUIRE VALUE(S)
 			////////////////////////////////////
 
-			//determine Pick/AREV values like "[xxx" "xxx]" and "[xxx]"
+			// determine Pick/AREV values like "[xxx" "xxx]" and "[xxx]"
+			// TODO
 			if (word1[1] == "'") {
 
 				if (word1[2] == "[") {
@@ -3032,6 +3033,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				value.swapper("*", "\\*");
 			}
 
+			// STARTING
 			// special processing for STARTING]
 			// convert "STARTING 'ABC'"  to "BETWEEN 'X' AND 'XZZZZZZ'
 			// so that any btree index if present will be used. "LIKE" or REGULAR EXPRESSIONS will not use indexes
