@@ -5,7 +5,7 @@ var gtexttagnames = /(^SPAN$)|(^INPUT$)|(^TEXTAREA$)/
 var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //var nbsp160 = String.fromCharCode(160)
 
-gnewimage = gimagetheme+'application_form_add.png'
+gnewimage = gimagetheme + 'application_form_add.png'
 //gnewimage = gimagetheme + 'application.png'//'add.png'
 gopenimage = gimagetheme + 'open.gif'
 gfindimage = gimagetheme + 'zoom.png'
@@ -192,8 +192,8 @@ function* formfunctions_onload() {
     }
 
     //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename)
-    var dictfunctionname=(guseyield?'yield * ':'') + 'dict_' + gdictfilename
-    var dictarray=yield* exodusevaluate(dictfunctionname + '(gparameters)', 'yield* formfunctions_onload()')
+    var dictfunctionname = (guseyield ? 'yield * ' : '') + 'dict_' + gdictfilename
+    var dictarray = yield* exodusevaluate(dictfunctionname + '(gparameters)', 'yield* formfunctions_onload()')
     gro = new exodusrecord(dictarray, gdatafilename)
 
     gds.dict = gro.dict
@@ -228,11 +228,11 @@ function* formfunctions_onload() {
         var datafld = null
         if (!element.id) {
             try {
-                datafld=element.getAttribute('datafld')
+                datafld = element.getAttribute('datafld')
                 if (!datafld)
-                    datafld=element.getAttribute('datafld')
+                    datafld = element.getAttribute('datafld')
                 if (datafld)
-                    element.id=datafld
+                    element.id = datafld
             } catch (e) {
             }
         }
@@ -260,18 +260,18 @@ function* formfunctions_onload() {
             if (!dictitem) {
                 //dont error if id not in dictionary because could be non form element but do error if datafld specified
                 if (datafld)
-                    systemerror('yield* formfunctions_onload()','Form element '+exodusquote(fieldname)+' is not in the '+exodusquote(gdictfilename)+' dictionary\nor is not in the correct group.')
+                    systemerror('yield* formfunctions_onload()', 'Form element ' + exodusquote(fieldname) + ' is not in the ' + exodusquote(gdictfilename) + ' dictionary\nor is not in the correct group.')
                 continue
             }
 
             //authorisation to make any field read only on bound forms (files)
             //eg CLIENT UPDATE "MARKET"
             //eg CLIENT UPDATE "MARKET CODE"
-            if (gKeyNodes){
-                var words=fieldname.split('_')
-                for (var wordn=0;wordn<words.length;++wordn) {
-                    if (!(yield* exodussecurity(gdatafilename.exodussingular()+' UPDATE '+words.slice(0,wordn+1).join(' ').exodusquote()))) {
-                        dictitem.readonly=gmsg
+            if (gKeyNodes) {
+                var words = fieldname.split('_')
+                for (var wordn = 0; wordn < words.length; ++wordn) {
+                    if (!(yield* exodussecurity(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()))) {
+                        dictitem.readonly = gmsg
                         break;
                     }
                 }
@@ -302,7 +302,7 @@ function* formfunctions_onload() {
             }
             //element=eval(element.id)
 
-           ///log('formfunctions_onload ' + fieldname)
+            ///log('formfunctions_onload ' + fieldname)
 
             //dictionary modifications
             //none - currently done in dictrec builder
@@ -313,7 +313,7 @@ function* formfunctions_onload() {
                 //replace original element
                 var newspan = document.createElement('span')
                 element.parentNode.replaceChild(newspan, element)
-                newspan.style.marginLeft=element.style.marginLeft
+                newspan.style.marginLeft = element.style.marginLeft
 
                 //copy over attributes
                 newspan.tabIndex = element.tabIndex
@@ -343,7 +343,7 @@ function* formfunctions_onload() {
                 (element.getAttribute('exodusradio') && element.type != 'radio')
                 ||
                 (element.getAttribute('exoduscheckbox') && element.type != 'checkbox')
-	           ) {
+            ) {
 
                 //radio has preference over checkbox
                 if (element.getAttribute('exodusradio'))
@@ -405,7 +405,7 @@ function* formfunctions_onload() {
                         //addeventlistener(element, 'focus', 'document_onfocus')
                         //addlistener doesnt work on rows since cloning rows doesnt clone listeners
                         //addeventlistener(element, 'click', 'onclickradiocheckbox')
-                        element.setAttribute('exodusonclick','yield* onclickradiocheckbox()')
+                        element.setAttribute('exodusonclick', 'yield* onclickradiocheckbox()')
                     }
 
                 }
@@ -417,12 +417,12 @@ function* formfunctions_onload() {
 
             }
 
-            var exodusdropdown=element.getAttribute('exodusdropdown')
+            var exodusdropdown = element.getAttribute('exodusdropdown')
             if (exodusdropdown) {
 
                 exodusassertobject(element, 'formfunctions_onload', 'element (exodusdropdown)')
-                if (typeof exodusdropdown=='string')
-                    exodusdropdown=exodusdropdown.split(fm)
+                if (typeof exodusdropdown == 'string')
+                    exodusdropdown = exodusdropdown.split(fm)
                 var request = exodusdropdown[0]
                 var colarray = exodusdropdown[1]
                 var noautoselection = exodusdropdown[2]
@@ -440,10 +440,10 @@ function* formfunctions_onload() {
 
                 //element.swapNode(t)
                 element.parentNode.replaceChild(selectelement, element)
-                selectelement.id=element.id
+                selectelement.id = element.id
 
                 //create all the options of the element
-                yield* exodussetdropdown(selectelement, 'CACHE\r'+request, colarray, '', noautoselection)
+                yield* exodussetdropdown(selectelement, 'CACHE\r' + request, colarray, '', noautoselection)
 
                 element = selectelement
                 //    element.innerHTML=element.innerHTML+' '
@@ -460,8 +460,8 @@ function* formfunctions_onload() {
                     typeof (element.getAttribute('exodusconversion')) == 'string'
                     &&
                     element.getAttribute('exodusconversion').slice(0, 1) == '['
-                   ) {
-                   //do nothing
+                ) {
+                    //do nothing
                 }
 
                 //conversion is an array of options
@@ -498,11 +498,11 @@ function* formfunctions_onload() {
                 !element.getAttribute('disabled')
                 &&
                 element.tagName && element.tagName == 'SELECT'
-               ) {
+            ) {
                 setdisabledandhidden(element, true)
             }
             //onchange for non-select elements (ie9+)
-            else if (element.tagName != 'SELECT' && typeof element.oninput!='undefined') {
+            else if (element.tagName != 'SELECT' && typeof element.oninput != 'undefined') {
                 addeventlistener(element, 'input', 'form_oninput')
             }
 
@@ -594,9 +594,9 @@ function* formfunctions_onload() {
                     //element.style.display = 'inline-block'
                     //perhaps we ought to be using <div>
                     //chrome and firefox produce different results with inline-block
-                    if (element.getAttribute('exoduspopup') || element.getAttribute('exoduslink')){
+                    if (element.getAttribute('exoduspopup') || element.getAttribute('exoduslink')) {
                         element.style.display = 'inline-block'
-  //                      element.style.float='left'
+                        //                      element.style.float='left'
                     } else
                         element.style.display = 'block'
                     //element.style.float='left'
@@ -642,15 +642,15 @@ function* formfunctions_onload() {
                 )
             ) {
                 if (typeof element.getAttribute('exoduspopup') == 'string'
-                        || element.tagName == 'SELECT') {
+                    || element.tagName == 'SELECT') {
                     //conversion is a routine eg [yield* exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
 
-                    element.style.verticalAlign='top'
+                    element.style.verticalAlign = 'top'
 
                     var element2 = document.createElement('img')
                     //add the button right before/after the field
                     element2.id = element.id + '_popup'
-//                    element2.style.float='left'
+                    //                    element2.style.float='left'
 
                     //ensure popup icon stays to the left of the input field
                     var nowrapper = document.createElement('span')
@@ -697,7 +697,7 @@ function* formfunctions_onload() {
                 else {
                     //conversion is a routine eg [yield* exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
 
-                    element.style.verticalAlign='top'
+                    element.style.verticalAlign = 'top'
 
                     var element2 = document.createElement('img')
                     //add the button right after the field
@@ -713,26 +713,26 @@ function* formfunctions_onload() {
                     //insertafter(element,element2)
                     element.parentNode.insertBefore(element2, element)
 
-/*
-                    //put nowrap flag on TD in 3 levels
-                    var td = element.parentNode
-                    if (element.tagName != 'SPAN') {
-                        if (td && td.tagName != 'TD') td = td.parentNode
-                        if (td && td.tagName != 'TD') td = td.parentNode
-                        if (td && td.tagName == 'TD') td.noWrap = true
-                    }
-
-                    if (Number(element.getAttribute('exodusgroupno')) && element.getAttribute('exodusalign') == 'R') {
-                        element.parentNode.insertBefore(element2, null)
-                    }
-                    else {
-                        element.parentNode.insertBefore(element2, element)
-                    }
-*/
+                    /*
+                                        //put nowrap flag on TD in 3 levels
+                                        var td = element.parentNode
+                                        if (element.tagName != 'SPAN') {
+                                            if (td && td.tagName != 'TD') td = td.parentNode
+                                            if (td && td.tagName != 'TD') td = td.parentNode
+                                            if (td && td.tagName == 'TD') td.noWrap = true
+                                        }
+                    
+                                        if (Number(element.getAttribute('exodusgroupno')) && element.getAttribute('exodusalign') == 'R') {
+                                            element.parentNode.insertBefore(element2, null)
+                                        }
+                                        else {
+                                            element.parentNode.insertBefore(element2, element)
+                                        }
+                    */
                     element2.src = glinkimage
                     //element2.style.border='solid 1px'
                     element2.style.verticalAlign = 'top'
-//                    element2.style.verticalAlign = 'middle'
+                    //                    element2.style.verticalAlign = 'middle'
                     element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
                     element2.style.cursor = 'pointer'
 
@@ -745,8 +745,8 @@ function* formfunctions_onload() {
             //add image element and hide element
             if (element.getAttribute('exodusimage')) {
                 var element2 = document.createElement('img')
-                element.parentNode.insertBefore(element2,element.nextSibling)
-                element.style.display='none'
+                element.parentNode.insertBefore(element2, element.nextSibling)
+                element.style.display = 'none'
             }
 
             //use the data field name as the id and name of the element
@@ -811,9 +811,9 @@ function* formfunctions_onload() {
                         CKEDITOR.config.autoGrow_minHeight = 100;
 
                         //CKEDITOR may not be ready until after first yield* opendoc2()
-                		CKEDITOR.on( 'instanceReady', function(event) {
-                			gCKEDITOR_EDITOR = event.editor
-                			gCKEDITOR_EDITOR.setReadOnly(!glocked)//also in yield* opendoc2() post read document_onfocus
+                        CKEDITOR.on('instanceReady', function (event) {
+                            gCKEDITOR_EDITOR = event.editor
+                            gCKEDITOR_EDITOR.setReadOnly(!glocked)//also in yield* opendoc2() post read document_onfocus
                         })
 
                         var verticalpercent = 100
@@ -824,9 +824,9 @@ function* formfunctions_onload() {
 
                         //http://docs.cksource.com/Talk:CKEditor_3.x/Developers_Guide
                         ockeditor = CKEDITOR.replace(element.id, {
-                        	extraPlugins: 'autogrow'
+                            extraPlugins: 'autogrow'
                             , autoGrow_maxHeight: 800
-//                            , autoGrow_minHeight: 100
+                            //                            , autoGrow_minHeight: 100
                         })
 
                         //element.id is passed as data on event to document_onfocus_sync
@@ -839,8 +839,8 @@ function* formfunctions_onload() {
                     else {
 
                         element.cols = element.size ? element.size : 30
-                        var exodusrows=element.getAttribute('exodusrows')
-                        if (exodusrows && exodusrows>1)
+                        var exodusrows = element.getAttribute('exodusrows')
+                        if (exodusrows && exodusrows > 1)
                             element.rows = exodusrows
                     }
                 }
@@ -851,10 +851,10 @@ function* formfunctions_onload() {
             //lower case
             if (!(element.getAttribute('exoduslowercase'))) {
                 if (element.tagName == 'SELECT'
-                        //exodus_dict_text(di) now sets lowercase true but can be removed
-                        //to allow capitalised flowing text eg ratecard columns
-                        //|| element.getAttribute('exodusalign') == 'T'
-                        || element.getAttribute('exodustype') == 'S') {
+                    //exodus_dict_text(di) now sets lowercase true but can be removed
+                    //to allow capitalised flowing text eg ratecard columns
+                    //|| element.getAttribute('exodusalign') == 'T'
+                    || element.getAttribute('exodustype') == 'S') {
                     element.setAttribute('exoduslowercase', true)
                 }
                 else {
@@ -942,10 +942,10 @@ function* formfunctions_onload() {
                     (
                         element.getAttribute('exodusrequired')
                         ||
-                        element.getAttribute('exodusfieldno')=='0'
+                        element.getAttribute('exodusfieldno') == '0'
                     )
-                //mark elements with default values as required even though probably no data entry if required
-                //&&!element.getAttribute('exodusdefaultvalue')
+                    //mark elements with default values as required even though probably no data entry if required
+                    //&&!element.getAttribute('exodusdefaultvalue')
                     && element.type != 'radio'
                     && element.type != 'checkbox'
                 ) {
@@ -1001,7 +1001,7 @@ function* formfunctions_onload() {
 
                 datasrcelements[datasrcelements.length] = element
 
-            //elements with group no - set the data source of repeating lines
+                //elements with group no - set the data source of repeating lines
             }
             else {
 
@@ -1036,25 +1036,25 @@ function* formfunctions_onload() {
                     element2.originalsrc = element2.src
                     element2.title = 'Sort by ' + element.getAttribute('exodustitle')
                     //addeventlistener(element2, 'click', 'sorttable')
-                    element2.setAttribute('exodusonclick','yield* sorttable(event)')
+                    element2.setAttribute('exodusonclick', 'yield* sorttable(event)')
                     element2.sorttableelementid = element.id
                     gsortimages[element.id] = element2
 
                 }
 
                 //any element can determine if emptyrows are allowed
-                if (temp=element.getAttribute('exodusallowemptyrows'))
-                    tablex.setAttribute('exodusallowemptyrows',temp)
+                if (temp = element.getAttribute('exodusallowemptyrows'))
+                    tablex.setAttribute('exodusallowemptyrows', temp)
 
                 //any element can determine if a row is required
-                if (temp=element.getAttribute('exodusrowrequired'))
-                    tablex.setAttribute('exodusrowrequired',temp)
+                if (temp = element.getAttribute('exodusrowrequired'))
+                    tablex.setAttribute('exodusrowrequired', temp)
 
                 //need to know the last data entry column
                 if (!element.getAttribute('exodusreadonly') && element.tagName.match(gdatatagnames)) {
                     //spans are only input if .isContentEditable
                     if (element.tagName != 'SPAN' || element.isContentEditable) {
-                        tablex.setAttribute('exoduslastinputcolscreenfn',element.getAttribute('exodusscreenfn'))
+                        tablex.setAttribute('exoduslastinputcolscreenfn', element.getAttribute('exodusscreenfn'))
                         //element.setAttribute('exodusislastinputcolumn',true)
                     }
                 }
@@ -1071,8 +1071,8 @@ function* formfunctions_onload() {
                         element.tagName != 'SPAN'
                         || element.isContentEditable
                     ) {
-                        tablex.setAttribute('exodusfirstinputcolscreenfn',element.getAttribute('exodusscreenfn'))
-                        element.setAttribute('exodusisfirstinputcolumn',true)
+                        tablex.setAttribute('exodusfirstinputcolscreenfn', element.getAttribute('exodusscreenfn'))
+                        element.setAttribute('exodusisfirstinputcolumn', true)
                     }
                 }
 
@@ -1102,15 +1102,15 @@ function* formfunctions_onload() {
                     gtables[groupno][gtables[groupno].length] = screenfn
 
                     //allow finding table element via groupno
-                    gtables[groupno].tablex=tablex
+                    gtables[groupno].tablex = tablex
 
                     function* maybe_remove_rowbutton(insertdelete) {
                         if (
-                            element.getAttribute('exodusno'+insertdelete+'row')
-                            && !tablex.getAttribute('no'+insertdelete+'row')
+                            element.getAttribute('exodusno' + insertdelete + 'row')
+                            && !tablex.getAttribute('no' + insertdelete + 'row')
                         ) {
-                            tablex.setAttribute('no'+insertdelete+'row',true)
-                            exodusremoveelementsbyid(insertdelete+'rowbutton' + groupno)
+                            tablex.setAttribute('no' + insertdelete + 'row', true)
+                            exodusremoveelementsbyid(insertdelete + 'rowbutton' + groupno)
                         }
                     }
 
@@ -1147,9 +1147,9 @@ function* formfunctions_onload() {
                     //TODO process tables after processing all fields
                     //add insert/delete buttons at the end instead of on the first table element discovered
                     if (element.getAttribute('exodusnoinsertrow'))
-                        tablex.setAttribute('noinsertrow','noinsertrow')
+                        tablex.setAttribute('noinsertrow', 'noinsertrow')
                     if (element.getAttribute('exodusnodeleterow'))
-                        tablex.setAttribute('nodeleterow','nodeleterow')
+                        tablex.setAttribute('nodeleterow', 'nodeleterow')
 
                     //      if (!tablex.className) tablex.className='exodusform'
                     //      tablex.border=1
@@ -1182,16 +1182,16 @@ function* formfunctions_onload() {
                     //if (!(exodusgetattribute(element,'exodusnoinsertrow')))
                     if (!(element.getAttribute('exodusnoinsertrow'))) {
                         t += '  <IMG id=insertrowbutton' + groupno
-                        + ' title="Insert a new row here ' + t2
-                        + '" exodusonclick="yield* insertrow_onclick(event)" src="' + ginsertrowimage
-                        + '" style="cursor:pointer;">'//: solid 1px">'
+                            + ' title="Insert a new row here ' + t2
+                            + '" exodusonclick="yield* insertrow_onclick(event)" src="' + ginsertrowimage
+                            + '" style="cursor:pointer;">'//: solid 1px">'
                     }
                     //if (!(exodusgetattribute(element,'exodusnodeleterow')))
                     if (!(element.getAttribute('exodusnodeleterow'))) {
                         t += '  <IMG id=deleterowbutton' + groupno
-                        + ' title="Delete this row ' + t3
-                        + '" exodusonclick="yield* deleterow_onclick(event)" src ="' + gdeleterowimage
-                        + '" style="cursor:pointer">'//: solid 1px">'
+                            + ' title="Delete this row ' + t3
+                            + '" exodusonclick="yield* deleterow_onclick(event)" src ="' + gdeleterowimage
+                            + '" style="cursor:pointer">'//: solid 1px">'
                     }
                     t += ' </span>'
                     var insertdeletebuttons = document.createElement('td')
@@ -1292,7 +1292,7 @@ function* formfunctions_onload() {
             for (var fieldn2 = 0; fieldn2 < gfields.length; fieldn2++) {
                 var field2 = gfields[fieldn2]
                 if (functioncode.indexOf('"' + field2.getAttribute('exodusname') + '"', 0) >= 0
- || functioncode.indexOf("'" + field2.getAttribute('exodusname') + "'", 0) >= 0) {
+                    || functioncode.indexOf("'" + field2.getAttribute('exodusname') + "'", 0) >= 0) {
                     var deps = field2.getAttribute('exodusdependents')
                     if (deps)
                         deps += ';'
@@ -1323,9 +1323,9 @@ function* formfunctions_onload() {
 
     //get copies of the gfields in case they are deleted from the document (eg table row 1 is deleted)
     for (var fieldn = 0; fieldn < gfields.length; fieldn++) {
-        var id=gfields[fieldn].id
+        var id = gfields[fieldn].id
         gfields[fieldn] = gfields[fieldn].cloneNode(false)
-        gfields[fieldn].id=id
+        gfields[fieldn].id = id
     }
 
     if (!gfirstnonkeyelement)
@@ -1355,7 +1355,7 @@ function* formfunctions_onload() {
 
     //wrap form buttons in a span so they align the same as the menu, logout and refresh buttons
     function menubuttonhtml2(id, imagesrc, name, title, accesskey, align) {
-        return '<span>'+menubuttonhtml(id, imagesrc, name, title, accesskey, align)+'</span>'
+        return '<span>' + menubuttonhtml(id, imagesrc, name, title, accesskey, align) + '</span>'
     }
 
     //bound form buttons NEW/OPEN/EDIT-RELEASE
@@ -1411,14 +1411,14 @@ function* formfunctions_onload() {
 
     //a span to keep the ok and cancel buttons side by side
     if (!gKeyNodes)
-        buttonhtml='<span style="white-space:nowrap">'+buttonhtml+'</span>'
+        buttonhtml = '<span style="white-space:nowrap">' + buttonhtml + '</span>'
 
     //a separator span to keep the ok and cancel buttons from overlapping a floating div
-    if (!gKeyNodes&&$$('autofitwindowelement'))
-        buttonhtml='<div style="clear:both">&nbsp;</div>'+buttonhtml
+    //if (!gKeyNodes && $$('autofitwindowelement'))
+    //    buttonhtml = '<div style="clear:both">&nbsp;</div>' + buttonhtml
 
     //create the button rank and insert it into the form
-    var formbuttons=document.createElement(gKeyNodes?'SPAN':'DIV')
+    var formbuttons = document.createElement(gKeyNodes ? 'SPAN' : 'DIV')
     if (gKeyNodes) {
         formbuttons.style.padding = 0;
         formbuttons.style.margin = 0;
@@ -1454,15 +1454,19 @@ function* formfunctions_onload() {
         //NB there is no float "center"
         //formbuttons.style.textAlign = 'center'
         //style="margin-left: auto; margin-right: auto; float: left"
-        formbuttons.setAttribute('align','center')
+        formbuttons.setAttribute('align', 'center')
         //padding is required because graphic button has VERY LITTLE padding for some reason
-        formbuttons.style.paddingTop='12px'
-        formbuttons.style.paddingBottom='12px'
+        formbuttons.style.paddingTop = '12px'
+        formbuttons.style.paddingBottom = '12px'
 
-	//form buttons (save/ok etc.) at the bottom
+        //form buttons (save/ok etc.) at the bottom
         document.body.insertBefore(formbuttons, null)//document.body.firstChild)
+        //var wholepage = document.getElementById('autofitwindowelement')
+        //if (!wholepage)
+        //    wholepage = document.body
+        //wholepage.insertBefore(formbuttons, null)//document.body.firstChild)
 
-//alert(formbuttons.parentNode.innerHTML)
+        //alert(formbuttons.parentNode.innerHTML)
     }
     formbuttons.id = 'formbuttonsdiv'
     //formbuttons.style.float='left'
@@ -1471,11 +1475,11 @@ function* formfunctions_onload() {
 
     //make global variables to correspond to the buttons
     //to provide backward compatibility with IE code which can refer to document elements like global variables
-    var buttonnames=['new','open','editrelease','save','close','delete','copy','list','printsend','first','last','select','next','previous']
-    for (var buttonn=0;buttonn<buttonnames.length;++buttonn) {
-        buttonname=buttonnames[buttonn]+'record'
-        buttonelement=$$(buttonname+'button')
-        window[buttonname]=buttonelement
+    var buttonnames = ['new', 'open', 'editrelease', 'save', 'close', 'delete', 'copy', 'list', 'printsend', 'first', 'last', 'select', 'next', 'previous']
+    for (var buttonn = 0; buttonn < buttonnames.length; ++buttonn) {
+        buttonname = buttonnames[buttonn] + 'record'
+        buttonelement = $$(buttonname + 'button')
+        window[buttonname] = buttonelement
     }
 
     //program the various buttons to be visible when enabled
@@ -1533,11 +1537,11 @@ function* formfunctions_onload() {
     }
     //hide the open button if no openfunction
     if (openfunction) {
-        openrecord.setAttribute('exoduspopup',openfunction)
+        openrecord.setAttribute('exoduspopup', openfunction)
         openrecord.style.display = ''
     }
     else if (openrecord)
-            openrecord.style.display = 'none'
+        openrecord.style.display = 'none'
 
     //remove record orientated buttons if no key fields
     if (!gKeyNodes) {
@@ -1631,11 +1635,11 @@ function* formfunctions_onload() {
     wstatus('')
 
     //yielding code cannot stop to ask questions in onbeforeunload
-    window.onbeforeunload=window_onbeforeunload_sync
+    window.onbeforeunload = window_onbeforeunload_sync
 
     //unstoppable - unlocks gkey if glocked
     //addeventlistener(window, 'unload', 'window_onunload')
-    window.onunload=window_onunload_sync
+    window.onunload = window_onunload_sync
 
     addeventlistener(document, 'keydown', 'document_onkeydown')
     //to prevent ctrl+N opening documents in not msie browsers but kills enter key in msie for some reason
@@ -1732,7 +1736,7 @@ function* setfirstlastcolumn(groupno) {
             !gfields[screenfn].getAttribute('exodusreadonly')
             && exodusenabledandvisible(gfields[screenfn].id)
         )
-            tablex.setAttribute('exoduslastinputcolscreenfn',screenfn)
+            tablex.setAttribute('exoduslastinputcolscreenfn', screenfn)
     }
 
 }
@@ -1831,11 +1835,11 @@ function* element_exodussetdropdown(element, request, noautoselection) {
 
 //be careful this is a sync function without _sync in name so only convert exodus3 to exodus2
 //or add this function name to the list of functions that dont require yield if converting exodus2 to exodus3
-function setgpreviouselement(element,value) {
+function setgpreviouselement(element, value) {
 
     if (!element) {
-        gpreviouselement=null
-        gpreviousvalue=''
+        gpreviouselement = null
+        gpreviousvalue = ''
         return
     }
 
@@ -1845,15 +1849,15 @@ function setgpreviouselement(element,value) {
         gpreviouselement = element
 
     //handle unusual case that if focused on OPTION instead of SELECT eg from newrecordfocus()
-    if (gpreviouselement.tagName=='OPTION')
-        gpreviouselement=gpreviouselement.parentNode
+    if (gpreviouselement.tagName == 'OPTION')
+        gpreviouselement = gpreviouselement.parentNode
 
     //set gpreviousvalue as well
-    if (typeof value=='undefined') {
+    if (typeof value == 'undefined') {
         //assumes grecn set if mv element
-        gpreviousvalue=getvalue(gpreviouselement)
+        gpreviousvalue = getvalue(gpreviouselement)
     } else
-        gpreviousvalue=value
+        gpreviousvalue = value
 }
 
 function* newrecordfocus() {
@@ -1946,7 +1950,7 @@ function* gds_onreadystatechange() {
 
 function* tablex_onreadystatechange(event) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     //if need to focus on a table field then
     //do it when the table is complete
@@ -1963,7 +1967,7 @@ function* tablex_onreadystatechange(event) {
 
 function* printsendrecord_onclick(event) {
 
-    event=getevent(event)
+    event = getevent(event)
     exoduscancelevent(event)
 
     //work out the print function else return
@@ -1976,7 +1980,7 @@ function* printsendrecord_onclick(event) {
     printfunction = printfunction.replace(/%KEY%/gi, gkey)
     //alert('DEBUG: saoc')
     yield* validateupdate()
-    if (gchangesmade&&!(yield* saveandorcleardoc('PRINT'))) {
+    if (gchangesmade && !(yield* saveandorcleardoc('PRINT'))) {
         focusongpreviouselement()
         return
     }
@@ -1988,7 +1992,7 @@ function* printsendrecord_onclick(event) {
 
 function* listrecord_onclick(event) {
 
-    event=getevent(event)
+    event = getevent(event)
     exoduscancelevent(event)
 
     //work out the print function else return
@@ -2006,8 +2010,8 @@ function* listrecord_onclick(event) {
 //'WINDOW ONBEFORE UNLOAD
 //'''''''''''''''''''''''
 function window_onbeforeunload_sync(event) {
-    var result=window_onbeforeunload2_sync(event)
-    console.log('onbeforeunload returning '+result)
+    var result = window_onbeforeunload2_sync(event)
+    console.log('onbeforeunload returning ' + result)
     return result
 }
 
@@ -2022,13 +2026,13 @@ function window_onbeforeunload2_sync(event) {
     //persuade user to cancel unload if any request is pending
     if (db.requesting) {
         if (event.preventDefault)
-            event.preventDefault() 
+            event.preventDefault()
         return '!!! WAITING FOR REQUEST TO COMPLETE !!!'
 
-    //persuade user to cancel unload if any unsaved changes
+        //persuade user to cancel unload if any unsaved changes
     } else if (glocked && gchangesmade) {
         if (event.preventDefault)
-            event.preventDefault() 
+            event.preventDefault()
         return '!!! YOU HAVE NOT SAVED YOUR DATA !!!'
     }
 
@@ -2051,13 +2055,13 @@ function window_onunload_sync() {
     console.log('---------- WINDOW_ONUNLOAD SYNC ----------')
 
     //ensure any unlocking is synchronous - which seems to reach server, unlike async xmlhttp
-    gonunload=true
+    gonunload = true
 
     if (!ginitok)
         return
 
     //save gdataset in case we are refreshing and the parent window isnt there to get it from
-    exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')    
+    exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
     //unlock any document before unloading
     //using .next() instead of yield* to call async code
@@ -2065,18 +2069,18 @@ function window_onunload_sync() {
 
         //Save unlock request for following window to perform hopefully
         //in case following code doesnt successfully unlock its record in onbeforeunload
-        var pending=['UNLOCK',gro.filename,gkey,gro.sessionid].join('\r')
-        exodussetcookie(glogincode, 'EXODUSpending',pending)
+        var pending = ['UNLOCK', gro.filename, gkey, gro.sessionid].join('\r')
+        exodussetcookie(glogincode, 'EXODUSpending', pending)
 
-        console.log('trying to unlock '+gkey+' immediately but async request doesnt seem to reach server reliably while unloading')
+        console.log('trying to unlock ' + gkey + ' immediately but async request doesnt seem to reach server reliably while unloading')
         //yield* unlockdoc()
-        var result=unlockdoc()
+        var result = unlockdoc()
         if (result.next)
             result.next()
 
-    //or cancel any pending request
+        //or cancel any pending request
     } else if (gxhttp && gxhttp.status != 200) {
-//        gxhttp.abort()
+        //        gxhttp.abort()
     }
 
 }
@@ -2085,38 +2089,38 @@ function window_onunload_sync() {
 
 function* document_onclick(event) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     if (!event.target.getAttribute) {
-        console.log('yield* document_onclick() missing event.target or event.target.getAttribute() '+event)
+        console.log('yield* document_onclick() missing event.target or event.target.getAttribute() ' + event)
         return
     }
 
-    if (event.target&&event.target.getAttribute)
+    if (event.target && event.target.getAttribute)
         grecn = getrecn(event.target)
 
-   ///log('document_onclick ' + event.target.id)
+    ///log('document_onclick ' + event.target.id)
 
     var result
 
     if (event.target.getAttribute('isexoduspopup'))
-        result=yield*  exoduspopup(event)
+        result = yield* exoduspopup(event)
 
     else if (event.target.getAttribute('isexoduslink'))
-        result=yield* exoduslink(event)
+        result = yield* exoduslink(event)
 
     //call the first exodusonclick expression found in element then parents
-    var target=event.target
+    var target = event.target
     do {
-        var onclickexpression=target.getAttribute('exodusonclick')
-        target=target.parentNode
-    } while (!onclickexpression&&target&&target.parentNode&&target.parentNode.getAttribute)
+        var onclickexpression = target.getAttribute('exodusonclick')
+        target = target.parentNode
+    } while (!onclickexpression && target && target.parentNode && target.parentNode.getAttribute)
     if (onclickexpression) {
         //replace trailing "()" with "(event)" to pass event
         //simulating how document.onclick="funcx()" passes event into funcx()
         //exodusevaluate3 will then be able to arrange that
         // the noclick function can refer to the event variable
-        result=yield* exodusevaluate(onclickexpression.replace(/\(\)$/,'(event)'),null,'event',event)
+        result = yield* exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
     }
 
     //logout('document_onclick ' + event.target.id)
@@ -2125,34 +2129,34 @@ function* document_onclick(event) {
 }
 
 function* tabit2() {
-            var element=gpreviouselement
-            //older defacto ff/chrome/ie9+ (createEvent/initMousEvent+dispatchEvent)
-            if (document.createEventxxx) {
-                //mozilla http://developer.mozilla.org/en/docs/DOM:event.initMouseEvent
-                var eventx = document.createEvent("KeyboardEvent");
-                form_blockevents(false,'tabit2')
-                var modifiers=''
-                //if (event.shiftKey)
-                //    modifiers+=' Shift'
-                eventx.initKeyboardEvent('keydown', true, true, window, 9, 0, modifiers)//, repeat, locale);
-                var cancelled = !element.dispatchEvent(eventx);
-                form_blockevents(true,'tabit2')
-            }
-            //newer standard in ff/chrome and win10 (new MouseEvent+despatchEvent)
-            else if (typeof KeyboardEvent!='undefined') {
-                var eventx = new KeyboardEvent('keydown', {
-                'view': window,
-                'bubbles': true,
-                'cancelable': true,
-                'keyCode': 9
-                });
-                form_blockevents(false,'tabit2')
-                var cancelled = !element.dispatchEvent(eventx);
-                form_blockevents(true,'tabit2')
-            //older msie pre 9?
-            } else
-                focusdirection(direction, element, notgroupno)
-        }
+    var element = gpreviouselement
+    //older defacto ff/chrome/ie9+ (createEvent/initMousEvent+dispatchEvent)
+    if (document.createEventxxx) {
+        //mozilla http://developer.mozilla.org/en/docs/DOM:event.initMouseEvent
+        var eventx = document.createEvent("KeyboardEvent");
+        form_blockevents(false, 'tabit2')
+        var modifiers = ''
+        //if (event.shiftKey)
+        //    modifiers+=' Shift'
+        eventx.initKeyboardEvent('keydown', true, true, window, 9, 0, modifiers)//, repeat, locale);
+        var cancelled = !element.dispatchEvent(eventx);
+        form_blockevents(true, 'tabit2')
+    }
+    //newer standard in ff/chrome and win10 (new MouseEvent+despatchEvent)
+    else if (typeof KeyboardEvent != 'undefined') {
+        var eventx = new KeyboardEvent('keydown', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': true,
+            'keyCode': 9
+        });
+        form_blockevents(false, 'tabit2')
+        var cancelled = !element.dispatchEvent(eventx);
+        form_blockevents(true, 'tabit2')
+        //older msie pre 9?
+    } else
+        focusdirection(direction, element, notgroupno)
+}
 
 /*
 function* document_onkeypress(event) {
@@ -2191,73 +2195,73 @@ function* document_onkeydown(event) {
 
 function* document_onkeydown2(event) {
 
-/*
-8   	Backspace
-9   	Tab
-13  	Enter
-16  	Shift
-17  	Ctrl
-18  	Alt
-19  	Pause, Break
-20  	CapsLock
-27  	Esc
-32  	Space
-33  	Page Up/PgUp
-34  	Page Down/PgDn
-35  	End
-36  	Home
-37  	Left arrow
-38  	Up arrow
-39  	Right arrow
-40  	Down arrow
-38  	Up arrow
-39  	Right arrow
-40  	Down arrow
-44  	PrntScrn
-45	    Insert
-46	    Delete
-48-57	0 to 9
-96-105	0-9 on Numpad
-65-90	A to Z
-91	    WIN Key (Start)
-93	    WIN Menu
-112-123	F1 to F12
-144	    NumLock
-145	    ScrollLock
+    /*
+    8   	Backspace
+    9   	Tab
+    13  	Enter
+    16  	Shift
+    17  	Ctrl
+    18  	Alt
+    19  	Pause, Break
+    20  	CapsLock
+    27  	Esc
+    32  	Space
+    33  	Page Up/PgUp
+    34  	Page Down/PgDn
+    35  	End
+    36  	Home
+    37  	Left arrow
+    38  	Up arrow
+    39  	Right arrow
+    40  	Down arrow
+    38  	Up arrow
+    39  	Right arrow
+    40  	Down arrow
+    44  	PrntScrn
+    45	    Insert
+    46	    Delete
+    48-57	0 to 9
+    96-105	0-9 on Numpad
+    65-90	A to Z
+    91	    WIN Key (Start)
+    93	    WIN Menu
+    112-123	F1 to F12
+    144	    NumLock
+    145	    ScrollLock
+    
+    188	    , <
+    190	    . >
+    46	    . on Numpad
+    191	    / ?
+    192 	~
+    219	    [ {
+    220	    \ |
+    221	    ] }
+    222	    ' "
+    
+    Numpad
+    45	    Ins
+    35  	End
+    40  	Down
+    34  	PgDown
+    37  	Left
+    101/12	5
+    39  	Right
+    36  	Home
+    38  	Up
+    33  	PgUp
+    106 	*
+    107 	+
+    109 	-
+    110/46	. Del
+    111     /
+    */
 
-188	    , <
-190	    . >
-46	    . on Numpad
-191	    / ?
-192 	~
-219	    [ {
-220	    \ |
-221	    ] }
-222	    ' "
-
-Numpad
-45	    Ins
-35  	End
-40  	Down
-34  	PgDown
-37  	Left
-101/12	5
-39  	Right
-36  	Home
-38  	Up
-33  	PgUp
-106 	*
-107 	+
-109 	-
-110/46	. Del
-111     /
-*/
-
-    event=getevent(event)
+    event = getevent(event)
     var keycode = event.keyCode ? event.keyCode : event.which
-    console.log('onkeydown '+keycode)
+    console.log('onkeydown ' + keycode)
 
-   ///log('document_onkeydown ' + event.target.id + ' ' + keycode)
+    ///log('document_onkeydown ' + event.target.id + ' ' + keycode)
 
     //no processing if not initialised
     if (!ginitok)
@@ -2362,8 +2366,8 @@ Numpad
             //older msie pre 9?
             } else
             */
-                exodussettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
-                //menubutton.click()
+            exodussettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
+            //menubutton.click()
         }
         //was done by accesskeys on hidden buttons but firefox requires shift+alt for access
         // unless configure http://kb.mozillazine.org/Ui.key.contentAccess
@@ -2410,7 +2414,7 @@ Numpad
     }
 
     //alt+^ is select record
-    if (keycode ==  54 && event.altKey && event.shiftKey) {
+    if (keycode == 54 && event.altKey && event.shiftKey) {
         exodussettimeout('yield* selectrecord_onclick()', 1)
         return exoduscancelevent(event)
     }
@@ -2466,7 +2470,7 @@ Numpad
         if (temp && (temp.outerHTML || temp.innerHTML)) {
             var windowx = yield* windowopen()
             if (windowx)
-            //windowx.document.body.innerText=decodehtmlcodes(temp.outerHTML?temp.outerHTML:temp.innerHTML)
+                //windowx.document.body.innerText=decodehtmlcodes(temp.outerHTML?temp.outerHTML:temp.innerHTML)
                 windowx.document.body.innerHTML = encodehtmlcodes(temp.outerHTML ? temp.outerHTML : temp.innerHTML)
         }
 
@@ -2480,8 +2484,8 @@ Numpad
 
         //internet explorer
         if (document.selection
-         && document.selection.createRange
-         && (textrange = document.selection.createRange()).text != '') {
+            && document.selection.createRange
+            && (textrange = document.selection.createRange()).text != '') {
             textrange.collapse(false)
             textrange.select()
             return exoduscancelevent(event)
@@ -2489,21 +2493,21 @@ Numpad
 
         //.selectionStart throws and error on ff/chrome/standard on radio/checkbox etc
         //works on INPUT text only
-        if (element.type=='text') {
+        if (element.type == 'text') {
             try {
-                var selectionStart=element.selectionStart
+                var selectionStart = element.selectionStart
             } catch (e) {
-                var selectionStart=false
+                var selectionStart = false
             }
-            if (typeof selectionStart=='number') {
+            if (typeof selectionStart == 'number') {
                 //select nothing if anything selected
-                if (element.selectionStart!=element.selectionEnd) {
-                    element.selectionStart=element.selectionEnd
-                    element.selectionEnd=document.activeElement.selectionStart
-                //select all if nothing selected
+                if (element.selectionStart != element.selectionEnd) {
+                    element.selectionStart = element.selectionEnd
+                    element.selectionEnd = document.activeElement.selectionStart
+                    //select all if nothing selected
                 } else {
-                    element.selectionStart=0
-                    element.selectionEnd=999999999
+                    element.selectionStart = 0
+                    element.selectionEnd = 999999999
                 }
                 return exoduscancelevent(event)
             }
@@ -2632,9 +2636,9 @@ Numpad
 
         //get the rown else exit
         //if (ggroupno > 0) {
-            var rown = rowx.rowIndex
-            if (tablex.tHead)
-                rown -= tablex.tHead.rows.length
+        var rown = rowx.rowIndex
+        if (tablex.tHead)
+            rown -= tablex.tHead.rows.length
         //}
 
         //get the recordset
@@ -2652,8 +2656,8 @@ Numpad
         var pagen = exodusint(grecn / pagesize)
         var npages = Math.ceil((rs.length) / pagesize)
 
-        var tablex_firstinputcolscreenfn=form_getfirstinputcolscreenfn(tablex)
-        var tablex_lastinputcolscreenfn=form_getlastinputcolscreenfn(tablex)
+        var tablex_firstinputcolscreenfn = form_getfirstinputcolscreenfn(tablex)
+        var tablex_lastinputcolscreenfn = form_getlastinputcolscreenfn(tablex)
 
     }
 
@@ -2668,7 +2672,7 @@ Numpad
             if (elements && elements.tagName)
                 elements = [elements]
 
-            var reply = window.prompt('Go to line number ? (1-' + elements.length + ')',grecn + 1)
+            var reply = window.prompt('Go to line number ? (1-' + elements.length + ')', grecn + 1)
             if (!reply)
                 break
 
@@ -2698,18 +2702,18 @@ Numpad
     //ctrl+home 36 = first col, first row (top left)
     //ctrl+end  35 = last col, last row (bottom right)
     if (tablex && (keycode == 36 || keycode == 35) && event.ctrlKey && !event.shiftKey && !event.altKey) {
-        if (keycode==36) {
+        if (keycode == 36) {
             var id = gfields[tablex_firstinputcolscreenfn].id
-            var startrown=0
-            var increment=1
+            var startrown = 0
+            var increment = 1
         } else {
             var id = gfields[tablex_lastinputcolscreenfn].id
-            var startrown=grows.length-1
-            var increment=-1
+            var startrown = grows.length - 1
+            var increment = -1
         }
         //work forwards from first to last row, or backwards from last to first row, looking for a visible row to focus on
-        for (var ii=startrown;ii>=0 && ii<grows.length;ii+=increment) {
-            var element=grows[ii].exodusfields[id]
+        for (var ii = startrown; ii >= 0 && ii < grows.length; ii += increment) {
+            var element = grows[ii].exodusfields[id]
             if (exodusenabledandvisible(element)) {
                 focuson(element)
                 break
@@ -2733,14 +2737,14 @@ Numpad
             event.keyCode = keycode
         } else {
             //.selectionStart throws and error on ff/chrome/standard on radio/checkbox etc
-            try {var selectionStart=element.selectionStart} catch (e) {var selectionStart=false}
+            try { var selectionStart = element.selectionStart } catch (e) { var selectionStart = false }
             if (typeof selectionStart == 'number' && element.selectionStart == 0 && element.selectionEnd == element.value.length) {
                 keycode = 9
                 event.keyCode = keycode
             }
         }
-        if (event.keyCode!=keycode) {
-            var direction=event.shiftKey*-2+1
+        if (event.keyCode != keycode) {
+            var direction = event.shiftKey * -2 + 1
             focusdirection(direction, element)
             return exoduscancelevent(event)
         }
@@ -2757,11 +2761,11 @@ Numpad
             //on last column - add a row
             //exodusfirstinputcolscreenfn
             var firstcolelement = rowx.exodusfields[gfields[gtables[ggroupno][0]].id]
-            if (   (glocked|| !gKeyNodes)
-                   //&& element.getAttribute('exodusscreenfn') == tablex.getAttribute('exoduslastinputcolscreenfn')
-                   && element.getAttribute('exodusscreenfn') == tablex_lastinputcolscreenfn
-                   && getvalue(firstcolelement) != ''
-                ) {
+            if ((glocked || !gKeyNodes)
+                //&& element.getAttribute('exodusscreenfn') == tablex.getAttribute('exoduslastinputcolscreenfn')
+                && element.getAttribute('exodusscreenfn') == tablex_lastinputcolscreenfn
+                && getvalue(firstcolelement) != ''
+            ) {
                 if (glocked || !gKeyNodes) {
                     //exodusaddrow(ggroupno)
                     if (!(yield* form_insertrow(event, true)))
@@ -2787,12 +2791,12 @@ Numpad
         //ctrl+enter or enter with single field is ok/save record
         //if (event.ctrlKey||(gfields.length==1&&Number(gfields[0].getAttribute('exodusgroupno'))))
         if (event.ctrlKey
-             || (
-                    !Number(element.getAttribute('exodusgroupno'))
-                    && gfinalinputelement
-                    && gfinalinputelement.id == gstartelement.id
-                )
-            ) {
+            || (
+                !Number(element.getAttribute('exodusgroupno'))
+                && gfinalinputelement
+                && gfinalinputelement.id == gstartelement.id
+            )
+        ) {
             if (!(saverecord.getAttribute('disabled'))) {
                 //yield* savedoc()
                 yield* saverecord_onclick()
@@ -2811,35 +2815,35 @@ Numpad
             focusdirection(-1, element)
             return exoduscancelevent(event)
         }
-/*
-        var keyEvt = document.createEvent("KeyboardEvent");
-        if (keyEvt.initKeyEvent){
-            //mozilla deprecated
-            keyEvt.initKeyEvent(
-                "keydown",   //event type
-                true,       //bubbled
-                true,       //cancelable
-                null,       //viewArg
-                event.ctrlKey,
-                event.altKey,
-                event.shiftKey,
-                false,      //metaKeyArg
-                keycode,    //virtual keycode of depressed key else 0
-                0           //unicode of depressed key if any else 0
-                );
-            gonkeydown=false
-            element.dispatchEvent(keyEvt);
-            keyEvt.stopPropagation;
-        } else if (keyEvt.initKeyboardEvent){
-                      // Safari?
-        }
-*/
+        /*
+                var keyEvt = document.createEvent("KeyboardEvent");
+                if (keyEvt.initKeyEvent){
+                    //mozilla deprecated
+                    keyEvt.initKeyEvent(
+                        "keydown",   //event type
+                        true,       //bubbled
+                        true,       //cancelable
+                        null,       //viewArg
+                        event.ctrlKey,
+                        event.altKey,
+                        event.shiftKey,
+                        false,      //metaKeyArg
+                        keycode,    //virtual keycode of depressed key else 0
+                        0           //unicode of depressed key if any else 0
+                        );
+                    gonkeydown=false
+                    element.dispatchEvent(keyEvt);
+                    keyEvt.stopPropagation;
+                } else if (keyEvt.initKeyboardEvent){
+                              // Safari?
+                }
+        */
         keycode = 9
         event.keyCode = keycode
 
         //setting keyCode is only allowed on msie
         //if (!document.all && !event.ctrlKey) {
-        if (event.keyCode!=keycode) {
+        if (event.keyCode != keycode) {
             var notgroupno
             if (event.shiftKey)
                 direction = -1
@@ -2847,11 +2851,11 @@ Numpad
                 direction = 1
                 //enter on first column if required and no default skips (TODO and not rowrequired) first field after the table)
                 if (ggroupno
-                    &&element.getAttribute('exodusrequired')
-                    &&element.getAttribute('exodusscreenfn')==tablex_firstinputcolscreenfn
-                    &&!getvalue(element)
-                   ){
-                   notgroupno=ggroupno
+                    && element.getAttribute('exodusrequired')
+                    && element.getAttribute('exodusscreenfn') == tablex_firstinputcolscreenfn
+                    && !getvalue(element)
+                ) {
+                    notgroupno = ggroupno
                 }
             }
 
@@ -2871,7 +2875,7 @@ Numpad
         return true
 
     //left arrow, right arrow, up arrow, down arrow on radio or SELECT all handled by browser
-    if (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40 ) {
+    if (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40) {
         if (element.type && element.type == 'radio')
             return true
         if (element.tagName == 'SELECT')
@@ -2888,7 +2892,7 @@ Numpad
 
     function onkeydown_allisselected(element) {
 
-        var text=getvalue(element)
+        var text = getvalue(element)
 
         //empty field is considered as all selected
         if (!text)
@@ -2899,31 +2903,31 @@ Numpad
         //try {var selectionStart=element.selectionStart} catch (e) {var selectionStart=false}
         //if (selectionStart) {
         if (typeof element.selectionStart == 'number') {
-            if (element.selectionStart!=0 || element.selectionEnd!=text.length)
+            if (element.selectionStart != 0 || element.selectionEnd != text.length)
                 return false
 
-        //msie (doesnt work on spans?)
+            //msie (doesnt work on spans?)
         } else if (document.selection) {
             //var textrange = document.selection.createRange()
             //var textrange=document.forms[0].selection.createRange()
-//            alert(document.selection.createRange().text+' ... '+text)
-            if (document.selection.createRange().text.replace(/[\r\n]/g,'') != text.replace(/[\r\n]/g,''))
+            //            alert(document.selection.createRange().text+' ... '+text)
+            if (document.selection.createRange().text.replace(/[\r\n]/g, '') != text.replace(/[\r\n]/g, ''))
                 return false
 
-        //standard spans firefox/chrome
+            //standard spans firefox/chrome
         } else if (window.getSelection) {
-//        alert('z')
+            //        alert('z')
             //anchorOffset: 3, focusNode: #text "sdvsdvsdv ", focusOffset: 7, isCollapsed: false
-            var selection=window.getSelection()
+            var selection = window.getSelection()
 
-//            if (selection.toString && selection.text.replace(/[\r\n]/g,'') == text.replace(/[\r\n]/g,'')) {
-            if (selection.toString && selection.toString().replace(/[\r\n]/g,'') == text.replace(/[\r\n]/g,'')) {
+            //            if (selection.toString && selection.text.replace(/[\r\n]/g,'') == text.replace(/[\r\n]/g,'')) {
+            if (selection.toString && selection.toString().replace(/[\r\n]/g, '') == text.replace(/[\r\n]/g, '')) {
                 return true
             }
 
             //this doesnt seem to work
-//            alert(selection.isCollapsed + ' : ' + selection.getRangeAt(0).startOffset  + ' : ' +  selection.getRangeAt(0).endOffset + ' : ' + selection.rangeCount + ' : ' + text.length)
-            if (selection.isCollapsed || selection.getRangeAt(0).startOffset!=0 || selection.getRangeAt(0).endOffset!=text.length)
+            //            alert(selection.isCollapsed + ' : ' + selection.getRangeAt(0).startOffset  + ' : ' +  selection.getRangeAt(0).endOffset + ' : ' + selection.rangeCount + ' : ' + text.length)
+            if (selection.isCollapsed || selection.getRangeAt(0).startOffset != 0 || selection.getRangeAt(0).endOffset != text.length)
                 return false
 
         }
@@ -2956,8 +2960,8 @@ Numpad
 
     //up down in multiline text treated normally - up and down in the text
     if ((keycode == 38 || keycode == 40) && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-            if (!onkeydown_allisselected(element) && getvalue(element).indexOf('\n')>=0)
-                return
+        if (!onkeydown_allisselected(element) && getvalue(element).indexOf('\n') >= 0)
+            return
     }
 
     //up down keys outside a table are like left/right
@@ -3064,7 +3068,7 @@ Numpad
         }
 
         //pgup or up arrow
-        if (keycode == 33 || (keycode == 38  && !event.ctrlKey && !event.shiftKey && !event.altKey)) {
+        if (keycode == 33 || (keycode == 38 && !event.ctrlKey && !event.shiftKey && !event.altKey)) {
 
             //ctrl+pgup or up (sadly not since reserved by firefox to change tabs
             //goes to first line of first page
@@ -3078,8 +3082,8 @@ Numpad
                 if (rown > 0) {
                     //up
                     if (keycode == 38) {
-                        var newrown=rown-1
-                        while (newrown>0 && !exodusenabledandvisible(grows[newrown])) {
+                        var newrown = rown - 1
+                        while (newrown > 0 && !exodusenabledandvisible(grows[newrown])) {
                             newrown--
                         }
                         focuson(grows[newrown].exodusfields[id])
@@ -3119,8 +3123,8 @@ Numpad
 
     //following are all keycodes when within tabular rows section
     //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    if (event.altKey&&event.ctrlKey&&keycode==18)
-     return true
+    if (event.altKey && event.ctrlKey && keycode == 18)
+        return true
 
     //Ctrl+N is insert row only in rows
     // with or without shift
@@ -3148,13 +3152,13 @@ Numpad
 
     //protect readonly fields
     if (!(event.altKey || event.ctrlKey)
-         && (element.getAttribute('exodusreadonly')
-         || (gKeyNodes
-         && !glocked
-         && element
-         && element.getAttribute('exodusfieldno')
-         && element.getAttribute('exodusfieldno') != 0
-         ))) {
+        && (element.getAttribute('exodusreadonly')
+            || (gKeyNodes
+                && !glocked
+                && element
+                && element.getAttribute('exodusfieldno')
+                && element.getAttribute('exodusfieldno') != 0
+            ))) {
         if (![9, 16, 17, 18, 20, 35, 36, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123].exoduslocate(keycode)) {
             exoduscancelevent(event)
             if (gKeyNodes && !glocked) {
@@ -3172,14 +3176,14 @@ Numpad
 //return the first or last enabled and visible input exodusscreenfn given a table element
 //or the precalculated ones if none
 function form_getlastinputcolscreenfn(tablex) {
-    return form_getfirstinputcolscreenfn(tablex,true)
+    return form_getfirstinputcolscreenfn(tablex, true)
 }
-function form_getfirstinputcolscreenfn(tablex,last) {
-    var groupno=tablex.getAttribute('exodusgroupno')
-    var sfns=gtables[groupno]
+function form_getfirstinputcolscreenfn(tablex, last) {
+    var groupno = tablex.getAttribute('exodusgroupno')
+    var sfns = gtables[groupno]
     var sfn
-    for (var ii=0;ii<sfns.length;++ii) {
-        var element=gfields[sfns[ii]]
+    for (var ii = 0; ii < sfns.length; ++ii) {
+        var element = gfields[sfns[ii]]
 
         //skip non-input elements
         if (!element.getAttribute('exodusfieldno') || element.getAttribute('exodusreadonly') || !element.tagName.match(gdatatagnames))
@@ -3187,7 +3191,7 @@ function form_getfirstinputcolscreenfn(tablex,last) {
 
         //capture only enabled and visible elements
         if (exodusenabledandvisible(element)) {
-            sfn=sfns[ii]
+            sfn = sfns[ii]
             //if first then skip out as soon as found one
             if (!last)
                 return sfn
@@ -3199,7 +3203,7 @@ function form_getfirstinputcolscreenfn(tablex,last) {
         return sfn
 
     //otherwise return the precalculated defaults
-    return tablex.getAttribute(last?'exoduslastinputcolscreenfn':'exodusfirstinputcolscreenfn')
+    return tablex.getAttribute(last ? 'exoduslastinputcolscreenfn' : 'exodusfirstinputcolscreenfn')
 }
 
 //checks and blocks if document is readonly
@@ -3229,16 +3233,16 @@ function focusdirection(direction, element, notgroupno, scopex) {
     if (!nextelement) {
         //if (!window.event) return
         if (gevent)
-            nextelement=gevent.target
+            nextelement = gevent.target
         if (!nextelement)
             return
     }
     // if (!element) return
     var elementtabindex = nextelement ? nextelement.tabIndex : 999999999999
 
-    var origgroupno=nextelement.getAttribute('exodusgroupno')
+    var origgroupno = nextelement.getAttribute('exodusgroupno')
 
-    var scope=scopex
+    var scope = scopex
     if (!scope)
         scope = document.all
     if (!scope)
@@ -3255,15 +3259,15 @@ function focusdirection(direction, element, notgroupno, scopex) {
         //find nextelement in scope
         if (scope.indexOf) {
             //probably never occurs since scope is a collection not an array
-            scopeindex=scope.indexOf(nextelement)
+            scopeindex = scope.indexOf(nextelement)
         } else {
-            for (scopeindex=0;scopeindex<=scope.length;++scopeindex) {
-                if (scope[scopeindex]==nextelement)
+            for (scopeindex = 0; scopeindex <= scope.length; ++scopeindex) {
+                if (scope[scopeindex] == nextelement)
                     break;
             }
         }
         //fail if cannot locate nextelement (eg element is no longer linked into document due to  something like deleteallrows()?)
-        if (scopeindex>=0 && scope[scopeindex]!=nextelement) {
+        if (scopeindex >= 0 && scope[scopeindex] != nextelement) {
             //focuson(nextelement)
             return
         }
@@ -3318,7 +3322,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
         }
 
         //skip uneditable elements
-        if (nextelement.tagName!='INPUT' && !nextelement.isContentEditable && nextelement.tagName!='SELECT' && nextelement.tagName!='TEXTAREA') {
+        if (nextelement.tagName != 'INPUT' && !nextelement.isContentEditable && nextelement.tagName != 'SELECT' && nextelement.tagName != 'TEXTAREA') {
             //console.log('SKIP '+nextid+' is not contentEditable')
             continue
         }
@@ -3354,13 +3358,13 @@ function focusdirection(direction, element, notgroupno, scopex) {
         }
 
         //skip lower tabindex if forward direction
-        if (direction>0 && elementtabindex && nextelement.tabIndex < elementtabindex) {
+        if (direction > 0 && elementtabindex && nextelement.tabIndex < elementtabindex) {
             //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' < '+elementtabindex)
             continue
         }
 
         //skip higher tabindex if backward direction
-        if (direction<0 && elementtabindex && nextelement.tabIndex > elementtabindex) {
+        if (direction < 0 && elementtabindex && nextelement.tabIndex > elementtabindex) {
             //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' > '+elementtabindex)
             continue
         }
@@ -3368,13 +3372,13 @@ function focusdirection(direction, element, notgroupno, scopex) {
         //(isMSIE && nextelement.currentStyle && nextelement.currentStyle.display == 'none' && nextelement.parentNode.currentStyle.display == 'none')
         //should also text mozilla currentstyle
         //(yield* getcurrentstyle(nextelement) && yield* getcurrentstyle(nextelement).display == 'none' && yield* getcurrentstyle(nextelement.parentNode).display == 'none')
-        if (isMSIE&&!exodusenabledandvisible(nextelement)) {
+        if (isMSIE && !exodusenabledandvisible(nextelement)) {
             //console.log('SKIP '+nextid+' isMSIE and not enabledandvisible')
             continue
         }
 
         //left/right/up/down keys skip over SELECT or radio buttons because they cannot be prevented from changing its value if pressed again
-        if ((gkeycode == 37 || gkeycode == 39 || gkeycode == 38 || gkeycode == 40) && (nextelement.tagName=='SELECT' || nextelement.type=='radio')) {
+        if ((gkeycode == 37 || gkeycode == 39 || gkeycode == 38 || gkeycode == 40) && (nextelement.tagName == 'SELECT' || nextelement.type == 'radio')) {
             //console.log('SKIP '+nextid+' cursor keys skip over SELECT or radio items')
             continue
         }
@@ -3392,21 +3396,21 @@ function focusdirection(direction, element, notgroupno, scopex) {
     }
 
     //if arrived on last column and row of a table using up then focus on the first column last row
-    if (direction<0) {
-        var nextgroupno=nextelement.getAttribute('exodusgroupno')
-        if (nextgroupno!=origgroupno&&nextgroupno!=0) {
+    if (direction < 0) {
+        var nextgroupno = nextelement.getAttribute('exodusgroupno')
+        if (nextgroupno != origgroupno && nextgroupno != 0) {
             if (gtables[nextgroupno]) {
-                var tablex=gtables[nextgroupno].tablex
+                var tablex = gtables[nextgroupno].tablex
                 if (tablex) {
-                    var tablex_lastinputcolscreenfn=form_getlastinputcolscreenfn(tablex)
-                    if (nextelement.getAttribute('exodusscreenfn')==tablex_lastinputcolscreenfn) {
-                        var tablex_firstinputcolscreenfn=form_getfirstinputcolscreenfn(tablex)
-                        var firstinputcolid=gfields[tablex_firstinputcolscreenfn].id
+                    var tablex_lastinputcolscreenfn = form_getlastinputcolscreenfn(tablex)
+                    if (nextelement.getAttribute('exodusscreenfn') == tablex_lastinputcolscreenfn) {
+                        var tablex_firstinputcolscreenfn = form_getfirstinputcolscreenfn(tablex)
+                        var firstinputcolid = gfields[tablex_firstinputcolscreenfn].id
                         var row = tablex.tBodies[0].getElementsByTagName('tr')[getrecn(nextelement)]
                         setupnewrow(row)//create .exodusfields
-                        var firstcolelement=row.exodusfields[firstinputcolid]
+                        var firstcolelement = row.exodusfields[firstinputcolid]
                         if (firstcolelement)
-                            nextelement=firstcolelement
+                            nextelement = firstcolelement
                     }
                 }
             }
@@ -3414,7 +3418,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
     }
 
     //found it. focus on it
-    console.log('focusdirection '+nextelement.tagName+' '+nextelement.id)
+    console.log('focusdirection ' + nextelement.tagName + ' ' + nextelement.id)
     focuson(nextelement)
 
 }
@@ -3480,16 +3484,16 @@ function* newrecord_onclick() {
         //if no default and key field not required, that means that key will be generated by server on request
         //if default and default starts with " character then considered to be a fixed default and not required if user clicks "New" button
         if (
-            ( !defaultvalue && keyelement.getAttribute('exodusrequired') )
+            (!defaultvalue && keyelement.getAttribute('exodusrequired'))
             ||
-            ( defaultvalue && defaultvalue.slice(0,1) == '"' )
-           ){
+            (defaultvalue && defaultvalue.slice(0, 1) == '"')
+        ) {
             //if already defaulted with fixed string then remove default value and prevent defaulting
             //if they enter something then click New it will be like they clicked Tab to the first non-key element
-            var keyid=keyelement.id
-            var currentvalue=yield* gds.getx(keyid)
+            var keyid = keyelement.id
+            var currentvalue = yield* gds.getx(keyid)
             if (currentvalue && currentvalue == eval(defaultvalue)) {
-                yield* gds.setx(keyid,'','')
+                yield* gds.setx(keyid, '', '')
                 gds.setdefaulted(keyid, null, true)
             }
             //focus on the key element
@@ -3506,7 +3510,7 @@ function* newrecord_onclick() {
 
     //if new clicked while on gfirstnonkeyelement ensure that focussing on it triggers read record
     //gpreviouselement=null
-    if (gstartelement&&gstartelement.id)
+    if (gstartelement && gstartelement.id)
         exodussettimeout('focuson("' + gstartelement.id + '")', 100)
 
     exodussettimeout('focuson("' + tt + '")', 200)
@@ -3643,15 +3647,15 @@ function* saverecord_onclick() {
     else if (db.data) {
         //dont open in tab if dialog window and not closing
         //because user cant focus on underlying window tabs while in (pseudo) modal dialog window
-        if (gisdialog&&!closeafter)
+        if (gisdialog && !closeafter)
             yield* windowopen(db.data)//new window
         else
-            yield* windowopen(db.data,'','tab')//tab
+            yield* windowopen(db.data, '', 'tab')//tab
     }
 
     //option to close window
-    var closeafter=gparameters.savemode && gparameters.savemode.indexOf('CLOSE') >= 0
-    if (closeafter){
+    var closeafter = gparameters.savemode && gparameters.savemode.indexOf('CLOSE') >= 0
+    if (closeafter) {
         //window.returnValue=true
         //window.close()
         exoduswindowclose(true)
@@ -3721,7 +3725,7 @@ function* closerecord_onclick() {
 ///////////////
 function* deleterecord_onclick(event) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     if (!(yield* deletedoc()))
         return exoduscancelevent(event)
@@ -3772,7 +3776,7 @@ var gopening = false
 function* opendoc(newkey) {
 
     //login('opendoc')
-    var result=yield* opendoc_body(newkey)
+    var result = yield* opendoc_body(newkey)
     //logout('opendoc '+result)
 
     return result
@@ -3788,13 +3792,13 @@ function* opendoc_body(newkey) {
 
     //check potential key has as many parts as there are key fields
     if (newkey && gKeyNodes.length > 1) {
-        if (typeof newkey=='string')
-            newkey1=newkey
+        if (typeof newkey == 'string')
+            newkey1 = newkey
         else
-            newkey1=newkey[0]
+            newkey1 = newkey[0]
         var sepchar = gKeyNodes[0].exoduskeypart ? '*' : gKeyNodes[0].exoduswordsep
         if (sepchar && newkey1.split(sepchar).length != gKeyNodes.length) {
-            systemerror('opendoc', newkey1.exodusquote() + ' does not have the correct number of key parts ('+gKeyNodes.length+')')
+            systemerror('opendoc', newkey1.exodusquote() + ' does not have the correct number of key parts (' + gKeyNodes.length + ')')
             return false
         }
     }
@@ -3871,7 +3875,7 @@ function* opendoc2(newkey0) {
     //optional preread function (returns false to abort)
     if (typeof (form_preread) == 'function') {
 
-       ///log('preread external key=' + gkeyexternal + ' internalkey=' + gkey)
+        ///log('preread external key=' + gkeyexternal + ' internalkey=' + gkey)
         if (!(yield* exodusevaluateall('yield* form_preread()', 'yield* opendoc2()')))
             return false //logout('opendoc2 - preread false')
 
@@ -3888,7 +3892,7 @@ function* opendoc2(newkey0) {
     gro.key = gkey
     if (gkey || !gupdateonlymode)
     //read with key='' means get the next sequential number
-        /**/ yield * gro.read(!greadonlymode && !gparameters.openreadonly)
+        /**/ yield* gro.read(!greadonlymode && !gparameters.openreadonly)
 
     yield* loadnewkey()
 
@@ -4063,9 +4067,9 @@ function* opendoc2(newkey0) {
     //so we also do the same in its instanceReady event.
     //MSIE has a problem with this, "permission denied" - so skip on error
     try {
-        if (typeof gCKEDITOR_EDITOR!='undefined')
+        if (typeof gCKEDITOR_EDITOR != 'undefined')
             gCKEDITOR_EDITOR.setReadOnly(!glocked)
-    } catch (e) {}
+    } catch (e) { }
 
     //enable the close and print buttons
     setdisabledandhidden(closerecord, false)
@@ -4112,7 +4116,7 @@ function* loadnewkey() {
 function* closedoc(mode) {
 
     //WINDOWUNLOAD,CLOSE,NEW,OPEN
-    if (!mode||mode.type)
+    if (!mode || mode.type)
         mode = 'CLOSE'
 
     //first update the current field
@@ -4123,7 +4127,7 @@ function* closedoc(mode) {
 
     //return yield* saveandorcleardoc(mode,save,clear=mode!='OPEN')
     //return yield* saveandorcleardoc(mode,save=mode!='CLEAR',clear=mode!='OPEN')
-    var result=yield* saveandorcleardoc(mode)
+    var result = yield* saveandorcleardoc(mode)
 
     /*/msie needs to result null otherwise prompts to leave or stay in window
     //this is how we tell that we are in msie and onbeforeunload event
@@ -4151,16 +4155,16 @@ function* saveandunlockdoc() {
 //'''''''''''
 //'SAVE DOC
 //'''''''''''
-var gform_in_savedoc=false
+var gform_in_savedoc = false
 function* savedoc(mode) {
 
     //prevent reentry in async environment
     if (gform_in_savedoc)
         return false
 
-    gform_in_savedoc=true
-    var result=yield* savedoc_body(mode)
-    gform_in_savedoc=false
+    gform_in_savedoc = true
+    var result = yield* savedoc_body(mode)
+    gform_in_savedoc = false
 
     return result
 }
@@ -4189,18 +4193,18 @@ function* savedoc_body(mode) {
 //'''''''''''
 //'SAVE DOC
 //'''''''''''
-var gform_in_saveandorcleardoc=false
+var gform_in_saveandorcleardoc = false
 function* saveandorcleardoc(mode) {
 
     //prevent reentry in async environment
     if (gform_in_saveandorcleardoc)
         return false
 
-    gform_in_saveandorcleardoc=true
+    gform_in_saveandorcleardoc = true
 
-    var result=yield* saveandorcleardoc_body(mode)
+    var result = yield* saveandorcleardoc_body(mode)
 
-    gform_in_saveandorcleardoc=false
+    gform_in_saveandorcleardoc = false
 
     return result
 }
@@ -4241,14 +4245,14 @@ function* saveandorcleardoc_body(mode) {
     if (glocked
         && (gchangesmade
             || (gallowsavewithoutchanges
-                && !clear && mode!='OPEN' && mode!='RELEASE'
-               )
+                && !clear && mode != 'OPEN' && mode != 'RELEASE'
+            )
             || (gpreviouselement
                 && gpreviouselement.getAttribute('exodusfieldno') > 0
                 && getvalue(gpreviouselement) != gpreviousvalue
-                )
             )
-        ) {
+        )
+    ) {
 
         //check last data entry is valid unless closing in which case discard will not validate
         if (mode != 'CHANGEKEY' && mode != 'CLOSE' && !(yield* validateupdate())) {
@@ -4285,7 +4289,7 @@ function* saveandorcleardoc_body(mode) {
                     action += ' or '
                 action += discardtitle
             }
-            var canceltitle='<u>C</u>ancel'//Cancel
+            var canceltitle = '<u>C</u>ancel'//Cancel
             var response = yield* exodusconfirm(action + ' ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1, savetitle, discardtitle, canceltitle)
         }
 
@@ -4450,7 +4454,7 @@ function* cleardoc() {
     }
 
     //not if clearing
-    if (!gwindowunloading&&gkey) {
+    if (!gwindowunloading && gkey) {
 
         //setfocus on first non-defaulted key node
         var focussed = false
@@ -4594,23 +4598,23 @@ function* deletedoc() {
 function* form_oninput(event) {
     if (gchangesmade)
         return true
-    event=getevent(event)
+    event = getevent(event)
 
     //changing key fields does not cause gchangesmade
-    var fn=Number(event.target.getAttribute('exodusfieldno'))
+    var fn = Number(event.target.getAttribute('exodusfieldno'))
     if (!fn)
         return true
 
     //remember this element so pressing escape can cancel gchangesmade
     //removed in onfocus
-    gelementthatjustcalledsetchangesmade=event.target
+    gelementthatjustcalledsetchangesmade = event.target
     setchangesmade(true)
     return true
 }
 
 function* form_onchangeselect(event) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     if (!gpreviouselement) {
         //gpreviouselement = event.target
@@ -4648,7 +4652,7 @@ function* validateall(mode) {
         //get header row or single row of group
         var rows = (groupno == 0) ? [gds.data] : gds.data['group' + groupno]
 
-        var tablex=gtables[groupno]
+        var tablex = gtables[groupno]
         var allowemptyrows = (groupno == 0) ? false : tablex.tableelement.getAttribute('exodusallowemptyrows')
         var rowrequired = (groupno == 0) ? false : tablex.tableelement.getAttribute('exodusrowrequired')
         var nrowsfound = 0
@@ -4699,12 +4703,12 @@ function* validateall(mode) {
 
                 //flag first element that is required, enabled and visible and missing
                 if (mode != 'filldefaults'
-                        && !missingelement
-                        //setting .disabled to true seems to have the effect of
-                        // setting attribute disabled to "" in modern browsers!
-                        //&& !element.getAttribute('disabled')
-                        && !element.disabled
-                        && exodusenabledandvisible(element)) {
+                    && !missingelement
+                    //setting .disabled to true seems to have the effect of
+                    // setting attribute disabled to "" in modern browsers!
+                    //&& !element.getAttribute('disabled')
+                    && !element.disabled
+                    && exodusenabledandvisible(element)) {
                     missingelement = element
                     if (groupno == 0)
                         break
@@ -4725,9 +4729,9 @@ function* validateall(mode) {
 
             //prevent blank rows (except last one) unless allowed
             if (mode != 'filldefaults'
-                   && !anydata
-                   && groupno != 0
-                   && rown < (rows.length - 1)) {
+                && !anydata
+                && groupno != 0
+                && rown < (rows.length - 1)) {
                 if (!allowemptyrows) {
                     var missingelement = rows[0][firstcolumnname].element
                     yield* exodusinvalid('Empty rows are not allowed for ' + missingelement.getAttribute('exodustitle'))
@@ -4743,13 +4747,13 @@ function* validateall(mode) {
 
         //error if not enough rows
         if
-          (
-           groupno > 0
-           && mode != 'filldefaults'
-           && !nrowsfound
-           && rowrequired
-           && exodusenabledandvisible($$('exodusgroup' + groupno))
-          ) {
+            (
+            groupno > 0
+            && mode != 'filldefaults'
+            && !nrowsfound
+            && rowrequired
+            && exodusenabledandvisible($$('exodusgroup' + groupno))
+        ) {
             var missingelement = rows[0][firstcolumnname].element
             yield* exodusinvalid('At least one ' + missingelement.getAttribute('exodustitle') + ' is required.')
             focuson(missingelement)
@@ -4776,7 +4780,7 @@ function* writedoc(unlock) {
     gvalue = ''
     if (typeof (form_prewrite) == 'function') {
         if (!(yield* exodusevaluateall('yield* form_prewrite()', 'yield* writedoc()'))) return false
-       ///log('form_prewrite - after')
+        ///log('form_prewrite - after')
     }
 
     //stop the relocker while saving the document
@@ -4786,7 +4790,7 @@ function* writedoc(unlock) {
 
     gro.request = unlock ? 'WRITEU' : 'WRITE' + '\r' + gdatafilename + '\r' + gkey
     gro.data = gds.data
-    if (!(/**/ yield * gro.writex(unlock))) {
+    if (!(/**/ yield* gro.writex(unlock))) {
 
         //yield* exodusnote('Cannot save '+exodusquote(gkeyexternal)+' because: \r\r'+gro.response)
         yield* exodusinvalid('Cannot save ' + exodusquote(gkeyexternal) + ' because: \n\n' + gro.response)
@@ -4819,7 +4823,7 @@ function* writedoc(unlock) {
         //existing gds' elements are pointing to screen elements so do not copy
         //gds.data=gro.data
 
-        /**/ yield * gds.rebind(gro.data)
+        /**/ yield* gds.rebind(gro.data)
 
         var recn = grecn
         grecn = null
@@ -4979,7 +4983,7 @@ function focuson(element) {
     if (typeof element == 'object' && !element.tagName && element.length > 0)
         element = element[0]
 
-   ///log(element.id + ' ' + element.outerHTML)
+    ///log(element.id + ' ' + element.outerHTML)
 
     //if already focused on the element then .focus event will not occur so ...
     //NOW will because do .blur() beforehand
@@ -4992,22 +4996,20 @@ function focuson(element) {
             if (element.select)
                 element.select()
         }
-        catch (e)
-            { }
+        catch (e) { }
 
         //gpreviouselement = element
         //gpreviousvalue = getvalue(gpreviouselement)
         setgpreviouselement(element)
-        yield* setdefault(element)
+        yield * setdefault(element)
         //should really call setgpreviouselement again here
-       ///log('gpreviouselement and value set to ' + gpreviouselement.id + ' ' + exodusquote(gpreviousvalue))
+        ///log('gpreviouselement and value set to ' + gpreviouselement.id + ' ' + exodusquote(gpreviousvalue))
 
         try {
             if (element.tagName != 'TEXTAREA')
                 element.select()
         }
-        catch (e)
-            { }
+        catch (e) { }
 
     } else {
 
@@ -5034,10 +5036,10 @@ function focuson2() {
     var focusonelement = gfocusonelement
     gfocusonelement = null
 
-    console.log('focuson2 '+focusonelement.tagName+' '+focusonelement.id)
+    console.log('focuson2 ' + focusonelement.tagName + ' ' + focusonelement.id)
 
     //allowreadonly=true
-    if (!(exodusenabledandvisible(focusonelement,true)))
+    if (!(exodusenabledandvisible(focusonelement, true)))
         return focusnext(focusonelement)
 
     try {
@@ -5066,19 +5068,19 @@ function focuson2() {
 //'''''''''
 function document_onfocus_sync(event) {
     //LEAVE SPACE after function name to prevent this having yield * prefixed
-    var result=document_onfocus (event)
+    var result = document_onfocus(event)
     //above in yielding code returns an object with a method .next() to actually run it
-    /* yield */ result=result.next()
+    /* yield */ result = result.next()
     return result
 }
 
 function* document_onfocus(event) {
 
-    event=getevent(event)
+    event = getevent(event)
     //window.status='onfocus '+new Date
 
     //ckeditor configured to pass element.id in event
-    if (event.target&&event.target.listenerData) {
+    if (event.target && event.target.listenerData) {
         event.target = $$(event.target.listenerData)
         event.target.isckeditor = true
         if (gCKEDITOR_EDITOR)
@@ -5097,32 +5099,32 @@ function* document_onfocus(event) {
 
     var text = 'document_onfocus' + ' tag:' + event.target.tagName + ' id:' + event.target.id + (gpreviouselement ? ' gpreviouselement:' + gpreviouselement.id : '')
     console.log(text)
-   ///log(text)
+    ///log(text)
     //window.status=text
 
     //window.status='document_onfocus'+' tag:'+event.target.tagName+' id:'+event.target.id+(gpreviouselement?' gpreviouselement:'+gpreviouselement.id:'')
 
-   ///log('get element and elementid')
+    ///log('get element and elementid')
     var element = event.target
 
-   ///log('quit if no element.id')
+    ///log('quit if no element.id')
     if (!element.id)
         return false //logout('document_onfocus')
 
-   ///log('quit calendar focus')
+    ///log('quit calendar focus')
     if (element.className == 'calendar')
         return false //logout('document_onfocus')
 
-   ///log('get elementid')
+    ///log('get elementid')
     var elementid = ''
     try {
         elementid = element.id.toString()
-       ///log('handle focus on ckeditor')
+        ///log('handle focus on ckeditor')
         if (elementid.indexOf('___Frame') > 0) {
-           ///log('to prevent endless loop after cancelling postread (due to ckeditor refocussing on itself?')
-           ///log('minor problem is that this prevents click on ckeditor from triggering a record read')
+            ///log('to prevent endless loop after cancelling postread (due to ckeditor refocussing on itself?')
+            ///log('minor problem is that this prevents click on ckeditor from triggering a record read')
             if (gKeyNodes && !gkey) {
-               ///log('timeout to focus on last key element')
+                ///log('timeout to focus on last key element')
                 exodussettimeout('try{gKeyNodes[gKeyNodes.length-1].focus()}catch(e){}', 10)
                 return false //logout('document_onfocus')
             }
@@ -5144,7 +5146,7 @@ function* document_onfocus(event) {
 
     ///log('if arrived on a readonly field by tab (or enter as tab)\nthen skip forwards (or backwards) to the next field')
     if (gkeycode == 9 || gkeycode == 13) {
-       ///log('but only if normal tabindex because focusnext doesnt work otherwise')
+        ///log('but only if normal tabindex because focusnext doesnt work otherwise')
         if (element.getAttribute('exodusreadonly') && element.tabIndex == 999) {
             if (event.shiftKey)
                 focusprevious(element)
@@ -5154,13 +5156,13 @@ function* document_onfocus(event) {
         }
     }
 
-   ///log('no validation/update except changing exodus elements:' + element.getAttribute('exodustype'))
+    ///log('no validation/update except changing exodus elements:' + element.getAttribute('exodustype'))
     if (!(element.getAttribute('exodustype'))) {
         //logout('document_onfocus')
         return
     }
 
-   ///log('quit if opening')
+    ///log('quit if opening')
     if (gopening) {
         console.log('gopening still!')
         //ignore this until fix resuming after ok/cancel
@@ -5168,17 +5170,17 @@ function* document_onfocus(event) {
         return exoduscancelevent(event)
     }
 
-   ///log('drop down any "modal" popup divs')
+    ///log('drop down any "modal" popup divs')
     yield* form_closepopups()
 
-   ///log('quit if refocussing')
+    ///log('quit if refocussing')
     if (element == gonfocuselement) {
         //  if (yield* setdefault(element))  if (element.tagName!='TEXTAREA') element.select()
         return false //logout('document_onfocus')
     }
     gonfocuselement = element
 
-   ///log('quit if refocussing on gpreviouselement')
+    ///log('quit if refocussing on gpreviouselement')
     if (gpreviouselement && element == gpreviouselement)
         return false //logout('document_onfocus')
 
@@ -5186,38 +5188,38 @@ function* document_onfocus(event) {
     //if (element&&element.id==(gpreviouselement.id+'_popup'))
     // return false //logout('document_onfocus')
 
-   ///log('check if changed element')
+    ///log('check if changed element')
     if (element != gpreviouselement) {
-       ///log('validate/update previous data entry ' + (gpreviouselement ? gpreviouselement.id : ''))
+        ///log('validate/update previous data entry ' + (gpreviouselement ? gpreviouselement.id : ''))
         if (!(yield* validateupdate()))
             return false //logout('document_onfocus')
     }
 
-   ///log('quit if we are not focused on a proper element')
+    ///log('quit if we are not focused on a proper element')
     if (!elementid)
         return false //logout('document_onfocus')
 
-   ///log('OK. Now previous element is valid')
+    ///log('OK. Now previous element is valid')
 
-   ///log('find what row we are on')
+    ///log('find what row we are on')
     grecn = getrecn(element)
 
-   ///log('quit if not exodus data entry field')
+    ///log('quit if not exodus data entry field')
     if (!element.tagName.match(gdatatagnames))
         return false //logout('document_onfocus')
 
-   ///log('check key fields')
+    ///log('check key fields')
     if (gKeyNodes && !glocked) {
         if (!(yield* checkrequired(gKeyNodes, element, 0)))
             return false //logout('document_onfocus' + ' ' + elementid + ' is required but is blank (0)')
     }
 
-   ///log('check no required fields are missing in prior data')
-   ///log(' fill in any defaults where possible')
+    ///log('check no required fields are missing in prior data')
+    ///log(' fill in any defaults where possible')
     if (!gKeyNodes || glocked)//check keynodes as well now
     {
 
-       ///log('check no missing data in group 0 always')
+        ///log('check no missing data in group 0 always')
         if (!(yield* checkrequired(gfields, element, 0)))
             return false //logout('document_onfocus' + ' ' + elementid + ' a prior element is visible and required but is blank (1)')
 
@@ -5232,11 +5234,11 @@ function* document_onfocus(event) {
 
     }
 
-   ///log('all previous fields are valid now')
+    ///log('all previous fields are valid now')
     //wwww
     //triggered by timeout from validateupdate now
     //but do it ALSO here in case triggered by defaulted key field
-   ///log('if the key is complete and not on a key field, get the record')
+    ///log('if the key is complete and not on a key field, get the record')
     //if (!gloaded&&gKeyNodes&&element.getAttribute('exodusfieldno')!=0)
     //dont check if element not changed to avoid endless loop if opendoc errors
     if (gKeyNodes && element != gpreviouselement) {
@@ -5251,27 +5253,27 @@ function* document_onfocus(event) {
             return false //logout('document_onfocus' + ' ' + exodusquote(elementid) + ' new record')
         }
     }
-   ///log('there is no new record so setup current element')
+    ///log('there is no new record so setup current element')
 
-   ///log('scroll to top left if the key field')
+    ///log('scroll to top left if the key field')
     if (element == gstartelement || element.getAttribute('exodusfieldno') == 0)
         window.scrollTo(0, 0)
 
     //if (element.tagName.match(gtexttagnames))  if (element.tagName!='TEXTAREA') element.select()
 
-   ///log('scroll into view')
+    ///log('scroll into view')
     scrollintoview(element)
 
-   ///log('remove blanks used to force formatting of spans')
+    ///log('remove blanks used to force formatting of spans')
     if (element.tagName == 'SPAN' && element.innerText == ' ')
         element.innerText = ''
 
-   ///log('change gpreviouselement/value to current element/value')
+    ///log('change gpreviouselement/value to current element/value')
     //gpreviouselement = element
     //gpreviousvalue = getvalue(gpreviouselement)
     setgpreviouselement(element)
 
-   ///log('set the default of the current element')
+    ///log('set the default of the current element')
     yield* setdefault(element, donotvalidateupdate = true)
 
     ///log('deselect previous (this does not work unless .select() is used')
@@ -5282,7 +5284,7 @@ function* document_onfocus(event) {
     //    //  textrange.select()
     //}
 
-   //log('select the whole text')
+    //log('select the whole text')
     if (element.tagName != 'TEXTAREA' && element.tagName != 'OPTION' && element.tagName != 'SELECT')
         try {
 
@@ -5291,44 +5293,44 @@ function* document_onfocus(event) {
                 element.select()
             else {
 
-        //TODO remove code duplication
+                //TODO remove code duplication
 
-        //seems to be the most standards based way and works on spans too
-        //http://stackoverflow.com/questions/11451353/how-to-select-the-text-of-a-span-on-click
-        if (window.getSelection && document.createRange) {
-            selection = window.getSelection();
-            if (selection.isCollapsed) {
-                //following selects all of text
-                selection.removeAllRanges();
-                range = document.createRange();
-                range.selectNodeContents(element);
-                selection.addRange(range);
-            } else {
-                //following removes any selection
-                selection.collapseToEnd();
+                //seems to be the most standards based way and works on spans too
+                //http://stackoverflow.com/questions/11451353/how-to-select-the-text-of-a-span-on-click
+                if (window.getSelection && document.createRange) {
+                    selection = window.getSelection();
+                    if (selection.isCollapsed) {
+                        //following selects all of text
+                        selection.removeAllRanges();
+                        range = document.createRange();
+                        range.selectNodeContents(element);
+                        selection.addRange(range);
+                    } else {
+                        //following removes any selection
+                        selection.collapseToEnd();
+                    }
+                    //            return exoduscancelevent(event)
+                } else if (document.selection && document.body.createTextRange) {
+                    range = document.body.createTextRange();
+                    range.moveToElementText(element);
+                    range.select();
+                    //            return exoduscancelevent(event)
+                }
             }
-//            return exoduscancelevent(event)
-        } else if (document.selection && document.body.createTextRange) {
-            range = document.body.createTextRange();
-            range.moveToElementText(element);
-            range.select();
-//            return exoduscancelevent(event)
-        }
-}
 
         } catch (e) { }
 
-   //log('focus on current or next element')
+    //log('focus on current or next element')
     //this is not necessary unless .select() is used above
     //note that validation code from previous field may make current element disappear
     if (!element.isckeditor) {
         try {
             //element.focus()
             focuson(element)
-           //log('focussed on current element')
+            //log('focussed on current element')
         }
         catch (e) {
-           //log('try focusnext')
+            //log('try focusnext')
             focusnext(element)
         }
     }
@@ -5363,7 +5365,7 @@ gpreviousvalue=getvalue(gpreviouselement)
 
 function* onclickradiocheckbox(event) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     //wstatus(getvalue(event.target.id)+' '+gpreviousvalue)
     //space or arrow keys also simulate a click event
@@ -5431,7 +5433,7 @@ function* validateupdate() {
         return true
     }
 
-   //log('User/setdefault changed ' + id + '\nfrom ' + exodusquote(gpreviousvalue) + '\nto ' + exodusquote(newvalue))
+    //log('User/setdefault changed ' + id + '\nfrom ' + exodusquote(gpreviousvalue) + '\nto ' + exodusquote(newvalue))
 
     //check for prior required fields if a grouped element
     var elements
@@ -5458,7 +5460,7 @@ function* validateupdate() {
     }
 
     //get the old value (internal format) and grecn
-    gcell = gds.getcells(gpreviouselement,grecn)[0]
+    gcell = gds.getcells(gpreviouselement, grecn)[0]
     goldvalue = gcell.text
     gorigvalue = (typeof gcell.oldtext != 'undefined') ? gcell.oldtext : gcell.text
 
@@ -5474,7 +5476,7 @@ function* validateupdate() {
     }
 
     //pressing escape will no longer cancel gchangesmade
-    gelementthatjustcalledsetchangesmade=null
+    gelementthatjustcalledsetchangesmade = null
 
     //update
     ////////
@@ -5503,54 +5505,54 @@ function* validateupdate() {
 
     //update the element if not multiple selections
     if (!multiplegvalue) {
-        var defaulted=gpreviouselement.dataitem && gpreviouselement.dataitem.defaulted
+        var defaulted = gpreviouselement.dataitem && gpreviouselement.dataitem.defaulted
 
-        yield* gds.setx(gpreviouselement,grecn, gvalue)
+        yield* gds.setx(gpreviouselement, grecn, gvalue)
 
         //restore defaulted status if case it was reset by setx
         if (defaulted)
-            gpreviouselement.dataitem.defaulted=defaulted
+            gpreviouselement.dataitem.defaulted = defaulted
     }
 
     //wwww
-/* cant do this here otherwise will retrieve multipart key records when only clearing
-    //switch to new key if new and user accepts to close the current one
-    var nextkey
-    if (gKeyNodes
-     && gpreviouselement.getAttribute('exodusfieldno') == 0
-     && (nextkey = yield* getkey())
-     && nextkey != gkey) {
-        //do not change key if user chooses not to unload an existing document
-        if (!(yield* closedoc('CHANGEKEY'))) {
-            focusongpreviouselement()
-            return false //logout('validateupdate - closedoc refused')
+    /* cant do this here otherwise will retrieve multipart key records when only clearing
+        //switch to new key if new and user accepts to close the current one
+        var nextkey
+        if (gKeyNodes
+         && gpreviouselement.getAttribute('exodusfieldno') == 0
+         && (nextkey = yield* getkey())
+         && nextkey != gkey) {
+            //do not change key if user chooses not to unload an existing document
+            if (!(yield* closedoc('CHANGEKEY'))) {
+                focusongpreviouselement()
+                return false //logout('validateupdate - closedoc refused')
+            }
+    
+            //return false and just allow opendoc to happen
+    
+            //exodussettimeout('yield* opendoc("'+nextkey+'")',1)
+            //alert('DEBUG: settimeout opendoc gkey:'+gkey+' nextkey:'+nextkey)
+            //settimeout results in overlapping xmlhttp requests in FF 3.0.3
+            //eg alt+P
+            //1.triggers update
+            //2.settimeout opendoc
+            //3.settimeout printrecord
+            //4.printrecord STARTS an XML request and waits synchronously for the result
+            //5.opendoc timesout(?!)
+            //6.opendoc issues ANOTHER XML request and we get a trap message due to this.listening being already set
+            //try to avoid the above by calling opendoc directly BUT this may cause errors on return from validateupdate
+            yield* opendoc(nextkey)
+    
+            //logout('validateupdate - opendoc')
+            return false
         }
-
-        //return false and just allow opendoc to happen
-
-        //exodussettimeout('yield* opendoc("'+nextkey+'")',1)
-        //alert('DEBUG: settimeout opendoc gkey:'+gkey+' nextkey:'+nextkey)
-        //settimeout results in overlapping xmlhttp requests in FF 3.0.3
-        //eg alt+P
-        //1.triggers update
-        //2.settimeout opendoc
-        //3.settimeout printrecord
-        //4.printrecord STARTS an XML request and waits synchronously for the result
-        //5.opendoc timesout(?!)
-        //6.opendoc issues ANOTHER XML request and we get a trap message due to this.listening being already set
-        //try to avoid the above by calling opendoc directly BUT this may cause errors on return from validateupdate
-        yield* opendoc(nextkey)
-
-        //logout('validateupdate - opendoc')
-        return false
-    }
-*/
+    */
     //post update
     /////////////
 
     //flag record edited
     if (gpreviouselement.getAttribute('exodusfieldno') != 0
-         && !gpreviouselement.getAttribute('exodusnochangeswarning')) {
+        && !gpreviouselement.getAttribute('exodusnochangeswarning')) {
         setchangesmade(true)
     }
 
@@ -5563,8 +5565,8 @@ function* validateupdate() {
 
     //logout('validateupdate - done')
 
-    if (gautofitwindow)
-        exodussettimeout('exodusautofitwindow()', 1)
+    //if (gautofitwindow)
+    //    exodussettimeout('exodusautofitwindow()', 1)
 
     return true
 
@@ -5576,7 +5578,7 @@ function focusongpreviouselement() {
 
 function focusongpreviouselement2() {
 
-   //log('focusing back to ' + gpreviouselement.id)
+    //log('focusing back to ' + gpreviouselement.id)
 
     //prevent loop since focus doesnt go back to radio button immediately
     //doesnt seem to work though
@@ -5616,7 +5618,7 @@ function* earlyupdate() {
     if (!gpreviouselement || !gpreviouselement.id || (gpreviouselement.type && gpreviouselement.type == 'button'))
         return
 
-    yield* gds.setx(gpreviouselement,grecn, gvalue)
+    yield* gds.setx(gpreviouselement, grecn, gvalue)
 
 }
 
@@ -5674,9 +5676,9 @@ function* checkrequired(elements, element, groupno) {
                 //if (element&&element2.getAttribute('exodusrequired')&&getvalue(element2)=='')
                 //if (element&&(!Number(element.getAttribute('exodusgroupno'))||element2.getAttribute('exodusrequired'))&&getvalue(element2)=='')
                 if (element
-                        && ((gds.isnewrecord && !Number(element2.getAttribute('exodusgroupno')))
+                    && ((gds.isnewrecord && !Number(element2.getAttribute('exodusgroupno')))
                         || element2.getAttribute('exodusrequired'))
-                        && getvalue(element2) == '') {
+                    && getvalue(element2) == '') {
 
                     //try to set the default
                     if (!(yield* setdefault(element2)) && exodusenabledandvisible(element2)) {
@@ -5686,7 +5688,7 @@ function* checkrequired(elements, element, groupno) {
 
                     //if still empty then fail
                     //if (getvalue(element2)=='')
-                    if (element2.getAttribute('exodusrequired') && !element2.getAttribute('exodusreadonly') && gds.getcells(element2,grecn)[0].text == '') {
+                    if (element2.getAttribute('exodusrequired') && !element2.getAttribute('exodusreadonly') && gds.getcells(element2, grecn)[0].text == '') {
 
                         //disabled or invisible elements may be blank and required (even after setdefault)
                         if (element2.disabled || element2.getAttribute('disabled') || !exodusenabledandvisible(element2))
@@ -5806,59 +5808,59 @@ function getvalue(element, recn) {
 
         case 'INPUT': {
 
-                switch (element.type) {
+            switch (element.type) {
 
-                    case 'text':
-                        var tx=element.value.exodustrimr()
-                        //may be visibly uppercase due to style but internally lowercase so change it here
-                        if (!element.getAttribute('exoduslowercase'))
-                            return tx.toUpperCase()
-                        return tx
+                case 'text':
+                    var tx = element.value.exodustrimr()
+                    //may be visibly uppercase due to style but internally lowercase so change it here
+                    if (!element.getAttribute('exoduslowercase'))
+                        return tx.toUpperCase()
+                    return tx
 
-                    case 'radio': {
+                case 'radio': {
 
-                            var elements = getradiocheckboxelements(element)
-                            for (var ii = 0; ii < elements.length; ii++) {
-                                var element = elements[ii]
-                                if (element.checked) {
-                                    if (typeof element.value == 'undefined')
-                                        return ii
-                                    else
-                                        return element.value
-                                }
-                            }
-                            //nothing selected
-                            return ''
-
+                    var elements = getradiocheckboxelements(element)
+                    for (var ii = 0; ii < elements.length; ii++) {
+                        var element = elements[ii]
+                        if (element.checked) {
+                            if (typeof element.value == 'undefined')
+                                return ii
+                            else
+                                return element.value
                         }
-
-                    case 'checkbox': {
-
-                            var elements = getradiocheckboxelements(element)
-                            var values = []
-                            for (var ii = 0; ii < elements.length; ii++) {
-                                var element = elements[ii]
-                                if (element.checked) {
-                                    values[values.length] = (typeof element.value == 'undefined') ? ii : element.value
-                                }
-                            }
-                            return values.join(sm)
-
-                        }
-
-                    case 'button': {
-
-                            return ''
-                        }
-
-                    default: {
-
-                            return systemerror('getvalue()', exodusquote(element.type) + ' invalid INPUT element type')
-                        }
+                    }
+                    //nothing selected
+                    return ''
 
                 }
 
+                case 'checkbox': {
+
+                    var elements = getradiocheckboxelements(element)
+                    var values = []
+                    for (var ii = 0; ii < elements.length; ii++) {
+                        var element = elements[ii]
+                        if (element.checked) {
+                            values[values.length] = (typeof element.value == 'undefined') ? ii : element.value
+                        }
+                    }
+                    return values.join(sm)
+
+                }
+
+                case 'button': {
+
+                    return ''
+                }
+
+                default: {
+
+                    return systemerror('getvalue()', exodusquote(element.type) + ' invalid INPUT element type')
+                }
+
             }
+
+        }
 
         case 'OPTION': return getdropdown0(element.parentNode)
 
@@ -5867,48 +5869,48 @@ function getvalue(element, recn) {
         //crlf becomes space to prevent entry of tm characters in text fields
         case 'SPAN':
             //if (element.isContentEditable)
-                //var value = element.innerText.replace(/([\r\n]+)/g, ' ').exodustrimr()
-                //allow /r by itself but replace \\r\n combinations (to allow spans to have multiple lines)
-                //var value = element.innerText.replace(/\r\n/g, ' ').exodustrimr()
+            //var value = element.innerText.replace(/([\r\n]+)/g, ' ').exodustrimr()
+            //allow /r by itself but replace \\r\n combinations (to allow spans to have multiple lines)
+            //var value = element.innerText.replace(/\r\n/g, ' ').exodustrimr()
 
-                //var value = element.innerText //returns with random missing spaces in IE11
-                //works on IE11 as well only from IE9
-                //alternatives are .data and .wholeText
-                if (typeof element.textContent!='undefined')
-                    var value = element.textContent
-                else
-                    //the old method seems to work everywhere except later versions of IE
-                    //Note: .innerText property shim to textContent is added to HTMLElement.prototype in client.js
-                    var value = element.innerText
+            //var value = element.innerText //returns with random missing spaces in IE11
+            //works on IE11 as well only from IE9
+            //alternatives are .data and .wholeText
+            if (typeof element.textContent != 'undefined')
+                var value = element.textContent
+            else
+                //the old method seems to work everywhere except later versions of IE
+                //Note: .innerText property shim to textContent is added to HTMLElement.prototype in client.js
+                var value = element.innerText
 
-                //MSIE (IE7) has \r\n for line marks whereas FIREFOX et al have \n
-                //value = value.replace(/\r\n/g, ' ').exodustrimr()
+            //MSIE (IE7) has \r\n for line marks whereas FIREFOX et al have \n
+            //value = value.replace(/\r\n/g, ' ').exodustrimr()
             //else
             //    var value = element.innerHTML.replace(/([\r\n]+)/g, ' ').exodustrimr()
             //if (value == nbsp160)
             //    return "";
             //remove trailing spaces and end of lines
-            return value.replace(/[ \r\n]+$/,'')
+            return value.replace(/[ \r\n]+$/, '')
 
         case 'TEXTAREA': {
 
-                //http://wiki.ckeditor.net/Developer%27s_Guide/Javascript_API
-                if (typeof CKEDITOR != 'undefined') {
-                    var oEditor = CKEDITOR.instances[element.id]
-                    if (oEditor) {
-                        //needs encoding set correctly eg UTF-8 in meta of html page
-                        var result = oEditor.getData()
-                        return result
-                    }
+            //http://wiki.ckeditor.net/Developer%27s_Guide/Javascript_API
+            if (typeof CKEDITOR != 'undefined') {
+                var oEditor = CKEDITOR.instances[element.id]
+                if (oEditor) {
+                    //needs encoding set correctly eg UTF-8 in meta of html page
+                    var result = oEditor.getData()
+                    return result
                 }
-
-                return element.value.exodustrimr()
             }
+
+            return element.value.exodustrimr()
+        }
 
         default: {
 
-                return systemerror('getvalue()', exodusquote(element.tagName) + ' invalid tagName')
-            }
+            return systemerror('getvalue()', exodusquote(element.tagName) + ' invalid tagName')
+        }
     }
 
 }
@@ -5930,7 +5932,7 @@ function exodussetreadonly(elements, msg, options, recn) {
             if (Number(gfields[ii].getAttribute('exodusgroupno')) == elementx
                 && Number(gfields[ii].getAttribute('exodusfieldno'))
                 && (!(exodussetreadonly(gfields[ii].id, msg, options, recn))))
-                    return false
+                return false
         }
         return true
     }
@@ -5953,7 +5955,7 @@ function exodussetreadonly(elements, msg, options, recn) {
         //since extraction of all elements for one element id is probably time consuming
         if (typeof recn == 'object' && recn.length && !elementx.tagName) {
             if (typeof elementx.length == 'undefined')
-                elementx=[elementx]
+                elementx = [elementx]
             for (var ii = 0; ii < recn.length; ii++) {
                 if (!(exodussetreadonly(elementx[recn[ii]], msg, options)))
                     return false
@@ -5997,10 +5999,10 @@ function exodussetreadonly(elements, msg, options, recn) {
 
     //provide hasAttribute method for ie6 etc
     if (!elementx.hasAttribute) {
-        elementx.hasAttribute=
-        function hasAttribute(attrName){
-          	return typeof this[attrName] !== 'undefined'
-        }
+        elementx.hasAttribute =
+            function hasAttribute(attrName) {
+                return typeof this[attrName] !== 'undefined'
+            }
     }
 
     if (msg) {
@@ -6010,7 +6012,7 @@ function exodussetreadonly(elements, msg, options, recn) {
         //if (elementx.id!=document.activeElement.id)
         if (gevent && (typeof gevent.target == 'undefined' || elementx.id != gevent.target.id)) {
             //remove tabindex (unless we are on the element otherwise tab key doesnt work anymore!)
-            elementx.setAttribute('oldtabindex',elementx.tabIndex)
+            elementx.setAttribute('oldtabindex', elementx.tabIndex)
             elementx.tabIndex = -1
         }
 
@@ -6021,37 +6023,37 @@ function exodussetreadonly(elements, msg, options, recn) {
 
         if (options && options.indexOf('BGCOLOR') >= 0) {
             if (!elementx.getAttribute('oldbgcolor'))
-                elementx.setAttribute('oldbgcolor',elementx.style.backgroundColor)
+                elementx.setAttribute('oldbgcolor', elementx.style.backgroundColor)
             //elementx.style.backgroundColor='#ffffc0'
             var newbgcolor = elementx.parentNode.style.backgroundColor
             if (!newbgcolor)
-            // newbgcolor=document.styleSheets[0].rules[0].style.backgroundColor
+                // newbgcolor=document.styleSheets[0].rules[0].style.backgroundColor
                 newbgcolor = '#f6f6f6'
             elementx.style.backgroundColor = newbgcolor
 
             //spans have no type
             if (!elementx.type || !elementx.type.match(gradiocheckboxtypes)) {
                 if (!elementx.oldborderwidth)
-                    elementx.setAttribute('oldborderwidth',elementx.style.borderWidth)
+                    elementx.setAttribute('oldborderwidth', elementx.style.borderWidth)
                 elementx.style.borderWidth = '1px'
 
                 if (!elementx.hasAttribute('oldborderstyle'))
-                    elementx.setAttribute('oldborderstyle',elementx.style.borderStyle)
+                    elementx.setAttribute('oldborderstyle', elementx.style.borderStyle)
                 elementx.style.borderStyle = 'solid'
 
                 if (!elementx.hasAttribute('oldbordercolor'))
-                    elementx.setAttribute('oldbordercolor',elementx.style.borderColor)
+                    elementx.setAttribute('oldbordercolor', elementx.style.borderColor)
                 elementx.style.borderColor = '#dddddd'
             }
 
         }
 
         if (elementx.type && elementx.type.match(gradiocheckboxtypes))
-            elementx.setAttribute('disabled',true)
+            elementx.setAttribute('disabled', true)
 
         if (options && options.indexOf('BORDER') >= 0) {
             if (!elementx.hasAttribute('oldborderstyle'))
-                elementx.setAttribute('oldborderstyle',elementx.style.borderStyle)
+                elementx.setAttribute('oldborderstyle', elementx.style.borderStyle)
             elementx.style.borderStyle = 'none'
         }
 
@@ -6099,12 +6101,12 @@ function exodussetreadonly(elements, msg, options, recn) {
 }
 
 function* readonly_onchange(event) {
-    event=getevent(event)
+    event = getevent(event)
 
     //called when user starts to change a readonly element
 
     //ckeditor configured to pass element.id in event
-    if (event.target&&event.target.listenerData) {
+    if (event.target && event.target.listenerData) {
         event.target = $$(event.target.listenerData)
     }
 
@@ -6158,134 +6160,134 @@ function setvalue2(element, value) {
     switch (element.tagName) {
         case 'INPUT': {
 
-                switch (element.type) {
+            switch (element.type) {
 
-                    case 'text': {
+                case 'text': {
 
-                            setexoduslink(element, value)
-                            element.value = value
-                            break
+                    setexoduslink(element, value)
+                    element.value = value
+                    break
+                }
+
+                case 'radio': {
+
+                    var elements = getradiocheckboxelements(element)
+                    for (var ii = 0; ii < elements.length; ii++) {
+                        var element = elements[ii]
+                        if (value.exoduslocate(element.value.toString()) > 0) {
+                            element.checked = true
+                            value = element.value
+                            if (value == 'undefined')
+                                value = ii
                         }
+                        else
+                            element.checked = false
+                    }
 
-                    case 'radio': {
-
-                            var elements = getradiocheckboxelements(element)
-                            for (var ii = 0; ii < elements.length; ii++) {
-                                var element = elements[ii]
-                                if (value.exoduslocate(element.value.toString()) > 0) {
-                                    element.checked = true
-                                    value = element.value
-                                    if (value == 'undefined')
-                                        value = ii
-                                }
-                                else
-                                    element.checked = false
-                            }
-
-                            break
-
-                        }
-
-                    case 'checkbox': {
-
-                            //multiple values as : or , separated string
-                            if (typeof value == 'string' && value.indexOf(':') >= 0) value = value.split(':')
-                            if (typeof value == 'string') value = value.split(sm)
-
-                            var elements = getradiocheckboxelements(element)
-                            for (var ii = 0; ii < elements.length; ii++) {
-                                var element = elements[ii]
-                                if (value.exoduslocate(element.value.toString()) > 0)
-                                    element.checked = true
-                                else
-                                    element.checked = false
-                            }
-
-                            break
-
-                        }
+                    break
 
                 }
 
-                break//INPUT
+                case 'checkbox': {
+
+                    //multiple values as : or , separated string
+                    if (typeof value == 'string' && value.indexOf(':') >= 0) value = value.split(':')
+                    if (typeof value == 'string') value = value.split(sm)
+
+                    var elements = getradiocheckboxelements(element)
+                    for (var ii = 0; ii < elements.length; ii++) {
+                        var element = elements[ii]
+                        if (value.exoduslocate(element.value.toString()) > 0)
+                            element.checked = true
+                        else
+                            element.checked = false
+                    }
+
+                    break
+
+                }
+
             }
+
+            break//INPUT
+        }
 
         case 'TEXTAREA': {
 
-                setexoduslink(element, value)
+            setexoduslink(element, value)
 
-                //http://wiki.ckeditor.net/Developer%27s_Guide/Javascript_API
-                if (typeof CKEDITOR != 'undefined') {
-                    oEditor = CKEDITOR.instances[element.id]
-                    if (oEditor) {
-                        //oEditor.SetHTML(value)
-                        //oEditor.setData(value)
-                        //using .setTimeout() because Internet Explorer 10/11 at least give error "permission denied"
-                        //if you call setData before previous setData has completed (asynchronously)
-                        window.setTimeout(function (){
-                            try {
-                                oEditor.setData(value)
-                                //oEditor.updateElement(value)
-                            } catch (e){}
-                        },500)
-                    }
+            //http://wiki.ckeditor.net/Developer%27s_Guide/Javascript_API
+            if (typeof CKEDITOR != 'undefined') {
+                oEditor = CKEDITOR.instances[element.id]
+                if (oEditor) {
+                    //oEditor.SetHTML(value)
+                    //oEditor.setData(value)
+                    //using .setTimeout() because Internet Explorer 10/11 at least give error "permission denied"
+                    //if you call setData before previous setData has completed (asynchronously)
+                    window.setTimeout(function () {
+                        try {
+                            oEditor.setData(value)
+                            //oEditor.updateElement(value)
+                        } catch (e) { }
+                    }, 500)
                 }
-
-                element.value = value
-                break
             }
+
+            element.value = value
+            break
+        }
 
         case 'SPAN': {
 
-                setexoduslink(element, value)
+            setexoduslink(element, value)
 
-                if (element.getAttribute('exodusimage')) {
-                    var img=element.nextSibling
-                    if (!img)
-                        img=element.parentNode.nextSibling
-                    if (img && img.tagName=='IMG')
-                        img.src=value
-                }
-
-                //this puts a char 160 no-break-space to ensure height isnt zero
-                //the other solution, putting style min-height doesnt zoom with ctrl+ ctrl- (does in ff 32)
-                //if (value == '')
-                //    value = '&nbsp;'
-
-                //treat as text
-                //IF element is contenteditable and the new value doesnt look like HTML
-                // and browser doesnt support "Sequences of whitespace are preserved."
-                if (element.isContentEditable&&(value.slice(0,1)!='<'||value.slice(-1)!='>')&&element.style.whiteSpace!='pre-wrap')
-
-                    //WARNING:
-                    //leading, trailing and excess spaces will be converted to character 160 (&nbsp;) in order to retain
-                    //their appearance since HTML spans dont show leading, trailing or more than one consecutive space
-                    //THEREFORE using span tags (but not input tags) CAN CONTAIN CHAR(160) IN TEXT ON THE SERVER
-                    element.innerText = value
-
-                //treat is HTML
-                //if element is not contenteditable, or the new value looks like HTML
-                else
-                    element.innerHTML = value
-                break
+            if (element.getAttribute('exodusimage')) {
+                var img = element.nextSibling
+                if (!img)
+                    img = element.parentNode.nextSibling
+                if (img && img.tagName == 'IMG')
+                    img.src = value
             }
+
+            //this puts a char 160 no-break-space to ensure height isnt zero
+            //the other solution, putting style min-height doesnt zoom with ctrl+ ctrl- (does in ff 32)
+            //if (value == '')
+            //    value = '&nbsp;'
+
+            //treat as text
+            //IF element is contenteditable and the new value doesnt look like HTML
+            // and browser doesnt support "Sequences of whitespace are preserved."
+            if (element.isContentEditable && (value.slice(0, 1) != '<' || value.slice(-1) != '>') && element.style.whiteSpace != 'pre-wrap')
+
+                //WARNING:
+                //leading, trailing and excess spaces will be converted to character 160 (&nbsp;) in order to retain
+                //their appearance since HTML spans dont show leading, trailing or more than one consecutive space
+                //THEREFORE using span tags (but not input tags) CAN CONTAIN CHAR(160) IN TEXT ON THE SERVER
+                element.innerText = value
+
+            //treat is HTML
+            //if element is not contenteditable, or the new value looks like HTML
+            else
+                element.innerHTML = value
+            break
+        }
 
         case 'SELECT': {
 
-                setdropdown3(element, null, '', value)
-                break
-            }
+            setdropdown3(element, null, '', value)
+            break
+        }
 
         case 'OPTION': {
 
-                setdropdown3(element.parentNode, null, '', value)
-                break
-            }
+            setdropdown3(element.parentNode, null, '', value)
+            break
+        }
 
         default: {
 
-                return systemerror('setvalue2()', exodusquote(element) + ' ' + exodusquote(element.tagName) + ' invalid tagName in setvalue2(' + element + ',' + value + ')')
-            }
+            return systemerror('setvalue2()', exodusquote(element) + ' ' + exodusquote(element.tagName) + ' invalid tagName in setvalue2(' + element + ',' + value + ')')
+        }
 
     } //of switch
 
@@ -6321,15 +6323,15 @@ function getradiocheckboxelements(element) {
 
 function setexoduslink(element, value) {
     return//always display now
-/*    if (element.getAttribute('exoduslink')) {
-        if (element.previousSibling && element.previousSibling.getAttribute('exoduslink')) {
-            element.previousSibling.style.display = value ? '' : 'none'
+    /*    if (element.getAttribute('exoduslink')) {
+            if (element.previousSibling && element.previousSibling.getAttribute('exoduslink')) {
+                element.previousSibling.style.display = value ? '' : 'none'
+            }
+            else if (element.nextSibling && element.nextSibling.getAttribute('exoduslink')) {
+                element.nextSibling.style.display = value ? '' : 'none'
+            }
         }
-        else if (element.nextSibling && element.nextSibling.getAttribute('exoduslink')) {
-            element.nextSibling.style.display = value ? '' : 'none'
-        }
-    }
-*/
+    */
 }
 
 function* getdefault(element) {
@@ -6355,8 +6357,8 @@ function* getdefault(element) {
     //}
 
     //return '' if no default
-    defaultvalueexpression=element.getAttribute('exodusdefaultvalue')
-    if (!defaultvalueexpression||defaultvalueexpression=='""')
+    defaultvalueexpression = element.getAttribute('exodusdefaultvalue')
+    if (!defaultvalueexpression || defaultvalueexpression == '""')
         return ''
 
     //login('getdefault ' + element.id)
@@ -6381,7 +6383,7 @@ function* getdefault(element) {
     if (typeof defaultvalue == 'number')
         defaultvalue = defaultvalue.toString()
     if (typeof defaultvalue != 'string') {
-        yield* exodusinvalid(element.id + ' default returned is ' + typeof defaultvalue + ' - "" used\nExpression:'+defaultvalueexpression)
+        yield* exodusinvalid(element.id + ' default returned is ' + typeof defaultvalue + ' - "" used\nExpression:' + defaultvalueexpression)
         defaultvalue = ''
     }
 
@@ -6390,20 +6392,20 @@ function* getdefault(element) {
 
 }
 
-var gautofitwindowpending
-function setchangesmade(value,savebuttonactive) {
-    gchangesmade=value
+//var gautofitwindowpending
+function setchangesmade(value, savebuttonactive) {
+    gchangesmade = value
     if (!gchangesmade)
-        gelementthatjustcalledsetchangesmade=null
+        gelementthatjustcalledsetchangesmade = null
     if (typeof savebuttonactive == 'undefined')
         savebuttonactive = value || !gKeyNodes
-    var savebuttonstyle=savebuttonactive ? gsaveimage : gsavegreyimage
+    var savebuttonstyle = savebuttonactive ? gsaveimage : gsavegreyimage
     setgraphicbutton(saverecord, null, savebuttonstyle)
 
-    if (gautofitwindow && !gautofitwindowpending) {
-        gautofitwindowpending=true
-        exodussettimeout('exodusautofitwindow()', 1)
-    }
+    //if (gautofitwindow && !gautofitwindowpending) {
+    //    gautofitwindowpending = true
+    //    exodussettimeout('exodusautofitwindow()', 1)
+    //}
 
 }
 
@@ -6470,7 +6472,7 @@ function* setdefault(element, donotupdate) {
     }
 
     //save the default for use eg by custom validation routines to avoid work
-    element.setAttribute('exodusdefault',gdefault)
+    element.setAttribute('exodusdefault', gdefault)
 
     //set the value (externally only)
     //yield* gds.setx(element,grecn,gdefault)
@@ -6501,7 +6503,7 @@ function* setdefault(element, donotupdate) {
 
     }
 
-   //log(element.id + ' defaulted to ' + gdefault)
+    //log(element.id + ' defaulted to ' + gdefault)
 
     //logout('setdefault ' + element.id + ' ' + exodusquote(gdefault))
 
@@ -6573,10 +6575,10 @@ function* validate(element) {
 
     grecn = getrecn(element)
 
-   //log('grecn=' + grecn)
+    //log('grecn=' + grecn)
 
     //old value
-    goldvalue = gds.getcells(element,grecn)
+    goldvalue = gds.getcells(element, grecn)
     if (goldvalue != null)
         goldvalue = goldvalue[0].text
 
@@ -6591,9 +6593,9 @@ function* validate(element) {
     }
 
     //get something to show in error messages
-    var elementtitle=element.getAttribute('exodustitle')
+    var elementtitle = element.getAttribute('exodustitle')
     if (!elementtitle)
-        elementtitle=element.id
+        elementtitle = element.id
 
     if (element.tagName != 'SELECT' && element.type != 'radio') {
 
@@ -6614,8 +6616,8 @@ function* validate(element) {
         */
 
         //remove all non-printing characters (eg tab) from key fields
-        if (Number(element.getAttribute('exodusfieldno'))==0) {
-            gvalue=gvalue.replace(/[\x00-\x1F]/g,'')
+        if (Number(element.getAttribute('exodusfieldno')) == 0) {
+            gvalue = gvalue.replace(/[\x00-\x1F]/g, '')
         }
 
         //invalid character check
@@ -6639,9 +6641,9 @@ function* validate(element) {
             //get unused invalid characters
             var charsx = invalidcharacters.exodusconvert(gvalue, '')
             //get used invalid characters
-            charsx = invalidcharacters.exodusconvert(charsx, '').exodusswap('|','&#124;')
+            charsx = invalidcharacters.exodusconvert(charsx, '').exodusswap('|', '&#124;')
             //.exodusswap(fm,'&u'+fm.charCodeAt(0)+';')
-            yield* exodusinvalid('The following characters are not allowed in '+elementtitle+'.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exodusswap(' ', ' space ')+'&nbsp;</span><br />&nbsp;')
+            yield* exodusinvalid('The following characters are not allowed in ' + elementtitle + '.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exodusswap(' ', ' space ') + '&nbsp;</span><br />&nbsp;')
             return false //logout('validate')
         }
 
@@ -6650,7 +6652,7 @@ function* validate(element) {
 
             var temp = gvalue.exodusconvert(element.getAttribute('exodusvalidcharacters'), '')
             if (temp != '') {
-                yield* exodusinvalid('Only the following characters are allowed in '+elementtitle+'.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exodusvalidcharacters').exodusswap('|','&#124;') + '\"')
+                yield* exodusinvalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exodusvalidcharacters').exodusswap('|', '&#124;') + '\"')
                 return false //logout('validate')
             }
         }
@@ -6658,19 +6660,19 @@ function* validate(element) {
     }
 
     //required check
-   //log('required check')
+    //log('required check')
     if (gvalue == ''
-         && element.getAttribute('exodusrequired')
-         && exodusenabledandvisible(element)) {
+        && element.getAttribute('exodusrequired')
+        && exodusenabledandvisible(element)) {
         yield* exodusinvalid(elementtitle + ' is required...')
         return false //logout('validate')
     }
 
-   //log('before file check')
+    //log('before file check')
     //file check (skip if has dropdown)
     if (element.getAttribute('exodusfilename')
-         && gvalue != ''
-         && !element.getAttribute('exodusdropdown')) {
+        && gvalue != ''
+        && !element.getAttribute('exodusdropdown')) {
 
         var filename = element.getAttribute('exodusfilename')
         var key = gvalue
@@ -6691,7 +6693,7 @@ function* validate(element) {
 
     }
 
-   //log('before conversion')
+    //log('before conversion')
 
     var gvaluebeforeiconv = gvalue
 
@@ -6714,10 +6716,10 @@ function* validate(element) {
         //var quotechar = (gvalue.indexOf('"') >= 0) ? "'" : '"'
         //var expression = convarray[0] + '(' + '"ICONV",' + quotechar + gvalue.replace(/\\/g, '\\\\') + quotechar + ',"' + convarray.slice(1) + '")'
 
-        var value=gvalue.replace(/\\/g, '\\\\')
-        value=value.replace(/\"/g,'\\"')
-        value=value.replace(/[\x0D]/g,'\\r')
-        value=value.replace(/[\x0A]/g,'\\n')
+        var value = gvalue.replace(/\\/g, '\\\\')
+        value = value.replace(/\"/g, '\\"')
+        value = value.replace(/[\x0D]/g, '\\r')
+        value = value.replace(/[\x0A]/g, '\\n')
         var expression = convarray[0] + '(' + '"ICONV","' + value + '","' + convarray.slice(1) + '")'
 
         gmsg = ''
@@ -6738,7 +6740,7 @@ function* validate(element) {
     }
 
     //custom validation - data in internal format
-   //log('before custom validation')
+    //log('before custom validation')
     var storegrecn = grecn
     var elementvalidation = element.getAttribute('exodusvalidation')
     if (elementvalidation) {
@@ -6765,7 +6767,7 @@ function* validate(element) {
     grecn = getrecn(gpreviouselement)
 
     //check for uniqueness for multivalues
-   //log('before unique check')
+    //log('before unique check')
     if (gvalue && ggroupno > 0 && element.getAttribute('exodusunique')) {
         var othervalues = yield* gds.getall(element.id)
         var ln
@@ -6790,20 +6792,20 @@ function* validate(element) {
     //assumes that numbers will be in number format
     var elementsequence = element.getAttribute('exodussequence')
     if (gvalue
-         && ggroupno > 0
-         && elementsequence) {
+        && ggroupno > 0
+        && elementsequence) {
         var title = element.getAttribute('exodustitle')
         if (elementsequence == 'A') {
             var temp
             if ((temp = yield* getpreviousrow('', true, true))
-                   && gvalue < temp) {
+                && gvalue < temp) {
                 //    alert(typeof gvalue+' '+gvalue+' < '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
                 return yield* exodusinvalid(title + ' cannot be less than ' + title + ' in the previous row above')
             }
             var temp
             if ((temp = yield* getnextrow('', true, true))
-                   && gvalue > temp) {
+                && gvalue > temp) {
                 //    alert(typeof gvalue+' '+gvalue+' > '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
                 return yield* exodusinvalid(title + ' cannot be greater than ' + title + ' in the next row below')
@@ -6812,7 +6814,7 @@ function* validate(element) {
     }
 
     //output conversion
-   //log('before output conversion')
+    //log('before output conversion')
 
     ovalue = yield* validateoconv(element, gvalue)
     if (ovalue == 'undefined' || ovalue == null)
@@ -6855,10 +6857,10 @@ function* validateoconv(element, ivalue) {
     //var quotechar = (ivalue.indexOf('"') >= 0) ? "'" : '"'
     //var expression = convarray[0] + '(' + '"OCONV",' + quotechar + ivalue.replace(/\\/g, '\\\\') + quotechar + ',"' + convarray[1] + '")'
 
-    ivalue=ivalue.replace(/\\/g, '\\\\')
-    ivalue=ivalue.replace(/\"/g,'\\"')
-    ivalue=ivalue.replace(/[\x0D]/g,'\\r')
-    ivalue=ivalue.replace(/[\x0A]/g,'\\n')
+    ivalue = ivalue.replace(/\\/g, '\\\\')
+    ivalue = ivalue.replace(/\"/g, '\\"')
+    ivalue = ivalue.replace(/[\x0D]/g, '\\r')
+    ivalue = ivalue.replace(/[\x0A]/g, '\\n')
     var expression = convarray[0] + '(' + '"OCONV","' + ivalue + '","' + convarray[1] + '")'
 
     gmsg = ''
@@ -6977,7 +6979,7 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
         //(starting and ending with single or double quote
         //and no single or double quotes internally)
         if (functionorcode.match(/^(["'])[^'"]*\1$/))
-            return functionorcode.slice(1,-1)
+            return functionorcode.slice(1, -1)
 
         //special code to return today's date
         if (functionorcode == 'TODAY')
@@ -6990,18 +6992,18 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
     //if (gstepping||(!ginitok&&gusername=='EXODUS'))
     // if (true||gstepping||gusername=='EXODUS')
     if (gstepping || gusername == 'EXODUS' || gusername == 'STEVE')
-        result=yield* exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
+        result = yield* exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
     else {
 
         //var e
         try {
-            result=yield* exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
+            result = yield* exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
         }
         catch (e) {
-        //chrome exception is not available except inside catch clause
-        //} if (e) {
+            //chrome exception is not available except inside catch clause
+            //} if (e) {
             //if (typeof callerfunctionname == 'undefined') callerfunctionname = '"not specified"'
-            systemerror('yield* exodusevaluate()'+functionorcode, e)
+            systemerror('yield* exodusevaluate()' + functionorcode, e)
             return yield* exodusinvalid()
         }
 
@@ -7019,55 +7021,55 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
 }
 
 //var gcatcherrors=true//use try/catch to show errors to users on screen
-var gcatcherrors=false//avoid try/catch thereby allowing javascript error line number etc to show in console and/or be caught by debugger
+var gcatcherrors = false//avoid try/catch thereby allowing javascript error line number etc to show in console and/or be caught by debugger
 
 function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobject) {
 
     //arg1name and arg1 are 'event' and event in some use cases
     //in order to pass event into exodusonclick functions
     if (!arg1name)
-        arg1name='dummyarg1name'
+        arg1name = 'dummyarg1name'
     if (!arg1)
-        arg1=null
+        arg1 = null
 
     //straight function call
     if (typeof functionorcode == 'function')
         return functionorcode(arg1)
 
-    var functioncode=functionorcode
-    if (functioncode.indexOf('return ')<0)
-        functioncode='return '+functioncode
+    var functioncode = functionorcode
+    if (functioncode.indexOf('return ') < 0)
+        functioncode = 'return ' + functioncode
 
     //yielding function code - wrap in a generator function
-    if (functioncode.match&&functioncode.match(gyieldregex)) {
+    if (functioncode.match && functioncode.match(gyieldregex)) {
         if (guseyield) {
-            try{
-                /* yield */ functioncode='return function *(){'+functioncode+'}'
+            try {
+                /* yield */ functioncode = 'return function *(){' + functioncode + '}'
                 //arg1name can be the textual name of any variable or argumentname in the text of the function code
-                functionx=new Function(arg1name,functioncode)
+                functionx = new Function(arg1name, functioncode)
             }
             catch (e) {
-                return systemerror('yield* exodusevaluate3()\nError creating function \n'+functioncode,e)
+                return systemerror('yield* exodusevaluate3()\nError creating function \n' + functioncode, e)
             }
             if (gcatcherrors) {
                 try {
 
                     //we pass in the value of arg1 when calling the function
-                    /* yield */var result=yield * functionx(arg1).apply(thisobject||this)
+                    /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
                     return result
                 }
                 catch (e) {
-                    return systemerror('yield* exodusevaluate3()\n'+functioncode,e)
+                    return systemerror('yield* exodusevaluate3()\n' + functioncode, e)
                 }
-            //commented out to enable showing of run time script errors
+                //commented out to enable showing of run time script errors
             } else {
                     //we pass in the value of arg1 when calling the function
-                    /* yield */var result=yield * functionx(arg1).apply(thisobject||this)
-                    return result
+                    /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
+                return result
             }
 
         } else
-            functioncode=functioncode.replace(gyieldregex,'')
+            functioncode = functioncode.replace(gyieldregex, '')
     }
 
     //non-yielding function code
@@ -7075,13 +7077,13 @@ function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobje
 
         //arg1name can be the textual name of any variable in the text of the function code
         //TODO should only add return if no return in functioncode - to allow multi-line function code with returns in later lines
-        functionx=new Function(arg1name,functioncode)
+        functionx = new Function(arg1name, functioncode)
     } catch (e) {
-        return systemerror('yield* exodusevaluate3()\n'+functioncode,e)
+        return systemerror('yield* exodusevaluate3()\n' + functioncode, e)
     }
     //we pass in the value of the argument when calling the function
     //return functionx.apply(this,arg1)
-    return functionx.call(thisobject||this,arg1)
+    return functionx.call(thisobject || this, arg1)
 }
 
 function* oconvertvalue(ivalue, conversion) {
@@ -7090,11 +7092,11 @@ function* oconvertvalue(ivalue, conversion) {
     return ivalue.exodusoconv(conversion)
 }
 
-function* deleterow_onclick(event){
+function* deleterow_onclick(event) {
     return yield* form_deleterow(event)
 }
 
-function* insertrow_onclick(event){
+function* insertrow_onclick(event) {
     return yield* form_insertrow(event)
 }
 
@@ -7105,7 +7107,7 @@ function* form_deleterow(event, element) {
 
     //login('deleterow')
 
-    event=getevent(event)
+    event = getevent(event)
 
     if (!element)
         element = event.target
@@ -7129,11 +7131,11 @@ function* form_deleterow(event, element) {
 
     //make sure any previous data entered is valid EXCEPT if on the current line benig deleted
     if
-      (gpreviouselement
-       && (Number(gpreviouselement.getAttribute('exodusgroupno')) != groupno
-       || getrecn(gpreviouselement) != rown)
-       && !(yield* validateupdate())
-       )
+        (gpreviouselement
+        && (Number(gpreviouselement.getAttribute('exodusgroupno')) != groupno
+            || getrecn(gpreviouselement) != rown)
+        && !(yield* validateupdate())
+    )
         return false //logout('deleterow gprevious invalid')
 
     //cannot delete if keyed and not locked
@@ -7186,7 +7188,7 @@ function* form_deleterow(event, element) {
     if (document.getElementsByClassName)
         element = grows[rown].getElementsByClassName('exodusid_' + id)[0]
     else
-    //using (id) instead of [id] because will return only one?
+        //using (id) instead of [id] because will return only one?
         element = grows[rown].all(id)
     focuson(element)
     //gpreviouselement = element
@@ -7351,8 +7353,8 @@ function exodusaddrow(groupno) {
 function* readonlydocmsg() {
 
     //restore any previous value
-    if (gpreviouselement&&gvalue!=gpreviousvalue)
-        setvalue(gpreviouselement,gpreviousvalue)
+    if (gpreviouselement && gvalue != gpreviousvalue)
+        setvalue(gpreviouselement, gpreviousvalue)
 
     //readonly after key has been entered
     if (gKeyNodes || gkey)
@@ -7368,7 +7370,7 @@ function* readonlydocmsg() {
 //'''''''''''
 function* form_insertrow(event, append) {
 
-    event=getevent(event)
+    event = getevent(event)
     if (event.target.tagName == 'BODY')
         return
 
@@ -7411,12 +7413,12 @@ function* form_insertrow(event, append) {
     //option to insert AFTER if clicking the one row or clicking the penultimate row of many
     if (typeof append == 'undefined') {
         //clicking on the final row of multiple rows always adds AFTER/BELOW since most common and natural
-        if (nrows > 1 && rown == nrows-1)
+        if (nrows > 1 && rown == nrows - 1)
             grecn++
         //clicking a single row OR clicking the penultimate row
-        else if (nrows == 1 || rown == nrows-2) {
-            var defaultchoice = (nrows==1) ? 2 : 1
-            var choice=yield* exodusconfirm('Insert row before or after?',1,'Before','After','Cancel')
+        else if (nrows == 1 || rown == nrows - 2) {
+            var defaultchoice = (nrows == 1) ? 2 : 1
+            var choice = yield* exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel')
             if (!choice)
                 return false
             if (choice == 2)
@@ -7608,7 +7610,7 @@ function* nextrecord2(event, direction) {
         yield* opendoc(nextkey)
     }
 
-    yield* setgkeys(nextkeys,nextkeyn)
+    yield* setgkeys(nextkeys, nextkeyn)
 
     return true
 
@@ -7616,7 +7618,7 @@ function* nextrecord2(event, direction) {
 
 function* exoduslink(event, element) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     //login('exoduslink')
 
@@ -7649,7 +7651,7 @@ function* exoduslink(event, element) {
 
     grecn = getrecn(element)
 
-    gvalue = getvalue(element,grecn)
+    gvalue = getvalue(element, grecn)
     if (!(element.getAttribute('exoduslowercase')))
         gvalue = gvalue.toUpperCase()
 
@@ -7663,7 +7665,7 @@ function* exoduslink(event, element) {
 
 function* exoduspopup(event, element) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     //element is only provided from f7/alt+down keyboard events
 
@@ -7675,16 +7677,16 @@ function* exoduspopup(event, element) {
     if (!element) {
         element = event.target
         while (element
-                && ( !element.getAttribute || !element.getAttribute('exoduspopup') )
-                && element.tagName != 'SELECT') {
+            && (!element.getAttribute || !element.getAttribute('exoduspopup'))
+            && element.tagName != 'SELECT') {
             element = element.nextSibling
         }
         if (!element) {
-            var elements=event.target.parentNode.getElementsByTagName('*')
-            for (var elementn=0;elementn<elements.length;++elementn) {
-                element=elements[elementn]
-                if (element.getAttribute&&element.getAttribute('exoduspopup'))
-                 break
+            var elements = event.target.parentNode.getElementsByTagName('*')
+            for (var elementn = 0; elementn < elements.length; ++elementn) {
+                element = elements[elementn]
+                if (element.getAttribute && element.getAttribute('exoduspopup'))
+                    break
             }
         }
     }
@@ -7693,7 +7695,7 @@ function* exoduspopup(event, element) {
     if (!element)
         return false //logout('exoduspopup - no element')
 
-   //log('check no missing data in group 0 always')
+    //log('check no missing data in group 0 always')
     if (!(yield* checkrequired(gfields, element, 0)))
         return false //logout('exoduspopup' + ' ' + element.id + ' a prior element is visible and required but is blank (1)')
 
@@ -7737,7 +7739,7 @@ function* exoduspopup(event, element) {
     //get a reply or return false
     /////////////////////////////
     if ((reply = yield* exoduspopup2(element)) == null) {
-//    alert('xxx')
+        //    alert('xxx')
         focuson(element)
         return false //logout('exoduspopup - no reply')
     }
@@ -7745,15 +7747,15 @@ function* exoduspopup(event, element) {
     //update the element multiple selections qqq
     //if reply is an array use replace all rows
     if (reply.length > 1
-         && Number(element.getAttribute('exodusgroupno'))
-         && typeof (reply) == 'object') {
-                //var elementid = element.id
+        && Number(element.getAttribute('exodusgroupno'))
+        && typeof (reply) == 'object') {
+        //var elementid = element.id
 
         var elementid = element.id
 
         //deselect items already selected
         if (grecn > 0) {
-            var prevalues = ((yield* gds.getall(elementid))).slice(0,grecn)
+            var prevalues = ((yield* gds.getall(elementid))).slice(0, grecn)
             for (var ii = 0; ii < prevalues.length; ++ii) {
                 var replyn
                 if (replyn = reply.exoduslocate(prevalues[ii]))
@@ -7763,7 +7765,7 @@ function* exoduspopup(event, element) {
                 return false //logout('exoduspopup - no new selections')
         }
 
-        yield* insertallrows(element, reply,grecn)
+        yield* insertallrows(element, reply, grecn)
         setchangesmade(true)//should this be done in insertallrows to ensure Save button is enabled in other cases too?
 
         //focus on next element AFTER table
@@ -7843,18 +7845,18 @@ function* exoduspopup2(element) {
         var selectvalues = []
         for (var ii = 0; ii < element.childNodes.length; ii++) {
             var option = element.childNodes[ii]
-            var optionvalue=option.value
+            var optionvalue = option.value
             if (!optionvalue)
-                optionvalue=''
-            var optiontext=option.innerText
+                optionvalue = ''
+            var optiontext = option.innerText
             if (!optiontext)
-                optiontext=''
+                optiontext = ''
             selectvalues[selectvalues.length] = [optionvalue, optiontext]
         }
 
         //allow multiple selection if element is in a group with only one input column
         var multipleselection = false
-        var elgroupno=Number(element.getAttribute('exodusgroupno'))
+        var elgroupno = Number(element.getAttribute('exodusgroupno'))
         if (elgroupno) {
             var tableelement = gtables[elgroupno].tableelement
             var multipleselection = tableelement && tableelement.getAttribute('exoduslastinputcolscreenfn') == tableelement.getAttribute('exodusfirstinputcolscreenfn')
@@ -7869,25 +7871,25 @@ function* exoduspopup2(element) {
 
         //convert an array of row number(s) to an array of value(s)
         for (var ii = 0; ii < reply.length; ii++) {
-            reply[ii]=selectvalues[reply[ii] - 1][0]
+            reply[ii] = selectvalues[reply[ii] - 1][0]
         }
 
         //remove empty values
-        reply=reply.exodustrim('')
+        reply = reply.exodustrim('')
 
         //minimum one value
         if (!reply.length)
-            reply=['']
+            reply = ['']
 
     }
 
     //undefined, null or '' all return as null
     if
-          (typeof (reply) == 'undefined'
-          || (typeof (reply) == 'boolean' && reply == false)
-          || reply == null
-          || (typeof (reply) == 'string' && reply == '')
-          ) {
+        (typeof (reply) == 'undefined'
+        || (typeof (reply) == 'boolean' && reply == false)
+        || reply == null
+        || (typeof (reply) == 'string' && reply == '')
+    ) {
         reply = null
 
         //if popup returns nothing but gdependents is set then the popup must have updated
@@ -7903,7 +7905,7 @@ function* exoduspopup2(element) {
 
             if (reply.length > 1 && reply.length <= 50) {
                 var openall = 2
-                openall=yield* exodusconfirm('Open all in one tab?', 1, 'One', 'Many')
+                openall = yield* exodusconfirm('Open all in one tab?', 1, 'One', 'Many')
                 if (!openall)
                     return false
                 if (openall == 2) {
@@ -7916,15 +7918,15 @@ function* exoduspopup2(element) {
                             yield* windowopen(window.location.href.toString().split('?')[0] + '?key=' + key)
                     }
                     //window.location.assign(window.location.href.toString().split('?')[0] + '?key=' + reply[0])
-                    reply=[reply[0]]//return the first key only
+                    reply = [reply[0]]//return the first key only
                 }
             }
 
-            yield* setgkeys(reply,0)
-            reply=reply[0]
+            yield* setgkeys(reply, 0)
+            reply = reply[0]
         }
         else {
-            yield* setgkeys([reply],0)
+            yield* setgkeys([reply], 0)
         }
     }
 
@@ -7932,34 +7934,34 @@ function* exoduspopup2(element) {
 
 }
 
-function* setgkeys(keys,keyn){
-    if (typeof keys=='string') {
-        keys=[keys]
+function* setgkeys(keys, keyn) {
+    if (typeof keys == 'string') {
+        keys = [keys]
     }
-    gkeys=keys
-    var tt = gkeys.length>1?"":"none"
-    firstrecord.style.display=tt
-    previousrecord.style.display=tt
-    selectrecord.style.display=tt
-    nextrecord.style.display=tt
-    lastrecord.style.display=tt
-    if (typeof keyn=='undefined') {
-        for (keyn=0;keyn<gkeys.length;++keyn) {
-            if (keys[keyn]==gkey) {
+    gkeys = keys
+    var tt = gkeys.length > 1 ? "" : "none"
+    firstrecord.style.display = tt
+    previousrecord.style.display = tt
+    selectrecord.style.display = tt
+    nextrecord.style.display = tt
+    lastrecord.style.display = tt
+    if (typeof keyn == 'undefined') {
+        for (keyn = 0; keyn < gkeys.length; ++keyn) {
+            if (keys[keyn] == gkey) {
                 break
             }
         }
     }
-    if (keyn<gkeys.length) {
+    if (keyn < gkeys.length) {
         yield* setgkeyn(keyn)
     }
 }
 
 function* setgkeyn(keyn) {
-    gkeyn=keyn
-    firstrecord.disabled=gkeyn==0?true:false
-    selectrecord.innerHTML=(gkeyn+1)+" of "+gkeys.length
-    lastrecord.disabled=(gkeyn==(gkeys.length-1))?true:false
+    gkeyn = keyn
+    firstrecord.disabled = gkeyn == 0 ? true : false
+    selectrecord.innerHTML = (gkeyn + 1) + " of " + gkeys.length
+    lastrecord.disabled = (gkeyn == (gkeys.length - 1)) ? true : false
 }
 
 function* getkeyexternal() {
@@ -8057,7 +8059,7 @@ function getrecn(element) {
     //returns null if element not part of a table
 
     var recn
-    if (element.getAttribute&&!(Number(element.getAttribute('exodusgroupno')))) {
+    if (element.getAttribute && !(Number(element.getAttribute('exodusgroupno')))) {
         recn = null
     }
     else {
@@ -8074,7 +8076,7 @@ function getrecn(element) {
 
     //partially solve a bug that deleteallrows deletes our row and leaves us unable to find recn from its rowIndex
     //since rowIndex of a deleted row (removed from DOM) is -1
-    if (recn<0) {
+    if (recn < 0) {
         //var msg='getrecn'+recn
         //if (rowx)
         //    msg+=' rowx.rowIndex'+rowx.rowIndex
@@ -8082,7 +8084,7 @@ function getrecn(element) {
         //if (tablex)
         //    msg+=' tablex.tHead.rows.length'+tablex.tHead.rows.length
         //alert(msg)
-        recn=0
+        recn = 0
     }
 
     return recn
@@ -8112,9 +8114,9 @@ function* getrowx(dictid, skipblanks, forward, iconv) {
         if (grecn == 0)
             return ''
         if (iconv)
-            value = yield* gds.get1(dictid,grecn - 1)
+            value = yield* gds.get1(dictid, grecn - 1)
         else
-            value = getvalue(dictid,grecn - 1)
+            value = getvalue(dictid, grecn - 1)
         if (value)
             return value
         if (!skipblanks)
@@ -8153,12 +8155,12 @@ function* getrowx(dictid, skipblanks, forward, iconv) {
 }
 
 function* form_ondblclick(event) {
-    event=getevent(event)
+    event = getevent(event)
     return yield* form_filter('filter')
 }
 
 function* form_onrightclick(event) {
-    event=getevent(event)
+    event = getevent(event)
     return true
 }
 
@@ -8216,8 +8218,8 @@ function* form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         groupno = colidorgroupno
     }
 
-//ensure the function name is recognised by the yield converter
-//function* prefilter(){}
+    //ensure the function name is recognised by the yield converter
+    //function* prefilter(){}
 
     //prefilter
     if (typeof form_prefilter == 'function') {
@@ -8289,7 +8291,7 @@ function* form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     }
     else {
-        values = yield* gds.regetx(colid,null)
+        values = yield* gds.regetx(colid, null)
         if (!regexp && !maxrecn) {
             grecn = getrecn()
             var value = values[grecn]
@@ -8379,7 +8381,7 @@ function* form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         }
         //mark last unhidden row as expand image
         for (var rown = 0; rown < lastunhiddenrows.length; ++rown)
-        //change to expandrow image
+            //change to expandrow image
             setinsertimage('expand', lastunhiddenrows[rown], groupno)
         yield* calcfields()
     }
@@ -8549,7 +8551,7 @@ function* form_pop_index(filename, fieldname, many) {
     //get index values
     var indexvalues = yield* form_get_index(filename, fieldname)
     if (!indexvalues || indexvalues.group1.length == 0)
-        return yield* exodusinvalid('No ' + fieldname.toLowerCase().exodusconvert('_',' ') +'(s) have been entered on ' + filename.toLowerCase().exodusconvert('._','  ') + ' file yet')
+        return yield* exodusinvalid('No ' + fieldname.toLowerCase().exodusconvert('_', ' ') + '(s) have been entered on ' + filename.toLowerCase().exodusconvert('._', '  ') + ' file yet')
 
     //user selects index value(s)
     var result = yield* exodusdecide2('', indexvalues, [[fieldname, fieldname.exoduscapitalise()]], 0, '', many)
@@ -8625,24 +8627,24 @@ function copydictitem(dictitem, element) {
 }
 
 function form_setdefault(str) {
-    gro.defaultrevstr=unescape(str.exodusconvert('`^]}\~',rm+fm+vm+sm+tm+stm))
+    gro.defaultrevstr = unescape(str.exodusconvert('`^]}\~', rm + fm + vm + sm + tm + stm))
     return 'ok'
 }
 
 function* form_postread_noteifdeleted(descending) {
 
     //skip if not deleted. deleted = gds.isnewrecord but has some version
-    if (!gds.isnewrecord||!(yield* gds.getx('VERSION')))
+    if (!gds.isnewrecord || !(yield* gds.getx('VERSION')))
         return false
 
     //descending means the latest log is inserted as first mv, which is the least common option, in PLAN/SCHEDULE/BATCHES
-    var logn=descending?0:-1
-    
-    var note='This record was deleted by '+(yield* gds.get1('USERNAME_UPDATED',logn))+' on '+(yield* gds.get1('DATETIME_UPDATED',logn)).exodusoconv('[DATE_TIME]')+'.'
-    note+='\n\nYou can restore it by saving it again'
+    var logn = descending ? 0 : -1
+
+    var note = 'This record was deleted by ' + (yield* gds.get1('USERNAME_UPDATED', logn)) + ' on ' + (yield* gds.get1('DATETIME_UPDATED', logn)).exodusoconv('[DATE_TIME]') + '.'
+    note += '\n\nYou can restore it by saving it again'
     yield* exodusnote(note)
 
-    gallowsavewithoutchanges=true
+    gallowsavewithoutchanges = true
     setchangesmade(false, true)//change style of Save button
 
     //indicate is deleted
@@ -8651,50 +8653,50 @@ function* form_postread_noteifdeleted(descending) {
 
 function* document_oncopy(event) {
 
-    event=getevent(event)
-    var element=event.target
+    event = getevent(event)
+    var element = event.target
 
     //choose
     //form_oncopy if present
     //form_oncopy_generic
-    if (typeof form_oncopy=='undefined')
-        form_oncopy=form_oncopy_generic
+    if (typeof form_oncopy == 'undefined')
+        form_oncopy = form_oncopy_generic
 
     //return true if handled EVEN IF FAILED
     //return false to allow normal handler below
     if (yield* form_oncopy(event)) {
-      return exoduscancelevent(event)
+        return exoduscancelevent(event)
     }
 
     return true
-    
+
 }
 
 function* form_oncopy_generic(event) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     //resolve any data entry issues first
     if (!(yield* validateupdate()))
         return true//prevent normal copy
 
     //if no cols to copy then return false to trigger normal copy
-    var cols=form_copypaste_getcols(event,false)
+    var cols = form_copypaste_getcols(event, false)
     if (!cols)
         return false
 
-    var elementid=cols[0][0]
+    var elementid = cols[0][0]
 
     //determine the lns that are selected
-    var selection=window.getSelection()
+    var selection = window.getSelection()
     //var elements=document.getElementsByName('ITEM_DESCRIPTION')
     //getElementByName doesnt work on span tags
     var elements = document.getElementsByClassName('exodusid_' + elementid)
-    var lns=[]
+    var lns = []
     if (!selection.containsNode)
         return false//not supported in MSIE so trigger normal copy?
-    for (var ln=0;ln<elements.length;++ln) {
-        if (selection.containsNode(elements[ln],true))
+    for (var ln = 0; ln < elements.length; ++ln) {
+        if (selection.containsNode(elements[ln], true))
             lns.push(ln)
     }
 
@@ -8702,32 +8704,32 @@ function* form_oncopy_generic(event) {
     if (!lns.length)
         return false
 
-    var ncols=cols.length
-    var data=[]
+    var ncols = cols.length
+    var data = []
 
     //first line output is tab separated column titles (dictids)
-    var txln=[]    
-    for (var coln=0;coln<ncols;++coln) {
+    var txln = []
+    for (var coln = 0; coln < ncols; ++coln) {
         txln.push(cols[coln][1])
     }
     data.push(txln.join('\t'))
 
     //ln used in gds.get1(dictid,ln) below
-    for (var lnn=0;lnn<lns.length;++lnn){
-        var ln=lns[lnn]
+    for (var lnn = 0; lnn < lns.length; ++lnn) {
+        var ln = lns[lnn]
 
         //build a line of text using the column names
-        var txln=[]
-        for (var coln=0;coln<ncols;++coln) {
-            var colpars=cols[coln]
-            var dictid=colpars[0]
+        var txln = []
+        for (var coln = 0; coln < ncols; ++coln) {
+            var colpars = cols[coln]
+            var dictid = colpars[0]
             if (!dictid)
                 //empty col for letters and dates multi-row generated below
                 txln.push('')
             else {
-                var cell=yield* gds.get1(dictid,ln)
-                if (colpars[2]&&colpars[2].slice(0,1)=='[')
-                    cell=cell.exodusoconv(colpars[2])
+                var cell = yield* gds.get1(dictid, ln)
+                if (colpars[2] && colpars[2].slice(0, 1) == '[')
+                    cell = cell.exodusoconv(colpars[2])
                 txln.push(cell)
             }
         }
@@ -8736,7 +8738,7 @@ function* form_oncopy_generic(event) {
         data.push(txln.join('\t'))
 
     }
-    
+
     //using dos/windows style line endings to be compatible with windows notepad
     //everything else seems to handle them properly
     event.clipboardData.setData('text/plain', data.join('\r\n'));
@@ -8751,8 +8753,8 @@ function* form_oncopy_generic(event) {
 
 function* document_onpaste(event) {
 
-    event=getevent(event)
-    var element=event.target
+    event = getevent(event)
+    var element = event.target
 
     //only supporting form_paste in first column
     if (!element.getAttribute('exodusisfirstinputcolumn')) {
@@ -8775,19 +8777,19 @@ function* document_onpaste(event) {
         return true
 
     //use form_onpaste_generic if form_onpaste not defined
-    if (typeof form_onpaste=='undefined')
-        form_onpaste=form_onpaste_generic
+    if (typeof form_onpaste == 'undefined')
+        form_onpaste = form_onpaste_generic
 
     //return true to suppress normal handler EVEN IF FAILED
     if (yield* form_onpaste(event))
-      return exoduscancelevent(event)
+        return exoduscancelevent(event)
 
     //in case we selected a text node
     if (!element.getAttribute && element.parentNode.getAttribute)
-        element=element.parentElement
-        
+        element = element.parentElement
+
     //prevent paste into readonly
-    var msg=element.getAttribute('exodusreadonly')
+    var msg = element.getAttribute('exodusreadonly')
     if (msg) {
         exoduscancelevent()
         return yield* exodusinvalid(msg)
@@ -8825,98 +8827,98 @@ function* document_onpaste(event) {
 
 function form_copypaste_getcols(event, pasting) {
 
-    event=getevent(event)
-    
-    var element=event.target
-    if (!element||!element.getAttribute) {
-        element=element.parentElement
-        if (!element||!element.getAttribute)
+    event = getevent(event)
+
+    var element = event.target
+    if (!element || !element.getAttribute) {
+        element = element.parentElement
+        if (!element || !element.getAttribute)
             return false
     }
 
-    var selection=window.getSelection()
-    var tablex=getancestor(selection.anchorNode,'TABLE')
+    var selection = window.getSelection()
+    var tablex = getancestor(selection.anchorNode, 'TABLE')
     if (!tablex)
         return false
-    var groupn=tablex.getAttribute('exodusgroupno')
-    if (groupn<1)
+    var groupn = tablex.getAttribute('exodusgroupno')
+    if (groupn < 1)
         return false
 
     //only copy/paste on rows - get groupn or quit
     //var groupn=element.getAttribute('exodusgroupno')
     //if (groupn<1)
     //    return false
-        
+
     //only cut/paste on first col
     //if (!element.getAttribute('exodusisfirstinputcolumn'))
     //    return false
-        
+
     //get table columns
-    var tablefieldns=gtables[groupn]
-    var cols=[]
-    for (var fn=0;fn<tablefieldns.length;++fn) {
-        var element=gfields[tablefieldns[fn]]
+    var tablefieldns = gtables[groupn]
+    var cols = []
+    for (var fn = 0; fn < tablefieldns.length; ++fn) {
+        var element = gfields[tablefieldns[fn]]
         if (pasting && element.getAttribute('exodusreadonly'))
             continue
-        var elementtitle=element.id.exodusconvert('_',' ')
-        var conversion=element.getAttribute('exodusconversion')
-        var col=[element.id,elementtitle,conversion]
+        var elementtitle = element.id.exodusconvert('_', ' ')
+        var conversion = element.getAttribute('exodusconversion')
+        var col = [element.id, elementtitle, conversion]
         cols.push(col)
     }
-    
+
     if (!cols.length)
         return false
-        
+
     return cols
-    
+
 }
 
-function* form_onpaste_generic(event,elementid,validatedata_function,importdata_function) {
+function* form_onpaste_generic(event, elementid, validatedata_function, importdata_function) {
 
     //return false - to indicate normal paste should occur
     //return true - to avoid normal paste
     /////////////////////////////////////
     if (!validatedata_function)
-        validatedata_function=form_onpaste_generic_validatedata
+        validatedata_function = form_onpaste_generic_validatedata
     if (!importdata_function)
-        importdata_function=form_onpaste_generic_importdata
+        importdata_function = form_onpaste_generic_importdata
 
-    event=getevent(event)
+    event = getevent(event)
 
     //do normal paste if not on a row
-    if (getrecn()==null)
+    if (getrecn() == null)
         return false
 
     //determine columns to paste otherwise quit
     if (!elementid) {
-        var cols=form_copypaste_getcols(event,true)
+        var cols = form_copypaste_getcols(event, true)
         if (!cols)
             return false
-        elementid=cols[0][0]
+        elementid = cols[0][0]
     }
 
-//    //indicate normal paste should occur except on first column of rows
-//    if (!event.target||event.target.id!=elementid)
-//      return false
-//
-//    //rather horrible way to reverse default paste which happens later
-//    var beforepaste_element=gpreviouselement
-//    var beforepaste_value=gpreviousvalue
-//    window.setTimeout(
-//        function () {
-//            setvalue(beforepaste_element,beforepaste_value)
-//        }
-//    ,1)
-//    
+    //    //indicate normal paste should occur except on first column of rows
+    //    if (!event.target||event.target.id!=elementid)
+    //      return false
+    //
+    //    //rather horrible way to reverse default paste which happens later
+    //    var beforepaste_element=gpreviouselement
+    //    var beforepaste_value=gpreviousvalue
+    //    window.setTimeout(
+    //        function () {
+    //            setvalue(beforepaste_element,beforepaste_value)
+    //        }
+    //    ,1)
+    //    
     //resolve any data entry issues first
     if (!(yield* validateupdate()))
         return true
 
     //from here on we do NOT want normal paste to happen afterwards
     exoduscancelevent()
-    
+
     //skip if no clipboard
-    var clipboarddata = gevent.clipboardData?gevent.clipboardData:window.clipboardData
+    var clipboarddata = gevent.clipboardData ? gevent.clipboardData : window.clipboardData
     if (!clipboarddata)
         return true
 
@@ -8925,22 +8927,22 @@ function* form_onpaste_generic(event,elementid,validatedata_function,importdata_
     var data = clipboarddata.getData('Text')
 
     //standardise on \n and remove trailing \n
-    data = data.replace(/\r\n/g, '\n').replace(/\n+$/,'')
+    data = data.replace(/\r\n/g, '\n').replace(/\n+$/, '')
 
     //normal paste if not multi-line
     if (data.indexOf('\n') < 0)
         return false
 
-//    //user pastes data
-//    if (!data) {
-//        //args.SCHEDULE_TEXT = gscheduleimportdata.exodusconvert(tm,vm)
-//        var args = {}
-//        data = yield* exodusshowmodaldialog('../media/schedules_import.htm', args)
-//        if (!data)
-//            return true
-//        data = data.replace(tm, '\n')
-//        //gscheduleimportdata = data
-//    }
+    //    //user pastes data
+    //    if (!data) {
+    //        //args.SCHEDULE_TEXT = gscheduleimportdata.exodusconvert(tm,vm)
+    //        var args = {}
+    //        data = yield* exodusshowmodaldialog('../media/schedules_import.htm', args)
+    //        if (!data)
+    //            return true
+    //        data = data.replace(tm, '\n')
+    //        //gscheduleimportdata = data
+    //    }
 
     //convert pairs of double quotes to one double quote and remove surrounding double quotes
     //eg "30""" becomes 30"
@@ -8951,7 +8953,7 @@ function* form_onpaste_generic(event,elementid,validatedata_function,importdata_
     var nlines = data.length
     var line1 = data[0].split('\t')
     var ncols = line1.length
-    for (var ln = nlines-1; ln>=0; --ln) {
+    for (var ln = nlines - 1; ln >= 0; --ln) {
 
         var line = data[ln].split('\t')
 
@@ -8961,24 +8963,24 @@ function* form_onpaste_generic(event,elementid,validatedata_function,importdata_
         //line = line.replace(/ +\t/g, '\t').replace(/\t +/g, '\t')
         //unfortunately array.exodustrim removes empty cells
         //line=line.exodustrim()
-        for (var ii=line.length-1;ii>=0;--ii)
-            line[ii]=line[ii].exodustrim()
-        
+        for (var ii = line.length - 1; ii >= 0; --ii)
+            line[ii] = line[ii].exodustrim()
+
         // skip blank lines
         //if (!line.join('')) {
         //    data.splice(ln,1)
         //    --nlines
         //    continue
         //}
-                
+
         //ensure full set of columns
         while (line.length < ncols)
             line.push('')
 
-        data[ln]=line
+        data[ln] = line
     }
 
-    data.startln=1
+    data.startln = 1
     if (nlines < data.startln + 1) {
         //yield* form_undopaste(beforepaste_element,beforepaste_value)
         yield* exodusinvalid('Not enough lines to import')
@@ -8986,23 +8988,23 @@ function* form_onpaste_generic(event,elementid,validatedata_function,importdata_
     }
 
     //pass the desired target cols with the data
-    data.cols=cols
+    data.cols = cols
 
     //////////        
     //validate
     //////////
-    var ninvalid=yield* validatedata_function(data)
-    if (ninvalid===false)
+    var ninvalid = yield* validatedata_function(data)
+    if (ninvalid === false)
         return true
-    
-    if (data.length<=1) {
+
+    if (data.length <= 1) {
         yield* exodusinvalid('Nothing to import')
         return true
     }
-    
+
     //option to quit if any invalid items
     if (ninvalid) {
-        if (!(yield* exodusyesno('There were '+ninvalid+' invalid items\nDo you want to continue?\n\n(Invalid items will be imported as blank)')))
+        if (!(yield* exodusyesno('There were ' + ninvalid + ' invalid items\nDo you want to continue?\n\n(Invalid items will be imported as blank)')))
             return true
     }
 
@@ -9021,54 +9023,54 @@ function* form_onpaste_generic(event,elementid,validatedata_function,importdata_
 
 }
 
-function* form_onpaste_ignore_cancel(rown,coln,coltitle,data,msg) {
-    return yield* exodusokcancel('WARNING! in Row:'+(rown+1)+' Col:'+(coln+1)+'\n\n'+coltitle+' = "'+data+'"\n\n'+msg,'Ignore','Cancel')
+function* form_onpaste_ignore_cancel(rown, coln, coltitle, data, msg) {
+    return yield* exodusokcancel('WARNING! in Row:' + (rown + 1) + ' Col:' + (coln + 1) + '\n\n' + coltitle + ' = "' + data + '"\n\n' + msg, 'Ignore', 'Cancel')
 }
-        
+
 function* form_onpaste_generic_validatedata(data) {
 
     //returns ninvalid (or false to cancel)
-    
-    var ninvalid=0
-    var nlns=data.length
-    
+
+    var ninvalid = 0
+    var nlns = data.length
+
     //configuration
 
     var line1 = data[0]
     var rowtitles = line1
-    var ncols=line1.length
+    var ncols = line1.length
 
     //this translates form coln to coln in the input/pasted coln
-    var colns=[]
-    data.colns=colns
-    
+    var colns = []
+    data.colns = colns
+
     //data.cols=gcostestimatecols
-    var ncols=data.cols.length
-    
+    var ncols = data.cols.length
+
     //add conversions and validations to data.cols[]
-    for (var coln=0;coln<ncols;++coln) {
-        var col=data.cols[coln]
-        var element0=$$(col[0])
+    for (var coln = 0; coln < ncols; ++coln) {
+        var col = data.cols[coln]
+        var element0 = $$(col[0])
         if (element0[0])
-            element0=element0[0]
-        
-        col.conversion=element0.getAttribute('exodusconversion')
+            element0 = element0[0]
+
+        col.conversion = element0.getAttribute('exodusconversion')
         if (!col.conversion)
-            col.conversion=element0.getAttribute('exoduscheckbox')
-        if (col.conversion && col.conversion.slice(0,1)!='[')
-            col.conversion=col.conversion.exodussplit(':;')
-            
-        col.filename=element0.getAttribute('exodusfilename')
-        col.validation=element0.getAttribute('exodusvalidation')
+            col.conversion = element0.getAttribute('exoduscheckbox')
+        if (col.conversion && col.conversion.slice(0, 1) != '[')
+            col.conversion = col.conversion.exodussplit(':;')
+
+        col.filename = element0.getAttribute('exodusfilename')
+        col.validation = element0.getAttribute('exodusvalidation')
     }
-    
+
     //parse line1 for column headings and find the datacoln for each screencoln
-    var nimportablecols=0
-    for (var datacoln=0;datacoln<line1.length;++datacoln) {
-        var coltitle=line1[datacoln].toUpperCase()
-        for (var coln=0;coln<ncols;++coln) {
-            if (data.cols[coln][1]==coltitle) {
-                data.colns[coln]=datacoln
+    var nimportablecols = 0
+    for (var datacoln = 0; datacoln < line1.length; ++datacoln) {
+        var coltitle = line1[datacoln].toUpperCase()
+        for (var coln = 0; coln < ncols; ++coln) {
+            if (data.cols[coln][1] == coltitle) {
+                data.colns[coln] = datacoln
                 ++nimportablecols
                 break
             }
@@ -9076,101 +9078,101 @@ function* form_onpaste_generic_validatedata(data) {
     }
     //ensure at least one column to be imported
     if (!nimportablecols) {
-        var allcoltx=[]
-        for (var coln=0;coln<ncols;++coln)
+        var allcoltx = []
+        for (var coln = 0; coln < ncols; ++coln)
             allcoltx.push(data.cols[coln][1])
-        return yield* exodusinvalid('No recognisable columns in data\n\nPossible columns: '+allcoltx.join(', '))
+        return yield* exodusinvalid('No recognisable columns in data\n\nPossible columns: ' + allcoltx.join(', '))
     }
 
     //for each line of pasted data
-    for (var ln=1;ln<nlns;++ln) {
- 
-        var line=data[ln]
-           
+    for (var ln = 1; ln < nlns; ++ln) {
+
+        var line = data[ln]
+
         //for each screen coln
-        for (coln=0;coln<ncols;++coln) {
-        
+        for (coln = 0; coln < ncols; ++coln) {
+
             //find the data col
-            var datacoln=data.colns[coln]
+            var datacoln = data.colns[coln]
             if (datacoln) {
-            
-                var ivalue=null
-                var ovalue=line[datacoln]
+
+                var ivalue = null
+                var ovalue = line[datacoln]
                 if (!ovalue)
                     continue
 
-                var col=data.cols[coln]
-                
+                var col = data.cols[coln]
+
                 //basic input conversion/validation
                 if (col.conversion) {
                     //things like [NUMBER,NDECS]
-                    if (col.conversion.slice(0,1)=='[') {
-                        ivalue=ovalue.exodusiconv(col.conversion)
+                    if (col.conversion.slice(0, 1) == '[') {
+                        ivalue = ovalue.exodusiconv(col.conversion)
                     }
                     //things like dropdowns and checkboxes
                     else {
-                        ivalue=null
-                        for (var ii=0;ii<col.conversion.length;++ii) {
-                             var option=col.conversion[ii]
-                             if (ovalue==option[1])
-                                ivalue=option[0]
-                             else if (ovalue==option[0])
-                                ivalue=ovalue
+                        ivalue = null
+                        for (var ii = 0; ii < col.conversion.length; ++ii) {
+                            var option = col.conversion[ii]
+                            if (ovalue == option[1])
+                                ivalue = option[0]
+                            else if (ovalue == option[0])
+                                ivalue = ovalue
                         }
-                        if (ivalue==null) {
-                            gmsg='Allowable values are '+col.conversion.exodusjoin(',=')
+                        if (ivalue == null) {
+                            gmsg = 'Allowable values are ' + col.conversion.exodusjoin(',=')
                         }
                     }
                     //blank any invalid values
-                    if (ivalue===null) {
+                    if (ivalue === null) {
                         //'Format must be '+conversion.slice(1,-1).split(',')[0]
-                        if (!(yield* form_onpaste_ignore_cancel(ln,datacoln,data.cols[coln][1],ovalue,gmsg)))
+                        if (!(yield* form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ovalue, gmsg)))
                             return false
-                        ivalue=''
+                        ivalue = ''
                         ninvalid++
                     }
                 }
                 else
-                    ivalue=ovalue
-                    
+                    ivalue = ovalue
+
                 //basic file check
                 if (col.filename) {
-                    ivalue=ivalue.toUpperCase()
+                    ivalue = ivalue.toUpperCase()
 
                     //warn and blank if not on file
-                    var rec=[]
-                    if (!(yield* rec.exodusread(col.filename,ivalue))) {
+                    var rec = []
+                    if (!(yield* rec.exodusread(col.filename, ivalue))) {
                         //'Format must be '+conversion.slice(1,-1).split(',')[0]
-                        if (!(yield* form_onpaste_ignore_cancel(ln,datacoln,data.cols[coln][1],ivalue,'Code does not exist or cannot be accessed')))
+                        if (!(yield* form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ivalue, 'Code does not exist or cannot be accessed')))
                             return false
-                        ivalue=''
+                        ivalue = ''
                         ninvalid++
                     }
                 }
 
-                line[datacoln]=ivalue
+                line[datacoln] = ivalue
             }
         }
     }
-    
+
     return ninvalid
-   
+
 }
 
-function* form_onpaste_generic_importdata(data){
+function* form_onpaste_generic_importdata(data) {
 
     //returns undefined if successful or false if any invalid vehicle code
 
- 
-    var ninserted=0
-    var nlines=data.length
-    var ncols=data.cols.length
-    
+
+    var ninserted = 0
+    var nlines = data.length
+    var ncols = data.cols.length
+
     //for each line of pasted data
     for (var ln = data.startln; ln < nlines; ++ln) {
 
         var line = data[ln]
-        
+
         //add a new row if last row is not blank
         //var rown = gds.data.group1.length - 1
         //if (yield* gds.get1('VEHICLE_CODE', rown)) {
@@ -9181,27 +9183,27 @@ function* form_onpaste_generic_importdata(data){
             ++grecn
         else
             ninserted = 1
-        gds.insertrow(1,grecn)
+        gds.insertrow(1, grecn)
 
         //for each screen coln
-        for (coln=0;coln<ncols;++coln) {
-        
+        for (coln = 0; coln < ncols; ++coln) {
+
             //find the data col
-            var datacoln=data.colns[coln]
-            if (typeof datacoln=='number') {
-            
-                var colid=data.cols[coln][0]
-                gpreviouselement=$$(colid)[grecn]
-                gpreviousvalue=getvalue(gpreviouselement)
-                setvalue(gpreviouselement,line[datacoln])
+            var datacoln = data.colns[coln]
+            if (typeof datacoln == 'number') {
+
+                var colid = data.cols[coln][0]
+                gpreviouselement = $$(colid)[grecn]
+                gpreviousvalue = getvalue(gpreviouselement)
+                setvalue(gpreviouselement, line[datacoln])
 
                 if (!(yield* validateupdate()))
                     return false
-                    
+
             }
         }
     }
- 
-  return
-     
+
+    return
+
 }

@@ -23,7 +23,7 @@ if (typeof EXODUSlocation == 'undefined')
 //most global variables start with g except some very commonly used ones like fm, vm, sm
 //a more complete set of global variables may be found using a debugger
 
-var gautofitwindow = true
+//var gautofitwindow = true
 var gisdialog
 var glocked//mainly required in dbform but used in logout
 
@@ -783,23 +783,20 @@ function unblockmodalui_sync() {
 
 function getdialogstyle_sync(dialogstyle) {
 
-    var standardstyle = ''
-
-    standardstyle += 'Center: yes'
-    standardstyle += ', Help: no'
-    standardstyle += ', Resizable: yes'
-    standardstyle += ', Scroll: yes'
-    standardstyle += ', Status: no'
-    standardstyle += ', scrollbars=1'//mozilla?
+    var standardstyle = 'Center:yes'
+    standardstyle += ',Help:no'
+    standardstyle += ',Resizable:yes'
+    standardstyle += ',Scroll:yes'
+    standardstyle += ',Status:no'
+    standardstyle += ',scrollbars=1'//mozilla?
     //standardstyle+=',modal=yes'//no longer supported in chrome
-    standardstyle += ', alwaysRaised=yes'
+    standardstyle += ',alwaysRaised=yes'
 
     var max = getmaxwindow_sync()
-
     //var maxwidth = window.outerWidth//window.innerWidth//screen.availWidth
     //var maxheight = window.outerHeight//window.innerHeight//screen.availHeight
-    var maxwidth = max.width
-    var maxheight = max.height
+    //var maxwidth = max.width
+    //var maxheight = max.height
 
     //on ie6 seems to minimise
     //maxwidth=0
@@ -807,27 +804,28 @@ function getdialogstyle_sync(dialogstyle) {
     if (!dialogstyle) {
         //var maxwidth=window.screen.availWidth
         //var maxheight=window.screen.availHeight
-        var dialogstyle = 'DialogHeight:' + maxheight + 'px; DialogWidth:' + maxwidth + 'px; Center: yes; Help: yes; Resizable: yes; Status: No;'
-        //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-        dialogstyle = standardstyle
+        //var dialogstyle = 'DialogHeight:' + maxheight + 'px;DialogWidth:' + maxwidth + 'px'
+        //var dialogstyle = 'Center:yes,Help:yes,Resizable:yes;Status:No'
+        var dialogstyle = standardstyle
 
-        if (maxwidth)
-            dialogstyle += ', DialogWidth:' + maxwidth + 'px'
-        if (maxheight)
-            dialogstyle += ', DialogHeight:' + maxheight + 'px'
+        //IE
+        //if (maxwidth)
+        //    dialogstyle += ',DialogWidth:' + maxwidth + 'px'
+        //if (maxheight)
+        //    dialogstyle += ',DialogHeight:' + maxheight + 'px'
 
         //mozilla
-        if (maxwidth)
-            dialogstyle += ', width=' + maxwidth
-        if (maxheight)
-            dialogstyle += ', height=' + maxheight
+        if (max.width)
+            dialogstyle += ',width=' + max.width
+        if (max.height)
+            dialogstyle += ',height=' + max.height
 
         if (typeof window.screenX != 'undefined')
             //dialogstyle+=', left='+window.screenX
-            dialogstyle += ', left=' + max.left
+            dialogstyle += ',left=' + max.left
         if (typeof window.screenY != 'undefined')
             //dialogstyle+=', top='+window.screenY
-            dialogstyle += ', top=' + max.top
+            dialogstyle += ',top=' + max.top
 
         //prevents centering in ff3
         //dialogstyle+='; DialogHeight: 100px; DialogWidth: 500px'
@@ -835,11 +833,12 @@ function getdialogstyle_sync(dialogstyle) {
         //dialogstyle+='; DialogTop: 100px; DialogLeft: 100px'
     }
     else if (dialogstyle == 'max') {
-        dialogstyle = standardstyle + ', DialogHeight:' + max.height + 'px, DialogWidth:' + max.width + 'px;'
+        dialogstyle = standardstyle + ',height:' + max.height + 'px,width:' + max.width + 'px;'
     }
 
     //return with comma AND semicolon separators (MSIE requires semicolon and Firefox/Webkit require commas)
-    dialogstyle = dialogstyle + ';' + dialogstyle.replace(/,/g, ';')
+    //dialogstyle = dialogstyle + ';' + dialogstyle.replace(/,/g, ';')
+
     return dialogstyle
 }
 
@@ -871,6 +870,17 @@ function* exodusshowmodaldialog(url, arguments, dialogstyle) {
 
         //yielding code
         else {
+
+            //example
+            //../media/schedulefind.htm?FILENAME=SCHEDULES
+            /*
+            Center: yes, Help: no, Resizable: yes, Scroll: yes, Status: no, scrollbars=1,
+            alwaysRaised=yes, DialogWidth:1870px, DialogHeight:1053px, width=1870, height=1053, left=50, top=27
+            ;
+            Center: yes; Help: no; Resizable: yes; Scroll: yes; Status: no; scrollbars=1; 
+            alwaysRaised=yes; DialogWidth:1870px; DialogHeight:1053px; width=1870; height=1053; left=50; top=27
+            */
+            dialogstyle = '' // now always show in a tab
 
             //open the child window async
             gchildwin = window.open(url, '', dialogstyle)
@@ -1459,8 +1469,8 @@ function* clientfunctions_windowonload() {
     if (typeof formfunctions_onload == 'function')
         yield* formfunctions_onload()
 
-    if (gautofitwindow && document.getElementById('autofitwindowelement'))
-        exodussettimeout('exodusautofitwindow()', 10)
+    //if (gautofitwindow && document.getElementById('autofitwindowelement'))
+    //    exodussettimeout('exodusautofitwindow()', 10)
     //exodussetinterval('exodusautofitwindow()', 10)
 
     add_exodus_menubar()
@@ -1530,18 +1540,6 @@ function* clientfunctions_windowonload() {
     if (gwindowonload)
         try { gwindowonload() }
         catch (e) { }
-
-    //2nd interation seems to fit better
-    if (gautofitwindow && document.getElementById('autofitwindowelement'))
-        exodussettimeout('exodusautofitwindow()', 100)
-
-    //firefox on linux refuses to resize/move immediately
-    if (gautofitwindow && document.getElementById('autofitwindowelement'))
-        exodussettimeout('exodusautofitwindow()', 300)
-
-    //2nd interation seems to fit better
-    if (gautofitwindow && document.getElementById('autofitwindowelement'))
-        exodussettimeout('exodusautofitwindow()', 300)
 
     //logout('clientfunctions_windowonload')
 
@@ -4512,7 +4510,7 @@ function getmaxwindow_sync() {
             parentwindow = parentwindow.parent
     }
     if (!parentwindow)
-        systemerror('cannot find window.opener or window.parent', 'exodusautofitwindow')
+        systemerror('cannot find window.opener or window.parent', 'getmaxwindow_sync')
 
     var max = {}
     try {
@@ -4541,72 +4539,6 @@ function getmaxwindow_sync() {
     return max
 }
 
-function exodusautofitwindow() {
-
-    gautofitwindowpending = false
-
-    var element = $$('autofitwindowelement')
-    if (!element)
-        return
-
-    //width
-    var newwidth = element.offsetWidth + 50
-    //removed because problem with too wide calendar popup
-    //if (newwidth < 500)
-    //    newwidth = 500
-
-    //height
-    var newheight = element.offsetTop + element.offsetHeight + 100
-
-    //allow for surrounding bars
-    if (window.dialogTop) {
-        newwidth += 20
-        newheight += 10
-    }
-    else if (false) {
-        newwidth += 10
-        newheight += 80
-    }
-    else {
-        newwidth += 60
-        newheight += 80
-    }
-
-    var max = getmaxwindow_sync()
-
-    //constrain to screen size
-    if (newwidth > max.width)
-        newwidth = max.width
-    if (newheight > max.height)
-        newheight = max.height
-
-    //position in center
-    var newleft = max.left + (max.width - newwidth) / 2
-    var newtop = max.top + (max.height - newheight) / 2
-
-    console.log('autofitwindow: left:' + newleft + ' top:' + newtop + ' width:' + newwidth + ' height:' + newheight)
-
-    //yield* debug(window.resizeTo)
-    //w3c (but present in IE but doesnt work - so try both)
-    //if (window.resizeTo)
-    try {
-        window.resizeTo(newwidth, newheight)
-        window.moveTo(newleft, newtop)
-        //ff on linux wont seem to do immediately
-        window.setTimeout('try{window.moveTo(' + newleft + ', ' + newtop + ')} catch(e){}', 1)
-    }
-    catch (e) { }
-    //msie (and later versions of FF3 but setting doesnt seem to work in 3.03)
-    //else if (window.dialogWidth)
-    try {
-        window.dialogWidth = newwidth + 'px'
-        window.dialogHeight = newheight + 'px'
-        window.dialogTop = newtop + 'px'
-        window.dialogLeft = newleft + 'px'
-    }
-    catch (e) { }
-
-}
 
 var gblockevents//stops onclick event at the same time as onfocus event
 function form_blockevents(truefalse, callinfo) {
@@ -5548,7 +5480,7 @@ function decide_onload(decide_args) {
         var tt = '<button'
             + ' title="Press A for All"'
             //+ ' onclick="decide_all_onclick()"'
-            + ' style="font-size:80%"'
+            + ' style="font-size:80%" class="exodusbutton"'
             + '>All</button>'
     else
         var tt = '&nbsp;'
@@ -5707,6 +5639,13 @@ function decide_onload(decide_args) {
             var oCell = document.createElement('td')
             oCell.setAttribute('name', 'decide_rank')
             oCell.align = 'center'
+
+            //set defaultreply's row, to rank 1 (GB)
+            //if (typeof defaultreply == 'number') {
+            //    if (rown==defaultreply[0]-1)
+            //        oCell.innerHTML=1
+            //}
+
             oRow.appendChild(oCell)
         }
 
