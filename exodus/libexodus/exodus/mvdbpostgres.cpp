@@ -2081,13 +2081,13 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 				// add the join
 				///similar code above/below
-				var join_part1 = "\n  ";
 				//main file is on the left
 				//secondary file is on the right
 				//normally we want all records on the left (main file) and any secondary file records that exist ... LEFT JOIN
 				//if joining to stage2_calculated field file then we want only records that exist in the stage2_calculated fields file ... RIGHT JOIN (could be INNER JOIN)
-				join_part1 ^= stage2_calculated ? "RIGHT" : "LEFT";
-				join_part1 ^= " JOIN\n   " ^ xlatetargetfilename ^ " ON ";
+				//RIGHT JOIN MUST BE IDENTICAL ELSE WHERE TO PREVENT DUPLICATION
+				var join_part1 = stage2_calculated ? "RIGHT" : "LEFT";
+				join_part1 ^= " JOIN " ^ xlatetargetfilename ^ " ON ";
 				// var join_part2=xlatekeyexpression ^ "::text = " ^
 				// xlatetargetfilename ^ ".key"; var join_part2=xlatetargetfilename
 				// ^
@@ -2212,7 +2212,7 @@ exodus_call:
 				//multivalued prestage2_calculated field
 				if (fieldname0[-1] == ":") {
 					var joinsectionn = 1;
-					var join = "LEFT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
+					var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 					//if (!joins.a(joinsectionn).index(join))
 					if (!joins.index(join))
 						joins.r(joinsectionn, -1, join);

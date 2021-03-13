@@ -1,50 +1,73 @@
 #!/bin/bash
-set -e
-set -x
+set -eux
 
+:
 : Creates/updates service/www from neosys.net
+: ===========================================
 :
 : 1. Clones the neosys.net git repo
 : 2. Removes some directories and changes "neosys" to "exodus" in neosys.net
 : 3. Copies from neosys.net to www
 
-if ! test -d ./www ; then echo must be run in service ; exit ;fi
+	if ! test -d ./www ; then echo must be run in service ; exit ;fi
 
-cd ~/exodus/service || exit
-rm neosys.net -rf || exit
-git clone https://git.hosts.neosys.com/gits/neosys.net/ || exit
+	cd ~/exodus/service || exit
+	rm neosys.net -rf || exit
+	git clone https://git.hosts.neosys.com/gits/neosys.net/ || exit
 
-cd neosys.net || exit
+	cd neosys.net || exit
 
-#remove some unnecessary directories completely
-rm 2 -rf
-rm 3/{agency,finance,general,jobs,media} -r
-#rm neosys/editor -rf
-rm .git .vs .vscode -rf
+:
+: Remove some unnecessary directories completely
+: ==============================================
+:
+	rm 2 -rf
+	rm 3/{agency,finance,general,jobs,media} -r
+	#rm neosys/editor -rf
+	rm .git .vs .vscode -rf
 
-#remove some unnecessary files
-rm -rf .gitignore accounts.htm adagency.htm favicon.ico readme.txt web.config
-rm -rf 3/accounts.htm 3/adagency.htm 3/menu.htm
-rm -rf neosys/dll/{upload.dll,upload.dl_}
+:
+: Remove some unnecessary files
+: =============================
+:
+	rm -rf .gitignore accounts.htm adagency.htm favicon.ico readme.txt web.config
+	rm -rf 3/accounts.htm 3/adagency.htm 3/menu.htm
+	rm -rf neosys/dll/{upload.dll,upload.dl_}
 
-#rename some directories
-mv 3/neosys 3/exodus
-mv neosys exodus
+:
+: Rename some directories and files
+: =================================
+:
+	mv 3/neosys 3/exodus
+	mv neosys exodus
+:
+	mv ./3/exodus/scripts/neosys.js ./3/exodus/scripts/exodus.js
+	mv ./exodus/images/theme2/neosys32x25.gif ./exodus/images/theme2/exodus32x25.gif
+	#mv ./exodus/images/theme2/neosysm.jpg ./exodus/images/theme2/exodusm.jpg
+	mv ./exodus/doc/neosysfunctions.htm ./exodus/doc/exodusfunctions.htm
 
-#rename some files
-mv ./3/exodus/scripts/neosys.js ./3/exodus/scripts/exodus.js
-mv ./exodus/images/theme2/neosys32x25.gif ./exodus/images/theme2/exodus32x25.gif
-#mv ./exodus/images/theme2/neosysm.jpg ./exodus/images/theme2/exodusm.jpg
-mv ./exodus/doc/neosysfunctions.htm ./exodus/doc/exodusfunctions.htm
+:
+: favicon
+: =======
+:
+	cp ./exodus/images/theme2/exodus.ico favicon.ico
 
-#favicon
-cp ./exodus/images/theme2/exodus.ico favicon.ico
+:
+: Change neosys to exodus in all text - except neosys.com
+: =======================================================
+:
+	find ../neosys.net -type f -exec sed -i 's#neosys#exodus#g' {} \;
+	find ../neosys.net -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
+	find ../neosys.net -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
+	find ../neosys.net -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
 
-#change neosys to exodus in all text (except neosys.com)
-find ../neosys.net -type f -exec sed -i 's#neosys#exodus#g' {} \;
-find ../neosys.net -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
-find ../neosys.net -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
-find ../neosys.net -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
+:
+: Copy into the target directory
+: ==============================
+:
+	cd ~/exodus/service || exit
+	rsync -avr --delete neosys.net/* www
 
-cd ~/exodus/service || exit
-rsync -avr --delete neosys.net/* www
+:
+: Finished in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds
+: =================================================================

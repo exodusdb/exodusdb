@@ -12,6 +12,11 @@ TABLE.exodusform
     text-align: left;
 }
 
+.exodusform > tbody > tr > td,.exodusform > tbody > tr > thead, .exodusform > thead > tr > th, .exodusform > thead > tr > td
+{
+    border: 1px lightgrey solid;
+}
+
 TABLE
 {
     border-collapse: collapse;

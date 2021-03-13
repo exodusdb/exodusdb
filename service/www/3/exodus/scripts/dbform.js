@@ -1211,7 +1211,7 @@ function* formfunctions_onload() {
                     pgupdownbuttons.width = '1%'
 
                     var t = '&nbsp;'
-                    t += '<button id=exodusgroup' + groupno + 'showall'
+                    t += '<button id=exodusgroup' + groupno + 'showall class=exodusbutton'
                     t += ' style=display:none exodusonclick="yield* form_filter(\'unfilter\',' + groupno + ')"'
                     t += '>Show All</button>'
 
@@ -1433,8 +1433,7 @@ function* formfunctions_onload() {
     //insert a div that has NO boxes to the left of it so the form (title especially)
     //cannot appear to right of the (left floating) menu buttons
     var temp = document.createElement('div')
-    temp.style.clear = 'left'
-    //document.body.insertBefore(temp, document.body.firstChild)
+    temp.style.cssText = 'clear: left; min-height: 1px;'
     gexodus_menubar.insertBefore(temp, gexodus_menubar.firstChild)
 
     if (gKeyNodes)

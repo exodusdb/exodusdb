@@ -1514,6 +1514,7 @@ function* clientfunctions_windowonload() {
         if (gmenucodes && gmenucodes != 'EXIT2') {
             var menu_span = document.createElement('span')
             menu_span.style.float = 'left'
+            menu_span.style.maxWidth = '65px'//stop first button flashing very wide initially
             menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. ' + ctrlalt + '+M', 'M')
             //document.body.insertBefore(menu_span, document.body.firstChild)
             gexodus_menubar.insertBefore(menu_span, gexodus_menubar.firstChild)
@@ -4312,8 +4313,6 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
     //there is no float:center?!
     var style = 'white-space:nowrap'
-    if (id == 'menu')
-        style += ';max-width:48px'//stop first button flashing very wide initially
     if (align == 'center')
         //tx+=' style="float:'+align+'"'
         //tx+=' style="margin:0 auto"'
@@ -5232,7 +5231,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         html += '\
             <tr>\
             <td colspan=2 align="center">\
-            <table id="decide_table1" xwidth=100% xclass="exodusform" border="1" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
+            <table id="decide_table1" xwidth=100% xclass="exodusform" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
                 <thead onclick="decide_sorttable2(event)" style="cursor: pointer">\
                     <tr id="decide_table1head1row1">\
                     </tr>\
