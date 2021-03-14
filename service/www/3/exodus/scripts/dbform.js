@@ -6694,7 +6694,7 @@ function* validate(element) {
 
     //log('before conversion')
 
-    var gvaluebeforeiconv = gvalue
+    gvaluebeforeiconv = gvalue
 
     //if conversion is a routine. eg [NUMBER] [DATE] are standard
     var conversion = element.getAttribute('exodusconversion')

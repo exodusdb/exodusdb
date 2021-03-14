@@ -444,7 +444,7 @@ DLL_PUBLIC void logputl(const Printable& value, const Additional&... values) {
 }
 
 #define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, "_^]\[/").quote().outputl("TRACE: " #EXPRESSION "=");
+	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, "_^]\[/").quote().logputl("TRACE: " #EXPRESSION "=");
 
 }  // namespace exodus
 

@@ -1758,16 +1758,20 @@ function PERIOD_OF_YEAR(type, input, mode) {
 
     maxmth = 12
     gmsg = 'e.g. month "1" or month/year "1/02" or "1/2002"\r'
+    if (!mode && goldvalue)
+        mode = goldvalue
 
     input = input.toString()
-    if (input == '') return input
+    if (input == '')
+        return input
 
     input = input.split('/')
 
     //check in format 99 or 99/99
-    if (input.length > 2) return null
+    if (input.length > 2)
+        return null
 
-    //default to current year
+    //default year if not provided
     if (input.length == 1 || input[1] == '') {
         if (mode) {
             //mode can be the current period eg 7/02
@@ -1777,9 +1781,10 @@ function PERIOD_OF_YEAR(type, input, mode) {
             input[1] = mode[1]
 
             //if the entered month is after the mode month then default to the previous year
-            if (input[0].exodusaddcent() > mode[0].exodusaddcent()) {
-                input[1] = (input[1] - 1).toString()
-            }
+            //causes problem on agencyfilter.htm
+            //if (input[0].exodusaddcent() > mode[0].exodusaddcent()) {
+            //    input[1] = (input[1] - 1).toString()
+            //}
         }
         else {
             input[1] = new Date().getFullYear()
@@ -1790,7 +1795,8 @@ function PERIOD_OF_YEAR(type, input, mode) {
     var year = input[1]
 
     //trim leading zero
-    if (month.substr(0, 1) == '0') month = month.substr(1)
+    if (month.substr(0, 1) == '0')
+        month = month.substr(1)
 
     //determine maxmonth number
     //T=period[1,'/']
@@ -1802,12 +1808,16 @@ function PERIOD_OF_YEAR(type, input, mode) {
 
     //check month
     var mths = []
-    for (var i = 1; i <= maxmth; i++) { mths[i - 1] = i.toString() }
-    if (!mths.exoduslocate(month)) return null
+    for (var i = 1; i <= maxmth; i++) {
+        mths[i - 1] = i.toString()
+    }
+    if (!mths.exoduslocate(month))
+        return null
 
     //check year ... ICONV converts to 2 digits, OCONV converts to 4 digits
     year = ADDCENT(type, year)
-    if (year == null) return null
+    if (year == null)
+        return null
 
     return month + '/' + year
 
