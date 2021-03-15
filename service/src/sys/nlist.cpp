@@ -265,7 +265,7 @@ function main() {
 
 	==== VALUE TESTS ====;
 		;
-		[	ENDING	;
+		[	ENDING, ENDS	;
 		[]	CONTAINING, CONTAINS;
 		]	STARTING, STARTS;
 		GE	>=;

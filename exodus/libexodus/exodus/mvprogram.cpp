@@ -149,7 +149,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		var opno;
 		if (!op)
 			opno = 0;
-		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! !").locateusing(" ", op.convert(" ", "_"), opno))
+		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! ! ] [ []").locateusing(" ", op.convert(" ", "_"), opno))
 			throw MVError(op.quote() ^ " unknown op in sql select");
 		opnos(fieldn) = opno;
 
@@ -281,6 +281,16 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 					break;
 				case 16:  // is false (isnt true)
 					ok = !value;
+					break;
+				case 17:  // STARTING ]
+					ok = reqvalues(fieldn).substr(0,value.length()) == value;
+					break;
+				case 18:  // ENDING [
+					ok = reqvalues(fieldn).substr(-value.length()) == value;
+					ok = !value;
+					break;
+				case 19:  //  CONTAINING []
+					ok = reqvalues(fieldn).index(value);
 					break;
 			}
 			if (!ok) {

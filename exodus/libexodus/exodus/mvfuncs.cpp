@@ -34,9 +34,9 @@ Binary    Hex          Comments
 #pragma warning(disable : 4530)
 #endif
 
-//#ifndef _MSC_VER
-//#include <signal.h>
-//#endif
+#ifndef _MSC_VER
+#include <signal.h> //for raise(SIGTRAP)
+#endif
 
 //#include <cmath>      //for stod()
 //#include <sstream>
@@ -1577,23 +1577,24 @@ var& var::converter(const var& oldchars, const var& newchars) {
 // 4. all characters mean non-numeric
 
 bool var::isnum(void) const {
+
 	THISIS("bool var::isnum(void) const")
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here
 	THISISDEFINED()
 
 	// is numeric already
-	if (var_typ & VARTYP_INTDBL)
+	if (this->var_typ & VARTYP_INTDBL)
 		return true;
 
 	// is known not numeric already
 	// maybe put this first if comparison operations on strings are more frequent than numeric
 	// operations on numbers
-	if (var_typ & VARTYP_NAN)
+	if (this->var_typ & VARTYP_NAN)
 		return false;
 
 	// not assigned error
-	if (!var_typ)
+	if (!this->var_typ)
 		throw MVUnassigned("isnum()");
 
 	// if not a number and not unassigned then it is an unknown string
@@ -1611,13 +1612,21 @@ bool var::isnum(void) const {
 	// Example, natural names for DB tables are CUSTOMERS1 and REPORT2009, but not 1CUSTOMER and
 	// 2009REPORT
 	//	for (int ii=(int)var_str.length()-1;ii>=0;--ii)
-	for (int ii = 0; ii < (int)var_str.length(); ii++) {
+	int strlen = var_str.length();
+
+	//very long strings, even if numeric, are deemed not numeric because they cannot be converted to double/long int
+	if (strlen > 30) {
+		this->var_typ = VARTYP_NANSTR;
+		return false;
+	}
+
+	for (int ii = 0; ii < strlen; ii++) {
 		char cc = var_str[ii];
 		// + 2B		- 2D
 		// . 2E		number 30-39
 		if (cc > '9')  // for sure not a number
 		{
-			var_typ = VARTYP_NANSTR;
+			this->var_typ = VARTYP_NANSTR;
 			return false;
 		}
 		if (cc >= '0') {
@@ -1627,7 +1636,7 @@ bool var::isnum(void) const {
 				case '.':
 					if (point)	// 2nd point - is non-numeric
 					{
-						var_typ = VARTYP_NANSTR;
+						this->var_typ = VARTYP_NANSTR;
 						return false;
 					}
 					point = true;
@@ -1638,14 +1647,14 @@ bool var::isnum(void) const {
 					// non-numeric if +/- is not the first character or is the only
 					// character
 					if (ii) {
-						var_typ = VARTYP_NANSTR;
+						this->var_typ = VARTYP_NANSTR;
 						return false;
 					}
 					break;
 
 				// any other character mean non-numeric
 				default:
-					var_typ = VARTYP_NANSTR;
+					this->var_typ = VARTYP_NANSTR;
 					return false;
 			}
 		}
@@ -1664,54 +1673,73 @@ bool var::isnum(void) const {
 	// perhaps slightly unusual cases here
 	// zero length string and strings like + - . +. -.
 	if (!digit) {
+
 		// must be at least one digit unless zero length string
-		if (var_str.length())
-		// goto nan;
+		if (this->var_str.length())
 		{
-			var_typ = VARTYP_NANSTR;
+			this->var_typ = VARTYP_NANSTR;
 			return false;
 		}
 
 		// zero length string is integer 0
-		var_int = 0;
-		var_typ = VARTYP_INTSTR;
+		this->var_int = 0;
+		this->var_typ = VARTYP_INTSTR;
 		return true;
 	}
 
-	// get and save the number as int or double
-	if (point) {
-		// var_dbl=_wtof(var_str.c_str());
-		// var_dbl=_wtof(var_str.c_str());
-		// TODO optimise with code based on the following idea?
-		/*
-		union switchitup
-		{
-			char bigletter;
-			char smalletters[sizeof(char)/sizeof(char)];
-		} abcd;
-		abcd.bigletter=0x0035;
-		std::cout<<atoi(abcd.smalletters)<<std::endl;
-		*/
+	// get and save the number as double or (long) int
+	try {
 
-		// http://www.globalyzer.com/gi/help/gihelp/unsafeMethod/atof.htm :
-		// "... _wtof is supported only on Windows platforms"
-		// "... Recommended Replacements: ANSI UTF-16 strtod"
-		///		std::string result(var_str.begin(),var_str.end());
-		///		var_dbl=atof(result.c_str());
-		//var_dbl = strtod(var_str.c_str(), 0);
-		var_dbl = std::stod(var_str.c_str(), 0);
-		var_typ = VARTYP_DBLSTR;
-	} else {
-		// var_int=_wtoi(var_str.c_str());
-		// TODO optimise
+		//double
+		if (point) {
+			// var_dbl=_wtof(var_str.c_str());
+			// var_dbl=_wtof(var_str.c_str());
+			// TODO optimise with code based on the following idea?
+			/*
+			union switchitup
+			{
+				char bigletter;
+				char smalletters[sizeof(char)/sizeof(char)];
+			} abcd;
+			abcd.bigletter=0x0035;
+			std::cout<<atoi(abcd.smalletters)<<std::endl;
+			*/
 
-		// change from
-		///		std::string result(var_str.begin(),var_str.end());
-		///		var_int=atoi(result.c_str());
-		//var_int = strtol(var_str.c_str(), 0, 10);
-		var_int = std::stol(var_str.c_str(), 0, 10);
-		var_typ = VARTYP_INTSTR;
+			// http://www.globalyzer.com/gi/help/gihelp/unsafeMethod/atof.htm :
+			// "... _wtof is supported only on Windows platforms"
+			// "... Recommended Replacements: ANSI UTF-16 strtod"
+			///		std::string result(var_str.begin(),var_str.end());
+			///		var_dbl=atof(result.c_str());
+			//      var_dbl = strtod(var_str.c_str(), 0);
+			//      this->var_dbl = std::stod(var_str.c_str(), 0);
+			this->var_dbl = std::stod(this->var_str);
+			this->var_typ = VARTYP_DBLSTR;
+		}
+
+		//long int
+		else {
+			// var_int=_wtoi(var_str.c_str());
+			// TODO optimise
+
+			// change from
+			///		std::string result(var_str.begin(),var_str.end());
+			///		var_int=atoi(result.c_str());
+			//var_int = strtol(var_str.c_str(), 0, 10);
+			//this->var_int = std::stol(var_str.c_str(), 0, 10);
+				this->var_int = std::stol(this->var_str);
+
+			this->var_typ = VARTYP_INTSTR;
+		}
+
 	}
+
+	//catch (std::out_of_range) could be too many digits eg (a very long string of digits)
+	catch (...) {
+		//throw MVError("Cannot convert '" ^ *this ^ "' to long int");
+		this->var_typ = VARTYP_NANSTR;
+		return false;
+	}
+
 	// indicate isNumeric
 	return true;
 }
@@ -1991,9 +2019,9 @@ var var::debug() const {
 #ifdef raise
 	raise(SIGTRAP);
 #else
-	for (var ii = 0; ii < 3; ii++) {
-		__asm__("int3");
-	}
+	__asm__("int3");
+	//__asm__("int3");
+	//__asm__("int3");
 #endif
 
 	// throw MVDebug();

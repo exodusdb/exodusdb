@@ -1714,6 +1714,10 @@ MVError::MVError(const var& description_)
 	// capture the stack at point of creation i.e. when thrown
 	this->stack = backtrace();
 	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
+
+	if (description.osgetenv("EXO_DEBUG")) {
+		description.debug();
+	}
 }
 
 MVUnassigned ::MVUnassigned(const var& var1)

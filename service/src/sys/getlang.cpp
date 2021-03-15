@@ -48,17 +48,21 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		call getlang(origprogname, langcode2, origdatatype, languagefile, lang);
 		var lang2 = lang;
 
-		lang = "";
-		var n1 = lang1.count(FM) + 1;
-		var n2 = lang2.count(FM) + 1;
-		if (n1 lt n2) {
-			nn = n2;
+		if (lang2 and lang2 ne lang1) {
+			lang = "";
+			var n1 = lang1.count(FM) + 1;
+			var n2 = lang2.count(FM) + 1;
+			if (n1 lt n2) {
+				nn = n2;
+			} else {
+				nn = n1;
+			}
+			for (var fn = 1; fn <= nn; ++fn) {
+				lang.r(fn, (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim());
+			} //fn;
 		} else {
-			nn = n1;
+			lang = lang1;
 		}
-		for (var fn = 1; fn <= nn; ++fn) {
-			lang.r(fn, (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim());
-		} //fn;
 
 		return 0;
 	}
