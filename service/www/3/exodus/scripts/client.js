@@ -5640,10 +5640,10 @@ function decide_onload(decide_args) {
             oCell.align = 'center'
 
             //set defaultreply's row, to rank 1 (GB)
-            //if (typeof defaultreply == 'number') {
-            //    if (rown==defaultreply[0]-1)
-            //        oCell.innerHTML=1
-            //}
+            if (typeof defaultreply[0] == 'number') {
+                if (rown == defaultreply[0] - 1)
+                    oCell.innerHTML = 1
+            }
 
             oRow.appendChild(oCell)
         }

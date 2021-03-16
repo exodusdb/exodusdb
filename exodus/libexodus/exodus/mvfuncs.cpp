@@ -38,6 +38,19 @@ Binary    Hex          Comments
 #include <signal.h> //for raise(SIGTRAP)
 #endif
 
+#include <charconv> // for from_chars and to_chars
+
+//Eisel-Lemire algorithm seems to be fastest "parse chars to double" according to Lavavej at Microsoft
+//Feb 2021 https://reviews.llvm.org/D70631 "There have been a couple of algorithmic developments very recently
+// - for parsing (from_chars), the Eisel-Lemire algorithm is much faster than the technique used here.
+// I would have used it if it were available back then!"
+//
+//https://github.com/fastfloat/fast_float
+#if __has_include (<fast_float/fast_float.h>)
+#define USE_FASTFLOAT
+#include <fast_float/fast_float.h>
+#endif
+
 //#include <cmath>      //for stod()
 //#include <sstream>
 //#include <iomanip>    //for setprecision
@@ -1712,8 +1725,26 @@ bool var::isnum(void) const {
 			///		var_dbl=atof(result.c_str());
 			//      var_dbl = strtod(var_str.c_str(), 0);
 			//      this->var_dbl = std::stod(var_str.c_str(), 0);
-			this->var_dbl = std::stod(this->var_str);
-			this->var_typ = VARTYP_DBLSTR;
+
+#ifdef USE_FASTFLOAT
+		auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl);
+		if (ec != std::errc()) {
+			//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
+			this->var_typ = VARTYP_NANSTR;
+			return false;
+		}
+		//std::cout << "parsed the number " << result << std::endl;
+#elif defined(USE_CHARCONV)
+		auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl);
+		if (ec != std::errc()) {
+			this->var_typ = VARTYP_NANSTR;
+			return false;
+		}
+#else
+		this->var_dbl = std::stod(this->var_str);
+#endif
+
+		this->var_typ = VARTYP_DBLSTR;
 		}
 
 		//long int
@@ -1726,7 +1757,7 @@ bool var::isnum(void) const {
 			///		var_int=atoi(result.c_str());
 			//var_int = strtol(var_str.c_str(), 0, 10);
 			//this->var_int = std::stol(var_str.c_str(), 0, 10);
-				this->var_int = std::stol(this->var_str);
+			this->var_int = std::stol(this->var_str);
 
 			this->var_typ = VARTYP_INTSTR;
 		}

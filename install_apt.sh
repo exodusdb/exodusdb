@@ -104,12 +104,14 @@ EOF
 : 3. Configuring Exodus for Postgres
 : ==================================
 :
+	mkdir -p ~/.config/exodus
+:
 	echo host=127.0.0.1 \
 	port=5432 \
 	dbname=exodus \
 	user=exodus \
 	password=somesillysecret \
-	> ~/.exodus
+	> ~/.config/exodus/exodus.cfg
 
 :
 : 4. Add some postgres utility functions

@@ -315,12 +315,12 @@ var var::build_conn_info(const var& conninfo) const {
 		var configfilename = "";
 		var home = "";
 		if (home.osgetenv("HOME"))
-			configfilename = home ^ OSSLASH ^ ".exodus";
+			configfilename = home ^ OSSLASH ^ ".config/exodus/exodus.cfg";
 		else if (home.osgetenv("USERPROFILE"))
 			configfilename ^= home ^ OSSLASH ^ "Exodus\\.exodus";
 		var configconn = "";
 		if (!configconn.osread(configfilename))
-			configconn.osread(".exodus");
+			configconn.osread("exodus.cfg");
 
 		// discover any configuration in the environment
 		var envconn = "";

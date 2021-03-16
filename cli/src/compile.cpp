@@ -36,7 +36,7 @@ function main() {
 
 	//default to previous edit/compile - similar code in edic and compile
 	//check command syntax
-	var edic_hist = osgetenv("HOME") ^ "/.edic";
+	var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
 	if (dcount(COMMAND, FM) < 2) {
 		if (osread(COMMAND, edic_hist)) {
 			OPTIONS = COMMAND.a(2);
