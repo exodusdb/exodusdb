@@ -533,9 +533,17 @@ void var::createString() const {
 	throw MVUnassigned("createString()");
 }
 
-// DLL_PUBLIC
-std::string var::toString() const {
-	THISIS("std::string var::toString() const")
+// temporary var can return move its string into the output
+std::string var::toString() && {
+	THISIS("std::string var::toString() &&")
+	THISISSTRING()
+
+	return std::move(var_str);
+}
+
+// non-temporary var can return a const ref to its string
+const std::string& var::toString() const& {
+	THISIS("std::string var::toString() const&")
 	THISISSTRING()
 
 	return var_str;

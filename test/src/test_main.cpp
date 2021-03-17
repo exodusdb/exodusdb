@@ -45,6 +45,19 @@ function main()
 	cursor=getcursor();
 	assert(cursor eq "\x1b[24;7H" or cursor eq "");
 
+	//check that we cannot assign or copy from an unassigned variable
+	{
+	    var x1;
+	    try {
+	        var x2(x1);
+	        var x3=x1;
+	        assert(false && "var x2(x1) should throw unassigned error)");
+	    }
+	    catch (MVUnassigned e) {
+	        assert(true || "x2(x1) does give unassigned error)");
+	    }
+	}
+
 	//output time and date to stderr
 	errputl("Using Exodus library version:" ^ var().version());
 	date().oconv("D").errputl("Date is:");

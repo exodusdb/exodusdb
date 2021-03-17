@@ -380,18 +380,18 @@ class DLL_PUBLIC var final {
 	var();
 
 	// copy constructor
-	var(const var& var1) = default;
+	var(const var& var1);// = default;
 
 	// move constructor
-	var(var&& var1) = default;
+	var(var&& var1) noexcept;// = default;
 
 	// copy assignment constructor
-	var& operator=(const var& var1) = default;
+	var& operator=(const var& var1);// = default;
 
 	// move assignment
-	var& operator=(var&& var1) = default;
+	var& operator=(var&& var1) noexcept;// = default;
 
-	// destructor
+	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
 	~var();
 
@@ -399,9 +399,11 @@ class DLL_PUBLIC var final {
 	// CONSTRUCTORS FROM
 	////////////////////
 
-#define ALL_IN_ONE_STRING_CONSTRUCTOR
+//#define ALL_IN_ONE_STRING_CONSTRUCTOR
 #ifdef ALL_IN_ONE_STRING_CONSTRUCTOR
+	//accepts l and r values
 	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S,std::string>>>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	var(S&& fromstr)
 		: var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR) {};
 
@@ -412,7 +414,7 @@ class DLL_PUBLIC var final {
 	// swig java duplicates this with var(std::string&) above
 #if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
 	var(const std::string& str1);
-	var(std::string&& str1);
+	var(std::string&& str1) noexcept;
 	//in c++20 but not g++ v9.3
 	//constexpr var(const std::string& str1);
 #endif
@@ -473,7 +475,8 @@ class DLL_PUBLIC var final {
 	std::u32string to_u32string() const;
 	void from_u32string(std::u32string) const;
 
-	std::string toString() const;
+	std::string toString() &&;            //for temporary vars
+	const std::string& toString() const&; //for non-temporaries
 
 	// weird version for perl that outputs "" if undefined
 	std::string toString2() const;

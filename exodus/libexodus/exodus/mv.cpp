@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include <limits>
 #include <sstream>
+#include <vector>
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
@@ -105,7 +106,6 @@ var::var()
 	// var_typ=VARTYP_UNA;
 }
 
-/* =default
 // copy constructor
 var::var(const var& rhs)
     : var_str(rhs.var_str),
@@ -117,24 +117,25 @@ var::var(const var& rhs)
 	  // use initializers for speed and only check afterwards if copiedvar was assigned
 	  THISIS("var::var(const var& rhs)") ISASSIGNED(rhs)
 
+	//std::clog << "copy ctor const var&" << std::endl;
+
 	  // not a pointer anymore for speed
 	  // priv=new pimpl;
-}*/
+}
 
-/* = default
 // move constructor
-var::var(const var&& rhs) noexcept
+var::var(var&& rhs) noexcept
     : var_str(std::move(rhs.var_str)),
       var_int(rhs.var_int),
       var_dbl(rhs.var_dbl),
       var_typ(rhs.var_typ)
 {
-	//std::cout << "copy ctor var&" << std::endl;
+	//std::clog << "move ctor var&& noexcept" << std::endl;
 
 	// skip this for speed since temporararies are unlikely to be unassigned
-	// THISIS("var::var(const var&& rhs)")
+	// THISIS("var::var(var&& rhs) noexcept")
 	// ISASSIGNED(rhs)
-}*/
+}
 
 // ctor for char
 // use initializers since cannot fail (but could find how to init the char1)
@@ -169,7 +170,7 @@ var::var(const std::string& str1)
 
 // constructor for temporary std::string
 // just use initializers since cannot fail unless out of memory
-var::var(std::string&& str1)
+var::var(std::string&& str1) noexcept
 	: var_str(std::move(str1)),
 	  var_typ(VARTYP_STR) {}
 
@@ -339,16 +340,18 @@ var::operator const char*()
 // cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
-/* = default
+
 var& var::operator=(const var& rhs)
 {
 	THISIS("var& var::operator= (const var& rhs)")
 	THISISDEFINED()
 	ISASSIGNED(rhs)
 
-	// very important not to self assign!!!
+	// important not to self assign
 	if (this == &rhs)
 		return *this;
+
+	//std::clog << "copy assignment" <<std::endl;
 
 	// copy everything across
 	var_str = rhs.var_str;
@@ -357,29 +360,29 @@ var& var::operator=(const var& rhs)
 	var_typ = rhs.var_typ;
 
 	return *this;
-}*/
+}
 
-/* =default
 // move assignment
-var& var::operator=(const var&& rhs) noexcept
+var& var::operator=(var&& rhs) noexcept
 {
 	//	THISIS("var& var::operator= (var rhs)")
 	//	THISISDEFINED()
+
+	//std::clog << "move assignment" <<std::endl;
 
 	// copy-and-swap idiom
 	// 1. create a temporary copy of the variable to be copied BEFORE even arriving in this
 	// routine
 	// 2. swap this and temporary copy
 	// 3. what was this is now in the temp will now be destructed correctly on exit
-	using std::swap;
-	swap(var_str, rhs.var_str);
+	std::swap(var_str, rhs.var_str);
 	// just grab the rest
 	var_dbl = rhs.var_dbl;
 	var_int = rhs.var_int;
 	var_typ = rhs.var_typ;
 
 	return *this;
-}*/
+}
 
 //=int
 // The assignment operator should always return a reference to *this.
@@ -1572,6 +1575,14 @@ std::string dblToString(double double1) {
 	return str1;
 	*/
 
+	/*
+	std::vector<char> buf(64); // note +1 for null terminator
+	//std::snprintf(&buf[0], buf.size(), "%.16g", double1);
+	std::snprintf(&buf[0], buf.size(), "%.17g", double1);
+
+	return std::string(buf.data());
+	*/
+
 	int minus = double1 < 0 ? 1 : 0;
 
 	std::ostringstream ss;
@@ -1595,8 +1606,8 @@ std::string dblToString(double double1) {
 
 	//there appears to be little or no speed difference between always going via scientific format
 	//and default method which only goes via scientific format for very large or small numbers
-//#define ALWAYS_SCIENTIFIC
-#ifdef ALWAYS_SCIENTIFIC
+//#define ALWAYS_VIA_SCIENTIFIC
+#ifdef ALWAYS_VIA_SCIENTIFIC
 	//use digits10 if using scientific because we automatically get one additional on the left
 	ss.precision(15);
 	ss << std::scientific;
@@ -1613,7 +1624,7 @@ std::string dblToString(double double1) {
 	////////////////////////////////////////////
 	//if not scientific format then return as is
 	////////////////////////////////////////////
-#ifndef ALWAYS_SCIENTIFIC
+#ifndef ALWAYS_VIA_SCIENTIFIC
 	if (epos == std::string::npos)
 		return s;
 #endif
