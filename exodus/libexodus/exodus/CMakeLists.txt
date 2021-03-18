@@ -105,7 +105,7 @@ message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
 #pq is needed for postgresql client library code
 #dl is needed for dynamic link library code
 #target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
-target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ryu)
+target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ryu ryu_parse)
 
 ### state that the output libexodus should be installed in the default system library
 

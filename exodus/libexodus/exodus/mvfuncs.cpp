@@ -38,7 +38,21 @@ Binary    Hex          Comments
 #include <signal.h> //for raise(SIGTRAP)
 #endif
 
-#include <charconv> // for from_chars and to_chars
+/* using fastfloat instead of ryu because it is > 3 time faster
+	but it doesnt prevent excessively long decimal ASCII input
+	and unconfirmed if it does supports round trip ascii->double->ascii
+	//from test_perf.cpp
+    var v("1234.5678");  //23ns
+    //v.isnum();         //+ 56ns ( 79ns using fastfloat)
+    //v.isnum();         //+184ns (207ns using ryu)
+    //v.isnum();         //+194ns (217ns using std::stod)
+    //v.isnum();         //+???ns (???ns using <charconv> from_chars)
+*/
+
+//fastfloat  "1234.5678" -> 1234.5678  56ns (but does it round trip?)
+//ryu        "1234.5678" -> 1234.5678 184ns
+//std::stod  "1234.5678" -> 1234.5678 192ns (but does it round trip?)
+//from_chars "1234.5678" -> 1234.5678 ???ns (but does it round trip?)
 
 //Eisel-Lemire algorithm seems to be fastest "parse chars to double" according to Lavavej at Microsoft
 //Feb 2021 https://reviews.llvm.org/D70631 "There have been a couple of algorithmic developments very recently
@@ -47,9 +61,17 @@ Binary    Hex          Comments
 //
 //https://github.com/fastfloat/fast_float
 #if __has_include (<fast_float/fast_float.h>)
-#define USE_FASTFLOAT
+#define HAS_FASTFLOAT
 #include <fast_float/fast_float.h>
 #endif
+
+#if __has_include(<ryu/ryu_parse.h>)
+#define HAS_RYU
+#include <ryu/ryu_parse.h>
+#endif
+
+//gcc 10 doesnt include conv from and to floating point
+//#include <charconv> // for from_chars and to_chars
 
 //#include <cmath>      //for stod()
 //#include <sstream>
@@ -1734,22 +1756,48 @@ bool var::isnum(void) const {
 			//      var_dbl = strtod(var_str.c_str(), 0);
 			//      this->var_dbl = std::stod(var_str.c_str(), 0);
 
-#ifdef USE_FASTFLOAT
-		auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl);
+#if defined(HAS_FASTFLOAT)
+
+		//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
+
+		auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
 		if (ec != std::errc()) {
 			//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
 			this->var_typ = VARTYP_NANSTR;
 			return false;
 		}
-		//std::cout << "parsed the number " << result << std::endl;
+
 #elif defined(USE_CHARCONV)
+
+		//std::cout << "from_chars decimal iconv" << var_str << std::endl;
+
+		//only available in gcc 11 onwards. msvc has it from 2017 or 19
 		auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl);
 		if (ec != std::errc()) {
 			this->var_typ = VARTYP_NANSTR;
 			return false;
 		}
+
+#elif defined(HAS_RYU)
+
+		//std::cout << "ryu_parse decimal iconv" << var_str << std::endl;
+
+		//Status status = s2d(this->var_str.c_str(), this->var_dbl);
+		Status status = s2d_n(this->var_str.data(), int(this->var_str.size()), &this->var_dbl);
+		//  SUCCESS,
+		//  INPUT_TOO_SHORT,
+		//  INPUT_TOO_LONG,
+		//  MALFORMED_INPUT
+		if (status != SUCCESS)
+			return false;
+
 #else
+
+		//std::cout << "std::stod decimal iconv" << var_str << std::endl;
+
+		//boring old std::stod currently (2021) much slower than fastfloat
 		this->var_dbl = std::stod(this->var_str);
+
 #endif
 
 		this->var_typ = VARTYP_DBLSTR;

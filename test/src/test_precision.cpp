@@ -3,6 +3,20 @@
 //#include <format>
 #include <cmath>
 
+//convert ASCII decimal to double
+#if __has_include (<fast_float/fast_float.h>)
+#define HAS_FASTFLOAT
+#include <fast_float/fast_float.h>
+#endif
+
+//1. convert ASCII decimal to double
+//2. convert double to ASCII decimal
+#if __has_include(<ryu/ryu_parse.h>)
+#define HAS_RYU
+#define USE_RYU_OUT//if using d2s not d2exp in mv.cpp
+#include <ryu/ryu_parse.h>
+#endif
+
 #include <exodus/program.h>
 #include <cassert>
 using namespace std;
@@ -43,21 +57,32 @@ function main() {
 
 		//TRACE(numeric_limits<double>::max_digits10)
 
-		cout << "\nsize of double used by var" << sizeof(double) << std::endl;
-		cout <<" size of long double" << sizeof(long double) << endl;
+		cout << "\nsize of double used by var = " << sizeof(double) << std::endl;
+		cout <<" size of long double = " << sizeof(long double) << endl;
 
 		//cout << setprecision(16) << fixed << 1234567890123456.789012345678901234567890 << endl;
 		//cout << setprecision(16) << fixed << 999999999999999.9 << endl;
 
-		printl(var("999999999999999.9")+0);
-		assert((var("999999999999999.9")   +0 ).toString() == "999999999999999.9");
-		printl(var("9999999999999999.9")+0);
-		assert((var("9999999999999999.9")  +0 ).toString() == "10000000000000000");
-		printl(var("99999999999999999.9")+0);
-		assert((var("99999999999999999.9") +0 ).toString() == "100000000000000000");
-		printl(var("999999999999999999.9")+0);
-		assert((var("999999999999999999.9")+0 ).toString() == "1000000000000000000");
+		printl( var("999999999999999.9")    + 0);
+		//           999999999999999.875
+		assert((var("999999999999999.9")    + 0).toString() == "999999999999999.9");
+		printl( var("9999999999999999.9")   + 0);
+		assert((var("9999999999999999.9")   + 0).toString() == "10000000000000000");
+#if defined(HAS_RYU) and not defined(HAS_FASTFLOAT)
+		//ryu conversion of ASCII numbers to doubles REJECTS too precise numbers that cannot be round tripped
+		assert( ! var("99999999999999999.9").isnum());
+		assert( ! var("0.999999999999999999").isnum());
 
+		assert(   var("9999999999999999.9").isnum());
+		assert(   var("0.99999999999999999").isnum());
+#else
+		printl( var("99999999999999999.9")  + 0);
+		assert((var("99999999999999999.9")  + 0).toString() == "100000000000000000");
+		printl( var("999999999999999999.9") + 0);
+		assert((var("999999999999999999.9") + 0).toString() == "1000000000000000000");
+#endif
+		TRACE(var(10)/var(3));
+		assert(var(10)/var(3) == "3.3333333333333333");
 		printl(var(999999999999999.9d)    ^ "x");
 		assert((var(999999999999999.9d)    ^ "x") == "999999999999999.9x");
 		assert((var(9999999999999999.9d)   ^ "x") == "10000000000000000x");
@@ -79,8 +104,11 @@ function main() {
 		dv1 = dd1;
 		dv2 = "1234567890.00005678d";
 		sv1 = dv1 ^ "x";
-	  //sv2 = "1234567890.000057x";
+#ifndef USE_RYU_OUT
+		sv2 = "1234567890.000057x";
+#else
 		sv2 = "1234567890.0000567x";//ryu
+#endif
 		gosub out();
 		assert(sv1 == sv2);
 
@@ -136,8 +164,11 @@ function main() {
 		dv1 = dd1;
 		dv2="12345678901234567890123456789.0d";
 		sv1=dv1^"x";
-	  //sv2="12345678901234570000000000000x";
+#ifndef USE_RYU_OUT
+		sv2="12345678901234570000000000000x";
+#else
 		sv2="12345678901234568000000000000x";//ryu
+#endif
 		gosub out();
 		assert(sv1 == sv2);
 
@@ -146,14 +177,22 @@ function main() {
 		dv1 = dd1;
 		dv2="99999999999999.9d";
 		sv1=dv1^"x";
-	  //sv2="99999999999999.91x";
+#ifndef USE_RYU_OUT
+		sv2="99999999999999.91x";
+#else
 		sv2="99999999999999.9x";//ryu
+#endif
 		gosub out();
 		assert(sv1 == sv2);
 
+		//test2 tests both positive and negative round trip chars to chars
+
         assert(test2("00000000000000000000.00000000000000000000",                   "0x"));
-      //assert(test2("00000000000000000000.00000000000000000001",                   "0.000000000000000000009999999999999999x"));
+#ifndef USE_RYU_OUT
+		assert(test2("00000000000000000000.00000000000000000001",                   "0.000000000000000000009999999999999999x"));
+#else
 		assert(test2("00000000000000000000.00000000000000000001",                   "0.00000000000000000001x"));//ryu
+#endif
 		assert(test2("00000000000000000000.00000000000000000012",                   "0.00000000000000000012x"));
 		assert(test2("00000000000000000000.00000000000000000123",                   "0.00000000000000000123x"));
 		assert(test2("00000000000000000000.00000000000000001234",                   "0.00000000000000001234x"));
@@ -170,8 +209,7 @@ function main() {
 		assert(test2("00000000000000000000.00000123456789012345",                   "0.00000123456789012345x"));
 		assert(test2("00000000000000000000.00001234567890123456",                   "0.00001234567890123456x"));
 
-#define RYU
-#ifdef RYU
+#ifdef USE_RYU_OUT
 		assert(test2("00000000000000000000.000000000000000000012345678901234567",   "0.000000000000000000012345678901234567x"));
 		assert(test2("00000000000000000000.00000000000000000012345678901234567",    "0.00000000000000000012345678901234568x"));
 		assert(test2("00000000000000000000.0000000000000000012345678901234567",     "0.0000000000000000012345678901234566x"));
@@ -351,10 +389,12 @@ function main() {
 	assert(var(1e-14) == "0");//comparing to zero is special (diff less than 0.0001)
 
 	assert(var(1e-11f).toString() == "0.000000000009999999960041972");
-  //assert(var(1e-11d).toString() == "0.000000000009999999999999999");
 	printl(var(1e-11d));
+#ifndef USE_RYU_OUT
+	assert(var(1e-11d).toString() == "0.000000000009999999999999999");
+#else
 	assert(var(1e-11d).toString() == "0.00000000001");//ryu
-
+#endif
 	assert(var(1e-12f).toString() == "0.0000000000009999999960041972");
 	assert(var(1e-12 ).toString() == "0.000000000001");
 	assert(var(1e-13f).toString() == "0.000000000000099999998245167");
@@ -399,9 +439,13 @@ function main() {
 
 	assert((var(pwr(10,-26)) ^ "x") =="0.00000000000000000000000001x");//better calculation of 10^-26
 	assert((var(1/pwr(10,26)) ^ "x") =="0.000000000000000000000000009999999999999999x");//poorer calculation of 1/10^26
-  //assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x") == "0.000000000000000000000000000000000000000001434929627468613x");
-	printl(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x"));//ryu
-	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x") == "0.0000000000000000000000000000000000000000014349296274686127x");
+
+	printl(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x"));
+#ifndef USE_RYU_OUT
+	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x") == "0.000000000000000000000000000000000000000001434929627468613x");
+#else
+	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x") == "0.0000000000000000000000000000000000000000014349296274686127x");//ryu
+#endif
 	assert(var(pwr(10,-26)) == var(1/pwr(10,26)));
 
 	assert((var(pwr(10,-26)) ^ "x")  == "0.00000000000000000000000001x");

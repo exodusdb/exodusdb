@@ -33,7 +33,12 @@ THE SOFTWARE.
 #include <sstream>
 #include <vector>
 
+//ryu_printf     1234.5678 -> "1234.5678" 800ns
+//sstream/printf 1234.5678 -> "1234.5678" 1800ns
+#if __has_include(<ryu/ryu.h>)
+#define USE_RYU
 #include <ryu/ryu.h>
+#endif
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
@@ -1591,30 +1596,80 @@ std::string dblToString(double double1) {
 
 	int minus = double1 < 0 ? 1 : 0;
 
-#define USE_RYU_D2S
-#ifdef USE_RYU_D2S
-//#if defined(d2s_buffered_n)
+	//Precision on scientific output allows the full precision to obtained
+	//regardless of the size of the number (big or small)
+	//
+	//Precision on fixed output only controls the precision after the decimal point
+	//so the precision needs to be huge to cater for very small numbers eg < 10E-20
+
+#ifdef USE_RYU
+
+	//std::cout << "ryu_printf decimal oconv" << std::endl;
 
 	std::string s;
-	s.resize(1024);
+	s.resize(24);
 
-	int n = d2s_buffered_n(double1, s.data());
+#if 1 // 514ns
+
+	//ryu perfect round trip ASCII DOUBLE ASCII but not perfect for calculated or compiled doubles
+
+	//ryu output (max precision for round tripping ASCII->double->ASCII)
+	//always scientific format to variable precision (cannot control precision)
+	//followed by conversion to fixed format below
+	//
+	//But this only work perfectly for doubles obtained from ASCII.
+	//i.e. calculated doubles are sometimes wrong
+	//e.g. 10.0/3.0 -> 3.3333333333333335 whereas "3.3333333333333333" -> double -> "3.3333333333333333"
+	//e.g. 1234567890.00005678 -> "1234567890.0000567"
+	const int n = d2s_buffered_n(double1, s.data());
 	s.resize(n);
-	/*
-	int n = d2fixed_buffered_n(double1, 15, s.data());
+	//s is now something like "1.2345678E3"
+	//std::cout << s << std::endl;
+	//return s;//435ns here. 514ns after conversion to fixed decimal place below (79ns)
+	const std::size_t epos = s.find('E');
+
+#elif 0 //740ns
+
+	//ryu_printf compatible with nice rounding of all doubles but not perfect round tripping
+
+	//ryu_printf %e equivalent (always scientific format to properly control precision)
+	//followed by conversion to fixed format below
+	//using precision 15 (which means 16 digits in scientific format)
+	const int n = d2exp_buffered_n(double1, 15, s.data());
 	s.resize(n);
-	while (s.back() == '0')
-		s.pop_back();
+	//s is now something like "1.234567800000000e+03"
+	//std::cout << s << std::endl;
+	//return s;//650ns here. 743ns after changing to fixed point below (93ns)
+	const std::size_t epos = s.find('e');
+
+#else
+
+	//ryu_printf %f equivalent (always fixed format)
+	//
+	//But this suffers from precision being after decimal point instead of overall number of digits
+	// eg 1234.5678 -> "1234.56780000000003"
+	//printl( var("999999999999999.9")    + 0);
+    //             999999999999999.875
+	//Could truncate after 15 digits but this would not be rounded properly
+	const int n = d2fixed_buffered_n(double1, 16, s.data());
+	s.resize(n);
+	//remove trailing zeros
+	//while (s.back() == '0')
+	//	s.pop_back();
+	std::size_t lastdigit = s.find_last_not_of('0');
+	if (lastdigit != std::string::npos)
+		s.resize(lastdigit);
+	//remove trailing decimal point
 	if (s.back() == '.')
 		s.pop_back();
 	return s;
-	*/
-
-	std::size_t epos = s.find('E');
-
+	const std::size_t epos = std::string::npos;
+#endif
 	//std::cout << s << std::endl;
 
-#else
+#else //1800ns
+
+	//std::cout << "std:sstream decimal oconv" << std::endl;
 
 	std::ostringstream ss;
 
@@ -1659,8 +1714,9 @@ std::string dblToString(double double1) {
 	if (epos == std::string::npos)
 		return s;
 #endif
+	//std::cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 
-#endif //DBL_TO_STR
+#endif //USE_RYU
 
 	// Algorithm
 	//
@@ -1698,12 +1754,13 @@ std::string dblToString(double double1) {
 			s.pop_back();
 		if (s.back() == '.')
 			s.pop_back();
-#ifdef USE_RYU_D2S
+#ifdef USE_RYU
 		//single zero if none
 		//if (s.size() == std::size_t(minus))
 		if (s.size() == 0 || s == "-")
 			s.push_back('0');
 #endif
+		return s;
 	}
 
 	//positive exponent
@@ -1730,11 +1787,7 @@ std::string dblToString(double double1) {
 			//insert decimal point
 			s.insert(exponent + minus + 1, 1, '.');
 
-			//superfluous trailing zeros and decimal point
-			while (s.back() == '0')
-				s.pop_back();
-			if (s.back() == '.')
-				s.pop_back();
+			goto removetrailing;
 		}
 
 		//negative exponent
@@ -1749,9 +1802,15 @@ std::string dblToString(double double1) {
 		//insert decimal point
 		s.insert(1 + minus, 1, '.');
 
-		//remove trailing zeros and decimal point
+removetrailing:
+		//remove trailing zeros
 		while (s.back() == '0')
 			s.pop_back();
+		//std::size_t lastdigit = s.find_last_not_of('0');
+		//if (lastdigit != std::string::npos)
+		//	s.resize(lastdigit+1);
+
+		//remove trailing decimal point
 		if (s.back() == '.')
 			s.pop_back();
 	}

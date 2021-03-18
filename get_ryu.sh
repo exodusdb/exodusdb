@@ -19,14 +19,17 @@ set -eux
 : ==============
 :
 	cd ryu
-	bazel build //ryu
-	bazel test //ryu
+	bazel build ryu/ryu
+	bazel test ryu/ryu
+	bazel build ryu/ryu_parse
+	bazel test ryu/ryu_parse
 
 : install
 : =======
 :
 	cp bazel-bin/ryu/libryu.{a,so} /usr/local/lib
-	mkdir /usr/local/include/ryu
-	cp ryu/ryu.h /usr/local/include/ryu
+	cp bazel-bin/ryu/libryu_parse.{a,so} /usr/local/lib
+	mkdir -p /usr/local/include/ryu
+	cp ryu/{ryu.h,ryu_parse.h} /usr/local/include/ryu
 	ldconfig
 

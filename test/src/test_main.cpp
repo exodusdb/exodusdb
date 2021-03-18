@@ -238,9 +238,15 @@ function main()
 		//2. full precision using VERY FAST ryu algorithm (450ns)
 		//full accuracy of ryu shows why calculations always must be rounded after every calculation because every calculation introduces more inaccuracies.
 		printl(var(10.0/3.0));
-		assert(var(10.0/3.0).toString() ==  "3.333333333333333"//crude reduction in precision to 16 hides inaccuracies when there are only few calculations.
-			|| var(10.0/3.0).toString() ==  "3.3333333333333335");//ryu full accuracy shows the enevitable inaccuracies inherent in using doubles for financial calculations
-
+		assert(
+			var(10.0/3.0).toString()
+			//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
+			==  "3.333333333333333"
+			||
+			var(10.0/3.0).toString()
+			//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
+			==  "3.3333333333333335"
+		);
 		assert(var(10.0/3.0*2.0).toString() == "6.666666666666667");
 		assert(var(10.0/3.0*3.0).toString() == "10");
 
