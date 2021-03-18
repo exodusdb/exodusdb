@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include <sstream>
 #include <vector>
 
+#include <ryu/ryu.h>
+
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
@@ -113,14 +115,14 @@ var::var(const var& rhs)
       var_dbl(rhs.var_dbl),
       var_typ(rhs.var_typ)
 {
-	  // checking after copy for speed
-	  // use initializers for speed and only check afterwards if copiedvar was assigned
-	  THISIS("var::var(const var& rhs)") ISASSIGNED(rhs)
+	// use initializers (why?) and only check afterwards if copiedvar was assigned
+	THISIS("var::var(const var& rhs)")
+	ISASSIGNED(rhs)
 
 	//std::clog << "copy ctor const var&" << std::endl;
 
-	  // not a pointer anymore for speed
-	  // priv=new pimpl;
+	// not a pointer anymore for speed
+	// priv=new pimpl;
 }
 
 // move constructor
@@ -335,23 +337,22 @@ var::operator const char*()
 /////////////////
 
 // copy assignment
-//=var
+// var1 = var2
 // The assignment operator should always return a reference to *this.
 // cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
-
 var& var::operator=(const var& rhs)
 {
 	THISIS("var& var::operator= (const var& rhs)")
-	THISISDEFINED()
+	THISISDEFINED()//could be skipped for speed?
 	ISASSIGNED(rhs)
+
+	//std::clog << "copy assignment" <<std::endl;
 
 	// important not to self assign
 	if (this == &rhs)
 		return *this;
-
-	//std::clog << "copy assignment" <<std::endl;
 
 	// copy everything across
 	var_str = rhs.var_str;
@@ -363,20 +364,25 @@ var& var::operator=(const var& rhs)
 }
 
 // move assignment
+// var = temporary var
 var& var::operator=(var&& rhs) noexcept
 {
-	//	THISIS("var& var::operator= (var rhs)")
-	//	THISISDEFINED()
+	// skip this for speed?
+	// THISIS("var& var::operator= (var rhs)")
+	// THISISDEFINED()
+
+	// skip this for speed since temporararies are unlikely to be unassigned
+	// THISIS("var::var(var&& rhs) noexcept")
+	// ISASSIGNED(rhs)
 
 	//std::clog << "move assignment" <<std::endl;
 
-	// copy-and-swap idiom
-	// 1. create a temporary copy of the variable to be copied BEFORE even arriving in this
-	// routine
-	// 2. swap this and temporary copy
-	// 3. what was this is now in the temp will now be destructed correctly on exit
-	std::swap(var_str, rhs.var_str);
-	// just grab the rest
+	// important not to self assign
+	if (this == &rhs)
+		return *this;
+
+	// move everything over
+	var_str = std::move(rhs.var_str);
 	var_dbl = rhs.var_dbl;
 	var_int = rhs.var_int;
 	var_typ = rhs.var_typ;
@@ -1585,6 +1591,31 @@ std::string dblToString(double double1) {
 
 	int minus = double1 < 0 ? 1 : 0;
 
+#define USE_RYU_D2S
+#ifdef USE_RYU_D2S
+//#if defined(d2s_buffered_n)
+
+	std::string s;
+	s.resize(1024);
+
+	int n = d2s_buffered_n(double1, s.data());
+	s.resize(n);
+	/*
+	int n = d2fixed_buffered_n(double1, 15, s.data());
+	s.resize(n);
+	while (s.back() == '0')
+		s.pop_back();
+	if (s.back() == '.')
+		s.pop_back();
+	return s;
+	*/
+
+	std::size_t epos = s.find('E');
+
+	//std::cout << s << std::endl;
+
+#else
+
 	std::ostringstream ss;
 
 	//EITHER use 15 for which 64-bit IEEE 754 type double guarantees
@@ -1629,13 +1660,16 @@ std::string dblToString(double double1) {
 		return s;
 #endif
 
+#endif //DBL_TO_STR
+
 	// Algorithm
 	//
 	// Output in C++ scientific format to required precision
+	// using sstream, ryu or to_chars. (use ryu currently)
 	// then modify that string into normal format as follows:
 	//
 	// 1. remove the trailing "e+99" exponent
-	// 2. add zeroes to the front or back of the number if exponent is not 00
+	// 2. add zeroes to the front or back of the number if exponent is not 0
 	// 3. move the decimal point to the correct position.
 	// 4. remove any trailing 0's and decimal point
 	//
@@ -1653,7 +1687,8 @@ std::string dblToString(double double1) {
 
 	auto exponent = stoi(s.substr(epos + 1));
 
-	s.erase(epos);
+	if (epos != std::string::npos)
+		s.erase(epos);
 
 	//exponent 0
 	if (!exponent) {
@@ -1663,6 +1698,12 @@ std::string dblToString(double double1) {
 			s.pop_back();
 		if (s.back() == '.')
 			s.pop_back();
+#ifdef USE_RYU_D2S
+		//single zero if none
+		//if (s.size() == std::size_t(minus))
+		if (s.size() == 0 || s == "-")
+			s.push_back('0');
+#endif
 	}
 
 	//positive exponent

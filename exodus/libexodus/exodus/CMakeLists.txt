@@ -34,10 +34,6 @@ cmake_minimum_required(VERSION 2.8)
 #said to be not a good idea to link c++11 lib to pre c+11 libs (whether this applies to exodus annd boost is unknown)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-add_definitions(-DEXODUS_IPC_BOOST)
-add_definitions(-DEXODUS_IPC_POSIX)
-add_definitions(-DEXODUS_IPC_WINPIPES)
-
 ### POSTGRES ###
 ################
 ##set(PostgreSQL_ADDITIONAL_VERSIONS "9.3" "9.3.4")
@@ -109,7 +105,7 @@ message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
 #pq is needed for postgresql client library code
 #dl is needed for dynamic link library code
 #target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
-target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
+target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ryu)
 
 ### state that the output libexodus should be installed in the default system library
 

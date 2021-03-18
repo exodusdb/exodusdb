@@ -233,11 +233,16 @@ function main()
 	assert(test_sum("]7.00^-1]1")== "7^0");
 
 	{
-		printl(var(10.0/3));
-		//assert(var(10.0/3).toString() ==   "3.3333333333333");
-		assert(var(10.0/3).toString() ==   "3.333333333333333");
-		assert(var(10.0/3*2).toString() == "6.666666666666667");
-		assert(var(10.0/3*3).toString() == "10");
+		//exodus currently configured to use 2. for very great speed (see mv.cpp USE_RYU) BUT it will include over accurate figures without any rounding
+		//1. precision 16 using sstring. SLOW (1850ns)
+		//2. full precision using VERY FAST ryu algorithm (450ns)
+		//full accuracy of ryu shows why calculations always must be rounded after every calculation because every calculation introduces more inaccuracies.
+		printl(var(10.0/3.0));
+		assert(var(10.0/3.0).toString() ==  "3.333333333333333"//crude reduction in precision to 16 hides inaccuracies when there are only few calculations.
+			|| var(10.0/3.0).toString() ==  "3.3333333333333335");//ryu full accuracy shows the enevitable inaccuracies inherent in using doubles for financial calculations
+
+		assert(var(10.0/3.0*2.0).toString() == "6.666666666666667");
+		assert(var(10.0/3.0*3.0).toString() == "10");
 
 		var x=10;
 		var y=3;
