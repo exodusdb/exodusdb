@@ -172,12 +172,18 @@ function main()
 	printl("sizeof");
 	printl("int:      ",(int)sizeof(int));
 	printl("long:     ",(int)sizeof(long));
+	printl("long int: ",(int)sizeof(long int));
+	printl("long long:",(int)sizeof(long long));
 	printl("float:    ",(int)sizeof(float));
+	printl("double:   ",(int)sizeof(double));
 	printl();
 	printl("string:   ",(int)sizeof(std::string));
 	printl("long long:",(int)sizeof(long long));
 	printl("double:   ",(int)sizeof(double));
-	printl("char:     ",(int)sizeof(char));
+	printl("uint:     ",(int)sizeof(uint));
+	printl("uint:     ",(int)sizeof(uint),      " padding1");
+	printl("long long:",(int)sizeof(long long), " padding2");
+	printl("           ==");
 	printl("var:      ",(int)sizeof(var));
 
 	auto size = sizeof(std::string);

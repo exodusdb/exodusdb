@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include <sstream>
 #include <vector>
 
+//ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
 //sstream/printf 1234.5678 -> "1234.5678" 1800ns
 #if __has_include(<ryu/ryu.h>)
@@ -1609,9 +1610,10 @@ std::string dblToString(double double1) {
 	std::string s;
 	s.resize(24);
 
-#if 1 // 514ns
+#define USE_RYU_D2S
+#ifdef USE_RYU_D2S  // 500ns using ryu d2s() which always outputs scientific even 0E0 for zero.
 
-	//ryu perfect round trip ASCII DOUBLE ASCII but not perfect for calculated or compiled doubles
+	//ryu perfect round trip ASCII->double->ASCII but not perfect for calculated or compiled doubles
 
 	//ryu output (max precision for round tripping ASCII->double->ASCII)
 	//always scientific format to variable precision (cannot control precision)
@@ -1623,12 +1625,12 @@ std::string dblToString(double double1) {
 	//e.g. 1234567890.00005678 -> "1234567890.0000567"
 	const int n = d2s_buffered_n(double1, s.data());
 	s.resize(n);
-	//s is now something like "1.2345678E3"
+	//s is now something like "1.2345678E3" or "0E0" always in E format.
 	//std::cout << s << std::endl;
-	//return s;//435ns here. 514ns after conversion to fixed decimal place below (79ns)
+	//return s;//435ns here. 500ns after conversion to fixed decimal place below (65ns)
 	const std::size_t epos = s.find('E');
 
-#elif 0 //740ns
+#elif 0 //740ns ryu d2exp() always output scientific
 
 	//ryu_printf compatible with nice rounding of all doubles but not perfect round tripping
 
@@ -1642,7 +1644,7 @@ std::string dblToString(double double1) {
 	//return s;//650ns here. 743ns after changing to fixed point below (93ns)
 	const std::size_t epos = s.find('e');
 
-#else
+#else //???ns ryu d2fixed() always output fixed decimal point with fixed precision
 
 	//ryu_printf %f equivalent (always fixed format)
 	//
@@ -1749,6 +1751,7 @@ std::string dblToString(double double1) {
 	//exponent 0
 	if (!exponent) {
 
+#ifndef USE_RYU_D2S
 		//remove trailing zeros and decimal point
 		while (s.back() == '0')
 			s.pop_back();
@@ -1759,6 +1762,7 @@ std::string dblToString(double double1) {
 		//if (s.size() == std::size_t(minus))
 		if (s.size() == 0 || s == "-")
 			s.push_back('0');
+#endif
 #endif
 		return s;
 	}
@@ -1787,7 +1791,9 @@ std::string dblToString(double double1) {
 			//insert decimal point
 			s.insert(exponent + minus + 1, 1, '.');
 
+#ifndef USE_RYU_D2S
 			goto removetrailing;
+#endif
 		}
 
 		//negative exponent
@@ -1802,6 +1808,7 @@ std::string dblToString(double double1) {
 		//insert decimal point
 		s.insert(1 + minus, 1, '.');
 
+#ifndef USE_RYU_D2S
 removetrailing:
 		//remove trailing zeros
 		while (s.back() == '0')
@@ -1813,6 +1820,7 @@ removetrailing:
 		//remove trailing decimal point
 		if (s.back() == '.')
 			s.pop_back();
+#endif
 	}
 
 	return s;

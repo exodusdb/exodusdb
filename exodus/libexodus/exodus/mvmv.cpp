@@ -907,6 +907,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 			return var(var_str);
 	}
 
+	// unless extracting field 1,
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = 0;
 	int fieldn2 = 1;
@@ -937,6 +938,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 			return var(var_str.substr(start_pos, field_end_pos - start_pos));
 	}
 
+	// unless extracting value 1,
 	// find the starting position of the value or return ""
 	// using start_pos and end_pos of
 	int valuen2 = 1;
@@ -966,6 +968,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 	if (subvalueno < 0)
 		return var("");
 
+	// unless extracting subvalue 1,
 	// find the starting position of the subvalue or return ""
 	// using start_pos and end_pos of
 	int subvaluen2 = 1;

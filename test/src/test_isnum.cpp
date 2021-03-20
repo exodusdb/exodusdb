@@ -26,10 +26,8 @@ function main()
 		assert( var("2").isnum());
 		assert( var("00000876229").isnum());
 		assert( var("+999").isnum());
-		assert( var("0").isnum());
 		assert( var("12222").isnum());
 		assert( var("22222222").isnum());
-		assert( var("0000000000").isnum());
 		assert( var("+2").isnum());
 		assert( var("222").isnum());
 		assert( var("222").isnum());
@@ -38,7 +36,28 @@ function main()
 		assert( var("222").isnum());
 		assert( var("222").isnum());
 
+		assert( var("0").isnum());
+		assert( var("00").isnum());
+		assert( var("0000000000").isnum());
 		assert( var("-0000000000").isnum());
+		assert( var("-0").isnum());
+		assert( var("-00").isnum());
+		assert( var("+0").isnum());
+		assert( var("+00").isnum());
+
+		assert( var("0.0").isnum());
+		assert( var("-0.0").isnum());
+		assert( var("0.00").isnum());
+		assert( var("-0.00").isnum());
+		assert( var("00.0").isnum());
+		assert( var("-00.0").isnum());
+		assert( var("00.00").isnum());
+		assert( var("-00.00").isnum());
+		assert( var("0.").isnum());
+		assert( var("-0.").isnum());
+		assert( var(".0").isnum());
+		assert( var("-.0").isnum());
+
 		assert( var("-2").isnum());
 		assert( var("-222").isnum());
 		assert( var("-222").isnum());

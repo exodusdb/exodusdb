@@ -1464,14 +1464,16 @@ class DLL_PUBLIC var final {
 #ifdef _MSC_VER
 #pragma warning(disable : 4251)
 #endif
-	mutable std::string var_str;
+	mutable std::string var_str;	//32 bytes
 #ifdef _MSC_VER
 #pragma warning(4 : 4251)
 #endif
-	mutable mvint_t var_int;
-	mutable double var_dbl;
+	mutable mvint_t var_int;		//8 bytes/64 bits - currently defined as a long long
+	mutable double var_dbl;			//8 bytes/64 buts - double
 	// initialise type last
-	mutable VARTYP var_typ;
+	mutable VARTYP var_typ;			//actually a uint which will be 4 bytes
+	//mutable uint padding1;
+	//mutable long int padding2;
 
 	// PRIVATE MEMBER FUNCTIONS
 	//////////////////////////

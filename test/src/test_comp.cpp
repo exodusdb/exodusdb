@@ -1,6 +1,9 @@
 #include <exodus/program.h>
 #include <cassert>
 
+//exodus/c++ > uses SMALLEST_NUMBER to compare equality
+////0.0001 for pick/arev compatibility
+
 programinit()
 
 //#include <l2.h>
@@ -60,17 +63,17 @@ function main() {
 
 	//big <
 
-	assert(!(bigs<bigs));
+	assert(not(bigs<bigs));
 	assert(bigs>bigi);
-	assert(!(bigs>bigd));
+	assert(not(bigs>bigd));
 
 	assert(bigi<bigs);
-	assert(!(bigi<bigi));
+	assert(not(bigi<bigi));
 	assert(bigi<bigd);
 
-	assert(!(bigd<bigs));
+	assert(not(bigd<bigs));
 	assert(bigd>bigi);
-	assert(!(bigd>bigd));
+	assert(not(bigd>bigd));
 
 	assert(bigs>lits);
 	assert(bigs>litd);
@@ -125,14 +128,14 @@ function main() {
 	//assert(liti>0);
 	assert(litd>0);
 
-	assert(!(tinys>0));
-	//assert(!(tinyi>0));
-	assert(!(tinyd>0));
+	assert(not(tinys>0));
+	//assert(not(tinyi>0));
+	assert(not(tinyd>0));
 
-	assert(!(zeros>0));
-	assert(!(zeroi>0));
+	assert(not(zeros>0));
+	assert(not(zeroi>0));
 	//printl(zerod);
-	assert(!(zerod>0));
+	assert(not(zerod>0));
 
 	assert(0<bigs);
 	assert(0<bigi);
@@ -142,13 +145,13 @@ function main() {
 	//assert(0<liti);
 	assert(0<litd);
 
-	assert(!(0<tinys));
+	assert(not(0<tinys));
 	//assert(0<tinyi);
-	assert(!(0<tinyd));
+	assert(not(0<tinyd));
 
-	assert(!(0<zeros));
-	assert(!(0<zeroi));
-	assert(!(0<zerod));
+	assert(not(0<zeros));
+	assert(not(0<zeroi));
+	assert(not(0<zerod));
 
 	assert(bigs!=0);
 	assert(bigi!=0);
@@ -183,10 +186,10 @@ function main() {
 	//bool using_epsilon = true;
 	//if (not using_epsilon) {
 		assert(tinys==0);
-		//assert(!(tinyi>0));
+		//assert(not(tinyi>0));
 		assert(tinyd==0);
 		assert(tinys==0.0);
-		//assert(!(tinyi>0));
+		//assert(not(tinyi>0));
 		assert(tinyd==0.0);
 	//}
 
@@ -294,13 +297,12 @@ function main() {
 	assert(not(pwr(10.0,-17) > 0));
 	assert(not(pwr(10.0,-18) > 0));
 
-	//exodus/c++ > uses SMALLEST_NUMBER
-	//assert(pwr(10.0,-10)>0);//.0000000001
-	//assert(pwr(10.0,-9)>0);//.000000001
-	//assert(pwr(10.0,-8)>0);//.00000001
-	//assert(pwr(10.0,-7)>0);//.0000001
-	//assert(pwr(10.0,-6)>0);//.000001
-	//assert(pwr(10.0,-5)>0);//.00001
+	assert(not(pwr(10.0,-10)>0));//.0000000001
+	assert(not(pwr(10.0,-9)>0));//.000000001
+	assert(not(pwr(10.0,-8)>0));//.00000001
+	assert(not(pwr(10.0,-7)>0));//.0000001
+	assert(not(pwr(10.0,-6)>0));//.000001
+	assert(not(pwr(10.0,-5)>0));//.00001
 	//
 	assert((pwr(10.0,-4)>0));//.0001
 	assert((pwr(10.0,-3)>0));//.001
