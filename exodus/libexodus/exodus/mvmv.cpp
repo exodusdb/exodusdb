@@ -41,7 +41,7 @@ namespace exodus {
 
 // dim=var.split()
 dim var::split() const {
-	THISIS("var var::split() const")
+	THISIS("dim var::split() const")
 	THISISSTRING()
 
 	//TODO provide a version that can split on any utf8 character
@@ -50,7 +50,7 @@ dim var::split() const {
 	// contains a pointer to an array of vars)
 	dim tempdim2;
 	tempdim2.split(*this);
-	return tempdim2;
+	return tempdim2;//NRVO hopefully since single named return
 }
 
 // number=dim.split(varstr)
@@ -105,7 +105,7 @@ var dim::split(const var& str1) {
 			this->data_[fieldno] = "";
 	}
 
-	return nfields;
+	return nfields;//NRVO hopefully since single named return
 }
 
 dim& dim::sort(bool reverse) {
@@ -141,7 +141,7 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const 
 	ISSTRING(substrx)
 
 	if (substrx.var_str == "")
-		return var("");
+		return "";
 
 	int fieldno = fieldnx > 0 ? fieldnx : 1;
 	int nfields = nfieldsx > 0 ? nfieldsx : 1;
@@ -158,7 +158,7 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const 
 		start_pos = var_str.find(substrx.var_str, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
-			return var("");
+			return "";
 		// start_pos++;
 		start_pos += len_substr;
 		fieldn2++;
@@ -171,7 +171,7 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const 
 		end_pos = var_str.find(substrx.var_str, end_pos);
 		// past of of string?
 		if (end_pos == std::string::npos) {
-			return var(var_str.substr(start_pos, var_str.length() - start_pos));
+			return this->var_str.substr(start_pos, var_str.length() - start_pos);
 		}
 		// end_pos++;
 		end_pos += len_substr;
@@ -180,7 +180,7 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const 
 	// backup to first character if closing separator in case multi-byte separator
 	end_pos -= (len_substr - 1);
 
-	return var(var_str.substr(start_pos, end_pos - start_pos - 1));
+	return this->var_str.substr(start_pos, end_pos - start_pos - 1);
 }
 
 ///////////////////////////////////////////
@@ -319,9 +319,11 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	if (order) {
 		// THISIS(...)
 		// ISSTRING(usingchar)
-		bool result = locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting);
-		if (result)
-			return result;
+		//bool result = locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting);
+		//if (result)
+		//	return result;
+		if (locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting))
+			return true;
 	}
 
 	// find null in a null field
@@ -531,7 +533,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 
 	// any negatives at all returns ""
 	// done inline since unusual
-	// if (fieldno<0||valueno<0||subvalueno<0) return var("")
+	// if (fieldno<0||valueno<0||subvalueno<0) return ""
 
 	char ordermode;
 	if (strlen(ordercode) == 0)
@@ -890,7 +892,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 
 	// any negatives at all returns ""
 	// done inline since unusual
-	// if (fieldno<0||valueno<0||subvalueno<0) return var("")
+	// if (fieldno<0||valueno<0||subvalueno<0) return ""
 
 	// FIND FIELD
 
@@ -900,11 +902,11 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 	// zero means all, negative return ""
 	if (fieldno <= 0) {
 		if (fieldno < 0)
-			return var("");
+			return "";
 		if (valueno || subvalueno)
 			fieldno = 1;
 		else
-			return var(var_str);
+			return this->var_str;
 	}
 
 	// unless extracting field 1,
@@ -915,7 +917,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 		start_pos = var_str.find(FM_, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
-			return var("");
+			return "";
 		start_pos++;
 		fieldn2++;
 	}
@@ -931,11 +933,11 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 	// zero means all, negative return ""
 	if (valueno <= 0) {
 		if (valueno < 0)
-			return var("");
+			return "";
 		if (subvalueno)
 			valueno = 1;
 		else
-			return var(var_str.substr(start_pos, field_end_pos - start_pos));
+			return this->var_str.substr(start_pos, field_end_pos - start_pos);
 	}
 
 	// unless extracting value 1,
@@ -946,11 +948,11 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 		start_pos = var_str.find(VM_, start_pos);
 		// past end of string?
 		if (start_pos == std::string::npos)
-			return var("");
+			return "";
 		start_pos++;
 		// past end of field?
 		if (start_pos > field_end_pos)
-			return var("");
+			return "";
 		valuen2++;
 	}
 
@@ -964,9 +966,9 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 
 	// zero means all, negative means ""
 	if (subvalueno == 0)
-		return var(var_str.substr(start_pos, value_end_pos - start_pos));
+		return this->var_str.substr(start_pos, value_end_pos - start_pos);
 	if (subvalueno < 0)
-		return var("");
+		return "";
 
 	// unless extracting subvalue 1,
 	// find the starting position of the subvalue or return ""
@@ -976,11 +978,11 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 		start_pos = var_str.find(SM_, start_pos);
 		// past end of string?
 		if (start_pos == std::string::npos)
-			return var("");
+			return "";
 		start_pos++;
 		// past end of value?
 		if (start_pos > value_end_pos)
-			return var("");
+			return "";
 		subvaluen2++;
 	}
 
@@ -988,9 +990,9 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 	std::string::size_type subvalue_end_pos;
 	subvalue_end_pos = var_str.find(SM_, start_pos);
 	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
-		return var(var_str.substr(start_pos, value_end_pos - start_pos));
+		return this->var_str.substr(start_pos, value_end_pos - start_pos);
 
-	return var(var_str.substr(start_pos, subvalue_end_pos - start_pos));
+	return this->var_str.substr(start_pos, subvalue_end_pos - start_pos);
 }
 
 /////////////////////////////////////////////////
@@ -999,8 +1001,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 
 // var var::erase(const int fieldno,const int valueno,const int subvalueno) const
 var var::remove(const int fieldno, const int valueno, const int subvalueno) const {
-	var newmv = *this;
-	return newmv.remover(fieldno, valueno, subvalueno);
+	return var(*this).remover(fieldno, valueno, subvalueno);
 }
 
 // var& var::eraser(int fieldno,int valueno,int subvalueno)
@@ -1010,7 +1011,7 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 
 	// return "" if replacing 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {
-		// functionmode return var("");//var(var1);
+		// functionmode return "";//var(var1);
 		// proceduremode
 		this->var_str.clear();
 		this->var_typ = VARTYP_STR;
@@ -1288,8 +1289,7 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement) {
 ///////////////////////////////////////////
 
 var var::insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) const& {
-	var newmv = var(*this).inserter(fieldno, valueno, subvalueno, insertion);
-	return newmv;
+	return var(*this).inserter(fieldno, valueno, subvalueno, insertion);
 }
 
 // given only field and value numbers
@@ -1485,10 +1485,10 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 /////////
 
 var var::substr(const int startindex1) const& {
-	//return var(*this).substrer(startindex1);
-	var temp = *this;
-	temp.substrer(startindex1);
-	return temp;
+	return var(*this).substrer(startindex1);
+	//var temp = *this;
+	//temp.substrer(startindex1);
+	//return temp;
 }
 
 // on temporary
@@ -1500,9 +1500,7 @@ var& var::substr(const int startindex1) && {
 // var.s(start,length) substring
 var var::substr(const int startindex1, const int length) const& {
 	//return var(*this).substrer(startindex1, length);
-	var temp = *this;
-	temp.substrer(startindex1, length);
-	return temp;
+	return var(*this).substrer(startindex1, length);
 }
 
 // on temporary
@@ -1513,7 +1511,7 @@ var& var::substr(const int startindex1, const int length) && {
 // in-place
 var& var::substrer(const int startindex1) {
 	// TODO look at using erase to speed up
-	return substrer(startindex1, (int)var_str.length());
+	return this->substrer(startindex1, (int)var_str.length());
 }
 
 //[x,y]
@@ -1616,7 +1614,7 @@ var var::operator[](const int charno) const {
 	// handle positive indexing first for speed on the assumption
 	// that it is commoner than negative indexing
 	if (charno > 0)
-		return var_str[charno - 1];
+		return this->var_str[charno - 1];
 
 	// character 0 return the first character or "" if none
 	// have to get this special case out of the way first
@@ -1624,7 +1622,7 @@ var var::operator[](const int charno) const {
 	// since it only has to be done later anyway
 	if (charno == 0) {
 		if (nchars)
-			return var_str[0];
+			return this->var_str[0];
 		else
 			return "";
 	}
@@ -1638,11 +1636,11 @@ var var::operator[](const int charno) const {
 
 	// if index is now 0 or positive then return the character
 	if (charno2 >= 0)
-		return var_str[charno2];  // no need for -1 here
+		return this->var_str[charno2];  // no need for -1 here
 
 	// otherwise so negative as to point before beginning of string
 	// and rule is to return the first character in that case
-	return var_str[0];
+	return this->var_str[0];
 }
 
 /////////////////////////////////////
@@ -1800,7 +1798,7 @@ var var::substr(const int startindex1, const var& delimiterchars, int& endindex)
 	// past of of string?
 	if (end_pos == std::string::npos) {
 		endindex = int(var_str.length() + 1);
-		return var(var_str.substr(start_pos, var_str.length() - start_pos));
+		return this->var_str.substr(start_pos, var_str.length() - start_pos);
 	}
 
 	// return the index of the dicovered delimiter
@@ -1808,7 +1806,7 @@ var var::substr(const int startindex1, const var& delimiterchars, int& endindex)
 	endindex = int(end_pos + 1);
 
 	// extract and return the substr as well
-	return var(var_str.substr(start_pos, end_pos - start_pos));
+	return this->var_str.substr(start_pos, end_pos - start_pos);
 }
 
 ////////
@@ -1827,7 +1825,7 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 	int startindex0 = startindex1.toInt() - 1;
 	std::string::size_type start_pos = (startindex0 >= 0) ? startindex0 : 0;
 
-	var returnable = "";
+	//var returnable = "";
 
 	// domain check
 	// handle before start of string
@@ -1841,8 +1839,8 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 	// handle after end of string
 	if (start_pos >= var_str.length()) {
 		delimiterno = 0;
-		//return "";
-		return returnable;
+		return "";
+		//return returnable;
 	}
 
 	// find the end of the field (or string)
@@ -1854,14 +1852,14 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 		// wont work if string is the maximum string length but that cant occur
 		startindex1 = (int)(var_str.length() + 2);
 		delimiterno = 0;
-		//return var(var_str.substr(start_pos, var_str.length() - start_pos));
-		returnable = var(var_str.substr(start_pos, var_str.length() - start_pos));
-		return returnable;
+		return this->var_str.substr(start_pos, var_str.length() - start_pos);
+		//returnable = (this->var_str.substr(start_pos, var_str.length() - start_pos));
+		//return returnable;
 	}
 
 	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6
 	// delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_str[end_pos]);
-	delimiterno = int(*_RM_) - int(var_str[end_pos]) + 1;
+	delimiterno = int(*_RM_) - int(this->var_str[end_pos]) + 1;
 
 	// point AFTER the found separator or TWO after the length of the string (TODO shouldnt this
 	// be one??/bug in AREV) wont work if string is the maximum string length but that cant
@@ -1869,9 +1867,9 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 	startindex1 = int(end_pos + 2);
 
 	// extract and return the substr as well
-	//return var(var_str.substr(start_pos, end_pos - start_pos));
-	returnable = var(var_str.substr(start_pos, end_pos - start_pos));
-	return returnable;
+	return this->var_str.substr(start_pos, end_pos - start_pos);
+	//returnable = (this->var_str.substr(start_pos, end_pos - start_pos));
+	//return returnable;
 }
 
 //////
@@ -1937,7 +1935,7 @@ var var::sum() const {
 	min_sep_present = 1 + max_sep - min_sep_present;
 	var inpos = 1;
 	var flag = 0;
-	var outstr = "";
+	var outstr = "";//NRVO hopefully
 
 	//std::clog << (*this) << std::endl;
 
@@ -2014,7 +2012,7 @@ var var::sum() const {
 
 	} while (nextsep);
 
-	return outstr;
+	return outstr;//NRVO hopefully since single named return
 }
 
 var var::sum(const var& sepchar) const {
@@ -2037,7 +2035,7 @@ var var::sum(const var& sepchar) const {
 		else
 			result += (*this).sum(temp);
 	}
-	return result;
+	return result;//NRVO hopefully since single named return
 }
 
 }  // namespace exodus

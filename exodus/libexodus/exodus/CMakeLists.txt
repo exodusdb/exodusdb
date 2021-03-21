@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.1)
 
 message("")
 message("--LIBEXODUS CMAKE INIT --")
@@ -21,8 +22,6 @@ if(RESVAR EQUAL "0")
 else()
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif()
-
-cmake_minimum_required(VERSION 2.8)
 
 #2014/06/01 exodus doesnt require c++11 but can compile using it
 #NB exodus cli "compile" hard codes compilation as c++11 so exodus applications can be written in c++11
@@ -93,7 +92,7 @@ add_library(exodus SHARED
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
-set_target_properties(exodus PROPERTIES SOVERSION "19.01")
+set_target_properties(exodus PROPERTIES SOVERSION "21.03")
 
 ### specify what libraries are to be linked in when building libexodus ###
 

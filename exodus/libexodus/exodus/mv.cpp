@@ -573,28 +573,37 @@ var var::operator++(int) {
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
+	var priorvalue;
+
 tryagain:
 	// prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<mvint_t>::max())
 			throw MVIntOverflow("operator++");
+		priorvalue = var(var_int);
 		var_int++;
 		var_typ = VARTYP_INT;  // reset to one unique type
+
 	} else if (var_typ & VARTYP_DBL) {
+		priorvalue = var_dbl;
 		var_dbl++;
 		var_typ = VARTYP_DBL;  // reset to one unique type
+
 	} else if (var_typ & VARTYP_STR) {
 		// try to convert to numeric
 		if (isnum())
 			goto tryagain;
 
+		//trigger MVNonNumeric
 		THISISNUMERIC()
+
 	} else {
+		//trigger MVUnassigned
 		THISISNUMERIC()
 	}
 
 	// NO DO NOT! return *this ... postfix return a temporary!!! eg var(*this)
-	return var(*this);
+	return priorvalue;
 }
 
 // not returning void so is usable in expressions
@@ -604,26 +613,34 @@ var var::operator--(int) {
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
+	var priorvalue;
+
 tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
+		priorvalue = var(var_int);
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
+
 	} else if (var_typ & VARTYP_DBL) {
+		priorvalue = var_dbl;
 		var_dbl--;
 		var_typ = VARTYP_DBL;  // reset to one unique type
+
 	} else if (var_typ & VARTYP_STR) {
 		// try to convert to numeric
 		if (isnum())
 			goto tryagain;
 
+		//trigger MVNonNumeric
 		THISISNUMERIC()
+
 	} else {
+		//trigger MVUnassigned
 		THISISNUMERIC()
 	}
 
-	// NO DO NOT! return *this ... postfix must return a temporary!!! eg var(*this)
-	return var(*this);
+	return priorvalue;
 }
 
 // not returning void so is usable in expressions
@@ -648,8 +665,11 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
+		//trigger MVNonNumeric
 		THISISNUMERIC()
+
 	} else {
+		//trigger MVUnassigned
 		THISISNUMERIC()
 	}
 
@@ -669,16 +689,21 @@ tryagain:
 	if (var_typ & VARTYP_INT) {
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
+
 	} else if (var_typ & VARTYP_DBL) {
 		var_dbl--;
 		var_typ = VARTYP_DBL;  // reset to one unique type
+
 	} else if (var_typ & VARTYP_STR) {
 		// try to convert to numeric
 		if (isnum())
 			goto tryagain;
 
+		//trigger MVNonNumeric
 		THISISNUMERIC()
+
 	} else {
+		//trigger MVUnassigned
 		THISISNUMERIC()
 	}
 

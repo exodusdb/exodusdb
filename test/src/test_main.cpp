@@ -30,6 +30,8 @@ programinit()
 function main()
 {
 
+	stop("Test passed");
+
 	print(at(-1));
 	var cursor=getcursor();
 	//no cursor if no terminal
@@ -47,15 +49,26 @@ function main()
 
 	//check that we cannot assign or copy from an unassigned variable
 	{
-	    var x1;
-	    try {
-	        var x2(x1);
-	        var x3=x1;
-	        assert(false && "var x2(x1) should throw unassigned error)");
-	    }
-	    catch (MVUnassigned e) {
-	        assert(true || "x2(x1) does give unassigned error)");
-	    }
+		var x1;
+		try {
+			var x3=x1;//unassigned var
+			assert(false && "var x3 = x1 should throw unassigned error)");
+		}
+		catch (MVUnassigned e) {
+			assert(true || "var v3 = v1) does give unassigned error)");
+		}
+	}
+
+	//check that we cannot assign or copy from an unassigned dim element
+	{
+		var x1;
+		try {
+			var x2(x1);//unassigned dim element
+			assert(false && "var x2(x1) should throw unassigned error)");
+		}
+		catch (MVUnassigned e) {
+			assert(true || "x2(x1) does give unassigned error)");
+		}
 	}
 
 	//output time and date to stderr
@@ -129,26 +142,26 @@ function main()
 	*/
 
 	/*Ubuntu
-	 apt-cache search locale |grep -i greek
-	 greek turkish german
-	 apt-get install language-support-el language-support-tr language-support-de
+		apt-cache search locale |grep -i greek
+		greek turkish german
+		apt-get install language-support-el language-support-tr language-support-de
 	*/
 
 	//non-ASCII unicode characters
 
 	var ArabicIndicDigits		="٠١٢٣٤٥٦٧٨٩";
 	var alldigits=
-	"Western	: 0 1 2 3 4 5 6 7 8 9  \n"
-	"Arabic		: ٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩  \n"
-	"Devanagari	: ० १ २ ३ ४ ५ ६ ७ ८ ९  \n"
-	"Gujarati 	: ૦ ૧ ૨ ૩ ૪ ૫ ૬ ૭ ૮ ૯  \n"
-	"Punjabi 	: ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯  \n"
-	"Bengali 	: ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯  \n"
-	"Odia 		: ୦ ୧ ୨ ୩ ୪ ୫ ୬ ୭ ୮ ୯  \n"
-	"Telugu 	: ౦ ౧ ౨ ౩ ౪ ౫ ౬ ౭ ౮ ౯  \n"
-	"Kannada 	: ೦ ೧ ೨ ೩ ೪ ೫ ೬ ೭ ೮ ೯  \n"
-	"Tamil 		: ௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯  \n"
-	"Malayalam 	: ൦ ൧ ൨ ൩ ൪ ൫ ൬ ൭ ൮ ൯  \n";
+	"Western    : 0 1 2 3 4 5 6 7 8 9  \n"
+	"Arabic     : ٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩  \n"
+	"Devanagari : ० १ २ ३ ४ ५ ६ ७ ८ ९  \n"
+	"Gujarati   : ૦ ૧ ૨ ૩ ૪ ૫ ૬ ૭ ૮ ૯  \n"
+	"Punjabi    : ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯  \n"
+	"Bengali    : ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯  \n"
+	"Odia       : ୦ ୧ ୨ ୩ ୪ ୫ ୬ ୭ ୮ ୯  \n"
+	"Telugu     : ౦ ౧ ౨ ౩ ౪ ౫ ౬ ౭ ౮ ౯  \n"
+	"Kannada    : ೦ ೧ ೨ ೩ ೪ ೫ ೬ ೭ ೮ ೯  \n"
+	"Tamil      : ௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯  \n"
+	"Malayalam  : ൦ ൧ ൨ ൩ ൪ ൫ ൬ ൭ ൮ ൯  \n";
 
 	var GreekSmallAlpha         ="α";//\u03B1";//GREEK SMALL LETTER ALPHA
 	var GreekSmallFinalSigma    ="ς";//\u03C2";//GREEK SMALL LETTER FINAL SIGMA
@@ -191,7 +204,7 @@ function main()
 	auto small = std::string(capacity, '*');
 	auto big = std::string(capacity + 1, '*');
 
- 	std::cout << "\nstd:string implementation\n";
+	std::cout << "\nstd:string implementation\n";
 	std::cout << "sizeof  : " << size << std::endl;
 	std::cout << "Capacity: " << capacity << std::endl;
 	std::cout << "Small   : " << small.capacity() << std::endl;
@@ -299,7 +312,7 @@ function main()
 
 	//check conversion of unprintable field marks to unusual ASCII characters
 	//except TM which is ESC
-  	std::ostringstream stringstr;
+	std::ostringstream stringstr;
 	stringstr << var(RM ^ FM ^ VM ^ SM ^ TM ^ STM);
 	std::cout << stringstr.str() << std::endl;
 	//assert(var(stringstr.str()) == "~^]\\[|");
@@ -932,40 +945,39 @@ function main()
 
 	//check osread/write with and without conversion to codepages
 
-        //cyrillic ISO-8859-5 cp bytes
-        var cp_allo1{"\xB0\xDB\xDB\xDE"};
+	//cyrillic ISO-8859-5 cp bytes
+	var cp_allo1{"\xB0\xDB\xDB\xDE"};
 
-        //output binary unconverted
-        oswrite(cp_allo1,"t_cp_allo.txt");
-        assert(cp_allo1.oconv("HEX").outputl("cp_allo1=")=="B0DBDBDE");
+	//output binary unconverted
+	oswrite(cp_allo1,"t_cp_allo.txt");
+	assert(cp_allo1.oconv("HEX").outputl("cp_allo1=")=="B0DBDBDE");
 
-        //hexdump -C t_cp_allo.txt
-        //00000000  b0 db db de
-        //00000004
+	//hexdump -C t_cp_allo.txt
+	//00000000  b0 db db de
+	//00000004
 
-        //check that we can read binary back in unconverted
-        var cp_allo2=osread("t_cp_allo.txt");
-        assert(cp_allo2.oconv("HEX").outputl("cp_allo2=")=="B0DBDBDE");
+	//check that we can read binary back in unconverted
+	var cp_allo2=osread("t_cp_allo.txt");
+	assert(cp_allo2.oconv("HEX").outputl("cp_allo2=")=="B0DBDBDE");
 
-        //read in from binary cyrillic codepage text converting to utf8
-        var utf8_allo3;
-        if (not utf8_allo3.osread("t_cp_allo.txt","ISO-8859-5"))
-                stop("cant read t_cp_allo.txt with cp ISO-8859-5");
-        assert(utf8_allo3.length()==8);
-        assert(utf8_allo3.oconv("HEX")=="D090D0BBD0BBD0BE");
-        assert(utf8_allo3=="Алло");
+	//read in from binary cyrillic codepage text converting to utf8
+	var utf8_allo3;
+	assert(utf8_allo3.osread("t_cp_allo.txt","ISO-8859-5"));
+	assert(utf8_allo3.length()==8);
+	assert(utf8_allo3.oconv("HEX")=="D090D0BBD0BBD0BE");
+	assert(utf8_allo3=="Алло");
 
-        //output utf8 convering to ISO-8859-5
-        oswrite(utf8_allo3,"t_cp_allo4.txt","ISO-8859-5");
-/*
+	//output utf8 convering to ISO-8859-5
+	oswrite(utf8_allo3,"t_cp_allo4.txt","ISO-8859-5");
+	/*
 root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
 00000000  b0 db db de                                       |....|
 00000004
 */
-        //read back in binary to check that out output did convert from utf to cyrillic
-        var cp_allo5;
-        osread(cp_allo5,"t_cp_allo4.txt");
-        assert(cp_allo5==cp_allo1);
+	//read back in binary to check that out output did convert from utf to cyrillic
+	var cp_allo5;
+	osread(cp_allo5,"t_cp_allo4.txt");
+	assert(cp_allo5==cp_allo1);
 
 /*
 root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
@@ -981,34 +993,34 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//fieldno given and =0 means search whole string using character FM
 	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("AL","A",lbvn,0)||lbvn==4);
 
-        assert(seq(chr(-513))==255);
-        assert(seq(chr(-512))==0);
-        assert(seq(chr(-256))==0);
-        assert(seq(chr(-1))==255);
-        assert(seq(chr(0))==0);
-        assert(seq(chr(1))==1);
-        assert(seq(chr(127))==127);
-        assert(seq(chr(128))==128);
-        assert(seq(chr(255))==255);
-        assert(seq(chr(256))==0);
-        assert(seq(chr(512))==0);
-        assert(seq(chr(513))==1);
+	assert(seq(chr(-513))==255);
+	assert(seq(chr(-512))==0);
+	assert(seq(chr(-256))==0);
+	assert(seq(chr(-1))==255);
+	assert(seq(chr(0))==0);
+	assert(seq(chr(1))==1);
+	assert(seq(chr(127))==127);
+	assert(seq(chr(128))==128);
+	assert(seq(chr(255))==255);
+	assert(seq(chr(256))==0);
+	assert(seq(chr(512))==0);
+	assert(seq(chr(513))==1);
 
-        //test all 8 bit bytes can be written and read
-        var tx="";
-        var tx2;
-        for (int ii=0;ii<65536;ii++)
-                tx^=chr(ii);
+	//test all 8 bit bytes can be written and read
+	var tx="";
+	var tx2;
+	for (int ii=0;ii<65536;ii++)
+		tx^=chr(ii);
 
-        //output to binary - check roundtrip
-        oswrite(tx,"test_main.$1");
-        osread(tx2,"test_main.$1");
-        assert(tx2==tx);
+	//output to binary - check roundtrip
+	oswrite(tx,"test_main.$1");
+	osread(tx2,"test_main.$1");
+	assert(tx2==tx);
 
-        //read as codepage
-        //oswrite(tx,"test_main.$1","ISO-8859-5");
-        osread(tx2,"test_main.$1","ISO-8859-5");
-        //assert(tx2==tx);
+	//read as codepage
+	//oswrite(tx,"test_main.$1","ISO-8859-5");
+	osread(tx2,"test_main.$1","ISO-8859-5");
+	//assert(tx2==tx);
 
 	osdelete("test_main.$1");
 
@@ -1020,8 +1032,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//test regex group and use group in replace
 	//replace char+space with x+char+dash
 	//TODO add g option
-        var text="what a lot of money";
-        assert(text.replace("(.) ","x$1-")=="whaxt-xa-loxt-oxf-money");
+	var text="what a lot of money";
+	assert(text.replace("(.) ","x$1-")=="whaxt-xa-loxt-oxf-money");
 
 	//simple test of regex and case insensitive regex swap (commonly known as replace)
 	assert(replace("abcd","b.","xyz").outputl() eq "axyzd");//right case to convert
@@ -1050,9 +1062,9 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	}
 
 #if defined(WIN32) or defined(__APPLE__)
-		var nbinarychars=256;
+	var nbinarychars=256;
 #else
-		var nbinarychars=128;
+	var nbinarychars=128;
 #endif
 	{	//test writing and reading bytes
 
@@ -1465,62 +1477,63 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv(letters,"MR/N") eq letters);
 	assert(oconv(letters,"MR/B") eq "");
 
+	//lambda function
 	auto testinvert=[](var cc)
-        {
-	        var inverted=cc.invert();
-        	var invertedtwice=invert(inverted);
-                if (cc eq inverted or cc ne invertedtwice) {
+	{
+		var inverted=cc.invert();
+		var invertedtwice=invert(inverted);
 
-                	cc				.outputl("original      =");
-                	inverted			.outputl("inverted      =");
-                	invertedtwice			.outputl("inverted twice=");
+		cc                        .outputl("original      =");
+		inverted                  .outputl("inverted      =");
+		invertedtwice             .outputl("inverted twice=");
 
-                	cc.oconv("HEX")			.outputl("original hex  =");
-                	inverted.oconv("HEX")		.outputl("inverted hex  =");
-                	invertedtwice.oconv("HEX")	.outputl("invertedx2 hex=");
+		cc.oconv("HEX")           .outputl("original hex  =");
+		inverted.oconv("HEX")     .outputl("inverted hex  =");
+		invertedtwice.oconv("HEX").outputl("invertedx2 hex=");
 
-                	cc.textseq()			.outputl("original seq  =");
-                	inverted.textseq()		.outputl("inverted seq  =");
-                	invertedtwice.textseq()		.outputl("invertedx2 seq=");
+		cc.textseq()              .outputl("original seq  =");
+		inverted.textseq()        .outputl("inverted seq  =");
+		invertedtwice.textseq()   .outputl("invertedx2 seq=");
 
-                	cc.len()			.outputl("original len  =");
-                	inverted.len()			.outputl("inverted len  =");
-                	invertedtwice.len()		.outputl("invertedx2 len=");
+		cc.len()                  .outputl("original len  =");
+		inverted.len()            .outputl("inverted len  =");
+		invertedtwice.len()       .outputl("invertedx2 len=");
 
-                	stop();
-                }
+		assert(cc ne inverted);
 		assert(cc == invertedtwice);
-		assert(cc.oconv("HEX") == invertedtwice.oconv("HEX"));
-        };
 
-        //check invert works and is reversible for the first 65535 unicode characters
+		assert(cc.oconv("HEX") == invertedtwice.oconv("HEX"));
+	};
+
+	//check invert works and is reversible for the first 65535 unicode characters
 	testinvert("␚ ␛ ␜ ␝ ␞ ␟");
 
-        //check invert is reversible for all bytes (only ASCII bytes are inverted)
-        for (var ii=0;ii<=0x1FFFF;ii++) {
-                var cc=textchr(ii);
-                if (cc.len())
-                	testinvert(cc);
-                else if (ii < 0xD800 or ii > 0xDFFF )
+	//check invert is reversible for all bytes (only ASCII bytes are inverted)
+	for (var ii=0;ii<=0x1FFFF;ii++) {
+		var cc=textchr(ii);
+		if (cc.len())
+			testinvert(cc);
+		else if (ii < 0xD800 or ii > 0xDFFF )
 			printl(ii);
-        }
+	}
 
-        //check unicode is invalid from 0xD800-0xDFF (UTF16 encoding) and 0x110000 onwards
-        assert(textchr(0xD7FF)!="");
-        assert(textchr(0xD800)=="");
-        assert(textchr(0xDFFF)=="");
-        assert(textchr(0xE000)!="");
-        assert(textchr(0x10FFFF)!="");
-        assert(textchr(0x110000)=="");
+	//check unicode is invalid from 0xD800-0xDFF (UTF16 encoding) and 0x110000 onwards
+	assert(textchr(0xD7FF)!="");
+	assert(textchr(0xD800)=="");
+	assert(textchr(0xDFFF)=="");
+	assert(textchr(0xE000)!="");
+	assert(textchr(0x10FFFF)!="");
+	assert(textchr(0x110000)=="");
 
 	COMMAND.outputl("COMMAND-");
-	assert(COMMAND eq "service"
-	 or COMMAND eq "main"
-	 or COMMAND eq "main2"
-	 or COMMAND eq "main2.out"
-	 or COMMAND eq "test_main"
-	 or COMMAND eq "test_main.out"
-	 );
+	assert(
+		COMMAND eq "service"
+		or COMMAND eq "main"
+		or COMMAND eq "main2"
+		or COMMAND eq "main2.out"
+		or COMMAND eq "test_main"
+		or COMMAND eq "test_main.out"
+	);
 
 	//test int/string changes after inc/dec (should really check MANY other ops)
 	var nn=0;
@@ -1605,12 +1618,14 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//xyz=xyz;
 	printl("\nTest catching MVError");
 	try {
-		//runtime errors
-		var x1=x1^=1;
-		var undefx=undefx++;
-		var z=z+1;
-		//var xx=xx.operator++();
-		var xx=xx++;
+		//runtime errors instead of compiler error sadly
+
+		var x1=x1^=1;			//sadly c++ compiler allows this
+		var undefx=undefx++;	//sadly c++ compiler allows this
+		var z=z+1;				//sadly c++ compiler allows this
+		//var x++;				//doesnt compile
+		var xx=xx.operator++(); //sadly c++ compiler allows this
+		//var xx=xx++;			//doesnt compile
 	}
 	catch (MVError error) {
 		print(error.description);
@@ -1625,12 +1640,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	catch (MVUndefined mve) {
 		mve.description.outputl();
 	}
-	catch(MVUnassigned mve) {
-		mve.description.outputl();
-	}
-	catch(MVNonNumeric mve) {
-		mve.description.outputl();
-	}
+	//catch(MVUnassigned mve) {
+	//	mve.description.outputl();
+	//}
+	//catch(MVNonNumeric mve) {
+	//	mve.description.outputl();
+	//}
 	catch (...) {
 		//should never get here because above should cause a runtime error
 		assert(false);
@@ -2024,9 +2039,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	da1="f1" ^VM^ "f1v2s1" ^SM^ "f1v2s2" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2";
 	assert(remover(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
 
-	var tempfile=OSSLASH^"129834192784";
-	if (osopen(tempfile,tempfile))
-		assert(false and var("non-existent file opened!"));
+	var nonexistentfile=OSSLASH^"129834192784";
+	assert(!osopen(nonexistentfile,nonexistentfile));
 
 	printl(round(var("6000.50")/20,2));
 	assert(round(var("6000.50")/20,2)==300.03);
@@ -2838,7 +2852,7 @@ function test_codepage(in codepage, in lang) {
 //function to conveniently test sum function
 function test_sum(in instr)
 {
-	    return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"~^]}>|");
+	return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"~^]}>|");
 }
 
 programexit()

@@ -36,8 +36,8 @@ THE SOFTWARE.
 #endif
 #endif
 
-#define EXODUS_RELEASE "19.5"
-#define EXODUS_PATCH "19.5.0"
+#define EXODUS_RELEASE "21.03"
+#define EXODUS_PATCH "21.03.0"
 
 // if installing with autotools then for latest version of boost and other installation macro
 // download the snapshot from here. AX_BOOST_DATE_TIME etc
@@ -80,7 +80,7 @@ THE SOFTWARE.
 // n=0 gives 1235
 // n=-2 gives 1200
 // storage could be changed to integer if n<=0 or left probably better since likely to be added to
-// other similar ints thereafter if (var_dbl>=0) 	var_dbl=long long int(var_dbl+0.5) else
+// other similar ints thereafter if (var_dbl>=0) var_dbl=long long int(var_dbl+0.5) else
 // var_dbl=long
 // long int(var_dbl-0.5);
 
@@ -602,9 +602,9 @@ class DLL_PUBLIC var final {
 	// DONT declare this so we force use of the above const version that produces a temporary
 	//var& operator()(int fieldno, int valueno = 0, int subvalueno = 0);
 	/* SADLY no way to get a different operator() function called when on the left hand side of assign
-   	therefore not possible to create syntax like "xyz(1,2)="xx";" to REPLACE fields, values and
-   	subvalues so operator() is defined only for the more common xyz=extract(1,2,3); i.e. on the right
-   	hand side. http://codepad.org/MzzhlRkb
+	therefore not possible to create syntax like "xyz(1,2)="xx";" to REPLACE fields, values and
+	subvalues so operator() is defined only for the more common xyz=extract(1,2,3); i.e. on the right
+	hand side. http://codepad.org/MzzhlRkb
 	*/
 
 	// BRACKETS []
