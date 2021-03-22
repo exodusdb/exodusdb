@@ -33,8 +33,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O2")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1 -fprofile-arcs -ftest-coverage")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1 -fprofile-arcs -ftest-coverage")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native")
 message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
 #allow exodus executable and exodus library

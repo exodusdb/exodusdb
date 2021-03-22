@@ -1,5 +1,7 @@
-#include <exodus/program.h>
+#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
+
+#include <exodus/program.h>
 
 //exodus/c++ > uses SMALLEST_NUMBER to compare equality
 ////0.0001 for pick/arev compatibility

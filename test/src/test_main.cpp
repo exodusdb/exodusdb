@@ -1,3 +1,4 @@
+#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 #include <sstream>
 
@@ -112,6 +113,7 @@ function main()
     assert(floor(v) == int(v));
 
 	double d=1234.567;
+	//false && d;
 	assert(var(d)=="1234.567");
 	assert(var(-d)=="-1234.567");
 	assert(int(var(d))==1234);
@@ -954,9 +956,6 @@ function main()
 	var offsetx=0;
 	var testfilex;
 	assert(osopen(testfilename,testfilex));
-	//HORRIBLE HACK to bypass some weird failure on github actions testing
-	if (unassigned(testfilex))
-		testfilex=testfilename;
 	TRACE(testfilex);
 	assert(testfilex);
 	var testdata;
@@ -1029,7 +1028,7 @@ function main()
 	var cp_allo1{"\xB0\xDB\xDB\xDE"};
 
 	//output binary unconverted
-	oswrite(cp_allo1,"t_cp_allo.txt");
+	assert(oswrite(cp_allo1,"t_cp_allo.txt"));
 	assert(cp_allo1.oconv("HEX").outputl("cp_allo1=")=="B0DBDBDE");
 
 	//hexdump -C t_cp_allo.txt
@@ -1046,12 +1045,9 @@ function main()
 	assert(utf8_allo3.length()==8);
 	assert(utf8_allo3.oconv("HEX")=="D090D0BBD0BBD0BE");
 	assert(utf8_allo3=="Алло");
-	assert(utf8_allo3=="Алло");
 
 	//output utf8 convering to ISO-8859-5
-	//horrible hack to avoid MVUnassigned on github actions build
-	utf8_allo3="Алло";
-	oswrite(utf8_allo3,"t_cp_allo4.txt","ISO-8859-5");
+	assert(oswrite(utf8_allo3,"t_cp_allo4.txt","ISO-8859-5"));
 	/*
 root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
 00000000  b0 db db de                                       |....|
@@ -1059,7 +1055,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
 */
 	//read back in binary to check that out output did convert from utf to cyrillic
 	var cp_allo5;
-	osread(cp_allo5,"t_cp_allo4.txt");
+	assert(osread(cp_allo5,"t_cp_allo4.txt"));
 	assert(cp_allo5==cp_allo1);
 
 /*
@@ -1186,9 +1182,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//open t_temp5.txt as utf8 for random access
 		var tempfile;
 		assert(osopen(tempfilename5,tempfile,"utf8"));
-		//HORRIBLE HACK TO BYPASS weird problem on github actions testing
-		if (unassigned(tempfile))
-			tempfile=tempfilename5;
 		//test reading from beyond end of file - returns ""
 		//offset2 is BYTE OFFSET NOT CHARACTER OFFSET!!!
 		var data,offset2;
@@ -1206,9 +1199,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		//test reading in C/binary mode (not UTF8)
 		assert(osopen(tempfilename5,tempfile,"C"));
-		//HORRIBLE HACK TO BYPASS weird problem on github actions testing
-		if (unassigned(tempfile))
-			tempfile=tempfilename5;
 		//assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
 		//assert(data.osbread(tempfile,offset2=1,1) eq greek2[2]);
 		//assert(data.osbread(tempfile,offset2=2,1) eq greek2[3]);
@@ -2774,6 +2764,7 @@ subroutine internal_subroutine_xyzz(in xyzz)
 	printl("internal_subroutine_xyzz(in xyzz)");
 	//var xx;
 	//printl(xx);
+	//false && xyzz;
 	assert(xyzz(2,2,2) eq "b22");
 	return;
 }

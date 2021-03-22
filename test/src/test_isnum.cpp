@@ -1,4 +1,6 @@
-#include <assert.h>
+#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#include <cassert>
+
 #include <exodus/program.h>
 
 #define LOOPS 1

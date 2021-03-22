@@ -898,26 +898,32 @@ class DLL_PUBLIC var final {
 	void breakon() const;
 	void breakoff() const;
 
-	// STANDARD OUTPUT
-	//////////////////
+	// OUTPUT
+	/////////
 
-	const var& output() const;
-	const var& outputl() const;
-	const var& outputt() const;
+	//to stdout/cout
+	const var& output() const;//output without line ending, without flush
+	const var& outputl() const;//output without a line ending and flush
+	const var& outputt() const;//output with a tab and flush
 
+	//as above but with var1 prefixed
 	const var& output(const var& var1) const;
 	const var& outputl(const var& var1) const;
 	const var& outputt(const var& var1) const;
 
+	//to stdlog/clog
 	const var& logput() const;
 	const var& logputl() const;
 
+	//as above but with var1 prefixed
 	const var& logput(const var& var1) const;
 	const var& logputl(const var& var1) const;
 
+	//to stderr/cerr
 	const var& errput() const;
 	const var& errputl() const;
 
+	//as above but with var1 prefixed
 	const var& errput(const var& var1) const;
 	const var& errputl(const var& var1) const;
 

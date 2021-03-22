@@ -1,3 +1,6 @@
+#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#include <cassert>
+
 //
 // Exodus Development Platform
 //
@@ -6,7 +9,6 @@
 // NOTES.
 //
 #include <exodus/program.h>
-#include <cassert>
 
 programinit()
 
