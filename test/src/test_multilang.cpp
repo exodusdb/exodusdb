@@ -16,6 +16,12 @@ function main()
 {
 	var cmd;
 
+	var exodusdir=osgetenv("GITHUB_WORKSPACE");
+	if (exodusdir) {
+		printl(exodusdir);
+		oscwd(exodusdir ^ "/test/src");
+	}
+
 	//	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
 	var utf8_html = "utf8.html";
 	var buf;

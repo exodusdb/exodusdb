@@ -111,16 +111,14 @@ THE SOFTWARE.
 		this->createString();                                  \
 	};
 
-// includes isassigned which includes ISDEFINED
+//NB always try to convert strings to doubles first
 #define THISISNUMERIC()                                       \
-	/*THISISASSIGNED()*/                                      \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname)                  \
 			^ " : var is " ^ this->substr(1, 20).quote());
 
-// includes isassigned which includes ISDEFINED
+//NB always try to convert strings to doubles first
 #define THISISDECIMAL()                                       \
-	/*THISISASSIGNED()*/                                      \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
 						   this->substr(1, 20).quote());      \
@@ -129,9 +127,8 @@ THE SOFTWARE.
 		var_typ |= VARTYP_DBL;                                \
 	}
 
-// includes isassigned which includes ISDEFINED
+//NB always try to convert strings to doubles first
 #define THISISINTEGER()                                       \
-	/*THISISASSIGNED()*/                                      \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
 						   this->substr(1, 20).quote());      \
