@@ -35,9 +35,9 @@ namespace exodus {
 
 // and var::field,field2,locate,extract,remove,pickreplace,insert,substr,splice,remove
 
-///////
+////////
 // SPLIT
-///////
+////////
 
 // dim=var.split()
 dim var::split() const {
@@ -123,32 +123,35 @@ dim& dim::sort(bool reverse) {
 	return *this;
 }
 
-///////////////////////////////////////////
-// FIELD
-///////////////////////////////////////////
+///////////////
+// FIELD/FIELD2
+///////////////
 
-var var::field2(const var& sep, const int fieldno, const int nfields) const {
+// FIELD2()
+var var::field2(const var& separator, const int fieldno, const int nfields) const {
 	if (fieldno >= 0)
-		return field(sep, fieldno, nfields);
+		return field(separator, fieldno, nfields);
 
-	return field(sep, count(sep) + 1 + fieldno + 1, nfields);
+	return field(separator, count(separator) + 1 + fieldno + 1, nfields);
 }
 
-// FIELD(x,y,z)
-// var.field(substr,fieldno,nfields)
-var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const {
-	THISIS("var var::field(const var& substrx,const int fieldnx,const int nfieldsx) const")
+// FIELD()
+// var.field(separator,fieldno,nfields)
+var var::field(const var& separatorx, const int fieldnx, const int nfieldsx) const {
+	THISIS("var var::field(const var& separatorx,const int fieldnx,const int nfieldsx) const")
 	THISISSTRING()
-	ISSTRING(substrx)
+	ISSTRING(separatorx)
 
-	if (substrx.var_str == "")
-		return "";
+	if (separatorx.var_str == "") {
+		//return "";
+		throw MVError("separator cannot be blank in field()");
+	}
 
 	int fieldno = fieldnx > 0 ? fieldnx : 1;
 	int nfields = nfieldsx > 0 ? nfieldsx : 1;
 
-	// substr might be multi-byte ... esp. for non-ASCII
-	std::string::size_type len_substr = substrx.var_str.length();
+	// separator might be multi-byte ... esp. for non-ASCII
+	std::string::size_type len_separator = separatorx.var_str.length();
 
 	// FIND FIELD
 
@@ -156,12 +159,12 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const 
 	std::string::size_type start_pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
-		start_pos = var_str.find(substrx.var_str, start_pos);
+		start_pos = var_str.find(separatorx.var_str, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return "";
 		// start_pos++;
-		start_pos += len_substr;
+		start_pos += len_separator;
 		fieldn2++;
 	}
 
@@ -169,61 +172,60 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const 
 	std::string::size_type end_pos = start_pos;
 	int pastfieldn = fieldno + nfields;
 	while (fieldn2 < pastfieldn) {
-		end_pos = var_str.find(substrx.var_str, end_pos);
+		end_pos = var_str.find(separatorx.var_str, end_pos);
 		// past of of string?
 		if (end_pos == std::string::npos) {
 			return this->var_str.substr(start_pos, var_str.length() - start_pos);
 		}
 		// end_pos++;
-		end_pos += len_substr;
+		end_pos += len_separator;
 		fieldn2++;
 	}
 	// backup to first character if closing separator in case multi-byte separator
-	end_pos -= (len_substr - 1);
+	end_pos -= (len_separator - 1);
 
 	return this->var_str.substr(start_pos, end_pos - start_pos - 1);
 }
 
-///////////////////////////////////////////
-// FIELD
-///////////////////////////////////////////
+/////////////
+// FIELDSTORE
+/////////////
 
-// FIELDSTORE(x,y,z)
-// var.fieldstore(substr,fieldno,nfields,replacement)
-var var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx, const var& replacementx) const& {
-	var newmv = *this;
-	return newmv.fieldstorer(sepchar, fieldnx, nfieldsx, replacementx);
+// var.fieldstore(separator,fieldno,nfields,replacement)
+var var::fieldstore(const var& separator, const int fieldnx, const int nfieldsx, const var& replacementx) const& {
+	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 }
 
 // on temporary
-var& var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx, const var& replacementx) && {
-	return this->fieldstorer(sepchar, fieldnx, nfieldsx, replacementx);
+var& var::fieldstore(const var& separator, const int fieldnx, const int nfieldsx, const var& replacementx) && {
+	return this->fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 }
 
 // in-place
-var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx, const var& replacementx) {
+var& var::fieldstorer(const var& separator0, const int fieldnx, const int nfieldsx, const var& replacementx) {
 	THISIS(
-		"var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, "
+		"var& var::fieldstorer(const var& separator0,const int fieldnx,const int nfieldsx, "
 		"const var& replacementx)")
 	THISISSTRINGMUTATOR()
-	ISSTRING(sepchar0)
+	ISSTRING(separator0)
 
-	std::string sepchar = sepchar0.var_str;
-	if (sepchar == "") {
-		// *this = "";
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
-		return *this;
+	std::string separator = separator0.var_str;
+	if (separator == "") {
+		//// *this = "";
+		//this->var_str.clear();
+		//this->var_typ = VARTYP_STR;
+		//return *this;
+		throw MVError("separator cannot be blank in fieldstorer()");
 	}
 
-	// handle multibyte/non-ASCII sepchars
-	std::string::size_type sepchar_len = sepchar0.var_str.length();
+	// handle multibyte/non-ASCII separators
+	std::string::size_type separator_len = separator0.var_str.length();
 
 	int fieldno;
 	if (fieldnx > 0)
 		fieldno = fieldnx;
 	else if (fieldnx < 0)
-		fieldno = this->count(sepchar0) + 1 + fieldnx + 1;
+		fieldno = this->count(separator0) + 1 + fieldnx + 1;
 	else
 		fieldno = 1;
 
@@ -232,14 +234,14 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 	// pad replacement if required
 	var replacement;
 	if (nfieldsx >= 0) {
-		int nreplacementfields = replacementx.count(sepchar0) + 1;
+		int nreplacementfields = replacementx.count(separator0) + 1;
 		// pad to correct number of fields
 		if (nreplacementfields < nfields) {
 			replacement = replacementx;
 			for (; nreplacementfields < nfields; nreplacementfields++)
-				replacement ^= sepchar;
+				replacement ^= separator;
 		} else if (nfieldsx && nreplacementfields > nfields) {
-			replacement = replacementx.field(sepchar, 1, nfields);
+			replacement = replacementx.field(separator, 1, nfields);
 		} else
 			replacement = replacementx;
 	} else {
@@ -252,18 +254,18 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 	std::string::size_type start_pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
-		start_pos = var_str.find(sepchar, start_pos);
+		start_pos = var_str.find(separator, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos) {
 			do {
-				var_str += sepchar;
+				var_str += separator;
 				fieldn2++;
 			} while (fieldn2 < fieldno);
 			var_str += replacement.var_str;
 			return *this;
 		}
 		// start_pos++;
-		start_pos += sepchar_len;
+		start_pos += separator_len;
 		fieldn2++;
 	}
 
@@ -271,24 +273,25 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 	std::string::size_type end_pos = start_pos;
 	int pastfieldn = fieldno + nfields;
 	while (fieldn2 < pastfieldn) {
-		end_pos = var_str.find(sepchar, end_pos);
+		end_pos = var_str.find(separator, end_pos);
 		// past of of string?
 		if (end_pos == std::string::npos) {
 			var_str.replace(start_pos, std::string::npos, replacement.var_str);
 			return *this;
 		}
 		// end_pos++;
-		end_pos += sepchar_len;
+		end_pos += separator_len;
 		fieldn2++;
 	}
 
 	// backup to first byte of end of field sep
-	end_pos -= (sepchar_len - 1);
+	end_pos -= (separator_len - 1);
 
 	// insert or replace
 	if (end_pos == start_pos) {
+		//insert
 		if (nfields == 0)
-			replacement.var_str += sepchar;
+			replacement.var_str += separator;
 		var_str.insert(start_pos, replacement.var_str);
 	} else {
 		var_str.replace(start_pos, end_pos - start_pos - 1, replacement.var_str);
@@ -297,9 +300,9 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 	return *this;
 }
 
-///////////////////////////////////////////
+/////////
 // LOCATE
-///////////////////////////////////////////
+/////////
 
 // hardcore string locate function given a section of a string and all parameters
 inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const char order, const std::string& usingchar, var& setting) {
@@ -1658,8 +1661,8 @@ var var::mv(const char* opcode, const var& var2) const {
 	var outstr = "";
 	var mv1;
 	var mv2;
-	char sepchar1 = VM_;
-	char sepchar2 = VM_;
+	char separator1 = VM_;
+	char separator2 = VM_;
 
 	// pointers into this->var_str
 	// p1a and p1b are zero based indexes of first and last+1 characters of a value in var1
@@ -1674,29 +1677,29 @@ var var::mv(const char* opcode, const var& var2) const {
 
 	while (true) {
 
-		char sepchar1_prior = sepchar1;
+		char separator1_prior = separator1;
 
 		// find the end of a value in var1 (this)
-		if (sepchar1 <= sepchar2) {
+		if (separator1 <= separator2) {
 getnextp1:
 			p1b = this->var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, p1a);
 			if (p1b == std::string::npos) {
-				sepchar1 = RM_ + 1;
+				separator1 = RM_ + 1;
 			} else {
-				sepchar1 = this->var_str[p1b];
+				separator1 = this->var_str[p1b];
 			}
 			mv1 = var(this->var_str.substr(p1a, p1b - p1a));  //.outputl("mv1=");
 			p1a = p1b;
 		}
 
 		// find the end of a value in var1 (this)
-		if (sepchar2 <= sepchar1_prior) {
+		if (separator2 <= separator1_prior) {
 getnextp2:
 			p2b = var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, p2a);
 			if (p2b == std::string::npos) {
-				sepchar2 = RM_ + 1;
+				separator2 = RM_ + 1;
 			} else {
-				sepchar2 = var2.var_str[p2b];
+				separator2 = var2.var_str[p2b];
 			}
 			mv2 = var(var2.var_str.substr(p2a, p2b - p2a));	 //.outputl("mv2=");
 			p2a = p2b;
@@ -1734,25 +1737,25 @@ getnextp2:
 				break;
 		}
 
-		if (sepchar1 == sepchar2) {
+		if (separator1 == separator2) {
 
 			// if both pointers past end of their strings then we are done
-			if (sepchar1 > RM_)
+			if (separator1 > RM_)
 				break;
 
-			outstr ^= sepchar1;
+			outstr ^= separator1;
 			// outstr.convert(_VM_ _FM_, "]^").outputl("= outstr=");
 			p1a++;
 			p2a++;
-		} else if (sepchar1 < sepchar2) {
-			outstr ^= sepchar1;
+		} else if (separator1 < separator2) {
+			outstr ^= separator1;
 			// outstr.convert(_VM_ _FM_, "]^").outputl("< outstr=");
 			mv2 = "";
 			p1a++;
-			sepchar1_prior = sepchar1;
+			separator1_prior = separator1;
 			goto getnextp1;
 		} else {
-			outstr ^= sepchar2;
+			outstr ^= separator2;
 			// outstr.convert(_VM_ _FM_, "]^").outputl("> outstr=");
 			mv1 = "";
 			p2a++;
@@ -1876,10 +1879,9 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 //////
 // SUM
 /////
-/*
-var var::sum() const
+var var::sumall() const
 {
-	THISIS("var var::sum()")
+	THISIS("var var::sumall()")
 	THISISSTRING()
 
 	// Add up all numbers regardless of separators or levels (multilevel)
@@ -1897,6 +1899,11 @@ var var::sum() const
 
 		size_t subfieldsize = subfield.var_str.size();
 		if (subfieldsize) {
+			//for clarity of error message,
+			//throw any error here instead of leaving it up to the +=
+			if (!subfield.isnum())
+				throw MVNonNumeric("sumall() " ^ subfield.substr(1,128).quote());
+
 			result += subfield;
 			size_t n=subfield.var_str.find('.');
 			if (n) {
@@ -1909,7 +1916,7 @@ var var::sum() const
 			break;
 	}
 	return result.round(maxdecimals);
-}*/
+}
 
 var var::sum() const {
 	THISIS("var var::sum()")
@@ -1931,6 +1938,12 @@ var var::sum() const {
 			break;
 	};
 	if (min_sep_present > max_sep) {
+
+		//for clarity of error message,
+		//throw any error here instead of leaving it up to the +=
+		if (!this->isnum())
+			throw MVNonNumeric("sum() " ^ this->substr(1,128).quote());
+
 		return (*this) + 0;
 	}
 	min_sep_present = 1 + max_sep - min_sep_present;
@@ -1949,7 +1962,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!part.isnum())
-			throw MVNonNumeric("sum() " ^ part.quote());
+			throw MVNonNumeric("sum() " ^ part.substr(1,128).quote());
 
 		if (flag) {
 
@@ -2016,25 +2029,26 @@ var var::sum() const {
 	return outstr;//NRVO hopefully since single named return
 }
 
-var var::sum(const var& sepchar) const {
-	THISIS("var var::sum(const var& sepchar) const")
+var var::sum(const var& separator) const {
+	THISIS("var var::sum(const var& separator) const")
 	THISISSTRING()
 
 	var result = 0;
-	int nn = this->dcount(sepchar);
+	int nn = this->dcount(separator);
 
-	// static var allsepchars=_STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
-	// var sepcharn=allsepchars.index(sepchar);
-	// if (!sepcharn) return var1*var2;
+	// static var allseparators=_STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
+	// var separatorn=allseparators.index(separator);
+	// if (!separatorn) return var1*var2;
 
 	// TODO make this faster using remove or index?
 	var temp;
 	for (int ii = 1; ii <= nn; ++ii) {
-		temp = (*this).field(sepchar, ii);
+		temp = (*this).field(separator, ii);
 		if (temp.isnum())
 			result += temp;
 		else
-			result += (*this).sum(temp);
+			//result += (*this).sum(temp);
+			result += temp.sum();
 	}
 	return result;//NRVO hopefully since single named return
 }

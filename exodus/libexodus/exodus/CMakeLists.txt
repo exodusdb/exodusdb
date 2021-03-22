@@ -73,6 +73,9 @@ message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
 
 ### include postgres ###
 
+find_library(RYU_LIBRARIES NAMES ryu)
+#find_library(RYULIBRARIES NAMES ryu ryu_parse)
+
 include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
 
 ### define an output called exodus of type shared library and list all its source files###
@@ -104,7 +107,7 @@ message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
 #pq is needed for postgresql client library code
 #dl is needed for dynamic link library code
 #target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
-target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ryu ryu_parse)
+target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ${RYU_LIBRARIES})
 
 ### state that the output libexodus should be installed in the default system library
 

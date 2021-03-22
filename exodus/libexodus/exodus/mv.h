@@ -1240,8 +1240,9 @@ class DLL_PUBLIC var final {
 	// MV STRING FILTERS
 	////////////////////
 
-	ND var sum(const var& sepchar) const;
 	ND var sum() const;
+	ND var sumall() const;
+	ND var sum(const var& sepchar) const;
 
 	// binary ops + - * / : on mv strings 10]20]30
 	// e.g. var("10]20]30").mv("+","2]3]4")

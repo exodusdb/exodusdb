@@ -30,7 +30,7 @@ programinit()
 function main()
 {
 
-	stop("Test passed");
+	//stop("Test passed");
 
 	print(at(-1));
 	var cursor=getcursor();
@@ -217,9 +217,20 @@ function main()
 	printl(round(var("6000.50")/20,2));
 	assert(round(var("6000.50")/20,2)==300.03);
 
+	//sum with defined separator
+	assert(var("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ).sum(VM) == 0);
+	//multilevel
+	assert(var("2245000900.76" _VM_ "102760000" _SM_ "8099.9" _VM_ "-2347769000.66" _VM_ ).sum(VM) == 0);
+	assert(var("2245000900.76").sum(VM) == 2245000900.76);
+	assert(var("").sum(VM) == 0);
+	//sumall
+	assert(var("2245000900.76" _VM_ "102760000" _SM_ "8099.9" _VM_ "-2347769000.66" _VM_ ).sumall() == 0);
+
 	//test sum rounds result to no more than the input decimals input
 	printl(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ));
 	assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ) == 0);
+	assert(sum("2245000900.76") == 2245000900.76);
+	assert(sum("") == 0);
 
 	printl(test_sum("1}2]3}4"));
 	assert(test_sum("1]2^3]4")          == "3^7");
@@ -454,6 +465,75 @@ function main()
 	var greekstr2=fieldstore(greek5x2,"β",2,1,"xxx");
 	assert(greekstr2=="αβxxxβγδε");
 	assert(greekstr2.length()==15);
+	//on a temporary
+	greekstr2=var(greek5x2).fieldstore("β",2,1,"xxx");
+	assert(greekstr2=="αβxxxβγδε");
+	assert(greekstr2.length()==15);
+
+	//fieldstorer
+	//in place - oo method
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",2,1,"xxx");
+	assert(greekstr2=="αβxxxβγδε");
+	assert(greekstr2.length()==15);
+	//in place - procedural
+	greekstr2=greek5x2;
+	fieldstorer(greekstr2,"β",2,1,"xxx");
+	assert(greekstr2=="αβxxxβγδε");
+	assert(greekstr2.length()==15);
+	//empty separator character
+	try {
+		printl(fieldstore(greekstr2,"",2,1,"xxx"));
+		assert(false && "empty separator character in fieldstore() should generate an error");
+	}
+	catch (MVError e) {
+	}
+	try {
+		printl(field(greekstr2,"",1));
+		assert(false && "empty separator character in field() should generate an error");
+	}
+	catch (MVError e) {
+	}
+	//fieldstore after end of string
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",5,1,"xxx");
+    assert(greekstr2=="αβγδεαβγδεββxxx");
+	//negative field number from back
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",-2,1,"xxx");
+	assert(greekstr2=="αβxxxβγδε");
+	assert(greekstr2.length()==15);
+	//positive number of fields indicates to replace fieldwise with the fields in the insertion. empty fields if the number of fields in the insertion value is insufficient
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",2,2,"xxx");
+	assert(greekstr2=="αβxxxβ");
+	assert(greekstr2.length()==9);
+	//positive number of fields indicates to replace fieldwise with the fields in the insertion.
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",2,2,"xxxβyyy");
+	assert(greekstr2=="αβxxxβyyy");
+	assert(greekstr2.length()==12);
+	//negative number of fields indicates to replace that positive number of fields with whatever is the insertion.
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",2,-2,"xxx");
+	assert(greekstr2=="αβxxx");
+	assert(greekstr2.length()==7);
+	//replacing an empty field with something
+	greekstr2="αββγδε";
+	greekstr2.fieldstorer("β",2,1,"xxx");
+	assert(greekstr2=="αβxxxβγδε");
+	//replacing a field with nothing
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",2,1,"");
+	assert(greekstr2=="αββγδε");
+	//replacing an empty field with nothing
+	greekstr2="αββγδε";
+	greekstr2.fieldstorer("β",2,1,"");
+	//replacing 0 fields
+	greekstr2=greek5x2;
+	greekstr2.fieldstorer("β",2,0,"xxx");
+	printl(greekstr2);
+	//assert(greekstr2 == "αβγδεαβγδε");
 
 	greekstr2=fieldstore(greek5x2,"β",2,1,"1β2β3");
 	assert(greekstr2=="αβ1βγδε");
@@ -1483,6 +1563,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		var inverted=cc.invert();
 		var invertedtwice=invert(inverted);
 
+		/*
 		cc                        .outputl("original      =");
 		inverted                  .outputl("inverted      =");
 		invertedtwice             .outputl("inverted twice=");
@@ -1498,7 +1579,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		cc.len()                  .outputl("original len  =");
 		inverted.len()            .outputl("inverted len  =");
 		invertedtwice.len()       .outputl("invertedx2 len=");
-
+		*/
 		assert(cc ne inverted);
 		assert(cc == invertedtwice);
 
@@ -1884,61 +1965,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(str1.trimmer(" ","FB") eq "xxx  xxx");
 	assert(str1 ne str0);
 
-	dim a9;
-	var a10;
-	assert(split("xx"^FM^"bb",a9) eq 2);
-	assert(join(a9) eq ("xx" ^FM^ "bb"));
-
-	dim dx(3);
-	dx=1;
-	assert(dx.join().outputl()==(1^FM^1^FM^1));
-
-	var r[2];
-	assert(unassigned(r[0]));
-
-	dim a7(2,3);
-
-	for (int ii=1;ii<=2;++ii)
-		for (int jj=1;jj<=3;++jj)
-			a7(ii,jj)=ii^var(".")^jj;
-
-	dim a8(4,5);
-	for (int ii=1;ii<=4;++ii)
-		for (int jj=1;jj<=5;++jj)
-			a8(ii,jj)=ii^var(".")^jj;
-
-	a8=2.2;
-
-	for (int ii=1;ii<=4;++ii) {
-		for (int jj=1;jj<=5;++jj)
-			a8(ii,jj).outputt("=");
-//		printl();
-	}
-
-	a8=a7;
-
-	for (int ii=1;ii<=2;++ii) {
-		for (int jj=1;jj<=3;++jj) {
-			a8(ii,jj).outputt("=");
-			assert(a8(ii,jj)==a7(ii,jj));
-//		printl();
-		}
-	}
-	printl();
-
-	assert(a7.split("xx"^FM^"bb") eq 2);
-	assert(a7(1) eq "xx");
-	assert(a7(2) eq "bb");
-	assert(a7.join() eq ("xx"^FM^"bb"));
-
-	dim arrx(2,2),arry;
-	arrx(1,1)="xx";
-	assert(arrx(1,1) eq "xx");
-	arrx(1,2)=arrx(1,1);
-	assert(arrx(1,2) eq "xx");
-	arry=arrx;
-	assert(arry(1,1) eq "xx");
-
+	//test daisychaining assignments
 	var aa1,aa2,aa3,aa4;
 	aa1=aa2=aa3="aa";
 	assert(aa1 eq "aa");
@@ -1946,34 +1973,34 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(aa3 eq "aa");
 
 	//string seed
-        initrnd("cccc");
-        printl(rnd(1000000000));
-        initrnd("cccc");
-        assert(rnd(1000000000)==231348803);
+	initrnd("cccc");
+	printl(rnd(1000000000));
+	initrnd("cccc");
+	assert(rnd(1000000000)==231348803);
 
 	//slightly different string seed
-        initrnd("cccd");
-        printl(rnd(1000000000));
-        initrnd("cccd");
-        assert(rnd(1000000000)==610052346);
+	initrnd("cccd");
+	printl(rnd(1000000000));
+	initrnd("cccd");
+	assert(rnd(1000000000)==610052346);
 
 	//integer seed
-        //initrnd(123457);
-        //printl(rnd(1000000000));
-        initrnd(123457);
-        assert(rnd(1000000000)==466803956);
+	//initrnd(123457);
+	//printl(rnd(1000000000));
+	initrnd(123457);
+	assert(rnd(1000000000)==466803956);
 
 	//slightly different integer seed
-        //initrnd(123458);
-        //printl(rnd(1000000000));
-        initrnd(123458);
-        assert(rnd(1000000000)==191396791);
+	//initrnd(123458);
+	//printl(rnd(1000000000));
+	initrnd(123458);
+	assert(rnd(1000000000)==191396791);
 
 	//initrnd treats floats as integers so same result as above
-        //initrnd(123458.2);
-        //printl(rnd(1000000000));
-        initrnd(123458.2);
-        assert(rnd(1000000000)==191396791);
+	//initrnd(123458.2);
+	//printl(rnd(1000000000));
+	initrnd(123458.2);
+	assert(rnd(1000000000)==191396791);
 
 	var tempinp;
 //	input("Press Enter ...",tempinp);
@@ -2230,37 +2257,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//try{unass+1;}
 	//catch(...){};
 
-	//using mv dimensioned arrays
-	//mv dimensioned arrays have a zero element that is
-	//used in case either or both of the indexes are zero
-	dim arr1(3), arr2(3,3);
-	arr1(0)=0;
-	arr1(0,0)=0;
-	for (int ii=1; ii<=3; ++ii) {
-		arr1(ii)=ii;
-		for (int jj=1; jj<=3; ++jj)
-			arr2(ii,jj)=ii*3+jj;
-	}
-	assert(arr1(0) eq "0");
-	assert(arr1(0,0) eq "0");
-	for (int ii=1; ii<=3; ++ii) {
-		assert(arr1(ii) eq ii);
-		for (int jj=1; jj<=3; ++jj)
-			assert(arr2(ii,jj) eq ii*3+jj);
-	}
-
-/* 
-	//using c arrays UNSAFE! USE exodus dim INSTEAD;
-	var arrxxx[10];
-
-	//can use int but not var for indexing c arrays
-	int intx=0;
-	arrxxx[intx]="x";
-	var varx=0;
-	//following will not compile on MSVC (g++ is ok) due to "ambiguous" due to using var for index element
-	//arrxxx[varx]="y";
-	arrxxx[int(varx)]="y";
-*/
 	//bool cannot be used numerically ON MSVC (unlike in pick)
 	//could change all logical ops to return var or find a way to allow void* pointer to promote to bool
 	//or perhaps add bool to the list of automatic constructors?
@@ -2268,17 +2264,17 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	var log2="x";
 	//following will not compile now that all exodus logical operators return bool instead of var
 	//if (log1 eq log2^log1) {}
-/*
-in.cpp(181) : error C2666: 'exodus::operator ^' : 7 overloads have similar conversions
-could be 'exodus::var exodus::operator +(const int,const exodus::var &)' [found using argument-dependent lookup]
-or 'exodus::var exodus::operator +(const exodus::var &,const double)' [found using argument-dependent lookup]
-or 'exodus::var exodus::operator +(const exodus::var &,const int)' [found using argument-dependent lookup]
-or 'exodus::var exodus::operator +(const exodus::var &,const exodus::var &)' [found using argument-dependent lookup]
-or 'built-in C++ operator+(int, bool)'
-or 'built-in C++ operator+(unsigned int, bool)'
-or 'built-in C++ operator+(bool, bool)'
-while trying to match the argument list '(exodus::var, bool)'
-*/
+	/*
+	in.cpp(181) : error C2666: 'exodus::operator ^' : 7 overloads have similar conversions
+	could be 'exodus::var exodus::operator +(const int,const exodus::var &)' [found using argument-dependent lookup]
+	or 'exodus::var exodus::operator +(const exodus::var &,const double)' [found using argument-dependent lookup]
+	or 'exodus::var exodus::operator +(const exodus::var &,const int)' [found using argument-dependent lookup]
+	or 'exodus::var exodus::operator +(const exodus::var &,const exodus::var &)' [found using argument-dependent lookup]
+	or 'built-in C++ operator+(int, bool)'
+	or 'built-in C++ operator+(unsigned int, bool)'
+	or 'built-in C++ operator+(bool, bool)'
+	while trying to match the argument list '(exodus::var, bool)'
+	*/
 
 	//neither will the following
 	//var log3=count(log1,"x")+(log1 ne "");
@@ -2700,10 +2696,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	tconv="xxxxx/xxxxx xxx" ^ FM ^ "xx";
 	tconv=tconv.oconv("T#8");
 	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " ^ FM ^ "xx      "));
-
-	//test redimensioning
-	dim aaaa(10);
-	aaaa.redim(20,30);
 
 	var sentence=sentence();
 
