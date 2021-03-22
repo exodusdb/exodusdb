@@ -51,6 +51,7 @@ dim var::split() const {
 	dim tempdim2;
 	tempdim2.split(*this);
 	return tempdim2;//NRVO hopefully since single named return
+	//return dim().split(*this);//doesnt work because split returns a var, the number of fields
 }
 
 // number=dim.split(varstr)
@@ -456,7 +457,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 			// AL Ascending Left Justified
 			case '\x01':
 				//				//arev strangeness? to locate a field whereever
-				//it is regardless of order even ""? 				if
+				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
 				//if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
@@ -474,7 +475,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 			// DL Descending Left Justified
 			case '\x02':
 				//				//arev strangeness? to locate a field whereever
-				//it is regardless of order even ""? 				if
+				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
 				value = var_str.substr(start_pos, nextstart_pos - start_pos);
@@ -490,7 +491,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 			// AR Ascending Right Justified
 			case '\x03':
 				//				//arev strangeness? to locate a field whereever
-				//it is regardless of order even ""? 				if
+				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
 				if (var_str.substr(start_pos, nextstart_pos - start_pos) <= target) {
@@ -505,7 +506,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 			// DR Descending Right Justified
 			case '\x04':
 				//				//arev strangeness? to locate a field whereever
-				//it is regardless of order even ""? 				if
+				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
 				value = var_str.substr(start_pos, nextstart_pos - start_pos);

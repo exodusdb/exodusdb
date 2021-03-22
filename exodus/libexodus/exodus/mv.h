@@ -637,6 +637,7 @@ class DLL_PUBLIC var final {
 
 	//=string
 	var& operator=(const std::string& string2);
+	var& operator=(const std::string&& string2);
 
 	//=var
 	var& operator^=(const var& var1);
@@ -719,10 +720,12 @@ class DLL_PUBLIC var final {
 
 	DLL_PUBLIC friend bool operator==(const var& lhs, const var& rhs) { return MVeq(lhs, rhs); }
 	DLL_PUBLIC friend bool operator==(const var& lhs, const char* char2) { return MVeq(lhs, var(char2)); }
+	DLL_PUBLIC friend bool operator==(const var& lhs, const char char2) { return MVeq(lhs, var(char2)); }
 	DLL_PUBLIC friend bool operator==(const var& lhs, const int int2) { return MVeq(lhs, var(int2)); }
 	DLL_PUBLIC friend bool operator==(const var& lhs, const double double2) { return MVeq(lhs, var(double2)); }
 	DLL_PUBLIC friend bool operator==(const var& lhs, const bool bool2) { return MVeq(lhs, var(bool2)); }
 	DLL_PUBLIC friend bool operator==(const char* char1, const var& rhs) { return MVeq(rhs, var(char1)); }
+	DLL_PUBLIC friend bool operator==(const char char1, const var& rhs) { return MVeq(rhs, var(char1)); }
 	DLL_PUBLIC friend bool operator==(const int int1, const var& rhs) { return MVeq(rhs, var(int1)); }
 	DLL_PUBLIC friend bool operator==(const double double1, const var& rhs) { return MVeq(rhs, var(double1)); }
 	DLL_PUBLIC friend bool operator==(const bool bool1, const var& rhs) { return MVeq(rhs, var(bool1)); }
@@ -868,9 +871,9 @@ class DLL_PUBLIC var final {
 	DLL_PUBLIC friend var operator^(var&& lhs, const double double2) { return lhs ^= double2; }
 
 	// unary operators +var -var !var
-	DLL_PUBLIC friend var operator+(const var& var1) { return MVplus(var1); }
-	DLL_PUBLIC friend var operator-(const var& var1) { return MVminus(var1); }
-	DLL_PUBLIC friend bool operator!(const var& var1) { return MVnot(var1); }
+	DLL_PUBLIC ND friend var operator+(const var& var1) { return MVplus(var1); }
+	DLL_PUBLIC ND friend var operator-(const var& var1) { return MVminus(var1); }
+	DLL_PUBLIC ND friend bool operator!(const var& var1) { return MVnot(var1); }
 
 	// OS TIME/DATE
 	///////////////
@@ -1449,8 +1452,7 @@ class DLL_PUBLIC var final {
 	void abort(const var& text DEFAULTNULL) const;
 	void abortall(const var& text DEFAULTNULL) const;
 
-	var debug() const;
-	var debug(const var&) const;
+	var debug(const var& DEFAULTNULL) const;
 
 	var logoff() const;
 
@@ -1576,9 +1578,9 @@ DLL_PUBLIC ND bool MVlt(const var& var1, const var& var2);
 DLL_PUBLIC ND bool MVlt(const var& var1, const int int2);
 DLL_PUBLIC ND bool MVlt(const int int1, const var& var2);
 
-DLL_PUBLIC ND var MVplus(const var& var1);
-DLL_PUBLIC ND var MVminus(const var& var1);
-DLL_PUBLIC ND bool MVnot(const var& var1);
+//DLL_PUBLIC ND var MVplus(const var& var1);
+//DLL_PUBLIC ND var MVminus(const var& var1);
+//DLL_PUBLIC ND bool MVnot(const var& var1);
 
 DLL_PUBLIC ND var MVadd(const var& var1, const var& var2);
 
@@ -1901,9 +1903,6 @@ class DLL_PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPo
 class DLL_PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (const var& var1    );};
 class DLL_PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (const var& var1    );};
 class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (const var& var1 DEFAULTNULL);};
-//class DLL_PUBLIC MVStop			: public MVError {public: explicit MVStop                 (const var& var1 DEFAULTNULL);};
-//class DLL_PUBLIC MVAbort			: public MVError {public: explicit MVAbort                (const var& var1 DEFAULTNULL);};
-//class DLL_PUBLIC MVAbortAll		: public MVError {public: explicit MVAbortAll             (const var& var1 DEFAULTNULL);};
 class DLL_PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
 class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(const var& var1    );};
 class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};

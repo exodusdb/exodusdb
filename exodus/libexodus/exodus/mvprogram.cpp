@@ -1372,10 +1372,11 @@ bool ExodusProgramBase::unlockrecord(const var& filename, var& file0, const var&
 void ExodusProgramBase::debug() const {
 
 	var reply;
-	std::cout << "debug():";
+	std::clog << "debug():";
 	if (OSSLASH == "/")
-		asm("int $3");
-	// cin>>reply;
+		asm("int $3");//use gdb n commands to resume
+	else
+		var().debug();
 	return;
 }
 

@@ -100,7 +100,7 @@ var::var()
 	// and not even a compiler warning in msvc8 or g++4.1.2
 
 	// so the following test is put everywhere to protect against this type of accidental
-	// programming if (var_typ&VARTYP_MASK) 	throw MVUndefined("funcname()"); should really
+	// programming if (var_typ&VARTYP_MASK) throw MVUndefined("funcname()"); should really
 	// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
 	// decimal 1111binary this could be removed in production code perhaps
 
@@ -461,7 +461,7 @@ var& var::operator=(const char* char2) {
 	return *this;
 }
 
-//=std::string
+//=std::string variable (lvalue)
 // The assignment operator should always return a reference to *this.
 var& var::operator=(const std::string& string2) {
 
@@ -472,6 +472,21 @@ var& var::operator=(const std::string& string2) {
 	// slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
 	var_str = string2;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+//=std::string temporary (rvalue)
+// The assignment operator should always return a reference to *this.
+var& var::operator=(const std::string&& string2) {
+
+	THISIS("var& var::operator= (const std::string&& string2)")
+	// protect against unlikely syntax as follows:
+	// var undefinedassign=undefinedassign=std::string("xxx"";
+	// this causes crash due to bad memory access due to setting string that doesnt exist
+	// slows down all string settings so consider NOT CHECKING in production code
+	THISISDEFINED()
+	var_str = std::move(string2);
 	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
@@ -618,6 +633,8 @@ var var::operator--(int) {
 tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<mvint_t>::min())
+			throw MVIntUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -687,6 +704,8 @@ var& var::operator--() {
 tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<mvint_t>::min())
+			throw MVIntUnderflow("operator--");
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
 
@@ -930,7 +949,8 @@ inline bool almost_equal(double x, double y, int) {
 	return (std::abs(x - y) < SMALLEST_NUMBER);
 }
 
-// almost identical between MVeq and MVlt except where noted (and doubles compare only to 0.0001 accuracy)
+// almost identical code in MVeq and MVlt except where noted
+// NOTE doubles compare only to 0.0001 accuracy)
 DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs) {
 	THISIS("bool MVeq(const var& lhs,const var& rhs)")
 	ISDEFINED(lhs)
@@ -1047,6 +1067,7 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs) {
 }
 
 // almost identical between MVeq and MVlt except where noted
+// NOTE doubles compare only to 0.0001 accuracy)
 DLL_PUBLIC bool MVlt(const var& lhs, const var& rhs) {
 	THISIS("bool MVlt(const var& lhs,const var& rhs)")
 	ISDEFINED(lhs)
@@ -1131,8 +1152,8 @@ DLL_PUBLIC bool MVlt(const var& lhs, const var& rhs) {
 	return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) < 0;
 }
 
-// almost identical between MVeq and MVlt except where noted
-// this is the var<int version for speed
+// similar to MVeq and MVlt - this is the var<int version for speed
+// NOTE doubles compare only to 0.0001 accuracy)
 DLL_PUBLIC bool MVlt(const var& lhs, const int int2) {
 	THISIS("bool MVlt(const var& lhs,const int int2)")
 	ISDEFINED(lhs)
@@ -1174,8 +1195,8 @@ DLL_PUBLIC bool MVlt(const var& lhs, const int int2) {
 	return lhs.var_str < intToString(int2);
 }
 
-// almost identical between MVeq and MVlt except where noted
-// this is the int<var version for speed
+// similar to MVeq and MVlt - this is the int<var version for speed
+// NOTE doubles compare only to 0.0001 accuracy)
 DLL_PUBLIC bool MVlt(const int int1, const var& rhs) {
 	THISIS("bool MVlt(const int int1,const var& rhs)")
 	ISDEFINED(rhs)

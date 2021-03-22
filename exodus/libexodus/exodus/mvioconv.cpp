@@ -215,7 +215,7 @@ var var::iconv(const char* convstr) const {
 	}
 
 	// TODO implement
-	throw MVError("iconv '" ^ var(convstr) ^ "' not implemented yet ");
+	throw MVNotImplemented("iconv '" ^ var(convstr) ^ "' not implemented yet ");
 
 	return *this;
 }
@@ -810,11 +810,11 @@ var var::oconv(const char* conversion) const {
 			return (*this);
 
 			//default:
-			//	throw MVError("oconv " ^ var(*conversionchar).oconv("HEX").substr(1,6) ^ " not implemented yet ");
+			//	throw MVNotImplmented("oconv " ^ var(*conversionchar).oconv("HEX").substr(1,6) ^ " not implemented yet ");
 	}
 
 	// TODO implement
-	throw MVError("oconv '" ^ var(conversion).substr(1, 6) ^ "' not implemented yet ");
+	throw MVNotImplemented("oconv '" ^ var(conversion).substr(1, 6) ^ "' not implemented yet ");
 
 	// unknown conversions are simply ignored in AREV
 	return *this;

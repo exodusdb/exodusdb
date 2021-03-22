@@ -34,7 +34,7 @@ Binary    Hex          Comments
 #pragma warning(disable : 4530)
 #endif
 
-#ifndef _MSC_VER
+#if __has_include(<signal.h>)
 #include <signal.h> //for raise(SIGTRAP)
 #endif
 
@@ -2094,54 +2094,44 @@ var var::index(const var& substrx, const int occurrenceno) const {
 	return 0;
 }
 
-var var::debug() const {
+var var::debug(const var& var1) const {
 	// THISIS("var var::debug() const")
 
-	std::cout << "var::debug()" << std::endl
-			  << std::flush;
+	std::clog << "var::debug(" << var1 << ")" << std::endl;
+	//flush to ensure all stdout is visible
+	std::cout << std::flush;
+
 	//"good way to break into the debugger by causing a seg fault"
 	// *(int *)0 = 0;
 	// throw var("Debug Statement");
 
-#ifdef raise
-	raise(SIGTRAP);
-#else
+#if __has_include(<signal.h>)
+	::raise(SIGTRAP);
+#elif 1
 	__asm__("int3");
 	//__asm__("int3");
 	//__asm__("int3");
-#endif
 
-	// throw MVDebug();
-	return "";
-}
-
-var var::debug(const var& var1) const {
-	// THISIS("var var::debug(const var& var1) const")
-
-	std::cout << "var::debug()" << std::endl
-			  << std::flush;
-// good way to break into the debugger by causing a seg fault
-#ifdef _MSC_VER
+#elif defined(_MSC_VER)
 	// throw var("Debug Statement");
 	throw MVDebug(var1);
-#else
+
+// another way to break into the debugger by causing a seg fault
+#elif 0
 	*(int*)0 = 0;
 #endif
 
 	return "";
-
-	// evade warning: unused parameter var1
-	if (var1) {
-	};
 }
 
 var var::logoff() const {
 	// THISIS("var var::logoff() const")
 	// THISISSTRING("var.logoff()")
 
-	LOCKIOSTREAM
-	std::cout << "var::logoff not implemented yet " << std::endl;
-	return "";
+	//LOCKIOSTREAM
+	//std::cout << "var::logoff not implemented yet " << std::endl;
+	//return "";
+	throw MVLogoff();
 }
 
 var var::abs() const {

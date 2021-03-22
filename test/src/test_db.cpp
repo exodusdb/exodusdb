@@ -607,8 +607,8 @@ dict(AGE_IN_YEARS) {
 	assert(key=="SB001");
 	myclients.readnext(key);
 	assert(key=="SB001");
-        //committrans();
-        //rollbacktrans();
+	//committrans();
+	//rollbacktrans();
 
     }
 

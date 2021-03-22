@@ -36,7 +36,7 @@ namespace exodus {
 // was declared private to prevent it being called but somehow still "dim xyz();" still compiles
 // although with a warning now public to allow usage in class variables
 dim::dim()
-	: nrows_(1), ncols_(1), initialised_(false)
+	: nrows_(0), ncols_(0), initialised_(false)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
 	// throw MVArrayDimensionedZero();
@@ -191,23 +191,23 @@ dim& dim::operator=(const dim& sourcedim) {
 }
 
 dim& dim::operator=(const var& sourcevar) {
-	if (!initialised_)
-		throw MVArrayNotDimensioned();
-	init(sourcevar);
+	//if (!initialised_)
+	//	throw MVArrayNotDimensioned();
+	this->init(sourcevar);
 	return *this;
 }
 
 dim& dim::operator=(const int sourceint) {
-	if (!initialised_)
-		throw MVArrayNotDimensioned();
+	//if (!initialised_)
+	//	throw MVArrayNotDimensioned();
 	init(sourceint);
 	return *this;
 }
 
 dim& dim::operator=(const double sourcedbl) {
-	if (!initialised_)
-		throw MVArrayNotDimensioned();
-	init(sourcedbl);
+	//if (!initialised_)
+	//	throw MVArrayNotDimensioned();
+	this->init(sourcedbl);
 	return *this;
 }
 
