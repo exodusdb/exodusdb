@@ -9,6 +9,12 @@ programinit()
 
 function main() {
 
+	//Pass if no default database connection
+	if (not connect()) {
+		printl("No default db connection to perform db testing. Test passed");
+		return 0;
+	}
+
 	//ensure dict_voc has f1m
 	var dictvoc;
 	if (not(dictvoc.open("dict_voc", ""))) {

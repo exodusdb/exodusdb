@@ -1048,6 +1048,8 @@ function main()
 	assert(utf8_allo3=="Алло");
 
 	//output utf8 convering to ISO-8859-5
+	//horrible hack to avoid MVUnassigned on github actions build
+	utf8_allo3=="Алло";
 	oswrite(utf8_allo3,"t_cp_allo4.txt","ISO-8859-5");
 	/*
 root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
