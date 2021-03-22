@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <limits>
 #include <sstream>
 #include <vector>
+#include <cassert>
 
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
@@ -1547,31 +1548,17 @@ inline double exodusmodulus(const double top, const double bottom) {
 	return top - double(int(top / bottom) * bottom);
 }
 
-// TODO ensure locale doesnt produce like 123.456,78
 std::string intToString(int int1) {
 
-	// TODO test ostringstream type creation speed and of slow then
-	// consider using a thread global to avoid continual creation
-
-	// see http://www.gotw.ca/publications/mill19.htm
-	// and http://www.boost.org/libs/conversion/lexical_cast.htm
-	// for background to choice of ostringstream for implementation
-
-	// 1. sprintf rejected because snprintf is safer
-	// 2. snprintf rejected because cannot handle wide characters
-	// 3. strstream rejected because it is deprecated and might cease to be supported
-	// but is the fastest if you use its ability to preallocate memory in one go
-	// RECONSIDER IMPLEMENTING IN strstream for performance
-	// 4. stringstream CHOSEN even though very slow versus snprintf
-	// 5. boost:lexical_cast rejected because two step conversion is very slow
-	// and unnecessary if you just want a string and doesnt allow precision control
-	// useful for float2string
-
+	//600ns
 	// NB plain stringstream causes a memory leak in msvc8 before sp1
-	std::ostringstream ss;
-	ss << int1;
-	// debuggFUNCTION&& cout<<"intToString(int "<<int1<<") returns '"<<s<<"'\n";
-	return ss.str();
+	//std::ostringstream ss;
+	//ss << int1;
+	//// debuggFUNCTION&& cout<<"intToString(int "<<int1<<") returns '"<<s<<"'\n";
+	//return ss.str();
+
+	//40ns
+	return std::to_string(int1);
 }
 
 // TODO ensure locale doesnt produce like 123.456,78
