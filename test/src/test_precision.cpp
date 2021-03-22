@@ -23,10 +23,10 @@
 //ryu support ICONV and OCONV but we only use its OCONV
 //1. convert ASCII decimal to double ("ICONV")
 //2. convert double to ASCII decimal ("OCONV")
-#if __has_include(<ryu/ryu_parse.h>)
+#if __has_include(<ryu/ryu.h>)
 #define HAS_RYU
 #define USE_RYU_D2S//if using d2s not d2exp in mv.cpp
-#include <ryu/ryu_parse.h>
+//#include <ryu/ryu.h>
 #endif
 
 #include <exodus/program.h>
@@ -78,8 +78,14 @@ function main() {
 		assert( (var(9.36749)        ^ "x") == "9.36749x");
 		assert(((var("9.36749") + 0) ^ "x") == "9.36749x");
 
+		printl( var(1234567890123456789.)  ^ "x");
+#ifdef HAS_RYU
 		assert((var(1234567890123456789.)  ^ "x") == "1234567890123456800x");
 		assert((var(12345678901234567890.) ^ "x") == "12345678901234567000x");
+#else
+		assert((var(1234567890123456789.)  ^ "x") == "1234567890123457000x");
+		assert((var(12345678901234567890.) ^ "x") == "12345678901234570000x");
+#endif
 
 		printl( var("999999999999999.9")    + 0);
 		//           999999999999999.875

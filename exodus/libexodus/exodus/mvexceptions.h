@@ -112,14 +112,15 @@ THE SOFTWARE.
 	};
 
 // includes isassigned which includes ISDEFINED
-#define THISISNUMERIC() \
-	THISISASSIGNED()    \
-	if (!this->isnum()) \
-		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1, 20).quote());
+#define THISISNUMERIC()                                       \
+	/*THISISASSIGNED()*/                                      \
+	if (!this->isnum())                                       \
+		throw MVNonNumeric(var(functionname)                  \
+			^ " : var is " ^ this->substr(1, 20).quote());
 
 // includes isassigned which includes ISDEFINED
 #define THISISDECIMAL()                                       \
-	THISISASSIGNED()                                          \
+	/*THISISASSIGNED()*/                                      \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
 						   this->substr(1, 20).quote());      \
@@ -130,7 +131,7 @@ THE SOFTWARE.
 
 // includes isassigned which includes ISDEFINED
 #define THISISINTEGER()                                       \
-	THISISASSIGNED()                                          \
+	/*THISISASSIGNED()*/                                      \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
 						   this->substr(1, 20).quote());      \

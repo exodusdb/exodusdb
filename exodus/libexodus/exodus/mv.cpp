@@ -1314,15 +1314,15 @@ var MVadd(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_typ & VARTYP_INT)
-		if (rhs.var_typ & VARTYP_INT)
-			return lhs.var_int + rhs.var_int;  // only this returns an int, the following
-											   // both return doubles
-		else
-			return lhs.var_int +
-				   ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
-	else
-		return lhs.var_dbl + ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+    //identical code in MVadd and MVsub except for +/-
+    //identical code in MVadd, MVsub, MVmul except for +,-,*
+	if (lhs.var_typ & VARTYP_DBL)
+		return lhs.var_dbl + ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
+	else if (rhs.var_typ & VARTYP_DBL)
+        return lhs.var_int + rhs.var_dbl;
+    else
+        return lhs.var_int + rhs.var_int;
+
 }
 
 var MVsub(const var& lhs, const var& rhs) {
@@ -1330,15 +1330,14 @@ var MVsub(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_typ & VARTYP_INT)
-		if (rhs.var_typ & VARTYP_INT)
-			return lhs.var_int - rhs.var_int;  // only this returns an int, the following
-											   // both return doubles
-		else
-			return lhs.var_int -
-				   ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
-	else
-		return lhs.var_dbl - ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+    //identical code in MVadd, MVsub, MVmul except for +,-,*
+	if (lhs.var_typ & VARTYP_DBL)
+		return lhs.var_dbl - ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
+	else if (rhs.var_typ & VARTYP_DBL)
+        return lhs.var_int - rhs.var_dbl;
+    else
+        return lhs.var_int - rhs.var_int;
+
 }
 
 var MVmul(const var& lhs, const var& rhs) {
@@ -1346,15 +1345,14 @@ var MVmul(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_typ & VARTYP_INT)
-		if (rhs.var_typ & VARTYP_INT)
-			return lhs.var_int * rhs.var_int;  // only this returns an int, the following
-											   // both return doubles
-		else
-			return lhs.var_int *
-				   ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
-	else
-		return lhs.var_dbl * ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+    //identical code in MVadd, MVsub, MVmul except for +,-,*
+	if (lhs.var_typ & VARTYP_DBL)
+		return lhs.var_dbl * ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
+	else if (rhs.var_typ & VARTYP_DBL)
+        return lhs.var_int * rhs.var_dbl;
+    else
+        return lhs.var_int * rhs.var_int;
+
 }
 
 var MVdiv(const var& lhs, const var& rhs) {

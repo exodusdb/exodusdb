@@ -278,6 +278,7 @@ function main() {
 	assert(var(0.0001)/var(10.0)==var(0.00001));
 
 	var t=1/3;
+	printl(var(10.0/3));
 	printl(var(10.0/3)*3);
 	assert(var(10.0/3)*3==10);
 	assert(var(10.0/3*3)==10);

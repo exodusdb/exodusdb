@@ -1,13 +1,22 @@
 #undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
+//ryu support ICONV and OCONV but we only use its OCONV
+//1. convert ASCII decimal to double ("ICONV")
+//2. convert double to ASCII decimal ("OCONV")
+#if __has_include(<ryu/ryu.h>)
+#define HAS_RYU
+#define USE_RYU_D2S//if using d2s not d2exp in mv.cpp
+//#include <ryu/ryu.h>
+#endif
+
 #include <exodus/program.h>
 
 using namespace std;
 
 programinit()
 
-function test(in str, in str20 = "") {
+function test(in str, in str2o = "") {
 
 	print(str,"==",str.quote());
 	printl((str == str)? " is true" : " is false","and ");
@@ -44,10 +53,30 @@ function test(in str, in str20 = "") {
 	assert(double(str) ==  str);
 	assert( str    == double(str));
 
-	var str2 = (len(str20) > 0) ? str20 : str;
+	var str2 = (len(str2o) > 0) ? str2o : str;
 	print("\t\t\t\t",quote(str)," -> ",quote(str2));
-	printl((quote(str + 0) == quote(str2))? " is true" : " is false");
-	assert(quote(str + 0) == quote(str2));
+	printl((quote(str+0) == quote(str2))? " is true" : " is false");
+	//var x=str+0;
+	//var y=quote(str+0);
+	//var z=quote(str2);
+	//if (quote(str+0) != quote(str2))
+	//	debug();
+#ifdef USE_RYU_D2S
+	assert(quote(str+0) == quote(str2));//RYU converts 99.9+0 (99.90000000000000006) to 99.9
+#else
+	assert((str+0) == str2);//numerical comparison to avoid 99.9+0 = 99.90000000000000006 without using RYU
+#endif
+	//var rounded_str = round(str,14)+0;
+	//var x = str+0;
+	//printl();
+	//TRACE(x)
+	//if (quote(str + 0) != quote(str2))
+	//	debug();
+	//var a=quote(str);
+	//var b=quote(str+0);
+	//var c=quote(str2);
+	//printl((quote(rounded_str) == quote(str2))? " is true" : " is false");
+	//assert(quote(rounded_str) == quote(str2));
 
 	return 0;
 }

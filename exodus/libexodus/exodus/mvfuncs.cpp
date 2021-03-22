@@ -65,9 +65,9 @@ Binary    Hex          Comments
 #include <fast_float/fast_float.h>
 #endif
 
-#if __has_include(<ryu/ryu_parse.h>)
+#if __has_include(<ryu/ryu.h>)
 #define HAS_RYU
-#include <ryu/ryu_parse.h>
+#include <ryu/ryu.h>
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
