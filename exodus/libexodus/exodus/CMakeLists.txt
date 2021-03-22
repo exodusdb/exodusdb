@@ -45,6 +45,7 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
+include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
 
 ### BOOST ###
 #############
@@ -68,18 +69,15 @@ set(Boost_USE_STATIC_RUNTIME     ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 #note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
 message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
-
 #NOICU find_package(ICU 4.4 REQUIRED)
 
-### include postgres ###
-
+### RYU ###
+###########
 find_library(RYU_LIBRARIES NAMES ryu)
+message(${RYU_LIBRARIES})
 #find_library(RYULIBRARIES NAMES ryu ryu_parse)
 
-include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
-
 ### define an output called exodus of type shared library and list all its source files###
-
 add_library(exodus SHARED
 # mvutf.cpp
 # ConvertUTF.c
@@ -107,7 +105,8 @@ message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
 #pq is needed for postgresql client library code
 #dl is needed for dynamic link library code
 #target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
-if (RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-notfound")
+#if (RYU_LIBRARIES STREQUAL "NOTFOUND")
+if (RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-NOTFOUND")
 target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
 else()
 target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ${RYU_LIBRARIES})
