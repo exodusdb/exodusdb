@@ -1049,7 +1049,7 @@ function main()
 
 	//output utf8 convering to ISO-8859-5
 	//horrible hack to avoid MVUnassigned on github actions build
-	utf8_allo3=="Алло";
+	utf8_allo3="Алло";
 	oswrite(utf8_allo3,"t_cp_allo4.txt","ISO-8859-5");
 	/*
 root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
@@ -2011,8 +2011,10 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	var A="A";
 	assert(a<A);
 
+	//gosub is a throwaway word to indicate calling a local member function
+	//call is similar but conventionally used for external function (shared lib functions)
 	var da1="aa"^FM^"b1"^VM^"b2"^SM^"b22"^FM^"cc";
-	gosub internal_subroutine_xyz(da1);
+	gosub internal_subroutine_xyzz(da1);
 
 	//extraction
 	assert(da1(2) eq extract(da1,2));//this extracts field 2
@@ -2766,13 +2768,13 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 }
 
 //be careful not to name any subroutines the same as any variables
-function internal_subroutine_xyz(in xyzz)
+subroutine internal_subroutine_xyzz(in xyzz)
 {
-	printl("internal_subroutine_xyz(in xyzz)");
+	printl("internal_subroutine_xyzz(in xyzz)");
 	//var xx;
 	//printl(xx);
 	assert(xyzz(2,2,2) eq "b22");
-	return 1;
+	return;
 }
 
 function accrest() {

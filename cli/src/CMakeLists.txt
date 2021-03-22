@@ -7,6 +7,8 @@ cmake_minimum_required(VERSION 2.8)
 message("")
 message("--EXODUS CLI CMAKE INIT --")
 
+#allow relative link directories
+cmake_policy(SET CMP0015 NEW)
 include_directories(../../exodus/libexodus)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
