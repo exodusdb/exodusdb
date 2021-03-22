@@ -1046,6 +1046,7 @@ function main()
 	assert(utf8_allo3.length()==8);
 	assert(utf8_allo3.oconv("HEX")=="D090D0BBD0BBD0BE");
 	assert(utf8_allo3=="Алло");
+	assert(utf8_allo3=="Алло");
 
 	//output utf8 convering to ISO-8859-5
 	//horrible hack to avoid MVUnassigned on github actions build
