@@ -259,6 +259,8 @@ var::operator const char*() const
 #ifndef HASINTREFOP
 var::operator int() const {
 	THISIS("var::operator int() const")
+	//converts string or double to int using pick/arev/jbase int() which is floor()
+	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
 	THISISINTEGER()
 	return int(var_int);
 }
@@ -272,6 +274,8 @@ var::operator double() const {
 #else
 var::operator int&() const {
 	THISIS("var::operator mv_int_t&()")
+	//converts string or double to int using pick/arev/jbase int() which is floor()
+	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
 	THISISINTEGER()
 	// TODO check that converting mvint_t (which is long long) to int doesnt cause any practical
 	// problems) PROBABLY WILL! since we are returning a non const reference which allows
@@ -1361,15 +1365,65 @@ var MVdiv(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	// always returns a double
+	// always returns a double because 10/3 must be 3.3333333
 
-	double bottom = (rhs.var_typ & VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
-	if (!bottom)
-		throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+	if (lhs.var_typ & VARTYP_DBL) {
+		// 1. double ... double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+								 "')");
+       	 	return lhs.var_dbl / rhs.var_dbl;
+		}
+		// 2. double ... int
+		else {
+			if (!rhs.var_int)
+				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+								 "')");
+        	return lhs.var_dbl / rhs.var_int;
+		}
+	}
+	// 3. int ... double
+	else if (rhs.var_typ & VARTYP_DBL) {
+		if (!rhs.var_dbl)
+			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
 							 "')");
+        return static_cast<double>(lhs.var_int) / rhs.var_dbl;
+	}
+	// 4. int ... int
+    else {
+		if (!rhs.var_int)
+			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+							 "')");
+        return static_cast<double>(lhs.var_int) / rhs.var_int;
+	}
 
-	double top = (lhs.var_typ & VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
-	return top / bottom;
+}
+
+double exodusmodulus(const double top, const double bottom) {
+#define USE_PICKOS_MODULUS
+#ifdef USE_PICKOS_MODULUS
+
+	// note that exodus var int() is floor function as per arev/jbase/pick standard
+	// whereas c/c++ int() function is round to nearest even number (negative or positive)
+
+	//https://arev.neosys.com/x/pAEz.html
+	//var(i) - (int(var(i)/var(j)) * var(j))) ... where int() is pickos int() (i.e. floor)
+	return top - double(floor(top / bottom) * bottom);
+
+#else
+	//return top - double(int(top / bottom) * bottom);
+	//return top % bottom;//doesnt compile (doubles)
+
+	//fmod - The floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where n is x/y with its fractional part truncated.
+	//https://en.cppreference.com/w/c/numeric/math/fmod
+	//return std::fmod(top,bottom);
+
+	//remainder - The IEEE floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where the value n is the integral value nearest the exact value x/y. When |n-x/y| = ½, the value n is chosen to be even.
+	//https://en.cppreference.com/w/c/numeric/math/remainder
+	return std::remainder(top,bottom);
+
+#endif
 }
 
 var MVmod(const var& lhs, const var& rhs) {
@@ -1377,21 +1431,41 @@ var MVmod(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	// integer version;
-	if (lhs.var_typ & VARTYP_INT && rhs.var_typ & VARTYP_INT) {
+	//returns an integer var IIF both arguments are integer vars
+	//otherwise returns a double var
+
+	if (lhs.var_typ & VARTYP_DBL) {
+		// 1. double ... double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+								 "')");
+       	 	return exodusmodulus(lhs.var_dbl,rhs.var_dbl);
+		}
+		// 2. double ... int
+		else {
+			if (!rhs.var_int)
+				throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+								 "')");
+			return exodusmodulus(lhs.var_dbl, rhs.var_int);
+		}
+	}
+	// 3. int ... double
+	else if (rhs.var_typ & VARTYP_DBL) {
+		if (!rhs.var_dbl)
+			throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+							 "')");
+		return exodusmodulus(lhs.var_int, rhs.var_dbl);
+	}
+	// 4. int ... int
+    else {
 		if (!rhs.var_int)
-			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^
-								 rhs.substr(1, 20) ^ "')");
+			throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+							 "')");
+		//return exodusmodulus(lhs.var_int, rhs.var_int);
 		return lhs.var_int % rhs.var_int;
 	}
 
-	double bottom = (rhs.var_typ & VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
-	if (!bottom)
-		throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-							 "')");
-
-	double top = (lhs.var_typ & VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
-	return exodusmodulus(top, bottom);
 }
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
@@ -1404,105 +1478,6 @@ var MVcat(const var& lhs, const var& rhs) {
 
 	return lhs.var_str + rhs.var_str;
 }
-
-/* treat as "hidden friends"
-
-//PLUS
-DLL_PUBLIC var operator+(const var& lhs, const var& rhs) { return MVadd(lhs, rhs); }
-DLL_PUBLIC var operator+(const var& lhs, const char* char2) { return MVadd(lhs, var(char2)); }
-DLL_PUBLIC var operator+(const var& lhs, const int int2) { return MVadd(lhs, var(int2)); }
-DLL_PUBLIC var operator+(const var& lhs, const double double2) { return MVadd(lhs, var(double2)); }
-//DLL_PUBLIC var operator+(const var& lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
-DLL_PUBLIC var operator+(const char* char1, const var& rhs) { return MVadd(var(char1), rhs); }
-DLL_PUBLIC var operator+(const int int1, const var& rhs) { return MVadd(var(int1), rhs); }
-DLL_PUBLIC var operator+(const double double1, const var& rhs) { return MVadd(var(double1), rhs); }
-//DLL_PUBLIC var operator+(const bool bool1, const var& rhs) { return MVadd(var(bool1), rhs); }
-//rvalues
-DLL_PUBLIC var operator+(var&& lhs, const var& rhs) { return lhs+=rhs; }
-DLL_PUBLIC var operator+(var&& lhs, const char* char2) { return lhs+=char2; }
-DLL_PUBLIC var operator+(var&& lhs, const int int2) { return lhs+=int2; }
-DLL_PUBLIC var operator+(var&& lhs, const double double2) { return lhs+=double2; }
-//DLL_PUBLIC var operator+(var&& lhs, const bool bool2) { return lhs+=bool2; }
-//DLL_PUBLIC var operator+(const char* char1, var&& rhs) { return rhs+=char1; }
-//DLL_PUBLIC var operator+(const int int1, var&& rhs) { return rhs+=int1; }
-//DLL_PUBLIC var operator+(const double double1, var&& rhs) { return rhs+=double1; }
-//DLL_PUBLIC var operator+(const bool bool1, var&& rhs) { return rhs+=bool1; }
-
-//MINUS
-DLL_PUBLIC var operator-(const var& lhs, const var& rhs) { return MVsub(lhs, rhs); }
-DLL_PUBLIC var operator-(const var& lhs, const char* char2) { return MVsub(lhs, var(char2)); }
-DLL_PUBLIC var operator-(const var& lhs, const int int2) { return MVsub(lhs, var(int2)); }
-DLL_PUBLIC var operator-(const var& lhs, const double double2) { return MVsub(lhs, var(double2)); }
-//DLL_PUBLIC var operator-(const var& lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
-DLL_PUBLIC var operator-(const char* char1, const var& rhs) { return MVsub(var(char1), rhs); }
-DLL_PUBLIC var operator-(const int int1, const var& rhs) { return MVsub(var(int1), rhs); }
-DLL_PUBLIC var operator-(const double double1, const var& rhs) { return MVsub(var(double1), rhs); }
-//DLL_PUBLIC var operator-(const bool bool1, const var& rhs) { return MVsub(var(bool1), rhs); }
-//rvalues
-DLL_PUBLIC var operator-(var&& lhs, const var& rhs) { return lhs-=rhs; }
-DLL_PUBLIC var operator-(var&& lhs, const char* char2) { return lhs-=char2; }
-DLL_PUBLIC var operator-(var&& lhs, const int int2) { return lhs-=int2; }
-DLL_PUBLIC var operator-(var&& lhs, const double double2) { return lhs-=double2; }
-
-//MULTIPLY
-DLL_PUBLIC var operator*(const var& lhs, const var& rhs) { return MVmul(lhs, rhs); }
-DLL_PUBLIC var operator*(const var& lhs, const char* char2) { return MVmul(lhs, var(char2)); }
-DLL_PUBLIC var operator*(const var& lhs, const int int2) { return MVmul(lhs, var(int2)); }
-DLL_PUBLIC var operator*(const var& lhs, const double double2) { return MVmul(lhs, var(double2)); }
-//DLL_PUBLIC var operator*(const var& lhs, const bool bool2) { return MVmul(lhs, var(bool2)); }
-DLL_PUBLIC var operator*(const char* char1, const var& rhs) { return MVmul(var(char1), rhs); }
-DLL_PUBLIC var operator*(const int int1, const var& rhs) { return MVmul(var(int1), rhs); }
-DLL_PUBLIC var operator*(const double double1, const var& rhs) { return MVmul(var(double1), rhs); }
-//DLL_PUBLIC var operator*(const bool bool1, const var& rhs) { return MVmul(var(bool1), rhs); }
-//rvalues - pending implementation of var*=
-//DLL_PUBLIC var operator*(var&& lhs, const var& rhs) { return lhs*=rhs; }
-//DLL_PUBLIC var operator*(var&& lhs, const char* char2) { return lhs*=char2; }
-//DLL_PUBLIC var operator*(var&& lhs, const int int2) { return lhs*=int2; }
-//DLL_PUBLIC var operator*(var&& lhs, const double double2) { return lhs*=double2; }
-
-//DIVIDE
-DLL_PUBLIC var operator/(const var& lhs, const var& rhs) { return MVdiv(lhs, rhs); }
-DLL_PUBLIC var operator/(const var& lhs, const char* char2) { return MVdiv(lhs, var(char2)); }
-DLL_PUBLIC var operator/(const var& lhs, const int int2) { return MVdiv(lhs, var(int2)); }
-DLL_PUBLIC var operator/(const var& lhs, const double double2) { return MVdiv(lhs, var(double2)); }
-// disallow divide by boolean to prevent possible runtime divide by zero
-// DLL_PUBLIC var operator/ (const var&     lhs    ,const bool     bool2   ){return
-// MVdiv(lhs,var(bool2)  );}
-DLL_PUBLIC var operator/(const char* char1, const var& rhs) { return MVdiv(var(char1), rhs); }
-DLL_PUBLIC var operator/(const int int1, const var& rhs) { return MVdiv(var(int1), rhs); }
-DLL_PUBLIC var operator/(const double double1, const var& rhs) { return MVdiv(var(double1), rhs); }
-//DLL_PUBLIC var operator/(const bool bool1, const var& rhs) { return MVdiv(var(bool1), rhs); }
-
-//MODULO
-DLL_PUBLIC var operator%(const var& lhs, const var& rhs) { return MVmod(lhs, rhs); }
-DLL_PUBLIC var operator%(const var& lhs, const char* char2) { return MVmod(lhs, var(char2)); }
-DLL_PUBLIC var operator%(const var& lhs, const int int2) { return MVmod(lhs, var(int2)); }
-DLL_PUBLIC var operator%(const var& lhs, const double double2) { return MVmod(lhs, var(double2)); }
-// disallow divide by boolean to prevent possible runtime divide by zero
-// DLL_PUBLIC var operator% (const var&     lhs    ,const bool    bool2   ){return
-// MVmod(lhs,var(bool2)  );}
-DLL_PUBLIC var operator%(const char* char1, const var& rhs) { return MVmod(var(char1), rhs); }
-DLL_PUBLIC var operator%(const int int1, const var& rhs) { return MVmod(var(int1), rhs); }
-DLL_PUBLIC var operator%(const double double1, const var& rhs) { return MVmod(var(double1), rhs); }
-//DLL_PUBLIC var operator%(const bool bool1, const var& rhs) { return MVmod(var(bool1), rhs); }
-
-//CONCATENATE
-// NB do *NOT* support concatenate with bool or vice versa!!!
-// to avoid compiler doing wrong precendence issue between ^ and logical operators
-DLL_PUBLIC var operator^(const var& lhs, const var& rhs) { return MVcat(lhs, rhs); }
-DLL_PUBLIC var operator^(const var& lhs, const char* char2) { return MVcat(lhs, var(char2)); }
-DLL_PUBLIC var operator^(const var& lhs, const int int2) { return MVcat(lhs, var(int2)); }
-DLL_PUBLIC var operator^(const var& lhs, const double double2) { return MVcat(lhs, var(double2)); }
-DLL_PUBLIC var operator^(const char* char1, const var& rhs) { return MVcat(var(char1), rhs); }
-DLL_PUBLIC var operator^(const int int1, const var& rhs) { return MVcat(var(int1), rhs); }
-DLL_PUBLIC var operator^(const double double1, const var& rhs) { return MVcat(var(double1), rhs); }
-//rvalues
-DLL_PUBLIC var operator^(var&& lhs, const var& rhs) { return lhs^=rhs; }
-DLL_PUBLIC var operator^(var&& lhs, const char* char2) { return lhs^=char2; }
-DLL_PUBLIC var operator^(var&& lhs, const int int2) { return lhs^=int2; }
-DLL_PUBLIC var operator^(var&& lhs, const double double2) { return lhs^=double2; }
-
-*/
 
 //#if defined __MINGW32__
 // allow use of cout<<var
@@ -1543,10 +1518,6 @@ std::istream& operator>>(std::istream& istream1, var& var1) {
 }
 
 //#endif
-
-inline double exodusmodulus(const double top, const double bottom) {
-	return top - double(int(top / bottom) * bottom);
-}
 
 std::string intToString(int int1) {
 
