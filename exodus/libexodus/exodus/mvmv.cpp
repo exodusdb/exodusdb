@@ -736,22 +736,22 @@ bool var::locate(const var& target) const {
 	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
 }
 
-///////////////////////////////////////////
+////////////
 // LOCATE BY
-///////////////////////////////////////////
+////////////
 
-// this version caters for the rare syntax where the order is given as a variable
+// 1. rare syntax where the order is given as a variable
 bool var::locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
 	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 }
 
-// no fieldno or valueno means locate using character VM
-// this version caters for the rare syntax where the order is given as a variable
+// 2. no fieldno or valueno means locate using character VM
+// caters for the rare syntax where the order is given as a variable
 bool var::locateby(const var& ordercode, const var& target, var& setting) const {
 	return locateby(ordercode.toString().c_str(), target, setting);
 }
 
-// no fieldno or valueno means locate using character VM
+// 3. no fieldno or valueno means locate using character VM
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
 bool var::locateby(const char* ordercode, const var& target, var& setting) const {
@@ -772,7 +772,7 @@ bool var::locateby(const char* ordercode, const var& target, var& setting) const
 	return locatex(var_str, target.var_str, ordercode, _VM_, setting, 0, 0, 0);
 }
 
-// specialised const char version of ordercode for speed of usual syntax where ordermode is given as
+// 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
 bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
 	THISIS(
@@ -804,11 +804,11 @@ bool var::locateby(const char* ordercode, const var& target, var& setting, const
 	return locatex(var_str, target.var_str, ordercode, usingchar, setting, fieldno, valueno, 0);
 }
 
-///////////////////////////////////////////
-// LOCATE BY ... USING ...
-///////////////////////////////////////////
+///////////////////
+// LOCATE BY, USING
+///////////////////
 
-// this version caters for the rare syntax where the order is given as a variable
+// 1. rare syntax where the order is given as a variable
 bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/) const {
 	THISIS(
 		"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& "
@@ -823,7 +823,7 @@ bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& t
 				   setting, fieldno, valueno, 0);
 }
 
-// specialised const char version of ordercode for speed of usual syntax where ordermode is given as
+// 2. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
 bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/) const {
 	THISIS(
@@ -845,10 +845,11 @@ bool var::locatebyusing(const char* ordercode, const char* usingchar, const var&
 	return locatex(var_str, target.var_str, ordercode, usingchar, setting, fieldno, valueno, 0);
 }
 
-///////////////////////////////////////////
+///////////////
 // LOCATE USING
-///////////////////////////////////////////
+///////////////
 
+// 1. simple version
 bool var::locateusing(const var& usingchar, const var& target) const {
 	THISIS("bool var::locateusing(const var& usingchar, const var& target) const")
 	THISISSTRING()
@@ -860,6 +861,7 @@ bool var::locateusing(const var& usingchar, const var& target) const {
 	return locatex(var_str, target.var_str, "", usingchar.var_str, setting, 0, 0, 0);
 }
 
+// 2. specify field/value/subvalue and return position
 bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
 		"bool var::locateusing(const var& usingchar, const var& target, var& setting, const "
@@ -873,21 +875,28 @@ bool var::locateusing(const var& usingchar, const var& target, var& setting, con
 				   subvalueno);
 }
 
-///////////////////////////////////////////
+//////////
 // EXTRACT
-///////////////////////////////////////////
+//////////
 
+// 1. round bracket syntax for convenience since PickOS <> angle bracket syntax not possible in C++
+// xxx=yyy(1,2,3)
+// declared default value=0 and subvalue=0
 var var::operator()(int fieldno, int valueno, int subvalueno) const {
 	//std::cout << "var" << std::endl;
 	return a(fieldno, valueno, subvalueno);
 }
 
+// 2. old "extract()" function
+// xxx = extract(yyy,1,2,3)
+// declared default value=0 and subvalue=0
 var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) const {
 	return a(argfieldn, argvaluen, argsubvaluen);
 }
 
-// extract int int int
-// NB declared with value=0 and subvalue=0
+// 3. abbreviated xxxx.a(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
+// xxx = yyy.a(1,2,3)
+// declared default value=0 and subvalue=0
 var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) const {
 	THISIS(
 		"var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) "
@@ -999,16 +1008,16 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 	return this->var_str.substr(start_pos, subvalue_end_pos - start_pos);
 }
 
-/////////////////////////////////////////////////
-// REMOVE int fieldno, int valueno=0, int subvalueno=0
-/////////////////////////////////////////////////
+//////////////////////////////
+// REMOVE was PickOS "DELETE()"
+//////////////////////////////
 
-// var var::erase(const int fieldno,const int valueno,const int subvalueno) const
+// 1. return a temporary
 var var::remove(const int fieldno, const int valueno, const int subvalueno) const {
 	return var(*this).remover(fieldno, valueno, subvalueno);
 }
 
-// var& var::eraser(int fieldno,int valueno,int subvalueno)
+// 2. remove in place
 var& var::remover(int fieldno, int valueno, int subvalueno) {
 	THISIS("var& var::remover(int fieldno,int valueno,int subvalueno)")
 	THISISSTRINGMUTATOR()
@@ -1026,12 +1035,13 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 	std::string::size_type start_pos = 0;
 	std::string::size_type field_end_pos;
 
-	// negative means return all
+	// negative means remove nothing
 	if (fieldno < 0) {
 		return *this;
+
 	} else {
 
-		// find the starting position of the field or append enough FM_ to satisfy
+		// find the starting position of the field or quit
 		int fieldn2 = 1;
 		while (fieldn2 < fieldno) {
 			start_pos = var_str.find(FM_, start_pos);
@@ -1044,22 +1054,18 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 		}
 
 		// find the end of the field (or string)
-		if (start_pos == std::string::npos) {
-			start_pos = var_str.length();
-			field_end_pos = start_pos;
-		} else {
-			field_end_pos = var_str.find(FM_, start_pos);
-			if (field_end_pos == std::string::npos)
-				field_end_pos = var_str.length();
-		}
+		field_end_pos = var_str.find(FM_, start_pos);
+		if (field_end_pos == std::string::npos)
+			field_end_pos = var_str.length();
 	}
 
 	////////////// FIND VALUE ///////////////////
 	std::string::size_type value_end_pos;
 
-	// zero means all, negative means append one mv ... regardless of subvalueno
+	// zero means remove all values, negative means remove nothing
 	if (valueno < 0) {
 		return *this;
+
 	} else if (valueno == 0 && subvalueno == 0) {
 		if (fieldno > 1)
 			start_pos--;
@@ -1067,9 +1073,10 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 			field_end_pos++;
 		var_str.erase(start_pos, field_end_pos - start_pos);
 		return *this;
+
 	} else {
 
-		// find the starting position of the value or insert enough VM_ to satisfy
+		// find the starting position of the value or quit
 		int valuen2 = 1;
 		while (valuen2 < valueno) {
 			start_pos = var_str.find(VM_, start_pos);
@@ -1090,9 +1097,10 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 	////////// FIND SUBVALUE  //////////////////////
 	std::string::size_type subvalue_end_pos;
 
-	// zero means all, negative means append one sv ... regardless of subvalueno
+	// zero means remove all subvalues, negative means remove nothing
 	if (subvalueno < 0) {
 		return *this;
+
 	} else if (subvalueno == 0) {
 		if (valueno > 1)
 			start_pos--;
@@ -1100,8 +1108,9 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 			value_end_pos++;
 		var_str.erase(start_pos, value_end_pos - start_pos);
 		return *this;
+
 	} else {
-		// find the starting position of the subvalue or insert enough SM_ to satisfy
+		// find the starting position of the subvalue or quit
 		int subvaluen2 = 1;
 		while (subvaluen2 < subvalueno) {
 			start_pos = var_str.find(SM_, start_pos);

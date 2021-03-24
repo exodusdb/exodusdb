@@ -1373,14 +1373,14 @@ var MVdiv(const var& lhs, const var& rhs) {
 			if (!rhs.var_dbl)
 				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
 								 "')");
-       	 	return lhs.var_dbl / rhs.var_dbl;
+			return lhs.var_dbl / rhs.var_dbl;
 		}
 		// 2. double ... int
 		else {
 			if (!rhs.var_int)
 				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
 								 "')");
-        	return lhs.var_dbl / rhs.var_int;
+			return lhs.var_dbl / rhs.var_int;
 		}
 	}
 	// 3. int ... double
@@ -1388,14 +1388,14 @@ var MVdiv(const var& lhs, const var& rhs) {
 		if (!rhs.var_dbl)
 			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
 							 "')");
-        return static_cast<double>(lhs.var_int) / rhs.var_dbl;
+		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
 	}
 	// 4. int ... int
     else {
 		if (!rhs.var_int)
 			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
 							 "')");
-        return static_cast<double>(lhs.var_int) / rhs.var_int;
+		return static_cast<double>(lhs.var_int) / rhs.var_int;
 	}
 
 }
@@ -1440,7 +1440,7 @@ var MVmod(const var& lhs, const var& rhs) {
 			if (!rhs.var_dbl)
 				throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
 								 "')");
-       	 	return exodusmodulus(lhs.var_dbl,rhs.var_dbl);
+			return exodusmodulus(lhs.var_dbl,rhs.var_dbl);
 		}
 		// 2. double ... int
 		else {

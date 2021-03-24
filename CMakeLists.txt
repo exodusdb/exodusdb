@@ -37,6 +37,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-p
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native")
 message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
+message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
+message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
+
 #allow exodus executable and exodus library
 #cmake_policy(SET CMP0002 OLD)
 

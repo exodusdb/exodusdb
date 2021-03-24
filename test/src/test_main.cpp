@@ -326,7 +326,7 @@ function main()
 	//check conversion of unprintable field marks to unusual ASCII characters
 	//except TM which is ESC
 	std::ostringstream stringstr;
-	stringstr << var(RM ^ FM ^ VM ^ SM ^ TM ^ STM);
+	stringstr << var(_RM_ _FM_ _VM_ _SM_ _TM_  _STM_);
 	std::cout << stringstr.str() << std::endl;
 	//assert(var(stringstr.str()) == "~^]\\[|");
 	assert(var(stringstr.str()) == "~^]}" "\x1B" "|");
@@ -401,22 +401,22 @@ function main()
 	//groups
 	var csvline1="abcdef abcdef";
 	var csvre1="(bc).(ef)";
-	assert(match(csvline1,csvre1).convert(FM^VM,"^]")=="bcdef]bc]ef^bcdef]bc]ef");
+	assert(match(csvline1,csvre1).convert(_FM_ _VM_,"^]")=="bcdef]bc]ef^bcdef]bc]ef");
 
 	//no groups
 	var csvline2="abcdef abcdef";
 	var csvre2="bc.ef";
-	assert(match(csvline2,csvre2).convert(FM^VM,"^]")=="bcdef^bcdef");
+	assert(match(csvline2,csvre2).convert(_FM_ _VM_,"^]")=="bcdef^bcdef");
 
 	//not asserted but a complicated CSV match
 	var csvline=R"(123,2.99,AMO024,Title,"Description, more info",,123987564)";
 	var csvre=R"tag((?:^|,)(?=[^"]|(")?)"?((?(1)[^"]*|[^,"]*))"?(?=,|$))tag";
-	assert(match(csvline,csvre).convert(FM^VM,"^]")==R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
+	assert(match(csvline,csvre).convert(_FM_ _VM_,"^]")==R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
 
 	//unicode case insensitive finding
-	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","i").convert(FM^VM,"^]")=="αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");
+	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","i").convert(_FM_ _VM_,"^]")=="αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");
 	//unicode case sensitive NOT finding
-	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(FM^VM,"^]")=="");
+	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(_FM_ _VM_,"^]")=="");
 
 	var r1 = _FM_ "0.123";
 	assert(r1.replace("([\x1A-\x1F]-?)0.","$1.") == _FM_ ".123");
@@ -445,7 +445,7 @@ function main()
 	//test regular expression
 	//four digits followed by dash or space) three times ... followed by four digits
 	var regex1="(\\d{4}[- ]){3}\\d{4}";
-	assert(var("1247-1234-1234-1234").match(regex1,"r").convert(FM^VM,"^]")=="1247-1234-1234-1234]1234-");
+	assert(var("1247-1234-1234-1234").match(regex1,"r").convert(_FM_ _VM_,"^]")=="1247-1234-1234-1234]1234-");
 	assert(var("1247.1234-1234-1234").match(regex1,"r")=="");
 
 	printl(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match("文字.*漢字\\(UTF"));
@@ -537,6 +537,23 @@ function main()
 	printl(greekstr2);
 	//assert(greekstr2 == "αβγδεαβγδε");
 
+	//insert into empty string
+	greekstr2="";
+	greekstr2.fieldstorer("β",1,3,"xxx");
+	printl(greekstr2);
+	assert(greekstr2=="xxxββ");
+	//insert into empty string
+	greekstr2="";
+	greekstr2.fieldstorer("β",0,0,"");
+	printl(greekstr2);
+	assert(greekstr2=="");
+	//insert into empty string
+	greekstr2="";
+	greekstr2.fieldstorer("β",3,3,"xxx");
+	printl(greekstr2);
+	assert(greekstr2=="ββxxxββ");
+
+	//temporary
 	greekstr2=fieldstore(greek5x2,"β",2,1,"1β2β3");
 	assert(greekstr2=="αβ1βγδε");
 
@@ -570,16 +587,72 @@ function main()
 	assert(greek5x4.locateusing("β","γδεα",setting));
 	assert(setting==2);
 
-	var sort="a" _FM_ "b" _FM_ "d";
-	var sortn;
-	sort.locatebyusing("AL",FM,"b",sortn);
-	assert(sortn==2);
-	sort.locatebyusing("AL",FM,"c",sortn);
-	assert(sortn==3);
+	//more fieldstorer
+	{
+		var x="a b c d";
+		x.fieldstorer(" ",2,0,"yyy");
+		printl(x);
+		assert(x == "a yyy b c d");
 
-	sort.locateusing(FM,"b",sortn);
+		x="";
+		x.fieldstorer("|",2,0,"yyy");
+		printl(x);
+		assert(x == "|yyy");
+
+		x="";
+		x.fieldstorer("β",2,2,"y");
+		printl(x);
+		assert(x == "βyβ");
+
+		x="";
+		x.fieldstorer("β",3,1,"y");
+		printl(x);
+		assert(x == "ββy");
+
+		x="";
+		x.fieldstorer("β",3,2,"y");
+		printl(x);
+		assert(x == "ββyβ");
+
+		x="";
+		x.fieldstorer("β",3,2,"yyy");
+		printl(x);
+		assert(x == "ββyyyβ");
+
+		x="";
+		x.fieldstorer("β",3,3,"yyy");
+		printl(x);
+		assert(x == "ββyyyββ");
+
+		x="";
+		x.fieldstorer("β",3,4,"yyy");
+		printl(x);
+		assert(x == "ββyyyβββ");
+	}
+
+	var sort="aa" _FM_ "bb" _FM_ "dd";
+	var sortn;
+	assert(!sort.locatebyusing(var("AL"),FM,"a",sortn));
+	assert(sortn==1);
+	assert(!sort.locatebyusing("AL",FM,"a",sortn));
+	assert(sortn==1);
+	assert(sort.locatebyusing("AL",FM,"bb",sortn));
 	assert(sortn==2);
-	sort.locateusing(FM,"c",sortn);
+	assert(!sort.locatebyusing("AL",FM,"cc",sortn));
+	assert(sortn==3);
+	assert(!sort.locatebyusing("AL",FM,"ee",sortn));
+	assert(sortn==4);
+	//usingchar is cstr
+	assert(sort.locatebyusing("AL", _FM_, "bb", sortn));
+	assert(sortn==2);
+
+	assert(sort.locateusing(FM,"aa",sortn));
+	assert(sortn==1);
+	assert(sort.locateusing(FM,"bb",sortn));
+	assert(sortn==2);
+	assert(!sort.locateusing(FM,"cc",sortn));
+	assert(sortn==4);
+	assert(!sort.locateusing(FM,"ee",sortn));
 	assert(sortn==4);
 
 	/* now using epsilon to judge small numbers and differences see MVeq()
@@ -750,11 +823,11 @@ function main()
 	logputl("0", "1", "2", "l");
 	logputl("0", "1", "2", "l");
 
-	assert(crop(VM ^ FM) eq "");
-	assert(crop("xxx" ^ VM ^ FM) eq "xxx");
-	assert(crop("aaa" ^ VM ^ FM ^ "bbb") eq ("aaa" ^ FM ^ "bbb"));
-	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ FM ^ FM ^ "ddd"));
-	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ RM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ RM ^ "ddd"));
+	assert(crop(_VM_ _FM_) eq "");
+	assert(crop("xxx" _VM_ _FM_) eq "xxx");
+	assert(crop("aaa" _VM_ _FM_ "bbb") eq ("aaa" _FM_ "bbb"));
+	assert(crop("aaa" _FM_ "bbb" _FM_ _VM_ _SM_ _FM_ "ddd") eq ("aaa" _FM_ "bbb" _FM_ _FM_ "ddd"));
+	assert(crop("aaa" _FM_ "bbb" _FM_ _VM_ _SM_ _FM_ _RM_ "ddd") eq ("aaa" _FM_ "bbb" _RM_ "ddd"));
 
 	assert(crop("aa" _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
 	assert(crop("aa" _SM_ _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
@@ -792,6 +865,27 @@ function main()
 	locxx.locateby(ar,21,locii);
 	assert(locii==6);
 
+
+	var order="AR";
+	locxx.convert(VM,SM).locateby(order,20,locii,1,1);
+	assert(locii==5);
+	locxx.convert(VM,SM).locateby("AR",20,locii,1,1);
+	assert(locii==5);
+
+
+	locxx.locateby("AR",20,locii);
+	assert(locii==5);
+
+	locxx.locateby("AL",20,locii);
+	assert(locii==5);
+
+	locxd.locateby("DR",20,locii);
+	assert(locii==5);
+
+	locxd.locateby("DL",20,locii);
+	assert(locii==5);
+
+
 	locxx.locateby("AR",21,locii);
 	assert(locii==6);
 
@@ -803,6 +897,20 @@ function main()
 
 	locxd.locateby("DL",21,locii);
 	assert(locii==2);
+
+
+	locxx.locateby("AR",321,locii);
+	assert(locii==10);
+
+	locxx.locateby("AL",321,locii);
+	assert(locii==10);
+
+	locxd.locateby("DR",321,locii);
+	assert(locii==1);
+
+	locxd.locateby("DL",321,locii);
+	assert(locii==1);
+
 
 	locxx.converter(VM,",");
 	locxd.converter(VM,",");
@@ -909,38 +1017,38 @@ function main()
 
 	//testing inserter
 	var t1="aa";
-	assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+	assert(t1.inserter(-1,"xyz").convert(_FM_ _VM_,"^]")=="aa^xyz");
 	t1="aa";
-	assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz^aa");
+	assert(t1.inserter(0,"xyz").convert(_FM_ _VM_,"^]")=="xyz^aa");
 	t1="aa";
-	assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz^aa");
+	assert(t1.inserter(1,"xyz").convert(_FM_ _VM_,"^]")=="xyz^aa");
 	t1="aa";
-	assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+	assert(t1.inserter(2,"xyz").convert(_FM_ _VM_,"^]")=="aa^xyz");
 	t1="aa";
-	assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="aa^^xyz");
+	assert(t1.inserter(3,"xyz").convert(_FM_ _VM_,"^]")=="aa^^xyz");
 	t1="aa";
-	assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz]aa");
+	assert(t1.inserter(1,1,"xyz").convert(_FM_ _VM_,"^]")=="xyz]aa");
 	t1="aa";
-	assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+	assert(t1.inserter(2,1,"xyz").convert(_FM_ _VM_,"^]")=="aa^xyz");
 	t1="aa";
-	assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="aa^]xyz");
+	assert(t1.inserter(2,2,"xyz").convert(_FM_ _VM_,"^]")=="aa^]xyz");
 
 	t1="";
-	assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="xyz");
+	assert(t1.inserter(-1,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
 	t1="";
-	assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz");
+	assert(t1.inserter(0,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
 	t1="";
-	assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz");
+	assert(t1.inserter(1,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
 	t1="";
-	assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="^xyz");
+	assert(t1.inserter(2,"xyz").convert(_FM_ _VM_,"^]")=="^xyz");
 	t1="";
-	assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="^^xyz");
+	assert(t1.inserter(3,"xyz").convert(_FM_ _VM_,"^]")=="^^xyz");
 	t1="";
-	assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz");
+	assert(t1.inserter(1,1,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
 	t1="";
-	assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="^xyz");
+	assert(t1.inserter(2,1,"xyz").convert(_FM_ _VM_,"^]")=="^xyz");
 	t1="";
-	assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="^]xyz");
+	assert(t1.inserter(2,2,"xyz").convert(_FM_ _VM_,"^]")=="^]xyz");
 	t1="";
 
 	var errmsg;
@@ -1857,7 +1965,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(a eq "axxe");
 
 	//test single character extraction
-	var expected="a" ^ FM ^ "a" ^ FM ^ "b" ^ FM ^ "a" ^ FM ^ "a" ^ FM ^ "b" ^ FM ^ "";
+	var expected="a" _FM_ "a" _FM_ "b" _FM_ "a" _FM_ "a" _FM_ "b" _FM_ "";
 	var tempstr2="ab";
 	for (var ii=-3; ii<=3; ++ii)
 		assert(tempstr2[ii] eq expected.a(ii+4));
@@ -2023,46 +2131,70 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//replacement
 	da1(2)="x";//sadly this compile and runs without error but does nothing!
 
-	da1="f1" ^FM^ "f2" ^FM^ "f3";
+	da1="f1" _FM_ "f2" _FM_ "f3";
 
 	//replace field 2 with "R2"
 	da1="";
-	assert(pickreplacer(da1, 2, "R2") eq ( FM ^ "R2"));
+	assert(pickreplacer(da1, 2, "R2") eq ( _FM_ "R2"));
 
 	//replace field 2, value 3 with "R22"
 	da1="";
-	assert(pickreplacer(da1, 2, 3, "R23") eq ( FM ^VM^VM^ "R23"));
+	assert(pickreplacer(da1, 2, 3, "R23") eq ( _FM_ _VM_ _VM_ "R23"));
 
 	//replace field 2, value 3, subvalue 4 with "R234"
 	da1="";
-	assert(pickreplacer(da1, 2, 3, 4, "R234") eq ( FM^ VM^VM^ SM^SM^SM^ "R234"));
+	assert(pickreplacer(da1, 2, 3, 4, "R234") eq ( _FM_ _VM_ _VM_ _SM_ _SM_ _SM_ "R234"));
 
 	//insert "I2" at field 2
-	da1="f1" ^FM^ "f2";
-	assert(inserter(da1, 2, "I2") eq ( "f1" ^FM^ "I2" ^FM^ "f2"));
+	da1="f1" _FM_ "f2";
+	assert(inserter(da1, 2, "I2") eq ( "f1" _FM_ "I2" _FM_ "f2"));
 
 	//insert "I21" at field 2, value 1
-	da1="f1" ^FM^ "f2";
-	assert(inserter(da1, 2, 1, "I21") eq ( "f1" ^FM^ "I21" ^VM^ "f2"));
+	da1="f1" _FM_ "f2";
+	assert(inserter(da1, 2, 1, "I21") eq ( "f1" _FM_ "I21" _VM_ "f2"));
 
 	//insert "I211" at field 2, value 1, subvalue 1
-	da1="f1" ^FM^ "f2";
-	assert(inserter(da1, 2, 1, 1, "I211") eq ( "f1" ^FM^ "I211" ^SM^ "f2"));
+	da1="f1" _FM_ "f2";
+	assert(inserter(da1, 2, 1, 1, "I211") eq ( "f1" _FM_ "I211" _SM_ "f2"));
 
-	//remove (delete) field 1
-	da1="f1" ^FM^ "f2";
+	//remove (delete)
+
+	//remove field 1
+	da1="f1" _FM_ "f2";
+	assert(remove(da1, 1) eq ( "f2"));
 	assert(remover(da1, 1) eq ( "f2"));
+	assert(da1 == "f2");
 
-	//remove (delete) field 1, value 2
-	da1="f1" ^VM^ "f1v2" ^VM^ "f1v3" ^FM^ "f2";
-	assert(remover(da1, 1, 2) eq ("f1" ^VM^ "f1v3" ^FM^ "f2"));
+	//remove field 1, value 2
+	da1="f1" _VM_ "f1v2" _VM_ "f1v3" _FM_ "f2";
+	assert(remove(da1, 1, 2) eq ("f1" _VM_ "f1v3" _FM_ "f2"));
 
-	//remove (delete) field 1, value 2, subvalue 2
-	da1="f1" ^VM^ "f1v2s1" ^SM^ "f1v2s2" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2";
-	assert(remover(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
+	//remove field 1, value 2, subvalue 2
+	da1="f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3" _FM_ "f2";
+	assert(remove(da1, 1, 2, 2) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s3" _VM_ "f1v3" _FM_ "f2"));
 
+	//remove field 2, value 1, subvalue 1
+	assert(remove(da1, 2, 1, 1) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3" _FM_));
+	assert(remove(da1, 2, 0, 0) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3"));
+	assert(remove(da1, 3, 0, 0) eq da1);
+
+	da1="1^2^31]32]331|332|333]34^4";
+	assert(da1.convert("^]|",_FM_ _VM_ _SM_).remove(3,3,0) == var("1^2^31]32]34^4").convert("^]|",_FM_ _VM_ _SM_));
+
+	da1="1^2^311|312]32]331|332|333]34^4";
+	assert(da1.convert("^]|",_FM_ _VM_ _SM_).remove(3,1,0) == var("1^2^32]331|332|333]34^4").convert("^]|",_FM_ _VM_ _SM_));
+
+	da1="1^2^311|312]32]331|332|333]34^4";
+	assert(da1.convert("^]|",_FM_ _VM_ _SM_).remove(3,1,1) == var("1^2^312]32]331|332|333]34^4").convert("^]|",_FM_ _VM_ _SM_));
+
+	//remove 0, 0, 0
+	assert(remove(da1,0 ,0 ,0) eq "");
+
+	//osopen fail
 	var nonexistentfile=OSSLASH^"129834192784";
 	assert(!osopen(nonexistentfile,nonexistentfile));
+
+	//round
 
 	printl(round(var("6000.50")/20,2));
 	assert(round(var("6000.50")/20,2)==300.03);
@@ -2387,13 +2519,13 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv("-1.5","MX") eq "FFFFFFFE");
 	assert(oconv("-1","MX") eq "FFFFFFFF");
 	assert(oconv("1.5","MX") eq "2");
-	assert(oconv("20" ^ FM ^ 255,"MX") eq ("14" ^FM^ "FF"));
+	assert(oconv("20" _FM_ "255","MX") eq ("14" _FM_ "FF"));
 
 	assert(oconv("","D") eq "");
 	assert(oconv("X","D") eq "X");
 	assert(oconv("-1.5","D") eq "29 DEC 1967");
 	assert(oconv("1.5","D") eq "01 JAN 1968");
-	assert(oconv("1.5" ^ FM ^ -1.5,"D") eq ("01 JAN 1968"^FM^"29 DEC 1967"));
+	assert(oconv("1.5" _FM_ "-1.5","D") eq ("01 JAN 1968" _FM_ "29 DEC 1967"));
 
 	assert(oconv(14276,"D") eq "31 JAN 2007");
 	assert(oconv(14276,"D2") eq "31 JAN 07");
@@ -2545,8 +2677,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(var(9).oconv("MT2US").outputl() eq "09:00:00");
 	assert(var(-9).oconv("MT2US").outputl() eq "-09:00:00");
 
-//	assert(oconv(FM ^ "\x0035","HEX4") eq "00FE0035");
-	//assert(oconv(FM ^ "\x0035","HEX4") eq "07FE0035");
+//	assert(oconv(_FM_ "\x0035","HEX4") eq "00FE0035");
+	//assert(oconv(_FM_ "\x0035","HEX4") eq "07FE0035");
 	//assert(oconv(FM,"HEX4") eq "07FE");
 
 
@@ -2688,9 +2820,9 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 	var tconv=FM.oconv("T#20");
 	assert(tconv eq ("                    " _FM_ "                    "));
-	tconv="xxxxx/xxxxx xxx" ^ FM ^ "xx";
+	tconv="xxxxx/xxxxx xxx" _FM_ "xx";
 	tconv=tconv.oconv("T#8");
-	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " ^ FM ^ "xx      "));
+	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " _FM_ "xx      "));
 
 	var sentence=sentence();
 
@@ -2775,7 +2907,7 @@ function accrest() {
         if (not osopen(infilename,infile))
                 abort("Cant read "^infilename);
 
-        var fms=FM^VM^SM^TM^STM;
+        var fms=_FM_ _VM_^SM^TM^STM;
         var visibles="^]\???";
         var EOL="\r\n";
         var offset=0;
