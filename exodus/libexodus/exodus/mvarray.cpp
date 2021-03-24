@@ -67,9 +67,6 @@ dim::dim(int rows, int cols)
 	//std::cout<< "created[] " << data_ << std::endl;
 }
 
-// dim split is defined in mvmv.cpp
-// var dim::split(const var& str1)
-
 bool dim::read(const var& filehandle, const var& key) {
 	THISIS("bool dim::matread(const var& filehandle, const var& key)")
 	ISSTRING(filehandle)
@@ -255,6 +252,90 @@ var dim::join(const var& sepchar) const {
 	}
 
 	return output;
+}
+
+// dim=var.split()
+dim var::split() const {
+	THISIS("dim var::split() const")
+	THISISSTRING()
+
+	//TODO provide a version that can split on any utf8 character
+	// should use dim's move constructor to place the array directly in place avoiding a slow
+	// deep copy and perhaps even copy/move elision to not even copy the base dim object (which
+	// contains a pointer to an array of vars)
+	dim tempdim2;
+	tempdim2.split(*this);
+	return tempdim2;//NRVO hopefully since single named return
+	//return dim().split(*this);//doesnt work because split returns a var, the number of fields
+}
+
+// number=dim.split(varstr)
+// returns number of elements
+var dim::split(const var& str1) {
+	THISIS("var dim::split(const var& var1)")
+	ISSTRING(str1)
+
+	// maybe dimension to the size of the string
+	// do NOT redimension always since pick/arev matread/matparse do not
+	// and we may get VNA accessing array elements if too few.
+	if (!this->initialised_ || this->ncols_ != 1)
+		this->redim(str1.count(FM_) + 1);
+
+	// empty string just fills array with empty string
+	if (str1.length() == 0) {
+		(*this) = "";
+		return this->nrows_;
+	}
+
+	// start at the beginning and look for FM delimiters
+	std::string::size_type start_pos = 0;
+	std::string::size_type next_pos = 0;
+	int fieldno;
+	for (fieldno = 1; fieldno <= this->nrows_;) {
+
+		// find the next FM delimiter
+		next_pos = str1.var_str.find(FM_, start_pos);
+
+		// not found - past end of string?
+		if (next_pos == std::string::npos) {
+			this->data_[fieldno] = str1.var_str.substr(start_pos);
+			break;
+		}
+
+		// fill an element with a field
+		this->data_[fieldno] = str1.var_str.substr(start_pos, next_pos - start_pos);
+
+		start_pos = next_pos + 1;
+		fieldno++;
+	}
+
+	int nfields = fieldno;
+
+	// stuff any excess fields into the last element
+	if (next_pos != std::string::npos) {
+		this->data_[this->nrows_] ^= FM ^ str1.var_str.substr(start_pos);
+	} else {
+		++fieldno;
+		// fill any remaining array elements with empty string
+		for (; fieldno <= (this->nrows_); ++fieldno)
+			this->data_[fieldno] = "";
+	}
+
+	return nfields;//NRVO hopefully since single named return
+}
+
+dim& dim::sort(bool reverse) {
+	//THISIS("var dim::sort(bool reverse = false)")
+
+	//note that _data[0] may be empty
+	//std::cout<<nfields<<std::endl;
+	//std::cout<<data_[0]<<std::endl;
+	if (!reverse)
+		std::sort(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1);
+	else
+		std::sort(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1, std::greater<var>());
+
+	return *this;
 }
 
 }  // namespace exodus

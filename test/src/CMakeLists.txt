@@ -24,6 +24,7 @@ link_directories(../../exodus/libexodus/exodus)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 file(GLOB files "test_*.cpp")
+#file(GLOB files "test_mvmv.cpp")
 foreach(file ${files})
 	string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
 

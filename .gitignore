@@ -16,3 +16,4 @@ Testing/
 tests/
 a.out
 DartConfiguration.tcl
+*.gcov

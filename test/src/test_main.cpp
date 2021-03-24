@@ -219,51 +219,6 @@ function main()
 	printl(round(var("6000.50")/20,2));
 	assert(round(var("6000.50")/20,2)==300.03);
 
-	//sum with defined separator
-	assert(var("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ).sum(VM) == 0);
-	//multilevel
-	assert(var("2245000900.76" _VM_ "102760000" _SM_ "8099.9" _VM_ "-2347769000.66" _VM_ ).sum(VM) == 0);
-	assert(var("2245000900.76").sum(VM) == 2245000900.76);
-	assert(var("").sum(VM) == 0);
-	//sumall
-	assert(var("2245000900.76" _VM_ "102760000" _SM_ "8099.9" _VM_ "-2347769000.66" _VM_ ).sumall() == 0);
-
-	//test sum rounds result to no more than the input decimals input
-	printl(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ));
-	assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ) == 0);
-	assert(sum("2245000900.76") == 2245000900.76);
-	assert(sum("") == 0);
-
-	printl(test_sum("1}2]3}4"));
-	assert(test_sum("1]2^3]4")          == "3^7");
-	assert(test_sum("1}2]3}4^9")        == "3]7^9");
-	assert(test_sum("1}2}3}4}9")        == "19");
-	assert(test_sum("1}2]3}4~9")        == "3]7~9");
-	assert(test_sum("1~2^3]5}6|7")      == "1~2^3]5}13");
-	assert(test_sum("1~2>2>2~3~4}5}6")  == "1~6~3~4}5}6");
-	assert(test_sum("1~2|2|2~3~4}5}6")  == "1~6~3~4}5}6");
-	assert(test_sum("1~2>2|2~3~4}5}6")  == "1~2>4~3~4}5}6");
-
-	assert(test_sum("1~2~3~4~5~6")      == "21");//rm
-	assert(test_sum("1^2^3^4^5^6")      == "21");//fm
-	assert(test_sum("1]2]3]4]5]6")      == "21");//vm
-	assert(test_sum("1}2}3}4}5}6")      == "21");//sm
-	assert(test_sum("1>2>3>4>5>6")      == "21");//tm
-	assert(test_sum("1|2|3|4|5|6")      == "21");//stm
-
-	//check max decimal places respected
-	assert(test_sum("1.2345|2|3|4|5|6")			== "21.2345");
-
-	//check trailing zeros are eliminated
-	assert(test_sum("1.2345|2|3|4|5|6|-.2345")	== "21");
-
-	//test strange combinations
-	assert(test_sum("^-1]1")== "^0");
-	assert(test_sum("]^-1]1")== "0^0");
-	assert(test_sum("]7^-1]1")== "7^0");
-	assert(test_sum("]7.10^-1]1")== "7.1^0");
-	assert(test_sum("]7.00^-1]1")== "7^0");
-
 	{
 		//exodus currently configured to use 2. for very great speed (see mv.cpp USE_RYU) BUT it will include over accurate figures without any rounding
 		//1. precision 16 using sstring. SLOW (1850ns)
@@ -463,106 +418,8 @@ function main()
 	assert(greek5x2f2.length()==8);
 	assert(greek5x2f2.oconv("HEX")=="CEB3CEB4CEB5CEB1");
 
-	//multibyte sep fieldstore
-	var greekstr2=fieldstore(greek5x2,"β",2,1,"xxx");
-	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
-	//on a temporary
-	greekstr2=var(greek5x2).fieldstore("β",2,1,"xxx");
-	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
-
-	//fieldstorer
-	//in place - oo method
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",2,1,"xxx");
-	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
-	//in place - procedural
-	greekstr2=greek5x2;
-	fieldstorer(greekstr2,"β",2,1,"xxx");
-	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
-	//empty separator character
-	try {
-		printl(fieldstore(greekstr2,"",2,1,"xxx"));
-		assert(false && "empty separator character in fieldstore() should generate an error");
-	}
-	catch (MVError e) {
-	}
-	try {
-		printl(field(greekstr2,"",1));
-		assert(false && "empty separator character in field() should generate an error");
-	}
-	catch (MVError e) {
-	}
-	//fieldstore after end of string
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",5,1,"xxx");
-    assert(greekstr2=="αβγδεαβγδεββxxx");
-	//negative field number from back
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",-2,1,"xxx");
-	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
-	//positive number of fields indicates to replace fieldwise with the fields in the insertion. empty fields if the number of fields in the insertion value is insufficient
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",2,2,"xxx");
-	assert(greekstr2=="αβxxxβ");
-	assert(greekstr2.length()==9);
-	//positive number of fields indicates to replace fieldwise with the fields in the insertion.
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",2,2,"xxxβyyy");
-	assert(greekstr2=="αβxxxβyyy");
-	assert(greekstr2.length()==12);
-	//negative number of fields indicates to replace that positive number of fields with whatever is the insertion.
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",2,-2,"xxx");
-	assert(greekstr2=="αβxxx");
-	assert(greekstr2.length()==7);
-	//replacing an empty field with something
-	greekstr2="αββγδε";
-	greekstr2.fieldstorer("β",2,1,"xxx");
-	assert(greekstr2=="αβxxxβγδε");
-	//replacing a field with nothing
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",2,1,"");
-	assert(greekstr2=="αββγδε");
-	//replacing an empty field with nothing
-	greekstr2="αββγδε";
-	greekstr2.fieldstorer("β",2,1,"");
-	//replacing 0 fields
-	greekstr2=greek5x2;
-	greekstr2.fieldstorer("β",2,0,"xxx");
-	printl(greekstr2);
-	//assert(greekstr2 == "αβγδεαβγδε");
-
-	//insert into empty string
-	greekstr2="";
-	greekstr2.fieldstorer("β",1,3,"xxx");
-	printl(greekstr2);
-	assert(greekstr2=="xxxββ");
-	//insert into empty string
-	greekstr2="";
-	greekstr2.fieldstorer("β",0,0,"");
-	printl(greekstr2);
-	assert(greekstr2=="");
-	//insert into empty string
-	greekstr2="";
-	greekstr2.fieldstorer("β",3,3,"xxx");
-	printl(greekstr2);
-	assert(greekstr2=="ββxxxββ");
-
-	//temporary
-	greekstr2=fieldstore(greek5x2,"β",2,1,"1β2β3");
-	assert(greekstr2=="αβ1βγδε");
-
-	greekstr2=fieldstore(greek5x2,"β",2,-1,"1β2β3");
-	assert(greekstr2=="αβ1β2β3βγδε");
-
-	var greek5x4="αβγδεαβγδεαβγδεαβγδε";
-	assert(fieldstore(greek5x4,"β",2,3,"ζ")=="αβζβββγδε");
-	assert(fieldstore(greek5x4,"β",2,-3,"ζ")=="αβζβγδε");
+    var greek5x4="αβγδεαβγδεαβγδεαβγδε";
+	//var greekstr2=fieldstore(greek5x2,"β",2,1,"xxx");
 
 	//text four byte utf8
 	var chinesechar=textchr(171416);
@@ -586,74 +443,6 @@ function main()
 	var setting;
 	assert(greek5x4.locateusing("β","γδεα",setting));
 	assert(setting==2);
-
-	//more fieldstorer
-	{
-		var x="a b c d";
-		x.fieldstorer(" ",2,0,"yyy");
-		printl(x);
-		assert(x == "a yyy b c d");
-
-		x="";
-		x.fieldstorer("|",2,0,"yyy");
-		printl(x);
-		assert(x == "|yyy");
-
-		x="";
-		x.fieldstorer("β",2,2,"y");
-		printl(x);
-		assert(x == "βyβ");
-
-		x="";
-		x.fieldstorer("β",3,1,"y");
-		printl(x);
-		assert(x == "ββy");
-
-		x="";
-		x.fieldstorer("β",3,2,"y");
-		printl(x);
-		assert(x == "ββyβ");
-
-		x="";
-		x.fieldstorer("β",3,2,"yyy");
-		printl(x);
-		assert(x == "ββyyyβ");
-
-		x="";
-		x.fieldstorer("β",3,3,"yyy");
-		printl(x);
-		assert(x == "ββyyyββ");
-
-		x="";
-		x.fieldstorer("β",3,4,"yyy");
-		printl(x);
-		assert(x == "ββyyyβββ");
-	}
-
-	var sort="aa" _FM_ "bb" _FM_ "dd";
-	var sortn;
-	assert(!sort.locatebyusing(var("AL"),FM,"a",sortn));
-	assert(sortn==1);
-	assert(!sort.locatebyusing("AL",FM,"a",sortn));
-	assert(sortn==1);
-	assert(sort.locatebyusing("AL",FM,"bb",sortn));
-	assert(sortn==2);
-	assert(!sort.locatebyusing("AL",FM,"cc",sortn));
-	assert(sortn==3);
-	assert(!sort.locatebyusing("AL",FM,"ee",sortn));
-	assert(sortn==4);
-	//usingchar is cstr
-	assert(sort.locatebyusing("AL", _FM_, "bb", sortn));
-	assert(sortn==2);
-
-	assert(sort.locateusing(FM,"aa",sortn));
-	assert(sortn==1);
-	assert(sort.locateusing(FM,"bb",sortn));
-	assert(sortn==2);
-	assert(!sort.locateusing(FM,"cc",sortn));
-	assert(sortn==4);
-	assert(!sort.locateusing(FM,"ee",sortn));
-	assert(sortn==4);
 
 	/* now using epsilon to judge small numbers and differences see MVeq()
 
@@ -837,220 +626,6 @@ function main()
 	assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_FM_ "aa" _FM_ "bb");
 	assert(crop(_FM_ _RM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_RM_ "aa" _FM_ "bb");
 
-	var locii;
-	var locxx="1 2 3 10 20 30 100 200 300";
-	var locxd="300 200 100 30 20 10 3 2 1";
-	locxx.converter(" ",VM);
-	locxd.converter(" ",VM);
-	var ar="AR";
-	var locsep=",";
-
-	assert(locxx.locate(10)==1);
-
-	locxx.locate(30,locii);
-	assert(locii==6);
-
-	locxx.locate(31,locii);
-	assert(locii==10);
-
-	locxx.locate(30,locii,1);
-	assert(locii==6);
-
-	locxx.locate(31,locii,1);
-	assert(locii==10);
-
-	locxx.locate(31,locii,2);
-	assert(locii==1);
-
-	locxx.locateby(ar,21,locii);
-	assert(locii==6);
-
-
-	var order="AR";
-	locxx.convert(VM,SM).locateby(order,20,locii,1,1);
-	assert(locii==5);
-	locxx.convert(VM,SM).locateby("AR",20,locii,1,1);
-	assert(locii==5);
-
-
-	locxx.locateby("AR",20,locii);
-	assert(locii==5);
-
-	locxx.locateby("AL",20,locii);
-	assert(locii==5);
-
-	locxd.locateby("DR",20,locii);
-	assert(locii==5);
-
-	locxd.locateby("DL",20,locii);
-	assert(locii==5);
-
-
-	locxx.locateby("AR",21,locii);
-	assert(locii==6);
-
-	locxx.locateby("AL",21,locii);
-	assert(locii==3);
-
-	locxd.locateby("DR",21,locii);
-	assert(locii==5);
-
-	locxd.locateby("DL",21,locii);
-	assert(locii==2);
-
-
-	locxx.locateby("AR",321,locii);
-	assert(locii==10);
-
-	locxx.locateby("AL",321,locii);
-	assert(locii==10);
-
-	locxd.locateby("DR",321,locii);
-	assert(locii==1);
-
-	locxd.locateby("DL",321,locii);
-	assert(locii==1);
-
-
-	locxx.converter(VM,",");
-	locxd.converter(VM,",");
-
-	assert(locxx.locateusing(",",30)==1);
-	assert(locxx.locateusing(",",31)==0);
-
-	locxx.locateusing(",",30,locii);
-	assert(locii==6);
-
-	locxx.locateusing(locsep,30,locii);
-	assert(locii==6);
-
-
-	locxx.converter(",",VM);
-	locxd.converter(",",VM);
-
-	assert(locate(10,locxx)==1);
-
-	locate(30,locxx,locii);
-	assert(locii==6);
-
-	locate(31,locxx,locii);
-	assert(locii==10);
-
-	locate(30,locxx,locii,1);
-	assert(locii==6);
-
-	locate(31,locxx,locii,1);
-	assert(locii==10);
-
-	locate(31,locxx,locii,2);
-	assert(locii==1);
-
-	locateby(ar,21,locxx,locii);
-	assert(locii==6);
-
-	locateby("AR",21,locxx,locii);
-	assert(locii==6);
-
-	locateby("AL",21,locxx,locii);
-	assert(locii==3);
-
-	locateby("DR",21,locxd,locii);
-	assert(locii==5);
-
-	locateby("DL",21,locxd,locii);
-	assert(locii==2);
-
-	locxx.converter(VM,",");
-	locxd.converter(VM,",");
-
-	assert(locateusing(",",30,locxx)==1);
-	assert(locateusing(",",31,locxx)==0);
-
-	locateusing(",",30,locxx,locii);
-	assert(locii==6);
-
-	locateusing(locsep,30,locxx,locii);
-	assert(locii==6);
-
-
-	var aaa="11"^VM^VM^"13"^VM^FM^"21";
-	var bbb="1011"^VM^VM^"1013";
-
-	assert(aaa.mv(":",bbb).convert(_VM_ _FM_, "]^")=="111011]]131013]^21");
-	assert(aaa.mv("+",bbb).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
-	assert(aaa.mv("-",bbb).convert(_VM_ _FM_, "]^")=="-1000]0]-1000]0^21");
-	assert(aaa.mv("*",bbb).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
-
-	assert(bbb.mv(":",aaa).convert(_VM_ _FM_, "]^")=="101111]]101313]^21");
-	assert(bbb.mv("+",aaa).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
-	assert(bbb.mv("-",aaa).convert(_VM_ _FM_, "]^")=="1000]0]1000]0^-21");
-	assert(bbb.mv("*",aaa).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
-
-	aaa="11"  ^VM^VM^"13"  ^VM^FM^"21";
-	bbb="1011"^VM^"0"^VM^"1013"^VM^FM^"2011";
-	printl(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^"));
-	assert(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
-
-	aaa=""^VM^"" ^VM^"0"^VM^"0"^VM;
-	bbb=""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0";
-	assert(aaa.mv("/",bbb).convert(_VM_ _FM_, "]^")=="0]0]0]0]0]0]0]0");
-
-	//testing .mv(+ - * / :)
-	var m1="1" _VM_ "2" _VM_ _VM_ "4";
-	var m2="100" _VM_ "200" _VM_ "300"; 
-
-	m1.convert(VM,"]").outputl("m1=");
-	m2.convert(VM,"]").outputl("m2=");
-
-	m1.mv("+",m2).convert(VM,"]").outputl("xxxx=");
-	assert(m1.mv("+",m2).convert(VM,"]")=="101]202]300]4");
-	assert(m1.mv("-",m2).convert(VM,"]")=="-99]-198]-300]4");
-	assert(m1.mv("*",m2).convert(VM,"]")=="100]400]0]0");
-	assert(m1.mv(":",m2).convert(VM,"]")=="1100]2200]300]4");
-
-	printl();
-	m2.r(1,4,400);
-	m2.convert(VM,"]").outputl("m2=");
-	printl(m1.mv("/",m2).convert(VM,"]"));
-	printl("should be \"0.01]0.01]0]0.01\"");
-	assert(m1.mv("/",m2).convert(VM,"]")=="0.01]0.01]0]0.01");
-
-	//testing inserter
-	var t1="aa";
-	assert(t1.inserter(-1,"xyz").convert(_FM_ _VM_,"^]")=="aa^xyz");
-	t1="aa";
-	assert(t1.inserter(0,"xyz").convert(_FM_ _VM_,"^]")=="xyz^aa");
-	t1="aa";
-	assert(t1.inserter(1,"xyz").convert(_FM_ _VM_,"^]")=="xyz^aa");
-	t1="aa";
-	assert(t1.inserter(2,"xyz").convert(_FM_ _VM_,"^]")=="aa^xyz");
-	t1="aa";
-	assert(t1.inserter(3,"xyz").convert(_FM_ _VM_,"^]")=="aa^^xyz");
-	t1="aa";
-	assert(t1.inserter(1,1,"xyz").convert(_FM_ _VM_,"^]")=="xyz]aa");
-	t1="aa";
-	assert(t1.inserter(2,1,"xyz").convert(_FM_ _VM_,"^]")=="aa^xyz");
-	t1="aa";
-	assert(t1.inserter(2,2,"xyz").convert(_FM_ _VM_,"^]")=="aa^]xyz");
-
-	t1="";
-	assert(t1.inserter(-1,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
-	t1="";
-	assert(t1.inserter(0,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
-	t1="";
-	assert(t1.inserter(1,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
-	t1="";
-	assert(t1.inserter(2,"xyz").convert(_FM_ _VM_,"^]")=="^xyz");
-	t1="";
-	assert(t1.inserter(3,"xyz").convert(_FM_ _VM_,"^]")=="^^xyz");
-	t1="";
-	assert(t1.inserter(1,1,"xyz").convert(_FM_ _VM_,"^]")=="xyz");
-	t1="";
-	assert(t1.inserter(2,1,"xyz").convert(_FM_ _VM_,"^]")=="^xyz");
-	t1="";
-	assert(t1.inserter(2,2,"xyz").convert(_FM_ _VM_,"^]")=="^]xyz");
-	t1="";
-
 	var errmsg;
 	//if (not createdb("steve",errmsg))
 	//	errmsg.outputl();
@@ -1171,14 +746,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 00000000  d0 90 d0 bb d0 bb d0 be                           |........|
 00000008
 */
-
-	var lbvn;
-	//no fieldno/value given means using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn)||lbvn==4);
-	//fieldno given means search in that field using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn,1)||lbvn==4);
-	//fieldno given and =0 means search whole string using character FM
-	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("AL","A",lbvn,0)||lbvn==4);
 
 	assert(seq(chr(-513))==255);
 	assert(seq(chr(-512))==0);
@@ -1928,16 +1495,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(s1 eq "");
 	assert(s2 eq "1");
 
-	//accessing individual characters by index 1=first -1=last etc.
-	var a="abc";
-	assert(a[1] eq "a");	//a = first character
-	assert(a[2] eq "b");	//b = second character
-	assert(a[4] eq "");	//"" = if access after last character
-	assert(a[-1] eq "c");	//c = last character
-	assert(a[-2] eq "b");	//b = last but one character
-	assert(a[-9] eq "a");	//a = first character if too negative
-	assert(a[0] eq "a");	//a = zero is the same as too negative
-
 	//replacing a section of a string:
 	//given start character number, number of characters to replace and a replacement string
 	//(this is equivalent to the following classic mv basic syntax
@@ -1945,7 +1502,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//tempstr[2,3]='abc'
 
 	//replacing a section of a string - method 1
-	a="abcde";
+	var a="abcde";
 	splicer(a,3,2,"xx");
 	assert(a eq "abxxe");
 
@@ -2112,83 +1669,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 	//gosub is a throwaway word to indicate calling a local member function
 	//call is similar but conventionally used for external function (shared lib functions)
-	var da1="aa"^FM^"b1"^VM^"b2"^SM^"b22"^FM^"cc";
-	gosub internal_subroutine_xyzz(da1);
-
-	//extraction
-	assert(da1(2) eq extract(da1,2));//this extracts field 2
-	assert(da1(2,2) eq extract(da1,2,2));//this extracts field 2, value 2
-	assert(da1(2,2,2) eq extract(da1,2,2,2));//this extracts field 2, value 2, subvalue 2
-
-	//this wont work
-	pickreplace(da1,3,"x");//or this
-	pickreplace(da1,3,3,"x");//or this
-	pickreplace(da1,3,3,3,"x");//or this
-	insert(da1,3,"x");//or this
-	insert(da1,3,3,"x");//or this
-	insert(da1,3,3,3,"x");//or this
-
-	//replacement
-	da1(2)="x";//sadly this compile and runs without error but does nothing!
-
-	da1="f1" _FM_ "f2" _FM_ "f3";
-
-	//replace field 2 with "R2"
-	da1="";
-	assert(pickreplacer(da1, 2, "R2") eq ( _FM_ "R2"));
-
-	//replace field 2, value 3 with "R22"
-	da1="";
-	assert(pickreplacer(da1, 2, 3, "R23") eq ( _FM_ _VM_ _VM_ "R23"));
-
-	//replace field 2, value 3, subvalue 4 with "R234"
-	da1="";
-	assert(pickreplacer(da1, 2, 3, 4, "R234") eq ( _FM_ _VM_ _VM_ _SM_ _SM_ _SM_ "R234"));
-
-	//insert "I2" at field 2
-	da1="f1" _FM_ "f2";
-	assert(inserter(da1, 2, "I2") eq ( "f1" _FM_ "I2" _FM_ "f2"));
-
-	//insert "I21" at field 2, value 1
-	da1="f1" _FM_ "f2";
-	assert(inserter(da1, 2, 1, "I21") eq ( "f1" _FM_ "I21" _VM_ "f2"));
-
-	//insert "I211" at field 2, value 1, subvalue 1
-	da1="f1" _FM_ "f2";
-	assert(inserter(da1, 2, 1, 1, "I211") eq ( "f1" _FM_ "I211" _SM_ "f2"));
-
-	//remove (delete)
-
-	//remove field 1
-	da1="f1" _FM_ "f2";
-	assert(remove(da1, 1) eq ( "f2"));
-	assert(remover(da1, 1) eq ( "f2"));
-	assert(da1 == "f2");
-
-	//remove field 1, value 2
-	da1="f1" _VM_ "f1v2" _VM_ "f1v3" _FM_ "f2";
-	assert(remove(da1, 1, 2) eq ("f1" _VM_ "f1v3" _FM_ "f2"));
-
-	//remove field 1, value 2, subvalue 2
-	da1="f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3" _FM_ "f2";
-	assert(remove(da1, 1, 2, 2) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s3" _VM_ "f1v3" _FM_ "f2"));
-
-	//remove field 2, value 1, subvalue 1
-	assert(remove(da1, 2, 1, 1) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3" _FM_));
-	assert(remove(da1, 2, 0, 0) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3"));
-	assert(remove(da1, 3, 0, 0) eq da1);
-
-	da1="1^2^31]32]331|332|333]34^4";
-	assert(da1.convert("^]|",_FM_ _VM_ _SM_).remove(3,3,0) == var("1^2^31]32]34^4").convert("^]|",_FM_ _VM_ _SM_));
-
-	da1="1^2^311|312]32]331|332|333]34^4";
-	assert(da1.convert("^]|",_FM_ _VM_ _SM_).remove(3,1,0) == var("1^2^32]331|332|333]34^4").convert("^]|",_FM_ _VM_ _SM_));
-
-	da1="1^2^311|312]32]331|332|333]34^4";
-	assert(da1.convert("^]|",_FM_ _VM_ _SM_).remove(3,1,1) == var("1^2^312]32]331|332|333]34^4").convert("^]|",_FM_ _VM_ _SM_));
-
-	//remove 0, 0, 0
-	assert(remove(da1,0 ,0 ,0) eq "");
+	gosub internal_subroutine_xyzz("aa" _FM_ "b1" _VM_ "b2" _SM_ "b22" _FM_ "cc");
 
 	//osopen fail
 	var nonexistentfile=OSSLASH^"129834192784";
@@ -2838,11 +2319,11 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(mod(dividend,30) eq 10);
 
 	var env=osgetenv("");
-	osgetenv("PATH");
-	osgetenv("HOME");
+	assert(osgetenv("PATH"));
+	assert(osgetenv("HOME"));
 	env="Steve";
 	env.ossetenv("XYZ");
-	osgetenv("XYZ");
+	assert(osgetenv("XYZ"));
 
 //	var().debug();
 //	var xx=xx[1];
@@ -2967,12 +2448,6 @@ function test_codepage(in codepage, in lang) {
 	assert(as_utf8a == as_utf8b);
 
 	return 0;
-}
-
-//function to conveniently test sum function
-function test_sum(in instr)
-{
-	return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"~^]}>|");
 }
 
 programexit()

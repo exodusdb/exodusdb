@@ -35,94 +35,6 @@ namespace exodus {
 
 // and var::field,field2,locate,extract,remove,pickreplace,insert,substr,splice,remove
 
-////////
-// SPLIT
-////////
-
-// dim=var.split()
-dim var::split() const {
-	THISIS("dim var::split() const")
-	THISISSTRING()
-
-	//TODO provide a version that can split on any utf8 character
-	// should use dim's move constructor to place the array directly in place avoiding a slow
-	// deep copy and perhaps even copy/move elision to not even copy the base dim object (which
-	// contains a pointer to an array of vars)
-	dim tempdim2;
-	tempdim2.split(*this);
-	return tempdim2;//NRVO hopefully since single named return
-	//return dim().split(*this);//doesnt work because split returns a var, the number of fields
-}
-
-// number=dim.split(varstr)
-// returns number of elements
-var dim::split(const var& str1) {
-	THISIS("var dim::split(const var& var1)")
-	ISSTRING(str1)
-
-	// maybe dimension to the size of the string
-	// do NOT redimension always since pick/arev matread/matparse do not
-	// and we may get VNA accessing array elements if too few.
-	if (!this->initialised_ || this->ncols_ != 1)
-		this->redim(str1.count(FM_) + 1);
-
-	// empty string just fills array with empty string
-	if (str1.length() == 0) {
-		(*this) = "";
-		return this->nrows_;
-	}
-
-	// start at the beginning and look for FM delimiters
-	std::string::size_type start_pos = 0;
-	std::string::size_type next_pos = 0;
-	int fieldno;
-	for (fieldno = 1; fieldno <= this->nrows_;) {
-
-		// find the next FM delimiter
-		next_pos = str1.var_str.find(FM_, start_pos);
-
-		// not found - past end of string?
-		if (next_pos == std::string::npos) {
-			this->data_[fieldno] = str1.var_str.substr(start_pos);
-			break;
-		}
-
-		// fill an element with a field
-		this->data_[fieldno] = str1.var_str.substr(start_pos, next_pos - start_pos);
-
-		start_pos = next_pos + 1;
-		fieldno++;
-	}
-
-	int nfields = fieldno;
-
-	// stuff any excess fields into the last element
-	if (next_pos != std::string::npos) {
-		this->data_[this->nrows_] ^= FM ^ str1.var_str.substr(start_pos);
-	} else {
-		++fieldno;
-		// fill any remaining array elements with empty string
-		for (; fieldno <= (this->nrows_); ++fieldno)
-			this->data_[fieldno] = "";
-	}
-
-	return nfields;//NRVO hopefully since single named return
-}
-
-dim& dim::sort(bool reverse) {
-	//THISIS("var dim::sort(bool reverse = false)")
-
-	//note that _data[0] may be empty
-	//std::cout<<nfields<<std::endl;
-	//std::cout<<data_[0]<<std::endl;
-	if (!reverse)
-		std::sort(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1);
-	else
-		std::sort(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1, std::greater<var>());
-
-	return *this;
-}
-
 ///////////////
 // FIELD/FIELD2
 ///////////////
@@ -369,7 +281,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					}
 					setting = valuen2 + 1;
 					return false;
-					break;
+					//break;
 
 				// AL Ascending Left Justified
 				case '\x01':
@@ -390,7 +302,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					}
 					setting = valuen2 + 1;
 					return false;
-					break;
+					//break;
 
 				// AR Ascending Right Justified
 				case '\x02':
@@ -404,7 +316,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					}
 					setting = valuen2 + 1;
 					return false;
-					break;
+					//break;
 
 				// DL Descending Left Justified
 				case '\x03':
@@ -418,7 +330,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					}
 					setting = valuen2 + 1;
 					return false;
-					break;
+					//break;
 
 				// DR Descending Right Justified
 				case '\x04':
@@ -432,7 +344,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					}
 					setting = valuen2 + 1;
 					return false;
-					break;
+					//break;
 
 				default:
 					throw MVError("locateat() invalid mode " ^ var(order));
@@ -650,13 +562,18 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		return !target.length();
 	}
 
-	// zero means all, negative means ""
-	if (subvalueno == 0)
-		return locateat(var_str, target, start_pos, value_end_pos, ordermode, usingchar,
-						setting);
-	if (subvalueno < 0) {
-		setting = 1;
-		return !target.length();
+	if (subvalueno <= 0) {
+
+		// zero means all
+		if (subvalueno == 0)
+			return locateat(var_str, target, start_pos, value_end_pos, ordermode, usingchar,
+							setting);
+
+		// negative means ""
+		else {
+			setting = 1;
+			return !target.length();
+		}
 	}
 
 	// find the starting position of the subvalue or return ""
