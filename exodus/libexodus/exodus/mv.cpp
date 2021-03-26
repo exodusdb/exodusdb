@@ -452,15 +452,15 @@ var& var::operator=(const char char2) {
 
 //=char*
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const char* char2) {
-	THISIS("var& var::operator= (const char* char2)")
+var& var::operator=(const char* cstr) {
+	THISIS("var& var::operator= (const char* cstr2)")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign="xxx";
 	// this causes crash due to bad memory access due to setting string that doesnt exist
 	// slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
 
-	var_str = char2;
+	var_str = cstr;
 	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
@@ -553,13 +553,13 @@ var& var::operator^=(const char char1) {
 
 //^=char*
 // The assignment operator should always return a reference to *this.
-var& var::operator^=(const char* char1) {
-	THISIS("var& var::operator^= (const char* char1)")
+var& var::operator^=(const char* cstr) {
+	THISIS("var& var::operator^= (const char* cstr)")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
 	// var_str+=std::string(char1);
-	var_str += char1;
+	var_str += cstr;
 	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
@@ -1470,7 +1470,7 @@ var MVmod(const var& lhs, const var& rhs) {
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
 // slightly wrong precedence but at least we have a reliable concat operator to replace the + which
-// is now reserved for ADDITION
+// is now reserved for forced ADDITION both according to fundamental PickOS principle
 var MVcat(const var& lhs, const var& rhs) {
 	THISIS("var operator^(const var& lhs,const var& rhs)")
 	ISSTRING(lhs)
@@ -1478,6 +1478,59 @@ var MVcat(const var& lhs, const var& rhs) {
 
 	return lhs.var_str + rhs.var_str;
 }
+
+var MVcat(const var& lhs, const char* cstr) {
+	THISIS("var operator^(const var& lhs,const char* cstr)")
+	ISSTRING(lhs)
+
+	return lhs.var_str + cstr;
+}
+
+var MVcat(const char* cstr, const var& rhs) {
+	THISIS("var operator^(const char* cstr, const var& rhs)")
+	ISSTRING(rhs)
+
+	return cstr + rhs.var_str;
+}
+
+var MVcat(const var& lhs, const char char2) {
+	THISIS("var operator^(const var& lhs,const char char2)")
+	ISSTRING(lhs)
+
+	return lhs.var_str + char2;
+}
+/*
+
+var& var::operator^(const var& vstr) {
+	THISIS("var& var::operator^(const var& vstr)")
+	THISISSTRING()
+	ISSTRING(vstr)
+
+	this->var_str += vstr.var_str;
+
+	return *this;
+}
+
+var& var::operator^(const char* cstr) {
+	std::clog <<("var operator^(const char& cstr)") << std::endl;
+	THISIS("var& var::operator^(const char& cstr)")
+	THISISSTRING()
+
+	this->var_str += cstr;
+
+	return *this;
+}
+
+var& var::operator^(const std::string& stdstr) {
+	THISIS("var& var::operator^(const std::string& stdstr)");
+	THISISSTRING()
+	ISSTRING(stdstr)
+
+	this->var_str += stdstr.var_str;
+
+	return *this;
+}
+*/
 
 //#if defined __MINGW32__
 // allow use of cout<<var

@@ -649,7 +649,7 @@ function main() {
 		try {dim x; var y=x.join();uncaught="MVArrayNotDimensioned";}  catch (MVArrayNotDimensioned e){};
 		try {stop()               ;uncaught="MVStop";}                 catch (const MVStop& e){printl("Caught MVStop");};
 		try {var().abort(99)      ;uncaught="MVAbort";}                catch (MVAbort e){printl("Caught MVAbort");};
-		//for some strange reason this cannot be caught despite being almost identical to abort
+		//for some currently unknown reason this cannot be caught despite being almost identical to abort
 		//try {var().abortall()   ;uncaught="MVAbortAll";}             catch (MVAbortAll e){printl("Caught MVAbortAll");};
 		try {logoff()             ;uncaught="MVLogoff";}               catch (MVLogoff e){};
 
@@ -673,7 +673,370 @@ function main() {
 	assert(var(-0.0001)      .toString() == "-0.0001");
 	assert(var(-0.000'000'01).toString() == "-0.00000001");
 
+	var v1 = 1;
+	var v2 = 1;
+
+	// == eq
+	assert(v1 == v2);
+	assert(v1 == "1.0");
+	assert(v1 == '1');
+	assert(v1 == 1);
+	assert(v1 == 1.0);
+	assert(v1 == true);
+	assert("1.0" == v1);
+	assert('1' == v2);
+	assert(1 == v2);
+	assert(1.0 == v2);
+	assert(true == v2);
+
+	// != ne
+	assert(!(v1 != v2));
+	assert(!(v1 != "1.0"));
+	assert(!(v1 != '1'));
+	assert(!(v1 != 1));
+	assert(!(v1 != 1.0));
+	assert(!(v1 != true));
+	assert(!("1.0" != v2));
+	assert(!('1' != v2));
+	assert(!(1 != v2));
+	assert(!(1.0 != v2));
+	assert(!(true != v2));
+
+	// < lt
+	assert(!(v1 < v2));
+	assert(!(v1 < "1.0"));
+	assert(!(v1 < '1'));
+	assert(!(v1 < 1));
+	assert(!(v1 < 1.0));
+	assert(!(v1 < true));
+	assert(!("1.0" < v2));
+	assert(!('1' < v2));
+	assert(!(1 < v2));
+	assert(!(1.0 < v2));
+	assert(!(true < v2));
+
+	// <= le
+	assert((v1 <= v2));
+	assert((v1 <= "1.0"));
+	assert((v1 <= '1'));
+	assert((v1 <= 1));
+	assert((v1 <= 1.0));
+	assert((v1 <= true));
+	assert(("1.0" <= v2));
+	assert(('1' <= v2));
+	assert((1 <= v2));
+	assert((1.0 <= v2));
+	assert((true <= v2));
+
+	/// > lt
+	assert(!(v1 > v2));
+	assert(!(v1 > "1.0"));
+	assert(!(v1 > '1'));
+	assert(!(v1 > 1));
+	assert(!(v1 > 1.0));
+	assert(!(v1 > true));
+	assert(!("1.0" > v2));
+	assert(!('1' > v2));
+	assert(!(1 > v2));
+	assert(!(1.0 > v2));
+	assert(!(true > v2));
+
+	// >= ge
+	assert((v1 >= v2));
+	assert((v1 >= "1.0"));
+	assert((v1 >= '1'));
+	assert((v1 >= 1));
+	assert((v1 >= 1.0));
+	assert((v1 >= true));
+	assert(("1.0" >= v2));
+	assert(('1' >= v2));
+	assert((1 >= v2));
+	assert((1.0 >= v2));
+	assert((true >= v2));
+
+	// + add
+	assert((v1 + v2) == 2);
+	assert((v1 + "1.0") == 2);
+	assert((v1 + '1') == 2);
+	assert((v1 + 1) == 2);
+	assert((v1 + 1.0) == 2);
+	assert((v1 + true) == 2);
+	assert(("1.0" + v2) == 2);
+	assert(('1' + v2) == 2);
+	assert((1 + v2) == 2);
+	assert((1.0 + v2) == 2);
+	assert((true + v2) == 2);
+
+	// - subtract
+	assert((v1 - v2) == 0);
+	assert((v1 - "1.0") == 0);
+	assert((v1 - '1') == 0);
+	assert((v1 - 1) == 0);
+	assert((v1 - 1.0) == 0);
+	assert((v1 - true) == 0);
+	assert(("1.0" - v2) == 0);
+	assert(('1' - v2) == 0);
+	assert((1 - v2) == 0);
+	assert((1.0 - v2) == 0);
+	assert((true - v2) == 0);
+
+	v1 = 2;
+	v2 = 2;
+
+	// * multiply
+	assert((v1 * v2) == 4);
+	assert((v1 * "2.0") == 4);
+	assert((v1 * '2') == 4);
+	assert((v1 * 2) == 4);
+	assert((v1 * 2.0) == 4);
+	assert((v1 * true) == 2);
+	assert(("2.0" * v2) == 4);
+	assert(('2' * v2) == 4);
+	assert((2 * v2) == 4);
+	assert((2.0 * v2) == 4);
+	assert((true * v2) == 2);
+
+	// / divide
+	assert((v1 / v2) == 1);
+	assert((v1 / "2.0") == 1);
+	assert((v1 / '2') == 1);
+	assert((v1 / 2) == 1);
+	assert((v1 / 2.0) == 1);
+	assert((v1 / true) == 2);
+	assert(("2.0" / v2) == 1);
+	assert(('2' / v2) == 1);
+	assert((2 / v2) == 1);
+	assert((2.0 / v2) == 1);
+	assert((true / v2) == 0.5);
+
+	// % modulo
+	assert((v1 % v2) == 0);
+	assert((v1 % "2.0") == 0);
+	assert((v1 % '2') == 0);
+	assert((v1 % 2) == 0);
+	assert((v1 % 2.0) == 0);
+	assert((v1 % true) == 0);
+	assert(("2.0" % v2) == 0);
+	assert(('2' % v2) == 0);
+	assert((2 % v2) == 0);
+	assert((2.0 % v2) == 0);
+	assert((true % v2) == 1);
+
+    //CONCATENATE
+    // NB do *NOT* support concatenate with bool or vice versa!!!
+    // to avoid compiler doing wrong precendence issue between ^ and logical operators
+
+	// : concat
+	assert((v1 ^ v2) == "22");
+	assert((v1 ^ "2.0") == "22.0");
+	assert((v1 ^ '2') == "22");
+	assert((v1 ^ 2) == "22");
+	assert((v1 ^ 2.0) == "22");
+	assert((v1 ^ true) == "21");
+	assert(("2.0" ^ v2) == "2.02");
+	assert(('2' ^ v2) == "22");
+	assert((2 ^ v2) == "22");
+	assert((2.0 ^ v2) == "22");
+	assert((true ^ v2) == "12");
+
+	// unary + - !
+	assert((+v1) == 2);
+	assert((-v1) == -2);
+	assert((!v1) == 0);
+	assert((!!v1) == 1);
+
+	// ++ -- prefix and postfix
+	assert(v1++ == 2);
+	assert(v1 == 3);
+	assert(++v1 == 4);
+	assert(v1-- == 4);
+	assert(v1 == 3);
+	assert(--v1 == 2);
+
+	//REPEAT with different v1 and v2
+
+	v1 = 2;
+	v2 = 3;
+
+	// == eq
+	assert(!(v1 == v2));
+	assert(v1 == "2.0");
+	assert(v1 == '2');
+	assert(v1 == 2);
+	assert(v1 == 2.0);
+	assert(!(v1 == true));
+	assert(!("2.0" == v2));
+	assert(!('2' == v2));
+	assert(!(2 == v2));
+	assert(!(2.0 == v2));
+	assert(!(true == v2));
+
+	// != ne
+	assert(v1 != v2);
+	assert(v1 != "3.0");
+	assert(v1 != '3');
+	assert(v1 != 3);
+	assert(v1 != 3.0);
+	assert(v1 != true);
+	assert("2.0" != v2);
+	assert('2' != v2);
+	assert(2 != v2);
+	assert(2.0 != v2);
+	assert(true != v2);
+
+	// < lt
+	assert((v1 < v2));
+	assert((v1 < "3.0"));
+	assert((v1 < '3'));
+	assert((v1 < 3));
+	assert((v1 < 3.0));
+	assert(!(v1 < true));
+	assert(("2.0" < v2));
+	assert(('2' < v2));
+	assert((2 < v2));
+	assert((2.0 < v2));
+	assert((true < v2));
+
+	// <= le
+	assert((v1 <= v2));
+	assert((v1 <= "3.0"));
+	assert((v1 <= '3'));
+	assert((v1 <= 3));
+	assert((v1 <= 3.0));
+	assert(!(v1 <= true));
+	assert(("2.0" <= v2));
+	assert(('2' <= v2));
+	assert((2 <= v2));
+	assert((2.0 <= v2));
+	assert((true <= v2));
+
+	/// > lt
+	assert(!(v1 > v2));
+	assert(!(v1 > "3.0"));
+	assert(!(v1 > '3'));
+	assert(!(v1 > 3));
+	assert(!(v1 > 3.0));
+	assert((v1 > true));
+	assert(!("2.0" > v2));
+	assert(!('2' > v2));
+	assert(!(2 > v2));
+	assert(!(2.0 > v2));
+	assert(!(true > v2));
+
+	// >= ge
+	assert(!(v1 >= v2));
+	assert(!(v1 >= "3.0"));
+	assert(!(v1 >= '3'));
+	assert(!(v1 >= 3));
+	assert(!(v1 >= 3.0));
+	assert((v1 >= true));
+	assert(!("2.0" >= v2));
+	assert(!('2' >= v2));
+	assert(!(2 >= v2));
+	assert(!(2.0 >= v2));
+	assert(!(true >= v2));
+
+	// + add
+	assert((v1 + v2) == 5);
+	assert((v1 + "3.0") == 5);
+	assert((v1 + '3') == 5);
+	assert((v1 + 3) == 5);
+	assert((v1 + 3.0) == 5);
+	assert((v1 + true) == 3);
+	assert(("2.0" + v2) == 5);
+	assert(('2' + v2) == 5);
+	assert((2 + v2) == 5);
+	assert((2.0 + v2) == 5);
+	assert((true + v2) == 4);
+
+	// - subtract
+	assert((v1 - v2) == -1);
+	assert((v1 - "3.0") == -1);
+	assert((v1 - '3') == -1);
+	assert((v1 - 3) == -1);
+	assert((v1 - 3.0) == -1);
+	assert((v1 - true) == 1);
+	assert(("2.0" - v2) == -1);
+	assert(('2' - v2) == -1);
+	assert((2 - v2) == -1);
+	assert((2.0 - v2) == -1);
+	assert((true - v2) == -2);
+
+	// * multiply
+	assert((v1 * v2) == 6);
+	assert((v1 * "3.0") == 6);
+	assert((v1 * '3') == 6);
+	assert((v1 * 3) == 6);
+	assert((v1 * 3.0) == 6);
+	assert((v1 * true) == 2);
+	assert(("2.0" * v2) == 6);
+	assert(('2' * v2) == 6);
+	assert((2 * v2) == 6);
+	assert((2.0 * v2) == 6);
+	assert((true * v2) == 3);
+
+	// / divide
+	TRACE((v1 / v2));
+	assert((v1 / v2) == 0.6666);//both are right because exodus compares floating point numbers only within 0.0001
+	assert((v1 / v2) == 0.6667);
+	TRACE((v1 / "3.0"));
+	assert((v1 / "3.0") == 0.6667);
+	assert((v1 / '3') == 0.6667);
+	assert((v1 / 3) == 0.6667);
+	assert((v1 / 3.0) == 0.6667);
+	assert((v1 / true) == 2);
+	assert(("2.0" / v2) == 0.6667);
+	assert(('2' / v2) == 0.6667);
+	assert((2 / v2) == 0.6667);
+	assert((2.0 / v2) == 0.6667);
+	assert((true / v2) == 0.3333);
+
+	// % modulo
+	assert((v1 % v2) == 2);
+	assert((v1 % "3.0") == 2);
+	assert((v1 % '3') == 2);
+	assert((v1 % 3) == 2);
+	assert((v1 % 3.0) == 2);
+	assert((v1 % true) == 0);
+	assert(("2.0" % v2) == 2);
+	assert(('2' % v2) == 2);
+	assert((2 % v2) == 2);
+	assert((2.0 % v2) == 2);
+	assert((true % v2) == 1);
+
+    //CONCATENATE
+    // NB do *NOT* support concatenate with bool or vice versa!!!
+    // to avoid compiler doing wrong precendence issue between ^ and logical operators
+
+	// : concat
+	assert((v1 ^ v2) == "23");
+	assert((v1 ^ "3.0") == "23.0");
+	assert((v1 ^ '3') == "23");
+	assert((v1 ^ 3) == "23");
+	assert((v1 ^ 3.0) == "23");
+	assert((v1 ^ true) == "21");
+	assert(("2.0" ^ v2) == "2.03");
+	assert(('2' ^ v2) == "23");
+	assert((2 ^ v2) == "23");
+	assert((2.0 ^ v2) == "23");
+	assert((true ^ v2) == "13");
+
+	// unary + - !
+	assert((+v1) == 2);
+	assert((-v1) == -2);
+	assert((!v1) == 0);
+	assert((!!v1) == 1);
+
+	// ++ -- prefix and postfix
+	assert(v1++ == 2);
+	assert(v1 == 3);
+	assert(++v1 == 4);
+	assert(v1-- == 4);
+	assert(v1 == 3);
+	assert(--v1 == 2);
+
 	printl("Test passed");
+
 	return 0;
 }
 

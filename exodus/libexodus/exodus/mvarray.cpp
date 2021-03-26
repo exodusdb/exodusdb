@@ -242,7 +242,7 @@ var dim::join(const var& sepchar) const {
 			output ^= data_[ii];
 		}
 	} else {
-		std::string sepstring = sepchar;
+		std::string sepstring = sepchar.toString();
 
 		// append any additional elements
 		for (int ii = 2; ii <= nn; ++ii) {

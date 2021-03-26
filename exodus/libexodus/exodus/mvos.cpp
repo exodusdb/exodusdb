@@ -1259,7 +1259,7 @@ bool var::osread(const char* osfilename, const var& codepage) {
 
 	if (codepage)
 		// this->var_str=boost::locale::conv::to_utf<char>(this->var_str,"ISO-8859-5")};
-		this->var_str = boost::locale::conv::to_utf<char>(this->var_str, codepage);
+		this->var_str = boost::locale::conv::to_utf<char>(this->var_str, codepage.var_str);
 
 	return true;
 }
@@ -1272,7 +1272,7 @@ var var::to_codepage(const var& codepage) const {
 	ISSTRING(codepage)
 
 	//from utf8 to codepage
-	return boost::locale::conv::from_utf<char>(this->var_str, codepage);
+	return boost::locale::conv::from_utf<char>(this->var_str, codepage.var_str);
 }
 
 var var::from_codepage(const var& codepage) const {
@@ -1283,7 +1283,7 @@ var var::from_codepage(const var& codepage) const {
 	ISSTRING(codepage)
 
 	//to utf from codepage
-	return boost::locale::conv::to_utf<char>(this->var_str, codepage);
+	return boost::locale::conv::to_utf<char>(this->var_str, codepage.var_str);
 }
 
 // if codepage is provided (not locale) then exodus assumes internally
@@ -1307,7 +1307,7 @@ bool var::oswrite(const var& osfilename, const var& codepage) const {
 
 	// write out the full string or fail
 	if (codepage) {
-		std::string tempstr = boost::locale::conv::from_utf<char>(this->var_str, codepage);
+		std::string tempstr = boost::locale::conv::from_utf<char>(this->var_str, codepage.var_str);
 		myfile.write(tempstr.data(), int(tempstr.length()));
 	} else {
 		myfile.write(this->var_str.data(), int(this->var_str.length()));

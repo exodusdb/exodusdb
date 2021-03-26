@@ -33,7 +33,7 @@ DLL_PUBLIC
 ExodusProgramBase::~ExodusProgramBase(){};
 
 var ExodusProgramBase::libinfo(const var& command) {
-	return var(perform_exodusfunctorbase_.libfilename(command)).osfile();
+	return var(perform_exodusfunctorbase_.libfilename(command.toString())).osfile();
 }
 
 bool ExodusProgramBase::select(const var& sortselectclause) {

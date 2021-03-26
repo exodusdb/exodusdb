@@ -381,7 +381,7 @@ bool var::connect(const var& conninfo) {
 	PGconn* pgconn;
 	for (;;) {
 #if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
-		if (not msvc_PQconnectdb(&pgconn, conninfo2.toString())) {
+		if (not msvc_PQconnectdb(&pgconn, conninfo2.var_str)) {
 #if TRACING >= 1
 			var libname = "libpq.dl";
 			// var libname="libpq.so";
@@ -394,7 +394,7 @@ bool var::connect(const var& conninfo) {
 		};
 #else
 		//connect
-		pgconn = PQconnectdb(conninfo2.toString().c_str());
+		pgconn = PQconnectdb(conninfo2.var_str.c_str());
 #endif
 
 		//connected ok
@@ -677,7 +677,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		return true;
 	}
 
-	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").toString();
+	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
 
 	// *
 
@@ -916,10 +916,10 @@ bool var::read(const var& filehandle, const var& key) {
 	// lower case key if reading from dictionary
 	// std::string key2;
 	// if (filehandle.substr(1,5).lcase()=="dict_")
-	//	key2=key.lcase().toString();
+	//	key2=key.lcase().var_str;
 	// else
-	//	key2=key.toString();
-	std::string key2 = key.normalize();
+	//	key2=key.var_str;
+	std::string key2 = key.normalize().var_str;
 
 	//$1=key
 	paramValues[0] = key2.data();
@@ -931,7 +931,7 @@ bool var::read(const var& filehandle, const var& key) {
 	DEBUG_LOG_SQL1
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
-											sql.toString().c_str(), 1, /* one param */
+											sql.var_str.c_str(), 1, /* one param */
 											NULL,					   /* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,	 // text arguments
@@ -1210,7 +1210,7 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
 	// whereas PQexecParams is the opposite
-	Scoped_PGresult pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
+	Scoped_PGresult pgresult = PQexec(thread_pgconn, sqlcmd.var_str.c_str());
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK &&
 		PQresultStatus(pgresult) != PGRES_TUPLES_OK) {
@@ -1304,10 +1304,10 @@ bool var::write(const var& filehandle, const var& key) const {
 		return true;
 	}
 
-	// std::string key2=key.toString();
-	// std::string data2=this->toString();
-	std::string key2 = key.normalize();
-	std::string data2 = this->normalize();
+	// std::string key2=key.var_str;
+	// std::string data2=this->var_str;
+	std::string key2 = key.normalize().var_str;
+	std::string data2 = this->normalize().var_str;
 
 	// a 2 parameter array
 	const char* paramValues[2];
@@ -1342,7 +1342,7 @@ bool var::write(const var& filehandle, const var& key) const {
 	DEBUG_LOG_SQL1
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
-											sql.toString().c_str(),
+											sql.var_str.c_str(),
 											2,	   // two params (key and data)
 											NULL,  // let the backend deduce param type
 											paramValues, paramLengths,
@@ -1377,10 +1377,10 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	// clear any cache
 	filehandle.deleteo(key);
 
-	// std::string key2=key.toString();
-	// std::string data2=this->toString();
-	std::string key2 = key.normalize();
-	std::string data2 = this->normalize();
+	// std::string key2=key.var_str;
+	// std::string data2=this->var_str;
+	std::string key2 = key.normalize().var_str;
+	std::string data2 = this->normalize().var_str;
 
 	// a 2 parameter array
 	const char* paramValues[2];
@@ -1406,7 +1406,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	DEBUG_LOG_SQL1
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
-											sql.toString().c_str(),
+											sql.var_str.c_str(),
 											2,	   // two params (key and data)
 											NULL,  // let the backend deduce param type
 											paramValues, paramLengths,
@@ -1452,10 +1452,10 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	// clear any cache
 	filehandle.deleteo(key);
 
-	// std::string key2=key.toString();
-	// std::string data2=this->toString();
-	std::string key2 = key.normalize();
-	std::string data2 = this->normalize();
+	// std::string key2=key.var_str;
+	// std::string data2=this->var_str;
+	std::string key2 = key.normalize().var_str;
+	std::string data2 = this->normalize().var_str;
 
 	// a 2 parameter array
 	const char* paramValues[2];
@@ -1482,7 +1482,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	DEBUG_LOG_SQL1
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
-											sql.toString().c_str(),
+											sql.var_str.c_str(),
 											2,	   // two params (key and data)
 											NULL,  // let the backend deduce param type
 											paramValues, paramLengths,
@@ -1519,8 +1519,8 @@ bool var::deleterecord(const var& key) const {
 	// clear any cache
 	this->deleteo(key);
 
-	// std::string key2=key.toString();
-	std::string key2 = key.normalize();
+	// std::string key2=key.var_str;
+	std::string key2 = key.normalize().var_str;
 
 	// a one parameter array
 	const char* paramValues[1];
@@ -1539,7 +1539,7 @@ bool var::deleterecord(const var& key) const {
 		return false;
 
 	DEBUG_LOG_SQL1
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn, sql.toString().c_str(), 1, /* two param */
+	Scoped_PGresult pgresult = PQexecParams(thread_pgconn, sql.var_str.c_str(), 1, /* two param */
 											NULL,									  /* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,	 // text arguments
@@ -1676,7 +1676,7 @@ bool var::createfile(const var& filename) const {
 	// behavior is ON COMMIT DELETE ROWS. However, the default behavior in PostgreSQL is ON
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
-	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").toString();
+	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
 
 	var sql = "CREATE";
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
@@ -2685,8 +2685,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				}
 
 				if (usingnaturalorder) {
-					word1 = naturalorder(word1.toString());
-					word2 = naturalorder(word2.toString());
+					word1 = naturalorder(word1.var_str);
+					word2 = naturalorder(word2.var_str);
 				}
 
 				// no filtering in database on calculated items
@@ -3019,7 +3019,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			// natural order value(s)
 			if (usingnaturalorder)
-				value = naturalorder(value.toString());
+				value = naturalorder(value.var_str);
 
 			// without xxx = "abc"
 			// with xxx not = "abc"
@@ -4382,7 +4382,7 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 	/* dont use PQexec because is cannot be told to return binary results
 	 and use PQexecParams with zero parameters instead
 	//execute the command
-	pgresult = getpgresult(thread_pgconn, sql.toString().c_str());
+	pgresult = getpgresult(thread_pgconn, sql.var_str.c_str());
 	pgresult = pgresult;
 	*/
 

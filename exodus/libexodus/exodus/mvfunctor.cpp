@@ -327,7 +327,7 @@ std::string ExodusFunctorBase::libfilename(std::string libraryname) const {
 		var exo_HOME;
 		if (not exo_HOME.osgetenv("EXO_HOME"))
 			exo_HOME.osgetenv("HOME");
-		libfilename.replace(0, 1, exo_HOME);
+		libfilename.replace(0, 1, exo_HOME.toString());
 	}
 
 	return libfilename;
@@ -373,7 +373,7 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 		var exo_HOME;
 		if (not exo_HOME.osgetenv("EXO_HOME"))
 			exo_HOME.osgetenv("HOME");
-		libraryfilename_.replace(0, 1, exo_HOME);
+		libraryfilename_.replace(0, 1, exo_HOME.toString());
 		//var(libraryfilename_).outputl();
 	}
 
