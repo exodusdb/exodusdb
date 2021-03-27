@@ -255,8 +255,8 @@ var dim::join(const var& sepchar) const {
 }
 
 // dim=var.split()
-dim var::split() const {
-	THISIS("dim var::split() const")
+dim var::split(const var& separator) const {
+	THISIS("dim var::split(const var& separator=\"\") const")
 	THISISSTRING()
 
 	//TODO provide a version that can split on any utf8 character
@@ -264,22 +264,28 @@ dim var::split() const {
 	// deep copy and perhaps even copy/move elision to not even copy the base dim object (which
 	// contains a pointer to an array of vars)
 	dim tempdim2;
-	tempdim2.split(*this);
+	tempdim2.split(*this, separator);
 	return tempdim2;//NRVO hopefully since single named return
 	//return dim().split(*this);//doesnt work because split returns a var, the number of fields
 }
 
 // number=dim.split(varstr)
 // returns number of elements
-var dim::split(const var& str1) {
-	THISIS("var dim::split(const var& var1)")
+var dim::split(const var& str1, const var& separator) {
+	THISIS("var dim::split(const var& var1, const var& separator=\"\")")
 	ISSTRING(str1)
+	ISSTRING(separator)
+
+	//TODO template another version to be fast for single byte separator esp. default FM_
+	//var sep = separator.var_str.size() ? separator : FM_;
+	var sep = separator.var_str.size() ? separator : FM;
+	int sepsize = sep.var_str.size();
 
 	// maybe dimension to the size of the string
 	// do NOT redimension always since pick/arev matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
 	if (!this->initialised_ || this->ncols_ != 1)
-		this->redim(str1.count(FM_) + 1);
+		this->redim(str1.count(sep) + 1);
 
 	// empty string just fills array with empty string
 	if (str1.length() == 0) {
@@ -294,7 +300,8 @@ var dim::split(const var& str1) {
 	for (fieldno = 1; fieldno <= this->nrows_;) {
 
 		// find the next FM delimiter
-		next_pos = str1.var_str.find(FM_, start_pos);
+		//next_pos = str1.var_str.find(FM_, start_pos);
+		next_pos = str1.var_str.find(sep.var_str, start_pos);
 
 		// not found - past end of string?
 		if (next_pos == std::string::npos) {
@@ -305,7 +312,7 @@ var dim::split(const var& str1) {
 		// fill an element with a field
 		this->data_[fieldno] = str1.var_str.substr(start_pos, next_pos - start_pos);
 
-		start_pos = next_pos + 1;
+		start_pos = next_pos + sepsize;
 		fieldno++;
 	}
 
@@ -313,7 +320,8 @@ var dim::split(const var& str1) {
 
 	// stuff any excess fields into the last element
 	if (next_pos != std::string::npos) {
-		this->data_[this->nrows_] ^= FM ^ str1.var_str.substr(start_pos);
+		//this->data_[this->nrows_] ^= FM ^ str1.var_str.substr(start_pos);
+		this->data_[this->nrows_] ^= sep ^ str1.var_str.substr(start_pos);
 	} else {
 		++fieldno;
 		// fill any remaining array elements with empty string
@@ -321,7 +329,7 @@ var dim::split(const var& str1) {
 			this->data_[fieldno] = "";
 	}
 
-	return nfields;//NRVO hopefully since single named return
+	return nfields;//NRVO hopefully since single named return and/or requires a conversion from int to var
 }
 
 dim& dim::sort(bool reverse) {

@@ -726,10 +726,11 @@ bool var::locateby(const char* ordercode, const var& target, var& setting, const
 ///////////////////
 
 // 1. rare syntax where the order is given as a variable
-bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/) const {
+bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting,
+	const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
 		"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& "
-		"target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//)const")
+		"target, var& setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	ISSTRING(ordercode)
 	ISSTRING(usingchar)
 	ISSTRING(target)
@@ -737,15 +738,16 @@ bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& t
 	// return locatebyusing(ordercode.toString().c_str(), usingchar.toString().c_str(), target,
 	// setting, fieldno, valueno);
 	return locatex(var_str, target.var_str, ordercode.toString().c_str(), usingchar.var_str,
-				   setting, fieldno, valueno, 0);
+				   setting, fieldno, valueno, subvalueno);
 }
 
 // 2. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/) const {
+bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting,
+	const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
 		"bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& "
-		"target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//) const")
+		"target, var& setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -759,7 +761,7 @@ bool var::locatebyusing(const char* ordercode, const char* usingchar, const var&
 	// if field number is given then locate in values of that field
 	// otherwise locate in fields of the string
 
-	return locatex(var_str, target.var_str, ordercode, usingchar, setting, fieldno, valueno, 0);
+	return locatex(var_str, target.var_str, ordercode, usingchar, setting, fieldno, valueno, subvalueno);
 }
 
 ///////////////

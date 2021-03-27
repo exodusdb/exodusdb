@@ -1171,9 +1171,9 @@ WINDOWS-1257
 WINDOWS-1258
 */
 
-// if codepage is provided then exodus converts from the
+// no binary conversion is performed on input unless
+// codepage is provided then exodus converts from the
 // specified codepage (not locale) on input to utf-8 internally
-// otherwise no conversion is performed
 bool var::osread(const var& osfilename, const var& codepage) {
 	THISIS("bool var::osread(const var& osfilename, const var& codepage")
 	ISSTRING(osfilename)
@@ -1286,9 +1286,9 @@ var var::from_codepage(const var& codepage) const {
 	return boost::locale::conv::to_utf<char>(this->var_str, codepage.var_str);
 }
 
-// if codepage is provided (not locale) then exodus assumes internally
+// no binary conversion is performed on output unless
+// codepage is provided (not locale) then exodus assumes internally
 // utf-8 and converts all output to the specified codepage
-// otherwise no conversion is performed
 bool var::oswrite(const var& osfilename, const var& codepage) const {
 	THISIS(
 		"bool var::oswrite(const var& osfilename, const var& codepage="

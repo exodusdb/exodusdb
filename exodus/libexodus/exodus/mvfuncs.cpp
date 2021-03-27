@@ -71,7 +71,7 @@ Binary    Hex          Comments
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
-//#include <charconv> // for from_chars and to_chars
+#include <charconv> // for from_chars and to_chars
 
 //#include <cmath>      //for stod()
 //#include <sstream>
@@ -1528,22 +1528,7 @@ var& var::raiser() {
 	return *this;
 }
 
-// convert() - replaces one by one in string, a list of characters with another list of characters
-// if the target list is shorter than the source list of characters then characters are deleted
-var var::convert(const var& oldchars, const var& newchars) const& {
-	THISIS("var var::convert(const var& oldchars,const var& newchars) const")
-	THISISSTRING()
-
-	// return var(*this).converter(oldchars,newchars);
-	var temp = var(*this).converter(oldchars, newchars);
-	return temp;
-}
-
-// on temporary
-var& var::convert(const var& oldchars, const var& newchars) && {
-	return this->converter(oldchars, newchars);
-}
-
+//generic helper to handle char and u32_char wise conversion (mapping)
 template <class T>
 void converter_helper(T& var_str, const T& oldchars, const T& newchars) {
 	typename T::size_type pos = T::npos;
@@ -1573,6 +1558,24 @@ void converter_helper(T& var_str, const T& oldchars, const T& newchars) {
 	return;
 }
 
+// convert() - replaces one by one in string, a list of characters with another list of characters
+// if the target list is shorter than the source list of characters then characters are deleted
+var var::convert(const var& oldchars, const var& newchars) const& {
+	THISIS("var var::convert(const var& oldchars,const var& newchars) const")
+	THISISSTRING()
+
+	// return var(*this).converter(oldchars,newchars);
+	var temp = var(*this).converter(oldchars, newchars);
+	return temp;
+}
+
+// on temporary
+var& var::convert(const var& oldchars, const var& newchars) && {
+	//dont check if defined/assigned since temporaries very unlikely to be so
+
+	return this->converter(oldchars, newchars);
+}
+
 // in-place
 var& var::converter(const var& oldchars, const var& newchars) {
 	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
@@ -1580,12 +1583,41 @@ var& var::converter(const var& oldchars, const var& newchars) {
 	ISSTRING(oldchars)
 	ISSTRING(newchars)
 
-	// all ASCII -> bytewise conversion
+	converter_helper(var_str, oldchars.var_str, newchars.var_str);
+
+	return *this;
+}
+
+// textconvert() - replaces one by one in string, a list of characters with another list of characters
+// if the target list is shorter than the source list of characters then characters are deleted
+var var::textconvert(const var& oldchars, const var& newchars) const& {
+	THISIS("var var::textconvert(const var& oldchars,const var& newchars) const")
+	THISISSTRING()
+
+	return var(*this).textconverter(oldchars, newchars);
+}
+
+// on temporary
+var& var::textconvert(const var& oldchars, const var& newchars) && {
+	//dont check if defined/assigned since temporaries very unlikely to be so
+
+	return this->textconverter(oldchars, newchars);
+}
+
+// in-place
+var& var::textconverter(const var& oldchars, const var& newchars) {
+	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
+	THISISSTRINGMUTATOR()
+	ISSTRING(oldchars)
+	ISSTRING(newchars)
+
+	// all ASCII -> bytewise conversion for speed
 	if (is_ascii(oldchars.var_str) && is_ascii(newchars.var_str)) {
 		converter_helper(var_str, oldchars.var_str, newchars.var_str);
+	}
 
-		// any non-ASCI -> convert to wide before conversion, then back again
-	} else {
+	// any non-ASCI -> convert to wide before conversion, then back again
+	else {
 
 		// convert everything to from UTF8 to wide string
 		std::u32string u32_var_str = this->to_u32string();
@@ -1758,49 +1790,49 @@ bool var::isnum(void) const {
 
 #if defined(HAS_FASTFLOAT)
 
-		//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
+			//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
 
-		auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
-		if (ec != std::errc()) {
-			//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
-			this->var_typ = VARTYP_NANSTR;
-			return false;
-		}
+			auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
+			if (ec != std::errc()) {
+				//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
+				this->var_typ = VARTYP_NANSTR;
+				return false;
+			}
 
-#elif defined(USE_CHARCONV)
+#elif defined(USE_CHARCONV)  //double only available in gcc 11 onwards. msvc has it from 2017 or 19
 
-		//std::cout << "from_chars decimal iconv" << var_str << std::endl;
+			//std::cout << "from_chars decimal iconv" << var_str << std::endl;
 
-		//only available in gcc 11 onwards. msvc has it from 2017 or 19
-		auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl);
-		if (ec != std::errc()) {
-			this->var_typ = VARTYP_NANSTR;
-			return false;
-		}
+			auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl);
+			if (ec != std::errc()) {
+				this->var_typ = VARTYP_NANSTR;
+				return false;
+			}
 
 #elif defined(HAS_RYU)
 
-		//std::cout << "ryu_parse decimal iconv" << var_str << std::endl;
+			//std::cout << "ryu_parse decimal iconv" << var_str << std::endl;
 
-		//Status status = s2d(this->var_str.c_str(), this->var_dbl);
-		Status status = s2d_n(this->var_str.data(), int(this->var_str.size()), &this->var_dbl);
-		//  SUCCESS,
-		//  INPUT_TOO_SHORT,
-		//  INPUT_TOO_LONG,
-		//  MALFORMED_INPUT
-		if (status != SUCCESS)
-			return false;
+			//Status status = s2d(this->var_str.c_str(), this->var_dbl);
+			Status status = s2d_n(this->var_str.data(), int(this->var_str.size()), &this->var_dbl);
+			//  SUCCESS,
+			//  INPUT_TOO_SHORT,
+			//  INPUT_TOO_LONG,
+			//  MALFORMED_INPUT
+			if (status != SUCCESS)
+				return false;
 
 #else
 
-		//std::cout << "std::stod decimal iconv" << var_str << std::endl;
+			//std::cout << "std::stod decimal iconv" << var_str << std::endl;
 
-		//boring old std::stod currently (2021) much slower than fastfloat
-		this->var_dbl = std::stod(this->var_str);
+			//boring old std::stod currently (2021) much slower than fastfloat
+			this->var_dbl = std::stod(this->var_str);
 
 #endif
 
-		this->var_typ = VARTYP_DBLSTR;
+			this->var_typ = VARTYP_DBLSTR;
+
 		}
 
 		//long int
@@ -1812,9 +1844,23 @@ bool var::isnum(void) const {
 			///		std::string result(var_str.begin(),var_str.end());
 			///		var_int=atoi(result.c_str());
 			//var_int = strtol(var_str.c_str(), 0, 10);
-			//this->var_int = std::stol(var_str.c_str(), 0, 10);
-			this->var_int = std::stol(this->var_str);
 
+            //var v="1234";//27ns
+            //v.isnum();//+78ns (105ns) using stol 0 10
+            //v.isnum();//+54ns (81ns) using charconv from_chars int
+            //v.isnum();//+49ns (76ns) using atol BEST
+
+#if 1
+			//this->var_int = std::stol(var_str.c_str(), 0, 10);
+			//this->var_int = std::stol(this->var_str);
+			this->var_int = std::atol(this->var_str.c_str());//fastest gcc 10.2
+#else
+            auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_int);
+            if (ec != std::errc()) {
+                this->var_typ = VARTYP_NANSTR;
+                return false;
+            }
+#endif
 			this->var_typ = VARTYP_INTSTR;
 		}
 

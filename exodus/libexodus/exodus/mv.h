@@ -1152,6 +1152,7 @@ class DLL_PUBLIC var final {
 	// all return var& and are not const)
 
 	var& converter(const var& oldchars, const var& newchars);
+	var& textconverter(const var& oldchars, const var& newchars);
 	var& swapper(const var& whatstr, const var& withstr);
 	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL);
 	var& splicer(const int start1, const int length, const var& str);
@@ -1184,6 +1185,7 @@ class DLL_PUBLIC var final {
 	//////////////////////
 
 	ND var& convert(const var& oldchars, const var& newchars) &&;
+	ND var& textconvert(const var& oldchars, const var& newchars) &&;
 	ND var& swap(const var& whatstr, const var& withstr) &&;
 	ND var& replace(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL) &&;
 	ND var& splice(const int start1, const int length, const var& str) &&;
@@ -1218,6 +1220,7 @@ class DLL_PUBLIC var final {
 	// all are const
 
 	ND var convert(const var& oldchars, const var& newchars) const&;
+	ND var textconvert(const var& oldchars, const var& newchars) const&;
 	ND var swap(const var& whatstr, const var& withstr) const&;
 	ND var replace(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL) const&;
 	ND var splice(const int start1, const int length, const var& str) const&;
@@ -1252,7 +1255,7 @@ class DLL_PUBLIC var final {
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
-	dim split() const;
+	dim split(const var& separator DEFAULTNULL) const;
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -1397,8 +1400,8 @@ class DLL_PUBLIC var final {
 	bool locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno = 0) const;
 
 	// locatebyusing
-	bool locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0) const;
-	bool locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0) const;
+	bool locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	bool locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// DATABASE MANAGEMENT
 	/////////////////////
@@ -1781,7 +1784,7 @@ class DLL_PUBLIC dim {
 
 	// see also var::split
 	// return the number of fields
-	var split(const var& var1);
+	var split(const var& var1, const var& separator DEFAULTNULL);
 	dim& sort(bool reverse = false);
 
 	bool read(const var& filehandle, const var& key);

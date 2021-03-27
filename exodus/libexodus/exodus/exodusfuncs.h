@@ -165,6 +165,8 @@ DLL_PUBLIC ND var len(const var& var2);
 DLL_PUBLIC ND var length(const var& var2);
 DLL_PUBLIC    var& converter(var& instring, const var& oldchars, const var& newchars);
 DLL_PUBLIC ND var convert(const var& instring, const var& oldchars, const var& newchars);
+DLL_PUBLIC    var& textconverter(var& instring, const var& oldchars, const var& newchars);
+DLL_PUBLIC ND var textconvert(const var& instring, const var& oldchars, const var& newchars);
 DLL_PUBLIC    var& swapper(var& instring, const var& oldstr, const var& newstr);
 DLL_PUBLIC ND var swap(const var& instring, const var& oldstr, const var& newstr);
 DLL_PUBLIC    var& replacer(var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);

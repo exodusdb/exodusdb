@@ -332,6 +332,14 @@ DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newc
 	return instring.convert(oldchars, newchars);
 }
 
+DLL_PUBLIC var& textconverter(var& instring, const var& oldchars, const var& newchars) {
+	return instring.textconverter(oldchars, newchars);
+}
+
+DLL_PUBLIC var textconvert(const var& instring, const var& oldchars, const var& newchars) {
+	return instring.textconvert(oldchars, newchars);
+}
+
 DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to) {
 	return instring.swapper(from, to);
 }
