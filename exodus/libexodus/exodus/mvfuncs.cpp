@@ -506,14 +506,14 @@ int var::toInt() const {
 	THISIS("int var::toInt() const")
 	THISISINTEGER()
 
-	return var_int;
+	return static_cast<int>(var_int);
 }
 
-int var::toLong() const {
+long long var::toLong() const {
 	THISIS("int var::toLong() const")
 	THISISINTEGER()
 
-	return var_int;
+	return static_cast<long long>(var_int);
 }
 
 double var::toDouble() const {

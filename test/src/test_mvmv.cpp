@@ -434,7 +434,9 @@ function main() {
 	assert(!revints.locateby("DR",21,locii));
 	assert(locii==5);
 
+	//?
 	assert(!revints.locateby("DL",21,locii));
+	TRACE(locii);
 	assert(locii==2);
 
 

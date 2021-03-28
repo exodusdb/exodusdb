@@ -260,6 +260,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	int targetlen = (int)target.length();
 	int valuen2 = 1;
 	do {
+
 		size_t nextstart_pos = var_str.find(usingchar, start_pos);
 		// past end of string?
 		// if (nextstart_pos==string::npos)
@@ -308,11 +309,15 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 				case '\x02':
 					value = var_str.substr(start_pos, nextstart_pos - start_pos);
 					if (value >= target2) {
-						setting = valuen2;
-						if (value == target2)
+						if (value == target2) {
+							setting = valuen2;
+							//setting = valuen2 + (value.length() < target2.length());
 							return true;
-						else
+						}
+						else {
+							setting = valuen2;
 							return false;
+						}
 					}
 					setting = valuen2 + 1;
 					return false;
@@ -394,9 +399,11 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
 				value = var_str.substr(start_pos, nextstart_pos - start_pos);
-				if (value >= target2) {
+				if (value >= target) {
+				//if (value >= target2) {
 					setting = valuen2;
-					if (value == target2)
+					if (value == target)
+					//if (value == target2)
 						return true;
 					else
 						return false;
@@ -416,6 +423,21 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					else
 						return false;
 				}
+
+				/*
+				value = var_str.substr(start_pos, nextstart_pos - start_pos);
+				if (value <= target2) {
+					if (value == target2) {
+						//setting = valuen2;
+						setting = valuen2;//(value.length() < target2.length());
+						return true;
+					}
+					else {
+						setting = valuen2;
+						return false;
+					}
+				}
+				*/
 				break;
 
 			// DR Descending Right Justified

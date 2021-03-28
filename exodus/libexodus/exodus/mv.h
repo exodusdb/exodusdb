@@ -468,7 +468,7 @@ class DLL_PUBLIC var final {
 	// standard c/c++ int() in other words simply take the number to the left of the point. -1.5
 	// becomes -1 and 1.5 becomes 1
 	int toInt() const;
-	int toLong() const;
+	long long toLong() const;
 
 	double toDouble() const;
 

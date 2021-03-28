@@ -1997,8 +1997,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv(-0,"MX") eq "0");
 	assert(oconv("X","MX") eq "X");
 	//assert(oconv("-1.5","MX") eq "FFFFFFFFFFFFFFFE");
-	assert(oconv("-1.5","MX") eq "FFFFFFFE");
-	assert(oconv("-1","MX") eq "FFFFFFFF");
+	assert(oconv("-1.5","MX") eq "FFFFFFFFFFFFFFFE");
+	assert(oconv("-1","MX") eq "FFFFFFFFFFFFFFFF");
 	assert(oconv("1.5","MX") eq "2");
 	assert(oconv("20" _FM_ "255","MX") eq ("14" _FM_ "FF"));
 
@@ -2035,6 +2035,10 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	var feb29_2004=13209;//iconv("29 FEB 2004","D");
 	assert(oconv(feb29_2004,"DL") eq "29");
 
+	//check does multivalues
+	assert(oconv("14591" _VM_ _VM_ "14592", "D") eq "12 DEC 2007" _VM_ _VM_ "13 DEC 2007");
+	assert(oconv("14591" _FM_ _VM_ "14592", "D") eq "12 DEC 2007" _FM_ _VM_ "13 DEC 2007");
+
 	assert(oconv(14591,"D") eq "12 DEC 2007");
 	assert(oconv(14591,"D2/") eq "12/12/07");
 	assert(oconv(14591,"D2-") eq "12-12-07");
@@ -2055,6 +2059,14 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
 	for (var ii=43200-61; ii<=43200+61 ; ++ii)
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
+
+	//check oconv does multivalues
+	assert(var("60" _RM_ "120").oconv("MT")="00:01" _RM_ "00:02");
+	assert(var("60" _FM_ "120").oconv("MT")="00:01" _FM_ "00:02");
+	assert(var("60" _VM_ "120").oconv("MT")="00:01" _VM_ "00:02");
+	assert(var("60" _SM_ "120").oconv("MT")="00:01" _SM_ "00:02");
+	assert(var("60" _TM_ "120").oconv("MT")="00:01" _TM_ "00:02");
+	assert(var("60" _STM_ "120").oconv("MT")="00:01" _STM_ "00:02");
 
 	//test that some random times iconv/oconv roundtrip ok
 	initrnd(1000);
@@ -2162,6 +2174,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//assert(oconv(_FM_ "\x0035","HEX4") eq "07FE0035");
 	//assert(oconv(FM,"HEX4") eq "07FE");
 
+	assert(oconv(43260,"MT")    == "12:01");
+	assert(oconv(43260,"MTH")   == "12:01PM");
+	assert(oconv(43260,"MTS")   == "12:01:00");
+	assert(oconv(43260,"MTHS")  == "12:01:00PM");
+	assert(oconv(61200,"MT")    == "17:00");
+	assert(oconv(61200,"MTHS,") == "05,00,00PM");
 
 	//test copying files forced overwrite)
     osmkdir("d1/d1");

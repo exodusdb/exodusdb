@@ -1,0 +1,2608 @@
+	FIELD		x	-1	-1										
+	FIELD		x	-1	0										
+	FIELD		x	-1	1										
+	FIELD		x	-1	2										
+	FIELD		x	0	-1										
+	FIELD		x	0	0										
+	FIELD		x	0	1										
+	FIELD		x	0	2										
+	FIELD		x	1	-1										
+	FIELD		x	1	0										
+	FIELD		x	1	1										
+	FIELD		x	1	2										
+	FIELD		x	2	-1										
+	FIELD		x	2	0										
+	FIELD		x	2	1										
+	FIELD		x	2	2										
+	FIELD			-1	-1										
+	FIELD			-1	0										
+	FIELD			-1	1										
+	FIELD			-1	2										
+	FIELD			0	-1										
+	FIELD			0	0										
+	FIELD			0	1										
+	FIELD			0	2										
+	FIELD			1	-1										
+	FIELD			1	0										
+	FIELD			1	1										
+	FIELD			1	2										
+	FIELD			2	-1										
+	FIELD			2	0										
+	FIELD			2	1										
+	FIELD			2	2										
+	FIELD	xxxa	x	-1	-1										
+	FIELD	xxxa	x	-1	0										
+	FIELD	xxxa	x	-1	1										
+x	FIELD	xxxa	x	-1	2										
+	FIELD	xxxa	x	0	-1										
+	FIELD	xxxa	x	0	0										
+	FIELD	xxxa	x	0	1										
+x	FIELD	xxxa	x	0	2										
+	FIELD	xxxa	x	1	-1										
+	FIELD	xxxa	x	1	0										
+	FIELD	xxxa	x	1	1										
+x	FIELD	xxxa	x	1	2										
+	FIELD	xxxa	x	2	-1										
+	FIELD	xxxa	x	2	0										
+	FIELD	xxxa	x	2	1										
+x	FIELD	xxxa	x	2	2										
+	FIELD	xxxa		-1	-1										
+	FIELD	xxxa		-1	0										
+	FIELD	xxxa		-1	1										
+	FIELD	xxxa		-1	2										
+	FIELD	xxxa		0	-1										
+	FIELD	xxxa		0	0										
+	FIELD	xxxa		0	1										
+	FIELD	xxxa		0	2										
+	FIELD	xxxa		1	-1										
+	FIELD	xxxa		1	0										
+	FIELD	xxxa		1	1										
+	FIELD	xxxa		1	2										
+	FIELD	xxxa		2	-1										
+	FIELD	xxxa		2	0										
+	FIELD	xxxa		2	1										
+	FIELD	xxxa		2	2										
+	FIELD	xxxab	x	-1	-1										
+	FIELD	xxxab	x	-1	0										
+	FIELD	xxxab	x	-1	1										
+x	FIELD	xxxab	x	-1	2										
+	FIELD	xxxab	x	0	-1										
+	FIELD	xxxab	x	0	0										
+	FIELD	xxxab	x	0	1										
+x	FIELD	xxxab	x	0	2										
+	FIELD	xxxab	x	1	-1										
+	FIELD	xxxab	x	1	0										
+	FIELD	xxxab	x	1	1										
+x	FIELD	xxxab	x	1	2										
+	FIELD	xxxab	x	2	-1										
+	FIELD	xxxab	x	2	0										
+	FIELD	xxxab	x	2	1										
+x	FIELD	xxxab	x	2	2										
+	FIELD	xxxab		-1	-1										
+	FIELD	xxxab		-1	0										
+	FIELD	xxxab		-1	1										
+	FIELD	xxxab		-1	2										
+	FIELD	xxxab		0	-1										
+	FIELD	xxxab		0	0										
+	FIELD	xxxab		0	1										
+	FIELD	xxxab		0	2										
+	FIELD	xxxab		1	-1										
+	FIELD	xxxab		1	0										
+	FIELD	xxxab		1	1										
+	FIELD	xxxab		1	2										
+	FIELD	xxxab		2	-1										
+	FIELD	xxxab		2	0										
+	FIELD	xxxab		2	1										
+	FIELD	xxxab		2	2										
+	FIELD	xxa	x	-1	-1										
+	FIELD	xxa	x	-1	0										
+	FIELD	xxa	x	-1	1										
+x	FIELD	xxa	x	-1	2										
+	FIELD	xxa	x	0	-1										
+	FIELD	xxa	x	0	0										
+	FIELD	xxa	x	0	1										
+x	FIELD	xxa	x	0	2										
+	FIELD	xxa	x	1	-1										
+	FIELD	xxa	x	1	0										
+	FIELD	xxa	x	1	1										
+x	FIELD	xxa	x	1	2										
+	FIELD	xxa	x	2	-1										
+	FIELD	xxa	x	2	0										
+	FIELD	xxa	x	2	1										
+xa	FIELD	xxa	x	2	2										
+	FIELD	xxa		-1	-1										
+	FIELD	xxa		-1	0										
+	FIELD	xxa		-1	1										
+	FIELD	xxa		-1	2										
+	FIELD	xxa		0	-1										
+	FIELD	xxa		0	0										
+	FIELD	xxa		0	1										
+	FIELD	xxa		0	2										
+	FIELD	xxa		1	-1										
+	FIELD	xxa		1	0										
+	FIELD	xxa		1	1										
+	FIELD	xxa		1	2										
+	FIELD	xxa		2	-1										
+	FIELD	xxa		2	0										
+	FIELD	xxa		2	1										
+	FIELD	xxa		2	2										
+	FIELD	xxaxa	x	-1	-1										
+	FIELD	xxaxa	x	-1	0										
+	FIELD	xxaxa	x	-1	1										
+x	FIELD	xxaxa	x	-1	2										
+	FIELD	xxaxa	x	0	-1										
+	FIELD	xxaxa	x	0	0										
+	FIELD	xxaxa	x	0	1										
+x	FIELD	xxaxa	x	0	2										
+	FIELD	xxaxa	x	1	-1										
+	FIELD	xxaxa	x	1	0										
+	FIELD	xxaxa	x	1	1										
+x	FIELD	xxaxa	x	1	2										
+	FIELD	xxaxa	x	2	-1										
+	FIELD	xxaxa	x	2	0										
+	FIELD	xxaxa	x	2	1										
+xa	FIELD	xxaxa	x	2	2										
+	FIELD	xxaxa		-1	-1										
+	FIELD	xxaxa		-1	0										
+	FIELD	xxaxa		-1	1										
+	FIELD	xxaxa		-1	2										
+	FIELD	xxaxa		0	-1										
+	FIELD	xxaxa		0	0										
+	FIELD	xxaxa		0	1										
+	FIELD	xxaxa		0	2										
+	FIELD	xxaxa		1	-1										
+	FIELD	xxaxa		1	0										
+	FIELD	xxaxa		1	1										
+	FIELD	xxaxa		1	2										
+	FIELD	xxaxa		2	-1										
+	FIELD	xxaxa		2	0										
+	FIELD	xxaxa		2	1										
+	FIELD	xxaxa		2	2										
+	FIELD	xxaxab	x	-1	-1										
+	FIELD	xxaxab	x	-1	0										
+	FIELD	xxaxab	x	-1	1										
+x	FIELD	xxaxab	x	-1	2										
+	FIELD	xxaxab	x	0	-1										
+	FIELD	xxaxab	x	0	0										
+	FIELD	xxaxab	x	0	1										
+x	FIELD	xxaxab	x	0	2										
+	FIELD	xxaxab	x	1	-1										
+	FIELD	xxaxab	x	1	0										
+	FIELD	xxaxab	x	1	1										
+x	FIELD	xxaxab	x	1	2										
+	FIELD	xxaxab	x	2	-1										
+	FIELD	xxaxab	x	2	0										
+	FIELD	xxaxab	x	2	1										
+xa	FIELD	xxaxab	x	2	2										
+	FIELD	xxaxab		-1	-1										
+	FIELD	xxaxab		-1	0										
+	FIELD	xxaxab		-1	1										
+	FIELD	xxaxab		-1	2										
+	FIELD	xxaxab		0	-1										
+	FIELD	xxaxab		0	0										
+	FIELD	xxaxab		0	1										
+	FIELD	xxaxab		0	2										
+	FIELD	xxaxab		1	-1										
+	FIELD	xxaxab		1	0										
+	FIELD	xxaxab		1	1										
+	FIELD	xxaxab		1	2										
+	FIELD	xxaxab		2	-1										
+	FIELD	xxaxab		2	0										
+	FIELD	xxaxab		2	1										
+	FIELD	xxaxab		2	2										
+	FIELD	xxab	x	-1	-1										
+	FIELD	xxab	x	-1	0										
+	FIELD	xxab	x	-1	1										
+x	FIELD	xxab	x	-1	2										
+	FIELD	xxab	x	0	-1										
+	FIELD	xxab	x	0	0										
+	FIELD	xxab	x	0	1										
+x	FIELD	xxab	x	0	2										
+	FIELD	xxab	x	1	-1										
+	FIELD	xxab	x	1	0										
+	FIELD	xxab	x	1	1										
+x	FIELD	xxab	x	1	2										
+	FIELD	xxab	x	2	-1										
+	FIELD	xxab	x	2	0										
+	FIELD	xxab	x	2	1										
+xab	FIELD	xxab	x	2	2										
+	FIELD	xxab		-1	-1										
+	FIELD	xxab		-1	0										
+	FIELD	xxab		-1	1										
+	FIELD	xxab		-1	2										
+	FIELD	xxab		0	-1										
+	FIELD	xxab		0	0										
+	FIELD	xxab		0	1										
+	FIELD	xxab		0	2										
+	FIELD	xxab		1	-1										
+	FIELD	xxab		1	0										
+	FIELD	xxab		1	1										
+	FIELD	xxab		1	2										
+	FIELD	xxab		2	-1										
+	FIELD	xxab		2	0										
+	FIELD	xxab		2	1										
+	FIELD	xxab		2	2										
+	FIELD	xxabxa	x	-1	-1										
+	FIELD	xxabxa	x	-1	0										
+	FIELD	xxabxa	x	-1	1										
+x	FIELD	xxabxa	x	-1	2										
+	FIELD	xxabxa	x	0	-1										
+	FIELD	xxabxa	x	0	0										
+	FIELD	xxabxa	x	0	1										
+x	FIELD	xxabxa	x	0	2										
+	FIELD	xxabxa	x	1	-1										
+	FIELD	xxabxa	x	1	0										
+	FIELD	xxabxa	x	1	1										
+x	FIELD	xxabxa	x	1	2										
+	FIELD	xxabxa	x	2	-1										
+	FIELD	xxabxa	x	2	0										
+	FIELD	xxabxa	x	2	1										
+xab	FIELD	xxabxa	x	2	2										
+	FIELD	xxabxa		-1	-1										
+	FIELD	xxabxa		-1	0										
+	FIELD	xxabxa		-1	1										
+	FIELD	xxabxa		-1	2										
+	FIELD	xxabxa		0	-1										
+	FIELD	xxabxa		0	0										
+	FIELD	xxabxa		0	1										
+	FIELD	xxabxa		0	2										
+	FIELD	xxabxa		1	-1										
+	FIELD	xxabxa		1	0										
+	FIELD	xxabxa		1	1										
+	FIELD	xxabxa		1	2										
+	FIELD	xxabxa		2	-1										
+	FIELD	xxabxa		2	0										
+	FIELD	xxabxa		2	1										
+	FIELD	xxabxa		2	2										
+	FIELD	xxabxab	x	-1	-1										
+	FIELD	xxabxab	x	-1	0										
+	FIELD	xxabxab	x	-1	1										
+x	FIELD	xxabxab	x	-1	2										
+	FIELD	xxabxab	x	0	-1										
+	FIELD	xxabxab	x	0	0										
+	FIELD	xxabxab	x	0	1										
+x	FIELD	xxabxab	x	0	2										
+	FIELD	xxabxab	x	1	-1										
+	FIELD	xxabxab	x	1	0										
+	FIELD	xxabxab	x	1	1										
+x	FIELD	xxabxab	x	1	2										
+	FIELD	xxabxab	x	2	-1										
+	FIELD	xxabxab	x	2	0										
+	FIELD	xxabxab	x	2	1										
+xab	FIELD	xxabxab	x	2	2										
+	FIELD	xxabxab		-1	-1										
+	FIELD	xxabxab		-1	0										
+	FIELD	xxabxab		-1	1										
+	FIELD	xxabxab		-1	2										
+	FIELD	xxabxab		0	-1										
+	FIELD	xxabxab		0	0										
+	FIELD	xxabxab		0	1										
+	FIELD	xxabxab		0	2										
+	FIELD	xxabxab		1	-1										
+	FIELD	xxabxab		1	0										
+	FIELD	xxabxab		1	1										
+	FIELD	xxabxab		1	2										
+	FIELD	xxabxab		2	-1										
+	FIELD	xxabxab		2	0										
+	FIELD	xxabxab		2	1										
+	FIELD	xxabxab		2	2										
+	FIELD	xa	x	-1	-1										
+	FIELD	xa	x	-1	0										
+	FIELD	xa	x	-1	1										
+xa	FIELD	xa	x	-1	2										
+	FIELD	xa	x	0	-1										
+	FIELD	xa	x	0	0										
+	FIELD	xa	x	0	1										
+xa	FIELD	xa	x	0	2										
+	FIELD	xa	x	1	-1										
+	FIELD	xa	x	1	0										
+	FIELD	xa	x	1	1										
+xa	FIELD	xa	x	1	2										
+a	FIELD	xa	x	2	-1										
+a	FIELD	xa	x	2	0										
+a	FIELD	xa	x	2	1										
+a	FIELD	xa	x	2	2										
+	FIELD	xa		-1	-1										
+	FIELD	xa		-1	0										
+	FIELD	xa		-1	1										
+	FIELD	xa		-1	2										
+	FIELD	xa		0	-1										
+	FIELD	xa		0	0										
+	FIELD	xa		0	1										
+	FIELD	xa		0	2										
+	FIELD	xa		1	-1										
+	FIELD	xa		1	0										
+	FIELD	xa		1	1										
+	FIELD	xa		1	2										
+	FIELD	xa		2	-1										
+	FIELD	xa		2	0										
+	FIELD	xa		2	1										
+	FIELD	xa		2	2										
+	FIELD	xaxxa	x	-1	-1										
+	FIELD	xaxxa	x	-1	0										
+	FIELD	xaxxa	x	-1	1										
+xa	FIELD	xaxxa	x	-1	2										
+	FIELD	xaxxa	x	0	-1										
+	FIELD	xaxxa	x	0	0										
+	FIELD	xaxxa	x	0	1										
+xa	FIELD	xaxxa	x	0	2										
+	FIELD	xaxxa	x	1	-1										
+	FIELD	xaxxa	x	1	0										
+	FIELD	xaxxa	x	1	1										
+xa	FIELD	xaxxa	x	1	2										
+a	FIELD	xaxxa	x	2	-1										
+a	FIELD	xaxxa	x	2	0										
+a	FIELD	xaxxa	x	2	1										
+ax	FIELD	xaxxa	x	2	2										
+	FIELD	xaxxa		-1	-1										
+	FIELD	xaxxa		-1	0										
+	FIELD	xaxxa		-1	1										
+	FIELD	xaxxa		-1	2										
+	FIELD	xaxxa		0	-1										
+	FIELD	xaxxa		0	0										
+	FIELD	xaxxa		0	1										
+	FIELD	xaxxa		0	2										
+	FIELD	xaxxa		1	-1										
+	FIELD	xaxxa		1	0										
+	FIELD	xaxxa		1	1										
+	FIELD	xaxxa		1	2										
+	FIELD	xaxxa		2	-1										
+	FIELD	xaxxa		2	0										
+	FIELD	xaxxa		2	1										
+	FIELD	xaxxa		2	2										
+	FIELD	xaxxab	x	-1	-1										
+	FIELD	xaxxab	x	-1	0										
+	FIELD	xaxxab	x	-1	1										
+xa	FIELD	xaxxab	x	-1	2										
+	FIELD	xaxxab	x	0	-1										
+	FIELD	xaxxab	x	0	0										
+	FIELD	xaxxab	x	0	1										
+xa	FIELD	xaxxab	x	0	2										
+	FIELD	xaxxab	x	1	-1										
+	FIELD	xaxxab	x	1	0										
+	FIELD	xaxxab	x	1	1										
+xa	FIELD	xaxxab	x	1	2										
+a	FIELD	xaxxab	x	2	-1										
+a	FIELD	xaxxab	x	2	0										
+a	FIELD	xaxxab	x	2	1										
+ax	FIELD	xaxxab	x	2	2										
+	FIELD	xaxxab		-1	-1										
+	FIELD	xaxxab		-1	0										
+	FIELD	xaxxab		-1	1										
+	FIELD	xaxxab		-1	2										
+	FIELD	xaxxab		0	-1										
+	FIELD	xaxxab		0	0										
+	FIELD	xaxxab		0	1										
+	FIELD	xaxxab		0	2										
+	FIELD	xaxxab		1	-1										
+	FIELD	xaxxab		1	0										
+	FIELD	xaxxab		1	1										
+	FIELD	xaxxab		1	2										
+	FIELD	xaxxab		2	-1										
+	FIELD	xaxxab		2	0										
+	FIELD	xaxxab		2	1										
+	FIELD	xaxxab		2	2										
+	FIELD	xaxa	x	-1	-1										
+	FIELD	xaxa	x	-1	0										
+	FIELD	xaxa	x	-1	1										
+xa	FIELD	xaxa	x	-1	2										
+	FIELD	xaxa	x	0	-1										
+	FIELD	xaxa	x	0	0										
+	FIELD	xaxa	x	0	1										
+xa	FIELD	xaxa	x	0	2										
+	FIELD	xaxa	x	1	-1										
+	FIELD	xaxa	x	1	0										
+	FIELD	xaxa	x	1	1										
+xa	FIELD	xaxa	x	1	2										
+a	FIELD	xaxa	x	2	-1										
+a	FIELD	xaxa	x	2	0										
+a	FIELD	xaxa	x	2	1										
+axa	FIELD	xaxa	x	2	2										
+	FIELD	xaxa		-1	-1										
+	FIELD	xaxa		-1	0										
+	FIELD	xaxa		-1	1										
+	FIELD	xaxa		-1	2										
+	FIELD	xaxa		0	-1										
+	FIELD	xaxa		0	0										
+	FIELD	xaxa		0	1										
+	FIELD	xaxa		0	2										
+	FIELD	xaxa		1	-1										
+	FIELD	xaxa		1	0										
+	FIELD	xaxa		1	1										
+	FIELD	xaxa		1	2										
+	FIELD	xaxa		2	-1										
+	FIELD	xaxa		2	0										
+	FIELD	xaxa		2	1										
+	FIELD	xaxa		2	2										
+	FIELD	xaxaxa	x	-1	-1										
+	FIELD	xaxaxa	x	-1	0										
+	FIELD	xaxaxa	x	-1	1										
+xa	FIELD	xaxaxa	x	-1	2										
+	FIELD	xaxaxa	x	0	-1										
+	FIELD	xaxaxa	x	0	0										
+	FIELD	xaxaxa	x	0	1										
+xa	FIELD	xaxaxa	x	0	2										
+	FIELD	xaxaxa	x	1	-1										
+	FIELD	xaxaxa	x	1	0										
+	FIELD	xaxaxa	x	1	1										
+xa	FIELD	xaxaxa	x	1	2										
+a	FIELD	xaxaxa	x	2	-1										
+a	FIELD	xaxaxa	x	2	0										
+a	FIELD	xaxaxa	x	2	1										
+axa	FIELD	xaxaxa	x	2	2										
+	FIELD	xaxaxa		-1	-1										
+	FIELD	xaxaxa		-1	0										
+	FIELD	xaxaxa		-1	1										
+	FIELD	xaxaxa		-1	2										
+	FIELD	xaxaxa		0	-1										
+	FIELD	xaxaxa		0	0										
+	FIELD	xaxaxa		0	1										
+	FIELD	xaxaxa		0	2										
+	FIELD	xaxaxa		1	-1										
+	FIELD	xaxaxa		1	0										
+	FIELD	xaxaxa		1	1										
+	FIELD	xaxaxa		1	2										
+	FIELD	xaxaxa		2	-1										
+	FIELD	xaxaxa		2	0										
+	FIELD	xaxaxa		2	1										
+	FIELD	xaxaxa		2	2										
+	FIELD	xaxaxab	x	-1	-1										
+	FIELD	xaxaxab	x	-1	0										
+	FIELD	xaxaxab	x	-1	1										
+xa	FIELD	xaxaxab	x	-1	2										
+	FIELD	xaxaxab	x	0	-1										
+	FIELD	xaxaxab	x	0	0										
+	FIELD	xaxaxab	x	0	1										
+xa	FIELD	xaxaxab	x	0	2										
+	FIELD	xaxaxab	x	1	-1										
+	FIELD	xaxaxab	x	1	0										
+	FIELD	xaxaxab	x	1	1										
+xa	FIELD	xaxaxab	x	1	2										
+a	FIELD	xaxaxab	x	2	-1										
+a	FIELD	xaxaxab	x	2	0										
+a	FIELD	xaxaxab	x	2	1										
+axa	FIELD	xaxaxab	x	2	2										
+	FIELD	xaxaxab		-1	-1										
+	FIELD	xaxaxab		-1	0										
+	FIELD	xaxaxab		-1	1										
+	FIELD	xaxaxab		-1	2										
+	FIELD	xaxaxab		0	-1										
+	FIELD	xaxaxab		0	0										
+	FIELD	xaxaxab		0	1										
+	FIELD	xaxaxab		0	2										
+	FIELD	xaxaxab		1	-1										
+	FIELD	xaxaxab		1	0										
+	FIELD	xaxaxab		1	1										
+	FIELD	xaxaxab		1	2										
+	FIELD	xaxaxab		2	-1										
+	FIELD	xaxaxab		2	0										
+	FIELD	xaxaxab		2	1										
+	FIELD	xaxaxab		2	2										
+	FIELD	xaxab	x	-1	-1										
+	FIELD	xaxab	x	-1	0										
+	FIELD	xaxab	x	-1	1										
+xa	FIELD	xaxab	x	-1	2										
+	FIELD	xaxab	x	0	-1										
+	FIELD	xaxab	x	0	0										
+	FIELD	xaxab	x	0	1										
+xa	FIELD	xaxab	x	0	2										
+	FIELD	xaxab	x	1	-1										
+	FIELD	xaxab	x	1	0										
+	FIELD	xaxab	x	1	1										
+xa	FIELD	xaxab	x	1	2										
+a	FIELD	xaxab	x	2	-1										
+a	FIELD	xaxab	x	2	0										
+a	FIELD	xaxab	x	2	1										
+axab	FIELD	xaxab	x	2	2										
+	FIELD	xaxab		-1	-1										
+	FIELD	xaxab		-1	0										
+	FIELD	xaxab		-1	1										
+	FIELD	xaxab		-1	2										
+	FIELD	xaxab		0	-1										
+	FIELD	xaxab		0	0										
+	FIELD	xaxab		0	1										
+	FIELD	xaxab		0	2										
+	FIELD	xaxab		1	-1										
+	FIELD	xaxab		1	0										
+	FIELD	xaxab		1	1										
+	FIELD	xaxab		1	2										
+	FIELD	xaxab		2	-1										
+	FIELD	xaxab		2	0										
+	FIELD	xaxab		2	1										
+	FIELD	xaxab		2	2										
+	FIELD	xaxabxa	x	-1	-1										
+	FIELD	xaxabxa	x	-1	0										
+	FIELD	xaxabxa	x	-1	1										
+xa	FIELD	xaxabxa	x	-1	2										
+	FIELD	xaxabxa	x	0	-1										
+	FIELD	xaxabxa	x	0	0										
+	FIELD	xaxabxa	x	0	1										
+xa	FIELD	xaxabxa	x	0	2										
+	FIELD	xaxabxa	x	1	-1										
+	FIELD	xaxabxa	x	1	0										
+	FIELD	xaxabxa	x	1	1										
+xa	FIELD	xaxabxa	x	1	2										
+a	FIELD	xaxabxa	x	2	-1										
+a	FIELD	xaxabxa	x	2	0										
+a	FIELD	xaxabxa	x	2	1										
+axab	FIELD	xaxabxa	x	2	2										
+	FIELD	xaxabxa		-1	-1										
+	FIELD	xaxabxa		-1	0										
+	FIELD	xaxabxa		-1	1										
+	FIELD	xaxabxa		-1	2										
+	FIELD	xaxabxa		0	-1										
+	FIELD	xaxabxa		0	0										
+	FIELD	xaxabxa		0	1										
+	FIELD	xaxabxa		0	2										
+	FIELD	xaxabxa		1	-1										
+	FIELD	xaxabxa		1	0										
+	FIELD	xaxabxa		1	1										
+	FIELD	xaxabxa		1	2										
+	FIELD	xaxabxa		2	-1										
+	FIELD	xaxabxa		2	0										
+	FIELD	xaxabxa		2	1										
+	FIELD	xaxabxa		2	2										
+	FIELD	xaxabxab	x	-1	-1										
+	FIELD	xaxabxab	x	-1	0										
+	FIELD	xaxabxab	x	-1	1										
+xa	FIELD	xaxabxab	x	-1	2										
+	FIELD	xaxabxab	x	0	-1										
+	FIELD	xaxabxab	x	0	0										
+	FIELD	xaxabxab	x	0	1										
+xa	FIELD	xaxabxab	x	0	2										
+	FIELD	xaxabxab	x	1	-1										
+	FIELD	xaxabxab	x	1	0										
+	FIELD	xaxabxab	x	1	1										
+xa	FIELD	xaxabxab	x	1	2										
+a	FIELD	xaxabxab	x	2	-1										
+a	FIELD	xaxabxab	x	2	0										
+a	FIELD	xaxabxab	x	2	1										
+axab	FIELD	xaxabxab	x	2	2										
+	FIELD	xaxabxab		-1	-1										
+	FIELD	xaxabxab		-1	0										
+	FIELD	xaxabxab		-1	1										
+	FIELD	xaxabxab		-1	2										
+	FIELD	xaxabxab		0	-1										
+	FIELD	xaxabxab		0	0										
+	FIELD	xaxabxab		0	1										
+	FIELD	xaxabxab		0	2										
+	FIELD	xaxabxab		1	-1										
+	FIELD	xaxabxab		1	0										
+	FIELD	xaxabxab		1	1										
+	FIELD	xaxabxab		1	2										
+	FIELD	xaxabxab		2	-1										
+	FIELD	xaxabxab		2	0										
+	FIELD	xaxabxab		2	1										
+	FIELD	xaxabxab		2	2										
+	FIELD	xab	x	-1	-1										
+	FIELD	xab	x	-1	0										
+	FIELD	xab	x	-1	1										
+xab	FIELD	xab	x	-1	2										
+	FIELD	xab	x	0	-1										
+	FIELD	xab	x	0	0										
+	FIELD	xab	x	0	1										
+xab	FIELD	xab	x	0	2										
+	FIELD	xab	x	1	-1										
+	FIELD	xab	x	1	0										
+	FIELD	xab	x	1	1										
+xab	FIELD	xab	x	1	2										
+ab	FIELD	xab	x	2	-1										
+ab	FIELD	xab	x	2	0										
+ab	FIELD	xab	x	2	1										
+ab	FIELD	xab	x	2	2										
+	FIELD	xab		-1	-1										
+	FIELD	xab		-1	0										
+	FIELD	xab		-1	1										
+	FIELD	xab		-1	2										
+	FIELD	xab		0	-1										
+	FIELD	xab		0	0										
+	FIELD	xab		0	1										
+	FIELD	xab		0	2										
+	FIELD	xab		1	-1										
+	FIELD	xab		1	0										
+	FIELD	xab		1	1										
+	FIELD	xab		1	2										
+	FIELD	xab		2	-1										
+	FIELD	xab		2	0										
+	FIELD	xab		2	1										
+	FIELD	xab		2	2										
+	FIELD	xabxxa	x	-1	-1										
+	FIELD	xabxxa	x	-1	0										
+	FIELD	xabxxa	x	-1	1										
+xab	FIELD	xabxxa	x	-1	2										
+	FIELD	xabxxa	x	0	-1										
+	FIELD	xabxxa	x	0	0										
+	FIELD	xabxxa	x	0	1										
+xab	FIELD	xabxxa	x	0	2										
+	FIELD	xabxxa	x	1	-1										
+	FIELD	xabxxa	x	1	0										
+	FIELD	xabxxa	x	1	1										
+xab	FIELD	xabxxa	x	1	2										
+ab	FIELD	xabxxa	x	2	-1										
+ab	FIELD	xabxxa	x	2	0										
+ab	FIELD	xabxxa	x	2	1										
+abx	FIELD	xabxxa	x	2	2										
+	FIELD	xabxxa		-1	-1										
+	FIELD	xabxxa		-1	0										
+	FIELD	xabxxa		-1	1										
+	FIELD	xabxxa		-1	2										
+	FIELD	xabxxa		0	-1										
+	FIELD	xabxxa		0	0										
+	FIELD	xabxxa		0	1										
+	FIELD	xabxxa		0	2										
+	FIELD	xabxxa		1	-1										
+	FIELD	xabxxa		1	0										
+	FIELD	xabxxa		1	1										
+	FIELD	xabxxa		1	2										
+	FIELD	xabxxa		2	-1										
+	FIELD	xabxxa		2	0										
+	FIELD	xabxxa		2	1										
+	FIELD	xabxxa		2	2										
+	FIELD	xabxxab	x	-1	-1										
+	FIELD	xabxxab	x	-1	0										
+	FIELD	xabxxab	x	-1	1										
+xab	FIELD	xabxxab	x	-1	2										
+	FIELD	xabxxab	x	0	-1										
+	FIELD	xabxxab	x	0	0										
+	FIELD	xabxxab	x	0	1										
+xab	FIELD	xabxxab	x	0	2										
+	FIELD	xabxxab	x	1	-1										
+	FIELD	xabxxab	x	1	0										
+	FIELD	xabxxab	x	1	1										
+xab	FIELD	xabxxab	x	1	2										
+ab	FIELD	xabxxab	x	2	-1										
+ab	FIELD	xabxxab	x	2	0										
+ab	FIELD	xabxxab	x	2	1										
+abx	FIELD	xabxxab	x	2	2										
+	FIELD	xabxxab		-1	-1										
+	FIELD	xabxxab		-1	0										
+	FIELD	xabxxab		-1	1										
+	FIELD	xabxxab		-1	2										
+	FIELD	xabxxab		0	-1										
+	FIELD	xabxxab		0	0										
+	FIELD	xabxxab		0	1										
+	FIELD	xabxxab		0	2										
+	FIELD	xabxxab		1	-1										
+	FIELD	xabxxab		1	0										
+	FIELD	xabxxab		1	1										
+	FIELD	xabxxab		1	2										
+	FIELD	xabxxab		2	-1										
+	FIELD	xabxxab		2	0										
+	FIELD	xabxxab		2	1										
+	FIELD	xabxxab		2	2										
+	FIELD	xabxa	x	-1	-1										
+	FIELD	xabxa	x	-1	0										
+	FIELD	xabxa	x	-1	1										
+xab	FIELD	xabxa	x	-1	2										
+	FIELD	xabxa	x	0	-1										
+	FIELD	xabxa	x	0	0										
+	FIELD	xabxa	x	0	1										
+xab	FIELD	xabxa	x	0	2										
+	FIELD	xabxa	x	1	-1										
+	FIELD	xabxa	x	1	0										
+	FIELD	xabxa	x	1	1										
+xab	FIELD	xabxa	x	1	2										
+ab	FIELD	xabxa	x	2	-1										
+ab	FIELD	xabxa	x	2	0										
+ab	FIELD	xabxa	x	2	1										
+abxa	FIELD	xabxa	x	2	2										
+	FIELD	xabxa		-1	-1										
+	FIELD	xabxa		-1	0										
+	FIELD	xabxa		-1	1										
+	FIELD	xabxa		-1	2										
+	FIELD	xabxa		0	-1										
+	FIELD	xabxa		0	0										
+	FIELD	xabxa		0	1										
+	FIELD	xabxa		0	2										
+	FIELD	xabxa		1	-1										
+	FIELD	xabxa		1	0										
+	FIELD	xabxa		1	1										
+	FIELD	xabxa		1	2										
+	FIELD	xabxa		2	-1										
+	FIELD	xabxa		2	0										
+	FIELD	xabxa		2	1										
+	FIELD	xabxa		2	2										
+	FIELD	xabxaxa	x	-1	-1										
+	FIELD	xabxaxa	x	-1	0										
+	FIELD	xabxaxa	x	-1	1										
+xab	FIELD	xabxaxa	x	-1	2										
+	FIELD	xabxaxa	x	0	-1										
+	FIELD	xabxaxa	x	0	0										
+	FIELD	xabxaxa	x	0	1										
+xab	FIELD	xabxaxa	x	0	2										
+	FIELD	xabxaxa	x	1	-1										
+	FIELD	xabxaxa	x	1	0										
+	FIELD	xabxaxa	x	1	1										
+xab	FIELD	xabxaxa	x	1	2										
+ab	FIELD	xabxaxa	x	2	-1										
+ab	FIELD	xabxaxa	x	2	0										
+ab	FIELD	xabxaxa	x	2	1										
+abxa	FIELD	xabxaxa	x	2	2										
+	FIELD	xabxaxa		-1	-1										
+	FIELD	xabxaxa		-1	0										
+	FIELD	xabxaxa		-1	1										
+	FIELD	xabxaxa		-1	2										
+	FIELD	xabxaxa		0	-1										
+	FIELD	xabxaxa		0	0										
+	FIELD	xabxaxa		0	1										
+	FIELD	xabxaxa		0	2										
+	FIELD	xabxaxa		1	-1										
+	FIELD	xabxaxa		1	0										
+	FIELD	xabxaxa		1	1										
+	FIELD	xabxaxa		1	2										
+	FIELD	xabxaxa		2	-1										
+	FIELD	xabxaxa		2	0										
+	FIELD	xabxaxa		2	1										
+	FIELD	xabxaxa		2	2										
+	FIELD	xabxaxab	x	-1	-1										
+	FIELD	xabxaxab	x	-1	0										
+	FIELD	xabxaxab	x	-1	1										
+xab	FIELD	xabxaxab	x	-1	2										
+	FIELD	xabxaxab	x	0	-1										
+	FIELD	xabxaxab	x	0	0										
+	FIELD	xabxaxab	x	0	1										
+xab	FIELD	xabxaxab	x	0	2										
+	FIELD	xabxaxab	x	1	-1										
+	FIELD	xabxaxab	x	1	0										
+	FIELD	xabxaxab	x	1	1										
+xab	FIELD	xabxaxab	x	1	2										
+ab	FIELD	xabxaxab	x	2	-1										
+ab	FIELD	xabxaxab	x	2	0										
+ab	FIELD	xabxaxab	x	2	1										
+abxa	FIELD	xabxaxab	x	2	2										
+	FIELD	xabxaxab		-1	-1										
+	FIELD	xabxaxab		-1	0										
+	FIELD	xabxaxab		-1	1										
+	FIELD	xabxaxab		-1	2										
+	FIELD	xabxaxab		0	-1										
+	FIELD	xabxaxab		0	0										
+	FIELD	xabxaxab		0	1										
+	FIELD	xabxaxab		0	2										
+	FIELD	xabxaxab		1	-1										
+	FIELD	xabxaxab		1	0										
+	FIELD	xabxaxab		1	1										
+	FIELD	xabxaxab		1	2										
+	FIELD	xabxaxab		2	-1										
+	FIELD	xabxaxab		2	0										
+	FIELD	xabxaxab		2	1										
+	FIELD	xabxaxab		2	2										
+	FIELD	xabxab	x	-1	-1										
+	FIELD	xabxab	x	-1	0										
+	FIELD	xabxab	x	-1	1										
+xab	FIELD	xabxab	x	-1	2										
+	FIELD	xabxab	x	0	-1										
+	FIELD	xabxab	x	0	0										
+	FIELD	xabxab	x	0	1										
+xab	FIELD	xabxab	x	0	2										
+	FIELD	xabxab	x	1	-1										
+	FIELD	xabxab	x	1	0										
+	FIELD	xabxab	x	1	1										
+xab	FIELD	xabxab	x	1	2										
+ab	FIELD	xabxab	x	2	-1										
+ab	FIELD	xabxab	x	2	0										
+ab	FIELD	xabxab	x	2	1										
+abxab	FIELD	xabxab	x	2	2										
+	FIELD	xabxab		-1	-1										
+	FIELD	xabxab		-1	0										
+	FIELD	xabxab		-1	1										
+	FIELD	xabxab		-1	2										
+	FIELD	xabxab		0	-1										
+	FIELD	xabxab		0	0										
+	FIELD	xabxab		0	1										
+	FIELD	xabxab		0	2										
+	FIELD	xabxab		1	-1										
+	FIELD	xabxab		1	0										
+	FIELD	xabxab		1	1										
+	FIELD	xabxab		1	2										
+	FIELD	xabxab		2	-1										
+	FIELD	xabxab		2	0										
+	FIELD	xabxab		2	1										
+	FIELD	xabxab		2	2										
+	FIELD	xabxabxa	x	-1	-1										
+	FIELD	xabxabxa	x	-1	0										
+	FIELD	xabxabxa	x	-1	1										
+xab	FIELD	xabxabxa	x	-1	2										
+	FIELD	xabxabxa	x	0	-1										
+	FIELD	xabxabxa	x	0	0										
+	FIELD	xabxabxa	x	0	1										
+xab	FIELD	xabxabxa	x	0	2										
+	FIELD	xabxabxa	x	1	-1										
+	FIELD	xabxabxa	x	1	0										
+	FIELD	xabxabxa	x	1	1										
+xab	FIELD	xabxabxa	x	1	2										
+ab	FIELD	xabxabxa	x	2	-1										
+ab	FIELD	xabxabxa	x	2	0										
+ab	FIELD	xabxabxa	x	2	1										
+abxab	FIELD	xabxabxa	x	2	2										
+	FIELD	xabxabxa		-1	-1										
+	FIELD	xabxabxa		-1	0										
+	FIELD	xabxabxa		-1	1										
+	FIELD	xabxabxa		-1	2										
+	FIELD	xabxabxa		0	-1										
+	FIELD	xabxabxa		0	0										
+	FIELD	xabxabxa		0	1										
+	FIELD	xabxabxa		0	2										
+	FIELD	xabxabxa		1	-1										
+	FIELD	xabxabxa		1	0										
+	FIELD	xabxabxa		1	1										
+	FIELD	xabxabxa		1	2										
+	FIELD	xabxabxa		2	-1										
+	FIELD	xabxabxa		2	0										
+	FIELD	xabxabxa		2	1										
+	FIELD	xabxabxa		2	2										
+	FIELD	xabxabxab	x	-1	-1										
+	FIELD	xabxabxab	x	-1	0										
+	FIELD	xabxabxab	x	-1	1										
+xab	FIELD	xabxabxab	x	-1	2										
+	FIELD	xabxabxab	x	0	-1										
+	FIELD	xabxabxab	x	0	0										
+	FIELD	xabxabxab	x	0	1										
+xab	FIELD	xabxabxab	x	0	2										
+	FIELD	xabxabxab	x	1	-1										
+	FIELD	xabxabxab	x	1	0										
+	FIELD	xabxabxab	x	1	1										
+xab	FIELD	xabxabxab	x	1	2										
+ab	FIELD	xabxabxab	x	2	-1										
+ab	FIELD	xabxabxab	x	2	0										
+ab	FIELD	xabxabxab	x	2	1										
+abxab	FIELD	xabxabxab	x	2	2										
+	FIELD	xabxabxab		-1	-1										
+	FIELD	xabxabxab		-1	0										
+	FIELD	xabxabxab		-1	1										
+	FIELD	xabxabxab		-1	2										
+	FIELD	xabxabxab		0	-1										
+	FIELD	xabxabxab		0	0										
+	FIELD	xabxabxab		0	1										
+	FIELD	xabxabxab		0	2										
+	FIELD	xabxabxab		1	-1										
+	FIELD	xabxabxab		1	0										
+	FIELD	xabxabxab		1	1										
+	FIELD	xabxabxab		1	2										
+	FIELD	xabxabxab		2	-1										
+	FIELD	xabxabxab		2	0										
+	FIELD	xabxabxab		2	1										
+	FIELD	xabxabxab		2	2										
+a	FIELD	a	x	-1	-1										
+a	FIELD	a	x	-1	0										
+a	FIELD	a	x	-1	1										
+a	FIELD	a	x	-1	2										
+a	FIELD	a	x	0	-1										
+a	FIELD	a	x	0	0										
+a	FIELD	a	x	0	1										
+a	FIELD	a	x	0	2										
+a	FIELD	a	x	1	-1										
+a	FIELD	a	x	1	0										
+a	FIELD	a	x	1	1										
+a	FIELD	a	x	1	2										
+	FIELD	a	x	2	-1										
+	FIELD	a	x	2	0										
+	FIELD	a	x	2	1										
+	FIELD	a	x	2	2										
+	FIELD	a		-1	-1										
+	FIELD	a		-1	0										
+	FIELD	a		-1	1										
+	FIELD	a		-1	2										
+	FIELD	a		0	-1										
+	FIELD	a		0	0										
+	FIELD	a		0	1										
+	FIELD	a		0	2										
+	FIELD	a		1	-1										
+	FIELD	a		1	0										
+	FIELD	a		1	1										
+	FIELD	a		1	2										
+	FIELD	a		2	-1										
+	FIELD	a		2	0										
+	FIELD	a		2	1										
+	FIELD	a		2	2										
+a	FIELD	axxxa	x	-1	-1										
+a	FIELD	axxxa	x	-1	0										
+a	FIELD	axxxa	x	-1	1										
+ax	FIELD	axxxa	x	-1	2										
+a	FIELD	axxxa	x	0	-1										
+a	FIELD	axxxa	x	0	0										
+a	FIELD	axxxa	x	0	1										
+ax	FIELD	axxxa	x	0	2										
+a	FIELD	axxxa	x	1	-1										
+a	FIELD	axxxa	x	1	0										
+a	FIELD	axxxa	x	1	1										
+ax	FIELD	axxxa	x	1	2										
+	FIELD	axxxa	x	2	-1										
+	FIELD	axxxa	x	2	0										
+	FIELD	axxxa	x	2	1										
+x	FIELD	axxxa	x	2	2										
+	FIELD	axxxa		-1	-1										
+	FIELD	axxxa		-1	0										
+	FIELD	axxxa		-1	1										
+	FIELD	axxxa		-1	2										
+	FIELD	axxxa		0	-1										
+	FIELD	axxxa		0	0										
+	FIELD	axxxa		0	1										
+	FIELD	axxxa		0	2										
+	FIELD	axxxa		1	-1										
+	FIELD	axxxa		1	0										
+	FIELD	axxxa		1	1										
+	FIELD	axxxa		1	2										
+	FIELD	axxxa		2	-1										
+	FIELD	axxxa		2	0										
+	FIELD	axxxa		2	1										
+	FIELD	axxxa		2	2										
+a	FIELD	axxxab	x	-1	-1										
+a	FIELD	axxxab	x	-1	0										
+a	FIELD	axxxab	x	-1	1										
+ax	FIELD	axxxab	x	-1	2										
+a	FIELD	axxxab	x	0	-1										
+a	FIELD	axxxab	x	0	0										
+a	FIELD	axxxab	x	0	1										
+ax	FIELD	axxxab	x	0	2										
+a	FIELD	axxxab	x	1	-1										
+a	FIELD	axxxab	x	1	0										
+a	FIELD	axxxab	x	1	1										
+ax	FIELD	axxxab	x	1	2										
+	FIELD	axxxab	x	2	-1										
+	FIELD	axxxab	x	2	0										
+	FIELD	axxxab	x	2	1										
+x	FIELD	axxxab	x	2	2										
+	FIELD	axxxab		-1	-1										
+	FIELD	axxxab		-1	0										
+	FIELD	axxxab		-1	1										
+	FIELD	axxxab		-1	2										
+	FIELD	axxxab		0	-1										
+	FIELD	axxxab		0	0										
+	FIELD	axxxab		0	1										
+	FIELD	axxxab		0	2										
+	FIELD	axxxab		1	-1										
+	FIELD	axxxab		1	0										
+	FIELD	axxxab		1	1										
+	FIELD	axxxab		1	2										
+	FIELD	axxxab		2	-1										
+	FIELD	axxxab		2	0										
+	FIELD	axxxab		2	1										
+	FIELD	axxxab		2	2										
+a	FIELD	axxa	x	-1	-1										
+a	FIELD	axxa	x	-1	0										
+a	FIELD	axxa	x	-1	1										
+ax	FIELD	axxa	x	-1	2										
+a	FIELD	axxa	x	0	-1										
+a	FIELD	axxa	x	0	0										
+a	FIELD	axxa	x	0	1										
+ax	FIELD	axxa	x	0	2										
+a	FIELD	axxa	x	1	-1										
+a	FIELD	axxa	x	1	0										
+a	FIELD	axxa	x	1	1										
+ax	FIELD	axxa	x	1	2										
+	FIELD	axxa	x	2	-1										
+	FIELD	axxa	x	2	0										
+	FIELD	axxa	x	2	1										
+xa	FIELD	axxa	x	2	2										
+	FIELD	axxa		-1	-1										
+	FIELD	axxa		-1	0										
+	FIELD	axxa		-1	1										
+	FIELD	axxa		-1	2										
+	FIELD	axxa		0	-1										
+	FIELD	axxa		0	0										
+	FIELD	axxa		0	1										
+	FIELD	axxa		0	2										
+	FIELD	axxa		1	-1										
+	FIELD	axxa		1	0										
+	FIELD	axxa		1	1										
+	FIELD	axxa		1	2										
+	FIELD	axxa		2	-1										
+	FIELD	axxa		2	0										
+	FIELD	axxa		2	1										
+	FIELD	axxa		2	2										
+a	FIELD	axxaxa	x	-1	-1										
+a	FIELD	axxaxa	x	-1	0										
+a	FIELD	axxaxa	x	-1	1										
+ax	FIELD	axxaxa	x	-1	2										
+a	FIELD	axxaxa	x	0	-1										
+a	FIELD	axxaxa	x	0	0										
+a	FIELD	axxaxa	x	0	1										
+ax	FIELD	axxaxa	x	0	2										
+a	FIELD	axxaxa	x	1	-1										
+a	FIELD	axxaxa	x	1	0										
+a	FIELD	axxaxa	x	1	1										
+ax	FIELD	axxaxa	x	1	2										
+	FIELD	axxaxa	x	2	-1										
+	FIELD	axxaxa	x	2	0										
+	FIELD	axxaxa	x	2	1										
+xa	FIELD	axxaxa	x	2	2										
+	FIELD	axxaxa		-1	-1										
+	FIELD	axxaxa		-1	0										
+	FIELD	axxaxa		-1	1										
+	FIELD	axxaxa		-1	2										
+	FIELD	axxaxa		0	-1										
+	FIELD	axxaxa		0	0										
+	FIELD	axxaxa		0	1										
+	FIELD	axxaxa		0	2										
+	FIELD	axxaxa		1	-1										
+	FIELD	axxaxa		1	0										
+	FIELD	axxaxa		1	1										
+	FIELD	axxaxa		1	2										
+	FIELD	axxaxa		2	-1										
+	FIELD	axxaxa		2	0										
+	FIELD	axxaxa		2	1										
+	FIELD	axxaxa		2	2										
+a	FIELD	axxaxab	x	-1	-1										
+a	FIELD	axxaxab	x	-1	0										
+a	FIELD	axxaxab	x	-1	1										
+ax	FIELD	axxaxab	x	-1	2										
+a	FIELD	axxaxab	x	0	-1										
+a	FIELD	axxaxab	x	0	0										
+a	FIELD	axxaxab	x	0	1										
+ax	FIELD	axxaxab	x	0	2										
+a	FIELD	axxaxab	x	1	-1										
+a	FIELD	axxaxab	x	1	0										
+a	FIELD	axxaxab	x	1	1										
+ax	FIELD	axxaxab	x	1	2										
+	FIELD	axxaxab	x	2	-1										
+	FIELD	axxaxab	x	2	0										
+	FIELD	axxaxab	x	2	1										
+xa	FIELD	axxaxab	x	2	2										
+	FIELD	axxaxab		-1	-1										
+	FIELD	axxaxab		-1	0										
+	FIELD	axxaxab		-1	1										
+	FIELD	axxaxab		-1	2										
+	FIELD	axxaxab		0	-1										
+	FIELD	axxaxab		0	0										
+	FIELD	axxaxab		0	1										
+	FIELD	axxaxab		0	2										
+	FIELD	axxaxab		1	-1										
+	FIELD	axxaxab		1	0										
+	FIELD	axxaxab		1	1										
+	FIELD	axxaxab		1	2										
+	FIELD	axxaxab		2	-1										
+	FIELD	axxaxab		2	0										
+	FIELD	axxaxab		2	1										
+	FIELD	axxaxab		2	2										
+a	FIELD	axxab	x	-1	-1										
+a	FIELD	axxab	x	-1	0										
+a	FIELD	axxab	x	-1	1										
+ax	FIELD	axxab	x	-1	2										
+a	FIELD	axxab	x	0	-1										
+a	FIELD	axxab	x	0	0										
+a	FIELD	axxab	x	0	1										
+ax	FIELD	axxab	x	0	2										
+a	FIELD	axxab	x	1	-1										
+a	FIELD	axxab	x	1	0										
+a	FIELD	axxab	x	1	1										
+ax	FIELD	axxab	x	1	2										
+	FIELD	axxab	x	2	-1										
+	FIELD	axxab	x	2	0										
+	FIELD	axxab	x	2	1										
+xab	FIELD	axxab	x	2	2										
+	FIELD	axxab		-1	-1										
+	FIELD	axxab		-1	0										
+	FIELD	axxab		-1	1										
+	FIELD	axxab		-1	2										
+	FIELD	axxab		0	-1										
+	FIELD	axxab		0	0										
+	FIELD	axxab		0	1										
+	FIELD	axxab		0	2										
+	FIELD	axxab		1	-1										
+	FIELD	axxab		1	0										
+	FIELD	axxab		1	1										
+	FIELD	axxab		1	2										
+	FIELD	axxab		2	-1										
+	FIELD	axxab		2	0										
+	FIELD	axxab		2	1										
+	FIELD	axxab		2	2										
+a	FIELD	axxabxa	x	-1	-1										
+a	FIELD	axxabxa	x	-1	0										
+a	FIELD	axxabxa	x	-1	1										
+ax	FIELD	axxabxa	x	-1	2										
+a	FIELD	axxabxa	x	0	-1										
+a	FIELD	axxabxa	x	0	0										
+a	FIELD	axxabxa	x	0	1										
+ax	FIELD	axxabxa	x	0	2										
+a	FIELD	axxabxa	x	1	-1										
+a	FIELD	axxabxa	x	1	0										
+a	FIELD	axxabxa	x	1	1										
+ax	FIELD	axxabxa	x	1	2										
+	FIELD	axxabxa	x	2	-1										
+	FIELD	axxabxa	x	2	0										
+	FIELD	axxabxa	x	2	1										
+xab	FIELD	axxabxa	x	2	2										
+	FIELD	axxabxa		-1	-1										
+	FIELD	axxabxa		-1	0										
+	FIELD	axxabxa		-1	1										
+	FIELD	axxabxa		-1	2										
+	FIELD	axxabxa		0	-1										
+	FIELD	axxabxa		0	0										
+	FIELD	axxabxa		0	1										
+	FIELD	axxabxa		0	2										
+	FIELD	axxabxa		1	-1										
+	FIELD	axxabxa		1	0										
+	FIELD	axxabxa		1	1										
+	FIELD	axxabxa		1	2										
+	FIELD	axxabxa		2	-1										
+	FIELD	axxabxa		2	0										
+	FIELD	axxabxa		2	1										
+	FIELD	axxabxa		2	2										
+a	FIELD	axxabxab	x	-1	-1										
+a	FIELD	axxabxab	x	-1	0										
+a	FIELD	axxabxab	x	-1	1										
+ax	FIELD	axxabxab	x	-1	2										
+a	FIELD	axxabxab	x	0	-1										
+a	FIELD	axxabxab	x	0	0										
+a	FIELD	axxabxab	x	0	1										
+ax	FIELD	axxabxab	x	0	2										
+a	FIELD	axxabxab	x	1	-1										
+a	FIELD	axxabxab	x	1	0										
+a	FIELD	axxabxab	x	1	1										
+ax	FIELD	axxabxab	x	1	2										
+	FIELD	axxabxab	x	2	-1										
+	FIELD	axxabxab	x	2	0										
+	FIELD	axxabxab	x	2	1										
+xab	FIELD	axxabxab	x	2	2										
+	FIELD	axxabxab		-1	-1										
+	FIELD	axxabxab		-1	0										
+	FIELD	axxabxab		-1	1										
+	FIELD	axxabxab		-1	2										
+	FIELD	axxabxab		0	-1										
+	FIELD	axxabxab		0	0										
+	FIELD	axxabxab		0	1										
+	FIELD	axxabxab		0	2										
+	FIELD	axxabxab		1	-1										
+	FIELD	axxabxab		1	0										
+	FIELD	axxabxab		1	1										
+	FIELD	axxabxab		1	2										
+	FIELD	axxabxab		2	-1										
+	FIELD	axxabxab		2	0										
+	FIELD	axxabxab		2	1										
+	FIELD	axxabxab		2	2										
+a	FIELD	axa	x	-1	-1										
+a	FIELD	axa	x	-1	0										
+a	FIELD	axa	x	-1	1										
+axa	FIELD	axa	x	-1	2										
+a	FIELD	axa	x	0	-1										
+a	FIELD	axa	x	0	0										
+a	FIELD	axa	x	0	1										
+axa	FIELD	axa	x	0	2										
+a	FIELD	axa	x	1	-1										
+a	FIELD	axa	x	1	0										
+a	FIELD	axa	x	1	1										
+axa	FIELD	axa	x	1	2										
+a	FIELD	axa	x	2	-1										
+a	FIELD	axa	x	2	0										
+a	FIELD	axa	x	2	1										
+a	FIELD	axa	x	2	2										
+	FIELD	axa		-1	-1										
+	FIELD	axa		-1	0										
+	FIELD	axa		-1	1										
+	FIELD	axa		-1	2										
+	FIELD	axa		0	-1										
+	FIELD	axa		0	0										
+	FIELD	axa		0	1										
+	FIELD	axa		0	2										
+	FIELD	axa		1	-1										
+	FIELD	axa		1	0										
+	FIELD	axa		1	1										
+	FIELD	axa		1	2										
+	FIELD	axa		2	-1										
+	FIELD	axa		2	0										
+	FIELD	axa		2	1										
+	FIELD	axa		2	2										
+a	FIELD	axaxxa	x	-1	-1										
+a	FIELD	axaxxa	x	-1	0										
+a	FIELD	axaxxa	x	-1	1										
+axa	FIELD	axaxxa	x	-1	2										
+a	FIELD	axaxxa	x	0	-1										
+a	FIELD	axaxxa	x	0	0										
+a	FIELD	axaxxa	x	0	1										
+axa	FIELD	axaxxa	x	0	2										
+a	FIELD	axaxxa	x	1	-1										
+a	FIELD	axaxxa	x	1	0										
+a	FIELD	axaxxa	x	1	1										
+axa	FIELD	axaxxa	x	1	2										
+a	FIELD	axaxxa	x	2	-1										
+a	FIELD	axaxxa	x	2	0										
+a	FIELD	axaxxa	x	2	1										
+ax	FIELD	axaxxa	x	2	2										
+	FIELD	axaxxa		-1	-1										
+	FIELD	axaxxa		-1	0										
+	FIELD	axaxxa		-1	1										
+	FIELD	axaxxa		-1	2										
+	FIELD	axaxxa		0	-1										
+	FIELD	axaxxa		0	0										
+	FIELD	axaxxa		0	1										
+	FIELD	axaxxa		0	2										
+	FIELD	axaxxa		1	-1										
+	FIELD	axaxxa		1	0										
+	FIELD	axaxxa		1	1										
+	FIELD	axaxxa		1	2										
+	FIELD	axaxxa		2	-1										
+	FIELD	axaxxa		2	0										
+	FIELD	axaxxa		2	1										
+	FIELD	axaxxa		2	2										
+a	FIELD	axaxxab	x	-1	-1										
+a	FIELD	axaxxab	x	-1	0										
+a	FIELD	axaxxab	x	-1	1										
+axa	FIELD	axaxxab	x	-1	2										
+a	FIELD	axaxxab	x	0	-1										
+a	FIELD	axaxxab	x	0	0										
+a	FIELD	axaxxab	x	0	1										
+axa	FIELD	axaxxab	x	0	2										
+a	FIELD	axaxxab	x	1	-1										
+a	FIELD	axaxxab	x	1	0										
+a	FIELD	axaxxab	x	1	1										
+axa	FIELD	axaxxab	x	1	2										
+a	FIELD	axaxxab	x	2	-1										
+a	FIELD	axaxxab	x	2	0										
+a	FIELD	axaxxab	x	2	1										
+ax	FIELD	axaxxab	x	2	2										
+	FIELD	axaxxab		-1	-1										
+	FIELD	axaxxab		-1	0										
+	FIELD	axaxxab		-1	1										
+	FIELD	axaxxab		-1	2										
+	FIELD	axaxxab		0	-1										
+	FIELD	axaxxab		0	0										
+	FIELD	axaxxab		0	1										
+	FIELD	axaxxab		0	2										
+	FIELD	axaxxab		1	-1										
+	FIELD	axaxxab		1	0										
+	FIELD	axaxxab		1	1										
+	FIELD	axaxxab		1	2										
+	FIELD	axaxxab		2	-1										
+	FIELD	axaxxab		2	0										
+	FIELD	axaxxab		2	1										
+	FIELD	axaxxab		2	2										
+a	FIELD	axaxa	x	-1	-1										
+a	FIELD	axaxa	x	-1	0										
+a	FIELD	axaxa	x	-1	1										
+axa	FIELD	axaxa	x	-1	2										
+a	FIELD	axaxa	x	0	-1										
+a	FIELD	axaxa	x	0	0										
+a	FIELD	axaxa	x	0	1										
+axa	FIELD	axaxa	x	0	2										
+a	FIELD	axaxa	x	1	-1										
+a	FIELD	axaxa	x	1	0										
+a	FIELD	axaxa	x	1	1										
+axa	FIELD	axaxa	x	1	2										
+a	FIELD	axaxa	x	2	-1										
+a	FIELD	axaxa	x	2	0										
+a	FIELD	axaxa	x	2	1										
+axa	FIELD	axaxa	x	2	2										
+	FIELD	axaxa		-1	-1										
+	FIELD	axaxa		-1	0										
+	FIELD	axaxa		-1	1										
+	FIELD	axaxa		-1	2										
+	FIELD	axaxa		0	-1										
+	FIELD	axaxa		0	0										
+	FIELD	axaxa		0	1										
+	FIELD	axaxa		0	2										
+	FIELD	axaxa		1	-1										
+	FIELD	axaxa		1	0										
+	FIELD	axaxa		1	1										
+	FIELD	axaxa		1	2										
+	FIELD	axaxa		2	-1										
+	FIELD	axaxa		2	0										
+	FIELD	axaxa		2	1										
+	FIELD	axaxa		2	2										
+a	FIELD	axaxaxa	x	-1	-1										
+a	FIELD	axaxaxa	x	-1	0										
+a	FIELD	axaxaxa	x	-1	1										
+axa	FIELD	axaxaxa	x	-1	2										
+a	FIELD	axaxaxa	x	0	-1										
+a	FIELD	axaxaxa	x	0	0										
+a	FIELD	axaxaxa	x	0	1										
+axa	FIELD	axaxaxa	x	0	2										
+a	FIELD	axaxaxa	x	1	-1										
+a	FIELD	axaxaxa	x	1	0										
+a	FIELD	axaxaxa	x	1	1										
+axa	FIELD	axaxaxa	x	1	2										
+a	FIELD	axaxaxa	x	2	-1										
+a	FIELD	axaxaxa	x	2	0										
+a	FIELD	axaxaxa	x	2	1										
+axa	FIELD	axaxaxa	x	2	2										
+	FIELD	axaxaxa		-1	-1										
+	FIELD	axaxaxa		-1	0										
+	FIELD	axaxaxa		-1	1										
+	FIELD	axaxaxa		-1	2										
+	FIELD	axaxaxa		0	-1										
+	FIELD	axaxaxa		0	0										
+	FIELD	axaxaxa		0	1										
+	FIELD	axaxaxa		0	2										
+	FIELD	axaxaxa		1	-1										
+	FIELD	axaxaxa		1	0										
+	FIELD	axaxaxa		1	1										
+	FIELD	axaxaxa		1	2										
+	FIELD	axaxaxa		2	-1										
+	FIELD	axaxaxa		2	0										
+	FIELD	axaxaxa		2	1										
+	FIELD	axaxaxa		2	2										
+a	FIELD	axaxaxab	x	-1	-1										
+a	FIELD	axaxaxab	x	-1	0										
+a	FIELD	axaxaxab	x	-1	1										
+axa	FIELD	axaxaxab	x	-1	2										
+a	FIELD	axaxaxab	x	0	-1										
+a	FIELD	axaxaxab	x	0	0										
+a	FIELD	axaxaxab	x	0	1										
+axa	FIELD	axaxaxab	x	0	2										
+a	FIELD	axaxaxab	x	1	-1										
+a	FIELD	axaxaxab	x	1	0										
+a	FIELD	axaxaxab	x	1	1										
+axa	FIELD	axaxaxab	x	1	2										
+a	FIELD	axaxaxab	x	2	-1										
+a	FIELD	axaxaxab	x	2	0										
+a	FIELD	axaxaxab	x	2	1										
+axa	FIELD	axaxaxab	x	2	2										
+	FIELD	axaxaxab		-1	-1										
+	FIELD	axaxaxab		-1	0										
+	FIELD	axaxaxab		-1	1										
+	FIELD	axaxaxab		-1	2										
+	FIELD	axaxaxab		0	-1										
+	FIELD	axaxaxab		0	0										
+	FIELD	axaxaxab		0	1										
+	FIELD	axaxaxab		0	2										
+	FIELD	axaxaxab		1	-1										
+	FIELD	axaxaxab		1	0										
+	FIELD	axaxaxab		1	1										
+	FIELD	axaxaxab		1	2										
+	FIELD	axaxaxab		2	-1										
+	FIELD	axaxaxab		2	0										
+	FIELD	axaxaxab		2	1										
+	FIELD	axaxaxab		2	2										
+a	FIELD	axaxab	x	-1	-1										
+a	FIELD	axaxab	x	-1	0										
+a	FIELD	axaxab	x	-1	1										
+axa	FIELD	axaxab	x	-1	2										
+a	FIELD	axaxab	x	0	-1										
+a	FIELD	axaxab	x	0	0										
+a	FIELD	axaxab	x	0	1										
+axa	FIELD	axaxab	x	0	2										
+a	FIELD	axaxab	x	1	-1										
+a	FIELD	axaxab	x	1	0										
+a	FIELD	axaxab	x	1	1										
+axa	FIELD	axaxab	x	1	2										
+a	FIELD	axaxab	x	2	-1										
+a	FIELD	axaxab	x	2	0										
+a	FIELD	axaxab	x	2	1										
+axab	FIELD	axaxab	x	2	2										
+	FIELD	axaxab		-1	-1										
+	FIELD	axaxab		-1	0										
+	FIELD	axaxab		-1	1										
+	FIELD	axaxab		-1	2										
+	FIELD	axaxab		0	-1										
+	FIELD	axaxab		0	0										
+	FIELD	axaxab		0	1										
+	FIELD	axaxab		0	2										
+	FIELD	axaxab		1	-1										
+	FIELD	axaxab		1	0										
+	FIELD	axaxab		1	1										
+	FIELD	axaxab		1	2										
+	FIELD	axaxab		2	-1										
+	FIELD	axaxab		2	0										
+	FIELD	axaxab		2	1										
+	FIELD	axaxab		2	2										
+a	FIELD	axaxabxa	x	-1	-1										
+a	FIELD	axaxabxa	x	-1	0										
+a	FIELD	axaxabxa	x	-1	1										
+axa	FIELD	axaxabxa	x	-1	2										
+a	FIELD	axaxabxa	x	0	-1										
+a	FIELD	axaxabxa	x	0	0										
+a	FIELD	axaxabxa	x	0	1										
+axa	FIELD	axaxabxa	x	0	2										
+a	FIELD	axaxabxa	x	1	-1										
+a	FIELD	axaxabxa	x	1	0										
+a	FIELD	axaxabxa	x	1	1										
+axa	FIELD	axaxabxa	x	1	2										
+a	FIELD	axaxabxa	x	2	-1										
+a	FIELD	axaxabxa	x	2	0										
+a	FIELD	axaxabxa	x	2	1										
+axab	FIELD	axaxabxa	x	2	2										
+	FIELD	axaxabxa		-1	-1										
+	FIELD	axaxabxa		-1	0										
+	FIELD	axaxabxa		-1	1										
+	FIELD	axaxabxa		-1	2										
+	FIELD	axaxabxa		0	-1										
+	FIELD	axaxabxa		0	0										
+	FIELD	axaxabxa		0	1										
+	FIELD	axaxabxa		0	2										
+	FIELD	axaxabxa		1	-1										
+	FIELD	axaxabxa		1	0										
+	FIELD	axaxabxa		1	1										
+	FIELD	axaxabxa		1	2										
+	FIELD	axaxabxa		2	-1										
+	FIELD	axaxabxa		2	0										
+	FIELD	axaxabxa		2	1										
+	FIELD	axaxabxa		2	2										
+a	FIELD	axaxabxab	x	-1	-1										
+a	FIELD	axaxabxab	x	-1	0										
+a	FIELD	axaxabxab	x	-1	1										
+axa	FIELD	axaxabxab	x	-1	2										
+a	FIELD	axaxabxab	x	0	-1										
+a	FIELD	axaxabxab	x	0	0										
+a	FIELD	axaxabxab	x	0	1										
+axa	FIELD	axaxabxab	x	0	2										
+a	FIELD	axaxabxab	x	1	-1										
+a	FIELD	axaxabxab	x	1	0										
+a	FIELD	axaxabxab	x	1	1										
+axa	FIELD	axaxabxab	x	1	2										
+a	FIELD	axaxabxab	x	2	-1										
+a	FIELD	axaxabxab	x	2	0										
+a	FIELD	axaxabxab	x	2	1										
+axab	FIELD	axaxabxab	x	2	2										
+	FIELD	axaxabxab		-1	-1										
+	FIELD	axaxabxab		-1	0										
+	FIELD	axaxabxab		-1	1										
+	FIELD	axaxabxab		-1	2										
+	FIELD	axaxabxab		0	-1										
+	FIELD	axaxabxab		0	0										
+	FIELD	axaxabxab		0	1										
+	FIELD	axaxabxab		0	2										
+	FIELD	axaxabxab		1	-1										
+	FIELD	axaxabxab		1	0										
+	FIELD	axaxabxab		1	1										
+	FIELD	axaxabxab		1	2										
+	FIELD	axaxabxab		2	-1										
+	FIELD	axaxabxab		2	0										
+	FIELD	axaxabxab		2	1										
+	FIELD	axaxabxab		2	2										
+a	FIELD	axab	x	-1	-1										
+a	FIELD	axab	x	-1	0										
+a	FIELD	axab	x	-1	1										
+axab	FIELD	axab	x	-1	2										
+a	FIELD	axab	x	0	-1										
+a	FIELD	axab	x	0	0										
+a	FIELD	axab	x	0	1										
+axab	FIELD	axab	x	0	2										
+a	FIELD	axab	x	1	-1										
+a	FIELD	axab	x	1	0										
+a	FIELD	axab	x	1	1										
+axab	FIELD	axab	x	1	2										
+ab	FIELD	axab	x	2	-1										
+ab	FIELD	axab	x	2	0										
+ab	FIELD	axab	x	2	1										
+ab	FIELD	axab	x	2	2										
+	FIELD	axab		-1	-1										
+	FIELD	axab		-1	0										
+	FIELD	axab		-1	1										
+	FIELD	axab		-1	2										
+	FIELD	axab		0	-1										
+	FIELD	axab		0	0										
+	FIELD	axab		0	1										
+	FIELD	axab		0	2										
+	FIELD	axab		1	-1										
+	FIELD	axab		1	0										
+	FIELD	axab		1	1										
+	FIELD	axab		1	2										
+	FIELD	axab		2	-1										
+	FIELD	axab		2	0										
+	FIELD	axab		2	1										
+	FIELD	axab		2	2										
+a	FIELD	axabxxa	x	-1	-1										
+a	FIELD	axabxxa	x	-1	0										
+a	FIELD	axabxxa	x	-1	1										
+axab	FIELD	axabxxa	x	-1	2										
+a	FIELD	axabxxa	x	0	-1										
+a	FIELD	axabxxa	x	0	0										
+a	FIELD	axabxxa	x	0	1										
+axab	FIELD	axabxxa	x	0	2										
+a	FIELD	axabxxa	x	1	-1										
+a	FIELD	axabxxa	x	1	0										
+a	FIELD	axabxxa	x	1	1										
+axab	FIELD	axabxxa	x	1	2										
+ab	FIELD	axabxxa	x	2	-1										
+ab	FIELD	axabxxa	x	2	0										
+ab	FIELD	axabxxa	x	2	1										
+abx	FIELD	axabxxa	x	2	2										
+	FIELD	axabxxa		-1	-1										
+	FIELD	axabxxa		-1	0										
+	FIELD	axabxxa		-1	1										
+	FIELD	axabxxa		-1	2										
+	FIELD	axabxxa		0	-1										
+	FIELD	axabxxa		0	0										
+	FIELD	axabxxa		0	1										
+	FIELD	axabxxa		0	2										
+	FIELD	axabxxa		1	-1										
+	FIELD	axabxxa		1	0										
+	FIELD	axabxxa		1	1										
+	FIELD	axabxxa		1	2										
+	FIELD	axabxxa		2	-1										
+	FIELD	axabxxa		2	0										
+	FIELD	axabxxa		2	1										
+	FIELD	axabxxa		2	2										
+a	FIELD	axabxxab	x	-1	-1										
+a	FIELD	axabxxab	x	-1	0										
+a	FIELD	axabxxab	x	-1	1										
+axab	FIELD	axabxxab	x	-1	2										
+a	FIELD	axabxxab	x	0	-1										
+a	FIELD	axabxxab	x	0	0										
+a	FIELD	axabxxab	x	0	1										
+axab	FIELD	axabxxab	x	0	2										
+a	FIELD	axabxxab	x	1	-1										
+a	FIELD	axabxxab	x	1	0										
+a	FIELD	axabxxab	x	1	1										
+axab	FIELD	axabxxab	x	1	2										
+ab	FIELD	axabxxab	x	2	-1										
+ab	FIELD	axabxxab	x	2	0										
+ab	FIELD	axabxxab	x	2	1										
+abx	FIELD	axabxxab	x	2	2										
+	FIELD	axabxxab		-1	-1										
+	FIELD	axabxxab		-1	0										
+	FIELD	axabxxab		-1	1										
+	FIELD	axabxxab		-1	2										
+	FIELD	axabxxab		0	-1										
+	FIELD	axabxxab		0	0										
+	FIELD	axabxxab		0	1										
+	FIELD	axabxxab		0	2										
+	FIELD	axabxxab		1	-1										
+	FIELD	axabxxab		1	0										
+	FIELD	axabxxab		1	1										
+	FIELD	axabxxab		1	2										
+	FIELD	axabxxab		2	-1										
+	FIELD	axabxxab		2	0										
+	FIELD	axabxxab		2	1										
+	FIELD	axabxxab		2	2										
+a	FIELD	axabxa	x	-1	-1										
+a	FIELD	axabxa	x	-1	0										
+a	FIELD	axabxa	x	-1	1										
+axab	FIELD	axabxa	x	-1	2										
+a	FIELD	axabxa	x	0	-1										
+a	FIELD	axabxa	x	0	0										
+a	FIELD	axabxa	x	0	1										
+axab	FIELD	axabxa	x	0	2										
+a	FIELD	axabxa	x	1	-1										
+a	FIELD	axabxa	x	1	0										
+a	FIELD	axabxa	x	1	1										
+axab	FIELD	axabxa	x	1	2										
+ab	FIELD	axabxa	x	2	-1										
+ab	FIELD	axabxa	x	2	0										
+ab	FIELD	axabxa	x	2	1										
+abxa	FIELD	axabxa	x	2	2										
+	FIELD	axabxa		-1	-1										
+	FIELD	axabxa		-1	0										
+	FIELD	axabxa		-1	1										
+	FIELD	axabxa		-1	2										
+	FIELD	axabxa		0	-1										
+	FIELD	axabxa		0	0										
+	FIELD	axabxa		0	1										
+	FIELD	axabxa		0	2										
+	FIELD	axabxa		1	-1										
+	FIELD	axabxa		1	0										
+	FIELD	axabxa		1	1										
+	FIELD	axabxa		1	2										
+	FIELD	axabxa		2	-1										
+	FIELD	axabxa		2	0										
+	FIELD	axabxa		2	1										
+	FIELD	axabxa		2	2										
+a	FIELD	axabxaxa	x	-1	-1										
+a	FIELD	axabxaxa	x	-1	0										
+a	FIELD	axabxaxa	x	-1	1										
+axab	FIELD	axabxaxa	x	-1	2										
+a	FIELD	axabxaxa	x	0	-1										
+a	FIELD	axabxaxa	x	0	0										
+a	FIELD	axabxaxa	x	0	1										
+axab	FIELD	axabxaxa	x	0	2										
+a	FIELD	axabxaxa	x	1	-1										
+a	FIELD	axabxaxa	x	1	0										
+a	FIELD	axabxaxa	x	1	1										
+axab	FIELD	axabxaxa	x	1	2										
+ab	FIELD	axabxaxa	x	2	-1										
+ab	FIELD	axabxaxa	x	2	0										
+ab	FIELD	axabxaxa	x	2	1										
+abxa	FIELD	axabxaxa	x	2	2										
+	FIELD	axabxaxa		-1	-1										
+	FIELD	axabxaxa		-1	0										
+	FIELD	axabxaxa		-1	1										
+	FIELD	axabxaxa		-1	2										
+	FIELD	axabxaxa		0	-1										
+	FIELD	axabxaxa		0	0										
+	FIELD	axabxaxa		0	1										
+	FIELD	axabxaxa		0	2										
+	FIELD	axabxaxa		1	-1										
+	FIELD	axabxaxa		1	0										
+	FIELD	axabxaxa		1	1										
+	FIELD	axabxaxa		1	2										
+	FIELD	axabxaxa		2	-1										
+	FIELD	axabxaxa		2	0										
+	FIELD	axabxaxa		2	1										
+	FIELD	axabxaxa		2	2										
+a	FIELD	axabxaxab	x	-1	-1										
+a	FIELD	axabxaxab	x	-1	0										
+a	FIELD	axabxaxab	x	-1	1										
+axab	FIELD	axabxaxab	x	-1	2										
+a	FIELD	axabxaxab	x	0	-1										
+a	FIELD	axabxaxab	x	0	0										
+a	FIELD	axabxaxab	x	0	1										
+axab	FIELD	axabxaxab	x	0	2										
+a	FIELD	axabxaxab	x	1	-1										
+a	FIELD	axabxaxab	x	1	0										
+a	FIELD	axabxaxab	x	1	1										
+axab	FIELD	axabxaxab	x	1	2										
+ab	FIELD	axabxaxab	x	2	-1										
+ab	FIELD	axabxaxab	x	2	0										
+ab	FIELD	axabxaxab	x	2	1										
+abxa	FIELD	axabxaxab	x	2	2										
+	FIELD	axabxaxab		-1	-1										
+	FIELD	axabxaxab		-1	0										
+	FIELD	axabxaxab		-1	1										
+	FIELD	axabxaxab		-1	2										
+	FIELD	axabxaxab		0	-1										
+	FIELD	axabxaxab		0	0										
+	FIELD	axabxaxab		0	1										
+	FIELD	axabxaxab		0	2										
+	FIELD	axabxaxab		1	-1										
+	FIELD	axabxaxab		1	0										
+	FIELD	axabxaxab		1	1										
+	FIELD	axabxaxab		1	2										
+	FIELD	axabxaxab		2	-1										
+	FIELD	axabxaxab		2	0										
+	FIELD	axabxaxab		2	1										
+	FIELD	axabxaxab		2	2										
+a	FIELD	axabxab	x	-1	-1										
+a	FIELD	axabxab	x	-1	0										
+a	FIELD	axabxab	x	-1	1										
+axab	FIELD	axabxab	x	-1	2										
+a	FIELD	axabxab	x	0	-1										
+a	FIELD	axabxab	x	0	0										
+a	FIELD	axabxab	x	0	1										
+axab	FIELD	axabxab	x	0	2										
+a	FIELD	axabxab	x	1	-1										
+a	FIELD	axabxab	x	1	0										
+a	FIELD	axabxab	x	1	1										
+axab	FIELD	axabxab	x	1	2										
+ab	FIELD	axabxab	x	2	-1										
+ab	FIELD	axabxab	x	2	0										
+ab	FIELD	axabxab	x	2	1										
+abxab	FIELD	axabxab	x	2	2										
+	FIELD	axabxab		-1	-1										
+	FIELD	axabxab		-1	0										
+	FIELD	axabxab		-1	1										
+	FIELD	axabxab		-1	2										
+	FIELD	axabxab		0	-1										
+	FIELD	axabxab		0	0										
+	FIELD	axabxab		0	1										
+	FIELD	axabxab		0	2										
+	FIELD	axabxab		1	-1										
+	FIELD	axabxab		1	0										
+	FIELD	axabxab		1	1										
+	FIELD	axabxab		1	2										
+	FIELD	axabxab		2	-1										
+	FIELD	axabxab		2	0										
+	FIELD	axabxab		2	1										
+	FIELD	axabxab		2	2										
+a	FIELD	axabxabxa	x	-1	-1										
+a	FIELD	axabxabxa	x	-1	0										
+a	FIELD	axabxabxa	x	-1	1										
+axab	FIELD	axabxabxa	x	-1	2										
+a	FIELD	axabxabxa	x	0	-1										
+a	FIELD	axabxabxa	x	0	0										
+a	FIELD	axabxabxa	x	0	1										
+axab	FIELD	axabxabxa	x	0	2										
+a	FIELD	axabxabxa	x	1	-1										
+a	FIELD	axabxabxa	x	1	0										
+a	FIELD	axabxabxa	x	1	1										
+axab	FIELD	axabxabxa	x	1	2										
+ab	FIELD	axabxabxa	x	2	-1										
+ab	FIELD	axabxabxa	x	2	0										
+ab	FIELD	axabxabxa	x	2	1										
+abxab	FIELD	axabxabxa	x	2	2										
+	FIELD	axabxabxa		-1	-1										
+	FIELD	axabxabxa		-1	0										
+	FIELD	axabxabxa		-1	1										
+	FIELD	axabxabxa		-1	2										
+	FIELD	axabxabxa		0	-1										
+	FIELD	axabxabxa		0	0										
+	FIELD	axabxabxa		0	1										
+	FIELD	axabxabxa		0	2										
+	FIELD	axabxabxa		1	-1										
+	FIELD	axabxabxa		1	0										
+	FIELD	axabxabxa		1	1										
+	FIELD	axabxabxa		1	2										
+	FIELD	axabxabxa		2	-1										
+	FIELD	axabxabxa		2	0										
+	FIELD	axabxabxa		2	1										
+	FIELD	axabxabxa		2	2										
+a	FIELD	axabxabxab	x	-1	-1										
+a	FIELD	axabxabxab	x	-1	0										
+a	FIELD	axabxabxab	x	-1	1										
+axab	FIELD	axabxabxab	x	-1	2										
+a	FIELD	axabxabxab	x	0	-1										
+a	FIELD	axabxabxab	x	0	0										
+a	FIELD	axabxabxab	x	0	1										
+axab	FIELD	axabxabxab	x	0	2										
+a	FIELD	axabxabxab	x	1	-1										
+a	FIELD	axabxabxab	x	1	0										
+a	FIELD	axabxabxab	x	1	1										
+axab	FIELD	axabxabxab	x	1	2										
+ab	FIELD	axabxabxab	x	2	-1										
+ab	FIELD	axabxabxab	x	2	0										
+ab	FIELD	axabxabxab	x	2	1										
+abxab	FIELD	axabxabxab	x	2	2										
+	FIELD	axabxabxab		-1	-1										
+	FIELD	axabxabxab		-1	0										
+	FIELD	axabxabxab		-1	1										
+	FIELD	axabxabxab		-1	2										
+	FIELD	axabxabxab		0	-1										
+	FIELD	axabxabxab		0	0										
+	FIELD	axabxabxab		0	1										
+	FIELD	axabxabxab		0	2										
+	FIELD	axabxabxab		1	-1										
+	FIELD	axabxabxab		1	0										
+	FIELD	axabxabxab		1	1										
+	FIELD	axabxabxab		1	2										
+	FIELD	axabxabxab		2	-1										
+	FIELD	axabxabxab		2	0										
+	FIELD	axabxabxab		2	1										
+	FIELD	axabxabxab		2	2										
+ab	FIELD	ab	x	-1	-1										
+ab	FIELD	ab	x	-1	0										
+ab	FIELD	ab	x	-1	1										
+ab	FIELD	ab	x	-1	2										
+ab	FIELD	ab	x	0	-1										
+ab	FIELD	ab	x	0	0										
+ab	FIELD	ab	x	0	1										
+ab	FIELD	ab	x	0	2										
+ab	FIELD	ab	x	1	-1										
+ab	FIELD	ab	x	1	0										
+ab	FIELD	ab	x	1	1										
+ab	FIELD	ab	x	1	2										
+	FIELD	ab	x	2	-1										
+	FIELD	ab	x	2	0										
+	FIELD	ab	x	2	1										
+	FIELD	ab	x	2	2										
+	FIELD	ab		-1	-1										
+	FIELD	ab		-1	0										
+	FIELD	ab		-1	1										
+	FIELD	ab		-1	2										
+	FIELD	ab		0	-1										
+	FIELD	ab		0	0										
+	FIELD	ab		0	1										
+	FIELD	ab		0	2										
+	FIELD	ab		1	-1										
+	FIELD	ab		1	0										
+	FIELD	ab		1	1										
+	FIELD	ab		1	2										
+	FIELD	ab		2	-1										
+	FIELD	ab		2	0										
+	FIELD	ab		2	1										
+	FIELD	ab		2	2										
+ab	FIELD	abxxxa	x	-1	-1										
+ab	FIELD	abxxxa	x	-1	0										
+ab	FIELD	abxxxa	x	-1	1										
+abx	FIELD	abxxxa	x	-1	2										
+ab	FIELD	abxxxa	x	0	-1										
+ab	FIELD	abxxxa	x	0	0										
+ab	FIELD	abxxxa	x	0	1										
+abx	FIELD	abxxxa	x	0	2										
+ab	FIELD	abxxxa	x	1	-1										
+ab	FIELD	abxxxa	x	1	0										
+ab	FIELD	abxxxa	x	1	1										
+abx	FIELD	abxxxa	x	1	2										
+	FIELD	abxxxa	x	2	-1										
+	FIELD	abxxxa	x	2	0										
+	FIELD	abxxxa	x	2	1										
+x	FIELD	abxxxa	x	2	2										
+	FIELD	abxxxa		-1	-1										
+	FIELD	abxxxa		-1	0										
+	FIELD	abxxxa		-1	1										
+	FIELD	abxxxa		-1	2										
+	FIELD	abxxxa		0	-1										
+	FIELD	abxxxa		0	0										
+	FIELD	abxxxa		0	1										
+	FIELD	abxxxa		0	2										
+	FIELD	abxxxa		1	-1										
+	FIELD	abxxxa		1	0										
+	FIELD	abxxxa		1	1										
+	FIELD	abxxxa		1	2										
+	FIELD	abxxxa		2	-1										
+	FIELD	abxxxa		2	0										
+	FIELD	abxxxa		2	1										
+	FIELD	abxxxa		2	2										
+ab	FIELD	abxxxab	x	-1	-1										
+ab	FIELD	abxxxab	x	-1	0										
+ab	FIELD	abxxxab	x	-1	1										
+abx	FIELD	abxxxab	x	-1	2										
+ab	FIELD	abxxxab	x	0	-1										
+ab	FIELD	abxxxab	x	0	0										
+ab	FIELD	abxxxab	x	0	1										
+abx	FIELD	abxxxab	x	0	2										
+ab	FIELD	abxxxab	x	1	-1										
+ab	FIELD	abxxxab	x	1	0										
+ab	FIELD	abxxxab	x	1	1										
+abx	FIELD	abxxxab	x	1	2										
+	FIELD	abxxxab	x	2	-1										
+	FIELD	abxxxab	x	2	0										
+	FIELD	abxxxab	x	2	1										
+x	FIELD	abxxxab	x	2	2										
+	FIELD	abxxxab		-1	-1										
+	FIELD	abxxxab		-1	0										
+	FIELD	abxxxab		-1	1										
+	FIELD	abxxxab		-1	2										
+	FIELD	abxxxab		0	-1										
+	FIELD	abxxxab		0	0										
+	FIELD	abxxxab		0	1										
+	FIELD	abxxxab		0	2										
+	FIELD	abxxxab		1	-1										
+	FIELD	abxxxab		1	0										
+	FIELD	abxxxab		1	1										
+	FIELD	abxxxab		1	2										
+	FIELD	abxxxab		2	-1										
+	FIELD	abxxxab		2	0										
+	FIELD	abxxxab		2	1										
+	FIELD	abxxxab		2	2										
+ab	FIELD	abxxa	x	-1	-1										
+ab	FIELD	abxxa	x	-1	0										
+ab	FIELD	abxxa	x	-1	1										
+abx	FIELD	abxxa	x	-1	2										
+ab	FIELD	abxxa	x	0	-1										
+ab	FIELD	abxxa	x	0	0										
+ab	FIELD	abxxa	x	0	1										
+abx	FIELD	abxxa	x	0	2										
+ab	FIELD	abxxa	x	1	-1										
+ab	FIELD	abxxa	x	1	0										
+ab	FIELD	abxxa	x	1	1										
+abx	FIELD	abxxa	x	1	2										
+	FIELD	abxxa	x	2	-1										
+	FIELD	abxxa	x	2	0										
+	FIELD	abxxa	x	2	1										
+xa	FIELD	abxxa	x	2	2										
+	FIELD	abxxa		-1	-1										
+	FIELD	abxxa		-1	0										
+	FIELD	abxxa		-1	1										
+	FIELD	abxxa		-1	2										
+	FIELD	abxxa		0	-1										
+	FIELD	abxxa		0	0										
+	FIELD	abxxa		0	1										
+	FIELD	abxxa		0	2										
+	FIELD	abxxa		1	-1										
+	FIELD	abxxa		1	0										
+	FIELD	abxxa		1	1										
+	FIELD	abxxa		1	2										
+	FIELD	abxxa		2	-1										
+	FIELD	abxxa		2	0										
+	FIELD	abxxa		2	1										
+	FIELD	abxxa		2	2										
+ab	FIELD	abxxaxa	x	-1	-1										
+ab	FIELD	abxxaxa	x	-1	0										
+ab	FIELD	abxxaxa	x	-1	1										
+abx	FIELD	abxxaxa	x	-1	2										
+ab	FIELD	abxxaxa	x	0	-1										
+ab	FIELD	abxxaxa	x	0	0										
+ab	FIELD	abxxaxa	x	0	1										
+abx	FIELD	abxxaxa	x	0	2										
+ab	FIELD	abxxaxa	x	1	-1										
+ab	FIELD	abxxaxa	x	1	0										
+ab	FIELD	abxxaxa	x	1	1										
+abx	FIELD	abxxaxa	x	1	2										
+	FIELD	abxxaxa	x	2	-1										
+	FIELD	abxxaxa	x	2	0										
+	FIELD	abxxaxa	x	2	1										
+xa	FIELD	abxxaxa	x	2	2										
+	FIELD	abxxaxa		-1	-1										
+	FIELD	abxxaxa		-1	0										
+	FIELD	abxxaxa		-1	1										
+	FIELD	abxxaxa		-1	2										
+	FIELD	abxxaxa		0	-1										
+	FIELD	abxxaxa		0	0										
+	FIELD	abxxaxa		0	1										
+	FIELD	abxxaxa		0	2										
+	FIELD	abxxaxa		1	-1										
+	FIELD	abxxaxa		1	0										
+	FIELD	abxxaxa		1	1										
+	FIELD	abxxaxa		1	2										
+	FIELD	abxxaxa		2	-1										
+	FIELD	abxxaxa		2	0										
+	FIELD	abxxaxa		2	1										
+	FIELD	abxxaxa		2	2										
+ab	FIELD	abxxaxab	x	-1	-1										
+ab	FIELD	abxxaxab	x	-1	0										
+ab	FIELD	abxxaxab	x	-1	1										
+abx	FIELD	abxxaxab	x	-1	2										
+ab	FIELD	abxxaxab	x	0	-1										
+ab	FIELD	abxxaxab	x	0	0										
+ab	FIELD	abxxaxab	x	0	1										
+abx	FIELD	abxxaxab	x	0	2										
+ab	FIELD	abxxaxab	x	1	-1										
+ab	FIELD	abxxaxab	x	1	0										
+ab	FIELD	abxxaxab	x	1	1										
+abx	FIELD	abxxaxab	x	1	2										
+	FIELD	abxxaxab	x	2	-1										
+	FIELD	abxxaxab	x	2	0										
+	FIELD	abxxaxab	x	2	1										
+xa	FIELD	abxxaxab	x	2	2										
+	FIELD	abxxaxab		-1	-1										
+	FIELD	abxxaxab		-1	0										
+	FIELD	abxxaxab		-1	1										
+	FIELD	abxxaxab		-1	2										
+	FIELD	abxxaxab		0	-1										
+	FIELD	abxxaxab		0	0										
+	FIELD	abxxaxab		0	1										
+	FIELD	abxxaxab		0	2										
+	FIELD	abxxaxab		1	-1										
+	FIELD	abxxaxab		1	0										
+	FIELD	abxxaxab		1	1										
+	FIELD	abxxaxab		1	2										
+	FIELD	abxxaxab		2	-1										
+	FIELD	abxxaxab		2	0										
+	FIELD	abxxaxab		2	1										
+	FIELD	abxxaxab		2	2										
+ab	FIELD	abxxab	x	-1	-1										
+ab	FIELD	abxxab	x	-1	0										
+ab	FIELD	abxxab	x	-1	1										
+abx	FIELD	abxxab	x	-1	2										
+ab	FIELD	abxxab	x	0	-1										
+ab	FIELD	abxxab	x	0	0										
+ab	FIELD	abxxab	x	0	1										
+abx	FIELD	abxxab	x	0	2										
+ab	FIELD	abxxab	x	1	-1										
+ab	FIELD	abxxab	x	1	0										
+ab	FIELD	abxxab	x	1	1										
+abx	FIELD	abxxab	x	1	2										
+	FIELD	abxxab	x	2	-1										
+	FIELD	abxxab	x	2	0										
+	FIELD	abxxab	x	2	1										
+xab	FIELD	abxxab	x	2	2										
+	FIELD	abxxab		-1	-1										
+	FIELD	abxxab		-1	0										
+	FIELD	abxxab		-1	1										
+	FIELD	abxxab		-1	2										
+	FIELD	abxxab		0	-1										
+	FIELD	abxxab		0	0										
+	FIELD	abxxab		0	1										
+	FIELD	abxxab		0	2										
+	FIELD	abxxab		1	-1										
+	FIELD	abxxab		1	0										
+	FIELD	abxxab		1	1										
+	FIELD	abxxab		1	2										
+	FIELD	abxxab		2	-1										
+	FIELD	abxxab		2	0										
+	FIELD	abxxab		2	1										
+	FIELD	abxxab		2	2										
+ab	FIELD	abxxabxa	x	-1	-1										
+ab	FIELD	abxxabxa	x	-1	0										
+ab	FIELD	abxxabxa	x	-1	1										
+abx	FIELD	abxxabxa	x	-1	2										
+ab	FIELD	abxxabxa	x	0	-1										
+ab	FIELD	abxxabxa	x	0	0										
+ab	FIELD	abxxabxa	x	0	1										
+abx	FIELD	abxxabxa	x	0	2										
+ab	FIELD	abxxabxa	x	1	-1										
+ab	FIELD	abxxabxa	x	1	0										
+ab	FIELD	abxxabxa	x	1	1										
+abx	FIELD	abxxabxa	x	1	2										
+	FIELD	abxxabxa	x	2	-1										
+	FIELD	abxxabxa	x	2	0										
+	FIELD	abxxabxa	x	2	1										
+xab	FIELD	abxxabxa	x	2	2										
+	FIELD	abxxabxa		-1	-1										
+	FIELD	abxxabxa		-1	0										
+	FIELD	abxxabxa		-1	1										
+	FIELD	abxxabxa		-1	2										
+	FIELD	abxxabxa		0	-1										
+	FIELD	abxxabxa		0	0										
+	FIELD	abxxabxa		0	1										
+	FIELD	abxxabxa		0	2										
+	FIELD	abxxabxa		1	-1										
+	FIELD	abxxabxa		1	0										
+	FIELD	abxxabxa		1	1										
+	FIELD	abxxabxa		1	2										
+	FIELD	abxxabxa		2	-1										
+	FIELD	abxxabxa		2	0										
+	FIELD	abxxabxa		2	1										
+	FIELD	abxxabxa		2	2										
+ab	FIELD	abxxabxab	x	-1	-1										
+ab	FIELD	abxxabxab	x	-1	0										
+ab	FIELD	abxxabxab	x	-1	1										
+abx	FIELD	abxxabxab	x	-1	2										
+ab	FIELD	abxxabxab	x	0	-1										
+ab	FIELD	abxxabxab	x	0	0										
+ab	FIELD	abxxabxab	x	0	1										
+abx	FIELD	abxxabxab	x	0	2										
+ab	FIELD	abxxabxab	x	1	-1										
+ab	FIELD	abxxabxab	x	1	0										
+ab	FIELD	abxxabxab	x	1	1										
+abx	FIELD	abxxabxab	x	1	2										
+	FIELD	abxxabxab	x	2	-1										
+	FIELD	abxxabxab	x	2	0										
+	FIELD	abxxabxab	x	2	1										
+xab	FIELD	abxxabxab	x	2	2										
+	FIELD	abxxabxab		-1	-1										
+	FIELD	abxxabxab		-1	0										
+	FIELD	abxxabxab		-1	1										
+	FIELD	abxxabxab		-1	2										
+	FIELD	abxxabxab		0	-1										
+	FIELD	abxxabxab		0	0										
+	FIELD	abxxabxab		0	1										
+	FIELD	abxxabxab		0	2										
+	FIELD	abxxabxab		1	-1										
+	FIELD	abxxabxab		1	0										
+	FIELD	abxxabxab		1	1										
+	FIELD	abxxabxab		1	2										
+	FIELD	abxxabxab		2	-1										
+	FIELD	abxxabxab		2	0										
+	FIELD	abxxabxab		2	1										
+	FIELD	abxxabxab		2	2										
+ab	FIELD	abxa	x	-1	-1										
+ab	FIELD	abxa	x	-1	0										
+ab	FIELD	abxa	x	-1	1										
+abxa	FIELD	abxa	x	-1	2										
+ab	FIELD	abxa	x	0	-1										
+ab	FIELD	abxa	x	0	0										
+ab	FIELD	abxa	x	0	1										
+abxa	FIELD	abxa	x	0	2										
+ab	FIELD	abxa	x	1	-1										
+ab	FIELD	abxa	x	1	0										
+ab	FIELD	abxa	x	1	1										
+abxa	FIELD	abxa	x	1	2										
+a	FIELD	abxa	x	2	-1										
+a	FIELD	abxa	x	2	0										
+a	FIELD	abxa	x	2	1										
+a	FIELD	abxa	x	2	2										
+	FIELD	abxa		-1	-1										
+	FIELD	abxa		-1	0										
+	FIELD	abxa		-1	1										
+	FIELD	abxa		-1	2										
+	FIELD	abxa		0	-1										
+	FIELD	abxa		0	0										
+	FIELD	abxa		0	1										
+	FIELD	abxa		0	2										
+	FIELD	abxa		1	-1										
+	FIELD	abxa		1	0										
+	FIELD	abxa		1	1										
+	FIELD	abxa		1	2										
+	FIELD	abxa		2	-1										
+	FIELD	abxa		2	0										
+	FIELD	abxa		2	1										
+	FIELD	abxa		2	2										
+ab	FIELD	abxaxxa	x	-1	-1										
+ab	FIELD	abxaxxa	x	-1	0										
+ab	FIELD	abxaxxa	x	-1	1										
+abxa	FIELD	abxaxxa	x	-1	2										
+ab	FIELD	abxaxxa	x	0	-1										
+ab	FIELD	abxaxxa	x	0	0										
+ab	FIELD	abxaxxa	x	0	1										
+abxa	FIELD	abxaxxa	x	0	2										
+ab	FIELD	abxaxxa	x	1	-1										
+ab	FIELD	abxaxxa	x	1	0										
+ab	FIELD	abxaxxa	x	1	1										
+abxa	FIELD	abxaxxa	x	1	2										
+a	FIELD	abxaxxa	x	2	-1										
+a	FIELD	abxaxxa	x	2	0										
+a	FIELD	abxaxxa	x	2	1										
+ax	FIELD	abxaxxa	x	2	2										
+	FIELD	abxaxxa		-1	-1										
+	FIELD	abxaxxa		-1	0										
+	FIELD	abxaxxa		-1	1										
+	FIELD	abxaxxa		-1	2										
+	FIELD	abxaxxa		0	-1										
+	FIELD	abxaxxa		0	0										
+	FIELD	abxaxxa		0	1										
+	FIELD	abxaxxa		0	2										
+	FIELD	abxaxxa		1	-1										
+	FIELD	abxaxxa		1	0										
+	FIELD	abxaxxa		1	1										
+	FIELD	abxaxxa		1	2										
+	FIELD	abxaxxa		2	-1										
+	FIELD	abxaxxa		2	0										
+	FIELD	abxaxxa		2	1										
+	FIELD	abxaxxa		2	2										
+ab	FIELD	abxaxxab	x	-1	-1										
+ab	FIELD	abxaxxab	x	-1	0										
+ab	FIELD	abxaxxab	x	-1	1										
+abxa	FIELD	abxaxxab	x	-1	2										
+ab	FIELD	abxaxxab	x	0	-1										
+ab	FIELD	abxaxxab	x	0	0										
+ab	FIELD	abxaxxab	x	0	1										
+abxa	FIELD	abxaxxab	x	0	2										
+ab	FIELD	abxaxxab	x	1	-1										
+ab	FIELD	abxaxxab	x	1	0										
+ab	FIELD	abxaxxab	x	1	1										
+abxa	FIELD	abxaxxab	x	1	2										
+a	FIELD	abxaxxab	x	2	-1										
+a	FIELD	abxaxxab	x	2	0										
+a	FIELD	abxaxxab	x	2	1										
+ax	FIELD	abxaxxab	x	2	2										
+	FIELD	abxaxxab		-1	-1										
+	FIELD	abxaxxab		-1	0										
+	FIELD	abxaxxab		-1	1										
+	FIELD	abxaxxab		-1	2										
+	FIELD	abxaxxab		0	-1										
+	FIELD	abxaxxab		0	0										
+	FIELD	abxaxxab		0	1										
+	FIELD	abxaxxab		0	2										
+	FIELD	abxaxxab		1	-1										
+	FIELD	abxaxxab		1	0										
+	FIELD	abxaxxab		1	1										
+	FIELD	abxaxxab		1	2										
+	FIELD	abxaxxab		2	-1										
+	FIELD	abxaxxab		2	0										
+	FIELD	abxaxxab		2	1										
+	FIELD	abxaxxab		2	2										
+ab	FIELD	abxaxa	x	-1	-1										
+ab	FIELD	abxaxa	x	-1	0										
+ab	FIELD	abxaxa	x	-1	1										
+abxa	FIELD	abxaxa	x	-1	2										
+ab	FIELD	abxaxa	x	0	-1										
+ab	FIELD	abxaxa	x	0	0										
+ab	FIELD	abxaxa	x	0	1										
+abxa	FIELD	abxaxa	x	0	2										
+ab	FIELD	abxaxa	x	1	-1										
+ab	FIELD	abxaxa	x	1	0										
+ab	FIELD	abxaxa	x	1	1										
+abxa	FIELD	abxaxa	x	1	2										
+a	FIELD	abxaxa	x	2	-1										
+a	FIELD	abxaxa	x	2	0										
+a	FIELD	abxaxa	x	2	1										
+axa	FIELD	abxaxa	x	2	2										
+	FIELD	abxaxa		-1	-1										
+	FIELD	abxaxa		-1	0										
+	FIELD	abxaxa		-1	1										
+	FIELD	abxaxa		-1	2										
+	FIELD	abxaxa		0	-1										
+	FIELD	abxaxa		0	0										
+	FIELD	abxaxa		0	1										
+	FIELD	abxaxa		0	2										
+	FIELD	abxaxa		1	-1										
+	FIELD	abxaxa		1	0										
+	FIELD	abxaxa		1	1										
+	FIELD	abxaxa		1	2										
+	FIELD	abxaxa		2	-1										
+	FIELD	abxaxa		2	0										
+	FIELD	abxaxa		2	1										
+	FIELD	abxaxa		2	2										
+ab	FIELD	abxaxaxa	x	-1	-1										
+ab	FIELD	abxaxaxa	x	-1	0										
+ab	FIELD	abxaxaxa	x	-1	1										
+abxa	FIELD	abxaxaxa	x	-1	2										
+ab	FIELD	abxaxaxa	x	0	-1										
+ab	FIELD	abxaxaxa	x	0	0										
+ab	FIELD	abxaxaxa	x	0	1										
+abxa	FIELD	abxaxaxa	x	0	2										
+ab	FIELD	abxaxaxa	x	1	-1										
+ab	FIELD	abxaxaxa	x	1	0										
+ab	FIELD	abxaxaxa	x	1	1										
+abxa	FIELD	abxaxaxa	x	1	2										
+a	FIELD	abxaxaxa	x	2	-1										
+a	FIELD	abxaxaxa	x	2	0										
+a	FIELD	abxaxaxa	x	2	1										
+axa	FIELD	abxaxaxa	x	2	2										
+	FIELD	abxaxaxa		-1	-1										
+	FIELD	abxaxaxa		-1	0										
+	FIELD	abxaxaxa		-1	1										
+	FIELD	abxaxaxa		-1	2										
+	FIELD	abxaxaxa		0	-1										
+	FIELD	abxaxaxa		0	0										
+	FIELD	abxaxaxa		0	1										
+	FIELD	abxaxaxa		0	2										
+	FIELD	abxaxaxa		1	-1										
+	FIELD	abxaxaxa		1	0										
+	FIELD	abxaxaxa		1	1										
+	FIELD	abxaxaxa		1	2										
+	FIELD	abxaxaxa		2	-1										
+	FIELD	abxaxaxa		2	0										
+	FIELD	abxaxaxa		2	1										
+	FIELD	abxaxaxa		2	2										
+ab	FIELD	abxaxaxab	x	-1	-1										
+ab	FIELD	abxaxaxab	x	-1	0										
+ab	FIELD	abxaxaxab	x	-1	1										
+abxa	FIELD	abxaxaxab	x	-1	2										
+ab	FIELD	abxaxaxab	x	0	-1										
+ab	FIELD	abxaxaxab	x	0	0										
+ab	FIELD	abxaxaxab	x	0	1										
+abxa	FIELD	abxaxaxab	x	0	2										
+ab	FIELD	abxaxaxab	x	1	-1										
+ab	FIELD	abxaxaxab	x	1	0										
+ab	FIELD	abxaxaxab	x	1	1										
+abxa	FIELD	abxaxaxab	x	1	2										
+a	FIELD	abxaxaxab	x	2	-1										
+a	FIELD	abxaxaxab	x	2	0										
+a	FIELD	abxaxaxab	x	2	1										
+axa	FIELD	abxaxaxab	x	2	2										
+	FIELD	abxaxaxab		-1	-1										
+	FIELD	abxaxaxab		-1	0										
+	FIELD	abxaxaxab		-1	1										
+	FIELD	abxaxaxab		-1	2										
+	FIELD	abxaxaxab		0	-1										
+	FIELD	abxaxaxab		0	0										
+	FIELD	abxaxaxab		0	1										
+	FIELD	abxaxaxab		0	2										
+	FIELD	abxaxaxab		1	-1										
+	FIELD	abxaxaxab		1	0										
+	FIELD	abxaxaxab		1	1										
+	FIELD	abxaxaxab		1	2										
+	FIELD	abxaxaxab		2	-1										
+	FIELD	abxaxaxab		2	0										
+	FIELD	abxaxaxab		2	1										
+	FIELD	abxaxaxab		2	2										
+ab	FIELD	abxaxab	x	-1	-1										
+ab	FIELD	abxaxab	x	-1	0										
+ab	FIELD	abxaxab	x	-1	1										
+abxa	FIELD	abxaxab	x	-1	2										
+ab	FIELD	abxaxab	x	0	-1										
+ab	FIELD	abxaxab	x	0	0										
+ab	FIELD	abxaxab	x	0	1										
+abxa	FIELD	abxaxab	x	0	2										
+ab	FIELD	abxaxab	x	1	-1										
+ab	FIELD	abxaxab	x	1	0										
+ab	FIELD	abxaxab	x	1	1										
+abxa	FIELD	abxaxab	x	1	2										
+a	FIELD	abxaxab	x	2	-1										
+a	FIELD	abxaxab	x	2	0										
+a	FIELD	abxaxab	x	2	1										
+axab	FIELD	abxaxab	x	2	2										
+	FIELD	abxaxab		-1	-1										
+	FIELD	abxaxab		-1	0										
+	FIELD	abxaxab		-1	1										
+	FIELD	abxaxab		-1	2										
+	FIELD	abxaxab		0	-1										
+	FIELD	abxaxab		0	0										
+	FIELD	abxaxab		0	1										
+	FIELD	abxaxab		0	2										
+	FIELD	abxaxab		1	-1										
+	FIELD	abxaxab		1	0										
+	FIELD	abxaxab		1	1										
+	FIELD	abxaxab		1	2										
+	FIELD	abxaxab		2	-1										
+	FIELD	abxaxab		2	0										
+	FIELD	abxaxab		2	1										
+	FIELD	abxaxab		2	2										
+ab	FIELD	abxaxabxa	x	-1	-1										
+ab	FIELD	abxaxabxa	x	-1	0										
+ab	FIELD	abxaxabxa	x	-1	1										
+abxa	FIELD	abxaxabxa	x	-1	2										
+ab	FIELD	abxaxabxa	x	0	-1										
+ab	FIELD	abxaxabxa	x	0	0										
+ab	FIELD	abxaxabxa	x	0	1										
+abxa	FIELD	abxaxabxa	x	0	2										
+ab	FIELD	abxaxabxa	x	1	-1										
+ab	FIELD	abxaxabxa	x	1	0										
+ab	FIELD	abxaxabxa	x	1	1										
+abxa	FIELD	abxaxabxa	x	1	2										
+a	FIELD	abxaxabxa	x	2	-1										
+a	FIELD	abxaxabxa	x	2	0										
+a	FIELD	abxaxabxa	x	2	1										
+axab	FIELD	abxaxabxa	x	2	2										
+	FIELD	abxaxabxa		-1	-1										
+	FIELD	abxaxabxa		-1	0										
+	FIELD	abxaxabxa		-1	1										
+	FIELD	abxaxabxa		-1	2										
+	FIELD	abxaxabxa		0	-1										
+	FIELD	abxaxabxa		0	0										
+	FIELD	abxaxabxa		0	1										
+	FIELD	abxaxabxa		0	2										
+	FIELD	abxaxabxa		1	-1										
+	FIELD	abxaxabxa		1	0										
+	FIELD	abxaxabxa		1	1										
+	FIELD	abxaxabxa		1	2										
+	FIELD	abxaxabxa		2	-1										
+	FIELD	abxaxabxa		2	0										
+	FIELD	abxaxabxa		2	1										
+	FIELD	abxaxabxa		2	2										
+ab	FIELD	abxaxabxab	x	-1	-1										
+ab	FIELD	abxaxabxab	x	-1	0										
+ab	FIELD	abxaxabxab	x	-1	1										
+abxa	FIELD	abxaxabxab	x	-1	2										
+ab	FIELD	abxaxabxab	x	0	-1										
+ab	FIELD	abxaxabxab	x	0	0										
+ab	FIELD	abxaxabxab	x	0	1										
+abxa	FIELD	abxaxabxab	x	0	2										
+ab	FIELD	abxaxabxab	x	1	-1										
+ab	FIELD	abxaxabxab	x	1	0										
+ab	FIELD	abxaxabxab	x	1	1										
+abxa	FIELD	abxaxabxab	x	1	2										
+a	FIELD	abxaxabxab	x	2	-1										
+a	FIELD	abxaxabxab	x	2	0										
+a	FIELD	abxaxabxab	x	2	1										
+axab	FIELD	abxaxabxab	x	2	2										
+	FIELD	abxaxabxab		-1	-1										
+	FIELD	abxaxabxab		-1	0										
+	FIELD	abxaxabxab		-1	1										
+	FIELD	abxaxabxab		-1	2										
+	FIELD	abxaxabxab		0	-1										
+	FIELD	abxaxabxab		0	0										
+	FIELD	abxaxabxab		0	1										
+	FIELD	abxaxabxab		0	2										
+	FIELD	abxaxabxab		1	-1										
+	FIELD	abxaxabxab		1	0										
+	FIELD	abxaxabxab		1	1										
+	FIELD	abxaxabxab		1	2										
+	FIELD	abxaxabxab		2	-1										
+	FIELD	abxaxabxab		2	0										
+	FIELD	abxaxabxab		2	1										
+	FIELD	abxaxabxab		2	2										
+ab	FIELD	abxab	x	-1	-1										
+ab	FIELD	abxab	x	-1	0										
+ab	FIELD	abxab	x	-1	1										
+abxab	FIELD	abxab	x	-1	2										
+ab	FIELD	abxab	x	0	-1										
+ab	FIELD	abxab	x	0	0										
+ab	FIELD	abxab	x	0	1										
+abxab	FIELD	abxab	x	0	2										
+ab	FIELD	abxab	x	1	-1										
+ab	FIELD	abxab	x	1	0										
+ab	FIELD	abxab	x	1	1										
+abxab	FIELD	abxab	x	1	2										
+ab	FIELD	abxab	x	2	-1										
+ab	FIELD	abxab	x	2	0										
+ab	FIELD	abxab	x	2	1										
+ab	FIELD	abxab	x	2	2										
+	FIELD	abxab		-1	-1										
+	FIELD	abxab		-1	0										
+	FIELD	abxab		-1	1										
+	FIELD	abxab		-1	2										
+	FIELD	abxab		0	-1										
+	FIELD	abxab		0	0										
+	FIELD	abxab		0	1										
+	FIELD	abxab		0	2										
+	FIELD	abxab		1	-1										
+	FIELD	abxab		1	0										
+	FIELD	abxab		1	1										
+	FIELD	abxab		1	2										
+	FIELD	abxab		2	-1										
+	FIELD	abxab		2	0										
+	FIELD	abxab		2	1										
+	FIELD	abxab		2	2										
+ab	FIELD	abxabxxa	x	-1	-1										
+ab	FIELD	abxabxxa	x	-1	0										
+ab	FIELD	abxabxxa	x	-1	1										
+abxab	FIELD	abxabxxa	x	-1	2										
+ab	FIELD	abxabxxa	x	0	-1										
+ab	FIELD	abxabxxa	x	0	0										
+ab	FIELD	abxabxxa	x	0	1										
+abxab	FIELD	abxabxxa	x	0	2										
+ab	FIELD	abxabxxa	x	1	-1										
+ab	FIELD	abxabxxa	x	1	0										
+ab	FIELD	abxabxxa	x	1	1										
+abxab	FIELD	abxabxxa	x	1	2										
+ab	FIELD	abxabxxa	x	2	-1										
+ab	FIELD	abxabxxa	x	2	0										
+ab	FIELD	abxabxxa	x	2	1										
+abx	FIELD	abxabxxa	x	2	2										
+	FIELD	abxabxxa		-1	-1										
+	FIELD	abxabxxa		-1	0										
+	FIELD	abxabxxa		-1	1										
+	FIELD	abxabxxa		-1	2										
+	FIELD	abxabxxa		0	-1										
+	FIELD	abxabxxa		0	0										
+	FIELD	abxabxxa		0	1										
+	FIELD	abxabxxa		0	2										
+	FIELD	abxabxxa		1	-1										
+	FIELD	abxabxxa		1	0										
+	FIELD	abxabxxa		1	1										
+	FIELD	abxabxxa		1	2										
+	FIELD	abxabxxa		2	-1										
+	FIELD	abxabxxa		2	0										
+	FIELD	abxabxxa		2	1										
+	FIELD	abxabxxa		2	2										
+ab	FIELD	abxabxxab	x	-1	-1										
+ab	FIELD	abxabxxab	x	-1	0										
+ab	FIELD	abxabxxab	x	-1	1										
+abxab	FIELD	abxabxxab	x	-1	2										
+ab	FIELD	abxabxxab	x	0	-1										
+ab	FIELD	abxabxxab	x	0	0										
+ab	FIELD	abxabxxab	x	0	1										
+abxab	FIELD	abxabxxab	x	0	2										
+ab	FIELD	abxabxxab	x	1	-1										
+ab	FIELD	abxabxxab	x	1	0										
+ab	FIELD	abxabxxab	x	1	1										
+abxab	FIELD	abxabxxab	x	1	2										
+ab	FIELD	abxabxxab	x	2	-1										
+ab	FIELD	abxabxxab	x	2	0										
+ab	FIELD	abxabxxab	x	2	1										
+abx	FIELD	abxabxxab	x	2	2										
+	FIELD	abxabxxab		-1	-1										
+	FIELD	abxabxxab		-1	0										
+	FIELD	abxabxxab		-1	1										
+	FIELD	abxabxxab		-1	2										
+	FIELD	abxabxxab		0	-1										
+	FIELD	abxabxxab		0	0										
+	FIELD	abxabxxab		0	1										
+	FIELD	abxabxxab		0	2										
+	FIELD	abxabxxab		1	-1										
+	FIELD	abxabxxab		1	0										
+	FIELD	abxabxxab		1	1										
+	FIELD	abxabxxab		1	2										
+	FIELD	abxabxxab		2	-1										
+	FIELD	abxabxxab		2	0										
+	FIELD	abxabxxab		2	1										
+	FIELD	abxabxxab		2	2										
+ab	FIELD	abxabxa	x	-1	-1										
+ab	FIELD	abxabxa	x	-1	0										
+ab	FIELD	abxabxa	x	-1	1										
+abxab	FIELD	abxabxa	x	-1	2										
+ab	FIELD	abxabxa	x	0	-1										
+ab	FIELD	abxabxa	x	0	0										
+ab	FIELD	abxabxa	x	0	1										
+abxab	FIELD	abxabxa	x	0	2										
+ab	FIELD	abxabxa	x	1	-1										
+ab	FIELD	abxabxa	x	1	0										
+ab	FIELD	abxabxa	x	1	1										
+abxab	FIELD	abxabxa	x	1	2										
+ab	FIELD	abxabxa	x	2	-1										
+ab	FIELD	abxabxa	x	2	0										
+ab	FIELD	abxabxa	x	2	1										
+abxa	FIELD	abxabxa	x	2	2										
+	FIELD	abxabxa		-1	-1										
+	FIELD	abxabxa		-1	0										
+	FIELD	abxabxa		-1	1										
+	FIELD	abxabxa		-1	2										
+	FIELD	abxabxa		0	-1										
+	FIELD	abxabxa		0	0										
+	FIELD	abxabxa		0	1										
+	FIELD	abxabxa		0	2										
+	FIELD	abxabxa		1	-1										
+	FIELD	abxabxa		1	0										
+	FIELD	abxabxa		1	1										
+	FIELD	abxabxa		1	2										
+	FIELD	abxabxa		2	-1										
+	FIELD	abxabxa		2	0										
+	FIELD	abxabxa		2	1										
+	FIELD	abxabxa		2	2										
+ab	FIELD	abxabxaxa	x	-1	-1										
+ab	FIELD	abxabxaxa	x	-1	0										
+ab	FIELD	abxabxaxa	x	-1	1										
+abxab	FIELD	abxabxaxa	x	-1	2										
+ab	FIELD	abxabxaxa	x	0	-1										
+ab	FIELD	abxabxaxa	x	0	0										
+ab	FIELD	abxabxaxa	x	0	1										
+abxab	FIELD	abxabxaxa	x	0	2										
+ab	FIELD	abxabxaxa	x	1	-1										
+ab	FIELD	abxabxaxa	x	1	0										
+ab	FIELD	abxabxaxa	x	1	1										
+abxab	FIELD	abxabxaxa	x	1	2										
+ab	FIELD	abxabxaxa	x	2	-1										
+ab	FIELD	abxabxaxa	x	2	0										
+ab	FIELD	abxabxaxa	x	2	1										
+abxa	FIELD	abxabxaxa	x	2	2										
+	FIELD	abxabxaxa		-1	-1										
+	FIELD	abxabxaxa		-1	0										
+	FIELD	abxabxaxa		-1	1										
+	FIELD	abxabxaxa		-1	2										
+	FIELD	abxabxaxa		0	-1										
+	FIELD	abxabxaxa		0	0										
+	FIELD	abxabxaxa		0	1										
+	FIELD	abxabxaxa		0	2										
+	FIELD	abxabxaxa		1	-1										
+	FIELD	abxabxaxa		1	0										
+	FIELD	abxabxaxa		1	1										
+	FIELD	abxabxaxa		1	2										
+	FIELD	abxabxaxa		2	-1										
+	FIELD	abxabxaxa		2	0										
+	FIELD	abxabxaxa		2	1										
+	FIELD	abxabxaxa		2	2										
+ab	FIELD	abxabxaxab	x	-1	-1										
+ab	FIELD	abxabxaxab	x	-1	0										
+ab	FIELD	abxabxaxab	x	-1	1										
+abxab	FIELD	abxabxaxab	x	-1	2										
+ab	FIELD	abxabxaxab	x	0	-1										
+ab	FIELD	abxabxaxab	x	0	0										
+ab	FIELD	abxabxaxab	x	0	1										
+abxab	FIELD	abxabxaxab	x	0	2										
+ab	FIELD	abxabxaxab	x	1	-1										
+ab	FIELD	abxabxaxab	x	1	0										
+ab	FIELD	abxabxaxab	x	1	1										
+abxab	FIELD	abxabxaxab	x	1	2										
+ab	FIELD	abxabxaxab	x	2	-1										
+ab	FIELD	abxabxaxab	x	2	0										
+ab	FIELD	abxabxaxab	x	2	1										
+abxa	FIELD	abxabxaxab	x	2	2										
+	FIELD	abxabxaxab		-1	-1										
+	FIELD	abxabxaxab		-1	0										
+	FIELD	abxabxaxab		-1	1										
+	FIELD	abxabxaxab		-1	2										
+	FIELD	abxabxaxab		0	-1										
+	FIELD	abxabxaxab		0	0										
+	FIELD	abxabxaxab		0	1										
+	FIELD	abxabxaxab		0	2										
+	FIELD	abxabxaxab		1	-1										
+	FIELD	abxabxaxab		1	0										
+	FIELD	abxabxaxab		1	1										
+	FIELD	abxabxaxab		1	2										
+	FIELD	abxabxaxab		2	-1										
+	FIELD	abxabxaxab		2	0										
+	FIELD	abxabxaxab		2	1										
+	FIELD	abxabxaxab		2	2										
+ab	FIELD	abxabxab	x	-1	-1										
+ab	FIELD	abxabxab	x	-1	0										
+ab	FIELD	abxabxab	x	-1	1										
+abxab	FIELD	abxabxab	x	-1	2										
+ab	FIELD	abxabxab	x	0	-1										
+ab	FIELD	abxabxab	x	0	0										
+ab	FIELD	abxabxab	x	0	1										
+abxab	FIELD	abxabxab	x	0	2										
+ab	FIELD	abxabxab	x	1	-1										
+ab	FIELD	abxabxab	x	1	0										
+ab	FIELD	abxabxab	x	1	1										
+abxab	FIELD	abxabxab	x	1	2										
+ab	FIELD	abxabxab	x	2	-1										
+ab	FIELD	abxabxab	x	2	0										
+ab	FIELD	abxabxab	x	2	1										
+abxab	FIELD	abxabxab	x	2	2										
+	FIELD	abxabxab		-1	-1										
+	FIELD	abxabxab		-1	0										
+	FIELD	abxabxab		-1	1										
+	FIELD	abxabxab		-1	2										
+	FIELD	abxabxab		0	-1										
+	FIELD	abxabxab		0	0										
+	FIELD	abxabxab		0	1										
+	FIELD	abxabxab		0	2										
+	FIELD	abxabxab		1	-1										
+	FIELD	abxabxab		1	0										
+	FIELD	abxabxab		1	1										
+	FIELD	abxabxab		1	2										
+	FIELD	abxabxab		2	-1										
+	FIELD	abxabxab		2	0										
+	FIELD	abxabxab		2	1										
+	FIELD	abxabxab		2	2										
+ab	FIELD	abxabxabxa	x	-1	-1										
+ab	FIELD	abxabxabxa	x	-1	0										
+ab	FIELD	abxabxabxa	x	-1	1										
+abxab	FIELD	abxabxabxa	x	-1	2										
+ab	FIELD	abxabxabxa	x	0	-1										
+ab	FIELD	abxabxabxa	x	0	0										
+ab	FIELD	abxabxabxa	x	0	1										
+abxab	FIELD	abxabxabxa	x	0	2										
+ab	FIELD	abxabxabxa	x	1	-1										
+ab	FIELD	abxabxabxa	x	1	0										
+ab	FIELD	abxabxabxa	x	1	1										
+abxab	FIELD	abxabxabxa	x	1	2										
+ab	FIELD	abxabxabxa	x	2	-1										
+ab	FIELD	abxabxabxa	x	2	0										
+ab	FIELD	abxabxabxa	x	2	1										
+abxab	FIELD	abxabxabxa	x	2	2										
+	FIELD	abxabxabxa		-1	-1										
+	FIELD	abxabxabxa		-1	0										
+	FIELD	abxabxabxa		-1	1										
+	FIELD	abxabxabxa		-1	2										
+	FIELD	abxabxabxa		0	-1										
+	FIELD	abxabxabxa		0	0										
+	FIELD	abxabxabxa		0	1										
+	FIELD	abxabxabxa		0	2										
+	FIELD	abxabxabxa		1	-1										
+	FIELD	abxabxabxa		1	0										
+	FIELD	abxabxabxa		1	1										
+	FIELD	abxabxabxa		1	2										
+	FIELD	abxabxabxa		2	-1										
+	FIELD	abxabxabxa		2	0										
+	FIELD	abxabxabxa		2	1										
+	FIELD	abxabxabxa		2	2										
+ab	FIELD	abxabxabxab	x	-1	-1										
+ab	FIELD	abxabxabxab	x	-1	0										
+ab	FIELD	abxabxabxab	x	-1	1										
+abxab	FIELD	abxabxabxab	x	-1	2										
+ab	FIELD	abxabxabxab	x	0	-1										
+ab	FIELD	abxabxabxab	x	0	0										
+ab	FIELD	abxabxabxab	x	0	1										
+abxab	FIELD	abxabxabxab	x	0	2										
+ab	FIELD	abxabxabxab	x	1	-1										
+ab	FIELD	abxabxabxab	x	1	0										
+ab	FIELD	abxabxabxab	x	1	1										
+abxab	FIELD	abxabxabxab	x	1	2										
+ab	FIELD	abxabxabxab	x	2	-1										
+ab	FIELD	abxabxabxab	x	2	0										
+ab	FIELD	abxabxabxab	x	2	1										
+abxab	FIELD	abxabxabxab	x	2	2										
+	FIELD	abxabxabxab		-1	-1										
+	FIELD	abxabxabxab		-1	0										
+	FIELD	abxabxabxab		-1	1										
+	FIELD	abxabxabxab		-1	2										
+	FIELD	abxabxabxab		0	-1										
+	FIELD	abxabxabxab		0	0										
+	FIELD	abxabxabxab		0	1										
+	FIELD	abxabxabxab		0	2										
+	FIELD	abxabxabxab		1	-1										
+	FIELD	abxabxabxab		1	0										
+	FIELD	abxabxabxab		1	1										
+	FIELD	abxabxabxab		1	2										
+	FIELD	abxabxabxab		2	-1										
+	FIELD	abxabxabxab		2	0										
+	FIELD	abxabxabxab		2	1										
+	FIELD	abxabxabxab		2	2										
+	FIELD	abxabxabxab		-1	-1										
+	FIELD	abxabxabxab		-1	0										
+	FIELD	abxabxabxab		-1	1										
+	FIELD	abxabxabxab		-1	2										
+	FIELD	abxabxabxab		0	-1										
+	FIELD	abxabxabxab		0	0										
+	FIELD	abxabxabxab		0	1										
+	FIELD	abxabxabxab		0	2										
+	FIELD	abxabxabxab		1	-1										
+	FIELD	abxabxabxab		1	0										
+	FIELD	abxabxabxab		1	1										
+	FIELD	abxabxabxab		1	2										
+	FIELD	abxabxabxab		2	-1										
+	FIELD	abxabxabxab		2	0										
+	FIELD	abxabxabxab		2	1										
+	FIELD	abxabxabxab		2	2										

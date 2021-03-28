@@ -1,0 +1,196 @@
+	SUBSTR		-3	-3										
+	SUBSTR		-3	-2										
+	SUBSTR		-3	-1										
+	SUBSTR		-3	0										
+	SUBSTR		-3	1										
+	SUBSTR		-3	2										
+	SUBSTR		-3	3										
+	SUBSTR		-2	-3										
+	SUBSTR		-2	-2										
+	SUBSTR		-2	-1										
+	SUBSTR		-2	0										
+	SUBSTR		-2	1										
+	SUBSTR		-2	2										
+	SUBSTR		-2	3										
+	SUBSTR		-1	-3										
+	SUBSTR		-1	-2										
+	SUBSTR		-1	-1										
+	SUBSTR		-1	0										
+	SUBSTR		-1	1										
+	SUBSTR		-1	2										
+	SUBSTR		-1	3										
+	SUBSTR		0	-3										
+	SUBSTR		0	-2										
+	SUBSTR		0	-1										
+	SUBSTR		0	0										
+	SUBSTR		0	1										
+	SUBSTR		0	2										
+	SUBSTR		0	3										
+	SUBSTR		1	-3										
+	SUBSTR		1	-2										
+	SUBSTR		1	-1										
+	SUBSTR		1	0										
+	SUBSTR		1	1										
+	SUBSTR		1	2										
+	SUBSTR		1	3										
+	SUBSTR		2	-3										
+	SUBSTR		2	-2										
+	SUBSTR		2	-1										
+	SUBSTR		2	0										
+	SUBSTR		2	1										
+	SUBSTR		2	2										
+	SUBSTR		2	3										
+	SUBSTR		3	-3										
+	SUBSTR		3	-2										
+	SUBSTR		3	-1										
+	SUBSTR		3	0										
+	SUBSTR		3	1										
+	SUBSTR		3	2										
+	SUBSTR		3	3										
+	SUBSTR	a	-3	-3										
+	SUBSTR	a	-3	-2										
+	SUBSTR	a	-3	-1										
+	SUBSTR	a	-3	0										
+a	SUBSTR	a	-3	1										
+a	SUBSTR	a	-3	2										
+a	SUBSTR	a	-3	3										
+	SUBSTR	a	-2	-3										
+	SUBSTR	a	-2	-2										
+	SUBSTR	a	-2	-1										
+	SUBSTR	a	-2	0										
+a	SUBSTR	a	-2	1										
+a	SUBSTR	a	-2	2										
+a	SUBSTR	a	-2	3										
+a	SUBSTR	a	-1	-3										
+a	SUBSTR	a	-1	-2										
+a	SUBSTR	a	-1	-1										
+	SUBSTR	a	-1	0										
+a	SUBSTR	a	-1	1										
+a	SUBSTR	a	-1	2										
+a	SUBSTR	a	-1	3										
+	SUBSTR	a	0	-3										
+	SUBSTR	a	0	-2										
+	SUBSTR	a	0	-1										
+	SUBSTR	a	0	0										
+a	SUBSTR	a	0	1										
+a	SUBSTR	a	0	2										
+a	SUBSTR	a	0	3										
+a	SUBSTR	a	1	-3										
+a	SUBSTR	a	1	-2										
+a	SUBSTR	a	1	-1										
+	SUBSTR	a	1	0										
+a	SUBSTR	a	1	1										
+a	SUBSTR	a	1	2										
+a	SUBSTR	a	1	3										
+a	SUBSTR	a	2	-3										
+a	SUBSTR	a	2	-2										
+a	SUBSTR	a	2	-1										
+	SUBSTR	a	2	0										
+	SUBSTR	a	2	1										
+	SUBSTR	a	2	2										
+	SUBSTR	a	2	3										
+a	SUBSTR	a	3	-3										
+a	SUBSTR	a	3	-2										
+a	SUBSTR	a	3	-1										
+	SUBSTR	a	3	0										
+	SUBSTR	a	3	1										
+	SUBSTR	a	3	2										
+	SUBSTR	a	3	3										
+	SUBSTR	ab	-3	-3										
+	SUBSTR	ab	-3	-2										
+	SUBSTR	ab	-3	-1										
+	SUBSTR	ab	-3	0										
+a	SUBSTR	ab	-3	1										
+ab	SUBSTR	ab	-3	2										
+ab	SUBSTR	ab	-3	3										
+a	SUBSTR	ab	-2	-3										
+a	SUBSTR	ab	-2	-2										
+a	SUBSTR	ab	-2	-1										
+	SUBSTR	ab	-2	0										
+a	SUBSTR	ab	-2	1										
+ab	SUBSTR	ab	-2	2										
+ab	SUBSTR	ab	-2	3										
+ba	SUBSTR	ab	-1	-3										
+ba	SUBSTR	ab	-1	-2										
+b	SUBSTR	ab	-1	-1										
+	SUBSTR	ab	-1	0										
+b	SUBSTR	ab	-1	1										
+b	SUBSTR	ab	-1	2										
+b	SUBSTR	ab	-1	3										
+	SUBSTR	ab	0	-3										
+	SUBSTR	ab	0	-2										
+	SUBSTR	ab	0	-1										
+	SUBSTR	ab	0	0										
+a	SUBSTR	ab	0	1										
+ab	SUBSTR	ab	0	2										
+ab	SUBSTR	ab	0	3										
+a	SUBSTR	ab	1	-3										
+a	SUBSTR	ab	1	-2										
+a	SUBSTR	ab	1	-1										
+	SUBSTR	ab	1	0										
+a	SUBSTR	ab	1	1										
+ab	SUBSTR	ab	1	2										
+ab	SUBSTR	ab	1	3										
+ba	SUBSTR	ab	2	-3										
+ba	SUBSTR	ab	2	-2										
+b	SUBSTR	ab	2	-1										
+	SUBSTR	ab	2	0										
+b	SUBSTR	ab	2	1										
+b	SUBSTR	ab	2	2										
+b	SUBSTR	ab	2	3										
+ba	SUBSTR	ab	3	-3										
+ba	SUBSTR	ab	3	-2										
+b	SUBSTR	ab	3	-1										
+	SUBSTR	ab	3	0										
+	SUBSTR	ab	3	1										
+	SUBSTR	ab	3	2										
+	SUBSTR	ab	3	3										
+a	SUBSTR	abc	-3	-3										
+a	SUBSTR	abc	-3	-2										
+a	SUBSTR	abc	-3	-1										
+	SUBSTR	abc	-3	0										
+a	SUBSTR	abc	-3	1										
+ab	SUBSTR	abc	-3	2										
+abc	SUBSTR	abc	-3	3										
+ba	SUBSTR	abc	-2	-3										
+ba	SUBSTR	abc	-2	-2										
+b	SUBSTR	abc	-2	-1										
+	SUBSTR	abc	-2	0										
+b	SUBSTR	abc	-2	1										
+bc	SUBSTR	abc	-2	2										
+bc	SUBSTR	abc	-2	3										
+cba	SUBSTR	abc	-1	-3										
+cb	SUBSTR	abc	-1	-2										
+c	SUBSTR	abc	-1	-1										
+	SUBSTR	abc	-1	0										
+c	SUBSTR	abc	-1	1										
+c	SUBSTR	abc	-1	2										
+c	SUBSTR	abc	-1	3										
+	SUBSTR	abc	0	-3										
+	SUBSTR	abc	0	-2										
+	SUBSTR	abc	0	-1										
+	SUBSTR	abc	0	0										
+a	SUBSTR	abc	0	1										
+ab	SUBSTR	abc	0	2										
+abc	SUBSTR	abc	0	3										
+a	SUBSTR	abc	1	-3										
+a	SUBSTR	abc	1	-2										
+a	SUBSTR	abc	1	-1										
+	SUBSTR	abc	1	0										
+a	SUBSTR	abc	1	1										
+ab	SUBSTR	abc	1	2										
+abc	SUBSTR	abc	1	3										
+ba	SUBSTR	abc	2	-3										
+ba	SUBSTR	abc	2	-2										
+b	SUBSTR	abc	2	-1										
+	SUBSTR	abc	2	0										
+b	SUBSTR	abc	2	1										
+bc	SUBSTR	abc	2	2										
+bc	SUBSTR	abc	2	3										
+cba	SUBSTR	abc	3	-3										
+cb	SUBSTR	abc	3	-2										
+c	SUBSTR	abc	3	-1										
+	SUBSTR	abc	3	0										
+c	SUBSTR	abc	3	1										
+c	SUBSTR	abc	3	2										
+c	SUBSTR	abc	3	3										

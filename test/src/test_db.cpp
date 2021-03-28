@@ -497,8 +497,8 @@ dict(AGE_IN_YEARS) {
 	assert(ads.createindex("BRAND_CODE"));
 	assert(ads.deleteindex("BRAND_CODE"));
 	//procedural
-	assert(createindex("ADS BRAND_CODE"));
-	assert(deleteindex("ADS BRAND_CODE"));
+	assert(createindex("MY_ADS BRAND_CODE"));
+	assert(deleteindex("MY_ADS BRAND_CODE"));
 
 //	var("").select("MARKETS","WITH CURRENCY_NAME = '' AND WITH AUTHORISED");
 //	var("").select("MARKETS","WITH AUTHORISED");

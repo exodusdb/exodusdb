@@ -93,7 +93,7 @@ var var::iconv(const char* convstr) const {
 			return output;
 			break;
 
-		// MD, MC, MT, MX
+		// "MD", "MC", "MT", "MX"
 		case 'M':
 
 			// point to 2nd character
@@ -116,7 +116,7 @@ var var::iconv(const char* convstr) const {
 					// check second character
 					switch (*conversionchar) {
 
-						// MD MC - Decimal places
+						// "MD" "MC" - Decimal places
 						case 'D':
 						case 'C':
 
@@ -126,18 +126,18 @@ var var::iconv(const char* convstr) const {
 							//^= part.iconv_MD(convstr);
 							break;
 
-						// MT
+						// "MT"
 						case 'T':
 							// output ^= part.iconv_MT(convstr);
 							output ^= part.iconv_MT();
 							break;
 
-						// MR - replace iconv is same as oconv!
+						// "MR" - replace iconv is same as oconv!
 						case 'R':
 							output ^= part.oconv_MR(conversionchar);
 							break;
 
-						// MX number to hex (not string to hex)
+						// "MX" number to hex (not string to hex)
 						case 'X':
 							throw MVNotImplemented("iconv('MX')");
 							// std::ostringstream ss;
@@ -647,7 +647,7 @@ var var::oconv(const char* conversion) const {
 		// D
 		case 'D':
 
-			do {
+			while (true) {
 
 				// very similar subfield remove code for most conversions except TLR which
 				// always format "" and [] part=remove(charn, terminator);
@@ -663,12 +663,12 @@ var var::oconv(const char* conversion) const {
 				if (!terminator)
 					break;
 				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
-			} while (true);
+			};
 
 			return output;
 			break;
 
-		// MD, MC, MT, MX, ML, MR
+		// "MD", "MC", "MT", "MX", "ML", "MR"
 		case 'M':
 
 			// point to 2nd character
@@ -693,7 +693,7 @@ var var::oconv(const char* conversion) const {
 						output ^= part.oconv_MR(++conversionchar);
 				}
 
-				// non-numeric are left unconverted for MD/MT/MX
+				// non-numeric are left unconverted for "MD", "MT", "MX"
 				else if (!part.isnum())
 					output ^= part;
 
@@ -709,11 +709,11 @@ var var::oconv(const char* conversion) const {
 							output ^= part.oconv_MD(conversion);
 							break;
 
-						// MT - time
+						// "MT" - time
 						case 'T':
-							// point to the remainder of the conversion after the MT
+							// point to the remainder of the conversion after the "MT"
 							if (notemptystring) {
-								output ^= part.oconv_MT(++conversionchar);
+								output ^= part.oconv_MT(conversionchar+1);
 							}
 
 							break;
@@ -721,9 +721,19 @@ var var::oconv(const char* conversion) const {
 						// MX - number to hex (not string to hex)
 						case 'X':
 							if (notemptystring) {
+
+								//convert decimal to long
+								if (!(part.var_typ & VARTYP_INT)) {
+									part=part.round();//actually to mvint_t i.e. long long int
+									part.toLong();
+								}
+
+								//convert to hex
 								std::ostringstream ss;
 								ss << std::hex << std::uppercase
-								   << part.round().toInt();
+								//   << part.round().toInt();
+								   << part.var_int;
+
 								output ^= ss.str();
 							}
 

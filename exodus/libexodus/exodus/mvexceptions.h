@@ -111,13 +111,13 @@ THE SOFTWARE.
 		this->createString();                                  \
 	};
 
-//NB always try to convert strings to doubles first
+//NB always try to convert strings to doubles first. in isnum()
 #define THISISNUMERIC()                                       \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname)                  \
 			^ " : var is " ^ this->substr(1, 20).quote());
 
-//NB always try to convert strings to doubles first
+//NB always try to convert strings to doubles first. in isnum()
 #define THISISDECIMAL()                                       \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
@@ -127,7 +127,7 @@ THE SOFTWARE.
 		var_typ |= VARTYP_DBL;                                \
 	}
 
-//NB always try to convert strings to doubles first
+//NB always try to convert strings to doubles first. in isnum()
 #define THISISINTEGER()                                       \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
