@@ -132,6 +132,13 @@ using mvint_t = long long;
 
 #define ND [[nodiscard]]
 
+//#define VISIBLE_FMS "_]\[Z"  //PickOS standard
+//#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
+//#define VISIBLE_FMS "_^]}`~"   //all uncommon in data. _ ^ ] are identical to PickOS/AREV
+#define VISIBLE_FMS "_^]}|~"   //all uncommon in data. _ ^ ] are identical to PickOS/AREV
+#define TRACE(EXPRESSION) \
+    var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
+
 namespace exodus {
 
 //#define SMALLEST_NUMBER 1e-13
