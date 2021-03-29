@@ -66,9 +66,7 @@ function main() {
 	//NB @VOLUMES blank on C++ and used to run slightly differently on C++
 	//eg function called is generalalerts instead of general.alerts
 
-	//$insert gbp,arev.common2
 	#include <general_common.h>
-	//$INSERT ABP,COMMON
 	//global tt,tt2,s33,lastlog
 
 	//!WARNING decide() returns REPLY number instead of VALUE when not interactive
@@ -388,7 +386,7 @@ updateversion:
 	//NB EXODUS memory is tested in LOGON.OLD
 	//http://www.columbia.edu/~em36/wpdos/emsxp.html
 
-	//AREV startup options
+	//startup options
 	//http://www.revelation.com/knowledge.nsf/461ff2bd5a8ddeed852566f50065057d/3c57c588ce21daf9852563920051f70b?OpenDocument
 	//AREV adagency,exodus /X /M4096
 	///X tells the system to use EMS memory for variable storage.
@@ -1396,6 +1394,7 @@ getproxy:
 	//call checkfile"!INDEXING");
 	//call checkfile"LOCKS");
 	//call checkfile"PROCESSES");
+	//call checkfile"STATISTICS");
 
 	call log2("*check/fix !xxx records in !xxx files", logtime);
 	//call fixindexes);
@@ -1794,7 +1793,7 @@ nextdoc:
 			perform("SETFILE REVBOOT SYSPROG,SALADS SYSOBJ SYSOBJ (S)");
 			perform("NCOPY GBP $MSG $RTP25 (SON) TO: (SYSOBJ)");
 
-			//make arev dos screen run at full speed-must have been done everywhere now
+			//make dos screen run at full speed-must have been done everywhere now
 			//call log2('*fixvideo',logtime)
 			//call fixvideo
 

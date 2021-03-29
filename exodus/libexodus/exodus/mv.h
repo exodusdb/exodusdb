@@ -134,8 +134,8 @@ using mvint_t = long long;
 
 //#define VISIBLE_FMS "_]\[Z"  //PickOS standard
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
-//#define VISIBLE_FMS "_^]}`~"   //all uncommon in data. _ ^ ] are identical to PickOS/AREV
-#define VISIBLE_FMS "_^]}|~"   //all uncommon in data. _ ^ ] are identical to PickOS/AREV
+//#define VISIBLE_FMS "_^]}`~"   //all uncommon in data. _ ^ ] are identical to pickos
+#define VISIBLE_FMS "_^]}|~"   //all uncommon in data. _ ^ ] are identical to pickos
 #define TRACE(EXPRESSION) \
     var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
 
@@ -144,8 +144,8 @@ namespace exodus {
 //#define SMALLEST_NUMBER 1e-13
 //0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
 //#define SMALLEST_NUMBER 1e-10
-//#define SMALLEST_NUMBER 1e-4d//0.0001 for pick/arev compatibility
-constexpr double SMALLEST_NUMBER = 1e-4d;  //0.0001 for pick/arev compatibility
+//#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
+constexpr double SMALLEST_NUMBER = 1e-4d;  //0.0001 for pickos compatibility
 
 // the var versions of the above (without leading or trailing _)
 // are defined AFTER the class declaration of "var"
@@ -1320,8 +1320,8 @@ class DLL_PUBLIC var final {
 	/////////////////////////////
 
 	// this function hardly occurs anywhere in exodus code and should probably be renamed to
-	// something better it was called replace() in pick/arev but we are now using "replace()" to
-	// change substrings using regex (similar to the old pick swap function) its mutator function
+	// something better it was called replace() in pickos but we are now using "replace()" to
+	// change substrings using regex (similar to the old pickos swap function) its mutator function
 	// is .r()
 	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, const var& replacement) const;
 	ND var pickreplace(const int fieldno, const int valueno, const var& replacement) const;
@@ -1332,12 +1332,12 @@ class DLL_PUBLIC var final {
 	ND var insert(const int fieldno, const int valueno, const var& insertion) const&;
 	ND var insert(const int fieldno, const var& insertion) const&;
 
-	/// remove() was delete() in pick/arev
+	/// remove() was delete() in pickos
 	// var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
 	ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
 
 	//.a(...) stands for .attribute(...) or extract(...)
-	// pick/revelation
+	// pickos
 	// xxx=yyy<10>";
 	// becomes c++
 	// xxx=yyy.a(10);
@@ -1368,7 +1368,7 @@ class DLL_PUBLIC var final {
 
 	// mutable versions update and return source
 	// r stands for "replacer" abbreviated due to high incidience in code
-	// pick/revelation
+	// pickos
 	// xyz<10>="abc";
 	// becomes c++
 	//  xyz.r(10,"abc");

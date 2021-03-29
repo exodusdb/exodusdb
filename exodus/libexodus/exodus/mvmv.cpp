@@ -228,8 +228,8 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	//	return true;
 	//}
 
-	// arev strangeness? locate even if out of order
-	// if this is the PICK standard and needs to be implemented properly it should be
+	// pickos strangeness? locate even if out of order
+	// if this is the pickos standard and needs to be implemented properly it should be
 	// implemented as continue to search to end instead of search twice like this this will
 	// probably be switched off as unnecessary and slow behaviour for EXODUS applications
 	if (order) {
@@ -295,7 +295,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 						if (comp == 0)
 							return true;
 						else
-							// arev error strangeness? empty is not greater than
+							// pickos error strangeness? empty is not greater than
 							// any target except empty
 							//						if
 							//(start_pos==end_pos) setting+=1;
@@ -358,7 +358,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 		// if (var_str.substr(start_pos,nextstart_pos-start_pos)==target)
 		// should only test for target up to next sep
-		// but arev (by accidental error?) at least checks for the whole target
+		// but pickos (by accidental error?) at least checks for the whole target
 		// even if the target contains the sep character
 		// if (var_str.substr(start_pos,nextstart_pos-start_pos)==target)
 		//(int) is to avoid warning of unsigned integer
@@ -376,7 +376,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 			// AL Ascending Left Justified
 			case '\x01':
-				//				//arev strangeness? to locate a field whereever
+				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
@@ -394,7 +394,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 			// DL Descending Left Justified
 			case '\x02':
-				//				//arev strangeness? to locate a field whereever
+				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
@@ -412,7 +412,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 			// AR Ascending Right Justified
 			case '\x03':
-				//				//arev strangeness? to locate a field whereever
+				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
@@ -442,7 +442,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 			// DR Descending Right Justified
 			case '\x04':
-				//				//arev strangeness? to locate a field whereever
+				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
 				// (!targetlen&&nextstart_pos==start_pos) break;
 
@@ -1722,7 +1722,7 @@ getnextp2:
 
 // returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
-// COL2() in arev) NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
+// COL2() in pickos) NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
 var var::substr(const int startindex1, const var& delimiterchars, int& endindex) const {
 	THISIS("var var::substr(const int startindex1, var& delimiterchars, int& endindex) const")
 	THISISSTRING()
@@ -1764,7 +1764,7 @@ var var::substr(const int startindex1, const var& delimiterchars, int& endindex)
 }
 
 ////////
-// SUBSTR2 - similar to substr(startindex,delimiterchars) was called remove() in pick/arev
+// SUBSTR2 - similar to substr(startindex,delimiterchars) was called remove() in pickos
 ////////
 
 // returns the characters up to the next delimiter
@@ -1816,7 +1816,7 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 	delimiterno = int(*_RM_) - int(this->var_str[end_pos]) + 1;
 
 	// point AFTER the found separator or TWO after the length of the string (TODO shouldnt this
-	// be one??/bug in AREV) wont work if string is the maximum string length but that cant
+	// be one??/bug in pickos) wont work if string is the maximum string length but that cant
 	// occur
 	startindex1 = int(end_pos + 2);
 

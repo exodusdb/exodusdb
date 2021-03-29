@@ -763,7 +763,7 @@ var var::oconv(const char* conversion) const {
 			return oconv_T(conversion);
 			break;
 
-		// HEX (unlike arev it converts high separator characters)
+		// HEX (unlike pickos, it converts high separator characters)
 		case 'H':
 
 			// empty string in, empty string out
@@ -826,7 +826,7 @@ var var::oconv(const char* conversion) const {
 	// TODO implement
 	throw MVNotImplemented("oconv '" ^ var(conversion).substr(1, 6) ^ "' not implemented yet ");
 
-	// unknown conversions are simply ignored in AREV
+	// unknown conversions are simply ignored in pickos
 	return *this;
 }
 

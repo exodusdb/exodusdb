@@ -739,7 +739,7 @@ DLL_PUBLIC bool createfile(const var& filename) {
 	//remove options like (S)
 	var filename2 = filename.field("(", 1).trim();
 
-	//remove arev volume locations
+	//remove pickos volume locations
 	filename2.swapper("DATA ", "").swapper("REVBOOT ", "").swapper("DATAVOL ", "").trimmer();
 
 	return filename.createfile(filename2);

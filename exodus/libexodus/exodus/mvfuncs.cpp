@@ -487,9 +487,9 @@ bool var::toBool() const {
 		if (var_typ & VARTYP_DBL)
 			//return (bool)(var_dbl != 0);
 			//return std::abs(var_dbl)>=0.00000000001;
-			//AREV print (0.00001 or 0)    ... prints 0 (bool)
-			//AREV print (0.00005=0.00006) ... prints 0 (==)
-			//AREV print (0.00005<0.00006) ... prints 1 (<)
+			//pickos print (0.00001 or 0)    ... prints 0 (bool)
+			//pickos print (0.00005=0.00006) ... prints 0 (==)
+			//pickos print (0.00005<0.00006) ... prints 1 (<)
 			return std::abs(var_dbl) >= SMALLEST_NUMBER;
 
 		if (!(var_typ)) {
@@ -1279,7 +1279,7 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
 
-	// TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
+	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
 
 	unsigned int start1b;
 	if (start1 > 0) {
@@ -1319,7 +1319,7 @@ var& var::splicer(const int start1, const var& newstr) {
 	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
 
-	// TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
+	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
 	uint start1b;
 	if (start1 > 0)
 		start1b = start1;
@@ -2400,7 +2400,7 @@ var var::exp() const {
 	throw MVError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-// WARNING/ pick/arev column and row numbering is 0 based but
+// WARNING/ pickos column and row numbering is 0 based but
 // in exodus we move to 1 based numbering to be consistent with
 // c/c++/linux/terminal standards. hopefully not too inconvenient
 

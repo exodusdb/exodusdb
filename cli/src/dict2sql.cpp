@@ -142,7 +142,7 @@ COST 10;
 	//exodus_tobool -> bool
 	do_sql("exodus_tobool(instring text)", "bool", tobool_sql, sqltemplate);
 
-	//exodus_date -> int (today's date as a number according to PICK/AREV)
+	//exodus_date -> int (today's date as a number according to pickos)
 	do_sql("exodus_date()", "int", exodus_date_sql, sqltemplate);
 
 	//exodus_extract_date_array -> date[]
@@ -766,7 +766,7 @@ BEGIN
   return FALSE;
  end if;
 
- -- note that Pick/Arev's '', is numeric unlike pgsql
+ -- note that pickos's '', is numeric unlike pgsql
  if $1='' then
   return TRUE;
  end if;
@@ -786,12 +786,12 @@ DECLARE
  tt numeric;
 BEGIN
 
- -- note that Pick/Arev's '', is numeric 0 and false unlike pgsql
+ -- note that pickos's '', is numeric 0 and false unlike pgsql
  if $1='' then
   return FALSE;
  end if;
 
- -- spaces are not numeric in PICLK/AREV therefore are true
+ -- spaces are not numeric in pickos therefore are true
  if position(' ' in $1)::bool then
   return TRUE;
  end if;

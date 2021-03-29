@@ -52,7 +52,6 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	//unless sortselect is prefixed with %RAW% then
 	//!!!needs something like the following in the calling program
 	//since it calls LISTEN3 and filename.subs('POSTREAD') to get accurate data
-	//$insert gbp,arev.common
 	//clearcommon
 
 	#include <general_common.h>

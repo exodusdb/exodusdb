@@ -353,7 +353,7 @@ function main() {
 		}
 		html = 1;
 
-		//if not arev then dont force html or force output to file
+		//if not DOS then dont force html or force output to file
 	} else {
 		html = SYSTEM.a(2).lcase().substr(-3, 3) eq "htm";
 	}

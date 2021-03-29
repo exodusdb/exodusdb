@@ -18,7 +18,7 @@ function main() {
 	mv.labelledcommon[gen_common_no]=new gen_common;
 	mv.labelledcommon[agy_common_no]=new agy_common;
 
-	/*cat ~/arev/dic/ *.SQL | psql -h 127.0.0.1 -U exodus exodus*/
+	/*cat ~/pickos/dic/ *.SQL | psql -h 127.0.0.1 -U exodus exodus*/
 
 	//gen.addresses="addresses";
 	//gen.timesheets="timesheets";

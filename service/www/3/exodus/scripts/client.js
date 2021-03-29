@@ -253,7 +253,7 @@ function exodus_client_init() {
 
     //\x0A-\x0F in the back end
     //(no longer) also block character F8 and F9
-    //F9 is used as a field mark in AREV eg PRINT ("XXX":\F9\:"YYY") 'L#20' ... formats both to 20 characters
+    //F9 is used as a field mark in DOS eg PRINT ("XXX":\F9\:"YYY") 'L#20' ... formats both to 20 characters
     //also block character F8 since to make logical block of eight field mark characters
     //XMLXXre = /([\x25\x3C\x3E\x26\u07FF\u07FE\u07FD\u07FC\u07FB\u07FA\u07F9\u07F8])/g
     //FMs = '\u07FF\u07FE\u07FD\u07FC\u07FB\u07FA\u07F9\u07F8'
@@ -1700,7 +1700,7 @@ Array.prototype.exodusxlate = function* arrayxlate(filename, fieldno, mode) {
         //the usual postread processing and it puts this into the cache for
         //later processing as well (perhaps it should not put it in the cache)
         //it is difficult to call the usual postread processing from SELECT2
-        //on the server since postreads require AREV.COMMON (OREC etc)
+        //on the server since postreads require DOS.COMMON (OREC etc)
         //perhaps one should have a special POSTREADX which only touches @record
 
         //select the (deduplicated) records or return systemerror

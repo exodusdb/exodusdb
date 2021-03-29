@@ -992,7 +992,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 	// if (!perform_exodusfunctorbase_.mv_)
 	//	perform_exodusfunctorbase_.mv_=this;
 
-	// lowercase all library functions to aid in conversion from arev
+	// lowercase all library functions to aid in conversion from pickos
 	// TODO remove after conversion complete
 
 	perform_exodusfunctorbase_.mv_ = (&mv);
@@ -1906,7 +1906,7 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion) {
 
 		else
 		// OR call custom conversion routines
-		// unlike arev, custom routines are reponsible
+		// unlike pickos, custom routines are reponsible
 		// for processing and returning multiple values
 		{
 
@@ -2157,8 +2157,8 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 
 	//WARNING IF YOU CHANGE THIS THEN ADECOM GOES TO MODULE xxx and libexodus
 	////////////////////////////////////////////////////////////////////////
-	//where exodus/service/src/getarev will copy
-	//~/arev/xxx/number.cpp to ~/exodus/cli/src
+	//where exodus/service/src/getpickos will copy
+	//~/pickos/xxx/number.cpp to ~/exodus/cli/src
 
 	var fmtx;
 	var input1;	 //num
@@ -2189,7 +2189,7 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 
 		output = input.trim();
 
-		//first get into a revelation number with dots not commas
+		//first get into a pickos number with dots not commas
 		if (BASEFMT.substr(1, 2) eq "MC") {
 			output.converter(",", ".");
 		} else {

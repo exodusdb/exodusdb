@@ -786,7 +786,7 @@ could generate the following overloads in the lib's .h header
 					var add_func = "";
 					var can_default = true;
 
-					//build nargs additional functions to cater for optional arguments in arev
+					//build nargs additional functions to cater for optional arguments in DOS
 
 					for (int maxargn = 1; maxargn <= nargs; ++maxargn) {
 
@@ -821,7 +821,7 @@ could generate the following overloads in the lib's .h header
 									argname2 = argname ^ "_" ^ argtype;
 									//declare it
 									func_body ^= " var " ^ argname2;
-									//default it. arev doesnt have a "default" for missing args other than "var()" ie unassigned
+									//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
 									if (argdefault ne "" and argdefault ne "var()")
 										func_body ^= " = " ^ argdefault;
 									func_body ^= ";\r\n";
@@ -831,7 +831,7 @@ could generate the following overloads in the lib's .h header
 								argname2 = argname ^ "_" ^ argtype;
 								//declare it
 								func_body ^= " var " ^ argname2;
-								//default it. arev doesnt have a "default" for missing args other than "var()" ie unassigned
+								//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
 								if (argdefault ne "" and argdefault ne "var()")
 									func_body ^= " = " ^ argdefault;
 								func_body ^= ";\r\n";

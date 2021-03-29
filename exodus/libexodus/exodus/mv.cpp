@@ -259,7 +259,7 @@ var::operator const char*() const
 #ifndef HASINTREFOP
 var::operator int() const {
 	THISIS("var::operator int() const")
-	//converts string or double to int using pick/arev/jbase int() which is floor()
+	//converts string or double to int using pickos int() which is floor()
 	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
 	THISISINTEGER()
 	return int(var_int);
@@ -274,7 +274,7 @@ var::operator double() const {
 #else
 var::operator int&() const {
 	THISIS("var::operator mv_int_t&()")
-	//converts string or double to int using pick/arev/jbase int() which is floor()
+	//converts string or double to int using pickos int() which is floor()
 	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
 	THISISINTEGER()
 	// TODO check that converting mvint_t (which is long long) to int doesnt cause any practical
@@ -911,7 +911,7 @@ tryagain:
 //#endif
 
 /* more accurate way of comparing two decimals using EPSILON and ulp
-   not using it simply to make better emulation of pick/arev at least initially
+   not using it simply to make better emulation of pickos at least initially
 
 //comparing floating point numbers is a VERY complex matter since c++ double uses BINARY NOT DECIMAL
 //
@@ -950,7 +950,7 @@ inline bool almost_equal(double x, double y, int ulp)
 */
 
 inline bool almost_equal(double x, double y, int) {
-	//crude arev and pick(?) method
+	//crude pickos method
 	return (std::abs(x - y) < SMALLEST_NUMBER);
 }
 
@@ -1404,10 +1404,10 @@ double exodusmodulus(const double top, const double bottom) {
 #define USE_PICKOS_MODULUS
 #ifdef USE_PICKOS_MODULUS
 
-	// note that exodus var int() is floor function as per arev/jbase/pick standard
+	// note that exodus var int() is floor function as per pickos standard
 	// whereas c/c++ int() function is round to nearest even number (negative or positive)
 
-	//https://arev.neosys.com/x/pAEz.html
+	//https://pickos.neosys.com/x/pAEz.html
 	//var(i) - (int(var(i)/var(j)) * var(j))) ... where int() is pickos int() (i.e. floor)
 	return top - double(floor(top / bottom) * bottom);
 

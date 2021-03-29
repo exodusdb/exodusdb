@@ -279,7 +279,7 @@ function main() {
 
 		if (USER0.a(2) eq "SORTORDER") {
 
-			/* should be inverted but bother since cant get arev only collated ascii;
+			/* should be inverted but bother since cant get DOS only collated ascii;
 				if len(data) ne 254 then;
 					call msg('SORTORDER data is ':len(data):' but must be 254 characters long|(initial char 0 excluded)');
 					stop;
@@ -680,7 +680,7 @@ performreport:
 			cmd ^= " xAND WITH LOG_SOURCE1 STARTING " ^ (logkey.quote());
 		}
 		if (logsearch) {
-			cmd ^= " xAND WITH ALLUPPERCASE [] " ^ (logsearch.quote());
+			cmd ^= " xAND WITH ALLUPPERCASE CONTAINING " ^ (logsearch.quote());
 		}
 		cmd ^= " ID-SUPP";
 		var temp = cmd.index("xAND");

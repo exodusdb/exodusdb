@@ -282,7 +282,7 @@ var dim::split(const var& str1, const var& separator) {
 	int sepsize = sep.var_str.size();
 
 	// maybe dimension to the size of the string
-	// do NOT redimension always since pick/arev matread/matparse do not
+	// do NOT redimension always since pick matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
 	if (!this->initialised_ || this->ncols_ != 1)
 		this->redim(str1.count(sep) + 1);

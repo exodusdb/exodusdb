@@ -2314,7 +2314,7 @@ function* document_onkeydown2(event) {
         return exoduscancelevent(event)
     }
 
-    //F7 is now popup (used to be F2 in arev) also replaces windows standard alt+down combination
+    //F7 is now popup (used to be F2 in DOS) also replaces windows standard alt+down combination
     if (keycode == 118 || (event.altKey && keycode == 40 && element.tagName == 'SELECT')) {
         yield* exoduspopup(event)
         return exoduscancelevent(event)

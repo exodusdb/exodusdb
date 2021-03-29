@@ -73,7 +73,7 @@ programinit()
 
 			if (rec2 ne RECORD) {
 
-				//revert both records to leading zero 0.1, -0.1 instead of old arev .1 and -.1;
+				//revert both records to leading zero 0.1, -0.1 instead of old pickos .1 and -.1;
 				RECORD.replacer("([\x1A-\x1F]-?)0\\.", "$1.");
 				rec2.replacer("([\x1A-\x1F]-?)0\\.", "$1.");
 

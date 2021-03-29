@@ -39,7 +39,7 @@ function main(in mode0) {
 
 	//global tt,nusers,usern,mode
 
-	//nb general.subs can only be called from programs with AREV.COMMON2
+	//nb general.subs can only be called from programs with win_common.h
 	//because msg etc are common variables and must be defined in caller
 
 	mode = mode0;

@@ -271,7 +271,7 @@ bool ExodusFunctorBase::initsgf(const char* newlibraryname, const char* newfunct
 }
 
 // assign (case sensitive)
-// arev xxx="functionname"; call @xxx
+// pickos xxx="functionname"; call @xxx
 ExodusFunctorBase& ExodusFunctorBase::operator=(const char* newlibraryname) {
 	if (newlibraryname != libraryname_) {
 		closelib();

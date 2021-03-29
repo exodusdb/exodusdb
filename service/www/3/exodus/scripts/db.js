@@ -679,7 +679,7 @@ exodusrecord.prototype.writeu=function* exodusrecord_writeu() {
 ////////
 exodusrecord.prototype.write=function* exodusrecord_write() {
 
- //writes and leaves lock (zzz is this implemented in AREV LISTEN yet?)
+ //writes and leaves lock (zzz is this implemented in DOS LISTEN yet?)
  return /**/ yield * this.writex(false)
 }
 
@@ -847,7 +847,7 @@ exodusrecord.prototype.writex=function* exodusrecord_writex(withunlock) {
          }
          else {
 
-          //check for four ascii zero characters being passed. caused by bug in AREV 2.0
+          //check for four ascii zero characters being passed. caused by bug in DOS 2.0
           //no EXODUS data should contain char(0). Usually presents as four character zeros.
           //if (temp.charCodeAt(0)==0)
           if (temp.indexOf(String.fromCharCode(0))>=0) {

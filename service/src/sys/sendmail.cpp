@@ -326,7 +326,7 @@ forcedemail:
 	}
 	params ^= FM;
 
-	//AREV uses EXODUS sendmail.js script which uses windows CDO object
+	//DOS uses EXODUS sendmail.js script which uses windows CDO object
 	if (VOLUMES) {
 
 		params.swapper(FM, "\r\n");

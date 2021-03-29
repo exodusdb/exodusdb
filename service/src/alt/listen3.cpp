@@ -37,7 +37,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	var replacewrite = "";
 	var replacedelete = "";
 
-	//fix filenames from AREV to EXODUS style
+	//fix filenames from PICKOS to EXODUS style
 	if (not(VOLUMES)) {
 		filename.swapper("MEDIA" ".TYPE", "JOB_TYPE");
 		filename.converter(".", "_");

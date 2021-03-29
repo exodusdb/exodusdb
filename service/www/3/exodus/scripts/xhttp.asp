@@ -1064,8 +1064,8 @@
         //kick off exodus
         //cmd=proglocation+'exodus.js /system '+this.system+' /dataset '+this.dataset
         //cmd+=' /username '+this.username+' /password '+this.password
-        cmd='AREV.EXE ADAGENCY,EXODUS /X'
-        // cmd='WAITING.EXE AREV.EXE 3 3'
+        cmd='DOS.EXE ADAGENCY,EXODUS /X'
+        // cmd='WAITING.EXE DOS.EXE 3 3'
         taskid = this.wscriptshell.Run(cmd)
         Response.Write('error: '+currentdirectory)
         Response.End()

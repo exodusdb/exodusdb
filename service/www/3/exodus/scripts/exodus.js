@@ -1154,7 +1154,7 @@ function exodusconv(mode, value, conversion) {
         // was repeatable in two debug sessions but disappeared with a reboot
         //UPDATE !!!
         //this appears to be caused when the server return a string containing x00 characters
-        //usually caused by a random bug in AREV 2.0 where inserting into a string
+        //usually caused by a random bug in DOS 2.0 where inserting into a string
         //after on oconv/iconv conversion and garbagecollect workaround not called
         //results in four ascii zero characters
         //value.length is four

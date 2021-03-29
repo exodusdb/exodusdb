@@ -471,7 +471,7 @@ function main() {
 
 	//save the current program stack
 	//limit on 299 "programs" and dictionary entries count as 1!!!
-	//see "arev stack and rtp documentation.htm"
+	//see "rev stack and rtp documentation.htm"
 	//and http://www.revelation.com/knowledge.nsf/07dbcbabb6b3e379852566f50064cf25/daca1813e510f571852563b6006a9b9c?OpenDocument
 	stack = "";
 	//call programstackstack);
@@ -491,9 +491,9 @@ nextrequest:
 	SYSTEM.r(6, "");
 
 	TCLSTACK = TCLSTACK.field(FM, 1, 10);
-	//<AREV>
+	//<REV>
 	execute("RESET");
-	//</AREV>
+	//</REV>
 	SYSTEM.r(33, 1);
 	RECORD = "";
 	ID = "";
@@ -2694,11 +2694,11 @@ subroutine properlk() {
 	//also in balances
 	//will cause the LOCK statement to fail
 	srcfile2 = win.srcfile;
-	//<AREV>
+	/*
 	if (not(win.srcfile.unassigned())) {
 		srcfile2.swapper("SHADOW.MFS" ^ SVM, "");
 	}
-	//</AREV>
+	*/
 
 	//dont pass the filename because that causes persistent lock checking
 	//in jbase version of lockrecord()
@@ -2722,9 +2722,9 @@ subroutine properunlk() {
 	//must exclude the shadowing system otherwise the entry in the LOCKS file
 	//will be removed as well
 	srcfile2 = win.srcfile;
-	//<AREV>
+	/*
 	srcfile2.swapper("SHADOW.MFS" ^ SVM, "");
-	//</AREV>
+	*/
 
 	srcfile2.unlock( keyx);
 
@@ -2906,10 +2906,10 @@ subroutine lockit() {
 	nextbfs = "";
 	handle = file;
 
-	//<AREV>
+	/*
 	//handle=handle[-1,'B':vm]
 	handle = field2(handle, VM, -1);
-	//</AREV>
+	*/
 
 	keyorfilename = keyx;
 	fmc = 2;

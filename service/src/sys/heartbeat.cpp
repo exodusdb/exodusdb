@@ -44,9 +44,9 @@ function main(in mode, in status0="") {
 		var userlockid = PROCESSNO;
 
 		//on advanced revelation the pattern is U7906nnnn where 7906
-		// where 7906 appears to be the last 4 digits of the AREV serial() number
+		// where 7906 appears to be the last 4 digits of the DOS serial() number
 		//and nn is a simple incrementing number (excluding all numbers ending 0!)
-		//based on AREV using some pattern of os locks on the REVBOOT file
+		//based on REV using some pattern of os locks on the REVBOOT file
 		//eg U79061-U79069 first nine process
 		//eg U790611-U790619 2nd nine process
 		//eg U790621-U790629 3rd nine process

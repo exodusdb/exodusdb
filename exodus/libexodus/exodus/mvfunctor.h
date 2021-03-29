@@ -118,7 +118,7 @@ class DLL_PUBLIC ExodusFunctorBase {
 	ExodusFunctorBase(MvEnvironment& mv);
 
 	// to allow function name to be assigned a name and this name is the name of the library
-	// called arev call @
+	// called pickos call @
 	ExodusFunctorBase& operator=(const char*);
 
 	// call shared member function

@@ -650,7 +650,7 @@ getvalues:
 
 		call select2(filename0, SYSTEM.a(2), sortselect, dictids, options, USER1, USER3, "", "", "", maxnrecs);
 		//restore the program stack although this is done in LISTEN per request
-		//arev has a limit on 299 "programs" and dictionary entries count as 1 each!
+		//rev has a limit on 299 "programs" and dictionary entries count as 1 each!
 		//call program.stack(programstack)
 
 		if (USER4) {
