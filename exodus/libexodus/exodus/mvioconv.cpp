@@ -713,7 +713,7 @@ var var::oconv(const char* conversion) const {
 						case 'T':
 							// point to the remainder of the conversion after the "MT"
 							if (notemptystring) {
-								output ^= part.oconv_MT(conversionchar+1);
+								output ^= part.oconv_MT(conversionchar + 1);
 							}
 
 							break;
@@ -724,14 +724,14 @@ var var::oconv(const char* conversion) const {
 
 								//convert decimal to long
 								if (!(part.var_typ & VARTYP_INT)) {
-									part=part.round();//actually to mvint_t i.e. long long int
+									part = part.round();  //actually to mvint_t i.e. long long int
 									part.toLong();
 								}
 
 								//convert to hex
 								std::ostringstream ss;
 								ss << std::hex << std::uppercase
-								//   << part.round().toInt();
+								   //   << part.round().toInt();
 								   << part.var_int;
 
 								output ^= ss.str();

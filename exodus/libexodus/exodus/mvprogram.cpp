@@ -283,7 +283,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 					ok = !value;
 					break;
 				case 17:  // STARTING ]
-					ok = reqvalues(fieldn).substr(0,value.length()) == value;
+					ok = reqvalues(fieldn).substr(0, value.length()) == value;
 					break;
 				case 18:  // ENDING [
 					ok = reqvalues(fieldn).substr(-value.length()) == value;
@@ -1374,7 +1374,7 @@ void ExodusProgramBase::debug() const {
 	var reply;
 	std::clog << "debug():";
 	if (OSSLASH == "/")
-		asm("int $3");//use gdb n commands to resume
+		asm("int $3");	//use gdb n commands to resume
 	else
 		var().debug();
 	return;

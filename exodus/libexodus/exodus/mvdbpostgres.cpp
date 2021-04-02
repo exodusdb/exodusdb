@@ -932,7 +932,7 @@ bool var::read(const var& filehandle, const var& key) {
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(), 1, /* one param */
-											NULL,					   /* let the backend deduce param type */
+											NULL,					/* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
@@ -1540,7 +1540,7 @@ bool var::deleterecord(const var& key) const {
 
 	DEBUG_LOG_SQL1
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn, sql.var_str.c_str(), 1, /* two param */
-											NULL,									  /* let the backend deduce param type */
+											NULL,								   /* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
@@ -2153,6 +2153,8 @@ exodus_call:
 
 	// vector (for GIN or indexing/filtering multivalue fields)
 	if ((ismv1 and !forsort) || fieldname.substr(-5).ucase() == "_XREF") {
+		//this is the sole creation of to_tsvector in mvdbpostgres.cpp
+		//it will be used like to_tsvector(...) @@ to_tsquery(...)
 		sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
 		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
@@ -2762,8 +2764,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				postfix = ".*";
 				op = "=";
 				word1 = getword(remaining, ucword);
-			}
-			else if (ucword == "STARTING" or ucword == "]") {
+			} else if (ucword == "STARTING" or ucword == "]") {
 
 				//identical code above/below
 				if (dictexpression_isvector) {
@@ -2776,8 +2777,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				}
 
 				word1 = getword(remaining, ucword);
-			}
-			else if (ucword == "ENDING" or ucword == "[") {
+			} else if (ucword == "ENDING" or ucword == "[") {
 				prefix = ".*";
 				postfix = "$";
 				op = "=";
@@ -2825,7 +2825,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 						postfix = "$";
 					}
 
-				//STARTING
+					//STARTING
 				} else if (word1[-2] == "]") {
 					word1.splicer(-2, 1, "");
 
@@ -3041,7 +3041,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 				var expression = "";
 				for (var& subvalue : value) {
-				    expression ^= dictexpression ^ " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
+					expression ^= dictexpression ^ " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.splicer(-1, "");
 				expression.swapper(FM, " OR ");
@@ -3099,7 +3099,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 						value = "ANY(ARRAY[" ^ value ^ "])";
 					}
 				}
-
 			}
 
 			//full text search or mv field search
@@ -3140,6 +3139,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//use "english" dictionary for stemming (or "simple" dictionary for none)
 				// MUST use the SAME in both to_tsvector AND to_tsquery
 				//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
+				//this is the sole occurrence of to_tsquery in mvdbpostgres.cpp
+				//it will be used like to_tsvector(...) @@ to_tsquery(...)
 				value = "to_tsquery('simple'," ^ value ^ ")";
 				//value = "to_tsquery('english'," ^ value ^ ")";
 

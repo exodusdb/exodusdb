@@ -112,10 +112,9 @@ THE SOFTWARE.
 	};
 
 //NB always try to convert strings to doubles first. in isnum()
-#define THISISNUMERIC()                                       \
-	if (!this->isnum())                                       \
-		throw MVNonNumeric(var(functionname)                  \
-			^ " : var is " ^ this->substr(1, 20).quote());
+#define THISISNUMERIC() \
+	if (!this->isnum()) \
+		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1, 20).quote());
 
 //NB always try to convert strings to doubles first. in isnum()
 #define THISISDECIMAL()                                       \

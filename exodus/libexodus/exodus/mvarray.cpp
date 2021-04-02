@@ -265,8 +265,8 @@ dim var::split(const var& separator) const {
 	// contains a pointer to an array of vars)
 	dim tempdim2;
 	tempdim2.split(*this, separator);
-	return tempdim2;//NRVO hopefully since single named return
-	//return dim().split(*this);//doesnt work because split returns a var, the number of fields
+	return tempdim2;  //NRVO hopefully since single named return
+					  //return dim().split(*this);//doesnt work because split returns a var, the number of fields
 }
 
 // number=dim.split(varstr)
@@ -329,7 +329,7 @@ var dim::split(const var& str1, const var& separator) {
 			this->data_[fieldno] = "";
 	}
 
-	return nfields;//NRVO hopefully since single named return and/or requires a conversion from int to var
+	return nfields;	 //NRVO hopefully since single named return and/or requires a conversion from int to var
 }
 
 dim& dim::sort(bool reverse) {

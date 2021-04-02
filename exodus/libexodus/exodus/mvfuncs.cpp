@@ -35,7 +35,7 @@ Binary    Hex          Comments
 #endif
 
 #if __has_include(<signal.h>)
-#include <signal.h> //for raise(SIGTRAP)
+#include <signal.h>	 //for raise(SIGTRAP)
 #endif
 
 /* using fastfloat instead of ryu because it is > 3 time faster
@@ -60,7 +60,7 @@ Binary    Hex          Comments
 // I would have used it if it were available back then!"
 //
 //https://github.com/fastfloat/fast_float
-#if __has_include (<fast_float/fast_float.h>)
+#if __has_include(<fast_float/fast_float.h>)
 #define HAS_FASTFLOAT
 #include <fast_float/fast_float.h>
 #endif
@@ -71,7 +71,7 @@ Binary    Hex          Comments
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
-#include <charconv> // for from_chars and to_chars
+#include <charconv>	 // for from_chars and to_chars
 
 //#include <cmath>      //for stod()
 //#include <sstream>
@@ -1750,8 +1750,7 @@ bool var::isnum(void) const {
 	if (!digit) {
 
 		// must be at least one digit unless zero length string
-		if (this->var_str.length())
-		{
+		if (this->var_str.length()) {
 			this->var_typ = VARTYP_NANSTR;
 			return false;
 		}
@@ -1792,18 +1791,18 @@ bool var::isnum(void) const {
 
 			//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
 
-			auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
+			auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data() + this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
 			if (ec != std::errc()) {
 				//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
 				this->var_typ = VARTYP_NANSTR;
 				return false;
 			}
 
-#elif defined(USE_CHARCONV)  //double only available in gcc 11 onwards. msvc has it from 2017 or 19
+#elif defined(USE_CHARCONV)	 //double only available in gcc 11 onwards. msvc has it from 2017 or 19
 
 			//std::cout << "from_chars decimal iconv" << var_str << std::endl;
 
-			auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_dbl);
+			auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data() + this->var_str.size(), this->var_dbl);
 			if (ec != std::errc()) {
 				this->var_typ = VARTYP_NANSTR;
 				return false;
@@ -1845,21 +1844,21 @@ bool var::isnum(void) const {
 			///		var_int=atoi(result.c_str());
 			//var_int = strtol(var_str.c_str(), 0, 10);
 
-            //var v="1234";//27ns
-            //v.isnum();//+78ns (105ns) using stol 0 10
-            //v.isnum();//+54ns (81ns) using charconv from_chars int
-            //v.isnum();//+49ns (76ns) using atol BEST
+			//var v="1234";//27ns
+			//v.isnum();//+78ns (105ns) using stol 0 10
+			//v.isnum();//+54ns (81ns) using charconv from_chars int
+			//v.isnum();//+49ns (76ns) using atol BEST
 
 #if 1
 			//this->var_int = std::stol(var_str.c_str(), 0, 10);
 			//this->var_int = std::stol(this->var_str);
-			this->var_int = std::atol(this->var_str.c_str());//fastest gcc 10.2
+			this->var_int = std::atol(this->var_str.c_str());  //fastest gcc 10.2
 #else
-            auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data()+this->var_str.size(), this->var_int);
-            if (ec != std::errc()) {
-                this->var_typ = VARTYP_NANSTR;
-                return false;
-            }
+			auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data() + this->var_str.size(), this->var_int);
+			if (ec != std::errc()) {
+				this->var_typ = VARTYP_NANSTR;
+				return false;
+			}
 #endif
 			this->var_typ = VARTYP_INTSTR;
 		}

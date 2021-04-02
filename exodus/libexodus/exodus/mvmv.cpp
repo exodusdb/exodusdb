@@ -313,8 +313,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 							setting = valuen2;
 							//setting = valuen2 + (value.length() < target2.length());
 							return true;
-						}
-						else {
+						} else {
 							setting = valuen2;
 							return false;
 						}
@@ -400,10 +399,10 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 				value = var_str.substr(start_pos, nextstart_pos - start_pos);
 				if (value >= target) {
-				//if (value >= target2) {
+					//if (value >= target2) {
 					setting = valuen2;
 					if (value == target)
-					//if (value == target2)
+						//if (value == target2)
 						return true;
 					else
 						return false;
@@ -748,8 +747,7 @@ bool var::locateby(const char* ordercode, const var& target, var& setting, const
 ///////////////////
 
 // 1. rare syntax where the order is given as a variable
-bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting,
-	const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
 		"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& "
 		"target, var& setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
@@ -765,8 +763,7 @@ bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& t
 
 // 2. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting,
-	const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
 		"bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& "
 		"target, var& setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
@@ -1590,7 +1587,7 @@ var var::operator[](const int charno) const {
 
 	// if index is now 0 or positive then return the character
 	if (charno2 >= 0)
-		return this->var_str[charno2];  // no need for -1 here
+		return this->var_str[charno2];	// no need for -1 here
 
 	// otherwise so negative as to point before beginning of string
 	// and rule is to return the first character in that case
@@ -1829,21 +1826,19 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 //////
 // SUM
 /////
-var var::sumall() const
-{
+var var::sumall() const {
 	THISIS("var var::sumall()")
 	THISISSTRING()
 
 	// Add up all numbers regardless of separators or levels (multilevel)
 	// Limit the number of decimal places in returned value to the max found in the input
-    // assert(sum("2245000900.76" _FM_ "102768099.9" _VM_ "-2347769000.66") == 0);
+	// assert(sum("2245000900.76" _FM_ "102768099.9" _VM_ "-2347769000.66") == 0);
 
 	var result = 0;
 	var start = 0;
 	var subfield, term;
 	size_t maxdecimals = 0;
-	while (true)
-	{
+	while (true) {
 		//this extracts a substring up to any separator charactor STM-RM
 		subfield = (*this).substr2(start, term);
 
@@ -1852,14 +1847,14 @@ var var::sumall() const
 			//for clarity of error message,
 			//throw any error here instead of leaving it up to the +=
 			if (!subfield.isnum())
-				throw MVNonNumeric("sumall() " ^ subfield.substr(1,128).quote());
+				throw MVNonNumeric("sumall() " ^ subfield.substr(1, 128).quote());
 
 			result += subfield;
-			size_t n=subfield.var_str.find('.');
+			size_t n = subfield.var_str.find('.');
 			if (n) {
-				n=subfieldsize-n;
-				if (n>maxdecimals)
-					maxdecimals=n;
+				n = subfieldsize - n;
+				if (n > maxdecimals)
+					maxdecimals = n;
 			}
 		}
 		if (not term)
@@ -1892,14 +1887,14 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!this->isnum())
-			throw MVNonNumeric("sum() " ^ this->substr(1,128).quote());
+			throw MVNonNumeric("sum() " ^ this->substr(1, 128).quote());
 
 		return (*this) + 0;
 	}
 	min_sep_present = 1 + max_sep - min_sep_present;
 	var inpos = 1;
 	var flag = 0;
-	var outstr = "";//NRVO hopefully
+	var outstr = "";  //NRVO hopefully
 
 	//std::clog << (*this) << std::endl;
 
@@ -1912,7 +1907,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!part.isnum())
-			throw MVNonNumeric("sum() " ^ part.substr(1,128).quote());
+			throw MVNonNumeric("sum() " ^ part.substr(1, 128).quote());
 
 		if (flag) {
 
@@ -1976,7 +1971,7 @@ var var::sum() const {
 
 	} while (nextsep);
 
-	return outstr;//NRVO hopefully since single named return
+	return outstr;	//NRVO hopefully since single named return
 }
 
 var var::sum(const var& separator) const {
@@ -2000,7 +1995,7 @@ var var::sum(const var& separator) const {
 			//result += (*this).sum(temp);
 			result += temp.sum();
 	}
-	return result;//NRVO hopefully since single named return
+	return result;	//NRVO hopefully since single named return
 }
 
 }  // namespace exodus

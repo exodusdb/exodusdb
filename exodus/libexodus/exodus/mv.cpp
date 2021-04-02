@@ -29,10 +29,10 @@ THE SOFTWARE.
 // TODO make mvtype a bit field indicating multiple types present
 // or overlap the string/integer/float variables to save space
 
+#include <cassert>
 #include <limits>
 #include <sstream>
 #include <vector>
-#include <cassert>
 
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
@@ -117,28 +117,26 @@ var::var()
 
 // copy constructor
 var::var(const var& rhs)
-    : var_str(rhs.var_str),
-      var_int(rhs.var_int),
-      var_dbl(rhs.var_dbl),
-      var_typ(rhs.var_typ)
-{
-	// use initializers (why?) and only check afterwards if copiedvar was assigned
-	THISIS("var::var(const var& rhs)")
-	ISASSIGNED(rhs)
+	: var_str(rhs.var_str),
+	  var_int(rhs.var_int),
+	  var_dbl(rhs.var_dbl),
+	  var_typ(rhs.var_typ){
+		  // use initializers (why?) and only check afterwards if copiedvar was assigned
+		  THISIS("var::var(const var& rhs)")
+			  ISASSIGNED(rhs)
 
-	//std::clog << "copy ctor const var&" << std::endl;
+		  //std::clog << "copy ctor const var&" << std::endl;
 
-	// not a pointer anymore for speed
-	// priv=new pimpl;
-}
+		  // not a pointer anymore for speed
+		  // priv=new pimpl;
+	  }
 
-// move constructor
-var::var(var&& rhs) noexcept
-    : var_str(std::move(rhs.var_str)),
-      var_int(rhs.var_int),
-      var_dbl(rhs.var_dbl),
-      var_typ(rhs.var_typ)
-{
+	  // move constructor
+	  var::var(var && rhs) noexcept
+	: var_str(std::move(rhs.var_str)),
+	  var_int(rhs.var_int),
+	  var_dbl(rhs.var_dbl),
+	  var_typ(rhs.var_typ) {
 	//std::clog << "move ctor var&& noexcept" << std::endl;
 
 	// skip this for speed since temporararies are unlikely to be unassigned
@@ -353,10 +351,9 @@ var::operator const char*()
 // cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
-var& var::operator=(const var& rhs)
-{
+var& var::operator=(const var& rhs) {
 	THISIS("var& var::operator= (const var& rhs)")
-	THISISDEFINED()//could be skipped for speed?
+	THISISDEFINED()	 //could be skipped for speed?
 	ISASSIGNED(rhs)
 
 	//std::clog << "copy assignment" <<std::endl;
@@ -376,8 +373,7 @@ var& var::operator=(const var& rhs)
 
 // move assignment
 // var = temporary var
-var& var::operator=(var&& rhs) noexcept
-{
+var& var::operator=(var&& rhs) noexcept {
 	// skip this for speed?
 	// THISIS("var& var::operator= (var rhs)")
 	// THISISDEFINED()
@@ -1319,15 +1315,14 @@ var MVadd(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-    //identical code in MVadd and MVsub except for +/-
-    //identical code in MVadd, MVsub, MVmul except for +,-,*
+	//identical code in MVadd and MVsub except for +/-
+	//identical code in MVadd, MVsub, MVmul except for +,-,*
 	if (lhs.var_typ & VARTYP_DBL)
 		return lhs.var_dbl + ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
 	else if (rhs.var_typ & VARTYP_DBL)
-        return lhs.var_int + rhs.var_dbl;
-    else
-        return lhs.var_int + rhs.var_int;
-
+		return lhs.var_int + rhs.var_dbl;
+	else
+		return lhs.var_int + rhs.var_int;
 }
 
 var MVsub(const var& lhs, const var& rhs) {
@@ -1335,14 +1330,13 @@ var MVsub(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-    //identical code in MVadd, MVsub, MVmul except for +,-,*
+	//identical code in MVadd, MVsub, MVmul except for +,-,*
 	if (lhs.var_typ & VARTYP_DBL)
 		return lhs.var_dbl - ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
 	else if (rhs.var_typ & VARTYP_DBL)
-        return lhs.var_int - rhs.var_dbl;
-    else
-        return lhs.var_int - rhs.var_int;
-
+		return lhs.var_int - rhs.var_dbl;
+	else
+		return lhs.var_int - rhs.var_int;
 }
 
 var MVmul(const var& lhs, const var& rhs) {
@@ -1350,14 +1344,13 @@ var MVmul(const var& lhs, const var& rhs) {
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-    //identical code in MVadd, MVsub, MVmul except for +,-,*
+	//identical code in MVadd, MVsub, MVmul except for +,-,*
 	if (lhs.var_typ & VARTYP_DBL)
 		return lhs.var_dbl * ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
 	else if (rhs.var_typ & VARTYP_DBL)
-        return lhs.var_int * rhs.var_dbl;
-    else
-        return lhs.var_int * rhs.var_int;
-
+		return lhs.var_int * rhs.var_dbl;
+	else
+		return lhs.var_int * rhs.var_int;
 }
 
 var MVdiv(const var& lhs, const var& rhs) {
@@ -1372,14 +1365,14 @@ var MVdiv(const var& lhs, const var& rhs) {
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
 				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-								 "')");
+									 "')");
 			return lhs.var_dbl / rhs.var_dbl;
 		}
 		// 2. double ... int
 		else {
 			if (!rhs.var_int)
 				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-								 "')");
+									 "')");
 			return lhs.var_dbl / rhs.var_int;
 		}
 	}
@@ -1387,17 +1380,16 @@ var MVdiv(const var& lhs, const var& rhs) {
 	else if (rhs.var_typ & VARTYP_DBL) {
 		if (!rhs.var_dbl)
 			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-							 "')");
+								 "')");
 		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
 	}
 	// 4. int ... int
-    else {
+	else {
 		if (!rhs.var_int)
 			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-							 "')");
+								 "')");
 		return static_cast<double>(lhs.var_int) / rhs.var_int;
 	}
-
 }
 
 double exodusmodulus(const double top, const double bottom) {
@@ -1421,7 +1413,7 @@ double exodusmodulus(const double top, const double bottom) {
 
 	//remainder - The IEEE floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where the value n is the integral value nearest the exact value x/y. When |n-x/y| = ½, the value n is chosen to be even.
 	//https://en.cppreference.com/w/c/numeric/math/remainder
-	return std::remainder(top,bottom);
+	return std::remainder(top, bottom);
 
 #endif
 }
@@ -1439,14 +1431,14 @@ var MVmod(const var& lhs, const var& rhs) {
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
 				throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-								 "')");
-			return exodusmodulus(lhs.var_dbl,rhs.var_dbl);
+									 "')");
+			return exodusmodulus(lhs.var_dbl, rhs.var_dbl);
 		}
 		// 2. double ... int
 		else {
 			if (!rhs.var_int)
 				throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-								 "')");
+									 "')");
 			return exodusmodulus(lhs.var_dbl, rhs.var_int);
 		}
 	}
@@ -1454,18 +1446,17 @@ var MVmod(const var& lhs, const var& rhs) {
 	else if (rhs.var_typ & VARTYP_DBL) {
 		if (!rhs.var_dbl)
 			throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-							 "')");
+								 "')");
 		return exodusmodulus(lhs.var_int, rhs.var_dbl);
 	}
 	// 4. int ... int
-    else {
+	else {
 		if (!rhs.var_int)
 			throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
-							 "')");
+								 "')");
 		//return exodusmodulus(lhs.var_int, rhs.var_int);
 		return lhs.var_int % rhs.var_int;
 	}
-
 }
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
@@ -1667,7 +1658,7 @@ std::string dblToString(double double1) {
 	s.resize(24);
 
 #define USE_RYU_D2S
-#ifdef USE_RYU_D2S  // 500ns using ryu d2s() which always outputs scientific even 0E0 for zero.
+#ifdef USE_RYU_D2S	// 500ns using ryu d2s() which always outputs scientific even 0E0 for zero.
 
 	//ryu perfect round trip ASCII->double->ASCII but not perfect for calculated or compiled doubles
 
@@ -1686,7 +1677,7 @@ std::string dblToString(double double1) {
 	//return s;//435ns here. 500ns after conversion to fixed decimal place below (65ns)
 	const std::size_t epos = s.find('E');
 
-#elif 0 //740ns ryu d2exp() always output scientific
+#elif 0	 //740ns ryu d2exp() always output scientific
 
 	//ryu_printf compatible with nice rounding of all doubles but not perfect round tripping
 
@@ -1700,14 +1691,14 @@ std::string dblToString(double double1) {
 	//return s;//650ns here. 743ns after changing to fixed point below (93ns)
 	const std::size_t epos = s.find('e');
 
-#else //???ns ryu d2fixed() always output fixed decimal point with fixed precision
+#else  //???ns ryu d2fixed() always output fixed decimal point with fixed precision
 
 	//ryu_printf %f equivalent (always fixed format)
 	//
 	//But this suffers from precision being after decimal point instead of overall number of digits
 	// eg 1234.5678 -> "1234.56780000000003"
 	//printl( var("999999999999999.9")    + 0);
-    //             999999999999999.875
+	//             999999999999999.875
 	//Could truncate after 15 digits but this would not be rounded properly
 	const int n = d2fixed_buffered_n(double1, 16, s.data());
 	s.resize(n);
@@ -1725,7 +1716,7 @@ std::string dblToString(double double1) {
 #endif
 	//std::cout << s << std::endl;
 
-#else //1800ns
+#else  //1800ns
 
 	//std::cout << "std:sstream decimal oconv" << std::endl;
 
@@ -1772,9 +1763,9 @@ std::string dblToString(double double1) {
 	if (epos == std::string::npos)
 		return s;
 #endif
-	//std::cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
+		//std::cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 
-#endif //USE_RYU
+#endif	//USE_RYU
 
 	// Algorithm
 	//

@@ -135,9 +135,9 @@ using mvint_t = long long;
 //#define VISIBLE_FMS "_]\[Z"  //PickOS standard
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
 //#define VISIBLE_FMS "_^]}`~"   //all uncommon in data. _ ^ ] are identical to pickos
-#define VISIBLE_FMS "_^]}|~"   //all uncommon in data. _ ^ ] are identical to pickos
+#define VISIBLE_FMS "_^]}|~"  //all uncommon in data. _ ^ ] are identical to pickos
 #define TRACE(EXPRESSION) \
-    var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
+	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
 
 namespace exodus {
 
@@ -387,16 +387,16 @@ class DLL_PUBLIC var final {
 	var();
 
 	// copy constructor
-	var(const var& fromvar);// = default;
+	var(const var& fromvar);  // = default;
 
 	// move constructor
-	var(var&& fromvar) noexcept;// = default;
+	var(var&& fromvar) noexcept;  // = default;
 
 	// copy assignment constructor
-	var& operator=(const var& fromvar);// = default;
+	var& operator=(const var& fromvar);	 // = default;
 
 	// move assignment
-	var& operator=(var&& fromvar) noexcept;// = default;
+	var& operator=(var&& fromvar) noexcept;	 // = default;
 
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
@@ -409,10 +409,10 @@ class DLL_PUBLIC var final {
 //#define ALL_IN_ONE_STRING_CONSTRUCTOR
 #ifdef ALL_IN_ONE_STRING_CONSTRUCTOR
 	//accepts l and r values
-	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S,std::string>>>
+	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S, std::string>>>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	var(S&& fromstr)
-		: var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR) {};
+		: var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR){};
 
 #else
 
@@ -482,8 +482,8 @@ class DLL_PUBLIC var final {
 	std::u32string to_u32string() const;
 	void from_u32string(std::u32string) const;
 
-	std::string toString() &&;            //for temporary vars
-	const std::string& toString() const&; //for non-temporaries
+	std::string toString() &&;			   //for temporary vars
+	const std::string& toString() const&;  //for non-temporaries
 
 	// weird version for perl that outputs "" if undefined
 	std::string toString2() const;
@@ -576,7 +576,7 @@ class DLL_PUBLIC var final {
 	// in a lot of compilation failures due to "ambiguous overload"
 	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
 	// for now prevent this to ensure efficient programming
-//explicit
+	//explicit
 	operator std::string() const;
 
 	// allow conversion to char (takes first char or char 0 if zero length string)
@@ -953,12 +953,12 @@ class DLL_PUBLIC var final {
 	}
 	DLL_PUBLIC friend var operator^(var&& lhs, const char* cstr2) {
 		//std::clog << "DLL_PUBLIC friend var operator^(var&& lhs, const char* cstr2)" << std::endl;
-    	/*
+		/*
     	var x="abcdefghijklmnop";//59ns
     	//var y(x);// (114ns)
     	var(x)^"a";// +126ns (240ns) surprisingly high looks like two additional heap allocs
     	*/
-        //no difference in speed between the following:
+		//no difference in speed between the following:
 		return lhs ^= cstr2;
 		//return std::move(lhs) ^= cstr2;
 	}
@@ -1007,9 +1007,9 @@ class DLL_PUBLIC var final {
 	/////////
 
 	//to stdout/cout
-	const var& output() const;//output without line ending, without flush
-	const var& outputl() const;//output without a line ending and flush
-	const var& outputt() const;//output with a tab and flush
+	const var& output() const;	 //output without line ending, without flush
+	const var& outputl() const;	 //output without a line ending and flush
+	const var& outputt() const;	 //output with a tab and flush
 
 	//as above but with var1 prefixed
 	const var& output(const var& var1) const;
@@ -1581,16 +1581,16 @@ class DLL_PUBLIC var final {
 #ifdef _MSC_VER
 #pragma warning(disable : 4251)
 #endif
-	mutable std::string var_str;	//32 bytes
+	mutable std::string var_str;  //32 bytes
 #ifdef _MSC_VER
 #pragma warning(4 : 4251)
 #endif
-	mutable mvint_t var_int;		//8 bytes/64 bits - currently defined as a long long
-	mutable double var_dbl;			//8 bytes/64 buts - double
+	mutable mvint_t var_int;  //8 bytes/64 bits - currently defined as a long long
+	mutable double var_dbl;	  //8 bytes/64 buts - double
 	// initialise type last
-	mutable VARTYP var_typ;			//actually a uint which will be 4 bytes
-	//mutable uint padding1;
-	//mutable long int padding2;
+	mutable VARTYP var_typ;	 //actually a uint which will be 4 bytes
+							 //mutable uint padding1;
+							 //mutable long int padding2;
 
 	// PRIVATE MEMBER FUNCTIONS
 	//////////////////////////

@@ -29,8 +29,10 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	var fieldname = cmd.a(1, 1);
 	var parts = cmd.a(1, 2);
 	if (fieldname.substr(-4)=="XREF") {
-		//XREF sql is implemented as STARTING
+
+		//XREF sql was implemented as STARTING so ] was not required
 		parts.converter("]","");
+
 		var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(parts) ^ " (S)";
 		select(selectcmd);
 
