@@ -89,6 +89,16 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	var calc_fields_file = "";
 	calc_fields_file.open("calc_fields");
 
+	//open the dictionary
+	if (dictfilename.substr(1, 5).lcase() != "dict_")
+		dictfilename = "dict_" ^ dictfilename;
+	if (!DICT.open(dictfilename)) {
+		dictfilename = "dict_voc";
+		if (!DICT.open(dictfilename)) {
+			throw MVDBException(dictfilename.quote() ^ " cannot be opened");
+		}
+	}
+
 	//prepare to create a temporary sql table
 	//DROP TABLE IF EXISTS SELECT_STAGE2;
 	//CREATE TABLE SELECT_STAGE2(
@@ -114,13 +124,20 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	int nfields = calc_fields.a(1).dcount(VM);
 	dim dictids(nfields);
 	dim opnos(nfields);
-	dim reqvalues(nfields);
-	dim reqvalues2(nfields);
+	dim reqivalues(nfields);
+	dim reqivalues2(nfields);
+	dim ioconvs(nfields);
+
 	for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
 		//dictids
 
 		var dictid = calc_fields.a(1, fieldn);
+
+		var dictrec;
+		if (not dictrec.reado(DICT,dictid))
+			dictrec="";
+		ioconvs(fieldn) = dictrec.a(7);
 
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
@@ -133,19 +150,19 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 
 		//ops
 
-		var value = calc_fields.a(3, fieldn).convert(SM, VM).unquote();
+		var ovalue = calc_fields.a(3, fieldn).convert(SM, VM).unquote();
 
 		var op = calc_fields.a(2, fieldn);
 
 		//multivalued selections are not well supported from mvdbpostgresql. handle the obvious cases"
-		if (value.index(VM)) {
+		if (ovalue.index(VM)) {
 			if (op == "=")
 				op = "in";
 			else if (op == "<>")
 				op = "not_in";
 		}
 
-		//turn ops into numbers for speed
+		//turn ops into numbers for speed. see c++ switch statement below
 		var opno;
 		if (!op)
 			opno = 0;
@@ -153,24 +170,53 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 			throw MVError(op.quote() ^ " unknown op in sql select");
 		opnos(fieldn) = opno;
 
-		//reqvalues
-		if (op == "in" and value[1] == "(" and value[-1] == ")") {
-			value.splicer(1, 1, "").splicer(-1, 1, "");
-			value.swapper("', '", VM);
-			value.trimmerb().trimmerf().unquoter();
-			//value.convert(VM,"]").outputl("value=");
+		//reqivalues
+		if (op == "in" and ovalue[1] == "(" and ovalue[-1] == ")") {
+			ovalue.splicer(1, 1, "").splicer(-1, 1, "");
+			ovalue.swapper("', '", VM);
+			ovalue.trimmerb().trimmerf().unquoter();
+			//ovalue.convert(VM,"]").outputl("ovalue=");
 		}
-		if (dictid.substr(-4, 4) == "DATE")
-			value = iconv(value, "D");
-		reqvalues(fieldn) = value;
 
-		var value2 = calc_fields.a(4, fieldn).unquote();
-		if (dictid.substr(-4, 4) == "DATE")
-			value2 = iconv(value2, "D");
-		reqvalues2(fieldn) = value2;
+		var ovalue2 = calc_fields.a(4, fieldn).unquote();
+
+		//iconv
+		var ivalue;
+		var ivalue2;
+		var ioconv = ioconvs(fieldn);
+		if (ioconv) {
+			ivalue = iconv(ovalue, ioconv);
+			ivalue2 = iconv(ovalue2, ioconv);
+		}
+		else {
+			ivalue = ovalue;
+			ivalue2 = ovalue2;
+		}
+
+		//save reqivalues
+		reqivalues(fieldn) = ivalue;
+		reqivalues2(fieldn) = ivalue2;
+
+		//sqltype
+		var sqltype;
+		if (ioconv.index("[NUMBER")) {
+			sqltype = "NUMERIC";
+		}
+		if (ioconv.index("[DATE")) {
+			sqltype = "DATE";
+		}
+		else if (ioconv.index("[TIME")) {
+			sqltype = "TIME";//TODO check if works
+		}
+		else if (ioconv.index("[DATETIME")) {
+			sqltype = "DATE";//TODO
+		}
+		else {
+			sqltype = "TEXT";
+		}
 
 		//sql temp table column
-		createtablesql ^= " " ^ sqlcolid ^ " TEXT,";
+		createtablesql ^= " " ^ sqlcolid ^ " "^ sqltype ^ ",";
 
 		//sql insert column
 		baseinsertsql ^= sqlcolid ^ ",";
@@ -178,13 +224,13 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		//debug
 		//dictid.outputt();
 		//op.outputt();
-		//value.outputt();
+		//ovalue.outputt();
 		//var("").outputl();
 
 		//debug
 		if (calc_fields_file && dictid != "AUTHORISED") {
 			var key = dictfilename ^ "*" ^ dictid;
-			var rec = sortselectclause ^ FM ^ op ^ FM ^ value ^ FM ^ value2;
+			var rec = sortselectclause ^ FM ^ op ^ FM ^ ovalue ^ FM ^ ovalue2;
 			rec.write(calc_fields_file, key);
 			key.outputl("written to calc_fields ");
 		}
@@ -203,16 +249,6 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	} else
 		baseinsertsql = "";
 
-	//open the dictionary
-	if (dictfilename.substr(1, 5).lcase() != "dict_")
-		dictfilename = "dict_" ^ dictfilename;
-	if (!DICT.open(dictfilename)) {
-		dictfilename = "dict_voc";
-		if (!DICT.open(dictfilename)) {
-			throw MVDBException(dictfilename.quote() ^ " cannot be opened");
-		}
-	}
-
 	int maxnrecs = calc_fields.a(6);
 	int recn = 0;
 
@@ -226,82 +262,85 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 
 		for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
-			var value = calculate(dictids(fieldn));
+			var ivalue = calculate(dictids(fieldn));
 
 			//debug
-			//value.outputl(dictids(fieldn) ^ " value=");
+			//ivalue.outputl(dictids(fieldn) ^ " ivalue=");
 
 			switch (int(opnos(fieldn))) {
 				case 0:
 					break;
 				case 1:	 // =
-					ok = value == reqvalues(fieldn);
+					ok = ivalue == reqivalues(fieldn);
 					break;
 				case 2:	 // <>
-					ok = value != reqvalues(fieldn);
+					ok = ivalue != reqivalues(fieldn);
 					break;
 				case 3:	 // >
-					ok = value > reqvalues(fieldn);
+					ok = ivalue > reqivalues(fieldn);
 					break;
 				case 4:	 // <
-					ok = value < reqvalues(fieldn);
+					ok = ivalue < reqivalues(fieldn);
 					break;
 				case 5:	 // >=
-					ok = value >= reqvalues(fieldn);
+					ok = ivalue >= reqivalues(fieldn);
 					break;
 				case 6:	 // <=
-					ok = value <= reqvalues(fieldn);
+					ok = ivalue <= reqivalues(fieldn);
 					break;
 				case 7:	 // ~ regex
-					ok = value.match(reqvalues(fieldn));
+					ok = ivalue.match(reqivalues(fieldn));
 					break;
 				case 8:	 // ~* regex case insensitive
-					ok = value.match(reqvalues(fieldn), "i");
+					ok = ivalue.match(reqivalues(fieldn), "i");
 					break;
 				case 9:	 // !~ not regex
-					ok = !(value.match(reqvalues(fieldn)));
+					ok = !(ivalue.match(reqivalues(fieldn)));
 					break;
 				case 10:  // !~* not regex case insensitive
-					ok = !(value.match(reqvalues(fieldn), "i"));
+					ok = !(ivalue.match(reqivalues(fieldn), "i"));
 					break;
 				case 11:  // between x and y, from x to
-					ok = (value >= reqvalues(fieldn) && value <= reqvalues2(fieldn));
+					ok = (ivalue >= reqivalues(fieldn) && ivalue <= reqivalues2(fieldn));
 					break;
 				case 12:  // not between x and y, not from x to y
-					ok = (value < reqvalues(fieldn) || value > reqvalues2(fieldn));
+					ok = (ivalue < reqivalues(fieldn) || ivalue > reqivalues2(fieldn));
 					break;
 				case 13:  // in list
-					ok = reqvalues(fieldn).locate(value);
+					ok = reqivalues(fieldn).locate(ivalue);
 					break;
 				case 14:  // not in list
-					ok = !reqvalues(fieldn).locate(value);
+					ok = !reqivalues(fieldn).locate(ivalue);
 					break;
 				case 15:  // is true (not "" 0 "0" "00" "0.0" etc).
-					ok = value;
+					ok = ivalue;
 					break;
 				case 16:  // is false (isnt true)
-					ok = !value;
+					ok = !ivalue;
 					break;
 				case 17:  // STARTING ]
-					ok = reqvalues(fieldn).substr(0, value.length()) == value;
+					ok = reqivalues(fieldn).substr(0, ivalue.length()) == ivalue;
 					break;
 				case 18:  // ENDING [
-					ok = reqvalues(fieldn).substr(-value.length()) == value;
-					ok = !value;
+					ok = reqivalues(fieldn).substr(-ivalue.length()) == ivalue;
+					ok = !ivalue;
 					break;
 				case 19:  //  CONTAINING []
-					ok = reqvalues(fieldn).index(value);
+					ok = reqivalues(fieldn).index(ivalue);
 					break;
 			}
 			if (!ok) {
 				//debug
-				//value.outputl("FAILED=");
+				//ivalue.outputl("FAILED=");
 				break;
 			}
 
-			//VALUES (41472, 'Practical PostgreSQL', 1212, 4);
-			value.swapper("'", "''").squoter();
-			insertsql ^= " " ^ value ^ ",";
+			//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
+			var ovalue = ivalue.swap("'", "''");
+			var ioconv = ioconvs(fieldn);
+			if (ioconv)
+				ovalue = oconv(ovalue,ioconv);
+			insertsql ^= " " ^ ovalue.squote() ^ ",";
 		}
 
 		//skip if failed to match

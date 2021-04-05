@@ -2265,7 +2265,7 @@ var getword(var& remainingwords, var& ucword) {
 
 	// grab multiple values (numbers or quoted words) into one list, separated by FM
 	//value chars are " ' 0-9 . + -
-	if (joinvalues && valuechars.index(word1[1])) {
+	if (remainingwords && joinvalues && valuechars.index(word1[1])) {
 		word1 = SQ ^ word1.unquote().swap("'", "''") ^ SQ;
 
 		var nextword = remainingwords.field(" ", 1);
@@ -2281,6 +2281,7 @@ var getword(var& remainingwords, var& ucword) {
 			}
 		}
 
+		/*
 		while (nextword && valuechars.index(nextword[1])) {
 			tosqlstring(nextword);
 			if (word1 != "")
@@ -2301,6 +2302,19 @@ var getword(var& remainingwords, var& ucword) {
 				}
 			}
 		}
+		*/
+		nextword = getword(remainingwords, ucword);
+		if (nextword && valuechars.index(nextword[1])) {
+			tosqlstring(nextword);
+			if (word1 != "")
+				word1 ^= FM_;
+			word1 ^= SQ ^ nextword.unquote() ^ SQ;
+		}
+		else {
+			//push the nextword back if not a value word
+			remainingwords = nextword ^ " " ^ remainingwords;
+		}
+
 	} else {
 		// word1.ucaser();
 	}
@@ -2806,7 +2820,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			////////////////////////////////////
 			// Filter Stage 6 - ACQUIRE VALUE(S)
 			////////////////////////////////////
-
+TRACE(word1)
 			// determine Pick/AREV values like "[xxx" "xxx]" and "[xxx]"
 			// TODO
 			if (word1[1] == "'") {
@@ -2909,6 +2923,19 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			var value = word1;
 
+			//change 'WITH SOMEMVFIELD = ""' to just 'WITH SOMEMVFIELD' to avoid ts_vector searching for nothing
+			if (value == "''") {
+
+				//remove multivalue handling - duplicate code elsewhere
+				if (dictexpression.index("to_tsvector(")) {
+					//dont create exodus_tobool(to_tsvector(...
+					dictexpression.swapper("to_tsvector('simple',","");
+					dictexpression.splicer(-1, 1, "");
+					dictexpression_isvector = false;
+				}
+
+			}
+
 			/////////////////////////////////////////////////////////////////////
 			// Filter Stage 7 - SAVE INFO FOR CALCULATED FIELDS IN STAGE 2 SELECT
 			/////////////////////////////////////////////////////////////////////
@@ -2989,11 +3016,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					dictexpression.splicer(-13, "");
 				}
 
+				//remove multivalue handling - duplicate code elsewhere
+				if (dictexpression.index("to_tsvector(")) {
+					//dont create exodus_tobool(to_tsvector(...
+					dictexpression.swapper("to_tsvector('simple',","");
+					dictexpression.splicer(-1, 1, "");
+//TRACE(dictexpression)
+					dictexpression_isvector = false;
+				}
+
 				//currently tobool requires only text input
 				//TODO some way to detect DATE SYMBOLIC FIELDS and not hack special dict words!
 				//doesnt work on multivalued fields - results in:
 				//exodus_tobool(SELECT_STAGE2_CURSOR_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
-				if (dictexpression.index("FULLY_"))
+				//TODO work out better way of determining DATE/TIME that must be tested versus null
+				if (dictexpression.index("FULLY_") || (!dictexpression.index("exodus_extract") && dictexpression.index("_DATE")))
 					dictexpression ^= " is not null";
 				else
 					dictexpression = "exodus_tobool(" ^ dictexpression ^ ")";
@@ -3003,12 +3040,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// eg WITH CLIENT_TYPE "X" .. assume missing "=" sign
 			else if (op == "") {
 				op = "=";
-			}
-
-			// missing value means error in sql
-			// WITH CLIENT_TYPE =
-			if (value == "") {
-				// value="";
 			}
 
 			///////////////////////////////////////////////////////////
@@ -3041,7 +3072,23 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 				var expression = "";
 				for (var& subvalue : value) {
-					expression ^= dictexpression ^ " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
+					/* ordinary UTF8 collation strangely doesnt sort single punctuation characters along with phrases starting with the same
+					   so we will use C collation which does. All so that we can use BETWEEN instead of LIKE to support STARTING WITH syntax
+					test_test=# select * from test1 order by key;
+					    key    |   data    
+					-----------+-----------
+					 %         | %
+					 +         | +
+					 1         | 1
+					 10        | 10
+					 2         | 2
+					 20        | 20
+					 A         | A
+					 B         | B
+					 %RECORDS% | RECORDS
+					 +RECORDS+ | +RECORDS+
+					*/
+					expression ^= dictexpression ^ " COLLATE \"C\" BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.splicer(-1, "");
 				expression.swapper(FM, " OR ");
@@ -3141,7 +3188,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
 				//this is the sole occurrence of to_tsquery in mvdbpostgres.cpp
 				//it will be used like to_tsvector(...) @@ to_tsquery(...)
-				value = "to_tsquery('simple'," ^ value ^ ")";
+				if (value)
+					value = "to_tsquery('simple'," ^ value ^ ")";
 				//value = "to_tsquery('english'," ^ value ^ ")";
 
 				/* creating a "none" stop list?
