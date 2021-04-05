@@ -2820,7 +2820,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			////////////////////////////////////
 			// Filter Stage 6 - ACQUIRE VALUE(S)
 			////////////////////////////////////
-TRACE(word1)
+			//TRACE(word1)
+
 			// determine Pick/AREV values like "[xxx" "xxx]" and "[xxx]"
 			// TODO
 			if (word1[1] == "'") {
@@ -3074,6 +3075,9 @@ TRACE(word1)
 				for (var& subvalue : value) {
 					/* ordinary UTF8 collation strangely doesnt sort single punctuation characters along with phrases starting with the same
 					   so we will use C collation which does. All so that we can use BETWEEN instead of LIKE to support STARTING WITH syntax
+
+					Example WITHOUT collation showing % sorted in different places
+
 					test_test=# select * from test1 order by key;
 					    key    |   data    
 					-----------+-----------
@@ -3088,6 +3092,7 @@ TRACE(word1)
 					 %RECORDS% | RECORDS
 					 +RECORDS+ | +RECORDS+
 					*/
+
 					expression ^= dictexpression ^ " COLLATE \"C\" BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.splicer(-1, "");
@@ -3099,56 +3104,37 @@ TRACE(word1)
 
 			}
 
-			// multiple values
-			else if (value.index(FM)) {
+			// single value data with multiple values filter
+			else if (value.index(FM) && !dictexpression_isvector) {
 
-				//in full text query on multiple words,
-				//we implement that words all are required
-				//all values and words separated by spaced are used as "word stems"
-				//NB ":*" means "ending in" to postgres tsquery. see:
-				//https://www.postgresql.org/docs/10/datatype-textsearch.html
-				//"lexemes in a tsquery can be labeled with * to specify prefix matching:"
-				if (dictexpression_isvector) {
+				//WARNING ", " is swapped in mvprogram.cpp ::select()
+				//so change there if changed here
+				value.swapper(FM_, ", ");
 
-					//quoted values
-					value.swapper("'" _FM_ "'", "|");
-
-					//unquoted numbers
-					value.swapper(FM_, "&");
+				// no processing for arrays (why?)
+				if (dictexpression_isarray) {
 				}
 
-				//ordinary query values
+				//lhs is an array ("multivalues" in postgres)
+				//dont convert rhs to in() or any()
+				else if (op == "=") {
+					op = "in";
+					value = "( " ^ value ^ " )";
+				}
+
+				// not any of
+				else if (op == "<>") {
+					op = "not in";
+					value = "( " ^ value ^ " )";
+				}
+
+				//any of
 				else {
-
-					//WARNING ", " is swapped in mvprogram.cpp ::select()
-					//so change there if changed here
-					value.swapper(FM_, ", ");
-
-					// no processing for arrays (why?)
-					if (dictexpression_isarray) {
-					}
-
-					//lhs is an array ("multivalues" in postgres)
-					//dont convert rhs to in() or any()
-					else if (op == "=") {
-						op = "in";
-						value = "( " ^ value ^ " )";
-					}
-
-					// not any of
-					else if (op == "<>") {
-						op = "not in";
-						value = "( " ^ value ^ " )";
-					}
-
-					//any of
-					else {
-						value = "ANY(ARRAY[" ^ value ^ "])";
-					}
+					value = "ANY(ARRAY[" ^ value ^ "])";
 				}
 			}
 
-			//full text search or mv field search
+			//full text search OR mv data search
 			if (dictexpression_isvector) {
 
 				//see note on isxref in "multiple values" section above
@@ -3157,28 +3143,69 @@ TRACE(word1)
 				// & separates multiple required
 				// | separates multiples alternatives
 				// 'fat & (rat | cat)'::tsquery;
+				//
+				// :* means "ending in" to postgres tsquery. see:
+				// https://www.postgresql.org/docs/10/datatype-textsearch.html
+				// "lexemes in a tsquery can be labeled with * to specify prefix matching:"
+				//
+				// Spaces are NOT allowed in values unless quoted
+				// Single quotes must be doubled '' (not ")
+				// since the whole query string will be single quoted
+
+				//in full text query on multiple words,
+				//we implement that words all are required
+				//all values and words separated by spaced are used as "word stems"
+
+				//using to_tsquery to search multivalued data
+				if (!dictexpression_isfulltext) {
+
+					//double the single quotes so the whole thing can be wrapped in single quotes
+					//and because to_tsquery generates a syntax error in case of spaces inside values unless quotedd
+					value.swapper("'","''");
+
+					//wrap everything in single quotes for sql
+					value.squoter();
+
+					//multiple with options become alternatives using to_tsquery | divider
+					value.swapper(FM_, "|");
+
+				}
 
 				// if full text search
 				//if (dictid.substr(-5).ucase() == "_XREF") {
 				if (dictexpression_isfulltext) {
 
-					//use spaces to indicate search words
-					value.swapper(" ", ":*&");
+					//multiple searches not handled fully yet
+					value.converter(FM," ");
+
+					//remove all single quotes
+					value.converter("'","");
 
 					//append postfix :* to every search word
 					//so STEV:* also finds STEVE and STEVEN
+
+					//use spaces to indicate search words
+					value.swapper(" ", ":*&");
+					//value.splicer(-1, 0, ":*");
+					value ^= ":*";
+
+					//respect any user entered AND or OR operators
 					value.swapper("&", ":*&");
 					value.swapper("|", ":*|");
-					value.splicer(-1, 0, ":*");
+
+					//put squotes back
+					value.squoter();
 
 				}
 				//select multivalues starting "XYZ" by selecting "XYZ]"
 				else if (postfix) {
+					value.swapper("]''", "'':*");
 					value.swapper("]", ":*");
 					//value.swapper("|", ":*|");
 					value.splicer(-1, 0, ":*");
 				}
 
+				value.swapper("]''", "'':*");
 				value.swapper("]", ":*");
 				//value.splicer(-1, 0, ":*");
 

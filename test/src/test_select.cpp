@@ -73,10 +73,10 @@ function main() {
 
 function test() {
 
-		assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
-		assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 1=") == "B");
-		assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 2=") == "C");
-		assert(!readnext(RECORD,ID,MV));
+	assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
+	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 1=") == "B");
+	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 2=") == "C");
+	assert(!readnext(RECORD,ID,MV));
 
 	assert(select(testfilename ^ " with f1m 'AA' (SR)"));
 	assert(readnext(RECORD,ID,MV) && ID.outputl("AA 1=") == "A");
