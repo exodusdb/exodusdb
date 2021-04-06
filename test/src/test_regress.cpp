@@ -15,6 +15,8 @@ function main() {
 
 	var filenames = remove(COMMAND,1);
 
+	//var manual = filenames;
+
 	var exodusdir=osgetenv("GITHUB_WORKSPACE");
 
 	// skip regression testing for speed
@@ -41,8 +43,8 @@ function main() {
 	for (var filename : filenames) {
 
 		//dont always test isnum because it is long and largely a waste of time
-		if (filename == "ISNUM.TXT")
-			continue;
+		//if (not manual and filename == "ISNUM.TXT")
+		//	continue;
 
 		if (filename) {
 
