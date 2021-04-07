@@ -2158,6 +2158,16 @@ exodus_call:
 		sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
 		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
+
+		//multivalued prestage2_calculated field DUPLICATE CODE
+		if (fieldname0[-1] == ":") {
+			var joinsectionn = 1;
+			var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
+			//if (!joins.a(joinsectionn).index(join))
+			if (!joins.index(join))
+				joins.r(joinsectionn, -1, join);
+		}
+
 	}
 
 	// unnest multivalued fields into multiple output rows
@@ -2211,7 +2221,7 @@ exodus_call:
 					selects ^= ", " ^ sqlexpression;
 			} else {
 
-				//multivalued prestage2_calculated field
+				//multivalued prestage2_calculated field DUPLICATE CODE
 				if (fieldname0[-1] == ":") {
 					var joinsectionn = 1;
 					var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";

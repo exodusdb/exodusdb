@@ -443,8 +443,12 @@ var var::oconv_MD(const char* conversion) const {
 				break;
 
 			default:
-				if (prefixchar == '\0')
+				if (prefixchar == '\0') {
+					//MD140P conversion ie 0 for prefix, is invalid conversion
+					if (nextchar == '0')
+						return *this;
 					prefixchar = nextchar;
+				}
 				break;
 		}
 		// move to next character if any otherwise break
