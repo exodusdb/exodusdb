@@ -25,6 +25,7 @@ function main(in nextcompanycode) {
 			if (not(xx.read(gen.companies, nextcompanycode))) {
 				call sysmsg(nextcompanycode.quote() ^ " COMPANY IS MISSING IN INIT.COMPANY()");
 				//TODO return abort code and change all callers to handle failure
+				debug();
 				return 0;
 				}
 			}
