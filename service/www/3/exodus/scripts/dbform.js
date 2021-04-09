@@ -1999,7 +1999,11 @@ function* listrecord_onclick(event) {
     if (!listfunction)
         return
 
-    if (!(yield* saveandorcleardoc('PRINT'))) {
+    yield* validateupdate()
+    listfunction = listfunction.replace(/%KEY%/gi, gkey)
+
+    if (gchangesmade && !(yield* saveandorcleardoc('PRINT'))) {
+        focusongpreviouselement()
         return
     }
     yield* exodusevaluate(listfunction, 'yield* listrecord_onclick()')
@@ -6614,9 +6618,17 @@ function* validate(element) {
         }
         */
 
-        //remove all non-printing characters (eg tab) from key fields
+        //special key field validation and conversion
         if (Number(element.getAttribute('exodusfieldno')) == 0) {
+
+            //remove all non-printing ASCII characters (eg tab) from key fields
             gvalue = gvalue.replace(/[\x00-\x1F]/g, '')
+
+            //prevent anything that is effectively 0
+            if (exodusnum(gvalue) && !Number(gvalue)) {
+                yield* exodusinvalid(elementtitle + ' cannot be zero')
+                return false //logout('validate')
+            }
         }
 
         //invalid character check

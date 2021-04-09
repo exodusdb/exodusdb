@@ -30,6 +30,7 @@ function main(in type, in inx, in mode, out outx) {
 		//find all DOS related code by searching GBP for /86400
 		if (datemode.index("DOS")) {
 			datemode.swapper("DOS", "");
+			//in1-=24873
 			in1 -= 24837;
 		}
 

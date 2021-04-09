@@ -688,27 +688,23 @@ exodusrecord.prototype.write=function* exodusrecord_write() {
 exodusrecord.prototype.writex=function* exodusrecord_writex(withunlock) {
 
  if (no(this.data)) {
-
   this.response="data not defined in writex"
   return 0
  }
   
  if (no(this.key)) {
-
   this.response="key not defined in writex"
   return 0
  }
 
  //convert the object to a rev string
  if (!(this.obj2rev())) {
-
   this.response='Error: Internal failure to convert object to revstr in writex'
   return 0
  }
  
  if (typeof gmaxstrsize == 'undefined') gmaxstrsize=60000
  if (gmaxstrsize && this.revstr.length>gmaxstrsize) {
-
   this.response='Error: Document is too large to save ('+this.revstr.length+' bytes/max '+maxbytes+')\rEdit some characters from the document and try again)'
   return 0
  }

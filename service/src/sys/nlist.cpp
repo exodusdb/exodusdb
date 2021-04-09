@@ -228,6 +228,8 @@ function main() {
 	showborder = 0;
 	headtabperpage = 1;
 
+	//compile nlist without linemarks. its inner loops benefit from efficiency
+
 	//for safety in case we are called with (PE) options, to avoid hanging
 	//PRINTER OFF;
 

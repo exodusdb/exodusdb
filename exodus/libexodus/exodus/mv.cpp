@@ -1725,7 +1725,7 @@ std::string dblToString(double double1) {
 	//EITHER use 15 for which 64-bit IEEE 754 type double guarantees
 	//roundtrip double/text/double for 15 decimal digits
 	//
-	//OR use precision 14 to avoid 1.1-1 = 1.000000000000001
+	//OR use precision 14 to avoid 1.1-1 = 0.1000000000000001
 	//but this will only reduce errors after a single calculation
 	//since errors are cumulative (random walk)
 	//

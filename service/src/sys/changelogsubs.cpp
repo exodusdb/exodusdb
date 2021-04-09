@@ -246,11 +246,11 @@ subroutine select() {
 		andx = " AND";
 	}
 	if (USERNAME ne "EXODUS") {
-		cmd ^= andx ^ " WITH DISTRIBUTION \"\"";
+		//cmd:=andx:' WITH DISTRIBUTION ""'
+		//andx=' AND'
+		//cmd:=' "User"'
+		cmd ^= andx ^ " ( WITH NO DISTRIBUTION OR WITH DISTRIBUTION = \"User\" )";
 		andx = " AND";
-		//if security('DOCUMENTATION ACCESS USER') then
-		cmd ^= " \"User\"";
-		// end
 	}
 	call safeselect(cmd ^ " (S)");
 

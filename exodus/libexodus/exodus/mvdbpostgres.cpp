@@ -2595,8 +2595,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// dont start with AND or OR
 			if (whereclause)
 				whereclause ^= "\n " ^ ucword;
-			if (ucword == "OR")
+			if (ucword == "OR") {
 				orwith = true;
+				debug();
+			}
 			continue;
 		}
 

@@ -324,6 +324,11 @@ function main()
 	printl(oconv(1234.567,"MD20P" _VM_ "[NUMBER]"));
 	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]")=="1,234.57");
 
+	//prefix char of 0 (third char after MD) makes oconv invalid
+	assert((oconv(-12,"MD140")^"x")=="-12x");
+	assert((oconv(-12.123,"MD140")^"x")=="-12.123x");
+	assert((oconv("abc","MD140")^"x")=="abcx");
+
 	//osread invalid utf8 should read without change
 	//will be unwritable to database which only accepts utf8 key and data
 	if (not osread(utftest,utftestfilename)) {
