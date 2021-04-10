@@ -474,7 +474,7 @@ subroutine getuserdept2(in mode) {
 
 	//locate divider, or usern+1
 	var nusers1 = SECURITY.a(1).count(VM) + 1;
-	for (usern = 1; usern <= nusers1; ++usern) {
+	for (usern += 1; usern <= nusers1; ++usern) {
 		///BREAK;
 		if (SECURITY.a(1, usern) eq "---") break;
 	} //usern;

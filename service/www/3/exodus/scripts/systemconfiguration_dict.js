@@ -7,7 +7,8 @@ function* form_postinit() {
 }
 
 function* form_postdisplay() {
-    showhide('databasesection', (yield* gds.getall('SCOPE'))=='SYSTEM.CFG')
+    showhide('databasesection', (!gexodus_server && (yield* gds.getall('SCOPE'))=='SYSTEM.CFG'))
+    showhide(['backupsection','old_server'], !gexodus_server)
     return true
 }
 

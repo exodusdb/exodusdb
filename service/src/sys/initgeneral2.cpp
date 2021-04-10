@@ -374,9 +374,11 @@ nextuser:
 		href = "../exodus/systemconfiguration.htm";
 		call menusubs("ADDITEM", menutx, item, href);
 
-		item = "_Backup";
-		href = "../exodus/backup.htm";
-		call menusubs("ADDITEM", menutx, item, href);
+		if (VOLUMES) {
+			item = "_Backup";
+			href = "../exodus/backup.htm";
+			call menusubs("ADDITEM", menutx, item, href);
+		}
 
 		item = "L_og";
 		href = "../exodus/log.htm";
@@ -395,21 +397,25 @@ nextuser:
 
 		call menusubs("ADDSEP", menutx);
 
-		item = "List of Database _Processes";
-		var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
-			//backslash
-		onclick.converter("|", var().chr(92));
-		call menusubs("ADDITEM", menutx, item, href, onclick);
+		if (VOLUMES) {
+			item = "List of Database _Processes";
+			var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
+				//backslash
+			onclick.converter("|", var().chr(92));
+			call menusubs("ADDITEM", menutx, item, href, onclick);
+		}
 
 		item = "_List of Documents in Use";
-		onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTLOCKS');return false";
+		var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTLOCKS');return false";
 			//backslash
 		onclick.converter("|", var().chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
-		item = "_Stop/Restart EXODUS Service";
-		href = "../exodus/stopservice.htm";
-		call menusubs("ADDITEM", menutx, item, href);
+		if (VOLUMES) {
+			item = "_Stop/Restart EXODUS Service";
+			href = "../exodus/stopservice.htm";
+			call menusubs("ADDITEM", menutx, item, href);
+		}
 
 		call menusubs("ENDMENU", menutx);
 

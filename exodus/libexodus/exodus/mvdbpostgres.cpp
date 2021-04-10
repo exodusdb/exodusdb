@@ -1881,6 +1881,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		if (!fieldno) {
 
 			var isdate = conversion[1] == "D" || conversion.substr(1, 5) == "[DATE";
+			var istime = !isdate && (conversion.substr(1,2) == "MT" || conversion.substr(1, 5) == "[TIME");
 
 			if (forsort && !isdate)
 				// sqlexpression="exodus_extract_sort(" ^
@@ -1908,6 +1909,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					// cannot seem to use + on dates in indexes
 					//therefore
 					"exodus_extract_date(" ^ sqlexpression ^ ",0,0,0)";
+			else if (istime)
+				sqlexpression =
+					"exodus_extract_time(" ^ sqlexpression ^ ",0,0,0)";
 
 			return sqlexpression;
 		}

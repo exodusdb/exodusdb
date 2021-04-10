@@ -40,9 +40,14 @@ function main(in a0, io bb, in sep) {
 		var bcode = "";
 
 		var nb = bb.count(VM) + (bb ne "");
-		//cause assist c++ decompiler to lift bn out of loop
-		var bn = 1;
-		for (var bn = 1; bn <= nb; ++bn) {
+		//assist ADECOM c++ decompiler to lift bn out of loop
+		//bn=1
+		//for bn=1 to nb
+		var bn = 0;
+		while (true) {
+			bn += 1;
+			///BREAK;
+			if (not(bn le nb)) break;
 			var bnum = split(bb.a(1, bn), bcode);
 			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
 
@@ -63,10 +68,11 @@ function main(in a0, io bb, in sep) {
 				break;
 			}
 
-		//could be faster if input was guaranteed to be in order
-		//until bcode>=acode
+			//could be faster if input was guaranteed to be in order
+			//until bcode>=acode
 
-		} //bn;
+			//next bn
+		}//loop;
 
 		//if bcode<>acode and len(anum) then
 		if (bcode ne acode) {

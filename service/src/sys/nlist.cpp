@@ -1016,7 +1016,7 @@ nextkey:
 
 						//determine B99.99 format for row and col
 						tt2 = "";
-						for (tt = 1; tt <= 9999; ++tt) {
+						for (tt += 1; tt <= 9999; ++tt) {
 							charx = word[tt];
 							///BREAK;
 							if (not(charx.length() and var("0123456789,").index(charx))) break;

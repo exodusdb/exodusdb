@@ -298,6 +298,8 @@ function exodus_client_init() {
     }
     setdateformat()
 
+    gexodus_server = gdataset.toLowerCase() == gdataset
+
     if (typeof gparameters == 'undefined')
         gparameters = new Object
     if (typeof window.dialogArguments != 'undefined') {

@@ -745,7 +745,8 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 	//picktime=pg_atoi(intstr,4,'.');
 	picktime=atoi(intstr);
 
-    #define SIZEOFINTERVAL 12
+    //#define SIZEOFINTERVAL 12
+    #define SIZEOFINTERVAL (int)(sizeof(Interval*))
 	//prepare a new output
 	//text	   *output = (text *) palloc(VARSIZE(input));
 	output = (Interval *) palloc(VARHDRSZ+SIZEOFINTERVAL);
@@ -758,6 +759,7 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 #	endif
 
 	PG_RETURN_INTERVAL_P(output);
+	//PG_RETURN_TIME(output);
 }
 
 PG_FUNCTION_INFO_V1(exodus_extract_datetime);
