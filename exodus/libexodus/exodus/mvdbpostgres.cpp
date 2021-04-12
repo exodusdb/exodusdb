@@ -1883,7 +1883,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			var isdate = conversion[1] == "D" || conversion.substr(1, 5) == "[DATE";
 			var istime = !isdate && (conversion.substr(1,2) == "MT" || conversion.substr(1, 5) == "[TIME");
 
-			if (forsort && !isdate)
+			if (forsort && !isdate && !istime)
 				// sqlexpression="exodus_extract_sort(" ^
 				// fileexpression(mainfilename, filename,"key") ^ ")";
 				sqlexpression =
