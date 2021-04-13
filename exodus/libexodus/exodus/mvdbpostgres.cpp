@@ -1871,7 +1871,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	//dont assume things that are R are numeric
 	//eg period 1/19 is right justified but not numeric and sql select will crash if ::float8 is used
 	//||dictrec.a(9) == "R";
-	var isnumeric = isinteger || isdecimal;
+	var isnumeric = isinteger || isdecimal || dictrec.a(9) == "R";
 	var ismv1 = dictrec.a(4)[1] == "M";
 	var fromjoin = false;
 
@@ -2601,7 +2601,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				whereclause ^= "\n " ^ ucword;
 			if (ucword == "OR") {
 				orwith = true;
-				debug();
 			}
 			continue;
 		}
