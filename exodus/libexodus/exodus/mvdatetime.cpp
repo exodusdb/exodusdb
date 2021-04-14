@@ -491,7 +491,7 @@ var var::oconv_MT(const char* conversion) const {
 
 	// guess 1st option is most often zero/ie most conversions are MT only and short circuit
 	if (!(*conversionchar)) {
-		timesecs = round();
+		timesecs = this->round();
 
 		// interpret conversion characters
 	} else {
@@ -511,6 +511,13 @@ var var::oconv_MT(const char* conversion) const {
 		if (*conversionchar == 'U') {
 			++conversionchar;
 			unlimited = true;
+		}
+
+		// next may be a Z to convert 0 to ""
+		if (*conversionchar == 'Z') {
+			if (!timesecs)
+				return "";
+			++conversionchar;
 		}
 
 		// next may be an H to indicate AM/PM
