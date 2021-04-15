@@ -3246,8 +3246,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			// testing for "" may become testing for null
 			// for date and time which are returned as null for empty string
+			//TODO detect FULLY_BOOKED and FULLY_APPROVED as dates automatically
 			else if (value == "''") {
-				if (dictexpression.index("extract_date") ||
+				if (dictexpression.index("extract_date") || dictexpression.index("FULLY_") ||
 					dictexpression.index("extract_time")) {
 					if (op == "=")
 						op = "is";

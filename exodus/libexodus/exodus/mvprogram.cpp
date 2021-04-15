@@ -127,6 +127,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	dim reqivalues(nfields);
 	dim reqivalues2(nfields);
 	dim ioconvs(nfields);
+	dim sqltypes(nfields);
 
 	for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
@@ -214,6 +215,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		else {
 			sqltype = "TEXT";
 		}
+		sqltypes(fieldn) = sqltype;
 
 		//sql temp table column
 		createtablesql ^= " " ^ sqlcolid ^ " "^ sqltype ^ ",";
@@ -340,7 +342,14 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 			var ioconv = ioconvs(fieldn);
 			if (ioconv)
 				ovalue = oconv(ovalue,ioconv);
-			insertsql ^= " " ^ ovalue.squote() ^ ",";
+
+			var sqltype = sqltypes(fieldn);
+			if ((sqltype == "DATE" or sqltype == "TIME") && !ovalue)
+				ovalue = "NULL";
+			else
+				ovalue.squoter();
+
+			insertsql ^= " " ^ ovalue ^ ",";
 		}
 
 		//skip if failed to match
@@ -351,6 +360,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 
 		//ID.outputl("stage1 ok ");
 
+		//replace final comma with a closing bracket
 		insertsql.splicer(-1, 1, ")");
 
 		//insertsql.outputl();

@@ -143,7 +143,7 @@ COST 10;
 	do_sql("exodus_tobool(instring text)", "bool", tobool_sql, sqltemplate);
 
 	//exodus_date -> int (today's date as a number according to pickos)
-	do_sql("exodus_date()", "int", exodus_date_sql, sqltemplate);
+	do_sql("exodus_date()", "int", exodus_todays_date_sql, sqltemplate);
 
 	//exodus_extract_date_array -> date[]
 	do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
@@ -157,14 +157,14 @@ COST 10;
 	return 0;
 }
 
-subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplate) {
+subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
 
-	printl(functionname_and_args, " -> ", returntype);
+	printl(functionname_and_args, " -> ", return_sqltype);
 
 	var functionsql = sqltemplate;
 
 	functionsql.swapper("$functionname_and_args", functionname_and_args);
-	functionsql.swapper("$return_type", returntype);
+	functionsql.swapper("$return_type", return_sqltype);
 
 	functionsql.swapper("$sqlcode", sql);
 
@@ -262,8 +262,11 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
 	var conversion = dictrec.a(7);
-	if (conversion.substr(1, 6) == "[DATE,")
+	if (conversion.substr(1, 6) == "[DATE," || conversion.substr(1, 6) == "[DATE2")
 		dict_returns = "date";
+	if (conversion.substr(1, 5) == "[TIME")
+		//dict_returns = "time";
+		dict_returns = "integer";
 	else if (conversion.substr(1, 7) == "[NUMBER") {
 		if (conversion[9] == "0")
 			//[NUMBER,0]
@@ -808,7 +811,7 @@ END;
 )V0G0N";
 
 //exodus_date -> int
-var exodus_date_sql =
+var exodus_todays_date_sql =
 	R"V0G0N(
  return current_date-'1968-1-1'::date;
 )V0G0N";
