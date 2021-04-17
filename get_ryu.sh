@@ -14,16 +14,16 @@ set -eux
 : get ryu
 : =======
 :
-	git clone https://github.com/ulfjack/ryu.git
+	test -d ryu || git clone https://github.com/ulfjack/ryu.git
 
 : build and test
 : ==============
 :
 	cd ryu
-	bazel build ryu/ryu
-	bazel test ryu/ryu
-	bazel build ryu/ryu_parse
-	bazel test ryu/ryu_parse
+	bazel build ryu/ryu || true
+	bazel test ryu/ryu || true
+	bazel build ryu/ryu_parse || true
+	bazel test ryu/ryu_parse || true
 
 : install
 : =======
