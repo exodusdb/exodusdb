@@ -1788,10 +1788,11 @@ bool var::isnum(void) const {
 			//      this->var_dbl = std::stod(var_str.c_str(), 0);
 
 #if defined(HAS_FASTFLOAT)
-
 			//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
 
-			auto [p, ec] = fast_float::from_chars(this->var_str.data(), this->var_str.data() + this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
+			char* first = this->var_str.data();
+			first += *first == '+';
+			auto [p, ec] = fast_float::from_chars(first, this->var_str.data() + this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
 			if (ec != std::errc()) {
 				//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
 				this->var_typ = VARTYP_NANSTR;
