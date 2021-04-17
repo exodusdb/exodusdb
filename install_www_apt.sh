@@ -182,7 +182,7 @@ V0G0N
 :
 	curl -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
 	dpkg -i wkhtmltox_0.12.6-1.focal_amd64.deb || true
-	apt --fix-broken install
+	apt -y --fix-broken install
 :
 : Test it works
 :
