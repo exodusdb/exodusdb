@@ -2752,7 +2752,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 						date_time_numeric = "date";
 					} else if (dictexpression.index("time_array(")) {
 						whereclause ^= " tsrange(";
-						date_time_numeric = "time";
+						//date_time_numeric = "time";
+						date_time_numeric = "interval";
 					} else {
 						whereclause ^= " numrange(";
 						date_time_numeric = "numeric";

@@ -708,57 +708,8 @@ exodus_extract_date(PG_FUNCTION_ARGS)
 
 }
 
-PG_FUNCTION_INFO_V1(exodus_extract_time);
-
-Datum
-exodus_extract_time(PG_FUNCTION_ARGS)
-{
-
-	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
-	//VARDATA() gives you a pointer to the data region of a struct.
-	//VARSIZE() gives you the total size of the structure
-	//VARHDRSZ
-
-	int64 picktime;
-
-	char intstr[21]="12345";
-
-	GETINPUTSTARTLENGTH
-
-	//intstr="12345";
-	intstr[20]='\0';
-
-	//return NULL for zero length string
-	if (outlen==0)
-		PG_RETURN_NULL();
-
-	//prepare a c str
-	if (outlen>=20)
-	{
-		elog(ERROR, "pgexodus exodus_extract_time cannot convert more than 20 characters to an integer time");
-		PG_RETURN_NULL();
-	}
-
-	memcpy(intstr,			// destination
-		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
-	intstr[outlen]='\0';
-
-	//convert the c str to an int
-	//picktime=outlen;
-	//this will error if not a valid integer
-	//picktime=pg_atoi(intstr,4,'.');
-	picktime=atoi(intstr);
-	picktime*=1000000;
-	//picktime=1000000;//1 second in microseconds
-	//pick date 0 is 0-86399 (seconds)
-	//pg date 0 is 0-86399999999 (microseconds)
-	PG_RETURN_INT64(picktime);
-//	PG_RETURN_TIMEADT(picktime);
-
-}
-
-#if 0 //old time extraction as interval but still declared as returning time (why was it done like this?)
+//time extraction as interval so that we can handle times like 25:00 which fall into the following day
+#if 1
 PG_FUNCTION_INFO_V1(exodus_extract_time);
 
 Datum
@@ -811,6 +762,58 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 #	endif
 
 	PG_RETURN_INTERVAL_P(output);
+}
+
+#else
+//returning time as time - not used because cant handle times like 25:00
+PG_FUNCTION_INFO_V1(exodus_extract_time);
+
+Datum
+exodus_extract_time(PG_FUNCTION_ARGS)
+{
+
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
+	//VARDATA() gives you a pointer to the data region of a struct.
+	//VARSIZE() gives you the total size of the structure
+	//VARHDRSZ
+
+	int64 picktime;
+
+	char intstr[21]="12345";
+
+	GETINPUTSTARTLENGTH
+
+	//intstr="12345";
+	intstr[20]='\0';
+
+	//return NULL for zero length string
+	if (outlen==0)
+		PG_RETURN_NULL();
+
+	//prepare a c str
+	if (outlen>=20)
+	{
+		elog(ERROR, "pgexodus exodus_extract_time cannot convert more than 20 characters to an integer time");
+		PG_RETURN_NULL();
+	}
+
+	memcpy(intstr,			// destination
+		   (void *) (VARDATA(input)+outstart),	// starting from
+		   outlen);						// how many bytes
+	intstr[outlen]='\0';
+
+	//convert the c str to an int
+	//picktime=outlen;
+	//this will error if not a valid integer
+	//picktime=pg_atoi(intstr,4,'.');
+	picktime=atoi(intstr);
+	picktime*=1000000;
+	//picktime=1000000;//1 second in microseconds
+	//pick date 0 is 0-86399 (seconds)
+	//pg date 0 is 0-86399999999 (microseconds)
+	PG_RETURN_INT64(picktime);
+//	PG_RETURN_TIMEADT(picktime);
+
 }
 #endif
 

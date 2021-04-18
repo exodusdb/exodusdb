@@ -76,6 +76,7 @@ function main() {
 
 	var().sqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;");
 
+	var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_time_array(data text, fn int, vn int, sn int) returns time[];");
 	//create dict_all file
 
 	//ignore error if doesnt exist
@@ -148,8 +149,11 @@ COST 10;
 	//exodus_extract_date_array -> date[]
 	do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
 
+	//return time as interval which can handle times like 25:00
 	//exodus_extract_time_array -> time[]
-	do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
+	//do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
+	//exodus_extract_time_array -> time[]
+	do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
 
 	//exodus_addcent4 -> text
 	do_sql("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
@@ -266,7 +270,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		dict_returns = "date";
 	if (conversion.substr(1, 5) == "[TIME")
 		//dict_returns = "time";
-		dict_returns = "integer";
+		dict_returns = "interval";
 	else if (conversion.substr(1, 7) == "[NUMBER") {
 		if (conversion[9] == "0")
 			//[NUMBER,0]
@@ -838,7 +842,7 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_extract_time_array -> time[]
+//exodus_extract_time_array -> interval[]
 //almost identical code in exodus_extract_date_array
 var exodus_extract_time_array_sql =
 	R"V0G0N(
@@ -846,7 +850,7 @@ DECLARE
  times text := exodus_extract_text(data,fn,vn,sn);
  timex text;
  ntimes int := exodus_count(times,VM)+(times!='')::int;
- time_array time[];
+ time_array interval[];
 BEGIN
  for timen in 1..ntimes loop
   timex := split_part(times,VM,timen);
