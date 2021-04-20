@@ -2656,7 +2656,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			//var dictexpression_isarray=dictexpression.index("string_to_array(");
 			var dictexpression_isarray = dictexpression.index("_array(");
 			var dictexpression_isvector = dictexpression.index("to_tsvector(");
-			var dictexpression_isfulltext = dictid.substr(-5).ucase() == "_XREF";
+			//var dictexpression_isfulltext = dictid.substr(-5).ucase() == "_XREF";
+			var dictexpression_isfulltext = dictid.substr(-4).ucase() == "XREF";
 
 			// add the dictid expression
 			//if (dictexpression.index("exodus_call"))
@@ -3096,7 +3097,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 					test_test=# select * from test1 order by key;
 					    key    |   data    
-					-----------+-----------
+					-----------+---------==--
 					 %         | %
 					 +         | +
 					 1         | 1
@@ -3173,7 +3174,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//all values and words separated by spaced are used as "word stems"
 
 				//using to_tsquery to search multivalued data
-				if (!dictexpression_isfulltext) {
+				if (not dictexpression_isfulltext) {
 
 					//double the single quotes so the whole thing can be wrapped in single quotes
 					//and because to_tsquery generates a syntax error in case of spaces inside values unless quotedd
@@ -3192,6 +3193,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				if (dictexpression_isfulltext) {
 
 					var values="";
+					value.converter(VM,FM);
 					for (var partvalue : value) {
 
 						//multiple searches not handled fully yet
@@ -3212,15 +3214,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 						partvalue.swapper("&", ":*&");
 						partvalue.swapper("|", ":*|");
 
-						//put squotes back
-						partvalue.squoter();
-
 						values ^= "(" ^ partvalue ^ ")";
 						values ^= FM;
 					}
 					values.splicer(-1,1,"");
 					values.swapper(FM, "|");
-					value = values;
+					value = values.squote();
 				}
 				//select multivalues starting "XYZ" by selecting "XYZ]"
 				else if (postfix) {
