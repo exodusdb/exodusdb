@@ -30,6 +30,8 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	var parts = cmd.a(1, 2);
 	if (fieldname.substr(-4)=="XREF") {
 
+		parts = cmd.a(1).remove(1,1);
+
 		//XREF sql was implemented as STARTING so ] was not required
 		parts.converter("]","");
 

@@ -257,103 +257,127 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	//nextrecord:
 	while (CURSOR.readnext(RECORD, ID, MV)) {
 
-		bool ok = true;
+		bool allok = true;
 
 		//var id2 = MV ? (ID ^ "*" ^ MV) : ID;
 		var insertsql = baseinsertsql ^ ID.swapper("'", "''").squote() ^ ",";
 
+		//some or all fields may have filters on them
+		//some or all fields may not have filters, if 'order by' calculated fields
 		for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
-			var ivalue = calculate(dictids(fieldn));
+			var ivalues = calculate(dictids(fieldn));
 
-			//debug
-			//ivalue.outputl(dictids(fieldn) ^ " ivalue=");
-
-			switch (int(opnos(fieldn))) {
-				case 0:
-					break;
-				case 1:	 // =
-					ok = ivalue == reqivalues(fieldn);
-					break;
-				case 2:	 // <>
-					ok = ivalue != reqivalues(fieldn);
-					break;
-				case 3:	 // >
-					ok = ivalue > reqivalues(fieldn);
-					break;
-				case 4:	 // <
-					ok = ivalue < reqivalues(fieldn);
-					break;
-				case 5:	 // >=
-					ok = ivalue >= reqivalues(fieldn);
-					break;
-				case 6:	 // <=
-					ok = ivalue <= reqivalues(fieldn);
-					break;
-				case 7:	 // ~ regex
-					ok = ivalue.match(reqivalues(fieldn));
-					break;
-				case 8:	 // ~* regex case insensitive
-					ok = ivalue.match(reqivalues(fieldn), "i");
-					break;
-				case 9:	 // !~ not regex
-					ok = !(ivalue.match(reqivalues(fieldn)));
-					break;
-				case 10:  // !~* not regex case insensitive
-					ok = !(ivalue.match(reqivalues(fieldn), "i"));
-					break;
-				case 11:  // between x and y, from x to
-					ok = (ivalue >= reqivalues(fieldn) && ivalue <= reqivalues2(fieldn));
-					break;
-				case 12:  // not between x and y, not from x to y
-					ok = (ivalue < reqivalues(fieldn) || ivalue > reqivalues2(fieldn));
-					break;
-				case 13:  // in list
-					ok = reqivalues(fieldn).locate(ivalue);
-					break;
-				case 14:  // not in list
-					ok = !reqivalues(fieldn).locate(ivalue);
-					break;
-				case 15:  // is true (not "" 0 "0" "00" "0.0" etc).
-					ok = ivalue;
-					break;
-				case 16:  // is false (isnt true)
-					ok = !ivalue;
-					break;
-				case 17:  // STARTING ]
-					ok = reqivalues(fieldn).substr(0, ivalue.length()) == ivalue;
-					break;
-				case 18:  // ENDING [
-					ok = reqivalues(fieldn).substr(-ivalue.length()) == ivalue;
-					ok = !ivalue;
-					break;
-				case 19:  //  CONTAINING []
-					ok = reqivalues(fieldn).index(ivalue);
-					break;
-			}
-			if (!ok) {
+			if (opnos(fieldn)) {
 				//debug
-				//ivalue.outputl("FAILED=");
-				break;
-			}
+				//ivalues.outputl(dictids(fieldn) ^ " ivalues=");
+
+				var nextsep;
+				var pos = 1;
+				bool ok = false;
+
+				while (true) {
+
+					var ivalue = ivalues.substr2(pos,nextsep);
+
+					switch (int(opnos(fieldn))) {
+						case 0://cannot occur - due to if statement above
+							break;
+						case 1:	 // =
+							ok = ivalue == reqivalues(fieldn);
+							//ok = ivalue.locate(reqivalues(fieldn));
+							break;
+						case 2:	 // <>
+							ok = ivalue != reqivalues(fieldn);
+							//ok = !ivalue.locate(reqivalues(fieldn));
+							break;
+						case 3:	 // >
+							ok = ivalue > reqivalues(fieldn);
+							break;
+						case 4:	 // <
+							ok = ivalue < reqivalues(fieldn);
+							break;
+						case 5:	 // >=
+							ok = ivalue >= reqivalues(fieldn);
+							break;
+						case 6:	 // <=
+							ok = ivalue <= reqivalues(fieldn);
+							break;
+						case 7:	 // ~ regex
+							ok = ivalue.match(reqivalues(fieldn));
+							break;
+						case 8:	 // ~* regex case insensitive
+							ok = ivalue.match(reqivalues(fieldn), "i");
+							break;
+						case 9:	 // !~ not regex
+							ok = !(ivalue.match(reqivalues(fieldn)));
+							break;
+						case 10:  // !~* not regex case insensitive
+							ok = !(ivalue.match(reqivalues(fieldn), "i"));
+							break;
+						case 11:  // between x and y, from x to
+							ok = (ivalue >= reqivalues(fieldn) && ivalue <= reqivalues2(fieldn));
+							break;
+						case 12:  // not between x and y, not from x to y
+							ok = (ivalue < reqivalues(fieldn) || ivalue > reqivalues2(fieldn));
+							break;
+						case 13:  // in list
+							ok = reqivalues(fieldn).locate(ivalue);
+							break;
+						case 14:  // not in list
+							ok = !reqivalues(fieldn).locate(ivalue);
+							break;
+						case 15:  // is true (not "" 0 "0" "00" "0.0" etc).
+							ok = ivalue;
+							break;
+						case 16:  // is false (isnt true)
+							ok = !ivalue;
+							break;
+						case 17:  // STARTING ]
+							ok = reqivalues(fieldn).substr(0, ivalue.length()) == ivalue;
+							break;
+						case 18:  // ENDING [
+							ok = reqivalues(fieldn).substr(-ivalue.length()) == ivalue;
+							ok = !ivalue;
+							break;
+						case 19:  //  CONTAINING []
+							ok = reqivalues(fieldn).index(ivalue);
+							break;
+					}//switch
+
+					//quit searching data values if found or no more
+					if (ok || !nextsep)
+						break;
+
+				}//for each ivalue
+
+				//if a field fails test then skip and remaining fields and readnext candidate record
+				if (!ok) {
+					//debug
+					//ivalue.outputl("FAILED=");
+					allok = false;
+					break;// out of fields loop. assuming that all filters are AND. fail one = skip record
+				}
+
+			}//if opno
 
 			//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
-			var ovalue = ivalue.swap("'", "''");
-			var ioconv = ioconvs(fieldn);
-			if (ioconv)
-				ovalue = oconv(ovalue,ioconv);
+			var ovalues = ivalues.swap("'", "''");
+			if (ioconvs(fieldn))
+				ovalues = oconv(ovalues,ioconvs(fieldn));
 
 			var sqltype = sqltypes(fieldn);
-			if ((sqltype == "DATE" or sqltype == "TIME") && !ovalue)
-				ovalue = "NULL";
+			if (!ovalues && (sqltype == "DATE" || sqltype == "TIME" || sqltype == "TIMESTAMP"))
+				ovalues = "NULL";
 			else
-				ovalue.squoter();
+				ovalues.squoter();
 
-			insertsql ^= " " ^ ovalue ^ ",";
-		}
+			insertsql ^= " " ^ ovalues ^ ",";
+
+		}//fieldn
 
 		//skip if failed to match
-		if (!ok) {
+		if (!allok) {
 			//ID.outputl("failed ");
 			continue;
 		}
@@ -370,10 +394,12 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		//option to limit number of records returned
 		++recn;
 		if (maxnrecs && recn > maxnrecs) {
+			//break out of readnext loop
 			CURSOR.clearselect();
 			//break;
 		}
-	}
+
+	}//readnext
 
 	sortselectclause2.errputl("\nstage2=");
 

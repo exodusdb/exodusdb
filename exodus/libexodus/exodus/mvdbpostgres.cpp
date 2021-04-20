@@ -3191,27 +3191,36 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//if (dictid.substr(-5).ucase() == "_XREF") {
 				if (dictexpression_isfulltext) {
 
-					//multiple searches not handled fully yet
-					value.converter(FM," ");
+					var values="";
+					for (var partvalue : value) {
 
-					//remove all single quotes
-					value.converter("'","");
+						//multiple searches not handled fully yet
+						//partvalue.converter(FM," ");
 
-					//append postfix :* to every search word
-					//so STEV:* also finds STEVE and STEVEN
+						//remove all single quotes
+						partvalue.converter("'","");
 
-					//use spaces to indicate search words
-					value.swapper(" ", ":*&");
-					//value.splicer(-1, 0, ":*");
-					value ^= ":*";
+						//append postfix :* to every search word
+						//so STEV:* also finds STEVE and STEVEN
 
-					//respect any user entered AND or OR operators
-					value.swapper("&", ":*&");
-					value.swapper("|", ":*|");
+						//use spaces to indicate search words
+						partvalue.swapper(" ", ":*&");
+						//partvalue.splicer(-1, 0, ":*");
+						partvalue ^= ":*";
 
-					//put squotes back
-					value.squoter();
+						//respect any user entered AND or OR operators
+						partvalue.swapper("&", ":*&");
+						partvalue.swapper("|", ":*|");
 
+						//put squotes back
+						partvalue.squoter();
+
+						values ^= "(" ^ partvalue ^ ")";
+						values ^= FM;
+					}
+					values.splicer(-1,1,"");
+					values.swapper(FM, "|");
+					value = values;
 				}
 				//select multivalues starting "XYZ" by selecting "XYZ]"
 				else if (postfix) {
@@ -3247,20 +3256,33 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			// testing for "" may become testing for null
 			// for date and time which are returned as null for empty string
-			//TODO detect FULLY_BOOKED and FULLY_APPROVED as dates automatically
 			else if (value == "''") {
-				if (dictexpression.index("extract_date") || dictexpression.index("FULLY_") ||
+				if (dictexpression.index("extract_date") ||
+					dictexpression.index("extract_datetime") ||
 					dictexpression.index("extract_time")) {
+					//if (op == "=")
+					//	op = "is";
+					//else
+					//	op = "is not";
+					//value = "null";
+					dictexpression.swapper("extract_date(","extract_text(");
+					dictexpression.swapper("extract_datetime(","extract_text(");
+					dictexpression.swapper("extract_time(","extract_text(");
+				}
+				// currently number returns 0 for empty string
+				//|| dictexpression.index("extract_number")
+				else if (dictexpression.index("extract_number")) {
+					//value = "'0'";
+					dictexpression.swapper("extract_number(","extract_text(");
+				}
+				//horrible hack to allow filtering calculated date fields versus ""
+				//TODO detect FULLY_BOOKED and FULLY_APPROVED as dates automatically
+				else if (dictexpression.index("FULLY_")) {
 					if (op == "=")
 						op = "is";
 					else
 						op = "is not";
 					value = "null";
-				}
-				// currently number returns 0 for empty string
-				//|| dictexpression.index("extract_number")
-				else if (dictexpression.index("extract_number")) {
-					value = "'0'";
 				}
 			}
 
