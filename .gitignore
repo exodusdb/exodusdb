@@ -2,6 +2,7 @@ CMake*
 cmake*
 *.cmake
 CPack*
+_CPack_Packages*
 Makefile
 install_manifest.txt
 *libexodus.so*
