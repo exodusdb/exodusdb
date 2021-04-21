@@ -3192,27 +3192,43 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//if (dictid.substr(-5).ucase() == "_XREF") {
 				if (dictexpression_isfulltext) {
 
+					//https://www.postgresql.org/docs/current/textsearch-controls.html
+					//and
+					//https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
+
+					//construct according to ts_query syntax using & | ( )
+					//e.g. trying to find records containing either ADIDAS or KIA MOTORS where \036 is VM
+					//value 'ADID\036KIA&MOT' -> '(ADID:*)|(KIA:*&MOT:*)
+
+					// xxx:* searches for words starting with xxx
+
+					//multivalues are searched using "OR" which is the | pipe character in ts_query syntax
+					//words separated by spaces (or & characters) are searched for uing "AND" which is & in ts_query syntax
 					var values="";
 					value.converter(VM,FM);
 					for (var partvalue : value) {
 
-						//multiple searches not handled fully yet
-						//partvalue.converter(FM," ");
-
 						//remove all single quotes
-						partvalue.converter("'","");
+						//partvalue.converter("'","");
+
+						//swap all single quotes in search term for pairs of single quotes as per postgres syntax
+						partvalue.swapper("'","''");
 
 						//append postfix :* to every search word
 						//so STEV:* also finds STEVE and STEVEN
 
-						//use spaces to indicate search words
-						partvalue.swapper(" ", ":*&");
+						//spaces should have been converted to & before selection
+						//spaces imply &
+						//partvalue.swapper(" ", "&");
 						//partvalue.splicer(-1, 0, ":*");
-						partvalue ^= ":*";
 
 						//respect any user entered AND or OR operators
+						//search for all words STARTING with user defined words
 						partvalue.swapper("&", ":*&");
 						partvalue.swapper("|", ":*|");
+						partvalue.swapper("!", ":*!");
+
+						partvalue ^= ":*";
 
 						values ^= "(" ^ partvalue ^ ")";
 						values ^= FM;
