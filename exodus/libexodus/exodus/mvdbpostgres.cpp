@@ -1875,13 +1875,13 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	var ismv1 = dictrec.a(4)[1] == "M";
 	var fromjoin = false;
 
+	var isdate = conversion[1] == "D" || conversion.substr(1, 5) == "[DATE";
+	var istime = !isdate && (conversion.substr(1,2) == "MT" || conversion.substr(1, 5) == "[TIME");
+
 	var sqlexpression;
 	if (dicttype == "F") {
 		// key field
 		if (!fieldno) {
-
-			var isdate = conversion[1] == "D" || conversion.substr(1, 5) == "[DATE";
-			var istime = !isdate && (conversion.substr(1,2) == "MT" || conversion.substr(1, 5) == "[TIME");
 
 			if (forsort && !isdate && !istime)
 				// sqlexpression="exodus_extract_sort(" ^
@@ -1922,10 +1922,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		if (conversion.substr(1, 9) == "[DATETIME")
 			sqlexpression = "exodus_extract_datetime(" ^ extractargs;
 
-		else if (conversion[1] == "D" || conversion.substr(1, 5) == "[DATE")
+		else if (isdate)
 			sqlexpression = "exodus_extract_date(" ^ extractargs;
 
-		else if (conversion.substr(1, 2) == "MT" || conversion.substr(1, 5) == "[TIME")
+		else if (istime)
 			sqlexpression = "exodus_extract_time(" ^ extractargs;
 
 		// for now (until we have a extract_number/integer/float) that doesnt fail on
@@ -2182,13 +2182,14 @@ exodus_call:
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
 		if (sqlexpression.substr(1, 20) == "exodus_extract_date(" || sqlexpression.substr(1, 20) == "exodus_extract_time(")
 			sqlexpression.splicer(20, 0, "_array");
-		else
+		else {
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
-		// Note 3rd argument '' means convert empty multivalues to NULL in the array
-		// otherwise conversion to float will fail
-		if (isnumeric)
-			sqlexpression ^= "::float8[]";
+			// Note 3rd argument '' means convert empty multivalues to NULL in the array
+			// otherwise conversion to float will fail
+			if (isnumeric)
+				sqlexpression ^= "::float8[]";
+		}
 
 		//now do this for all fields including WHERE and ORDER BY
 		//eg SELECT BOOKING_ORDERS WITH YEAR_PERIOD "21.02" AND WITH IS_LATEST AND WITH CLIENT_CODE "MIC" AND WITH @ID NOT "%]" BY ORDER_NO
@@ -2768,7 +2769,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				whereclause ^= " " ^ dictexpression;
 
 				if (negative)
-					whereclause ^= " not ";
+					whereclause ^= " NOT ";
 
 				if (whereclause)
 					whereclause ^= " BETWEEN " ^ word1 ^ " AND " ^ word2;
@@ -2867,7 +2868,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 						postfix = ".*";
 					}
 					//NOT using regular expression logic for single valued fields and STARTING
+					//this should trigger 'COLLATE "C" BETWEEN x AND y" below to ensure postgres indexes are used
 					else {
+						negative = op == "<>";
 						op = "]";
 					}
 				}
@@ -3109,7 +3112,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					 %RECORDS% | RECORDS
 					 +RECORDS+ | +RECORDS+
 					*/
-
 					expression ^= dictexpression ^ " COLLATE \"C\" BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.splicer(-1, "");

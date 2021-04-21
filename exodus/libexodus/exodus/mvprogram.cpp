@@ -2007,6 +2007,7 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion) {
 
 			var output;
 
+			//custom function "[NUMBER]" actually has a built in function
 			if (functionname == "number") {
 
 				gosub number("OCONV", result, mode, output);
@@ -2061,26 +2062,39 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 		// var subconversion=conversion.remove(ptr,delimiter);
 		var subconversion = conversion.substr2(ptr, delimiter);
 
-		// either call custom conversion routines
-		if (subconversion[1] == "[") {
+		// or call standard conversion methods
+		if (subconversion[1] != "[") {
+
+			result = result.iconv(subconversion);
+
+		// or call custom conversion routines
+		} else {
+
+			//determine the function name
+			var functionname = subconversion.substr(2).field(",", 1).field("]", 1).lcase();;
 
 			// extract any params
 			var mode = subconversion.field(",", 2, 9999).field("]", 1);
 
-			// set the function name
-			ioconv_custom = subconversion.substr(2).field(",", 1).field("]", 1).lcase();
-
-			// wire up the current environment
-			ioconv_custom.mv_ = (&mv);
-
-			// and call it
 			var output;
-			call ioconv_custom("ICONV", result, mode, output);
-			result = output;
 
-			// or call standard conversion methods
-		} else {
-			result = result.iconv(subconversion);
+			//custom function "[NUMBER]" actually has a built in function
+            if (functionname == "number") {
+                gosub number("ICONV", result, mode, output);
+
+            } else {
+
+				// set the function name
+				ioconv_custom = functionname;
+
+				// wire up the current environment
+				ioconv_custom.mv_ = (&mv);
+
+				// and call it
+				call ioconv_custom("ICONV", result, mode, output);
+			}
+
+			result = output;
 		}
 	} while (delimiter);
 
