@@ -266,8 +266,10 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
 	var conversion = dictrec.a(7);
-	if (conversion.substr(1, 6) == "[DATE," || conversion.substr(1, 6) == "[DATE2")
+	if (conversion.substr(1, 6) == "[DATE]" || conversion.substr(1, 6) == "[DATE," || conversion.substr(1, 6) == "[DATE2")
 		dict_returns = "date";
+	else if (conversion.substr(1, 9) == "[DATETIME")
+		dict_returns = "timestamp";
 	if (conversion.substr(1, 5) == "[TIME")
 		//dict_returns = "time";
 		dict_returns = "interval";
