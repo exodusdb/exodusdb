@@ -37,7 +37,7 @@ function main(in mode0) {
 	#include <general_common.h>
 	//global mode,text,ucline,rec,idate,date,line1,idates,errors,update,keywords,nkeywords,cmd,nlines
 
-	#define data USER1
+	#define data_ USER1
 	keywords = "MEDIA" _VM_ "JOBS" _VM_ "FINANCE" _VM_ "TIMESHEETS" _VM_ "TECHNICAL" _VM_ "USER INTERFACE";
 	mode = mode0;
 	nkeywords = keywords.count(VM) + 1;
@@ -216,7 +216,7 @@ subroutine select0() {
 		//get the first installed version date equal to or prior to the selected
 		//locate mode<3> in data by 'AR' using fm setting versionn else
 		//locatebyusing() not available in c++
-		tt = USER1;
+		tt = data_;
 		tt.converter(FM, VM);
 		if (not(tt.locateby("AR", mode.a(3), versionn))) {
 			if (versionn gt 1) {
@@ -230,7 +230,7 @@ subroutine select0() {
 }
 
 subroutine select() {
-	USER1 = mode.field(FM, 2, 9999);
+	data_ = mode.field(FM, 2, 9999);
 
 	//force all
 	//data<2>=0
@@ -238,11 +238,11 @@ subroutine select() {
 	cmd = "SELECT CHANGELOG";
 	var andx = "";
 	if (USER1.a(1)) {
-		cmd ^= " WITH KEYWORD " ^ quote2(USER1.a(1));
+		cmd ^= " WITH KEYWORD " ^ quote2(data_.a(1));
 		andx = " AND";
 	}
 	if (USER1.a(2)) {
-		cmd ^= andx ^ " WITH DATE GE " ^ (USER1.a(2).oconv("D4").quote());
+		cmd ^= andx ^ " WITH DATE GE " ^ (data_.a(2).oconv("D4").quote());
 		andx = " AND";
 	}
 	if (USERNAME ne "EXODUS") {
@@ -276,7 +276,7 @@ subroutine list() {
 
 	var headingx = "What''s New in EXODUS";
 	gosub getcurrentversiondatetime();
-	if (USER1.a(2)) {
+	if (data_.a(2)) {
 		//heading:=' version ':data<2> '[DATE,4*]':' -'
 		call daterangetext(USER1.a(2), currentversiondatetime, tt, gen.glang);
 		headingx ^= " : " ^ tt;
@@ -284,7 +284,7 @@ subroutine list() {
 		headingx ^= " Version : " ^ oconv(currentversiondatetime, "[DATE,4*]");
 	}
 
-	if (USER1.a(1)) {
+	if (data_.a(1)) {
 		headingx ^= "'L'" ^ USER1.a(1);
 		headingx.swapper(SVM, ", ");
 		headingx.swapper(VM, ", ");
@@ -422,7 +422,7 @@ subroutine getversiondates() {
 	} //ii;
 
 	//list of installed versions
-	USER1 = versiondata;
+	data_ = versiondata;
 	return;
 }
 

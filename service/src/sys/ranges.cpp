@@ -27,7 +27,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	#include <general_common.h>
 
 	//equ maxlistpartsize to 32000
-	var maxlistpartsize = maxstrsize / 2;
+	var maxlistpartsize = maxstrsize_ / 2;
 
 	if (basekey0.unassigned()) {
 		basekey = "";
@@ -132,7 +132,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 				} else {
 					//if (len(range)+len(ranges))>65000 then
-					if (range.length() + ranges.length() gt maxstrsize - 530) {
+					if (range.length() + ranges.length() gt maxstrsize_ - 530) {
 						//call msg('Range exceeds maximum of 65,000 characters|Please enter a smaller range')
 						call mssg("Range exceeds maximum|Please enter a smaller range");
 						ranges = "";

@@ -48,8 +48,8 @@ function main(in mode) {
 	#include <general_common.h>
 	//global ptr,ii
 
-	#define request USER0
-	#define data USER1
+	#define request_ USER0
+	#define data_ USER1
 
 	//determine upload directory
 	var uploadroot = SYSTEM.a(49);
@@ -60,9 +60,9 @@ function main(in mode) {
 
 	if (mode eq "POSTUPLOAD") {
 
-		filename = USER0.a(3);
+		filename = request_.a(3);
 		key = USER0.a(4);
-		var targetfilename = USER0.a(5);
+		var targetfilename = request_.a(5);
 		var newstatus = USER0.a(6);
 
 		//lock it
@@ -114,9 +114,9 @@ postuploadfail:
 		}
 
 		//additional option to check file and key is not locked
-		filename = USER0.a(3);
+		filename = request_.a(3);
 		key = USER0.a(4);
-		var ensurenotlocked = USER0.a(5);
+		var ensurenotlocked = request_.a(5);
 		if (ensurenotlocked eq "undefined") {
 			ensurenotlocked = "";
 		}
@@ -221,7 +221,7 @@ postuploadfail:
 
 	} else if (mode.field(".", 1) eq "OPENUPLOAD") {
 
-		USER1 = virtualroot;
+		data_ = virtualroot;
 		//data<2>=filenames
 
 		var virtualfilebase = mode.field(".", 2, 9999).lcase();

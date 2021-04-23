@@ -244,7 +244,7 @@ function main() {
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	#define interactive not(SYSTEM.a(33))
+	#define interactive_ not(SYSTEM.a(33))
 	ulchar = "-";
 
 	//NLIST keywords and aliases. blank keyword means throwaway word
@@ -1061,7 +1061,7 @@ dictrecexit:;
 		//sys.messages W156
 		tt = "|\"%1%\" is an unrecognized word.";
 		tt.swapper("%1%", word);
-		if (interactive) {
+		if (interactive_) {
 			if (VOLUMES) {
 				tt ^= "|Please correct the word by retyping it|or pressing [F4] to edit it.|Press [Esc] to re-start.|";
 			} else {

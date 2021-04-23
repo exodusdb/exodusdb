@@ -14,7 +14,7 @@ var lockfile;
 function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
 	//c sys ,,,,io,in,out
 
-	#define lockitemsep "*"
+	#define lockitemsep_ "*"
 
 	#include <general_common.h>
 	//global lockfile,lockitem
@@ -69,7 +69,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 lockit:
 ///////
 
-	lockitem = lockfilename ^ lockitemsep ^ lockkey;
+	lockitem = lockfilename ^ lockitemsep_ ^ lockkey;
 	if (locklist.locateusing(FM, lockitem, lockn)) {
 		//msg=quote(lockitem):' already locked'
 		return 1;
@@ -155,8 +155,8 @@ subroutine unlockall(io locklist, io msg) {
 		lockitem = locklist.a(lockn);
 		///BREAK;
 		if (not lockitem) break;
-		var filename = lockitem.field(lockitemsep, 1);
-		var lockkeyx = lockitem.field(lockitemsep, 2, 9999);
+		var filename = lockitem.field(lockitemsep_, 1);
+		var lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
 		if (filename ne filename2) {
 			if (not(lockfile.open(filename, ""))) {
 				msg.r(-1, filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL");

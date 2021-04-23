@@ -337,7 +337,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		var tt = tempfilename2.osfile().a(1);
 		//if tt gt 32000 then
-		if (tt gt maxstrsize / 2) {
+		if (tt gt maxstrsize_ / 2) {
 			datax = "";
 			gosub getlog(logfilename, cleanup, log);
 			msg = "Excessive response (" ^ tt ^ ")" ^ log;

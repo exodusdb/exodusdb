@@ -16,7 +16,7 @@ function main(in nextcompanycode) {
 	#include <general_common.h>
 	//global desc1,desc2
 
-	#define interactive not(SYSTEM.a(33))
+	#define interactive_ not(SYSTEM.a(33))
 
 	if (not(nextcompanycode.unassigned())) {
 

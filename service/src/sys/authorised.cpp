@@ -148,7 +148,7 @@ updateprivs:
 		}
 		if (not(noadd)) {
 			//NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
-			noadd = (task[-1] eq DQ) or (SECURITY.length() gt maxstrsize * 2 / 3);
+			noadd = (task[-1] eq DQ) or (SECURITY.length() gt maxstrsize_ * 2 / 3);
 			//if passed a default lock then add even tasks ending like "XXXXX"
 			if (not(defaultlock.unassigned())) {
 				if (defaultlock) {
@@ -165,7 +165,7 @@ updateprivs:
 				}
 			}
 			//if len(userprivs) lt 65000 then
-			if (SECURITY.length() lt maxstrsize - 530) {
+			if (SECURITY.length() lt maxstrsize_ - 530) {
 				if (not(SECURITY.a(10).locateby("AL", task, taskn))) {
 					if (defaultlock.unassigned()) {
 						newlock = "";

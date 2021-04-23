@@ -21,11 +21,11 @@ function main(in mode, in params, io result, io msg) {
 	//means window of 60*60 seconds rolling every 60 seconds
 	//max events 60 and store in DOS EMAILS.DAT file so per installation
 	//could be DEFINITIONS EMAILS.ROUNDROBIN to be per database
-	#define secsperperiod params.a(1)
-	#define periodsperwindow params.a(2)
-	#define maxeventsperwindow params.a(3)
-	#define roundrobinfilename params.a(4)
-	#define roundrobinkey params.a(5)
+	#define secsperperiod_ params.a(1)
+	#define periodsperwindow_ params.a(2)
+	#define maxeventsperwindow_ params.a(3)
+	#define roundrobinfilename_ params.a(4)
+	#define roundrobinkey_ params.a(5)
 
 	result = "";
 	msg = "";
@@ -63,12 +63,12 @@ function main(in mode, in params, io result, io msg) {
 		}
 
 		var roundrobinfile;
-		if (not(roundrobinfile.open(roundrobinfilename, ""))) {
-			msg = "ROUNDROBIN: CANNOT OPEN " ^ roundrobinfilename;
+		if (not(roundrobinfile.open(roundrobinfilename_, ""))) {
+			msg = "ROUNDROBIN: CANNOT OPEN " ^ roundrobinfilename_;
 			return 0;
 		}
 
-		var roundrobinlock = "ROUNDROBIN*" ^ roundrobinfilename ^ "*" ^ roundrobinkey;
+		var roundrobinlock = "ROUNDROBIN*" ^ roundrobinfilename_ ^ "*" ^ roundrobinkey_;
 
 		//try to lock for 9 seconds since other locks should be brief
 		if (not(lockrecord("VOC", voc, roundrobinlock, "", 9))) {
@@ -80,7 +80,7 @@ function main(in mode, in params, io result, io msg) {
 
 		//get the round robin data
 		var roundrobin;
-		if (not(roundrobin.read(roundrobinfile, roundrobinkey))) {
+		if (not(roundrobin.read(roundrobinfile, roundrobinkey_))) {
 			roundrobin = "";
 		}
 		if (roundrobin.index(var().chr(0))) {
@@ -90,27 +90,27 @@ function main(in mode, in params, io result, io msg) {
 
 		//determine current and last timeperiod
 		//currentperiodn=date()*24*secsperperiod+mod(time(),secsperperiod)
-		var currentperiodn = ((var().date() * 24 * 60 * 60 + var().time()) / secsperperiod).floor();
+		var currentperiodn = ((var().date() * 24 * 60 * 60 + var().time()) / secsperperiod_).floor();
 		var lastperiodn = roundrobin.a(1);
 
 		//prevent catch up longer than periodsperwindow (add 2 for safety)
-		if (currentperiodn - lastperiodn gt periodsperwindow + 2) {
-			lastperiodn = currentperiodn - periodsperwindow - 2;
+		if (currentperiodn - lastperiodn gt periodsperwindow_ + 2) {
+			lastperiodn = currentperiodn - periodsperwindow_ - 2;
 		}
 
 		//clear any skipped periods since last update
 		//nb start from lastperiodn+1 to avoid clearing current period multiple times
 		//ie clear only on the first time that we arrive in it
 		for (var periodn = lastperiodn + 1; periodn <= currentperiodn; ++periodn) {
-			roundrobin.r(2, periodn % periodsperwindow + 1, "");
+			roundrobin.r(2, periodn % periodsperwindow_ + 1, "");
 		} //periodn;
 
 		//record the current period as the last period so that in the next call
 		//we can clear skipped periods (but not the current period again)
 		roundrobin.r(1, currentperiodn);
-		var currentbreakn = currentperiodn % periodsperwindow + 1;
+		var currentbreakn = currentperiodn % periodsperwindow_ + 1;
 
-		if (roundrobin.a(2).sum() lt maxeventsperwindow) {
+		if (roundrobin.a(2).sum() lt maxeventsperwindow_) {
 
 			result = 1;
 
@@ -127,7 +127,7 @@ function main(in mode, in params, io result, io msg) {
 			roundrobin.converter(var().chr(0), "");
 			var(var().date() ^ FM ^ var().time()).oswrite("RRW");
 		}
-		roundrobin.write(roundrobinfile, roundrobinkey);
+		roundrobin.write(roundrobinfile, roundrobinkey_);
 
 	//for testing
 	//print lastperiodn,currentperiodn,currentbreakn,result,roundrobin<2>

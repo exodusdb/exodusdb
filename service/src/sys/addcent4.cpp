@@ -7,7 +7,7 @@ function main(in type, in in0, in mode, out outx) {
 	//c sys in,in,in,out
 	//global inx
 
-	#define centuryyear 50
+	#define centuryyear_ 50
 
 	//avoid c++ warning about unused variable
 	if (0) {
@@ -71,7 +71,7 @@ noconv:
 
 		//00-49 -> 2000 ... 2049
 		//50-99 -> 2050 ... 2099
-		if (inx le centuryyear) {
+		if (inx le centuryyear_) {
 			outx = "20" ^ inx;
 		} else {
 			outx = "19" ^ inx;

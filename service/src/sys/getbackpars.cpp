@@ -22,19 +22,19 @@ function main(out bakpars, in process0=var()) {
 
 	//by test data means any non-live data that doesnt require backup
 
-	#define lastbakattemptdate bakpars.a(1)
-	#define minbaktime bakpars.a(3)
-	#define maxbaktime bakpars.a(4)
-	#define bakdows bakpars.a(5)
-	#define bakemails bakpars.a(6)
-	#define bakdisk bakpars.a(7)
-	#define bakexcludedatasets bakpars.a(8)
-	#define bakdisable bakpars.a(9)
-	#define bakdataemails bakpars.a(10)
-	#define baktestdata bakpars.a(11)
-	#define bakdisk2 bakpars.a(12)
-	#define bakmediarotation bakpars.a(13)
-	#define logemail bakpars.a(14)
+	#define lastbakattemptdate_ bakpars.a(1)
+	#define minbaktime_ bakpars.a(3)
+	#define maxbaktime_ bakpars.a(4)
+	#define bakdows_ bakpars.a(5)
+	#define bakemails_ bakpars.a(6)
+	#define bakdisk_ bakpars.a(7)
+	#define bakexcludedatasets_ bakpars.a(8)
+	#define bakdisable_ bakpars.a(9)
+	#define bakdataemails_ bakpars.a(10)
+	#define baktestdata_ bakpars.a(11)
+	#define bakdisk2_ bakpars.a(12)
+	#define bakmediarotation_ bakpars.a(13)
+	#define logemail_ bakpars.a(14)
 
 	//backup params
 	//1=date last attempted
@@ -76,35 +76,35 @@ function main(out bakpars, in process0=var()) {
 
 	//if bakpars<3>='' then bakpars<3>='2:00'
 	//if bakpars<4>='' then bakpars<4>='2:05'
-	if (minbaktime eq "") {
+	if (minbaktime_ eq "") {
 		bakpars.r(3, "1:00");
 	}
-	if (maxbaktime eq "") {
+	if (maxbaktime_ eq "") {
 		bakpars.r(4, "1:05");
 	}
-	if (not(minbaktime.isnum())) {
-		bakpars.r(3, minbaktime.iconv("MT"));
+	if (not(minbaktime_.isnum())) {
+		bakpars.r(3, minbaktime_.iconv("MT"));
 	}
-	if (not(maxbaktime.isnum())) {
-		bakpars.r(4, maxbaktime.iconv("MT"));
+	if (not(maxbaktime_.isnum())) {
+		bakpars.r(4, maxbaktime_.iconv("MT"));
 	}
-	if (bakdows eq "") {
+	if (bakdows_ eq "") {
 		bakpars.r(5, "1234567");
 	}
 
 	//fix bug in data entry that allows : and :: to be entered
-	if (bakdisk[1] eq ":") {
+	if (bakdisk_[1] eq ":") {
 		bakpars.r(7, "");
 	}
-	if (bakdisk2[1] eq ":") {
+	if (bakdisk2_[1] eq ":") {
 		bakpars.r(12, "");
 	}
 
-	if (not(bakdisk)) {
+	if (not(bakdisk_)) {
 		bakpars.r(7, "C:");
 	}
-	if (bakdisk2 eq "") {
-		bakpars.r(12, bakdisk);
+	if (bakdisk2_ eq "") {
+		bakpars.r(12, bakdisk_);
 	}
 
 	//backup depending on configuration file
@@ -127,7 +127,7 @@ function main(out bakpars, in process0=var()) {
 	} else {
 
 		//autodetermine if it is "test" data
-		if (baktestdata eq "") {
+		if (baktestdata_ eq "") {
 			var testdata = 1;
 			if (process.a(17).substr(-4, 4) eq "TEST") {
 			} else if (process.a(23).ucase().index("TRAINING")) {
@@ -135,7 +135,7 @@ function main(out bakpars, in process0=var()) {
 			} else {
 				//not otherwise specified then exclude database if in list of non-live data
 				//none-live could include test data or consolidated copies
-				if (not(bakexcludedatasets.locate(process.a(17), xx))) {
+				if (not(bakexcludedatasets_.locate(process.a(17), xx))) {
 					testdata = 0;
 				}
 			}

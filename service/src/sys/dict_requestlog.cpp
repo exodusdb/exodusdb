@@ -23,5 +23,9 @@ libraryinit(seq)
 //--------------
 function main() {
 	return ID;
+	/*pgsql;
+	return key;
+	*/
+	return ANS;
 }
 libraryexit(seq)

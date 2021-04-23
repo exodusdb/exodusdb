@@ -71,10 +71,10 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 
-	#define request USER0
-	#define iodat USER1
-	#define response USER3
-	#define msg USER4
+	#define request_ USER0
+	#define iodat_ USER1
+	#define response_ USER3
+	#define msg_ USER4
 	var tracing = 1;
 
 	//no output in arguments allowed since c++ doesnt allow
@@ -343,7 +343,7 @@ passfail:
 				//only checking during LOGIN. TODO is this ok?
 				//no longer has to be done after setting @username
 				if (word2 eq "LOGIN") {
-					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.a(17).quote()), USER4, "", username))) {
+					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.a(17).quote()), msg_, "", username))) {
 						invalidlogin = USER4;
 						goto validateexit;
 					}
@@ -760,7 +760,7 @@ validateexit2:
 					win.orec = RECORD;
 					call usersubs("PREWRITE.RESETPASSWORD");
 					if (not(win.valid)) {
-						USER4.transfer(request5);
+						msg_.transfer(request5);
 						return 0;
 					}
 
@@ -842,19 +842,19 @@ validateexit2:
 				var lastuser = "";
 				if (readnext(lastuserid)) {
 					if (lastuser.read(users, lastuserid)) {
-						USER4 ^= " (last login was " ^ lastuser.a(1);
+						msg_ ^= " (last login was " ^ lastuser.a(1);
 						if (lastuser.a(1)) {
 							if (lastuserid ne lastuser.a(1)) {
 								USER4 ^= " (" ^ lastuserid ^ ")";
 							}
 						} else {
-							USER4 ^= lastuserid;
+							msg_ ^= lastuserid;
 						}
 						USER4 ^= " on " ^ oconv(lastuser.a(13), "[DATETIME,4*,MTS]") ^ ")";
 					}
 					clearselect();
 				}
-				body = USER4;
+				body = msg_;
 
 				//add whoistx info for non-private ip nos with no prior successful login
 				if (lastuser eq "" or isdevsys) {
@@ -920,7 +920,7 @@ validateexit2:
 		var dataset = request2.ucase();
 		var username = request3.ucase();
 
-		USER1 = "";
+		iodat_ = "";
 		USER4 = "";
 		var authcompcodes = "";
 
@@ -933,18 +933,18 @@ validateexit2:
 				//dont pass system variables
 		call loginnet(dataset, username, cookie, loginmsg, authcompcodes);
 		USER1 = cookie;
-		USER4 = loginmsg;
-		if (USER1 eq "") {
-			USER3 = USER4;
+		msg_ = loginmsg;
+		if (iodat_ eq "") {
+			response_ = USER4;
 			return 0;
 		}
 		//  end
 		// end
 
 		if (not USER1) {
-			USER1 = "X=X";
+			iodat_ = "X=X";
 		}
-		USER3 = ("OK " ^ USER4).trim();
+		USER3 = ("OK " ^ msg_).trim();
 
 		//record the last login per user
 		var users;
@@ -1022,9 +1022,9 @@ validateexit2:
 		}
 
 		//detach the calling process
-		USER3 = request2;
+		response_ = request2;
 		USER3.converter(VM ^ "|", FM ^ FM);
-		USER3.swapper(FM, "\r\n");
+		response_.swapper(FM, "\r\n");
 
 		call oswrite(USER3, responsefilename);
 		//osclose responsefilename

@@ -28,7 +28,7 @@ function main(in mode0) {
 	#include <general_common.h>
 	//global encryptx,password,maxlen,show,ok,msg,userx
 
-	#define prikey "1000" ^ "100"
+	#define prikey_ "1000" ^ "100"
 
 	if (mode0.unassigned()) {
 		mode = "";

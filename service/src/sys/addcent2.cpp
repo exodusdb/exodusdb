@@ -6,7 +6,7 @@ function main(in yymm) {
 
 	//only used in accounting to convert YYMM->YYYYMM
 
-	#define centuryyear 50
+	#define centuryyear_ 50
 
 	//linemark
 
@@ -16,7 +16,7 @@ function main(in yymm) {
 	}
 
 	//year 00-50 -> 2000-2050
-	if (yymm.substr(1, 2) le centuryyear) {
+	if (yymm.substr(1, 2) le centuryyear_) {
 		return "20" ^ yymm;
 	}
 

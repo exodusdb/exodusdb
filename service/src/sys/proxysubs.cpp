@@ -30,14 +30,14 @@ function main(in module, in mode, in stationery) {
 
 	#include <general_common.h>
 
-	#define request USER0
-	#define data USER1
-	#define response USER3
-	#define msg USER4
+	#define request_ USER0
+	#define data_ USER1
+	#define response_ USER3
+	#define msg_ USER4
 
 	var outfiles = SYSTEM.a(2);
 	outfiles.converter(";", VM);
-	USER1 = outfiles;
+	data_ = outfiles;
 	var nfiles = outfiles.count(VM) + (outfiles ne "");
 	for (var filen = 1; filen <= nfiles; ++filen) {
 
@@ -55,7 +55,7 @@ function main(in module, in mode, in stationery) {
 		if (tt) {
 			USER1.r(1, filen, ".." ^ t2 ^ ".." ^ outfile.substr(tt, 999999));
 		} else {
-			USER1.r(1, filen, outfile);
+			data_.r(1, filen, outfile);
 		}
 
 	} //filen;
@@ -66,11 +66,11 @@ function main(in module, in mode, in stationery) {
 
 	//if returning many files then always return ok, with any messages as warnings
 	if (nfiles gt 1) {
-		USER3 = "OK";
-		if (USER4) {
+		response_ = "OK";
+		if (msg_) {
 			USER3 ^= " " ^ USER4;
 		}
-		USER4 = "";
+		msg_ = "";
 	}
 
 	return 0;
@@ -90,11 +90,11 @@ fileok:
 			}
 		}
 
-		USER3 = "OK";
-		if (USER4) {
+		response_ = "OK";
+		if (msg_) {
 			USER3 ^= " " ^ USER4;
 		}
-		USER4 = "";
+		msg_ = "";
 
 	} else {
 
@@ -105,14 +105,14 @@ fileok:
 			}
 		}
 
-		USER3 = USER4;
+		response_ = USER4;
 		if (USER3 eq "") {
-			USER3 = "Error: No output file in " ^ module ^ "PROXY " ^ mode;
+			response_ = "Error: No output file in " ^ module ^ "PROXY " ^ mode;
 			call sysmsg(USER3);
 		}
 
 		//force error
-		if (USER3.substr(1, 6) ne "Error:") {
+		if (response_.substr(1, 6) ne "Error:") {
 			USER3.splicer(1, 0, "Error:");
 		}
 

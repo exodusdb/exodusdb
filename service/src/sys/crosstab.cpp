@@ -89,7 +89,7 @@ var newoptions;
 var printtx_ii;//num
 var spaceoptionsize;
 
-function main(in filename, in rowfields0, in colfield, in datafield, io table, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
+function main(in filename, in rowfields0, in colfield, in datafield, io output_, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
 	//c sys in,in,in,in,io,io,io,io,io,io,io,io
 	//global all
 
@@ -124,7 +124,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io table, i
 	if ((table.unassigned() or allrowvals.unassigned()) or allcolvals.unassigned()) {
 		allcolvals = "";
 		allrowvals = "";
-		table = "";
+		output_ = "";
 	}
 	if (prefixes.unassigned()) {
 		prefixes = "";
@@ -362,13 +362,13 @@ toobig:
 				}
 				allcolvals.inserter(1, coln, colval);
 
-				if (table.length() + nrows * 2 gt 65000) {
+				if (output_.length() + nrows * 2 gt 65000) {
 					goto toobig;
 				}
 
 				table.inserter(1, 1 + coln, colval);
 				for (rownx = 2; rownx <= nrows + 1; ++rownx) {
-					table.inserter(rownx, 1 + coln, "");
+					output_.inserter(rownx, 1 + coln, "");
 				} //rownx;
 			}
 
@@ -376,13 +376,13 @@ toobig:
 				goto toobig;
 			}
 
-			oldval = table.a(rown + 1, coln + 1);
+			oldval = output_.a(rown + 1, coln + 1);
 			table.r(rown + 1, coln + 1, oldval + datavals);
-			table.r(1, 1, table.a(1, 1) + 1);
+			output_.r(1, 1, table.a(1, 1) + 1);
 
 			//total column at the end
 			if (not totcol) {
-				oldval = table.a(rown + 1, ncols + 2);
+				oldval = output_.a(rown + 1, ncols + 2);
 				table.r(rown + 1, ncols + 2, oldval + datavals);
 			}
 
@@ -406,29 +406,29 @@ exit:
 		if (colconv) {
 			//ncolvals=count(allcolvals,vm)+1
 			for (coln = 1; coln <= ncols; ++coln) {
-				table.r(1, 1 + coln, oconv(table.a(1, 1 + coln), colconv));
+				output_.r(1, 1 + coln, oconv(table.a(1, 1 + coln), colconv));
 			} //coln;
 		}
 	}
 
 	if (totcol) {
-		table.r(1, 1 + coln, datadict.a(3));
+		output_.r(1, 1 + coln, datadict.a(3));
 	} else {
 		for (coln = 1; coln <= ncols; ++coln) {
-			table.r(1, 1 + coln, coldict.a(3) ^ " " ^ table.a(1, 1 + coln));
+			table.r(1, 1 + coln, coldict.a(3) ^ " " ^ output_.a(1, 1 + coln));
 		} //coln;
 		table.r(1, ncols + 2, "Total " ^ datadict.a(3));
 	}
 
 	for (rown = 1; rown <= nrows; ++rown) {
-		if (table.length() + allrowvals.length() gt 65000) {
+		if (output_.length() + allrowvals.length() gt 65000) {
 			goto toobig;
 		}
 		table.r(rown + 1, 1, allrowvals.a(1, rown));
 	} //rown;
 
 	//format the row title values
-	table.r(1, 1, 1, "");
+	output_.r(1, 1, 1, "");
 	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 		//table<1,1,rowfn>=rowfields<1,rowfn>
 		table.r(1, 1, rowfn, rowdict(rowfn).a(3));
@@ -437,21 +437,21 @@ exit:
 		if (rowconv) {
 			//nrows=count(allrowvals,vm)+(allrowvals<>'')
 			for (rown = 1; rown <= nrows; ++rown) {
-				table.r(rown + 1, 1, rowfn, oconv(table.a(rown + 1, 1, rowfn), rowconv));
+				output_.r(rown + 1, 1, rowfn, oconv(table.a(rown + 1, 1, rowfn), rowconv));
 			} //rown;
 		}
 
 	} //rowfn;
 
 	//convert sm row keys into columns
-	table.converter(SVM, VM);
+	output_.converter(SVM, VM);
 
 	return 0;
 	/*;
 	///////
 	output:
 	///////
-		#define output table
+		#define output_ table
 		//equ dedup to 1
 		//equ html to 1
 		dedup=1;
@@ -491,7 +491,7 @@ exit:
 			tx='<H1 align=center>EXODUS USAGE STATISTICS</H1>';
 			gosub printtx;
 
-			tx='<table border=1 class=exodustable';
+			tx='<output_ border=1 class=exodustable';
 			tx:=' CELLSPACING=0 CELLPADDING=2 ALIGN=CENTER';
 			tx:=' STYLE="font-size:66%"';
 			tx:='>';
@@ -547,7 +547,7 @@ exit:
 					gosub printtx;
 					end;
 				next rown;
-			tx:='</table>':crlf;
+			tx:='</output_>':crlf;
 
 			gosub printtx;
 

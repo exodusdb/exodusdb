@@ -72,23 +72,23 @@ function main(in mode) {
 	//24=otherkeys
 	//25=passwordautoexpirydays (also see system<128>)
 	//26=emailnewusers
-	#define minpasswordchars 4
-	#define emailnewusers RECORD.a(26)
+	#define minpasswordchars_ 4
+	#define emailnewusers_ RECORD.a(26)
 
-	#define tstore win.registerx(3)
-	#define updatelowergroups win.registerx(4)
-	#define updatehighergroups win.registerx(5)
-	#define curruser win.registerx(6)
-	#define origfullrec win.registerx(7)
-	#define startn win.registerx(8)
-	#define endn win.registerx(9)
+	#define tstore_ win.registerx(3)
+	#define updatelowergroups_ win.registerx(4)
+	#define updatehighergroups_ win.registerx(5)
+	#define curruser_ win.registerx(6)
+	#define origfullrec_ win.registerx(7)
+	#define startn_ win.registerx(8)
+	#define endn_ win.registerx(9)
 
 	//NB (not any more) valid companies are buffered in userprivs<9>
 
 	win.valid = 1;
 
 	//no validation for EXODUS
-	if (curruser.index("EXODUS")) {
+	if (curruser_.index("EXODUS")) {
 		if (mode.substr(1, 4) eq "VAL." and mode ne "VAL.USER") {
 			return 0;
 		}
@@ -462,8 +462,8 @@ function main(in mode) {
 		} else {
 			if (win.templatex eq "HOURLYRATES") {
 				filename = "HOURLY RATE";
-				updatehighergroups = 1;
-				updatelowergroups = 1;
+				updatehighergroups_ = 1;
+				updatelowergroups_ = 1;
 				defaultlock = "TA";
 			} else {
 				msg = win.templatex.quote() ^ " unknown template in security.subs";
@@ -488,16 +488,16 @@ function main(in mode) {
 			}
 
 			//check supervisor status
-			updatelowergroups = authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, "");
-			updatehighergroups = authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, "");
+			updatelowergroups_ = authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, "");
+			updatehighergroups_ = authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, "");
 
 		}
 
 		//if logged in as account then same as logged in as EXODUS
 		if (var("012").index(PRIVILEGE)) {
-			curruser = "EXODUS";
+			curruser_ = "EXODUS";
 		} else {
-			curruser = USERNAME;
+			curruser_ = USERNAME;
 		}
 
 		//check security
@@ -541,7 +541,7 @@ function main(in mode) {
 		//sort the tasks
 		call sortarray(SECURITY, "10" ^ VM ^ "11", "AL");
 
-		origfullrec = SECURITY;
+		origfullrec_ = SECURITY;
 
 		RECORD = SECURITY;
 
@@ -549,12 +549,12 @@ function main(in mode) {
 
 		//don't delete users for hourly rates
 		if (win.templatex eq "HOURLYRATES") {
-			updatehighergroups = 1;
-			updatelowergroups = 1;
+			updatehighergroups_ = 1;
+			updatelowergroups_ = 1;
 		}
 
 		//delete disallowed tasks (except all master type user to see all tasks)
-		if (not(updatehighergroups and updatelowergroups)) {
+		if (not(updatehighergroups_ and updatelowergroups_)) {
 			var tasks = RECORD.a(10);
 			var locks = RECORD.a(11);
 			var ntasks = tasks.count(VM) + (tasks ne "");
@@ -570,7 +570,7 @@ function main(in mode) {
 		}
 
 		//hide higher/lower users
-		if (not(curruser.index("EXODUS"))) {
+		if (not(curruser_.index("EXODUS"))) {
 
 			var usercodes = RECORD.a(1);
 			var nusers = usercodes.count(VM) + (usercodes ne "");
@@ -582,51 +582,51 @@ function main(in mode) {
 			}
 
 			//hide higher users
-			if (updatehighergroups) {
-				startn = 1;
+			if (updatehighergroups_) {
+				startn_ = 1;
 			} else {
-				startn = usern;
+				startn_ = usern;
 				while (true) {
 					///BREAK;
-					if (not(startn gt 1 and (RECORD.a(2, startn - 1) eq ""))) break;
-					startn -= 1;
+					if (not(startn_ gt 1 and (RECORD.a(2, startn_ - 1) eq ""))) break;
+					startn_ -= 1;
 				}//loop;
 			}
 
 			//hide lower users
-			if (updatelowergroups) {
-				endn = nusers;
+			if (updatelowergroups_) {
+				endn_ = nusers;
 			} else {
-				endn = usern;
+				endn_ = usern;
 				while (true) {
 					///BREAK;
-					if (not(endn lt nusers and (RECORD.a(1, endn + 1) ne "---"))) break;
-					endn += 1;
+					if (not(endn_ lt nusers and (RECORD.a(1, endn_ + 1) ne "---"))) break;
+					endn_ += 1;
 				}//loop;
 			}
 
 			//extract out the allowable users and keys
 			//also in prewrite
 
-			if (startn ne 1 or endn ne nusers) {
-				var nn = endn - startn + 1;
+			if (startn_ ne 1 or endn_ ne nusers) {
+				var nn = endn_ - startn_ + 1;
 
 				if (not interactive) {
 
 					//save hidden users for remote client in field 23
-					var temp = RECORD.a(1).field(VM, 1, startn);
-					temp ^= VM ^ RECORD.a(1).field(VM, endn + 1, 9999);
+					var temp = RECORD.a(1).field(VM, 1, startn_);
+					temp ^= VM ^ RECORD.a(1).field(VM, endn_ + 1, 9999);
 					temp.converter(VM, ",");
 					RECORD.r(23, temp);
 
 					//save hidden keys for remote client in field 23
 
-					var visiblekeys = RECORD.a(2).field(VM, startn, nn);
+					var visiblekeys = RECORD.a(2).field(VM, startn_, nn);
 					visiblekeys.converter(",", VM);
 					visiblekeys = trim(visiblekeys, VM);
 
-					var invisiblekeys = RECORD.a(2).field(VM, 1, startn);
-					invisiblekeys ^= VM ^ RECORD.a(2).field(VM, endn + 1, 9999);
+					var invisiblekeys = RECORD.a(2).field(VM, 1, startn_);
+					invisiblekeys ^= VM ^ RECORD.a(2).field(VM, endn_ + 1, 9999);
 					invisiblekeys.converter(",", VM);
 					invisiblekeys = trim(invisiblekeys, VM);
 
@@ -650,12 +650,12 @@ function main(in mode) {
 
 				//delete higher and lower users if not allowed
 				for (var fn = 1; fn <= 8; ++fn) {
-					RECORD.r(fn, RECORD.a(fn).field(VM, startn, nn));
+					RECORD.r(fn, RECORD.a(fn).field(VM, startn_, nn));
 				} //fn;
 
 			} else {
-				startn = "";
-				endn = "";
+				startn_ = "";
+				endn_ = "";
 			}
 
 		}
@@ -681,8 +681,8 @@ function main(in mode) {
 			}
 		} //usern;
 
-		RECORD.r(20, startn);
-		RECORD.r(21, endn);
+		RECORD.r(20, startn_);
+		RECORD.r(21, endn_);
 
 		//enable flowing text keys in postread
 		//restore comma format in prewrite
@@ -714,16 +714,16 @@ function main(in mode) {
 	} else if (mode eq "SAVE") {
 
 		//get/clear temporary storage
-		startn = RECORD.a(20);
-		endn = RECORD.a(21);
+		startn_ = RECORD.a(20);
+		endn_ = RECORD.a(21);
 
 		if (not interactive) {
-			if (not(origfullrec.read(DEFINITIONS, "SECURITY"))) {
+			if (not(origfullrec_.read(DEFINITIONS, "SECURITY"))) {
 				msg = "SECURITY missing from DEFINITIONS";
 				return invalid(msg);
 			}
 			if (VOLUMES) {
-				origfullrec = origfullrec.invert();
+				origfullrec_ = origfullrec_.invert();
 			}
 
 			//simulate orec
@@ -737,7 +737,7 @@ function main(in mode) {
 			}
 
 			//safety check
-			if (win.orec.a(20) ne startn or win.orec.a(21) ne endn) {
+			if (win.orec.a(20) ne startn_ or win.orec.a(21) ne endn_) {
 
 				//trace
 				win.orec.write(DEFINITIONS, "SECURITY.OREC.BAD");
@@ -785,11 +785,11 @@ function main(in mode) {
 
 					newpassword = RECORD.a(4, usern);
 					if (newpassword and newpassword.length() lt 4) {
-						msg = userx.quote() ^ " user password cannot be less than " ^ minpasswordchars;
+						msg = userx.quote() ^ " user password cannot be less than " ^ minpasswordchars_;
 						return invalid(msg);
 					}
 
-					if (not(origfullrec.a(1).locate(userx, ousern))) {
+					if (not(origfullrec_.a(1).locate(userx, ousern))) {
 						ousern = 0;
 					}
 
@@ -802,7 +802,7 @@ function main(in mode) {
 						//remove old password so that changing password TO THE SAME PASSWORD
 						//still triggers update of users file log section
 						if (ousern) {
-							origfullrec.r(4, ousern, "");
+							origfullrec_.r(4, ousern, "");
 						}
 
 						//zap any user generated pass in case they reset it while security was locked
@@ -818,7 +818,7 @@ function main(in mode) {
 					} else {
 						//recover old password
 						if (ousern) {
-							var oldpassword = origfullrec.a(4, ousern);
+							var oldpassword = origfullrec_.a(4, ousern);
 							RECORD.r(4, usern, oldpassword);
 						}
 					}
@@ -862,19 +862,19 @@ function main(in mode) {
 			} //usern;
 
 			//put back any hidden users
-			if (startn) {
-				var nn = endn - startn + 1;
+			if (startn_) {
+				var nn = endn_ - startn_ + 1;
 				var nvms = RECORD.a(1).count(VM);
 				for (var fn = 1; fn <= 8; ++fn) {
 					var temp = RECORD.a(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
-					RECORD.r(fn, origfullrec.a(fn).fieldstore(VM, startn, -nn, temp));
+					RECORD.r(fn, origfullrec_.a(fn).fieldstore(VM, startn_, -nn, temp));
 				} //fn;
 			}
 
 			//put back any hidden tasks
-			var tasks = origfullrec.a(10);
-			var locks = origfullrec.a(11);
+			var tasks = origfullrec_.a(10);
+			var locks = origfullrec_.a(11);
 			var ntasks = tasks.count(VM) + (tasks ne "");
 			for (var taskn = 1; taskn <= ntasks; ++taskn) {
 				var task = tasks.a(1, taskn);
@@ -979,9 +979,9 @@ function main(in mode) {
 				sysrec = RECORD.a(4, usern, 2);
 				//locate user in orec<1> setting ousern then
 				var menuid = "";
-				if (origfullrec.a(1).locate(userx, ousern)) {
+				if (origfullrec_.a(1).locate(userx, ousern)) {
 					//oSYSREC=orec<4,ousern,2>
-					var osysrec = origfullrec.a(4, ousern, 2);
+					var osysrec = origfullrec_.a(4, ousern, 2);
 				} else {
 					var osysrec = "";
 
@@ -1036,7 +1036,7 @@ function main(in mode) {
 					//save historical logins/password resets in listen2 and security.subs
 					//similar in security.subs and user.subs
 					var userpass = userpasswords.a(1, usern);
-					var ouserpass = origfullrec.a(4, ousern);
+					var ouserpass = origfullrec_.a(4, ousern);
 					if (userpass ne ouserpass) {
 						//datetime=(date():'.':time() 'R(0)#5')+0
 						var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
@@ -1137,7 +1137,7 @@ function main(in mode) {
 			}
 
 			//email new users if requested to do so
-			if (newusers and emailnewusers) {
+			if (newusers and emailnewusers_) {
 				var nn = newusers.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 
@@ -1496,7 +1496,7 @@ subroutine generatepassword() {
 	var vowels = "AEIOUY";
 	consonants.converter(vowels ^ "QX", "");
 	newpassword = "";
-	for (var ii = 1; ii <= minpasswordchars / 2; ++ii) {
+	for (var ii = 1; ii <= minpasswordchars_ / 2; ++ii) {
 		newpassword ^= consonants[consonants.length().rnd() + 1];
 		newpassword ^= vowels[vowels.length().rnd() + 1];
 	} //ii;

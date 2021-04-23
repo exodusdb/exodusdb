@@ -43,42 +43,42 @@ function main() {
 	//c sys
 	//global mode,stationery,task
 
-	#define request USER0
-	#define data USER1
-	#define response USER3
-	#define msg USER4
+	#define request_ USER0
+	#define data_ USER1
+	#define response_ USER3
+	#define msg_ USER4
 
 	#include <general_common.h>
 	//global fn,stationery,mode
 
 	//clearcommon();
 	win.valid = 1;
-	USER4 = "";
+	msg_ = "";
 	stationery = "";
 
-	call cropper(USER0);
-	call cropper(USER1);
+	call cropper(request_);
+	call cropper(data_);
 	mode = USER0.a(1).ucase();
 
 	//request 2 - can be anything actually
 
-	win.datafile = USER0.a(2);
+	win.datafile = request_.a(2);
 	var keyx = USER0.a(3);
 
-	USER3 = "OK";
+	response_ = "OK";
 
 	if (mode eq "TEST") {
 
 	} else if (mode eq "PERIODTABLE") {
 
-		var year = USER0.a(2).field("-", 1).field("/", 2);
+		var year = request_.a(2).field("-", 1).field("/", 2);
 		var finyear = USER0.a(3);
 
 		perform("PERIODTABLE " ^ year ^ " " ^ finyear ^ " (H)");
 
 		gosub postproc();
 
-	} else if (mode eq "FILEMAN" and USER0.a(2) eq "COPYDB") {
+	} else if (mode eq "FILEMAN" and request_.a(2) eq "COPYDB") {
 
 		var copydb = USER0.a(3);
 		if (not(SYSTEM.a(58).locate(copydb, dbn))) {
@@ -94,15 +94,15 @@ function main() {
 		//by ensuring the user is currently logged in to one or other database
 		if ((USERNAME ne "EXODUS" and copydb ne SYSTEM.a(17)) and todb ne SYSTEM.a(17)) {
 			USER4 = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
-			USER4.r(-1, "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote()));
+			msg_.r(-1, "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote()));
 			USER4.r(-1, "but you are currently logged in to database " ^ (SYSTEM.a(17).quote()));
-			call mssg(USER4);
+			call mssg(msg_);
 			stop();
 		}
 
 		//should really have an option to close the live dataset and then copy
 		if (not(authorised("DATASET COPY", USER4, "LS"))) {
-			call mssg(USER4);
+			call mssg(msg_);
 			stop();
 		}
 
@@ -114,7 +114,7 @@ function main() {
 		perform("COPYDB " ^ copydb ^ " " ^ todb);
 
 		USER3 = USER4;
-		if (not USER3) {
+		if (not response_) {
 			log ^= "|" ^ var().time().oconv("MTS") ^ " Finished";
 			call sysmsg(log);
 			USER3 = "OK " ^ log;
@@ -124,7 +124,7 @@ function main() {
 
 		var groupids = USER1.a(1);
 		var jobfunctionids = "";
-		var userids = USER1.a(2);
+		var userids = data_.a(2);
 		if (not((groupids or jobfunctionids) or userids)) {
 			call mssg("You must specify some groups or users to email");
 			stop();
@@ -143,21 +143,21 @@ function main() {
 		var options = "TR";
 
 		var subject = USER1.a(4);
-		var message = USER1.a(5);
+		var message = data_.a(5);
 
 		message.converter(TM, VM);
 		call emailusers("", subject, message, groupids, jobfunctionids, userids, options, emailresult);
 
 		if (emailresult) {
 			emailresult.converter(VM ^ FM, "\r\r");
-			USER3 = "OK Email Sent to" "\r" ^ emailresult;
+			response_ = "OK Email Sent to" "\r" ^ emailresult;
 		} else {
 			call mssg("No users can be found to email,|or some problem with email server");
 		}
 		USER1 = "";
 
 	} else if (mode eq "VAL.EMAIL") {
-		win.is = USER0;
+		win.is = request_;
 		call usersubs(mode);
 
 	//case mode[-3,3]='SSH'
@@ -165,7 +165,7 @@ function main() {
 
 	} else if (mode eq "PASSWORDRESET") {
 
-		if (not(authorised("PASSWORD RESET", USER4))) {
+		if (not(authorised("PASSWORD RESET", msg_))) {
 			call mssg(USER4);
 			stop();
 		}
@@ -177,7 +177,7 @@ function main() {
 		}
 
 		ID = USER0.a(2);
-		var emailaddress = USER0.a(3);
+		var emailaddress = request_.a(3);
 
 		var baduseroremail = "Either " ^ (ID.quote()) ^ " or " ^ (emailaddress.quote()) ^ " does not exist";
 
@@ -248,16 +248,16 @@ function main() {
 		call uploadsubs("POSTUPLOAD");
 
 	} else if (mode eq "VERIFYUPLOAD") {
-		call uploadsubs("VERIFYUPLOAD." ^ USER0.a(2));
+		call uploadsubs("VERIFYUPLOAD." ^ request_.a(2));
 
 	} else if (mode eq "OPENUPLOAD") {
 		call uploadsubs("OPENUPLOAD." ^ USER0.a(2));
 
 	} else if (mode eq "DELETEUPLOAD") {
-		call uploadsubs("DELETEUPLOAD." ^ USER0.a(2));
+		call uploadsubs("DELETEUPLOAD." ^ request_.a(2));
 
 	} else if (mode eq "GETCODEPAGE") {
-		USER1 = "";
+		data_ = "";
 		//have to skip char zero it seems to be treated as string terminator
 		//somewhere on the way to the browser (not in revelation)
 		for (var ii = 1; ii <= 255; ++ii) {
@@ -277,7 +277,7 @@ function main() {
 			goto badsetcodepage;
 		}
 
-		if (USER0.a(2) eq "SORTORDER") {
+		if (request_.a(2) eq "SORTORDER") {
 
 			/* should be inverted but bother since cant get DOS only collated ascii;
 				if len(data) ne 254 then;
@@ -296,7 +296,7 @@ setcodepagecase:
 					recordx = "";
 				}
 			}
-			var temp = USER1;
+			var temp = data_;
 			temp.swapper(RM, "%FF");
 			temp.swapper(FM, "%FE");
 			temp.swapper(VM, "%FD");
@@ -319,7 +319,7 @@ setcodepagecase:
 					next ii;
 				*/
 
-		} else if (USER0.a(2) eq "LOWERCASE") {
+		} else if (request_.a(2) eq "LOWERCASE") {
 			fn = 10;
 			goto setcodepagecase;
 
@@ -329,16 +329,16 @@ badsetcodepage:
 			return 0;
 		}
 
-		USER3 = "OK";
+		response_ = "OK";
 
 	} else if (mode eq "GETDATASETS") {
 		ANS = "";
 		call generalsubs("GETDATASETS");
 		USER1 = ANS;
-		if (USER1) {
+		if (data_) {
 			USER3 = "OK";
 		} else {
-			USER3 = "Error: No datasets found";
+			response_ = "Error: No datasets found";
 		}
 
 	} else if (mode eq "LISTPROCESSES") {
@@ -367,8 +367,8 @@ badsetcodepage:
 
 	} else if (mode.ucase() eq "WHATSNEW") {
 
-		call changelogsubs("SELECTANDLIST" ^ FM ^ USER1);
-		if (USER4) {
+		call changelogsubs("SELECTANDLIST" ^ FM ^ data_);
+		if (msg_) {
 			USER4.transfer(USER3);
 			stop();
 		}
@@ -386,7 +386,7 @@ badsetcodepage:
 	} else if (mode eq "GETDEPTS") {
 		call usersubs("GETDEPTS");
 		USER1 = ANS;
-		USER3 = "OK";
+		response_ = "OK";
 
 	} else if (mode eq "LISTACTIVITIES") {
 
@@ -398,8 +398,8 @@ badsetcodepage:
 		perform("ABOUT");
 		//transfer @user4 to data
 		//response='OK'
-		USER4.transfer(USER3);
-		USER3.splicer(1, 0, "OK ");
+		msg_.transfer(USER3);
+		response_.splicer(1, 0, "OK ");
 
 	} else if (mode eq "UTIL") {
 		perform("UTIL");
@@ -407,7 +407,7 @@ badsetcodepage:
 
 	} else if (mode eq "PROG") {
 		perform("PROG");
-		USER3 = "OK";
+		response_ = "OK";
 
 	//LISTAUTH.TASKS = list of tasks LISTTASKS
 	//LISTAUTH.USERS = list of users LISTUSERS
@@ -436,16 +436,16 @@ badsetcodepage:
 			stop();
 		}
 
-		USER1 = RECORD;
+		data_ = RECORD;
 		USER3 = "OK";
 
 	} else if (mode eq "GETREPORTS") {
 
-		task = USER0.a(2);
+		task = request_.a(2);
 		gosub gettaskprefix();
 		if (taskprefix) {
 			if (not(authorised(taskprefix ^ " ACCESS", USER4, ""))) {
-				call mssg(USER4);
+				call mssg(msg_);
 				stop();
 			}
 		}
@@ -485,7 +485,7 @@ nextrep:
 				report.converter(VM, RM);
 				var nn = report.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
-					USER1.r(ii, repn, report.a(ii));
+					data_.r(ii, repn, report.a(ii));
 				} //ii;
 
 				USER1.r(9, repn, reportid);
@@ -493,17 +493,17 @@ nextrep:
 	//print repn,data<1>
 			}
 			//if len(data)<65000 then goto nextrep
-			if (USER1.length() lt maxstrsize - 530) {
+			if (data_.length() lt maxstrsize_ - 530) {
 				goto nextrep;
 			}
 		}
-		USER3 = "OK";
+		response_ = "OK";
 
 	} else if (mode eq "DELETEREPORT") {
 
 		gosub opendocuments();
 
-		var docnos = USER0.a(2);
+		var docnos = request_.a(2);
 
 		var ndocs = docnos.count(VM) + 1;
 		for (var docn = 1; docn <= ndocs; ++docn) {
@@ -531,7 +531,7 @@ nextrep:
 
 		var doc;
 		if (not(doc.read(gen.documents, USER0.a(2)))) {
-			call mssg("Document " ^ (USER0.a(2).quote()) ^ " is missing");
+			call mssg("Document " ^ (request_.a(2).quote()) ^ " is missing");
 			stop();
 		}
 
@@ -546,7 +546,7 @@ nextrep:
 		gosub opendocuments();
 
 		var doc;
-		if (not(doc.read(gen.documents, USER0.a(2)))) {
+		if (not(doc.read(gen.documents, request_.a(2)))) {
 			call mssg("Document " ^ (USER0.a(2).quote()) ^ " is missing");
 			stop();
 		}
@@ -555,7 +555,7 @@ nextrep:
 		gosub gettaskprefix();
 		if (taskprefix) {
 			if (not(authorised(taskprefix ^ " CREATE", USER4, ""))) {
-				call mssg(USER4);
+				call mssg(msg_);
 				stop();
 			}
 		}
@@ -574,7 +574,7 @@ nextrep:
 		doc.r(1, USERNAME);
 		doc.write(gen.documents, ID);
 
-		USER1 = ID ^ FM ^ doc;
+		data_ = ID ^ FM ^ doc;
 
 		USER3 = "OK";
 
@@ -585,9 +585,9 @@ nextrep:
 
 		//get parameters from documents into @pseudo
 
-		if (not(gen.document.read(gen.documents, USER0.a(2)))) {
+		if (not(gen.document.read(gen.documents, request_.a(2)))) {
 			USER4 = "Document " ^ (USER0.a(2).quote()) ^ " does not exist";
-			call mssg(USER4);
+			call mssg(msg_);
 			stop();
 		}
 
@@ -595,7 +595,7 @@ nextrep:
 		gosub gettaskprefix();
 		if (taskprefix) {
 			if (not(authorised(taskprefix ^ " ACCESS", USER4, ""))) {
-				call mssg(USER4);
+				call mssg(msg_);
 				stop();
 			}
 		}
@@ -614,7 +614,7 @@ nextrep:
 				PSEUDO.r(fn, tt);
 			}
 		} //fn;
-		USER1 = "";
+		data_ = "";
 
 		//save runtime params in case saving below for scheduled reruns
 		//document<11>=lower(data)
@@ -629,7 +629,7 @@ nextrep:
 			//run but suppress email
 			//perform 'TEST ':request<2>:' (S)'
 
-			USER0 = raise(gen.document.a(5)).field(FM, 2, 999999) ^ FM ^ USER0.a(2);
+			request_ = raise(gen.document.a(5)).field(FM, 2, 999999) ^ FM ^ USER0.a(2);
 			//moved up so parameters show in any emailed error messages
 			//data=@pseudo
 			//override the saved period with a current period
@@ -637,13 +637,13 @@ nextrep:
 			if (runtimeperiod[1] eq "0") {
 				runtimeperiod.splicer(1, 1, "");
 			}
-			USER1.swapper("{RUNTIME_PERIOD}", runtimeperiod);
+			data_.swapper("{RUNTIME_PERIOD}", runtimeperiod);
 			goto performreport;
 
 		} else {
 
 performreport:
-			USER3 = "";
+			response_ = "";
 
 			perform(sentencex);
 			if (not USER3) {
@@ -703,7 +703,7 @@ performreport:
 
 	} else if (mode eq "LISTCURRENCIES") {
 
-		perform("LISTCURRENCIES " ^ USER0.a(2));
+		perform("LISTCURRENCIES " ^ request_.a(2));
 
 		gosub postproc();
 
@@ -716,8 +716,8 @@ performreport:
 
 	} else if (mode.field(".", 1) eq "GETTASKS") {
 
-		call securitysubs("GETTASKS." ^ USER0.a(2) ^ "." ^ USER0.a(3));
-		USER1 = ANS;
+		call securitysubs("GETTASKS." ^ USER0.a(2) ^ "." ^ request_.a(3));
+		data_ = ANS;
 
 	} else {
 		call mssg("System Error: " ^ (mode.quote()) ^ " invalid request in GENERALPROXY");
@@ -808,9 +808,9 @@ subroutine postproc() {
 subroutine initlog() {
 
 	logkey = USER0.a(2);
-	logyear = USER0.a(3);
+	logyear = request_.a(3);
 	var logformat = USER0.a(4);
-	var logoptions = USER0.a(5);
+	var logoptions = request_.a(5);
 
 	if (logoptions.match("^\\d*/\\d{2}$")) {
 		logyear = addcent4(logoptions.field("/", 2));
@@ -818,7 +818,7 @@ subroutine initlog() {
 	}
 
 	logfromdate = USER1.a(5);
-	loguptodate = USER1.a(6);
+	loguptodate = data_.a(6);
 	logsearch = USER1.a(7);
 
 	if (logoptions eq "TODAY") {
@@ -838,18 +838,18 @@ subroutine initlog() {
 		logyear = tt.oconv("D").substr(-4, 4);
 		var logtoyear = tt2.oconv("D").substr(-4, 4);
 		if (logyear ne logtoyear) {
-			USER3 = "Dates must be within one calendar year";
+			response_ = "Dates must be within one calendar year";
 			stop();
 		}
 	}
 
 	if (not(authorised("LOG ACCESS", USER4, ""))) {
-		USER3 = USER4;
+		USER3 = msg_;
 		stop();
 	}
 
 	if (not(authorised("LOG ACCESS " ^ (logkey.quote()), USER4, ""))) {
-		USER3 = USER4;
+		response_ = msg_;
 		stop();
 	}
 

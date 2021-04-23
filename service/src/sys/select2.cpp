@@ -94,7 +94,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		} //ii;
 	}
 
-	#define msg USER4
+	#define msg_ USER4
 
 	useactivelist = sortselect.index("%SELECTLIST%");
 	sortselect.swapper("%SELECTLIST%", "");
@@ -128,7 +128,7 @@ nocommon:
 		win.srcfile.transfer(savesrcfile);
 		win.datafile.transfer(savedatafile);
 		win.wlocked.transfer(savewlocked);
-		USER4.transfer(savemsg);
+		msg_.transfer(savemsg);
 		win.reset.transfer(savereset);
 		win.valid.transfer(savevalid);
 	}
@@ -324,11 +324,11 @@ nocommon:
 
 		//handle invalid cmd
 		//R18.1 is normal 'No records found' message
-		if (USER4 and not(USER4.index("R18.1"))) {
+		if (USER4 and not(msg_.index("R18.1"))) {
 			if (USER4.field(" ", 1) eq "W156") {
-				USER4 = USER4.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
+				msg_ = USER4.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
 			}
-			response = USER4;
+			response = msg_;
 
 			//abort
 			gosub exit();
@@ -450,7 +450,7 @@ nextrec:
 			//call trimexcessmarks(iodat)
 
 			//postread can request abort by setting msg or reset>=5
-			if (win.reset ge 5 or USER4) {
+			if (win.reset ge 5 or msg_) {
 				goto nextrec;
 			}
 
@@ -548,7 +548,7 @@ nextrec:
 	//get next if output to file or space for more data
 	//goto nextrec
 	//if xml or len(DATAX)<64000 then goto nextrec
-	if (xml or (datax.length() lt maxstrsize - 1530)) {
+	if (xml or (datax.length() lt maxstrsize_ - 1530)) {
 		goto nextrec;
 	}
 

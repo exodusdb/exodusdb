@@ -21,7 +21,7 @@ function main(in mode) {
 	//jbase
 	#include <general_common.h>
 
-	#define origfullrec win.registerx(7)
+	#define origfullrec_ win.registerx(7)
 
 	if (mode eq "GETCHANGEDTASKS") {
 
@@ -30,8 +30,8 @@ function main(in mode) {
 		//email changed tasks
 		var newtasks = RECORD.a(10);
 		var newlocks = RECORD.a(11);
-		var oldtasks = origfullrec.a(10);
-		var oldlocks = origfullrec.a(11);
+		var oldtasks = origfullrec_.a(10);
+		var oldlocks = origfullrec_.a(11);
 		var ntasks = newtasks.count(VM) + (newtasks ne "");
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
 			var task = newtasks.a(1, taskn);

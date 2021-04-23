@@ -20,8 +20,8 @@ libraryinit()
 #include <win_common.h>
 
 var request2;
-var request3;
-var request4;
+var installend_;
+var serverend_;
 var request5;
 var request6;
 var filename;
@@ -70,10 +70,10 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 
-	#define request USER0
-	#define iodat USER1
-	#define response USER3
-	#define msg USER4
+	#define request_ USER0
+	#define iodat_ USER1
+	#define response_ USER3
+	#define msg_ USER4
 	var tracing = 1;
 
 	//no output in arguments allowed since c++ doesnt allow
@@ -86,12 +86,12 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		request2 = request2in;
 	}
 	if (request3in.unassigned()) {
-		request3 = "";
+		installend_ = "";
 	} else {
 		request3 = request3in;
 	}
 	if (request4in.unassigned()) {
-		request4 = "";
+		serverend_ = "";
 	} else {
 		request4 = request4in;
 	}
@@ -141,7 +141,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	} else if (request1 eq "DELETEOLDFILES2") {
 
-		inpath = request3;
+		inpath = installend_;
 		tt = "\\/";
 		inpath.converter(tt, OSSLASH OSSLASH);
 		//delete old response and temp files every 1 minute
@@ -158,7 +158,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		inpath = request3;
 
 		//delete files older than x
-		ageinsecs = request4;
+		ageinsecs = serverend_;
 		if (not ageinsecs) {
 			ageinsecs = SYSTEM.a(28);
 		}
@@ -233,7 +233,7 @@ restart:
 		}
 
 		var live = request2;
-		processes = request3;
+		processes = installend_;
 
 		////////////////////////////////////////////////////////////////////////////
 		//Look for NEOPATCH.1 file in three locations
@@ -485,7 +485,7 @@ nextpatch:;
 
 	} else if (request1.substr(1, 8) eq "GETINDEX") {
 
-		USER1 = "";
+		iodat_ = "";
 		filename = request2;
 		var fieldname = request3;
 		var prefix = request4;
@@ -495,7 +495,7 @@ nextpatch:;
 		}
 		if (sortby) {
 			if (not(var("AL,AR,DL,DR").locateusing(",", sortby, xx))) {
-				USER3 = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEXVALUES";
+				response_ = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEXVALUES";
 				return 0;
 			}
 		}
@@ -523,20 +523,20 @@ nextpatch:;
 			temp = "JOURNAL";
 		}
 
-		if (not(authorised(singular(temp) ^ " LIST", USER4, ""))) {
-			USER3 = USER4;
+		if (not(authorised(singular(temp) ^ " LIST", msg_, ""))) {
+			response_ = USER4;
 			return 0;
 		}
 
 getvalues:
 		call collectixvals(filename, fieldname, prefix);
 		PSEUDO.transfer(USER1);
-		if (USER1[1] eq FM) {
+		if (iodat_[1] eq FM) {
 			USER1.splicer(1, 1, "");
 		}
 		USER3 = "OK";
 
-		if (sortby and USER1) {
+		if (sortby and iodat_) {
 			//convert fm to rm in iodat
 			//iodat:=rm
 			//call v119('S','',sortby[1,1],sortby[2,1],iodat,flag)
@@ -544,7 +544,7 @@ getvalues:
 			//iodat[-1,1]=''
 			//v119 C/ASM sort routine cannot be easily converted/reimplemented in c++
 			USER1.converter(FM, VM);
-			call sortarray(USER1, 1, sortby);
+			call sortarray(iodat_, 1, sortby);
 			USER1.converter(VM, FM);
 		}
 
@@ -554,21 +554,21 @@ getvalues:
 			//execs will be in field 1
 			//stopped reason will be in parallel in field 2
 			//stopped execs will be at the end
-			USER1.converter(FM, VM);
+			iodat_.converter(FM, VM);
 
 			//remove or move any stopped execs to the end and add reason
 			var nn = USER1.count(VM) + 1;
 			var nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
-				var execcode = USER1.a(1, ii);
+				var execcode = iodat_.a(1, ii);
 				if (execstoplist.a(1).locate(execcode, stopn)) {
 					var reason = execstoplist.a(2, stopn);
 					if (reason) {
 						USER1.remover(1, ii);
-						USER1.remover(2, ii);
+						iodat_.remover(2, ii);
 						if (not active) {
 							USER1.r(1, nn2, execcode);
-							USER1.r(2, nn2, reason);
+							iodat_.r(2, nn2, reason);
 						}
 						ii -= 1;
 						nn -= 1;
@@ -583,26 +583,26 @@ getvalues:
 			}
 
 			//1=force vm to ensure xml has empty not missing tags
-			USER1.r(2, 1, USER1.a(2, 1));
-			USER1 = invertarray(USER1, 1);
+			iodat_.r(2, 1, USER1.a(2, 1));
+			iodat_ = invertarray(USER1, 1);
 
 		}
 
-		if (USER0.index("RECORD")) {
-			USER1 = invertarray(USER1, 1);
+		if (request_.index("RECORD")) {
+			iodat_ = invertarray(USER1, 1);
 
 		} else if (USER0.index("XML")) {
-			if (USER1) {
+			if (iodat_) {
 				call htmllib2("STRIPTAGS", USER1);
-				USER1.swapper(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
+				iodat_.swapper(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
 				USER1.splicer(1, 0, "<record><" ^ fieldname ^ ">");
-				USER1 ^= "</" ^ fieldname ^ ">" "</record>";
+				iodat_ ^= "</" ^ fieldname ^ ">" "</record>";
 				if (USER1.index(VM)) {
-					USER1.swapper("</" ^ fieldname ^ ">", "</STOPPED>");
+					iodat_.swapper("</" ^ fieldname ^ ">", "</STOPPED>");
 					USER1.swapper(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
 			}
-			USER1.splicer(1, 0, "<records>");
+			iodat_.splicer(1, 0, "<records>");
 			USER1 ^= "</records>";
 		} else {
 			//convert fm to vm in iodat
@@ -617,8 +617,8 @@ getvalues:
 			filename0.swapper("MEDIA_TYPE", "JOB_TYPE");
 		}
 		filename = filename0.field(" ", 1);
-		var sortselect = request3;
-		var dictids = request4;
+		var sortselect = installend_;
+		var dictids = serverend_;
 		var options = request5;
 		var maxnrecs = request6;
 
@@ -628,7 +628,7 @@ getvalues:
 
 		var file;
 		if (not(file.open(filename, ""))) {
-			USER3 = filename.quote() ^ " file does not exist in LISTEN SELECT";
+			response_ = filename.quote() ^ " file does not exist in LISTEN SELECT";
 			return 0;
 		}
 
@@ -642,21 +642,21 @@ getvalues:
 
 		//and data passed to SELECT is assumed to be a selectlist
 
-		if (USER1) {
+		if (iodat_) {
 			makelist("", USER1);
 			sortselect ^= "%SELECTLIST%";
-			USER1 = "";
+			iodat_ = "";
 		}
 
-		call select2(filename0, SYSTEM.a(2), sortselect, dictids, options, USER1, USER3, "", "", "", maxnrecs);
+		call select2(filename0, SYSTEM.a(2), sortselect, dictids, options, USER1, response_, "", "", "", maxnrecs);
 		//restore the program stack although this is done in LISTEN per request
 		//rev has a limit on 299 "programs" and dictionary entries count as 1 each!
 		//call program.stack(programstack)
 
-		if (USER4) {
+		if (msg_) {
 			USER3 = trim(USER4.a(1), FM);
 		} else {
-			USER1 = "%DIRECTOUTPUT%";
+			iodat_ = "%DIRECTOUTPUT%";
 			//response='OK'
 		}
 
@@ -772,30 +772,30 @@ nextlock:
 
 	} else if (request1 eq "STOPDB") {
 
-		#define installend request3
-		#define serverend request4
+		#define installend_ request3
+		#define serverend_ request4
 
 		//check authorised
 		tt = request2;
 		if (not tt) {
 			tt = "STOP";
 		}
-		if (not(authorised("DATABASE " ^ tt, USER4, "LS"))) {
-			USER3 = "Error: " ^ USER4;
+		if (not(authorised("DATABASE " ^ tt, msg_, "LS"))) {
+			response_ = "Error: " ^ USER4;
 			return 0;
 		}
 
-		if (installend.osfile() or serverend.osfile()) {
+		if (installend_.osfile() or serverend_.osfile()) {
 			//response='Error: Database already stopped/stopping'
 			call listen4(19, USER3);
 
 		} else {
 
-			call oswrite("", installend);
+			call oswrite("", installend_);
 
 			//stop server
 			if (request2.index("ALL")) {
-				call oswrite("", serverend);
+				call oswrite("", serverend_);
 			}
 
 			//wait up to 30 seconds for other users to quit
@@ -811,13 +811,13 @@ nextlock:
 			var otherusersx = otherusers();
 			if (otherusersx) {
 				//response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
-				call listen4(20, USER3, otherusersx);
-				installend.osdelete();
+				call listen4(20, response_, otherusersx);
+				installend_.osdelete();
 			} else {
 				osshell("NET STOP EXODUSSERVICE");
 
 				if (request2.substr(1, 7) eq "RESTART") {
-					installend.osdelete();
+					installend_.osdelete();
 					osshell("NET START EXODUSSERVICE");
 				}
 
@@ -825,7 +825,7 @@ nextlock:
 			}
 
 			if (request2.index("ALL")) {
-				serverend.osdelete();
+				serverend_.osdelete();
 			}
 		}
 
@@ -837,7 +837,7 @@ nextlock:
 		call getbackpars(bakpars);
 
 		//backup may respond to user itself if it starts
-		USER4 = "";
+		msg_ = "";
 		perform("FILEMAN BACKUP " ^ SYSTEM.a(17) ^ " " ^ bakpars.a(7));
 
 		//if backup has already responded to user
@@ -850,18 +850,18 @@ nextlock:
 			}
 		}
 
-		USER3 = USER4;
+		response_ = msg_;
 		USER3.converter(FM ^ VM, "\r\r");
 
-		call sysmsg(USER3, "EXODUS Backup");
+		call sysmsg(response_, "EXODUS Backup");
 
 		if (USER3.ucase().index("SUCCESS")) {
-			USER3.splicer(1, 0, "OK ");
+			response_.splicer(1, 0, "OK ");
 		}
 
 		//note: if backup did not respond already then the requestexit will
 		//respond as usual with the error message from backup
-		USER1 = "";
+		iodat_ = "";
 
 	} else {
 		printl(request1.quote(), " invalid request in LISTEN5");
@@ -900,7 +900,7 @@ subroutine fileaccesscheck() {
 			if (not(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msg2, ""))) {
 				//if there is an authorised dictionary item then leave it up to that
 				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).index("ALLOWPARTIALACCESS"))) {
-					USER3 = USER4;
+					response_ = msg_;
 					return;
 				}
 			}

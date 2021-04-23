@@ -16,7 +16,7 @@ function main(in msg0, io time0) {
 		return 0;
 	}
 
-	#define sep " "
+	#define sep_ " "
 
 	if (VOLUMES) {
 		//logfilename=field(FIELD2(@rollout.file,'\',-1),'.',1):'.LOG'
@@ -66,13 +66,13 @@ function main(in msg0, io time0) {
 		//entry:=oconv(date(),'D2-J')
 		entry = var().date().oconv("D2-E");
 		entry = entry.substr(-2, 2) ^ "-" ^ entry.substr(1, 5);
-		entry ^= sep ^ time2.oconv("MTS") ^ sep;
+		entry ^= sep_ ^ time2.oconv("MTS") ^ sep_;
 		//entry:=field(time2,'.',2) 'MD20P'
 	}
 	//similar in listen and log2
 	entry ^= SYSTEM.a(24) ^ ": " ^ (time2 - time0).oconv("MD20P");
 	//entry:=sep:sep:sep:sep
-	entry ^= sep ^ msg0;
+	entry ^= sep_ ^ msg0;
 
 	if (VOLUMES) {
 		printl(entry);
