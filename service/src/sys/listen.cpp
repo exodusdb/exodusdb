@@ -23,7 +23,7 @@ libraryinit()
 #include <flushindex.h>
 #include <rtp57.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var logfilename;
@@ -205,7 +205,7 @@ function main() {
 	//
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global all
 
 	//finance?!
@@ -863,7 +863,7 @@ nextsearch0:
 
 		} else {
 			//call log2('Preventing further automatic backups today',logtime)
-			((var().date() + var().time() / 86400).oconv("MD50P")).writev(DEFINITIONS, "BACKUP", 1);
+			((var().date() + var().time() / 86400).oconv("MD50P")).writev(sys._definitions, "BACKUP", 1);
 
 backup:
 			//similar code in LISTEN and LISTEN2
@@ -991,11 +991,11 @@ readlink1:
 			//tt=index(replyfilename,'/data/',1)
 			replyfilename.converter("/", OSSLASH);
 			//tt=index(replyfilename,'\data\',1)
-			tt = replyfilename.index(OSSLASH "data" OSSLASH);
+			tt = replyfilename.index(OSSLASH_ "data" OSSLASH_);
 			if (tt) {
 				//eg drive() = D:\EXODUS\EXODUS\ ...
 				//replyfilename='..\':replyfilename[tt+1,9999]
-				replyfilename = ".." OSSLASH ^ replyfilename.substr(tt + 1, 9999);
+				replyfilename = ".." OSSLASH_ ^ replyfilename.substr(tt + 1, 9999);
 			}
 		}
 
@@ -1386,9 +1386,9 @@ cannotopenlinkfile2:
 
 	//update security table every few secs and every login
 	//if request1='LOGIN' or index('036',time()[-1,1],1) then gosub getsecurity
-	if (SECURITY.read(DEFINITIONS, "SECURITY")) {
+	if (sys._security.read(sys._definitions, "SECURITY")) {
 		if (VOLUMES) {
-			SECURITY = SECURITY.invert();
+			sys._security = sys._security.invert();
 		}
 	}
 

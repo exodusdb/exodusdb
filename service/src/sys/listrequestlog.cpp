@@ -11,7 +11,7 @@ var msg;
 function main() {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	if (not(authorised("REQUESTLOG ACCESS", msg))) {
 		call mssg(msg);

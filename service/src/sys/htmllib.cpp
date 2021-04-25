@@ -1,14 +1,14 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var params;
 var params2;
 var filler;
 var tagsep;
 
-function main(in mode, io agent_, in params0="", in params20="") {
+function main(in mode, io datax, in params0="", in params20="") {
 	//c sys in,io,"",""
 
 	//BEING REPLACED BY LOWERCASE VERSION HTMLLIB2()
@@ -17,7 +17,7 @@ function main(in mode, io agent_, in params0="", in params20="") {
 	//ABP neither used
 
 	//jbase
-	#include <general_common.h>
+	#include <system_common.h>
 	//global datax
 
 	var td = "<td>";
@@ -41,21 +41,21 @@ function main(in mode, io agent_, in params0="", in params20="") {
 		var tt = " " ^ VM;
 		while (true) {
 			///BREAK;
-			if (not(agent_.index(tt))) break;
+			if (not(datax.index(tt))) break;
 			datax.swapper(tt, VM);
 		}//loop;
 		tt = " " ^ FM;
 		while (true) {
 			///BREAK;
-			if (not(agent_.index(tt))) break;
+			if (not(datax.index(tt))) break;
 			datax.swapper(tt, FM);
 		}//loop;
 		filler = "&nbsp;";
-		gosub fill(agent_);
+		gosub fill(datax);
 
 		datax.swapper(FM, "</TD></TR>" ^ FM ^ "<TR><TD>");
-		agent_.swapper(VM, "</TD>" ^ VM ^ "<TD>");
-		datax = "<TR><TD>" ^ agent_ ^ "</TD></TR>";
+		datax.swapper(VM, "</TD>" ^ VM ^ "<TD>");
+		datax = "<TR><TD>" ^ datax ^ "</TD></TR>";
 
 		//trth='<TR><TD>'
 		if (params2) {
@@ -67,7 +67,7 @@ function main(in mode, io agent_, in params0="", in params20="") {
 			line1.swapper("</TD>", "</th>");
 			line1.swapper("<td>", "<th>");
 			line1.swapper("</td>", "</th>");
-			agent_.r(1, line1);
+			datax.r(1, line1);
 		}
 
 		//prefix
@@ -79,7 +79,7 @@ function main(in mode, io agent_, in params0="", in params20="") {
 		datax.splicer(1, 0, params2 ^ "<TBODY>");
 
 		//postfix
-		agent_ ^= "</TBODY></TABLE>";
+		datax ^= "</TBODY></TABLE>";
 		//datax=datax:'</TBODY></TABLE ID=':tableid:'>'
 
 		//if not(count(datax,fm)) and index(datax<1>,'<TH>',1) then
@@ -88,15 +88,15 @@ function main(in mode, io agent_, in params0="", in params20="") {
 
 		//highlight last row if a total
 		var nlines = datax.count(FM) + 1;
-		var lastline = agent_.a(nlines);
+		var lastline = datax.a(nlines);
 	//Total
-		if (lastline.index("<TD>" ^ gen.glang.a(28))) {
+		if (lastline.index("<TD>" ^ sys.glang.a(28))) {
 			lastline.swapper("TD>", "TH>");
 			lastline.swapper("td>", "th>");
 			datax.r(nlines, lastline);
 		}
 
-		agent_.converter(FM ^ VM, "");
+		datax.converter(FM ^ VM, "");
 
 	//fill in the missing cells
 	} else if (mode eq "TABLE.FILL") {
@@ -105,7 +105,7 @@ function main(in mode, io agent_, in params0="", in params20="") {
 
 	} else if (mode eq "HASHTABLE") {
 
-		var nv = agent_.count(VM) + 1;
+		var nv = datax.count(VM) + 1;
 		for (var vn = 1; vn <= nv; ++vn) {
 			var data2 = datax.a(1, vn);
 
@@ -146,7 +146,7 @@ function main(in mode, io agent_, in params0="", in params20="") {
 				data2.splicer(1, 0, "<table class=\"hashtable\">" ^ tr);
 				data2 ^= trx ^ "</table>";
 
-				agent_.r(1, vn, data2);
+				datax.r(1, vn, data2);
 
 			}
 
@@ -155,16 +155,16 @@ function main(in mode, io agent_, in params0="", in params20="") {
 	} else if (mode eq "STRIPTAGS") {
 		while (true) {
 			var tag1 = datax.index("<");
-			var tag2 = agent_.index(">");
+			var tag2 = datax.index(">");
 			///BREAK;
 			if (not(tag1 and tag1 lt tag2)) break;
 			datax.splicer(tag1, tag2 - tag1 + 1, "");
 		}//loop;
 
 	} else if (mode eq "DECODEHTML") {
-		agent_.swapper("&nbsp;", " ");
+		datax.swapper("&nbsp;", " ");
 		datax.swapper("&lt;", "<");
-		agent_.swapper("&gt;", ">");
+		datax.swapper("&gt;", ">");
 		datax.swapper("&amp;", "&");
 
 	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
@@ -172,7 +172,7 @@ function main(in mode, io agent_, in params0="", in params20="") {
 		//to check versus DOS BROWSERS.TXT
 		//GET NEW RUN GBP2 CHK.AGENTSTRING
 
-		#define agent_ datax
+		//equ agent to datax
 
 		//Windows NT 6.3     Windows 8.1
 		//Windows NT 6.2     Windows 8
@@ -188,31 +188,31 @@ function main(in mode, io agent_, in params0="", in params20="") {
 		//similar code in INIT.GENERAL and HTMLLIB
 		//name can be CLIENT OS or SERVER OS
 		var osname = "";
-		if (agent_.index("NT 10.0")) {
+		if (datax.index("NT 10.0")) {
 			osname = "10";
-		} else if (agent_.index("NT 6.3")) {
+		} else if (datax.index("NT 6.3")) {
 			osname = "8.1";
-		} else if (agent_.index("NT 6.2")) {
+		} else if (datax.index("NT 6.2")) {
 			osname = "8";
-		} else if (agent_.index("NT 6.1")) {
+		} else if (datax.index("NT 6.1")) {
 			osname = "7";
-		} else if (agent_.index("NT 6.0")) {
+		} else if (datax.index("NT 6.0")) {
 			osname = "Vista/2008";
-		} else if (agent_.index("NT 5.2")) {
+		} else if (datax.index("NT 5.2")) {
 			osname = "XP-64";
-		} else if (agent_.index("NT 5.1")) {
+		} else if (datax.index("NT 5.1")) {
 			osname = "XP";
-		} else if (agent_.index("Windows NT ")) {
-			var tt = agent_.index("Windows NT ");
-			osname = ((agent_.substr(tt + 11, 9999)).field(";", 1)).field(")", 1);
+		} else if (datax.index("Windows NT ")) {
+			var tt = datax.index("Windows NT ");
+			osname = ((datax.substr(tt + 11, 9999)).field(";", 1)).field(")", 1);
 		}
-		if (agent_.index("WOW64")) {
+		if (datax.index("WOW64")) {
 			osname ^= "-64";
 		}
 		if (osname) {
 			osname = "Win" ^ osname;
 			//add touch if Windows but not Windows Phone
-			if (agent_.index("Touch")) {
+			if (datax.index("Touch")) {
 				osname ^= " Touch";
 			}
 		}
@@ -220,34 +220,34 @@ function main(in mode, io agent_, in params0="", in params20="") {
 		if (not osname) {
 			var tt = 0;
 			if (not tt) {
-				tt = agent_.index("Android ");
+				tt = datax.index("Android ");
 			}
 			if (not tt) {
-				tt = agent_.index("Android");
+				tt = datax.index("Android");
 			}
 			if (not tt) {
-				tt = agent_.index("iPhone OS");
+				tt = datax.index("iPhone OS");
 			}
 			if (not tt) {
-				tt = agent_.index("CPU OS");
+				tt = datax.index("CPU OS");
 			}
 			if (not tt) {
-				tt = agent_.index("Mac OS");
+				tt = datax.index("Mac OS");
 			}
 			if (not tt) {
-				tt = agent_.index("Windows Phone ");
+				tt = datax.index("Windows Phone ");
 				if (tt) {
-					agent_.splicer(tt, 13, "WinPhone");
+					datax.splicer(tt, 13, "WinPhone");
 				}
 			}
 			if (not tt) {
-				tt = agent_.index("Linux");
+				tt = datax.index("Linux");
 			}
 			if (not tt) {
-				tt = agent_.index("CrOS");
+				tt = datax.index("CrOS");
 			}
 			if (tt) {
-				osname = agent_.substr(tt, 9999);
+				osname = datax.substr(tt, 9999);
 				if (osname.substr(1, 4) eq "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
@@ -266,13 +266,13 @@ function main(in mode, io agent_, in params0="", in params20="") {
 
 		//Trident tells you the actual browser software for MS
 		var browser = "";
-		if (agent_.index("Trident/7.0")) {
+		if (datax.index("Trident/7.0")) {
 			browser = "11";
-		} else if (agent_.index("Trident/6.0")) {
+		} else if (datax.index("Trident/6.0")) {
 			browser = "10";
-		} else if (agent_.index("Trident/5.0")) {
+		} else if (datax.index("Trident/5.0")) {
 			browser = "9";
-		} else if (agent_.index("Trident/4.0")) {
+		} else if (datax.index("Trident/4.0")) {
 			browser = "8";
 		}
 
@@ -283,15 +283,15 @@ function main(in mode, io agent_, in params0="", in params20="") {
 		//MSIE 7.0  Windows Internet Explorer 7 or IE7 Compatibility View/Browser Mode
 		//MSIE 6.0  Microsoft Internet Explorer 6
 		var iemode = "";
-		if (agent_.index("MSIE 10.0")) {
+		if (datax.index("MSIE 10.0")) {
 			iemode = "10";
-		} else if (agent_.index("MSIE 9.0")) {
+		} else if (datax.index("MSIE 9.0")) {
 			iemode = "9";
-		} else if (agent_.index("MSIE 8.0")) {
+		} else if (datax.index("MSIE 8.0")) {
 			iemode = "8";
-		} else if (agent_.index("MSIE 7.0")) {
+		} else if (datax.index("MSIE 7.0")) {
 			iemode = "7";
-		} else if (agent_.index("MSIE 6.0")) {
+		} else if (datax.index("MSIE 6.0")) {
 			iemode = "6";
 		}
 
@@ -307,21 +307,21 @@ function main(in mode, io agent_, in params0="", in params20="") {
 		}
 
 		if (not browser) {
-			var tt = agent_.index("Chrome");
+			var tt = datax.index("Chrome");
 			if (not tt) {
-				tt = agent_.index("Firefox");
+				tt = datax.index("Firefox");
 			}
 			if (not tt) {
-				tt = agent_.index("Safari");
+				tt = datax.index("Safari");
 			}
 			if (not tt) {
-				tt = agent_.index("Opera");
+				tt = datax.index("Opera");
 			}
 			if (not tt) {
-				tt = agent_.index("Netscape");
+				tt = datax.index("Netscape");
 			}
 			if (tt) {
-				browser = agent_.substr(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
+				browser = datax.substr(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
 			}
 		}
 		if (browser.substr(-2, 2) eq ".0") {
@@ -330,10 +330,10 @@ function main(in mode, io agent_, in params0="", in params20="") {
 
 		var submode = mode.field(".", 3);
 		if (submode eq "OS") {
-			agent_ = osname;
+			datax = osname;
 			return 0;
 		} else if (submode eq "BROWSER") {
-			agent_ = browser;
+			datax = browser;
 			return 0;
 		}
 
@@ -344,10 +344,10 @@ function main(in mode, io agent_, in params0="", in params20="") {
 			if (browser) {
 				osname ^= browser;
 			} else {
-				osname ^= agent_;
+				osname ^= datax;
 			}
-			//tt=osname:'<br>':agent
-			agent_ = osname;
+			//tt=osname:'<br>':datax
+			datax = osname;
 		}
 
 		//returns agent in datax see equate above
@@ -359,9 +359,9 @@ function main(in mode, io agent_, in params0="", in params20="") {
 	return 0;
 }
 
-subroutine fill(io agent_) {
+subroutine fill(io datax) {
 
-	var nn = datax.count(FM) + (agent_ ne "");
+	var nn = datax.count(FM) + (datax ne "");
 
 		//find max number of columns
 	var n2 = 0;
@@ -375,7 +375,7 @@ subroutine fill(io agent_) {
 		//make sure all columns are filled
 	for (var ii = 1; ii <= nn; ++ii) {
 		for (var i2 = 1; i2 <= n2; ++i2) {
-			if (agent_.a(ii, i2) eq "") {
+			if (datax.a(ii, i2) eq "") {
 				datax.r(ii, i2, filler);
 			}
 		} //i2;

@@ -113,7 +113,7 @@ var upgflagfile;
 function main() {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global all
 
 	//NB the PROCESSES file is central to all databases in one installation

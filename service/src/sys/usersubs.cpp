@@ -29,7 +29,7 @@ var wsmsg;
 function main(in mode) {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//$insert abp,common
 
 	var users;

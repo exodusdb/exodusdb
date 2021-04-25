@@ -16,7 +16,7 @@ function main(in localdate0, in localtime0) {
 	//c sys
 
 	//caserevised*
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//use parameters only if both are provided
 	if (localtime0.unassigned()) {

@@ -6,7 +6,7 @@ libraryinit()
 #include <shell2.h>
 #include <singular.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
@@ -45,7 +45,7 @@ function main(in mode) {
 	//test wrote 1,000,000 files containing the filenumber 1,2,3 etc in about 5 mins
 	//and the files could be randomly read and written at excellent speed
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global ptr,ii
 
 	#define request_ USER0
@@ -168,7 +168,7 @@ postuploadfail:
 			//if result else
 			var fullsubfolder = (uploadroot ^ subfolder).lcase();
 			//remove doubled up separators - \\ on winddows or // on linux
-			fullsubfolder.swapper(OSSLASH OSSLASH, OSSLASH);
+			fullsubfolder.swapper(OSSLASH_ OSSLASH_, OSSLASH);
 			//osopen fullsubfolder to xx else if status() ne 2 then
 			//cannot use dos 8 characters since keys can be > 8 characters
 			call shell2("dir " ^ fullsubfolder, errors);

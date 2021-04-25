@@ -15,7 +15,7 @@ function main(in mode, io idate, in usercode, in userx, in marketcode, in market
 	//holiday type is one of the following (priority in the same order)
 	//1=weekend, 2=public, 3=personal, 4=expired login, 0=not holiday
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//prevent c++ warnings about unused variables
 	if (usercode.unassigned()) {

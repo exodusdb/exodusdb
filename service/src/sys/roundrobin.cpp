@@ -10,7 +10,7 @@ var errormsg;
 function main(in mode, in params, io result, io msg) {
 	//c sys in,in,io,io
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//output:
 	//empty = ok

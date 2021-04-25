@@ -24,7 +24,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	//
 	//Returns: result in ranges0 unless listid given
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//equ maxlistpartsize to 32000
 	var maxlistpartsize = maxstrsize_ / 2;

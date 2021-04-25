@@ -16,7 +16,7 @@ var ver;
 function main() {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//if @username='EXODUS' then break on
 	//BREAK ON;

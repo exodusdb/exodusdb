@@ -40,7 +40,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 
 	//global tt,maxemailsize,forcedemailx
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	if (ccaddress0.unassigned()) {
 		ccaddress = "";

@@ -54,7 +54,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	//since it calls LISTEN3 and filename.subs('POSTREAD') to get accurate data
 	//clearcommon
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global maxnrecs,useactivelist
 
 	var filename = filenamex;

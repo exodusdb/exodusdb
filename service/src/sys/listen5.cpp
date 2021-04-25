@@ -16,12 +16,12 @@ libraryinit()
 #include <esctoattr.h>
 #include <scrnio.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var request2;
-var installend_;
-var serverend_;
+var request3;
+var request4;
 var request5;
 var request6;
 var filename;
@@ -53,6 +53,7 @@ var lockid;
 var dostime;//num
 var yy;
 var zz;
+var serverend;
 var bakpars;
 var msg2;
 var fileattributes;
@@ -61,7 +62,7 @@ var filetime;
 function main(in request1, in request2in, in request3in, in request4in, in request5in, in request6in) {
 	//c sys in,in,in,in,in,in
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//$insert abp,common
 	//$insert bp,agency.common
 	//global ii,passwordexpired,lastlogindate,maxnologindays,validips
@@ -86,12 +87,12 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		request2 = request2in;
 	}
 	if (request3in.unassigned()) {
-		installend_ = "";
+		request3 = "";
 	} else {
 		request3 = request3in;
 	}
 	if (request4in.unassigned()) {
-		serverend_ = "";
+		request4 = "";
 	} else {
 		request4 = request4in;
 	}
@@ -141,9 +142,9 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	} else if (request1 eq "DELETEOLDFILES2") {
 
-		inpath = installend_;
+		inpath = request3;
 		tt = "\\/";
-		inpath.converter(tt, OSSLASH OSSLASH);
+		inpath.converter(tt, OSSLASH_ OSSLASH_);
 		//delete old response and temp files every 1 minute
 		call listen5("DELETEOLDFILES", "*.4", inpath);
 		call listen5("DELETEOLDFILES", "*.5", inpath);
@@ -158,7 +159,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		inpath = request3;
 
 		//delete files older than x
-		ageinsecs = serverend_;
+		ageinsecs = request4;
 		if (not ageinsecs) {
 			ageinsecs = SYSTEM.a(28);
 		}
@@ -233,7 +234,7 @@ restart:
 		}
 
 		var live = request2;
-		processes = installend_;
+		processes = request3;
 
 		////////////////////////////////////////////////////////////////////////////
 		//Look for NEOPATCH.1 file in three locations
@@ -299,13 +300,13 @@ restart:
 			}
 
 			//skip if already installed in this database
-			if (xx.read(DEFINITIONS, patchid)) {
+			if (xx.read(sys._definitions, patchid)) {
 				call unlockrecord("", processes, patchid);
 				goto nextpatch;
 			}
 
 			//prevent from ever running this patch again on this database
-			rec.write(DEFINITIONS, patchid);
+			rec.write(sys._definitions, patchid);
 
 			//get current EXODUS version timestamp
 			versiondatetime = "";
@@ -332,7 +333,7 @@ restart:
 			}
 
 			//skip patch if older than last patch
-			if (not(lastpatchid.read(DEFINITIONS, "INSTALL*LAST"))) {
+			if (not(lastpatchid.read(sys._definitions, "INSTALL*LAST"))) {
 				lastpatchid = "";
 			}
 			if (lastpatchid) {
@@ -344,7 +345,7 @@ restart:
 
 			//ensure that we only ever runonce something just loaded from a patch
 			runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
-			DEFINITIONS.deleterecord(runoncekey);
+			sys._definitions.deleterecord(runoncekey);
 
 			if (not skipemail) {
 
@@ -374,9 +375,9 @@ restart:
 			}
 
 			//record success/failure before any autorun
-			(var().date() ^ "." ^ var().time().oconv("R(0)#5")).writev(DEFINITIONS, patchid, 6);
+			(var().date() ^ "." ^ var().time().oconv("R(0)#5")).writev(sys._definitions, patchid, 6);
 
-			skipreason.writev(DEFINITIONS, patchid, 7);
+			skipreason.writev(sys._definitions, patchid, 7);
 
 			if (skipreason) {
 				//release
@@ -385,13 +386,13 @@ restart:
 			}
 
 			//save the last patch info - used to prevent backward patching
-			patchid.write(DEFINITIONS, "INSTALL*LAST");
+			patchid.write(sys._definitions, "INSTALL*LAST");
 
 			//post install runonce if installed
 			//if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
 			//if the runonce record appears in the definitions then
 			//run it, save it and delete it
-			if (runonce.read(DEFINITIONS, runoncekey)) {
+			if (runonce.read(sys._definitions, runoncekey)) {
 				perform("RUN DEFINITIONS " ^ runoncekey.substr(2, 9999));
 				//leave it for inspection
 				//delete definitions,runoncekey
@@ -549,7 +550,7 @@ getvalues:
 		}
 
 		var execstoplist;
-		if (execstoplist.read(DEFINITIONS, "INDEXVALUES*" ^ filename ^ "*" ^ fieldname)) {
+		if (execstoplist.read(sys._definitions, "INDEXVALUES*" ^ filename ^ "*" ^ fieldname)) {
 
 			//execs will be in field 1
 			//stopped reason will be in parallel in field 2
@@ -617,8 +618,8 @@ getvalues:
 			filename0.swapper("MEDIA_TYPE", "JOB_TYPE");
 		}
 		filename = filename0.field(" ", 1);
-		var sortselect = installend_;
-		var dictids = serverend_;
+		var sortselect = request3;
+		var dictids = request4;
 		var options = request5;
 		var maxnrecs = request6;
 
@@ -772,8 +773,8 @@ nextlock:
 
 	} else if (request1 eq "STOPDB") {
 
-		#define installend_ request3
-		#define serverend_ request4
+		//equ install.end to request3
+		//equ server.end to request4
 
 		//check authorised
 		tt = request2;
@@ -785,17 +786,17 @@ nextlock:
 			return 0;
 		}
 
-		if (installend_.osfile() or serverend_.osfile()) {
+		if (request3.osfile() or serverend.osfile()) {
 			//response='Error: Database already stopped/stopping'
 			call listen4(19, USER3);
 
 		} else {
 
-			call oswrite("", installend_);
+			call oswrite("", request3);
 
 			//stop server
 			if (request2.index("ALL")) {
-				call oswrite("", serverend_);
+				call oswrite("", request4);
 			}
 
 			//wait up to 30 seconds for other users to quit
@@ -812,12 +813,12 @@ nextlock:
 			if (otherusersx) {
 				//response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, response_, otherusersx);
-				installend_.osdelete();
+				request3.osdelete();
 			} else {
 				osshell("NET STOP EXODUSSERVICE");
 
 				if (request2.substr(1, 7) eq "RESTART") {
-					installend_.osdelete();
+					request3.osdelete();
 					osshell("NET START EXODUSSERVICE");
 				}
 
@@ -825,7 +826,7 @@ nextlock:
 			}
 
 			if (request2.index("ALL")) {
-				serverend_.osdelete();
+				request4.osdelete();
 			}
 		}
 

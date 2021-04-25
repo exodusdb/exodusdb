@@ -239,7 +239,7 @@ function main() {
 		printl(SENTENCE);
 	}
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global all
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx

@@ -13,7 +13,7 @@ function main() {
 	//
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//clearcommon();
 
 	var options = SENTENCE.field("(", 2);

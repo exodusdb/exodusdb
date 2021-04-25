@@ -63,7 +63,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 	//handles VALIDATE,BECOMEUSERANDCONNECTION,LOGIN and RESPOND
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//$insert abp,common
 	//$insert bp,agency.common
 	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips

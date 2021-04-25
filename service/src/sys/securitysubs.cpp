@@ -49,7 +49,7 @@ var wsmsg;
 
 function main(in mode) {
 	//c sys
-	#include <general_common.h>
+	#include <system_common.h>
 	//global sysrec,lastfn,encryptx,newpassword
 
 	var interactive = not(SYSTEM.a(33));

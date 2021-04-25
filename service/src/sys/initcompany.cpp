@@ -13,7 +13,7 @@ var temp;
 function main(in nextcompanycode) {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global desc1,desc2
 
 	#define interactive_ not(SYSTEM.a(33))

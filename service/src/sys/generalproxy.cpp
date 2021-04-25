@@ -48,7 +48,7 @@ function main() {
 	#define response_ USER3
 	#define msg_ USER4
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global fn,stationery,mode
 
 	//clearcommon();

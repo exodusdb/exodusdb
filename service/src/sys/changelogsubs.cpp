@@ -34,7 +34,7 @@ var wsmsg;
 function main(in mode0) {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global mode,text,ucline,rec,idate,date,line1,idates,errors,update,keywords,nkeywords,cmd,nlines
 
 	#define data_ USER1

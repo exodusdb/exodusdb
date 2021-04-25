@@ -21,7 +21,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//BP MEDIADIARY mode WRITE/ASP for media diary
 	//ABP none
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//default unassigned parameters
 	if (mode0.unassigned()) {

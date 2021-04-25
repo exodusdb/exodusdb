@@ -19,7 +19,7 @@ var taskn2;
 function main(in mode) {
 	//c sys
 	//jbase
-	#include <general_common.h>
+	#include <system_common.h>
 
 	#define origfullrec_ win.registerx(7)
 

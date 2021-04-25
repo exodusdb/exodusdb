@@ -12,7 +12,7 @@ function main() {
 	//c sys
 	//global reqdate
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	var update = 1;
 

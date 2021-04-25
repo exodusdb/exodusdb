@@ -11,7 +11,7 @@ var ans;//num
 var userx;
 
 function main() {
-	#include <general_common.h>
+	#include <system_common.h>
 	if (ID eq "EXODUS") {
 		goto unknown;
 	}
@@ -164,7 +164,7 @@ libraryinit(keys)
 var usern;
 
 function main() {
-	#include <general_common.h>
+	#include <system_common.h>
 	if (SECURITY.a(1).locate(ID, usern)) {
 		ANS = SECURITY.a(2, usern);
 	} else {

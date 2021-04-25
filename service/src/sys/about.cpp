@@ -20,7 +20,7 @@ function main() {
 	//c sys
 	//global all
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	interactive = not(SYSTEM.a(33));
 

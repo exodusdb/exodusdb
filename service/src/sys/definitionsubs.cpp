@@ -10,7 +10,7 @@ libraryinit()
 #include <definitionsubs.h>
 #include <singular.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
@@ -33,7 +33,7 @@ var wsmsg;
 function main(in mode) {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//use agp<> instead of @record<> to assist source code searching for agp<?>
 
@@ -106,11 +106,11 @@ function main(in mode) {
 
 			// backup rec on definitions
 			if (ID eq "SYSTEM") {
-				if (not(backuprec.read(DEFINITIONS, backupkey))) {
+				if (not(backuprec.read(sys._definitions, backupkey))) {
 					backuprec = "";
 				}
 				smtpkey = "SMTP.CFG";
-				if (not(smtprec.read(DEFINITIONS, smtpkey))) {
+				if (not(smtprec.read(sys._definitions, smtpkey))) {
 					smtprec = "";
 				}
 
@@ -362,7 +362,7 @@ preventupdate:
 			for (var fn = 100; fn <= 102; ++fn) {
 				var usercode = RECORD.a(fn);
 				if (usercode) {
-					if (not(SECURITY.a(1).locate(usercode, xx))) {
+					if (not(sys._security.a(1).locate(usercode, xx))) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
@@ -455,14 +455,14 @@ preventupdate:
 			if (ID eq "SYSTEM") {
 
 				//get lastbackupdate in unlikely event that it has changed during update
-				if (not(tt.readv(DEFINITIONS, backupkey, 1))) {
+				if (not(tt.readv(sys._definitions, backupkey, 1))) {
 					tt = "";
 				}
 				backuprec.r(1, tt);
 
-				backuprec.write(DEFINITIONS, backupkey);
+				backuprec.write(sys._definitions, backupkey);
 				smtpkey = "SMTP.CFG";
-				smtprec.write(DEFINITIONS, smtpkey);
+				smtprec.write(sys._definitions, smtpkey);
 
 			//write system and backup rec in dos
 			} else {
@@ -482,7 +482,7 @@ preventupdate:
 				if (not drive) break;
 				//TODO replace with checkwritable()
 				drive ^= ":";
-				call osmkdir(drive ^ OSSLASH "data.bak");
+				call osmkdir(drive ^ OSSLASH_ "data.bak");
 				call shell2("dir " ^ drive.substr(1, 2), errors);
 				if (errors) {
 					call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");

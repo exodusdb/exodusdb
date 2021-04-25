@@ -16,7 +16,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 
 	#define lockitemsep_ "*"
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global lockfile,lockitem
 
 	//declare function delay

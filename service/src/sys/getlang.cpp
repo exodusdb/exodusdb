@@ -14,7 +14,7 @@ var codepage;
 function main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
 	//c sys in,in,in,io,io
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global question,temp,languagecode,progname
 
 	lang = "";

@@ -65,7 +65,7 @@ function main() {
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	#include <general_common.h>
+	#include <system_common.h>
 	var interactive = not(SYSTEM.a(33));
 
 	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {

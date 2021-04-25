@@ -9,7 +9,7 @@ var origusername;
 function main(in cmd, in username) {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	if (username) {
 		if (not(SECURITY.a(1).locate(username, xx))) {

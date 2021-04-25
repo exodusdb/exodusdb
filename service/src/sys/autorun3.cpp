@@ -53,7 +53,7 @@ function main(in docids0="", in options0="") {
 
 	//clearcommon();
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global agp,market,marketcode,useraddress,inpath,tt,forceemail,voccmd,tracing
 
 	#define request_ USER0

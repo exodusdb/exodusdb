@@ -168,7 +168,7 @@ libraryinit(different)
 var rec;
 
 function main() {
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE
 	//IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999
@@ -613,7 +613,7 @@ libraryinit(timedate)
 #include <gen_common.h>
 
 function main() {
-	#include <general_common.h>
+	#include <system_common.h>
 	var ans = field2(RECORD, FM, -1);
 	if (ans[1] eq "V") {
 		ans = field2(RECORD, FM, -2);

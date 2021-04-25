@@ -24,7 +24,7 @@ var oldmenu;
 function main(in mode, io logtime, in menu) {
 	//c sys in,io,in
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	call log2("*init.general2 " ^ mode.a(1), logtime);
 

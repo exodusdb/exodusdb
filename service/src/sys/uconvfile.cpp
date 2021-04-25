@@ -20,7 +20,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	//uses the unicode uconv to convert file format
 	//
 	//http://www.microsoft.com/globaldev/reference/cphome.mspx
-	#include <general_common.h>
+	#include <system_common.h>
 
 	if (encoding1i.unassigned()) {
 		encoding1 = "";

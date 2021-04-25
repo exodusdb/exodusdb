@@ -21,7 +21,7 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 
 	//this is a special login routine called from LISTEN2
 	//declare function validcode1
-	#include <general_common.h>
+	#include <system_common.h>
 	//$insert abp,common
 	//$insert bp,agency.common
 	cookie = "";

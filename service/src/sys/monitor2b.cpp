@@ -17,7 +17,7 @@ var log;
 function main(in mode, in request, in tempfilename, out datax, out msg) {
 	//c sys in,in,in,out,out
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//mode is WRITE or READ
 	//request is required sent to the server and

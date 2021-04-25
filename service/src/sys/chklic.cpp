@@ -28,7 +28,7 @@ var errormsg;
 
 function main(in mode0, out msg) {
 	//c sys in,out
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//global mode,modulename,did,uptodate,licn,tt,msg
 

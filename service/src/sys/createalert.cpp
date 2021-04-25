@@ -17,7 +17,7 @@ var datax;
 function main() {
 	//c sys
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	var sentencex = SENTENCE.field("(", 1);
 	//cheap parser requires ~ for spaces

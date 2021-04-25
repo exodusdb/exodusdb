@@ -13,7 +13,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 
 	//called from nlist, adxtab
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global rowspan,colspan,t2
 
 	//given fm list of column heading and vm per row of column heading

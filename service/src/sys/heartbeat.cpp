@@ -20,7 +20,7 @@ function main(in mode, in status0="") {
 	//1. saves process info and status in processes file
 	//2. checks for .end flags and performs logoff/shutdown if present
 
-	#include <general_common.h>
+	#include <system_common.h>
 	if (status.unassigned()) {
 		status = "";
 	} else {

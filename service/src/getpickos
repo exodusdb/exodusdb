@@ -57,8 +57,8 @@ function conv_n_e_osys2exodus {
 	conv_n_e_osys2exodus sql
 
 :
-#: Get all .cpp and .h files from ~/pickos/sys
-: Get all .cpp from ~/pickos/sys
+: Get all .cpp and .h files from ~/pickos/sys
+#: Get all .cpp from ~/pickos/sys
 : =========================================
 :
 : All NEOSYS converted to EXODUS already in ADECOM
@@ -66,8 +66,8 @@ function conv_n_e_osys2exodus {
 	for MODULE in sys
 	do
 		mkdir -p  ./$MODULE
-		#cp ~/pickos/$MODULE/*.cpp ~/pickos/$MODULE/*.h ./$MODULE/
-		cp ~/pickos/$MODULE/*.cpp ./$MODULE/
+		cp ~/pickos/$MODULE/*.cpp ~/pickos/$MODULE/*.h ./$MODULE/
+		#cp ~/pickos/$MODULE/*.cpp ./$MODULE/
 	done
 
 :

@@ -23,7 +23,7 @@ function main(in mode) {
 	//c sys
 	//global task
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//declare function lockposting
 
 	//"where" is not really functional in the intranet system

@@ -26,7 +26,7 @@ function main(in amountfmlanguage, in currcode0) {
 	//c sys
 	//global all
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	comma = "";
 

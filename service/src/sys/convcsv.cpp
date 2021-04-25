@@ -50,7 +50,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	//BP MEDIADIARY2 ditto
 	//ABP DAYBOOKS   ditto
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global ptr
 
 	if (sentence0.unassigned()) {

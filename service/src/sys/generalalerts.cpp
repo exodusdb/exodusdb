@@ -10,7 +10,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 	//at 7am on the 14th of each month (ie regularly but not everyday)
 	//CREATEALERT CURRUSERS GENERAL CURRUSERS 7:14 EXODUS (ROS)
 
-	#include <general_common.h>
+	#include <system_common.h>
 
 	var alerttype = alerttype0.field(":", 1);
 	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);

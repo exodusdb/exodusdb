@@ -20,7 +20,7 @@ var divx;
 function main(in mode0, out html, in compcode0="") {
 	//c sys in,out,""
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//$insert bp,agency.common
 	//global letterheadcompany,modex,tt,hascompanies,compcode
 

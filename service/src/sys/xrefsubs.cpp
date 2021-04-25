@@ -23,7 +23,7 @@ var xx;
 
 function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist) {
 	//c sys in,in,in,io,in,io
-	#include <general_common.h>
+	#include <system_common.h>
 
 	//also needs
 	//datafile,src.file

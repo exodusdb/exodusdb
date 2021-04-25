@@ -25,7 +25,7 @@ var allowablechars;
 
 function main(in mode0) {
 	//c sys
-	#include <general_common.h>
+	#include <system_common.h>
 	//global encryptx,password,maxlen,show,ok,msg,userx
 
 	#define prikey_ "1000" ^ "100"

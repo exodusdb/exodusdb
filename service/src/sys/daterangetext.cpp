@@ -17,7 +17,7 @@ function main(in d1, in d2, out result, io lang) {
 	//Feb 2010 - Jan 2011
 	//10 Mar 2010 - 5 Feb 2010
 
-	#include <general_common.h>
+	#include <system_common.h>
 	if (lang.unassigned()) {
 		lang = gen.glang;
 	}

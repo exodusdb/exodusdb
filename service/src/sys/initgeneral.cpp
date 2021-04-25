@@ -20,7 +20,7 @@ libraryinit()
 #include <systemsubs.h>
 #include <initcompany.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var lastlog;
 var logtime;
@@ -66,7 +66,7 @@ function main() {
 	//NB @VOLUMES blank on C++ and used to run slightly differently on C++
 	//eg function called is generalalerts instead of general.alerts
 
-	#include <general_common.h>
+	#include <system_common.h>
 	//global tt,tt2,s33,lastlog
 
 	//!WARNING decide() returns REPLY number instead of VALUE when not interactive
@@ -308,9 +308,9 @@ function main() {
 			dbdatetimerequired = dbdate.iconv("D") + dbtime.iconv("MT") / 86400;
 		} else {
 		}
-		if (DEFINITIONS.open("DEFINITIONS", "")) {
+		if (sys._definitions.open("DEFINITIONS", "")) {
 			var dbversion;
-			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
+			if (not(dbversion.read(sys._definitions, "DBVERSION"))) {
 				goto updateversion;
 			}
 			if (oldmethod and dbversion.a(1) eq "14334.5") {
@@ -349,7 +349,7 @@ updateversion:
 				dbversion = dbdatetimerequired;
 				dbversion.r(2, dbdate);
 				dbversion.r(3, dbtime);
-				dbversion.write(DEFINITIONS, "DBVERSION");
+				dbversion.write(sys._definitions, "DBVERSION");
 			}
 
 		}
@@ -501,7 +501,7 @@ nextreport:
 		}
 	}
 
-	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
+	if (not(sys._definitions.open("DEFINITIONS", ""))) {
 		var().chr(7).output();
 		msg = "The DEFINITIONS file is missing";
 		msg.r(-1, "Did you startup using the right command file/datasettype?");
@@ -618,7 +618,7 @@ nextreport:
 
 	call log2("*get DEFINITIONS SYSTEM parameters", logtime);
 	//do in reverse order so that the higher levels get priority
-	if (not(SYSTEM.read(DEFINITIONS, "SYSTEM"))) {
+	if (not(SYSTEM.read(sys._definitions, "SYSTEM"))) {
 		SYSTEM = "";
 	}
 	tt = "system.cfg";
@@ -689,7 +689,7 @@ nextreport:
 			call osread(smtp, "smtp.cfg");
 		}
 		if (not(smtp.a(1))) {
-			if (not(smtp.read(DEFINITIONS, "SMTP.CFG"))) {
+			if (not(smtp.read(sys._definitions, "SMTP.CFG"))) {
 				{}
 			}
 		}
@@ -1110,15 +1110,15 @@ getproxy:
 	DATEFMT = "D2/E";
 
 	call log2("*get security - also in LISTEN", logtime);
-	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+	if (not(sys._security.read(sys._definitions, "SECURITY"))) {
 		if (temp.open("dict_DEFINITIONS")) {
-			if (SECURITY.read(temp, "SECURITY")) {
-				SECURITY.write(DEFINITIONS, "SECURITY");
+			if (sys._security.read(temp, "SECURITY")) {
+				sys._security.write(sys._definitions, "SECURITY");
 			}
 		}
 	}
 	if (VOLUMES) {
-		SECURITY = SECURITY.invert();
+		sys._security = sys._security.invert();
 	}
 
 	//must be before init.acc, init.agency or any task adding
@@ -1208,7 +1208,7 @@ getproxy:
 		}
 
 		call log2("*zzz should create full user record not just the name", logtime);
-		var usercodes = SECURITY.a(1);
+		var usercodes = sys._security.a(1);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (var usern = 1; usern <= nusers; ++usern) {
 			var userx = usercodes.a(1, usern);
@@ -1300,23 +1300,23 @@ getproxy:
 	call log2("*open general files", logtime);
 	var valid = 1;
 	//DEFINITIONS='' why was this commented out?
-	if (not(openfile("ALANGUAGE", gen.alanguage, "DEFINITIONS"))) {
+	if (not(openfile("ALANGUAGE", sys.alanguage, "DEFINITIONS"))) {
 		valid = 0;
 	}
-	if (not(openfile("COMPANIES", gen.companies, "DEFINITIONS"))) {
+	if (not(openfile("COMPANIES", sys.companies, "DEFINITIONS"))) {
 		valid = 0;
 	}
-	if (not(openfile("CURRENCIES", gen.currencies, "COMPANIES"))) {
+	if (not(openfile("CURRENCIES", sys.currencies, "COMPANIES"))) {
 		valid = 0;
 	}
-	if (not(openfile("UNITS", gen.units, "CURRENCIES"))) {
+	if (not(openfile("UNITS", sys.units, "CURRENCIES"))) {
 		valid = 0;
-		gen.units = "";
+		sys.units = "";
 	}
-	if (not(openfile("ADDRESSES", gen.addresses, "COMPANIES"))) {
+	if (not(openfile("ADDRESSES", sys.addresses, "COMPANIES"))) {
 		valid = 0;
 	}
-	if (not(openfile("DOCUMENTS", gen.documents, "ADDRESSES", 1))) {
+	if (not(openfile("DOCUMENTS", sys.documents, "ADDRESSES", 1))) {
 		valid = "";
 	}
 	if (not(openfile("SHADOW", shadow, "COMPANIES", 1))) {
@@ -1417,7 +1417,7 @@ getproxy:
 				perform 'RENAMEFILE LOG':year:' LOG':year:'.BAD (S)';
 				//get back to any existing correct file
 				tattach='ATTACH ../data/':system<17>:'/GENERAL LOG':year:' (S)';
-				convert '/' to OSSLASH in tattach;
+				convert '/' to OSSLASH_ in tattach;
 				perform tattach;
 				//open/create new in the right place
 				if openfile('LOG':year,log,'DEFINITIONS') then;
@@ -1452,41 +1452,41 @@ getproxy:
 
 	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
 	if (not exodusid) {
-		if (temp.read(DEFINITIONS, "AUTOEXEC")) {
+		if (temp.read(sys._definitions, "AUTOEXEC")) {
 			perform("TASK AUTOEXEC");
 		}
 	}
 
 	call log2("*get first company for init.acc", logtime);
 	clearselect();
-	select(gen.companies);
+	select(sys.companies);
 	if (not LISTACTIVE) {
 		//call note('WARNING: *** NO COMPANY RECORD ***')
 		call log2("WARNING: --- NO COMPANY RECORD ---");
-		gen.company = "";
+		sys.company = "";
 	}
 	var anyfixed = -1;
 fixnextcompany:
 	anyfixed += 1;
-	gen.gcurrcompany = "";
+	sys.gcurrcompany = "";
 	var maxyear = "";
 	if (readnext(companycode)) {
-		if (not(gen.company.read(gen.companies, companycode))) {
+		if (not(sys.company.read(sys.companies, companycode))) {
 			goto fixnextcompany;
 		}
 
 		if (VOLUMES) {
-			gen.company.r(27, gen.company.a(27).invert());
+			sys.company.r(27, sys.company.a(27).invert());
 		}
 
 		//initialise with a recent company
-		tt = gen.company.a(2).field("/", 2);
+		tt = sys.company.a(2).field("/", 2);
 		if (tt gt maxyear) {
 			maxyear = tt;
-			gen.gcurrcompany = companycode;
+			sys.gcurrcompany = companycode;
 		}
 
-		var marketcode = gen.company.a(30);
+		var marketcode = sys.company.a(30);
 		if (marketcode) {
 			var markets;
 			if (markets.open("MARKETS", "")) {
@@ -1501,12 +1501,12 @@ fixnextcompany:
 		}
 
 		call log2("*remove obsolete period 13 from deloitte data", logtime);
-		if (gen.company.index("13X4WEEK,1/7,5")) {
-			tt = gen.company.a(16);
+		if (sys.company.index("13X4WEEK,1/7,5")) {
+			tt = sys.company.a(16);
 			tt.swapper("13/", "12/");
-			gen.company.r(16, tt);
+			sys.company.r(16, tt);
 fixcompany:
-			gen.company.write(gen.companies, companycode);
+			sys.company.write(sys.companies, companycode);
 			goto fixnextcompany;
 		}
 
@@ -1548,13 +1548,13 @@ fixcompany:
 
 	call log2("*add number format to company records", logtime);
 	clearselect();
-	select(gen.companies);
+	select(sys.companies);
 	var numberformat = "";
 	var compcode = "";
 convcompany:
 	if (readnext(compcode)) {
 		var tempcompany;
-		if (tempcompany.read(gen.companies, compcode)) {
+		if (tempcompany.read(sys.companies, compcode)) {
 			if (tempcompany.a(22) eq "") {
 				if (not numberformat) {
 					call decide("Which format do you want for numbers ?||(See \"NUMBER FORMAT\" on the company file)", "1.000,00 (dot for thousands)" ^ VM ^ "1,000.00 (comma for thousands)", reply);
@@ -1564,7 +1564,7 @@ convcompany:
 						numberformat = "1,000.00";
 					}
 				}
-				numberformat.writev(gen.companies, compcode, 22);
+				numberformat.writev(sys.companies, compcode, 22);
 
 				goto convcompany;
 			}
@@ -1572,19 +1572,19 @@ convcompany:
 	}
 
 	call log2("*get the company description", logtime);
-	gen.company = "";
+	sys.company = "";
 	var currperiod = "";
 	//call init.company('')
 	//change so that interactive ADAGENCY gets a company code
 	//force acquisition of language
-	gen.glang = "";
+	sys.glang = "";
 	//gcurr.company=''
-	call initcompany(gen.gcurrcompany);
-	SYSTEM.r(37, gen.gcurrcompany);
+	call initcompany(sys.gcurrcompany);
+	SYSTEM.r(37, sys.gcurrcompany);
 
 	call log2("*ensure random key exists", logtime);
 	var datasetid;
-	if (not(datasetid.read(DEFINITIONS, "GLOBALDATASETID"))) {
+	if (not(datasetid.read(sys._definitions, "GLOBALDATASETID"))) {
 newdatasetid:
 		dostime = ostime();
 		datasetid = var().date() ^ "." ^ dostime;
@@ -1594,7 +1594,7 @@ newdatasetid:
 adddatasetcodename:
 		datasetid.r(2, SYSTEM.a(23));
 		datasetid.r(3, SYSTEM.a(17));
-		datasetid.write(DEFINITIONS, "GLOBALDATASETID");
+		datasetid.write(sys._definitions, "GLOBALDATASETID");
 	}
 	if (datasetid.a(3) eq "" and SYSTEM.a(17)) {
 		goto adddatasetcodename;
@@ -1647,7 +1647,7 @@ adddatasetcodename:
 
 		call log2("*show and update last login time", logtime);
 		var userx;
-		if (not(userx.read(DEFINITIONS, "USER*" ^ USERNAME))) {
+		if (not(userx.read(sys._definitions, "USER*" ^ USERNAME))) {
 			userx = "";
 		}
 		if (userx.a(4) and interactive) {
@@ -1656,13 +1656,13 @@ adddatasetcodename:
 		}
 
 		call log2("*save last login time", logtime);
-		userx.write(DEFINITIONS, "USER*" ^ USERNAME ^ "*LAST");
+		userx.write(sys._definitions, "USER*" ^ USERNAME ^ "*LAST");
 
 		call log2("*update the last login time", logtime);
 		userx.r(4, var().date());
 		userx.r(5, var().time());
 		userx.r(6, STATION);
-		userx.write(DEFINITIONS, "USER*" ^ USERNAME);
+		userx.write(sys._definitions, "USER*" ^ USERNAME);
 
 		//call log2('*check processes',logtime)
 		//clearselect
@@ -1671,16 +1671,16 @@ adddatasetcodename:
 	}
 
 	call log2("*clean up document keys", logtime);
-	if (gen.documents.open("DOCUMENTS", "")) {
-		select(gen.documents);
+	if (sys.documents.open("DOCUMENTS", "")) {
+		select(sys.documents);
 nextdoc:
 		if (readnext(docid)) {
 			var docid2 = (field2(docid, "\\", -1)).field(".", 1);
 			if (docid2 ne docid) {
 				var doc;
-				if (doc.read(gen.documents, docid)) {
-					doc.write(gen.documents, docid2);
-					gen.documents.deleterecord(docid);
+				if (doc.read(sys.documents, docid)) {
+					doc.write(sys.documents, docid2);
+					sys.documents.deleterecord(docid);
 
 				}
 			}
@@ -1707,7 +1707,7 @@ nextdoc:
 
 		call log2("*convert codepage", logtime);
 		if (codepaging.osread("CODEPAGE.CFG")) {
-			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
+			if (not(codepage.read(sys._definitions, "PARAM*CODEPAGE"))) {
 				codepage = "0" ^ FM ^ codepaging.a(2);
 			}
 			if ((codepage.a(2) eq "737" and not(codepage.a(1))) and codepaging.a(3) eq "1253") {
@@ -1768,7 +1768,7 @@ nextdoc:
 	//FOLLOWING MUST ALL BE DONE LAST OF ALL
 
 	call log2("*save upgrade history and email notification", logtime);
-	if (version.osread("GENERAL" OSSLASH "VERSION.DAT")) {
+	if (version.osread("GENERAL" OSSLASH_ "VERSION.DAT")) {
 
 		//get version installed
 		var versioninstalled = version.field("\r", 1).trim();
@@ -1801,11 +1801,11 @@ nextdoc:
 
 		//update software version in database
 		tt2 = "VERSION*LASTEMAILED";
-		if (not(tt.read(DEFINITIONS, tt2))) {
+		if (not(tt.read(sys._definitions, tt2))) {
 			tt = "";
 		}
 		if (tt ne versioninstalled) {
-			versioninstalled.write(DEFINITIONS, tt2);
+			versioninstalled.write(sys._definitions, tt2);
 
 			//email users on live systems LISTED IN SYSTEM CONFIGURATION only
 			if (SYSTEM.a(58).locate(SYSTEM.a(17), xx)) {

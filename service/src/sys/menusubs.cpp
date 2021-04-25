@@ -5,7 +5,7 @@ libraryinit()
 
 var id;
 
-function main(in mode, io tx, in arg3, io href_, in arg5) {
+function main(in mode, io tx, in arg3, io arg4, in arg5) {
 	//c sys in,io,in,io,in
 
 	if (mode eq "INITMENUS") {
@@ -25,7 +25,7 @@ function main(in mode, io tx, in arg3, io href_, in arg5) {
 		if (arg4.unassigned()) {
 			id = "";
 		} else {
-			id = href_;
+			id = arg4;
 		}
 
 		//<a id="menu_SUPPORT">_Support</a>
@@ -68,7 +68,7 @@ function main(in mode, io tx, in arg3, io href_, in arg5) {
 	} else if (mode eq "ADDITEM") {
 
 		var item = arg3;
-		#define href_ arg4
+		//equate href to arg4
 		//equate onclick to arg5
 
 		//<a href="../media/schedules.htm?filename=PLANS&amp;plantype=1&ratings=1"><u>M</u>onth Plan File</a><br />
@@ -85,7 +85,7 @@ function main(in mode, io tx, in arg3, io href_, in arg5) {
 			item.splicer(tt, 2, "<u>" ^ item[tt + 1] ^ "</u>");
 		}
 
-		tx ^= FM ^ " <a" ^ props ^ " href=\"" ^ href_ ^ "\">" ^ item ^ "</a><br />";
+		tx ^= FM ^ " <a" ^ props ^ " href=\"" ^ arg4 ^ "\">" ^ item ^ "</a><br />";
 
 	} else if (mode eq "ADDSEP") {
 
