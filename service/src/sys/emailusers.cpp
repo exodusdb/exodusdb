@@ -5,7 +5,7 @@ libraryinit()
 #include <emailusers.h>
 #include <sendmail.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var mode;
 var subject;

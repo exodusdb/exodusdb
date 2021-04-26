@@ -3,7 +3,7 @@ libraryinit()
 
 #include <shell2.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var encoding1;
 var encoding2;

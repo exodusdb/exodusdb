@@ -3,7 +3,7 @@ libraryinit()
 
 #include <getdatetime.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var localdate;
 var localtime;
@@ -35,10 +35,10 @@ function main(in localdate0, in localtime0) {
 		temp.splicer(1, 1, "");
 	}
 	if (temp.substr(-2, 2) eq "AM") {
-		temp.splicer(-2, 2, gen.glang.a(16));
+		temp.splicer(-2, 2, sys.glang.a(16));
 	}
 	if (temp.substr(-2, 2) eq "PM") {
-		temp.splicer(-2, 2, gen.glang.a(17));
+		temp.splicer(-2, 2, sys.glang.a(17));
 	}
 
 	if (DATEFMT eq "") {

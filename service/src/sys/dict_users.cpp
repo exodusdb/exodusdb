@@ -4,7 +4,7 @@ libraryinit(authorised)
 //---------------------
 #include <authorised.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var usern;
 var ans;//num
@@ -159,7 +159,7 @@ libraryexit(is_department)
 
 libraryinit(keys)
 //---------------
-#include <gen_common.h>
+#include <sys_common.h>
 
 var usern;
 

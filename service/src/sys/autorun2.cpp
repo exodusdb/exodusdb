@@ -3,7 +3,7 @@ libraryinit()
 
 #include <getsubs.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var mode;
 var datax;
@@ -45,9 +45,9 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		targetusercodes = targetusercodes0;
 	}
 	if (document0.unassigned()) {
-		gen.document = "";
+		sys.document = "";
 	} else {
-		gen.document = document0;
+		sys.document = document0;
 	}
 	if (docid.unassigned()) {
 		docid = "";
@@ -55,13 +55,13 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	if (title0) {
 		title = title0;
 	} else {
-		title = gen.document.a(1);
+		title = sys.document.a(1);
 	}
 
 	//default runtime to once
-	if (not(gen.document.field(FM, 20, 10).convert(FM, ""))) {
+	if (not(sys.document.field(FM, 20, 10).convert(FM, ""))) {
 		//run once now
-		gen.document.r(27, 1);
+		sys.document.r(27, 1);
 	}
 
 	var fullrequest = module ^ "PROXY" ^ FM ^ request;
@@ -77,7 +77,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//determine the runas usercode if not specified
 	if (not runasusercode) {
 		//allow for runuser to be passed in document
-		runasusercode = gen.document.a(1);
+		runasusercode = sys.document.a(1);
 	}
 	if (runasusercode) {
 		var runasuser;
@@ -107,7 +107,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//send to the "run as" user and all users above in the same group
 	if (targetusercodes eq "") {
 		//allow for targetusers to be passed in document
-		targetusercodes = gen.document.a(14);
+		targetusercodes = sys.document.a(14);
 		//runasuser is NOT a target unless there are no recipients
 		//if targetusercodes='' then
 		// targetusercodes=runasusercode
@@ -166,17 +166,17 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	//got all data, prepare autorun document
 
-	gen.document.r(2, title);
-	gen.document.r(5, lower(fullrequest));
-	gen.document.r(6, lower(datax));
-	gen.document.r(1, runasusercode);
-	gen.document.r(14, targetusercodes);
+	sys.document.r(2, title);
+	sys.document.r(5, lower(fullrequest));
+	sys.document.r(6, lower(datax));
+	sys.document.r(1, runasusercode);
+	sys.document.r(14, targetusercodes);
 
-	gen.document.r(7, APPLICATION);
-	gen.document.r(3, var().date());
-	gen.document.r(4, var().time());
-	if (gen.document.a(12) eq "") {
-		gen.document.r(12, 1);
+	sys.document.r(7, APPLICATION);
+	sys.document.r(3, var().date());
+	sys.document.r(4, var().time());
+	if (sys.document.a(12) eq "") {
+		sys.document.r(12, 1);
 	}
 
 	//email delivery - save if report successful or not run
@@ -184,8 +184,8 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		//dont lose last run date/time to avoid rerunning.
 		//to force rerun delete and recreate
 		var olddoc;
-		if (olddoc.read(gen.documents, docid)) {
-			gen.document.r(13, olddoc.a(13));
+		if (olddoc.read(sys.documents, docid)) {
+			sys.document.r(13, olddoc.a(13));
 		}
 	} else {
 		var saveid = ID;
@@ -201,12 +201,12 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//prevent document from being run until the request has been processed
 	//relies on unlock all in listen
 	if (mode eq "ASAP") {
-		if (not(gen.documents.lock( docid))) {
+		if (not(sys.documents.lock( docid))) {
 			{}
 		}
 	}
 
-	gen.document.write(gen.documents, docid);
+	sys.document.write(sys.documents, docid);
 
 	return 1;
 }

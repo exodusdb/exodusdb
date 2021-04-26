@@ -6,7 +6,7 @@ libraryinit()
 #include <convertercsv.h>
 #include <uconvfile.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var sentencex;
 var selectx;
@@ -323,7 +323,7 @@ nextdict:
 					//title[1,1]=t
 					title = capitalise(title);
 
-					title.swapper("(Base)", "(" ^ gen.company.a(3) ^ ")");
+					title.swapper("(Base)", "(" ^ sys.company.a(3) ^ ")");
 
 					//swap ' code' with '' in title
 

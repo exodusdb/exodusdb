@@ -4,7 +4,7 @@ libraryinit()
 #include <convpdf.h>
 #include <sysmsg.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var outfile;
 var errors;

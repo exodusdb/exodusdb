@@ -163,7 +163,7 @@ libraryexit(datetime_created)
 libraryinit(different)
 //--------------------
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var rec;
 
@@ -610,7 +610,7 @@ libraryexit(time)
 libraryinit(timedate)
 //-------------------
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 function main() {
 	#include <system_common.h>

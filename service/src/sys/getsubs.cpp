@@ -4,7 +4,7 @@ libraryinit()
 #include <authorised.h>
 #include <singular.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
@@ -33,8 +33,8 @@ function main(in mode) {
 	var where = "docs/public/";
 	where.converter("/", OSSLASH);
 
-	if (gen.documents.unassigned()) {
-		if (not(gen.documents.open("DOCUMENTS", ""))) {
+	if (sys.documents.unassigned()) {
+		if (not(sys.documents.open("DOCUMENTS", ""))) {
 			call fsmsg();
 			win.valid = 0;
 			return 0;
@@ -45,14 +45,14 @@ function main(in mode) {
 
 		//lock source of document numbers
 		printl("*lock source of document numbers");
-		if (not(lockrecord("DOCUMENTS", gen.documents, "0", xx, 10))) {
+		if (not(lockrecord("DOCUMENTS", sys.documents, "0", xx, 10))) {
 			win.valid = 0;
 			return 0;
 		}
 
 		//get/update next document number
 		var nextno;
-		if (not(nextno.read(gen.documents, "0"))) {
+		if (not(nextno.read(sys.documents, "0"))) {
 			if (not(nextno.osread(where ^ "0"))) {
 				nextno = "";
 			}
@@ -77,14 +77,14 @@ nextdoc:
 		// end
 
 		//skip if document already exists
-		if (tt.read(gen.documents, ID)) {
+		if (tt.read(sys.documents, ID)) {
 			goto nextdoc;
 		}
-		if (tt.read(gen.documents, where ^ ID)) {
+		if (tt.read(sys.documents, where ^ ID)) {
 			goto nextdoc;
 		}
 
-		xx = unlockrecord("DOCUMENTS", gen.documents, "0");
+		xx = unlockrecord("DOCUMENTS", sys.documents, "0");
 
 	} else if (mode eq "POSTREAD") {
 

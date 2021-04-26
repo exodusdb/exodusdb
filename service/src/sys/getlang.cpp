@@ -3,7 +3,7 @@ libraryinit()
 
 #include <getlang.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var nn;
 var progname;
@@ -29,12 +29,12 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 
 	var origlanguagecode = languagecode0;
 	if (not origlanguagecode) {
-		origlanguagecode = gen.company.a(14);
+		origlanguagecode = sys.company.a(14);
 		if (origlanguagecode eq "ENGLISH") {
 			origlanguagecode = "";
 		}
 		if (not origlanguagecode) {
-			origlanguagecode = gen.gcurrcompany;
+			origlanguagecode = sys.gcurrcompany;
 		}
 	}
 

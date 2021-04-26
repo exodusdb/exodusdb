@@ -6,7 +6,7 @@ libraryinit()
 #include <sendmail.h>
 #include <sysmsg.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var mode;

@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <sys_common.h>
+
 var logfilename;
 var logfilelength;//num
 var temposfilename83;

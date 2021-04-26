@@ -11,7 +11,7 @@ libraryinit()
 #include <sysmsg.h>
 #include <upgrade.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var checkinterval;//num
 var forced;
@@ -539,7 +539,7 @@ nextprocess:
 					if (var().time() gt backuprequired.a(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
-					dow = ((gen.glang.a(22).field("|", (nextbackupdate - 1) % 7 + 1)).substr(1, 8)).ucase();
+					dow = ((sys.glang.a(22).field("|", (nextbackupdate - 1) % 7 + 1)).substr(1, 8)).ucase();
 					nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
 					nextbackupfilename.converter("/", OSSLASH);
 					nextbackupfileinfo = nextbackupfilename.osfile();

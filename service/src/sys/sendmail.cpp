@@ -5,7 +5,7 @@ libraryinit()
 #include <shell2.h>
 #include <log.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var ccaddress;
 var subject;

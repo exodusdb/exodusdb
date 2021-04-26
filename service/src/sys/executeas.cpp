@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var xx;
 var origusername;

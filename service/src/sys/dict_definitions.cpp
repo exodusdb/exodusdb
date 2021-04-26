@@ -113,6 +113,8 @@ libraryexit(password_age)
 
 libraryinit(process_comment2)
 //---------------------------
+#include <sys_common.h>
+
 function main() {
 	ANS = "";
 	if (ID.field("*", 2) eq SYSTEM.a(32)) {

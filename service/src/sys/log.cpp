@@ -5,6 +5,8 @@ libraryinit()
 #include <getbackpars.h>
 #include <sendmail.h>
 
+#include <sys_common.h>
+
 var programname;
 var text;
 var xstation;

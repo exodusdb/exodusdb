@@ -6,7 +6,7 @@ libraryinit()
 #include <systemfile.h>
 #include <inputbox.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var mode;
 var userx;

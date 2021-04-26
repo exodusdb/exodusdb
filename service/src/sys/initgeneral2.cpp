@@ -7,7 +7,7 @@ libraryinit()
 #include <sysmsg.h>
 #include <menusubs.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var tt;
 var hosts;

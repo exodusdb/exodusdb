@@ -5,7 +5,7 @@ libraryinit()
 #include <readhostsallow.h>
 #include <shell2.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var sentencex;
 var ip12;

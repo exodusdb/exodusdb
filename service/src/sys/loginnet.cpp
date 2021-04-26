@@ -6,7 +6,7 @@ libraryinit()
 #include <addcent4.h>
 #include <changelogsubs.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var menuid;
 var taskn;//num
@@ -140,8 +140,8 @@ deleteit:
 	var compcode = "";
 
 	var allcomps;
-	if (not(allcomps.read(gen.companies, "%RECORDS%"))) {
-		select(gen.companies);
+	if (not(allcomps.read(sys.companies, "%RECORDS%"))) {
+		select(sys.companies);
 		allcomps = "";
 nextcomp:
 		if (readnext(compcodex)) {
@@ -183,13 +183,13 @@ nextcomp:
 	compcode = compcodes.a(1);
 	if (compcode) {
 		var tempcompany;
-		if (not(tempcompany.read(gen.companies, compcode))) {
+		if (not(tempcompany.read(sys.companies, compcode))) {
 			msg = "Error: " ^ (compcode.quote()) ^ " company code is missing";
 			return 0;
 		}
 	}
 
-	gen.company = "";
+	sys.company = "";
 	call initcompany(compcode);
 
 	var ncompanies = compcodes.count(FM) + 1;
@@ -199,7 +199,7 @@ nextcomp:
 	//market
 	//defmarketcode=if company<30> then company<30> else agp<37>;*market
 	//WARNING TODO: check ternary op following;
-	var defmarketcode = gen.company.a(30) ? gen.company.a(30) : SYSTEM.a(137);
+	var defmarketcode = sys.company.a(30) ? sys.company.a(30) : SYSTEM.a(137);
 	//if unassigned(markets) then markets=''
 	//TODO maybe use the market on the user file?
 	//markets is not open in finance only module
@@ -265,7 +265,7 @@ nextcomp:
 	cookie ^= "&fs=" ^ SYSTEM.a(46, 7);
 
 	//date format
-	cookie ^= "&df=" ^ gen.company.a(10);
+	cookie ^= "&df=" ^ sys.company.a(10);
 
 	//first day of week
 	//tt=agp<13>+1

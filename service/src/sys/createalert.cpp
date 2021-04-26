@@ -5,7 +5,7 @@ libraryinit()
 #include <authorised.h>
 #include <autorun2.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var msg;
 var runasuser;
@@ -45,13 +45,13 @@ function main() {
 		}
 		if (not silent) {
 			var xx;
-			if (not(xx.read(gen.documents, alertid))) {
+			if (not(xx.read(sys.documents, alertid))) {
 				call fsmsg();
 				stop();
 			}
 		}
 
-		gen.documents.deleterecord(alertid);
+		sys.documents.deleterecord(alertid);
 
 		//RO means delete and overwrite to force rerun now (loss of lastrun time)
 		if (not overwrite) {
@@ -61,7 +61,7 @@ function main() {
 	} else {
 		if (not(silent or overwrite)) {
 			var xx;
-			if (xx.read(gen.documents, alertid)) {
+			if (xx.read(sys.documents, alertid)) {
 				call mssg(alertid.quote() ^ " already exists");
 				stop();
 			}
@@ -138,19 +138,19 @@ syntax:
 
 	var docid = alertid;
 
-	gen.document = "";
-	gen.document.r(30, testemail);
-	gen.document.r(22, runhours.field(":", 1));
-	gen.document.r(23, runhours.field(":", 2));
-	gen.document.r(24, runhours.field(":", 3));
-	gen.document.r(25, runhours.field(":", 4));
-	gen.document.r(26, runhours.field(":", 5));
-	gen.document.r(27, runhours.field(":", 6));
+	sys.document = "";
+	sys.document.r(30, testemail);
+	sys.document.r(22, runhours.field(":", 1));
+	sys.document.r(23, runhours.field(":", 2));
+	sys.document.r(24, runhours.field(":", 3));
+	sys.document.r(25, runhours.field(":", 4));
+	sys.document.r(26, runhours.field(":", 5));
+	sys.document.r(27, runhours.field(":", 6));
 	//document<28>=
-	gen.document.r(31, module);
-	gen.document.r(32, alerttype);
+	sys.document.r(31, module);
+	sys.document.r(32, alerttype);
 
-	call autorun2("WRITE", title, module, request, datax, runasusercode, targetusercodes, gen.document, docid, msg);
+	call autorun2("WRITE", title, module, request, datax, runasusercode, targetusercodes, sys.document, docid, msg);
 
 	if (msg) {
 		call mssg(msg);

@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 function main(in alerttype0, in runasuser, out tasks, out title, out request, out datax) {
 	//c sys in,in,out,out,out,out

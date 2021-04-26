@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 function main(in d1, in d2, out result, io lang) {
 	//c sys in,in,out,io
@@ -19,7 +19,7 @@ function main(in d1, in d2, out result, io lang) {
 
 	#include <system_common.h>
 	if (lang.unassigned()) {
-		lang = gen.glang;
+		lang = sys.glang;
 	}
 
 	var t2 = d2.oconv("D/E");

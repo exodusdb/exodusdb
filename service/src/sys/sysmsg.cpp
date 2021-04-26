@@ -8,7 +8,7 @@ libraryinit()
 #include <roundrobin.h>
 #include <sendmail.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var subjectin;
 var username;

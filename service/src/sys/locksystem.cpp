@@ -4,6 +4,8 @@ libraryinit()
 #include <otherusers.h>
 #include <shutdownothers.h>
 
+#include <sys_common.h>
+
 var interactive;
 var mode;
 var dataset;

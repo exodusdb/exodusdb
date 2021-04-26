@@ -3,6 +3,8 @@ libraryinit()
 
 #include <videorw.h>
 
+#include <sys_common.h>
+
 var startmode;
 var temp;
 var reply;//num

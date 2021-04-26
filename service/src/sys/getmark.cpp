@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <sys_common.h>
+
 var link;
 
 function main(in mode, in html, io mark) {

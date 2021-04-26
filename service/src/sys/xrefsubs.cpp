@@ -5,7 +5,7 @@ libraryinit()
 #include <singular.h>
 #include <authorised.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>

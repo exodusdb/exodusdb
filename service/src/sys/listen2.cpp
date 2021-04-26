@@ -14,7 +14,7 @@ libraryinit()
 #include <openfile.h>
 #include <initcompany.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var usern;//num
@@ -1063,7 +1063,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	SYSTEM.r(46, SYSTEM.a(47));
 
 	//in LISTEN2 and INIT.COMPANY
-	var companystyle = gen.company.a(70);
+	var companystyle = sys.company.a(70);
 	if (companystyle) {
 		SYSTEM.r(46, companystyle);
 	}
@@ -1147,9 +1147,9 @@ subroutine addwhoistx() {
 }
 
 subroutine switchcompany() {
-	if (not(ucomps.locate(gen.gcurrcompany, xx))) {
+	if (not(ucomps.locate(sys.gcurrcompany, xx))) {
 		var tc = ucomps.a(1, 1);
-		if (xx.read(gen.companies, tc)) {
+		if (xx.read(sys.companies, tc)) {
 			call initcompany(tc);
 		}
 	}

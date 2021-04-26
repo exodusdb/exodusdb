@@ -3,7 +3,7 @@ libraryinit()
 
 #include <log.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var reqdate;
 var tt;

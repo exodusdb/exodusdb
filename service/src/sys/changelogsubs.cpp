@@ -9,7 +9,7 @@ libraryinit()
 #include <singular.h>
 #include <authorised.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
@@ -278,7 +278,7 @@ subroutine list() {
 	gosub getcurrentversiondatetime();
 	if (data_.a(2)) {
 		//heading:=' version ':data<2> '[DATE,4*]':' -'
-		call daterangetext(USER1.a(2), currentversiondatetime, tt, gen.glang);
+		call daterangetext(USER1.a(2), currentversiondatetime, tt, sys.glang);
 		headingx ^= " : " ^ tt;
 	} else {
 		headingx ^= " Version : " ^ oconv(currentversiondatetime, "[DATE,4*]");

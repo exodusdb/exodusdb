@@ -12,7 +12,7 @@ libraryinit()
 #include <dedup.h>
 #include <singular.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>

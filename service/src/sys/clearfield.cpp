@@ -4,6 +4,8 @@ libraryinit()
 #include <giveway.h>
 #include <flushindex.h>
 
+#include <sys_common.h>
+
 var options;
 var nindexed;//num
 

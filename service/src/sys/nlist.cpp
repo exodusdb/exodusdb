@@ -15,7 +15,7 @@ libraryinit()
 #include <docmods.h>
 #include <timedate2.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var copyright;
 var showborder;//num

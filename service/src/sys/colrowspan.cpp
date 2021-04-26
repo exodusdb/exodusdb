@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var nobase;//num
 var t2;
@@ -110,7 +110,7 @@ nextcoln:;
 	//change all "(Base)" in dictionary column headings to the base currency
 	//unless the keyword NO-BASE is present in which case replace with blank
 	//this is useful if all the columns are base and no need to see the currency
-	t2 = gen.company.a(3);
+	t2 = sys.company.a(3);
 	if (t2) {
 		if (nobase) {
 			t2 = "";
@@ -118,7 +118,7 @@ nextcoln:;
 			t2 = "(" ^ t2 ^ ")";
 		}
 		colhdg.swapper("(Base)", t2);
-		colhdg.swapper("%BASE%", gen.company.a(3));
+		colhdg.swapper("%BASE%", sys.company.a(3));
 	}
 
 	return 0;

@@ -4,7 +4,7 @@ libraryinit()
 #include <date.h>
 #include <authorised.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var modex;
 var hascompanies;
@@ -38,20 +38,20 @@ function main(in mode0, out html, in compcode0="") {
 	compcode = "";
 	if (compcode0.unassigned()) {
 		if (hascompanies) {
-			compcode = gen.gcurrcompany;
+			compcode = sys.gcurrcompany;
 		}
 	} else if (compcode0) {
 		compcode = compcode0;
 	} else {
 		if (hascompanies) {
-			compcode = gen.gcurrcompany;
+			compcode = sys.gcurrcompany;
 		}
 	}
 
 	letterheadcompany = "";
 	if (hascompanies) {
-		if (not(gen.companies.unassigned() or gen.companies eq "")) {
-			if (not(letterheadcompany.read(gen.companies, compcode))) {
+		if (not(sys.companies.unassigned() or sys.companies eq "")) {
+			if (not(letterheadcompany.read(sys.companies, compcode))) {
 				{}
 			}
 			if (VOLUMES) {
@@ -118,7 +118,7 @@ function main(in mode0, out html, in compcode0="") {
 	var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 	tt = "L";
 	if (hascompanies) {
-		call date("OCONV", datetime, tt, tdate, gen.glang);
+		call date("OCONV", datetime, tt, tdate, sys.glang);
 	} else {
 		call date("OCONV", datetime, tt, tdate, "");
 	}
@@ -289,7 +289,7 @@ subroutine getcompanyconfig(io html, io mode) {
 			if (imagecompcode) {
 				//get image type from the other company
 				var imagecomp;
-				if (not(imagecomp.read(gen.companies, imagecompcode))) {
+				if (not(imagecomp.read(sys.companies, imagecompcode))) {
 					imagecomp = "";
 				}
 				imagetype = imagecomp.a(62, coln);
@@ -332,7 +332,7 @@ subroutine getcompanyconfig(io html, io mode) {
 			text = "";
 			var textcompany = "";
 			if (hascompanies) {
-				if (not(textcompany.read(gen.companies, textcompcode))) {
+				if (not(textcompany.read(sys.companies, textcompcode))) {
 					textcompany = "";
 				}
 			}

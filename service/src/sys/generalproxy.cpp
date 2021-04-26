@@ -16,7 +16,7 @@ libraryinit()
 #include <proxysubs.h>
 #include <addcent4.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var stationery;
@@ -267,7 +267,7 @@ function main() {
 		USER3 = "OK";
 
 	} else if (mode eq "SETCODEPAGE") {
-		if (not(gen.alanguage.open("ALANGUAGE", ""))) {
+		if (not(sys.alanguage.open("ALANGUAGE", ""))) {
 			call fsmsg();
 			stop();
 		}
@@ -291,8 +291,8 @@ function main() {
 			fn = 9;
 setcodepagecase:
 			var recordx;
-			if (not(recordx.read(gen.alanguage, "GENERAL*" ^ codepage))) {
-				if (not(recordx.read(gen.alanguage, "GENERAL"))) {
+			if (not(recordx.read(sys.alanguage, "GENERAL*" ^ codepage))) {
+				if (not(recordx.read(sys.alanguage, "GENERAL"))) {
 					recordx = "";
 				}
 			}
@@ -302,7 +302,7 @@ setcodepagecase:
 			temp.swapper(VM, "%FD");
 			recordx.r(1, fn, temp);
 
-			recordx.write(gen.alanguage, "GENERAL*" ^ codepage);
+			recordx.write(sys.alanguage, "GENERAL*" ^ codepage);
 
 				/*;
 				//check lower=lcase(upper) and vice versa
@@ -469,7 +469,7 @@ badsetcodepage:
 nextrep:
 		if (readnext(reportid)) {
 			var report;
-			if (report.read(gen.documents, reportid)) {
+			if (report.read(sys.documents, reportid)) {
 				repn += 1;
 
 				var temp = report.a(2);
@@ -509,7 +509,7 @@ nextrep:
 		for (var docn = 1; docn <= ndocs; ++docn) {
 			ID = docnos.a(1, docn);
 			if (ID) {
-				if (RECORD.read(gen.documents, ID)) {
+				if (RECORD.read(sys.documents, ID)) {
 					win.orec = RECORD;
 					call getsubs("PREDELETE");
 					if (not(win.valid)) {
@@ -517,7 +517,7 @@ nextrep:
 					}
 
 					if (win.valid) {
-						gen.documents.deleterecord(ID);
+						sys.documents.deleterecord(ID);
 
 						call getsubs("POSTDELETE");
 					}
@@ -530,7 +530,7 @@ nextrep:
 		gosub opendocuments();
 
 		var doc;
-		if (not(doc.read(gen.documents, USER0.a(2)))) {
+		if (not(doc.read(sys.documents, USER0.a(2)))) {
 			call mssg("Document " ^ (request_.a(2).quote()) ^ " is missing");
 			stop();
 		}
@@ -539,14 +539,14 @@ nextrep:
 
 		doc.r(6, lower(USER1));
 
-		doc.write(gen.documents, USER0.a(2));
+		doc.write(sys.documents, USER0.a(2));
 
 	} else if (mode eq "COPYREPORT") {
 
 		gosub opendocuments();
 
 		var doc;
-		if (not(doc.read(gen.documents, request_.a(2)))) {
+		if (not(doc.read(sys.documents, request_.a(2)))) {
 			call mssg("Document " ^ (USER0.a(2).quote()) ^ " is missing");
 			stop();
 		}
@@ -572,7 +572,7 @@ nextrep:
 		doc.r(10, "");
 
 		doc.r(1, USERNAME);
-		doc.write(gen.documents, ID);
+		doc.write(sys.documents, ID);
 
 		data_ = ID ^ FM ^ doc;
 
@@ -585,13 +585,13 @@ nextrep:
 
 		//get parameters from documents into @pseudo
 
-		if (not(gen.document.read(gen.documents, request_.a(2)))) {
+		if (not(sys.document.read(sys.documents, request_.a(2)))) {
 			USER4 = "Document " ^ (USER0.a(2).quote()) ^ " does not exist";
 			call mssg(msg_);
 			stop();
 		}
 
-		task = gen.document.a(5);
+		task = sys.document.a(5);
 		gosub gettaskprefix();
 		if (taskprefix) {
 			if (not(authorised(taskprefix ^ " ACCESS", USER4, ""))) {
@@ -603,7 +603,7 @@ nextrep:
 		//if task='BALANCES' then printopts='P'
 		//if index(task,'MEDIADIARY',1) then printopts='X'
 
-		PSEUDO = gen.document.a(6);
+		PSEUDO = sys.document.a(6);
 		PSEUDO.converter(RM, VM);
 		PSEUDO = raise(PSEUDO);
 
@@ -619,17 +619,17 @@ nextrep:
 		//save runtime params in case saving below for scheduled reruns
 		//document<11>=lower(data)
 
-		var sentencex = gen.document.a(5);
+		var sentencex = sys.document.a(5);
 		sentencex.converter(VM, " ");
 		USER1 = PSEUDO;
 
 		//in case we are calling another proxy
-		if (gen.document.a(5, 1).substr(-5, 5) eq "PROXY") {
+		if (sys.document.a(5, 1).substr(-5, 5) eq "PROXY") {
 
 			//run but suppress email
 			//perform 'TEST ':request<2>:' (S)'
 
-			request_ = raise(gen.document.a(5)).field(FM, 2, 999999) ^ FM ^ USER0.a(2);
+			request_ = raise(sys.document.a(5)).field(FM, 2, 999999) ^ FM ^ USER0.a(2);
 			//moved up so parameters show in any emailed error messages
 			//data=@pseudo
 			//override the saved period with a current period
@@ -874,7 +874,7 @@ subroutine gettaskprefix() {
 }
 
 subroutine opendocuments() {
-	if (not(gen.documents.open("DOCUMENTS", ""))) {
+	if (not(sys.documents.open("DOCUMENTS", ""))) {
 		call fsmsg();
 		stop();
 	}

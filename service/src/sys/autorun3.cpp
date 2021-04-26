@@ -9,7 +9,7 @@ libraryinit()
 #include <sendmail.h>
 #include <listen4.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var docids;
@@ -106,7 +106,7 @@ function main(in docids0="", in options0="") {
 
 	//allow one autorun per database - hopefully this wont overload the server
 	var lockfilename = "DOCUMENTS";
-	var lockfile = gen.documents;
+	var lockfile = sys.documents;
 	var lockkey = "%" ^ datasetcode ^ "%";
 	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 1))) {
 
@@ -132,7 +132,7 @@ function main(in docids0="", in options0="") {
 		docids.swapper(",", FM);
 		docn = 0;
 	} else {
-		select(gen.documents);
+		select(sys.documents);
 	}
 	var locked = 0;
 	var ndocsprocessed = 0;
@@ -141,7 +141,7 @@ nextdoc:
 ////////
 
 	if (locked) {
-		call unlockrecord("DOCUMENTS", gen.documents, docid);
+		call unlockrecord("DOCUMENTS", sys.documents, docid);
 		locked = 0;
 	}
 
@@ -173,7 +173,7 @@ readdoc:
 	//depending on the autorunkey then this may be redundant
 
 	//get document
-	if (not(gen.document.read(gen.documents, docid))) {
+	if (not(sys.document.read(sys.documents, docid))) {
 		printl(docid.quote(), " document doesnt exist in AUTORUN3");
 		//call ossleep(1000*1)
 		goto nextdoc;
@@ -181,7 +181,7 @@ readdoc:
 
 	//only do saved and enabled documents for now
 	//0/1 saved disabled/enabled. Blank=Ordinary documents
-	if (not(gen.document.a(12))) {
+	if (not(sys.document.a(12))) {
 		goto nextdoc;
 	}
 
@@ -207,7 +207,7 @@ currdatetime:
 		//would be faster to work out nextdatetime once initially - but how to do it?
 		//if not(docids) and currdatetime<nextdatetime then goto nextdoc
 
-		var lastdatetime = gen.document.a(13);
+		var lastdatetime = sys.document.a(13);
 
 		//skip if already run in the last 60 minutes. this is an easy way
 		//to avoid reruns but maximum scheduling frequency is hourly
@@ -224,7 +224,7 @@ currdatetime:
 		//26 date
 		//27 max number of times
 
-		var restrictions = trim(gen.document.field(FM, 21, 7), FM, "B");
+		var restrictions = trim(sys.document.field(FM, 21, 7), FM, "B");
 		restrictions.converter(",", VM);
 
 		//skip if no restrictions applied yet
@@ -329,7 +329,7 @@ preventsameday:
 	//lock documents that need processing
 	//but reread after lock in case another process has not started processing it
 	if (not locked) {
-		if (not(lockrecord("DOCUMENTS", gen.documents, docid))) {
+		if (not(lockrecord("DOCUMENTS", sys.documents, docid))) {
 			if (logging) {
 				printl("locked");
 			}
@@ -341,24 +341,24 @@ preventsameday:
 
 	//register that the document has been processed
 	//even if nobody present to be emailed
-	gen.document.r(13, currdatetime);
-	if (gen.document.a(27) ne "") {
-		gen.document.r(27, gen.document.a(27) - 1);
+	sys.document.r(13, currdatetime);
+	if (sys.document.a(27) ne "") {
+		sys.document.r(27, sys.document.a(27) - 1);
 	}
-	if (gen.document.a(27) ne "" and not(gen.document.a(27))) {
-		gen.documents.deleterecord(docid);
+	if (sys.document.a(27) ne "" and not(sys.document.a(27))) {
+		sys.documents.deleterecord(docid);
 
 	} else {
-		gen.document.write(gen.documents, docid);
+		sys.document.write(sys.documents, docid);
 	}
 
 	//force all emails to be routed to test address
 	//if on development system they are ALWAYS routed
 	//so this is mainly for testing on client systems
-	forceemail = gen.document.a(30);
+	forceemail = sys.document.a(30);
 	//if not(forceemail) and @username='EXODUS' then forceemail=devATexodus
 	//report is always run as the document owning user
-	var runasusercode = gen.document.a(1);
+	var runasusercode = sys.document.a(1);
 	var userx;
 	if (not(userx.read(users, runasusercode))) {
 		if (not(runasusercode eq "EXODUS")) {
@@ -388,7 +388,7 @@ preventsameday:
 	//any output regardless of if they are on holiday
 
 	var ccaddress = "";
-	var usercodes = gen.document.a(14);
+	var usercodes = sys.document.a(14);
 	if (usercodes eq "") {
 		toaddress = userx.a(7);
 	} else {
@@ -424,7 +424,7 @@ preventsameday:
 
 					marketcode = userx.a(25);
 					if (not marketcode) {
-						marketcode = gen.company.a(30, 1);
+						marketcode = sys.company.a(30, 1);
 					}
 					market = marketcode;
 					if (markets) {
@@ -464,8 +464,8 @@ nextuser:;
 	}
 
 	//before running the document refresh the title, request and data
-	var module = gen.document.a(31);
-	var alerttype = gen.document.a(32);
+	var module = sys.document.a(31);
+	var alerttype = sys.document.a(32);
 
 	if (module and alerttype) {
 
@@ -481,16 +481,16 @@ nextuser:;
 		call generalalerts(alerttype, runasusercode, authtasks, title, request_, datax);
 
 		//update the document and documents file if necessary
-		call cropper(gen.document);
-		var origdocument = gen.document;
+		call cropper(sys.document);
+		var origdocument = sys.document;
 
-		gen.document.r(2, title);
-		gen.document.r(5, lower(module ^ "PROXY" ^ FM ^ USER0));
-		gen.document.r(6, lower(datax));
+		sys.document.r(2, title);
+		sys.document.r(5, lower(module ^ "PROXY" ^ FM ^ USER0));
+		sys.document.r(6, lower(datax));
 
 		call cropper(datax);
-		if (gen.document ne origdocument) {
-			gen.document.write(gen.documents, docid);
+		if (sys.document ne origdocument) {
+			sys.document.write(sys.documents, docid);
 		}
 
 	} else {
@@ -531,9 +531,9 @@ nextuser:;
 
 	//request='EXECUTE':fm:'GENERAL':fm:'GETREPORT':fm:docid
 	//voccmd='GENERALPROXY'
-	request_ = raise("EXECUTE" ^ VM ^ gen.document.a(5));
+	request_ = raise("EXECUTE" ^ VM ^ sys.document.a(5));
 
-	iodat_ = raise(gen.document.a(6));
+	iodat_ = raise(sys.document.a(6));
 
 	//override the saved period with a current period
 
@@ -567,9 +567,9 @@ nextuser:;
 		gosub getdaysago();
 		USER1.swapper("{3WORKINGDAYSAGO}", xdate);
 	}
-	var closedperiod = gen.company.a(37);
+	var closedperiod = sys.company.a(37);
 	if (closedperiod) {
-		opendate = iconv(closedperiod, gen.company.a(6)) + 1;
+		opendate = iconv(closedperiod, sys.company.a(6)) + 1;
 	} else {
 		opendate = 11689;
 	}
@@ -603,10 +603,10 @@ nextsign:
 
 		var subject = "EXODUS";
 		//if repeatable then include report number to allow filtering
-		if (gen.document.a(27) eq "") {
+		if (sys.document.a(27) eq "") {
 			subject ^= " " ^ docid;
 		}
-		subject ^= ": %RESULT%" ^ gen.document.a(2);
+		subject ^= ": %RESULT%" ^ sys.document.a(2);
 
 		//email it
 		if (response_.substr(1, 2) ne "OK" or printfilename.osfile().a(1) lt 10) {
@@ -626,7 +626,7 @@ nextsign:
 				var(response_).oswrite("xyz.xyz");
 			}
 			//swap 'Error:' with 'Result:' in body
-			body.r(-1, ("Document: " ^ gen.document.a(2) ^ " (" ^ docid ^ ")").trim());
+			body.r(-1, ("Document: " ^ sys.document.a(2) ^ " (" ^ docid ^ ")").trim());
 			body.r(-1, "Database: " ^ SYSTEM.a(23) ^ " (" ^ SYSTEM.a(17) ^ ")");
 			//swap '%RESULT%' with '* ' in subject
 			subject.swapper("%RESULT%", "");
@@ -650,7 +650,7 @@ nextsign:
 			//if ucase(printfilename[-4,4])='.XLS' then
 			//locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
 			tt = (field2(printfilename, ".", -1)).lcase();
-			if (tt.index("htm") and gen.document.a(33) ne "2") {
+			if (tt.index("htm") and sys.document.a(33) ne "2") {
 				//insert body from file
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;
@@ -725,7 +725,7 @@ subroutine exec2() {
 	//print @(0):@(-4):localtime 'MTS':' AUTORUN ':docid:
 	//similar in LISTEN and AUTORUN
 	printl();
-	print(var().time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(FM, " "), " ", gen.document.a(2), ":");
+	print(var().time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(FM, " "), " ", sys.document.a(2), ":");
 
 	//print 'link',linkfilename2
 	//print 'request',request
@@ -808,7 +808,7 @@ subroutine exec2() {
 			response_ = "No response from " ^ voccmd;
 		}
 sysmsgit:
-		call sysmsg("AUTORUN " ^ docid ^ " " ^ gen.document.a(2) ^ FM ^ USER3);
+		call sysmsg("AUTORUN " ^ docid ^ " " ^ sys.document.a(2) ^ FM ^ USER3);
 	}
 
 	call cropper(msg_);
@@ -884,7 +884,7 @@ subroutine fmtresp() {
 
 subroutine getdaysago() {
 	var weekend = "67";
-	marketcode = gen.company.a(30, 1);
+	marketcode = sys.company.a(30, 1);
 	if (marketcode) {
 		tt = marketcode.xlate("MARKETS", 9, "X");
 		if (tt) {

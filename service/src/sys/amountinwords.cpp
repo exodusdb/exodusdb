@@ -3,7 +3,7 @@ libraryinit()
 
 #include <amountinwords.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var comma;
 var sentencex;
@@ -43,7 +43,7 @@ function main(in amountfmlanguage, in currcode0) {
 		currcode = "";
 	} else {
 		currcode = currcode0;
-		if (not(amountcurrency.read(gen.currencies, currcode))) {
+		if (not(amountcurrency.read(sys.currencies, currcode))) {
 			{}
 		}
 	}

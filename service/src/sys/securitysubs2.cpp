@@ -4,7 +4,7 @@ libraryinit()
 #include <authorised.h>
 #include <log2.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var taskn;//num

@@ -7,7 +7,7 @@ libraryinit()
 #include <sendmail.h>
 #include <upgrade.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 
 var tt;//num
 var bakpars;
@@ -192,22 +192,22 @@ listen:
 
 			//send email of error
 			//readv address from definitions,'BACKUP',6 else address=''
-			gen.address = bakpars.a(6);
+			sys.address = bakpars.a(6);
 			if (bakpars.a(10)) {
-				if (gen.address) {
-					gen.address ^= "/";
+				if (sys.address) {
+					sys.address ^= "/";
 				}
-				gen.address ^= bakpars.a(10);
+				sys.address ^= bakpars.a(10);
 			}
-			if (gen.address eq "") {
-				if (not(gen.address.readv(DEFINITIONS, "REPLICATION", 12))) {
-					gen.address = "";
+			if (sys.address eq "") {
+				if (not(sys.address.readv(DEFINITIONS, "REPLICATION", 12))) {
+					sys.address = "";
 				}
 			}
-			if (gen.address eq "") {
-				gen.address = "backups@neosys.com";
+			if (sys.address eq "") {
+				sys.address = "backups@neosys.com";
 			}
-			if (gen.address) {
+			if (sys.address) {
 
 				var body = "Server=" ^ SYSTEM.a(44).trim();
 				body.r(-1, "Client=" ^ STATION.trim());
@@ -228,7 +228,7 @@ listen:
 				body.swapper("\r", "\r\n");
 
 				//sendmail - if it fails, there will be an entry in the log
-				var address1 = gen.address.field("/", 1);
+				var address1 = sys.address.field("/", 1);
 				var errormsg = "";
 				if (address1) {
 					call sendmail(address1, "", subject, body, "", "", errormsg);
@@ -236,7 +236,7 @@ listen:
 
 				//optionally email backup.zip
 				if ((errormsg eq "" or errormsg.substr(1, 2) eq "OK") and attachfilename) {
-					var address2 = gen.address.field("/", 2);
+					var address2 = sys.address.field("/", 2);
 					//remove exodus from the backup.zip recipients
 					if (address2.locateusing(";", "backups@neosys.com", xx)) {
 						address2.converter(";", VM);

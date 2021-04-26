@@ -6,7 +6,7 @@ libraryinit()
 #include <safeselect.h>
 #include <systemsubs.h>
 
-#include <gen_common.h>
+#include <sys_common.h>
 #include <win_common.h>
 
 var dictids;

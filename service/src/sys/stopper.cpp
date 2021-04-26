@@ -3,6 +3,8 @@ libraryinit()
 
 #include <videorw.h>
 
+#include <sys_common.h>
+
 var mode;
 
 function main(in mode0, in time, in date, io buffer, out msg) {
