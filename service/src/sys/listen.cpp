@@ -863,7 +863,7 @@ nextsearch0:
 
 		} else {
 			//call log2('Preventing further automatic backups today',logtime)
-			((var().date() + var().time() / 86400).oconv("MD50P")).writev(sys._definitions, "BACKUP", 1);
+			((var().date() + var().time() / 86400).oconv("MD50P")).writev(DEFINITIONS, "BACKUP", 1);
 
 backup:
 			//similar code in LISTEN and LISTEN2
@@ -1386,7 +1386,7 @@ cannotopenlinkfile2:
 
 	//update security table every few secs and every login
 	//if request1='LOGIN' or index('036',time()[-1,1],1) then gosub getsecurity
-	if (sys._security.read(sys._definitions, "SECURITY")) {
+	if (sys._security.read(DEFINITIONS, "SECURITY")) {
 		if (VOLUMES) {
 			sys._security = sys._security.invert();
 		}

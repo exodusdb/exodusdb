@@ -300,13 +300,13 @@ restart:
 			}
 
 			//skip if already installed in this database
-			if (xx.read(sys._definitions, patchid)) {
+			if (xx.read(DEFINITIONS, patchid)) {
 				call unlockrecord("", processes, patchid);
 				goto nextpatch;
 			}
 
 			//prevent from ever running this patch again on this database
-			rec.write(sys._definitions, patchid);
+			rec.write(DEFINITIONS, patchid);
 
 			//get current EXODUS version timestamp
 			versiondatetime = "";
@@ -333,7 +333,7 @@ restart:
 			}
 
 			//skip patch if older than last patch
-			if (not(lastpatchid.read(sys._definitions, "INSTALL*LAST"))) {
+			if (not(lastpatchid.read(DEFINITIONS, "INSTALL*LAST"))) {
 				lastpatchid = "";
 			}
 			if (lastpatchid) {
@@ -345,7 +345,7 @@ restart:
 
 			//ensure that we only ever runonce something just loaded from a patch
 			runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
-			sys._definitions.deleterecord(runoncekey);
+			DEFINITIONS.deleterecord(runoncekey);
 
 			if (not skipemail) {
 
@@ -375,9 +375,9 @@ restart:
 			}
 
 			//record success/failure before any autorun
-			(var().date() ^ "." ^ var().time().oconv("R(0)#5")).writev(sys._definitions, patchid, 6);
+			(var().date() ^ "." ^ var().time().oconv("R(0)#5")).writev(DEFINITIONS, patchid, 6);
 
-			skipreason.writev(sys._definitions, patchid, 7);
+			skipreason.writev(DEFINITIONS, patchid, 7);
 
 			if (skipreason) {
 				//release
@@ -386,13 +386,13 @@ restart:
 			}
 
 			//save the last patch info - used to prevent backward patching
-			patchid.write(sys._definitions, "INSTALL*LAST");
+			patchid.write(DEFINITIONS, "INSTALL*LAST");
 
 			//post install runonce if installed
 			//if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
 			//if the runonce record appears in the definitions then
 			//run it, save it and delete it
-			if (runonce.read(sys._definitions, runoncekey)) {
+			if (runonce.read(DEFINITIONS, runoncekey)) {
 				perform("RUN DEFINITIONS " ^ runoncekey.substr(2, 9999));
 				//leave it for inspection
 				//delete definitions,runoncekey
@@ -550,7 +550,7 @@ getvalues:
 		}
 
 		var execstoplist;
-		if (execstoplist.read(sys._definitions, "INDEXVALUES*" ^ filename ^ "*" ^ fieldname)) {
+		if (execstoplist.read(DEFINITIONS, "INDEXVALUES*" ^ filename ^ "*" ^ fieldname)) {
 
 			//execs will be in field 1
 			//stopped reason will be in parallel in field 2

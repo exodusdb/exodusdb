@@ -106,11 +106,11 @@ function main(in mode) {
 
 			// backup rec on definitions
 			if (ID eq "SYSTEM") {
-				if (not(backuprec.read(sys._definitions, backupkey))) {
+				if (not(backuprec.read(DEFINITIONS, backupkey))) {
 					backuprec = "";
 				}
 				smtpkey = "SMTP.CFG";
-				if (not(smtprec.read(sys._definitions, smtpkey))) {
+				if (not(smtprec.read(DEFINITIONS, smtpkey))) {
 					smtprec = "";
 				}
 
@@ -455,14 +455,14 @@ preventupdate:
 			if (ID eq "SYSTEM") {
 
 				//get lastbackupdate in unlikely event that it has changed during update
-				if (not(tt.readv(sys._definitions, backupkey, 1))) {
+				if (not(tt.readv(DEFINITIONS, backupkey, 1))) {
 					tt = "";
 				}
 				backuprec.r(1, tt);
 
-				backuprec.write(sys._definitions, backupkey);
+				backuprec.write(DEFINITIONS, backupkey);
 				smtpkey = "SMTP.CFG";
-				smtprec.write(sys._definitions, smtpkey);
+				smtprec.write(DEFINITIONS, smtpkey);
 
 			//write system and backup rec in dos
 			} else {

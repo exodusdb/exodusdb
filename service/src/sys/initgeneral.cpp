@@ -308,9 +308,9 @@ function main() {
 			dbdatetimerequired = dbdate.iconv("D") + dbtime.iconv("MT") / 86400;
 		} else {
 		}
-		if (sys._definitions.open("DEFINITIONS", "")) {
+		if (DEFINITIONS.open("DEFINITIONS", "")) {
 			var dbversion;
-			if (not(dbversion.read(sys._definitions, "DBVERSION"))) {
+			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
 			}
 			if (oldmethod and dbversion.a(1) eq "14334.5") {
@@ -349,7 +349,7 @@ updateversion:
 				dbversion = dbdatetimerequired;
 				dbversion.r(2, dbdate);
 				dbversion.r(3, dbtime);
-				dbversion.write(sys._definitions, "DBVERSION");
+				dbversion.write(DEFINITIONS, "DBVERSION");
 			}
 
 		}
@@ -501,7 +501,7 @@ nextreport:
 		}
 	}
 
-	if (not(sys._definitions.open("DEFINITIONS", ""))) {
+	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
 		var().chr(7).output();
 		msg = "The DEFINITIONS file is missing";
 		msg.r(-1, "Did you startup using the right command file/datasettype?");
@@ -618,7 +618,7 @@ nextreport:
 
 	call log2("*get DEFINITIONS SYSTEM parameters", logtime);
 	//do in reverse order so that the higher levels get priority
-	if (not(SYSTEM.read(sys._definitions, "SYSTEM"))) {
+	if (not(SYSTEM.read(DEFINITIONS, "SYSTEM"))) {
 		SYSTEM = "";
 	}
 	tt = "system.cfg";
@@ -689,7 +689,7 @@ nextreport:
 			call osread(smtp, "smtp.cfg");
 		}
 		if (not(smtp.a(1))) {
-			if (not(smtp.read(sys._definitions, "SMTP.CFG"))) {
+			if (not(smtp.read(DEFINITIONS, "SMTP.CFG"))) {
 				{}
 			}
 		}
@@ -1110,10 +1110,10 @@ getproxy:
 	DATEFMT = "D2/E";
 
 	call log2("*get security - also in LISTEN", logtime);
-	if (not(sys._security.read(sys._definitions, "SECURITY"))) {
+	if (not(sys._security.read(DEFINITIONS, "SECURITY"))) {
 		if (temp.open("dict_DEFINITIONS")) {
 			if (sys._security.read(temp, "SECURITY")) {
-				sys._security.write(sys._definitions, "SECURITY");
+				sys._security.write(DEFINITIONS, "SECURITY");
 			}
 		}
 	}
@@ -1452,7 +1452,7 @@ getproxy:
 
 	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
 	if (not exodusid) {
-		if (temp.read(sys._definitions, "AUTOEXEC")) {
+		if (temp.read(DEFINITIONS, "AUTOEXEC")) {
 			perform("TASK AUTOEXEC");
 		}
 	}
@@ -1584,7 +1584,7 @@ convcompany:
 
 	call log2("*ensure random key exists", logtime);
 	var datasetid;
-	if (not(datasetid.read(sys._definitions, "GLOBALDATASETID"))) {
+	if (not(datasetid.read(DEFINITIONS, "GLOBALDATASETID"))) {
 newdatasetid:
 		dostime = ostime();
 		datasetid = var().date() ^ "." ^ dostime;
@@ -1594,7 +1594,7 @@ newdatasetid:
 adddatasetcodename:
 		datasetid.r(2, SYSTEM.a(23));
 		datasetid.r(3, SYSTEM.a(17));
-		datasetid.write(sys._definitions, "GLOBALDATASETID");
+		datasetid.write(DEFINITIONS, "GLOBALDATASETID");
 	}
 	if (datasetid.a(3) eq "" and SYSTEM.a(17)) {
 		goto adddatasetcodename;
@@ -1647,7 +1647,7 @@ adddatasetcodename:
 
 		call log2("*show and update last login time", logtime);
 		var userx;
-		if (not(userx.read(sys._definitions, "USER*" ^ USERNAME))) {
+		if (not(userx.read(DEFINITIONS, "USER*" ^ USERNAME))) {
 			userx = "";
 		}
 		if (userx.a(4) and interactive) {
@@ -1656,13 +1656,13 @@ adddatasetcodename:
 		}
 
 		call log2("*save last login time", logtime);
-		userx.write(sys._definitions, "USER*" ^ USERNAME ^ "*LAST");
+		userx.write(DEFINITIONS, "USER*" ^ USERNAME ^ "*LAST");
 
 		call log2("*update the last login time", logtime);
 		userx.r(4, var().date());
 		userx.r(5, var().time());
 		userx.r(6, STATION);
-		userx.write(sys._definitions, "USER*" ^ USERNAME);
+		userx.write(DEFINITIONS, "USER*" ^ USERNAME);
 
 		//call log2('*check processes',logtime)
 		//clearselect
@@ -1707,7 +1707,7 @@ nextdoc:
 
 		call log2("*convert codepage", logtime);
 		if (codepaging.osread("CODEPAGE.CFG")) {
-			if (not(codepage.read(sys._definitions, "PARAM*CODEPAGE"))) {
+			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
 				codepage = "0" ^ FM ^ codepaging.a(2);
 			}
 			if ((codepage.a(2) eq "737" and not(codepage.a(1))) and codepaging.a(3) eq "1253") {
@@ -1801,11 +1801,11 @@ nextdoc:
 
 		//update software version in database
 		tt2 = "VERSION*LASTEMAILED";
-		if (not(tt.read(sys._definitions, tt2))) {
+		if (not(tt.read(DEFINITIONS, tt2))) {
 			tt = "";
 		}
 		if (tt ne versioninstalled) {
-			versioninstalled.write(sys._definitions, tt2);
+			versioninstalled.write(DEFINITIONS, tt2);
 
 			//email users on live systems LISTED IN SYSTEM CONFIGURATION only
 			if (SYSTEM.a(58).locate(SYSTEM.a(17), xx)) {
