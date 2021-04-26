@@ -1386,9 +1386,9 @@ cannotopenlinkfile2:
 
 	//update security table every few secs and every login
 	//if request1='LOGIN' or index('036',time()[-1,1],1) then gosub getsecurity
-	if (sys._security.read(DEFINITIONS, "SECURITY")) {
+	if (SECURITY.read(DEFINITIONS, "SECURITY")) {
 		if (VOLUMES) {
-			sys._security = sys._security.invert();
+			SECURITY = SECURITY.invert();
 		}
 	}
 

@@ -1110,15 +1110,15 @@ getproxy:
 	DATEFMT = "D2/E";
 
 	call log2("*get security - also in LISTEN", logtime);
-	if (not(sys._security.read(DEFINITIONS, "SECURITY"))) {
+	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 		if (temp.open("dict_DEFINITIONS")) {
-			if (sys._security.read(temp, "SECURITY")) {
-				sys._security.write(DEFINITIONS, "SECURITY");
+			if (SECURITY.read(temp, "SECURITY")) {
+				SECURITY.write(DEFINITIONS, "SECURITY");
 			}
 		}
 	}
 	if (VOLUMES) {
-		sys._security = sys._security.invert();
+		SECURITY = SECURITY.invert();
 	}
 
 	//must be before init.acc, init.agency or any task adding
@@ -1208,7 +1208,7 @@ getproxy:
 		}
 
 		call log2("*zzz should create full user record not just the name", logtime);
-		var usercodes = sys._security.a(1);
+		var usercodes = SECURITY.a(1);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (var usern = 1; usern <= nusers; ++usern) {
 			var userx = usercodes.a(1, usern);

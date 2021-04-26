@@ -362,7 +362,7 @@ preventupdate:
 			for (var fn = 100; fn <= 102; ++fn) {
 				var usercode = RECORD.a(fn);
 				if (usercode) {
-					if (not(sys._security.a(1).locate(usercode, xx))) {
+					if (not(SECURITY.a(1).locate(usercode, xx))) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
