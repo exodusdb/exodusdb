@@ -7,7 +7,7 @@ libraryinit()
 #include <authorised.h>
 #include <singular.h>
 
-#include <gen_common.h>
+//#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
@@ -35,7 +35,7 @@ var wsmsg;
 
 function main(in mode0) {
 	//c gen
-	#include <general_common.h>
+	//#include <sys_common.h>
 
 	//global tt,nusers,usern,mode
 
