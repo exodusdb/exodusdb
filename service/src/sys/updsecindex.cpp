@@ -3,10 +3,11 @@ libraryinit()
 
 #include <sys_common.h>
 
+var indexingfilename;
 var indexingrecord;
 var recordx;
 
-function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in newvalues, io valid, io msg) {
+function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in newvalues, io valid, io msg) {
 	//c sys in,in,io,in,in,in,io,io
 	#include <system_common.h>
 	//update symbolic indexed files
@@ -29,20 +30,27 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 	valid = 0;
 	msg = "Unknown error in UPD.SECINDEX";
 
+	if (VOLUMES) {
+		indexingfilename = "!INDEXING";
+	} else {
+		//only used for locking
+		indexingfilename = "DEFINITIONS";
+	}
+
 	var indexingfile;
-	if (not(indexingfile.open("!INDEXING", ""))) {
+	if (not(indexingfile.open(indexingfilename, ""))) {
 		msg = "SYSTEM ERROR: " ^ (var("!INDEXING").quote()) ^ " file cannot be opened";
 		return 0;
 	}
 
 	if (mode eq "INDEXINGLOCK") {
-		if (not(lockrecord("!INDEXING", indexingfile, indexingkey, indexingrecord, secstowaitforindexinglock))) {
+		if (not(lockrecord(indexingfilename, indexingfile, indexingkey, indexingrecord, secstowaitforindexinglock))) {
 			msg = "Central !INDEXING record is in use elsewhere";
 			return 0;
 		}
 
 	} else if (mode eq "INDEXINGUNLOCK") {
-		call unlockrecord("!INDEXING", indexingfile, indexingkey);
+		call unlockrecord(indexingfilename, indexingfile, indexingkey);
 
 	} else if ((mode eq "LOCK" or mode eq "UNLOCK") or mode eq "UPDATE") {
 
@@ -59,6 +67,8 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 
 		//allow for keys to be passed as vm
 		keys.converter(VM, FM);
+
+		var nfields = fieldnameornos.count(FM) + (fieldnameornos ne "");
 
 		var nkeys = keys.count(FM) + (keys ne "");
 		for (var keyn = 1; keyn <= nkeys; ++keyn) {
@@ -85,13 +95,17 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 
 			} else if (mode eq "UPDATE") {
 
-				var nfields = fieldnames.count(FM) + (fieldnames ne "");
 				for (var fieldn = 1; fieldn <= nfields; ++fieldn) {
 
-					var fieldname = fieldnames.a(fieldn);
+					var fieldnameorno = fieldnameornos.a(fieldn);
 
 					if (oldvalues.a(fieldn) ne newvalues.a(fieldn)) {
-						upd ^= fieldname ^ FM ^ keyx ^ FM ^ oldvalues.a(fieldn) ^ FM ^ newvalues.a(fieldn) ^ FM;
+						if (fieldnameorno.isnum()) {
+							newvalues.a(fieldn).writev(file, keyx, fieldnameorno);
+
+						} else {
+							upd ^= fieldnameorno ^ FM ^ keyx ^ FM ^ oldvalues.a(fieldn) ^ FM ^ newvalues.a(fieldn) ^ FM;
+						}
 						cnt += 1;
 					}
 

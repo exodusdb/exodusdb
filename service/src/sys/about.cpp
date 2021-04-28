@@ -50,7 +50,7 @@ function main() {
 	file = "JOBS";
 	gosub getnrecs();
 	if (nrecs) {
-		mod = "PRODUCTION";
+		mod = "JOB";
 		dir = "ADAGENCY";
 		gosub getver();
 	}

@@ -1,6 +1,6 @@
 #include <exodus/common.h>
 
-#define sys_common_no 2
+#define sys_common_no 0
 
 commoninit(sys,sys_common_no)
 

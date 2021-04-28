@@ -59,7 +59,7 @@ readmenu:
 	oldmenus.swapper("ACCS", "FINANCE");
 	oldmenus.swapper("ANALMENU", "ANALYSIS");
 	oldmenus.swapper("ANALYSIS.INVOICES", "ANALYSIS");
-	oldmenus.swapper("ADPRODUCTION", "JOBS");
+	oldmenus.swapper("ADJOB", "JOBS");
 	oldmenus.swapper("GENERAL", "SUPPORT");
 	//convert '.' to '_' in oldmenus
 
