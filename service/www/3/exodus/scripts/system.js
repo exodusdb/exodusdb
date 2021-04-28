@@ -109,7 +109,8 @@ function* system_pop_users(many, withtask, haslocks, sselect) {
         sortselect += ' AND WITH AUTHORISED_' + withtask.exodusconvert(' ', '_').toUpperCase()
     //users tend not to have locks and departments/group tend to have locks
     if (typeof haslocks == 'boolean')
-        sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
+/       sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
+//        sortselect += ' AND WITH KEYS ' + (haslocks ? 'EQ' : 'NE') + ' ""'
     sortselect = 'BY RANK ' + sortselect.slice(5)
     var selcol0 = 1
 
