@@ -85,7 +85,8 @@ function* system_dict_usercode(di, many, withtask, haslocks, sselect) {
         systemerror(di.name, '"Select Many" requires group>0')
     if (typeof withtask == 'undefined' || withtask == '')
         withtask = '' // '""'
-    if (typeof haslocks == 'undefined' || haslocks == '')
+	//if (typeof haslocks == 'undefined' || haslocks == '')
+    if (typeof haslocks == 'undefined' || typeof haslocks == 'string')
         haslocks = '""'
     if (typeof sselect == 'undefined' || sselect == '')
         sselect = '""'
@@ -109,8 +110,7 @@ function* system_pop_users(many, withtask, haslocks, sselect) {
         sortselect += ' AND WITH AUTHORISED_' + withtask.exodusconvert(' ', '_').toUpperCase()
     //users tend not to have locks and departments/group tend to have locks
     if (typeof haslocks == 'boolean')
-/       sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
-//        sortselect += ' AND WITH KEYS ' + (haslocks ? 'EQ' : 'NE') + ' ""'
+       sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
     sortselect = 'BY RANK ' + sortselect.slice(5)
     var selcol0 = 1
 
