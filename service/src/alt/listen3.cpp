@@ -39,8 +39,8 @@ function main(io filename, in mode, out filetitle, out triggers) {
 
 	//fix filenames from PICKOS to EXODUS style
 	if (not(VOLUMES)) {
-		filename.swapper("MEDIA" ".TYPE", "JOB_TYPE");
 		filename.converter(".", "_");
+		filename.swapper("MEDIA_TYPE", "JOB_TYPE");
 	}
 
 	if (filename eq "DEFINITIONS") {

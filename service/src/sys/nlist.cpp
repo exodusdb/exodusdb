@@ -547,7 +547,7 @@ filename:
 			}
 
 			if (var("JOBS,JOB_ORDERS,JOB_INVOICES").locateusing(",", filename, xx)) {
-				printtxmark = "Production Management";
+				printtxmark = "Job Management";
 			}
 
 			if (var("CHARTS,RECURRING").locateusing(",", filename, xx)) {
