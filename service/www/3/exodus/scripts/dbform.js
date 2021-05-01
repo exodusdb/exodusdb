@@ -3529,12 +3529,7 @@ function* editreleaserecord_onclick() {
 
     //not locked and there is a key
     if (!glocked) {
-        saveopenreadonly = gparameters.openreadonly
-        if (saveopenreadonly)
-            gparameters.openreadonly = false
         yield* opendoc(gkey)
-        if (saveopenreadonly)
-            gparameters.openreadonly = saveopenreadonly
         return true
     }
 
@@ -3897,6 +3892,9 @@ function* opendoc2(newkey0) {
     //read with key='' means get the next sequential number
         /**/ yield* gro.read(!greadonlymode && !gparameters.openreadonly)
 
+    //switch off one-time option
+    gparameters.openreadonly = false
+
     yield* loadnewkey()
 
     glocked = gro.sessionid != ''
@@ -4060,7 +4058,7 @@ function* opendoc2(newkey0) {
         if (deleterecord && !gds.isnewrecord && !greadonlymode && !gupdateonlymode && !gpreventdeletion)
             setdisabledandhidden(deleterecord, false)
     }
-    else if (!greadonlymode && gparameters.openreadonly) {
+    else if (!greadonlymode) {
         setdisabledandhidden(editreleaserecord, false)
         setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
     }

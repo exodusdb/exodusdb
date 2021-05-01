@@ -2,7 +2,7 @@
 programinit()
 
 #include <win_common.h>
-#include <gen_common.h>
+#include <sys_common.h>
 //#include <agy_common.h>
 #include <initcompany.h>
 #include <hashpass.h>
@@ -15,7 +15,7 @@ function main() {
 
 	//NB numbers and names MUST match those in the matching common .h files
 	mv.labelledcommon[win_common_no]=new win_common;
-	mv.labelledcommon[gen_common_no]=new gen_common;
+	mv.labelledcommon[sys_common_no]=new sys_common;
 	//mv.labelledcommon[agy_common_no]=new agy_common;
 
 	/*cat ~/pickos/dic/ *.SQL | psql -h 127.0.0.1 -U exodus exodus*/

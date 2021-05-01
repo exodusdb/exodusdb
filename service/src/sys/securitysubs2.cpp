@@ -105,10 +105,10 @@ function main(in mode) {
 		t10.swapper(" - ", " ");
 		t10.swapper("MEDIA INVOICE - INVOICE WITHOUT ACCOUNT", "MEDIA INVOICE CREATE WITHOUT ACCOUNT");
 		t10.swapper("JOB FILE UPDATE OWN JOB", "JOB FILE UPDATE OTHERS JOBS");
-		t10.swapper("PRODUCTION QUOTE", "PRODUCTION ESTIMATE");
+		t10.swapper("JOB QUOTE", "JOB ESTIMATE");
 		t10.swapper(" FILE ", " ");
 		t10.swapper("RECURRING ENTRIES", "RECURRING");
-		t10.swapper("PRODUCTION ESTIMATE CREATE OWN ORDER NO", "PRODUCTION ESTIMATE CREATE OWN NO");
+		t10.swapper("JOB ESTIMATE CREATE OWN ORDER NO", "JOB ESTIMATE CREATE OWN NO");
 		t10.swapper("VEHICLE RATE ", "RATECARDS ");
 		t10.swapper("MEDIA COSTS ", "MEDIA COST ");
 
@@ -140,7 +140,7 @@ function main(in mode) {
 		t10.swapper("UNITS ", "UNIT ");
 		//swap 'SUPPLIER INVOICE ACCESS' with 'MEDIA ':'SUPPLIER INVOICE ACCESS' in t10
 		//swap 'SUPPLIER INVOICE CREATE' with 'MEDIA ':'SUPPLIER INVOICE CREATE' in t10
-		//swap 'SUPPLIER INVOICE UPDATE' with 'PRODUCTION ':'SUPPLIER INVOICE UPDATE' in t10
+		//swap 'SUPPLIER INVOICE UPDATE' with 'JOB ':'SUPPLIER INVOICE UPDATE' in t10
 
 		t10.swapper("OWN ORDER NO", "OWN NO");
 		t10.swapper("OWN ESTIMATE NO", "OWN NO");
@@ -154,8 +154,8 @@ function main(in mode) {
 		}//loop;
 		while (true) {
 			///BREAK;
-			if (not(t10.index("PRODUCTION PRODUCTION "))) break;
-			t10.swapper("PRODUCTION PRODUCTION ", "PRODUCTION ");
+			if (not(t10.index("JOB JOB "))) break;
+			t10.swapper("JOB JOB ", "JOB ");
 		}//loop;
 
 		t10.trimmer();
@@ -182,10 +182,10 @@ function main(in mode) {
 		} //ii;
 
 		//ensure certain documents cannot be deleted
-		if (newuserprivs.a(10).locate("PRODUCTION ORDER DELETE", taskn)) {
+		if (newuserprivs.a(10).locate("JOB ORDER DELETE", taskn)) {
 			newuserprivs.r(11, taskn, "EXODUS");
 		}
-		if (newuserprivs.a(10).locate("PRODUCTION ESTIMATE DELETE", taskn)) {
+		if (newuserprivs.a(10).locate("JOB ESTIMATE DELETE", taskn)) {
 			newuserprivs.r(11, taskn, "EXODUS");
 		}
 		if (newuserprivs.a(10).locate("JOB DELETE", taskn)) {

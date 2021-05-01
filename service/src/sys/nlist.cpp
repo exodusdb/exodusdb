@@ -546,8 +546,8 @@ filename:
 				printtxmark = "Media Management";
 			}
 
-			if (var("JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").locateusing(",", filename, xx)) {
-				printtxmark = "Production Management";
+			if (var("JOBS,JOB_ORDERS,JOB_INVOICES").locateusing(",", filename, xx)) {
+				printtxmark = "Job Management";
 			}
 
 			if (var("CHARTS,RECURRING").locateusing(",", filename, xx)) {

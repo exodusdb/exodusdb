@@ -56,6 +56,8 @@ function main() {
 		title ^= "'L'Filter : " ^ fromtime.oconv("MT") ^ " - " ^ uptotime.oconv("MT");
 	}
 
+	cmd ^= " %AND% WITH REQUEST1 NE \"RELOCK\"";
+
 	if (containing) {
 
 		var tt = containing.ucase();

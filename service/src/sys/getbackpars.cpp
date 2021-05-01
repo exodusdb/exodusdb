@@ -74,22 +74,28 @@ function main(out bakpars, in process0=var()) {
 		} //ii;
 	}
 
-	//if bakpars<3>='' then bakpars<3>='2:00'
-	//if bakpars<4>='' then bakpars<4>='2:05'
-	if (minbaktime_ eq "") {
-		bakpars.r(3, "1:00");
-	}
-	if (maxbaktime_ eq "") {
-		bakpars.r(4, "1:05");
-	}
-	if (not(minbaktime_.isnum())) {
-		bakpars.r(3, minbaktime_.iconv("MT"));
-	}
-	if (not(maxbaktime_.isnum())) {
-		bakpars.r(4, maxbaktime_.iconv("MT"));
-	}
-	if (bakdows_ eq "") {
-		bakpars.r(5, "1234567");
+	if (VOLUMES) {
+		//if bakpars<3>='' then bakpars<3>='2:00'
+		//if bakpars<4>='' then bakpars<4>='2:05'
+		if (minbaktime_ eq "") {
+			bakpars.r(3, "1:00");
+		}
+		if (maxbaktime_ eq "") {
+			bakpars.r(4, "1:05");
+		}
+		if (not(minbaktime_.isnum())) {
+			bakpars.r(3, minbaktime_.iconv("MT"));
+		}
+		if (not(maxbaktime_.isnum())) {
+			bakpars.r(4, maxbaktime_.iconv("MT"));
+		}
+		if (bakdows_ eq "") {
+			bakpars.r(5, "1234567");
+		}
+	} else {
+		//suppress on exodus
+		bakpars.r(3, -1);
+		bakpars.r(4, -1);
 	}
 
 	//fix bug in data entry that allows : and :: to be entered

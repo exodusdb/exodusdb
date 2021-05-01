@@ -379,7 +379,7 @@ function main(in mode0, out msg) {
 		datedict = "YEAR_PERIOD";
 		chkmodulename = "JOBS";
 
-	} else if (win.datafile eq "PRODUCTION_INVOICES" or win.datafile eq "PRODUCTION_ORDERS") {
+	} else if (win.datafile eq "JOB_INVOICES" or win.datafile eq "JOB_ORDERS") {
 		datedict = "DATE";
 		chkmodulename = "JOBS";
 
