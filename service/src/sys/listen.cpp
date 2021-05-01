@@ -3115,7 +3115,7 @@ subroutine checkcompany() {
 }
 
 subroutine updreqlog() {
-	if (not reqlog) {
+	if (not(reqlog) or request1 eq "RELOCK") {
 		return;
 	}
 
