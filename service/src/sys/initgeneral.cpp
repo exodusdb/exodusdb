@@ -48,7 +48,6 @@ var ver;
 var vern;
 var cpu;
 var errors;
-var shadow;
 var lists;
 var companycode;
 var dostime;
@@ -1319,8 +1318,10 @@ getproxy:
 	if (not(openfile("DOCUMENTS", sys.documents, "ADDRESSES", 1))) {
 		valid = "";
 	}
-	if (not(openfile("SHADOW", shadow, "COMPANIES", 1))) {
-		valid = "";
+	//IF OPENFILE2('SHADOW',shadow,'COMPANIES',1) ELSE VALID=''
+	var shadow;
+	if (shadow.open("SHADOW", "")) {
+		perform("DELETEFILE SHADOW");
 	}
 	if (not valid) {
 		var().chr(7).output();

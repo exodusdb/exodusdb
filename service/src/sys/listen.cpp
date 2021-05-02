@@ -491,9 +491,9 @@ nextrequest:
 	SYSTEM.r(6, "");
 
 	TCLSTACK = TCLSTACK.field(FM, 1, 10);
-	//<REV>
+	/*
 	execute("RESET");
-	//</REV>
+	*/
 	SYSTEM.r(33, 1);
 	RECORD = "";
 	ID = "";
