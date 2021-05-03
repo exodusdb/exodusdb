@@ -2373,6 +2373,13 @@ bool var::saveselect(const var& filename) {
 	return recn > 0;
 }
 
+void to_extract_text(var& dictexpression) {
+				dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
+				dictexpression.replacer("^exodus_extract_sort\\(", "exodus_extract_text\\(");
+				dictexpression.replacer("^exodus_extract_date\\(", "exodus_extract_text\\(");
+				dictexpression.replacer("^exodus_extract_datetime\\(", "exodus_extract_text\\(");
+}
+
 bool var::select(const var& sortselectclause) {
 	THISIS("bool var::select(const var& sortselectclause) const")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -3026,9 +3033,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//value = "''";
 
 				//remove conversion to date/number etc
-				dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
-				dictexpression.replacer("^exodus_extract_date\\(", "exodus_extract_text\\(");
-				dictexpression.replacer("^exodus_extract_datetime\\(", "exodus_extract_text\\(");
+				to_extract_text(dictexpression);
 
 				//remove conversion to array
 				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
@@ -3112,6 +3117,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					 %RECORDS% | RECORDS
 					 +RECORDS+ | +RECORDS+
 					*/
+					dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
 					expression ^= dictexpression ^ " COLLATE \"C\" BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.splicer(-1, "");
@@ -3137,18 +3143,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//lhs is an array ("multivalues" in postgres)
 				//dont convert rhs to in() or any()
 				else if (op == "=") {
+					to_extract_text(dictexpression);
 					op = "in";
 					value = "( " ^ value ^ " )";
 				}
 
 				// not any of
 				else if (op == "<>") {
+					to_extract_text(dictexpression);
 					op = "not in";
 					value = "( " ^ value ^ " )";
 				}
 
 				//any of
 				else {
+					to_extract_text(dictexpression);
 					value = "ANY(ARRAY[" ^ value ^ "])";
 				}
 			}

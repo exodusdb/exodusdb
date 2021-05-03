@@ -85,7 +85,7 @@ function* system_dict_usercode(di, many, withtask, haslocks, sselect) {
         systemerror(di.name, '"Select Many" requires group>0')
     if (typeof withtask == 'undefined' || withtask == '')
         withtask = '' // '""'
-    if (typeof haslocks == 'undefined' || haslocks == '')
+    if (typeof haslocks == 'undefined' || haslocks === '')
         haslocks = '""'
     if (typeof sselect == 'undefined' || sselect == '')
         sselect = '""'
