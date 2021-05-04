@@ -1321,7 +1321,7 @@ getproxy:
 	//IF OPENFILE2('SHADOW',shadow,'COMPANIES',1) ELSE VALID=''
 	var shadow;
 	if (shadow.open("SHADOW", "")) {
-		perform("DELETEFILE SHADOW");
+		perform("DELETEFILE SHADOW (S)");
 	}
 	if (not valid) {
 		var().chr(7).output();
