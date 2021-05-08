@@ -83,11 +83,15 @@ function* system_dict_usercode(di, many, withtask, haslocks, sselect) {
         many = false
     if (many && !di.groupno)
         systemerror(di.name, '"Select Many" requires group>0')
-    if (typeof withtask == 'undefined' || withtask == '')
+    //if (typeof withtask == 'undefined' || withtask == '')
+    if (typeof withtask == 'undefined' || withtask === '')
         withtask = '' // '""'
-    if (typeof haslocks == 'undefined' || haslocks === '')
+    //if (typeof haslocks == 'undefined' || haslocks == '')
+    //if (typeof haslocks == 'undefined' || haslocks === '')
+    if (typeof haslocks != 'boolean')
         haslocks = '""'
-    if (typeof sselect == 'undefined' || sselect == '')
+    //if (typeof sselect == 'undefined' || sselect == '')
+    if (typeof sselect == 'undefined' || sselect === '')
         sselect = '""'
     if ("'\"".indexOf(sselect.substr(0, 1)) == -1)
         sselect = '"' + sselect.exodusswap('"', '\\"') + '"'

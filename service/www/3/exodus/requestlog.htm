@@ -53,6 +53,12 @@ function* dict_LISTREQUESTLOG(parameters) {
 
  di=dict[++din]=dictrec('USER_CODE','F',11,'',groupn)
  yield* system_dict_usercode(di,many=true)
+
+ di=dict[++din]=dictrec('RELOCKS','F',12)
+ di.radio='1;Show:0;Hide'
+ di.horizontal=true;
+ di.defaultvalue='0'
+
  return dict
  
 }
@@ -116,6 +122,13 @@ function* form_postinit() {
                                 <input id="USER_CODE" /></td>
                         </tr>
                     </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Relocks</td>
+                <td style="vertical-align: middle">
+                                <input id="RELOCKS" />
                 </td>
             </tr>
         </table>
