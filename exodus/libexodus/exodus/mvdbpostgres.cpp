@@ -3216,7 +3216,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					//multivalues are searched using "OR" which is the | pipe character in ts_query syntax
 					//words separated by spaces (or & characters) are searched for uing "AND" which is & in ts_query syntax
 					var values="";
-					value.converter(VM,FM);
+					value.unquoter().converter(VM,FM);
 					for (var partvalue : value) {
 
 						//remove all single quotes
