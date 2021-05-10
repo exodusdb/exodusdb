@@ -1081,6 +1081,12 @@ var ExodusProgramBase::perform(const var& sentence) {
 	var saverecur2;
 	var saverecur3;
 	var saverecur4;
+	//
+	var saveid;
+	var saverecord;
+	var savemv;
+	var savedict;
+
 	SENTENCE.transfer(savesentence);
 	COMMAND.transfer(savecommand);
 	OPTIONS.transfer(saveoptions);
@@ -1089,6 +1095,11 @@ var ExodusProgramBase::perform(const var& sentence) {
 	RECUR2.transfer(saverecur2);
 	RECUR3.transfer(saverecur3);
 	RECUR4.transfer(saverecur4);
+	//
+	ID.transfer(saveid);
+	RECORD.transfer(saverecord);
+	MV.transfer(savemv);
+	DICT.transfer(savedict);
 
 	//a lambda function to restore the environment
 	auto restore_environment = [&]() {
@@ -1101,6 +1112,11 @@ var ExodusProgramBase::perform(const var& sentence) {
 		saverecur2.transfer(RECUR2);
 		saverecur3.transfer(RECUR3);
 		saverecur4.transfer(RECUR4);
+		//
+		saveid.transfer(ID);
+		saverecord.transfer(RECORD);
+		savemv.transfer(MV);
+		savedict.transfer(DICT);
 	};
 
 	SENTENCE = sentence;
