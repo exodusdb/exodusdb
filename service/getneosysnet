@@ -41,6 +41,8 @@ set -eux
 	mv 3/neosys 3/exodus
 	mv neosys exodus
 :
+: neosys becomes exodus
+:
 	mv ./3/exodus/scripts/neosys.js ./3/exodus/scripts/exodus.js
 	mv ./exodus/images/theme2/neosys32x25.gif ./exodus/images/theme2/exodus32x25.gif
 	#mv ./exodus/images/theme2/neosysm.jpg ./exodus/images/theme2/exodusm.jpg
