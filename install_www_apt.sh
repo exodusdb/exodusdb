@@ -178,10 +178,11 @@ V0G0N
 :
 : https://wkhtmltopdf.org/downloads.html
 :
-: 20.04 focal
+: 20.04 bionic or focal
 :
-	curl -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
-	dpkg -i wkhtmltox_0.12.6-1.focal_amd64.deb || true
+	RELEASE=`lsb_release -cs`
+	curl -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb
+	dpkg -i wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb || true
 	apt -y --fix-broken install
 :
 : Test it works
