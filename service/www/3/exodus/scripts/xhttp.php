@@ -728,14 +728,16 @@ function getdatabases($exodusrootpath, $systemcode)
 					continue;
 				if ($databases)
 					$databases .= "*";
-				else
-					$databases = "xyz ";
 				$databases .= $file->getFilename() . "," . $file->getFilename();
 			}
 			if (!$databases) {
 				$response = "Cannot see vol file $volfilename or $volfilename2 nor any subdirs";
 				return "";
 			}
+			$databases = explode("*", $databases);
+			sort($databases);
+			$databases = implode("*", $databases);
+			$databases = "xyz ".$databases;
 		}
 	}
 	if (!$databases) {
