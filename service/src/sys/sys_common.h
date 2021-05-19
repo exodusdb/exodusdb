@@ -16,7 +16,7 @@ commoninit(sys,sys_common_no)
 	var documents;
 	var unit;
 	var units;
-	var popuprowbuffer;
+	var markets;
 	var _security;
 	var glang;
 	var _definitions;

@@ -1124,7 +1124,7 @@ subroutine requestinit() {
 	request_ = USER0.field(FM, firstrequestfieldn, 99999);
 
 	responsetime = "";
-	rawresponse = "";
+	rawresponse = "PENDING";
 	gosub updreqlog();
 
 	if (logfilename) {
@@ -3115,12 +3115,18 @@ subroutine checkcompany() {
 }
 
 subroutine updreqlog() {
-	if (not(reqlog) or request1 eq "RELOCK") {
+	if (not reqlog) {
 		return;
 	}
+	//if request1 eq 'RELOCK' then return
 
 	tt = username ^ FM ^ ipno ^ FM ^ netid ^ FM ^ FM ^ responsetime ^ FM ^ rawresponse.a(1);
-	tt.r(11, request_);
+	if (request_.a(1) eq "EXECUTE") {
+		tt.r(11, USER0.a(2) ^ "_" ^ request_.a(3) ^ FM ^ USER0.field(FM, 4, 9999));
+	} else {
+		tt.r(11, request_);
+	}
+
 	logid = datasetcode ^ "*" ^ requestdate ^ "*" ^ requesttime ^ "*" ^ processno;
 	tt.write(reqlog, logid);
 

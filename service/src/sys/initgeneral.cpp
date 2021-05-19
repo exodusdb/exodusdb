@@ -1297,28 +1297,47 @@ getproxy:
 	}
 
 	call log2("*open general files", logtime);
+
 	var valid = 1;
 	//DEFINITIONS='' why was this commented out?
+
 	if (not(openfile("ALANGUAGE", sys.alanguage, "DEFINITIONS"))) {
 		valid = 0;
 	}
+
 	if (not(openfile("COMPANIES", sys.companies, "DEFINITIONS"))) {
 		valid = 0;
 	}
-	if (not(openfile("CURRENCIES", sys.currencies, "COMPANIES"))) {
+	if (not(openfile("COMPANY_VERSIONS", xx, "COMPANIES"))) {
 		valid = 0;
 	}
+
+	if (not(openfile("CURRENCIES", sys.currencies, "DEFINITIONS"))) {
+		valid = 0;
+	}
+	if (not(openfile("CURRENCY_VERSIONS", xx, "CURRENCIES"))) {
+		valid = 0;
+	}
+
+	if (not(openfile("MARKETS", sys.markets, "DEFINITIONS"))) {
+		valid = 0;
+	}
+	if (not(openfile("MARKET_VERSIONS", xx, "MARKETS"))) {
+		valid = 0;
+	}
+
 	if (not(openfile("UNITS", sys.units, "CURRENCIES"))) {
 		valid = 0;
 		sys.units = "";
 	}
-	if (not(openfile("ADDRESSES", sys.addresses, "COMPANIES"))) {
+	if (not(openfile("ADDRESSES", sys.addresses, "DEFINITIONS"))) {
 		valid = 0;
 	}
-	if (not(openfile("DOCUMENTS", sys.documents, "ADDRESSES", 1))) {
-		valid = "";
+	if (not(openfile("DOCUMENTS", sys.documents, "DEFINITIONS", 1))) {
+		valid = 0;
 	}
-	//IF OPENFILE2('SHADOW',shadow,'COMPANIES',1) ELSE VALID=''
+
+	//IF OPENFILE2('SHADOW',shadow,'DEFINITIONS',1) ELSE valid=0
 	var shadow;
 	if (shadow.open("SHADOW", "")) {
 		perform("DELETEFILE SHADOW (S)");
@@ -1328,18 +1347,6 @@ getproxy:
 		if (interactive) {
 			call note("DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING");
 		}
-	}
-
-	if (not(openfile("CURRENCY_VERSIONS", xx, "CURRENCIES", 1))) {
-		valid = "";
-	}
-	if (xx.open("MARKETS", "")) {
-		if (not(openfile("MARKET_VERSIONS", xx, "MARKETS", 1))) {
-			valid = "";
-		}
-	}
-	if (not(openfile("COMPANY_VERSIONS", xx, "COMPANIES", 1))) {
-		valid = "";
 	}
 
 	if (VOLUMES) {
@@ -1489,10 +1496,9 @@ fixnextcompany:
 
 		var marketcode = sys.company.a(30);
 		if (marketcode) {
-			var markets;
-			if (markets.open("MARKETS", "")) {
+			if (sys.markets.open("MARKETS", "")) {
 				var market;
-				if (not(market.read(markets, marketcode))) {
+				if (not(market.read(sys.markets, marketcode))) {
 					market = "";
 					msg = marketcode.quote() ^ " is missing from company " ^ companycode;
 					call note(msg);
