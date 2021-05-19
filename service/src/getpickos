@@ -2,12 +2,14 @@
 set -eux
 
 :
-: Refreshes the service/sys source folders from the ~/pickos folder where the output of ADECOM is placed
+: Refreshes the service/sys source folders from the pickos folder where the output of ADECOM is placed
 :
 : Converts EXODUS/exodus to EXODUS/exodus except neosys.com and Copyright NEOSYS
 : Does not delete any files in the target that are no longer present in the source
 : TODO: Delete everything before refreshing from scratch and regenerate all header files
-: rsync -avz -e "ssh -p 19525" --delete "/cygdrive/d/exodus/pickos/" root@exodus.neosys.com:/root/pickos
+: rsync -avz -e "ssh -p 19525" --delete "/cygdrive/d/exodus/pickos/" root@bkup.neosys.com:/backups/current/win3/pickos
+
+	PICKOS=/backups/current/win3/pickos/
 
 :
 : Check if running in the right directory
@@ -19,7 +21,7 @@ set -eux
 	fi
 
 :
-: A function to change all N_E_OSYS/n_e_osys to EXODUS/exodus in all text - except neosys.com
+: Function to change all N_E_OSYS/n_e_osys to EXODUS/exodus in all text - except neosys.com
 : ===========================================================================================
 :
 function conv_n_e_osys2exodus {
@@ -35,21 +37,25 @@ function conv_n_e_osys2exodus {
     find ./$1 -type f -exec sed -i 's#Batch#Journal#g' {} \;
 }
 
+: START
+: =====
+:
+
 :
 : Get dictionary SQL from pickos
 : ==============================
 :
 : e.g. use F5 DATA2SQL DICT.VOC to generate dict_voc.sql file
-: then ./syncup.sh to put it in the ~/pickos/data dir first
+: then ./syncup.sh to put it in the $PICKOS/data dir first
 :
-	cp -a ~/pickos/data/DICTCHAN.SQL sql/dict_changelog.sql
-	cp -a ~/pickos/data/DICTLOCK.SQL sql/dict_locks.sql
-	cp -a ~/pickos/data/DICTPROC.SQL sql/dict_processes.sql
-	cp -a ~/pickos/data/DICTREQU.SQL sql/dict_requestlog.sql
-	cp -a ~/pickos/data/DICTSTAT.SQL sql/dict_statistics.sql
-	cp -a ~/pickos/data/DICTUSER.SQL sql/dict_users.sql
-	cp -a ~/pickos/data/DICTVOC.SQL sql/dict_voc.sql
-	cp -a ~/pickos/data/DICTDEFI.SQL sql/dict_definitions.sql
+	cp -a $PICKOS/data/DICTCHAN.SQL sql/dict_changelog.sql
+	cp -a $PICKOS/data/DICTLOCK.SQL sql/dict_locks.sql
+	cp -a $PICKOS/data/DICTPROC.SQL sql/dict_processes.sql
+	cp -a $PICKOS/data/DICTREQU.SQL sql/dict_requestlog.sql
+	cp -a $PICKOS/data/DICTSTAT.SQL sql/dict_statistics.sql
+	cp -a $PICKOS/data/DICTUSER.SQL sql/dict_users.sql
+	cp -a $PICKOS/data/DICTVOC.SQL sql/dict_voc.sql
+	cp -a $PICKOS/data/DICTDEFI.SQL sql/dict_definitions.sql
 :
 : Convert all NEOSYS to EXODUS in sql
 : ===================================
@@ -57,8 +63,8 @@ function conv_n_e_osys2exodus {
 	conv_n_e_osys2exodus sql
 
 :
-: Get all .cpp and .h files from ~/pickos/sys
-#: Get all .cpp from ~/pickos/sys
+: Get all .cpp and .h files from $PICKOS/sys
+#: Get all .cpp from $PICKOS/sys
 : =========================================
 :
 : All NEOSYS converted to EXODUS already in ADECOM
@@ -66,8 +72,8 @@ function conv_n_e_osys2exodus {
 	for MODULE in sys
 	do
 		mkdir -p  ./$MODULE
-		cp ~/pickos/$MODULE/*.cpp ~/pickos/$MODULE/*.h ./$MODULE/
-		#cp ~/pickos/$MODULE/*.cpp ./$MODULE/
+		cp $PICKOS/$MODULE/*.cpp $PICKOS/$MODULE/*.h ./$MODULE/
+		#cp $PICKOS/$MODULE/*.cpp ./$MODULE/
 	done
 
 :
