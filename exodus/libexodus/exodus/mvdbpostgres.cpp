@@ -2877,7 +2877,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					//NOT using regular expression logic for single valued fields and STARTING
 					//this should trigger 'COLLATE "C" BETWEEN x AND y" below to ensure postgres indexes are used
 					else {
-						negative = op == "<>";
+						if (op == "<>")
+							negative = !negative;
 						op = "]";
 					}
 				}
@@ -3118,7 +3119,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					 +RECORDS+ | +RECORDS+
 					*/
 					dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
-					expression ^= dictexpression ^ " COLLATE \"C\" BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
+					expression ^= dictexpression ^ " COLLATE \"C\"";
+					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.splicer(-1, "");
 				expression.swapper(FM, " OR ");
