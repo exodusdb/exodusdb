@@ -1,6 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <gethtml.h>
 #include <authorised.h>
 #include <otherusers.h>
 #include <sysmsg.h>
@@ -21,6 +22,7 @@ libraryinit()
 
 var stationery;
 var mode;
+var html;
 var dbn;
 var emailresult;
 var usersordefinitions;
@@ -68,6 +70,43 @@ function main() {
 	response_ = "OK";
 
 	if (mode eq "TEST") {
+
+	} else if (mode.a(1) eq "PREVIEWLETTERHEAD") {
+
+		//comma sep
+		var compcodes = request_.a(2);
+		var testing = USER0.a(3);
+
+		var allhtml = "";
+
+		//if testing, style borders of td and divs for visual insight
+		if (testing) {
+			allhtml.r(-1, "<style>");
+			allhtml.r(-1, "td {border:dotted 1px #EEEEEE;}");
+			allhtml.r(-1, "div {border:dashed 1px lightgrey;}");
+			allhtml.r(-1, "</style>");
+		}
+
+		var ncomps = compcodes.count(",") + 1;
+		for (var compn = 1; compn <= ncomps; ++compn) {
+
+			mode = "HEAD";
+			var compcode = compcodes.field(",", compn);
+			call gethtml(mode, html, compcode);
+
+			allhtml.r(-1, "<br />Company " ^ compcode ^ " from " ^ mode);
+			allhtml.r(-1, "<br />");
+
+			//if not testing then wrap html in hr for clarity
+			//if testing else allhtml<-1>='<hr/>'
+			allhtml.r(-1, html);
+			//if testing else allhtml<-1>='<hr/>'
+
+		} //compn;
+		allhtml.r(-1, "Press F5 to refresh any images just uploaded.");
+		allhtml.swapper(FM, "\r\n");
+		var(allhtml).oswrite(SYSTEM.a(2));
+		gosub postproc();
 
 	} else if (mode eq "PERIODTABLE") {
 
@@ -151,7 +190,7 @@ function main() {
 		if (emailresult) {
 			emailresult.converter(VM ^ FM, "\r\r");
 			response_ = "OK Email Sent to" "\r" ^ emailresult;
-		} else {
+			} else {
 			call mssg("No users can be found to email,|or some problem with email server");
 		}
 		USER1 = "";
