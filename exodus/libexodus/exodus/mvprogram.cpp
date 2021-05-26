@@ -285,9 +285,12 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 							break;
 						case 1:	 // =
 							ok = ivalue == reqivalues(fieldn);
-TRACE(ivalue)
-TRACE(reqivalues(fieldn))
 							//ok = ivalue.locate(reqivalues(fieldn));
+							//if (ok) {
+							//	TRACE(ivalue)
+							//	TRACE(reqivalues(fieldn))
+							//	TRACE(calculate("COMPANY_CODE"))
+							//}
 							break;
 						case 2:	 // <>
 							ok = ivalue != reqivalues(fieldn);
@@ -363,16 +366,19 @@ TRACE(reqivalues(fieldn))
 
 			}//if opno
 
-			//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
-			var ovalues = ivalues.swap("'", "''");
-			if (ioconvs(fieldn))
-				ovalues = oconv(ovalues,ioconvs(fieldn));
-
 			var sqltype = sqltypes(fieldn);
-			if (!ovalues && (sqltype == "DATE" || sqltype == "TIME" || sqltype == "TIMESTAMP"))
-				ovalues = "NULL";
-			else
-				ovalues.squoter();
+			var ovalues;
+			if (sqltype == "DATE" || sqltype == "TIME" || sqltype == "TIMESTAMP") {
+				if (ivalues) {
+					ovalues = oconv(ivalues,ioconvs(fieldn)).squoter();
+				}
+				else
+					ovalues = "NULL";
+			}
+			else {
+				//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
+				ovalues = ivalues.swap("'", "''").squoter();
+			}
 
 			insertsql ^= " " ^ ovalues ^ ",";
 
