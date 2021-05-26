@@ -285,6 +285,8 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 							break;
 						case 1:	 // =
 							ok = ivalue == reqivalues(fieldn);
+TRACE(ivalue)
+TRACE(reqivalues(fieldn))
 							//ok = ivalue.locate(reqivalues(fieldn));
 							break;
 						case 2:	 // <>

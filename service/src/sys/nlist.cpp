@@ -811,7 +811,7 @@ nextkey:
 				}
 			}
 			if (title eq "") {
-				title = tt.a(3) ^ nbsp ^ ":";
+				title = rec.a(3) ^ nbsp ^ ":";
 			}
 		}
 
