@@ -2392,15 +2392,19 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 			if (ndecs eq "BASE") {
 				output1 = oconv(numx, BASEFMT ^ zz) ^ unitx;
 			} else {
+				//if ndecs='' then ndecs=len(field(numx,'.',2))
+				//!ndecs could be X to mean no conversion at all!
+				//FMTX=@USER2[1,2]:ndecs:'0P,':z
 				if (ndecs eq "") {
-					ndecs = numx.field(".", 2).length();
+					fmtx = BASEFMT.substr(1, 2) ^ numx.field(".", 2).length() ^ "0P," ^ zz;
+				} else {
+					fmtx = BASEFMT.substr(1, 2) ^ ndecs ^ "0P," ^ zz;
 				}
-				//ndecs could be X to mean no conversion at all!
-				fmtx = BASEFMT.substr(1, 2) ^ ndecs ^ "0P," ^ zz;
 				if (numx.isnum()) {
 					numx += 0;
 				}
 				output1 = oconv(numx, fmtx) ^ unitx;
+
 			}
 
 			if (output1.length()) {
