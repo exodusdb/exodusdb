@@ -63,7 +63,8 @@ function main() {
 	optimise = count(OPTIONS.ucase(), "O");				//prevents backtrace
 	generateheadersonly = index(OPTIONS.ucase(), "H");	//prevents backtrace
 
-	var ncpus = osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ", 1);
+	//var ncpus = osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ", 1);
+	var ncpus = osshellread("grep -c ^processor /proc/cpuinfo").convert("\r\n","");
 	if (ncpus)
 		max_nthreads = ncpus * 1.5;
 	else

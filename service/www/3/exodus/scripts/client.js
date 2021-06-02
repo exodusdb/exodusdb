@@ -298,7 +298,8 @@ function exodus_client_init() {
     }
     setdateformat()
 
-    gexodus_server = gdataset.toLowerCase() == gdataset
+    //gexodus_server = gdataset.toLowerCase() == gdataset
+    gexodus_server = typeof exodusread != 'undefined'
 
     if (typeof gparameters == 'undefined')
         gparameters = new Object
@@ -1304,7 +1305,11 @@ function exodus_set_style(mode, value, value2) {
     //if (!value) return
 
     //var rules = document.styleSheets[0].cssRules||document.styleSheets[0].rules
-    var ss = document.getElementById('exodus_global_css');
+    //var ss = document.getElementById('exodus_global_css');
+    var link=document.querySelector("link[href='../exodus/global.css']")
+    if (!link)
+        return
+    var ss = link.sheet
     var rules = ss.cssRules || ss.rules
     var oldvalue = ''
 
