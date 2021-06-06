@@ -1333,8 +1333,7 @@ getproxy:
 		valid = 0;
 	}
 	//IF OPENFILE2('SHADOW',shadow,'DEFINITIONS',1) ELSE valid=0
-	var shadow;
-	if (shadow.open("SHADOW", "")) {
+	if (xx.open("SHADOW", "")) {
 		perform("DELETEFILE SHADOW (S)");
 	}
 

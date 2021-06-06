@@ -19,6 +19,7 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
+var initdir;
 var request2;
 var request3;
 var request4;
@@ -67,7 +68,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	//$insert abp,common
 	//$insert bp,agency.common
 	//global ii,passwordexpired,lastlogindate,maxnologindays,validips
-	//global filetime,fileattributes
+	//global filetime,fileattributes,initdir
 	//global runonce,runoncekey,lastpatchid,skipemail,skipreason,patchdatetime,versionkey,versiondatetime,rec,keyandrec,patchid,offset
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
@@ -77,6 +78,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	#define response_ USER3
 	#define msg_ USER4
 	var tracing = 1;
+	initdir = "";
 
 	//no output in arguments allowed since c++ doesnt allow
 	// defaulting or value based arguments and setting them
@@ -115,8 +117,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 		//db start commands
 		if (VOLUMES) {
-			var("*.RUN").initdir();
-			filenamesx = var().oslistf();
+			var initdir="*.RUN";
+			filenamesx = initdir.oslistf();
 		} else {
 			filenamesx = oslistf("*.run");
 		}
@@ -943,21 +945,22 @@ subroutine deleteoldfiles() {
 
 	//for each suitable file
 	if (VOLUMES) {
-		filespec.initdir();
-		filenamesx = var().oslistf();
+		var initdir=filespec;
+		filenamesx = initdir.oslistf();
 	} else {
 		filenamesx = oslistf(filespec);
 	}
 
-	while (true) {
-		///BREAK;
-		if (not filenamesx) break;
+nextfiles:
+	if (filenamesx) {
 
 		//get the file time
 		var filename0 = filenamesx.field(FM, 1);
 		filenamesx.splicer(1, filenamesx.field(FM, 1).length() + 1, "");
-		if (not filenamesx) {
-			filenamesx = var().oslistf();
+		if (VOLUMES) {
+			if (not filenamesx) {
+				filenamesx = initdir.oslistf();
+			}
 		}
 
 		filename = inpath ^ filename0;
@@ -992,7 +995,8 @@ deleteit:
 
 		}
 
-	}//loop;
+		goto nextfiles;
+	}
 
 	return;
 }
