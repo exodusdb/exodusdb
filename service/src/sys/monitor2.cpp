@@ -27,8 +27,8 @@ var currenttime;//num
 var cidx;
 var hostid;
 var installid;
-var datax;
 var msg;
+var datax;
 dim usertab;
 var minusagetime;
 var delusagetime;
@@ -194,6 +194,7 @@ function main() {
 	/////
 
 	//TODO call READ before write to get any results
+	msg = "";
 	if (cidx) {
 		call monitor2b("READ", request, tempfilename, datax, msg);
 	}
@@ -324,9 +325,9 @@ nextprocess:
 					tt.r(1, 1, 3, bakpars.a(3));
 				}
 				backuprequired.r(1, dbasen, tt);
-			}
+				}
 
-			}
+		}
 
 		goto nextprocess;
 	}
@@ -824,6 +825,7 @@ gotip:
 
 	//request it to be done
 	//currently just uses wget to http post the info in the background
+	msg = "";
 	if (cidx) {
 		call monitor2b("WRITE", request, tempfilename, datax, msg);
 	}
@@ -835,6 +837,7 @@ gotip:
 	if ((var(0) and SYSTEM.a(124)) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
 		if (msg) {
 		} else {
+			msg = "";
 			if (cidx) {
 				call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
 			}
