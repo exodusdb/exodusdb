@@ -188,15 +188,15 @@ function main() {
 	}
 	hostid = hostid.trim().lcase();
 
-	installid = hostid ^ "_" ^ cidx;
+	installid = SYSTEM.a(139) ^ hostid ^ "_" ^ cidx;
 
 	//READ
 	/////
 
 	//TODO call READ before write to get any results
-	//print
-	//gosub control
-	call monitor2b("READ", request, tempfilename, datax, msg);
+	if (cidx) {
+		call monitor2b("READ", request, tempfilename, datax, msg);
+	}
 
 	if (msg) {
 		//ignore errors which can include wget not being available
@@ -326,7 +326,7 @@ nextprocess:
 				backuprequired.r(1, dbasen, tt);
 			}
 
-		}
+			}
 
 		goto nextprocess;
 	}
@@ -670,7 +670,7 @@ nextdbasen:;
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 	//dont allow upgrades by test databases
-	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
+	if ((var(0) and SYSTEM.a(124)) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
 
 		//get upgrade file details
 		upgradefilename83 = SYSTEM.a(112);
@@ -824,17 +824,20 @@ gotip:
 
 	//request it to be done
 	//currently just uses wget to http post the info in the background
-	//gosub control
-	call monitor2b("WRITE", request, tempfilename, datax, msg);
+	if (cidx) {
+		call monitor2b("WRITE", request, tempfilename, datax, msg);
+	}
 
 	//also look to get any upgrade file
 	//TODO put this on a less frequent check since it will only be
 	//updated after the nightly backup usually *unless last hour users are 0/0/0
 	//dont allow upgrades by test databases
-	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
+	if ((var(0) and SYSTEM.a(124)) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
 		if (msg) {
 		} else {
-			call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
+			if (cidx) {
+				call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
+			}
 		}
 	}
 

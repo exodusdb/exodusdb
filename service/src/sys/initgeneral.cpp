@@ -245,6 +245,8 @@ function main() {
 	//system<136> financial curr.year
 	//system<137> agency default market code
 	//system<138> agency last day of week mon-sun 1-7
+	//system<139> domain name prefix eg d- t-
+	//system<140> cid eg 79350001
 
 	call log2("*init.general obtaining exclusive access:", logtime);
 	var voc;
@@ -1297,35 +1299,29 @@ getproxy:
 	}
 
 	call log2("*open general files", logtime);
-
 	var valid = 1;
 	//DEFINITIONS='' why was this commented out?
-
 	if (not(openfile("ALANGUAGE", sys.alanguage, "DEFINITIONS"))) {
 		valid = 0;
 	}
-
 	if (not(openfile("COMPANIES", sys.companies, "DEFINITIONS"))) {
 		valid = 0;
 	}
 	if (not(openfile("COMPANY_VERSIONS", xx, "COMPANIES"))) {
 		valid = 0;
 	}
-
 	if (not(openfile("CURRENCIES", sys.currencies, "DEFINITIONS"))) {
 		valid = 0;
 	}
 	if (not(openfile("CURRENCY_VERSIONS", xx, "CURRENCIES"))) {
 		valid = 0;
 	}
-
 	if (not(openfile("MARKETS", sys.markets, "DEFINITIONS"))) {
 		valid = 0;
 	}
 	if (not(openfile("MARKET_VERSIONS", xx, "MARKETS"))) {
 		valid = 0;
 	}
-
 	if (not(openfile("UNITS", sys.units, "CURRENCIES"))) {
 		valid = 0;
 		sys.units = "";
@@ -1333,15 +1329,15 @@ getproxy:
 	if (not(openfile("ADDRESSES", sys.addresses, "DEFINITIONS"))) {
 		valid = 0;
 	}
-	if (not(openfile("DOCUMENTS", sys.documents, "DEFINITIONS", 1))) {
+	if (not(openfile("DOCUMENTS", sys.documents, "DEFINITIONS"))) {
 		valid = 0;
 	}
-
 	//IF OPENFILE2('SHADOW',shadow,'DEFINITIONS',1) ELSE valid=0
 	var shadow;
 	if (shadow.open("SHADOW", "")) {
 		perform("DELETEFILE SHADOW (S)");
 	}
+
 	if (not valid) {
 		var().chr(7).output();
 		if (interactive) {

@@ -7327,7 +7327,23 @@ function* insertallrows(elements, values, fromrecn) {
 
         //set the record and form values
         for (var coln = 0; coln < elements.length && coln < rowvalues.length; coln++) {
-            yield* gds.setx(elements[coln], rown + fromrecn, rowvalues[coln])
+            //yield* gds.setx(elements[coln], rown + fromrecn, rowvalues[coln])
+
+            var element = elements[coln]
+            var oldvalue = yield* gds.get1(element, rown + fromrecn)
+            var newvalue = rowvalues[coln]
+
+            //set and call validation to trigger any consequences
+            if (newvalue != oldvalue) {
+                grecn = rown + fromrecn
+                gpreviousvalue = oldvalue
+                gpreviouselement = $$(element.id)[grecn]
+                //yield* gds.setx(element, grecn, newvalue)
+                //TODO setvalue expects external format not internal format
+                setvalue(gpreviouselement,newvalue)
+                if (!(yield* validateupdate()))
+                    return false
+            }
         }
 
     }

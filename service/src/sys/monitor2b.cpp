@@ -6,7 +6,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var httpsbug;//num
+var wgetrc;
 var authurl;
 var params;
 var text;
@@ -42,24 +42,25 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		return 0;
 	}
 
-	//make cygwin command
-	var wgetrc = "";
-	//look for local or cygwin wget.exe otherwise quit
-	//WARNING TODO: check ternary op following;
-	var exe = oscwd().index(":") ? ".exe" : "";
-	var cmd = SYSTEM.a(50) ^ "wget" ^ exe;
-	if (cmd.osfile()) {
-		httpsbug = 0;
-	} else {
-		httpsbug = 1;
-		cmd = "wget" ^ exe;
-	}
-
-	if (not(cmd.osfile())) {
-		//avoid error in READ/UPGRADE phase of MONITOR2
-		//msg='wget.exe not available in CONTROL()'
-		msg = "";
-		return 0;
+	//make linux/cygwin command
+	var cmd = "wget";
+	var httpsbug = 0;
+	if (VOLUMES) {
+		wgetrc = "";
+		//look for local or cygwin wget.exe otherwise quit
+		//WARNING TODO: check ternary op following;
+		var exe = oscwd().index(":") ? ".exe" : "";
+		cmd = SYSTEM.a(50) ^ "wget" ^ exe;
+		if (not(cmd.osfile())) {
+			httpsbug = 1;
+			cmd = "wget" ^ exe;
+		}
+		if (not(cmd.osfile())) {
+			//avoid error in READ/UPGRADE phase of MONITOR2
+			//msg='wget.exe not available in CONTROL()'
+			msg = "";
+			return 0;
+		}
 	}
 
 	//!!!
@@ -69,8 +70,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	msg = "unknown error in control";
 
-	var logfilename = tempfilename ^ ".$WG";
-	var tempfilename2 = tempfilename ^ ".$RE";
+	var logfilename = tempfilename ^ ".XWG";
+	var tempfilename2 = tempfilename ^ ".XRE";
 
 	//user and pass currently not required for some reason
 	//but leave configured in case they are re-instated on the server
@@ -160,11 +161,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				cmd ^= " --no-check-certificate";
 			}
 			//cmd:=' -O ':tempfilename2
-			cmd ^= " -o " ^ logfilename;
+			cmd ^= " --output-file=" ^ logfilename;
 			cmd ^= " --referer=" ^ referer;
-			cmd ^= " -t 3";
-			cmd ^= " -T 60";
-			cmd ^= " -b";
+			cmd ^= " --tries=3";
+			cmd ^= " --timeout=60";
+			cmd ^= " --background";
 		} else {
 			//wgetrc<-1>='output_document=':tempfilename2
 			if (httpsbug) {
@@ -237,7 +238,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				if (cmd.index(" -N ")) {
 					params = "?data=" ^ params;
 				} else {
-					var datafilename = tempfilename ^ ".$DA";
+					var datafilename = tempfilename ^ ".XDA";
 
 					//encodeuri
 					params.swapper("%", "%25");
@@ -288,7 +289,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			cmd ^= " " ^ ((authurl ^ "?" ^ params).quote());
 
 			wgetrc.swapper(FM, "\r\n");
-			var wgetrcfilename = oscwd() ^ tempfilename ^ ".$RC";
+			var wgetrcfilename = oscwd() ^ tempfilename ^ ".XRC";
 			var(wgetrc).oswrite(wgetrcfilename);
 
 			if (wgetrcfilename[2] eq ":") {
@@ -298,7 +299,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			wgetrcfilename.converter(OSSLASH, "/");
 
 			var cmdfilename = tempfilename ^ ".cmd";
-			var errorfilename = tempfilename ^ ".$ER";
+			var errorfilename = tempfilename ^ ".XER";
 			var cmdfile = "set WGETRC=" ^ wgetrcfilename;
 			cmdfile ^= "\r\n" ^ cmd ^ " 2>" ^ errorfilename;
 			var(cmdfile).oswrite(cmdfilename);

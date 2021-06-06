@@ -24,6 +24,7 @@ var request3;
 var request4;
 var request5;
 var request6;
+var filenamesx;
 var filename;
 var processes;
 var tt;
@@ -113,9 +114,12 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	if (request1 eq "RUNS") {
 
 		//db start commands
-		//initdir '*.RUN'
-		//filenamesx=dirlist()
-		var filenamesx = oslistf("*.run");
+		if (VOLUMES) {
+			var("*.RUN").initdir();
+			filenamesx = var().oslistf();
+		} else {
+			filenamesx = oslistf("*.run");
+		}
 
 		for (var filen = 1; filen <= 9999; ++filen) {
 			filename = filenamesx.a(filen);
@@ -938,9 +942,12 @@ subroutine deleteoldfiles() {
 	}
 
 	//for each suitable file
-	//initdir filespec
-	//filenamesx=dirlist()
-	var filenamesx = oslistf(filespec);
+	if (VOLUMES) {
+		filespec.initdir();
+		filenamesx = var().oslistf();
+	} else {
+		filenamesx = oslistf(filespec);
+	}
 
 	while (true) {
 		///BREAK;

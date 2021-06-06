@@ -2,7 +2,7 @@
 libraryinit()
 
 function main() {
-	return 79350140;
+	return SYSTEM.a(140);
 }
 
 libraryexit()
