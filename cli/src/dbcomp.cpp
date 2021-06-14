@@ -3,71 +3,86 @@ programinit()
 
 	function main() {
 
-	logputl("compdbs says 'Hello World!'");
-
 	var timestarted = time();
 
 	var db1 = COMMAND.a(2);
 	var db2 = COMMAND.a(3);
 
+	var silent = OPTIONS.index("S");
+
+	if (not silent)
+		logputl("compdbs says 'Hello World!'");
+
 	if (not(db1.connect())) {
 		call fsmsg();
-		stop();
+		stop(1);
 	}
 
 	if (not(db2.connect())) {
 		call fsmsg();
-		stop();
+		stop(1);
 	}
 
-	var filename;
-	var filen = 0;
-	while (filename = COMMAND.a(++filen + 3)) {
-		logput(filename, "");
+	int nerrors = 0;
+
+	var filenames = COMMAND.field(FM, 4, 9999);
+	if (not filenames)
+		filenames = db1.listfiles();
+	for (var filename : filenames) {
+
+		if (not silent)
+			outputl("\n", filename);
+
+		if (filename.substr(1,10) eq "preselect_" or filename.substr(1,14) eq "select_stage2_" or filename eq "dict_all" or filename eq "processes")
+			continue;
 
 		var file1;
 		if (not file1.open(filename, db1)) {
 			call fsmsg();
-			stop();
+			stop(1);
 		}
 
-		logputl(file1.reccount());
+		var reccount = file1.reccount();
 
 		var file2;
 		if (not file2.open(filename, db2)) {
 			call fsmsg();
-			stop();
+			stop(1);
 		}
 
-		var keys;
-		if (keys.osread("qwerty")) {
-			keys.converter("\n", FM);
-			file1.makelist("", keys);
-		} else
+		//var keys;
+		//if (keys.osread("qwerty")) {
+		//	keys.converter("\n", FM);
+		//	file1.makelist("", keys);
+		//} else
 			file1.select("SELECT " ^ filename ^ " (SR)");
 
 		var recn = 0;
 		while (file1.readnext(RECORD, ID, MV)) {
 
 			if (esctoexit())
-				stop();
+				stop(1);
 
 			recn++;
-			logput(at(-40) ^ recn ^ ".", ID);
-			//printl("",RECORD.length());
-			if ((recn % 1000) == 1)
-				osflush();
+			if (not silent) {
+				output(at(-40), recn, "/", reccount, " ", ID);
+				//printl("",RECORD.length());
+				if ((recn % 1000) eq 1)
+					osflush();
+			}
 
 			if (not RECORD) {
 				if (not RECORD.read(file1, ID)) {
-					printl(ID, "missing from filename", db1.a(1));
+					errputl(ID, "missing from filename", db1.a(1));
+					nerrors++;
 					continue;
 				}
 			}
 
 			var rec2;
 			if (not read(rec2, file2, ID)) {
-				printl(ID, " missing from", db2.a(1), filename);
+				errputl(ID, " missing from", db2.a(1), filename);
+				nerrors++;
 				continue;
 			}
 
@@ -80,13 +95,13 @@ programinit()
 				//RECORD is db1 and rec2 is db2
 
 				//temp suppress ads field 56
-				if (filename == "ads") {
+				if (filename eq "ads") {
 					RECORD.r(56, rec2.a(56));
 					RECORD.swapper(".000", "");
 					rec2.swapper(".000", "");
 					RECORD.replacer("\\.00([\x1A-\x1F])", "$1");
 					rec2.replacer("\\.00([\x1A-\x1F])", "$1");
-				} else if (filename == "brands") {
+				} else if (filename eq "brands") {
 					RECORD.r(14, rec2.a(14));
 					RECORD.r(15, rec2.a(15));
 				}
@@ -95,7 +110,8 @@ programinit()
 				RECORD.cropper();
 				rec2.cropper();
 				if (rec2 ne RECORD) {
-					printl(" ", ID, " different.");
+					nerrors++;
+					//errputl(" ", ID, " different.");
 					//printl(RECORD);
 					//printl(rec2);
 					var nfs = dcount(RECORD, FM);
@@ -106,8 +122,8 @@ programinit()
 						var f1 = RECORD.a(fn);
 						var f2 = rec2.a(fn);
 						if (f1 ne f2) {
-							printl(fn ^ "-", f1);
-							printl(fn ^ "+", f2);
+							errputl(filename, " ", ID, " ", fn, "-", f1);
+							errputl(filename, " ", ID, " ", fn, "+", f2);
 						}
 					}
 				}
@@ -118,13 +134,16 @@ programinit()
 
 	//call stopper("",timestarted,datestarted);
 
-	logputl();
-	var seconds = time() - timestarted;
-	while (seconds < 0)
-		seconds += 86400;
-	logputl("Finished in", int(seconds / 60), "minutes and", mod(seconds, 60), "seconds.");
+	if (not silent) {
+		logputl();
+		var seconds = time() - timestarted;
+		while (seconds < 0)
+			seconds += 86400;
+		logputl("Finished in", int(seconds / 60), "minutes and", mod(seconds, 60), "seconds.");
+	}
 
-	return 0;
+	return nerrors;
+
 }
 
 programexit()

@@ -1493,7 +1493,7 @@ function* clientfunctions_windowonload() {
         //button to refresh (clear cache)
         if (typeof gshowrefreshcachebutton == 'undefined' || gshowrefreshcachebutton) {
             var temp2 = document.createElement('span')
-            temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Cache. ' + ctrlalt + '+R', 'X')
+            temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Database Cache. ' + ctrlalt + '+R', 'X')
             //document.body.insertBefore(temp2, document.body.firstChild)
             gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
             temp2.style.float = 'left'

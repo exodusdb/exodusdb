@@ -1174,8 +1174,9 @@ function* formfunctions_onload() {
                         t3 = 'x'
                     }
                     else {
-                        t2 = '(Ctrl+Shift+N)'
-                        t3 = '(Ctrl+D)'
+                        //duplicate keycodes in 3 places
+                        t2 = '(Ctrl+I or Ctrl+Insert)'
+                        t3 = '(Ctrl+D or Ctrl+Delete)'
                     }
                     var t = ''
                     t += ' <span style="white-space: nowrap">'
@@ -2262,7 +2263,14 @@ function* document_onkeydown2(event) {
 
     event = getevent(event)
     var keycode = event.keyCode ? event.keyCode : event.which
-    console.log('onkeydown ' + keycode)
+    var tt = 'onkeydown ' + keycode
+    if (event.ctrlKey)
+        tt += ' + ctrl'
+    if (event.shiftKey)
+        tt += ' + shift'
+    if (event.altKey)
+        tt += ' + alt'
+    console.log(tt)
 
     ///log('document_onkeydown ' + event.target.id + ' ' + keycode)
 
@@ -2338,7 +2346,7 @@ function* document_onkeydown2(event) {
 
     //menu bar hot keys for non-msie (including msie now) alt keys
     //if (event.altKey && !document.all && [77, 78, 76, 79, 83, 67, 82, 69, 73, 80, 88].exoduslocate(gkeycode)) {
-    if (event.altKey && [71, 78, 76, 79, 83, 67, 82, 69, 77, 80, 88].exoduslocate(gkeycode)) {
+    if (event.altKey && ! event.shiftKey && [71, 78, 76, 79, 83, 67, 82, 69, 77, 80, 88].exoduslocate(gkeycode)) {
         exoduscancelevent(event)
         var found = true
         //alt+m main menu
@@ -3129,11 +3137,9 @@ function* document_onkeydown2(event) {
     if (event.altKey && event.ctrlKey && keycode == 18)
         return true
 
-    //Ctrl+N is insert row only in rows
-    // with or without shift
-    //NB bare Ctrl+N doesnt get passed to javascript at all by most browsers
-    //but Ctrl+Shift+N does
-    if (event.ctrlKey && keycode == 78 && rowx) {
+    //Ctrl+I or Ctrl+Insert is insert row, but only in rows.
+    //with or without shift
+    if (event.ctrlKey && (keycode == 73 || keycode == 45) && rowx) {
         var button = rowx.exodusfields['insertrowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
             exoduscancelevent(event)
@@ -3142,9 +3148,9 @@ function* document_onkeydown2(event) {
         return false
     }
 
-    //Ctrl+D is delete row, but only in rows
-    // with or without shift
-    if (event.ctrlKey && keycode == 68 && rowx) {
+    //Ctrl+D or Ctrl+Delete is delete row, but only in rows.
+    //with or without shift
+    if (event.ctrlKey && (keycode == 68 || keycode == 46) && rowx) {
         var button = rowx.exodusfields['deleterowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
             exoduscancelevent(event)
@@ -7293,11 +7299,13 @@ function* insertallrows(elements, values, fromrecn) {
 
     //get first element if an array passed
     //otherwise convert elements to an array
-    var element = elements
-    if (!element.tagName && element.length && element[0].tagName)
-        element = element[0]
+    //var element = elements
+    if (!elements.tagName && elements.length && elements[0].tagName) {
+        //element = element[0]
+    }
     else
         elements = [elements]
+    var element = elements[0]
 
     if (!fromrecn)
         fromrecn = 0
@@ -7306,7 +7314,9 @@ function* insertallrows(elements, values, fromrecn) {
 
     var groupno = Number(element.getAttribute('exodusgroupno'))
 
-    yield* deleteallrows(element, fromrecn)
+    //if (elements.length == 1)
+    //yield* deleteallrows(element, fromrecn)
+    yield* deleteallrows(element, fromrecn + 1)
 
     //get the group
     var rows = gds.data['group' + groupno]
@@ -7337,10 +7347,23 @@ function* insertallrows(elements, values, fromrecn) {
             if (newvalue != oldvalue) {
                 grecn = rown + fromrecn
                 gpreviousvalue = oldvalue
-                gpreviouselement = $$(element.id)[grecn]
+                //gpreviouselement = document.getElementsByName(element.id)[grecn]
+                //if (!gpreviouselement)
+                //  gpreviouselement = element
+                if (element.id) {
+                    gpreviouselement = $$(element.id)
+                    if (gpreviouselement[grecn])
+                        gpreviouselement = gpreviouselement[grecn]
+                } 
                 //yield* gds.setx(element, grecn, newvalue)
-                //TODO setvalue expects external format not internal format
-                setvalue(gpreviouselement,newvalue)
+                var ovalue = yield* validateoconv(gpreviouselement, newvalue)
+                if (typeof ovalue == 'undefined' || ovalue == null) {
+                    return false                                       
+                }
+                //const conversion = gpreviouselement.getAttribute('exodusconversion')
+                //if (conversion && conversion.substr(0,1) == '[')
+                //    newvalue = newvalue.exodusoconv(conversion)
+                setvalue(gpreviouselement,ovalue)
                 if (!(yield* validateupdate()))
                     return false
             }
@@ -7532,11 +7555,13 @@ function setinsertimage(mode, row, groupno) {
 
     if (mode == 'expand') {
         insertimage.src = gexpandrowimage
-        insertimage.title = 'Expand hidden rows here (Ctrl+Shift+N)'
+        //duplicate keycodes in 3 places
+        insertimage.title = 'Expand hidden rows here (Ctrl+I or Ctrl+Insert)'
     }
     else {
         insertimage.src = ginsertrowimage
-        insertimage.title = 'Insert a new row here (Ctrl+Shift+N)'
+        //duplicate keycodes in 3 places
+        insertimage.title = 'Insert a new row here (Ctrl+I or Ctrl+Insert)'
     }
     return
 }

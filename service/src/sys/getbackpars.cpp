@@ -115,13 +115,16 @@ function main(out bakpars, in process0=var()) {
 
 	//backup depending on configuration file
 	//if any database listed there
-	if (process.a(58)) {
+	var dbcode = process.a(17).lcase();
+	var dbcodes = process.a(58).lcase();
+
+	if (dbcodes) {
 
 		//databases to be excluded
 		bakpars.r(8, "");
 
 		//decide backup required or not by indicating testdata
-		if (process.a(58).locate(process.a(17), dbn)) {
+		if (dbcodes.locate(dbcode, dbn)) {
 			tt = process.a(60, dbn);
 		} else {
 			tt = 0;
@@ -135,7 +138,7 @@ function main(out bakpars, in process0=var()) {
 		//autodetermine if it is "test" data
 		if (baktestdata_ eq "") {
 			var testdata = 1;
-			if (process.a(17).substr(-4, 4) eq "TEST") {
+			if ((process.a(17).substr(-4, 4)).ucase() eq "TEST") {
 			} else if (process.a(23).ucase().index("TRAINING")) {
 			} else if (process.a(23).ucase().index("TESTING")) {
 			} else {

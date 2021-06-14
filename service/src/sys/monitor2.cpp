@@ -60,9 +60,10 @@ var voc;
 var xx;
 var dbasesystem;
 var nmaint;
-var backupdrive;
+var backupdrive;//num
 var tpath;
 var paramrec;
+var home;
 var lastbackupsize;//num
 var lastbackupdatetime;//num
 var currentdatetime;//num
@@ -123,7 +124,7 @@ function main() {
 	checkinterval = 180;
 
 	//command mode forces, call mode only every x minutes
-	forced = SENTENCE.field(" ", 1) eq "MONITOR2";
+	forced = SENTENCE.field(" ", 1).ucase() eq "MONITOR2";
 
 	upgradeready = 0;
 	//only counts web users
@@ -287,7 +288,11 @@ nextprocess:
 			dbasecodes.r(1, dbasen, dbasecode);
 		}
 		dbasesystems.r(1, dbasen, RECORD.a(51));
-		status = calculate("STATUS");
+		if (VOLUMES) {
+			status = calculate("STATUS");
+		} else {
+			status = "OK";
+		}
 		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
 			//statusn will be 6
 			processcount.r(20, dbasen, status);
@@ -325,7 +330,7 @@ nextprocess:
 					tt.r(1, 1, 3, bakpars.a(3));
 				}
 				backuprequired.r(1, dbasen, tt);
-				}
+			}
 
 		}
 
@@ -465,6 +470,9 @@ nextprocess:
 		//Warning for 1 day or never
 		//Critical for more
 		backupdrive = backuprequired.a(1, dbasen, 1).ucase();
+		if (not(VOLUMES)) {
+			backupdrive = 1;
+		}
 		if (backupdrive) {
 
 	//uncomment to test non-existant drive
@@ -472,8 +480,21 @@ nextprocess:
 			description ^= " Backup->" ^ backupdrive;
 			tpath = "../data/" ^ dbasecode.lcase() ^ "/params2";
 			tpath.converter("/", OSSLASH);
-			if (not(paramrec.osread(tpath))) {
-				paramrec = "";
+			if (VOLUMES) {
+				//time fm date fm size
+				if (not(paramrec.osread(tpath))) {
+					paramrec = "";
+				}
+			} else {
+				//time fm date
+				tt = tpath.osfile();
+				paramrec = tt.a(3) ^ FM ^ tt.a(2);
+				//size
+				call osgetenv("HOME", home);
+				tpath ^= "/backups/sql/" ^ dbasecode.lcase() ^ ".sql.gz";
+				tpath.converter("/", OSSLASH);
+
+				paramrec.r(3, tpath.osfile().a(1));
 			}
 			lastbackupsize = paramrec.a(3);
 			if (lastbackupsize) {
@@ -715,7 +736,7 @@ nextdbasen:;
 				} else if (wgetoutput.ucase().index(" ERROR 404")) {
 				} else if (wgetoutput.ucase().index(" failed: Unknown host.")) {
 					printl("DNS cant resolve upgrade host name");
-				} else {
+				} else if (2) {
 					if (not(var("exodus.id").osfile())) {
 						print("upgrade downloading");
 					}
