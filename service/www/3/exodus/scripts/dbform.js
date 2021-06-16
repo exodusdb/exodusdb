@@ -7328,7 +7328,7 @@ function* insertallrows(elements, values, fromrecn) {
     for (var rown = 0; rown < values.length; rown++) {
 
         //insert a new row (except for the last)
-        if (rown < (values.length - 1))
+        if (rown > 0 && rown < (values.length - 1))
             gds.insertrow(groupno, rown + fromrecn)
 
         var rowvalues = values[rown]
@@ -7364,8 +7364,9 @@ function* insertallrows(elements, values, fromrecn) {
                 //if (conversion && conversion.substr(0,1) == '[')
                 //    newvalue = newvalue.exodusoconv(conversion)
                 setvalue(gpreviouselement,ovalue)
-                if (!(yield* validateupdate()))
+                if ((!gKeyNodes || glocked) && !(yield* validateupdate()))
                     return false
+                gpreviousvalue = newvalue
             }
         }
 

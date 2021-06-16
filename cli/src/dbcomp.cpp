@@ -86,8 +86,9 @@ programinit()
 				continue;
 			}
 
-			if (rec2 ne RECORD) {
+			if (rec2 ne RECORD and ID.substr(-5,5) != "_XREF") {
 
+				/*
 				//revert both records to leading zero 0.1, -0.1 instead of old pickos .1 and -.1;
 				RECORD.replacer("([\x1A-\x1F]-?)0\\.", "$1.");
 				rec2.replacer("([\x1A-\x1F]-?)0\\.", "$1.");
@@ -109,6 +110,7 @@ programinit()
 				//if still different, output
 				RECORD.cropper();
 				rec2.cropper();
+				*/
 				if (rec2 ne RECORD) {
 					nerrors++;
 					//errputl(" ", ID, " different.");
@@ -122,6 +124,7 @@ programinit()
 						var f1 = RECORD.a(fn);
 						var f2 = rec2.a(fn);
 						if (f1 ne f2) {
+							errputl();
 							errputl(filename, " ", ID, " ", fn, "-", f1);
 							errputl(filename, " ", ID, " ", fn, "+", f2);
 						}
