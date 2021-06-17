@@ -118,7 +118,9 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		toaddress = toaddress0;
 
 		//development systems ALWAYS email hardcoded in next line
-		if (var("exodus.id").osfile() or not(VOLUMES)) {
+		//1. exodus.id always indicates a test system (dos or exodus)
+		//2. on exodus lack of live.txt file indicates a test system
+		if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile())))) {
 			forcedemailx = "dev@neosys.com";
 			//toaddress=xlate('USERS','EXODUS',7,'X')
 			//if toaddress else toaddress='dev@neosys.com'
@@ -426,14 +428,14 @@ forcedemail:
 				}
 
 				if (opt eq "-r") {
-					headers ^= VM ^ "From:" ^ arg;
-					headers ^= VM ^ "To:" ^ toaddress;
+					headers ^= VM ^ "From: " ^ arg;
+					headers ^= VM ^ "To: " ^ toaddress;
 
 				} else if (opt eq "-s") {
-					headers ^= VM ^ "Subject:" ^ arg;
+					headers ^= VM ^ "Subject: " ^ arg;
 
 				} else if (opt eq "-c") {
-					headers ^= VM ^ "cc:" ^ arg;
+					headers ^= VM ^ "cc: " ^ arg;
 
 				} else if (opt eq "-a") {
 					headers ^= VM ^ arg;
