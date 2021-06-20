@@ -1,0 +1,57 @@
+#!/bin/bash
+set -eux
+
+:
+: =======================
+: Delete a NEOSYS service
+: =======================
+:
+:   'Syntax is ./delete_service <SERVICE_SUFFIX> HOST_DIR [DB_CODE] {live|test}'
+:
+:   'e.g.      ./delete_service exo exodus '' live'
+:   'e.g.      ./delete_service agy watermelon watermelon test'
+:
+
+    SERVICE_SUFFIX=$1
+    HOST_DIR=$2
+    DB_CODE=${3:-${HOST_DIR}}
+    LIVE_OR_TEST=${4}
+:
+    SERVICE_CODE=${SERVICE_SUFFIX}_$LIVE_OR_TEST
+    FULL_SERVICE_CODE=$SERVICE_CODE@${DB_CODE}
+
+:
+: Check syntax
+: ============
+:
+    if [ $LIVE_OR_TEST != live -a $LIVE_OR_TEST != test ]; then
+:       'Syntax error'
+        exit 1
+    fi
+
+:
+:
+: Stop and disable the service
+: ============================
+:
+	sudo systemctl stop $FULL_SERVICE_CODE || true
+	sudo systemctl disable $FULL_SERVICE_CODE || true
+#:
+#: NO. BECAUSE IT IS A TEMPLATE FOR OTHER NEOSYS SERVICES
+#: Remove the service definition file
+#: ==================================
+#:
+#:	sudo rm /etc/systemd/system/$SERVICE_CODE.service || true
+#:
+
+:
+: Remove any log files
+: ====================
+:
+:	'sudo rm -f /etc/rsyslog.d/$SERVICE_CODE.conf || true'
+:	'sudo rm -f /var/log/$PREFIX/$DB_CODE.log || true'
+
+:
+: $FULL_SERVICE_CODE service deleted.
+: ===================================
+

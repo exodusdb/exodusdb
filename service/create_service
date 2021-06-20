@@ -1,0 +1,187 @@
+#!/bin/bash
+set -eux
+
+: =================================
+: Create/Recreate an EXODUS service
+: =================================
+:
+:	'Syntax is ./db_code create_service <SERVICE_SUFFIX> HOST_DIR [DB_CODE] {live|test}'
+:
+:	'e.g.      ./create_service exo exodus "" live'
+:	'e.g.      ./create_service agy watermelon "" test'
+
+	SERVICE_SUFFIX=$1
+	HOST_DIR=$2
+	DB_CODE=${3:-${HOST_DIR}}
+	LIVE_OR_TEST=${4}
+:
+	SERVICE_CODE=${SERVICE_SUFFIX}_$LIVE_OR_TEST
+	FULL_SERVICE_CODE=$SERVICE_CODE@${DB_CODE}
+
+:
+: Check syntax
+: ============
+:
+	if [ $LIVE_OR_TEST != live -a $LIVE_OR_TEST != test ]; then
+:		'Syntax error'
+		exit 1
+	fi
+
+:
+: For live databases, EXO_HOME is $HOME/live
+: For test databases, EXO_HOME is $HOME
+: =========================================
+:
+	if [ $LIVE_OR_TEST = test ]; then
+		export EXO_HOME=$HOME
+		export IDB_CODE=%i_test
+		export IDB_CODES=%i_test
+	else
+		export EXO_HOME=$HOME/live
+#		export DB_CODES="$DB_CODE $DB_CODE $DB_CODE"
+		export IDB_CODE="%i"
+		export IDB_CODES="%i %i %i"
+	fi
+:
+
+	WORK_DIR1=~/hosts/$HOST_DIR/work/
+	WORK_DIR2=~/hosts/%i/work/
+	WORK_DIR3=~/hosts/$HOST_DIR/work/
+
+:
+: Symbolic link for extra databases that dont match the working directory
+: =======================================================================
+:
+	HOST_DIR1=${WORK_DIR1%/work/}
+	HOST_DIR3=${WORK_DIR3%/work/}
+	if [ $WORK_DIR1 != $WORK_DIR3 ]; then
+		test -d $WORK_DIR3 || ln -s $HOST_DIR1 $HOST_DIR3
+	fi
+:
+#: Start logging
+#: =============
+#mkdir /var/log/neo -p
+#touch /var/log/neo/$DB_CODE.log
+##ls -alth /var/log/syslog
+#sudo chown syslog:adm /var/log/neo/$DB_CODE.log
+#:
+#cat > /etc/rsyslog.d/$SERVICE_CODE.conf << V0G0N
+#if \$programname == '$SERVICE_CODE' then /var/log/neo/$DB_CODE.log
+#& stop
+#V0G0N
+#:
+#sudo service rsyslog restart
+
+:
+: Check the server program and work directory are actually available
+: ==================================================================
+:
+	SERVICE_BIN=$EXO_HOME/bin/serve_$SERVICE_SUFFIX
+	if ! test -x $SERVICE_BIN; then
+		set +x
+		echo "$SERVICE_BIN program not available or not executable. Cannot create service."
+		exit 1
+	fi
+
+	if ! test -d $WORK_DIR1; then
+		set +x
+		echo "Work directory $WORK_DIR1 is not available. Cannot create service."
+		exit 1
+	fi
+
+:
+: Create the service
+: ==================
+:
+	SERVICE_FILENAME=/etc/systemd/system/$SERVICE_CODE@.service
+	TMPFILE=$(mktemp /tmp/create_service.XXXXXXXXX)
+:
+	cat > $TMPFILE <<-V0G0N
+		[Unit]
+		Description=$SERVICE_CODE@%i Service
+		After=network.target postgresql.service
+		StartLimitBurst=3
+		StartLimitIntervalSec=30
+		#
+		[Service]
+		Type=simple
+		Restart=on-failure
+		RestartSec=1
+		PIDFile=/run/neo/$SERVICE_CODE@%i.pid
+		User=$USER
+		WorkingDirectory=$WORK_DIR2
+		Environment="EXO_HOME=$EXO_HOME"
+		Environment="EXO_DBNAME=$IDB_CODE"
+		Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$EXO_HOME/bin"
+		Environment="EXO_STARTED_BY_SYSTEMD=true"
+		Environment="EXO_SERVICE_CODE=$SERVICE_CODE@%i"
+		ExecStart=$SERVICE_BIN $IDB_CODES
+		ExecReload=/bin/kill -s HUP \$MAINPID
+		#StandardOutput=append:/var/log/neo/${IDB_CODE}.log
+		#StandardError=append:/var/log/neo/${IDB_CODE}_error.log
+		StandardOutput=syslog
+		StandardError=syslog
+		SyslogIdentifier=$SERVICE_CODE@%i
+		#
+		[Install]
+		WantedBy=multi-user.target
+V0G0N
+:
+	sudo mv $TMPFILE $SERVICE_FILENAME
+	chmod a+r $SERVICE_FILENAME
+
+:
+: Set trigger to reload systemd
+: =============================
+:
+	touch systemctl.daemon-reload.required
+:	#sudo systemctl daemon-reload
+
+:
+: Configure the exodus service to autostart
+: =========================================
+:
+	sudo systemctl enable $FULL_SERVICE_CODE
+
+:
+: Starting the service
+: =================
+:
+	sudo service $FULL_SERVICE_CODE start &
+
+:
+: Ensure setfacl is installed
+: ===========================
+:
+    which setfacl || apt install -y acl
+
+:
+: Ensure directory permissions on data/$DB_CODE
+: ==============================================
+:
+: IDENTICAL code in create_site and create_service. KEEP IN SYNC
+:
+	DB_DIR=~/hosts/$HOST_DIR/data/$DB_CODE
+	mkdir -p $DB_DIR
+	chmod a+srw $DB_DIR
+	setfacl -d -m g::rw $DB_DIR
+
+:
+: Finished creating service $FULL_SERVICE_CODE
+: ===============================================
+
+:
+: Managing the service
+: ====================
+:
+: sudo service $FULL_SERVICE_CODE {start/stop/restart/status}
+:  or
+: ./debug $DB_CODE
+:  or
+: cd $WORK_DIR1
+: 'export PATH=$PATH:$HOME/neo/bin'
+: serve_agy
+:
+: tail /var/log/syslog -f
+:
+: service $FULL_SERVICE_CODE status || true

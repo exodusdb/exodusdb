@@ -1,0 +1,25 @@
+#!/bin/bash
+set -eux
+
+:
+: Copy all EXODUS programs to live
+: ================================
+:
+
+:
+: Install the latest version of the neomail script
+: ================================================
+:
+	cp neomail ~/bin
+
+:
+: copy all bin and lib files
+: ==========================
+:
+	#rsync -av ~/bin ~/lib ~/inc ~/live
+	#rsync -a ~/{bin,lib,inc} ~/live
+	rsync -av ~/{bin,lib} ~/live
+
+:
+: Finished copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: =========================================================================

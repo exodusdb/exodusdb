@@ -1,0 +1,92 @@
+#!/bin/bash
+set -eux
+
+: ====================================================================
+: Stop a background service and run it in the foreground for debugging
+: ====================================================================
+:
+
+	DB_CODE=$1
+	OPTIONS=${2:-}
+
+	SITE_DIR=${DB_CODE%_test}
+
+:
+: Check Syntax
+: ============
+:
+: 'Syntax:	./run xxxxxxxx'
+:
+: 'Example:	./run centauro'
+: '			./run centauro_test'
+:
+	if [ -z "$DB_CODE" ]; then
+		set +x
+		echo 'Syntax error. Cannot continue.'
+		exit 1
+	fi
+
+:
+: Service code is neo@xxxxxxxx or test@xxxxxxxx ... WITHOUT _test suffix
+: EXO_HOME binary directory is ~/neo for live, or ~/ for test databases
+: =====================================================================
+:
+	if [ "${DB_CODE: -5}" = "_test" ]; then
+		SERVICE_PREFIX=test
+		export EXO_HOME=~
+		export EXO_DEBUG=1
+	else
+		SERVICE_PREFIX=live
+		export EXO_HOME=~/live
+		export EXO_DEBUG=
+	fi
+:
+	SERVICE_CODE=${SERVICE_PREFIX}@${DB_CODE%_test}
+
+:
+: Ensure the correct bin is found first in the path
+: =================================================
+:
+	export PATH="$EXO_HOME/bin:$PATH"
+
+:
+:
+: Change to the working directory
+: ===============================
+:
+	cd ~/hosts/$SITE_DIR/work
+
+:
+: Stop the background process
+: ===========================
+:
+	sudo systemctl stop $SERVICE_CODE
+
+:
+: Select the database to use
+: ==========================
+:
+	export EXO_DBNAME=$DB_CODE
+
+:
+: Install gdb if necessary
+: ========================
+:
+    which gdb || apt install -y gdb
+
+:
+: Start the server process
+: ========================
+:
+	export EXO_DEBUG=1
+	gdb -ex "set print inferior-events off" -ex run --args serve_agy $OPTIONS
+
+:
+: Resume the normal background service
+: ====================================
+:
+	sudo systemctl start $SERVICE_CODE
+
+:
+: Finished debug of $SITE_DIR - $DB_CODE in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds
+: ====================================================================

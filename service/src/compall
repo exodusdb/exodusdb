@@ -1,11 +1,12 @@
 #!/bin/bash
-set -x
-set -e
+set -eux
 
-:
+: ======================
 : Compile EXODUS service
 : ======================
-
+:
+:   Please ignore compile error on sys/serve_exo.cpp and various warnings
+:
 :
 : Generate all headers first
 : ==========================

@@ -1,0 +1,31 @@
+#!/bin/bash
+set -eux
+
+: ========================
+: Create test database
+: ========================
+:
+:	'Syntax is ./create_testdb LIVE_EXO_DBNAME'
+:
+	LIVE_EXO_DBNAME=$1
+	TEST_EXO_DBNAME=$1_test
+
+:
+: Check Syntax
+: ============
+:
+	if [ -z "LIVE_EXO_DBNAME"  ]; then
+		set +x
+		echo 'Syntax is wrong. Cannot continue.'
+		exit 1
+	fi
+
+:
+: Do the copy
+: ===========
+:
+	./copy_db $LIVE_EXO_DBNAME $TEST_EXO_DBNAME DELETE
+
+:
+: Finished create_testdb $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: =======================================================

@@ -1,0 +1,7 @@
+#!/bin/bash
+#sudo -u postgres psql -c "SELECT datname,usename,backend_start,state_change,state,query FROM pg_stat_activity where state is not null and datname != 'postgres'"
+#watch "sudo -u postgres psql -c \"SELECT datname,usename,state_change,state,query FROM pg_stat_activity where state is not null and datname != 'postgres'\""
+#watch "sudo -u postgres psql -c \"SELECT datname,usename,state_change,state,query FROM pg_stat_activity where state is not null and datname != 'postgres' order by state_change\""
+#watch "sudo -u postgres psql -c \"SELECT datname,usename,state_change,state,query FROM pg_stat_activity where usename = 'exodus' order by state_change\""
+#watch "sudo -u postgres psql -c \"SELECT datname,usename,state_change,state,query FROM pg_stat_activity where usename = 'exodus' order by datname\""
+watch "sudo -u postgres psql -c \"SELECT datname,usename,state_change,state,query FROM pg_stat_activity where usename = 'exodus' order by datname\" | wc"

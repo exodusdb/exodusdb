@@ -1,0 +1,15 @@
+#!/bin/bash
+set -eux
+
+: ====================================
+: test if a postgresql database exists
+: ====================================
+:
+
+	EXO_DBNAME=$1
+
+	if sudo -u  postgres psql $EXO_DBNAME -c 'select 1' &> /dev/null; then
+		exit 0
+	else
+		exit 1
+	fi

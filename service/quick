@@ -1,0 +1,131 @@
+#!/bin/bash
+set -eu
+
+: show status of NEOSYS processes
+: ===============================
+:
+
+getpidinfo() {
+
+	#ps output for a live process
+	#%CPU WCHAN
+	#0.1 -
+	#0.0 futex_wait_queue_me
+	#0.0 poll_schedule_timeout.constprop.0
+	#0.0 poll_schedule_timeout.constprop.0
+	#0.0 poll_schedule_timeout.constprop.0
+
+	#ps output for a test process
+	#%CPU WCHAN
+	# 0.0 -
+	# 0.0 poll_schedule_timeout.constprop.0
+
+	local pid=${1:-}
+	if [ -z $pid ]; then
+		echo 0
+		return
+	else
+		ps -mo pcpu,wchan $pid | \
+		while read pcpu wchan; do
+			if [ "$pcpu" = "%CPU" ]; then
+				continue
+			fi
+			if [ "$wchan" = "-" ]; then
+				#$wchan
+				echo "$pcpu"
+			fi
+		done
+	fi
+
+}
+
+function live_or_test() {
+
+		if [ $2 = LIVE ]; then
+			suffix=
+			prefix=neo
+		else
+			suffix=_test
+			prefix=tst
+		fi
+
+		local dbcode=${1}${suffix}
+
+		local -i time_modified_in_secs=$(stat -c%Y ~/hosts/$hostcode/data/$dbcode/*.svr 2> /dev/null || true)
+		local -i time_now_in_secs=$(date +%s)
+		local -i age_in_secs=$(($time_now_in_secs-$time_modified_in_secs))
+
+		local pid=$(cat /run/neo/$prefix@$hostcode.pid 2>/dev/null || true)
+
+		pidinfo=$(getpidinfo $pid)
+
+:
+: Green, orange or red depending on age  lt 10sec or gt 60 seconds
+: ================================================================
+:
+		if [ $age_in_secs -gt 60 ]; then
+			printf "\e[31m"	#red
+		elif [ $age_in_secs -gt 10 ]; then
+			printf "\e[33m"	#orange
+		else
+			printf "\e[32m"	#green
+		fi
+
+:
+:
+		##printf "%6s:%02i:%02i %5s " $(($age_in_secs/3600)) $(($age_in_secs/60%60)) $(($age_in_secs%60)) $pidinfo
+#printf "\n$pidinfo\n"
+		printf "%6s:%02i:%02i %5s" $(($age_in_secs/3600)) $(($age_in_secs/60%60)) $(($age_in_secs%60)) $pidinfo
+
+:
+: Reset colour to normal
+: ======================
+:
+		##reset color
+		printf "\e[0m"
+
+}
+
+function main() {
+
+:
+: Output columns headings
+: =======================
+:
+#	hostcodes=$(ls ~/hosts)
+	hostcodes=$(find ~/hosts/* -maxdepth 0 -type d -printf "%f\n")
+
+	#first line of headine
+	printf "%30s " dbcode
+	printf "%12s %5s " live
+	printf "%12s %5s " test
+	printf "\n"
+
+	#second line of heading
+	printf "%30s "
+	printf "%12s %5s " age CPU%
+	printf "%12s %5s " age CPU%
+	printf "\n"
+
+:
+: Output one line per live database in ~/hosts
+: ============================================
+:
+	for hostcode in $hostcodes; do
+
+		printf "%30s " $hostcode
+:
+: Live columns
+:
+		live_or_test $hostcode live
+:
+: Test columns
+:
+		live_or_test $hostcode test
+
+		printf "\n"
+
+	done
+}
+
+	main

@@ -1,0 +1,77 @@
+#!/bin/bash
+set -eux
+
+: ===============================================================
+: Restore a postgres database from an sql dump to a _test database
+: ===============================================================
+:
+:	'Syntax is ./doall <EXO_DBNAME> restore_db'
+:	'       or ./restore_db <EXO_DBNAME> [<BACKUPDIR>] [OPTION]'
+:	''
+:   '       BACKUPDIR defaults to ~/backups/sql'
+:	'		OPTION is N to NOT restart the target database service.'
+:
+	FROM_EXO_DBNAME=$1
+	NEW_BACKUP_DIR=${2:-~/backups/sql}
+	RESTART=${3:-N}
+:
+	TO_EXO_DBNAME=${1}_test
+
+:
+: Check Syntax
+: ============
+:
+	if [ -z "FROM_EXO_DBNAME"  -o  -z "$NEW_BACKUP_DIR" ]; then
+		set +x
+		echo 'Syntax is wrong. Cannot continue.'
+		exit 1
+	fi
+
+:
+: Stop the target database
+: ========================
+:
+	CMD=stop ./doone TEST $FROM_EXO_DBNAME
+
+:
+: Give it a little time to stop
+: =============================
+:
+	sleep 5
+
+:
+: Drop the target database
+: ========================
+:
+	sudo -u postgres dropdb $TO_EXO_DBNAME || true
+
+:
+: Create the target database
+: ==========================
+:
+	sudo -u postgres createdb -O exodus -T template0 $TO_EXO_DBNAME
+
+:
+: Restore into the target database
+: ================================
+:
+	set -o pipefail
+	zcat $NEW_BACKUP_DIR/$FROM_EXO_DBNAME.sql.gz | sudo -u postgres psql $TO_EXO_DBNAME > /dev/null
+
+:
+: Recreate all functions
+: ======================
+:
+	EXO_DBNAME=$TO_EXO_DBNAME dict2sql > /dev/null
+
+:
+: Optionally restart the target database
+: ======================================
+:
+	if [ "$RESTART" != "N" ]; then
+		CMD=start ./doone TEST $FROM_EXO_DBNAME ''
+	fi
+
+:
+: Finished restore_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: ======================================================

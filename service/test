@@ -1,0 +1,16 @@
+#!/bin/bash
+set -eux
+
+: ====================================================================
+: Stop a background test service and run it in the foreground with gdb
+: ====================================================================
+:
+:	'Syntax:  ./test [dbcode]'
+:
+:	'Example: ./test			#uses test_test database'
+:	'	        ./test centauro	#uses centauro_test database'
+:
+
+	export DB_CODE=${1:-test}		#default to the test_test database
+
+	./run ${DB_CODE%_test}_test 	#remove superfluous _test and append _test

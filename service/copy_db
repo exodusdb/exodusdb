@@ -1,0 +1,59 @@
+#!/bin/bash
+set -eux
+
+: ========================
+: Copy a postgres database
+: ========================
+:
+:	'Syntax is ./copy_db FROM_DB_CODE TO_DB_CODE [DELETE]'
+:
+	FROM_DB_CODE=$1
+	TO_DB_CODE=$2
+#	OPTIONS=$3
+    OPTIONS=${3:-}
+
+:
+: Check Syntax
+: ============
+:
+	if [ -z "FROM_DB_CODE"  -o  -z "$TO_DB_CODE" ]; then
+		set +x
+		echo 'Syntax is wrong. Cannot continue.'
+		exit 1
+	fi
+
+:
+: Shutdown $FROM_DB_CODE service
+: ==============================
+:
+	CMD=stop ./doone $FROM_DB_CODE ''
+
+:
+: Give it some time to stop
+: =========================
+:
+	sleep 5
+
+:
+: Delete any existing $TO_DB_CODE database
+: ======================================================
+:
+	if [ "$OPTIONS" = "DELETE" ]; then
+		sudo -u postgres dropdb $TO_DB_CODE || true
+	fi
+
+:
+: Copy $FROM_DB_CODE to $TO_DB_CODE
+: ====================================
+:
+	sudo -u postgres createdb -O exodus -T $FROM_DB_CODE $TO_DB_CODE
+
+:
+: Restart $FROM_DB_CODE service
+: =============================
+:
+	CMD=start ./doone $FROM_DB_CODE ''
+
+:
+: Finished copy_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: =======================================================

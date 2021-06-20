@@ -1,0 +1,102 @@
+#!/bin/bash
+set -eux
+
+: ===================================================
+: Configure Postgres with more connections and memory
+: ===================================================
+:
+: Note: Restarts postgres
+:
+
+	MAX_CONNECTIONS=300
+	SHARED_BUFFERS=256MB
+
+: ==============================================================
+: A function to show the maximum connections and memory reserved
+: ==============================================================
+:
+function showmax() {
+	sudo -u postgres psql <<-V0G0N
+		show max_connections;
+		show shared_buffers;
+V0G0N
+}
+
+: ==========================================================
+: A function to show any connections idle longer than x mins
+: ==========================================================
+:
+function showidle() {
+	sudo -u postgres psql <<-V0G0N
+		SELECT datid, datname, pid, usesysid, usename, application_name, client_addr, client_hostname, client_port
+		FROM pg_stat_activity
+		WHERE datname = 'centralauth'
+		AND pid <> pg_backend_pid()
+		AND state in ('idle', 'idle in transaction', 'idle in transaction (aborted)', 'disabled')
+		AND state_change < current_timestamp - INTERVAL '$1' MINUTE; -- You can set your own
+V0G0N
+}
+
+: ===================================================================
+: A function to kill any postgres connections idle longer than x mins
+: ===================================================================
+:
+function killidle() {
+	sudo -u postgres psql <<V0G0N
+	SELECT pg_terminate_backend(pid)
+	FROM pg_stat_activity
+	WHERE datname = 'centralauth'
+	AND pid <> pg_backend_pid()
+	AND state in ('idle', 'idle in transaction', 'idle in transaction (aborted)', 'disabled')
+	AND state_change < current_timestamp - INTERVAL '$1' MINUTE;
+V0G0N
+}
+
+:
+: =============
+: Main function
+: =============
+
+:
+: Check postgresql 12 is installed
+: ================================
+:
+	test -d /etc/postgresql/12/main/conf.d
+
+:
+: Show connections idle > 1 min
+: =============================
+:
+	showidle 1
+
+:
+: Show the current maxima
+: =======================
+:
+	showmax
+
+:
+: Set new maxima
+: ==============
+:
+#	echo "max_connections = 300" > /etc/postgresql/12/main/conf.d/neosys.conf && service postgresql restart
+	sudo -u postgres psql <<-V0G0N
+		ALTER SYSTEM SET max_connections TO '$MAX_CONNECTIONS';
+		ALTER SYSTEM SET shared_buffers TO '$SHARED_BUFFERS'
+V0G0N
+
+:
+: Restart postgresql
+: ==================
+:
+	sudo service postgresql restart
+
+:
+: Show the new maxima
+: ===================
+:
+	showmax
+
+:
+: Finished config_postgres
+: ========================

@@ -1,0 +1,65 @@
+#!/bin/bash
+set -eux
+
+: ==========================
+: Backup a postgres database
+: ==========================
+:
+:	'Syntax is ./backup_db <EXO_DBNAME> [<BACKUPDIR>]'
+:	'<BACKUPDIR> defaults to ~/backups/sql'
+:
+	EXO_DBNAME=$1
+	NEW_BACKUP_DIR=${2:-~/backups/sql}
+
+	RESTART=Y
+
+:
+: Check Syntax
+: ============
+:
+	if [ -z "$EXO_DBNAME"  -o  -z "$NEW_BACKUP_DIR" ]; then
+		set +x
+		echo 'Syntax is wrong. Cannot continue.'
+		exit 1
+	fi
+
+:
+: Ensure target directory exists
+: ==============================
+:
+	mkdir -p $NEW_BACKUP_DIR
+
+:
+: Dump the database SQL and zip it
+: ================================
+:
+	set -o pipefail
+	#NCPUS=`grep -c processor /proc/cpuinfo`
+	sudo -u postgres pg_dump $EXO_DBNAME | gzip > $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part
+	mv $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz
+
+:
+: Restore without restarting
+: ==========================
+:
+	./restore_db $EXO_DBNAME "$NEW_BACKUP_DIR" "N"
+
+:
+: Compare and flag success if ok
+: ==============================
+:
+	if dbcomp $EXO_DBNAME ${EXO_DBNAME}_test {S}; then
+		touch "$HOME/hosts/$EXO_DBNAME/data/$EXO_DBNAME/params2"
+	fi
+
+:
+: Optionally restart the target database
+: ======================================
+:
+	if [ "$RESTART" != "N" ]; then
+		CMD=start ./doone TEST ${EXO_DBNAME}
+	fi
+
+:
+: Finished backup_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: ======================================================
