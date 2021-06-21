@@ -26,7 +26,7 @@ set -eux
 : Shutdown $FROM_DB_CODE service
 : ==============================
 :
-	CMD=stop ./doone $FROM_DB_CODE ''
+	./service ${FROM_DB_CODE} stop
 
 :
 : Give it some time to stop
@@ -52,7 +52,7 @@ set -eux
 : Restart $FROM_DB_CODE service
 : =============================
 :
-	CMD=start ./doone $FROM_DB_CODE ''
+	./service ${FROM_DB_CODE} start
 
 :
 : Finished copy_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.

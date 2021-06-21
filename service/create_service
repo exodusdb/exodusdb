@@ -5,17 +5,17 @@ set -eux
 : Create/Recreate an EXODUS service
 : =================================
 :
-:	'Syntax is ./db_code create_service <SERVICE_SUFFIX> HOST_DIR [DB_CODE] {live|test}'
+:	'Syntax is ./db_code create_service <APP_CODE> <HOST_DIR> "[DB_CODE]" {live|test}'
 :
 :	'e.g.      ./create_service exo exodus "" live'
 :	'e.g.      ./create_service agy watermelon "" test'
 
-	SERVICE_SUFFIX=$1
+	APP_CODE=$1
 	HOST_DIR=$2
 	DB_CODE=${3:-${HOST_DIR}}
 	LIVE_OR_TEST=${4}
 :
-	SERVICE_CODE=${SERVICE_SUFFIX}_$LIVE_OR_TEST
+	SERVICE_CODE=${APP_CODE}_$LIVE_OR_TEST
 	FULL_SERVICE_CODE=$SERVICE_CODE@${DB_CODE}
 
 :
@@ -76,7 +76,7 @@ set -eux
 : Check the server program and work directory are actually available
 : ==================================================================
 :
-	SERVICE_BIN=$EXO_HOME/bin/serve_$SERVICE_SUFFIX
+	SERVICE_BIN=$EXO_HOME/bin/serve_$APP_CODE
 	if ! test -x $SERVICE_BIN; then
 		set +x
 		echo "$SERVICE_BIN program not available or not executable. Cannot create service."

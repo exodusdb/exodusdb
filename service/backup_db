@@ -57,7 +57,7 @@ set -eux
 : ======================================
 :
 	if [ "$RESTART" != "N" ]; then
-		CMD=start ./doone TEST ${EXO_DBNAME}
+		./service ${EXO_DBNAME} start test
 	fi
 
 :

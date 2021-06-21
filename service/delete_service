@@ -6,18 +6,18 @@ set -eux
 : Delete a NEOSYS service
 : =======================
 :
-:   'Syntax is ./delete_service <SERVICE_SUFFIX> HOST_DIR [DB_CODE] {live|test}'
+:   'Syntax is ./delete_service <APP_CODE> <HOST_DIR> "[DB_CODE]" {live|test}'
 :
 :   'e.g.      ./delete_service exo exodus '' live'
 :   'e.g.      ./delete_service agy watermelon watermelon test'
 :
 
-    SERVICE_SUFFIX=$1
+    APP_CODE=$1
     HOST_DIR=$2
     DB_CODE=${3:-${HOST_DIR}}
     LIVE_OR_TEST=${4}
 :
-    SERVICE_CODE=${SERVICE_SUFFIX}_$LIVE_OR_TEST
+    SERVICE_CODE=${APP_CODE}_$LIVE_OR_TEST
     FULL_SERVICE_CODE=$SERVICE_CODE@${DB_CODE}
 
 :

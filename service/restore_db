@@ -31,7 +31,7 @@ set -eux
 : Stop the target database
 : ========================
 :
-	CMD=stop ./doone TEST $FROM_EXO_DBNAME
+	./service ${FROM_EXO_DBNAME} stop test
 
 :
 : Give it a little time to stop
@@ -69,7 +69,7 @@ set -eux
 : ======================================
 :
 	if [ "$RESTART" != "N" ]; then
-		CMD=start ./doone TEST $FROM_EXO_DBNAME ''
+		./service ${FROM_EXO_DBNAME} start test
 	fi
 
 :

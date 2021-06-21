@@ -1,0 +1,34 @@
+#!/bin/bash
+set -eux
+
+: =====================================================
+: Service commands start, stop, restart, reload, status
+: =====================================================
+:
+: 'Syntax is ./service <DB_CODE> {start|stop|restart|reload|status} [test|live]'
+:
+: 'Environment variable: $APP_CODE Defaults to "exo". Used for prefix on services'
+:
+	DB_CODE=${1}
+	CMD=${2}
+	LIVE_OR_TEST=${3:-}
+
+:
+	APP_CODE=${APP_CODE:-exo}
+
+:
+: LIVE
+: ====
+:
+	if [ "$LIVE_OR_TEST" != "test" ]; then
+		sudo systemctl $CMD ${APP_CODE}_live@$DB_CODE &
+	fi
+
+:
+: TEST
+: ====
+:
+	if [ "$LIVE_OR_TEST" != "live" ]; then
+		sudo systemctl $CMD ${APP_CODE}_test@$DB_CODE &
+	fi
+
