@@ -6,20 +6,21 @@ set -eux
 : =============================
 :
 	EXODUS=~/exodus
-	test -f $EXODUS/service/install_all.sh || ( echo Must be run in ~/exodus/service install dir without path && exit )
 
 :
-: If installing into /root/then allow cd into /root - but no read access of course
-: ================================================================================
+: Allow cd into /root - but no read access of course
+: ==================================================
+:
+: 	Only if installing into /root/
 :
 	[ ${EXODUS:0:6} = /root/ ] && chmod o+x /root
 
 :
-: Install apache and php
-: ======================
+: Install apache with php and configure a site
+: ============================================
 :
-
-	./create_site exo exodus
+	cd $EXODUS/service
+	./create_site exodus
 
 :
 : Disable default web sites
@@ -31,14 +32,19 @@ set -eux
 : Compile the service
 : ===================
 :
-: ignore compile error on sys/server.cpp and various warnings
 	cd $EXODUS/service/src
-	#. config
 	./compall
 
 :
-: Setup database dict_users
-: =========================
+: Copy all $EXODUS/bin,lib to ~/live
+: ==================================
+:
+	cd $EXODUS/service
+	./copyall
+
+:
+: Setup database dictionaries
+: ===========================
 :
 	cd /tmp
 	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
@@ -70,7 +76,7 @@ set -eux
 	dpkg -i wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb || true
 	apt -y --fix-broken install
 :
-: Test it works
+: Test html2pdf works
 :
 	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
 
