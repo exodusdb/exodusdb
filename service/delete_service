@@ -52,6 +52,16 @@ set -eux
 :	'sudo rm -f /var/log/$PREFIX/$DB_CODE.log || true'
 
 :
+: Notify the daemon
+: =================
+:
+        if [ -z ${DOALL:-} ]; then
+                sudo systemctl daemon-reload 
+        else
+                touch /tmp/systemctl.daemon-reload.required
+        fi
+
+:
 : $FULL_SERVICE_CODE service deleted.
 : ===================================
 

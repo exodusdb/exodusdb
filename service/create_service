@@ -134,8 +134,11 @@ V0G0N
 : Set trigger to reload systemd
 : =============================
 :
-	touch systemctl.daemon-reload.required
-:	#sudo systemctl daemon-reload
+	if [ -z ${DOALL:-} ]; then
+		sudo systemctl daemon-reload
+	else
+		touch /tmp/systemctl.daemon-reload.required
+	fi
 
 :
 : Configure the exodus service to autostart
