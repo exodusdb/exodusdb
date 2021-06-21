@@ -5,8 +5,8 @@ set -eux
 : Compile EXODUS service
 : ======================
 :
-:   Please ignore compile error on sys/serve_exo.cpp and various warnings
-:
+: Please ignore a few warnings about 'cast between incompatible pointer to member types'
+
 :
 : Generate all headers first
 : ==========================
