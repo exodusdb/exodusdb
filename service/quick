@@ -93,7 +93,7 @@ function main() {
 : =======================
 :
 #	hostcodes=$(ls ~/hosts)
-	hostcodes=$(find ~/hosts/* -maxdepth 0 -type d -printf "%f\n")
+	hostcodes=$(find ~/hosts/* -maxdepth 0 -type d,l -printf "%f\n")
 
 	#first line of headine
 	printf "%30s " dbcode
