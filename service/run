@@ -5,49 +5,69 @@ set -eux
 : Stop a background service and run it in the foreground for debugging
 : ====================================================================
 :
+: 'Syntax:	./run xxxxxxxx [<OPTIONS>]'
+:
+: 'Example:	./run centauro'
+: '			./run centauro_test'
+:
 
 	DB_CODE=$1
 	OPTIONS=${2:-}
 
+:
+: Caller sets APP_CODE or it defaults to exo
+: ==========================================
+:
+	APP_CODE=${APP_CODE:-exo}
+
+:
+: Remove any _test suffix from DB_CODE to get the working host dir
+: ================================================================
+:
 	SITE_DIR=${DB_CODE%_test}
 
 :
 : Check Syntax
 : ============
 :
-: 'Syntax:	./run xxxxxxxx'
-:
-: 'Example:	./run centauro'
-: '			./run centauro_test'
-:
 	if [ -z "$DB_CODE" ]; then
-		set +x
-		echo 'Syntax error. Cannot continue.'
+:		'Syntax error. Cannot continue.'
 		exit 1
 	fi
 
 :
-: Service code is neo@xxxxxxxx or test@xxxxxxxx ... WITHOUT _test suffix
-: EXO_HOME binary directory is ~/neo for live, or ~/ for test databases
-: =====================================================================
+: Binary dirs bin and lib are in ~/ or ~/live
+: ===========================================
 :
 	if [ "${DB_CODE: -5}" = "_test" ]; then
-		SERVICE_PREFIX=test
 		export EXO_HOME=~
 		export EXO_DEBUG=1
 	else
-		SERVICE_PREFIX=live
 		export EXO_HOME=~/live
 		export EXO_DEBUG=
 	fi
 :
-	SERVICE_CODE=${SERVICE_PREFIX}@${DB_CODE%_test}
 
 :
 : Ensure the correct bin is found first in the path
 : =================================================
 :
 	export PATH="$EXO_HOME/bin:$PATH"
+
+:
+: Service code is APP_live@xxxxxxxx or APP_test@xxxxxxxx
+: ==========================================================
+:
+: Where APP defaults to exo
+: and xxxxxxxx is the database code WITHOUT any _test suffix
+:
+	if [ "${DB_CODE: -5}" = "_test" ]; then
+		SERVICE_SUFFIX=test
+	else
+		SERVICE_SUFFIX=live
+	fi
+:
+	FULL_SERVICE_CODE=${APP_CODE}_${SERVICE_SUFFIX}@${DB_CODE%_test}
 
 :
 :
@@ -60,13 +80,14 @@ set -eux
 : Stop the background process
 : ===========================
 :
-	sudo systemctl stop $SERVICE_CODE
+	sudo systemctl stop $FULL_SERVICE_CODE
 
 :
-: Select the database to use
-: ==========================
+: Select the database to use and request debugging
+: ================================================
 :
 	export EXO_DBNAME=$DB_CODE
+	export EXO_DEBUG=1
 
 :
 : Install gdb if necessary
@@ -75,17 +96,16 @@ set -eux
     which gdb || apt install -y gdb
 
 :
-: Start the server process
-: ========================
+: Start the server process under gdb
+: ==================================
 :
-	export EXO_DEBUG=1
-	gdb -ex "set print inferior-events off" -ex run --args serve_agy $OPTIONS
+	gdb -ex "set print inferior-events off" -ex run --args serve_${APP_CODE} $OPTIONS
 
 :
-: Resume the normal background service
-: ====================================
+: After debugging is finished, resume the normal background service
+: =================================================================
 :
-	sudo systemctl start $SERVICE_CODE
+	sudo systemctl start $FULL_SERVICE_CODE
 
 :
 : Finished debug of $SITE_DIR - $DB_CODE in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds
