@@ -21,7 +21,7 @@ set -eux
 : ====
 :
 	if [ "$LIVE_OR_TEST" != "test" ]; then
-		sudo systemctl $CMD ${APP_CODE}_live@$DB_CODE &
+		sudo systemctl $CMD ${APP_CODE}_live@$DB_CODE
 	fi
 
 :
@@ -29,6 +29,6 @@ set -eux
 : ====
 :
 	if [ "$LIVE_OR_TEST" != "live" ]; then
-		sudo systemctl $CMD ${APP_CODE}_test@$DB_CODE &
+		sudo systemctl $CMD ${APP_CODE}_test@$DB_CODE
 	fi
 
