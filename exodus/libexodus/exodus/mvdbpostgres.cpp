@@ -3235,6 +3235,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 						//partvalue.swapper(" ", "&");
 						//partvalue.splicer(-1, 0, ":*");
 
+						//treat entered colons as &
+						partvalue.swapper(":", "&");
+
 						//respect any user entered AND or OR operators
 						//search for all words STARTING with user defined words
 						partvalue.swapper("&", ":*&");

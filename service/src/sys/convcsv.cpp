@@ -48,7 +48,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	//BP AUDITINVS   perform then self call
 	//BP EXPORTADS   ditto
 	//BP MEDIADIARY2 ditto
-	//ABP DAYBOOKS   ditto
+	//ABP JOURNALS   ditto
 
 	#include <system_common.h>
 	//global ptr
@@ -114,6 +114,11 @@ function main(in sentence0, in select0="", in filters0="") {
 	var firstmvonly = sentencex.index(" FIRSTMVONLY");
 	if (firstmvonly) {
 		sentencex.swapper(" FIRSTMVONLY", "");
+	}
+
+	var mv1only = sentencex.index(" MV1ONLY");
+	if (mv1only) {
+		sentencex.swapper(" MV1ONLY", "");
 	}
 
 	var raw = sentencex.index(" RAW");
@@ -450,6 +455,10 @@ nextrec:
 	//get the record
 	if (not(RECORD.read(file, ID))) {
 		goto nextrec;
+	}
+
+	if (mv1only) {
+		mvx = 1;
 	}
 
 	MV = mvx;

@@ -80,7 +80,7 @@ THE SOFTWARE.
 	ISASSIGNED(VARNAME)                                                         \
 	if (!VARNAME.isnum())                                                       \
 		throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME) ^ " is " ^ \
-						   VARNAME.substr(1, 20).quote());
+						   VARNAME.substr(1, 128).quote());
 
 // in some bizarre case we cant show contents of variable so put the following line instead of the
 // last one above 	throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME));
@@ -114,13 +114,13 @@ THE SOFTWARE.
 //NB always try to convert strings to doubles first. in isnum()
 #define THISISNUMERIC() \
 	if (!this->isnum()) \
-		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1, 20).quote());
+		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1, 128).quote());
 
 //NB always try to convert strings to doubles first. in isnum()
 #define THISISDECIMAL()                                       \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
-						   this->substr(1, 20).quote());      \
+						   this->substr(1, 128).quote());      \
 	if (!(var_typ & VARTYP_DBL)) {                            \
 		var_dbl = double(var_int);                            \
 		var_typ |= VARTYP_DBL;                                \
@@ -130,7 +130,7 @@ THE SOFTWARE.
 #define THISISINTEGER()                                       \
 	if (!this->isnum())                                       \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
-						   this->substr(1, 20).quote());      \
+						   this->substr(1, 128).quote());      \
 	if (!(var_typ & VARTYP_INT)) {                            \
 		var_int = std::floor(var_dbl);                        \
 		var_typ |= VARTYP_INT;                                \

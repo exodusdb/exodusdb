@@ -6,6 +6,8 @@ function main(in yymm) {
 
 	//only used in accounting to convert YYMM->YYYYMM
 
+	//keep "centuryyear" in sync in frontend exodus.js
+	//and backend ADDCENT ADDCENT2 ADDCENT4
 	#define centuryyear_ 50
 
 	//linemark

@@ -118,7 +118,7 @@ function main(out bakpars, in process0=var()) {
 	var dbcode = process.a(17).lcase();
 	var dbcodes = process.a(58).lcase();
 
-	if (dbcodes) {
+	if (dbcodes and VOLUMES) {
 
 		//databases to be excluded
 		bakpars.r(8, "");

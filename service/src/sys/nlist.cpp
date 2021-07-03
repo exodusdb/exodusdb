@@ -1565,6 +1565,11 @@ nextrec:
 			goto nextrec;
 		}
 	}
+	//if @id='OX25637' then
+	//x=@record<50>
+	//oswrite @record on 'r'
+	//debug
+	//end
 
 	if (onlyauthorised) {
 		if (not(calculate("AUTHORISED"))) {

@@ -767,7 +767,7 @@ tryagain:
 		goto tryagain;
 
 	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 20) ^ "+= ");
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 //-=var (very similar to version with on rhs)
@@ -797,7 +797,7 @@ tryagain:
 		goto tryagain;
 
 	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 20) ^ "-= ");
+	throw MVNonNumeric(substr(1, 128) ^ "-= ");
 }
 
 // allow varx+=1.5 to compile
@@ -855,7 +855,7 @@ tryagain:
 		goto tryagain;
 
 	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 20) ^ "+= ");
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 //-=var
@@ -901,7 +901,7 @@ tryagain:
 		goto tryagain;
 
 	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 20) ^ "-= ");
+	throw MVNonNumeric(substr(1, 128) ^ "-= ");
 }
 
 //#endif
@@ -1264,7 +1264,7 @@ var MVplus(const var& var1) {
 	// non-numeric
 	ISNUMERIC(var1)
 	// will never get here
-	throw MVNonNumeric("+(" ^ var1.substr(1, 20) ^ ")");
+	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
 }
 
 //-var (identical to +var above except for two additional - signs)
@@ -1294,7 +1294,7 @@ var MVminus(const var& var1) {
 	// non-numeric
 	ISNUMERIC(var1)
 	// will never get here
-	throw MVNonNumeric("+(" ^ var1.substr(1, 20) ^ ")");
+	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
 }
 
 //! var
@@ -1364,14 +1364,14 @@ var MVdiv(const var& lhs, const var& rhs) {
 		// 1. double ... double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 									 "')");
 			return lhs.var_dbl / rhs.var_dbl;
 		}
 		// 2. double ... int
 		else {
 			if (!rhs.var_int)
-				throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 									 "')");
 			return lhs.var_dbl / rhs.var_int;
 		}
@@ -1379,14 +1379,14 @@ var MVdiv(const var& lhs, const var& rhs) {
 	// 3. int ... double
 	else if (rhs.var_typ & VARTYP_DBL) {
 		if (!rhs.var_dbl)
-			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 								 "')");
 		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
 	}
 	// 4. int ... int
 	else {
 		if (!rhs.var_int)
-			throw MVDivideByZero("div('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 								 "')");
 		return static_cast<double>(lhs.var_int) / rhs.var_int;
 	}
@@ -1430,14 +1430,14 @@ var MVmod(const var& lhs, const var& rhs) {
 		// 1. double ... double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 									 "')");
 			return exodusmodulus(lhs.var_dbl, rhs.var_dbl);
 		}
 		// 2. double ... int
 		else {
 			if (!rhs.var_int)
-				throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 									 "')");
 			return exodusmodulus(lhs.var_dbl, rhs.var_int);
 		}
@@ -1445,14 +1445,14 @@ var MVmod(const var& lhs, const var& rhs) {
 	// 3. int ... double
 	else if (rhs.var_typ & VARTYP_DBL) {
 		if (!rhs.var_dbl)
-			throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 								 "')");
 		return exodusmodulus(lhs.var_int, rhs.var_dbl);
 	}
 	// 4. int ... int
 	else {
 		if (!rhs.var_int)
-			throw MVDivideByZero("mod('" ^ lhs.substr(1, 20) ^ "', '" ^ rhs.substr(1, 20) ^
+			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 								 "')");
 		//return exodusmodulus(lhs.var_int, rhs.var_int);
 		return lhs.var_int % rhs.var_int;

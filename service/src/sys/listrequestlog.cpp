@@ -25,6 +25,7 @@ function main() {
 	var containing = PSEUDO.a(9);
 	var duration = PSEUDO.a(10);
 	var usercodes = PSEUDO.a(11);
+	var relocks = PSEUDO.a(12);
 
 	var cmd = "SORT REQUESTLOG BY SEQ";
 
@@ -56,7 +57,9 @@ function main() {
 		title ^= "'L'Filter : " ^ fromtime.oconv("MT") ^ " - " ^ uptotime.oconv("MT");
 	}
 
-	cmd ^= " %AND% WITH REQUEST1 NE \"RELOCK\"";
+	if (not relocks) {
+		cmd ^= " %AND% WITH REQUEST1 NE \"RELOCK\"";
+	}
 
 	if (containing) {
 

@@ -64,6 +64,13 @@ set -eux
 	./create_service exo exodus '' live
 
 :
+: Install required packages
+: =========================
+:
+:	whois is used in unknown ip no login notification emails
+	apt-get -y install whois
+
+:
 : Install html2pdf
 : ================
 :
@@ -76,7 +83,7 @@ set -eux
 	dpkg -i wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb || true
 	apt -y --fix-broken install
 :
-: Test html2pdf works
+: Verify html2pdf works
 :
 	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
 
@@ -84,4 +91,4 @@ set -eux
 : Finished install_all in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : ==============================================================
 :
-:	Apache should be listening on port 80 and 443
+:	Apache should now be listening on port 80 and 443
