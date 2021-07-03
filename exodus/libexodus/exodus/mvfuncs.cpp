@@ -1692,7 +1692,10 @@ bool var::isnum(void) const {
 	//very long strings, even if numeric, are deemed not numeric because they cannot be converted to double/long int
 	//if (strlen > 30) {
 	//allow "-0.0000000000009094947017729282" which can come from a calculation on doubles producing a double
-	if (strlen > 31) {
+	//allow "-0.00000000000004263256414560601" which can come from
+	//if (strlen > 31) {
+	//allow "-0.00000000000004263256414560601" which can come from a calculation on doubles producing a double
+	if (strlen > 32) {
 		this->var_typ = VARTYP_NANSTR;
 		return false;
 	}

@@ -1180,6 +1180,7 @@ function main(in mode) {
 							body.r(1, -1, baselinkdescs.a(1, linkn) ^ " " ^ baselinks.a(1, linkn));
 							//if @account='ACCOUNTS' then body:='?ACCOUNTS'
 						} //linkn;
+						body.swapper("Internet Explorer", "MS Edge");
 					} else {
 						body.r(1, -1, "Please contact your IT support or colleagues");
 					}
@@ -1190,7 +1191,7 @@ function main(in mode) {
 					body.r(1, -1, "http://userwiki.neosys.com/index.php/resettingpassword");
 
 					//in security.subs and listen2
-					body ^= VM;
+					//body:=vm
 					body.r(1, -1, "Browser Configuration *REQUIRED*");
 					body.r(1, -1, "http://userwiki.neosys.com/index.php/gettingstarted");
 

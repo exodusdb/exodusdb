@@ -2265,7 +2265,7 @@ badwrite:
 			//is the above true? because unlock just below will
 			//remove the lock file record
 			//and actually the unlock will fail if it cannot true lock the record
-			//daybook.subs4 unlocks and it works fine and will leave lock hanging if it does not
+			//journal.subs4 unlocks and it works fine and will leave lock hanging if it does not
 			if (ID ne keyx) {
 
 				gosub unlock();

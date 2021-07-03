@@ -7,6 +7,8 @@ function main(in type, in in0, in mode, out outx) {
 	//c sys in,in,in,out
 	//global inx
 
+	//keep "centuryyear" in sync in frontend exodus.js
+	//and backend ADDCENT ADDCENT2 ADDCENT4
 	#define centuryyear_ 50
 
 	//avoid c++ warning about unused variable
@@ -40,7 +42,7 @@ noconv:
 		//-3    1997
 		if (inx.isnum() and inx le 0) {
 			inx += 2000;
-			}
+		}
 
 		//not pure digits - no conv
 		if (not(inx.match("^\\d*$"))) {

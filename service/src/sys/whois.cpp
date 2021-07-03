@@ -81,7 +81,7 @@ returnzero:
 	//check cygwin whois present otherwise quit
 	//WARNING TODO: check ternary op following;
 	exe = oscwd().index(":") ? ".exe" : "";
-	if (not((cmd ^ "whois" ^ exe).osfile())) {
+	if (VOLUMES and (not((cmd ^ "whois" ^ exe).osfile()))) {
 		text = "whois command is not installed";
 		return 0;
 	}

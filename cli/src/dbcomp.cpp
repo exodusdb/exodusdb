@@ -25,15 +25,19 @@ programinit()
 
 	int nerrors = 0;
 
+	var exclude_filenames="dict_all";
 	var filenames = COMMAND.field(FM, 4, 9999);
-	if (not filenames)
+	if (not filenames) {
 		filenames = db1.listfiles();
+		//TODO get from command line somehow to avoid hardcoding
+		exclude_filenames ^= _VM_ "processes" _VM_ "locks" _VM_ "statistics" _VM_ "requestlog";
+	}
 	for (var filename : filenames) {
 
 		if (not silent)
 			outputl("\n", filename);
 
-		if (filename.substr(1,10) eq "preselect_" or filename.substr(1,14) eq "select_stage2_" or filename eq "dict_all" or filename eq "processes")
+		if (filename.substr(1,10) eq "preselect_" or filename.substr(1,14) eq "select_stage2_" or locate(filename,exclude_filenames))
 			continue;
 
 		var file1;

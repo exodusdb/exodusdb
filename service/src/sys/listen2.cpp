@@ -107,11 +107,10 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		//determine username from emailaddress
 		//only for users with single, unique emails
 		if (passwordreset) {
-			var tt = SECURITY.ucase();
+			var tt = SECURITY.a(7).ucase();
 			//password is email address when resetting
-			if (tt.a(7).locate(password.ucase(), usern)) {
+			if (tt.locate(password.ucase(), usern)) {
 				//only if email address occurs more than once
-				tt = tt.a(7);
 				tt.r(1, usern, "");
 				tt.converter("; ", VM);
 				if (not(tt.locate(password.ucase(), xx))) {
@@ -661,7 +660,7 @@ validateexit2:
 				text = "Password&nbsp;Reset Failed:" "\r\n";
 				//text:=crlf:'1. ':password:' not known'
 				//text:=crlf:'2. no email known for ':username
-				text ^= "\r\n" ^ password ^ " and " ^ username ^ " are both unrecognised";
+				text ^= "\r\n" ^ password ^ " and " ^ username ^ " are unrecognised or expired";
 				text ^= "\r\n" " Database: " ^ SYSTEM.a(17);
 			} else {
 				text = invalidlogin;
@@ -693,7 +692,9 @@ validateexit2:
 						//!if password is one of users email addresses
 						//!locate ucase(password) in ucase(@record<7>) using ';' setting xx then
 						//ONLY if user has an email address
-						if (RECORD.a(7)) {
+						//and account is not expired
+						var expirydate = RECORD.a(35);
+						if (RECORD.a(7) and ((expirydate eq "" or expirydate gt var().date()))) {
 
 							//signify ok
 							passwordreset = 2;

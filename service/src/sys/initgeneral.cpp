@@ -631,6 +631,10 @@ nextreport:
 	tt2 = 1;
 	gosub getsystem();
 
+	//c++ only
+	SYSTEM.r(58,oslistd("../data/").convert(FM,VM));
+	SYSTEM.fieldstorer(FM, 59, 5, "");
+
 	call log2("*restore session parameters", logtime);
 	//restore IMMEDIATELY to avoid bugs creeping in
 	SYSTEM.r(33, oldsystem.a(33));

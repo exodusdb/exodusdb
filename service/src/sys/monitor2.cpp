@@ -50,7 +50,7 @@ var bakpars;
 var descriptions;
 var status0123;//num
 var ndbases;
-var nok;
+var nok;//num
 var description;
 var minreq;
 var nhung;
@@ -60,7 +60,7 @@ var voc;
 var xx;
 var dbasesystem;
 var nmaint;
-var backupdrive;//num
+var backupdrive;
 var tpath;
 var paramrec;
 var home;
@@ -291,6 +291,7 @@ nextprocess:
 		if (VOLUMES) {
 			status = calculate("STATUS");
 		} else {
+			//TODO work out status of exodus processes
 			status = "OK";
 		}
 		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
@@ -324,7 +325,7 @@ nextprocess:
 				//backpars 12 (upload backup target) can be 0 to suppress
 				if (bakpars.a(12) and bakpars.a(12) ne bakpars.a(7)) {
 					tt.r(1, 1, 2, bakpars.a(12));
-				}
+					}
 				//backuptime
 				if (tt) {
 					tt.r(1, 1, 3, bakpars.a(3));
@@ -356,6 +357,9 @@ nextprocess:
 
 		//show nok (number ok)
 		nok = processcount.a(1, dbasen);
+		if (not(nok) and not(VOLUMES)) {
+			nok = 1;
+		}
 		description = dbasecode;
 		//if nok then description:=' ':nok:':Ok'
 		if (nok gt 1) {
@@ -471,11 +475,11 @@ nextprocess:
 		//Critical for more
 		backupdrive = backuprequired.a(1, dbasen, 1).ucase();
 		if (not(VOLUMES)) {
-			backupdrive = 1;
+			backupdrive = dbasecode.substr(-5, 5) ne "_test";
 		}
 		if (backupdrive) {
 
-	//uncomment to test non-existant drive
+	//uncomment to test non-existent drive
 	//backupdrive='1'
 			description ^= " Backup->" ^ backupdrive;
 			tpath = "../data/" ^ dbasecode.lcase() ^ "/params2";

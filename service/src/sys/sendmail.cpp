@@ -505,19 +505,28 @@ forcedemail:
 		errorfilename.osdelete();
 	}
 
+	var details = "To:       " ^ toaddress;
+	if (ccaddress) {
+		details.r(-1, "cc:       " ^ ccaddress);
+	}
+	details.r(-1, "Subject:  " ^ subject);
+	details.r(-1, "Size:     " ^ oconv(msgsize, "[XBYTES]"));
+
 	errormsg.r(1, errormsg.a(1).trim());
 	//in what situation can it return OK+message ??
 	if (errormsg.a(1) eq "OK") {
 		errormsg.remover(1);
+		call log("SENDMAIL", details);
 	} else {
 		errormsg = trim(errormsg, FM, "B");
-		errormsg.r(-1, FM ^ "Size:     " ^ oconv(msgsize, "[XBYTES]"));
-		errormsg.r(-1, "From:     " ^ params1.a(1));
-		errormsg.r(-1, "To:       " ^ toaddress);
-		if (ccaddress) {
-			errormsg.r(-1, "cc:       " ^ ccaddress);
-		}
-		errormsg.r(-1, "Server:   " ^ params1.a(2));
+		//errormsg<-1>=@fm:'Size:     ':msgsize '[XBYTES]'
+		//errormsg<-1>='From:     ':params1<1>
+		//errormsg<-1>='To:       ':toaddress
+		//if ccaddress then
+		// errormsg<-1>='cc:       ':ccaddress
+		// end
+		errormsg.r(-1, FM ^ details);
+		errormsg.r(-1, FM ^ "Server:   " ^ params1.a(2));
 		errormsg.r(-1, "Port:     " ^ params1.a(3));
 		errormsg.r(-1, "UseSSL:   " ^ params1.a(5));
 		errormsg.r(-1, "AuthType: " ^ params1.a(6));

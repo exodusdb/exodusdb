@@ -10,7 +10,7 @@ function main(in input0, out unitx) {
 	var inputx = input0;
 	//convert ' ABCDEFGHIJKLMNOPQRSTUVWXYZ' to '' in inputx
 	//patsalides db PT0303 base currency code contains $,
-	//must be removed otherwise B16 in daybook.subs4
+	//must be removed otherwise B16 in journal.subs4
 	inputx.converter(" ABCDEFGHIJKLMNOPQRSTUVWXYZ$", "");
 
 	return inputx;

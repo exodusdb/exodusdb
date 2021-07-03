@@ -14,6 +14,12 @@ var gdateyearpos
 var gdateformat
 var gfirstdayofweek
 
+//keep "centuryyear" in sync in frontend exodus.js
+//and backend ADDCENT ADDCENT2 ADDCENT4
+//00-49 <-> 2000-2049
+//50-99 <-> 1950-1999
+var gcenturyyear = 50
+
 //returns an array of unique array elements from an array (removes duplicates)
 Array.prototype.exodusunique = function exodusunique(removeempty) {
     var uniquecodes = []
@@ -1638,10 +1644,6 @@ function exodusaddcentmethod(type) {
 //since 2001 could be YYMM or YYYY
 function ADDCENT(type, input, mode) {
 
-    //00-89 <-> 2000-2089
-    //90-99 <-> 1990-1999
-    var centuryyear = 90
-
     //cater for direct call (not via oconv)
     if (type != 'OCONV' && type != 'ICONV') {
         input = type
@@ -1699,7 +1701,7 @@ function ADDCENT(type, input, mode) {
     input2 = input.substr(0, 2)
 
     if (input.length < 4) {
-        out = ((parseInt(input2, 10) < centuryyear) ? '20' : '19') + input
+        out = ((parseInt(input2, 10) < gcenturyyear) ? '20' : '19') + input
     }
     else {
         out = input
@@ -1712,8 +1714,6 @@ function ADDCENT(type, input, mode) {
 }
 
 function CENTURY(type, input, mode) {
-
-    var centuryyear = 90
 
     //cater for direct call (not via oconv)
     if (type != 'OCONV' && type != 'ICONV') {
@@ -1744,7 +1744,7 @@ function CENTURY(type, input, mode) {
     input2 = input.substr(0, 2)
 
     if (input.length < 4) {
-        out = ((parseInt(input2, 10) <= centuryyear) ? '20' : '19') + input
+        out = ((parseInt(input2, 10) <= gcenturyyear) ? '20' : '19') + input
     }
 
     if (type == 'ICONV' && mode == '2') out = out.substr(2, 2)

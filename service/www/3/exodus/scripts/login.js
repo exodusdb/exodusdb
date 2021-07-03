@@ -78,10 +78,14 @@ function* formfunctions_onload() {
     else {
         //gsystem=ghref[2]
         //if (!gsystem) gsystem='ADAGENCY'
-        datasetcode = exodusgetcookie2('dataset', 'EXODUS', '')
+        datasetcode = exodusgetcookie('EXODUS','dataset')
         //guess/default the datasetcode to the first part of the domain name for the first time or after clearing cookies
-        if (!datasetcode)
-            datasetcode = window.location.host.toString().split('.')[0].toUpperCase().substr(0,8)
+        if (!datasetcode) {
+            //datasetcode = window.location.host.toString().split('.')[0].toUpperCase().substr(0,8)
+            datasetcode = window.location.host.toString().split('.')[0]
+            if (typeof exodusgetcookie == 'undefined')
+                datasetcode = datasetcode.substr(0,8).toUpperCase()
+        }
         yield* exodussetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
         if (startinglocation != 'login' && exodusgetcookie2('a', 'EXODUS', '') == 'true') {
             gusername_element.value = exodusgetcookie2('u', 'EXODUS', '')
@@ -200,6 +204,9 @@ function* login_onclick() {
     //exoduscancelevent(event)
 
     var datasetx = exodusgetdropdown(gdataset_element)
+
+    if (datasetx.substr(-4,4).toUpperCase() != 'TEST')
+       exodussetcookie('EXODUS','dataset',datasetx,'',true)
 
     if (!gusername_element.value) {
         //  alert('Please enter your username first')

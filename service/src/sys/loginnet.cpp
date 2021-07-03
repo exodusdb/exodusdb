@@ -13,7 +13,6 @@ var taskn;//num
 var xx;
 var menun2;
 var compcodex;
-var msg0;
 var paramrec;
 
 function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
@@ -161,10 +160,10 @@ nextcomp:
 			//if validcode1(compcode,'','',xx,yy) then compcodes<-1>=compcode
 			//dont use general subroutine in system module
 			var companypositive = "";
-			if (not(authorised("COMPANY ACCESS", msg0, ""))) {
+			if (not(authorised("COMPANY ACCESS", xx, ""))) {
 				companypositive = "#";
 			}
-			if (authorised(companypositive ^ "COMPANY ACCESS " ^ (compcode.quote()), msg, "")) {
+			if (authorised(companypositive ^ "COMPANY ACCESS " ^ (compcode.quote()), xx, "")) {
 				compcodes.r(-1, compcode);
 			}
 
