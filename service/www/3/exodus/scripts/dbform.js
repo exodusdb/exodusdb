@@ -6628,8 +6628,8 @@ function* validate(element) {
             //remove all non-printing ASCII characters (eg tab) from key fields
             gvalue = gvalue.replace(/[\x00-\x1F]/g, '')
 
-            //prevent anything that is effectively 0
-            if (exodusnum(gvalue) && !Number(gvalue)) {
+            //prevent anything that is effectively 0 unless it is a checkbox
+            if (element.type != 'checkbox' && exodusnum(gvalue) && !Number(gvalue)) {
                 yield* exodusinvalid(elementtitle + ' cannot be zero')
                 return false //logout('validate')
             }
