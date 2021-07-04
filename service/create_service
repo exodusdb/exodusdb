@@ -5,18 +5,18 @@ set -eux
 : Create/Recreate an EXODUS service
 : =================================
 :
-:	'Syntax is ./db_code create_service <APP_CODE> <HOST_DIR> "[DB_CODE]" {live|test}'
+:	'Syntax is ./create_service <APP_CODE> <HOST_DIR> "[BASE_DB_CODE]" {live|test}'
 :
 :	'e.g.      ./create_service exo exodus "" live'
 :	'e.g.      ./create_service agy watermelon "" test'
 
 	APP_CODE=$1
 	HOST_DIR=$2
-	DB_CODE=${3:-${HOST_DIR}}
+	BASE_DB_CODE=${3:-${HOST_DIR}}
 	LIVE_OR_TEST=${4}
 :
 	SERVICE_CODE=${APP_CODE}_$LIVE_OR_TEST
-	FULL_SERVICE_CODE=$SERVICE_CODE@${DB_CODE}
+	FULL_SERVICE_CODE=$SERVICE_CODE@${BASE_DB_CODE}
 
 :
 : Check syntax
@@ -36,11 +36,12 @@ set -eux
 		export EXO_HOME=$HOME
 		export IDB_CODE=%i_test
 		export IDB_CODES=%i_test
+		export FULL_DB_CODE=${BASE_DB_CODE}_test
 	else
 		export EXO_HOME=$HOME/live
-#		export DB_CODES="$DB_CODE $DB_CODE $DB_CODE"
 		export IDB_CODE="%i"
 		export IDB_CODES="%i %i %i"
+		export FULL_DB_CODE=${BASE_DB_CODE}
 	fi
 :
 
@@ -57,20 +58,6 @@ set -eux
 	if [ $WORK_DIR1 != $WORK_DIR3 ]; then
 		test -d $WORK_DIR3 || ln -s $HOST_DIR1 $HOST_DIR3
 	fi
-:
-#: Start logging
-#: =============
-#mkdir /var/log/neo -p
-#touch /var/log/neo/$DB_CODE.log
-##ls -alth /var/log/syslog
-#sudo chown syslog:adm /var/log/neo/$DB_CODE.log
-#:
-#cat > /etc/rsyslog.d/$SERVICE_CODE.conf << V0G0N
-#if \$programname == '$SERVICE_CODE' then /var/log/neo/$DB_CODE.log
-#& stop
-#V0G0N
-#:
-#sudo service rsyslog restart
 
 :
 : Check the server program and work directory are actually available
@@ -159,12 +146,12 @@ V0G0N
     which setfacl || apt install -y acl
 
 :
-: Ensure directory permissions on data/$DB_CODE
+: Ensure directory permissions on data/$FULL_DB_CODE
 : ==============================================
 :
 : IDENTICAL code in create_site and create_service. KEEP IN SYNC
 :
-	DB_DIR=~/hosts/$HOST_DIR/data/$DB_CODE
+	DB_DIR=~/hosts/$HOST_DIR/data/$FULL_DB_CODE
 	mkdir -p $DB_DIR
 	chmod a+srw $DB_DIR
 	setfacl -d -m g::rw $DB_DIR
@@ -179,7 +166,7 @@ V0G0N
 :
 : sudo service $FULL_SERVICE_CODE {start/stop/restart/status}
 :  or
-: ./debug $DB_CODE
+: ./debug $BASE_DB_CODE
 :  or
 : cd $WORK_DIR1
 : 'export PATH=$PATH:$HOME/neo/bin'
