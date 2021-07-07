@@ -1695,7 +1695,11 @@ bool var::isnum(void) const {
 	//allow "-0.00000000000004263256414560601" which can come from
 	//if (strlen > 31) {
 	//allow "-0.00000000000004263256414560601" which can come from a calculation on doubles producing a double
-	if (strlen > 32) {
+	//if (strlen > 32) {
+    //allow "-0.000000000000018207657603852567"
+	//if (strlen > 33) {
+	//play safe
+	if (strlen > 48) {
 		this->var_typ = VARTYP_NANSTR;
 		return false;
 	}

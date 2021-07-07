@@ -2156,7 +2156,8 @@ exodus_call:
 	ismv = ismv1;
 
 	// vector (for GIN or indexing/filtering multivalue fields)
-	if ((ismv1 and !forsort) || fieldname.substr(-5).ucase() == "_XREF") {
+	//if ((ismv1 and !forsort) || fieldname.substr(-5).ucase() == "_XREF") {
+	if ((ismv1 and !forsort) || fieldname.substr(-4).ucase() == "XREF") {
 		//this is the sole creation of to_tsvector in mvdbpostgres.cpp
 		//it will be used like to_tsvector(...) @@ to_tsquery(...)
 		sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";

@@ -205,6 +205,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		}
 		if (ioconv.index("[DATE")) {
 			sqltype = "DATE";
+            ioconvs(fieldn) = "D";
 		}
 		else if (ioconv.index("[TIME")) {
 			sqltype = "TIME";//TODO check if works
@@ -304,6 +305,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 							break;
 						case 5:	 // >=
 							ok = ivalue >= reqivalues(fieldn);
+							//TRACE(ivalue ^ " " ^ reqivalues(fieldn) ^ " " ^ ok)
 							break;
 						case 6:	 // <=
 							ok = ivalue <= reqivalues(fieldn);
@@ -397,7 +399,9 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 
 		//insertsql.outputl();
 
-		CURSOR.sqlexec(insertsql);
+		if (not CURSOR.sqlexec(insertsql)) {
+			insertsql.errputl("Error inserting pass2 record:");
+		}
 
 		//option to limit number of records returned
 		++recn;

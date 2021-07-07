@@ -1811,8 +1811,8 @@ recexit:
 				}
 
 				//colored cells starting with ESC
-				if (tt[1] eq "\x1B") {
-					if (tt.substr(1, 2) eq ("\x1B" "\x1B")) {
+				if (tt[1] eq "\x19") {
+					if (tt.substr(1, 2) eq ("\x19" "\x19")) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.length()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
