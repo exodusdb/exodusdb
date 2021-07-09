@@ -183,6 +183,18 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	if (verbose)
 		functionsql.outputl();
 
+	//delete index if function has changed
+	var reindexrequired = false;
+	var oldfunction;
+	var functionname=field(functionname_and_args,"(",1).lcase();
+	var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'",oldfunction);
+	oldfunction.substrer(oldfunction.index("\n")+1);
+	if (oldfunction and not functionsql.index(oldfunction)) {
+		reindexrequired = true;
+		TRACE(functionsql)
+		TRACE(oldfunction)
+	}
+
 	var errmsg;
 	var().sqlexec(functionsql, errmsg);
 
@@ -193,14 +205,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 		if (verbose)
 			dropsql.outputl();
 
-		//drop any index using the previous function
-		//TODO identify file/fields like production_orders_date_time
-		//var filename=functionname_and_args.field("_",2);
-		//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
-		var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
-		var fieldname = filename.convert(LOWERCASE, "").trim("_");
-		filename = filename.convert(UPPERCASE, "").trim("_");
-		filename.deleteindex(fieldname);
+		reindexrequired = true;
 
 		var().sqlexec(dropsql, errmsg);
 		errmsg.outputl();
@@ -219,6 +224,23 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 		}
 		errmsg.outputl();
 	}
+	if (reindexrequired) {
+		//drop any index using the previous function
+		//TODO identify file/fields like production_orders_date_time
+		//var filename=functionname_and_args.field("_",2);
+		//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
+		var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
+		var fieldname = filename.convert(LOWERCASE, "").trim("_");
+		filename = filename.convert(UPPERCASE, "").trim("_");
+		if (filename.listindexes(filename,fieldname)) {
+			logputl("Deleting index " ^ filename ^ " " ^ fieldname);
+			filename.deleteindex(fieldname);
+			logputl("Creating index " ^ filename ^ " " ^ fieldname);
+			filename.createindex(fieldname);
+
+		}
+	}
+
 	return;
 }
 
