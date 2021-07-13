@@ -59,48 +59,19 @@ function main() {
 	} else
 		filenames = var().listfiles();
 
-	//create global view of all dicts in "dict_all"
-	var viewsql = "";
-	if (doall)
-		viewsql ^= "CREATE MATERIALIZED VIEW dict_all AS\n";
-
-	//do one or many/all files
-	int nfiles = dcount(filenames, FM);
-	for (int filen = 1; filen <= nfiles; ++filen)
-		onefile(filenames.a(filen), dictid, viewsql);
-
 	//quit if not doing all files
 	/////////////////////////////
-	if (!doall)
-		return 0;
+	if (doall) {
 
-	var().sqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;");
+		var().sqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;");
 
-	var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_time_array(data text, fn int, vn int, sn int);");
-	//create dict_all file
+		var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_time_array(data text, fn int, vn int, sn int);");
+		//create dict_all file
 
-	//ignore error if doesnt exist
-	if (not var().sqlexec("DROP MATERIALIZED VIEW dict_all"))
-		var().sqlexec("DROP VIEW dict_all");
+		//create exodus pgsql functions
 
-	if (nfiles) {
-		viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
-		var errmsg;
-		if (verbose)
-			viewsql.output("SQL:");
-		if (var().sqlexec(viewsql, errmsg))
-			printl("dict_all file created");
-		else {
-			if (not verbose)
-				viewsql.outputl("SQL:");
-			errmsg.outputl("Error:");
-		}
-	}
-
-	//create exodus pgsql functions
-
-	var sqltemplate =
-		R"V0G0N(
+		var sqltemplate =
+			R"V0G0N(
 CREATE OR REPLACE FUNCTION
 $functionname_and_args
 RETURNS $return_type
@@ -117,46 +88,80 @@ DEFINER
 COST 10;
 )V0G0N";
 
-	//exodus_trim (leading, trailing and excess inner spaces)
-	var trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
-	do_sql("exodus_trim(data text)", "text", trimsql, sqltemplate);
+		//exodus_trim (leading, trailing and excess inner spaces)
+		var trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
+		do_sql("exodus_trim(data text)", "text", trimsql, sqltemplate);
 
-	//exodus_field_replace (a field)
-	do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
+		//exodus_field_replace (a field)
+		do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
 
-	//exodus_field_remove (a field)
-	do_sql("exodus_field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
+		//exodus_field_remove (a field)
+		do_sql("exodus_field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
 
-	//exodus_split 123.45USD -> 123.45
-	do_sql("exodus_split(data text)", "text", split_sql, sqltemplate);
+		//exodus_split 123.45USD -> 123.45
+		do_sql("exodus_split(data text)", "text", split_sql, sqltemplate);
 
-	//exodus_unique (fields)
-	//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
-	do_sql("exodus_unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
+		//exodus_unique (fields)
+		//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
+		do_sql("exodus_unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
 
-	//exodus_locate -> int
-	do_sql("exodus_locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
+		//exodus_locate -> int
+		do_sql("exodus_locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
 
-	//exodus_isnum -> bool
-	do_sql("exodus_isnum(instring text)", "bool", isnum_sql, sqltemplate);
+		//exodus_isnum -> bool
+		do_sql("exodus_isnum(instring text)", "bool", isnum_sql, sqltemplate);
 
-	//exodus_tobool -> bool
-	do_sql("exodus_tobool(instring text)", "bool", tobool_sql, sqltemplate);
+		//exodus_tobool(text) -> bool
+		do_sql("exodus_tobool(instring text)", "bool", text_tobool_sql, sqltemplate);
 
-	//exodus_date -> int (today's date as a number according to pickos)
-	do_sql("exodus_date()", "int", exodus_todays_date_sql, sqltemplate);
+		//exodus_tobool(numeric) -> bool
+		do_sql("exodus_tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
 
-	//exodus_extract_date_array -> date[]
-	do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
+		//exodus_date -> int (today's date as a number according to pickos)
+		do_sql("exodus_date()", "int", exodus_todays_date_sql, sqltemplate);
 
-	//return time as interval which can handle times like 25:00
-	//exodus_extract_time_array -> time[]
-	//do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
-	//exodus_extract_time_array -> time[]
-	do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
+		//exodus_extract_date_array -> date[]
+		do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
 
-	//exodus_addcent4 -> text
-	do_sql("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
+		//return time as interval which can handle times like 25:00
+		//exodus_extract_time_array -> time[]
+		//do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
+		//exodus_extract_time_array -> time[]
+		do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
+
+		//exodus_addcent4 -> text
+		do_sql("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
+	}
+
+	//create global view of all dicts in "dict_all"
+	var viewsql = "";
+	if (doall)
+		viewsql ^= "CREATE MATERIALIZED VIEW dict_all AS\n";
+
+	//do one or many/all files
+	int nfiles = dcount(filenames, FM);
+	for (int filen = 1; filen <= nfiles; ++filen)
+		onefile(filenames.a(filen), dictid, viewsql);
+
+	if (doall) {
+		//ignore error if doesnt exist
+		if (not var().sqlexec("DROP MATERIALIZED VIEW dict_all"))
+			var().sqlexec("DROP VIEW dict_all");
+
+		if (nfiles) {
+			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
+			var errmsg;
+			if (verbose)
+				viewsql.output("SQL:");
+			if (var().sqlexec(viewsql, errmsg))
+				printl("dict_all file created");
+			else {
+				if (not verbose)
+					viewsql.outputl("SQL:");
+				errmsg.outputl("Error:");
+			}
+		}
+	}
 
 	return 0;
 }
@@ -191,8 +196,8 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	oldfunction.substrer(oldfunction.index("\n")+1);
 	if (oldfunction and not functionsql.index(oldfunction)) {
 		reindexrequired = true;
-		TRACE(functionsql)
-		TRACE(oldfunction)
+		//TRACE(functionsql)
+		//TRACE(oldfunction)
 	}
 
 	var errmsg;
@@ -811,7 +816,7 @@ END;
 )V0G0N";
 
 //exodus_tobool -> bool
-var tobool_sql =
+var text_tobool_sql =
 	R"V0G0N(
 DECLARE
  tt numeric;
@@ -835,6 +840,14 @@ tt = $1::NUMERIC;
 EXCEPTION WHEN others THEN
  RETURN TRUE;
 
+END;
+)V0G0N";
+
+//exodus_tobool(numeric) -> bool
+var numeric_tobool_sql =
+	R"V0G0N(
+BEGIN
+ return $1 != 0;
 END;
 )V0G0N";
 

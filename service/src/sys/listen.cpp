@@ -842,7 +842,7 @@ nextsearch0:
 		//delay closedown randomly to avoid conflict with identically configured processes
 		call ossleep(1000*var(10).rnd());
 
-		dow = (var().date() - 1) % 7 + 1;
+		dow = (var().date() - 1).mod(7) + 1;
 
 		//optionally perform backup and/or shutdown and not backed up today
 		if (bakpars.a(9)) {
@@ -1616,7 +1616,7 @@ cannotopenlinkfile2:
 		//tt=''
 		//call program.stack(tt)
 		//tt=count(tt,fm)+1:'/':count(tt,fm)+1
-		tt = " " ^ oconv((responsetime - requesttime) % 86400, "[NUMBER,2]") ^ "s ";
+		tt = " " ^ oconv((responsetime - requesttime).mod(86400), "[NUMBER,2]") ^ "s ";
 		//seconds
 		tt ^= rawresponse.a(1, 1).field("|", 1).a(1, 1);
 		if (tt.index("<")) {

@@ -5,23 +5,23 @@ set -eux
 : Backup a postgres database
 : ==========================
 :
-:	'Syntax is ./backup_db <EXO_DBNAME> [<BACKUPDIR>]'
+:	'Syntax is:'
+:
+:	' ./backup_db <EXO_DBNAME> [<OPTIONS>...] [<BACKUPDIR>]'
+:
+:	'<OPTIONS> are (B)ackup, (R)estore, (V)erify, (S)tart'
+:	'          defaults to BRVS'
+:
 :	'<BACKUPDIR> defaults to ~/backups/sql'
 :
+:	'e.g.'
+:
+:	' ./backup_db mgg'
+:	' ./backup_db mgg BRVS'
+:
 	EXO_DBNAME=$1
-	NEW_BACKUP_DIR=${2:-~/backups/sql}
-
-	RESTART=Y
-
-:
-: Check Syntax
-: ============
-:
-	if [ -z "$EXO_DBNAME"  -o  -z "$NEW_BACKUP_DIR" ]; then
-		set +x
-		echo 'Syntax is wrong. Cannot continue.'
-		exit 1
-	fi
+	OPTIONS=${2:-BRVS}
+	NEW_BACKUP_DIR=${3:-~/backups/sql}
 
 :
 : Ensure target directory exists
@@ -33,30 +33,36 @@ set -eux
 : Dump the database SQL and zip it
 : ================================
 :
-	set -o pipefail
-	#NCPUS=`grep -c processor /proc/cpuinfo`
-	sudo -u postgres pg_dump $EXO_DBNAME | gzip > $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part
-	mv $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz
-
-:
-: Restore without restarting
-: ==========================
-:
-	./restore_db $EXO_DBNAME "$NEW_BACKUP_DIR" "N"
-
-:
-: Compare and flag success if ok
-: ==============================
-:
-	if dbcomp $EXO_DBNAME ${EXO_DBNAME}_test {S}; then
-		touch "$HOME/hosts/$EXO_DBNAME/data/$EXO_DBNAME/params2"
+	if [[ $OPTIONS =~ "B" ]]; then
+		set -o pipefail
+		#NCPUS=`grep -c processor /proc/cpuinfo`
+		sudo -u postgres pg_dump $EXO_DBNAME | gzip > $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part
+		mv $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz
 	fi
 
 :
-: Optionally restart the target database
-: ======================================
+: Optionally restore into ${EXO_DBNAME}_test - without restarting it afterwards
+: =============================================================================
 :
-	if [ "$RESTART" != "N" ]; then
+	if [[ $OPTIONS =~ "R" ]]; then
+		./restore_db $EXO_DBNAME "$NEW_BACKUP_DIR" "N"
+	fi
+
+:
+: Optionally Compare and flag success if ok
+: =========================================
+:
+	if [[  $OPTIONS =~ "V" ]]; then
+		if dbcomp $EXO_DBNAME ${EXO_DBNAME}_test {S}; then
+			touch "$HOME/hosts/$EXO_DBNAME/data/$EXO_DBNAME/params2"
+		fi
+	fi
+
+:
+: Optionally restart the target TEST database ${EXO_DBNAME}_test
+: ==============================================================
+:
+	if [[ $OPTIONS =~ "S" ]]; then
 		./service ${EXO_DBNAME} start test
 	fi
 

@@ -288,7 +288,7 @@ nextuser:
 		call log2("*trim requestlog", logtime);
 
 		//only run on saturdays and only run once per day per installation
-		if ((var().date() - 1) % 7 + 1 ne 6) {
+		if ((var().date() - 1).mod(7) + 1 ne 6) {
 			return 0;
 		}
 

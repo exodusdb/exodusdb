@@ -51,7 +51,7 @@ function main(in type, in inx, in mode, out outx) {
 		if (SW.a(1)) {
 			in2 = (in2 + SW.a(1) + 0.5).floor();
 			var in2orig = in2;
-			in2 = in2 % 86400;
+			in2 = in2.mod(86400);
 			if (in2 lt in2orig) {
 				in1 += 1;
 			} else if (in2 gt in2orig) {

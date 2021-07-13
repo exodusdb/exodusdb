@@ -61,6 +61,8 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		////////////
 	}
 
+	TRACE(sortselectclause)
+
 	//stage 2
 	/////////
 
@@ -203,7 +205,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		if (ioconv.index("[NUMBER")) {
 			sqltype = "NUMERIC";
 		}
-		if (ioconv.index("[DATE")) {
+		else if (ioconv.index("[DATE")) {
 			sqltype = "DATE";
             ioconvs(fieldn) = "D";
 		}
@@ -217,6 +219,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 			sqltype = "TEXT";
 		}
 		sqltypes(fieldn) = sqltype;
+		//TRACE(dictid^" "^ioconv^" "^sqltype)
 
 		//sql temp table column
 		createtablesql ^= " " ^ sqlcolid ^ " "^ sqltype ^ ",";

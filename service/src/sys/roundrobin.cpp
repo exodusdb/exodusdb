@@ -102,13 +102,13 @@ function main(in mode, in params, io result, io msg) {
 		//nb start from lastperiodn+1 to avoid clearing current period multiple times
 		//ie clear only on the first time that we arrive in it
 		for (var periodn = lastperiodn + 1; periodn <= currentperiodn; ++periodn) {
-			roundrobin.r(2, periodn % periodsperwindow_ + 1, "");
+			roundrobin.r(2, periodn.mod(periodsperwindow_) + 1, "");
 		} //periodn;
 
 		//record the current period as the last period so that in the next call
 		//we can clear skipped periods (but not the current period again)
 		roundrobin.r(1, currentperiodn);
-		var currentbreakn = currentperiodn % periodsperwindow_ + 1;
+		var currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
 
 		if (roundrobin.a(2).sum() lt maxeventsperwindow_) {
 

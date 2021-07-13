@@ -41,7 +41,7 @@ function main(in type, in input0, in mode0, out output) {
 			//output=OCONV(INPUT0,modex)
 			//output=OCONV(INPUT0,mode)
 			//output=OCONV(mod(INPUT0+@sw<1>,86400),mode)
-			output = oconv(input0 % 86400, mode);
+			output = oconv(input0.mod(86400), mode);
 		}
 
 		//25 hour format (25:00 is 01:00 the next day)
@@ -70,7 +70,7 @@ function main(in type, in input0, in mode0, out output) {
 			input2 = input2.fieldstore(":", 1, 1, temp - 24);
 			//output=iconv(input2,'MT')
 			//output=mod(iconv(input2,'MT')-@sw<1>,86400)
-			output = input2.iconv("MT") % 86400;
+			output = input2.iconv("MT").mod(86400);
 			output += 86400;
 		} else {
 			//modex=mode
@@ -78,7 +78,7 @@ function main(in type, in input0, in mode0, out output) {
 			//if modex else modex='MT'
 			//output=iconv(INPUT0,modex)
 			//output=mod(iconv(INPUT0,'MT')-@sw<1>,86400)
-			output = input0.iconv("MT") % 86400;
+			output = input0.iconv("MT").mod(86400);
 		}
 
 	}

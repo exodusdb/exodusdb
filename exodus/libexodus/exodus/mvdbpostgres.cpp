@@ -3442,7 +3442,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			debug();
 		//must be empty!
 
-		joins.inserter(1, 1, "\n INNER JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");
+		joins.inserter(1, 1, "\n RIGHT JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");
 	}
 
 	// assemble the full sql select statement:

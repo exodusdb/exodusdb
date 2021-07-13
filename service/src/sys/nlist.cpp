@@ -20,6 +20,7 @@ libraryinit()
 var copyright;
 var showborder;//num
 var headtabperpage;//num
+var colorprefix;
 var ulchar;
 var nblocks;//num
 var blockn;//num
@@ -227,6 +228,7 @@ function main() {
 	copyright = "";
 	showborder = 0;
 	headtabperpage = 1;
+	colorprefix = "\x19";
 
 	//compile nlist without linemarks. its inner loops benefit from efficiency
 
@@ -1635,7 +1637,7 @@ nextrec:
 		if (recn le 2) {
 			printl();
 		}
-		if (printfilename and (not(recn % 100))) {
+		if (printfilename and not(recn.mod(100))) {
 			//first recn will be 2
 			//similar in recinit and x2exit
 			output(at(-40), recn, ". ", ID, " ", MV);
@@ -1810,9 +1812,9 @@ recexit:
 					tt.swapper("\r\n", "<br />");
 				}
 
-				//colored cells starting with ESC
-				if (tt[1] eq "\x19") {
-					if (tt.substr(1, 2) eq ("\x19" "\x19")) {
+				//colored cells starting with colorprefix
+				if (tt[1] eq colorprefix) {
+					if (tt[2] eq colorprefix) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.length()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;

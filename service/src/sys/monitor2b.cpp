@@ -266,7 +266,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 			//run the wget command
 			//print @(0):@(-4):time() 'MTS':' CONTROL ':cmd[1,50]:'... ':
-			output(at(-40), var().time().oconv("MTS"), " CONTROL ", cmd.substr(1, 50), "... ");
 
 			//garbagecollect;
 			var().osflush();
@@ -305,15 +304,15 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			cmdfile ^= "\r\n" ^ cmd ^ " 2>" ^ errorfilename;
 			var(cmdfile).oswrite(cmdfilename);
 
-			printl();
-			print("CONTROL cmd /c ", cmdfilename, " ... ");
+			//print
+			//print 'CONTROL cmd /c ':cmdfilename:' ... ':
 
 			//garbagecollect;
 			var().osflush();
 			("cmd /c " ^ cmdfilename).osshell();
 			var().osflush();
 
-			printl("done");
+			//print 'done'
 
 			if (not(errors.osread(errorfilename))) {
 				errors = "";
@@ -437,7 +436,7 @@ subroutine hash(in salt, in max, out hashcode) {
 
 	hashcode = salt;
 	for (var ii = 1; ii <= text.length(); ++ii) {
-		hashcode = (hashcode * (text[ii]).seq()) % max;
+		hashcode = (hashcode * (text[ii]).seq()).mod(max);
 	} //ii;
 	return;
 }

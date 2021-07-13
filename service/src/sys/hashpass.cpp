@@ -12,13 +12,13 @@ function main(in password) {
 	while (true) {
 		///BREAK;
 		if (not(hashedpassword ne "")) break;
-		encryptkey = (encryptkey % 390001) * (hashedpassword[1]).seq() + 1;
+		encryptkey = (encryptkey.mod(390001)) * (hashedpassword[1]).seq() + 1;
 		hashedpassword.splicer(1, 1, "");
 	}//loop;
 
 	//pass2
 	while (true) {
-		hashedpassword ^= var().chr(65 + (encryptkey % 50));
+		hashedpassword ^= var().chr(65 + (encryptkey.mod(50)));
 		encryptkey = (encryptkey / 50).floor();
 		///BREAK;
 		if (not encryptkey) break;

@@ -100,7 +100,7 @@ subroutine getfirstdom() {
 	//if period<>1 then
 	while (true) {
 		///BREAK;
-		if (not((idate - 1) % 7 + 1 ne firstdayofweek)) break;
+		if (not((idate - 1).mod(7) + 1 ne firstdayofweek)) break;
 		idate += 1;
 	}//loop;
 	// end

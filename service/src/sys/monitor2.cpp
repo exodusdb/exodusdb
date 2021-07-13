@@ -248,7 +248,7 @@ nextstatistic:
 			netid(2) = ID.field("*", 3);
 			netid(3) = ID.field("*", 4);
 			hourn = ((currenttime - RECORD.a(1)) * 24).floor() + 1;
-			hourn = (hourn - 1) % 24 + 1;
+			hourn = (hourn - 1).mod(24) + 1;
 			for (ii = 1; ii <= 3; ++ii) {
 				if (not(usertab(hourn, ii).locate(netid(ii), tt))) {
 					usertab(hourn, ii).r(1, -1, netid(ii));
@@ -565,7 +565,7 @@ nextprocess:
 					if (var().time() gt backuprequired.a(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
-					dow = ((sys.glang.a(22).field("|", (nextbackupdate - 1) % 7 + 1)).substr(1, 8)).ucase();
+					dow = ((sys.glang.a(22).field("|", (nextbackupdate - 1).mod(7) + 1)).substr(1, 8)).ucase();
 					nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
 					nextbackupfilename.converter("/", OSSLASH);
 					nextbackupfileinfo = nextbackupfilename.osfile();
@@ -597,7 +597,7 @@ nextprocess:
 									toaddresses.swapper("backups@neosys.com", "");
 									toaddresses = trim(toaddresses, ";");
 									if (toaddresses) {
-										remindern = (localtime - 21600) % 3600 * reminderhours + 1;
+										remindern = (localtime - 21600).mod(3600 * reminderhours) + 1;
 										subject = "EXODUS Backup Reminder";
 										if (remindern gt 1) {
 											subject ^= " (" ^ remindern ^ ")";

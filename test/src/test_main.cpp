@@ -1,7 +1,7 @@
 #undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 #include <sstream>
-
+#include <cmath>
 #include <exodus/program.h>
 
 //experiment with some syntactic sugar
@@ -1734,16 +1734,91 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	ossetenv("XYZ","abc");
 	assert(osgetenv("XYZ") == "abc");
 
+	var dividend=100;
+	TRACE(mod(dividend,30));
+	assert(mod(dividend,30) eq 10);
+
+	assert(mod(-4,3)==2);
+	assert(mod(-3,3)==0);
+	assert(mod(-2,3)==1);
+	assert(mod(-1,3)==2);
+	assert(mod(-0,3)==0);
+	assert(mod(0,3)==0);
+	assert(mod(1,3)==1);
+	assert(mod(2,3)==2);
+	assert(mod(3,3)==0);
+	assert(mod(4,3)==1);
+
+	assert(mod(-4.0,3)==2);
+	assert(mod(-3.0,3)==0);
+	assert(mod(-2.0,3)==1);
+	assert(mod(-1.0,3)==2);
+	assert(mod(-0.0,3)==0);
+	assert(mod(0.0,3)==0);
+	assert(mod(1.0,3)==1);
+	assert(mod(2.0,3)==2);
+	assert(mod(3.0,3)==0);
+	assert(mod(4.0,3)==1);
+
+	assert(mod(-4.0,3.0)==2);
+	assert(mod(-3.0,3.0)==0);
+	assert(mod(-2.0,3.0)==1);
+	assert(mod(-1.0,3.0)==2);
+	assert(mod(-0.0,3.0)==0);
+	assert(mod(0.0,3.0)==0);
+	assert(mod(1.0,3.0)==1);
+	assert(mod(2.0,3.0)==2);
+	assert(mod(3.0,3.0)==0);
+	assert(mod(4.0,3.0)==1);
+
+	assert(mod(-4,3.0)==2);
+	assert(mod(-3,3.0)==0);
+	assert(mod(-2,3.0)==1);
+	assert(mod(-1,3.0)==2);
+	assert(mod(-0,3.0)==0);
+	assert(mod(0,3.0)==0);
+	assert(mod(1,3.0)==1);
+	assert(mod(2,3.0)==2);
+	assert(mod(3,3.0)==0);
+	assert(mod(4,3.0)==1);
+
+	//negative dividend
+/*
+	assert(mod(-4,-3)==-1);
+	assert(mod(-3,-3)==0);
+	assert(mod(-2,-3)==-2);
+	assert(mod(-1,-3)==-1);
+	assert(mod(-0,-3)==0);
+	assert(mod(0,-3)==0);
+	TRACE(mod(1,-3));
+	assert(mod(1,-3)==-2);
+	assert(mod(2,-3)==-1);
+	assert(mod(3,-3)==0);
+	assert(mod(4,-3)==-2);
+*/
+	assert(mod(-4.0,-3.0)==-1);
+	assert(mod(-3.0,-3.0)==0);
+	assert(mod(-2.0,-3.0)==-2);
+	assert(mod(-1.0,-3.0)==-1);
+	assert(mod(-0.0,-3.0)==0);
+	assert(mod(0.0,-3.0)==0);
+	TRACE(mod(1.0,-3.0));
+	TRACE(fmod(1.0,-3.0));
+	TRACE(1 % -3)
+	TRACE(-1 % 3)
+	assert(mod(1.0,-3.0)==-2);
+	assert(mod(2.0,-3.0)==-1);
+	assert(mod(3.0,-3.0)==0);
+	assert(mod(4.0,-3.0)==-2);
+
 	//check floating point modulo
+	TRACE(mod(2.3,var(1.499)).round(3));
 	assert(mod(2.3,var(1.499)).round(3) eq 0.801);
+	TRACE(mod(-2.3,var(-1.499)).round(3));
 	assert(mod(-2.3,var(-1.499)).round(3) eq -0.801);
-	//following is what c++ fmod does (a rather mathematical concept)
-	//assert(mod(-2.3,var(1.499)).round(3).outputl() eq -0.801);
-	//assert(mod(2.3,var(-1.499)).round(3).outputl() eq 0.801);
-	//but arev and qm ensure that the result is somewhere from 0 up to or down to
-	//(but not including) the divisor
-	//method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
+	TRACE(mod(-2.3,var(1.499)).round(3));
 	assert(mod(-2.3,var(1.499)).round(3) eq 0.698);
+	TRACE(mod(2.3,var(-1.499)).round(3));
 	assert(mod(2.3,var(-1.499)).round(3) eq -0.698);
 
 	assert(oconv(1234,"MD20P") eq "1234.00");
@@ -2337,9 +2412,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 //    var xx="XXX";
 //  xx.inverter();
-
-	var dividend=100;
-	assert(mod(dividend,30) eq 10);
 
 	var env=osgetenv("");
 	assert(osgetenv("PATH"));

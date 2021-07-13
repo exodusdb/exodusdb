@@ -33,11 +33,11 @@ set -eux
 :
 	./service ${FROM_EXO_DBNAME} stop test
 
-:
-: Give it a little time to stop
-: =============================
-:
-	sleep 5
+#:
+#: Give it a little time to stop
+#: =============================
+#:
+#	sleep 5
 
 :
 : Drop the target database
@@ -49,7 +49,7 @@ set -eux
 : Create the target database
 : ==========================
 :
-	sudo -u postgres createdb -O exodus -T template0 $TO_EXO_DBNAME
+	sudo -u postgres createdb -O exodus -T template1 $TO_EXO_DBNAME
 
 :
 : Restore into the target database

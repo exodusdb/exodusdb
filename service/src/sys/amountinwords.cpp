@@ -75,7 +75,7 @@ function main(in amountfmlanguage, in currcode0) {
 	}
 
 	//thousands
-	thousands = ((amount % 1000000) / 1000).floor();
+	thousands = ((amount.mod(1000000)) / 1000).floor();
 	if (thousands) {
 		if (words ne "") {
 			words ^= comma ^ " ";
@@ -84,7 +84,7 @@ function main(in amountfmlanguage, in currcode0) {
 	}
 
 	//hundreds
-	hundreds = ((amount % 1000) / 100).floor();
+	hundreds = ((amount.mod(1000)) / 100).floor();
 	if (hundreds) {
 		if (words ne "") {
 			words ^= comma ^ " ";
@@ -93,7 +93,7 @@ function main(in amountfmlanguage, in currcode0) {
 	}
 
 	//units
-	unitsx = "00" ^ (amount % 100).floor();
+	unitsx = "00" ^ amount.mod(100).floor();
 	text = "Zero" _VM_ "One" _VM_ "Two" _VM_ "Three" _VM_ "Four" _VM_ "Five" _VM_ "Six" _VM_ "Seven" _VM_ "Eight" _VM_ "Nine" _VM_ "Ten" _VM_ "Eleven" _VM_ "Twelve" _VM_ "Thirteen" _VM_ "Fourteen" _VM_ "Fifteen" _VM_ "Sixteen" _VM_ "Seventeen" _VM_ "Eighteen" _VM_ "Nineteen" _VM_ "Twenty" _VM_ "Thirty" _VM_ "Forty" _VM_ "Fifty" _VM_ "Sixty" _VM_ "Seventy" _VM_ "Eighty" _VM_ "Ninety";
 	if (unitsx) {
 		if (words ne "") {
@@ -159,7 +159,7 @@ french:
 	}
 
 	//thousands
-	thousands = ((amount % 1000000) / 1000).floor();
+	thousands = ((amount.mod(1000000)) / 1000).floor();
 	if (thousands) {
 		if (words ne "") {
 			words ^= comma ^ " ";
@@ -171,7 +171,7 @@ french:
 	}
 
 	//hundreds
-	hundreds = ((amount % 1000) / 100).floor();
+	hundreds = ((amount.mod(1000)) / 100).floor();
 	if (hundreds) {
 		if (words ne "") {
 			words ^= comma ^ " ";
@@ -184,7 +184,7 @@ french:
 	}
 
 	//units
-	unitsx = "00" ^ (amount % 100).floor();
+	unitsx = "00" ^ amount.mod(100).floor();
 	text = "zero" _VM_ "un" _VM_ "deux" _VM_ "trois" _VM_ "quatre" _VM_ "cinq" _VM_ "six" _VM_ "sept" _VM_ "huit" _VM_ "neuf" _VM_ "dix" _VM_ "onze" _VM_ "douze" _VM_ "treize" _VM_ "quatorze" _VM_ "quinze" _VM_ "seize" _VM_ "dix-sept" _VM_ "dix-huit" _VM_ "dix-neuf" _VM_ "vingt" _VM_ "trente" _VM_ "quarante" _VM_ "cinquante" _VM_ "soixante" _VM_ "soixante-dix" _VM_ "quatre-vingt" _VM_ "quatre-vingt-dix";
 	if (unitsx) {
 		if (words ne "") {

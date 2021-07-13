@@ -1,10 +1,18 @@
 #!/bin/bash
 set -eux
 
-:
+: ================================
 : Copy all EXODUS programs to live
 : ================================
 :
+
+:
+: Create a directory for live services binaries
+: =============================================
+:
+: EXODUS environment variable "EXO_HOME" default
+:
+	mkdir -p $HOME/live
 
 :
 : Install the latest version of the neomail script
@@ -13,13 +21,19 @@ set -eux
 	cp neomail ~/bin
 
 :
-: copy all bin and lib files
-: ==========================
+: Copy all bin and lib files to live
+: ==================================
 :
 	#rsync -av ~/bin ~/lib ~/inc ~/live
 	#rsync -a ~/{bin,lib,inc} ~/live
+	#rsync -av --delete ~/{bin,lib} ~/live
 	rsync -av ~/{bin,lib} ~/live
 
+:
+: =============================================================================
+: NOTE - You MUST restart all live processes URGENTLY otherwise they will crash
+: =============================================================================
+:
 :
 : Finished copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : =========================================================================

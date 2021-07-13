@@ -23,7 +23,7 @@ libraryexit(department)
 libraryinit(last_access_time)
 //---------------------------
 function main() {
-	return (RECORD.a(1) * 86400 + SW.a(1)) % 86400;
+	return (RECORD.a(1) * 86400 + SW.a(1)).mod(86400);
 }
 libraryexit(last_access_time)
 

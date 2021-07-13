@@ -89,12 +89,11 @@ function main(in docids0="", in options0="") {
 		return 0;
 	}
 
-	var markets;
-	if (not(markets.open("MARKETS", ""))) {
+	if (not(sys.markets.open("MARKETS", ""))) {
 		if (not(APPLICATION eq "ACCOUNTS")) {
 			call fsmsg();
 		}
-		markets = "";
+		sys.markets = "";
 		return 0;
 	}
 
@@ -248,7 +247,7 @@ currdatetime:
 
 			//if one hour then treat it as a minimum hour
 			if (hours.isnum()) {
-				if (hournow lt hours % 24) {
+				if (hournow lt hours.mod(24)) {
 					if (logging) {
 						printl("not yet hour");
 					}
@@ -303,7 +302,7 @@ preventsameday:
 
 		//day of week restrictions
 		if (restrictions.a(5)) {
-			if (not(restrictions.a(5).locate((idate - 1) % 7 + 1, xx))) {
+			if (not(restrictions.a(5).locate((idate - 1).mod(7) + 1, xx))) {
 				if (logging) {
 					printl("wrong day of week");
 				}
@@ -427,8 +426,8 @@ preventsameday:
 						marketcode = sys.company.a(30, 1);
 					}
 					market = marketcode;
-					if (markets) {
-						if (not(market.read(markets, marketcode))) {
+					if (sys.markets) {
+						if (not(market.read(sys.markets, marketcode))) {
 							{}
 						}
 					}
@@ -842,7 +841,7 @@ sysmsgit:
 	requeststoptime = ostime();
 	if (tracing) {
 		//print @(0):@(-4):'Responded in ':(requeststoptime-requeststarttime) 'MD20P':' SECS ':rawresponse
-		print(" ", ((requeststoptime - requeststarttime) % 86400).oconv("MD20P"), "secs ", rawresponse);
+		print(" ", ((requeststoptime - requeststarttime).mod(86400)).oconv("MD20P"), "secs ", rawresponse);
 		//do after "emailing" message
 		//print str('-',79)
 		//print linkfilename1
@@ -895,7 +894,7 @@ subroutine getdaysago() {
 	xdate = var().date();
 	while (true) {
 		xdate -= 1;
-		if (not(weekend.index((xdate - 1) % 7 + 1))) {
+		if (not(weekend.index((xdate - 1).mod(7) + 1))) {
 			daysago -= 1;
 		}
 		///BREAK;

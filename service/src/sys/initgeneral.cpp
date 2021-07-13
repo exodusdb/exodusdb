@@ -1657,7 +1657,7 @@ adddatasetcodename:
 			userx = "";
 		}
 		if (userx.a(4) and interactive) {
-			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.a(4) - 1) % 7 + 1);
+			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.a(4) - 1).mod(7) + 1);
 			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.a(4).oconv("D") ^ " at " ^ userx.a(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.a(6).trim()).oconv("C#40") ^ "|");
 		}
 

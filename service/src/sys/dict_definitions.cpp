@@ -154,8 +154,8 @@ function main() {
 	var totsecs = daysecs + timesecs;
 
 	var hours = (totsecs / 60 / 60).floor();
-	var mins = ((totsecs / 60).floor()) % 60;
-	var secs = (totsecs % 60).floor();
+	var mins = ((totsecs / 60).floor()).mod(60);
+	var secs = totsecs.mod(60).floor();
 	return hours ^ ":" ^ mins.oconv("R(0)#2") ^ ":" ^ secs.oconv("R(0)#2") ^ "." ^ totsecs.field(".", 2).oconv("R#2");
 }
 libraryexit(process_duration)
@@ -163,7 +163,7 @@ libraryexit(process_duration)
 libraryinit(process_weekcommencing)
 //---------------------------------
 function main() {
-	return RECORD.a(1) - ((RECORD.a(1) - 1) % 7);
+	return RECORD.a(1) - ((RECORD.a(1) - 1).mod(7));
 }
 libraryexit(process_weekcommencing)
 

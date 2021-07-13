@@ -2212,58 +2212,55 @@ var var::mod(const var& divisor) const {
 	THISISNUMERIC()
 	ISNUMERIC(divisor)
 
-	// NB using c++ % operator which until c++11 had undefined behaviour if divisor was negative
+	// NB NOT using c++ % operator which until c++11 had undefined behaviour if divisor was negative
 	// from c++11 % the sign of the result after a negative divisor is always the same as the
 	// dividend
 
+    //following is what c++ fmod does (a mathematical concept)
+    //assert(mod(-2.3,var(1.499)).round(3).outputl() eq -0.801);
+    //assert(mod(2.3,var(-1.499)).round(3).outputl() eq 0.801);
+    //BUT arev and qm ensure that the result is somewhere from 0 up to or down to
+    //(but not including) the divisor
+
 	// prefer double dividend
 	if (var_typ & VARTYP_DBL) {
-		// prefer double divisor
-		if (divisor.var_typ & VARTYP_DBL) {
-			// return fmod(double(var_int),divisor.var_dbl);
-			if ((var_dbl < 0 && divisor.var_dbl >= 0) ||
-				(divisor.var_dbl < 0 && var_dbl >= 0))
-				// multivalue version of mod
-				return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
-			else
-				return fmod(var_dbl, divisor.var_dbl);
-		} else {
+
+		// use divisor's double if available otherwise create it from divisor's int/long
+		if (!(divisor.var_typ & VARTYP_DBL)) {
 			divisor.var_dbl = double(divisor.var_int);
-			// following would cache the double value but is it worth it?
-			// divisor.var_typ=divisor.var_typ & VARTYP_DBL;
-
-			if ((var_dbl < 0 && divisor.var_int >= 0) ||
-				(divisor.var_int < 0 && var_dbl >= 0))
-				// multivalue version of mod
-				return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
-			else
-				return fmod(var_dbl, divisor.var_dbl);
+			//divisor.var_typ = divisor.var_typ & VARTYP_DBL;
 		}
-	} else {
-		// prefer double divisor
-		if (divisor.var_typ & VARTYP_DBL) {
 
-			var_dbl = double(var_int);
-			// following would cache the double value but is it worth it?
-			// var_typ=var_typ & VARTYP_DBL;
+mod_doubles:
+	    //method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
+		//if ((var_dbl < 0 && divisor.var_dbl >= 0) ||
+		//	(divisor.var_dbl < 0 && var_dbl >= 0)) {
+		//	return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
+		//}
+		//else {
+		//	return fmod(var_dbl, divisor.var_dbl);
+		//}
 
-			if ((var_int < 0 && divisor.var_dbl >= 0) ||
-				(divisor.var_dbl < 0 && var_int >= 0))
-				// multivalue version of mod
-				return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
-			else
-				return fmod(var_dbl, divisor.var_dbl);
-		} else {
-			if ((var_int < 0 && divisor.var_int >= 0) ||
-				(divisor.var_int < 0 && var_int >= 0))
-				// multivalue version of mod
-				return (var_int % divisor.var_int) + divisor.var_int;
-			else
-				return var_int % divisor.var_int;
-		}
+		return var_dbl - std::floor(var_dbl / divisor.var_dbl) * divisor.var_dbl;
 	}
-	// cannot get here
-	throw MVError("mod(unknown mvtype=" ^ var(var_typ) ^ ")");
+
+	// prefer double divisor
+	if (divisor.var_typ & VARTYP_DBL) {
+		var_dbl = double(var_int);
+		//var_typ = var_typ & VARTYP_DBL;
+		goto mod_doubles;
+	}
+
+	//both ints/longs
+
+	//if ((var_int < 0 && divisor.var_int >= 0) ||
+	//	(divisor.var_int < 0 && var_int >= 0))
+	//	return (var_int % divisor.var_int) + divisor.var_int;
+	//else
+	//	return var_int % divisor.var_int;
+
+	double double1 = double(var_int);
+	return double1 - std::floor(double1 / divisor.var_int) * divisor.var_int;
 }
 
 var var::mod(const int divisor) const {
@@ -2274,21 +2271,35 @@ var var::mod(const int divisor) const {
 
 	// prefer double dividend
 	if (var_typ & VARTYP_DBL) {
-		if ((var_dbl < 0 && divisor >= 0) || (divisor < 0 && var_dbl >= 0)) {
-			// multivalue version of mod
-			double divisor2 = double(divisor);
-			return fmod(var_dbl, divisor2) + divisor2;
-		} else
-			return fmod(var_dbl, double(divisor));
-	} else {
-		if ((var_int < 0 && divisor >= 0) || (divisor < 0 && var_int >= 0))
-			// multivalue version of mod
-			return (var_int % divisor) + divisor;
-		else
-			return var_int % divisor;
+		//if ((var_dbl < 0 && divisor >= 0) || (divisor < 0 && var_dbl >= 0)) {
+		//	// multivalue version of mod
+		//	double divisor2 = double(divisor);
+		//	return fmod(var_dbl, divisor2) + divisor2;
+		//} else
+		//	return fmod(var_dbl, double(divisor));
+
+		//double divisor2 = double(divisor);
+		//double result = fmod(var_dbl, divisor2);
+		//if (result < 0 && divisor2 > 0)
+		//	result += divisor2;
+		//return result;
+
+		return var_dbl - std::floor(var_dbl / divisor) * divisor;
 	}
-	// cannot get here
-	throw MVError("mod(unknown mvtype=" ^ var(var_typ) ^ ")");
+
+	//if ((var_int < 0 && divisor >= 0) || (divisor < 0 && var_int >= 0))
+	//	// multivalue version of mod
+	//	return (var_int % divisor) + divisor;
+	//else
+	//	return var_int % divisor;
+
+	//mvint_t result = var_int % divisor;
+	//if (result < 0 && divisor > 0)
+	//	result += divisor;
+	//return result;
+
+	double double1 = double(var_int);
+	return double1 - std::floor(double1 / divisor) * divisor;
 }
 
 /*
