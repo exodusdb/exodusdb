@@ -181,7 +181,8 @@ listen:
 			if (VOLUMES) {
 				printl(USER4);
 			}
-			call sysmsg(USER4);
+			var techmsg = USER4.a(1).substr(1, 256);
+			call sysmsg(USER4, techmsg);
 
 		}
 
@@ -217,7 +218,7 @@ listen:
 				verfilename.converter("/", OSSLASH);
 				if (ver.osread(verfilename)) {
 					body.r(-1, "EXODUS Ver:" ^ ver.a(1));
-				}
+					}
 
 				//too slow so ignore it
 				//servername=getdrivepath(drive()[1,2])[3,'\']
