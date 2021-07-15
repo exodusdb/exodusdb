@@ -1881,8 +1881,12 @@ MVError::MVError(const var& description_)
 	this->stack = backtrace();
 	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
 
-	if (description.osgetenv("EXO_DEBUG")) {
-		description.debug();
+	//break into debugger if EXO_DEBUG is set to non-zero
+	//therwise allow catch at a higher level or abort
+	var exo_debug;
+	exo_debug.osgetenv("EXO_DEBUG");
+	if (exo_debug) {
+		var().debug();
 	}
 }
 
