@@ -4,27 +4,27 @@
 #include <cmath>
 #include <exodus/program.h>
 
-//experiment with some syntactic sugar
-#define on ,
-#define from ,
-#define to ,
-#define with ,
-
 // TESTING
-
+// =======
+//
 // if it runs ok with no static assertion failures
-// 1. compile test_main && test_main
-
+//
+//   compile test_main && test_main
+//
 // then test no changes in output with the following
-// 2. compile test_main && test_main > t_test_main 2> /dev/null && diff test_main.out t_test_main
+//
+//   test_main &> t_test_main && diff test_main.out t_test_main
+//
+// there will be a limited number of differences due to time/date/random output
 
 // DEVELOPING
-
-// any variable output (including dates/times/random numbers) must use errput (not print or output)
+// ==========
 //
-// if you add to or change the output in any way then update the expected output file
+// if you add to or change the output in any way,
+// which includes adding comments at the top due since program line numbers are part of output during error reporting
+// then update the expected output file
 //
-// test_main 1> test_main.out
+//   test_main &> test_main.out
 
 programinit()
 
