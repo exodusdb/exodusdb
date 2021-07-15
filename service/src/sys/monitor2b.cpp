@@ -272,7 +272,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			var result = shell2(cmd, errors);
 			var().osflush();
 
-			print("done ");
+			//print 'done ':
 			if (errors) {
 				printl(errors);
 			}

@@ -19,6 +19,8 @@ set -eux
 :	' ./backup_db mgg'
 :	' ./backup_db mgg BRVS'
 :
+:	'Only restores backup to test database'
+:
 	EXO_DBNAME=$1
 	OPTIONS=${2:-BRVS}
 	NEW_BACKUP_DIR=${3:-~/backups/sql}
