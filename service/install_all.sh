@@ -68,7 +68,9 @@ set -eux
 : =========================
 :
 :	whois is used in unknown ip no login notification emails
-	apt-get -y install whois
+:	mailutils is required to send email by neomail
+:
+	apt-get -y install whois mailutils
 
 :
 : Install html2pdf
