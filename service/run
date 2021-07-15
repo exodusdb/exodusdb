@@ -36,17 +36,30 @@ set -eux
 	fi
 
 :
-: Binary dirs bin and lib are in ~/ or ~/live
-: ===========================================
+: Flag to break into debugger on all errors iif _test database
+: ============================================================
 :
 	if [ "${DB_CODE: -5}" = "_test" ]; then
-		export EXO_HOME=~
+		#export EXO_HOME=~
 		export EXO_DEBUG=1
 	else
-		export EXO_HOME=~/live
+		#export EXO_HOME=~/live
 		export EXO_DEBUG=
 	fi
+
 :
+: Always use the test programs in ~/ when running manually
+: ========================================================
+:
+	export EXO_HOME=~
+	#export EXO_HOME=~/live
+	#if [ "${DB_CODE: -5}" = "_test" ]; then
+	#	export EXO_HOME=~
+	#	export EXO_DEBUG=1
+	#else
+	#	export EXO_HOME=~/live
+	#	export EXO_DEBUG=
+	#fi
 
 :
 : Ensure the correct bin is found first in the path
@@ -87,7 +100,6 @@ set -eux
 : ================================================
 :
 	export EXO_DBNAME=$DB_CODE
-	export EXO_DEBUG=1
 
 :
 : Install gdb if necessary
