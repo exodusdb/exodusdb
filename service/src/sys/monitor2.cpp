@@ -50,7 +50,9 @@ var bakpars;
 var descriptions;
 var status0123;//num
 var ndbases;
-var nok;//num
+var nok;
+var temp;
+var secs;
 var description;
 var minreq;
 var nhung;
@@ -288,12 +290,7 @@ nextprocess:
 			dbasecodes.r(1, dbasen, dbasecode);
 		}
 		dbasesystems.r(1, dbasen, RECORD.a(51));
-		if (VOLUMES) {
-			status = calculate("STATUS");
-		} else {
-			//TODO work out status of exodus processes
-			status = "OK";
-		}
+		status = calculate("STATUS");
 		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
 			//statusn will be 6
 			processcount.r(20, dbasen, status);
@@ -325,13 +322,13 @@ nextprocess:
 				//backpars 12 (upload backup target) can be 0 to suppress
 				if (bakpars.a(12) and bakpars.a(12) ne bakpars.a(7)) {
 					tt.r(1, 1, 2, bakpars.a(12));
-					}
+				}
 				//backuptime
 				if (tt) {
 					tt.r(1, 1, 3, bakpars.a(3));
 				}
 				backuprequired.r(1, dbasen, tt);
-			}
+				}
 
 		}
 
@@ -358,7 +355,13 @@ nextprocess:
 		//show nok (number ok)
 		nok = processcount.a(1, dbasen);
 		if (not(nok) and not(VOLUMES)) {
-			nok = 1;
+			temp = ("../data/" ^ dbasecode ^ "/" ^ dbasecode ^ ".svr").osfile();
+			secs = var().date() * 86400 + var().time() - (temp.a(2) * 86400 + temp.a(3));
+			nok = secs lt 600;
+			//otherwise flag hung
+			if (not nok) {
+				processcount.r(2, dbasen, 1);
+			}
 		}
 		description = dbasecode;
 		//if nok then description:=' ':nok:':Ok'
@@ -514,7 +517,7 @@ nextprocess:
 			currentdatetime = (var().date() + var().time() / 86400).oconv("MD50P");
 			tt = currentdatetime - lastbackupdatetime;
 			//allow one day and one hour
-			if (lastbackupdatetime and (tt gt 1 + 1 / 24)) {
+			if (lastbackupdatetime and (tt gt 1 + 1 / 24.0)) {
 				//warning if one day missed and critical if more than one
 				description ^= " not done " ^ tt.oconv("MD10P") ^ " days!";
 				if (paramrec and tt gt 2) {
@@ -875,7 +878,7 @@ gotip:
 	//report and prevent further checking/reporting for an hour
 	//unless somehow forced
 	if (msg) {
-		monitordata.r(1, currenttime.a(1) + 1 / 24);
+		monitordata.r(1, currenttime.a(1) + 1 / 24.0);
 		call sysmsg(msg);
 	} else {
 		//register checked at current time

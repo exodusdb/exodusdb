@@ -111,7 +111,7 @@ set -eux
 : Start the server process under gdb
 : ==================================
 :
-	gdb -ex "set print inferior-events off" -ex run --args serve_${APP_CODE} $OPTIONS
+	gdb -ex "set print inferior-events off" -ex run --args serve_${APP_CODE} $DB_CODE $OPTIONS
 
 :
 : After debugging is finished, resume the normal background service

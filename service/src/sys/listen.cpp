@@ -922,7 +922,7 @@ gotlink:
 		var().osflush();
 		if (not(linkfile1.osopen(linkfilename1))) {
 			//remove from future candidate files?
-			call ossleep(1000*1 / 10);
+			call ossleep(1000*1 / 10.0);
 			if (tracing) {
 				printl("CANNOT OPEN RW ", linkfilename1.quote());
 			}
@@ -940,7 +940,7 @@ readlink1:
 		//if cannot read it then try again
 		if (USER0 eq "" and var().time() eq timex) {
 			var().osflush();
-			call ossleep(1000*1 / 10);
+			call ossleep(1000*1 / 10.0);
 			linkfile1.osclose();
 			if (not(linkfile1.osopen(linkfilename1))) {
 				{}
@@ -1016,7 +1016,7 @@ deleterequest:
 		if (linkfilename1.osfile()) {
 			var().osflush();
 			//garbagecollect;
-			call ossleep(1000*1 / 10);
+			call ossleep(1000*1 / 10.0);
 			ntries += 1;
 			//if tracing then print 'COULD NOT DELETE ':linkfile1
 			if (ntries lt 100) {

@@ -210,7 +210,7 @@ currdatetime:
 
 		//skip if already run in the last 60 minutes. this is an easy way
 		//to avoid reruns but maximum scheduling frequency is hourly
-		if ((currdatetime - lastdatetime).abs() le 1 / 24) {
+		if ((currdatetime - lastdatetime).abs() le 1 / 24.0) {
 			goto nextdoc;
 		}
 
