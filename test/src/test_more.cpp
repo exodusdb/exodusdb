@@ -645,7 +645,7 @@ function main() {
 		//try {throw MVDebug("test");uncaught="MVDebug";}              catch (MVDebug e){};
 		try {var v=var("x").oconv("QQQ");uncaught="MVNotImplemented";} catch (MVNotImplemented e){};
 		try {dim x(0)             ;uncaught="MVArrayDimensionedZero";} catch (MVArrayDimensionedZero e){};
-		try {dim x(10);x(11)      ;uncaught="MVArrayIndexOutofBounds";}catch (MVArrayIndexOutOfBounds e){};
+		try {dim x(10);printl(x(11))      ;uncaught="MVArrayIndexOutofBounds";}catch (MVArrayIndexOutOfBounds e){};
 		try {dim x; var y=x.join();uncaught="MVArrayNotDimensioned";}  catch (MVArrayNotDimensioned e){};
 		try {stop()               ;uncaught="MVStop";}                 catch (const MVStop& e){printl("Caught MVStop");};
 		try {var().abort(99)      ;uncaught="MVAbort";}                catch (MVAbort e){printl("Caught MVAbort");};
