@@ -395,7 +395,7 @@ function main()
         assert(var("test.htm").match("*.","w")		=="");
         assert(var("test.htm").match("*.htm","w")	=="test.htm");
         assert(var("test.html").match("*.htm","w")	=="");
-        assert(var("test.htm").match("t*.???","w")	="test.htm");
+        assert(var("test.htm").match("t*.???","w")	=="test.htm");
         assert(var("test.htm").match("t.???","w")	=="");
         assert(var("test.htm").match("x.???","w")	=="");
         assert(var("testx.htm").match("*x.???","w")	=="testx.htm");
@@ -430,7 +430,7 @@ function main()
 	var chinesechar=textchr(171416);
 	assert(chinesechar=="𩶘");
 	printl(chinesechar);
-	assert(textseq(chinesechar^"abcd")=171416);
+	assert(textseq(chinesechar^"abcd")==171416);
 	assert(oconv(chinesechar,"HEX")=="F0A9B698");
 
 	printl(textchr(915));
@@ -1853,6 +1853,9 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(var("30/2/2008").iconv("DE") eq "");
 	assert(var("1/31/2008").iconv("DE") eq "");
 
+	//check uses yyyy-mm-dd format if data starts with four digit year
+	assert(iconv("2000-12-31","DE") == 12054);
+
 	assert(oconv(15036, "D")     == "01 MAR 2009");
 	assert(oconv(15036, "D2")    == "01 MAR 09");
 	assert(oconv(15036, "D4")    == "01 MAR 2009");
@@ -2141,12 +2144,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
 
 	//check oconv does multivalues
-	assert(var("60" _RM_ "120").oconv("MT")="00:01" _RM_ "00:02");
-	assert(var("60" _FM_ "120").oconv("MT")="00:01" _FM_ "00:02");
-	assert(var("60" _VM_ "120").oconv("MT")="00:01" _VM_ "00:02");
-	assert(var("60" _SM_ "120").oconv("MT")="00:01" _SM_ "00:02");
-	assert(var("60" _TM_ "120").oconv("MT")="00:01" _TM_ "00:02");
-	assert(var("60" _STM_ "120").oconv("MT")="00:01" _STM_ "00:02");
+	assert(var("60" _RM_ "120").oconv("MT")=="00:01" _RM_ "00:02");
+	assert(var("60" _FM_ "120").oconv("MT")=="00:01" _FM_ "00:02");
+	assert(var("60" _VM_ "120").oconv("MT")=="00:01" _VM_ "00:02");
+	assert(var("60" _SM_ "120").oconv("MT")=="00:01" _SM_ "00:02");
+	assert(var("60" _TM_ "120").oconv("MT")=="00:01" _TM_ "00:02");
+	assert(var("60" _STM_ "120").oconv("MT")=="00:01" _STM_ "00:02");
 
 	//test that some random times iconv/oconv roundtrip ok
 	initrnd(1000);
