@@ -558,7 +558,7 @@ function main() {
 	//pickreplace(da2,3,3,3,"x");//or this
 
 	//replacement
-	da2(2)="x";//sadly this compile and runs without error but does nothing!
+	//da2(2)="x";//this will not compile because da2(2) is a temporary;
 
 	da2="f1" _FM_ "f2" _FM_ "f3";
 
