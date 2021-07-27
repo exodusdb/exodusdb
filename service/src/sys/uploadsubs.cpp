@@ -15,7 +15,6 @@ var filename;
 var key;
 var msg;
 var file;
-var ii;//num
 var errors;
 var lengthx;//num
 var osfile;
@@ -26,11 +25,14 @@ var buff;
 var linenox;//num
 var eof;//num
 var line;
+var csv;
 var ptr;//num
 var ncols;
 var dictfile;
 var xx;
+var cell;
 var temp;
+var nquotes;//num
 var recordx;
 var allowduplicate;
 var op;
@@ -46,7 +48,7 @@ function main(in mode) {
 	//and the files could be randomly read and written at excellent speed
 
 	#include <system_common.h>
-	//global ptr,ii
+	//global ptr,iim,csv,nquotes
 
 	#define request_ USER0
 	#define data_ USER1
@@ -83,7 +85,7 @@ postuploadfail:
 		var dictids = "VERSION*STATUS*USERNAME*DATETIME*STATION";
 		var fns = "";
 		var dictfilename = "DICT." ^ filename;
-		for (ii = 1; ii <= 99; ++ii) {
+		for (var ii = 1; ii <= 99; ++ii) {
 			var dictid = dictids.field("*", ii);
 
 			///BREAK;
@@ -96,12 +98,12 @@ postuploadfail:
 			fns.r(ii, fn);
 		} //ii;
 
-		ii = rec.a(fns.a(1)).count(VM) + (rec.a(fns.a(1)) ne "");
-		rec.r(fns.a(1), ii, targetfilename);
-		rec.r(fns.a(2), ii, newstatus);
-		rec.r(fns.a(3), ii, USERNAME);
-		rec.r(fns.a(4), ii, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
-		rec.r(fns.a(5), ii, STATION);
+		var ii2 = rec.a(fns.a(1)).count(VM) + (rec.a(fns.a(1)) ne "");
+		rec.r(fns.a(1), ii2, targetfilename);
+		rec.r(fns.a(2), ii2, newstatus);
+		rec.r(fns.a(3), ii2, USERNAME);
+		rec.r(fns.a(4), ii2, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
+		rec.r(fns.a(5), ii2, STATION);
 
 		rec.write(file, key);
 
@@ -345,7 +347,7 @@ postuploadfail:
 		lengthx = RECORD.a(4);
 		filename = RECORD.a(5);
 		var dictfilename = RECORD.a(6);
-		var dictcolprefix = RECORD.a(7);
+		var dictcolprefix = RECORD.a(7).ucase();
 		var keydictid = RECORD.a(8);
 		var keyfunction = RECORD.a(9);
 		//reserve first 10 for non-imported additional info
@@ -397,7 +399,7 @@ postuploadfail:
 		// goto invalid
 		// end
 
-		temposfilename83 = (SYSTEM.a(24) ^ var(1000000).rnd()).substr(1, 8) ^ ".$IM";
+		temposfilename83 = (SYSTEM.a(24) ^ var(1000000).rnd()).substr(1, 8) ^ "._IM";
 
 		msg = (uploadroot ^ uploadpath).quote() ^ "\r\n";
 		msg = "Uploaded file cannot be found/copied" "\r\n";
@@ -410,6 +412,7 @@ postuploadfail:
 		var cmd = "cp " ^ ((uploadroot ^ uploadpath).quote()) ^ " " ^ temposfilename83;
 		call shell2(cmd, errors);
 		if (errors) {
+			printl(errors);
 			gosub invalid(msg);
 			gosub cleanup();
 			return 0;
@@ -429,13 +432,28 @@ postuploadfail:
 		nimported = 0;
 
 		while (true) {
+
+nextline:
+/////////
 			gosub getline();
+
 			///BREAK;
 			if (not(not(eof))) break;
-			if (line and linenox ge startatrown) {
+			if (not(line and linenox ge startatrown)) {
+				goto nextline;
+			}
 
-				//determine cols from first col heading
-				if (not(cols)) {
+			//determine cols from first col heading
+			if (not(cols)) {
+
+				csv = line.index("\",\"");
+				if (csv) {
+
+					gosub parseline(line);
+					line.converter(VM, FM);
+					cols = line;
+
+				} else {
 					var offset = 1;
 					while (true) {
 						var tt = line.index("  ");
@@ -450,127 +468,136 @@ postuploadfail:
 						offset += ptr;
 						line.splicer(1, ptr, "");
 					}//loop;
-					ncols = cols.count(FM) + 1;
+				}
+				ncols = cols.count(FM) + 1;
 	//oswrite cols on 'cols'
 
+				goto nextline;
+
+			}
+
+			//first record, open files and create dictionary
+			if (file eq "") {
+
+				if (not(file.open(filename, ""))) {
+					call fsmsg();
+					win.valid = 0;
+					gosub cleanup();
+					return 0;
+				}
+				if (not(dictfile.open(dictfilename, ""))) {
+					call fsmsg();
+					win.valid = 0;
+					gosub cleanup();
+					return 0;
+				}
+
+				//create dictionary
+				//grec='BY NUMID'
+				//grec='ID-SUPP'
+				//MUST be pure dictids
+				var grec = "";
+				for (var coln = 1; coln <= ncols; ++coln) {
+					var dictrec = "F";
+					dictrec.r(2, coln + fieldoffset);
+					dictrec.r(3, capitalise(cols.a(coln, 1)));
+					dictrec.r(10, "10");
+					var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1).convert(" ", "_").ucase();
+
+					var CONV = "";
+					var just = "L";
+					var nn = dictid.count("_") + 1;
+					for (var ii = 1; ii <= nn; ++ii) {
+						var word = dictid.field("_", ii);
+						if (datewords.locate(word, xx)) {
+							CONV = "[DATE,4*]";
+							just = "R";
+						} else {
+							if (timewords.locate(word, xx)) {
+								CONV = "[TIME2,48MTS]";
+								just = "R";
+							}
+						}
+					} //ii;
+					cols.r(coln, 4, CONV);
+					dictrec.r(7, CONV);
+					dictrec.r(9, just);
+
+					grec ^= dictid ^ " ";
+					dictrec.write(dictfile, dictid);
+				} //coln;
+				grec.splicer(-1, 1, "");
+				("G" ^ FM ^ FM ^ grec).write(dictfile, dictcolprefix);
+				("G" ^ FM ^ FM ^ grec).write(dictfile, "@CRT");
+
+				if (keyfunction) {
+					if (not keydictid) {
+						keydictid = dictcolprefix ^ "_TEMPKEY";
+					}
+					var tt = "S" ^ FM ^ FM ^ keydictid;
+					tt.r(8, keyfunction);
+					tt.r(9, "R");
+					tt.r(10, 10);
+
+					tt.write(dictfile, keydictid);
+				}
+
+			}
+
+			if (csv) {
+				gosub parseline(line);
+			}
+
+			var rec = "";
+			for (var coln = 1; coln <= ncols; ++coln) {
+				var col = cols.a(coln);
+				if (csv) {
+					cell = line.a(1, coln);
 				} else {
-
-					//first record, open files and create dictionary
-					if (file eq "") {
-
-						if (not(file.open(filename, ""))) {
-							call fsmsg();
-							win.valid = 0;
-							gosub cleanup();
-							return 0;
-						}
-						if (not(dictfile.open(dictfilename, ""))) {
-							call fsmsg();
-							win.valid = 0;
-							gosub cleanup();
-							return 0;
-						}
-
-						//create dictionary
-						//grec='BY NUMID'
-						//grec='ID-SUPP'
-						//MUST be pure dictids
-						var grec = "";
-						for (var coln = 1; coln <= ncols; ++coln) {
-							var dictrec = "F";
-							dictrec.r(2, coln + fieldoffset);
-							dictrec.r(3, capitalise(cols.a(coln, 1)));
-							dictrec.r(10, "10");
-							var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1).convert(" ", "_").ucase();
-
-							var CONV = "";
-							var just = "L";
-							var nn = dictid.count("_") + 1;
-							for (ii = 1; ii <= nn; ++ii) {
-								var word = dictid.field("_", ii);
-								if (datewords.locate(word, xx)) {
-									CONV = "[DATE,4*]";
-									just = "R";
-								} else {
-									if (timewords.locate(word, xx)) {
-										CONV = "[TIME2,48MTS]";
-										just = "R";
-									}
-								}
-							} //ii;
-							cols.r(coln, 4, CONV);
-							dictrec.r(7, CONV);
-							dictrec.r(9, just);
-
-							grec ^= " " ^ dictid;
-							dictrec.write(dictfile, dictid);
-						} //coln;
-						("G" ^ FM ^ FM ^ grec).write(dictfile, dictcolprefix);
-
-						if (keyfunction) {
-							if (not keydictid) {
-								keydictid = dictcolprefix ^ "_TEMPKEY";
+					cell = line.substr(col.a(1, 2), col.a(1, 3)).trimb();
+				}
+				if (cell.length()) {
+					if (col.a(1, 4)) {
+						var cell0 = cell;
+						var CONV = col.a(1, 4);
+						if (CONV.index("TIME")) {
+						//if no : in time then assume is already seconds
+							if (cell.index(":")) {
+								cell = iconv(cell, CONV);
 							}
-							var tt = "S" ^ FM ^ FM ^ keydictid;
-							tt.r(8, keyfunction);
-							tt.r(9, "R");
-							tt.r(10, 10);
-
-							tt.write(dictfile, keydictid);
+						} else {
+							cell = iconv(cell, CONV);
 						}
-
-					} else {
-
-						var rec = "";
-						for (var coln = 1; coln <= ncols; ++coln) {
-							var col = cols.a(coln);
-							var cell = line.substr(col.a(1, 2), col.a(1, 3)).trimb();
-							if (cell.length()) {
-								if (col.a(1, 4)) {
-									var cell0 = cell;
-									var CONV = col.a(1, 4);
-									if (CONV.index("TIME")) {
-									//if no : in time then assume is already seconds
-										if (cell.index(":")) {
-											cell = iconv(cell, CONV);
-										}
-									} else {
-										cell = iconv(cell, CONV);
-									}
-									if (not(cell.length())) {
-										call mssg(cell0.quote() ^ " cannot be converted in line " ^ linenox ^ " col " ^ coln);
-									//indicate strange but leave workable date/time
-										cell = "00";
-									}
-								}
-							}
-							rec.r(coln + fieldoffset, cell);
-						} //coln;
-
-						key = importcode ^ "*" ^ linenox;
-						if (importfilenamefn) {
-							rec.r(importfilenamefn, uploadpath);
-						}
-						if (importcodefn) {
-							rec.r(importcodefn, importcode);
-						}
-						if (linenofn) {
-							rec.r(linenofn, linenox);
-						}
-						//TODO once (on record one) should really check that any
-						//columns defined in the keydict as {} fields EXIST in the dictfile
-						if (keydictid) {
-							key = calculate(keydictid, dictfile, key, rec, 0);
-						}
-
-						nimported += 1;
-
-						if (not validating) {
-							rec.write(file, key);
+						if (not(cell.length())) {
+							call mssg(cell0.quote() ^ " cannot be converted in line " ^ linenox ^ " col " ^ coln);
+						//indicate strange but leave workable date/time
+							cell = "00";
 						}
 					}
-
 				}
+				rec.r(coln + fieldoffset, cell);
+			} //coln;
+
+			key = importcode ^ "*" ^ linenox;
+			if (importfilenamefn) {
+				rec.r(importfilenamefn, uploadpath);
+			}
+			if (importcodefn) {
+				rec.r(importcodefn, importcode);
+			}
+			if (linenofn) {
+				rec.r(linenofn, linenox);
+			}
+			//TODO once (on record one) should really check that any
+			//columns defined in the keydict as {} fields EXIST in the dictfile
+			if (keydictid) {
+				key = calculate(keydictid, dictfile, key, rec, 0);
+			}
+
+			nimported += 1;
+
+			if (not validating) {
+				rec.write(file, key);
 			}
 
 		}//loop;
@@ -628,6 +655,17 @@ addbuff:
 	line = buff.field("\r", 1);
 	buff.splicer(1, line.length() + 1, "");
 
+	nquotes = line.count(DQ);
+	while (true) {
+		///BREAK;
+		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.length())) break;
+		var line2 = buff.field("\r", 1);
+		nquotes += line2.count(DQ);
+		buff.splicer(1, line2.length() + 1, "");
+		line ^= "\n";
+		line ^= line2;
+	}//loop;
+
 	linenox += 1;
 	eof = 0;
 
@@ -659,6 +697,30 @@ subroutine lockfile() {
 
 subroutine unlockfile() {
 	call unlockrecord(filename, file, key);
+	return;
+}
+
+subroutine parseline(io line) {
+
+	//preserve escaped quotes
+	line.swapper("\\\"", "&quote;");
+
+	//preserve commas inside quotes
+	nquotes = line.count(DQ);
+	for (var quoten = 2; quoten <= nquotes; quoten+=2) {
+		var tt = line.field(DQ, quoten);
+		if (tt.index(",")) {
+			tt.swapper(",", "&comma;");
+			line = line.fieldstore(DQ, quoten, 1, tt);
+		}
+	} //quoten;
+
+	line.converter(",", VM);
+
+	line.swapper(DQ, "");
+	line.swapper("&quote;", DQ);
+	line.swapper("&comma;", ",");
+
 	return;
 }
 
