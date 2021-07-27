@@ -633,75 +633,39 @@ class DLL_PUBLIC var final {
 	// ASSIGN OPERATORS
 	///////////////////
 
-	//=int
+	//=int|double|char|char*|std::string&|std::string&& - only allow lvalue
 	var& operator=(const int) &;
-
-	//=double
 	var& operator=(const double) &;
-
-	//=char
 	var& operator=(const char) &;
-
-	//=char*
 	var& operator=(const char*) &;
-
-	//=string
 	var& operator=(const std::string&) &;
 	var& operator=(const std::string&&) &;
 
-	// ^=var
+	// ^=var|int|double|char|char*|std::string& - only allow lvalue
 	var& operator^=(const var&) &;
-
-	// ^=int
 	var& operator^=(const int) &;
-
-	// ^=double
 	var& operator^=(const double) &;
-
-	// ^=char
 	var& operator^=(const char) &;
-
-	// ^=char*
 	var& operator^=(const char*) &;
-
-	// ^=string
 	var& operator^=(const std::string&) &;
 
-	/*
-	//postfix returning void so cannot be used in expressions (avoid unreadable programs)
-	void operator++ (int);
-	void operator-- (int);
-
-	//TODO: since preventing pre and postfix in expressions then force only use of prefix
-	version since it is faster
-
-	//prefix returning void so cannot be used in expressions (avoid unreadable programs)
-	void operator++ ();
-	void operator-- ();
-	*/
-
-	//#ifndef HASINTREFOP
-	//#else
-	// postfix
+	// increment/decrement as postfix - only allow lvalue
 	var operator++(int) &;
 	var operator--(int) &;
 
-	// prefix
+	// increment/decrement as prefix - only allow lvalue
 	var& operator++() &;
 	var& operator--() &;
-	//+=var
+
+	//+=var|int|double - only allow lvalue
+	var& operator+=(const var&) &;
 	var& operator+=(int) &;
 	var& operator+=(double) &;
-	//-=var
+
+	//-=var|int|double - only allow lvalue
+	var& operator-=(const var&) &;
 	var& operator-=(int) &;
 	var& operator-=(double) &;
-
-	// not handled by inbuilt conversion of var to int
-	//+=var
-	var& operator+=(const var&) &;
-	//-=var
-	var& operator-=(const var&) &;
-	//#endif
 
 	/////////////
 	// BINARY OPS
