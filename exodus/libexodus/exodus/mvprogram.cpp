@@ -1412,12 +1412,16 @@ baddict:
 			}
 		}
 
+		//AREV does not do this.
+		//in AREV, a multivalued dict may call a single valued dict that calls a multivalued dict.
+		//and MV needs to be preserved over the set of calls.
+		//Therefore all the following is cancelled.
 		// for single valued fields, inform the called routine that MV is 0
-		int savedMV;
-		if (!ismv) {
-			savedMV = MV;
-			MV = 0;
-		}
+		//int savedMV;
+		//if (!ismv) {
+		//	savedMV = MV;
+		//	MV = 0;
+		//}
 
 		// return dict_exodusfunctorbase_.calldict();
 		// return ANS;
@@ -1430,8 +1434,8 @@ baddict:
 		// std::cout<<"postcal"<<std::endl;
 
 		// restore the MV if necessary
-		if (!ismv)
-			MV = savedMV;
+		//if (!ismv)
+		//	MV = savedMV;
 
 		return ANS;
 	}
