@@ -393,10 +393,12 @@ class DLL_PUBLIC var final {
 	var(var&& fromvar) noexcept;  // = default;
 
 	// copy assignment constructor
-	var& operator=(const var& fromvar);	 // = default;
+	var& operator=(const var& fromvar) &;	 // = default;
+	//var& operator=(const var &) && = delete; //disable assign to temporaries
 
 	// move assignment
-	var& operator=(var&& fromvar) noexcept;	 // = default;
+	var& operator=(var&& fromvar) & noexcept;	 // = default;
+	//var& operator=(var&& fromvar) && noexcept = delete;	 // disable move to temporaries
 
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
@@ -632,38 +634,38 @@ class DLL_PUBLIC var final {
 	///////////////////
 
 	//=int
-	var& operator=(const int);
+	var& operator=(const int) &;
 
 	//=double
-	var& operator=(const double);
+	var& operator=(const double) &;
 
 	//=char
-	var& operator=(const char);
+	var& operator=(const char) &;
 
 	//=char*
-	var& operator=(const char*);
+	var& operator=(const char*) &;
 
 	//=string
-	var& operator=(const std::string&);
-	var& operator=(const std::string&&);
+	var& operator=(const std::string&) &;
+	var& operator=(const std::string&&) &;
 
 	// ^=var
-	var& operator^=(const var&);
+	var& operator^=(const var&) &;
 
 	// ^=int
-	var& operator^=(const int);
+	var& operator^=(const int) &;
 
 	// ^=double
-	var& operator^=(const double);
+	var& operator^=(const double) &;
 
 	// ^=char
-	var& operator^=(const char);
+	var& operator^=(const char) &;
 
 	// ^=char*
-	var& operator^=(const char*);
+	var& operator^=(const char*) &;
 
 	// ^=string
-	var& operator^=(const std::string&);
+	var& operator^=(const std::string&) &;
 
 	/*
 	//postfix returning void so cannot be used in expressions (avoid unreadable programs)
@@ -681,24 +683,24 @@ class DLL_PUBLIC var final {
 	//#ifndef HASINTREFOP
 	//#else
 	// postfix
-	var operator++(int);
-	var operator--(int);
+	var operator++(int) &;
+	var operator--(int) &;
 
 	// prefix
-	var& operator++();
-	var& operator--();
+	var& operator++() &;
+	var& operator--() &;
 	//+=var
-	var& operator+=(int);
-	var& operator+=(double);
+	var& operator+=(int) &;
+	var& operator+=(double) &;
 	//-=var
-	var& operator-=(int);
-	var& operator-=(double);
+	var& operator-=(int) &;
+	var& operator-=(double) &;
 
 	// not handled by inbuilt conversion of var to int
 	//+=var
-	var& operator+=(const var&);
+	var& operator+=(const var&) &;
 	//-=var
-	var& operator-=(const var&);
+	var& operator-=(const var&) &;
 	//#endif
 
 	/////////////
@@ -1761,10 +1763,10 @@ class DLL_PUBLIC dim {
 	var join(const var& sepchar = FM_) const;
 
 	// parenthesis operators often come in pairs
-	var& operator()(int rowno, int colno = 1);
+	ND var& operator()(int rowno, int colno = 1);
 
 	// following const version is called if we do () on a dim which was defined as const xx
-	var& operator()(int rowno, int colno = 1) const;
+	ND var& operator()(int rowno, int colno = 1) const;
 
 	// Q: why is this commented out?
 	// A: we dont want to COPY vars out of an array when using it in rhs expression

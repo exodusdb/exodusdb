@@ -351,8 +351,8 @@ var::operator const char*()
 // cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
-var& var::operator=(const var& rhs) {
-	THISIS("var& var::operator= (const var& rhs)")
+var& var::operator=(const var& rhs) & {
+	THISIS("var& var::operator= (const var& rhs) &")
 	THISISDEFINED()	 //could be skipped for speed?
 	ISASSIGNED(rhs)
 
@@ -373,7 +373,7 @@ var& var::operator=(const var& rhs) {
 
 // move assignment
 // var = temporary var
-var& var::operator=(var&& rhs) noexcept {
+var& var::operator=(var&& rhs) & noexcept {
 	// skip this for speed?
 	// THISIS("var& var::operator= (var rhs)")
 	// THISISDEFINED()
@@ -399,7 +399,7 @@ var& var::operator=(var&& rhs) noexcept {
 
 //=int
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const int int1) {
+var& var::operator=(const int int1) & {
 	// THISIS("var& var::operator= (const int int1)")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=123';
@@ -414,7 +414,7 @@ var& var::operator=(const int int1) {
 
 //=double
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const double double1) {
+var& var::operator=(const double double1) & {
 	// THISIS("var& var::operator= (const double double1)")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=9.9';
@@ -429,9 +429,9 @@ var& var::operator=(const double double1) {
 
 //=char
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const char char2) {
+var& var::operator=(const char char2) & {
 
-	THISIS("var& var::operator= (const char char2)")
+	THISIS("var& var::operator= (const char char2) &")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=L'X';
 	// this causes crash due to bad memory access due to setting string that doesnt exist
@@ -448,8 +448,8 @@ var& var::operator=(const char char2) {
 
 //=char*
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const char* cstr) {
-	THISIS("var& var::operator= (const char* cstr2)")
+var& var::operator=(const char* cstr) & {
+	THISIS("var& var::operator= (const char* cstr2) &")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign="xxx";
 	// this causes crash due to bad memory access due to setting string that doesnt exist
@@ -464,9 +464,9 @@ var& var::operator=(const char* cstr) {
 
 //=std::string variable (lvalue)
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const std::string& string2) {
+var& var::operator=(const std::string& string2) & {
 
-	THISIS("var& var::operator= (const std::string& string2)")
+	THISIS("var& var::operator= (const std::string& string2) &")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=std::string("xxx"";
 	// this causes crash due to bad memory access due to setting string that doesnt exist
@@ -479,9 +479,9 @@ var& var::operator=(const std::string& string2) {
 }
 //=std::string temporary (rvalue)
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const std::string&& string2) {
+var& var::operator=(const std::string&& string2) & {
 
-	THISIS("var& var::operator= (const std::string&& string2)")
+	THISIS("var& var::operator= (const std::string&& string2) &")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=std::string("xxx"";
 	// this causes crash due to bad memory access due to setting string that doesnt exist
@@ -496,8 +496,8 @@ var& var::operator=(const std::string&& string2) {
 
 //^=var
 // The assignment operator should always return a reference to *this.
-var& var::operator^=(const var& rhs) {
-	THISIS("var& var::operator^=(const var& rhs)")
+var& var::operator^=(const var& rhs) & {
+	THISIS("var& var::operator^=(const var& rhs) &")
 	THISISSTRING()
 	ISSTRING(rhs)
 
@@ -510,8 +510,8 @@ var& var::operator^=(const var& rhs) {
 
 //^=int
 // The assignment operator should always return a reference to *this.
-var& var::operator^=(const int int1) {
-	THISIS("var& var::operator^= (const int int1)")
+var& var::operator^=(const int int1) & {
+	THISIS("var& var::operator^= (const int int1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -523,8 +523,8 @@ var& var::operator^=(const int int1) {
 
 //^=double
 // The assignment operator should always return a reference to *this.
-var& var::operator^=(const double double1) {
-	THISIS("var& var::operator^= (const double double1)")
+var& var::operator^=(const double double1) & {
+	THISIS("var& var::operator^= (const double double1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -536,8 +536,8 @@ var& var::operator^=(const double double1) {
 
 //^=char
 // The assignment operator should always return a reference to *this.
-var& var::operator^=(const char char1) {
-	THISIS("var& var::operator^= (const char char1)")
+var& var::operator^=(const char char1) & {
+	THISIS("var& var::operator^= (const char char1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -549,8 +549,8 @@ var& var::operator^=(const char char1) {
 
 //^=char*
 // The assignment operator should always return a reference to *this.
-var& var::operator^=(const char* cstr) {
-	THISIS("var& var::operator^= (const char* cstr)")
+var& var::operator^=(const char* cstr) & {
+	THISIS("var& var::operator^= (const char* cstr) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -563,8 +563,8 @@ var& var::operator^=(const char* cstr) {
 
 //^=std::string
 // The assignment operator should always return a reference to *this.
-var& var::operator^=(const std::string& string1) {
-	THISIS("var& var::operator^= (const std::string string1)")
+var& var::operator^=(const std::string& string1) & {
+	THISIS("var& var::operator^= (const std::string string1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -584,8 +584,8 @@ var& var::operator^=(const std::string& string1) {
 
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
-var var::operator++(int) {
-	THISIS("var var::operator++ (int)")
+var var::operator++(int) & {
+	THISIS("var var::operator++ (int) &")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -624,8 +624,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v--
-var var::operator--(int) {
-	THISIS("var var::operator-- (int)")
+var var::operator--(int) & {
+	THISIS("var var::operator-- (int) &")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -663,8 +663,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override ++var
-var& var::operator++() {
-	THISIS("var var::operator++ ()")
+var& var::operator++() & {
+	THISIS("var var::operator++ () &")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -697,8 +697,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
-var& var::operator--() {
-	THISIS("var& var::operator-- ()")
+var& var::operator--() & {
+	THISIS("var& var::operator-- () &")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -733,8 +733,8 @@ tryagain:
 
 //+=var (very similar to version with on rhs)
 // provided to disambiguate syntax like var1+=var2
-var& var::operator+=(int int1) {
-	THISIS("var& var::operator+= (int int1)")
+var& var::operator+=(int int1) & {
+	THISIS("var& var::operator+= (int int1) &")
 	THISISDEFINED()
 
 tryagain:
@@ -772,8 +772,8 @@ tryagain:
 
 //-=var (very similar to version with on rhs)
 // provided to disambiguate syntax like var1+=var2
-var& var::operator-=(int int1) {
-	THISIS("var& var::operator-= (int int1)")
+var& var::operator-=(int int1) & {
+	THISIS("var& var::operator-= (int int1) &")
 	THISISDEFINED()
 
 tryagain:
@@ -801,19 +801,19 @@ tryagain:
 }
 
 // allow varx+=1.5 to compile
-var& var::operator+=(double dbl1) {
+var& var::operator+=(double dbl1) & {
 	(*this) += var(dbl1);
 	return *this;
 }
 
-var& var::operator-=(double dbl1) {
+var& var::operator-=(double dbl1) & {
 	(*this) -= var(dbl1);
 	return *this;
 }
 
 //+=var
-var& var::operator+=(const var& rhs) {
-	THISIS("var& var::operator+= (const var& rhs)")
+var& var::operator+=(const var& rhs) & {
+	THISIS("var& var::operator+= (const var& rhs) &")
 	THISISDEFINED()
 
 tryagain:
@@ -859,8 +859,8 @@ tryagain:
 }
 
 //-=var
-var& var::operator-=(const var& rhs) {
-	THISIS("var& var::operator-= (const var& rhs)")
+var& var::operator-=(const var& rhs) & {
+	THISIS("var& var::operator-= (const var& rhs) &")
 	THISISDEFINED()
 
 tryagain:
