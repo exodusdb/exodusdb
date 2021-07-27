@@ -238,6 +238,12 @@ var var::iconv_D(const char* conversion) const {
 	// for now dont default current year since this is a user input type issue
 	// and exodus is planned to be used on the server side.
 
+	//switch to yyyy-mm-dd format if first part looks like a four digit year
+	if (parts[0] >= 1000) {
+		yearfirst = true;
+		dayfirst = false;
+	}
+
 	int day;
 	int year;
 	if (month != 0) {
