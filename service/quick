@@ -41,7 +41,7 @@ getpidinfo() {
 
 function live_or_test() {
 
-		if [ $2 = LIVE ]; then
+		if [ $2 = live ]; then
 			suffix=
 			prefix=neo
 		else
