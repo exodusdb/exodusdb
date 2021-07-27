@@ -802,19 +802,23 @@ nextdbasen:;
 	hostdescriptions ^= " - " ^ cpudesc ^ " x " ^ nprocs;
 
 	//list ipnos
-	result = shell2("ipconfig /all", errors).ucase();
-	result.converter("\r\n", FM);
-	nn = result.count(FM) + 1;
-	ips = "";
-	for (ii = 1; ii <= nn; ++ii) {
-		line = result.a(ii).trim();
-		line.swapper("IPV4 ADDRESS", "IP ADDRESS");
-		if (line.substr(1, 10) eq "IP ADDRESS") {
-			ips.r(-1, line.field(":", 2).trim().field("(", 1));
+	if (VOLUMES) {
+		result = shell2("ipconfig /all", errors).ucase();
+		result.converter("\r\n", FM);
+		nn = result.count(FM) + 1;
+		ips = "";
+		for (ii = 1; ii <= nn; ++ii) {
+			line = result.a(ii).trim();
+			line.swapper("IPV4 ADDRESS", "IP ADDRESS");
+			if (line.substr(1, 10) eq "IP ADDRESS") {
+				ips.r(-1, line.field(":", 2).trim().field("(", 1));
 			//only display the first
-			goto gotip;
-		}
-	} //ii;
+				goto gotip;
+			}
+		} //ii;
+	} else {
+		ips = shell2("printf $(hostname -I | cut -d' ' -f 1)");
+	}
 gotip:
 	if (not ips) {
 		ips = "0.0.0.0";
