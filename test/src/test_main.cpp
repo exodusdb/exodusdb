@@ -346,7 +346,7 @@ function main()
 	//check invalid utf8 has no change oswrite/osread round trip
 	oswrite(utftest,"t_"^utftestfilename);
 	osread(utftest2,"t_"^utftestfilename);
-	assert(utftest2=utftest);
+	assert(utftest2==utftest);
 
 	//check invalid utf has no change on ucase/lcase round trip
 	assert(lcase(ucase(utftest))==lcase(utftest));
@@ -662,7 +662,8 @@ function main()
 	assert(offsetx==0);
 
 	//check reading 2 bytes results in 1 unicode character (2 bytes)
-	testdata.osbread(testfilex,offsetx=0,2);
+	offsetx=0;
+	testdata.osbread(testfilex,offsetx,2);
 	assert(testdata==charout);
 	assert(testdata.length()==2);
 	assert(testdata.oconv("HEX2")=="CEB3");
@@ -865,15 +866,19 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//test reading from beyond end of file - returns ""
 		//offset2 is BYTE OFFSET NOT CHARACTER OFFSET!!!
 		var data,offset2;
-		data.osbread(tempfile,offset2=4,2);
+		offset2=4;
+		data.osbread(tempfile,offset2,2);
 		assert(data eq "");
 
 		//reading from middle of utf8 sequence -> invalid data TODO check valid UTF8
-		data.osbread(tempfile,offset2=3,2);
+		offset2=3;
+		data.osbread(tempfile,offset2,2);
 		assert(data.oconv("HEX")=="A3");
-		data.osbread(tempfile,offset2=1,2);
+		offset2=1;
+		data.osbread(tempfile,offset2,2);
 		assert(data.oconv("HEX")=="B3");
-		data.osbread(tempfile,offset2=2,2);
+		offset2=2;
+		data.osbread(tempfile,offset2,2);
 		data.oconv("HEX").outputl("test reading from middle of utf8 byte sequence test=");
 		//assert(data.osbread(tempfile,offset2=3,2) eq "");
 
@@ -883,13 +888,17 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//assert(data.osbread(tempfile,offset2=1,1) eq greek2[2]);
 		//assert(data.osbread(tempfile,offset2=2,1) eq greek2[3]);
 		//assert(data.osbread(tempfile,offset2=3,1) eq greek2[4]);
-		data.osbread(tempfile,offset2=0,1);
+		offset2=0;
+		data.osbread(tempfile,offset2,1);
 		assert(data eq greek2[1]);
-		data.osbread(tempfile,offset2=1,1);
+		offset2=1;
+		data.osbread(tempfile,offset2,1);
 		assert(data eq greek2[2]);
-		data.osbread(tempfile,offset2=2,1);
+		offset2=2;
+		data.osbread(tempfile,offset2,1);
 		assert(data eq greek2[3]);
-		data.osbread(tempfile,offset2=3,1);
+		offset2=3;
+		data.osbread(tempfile,offset2,1);
 		assert(data eq greek2[4]);
 
 		//verify utf-8 bytes
@@ -1628,12 +1637,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(str1.trimmer(" ","FB") eq "xxx  xxx");
 	assert(str1 ne str0);
 
-	//test daisychaining assignments
-	var aa1,aa2,aa3,aa4;
-	aa1=aa2=aa3="aa";
-	assert(aa1 eq "aa");
-	assert(aa2 eq "aa");
-	assert(aa3 eq "aa");
+	//test daisychaining assignments NOT ALLOWED - TO PREVENT = being used instead of == by mistake in if() clauses
+	//var aa1,aa2,aa3,aa4;
+	//aa1=aa2=aa3="aa";
+	//assert(aa1 eq "aa");
+	//assert(aa2 eq "aa");
+	//assert(aa3 eq "aa");
 
 	//string seed
 	initrnd("cccc");

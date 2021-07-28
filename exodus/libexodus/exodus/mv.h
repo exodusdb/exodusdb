@@ -373,6 +373,18 @@ VTC(VARTYP_NANSTR_DBCONN, VARTYP_NANSTR | VARTYP_DBCONN)
 //VTC(VARTYP_MASK, 0x80)
 VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE | VARTYP_DBCONN))
 
+//prevent or allow assignment to var to return a reference to the var
+//preventing will stop accidental usage of = instead of == in if() clauses
+//if you really want to assign in an if clause then use something like  if (x=123;x)
+#define PREVENT_ASSIGN_IN_IF
+#ifdef PREVENT_ASSIGN_IN_IF
+#define VOID_OR_VARREF void
+#define VOID_OR_THIS
+#else
+#define VOID_OR_VARREF "var&"
+#define VOID_OR_THIS "*this"
+#endif
+
 // class var
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
 class DLL_PUBLIC var final {
@@ -393,11 +405,11 @@ class DLL_PUBLIC var final {
 	var(var&& fromvar) noexcept;  // = default;
 
 	// copy assignment constructor
-	var& operator=(const var& fromvar) &;	 // = default;
+	VOID_OR_VARREF operator=(const var& fromvar) &;	 // = default;
 	//var& operator=(const var &) && = delete; //disable assign to temporaries
 
 	// move assignment
-	var& operator=(var&& fromvar) & noexcept;	 // = default;
+	VOID_OR_VARREF operator=(var&& fromvar) & noexcept;	 // = default;
 	//var& operator=(var&& fromvar) && noexcept = delete;	 // disable move to temporaries
 
 	// destructor - sets var_typ undefined
@@ -634,12 +646,12 @@ class DLL_PUBLIC var final {
 	///////////////////
 
 	//=int|double|char|char*|std::string&|std::string&& - only allow lvalue
-	var& operator=(const int) &;
-	var& operator=(const double) &;
-	var& operator=(const char) &;
-	var& operator=(const char*) &;
-	var& operator=(const std::string&) &;
-	var& operator=(const std::string&&) &;
+	VOID_OR_VARREF operator=(const int) &;
+	VOID_OR_VARREF operator=(const double) &;
+	VOID_OR_VARREF operator=(const char) &;
+	VOID_OR_VARREF operator=(const char*) &;
+	VOID_OR_VARREF operator=(const std::string&) &;
+	VOID_OR_VARREF operator=(const std::string&&) &;
 
 	// ^=var|int|double|char|char*|std::string& - only allow lvalue
 	var& operator^=(const var&) &;

@@ -139,10 +139,11 @@ function main() {
 
 		installcmd = "mv";
 
-		if ((compiler = osgetenv("EXO_CXX"))) {
+		compiler = osgetenv("EXO_CXX");
+		if (compiler) {
 			if (verbose)
 				printl("Using EXO_CXX environment variable for compiler " ^ compiler.quote());
-		} else if ((compiler = osgetenv("CXX"))) {
+		} else if (compiler = osgetenv("CXX");compiler) {
 			if (verbose)
 				printl("Using CXX environment variable for compiler " ^ compiler.quote());
 		} else {

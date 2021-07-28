@@ -351,7 +351,7 @@ var::operator const char*()
 // cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
-var& var::operator=(const var& rhs) & {
+VOID_OR_VARREF var::operator=(const var& rhs) & {
 	THISIS("var& var::operator= (const var& rhs) &")
 	THISISDEFINED()	 //could be skipped for speed?
 	ISASSIGNED(rhs)
@@ -360,7 +360,7 @@ var& var::operator=(const var& rhs) & {
 
 	// important not to self assign
 	if (this == &rhs)
-		return *this;
+		return VOID_OR_THIS;
 
 	// copy everything across
 	var_str = rhs.var_str;
@@ -368,12 +368,12 @@ var& var::operator=(const var& rhs) & {
 	var_int = rhs.var_int;
 	var_typ = rhs.var_typ;
 
-	return *this;
+	return VOID_OR_THIS;
 }
 
 // move assignment
 // var = temporary var
-var& var::operator=(var&& rhs) & noexcept {
+VOID_OR_VARREF var::operator=(var&& rhs) & noexcept {
 	// skip this for speed?
 	// THISIS("var& var::operator= (var rhs)")
 	// THISISDEFINED()
@@ -386,7 +386,7 @@ var& var::operator=(var&& rhs) & noexcept {
 
 	// important not to self assign
 	if (this == &rhs)
-		return *this;
+		return VOID_OR_THIS;
 
 	// move everything over
 	var_str = std::move(rhs.var_str);
@@ -394,12 +394,12 @@ var& var::operator=(var&& rhs) & noexcept {
 	var_int = rhs.var_int;
 	var_typ = rhs.var_typ;
 
-	return *this;
+	return VOID_OR_THIS;
 }
 
 //=int
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const int int1) & {
+VOID_OR_VARREF var::operator=(const int int1) & {
 	// THISIS("var& var::operator= (const int int1)")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=123';
@@ -409,12 +409,12 @@ var& var::operator=(const int int1) & {
 	var_int = int1;
 	var_typ = VARTYP_INT;  // reset to one unique type
 
-	return *this;
+	return VOID_OR_THIS;
 }
 
 //=double
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const double double1) & {
+VOID_OR_VARREF var::operator=(const double double1) & {
 	// THISIS("var& var::operator= (const double double1)")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=9.9';
@@ -424,12 +424,12 @@ var& var::operator=(const double double1) & {
 	var_dbl = double1;
 	var_typ = VARTYP_DBL;  // reset to one unique type
 
-	return *this;
+	return VOID_OR_THIS;
 }
 
 //=char
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const char char2) & {
+VOID_OR_VARREF var::operator=(const char char2) & {
 
 	THISIS("var& var::operator= (const char char2) &")
 	// protect against unlikely syntax as follows:
@@ -443,12 +443,12 @@ var& var::operator=(const char char2) & {
 	var_str = char2;
 	var_typ = VARTYP_STR;  // reset to one unique type
 
-	return *this;
+	return VOID_OR_THIS;
 }
 
 //=char*
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const char* cstr) & {
+VOID_OR_VARREF var::operator=(const char* cstr) & {
 	THISIS("var& var::operator= (const char* cstr2) &")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign="xxx";
@@ -459,12 +459,12 @@ var& var::operator=(const char* cstr) & {
 	var_str = cstr;
 	var_typ = VARTYP_STR;  // reset to one unique type
 
-	return *this;
+	return VOID_OR_THIS;
 }
 
 //=std::string variable (lvalue)
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const std::string& string2) & {
+VOID_OR_VARREF var::operator=(const std::string& string2) & {
 
 	THISIS("var& var::operator= (const std::string& string2) &")
 	// protect against unlikely syntax as follows:
@@ -475,11 +475,11 @@ var& var::operator=(const std::string& string2) & {
 	var_str = string2;
 	var_typ = VARTYP_STR;  // reset to one unique type
 
-	return *this;
+	return VOID_OR_THIS;
 }
 //=std::string temporary (rvalue)
 // The assignment operator should always return a reference to *this.
-var& var::operator=(const std::string&& string2) & {
+VOID_OR_VARREF var::operator=(const std::string&& string2) & {
 
 	THISIS("var& var::operator= (const std::string&& string2) &")
 	// protect against unlikely syntax as follows:
@@ -490,7 +490,7 @@ var& var::operator=(const std::string&& string2) & {
 	var_str = std::move(string2);
 	var_typ = VARTYP_STR;  // reset to one unique type
 
-	return *this;
+	return VOID_OR_THIS;
 }
 //^= is not templated since slightly slower to go through the creation of an var()
 

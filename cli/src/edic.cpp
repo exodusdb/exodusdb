@@ -412,7 +412,7 @@ programinit()
 					//printl(startatlineno);
 					//msvc style error lines
 					//test.cpp(6) : error C2143: syntax error : missing ';' before '}'
-				} else if ((charn = index(errors, ") : error "))) {
+				} else if (charn = index(errors, ") : error ");charn) {
 					startatlineno = errors.substr(charn - 10, 10).field2("(", 2);
 				}
 				if (startatlineno) {

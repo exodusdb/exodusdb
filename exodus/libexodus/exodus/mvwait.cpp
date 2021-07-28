@@ -250,7 +250,8 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
 
 				/* Inotify events are available */
 				//quit if any relevent events
-				if (events = handle_events(inotify_fd, wd, argc, argv))
+				events = handle_events(inotify_fd, wd, argc, argv);
+				if (events)
 					break;
 			}
 

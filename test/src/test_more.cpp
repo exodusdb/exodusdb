@@ -189,6 +189,48 @@ function main() {
 		assert(--v == 2.1);
 	}
 
+	{
+		var x;
+
+		//INCREMENT
+
+		x=1;
+		assert(x++ == 1);
+		assert(x == 2);
+
+		//assert(x.a(1)++ == 1);//does not compile
+		//assert((x.a(1))++ == 1);//does not compile
+		//assert(x == 2);
+
+		x = 1;
+		assert(++x == 2);
+		assert(x == 2);
+
+		x = 1;
+		//assert(++x.a(1) == 2);//does not compile
+		assert((++x).a(1) == 2);
+		assert(x == 2);
+
+		//DECREMENT
+
+		x=1;
+		assert(x-- == 1);
+		assert(x == 0);
+
+		//assert(x.a(1)-- == 1);//does not compile
+		//assert((x.a(1))-- == 1);//does not compile
+		assert(x == 0);
+
+		x = 1;
+		assert(--x == 0);
+		assert(x == 0);
+
+		x = 1;
+		//assert(--x.a(1) == 2);//does not compile
+		assert((--x).a(1) == 0);
+		assert(x == 0);
+	}
+
 	//+=
 	{
 		var v = 3;
@@ -655,7 +697,7 @@ function main() {
 
 		if (uncaught) {
 			printl(uncaught);
-			assert(uncaught = "");
+			assert(uncaught == "");
 		}
 		//	try {throw MV("test");} catch (MV e){};
 	}
