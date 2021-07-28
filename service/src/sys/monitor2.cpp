@@ -128,6 +128,11 @@ function main() {
 	//command mode forces, call mode only every x minutes
 	forced = SENTENCE.field(" ", 1).ucase() eq "MONITOR2";
 
+	//quit if disabled and not forced
+	if (not(forced) and var("../../serve_agy.disabled").osfile()) {
+		return 0;
+		}
+
 	upgradeready = 0;
 	//only counts web users
 	anyusers = 0;
@@ -328,7 +333,7 @@ nextprocess:
 					tt.r(1, 1, 3, bakpars.a(3));
 				}
 				backuprequired.r(1, dbasen, tt);
-				}
+			}
 
 		}
 
