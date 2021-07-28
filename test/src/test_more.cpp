@@ -1035,6 +1035,58 @@ function main() {
 	assert(v1 == 3);
 	assert(--v1 == 2);
 
+	{
+		var x=1;
+
+		//////////
+		//positive
+		//////////
+
+		//lvalue
+
+		printl(x++,1);
+		printl(x++, 2);
+		printl(x, 3);
+		printl(++ ++x, 4);
+		printl(x, 4);
+
+		x=1;
+		assert(x++ == 1);
+		assert(x == 2);
+		assert(++x ==3);
+		assert(x ==3);
+
+		//rvalue
+
+		x=1;
+		//assert(x.a(1)++ == 1);//pointless. should not compile
+		assert(x.a(1) == 1);
+		//assert(++x.a(1) == 2);//will not compile because "." priority > "++"
+		assert((++x).a(1) == 2);
+		assert(x.a(1) == 2);
+
+		//////////
+		//negative
+		//////////
+
+		//lvalue
+
+		x=1;
+		assert(x-- == 1);
+		assert(x == 0);
+		assert(--x == -1);
+		assert(x == -1);
+
+		//rvalue
+
+		x=1;
+		//assert(x.a(1)-- == 1);//pointless. should not compile
+		assert(x.a(1) == 1);
+		//assert(--x.a(1) == 2);//will not compile because "." priority > "--"
+		assert((--x).a(1) == 0);
+		assert(x.a(1) == 0);
+
+	}
 	printl("Test passed");
 
 	return 0;

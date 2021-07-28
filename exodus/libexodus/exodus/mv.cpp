@@ -579,8 +579,8 @@ var& var::operator^=(const std::string& string1) & {
 //#ifndef HASINTREFOP
 //#else
 
-// You must *not* make the postfix version return the 'this' object by reference; you have been
-// warned.
+// You must *not* make the postfix version return the 'this' object by reference
+// *** YOU HAVE BEEN WARNED ***
 
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
@@ -625,7 +625,7 @@ tryagain:
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v--
 var var::operator--(int) & {
-	THISIS("var var::operator-- (int) &")
+	THISIS("var var::operator-- (int) & ")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
