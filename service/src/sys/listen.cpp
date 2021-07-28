@@ -1,3 +1,4 @@
+
 #include <exodus/library.h>
 libraryinit()
 
@@ -514,6 +515,7 @@ nextsearch:
 
 	//clear any file handles
 	var().osflush();
+	var().disconnectall();
 
 	//on win95 this runs at same speed in full screen or windowed
 

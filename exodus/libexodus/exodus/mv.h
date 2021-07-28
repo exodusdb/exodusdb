@@ -1418,6 +1418,7 @@ class DLL_PUBLIC var final {
 
 	bool connect(const var& conninfo DEFAULTNULL);
 	bool disconnect();
+	bool disconnectall();
 	ND int getdefaultconnectionid() const;
 	bool setdefaultconnectionid() const;
 

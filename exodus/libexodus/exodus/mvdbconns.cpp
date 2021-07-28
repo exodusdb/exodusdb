@@ -96,13 +96,31 @@ void MvConnectionsCache::del_connection(int index) {
 	}
 }
 
+void MvConnectionsCache::del_connections(int from_index) {
+	boost::mutex::scoped_lock lock(mvconnections_mutex);
+	CONN_MAP::iterator ix;
+	ix = conntbl.begin();
+	while (ix != conntbl.end()) {
+		if (ix->first >= from_index) {
+			//TRACE(ix->first)
+			del((CACHED_CONNECTION)ix->second.connection);
+			delete ix->second.plock_table;
+			delete ix->second.precordcache;
+			ix = conntbl.erase(ix);
+		}
+		else {
+			ix++;
+		}
+	}
+	connection_id = from_index -= 1;
+}
+
 MvConnectionsCache::~MvConnectionsCache() {
 	// no need
 	// boost::mutex::scoped_lock lock(mvconnections_mutex);
 
 	CONN_MAP::iterator ix;
 	for (ix = conntbl.begin(); ix != conntbl.end(); ix++) {
-		//		del((CACHED_CONNECTION) ix->second.connection);
 		del((CACHED_CONNECTION)ix->second.connection);
 		delete ix->second.plock_table;
 		delete ix->second.precordcache;

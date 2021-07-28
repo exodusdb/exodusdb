@@ -25,45 +25,13 @@
 //#include <map>
 #include <unordered_map>
 
-// INtroducing the type for LockTable, it should be unordered set
-
-#if 0
-
-//#define HAVE_TR1
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef HAVE_CXX0X
-#include <unordered_set>
-#define UNORDERED_SET_FOR_LOCKTABLE std::unordered_set<uint64_t>
-
-// expect bug here since centos5.3 32bit has tr1 but not with an unordered set
-#elif defined(HAVE_TR1)
-#include <tr1/unordered_set>
-#define UNORDERED_SET_FOR_LOCKTABLE std::tr1::unordered_set<uint64_t>
-
-// assume we have a recent boost on windows
-// boost 1.33 doesnt seem to have unordered set
-#elif defined(HAVE_BOOST_UNORDERED_SET) || defined(_MSC_VER)
-#include <boost/unordered_set.hpp>
-#define UNORDERED_SET_FOR_LOCKTABLE boost::unordered_set<uint64_t>
-#else
 #define USE_MAP_FOR_UNORDERED
-#include <map>
-
-#define UNORDERED_SET_FOR_LOCKTABLE std::map<uint64_t, int>
-#endif
-
-#endif
-
-#define USE_MAP_FOR_UNORDERED
-//using LockTable = UNORDERED_SET_FOR_LOCKTABLE;
 using LockTable = std::unordered_map<uint64_t, int>;
 
 namespace exodus {
 
 using CACHED_CONNECTION = PGconn*;
-using DELETER_AND_DESTROYER = void (*)(CACHED_CONNECTION /*, UNORDERED_SET_FOR_LOCKTABLE * */);
+using DELETER_AND_DESTROYER = void (*)(CACHED_CONNECTION);
 
 using RecordCache = std::unordered_map<std::string, std::string>;
 
@@ -106,6 +74,7 @@ class MvConnectionsCache {
 	// manipulators
 	int add_connection(CACHED_CONNECTION connection_with_file);
 	void del_connection(int index);
+	void del_connections(int from_index);
 
 	// observers
 	CACHED_CONNECTION get_connection(int index) const;

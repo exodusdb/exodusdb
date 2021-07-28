@@ -103,18 +103,6 @@ namespace exodus {
 
 // bool startipc();
 
-// Deleter function to close connection and connection cache object
-// this is also called in the destructor of MVConnectionsCache
-// MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
-// TODO so make sure that we dont use exit(n) anywhere in the programs!
-static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
-	PGconn* pgp = (PGconn*)con_;
-	//var("========================== deleting connection ==============================").errputl();
-	PQfinish(pgp);	// AFAIK, it destroys the object by pointer
-					//	delete pgp;
-}
-static MvConnectionsCache mv_connections_cache(connection_DELETER_AND_DESTROYER);
-
 // DBTRACE is set in exodus_main (console programs) but not when used as a plain library
 // so initialise it on the fly. assume that it will usually be less than one for not tracing
 #define GETDBTRACE (DBTRACE >= 0 && getdbtrace())
@@ -123,6 +111,23 @@ bool getdbtrace() {
 		DBTRACE = var().osgetenv("EXO_DBTRACE") ? 1 : -1;
 	return DBTRACE > 0;
 }
+
+// Deleter function to close connection and connection cache object
+// this is also called in the destructor of MVConnectionsCache
+// MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
+// TODO so make sure that we dont use exit(n) anywhere in the programs!
+static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
+	PGconn* pgp = (PGconn*)con_;
+    // at this point we have good new connection to database
+    if (GETDBTRACE) {
+        var("PQFinish").logputl();
+	}
+	//var("========================== deleting connection ==============================").errputl();
+	PQfinish(pgp);	// AFAIK, it destroys the object by pointer
+					//	delete pgp;
+}
+//static
+thread_local MvConnectionsCache mv_connections_cache(connection_DELETER_AND_DESTROYER);
 
 //#if TRACING >= 5
 #define DEBUG_LOG_SQL         \
@@ -161,7 +166,7 @@ bool getdbtrace() {
 // this is not threadsafe
 // PGconn	 *thread_pgconn;
 // but this is ...
-boost::thread_specific_ptr<int> tss_pgconnids;
+boost::thread_specific_ptr<int> tss_pgconnid;
 boost::thread_specific_ptr<var> tss_pgconnparams;
 boost::thread_specific_ptr<var> tss_pglasterror;
 // boost::thread_specific_ptr<bool> tss_ipcstarted;
@@ -452,9 +457,9 @@ bool var::connect(const var& conninfo) {
 
 	// set default connection
 	// ONLY IF THERE ISNT ONE ALREADY
-	int* connid = tss_pgconnids.get();
+	int* connid = tss_pgconnid.get();
 	if (connid == NULL)
-		tss_pgconnids.reset(new int((int)conn_no));
+		tss_pgconnid.reset(new int((int)conn_no));
 
 	// save last connection string (used in startipc())
 	tss_pgconnparams.reset(new var(conninfo2));
@@ -482,7 +487,7 @@ bool var::connect(const var& conninfo) {
 
 int var::getdefaultconnectionid() const {
 	// otherwise return thread default connection id
-	int* connid = tss_pgconnids.get();
+	int* connid = tss_pgconnid.get();
 	if (connid && *connid != 0) {
 		//(var("getdefaultconnection found default thread connection id ") ^
 		// *connid).outputl();
@@ -510,7 +515,7 @@ bool var::setdefaultconnectionid() const {
 		MVDBException("is not a valid connection in setdefaultconnectionid()");
 
 	// save current connection handle number as thread specific handle no
-	tss_pgconnids.reset(new int((int)connid));
+	tss_pgconnid.reset(new int((int)connid));
 
 	return true;
 }
@@ -544,7 +549,7 @@ int var::getconnectionid_ordefault() const {
 		return connid2;
 
 	// otherwise return thread default connection id
-	int* connid = tss_pgconnids.get();
+	int* connid = tss_pgconnid.get();
 	connid2 = 0;
 	if (connid && *connid != 0) {
 		connid2 = *connid;
@@ -635,25 +640,37 @@ bool var::disconnect() {
 	if (GETDBTRACE)
 		var("DBTRACE mvdbpostgres disconnect() Closing connection").logputl();
 
-	int* default_connid = tss_pgconnids.get();
+	int* default_connid = tss_pgconnid.get();
 
-	//	if (THIS_IS_DBCONN())
-	//	{
+	//  if (THIS_IS_DBCONN())
+	//  {
 	var connid = this->getconnectionid();
 	if (connid) {
 		mv_connections_cache.del_connection((int)connid);
 		var_typ = VARTYP_UNA;
-		// if we happen to be disconnecting the same connection as the default connection
-		// then reset the default connection so that it will be reconnected to the next
-		// connect this is rather too smart but will probably do what people expect
+	// if we happen to be disconnecting the same connection as the default connection
+	// then reset the default connection so that it will be reconnected to the next
+	// connect this is rather too smart but will probably do what people expect
 		if (default_connid && *default_connid == connid)
-			tss_pgconnids.reset();
+			tss_pgconnid.reset();
 	} else {
 		if (default_connid && *default_connid) {
 			mv_connections_cache.del_connection(*default_connid);
-			tss_pgconnids.reset();
+			tss_pgconnid.reset();
 		}
 	}
+	return true;
+}
+
+bool var::disconnectall() {
+	THISIS("bool var::disconnectall()")
+	THISISDEFINED()
+
+	if (GETDBTRACE)
+		var("DBTRACE mvdbpostgres disconnectall() Closing all connections except the default").logputl();
+
+	mv_connections_cache.del_connections(2);
+
 	return true;
 }
 
