@@ -82,9 +82,6 @@ THE SOFTWARE.
 #include <cstring>	//for strcmp strlen
 #include <iostream>
 
-#include <boost/thread/tss.hpp>
-// http://beta.boost.org/doc/libs/1_41_0/doc/html/unordered.html
-
 // see exports.txt for all PQ functions
 //#include <postgresql/libpq-fe.h>//in postgres/include
 #include <libpq-fe.h>  //in postgres/include
@@ -100,6 +97,11 @@ THE SOFTWARE.
 #include <exodus/mvexceptions.h>
 
 namespace exodus {
+
+// the idea is for exodus to have access to one standard database without secret password
+static var defaultconninfo =
+	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
+	"password=somesillysecret connect_timeout=10";
 
 // bool startipc();
 
@@ -166,10 +168,9 @@ thread_local MvConnectionsCache mv_connections_cache(connection_DELETER_AND_DEST
 // this is not threadsafe
 // PGconn	 *thread_pgconn;
 // but this is ...
-boost::thread_specific_ptr<int> tss_pgconnid;
-boost::thread_specific_ptr<var> tss_pgconnparams;
-boost::thread_specific_ptr<var> tss_pglasterror;
-// boost::thread_specific_ptr<bool> tss_ipcstarted;
+thread_local int thread_default_connid = 0;
+thread_local var thread_connparams = "";
+thread_local var thread_dblasterror = "";
 
 std::string getresult(PGresult* pgresult, int rown, int coln) {
 	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
@@ -227,18 +228,15 @@ void var::setlasterror(const var& msg) const {
 	// dereferencing an invalid pointer or using some object after it has been freed. EVADE
 	// error for now by commenting next line
 
-	tss_pglasterror.reset(new var(msg));
+	thread_dblasterror = msg;
 }
 
 void var::setlasterror() const {
-	tss_pglasterror.reset();
+	thread_dblasterror = "";
 }
 
 var var::getlasterror() const {
-	if (tss_pglasterror.get())
-		return *tss_pglasterror.get();
-	else
-		return "";
+	return thread_dblasterror ?: "";
 }
 
 static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* thread_pgconn);
@@ -292,11 +290,6 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 
 #endif
 
-// the idea is for exodus to have access to one standard database without secret password
-static var defaultconninfo =
-	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
-	"password=somesillysecret connect_timeout=10";
-
 var var::build_conn_info(const var& conninfo) const {
 	// priority is
 	// 1) given parameters or last connection parameters
@@ -307,8 +300,8 @@ var var::build_conn_info(const var& conninfo) const {
 
 	var result(conninfo);
 	// if no conninfo details provided then use last connection details if any
-	if (!conninfo && tss_pgconnparams.get())
-		result = *tss_pgconnparams.get();
+	if (!conninfo)
+		result = thread_connparams;
 
 	// otherwise search for details from exodus config file
 	// if incomplete connection parameters provided
@@ -446,32 +439,22 @@ bool var::connect(const var& conninfo) {
 		var("var::connect() Connection to database succeeded.").logputl();
 
 	// cache the new connection handle
-	int conn_no = mv_connections_cache.add_connection(pgconn);
+	int connid = mv_connections_cache.add_connection(pgconn);
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
-	this->r(2, conn_no);
-	this->r(3, conninfo);
+	this->r(2, connid);
+	this->r(3, connid);
 
 	// this->outputl("new connection=");
 
 	// set default connection
 	// ONLY IF THERE ISNT ONE ALREADY
-	int* connid = tss_pgconnid.get();
-	if (connid == NULL)
-		tss_pgconnid.reset(new int((int)conn_no));
+	if (!thread_default_connid)
+		thread_default_connid = connid;
 
 	// save last connection string (used in startipc())
-	tss_pgconnparams.reset(new var(conninfo2));
-
-	// setup a thread to service callbacks from the database backend
-	// if (!tss_ipcstarted.get())
-	//{
-	//	//	#if TRACING >= 3
-	//		exodus::outputl("Starting IPC");
-	//	//	#endif
-	//	startipc();
-	//}
+	thread_connparams = conninfo2;
 
 	// doesnt work
 	// need to set PQnoticeReceiver to suppress NOTICES like when creating files
@@ -487,11 +470,9 @@ bool var::connect(const var& conninfo) {
 
 int var::getdefaultconnectionid() const {
 	// otherwise return thread default connection id
-	int* connid = tss_pgconnid.get();
-	if (connid && *connid != 0) {
-		//(var("getdefaultconnection found default thread connection id ") ^
-		// *connid).outputl();
-		return *connid;
+	int connid = thread_default_connid;
+	if (connid) {
+		return connid;
 	} else {
 		// var("getdefaultconnection returning 0").outputl();
 		return 0;
@@ -515,7 +496,7 @@ bool var::setdefaultconnectionid() const {
 		MVDBException("is not a valid connection in setdefaultconnectionid()");
 
 	// save current connection handle number as thread specific handle no
-	tss_pgconnid.reset(new int((int)connid));
+	thread_default_connid = connid;
 
 	return true;
 }
@@ -549,10 +530,10 @@ int var::getconnectionid_ordefault() const {
 		return connid2;
 
 	// otherwise return thread default connection id
-	int* connid = tss_pgconnid.get();
+	int connid = thread_default_connid;
 	connid2 = 0;
-	if (connid && *connid != 0) {
-		connid2 = *connid;
+	if (connid) {
+		connid2 = connid;
 		//(var("getconnectionid_ordefault found default thread connection id ") ^
 		// connid2).outputl();
 	}
@@ -640,7 +621,7 @@ bool var::disconnect() {
 	if (GETDBTRACE)
 		var("DBTRACE mvdbpostgres disconnect() Closing connection").logputl();
 
-	int* default_connid = tss_pgconnid.get();
+	int default_connid = thread_default_connid;
 
 	//  if (THIS_IS_DBCONN())
 	//  {
@@ -651,12 +632,12 @@ bool var::disconnect() {
 	// if we happen to be disconnecting the same connection as the default connection
 	// then reset the default connection so that it will be reconnected to the next
 	// connect this is rather too smart but will probably do what people expect
-		if (default_connid && *default_connid == connid)
-			tss_pgconnid.reset();
+	if (default_connid && default_connid == connid)
+		thread_default_connid = 0;
 	} else {
-		if (default_connid && *default_connid) {
-			mv_connections_cache.del_connection(*default_connid);
-			tss_pgconnid.reset();
+		if (default_connid) {
+			mv_connections_cache.del_connection(default_connid);
+			thread_default_connid = 0;
 		}
 	}
 	return true;
