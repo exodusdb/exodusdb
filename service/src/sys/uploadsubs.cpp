@@ -497,6 +497,13 @@ nextline:
 				//grec='ID-SUPP'
 				//MUST be pure dictids
 				var grec = "";
+
+				if (linenofn) {
+					grec ^= "LINE_NO ";
+					var dictrec = "F" ^ FM ^ linenofn ^ FM ^ "Line No." ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "R" ^ FM ^ "10";
+					dictrec.write(dictfile, "LINE_NO");
+				}
+
 				for (var coln = 1; coln <= ncols; ++coln) {
 					var dictrec = "F";
 					dictrec.r(2, coln + fieldoffset);
