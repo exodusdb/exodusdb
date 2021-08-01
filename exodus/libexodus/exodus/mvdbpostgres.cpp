@@ -129,7 +129,8 @@ static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
 					//	delete pgp;
 }
 //static
-thread_local MvConnectionsCache mv_connections_cache(connection_DELETER_AND_DESTROYER);
+thread_local MvConnectionsCache thread_connections(connection_DELETER_AND_DESTROYER);
+thread_local std::unordered_map<std::string, std::string> thread_file_handles;
 
 //#if TRACING >= 5
 #define DEBUG_LOG_SQL         \
@@ -174,6 +175,10 @@ thread_local var thread_dblasterror = "";
 
 std::string getresult(PGresult* pgresult, int rown, int coln) {
 	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
+}
+
+std::string normalise_filename(const var& filename) {
+	return filename.a(1).normalize().lcase().convert(".", "_").toString();
 }
 
 // used to detect sselect command words that are values like quoted words or plain numbers. eg "xxx"
@@ -323,26 +328,26 @@ var var::build_conn_info(const var& conninfo) const {
 		// discover any configuration in the environment
 		var envconn = "";
 		var temp;
-		if (temp.osgetenv("EXO_CONNECTION"))
+		if (temp.osgetenv("EXO_CONNECTION") && temp)
 			envconn ^= " " ^ temp;
 
 		// specific variable are appended ie override
-		if (temp.osgetenv("EXO_HOST"))
+		if (temp.osgetenv("EXO_HOST") && temp)
 			envconn ^= " host=" ^ temp;
 
-		if (temp.osgetenv("EXO_PORT"))
+		if (temp.osgetenv("EXO_PORT") && temp)
 			envconn ^= " port=" ^ temp;
 
-		if (temp.osgetenv("EXO_USER"))
+		if (temp.osgetenv("EXO_USER") && temp)
 			envconn ^= " user=" ^ temp;
 
-		if (temp.osgetenv("EXO_DBNAME"))
+		if (temp.osgetenv("EXO_DBNAME") && temp)
 			envconn ^= " dbname=" ^ temp;
 
-		if (temp.osgetenv("EXO_PASSWORD"))
+		if (temp.osgetenv("EXO_PASSWORD") && temp)
 			envconn ^= " password=" ^ temp;
 
-		if (temp.osgetenv("EXO_TIMEOUT"))
+		if (temp.osgetenv("EXO_TIMEOUT") && temp)
 			envconn ^= " connect_timeout=" ^ temp;
 
 		result = defaultconninfo ^ " " ^ configconn ^ " " ^ envconn ^ " " ^ result;
@@ -359,67 +364,69 @@ bool var::connect(const var& conninfo) {
 	THISISDEFINED()
 	ISSTRING(conninfo)
 
-	var conninfo2 = conninfo;
+	var fullconninfo = conninfo.trimf().trimb();
 
 	//use *this if conninfo not specified;
-	if (!conninfo2) {
+	if (!fullconninfo) {
 		if (this->assigned())
-			conninfo2 = *this;
+			fullconninfo = *this;
 	}
 
 	//add dbname= if missing
-	if (conninfo2 && !conninfo2.index("="))
-		conninfo2 = "dbname=" ^ conninfo2;
+	if (fullconninfo && !fullconninfo.index("="))
+		fullconninfo = "dbname=" ^ fullconninfo;
 
-	conninfo2 = build_conn_info(conninfo2);
+	fullconninfo = build_conn_info(fullconninfo);
 
 	if (GETDBTRACE)
-		conninfo2.logputl("DBTRACE:");
+		fullconninfo.logputl("DBTRACE:");
 
 	PGconn* pgconn;
 	for (;;) {
+
 #if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
-		if (not msvc_PQconnectdb(&pgconn, conninfo2.var_str)) {
+		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) {
 #if TRACING >= 1
 			var libname = "libpq.dl";
 			// var libname="libpq.so";
-			var(
-				"ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
-				". Verify configuration PATH contains postgres's \\bin.")
-				.errputl();
+			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
+				". Verify configuration PATH contains postgres's \\bin.";
+			//errmsg.errputl();
+			this->setlasterror(errmsg);
 #endif
 			return false;
 		};
 #else
 		//connect
-		pgconn = PQconnectdb(conninfo2.var_str.c_str());
+		pgconn = PQconnectdb(fullconninfo.var_str.c_str());
 #endif
 
-		//connected ok
-		if (PQstatus(pgconn) == CONNECTION_OK || conninfo2)
+		//connected OK
+		if (PQstatus(pgconn) == CONNECTION_OK || fullconninfo)
 			break;
 
 		// required even if connect fails according to docs
 		PQfinish(pgconn);
+
 		// try again with default conninfo
-		conninfo2 = defaultconninfo;
+		fullconninfo = defaultconninfo;
+
 	}
 
 	// failed to connect so return false
 	if (PQstatus(pgconn) != CONNECTION_OK) {
-		//if (GETDBTRACE)
-		//TODO remove password=somesillysecret
-		conninfo2.replace(R"(password\s*=\s*\w*)", "password=**********").errputl("connection string=");
 
 		//#if TRACING >= 3
-		var("ERROR: mvdbpostgres connect() Connection to database failed: " ^
-			var(PQerrorMessage(pgconn)))
-			.errputl();
-		// if (not conninfo2)
-		var("ERROR: mvdbpostgres connect() Postgres connection configuration "
-			"missing or incorrect. Please login.")
-			.errputl();
+		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
+		errmsg ^= " ERROR: mvdbpostgres connect() Postgres connection configuration "
+			"missing or incorrect. Please login.";
+
+		//TODO remove password=somesillysecret
+		errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").errputl("connection string=");
+
 		//#endif
+		//errmsg.errputl();
+		this->setlasterror(errmsg);
 
 		// required even if connect fails according to docs
 		PQfinish(pgconn);
@@ -439,10 +446,12 @@ bool var::connect(const var& conninfo) {
 		var("var::connect() Connection to database succeeded.").logputl();
 
 	// cache the new connection handle
-	int connid = mv_connections_cache.add_connection(pgconn);
+	int connid = thread_connections.add_connection(pgconn);
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
+	if (not this->a(1))
+		this->r(1,fullconninfo.field(" ",1));
 	this->r(2, connid);
 	this->r(3, connid);
 
@@ -454,7 +463,7 @@ bool var::connect(const var& conninfo) {
 		thread_default_connid = connid;
 
 	// save last connection string (used in startipc())
-	thread_connparams = conninfo2;
+	thread_connparams = fullconninfo;
 
 	// doesnt work
 	// need to set PQnoticeReceiver to suppress NOTICES like when creating files
@@ -466,6 +475,48 @@ bool var::connect(const var& conninfo) {
 	this->sqlexec(var("SET client_min_messages = ") ^ (GETDBTRACE ? "LOG" : "NOTICE"));
 
 	return true;
+}
+
+// conn1.attach("filename1^filename2...");
+bool var::attach(const var& filenames) {
+	THISIS("bool var::attach(const var& filenames")
+	THISISDEFINED()
+	ISSTRING(filenames)
+
+	var notattached_filenames = "";
+	for (var filename : filenames) {
+		//thread_file_handles[filename] = (filename ^ FM ^ connid).toString();
+		var filename2 = normalise_filename(filename);
+		var file;
+		if (file.open(filename2,*this)) {
+			thread_file_handles[filename2] = file.var_str;
+		}
+		else {
+			notattached_filenames ^= filename2 ^ " ";
+		}
+	}
+
+	//fail if anything not attached
+	if (notattached_filenames) {
+		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames.trimb().swap(FM,", ") ^" cannot be attached on connection " ^ (*this).a(1).quote();
+		this->setlasterror(errmsg);
+		return false;
+	}
+
+	return true;
+}
+
+// conn1.detach("filename1^filename2...");
+void var::detach(const var& filenames) {
+	THISIS("bool var::detach(const var& filenames")
+	THISISDEFINED()
+	ISSTRING(filenames)
+
+	for (var filename : filenames) {
+		std::string filename2 = normalise_filename(filename);
+		thread_file_handles.erase(filename2);
+	}
+	return;
 }
 
 int var::getdefaultconnectionid() const {
@@ -492,7 +543,7 @@ bool var::setdefaultconnectionid() const {
 	if (!connid)
 		MVDBException("setdefaultconnectionid() when not connected");
 
-	if (!mv_connections_cache.get_connection(connid))
+	if (!thread_connections.get_connection(connid))
 		MVDBException("is not a valid connection in setdefaultconnectionid()");
 
 	// save current connection handle number as thread specific handle no
@@ -600,7 +651,7 @@ void* var::connection() const {
 		throw MVDBException("connection() attempted when not connected");
 
 	// return a pg_connection structure
-	return mv_connections_cache.get_connection(connid);
+	return thread_connections.get_connection(connid);
 }
 
 // gets lock_table, associated with connection, associated with this object
@@ -608,13 +659,13 @@ void* var::get_lock_table() const {
 	int connid = this->getconnectionid_ordefault();
 	if (!connid)
 		throw MVDBException("get_lock_table() attempted when not connected");
-	// return connid ? mv_connections_cache.get_lock_table(connid) : NULL;
-	return mv_connections_cache.get_lock_table(connid);
+	// return connid ? thread_connections.get_lock_table(connid) : NULL;
+	return thread_connections.get_lock_table(connid);
 }
 
 // if this->obj contains connection_id, then such connection is disconnected with this-> becomes UNA
 // Otherwise, default connection is disconnected
-bool var::disconnect() {
+void var::disconnect() {
 	THISIS("bool var::disconnect()")
 	THISISDEFINED()
 
@@ -627,7 +678,7 @@ bool var::disconnect() {
 	//  {
 	var connid = this->getconnectionid();
 	if (connid) {
-		mv_connections_cache.del_connection((int)connid);
+		thread_connections.del_connection((int)connid);
 		var_typ = VARTYP_UNA;
 	// if we happen to be disconnecting the same connection as the default connection
 	// then reset the default connection so that it will be reconnected to the next
@@ -636,23 +687,23 @@ bool var::disconnect() {
 		thread_default_connid = 0;
 	} else {
 		if (default_connid) {
-			mv_connections_cache.del_connection(default_connid);
+			thread_connections.del_connection(default_connid);
 			thread_default_connid = 0;
 		}
 	}
-	return true;
+	return;
 }
 
-bool var::disconnectall() {
+void var::disconnectall() {
 	THISIS("bool var::disconnectall()")
 	THISISDEFINED()
 
 	if (GETDBTRACE)
 		var("DBTRACE mvdbpostgres disconnectall() Closing all connections except the default").logputl();
 
-	mv_connections_cache.del_connections(2);
+	thread_connections.del_connections(2);
 
-	return true;
+	return;
 }
 
 // open filehandle given a filename on current thread-default connection
@@ -675,7 +726,18 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		return true;
 	}
 
-	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
+	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
+	std::string filename2 = normalise_filename(filename);
+
+	//return predefined handle if any
+	if (!connection) {
+	    auto entry = thread_file_handles.find(filename2);
+    	if (entry != thread_file_handles.end()) {
+			//(*this) = thread_file_handles.at(filename2);
+			(*this) = entry->second;
+			return true;
+		}
+	}
 
 	// *
 
@@ -770,7 +832,7 @@ bool var::reado(const var& filehandle, const var& key) {
 	if (!connid)
 		throw MVDBException("getconnectionid() failed");
 	std::string cachedrecord =
-		mv_connections_cache.getrecord(connid, filehandle.a(1).var_str, key.var_str);
+		thread_connections.getrecord(connid, filehandle.a(1).var_str, key.var_str);
 	if (!cachedrecord.empty()) {
 		// key.outputl("cache read " ^ filehandle.a(1) ^ "=");
 		//(*this) = cachedrecord;
@@ -802,7 +864,7 @@ bool var::writeo(const var& filehandle, const var& key) const {
 	int connid = filehandle.getconnectionid_ordefault();
 	if (!connid)
 		throw MVDBException("getconnectionid() failed");
-	mv_connections_cache.putrecord(connid, filehandle.a(1).var_str, key.var_str, this->var_str);
+	thread_connections.putrecord(connid, filehandle.a(1).var_str, key.var_str, this->var_str);
 
 	return true;
 }
@@ -817,7 +879,7 @@ bool var::deleteo(const var& key) const {
 	int connid = this->getconnectionid_ordefault();
 	if (!connid)
 		throw MVDBException("getconnectionid() failed");
-	mv_connections_cache.delrecord(connid, this->a(1).var_str, key.var_str);
+	thread_connections.delrecord(connid, this->a(1).var_str, key.var_str);
 
 	return true;
 }
@@ -1578,7 +1640,7 @@ void var::clearcache() const {
 	int connid = this->getconnectionid_ordefault();
 	if (!connid)
 		throw MVDBException("getconnectionid() failed in clearcache");
-	mv_connections_cache.clearrecordcache(connid);
+	thread_connections.clearrecordcache(connid);
 	return;
 }
 
@@ -1674,7 +1736,8 @@ bool var::createfile(const var& filename) const {
 	// behavior is ON COMMIT DELETE ROWS. However, the default behavior in PostgreSQL is ON
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
-	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
+	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
+	std::string filename2 = normalise_filename(filename);
 
 	var sql = "CREATE";
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";

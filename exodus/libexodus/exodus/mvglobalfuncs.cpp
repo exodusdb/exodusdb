@@ -717,12 +717,12 @@ DLL_PUBLIC bool connect(const var& connectioninfo) {
 	return conn1.setdefaultconnectionid();
 }
 
-DLL_PUBLIC bool disconnect() {
-	return var().disconnect();
+DLL_PUBLIC void disconnect() {
+	var().disconnect();
 }
 
-DLL_PUBLIC bool disconnectall() {
-	return var().disconnectall();
+DLL_PUBLIC void disconnectall() {
+	var().disconnectall();
 }
 
 DLL_PUBLIC bool createdb(const var& dbname) {

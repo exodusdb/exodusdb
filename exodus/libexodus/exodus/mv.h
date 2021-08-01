@@ -1417,10 +1417,13 @@ class DLL_PUBLIC var final {
 	/////////////////
 
 	bool connect(const var& conninfo DEFAULTNULL);
-	bool disconnect();
-	bool disconnectall();
+	void disconnect();
+	void disconnectall();
 	ND int getdefaultconnectionid() const;
 	bool setdefaultconnectionid() const;
+
+	bool attach(const var& filenames);
+	void detach(const var& filenames);
 
 	// var() is a db connection or default connection
 	bool begintrans() const;
