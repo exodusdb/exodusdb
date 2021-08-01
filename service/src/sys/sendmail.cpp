@@ -359,7 +359,8 @@ forcedemail:
 
 		//optional cc address
 		if (ccaddress) {
-			cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote());
+			//cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote()); 
+			cmd ^= VM ^ "-aCC: " ^ (ccaddress.convert(";", ",").quote());
 		}
 
 		//optional attach file
