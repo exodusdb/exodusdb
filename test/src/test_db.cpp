@@ -240,8 +240,8 @@ function main()
 		assert(! read( tt, table3, "2.111"));
 		assert(! read( tt, table2, "3.111"));
 
-		assert(conn2.disconnect());
-		assert(conn3.disconnect());
+		conn2.disconnect();
+		conn3.disconnect();
 	}
 	{
 		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
@@ -297,6 +297,56 @@ function main()
 		printl("check can open table2 on copied database exodus4");
 		var table2b,table3b;
 		assert( table2b.open( "TABLE2",conn4));
+
+		///test attach
+		{
+
+			var uniquefilename = "TEMP_TEST_ATTACH";
+			var otherdbname = dbname4;
+
+			//delete the file first in case already exists
+			deletefile(uniquefilename);
+
+			//the file is not available in the default connection
+			assert(not open(uniquefilename));
+
+			//open a connection
+			var conn1;
+			assert(conn1.connect(otherdbname));
+
+			//delete the file first in case already exists
+			conn1.deletefile(uniquefilename);
+
+			//create the file
+			assert(conn1.createfile(uniquefilename));
+
+			//file exists in connection's listfiles
+			assert(conn1.listfiles().ucase().index(uniquefilename));
+
+			//file can be opened via the connection
+			//assert(open(uniquefilename, conn1));
+			assert(conn1.open(uniquefilename, conn1));
+
+			//file is not available without specifying connection
+			assert(not open(uniquefilename));
+
+			//test "attach"
+
+			//"attach" the file via the connection
+			assert(conn1.attach(uniquefilename));
+
+			//file can now be opened without specifying the connection
+			assert(open(uniquefilename));
+
+			//"detach" the file
+			conn1.detach(uniquefilename);
+
+			//the file is no longer available without specifying connection
+			assert(not open(uniquefilename));
+
+			conn1.disconnect();
+			
+		}
 
 		printl("remove any test databases");
 		//connect to exodus first cant delete db if connected to it.
