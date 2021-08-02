@@ -13,7 +13,7 @@
 // variable Requirement 7. disconnect() without parameters closes current (default) connection
 // Requirement 8. filename.disconnect() closes the connection, linked to the 'filename', and 'frees'
 // this var Requirement 9. Closed connection: just erased from map Requirement 10. Attempt to use
-// 'invalidated' connection raises exception Requirement 11. LockTables (which accompany DB table
+// 'invalidated' connection raises exception Requirement 11. ConnectionLockss (which accompany DB table
 // locks), are added to connection table and
 //					stored/deleted within connection record
 
@@ -26,40 +26,42 @@
 #include <unordered_map>
 
 #define USE_MAP_FOR_UNORDERED
-using LockTable = std::unordered_map<uint64_t, int>;
+using ConnectionLocks = std::unordered_map<uint64_t, int>;
 
 namespace exodus {
 
 using CACHED_CONNECTION = PGconn*;
 using DELETER_AND_DESTROYER = void (*)(CACHED_CONNECTION);
 
-using RecordCache = std::unordered_map<std::string, std::string>;
+using ConnectionRecordCache = std::unordered_map<std::string, std::string>;
 
 class MVConnection	 // used as 'second' in pair, stored in connection map
 {
    public:
 	// ctors
 	MVConnection()
-		: flag(0), connection(0), plock_table(0), extra(0), precordcache(0) {}
-	MVConnection(CACHED_CONNECTION connection_, LockTable* LockTable_, RecordCache* RecordCache_)
-		: flag(0), connection(connection_), plock_table(LockTable_), extra(0), precordcache(RecordCache_) {
+		: connection(0) {}
+	MVConnection(CACHED_CONNECTION connection_)
+		: connection(connection_) {
 	}
 
 	// 1=entry is in use
 	// 0=entry is not longer used and may be reused
-	int flag;
+	int flag = 0;
 
 	// postgres connection handle
 	CACHED_CONNECTION connection;
 
 	// postgres locks per connection
 	// used to fail lock (per mv standard_ instead of stack locks (per postgres standard)
-	LockTable* plock_table;
+	//ConnectionLocks* connection_locks;
+	ConnectionLocks connection_locks;
 
 	//?
-	int extra;
+	int extra = 0;
 
-	RecordCache* precordcache;
+	ConnectionRecordCache connection_readcache;
+
 };
 
 //using CONN_MAP = std::map<int, MVConnection>;
@@ -78,8 +80,8 @@ class MVConnections {
 
 	// observers
 	CACHED_CONNECTION get_connection(int index) const;
-	LockTable* get_lock_table(int index) const;
-	RecordCache* get_recordcache(int index) const;
+	MVConnection* get_mvconnection(int index) const;
+	ConnectionRecordCache* get_recordcache(int index) const;
 	std::string getrecord(const int connid, const std::string filename, const std::string key) const;
 	void putrecord(const int connid, const std::string filename, const std::string key, const std::string& record);
 	void delrecord(const int connid, const std::string filename, const std::string key);

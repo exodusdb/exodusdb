@@ -197,11 +197,35 @@ function main()
 		var file = "NANOTABLE";
 		deletefile(file);
 		assert( createfile( file));
-		file.lock( "1");
-		file.lock( "2");
-		file.unlock( "2");
-		file.unlock( "1");
+
+		//check 1 can be locked and not relocked
+		assert(file.lock( "1"));
+		assert(not file.lock( "1"));
+
+		//check 2 can be locked and not relocked
+		assert(file.lock( "2"));
+		assert(not file.lock( "2"));
+
+		//check 1 is still locked and can be unlocked and relocked
+		assert(not file.lock( "1"));
+		assert(file.unlock( "1"));
+		assert(file.lock( "1"));
+
+		//check 2 is still locked and can be unlocked and relocked
+		assert(not file.lock( "2"));
+		assert(file.unlock( "2"));
+		assert(file.lock( "2"));
+
+		//check unlockall
+		//Note: this unlocks locks on ALL FILES locks on the same connection
+		//NOT just the locks on the file in question
+		//TODO make it work per file and per connection?
+		assert(file.unlockall());
+		assert(file.lock( "1"));
+		assert(file.lock( "2"));
+
 		assert( deletefile( file));
+
 		disconnect();		// global connection
 	}
 
@@ -240,8 +264,51 @@ function main()
 		assert(! read( tt, table3, "2.111"));
 		assert(! read( tt, table2, "3.111"));
 
+		//test locks are per connection
+		assert(conn2.createfile("TESTLOCKS"));
+		assert(conn3.createfile("TESTLOCKS"));
+		var testlocks2;
+		var testlocks3;
+		assert(testlocks2.open("TESTLOCKS",conn2));
+		assert(testlocks3.open("TESTLOCKS",conn3));
+		assert(testlocks2.lock("123"));
+		assert(testlocks3.lock("123"));
+		assert(not testlocks2.lock("123"));
+		assert(not testlocks3.lock("123"));
+		assert(testlocks2.unlock("123"));
+		assert(testlocks3.unlock("123"));
+		assert(testlocks2.lock("123"));
+		assert(testlocks3.lock("123"));
+
 		conn2.disconnect();
 		conn3.disconnect();
+	}
+	{
+		//test with two connections to the same database that locks work between the two
+		var conn2a, conn2b;
+		assert(conn2a.connect(dbname2));
+		assert(conn2b.connect(dbname2));
+		var table2a,table2b;
+		assert(table2a.open("TABLE2",conn2a));
+		assert(table2b.open("TABLE2",conn2b));
+
+		//lock on one connection
+		assert(table2a.lock("123X"));
+		//should fail on the other
+		assert(not table2b.lock("123X"));
+
+		//should only be able to unlock on the connection that it was locked on
+		assert(table2b.unlock("123X"));//this actually FAILS to unlock
+		//should still fail
+		assert(not table2b.lock("123X"));
+
+		//unlocking on one connection
+		assert(table2a.unlock("123X"));
+		//should allow the other connection to lock
+		assert(table2b.lock("123X"));
+
+		conn2a.disconnect();
+		conn2b.disconnect();
 	}
 	{
 		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");

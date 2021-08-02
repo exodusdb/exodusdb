@@ -1599,7 +1599,8 @@ class DLL_PUBLIC var final {
 	void* connection() const;
 
 	// gets lock_table, associated with connection, associated with this object
-	void* get_lock_table() const;
+	//void* get_lock_table() const;
+	void* get_mvconnection() const;
 
 	var build_conn_info(const var& conninfo) const;
 
