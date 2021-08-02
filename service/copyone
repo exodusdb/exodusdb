@@ -21,7 +21,7 @@ set -eux
 :
 : Copy the lib file
 :
-		echo rsync -av --whole-file $LIBFILENAME ~/live/lib
+		rsync -av --whole-file $LIBFILENAME ~/live/lib
 	else
 
 :
@@ -31,7 +31,7 @@ set -eux
 :
 : Copy the bin file
 :
-			echo rsync -av --whole-file $BINFILENAME ~/live/bin
+			rsync -av --whole-file $BINFILENAME ~/live/bin
 		fi
 	fi
 :

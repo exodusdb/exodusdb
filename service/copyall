@@ -5,6 +5,22 @@ set -eux
 : Copy all EXODUS programs to live
 : ================================
 :
+: Syntax is:
+: 	./copyall
+:	./copyall CONFIRM
+:
+
+:
+: Dry run or not
+: ==============
+:
+	DRYRUN=--dry-run
+	if [ "${1:-}" = "CONFIRM" ]; then
+		DRYRUN=
+	elif [ "${1:-}" != "" ]; then
+:		Invalid syntax
+		exit 1
+	fi
 
 :
 : Create a directory for live services binaries
@@ -30,7 +46,7 @@ set -eux
 	#rsync -av ~/bin ~/lib ~/inc ~/live
 	#rsync -a ~/{bin,lib,inc} ~/live
 	#rsync -av --delete ~/{bin,lib} ~/live
-	rsync -av --whole-file ~/{bin,lib} ~/live
+	rsync $DRYRUN -av --whole-file ~/{bin,lib} ~/live
 
 :
 : =============================================================================
@@ -38,5 +54,5 @@ set -eux
 : =============================================================================
 :
 :
-: Finished copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: Finished $DRYRUN copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : =========================================================================
