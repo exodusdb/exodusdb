@@ -70,7 +70,7 @@ set -eux
 :	whois is used in unknown ip no login notification emails
 :	mailutils is required to send email by neomail
 :
-	apt-get -y install whois mailutils
+	apt-get -y install whois bsd-mail
 
 :
 : Install html2pdf
