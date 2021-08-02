@@ -40,8 +40,8 @@ set -eux
 #	sleep 5
 
 :
-: Kill the target database in case being tested in debugger
-: =========================================================
+: Kill any test process running the target database
+: =================================================
 :
 	for PIDFILENAME in /run/serve_$APP_CODE/$TO_EXO_DBNAME.pid
 	do
@@ -49,11 +49,17 @@ set -eux
 	done
 
 :
-: Drop the target database
-: ========================
+: Kill any existing connections to the target database
+: ====================================================
+:
+: dropdb only has the force option from postgres v13
 :
 	sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$TO_EXO_DBNAME';"
 
+:
+: Drop the target database
+: ========================
+:
 	sudo -u postgres dropdb --if-exists $TO_EXO_DBNAME
 
 :

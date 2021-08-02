@@ -1,0 +1,45 @@
+#!/bin/bash
+set -eux
+
+: ====================================
+: Copy a single EXODUS program to live
+: ====================================
+:
+	PROGNAME=$1
+
+:
+: Copy using rsync
+: ================
+:
+: The following may not be true and may not actually be required.
+: Use 'whole file' option to ensure that the OS dlopen understands everything has changed
+: otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
+:
+: Look for lib file
+:
+	if LIBFILENAME=`ls -1 ~/lib/lib$PROGNAME.so 2>/dev/null`; then
+:
+: Copy the lib file
+:
+		echo rsync -av --whole-file $LIBFILENAME ~/live/lib
+	else
+
+:
+: Look for bin file
+:
+		if BINFILENAME=`ls -1 ~/bin/$PROGNAME 2>/dev/null`; then
+:
+: Copy the bin file
+:
+			echo rsync -av --whole-file $BINFILENAME ~/live/bin
+		fi
+	fi
+:
+: ===========================================================================================
+: The following may not be true and may not actually be required.
+: NOTE - You must restart all/selected live processes for the new program to become effective
+: ===========================================================================================
+:
+:
+: Finished copying $PROGNAME to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: =========================================================================

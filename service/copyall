@@ -10,15 +10,15 @@ set -eux
 : Create a directory for live services binaries
 : =============================================
 :
-: EXODUS environment variable "EXO_HOME" default
+: May be used for EXODUS environment variable "EXO_HOME"
 :
 	mkdir -p $HOME/live
 
 :
-: Install the latest version of the neomail script
-: ================================================
+: Install the latest version of the neomail script into test
+: ==========================================================
 :
-	cp neomail ~/bin
+	rsync -av --whole-file neomail ~/bin
 
 :
 : Copy all bin and lib files to live

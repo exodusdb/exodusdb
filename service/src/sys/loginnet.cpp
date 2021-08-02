@@ -244,7 +244,8 @@ nextcomp:
 	cookie ^= "&mk=" ^ defmarketcode;
 	cookie ^= "&mc=" ^ maincurrcode;
 	cookie ^= "&tz=" ^ SW;
-	cookie ^= "&ms=60000";
+	//cookie ^= "&ms=60000";
+	cookie ^= "&ms=1000000";
 
 	//current datasetname
 	var temp = SYSTEM.a(23);
