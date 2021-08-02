@@ -35,13 +35,13 @@ using DELETER_AND_DESTROYER = void (*)(CACHED_CONNECTION);
 
 using RecordCache = std::unordered_map<std::string, std::string>;
 
-class MvConnectionEntry	 // used as 'second' in pair, stored in connection map
+class MVConnection	 // used as 'second' in pair, stored in connection map
 {
    public:
 	// ctors
-	MvConnectionEntry()
+	MVConnection()
 		: flag(0), connection(0), plock_table(0), extra(0), precordcache(0) {}
-	MvConnectionEntry(CACHED_CONNECTION connection_, LockTable* LockTable_, RecordCache* RecordCache_)
+	MVConnection(CACHED_CONNECTION connection_, LockTable* LockTable_, RecordCache* RecordCache_)
 		: flag(0), connection(connection_), plock_table(LockTable_), extra(0), precordcache(RecordCache_) {
 	}
 
@@ -62,14 +62,14 @@ class MvConnectionEntry	 // used as 'second' in pair, stored in connection map
 	RecordCache* precordcache;
 };
 
-//using CONN_MAP = std::map<int, MvConnectionEntry>;
-using CONN_MAP = std::unordered_map<int, MvConnectionEntry>;
+//using CONN_MAP = std::map<int, MVConnection>;
+using CONN_MAP = std::unordered_map<int, MVConnection>;
 
-class MvConnectionsCache {
+class MVConnections {
    public:
 	// ctors/dctors
-	MvConnectionsCache(DELETER_AND_DESTROYER del_);
-	virtual ~MvConnectionsCache();
+	MVConnections(DELETER_AND_DESTROYER del_);
+	virtual ~MVConnections();
 
 	// manipulators
 	int add_connection(CACHED_CONNECTION connection_with_file);

@@ -129,7 +129,7 @@ static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
 					//	delete pgp;
 }
 //static
-thread_local MvConnectionsCache thread_connections(connection_DELETER_AND_DESTROYER);
+thread_local MVConnections thread_connections(connection_DELETER_AND_DESTROYER);
 thread_local std::unordered_map<std::string, std::string> thread_file_handles;
 
 //#if TRACING >= 5
