@@ -128,9 +128,6 @@ static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
 	PQfinish(pgp);	// AFAIK, it destroys the object by pointer
 					//	delete pgp;
 }
-//static
-thread_local MvConnectionsCache thread_connections(connection_DELETER_AND_DESTROYER);
-thread_local std::unordered_map<std::string, std::string> thread_file_handles;
 
 //#if TRACING >= 5
 #define DEBUG_LOG_SQL         \
@@ -162,16 +159,11 @@ thread_local std::unordered_map<std::string, std::string> thread_file_handles;
 // explain select * from testview where field1  > 'aaaaaaaaa';
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
-//#include <pg_type.h>
-#define BYTEAOID 17;
-#define TEXTOID 25;
-
-// this is not threadsafe
-// PGconn	 *thread_pgconn;
-// but this is ...
 thread_local int thread_default_connid = 0;
 thread_local var thread_connparams = "";
 thread_local var thread_dblasterror = "";
+thread_local MVConnections thread_connections(connection_DELETER_AND_DESTROYER);
+thread_local std::unordered_map<std::string, std::string> thread_file_handles;
 
 std::string getresult(PGresult* pgresult, int rown, int coln) {
 	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
@@ -655,12 +647,11 @@ void* var::connection() const {
 }
 
 // gets lock_table, associated with connection, associated with this object
-void* var::get_lock_table() const {
+void* var::get_mvconnection() const {
 	int connid = this->getconnectionid_ordefault();
 	if (!connid)
-		throw MVDBException("get_lock_table() attempted when not connected");
-	// return connid ? thread_connections.get_lock_table(connid) : NULL;
-	return thread_connections.get_lock_table(connid);
+		throw MVDBException("get_mvconnection() attempted when not connected");
+	return thread_connections.get_mvconnection(connid);
 }
 
 // if this->obj contains connection_id, then such connection is disconnected with this-> becomes UNA
@@ -1081,14 +1072,16 @@ var var::lock(const var& key) const {
 
 	// check if already lock in current connection
 
-	//	LockTable* locktable=tss_locktables.get();
-	LockTable* locktable = (LockTable*)this->get_lock_table();
+	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
+	//ConnectionLocks* connection_locks = (ConnectionLocks*)this->get_lock_table();
 
-	if (locktable) {
+	MVConnection* mvconnection = (MVConnection*)this->get_mvconnection();
+
+	if (mvconnection) {
 		// if already in local lock table then dont lock on database
 		// since postgres stacks up multiple locks
 		// whereas multivalue databases dont
-		if (((*locktable).find(hash64)) != (*locktable).end())
+		if (mvconnection->connection_locks.find(hash64) != mvconnection->connection_locks.end())
 			return "";
 	}
 
@@ -1133,13 +1126,13 @@ var var::lock(const var& key) const {
 
 	// add it to the local lock table so we can detect double locking locally
 	// since postgres will stack up repeated locks by the same process
-	if (lockedok && locktable) {
+	if (lockedok && mvconnection) {
 		// register that it is locked
 #ifdef USE_MAP_FOR_UNORDERED
 		std::pair<const uint64_t, int> lock(hash64, 0);
-		(*locktable).insert(lock);
+		mvconnection->connection_locks.insert(lock);
 #else
-		(*locktable).insert(hash64);
+		mvconnection->connection_locks->insert(hash64);
 #endif
 	}
 
@@ -1163,15 +1156,16 @@ bool var::unlock(const var& key) const {
 	uint64_t hash64 =
 		MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
 
-	// remove from local current connection locktable
-	//	LockTable* locktable=tss_locktables.get();
-	LockTable* locktable = (LockTable*)this->get_lock_table();
-	if (locktable) {
-		// if not in local locktable then no need to unlock on database
-		if (((*locktable).find(hash64)) == (*locktable).end())
+	// remove from local current connection connection_locks
+	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
+	MVConnection* mvconnection = (MVConnection*)this->get_mvconnection();
+
+	if (mvconnection) {
+		// if not in local connection_locks then no need to unlock on database
+		if (mvconnection->connection_locks.find(hash64) == mvconnection->connection_locks.end())
 			return true;
 		// register that it is unlocked
-		(*locktable).erase(hash64);
+		mvconnection->connection_locks.erase(hash64);
 	}
 
 	// parameter array
@@ -1218,15 +1212,16 @@ bool var::unlockall() const {
 	// THISIS("void var::unlockall() const")
 
 	// check if any locks
-	//	LockTable* locktable=tss_locktables.get();
-	LockTable* locktable = (LockTable*)this->get_lock_table();
-	if (locktable) {
+	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
+	//ConnectionLocks* connection_locks = (ConnectionLocks*)this->get_lock_table();
+	MVConnection* mvconnection = (MVConnection*)this->get_mvconnection();
+	if (mvconnection) {
 		// if local lock table is empty then dont unlock all database
-		if ((*locktable).begin() == (*locktable).end())
+		if (mvconnection->connection_locks.begin() == mvconnection->connection_locks.end())
 			// TODO indicate in some global variable "OWN LOCK"
 			return true;
-		// register that it is locked
-		(*locktable).clear();
+		// register all unlocked locked
+		mvconnection->connection_locks.clear();
 	}
 
 	return this->sqlexec("SELECT PG_ADVISORY_UNLOCK_ALL()");
