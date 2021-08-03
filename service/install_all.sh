@@ -68,9 +68,10 @@ set -eux
 : =========================
 :
 :	whois is used in unknown ip no login notification emails
-:	mailutils is required to send email by neomail
+:	bsd-mailx provides "mail" which is required to send email by neomail
+:	mailutils is an alternative package that doesnt have identical options
 :
-	apt-get -y install whois bsd-mail
+	apt-get -y install whois bsd-mailx
 
 :
 : Install html2pdf

@@ -18,3 +18,4 @@ tests/
 a.out
 DartConfiguration.tcl
 *.gcov
+*.cpp.save
