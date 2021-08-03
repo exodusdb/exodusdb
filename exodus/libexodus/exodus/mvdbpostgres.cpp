@@ -689,10 +689,14 @@ void var::disconnectall() {
 	THISIS("bool var::disconnectall()")
 	THISISDEFINED()
 
-	if (GETDBTRACE)
-		var("DBTRACE mvdbpostgres disconnectall() Closing all connections except the default").logputl();
+	var connid = this->getconnectionid();
+	if (!connid)
+		connid = 2;
 
-	thread_connections.del_connections(2);
+	if (GETDBTRACE)
+		var("DBTRACE mvdbpostgres disconnectall() Closing all connections >=  " ^ connid).logputl();
+
+	thread_connections.del_connections(connid);
 
 	return;
 }

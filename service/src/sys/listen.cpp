@@ -477,9 +477,15 @@ function main() {
 	stack = "";
 	//call programstackstack);
 
+	var nextconnection;
+	nextconnection.connect(getenv("EXO_DBNAME"));
+
 ////////////
 nextrequest:
 ////////////
+
+	//disconnect any connections added while processing requests
+	nextconnection.disconnectall();
 
 	lastrequestdate = var().date();
 	lastrequesttime = var().time();
