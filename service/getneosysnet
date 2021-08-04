@@ -11,6 +11,12 @@ set -eux
 
 	if ! test -d ./www ; then echo must be run in service ; exit ;fi
 
+:
+: Era over
+: ========
+:
+	exit
+
 	cd ~/exodus/service || exit
 	rm neosys.net -rf || exit
 	git clone https://git.hosts.neosys.com/gits/neosys.net/ || exit

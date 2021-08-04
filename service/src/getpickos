@@ -12,6 +12,12 @@ set -eux
 	PICKOS=/backups/current/win3/pickos/
 
 :
+: Era over
+: ========
+:
+	exit
+
+:
 : Check if running in the right directory
 : =======================================
 :
