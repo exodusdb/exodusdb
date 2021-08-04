@@ -475,8 +475,24 @@ bool var::attach(const var& filenames) {
 	THISISDEFINED()
 	ISSTRING(filenames)
 
+	//option to attach all dict files
+	var filenames2;
+	if (filenames == "dict") {
+		filenames2 = "";
+		var allfilenames = this->listfiles();
+		for (var filename : allfilenames) {
+			if (filename.substr(1, 5) == "dict_") {
+				filenames2 ^= filename ^ FM;
+			}
+		}
+		filenames2.splicer(-1, 1, "");
+	}
+	else {
+		filenames2 = filenames;
+	}
+
 	var notattached_filenames = "";
-	for (var filename : filenames) {
+	for (var filename : filenames2) {
 		//thread_file_handles[filename] = (filename ^ FM ^ connid).toString();
 		var filename2 = normalise_filename(filename);
 		var file;
