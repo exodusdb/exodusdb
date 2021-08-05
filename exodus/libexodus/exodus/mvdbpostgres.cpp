@@ -122,7 +122,7 @@ static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
 	PGconn* pgp = (PGconn*)con_;
     // at this point we have good new connection to database
     if (GETDBTRACE) {
-        var("PQFinish").logputl();
+        var("DBTRACE PQFinish").logputl();
 	}
 	//var("========================== deleting connection ==============================").errputl();
 	PQfinish(pgp);	// AFAIK, it destroys the object by pointer
@@ -371,7 +371,7 @@ bool var::connect(const var& conninfo) {
 	fullconninfo = build_conn_info(fullconninfo);
 
 	if (GETDBTRACE)
-		fullconninfo.logputl("DBTRACE:");
+		fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTRACE var::connect() ");
 
 	PGconn* pgconn;
 	for (;;) {
@@ -412,9 +412,8 @@ bool var::connect(const var& conninfo) {
 		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
 		errmsg ^= " ERROR: mvdbpostgres connect() Postgres connection configuration "
 			"missing or incorrect. Please login.";
-
 		//TODO remove password=somesillysecret
-		errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").errputl("connection string=");
+		errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********");
 
 		//#endif
 		//errmsg.errputl();
@@ -434,8 +433,6 @@ bool var::connect(const var& conninfo) {
 #endif
 
 	// at this point we have good new connection to database
-	if (GETDBTRACE)
-		var("var::connect() Connection to database succeeded.").logputl();
 
 	// cache the new connection handle
 	int connid = thread_connections.add_connection(pgconn);
@@ -446,6 +443,9 @@ bool var::connect(const var& conninfo) {
 		this->r(1,fullconninfo.field(" ",1));
 	this->r(2, connid);
 	this->r(3, connid);
+
+	if (GETDBTRACE)
+		this->logputl("DBTRACE var::connect() OK ");
 
 	// this->outputl("new connection=");
 
@@ -498,6 +498,8 @@ bool var::attach(const var& filenames) {
 		var file;
 		if (file.open(filename2,*this)) {
 			thread_file_handles[filename2] = file.var_str;
+			if (GETDBTRACE)
+				file.logputl("DBTRACE var::attach() ");
 		}
 		else {
 			notattached_filenames ^= filename2 ^ " ";
@@ -677,7 +679,8 @@ void var::disconnect() {
 	THISISDEFINED()
 
 	if (GETDBTRACE)
-		var("DBTRACE mvdbpostgres disconnect() Closing connection").logputl();
+		//var("DBTRACE mvdbpostgres disconnect() Closing connection").logputl();
+		(this->assigned() ? *this : var("")).logputl("DBTRACE var::disconnect() ");
 
 	int default_connid = thread_default_connid;
 
@@ -710,7 +713,7 @@ void var::disconnectall() {
 		connid = 2;
 
 	if (GETDBTRACE)
-		var("DBTRACE mvdbpostgres disconnectall() Closing all connections >=  " ^ connid).logputl();
+		connid.logputl("DBTRACE var::disconnectall() >= ");
 
 	thread_connections.del_connections(connid);
 
@@ -746,6 +749,8 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
     	if (entry != thread_file_handles.end()) {
 			//(*this) = thread_file_handles.at(filename2);
 			(*this) = entry->second;
+			if (GETDBTRACE)
+				this->logputl("DBTRACE open() attached ");
 			return true;
 		}
 	}
@@ -2422,7 +2427,7 @@ bool var::saveselect(const var& filename) {
 	ISSTRING(filename)
 
 	if (GETDBTRACE)
-		var("DBTRACE: ::saveselect(" ^ filename ^ ")").logputl();
+		filename.logputl("DBTRACE var::saveselect() ");
 
 	int recn = 0;
 	var key;
@@ -3493,6 +3498,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	whereclause.swapper("\n AND true", "");
 	whereclause.swapper("true\n AND ", "");
 
+	//determine the connection from the filename
+	//could be an attached on a non-default connection
+	//selecting dict files would trigger this
+	if (not this->a(2)) {
+		var actualfile;
+		if (actualfile.open(actualfilename))
+			this->r(2, actualfile.a(2));
+	}
+
 	//save any active selection in a temporary table and INNER JOIN to it to avoid complete selection of primary file
 	if (this->hasnext()) {
 
@@ -3791,7 +3805,7 @@ bool var::savelist(const var& listname) {
 	ISSTRING(listname)
 
 	if (GETDBTRACE)
-		("DBTRACE: ::savelist(" ^ listname ^ ")").logputl();
+		listname.logputl("DBTRACE var::savelist() ");
 
 	// open the lists file on the same connection
 	var lists = *this;
@@ -3851,7 +3865,7 @@ bool var::getlist(const var& listname) {
 	ISSTRING(listname)
 
 	if (GETDBTRACE)
-		var("DBTRACE: ::getlist(" ^ listname ^ ")").logputl();
+		listname.logputl("DBTRACE var::getlist() ");
 
 	//int recn = 0;
 	var key;
@@ -3895,7 +3909,7 @@ bool var::formlist(const var& keys, const var& fieldno) {
 	ISNUMERIC(fieldno)
 
 	if (GETDBTRACE)
-		var("DBTRACE: ::formlist(" ^ keys ^ ")").logputl();
+		keys.logputl("DBTRACE var::formlist() ");
 
 	this->clearselect();
 
