@@ -1969,14 +1969,17 @@ const var& var::outputt(const var& str) const {
 // errput() unbuffered threadsafe output to standard error
 const var& var::errput() const {
 	LOCKIOSTREAM
-	return put(std::cerr);
+	//return put(std::cerr);
+	std::cerr << *this;
+	return *this;
 }
 
 // errputl() unbuffered threadsafe output to standard error
 // adds "\n"
 const var& var::errputl() const {
 	LOCKIOSTREAM
-	this->put(std::cerr);
+	//this->put(std::cerr);
+	std::cerr << *this;
 	std::cerr << std::endl;
 	return *this;
 }
@@ -1984,15 +1987,20 @@ const var& var::errputl() const {
 // overloaded errput outputs a prefix str
 const var& var::errput(const var& str) const {
 	LOCKIOSTREAM
-	str.put(std::cerr);
-	return this->put(std::cerr);
+	//str.put(std::cerr);
+	//return this->put(std::cerr);
+	std::cerr << str;
+	std::cerr << *this;
+	return *this;
 }
 
 // overloaded errputl outputs a prefix str
 const var& var::errputl(const var& str) const {
 	LOCKIOSTREAM
-	str.put(std::cerr);
-	this->put(std::cerr);
+	//str.put(std::cerr);
+	//this->put(std::cerr);
+	std::cerr << str;
+	std::cerr << *this;
 	std::cerr << std::endl;
 	return *this;
 }
@@ -2003,7 +2011,8 @@ const var& var::errputl(const var& str) const {
 // logput() buffered threadsafe output to standard log
 const var& var::logput() const {
 	LOCKIOSTREAM
-	this->put(std::clog);
+	//this->put(std::clog);
+	std::clog << *this;
 	//std::clog.flush();
 	return *this;
 }
@@ -2011,7 +2020,8 @@ const var& var::logput() const {
 // logput() flushed threadsafe output to standard log
 const var& var::logputl() const {
 	LOCKIOSTREAM
-	this->put(std::clog);
+	//this->put(std::clog);
+	std::clog << *this;
 	std::clog << std::endl;
 	return *this;
 }
@@ -2019,15 +2029,18 @@ const var& var::logputl() const {
 // overloaded logput with a prefix str
 const var& var::logput(const var& str) const {
 	LOCKIOSTREAM
-	str.put(std::clog);
+	//str.put(std::clog);
+	std::clog << str;
 	return this->put(std::clog);
 }
 
 // overloaded logputl with a prefix str
 const var& var::logputl(const var& str) const {
 	LOCKIOSTREAM
-	str.put(std::clog);
-	this->put(std::clog);
+	//str.put(std::clog);
+	//this->put(std::clog);
+	std::clog << str;
+	std::clog << *this;
 	std::clog << std::endl;
 	return *this;
 }
