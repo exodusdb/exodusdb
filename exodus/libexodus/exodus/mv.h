@@ -1127,6 +1127,18 @@ class DLL_PUBLIC var final {
 	const char* data() const;
 	bool isnum() const;
 
+	bool starts(const var& vstr) const;
+	bool starts(const char* cstr) const;
+	bool starts(const char c) const;
+
+	bool ends(const var& vstr) const;
+	bool ends(const char* cstr) const;
+	bool ends(const char c) const;
+
+	bool contains(const var& vstr) const;
+	bool contains(const char* cstr) const;
+	bool contains(const char c) const;
+
 	//static member for speed on std strings
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
 	//int localeAwareCompare(const std::string& str2) const;
@@ -1411,7 +1423,9 @@ class DLL_PUBLIC var final {
 	// bool selftest() const;
 	ND var version() const;
 
-	ND var getlasterror() const;
+	ND var lasterror() const;
+	void lasterror(const var& msg) const;
+
 
 	// DATABASE ACCESS
 	/////////////////
@@ -1419,8 +1433,6 @@ class DLL_PUBLIC var final {
 	bool connect(const var& conninfo DEFAULTNULL);
 	void disconnect();
 	void disconnectall();
-	ND int getdefaultconnectionid() const;
-	bool setdefaultconnectionid() const;
 
 	bool attach(const var& filenames);
 	void detach(const var& filenames);
@@ -1579,9 +1591,6 @@ class DLL_PUBLIC var final {
 
    private:
 	void createString() const;
-
-	void setlasterror(const var& msg) const;
-	void setlasterror() const;
 
 	bool cursorexists() const;
 	bool selectx(const var& fieldnames, const var& sortselectclause);

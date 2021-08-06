@@ -712,9 +712,7 @@ DLL_PUBLIC var iconv(const var& instring, const var& conversion)
 
 DLL_PUBLIC bool connect(const var& connectioninfo) {
 	var conn1;
-	if (not conn1.connect(connectioninfo))
-		return false;
-	return conn1.setdefaultconnectionid();
+	return conn1.connect(connectioninfo);
 }
 
 DLL_PUBLIC void disconnect() {
