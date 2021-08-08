@@ -43,8 +43,8 @@ set -eux
 	./copyall
 
 :
-: Setup database dictionaries
-: ===========================
+: Setup essential service database dictionaries
+: =============================================
 :
 	cd /tmp
 	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
@@ -67,9 +67,9 @@ set -eux
 : Install required packages
 : =========================
 :
-:	whois is used in unknown ip no login notification emails
-:	bsd-mailx provides "mail" which is required to send email by neomail
-:	mailutils is an alternative package that doesnt have identical options
+:	whois		used in unknown ip no login notification emails
+:	bsd-mailx	provides "mail" which is required to send email by neomail
+:	mailutils	not installed. like bsd-mailx but doesnt have identical options
 :
 	apt-get -y install whois bsd-mailx
 
@@ -91,7 +91,14 @@ set -eux
 	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
 
 :
+: Copy logo and ico into images and web root
+: ==========================================
+
+	cp favicon.ico www
+	cp exodusm.png www/exodus/images/theme2
+
+:
 : Finished install_all in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : ==============================================================
 :
-:	Apache should now be listening on port 80 and 443
+:	Apache+exodus should now be listening on port 80 and 443

@@ -77,5 +77,11 @@ set -eux
 	rsync -avr --delete neosys.net/* www
 
 :
+: Remove neosys.net
+: =================
+:
+	rm neosys.net -r
+
+:
 : Finished in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds
 : =================================================================

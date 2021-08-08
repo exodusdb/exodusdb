@@ -1,7 +1,3 @@
-logs/
-data/
-images/
-work/
 www/3/accounts.htm
 www/3/adagency.htm
 www/3/agency
@@ -9,6 +5,9 @@ www/3/finance
 www/3/general
 www/3/jobs
 www/3/media
+www/favicon.ico
+www/exodus/images/theme2/neosysm2.png
+www/exodus/images/theme2/neosyss.png
 systemctl.daemon-reload.required
 wkhtmltox_*.deb
 google.pdf
