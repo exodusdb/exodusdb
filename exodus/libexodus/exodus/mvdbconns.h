@@ -79,7 +79,7 @@ class MVConnections {
 	void del_connections(int from_index);
 
 	// observers
-	CACHED_CONNECTION get_connection(int index) const;
+	CACHED_CONNECTION get_pgconnection(int index) const;
 	MVConnection* get_mvconnection(int index) const;
 	ConnectionRecordCache* get_recordcache(int index) const;
 	std::string getrecord(const int connid, const std::string filename, const std::string key) const;

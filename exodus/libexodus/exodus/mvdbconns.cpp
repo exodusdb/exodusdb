@@ -29,7 +29,7 @@ int MVConnections::add_connection(CACHED_CONNECTION conn_to_cache) {
 	return connection_id;
 }
 
-CACHED_CONNECTION MVConnections::get_connection(int index) const {
+CACHED_CONNECTION MVConnections::get_pgconnection(int index) const {
 	//boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (CACHED_CONNECTION)(iter == conntbl.end() ? 0 : iter->second.connection);

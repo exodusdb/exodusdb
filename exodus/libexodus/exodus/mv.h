@@ -1597,23 +1597,23 @@ class DLL_PUBLIC var final {
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default
 	// connection string On return *this contains connection ID and type VARTYP_NANSTR_DBCONN
-	int getconnectionid_ordefault() const;
-	int getconnectionid() const;
+	//int getconnectionid_ordefault() const;
+	//int getconnectionid() const;
 
 	// finds connection of this variable:
 	// if this is not filename SQLOPENED variable, returns thread default connection or attempts
 	// a default connect()
 	// returning a void pointer in order to not have to include postgres headers in mv.h
 	// will have to be cast to (PGconn *)
-	void* connection() const;
+	//void* connection() const;
 
 	// gets lock_table, associated with connection, associated with this object
 	//void* get_lock_table() const;
-	void* get_mvconnection() const;
+	//void* get_mvconnection() const;
 
 	var build_conn_info(const var& conninfo) const;
 
-	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& froms, var& selects, var& ismv, bool forsort_or_select_or_index = false) const;
+	//var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& froms, var& selects, var& ismv, bool forsort_or_select_or_index = false) const;
 
 	// TODO check if can speed up by returning reference to converted self like MC
 	// left/right justification
