@@ -40,7 +40,7 @@ set -eux
 : ==================================
 :
 	cd $EXODUS/service
-	./copyall
+	./copyall CONFIRM
 
 :
 : Setup essential service database dictionaries
