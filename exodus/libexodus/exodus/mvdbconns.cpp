@@ -21,7 +21,7 @@ MVConnections::MVConnections(DELETER_AND_DESTROYER del_)
 	: del(del_), connection_id(0), conntbl() {
 }
 
-int MVConnections::add_connection(CACHED_CONNECTION conn_to_cache) {
+int MVConnections::add_connection(PGconn* conn_to_cache) {
 	//boost::mutex::scoped_lock lock(mvconnections_mutex);
 
 	connection_id++;
@@ -29,10 +29,17 @@ int MVConnections::add_connection(CACHED_CONNECTION conn_to_cache) {
 	return connection_id;
 }
 
-CACHED_CONNECTION MVConnections::get_pgconnection(int index) const {
+PGconn* MVConnections::get_pgconnection(int index) const {
+
+	//boost::mutex::scoped_lock lock(mvconnections_mutex); 
+
+	//for (auto pair : conntbl) {
+	//	std::clog << pair.first << ". " << (pair.second.connection) <<std::endl;
+	//}
+
 	//boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
-	return (CACHED_CONNECTION)(iter == conntbl.end() ? 0 : iter->second.connection);
+	return (PGconn*)(iter == conntbl.end() ? 0 : iter->second.connection);
 }
 
 MVConnection* MVConnections::get_mvconnection(int index) const {
@@ -94,8 +101,8 @@ void MVConnections::del_connection(int index) {
 	//boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::iterator iter = conntbl.find(index);
 	if (iter != conntbl.end()) {
-		//	CACHED_CONNECTION p /*std::pair<int, void*> p*/ = ;
-		del((CACHED_CONNECTION)iter /*conntbl.find(index)*/->second.connection);
+		//	PGconn* p /*std::pair<int, void*> p*/ = ;
+		del((PGconn*)iter /*conntbl.find(index)*/->second.connection);
 		//delete /*conntbl.find(index)*/ iter->second.connection_locks;
 		//delete /*conntbl.find(index)*/ iter->second.connection_readcache;
 		conntbl.erase(index);
@@ -109,7 +116,7 @@ void MVConnections::del_connections(int from_index) {
 	while (ix != conntbl.end()) {
 		if (ix->first >= from_index) {
 			//TRACE(ix->first)
-			del((CACHED_CONNECTION)ix->second.connection);
+			del((PGconn*)ix->second.connection);
 			//delete ix->second.connection_locks;
 			//delete ix->second.connection_readcache;
 			ix = conntbl.erase(ix);
@@ -127,7 +134,7 @@ MVConnections::~MVConnections() {
 
 	CONN_MAP::iterator ix;
 	for (ix = conntbl.begin(); ix != conntbl.end(); ix++) {
-		del((CACHED_CONNECTION)ix->second.connection);
+		del((PGconn*)ix->second.connection);
 		//delete ix->second.connection_locks;
 		//delete ix->second.connection_readcache;
 	}

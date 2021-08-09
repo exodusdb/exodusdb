@@ -118,25 +118,27 @@ bool getdbtrace() {
 // this is also called in the destructor of MVConnectionsCache
 // MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
 // TODO so make sure that we dont use exit(n) anywhere in the programs!
-static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
-	PGconn* pgp = (PGconn*)con_;
+static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
+	//PGconn* pgp = (PGconn*)pgconn;
+	auto pgconn2 = pgconn;
     // at this point we have good new connection to database
     if (GETDBTRACE) {
-        var("DBTR PQFinish").logputl();
+        var("").logputl("DBTR PQFinish");
 	}
 	//var("========================== deleting connection ==============================").errputl();
-	PQfinish(pgp);	// AFAIK, it destroys the object by pointer
+	PQfinish(pgconn2);	// AFAIK, it destroys the object by pointer
 					//	delete pgp;
 }
 
 //#if TRACING >= 5
-#define DEBUG_LOG_SQL         \
-	if (GETDBTRACE) {         \
-		sql.logputl("SQL0:"); \
+#define DEBUG_LOG_SQL                  \
+	if (GETDBTRACE) {                  \
+		sql.squote().logputl("SQL0 "); \
 	}
-#define DEBUG_LOG_SQL1                                                 \
-	if (GETDBTRACE) {                                                  \
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql) ^ " " ^ sql.swap("$1", var(paramValues[0]).squote())).logputl("SQL1 "); \
+
+#define DEBUG_LOG_SQL1                                                                                             \
+	if (GETDBTRACE) {                                                                                              \
+		((this->assigned() ? *this : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).squote())).logputl("SQL1 "); \
 	}
 //#else
 //#define DEBUG_LOG_SQL
@@ -171,13 +173,27 @@ std::string getresult(PGresult* pgresult, int rown, int coln) {
 }
 
 //given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
-std::string normalise_filename(const var& filename_or_handle) {
-	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").toString();
+std::string normal_filename(const var& filename_or_handle) {
+	return filename_or_handle.a(1).normalize().lcase().convert(".", "_");
 }
 
 // used to detect sselect command words that are values like quoted words or plain numbers. eg "xxx"
 // 'xxx' 123 .123 +123 -123
 static const var valuechars("\"'.0123456789-+");
+
+uint64_t mvdbpostgres_hash_filename_and_key(const var& filehandle, const var& key) {
+
+	std::string fileandkey = normal_filename(filehandle);
+	fileandkey.append(" ");
+	fileandkey.append(key.normalize());
+
+	// TODO .. provide endian identical version
+	// required if and when exodus processes connect to postgres on a DIFFERENT host
+	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
+	// SAME host
+	return MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
+
+}
 
 class PGResult {
 
@@ -346,6 +362,12 @@ PGconn* get_pgconnection(const var& dbhandle) {
 	// otherwise error
 	if (!mvconn_no)
 		throw MVDBException("pgconnection() requested when not connected");
+
+	if (GETDBTRACE) {
+		std::cout << std::endl;
+		PGconn* pgconn=thread_connections.get_pgconnection(mvconn_no);
+		std::clog << "CONN " << mvconn_no << " " << pgconn << std::endl;
+	}
 
 	// return the relevent pg_connection structure
 	return thread_connections.get_pgconnection(mvconn_no);
@@ -586,8 +608,10 @@ bool var::connect(const var& conninfo) {
 	this->r(2, mvconn_no);
 	this->r(3, mvconn_no);
 
-	if (GETDBTRACE)
-		this->logputl("DBTR var::connect() OK ");
+	if (GETDBTRACE) {
+		this->logput("DBTR var::connect() OK ");
+		std::clog << " " << pgconn << std::endl;
+	}
 
 	// this->outputl("new connection=");
 
@@ -635,7 +659,7 @@ bool var::attach(const var& filenames) {
 	var notattached_filenames = "";
 	for (var filename : filenames2) {
 		//thread_file_handles[filename] = (filename ^ FM ^ mvconn_no).toString();
-		var filename2 = normalise_filename(filename);
+		var filename2 = normal_filename(filename);
 		var file;
 		if (file.open(filename2,*this)) {
 			thread_file_handles[filename2] = file.var_str;
@@ -664,7 +688,7 @@ void var::detach(const var& filenames) {
 	ISSTRING(filenames)
 
 	for (var filename : filenames) {
-		std::string filename2 = normalise_filename(filename);
+		std::string filename2 = normal_filename(filename);
 		thread_file_handles.erase(filename2);
 	}
 	return;
@@ -738,7 +762,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	}
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = normalise_filename(filename);
+	std::string filename2 = normal_filename(filename);
 
 	//determine actual connection to use
 	var connection2;
@@ -1094,16 +1118,7 @@ var var::lock(const var& key) const {
 	THISISDEFINED()
 	ISSTRING(key)
 
-	std::string fileandkey = this->normalize().var_str;
-	fileandkey.append(" ");
-	fileandkey.append(key.normalize().var_str);
-
-	// TODO .. provide endian identical version
-	// required if and when exodus processes connect to postgres on a DIFFERENT host
-	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
-	// SAME host
-	uint64_t hash64 =
-		MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
+	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
 
 	// check if already lock in current connection
 
@@ -1132,17 +1147,15 @@ var var::lock(const var& key) const {
 
 	const char* sql = "SELECT PG_TRY_ADVISORY_LOCK($1)";
 
+	// DEBUG_LOG_SQL1
+	if (GETDBTRACE)
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLL ");
+
 	//"this" is a filehandle - get its connection
 	//PGconn* pgconn = (PGconn*)this->connection();
 	PGconn* pgconn = get_pgconnection(*this);
 	if (!pgconn)
 		return false;
-
-	// DEBUG_LOG_SQL1
-	if (GETDBTRACE) {
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql) ^ " | " ^ fileandkey).logputl("SQLL ");
-		((this->assigned() ? *this : "") ^ " | " ^ (&pgconn) ^ " | " ^ fileandkey).logputl("SQLL ");
-	}
 
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
@@ -1166,12 +1179,12 @@ var var::lock(const var& key) const {
 	// since postgres will stack up repeated locks by the same process
 	if (lockedok && mvconnection) {
 		// register that it is locked
-#ifdef USE_MAP_FOR_UNORDERED
+//#ifdef USE_MAP_FOR_UNORDERED
 		std::pair<const uint64_t, int> lock(hash64, 0);
 		mvconnection->connection_locks.insert(lock);
-#else
-		mvconnection->connection_locks->insert(hash64);
-#endif
+//#else
+//		mvconnection->connection_locks->insert(hash64);
+//#endif
 	}
 
 	return lockedok;
@@ -1183,16 +1196,7 @@ bool var::unlock(const var& key) const {
 	THISISDEFINED()
 	ISSTRING(key)
 
-	std::string fileandkey = this->normalize().var_str;
-	fileandkey.append(" ");
-	fileandkey.append(key.normalize().var_str);
-
-	// TODO .. provide endian identical version
-	// required if and when exodus processes connect to postgres on a DIFFERENT host
-	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
-	// SAME host
-	uint64_t hash64 =
-		MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
+	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
 
 	// remove from local current connection connection_locks
 	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
@@ -1218,15 +1222,15 @@ bool var::unlock(const var& key) const {
 
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
+	// DEBUG_LOG_SQL
+	if (GETDBTRACE)
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLU ");
+
 	//"this" is a filehandle - get its connection
 	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (!pgconn)
 		return false;
-
-	// DEBUG_LOG_SQL
-	if (GETDBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ sql ^ " | " ^ fileandkey).logputl("SQLU ");
 
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
@@ -1772,7 +1776,7 @@ bool var::createfile(const var& filename) const {
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = normalise_filename(filename);
+	std::string filename2 = normal_filename(filename);
 
 	var sql = "CREATE";
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
@@ -2534,7 +2538,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	if (GETDBTRACE)
 		sortselectclause.logputl("sortselectclause=");
 
-	var actualfilename = this->normalize();
+	var actualfilename = normal_filename(*this);
 	// actualfilename.outputl("actualfilename=");
 	var dictfilename = actualfilename;
 	var actualfieldnames = fieldnames;
@@ -3486,7 +3490,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				whereclause = keycodes;
 		}
 	}
-
+	//TRACE(actualfilename)
 	// sselect add by key on the end of any specific order bys
 	if (bykey)
 		orderclause ^= ", " ^ actualfilename ^ ".key";
@@ -4342,7 +4346,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
 
-	var filename = this->normalize();
+	var filename = normal_filename(*this);
 	var fieldname = fieldname0.convert(".", "_");
 
 	// actual dictfile to use is either given or defaults to that of the filename
@@ -4422,7 +4426,7 @@ bool var::deleteindex(const var& fieldname0) const {
 	THISISSTRING()
 	ISSTRING(fieldname0)
 
-	var filename = this->normalize();
+	var filename = normal_filename(*this);
 	var fieldname = fieldname0.convert(".", "_");
 
 	// delete the index field (actually only present on calculated field indexes so ignore

@@ -56,7 +56,7 @@ function main()
 		//and ensure failure to read results in unassigned variable
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
-		TRACE(xyz)
+		//TRACE(xyz)
 		assert(xyz == "xyz");
 
 		//read from cache ok
@@ -69,7 +69,7 @@ function main()
 		//and ensure failure to reado results in unassigned variable
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
-		TRACE(xyz)
+		//TRACE(xyz)
 		assert(xyz == "");
 
 		//writing to real file also clears cache forcing a real reread

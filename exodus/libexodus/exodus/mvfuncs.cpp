@@ -2031,7 +2031,8 @@ const var& var::logput(const var& str) const {
 	LOCKIOSTREAM
 	//str.put(std::clog);
 	std::clog << str;
-	return this->put(std::clog);
+	std::clog << *this;
+	return *this;
 }
 
 // overloaded logputl with a prefix str
