@@ -163,7 +163,7 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 
 thread_local int thread_default_data_mvconn_no = 0;
 thread_local int thread_default_dict_mvconn_no = 0;
-thread_local var thread_connparams = "";
+//thread_local var thread_connparams = "";
 thread_local var thread_dblasterror = "";
 thread_local MVConnections thread_connections(connection_DELETER_AND_DESTROYER);
 thread_local std::unordered_map<std::string, std::string> thread_file_handles;
@@ -332,34 +332,36 @@ PGconn* get_pgconnection(const var& dbhandle) {
 		// otherwise try the default connection
 		if (!mvconn_no) {
 
-			var temp = "";
+			var defaultdb;
 
 			//look for dicts in the following order
 			//1. $EXO_DICTDBNAME if defines
 			//2. db "dict" if present
 			//3. the default db connection
 			if (isdict) {
-				if (!temp.osgetenv("EXO_DICTDBNAME") || !temp)
-					temp="dicts";
+				defaultdb.osgetenv("EXO_DICTDBNAME");
+			} else {
+				defaultdb = "";
 			}
+			//TRACE(defaultdb)
 
 			//try to connect
-			if (temp.connect())
-				mvconn_no = get_mvconn_no(temp);
+			if (defaultdb.connect())
+				mvconn_no = get_mvconn_no(defaultdb);
 
 			//if cannot connect then for dictionaries look on default connection
 			else if (isdict) {
 
 				//attempt a default connection if not already done
 				if (!thread_default_data_mvconn_no) {
-					temp = "";
-					temp.connect();
+					defaultdb = "";
+					defaultdb.connect();
 				}
 
 				mvconn_no = thread_default_data_mvconn_no;
 			}
 
-			//save default connections
+			//save default dict/data connections
 			if (isdict) {
 				thread_default_dict_mvconn_no = mvconn_no;
 				if (GETDBTRACE) {
@@ -373,7 +375,6 @@ PGconn* get_pgconnection(const var& dbhandle) {
 				}
 			}
 		}
-		// var(mvconn_no).outputl("mvconn_no3=");
 
 	}
 
@@ -471,16 +472,16 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 
 var var::build_conn_info(const var& conninfo) const {
 	// priority is
-	// 1) given parameters or last connection parameters
+	// 1) given parameters //or last connection parameters
 	// 2) individual environment parameters
 	// 3) environment connection string
 	// 4) config file parameters
-	// 5) default parameters
+	// 5) hard coded default parameters
 
 	var result(conninfo);
 	// if no conninfo details provided then use last connection details if any
-	if (!conninfo)
-		result = thread_connparams;
+	//if (!conninfo)
+	//	result = thread_connparams;
 
 	// otherwise search for details from exodus config file
 	// if incomplete connection parameters provided
@@ -643,7 +644,7 @@ bool var::connect(const var& conninfo) {
 	}
 
 	// save last connection string (used in startipc())
-	thread_connparams = fullconninfo;
+	//thread_connparams = fullconninfo;
 
 	// doesnt work
 	// need to set PQnoticeReceiver to suppress NOTICES like when creating files
@@ -771,6 +772,20 @@ void var::disconnectall() {
 		mvconn_no.logputl("DBTR var::disconnectall() >= ");
 
 	thread_connections.del_connections(mvconn_no);
+
+	if (thread_default_data_mvconn_no >= mvconn_no) {
+		thread_default_data_mvconn_no = 0;
+		if (GETDBTRACE) {
+			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
+		}
+	}
+
+	if (thread_default_dict_mvconn_no >= mvconn_no) {
+		thread_default_dict_mvconn_no = 0;
+		if (GETDBTRACE) {
+			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
+		}
+	}
 
 	return;
 }
