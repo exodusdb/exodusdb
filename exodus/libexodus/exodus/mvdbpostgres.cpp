@@ -173,7 +173,7 @@ std::string getresult(PGresult* pgresult, int rown, int coln) {
 }
 
 //given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
-std::string normal_filename(const var& filename_or_handle) {
+std::string get_normal_filename(const var& filename_or_handle) {
 	return filename_or_handle.a(1).normalize().lcase().convert(".", "_");
 }
 
@@ -183,7 +183,7 @@ static const var valuechars("\"'.0123456789-+");
 
 uint64_t mvdbpostgres_hash_filename_and_key(const var& filehandle, const var& key) {
 
-	std::string fileandkey = normal_filename(filehandle);
+	std::string fileandkey = get_normal_filename(filehandle);
 	fileandkey.append(" ");
 	fileandkey.append(key.normalize());
 
@@ -280,6 +280,9 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 
 		    // save current connection handle number as thread specific handle no
 		    thread_default_mvconn_no = mvconn_no;
+			if (GETDBTRACE) {
+				var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
+			}
 		}
 	}
 
@@ -349,11 +352,18 @@ PGconn* get_pgconnection(const var& dbhandle) {
 				mvconn_no = thread_default_mvconn_no;
 
 			//save default connections
-			if (isdict)
+			if (isdict) {
 				thread_dict_default_mvconn_no = mvconn_no;
-			else
+				if (GETDBTRACE) {
+					var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DICT ");
+				}
+			}
+			else {
 				thread_default_mvconn_no = mvconn_no;
-
+				if (GETDBTRACE) {
+					var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
+				}
+			}
 		}
 		// var(mvconn_no).outputl("mvconn_no3=");
 
@@ -616,8 +626,13 @@ bool var::connect(const var& conninfo) {
 	// this->outputl("new connection=");
 
 	// set default connection - ONLY IF THERE ISNT ONE ALREADY
-	if (!thread_default_mvconn_no)
+	if (!thread_default_mvconn_no) {
 		thread_default_mvconn_no = mvconn_no;
+		if (GETDBTRACE) {
+			this->logputl("DBTR NEW DEFAULT CONN FOR DATA " ^ var(mvconn_no) ^ " on ");
+		}
+
+	}
 
 	// save last connection string (used in startipc())
 	thread_connparams = fullconninfo;
@@ -659,7 +674,7 @@ bool var::attach(const var& filenames) {
 	var notattached_filenames = "";
 	for (var filename : filenames2) {
 		//thread_file_handles[filename] = (filename ^ FM ^ mvconn_no).toString();
-		var filename2 = normal_filename(filename);
+		var filename2 = get_normal_filename(filename);
 		var file;
 		if (file.open(filename2,*this)) {
 			thread_file_handles[filename2] = file.var_str;
@@ -688,7 +703,7 @@ void var::detach(const var& filenames) {
 	ISSTRING(filenames)
 
 	for (var filename : filenames) {
-		std::string filename2 = normal_filename(filename);
+		std::string filename2 = get_normal_filename(filename);
 		thread_file_handles.erase(filename2);
 	}
 	return;
@@ -703,23 +718,34 @@ void var::disconnect() {
 	if (GETDBTRACE)
 		(this->assigned() ? *this : var("")).logputl("DBTR var::disconnect() ");
 
-	int default_mvconn_no = thread_default_mvconn_no;
-
-	//  if (THIS_IS_DBCONN())
-	//  {
 	var mvconn_no = get_mvconn_no(*this);
+	if (!mvconn_no)
+		mvconn_no = thread_default_mvconn_no;
+
 	if (mvconn_no) {
+
+		//disconnect
 		thread_connections.del_connection((int)mvconn_no);
 		var_typ = VARTYP_UNA;
-	// if we happen to be disconnecting the same connection as the default connection
-	// then reset the default connection so that it will be reconnected to the next
-	// connect this is rather too smart but will probably do what people expect
-	if (default_mvconn_no && default_mvconn_no == mvconn_no)
-		thread_default_mvconn_no = 0;
-	} else {
-		if (default_mvconn_no) {
-			thread_connections.del_connection(default_mvconn_no);
+
+		// if we happen to be disconnecting the same connection as the default connection
+		// then reset the default connection so that it will be reconnected to the next
+		// connect this is rather too smart but will probably do what people expect
+		if (mvconn_no == thread_default_mvconn_no) {
 			thread_default_mvconn_no = 0;
+			if (GETDBTRACE) {
+				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
+			}
+		}
+
+		// if we happen to be disconnecting the same connection as the default connection FOR DICT
+		// then reset the default connection so that it will be reconnected to the next
+		// connect this is rather too smart but will probably do what people expect
+		if (mvconn_no == thread_dict_default_mvconn_no) {
+			thread_dict_default_mvconn_no = 0;
+			if (GETDBTRACE) {
+				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
+			}
 		}
 	}
 	return;
@@ -762,7 +788,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	}
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = normal_filename(filename);
+	std::string filename2 = get_normal_filename(filename);
 
 	//determine actual connection to use
 	var connection2;
@@ -1776,7 +1802,7 @@ bool var::createfile(const var& filename) const {
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = normal_filename(filename);
+	std::string filename2 = get_normal_filename(filename);
 
 	var sql = "CREATE";
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
@@ -2538,7 +2564,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	if (GETDBTRACE)
 		sortselectclause.logputl("sortselectclause=");
 
-	var actualfilename = normal_filename(*this);
+	var actualfilename = get_normal_filename(*this);
 	// actualfilename.outputl("actualfilename=");
 	var dictfilename = actualfilename;
 	var actualfieldnames = fieldnames;
@@ -4346,7 +4372,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
 
-	var filename = normal_filename(*this);
+	var filename = get_normal_filename(*this);
 	var fieldname = fieldname0.convert(".", "_");
 
 	// actual dictfile to use is either given or defaults to that of the filename
@@ -4426,7 +4452,7 @@ bool var::deleteindex(const var& fieldname0) const {
 	THISISSTRING()
 	ISSTRING(fieldname0)
 
-	var filename = normal_filename(*this);
+	var filename = get_normal_filename(*this);
 	var fieldname = fieldname0.convert(".", "_");
 
 	// delete the index field (actually only present on calculated field indexes so ignore
