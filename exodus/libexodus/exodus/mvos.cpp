@@ -1759,7 +1759,8 @@ bool var::osrmdir(bool evenifnotempty) const {
 
 		if (evenifnotempty) {
 
-			// safety
+			// safety .. simply REFUSE to rm top level folders if not empty
+			// find some other way e.g. shell command if you must
 			if (!checknotabsoluterootfolder(toString()))
 				return false;
 
