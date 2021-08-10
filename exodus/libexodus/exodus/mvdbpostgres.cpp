@@ -161,8 +161,8 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 // explain select * from testview where field1  > 'aaaaaaaaa';
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
-thread_local int thread_default_mvconn_no = 0;
-thread_local int thread_dict_default_mvconn_no = 0;
+thread_local int thread_default_data_mvconn_no = 0;
+thread_local int thread_default_dict_mvconn_no = 0;
 thread_local var thread_connparams = "";
 thread_local var thread_dblasterror = "";
 thread_local MVConnections thread_connections(connection_DELETER_AND_DESTROYER);
@@ -259,7 +259,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 		return mvconn_no2;
 
 	// otherwise return thread default connection id
-	int mvconn_no = thread_default_mvconn_no;
+	int mvconn_no = thread_default_data_mvconn_no;
 	mvconn_no2 = 0;
 	if (mvconn_no) {
 		mvconn_no2 = mvconn_no;
@@ -279,7 +279,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 		    mvconn_no2 = get_mvconn_no(conn1);
 
 		    // save current connection handle number as thread specific handle no
-		    thread_default_mvconn_no = mvconn_no;
+		    thread_default_data_mvconn_no = mvconn_no;
 			if (GETDBTRACE) {
 				var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
 			}
@@ -323,9 +323,9 @@ PGconn* get_pgconnection(const var& dbhandle) {
 		bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict_");
 
 		if (isdict)
-			mvconn_no = thread_dict_default_mvconn_no;
+			mvconn_no = thread_default_dict_mvconn_no;
 		else
-			mvconn_no = thread_default_mvconn_no;
+			mvconn_no = thread_default_data_mvconn_no;
 
 		// var(mvconn_no).outputl("mvconn_no2=");
 
@@ -348,18 +348,26 @@ PGconn* get_pgconnection(const var& dbhandle) {
 				mvconn_no = get_mvconn_no(temp);
 
 			//if cannot connect then for dictionaries look on default connection
-			else if (isdict)
-				mvconn_no = thread_default_mvconn_no;
+			else if (isdict) {
+
+				//attempt a default connection if not already done
+				if (!thread_default_data_mvconn_no) {
+					temp = "";
+					temp.connect();
+				}
+
+				mvconn_no = thread_default_data_mvconn_no;
+			}
 
 			//save default connections
 			if (isdict) {
-				thread_dict_default_mvconn_no = mvconn_no;
+				thread_default_dict_mvconn_no = mvconn_no;
 				if (GETDBTRACE) {
 					var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DICT ");
 				}
 			}
 			else {
-				thread_default_mvconn_no = mvconn_no;
+				thread_default_data_mvconn_no = mvconn_no;
 				if (GETDBTRACE) {
 					var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
 				}
@@ -626,8 +634,8 @@ bool var::connect(const var& conninfo) {
 	// this->outputl("new connection=");
 
 	// set default connection - ONLY IF THERE ISNT ONE ALREADY
-	if (!thread_default_mvconn_no) {
-		thread_default_mvconn_no = mvconn_no;
+	if (!thread_default_data_mvconn_no) {
+		thread_default_data_mvconn_no = mvconn_no;
 		if (GETDBTRACE) {
 			this->logputl("DBTR NEW DEFAULT CONN FOR DATA " ^ var(mvconn_no) ^ " on ");
 		}
@@ -720,7 +728,7 @@ void var::disconnect() {
 
 	var mvconn_no = get_mvconn_no(*this);
 	if (!mvconn_no)
-		mvconn_no = thread_default_mvconn_no;
+		mvconn_no = thread_default_data_mvconn_no;
 
 	if (mvconn_no) {
 
@@ -731,8 +739,8 @@ void var::disconnect() {
 		// if we happen to be disconnecting the same connection as the default connection
 		// then reset the default connection so that it will be reconnected to the next
 		// connect this is rather too smart but will probably do what people expect
-		if (mvconn_no == thread_default_mvconn_no) {
-			thread_default_mvconn_no = 0;
+		if (mvconn_no == thread_default_data_mvconn_no) {
+			thread_default_data_mvconn_no = 0;
 			if (GETDBTRACE) {
 				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
 			}
@@ -741,8 +749,8 @@ void var::disconnect() {
 		// if we happen to be disconnecting the same connection as the default connection FOR DICT
 		// then reset the default connection so that it will be reconnected to the next
 		// connect this is rather too smart but will probably do what people expect
-		if (mvconn_no == thread_dict_default_mvconn_no) {
-			thread_dict_default_mvconn_no = 0;
+		if (mvconn_no == thread_default_dict_mvconn_no) {
+			thread_default_dict_mvconn_no = 0;
 			if (GETDBTRACE) {
 				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
 			}
