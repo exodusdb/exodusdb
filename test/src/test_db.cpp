@@ -430,27 +430,27 @@ function main()
 
 //#if 0
 
-	deletefile("XUSERS");
-	deletefile("dict_XUSERS");
+	deletefile("XO_USERS");
+	deletefile("dict_XO_USERS");
 
-	createfile("XUSERS");
-	createfile("DICT_XUSERS");
+	createfile("XO_USERS");
+	createfile("DICT_XO_USERS");
 
 	//create some dictionary records (field descriptions)
 	//PERSON_NO    Type "F", Key Field (0)
 	//BIRTHDAY     Type "F", Data Field 1
-	//AGE IN DAYS  Type "S", Source Code needs a dictionary subroutine library called dict_XUSERS
+	//AGE IN DAYS  Type "S", Source Code needs a dictionary subroutine library called dict_XO_USERS
 	//AGE IN YEARS Type "S", Source Code ditto
-	assert(write(convert( "F|0|Person No||||||R|10"   ,"|",FM),"DICT_XUSERS", "PERSON_NO"   ));
-	assert(write(convert( "F|1|Birthday||||D||R|12"   ,"|",FM),"DICT_XUSERS", "BIRTHDAY"    ));
-	assert(write(convert( "S||Age in Days||||||R|10"  ,"|",FM),"DICT_XUSERS", "AGE_IN_DAYS" ));
-	assert(write(convert( "S||Age in Years||||||R|10" ,"|",FM),"DICT_XUSERS", "AGE_IN_YEARS"));
+	assert(write(convert( "F|0|Person No||||||R|10"   ,"|",FM),"DICT_XO_USERS", "PERSON_NO"   ));
+	assert(write(convert( "F|1|Birthday||||D||R|12"   ,"|",FM),"DICT_XO_USERS", "BIRTHDAY"    ));
+	assert(write(convert( "S||Age in Days||||||R|10"  ,"|",FM),"DICT_XO_USERS", "AGE_IN_DAYS" ));
+	assert(write(convert( "S||Age in Years||||||R|10" ,"|",FM),"DICT_XO_USERS", "AGE_IN_YEARS"));
 
 	//create some users and their birthdays 11000=11 FEB 1998 .... 14000=30 APR 2006
-	assert(write("11000","XUSERS","1"));
-	assert(write("12000","XUSERS","2"));
-	assert(write("13000","XUSERS","3"));
-	assert(write("14000","XUSERS","4"));
+	assert(write("11000","XO_USERS","1"));
+	assert(write("12000","XO_USERS","2"));
+	assert(write("13000","XO_USERS","3"));
+	assert(write("14000","XO_USERS","4"));
 
 //DBTRACE=true;
 	//check can create and delete indexes
@@ -458,23 +458,23 @@ function main()
 	//use DBTRACE to see the error
 	printl("CHECKING IF PGEXODUS POSTGRES PLUGIN IS INSTALLED");
 	var pluginok=true;
-	if (not createindex("XUSERS","BIRTHDAY")) {
+	if (not createindex("XO_USERS","BIRTHDAY")) {
 		pluginok=false;
 		printl("Error: pgexodus, Exodus's plugin to PostgreSQL is not working. Run configexodus.");
 	}
 
 	if (pluginok) {
-		assert(listindexes("XUSERS") eq ("xusers" _VM_ "birthday"));
+		assert(listindexes("XO_USERS") eq ("xo_users" _VM_ "birthday"));
 		assert(listindexes() ne "");
-//ALN: do not delete to make subsequent select work::	assert(deleteindex("XUSERS","BIRTHDAY"));
-//		assert(listindexes("XUSERS") eq "");
+//ALN: do not delete to make subsequent select work::	assert(deleteindex("XO_USERS","BIRTHDAY"));
+//		assert(listindexes("XO_USERS") eq "");
 	}
 	//check can select and readnext through the records
 	printl("Beginning transaction");
 	assert(begintrans());
 	printl("Begun transaction");
 	if (pluginok) {
-		assert(select("select XUSERS with BIRTHDAY between '1 JAN 2000' and '31 DEC 2003'"));
+		assert(select("select XO_USERS with BIRTHDAY between '1 JAN 2000' and '31 DEC 2003'"));
 		assert(readnext(ID));
 		assert(ID eq 2);
 		assert(readnext(ID));
@@ -482,20 +482,20 @@ function main()
 		assert(not readnext(ID));//check no more
 	}
 //test function dictionaries
-//	if (not select("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
-//	if (not select("SELECT XUSERS"))
-	if (not select("SELECT XUSERS (R)"))
-		assert(false and var("Failed to Select XUSERS!"));
+//	if (not select("SELECT XO_USERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
+//	if (not select("SELECT XO_USERS"))
+	if (not select("SELECT XO_USERS (R)"))
+		assert(false and var("Failed to Select XO_USERS!"));
 
-	DICT="dict_XUSERS";
+	DICT="dict_XO_USERS";
 	while (readnext(RECORD,ID,MV))
 //	while (readnext(ID))
 	{
 		printl("ID=" ^ ID ^ " RECORD=" ^ RECORD);
 
 //		continue;
-//following requires dict_XUSERS to be a dictionary library something like
-//edic dict_XUSERS
+//following requires dict_XO_USERS to be a dictionary library something like
+//edic dict_XO_USERS
 /*
 #include <exodus/dict.h>
 
@@ -557,17 +557,17 @@ dict(AGE_IN_YEARS) {
 
 //	var().connectlocal("");
 
-	var filenames2="MY_JOBS";
-	filenames2^=FM^"MY_PRODUCTION_ORDERS";
-	filenames2^=FM^"MY_PRODUCTION_INVOICES";
-	filenames2^=FM^"MY_COMPANIES";
-	filenames2^=FM^"MY_BRANDS";
-	filenames2^=FM^"MY_CLIENTS";
-	filenames2^=FM^"MY_VEHICLES";
-	filenames2^=FM^"MY_SUPPLIERS";
-	filenames2^=FM^"MY_CURRENCIES";
-	filenames2^=FM^"MY_MARKETS";
-	filenames2^=FM^"MY_ADS";
+	var filenames2="EXO_JOBS";
+	filenames2^=FM^"EXO_PRODUCTION_ORDERS";
+	filenames2^=FM^"EXO_PRODUCTION_INVOICES";
+	filenames2^=FM^"EXO_COMPANIES";
+	filenames2^=FM^"EXO_BRANDS";
+	filenames2^=FM^"EXO_CLIENTS";
+	filenames2^=FM^"EXO_VEHICLES";
+	filenames2^=FM^"EXO_SUPPLIERS";
+	filenames2^=FM^"EXO_CURRENCIES";
+	filenames2^=FM^"EXO_MARKETS";
+	filenames2^=FM^"EXO_ADS";
 
 	var tempfile;
 	printl();
@@ -592,38 +592,38 @@ dict(AGE_IN_YEARS) {
 //	var().stop();
 
 	var ads;
-	if (!ads.open("MY_ADS"))
+	if (!ads.open("EXO_ADS"))
 	{
-		var().createfile("MY_ADS");
-		if (!ads.open("MY_ADS"))
-			printl("Cannot create MY_ADS");
-			//abort("Cannot create MY_ADS");
+		var().createfile("EXO_ADS");
+		if (!ads.open("EXO_ADS"))
+			printl("Cannot create EXO_ADS");
+			//abort("Cannot create EXO_ADS");
 	}
 
-	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_MY_CURRENCIES","CURRENCY_CODE");
-	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MY_CURRENCIES","CURRENCY_NAME");
-	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_MY_MARKETS","CODE");
-	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MY_MARKETS","NAME");
+	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_EXO_CURRENCIES","CURRENCY_CODE");
+	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_EXO_CURRENCIES","CURRENCY_NAME");
+	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_EXO_MARKETS","CODE");
+	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_EXO_MARKETS","NAME");
 
 	var dictrec="";
 	dictrec.r(1,"F");
 	dictrec.r(2,"3");
 	dictrec.r(3,"Brand Code");
-	if (not dictrec.write("DICT_MY_ADS","BRAND_CODE"))
+	if (not dictrec.write("DICT_EXO_ADS","BRAND_CODE"))
 		printl("cannot write dict_ads, BRAND_CODE");
 	//oo style
 	assert(ads.createindex("BRAND_CODE"));
 	assert(ads.deleteindex("BRAND_CODE"));
 	//procedural
-	assert(createindex("MY_ADS BRAND_CODE"));
-	assert(deleteindex("MY_ADS BRAND_CODE"));
+	assert(createindex("EXO_ADS BRAND_CODE"));
+	assert(deleteindex("EXO_ADS BRAND_CODE"));
 
 //	var("").select("MARKETS","WITH CURRENCY_NAME = '' AND WITH AUTHORISED");
 //	var("").select("MARKETS","WITH AUTHORISED");
-//	var("").select("MY_ADS","WITH AUTHORISED");
-//	ads.select("MY_ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
-//	ads.select("MY_ADS","BY MARKET_CODE");
-//	var().select("MY_ADS");
+//	var("").select("EXO_ADS","WITH AUTHORISED");
+//	ads.select("EXO_ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
+//	ads.select("EXO_ADS","BY MARKET_CODE");
+//	var().select("EXO_ADS");
 //	var("").select("SCHEDULES","WITH AUTHORISED");
 //	var("").select("SCHEDULES","");
 	//MvLibs mvlibs;
@@ -632,7 +632,7 @@ dict(AGE_IN_YEARS) {
 //	cin>>ii;
 	var record;
 	begintrans();
-	if (ads.select("SELECT MY_ADS")) {
+	if (ads.select("SELECT EXO_ADS")) {
 		while (ii<3&&ads.readnext(record,key,MV))
 		{
 			++ii;

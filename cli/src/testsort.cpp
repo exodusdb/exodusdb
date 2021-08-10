@@ -5,7 +5,7 @@ programinit()
 	//with multivalue-mimicking "everything is a global function" syntax
 	//instead of exodus's oo-style syntax "xxx.yyy().zzz()".
 	//
-	var filename = "myclients";
+	var filename = "xo_clients";
 
 function main() {
 
@@ -83,7 +83,7 @@ function main() {
 	if (not read(rec, dictfile, "BALANCE"))
 		printl("Cant read 'balance' record from dictionary");
 
-	printl("\nNB 'name_and_type' dictionary item S type calls dict_myclients.cpp library function!");
+	printl("\nNB 'name_and_type' dictionary item S type calls dict_xo_clients.cpp library function!");
 
 	printl("\nClear the client file");
 	clearfile(filename);

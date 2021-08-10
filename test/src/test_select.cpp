@@ -44,7 +44,7 @@ function main() {
 		} //ii;
 	}
 
-	testfilename="test_select";
+	testfilename="xo_test_select";
 	dictfilename="dict_" ^ testfilename;
 
 	deletefile(testfilename);
@@ -74,7 +74,8 @@ function main() {
 function test() {
 
 	assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
-	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 1=") == "B");
+	assert(readnext(RECORD,ID,MV));
+	assert(ID.outputl("E] FF 1=") == "B");
 	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 2=") == "C");
 	assert(!readnext(RECORD,ID,MV));
 

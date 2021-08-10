@@ -64,7 +64,7 @@ set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 
 # lib #
 
-add_library(dict_myclients SHARED dict_myclients.cpp)
+add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
 #add_library(number SHARED number.cpp)
 
 ### 2. LINK ###
@@ -119,9 +119,9 @@ configexodus
 ### 4. INSTALL LIBs ###
 
 ## CMAKE_PREFIX=/usr/local/
-#install(TARGETS dict_myclients DESTINATION lib)
+#install(TARGETS dict_xo_clients DESTINATION lib)
 #push it into /usr/lib where it can be found by dlopen
-#install(TARGETS dict_myclients number DESTINATION /usr/lib)
-install(TARGETS dict_myclients DESTINATION /usr/lib)
+#install(TARGETS dict_xo_clients number DESTINATION /usr/lib)
+install(TARGETS dict_xo_clients DESTINATION /usr/lib)
 
 message("--EXODUS CLI CMAKE EXIT --")

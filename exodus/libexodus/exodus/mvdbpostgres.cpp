@@ -310,7 +310,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 // NB in case 2 and 3 the connection id is recorded in the var
 // use void pointer to avoid need for including postgres headers in mv.h or any fancy class
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-PGconn* get_pgconnection(const var& dbhandle) {
+PGconn* get_pgconnection(var& dbhandle) {
 
 	// var("--- connection ---").outputl();
 	// get the connection associated with *this
@@ -340,6 +340,8 @@ PGconn* get_pgconnection(const var& dbhandle) {
 			//3. the default db connection
 			if (isdict) {
 				defaultdb.osgetenv("EXO_DICTDBNAME");
+				if (!defaultdb)
+					defaultdb="exodus_dict";
 			} else {
 				defaultdb = "";
 			}
@@ -374,6 +376,11 @@ PGconn* get_pgconnection(const var& dbhandle) {
 					var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
 				}
 			}
+		}
+
+		//save the connection number in the dbhandle
+		if (mvconn_no) {
+			dbhandle.r(2, mvconn_no);
 		}
 
 	}
@@ -1020,7 +1027,7 @@ bool var::read(const var& filehandle, const var& key) {
 		var sql = "SELECT key from " ^ filehandle.a(1).convert(".", "_") ^ ";";
 
 		//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-		auto pgconn = get_pgconnection(filehandle);
+		auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
 		if (pgconn == NULL)
 			return false;
 
@@ -1062,7 +1069,7 @@ bool var::read(const var& filehandle, const var& key) {
 	}
 
 	// get filehandle specific connection or fail
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
 	if (!pgconn)
 		return false;
 
@@ -1202,7 +1209,7 @@ var var::lock(const var& key) const {
 
 	//"this" is a filehandle - get its connection
 	//PGconn* pgconn = (PGconn*)this->connection();
-	PGconn* pgconn = get_pgconnection(*this);
+	PGconn* pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (!pgconn)
 		return false;
 
@@ -1277,7 +1284,7 @@ bool var::unlock(const var& key) const {
 
 	//"this" is a filehandle - get its connection
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (!pgconn)
 		return false;
 
@@ -1337,7 +1344,7 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 	ISSTRING(sqlcmd)
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (!pgconn) {
 		response = "Error: sqlexec cannot find thread database connection";
 		return false;
@@ -1478,7 +1485,7 @@ bool var::write(const var& filehandle, const var& key) const {
 	sql ^= " DO UPDATE SET data = $2";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
 	if (!pgconn)
 		return false;
 
@@ -1543,7 +1550,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	var sql = "UPDATE " ^ filehandle.a(1).convert(".", "_") ^ " SET data = $2 WHERE key = $1";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
 	if (!pgconn)
 		return false;
 
@@ -1620,7 +1627,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 		"INSERT INTO " ^ filehandle.a(1).convert(".", "_") ^ " (key,data) values( $1 , $2)";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
 	if (!pgconn)
 		return false;
 
@@ -1680,7 +1687,7 @@ bool var::deleterecord(const var& key) const {
 	var sql = "DELETE FROM " ^ this->a(1) ^ " WHERE KEY = $1";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (!pgconn)
 		return false;
 
@@ -1766,7 +1773,7 @@ bool var::statustrans() const {
 	THISISDEFINED()
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (!pgconn) {
 		this->lasterror("db connection " ^ var(get_mvconn_no(*this)) ^ "not opened");
 		return false;
@@ -3588,12 +3595,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//determine the connection from the filename
 	//could be an attached on a non-default connection
 	//selecting dict files would trigger this
-	if (not this->a(2)) {
+TRACE(*this)
+TRACE(actualfilename)
+	if (not this->a(2) || actualfilename.lcase().starts("dict_")) {
 		var actualfile;
 		if (actualfile.open(actualfilename))
 			this->r(2, actualfile.a(2));
+TRACE(actualfile)
 	}
-
+TRACE(*this)
 	//save any active selection in a temporary table and INNER JOIN to it to avoid complete selection of primary file
 	if (this->hasnext()) {
 
@@ -3628,6 +3638,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	// WITH HOLD is a very significant addition
 	// var sql="DECLARE cursor1_" ^ (*this) ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
 	// ^ " FROM ";
+	//TRACE(*this);
 	var sql = "DECLARE\n cursor1_" ^ this->a(1) ^ " SCROLL CURSOR WITH HOLD FOR";
 
 	//SELECT - field/column names
@@ -4124,7 +4135,7 @@ bool var::hasnext() const {
 		return false;
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (pgconn == NULL) {
 		// this->clearselect();
 		return false;
@@ -4336,7 +4347,7 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 	}
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (pgconn == NULL)
 		return "";
 
@@ -4520,7 +4531,7 @@ var var::listfiles() const {
 	sql ^= " UNION SELECT matviewname as table_name from pg_matviews;";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (pgconn == NULL)
 		return "";
 
@@ -4555,7 +4566,7 @@ bool var::cursorexists() const {
 	// var sql="SELECT name from pg_cursors";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (pgconn == NULL)
 		return "";
 
@@ -4603,7 +4614,7 @@ var var::listindexes(const var& filename0, const var& fieldname0) const {
 		");";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (pgconn == NULL)
 		return "";
 
@@ -4697,7 +4708,7 @@ var var::flushindex(const var& filename) const {
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconnection(const_cast<var&>(*this));
 	if (pgconn == NULL)
 		return "";
 
