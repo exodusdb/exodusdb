@@ -3231,7 +3231,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					//dont create exodus_tobool(to_tsvector(...
 					dictexpression.swapper("to_tsvector('simple',","");
 					dictexpression.splicer(-1, 1, "");
-//TRACE(dictexpression)
+					//TRACE(dictexpression)
 					dictexpression_isvector = false;
 				}
 
@@ -3602,15 +3602,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//determine the connection from the filename
 	//could be an attached on a non-default connection
 	//selecting dict files would trigger this
-TRACE(*this)
-TRACE(actualfilename)
+	//TRACE(*this)
+	//TRACE(actualfilename)
 	if (not this->a(2) || actualfilename.lcase().starts("dict_")) {
 		var actualfile;
 		if (actualfile.open(actualfilename))
 			this->r(2, actualfile.a(2));
-TRACE(actualfile)
+		//TRACE(actualfile)
 	}
-TRACE(*this)
+	//TRACE(*this)
 	//save any active selection in a temporary table and INNER JOIN to it to avoid complete selection of primary file
 	if (this->hasnext()) {
 
