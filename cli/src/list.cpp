@@ -1484,7 +1484,7 @@ nextdict:
 	} else {
 		if (not LISTACTIVE) {
 			//select(srcfile);
-			select("SELECT " ^ srcfile ^ " (SR)");
+			select("SELECT " ^ filename ^ " (SR)");
 		}
 	}
 	recn = "";

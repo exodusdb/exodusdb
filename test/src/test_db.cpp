@@ -108,7 +108,7 @@ function main()
 
 		printl("Check deleterecord works on a select list");
 //		select(tempfile ^ " with ID ge 5");
-		select(tempfile ^ " with ID ge '5'");
+		select(tempfilename ^ " with ID ge '5'");
 		deleterecord(tempfile);
 		assert(tempfile.reccount() == 5);
 

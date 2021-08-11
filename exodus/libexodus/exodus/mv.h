@@ -1484,12 +1484,12 @@ class DLL_PUBLIC var final {
 	//////////////////////
 
 	bool select(const var& sortselectclause DEFAULTNULL);
-	void clearselect() const;
+	void clearselect();
 
-	ND bool hasnext() const;
-	bool readnext(var& key) const;
-	bool readnext(var& key, var& valueno) const;
-	bool readnext(var& record, var& key, var& valueno) const;
+	ND bool hasnext();
+	bool readnext(var& key);
+	bool readnext(var& key, var& valueno);
+	bool readnext(var& record, var& key, var& valueno);
 
 	bool savelist(const var& listname);
 	bool getlist(const var& listname);
@@ -1592,7 +1592,7 @@ class DLL_PUBLIC var final {
    private:
 	void createString() const;
 
-	bool cursorexists() const;
+	bool cursorexists();
 	bool selectx(const var& fieldnames, const var& sortselectclause);
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default

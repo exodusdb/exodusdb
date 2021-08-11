@@ -728,11 +728,11 @@ DLL_PUBLIC bool createdb(const var& dbname) {
 }
 
 DLL_PUBLIC bool copydb(const var& from_dbname, const var& to_dbname) {
-	return from_dbname.copydb(from_dbname, to_dbname);
+	return var().copydb(from_dbname, to_dbname);
 }
 
 DLL_PUBLIC bool deletedb(const var& dbname) {
-	return dbname.deletedb(dbname);
+	return var().deletedb(dbname);
 }
 
 DLL_PUBLIC bool createfile(const var& filename) {
@@ -744,12 +744,12 @@ DLL_PUBLIC bool createfile(const var& filename) {
 	//remove pickos volume locations
 	filename2.swapper("DATA ", "").swapper("REVBOOT ", "").swapper("DATAVOL ", "").trimmer();
 
-	return filename.createfile(filename2);
+	return filename2.createfile(filename2);
 }
 
 DLL_PUBLIC bool deletefile(const var& filename_or_handle) {
 	//remove options like (S)
-	var filename2 = filename_or_handle.field("(", 1).trim();
+	var filename2 = filename_or_handle.field(" ", 1).trim();
 
 	//exodus doesnt automatically create dict files
 	filename2.swapper("DATA ", "").trimmer();

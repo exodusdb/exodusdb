@@ -310,7 +310,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 // NB in case 2 and 3 the connection id is recorded in the var
 // use void pointer to avoid need for including postgres headers in mv.h or any fancy class
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-PGconn* get_pgconnection(var& dbhandle) {
+PGconn* get_pgconnection(const var& dbhandle) {
 
 	// var("--- connection ---").outputl();
 	// get the connection associated with *this
@@ -379,9 +379,10 @@ PGconn* get_pgconnection(var& dbhandle) {
 		}
 
 		//save the connection number in the dbhandle
-		if (mvconn_no) {
-			dbhandle.r(2, mvconn_no);
-		}
+		//if (mvconn_no) {
+		//	dbhandle.unassigned("");
+		//	dbhandle.r(2, mvconn_no);
+		//}
 
 	}
 
@@ -1027,7 +1028,7 @@ bool var::read(const var& filehandle, const var& key) {
 		var sql = "SELECT key from " ^ filehandle.a(1).convert(".", "_") ^ ";";
 
 		//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-		auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
+		auto pgconn = get_pgconnection(filehandle);
 		if (pgconn == NULL)
 			return false;
 
@@ -1069,7 +1070,7 @@ bool var::read(const var& filehandle, const var& key) {
 	}
 
 	// get filehandle specific connection or fail
-	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
+	auto pgconn = get_pgconnection(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1209,7 +1210,7 @@ var var::lock(const var& key) const {
 
 	//"this" is a filehandle - get its connection
 	//PGconn* pgconn = (PGconn*)this->connection();
-	PGconn* pgconn = get_pgconnection(const_cast<var&>(*this));
+	PGconn* pgconn = get_pgconnection(*this);
 	if (!pgconn)
 		return false;
 
@@ -1284,7 +1285,7 @@ bool var::unlock(const var& key) const {
 
 	//"this" is a filehandle - get its connection
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (!pgconn)
 		return false;
 
@@ -1344,7 +1345,7 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 	ISSTRING(sqlcmd)
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (!pgconn) {
 		response = "Error: sqlexec cannot find thread database connection";
 		return false;
@@ -1485,7 +1486,7 @@ bool var::write(const var& filehandle, const var& key) const {
 	sql ^= " DO UPDATE SET data = $2";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
+	auto pgconn = get_pgconnection(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1550,7 +1551,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	var sql = "UPDATE " ^ filehandle.a(1).convert(".", "_") ^ " SET data = $2 WHERE key = $1";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
+	auto pgconn = get_pgconnection(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1627,7 +1628,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 		"INSERT INTO " ^ filehandle.a(1).convert(".", "_") ^ " (key,data) values( $1 , $2)";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
-	auto pgconn = get_pgconnection(const_cast<var&>(filehandle));
+	auto pgconn = get_pgconnection(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1687,7 +1688,7 @@ bool var::deleterecord(const var& key) const {
 	var sql = "DELETE FROM " ^ this->a(1) ^ " WHERE KEY = $1";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (!pgconn)
 		return false;
 
@@ -1773,7 +1774,7 @@ bool var::statustrans() const {
 	THISISDEFINED()
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (!pgconn) {
 		this->lasterror("db connection " ^ var(get_mvconn_no(*this)) ^ "not opened");
 		return false;
@@ -2620,6 +2621,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//var ncalc_fields=0;
 	this->r(10, "");
 
+	//catch bad FM character
+	if (sortselectclause.index(_FM_))
+		throw MVDBException("Illegal FM character in " ^ sortselectclause);
+
 	// sortselect clause can be a filehandle in which case we extract the filename from field1
 	// omitted if filename.select() or filehandle.select()
 	// cursor.select(...) where ...
@@ -2627,7 +2632,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	// filename can be omitted if calling like filename.select(...) or filehandle.select(...)
 	// nnn is optional limit to number of records returned
 	// TODO only convert \t\r\n outside single and double quotes
-	var remaining = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
+	//var remaining = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
+	var remaining = sortselectclause.convert("\t\r\n", "   ").trim();
+
 	// remaining.outputl("remaining=");
 
 	// remove trailing options eg (S) or {S}
@@ -3734,22 +3741,22 @@ TRACE(*this)
 	return true;
 }
 
-void var::clearselect() const {
+void var::clearselect() {
 
 	// THISIS("void var::clearselect() const")
 	// THISISSTRING()
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	/// if readnext through string
 	//3/4/5/6 setup in makelist. cleared in clearselect
 	//if (this->a(3) == "%MAKELIST%")
 	{
-		const_cast<var&>(*this).r(6, "");
-		const_cast<var&>(*this).r(5, "");
-		const_cast<var&>(*this).r(4, "");
-		const_cast<var&>(*this).r(3, "");
+		this->r(6, "");
+		this->r(5, "");
+		this->r(4, "");
+		this->r(3, "");
 		//		return;
 	}
 
@@ -4077,7 +4084,7 @@ bool var::makelist(const var& listname, const var& keys) {
 	return true;
 }
 
-bool var::hasnext() const {
+bool var::hasnext() {
 
 	// var xx;
 	// return this->readnext(xx);
@@ -4086,7 +4093,7 @@ bool var::hasnext() const {
 	// THISISSTRING()
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
@@ -4117,15 +4124,15 @@ bool var::hasnext() const {
 		if (!block.read(lists, listid)) {
 
 			//clear the listid
-			const_cast<var&>(*this).r(3, "");
+			this->r(3, "");
 
 			return false;
 		}
 
 		// might as well cache the next block for the next readnext
-		const_cast<var&>(*this).r(4, listno);
-		const_cast<var&>(*this).r(5, 0);
-		const_cast<var&>(*this).r(6, block.lowerer());
+		this->r(4, listno);
+		this->r(5, 0);
+		this->r(6, block.lowerer());
 
 		return true;
 	}
@@ -4135,7 +4142,7 @@ bool var::hasnext() const {
 		return false;
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL) {
 		// this->clearselect();
 		return false;
@@ -4165,12 +4172,12 @@ bool var::hasnext() const {
 	return true;
 }
 
-bool var::readnext(var& key) const {
+bool var::readnext(var& key) {
 	var valueno;
 	return this->readnext(key, valueno);
 }
 
-bool var::readnext(var& key, var& valueno) const {
+bool var::readnext(var& key, var& valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK) {
@@ -4180,7 +4187,7 @@ bool var::readnext(var& key, var& valueno) const {
 	}
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	THISIS("bool var::readnext(var& key, var& valueno) const")
 	THISISSTRING()
@@ -4269,7 +4276,7 @@ bool var::readnext(var& key, var& valueno) const {
 	}
 #endif
 
-bool var::readnext(var& record, var& key, var& valueno) const {
+bool var::readnext(var& record, var& key, var& valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
@@ -4279,7 +4286,7 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 	}
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	THISIS("bool var::readnext(var& record, var& key, var& valueno) const")
 	THISISSTRING()
@@ -4306,10 +4313,10 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 
 				// makelist provides one block of keys and nothing in the lists file
 				if (listid == "%MAKELIST%") {
-					const_cast<var&>(*this).r(3, "");
-					const_cast<var&>(*this).r(4, "");
-					const_cast<var&>(*this).r(5, "");
-					const_cast<var&>(*this).r(6, "");
+					this->r(3, "");
+					this->r(4, "");
+					this->r(5, "");
+					this->r(6, "");
 					return false;
 				}
 
@@ -4325,19 +4332,19 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 				if (!block.read(lists, listid)) {
 
 					//clear the listid
-					const_cast<var&>(*this).r(3, "");
+					this->r(3, "");
 
 					return false;
 				}
 
-				const_cast<var&>(*this).r(4, listno);
-				const_cast<var&>(*this).r(5, 0);
-				const_cast<var&>(*this).r(6, block.lowerer());
+				this->r(4, listno);
+				this->r(5, 0);
+				this->r(6, block.lowerer());
 				continue;
 			}
 
 			// bump up the key no pointer
-			const_cast<var&>(*this).r(5, keyno);
+			this->r(5, keyno);
 
 			// extract and return the key (and mv if present)
 			key = key_and_mv.a(1, 1, 1);
@@ -4347,7 +4354,7 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 	}
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
@@ -4531,7 +4538,7 @@ var var::listfiles() const {
 	sql ^= " UNION SELECT matviewname as table_name from pg_matviews;";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
@@ -4552,13 +4559,13 @@ var var::listfiles() const {
 	return filenames;
 }
 
-bool var::cursorexists() const {
+bool var::cursorexists() {
 	// THISIS("var var::cursorexists() const")
 	// could allow undefined usage since *this isnt used?
 	// THISISSTRING()
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
@@ -4566,7 +4573,7 @@ bool var::cursorexists() const {
 	// var sql="SELECT name from pg_cursors";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
@@ -4614,7 +4621,7 @@ var var::listindexes(const var& filename0, const var& fieldname0) const {
 		");";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
@@ -4708,7 +4715,7 @@ var var::flushindex(const var& filename) const {
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
 	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(const_cast<var&>(*this));
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
