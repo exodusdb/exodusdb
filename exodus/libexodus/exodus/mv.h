@@ -1403,9 +1403,9 @@ class DLL_PUBLIC var final {
 	// DATABASE MANAGEMENT
 	/////////////////////
 
-	bool createdb(const var& dbname) const;
-	bool copydb(const var& from_dbname, const var& to_dbname) const;
-	bool deletedb(const var& dbname) const;
+	bool dbcreate(const var& dbname) const;
+	bool dbcopy(const var& from_dbname, const var& to_dbname) const;
+	bool dbdelete(const var& dbname) const;
 
 	bool createfile(const var& filename) const;
 	bool renamefile(const var& filename, const var& newfilename) const;

@@ -7,7 +7,7 @@ programinit()
 	if (filename && filename.substr(1, 5) != "dict_")
 		filename = "dict_" ^ filename;
 	//perform("list " ^ dictfilename ^ " by type \"F\" by FMC by PART");
-TRACE(filename)
+
 	//list the dictionary filenames if none provided
 	if (not filename) {
 

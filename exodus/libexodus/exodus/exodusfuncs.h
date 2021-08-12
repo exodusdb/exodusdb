@@ -238,9 +238,9 @@ DLL_PUBLIC bool connect(const var& connectionstring DEFAULTNULL);
 DLL_PUBLIC void disconnect();
 DLL_PUBLIC void disconnectall();
 
-DLL_PUBLIC bool createdb(const var& dbname);
-DLL_PUBLIC bool copydb(const var& from_dbname, const var& to_dbname);
-DLL_PUBLIC bool deletedb(const var& dbname);
+DLL_PUBLIC bool dbcreate(const var& dbname);
+DLL_PUBLIC bool dbcopy(const var& from_dbname, const var& to_dbname);
+DLL_PUBLIC bool dbdelete(const var& dbname);
 
 DLL_PUBLIC bool createfile(const var& filename);
 DLL_PUBLIC bool deletefile(const var& filename_or_handle);

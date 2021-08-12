@@ -16,7 +16,7 @@ function main() {
 	gosub cleanup();
 
 	//createa specific database for dicts
-	assert(createdb(xo_dict));
+	assert(dbcreate(xo_dict));
 
 	//test with EXO_DICTDBNAME
 	if (true) {
@@ -120,7 +120,7 @@ function main() {
 
 subroutine cleanup() {
 
-	deletedb(xo_dict);
+	dbdelete(xo_dict);
 
 }
 programexit()

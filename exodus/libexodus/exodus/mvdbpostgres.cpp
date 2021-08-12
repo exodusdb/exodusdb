@@ -1787,20 +1787,20 @@ bool var::statustrans() const {
 }
 
 // sample code
-// var().createdb("mynewdb");//create a new database on the current thread-default connection
+// var().dbcreate("mynewdb");//create a new database on the current thread-default connection
 // var file;
 // file.open("myfile");
-// file.createdb("mynewdb");//creates a new db on the same connection as a file was opened on
+// file.dbcreate("mynewdb");//creates a new db on the same connection as a file was opened on
 // var connectionhandle;
 // connectionhandle.connect("connection string pars");
-// connectionhandle.createdb("mynewdb");
+// connectionhandle.dbcreate("mynewdb");
 
-bool var::createdb(const var& dbname) const {
-	return this->copydb(var(""), dbname);
+bool var::dbcreate(const var& dbname) const {
+	return this->dbcopy(var(""), dbname);
 }
 
-bool var::copydb(const var& from_dbname, const var& to_dbname) const {
-	THISIS("bool var::createdb(const var& from_dbname, const var& to_dbname)")
+bool var::dbcopy(const var& from_dbname, const var& to_dbname) const {
+	THISIS("bool var::dbcreate(const var& from_dbname, const var& to_dbname)")
 	THISISDEFINED()
 	ISSTRING(from_dbname)
 	ISSTRING(to_dbname)
@@ -1813,8 +1813,8 @@ bool var::copydb(const var& from_dbname, const var& to_dbname) const {
 	return this->sqlexec(sql);
 }
 
-bool var::deletedb(const var& dbname) const {
-	THISIS("bool var::deletedb(const var& dbname)")
+bool var::dbdelete(const var& dbname) const {
+	THISIS("bool var::dbdelete(const var& dbname)")
 	THISISDEFINED()
 	ISSTRING(dbname)
 
@@ -1909,12 +1909,16 @@ inline void tosqldate(var &datestr, const var &dateformat)
 */
 
 inline void tosqlstring(var& string1) {
-	// convert to sql style strings
-	// use single quotes and double up any internal single quotes
+
+	// if double quoted then convert to sql style single quoted strings
+	// double up any internal single quotes
 	if (string1[1] == "\"") {
+	//if (string1.var_str.front() == '"') {
 		string1.swapper("'", "''");
 		string1.splicer(1, 1, "'");
 		string1.splicer(-1, 1, "'");
+		//string1.var_str.front() = "'";
+		//string1.var_str.back() = "'";
 	}
 }
 
@@ -2622,7 +2626,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	this->r(10, "");
 
 	//catch bad FM character
-	if (sortselectclause.index(_FM_))
+	if (sortselectclause.var_str.find(FM_) != std::string::npos)
 		throw MVDBException("Illegal FM character in " ^ sortselectclause);
 
 	// sortselect clause can be a filehandle in which case we extract the filename from field1

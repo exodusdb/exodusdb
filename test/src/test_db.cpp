@@ -173,9 +173,9 @@ function main()
 		conn1.connect( "");			// creates new connection with default parameters (connection string)
 
 		//remove any existing test databases
-		conn1.deletedb( dbname2);
-		conn1.deletedb( dbname3);
-		conn1.deletedb( dbname4);
+		conn1.dbdelete( dbname2);
+		conn1.dbdelete( dbname3);
+		conn1.dbdelete( dbname4);
 
 		printl("verify CANNOT connect to non-existent deleted database2");
 		printl("=======================================================");
@@ -233,8 +233,8 @@ function main()
 		printl("create dbs exodus2 and exodus3");
 		var conn1;
 		assert(conn1.connect(""));
-		assert(conn1.createdb(dbname2));
-		assert(conn1.createdb(dbname3));
+		assert(conn1.dbcreate(dbname2));
+		assert(conn1.dbcreate(dbname3));
 
 		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
 		var conn2,conn3;
@@ -347,8 +347,8 @@ function main()
 /* rather slow to check so skip
 		printl("check CANNOT delete databases while a connection is open");
 		//NB try to delete db2 from conn3 and vice versa
-		assert(not conn3.deletedb(dbname2));
-		assert(not conn2.deletedb(dbname3));
+		assert(not conn3.dbdelete(dbname2));
+		assert(not conn2.dbdelete(dbname3));
 */
 		conn2.committrans();
 		conn3.committrans();
@@ -358,7 +358,7 @@ function main()
 
 		printl("check copy db exodus2b to exodus4b");
 		var conn4;
-		assert(conn4.copydb(dbname2,dbname4));
+		assert(conn4.dbcopy(dbname2,dbname4));
 		//printl(conn4.getlasterror());
 		assert(conn4.connect( dbname4));
 		printl("check can open table2 on copied database exodus4");
@@ -419,10 +419,10 @@ function main()
 		//connect to exodus first cant delete db if connected to it.
 		var conn1;
 		assert(conn1.connect("exodus"));
-		assert(conn1.deletedb(dbname2));
-		assert(conn1.deletedb(dbname3));
+		assert(conn1.dbdelete(dbname2));
+		assert(conn1.dbdelete(dbname3));
 		conn4.disconnect();
-		assert(conn1.deletedb(dbname4));
+		assert(conn1.dbdelete(dbname4));
 
 		conn1.disconnect();
 	}
