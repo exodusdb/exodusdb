@@ -41,6 +41,9 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	//stage 1
 	/////////
 
+	//force default connection
+	CURSOR.r(2, "");
+
 	//indicate there are no calculated fields
 	CURSOR.r(10, "");
 

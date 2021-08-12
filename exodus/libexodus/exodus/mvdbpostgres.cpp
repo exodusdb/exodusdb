@@ -123,7 +123,8 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 	auto pgconn2 = pgconn;
     // at this point we have good new connection to database
     if (GETDBTRACE) {
-        var("").logputl("DBTR PQFinish");
+        var("").logput("DBTR PQFinish");
+		std::clog << pgconn << std::endl;
 	}
 	//var("========================== deleting connection ==============================").errputl();
 	PQfinish(pgconn2);	// AFAIK, it destroys the object by pointer
@@ -226,7 +227,7 @@ class PGResult {
 
 	// destructor calls PQClear
 	~PGResult() {
-		// var("Cleared pgresult").outputl();
+		// var("Cleared pgresult").logputl();
 		if (pgresult_ != nullptr)
 			PQclear(pgresult_);
 	}
@@ -235,16 +236,16 @@ class PGResult {
 int get_mvconn_no(const var& dbhandle) {
 
 	if (!dbhandle.assigned()) {
-		// var("get_mvconn_no() returning 0 - unassigned").outputl();
+		// var("get_mvconn_no() returning 0 - unassigned").logputl();
 		return 0;
 	}
 	var mvconn_no = dbhandle.a(2);
 	if (mvconn_no.isnum()) {
-		/// var("get_mvconn_no() returning " ^ mvconn_no).outputl();
+		/// var("get_mvconn_no() returning " ^ mvconn_no).logputl();
 		return mvconn_no;
 	}
 
-	// var("get_mvconn_no() returning 0 - not numeric").outputl();
+	// var("get_mvconn_no() returning 0 - not numeric").logputl();
 
 	return 0;
 }
@@ -265,7 +266,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 		else
 			mvconn_no = thread_default_data_mvconn_no;
 
-		// var(mvconn_no).outputl("mvconn_no2=");
+		// var(mvconn_no).logputl("mvconn_no2=");
 
 		// otherwise try the default connection
 		if (!mvconn_no) {
@@ -344,7 +345,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 	if (mvconn_no) {
 		mvconn_no2 = mvconn_no;
 		//(var("get_mvconn_no_or_default found default thread connection id ") ^
-		// mvconn_no2).outputl();
+		// mvconn_no2).logputl();
 	}
 
 	// otherwise do a default connect and do setdefaultconnection
@@ -393,10 +394,10 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
 PGconn* get_pgconnection(const var& dbhandle) {
 
-	// var("--- connection ---").outputl();
+	// var("--- connection ---").logputl();
 	// get the connection associated with *this
 	int mvconn_no = get_mvconn_no_or_default(dbhandle);
-	// var(mvconn_no).outputl("mvconn_no1=");
+	// var(mvconn_no).logputl("mvconn_no1=");
 
 	// otherwise error
 	if (!mvconn_no)
@@ -409,7 +410,9 @@ PGconn* get_pgconnection(const var& dbhandle) {
 	}
 
 	// return the relevent pg_connection structure
-	return thread_connections.get_pgconnection(mvconn_no);
+	auto pgconn = thread_connections.get_pgconnection(mvconn_no);
+	//TODO error abort if zero
+	return pgconn;
 
 }
 
@@ -878,7 +881,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		";
 	var result;
 	connection2.sqlexec(sql, result);
-	//result.convert(RM,"|").outputl("result=");
+	//result.convert(RM,"|").logputl("result=");
 
 	// 2. look in materialised views
 	// select matviewname from pg_matviews where matviewname = '...';
@@ -917,7 +920,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		this->logputl("DBTR var::open ");
 	}
 
-	// outputl("opened filehandle");
+	// logputl("opened filehandle");
 
 	return true;
 }
@@ -956,7 +959,7 @@ bool var::reado(const var& filehandle, const var& key) {
 	std::string cachedrecord =
 		thread_connections.getrecord(mvconn_no, filehandle.a(1).var_str, key.var_str);
 	if (!cachedrecord.empty()) {
-		// key.outputl("cache read " ^ filehandle.a(1) ^ "=");
+		// key.logputl("cache read " ^ filehandle.a(1) ^ "=");
 		//(*this) = cachedrecord;
 		this->var_str = cachedrecord;
 		this->var_typ = VARTYP_STR;
@@ -1352,7 +1355,7 @@ bool var::sqlexec(const var& sql) const {
 	if (!ok) {
 		this->lasterror(response);
 		if (response.index("syntax") || GETDBTRACE)
-			response.outputl();
+			response.logputl();
 	}
 	return ok;
 }
@@ -2229,7 +2232,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 
 				// determine the join details
 				var xlatekeyexpression = "";
-				//xlatefromfieldname.outputl("xlatefromfieldname=");
+				//xlatefromfieldname.logputl("xlatefromfieldname=");
 				if (xlatefromfieldname.trim().substr(1, 8).lcase() == "@record<") {
 					xlatekeyexpression = "exodus_extract_text(";
 					xlatekeyexpression ^= filename ^ ".data";
@@ -2329,7 +2332,7 @@ exodus_call:
 							environmentn ^ "', '" ^ dictfilename.lcase() ^ "', '" ^
 							fieldname.lcase() ^ "', " ^ filename ^ ".key, " ^ filename ^
 							".data,0,0)";
-			//sqlexpression.outputl("sqlexpression=");
+			//sqlexpression.logputl("sqlexpression=");
 			// TODO apply naturalorder conversion by passing forsort
 			// option to exodus_call
 
@@ -2401,9 +2404,9 @@ exodus_call:
 			// if (from.substr(-7)=="::bytea")
 			//	from.splicer(-7,7,"");
 
-			// fieldname.outputl("fieldname=");
-			// filename.outputl("filename=");
-			// mainfilename.outputl("mainfilename=");
+			// fieldname.logputl("fieldname=");
+			// filename.logputl("filename=");
+			// mainfilename.logputl("mainfilename=");
 
 			// if a mv field requires a join then add it to the SELECT clause
 			// since not known currently how to to do mv joins in the FROM clause
@@ -2602,8 +2605,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		this->var_typ = VARTYP_STR;
 	}
 
-	// fieldnames.outputl("fieldnames=");
-	// sortselectclause.outputl("sortselectclause=");
+	// fieldnames.logputl("fieldnames=");
+	// sortselectclause.logputl("sortselectclause=");
 
 	// default to ""
 	if (!(var_typ & VARTYP_STR)) {
@@ -2618,7 +2621,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		sortselectclause.logputl("sortselectclause=");
 
 	var actualfilename = get_normal_filename(*this);
-	// actualfilename.outputl("actualfilename=");
+	// actualfilename.logputl("actualfilename=");
 	var dictfilename = actualfilename;
 	var actualfieldnames = fieldnames;
 	var dictfile = "";
@@ -2657,7 +2660,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//var remaining = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
 	var remaining = sortselectclause.convert("\t\r\n", "   ").trim();
 
-	// remaining.outputl("remaining=");
+	// remaining.logputl("remaining=");
 
 	// remove trailing options eg (S) or {S}
 	var lastword = remaining.field2(" ", -1);
@@ -2698,7 +2701,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		var xx = getword(remaining, firstucword);
 	}
 
-	// actualfilename.outputl("actualfilename=");
+	// actualfilename.logputl("actualfilename=");
 	if (!actualfilename) {
 		// this->outputl("this=");
 		throw MVDBException("filename missing from select statement:" ^ sortselectclause);
@@ -2706,9 +2709,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 	while (remaining.length()) {
 
-		// remaining.outputl("remaining=");
-		// whereclause.outputl("whereclause=");
-		// orderclause.outputl("orderclause=");
+		// remaining.logputl("remaining=");
+		// whereclause.logputl("whereclause=");
+		// orderclause.logputl("orderclause=");
 
 		var ucword;
 		var word1 = getword(remaining, ucword);
@@ -2719,7 +2722,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		if (!remaining.length() &&
 			((word1[1] == "(" && word1[-1] == ")") ||
 			 (word1[1] == "{" && word1[-1] == "}"))) {
-			// word1.outputl("skipping last word in () options ");
+			// word1.logputl("skipping last word in () options ");
 			continue;
 		}
 
@@ -2784,8 +2787,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 								  dictfile, dictid, joins, unnests, selects, ismv, true);
 
-			// dictexpression.outputl("dictexpression=");
-			// orderclause.outputl("orderclause=");
+			// dictexpression.logputl("dictexpression=");
+			// orderclause.logputl("orderclause=");
 
 			// no filtering in database on calculated items
 			//save then for secondary filtering
@@ -3193,10 +3196,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				// invert comparison if "without" or "not" for calculated fields
 				if (negative &&
 					var("= <> > < >= <= ~ ~* !~ !~* !! ! ]").locateusing(" ", op, aliasno)) {
-					// op.outputl("op entered:");
+					// op.logputl("op entered:");
 					negative = false;
 					op = var("<> = <= >= < > !~ !~* ~ ~* ! !! !]").field(" ", aliasno);
-					// op.outputl("op reversed:");
+					// op.logputl("op reversed:");
 				}
 
 				//++ncalc_fields;
@@ -3287,8 +3290,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// without xxx = "abc"
 			// with xxx not = "abc"
 
-			// notword.outputl("notword=");
-			// ucword.outputl("ucword=");
+			// notword.logputl("notword=");
+			// ucword.logputl("ucword=");
 
 			//allow searching for text with * characters embedded
 			//otherwise interpreted as glob character?
@@ -3552,7 +3555,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				whereclause ^= " ( " ^ value ^ " )";
 			else
 				whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
-			// whereclause.outputl("whereclause=");
+			// whereclause.logputl("whereclause=");
 
 		}  //with/without
 
@@ -3607,7 +3610,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//	}
 
 	// disambiguate from any INNER JOIN key
-	//actualfieldnames.outputl("actualfieldnames=");
+	//actualfieldnames.logputl("actualfieldnames=");
 	//actualfieldnames.swapper("key", actualfilename ^ ".key");
 	//actualfieldnames.swapper("data", actualfilename ^ ".data");
 	actualfieldnames.replacer("\\bkey\\b", actualfilename ^ ".key");
@@ -3714,7 +3717,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	if (maxnrecs && !calc_fields)
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
-	//sql.outputl("sql=");
+	//sql.logputl("sql=");
 
 	// DEBUG_LOG_SQL
 	// if (GETDBTRACE)
@@ -3731,7 +3734,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		if (!this->sqlexec(sql, errmsg)) {
 
 			if (errmsg)
-				errmsg.outputl("::selectx: " ^ sql ^ "\n" ^ errmsg);
+				errmsg.errputl("::selectx on handle(" ^ *this ^ ") " ^ sql ^ "\n");
 			// return false;
 		}
 	}
@@ -3743,7 +3746,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			this->deletelist(listname);
 
 		// TODO handle duplicate_cursor sqlstate 42P03
-		sql.outputl("sql=");
+		sql.logputl("sql=");
 
 		throw MVDBException(errmsg);
 
@@ -3805,7 +3808,7 @@ void var::clearselect() {
 	//	if (!this->sqlexec(deletetablesql, errors))
 	//	{
 	//		if (errors)
-	//			errors.outputl("::clearselect " ^ errors);
+	//			errors.logputl("::clearselect " ^ errors);
 	//		return;
 	//	}
 	//}
@@ -3822,7 +3825,7 @@ void var::clearselect() {
 
 	if (!this->sqlexec(sql, errors)) {
 		if (errors)
-			errors.outputl("::clearselect " ^ errors);
+			errors.errputl("::clearselect on handle(" ^ *this ^ ") ");
 		return;
 	}
 
@@ -3853,8 +3856,8 @@ bool readnextx(const var& cursor, PGResult& pgresult, PGconn* pgconn, bool forwa
 		// return false;
 
 		var errmsg = var(PQresultErrorMessage(pgresult));
-		// errmsg.outputl("errmsg=");
-		// var(pgresult).outputl("pgresult=");
+		// errmsg.logputl("errmsg=");
+		// var(pgresult).logputl("pgresult=");
 		var sqlstate = "";
 		if (PQresultErrorField(pgresult, PG_DIAG_SQLSTATE)) {
 			sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
@@ -4046,7 +4049,7 @@ bool var::formlist(const var& keys, const var& fieldno) {
 
 	var record;
 	if (not record.read(*this, keys)) {
-		keys.outputl("formlist() cannot read " ^ (*this) ^ ", ");
+		keys.errputl("formlist() cannot read on handle(" ^ *this ^ ") ");
 		return false;
 	}
 
@@ -4246,7 +4249,7 @@ bool var::readnext(var& key, var& valueno) {
 //	//eg 90001 is 9.0.1
 //	int pgserverversion=PQserverVersion(pgconn);
 //	if (pgserverversion>=90001) {
-//		var(pgserverversion).outputl();
+//		var(pgserverversion).logputl();
 //		//unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);
 //		size_t to_length;
 //		unsigned char* unescaped = PQunescapeBytea((const unsigned char*)
@@ -4261,7 +4264,7 @@ bool var::readnext(var& key, var& valueno) {
 //	// int datalen = PQgetlength(pgresult, 0, 0);
 //	// key=std::string(data,datalen);
 //	key = getresult(pgresult, 0, 0);
-//	// key.output("key=").len().outputl(" len=");
+//	// key.output("key=").len().logputl(" len=");
 //
 //	//recursive call to skip any meta data with keys starting and ending %
 //	//eg keys like "%RECORDS%" (without the quotes)
@@ -4456,13 +4459,13 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	var forsort = false;
 	var dictexpression = get_dictexpression(*this, filename, filename, actualdictfile, actualdictfile,
 										   fieldname, joins, unnests, selects, ismv, forsort);
-	// dictexpression.outputl("dictexp=");stop();
+	// dictexpression.logputl("dictexp=");stop();
 
 	//mv fields return in unnests, not dictexpression
 	//if (unnests)
 	//{
 	//	//dictexpression = unnests.a(3);
-	//	unnests.convert(FM,"^").outputl("unnests=");
+	//	unnests.convert(FM,"^").logputl("unnests=");
 	//}
 
 	var sql;
@@ -4479,16 +4482,16 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 		sql = "alter table " ^ filename ^ " add " ^ index_fieldname ^ " text";
 		if (not var().sqlexec(sql))
 		{
-			sql.outputl("sql failed ");
+			sql.logputl("sql failed ");
 			return false;
 		}
 
 		// update the new index field for all records
 		sql = "update " ^ filename ^ " set " ^ index_fieldname ^ " = " ^ dictexpression;
-		sql.outputl("sql=");
+		sql.logputl("sql=");
 		if (not var().sqlexec(sql))
 		{
-			sql.outputl("sql failed ");
+			sql.logputl("sql failed ");
 			return false;
 		}
 		dictexpression = index_fieldname;
@@ -4762,7 +4765,7 @@ var var::flushindex(const var& filename) const {
 		// attribute 1 in case passed a filehandle instead of just filename
 		sql ^= " " ^ filename.a(1).lcase();
 	sql ^= ";";
-	// sql.outputl("sql=");
+	// sql.logputl("sql=");
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
 	//PGconn* pgconn = (PGconn*)this->connection();
