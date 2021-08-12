@@ -37,7 +37,7 @@ function main()
 	var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);",response);
 	assert(response.field(RM,2)=="{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
 
-	var filename="test_main_temp1";
+	var filename="xo_test_db_temp1";
 
 	var trec;
 	deletefile(filename);
@@ -97,7 +97,7 @@ function main()
 
 	{
 		printl("Create a temp file");
-		var tempfilename="test_deleterecord";
+		var tempfilename="xo_test_db_deleterecord";
 		var tempfile=tempfilename;
 		deletefile(tempfile);
 		if (createfile(tempfile))
@@ -557,17 +557,17 @@ dict(AGE_IN_YEARS) {
 
 //	var().connectlocal("");
 
-	var filenames2="EXO_JOBS";
-	filenames2^=FM^"EXO_PRODUCTION_ORDERS";
-	filenames2^=FM^"EXO_PRODUCTION_INVOICES";
-	filenames2^=FM^"EXO_COMPANIES";
-	filenames2^=FM^"EXO_BRANDS";
-	filenames2^=FM^"EXO_CLIENTS";
-	filenames2^=FM^"EXO_VEHICLES";
-	filenames2^=FM^"EXO_SUPPLIERS";
-	filenames2^=FM^"EXO_CURRENCIES";
-	filenames2^=FM^"EXO_MARKETS";
-	filenames2^=FM^"EXO_ADS";
+	var filenames2="XO_JOBS";
+	filenames2^=FM^"XO_PRODUCTION_ORDERS";
+	filenames2^=FM^"XO_PRODUCTION_INVOICES";
+	filenames2^=FM^"XO_COMPANIES";
+	filenames2^=FM^"XO_BRANDS";
+	filenames2^=FM^"XO_CLIENTS";
+	filenames2^=FM^"XO_VEHICLES";
+	filenames2^=FM^"XO_SUPPLIERS";
+	filenames2^=FM^"XO_CURRENCIES";
+	filenames2^=FM^"XO_MARKETS";
+	filenames2^=FM^"XO_ADS";
 
 	var tempfile;
 	printl();
@@ -592,38 +592,38 @@ dict(AGE_IN_YEARS) {
 //	var().stop();
 
 	var ads;
-	if (!ads.open("EXO_ADS"))
+	if (!ads.open("XO_ADS"))
 	{
-		var().createfile("EXO_ADS");
-		if (!ads.open("EXO_ADS"))
-			printl("Cannot create EXO_ADS");
-			//abort("Cannot create EXO_ADS");
+		var().createfile("XO_ADS");
+		if (!ads.open("XO_ADS"))
+			printl("Cannot create XO_ADS");
+			//abort("Cannot create XO_ADS");
 	}
 
-	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_EXO_CURRENCIES","CURRENCY_CODE");
-	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_EXO_CURRENCIES","CURRENCY_NAME");
-	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_EXO_MARKETS","CODE");
-	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_EXO_MARKETS","NAME");
+	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_XO_CURRENCIES","CURRENCY_CODE");
+	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_XO_CURRENCIES","CURRENCY_NAME");
+	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_XO_MARKETS","CODE");
+	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_XO_MARKETS","NAME");
 
 	var dictrec="";
 	dictrec.r(1,"F");
 	dictrec.r(2,"3");
 	dictrec.r(3,"Brand Code");
-	if (not dictrec.write("DICT_EXO_ADS","BRAND_CODE"))
+	if (not dictrec.write("DICT_XO_ADS","BRAND_CODE"))
 		printl("cannot write dict_ads, BRAND_CODE");
 	//oo style
 	assert(ads.createindex("BRAND_CODE"));
 	assert(ads.deleteindex("BRAND_CODE"));
 	//procedural
-	assert(createindex("EXO_ADS BRAND_CODE"));
-	assert(deleteindex("EXO_ADS BRAND_CODE"));
+	assert(createindex("XO_ADS BRAND_CODE"));
+	assert(deleteindex("XO_ADS BRAND_CODE"));
 
 //	var("").select("MARKETS","WITH CURRENCY_NAME = '' AND WITH AUTHORISED");
 //	var("").select("MARKETS","WITH AUTHORISED");
-//	var("").select("EXO_ADS","WITH AUTHORISED");
-//	ads.select("EXO_ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
-//	ads.select("EXO_ADS","BY MARKET_CODE");
-//	var().select("EXO_ADS");
+//	var("").select("XO_ADS","WITH AUTHORISED");
+//	ads.select("XO_ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
+//	ads.select("XO_ADS","BY MARKET_CODE");
+//	var().select("XO_ADS");
 //	var("").select("SCHEDULES","WITH AUTHORISED");
 //	var("").select("SCHEDULES","");
 	//MvLibs mvlibs;
@@ -632,7 +632,7 @@ dict(AGE_IN_YEARS) {
 //	cin>>ii;
 	var record;
 	begintrans();
-	if (ads.select("SELECT EXO_ADS")) {
+	if (ads.select("SELECT XO_ADS")) {
 		while (ii<3&&ads.readnext(record,key,MV))
 		{
 			++ii;
