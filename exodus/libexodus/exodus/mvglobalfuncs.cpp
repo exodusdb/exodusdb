@@ -727,6 +727,10 @@ DLL_PUBLIC bool dbcreate(const var& dbname) {
 	return dbname.dbcreate(dbname);
 }
 
+DLL_PUBLIC var dblist() {
+	return var().dblist();
+}
+
 DLL_PUBLIC bool dbcopy(const var& from_dbname, const var& to_dbname) {
 	return var().dbcopy(from_dbname, to_dbname);
 }

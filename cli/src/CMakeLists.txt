@@ -44,6 +44,9 @@ add_executable(createfile createfile.cpp)
 add_executable(createindex createindex.cpp)
 add_executable(dbgrep dbgrep.cpp)
 add_executable(dbcomp dbcomp.cpp)
+add_executable(dbcreate dbcreate.cpp)
+add_executable(dbcopy dbcopy.cpp)
+add_executable(dbdelete dbdelete.cpp)
 add_executable(delete delete.cpp)
 add_executable(clearfile clearfile.cpp)
 add_executable(deletefile deletefile.cpp)
@@ -76,6 +79,9 @@ target_link_libraries(createfile exodus stdc++fs ${LIBS})
 target_link_libraries(createindex exodus stdc++fs ${LIBS})
 target_link_libraries(dbgrep exodus stdc++fs ${LIBS})
 target_link_libraries(dbcomp exodus stdc++fs ${LIBS})
+target_link_libraries(dbcreate exodus stdc++fs ${LIBS})
+target_link_libraries(dbcopy exodus stdc++fs ${LIBS})
+target_link_libraries(dbdelete exodus stdc++fs ${LIBS})
 target_link_libraries(delete exodus stdc++fs ${LIBS})
 target_link_libraries(clearfile exodus stdc++fs ${LIBS})
 target_link_libraries(deletefile exodus stdc++fs ${LIBS})
@@ -100,6 +106,9 @@ createfile
 createindex
 dbgrep
 dbcomp
+dbcreate
+dbcopy
+dbdelete
 delete
 clearfile
 deletefile

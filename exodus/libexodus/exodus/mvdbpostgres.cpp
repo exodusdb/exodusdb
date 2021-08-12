@@ -4530,7 +4530,6 @@ database
 
 var var::listfiles() const {
 	THISIS("var var::listfiles() const")
-	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
 
 	// from http://www.alberton.info/postgresql_meta_info.html
@@ -4561,6 +4560,36 @@ var var::listfiles() const {
 	filenames.splicer(1, 1, "");
 
 	return filenames;
+}
+
+var var::dblist() const {
+	THISIS("var var::dblist() const")
+	THISISDEFINED()
+
+	var sql = "SELECT datname FROM pg_database where datname not like 'template%'";
+
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
+	if (pgconn == NULL)
+		return "";
+
+	PGResult pgresult;
+	auto ok = get_pgresult(sql, pgresult, pgconn);
+
+	if (!ok)
+		return "";
+
+	var dbnames = "";
+	auto ndbs = PQntuples(pgresult);
+	for (auto dbn = 0; dbn < ndbs; dbn++) {
+		if (!PQgetisnull(pgresult, dbn, 0)) {
+			dbnames.var_str.append(getresult(pgresult, dbn, 0));
+			dbnames.var_str.push_back(FM_);
+		}
+	}
+	dbnames.var_str.pop_back();
+TRACE(dbnames);
+	return dbnames.sort();
 }
 
 bool var::cursorexists() {

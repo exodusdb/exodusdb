@@ -968,15 +968,15 @@ class DLL_PUBLIC var final {
 	var oswait(const int milliseconds, const var& directory) const;
 	var ostime() const;
 #ifdef SWIG
-#define DEFAULTNULL
-#define DEFAULTDOT
-#define DEFAULTSPACE
-#define DEFAULTVM
+#define DEFAULT_EMPTY_STRING
+#define DEFAULT_DOT
+#define DEFAULT_SPACE
+#define DEFAULT_VM
 #else
-#define DEFAULTNULL = ""
-#define DEFAULTDOT = "."
-#define DEFAULTSPACE = " "
-#define DEFAULTVM = VM_
+#define DEFAULT_EMPTY_STRING = ""
+#define DEFAULT_DOT = "."
+#define DEFAULT_SPACE = " "
+#define DEFAULT_VM = VM_
 #endif
 	void breakon() const;
 	void breakoff() const;
@@ -1110,8 +1110,8 @@ class DLL_PUBLIC var final {
 	// STRING INFO
 	//////////////
 
-	// bool match(const var& matchstr,const var& options DEFAULTNULL) const;
-	var match(const var& matchstr, const var& options DEFAULTNULL) const;
+	// bool match(const var& matchstr,const var& options DEFAULT_EMPTY_STRING) const;
+	var match(const var& matchstr, const var& options DEFAULT_EMPTY_STRING) const;
 	var seq() const;	  // ASCII
 	var textseq() const;  // TEXT
 	var dcount(const var& substrx) const;
@@ -1151,7 +1151,7 @@ class DLL_PUBLIC var final {
 	var& converter(const var& oldchars, const var& newchars);
 	var& textconverter(const var& oldchars, const var& newchars);
 	var& swapper(const var& whatstr, const var& withstr);
-	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL);
+	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING);
 	var& splicer(const int start1, const int length, const var& str);
 	var& splicer(const int start1, const var& str);
 	var& quoter();
@@ -1163,9 +1163,9 @@ class DLL_PUBLIC var final {
 	var& fcaser();		// utf8
 	var& normalizer();	// utf8
 	var& inverter();	// utf8
-	var& trimmer(const char* trimchar DEFAULTSPACE);
-	var& trimmerf(const char* trimchar DEFAULTSPACE);
-	var& trimmerb(const char* trimchar DEFAULTSPACE);
+	var& trimmer(const char* trimchar DEFAULT_SPACE);
+	var& trimmerf(const char* trimchar DEFAULT_SPACE);
+	var& trimmerb(const char* trimchar DEFAULT_SPACE);
 	var& trimmer(const var& trimchar);
 	var& trimmer(const var& trimchar, const var& options);
 	var& trimmerf(const var& trimchar);
@@ -1173,6 +1173,8 @@ class DLL_PUBLIC var final {
 	var& fieldstorer(const var& sepchar, const int fieldno, const int nfields, const var& replacement);
 	var& substrer(const int startindex);
 	var& substrer(const int startindex, const int length);
+
+	//var& sorter(const var& separator DEFAULT_EMPTY_STRING);
 
 	var& lowerer();
 	var& raiser();
@@ -1184,7 +1186,7 @@ class DLL_PUBLIC var final {
 	ND var& convert(const var& oldchars, const var& newchars) &&;
 	ND var& textconvert(const var& oldchars, const var& newchars) &&;
 	ND var& swap(const var& whatstr, const var& withstr) &&;
-	ND var& replace(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL) &&;
+	ND var& replace(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING) &&;
 	ND var& splice(const int start1, const int length, const var& str) &&;
 	ND var& splice(const int start1, const var& str) &&;
 	ND var& quote() &&;
@@ -1196,9 +1198,9 @@ class DLL_PUBLIC var final {
 	ND var& fcase() &&;		 // utf8
 	ND var& normalize() &&;	 // utf8
 	ND var& invert() &&;	 // utf8
-	ND var& trim(const char* trimchar DEFAULTSPACE) &&;
-	ND var& trimf(const char* trimchar DEFAULTSPACE) &&;
-	ND var& trimb(const char* trimchar DEFAULTSPACE) &&;
+	ND var& trim(const char* trimchar DEFAULT_SPACE) &&;
+	ND var& trimf(const char* trimchar DEFAULT_SPACE) &&;
+	ND var& trimb(const char* trimchar DEFAULT_SPACE) &&;
 	ND var& trim(const var& trimchar) &&;
 	ND var& trim(const var& trimchar, const var& options) &&;
 	ND var& trimf(const var& trimchar) &&;
@@ -1219,7 +1221,7 @@ class DLL_PUBLIC var final {
 	ND var convert(const var& oldchars, const var& newchars) const&;
 	ND var textconvert(const var& oldchars, const var& newchars) const&;
 	ND var swap(const var& whatstr, const var& withstr) const&;
-	ND var replace(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL) const&;
+	ND var replace(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING) const&;
 	ND var splice(const int start1, const int length, const var& str) const&;
 	ND var splice(const int start1, const var& str) const&;
 	ND var quote() const&;
@@ -1231,9 +1233,9 @@ class DLL_PUBLIC var final {
 	ND var fcase() const&;		// utf8
 	ND var normalize() const&;	// utf8
 	ND var invert() const&;		// utf8
-	ND var trim(const char* trimchar DEFAULTSPACE) const&;
-	ND var trimf(const char* trimchar DEFAULTSPACE) const&;
-	ND var trimb(const char* trimchar DEFAULTSPACE) const&;
+	ND var trim(const char* trimchar DEFAULT_SPACE) const&;
+	ND var trimf(const char* trimchar DEFAULT_SPACE) const&;
+	ND var trimb(const char* trimchar DEFAULT_SPACE) const&;
 	ND var trim(const var& trimchar) const&;
 	ND var trim(const var& trimchar, const var& options) const&;
 	ND var trimf(const var& trimchar) const&;
@@ -1252,7 +1254,9 @@ class DLL_PUBLIC var final {
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
-	dim split(const var& separator DEFAULTNULL) const;
+	dim split(const var& separator DEFAULT_EMPTY_STRING) const;
+
+	var sort(const var& separator DEFAULT_EMPTY_STRING);
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -1381,7 +1385,7 @@ class DLL_PUBLIC var final {
 	////////////////////
 
 	// should these be like extract, replace, insert, delete
-	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULTNULL)
+	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY_STRING)
 	ND bool locate(const var& target) const;
 	bool locate(const var& target, var& setting) const;
 	bool locate(const var& target, var& setting, const int fieldno, const int valueno = 0) const;
@@ -1404,6 +1408,7 @@ class DLL_PUBLIC var final {
 	/////////////////////
 
 	bool dbcreate(const var& dbname) const;
+	ND var dblist() const;
 	bool dbcopy(const var& from_dbname, const var& to_dbname) const;
 	bool dbdelete(const var& dbname) const;
 
@@ -1413,9 +1418,9 @@ class DLL_PUBLIC var final {
 	bool clearfile(const var& filename) const;
 	ND var listfiles() const;
 
-	bool createindex(const var& fieldname, const var& dictfile DEFAULTNULL) const;
+	bool createindex(const var& fieldname, const var& dictfile DEFAULT_EMPTY_STRING) const;
 	bool deleteindex(const var& fieldname) const;
-	ND var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL) const;
+	ND var listindexes(const var& filename DEFAULT_EMPTY_STRING, const var& fieldname DEFAULT_EMPTY_STRING) const;
 
 	bool sqlexec(const var& sqlcmd) const;
 	bool sqlexec(const var& sqlcmd, var& response) const;
@@ -1430,7 +1435,7 @@ class DLL_PUBLIC var final {
 	// DATABASE ACCESS
 	/////////////////
 
-	bool connect(const var& conninfo DEFAULTNULL);
+	bool connect(const var& conninfo DEFAULT_EMPTY_STRING);
 	void disconnect();
 	void disconnectall();
 
@@ -1444,10 +1449,10 @@ class DLL_PUBLIC var final {
 	bool statustrans() const;
 	void clearcache() const;
 
-	ND var reccount(const var& filename DEFAULTNULL) const;
-	var flushindex(const var& filename DEFAULTNULL) const;
+	ND var reccount(const var& filename DEFAULT_EMPTY_STRING) const;
+	var flushindex(const var& filename DEFAULT_EMPTY_STRING) const;
 
-	bool open(const var& dbfilename, const var& connection DEFAULTNULL);
+	bool open(const var& dbfilename, const var& connection DEFAULT_EMPTY_STRING);
 	void close();
 
 	// 1=ok, 0=failed, ""=already locked
@@ -1483,7 +1488,7 @@ class DLL_PUBLIC var final {
 	// DATABASE SORT/SELECT
 	//////////////////////
 
-	bool select(const var& sortselectclause DEFAULTNULL);
+	bool select(const var& sortselectclause DEFAULT_EMPTY_STRING);
 	void clearselect();
 
 	ND bool hasnext();
@@ -1503,21 +1508,21 @@ class DLL_PUBLIC var final {
 	/////////////////
 
 	bool osopen() const;
-	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
+	bool osopen(const var& filename, const var& locale DEFAULT_EMPTY_STRING) const;
 	bool osbread(const var& osfilevar, var& offset, const int length);
 	bool osbread(const var& osfilevar, const var& offset, const int length);
 	bool osbwrite(const var& osfilevar, var& offset) const;
 	bool osbwrite(const var& osfilevar, const var& offset) const;
 	void osclose() const;
-	bool osread(const var& osfilename, const var& codepage DEFAULTNULL);
-	bool oswrite(const var& osfilename, const var& codepage DEFAULTNULL) const;
+	bool osread(const var& osfilename, const var& codepage DEFAULT_EMPTY_STRING);
+	bool oswrite(const var& osfilename, const var& codepage DEFAULT_EMPTY_STRING) const;
 	bool osdelete() const;
 	bool osdelete(const var& osfilename) const;
 	bool osrename(const var& newosdir_or_filename) const;
 	bool oscopy(const var& to_osfilename) const;
-	ND var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode = 0) const;
-	ND var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
-	ND var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
+	ND var oslist(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING, const int mode = 0) const;
+	ND var oslistf(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING) const;
+	ND var oslistd(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING) const;
 	ND var osfile() const;
 	ND var osdir() const;
 	bool osmkdir() const;
@@ -1533,7 +1538,7 @@ class DLL_PUBLIC var final {
 	// same again but this time allowing native strings without needing automatic conversion of
 	// var->char* this is to only to avoid convertion too and from var but will usage of hard
 	// coded filenames etc really be in fast loops and performance related? perhaps only provide
-	bool osread(const char* osfilename, const var& codepage DEFAULTNULL);
+	bool osread(const char* osfilename, const var& codepage DEFAULT_EMPTY_STRING);
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
@@ -1557,11 +1562,11 @@ class DLL_PUBLIC var final {
 	// chain should be similar to one of the above?
 	// var chain() const;
 
-	void stop(const var& text DEFAULTNULL) const;
-	void abort(const var& text DEFAULTNULL) const;
-	void abortall(const var& text DEFAULTNULL) const;
+	void stop(const var& text DEFAULT_EMPTY_STRING) const;
+	void abort(const var& text DEFAULT_EMPTY_STRING) const;
+	void abortall(const var& text DEFAULT_EMPTY_STRING) const;
 
-	var debug(const var& DEFAULTNULL) const;
+	var debug(const var& DEFAULT_EMPTY_STRING) const;
 
 	var logoff() const;
 
@@ -1783,7 +1788,7 @@ class DLL_PUBLIC dim {
 
 	// see also var::split
 	// return the number of fields
-	var split(const var& var1, const var& separator DEFAULTNULL);
+	var split(const var& var1, const var& separator DEFAULT_EMPTY_STRING);
 	dim& sort(bool reverse = false);
 
 	bool read(const var& filehandle, const var& key);
@@ -1931,14 +1936,14 @@ DLL_PUBLIC inline bool TERMINATE_req = false;
 DLL_PUBLIC inline bool RELOAD_req = false;
 
 //void DLL_PUBLIC output(const var& var1);
-//void DLL_PUBLIC outputl(const var& var1 DEFAULTNULL);
-//void DLL_PUBLIC outputt(const var& var1 DEFAULTNULL);
+//void DLL_PUBLIC outputl(const var& var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC outputt(const var& var1 DEFAULT_EMPTY_STRING);
 
 //void DLL_PUBLIC errput(const var& var1);
-//void DLL_PUBLIC errputl(const var& var1 DEFAULTNULL);
+//void DLL_PUBLIC errputl(const var& var1 DEFAULT_EMPTY_STRING);
 
 //void DLL_PUBLIC logput(const var& var1);
-//void DLL_PUBLIC logputl(const var& var1 DEFAULTNULL);
+//void DLL_PUBLIC logputl(const var& var1 DEFAULT_EMPTY_STRING);
 
 var DLL_PUBLIC backtrace();
 
@@ -1959,7 +1964,7 @@ var DLL_PUBLIC getexecpath();
 // but doesnt get stack since stop() is called normally
 class DLL_PUBLIC MVStop {
    public:
-	explicit MVStop(const var& var1 DEFAULTNULL);
+	explicit MVStop(const var& var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -1967,7 +1972,7 @@ class DLL_PUBLIC MVStop {
 // but doesnt get stack since abort() is called normally
 class DLL_PUBLIC MVAbort {
    public:
-	explicit MVAbort(const var& var1 DEFAULTNULL);
+	explicit MVAbort(const var& var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -1975,7 +1980,7 @@ class DLL_PUBLIC MVAbort {
 // but doesnt get stack since abortall() is called normally
 class DLL_PUBLIC MVAbortAll {
    public:
-	explicit MVAbortAll(const var& var1 DEFAULTNULL);
+	explicit MVAbortAll(const var& var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -1983,7 +1988,7 @@ class DLL_PUBLIC MVAbortAll {
 // but doesnt get stack since abortall() is called normally
 class DLL_PUBLIC MVLogoff {
    public:
-	explicit MVLogoff(const var& var1 DEFAULTNULL);
+	explicit MVLogoff(const var& var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -2009,7 +2014,7 @@ class DLL_PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined    
 class DLL_PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (const var& var1    );};
 class DLL_PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (const var& var1    );};
 class DLL_PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (const var& var1    );};
-class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (const var& var1 DEFAULTNULL);};
+class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (const var& var1 DEFAULT_EMPTY_STRING);};
 class DLL_PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
 class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(const var& var1    );};
 class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};

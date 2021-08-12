@@ -258,8 +258,6 @@ var dim::join(const var& sepchar) const {
 
 // dim=var.split()
 dim var::split(const var& separator) const {
-	THISIS("dim var::split(const var& separator=\"\") const")
-	THISISSTRING()
 
 	//TODO provide a version that can split on any utf8 character
 	// should use dim's move constructor to place the array directly in place avoiding a slow
@@ -346,6 +344,20 @@ dim& dim::sort(bool reverse) {
 		std::sort(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1, std::greater<var>());
 
 	return *this;
+}
+
+//sorting var - using temporary dim
+var var::sort(const var& separator) {
+	THISIS("var var::sort(const var& separator=UNASSIGNED)")
+	THISISSTRING()
+	ISSTRING(separator)
+
+	//perhaps has slow but sorts alphanumerically by testing var<var
+	//eg bb cc aa 2 10 -> aa bb cc 10 2
+	//split return a temporary dim array that is sorted then joined back up again
+	var sep2 = separator ?: FM;
+	return this->split(sep2).sort().join(sep2);
+
 }
 
 }  // namespace exodus
