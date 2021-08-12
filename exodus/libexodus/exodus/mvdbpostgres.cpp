@@ -250,72 +250,10 @@ int get_mvconn_no(const var& dbhandle) {
 }
 
 int get_mvconn_no_or_default(const var& dbhandle) {
-	// first return connection id if this is a connection handle
-	//	if (THIS_IS_DBCONN())
-	//		return (int) var_int;
 
-	int mvconn_no2 = get_mvconn_no(dbhandle);
-	if (mvconn_no2)
-		return mvconn_no2;
-
-	// otherwise return thread default connection id
-	int mvconn_no = thread_default_data_mvconn_no;
-	mvconn_no2 = 0;
-	if (mvconn_no) {
-		mvconn_no2 = mvconn_no;
-		//(var("get_mvconn_no_or_default found default thread connection id ") ^
-		// mvconn_no2).outputl();
-	}
-
-	// otherwise do a default connect and do setdefaultconnection
-	else {
-		//std::cerr << "get_mvconn_no_or_default didnt find default thread connection" << std::endl;
-		// id");
-		var conn1;
-		if (conn1.connect()) {
-
-			//conn1.setdefaultconnectionid();
-		    // connection number should be in field 2
-		    mvconn_no2 = get_mvconn_no(conn1);
-
-		    // save current connection handle number as thread specific handle no
-		    thread_default_data_mvconn_no = mvconn_no;
-			if (GETDBTRACE) {
-				var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
-			}
-		}
-	}
-
-	// turn this into a db connection (int holds the connection number)
-	// leave any string in place but prevent it being used as a number
-	// var_int = mvconn_no2;
-	////var_str = ""; does it ever need initialising?
-	// var_typ = VARTYP_NANSTR_DBCONN;
-
-	// save the connection id
-	// this->r(2,mvconn_no2);
-
-	return mvconn_no2;
-}
-
-// var::connection()
-// 1. return the associated db connection
-// this could be a previously opened filevar, a previous connected connectionvar
-// or any variable previously used for a default connection
-// OR
-// 2. return the thread-default connection
-// OR
-// 3. do a default connect if necessary
-//
-// NB in case 2 and 3 the connection id is recorded in the var
-// use void pointer to avoid need for including postgres headers in mv.h or any fancy class
-// hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-PGconn* get_pgconnection(const var& dbhandle) {
-
-	// var("--- connection ---").outputl();
-	// get the connection associated with *this
 	int mvconn_no = get_mvconn_no(dbhandle);
-	// var(mvconn_no).outputl("mvconn_no1=");
+	if (mvconn_no)
+		return mvconn_no;
 
 	// otherwise get the default connection
 	if (!mvconn_no) {
@@ -385,6 +323,80 @@ PGconn* get_pgconnection(const var& dbhandle) {
 		//}
 
 	}
+
+	return mvconn_no;
+}
+
+/*
+int get_mvconn_no_or_default(const var& dbhandle) {
+
+	// first return connection id if this is a connection handle
+	//	if (THIS_IS_DBCONN())
+	//		return (int) var_int;
+
+	int mvconn_no2 = get_mvconn_no(dbhandle);
+	if (mvconn_no2)
+		return mvconn_no2;
+
+	// otherwise return thread default connection id
+	int mvconn_no = thread_default_data_mvconn_no;
+	mvconn_no2 = 0;
+	if (mvconn_no) {
+		mvconn_no2 = mvconn_no;
+		//(var("get_mvconn_no_or_default found default thread connection id ") ^
+		// mvconn_no2).outputl();
+	}
+
+	// otherwise do a default connect and do setdefaultconnection
+	else {
+		//std::cerr << "get_mvconn_no_or_default didnt find default thread connection" << std::endl;
+		// id");
+		var conn1;
+		if (conn1.connect()) {
+
+			//conn1.setdefaultconnectionid();
+		    // connection number should be in field 2
+		    mvconn_no2 = get_mvconn_no(conn1);
+
+		    // save current connection handle number as thread specific handle no
+		    thread_default_data_mvconn_no = mvconn_no;
+			if (GETDBTRACE) {
+				var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
+			}
+		}
+	}
+
+	// turn this into a db connection (int holds the connection number)
+	// leave any string in place but prevent it being used as a number
+	// var_int = mvconn_no2;
+	////var_str = ""; does it ever need initialising?
+	// var_typ = VARTYP_NANSTR_DBCONN;
+
+	// save the connection id
+	// this->r(2,mvconn_no2);
+
+	return mvconn_no2;
+}
+*/
+
+// var::connection()
+// 1. return the associated db connection
+// this could be a previously opened filevar, a previous connected connectionvar
+// or any variable previously used for a default connection
+// OR
+// 2. return the thread-default connection
+// OR
+// 3. do a default connect if necessary
+//
+// NB in case 2 and 3 the connection id is recorded in the var
+// use void pointer to avoid need for including postgres headers in mv.h or any fancy class
+// hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
+PGconn* get_pgconnection(const var& dbhandle) {
+
+	// var("--- connection ---").outputl();
+	// get the connection associated with *this
+	int mvconn_no = get_mvconn_no_or_default(dbhandle);
+	// var(mvconn_no).outputl("mvconn_no1=");
 
 	// otherwise error
 	if (!mvconn_no)
@@ -562,7 +574,7 @@ bool var::connect(const var& conninfo) {
 	fullconninfo = build_conn_info(fullconninfo);
 
 	if (GETDBTRACE)
-		fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect() ");
+		fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
 
 	PGconn* pgconn;
 	for (;;) {
@@ -821,14 +833,15 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
 	std::string filename2 = get_normal_filename(filename);
 
-	//determine actual connection to use
+	//use connection provided
 	var connection2;
 	if (connection) {
 		connection2 = connection;
 	}
 	else {
 
-		//return attached file handle if any
+
+		//otherwise use a preattached file handle
 	    auto entry = thread_file_handles.find(filename2);
     	if (entry != thread_file_handles.end()) {
 			//(*this) = thread_file_handles.at(filename2);
@@ -838,7 +851,8 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 			return true;
 		}
 
-		//default connection will be determined by the filename eg dict_
+		//or determine connection from filename
+		//use default data or dict connection
 		connection2 = filename2;
 
 	}
@@ -861,7 +875,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		filename2 +
 		"'\
 				)\
-	";
+		";
 	var result;
 	connection2.sqlexec(sql, result);
 	//result.convert(RM,"|").outputl("result=");
@@ -897,7 +911,11 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 	// save the filename and connection no
 	// memorise the current connection for this file var
-	(*this) = filename2 ^ FM ^ get_mvconn_no(connection2);
+	(*this) = filename2 ^ FM ^ get_mvconn_no_or_default(connection2);
+
+	if (GETDBTRACE) {
+		this->logputl("DBTR var::open ");
+	}
 
 	// outputl("opened filehandle");
 
@@ -4588,7 +4606,7 @@ var var::dblist() const {
 		}
 	}
 	dbnames.var_str.pop_back();
-TRACE(dbnames);
+
 	return dbnames.sort();
 }
 

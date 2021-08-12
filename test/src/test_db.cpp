@@ -27,7 +27,8 @@ function main()
 
 	//Pass if no default database connection
 	if (not connect()) {
-		printl("No default db connection to perform db testing. Test passed");
+		printl("No default db connection to perform db testing.");
+		printl("Test passed");
 		return 0;
 	}
 
