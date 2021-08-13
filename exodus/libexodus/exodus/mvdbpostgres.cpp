@@ -4587,7 +4587,7 @@ var var::dblist() const {
 	THISIS("var var::dblist() const")
 	THISISDEFINED()
 
-	var sql = "SELECT datname FROM pg_database where datname not like 'template%'";
+	var sql = "SELECT datname FROM pg_database";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
@@ -4604,8 +4604,11 @@ var var::dblist() const {
 	auto ndbs = PQntuples(pgresult);
 	for (auto dbn = 0; dbn < ndbs; dbn++) {
 		if (!PQgetisnull(pgresult, dbn, 0)) {
-			dbnames.var_str.append(getresult(pgresult, dbn, 0));
-			dbnames.var_str.push_back(FM_);
+			std::string dbname = getresult(pgresult, dbn, 0);
+			if (!dbname.starts_with("template") and !dbname.starts_with("postgres")) {
+				dbnames.var_str.append(dbname);
+				dbnames.var_str.push_back(FM_);
+			}
 		}
 	}
 	dbnames.var_str.pop_back();
