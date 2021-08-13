@@ -36,7 +36,17 @@ var ExodusProgramBase::libinfo(const var& command) {
 	return var(perform_exodusfunctorbase_.libfilename(command.toString())).osfile();
 }
 
-bool ExodusProgramBase::select(const var& sortselectclause) {
+bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
+
+	//TRACE(sortselectclause_or_filehandle)
+
+	//simple select on filehandle
+	if (sortselectclause_or_filehandle.index(FM)) {
+		CURSOR = sortselectclause_or_filehandle;
+		return CURSOR.select();
+	}
+
+	var sortselectclause = sortselectclause_or_filehandle;
 
 	//stage 1
 	/////////
@@ -64,8 +74,6 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		////////////
 	}
 
-	TRACE(sortselectclause)
-
 	//stage 2
 	/////////
 
@@ -85,8 +93,6 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 
 	//debug
 	//calc_fields.convert(FM^VM^SM,"   ").outputl("calc=");
-
-	var sortselectclause2 = sortselectclause;
 
 	var dictfilename = calc_fields.a(5, 1);
 
@@ -148,7 +154,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
 		//temporary parallel file
-		sortselectclause2.replacer("\\b" ^ dictid ^ "\\b", dictid ^ ":");
+		sortselectclause.replacer("\\b" ^ dictid ^ "\\b", dictid ^ ":");
 
 		dictid.converter(".", "_");
 		dictids(fieldn) = dictid;
@@ -419,9 +425,9 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 
 	}//readnext
 
-	sortselectclause2.errputl("\nstage2=");
+	sortselectclause.errputl("\nstage2=");
 
-	bool result = CURSOR.select(sortselectclause2);
+	bool result = CURSOR.select(sortselectclause);
 
 	return result;
 }

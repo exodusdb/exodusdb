@@ -54,7 +54,7 @@ class ExodusProgramBase {
 	MvEnvironment& mv;
 
 	// work on CURSOR
-	bool select(const var& sortselectclause DEFAULT_EMPTY_STRING);
+	bool select(const var& sortselectclause_or_filehandle DEFAULT_EMPTY_STRING);
 	bool hasnext();
 	bool readnext(var& key);
 	bool readnext(var& key, var& valueno);
