@@ -5,7 +5,15 @@ set -eux
 : Copy a single EXODUS program to live
 : ====================================
 :
-	PROGNAME=$1
+: 'Syntax is:'
+: '	./copyone <progname_or_libname>'
+:
+: 'e.g.'
+:
+: '	./copyone serve_exo'
+: ' ./copyone extract_xyz'
+:
+	PROGNAME=${1:?<progname_or_libname> argument is required.}
 
 :
 : Copy using rsync

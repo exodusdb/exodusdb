@@ -7,7 +7,7 @@ set -eux
 :
 :	'Syntax is:'
 :
-:	' ./backup_db <EXO_DBNAME> [<OPTIONS>...] [<BACKUPDIR>]'
+:	' ./backup_db <DBNAME> [<OPTIONS>...] [<BACKUPDIR>]'
 :
 :	'<OPTIONS> are (B)ackup, (R)estore, (V)erify, (S)tart'
 :	'          defaults to BRVS'
@@ -21,7 +21,7 @@ set -eux
 :
 :	'Only restores backup to test database'
 :
-	EXO_DBNAME=$1
+	EXO_DBNAME=${1:?<DBNAME> argument is required.}
 	OPTIONS=${2:-BRVS}
 	NEW_BACKUP_DIR=${3:-~/backups/sql}
 

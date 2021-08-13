@@ -9,9 +9,9 @@ set -eux
 :
 :	'e.g.      ./create_service exo exodus "" live'
 :	'e.g.      ./create_service agy watermelon "" test'
-
-	APP_CODE=$1
-	HOST_DIR=$2
+:
+	APP_CODE=${1:?<APP_CODE> argument is required.}
+	HOST_DIR=${2:?<HOST_DIR> argument is required.}
 	BASE_DB_CODE=${3:-${HOST_DIR}}
 	LIVE_OR_TEST=${4}
 :
