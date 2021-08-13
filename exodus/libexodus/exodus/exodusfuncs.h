@@ -237,6 +237,7 @@ DLL_PUBLIC ND var field2(const var& instring, const var& substrx, const int fiel
 DLL_PUBLIC bool connect(const var& connectionstring DEFAULTNULL);
 DLL_PUBLIC void disconnect();
 DLL_PUBLIC void disconnectall();
+DLL_PUBLIC ND var lasterror();
 
 DLL_PUBLIC bool dbcreate(const var& dbname);
 DLL_PUBLIC ND var dblist();

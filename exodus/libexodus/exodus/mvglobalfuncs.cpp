@@ -723,6 +723,10 @@ DLL_PUBLIC void disconnectall() {
 	var().disconnectall();
 }
 
+DLL_PUBLIC var lasterror() {
+	return var().lasterror();
+}
+
 DLL_PUBLIC bool dbcreate(const var& dbname) {
 	return dbname.dbcreate(dbname);
 }
