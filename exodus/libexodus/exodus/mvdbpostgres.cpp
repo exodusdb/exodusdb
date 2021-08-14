@@ -3640,10 +3640,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	if (this->hasnext()) {
 
 		//create a temporary sql table to hold the preselected keys
-		var temptablename = "PRESELECT_TEMP_CURSOR_" ^ this->a(1);
+		var temptablename = "SELECT_TEMP_CURSOR_" ^ this->a(1);
 		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-		//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
-		createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
+		if (true)
+			createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
+		else
+			createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		createtablesql ^= " (KEY TEXT)\n";
 		var errmsg;
 		if (!this->sqlexec(createtablesql, errmsg)) {

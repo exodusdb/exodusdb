@@ -115,11 +115,13 @@ bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
 	//CREATE TABLE SELECT_STAGE2(
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
-	var temptablename = "SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
+	var temptablename = "SELECT_TEMP_STAGE2_CURSOR_" ^ CURSOR.a(1);
 	var createtablesql = "";
 	createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-	//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
-	createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
+	if (true)
+		createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
+	else
+		createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
 	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
 
 	//prepare to insert sql records
