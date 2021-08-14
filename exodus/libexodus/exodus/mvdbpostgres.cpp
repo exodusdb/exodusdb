@@ -2005,7 +2005,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
 	//and their column names appended with a colon (:)
 	var stage2_calculated = fieldname[-1] == ":";
-	var stage2_filename = "SELECT_STAGE2_CURSOR_" ^ cursor.a(1);
+	var stage2_filename = "SELECT_TEMP_STAGE2_CURSOR_" ^ cursor.a(1);
 
 	if (stage2_calculated) {
 		fieldname.splicer(-1, 1, "");

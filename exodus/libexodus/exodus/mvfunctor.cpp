@@ -404,7 +404,11 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 		//		std::cerr << "mvfunctor:openlib: <<< ko <<< " << libraryfilename_ << std::endl;
 		//#endif
 		// std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
-		throw MVError(var(libraryfilename_) ^ " does not exist or cannot be found. (or cannot be linked/wrong version. Run with LD_DEBUG=libs for more info)");
+		var libraryfilename = libraryfilename_;
+		if (libraryfilename.osfile())
+			throw MVError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info)");
+		else
+			throw MVError(libraryfilename ^ " does not exist or cannot be found.");
 		return false;
 	}
 
