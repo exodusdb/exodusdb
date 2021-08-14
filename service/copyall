@@ -49,10 +49,20 @@ set -eux
 	rsync $DRYRUN -av --whole-file ~/{bin,lib} ~/live
 
 :
-: =============================================================================
-: NOTE - You MUST restart all live processes URGENTLY otherwise they will crash
-: =============================================================================
+: Warn DRYRUN if not CONFIRMed, or Restart required if CONFIRMed
+: ==============================================================
 :
+	if [[ -n "$DRYRUN" ]]; then
+:
+: =============================================================================
+: DRYRUN - - no CONFIRM provided
+: =============================================================================
+	else
+: ============================================================================
+: NOTE - You MUST restart all live processes URGENTLY otherwise they may crash
+: ============================================================================
+	fi
+
 :
 : Finished $DRYRUN copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : =========================================================================
