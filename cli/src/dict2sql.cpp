@@ -45,7 +45,11 @@ function main() {
 	// public | exodus_trim | text | data text
 	// ...
 
-	//TODO work on more than the default db connection
+	//establish the default connection BEFORE opening a connection to dict database
+	connect();
+
+	//for dicts if not default
+	var dictconnection = "";
 
 	var filenames = COMMAND.a(2).lcase();
 	var dictid = COMMAND.a(3);
@@ -56,8 +60,18 @@ function main() {
 		doall = false;
 		if (filenames.substr(1, 5) ne "dict_")
 			filenames.splicer(1, 0, "dict_");
-	} else
-		filenames = var().listfiles();
+	} else {
+		var dictdbname = "";
+		osgetenv("EXO_DICTDBNAME",dictdbname);
+        if (not dictdbname)
+            dictdbname = "exodus_dict";
+		if (dictdbname) {
+			if (not dictconnection.connect(dictdbname)) {
+				dictdbname.quote().logputl("dict2sql: Warning: Using default database because cannot connect to ");
+			}
+		}
+		filenames = dictconnection.listfiles();
+	}
 
 	//quit if not doing all files
 	/////////////////////////////
@@ -145,7 +159,7 @@ COST 10;
 
 	if (doall) {
 		//ignore error if doesnt exist
-		if (not var().sqlexec("DROP MATERIALIZED VIEW dict_all"))
+		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW dict_all"))
 			var().sqlexec("DROP VIEW dict_all");
 
 		if (nfiles) {
@@ -153,7 +167,7 @@ COST 10;
 			var errmsg;
 			if (verbose)
 				viewsql.output("SQL:");
-			if (var().sqlexec(viewsql, errmsg))
+			if (dictconnection.sqlexec(viewsql, errmsg))
 				printl("dict_all file created");
 			else {
 				if (not verbose)
