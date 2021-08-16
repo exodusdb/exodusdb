@@ -85,7 +85,7 @@ programinit()
 	var invalidfilechars = "/ \"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
 	temposfilename.lcaser().converter(invalidfilechars, str("-", len(invalidfilechars)));
 	temposfilename ^= "-pid" ^ ospid();
-	if (filename.substr(1, 5) == "dict_" and fieldno)
+	if (filename.substr(1, 5) == "dict." and fieldno)
 		temposfilename ^= ".sql";
 	else
 		temposfilename ^= ".tmp";
@@ -145,12 +145,12 @@ programinit()
 					printl(filename ^ " " ^ key ^ " > db");
 
 					//generate/update database functions if saved a symbolic dictionary record
-					var x = filename.substr(1, 5) == "dict_";
+					var x = filename.substr(1, 5) == "dict.";
 					var y = newrecord.a(1) eq "S";
 					var z = newrecord.a(8).index(
 						"/"
 						"*pgsql");
-					if (filename.substr(1, 5) == "dict_" and newrecord.a(1) eq "S" and newrecord.a(8).index("/"
+					if (filename.substr(1, 5) == "dict." and newrecord.a(1) eq "S" and newrecord.a(8).index("/"
 																											"*pgsql")) {
 						var oscmd = "dict2sql " ^ filename ^ " " ^ key;
 						//oscmd.outputl("oscmd=");

@@ -8,7 +8,7 @@ function main() {
 	var tempfilename="tempsortfile";
 	tempfilename.outputl("tempfilename=");
 
-	var dicttempfilename="dict_"^tempfilename;
+	var dicttempfilename="DICT."^tempfilename;
 	dicttempfilename.outputl("dicttempfilename=");
 
 	deletefile(tempfilename);

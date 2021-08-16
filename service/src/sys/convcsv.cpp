@@ -137,7 +137,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	} else {
 		tt = filename;
 	}
-	if (not(DICT.open("dict_" ^ tt))) {
+	if (not(DICT.open("DICT." ^ tt))) {
 		call fsmsg();
 		return 0;
 	}

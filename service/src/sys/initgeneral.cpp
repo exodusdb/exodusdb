@@ -1116,7 +1116,7 @@ getproxy:
 
 	call log2("*get security - also in LISTEN", logtime);
 	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
-		if (temp.open("dict_DEFINITIONS")) {
+		if (temp.open("DICT.DEFINITIONS")) {
 			if (SECURITY.read(temp, "SECURITY")) {
 				SECURITY.write(DEFINITIONS, "SECURITY");
 			}

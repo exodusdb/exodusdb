@@ -14,7 +14,7 @@ function main() {
 //	if (not connect())
 //		abort("Cannot connect to database. Please check configuration or run configexodus.");
 
-	var dictfilename = "dict_" ^ filename;
+	var dictfilename = "dict." ^ filename;
 
 	//leave the test data files around for playing with after the program finishes
 	var cleanup = false;

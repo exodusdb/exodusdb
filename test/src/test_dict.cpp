@@ -4,7 +4,7 @@
 programinit()
 
 	var xo_dict = "xo_dict";
-	var dict_xo_test = "dict_xo_test";
+	var dict_xo_test = "dict.xo_test";
 	var default_conn;
 	var xo_dict_conn;
 
@@ -29,7 +29,7 @@ function main() {
 		printl("\n   --- connect to the specific database ---\n");
 		assert(xo_dict_conn.connect(xo_dict));
 
-		printl("\n   --- say that dicts are on the specific database ---\n");
+		printl("\n   --- say that dicts are on the specific database " ^ xo_dict ^ " ---\n");
 		assert(ossetenv("EXO_DICTDBNAME",xo_dict));
 		assert(var(getenv("EXO_DICTDBNAME")) == xo_dict);
 

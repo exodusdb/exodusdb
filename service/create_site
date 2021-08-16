@@ -6,6 +6,7 @@ set -eux
 : =======================================
 :
 :	'Syntax is ./create_site <HOSTNAME> <HOST_DIR> <DB_CODE> [<SITE_NAME_PREFIX>]'
+:	'Example   ./create_site exodus
 :	'Example   ./create_site test "" "" t-'
 :
 	HOST_NAME=${1:?<HOSTNAME> argument is required.}

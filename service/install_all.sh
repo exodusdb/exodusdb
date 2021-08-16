@@ -47,14 +47,15 @@ set -eux
 : ===========================
 :
 	cd /tmp
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_users.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_processes.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_locks.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_requestlog.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_statistics.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_users.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_processes.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_locks.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_requestlog.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_statistics.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
+	cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
 
 :
 : Configure the exodus service

@@ -175,7 +175,7 @@ std::string getresult(PGresult* pgresult, int rown, int coln) {
 
 //given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 std::string get_normal_filename(const var& filename_or_handle) {
-	return filename_or_handle.a(1).normalize().lcase().convert(".", "_");
+	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
 }
 
 // used to detect sselect command words that are values like quoted words or plain numbers. eg "xxx"
@@ -259,7 +259,8 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 	// otherwise get the default connection
 	if (!mvconn_no) {
 
-		bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict_");
+		bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
+		//bool isdict = false;
 
 		if (isdict)
 			mvconn_no = thread_default_dict_mvconn_no;
@@ -576,8 +577,10 @@ bool var::connect(const var& conninfo) {
 
 	fullconninfo = build_conn_info(fullconninfo);
 
-	if (GETDBTRACE)
-		fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
+	if (GETDBTRACE) {
+		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
+		conninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
+	}
 
 	PGconn* pgconn;
 	for (;;) {
@@ -616,10 +619,10 @@ bool var::connect(const var& conninfo) {
 
 		//#if TRACING >= 3
 		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
-		errmsg ^= " ERROR: mvdbpostgres connect() Postgres connection configuration "
-			"missing or incorrect. Please login.";
+		//errmsg ^= " ERROR: mvdbpostgres connect() Postgres connection configuration "
+		//	"missing or incorrect. Please login.";
 		//TODO remove password=somesillysecret
-		errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********");
+		//errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********");
 
 		//#endif
 		//errmsg.errputl();
@@ -693,7 +696,7 @@ bool var::attach(const var& filenames) {
 		filenames2 = "";
 		var allfilenames = this->listfiles();
 		for (var filename : allfilenames) {
-			if (filename.substr(1, 5) == "dict_") {
+			if (filename.substr(1, 5) == "dict.") {
 				filenames2 ^= filename ^ FM;
 			}
 		}
@@ -834,7 +837,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	}
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = get_normal_filename(filename);
+	var filename2 = get_normal_filename(filename);
 
 	//use connection provided
 	var connection2;
@@ -866,6 +869,15 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//var sql="select '" ^ filename2 ^ "'::regclass";
 	//if (! connection.sqlexec(sql))
 
+	var tablename;
+	var schema;
+	if (filename2.index(".")) {
+		schema = filename2.field(".",1);
+		tablename = filename2.field(".",2,999);
+	} else {
+		schema = "public";
+		tablename = filename2;
+	}
 	// 1. look in information_schema.tables
 	var sql =
 		"\
@@ -873,12 +885,8 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		EXISTS	(\
     		SELECT 	table_name\
     		FROM 	information_schema.tables\
-    		WHERE\
-					table_name = '" +
-		filename2 +
-		"'\
-				)\
-		";
+    		WHERE   table_name = '" ^ tablename ^ "' AND table_schema = '" ^ schema ^ "'\
+				)";
 	var result;
 	connection2.sqlexec(sql, result);
 	//result.convert(RM,"|").logputl("result=");
@@ -890,11 +898,11 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 			"\
 			SELECT\
 			EXISTS	(\
-	    		SELECT 	matviewname\
+	    		SELECT 	matviewname as table_name\
 	    		FROM 	pg_matviews\
 	    		WHERE\
-						matviewname = '" +
-			filename2 +
+						matviewname = '" ^
+			filename2 ^
 			"'\
 					)\
 		";
@@ -1046,7 +1054,7 @@ bool var::read(const var& filehandle, const var& key) {
 
 	// reading a magic special key returns all keys in the file in natural order
 	if (key == "%RECORDS%") {
-		var sql = "SELECT key from " ^ filehandle.a(1).convert(".", "_") ^ ";";
+		var sql = "SELECT key from " + get_normal_filename(filehandle) + ";";
 
 		//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 		auto pgconn = get_pgconnection(filehandle);
@@ -1103,7 +1111,7 @@ bool var::read(const var& filehandle, const var& key) {
 
 	// lower case key if reading from dictionary
 	// std::string key2;
-	// if (filehandle.substr(1,5).lcase()=="dict_")
+	// if (filehandle.substr(1,5).lcase()=="dict.")
 	//	key2=key.lcase().var_str;
 	// else
 	//	key2=key.var_str;
@@ -1114,7 +1122,7 @@ bool var::read(const var& filehandle, const var& key) {
 	paramLengths[0] = int(key2.length());
 	// paramFormats[0]=1;
 
-	var sql = "SELECT data FROM " ^ filehandle.a(1).convert(".", "_") ^ " WHERE key = $1";
+	var sql = "SELECT data FROM " + get_normal_filename(filehandle) + " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
 	PGResult pgresult = PQexecParams(pgconn,
@@ -1354,7 +1362,8 @@ bool var::sqlexec(const var& sql) const {
 	bool ok = this->sqlexec(sql, response);
 	if (!ok) {
 		this->lasterror(response);
-		if (response.index("syntax") || GETDBTRACE)
+		//skip table does not exist because it is very normal to check if table exists
+		if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || GETDBTRACE)
 			response.logputl();
 	}
 	return ok;
@@ -1502,7 +1511,7 @@ bool var::write(const var& filehandle, const var& key) const {
 	// but performance gain is probably not great since the sql we use to read and write is
 	// quite simple (could PREPARE once per file/table)
 
-	sql = "INSERT INTO " ^ filehandle.a(1).convert(".", "_") ^ " (key,data) values( $1 , $2)";
+	sql = "INSERT INTO " + get_normal_filename(filehandle) + " (key,data) values( $1 , $2)";
 	sql ^= " ON CONFLICT (key)";
 	sql ^= " DO UPDATE SET data = $2";
 
@@ -1569,7 +1578,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	paramLengths[1] = int(data2.length());
 	// paramFormats[1] = 1;//binary
 
-	var sql = "UPDATE " ^ filehandle.a(1).convert(".", "_") ^ " SET data = $2 WHERE key = $1";
+	var sql = "UPDATE " +get_normal_filename(filehandle) + " SET data = $2 WHERE key = $1";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 	auto pgconn = get_pgconnection(filehandle);
@@ -1646,7 +1655,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	// paramFormats[1] = 1;//binary
 
 	var sql =
-		"INSERT INTO " ^ filehandle.a(1).convert(".", "_") ^ " (key,data) values( $1 , $2)";
+		"INSERT INTO " + get_normal_filename(filehandle) + " (key,data) values( $1 , $2)";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 	auto pgconn = get_pgconnection(filehandle);
@@ -1826,12 +1835,36 @@ bool var::dbcopy(const var& from_dbname, const var& to_dbname) const {
 	ISSTRING(from_dbname)
 	ISSTRING(to_dbname)
 
+	//create a database
 	var sql = "CREATE DATABASE " ^ to_dbname ^ " WITH";
 	sql ^= " ENCODING='UTF8' ";
 	if (from_dbname)
 		sql ^= " TEMPLATE " ^ from_dbname;
+	if (!this->sqlexec(sql)) {
+		return false;
+	}
 
-	return this->sqlexec(sql);
+	///connect to the new db
+	var newdb;
+	if (not newdb.connect(to_dbname)) {
+		newdb.lasterror().errputl();
+		return false;
+	}
+
+	//add dict schema to allow creation of dict files like dict.xxxxxxxx
+	sql = "CREATE SCHEMA IF NOT EXISTS dict";
+	//sql ^= "AUTHORIZATION exodus;"
+	var result = true;
+	if (!newdb.sqlexec(sql)) {
+		newdb.lasterror().errputl();
+		result = false;
+	}
+
+	//disconnec
+	newdb.disconnect();
+
+	return result;
+
 }
 
 bool var::dbdelete(const var& dbname) const {
@@ -1973,10 +2006,10 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 	var actualdictfile = dictfile;
 	if (!actualdictfile) {
 		var dictfilename;
-		if (mainfilename.substr(1, 5).lcase() == "dict_")
-			dictfilename = "dict_voc";
+		if (mainfilename.substr(1, 5).lcase() == "dict.")
+			dictfilename = "dict.voc";
 		else
-			dictfilename = "dict_" ^ mainfilename;
+			dictfilename = "dict." ^ mainfilename;
 
 		// we should open it through the same connection, as this->was opened, not any
 		// default connection
@@ -1986,7 +2019,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 		// initialise the actualdictfilename to the same connection as (*this)
 		//actualdictfile = (*this);
 		if (!actualdictfile.open(dictfilename)) {
-			dictfilename = "dict_voc";
+			dictfilename = "dict.voc";
 			if (!actualdictfile.open(dictfilename)) {
 
 				throw MVDBException("get_dictexpression() cannot open " ^
@@ -2028,10 +2061,10 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 			if (!dictrec.read(actualdictfile, fieldname)) {
 				// try in voc lowercase
 				fieldname.lcaser();
-				if (not dictrec.read("dict_voc", fieldname)) {
+				if (not dictrec.read("dict.voc", fieldname)) {
 					// try in voc uppercase
 					fieldname.ucaser();
-					if (not dictrec.read("dict_voc", fieldname)) {
+					if (not dictrec.read("dict.voc", fieldname)) {
 						if (fieldname == "@ID" || fieldname == "ID")
 							dictrec = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^
 									  FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
@@ -2042,7 +2075,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 								fieldname.quote() ^ " from " ^
 								actualdictfile.convert(FM, "^")
 									.quote() ^
-								" or \"dict_voc\"");
+								" or \"dict.voc\"");
 							//					exodus::errputl("ERROR:
 							// mvdbpostgres get_dictexpression() cannot
 							// read " ^ fieldname.quote() ^ " from " ^
@@ -2220,7 +2253,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 					//	throw MVDBException("get_dictexpression() DICT" ^
 					// xlatetargetfilename ^ " file cannot be opened"); var
 					// ismv;
-					var xlatetargetdictfilename = "dict_" ^ xlatetargetfilename;
+					var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
 					var xlatetargetdictfile;
 					if (!xlatetargetdictfile.open(xlatetargetdictfilename))
 						throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ functionx);
@@ -2742,7 +2775,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		// using filename
 		else if (ucword == "USING" && remaining) {
 			dictfilename = getword(remaining, xx);
-			if (!dictfile.open("dict_" ^ dictfilename)) {
+			if (!dictfile.open("dict." ^ dictfilename)) {
 				throw MVDBException("select() dict_" ^ dictfilename ^
 									" file cannot be opened");
 				// exodus::errputl("ERROR: mvdbpostgres select() dict_" ^
@@ -3629,7 +3662,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//selecting dict files would trigger this
 	//TRACE(*this)
 	//TRACE(actualfilename)
-	if (not this->a(2) || actualfilename.lcase().starts("dict_")) {
+	if (not this->a(2) || actualfilename.lcase().starts("dict.")) {
 		var actualfile;
 		if (actualfile.open(actualfilename))
 			this->r(2, actualfile.a(2));
@@ -4448,7 +4481,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	if (dictfile.assigned() and dictfile != "")
 		actualdictfile = dictfile;
 	else
-		actualdictfile = "dict_" ^ filename;
+		actualdictfile = "dict." ^ filename;
 
 	// example sql
 	// create index ads__brand_code on ads (exodus_extract_text(data,3,0,0));
@@ -4557,11 +4590,15 @@ var var::listfiles() const {
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
-	var sql =
-		"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE "
-		"TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema') ";
+	var schemafilter = " NOT IN ('pg_catalog', 'information_schema') ";
 
-	sql ^= " UNION SELECT matviewname as table_name from pg_matviews;";
+	var sql =
+		"SELECT table_name, table_schema FROM information_schema.tables WHERE table_type = 'BASE "
+		"TABLE'";
+	sql ^= " AND table_schema " ^ schemafilter;
+
+	sql ^= " UNION SELECT matviewname as table_name, schemaname as table_schema from pg_matviews";
+	sql ^= " WHERE schemaname " ^ schemafilter;
 
 	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
@@ -4577,10 +4614,17 @@ var var::listfiles() const {
 	var filenames = "";
 	int nfiles = PQntuples(pgresult);
 	for (int filen = 0; filen < nfiles; filen++) {
-		if (!PQgetisnull(pgresult, filen, 0))
-			filenames ^= FM ^ getresult(pgresult, filen, 0);
+		if (!PQgetisnull(pgresult, filen, 0)) {
+			var filename = getresult(pgresult, filen, 0);
+			var schema = getresult(pgresult, filen, 1);
+			if (schema == "public")
+				filenames ^= filename;
+			else
+				filenames ^= schema ^ "." ^ filename;
+			filenames.var_str.push_back(FM_);
+		}
 	}
-	filenames.splicer(1, 1, "");
+	filenames.var_str.pop_back();
 
 	return filenames;
 }

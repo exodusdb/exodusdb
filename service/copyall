@@ -49,6 +49,9 @@ set -eux
 	rsync $DRYRUN -av --whole-file ~/{bin,lib} ~/live
 
 :
+: Finished $DRYRUN copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: =========================================================================
+:
 : Warn DRYRUN if not CONFIRMed, or Restart required if CONFIRMed
 : ==============================================================
 :
@@ -63,6 +66,3 @@ set -eux
 : ============================================================================
 	fi
 
-:
-: Finished $DRYRUN copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
-: =========================================================================

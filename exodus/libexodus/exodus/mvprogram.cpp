@@ -101,10 +101,10 @@ bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
 	calc_fields_file.open("calc_fields");
 
 	//open the dictionary
-	if (dictfilename.substr(1, 5).lcase() != "dict_")
-		dictfilename = "dict_" ^ dictfilename;
+	if (dictfilename.substr(1, 5).lcase() != "dict.")
+		dictfilename = "dict." ^ dictfilename;
 	if (!DICT.open(dictfilename)) {
-		dictfilename = "dict_voc";
+		dictfilename = "dict.voc";
 		if (!DICT.open(dictfilename)) {
 			throw MVDBException(dictfilename.quote() ^ " cannot be opened");
 		}
@@ -1264,7 +1264,7 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 
 			// use calculate()
 			var result =
-				calculate(fieldno_or_name, "dict_" ^ filename.a(1), keyx, record);
+				calculate(fieldno_or_name, "dict." ^ filename.a(1), keyx, record);
 			if (nkeys > 1)
 				result.lowerer();
 			results.r(keyn, result);
@@ -1329,7 +1329,7 @@ var ExodusProgramBase::calculate(const var& dictid) {
 			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
 				// try dict_voc
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
-				if (not dictvoc.open("dict_voc")) {
+				if (not dictvoc.open("dict.voc")) {
 baddict:
 					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
@@ -1392,7 +1392,7 @@ baddict:
 
 			std::string str_libname;
 			if (indictvoc)
-				str_libname = "dict_voc";
+				str_libname = "dict.voc";
 			else
 				str_libname = DICT.a(1).lcase().convert(".", "_").toString();
 

@@ -14,7 +14,7 @@ function main() {
 	// 1. Creates pgsql functions to calculate columns given data and key
 	//    for each dictitem in each dictfile
 	//
-	// functions like "dict_filename_DICT_ID(key,data)" returns text
+	// functions like "dict.filename_DICT_ID(key,data)" returns text
 	// /df
 	// List of functions
 	// Schema | Name | Result data type | Argument data types | Type
@@ -58,8 +58,8 @@ function main() {
 
 	if (filenames) {
 		doall = false;
-		if (filenames.substr(1, 5) ne "dict_")
-			filenames.splicer(1, 0, "dict_");
+		if (filenames.substr(1, 5) ne "dict.")
+			filenames.splicer(1, 0, "dict.");
 	} else {
 		var dictdbname = "";
 		osgetenv("EXO_DICTDBNAME",dictdbname);
@@ -147,7 +147,7 @@ COST 10;
 		do_sql("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
 	}
 
-	//create global view of all dicts in "dict_all"
+	//create global view of all dicts in "dict.all"
 	var viewsql = "";
 	if (doall)
 		viewsql ^= "CREATE MATERIALIZED VIEW dict_all AS\n";
@@ -168,7 +168,7 @@ COST 10;
 			if (verbose)
 				viewsql.output("SQL:");
 			if (dictconnection.sqlexec(viewsql, errmsg))
-				printl("dict_all file created");
+				printl("dict.all file created");
 			else {
 				if (not verbose)
 					viewsql.outputl("SQL:");
@@ -265,7 +265,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 
 subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
-	if (dictfilename.substr(1, 5) ne "dict_" or dictfilename == "dict_all")
+	if (dictfilename.substr(1, 5) ne "dict." or dictfilename == "dict.all")
 		return;
 
 	if (!open(dictfilename, dictfile)) {
@@ -467,11 +467,11 @@ $RETVAR :=
 			//TRACE(dictid)
 			//TRACE(reqdictid)
 			//allow xlate job in jobs_text because it is for dict_production_orders section
-			//if (lcase(var("dict_") ^ target_filename) == dictfilename) {
+			//if (lcase(var("dict.") ^ target_filename) == dictfilename) {
 			//	errputl("> ", dictfilename, " ", dictid.quote(), " possible bad xlate");
 			//}
 			//allowing xlate jobs in dict_jobs text since it is used for other files
-			if (lcase(var("dict_") ^ target_filename) eq dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
+			if (lcase(var("dict.") ^ target_filename) eq dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
 				line = " -- Sorry. In " ^ target_filename ^ ", " ^ dictid ^ " you cannot xlate to same file due to pgsql bug.\n -- " ^ line;
 			} else {
 				//source file field number or expression for key to target file

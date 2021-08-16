@@ -34,7 +34,7 @@ function main() {
 
     //dict file
 	if (not dataonly)
-		create("dict_"^filename);
+		create("DICT."^filename);
 
     //data file
 	if (not dictonly)

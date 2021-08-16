@@ -141,7 +141,7 @@ function main()
 
     //check failure to read a record turns the record variable into unassigned and unusable
     var rec="abc";
-    assert( not rec.read("dict_voc","LJLKJLKJLKJLKJLKJw"));
+    assert( not rec.read("dict.voc","LJLKJLKJLKJLKJLKJw"));
     try
     {
         printl(rec.quote());
@@ -432,20 +432,20 @@ function main()
 //#if 0
 
 	deletefile("XO_USERS");
-	deletefile("dict_XO_USERS");
+	deletefile("dict.XO_USERS");
 
 	createfile("XO_USERS");
-	createfile("DICT_XO_USERS");
+	createfile("dict.XO_USERS");
 
 	//create some dictionary records (field descriptions)
 	//PERSON_NO    Type "F", Key Field (0)
 	//BIRTHDAY     Type "F", Data Field 1
 	//AGE IN DAYS  Type "S", Source Code needs a dictionary subroutine library called dict_XO_USERS
 	//AGE IN YEARS Type "S", Source Code ditto
-	assert(write(convert( "F|0|Person No||||||R|10"   ,"|",FM),"DICT_XO_USERS", "PERSON_NO"   ));
-	assert(write(convert( "F|1|Birthday||||D||R|12"   ,"|",FM),"DICT_XO_USERS", "BIRTHDAY"    ));
-	assert(write(convert( "S||Age in Days||||||R|10"  ,"|",FM),"DICT_XO_USERS", "AGE_IN_DAYS" ));
-	assert(write(convert( "S||Age in Years||||||R|10" ,"|",FM),"DICT_XO_USERS", "AGE_IN_YEARS"));
+	assert(write(convert( "F|0|Person No||||||R|10"   ,"|",FM),"dict.XO_USERS", "PERSON_NO"   ));
+	assert(write(convert( "F|1|Birthday||||D||R|12"   ,"|",FM),"dict.XO_USERS", "BIRTHDAY"    ));
+	assert(write(convert( "S||Age in Days||||||R|10"  ,"|",FM),"dict.XO_USERS", "AGE_IN_DAYS" ));
+	assert(write(convert( "S||Age in Years||||||R|10" ,"|",FM),"dict.XO_USERS", "AGE_IN_YEARS"));
 
 	//create some users and their birthdays 11000=11 FEB 1998 .... 14000=30 APR 2006
 	assert(write("11000","XO_USERS","1"));
@@ -488,7 +488,7 @@ function main()
 	if (not select("SELECT XO_USERS (R)"))
 		assert(false and var("Failed to Select XO_USERS!"));
 
-	DICT="dict_XO_USERS";
+	DICT="dict.XO_USERS";
 	while (readnext(RECORD,ID,MV))
 //	while (readnext(ID))
 	{
@@ -583,9 +583,9 @@ dict(AGE_IN_YEARS) {
 			assert(createfile(filename));
 		}
 
-		if (not open("dict_"^filename.lcase(), tempfile)) {
+		if (not open("dict."^filename.lcase(), tempfile)) {
 			printl("creating dict_"^filename);
-			assert(createfile("dict_"^filename));
+			assert(createfile("dict."^filename));
 		}
 
 	}
@@ -601,16 +601,16 @@ dict(AGE_IN_YEARS) {
 			//abort("Cannot create XO_ADS");
 	}
 
-	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_XO_CURRENCIES","CURRENCY_CODE");
-	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_XO_CURRENCIES","CURRENCY_NAME");
-	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_XO_MARKETS","CODE");
-	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_XO_MARKETS","NAME");
+	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","dict.XO_CURRENCIES","CURRENCY_CODE");
+	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","dict.XO_CURRENCIES","CURRENCY_NAME");
+	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","dict.XO_MARKETS","CODE");
+	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","dict.XO_MARKETS","NAME");
 
 	var dictrec="";
 	dictrec.r(1,"F");
 	dictrec.r(2,"3");
 	dictrec.r(3,"Brand Code");
-	if (not dictrec.write("DICT_XO_ADS","BRAND_CODE"))
+	if (not dictrec.write("dict.XO_ADS","BRAND_CODE"))
 		printl("cannot write dict_ads, BRAND_CODE");
 	//oo style
 	assert(ads.createindex("BRAND_CODE"));

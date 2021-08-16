@@ -19,7 +19,7 @@ function main() {
 
 	//ensure dict_voc has f1m
 	var dictvoc;
-	if (not(dictvoc.open("dict_voc", ""))) {
+	if (not(dictvoc.open("dict.voc", ""))) {
 		call fsmsg();
 		stop();
 	}
@@ -45,7 +45,7 @@ function main() {
 	}
 
 	testfilename="xo_test_select";
-	dictfilename="dict_" ^ testfilename;
+	dictfilename="dict." ^ testfilename;
 
 	deletefile(testfilename);
 	deletefile(dictfilename);
