@@ -232,7 +232,7 @@ void var::setlasterror() const {
 	thread_dblasterror = "";
 }
 
-var var::getlasterror() const {
+var var::lasterror() const {
 	return thread_dblasterror ?: "";
 }
 
@@ -4349,7 +4349,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 
 	bool result = this->sqlexec(sql);
 	if (!result)
-		this->getlasterror().errputl();
+		this->lasterror().errputl();
 	return result;
 }
 
@@ -4372,7 +4372,7 @@ bool var::deleteindex(const var& fieldname0) const {
 	var sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
 	bool result = this->sqlexec(sql);
 	if (!result)
-		this->getlasterror().errputl();
+		this->lasterror().errputl();
 	return result;
 }
 

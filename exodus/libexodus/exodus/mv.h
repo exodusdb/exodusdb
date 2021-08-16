@@ -1411,7 +1411,7 @@ class DLL_PUBLIC var final {
 	// bool selftest() const;
 	ND var version() const;
 
-	ND var getlasterror() const;
+	ND var lasterror() const;
 
 	// DATABASE ACCESS
 	/////////////////

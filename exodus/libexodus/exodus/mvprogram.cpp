@@ -1491,7 +1491,7 @@ void ExodusProgramBase::debug() const {
 }
 
 bool ExodusProgramBase::fsmsg(const var& msg) const {
-	mssg(msg ^ var().getlasterror());
+	mssg(msg ^ var().lasterror());
 	return false;
 }
 

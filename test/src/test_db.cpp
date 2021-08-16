@@ -32,7 +32,8 @@ function main()
 	}
 
 	var response;
-	var().sqlexec("select exodus_extract_date_array(''||chr(29)||'1',0,0,0);",response);
+	assert(var().sqlexec("select exodus_extract_date_array(''||chr(29)||'1',0,0,0);",response));
+	TRACE(response.field(RM,2))
 	assert(response.field(RM,2)=="{NULL,1968-01-01}");
 	var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);",response);
 	assert(response.field(RM,2)=="{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
