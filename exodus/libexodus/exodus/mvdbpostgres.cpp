@@ -540,8 +540,10 @@ var var::build_conn_info(const var& conninfo) const {
 		if (temp.osgetenv("EXO_USER") && temp)
 			envconn ^= " user=" ^ temp;
 
-		if (temp.osgetenv("EXO_DBNAME") && temp)
+		if (temp.osgetenv("EXO_DBNAME") && temp) {
+			envconn.replacer(R"(dbname\s*=\s*\w*)", "");
 			envconn ^= " dbname=" ^ temp;
+		}
 
 		if (temp.osgetenv("EXO_PASSWORD") && temp)
 			envconn ^= " password=" ^ temp;
@@ -566,9 +568,11 @@ bool var::connect(const var& conninfo) {
 	var fullconninfo = conninfo.trimf().trimb();
 
 	//use *this if conninfo not specified;
+	bool isdefault = false;
 	if (!fullconninfo) {
 		if (this->assigned())
 			fullconninfo = *this;
+		isdefault = !fullconninfo;
 	}
 
 	//add dbname= if missing
@@ -661,7 +665,7 @@ bool var::connect(const var& conninfo) {
 	// this->outputl("new connection=");
 
 	// set default connection - ONLY IF THERE ISNT ONE ALREADY
-	if (!thread_default_data_mvconn_no) {
+	if (isdefault && !thread_default_data_mvconn_no) {
 		thread_default_data_mvconn_no = mvconn_no;
 		if (GETDBTRACE) {
 			this->logputl("DBTR NEW DEFAULT CONN FOR DATA " ^ var(mvconn_no) ^ " on ");
@@ -912,7 +916,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//failure if not found
 	if (result[-1] != "t") {
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
-					 ") table does not exist.";
+					 ") file does not exist.";
 		this->lasterror(errmsg);
 		return false;
 	}
@@ -1138,7 +1142,7 @@ bool var::read(const var& filehandle, const var& key) {
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK) {
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		var errmsg =
-			"read(" ^ filehandle.convert("." _FM_, "_^").quote() ^ ", " ^ key.quote() ^ ")";
+			"read(" ^ filehandle.convert("." _FM_, "_^").swap("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
 		if (sqlstate == "42P01")
 			errmsg ^= " File doesnt exist";
 		else
@@ -1977,6 +1981,7 @@ inline void tosqlstring(var& string1) {
 }
 
 inline var fileexpression(const var& mainfilename, const var& filename, const var& keyordata) {
+
 	// evade warning: unused parameter mainfilename
 	if (false && mainfilename) {
 	}
