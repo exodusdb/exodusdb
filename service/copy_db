@@ -54,7 +54,7 @@ set -eux
 : Restart $FROM_DB_CODE service if exists
 : =======================================
 :
-	./service ${FROM_DB_CODE} start || trur
+	./service ${FROM_DB_CODE} start || true
 
 :
 : Finished copy_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
