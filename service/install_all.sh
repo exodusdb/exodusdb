@@ -76,7 +76,7 @@ set -eux
 : =================
 :
 	cd $EXODUS/service
-	./service LIVE exodus start
+	./service exodus start live
 
 :
 : Install required packages
