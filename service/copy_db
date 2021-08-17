@@ -23,10 +23,10 @@ set -eux
 	fi
 
 :
-: Shutdown $FROM_DB_CODE service
-: ==============================
+: Shutdown $FROM_DB_CODE service if exists
+: ========================================
 :
-	./service ${FROM_DB_CODE} stop
+	./service ${FROM_DB_CODE} stop || true
 
 :
 : Give it some time to stop
@@ -39,20 +39,22 @@ set -eux
 : ======================================================
 :
 	if [ "$OPTIONS" = "DELETE" ]; then
-		sudo -u postgres dropdb $TO_DB_CODE || true
+		#sudo -u postgres dropdb $TO_DB_CODE || true
+		dbdelete $TO_DB_CODE || true
 	fi
 
 :
 : Copy $FROM_DB_CODE to $TO_DB_CODE
 : ====================================
 :
-	sudo -u postgres createdb -O exodus -T $FROM_DB_CODE $TO_DB_CODE
+	#sudo -u postgres createdb -O exodus -T $FROM_DB_CODE $TO_DB_CODE
+	dbcopy $FROM_DB_CODE $TO_DB_CODE
 
 :
-: Restart $FROM_DB_CODE service
-: =============================
+: Restart $FROM_DB_CODE service if exists
+: =======================================
 :
-	./service ${FROM_DB_CODE} start
+	./service ${FROM_DB_CODE} start || trur
 
 :
 : Finished copy_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
