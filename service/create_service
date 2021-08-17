@@ -28,23 +28,22 @@ set -eux
 	fi
 
 :
-: For live databases, EXO_HOME is $HOME/live
-: For test databases, EXO_HOME is $HOME
+: For live databases, EXO_HOME is $HOME/live and EXO_DICTDB=exodus
+: For test databases, EXO_HOME is $HOME      and EXO_DICTDB=exodus_live
 : =========================================
 :
 	if [ $LIVE_OR_TEST = test ]; then
 		export EXO_HOME=$HOME
 		export IDB_CODE=%i_test
-		export DICTDB_CODE=exodus
 		export IDB_CODES=%i_test
 		export FULL_DB_CODE=${BASE_DB_CODE}_test
-		export DICTDB_CODE=exodus
+		export DICTDB=exodus
 	else
 		export EXO_HOME=$HOME/live
 		export IDB_CODE="%i"
 		export IDB_CODES="%i %i %i"
 		export FULL_DB_CODE=${BASE_DB_CODE}
-		export DICTDB_CODE=exodus_live
+		export DICTDB=exodus_live
 	fi
 :
 
@@ -102,7 +101,7 @@ set -eux
 		WorkingDirectory=$WORK_DIR2
 		Environment="EXO_HOME=$EXO_HOME"
 		Environment="EXO_DBNAME=$IDB_CODE"
-		Environment="EXO_DICTDBNAME=$DICTDB_CODE"
+		Environment="EXO_DICTDB=$DICTDB"
 		Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$EXO_HOME/bin"
 		Environment="EXO_STARTED_BY_SYSTEMD=true"
 		Environment="EXO_SERVICE_CODE=$SERVICE_CODE@%i"
@@ -138,10 +137,10 @@ V0G0N
 	sudo systemctl enable $FULL_SERVICE_CODE
 
 :
-: Starting the service
-: =================
+: NOT Starting the service
+: ========================
 :
-	sudo service $FULL_SERVICE_CODE start &
+:	sudo service $FULL_SERVICE_CODE start &
 
 :
 : Ensure setfacl is installed

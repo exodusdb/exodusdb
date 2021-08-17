@@ -23,15 +23,15 @@ function main() {
 	printl("\n   --- create a specific database for dicts ---\n");
 	assert(dbcreate(xo_dict));
 
-	printl("\n   --- test with EXO_DICTDBNAME ---\n");
+	printl("\n   --- test with EXO_DICTDB ---\n");
 	if (true) {
 
 		printl("\n   --- connect to the specific database ---\n");
 		assert(xo_dict_conn.connect(xo_dict));
 
 		printl("\n   --- say that dicts are on the specific database " ^ xo_dict ^ " ---\n");
-		assert(ossetenv("EXO_DICTDBNAME",xo_dict));
-		assert(var(getenv("EXO_DICTDBNAME")) == xo_dict);
+		assert(ossetenv("EXO_DICTDB",xo_dict));
+		assert(var(getenv("EXO_DICTDB")) == xo_dict);
 
 		printl("\n   --- create a dict on the specific database implicitly ---\n");
 		assert(createfile(dict_xo_test));
@@ -63,14 +63,14 @@ function main() {
 
 	}
 
-	printl("\n   --- test without EXO_DICTDBNAME ---\n");
+	printl("\n   --- test without EXO_DICTDB ---\n");
 	if (true) {
 
 		printl("\n   --- connect to the specific database (although not used for dict here) ---\n");
 
 		printl("\n   --- say that dicts are on the default database ---\n");
-		assert(ossetenv("EXO_DICTDBNAME",""));
-		assert(var(getenv("EXO_DICTDBNAME")) == "");
+		assert(ossetenv("EXO_DICTDB",""));
+		assert(var(getenv("EXO_DICTDB")) == "");
 
 		printl("\n   --- needed to remove default dict connection ---\n");
 		disconnectall();

@@ -83,6 +83,7 @@ CREATE OR REPLACE FUNCTION exodus_extract_number(text, int4, int4, int4)   RETUR
 CREATE ROLE exodus LOGIN
  PASSWORD 'somesillysecret'
  CREATEDB CREATEROLE;
+CREATE SCHEMA dict AUTHORIZATION exodus;
 CREATE DATABASE exodus
  WITH ENCODING='UTF8'
    OWNER=exodus;

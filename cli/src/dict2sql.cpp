@@ -62,7 +62,7 @@ function main() {
 			filenames.splicer(1, 0, "dict.");
 	} else {
 		var dictdbname = "";
-		osgetenv("EXO_DICTDBNAME",dictdbname);
+		osgetenv("EXO_DICTDB",dictdbname);
         if (not dictdbname)
             dictdbname = "exodus_dict";
 		if (dictdbname) {

@@ -275,11 +275,11 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 			var defaultdb;
 
 			//look for dicts in the following order
-			//1. $EXO_DICTDBNAME if defines
+			//1. $EXO_DICTDB if defines
 			//2. db "dict" if present
 			//3. the default db connection
 			if (isdict) {
-				defaultdb.osgetenv("EXO_DICTDBNAME");
+				defaultdb.osgetenv("EXO_DICTDB");
 				if (!defaultdb)
 					defaultdb="exodus_dict";
 			} else {

@@ -43,8 +43,14 @@ set -eux
 	./copyall
 
 :
-: Setup database dictionaries
-: ===========================
+: Create exodus_live db for live dictionaries if not already present
+: ==================================================================
+:
+	dblist|grep exodus_live > /dev/null || dbcreate exodus_live
+
+:
+: Import database dictionaries into exodus and exodus_live
+: =====================================================
 :
 	cd /tmp
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
@@ -56,6 +62,7 @@ set -eux
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
 	cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
+	cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus_live
 
 :
 : Configure the exodus service
@@ -63,6 +70,13 @@ set -eux
 :
 	cd $EXODUS/service
 	./create_service exo exodus '' live
+
+:
+: Start the service
+: =================
+:
+	cd $EXODUS/service
+	./service exodus start
 
 :
 : Install required packages
@@ -91,8 +105,15 @@ set -eux
 :
 	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
 
+
+:
+: Determine local ip number for info
+: ==================================
+:
+	IPNO=`ip -4 address|grep -v 127.0.0.1|grep -P '\d+\.\d+\.\d+\.\d+' -o|head -n1`
+
 :
 : Finished install_all in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : ==============================================================
 :
-:	Apache should now be listening on port 80 and 443
+:	Apache should now be listening on ipno $IPNO port 443
