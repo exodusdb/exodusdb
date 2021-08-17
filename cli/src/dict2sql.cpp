@@ -27,7 +27,7 @@ function main() {
 	// to call a dict functions to get a specific mv.
 	// If in future MV is required, then dict function arguments will probably become (key,data,mv)
 
-	// 2. Creates dict_all file which represents all dictionary files and their items in one file
+	// 2. Creates dict.all file which represents all dictionary files and their items in one file
 	//
 	// only performed when filename is omitted
 	//
@@ -80,7 +80,7 @@ function main() {
 		var().sqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;");
 
 		var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_time_array(data text, fn int, vn int, sn int);");
-		//create dict_all file
+		//create dict.all file
 
 		//create exodus pgsql functions
 
@@ -150,7 +150,7 @@ COST 10;
 	//create global view of all dicts in "dict.all"
 	var viewsql = "";
 	if (doall)
-		viewsql ^= "CREATE MATERIALIZED VIEW dict_all AS\n";
+		viewsql ^= "CREATE MATERIALIZED VIEW dict.all AS\n";
 
 	//do one or many/all files
 	int nfiles = dcount(filenames, FM);
@@ -159,8 +159,8 @@ COST 10;
 
 	if (doall) {
 		//ignore error if doesnt exist
-		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW dict_all"))
-			var().sqlexec("DROP VIEW dict_all");
+		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW dict.all"))
+			var().sqlexec("DROP VIEW dict.all");
 
 		if (nfiles) {
 			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
