@@ -40,7 +40,7 @@ set -eux
 : ==================================
 :
 	cd $EXODUS/service
-	./copyall
+	./copyall CONFIRM
 
 :
 : Create exodus_live db for live dictionaries if not already present
