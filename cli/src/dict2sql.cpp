@@ -8,18 +8,20 @@ var dictrec;
 
 function main() {
 
+	//TODO update comment to reflect the move to schema "dict" and allow for $EXO_DICTDB and exodus_dict
+
 	// Syntax:
 	// dict2sql {filename {dictid}} {V}
 
 	// 1. Creates pgsql functions to calculate columns given data and key
 	//    for each dictitem in each dictfile
 	//
-	// functions like "dict.filename_DICT_ID(key,data)" returns text
+	// functions like "dict_filename__DICT_ID(key,data)" returns text
 	// /df
 	// List of functions
 	// Schema | Name | Result data type | Argument data types | Type
 	// -------+---------------------------+--------------------+---------------------+--------
-	// public | dict_ads_brand_and_date | text | key text, data text | normal
+	// public | dict_ads__brand_and_date | text | key text, data text | normal
 	// ...
 
 	// NOTE: Multivalued pgsql dictionary functions currently should be written to calculate
@@ -63,8 +65,8 @@ function main() {
 	} else {
 		var dictdbname = "";
 		osgetenv("EXO_DICTDB",dictdbname);
-        if (not dictdbname)
-            dictdbname = "exodus_dict";
+		if (not dictdbname)
+			dictdbname = "exodus_dict";
 		if (dictdbname) {
 			if (not dictconnection.connect(dictdbname)) {
 				dictdbname.quote().logputl("dict2sql: Warning: Using default database because cannot connect to ");
@@ -153,16 +155,17 @@ COST 10;
 		viewsql ^= "CREATE MATERIALIZED VIEW dict.all AS\n";
 
 	//do one or many/all files
-	int nfiles = dcount(filenames, FM);
-	for (int filen = 1; filen <= nfiles; ++filen)
-		onefile(filenames.a(filen), dictid, viewsql);
+	//int nfiles = dcount(filenames, FM);
+	//for (int filen = 1; filen <= nfiles; ++filen)
+	for (var filename : filenames)
+		onefile(filename, dictid, viewsql);
 
 	if (doall) {
 		//ignore error if doesnt exist
 		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW dict.all"))
 			var().sqlexec("DROP VIEW dict.all");
 
-		if (nfiles) {
+		if (filenames.index(FM)) {
 			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
 			var errmsg;
 			if (verbose)
@@ -202,7 +205,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	if (verbose)
 		functionsql.outputl();
 
-	//delete index if function has changed
+	//decide if reindex is required - only if function has changed
 	var reindexrequired = false;
 	var oldfunction;
 	var functionname=field(functionname_and_args,"(",1).lcase();
@@ -214,7 +217,10 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 		//TRACE(oldfunction)
 	}
 
+	//create the function
 	var errmsg;
+	//supposedly this is on the default connection
+	TRACE("XXX DEFAULT CONNECTION?")
 	var().sqlexec(functionsql, errmsg);
 
 	//do drop function first if suggested
@@ -283,6 +289,7 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 		onedictid(dictfilename, dictid, reqdictid);
 	}
 
+	//add one file for the dict_all sql using sql UNION
 	if (viewsql) {
 		viewsql ^= "SELECT '" ^ dictfilename.substr(6).ucase() ^ "'||'*'||key as key, data\n";
 		viewsql ^= "FROM " ^ dictfilename ^ "\n";

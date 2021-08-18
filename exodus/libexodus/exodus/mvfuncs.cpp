@@ -2130,6 +2130,9 @@ var var::index(const var& substrx, const int occurrenceno) const {
 	THISISSTRING()
 	ISSTRING(substrx)
 
+	//TODO implement negative occurenceno as meaning backwards from the end
+	//eg -1 means the last occurrence
+
 	if (substrx.var_str == "")
 		return var(0);
 

@@ -307,13 +307,13 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 			if (isdict) {
 				thread_default_dict_mvconn_no = mvconn_no;
 				if (GETDBTRACE) {
-					var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DICT ");
+					var(mvconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
 				}
 			}
 			else {
 				thread_default_data_mvconn_no = mvconn_no;
 				if (GETDBTRACE) {
-					var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
+					var(mvconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
 				}
 			}
 		}
@@ -653,11 +653,13 @@ bool var::connect(const var& conninfo) {
 	if (!this->assigned())
 		(*this) = "";
 	if (not this->a(1))
-		this->r(1,fullconninfo.field(" ",1));
+		//this->r(1,fullconninfo.field(" ",1));
+		this->r(1,fullconninfo.field("dbname=",2).field(" ",1));
 	this->r(2, mvconn_no);
 	this->r(3, mvconn_no);
 
 	if (GETDBTRACE) {
+		fullconninfo.logputl("DBTR var::connect() OK ");
 		this->logput("DBTR var::connect() OK ");
 		std::clog << " " << pgconn << std::endl;
 	}
@@ -668,7 +670,7 @@ bool var::connect(const var& conninfo) {
 	if (isdefault && !thread_default_data_mvconn_no) {
 		thread_default_data_mvconn_no = mvconn_no;
 		if (GETDBTRACE) {
-			this->logputl("DBTR NEW DEFAULT CONN FOR DATA " ^ var(mvconn_no) ^ " on ");
+			this->logputl("DBTR NEW DEFAULT DATA CONN " ^ var(mvconn_no) ^ " on ");
 		}
 
 	}
