@@ -32,6 +32,7 @@ var cmd;
 var bodyfile;
 var errors;
 var errorfile;
+var home = "";
 
 function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
 	//c sys in,in,in,in,in,in,out,=var(),=var()
@@ -131,7 +132,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//if system<61> or (@username='EXODUS' and system<17,1>[-4,4]='TEST') then
 
 		//testdata and user exodus - always email sysmsg@neosys.com
-		if (SYSTEM.a(61) and USERNAME eq "EXODUS") {
+		home.osgetenv("HOME");
+		if (osfile(home ^ "/hosts/serve_agy.disabled") or (SYSTEM.a(61) and USERNAME eq "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:
