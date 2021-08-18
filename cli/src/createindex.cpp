@@ -28,16 +28,17 @@ programinit()
 			indexn += 1;
 		}
 
+		var indexname = filename ^ "__" ^ fieldname;
 		if (force && listindexes(filename, fieldname)) {
-			printl("Deleting index ", filename, "__", fieldname);
+			printl("Deleting index", indexname);
 			if (not filename.deleteindex(fieldname)) {
-				errputl("Cannot delete index ", filename, "__", fieldname);
+				errputl("Cannot delete index", indexname);
 				result = 1;
 			}
 		}
-		printl("Creating index " ^ filename ^ "__" ^ fieldname);
+		printl("Creating index", indexname);
 		if (not filename.createindex(fieldname)) {
-			errputl("Cannot create index " ^ filename ^ "__" ^ fieldname);
+			errputl("Cannot create index", indexname);
 			result = 1;
 		}
 	}

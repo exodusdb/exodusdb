@@ -11,6 +11,12 @@ set -eux
 :
 
 :
+: EXODUS installed in
+: ===================
+
+	EXODUS=~/exodus
+
+:
 : Dry run or not
 : ==============
 :
@@ -34,7 +40,7 @@ set -eux
 : Install the latest version of the neomail script into test
 : ==========================================================
 :
-	rsync -av --whole-file neomail ~/bin
+	rsync -av --whole-file $EXODUS/service/neomail ~/bin
 
 :
 : Copy all bin and lib files to live

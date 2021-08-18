@@ -174,7 +174,7 @@ std::string getresult(PGresult* pgresult, int rown, int coln) {
 }
 
 //given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
-std::string get_normal_filename(const var& filename_or_handle) {
+var get_normal_filename(const var& filename_or_handle) {
 	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
 }
 
@@ -742,8 +742,8 @@ void var::detach(const var& filenames) {
 	ISSTRING(filenames)
 
 	for (var filename : filenames) {
-		std::string filename2 = get_normal_filename(filename);
-		thread_file_handles.erase(filename2);
+		//std::string filename2 = get_normal_filename(filename);
+		thread_file_handles.erase(get_normal_filename(filename));
 	}
 	return;
 }
@@ -1058,7 +1058,7 @@ bool var::read(const var& filehandle, const var& key) {
 
 	// reading a magic special key returns all keys in the file in natural order
 	if (key == "%RECORDS%") {
-		var sql = "SELECT key from " + get_normal_filename(filehandle) + ";";
+		var sql = "SELECT key from " ^ get_normal_filename(filehandle) ^ ";";
 
 		//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 		auto pgconn = get_pgconnection(filehandle);
@@ -1126,7 +1126,7 @@ bool var::read(const var& filehandle, const var& key) {
 	paramLengths[0] = int(key2.length());
 	// paramFormats[0]=1;
 
-	var sql = "SELECT data FROM " + get_normal_filename(filehandle) + " WHERE key = $1";
+	var sql = "SELECT data FROM " ^ get_normal_filename(filehandle) ^ " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
 	PGResult pgresult = PQexecParams(pgconn,
@@ -1367,8 +1367,8 @@ bool var::sqlexec(const var& sql) const {
 	if (!ok) {
 		this->lasterror(response);
 		//skip table does not exist because it is very normal to check if table exists
-		if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || GETDBTRACE)
-			response.logputl();
+		//if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || GETDBTRACE)
+		//	response.logputl();
 	}
 	return ok;
 }
@@ -1515,7 +1515,7 @@ bool var::write(const var& filehandle, const var& key) const {
 	// but performance gain is probably not great since the sql we use to read and write is
 	// quite simple (could PREPARE once per file/table)
 
-	sql = "INSERT INTO " + get_normal_filename(filehandle) + " (key,data) values( $1 , $2)";
+	sql = "INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 	sql ^= " ON CONFLICT (key)";
 	sql ^= " DO UPDATE SET data = $2";
 
@@ -1582,7 +1582,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	paramLengths[1] = int(data2.length());
 	// paramFormats[1] = 1;//binary
 
-	var sql = "UPDATE " +get_normal_filename(filehandle) + " SET data = $2 WHERE key = $1";
+	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 	auto pgconn = get_pgconnection(filehandle);
@@ -1659,7 +1659,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	// paramFormats[1] = 1;//binary
 
 	var sql =
-		"INSERT INTO " + get_normal_filename(filehandle) + " (key,data) values( $1 , $2)";
+		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 
 	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 	auto pgconn = get_pgconnection(filehandle);
@@ -1891,14 +1891,15 @@ bool var::createfile(const var& filename) const {
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = get_normal_filename(filename);
+	//std::string filename2 = get_normal_filename(filename);
 
 	var sql = "CREATE";
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
 	// sql ^= " TABLE " ^ filename.convert(".","_");
 	if (filename.substr(-5, 5) == "_temp")
 		sql ^= " TEMP ";
-	sql ^= " TABLE " + filename2;
+	//sql ^= " TABLE " + filename2;
+	sql ^= " TABLE " ^ get_normal_filename(filename);
 	// sql ^= " (key bytea primary key, data bytea)";
 	sql ^= " (key text primary key, data text)";
 
@@ -1990,7 +1991,7 @@ inline var get_fileexpression(const var& mainfilename, const var& filename, cons
 	//	return keyordata;
 	// else
 	//return filename.convert(".", "_") ^ "." ^ keyordata;
-	return var(get_normal_filename(filename)) ^ "." ^ keyordata;
+	return get_normal_filename(filename) ^ "." ^ keyordata;
 
 	// if you dont use STRICT in the postgres function declaration/definitions then NULL
 	// parameters do not abort functions
@@ -2196,7 +2197,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 								 "*pgsql")) {
 
 			// plsql function name assumed to be like "dictfilename_FIELDNAME()"
-			sqlexpression = actualdictfile.a(1) ^ "_" ^ fieldname ^ "(";
+			sqlexpression = get_normal_filename(actualdictfile).swap("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
 
 			// function arguments are (key,data)
 			sqlexpression ^= get_fileexpression(mainfilename, filename, "key");
