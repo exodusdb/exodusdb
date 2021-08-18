@@ -137,8 +137,9 @@ function main() {
 	}
 
 	printl("\nJust type 'list' to see the syntax of list");
-	printl("or list dict_" ^ filename ^ " to see the dictionary");
-	printl("Type edic cli/src/testsort to see or edit/recompile this program.");
+	printl("or list dict." ^ filename ^ " to see the dictionary");
+	printl("or just listdict " ^ filename ^ " for the same");
+	printl("Type edic ~/exodus/cli/src/testsort to see or edit/recompile this program.");
 
 	return 0;
 }

@@ -27,7 +27,7 @@ programinit()
 				dictfilenames ^= filename ^ FM;
 		}
 		dictfilenames.swapper(FM, "\n");
-		printl(dictfilenames);
+		print(dictfilenames);
 
 		stop();
 

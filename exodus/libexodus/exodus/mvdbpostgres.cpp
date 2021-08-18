@@ -1980,7 +1980,7 @@ inline void tosqlstring(var& string1) {
 	}
 }
 
-inline var fileexpression(const var& mainfilename, const var& filename, const var& keyordata) {
+inline var get_fileexpression(const var& mainfilename, const var& filename, const var& keyordata) {
 
 	// evade warning: unused parameter mainfilename
 	if (false && mainfilename) {
@@ -1989,7 +1989,8 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	// if (filename == mainfilename)
 	//	return keyordata;
 	// else
-	return filename.convert(".", "_") ^ "." ^ keyordata;
+	//return filename.convert(".", "_") ^ "." ^ keyordata;
+	return var(get_normal_filename(filename)) ^ "." ^ keyordata;
 
 	// if you dont use STRICT in the postgres function declaration/definitions then NULL
 	// parameters do not abort functions
@@ -2124,13 +2125,13 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 
 			if (forsort && !isdate && !istime)
 				// sqlexpression="exodus_extract_sort(" ^
-				// fileexpression(mainfilename, filename,"key") ^ ")";
+				// get_fileexpression(mainfilename, filename,"key") ^ ")";
 				sqlexpression =
 					"exodus_extract_sort(" ^ mainfilename ^ ".key,0,0,0)";
 			else
-				// sqlexpression="convert_from(" ^ fileexpression(mainfilename,
+				// sqlexpression="convert_from(" ^ get_fileexpression(mainfilename,
 				// filename, "key") ^ ", 'UTF8')";
-				sqlexpression = fileexpression(mainfilename, filename, "key");
+				sqlexpression = get_fileexpression(mainfilename, filename, "key");
 
 			// multipart key
 			var keypartn = dictrec.a(5);
@@ -2156,7 +2157,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 		}
 
 		var extractargs =
-			fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
+			get_fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
 
 		if (conversion.substr(1, 9) == "[DATETIME")
 			sqlexpression = "exodus_extract_datetime(" ^ extractargs;
@@ -2198,9 +2199,9 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 			sqlexpression = actualdictfile.a(1) ^ "_" ^ fieldname ^ "(";
 
 			// function arguments are (key,data)
-			sqlexpression ^= fileexpression(mainfilename, filename, "key");
+			sqlexpression ^= get_fileexpression(mainfilename, filename, "key");
 			sqlexpression ^= ", ";
-			sqlexpression ^= fileexpression(mainfilename, filename, "data");
+			sqlexpression ^= get_fileexpression(mainfilename, filename, "data");
 			sqlexpression ^= ")";
 			// sqlexpression^="::bytea";
 
@@ -2247,7 +2248,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 				if (xlatetargetfieldname.isnum()) {
 					sqlexpression =
 						"exodus_extract_text(" ^
-						fileexpression(mainfilename, xlatetargetfilename,
+						get_fileexpression(mainfilename, xlatetargetfilename,
 									   "data") ^
 						", " ^ xlatetargetfieldname ^ ", 0, 0)";
 				} else if (stage2_calculated) {

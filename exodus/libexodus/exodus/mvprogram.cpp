@@ -1286,9 +1286,9 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mvno) {
 
 	//dictid @ID/@id is hard coded to return ID
-	//to avoid incessant lookup in main file dictionary and then defaulting to dict_voc
+	//to avoid incessant lookup in main file dictionary and then defaulting to dict.voc
 	//sadly this means that @ID cannot be customised per file
-	//possibly amend the read cache to cache the dict_voc version for the main file
+	//possibly amend the read cache to cache the dict.voc version for the main file
 	//if (dictid == "@ID" || dictid == "@id")
 	//	return ID;
 
@@ -1327,13 +1327,13 @@ var ExodusProgramBase::calculate(const var& dictid) {
 		if (not cache_dictrec_.reado(DICT, dictid)) {
 			// try lower case
 			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
-				// try dict_voc
+				// try dict.voc
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
 				if (not dictvoc.open("dict.voc")) {
 baddict:
 					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
-								  DICT.a(1).quote() ^ " nor in DICT_VOC");
+								  DICT.a(1).quote() ^ " nor in dict.voc");
 				}
 				if (not cache_dictrec_.reado(dictvoc, dictid)) {
 					// try lower case
@@ -1352,7 +1352,7 @@ baddict:
 		}
 		cache_dictid_ = DICT.a(1) ^ " " ^ dictid;
 
-		//detect from the cached record if it came from dict_voc
+		//detect from the cached record if it came from dict.voc
 		//so we can choose the libdict_voc if so
 		indictvoc = cache_dictrec_.a(16);
 
