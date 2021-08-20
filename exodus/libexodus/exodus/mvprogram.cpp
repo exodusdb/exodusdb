@@ -1392,7 +1392,7 @@ baddict:
 
 			std::string str_libname;
 			if (indictvoc)
-				str_libname = "dict.voc";
+				str_libname = "dict_voc";
 			else
 				str_libname = DICT.a(1).lcase().convert(".", "_").toString();
 

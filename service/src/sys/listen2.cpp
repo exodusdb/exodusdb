@@ -576,7 +576,7 @@ passwordexpired:
 											gosub addwhoistx();
 										}
 
-										var subject = "Login on " ^ ipno ^ " of " ^ userx.a(1) ^ " - " ^ username;
+										var subject = "Login on " ^ ipno ^ " by " ^ userx.a(1) ^ " - " ^ username;
 										call sysmsg(body, subject, username);
 
 									}
