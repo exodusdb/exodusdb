@@ -916,8 +916,8 @@ bool var::ossetenv(const var& envvarname) const {
 	//var("putenv " ^ var(tempstr) ).outputl();
 	//#pragma warning (disable : 4996)
 	//const int result = putenv((char*)(tempstr.c_str()));
-	//putenv("EXO_DBNAME=C:\\");
-	//std::cout<<getenv("EXO_DBNAME");
+	//putenv("EXO_DATA=C:\\");
+	//std::cout<<getenv("EXO_DATA");
 
 	//char winenv[1024];
 	char* env = (char*)malloc(1024);

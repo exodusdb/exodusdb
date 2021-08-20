@@ -28,8 +28,8 @@ set -eux
 	fi
 
 :
-: For live databases, EXO_HOME is $HOME/live and EXO_DICTDB=exodus
-: For test databases, EXO_HOME is $HOME      and EXO_DICTDB=exodus_live
+: For live databases, EXO_HOME is $HOME/live and EXO_DICT=exodus
+: For test databases, EXO_HOME is $HOME      and EXO_DICT=exodus_live
 : =========================================
 :
 	if [ $LIVE_OR_TEST = test ]; then
@@ -100,8 +100,8 @@ set -eux
 		User=$USER
 		WorkingDirectory=$WORK_DIR2
 		Environment="EXO_HOME=$EXO_HOME"
-		Environment="EXO_DBNAME=$IDB_CODE"
-		Environment="EXO_DICTDB=$DICTDB"
+		Environment="EXO_DATA=$IDB_CODE"
+		Environment="EXO_DICT=$DICTDB"
 		Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$EXO_HOME/bin"
 		Environment="EXO_STARTED_BY_SYSTEMD=true"
 		Environment="EXO_SERVICE_CODE=$SERVICE_CODE@%i"

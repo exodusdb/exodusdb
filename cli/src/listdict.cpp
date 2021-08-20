@@ -13,7 +13,7 @@ programinit()
 
 		//copy of rules in mvdbpostgres.cpp
 		var dictdb = "";
-		dictdb.osgetenv("EXO_DICTDB");
+		dictdb.osgetenv("EXO_DICT");
 		if (not dictdb)
 			dictdb = "exodus_dict";
 		var conn;

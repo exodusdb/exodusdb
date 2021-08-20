@@ -275,11 +275,11 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 			var defaultdb;
 
 			//look for dicts in the following order
-			//1. $EXO_DICTDB if defines
+			//1. $EXO_DICT if defines
 			//2. db "dict" if present
 			//3. the default db connection
 			if (isdict) {
-				defaultdb.osgetenv("EXO_DICTDB");
+				defaultdb.osgetenv("EXO_DICT");
 				if (!defaultdb)
 					defaultdb="exodus_dict";
 			} else {
@@ -527,7 +527,7 @@ var var::build_conn_info(const var& conninfo) const {
 		// discover any configuration in the environment
 		var envconn = "";
 		var temp;
-		if (temp.osgetenv("EXO_CONNECTION") && temp)
+		if (temp.osgetenv("EXO_CONN") && temp)
 			envconn ^= " " ^ temp;
 
 		// specific variable are appended ie override
@@ -540,15 +540,15 @@ var var::build_conn_info(const var& conninfo) const {
 		if (temp.osgetenv("EXO_USER") && temp)
 			envconn ^= " user=" ^ temp;
 
-		if (temp.osgetenv("EXO_DBNAME") && temp) {
+		if (temp.osgetenv("EXO_DATA") && temp) {
 			envconn.replacer(R"(dbname\s*=\s*\w*)", "");
 			envconn ^= " dbname=" ^ temp;
 		}
 
-		if (temp.osgetenv("EXO_PASSWORD") && temp)
+		if (temp.osgetenv("EXO_PASS") && temp)
 			envconn ^= " password=" ^ temp;
 
-		if (temp.osgetenv("EXO_TIMEOUT") && temp)
+		if (temp.osgetenv("EXO_TIME") && temp)
 			envconn ^= " connect_timeout=" ^ temp;
 
 		result = defaultconninfo ^ " " ^ configconn ^ " " ^ envconn ^ " " ^ result;

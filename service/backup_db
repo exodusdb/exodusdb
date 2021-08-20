@@ -21,7 +21,7 @@ set -eux
 :
 :	'Only restores backup to test database'
 :
-	EXO_DBNAME=${1:?<DBNAME> argument is required.}
+	EXO_DATA=${1:?<DBNAME> argument is required.}
 	OPTIONS=${2:-BRVS}
 	NEW_BACKUP_DIR=${3:-~/backups/sql}
 
@@ -38,16 +38,16 @@ set -eux
 	if [[ $OPTIONS =~ "B" ]]; then
 		set -o pipefail
 		#NCPUS=`grep -c processor /proc/cpuinfo`
-		sudo -u postgres pg_dump $EXO_DBNAME | gzip > $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part
-		mv $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz.part $NEW_BACKUP_DIR/$EXO_DBNAME.sql.gz
+		sudo -u postgres pg_dump $EXO_DATA | gzip > $NEW_BACKUP_DIR/$EXO_DATA.sql.gz.part
+		mv $NEW_BACKUP_DIR/$EXO_DATA.sql.gz.part $NEW_BACKUP_DIR/$EXO_DATA.sql.gz
 	fi
 
 :
-: Optionally restore into ${EXO_DBNAME}_test - without restarting it afterwards
+: Optionally restore into ${EXO_DATA}_test - without restarting it afterwards
 : =============================================================================
 :
 	if [[ $OPTIONS =~ "R" ]]; then
-		./restore_db $EXO_DBNAME "$NEW_BACKUP_DIR" "N"
+		./restore_db $EXO_DATA "$NEW_BACKUP_DIR" "N"
 	fi
 
 :
@@ -55,17 +55,17 @@ set -eux
 : =========================================
 :
 	if [[  $OPTIONS =~ "V" ]]; then
-		if dbcomp $EXO_DBNAME ${EXO_DBNAME}_test {S}; then
-			touch "$HOME/hosts/$EXO_DBNAME/data/$EXO_DBNAME/params2"
+		if dbcomp $EXO_DATA ${EXO_DATA}_test {S}; then
+			touch "$HOME/hosts/$EXO_DATA/data/$EXO_DATA/params2"
 		fi
 	fi
 
 :
-: Optionally restart the target TEST database ${EXO_DBNAME}_test
+: Optionally restart the target TEST database ${EXO_DATA}_test
 : ==============================================================
 :
 	if [[ $OPTIONS =~ "S" ]]; then
-		./service ${EXO_DBNAME} start test
+		./service ${EXO_DATA} start test
 	fi
 
 :

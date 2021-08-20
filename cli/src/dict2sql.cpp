@@ -8,7 +8,7 @@ var dictrec;
 
 function main() {
 
-	//TODO update comment to reflect the move to schema "dict" and allow for $EXO_DICTDB and exodus_dict
+	//TODO update comment to reflect the move to schema "dict" and allow for $EXO_DICT and exodus_dict
 
 	// Syntax:
 	// dict2sql {filename {dictid}} {V}
@@ -64,7 +64,7 @@ function main() {
 			filenames.splicer(1, 0, "dict.");
 	} else {
 		var dictdbname = "";
-		osgetenv("EXO_DICTDB",dictdbname);
+		osgetenv("EXO_DICT",dictdbname);
 		if (not dictdbname)
 			dictdbname = "exodus_dict";
 		if (dictdbname) {

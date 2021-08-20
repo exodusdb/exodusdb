@@ -30,7 +30,7 @@ so we do this instead
 	//second from environment
 	//TODO should be per parameter
 	var temp;
-	if (temp.osgetenv("EXO_CONNECTION"))
+	if (temp.osgetenv("EXO_CONN"))
 		origconfig ^= " " ^ temp;
 
 	//third from config file

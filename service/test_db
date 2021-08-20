@@ -9,9 +9,9 @@ set -eux
 :
 : '	./test_db <DBNAME>'
 :
-	EXO_DBNAME=${1:?<DBNAME> argument is required.}
+	EXO_DATA=${1:?<DBNAME> argument is required.}
 
-	if sudo -u  postgres psql $EXO_DBNAME -c 'select 1' &> /dev/null; then
+	if sudo -u  postgres psql $EXO_DATA -c 'select 1' &> /dev/null; then
 		exit 0
 	else
 		exit 1

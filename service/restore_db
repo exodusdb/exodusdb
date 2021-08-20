@@ -11,17 +11,17 @@ set -eux
 :   '       BACKUPDIR defaults to ~/backups/sql'
 :	'		OPTION is N to NOT restart the target database service.'
 :
-	FROM_EXO_DBNAME=${1:?<DBNAME> argument is required.}
+	FROM_EXO_DATA=${1:?<DBNAME> argument is required.}
 	NEW_BACKUP_DIR=${2:-~/backups/sql}
 	RESTART=${3:-N}
 :
-	TO_EXO_DBNAME=${FROM_EXO_DBNAME}_test
+	TO_EXO_DATA=${FROM_EXO_DATA}_test
 
 :
 : Check Syntax
 : ============
 :
-	if [ -z "FROM_EXO_DBNAME"  -o  -z "$NEW_BACKUP_DIR" ]; then
+	if [ -z "FROM_EXO_DATA"  -o  -z "$NEW_BACKUP_DIR" ]; then
 		set +x
 		echo 'Syntax is wrong. Cannot continue.'
 		exit 1
@@ -31,7 +31,7 @@ set -eux
 : Stop the target database
 : ========================
 :
-	./service ${FROM_EXO_DBNAME} stop test
+	./service ${FROM_EXO_DATA} stop test
 
 #:
 #: Give it a little time to stop
@@ -43,7 +43,7 @@ set -eux
 : Kill any test process running the target database
 : =================================================
 :
-	for PIDFILENAME in /run/serve_$APP_CODE/$TO_EXO_DBNAME.pid
+	for PIDFILENAME in /run/serve_$APP_CODE/$TO_EXO_DATA.pid
 	do
 		kill -TERM `cat $PIDFILENAME` || true
 	done
@@ -54,39 +54,39 @@ set -eux
 :
 : dropdb only has the force option from postgres v13
 :
-	sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$TO_EXO_DBNAME';"
+	sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$TO_EXO_DATA';"
 
 :
 : Drop the target database
 : ========================
 :
-	sudo -u postgres dropdb --if-exists $TO_EXO_DBNAME
+	sudo -u postgres dropdb --if-exists $TO_EXO_DATA
 
 :
 : Create the target database
 : ==========================
 :
-	sudo -u postgres createdb --owner exodus --template template1 $TO_EXO_DBNAME
+	sudo -u postgres createdb --owner exodus --template template1 $TO_EXO_DATA
 
 :
 : Restore into the target database
 : ================================
 :
 	set -o pipefail
-	zcat $NEW_BACKUP_DIR/$FROM_EXO_DBNAME.sql.gz | sudo -u postgres psql $TO_EXO_DBNAME > /dev/null
+	zcat $NEW_BACKUP_DIR/$FROM_EXO_DATA.sql.gz | sudo -u postgres psql $TO_EXO_DATA > /dev/null
 
 :
 : Recreate all functions
 : ======================
 :
-	EXO_DBNAME=$TO_EXO_DBNAME dict2sql > /dev/null
+	EXO_DATA=$TO_EXO_DATA dict2sql > /dev/null
 
 :
 : Optionally restart the target database
 : ======================================
 :
 	if [ "$RESTART" != "N" ]; then
-		./service ${FROM_EXO_DBNAME} start test
+		./service ${FROM_EXO_DATA} start test
 	fi
 
 :

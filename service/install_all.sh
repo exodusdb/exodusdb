@@ -1,9 +1,24 @@
 #!/bin/bash
 set -eux
 
-: =============================
-: Installing exodus web service
-: =============================
+: ===========================
+: Installs EXODUS web service
+: ===========================
+:
+: 'Syntax is ./install_all.sh <SITE_NAME>|exodus|none <DOMAIN_PREFIX>'
+:
+: 'eg.       ./install_all.sh'
+: 'eg.       ./install_all.sh exodus t-'
+:
+: '<SITE_NAME> defaults to "exodus"'
+: '<DOMAIN_PREFIX> defaults to ""'
+:
+	SITE_NAME=${1:-exodus}
+	DOMAIN_PREFIX=${2:-}
+
+:
+: Config
+: ======
 :
 	EXODUS=~/exodus
 
@@ -19,8 +34,10 @@ set -eux
 : Install apache with php and configure a site
 : ============================================
 :
-	cd $EXODUS/service
-	./create_site exodus
+	if [ $SITE_NAME != none ]; then
+		cd $EXODUS/service
+		./create_site $SITE_NAME '' '' $DOMAIN_PREFIX
+	fi
 
 :
 : Disable default web sites
@@ -50,7 +67,7 @@ set -eux
 
 :
 : Import database dictionaries into exodus and exodus_live
-: =====================================================
+: ========================================================
 :
 	cd /tmp
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
@@ -68,15 +85,19 @@ set -eux
 : Configure the exodus service
 : ============================
 :
-	cd $EXODUS/service
-	./create_service exo exodus '' live
+	if [ $SITE_NAME != none ]; then
+		cd $EXODUS/service
+		./create_service exo $SITE_NAME '' live
+	fi
 
 :
 : Start the service
 : =================
 :
-	cd $EXODUS/service
-	./service exodus start live
+	if [ $SITE_NAME != none ]; then
+		cd $EXODUS/service
+		./service $SITE_NAME start live
+	fi
 
 :
 : Install required packages

@@ -478,7 +478,7 @@ function main() {
 	//call programstackstack);
 
 	var nextconnection;
-	nextconnection.connect(getenv("EXO_DBNAME"));
+	nextconnection.connect(getenv("EXO_DATA"));
 
 ////////////
 nextrequest:
