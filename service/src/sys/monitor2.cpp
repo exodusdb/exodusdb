@@ -129,7 +129,7 @@ function main() {
 	forced = SENTENCE.field(" ", 1).ucase() eq "MONITOR2";
 
 	//quit if disabled and not forced
-	if (not(forced) and var("../../serve_agy.disabled").osfile()) {
+	if (not(forced) and var("../../disabled.cfg").osfile()) {
 		return 0;
 		}
 
