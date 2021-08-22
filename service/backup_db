@@ -7,24 +7,26 @@ set -eux
 :
 :	'Syntax is:'
 :
-:	' ./backup_db <DBNAME> [<OPTIONS>...] [<BACKUPDIR>]'
+:	' ./backup_db <DBNAME> [<OPTIONS>...] [<BACKUPDIR>] [<RESTOREDB_SUFFIX>]'
 :
 :	'<OPTIONS> are (B)ackup, (R)estore, (V)erify, (S)tart'
 :	'          defaults to BRVS'
 :
 :	'<BACKUPDIR> defaults to ~/backups/sql'
 :
+:	'RESTOREDB_SUFFIX defaults to test i.e. _test'
+:
 :	'e.g.'
 :
 :	' ./backup_db mgg'
 :	' ./backup_db mgg BRVS'
 :
-:	'Only restores backup to test database'
+:	'Restores backup to same databasename but ending _test by default'
 :
 	EXO_DATA=${1:?<DBNAME> argument is required.}
 	OPTIONS=${2:-BRVS}
 	NEW_BACKUP_DIR=${3:-~/backups/sql}
-
+	RESTOREDB_SUFFIX=${4:-test}
 :
 : Ensure target directory exists
 : ==============================
@@ -43,7 +45,7 @@ set -eux
 	fi
 
 :
-: Optionally restore into ${EXO_DATA}_test - without restarting it afterwards
+: Optionally restore into ${EXO_DATA}_$RESTOREDB_SUFFIX - without restarting it afterwards
 : =============================================================================
 :
 	if [[ $OPTIONS =~ "R" ]]; then
@@ -55,17 +57,17 @@ set -eux
 : =========================================
 :
 	if [[  $OPTIONS =~ "V" ]]; then
-		if dbcomp $EXO_DATA ${EXO_DATA}_test {S}; then
+		if dbcomp $EXO_DATA ${EXO_DATA}_$RESTOREDB_SUFFIX {S}; then
 			touch "$HOME/hosts/$EXO_DATA/data/$EXO_DATA/params2"
 		fi
 	fi
 
 :
-: Optionally restart the target TEST database ${EXO_DATA}_test
-: ==============================================================
+: Optionally restart the target TEST database ${EXO_DATA}_$RESTOREDB_SUFFIX
+: =========================================================================
 :
 	if [[ $OPTIONS =~ "S" ]]; then
-		./service ${EXO_DATA} start test
+		./service ${EXO_DATA} start $RESTORE_DB_SUFFIX
 	fi
 
 :

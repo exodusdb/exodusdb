@@ -1404,6 +1404,7 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
 		response = var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate;
+		response ^= FM ^ sqlcmd;
 		return false;
 	}
 
@@ -2505,6 +2506,21 @@ var getword(var& remainingwords, var& ucword) {
 
 	var word1 = remainingwords.field(" ", 1);
 	remainingwords = remainingwords.field(" ", 2, 99999);
+
+	//separate out leading or trailing parens () but not both
+	if (word1.length() > 1) {
+		if (word1[1] == "(" && word1[-1] != ")") {
+			//put remaining word back on the pending words
+			remainingwords.splicer(1, 0, word1.substr(2) ^ " ");
+			//return single leading paren (
+			word1 = "(";
+		} else if (word1[-1] == ")") {
+			//put single closing paren back on the pending words
+			remainingwords.splicer(1, 0, ") ");
+			//return word without trailing paren )
+			word1.splicer(-1, 1, "");
+		}
+	}
 
 	// join words within quote marks into one quoted phrase
 	var char1 = word1[1];
