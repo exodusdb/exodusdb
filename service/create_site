@@ -6,9 +6,10 @@ set -eux
 : =======================================
 :
 :	'Syntax is ./create_site <HOSTNAME> <HOST_DIR> <DB_CODE> [<SITE_NAME_PREFIX>]'
-:	'Example   ./create_site test '' '' t-'
+:	'Example   ./create_site exodus'
+:	'Example   ./create_site test "" "" t-'
 :
-	HOST_NAME=$1
+	HOST_NAME=${1:?<HOSTNAME> argument is required.}
 	HOST_DIR=${2:-$1}
 	DB_CODE=${3:-$1}
 	SITE_PREFIX=${4-}
@@ -37,12 +38,14 @@ set -eux
 	[ ${EXODUS:0:6} = /root/ ] && chmod o+x /root
 
 :
-: Install apache and php
-: ======================
+: Install apache and php if not already installed
+: ===============================================
 :
-	sudo apt install -y apache2 php php-xml
-	sudo a2enmod rewrite ssl
-	sudo /etc/init.d/apache2 restart
+	if which apachectl && which php; then true; else
+		sudo apt install -y apache2 php php-xml
+		sudo a2enmod rewrite ssl
+		sudo /etc/init.d/apache2 restart
+	fi
 
 :
 : Enable module to add headers

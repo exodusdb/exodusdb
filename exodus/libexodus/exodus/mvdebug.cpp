@@ -101,7 +101,7 @@ class MyStackWalker : public StackWalker {
 
 namespace exodus {
 
-void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnlines) {
+void addbacktraceline(const var& frameno, const var& sourcefilename, const var& lineno, var& returnlines) {
 
 	//#ifdef TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");
@@ -111,7 +111,7 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 	if (not lineno || not lineno.isnum())
 		return;
 
-	var linetext = sourcefilename.field2(OSSLASH, -1) ^ ":" ^ lineno;
+	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(OSSLASH, -1) ^ ":" ^ lineno;
 
 	// get the source file text
 	var filetext;
@@ -225,7 +225,7 @@ var backtrace() {
 		var sourcefilename = result.field("'", 2);
 		var lineno = result.field("'", 3).trim().field(" ", 2).field(",", 1);
 
-		addbacktraceline(sourcefilename, lineno, returnlines);
+		addbacktraceline(i, sourcefilename, lineno, returnlines);
 	}
 
 	free(strings);
@@ -314,7 +314,7 @@ var backtrace() {
 		if (line) {
 			var sourcefilename = line.field(":", 1);
 			var lineno = line.field(":", 2).field(" ", 1);
-			addbacktraceline(sourcefilename, lineno, returnlines);
+			addbacktraceline(ii, sourcefilename, lineno, returnlines);
 			// returnlines^=FM^sourcefilename.field2(OSSLASH,-1) ^ ":" ^ lineno ^ " " ^
 			// linesource;
 		}

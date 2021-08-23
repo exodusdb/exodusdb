@@ -42,8 +42,14 @@ endif()
 add_executable(compile compile.cpp)
 add_executable(createfile createfile.cpp)
 add_executable(createindex createindex.cpp)
+
+add_executable(dbcreate dbcreate.cpp)
 add_executable(dbgrep dbgrep.cpp)
+add_executable(dblist dblist.cpp)
+add_executable(dbcopy dbcopy.cpp)
 add_executable(dbcomp dbcomp.cpp)
+add_executable(dbdelete dbdelete.cpp)
+
 add_executable(delete delete.cpp)
 add_executable(clearfile clearfile.cpp)
 add_executable(deletefile deletefile.cpp)
@@ -64,7 +70,7 @@ set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 
 # lib #
 
-add_library(dict_myclients SHARED dict_myclients.cpp)
+add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
 #add_library(number SHARED number.cpp)
 
 ### 2. LINK ###
@@ -74,8 +80,14 @@ add_library(dict_myclients SHARED dict_myclients.cpp)
 target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
 target_link_libraries(createfile exodus stdc++fs ${LIBS})
 target_link_libraries(createindex exodus stdc++fs ${LIBS})
+
+target_link_libraries(dbcreate exodus stdc++fs ${LIBS})
+target_link_libraries(dblist exodus stdc++fs ${LIBS})
 target_link_libraries(dbgrep exodus stdc++fs ${LIBS})
+target_link_libraries(dbcopy exodus stdc++fs ${LIBS})
 target_link_libraries(dbcomp exodus stdc++fs ${LIBS})
+target_link_libraries(dbdelete exodus stdc++fs ${LIBS})
+
 target_link_libraries(delete exodus stdc++fs ${LIBS})
 target_link_libraries(clearfile exodus stdc++fs ${LIBS})
 target_link_libraries(deletefile exodus stdc++fs ${LIBS})
@@ -98,8 +110,14 @@ target_link_libraries(configexodus exodus stdc++fs ${LIBS})
 install(TARGETS compile
 createfile
 createindex
+
+dbcreate
+dblist
 dbgrep
+dbcopy
 dbcomp
+dbdelete
+
 delete
 clearfile
 deletefile
@@ -119,9 +137,9 @@ configexodus
 ### 4. INSTALL LIBs ###
 
 ## CMAKE_PREFIX=/usr/local/
-#install(TARGETS dict_myclients DESTINATION lib)
+#install(TARGETS dict_xo_clients DESTINATION lib)
 #push it into /usr/lib where it can be found by dlopen
-#install(TARGETS dict_myclients number DESTINATION /usr/lib)
-install(TARGETS dict_myclients DESTINATION /usr/lib)
+#install(TARGETS dict_xo_clients number DESTINATION /usr/lib)
+install(TARGETS dict_xo_clients DESTINATION /usr/lib)
 
 message("--EXODUS CLI CMAKE EXIT --")

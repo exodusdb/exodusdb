@@ -8,7 +8,7 @@ set -eux
 :	'Syntax is:'
 :	'./delete_site <HOST_NAME> [<SITE_DIR>]'
 :
-	HOST_NAME=$1
+	HOST_NAME=${1:?<HOST_NAME> argument is required.}
 	SITE_DIR=${2:-$1}
 
 	SITE_CODE=$HOST_NAME

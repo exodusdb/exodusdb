@@ -25,7 +25,7 @@ programinit()
 
 	int nerrors = 0;
 
-	var exclude_filenames="dict_all";
+	var exclude_filenames="dict.all";
 	var filenames = COMMAND.field(FM, 4, 9999);
 	if (not filenames) {
 		filenames = db1.listfiles();

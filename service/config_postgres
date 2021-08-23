@@ -8,7 +8,7 @@ set -eux
 : Note: Restarts postgres
 :
 
-	MAX_CONNECTIONS=300
+	MAX_CONNECTIONS=500
 	SHARED_BUFFERS=256MB
 
 : ==============================================================

@@ -199,7 +199,7 @@ nocommon:
 	dictids.converter(" ", FM);
 	var dictrecs = "";
 
-	if (not(DICT.open("dict_" ^ dictfilename))) {
+	if (not(DICT.open("DICT." ^ dictfilename))) {
 		response = "Error: " ^ (("DICT." ^ filename).quote()) ^ " file is not available";
 
 		//abort
@@ -208,7 +208,7 @@ nocommon:
 
 	}
 
-	if (not(openfile("dict_voc", dictvoc))) {
+	if (not(openfile("DICT.voc", dictvoc))) {
 		dictvoc = "";
 	}
 

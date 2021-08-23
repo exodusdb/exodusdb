@@ -9,12 +9,11 @@ set -eux
 :
 : 'Environment variable: $APP_CODE Defaults to "exo". Used for prefix on services'
 :
-	DB_CODE=${1}
-	CMD=${2}
-	LIVE_OR_TEST=${3:-}
-
-:
 	APP_CODE=${APP_CODE:-exo}
+:
+	DB_CODE=${1:?<DB_CODE> argument is required}
+	CMD=${2:?Action [start|stop|etc.] argument is required}
+	LIVE_OR_TEST=${3:-}
 
 :
 : LIVE

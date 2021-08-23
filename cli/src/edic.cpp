@@ -232,7 +232,7 @@ programinit()
 			question ^= "\n" ^ basefilename.quote() ^ " does not exist. Create what? (1-2) ";
 			while (true) {
 
-				if (basefilename.substr(1, 5).lcase() eq "dict_")
+				if (basefilename.substr(1, 5).lcase() eq "dict.")
 					progtype = 5;
 				else
 					progtype.input(question);

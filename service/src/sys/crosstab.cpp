@@ -154,7 +154,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		call fsmsg();
 		stop();
 	}
-	if (not(dictvoc.open("dict_voc", ""))) {
+	if (not(dictvoc.open("DICT.voc", ""))) {
 		call fsmsg();
 		stop();
 	}

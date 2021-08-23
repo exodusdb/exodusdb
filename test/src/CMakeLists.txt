@@ -23,7 +23,9 @@ link_directories(../../exodus/libexodus/exodus)
 #TODO look at breaking test_main main function into many smaller functions
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
-file(GLOB files "test_*.cpp")
+#file(GLOB files "test_*.cpp")
+file(GLOB_RECURSE files CONFIGURE_DEPENDS "test_*.cpp")
+list(SORT files)
 #file(GLOB files "test_mvmv.cpp")
 foreach(file ${files})
 	string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})

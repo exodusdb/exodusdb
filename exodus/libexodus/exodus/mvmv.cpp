@@ -1431,6 +1431,70 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 	return *this;
 }
 
+///////////////
+//STARTS / ENDS
+///////////////
+
+//starting is equivalent to x::index(y) == 1
+//contains is equivalent to x::index(y) != 0
+
+bool var::starts(const var& vstr) const {
+	THISIS("bool var::starts(const var& v) const")
+	THISISSTRING()
+	ISSTRING(vstr)
+	return this->var_str.starts_with(vstr.var_str);
+}
+
+bool var::ends(const var& vstr) const {
+	THISIS("bool var::ends(const var& vstr) const")
+	THISISSTRING()
+	ISSTRING(vstr)
+	return this->var_str.ends_with(vstr.var_str);
+}
+
+bool var::contains(const var& vstr) const {
+	THISIS("bool var::contains(const var& vstr) const")
+	THISISSTRING()
+	ISSTRING(vstr)
+	return this->var_str.find(vstr.var_str) != std::string::npos;
+}
+
+bool var::starts(const char* cstr) const {
+	THISIS("bool var::starts(const char* cstr) const")
+	THISISSTRING()
+	return this->var_str.starts_with(cstr);
+}
+
+bool var::ends(const char* cstr) const {
+	THISIS("bool var::ends(const char* cstr) const")
+	THISISSTRING()
+	return this->var_str.ends_with(cstr);
+}
+
+bool var::contains(const char* cstr) const {
+	THISIS("bool var::contains(const char* cstr) const")
+	THISISSTRING()
+	return this->var_str.find(cstr) != std::string::npos;
+}
+
+bool var::starts(const char c) const {
+	THISIS("bool var::starts(const char c) const noexcept")
+	THISISSTRING()
+	return this->var_str.starts_with(c);
+}
+
+bool var::ends(const char c) const {
+	THISIS("bool var::ends(const char c) const noexcept")
+	THISISSTRING()
+	return this->var_str.ends_with(c);
+}
+
+bool var::contains(const char c) const {
+	THISIS("bool var::contains(const char c) const")
+	THISISSTRING()
+	return this->var_str.find(c) != std::string::npos;
+}
+
 /////////
 // SUBSTR
 /////////

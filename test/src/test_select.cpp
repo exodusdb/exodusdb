@@ -19,7 +19,7 @@ function main() {
 
 	//ensure dict_voc has f1m
 	var dictvoc;
-	if (not(dictvoc.open("dict_voc", ""))) {
+	if (not(dictvoc.open("dict.voc", ""))) {
 		call fsmsg();
 		stop();
 	}
@@ -44,8 +44,8 @@ function main() {
 		} //ii;
 	}
 
-	testfilename="test_select";
-	dictfilename="dict_" ^ testfilename;
+	testfilename="xo_test_select";
+	dictfilename="dict." ^ testfilename;
 
 	deletefile(testfilename);
 	deletefile(dictfilename);
@@ -74,7 +74,8 @@ function main() {
 function test() {
 
 	assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
-	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 1=") == "B");
+	assert(readnext(RECORD,ID,MV));
+	assert(ID.outputl("E] FF 1=") == "B");
 	assert(readnext(RECORD,ID,MV) && ID.outputl("E] FF 2=") == "C");
 	assert(!readnext(RECORD,ID,MV));
 

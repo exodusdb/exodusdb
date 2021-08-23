@@ -48,7 +48,7 @@ function main() {
 		call mssg(filename.quote() ^ " FILE IS MISSING");
 		stop();
 	}
-	if (not(DICT.open("dict_" ^ filename))) {
+	if (not(DICT.open("DICT." ^ filename))) {
 		DICT = "";
 	}
 	var interactive = not(SYSTEM.a(33));

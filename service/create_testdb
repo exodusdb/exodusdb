@@ -5,16 +5,16 @@ set -eux
 : Create test database
 : ========================
 :
-:	'Syntax is ./create_testdb LIVE_EXO_DBNAME'
+:	'Syntax is ./create_testdb <LIVE_EXO_DATA>'
 :
-	LIVE_EXO_DBNAME=$1
-	TEST_EXO_DBNAME=$1_test
+	LIVE_EXO_DATA=${1:?<LIVE_EXO_DATA> argument is required.}
+	TEST_EXO_DATA=$1_test
 
 :
 : Check Syntax
 : ============
 :
-	if [ -z "LIVE_EXO_DBNAME"  ]; then
+	if [ -z "LIVE_EXO_DATA"  ]; then
 		set +x
 		echo 'Syntax is wrong. Cannot continue.'
 		exit 1
@@ -24,7 +24,7 @@ set -eux
 : Do the copy
 : ===========
 :
-	./copy_db $LIVE_EXO_DBNAME $TEST_EXO_DBNAME DELETE
+	./copy_db $LIVE_EXO_DATA $TEST_EXO_DATA DELETE
 
 :
 : Finished create_testdb $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.

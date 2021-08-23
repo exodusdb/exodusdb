@@ -5,13 +5,13 @@ set -eux
 : Stop a background service and run it in the foreground for debugging
 : ====================================================================
 :
-: 'Syntax:	./run xxxxxxxx [<OPTIONS>]'
+: 'Syntax:	./run <DBNAME> [<OPTIONS>]'
 :
 : 'Example:	./run centauro'
 : '			./run centauro_test'
 :
 
-	DB_CODE=$1
+	DB_CODE=${1:?<DBNAME> argument is required.}
 	OPTIONS=${2:-}
 
 :
@@ -96,10 +96,18 @@ set -eux
 	sudo systemctl stop $FULL_SERVICE_CODE
 
 :
-: Select the database to use and request debugging
-: ================================================
+: Indicate the database to use and request debugging
+: ==================================================
 :
-	export EXO_DBNAME=$DB_CODE
+	export EXO_DATA=$DB_CODE
+
+:
+: Indicate the database to use for dictionaries
+: =============================================
+:
+: Always the test dictionaries even while running a live database
+:
+	export EXO_DICT=exodus
 
 :
 : Install gdb if necessary

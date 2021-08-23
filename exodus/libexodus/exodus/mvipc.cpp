@@ -176,7 +176,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 		std::string str_libname(prequest + sizeof(int), **plength);
 		// TODO deduplicate code to construct library name duplicated in ::calculate and
 		// mvipc
-		str_libname.insert(0, "dict_");
+		str_libname.insert(0, "dict.");
 		prequest += *prequest + sizeof(int);
 
 		// dict key

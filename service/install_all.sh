@@ -1,9 +1,24 @@
 #!/bin/bash
 set -eux
 
-: =============================
-: Installing exodus web service
-: =============================
+: ===========================
+: Installs EXODUS web service
+: ===========================
+:
+: 'Syntax is ./install_all.sh <SITE_NAME>|exodus|none <DOMAIN_PREFIX>'
+:
+: 'eg.       ./install_all.sh'
+: 'eg.       ./install_all.sh exodus t-'
+:
+: '<SITE_NAME> defaults to "exodus"'
+: '<DOMAIN_PREFIX> defaults to ""'
+:
+	SITE_NAME=${1:-exodus}
+	DOMAIN_PREFIX=${2:-}
+
+:
+: Config
+: ======
 :
 	EXODUS=~/exodus
 
@@ -19,8 +34,10 @@ set -eux
 : Install apache with php and configure a site
 : ============================================
 :
-	cd $EXODUS/service
-	./create_site exodus
+	if [ $SITE_NAME != none ]; then
+		cd $EXODUS/service
+		./create_site $SITE_NAME '' '' $DOMAIN_PREFIX
+	fi
 
 :
 : Disable default web sites
@@ -43,25 +60,44 @@ set -eux
 	./copyall CONFIRM
 
 :
-: Setup essential service database dictionaries
-: =============================================
+: Create exodus_live db for live dictionaries if not already present
+: ==================================================================
+:
+	dblist|grep exodus_live > /dev/null || dbcreate exodus_live
+
+:
+: Import database dictionaries into exodus and exodus_live
+: ========================================================
 :
 	cd /tmp
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_users.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_processes.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_locks.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_requestlog.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_statistics.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
-	sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_users.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_processes.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_locks.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_requestlog.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_statistics.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
+	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
+	cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
+	cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus_live
 
 :
 : Configure the exodus service
 : ============================
 :
-	cd $EXODUS/service
-	./create_service exo exodus '' live
+	if [ $SITE_NAME != none ]; then
+		cd $EXODUS/service
+		./create_service exo $SITE_NAME '' live
+	fi
+
+:
+: Start the service
+: =================
+:
+	if [ $SITE_NAME != none ]; then
+		cd $EXODUS/service
+		./service $SITE_NAME start live
+	fi
 
 :
 : Install required packages
@@ -90,6 +126,13 @@ set -eux
 :
 	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
 
+
+:
+: Determine local ip number for info
+: ==================================
+:
+	IPNO=`ip -4 address|grep -v 127.0.0.1|grep -P '\d+\.\d+\.\d+\.\d+' -o|head -n1`
+
 :
 : Copy logo and ico into images and web root
 : ==========================================
@@ -101,4 +144,4 @@ set -eux
 : Finished install_all in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : ==============================================================
 :
-:	Apache+exodus should now be listening on port 80 and 443
+:	Apache should now be listening on ipno $IPNO port 443

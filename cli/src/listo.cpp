@@ -292,9 +292,9 @@ programinit()
 	}
 
 	//automatically create dict_voc if it is not present so you can list dictionaries
-	if (not open("dict_voc", dict_voc)) {
-		createfile("dict_voc");
-		if (open("dict_voc", dict_voc)) {
+	if (not open("dict.voc", dict_voc)) {
+		createfile("dict.voc");
+		if (open("dict.voc", dict_voc)) {
 
 			//prepare some dictionary records
 			var dictrecs = "";
@@ -345,7 +345,7 @@ programinit()
 	if (sentencex.index(" det-supp2", 1))
 		detsupp = 2;
 
-	if (not open("dict_voc", dict_voc))
+	if (not open("dict.voc", dict_voc))
 		//stop("Cannot open dict_voc");
 		dict_voc = "";
 
@@ -384,19 +384,19 @@ phraseinit:
 		//get the filename (or dict filename as dict_filename)
 		if (word eq "dict") {
 			gosub getword();
-			word = "dict_" ^ word;
+			word = "dict." ^ word;
 		}
 		filename = word;
 		if (not srcfile.open(filename))
 			abort(filename ^ " file does not exist");
 
-		if (filename.substr(1, 5).lcase() eq "dict_")
+		if (filename.substr(1, 5).lcase() eq "dict.")
 			dictfilename = "md";
 		else
 			dictfilename = filename;
 
-		if (not DICT.open("dict_" ^ dictfilename)) {
-			dictfilename = "dict_voc";
+		if (not DICT.open("dict." ^ dictfilename)) {
+			dictfilename = "dict.voc";
 			DICT = dict_voc;
 		}
 
@@ -526,7 +526,7 @@ phraseinit:
 	} else if (word eq "using") {
 		gosub getword();
 		dictfilename = word;
-		if (not DICT.open("dict_" ^ dictfilename)) {
+		if (not DICT.open("dict." ^ dictfilename)) {
 			fsmsg();
 			abort("");
 		}
@@ -706,9 +706,9 @@ dictrecexit:
 x1exit:
 	///////
 	//if no columns selected then try to use default @crt or @lptr group item
-	//if (not (coln or crtx) and (DICT ne dict_voc or datafile eq "md" or datafile eq "dict_voc")) {
+	//if (not (coln or crtx) and (DICT ne dict_voc or datafile eq "md" or datafile eq "dict.voc")) {
 	if (not(coln or crtx) and DICT) {
-		// and ((DICT.ucase() ne dict_voc.ucase()) or (filename.ucase() eq "MD") or (filename.ucase() eq "dict_voc"))) {
+		// and ((DICT.ucase() ne dict_voc.ucase()) or (filename.ucase() eq "MD") or (filename.ucase() eq "dict.voc"))) {
 
 		var words = printing ? "@LPTR,@CRT" : "@CRT,@LPTR";
 		for (int ii = 1; ii <= 2; ++ii) {

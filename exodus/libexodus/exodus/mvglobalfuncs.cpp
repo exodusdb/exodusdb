@@ -712,9 +712,7 @@ DLL_PUBLIC var iconv(const var& instring, const var& conversion)
 
 DLL_PUBLIC bool connect(const var& connectioninfo) {
 	var conn1;
-	if (not conn1.connect(connectioninfo))
-		return false;
-	return conn1.setdefaultconnectionid();
+	return conn1.connect(connectioninfo);
 }
 
 DLL_PUBLIC void disconnect() {
@@ -725,16 +723,24 @@ DLL_PUBLIC void disconnectall() {
 	var().disconnectall();
 }
 
-DLL_PUBLIC bool createdb(const var& dbname) {
-	return dbname.createdb(dbname);
+DLL_PUBLIC var lasterror() {
+	return var().lasterror();
 }
 
-DLL_PUBLIC bool copydb(const var& from_dbname, const var& to_dbname) {
-	return from_dbname.copydb(from_dbname, to_dbname);
+DLL_PUBLIC bool dbcreate(const var& dbname) {
+	return dbname.dbcreate(dbname);
 }
 
-DLL_PUBLIC bool deletedb(const var& dbname) {
-	return dbname.deletedb(dbname);
+DLL_PUBLIC var dblist() {
+	return var().dblist();
+}
+
+DLL_PUBLIC bool dbcopy(const var& from_dbname, const var& to_dbname) {
+	return var().dbcopy(from_dbname, to_dbname);
+}
+
+DLL_PUBLIC bool dbdelete(const var& dbname) {
+	return var().dbdelete(dbname);
 }
 
 DLL_PUBLIC bool createfile(const var& filename) {
@@ -746,12 +752,12 @@ DLL_PUBLIC bool createfile(const var& filename) {
 	//remove pickos volume locations
 	filename2.swapper("DATA ", "").swapper("REVBOOT ", "").swapper("DATAVOL ", "").trimmer();
 
-	return filename.createfile(filename2);
+	return filename2.createfile(filename2);
 }
 
 DLL_PUBLIC bool deletefile(const var& filename_or_handle) {
 	//remove options like (S)
-	var filename2 = filename_or_handle.field("(", 1).trim();
+	var filename2 = filename_or_handle.field(" ", 1).trim();
 
 	//exodus doesnt automatically create dict files
 	filename2.swapper("DATA ", "").trimmer();

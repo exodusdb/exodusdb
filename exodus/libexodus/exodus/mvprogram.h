@@ -54,7 +54,7 @@ class ExodusProgramBase {
 	MvEnvironment& mv;
 
 	// work on CURSOR
-	bool select(const var& sortselectclause DEFAULTNULL);
+	bool select(const var& sortselectclause_or_filehandle DEFAULT_EMPTY_STRING);
 	bool hasnext();
 	bool readnext(var& key);
 	bool readnext(var& key, var& valueno);
@@ -62,7 +62,7 @@ class ExodusProgramBase {
 	bool pushselect(const var& v1, var& v2, var& v3, var& v4);
 	bool popselect(const var& v1, var& v2, var& v3, var& v4);
 	void clearselect();
-	bool deleterecord(const var& filename_or_handle_or_command, const var& key DEFAULTNULL);
+	bool deleterecord(const var& filename_or_handle_or_command, const var& key DEFAULT_EMPTY_STRING);
 
 	bool savelist(const var& listname);
 	bool getlist(const var& listname);

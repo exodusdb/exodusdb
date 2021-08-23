@@ -7,7 +7,7 @@ function main() {
 	var nfiles=filenames.count(FM);
 	for (var filen=1;filen<=nfiles;filen++) {
 		var filename=filenames.a(filen);
-		if (filename.substr(1,5) ne "dict_")
+		if (filename.substr(1,5) ne "DICT.")
 			continue;
 		//var filesql =" select '" ^ filename ^ "' as filename,convert_from(key, 'UTF-8') as key, translate(convert_from(data, 'UTF-8'),'" ^ RM ^ FM ^ VM ^ SM ^ TM ^ STM ^ L"','\u02FF\u02FE\u02FD\u02FC\u02FB\u02FA') as data from " ^ filename ^ "\n";
 		//var filesql =" select '" ^ filename ^ "' as filename, key, data from " ^ filename ^ "\n";

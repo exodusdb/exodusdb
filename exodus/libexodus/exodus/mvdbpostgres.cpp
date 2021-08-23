@@ -118,25 +118,28 @@ bool getdbtrace() {
 // this is also called in the destructor of MVConnectionsCache
 // MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
 // TODO so make sure that we dont use exit(n) anywhere in the programs!
-static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
-	PGconn* pgp = (PGconn*)con_;
+static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
+	//PGconn* pgp = (PGconn*)pgconn;
+	auto pgconn2 = pgconn;
     // at this point we have good new connection to database
     if (GETDBTRACE) {
-        var("PQFinish").logputl();
+        var("").logput("DBTR PQFinish");
+		std::clog << pgconn << std::endl;
 	}
 	//var("========================== deleting connection ==============================").errputl();
-	PQfinish(pgp);	// AFAIK, it destroys the object by pointer
+	PQfinish(pgconn2);	// AFAIK, it destroys the object by pointer
 					//	delete pgp;
 }
 
 //#if TRACING >= 5
-#define DEBUG_LOG_SQL         \
-	if (GETDBTRACE) {         \
-		sql.logputl("SQL0:"); \
+#define DEBUG_LOG_SQL                  \
+	if (GETDBTRACE) {                  \
+		sql.squote().logputl("SQL0 "); \
 	}
-#define DEBUG_LOG_SQL1                                                 \
-	if (GETDBTRACE) {                                                  \
-		sql.swap("$1", var(paramValues[0]).squote()).logputl("SQL1:"); \
+
+#define DEBUG_LOG_SQL1                                                                                             \
+	if (GETDBTRACE) {                                                                                              \
+		((this->assigned() ? *this : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).squote())).logputl("SQL1 "); \
 	}
 //#else
 //#define DEBUG_LOG_SQL
@@ -159,8 +162,9 @@ static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
 // explain select * from testview where field1  > 'aaaaaaaaa';
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
-thread_local int thread_default_connid = 0;
-thread_local var thread_connparams = "";
+thread_local int thread_default_data_mvconn_no = 0;
+thread_local int thread_default_dict_mvconn_no = 0;
+//thread_local var thread_connparams = "";
 thread_local var thread_dblasterror = "";
 thread_local MVConnections thread_connections(connection_DELETER_AND_DESTROYER);
 thread_local std::unordered_map<std::string, std::string> thread_file_handles;
@@ -169,28 +173,43 @@ std::string getresult(PGresult* pgresult, int rown, int coln) {
 	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
 }
 
-std::string normalise_filename(const var& filename) {
-	return filename.a(1).normalize().lcase().convert(".", "_").toString();
+//given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
+var get_normal_filename(const var& filename_or_handle) {
+	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
 }
 
 // used to detect sselect command words that are values like quoted words or plain numbers. eg "xxx"
 // 'xxx' 123 .123 +123 -123
 static const var valuechars("\"'.0123456789-+");
 
-class Scoped_PGresult {
+uint64_t mvdbpostgres_hash_filename_and_key(const var& filehandle, const var& key) {
+
+	std::string fileandkey = get_normal_filename(filehandle);
+	fileandkey.append(" ");
+	fileandkey.append(key.normalize());
+
+	// TODO .. provide endian identical version
+	// required if and when exodus processes connect to postgres on a DIFFERENT host
+	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
+	// SAME host
+	return MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
+
+}
+
+class PGResult {
 
 	// Save pgresultptr in this class and to guarantee that it will be PQClear'ed on function
-	// exit Scoped_PGresult clearer(pgresult);
+	// exit PGResult clearer(pgresult);
 
 	// owns the PGresult object on the stack
 	PGresult* pgresult_ = nullptr;
 
    public:
 	//default constructor
-	Scoped_PGresult() = default;
+	PGResult() = default;
 
 	// constructor from a PGresult*
-	Scoped_PGresult(PGresult* pgresult)
+	PGResult(PGresult* pgresult)
 		: pgresult_(pgresult) {
 		// var("Got pgresult ... ").output();
 	}
@@ -207,16 +226,208 @@ class Scoped_PGresult {
 	};
 
 	// destructor calls PQClear
-	~Scoped_PGresult() {
-		// var("Cleared pgresult").outputl();
+	~PGResult() {
+		// var("Cleared pgresult").logputl();
 		if (pgresult_ != nullptr)
 			PQclear(pgresult_);
 	}
 };
 
-void var::setlasterror(const var& msg) const {
+int get_mvconn_no(const var& dbhandle) {
+
+	if (!dbhandle.assigned()) {
+		// var("get_mvconn_no() returning 0 - unassigned").logputl();
+		return 0;
+	}
+	var mvconn_no = dbhandle.a(2);
+	if (mvconn_no.isnum()) {
+		/// var("get_mvconn_no() returning " ^ mvconn_no).logputl();
+		return mvconn_no;
+	}
+
+	// var("get_mvconn_no() returning 0 - not numeric").logputl();
+
+	return 0;
+}
+
+int get_mvconn_no_or_default(const var& dbhandle) {
+
+	int mvconn_no = get_mvconn_no(dbhandle);
+	if (mvconn_no)
+		return mvconn_no;
+
+	// otherwise get the default connection
+	if (!mvconn_no) {
+
+		bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
+		//bool isdict = false;
+
+		if (isdict)
+			mvconn_no = thread_default_dict_mvconn_no;
+		else
+			mvconn_no = thread_default_data_mvconn_no;
+
+		// var(mvconn_no).logputl("mvconn_no2=");
+
+		// otherwise try the default connection
+		if (!mvconn_no) {
+
+			var defaultdb;
+
+			//look for dicts in the following order
+			//1. $EXO_DICT if defines
+			//2. db "dict" if present
+			//3. the default db connection
+			if (isdict) {
+				defaultdb.osgetenv("EXO_DICT");
+				if (!defaultdb)
+					defaultdb="exodus_dict";
+			} else {
+				defaultdb = "";
+			}
+			//TRACE(defaultdb)
+
+			//try to connect
+			if (defaultdb.connect())
+				mvconn_no = get_mvconn_no(defaultdb);
+
+			//if cannot connect then for dictionaries look on default connection
+			else if (isdict) {
+
+				//attempt a default connection if not already done
+				if (!thread_default_data_mvconn_no) {
+					defaultdb = "";
+					defaultdb.connect();
+				}
+
+				mvconn_no = thread_default_data_mvconn_no;
+			}
+
+			//save default dict/data connections
+			if (isdict) {
+				thread_default_dict_mvconn_no = mvconn_no;
+				if (GETDBTRACE) {
+					var(mvconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
+				}
+			}
+			else {
+				thread_default_data_mvconn_no = mvconn_no;
+				if (GETDBTRACE) {
+					var(mvconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
+				}
+			}
+		}
+
+		//save the connection number in the dbhandle
+		//if (mvconn_no) {
+		//	dbhandle.unassigned("");
+		//	dbhandle.r(2, mvconn_no);
+		//}
+
+	}
+
+	return mvconn_no;
+}
+
+/*
+int get_mvconn_no_or_default(const var& dbhandle) {
+
+	// first return connection id if this is a connection handle
+	//	if (THIS_IS_DBCONN())
+	//		return (int) var_int;
+
+	int mvconn_no2 = get_mvconn_no(dbhandle);
+	if (mvconn_no2)
+		return mvconn_no2;
+
+	// otherwise return thread default connection id
+	int mvconn_no = thread_default_data_mvconn_no;
+	mvconn_no2 = 0;
+	if (mvconn_no) {
+		mvconn_no2 = mvconn_no;
+		//(var("get_mvconn_no_or_default found default thread connection id ") ^
+		// mvconn_no2).logputl();
+	}
+
+	// otherwise do a default connect and do setdefaultconnection
+	else {
+		//std::cerr << "get_mvconn_no_or_default didnt find default thread connection" << std::endl;
+		// id");
+		var conn1;
+		if (conn1.connect()) {
+
+			//conn1.setdefaultconnectionid();
+		    // connection number should be in field 2
+		    mvconn_no2 = get_mvconn_no(conn1);
+
+		    // save current connection handle number as thread specific handle no
+		    thread_default_data_mvconn_no = mvconn_no;
+			if (GETDBTRACE) {
+				var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
+			}
+		}
+	}
+
+	// turn this into a db connection (int holds the connection number)
+	// leave any string in place but prevent it being used as a number
+	// var_int = mvconn_no2;
+	////var_str = ""; does it ever need initialising?
+	// var_typ = VARTYP_NANSTR_DBCONN;
+
+	// save the connection id
+	// this->r(2,mvconn_no2);
+
+	return mvconn_no2;
+}
+*/
+
+// var::connection()
+// 1. return the associated db connection
+// this could be a previously opened filevar, a previous connected connectionvar
+// or any variable previously used for a default connection
+// OR
+// 2. return the thread-default connection
+// OR
+// 3. do a default connect if necessary
+//
+// NB in case 2 and 3 the connection id is recorded in the var
+// use void pointer to avoid need for including postgres headers in mv.h or any fancy class
+// hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
+PGconn* get_pgconnection(const var& dbhandle) {
+
+	// var("--- connection ---").logputl();
+	// get the connection associated with *this
+	int mvconn_no = get_mvconn_no_or_default(dbhandle);
+	// var(mvconn_no).logputl("mvconn_no1=");
+
+	// otherwise error
+	if (!mvconn_no)
+		throw MVDBException("pgconnection() requested when not connected");
+
+	if (GETDBTRACE) {
+		std::cout << std::endl;
+		PGconn* pgconn=thread_connections.get_pgconnection(mvconn_no);
+		std::clog << "CONN " << mvconn_no << " " << pgconn << std::endl;
+	}
+
+	// return the relevent pg_connection structure
+	auto pgconn = thread_connections.get_pgconnection(mvconn_no);
+	//TODO error abort if zero
+	return pgconn;
+
+}
+
+// gets lock_table, associated with connection, associated with this object
+MVConnection* get_mvconnection(const var& dbhandle) {
+	int mvconn_no = get_mvconn_no_or_default(dbhandle);
+	if (!mvconn_no)
+		throw MVDBException("get_mvconnection() attempted when not connected");
+	return thread_connections.get_mvconnection(mvconn_no);
+}
+
+void var::lasterror(const var& msg) const {
 	// no checking for speed
-	// THISIS("void var::setlasterror(const var& msg")
+	// THISIS("void var::lasterror(const var& msg")
 	// ISSTRING(msg)
 
 	// tcache_get (tc_idx=12) at malloc.c:2943
@@ -228,15 +439,11 @@ void var::setlasterror(const var& msg) const {
 	thread_dblasterror = msg;
 }
 
-void var::setlasterror() const {
-	thread_dblasterror = "";
-}
-
 var var::lasterror() const {
 	return thread_dblasterror ?: "";
 }
 
-static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* thread_pgconn);
+static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn);
 
 #if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
@@ -289,16 +496,16 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 
 var var::build_conn_info(const var& conninfo) const {
 	// priority is
-	// 1) given parameters or last connection parameters
+	// 1) given parameters //or last connection parameters
 	// 2) individual environment parameters
 	// 3) environment connection string
 	// 4) config file parameters
-	// 5) default parameters
+	// 5) hard coded default parameters
 
 	var result(conninfo);
 	// if no conninfo details provided then use last connection details if any
-	if (!conninfo)
-		result = thread_connparams;
+	//if (!conninfo)
+	//	result = thread_connparams;
 
 	// otherwise search for details from exodus config file
 	// if incomplete connection parameters provided
@@ -320,7 +527,7 @@ var var::build_conn_info(const var& conninfo) const {
 		// discover any configuration in the environment
 		var envconn = "";
 		var temp;
-		if (temp.osgetenv("EXO_CONNECTION") && temp)
+		if (temp.osgetenv("EXO_CONN") && temp)
 			envconn ^= " " ^ temp;
 
 		// specific variable are appended ie override
@@ -333,13 +540,15 @@ var var::build_conn_info(const var& conninfo) const {
 		if (temp.osgetenv("EXO_USER") && temp)
 			envconn ^= " user=" ^ temp;
 
-		if (temp.osgetenv("EXO_DBNAME") && temp)
+		if (temp.osgetenv("EXO_DATA") && temp) {
+			envconn.replacer(R"(dbname\s*=\s*\w*)", "");
 			envconn ^= " dbname=" ^ temp;
+		}
 
-		if (temp.osgetenv("EXO_PASSWORD") && temp)
+		if (temp.osgetenv("EXO_PASS") && temp)
 			envconn ^= " password=" ^ temp;
 
-		if (temp.osgetenv("EXO_TIMEOUT") && temp)
+		if (temp.osgetenv("EXO_TIME") && temp)
 			envconn ^= " connect_timeout=" ^ temp;
 
 		result = defaultconninfo ^ " " ^ configconn ^ " " ^ envconn ^ " " ^ result;
@@ -359,9 +568,11 @@ bool var::connect(const var& conninfo) {
 	var fullconninfo = conninfo.trimf().trimb();
 
 	//use *this if conninfo not specified;
+	bool isdefault = false;
 	if (!fullconninfo) {
 		if (this->assigned())
 			fullconninfo = *this;
+		isdefault = !fullconninfo;
 	}
 
 	//add dbname= if missing
@@ -370,8 +581,10 @@ bool var::connect(const var& conninfo) {
 
 	fullconninfo = build_conn_info(fullconninfo);
 
-	if (GETDBTRACE)
-		fullconninfo.logputl("DBTRACE:");
+	if (GETDBTRACE) {
+		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
+		conninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
+	}
 
 	PGconn* pgconn;
 	for (;;) {
@@ -384,7 +597,7 @@ bool var::connect(const var& conninfo) {
 			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
 				". Verify configuration PATH contains postgres's \\bin.";
 			//errmsg.errputl();
-			this->setlasterror(errmsg);
+			this->lasterror(errmsg);
 #endif
 			return false;
 		};
@@ -410,15 +623,14 @@ bool var::connect(const var& conninfo) {
 
 		//#if TRACING >= 3
 		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
-		errmsg ^= " ERROR: mvdbpostgres connect() Postgres connection configuration "
-			"missing or incorrect. Please login.";
-
+		//errmsg ^= " ERROR: mvdbpostgres connect() Postgres connection configuration "
+		//	"missing or incorrect. Please login.";
 		//TODO remove password=somesillysecret
-		errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").errputl("connection string=");
+		//errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********");
 
 		//#endif
 		//errmsg.errputl();
-		this->setlasterror(errmsg);
+		this->lasterror(errmsg);
 
 		// required even if connect fails according to docs
 		PQfinish(pgconn);
@@ -434,28 +646,37 @@ bool var::connect(const var& conninfo) {
 #endif
 
 	// at this point we have good new connection to database
-	if (GETDBTRACE)
-		var("var::connect() Connection to database succeeded.").logputl();
 
 	// cache the new connection handle
-	int connid = thread_connections.add_connection(pgconn);
+	int mvconn_no = thread_connections.add_connection(pgconn);
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
 	if (not this->a(1))
-		this->r(1,fullconninfo.field(" ",1));
-	this->r(2, connid);
-	this->r(3, connid);
+		//this->r(1,fullconninfo.field(" ",1));
+		this->r(1,fullconninfo.field("dbname=",2).field(" ",1));
+	this->r(2, mvconn_no);
+	this->r(3, mvconn_no);
+
+	if (GETDBTRACE) {
+		fullconninfo.logputl("DBTR var::connect() OK ");
+		this->logput("DBTR var::connect() OK ");
+		std::clog << " " << pgconn << std::endl;
+	}
 
 	// this->outputl("new connection=");
 
-	// set default connection
-	// ONLY IF THERE ISNT ONE ALREADY
-	if (!thread_default_connid)
-		thread_default_connid = connid;
+	// set default connection - ONLY IF THERE ISNT ONE ALREADY
+	if (isdefault && !thread_default_data_mvconn_no) {
+		thread_default_data_mvconn_no = mvconn_no;
+		if (GETDBTRACE) {
+			this->logputl("DBTR NEW DEFAULT DATA CONN " ^ var(mvconn_no) ^ " on ");
+		}
+
+	}
 
 	// save last connection string (used in startipc())
-	thread_connparams = fullconninfo;
+	//thread_connparams = fullconninfo;
 
 	// doesnt work
 	// need to set PQnoticeReceiver to suppress NOTICES like when creating files
@@ -481,7 +702,7 @@ bool var::attach(const var& filenames) {
 		filenames2 = "";
 		var allfilenames = this->listfiles();
 		for (var filename : allfilenames) {
-			if (filename.substr(1, 5) == "dict_") {
+			if (filename.substr(1, 5) == "dict.") {
 				filenames2 ^= filename ^ FM;
 			}
 		}
@@ -493,11 +714,13 @@ bool var::attach(const var& filenames) {
 
 	var notattached_filenames = "";
 	for (var filename : filenames2) {
-		//thread_file_handles[filename] = (filename ^ FM ^ connid).toString();
-		var filename2 = normalise_filename(filename);
+		//thread_file_handles[filename] = (filename ^ FM ^ mvconn_no).toString();
+		var filename2 = get_normal_filename(filename);
 		var file;
 		if (file.open(filename2,*this)) {
 			thread_file_handles[filename2] = file.var_str;
+			if (GETDBTRACE)
+				file.logputl("DBTR var::attach() ");
 		}
 		else {
 			notattached_filenames ^= filename2 ^ " ";
@@ -507,7 +730,7 @@ bool var::attach(const var& filenames) {
 	//fail if anything not attached
 	if (notattached_filenames) {
 		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames.trimb().swap(FM,", ") ^" cannot be attached on connection " ^ (*this).a(1).quote();
-		this->setlasterror(errmsg);
+		this->lasterror(errmsg);
 		return false;
 	}
 
@@ -521,153 +744,10 @@ void var::detach(const var& filenames) {
 	ISSTRING(filenames)
 
 	for (var filename : filenames) {
-		std::string filename2 = normalise_filename(filename);
-		thread_file_handles.erase(filename2);
+		//std::string filename2 = get_normal_filename(filename);
+		thread_file_handles.erase(get_normal_filename(filename));
 	}
 	return;
-}
-
-int var::getdefaultconnectionid() const {
-	// otherwise return thread default connection id
-	int connid = thread_default_connid;
-	if (connid) {
-		return connid;
-	} else {
-		// var("getdefaultconnection returning 0").outputl();
-		return 0;
-	}
-}
-
-bool var::setdefaultconnectionid() const {
-	THISIS("bool var::setdefaultconnectionid()")
-	THISISDEFINED()
-
-	// this should be a db connection
-	// if (!THIS_IS_DBCONN())
-	//	MVDBException("is not a valid connection in setdefaultconnectionid()");
-
-	// connection number should be in field 2
-	int connid = this->getconnectionid();
-	if (!connid)
-		MVDBException("setdefaultconnectionid() when not connected");
-
-	if (!thread_connections.get_connection(connid))
-		MVDBException("is not a valid connection in setdefaultconnectionid()");
-
-	// save current connection handle number as thread specific handle no
-	thread_default_connid = connid;
-
-	return true;
-}
-
-int var::getconnectionid() const {
-	THISIS("bool var::getconnectionid()")
-	THISISDEFINED();
-
-	if (!this->assigned()) {
-		// var("getconnectionid() returning 0 - unassigned").outputl();
-		return 0;
-	}
-	var connid = this->a(2);
-	if (connid.isnum()) {
-		/// var("getconnectionid() returning " ^ connid).outputl();
-		return connid;
-	}
-
-	// var("getconnectionid() returning 0 - not numeric").outputl();
-
-	return 0;
-}
-
-int var::getconnectionid_ordefault() const {
-	// first return connection id if this is a connection handle
-	//	if (THIS_IS_DBCONN())
-	//		return (int) var_int;
-
-	int connid2 = this->getconnectionid();
-	if (connid2)
-		return connid2;
-
-	// otherwise return thread default connection id
-	int connid = thread_default_connid;
-	connid2 = 0;
-	if (connid) {
-		connid2 = connid;
-		//(var("getconnectionid_ordefault found default thread connection id ") ^
-		// connid2).outputl();
-	}
-
-	// otherwise do a default connect and do setdefaultconnection
-	else {
-		//std::cerr << "getconnectionid_ordefault didnt find default thread connection" << std::endl;
-		// id");
-		var conn1;
-		if (conn1.connect()) {
-			conn1.setdefaultconnectionid();
-			// connid2=(int) conn1.var_int;
-			connid2 = conn1.getconnectionid();
-		}
-	}
-
-	// turn this into a db connection (int holds the connection number)
-	// leave any string in place but prevent it being used as a number
-	// var_int = connid2;
-	////var_str = ""; does it ever need initialising?
-	// var_typ = VARTYP_NANSTR_DBCONN;
-
-	// save the connection id
-	// this->r(2,connid2);
-
-	return connid2;
-}
-
-// var::connection()
-// 1. return the associated db connection
-// this could be a previously opened filevar, a previous connected connectionvar
-// or any variable previously used for a default connection
-// OR
-// 2. return the thread-default connection
-// OR
-// 3. do a default connect if necessary
-//
-// NB in case 2 and 3 the connection id is recorded in the var
-// use void pointer to avoid need for including postgres headers in mv.h or any fancy class
-// hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-void* var::connection() const {
-
-	// var("--- connection ---").outputl();
-	// get the connection associated with *this
-	int connid = this->getconnectionid();
-	// var(connid).outputl("connid1=");
-
-	// otherwise get the default connection
-	if (!connid)
-		connid = this->getdefaultconnectionid();
-
-	// var(connid).outputl("connid2=");
-
-	// otherwise try the default connection
-	if (!connid) {
-		var temp = "";
-		if (temp.connect())
-			connid = temp.getconnectionid();
-	}
-	// var(connid).outputl("connid3=");
-
-	// otherwise error
-	if (!connid)
-		throw MVDBException("connection() attempted when not connected");
-
-	// return a pg_connection structure
-	return thread_connections.get_connection(connid);
-}
-
-// gets lock_table, associated with connection, associated with this object
-void* var::get_mvconnection() const {
-	int connid = this->getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("get_mvconnection() attempted when not connected");
-	return thread_connections.get_mvconnection(connid);
 }
 
 // if this->obj contains connection_id, then such connection is disconnected with this-> becomes UNA
@@ -677,25 +757,36 @@ void var::disconnect() {
 	THISISDEFINED()
 
 	if (GETDBTRACE)
-		var("DBTRACE mvdbpostgres disconnect() Closing connection").logputl();
+		(this->assigned() ? *this : var("")).logputl("DBTR var::disconnect() ");
 
-	int default_connid = thread_default_connid;
+	var mvconn_no = get_mvconn_no(*this);
+	if (!mvconn_no)
+		mvconn_no = thread_default_data_mvconn_no;
 
-	//  if (THIS_IS_DBCONN())
-	//  {
-	var connid = this->getconnectionid();
-	if (connid) {
-		thread_connections.del_connection((int)connid);
+	if (mvconn_no) {
+
+		//disconnect
+		thread_connections.del_connection((int)mvconn_no);
 		var_typ = VARTYP_UNA;
-	// if we happen to be disconnecting the same connection as the default connection
-	// then reset the default connection so that it will be reconnected to the next
-	// connect this is rather too smart but will probably do what people expect
-	if (default_connid && default_connid == connid)
-		thread_default_connid = 0;
-	} else {
-		if (default_connid) {
-			thread_connections.del_connection(default_connid);
-			thread_default_connid = 0;
+
+		// if we happen to be disconnecting the same connection as the default connection
+		// then reset the default connection so that it will be reconnected to the next
+		// connect this is rather too smart but will probably do what people expect
+		if (mvconn_no == thread_default_data_mvconn_no) {
+			thread_default_data_mvconn_no = 0;
+			if (GETDBTRACE) {
+				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
+			}
+		}
+
+		// if we happen to be disconnecting the same connection as the default connection FOR DICT
+		// then reset the default connection so that it will be reconnected to the next
+		// connect this is rather too smart but will probably do what people expect
+		if (mvconn_no == thread_default_dict_mvconn_no) {
+			thread_default_dict_mvconn_no = 0;
+			if (GETDBTRACE) {
+				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
+			}
 		}
 	}
 	return;
@@ -705,14 +796,28 @@ void var::disconnectall() {
 	THISIS("bool var::disconnectall()")
 	THISISDEFINED()
 
-	var connid = this->getconnectionid();
-	if (!connid)
-		connid = 2;
+	var mvconn_no = get_mvconn_no(*this);
+	if (!mvconn_no)
+		mvconn_no = 2;
 
 	if (GETDBTRACE)
-		var("DBTRACE mvdbpostgres disconnectall() Closing all connections >=  " ^ connid).logputl();
+		mvconn_no.logputl("DBTR var::disconnectall() >= ");
 
-	thread_connections.del_connections(connid);
+	thread_connections.del_connections(mvconn_no);
+
+	if (thread_default_data_mvconn_no >= mvconn_no) {
+		thread_default_data_mvconn_no = 0;
+		if (GETDBTRACE) {
+			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
+		}
+	}
+
+	if (thread_default_dict_mvconn_no >= mvconn_no) {
+		thread_default_dict_mvconn_no = 0;
+		if (GETDBTRACE) {
+			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
+		}
+	}
 
 	return;
 }
@@ -738,16 +843,30 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	}
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = normalise_filename(filename);
+	var filename2 = get_normal_filename(filename);
 
-	//return predefined handle if any
-	if (!connection) {
+	//use connection provided
+	var connection2;
+	if (connection) {
+		connection2 = connection;
+	}
+	else {
+
+
+		//otherwise use a preattached file handle
 	    auto entry = thread_file_handles.find(filename2);
     	if (entry != thread_file_handles.end()) {
 			//(*this) = thread_file_handles.at(filename2);
 			(*this) = entry->second;
+			if (GETDBTRACE)
+				this->logputl("DBTR open() attached ");
 			return true;
 		}
+
+		//or determine connection from filename
+		//use default data or dict connection
+		connection2 = filename2;
+
 	}
 
 	// *
@@ -756,6 +875,15 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//var sql="select '" ^ filename2 ^ "'::regclass";
 	//if (! connection.sqlexec(sql))
 
+	var tablename;
+	var schema;
+	if (filename2.index(".")) {
+		schema = filename2.field(".",1);
+		tablename = filename2.field(".",2,999);
+	} else {
+		schema = "public";
+		tablename = filename2;
+	}
 	// 1. look in information_schema.tables
 	var sql =
 		"\
@@ -763,15 +891,11 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		EXISTS	(\
     		SELECT 	table_name\
     		FROM 	information_schema.tables\
-    		WHERE\
-					table_name = '" +
-		filename2 +
-		"'\
-				)\
-	";
+    		WHERE   table_name = '" ^ tablename ^ "' AND table_schema = '" ^ schema ^ "'\
+				)";
 	var result;
-	connection.sqlexec(sql, result);
-	//result.convert(RM,"|").outputl("result=");
+	connection2.sqlexec(sql, result);
+	//result.convert(RM,"|").logputl("result=");
 
 	// 2. look in materialised views
 	// select matviewname from pg_matviews where matviewname = '...';
@@ -780,33 +904,37 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 			"\
 			SELECT\
 			EXISTS	(\
-	    		SELECT 	matviewname\
+	    		SELECT 	matviewname as table_name\
 	    		FROM 	pg_matviews\
 	    		WHERE\
-						matviewname = '" +
-			filename2 +
+						matviewname = '" ^
+			filename2 ^
 			"'\
 					)\
 		";
-		connection.sqlexec(sql, result);
+		connection2.sqlexec(sql, result);
 	}
 
 	//failure if not found
 	if (result[-1] != "t") {
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
-					 ") table does not exist.";
-		this->setlasterror(errmsg);
+					 ") file does not exist.";
+		this->lasterror(errmsg);
 		return false;
 	}
 	// */
 
-	this->setlasterror();
+	//this->lasterror();
 
 	// save the filename and connection no
 	// memorise the current connection for this file var
-	(*this) = filename2 ^ FM ^ connection.getconnectionid();
+	(*this) = filename2 ^ FM ^ get_mvconn_no_or_default(connection2);
 
-	// outputl("opened filehandle");
+	if (GETDBTRACE) {
+		this->logputl("DBTR var::open ");
+	}
+
+	// logputl("opened filehandle");
 
 	return true;
 }
@@ -839,18 +967,19 @@ bool var::reado(const var& filehandle, const var& key) {
 	ISSTRING(key)
 
 	// check cache first, and return any cached record
-	int connid = filehandle.getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed");
+	int mvconn_no = get_mvconn_no_or_default(filehandle);
+	if (!mvconn_no)
+		throw MVDBException("get_mvconn_no() failed");
 	std::string cachedrecord =
-		thread_connections.getrecord(connid, filehandle.a(1).var_str, key.var_str);
+		thread_connections.getrecord(mvconn_no, filehandle.a(1).var_str, key.var_str);
 	if (!cachedrecord.empty()) {
-		// key.outputl("cache read " ^ filehandle.a(1) ^ "=");
+		// key.logputl("cache read " ^ filehandle.a(1) ^ "=");
 		//(*this) = cachedrecord;
 		this->var_str = cachedrecord;
 		this->var_typ = VARTYP_STR;
 
-		this->setlasterror();
+		//this->lasterror();
+
 		return this->var_str.length() > 0;
 	}
 
@@ -872,10 +1001,10 @@ bool var::writeo(const var& filehandle, const var& key) const {
 
 	// update cache
 	// virtually identical code in read and write/update/insert/delete
-	int connid = filehandle.getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed");
-	thread_connections.putrecord(connid, filehandle.a(1).var_str, key.var_str, this->var_str);
+	int mvconn_no = get_mvconn_no_or_default(filehandle);
+	if (!mvconn_no)
+		throw MVDBException("get_mvconn_no() failed");
+	thread_connections.putrecord(mvconn_no, filehandle.a(1).var_str, key.var_str, this->var_str);
 
 	return true;
 }
@@ -887,10 +1016,10 @@ bool var::deleteo(const var& key) const {
 
 	// update cache
 	// virtually identical code in read and write/update/insert/delete
-	int connid = this->getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed");
-	thread_connections.delrecord(connid, this->a(1).var_str, key.var_str);
+	int mvconn_no = get_mvconn_no_or_default(*this);
+	if (!mvconn_no)
+		throw MVDBException("get_mvconn_no() failed");
+	thread_connections.delrecord(mvconn_no, this->a(1).var_str, key.var_str);
 
 	return true;
 }
@@ -924,21 +1053,22 @@ bool var::read(const var& filehandle, const var& key) {
 	// asking to read DOS file! do osread using key as osfilename!
 	if (filehandle == "") {
 		var errmsg = "read(...) filename not specified, probably not opened.";
-		this->setlasterror(errmsg);
+		this->lasterror(errmsg);
 		throw MVDBException(errmsg);
 		return false;
 	}
 
 	// reading a magic special key returns all keys in the file in natural order
 	if (key == "%RECORDS%") {
-		var sql = "SELECT key from " ^ filehandle.a(1).convert(".", "_") ^ ";";
+		var sql = "SELECT key from " ^ get_normal_filename(filehandle) ^ ";";
 
-		PGconn* pgconn = (PGconn*)filehandle.connection();
+		//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
+		auto pgconn = get_pgconnection(filehandle);
 		if (pgconn == NULL)
 			return false;
 
-		Scoped_PGresult pgresult;
-		bool ok = getpgresult(sql, pgresult, pgconn);
+		PGResult pgresult;
+		bool ok = get_pgresult(sql, pgresult, pgconn);
 
 		if (!ok)
 			return false;
@@ -969,13 +1099,14 @@ bool var::read(const var& filehandle, const var& key) {
 		if (this->var_str.back() == FM_)
 			this->var_str.pop_back();
 
-		this->setlasterror();
+		//this->lasterror();
+
 		return true;
 	}
 
 	// get filehandle specific connection or fail
-	PGconn* thread_pgconn = (PGconn*)filehandle.connection();
-	if (!thread_pgconn)
+	auto pgconn = get_pgconnection(filehandle);
+	if (!pgconn)
 		return false;
 
 	//$parameter array
@@ -986,7 +1117,7 @@ bool var::read(const var& filehandle, const var& key) {
 
 	// lower case key if reading from dictionary
 	// std::string key2;
-	// if (filehandle.substr(1,5).lcase()=="dict_")
+	// if (filehandle.substr(1,5).lcase()=="dict.")
 	//	key2=key.lcase().var_str;
 	// else
 	//	key2=key.var_str;
@@ -997,10 +1128,10 @@ bool var::read(const var& filehandle, const var& key) {
 	paramLengths[0] = int(key2.length());
 	// paramFormats[0]=1;
 
-	var sql = "SELECT data FROM " ^ filehandle.a(1).convert(".", "_") ^ " WHERE key = $1";
+	var sql = "SELECT data FROM " ^ get_normal_filename(filehandle) ^ " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
+	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(), 1, /* one param */
 											NULL,					/* let the backend deduce param type */
@@ -1013,13 +1144,13 @@ bool var::read(const var& filehandle, const var& key) {
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK) {
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		var errmsg =
-			"read(" ^ filehandle.convert("." _FM_, "_^").quote() ^ ", " ^ key.quote() ^ ")";
+			"read(" ^ filehandle.convert("." _FM_, "_^").swap("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
 		if (sqlstate == "42P01")
 			errmsg ^= " File doesnt exist";
 		else
-			errmsg ^= var(PQerrorMessage(thread_pgconn)) ^ " sqlstate:" ^ sqlstate;
+			errmsg ^= var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate;
 		;
-		this->setlasterror(errmsg);
+		this->lasterror(errmsg);
 		throw MVDBException(errmsg);
 		// return false;
 	}
@@ -1028,7 +1159,7 @@ bool var::read(const var& filehandle, const var& key) {
 		//leave record (this) untouched if record cannot be read
 		// *this = "";
 
-		this->setlasterror("ERROR: mvdbpostgres read() record does not exist " ^
+		this->lasterror("ERROR: mvdbpostgres read() record does not exist " ^
 						   key.quote());
 		return false;
 	}
@@ -1037,13 +1168,13 @@ bool var::read(const var& filehandle, const var& key) {
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
 		throw MVDBException(errmsg);
 		//errmsg.errputl();
-		//this->setlasterror(errmsg);
+		//this->lasterror(errmsg);
 		//return false;
 	}
 
 	*this = getresult(pgresult, 0, 0);
 
-	this->setlasterror();
+	//this->lasterror();
 
 	return true;
 }
@@ -1079,23 +1210,14 @@ var var::lock(const var& key) const {
 	THISISDEFINED()
 	ISSTRING(key)
 
-	std::string fileandkey = this->a(1).convert(".", "_").var_str;
-	fileandkey.append(" ");
-	fileandkey.append(key.normalize().var_str);
-
-	// TODO .. provide endian identical version
-	// required if and when exodus processes connect to postgres on a DIFFERENT host
-	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
-	// SAME host
-	uint64_t hash64 =
-		MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
+	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
 
 	// check if already lock in current connection
 
 	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
 	//ConnectionLocks* connection_locks = (ConnectionLocks*)this->get_lock_table();
 
-	MVConnection* mvconnection = (MVConnection*)this->get_mvconnection();
+	auto mvconnection = get_mvconnection(*this);
 
 	if (mvconnection) {
 		// if already in local lock table then dont lock on database
@@ -1117,16 +1239,17 @@ var var::lock(const var& key) const {
 
 	const char* sql = "SELECT PG_TRY_ADVISORY_LOCK($1)";
 
-	//"this" is a filehandle - get its connection
-	PGconn* thread_pgconn = (PGconn*)this->connection();
-	if (!thread_pgconn)
-		return false;
-
 	// DEBUG_LOG_SQL1
 	if (GETDBTRACE)
-		(var(sql) ^ " " ^ fileandkey).logputl("SQLL:");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLL ");
 
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
+	//"this" is a filehandle - get its connection
+	//PGconn* pgconn = (PGconn*)this->connection();
+	PGconn* pgconn = get_pgconnection(*this);
+	if (!pgconn)
+		return false;
+
+	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										 /* one param */
 											NULL,										 /* let the backend deduce param type */
@@ -1134,7 +1257,7 @@ var var::lock(const var& key) const {
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1) {
 		var errmsg = "lock(" ^ (*this) ^ ", " ^ key ^ ")\n" ^
-					 var(PQerrorMessage(thread_pgconn)) ^ "\n" ^ "PQresultStatus=" ^
+					 var(PQerrorMessage(pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 					 var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 					 var(PQntuples(pgresult));
 		//errmsg.errputl();
@@ -1148,12 +1271,12 @@ var var::lock(const var& key) const {
 	// since postgres will stack up repeated locks by the same process
 	if (lockedok && mvconnection) {
 		// register that it is locked
-#ifdef USE_MAP_FOR_UNORDERED
+//#ifdef USE_MAP_FOR_UNORDERED
 		std::pair<const uint64_t, int> lock(hash64, 0);
 		mvconnection->connection_locks.insert(lock);
-#else
-		mvconnection->connection_locks->insert(hash64);
-#endif
+//#else
+//		mvconnection->connection_locks->insert(hash64);
+//#endif
 	}
 
 	return lockedok;
@@ -1165,20 +1288,11 @@ bool var::unlock(const var& key) const {
 	THISISDEFINED()
 	ISSTRING(key)
 
-	std::string fileandkey = this->a(1).var_str;
-	fileandkey.append(" ");
-	fileandkey.append(key.normalize().var_str);
-
-	// TODO .. provide endian identical version
-	// required if and when exodus processes connect to postgres on a DIFFERENT host
-	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
-	// SAME host
-	uint64_t hash64 =
-		MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
+	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
 
 	// remove from local current connection connection_locks
 	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
-	MVConnection* mvconnection = (MVConnection*)this->get_mvconnection();
+	auto mvconnection = get_mvconnection(*this);
 
 	if (mvconnection) {
 		// if not in local connection_locks then no need to unlock on database
@@ -1200,16 +1314,17 @@ bool var::unlock(const var& key) const {
 
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
-	//"this" is a filehandle - get its connection
-	PGconn* thread_pgconn = (PGconn*)this->connection();
-	if (!thread_pgconn)
-		return false;
-
 	// DEBUG_LOG_SQL
 	if (GETDBTRACE)
-		(var(sql) ^ " " ^ fileandkey).logputl("SQLU:");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLU ");
 
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
+	//"this" is a filehandle - get its connection
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
+	if (!pgconn)
+		return false;
+
+	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										 /* one param */
 											NULL,										 /* let the backend deduce param type */
@@ -1217,7 +1332,7 @@ bool var::unlock(const var& key) const {
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1) {
 		var errmsg = "unlock(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^ ")\n" ^
-					 var(PQerrorMessage(thread_pgconn)) ^ "\n" ^ "PQresultStatus=" ^
+					 var(PQerrorMessage(pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 					 var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 					 var(PQntuples(pgresult));
 		//errmsg.errputl();
@@ -1234,7 +1349,7 @@ bool var::unlockall() const {
 	// check if any locks
 	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
 	//ConnectionLocks* connection_locks = (ConnectionLocks*)this->get_lock_table();
-	MVConnection* mvconnection = (MVConnection*)this->get_mvconnection();
+	auto mvconnection = get_mvconnection(*this);
 	if (mvconnection) {
 		// if local lock table is empty then dont unlock all database
 		if (mvconnection->connection_locks.begin() == mvconnection->connection_locks.end())
@@ -1252,9 +1367,10 @@ bool var::sqlexec(const var& sql) const {
 	var response = -1;	//no response required
 	bool ok = this->sqlexec(sql, response);
 	if (!ok) {
-		this->setlasterror(response);
-		if (response.index("syntax") || GETDBTRACE)
-			response.outputl();
+		this->lasterror(response);
+		//skip table does not exist because it is very normal to check if table exists
+		//if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || GETDBTRACE)
+		//	response.logputl();
 	}
 	return ok;
 }
@@ -1264,35 +1380,31 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 	THISIS("bool var::sqlexec(const var& sqlcmd, var& response) const")
 	ISSTRING(sqlcmd)
 
-	PGconn* thread_pgconn = (PGconn*)this->connection();
-	if (!thread_pgconn) {
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
+	if (!pgconn) {
 		response = "Error: sqlexec cannot find thread database connection";
 		return false;
 	}
 
 	// log the sql command
-	if (GETDBTRACE) {
-		//		exodus::logputl("SQLe:" ^ *this);
-		var temp("SQLE:");
-		//if (this->assigned())
-		//	temp ^= this->convert(_FM_, "^") ^ " ";
-		temp ^= sqlcmd;
-		temp.logputl();
-	}
+	if (GETDBTRACE)
+		((this->assigned() ? *this : "") ^ " | " ^ sqlcmd.convert("\t"," ").trim()).logputl("SQLE ");
 
 	// will contain any pgresult IF successful
 
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
 	// whereas PQexecParams is the opposite
-	Scoped_PGresult pgresult = PQexec(thread_pgconn, sqlcmd.var_str.c_str());
+	PGResult pgresult = PQexec(pgconn, sqlcmd.var_str.c_str());
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK &&
 		PQresultStatus(pgresult) != PGRES_TUPLES_OK) {
 		//int xx = PQresultStatus(pgresult);
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
-		response = var(PQerrorMessage(thread_pgconn)) ^ " sqlstate:" ^ sqlstate;
+		response = var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate;
+		response ^= FM ^ sqlcmd;
 		return false;
 	}
 
@@ -1406,16 +1518,17 @@ bool var::write(const var& filehandle, const var& key) const {
 	// but performance gain is probably not great since the sql we use to read and write is
 	// quite simple (could PREPARE once per file/table)
 
-	sql = "INSERT INTO " ^ filehandle.a(1).convert(".", "_") ^ " (key,data) values( $1 , $2)";
+	sql = "INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 	sql ^= " ON CONFLICT (key)";
 	sql ^= " DO UPDATE SET data = $2";
 
-	PGconn* thread_pgconn = (PGconn*)filehandle.connection();
-	if (!thread_pgconn)
+	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
+	auto pgconn = get_pgconnection(filehandle);
+	if (!pgconn)
 		return false;
 
 	DEBUG_LOG_SQL1
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
+	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,	   // two params (key and data)
@@ -1430,7 +1543,7 @@ bool var::write(const var& filehandle, const var& key) const {
 		var errmsg = var("ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
 						 ", " ^ key ^ ") failed: PQresultStatus=" ^
 						 var(PQresultStatus(pgresult)) ^ " " ^
-						 var(PQerrorMessage(thread_pgconn)));
+						 var(PQerrorMessage(pgconn)));
 		//errmsg.errputl();
 		throw MVDBException(errmsg);
 		//return false;
@@ -1472,14 +1585,15 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	paramLengths[1] = int(data2.length());
 	// paramFormats[1] = 1;//binary
 
-	var sql = "UPDATE " ^ filehandle.a(1).convert(".", "_") ^ " SET data = $2 WHERE key = $1";
+	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
-	PGconn* thread_pgconn = (PGconn*)filehandle.connection();
-	if (!thread_pgconn)
+	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
+	auto pgconn = get_pgconnection(filehandle);
+	if (!pgconn)
 		return false;
 
 	DEBUG_LOG_SQL1
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
+	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,	   // two params (key and data)
@@ -1494,7 +1608,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 #if TRACING >= 1
 		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 					 ", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-					 var(PQerrorMessage(thread_pgconn));
+					 var(PQerrorMessage(pgconn));
 		//errmsg.errputl();
 		throw MVDBException(errmsg);
 #endif
@@ -1506,7 +1620,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 #if TRACING >= 3
 		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-			var(PQerrorMessage(thread_pgconn)))
+			var(PQerrorMessage(pgconn)))
 			.errputl();
 #endif
 		return false;
@@ -1548,14 +1662,15 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	// paramFormats[1] = 1;//binary
 
 	var sql =
-		"INSERT INTO " ^ filehandle.a(1).convert(".", "_") ^ " (key,data) values( $1 , $2)";
+		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 
-	PGconn* thread_pgconn = (PGconn*)filehandle.connection();
-	if (!thread_pgconn)
+	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
+	auto pgconn = get_pgconnection(filehandle);
+	if (!pgconn)
 		return false;
 
 	DEBUG_LOG_SQL1
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
+	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,	   // two params (key and data)
@@ -1571,7 +1686,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 		var errmsg = "ERROR: mvdbpostgres insertrecord(" ^
 					 filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
 					 var(PQntuples(pgresult)) ^ " " ^
-					 var(PQerrorMessage(thread_pgconn));
+					 var(PQerrorMessage(pgconn));
 		//errmsg.errputl();
 		throw MVDBException(errmsg);
 #endif
@@ -1609,12 +1724,13 @@ bool var::deleterecord(const var& key) const {
 
 	var sql = "DELETE FROM " ^ this->a(1) ^ " WHERE KEY = $1";
 
-	PGconn* thread_pgconn = (PGconn*)this->connection();
-	if (!thread_pgconn)
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
+	if (!pgconn)
 		return false;
 
 	DEBUG_LOG_SQL1
-	Scoped_PGresult pgresult = PQexecParams(thread_pgconn, sql.var_str.c_str(), 1, /* two param */
+	PGResult pgresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
 											NULL,								   /* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,	 // text arguments
@@ -1626,7 +1742,7 @@ bool var::deleterecord(const var& key) const {
 		//#if TRACING >= 1
 		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
 					 ", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-					 var(PQerrorMessage(thread_pgconn));
+					 var(PQerrorMessage(pgconn));
 		//errmsg.errputl();
 		throw MVDBException(errmsg);
 		//#endif
@@ -1652,10 +1768,10 @@ void var::clearcache() const {
 	THISIS("bool var::clearcache() const")
 	THISISDEFINED()
 
-	int connid = this->getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed in clearcache");
-	thread_connections.clearrecordcache(connid);
+	int mvconn_no = get_mvconn_no_or_default(*this);
+	if (!mvconn_no)
+		throw MVDBException("get_mvconn_no() failed in clearcache");
+	thread_connections.clearrecordcache(mvconn_no);
 	return;
 }
 
@@ -1694,46 +1810,72 @@ bool var::statustrans() const {
 	THISIS("bool var::statustrans() const")
 	THISISDEFINED()
 
-	PGconn* thread_pgconn = (PGconn*)this->connection();
-	if (!thread_pgconn) {
-		this->setlasterror("db connection " ^ var(this->getconnectionid()) ^ "not opened");
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
+	if (!pgconn) {
+		this->lasterror("db connection " ^ var(get_mvconn_no(*this)) ^ "not opened");
 		return false;
 	}
-	this->setlasterror();
+
+	//this->lasterror();
 
 	// only idle is considered to be not in a transaction
-	return (PQtransactionStatus(thread_pgconn) != PQTRANS_IDLE);
+	return (PQtransactionStatus(pgconn) != PQTRANS_IDLE);
 }
 
 // sample code
-// var().createdb("mynewdb");//create a new database on the current thread-default connection
+// var().dbcreate("mynewdb");//create a new database on the current thread-default connection
 // var file;
 // file.open("myfile");
-// file.createdb("mynewdb");//creates a new db on the same connection as a file was opened on
+// file.dbcreate("mynewdb");//creates a new db on the same connection as a file was opened on
 // var connectionhandle;
 // connectionhandle.connect("connection string pars");
-// connectionhandle.createdb("mynewdb");
+// connectionhandle.dbcreate("mynewdb");
 
-bool var::createdb(const var& dbname) const {
-	return this->copydb(var(""), dbname);
+bool var::dbcreate(const var& dbname) const {
+	return this->dbcopy(var(""), dbname);
 }
 
-bool var::copydb(const var& from_dbname, const var& to_dbname) const {
-	THISIS("bool var::createdb(const var& from_dbname, const var& to_dbname)")
+bool var::dbcopy(const var& from_dbname, const var& to_dbname) const {
+	THISIS("bool var::dbcreate(const var& from_dbname, const var& to_dbname)")
 	THISISDEFINED()
 	ISSTRING(from_dbname)
 	ISSTRING(to_dbname)
 
+	//create a database
 	var sql = "CREATE DATABASE " ^ to_dbname ^ " WITH";
 	sql ^= " ENCODING='UTF8' ";
 	if (from_dbname)
 		sql ^= " TEMPLATE " ^ from_dbname;
+	if (!this->sqlexec(sql)) {
+		return false;
+	}
 
-	return this->sqlexec(sql);
+	///connect to the new db
+	var newdb;
+	if (not newdb.connect(to_dbname)) {
+		newdb.lasterror().errputl();
+		return false;
+	}
+
+	//add dict schema to allow creation of dict files like dict.xxxxxxxx
+	sql = "CREATE SCHEMA IF NOT EXISTS dict";
+	//sql ^= "AUTHORIZATION exodus;"
+	var result = true;
+	if (!newdb.sqlexec(sql)) {
+		newdb.lasterror().errputl();
+		result = false;
+	}
+
+	//disconnec
+	newdb.disconnect();
+
+	return result;
+
 }
 
-bool var::deletedb(const var& dbname) const {
-	THISIS("bool var::deletedb(const var& dbname)")
+bool var::dbdelete(const var& dbname) const {
+	THISIS("bool var::dbdelete(const var& dbname)")
 	THISISDEFINED()
 	ISSTRING(dbname)
 
@@ -1752,18 +1894,22 @@ bool var::createfile(const var& filename) const {
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	std::string filename2 = normalise_filename(filename);
+	//std::string filename2 = get_normal_filename(filename);
 
 	var sql = "CREATE";
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
 	// sql ^= " TABLE " ^ filename.convert(".","_");
 	if (filename.substr(-5, 5) == "_temp")
 		sql ^= " TEMP ";
-	sql ^= " TABLE " + filename2;
+	//sql ^= " TABLE " + filename2;
+	sql ^= " TABLE " ^ get_normal_filename(filename);
 	// sql ^= " (key bytea primary key, data bytea)";
 	sql ^= " (key text primary key, data text)";
 
-	return this->sqlexec(sql);
+	if (this->assigned())
+		return this->sqlexec(sql);
+	else
+		return filename.sqlexec(sql);
 }
 
 bool var::renamefile(const var& filename, const var& newfilename) const {
@@ -1772,7 +1918,12 @@ bool var::renamefile(const var& filename, const var& newfilename) const {
 	ISSTRING(filename)
 	ISSTRING(newfilename)
 
-	return this->sqlexec("ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename);
+	var sql = "ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename;
+
+	if (this->assigned())
+		return this->sqlexec(sql);
+	else
+		return filename.sqlexec(sql);
 }
 
 bool var::deletefile(const var& filename) const {
@@ -1780,7 +1931,12 @@ bool var::deletefile(const var& filename) const {
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	return this->sqlexec("DROP TABLE " ^ filename.a(1) ^ " CASCADE");
+	var sql = "DROP TABLE " ^ filename.a(1) ^ " CASCADE";
+
+	if (this->assigned())
+		return this->sqlexec(sql);
+	else
+		return filename.sqlexec(sql);
 }
 
 bool var::clearfile(const var& filename) const {
@@ -1788,7 +1944,11 @@ bool var::clearfile(const var& filename) const {
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	return this->sqlexec("DELETE FROM " ^ filename.a(1));
+	var sql = "DELETE FROM " ^ filename.a(1);
+	if (this->assigned())
+		return this->sqlexec(sql);
+	else
+		return filename.sqlexec(sql);
 }
 
 inline void unquoter_inline(var& string) {
@@ -1811,16 +1971,21 @@ inline void tosqldate(var &datestr, const var &dateformat)
 */
 
 inline void tosqlstring(var& string1) {
-	// convert to sql style strings
-	// use single quotes and double up any internal single quotes
+
+	// if double quoted then convert to sql style single quoted strings
+	// double up any internal single quotes
 	if (string1[1] == "\"") {
+	//if (string1.var_str.front() == '"') {
 		string1.swapper("'", "''");
 		string1.splicer(1, 1, "'");
 		string1.splicer(-1, 1, "'");
+		//string1.var_str.front() = "'";
+		//string1.var_str.back() = "'";
 	}
 }
 
-inline var fileexpression(const var& mainfilename, const var& filename, const var& keyordata) {
+inline var get_fileexpression(const var& mainfilename, const var& filename, const var& keyordata) {
+
 	// evade warning: unused parameter mainfilename
 	if (false && mainfilename) {
 	}
@@ -1828,7 +1993,8 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	// if (filename == mainfilename)
 	//	return keyordata;
 	// else
-	return filename.convert(".", "_") ^ "." ^ keyordata;
+	//return filename.convert(".", "_") ^ "." ^ keyordata;
+	return get_normal_filename(filename) ^ "." ^ keyordata;
 
 	// if you dont use STRICT in the postgres function declaration/definitions then NULL
 	// parameters do not abort functions
@@ -1840,7 +2006,9 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	// "coalesce(" ^ expression ^", ''::text)";
 }
 
-var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& unnests, var& selects, var& ismv, bool forsort) const {
+var get_dictexpression(const var& cursor, const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& unnests, var& selects, var& ismv, bool forsort) {
+
+	//cursor is required to join any calculated fields in any second pass
 
 	ismv = false;
 
@@ -1848,27 +2016,27 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	var actualdictfile = dictfile;
 	if (!actualdictfile) {
 		var dictfilename;
-		if (mainfilename.substr(1, 5).lcase() == "dict_")
-			dictfilename = "dict_voc";
+		if (mainfilename.substr(1, 5).lcase() == "dict.")
+			dictfilename = "dict.voc";
 		else
-			dictfilename = "dict_" ^ mainfilename;
+			dictfilename = "dict." ^ mainfilename;
 
 		// we should open it through the same connection, as this->was opened, not any
 		// default connection
-		// int connid = 0;
+		// int mvconn_no = 0;
 		// if (THIS_IS_DBCONN())
-		//	connid = (int) var_int;
+		//	mvconn_no = (int) var_int;
 		// initialise the actualdictfilename to the same connection as (*this)
-		actualdictfile = (*this);
+		//actualdictfile = (*this);
 		if (!actualdictfile.open(dictfilename)) {
-			dictfilename = "dict_voc";
+			dictfilename = "dict.voc";
 			if (!actualdictfile.open(dictfilename)) {
 
-				throw MVDBException("getdictexpression() cannot open " ^
+				throw MVDBException("get_dictexpression() cannot open " ^
 									dictfilename.quote());
 #if TRACING >= 1
 				var(
-					"ERROR: mvdbpostgres getdictexpression() cannot open " ^
+					"ERROR: mvdbpostgres get_dictexpression() cannot open " ^
 					dictfilename.quote())
 					.errputl();
 #endif
@@ -1880,7 +2048,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
 	//and their column names appended with a colon (:)
 	var stage2_calculated = fieldname[-1] == ":";
-	var stage2_filename = "SELECT_STAGE2_CURSOR_" ^ this->a(1);
+	var stage2_filename = "SELECT_TEMP_STAGE2_CURSOR_" ^ cursor.a(1);
 
 	if (stage2_calculated) {
 		fieldname.splicer(-1, 1, "");
@@ -1903,23 +2071,23 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			if (!dictrec.read(actualdictfile, fieldname)) {
 				// try in voc lowercase
 				fieldname.lcaser();
-				if (not dictrec.read("dict_voc", fieldname)) {
+				if (not dictrec.read("dict.voc", fieldname)) {
 					// try in voc uppercase
 					fieldname.ucaser();
-					if (not dictrec.read("dict_voc", fieldname)) {
+					if (not dictrec.read("dict.voc", fieldname)) {
 						if (fieldname == "@ID" || fieldname == "ID")
 							dictrec = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^
 									  FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
 									  15;
 						else {
 							throw MVDBException(
-								"getdictexpression() cannot read " ^
+								"get_dictexpression() cannot read " ^
 								fieldname.quote() ^ " from " ^
 								actualdictfile.convert(FM, "^")
 									.quote() ^
-								" or \"dict_voc\"");
+								" or \"dict.voc\"");
 							//					exodus::errputl("ERROR:
-							// mvdbpostgres getdictexpression() cannot
+							// mvdbpostgres get_dictexpression() cannot
 							// read " ^ fieldname.quote() ^ " from " ^
 							// actualdictfile.quote());
 							return "";
@@ -1961,13 +2129,13 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 			if (forsort && !isdate && !istime)
 				// sqlexpression="exodus_extract_sort(" ^
-				// fileexpression(mainfilename, filename,"key") ^ ")";
+				// get_fileexpression(mainfilename, filename,"key") ^ ")";
 				sqlexpression =
 					"exodus_extract_sort(" ^ mainfilename ^ ".key,0,0,0)";
 			else
-				// sqlexpression="convert_from(" ^ fileexpression(mainfilename,
+				// sqlexpression="convert_from(" ^ get_fileexpression(mainfilename,
 				// filename, "key") ^ ", 'UTF8')";
-				sqlexpression = fileexpression(mainfilename, filename, "key");
+				sqlexpression = get_fileexpression(mainfilename, filename, "key");
 
 			// multipart key
 			var keypartn = dictrec.a(5);
@@ -1993,7 +2161,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		}
 
 		var extractargs =
-			fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
+			get_fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
 
 		if (conversion.substr(1, 9) == "[DATETIME")
 			sqlexpression = "exodus_extract_datetime(" ^ extractargs;
@@ -2032,12 +2200,12 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 								 "*pgsql")) {
 
 			// plsql function name assumed to be like "dictfilename_FIELDNAME()"
-			sqlexpression = actualdictfile.a(1) ^ "_" ^ fieldname ^ "(";
+			sqlexpression = get_normal_filename(actualdictfile).swap("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
 
 			// function arguments are (key,data)
-			sqlexpression ^= fileexpression(mainfilename, filename, "key");
+			sqlexpression ^= get_fileexpression(mainfilename, filename, "key");
 			sqlexpression ^= ", ";
-			sqlexpression ^= fileexpression(mainfilename, filename, "data");
+			sqlexpression ^= get_fileexpression(mainfilename, filename, "data");
 			sqlexpression ^= ")";
 			// sqlexpression^="::bytea";
 
@@ -2084,7 +2252,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				if (xlatetargetfieldname.isnum()) {
 					sqlexpression =
 						"exodus_extract_text(" ^
-						fileexpression(mainfilename, xlatetargetfilename,
+						get_fileexpression(mainfilename, xlatetargetfilename,
 									   "data") ^
 						", " ^ xlatetargetfieldname ^ ", 0, 0)";
 				} else if (stage2_calculated) {
@@ -2092,14 +2260,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				} else {
 					// var dictxlatetofile=xlatetargetfilename;
 					// if (!dictxlatetofile.open("DICT",xlatetargetfilename))
-					//	throw MVDBException("getdictexpression() DICT" ^
+					//	throw MVDBException("get_dictexpression() DICT" ^
 					// xlatetargetfilename ^ " file cannot be opened"); var
 					// ismv;
-					var xlatetargetdictfilename = "dict_" ^ xlatetargetfilename;
+					var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
 					var xlatetargetdictfile;
 					if (!xlatetargetdictfile.open(xlatetargetdictfilename))
 						throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ functionx);
-					sqlexpression = getdictexpression(
+					sqlexpression = get_dictexpression(cursor, 
 						filename, xlatetargetfilename, xlatetargetdictfilename,
 						xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
 						selects, ismv, forsort);
@@ -2107,7 +2275,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 				// determine the join details
 				var xlatekeyexpression = "";
-				//xlatefromfieldname.outputl("xlatefromfieldname=");
+				//xlatefromfieldname.logputl("xlatefromfieldname=");
 				if (xlatefromfieldname.trim().substr(1, 8).lcase() == "@record<") {
 					xlatekeyexpression = "exodus_extract_text(";
 					xlatekeyexpression ^= filename ^ ".data";
@@ -2125,17 +2293,17 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				else if (xlatefromfieldname[1] == "{") {
 					xlatefromfieldname =
 						xlatefromfieldname.substr(2).splicer(-1, 1, "");
-					xlatekeyexpression = getdictexpression(
+					xlatekeyexpression = get_dictexpression(cursor,
 						filename, filename, dictfilename, dictfile,
-						xlatefromfieldname, joins, unnests, selects, ismv);
+						xlatefromfieldname, joins, unnests, selects, ismv, forsort);
 				} else if (xlatefromfieldname == "@ID") {
 					xlatekeyexpression = filename ^ ".key";
 				} else {
-					// throw  MVDBException("getdictexpression() " ^
+					// throw  MVDBException("get_dictexpression() " ^
 					// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
 					// DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
 #if TRACING >= 1
-					var("ERROR: mvdbpostgres getdictexpression() " ^
+					var("ERROR: mvdbpostgres get_dictexpression() " ^
 						filename.quote() ^ " " ^ fieldname.quote() ^
 						" - INVALID DICTIONARY EXPRESSION - " ^
 						dictrec.a(8).quote())
@@ -2207,7 +2375,7 @@ exodus_call:
 							environmentn ^ "', '" ^ dictfilename.lcase() ^ "', '" ^
 							fieldname.lcase() ^ "', " ^ filename ^ ".key, " ^ filename ^
 							".data,0,0)";
-			//sqlexpression.outputl("sqlexpression=");
+			//sqlexpression.logputl("sqlexpression=");
 			// TODO apply naturalorder conversion by passing forsort
 			// option to exodus_call
 
@@ -2215,10 +2383,10 @@ exodus_call:
 		}
 	} else {
 		// throw  filename ^ " " ^ fieldname ^ " - INVALID DICTIONARY ITEM";
-		// throw  MVDBException("getdictexpression(" ^ filename.quote() ^ ", " ^
+		// throw  MVDBException("get_dictexpression(" ^ filename.quote() ^ ", " ^
 		// fieldname.quote() ^ ") invalid dictionary type " ^ dicttype.quote());
 #if TRACING >= 1
-		var("ERROR: mvdbpostgres getdictexpression(" ^ filename.quote() ^ ", " ^
+		var("ERROR: mvdbpostgres get_dictexpression(" ^ filename.quote() ^ ", " ^
 			fieldname.quote() ^ ") invalid dictionary type " ^
 			dicttype.quote())
 			.errputl();
@@ -2279,9 +2447,9 @@ exodus_call:
 			// if (from.substr(-7)=="::bytea")
 			//	from.splicer(-7,7,"");
 
-			// fieldname.outputl("fieldname=");
-			// filename.outputl("filename=");
-			// mainfilename.outputl("mainfilename=");
+			// fieldname.logputl("fieldname=");
+			// filename.logputl("filename=");
+			// mainfilename.logputl("mainfilename=");
 
 			// if a mv field requires a join then add it to the SELECT clause
 			// since not known currently how to to do mv joins in the FROM clause
@@ -2338,6 +2506,21 @@ var getword(var& remainingwords, var& ucword) {
 
 	var word1 = remainingwords.field(" ", 1);
 	remainingwords = remainingwords.field(" ", 2, 99999);
+
+	//separate out leading or trailing parens () but not both
+	if (word1.length() > 1) {
+		if (word1[1] == "(" && word1[-1] != ")") {
+			//put remaining word back on the pending words
+			remainingwords.splicer(1, 0, word1.substr(2) ^ " ");
+			//return single leading paren (
+			word1 = "(";
+		} else if (word1[-1] == ")") {
+			//put single closing paren back on the pending words
+			remainingwords.splicer(1, 0, ") ");
+			//return word without trailing paren )
+			word1.splicer(-1, 1, "");
+		}
+	}
 
 	// join words within quote marks into one quoted phrase
 	var char1 = word1[1];
@@ -2422,7 +2605,7 @@ bool var::saveselect(const var& filename) {
 	ISSTRING(filename)
 
 	if (GETDBTRACE)
-		var("DBTRACE: ::saveselect(" ^ filename ^ ")").logputl();
+		filename.logputl("DBTR var::saveselect() ");
 
 	int recn = 0;
 	var key;
@@ -2480,8 +2663,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		this->var_typ = VARTYP_STR;
 	}
 
-	// fieldnames.outputl("fieldnames=");
-	// sortselectclause.outputl("sortselectclause=");
+	// fieldnames.logputl("fieldnames=");
+	// sortselectclause.logputl("sortselectclause=");
 
 	// default to ""
 	if (!(var_typ & VARTYP_STR)) {
@@ -2495,8 +2678,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	if (GETDBTRACE)
 		sortselectclause.logputl("sortselectclause=");
 
-	var actualfilename = this->a(1).convert(".", "_");
-	// actualfilename.outputl("actualfilename=");
+	var actualfilename = get_normal_filename(*this);
+	// actualfilename.logputl("actualfilename=");
 	var dictfilename = actualfilename;
 	var actualfieldnames = fieldnames;
 	var dictfile = "";
@@ -2521,6 +2704,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//var ncalc_fields=0;
 	this->r(10, "");
 
+	//catch bad FM character
+	if (sortselectclause.var_str.find(FM_) != std::string::npos)
+		throw MVDBException("Illegal FM character in " ^ sortselectclause);
+
 	// sortselect clause can be a filehandle in which case we extract the filename from field1
 	// omitted if filename.select() or filehandle.select()
 	// cursor.select(...) where ...
@@ -2528,8 +2715,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	// filename can be omitted if calling like filename.select(...) or filehandle.select(...)
 	// nnn is optional limit to number of records returned
 	// TODO only convert \t\r\n outside single and double quotes
-	var remaining = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
-	// remaining.outputl("remaining=");
+	//var remaining = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
+	var remaining = sortselectclause.convert("\t\r\n", "   ").trim();
+
+	// remaining.logputl("remaining=");
 
 	// remove trailing options eg (S) or {S}
 	var lastword = remaining.field2(" ", -1);
@@ -2570,7 +2759,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		var xx = getword(remaining, firstucword);
 	}
 
-	// actualfilename.outputl("actualfilename=");
+	// actualfilename.logputl("actualfilename=");
 	if (!actualfilename) {
 		// this->outputl("this=");
 		throw MVDBException("filename missing from select statement:" ^ sortselectclause);
@@ -2578,9 +2767,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 	while (remaining.length()) {
 
-		// remaining.outputl("remaining=");
-		// whereclause.outputl("whereclause=");
-		// orderclause.outputl("orderclause=");
+		// remaining.logputl("remaining=");
+		// whereclause.logputl("whereclause=");
+		// orderclause.logputl("orderclause=");
 
 		var ucword;
 		var word1 = getword(remaining, ucword);
@@ -2591,7 +2780,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		if (!remaining.length() &&
 			((word1[1] == "(" && word1[-1] == ")") ||
 			 (word1[1] == "{" && word1[-1] == "}"))) {
-			// word1.outputl("skipping last word in () options ");
+			// word1.logputl("skipping last word in () options ");
 			continue;
 		}
 
@@ -2611,7 +2800,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		// using filename
 		else if (ucword == "USING" && remaining) {
 			dictfilename = getword(remaining, xx);
-			if (!dictfile.open("dict_" ^ dictfilename)) {
+			if (!dictfile.open("dict." ^ dictfilename)) {
 				throw MVDBException("select() dict_" ^ dictfilename ^
 									" file cannot be opened");
 				// exodus::errputl("ERROR: mvdbpostgres select() dict_" ^
@@ -2624,10 +2813,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		else if (ucword == "DISTINCT" && remaining) {
 
 			var distinctfieldname = getword(remaining, xx);
-			var distinctexpression = getdictexpression(
+			var distinctexpression = get_dictexpression(*this, 
 				actualfilename, actualfilename, dictfilename, dictfile,
 				distinctfieldname, joins, unnests, selects, ismv, false);
-			var naturalsort_distinctexpression = getdictexpression(
+			var naturalsort_distinctexpression = get_dictexpression(*this, 
 				actualfilename, actualfilename, dictfilename, dictfile,
 				distinctfieldname, joins, unnests, selects, ismv, true);
 
@@ -2653,11 +2842,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// next word must be dictid
 			var dictid = getword(remaining, xx);
 			var dictexpression =
-				getdictexpression(actualfilename, actualfilename, dictfilename,
+				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 								  dictfile, dictid, joins, unnests, selects, ismv, true);
 
-			// dictexpression.outputl("dictexpression=");
-			// orderclause.outputl("orderclause=");
+			// dictexpression.logputl("dictexpression=");
+			// orderclause.logputl("orderclause=");
 
 			// no filtering in database on calculated items
 			//save then for secondary filtering
@@ -2733,7 +2922,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			var forsort =
 				false;	// because indexes are NOT created sortable (exodus_sort()
 			var dictexpression =
-				getdictexpression(actualfilename, actualfilename, dictfilename,
+				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 								  dictfile, word1, joins, unnests, selects, ismv, forsort);
 			var usingnaturalorder = dictexpression.index("exodus_extract_sort");
 			var dictid = word1;
@@ -3065,10 +3254,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				// invert comparison if "without" or "not" for calculated fields
 				if (negative &&
 					var("= <> > < >= <= ~ ~* !~ !~* !! ! ]").locateusing(" ", op, aliasno)) {
-					// op.outputl("op entered:");
+					// op.logputl("op entered:");
 					negative = false;
 					op = var("<> = <= >= < > !~ !~* ~ ~* ! !! !]").field(" ", aliasno);
-					// op.outputl("op reversed:");
+					// op.logputl("op reversed:");
 				}
 
 				//++ncalc_fields;
@@ -3125,7 +3314,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					//dont create exodus_tobool(to_tsvector(...
 					dictexpression.swapper("to_tsvector('simple',","");
 					dictexpression.splicer(-1, 1, "");
-//TRACE(dictexpression)
+					//TRACE(dictexpression)
 					dictexpression_isvector = false;
 				}
 
@@ -3159,8 +3348,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// without xxx = "abc"
 			// with xxx not = "abc"
 
-			// notword.outputl("notword=");
-			// ucword.outputl("ucword=");
+			// notword.logputl("notword=");
+			// ucword.logputl("ucword=");
 
 			//allow searching for text with * characters embedded
 			//otherwise interpreted as glob character?
@@ -3424,7 +3613,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				whereclause ^= " ( " ^ value ^ " )";
 			else
 				whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
-			// whereclause.outputl("whereclause=");
+			// whereclause.logputl("whereclause=");
 
 		}  //with/without
 
@@ -3447,7 +3636,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				whereclause = keycodes;
 		}
 	}
-
+	//TRACE(actualfilename)
 	// sselect add by key on the end of any specific order bys
 	if (bykey)
 		orderclause ^= ", " ^ actualfilename ^ ".key";
@@ -3479,7 +3668,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//	}
 
 	// disambiguate from any INNER JOIN key
-	//actualfieldnames.outputl("actualfieldnames=");
+	//actualfieldnames.logputl("actualfieldnames=");
 	//actualfieldnames.swapper("key", actualfilename ^ ".key");
 	//actualfieldnames.swapper("data", actualfilename ^ ".data");
 	actualfieldnames.replacer("\\bkey\\b", actualfilename ^ ".key");
@@ -3493,14 +3682,28 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	whereclause.swapper("\n AND true", "");
 	whereclause.swapper("true\n AND ", "");
 
+	//determine the connection from the filename
+	//could be an attached on a non-default connection
+	//selecting dict files would trigger this
+	//TRACE(*this)
+	//TRACE(actualfilename)
+	if (not this->a(2) || actualfilename.lcase().starts("dict.")) {
+		var actualfile;
+		if (actualfile.open(actualfilename))
+			this->r(2, actualfile.a(2));
+		//TRACE(actualfile)
+	}
+	//TRACE(*this)
 	//save any active selection in a temporary table and INNER JOIN to it to avoid complete selection of primary file
 	if (this->hasnext()) {
 
 		//create a temporary sql table to hold the preselected keys
-		var temptablename = "PRESELECT_TEMP_CURSOR_" ^ this->a(1);
+		var temptablename = "SELECT_TEMP_CURSOR_" ^ this->a(1);
 		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-		//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
-		createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
+		if (true)
+			createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
+		else
+			createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		createtablesql ^= " (KEY TEXT)\n";
 		var errmsg;
 		if (!this->sqlexec(createtablesql, errmsg)) {
@@ -3527,6 +3730,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	// WITH HOLD is a very significant addition
 	// var sql="DECLARE cursor1_" ^ (*this) ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
 	// ^ " FROM ";
+	//TRACE(*this);
 	var sql = "DECLARE\n cursor1_" ^ this->a(1) ^ " SCROLL CURSOR WITH HOLD FOR";
 
 	//SELECT - field/column names
@@ -3573,7 +3777,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	if (maxnrecs && !calc_fields)
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
-	//sql.outputl("sql=");
+	//sql.logputl("sql=");
 
 	// DEBUG_LOG_SQL
 	// if (GETDBTRACE)
@@ -3590,7 +3794,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		if (!this->sqlexec(sql, errmsg)) {
 
 			if (errmsg)
-				errmsg.outputl("::selectx: " ^ sql ^ "\n" ^ errmsg);
+				errmsg.errputl("::selectx on handle(" ^ *this ^ ") " ^ sql ^ "\n");
 			// return false;
 		}
 	}
@@ -3602,7 +3806,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			this->deletelist(listname);
 
 		// TODO handle duplicate_cursor sqlstate 42P03
-		sql.outputl("sql=");
+		sql.logputl("sql=");
 
 		throw MVDBException(errmsg);
 
@@ -3622,22 +3826,22 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	return true;
 }
 
-void var::clearselect() const {
+void var::clearselect() {
 
 	// THISIS("void var::clearselect() const")
 	// THISISSTRING()
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	/// if readnext through string
 	//3/4/5/6 setup in makelist. cleared in clearselect
 	//if (this->a(3) == "%MAKELIST%")
 	{
-		const_cast<var&>(*this).r(6, "");
-		const_cast<var&>(*this).r(5, "");
-		const_cast<var&>(*this).r(4, "");
-		const_cast<var&>(*this).r(3, "");
+		this->r(6, "");
+		this->r(5, "");
+		this->r(4, "");
+		this->r(3, "");
 		//		return;
 	}
 
@@ -3664,7 +3868,7 @@ void var::clearselect() const {
 	//	if (!this->sqlexec(deletetablesql, errors))
 	//	{
 	//		if (errors)
-	//			errors.outputl("::clearselect " ^ errors);
+	//			errors.logputl("::clearselect " ^ errors);
 	//		return;
 	//	}
 	//}
@@ -3681,7 +3885,7 @@ void var::clearselect() const {
 
 	if (!this->sqlexec(sql, errors)) {
 		if (errors)
-			errors.outputl("::clearselect " ^ errors);
+			errors.errputl("::clearselect on handle(" ^ *this ^ ") ");
 		return;
 	}
 
@@ -3692,7 +3896,7 @@ void var::clearselect() const {
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 // bool readnextx(const std::string& cursor, PGresultptr& pgresult)
 // called by readnext (and perhaps hasnext/select to implement LISTACTIVE)
-bool readnextx(const var& cursor, Scoped_PGresult& pgresult, PGconn* pgconn, bool forwards) {
+bool readnextx(const var& cursor, PGResult& pgresult, PGconn* pgconn, bool forwards) {
 	var sql;
 	if (forwards)
 		sql = "FETCH NEXT in cursor1_" ^ cursor.a(1);
@@ -3704,7 +3908,7 @@ bool readnextx(const var& cursor, Scoped_PGresult& pgresult, PGconn* pgconn, boo
 	// execute the sql
 	// cant use sqlexec here because it returns data
 	// sqlexec();
-	if (!getpgresult(sql, pgresult, pgconn)) {
+	if (!get_pgresult(sql, pgresult, pgconn)) {
 
 		// var errmsg=var(PQresultErrorMessage(pgresult));
 		// throw MVDBException(errmsg);
@@ -3712,13 +3916,13 @@ bool readnextx(const var& cursor, Scoped_PGresult& pgresult, PGconn* pgconn, boo
 		// return false;
 
 		var errmsg = var(PQresultErrorMessage(pgresult));
-		// errmsg.outputl("errmsg=");
-		// var(pgresult).outputl("pgresult=");
+		// errmsg.logputl("errmsg=");
+		// var(pgresult).logputl("pgresult=");
 		var sqlstate = "";
 		if (PQresultErrorField(pgresult, PG_DIAG_SQLSTATE)) {
 			sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		}
-		// pgresult is NULLPTR if if getpgresult failed but since the pgresult is needed by
+		// pgresult is NULLPTR if if get_pgresult failed but since the pgresult is needed by
 		// the caller, it will be cleared by called if not NULLPTR PQclear(pgresult);
 
 		// if cursor simply doesnt exist then see if a savelist one is available and enable
@@ -3763,11 +3967,15 @@ bool var::deletelist(const var& listname) const {
 	// THISISDEFINED()
 	ISSTRING(listname)
 
+	if (GETDBTRACE)
+		this->logputl("DBTR var::deletelist(" ^ listname ^ ") ");
+
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS"))
-		//return true;
-		throw MVDBException("LISTS file cannot be opened");
+		//skip this error for now because maybe no LISTS on some databases
+		return false;
+		//throw MVDBException("deletelist() LISTS file cannot be opened");
 
 	// initial block of keys are stored with no suffix (i.e. no *1)
 	lists.deleterecord(listname);
@@ -3791,12 +3999,12 @@ bool var::savelist(const var& listname) {
 	ISSTRING(listname)
 
 	if (GETDBTRACE)
-		("DBTRACE: ::savelist(" ^ listname ^ ")").logputl();
+		this->logputl("DBTR var::savelist(" ^ listname ^ ") ");
 
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS"))
-		throw MVDBException("LISTS file cannot be opened");
+		throw MVDBException("savelist() LISTS file cannot be opened");
 
 	// this should not throw if the list does not exist
 	this->deletelist(listname);
@@ -3851,7 +4059,7 @@ bool var::getlist(const var& listname) {
 	ISSTRING(listname)
 
 	if (GETDBTRACE)
-		var("DBTRACE: ::getlist(" ^ listname ^ ")").logputl();
+		listname.logputl("DBTR var::getlist(" ^ listname ^ ") ");
 
 	//int recn = 0;
 	var key;
@@ -3863,7 +4071,7 @@ bool var::getlist(const var& listname) {
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS"))
-		throw MVDBException("LISTS file cannot be opened");
+		throw MVDBException("getlist() LISTS file cannot be opened");
 
 	var keys;
 	if (!keys.read(lists, listname))
@@ -3895,13 +4103,13 @@ bool var::formlist(const var& keys, const var& fieldno) {
 	ISNUMERIC(fieldno)
 
 	if (GETDBTRACE)
-		var("DBTRACE: ::formlist(" ^ keys ^ ")").logputl();
+		keys.logputl("DBTR var::formlist() ");
 
 	this->clearselect();
 
 	var record;
 	if (not record.read(*this, keys)) {
-		keys.outputl("formlist() cannot read " ^ (*this) ^ ", ");
+		keys.errputl("formlist() cannot read on handle(" ^ *this ^ ") ");
 		return false;
 	}
 
@@ -3925,6 +4133,9 @@ bool var::makelist(const var& listname, const var& keys) {
 	ISSTRING(listname)
 	ISSTRING(keys)
 
+	if (GETDBTRACE)
+		this->logputl("DBTR var::makelist(" ^ listname ^ ") ");
+
 	// this is not often used since can be achieved by writing keys to lists file directly
 	if (listname) {
 		this->deletelist(listname);
@@ -3932,7 +4143,7 @@ bool var::makelist(const var& listname, const var& keys) {
 		// open the lists file on the same connection
 		var lists = *this;
 		if (!lists.open("LISTS"))
-			throw MVDBException("LISTS file cannot be opened");
+			throw MVDBException("makelist() LISTS file cannot be opened");
 		keys.write(lists, listname);
 		return true;
 	}
@@ -3958,7 +4169,7 @@ bool var::makelist(const var& listname, const var& keys) {
 	return true;
 }
 
-bool var::hasnext() const {
+bool var::hasnext() {
 
 	// var xx;
 	// return this->readnext(xx);
@@ -3967,7 +4178,7 @@ bool var::hasnext() const {
 	// THISISSTRING()
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
@@ -3982,10 +4193,13 @@ bool var::hasnext() const {
 		if (key_and_mv.length())
 			return true;
 
+		if (GETDBTRACE)
+			this->logputl("DBTR var::hasnext(" ^ listid ^ ") ");
+
 		// otherwise try and get another block
 		var lists = *this;
 		if (!lists.open("LISTS"))
-			throw MVDBException("LISTS file cannot be opened");
+			throw MVDBException("hasnext() LISTS file cannot be opened");
 		var listno = this->a(4);
 		listno++;
 		listid.fieldstorer("*", 2, 1, listno);
@@ -3995,15 +4209,15 @@ bool var::hasnext() const {
 		if (!block.read(lists, listid)) {
 
 			//clear the listid
-			const_cast<var&>(*this).r(3, "");
+			this->r(3, "");
 
 			return false;
 		}
 
 		// might as well cache the next block for the next readnext
-		const_cast<var&>(*this).r(4, listno);
-		const_cast<var&>(*this).r(5, 0);
-		const_cast<var&>(*this).r(6, block.lowerer());
+		this->r(4, listno);
+		this->r(5, 0);
+		this->r(6, block.lowerer());
 
 		return true;
 	}
@@ -4012,14 +4226,15 @@ bool var::hasnext() const {
 	if (!this->cursorexists())
 		return false;
 
-	PGconn* pgconn = (PGconn*)this->connection();
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL) {
 		// this->clearselect();
 		return false;
 	}
 
 	//PGresultptr pgresult;
-	Scoped_PGresult pgresult;
+	PGResult pgresult;
 	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
 
 	if (!ok) {
@@ -4031,7 +4246,7 @@ bool var::hasnext() const {
 	// now restore the cursor back one
 	/////////////////////////////////
 
-	Scoped_PGresult pgresult2;
+	PGResult pgresult2;
 	//ok =
 	readnextx(*this, pgresult2, pgconn, /*forwards=*/false);
 
@@ -4042,12 +4257,12 @@ bool var::hasnext() const {
 	return true;
 }
 
-bool var::readnext(var& key) const {
+bool var::readnext(var& key) {
 	var valueno;
 	return this->readnext(key, valueno);
 }
 
-bool var::readnext(var& key, var& valueno) const {
+bool var::readnext(var& key, var& valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK) {
@@ -4057,7 +4272,7 @@ bool var::readnext(var& key, var& valueno) const {
 	}
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	THISIS("bool var::readnext(var& key, var& valueno) const")
 	THISISSTRING()
@@ -4073,7 +4288,7 @@ bool var::readnext(var& key, var& valueno) const {
 //		return false;
 //	}
 //
-//	Scoped_PGresult pgresult;
+//	PGResult pgresult;
 //	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
 //
 //	//__asm__("int3");
@@ -4092,9 +4307,9 @@ bool var::readnext(var& key, var& valueno) const {
 //	//even in the case where there are no parameters and pqexec could be used.
 //
 //	//eg 90001 is 9.0.1
-//	int pgserverversion=PQserverVersion(thread_pgconn);
+//	int pgserverversion=PQserverVersion(pgconn);
 //	if (pgserverversion>=90001) {
-//		var(pgserverversion).outputl();
+//		var(pgserverversion).logputl();
 //		//unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);
 //		size_t to_length;
 //		unsigned char* unescaped = PQunescapeBytea((const unsigned char*)
@@ -4109,7 +4324,7 @@ bool var::readnext(var& key, var& valueno) const {
 //	// int datalen = PQgetlength(pgresult, 0, 0);
 //	// key=std::string(data,datalen);
 //	key = getresult(pgresult, 0, 0);
-//	// key.output("key=").len().outputl(" len=");
+//	// key.output("key=").len().logputl(" len=");
 //
 //	//recursive call to skip any meta data with keys starting and ending %
 //	//eg keys like "%RECORDS%" (without the quotes)
@@ -4146,7 +4361,7 @@ bool var::readnext(var& key, var& valueno) const {
 	}
 #endif
 
-bool var::readnext(var& record, var& key, var& valueno) const {
+bool var::readnext(var& record, var& key, var& valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
@@ -4156,7 +4371,7 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 	}
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	THISIS("bool var::readnext(var& record, var& key, var& valueno) const")
 	THISISSTRING()
@@ -4167,6 +4382,10 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 	// Note: code similarity between hasnext and readnext
 	var listid = this->a(3);
 	if (listid) {
+
+		if (GETDBTRACE)
+			this->logputl("DBTR var::readnext() ");
+
 		record = "";
 		while (true) {
 			var keyno = this->a(5);
@@ -4179,16 +4398,16 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 
 				// makelist provides one block of keys and nothing in the lists file
 				if (listid == "%MAKELIST%") {
-					const_cast<var&>(*this).r(3, "");
-					const_cast<var&>(*this).r(4, "");
-					const_cast<var&>(*this).r(5, "");
-					const_cast<var&>(*this).r(6, "");
+					this->r(3, "");
+					this->r(4, "");
+					this->r(5, "");
+					this->r(6, "");
 					return false;
 				}
 
 				var lists = *this;
 				if (!lists.open("LISTS"))
-					throw MVDBException("LISTS file cannot be opened");
+					throw MVDBException("readnext() LISTS file cannot be opened");
 
 				var listno = this->a(4);
 				listno++;
@@ -4198,19 +4417,19 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 				if (!block.read(lists, listid)) {
 
 					//clear the listid
-					const_cast<var&>(*this).r(3, "");
+					this->r(3, "");
 
 					return false;
 				}
 
-				const_cast<var&>(*this).r(4, listno);
-				const_cast<var&>(*this).r(5, 0);
-				const_cast<var&>(*this).r(6, block.lowerer());
+				this->r(4, listno);
+				this->r(5, 0);
+				this->r(6, block.lowerer());
 				continue;
 			}
 
 			// bump up the key no pointer
-			const_cast<var&>(*this).r(5, keyno);
+			this->r(5, keyno);
 
 			// extract and return the key (and mv if present)
 			key = key_and_mv.a(1, 1, 1);
@@ -4219,11 +4438,12 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 		}
 	}
 
-	PGconn* pgconn = (PGconn*)this->connection();
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
-	Scoped_PGresult pgresult;
+	PGResult pgresult;
 	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
 
 	if (!ok) {
@@ -4261,7 +4481,7 @@ bool var::readnext(var& record, var& key, var& valueno) const {
 	// record is third column
 	if (PQnfields(pgresult) < 3) {
 		//var errmsg = "readnext() must follow a select() clause with option (R)";
-		//this->setlasterror(errmsg);
+		//this->lasterror(errmsg);
 		//throw MVDBException(errmsg);
 		// return false;
 		record = "";
@@ -4278,7 +4498,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
 
-	var filename = this->a(1);
+	var filename = get_normal_filename(*this);
 	var fieldname = fieldname0.convert(".", "_");
 
 	// actual dictfile to use is either given or defaults to that of the filename
@@ -4286,7 +4506,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	if (dictfile.assigned() and dictfile != "")
 		actualdictfile = dictfile;
 	else
-		actualdictfile = "dict_" ^ filename;
+		actualdictfile = "dict." ^ filename;
 
 	// example sql
 	// create index ads__brand_code on ads (exodus_extract_text(data,3,0,0));
@@ -4297,15 +4517,15 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	var selects = "";
 	var ismv;
 	var forsort = false;
-	var dictexpression = getdictexpression(filename, filename, actualdictfile, actualdictfile,
+	var dictexpression = get_dictexpression(*this, filename, filename, actualdictfile, actualdictfile,
 										   fieldname, joins, unnests, selects, ismv, forsort);
-	// dictexpression.outputl("dictexp=");stop();
+	// dictexpression.logputl("dictexp=");stop();
 
 	//mv fields return in unnests, not dictexpression
 	//if (unnests)
 	//{
 	//	//dictexpression = unnests.a(3);
-	//	unnests.convert(FM,"^").outputl("unnests=");
+	//	unnests.convert(FM,"^").logputl("unnests=");
 	//}
 
 	var sql;
@@ -4322,16 +4542,16 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 		sql = "alter table " ^ filename ^ " add " ^ index_fieldname ^ " text";
 		if (not var().sqlexec(sql))
 		{
-			sql.outputl("sql failed ");
+			sql.logputl("sql failed ");
 			return false;
 		}
 
 		// update the new index field for all records
 		sql = "update " ^ filename ^ " set " ^ index_fieldname ^ " = " ^ dictexpression;
-		sql.outputl("sql=");
+		sql.logputl("sql=");
 		if (not var().sqlexec(sql))
 		{
-			sql.outputl("sql failed ");
+			sql.logputl("sql failed ");
 			return false;
 		}
 		dictexpression = index_fieldname;
@@ -4358,7 +4578,7 @@ bool var::deleteindex(const var& fieldname0) const {
 	THISISSTRING()
 	ISSTRING(fieldname0)
 
-	var filename = this->a(1);
+	var filename = get_normal_filename(*this);
 	var fieldname = fieldname0.convert(".", "_");
 
 	// delete the index field (actually only present on calculated field indexes so ignore
@@ -4391,23 +4611,27 @@ database
 
 var var::listfiles() const {
 	THISIS("var var::listfiles() const")
-	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
+	var schemafilter = " NOT IN ('pg_catalog', 'information_schema') ";
+
 	var sql =
-		"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE "
-		"TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema') ";
+		"SELECT table_name, table_schema FROM information_schema.tables WHERE table_type = 'BASE "
+		"TABLE'";
+	sql ^= " AND table_schema " ^ schemafilter;
 
-	sql ^= " UNION SELECT matviewname as table_name from pg_matviews;";
+	sql ^= " UNION SELECT matviewname as table_name, schemaname as table_schema from pg_matviews";
+	sql ^= " WHERE schemaname " ^ schemafilter;
 
-	PGconn* pgconn = (PGconn*)this->connection();
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
-	Scoped_PGresult pgresult;
-	bool ok = getpgresult(sql, pgresult, pgconn);
+	PGResult pgresult;
+	bool ok = get_pgresult(sql, pgresult, pgconn);
 
 	if (!ok)
 		return "";
@@ -4415,33 +4639,74 @@ var var::listfiles() const {
 	var filenames = "";
 	int nfiles = PQntuples(pgresult);
 	for (int filen = 0; filen < nfiles; filen++) {
-		if (!PQgetisnull(pgresult, filen, 0))
-			filenames ^= FM ^ getresult(pgresult, filen, 0);
+		if (!PQgetisnull(pgresult, filen, 0)) {
+			var filename = getresult(pgresult, filen, 0);
+			var schema = getresult(pgresult, filen, 1);
+			if (schema == "public")
+				filenames ^= filename;
+			else
+				filenames ^= schema ^ "." ^ filename;
+			filenames.var_str.push_back(FM_);
+		}
 	}
-	filenames.splicer(1, 1, "");
+	filenames.var_str.pop_back();
 
 	return filenames;
 }
 
-bool var::cursorexists() const {
+var var::dblist() const {
+	THISIS("var var::dblist() const")
+	THISISDEFINED()
+
+	var sql = "SELECT datname FROM pg_database";
+
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
+	if (pgconn == NULL)
+		return "";
+
+	PGResult pgresult;
+	auto ok = get_pgresult(sql, pgresult, pgconn);
+
+	if (!ok)
+		return "";
+
+	var dbnames = "";
+	auto ndbs = PQntuples(pgresult);
+	for (auto dbn = 0; dbn < ndbs; dbn++) {
+		if (!PQgetisnull(pgresult, dbn, 0)) {
+			std::string dbname = getresult(pgresult, dbn, 0);
+			if (!dbname.starts_with("template") and !dbname.starts_with("postgres")) {
+				dbnames.var_str.append(dbname);
+				dbnames.var_str.push_back(FM_);
+			}
+		}
+	}
+	dbnames.var_str.pop_back();
+
+	return dbnames.sort();
+}
+
+bool var::cursorexists() {
 	// THISIS("var var::cursorexists() const")
 	// could allow undefined usage since *this isnt used?
 	// THISISSTRING()
 
 	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
+	this->unassigned("");
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
 	var sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ this->a(1) ^ "'";
 	// var sql="SELECT name from pg_cursors";
 
-	PGconn* pgconn = (PGconn*)this->connection();
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
-	Scoped_PGresult pgresult;
-	bool ok = getpgresult(sql, pgresult, pgconn);
+	PGResult pgresult;
+	bool ok = get_pgresult(sql, pgresult, pgconn);
 
 	if (!ok)
 		return false;
@@ -4483,13 +4748,14 @@ var var::listindexes(const var& filename0, const var& fieldname0) const {
 		" AND indisprimary != 't'"
 		");";
 
-	PGconn* pgconn = (PGconn*)this->connection();
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
 	// execute command or return empty string
-	Scoped_PGresult pgresult;
-	bool ok = getpgresult(sql, pgresult, pgconn);
+	PGResult pgresult;
+	bool ok = get_pgresult(sql, pgresult, pgconn);
 
 	if (!ok)
 		return "";
@@ -4538,13 +4804,14 @@ var var::reccount(const var& filename0) const {
 	sql ^= filename.a(1).lcase();
 	sql ^= "';";
 
-	PGconn* pgconn = (PGconn*)filename.connection();
+	//PGconn* pgconn = (PGconn*)filename.get_pgconnection();
+	auto pgconn = get_pgconnection(filename);
 	if (pgconn == NULL)
 		return "";
 
 	// execute command or return empty string
-	Scoped_PGresult pgresult;
-	bool ok = getpgresult(sql, pgresult, pgconn);
+	PGResult pgresult;
+	bool ok = get_pgresult(sql, pgresult, pgconn);
 
 	if (!ok)
 		return "";
@@ -4572,16 +4839,17 @@ var var::flushindex(const var& filename) const {
 		// attribute 1 in case passed a filehandle instead of just filename
 		sql ^= " " ^ filename.a(1).lcase();
 	sql ^= ";";
-	// sql.outputl("sql=");
+	// sql.logputl("sql=");
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
-	PGconn* pgconn = (PGconn*)this->connection();
+	//PGconn* pgconn = (PGconn*)this->connection();
+	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
 
 	// execute command or return empty string
-	Scoped_PGresult pgresult;
-	bool ok = getpgresult(sql, pgresult, pgconn);
+	PGResult pgresult;
+	bool ok = get_pgresult(sql, pgresult, pgconn);
 
 	if (!ok)
 		return "";
@@ -4598,14 +4866,14 @@ var var::flushindex(const var& filename) const {
 // returns 1 for success
 // returns 0 for failure
 // WARNING in either case caller MUST PQclear(pgresult)
-//static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pgconn)
-static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* thread_pgconn) {
+//static bool get_pgresult(const var& sql, PGresultptr& pgresult, PGconn* pgconn)
+static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
 	DEBUG_LOG_SQL
 
 	/* dont use PQexec because is cannot be told to return binary results
 	 and use PQexecParams with zero parameters instead
 	//execute the command
-	pgresult = getpgresult(thread_pgconn, sql.var_str.c_str());
+	pgresult = get_pgresult(pgconn, sql.var_str.c_str());
 	pgresult = pgresult;
 	*/
 
@@ -4615,7 +4883,7 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 	// int		 paramFormats[1];
 
 	// will contain any pgresult IF successful
-	pgresult = PQexecParams(thread_pgconn, sql.toString().c_str(), 0, /* zero params */
+	pgresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
 							NULL,									  /* let the backend deduce param type */
 							paramValues, paramLengths,
 							0,	 // text arguments

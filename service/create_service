@@ -9,9 +9,9 @@ set -eux
 :
 :	'e.g.      ./create_service exo exodus "" live'
 :	'e.g.      ./create_service agy watermelon "" test'
-
-	APP_CODE=$1
-	HOST_DIR=$2
+:
+	APP_CODE=${1:?<APP_CODE> argument is required.}
+	HOST_DIR=${2:?<HOST_DIR> argument is required.}
 	BASE_DB_CODE=${3:-${HOST_DIR}}
 	LIVE_OR_TEST=${4}
 :
@@ -28,8 +28,8 @@ set -eux
 	fi
 
 :
-: For live databases, EXO_HOME is $HOME/live
-: For test databases, EXO_HOME is $HOME
+: For live databases, EXO_HOME is $HOME/live and EXO_DICT=exodus
+: For test databases, EXO_HOME is $HOME      and EXO_DICT=exodus_live
 : =========================================
 :
 	if [ $LIVE_OR_TEST = test ]; then
@@ -37,11 +37,13 @@ set -eux
 		export IDB_CODE=%i_test
 		export IDB_CODES=%i_test
 		export FULL_DB_CODE=${BASE_DB_CODE}_test
+		export DICTDB=exodus
 	else
 		export EXO_HOME=$HOME/live
 		export IDB_CODE="%i"
 		export IDB_CODES="%i %i %i"
 		export FULL_DB_CODE=${BASE_DB_CODE}
+		export DICTDB=exodus_live
 	fi
 :
 
@@ -98,7 +100,8 @@ set -eux
 		User=$USER
 		WorkingDirectory=$WORK_DIR2
 		Environment="EXO_HOME=$EXO_HOME"
-		Environment="EXO_DBNAME=$IDB_CODE"
+		Environment="EXO_DATA=$IDB_CODE"
+		Environment="EXO_DICT=$DICTDB"
 		Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$EXO_HOME/bin"
 		Environment="EXO_STARTED_BY_SYSTEMD=true"
 		Environment="EXO_SERVICE_CODE=$SERVICE_CODE@%i"
@@ -134,10 +137,10 @@ V0G0N
 	sudo systemctl enable $FULL_SERVICE_CODE
 
 :
-: Starting the service
-: =================
+: NOT Starting the service
+: ========================
 :
-	sudo service $FULL_SERVICE_CODE start &
+:	sudo service $FULL_SERVICE_CODE start &
 
 :
 : Ensure setfacl is installed

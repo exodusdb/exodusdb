@@ -5,7 +5,15 @@ set -eux
 : Copy a single EXODUS program to live
 : ====================================
 :
-	PROGNAME=$1
+: 'Syntax is:'
+: '	./copyone <progname_or_libname>'
+:
+: 'e.g.'
+:
+: '	./copyone serve_exo'
+: ' ./copyone extract_xyz'
+:
+	PROGNAME=${1:?<progname_or_libname> argument is required.}
 
 :
 : Copy using rsync
@@ -19,7 +27,7 @@ set -eux
 :
 	if LIBFILENAME=`ls -1 ~/lib/lib$PROGNAME.so 2>/dev/null`; then
 :
-: Copy the lib file
+: Copy the lib file - only if changed
 :
 		rsync -av --whole-file $LIBFILENAME ~/live/lib
 	else
@@ -29,7 +37,7 @@ set -eux
 :
 		if BINFILENAME=`ls -1 ~/bin/$PROGNAME 2>/dev/null`; then
 :
-: Copy the bin file
+: Copy the bin file - only if changed
 :
 			rsync -av --whole-file $BINFILENAME ~/live/bin
 		fi

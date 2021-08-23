@@ -2031,7 +2031,8 @@ const var& var::logput(const var& str) const {
 	LOCKIOSTREAM
 	//str.put(std::clog);
 	std::clog << str;
-	return this->put(std::clog);
+	std::clog << *this;
+	return *this;
 }
 
 // overloaded logputl with a prefix str
@@ -2128,6 +2129,9 @@ var var::index(const var& substrx, const int occurrenceno) const {
 	THISIS("var var::index(const var& substrx,const int occurrenceno) const")
 	THISISSTRING()
 	ISSTRING(substrx)
+
+	//TODO implement negative occurenceno as meaning backwards from the end
+	//eg -1 means the last occurrence
 
 	if (substrx.var_str == "")
 		return var(0);

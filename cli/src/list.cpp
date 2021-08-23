@@ -421,9 +421,9 @@ function main() {
 	rawtable = 0;
 	silent = 0;
 
-	if (not(dictvoc.open("dict_voc", ""))) {
-		createfile("dict_voc");
-		if (not(dictvoc.open("dict_voc", ""))) {
+	if (not(dictvoc.open("dict.voc", ""))) {
+		createfile("dict.voc");
+		if (not(dictvoc.open("dict.voc", ""))) {
 			call fsmsg();
 			stop();
 		}
@@ -532,7 +532,7 @@ filename:
 		} else {
 			dictfilename = filename;
 		}
-		if (not(DICT.open("dict_" ^ dictfilename))) {
+		if (not(DICT.open("dict." ^ dictfilename))) {
 			//commented so that list dict_clients gives dict.voc columns
 			//crtx = 1;
 			DICT = dictvoc;
@@ -729,7 +729,7 @@ nextkey:
 	} else if (word eq "USING") {
 		gosub getword();
 		dictfilename = word;
-		if (not(DICT.open("dict_" ^ dictfilename))) {
+		if (not(DICT.open("dict." ^ dictfilename))) {
 			call fsmsg();
 			stop();
 		}
@@ -1484,7 +1484,7 @@ nextdict:
 	} else {
 		if (not LISTACTIVE) {
 			//select(srcfile);
-			select("SELECT " ^ srcfile ^ " (SR)");
+			select("SELECT " ^ filename ^ " (SR)");
 		}
 	}
 	recn = "";

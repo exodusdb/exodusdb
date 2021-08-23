@@ -1038,6 +1038,50 @@ function main() {
 	assert(a[-9] eq "");
 	assert(a[0] eq "");
 
+	{
+		var left="left";
+
+		//var
+		assert(var("leftx").starts(left));
+		assert(var("xleft").ends(left));
+		assert(var("xleftx").contains(left));
+
+		//cstr
+		assert(var("left").starts("left"));
+		assert(var("left").ends("left"));
+		assert(var("left").contains("left"));
+		assert(var("xleft").contains("left"));
+		assert(var("xleftx").contains("left"));
+
+		assert(var("leftx").starts("left"));
+		assert(var("xleft").ends("left"));
+		assert(var("xleft").contains("left"));
+
+		assert(! var("left").starts("leftx"));
+		assert(! var("left").ends("xleft"));
+		assert(! var("left").contains("xleft"));
+		assert(! var("xl").contains("xleft"));
+
+		assert(! var("left").starts("xleft"));
+		assert(! var("left").ends("leftx"));
+		assert(! var("left").contains("leftx"));
+		assert(! var("left").contains("lx"));
+		assert(! var("left").contains("ex"));
+
+		//char
+		assert(var("leftx").starts('l'));
+		assert(var("xleft").ends('t'));
+		assert(var("xleft").contains('t'));
+		assert(var("xleft").contains('e'));
+		assert(var("xleft").contains('x'));
+
+		assert(! var("leftx").starts('x'));
+		assert(! var("xleft").ends('x'));
+		assert(! var("xleft").contains('y'));
+
+
+	}
+
 	printl("Test passed");
 
 	return 0;

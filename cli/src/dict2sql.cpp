@@ -8,18 +8,20 @@ var dictrec;
 
 function main() {
 
+	//TODO update comment to reflect the move to schema "dict" and allow for $EXO_DICT and exodus_dict
+
 	// Syntax:
 	// dict2sql {filename {dictid}} {V}
 
 	// 1. Creates pgsql functions to calculate columns given data and key
 	//    for each dictitem in each dictfile
 	//
-	// functions like "dict_filename_DICT_ID(key,data)" returns text
+	// functions like "dict_filename__DICT_ID(key,data)" returns text
 	// /df
 	// List of functions
 	// Schema | Name | Result data type | Argument data types | Type
 	// -------+---------------------------+--------------------+---------------------+--------
-	// public | dict_ads_brand_and_date | text | key text, data text | normal
+	// public | dict_ads__brand_and_date | text | key text, data text | normal
 	// ...
 
 	// NOTE: Multivalued pgsql dictionary functions currently should be written to calculate
@@ -27,7 +29,7 @@ function main() {
 	// to call a dict functions to get a specific mv.
 	// If in future MV is required, then dict function arguments will probably become (key,data,mv)
 
-	// 2. Creates dict_all file which represents all dictionary files and their items in one file
+	// 2. Creates dict.all file which represents all dictionary files and their items in one file
 	//
 	// only performed when filename is omitted
 	//
@@ -45,7 +47,11 @@ function main() {
 	// public | exodus_trim | text | data text
 	// ...
 
-	//TODO work on more than the default db connection
+	//establish the default connection BEFORE opening a connection to dict database
+	connect();
+
+	//for dicts if not default
+	var dictconnection = "";
 
 	var filenames = COMMAND.a(2).lcase();
 	var dictid = COMMAND.a(3);
@@ -54,10 +60,20 @@ function main() {
 
 	if (filenames) {
 		doall = false;
-		if (filenames.substr(1, 5) ne "dict_")
-			filenames.splicer(1, 0, "dict_");
-	} else
-		filenames = var().listfiles();
+		if (filenames.substr(1, 5) ne "dict.")
+			filenames.splicer(1, 0, "dict.");
+	} else {
+		var dictdbname = "";
+		osgetenv("EXO_DICT",dictdbname);
+		if (not dictdbname)
+			dictdbname = "exodus_dict";
+		if (dictdbname) {
+			if (not dictconnection.connect(dictdbname)) {
+				dictdbname.quote().logputl("dict2sql: Warning: Using default database because cannot connect to ");
+			}
+		}
+		filenames = dictconnection.listfiles();
+	}
 
 	//quit if not doing all files
 	/////////////////////////////
@@ -66,7 +82,7 @@ function main() {
 		var().sqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;");
 
 		var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_time_array(data text, fn int, vn int, sn int);");
-		//create dict_all file
+		//create dict.all file
 
 		//create exodus pgsql functions
 
@@ -133,28 +149,29 @@ COST 10;
 		do_sql("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
 	}
 
-	//create global view of all dicts in "dict_all"
+	//create global view of all dicts in "dict.all"
 	var viewsql = "";
 	if (doall)
-		viewsql ^= "CREATE MATERIALIZED VIEW dict_all AS\n";
+		viewsql ^= "CREATE MATERIALIZED VIEW dict.all AS\n";
 
 	//do one or many/all files
-	int nfiles = dcount(filenames, FM);
-	for (int filen = 1; filen <= nfiles; ++filen)
-		onefile(filenames.a(filen), dictid, viewsql);
+	//int nfiles = dcount(filenames, FM);
+	//for (int filen = 1; filen <= nfiles; ++filen)
+	for (var filename : filenames)
+		onefile(filename, dictid, viewsql);
 
 	if (doall) {
 		//ignore error if doesnt exist
-		if (not var().sqlexec("DROP MATERIALIZED VIEW dict_all"))
-			var().sqlexec("DROP VIEW dict_all");
+		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW dict.all"))
+			var().sqlexec("DROP VIEW dict.all");
 
-		if (nfiles) {
+		if (filenames.index(FM)) {
 			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
 			var errmsg;
 			if (verbose)
 				viewsql.output("SQL:");
-			if (var().sqlexec(viewsql, errmsg))
-				printl("dict_all file created");
+			if (dictconnection.sqlexec(viewsql, errmsg))
+				printl("dict.all file created");
 			else {
 				if (not verbose)
 					viewsql.outputl("SQL:");
@@ -188,7 +205,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	if (verbose)
 		functionsql.outputl();
 
-	//delete index if function has changed
+	//decide if reindex is required - only if function has changed
 	var reindexrequired = false;
 	var oldfunction;
 	var functionname=field(functionname_and_args,"(",1).lcase();
@@ -200,7 +217,10 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 		//TRACE(oldfunction)
 	}
 
+	//create the function
 	var errmsg;
+	//supposedly this is on the default connection
+	TRACE("XXX DEFAULT CONNECTION?")
 	var().sqlexec(functionsql, errmsg);
 
 	//do drop function first if suggested
@@ -251,7 +271,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 
 subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
-	if (dictfilename.substr(1, 5) ne "dict_" or dictfilename == "dict_all")
+	if (dictfilename.substr(1, 5) ne "dict." or dictfilename == "dict.all")
 		return;
 
 	if (!open(dictfilename, dictfile)) {
@@ -269,6 +289,7 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 		onedictid(dictfilename, dictid, reqdictid);
 	}
 
+	//add one file for the dict_all sql using sql UNION
 	if (viewsql) {
 		viewsql ^= "SELECT '" ^ dictfilename.substr(6).ucase() ^ "'||'*'||key as key, data\n";
 		viewsql ^= "FROM " ^ dictfilename ^ "\n";
@@ -453,11 +474,11 @@ $RETVAR :=
 			//TRACE(dictid)
 			//TRACE(reqdictid)
 			//allow xlate job in jobs_text because it is for dict_production_orders section
-			//if (lcase(var("dict_") ^ target_filename) == dictfilename) {
+			//if (lcase(var("dict.") ^ target_filename) == dictfilename) {
 			//	errputl("> ", dictfilename, " ", dictid.quote(), " possible bad xlate");
 			//}
 			//allowing xlate jobs in dict_jobs text since it is used for other files
-			if (lcase(var("dict_") ^ target_filename) eq dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
+			if (lcase(var("dict.") ^ target_filename) eq dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
 				line = " -- Sorry. In " ^ target_filename ^ ", " ^ dictid ^ " you cannot xlate to same file due to pgsql bug.\n -- " ^ line;
 			} else {
 				//source file field number or expression for key to target file

@@ -21,17 +21,16 @@
 #define MVDBCONNS_H
 
 #include <libpq-fe.h>  //in postgres/include
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/mutex.hpp>
+//#define USE_MAP_FOR_UNORDERED
 //#include <map>
 #include <unordered_map>
 
-#define USE_MAP_FOR_UNORDERED
 using ConnectionLocks = std::unordered_map<uint64_t, int>;
 
 namespace exodus {
 
-using CACHED_CONNECTION = PGconn*;
-using DELETER_AND_DESTROYER = void (*)(CACHED_CONNECTION);
+using DELETER_AND_DESTROYER = void (*)(PGconn*);
 
 using ConnectionRecordCache = std::unordered_map<std::string, std::string>;
 
@@ -41,7 +40,7 @@ class MVConnection	 // used as 'second' in pair, stored in connection map
 	// ctors
 	MVConnection()
 		: connection(0) {}
-	MVConnection(CACHED_CONNECTION connection_)
+	MVConnection(PGconn* connection_)
 		: connection(connection_) {
 	}
 
@@ -50,7 +49,7 @@ class MVConnection	 // used as 'second' in pair, stored in connection map
 	int flag = 0;
 
 	// postgres connection handle
-	CACHED_CONNECTION connection;
+	PGconn* connection;
 
 	// postgres locks per connection
 	// used to fail lock (per mv standard_ instead of stack locks (per postgres standard)
@@ -74,12 +73,12 @@ class MVConnections {
 	virtual ~MVConnections();
 
 	// manipulators
-	int add_connection(CACHED_CONNECTION connection_with_file);
+	int add_connection(PGconn* connection_with_file);
 	void del_connection(int index);
 	void del_connections(int from_index);
 
 	// observers
-	CACHED_CONNECTION get_connection(int index) const;
+	PGconn* get_pgconnection(int index) const;
 	MVConnection* get_mvconnection(int index) const;
 	ConnectionRecordCache* get_recordcache(int index) const;
 	std::string getrecord(const int connid, const std::string filename, const std::string key) const;
@@ -98,7 +97,7 @@ class MVConnections {
 	CONN_MAP conntbl;
 
 	// mutex to coordinate updates
-	mutable boost::mutex mvconnections_mutex;
+	//mutable boost::mutex mvconnections_mutex;
 };
 
 }  // namespace exodus

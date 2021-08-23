@@ -5,16 +5,16 @@ programinit()
 	//with multivalue-mimicking "everything is a global function" syntax
 	//instead of exodus's oo-style syntax "xxx.yyy().zzz()".
 	//
-	var filename = "myclients";
+	var filename = "xo_clients";
 
 function main() {
 
 	//no real need for this especially because a) it does a default connection and b) we are not creating a connection for following db operations
 	//it is here just to remind that we can connect to specific servers and dataabases if desired
-	if (not connect())
-		abort("Cannot connect to database. Please check configuration or run configexodus.");
+//	if (not connect())
+//		abort("Cannot connect to database. Please check configuration or run configexodus.");
 
-	var dictfilename = "dict_" ^ filename;
+	var dictfilename = "dict." ^ filename;
 
 	//leave the test data files around for playing with after the program finishes
 	var cleanup = false;
@@ -83,7 +83,7 @@ function main() {
 	if (not read(rec, dictfile, "BALANCE"))
 		printl("Cant read 'balance' record from dictionary");
 
-	printl("\nNB 'name_and_type' dictionary item S type calls dict_myclients.cpp library function!");
+	printl("\nNB 'name_and_type' dictionary item S type calls dict_xo_clients.cpp library function!");
 
 	printl("\nClear the client file");
 	clearfile(filename);
@@ -137,8 +137,9 @@ function main() {
 	}
 
 	printl("\nJust type 'list' to see the syntax of list");
-	printl("or list dict_" ^ filename ^ " to see the dictionary");
-	printl("Type edic cli/src/testsort to see or edit/recompile this program.");
+	printl("or list dict." ^ filename ^ " to see the dictionary");
+	printl("or just listdict " ^ filename ^ " for the same");
+	printl("Type edic ~/exodus/cli/src/testsort to see or edit/recompile this program.");
 
 	return 0;
 }

@@ -632,9 +632,9 @@ function main()
 	assert(crop(_FM_ _RM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_RM_ "aa" _FM_ "bb");
 
 	var errmsg;
-	//if (not createdb("steve",errmsg))
+	//if (not dbcreate("steve",errmsg))
 	//	errmsg.outputl();
-	//if (not deletedb("steve",errmsg))
+	//if (not dbdelete("steve",errmsg))
 	//	errmsg.outputl();
 
 	var testfilename="t_vm.txt";

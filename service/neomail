@@ -1,22 +1,29 @@
 #!/bin/bash
 set -eu
 
-:
+: =================================================
 : Email with optional attachment via local sendmail
 : =================================================
 :
-	TOEMAIL="$1"		#multiple email addressses can separated by ;
-
-	FULL_FILENAME="$2"	#absolute path to optional attachment
-
-	HEADERS="$3"		#must include EVERYTHING
-	#From:test@neosys.com
-	#Reply-to: dev@neosys.com
-	#To:dev@neosys.com;dev2@neosys.com
-	#Cc: aaa@neosys.com;bbb@neosys.com
-	#Subject:EXODUS: Media Diary (to:TBQBB)
-	#X-Auto-Response-Suppress: RN, NRN, OOF
-	#Precedence: bulk
+: 'Syntax is ./neomail <TO_EMAIL> <FULL_FILENAME> <HEADERS>'
+:
+: '1. Multiple email addressses can separated by ;'
+:
+: '2. Optional full path to file for attachment, or ""'
+:
+: '3. Headers must include EVERYTHING e.g.'
+:
+: 'From:test@neosys.com'
+: 'Reply-to: dev@neosys.com'
+: 'To:dev@neosys.com;dev2@neosys.com'
+: 'Cc: aaa@neosys.com;bbb@neosys.com'
+: 'Subject:EXODUS: Media Diary'
+: 'X-Auto-Response-Suppress: RN, NRN, OOF'
+: 'Precedence: bulk'
+:
+	TOEMAIL="${1:?<TO_EMAIL> argument is required.}"
+	FULL_FILENAME="${2:?<> argument is required or must be \'\'.}"
+	HEADERS="${3:?<HEADERS> argument is required.}"
 
 	if [ -n "$FULL_FILENAME" ]; then
 		FILENAME=${FULL_FILENAME##*/}

@@ -36,10 +36,23 @@ var ExodusProgramBase::libinfo(const var& command) {
 	return var(perform_exodusfunctorbase_.libfilename(command.toString())).osfile();
 }
 
-bool ExodusProgramBase::select(const var& sortselectclause) {
+bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
+
+	//TRACE(sortselectclause_or_filehandle)
+
+	//simple select on filehandle
+	if (sortselectclause_or_filehandle.index(FM)) {
+		CURSOR = sortselectclause_or_filehandle;
+		return CURSOR.select();
+	}
+
+	var sortselectclause = sortselectclause_or_filehandle;
 
 	//stage 1
 	/////////
+
+	//force default connection
+	CURSOR.r(2, "");
 
 	//indicate there are no calculated fields
 	CURSOR.r(10, "");
@@ -61,8 +74,6 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		////////////
 	}
 
-	TRACE(sortselectclause)
-
 	//stage 2
 	/////////
 
@@ -83,8 +94,6 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	//debug
 	//calc_fields.convert(FM^VM^SM,"   ").outputl("calc=");
 
-	var sortselectclause2 = sortselectclause;
-
 	var dictfilename = calc_fields.a(5, 1);
 
 	//debugging
@@ -92,10 +101,10 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	calc_fields_file.open("calc_fields");
 
 	//open the dictionary
-	if (dictfilename.substr(1, 5).lcase() != "dict_")
-		dictfilename = "dict_" ^ dictfilename;
+	if (dictfilename.substr(1, 5).lcase() != "dict.")
+		dictfilename = "dict." ^ dictfilename;
 	if (!DICT.open(dictfilename)) {
-		dictfilename = "dict_voc";
+		dictfilename = "dict.voc";
 		if (!DICT.open(dictfilename)) {
 			throw MVDBException(dictfilename.quote() ^ " cannot be opened");
 		}
@@ -106,11 +115,13 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 	//CREATE TABLE SELECT_STAGE2(
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
-	var temptablename = "SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
+	var temptablename = "SELECT_TEMP_STAGE2_CURSOR_" ^ CURSOR.a(1);
 	var createtablesql = "";
 	createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-	//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
-	createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
+	if (true)
+		createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
+	else
+		createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
 	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
 
 	//prepare to insert sql records
@@ -145,7 +156,7 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
 		//temporary parallel file
-		sortselectclause2.replacer("\\b" ^ dictid ^ "\\b", dictid ^ ":");
+		sortselectclause.replacer("\\b" ^ dictid ^ "\\b", dictid ^ ":");
 
 		dictid.converter(".", "_");
 		dictids(fieldn) = dictid;
@@ -416,9 +427,9 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 
 	}//readnext
 
-	sortselectclause2.errputl("\nstage2=");
+	sortselectclause.errputl("\nstage2=");
 
-	bool result = CURSOR.select(sortselectclause2);
+	bool result = CURSOR.select(sortselectclause);
 
 	return result;
 }
@@ -1253,7 +1264,7 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 
 			// use calculate()
 			var result =
-				calculate(fieldno_or_name, "dict_" ^ filename.a(1), keyx, record);
+				calculate(fieldno_or_name, "dict." ^ filename.a(1), keyx, record);
 			if (nkeys > 1)
 				result.lowerer();
 			results.r(keyn, result);
@@ -1275,9 +1286,9 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mvno) {
 
 	//dictid @ID/@id is hard coded to return ID
-	//to avoid incessant lookup in main file dictionary and then defaulting to dict_voc
+	//to avoid incessant lookup in main file dictionary and then defaulting to dict.voc
 	//sadly this means that @ID cannot be customised per file
-	//possibly amend the read cache to cache the dict_voc version for the main file
+	//possibly amend the read cache to cache the dict.voc version for the main file
 	//if (dictid == "@ID" || dictid == "@id")
 	//	return ID;
 
@@ -1316,13 +1327,13 @@ var ExodusProgramBase::calculate(const var& dictid) {
 		if (not cache_dictrec_.reado(DICT, dictid)) {
 			// try lower case
 			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
-				// try dict_voc
+				// try dict.voc
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
-				if (not dictvoc.open("dict_voc")) {
+				if (not dictvoc.open("dict.voc")) {
 baddict:
 					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
-								  DICT.a(1).quote() ^ " nor in DICT_VOC");
+								  DICT.a(1).quote() ^ " nor in dict.voc");
 				}
 				if (not cache_dictrec_.reado(dictvoc, dictid)) {
 					// try lower case
@@ -1341,7 +1352,7 @@ baddict:
 		}
 		cache_dictid_ = DICT.a(1) ^ " " ^ dictid;
 
-		//detect from the cached record if it came from dict_voc
+		//detect from the cached record if it came from dict.voc
 		//so we can choose the libdict_voc if so
 		indictvoc = cache_dictrec_.a(16);
 

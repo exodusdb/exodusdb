@@ -478,7 +478,7 @@ function main() {
 	//call programstackstack);
 
 	var nextconnection;
-	nextconnection.connect(getenv("EXO_DBNAME"));
+	nextconnection.connect(getenv("EXO_DATA"));
 
 ////////////
 nextrequest:
@@ -1970,7 +1970,7 @@ noupdate:
 			//simulate window environment for POSTREAD
 			win.srcfile = file;
 			win.datafile = filename;
-			if (not(DICT.open("dict_" ^ win.datafile))) {
+			if (not(DICT.open("DICT." ^ win.datafile))) {
 				if (sessionid) {
 					gosub unlock();
 				}
@@ -2152,7 +2152,7 @@ noupdate:
 			return;
 		}
 
-		if (not(DICT.open("dict_" ^ win.datafile))) {
+		if (not(DICT.open("DICT." ^ win.datafile))) {
 			//response=quote('DICT.':datafile):' file is not available'
 			call listen4(9, response_, "DICT." ^ win.datafile);
 			return;

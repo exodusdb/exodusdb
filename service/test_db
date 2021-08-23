@@ -5,10 +5,13 @@ set -eux
 : test if a postgresql database exists
 : ====================================
 :
+: 'Syntax is:'
+:
+: '	./test_db <DBNAME>'
+:
+	EXO_DATA=${1:?<DBNAME> argument is required.}
 
-	EXO_DBNAME=$1
-
-	if sudo -u  postgres psql $EXO_DBNAME -c 'select 1' &> /dev/null; then
+	if sudo -u  postgres psql $EXO_DATA -c 'select 1' &> /dev/null; then
 		exit 0
 	else
 		exit 1
