@@ -76,6 +76,7 @@ returnzero:
 		return 0;
 	}
 
+<<<<<<< HEAD
     if (true) {
         text = "http:/" "/geoiplookup.net/ip/" ^ ipno;
     }
@@ -107,8 +108,74 @@ returnzero:
 
 		text.swapper("\r\n", FM);
 		text.swapper("\n", FM);
+||||||| 29b0204
+	cmd = SYSTEM.a(50);
+
+	//check cygwin whois present otherwise quit
+	//WARNING TODO: check ternary op following;
+	exe = oscwd().index(":") ? ".exe" : "";
+	if (VOLUMES and (not((cmd ^ "whois" ^ exe).osfile()))) {
+		text = "whois command is not installed";
+		return 0;
 	}
 
+	//build the command
+	cmd ^= "whois " ^ ipno;
+
+	//dont wait for a long time - in case internet access is blocked
+	if ((cmd ^ "timeout.exe").osfile()) {
+		cmd.splicer(1, 0, SYSTEM.a(50) ^ "timeout 5 ");
+=======
+	if (true) {
+		text = "http:/" "/geoiplookup.net/ip/" ^ ipno;
+>>>>>>> dev
+	}
+<<<<<<< HEAD
+
+||||||| 29b0204
+
+	//capture the output of the whois command
+	text = shell2(cmd, errors);
+
+	if (errors) {
+		text ^= errors;
+	}
+
+	text.swapper("\r\n", FM);
+	text.swapper("\n", FM);
+
+=======
+	else {
+		cmd = SYSTEM.a(50);
+
+		//check cygwin whois present otherwise quit
+		//WARNING TODO: check ternary op following;
+		exe = oscwd().index(":") ? ".exe" : "";
+		if (VOLUMES and (not((cmd ^ "whois" ^ exe).osfile()))) {
+			text = "whois command is not installed";
+			return 0;
+		}
+
+		//build the command
+		cmd ^= "whois " ^ ipno;
+
+		//dont wait for a long time - in case internet access is blocked
+		if ((cmd ^ "timeout.exe").osfile()) {
+			cmd.splicer(1, 0, SYSTEM.a(50) ^ "timeout 5 ");
+		}
+
+		//capture the output of the whois command
+		text = shell2(cmd, errors);
+
+		if (errors) {
+			text ^= errors;
+		}
+
+		text.swapper("\r\n", FM);
+		text.swapper("\n", FM);
+	}
+
+>>>>>>> dev
 	return 0;
 }
 
