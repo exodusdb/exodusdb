@@ -220,7 +220,6 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	//create the function
 	var errmsg;
 	//supposedly this is on the default connection
-	TRACE("XXX DEFAULT CONNECTION?")
 	var().sqlexec(functionsql, errmsg);
 
 	//do drop function first if suggested

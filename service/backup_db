@@ -67,7 +67,7 @@ set -eux
 : =========================================================================
 :
 	if [[ $OPTIONS =~ "S" ]]; then
-		./service ${EXO_DATA} start $RESTORE_DB_SUFFIX
+		./service ${EXO_DATA} start $RESTOREDB_SUFFIX
 	fi
 
 :
