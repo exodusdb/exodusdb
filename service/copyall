@@ -6,9 +6,8 @@ set -eux
 : =================================================
 :
 : Syntax is:
-: 	./copyall
-:	./copyall CONFIRM
-:
+: 	./copyall                 \# dry run
+:	./copyall CONFIRM         \# really does it
 
 :
 : EXODUS installed in
@@ -29,14 +28,6 @@ set -eux
 	fi
 
 :
-: Create a directory for live services binaries
-: =============================================
-:
-: May be used for EXODUS environment variable "EXO_HOME"
-:
-	mkdir -p $HOME/live
-
-:
 : Create exodus_live database if not present
 : ==========================================
 :
@@ -45,6 +36,8 @@ set -eux
 :
 : Copy all dictionaries from exodus to exodus_live
 : ================================================
+:
+: Use --clean option to drop dict files before importing them
 :
 	if [ -z $DRYRUN ]; then
 		sudo -u postgres pg_dump --clean -t 'dict.*' exodus|sudo -u postgres psql exodus_live
@@ -63,12 +56,20 @@ set -eux
 	rsync -av --whole-file $EXODUS/service/neomail ~/bin
 
 :
+: Create a directory for live services binaries
+: =============================================
+:
+: May be used for EXODUS environment variable "EXO_HOME"
+:
+	mkdir -p $HOME/live
+
+:
 : Copy all bin and lib files to live
 : ==================================
 :
 :	MUST use 'whole file' option to ensure that the OS dlopen understands everything has changed
 :	otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
-
+:
 	#rsync -av ~/bin ~/lib ~/inc ~/live
 	#rsync -a ~/{bin,lib,inc} ~/live
 	#rsync -av --delete ~/{bin,lib} ~/live
