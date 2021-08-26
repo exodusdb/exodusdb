@@ -22,15 +22,17 @@ programinit()
 	//ExodusFunctorF0<int> xyz;
 
 	var verbose;
-var silent;
-var debugging;
-var optimise;
-var generateheadersonly;
-var posix;
-var windows;
+	var silent;
+	var debugging;
+	var optimise;
+	var generateheadersonly;
+	var force;
+	var posix;
+	var windows;
+	var libexodusinfo = "";
 
-var max_nthreads;
-std::list<std::thread> threadlist;
+	var max_nthreads;
+	std::list<std::thread> threadlist;
 
 function main() {
 
@@ -56,12 +58,14 @@ function main() {
 	var usedeffile = false;
 
 	//extract options
-	verbose = index(OPTIONS.ucase(), "V");
-	silent = index(OPTIONS.ucase(), "S");
-	debugging = not index(OPTIONS.ucase(), "R");  //no symbols for backtrace
+	OPTIONS.ucaser();
+	verbose = index(OPTIONS, "V");
+	silent = index(OPTIONS, "S");
+	debugging = not index(OPTIONS, "R");  //no symbols for backtrace
 	//the backtrace seems to work fine with release mode at least in vs2005
-	optimise = count(OPTIONS.ucase(), "O");				//prevents backtrace
-	generateheadersonly = index(OPTIONS.ucase(), "H");	//prevents backtrace
+	optimise = count(OPTIONS, "O");				//prevents backtrace
+	generateheadersonly = index(OPTIONS, "H");	//prevents backtrace
+	force = index(OPTIONS,"F");
 
 	//var ncpus = osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ", 1);
 	var ncpus = osshellread("grep -c ^processor /proc/cpuinfo").convert("\r\n","");
@@ -221,6 +225,8 @@ function main() {
 		//use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden";
 #endif
+
+		libexodusinfo = osfile("/usr/local/lib/libexodus.so");
 
 		//not posix
 	} else {
@@ -593,7 +599,8 @@ function main() {
 		else if (not silent)
 			printl(srcfilename);
 
-		if (not osfile(srcfilename)) {
+		var srcfileinfo = osfile(srcfilename);
+		if (!srcfileinfo) {
 			srcfilename.errputl("srcfile doesnt exist: ");
 			continue;
 		}
@@ -1124,6 +1131,22 @@ var inclusion=
 		//skip compilation if generateheadersonly option
 		if (generateheadersonly)
 			continue;
+
+		//skip compilation if
+		var outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
+		//TRACE(outputdir ^ OSSLASH ^ field2(binfilename, OSSLASH, -1))
+		//TRACE(srcfileinfo)
+		//TRACE(libexodusinfo)
+		//TRACE(outfileinfo)
+		if (outfileinfo and not(force) and not(generateheadersonly)) {
+			if (outfileinfo.a(2) > srcfileinfo.a(2) || (outfileinfo.a(2) == srcfileinfo.a(2) && outfileinfo.a(3) > srcfileinfo.a(3))) {
+				if (outfileinfo.a(2) > libexodusinfo.a(2) || (outfileinfo.a(2) == libexodusinfo.a(2) && outfileinfo.a(3) > libexodusinfo.a(3))) {
+					if (verbose)
+						printl("Skipping compilation since the output file is newer than both the source code and libexodus, and no (F)orce option provided.");
+					continue;
+				}
+			}
+		}
 
 		//WARNING: all parameters must be copyable into the thread ie assigned or defaulted
 		manifest = "";

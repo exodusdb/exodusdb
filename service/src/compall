@@ -1,11 +1,13 @@
 #!/bin/bash
 set -eux
 
-: ======================
-: Compile EXODUS service
-: ======================
+: ===============================
+: Compile EXODUS service programs
+: ===============================
 :
 : Please ignore a few warnings about 'cast between incompatible pointer to member types'
+:
+	COMPILER_OPTIONS=${1:-}
 
 :
 : Generate all headers first
@@ -17,7 +19,7 @@ set -eux
 : Compile EXODUS service
 : ======================
 :
-	compile alt exo sys {S}
+	compile alt exo sys {S${COMPILER_OPTIONS}}
 
 :
 : Finished compiling EXODUS service in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
