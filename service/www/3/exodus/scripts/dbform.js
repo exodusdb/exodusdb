@@ -5818,10 +5818,17 @@ function getvalue(element, recn) {
             switch (element.type) {
 
                 case 'text':
-                    var tx = element.value.exodustrimr()
-                    //may be visibly uppercase due to style but internally lowercase so change it here
-                    if (!element.getAttribute('exoduslowercase'))
-                        return tx.toUpperCase()
+                    //var tx = element.value.exodustrimr()
+
+                    //similar code in INPUT and SPAN
+					//always trim trailing white space
+                    var tx = element.value.replace(/\s+$/, '')
+                    if (!element.getAttribute('exoduslowercase')) {
+                        //may be visibly uppercase due to style but internally lowercase so change it here
+                        tx = tx.toUpperCase()
+						//trim leading white space if lower case not allowed
+						tx = tx.replace(/^\s+/, '')
+					}
                     return tx
 
                 case 'radio': {
@@ -5897,7 +5904,18 @@ function getvalue(element, recn) {
             //if (value == nbsp160)
             //    return "";
             //remove trailing spaces and end of lines
-            return value.replace(/[ \r\n]+$/, '')
+            //return value.replace(/[ \r\n]+$/, '')
+
+			//similar code in INPUT and SPAN
+            //remove trailing white space
+            value = value.replace(/\s+$/, '')
+            if (!element.getAttribute('exoduslowercase')) {
+                //may be visibly uppercase due to style but internally lowercase so change it here
+                value = value.toUpperCase()
+                //trim leading white space if lower case not allowed
+                value = value.replace(/^\s+/, '')
+            }
+            return value
 
         case 'TEXTAREA': {
 
