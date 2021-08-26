@@ -7,8 +7,8 @@ programinit()
 
 	var result = 0;
 
-	if (not filenames)
-		stop("Syntax is deletefile filename filename ...\ndict files are named dict.filename");
+	//if (not filenames)
+	//	stop("Syntax is deletefile filename filename ...\ndict files are named dict.filename");
 
 	var nfiles = dcount(filenames, FM);
 	for (var filen = 1; filen <= nfiles; ++filen) {
