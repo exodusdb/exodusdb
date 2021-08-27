@@ -274,6 +274,12 @@ function main()
 		assert(x/y*z=="10.0");
 	}
 
+    assert(capitalise("aa \"AAA\"") == "Aa \"AAA\"");
+    assert(capitalise("aa \"aAa\"") == "Aa \"aAa\"");
+    assert(capitalise("aa 'AAA'") == "Aa 'AAA'");
+    assert(capitalise("aa 'aAa'") == "Aa 'aAa'");
+    assert(capitalise("1aA 2AA 3Aa 4aa") == "1AA 2AA 3AA 4AA");
+
 	//raw strings
 	var value=R"('1')";
 	assert(value.swap("'",R"(\')")=="\\'1\\'");
