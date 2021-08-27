@@ -978,16 +978,16 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 			if (inquotes) {
 				inquotes = tt != inquotes;
 			} else {
-				if (tt == DQ && (string2.count(DQ) > 1 || tt == "\'") &&
-					string2.count("\'") > 1) {
+				//if (tt == DQ && (string2.count(DQ) > 1 || tt == "\'") &&
+				//	string2.count("\'") > 1) {
+				if ((tt eq DQ and string2.count(DQ) gt 1) or ((tt eq "'" and string2.count("'") gt 1))) {
 					inquotes = tt;
 				} else {
 					if (wordseps.index(tt, 1)) {
 						cap = 1;
 						if (tt == " ")
-							numx = var("1234567890")
-									   .index(string2.substr(ii + 1, 1),
-											  1);
+							//numx = var("1234567890").index(string2.substr(ii + 1, 1), 1);
+							numx = var("1234567890").index(string2[ii + 1], 1);
 					} else {
 						if (cap || numx) {
 							tt.converter(LOWERCASE, UPPERCASE);
@@ -1028,7 +1028,8 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 		// convert to uppercase
 		var quoted = "";
 		for (int ii = 1; ii <= 99999; ii++) {
-			var tt = string2.substr(ii, 1);
+			//var tt = string2.substr(ii, 1);
+			var tt = string2[ii];
 			// BREAK;
 			if (!(tt != ""))
 				break;

@@ -1547,6 +1547,7 @@ void converter_helper(T& var_str, const T& oldchars, const T& newchars) {
 
 		if (fromcharn < int(newchars.length()))
 			var_str.replace(pos, 1, newchars.substr(fromcharn, 1));
+			//var_str.replace(pos, 1, newchars[fromcharn]);
 		else
 			var_str.erase(pos, 1);
 

@@ -137,6 +137,7 @@ set -eux
 : Copy logo and ico into images and web root
 : ==========================================
 
+	cd $EXODUS/service
 	cp favicon.ico www
 	cp exodusm.png www/exodus/images/theme2
 
