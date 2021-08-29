@@ -1239,12 +1239,26 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 	var results = "";
 	var nkeys = key.dcount(VM);
 
+	var is_fieldno = fieldno_or_name.isnum();
+
+	var dictfile;
+	if (not is_fieldno) {
+		if (not dictfile.open("dict." ^ filename.a(1))) {
+			throw MVError("ExodusProgramBase::xlate(filename:" ^ filename ^ ", key:" ^ key ^ ",field:" ^ fieldno_or_name ^ ") - dict." ^ filename ^ " does not exist.");
+		}
+	}
+
 	for (var keyn = 1; keyn <= nkeys; ++keyn) {
 
 		var keyx = key.a(1, keyn);
 
-		// handle non-numeric field_no ie dictionary field/column name
-		if (not fieldno_or_name.isnum()) {
+		// if ordinary numeric or "" fieldno
+		if (is_fieldno) {
+			results.r(keyn, keyx.xlate(filename, fieldno_or_name, mode));
+		}
+
+		// otherwise handle non-numeric field_no ie dictionary field/column name
+		else {
 
 			// get the whole record
 			var record = keyx.xlate(filename, "", mode);
@@ -1265,15 +1279,12 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 
 			// use calculate()
 			var result =
-				calculate(fieldno_or_name, "dict." ^ filename.a(1), keyx, record);
+				calculate(fieldno_or_name, dictfile, keyx, record);
 			if (nkeys > 1)
 				result.lowerer();
 			results.r(keyn, result);
-			continue;
 		}
 
-		// ordinary numeric or "" fieldno
-		results.r(keyn, keyx.xlate(filename, fieldno_or_name, mode));
 	}
 
 	if (nkeys > 1)

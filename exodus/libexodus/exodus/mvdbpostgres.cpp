@@ -259,7 +259,13 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 	// otherwise get the default connection
 	if (!mvconn_no) {
 
+		//if (DBTRACE and dbhandle.assigned()) {
+		//	dbhandle.logputl("DBTR get_mvconn_no_or_default=");
+		//}
+
+		//dbhandle MUST always arrive in lower case to detect if "dict."
 		bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
+		//bool isdict = dbhandle.unassigned() ? false : (dbhandle.starts("dict.") || dbhandle.starts("DICT."));
 		//bool isdict = false;
 
 		if (isdict)
@@ -875,6 +881,10 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//var sql="select '" ^ filename2 ^ "'::regclass";
 	//if (! connection.sqlexec(sql))
 
+	if (GETDBTRACE) {
+		connection2.logputl("DBTR var::open-1 ");
+	}
+
 	var tablename;
 	var schema;
 	if (filename2.index(".")) {
@@ -896,6 +906,10 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	var result;
 	connection2.sqlexec(sql, result);
 	//result.convert(RM,"|").logputl("result=");
+
+	if (GETDBTRACE) {
+		connection2.logputl("DBTR var::open-2 ");
+	}
 
 	// 2. look in materialised views
 	// select matviewname from pg_matviews where matviewname = '...';
@@ -931,7 +945,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	(*this) = filename2 ^ FM ^ get_mvconn_no_or_default(connection2);
 
 	if (GETDBTRACE) {
-		this->logputl("DBTR var::open ");
+		this->logputl("DBTR var::open-3 ");
 	}
 
 	// logputl("opened filehandle");

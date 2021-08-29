@@ -2540,7 +2540,8 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const 
 	//	record="";
 	//	return record;
 	//}
-	file = filename;
+	//file MUST be lower case in order to detect "dict."
+	file = filename.lcase();
 
 	char sep = fieldno.length() ? VM_ : RM_;
 
