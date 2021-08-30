@@ -842,14 +842,14 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	THISISDEFINED()
 	ISSTRING(filename)
 
+	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
+	var filename2 = get_normal_filename(filename);
+
 	// asking to open DOS file! ok can osread/oswrite later!
-	if (filename == "DOS") {
+	if (filename == "dos") {
 		(*this) = filename;
 		return true;
 	}
-
-	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	var filename2 = get_normal_filename(filename);
 
 	//use connection provided
 	var connection2;

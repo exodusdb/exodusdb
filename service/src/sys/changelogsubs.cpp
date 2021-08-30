@@ -393,7 +393,8 @@ subroutine getcurrentversiondatetime() {
 	//temp=xlate('DOS','.\general\version.dat',1,'x')
 	var temp = "./general/version.dat";
 	temp.converter("/", OSSLASH);
-	temp = temp.xlate("DOS", 1, "X");
+	//temp = temp.xlate("DOS", 1, "X");
+	temp = osread(temp);
 	if (not(VOLUMES)) {
 		if (temp eq "") {
 			temp = EXECPATH.osfile();
