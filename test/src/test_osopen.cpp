@@ -21,7 +21,21 @@ function main() {
 
 	assert(data == "xyz");
 
+	assert(osdelete(filename));
+	assert(not osfile(filename));
+
+	printl("also test open/read/write/delete on file 'DOS'");
+	var dosfile;
+	assert(open("DOS",dosfile));
+	assert(open("dos",dosfile));
+	assert(write("xyz",dosfile,"t_xyz.txt"));
+	assert(read(RECORD,dosfile,"t_xyz.txt"));
+	assert(RECORD == "xyz");
+	assert(deleterecord(dosfile,"t_xyz.txt"));
+	assert(not read(RECORD,dosfile,"t_xyz.txt"));
+
 	printl("Test passed");
+
 	return 0;
 }
 

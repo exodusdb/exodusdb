@@ -845,9 +845,9 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
 	var filename2 = get_normal_filename(filename);
 
-	// asking to open DOS file! ok can osread/oswrite later!
-	if (filename == "dos") {
-		(*this) = filename;
+	// filename dos or DOS  means osread/oswrite/osdelete
+	if (filename2.var_str.length() == 3 && filename2.var_str == "dos") {
+		(*this) = "dos";
 		return true;
 	}
 
@@ -1059,8 +1059,18 @@ bool var::read(const var& filehandle, const var& key) {
 	//	this->var_str.resize(0);
 	//}
 
-	// asking to read DOS file! do osread using key as osfilename!
-	if (filehandle == "DOS") {
+	// lower case key if reading from dictionary
+	// std::string key2;
+	// if (filehandle.substr(1,5).lcase()=="dict.")
+	//	key2=key.lcase().var_str;
+	// else
+	//	key2=key.var_str;
+	std::string key2 = key.normalize().var_str;
+
+	// filehandle dos or DOS means osread/oswrite/osdelete
+	if (filehandle.var_str.length() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
+		//return this->osread(key2);  //.convert("\\",OSSLASH));
+		//use osfilenames unnormalised so we can read and write as is
 		return this->osread(key);  //.convert("\\",OSSLASH));
 	}
 
@@ -1128,14 +1138,6 @@ bool var::read(const var& filehandle, const var& key) {
 	int paramLengths[1];
 	// int		paramFormats[1];
 	// uint32_t	binaryIntVal;
-
-	// lower case key if reading from dictionary
-	// std::string key2;
-	// if (filehandle.substr(1,5).lcase()=="dict.")
-	//	key2=key.lcase().var_str;
-	// else
-	//	key2=key.var_str;
-	std::string key2 = key.normalize().var_str;
 
 	//$1=key
 	paramValues[0] = key2.data();
@@ -1496,19 +1498,21 @@ bool var::write(const var& filehandle, const var& key) const {
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	// clear any cache
-	filehandle.deleteo(key);
-
-	// asking to write DOS file! do osread!
-	if (filehandle == "DOS") {
-		this->oswrite(key);	 //.convert("\\",OSSLASH));
-		return true;
-	}
-
 	// std::string key2=key.var_str;
 	// std::string data2=this->var_str;
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
+
+	// clear any cache
+	filehandle.deleteo(key2);
+
+	// filehandle dos or DOS means osread/oswrite/osdelete
+	if (filehandle.var_str.length() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
+		//this->oswrite(key2);	 //.convert("\\",OSSLASH));
+		//use osfilenames unnormalised so we can read and write as is
+		this->oswrite(key);	 //.convert("\\",OSSLASH));
+		return true;
+	}
 
 	// a 2 parameter array
 	const char* paramValues[2];
@@ -1726,6 +1730,13 @@ bool var::deleterecord(const var& key) const {
 	// std::string key2=key.var_str;
 	std::string key2 = key.normalize().var_str;
 
+	// filehandle dos or DOS means osread/oswrite/osdelete
+	if (this->var_str.length() == 3 && (this->var_str == "dos" || this->var_str == "DOS")) {
+		//return this->osdelete(key2);
+		//use osfilenames unnormalised so we can read and write as is
+		return this->osdelete(key);
+	}
+
 	// a one parameter array
 	const char* paramValues[1];
 	int paramLengths[1];
@@ -1736,7 +1747,7 @@ bool var::deleterecord(const var& key) const {
 	paramLengths[0] = int(key2.length());
 	// paramFormats[0] = 1;//binary
 
-	var sql = "DELETE FROM " ^ this->a(1) ^ " WHERE KEY = $1";
+	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
