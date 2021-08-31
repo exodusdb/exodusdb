@@ -41,6 +41,16 @@ function main()
 
 	var filename="xo_test_db_temp1";
 
+	printl("test open/read/write/delete on file 'DOS'");
+	var dosfile;
+	assert(open("DOS",dosfile));
+	assert(open("dos",dosfile));
+	assert(write("xyz",dosfile,"t_xyz.txt"));
+	assert(read(RECORD,dosfile,"t_xyz.txt"));
+	assert(RECORD == "xyz");
+	assert(deleterecord(dosfile,"t_xyz.txt"));
+	assert(not read(RECORD,dosfile,"t_xyz.txt"));
+
 	var trec;
 	deletefile(filename);
 	assert(createfile(filename));

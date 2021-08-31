@@ -28,7 +28,7 @@ set -eux
 	fi
 
 :
-: Stop the target database
+: Stop the source database
 : ========================
 :
 	./service ${FROM_EXO_DATA} stop test
