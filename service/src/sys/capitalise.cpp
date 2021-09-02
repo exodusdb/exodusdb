@@ -11,6 +11,13 @@ var tt;
 var toupper;
 var quoted;
 
+////////////////////////////////////////
+// capitalise.cpp                     //
+// NO LONGER USED                     //
+// HARD CODED IN exodus/mvprogram.cpp //
+// no include statement is required   //
+////////////////////////////////////////
+
 function main(io str0, io mode, io wordseps, io oconv_out) {
 	//c sys io,io,io,io
 	//global all
