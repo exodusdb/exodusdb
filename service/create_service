@@ -5,13 +5,14 @@ set -eux
 : Create/Recreate an EXODUS service
 : =================================
 :
-:	'Syntax is ./create_service <APP_CODE> <HOST_DIR> "[BASE_DB_CODE]" {live|test}'
+: 'Syntax is ./create_service <APP_CODE> <HOST_DIR> "[<BASE_DB_CODE>]" live|test'
 :
-:	'e.g.      ./create_service exo exodus "" live'
-:	'e.g.      ./create_service agy watermelon "" test'
+: 'Example:  ./create_service exo exodus "" live'
 :
-	APP_CODE=${1:?<APP_CODE> argument is required.}
-	HOST_DIR=${2:?<HOST_DIR> argument is required.}
+: 'Example:  ./create_service agy watermelon "" test'
+:
+	APP_CODE=${1:?<APP_CODE> is required.}
+	HOST_DIR=${2:?<HOST_DIR> is required.}
 	BASE_DB_CODE=${3:-${HOST_DIR}}
 	LIVE_OR_TEST=${4}
 :

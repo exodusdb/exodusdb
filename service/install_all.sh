@@ -5,10 +5,11 @@ set -eux
 : Installs EXODUS web service
 : ===========================
 :
-: 'Syntax is ./install_all.sh <SITE_NAME>|exodus|none <DOMAIN_PREFIX>'
+: 'Syntax is ./install_all.sh [<SITE_NAME>|exodus|none] [<DOMAIN_PREFIX>]'
 :
-: 'eg.       ./install_all.sh'
-: 'eg.       ./install_all.sh exodus t-'
+: 'Example:  ./install_all.sh'
+:
+: 'Example:  ./install_all.sh exodus t-'
 :
 : '<SITE_NAME> defaults to "exodus"'
 : '<DOMAIN_PREFIX> defaults to ""'

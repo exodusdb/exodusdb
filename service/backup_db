@@ -5,23 +5,23 @@ set -eux
 : Backup a postgres database
 : ==========================
 :
-:	'Syntax is:'
+: ' Syntax:'
 :
-:	' ./backup_db <DBNAME> [<OPTIONS>...] [<BACKUPDIR>] [<RESTOREDB_SUFFIX>]'
+: '  ./backup_db <DBNAME> [<OPTIONS>...] [<BACKUPDIR>] [<RESTOREDB_SUFFIX>]'
 :
-:	'<OPTIONS> are (B)ackup, (R)estore, (V)erify, (S)tart'
-:	'          defaults to BRVS'
+: '<OPTIONS> are (B)ackup, (R)estore, (V)erify, (S)tart'
+: '          Defaults to BRVS'
 :
-:	'<BACKUPDIR> defaults to ~/backups/sql'
+: '<BACKUPDIR> defaults to ~/backups/sql'
 :
-:	'RESTOREDB_SUFFIX defaults to test i.e. _test'
+: 'RESTOREDB_SUFFIX defaults to test i.e. _test'
 :
-:	'e.g.'
+: 'Example:'
 :
-:	' ./backup_db mgg'
-:	' ./backup_db mgg BRVS'
+: '  ./backup_db mgg'
+: '  ./backup_db mgg BRVS'
 :
-:	'Restores backup to same databasename but ending _test by default'
+: 'Restores backup to same databasename but ending _test by default'
 :
 	EXO_DATA=${1:?<DBNAME> argument is required.}
 	OPTIONS=${2:-BRVS}

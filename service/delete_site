@@ -5,8 +5,7 @@ set -eux
 : Delete an apache site
 : =====================
 :
-:	'Syntax is:'
-:	'./delete_site <HOST_NAME> [<SITE_DIR>]'
+: 'Syntax is ./delete_site <HOST_NAME> [<SITE_DIR>]'
 :
 	HOST_NAME=${1:?<HOST_NAME> argument is required.}
 	SITE_DIR=${2:-$1}

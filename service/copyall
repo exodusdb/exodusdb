@@ -5,9 +5,11 @@ set -eux
 : Copy all EXODUS dictionaries and programs to live
 : =================================================
 :
-: Syntax is:
-: 	./copyall                 \# dry run
-:	./copyall CONFIRM         \# really does it
+: 'Syntax is ./copyall [CONFIRM]'
+:
+: '  ./copyall                 # dry run'
+:
+: '  ./copyall CONFIRM         # really does it'
 
 :
 : EXODUS installed in

@@ -5,7 +5,7 @@ set -eux
 : Copy a postgres database
 : ========================
 :
-:	'Syntax is ./copy_db <FROM_DBNAME> <TO_DNAME> [DELETE]'
+: 'Syntax is ./copy_db <FROM_DBNAME> <TO_DNAME> [DELETE]'
 :
 	FROM_DB_CODE=${1:?<FROM_DBNAME> argument is required.}
 	TO_DB_CODE=${2:?<TO_DBNAME> argument is required.}

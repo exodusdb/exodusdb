@@ -5,11 +5,13 @@ set -eux
 : Restore a postgres database from an sql dump to a _test database
 : ===============================================================
 :
-:	'Syntax is ./doall <DBNAME> restore_db'
-:	'       or ./restore_db <DBNAME> [<BACKUPDIR>] [OPTION]'
-:	''
-:   '       BACKUPDIR defaults to ~/backups/sql'
-:	'		OPTION is N to NOT restart the target database service.'
+: 'Syntax:'
+:
+: '  ./doall <DBNAME> restore_db [OPTION=N...]'
+:
+: '  ./restore_db <DBNAME> [<BACKUPDIR=~/backups/sql>] [OPTION...]'
+:
+: 'OPTION is N to NOT restart the target database service.'
 :
 	FROM_EXO_DATA=${1:?<DBNAME> argument is required.}
 	NEW_BACKUP_DIR=${2:-~/backups/sql}

@@ -5,10 +5,11 @@ set -eux
 : Delete a NEOSYS service
 : =======================
 :
-:   'Syntax is ./delete_service <APP_CODE> <HOST_DIR> "[DB_CODE]" {live|test}'
+: 'Syntax is ./delete_service <APP_CODE> <HOST_DIR> "[<DB_CODE>]" live|test'
 :
-:   'e.g.      ./delete_service exo exodus "" live'
-:   'e.g.      ./delete_service agy watermelon watermelon test'
+: 'Example:  ./delete_service exo exodus "" live'
+:
+: 'Example:  ./delete_service agy watermelon watermelon test'
 :
 
     APP_CODE=${1:?<APP_CODE> argument is required.}
