@@ -94,7 +94,9 @@ set -eux
 : Stop the background process
 : ===========================
 :
-	sudo systemctl stop $FULL_SERVICE_CODE
+	if [ "$SERVICE_SUFFIX" = "test" ]; then
+		sudo systemctl stop $FULL_SERVICE_CODE
+	fi
 
 :
 : Indicate the database to use and request debugging
@@ -126,7 +128,9 @@ set -eux
 : After debugging is finished, resume the normal background service
 : =================================================================
 :
-	sudo systemctl start $FULL_SERVICE_CODE
+	if [ "$SERVICE_SUFFIX" = "test" ]; then
+		sudo systemctl start $FULL_SERVICE_CODE
+	fi
 
 :
 : Finished debug of $SITE_DIR - $DB_CODE in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds
