@@ -11,12 +11,15 @@ programinit()
 	var silent = OPTIONS.index("S");
 
 	if (not silent)
-		logputl("dbcomp says 'Hello World!'");
+		db1.logputl("dbcomp connecting to ");
 
 	if (not(db1.connect())) {
 		call fsmsg();
 		stop(1);
 	}
+
+	if (not silent)
+		db2.logputl("dbcomp connecting to ");
 
 	if (not(db2.connect())) {
 		call fsmsg();
@@ -77,7 +80,7 @@ programinit()
 
 			if (not RECORD) {
 				if (not RECORD.read(file1, ID)) {
-					errputl(ID, "missing from filename", db1.a(1));
+					errputl(ID, "missing from filename", filename);
 					nerrors++;
 					continue;
 				}
