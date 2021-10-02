@@ -9,7 +9,7 @@ var reply;
 function main(in filename, io file, in similarfilename="", in autocreate="") {
 
 	//evade compiler warning
-	if (false&&autocreate) {};
+	if (false&&autocreate) {}
 
 	if (file.open(filename)) {
 		return true;

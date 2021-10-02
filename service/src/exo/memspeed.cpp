@@ -1,6 +1,4 @@
 #include <exodus/program.h>
-
-#include <exodus/program.h>
 programinit()
 
 var ss1;

@@ -49,9 +49,9 @@ function main(in cmd, in filename, in dictfile, out hits) {
 			//call safeselect(select);
 			select(selectcmd);
 			///BREAK;
-			if (not LISTACTIVE) break;;
+			if (not LISTACTIVE) break;
 
-		};//partn;
+		}//partn;
 	}
 
 	//turn the select list into a string of fields

@@ -38,16 +38,11 @@ function main(in mode0) {
 
 	mode = mode0;
 
-	if (mode.field(",", 1) == "PREREAD") {
-	}
-	else if (mode.field(",", 1) == "POSTREAD") {
-	}
-	else if (mode.field(",", 1) == "PREWRITE") {
-	}
-	else if (mode.field(",", 1) == "POSTWRITE") {
-	}
-	else if (mode.field(",", 1) == "PREDELETE") {
-	}
+	if (mode.field(",", 1) == "PREREAD") ;
+	else if (mode.field(",", 1) == "POSTREAD") ;
+	else if (mode.field(",", 1) == "PREWRITE") ;
+	else if (mode.field(",", 1) == "POSTWRITE") ;
+	else if (mode.field(",", 1) == "PREDELETE") ;
 	else if (mode.field(",", 1) == "POSTDELETE") {
 	} else {
 		var().chr(7).output();

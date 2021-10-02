@@ -308,7 +308,8 @@ subroutine getcompanyconfig(io html, io mode) {
 			}
 
 			//path to uploaded company logo files
-			var imagepath = "/images/" ^ SYSTEM.a(17) ^ "/UPLOAD/COMPANIES/";
+			//var imagepath = "/images/" ^ SYSTEM.a(17) ^ "/UPLOAD/COMPANIES/";
+			var imagepath = "/images/" ^ SYSTEM.a(17) ^ "/upload/companies/";
 
 			//logo_companycode_coln .jpg .png /gif
 			var imagefilename = "logo_" ^ imagecompcode ^ "_" ^ coln ^ "." ^ imagetype;

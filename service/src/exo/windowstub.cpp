@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include "systemsubs.h"
+#include <systemsubs.h>
 
 function main() {
 	//printl("windowstub says 'Hello World!'");

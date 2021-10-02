@@ -255,7 +255,10 @@ function main() {
 		//this lock is in INIT.GENERAL and MONITOR2 (to avoid starting processes)
 		var initwaitsecs = SYSTEM.a(129);
 		if (not initwaitsecs) {
-			initwaitsecs = 110 + var(10).rnd();
+			//initwaitsecs = 110 + var(10).rnd();
+			//increase to 10 minutes to allow things like reindexing and trimrequestlog to finish
+			//although nightly backup should only restarting _test databases
+			initwaitsecs = 600 + var(10).rnd();
 		}
 		//also in LOGON.OLD and INIT.GENERAL
 		var lockkey = "INIT.GENERAL.LOGIN";

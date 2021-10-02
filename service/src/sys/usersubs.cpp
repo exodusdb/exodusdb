@@ -66,7 +66,7 @@ function main(in mode) {
 			//maybe can only update self
 			//if security('AUTHORISATION UPDATE',xx) else
 			if (not(authorised("USER UPDATE", xx))) {
-				win.srcfile.unlock( ID);
+				win.srcfile.unlock(ID);
 				win.wlocked = 0;
 			}
 

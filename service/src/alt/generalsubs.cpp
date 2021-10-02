@@ -86,14 +86,14 @@ function main(in mode0) {
 				///BREAK;
 				if (not(usercode and usercode ne "---")) break;
 				groupusers ^= VM ^ usercode;
-			};//usern;
+			}//usern;
 			//add higher users in group
 			for (usern = usern0 - 1; usern >= 1; --usern) {
 				usercode = SECURITY.a(1, usern);
 				///BREAK;
 				if (not(usercode ne "---")) break;
 				groupusers ^= VM ^ usercode;
-			};//usern;
+			}//usern;
 		}
 
 		ANS = groupusers;
@@ -209,7 +209,7 @@ subroutine getdatasets() {
 		}
 		lastbackup = lastbackup.a(2);
 		datasetparams.r(1, datasetn, 4, lastbackup.oconv("D"));
-	};//datasetn;
+	}//datasetn;
 
 	return;
 }
@@ -232,7 +232,7 @@ subroutine getuserdept2() {
 	for (usern = 1; usern <= nusers; ++usern) {
 		///BREAK;
 		if (SECURITY.a(1, usern) == "---") break;
-	};//usern;
+	}//usern;
 
 	//get the department code
 	ANS = SECURITY.a(1, usern - 1);

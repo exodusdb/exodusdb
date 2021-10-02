@@ -45,8 +45,9 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 			var indexn;
 			if (not(indexvalues.locateby(orderby, indexvalue, indexn)))
 				indexvalues.inserter(1, indexn, indexvalue);
-		} else
+		} else {
 			indexvalues ^= indexvalue ^ FM;
+		}
 	}
 
 	//correct the output

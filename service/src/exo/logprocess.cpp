@@ -125,7 +125,7 @@ subroutine newprocessid(io processid) {
 			xx = "";
 		}
 	///BREAK;
-	if (not xx) break;;
+	if (not xx) break;
 	}//loop;
 
 	processrec.r(1, var().date());

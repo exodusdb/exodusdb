@@ -84,7 +84,7 @@ tryyear:
 	////////////////////////////////////////////////////////////////////////////
 	//return the last day of the period (internal format)
 	if (input0.index("/")) {
-		period = input0.field("/",1);
+		period = input0.field("/", 1);
 		year = input0.field("/", 2);
 	} else {
 		year = input0.substr(1, 2);

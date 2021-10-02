@@ -112,7 +112,7 @@ INSTALL      | 22 | Passed         | Unused         | Unused         | Unused   
 	//code 23 lock key
 	//code 24 unlock key
 
-	switch (int(code)) {
+	switch (code.toInt()) {
 
 	//write record on file,key
 	case 3:

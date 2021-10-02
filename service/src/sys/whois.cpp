@@ -78,8 +78,7 @@ returnzero:
 
     if (true) {
         text = "http:/" "/geoiplookup.net/ip/" ^ ipno;
-    }
-    else {
+    } else {
 		cmd = SYSTEM.a(50);
 
 		//check cygwin whois present otherwise quit

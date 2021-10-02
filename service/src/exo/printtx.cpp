@@ -328,7 +328,7 @@ subroutine convoptions() {
 				}
 				newoptions ^= spaceoptionsize.space();
 			}
-		};//ii;
+		}//ii;
 		//temp[optioncharn,-len(optionchars)-2]=newoptions
 		temp.splicer(optioncharn - optionchars.length() - 1, optionchars.length() + 2, newoptions);
 	}
@@ -361,7 +361,7 @@ subroutine getheadfoot() {
 		head1.converter("~", " ");
 		while (true) {
 		///BREAK;
-		if (not(head1.substr(-6,6) == "&nbsp;")) break;;
+		if (not(head1.substr(-6,6) == "&nbsp;")) break;
 			head1.splicer(-6, 6, "");
 		}//loop;
 		headx.r(1, head1);

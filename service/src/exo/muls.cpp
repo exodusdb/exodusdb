@@ -25,8 +25,9 @@ function main(in multipliers1, in multipliers2, in sep) {
 		//otherwise multiply, treating nulls as zeros
 		if (array1(ii).length() and array2(ii).length()) {
 			output(ii)=array1(ii)*array2(ii);
-		} else
+		} else {
 			output(ii)="";
+		}
 	}
 
 	//deal with the remaining elements which must all be null or zero

@@ -755,12 +755,15 @@ nextsearch0:
 		cmd = "";
 		cmd.input(oscwd() ^ " Command? ");
 		SYSTEM.r(2,"");
-		if (not libinfo(cmd.field(" "))) errputl(cmd.field(" "), " does not exist."); else
-		try {
-		var username=USERNAME;USERNAME="EXODUS";
-		execute(cmd);
-		USERNAME=username;
-		} catch (MVError e) {errputl(e.description);}
+		if (not libinfo(cmd.field(" "))) {
+			errputl(cmd.field(" "), " does not exist.");
+		} else {
+			try {
+				var username=USERNAME;USERNAME="EXODUS";
+				execute(cmd);
+				USERNAME=username;
+			} catch (MVError e) {errputl(e.description);}
+		}
 		osflush();
 	}
 

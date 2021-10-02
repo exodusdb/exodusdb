@@ -408,7 +408,7 @@ PGconn* get_pgconnection(const var& dbhandle) {
 
 	// otherwise error
 	if (!mvconn_no)
-		throw MVDBException("pgconnection() requested when not connected");
+		throw MVDBException("pgconnection() requested when not connected. dbhandle:" ^ dbhandle);
 
 	if (GETDBTRACE) {
 		std::cout << std::endl;
@@ -529,6 +529,8 @@ var var::build_conn_info(const var& conninfo) const {
 		var configconn = "";
 		if (!configconn.osread(configfilename))
 			configconn.osread("exodus.cfg");
+		//postgres ignores after \n?
+		configconn.converter("\r\n","  ");
 
 		// discover any configuration in the environment
 		var envconn = "";
@@ -660,7 +662,7 @@ bool var::connect(const var& conninfo) {
 		(*this) = "";
 	if (not this->a(1))
 		//this->r(1,fullconninfo.field(" ",1));
-		this->r(1,fullconninfo.field("dbname=",2).field(" ",1));
+		this->r(1,fullconninfo.field2("dbname=",-1).field(" ",1));
 	this->r(2, mvconn_no);
 	this->r(3, mvconn_no);
 

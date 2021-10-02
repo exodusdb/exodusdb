@@ -123,9 +123,8 @@ function main() {
 	var cmd=SENTENCE.field(" ",2,9999);
 	if (cmd)
 		perform(cmd);
-	else {
+	else
 		perform("listen");
-	}
 
 	return 0;
 }

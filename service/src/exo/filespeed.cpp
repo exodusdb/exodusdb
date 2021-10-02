@@ -102,7 +102,7 @@ nexttest:
 //		}
 		print(var().at(0), "W", ii);
 		rec.write(tempfile, ii);
-	};//ii;
+	}//ii;
 
 	//print
 	//print 'Deleting 1Kb records'
@@ -112,7 +112,7 @@ nexttest:
 //		}
 		print(var().at(0), "D", ii);
 		tempfile.deleterecord(ii);
-	};//ii;
+	}//ii;
 
 	if (usetransaction)
 		committrans();
