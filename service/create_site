@@ -109,9 +109,9 @@ set -eux
 : Use letsencrypt hosts.neosys.com cert if available
 : --------------------------------------------------
 :
-	sudo test -f /etc/letsencrypt/live/hosts.neosys.com/cert.pem      && sudo ln -snf /etc/letsencrypt/live/hosts.neosys.com/cert.pem      /etc/ssl/certs/exodus-cert.pem
+	sudo test -f /etc/letsencrypt/live/hosts.neosys.com/fullchain.pem      && sudo ln -snf /etc/letsencrypt/live/hosts.neosys.com/fullchain.pem      /etc/ssl/certs/exodus-cert.pem
 	sudo test -f /etc/letsencrypt/live/hosts.neosys.com/privkey.pem   && sudo ln -snf /etc/letsencrypt/live/hosts.neosys.com/privkey.pem   /etc/ssl/private/exodus-key.pem
-
+:
 :
 : Otherwise use self signed certificates if exodus cert and key not already present
 : ---------------------------------------------------------------------------------
