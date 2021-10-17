@@ -7313,6 +7313,27 @@ function* deleteallrows(groupnoorelement, fromrecn) {
 
 function* insertallrows(elements, values, fromrecn) {
 
+	//preserve the basics while insertallrows2 is called
+	var save_gpreviouselement = gpreviouselement
+	var save_gvalue = gvalue
+	var save_gpreviousvalue = gpreviousvalue
+	var save_grecn = grecn
+
+	var result = yield* insertallrows2(elements, values, fromrecn)
+
+	//if (gdataset.split('_')[0] == 'gravity' || gdataset.split('_')[1] == 'test') {
+		gpreviouselement = save_gpreviouselement
+		gvalue = save_gvalue
+		gpreviousvalue = save_gpreviousvalue
+		if (!save_grecn)
+			grecn = save_grecn
+	//}
+
+	return result
+}
+
+function* insertallrows2(elements, values, fromrecn) {
+
     //login('insertallrows')
 
     //get first element if an array passed
