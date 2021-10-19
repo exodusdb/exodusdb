@@ -16,6 +16,11 @@ function main(in nextcompanycode) {
 	#include <system_common.h>
 	//global desc1,desc2
 
+    //use app specific version of initcompany2
+    if (APPLICATION ne "EXODUS") {
+        initcompany2 = "initcompany2_app" ;
+    }
+
 	#define interactive_ not(SYSTEM.a(33))
 
 	if (not(nextcompanycode.unassigned())) {

@@ -44,6 +44,11 @@ function main(in mode0) {
 
 	mode = mode0;
 
+    //use app specific version of generalsubs
+    if (APPLICATION ne "EXODUS") {
+        generalsubs = "generalsubs_app";
+    }
+
 	if (mode == "GETDATASETS") {
 		gosub getdatasets();
 		ANS = datasetparams;
