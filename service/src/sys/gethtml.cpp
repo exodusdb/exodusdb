@@ -17,7 +17,7 @@ var xx;
 var div;
 var divx;
 
-function main(in mode0, out html, in compcode0="") {
+function main(in mode0, out html, in compcode0="", in qrtext="") {
 	//c sys in,out,""
 
 	#include <system_common.h>
@@ -129,6 +129,14 @@ function main(in mode0, out html, in compcode0="") {
 	html.swapper("%DATAURL%", "%URL%/data/%DATABASE%");
 	html.swapper("%URL%", SYSTEM.a(114, 1));
 	html.swapper("%DATABASE%", SYSTEM.a(17, 1));
+
+	// QR code
+	var svg = "";
+	if (qrtext) {
+		var cmd = "qrencode -t svg '" ^ qrtext ^ "'";
+		svg = osshellread(cmd);
+	}
+	html.swapper("%QR%", svg);
 
 	//check valid html .. html from company file is prechecked anyway
 
