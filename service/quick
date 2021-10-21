@@ -1,5 +1,6 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
+
 
 : show status of NEOSYS processes
 : ===============================

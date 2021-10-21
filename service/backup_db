@@ -19,7 +19,7 @@ set -eux
 : 'Example:'
 :
 : '  ./backup_db mgg'
-: '  ./backup_db mgg BRVS'
+: '  ./backup_db mgg BR #backup and restore to mgg_test without check or restart of mgg_test'
 :
 : 'Restores backup to same databasename but ending _test by default'
 :
