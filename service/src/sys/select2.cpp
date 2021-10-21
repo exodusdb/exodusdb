@@ -57,6 +57,11 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	#include <system_common.h>
 	//global maxnrecs,useactivelist
 
+    //use app specific version of listen3
+    if (APPLICATION ne "EXODUS") {
+        listen3 = "listen3_app" ;
+    }
+
 	var filename = filenamex;
 
 	var sortselect = sortselect0;

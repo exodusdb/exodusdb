@@ -221,7 +221,18 @@ function main() {
 
 	//clearcommon();
 
-	logfilename = "";
+    //use app specific version of listen3
+    if (APPLICATION ne "EXODUS") {
+        listen3 = "listen3_app" ;
+    }
+
+    //use app specific version of generalsubs
+    if (APPLICATION ne "EXODUS") {
+        generalsubs = "generalsubs_app";
+    }
+
+
+    logfilename = "";
 
 	portno = 5700;
 	if (SYSTEM.a(38)) {
