@@ -17,7 +17,7 @@ var xx;
 var div;
 var divx;
 
-function main(in mode0, out html, in compcode0="", in qrtext="") {
+function main(in mode0, out html, in compcode0="", in qr_text="") {
 	//c sys in,out,""
 
 	#include <system_common.h>
@@ -130,13 +130,21 @@ function main(in mode0, out html, in compcode0="", in qrtext="") {
 	html.swapper("%URL%", SYSTEM.a(114, 1));
 	html.swapper("%DATABASE%", SYSTEM.a(17, 1));
 
-	// QR code
-	var svg = "";
-	if (qrtext) {
-		var cmd = "qrencode -t svg '" ^ qrtext ^ "'";
-		svg = osshellread(cmd);
+	// QR code (requires apt install qrencode)
+	if (html.index("%QR%")) {
+
+		var svg = "";
+		if (qr_text) {
+
+			var cmd = "qrencode -t svg '" ^ qr_text ^ "'";
+			svg = osshellread(cmd);
+
+			//remove everything like xml and comments before the opening <svg tag
+			svg.splicer(1, svg.index("<svg") - 1, "");
+		}
+
+		html.swapper("%QR%", svg);
 	}
-	html.swapper("%QR%", svg);
 
 	//check valid html .. html from company file is prechecked anyway
 
