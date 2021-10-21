@@ -1138,13 +1138,37 @@ var inclusion=
 		//TRACE(srcfileinfo)
 		//TRACE(libexodusinfo)
 		//TRACE(outfileinfo)
-		if (outfileinfo and not(force) and not(generateheadersonly)) {
-			if (outfileinfo.a(2) > srcfileinfo.a(2) || (outfileinfo.a(2) == srcfileinfo.a(2) && outfileinfo.a(3) > srcfileinfo.a(3))) {
-				if (outfileinfo.a(2) > libexodusinfo.a(2) || (outfileinfo.a(2) == libexodusinfo.a(2) && outfileinfo.a(3) > libexodusinfo.a(3))) {
-					if (verbose)
-						printl("Skipping compilation since the output file is newer than both the source code and libexodus, and no (F)orce option provided.");
+		if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo,srcfileinfo) && is_newer(outfileinfo,libexodusinfo)) {
+
+			// Recompile is required if any include file is younger than the current output binary
+			bool recompile_required = false;
+			// TODO recode to find #index directly instead of by line since includes are generally only in the first part of a program
+			for (var line : text) {
+
+				// Skip lines unlike "#include <printplans7.h>"
+				if (! line.index("#include"))
 					continue;
+
+				// Acquire include file date/time
+				var incfilename=incdir ^ OSSLASH ^ line.field("<",2).field(">",1);
+				var incfileinfo = osfile(incfilename);
+				//TRACE(incfilename);
+				//TRACE(incfileinfo);
+
+				if (incfileinfo) {
+					if (is_newer(incfileinfo, outfileinfo)) {
+						recompile_required = true;
+						break;
+					}
 				}
+
+			}
+
+			//only skip if all headers are older than the current output file
+			if (! recompile_required) {
+				if (verbose)
+					printl("Skipping compilation since the output file is newer than both the source code, its include files and libexodus, and no (F)orce option provided.");
+				continue;
 			}
 		}
 
@@ -1617,6 +1641,21 @@ subroutine limit_threads(in maxn_threads) {
 				break;
 		}
 	}
+}
+
+function is_newer(in new_file_info, in old_file_info) {
+
+	int new_file_date = new_file_info.a(2);
+	int old_file_date = old_file_info.a(2);
+
+	if (new_file_date > old_file_date)
+		return true;
+
+	if (new_file_date < old_file_date)
+		return false;
+
+	return new_file_info.a(3) > old_file_info.a(3);
+
 }
 
 programexit()
