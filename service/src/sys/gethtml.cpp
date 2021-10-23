@@ -141,6 +141,19 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 
 			//remove everything like xml and comments before the opening <svg tag
 			svg.splicer(1, svg.index("<svg") - 1, "");
+
+//			#tooltip1 { position: relative; }
+//			#tooltip1 a span { display: none; color: #FFFFFF; }
+//			#tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
+//			The html markup is:-
+//			<p id="tooltip1"><a href="introduction.php">Introduction<span>Introduction to HTML and CSS: tooltip with extra text</span></a></p>
+
+			svg ="<style>\n"
+			"#tooltip1 { position: relative; }\n"
+			"#tooltip1 a span { display: none; color: #FFFFFF; }\n"
+			"#tooltip1 a:hover span { display: block; position: absolute; white-space: nowrap; background-color: #222; left: 20px; top: 20px; color: #FFFFFF; padding: 0 5px; }\n"
+			"</style>\n"
+			"<p id='tooltip1'><a>" ^ svg ^ "<span> " ^ qr_text.swap("\n","<br />") ^ "</span></a></p>";
 		}
 
 		html.swapper("%QR%", svg);
