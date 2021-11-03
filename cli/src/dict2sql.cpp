@@ -66,7 +66,7 @@ function main() {
 		var dictdbname = "";
 		osgetenv("EXO_DICT",dictdbname);
 		if (not dictdbname)
-			dictdbname = "exodus_dict";
+			dictdbname = "exodus";
 		if (dictdbname) {
 			if (not dictconnection.connect(dictdbname)) {
 				dictdbname.quote().logputl("dict2sql: Warning: Using default database because cannot connect to ");
@@ -550,7 +550,7 @@ $sqlcode
  )V0G0N";
 
 	//upload pgsql function to postgres
-	do_sql(dictfilename ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
+	do_sql(dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
 
 	// delete calc_fields
 
