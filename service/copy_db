@@ -23,10 +23,10 @@ set -eux
 	fi
 
 :
-: Shutdown $FROM_DB_CODE service if exists
+: Shutdown $TO_DB_CODE service if exists
 : ========================================
 :
-	./service ${FROM_DB_CODE} stop || true
+	./service ${TO_DB_CODE} stop && RESTART_REQUIRED=yes || RESTART_REQUIRED=no
 
 :
 : Give it some time to stop
@@ -40,7 +40,9 @@ set -eux
 :
 	if [ "$OPTIONS" = "DELETE" ]; then
 		#sudo -u postgres dropdb $TO_DB_CODE || true
-		dbdelete $TO_DB_CODE || true
+		for TRY in 1 2 3; do
+			dbdelete $TO_DB_CODE && break || true
+		done
 	fi
 
 :
@@ -51,10 +53,12 @@ set -eux
 	dbcopy $FROM_DB_CODE $TO_DB_CODE
 
 :
-: Restart $FROM_DB_CODE service if exists
+: Restart $TO_DB_CODE service if exists
 : =======================================
 :
-	./service ${FROM_DB_CODE} start || true
+	if [ $RESTART_REQUIRED = yes ]; then
+		./service ${TO_DB_CODE} start || true
+	fi
 
 :
 : Finished copy_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
