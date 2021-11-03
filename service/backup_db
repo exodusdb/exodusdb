@@ -25,7 +25,8 @@ set -eux
 :
 	EXO_DATA=${1:?<DBNAME> argument is required.}
 	OPTIONS=${2:-BRVS}
-	NEW_BACKUP_DIR=${3:-~/backups/sql}
+	#NEW_BACKUP_DIR=${3:-~/backups/sql}
+	NEW_BACKUP_DIR=${3:-~/hosts/$EXO_DATA/work}
 	RESTOREDB_SUFFIX=${4:-test}
 :
 : Ensure target directory exists

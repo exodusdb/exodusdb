@@ -14,7 +14,8 @@ set -eux
 : 'OPTION is N to NOT restart the target database service.'
 :
 	FROM_EXO_DATA=${1:?<DBNAME> argument is required.}
-	NEW_BACKUP_DIR=${2:-~/backups/sql}
+	#NEW_BACKUP_DIR=${2:-~/backups/sql}
+    NEW_BACKUP_DIR=${3:-~/hosts/$FROM_EXO_DATA/work}
 	RESTART=${3:-N}
 :
 	TO_EXO_DATA=${FROM_EXO_DATA}_test
