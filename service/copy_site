@@ -1,0 +1,95 @@
+#!/bin/bash
+set -euxo pipefail
+
+: ================================
+: Copy a site from a remote server
+: ================================
+:
+: 'Syntax is ./copy_site copy|move <SSH_HOST>[:SSH_PORT] DELETE <DB_NAME>'
+:
+: 'e.g. ./copy_site copy nl10:19525 DELETE test'
+:
+: 'move causes remote site to be shutdown and disabled'
+:
+: 'DELETE is required to indicate that the target site dir and database is to be overwritten'
+:
+	MODE=${1:?copy or move is required.}
+	[ "$MODE" = "copy" -o "$MODE" = "move" ]
+
+	SSH_HOST=${2:?SSH_HOST[:SSHPORT] is required.}
+
+	DELETE=${3:?DELETE is required.}
+	[ "$DELETE" = "DELETE" ]
+
+	COPY_EXO_DATA=${4:?DB_NAME is required.}
+
+	EXO_SITE=${5:-${COPY_EXO_DATA}}
+
+:
+: Config
+: ======
+:
+	export APP_CODE=agy
+
+	SSH_USER=root
+	HOSTS_DIR=~/hosts
+	NEOSYS_DIR=~/neosys
+	SERVICE_DIR=~/exodus/service
+
+:
+: Init
+: ====
+:
+	EXO_SITE=$COPY_EXO_DATA
+
+    SSH_PORT=`echo $SSH_HOST:|cut -d':' -f2`
+    SSH_HOST=`echo $SSH_HOST:|cut -d':' -f1`
+
+	SSH="ssh -p $SSH_PORT $SSH_USER@$SSH_HOST"
+
+:
+: If mode is move then shutdown the remote site
+: =============================================
+:
+	if [ $MODE = move ]; then
+		$SSH "cd $NEOSYS_DIR && ./doall $COPY_EXO_DATA stop && ./doall $COPY_EXO_DATA disable"
+	fi
+
+:
+: Backup the site database on the remote server
+: =============================================
+:
+: This dumps the postgresql database into an sql file in the remote site work dir
+:
+	$SSH "cd ~/neosys && ./doall $COPY_EXO_DATA backup_db B"
+
+:
+: Copy the remote work dir to this server
+: =======================================
+:
+	rsync -e "ssh -p $SSH_PORT" -avz --delete $SSH_USER@$SSH_HOST:$HOSTS_DIR/$EXO_SITE/ $HOSTS_DIR/$EXO_SITE
+
+:
+: Restore the database
+: ====================
+:
+	cd $NEOSYS_DIR
+	./doall $COPY_EXO_DATA restore_db
+
+:
+: Create the live database from the restored _test version
+: ========================================================
+:
+	cd $SERVICE_DIR
+	EXO_DATA= ./copy_db ${COPY_EXO_DATA}_test $COPY_EXO_DATA $DELETE
+
+:
+: Check the database has been copied correctly.
+: - skipped for speed. Do it manually if you want.
+: ================================================
+:
+:	dbcomp ${COPY_EXO_DATA}_test $COPY_EXO_DATA > /dev/null
+
+:
+: Finished $0 $* in $(($SECONDS/60)) mins. and $(($SECONDS%60)) secs.
+: ===================================================================
