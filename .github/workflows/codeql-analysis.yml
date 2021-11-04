@@ -68,7 +68,8 @@ jobs:
     #   make release
 
     - run:|
-       sudo apt update && sudo apt install -yq postgresql-server-dev-all libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
+       sudo apt update
+       sudo apt install -yq postgresql-server-dev-all libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
        cmake .
        make
 
