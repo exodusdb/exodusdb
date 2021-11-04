@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -euxo pipefail
 
 : ==========================
 : Backup a postgres database
@@ -9,8 +9,8 @@ set -eux
 :
 : '  ./backup_db <DBNAME> [<OPTIONS>...] [<BACKUPDIR>] [<RESTOREDB_SUFFIX>]'
 :
-: '<OPTIONS> are (B)ackup, (R)estore, (V)erify, (S)tart'
-: '          Defaults to BRVS'
+: '<OPTIONS> are (B)ackup, (R)estore, (V)erify'
+: '          Defaults to BRV'
 :
 : '<BACKUPDIR> defaults to ~/backups/sql'
 :
@@ -23,14 +23,24 @@ set -eux
 :
 : 'Restores backup to same databasename but ending _test by default'
 :
-	EXO_DATA=${1:?<DBNAME> argument is required.}
-	OPTIONS=${2:-BRVS}
+	LIVE_EXO_DATA=${1:?<DBNAME> argument is required.}
+
+	OPTIONS=${2:-BRV}
+
 	#NEW_BACKUP_DIR=${3:-~/backups/sql}
-	NEW_BACKUP_DIR=${3:-~/hosts/$EXO_DATA/work}
+	NEW_BACKUP_DIR=${3:-~/hosts/$LIVE_EXO_DATA/work}
+
 	RESTOREDB_SUFFIX=${4:-test}
+
 :
-: Ensure target directory exists
-: ==============================
+: Init
+: ====
+:
+	TEST_EXO_DATA=${LIVE_EXO_DATA}_$RESTOREDB_SUFFIX
+
+:
+: Create target directory if it doesnt exist
+: ==========================================
 :
 	mkdir -p $NEW_BACKUP_DIR
 
@@ -39,36 +49,61 @@ set -eux
 : ================================
 :
 	if [[ $OPTIONS =~ "B" ]]; then
-		set -o pipefail
 		#NCPUS=`grep -c processor /proc/cpuinfo`
-		sudo -u postgres pg_dump $EXO_DATA | gzip > $NEW_BACKUP_DIR/$EXO_DATA.sql.gz.part
-		mv $NEW_BACKUP_DIR/$EXO_DATA.sql.gz.part $NEW_BACKUP_DIR/$EXO_DATA.sql.gz
+		sudo -u postgres pg_dump $LIVE_EXO_DATA | gzip > $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz.part
+		mv $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz.part $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz
 	fi
 
 :
-: Optionally restore into ${EXO_DATA}_$RESTOREDB_SUFFIX - without restarting it afterwards
-: =============================================================================
-:
-	if [[ $OPTIONS =~ "R" ]]; then
-		./restore_db $EXO_DATA "$NEW_BACKUP_DIR" "N"
-	fi
-
-:
-: Optionally Compare and flag success if ok
-: =========================================
+: Optionally stop the test database if we are going to compare after restore
+: ==========================================================================
 :
 	if [[  $OPTIONS =~ "V" ]]; then
-		if dbcomp $EXO_DATA ${EXO_DATA}_$RESTOREDB_SUFFIX {S}; then
-			touch "$HOME/hosts/$EXO_DATA/data/$EXO_DATA/params2"
+
+		:
+		: Detect if test database is running
+		: ==================================
+		:
+			./service ${LIVE_EXO_DATA} is-active test && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
+
+		:
+		: Stop the test database if it is running
+		: =======================================
+		:
+			[ $RESTART_REQUIRED = Y ] && ./service ${LIVE_EXO_DATA} stop test
+
+	fi
+
+:
+: Optionally restore into test database
+: =====================================
+:
+	if [[ $OPTIONS =~ "R" ]]; then
+		./restore_db $LIVE_EXO_DATA "$NEW_BACKUP_DIR"
+	fi
+
+:
+: Optionally compare the restored test database with the backed up live db
+: ========================================================================
+:
+	if [[  $OPTIONS =~ "V" ]]; then
+
+		if dbcomp $LIVE_EXO_DATA $TEST_EXO_DATA {S}; then
+
+			:
+			: Flag success if no differences except in status/log files
+			: =========================================================
+			:
+				touch "$HOME/hosts/$LIVE_EXO_DATA/data/$LIVE_EXO_DATA/params2"
 		fi
 	fi
 
 :
-: Optionally restart the target TEST database ${EXO_DATA}_$RESTOREDB_SUFFIX
-: =========================================================================
+: Restart the test service if it was running and shutdown in order to perform compare
+: ===================================================================================
 :
-	if [[ $OPTIONS =~ "S" ]]; then
-		./service ${EXO_DATA} start $RESTOREDB_SUFFIX
+	if [ ${RESTART_REQUIRED:-N} = Y ]; then
+		./service ${LIVE_EXO_DATA} start test
 	fi
 
 :
