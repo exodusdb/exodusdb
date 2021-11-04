@@ -1,15 +1,15 @@
 #!/bin/bash
 set -euxo pipefail
 
-: ================================
-: Copy a site from a remote server
-: ================================
+: ======================================================
+: Copy a site from a remote server to the current server
+: ======================================================
 :
 : 'Syntax is ./copy_site copy|move <SSH_HOST>[:SSH_PORT] DELETE <DB_NAME>'
 :
 : 'e.g. ./copy_site copy nl10:19525 DELETE test'
 :
-: 'move causes remote site to be shutdown and disabled'
+: 'move causes the source (remote site) to be shutdown and disabled'
 :
 : 'DELETE is required to indicate that the target site dir and database is to be overwritten'
 :
@@ -85,10 +85,13 @@ set -euxo pipefail
 
 :
 : Check the database has been copied correctly.
-: - skipped for speed. Do it manually if you want.
-: ================================================
+: ============================================================
+: Skipped for speed unless moving. Do it manually if required.
+: ============================================================
 :
-:	dbcomp ${COPY_EXO_DATA}_test $COPY_EXO_DATA > /dev/null
+	if [ $MODE = move ]; then
+		dbcomp ${COPY_EXO_DATA}_test $COPY_EXO_DATA > /dev/null
+	fi
 
 :
 : Finished $0 $* in $(($SECONDS/60)) mins. and $(($SECONDS%60)) secs.
