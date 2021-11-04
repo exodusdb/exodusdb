@@ -1,65 +1,95 @@
 #!/bin/bash
-set -eux
+set -euxo pipefail
 
 : ========================
 : Copy a postgres database
 : ========================
 :
-: 'Syntax is ./copy_db <FROM_DBNAME> <TO_DNAME> [DELETE]'
+: 'Syntax is ./copy_db <FROM_DBCODE> <TO_DBCODE> [DELETE]'
 :
-	FROM_DB_CODE=${1:?<FROM_DBNAME> argument is required.}
-	TO_DB_CODE=${2:?<TO_DBNAME> argument is required.}
-#	OPTIONS=$3
-    OPTIONS=${3:-}
+	SOURCE_EXO_DATA=${1:?<FROM_DBCODE> argument is required.}
+	TARGET_EXO_DATA=${2:?<TO_DBCODE> argument is required.}
+	OPTIONS=${3:-}
 
 :
-: Check Syntax
-: ============
+: Determine source service. Simply remove any _test from the source db name
+: =========================================================================
 :
-	if [ -z "FROM_DB_CODE"  -o  -z "$TO_DB_CODE" ]; then
-		set +x
-		echo 'Syntax is wrong. Cannot continue.'
+	SOURCE_SERVICE=${SOURCE_EXO_DATA%_test}
+
+:
+: Determine source type - live or test
+: ====================================
+:
+	if [[ $SOURCE_EXO_DATA =~ "_test" ]]; then
+		SOURCE_TYPE=test
+	else
+		SOURCE_TYPE=live
+	fi
+
+:
+: Verify that source service is NOT running otherwise we cannot copy it using dbcopy
+: ==================================================================================
+:
+	if ./service ${SOURCE_SERVICE} is-active $SOURCE_TYPE; then
+		echo "SOURCE_EXO_DATA is running so it cannot be copied" 1>&2
 		exit 1
 	fi
 
 :
-: Shutdown $TO_DB_CODE service if exists
-: ========================================
+: Determine target service. Simply remove any _test from the target db name
+: =========================================================================
 :
-	./service ${TO_DB_CODE} stop && RESTART_REQUIRED=yes || RESTART_REQUIRED=no
+	TARGET_SERVICE=${TARGET_EXO_DATA%_test}
 
 :
-: Give it some time to stop
-: =========================
+: Determine target type - live or test
+: ====================================
 :
-	sleep 5
+	if [[ $TARGET_EXO_DATA =~ "_test" ]]; then
+		TARGET_TYPE=test
+	else
+		TARGET_TYPE=live
+	fi
 
 :
-: Delete any existing $TO_DB_CODE database
-: ======================================================
+: Detect if target service is running so we can restart after copying
+: ===================================================================
+:
+	./service ${TARGET_SERVICE} is-active $TARGET_TYPE && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
+
+:
+: Stop the target service if it is running so we can drop its database
+: ====================================================================
+:
+	[ $RESTART_REQUIRED = Y ] && ./service ${TARGET_SERVICE} stop ${TARGET_TYPE}
+
+:
+: Delete any existing target database
+: ===================================
 :
 	if [ "$OPTIONS" = "DELETE" ]; then
-		#sudo -u postgres dropdb $TO_DB_CODE || true
+		#sudo -u postgres dropdb $TARGET_EXO_DATA || true
 		for TRY in 1 2 3; do
-			dbdelete $TO_DB_CODE && break || true
+			dbdelete $TARGET_EXO_DATA && break || true
 		done
 	fi
 
 :
-: Copy $FROM_DB_CODE to $TO_DB_CODE
-: ====================================
+: Copy source database to target
+: ==============================
 :
-	#sudo -u postgres createdb -O exodus -T $FROM_DB_CODE $TO_DB_CODE
-	dbcopy $FROM_DB_CODE $TO_DB_CODE
+	#sudo -u postgres createdb -O exodus -T $SOURCE_EXO_DATA $TARGET_EXO_DATA
+	dbcopy $SOURCE_EXO_DATA $TARGET_EXO_DATA
 
 :
-: Restart $TO_DB_CODE service if exists
-: =======================================
+: Restart target service if it was running before
+: ===============================================
 :
-	if [ $RESTART_REQUIRED = yes ]; then
-		./service ${TO_DB_CODE} start || true
+	if [ $RESTART_REQUIRED = Y ]; then
+		./service $TARGET_SERVICE start $TARGET_TYPE || true
 	fi
 
 :
-: Finished copy_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: Finished $0 $* in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : =======================================================
