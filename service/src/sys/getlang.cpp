@@ -48,6 +48,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		call getlang(origprogname, langcode2, origdatatype, languagefile, lang);
 		var lang2 = lang;
 
+		//bilingual
 		if (lang2 and lang2 ne lang1) {
 			lang = "";
 			var n1 = lang1.count(FM) + 1;
@@ -58,7 +59,23 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 				nn = n1;
 			}
 			for (var fn = 1; fn <= nn; ++fn) {
-				lang.r(fn, (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim());
+				//lang.r(fn, (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim());
+				var lang1line = lang1.a(fn);
+				var lang2line = lang2.a(fn);
+				var nparts = dcount(lang1line, "|");
+				if (nparts eq 1) {
+					//eg English Arabic
+					lang.r(fn, (lang1line ^ " " ^ lang2line).trim());
+				} else {
+					//eg January Janvier|February Fevruar| etc.
+					var bilingual = "";
+					for (var partn = 1; partn <= nparts; partn++) {
+						bilingual ^= trim(field(lang1line, "|", partn) ^  " " ^ field(lang2line, "|", partn)) ^ "|";
+					}
+					//bilingual[-1,1]="";
+					bilingual.splicer(-1, 1, "");
+					lang.r(fn, bilingual);
+				}
 			} //fn;
 		} else {
 			lang = lang1;
