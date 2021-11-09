@@ -144,7 +144,7 @@ function main() {
 	}
 
 	if (not(DICT.open("DICT.PROCESSES", ""))) {
-		call fsmsg();
+		//call fsmsg();
 		return 0;
 	}
 
