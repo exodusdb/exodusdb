@@ -125,7 +125,10 @@ set -eux
 :
 : Verify html2pdf works
 :
-	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
+#	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
+	printf "<html><body>Nothing Special</body></html>\n" > wkhtmltopdf.html
+	/usr/local/bin/wkhtmltopdf --enable-local-file-access wkhtmltopdf.html wkhtmltopdf.pdf
+	rm wkhtmltopdf.html wkhtmltopdf.pdf
 
 
 :

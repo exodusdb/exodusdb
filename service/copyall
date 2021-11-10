@@ -2,7 +2,8 @@
 set -eux
 
 : =================================================
-: Copy all EXODUS dictionaries and programs to live
+#: Copy all EXODUS dictionaries and programs to live
+: Copy all EXODUS programs to live
 : =================================================
 :
 : 'Syntax is ./copyall [CONFIRM]'
@@ -35,21 +36,21 @@ set -eux
 :
 	listfiles exodus_live > /dev/null || dbcreate exodus_live
 
-:
-: Copy all dictionaries from exodus to exodus_live
-: ================================================
-:
-: Use --clean option to drop dict files before importing them
-:
-	if [ -z $DRYRUN ]; then
-		sudo -u postgres pg_dump --clean -t 'dict.*' exodus|sudo -u postgres psql exodus_live
-	else
-:
-:		$DRYRUN --- Skipping ---
-:		==========================
-:
-:		"~/exodus/service# sudo -u postgres pg_dump --clean -t 'dict.*' exodus|psql exodus_live"
-	fi
+#:
+#: Copy all dictionaries from exodus to exodus_live
+#: ================================================
+#:
+#: Use --clean option to drop dict files before importing them
+#:
+#	if [ -z $DRYRUN ]; then
+#		sudo -u postgres pg_dump --clean -t 'dict.*' exodus|sudo -u postgres psql exodus_live
+#	else
+#:
+#:		$DRYRUN --- Skipping ---
+#:		==========================
+#:
+#:		"~/exodus/service# sudo -u postgres pg_dump --clean -t 'dict.*' exodus|psql exodus_live"
+#	fi
 
 :
 : Install the latest version of the neomail script into test
