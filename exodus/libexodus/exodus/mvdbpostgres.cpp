@@ -287,7 +287,8 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 			if (isdict) {
 				defaultdb.osgetenv("EXO_DICT");
 				if (!defaultdb)
-					defaultdb="exodus_dict";
+					//must be the same in mvdbpostgres.cpp and dict2sql
+					defaultdb="exodus";
 			} else {
 				defaultdb = "";
 			}

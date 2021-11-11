@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	var verbose;
+var verbose;
 var dictfilename;
 var dictfile;
 var dictrec;
@@ -66,6 +66,7 @@ function main() {
 		var dictdbname = "";
 		osgetenv("EXO_DICT",dictdbname);
 		if (not dictdbname)
+			//must be the same in mvdbpostgres.cpp and dict2sql
 			dictdbname = "exodus";
 		if (dictdbname) {
 			if (not dictconnection.connect(dictdbname)) {
@@ -275,7 +276,7 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
 	if (!open(dictfilename, dictfile)) {
 		call fsmsg();
-		abort("onefile");
+		abort("dict2sql cannot open " ^ dictfilename);
 	}
 
 	if (reqdictid)
