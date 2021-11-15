@@ -3759,7 +3759,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	// var sql="DECLARE cursor1_" ^ (*this) ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
 	// ^ " FROM ";
 	//TRACE(*this);
-	var sql = "DECLARE\n cursor1_" ^ this->a(1) ^ " SCROLL CURSOR WITH HOLD FOR";
+	var sql = "DECLARE\n cursor1_" ^ this->a(1).convert(".", "_") ^ " SCROLL CURSOR WITH HOLD FOR";
 
 	//SELECT - field/column names
 	sql ^= " \nSELECT\n " ^ actualfieldnames;
@@ -3816,7 +3816,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 		var sql = "";
 		sql ^= "CLOSE cursor1_";
 		if (this->assigned())
-			sql ^= this->a(1);
+			sql ^= this->a(1).convert(".", "_");
 
 		var errmsg;
 		if (!this->sqlexec(sql, errmsg)) {
@@ -3905,7 +3905,7 @@ void var::clearselect() {
 	// sql^="DECLARE BEGIN ";
 	sql ^= "CLOSE cursor1_";
 	if (this->assigned())
-		sql ^= this->a(1);
+		sql ^= this->a(1).convert(".", "_");
 	// sql^="\nEXCEPTION WHEN\n invalid_cursor_name\n THEN";
 	// sql^="\nEND";
 
@@ -3927,9 +3927,9 @@ void var::clearselect() {
 bool readnextx(const var& cursor, PGResult& pgresult, PGconn* pgconn, bool forwards) {
 	var sql;
 	if (forwards)
-		sql = "FETCH NEXT in cursor1_" ^ cursor.a(1);
+		sql = "FETCH NEXT in cursor1_" ^ cursor.a(1).convert(".", "_");
 	else
-		sql = "FETCH BACKWARD in cursor1_" ^ cursor.a(1);
+		sql = "FETCH BACKWARD in cursor1_" ^ cursor.a(1).convert(".", "_");
 
 	// sql="BEGIN;" ^ sql ^ "; END";
 
@@ -4725,7 +4725,7 @@ bool var::cursorexists() {
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
-	var sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ this->a(1) ^ "'";
+	var sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ this->a(1).convert(".", "_") ^ "'";
 	// var sql="SELECT name from pg_cursors";
 
 	//PGconn* pgconn = (PGconn*)this->connection();
