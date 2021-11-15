@@ -1,0 +1,46 @@
+#!/bin/bash
+set -eux
+
+: =================================================
+: Copy all EXODUS dictionaries to live
+: =================================================
+:
+: 'Syntax is ./copydict CONFIRM'
+:
+: '  ./copydict CONFIRM         # really does it'
+:
+	[ ${1:?CONFIRM is required.} = CONFIRM ]
+
+:
+: Config
+: ======
+
+	EXODUS=~/exodus
+
+:
+: Create exodus_live database if not present
+: ==========================================
+:
+	listfiles exodus_live > /dev/null || dbcreate exodus_live
+
+:
+: Copy all dictionaries from exodus to exodus_live
+: ================================================
+:
+#: Use --clean option to drop dict files before importing them
+#:
+#	sudo -u postgres pg_dump --clean -t 'dict.*' exodus|sudo -u postgres psql exodus_live
+	copyfile exodus: exodus_live: {C}
+
+:
+: Finished copying EXOXUS dict to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: =========================================================================
+:
+: 'Pending on all databases if any pgsql function updated.'
+:
+: '	dict2sql'
+:
+: 'or if only one dict function updated'
+:
+: '	dict2sql <filename> <dictid>'
+:

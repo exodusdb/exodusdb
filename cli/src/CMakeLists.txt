@@ -52,6 +52,7 @@ add_executable(dbdelete dbdelete.cpp)
 
 add_executable(delete delete.cpp)
 add_executable(clearfile clearfile.cpp)
+add_executable(copyfile copyfile.cpp)
 add_executable(deletefile deletefile.cpp)
 add_executable(deleteindex deleteindex.cpp)
 add_executable(edir edir.cpp)
@@ -90,6 +91,7 @@ target_link_libraries(dbdelete exodus stdc++fs ${LIBS})
 
 target_link_libraries(delete exodus stdc++fs ${LIBS})
 target_link_libraries(clearfile exodus stdc++fs ${LIBS})
+target_link_libraries(copyfile exodus stdc++fs ${LIBS})
 target_link_libraries(deletefile exodus stdc++fs ${LIBS})
 target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
 target_link_libraries(edir exodus stdc++fs ${LIBS})
@@ -120,6 +122,7 @@ dbdelete
 
 delete
 clearfile
+copyfile
 deletefile
 deleteindex
 edir
