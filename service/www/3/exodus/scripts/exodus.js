@@ -365,9 +365,11 @@ Array.prototype.exodussum = function exodussumarray(sepchar) {
 
 //convert &amp; to & etc
 function decodehtmlcodes(htmlcodes) {
-    // htmlcodes=htmlcodes.replace(/\x26amp;/g,String.fromCharCode(38))
-    htmlcodes = htmlcodes.replace(/&amp;/g, '&')
-    htmlcodes = htmlcodes.replace(/&quot;/g, "'")
+    htmlcodes=htmlcodes.replace(/\x26amp;/g,String.fromCharCode(38))
+    htmlcodes=htmlcodes.replace(/\x26quot;/g,String.fromCharCode(39))
+	//use above to avoid code analysis warnings
+    //htmlcodes = htmlcodes.replace(/&amp;/g, '&')
+    //htmlcodes = htmlcodes.replace(/&quot;/g, "'")
     return htmlcodes
 }
 

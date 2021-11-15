@@ -156,7 +156,7 @@ if (!guseyield) {
         if (gcan_yield) {
 
             var url = window.location.toString()
-            window.location = url.replace(/\/[12]\//, '/3/')
+            window.location = url.replace(/\/[12]\//g, '/3/')
             gswitchingbrowser = true
             //return // no return in global code
         } else
@@ -1267,7 +1267,7 @@ function* exodusnote(msg, mode) {
     //msg=msg.replace(/\r/,'\r')
     //msg=msg.replace(/\n/,'\n')
     msg = msg.toString().replace(FMre, '\r\n').replace(VMre, '\r\n')
-    msg = msg.replace(/\|/, '\r\n')
+    msg = msg.replace(/\|/g, '\r\n')
 
     yield* exodusconfirm(msg, 1, 'OK', '', '', null, false, mode)
 
@@ -2120,7 +2120,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
     if (this.request == '') {
         this.data = ''
         this.response = ('ERROR: NO REQUEST')
-        this.response = this.response.replace(/"/, "'")
+        this.response = this.response.replace(/"/g, "'")
         this.result = ''
         return (0)
     }
@@ -2207,7 +2207,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
     if (this.requesting) {
         this.data = ''
         this.response = ('ERROR: ALREADY REQUESTING:\r' + this.requesting + '\r --- \rNEW REQUEST:\r' + this.request + this.data)
-        this.response = this.response.replace(/"/, "'")
+        this.response = this.response.replace(/"/g, "'")
         this.result = ''
         return 0
     }
@@ -2220,7 +2220,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
     if (this.request == '') {
         this.data = ''
         this.response = ('ERROR: NO REQUEST')
-        this.response = this.response.replace(/"/, "'")
+        this.response = this.response.replace(/"/g, "'")
         this.result = ''
         this.requesting = false
         return 0
@@ -2431,7 +2431,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
             //if (e.number==-2146697211) is "The system cannot locate the resource specified"
             this.data = ''
             this.response = servererrormsg + ' in .send()\n\n' + (e.number ? (e.number + ' ' + e.description) : e.toString())
-            this.response = this.response.replace(/"/, "'")
+            this.response = this.response.replace(/"/g, "'")
             this.result = ''
             dbready(dbwaitingwindow)
             this.requesting = false
@@ -2551,7 +2551,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
                 //xxx
                 this.data = ''
                 this.response = ('ERROR: ' + unescape(xhttp.responseText))
-                this.response = this.response.replace(/"/, "'")
+                this.response = this.response.replace(/"/g, "'")
                 this.result = ''
                 this.requesting = false
                 return 0
