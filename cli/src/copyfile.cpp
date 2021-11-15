@@ -28,6 +28,10 @@ function main() {
 	if (not db2.connect(dbname2))
 		abort(dbname2.quote() ^ " Cannot connect");
 
+	var dictonly = source eq "dict";
+	if (dictonly)
+		source = "";
+
 	if (not source) {
 		source = db1.listfiles();
 		target = "";
@@ -38,6 +42,9 @@ function main() {
 	for (var filename1 : source) {
 
 		if (filename1 eq "dict.all")
+			continue;
+
+		if (dictonly and filename1.substr(1,5) ne "dict.")
 			continue;
 
 		var filename2 = target;
