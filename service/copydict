@@ -30,7 +30,7 @@ set -eux
 #: Use --clean option to drop dict files before importing them
 #:
 #	sudo -u postgres pg_dump --clean -t 'dict.*' exodus|sudo -u postgres psql exodus_live
-	copyfile exodus: exodus_live: {C}
+	copyfile exodus:dict exodus_live: {C}
 
 :
 : Finished copying EXOXUS dict to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
