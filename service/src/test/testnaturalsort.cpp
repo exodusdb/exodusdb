@@ -57,7 +57,7 @@ function main() {
 		}
 	//read sorted records forwards to check numbers
 	if (not tempfile.select("by ID")) {
-		tempfile.getlasterror().logputl("lasterror=");
+		tempfile.lasterror().logputl("lasterror=");
 		abort("problem sorting file");
 	}
 	var key;
