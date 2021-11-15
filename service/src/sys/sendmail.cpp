@@ -121,7 +121,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//development systems ALWAYS email hardcoded in next line
 		//1. exodus.id always indicates a test system (dos or exodus)
 		//2. on exodus lack of live.txt file indicates a test system
-		if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile())))) {
+		if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile()))) or subject.index("mvdbpostgres")) {
 			forcedemailx = "dev@neosys.com";
 			//toaddress=xlate('USERS','EXODUS',7,'X')
 			//if toaddress else toaddress='dev@neosys.com'
