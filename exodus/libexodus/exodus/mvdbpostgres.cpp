@@ -409,7 +409,8 @@ PGconn* get_pgconnection(const var& dbhandle) {
 
 	// otherwise error
 	if (!mvconn_no)
-		throw MVDBException("pgconnection() requested when not connected. dbhandle:" ^ dbhandle);
+		//throw MVDBException("pgconnection() requested when not connected. dbhandle:" ^ dbhandle);
+		throw MVDBException("pgconnection() requested when not connected.");
 
 	if (GETDBTRACE) {
 		std::cout << std::endl;
