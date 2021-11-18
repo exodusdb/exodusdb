@@ -121,7 +121,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//development systems ALWAYS email hardcoded in next line
 		//1. exodus.id always indicates a test system (dos or exodus)
 		//2. on exodus lack of live.txt file indicates a test system
-		if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile()))) or subject.index("mvdbpostgres")) {
+		//if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile()))) or subject.index("mvdbpostgres")) {
+		if (var("exodus.id").osfile() or subject.index("mvdbpostgres")) {
 			forcedemailx = "dev@neosys.com";
 			//toaddress=xlate('USERS','EXODUS',7,'X')
 			//if toaddress else toaddress='dev@neosys.com'
@@ -133,7 +134,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 
 		//testdata and user exodus - always email sysmsg@neosys.com
 		home.osgetenv("HOME");
-		if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.a(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
+		//if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.a(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
+		if (not osfile("live.txt") or (SYSTEM.a(61) and USERNAME eq "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:

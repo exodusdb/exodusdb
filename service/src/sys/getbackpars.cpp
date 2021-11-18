@@ -141,6 +141,7 @@ function main(out bakpars, in process0=var()) {
 			if ((process.a(17).substr(-4, 4)).ucase() eq "TEST") {
 			} else if (process.a(23).ucase().index("TRAINING")) {
 			} else if (process.a(23).ucase().index("TESTING")) {
+			} else if (osfile("~/hosts/disabled.cfg")) {
 			} else {
 				//not otherwise specified then exclude database if in list of non-live data
 				//none-live could include test data or consolidated copies

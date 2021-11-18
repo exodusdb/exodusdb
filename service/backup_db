@@ -100,6 +100,7 @@ set -euxo pipefail
 
 :
 : Restart the test service if it was running and shutdown in order to perform compare
+: Compare cannot be done after starting the service since it will update the database
 : ===================================================================================
 :
 	if [ ${RESTART_REQUIRED:-N} = Y ]; then
