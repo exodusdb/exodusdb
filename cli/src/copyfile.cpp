@@ -6,6 +6,7 @@ programinit()
 	var targetfilename;
 	var targetdb;
 	var targetname;
+	var targetdir;
 	var sql;
 	dim sqltext;
 	var nlines;
@@ -19,9 +20,13 @@ function main() {
 	if (not COMMAND.a(2) or not COMMAND.a(3)) {
 
 		var syntax =
-		"Syntax is copyfile [<source>:][<sourcefilename>,...] [<targetdb>:[<targetfilename>] {OPTIONS}\n"
+		"Syntax is copyfile [SOURCE:][SOURCEFILENAME,...] [TARGET:][TARGETFILENAME] {OPTIONS}\n"
 		"\n"
-		"source can be a database name or an sql file containing COPY data like that produced by pg_dump";
+		"SOURCE can be a database name or an sql file containing COPY data like that produced by pg_dump\n"
+		"\n"
+		"TARGET can be a database name or a dir path ending /\n"
+		"\n"
+		"SOURCE and TARGET must be followed by : otherwise the default database will used.";
 
 		abort(syntax);
 	}
@@ -48,11 +53,21 @@ function main() {
 	//connect to source db if source not .sql file
 	var sourcedb;
 	if (not sql and not sourcedb.connect(sourcename))
-		abort(sourcename.quote() ^ " Cannot connect");
+		abort(sourcename.quote() ^ " Cannot connect to source");
 
-	//connect to target db
-	if (not targetdb.connect(targetname))
-		abort(targetname.quote() ^ " Cannot connect");
+	if (targetname.index("/")) {
+
+		//flag target is not a db
+		targetdb = "";
+
+		//target name will be a dir path
+		if (targetname[-1] ne "/")
+			targetname ^= "/";
+	} else {
+		//connect to target db
+		if (not targetdb.connect(targetname))
+			abort(targetname.quote() ^ " Cannot connect to target");
+	}
 
 	//dict means filter all and only dict files
 	dictonly = sourcefilenames eq "dict";
@@ -73,11 +88,11 @@ function main() {
 
 		sourcefilename = temp;
 
-		//never do dict.all which is an sql view of all dict. files
+		//skip dict.all which is an sql view of all dict files
 		if (sourcefilename eq "dict.all")
 			continue;
 
-		//filter dict. files
+		//option to skip all but dict files
 		if (not sql and dictonly and sourcefilename.substr(1,5) ne "dict.")
 			continue;
 
@@ -107,10 +122,18 @@ function main() {
 			if (not file1.open(sourcefilename, sourcedb) )
 				abort(sourcefilename.quote() ^ " cannot be opened in source db " ^ sourcename);
 
-			//open target file
-			if (not file2.open(targetfilename, targetdb)) {
-				if (not OPTIONS.index("C") or not targetdb.createfile(targetfilename) or not file2.open(targetfilename, targetdb))
-					abort(targetfilename.quote() ^ " cannot be opened in target db " ^ targetname);
+			if (targetdb) {
+
+				//open target file
+				if (not file2.open(targetfilename, targetdb)) {
+					if (not OPTIONS.index("C") or not targetdb.createfile(targetfilename) or not file2.open(targetfilename, targetdb))
+						abort(targetfilename.quote() ^ " cannot be opened in target db " ^ targetname);
+				}
+			} else {
+
+				//create the output dir
+				targetdir = targetname ^ targetfilename ^ "/";
+				osmkdir(targetdir);
 			}
 
 		}
@@ -137,19 +160,32 @@ function main() {
 
 			//skip if not changed
 			var oldrec;
-			if (oldrec.read(file2,ID)) {
+			var exists;
+			if (targetdb) {
+				exists = oldrec.read(file2,ID);
+			} else {
+				exists = oldrec.osread(targetdir ^ ID);
+				gosub escape_text(RECORD);
+			}
+			if (exists) {
+
+				//skip update if no change
 				if (RECORD eq oldrec) {
 					print("\tNot changed");
 					continue;
 				}
+
 				printl("\tChanged");
 			} else {
 				printl("\tNew");
 			}
 
-			//if (OPTIONS.index("W"))
+			if (targetdb) {
 				RECORD.write(file2, ID);
 
+			} else {
+				oswrite(RECORD, targetdir ^ ID);
+			}
 		}
 
 		//commit all target db updates
@@ -241,8 +277,8 @@ function getrec() {
 	//RECORD[1,len(ID)+1] = ""
 	RECORD.splicer(1,ID.length()+1,"");
 
-	gosub unescape(ID);
-	gosub unescape(RECORD);
+	gosub unescape_sql(ID);
+	gosub unescape_sql(RECORD);
 	//TRACE(ID)
 
 	print(at(-40) ^ recn ^ ".", ID);
@@ -250,7 +286,17 @@ function getrec() {
 	return true;
 }
 
-subroutine unescape(io arg1) {
+subroutine escape_text(io record) {
+	//escape new lines and backslashes
+	record.swapper("\\", "\\\\");
+	record.swapper("\n", "\\n");
+
+	//replace FM with new lines
+	record.converter(FM, "\n");
+	return;
+}
+
+subroutine unescape_sql(io arg1) {
 
 	if (not arg1.index("\\"))
 		return;
