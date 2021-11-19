@@ -467,9 +467,11 @@ forcedemail:
 
 	}
 
-	//print
-	//print cmd
+	//printl();
+	//TRACE(cmd)
 	errormsg = shell2(cmd, errors);
+	TRACE(errormsg)
+	TRACE(errors)
 	//pcperform 'CMD /c ':cmd
 
 	if (bodyfilename) {
@@ -499,6 +501,8 @@ forcedemail:
 		if (errormsg eq "") {
 			if (errors) {
 				errormsg = errors;
+				//call sysmsg(errors);
+				errputl(errors);
 			} else {
 				errormsg = "OK";
 			}
