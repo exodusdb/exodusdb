@@ -18,6 +18,6 @@ set -euxo pipefail
 		:
 		: pg_dump
 		:
-			sudo -u postgres pg_dump exodus --table $DB_FILENAME > $OS_FILENAME
+			sudo -u postgres pg_dump exodus --clean --table $DB_FILENAME > $OS_FILENAME
 
 	done
