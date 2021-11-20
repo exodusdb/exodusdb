@@ -20,6 +20,7 @@ DartConfiguration.tcl
 *.gcov
 *.cpp.save
 /ryu/
+/fast_float/
 p1.cpp
 p2.cpp
 p3.cpp
