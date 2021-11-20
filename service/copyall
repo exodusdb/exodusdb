@@ -67,8 +67,8 @@ set -eux
 	mkdir -p $HOME/live
 
 :
-: Copy all bin and lib files to live
-: ==================================
+: Copy all bin, lib and dat files to live
+: =======================================
 :
 :	MUST use 'whole file' option to ensure that the OS dlopen understands everything has changed
 :	otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
@@ -76,7 +76,7 @@ set -eux
 	#rsync -av ~/bin ~/lib ~/inc ~/live
 	#rsync -a ~/{bin,lib,inc} ~/live
 	#rsync -av --delete ~/{bin,lib} ~/live
-	rsync $DRYRUN -av --whole-file ~/{bin,lib} ~/live
+	rsync $DRYRUN -av --whole-file ~/{bin,lib,dat} ~/live
 
 :
 : Finished $DRYRUN copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.

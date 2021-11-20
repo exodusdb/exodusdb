@@ -1,9 +1,9 @@
 #!/bin/bash
 set -eux
 
-: ===============================
-: Compile EXODUS service programs
-: ===============================
+: =====================================================
+: Compile EXODUS service programs and install dat files
+: =====================================================
 :
 : Please ignore a few warnings about 'cast between incompatible pointer to member types'
 :
@@ -20,6 +20,12 @@ set -eux
 : ======================
 :
 	compile alt exo sys {S${COMPILER_OPTIONS}}
+
+:
+: Install dat files
+: =================
+:
+	rsync -avz --delete ./dat/* ~/dat/
 
 :
 : Finished compiling EXODUS service in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
