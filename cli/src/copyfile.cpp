@@ -14,6 +14,9 @@ programinit()
 	var sourcefilename;
 	var recn;
 	var dictonly;
+	var nsame;
+	var nchanged;
+	var nnew;
 
 function main() {
 
@@ -100,7 +103,7 @@ function main() {
 
 	//go through files one by one if source is a db
 	if (sourcedb)
-		sourcefilenames.converter(",", FM);
+		sourcefilenames.trimmer(",").converter(",", FM);
 
 	for (const var& temp : sourcefilenames) {
 
@@ -116,6 +119,11 @@ function main() {
 
 		// source is a db
 		if (sourcedb) {
+
+			//reset counters - duplicated in main() and getrec()
+			nsame = 0;
+			nchanged = 0;
+			nnew =0;
 
 			//open the source file
 			if (not file1.open(sourcefilename, sourcedb) )
@@ -161,14 +169,15 @@ function main() {
 			osmkdir(targetdir);
 		}
 
-		//speed up
+		// Speed up updates
 		if (targetdb)
 			targetdb.begintrans();
 
-		//select source file if source is a db
+		// Select source file if source is a db
+		// In ID order to be consistent so diff will work better
 		if (sourcedb) {
 			printl(sourcefilename);
-			file1.select(sourcefilename ^ " (R)");
+			file1.select(sourcefilename ^ " BY ID (R)");
 		}
 
 		//process source file
@@ -195,12 +204,15 @@ function main() {
 
 				//skip update if no change
 				if (RECORD eq oldrec) {
+					nsame++;
 					print("\tNot changed");
 					continue;
 				}
 
+				nchanged++;
 				printl("\tChanged");
 			} else {
+				nnew++;
 				printl("\tNew");
 			}
 
@@ -215,6 +227,10 @@ function main() {
 					abort("copyfile could not write " ^ targetdir ^ ID);
 			}
 		}
+
+		print(at(-40));
+		if (nchanged or nnew)
+			printl("Same:",nsame,"Changed:",nchanged, "New:",nnew);
 
 		//commit all target db updates
 		if (targetdb)
@@ -280,6 +296,11 @@ function getrec() {
 			printl();
 			printl(targetfilename);
 			recn = 0;
+
+			//reset counters - duplicated in main() and getrec()
+			nsame = 0;
+			nchanged = 0;
+			nnew =0;
 
 			// Open the target file
 			if (targetdb) {
