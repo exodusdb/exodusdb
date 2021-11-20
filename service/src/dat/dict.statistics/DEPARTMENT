@@ -1,0 +1,28 @@
+S
+
+Department
+S
+
+
+
+@ans=@record<3>*may be missing try to get from user fileif @ans else @ans=xlate('USERS',field(@id,'*',3),5,'X')*use database as better than blank/unknownif @ans else if field(@id,'*',3)='EXODUS' then  @ans='EXODUS' end else  @ans=field(@id,'*',1)  end end
+T
+20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

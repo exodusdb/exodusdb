@@ -1,0 +1,28 @@
+S
+
+TIMEDATE
+S
+
+
+
+$INSERT GBP,GENERAL.COMMONANS = FIELD2(@RECORD,@FM,-1)IF ANS[1,1] = 'V' THEN ANS = FIELD2(@RECORD,@FM,-2) ENDIF NOT(ANS[1,2] MATCHES '2N') THEN @ANS='' ELSE @ANS = ANS
+L
+21
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

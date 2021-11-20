@@ -1,0 +1,28 @@
+S
+
+NUM
+S
+0
+
+
+@ANS=@IDHOLD=@IDCONVERT '0123456789' TO '' IN HOLDCONVERT HOLD TO '' IN @ANS
+R
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

@@ -1,0 +1,28 @@
+S
+
+DurationHrs:Min:Sec
+S
+
+
+
+secsperday=24*60*60uptodate=@record<11>uptotime=@record<12>if uptodate='' then uptodate=date()if uptotime='' then uptotime=time()daysecs=(uptodate-@record<1>)*secsperdaytimesecs=uptotime-@record<2>totsecs=daysecs+timesecshours=int(totsecs/60/60)mins=mod(int(totsecs/60),60)secs=int(mod(totsecs,60))@ans=hours:':':mins 'R(0)#2':':':secs 'R(0)#2':'.':field(totsecs,'.',2) 'R#2'
+R
+12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

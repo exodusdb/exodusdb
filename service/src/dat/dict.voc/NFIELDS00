@@ -1,0 +1,28 @@
+S
+
+NFIELDS00
+S
+
+
+
+*remove comment blocksloop pos1=index(@record,'/*',1)while pos1 pos2=index(@record,'*/',1) if pos2 else pos2=len(@record)+1 @record[pos1,pos2-pos1+2]='' repeat*call msg('x')*remove comment linesnfields=count(@record,@fm)+1*dim x(nfields)*matparse @record into xfor i=1 to nfields *if trim(x(i))[1,1]='*' then x(i)='' if trim(@record<i>)[1,1]='*' then @record<i>='' next*@record=matunparse(x)*             call msg('y')*remove blank linesconvert \\\\FE20\\\\ to \\\\20FE\\\\ in @recordnfields=count(trim(@record),' ')+1@ans=nfields
+R
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

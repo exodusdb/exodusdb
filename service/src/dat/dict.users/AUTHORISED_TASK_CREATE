@@ -1,0 +1,28 @@
+S
+
+AuthorisedTask Create
+S
+
+
+
+declare function securityif security('TASK CREATE',msg,xx,@id) then @ans=1end else @ans=0 end
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

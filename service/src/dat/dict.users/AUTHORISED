@@ -1,0 +1,28 @@
+S
+
+Authorised
+S
+
+
+
+$insert gbp,general.commonif @id='EXODUS' then goto unknownlocate @username in userprivs<1> setting usern then if security('TIMESHEET ADMINISTRATOR') then  ans=1  return ans  end *may not be allowed to access higher users/groups if usern>@record<11> then  ans=security('AUTHORISATION UPDATE HIGHER GROUPS') end else  *look for the user in the same group as the active user  for usern2=usern to 9999   user=userprivs<1,usern2>  while user and user<>'---' and user ne @id   next usern2  *if found then same group therefore ok  if user=@id then   ans=1  end else   *not found therefore possibly not allowed access   ans=security('AUTHORISATION UPDATE LOWER GROUPS')   end  endend elseunknown: ans=(@username='EXODUS') endreturn ans
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

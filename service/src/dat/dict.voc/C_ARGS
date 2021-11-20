@@ -1,0 +1,28 @@
+S
+
+C ARGS
+S
+
+
+
+@ans=@record<2>if @ans[1,3] ne '*c ' then @ans=''
+T
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

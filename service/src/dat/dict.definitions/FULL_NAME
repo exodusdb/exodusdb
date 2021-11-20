@@ -1,0 +1,28 @@
+S
+
+Full Name
+M1
+
+
+
+@ans=xlate('USERS',@record<1>,1,'X')nn=count(@ans,@vm)+1for ii=1 to nn if @ans<1,ii>=@record<1,ii> then  @ans<1,ii>=''  end next
+T
+20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

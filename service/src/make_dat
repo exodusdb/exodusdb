@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euxo pipefail
+
+: ==========================================
+: Make exodus dat files from exodus database
+: ==========================================
+:
+	copyfile exodus:dict.changelog,dict.definitions,dict.locks,dict.processes,dict.requestlog,dict.statistics,dict.users,dict.voc ./dat

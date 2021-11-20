@@ -1,0 +1,28 @@
+S
+
+Last Updated
+S
+
+
+
+/*dostimenow=date()+24873+time()/86400elapsedsecs=int((dostimenow-@record<27>)*86400)ans=''interval=604800intervalname='weeks'gosub addintervaldescinterval=interval/7intervalname='days'gosub addintervaldescinterval=interval/24intervalname='hours'gosub addintervaldescinterval=interval/60intervalname='mins'gosub addintervaldescinterval=1intervalname='secs'gosub addintervaldescreturn trim(ans)****************addintervaldesc:****************if interval=1 or elapsedsecs>interval then nintervals=int(elapsedsecs/interval) elapsedsecs-=nintervals*interval if nintervals=1 then intervalname[-1,1]='' ans:=' ':nintervals:' ':intervalname endreturn*/declare function elapsedtimetextfromdate=int(@record<27>)-24873fromtime=('.':field(@record<27>,'.',2))*86400return elapsedtimetext(fromdate,fromtime,uptodate,uptotime)
+T
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

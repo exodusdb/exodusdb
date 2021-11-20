@@ -1,0 +1,28 @@
+S
+
+Keys
+S
+
+
+
+$insert gbp,general.commonlocate @id in userprivs<1> setting usern then @ans=userprivs<2,usern>end else @ans='' end
+L
+20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

@@ -1,0 +1,28 @@
+S
+
+Description
+S
+
+
+
+@ans=@record<3>distrib=@record<5>convert @svm to ':' in distribif distrib and not(index(distrib,'User',1)) then @ans[1,0]=field(distrib,':',1):': '
+T
+60
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

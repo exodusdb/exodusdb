@@ -1,0 +1,28 @@
+S
+
+VERSION
+S
+
+
+
+declare function field2if index(@dict,'VOC',1) then @ans=xlate(@record<3>,'$':@record<4>,'VERSION','X')end else @ANS = FIELD2(@RECORD,@FM,-1) *IF @ANS[1,1] = 'V' THEN *  @ANS=@ANS[2,99] *END ELSE *  @ANS = '' END
+L
+7
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

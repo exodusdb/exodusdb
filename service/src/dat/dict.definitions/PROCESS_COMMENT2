@@ -1,0 +1,28 @@
+S
+
+Comments
+S
+
+
+
+common /system/ system@ans=''if field(@id,'*',2)=system<32> then @ans<1,-1>='Current user session'if trim(@record<3>)=trim(@station) then @ans<1,-1>='Current workstation'if @record<5>=@username then @ans<1,-1>='Current user'
+T
+30
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

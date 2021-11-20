@@ -1,0 +1,28 @@
+S
+
+LIVE USER WITH EMAIL
+S
+
+
+
+if @record<7> then expired=@record<35> if expired and expired<=date() then  @ans=0 end else  @ans=1  endend else @ans='' end
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

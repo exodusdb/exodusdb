@@ -1,0 +1,28 @@
+S
+
+User-Name
+S
+
+
+
+usercode=field(@id,'*',3)@ans=xlate('USERS',usercode,1,'X')if @ans='' then @ans=usercode swap ' ' with '_' in @ansend else if @ans<>usercode then @ans:=' (':usercode:')' end
+T
+20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

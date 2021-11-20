@@ -1,0 +1,28 @@
+S
+
+Last Login
+M1
+
+
+[DATETIME]
+return xlate('USERS',{USER_CODE_WITH_EMAIL},13,'X')
+R
+20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

@@ -1,0 +1,28 @@
+S
+
+REVERSE THE USERS
+S
+
+
+
+declare function invertarray,reverse@record=invertarray(reverse(invertarray(@record)))
+L
+0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

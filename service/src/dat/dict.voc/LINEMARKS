@@ -1,0 +1,28 @@
+S
+
+LINEMARKS
+S
+
+
+
+if index('$*',@id[1,1],1) then return ''end else if index(@record,'linemark',1) then tt=@record convert ' ' to @fm in tt return index(tt,@fm:'linemark',1)end else @ans=0 endreturn @ans
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

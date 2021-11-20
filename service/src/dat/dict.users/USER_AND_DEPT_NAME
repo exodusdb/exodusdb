@@ -1,0 +1,28 @@
+S
+
+User and Dept. Name
+S
+
+
+
+@ans=@record<1>:' - ':@record<5>
+T
+30
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

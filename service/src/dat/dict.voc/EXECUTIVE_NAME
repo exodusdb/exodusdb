@@ -1,0 +1,28 @@
+S
+
+Executive
+S
+
+
+
+*ans={EXECUTIVE_CODE}*ans2=ans*convert @lower.case to @upper.case in ans2*@ans=xlate('USERS',ans2,1,'X')*if @ans else @ans=ansdeclare function capitaliseans={EXECUTIVE_CODE}ans2=ansconvert @lower.case to @upper.case in ans2if ans2 ne ans then transfer ans to @ansend else *@ans=xlate('USERS','%':ans2:'%',1,'X') @ans=xlate('USERS',ans2,1,'X') if @ans then  ans2=@ans  convert @lower.case to @upper.case in ans2  if ans2=@ans then   @ans=capitalise(@ans)   end end else  transfer ans to @ans  @ans=capitalise(@ans)  end end
+T
+20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

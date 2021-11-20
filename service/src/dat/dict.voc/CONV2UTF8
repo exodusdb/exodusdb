@@ -1,0 +1,28 @@
+S
+
+CONV2UTF8
+S
+
+
+
+origrecord=@recordorigid=@idcall conv2utf8(msg,@recur0,'')@recur1+=1print @(0):@(-4):@recur1:'. ':@rec.count:@ans=msgif @ans else @ans=@record<>origrecord or @id<>origid end*restore otherwise select will not find it again@id=origid
+T
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

@@ -1,0 +1,28 @@
+S
+
+ChequeIs Default
+S
+
+
+
+@ans=@record<14>if @ans then @ans='Default'
+L
+1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

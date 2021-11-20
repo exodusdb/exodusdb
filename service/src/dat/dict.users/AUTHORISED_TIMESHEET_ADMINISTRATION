@@ -1,0 +1,28 @@
+S
+
+AuthorisedTimesheet Administration
+S
+
+
+
+declare function securityif security('TIMESHEET ADMINISTRATION',msg,'',@id) then @ans=1end else @ans=0 end
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

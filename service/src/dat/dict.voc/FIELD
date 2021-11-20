@@ -1,0 +1,28 @@
+S
+
+FIELD
+M
+
+
+
+IF @RECUR0 ELSE CALL MSG('WHICH FIELD NUMBER ?','R',@RECUR0,'') END@ANS=@RECORD<@RECUR0>
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

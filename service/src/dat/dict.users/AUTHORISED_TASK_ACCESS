@@ -1,0 +1,28 @@
+S
+
+AuthorisedTask Access
+S
+
+
+
+declare function securityif security('TASK ACCESS',msg,'',@id) then @ans=1end else @ans=0 end
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

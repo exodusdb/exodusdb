@@ -1,0 +1,28 @@
+S
+
+NFIELDS
+S
+
+
+
+convert \\\\FE20\\\\ to \\\\20FE\\\\ in @record@ans=count(trim(@record),' ')+1
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

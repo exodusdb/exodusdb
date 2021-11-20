@@ -1,0 +1,28 @@
+S
+
+VERSION DATE
+S
+
+
+[DATE,4]
+@ans=iconv(field(trim({VERSION}),' ',2,3),'D')
+R
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

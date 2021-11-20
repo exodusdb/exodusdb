@@ -1,0 +1,28 @@
+S
+
+USER CODE WITH EMAIL
+M
+
+
+
+usercodes=@record<1,@mv>emails=@record<7,@mv>nusers=count(usercodes,@vm)+1for usern=1 to nusers if emails<1,usern>='' then  usercodes<1,usern>=''  end next usernreturn usercodes
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

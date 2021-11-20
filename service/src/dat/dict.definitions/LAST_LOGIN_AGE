@@ -1,0 +1,28 @@
+S
+
+Last LoginAge (days)
+M1
+
+
+
+@ans=xlate('USERS',{USER_CODE_WITH_EMAIL},13,'X')nn=count(@ans,@vm)+1for ii=1 to nn logindate=int(@ans<1,ii>) if logindate then  @ans<1,ii>=(date()-logindate) 'MD00P'  end next
+R
+5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
