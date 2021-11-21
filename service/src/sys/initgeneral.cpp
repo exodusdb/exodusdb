@@ -359,6 +359,10 @@ updateversion:
 		}
 	}
 
+	//install any dat files in the current database
+	//also load any new or amended pgsql functions found in dict files in dat
+	osshell("sync_dat");
+
 	call log2("*copy any new data records", logtime);
 	var bp;
 	if (bp.open("GBP", "")) {

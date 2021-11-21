@@ -64,6 +64,7 @@ add_executable(listdict listdict.cpp)
 add_executable(listindexes listindexes.cpp)
 add_executable(testsort testsort.cpp)
 add_executable(configexodus configexodus.cpp)
+add_executable(sync_dat sync_dat.cpp)
 
 #name is name only ... input and output files are exodus
 add_executable(exodus-cli exodus.cpp)
@@ -105,6 +106,7 @@ target_link_libraries(listdict exodus stdc++fs ${LIBS})
 target_link_libraries(listindexes exodus stdc++fs ${LIBS})
 target_link_libraries(testsort exodus stdc++fs ${LIBS})
 target_link_libraries(configexodus exodus stdc++fs ${LIBS})
+target_link_libraries(sync_dat exodus stdc++fs ${LIBS})
 
 
 ### 3. INSTALL BINs ###
@@ -135,6 +137,7 @@ listdict
 listindexes
 testsort
 configexodus
+sync_dat
  DESTINATION bin)
 
 ### 4. INSTALL LIBs ###
