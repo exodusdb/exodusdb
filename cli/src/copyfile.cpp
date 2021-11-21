@@ -1,8 +1,6 @@
 #include <exodus/program.h>
 programinit()
 
-	var file1;
-	var file2;
 	var targetfilename;
 	var sourcedb;
 	var targetdb;
@@ -12,6 +10,8 @@ programinit()
 	var nlines;
 	var ln;
 	var sourcefilename;
+	var file1;
+	var file2;
 	var recn;
 	var dictonly;
 	var nsame;
@@ -29,19 +29,43 @@ function main() {
 		"\n"
 		"TARGET can be a database name or a dir path ending /\n"
 		"\n"
-		"SOURCE and TARGET must be followed by : otherwise the default database will used.";
+		"SOURCE and TARGET must be followed by : otherwise the default database will used.\n"
+		"\n"
+		"OPTIONS only apply if target is a database.\n"
+		"\n"
+		"O - Overwrite is required to overwrite any existing records otherwise they are skipped.\n"
+		"\n"
+		"N - New is required to add new records to the target otherwise they are skipped.\n"
+		"\n"
+		//"M - Move causes any copied records to be deleted from the source.\n"
+		//"\n"
+		//"D - Delete causes any records in the target which dont exist in the source to be deleted.\n"
+		//"\n"
+		"C - Create is required if the target file does not exist and should be created. Implies Overwrite and New.\n"
+		"\n";
 
 		abort(syntax);
 	}
 
-	// dat files - db files and records stored as os dirs and filenames
+	// dat files - db files and records stored as os dirs and os files
 	//
-	// Linux files cannot contain / or char(0)
+	// Linux files cannot contain / or char(0) characters
 	// https://en.wikipedia.org/wiki/Filename#Comparison_of_filename_limitations
 	//
-	// Therefore dat files cannot contain the above characters for now.
+	// Therefore dat file name and keys cannot contain the above characters for now.
 	// Fortunately most dat files are dictionaries which tend to be more limited
-	//  by sql column name restrictions
+	//  by sql column name restrictions.
+
+	var allow_overwrite  = OPTIONS.index("O");
+	var allow_new        = OPTIONS.index("N");
+	//var move_option    = OPTIONS.index("M");
+	//var delete_option  = OPTIONS.index("D");
+	var allow_createfile = OPTIONS.index("C");
+
+	if (allow_createfile) {
+		allow_overwrite = 1;
+		allow_new = 1;
+	}
 
 	//parse source
 	var sourcename = "";
@@ -107,6 +131,10 @@ function main() {
 
 	for (const var& temp : sourcefilenames) {
 
+		// Note that if the source is an sql os file name then
+		// sourcefilename is actually a *list* of desired db filenames separated by commas
+		// whereas if source is a db name then sourcefilename contains a single db filename
+
 		sourcefilename = temp;
 
 		//skip dict.all which is an sql view of all dict files
@@ -154,8 +182,11 @@ function main() {
 
 			//open target file
 			if (not file2.open(targetfilename, targetdb)) {
-				if (not OPTIONS.index("C") or not targetdb.createfile(targetfilename) or not file2.open(targetfilename, targetdb))
-					abort(targetfilename.quote() ^ " cannot be opened in target db " ^ targetname);
+				if (not allow_createfile) {
+					abort(targetfilename.quote() ^ " does not exist in target db " ^ targetname ^ " and no (C)reate option provided.");
+				}
+				if (not targetdb.createfile(targetfilename) or not file2.open(targetfilename, targetdb))
+					abort(targetfilename.quote() ^ " cannot be created in target db " ^ targetname);
 			}
 		}
 
@@ -210,10 +241,22 @@ function main() {
 				}
 
 				nchanged++;
-				printl("\tChanged");
+				print("\tChanged");
+				if (not allow_overwrite) {
+					printl("\t - skipped");
+					continue;
+				}
+				printl();
+
 			} else {
+
 				nnew++;
-				printl("\tNew");
+				print("\tNew");
+				if (not allow_new) {
+					printl("\t - skipped");
+					continue;
+				}
+				printl();
 			}
 
 			// Write to db file
@@ -229,8 +272,11 @@ function main() {
 		}
 
 		print(at(-40));
-		if (nchanged or nnew)
+		//if (nsame or nchanged or nnew) {
+		if (nchanged or nnew) {
 			printl("Same:",nsame,"Changed:",nchanged, "New:",nnew);
+			//printl();
+		}
 
 		//commit all target db updates
 		if (targetdb)
@@ -346,13 +392,33 @@ function getrec() {
 	return true;
 }
 
+//WARNING: KEEP AS REVERSE OF unescape_text() IN sync_dat.cpp
 subroutine escape_text(io record) {
-	//escape new lines and backslashes
+
+	//escape backslashes
 	record.swapper("\\", "\\\\");
+
+	//escape new lines
 	record.swapper("\n", "\\n");
 
 	//replace FM with new lines
 	record.converter(FM, "\n");
+
+	return;
+}
+
+//identical code in copyfile and sync_dat
+subroutine unescape_text(io record) {
+
+	//replace new lines with FM
+	record.converter("\n", FM);
+
+	//unescape new lines
+	record.swapper("\\n", "\n");
+
+	//unescape backslashes
+	record.swapper("\\\\", "\\");
+
 	return;
 }
 
