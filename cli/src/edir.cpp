@@ -5,33 +5,26 @@ programinit()
 	//hard coded editor at the moment
 	//http://www.nano-editor.org/docs.php
 	var editor = "nano";
-//restrict to editing records for now
-//#define ALLOW_EDIC
-#ifdef ALLOW_EDIC
-	if (dcount(COMMAND, FM) < 3) {
-#else
-	if (dcount(COMMAND, FM) < 2) {
-#endif
 
-		//quit if arguments
-		if (dcount(COMMAND, FM) < 2)
-			abort(
-				"Syntax is:"
-				"\nedit databasefilename key ..."
-#ifdef ALLOW_EDIC
-				"\nor"
-				"\nedit osfilename"
-#endif
-			);
+	//quit if arguments
+	if (dcount(COMMAND, FM) < 2)
+		abort(
+			"Syntax is:"
+			"\nedir DBFILENAME KEY [FIELDNO]"
+			"\nor"
+			"\nedir OSFILEPATH [LINENO]"
+		);
 
-		//switch to edic if only one argument
-		osshell(COMMAND.pickreplace(1, 0, 0, "edic").convert(FM, " "));
-		stop();
-	}
+	// Allow for first argument to be an os file path
+	if (COMMAND.index(OSSLASH))
+		COMMAND.inserter(2,"DOS");
 
 	var filename = COMMAND.a(2).convert(".", "_");
 	var key = COMMAND.a(3).unquote().unquote();	 //spaces are quoted
 	var fieldno = COMMAND.a(4);
+
+	if (not fieldno.isnum())
+		abort("fieldno must be numeric");
 
 	//connect to the database
 	//if (not connect())
@@ -58,7 +51,20 @@ programinit()
 	if (not origrecord)
 		printl("New record");
 
-	var text = origrecord.a(fieldno);
+	//if no FM present then treat \n as FM
+	var line_sep = FM;
+	var record = origrecord;
+	if (not origrecord.index(FM)) {
+		if (record.index("\r\n"))
+			line_sep = "\r\n";
+		else if (record.index("\n"))
+			line_sep = "\n";
+		if (line_sep ne FM)
+			record=origrecord.swap(line_sep, FM);
+	}
+
+	//var text = origrecord.a(fieldno);
+	var text = record.a(fieldno);
 	var sepchar;
 	if (not fieldno)
 		sepchar = FM;
@@ -131,11 +137,15 @@ programinit()
 
 		if (text2 ne text) {
 
+			if (line_sep)
+				text2.swapper(FM, line_sep);
+
 			//print("Ok to update? ");
 			//var reply=inputl();
 			var reply = "Y";
 
-			var newrecord = fieldno ? origrecord.r(fieldno, text2) : text2;
+			//var newrecord = fieldno ? origrecord.r(fieldno, text2) : text2;
+			var newrecord = fieldno ? record.r(fieldno, text2) : text2;
 
 			//keep trying to update - perhaps futilely
 			//at least temp file will be left in the directory
