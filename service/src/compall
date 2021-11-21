@@ -28,5 +28,11 @@ set -eux
 	rsync -avz --delete ./dat/* ~/dat/
 
 :
+: Flag sync_dat to review all
+: ===========================
+:
+	touch ~/dat
+
+:
 : Finished compiling EXODUS service in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : =================================================================
