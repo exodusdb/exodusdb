@@ -184,7 +184,6 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
 			ANS = "CORRUPTSYSTEM";
 			SYSTEM.converter(var().chr(0), "");
-restart:
 			ANS = "RESTART " ^ ANS;
 			return 0;
 		}
@@ -192,18 +191,22 @@ restart:
 		//detect system parameter changes and restart
 		//this has the effect of detecting corruption in system which inserts lines
 		var s100 = SYSTEM.a(100);
-		for (ii = 1; ii <= 2; ++ii) {
+		var exohome=osgetenv("EXO_HOME");
+		var ospaths = "../../system.cfg,system.cfg";
+		ospaths ^= "," ^ exohome ^ "/dat/";
+		ospaths.converter("/", OSSLASH);
+		var npaths = dcount(ospaths, ",");
+		for (var ii = 1; ii <= npaths; ii++) {
+			var ospath = ospaths.field(",",ii);
 			//order is significant
-			tt = var("../../system.cfg,system.cfg").field(",", ii);
-			tt.converter("/", OSSLASH);
-			var t2 = tt.osfile().a(3);
-			var t3 = s100.a(1, ii);
-			if (t2 ne t3) {
-				if (t3) {
-					ANS = tt;
-					goto restart;
+			var newtime = (ospath[-1] eq OSSLASH) ? ospath.osdir().a(3) : ospath.osfile().a(3);
+			var oldtime = s100.a(1, ii);
+			if (newtime ne oldtime) {
+				if (oldtime) {
+					ANS = "RESTART " ^ ospath;
+					return 0;
 				} else {
-					SYSTEM.r(100, ii, t2);
+					SYSTEM.r(100, ii, newtime);
 				}
 			}
 		} //ii;
@@ -216,8 +219,9 @@ restart:
 				listen = field2(listen, FM, -1);
 				if (s100.a(1, 3)) {
 					if (s100.a(1, 3) ne listen) {
-						ANS = "$LISTEN";
-						goto restart;
+						//this will only restart listen, not the whole process/thread
+						ANS = "RESTART $LISTEN";
+						return 0;
 					}
 						//comment to solve c++ decomp problem
 				} else {
@@ -225,6 +229,7 @@ restart:
 				}
 			}
 		}
+
 		ANS = "";
 		return 0;
 

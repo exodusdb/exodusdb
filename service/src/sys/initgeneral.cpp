@@ -208,7 +208,7 @@ function main() {
 	//system<77>=bakpars<7> backup drive
 	//system<82>=bakpars<12> backup drive for uploads/images
 	//system<99>
-	//system<100> mv times of SYSTEM.CFG,../../SYSTEM.CFG etc detect reconfig
+	//system<100> mv times of SYSTEM.CFG,../../SYSTEM.CFG, ~/dat/ etc detect restart
 	//system<101> to system<109> used for smtp.cfg details
 	//system<110> to notes
 	//system<111> to cid()
@@ -361,6 +361,7 @@ updateversion:
 
 	//install any dat files in the current database
 	//also load any new or amended pgsql functions found in dict files in dat
+	call log2("*install any new db dat data", logtime);
 	osshell("sync_dat");
 
 	call log2("*copy any new data records", logtime);
