@@ -15,8 +15,6 @@ function main() {
 	var force = index(OPTIONS, "F");
 	var verbose = index(OPTIONS, "V");
 
-	var datinfo = osdir(datpath);
-
 	// Skip if no definitions file
 	var definitions;
 	if (not open("DEFINITIONS",definitions)) {
@@ -32,9 +30,9 @@ function main() {
 	last_sync_time = last_sync.a(2);
 
 	// Skip if nothing new
-	var dirinfo = osdir(datpath);
-	var dirtext = "sync_dat: " ^ datpath ^ " " ^ dirinfo.a(2).oconv("D-Y") ^ " " ^ dirinfo.a(3).oconv("MTS");
-	if (not force and not is_newer(dirinfo)) {
+	var datinfo = osdir(datpath);
+	var dirtext = "sync_dat: " ^ datpath ^ " " ^ datinfo.a(2).oconv("D-Y") ^ " " ^ datinfo.a(3).oconv("MTS");
+	if (not force and not is_newer(datinfo)) {
 		if (verbose)
 			printl(dirtext, "No change.");
 		return 0;

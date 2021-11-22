@@ -95,7 +95,8 @@ set -eux
 		#
 		[Service]
 		Type=simple
-		Restart=on-failure
+		#Restart=on-failure
+		Restart=always
 		RestartSec=1
 		PIDFile=/run/neo/$SERVICE_CODE@%i.pid
 		User=$USER
