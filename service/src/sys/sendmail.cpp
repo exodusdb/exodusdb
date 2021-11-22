@@ -135,7 +135,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//testdata and user exodus - always email sysmsg@neosys.com
 		home.osgetenv("HOME");
 		//if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.a(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
-		if (not osfile("live.txt") or (SYSTEM.a(61) and USERNAME eq "EXODUS")) {
+		if (not osfile("live.txt") or (SYSTEM.a(61) and USERNAME.ucase() eq "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:
