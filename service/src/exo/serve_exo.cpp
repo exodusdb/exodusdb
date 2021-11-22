@@ -46,7 +46,8 @@ function main() {
 	APPLICATION="EXODUS";
 
 	//user
-	USERNAME="exodus";
+	//USERNAME="exodus";
+	USERNAME="EXODUS";
 
 	//database
 	var databasecode=osgetenv("EXO_DATA");
