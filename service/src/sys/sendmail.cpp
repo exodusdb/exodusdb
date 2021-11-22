@@ -470,8 +470,10 @@ forcedemail:
 	//printl();
 	//TRACE(cmd)
 	errormsg = shell2(cmd, errors);
-	TRACE(errormsg)
-	TRACE(errors)
+	if (errormsg)
+		TRACE(errormsg)
+	if (errors)
+		TRACE(errors)
 	//pcperform 'CMD /c ':cmd
 
 	if (bodyfilename) {
