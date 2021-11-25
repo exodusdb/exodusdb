@@ -49,7 +49,7 @@ set -x
 	cmake .
 	make clean #in case half-built with wrong boost libs
 	cmake .
-	make -j
+	make -j $((`nproc`*2))
 	sudo make install
 
 :
