@@ -67,8 +67,8 @@ set -eux
 	dblist|grep exodus_live > /dev/null || dbcreate exodus_live
 
 :
-: Import database dictionaries into exodus and exodus_live
-: ========================================================
+: Import dat files into exodus and exodus_live
+: ===========================================
 :
 	cd /tmp
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
