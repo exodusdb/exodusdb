@@ -79,8 +79,10 @@ set -eux
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_statistics.sql
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
-	cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
-	cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus_live
+	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
+	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus_live
+	EXO_DATA=exodus EXO_DICT=exodus sync_dat
+	EXO_DATA=exodus_live EXO_DICT=exodus_live sync_dat
 
 :
 : Configure the exodus service
