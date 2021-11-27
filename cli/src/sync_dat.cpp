@@ -9,7 +9,10 @@ function main() {
 	var datpath = COMMAND.a(2);
 
 	if (not datpath) {
-		datpath = osgetenv("EXO_HOME") ^ "/dat";
+		//datpath = osgetenv("EXO_HOME") ^ "/dat";
+		if (not datpath.osgetenv("EXO_HOME"))
+			datpath = osgetenv("HOME");
+		datpath ^= "/dat";
 	}
 
 	var force = index(OPTIONS, "F");
@@ -61,7 +64,7 @@ function main() {
 		var dbfilename = dirname;
 		if (not open(dbfilename, dbfile)) {
 			createfile(dbfilename);
-			if (not open(dbfilename)) {
+			if (not open(dbfilename, dbfile)) {
 				errputl("Error: sync_dat cannot create " ^ dbfilename);
 				continue;
 			}
