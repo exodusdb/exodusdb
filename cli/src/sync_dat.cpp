@@ -18,13 +18,14 @@ function main() {
 	// Skip if no definitions file
 	var definitions;
 	if (not open("DEFINITIONS",definitions)) {
-		abort("Error: sync_dat - No DEFINITIONS file");
+		//abort("Error: sync_dat - No DEFINITIONS file");
+		definitions = "";
 	}
 
 	// Get the date and time of last sync
-	var definitions_key = "LAST_SYNC_DATE_TIME*DAT";
 	var last_sync;
-	if (not read(last_sync,definitions, definitions_key))
+	var definitions_key = "LAST_SYNC_DATE_TIME*DAT";
+	if (not definitions or not read(last_sync,definitions, definitions_key))
 		last_sync = "";
 	last_sync_date = last_sync.a(1);
 	last_sync_time = last_sync.a(2);
@@ -116,7 +117,8 @@ function main() {
 	}
 
 	// Record the current sync date and time
-	write(date() ^ FM ^ time() on definitions, definitions_key);
+	if (definitions)
+		write(date() ^ FM ^ time() on definitions, definitions_key);
 
 	return 0;
 }
