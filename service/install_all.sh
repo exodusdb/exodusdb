@@ -54,8 +54,8 @@ set -eux
 	./compall
 
 :
-: Copy all $EXODUS/bin,lib to ~/live
-: ==================================
+: Copy all $EXODUS/bin,lib,dat to ~/live
+: ======================================
 :
 	cd $EXODUS/service
 	./copyall CONFIRM

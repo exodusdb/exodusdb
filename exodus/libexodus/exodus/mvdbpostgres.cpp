@@ -4647,9 +4647,10 @@ var var::listfiles() const {
 	var schemafilter = " NOT IN ('pg_catalog', 'information_schema') ";
 
 	var sql =
-		"SELECT table_name, table_schema FROM information_schema.tables WHERE table_type = 'BASE "
-		"TABLE'";
-	sql ^= " AND table_schema " ^ schemafilter;
+		"SELECT table_name, table_schema FROM information_schema.tables"
+		//" WHERE table_type = 'BASE TABLE' AND";
+		" WHERE";
+	sql ^= " table_schema " ^ schemafilter;
 
 	sql ^= " UNION SELECT matviewname as table_name, schemaname as table_schema from pg_matviews";
 	sql ^= " WHERE schemaname " ^ schemafilter;

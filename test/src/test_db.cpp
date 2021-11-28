@@ -424,7 +424,7 @@ function main()
 			assert(not open(uniquefilename));
 
 			conn1.disconnect();
-			
+
 		}
 
 		printl("remove any test databases");
