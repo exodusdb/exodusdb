@@ -49,6 +49,7 @@ add_executable(dblist dblist.cpp)
 add_executable(dbcopy dbcopy.cpp)
 add_executable(dbcomp dbcomp.cpp)
 add_executable(dbdelete dbdelete.cpp)
+add_executable(dbattach dbattach.cpp)
 
 add_executable(delete delete.cpp)
 add_executable(clearfile clearfile.cpp)
@@ -89,6 +90,7 @@ target_link_libraries(dbgrep exodus stdc++fs ${LIBS})
 target_link_libraries(dbcopy exodus stdc++fs ${LIBS})
 target_link_libraries(dbcomp exodus stdc++fs ${LIBS})
 target_link_libraries(dbdelete exodus stdc++fs ${LIBS})
+target_link_libraries(dbattach exodus stdc++fs ${LIBS})
 
 target_link_libraries(delete exodus stdc++fs ${LIBS})
 target_link_libraries(clearfile exodus stdc++fs ${LIBS})
@@ -121,6 +123,7 @@ dbgrep
 dbcopy
 dbcomp
 dbdelete
+dbattach
 
 delete
 clearfile
