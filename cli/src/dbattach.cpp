@@ -6,7 +6,7 @@ function main() {
 	var dbname2 = COMMAND.a(2);
 	var filenames = COMMAND.field(FM, 3, 999999);
 
-	if (not dbname2) {
+	if (not dbname2 and not OPTIONS) {
 		var syntax =
 		"dbattach - Attach other database files into the current/default database\n"
 		"\n"
@@ -14,11 +14,13 @@ function main() {
 		"\n"
 		"Options:\n"
 		"\n"
-		"  F means forcibly delete any normal files in the current/default database.\n"
+		"  F   Forcibly delete any normal files in the current/default database.\n"
 		"\n"
-		"  R means remove the current file attachments.\n"
-		"  RR means remove the current user/database connection map.\n"
-		"  RRR means remove all connections and attachments.\n"
+		"  R   Remove the current file attachments.\n"
+		"  RR  Remove the current user/database connection map.\n"
+		"  RRR Remove all connections and attachments.\n"
+		"\n"
+		"  L   List attached foreign files in the current/default database\n"
 		"\n"
 		"If no filenames are provided then a database connection is created.\n"
 		"This is *required* before filenames can be provided and attached.\n"
@@ -46,6 +48,25 @@ function main() {
 
 	var sql;
 
+	if (OPTIONS.index("L")) {
+
+		sql = "select foreign_server_name, foreign_table_name from information_schema.foreign_tables;";
+		var result;
+		if (not conn1.sqlexec(sql, result))
+			abort(conn1.lasterror());
+
+		// change RM to FM etc. and remove column headings
+		result.lowerer();
+		result.remover(1);
+
+		//format for printing
+		result.converter(FM, "\n");
+		result.converter(VM, " ");
+
+		printl(result);
+		stop();
+	}
+
 	////////////////////////////////////////////////////////////////////////////
 	// Create an interdb connection from default database to the target database
 	////////////////////////////////////////////////////////////////////////////
@@ -71,6 +92,9 @@ function main() {
 		// Install extension required to establish interdb connections
 		if (not conn1.sqlexec("CREATE EXTENSION IF NOT EXISTS postgres_fdw WITH SCHEMA public"))
 			abort(conn1.lasterror());
+
+		if (not dbname2)
+			stop();
 
 		// Reset the interdb connection to the target db. Remove all connected tables.
 		if (not conn1.sqlexec("DROP SERVER IF EXISTS " ^ dbname2 ^ " CASCADE"))
@@ -114,6 +138,9 @@ function main() {
 	filenames.converter(",", FM).trimmer(FM);
 
 	for (var filename : filenames) {
+
+		if (not filename)
+			continue;
 
 		if (conn1.open(filename)) {
 
