@@ -3,9 +3,22 @@ libraryinit()
 
 function main(in input0, in max) {
 
+	var inputx;
+	var maxx;
+	var iscmd;
+	if (SENTENCE.field(" ", 1) eq "secid") {
+		iscmd = true;
+		inputx = SENTENCE.field(" ", 2);
+		maxx = SENTENCE.field(" ", 3);
+	} else {
+		iscmd = false;
+		inputx = input0;
+		maxx = max;
+	}
+
 	//use the max as part of the randomisation so that
 	//it acts as "salt" and slightly different max produce very different results
-	var inputx = max ^ input0;
+	inputx = maxx ^ inputx;
 
 	//insensitive to ascii punctuation and spaces
 	inputx.converter(" ~!\"$%^&*()_+|{}:@<>?#-=\\[];,./" "\'", "");
@@ -16,10 +29,21 @@ function main(in input0, in max) {
 	//use the cleaned in to initialise the random number generator
 	inputx.initrnd();
 
-	//and return the first random number generated, up to the max required
-	return rnd(max);
+	//return the first random number generated, up to the max required
+
+	if (iscmd) {
+		printl(rnd(maxx));
+		return 0;
+	}
+
+	return rnd(maxx);
 
 }
 
 
 libraryexit()
+
+
+
+
+
