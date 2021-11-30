@@ -77,6 +77,9 @@ bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
 	//stage 2
 	/////////
 
+	CURSOR.convert(FM^VM^SM,"^]}").outputl("2 Stage Select:");
+	sortselectclause.outputl();
+
 	//secondary sort/select on fields that could not be calculated by the database
 
 	//calc_fields.oswrite("calc_fields=");
@@ -414,7 +417,9 @@ bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
 		//insertsql.outputl();
 
 		if (not CURSOR.sqlexec(insertsql)) {
-			insertsql.errputl("Error inserting pass2 record:");
+			//tolerate failure to write in case multiple records returned (due to mv selection?)
+			if (not CURSOR.lasterror().index("duplicate key"))
+				CURSOR.lasterror().errputl("Error inserting pass2 record:");
 		}
 
 		//option to limit number of records returned
