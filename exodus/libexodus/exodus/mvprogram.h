@@ -14,6 +14,7 @@ class ExodusProgramBase {
 	using in = const var&;
 	using io = var&;
 	using out = var&;
+	using let = const var;
 
 #include <exodus/ioconv_custom.h>
 
