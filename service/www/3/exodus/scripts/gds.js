@@ -112,7 +112,7 @@ function* gds_regetx(dictitemorid, recn) {
     //calculate the answer (possibly multivalued)
     /* yield */ var results = /**/ yield * this.tempfunction.apply(this)
     // noyield // var results = this.tempfunction()
-    if (typeof results == 'undefined') systemerror('gds_recalx', (dictitem.name ? dictitem.name : dictitem.id) + ' function returned undefined')
+    if (typeof results == 'undefined') systemerror('gds_regetx', (dictitem.name ? dictitem.name : dictitem.id) + ' function returned undefined')
 
     //and update the record and display
     /*if (dictitem.type!='S') */

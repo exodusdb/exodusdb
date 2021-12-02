@@ -10,6 +10,10 @@ function main(in input0, in max) {
 		iscmd = true;
 		inputx = SENTENCE.field(" ", 2);
 		maxx = SENTENCE.field(" ", 3);
+		if (not inputx or maxx eq "" or not maxx.isnum()) {
+			errputl("Syntax is 'secid TEXT NUMBER'\nTEXT must have no spaces.");
+			stop();
+		}
 	} else {
 		iscmd = false;
 		inputx = input0;
