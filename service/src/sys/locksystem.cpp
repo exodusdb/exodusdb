@@ -26,7 +26,7 @@ function main(in mode0, in dataset0) {
 	//c sys
 	//global all
 
-	interactive = not(SYSTEM.a(33));
+	interactive = false; //not(SYSTEM.a(33));
 	if (mode0.unassigned()) {
 		mode = "";
 	} else {

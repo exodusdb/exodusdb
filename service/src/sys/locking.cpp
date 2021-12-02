@@ -38,7 +38,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	}
 	msg = "";
 
-	var interactive = not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.a(33));
 
 	if (var(0) and USERNAME eq "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);

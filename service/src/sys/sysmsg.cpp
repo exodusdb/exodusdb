@@ -32,7 +32,7 @@ function main(in msg0, in subject0="", in username0="") {
 	//not tested or used currently
 
 	#include <system_common.h>
-	var interactive = not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.a(33));
 	var datasetcode = SYSTEM.a(17);
 
 	//NB this routine is called automatically from msg()

@@ -148,7 +148,7 @@ function main() {
 	//accounting<3> for allocationorder
 	//accounting<4> for mv buffer of currency or unitcodes
 	//accounting<5> for mv buffer of fmts for <4>
-	var interactive = not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.a(33));
 	//equ generalresultcode to system<34>
 	//equ nrequests=system<35>
 	//equ defaultclientmark to system<36>

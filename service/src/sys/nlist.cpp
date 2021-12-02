@@ -246,7 +246,7 @@ function main() {
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	#define interactive_ not(SYSTEM.a(33))
+	#define interactive_ false //not(SYSTEM.a(33))
 	ulchar = "-";
 
 	//NLIST keywords and aliases. blank keyword means throwaway word

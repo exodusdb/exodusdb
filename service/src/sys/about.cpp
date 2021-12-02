@@ -22,7 +22,7 @@ function main() {
 
 	#include <system_common.h>
 
-	interactive = not(SYSTEM.a(33));
+	interactive = false; //not(SYSTEM.a(33));
 
 	if (interactive) {
 		l10 = "L#10";

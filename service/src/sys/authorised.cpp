@@ -159,7 +159,7 @@ updateprivs:
 		if (not noadd) {
 			gosub readuserprivs();
 			if (username eq "EXODUS") {
-				var interactive = not(SYSTEM.a(33));
+				var interactive = false; //not(SYSTEM.a(33));
 				if (interactive) {
 					call note(task ^ "|TASK ADDED");
 				}

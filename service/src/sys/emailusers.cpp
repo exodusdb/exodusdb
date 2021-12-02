@@ -30,7 +30,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	//global nn,ok,emails,expirydate,userx,usercode,toemails,ccemails
 	//global subject,body,replyto,nsent
 
-	var interactive = not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.a(33));
 
 	//options
 	//R = REPLYTO=@username email address if exists

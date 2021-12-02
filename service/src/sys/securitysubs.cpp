@@ -52,7 +52,7 @@ function main(in mode) {
 	#include <system_common.h>
 	//global sysrec,lastfn,encryptx,newpassword
 
-	var interactive = not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.a(33));
 
 	//SEE AUTHORISATION_DICT in UI
 	//@record/user grouped mvs
