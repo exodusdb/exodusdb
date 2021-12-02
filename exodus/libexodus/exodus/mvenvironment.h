@@ -173,8 +173,13 @@ class DLL_PUBLIC MvEnvironment {
 	var ENVIRONSET = "";
 	var DEFAULTSTOPS = "";
 	var MOVEKEYS = "";
-	var INDEXTIME = "";
-	var LEVEL = "";
+
+	// replaced
+	//var INDEXTIME = "";
+	var TERMINAL = "";
+
+	// other
+	var LEVEL = 1;
 	var VOLUMES = "";
 
 	// set in init()

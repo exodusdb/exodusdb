@@ -242,7 +242,8 @@ function main() {
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-#define interactive not(SYSTEM.a(33))
+	#define interactive not(SYSTEM.a(33))
+
 	ulchar = "-";
 
 	//NLIST keywords and aliases. blank keyword means throwaway word
@@ -1620,7 +1621,7 @@ nextrec:
 	//if interactive then print @AW<30>:@(36,@CRTHIGH/2):
 	if (not(silent) and not(printfilename.unassigned())) {
 		//put.cursor(cursor)
-		if (printfilename) {
+		if (printfilename and TERMINAL) {
 			print(var().at(0), var().at(-4), recn, ". ", ID, " ", MV);
 		}
 	}

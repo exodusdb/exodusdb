@@ -1127,6 +1127,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 	RECUR2.transfer(saverecur2);
 	RECUR3.transfer(saverecur3);
 	RECUR4.transfer(saverecur4);
+	LEVEL++;
 	//
 	ID.transfer(saveid);
 	RECORD.transfer(saverecord);
@@ -1144,6 +1145,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 		saverecur2.transfer(RECUR2);
 		saverecur3.transfer(RECUR3);
 		saverecur4.transfer(RECUR4);
+		LEVEL--;
 		//
 		saveid.transfer(ID);
 		saverecord.transfer(RECORD);

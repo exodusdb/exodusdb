@@ -252,10 +252,13 @@ using out = var&;
 #define ENVIRONSET mv.ENVIRONSET
 #define DEFAULTSTOPS mv.DEFAULTSTOPS
 #define MOVEKEYS mv.MOVEKEYS
-#define INDEXTIME mv.INDEXTIME
-#define LEVEL mv.LEVEL
 
+#define INDEXTIME mv.INDEXTIME
+
+#define TERMINAL mv.TERMINAL
+#define LEVEL mv.LEVEL
 #define VOLUMES mv.VOLUMES
+
 #define PROCESSNO mv.PROCESSNO
 #define CURSOR mv.CURSOR
 

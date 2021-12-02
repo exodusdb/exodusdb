@@ -1117,6 +1117,8 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 
 	//atexit(exodus_atexit);
 
+	mv.TERMINAL = osgetenv("TERM");
+
 	return 0;
 }
 

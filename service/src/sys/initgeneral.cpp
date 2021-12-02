@@ -1258,10 +1258,10 @@ getproxy:
 		SYSTEM.r(22, 300);
 	}
 
-	call log2("*suppress background indexing if time out is active", logtime);
-	if (SYSTEM.a(22)) {
-		INDEXTIME = 0;
-	}
+	//call log2("*suppress background indexing if time out is active", logtime);
+	//if (SYSTEM.a(22)) {
+	//	INDEXTIME = 0;
+	//}
 
 	call log2("*suppress words not to be indexed", logtime);
 	//see ED SYSTEM * ... ENVIRONMENT words like LTD
