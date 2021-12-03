@@ -5,6 +5,9 @@ set -euxo pipefail
 : Make exodus sql files
 : =====================
 :
+: Obsolete now that dictionaries are developed in dat files
+:
+	exit
 
 	DB_FILENAMES='dict.changelog dict.definitions dict.locks dict.processes dict.requestlog dict.statistics dict.users dict.voc'
 

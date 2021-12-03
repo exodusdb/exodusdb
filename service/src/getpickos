@@ -12,8 +12,8 @@ set -eux
 	PICKOS=/backups/current/win3/pickos/
 
 :
-: Era over
-: ========
+: Era over - all further decompilation to c++ can be migrated manually
+: ====================================================================
 :
 	exit
 

@@ -5,7 +5,7 @@ set -eux
 : Compile EXODUS service programs and install dat files
 : =====================================================
 :
-: Please ignore a few warnings about 'cast between incompatible pointer to member types'
+: Please ignore a few warnings only about 'cast between incompatible pointer to member types'
 :
 	COMPILER_OPTIONS=${1:-}
 
