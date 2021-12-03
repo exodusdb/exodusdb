@@ -7,11 +7,11 @@ set -euxo pipefail
 :
 : 'Syntax:'
 :
-: '  ./doall <DBNAME> restore_db'
+: '  ./doall DBNAME restore_db'
 :
-: '  ./restore_db <DBNAME> [<BACKUPDIR=~/backups/sql>]'
+: '  ./restore_db DBNAME [BACKUPDIR=~/hosts/EXO_DATA/work]'
 :
-	LIVE_EXO_DATA=${1:?<DBNAME> argument is required.}
+	LIVE_EXO_DATA=${1:?DBNAME argument is required.}
 	#NEW_BACKUP_DIR=${2:-~/backups/sql}
     NEW_BACKUP_DIR=${2:-~/hosts/$LIVE_EXO_DATA/work}
 

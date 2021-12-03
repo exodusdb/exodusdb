@@ -5,13 +5,13 @@ set -eux
 : Create/update an apache site for exodus
 : =======================================
 :
-: 'Syntax is ./create_site <HOSTNAME> "[<HOST_DIR>]" "[<DB_CODE>]" [<SITE_NAME_PREFIX>]'
+: 'Syntax is ./create_site HOSTNAME "[HOST_DIR]" "[DB_CODE]" [SITE_NAME_PREFIX]'
 :
 : 'Example:  ./create_site exodus'
 :
 : 'Example:  ./create_site test "" "" t-'
 :
-	HOST_NAME=${1:?<HOSTNAME> argument is required.}
+	HOST_NAME=${1:?HOSTNAME argument is required.}
 	HOST_DIR=${2:-$1}
 	DB_CODE=${3:-$1}
 	SITE_PREFIX=${4-}

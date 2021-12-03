@@ -5,10 +5,10 @@ set -euxo pipefail
 : Copy a postgres database
 : ========================
 :
-: 'Syntax is ./copy_db <FROM_DBCODE> <TO_DBCODE> [DELETE]'
+: 'Syntax is ./copy_db FROM_DBCODE TO_DBCODE [DELETE]'
 :
-	SOURCE_EXO_DATA=${1:?<FROM_DBCODE> argument is required.}
-	TARGET_EXO_DATA=${2:?<TO_DBCODE> argument is required.}
+	SOURCE_EXO_DATA=${1:?FROM_DBCODE argument is required.}
+	TARGET_EXO_DATA=${2:?TO_DBCODE argument is required.}
 	OPTIONS=${3:-}
 
 :

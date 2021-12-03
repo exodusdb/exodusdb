@@ -7,12 +7,12 @@ set -euxo pipefail
 :
 : ' Syntax:'
 :
-: '  ./backup_db <DBNAME> [<OPTIONS>...] [<BACKUPDIR>] [<RESTOREDB_SUFFIX>]'
+: '  ./backup_db DBNAME [OPTIONS...] [BACKUPDIR] [RESTOREDB_SUFFIX]'
 :
-: '<OPTIONS> are (B)ackup, (R)estore, (V)erify'
+: 'OPTIONS are (B)ackup, (R)estore, (V)erify'
 : '          Defaults to BRV'
 :
-: '<BACKUPDIR> defaults to ~/backups/sql'
+: 'BACKUPDIR defaults to ~/hosts/$LIVE_EXO_DATA/work'
 :
 : 'RESTOREDB_SUFFIX defaults to test i.e. _test'
 :
@@ -23,7 +23,7 @@ set -euxo pipefail
 :
 : 'Restores backup to same databasename but ending _test by default'
 :
-	LIVE_EXO_DATA=${1:?<DBNAME> argument is required.}
+	LIVE_EXO_DATA=${1:?DBNAME argument is required.}
 
 	OPTIONS=${2:-BRV}
 

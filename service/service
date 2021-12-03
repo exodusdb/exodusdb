@@ -5,13 +5,13 @@ set -eux
 : Service commands start, stop, restart, reload, status, enable, disable
 : ======================================================================
 :
-: 'Syntax is ./service <DB_CODE> start|stop|restart|reload|status|enable|disable [test|live]'
+: 'Syntax is ./service DB_CODE start|stop|restart|reload|status|enable|disable [test|live]'
 :
 : 'Environment variable: $APP_CODE Defaults to "exo". Used for prefix on services'
 :
 	APP_CODE=${APP_CODE:-exo}
 :
-	DB_CODE=${1:?<DB_CODE> argument is required}
+	DB_CODE=${1:?DB_CODE argument is required}
 	CMD=${2:?Action [start|stop|etc.] argument is required}
 	LIVE_OR_TEST=${3:-}
 

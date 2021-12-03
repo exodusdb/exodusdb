@@ -5,14 +5,14 @@ set -eux
 : Stop a background service and run it in the foreground for debugging
 : ====================================================================
 :
-: 'Syntax is ./run <DBNAME> [<OPTION>...]'
+: 'Syntax is ./run DBNAME [OPTION...]'
 :
 : 'Example:  ./run centauro'
 :
 : 'Example:  ./run centauro_test'
 :
 
-	DB_CODE=${1:?<DBNAME> argument is required.}
+	DB_CODE=${1:?DBNAME argument is required.}
 	OPTIONS=${2:-}
 
 :

@@ -5,7 +5,7 @@ set -eux
 : Stop a background test service and run it in the foreground with gdb
 : ====================================================================
 :
-:	'Syntax is ./test [<DBNAME>]'
+:	'Syntax is ./test [DBNAME]'
 :
 :	'Example:  ./test           #uses test_test database'
 :

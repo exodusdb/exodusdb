@@ -5,7 +5,7 @@ set -euxo pipefail
 : Copy a site from a remote server to the current server
 : ======================================================
 :
-: 'Syntax is ./copy_site copy|move <SSH_HOST>[:SSH_PORT] DELETE <DB_NAME>'
+: 'Syntax is ./copy_site copy|move SSH_HOST[:SSH_PORT] DELETE DB_NAME'
 :
 : 'e.g. ./copy_site copy nl10:19525 DELETE test'
 :

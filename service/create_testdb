@@ -5,9 +5,9 @@ set -eux
 : Create test database
 : ========================
 :
-: 'Syntax is ./create_testdb <LIVE_EXO_DATA>'
+: 'Syntax is ./create_testdb LIVE_EXO_DATA'
 :
-	LIVE_EXO_DATA=${1:?<LIVE_EXO_DATA> argument is required.}
+	LIVE_EXO_DATA=${1:?LIVE_EXO_DATA argument is required.}
 	TEST_EXO_DATA=$1_test
 
 :

@@ -5,7 +5,7 @@ set -eu
 : Email with optional attachment via local sendmail
 : =================================================
 :
-: 'Syntax is ./neomail <TO_EMAIL> <FULL_FILENAME> <HEADERS>'
+: 'Syntax is ./neomail TO_EMAIL FULL_FILENAME HEADERS'
 :
 : '1. Multiple email addressses can separated by ;'
 :
@@ -21,10 +21,10 @@ set -eu
 : 'X-Auto-Response-Suppress: RN, NRN, OOF'
 : 'Precedence: bulk'
 :
-	TOEMAIL="${1:?<TO_EMAIL> argument is required.}"
+	TOEMAIL="${1:?TO_EMAIL argument is required.}"
 	FULL_FILENAME="${2:-}"
-	#FULL_FILENAME="${2:?<FULL_FILENAME> argument is required or must be \'\'.}"
-	HEADERS="${3:?<HEADERS> argument is required.}"
+	#FULL_FILENAME="${2:?FULL_FILENAME argument is required or must be \'\'.}"
+	HEADERS="${3:?HEADERS argument is required.}"
 
 	if [ -n "$FULL_FILENAME" ]; then
 		FILENAME=${FULL_FILENAME##*/}
