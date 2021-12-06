@@ -1,3 +1,23 @@
+//#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+//#include <boost/algorithm/string.hpp>
+
+//std::string decode64(const std::string &val) {
+//    using namespace boost::archive::iterators;
+//    using It = transform_width<binary_from_base64<std::string::const_iterator>, 8, 6>;
+//    return boost::algorithm::trim_right_copy_if(std::string(It(std::begin(val)), It(std::end(val))), [](char c) {
+//        return c == '\0';
+//    });
+//}
+
+std::string encode64(const std::string &val) {
+    using namespace boost::archive::iterators;
+    using It = base64_from_binary<transform_width<std::string::const_iterator, 6, 8>>;
+    auto tmp = std::string(It(std::begin(val)), It(std::end(val)));
+    return tmp.append((3 - val.size() % 3) % 3, '=');
+}
+
 #include <exodus/library.h>
 libraryinit()
 
@@ -117,6 +137,9 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		stop();
 	} else {
 		toaddress = toaddress0;
+
+		if (toaddress eq "TBQBB")
+			toaddress = "support@neosys.com";
 
 		//development systems ALWAYS email hardcoded in next line
 		//1. exodus.id always indicates a test system (dos or exodus)
@@ -418,7 +441,7 @@ forcedemail:
 
 		}
 
-		//use neomail instead of mail if attachment
+		//use sendmail instead of mail if attachment
 		//because strangely ubuntu mail doesnt support the -A option
 		if (attachfilename) {
 			var headers = "";
@@ -450,13 +473,75 @@ forcedemail:
 			} //ii;
 
 			headers.splicer(1, 1, "");
+			headers ^= VM;
 			headers.converter("'", "");
 			headers.swapper(VM, "\r\n");
 
-			cmd = "neomail " ^ (toaddress.quote()) ^ " " ^ (attachfilename.quote()) ^ " " "'" ^ headers ^ "'";
+			//cmd = "neomail " ^ (toaddress.quote()) ^ " " ^ (attachfilename.quote()) ^ " " "'" ^ headers ^ "'";
+
+			// -t  Extract recipients from message headers. These are added to any recipients specified on the command line.
+			cmd = "sendmail -t " ^ toaddress;
+
+			var delimiter = "--------------5723BF0875E398DEC19D9328--";
+
+			// Use linux 'file' utility to determine mimetype
+			var mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n","");
+			TRACE(mimetype)
+
+			var attachfilename_only = attachfilename.field2(OSSLASH, -1);
+			var mimetext =
+                "MIME-Version: 1.0\r\n"
+                "Content-Type: multipart/mixed;\r\n"
+                " boundary=\"------------5723BF0875E398DEC19D9328\"\r\n"
+                "Content-Language: en-GB\r\n"
+				"\r\n"
+                "This is a multi-part message in MIME format.\r\n"
+                "--------------5723BF0875E398DEC19D9328\r\n"
+                "Content-Type: text/plain; charset=utf-8; format=flowed\r\n"
+                "Content-Transfer-Encoding: 7bit\r\n"
+				"\r\n"
+                "--------------5723BF0875E398DEC19D9328\r\n"
+                "Content-Type: " ^ mimetype ^ ";\r\n"
+                " name=" ^ attachfilename_only.quote() ^ "\r\n"
+                "Content-Transfer-Encoding: base64\r\n"
+                "Content-Disposition: attachment;\r\n"
+                " filename=" ^ attachfilename_only.quote() ^ "\r\n\r\n";
+			headers ^= mimetext;
+
+			// Output the headers
+			var tempfilename = var().ostempfilename();
+			oswrite(headers, tempfilename);
+
+//TRACE(headers);
+			// Append the attached file as base64
+			osshell("openssl base64 -in " ^ attachfilename.quote() ^ " >> " ^ tempfilename ^ " && printf \"\r\n" ^ delimiter ^ "\r\n\" >> " ^ tempfilename);
+/*
+			// Append a closing delimiter
+			var fileinfo = osfile(tempfilename);
+			var offset = fileinfo.a(1);
+TRACE(offset)
+			var osfile;
+			if (osfile.osopen(tempfilename)) {
+
+				offset = -1;//append
+TRACE(offset)
+				delimiter.osbwrite(osfile, offset);
+TRACE(offset)
+
+				var("\r\n").osbwrite(osfile, offset);
+				headers.osbwrite(osfile, offset);
+TRACE(offset)
+
+			}
+*/
+TRACE("copying")
+			// Reconstruct the complete input for sendmail
+			//tempfilename.osrename(bodyfilename);
+			tempfilename.oscopy(bodyfilename);
+TRACE("copyied")
 
 		}
-
+TRACE(cmd)
 		cmd.converter(VM, " ");
 
 		//and pipe the body file into the program as standard input

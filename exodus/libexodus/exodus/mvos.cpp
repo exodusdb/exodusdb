@@ -1334,6 +1334,8 @@ bool var::osbwrite(const var& osfilevar, var& offset) const {
 		"bool var::osbwrite(const var& osfilevar, var& offset) "
 		"const")
 	THISISSTRING()
+	ISNUMERIC(offset)
+
 	// test the following only if necessary in osopenx
 	// ISSTRING(osfilename)
 
@@ -1347,8 +1349,11 @@ bool var::osbwrite(const var& osfilevar, var& offset) const {
 	// NB seekp goes by bytes regardless of the fact that it is a wide stream
 	// myfile.seekp (offset*sizeof(char));
 	// offset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
-	pmyfile->seekp(
-		static_cast<long>(offset.var_int));	 // avoid warning, see comments to seekg()
+	if (offset < 0)
+		pmyfile->seekp(std::ios_base::end);
+	else
+		pmyfile->seekp(
+			static_cast<long>(offset.toInt()));	 // avoid warning, see comments to seekg()
 
 	// NB but write length goes by number of wide characters (not bytes)
 	pmyfile->write(this->var_str.data(), int(this->var_str.length()));
