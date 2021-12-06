@@ -35,7 +35,6 @@ set -eu
 
 		cat <<-V0G0N
 			$HEADERS
-
 		V0G0N
 
 		if [ -n "$FULL_FILENAME" ]; then
