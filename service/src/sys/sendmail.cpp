@@ -486,7 +486,7 @@ forcedemail:
 
 			// Use linux 'file' utility to determine mimetype
 			var mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n","");
-			TRACE(mimetype)
+			//TRACE(mimetype)
 
 			var attachfilename_only = attachfilename.field2(OSSLASH, -1);
 			var mimetext =
@@ -534,14 +534,14 @@ TRACE(offset)
 
 			}
 */
-TRACE("copying")
 			// Reconstruct the complete input for sendmail
 			//tempfilename.osrename(bodyfilename);
 			tempfilename.oscopy(bodyfilename);
-TRACE("copyied")
+			tempfilename.osdelete();
 
 		}
-TRACE(cmd)
+
+		//TRACE(cmd)
 		cmd.converter(VM, " ");
 
 		//and pipe the body file into the program as standard input
