@@ -53,12 +53,6 @@ set -eux
 #	fi
 
 :
-: Install the latest version of the neomail script into test
-: ==========================================================
-:
-	rsync -av --whole-file $EXODUS/service/neomail ~/bin
-
-:
 : Create a directory for live services binaries
 : =============================================
 :

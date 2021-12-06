@@ -1,13 +1,19 @@
 #!/bin/bash
 set -eux
 
-: =====================================================
-: Compile EXODUS service programs and install dat files
-: =====================================================
+: ================================================================
+: Compile EXODUS service programs and install script and dat files
+: ================================================================
 :
 : Please ignore a few warnings only about 'cast between incompatible pointer to member types'
 :
 	COMPILER_OPTIONS=${1:-}
+
+:
+: Install the latest version of the neomail script into test
+: ==========================================================
+:
+	rsync -av --whole-file ~/exodus/service/neomail ~/bin
 
 :
 : Generate all headers first
