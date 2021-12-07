@@ -42,10 +42,10 @@ BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
 
 BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus
 {
-    box-shadow: 0px 0px 10px #666666;
+    /*box-shadow: 0px 0px 10px #666666;
     border-color: #9393f3;
-    opacity: 1;
-    outline:none;
+    opacity: 1;*/
+    outline:thin solid;
 }
 
 BODY
