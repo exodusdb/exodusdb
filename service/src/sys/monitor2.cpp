@@ -574,7 +574,9 @@ nextprocess:
 						nextbackupdate += 1;
 					}
 					dow = ((sys.glang.a(22).field("|", (nextbackupdate - 1).mod(7) + 1)).substr(1, 8)).ucase();
-					nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
+					// eg 1/data.bak/adlined/wednesda/backup.zip
+					//nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
+					nextbackupfilename = "../../backup." ^ ((nextbackupdate - 1).mod(7) + 1) ^ ".txt";
 					nextbackupfilename.converter("/", OSSLASH);
 					nextbackupfileinfo = nextbackupfilename.osfile();
 
@@ -595,9 +597,9 @@ nextprocess:
 							call getdatetime(localdate, localtime, xx, xx2, xx3, xx4);
 							if (localtime ge 21600 and localtime le 64800) {
 								//only one email per installation
-								call osread(lastnote, "LASTNOTE.CFG");
+								call osread(lastnote, "lastnote.cfg");
 								if (lastnote.a(1) ne localdate or (lastnote.a(2) lt localtime - 3600 * reminderhours)) {
-									call oswrite(localdate ^ FM ^ localtime, "LASTNOTE.CFG");
+									call oswrite(localdate ^ FM ^ localtime, "lastnote.cfg");
 
 									//sendmail - if it fails, there will be an entry in the log
 									toaddresses = bakpars.a(6);
@@ -614,8 +616,9 @@ nextprocess:
 										if (localtime lt 43200) {
 											body.r(-1, FM ^ "Please change it " "before 12:00 midday today.");
 										} else {
-											body.r(-1, FM ^ "Please change it " "URGENTLY");
+											body.r(-1, FM ^ "Please change it " "before 00:00 midnight tonight.");
 										}
+										printl(body);
 										body.swapper(FM, var().chr(13));
 										call sendmail(toaddresses, "", subject, body, "", "", xx);
 									}
