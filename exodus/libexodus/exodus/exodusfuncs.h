@@ -88,6 +88,7 @@ DLL_PUBLIC ND var osread(const var& osfilename);
 DLL_PUBLIC bool osdelete(const var& osfilename);
 DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename);
 DLL_PUBLIC bool oscopy(const var& fromosdir_or_filename, const var& newosdir_or_filename);
+DLL_PUBLIC bool osmove(const var& fromosdir_or_filename, const var& newosdir_or_filename);
 
 DLL_PUBLIC ND var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode = 0);
 DLL_PUBLIC ND var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);

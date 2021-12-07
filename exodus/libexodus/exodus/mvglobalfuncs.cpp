@@ -158,6 +158,11 @@ DLL_PUBLIC bool oscopy(const var& fromosfilename, const var& to_osfilename) {
 	return fromosfilename.oscopy(to_osfilename);
 }
 
+// osmove x to y
+DLL_PUBLIC bool osmove(const var& fromosfilename, const var& to_osfilename) {
+	return fromosfilename.osmove(to_osfilename);
+}
+
 DLL_PUBLIC var oslist(const var& path, const var& wildcard, const int mode) {
 	return var().oslist(path, wildcard, mode);
 }
