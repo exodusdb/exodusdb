@@ -1520,6 +1520,7 @@ class DLL_PUBLIC var final {
 	bool osdelete(const var& osfilename) const;
 	bool osrename(const var& newosdir_or_filename) const;
 	bool oscopy(const var& to_osfilename) const;
+	bool osmove(const var& to_osfilename) const;
 	ND var oslist(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING, const int mode = 0) const;
 	ND var oslistf(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING) const;
 	ND var oslistd(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING) const;

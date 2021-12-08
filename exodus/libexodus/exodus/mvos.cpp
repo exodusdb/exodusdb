@@ -310,6 +310,8 @@ bool checknotabsoluterootfolder(std::string dirname) {
 	// cwd to top level and delete relative
 	// top level folder has only one slash either at the beginning or, on windows, like x:\ .
 	// NB copy/same code in osrmdir and osrename
+	if (!dirname.ends_with(OSSLASH_))
+		return true;
 	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
 		 std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
 		(SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_))) {
@@ -1599,6 +1601,47 @@ bool var::oscopy(const var& to_osfile_or_dirname) const {
 		 error_code);
 
 	return !error_code;
+}
+
+bool var::osmove(const var& newosdir_or_filename) const {
+	THISIS("bool var::osmove(const var& newosdir_or_filename) const")
+	THISISSTRING()
+	ISSTRING(newosdir_or_filename)
+
+	// prevent overwrite of existing file
+	// ACQUIRE
+	std::ifstream myfile;
+	// binary?
+	myfile.open(newosdir_or_filename.to_path_string().c_str(), std::ios::binary);
+	if (myfile) {
+		// RELEASE
+		myfile.close();
+		return false;
+	}
+
+	// safety
+	if (!checknotabsoluterootfolder(this->toString()))
+		return false;
+
+	// try to rename but will fail to move across file systems
+	if (!this->osrename(newosdir_or_filename)) {
+
+		//try to copy and delete instead
+		if (!this->oscopy(newosdir_or_filename))
+			return false;
+
+		//then try to delete original
+		if (this->osdelete())
+			return true;
+		else {
+
+			//otherwise delete the target too
+			newosdir_or_filename.osdelete();
+			return false;
+		}
+
+	}
+	return true;
 }
 
 bool var::osdelete() const {

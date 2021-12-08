@@ -199,14 +199,19 @@ function main() {
 
 		//enable function names in backtrace
 		//nopie to prevent ALSR preventing backtrace
-		if (debugging)
+		if (debugging) {
 			//basicoptions^=" -g -rdynamic";
-			basicoptions ^= " -no-pie -g -rdynamic";
+			basicoptions ^= " -no-pie -rdynamic";
+			basicoptions ^= " -ggdb";
+		}
 
 		//optimiser unfortunately prevents backtrace
 		//if (optimise) {
 		//basicoptions^=" -O1";
 		//basicoptions^=" -O3";
+		//-Og means optimise but has compatible with gdb
+		if (not optimise)
+			optimise = "g";
 		basicoptions ^= " -O" ^ optimise;
 		//}
 
