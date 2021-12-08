@@ -107,10 +107,19 @@ set -eux
 : =========================
 :
 :	whois		used in unknown ip no login notification emails
-:	bsd-mailx	provides "mail" which is required to send email by neomail
-:	mailutils	not installed. like bsd-mailx but doesnt have identical options
+:	bsd-mailx	provides "mail" which is required to send email?
+:	postfix     email handler
+:	mailutils	NOT installed. like bsd-mailx but doesnt have identical options
 :
-	apt-get -y install whois bsd-mailx
+	DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
+
+:
+: Configure postfix as a satellite server
+: =======================================
+:
+	postconf myhostname=$SITE_NAME.neosys.com
+	postconf relayhost=mailout.neosys.com:2500
+	postconf inet_interfaces=loopback-only
 
 :
 : Install html2pdf
