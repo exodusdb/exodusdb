@@ -114,12 +114,12 @@ set -eux
 	DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
 
 :
-: Configure postfix as a satellite server
-: =======================================
+: Configure postfix
+: =================
 :
-	postconf myhostname=$SITE_NAME.neosys.com
-	postconf relayhost=mailout.neosys.com:2500
-	postconf inet_interfaces=loopback-only
+	postconf myhostname=$SITE_NAME
+	#postconf relayhost=?
+	#postconf inet_interfaces=all|loopback-only?
 
 :
 : Install html2pdf
