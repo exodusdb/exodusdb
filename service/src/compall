@@ -13,7 +13,9 @@ set -eux
 : Install the latest version of the neomail script into test
 : ==========================================================
 :
-	rsync -av --whole-file ~/exodus/service/neomail ~/bin
+: neomail is only used by backup_db and will be removed once that is replaced by sendmail direct
+:
+	rsync -av --whole-file ~/exodus/service/neomail ~/bin/
 
 :
 : Generate all headers first
