@@ -43,6 +43,8 @@ function main() {
 	}
 	printl(dirtext,"Scanning ...");
 
+	begintrans();
+
 	// Process each subdir in turn. each one represents a db file.
 	var dirnames = oslistd(datpath ^ "/*");
 	for (var dirname : dirnames) {
@@ -122,6 +124,8 @@ function main() {
 	// Record the current sync date and time
 	if (definitions)
 		write(date() ^ FM ^ time() on definitions, definitions_key);
+
+	committrans();
 
 	return 0;
 }
