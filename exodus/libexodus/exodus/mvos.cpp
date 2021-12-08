@@ -310,8 +310,8 @@ bool checknotabsoluterootfolder(std::string dirname) {
 	// cwd to top level and delete relative
 	// top level folder has only one slash either at the beginning or, on windows, like x:\ .
 	// NB copy/same code in osrmdir and osrename
-	if (!dirname.ends_with(OSSLASH_))
-		return true;
+	//if (!dirname.ends_with(OSSLASH_))
+	//	return true;
 	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
 		 std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
 		(SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_))) {
