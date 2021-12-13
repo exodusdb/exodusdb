@@ -508,6 +508,8 @@ forcedemail:
                 " filename=" ^ attachfilename_only.quote() ^ "\r\n\r\n";
 			headers ^= mimetext;
 
+			TRACE(headers)
+
 			// Output the headers
 			var tempfilename = var().ostempfilename();
 			oswrite(headers, tempfilename);
@@ -640,11 +642,22 @@ TRACE(offset)
 }
 
 subroutine addlinks2osfilename() {
-	tt = osfilename;
-	tt.converter("\\", "/");
-	if (tt.substr(1, 3) eq "../") {
-		tt.splicer(1, 3, "");
-	}
+    tt = osfilename;
+    //tt.converter("\\", "/");
+    //if (tt.substr(1, 3) eq "../") {
+    //  tt.splicer(1, 3, "");
+    //}
+
+    //attachment path must start with '/data/'
+    //Apache will replace the alias /data/ to absolute path from /
+    //eg /root/hosts/test/work/../data/test/xxxxxx.xls
+    if (tt.index("../",1)){
+        //becomes: /data/test/xxxxxx.xls
+        tt.splicer(1,tt.index("../",1)+2,"");
+    }
+    if (body) {
+        body ^= FM;
+    }
 	if (body) {
 		body ^= FM;
 	}
