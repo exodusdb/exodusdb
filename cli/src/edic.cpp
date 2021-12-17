@@ -5,7 +5,8 @@ programinit()
 
 	//default to previous edit/compile - similar code in edic and compile
 	//check command syntax
-	var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
+	var edic_hist_dir = osgetenv("HOME") ^ "/.config/exodus/";
+	var edic_hist = edic_hist_dir ^ "edic_hist.txt";
 	if (dcount(COMMAND, FM) < 2) {
 		if (osread(COMMAND, edic_hist)) {
 			OPTIONS = COMMAND.a(2);
@@ -14,6 +15,8 @@ programinit()
 			abort("Syntax is 'edic osfilename'");
 		}
 	}
+	if (not osdir(edic_hist_dir))
+		osmkdir(edic_hist_dir);
 	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS, edic_hist))
 		printl("Cannot write to ", edic_hist);
 
