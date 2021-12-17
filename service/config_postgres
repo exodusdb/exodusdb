@@ -11,6 +11,17 @@ set -eux
 	MAX_CONNECTIONS=500
 	SHARED_BUFFERS=256MB
 
+:
+: Not configuring for SSD because initial tests didnt show much difference
+: ========================================================================
+:
+	SSD=
+	if [ $SSD ]; then
+		RANDOM_PAGE_COST=1
+	else
+		RANDOM_PAGE_COST=4
+	fi
+
 : ==============================================================
 : A function to show the maximum connections and memory reserved
 : ==============================================================
@@ -42,14 +53,14 @@ V0G0N
 : ===================================================================
 :
 function killidle() {
-	sudo -u postgres psql <<V0G0N
-	SELECT pg_terminate_backend(pid)
-	FROM pg_stat_activity
-	WHERE datname = 'centralauth'
-	AND pid <> pg_backend_pid()
-	AND state in ('idle', 'idle in transaction', 'idle in transaction (aborted)', 'disabled')
-	AND state_change < current_timestamp - INTERVAL '$1' MINUTE;
-V0G0N
+	sudo -u postgres psql <<-V0G0N
+		SELECT pg_terminate_backend(pid)
+		FROM pg_stat_activity
+		WHERE datname = 'centralauth'
+		AND pid <> pg_backend_pid()
+		AND state in ('idle', 'idle in transaction', 'idle in transaction (aborted)', 'disabled')
+		AND state_change < current_timestamp - INTERVAL '$1' MINUTE;
+	V0G0N
 }
 
 :
@@ -83,7 +94,15 @@ V0G0N
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET max_connections TO '$MAX_CONNECTIONS';
 		ALTER SYSTEM SET shared_buffers TO '$SHARED_BUFFERS'
-V0G0N
+	V0G0N
+
+:
+: Configure for ssd or spinning rust
+: ==================================
+:
+	sudo -u postgres psql <<-V0G0N
+		ALTER SYSTEM SET random_page_cost TO '$RANDOM_PAGE_COST';
+	V0G0N
 
 :
 : Restart postgresql
