@@ -595,7 +595,8 @@ nextprocess:
 							//usually 0600 1130 1700
 							reminderhours = 5.5;
 							call getdatetime(localdate, localtime, xx, xx2, xx3, xx4);
-							if (localtime ge 21600 and localtime le 64800) {
+							//if (localtime ge 21600 and localtime le 64800) {
+							if (localtime ge iconv("06:00", "MT") and localtime le iconv("18:00", "MT")){
 								//only one email per installation
 								call osread(lastnote, "lastnote.cfg");
 								if (lastnote.a(1) ne localdate or (lastnote.a(2) lt localtime - 3600 * reminderhours)) {
