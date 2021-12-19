@@ -546,6 +546,7 @@ nextprocess:
 				}
 				backupdrives.r(2, backupdriven, freespace);
 
+				/*
 				testdata = var().date() ^ FM ^ var().time();
 				if (freespace) {
 					testfile = backupdrive.a(1, 1, 1) ^ "/MONITOR.$$$";
@@ -560,8 +561,11 @@ nextprocess:
 				}
 
 				if (tt ne testdata) {
-					description ^= " impossible!!";
+				*/
 
+				// Check Presence of external device (possibly in container host server)
+				if (not osdir("/backups/usb")) {
+					description ^= " impossible!!";
 				} else {
 					//present
 					backupdrives.r(3, backupdriven, 1);
