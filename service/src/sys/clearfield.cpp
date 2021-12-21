@@ -119,7 +119,8 @@ next:
 	}
 	count += 1;
 	//if interactive then PRINT @(@crthigh/2,25) else print @(0):@(-4):
-	output(at(-40), count, nrecs , "\x09" , ID.oconv("L#30"), " ");
+	if (TERMINAL)
+		output(at(-40), count, nrecs , "\x09" , ID.oconv("L#30"), " ");
 	if (RECORD.read(file, ID)) {
 
 		var cleartovalue2 = cleartovalue;

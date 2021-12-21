@@ -722,6 +722,7 @@ bool var::attach(const var& filenames) {
 		filenames2 = filenames;
 	}
 
+	// cache file handles in thread_file_handles
 	var notattached_filenames = "";
 	for (var filename : filenames2) {
 		//thread_file_handles[filename] = (filename ^ FM ^ mvconn_no).toString();
@@ -739,7 +740,7 @@ bool var::attach(const var& filenames) {
 
 	//fail if anything not attached
 	if (notattached_filenames) {
-		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames.trimb().swap(FM,", ") ^" cannot be attached on connection " ^ (*this).a(1).quote();
+		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ (*this).a(1).quote();
 		this->lasterror(errmsg);
 		return false;
 	}

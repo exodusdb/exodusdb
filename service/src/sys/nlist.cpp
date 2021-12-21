@@ -1640,8 +1640,10 @@ nextrec:
 		if (printfilename and not(recn.mod(100))) {
 			//first recn will be 2
 			//similar in recinit and x2exit
-			output(at(-40), recn, ". ", ID, " ", MV);
-			 osflush();
+			if (TERMINAL) {
+				output(at(-40), recn, ". ", ID, " ", MV);
+				osflush();
+			}
 		}
 	}
 
@@ -1881,8 +1883,10 @@ x2exit:
 	//////
 
 	//similar in recinit and x2exit
-	output(at(-40), recn, ". ");
-	 osflush();
+	if (TERMINAL) {
+		output(at(-40), recn, ". ");
+		osflush();
+	}
 
 	//print the closing subtotals
 	breakleveln = nbreaks;

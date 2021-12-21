@@ -136,7 +136,10 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 						if (tt.a(5)) {
 							//garbagecollect;
 							tt = "CMD /C START EXODUS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
-							printl(at(0), at(-4), var().time().oconv("MTS"), " ", tt);
+							//printl(at(0), at(-4), var().time().oconv("MTS"), " ", tt);
+							if (TERMINAL)
+								print(at(-40));
+							printl(var().time().oconv("MTS"), " ", tt);
 							tt.osshell();
 						}
 						filename.osdelete();
