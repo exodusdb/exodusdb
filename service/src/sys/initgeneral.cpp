@@ -1491,6 +1491,8 @@ getproxy:
 	var foreign_dbnames = attach.a(1).convert(VM, FM);
 	foreign_dbno = 0;
 	for (let foreign_dbname : foreign_dbnames) {
+		if (not(foreign_dbname))
+			continue;
 		var foreign_dbconn;
 		if (not foreign_dbconn.connect(foreign_dbname))
 			abort("Error: serve_agy: Cannot connect attach to " ^ foreign_dbname.quote());
