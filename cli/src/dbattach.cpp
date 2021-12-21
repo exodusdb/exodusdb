@@ -54,7 +54,7 @@ function main() {
 		var result;
 		if (not conn1.sqlexec(sql, result))
 			abort(conn1.lasterror());
-
+TRACE(result)
 		// change RM to FM etc. and remove column headings
 		result.lowerer();
 		result.remover(1);
@@ -72,7 +72,7 @@ function main() {
 	////////////////////////////////////////////////////////////////////////////
 
 	// If no filenames are provided then just setup the interdb connection
-	if (not filenames) {
+	if (not filenames or OPTIONS.index("R")) {
 
 		/////////////////////////////////////////////////////////////////////////
 		// Must be done as a superuser eg postgres or exodus with superuser power
@@ -122,7 +122,7 @@ function main() {
 		if (not conn1.sqlexec("CREATE USER MAPPING FOR " ^ dbuser1 ^ " SERVER " ^ dbname2 ^ " OPTIONS (user '" ^ dbuser2 ^ "', password '" ^dbpass2 ^ "')"))
 			abort(conn1.lasterror());
 
-		printl("OK user " ^ dbuser1 ^ " in db " ^ dbname1 ^ " now has access to db " ^ dbname2);
+		//printl("OK user " ^ dbuser1 ^ " in db " ^ dbname1 ^ " now has access to db " ^ dbname2);
 
 		return 0;
 	}
@@ -158,11 +158,23 @@ function main() {
 			if (conn1.open(filename) and not conn1.sqlexec("DROP FOREIGN TABLE IF EXISTS " ^ filename))
 				{};//abort(conn1.lasterror());
 		}
-
 		//logputl("Connect to the foreign table " ^ filename);
-		if (not conn1.sqlexec("IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ")"
-			" FROM SERVER " ^ dbname2 ^ " INTO public"))
-			abort(conn1.lasterror());
+		var sql = "IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ") FROM SERVER " ^ dbname2 ^ " INTO public";
+		if (not conn1.sqlexec(sql)) {
+			var lasterror = conn1.lasterror();
+
+			// If the server is not already attached then attach it
+			// ERROR:  server "adlinek_test" does not exist
+			//  sqlstate:42704^IMPORT FOREIGN SCHEMA public LIMIT TO (markets) FROM SERVER adlinek_test INTO public
+			if (lasterror.index("sqlstate:42704")) {
+				if (not osshell(SENTENCE.field(" ", 1, 2)))
+					abort("");
+			}
+
+			if (not conn1.sqlexec(sql))
+				abort(conn1.lasterror());
+		}
+
 	}
 
 	return 0;
