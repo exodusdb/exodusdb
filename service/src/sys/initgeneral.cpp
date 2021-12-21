@@ -1472,6 +1472,37 @@ getproxy:
 		}
 	}
 
+	// Attach foreign files BEFORE any database operations
+	var foreignfiles = osshellread("dbattach {L}").converter("\n ", FM ^ VM).trim(FM);
+	var attach = "";
+	var foreign_dbno;
+	//group filenames by foreign dbname
+	for (let foreignfile : foreignfiles) {
+		var foreign_dbname = foreignfile.a(1, 1);
+		if (not foreign_dbname)
+			continue;
+		var filename = foreignfile.a(1, 2);
+		if (not attach.locate(foreign_dbname, foreign_dbno, 1))
+			attach.inserter(1, foreign_dbno, foreign_dbname);
+		attach.inserter(2, foreign_dbno, -1, filename);
+	}
+	TRACE(attach)
+	//attach filenames per foreign dbname
+	var foreign_dbnames = attach.a(1).convert(VM, FM);
+	foreign_dbno = 0;
+	for (let foreign_dbname : foreign_dbnames) {
+		var foreign_dbconn;
+		if (not foreign_dbconn.connect(foreign_dbname))
+			abort("Error: serve_agy: Cannot connect attach to " ^ foreign_dbname.quote());
+		foreign_dbno++;
+		var foreign_filenames = attach.a(2, foreign_dbno);
+		if (not foreign_dbconn.attach(foreign_filenames.convert(SM, FM))) {
+			var msg="Error: serve_agy: Cannot attach to " ^ foreign_filenames.convert(FM, " ") ^ " on " ^ foreign_dbconn;
+			msg.errputl();
+			abort(msg);
+		}
+	}
+
 	call log2("*get first company for init.acc", logtime);
 	clearselect();
 	select(sys.companies);
