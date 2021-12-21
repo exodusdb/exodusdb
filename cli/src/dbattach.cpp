@@ -7,41 +7,62 @@ function main() {
 	var filenames = COMMAND.field(FM, 3, 999999);
 
 	if (not dbname2 and not OPTIONS) {
+
 		var syntax =
-		"dbattach - Attach other database files into the current/default database\n"
-		"\n"
-		"Syntax is dbattach TARGETDB [FILENAME,...] {OPTION...}\n"
-		"\n"
-		"Options:\n"
-		"\n"
-		"  F   Forcibly delete any normal files in the current/default database.\n"
-		"\n"
-		"  R   Remove the current file attachments.\n"
-		"  RR  Remove the current user/database connection map.\n"
-		"  RRR Remove all connections and attachments.\n"
-		"\n"
-		"  L   List attached foreign files in the current/default database\n"
-		"\n"
-		"If no filenames are provided then a database connection is created.\n"
-		"This is *required* before filenames can be provided and attached.\n"
-		"\n"
-		"Any existing files will be DELETED.\n"
-		"\n"
-		"Note that any secondary indexes on the attached files are ineffective.\n"
-		"\n"
-		"Attachments are permanent until re-attached or removed.";
+			"dbattach - Attach foreign database files to the current default database\n"
+			"\n"
+			"Syntax is dbattach TARGETDB [FILENAME,...] {OPTION...}\n"
+			"\n"
+			"Options:\n"
+			"\n"
+			"  F   Forcibly delete any normal files in the current default database.\n"
+			"\n"
+			"  R   Detach foreign files\n"
+			"  RR  Remove foreign database connection.\n"
+			"  RRR Remove all foreign database connections and attachments.\n"
+			"\n"
+			"  L   List attached foreign files in the current default database\n"
+			"\n"
+			"If no filenames are provided then a database connection is created.\n"
+			"This is *required* before filenames can be provided and attached.\n"
+			"\n"
+			"Notes:\n"
+			"\n"
+			"Attachments are permanent until re-attached or removed.\n"
+			"\n"
+			"Indexes on attached files behave strangely.\n"
+			"\n"
+			"Issues:\n"
+			"\n"
+			"TARGETDB must be on the same connection as the current default database.\n"
+			"\n"
+			"Current user must have access to the foreign database.\n"
+			"\n"
+			"If EXO_USER and EXO_PASS are not set then exodus defaults are used.\n"
+			"\n"
+			"exodus .config file is not used currently.\n"
+			;
+
 		abort(syntax);
 	}
 
-	var dbuser1 = "exodus";
-
+	// TODO Get user from .config/Allow control
 	var dbname1 = osgetenv("EXO_DATA");
 	if (not dbname1)
 		dbname1 = "exodus";
 
-	var dbuser2 = dbuser1;
-	var dbpass2 = "somesillysecret";
+	// TODO Get user from .config/Allow control
+	var dbuser1 = osgetenv("EXO_USER");
+	if (not dbuser1)
+		dbuser1 = "exodus";
 
+	// TODO Allow control over dbuser2/dbpass2
+	var dbuser2 = dbuser1;
+	var dbpass2 = osgetenv("EXO_PASS");
+	if (not dbpass2)
+		dbpass2 = "somesillysecret";
+
+	// Default connection
 	var conn1;
 	if (not conn1.connect())
 		abort(conn1.lasterror());
@@ -54,7 +75,7 @@ function main() {
 		var result;
 		if (not conn1.sqlexec(sql, result))
 			abort(conn1.lasterror());
-TRACE(result)
+
 		// change RM to FM etc. and remove column headings
 		result.lowerer();
 		result.remover(1);

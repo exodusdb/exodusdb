@@ -1,6 +1,19 @@
 #!/bin/bash
 set -eux
 
+: ======================================
+: Floating point to_chars implementation
+: ======================================
+:
+: 'No longer required in g++11 in Ubuntu 22.04 since it is built-in'
+:
+: 'Both Clangs libc++ and GCCs libstdc++ now support floating-point to_chars() powered by Ryu.'
+: 'Clangs implementation was ported by @mordante from MSVC, which in turn was derived from'
+: 'Ulfs repo here, and is available in Clang trunk (should be part of Clang 14).'
+: 'GCCs implementation shipped in GCC 11, see their release notes.'
+: 'Example on Compiler Explorer: https://godbolt.org/z/f8Ms36qxc Note that you must enable -std=c++17 for this feature.'
+:
+
 : install basel build system
 : ==========================
 :
