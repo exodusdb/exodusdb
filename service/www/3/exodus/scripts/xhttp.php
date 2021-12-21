@@ -728,7 +728,17 @@ function getdatabases($exodusrootpath, $systemcode)
 					continue;
 				if ($databases)
 					$databases .= "*";
-				$databases .= $file->getFilename() . "," . $file->getFilename();
+
+				// Get database name from database "name" file otherwise use dbcode
+				//$databases .= $file->getFilename() . "," . $file->getFilename();
+				$dbname = ReadAll($exodusrootpath . 'data/' . $file->getFilename() . '/name');
+				if ($dbname)
+					$dbname = explode("\n", $dbname)[0];
+				else
+					$dbname = $file->getFilename();
+
+				$databases .= $dbname . "," . $file->getFilename();
+
 			}
 			if (!$databases) {
 				$response = "Cannot see vol file $volfilename or $volfilename2 nor any subdirs";
