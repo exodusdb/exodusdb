@@ -81,6 +81,9 @@ function main() {
 			if (not ID)
 				continue;
 
+			if (ID.starts(".") or ID.ends(".swp"))
+				continue;
+
 			// Skip files/records which are not newer
 			var filepath = dirpath ^ ID;
 			if (not force and not is_newer(osfile(filepath))) {

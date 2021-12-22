@@ -40,8 +40,8 @@ class MVConnection	 // used as 'second' in pair, stored in connection map
 	// ctors
 	MVConnection()
 		: connection(0) {}
-	MVConnection(PGconn* connection_)
-		: connection(connection_) {
+	MVConnection(PGconn* connection_, std::string conninfo)
+		: connection(connection_), conninfo(conninfo) {
 	}
 
 	// 1=entry is in use
@@ -61,6 +61,8 @@ class MVConnection	 // used as 'second' in pair, stored in connection map
 
 	ConnectionRecordCache connection_readcache;
 
+	std::string conninfo;
+
 };
 
 //using CONN_MAP = std::map<int, MVConnection>;
@@ -73,7 +75,7 @@ class MVConnections {
 	virtual ~MVConnections();
 
 	// manipulators
-	int add_connection(PGconn* connection_with_file);
+	int add_connection(PGconn* connection_with_file, const std::string conninfo);
 	void del_connection(int index);
 	void del_connections(int from_index);
 

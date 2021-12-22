@@ -658,7 +658,7 @@ bool var::connect(const var& conninfo) {
 	// at this point we have good new connection to database
 
 	// cache the new connection handle
-	int mvconn_no = thread_connections.add_connection(pgconn);
+	int mvconn_no = thread_connections.add_connection(pgconn, fullconninfo.var_str);
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";

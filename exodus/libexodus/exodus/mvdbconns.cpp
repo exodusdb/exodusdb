@@ -21,11 +21,11 @@ MVConnections::MVConnections(DELETER_AND_DESTROYER del_)
 	: del(del_), connection_id(0), conntbl() {
 }
 
-int MVConnections::add_connection(PGconn* conn_to_cache) {
+int MVConnections::add_connection(PGconn* conn_to_cache, const std::string conninfo) {
 	//boost::mutex::scoped_lock lock(mvconnections_mutex);
 
 	connection_id++;
-	conntbl[connection_id] = MVConnection(conn_to_cache);
+	conntbl[connection_id] = MVConnection(conn_to_cache, conninfo);
 	return connection_id;
 }
 
