@@ -21,7 +21,7 @@ set -eux
 : Generate all headers first
 : ==========================
 :
-	compile alt exo sys {HS}
+	compile alt exo sys {HS$COMPILER_OPTIONS}
 
 :
 : Compile EXODUS service
