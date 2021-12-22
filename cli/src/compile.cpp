@@ -59,6 +59,8 @@ function main() {
 
 	//extract options
 	OPTIONS.ucaser();
+	if (index(OPTIONS,"X"))
+		return 0;
 	verbose = index(OPTIONS, "V");
 	silent = index(OPTIONS, "S");
 	debugging = not index(OPTIONS, "R");  //no symbols for backtrace
