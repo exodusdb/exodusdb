@@ -1486,7 +1486,6 @@ getproxy:
 			attach.inserter(1, foreign_dbno, foreign_dbname);
 		attach.inserter(2, foreign_dbno, -1, filename);
 	}
-	TRACE(attach)
 	//attach filenames per foreign dbname
 	var foreign_dbnames = attach.a(1).convert(VM, FM);
 	foreign_dbno = 0;
