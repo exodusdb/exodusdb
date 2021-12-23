@@ -388,7 +388,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 }
 */
 
-// var::connection()
+// var::get_pgconnection()
 // 1. return the associated db connection
 // this could be a previously opened filevar, a previous connected connectionvar
 // or any variable previously used for a default connection
@@ -869,10 +869,20 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	    auto entry = thread_file_handles.find(filename2);
     	if (entry != thread_file_handles.end()) {
 			//(*this) = thread_file_handles.at(filename2);
-			(*this) = entry->second;
-			if (GETDBTRACE)
-				this->logputl("DBTR open() attached ");
-			return true;
+			auto cached_file_handle = entry->second;
+
+			// Make sure the connection is still valid otherwise redo the open
+			auto pgconn = get_pgconnection(cached_file_handle);
+			if (pgconn == NULL) {
+				thread_file_handles.erase(filename2);
+				//var(cached_file_handle).errputl("==== Connection cache INVALID = ");
+			} else {
+				//var(cached_file_handle).errputl("==== Connection cache VALID   = ");
+				(*this) = cached_file_handle;
+				if (GETDBTRACE)
+					this->logputl("DBTR open() attached ");
+				return true;
+			}
 		}
 
 		// Or determine connection from filename in case filename is a handle
@@ -952,6 +962,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	// Cache the filehandle so future opens return the same
 	// Similar code in dbattach and open
 	thread_file_handles[filename2] = this->var_str;
+	//this->errputl("==== Connection cache ADDED   = ");
 
 	if (GETDBTRACE) {
 		this->logputl("DBTR var::open-3 ");
@@ -1966,7 +1977,11 @@ bool var::deletefile(const var& filename) const {
 	ISSTRING(filename)
 
 	// Similar code in detach and deletefile
-	thread_file_handles.erase(get_normal_filename(filename));
+	if (thread_file_handles.erase(get_normal_filename(filename))) {
+		//filename.errputl("==== Connection cache DELETED = ");
+	} else {
+		//filename.errputl("==== Connection cache NONE    = ");
+	}
 
 	var sql = "DROP TABLE " ^ filename.a(1) ^ " CASCADE";
 
