@@ -587,7 +587,7 @@ bool var::connect(const var& conninfo) {
 
 	//add dbname= if missing
 	if (fullconninfo && !fullconninfo.index("="))
-		fullconninfo = "dbname=" ^ fullconninfo;
+		fullconninfo = "dbname=" ^ fullconninfo.lcase();
 
 	fullconninfo = build_conn_info(fullconninfo);
 
