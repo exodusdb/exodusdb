@@ -10,8 +10,12 @@ function main() {
 		return 0;
 	}
 
+	var connection = connection.connect(dbname)
 	var filenames = listfiles();
-	for (var filename : filenames) {
+	var dictconn;
+	if (dictconn.connect("exodus")) {
+		 ^ FM ^ connect("exodus").listfiles();
+	for (var filename : filenames.unique()) {
 		if (filename.index("xo_")) {
 			printl("Deleting", filename);
 			deletefile(filename);

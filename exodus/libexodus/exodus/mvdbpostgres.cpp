@@ -669,7 +669,7 @@ bool var::connect(const var& conninfo) {
 	this->r(3, mvconn_no);
 
 	if (GETDBTRACE) {
-		fullconninfo.logputl("DBTR var::connect() OK ");
+		fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect() OK ");
 		this->logput("DBTR var::connect() OK ");
 		std::clog << " " << pgconn << std::endl;
 	}
@@ -729,6 +729,7 @@ bool var::attach(const var& filenames) {
 		var filename2 = get_normal_filename(filename);
 		var file;
 		if (file.open(filename2,*this)) {
+			// Similar code in dbattach and open
 			thread_file_handles[filename2] = file.var_str;
 			if (GETDBTRACE)
 				file.logputl("DBTR var::attach() ");
@@ -756,6 +757,7 @@ void var::detach(const var& filenames) {
 
 	for (var filename : filenames) {
 		//std::string filename2 = get_normal_filename(filename);
+		// Similar code in detach and deletefile
 		thread_file_handles.erase(get_normal_filename(filename));
 	}
 	return;
@@ -856,15 +858,14 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		return true;
 	}
 
-	//use connection provided
+	// Either use connection provided
 	var connection2;
 	if (connection) {
 		connection2 = connection;
 	}
 	else {
 
-
-		//otherwise use a preattached file handle
+		// Or use any preopened or preattached file handle if available
 	    auto entry = thread_file_handles.find(filename2);
     	if (entry != thread_file_handles.end()) {
 			//(*this) = thread_file_handles.at(filename2);
@@ -874,7 +875,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 			return true;
 		}
 
-		//or determine connection from filename
+		// Or determine connection from filename in case filename is a handle
 		//use default data or dict connection
 		connection2 = filename2;
 
@@ -945,9 +946,12 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 	//this->lasterror();
 
-	// save the filename and connection no
-	// memorise the current connection for this file var
+	// var becomes a filehandle containing the filename and connection no
 	(*this) = filename2 ^ FM ^ get_mvconn_no_or_default(connection2);
+
+	// Cache the filehandle so future opens return the same
+	// Similar code in dbattach and open
+	thread_file_handles[filename2] = this->var_str;
 
 	if (GETDBTRACE) {
 		this->logputl("DBTR var::open-3 ");
@@ -1960,6 +1964,9 @@ bool var::deletefile(const var& filename) const {
 	THISIS("bool var::deletefile(const var& filename)")
 	THISISDEFINED()
 	ISSTRING(filename)
+
+	// Similar code in detach and deletefile
+	thread_file_handles.erase(get_normal_filename(filename));
 
 	var sql = "DROP TABLE " ^ filename.a(1) ^ " CASCADE";
 

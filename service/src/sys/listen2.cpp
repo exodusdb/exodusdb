@@ -994,7 +994,9 @@ validateexit2:
 			//ensure this user gets control of the user record
 			//to prevent "user is locked message" in case
 			//another user is logged in on the same name or workstation failure
-			if (openfile("LOCKS", locks)) {
+			//if (openfile("LOCKS", locks)) {
+			// Use LOCKS file on same connection as the USERS file
+			if (locks.open("LOCKS", users)) {
 				locks.deleterecord("USERS*" ^ username);
 
 			}
