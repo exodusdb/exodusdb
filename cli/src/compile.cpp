@@ -29,7 +29,7 @@ programinit()
 	var force;
 	var posix;
 	var windows;
-	var libexodusinfo = "";
+	var exodus_include_dir_info = "";
 
 	var max_nthreads;
 	std::list<std::thread> threadlist;
@@ -233,7 +233,8 @@ function main() {
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden";
 #endif
 
-		libexodusinfo = osfile("/usr/local/lib/libexodus.so");
+		//libexodusinfo = osfile("/usr/local/lib/libexodus.so");
+		exodus_include_dir_info = osdir("/usr/local/include/exodus");
 
 		//not posix
 	} else {
@@ -1143,9 +1144,9 @@ var inclusion=
 		var outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
 		//TRACE(outputdir ^ OSSLASH ^ field2(binfilename, OSSLASH, -1))
 		//TRACE(srcfileinfo)
-		//TRACE(libexodusinfo)
+		//TRACE(exodus_include_dir_info)
 		//TRACE(outfileinfo)
-		if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo,srcfileinfo) && is_newer(outfileinfo,libexodusinfo)) {
+		if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo,srcfileinfo) && is_newer(outfileinfo,exodus_include_dir_info)) {
 
 			// Recompile is required if any include file is younger than the current output binary
 			bool recompile_required = false;
