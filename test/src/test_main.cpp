@@ -1700,8 +1700,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	printl(round(var("6000.50")/20,2));
 	assert(round(var("6000.50")/20,2)==300.03);
 	assert(round(var("-6000.50")/20,2)==-300.03);
-	assert(round(var(6000.50d)/20,2)==300.03);
-	assert(round(var(-6000.50d)/20,2)==-300.03);
+	assert(round(var(6000.50)/20,2)==300.03);
+	assert(round(var(-6000.50)/20,2)==-300.03);
 	assert(round(var(6000.50f)/20,2)==300.03);
 	assert(round(var(-6000.50f)/20,2)==-300.03);
 

@@ -25,7 +25,7 @@ int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTRO
 
 	int ix;
 	for (ix = 0; ix < (int)conntbl.size(); ix++)
-		if (conntbl[ix].deleter == HANDLE_ENTRY_FREE)
+		if (conntbl[ix].deleter == nullptr)
 			break;
 
 	if (ix == (int)conntbl.size())
@@ -39,8 +39,8 @@ int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTRO
 
 CACHED_HANDLE MvHandlesCache::get_handle(int index, std::string name) {
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
-	return (conntbl[index].deleter == HANDLE_ENTRY_FREE) || (conntbl[index].extra != name)
-			   ? BAD_CACHED_HANDLE
+	return (conntbl[index].deleter == nullptr) || (conntbl[index].extra != name)
+			   ? nullptr
 			   : conntbl[index].handle;
 }
 
@@ -51,7 +51,7 @@ void MvHandlesCache::del_handle(int index) {
 		conntbl[index].deleter(conntbl[index].handle);
 		//conntbl[index].handle;
 	}
-	conntbl[index].deleter = 0;	 //	HANDLE_ENTRY_FREE
+	conntbl[index].deleter = 0;	 //	nullptr
 }
 
 MvHandlesCache::~MvHandlesCache() {
@@ -61,10 +61,10 @@ MvHandlesCache::~MvHandlesCache() {
 
 	int ix;
 	for (ix = 0; ix < (int)conntbl.size(); ix++)
-		if (conntbl[ix].deleter != HANDLE_ENTRY_FREE) {
+		if (conntbl[ix].deleter != nullptr) {
 			// do not call 'del_handle(ix)' here because of deadlock
 			conntbl[ix].deleter(conntbl[ix].handle);
-			conntbl[ix].deleter = 0;  //	HANDLE_ENTRY_FREE
+			conntbl[ix].deleter = 0;  //	nullptr
 		}
 }
 

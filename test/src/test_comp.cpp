@@ -254,20 +254,20 @@ function main() {
 	assert(pwr(10,2)!=0.0);//100
 	assert(pwr(10,3)!=0.0);//1000
 
-	assert(pwr(10,-10)==0.0d);//.0000000001
-	assert(pwr(10,-9)==0.0d);//.000000001
-	assert(pwr(10,-8)==0.0d);//.00000001
-	assert(pwr(10,-7)==0.0d);//.0000001
-	assert(pwr(10,-6)==0.0d);//.000001
-	assert(pwr(10,-5)==0.0d);//.00001
-	assert(pwr(10,-4)!=0.0d);//.0001
-	assert(pwr(10,-3)!=0.0d);//.001
-	assert(pwr(10,-2)!=0.0d);//.01
-	assert(pwr(10,-1)!=0.0d);//.1
-	assert(pwr(10,0)!=0.0d);//1
-	assert(pwr(10,1)!=0.0d);//10
-	assert(pwr(10,2)!=0.0d);//100
-	assert(pwr(10,3)!=0.0d);//1000
+	assert(pwr(10,-10)==0.0);//.0000000001
+	assert(pwr(10,-9)==0.0);//.000000001
+	assert(pwr(10,-8)==0.0);//.00000001
+	assert(pwr(10,-7)==0.0);//.0000001
+	assert(pwr(10,-6)==0.0);//.000001
+	assert(pwr(10,-5)==0.0);//.00001
+	assert(pwr(10,-4)!=0.0);//.0001
+	assert(pwr(10,-3)!=0.0);//.001
+	assert(pwr(10,-2)!=0.0);//.01
+	assert(pwr(10,-1)!=0.0);//.1
+	assert(pwr(10,0)!=0.0);//1
+	assert(pwr(10,1)!=0.0);//10
+	assert(pwr(10,2)!=0.0);//100
+	assert(pwr(10,3)!=0.0);//1000
 
 	assert(var(0.0000)==var(0.00001));
 	assert(var(0.0001/10)==var(0.00001));
@@ -287,14 +287,14 @@ function main() {
 
 	//on exodus/c++ all numbers different by 0.0001 are considered the same
 	//whereas on pick/arev they are considered different down to 
-	assert((var(0.0001d)>0));
-	assert((var(1e-4d)>0));
+	assert((var(0.0001)>0));
+	assert((var(1e-4)>0));
 
 	//on arev gt le ge le comparison does not use the same logic as == and bool
-	assert(not(var(0.00001d)>0));
-	assert(not(var(0.000000000000000001d)>0));
-	assert(not(var(1e-5d)>0));
-	assert(not(var(1e-18d)>0));
+	assert(not(var(0.00001)>0));
+	assert(not(var(0.000000000000000001)>0));
+	assert(not(var(1e-5)>0));
+	assert(not(var(1e-18)>0));
 	printl("tt", pwr(10.0,-16));
 	assert(not(pwr(10.0,-16) > 0));
 	assert(not(pwr(10.0,-17) > 0));

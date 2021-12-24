@@ -114,7 +114,7 @@ ExodusFunctorBase::ExodusFunctorBase()
 	// TODO optimise by only initialise one and detect usage on that only
 	: mv_(NULL), libraryname_(""), functionname_(""), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
 	pobject_ = 0;
-};
+}
 
 // constructor to provide everything immediately
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv)

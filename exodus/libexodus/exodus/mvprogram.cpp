@@ -30,7 +30,7 @@ ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 
 // destructor
 DLL_PUBLIC
-ExodusProgramBase::~ExodusProgramBase(){};
+ExodusProgramBase::~ExodusProgramBase(){}
 
 var ExodusProgramBase::libinfo(const var& command) {
 	return var(perform_exodusfunctorbase_.libfilename(command.toString())).osfile();

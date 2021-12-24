@@ -107,14 +107,14 @@ function main() {
 #endif
 		TRACE(var(10)/var(3));
 		assert(var(10)/var(3) == "3.3333333333333333");
-		printl(var(999999999999999.9d)    ^ "x");
-		assert((var(999999999999999.9d)    ^ "x") == "999999999999999.9x");
-		assert((var(9999999999999999.9d)   ^ "x") == "10000000000000000x");
-		assert((var(99999999999999999.9d)  ^ "x") == "100000000000000000x");
-		assert((var(999999999999999999.9d) ^ "x") == "1000000000000000000x");
+		printl(var(999999999999999.9)    ^ "x");
+		assert((var(999999999999999.9)    ^ "x") == "999999999999999.9x");
+		assert((var(9999999999999999.9)   ^ "x") == "10000000000000000x");
+		assert((var(99999999999999999.9)  ^ "x") == "100000000000000000x");
+		assert((var(999999999999999999.9) ^ "x") == "1000000000000000000x");
 
 		printl("\ntoo many decimal points get ROUNDED");
-		dd1 = 0.00005678901234567890d;
+		dd1 = 0.00005678901234567890;
 		dv1 = dd1;
 		dv2 = "0.00005678901234567890d";
 		sv1 = dv1^"x";
@@ -124,7 +124,7 @@ function main() {
 		assert(sv1 == sv2);
 
 		printl("\ntoo many digits of precision get truncated");
-		dd1 = 1234567890.00005678d;
+		dd1 = 1234567890.00005678;
 		dv1 = dd1;
 		dv2 = "1234567890.00005678d";
 		sv1 = dv1 ^ "x";
@@ -137,7 +137,7 @@ function main() {
 		assert(sv1 == sv2);
 
 		printl("\nsmall numbers are ok");
-		dd1 = 0.00005678d;
+		dd1 = 0.00005678;
 		dv1 = dd1;
 		dv2 = "0.00005678d";
 		sv1 = dv1^"x";
@@ -146,7 +146,7 @@ function main() {
 		assert(sv1 == sv2);
 
 		printl("\nsmallest decimal number");
-		dd1=0.0000000000001d;
+		dd1=0.0000000000001;
 		dv1 = dd1;
 		dv2="0.0000000000001d";
 		sv1 = dv1^"x";
@@ -156,7 +156,7 @@ function main() {
 
 		/*
 		printl("\nless than smallest decimal number becomes 0.0");
-		dd1=0.000000000000009d;
+		dd1=0.000000000000009;
 		dv1 = dd1;
 		dv2="0.000000000000009d";
 		sv1 = dv1^"x";
@@ -166,7 +166,7 @@ function main() {
 		*/
 
 		printl("\ncheck largest number (14x9) works without scientific format");
-		dd1= 9999999999999.9d;
+		dd1= 9999999999999.9;
 		dv1 = dd1;
 		dv2="9999999999999.9d";
 		sv1=dv1^"x";
@@ -175,7 +175,7 @@ function main() {
 		assert(sv1 == sv2);
 
 		printl("\nVery large numbers are rounded and lose accuracy");
-		dd1=999999999999999999.9d;
+		dd1=999999999999999999.9;
 		dv1 = dd1;
 		dv2="999999999999999999.9d";
 		sv1=dv1^"x";
@@ -184,7 +184,7 @@ function main() {
 		assert(sv1 == sv2);
 
 		printl("\nVery large numbers are rounded and lose accuracy");
-		dd1=12345678901234567890123456789.0d;
+		dd1=12345678901234567890123456789.0;
 		dv1 = dd1;
 		dv2="12345678901234567890123456789.0d";
 		sv1=dv1^"x";
@@ -197,7 +197,7 @@ function main() {
 		assert(sv1 == sv2);
 
 		printl("\ncheck excessive number DONT get converted to scientific");
-		dd1=99999999999999.9d;
+		dd1=99999999999999.9;
 		dv1 = dd1;
 		dv2="99999999999999.9d";
 		sv1=dv1^"x";
@@ -392,13 +392,13 @@ function main() {
 
 	//default is (d)ouble thankfully not (f)loat
 	printl(var(1e-11f));
-	printl(var(1e-11d));
+	printl(var(1e-11));
 	printl(var(1e-12f));
-	printl(var(1e-12d));
+	printl(var(1e-12));
 	printl(var(1e-13f));
-	printl(var(1e-13d));
+	printl(var(1e-13));
 	printl(var(1e-14f));
-	printl(var(1e-14d));
+	printl(var(1e-14));
 	//0.000000000009999999960041972
 	//0.000000000009999999999999999
 	//0.0000000000009999999960041972
@@ -414,11 +414,11 @@ function main() {
 	assert(var(1e-14) == "0");//comparing to zero is special (diff less than 0.0001)
 
 	assert(var(1e-11f).toString() == "0.000000000009999999960041972");
-	printl(var(1e-11d));
+	printl(var(1e-11));
 #ifndef USE_RYU_D2S
-	assert(var(1e-11d).toString() == "0.000000000009999999999999999");
+	assert(var(1e-11).toString() == "0.000000000009999999999999999");
 #else
-	assert(var(1e-11d).toString() == "0.00000000001");//ryu
+	assert(var(1e-11).toString() == "0.00000000001");//ryu
 #endif
 	assert(var(1e-12f).toString() == "0.0000000000009999999960041972");
 	assert(var(1e-12 ).toString() == "0.000000000001");

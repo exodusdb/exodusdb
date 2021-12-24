@@ -178,6 +178,7 @@ function main() {
 		//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
 		basicoptions ^= " -Wall";
 		basicoptions ^= " -Wextra";
+		basicoptions ^= " -Wpedantic";
 		basicoptions ^= " -Wno-unknown-pragmas";
 
 		//not available on gcc 4.1.2 TODO work out gcc version

@@ -145,7 +145,7 @@ namespace exodus {
 //0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
 //#define SMALLEST_NUMBER 1e-10
 //#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
-constexpr double SMALLEST_NUMBER = 1e-4d;  //0.0001 for pickos compatibility
+constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 
 // the var versions of the above (without leading or trailing _)
 // are defined AFTER the class declaration of "var"

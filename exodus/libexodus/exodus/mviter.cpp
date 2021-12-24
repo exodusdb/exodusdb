@@ -21,7 +21,7 @@ namespace exodus {
 
 //CONSTRUCTOR from a var (ie begin())
 var_iter::var_iter(const var& v)
-	: data(&v){};
+	: data(&v){}
 
 //check iter != iter (i.e. iter != end()
 bool var_iter::operator!=([[maybe_unused]] var_iter& vi) {
