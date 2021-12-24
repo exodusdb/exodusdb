@@ -30,7 +30,7 @@ programinit()
 	var posix;
 	var windows;
 	var exodus_include_dir_info = "";
-
+	var nasterisks = 0;
 	var max_nthreads;
 	std::list<std::thread> threadlist;
 
@@ -62,7 +62,7 @@ function main() {
 	if (index(OPTIONS,"X"))
 		return 0;
 	verbose = index(OPTIONS, "V");
-	silent = index(OPTIONS, "S");
+	silent = count(OPTIONS, "S");
 	debugging = not index(OPTIONS, "R");  //no symbols for backtrace
 	//the backtrace seems to work fine with release mode at least in vs2005
 	optimise = count(OPTIONS, "O");				//prevents backtrace
@@ -606,6 +606,11 @@ function main() {
 			printl("sourcefilename=", srcfilename);
 		else if (not silent)
 			printl(srcfilename);
+		else if (silent eq 1) {
+			nasterisks++;
+			print("*");
+			osflush();
+		}
 
 		var srcfileinfo = osfile(srcfilename);
 		if (!srcfileinfo) {
@@ -1212,6 +1217,10 @@ var inclusion=
 
 	//join any outstanding threads before terminating
 	limit_threads(0);
+
+
+	if (nasterisks)
+		printl();
 
 	return ncompilationfailures > 0;
 }  //main
