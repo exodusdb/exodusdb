@@ -27,8 +27,6 @@ THE SOFTWARE.
 #endif
 //#define TRACING 5
 
-// C4530: C++ exception handler used, but unwind semantics are not enabled.
-//#pragma warning (disable: 4530)
 #include <iostream>
 
 //#include <stdio.h>

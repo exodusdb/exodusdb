@@ -881,7 +881,6 @@ bool var::osgetenv(const var& envvarname) {
 
 	//TIP if you cant seem to osgetenv vars set in bash, then ensure you set them in bash with "export"
 
-#pragma warning(disable : 4996)
 	const char* cvalue = std::getenv(envvarname.var_str.c_str());
 	if (cvalue == 0) {
 		this->var_str.clear();

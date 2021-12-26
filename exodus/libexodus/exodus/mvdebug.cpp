@@ -44,9 +44,6 @@ THE SOFTWARE.
 // for signal
 #include <signal.h>
 
-// C4530: C++ exception handler used, but unwind semantics are not enabled.
-#pragma warning(disable : 4530)
-
 #include <exodus/mv.h>
 
 // Simple implementation of an additional output to the console:

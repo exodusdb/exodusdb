@@ -77,17 +77,6 @@ client closes its handle.
 
 // for documentation see end of file
 
-// allow deprecated mbstowcs instead of "safe" mbstowcs_s
-#pragma warning(disable : 4995 4996)
-
-// for mingw
-#ifdef _MSC_VER
-#include <strsafe.h>
-#else
-#include <aclapi.h>
-#include <ddk\ntifs.h>
-#endif
-
 // actually limited to 256 characters long according to MS
 #define MAXPIPENAMESIZE 1024
 

@@ -29,11 +29,6 @@ Binary    Hex          Comments
 11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
 */
 
-// C4530: C++ exception handler used, but unwind semantics are not enabled.
-#ifdef _MSC_VER
-#pragma warning(disable : 4530)
-#endif
-
 #if __has_include(<signal.h>)
 #include <signal.h>	 //for raise(SIGTRAP)
 #endif

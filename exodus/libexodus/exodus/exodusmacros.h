@@ -60,9 +60,6 @@ THE SOFTWARE.
 // disable the following warning because seems it can be ignored at least in MSVC 2005 32bit
 // warning C4190: 'xyz' has C-linkage specified, but returns UDT 'exodus::var' which is incompatible
 // with C
-#ifdef _MSC_VER
-#pragma warning(disable : 4190)
-#endif
 #endif
 
 // work out if any functions are being exported or imported

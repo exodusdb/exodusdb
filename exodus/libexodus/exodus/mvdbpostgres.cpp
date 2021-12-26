@@ -72,13 +72,6 @@ THE SOFTWARE.
 //# define __except catch
 #endif
 
-#pragma warning(disable : 4150)
-// warning C4150: deletion of pointer to incomplete type 'pg_conn'; no destructor called
-// see declaration of 'pg_conn'
-
-// C4530: C++ exception handler used, but unwind semantics are not enabled.
-#pragma warning(disable : 4530)
-
 #include <cstring>	//for strcmp strlen
 #include <iostream>
 

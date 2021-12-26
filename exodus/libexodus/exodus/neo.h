@@ -106,9 +106,6 @@ functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 
 */
 
-// warning C4190: 'XXX' has C-linkage specified, but returns UDT 'YYY' which is incompatible with C
-#pragma warning(disable : 4190)
-
 // this is not needed since it is automatically generated if missing
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) {
 	return TRUE;

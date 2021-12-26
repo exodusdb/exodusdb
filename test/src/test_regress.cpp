@@ -125,7 +125,7 @@ function onefile(in filename, in maxndifferences) {
 	var funcno;
 
 	data.converter("\r\n",_FM_ _FM_);
-	dim line2();
+	dim line2;
 	var result;
 
 	var lineno = 0;

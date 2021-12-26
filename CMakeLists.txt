@@ -29,14 +29,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 ############################################
 # remove -o1 for gdb to debug into libexodus
 ############################################
-# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3 -fvisibility=hidden")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3")            #5% faster than -O2
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O2")            #little difference from -O1 running test_main
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1 -Wpedantic ") #switched off to avoid warning about elvis operator ?:
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -Og")             #5% slower than -01 but supposedly better debugging
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1 -fprofile-arcs -ftest-coverage")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native")
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O3 -fvisibility=hidden")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O3")            #5% faster than -O2
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O2")            #little difference from -O1 running test_main
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O1")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -Og")             #5% slower than -01 but supposedly better debugging
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O1 -fprofile-arcs -ftest-coverage")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas") #switched off to avoid various warnings
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")           #switched off to avoid warning about elvis operator ?:
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
 message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
 message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")

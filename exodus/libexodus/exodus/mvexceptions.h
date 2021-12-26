@@ -37,9 +37,6 @@ THE SOFTWARE.
 #endif
 */
 
-// C4530: C++ exception handler used, but unwind semantics are not enabled.
-//#pragma warning (disable: 4530)
-
 // to insert code at front of every var member function
 #define THISIS(OBJECT) static const char* functionname = OBJECT;
 

@@ -322,7 +322,6 @@ std::string ExodusFunctorBase::libfilename(std::string libraryname) const {
 	//otherwise just default library libXXXXXX.so
 	std::string libfilename = EXODUSLIBPREFIX + libraryname + EXODUSLIBEXT;
 	if (libfilename[0] == '~') {
-#pragma warning(disable : 4996)
 		// env string is copied into string so following getenv usage is safe
 		var exo_HOME;
 		if (not exo_HOME.osgetenv("EXO_HOME"))
@@ -368,7 +367,6 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 	//otherwise just default library libXXXXXX.so
 	libraryfilename_ = EXODUSLIBPREFIX + newlibraryname + EXODUSLIBEXT;
 	if (libraryfilename_[0] == '~') {
-#pragma warning(disable : 4996)
 		// env string is copied into string so following getenv usage is safe
 		var exo_HOME;
 		if (not exo_HOME.osgetenv("EXO_HOME"))

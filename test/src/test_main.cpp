@@ -1404,20 +1404,23 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	try {
 		var abc=abc+1;
 		//should never get here because above should cause a runtime undefined error
-//		assert(false);
+		assert(false);
 	}
 	catch (MVUndefined mve) {
+		//g++ sees the above as undefined
 		mve.description.outputl();
 	}
-	//catch(MVUnassigned mve) {
-	//	mve.description.outputl();
-	//}
+	catch(MVUnassigned mve) {
+		//clang sees the above as unassigned
+		mve.description.outputl();
+	}
 	//catch(MVNonNumeric mve) {
 	//	mve.description.outputl();
 	//}
 	catch (...) {
 		//should never get here because above should cause a runtime error
-		assert(false);
+		//assert(false);
+		throw;
 	}
 
 	//this turns on tracing SQL statements to postgres

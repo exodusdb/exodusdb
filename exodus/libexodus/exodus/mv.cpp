@@ -20,8 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// C4530: C++ exception handler used, but unwind semantics are not enabled.
-#pragma warning(disable : 4530)
 #include <iostream>
 
 // TODO: check that "-" and "-." is NOT numeric

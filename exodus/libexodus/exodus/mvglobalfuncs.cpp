@@ -22,9 +22,6 @@ THE SOFTWARE.
 
 //#include <cstdlib> //for atexit()
 
-// C4530: C++ exception handler used, but unwind semantics are not enabled.
-#pragma warning(disable : 4530)
-
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
 

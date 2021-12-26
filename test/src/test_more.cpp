@@ -681,7 +681,7 @@ function main() {
 		try {minint--             ;uncaught="MVIntUnderflow";}  catch (MVIntUnderflow e){};
 		try {maxint++             ;uncaught="MVIntUnderflow";}  catch (MVIntOverflow e){};
 
-		try {var v = v+1          ;uncaught="MVUndefined";}     catch (MVUndefined e){};
+		try {var v = v+1          ;uncaught="MVUndefined";}     catch (MVUndefined e){} catch (MVUnassigned e){};
 		//unfortunately throw causes cmake test to fail so we skip them
 		//try {throw MVDBException("test");uncaught="MVDBException";}  catch (MVDBException e){};
 		//try {throw MVDebug("test");uncaught="MVDebug";}              catch (MVDebug e){};

@@ -130,7 +130,11 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 // http://www.viva64.com/content/articles/64-bit-development/?f=20_issues_of_porting_C++_code_on_the_64-bit_platform.html
 using mvint_t = long long;
 
+#if __clang_major__ != 10
 #define ND [[nodiscard]]
+#else
+#define ND
+#endif
 
 //#define VISIBLE_FMS "_]\[Z"  //PickOS standard
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly

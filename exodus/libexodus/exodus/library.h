@@ -37,11 +37,6 @@
 // http://msdn.microsoft.com/en-us/library/83cch5a6.aspx
 // http://msdn.microsoft.com/en-us/library/ck561bfk.aspx"
 //
-// Interestingly, Exodus up to subversion version 129 worked fine without this but I wasnt able to
-// detect what complexity had been added that caused MS to optimise and break mfp compatibility
-// warning C4158: assuming #pragma pointers_to_members(full_generality, virtual_inheritance)
-#pragma warning(disable : 4158)
-#pragma pointers_to_members(full_generality)
 
 // the above requirement could be removed if libraryexit() generated the exactly
 // correct pointer to member WITH THE RIGHT ARGUMENTS

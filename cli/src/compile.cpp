@@ -123,7 +123,7 @@ function main() {
 	var updateinusebinposix = true;
 
 	//hard coded compiler options at the moment
-	//assume msvc (cl) on windows and g++ otherwise
+	//assume msvc (cl) on windows and c++ (g++/clang) otherwise
 	posix = OSSLASH eq "/";
 	windows = not(posix);
 	if (posix) {
@@ -153,7 +153,7 @@ function main() {
 			if (verbose)
 				printl("Using CXX environment variable for compiler " ^ compiler.quote());
 		} else {
-			compiler = "g++";
+			compiler = "c++";
 #ifdef __APPLE__
 			if (PLATFORM_ eq "x86")
 				compiler = "g++-4.0";
@@ -187,7 +187,7 @@ function main() {
 		//following will result in 2 byte wchar in linux
 		//but all exodus libs also need to be in this format too
 		//leave as 4 byte for now to avoid forcing additional compilation option on exodus users
-		//who use g++ directly (or put runtime check that program+lib have the same size wchar
+		//who use c++ (g++/clang) directly (or put runtime check that program+lib have the same size wchar
 		//advising the right compilation option.
 		//basicoptions^=" -fshort-wchar";
 
@@ -230,7 +230,7 @@ function main() {
 		liboptions = " -fPIC -shared";
 		//soname?
 #if __GNUC__ >= 4
-		//use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
+		//use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden";
 #endif
 
