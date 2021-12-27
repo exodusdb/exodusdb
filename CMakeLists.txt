@@ -39,7 +39,11 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O1")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas") #switched off to avoid various warnings
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")           #switched off to avoid warning about elvis operator ?:
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie")
+
+# Turn off some warnings
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-cast-function-type")
+
 message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
 message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")

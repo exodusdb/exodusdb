@@ -179,7 +179,10 @@ function main() {
 		basicoptions ^= " -Wall";
 		basicoptions ^= " -Wextra";
 		basicoptions ^= " -Wpedantic";
+
+		// no-xxxxxxxx means switch off warning xxxxxxxx
 		basicoptions ^= " -Wno-unknown-pragmas";
+		basicoptions ^= " -Wno-cast-function-type";
 
 		//not available on gcc 4.1.2 TODO work out gcc version
 		//basicoptions^=" -Wno-unused-parameters"; //dont want if functions dont use their parameters
