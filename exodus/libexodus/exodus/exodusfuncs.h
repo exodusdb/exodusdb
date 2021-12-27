@@ -255,6 +255,7 @@ DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname 
 DLL_PUBLIC bool deleteindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL);
 DLL_PUBLIC ND var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL);
 DLL_PUBLIC bool begintrans();
+DLL_PUBLIC bool statustrans();
 DLL_PUBLIC bool rollbacktrans();
 DLL_PUBLIC bool committrans();
 DLL_PUBLIC bool lock(const var& filehandle, const var& key);

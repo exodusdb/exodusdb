@@ -814,6 +814,10 @@ DLL_PUBLIC bool begintrans() {
 	return var().begintrans();
 }
 
+DLL_PUBLIC bool statustrans() {
+	return var().statustrans();
+}
+
 DLL_PUBLIC bool rollbacktrans() {
 	return var().rollbacktrans();
 }
