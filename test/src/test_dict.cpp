@@ -10,6 +10,10 @@ programinit()
 
 function main() {
 
+	printl("\n   --- clear any existing EXO_DATA/DICT env ---\n");
+	assert(ossetenv("EXO_DATA",""));
+	assert(ossetenv("EXO_DICT",""));
+
 	printl("\n   --- default connection first thing before anything else to ensure clean ---\n");
     printl("\n   --- quit (pass test) if no default database connection ---\n");
     if (not default_conn.connect()) {
