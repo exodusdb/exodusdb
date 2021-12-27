@@ -77,6 +77,36 @@ function main() {
 
 	if (mode eq "TEST") {
 
+	} else if (mode eq "TRANTEST") {
+
+		var transactions = "exodus_trantest";
+		if (not open(transactions,transactions))
+			createfile(transactions);
+
+		//ERROR:  VACUUM cannot run inside a transaction block sqlstate:25001
+		//if (not transactions.sqlexec("vacuum " ^ transactions.a(1))) {
+		//	response_ = var().lasterror();
+		//	stop();
+		//}
+
+		ID = "1";
+		var ntrans = 100;
+		//printl();
+		//printl("TRANTEST 1.", PROCESSNO);
+		for (var recn=1; recn le ntrans; recn++) {
+			//if (TERMINAL and recn % 100)
+			//	printl(recn);
+			if (not read(RECORD, transactions, ID))
+				RECORD = "";
+			if (not write(RECORD+1, transactions, ID)) {
+				response_ = "ERROR: " ^ var().lasterror();
+				stop();
+			}
+		}
+		//printl();
+		//printl("TRANTEST 2.", PROCESSNO);
+		response_ = "OK Process No. " ^ PROCESSNO ^ ", Total: " ^ (RECORD + 1);
+
 	} else if (mode.a(1) eq "PREVIEWLETTERHEAD") {
 
 		//comma sep
