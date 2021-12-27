@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -eu
 
 : ======================================================================
 : Service commands start, stop, restart, reload, status, enable, disable
