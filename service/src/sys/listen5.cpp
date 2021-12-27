@@ -467,6 +467,7 @@ nextpatch:;
 		logx.swapper("%3C", "&lt;");
 		logx.swapper("%3E", "&gt;");
 
+/* obsolete
 	} else if (request1 eq "PROCESSINIT") {
 		//put username and database on the bottom line of the screen
 		var username = USERNAME.trim();
@@ -497,7 +498,7 @@ nextpatch:;
 	} else if (request1 eq "PROCESSEXIT") {
 		bottomline = var(80).space();
 		gosub printbottomline();
-
+*/
 	} else if (request1.substr(1, 8) eq "GETINDEX") {
 
 		iodat_ = "";

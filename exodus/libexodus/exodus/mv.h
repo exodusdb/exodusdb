@@ -1881,7 +1881,7 @@ inline const var PLATFORM_ = "x86";
 //	DLL_PUBLIC int DBTRACE=false;
 //#endif
 
-[[maybe_unused]] static inline int DBTRACE;
+[[maybe_unused]] static inline int DBTRACE=var().osgetenv("EXO_DBTRACE");
 
 // following are all not thread safe since they are at global scope and not const
 // perhaps they should be moved on to MvEnvironment mv

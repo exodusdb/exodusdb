@@ -276,7 +276,7 @@ listen:
 
 	}
 
-	//respond to client
+	// Respond to web client e.g. program crash due to Variable not Assigned
 	var linkfilename3 = PRIORITYINT.a(100);
 	if (linkfilename3) {
 		//cannot remove these since they may be codepage letters now

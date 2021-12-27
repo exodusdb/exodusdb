@@ -1426,11 +1426,30 @@ cannotopenlinkfile2:
 	ID = "";
 	MV = 0;
 
-	call listen5("PROCESSINIT");
+	//call listen5("PROCESSINIT");
 
-	gosub process();
+	//gosub process();
 
-	call listen5("PROCESSEXIT");
+	if (osgetenv("EXO_DEBUG")) {
+
+		begintrans();
+		gosub process();
+		if (not committrans())
+			USER3 = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ USER3;
+	}
+	else try {
+
+		begintrans();
+		gosub process();
+		if (not committrans())
+			USER3 = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ USER3;
+	}
+	catch (MVError mverror) {
+		rollbacktrans();
+		USER3 = mverror.description ^ FM ^ mverror.stack;
+	}
+
+	//call listen5("PROCESSEXIT");
 
 	//restore the program stack
 	//limit on 299 "programs" and dictionary entries count as 1!!!

@@ -100,12 +100,12 @@ static var defaultconninfo =
 
 // DBTRACE is set in exodus_main (console programs) but not when used as a plain library
 // so initialise it on the fly. assume that it will usually be less than one for not tracing
-#define GETDBTRACE (DBTRACE >= 0 && getdbtrace())
-bool getdbtrace() {
-	if (DBTRACE == 0)
-		DBTRACE = var().osgetenv("EXO_DBTRACE") ? 1 : -1;
-	return DBTRACE > 0;
-}
+//#define GETDBTRACE (DBTRACE >= 0 && getdbtrace())
+//bool getdbtrace() {
+//	if (DBTRACE == 0)
+//		DBTRACE = var().osgetenv("EXO_DBTRACE") ? 1 : -1;
+//	return DBTRACE > 0;
+//}
 
 // Deleter function to close connection and connection cache object
 // this is also called in the destructor of MVConnectionsCache
@@ -115,7 +115,7 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 	//PGconn* pgp = (PGconn*)pgconn;
 	auto pgconn2 = pgconn;
     // at this point we have good new connection to database
-    if (GETDBTRACE) {
+    if (DBTRACE) {
         var("").logput("DBTR PQFinish");
 		std::clog << pgconn << std::endl;
 	}
@@ -126,12 +126,12 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 
 //#if TRACING >= 5
 #define DEBUG_LOG_SQL                  \
-	if (GETDBTRACE) {                  \
+	if (DBTRACE) {                  \
 		sql.squote().logputl("SQL0 "); \
 	}
 
 #define DEBUG_LOG_SQL1                                                                                             \
-	if (GETDBTRACE) {                                                                                              \
+	if (DBTRACE) {                                                                                              \
 		((this->assigned() ? *this : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).squote())).logputl("SQL1 "); \
 	}
 //#else
@@ -306,13 +306,13 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 			//save default dict/data connections
 			if (isdict) {
 				thread_default_dict_mvconn_no = mvconn_no;
-				if (GETDBTRACE) {
+				if (DBTRACE) {
 					var(mvconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
 				}
 			}
 			else {
 				thread_default_data_mvconn_no = mvconn_no;
-				if (GETDBTRACE) {
+				if (DBTRACE) {
 					var(mvconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
 				}
 			}
@@ -362,7 +362,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 
 		    // save current connection handle number as thread specific handle no
 		    thread_default_data_mvconn_no = mvconn_no;
-			if (GETDBTRACE) {
+			if (DBTRACE) {
 				var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
 			}
 		}
@@ -405,7 +405,7 @@ PGconn* get_pgconnection(const var& dbhandle) {
 		//throw MVDBException("pgconnection() requested when not connected. dbhandle:" ^ dbhandle);
 		throw MVDBException("pgconnection() requested when not connected.");
 
-	if (GETDBTRACE) {
+	if (DBTRACE) {
 		std::cout << std::endl;
 		PGconn* pgconn=thread_connections.get_pgconnection(mvconn_no);
 		std::clog << "CONN " << mvconn_no << " " << pgconn << std::endl;
@@ -584,7 +584,7 @@ bool var::connect(const var& conninfo) {
 
 	fullconninfo = build_conn_info(fullconninfo);
 
-	if (GETDBTRACE) {
+	if (DBTRACE) {
 		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
 		conninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
 	}
@@ -661,7 +661,7 @@ bool var::connect(const var& conninfo) {
 	this->r(2, mvconn_no);
 	this->r(3, mvconn_no);
 
-	if (GETDBTRACE) {
+	if (DBTRACE) {
 		fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect() OK ");
 		this->logput("DBTR var::connect() OK ");
 		std::clog << " " << pgconn << std::endl;
@@ -672,7 +672,7 @@ bool var::connect(const var& conninfo) {
 	// set default connection - ONLY IF THERE ISNT ONE ALREADY
 	if (isdefault && !thread_default_data_mvconn_no) {
 		thread_default_data_mvconn_no = mvconn_no;
-		if (GETDBTRACE) {
+		if (DBTRACE) {
 			this->logputl("DBTR NEW DEFAULT DATA CONN " ^ var(mvconn_no) ^ " on ");
 		}
 
@@ -687,8 +687,8 @@ bool var::connect(const var& conninfo) {
 	// but this does
 	// this turns off the notice when creating tables with a primary key
 	// DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	//this->sqlexec(var("SET client_min_messages = ") ^ (GETDBTRACE ? "LOG" : "WARNING"));
-	this->sqlexec(var("SET client_min_messages = ") ^ (GETDBTRACE ? "LOG" : "NOTICE"));
+	//this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"));
+	this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "NOTICE"));
 
 	return true;
 }
@@ -724,7 +724,7 @@ bool var::attach(const var& filenames) {
 		if (file.open(filename2,*this)) {
 			// Similar code in dbattach and open
 			thread_file_handles[filename2] = file.var_str;
-			if (GETDBTRACE)
+			if (DBTRACE)
 				file.logputl("DBTR var::attach() ");
 		}
 		else {
@@ -762,7 +762,7 @@ void var::disconnect() {
 	THISIS("bool var::disconnect()")
 	THISISDEFINED()
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		(this->assigned() ? *this : var("")).logputl("DBTR var::disconnect() ");
 
 	var mvconn_no = get_mvconn_no(*this);
@@ -780,7 +780,7 @@ void var::disconnect() {
 		// connect this is rather too smart but will probably do what people expect
 		if (mvconn_no == thread_default_data_mvconn_no) {
 			thread_default_data_mvconn_no = 0;
-			if (GETDBTRACE) {
+			if (DBTRACE) {
 				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
 			}
 		}
@@ -790,7 +790,7 @@ void var::disconnect() {
 		// connect this is rather too smart but will probably do what people expect
 		if (mvconn_no == thread_default_dict_mvconn_no) {
 			thread_default_dict_mvconn_no = 0;
-			if (GETDBTRACE) {
+			if (DBTRACE) {
 				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
 			}
 		}
@@ -806,21 +806,21 @@ void var::disconnectall() {
 	if (!mvconn_no)
 		mvconn_no = 2;
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		mvconn_no.logputl("DBTR var::disconnectall() >= ");
 
 	thread_connections.del_connections(mvconn_no);
 
 	if (thread_default_data_mvconn_no >= mvconn_no) {
 		thread_default_data_mvconn_no = 0;
-		if (GETDBTRACE) {
+		if (DBTRACE) {
 			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
 		}
 	}
 
 	if (thread_default_dict_mvconn_no >= mvconn_no) {
 		thread_default_dict_mvconn_no = 0;
-		if (GETDBTRACE) {
+		if (DBTRACE) {
 			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
 		}
 	}
@@ -872,7 +872,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 			} else {
 				//var(cached_file_handle).errputl("==== Connection cache VALID   = ");
 				(*this) = cached_file_handle;
-				if (GETDBTRACE)
+				if (DBTRACE)
 					this->logputl("DBTR open() attached ");
 				return true;
 			}
@@ -890,7 +890,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//var sql="select '" ^ filename2 ^ "'::regclass";
 	//if (! connection.sqlexec(sql))
 
-	if (GETDBTRACE) {
+	if (DBTRACE) {
 		connection2.logputl("DBTR var::open-1 ");
 	}
 
@@ -916,7 +916,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	connection2.sqlexec(sql, result);
 	//result.convert(RM,"|").logputl("result=");
 
-	if (GETDBTRACE) {
+	if (DBTRACE) {
 		connection2.logputl("DBTR var::open-2 ");
 	}
 
@@ -957,7 +957,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	thread_file_handles[filename2] = this->var_str;
 	//this->errputl("==== Connection cache ADDED   = ");
 
-	if (GETDBTRACE) {
+	if (DBTRACE) {
 		this->logputl("DBTR var::open-3 ");
 	}
 
@@ -1269,7 +1269,7 @@ var var::lock(const var& key) const {
 	const char* sql = "SELECT PG_TRY_ADVISORY_LOCK($1)";
 
 	// DEBUG_LOG_SQL1
-	if (GETDBTRACE)
+	if (DBTRACE)
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLL ");
 
 	//"this" is a filehandle - get its connection
@@ -1344,7 +1344,7 @@ bool var::unlock(const var& key) const {
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
 	// DEBUG_LOG_SQL
-	if (GETDBTRACE)
+	if (DBTRACE)
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLU ");
 
 	//"this" is a filehandle - get its connection
@@ -1398,7 +1398,7 @@ bool var::sqlexec(const var& sql) const {
 	if (!ok) {
 		this->lasterror(response);
 		//skip table does not exist because it is very normal to check if table exists
-		//if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || GETDBTRACE)
+		//if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || DBTRACE)
 		//	response.logputl();
 	}
 	return ok;
@@ -1417,7 +1417,7 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 	}
 
 	// log the sql command
-	if (GETDBTRACE)
+	if (DBTRACE)
 		((this->assigned() ? *this : "") ^ " | " ^ sqlcmd.convert("\t"," ").trim()).logputl("SQLE ");
 
 	// will contain any pgresult IF successful
@@ -2649,7 +2649,7 @@ bool var::saveselect(const var& filename) {
 	// THISISDEFINED()
 	ISSTRING(filename)
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		filename.logputl("DBTR var::saveselect() ");
 
 	int recn = 0;
@@ -2720,7 +2720,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			this->createString();
 	}
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		sortselectclause.logputl("sortselectclause=");
 
 	var actualfilename = get_normal_filename(*this);
@@ -3825,7 +3825,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//sql.logputl("sql=");
 
 	// DEBUG_LOG_SQL
-	// if (GETDBTRACE)
+	// if (DBTRACE)
 	//	exodus::logputl(sql);
 
 	// first close any existing cursor with the same name, otherwise cannot create  new cursor
@@ -3892,7 +3892,7 @@ void var::clearselect() {
 
 	var listname = (*this) ^ "_" ^ getprocessn() ^ "_tempx";
 
-	// if (GETDBTRACE)
+	// if (DBTRACE)
 	//	exodus::logputl("DBTRACE: ::clearselect() for " ^ listname);
 
 	// dont close cursor unless it exists otherwise sql error aborts any transaction
@@ -3983,7 +3983,7 @@ bool readnextx(const var& cursor, PGResult& pgresult, PGconn* pgconn, bool forwa
 			//TODO should add BY LISTITEMNO
 			if (not cursor.select("select " ^ listfilename))
 				return false;
-			if (GETDBTRACE)
+			if (DBTRACE)
 				exodus::logputl("DBTRACE: readnextx(...) found standard selectfile "
 			^ listfilename);
 
@@ -4012,7 +4012,7 @@ bool var::deletelist(const var& listname) const {
 	// THISISDEFINED()
 	ISSTRING(listname)
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		this->logputl("DBTR var::deletelist(" ^ listname ^ ") ");
 
 	// open the lists file on the same connection
@@ -4043,7 +4043,7 @@ bool var::savelist(const var& listname) {
 	// THISISDEFINED()
 	ISSTRING(listname)
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		this->logputl("DBTR var::savelist(" ^ listname ^ ") ");
 
 	// open the lists file on the same connection
@@ -4103,7 +4103,7 @@ bool var::getlist(const var& listname) {
 	// THISISDEFINED()
 	ISSTRING(listname)
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		listname.logputl("DBTR var::getlist(" ^ listname ^ ") ");
 
 	//int recn = 0;
@@ -4147,7 +4147,7 @@ bool var::formlist(const var& keys, const var& fieldno) {
 	ISSTRING(keys)
 	ISNUMERIC(fieldno)
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		keys.logputl("DBTR var::formlist() ");
 
 	this->clearselect();
@@ -4178,7 +4178,7 @@ bool var::makelist(const var& listname, const var& keys) {
 	ISSTRING(listname)
 	ISSTRING(keys)
 
-	if (GETDBTRACE)
+	if (DBTRACE)
 		this->logputl("DBTR var::makelist(" ^ listname ^ ") ");
 
 	// this is not often used since can be achieved by writing keys to lists file directly
@@ -4238,7 +4238,7 @@ bool var::hasnext() {
 		if (key_and_mv.length())
 			return true;
 
-		if (GETDBTRACE)
+		if (DBTRACE)
 			this->logputl("DBTR var::hasnext(" ^ listid ^ ") ");
 
 		// otherwise try and get another block
@@ -4428,7 +4428,7 @@ bool var::readnext(var& record, var& key, var& valueno) {
 	var listid = this->a(3);
 	if (listid) {
 
-		if (GETDBTRACE)
+		if (DBTRACE)
 			this->logputl("DBTR var::readnext() ");
 
 		record = "";
@@ -4759,7 +4759,7 @@ bool var::cursorexists() {
 
 	ok = PQntuples(pgresult) > 0;
 
-	// if (GETDBTRACE)
+	// if (DBTRACE)
 	//	exodus::logputl("DBTRACE: ::cursorexists() is " ^ var(ok));
 
 	return ok;
