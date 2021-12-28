@@ -687,6 +687,10 @@ nextsearch0:
 	}
 	//break on
 
+	//quit if connection no longer active. postgres restarted/stopped.
+	if (not var().sqlexec("SELECT NOW()"))
+		var().logoff();
+
 	//place a lock to indicate processing
 	//should really retry in case blocked by other processes checking it
 	//call rtp57(syslock, '', '', trim(@station):processno, '', '', '')

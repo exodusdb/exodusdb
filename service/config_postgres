@@ -105,6 +105,29 @@ function killidle() {
 	V0G0N
 
 :
+: Log to syslog
+: =============
+:
+: https://logtail.com/tutorials/how-to-start-logging-with-postgresql/
+:
+#	sudo -u postgres psql <<-V0G0N
+#		ALTER SYSTEM SET log_destination TO 'syslog';
+#		ALTER SYSTEM SET log_line_prefix TO '%d'
+#	V0G0N
+	sudo -u postgres psql <<-V0G0N
+		ALTER SYSTEM RESET log_destination;
+		ALTER SYSTEM RESET log_line_prefix;
+	V0G0N
+
+:
+: Log all statements longer than n ms
+: ===================================
+:
+	sudo -u postgres psql <<-V0G0N
+		ALTER SYSTEM SET log_min_duration_statement TO 500;
+	V0G0N
+
+:
 : Restart postgresql
 : ==================
 :
