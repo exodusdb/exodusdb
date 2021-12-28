@@ -1432,8 +1432,7 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 		//int xx = PQresultStatus(pgresult);
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
-		response = var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate;
-		response ^= FM ^ sqlcmd;
+		response = var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate ^ " " ^ sqlcmd;
 		return false;
 	}
 
@@ -1969,18 +1968,20 @@ bool var::deletefile(const var& filename) const {
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	// Similar code in detach and deletefile
-	if (thread_file_handles.erase(get_normal_filename(filename))) {
-		//filename.errputl("==== Connection cache DELETED = ");
-	} else {
-		//filename.errputl("==== Connection cache NONE    = ");
-	}
-
 	// False if file does not exist
 	// Avoid generating sql errors since they abort transations
 	if (!var().open(filename, *this)) {
 		this->errputl(filename ^ " cannot be deleted because it does not exist. ");
 		return false;
+	}
+
+	// Remove from filehandle cache regardless of success or failure to deletefile
+	// Delete from cache AFTER the above open which will place it in the cache
+	// Similar code in detach and deletefile
+	if (thread_file_handles.erase(get_normal_filename(filename))) {
+		//filename.errputl("::deletefile ==== Connection cache DELETED = ");
+	} else {
+		//filename.errputl("::deletefile ==== Connection cache NONE    = ");
 	}
 
 	var sql = "DROP TABLE " ^ filename.a(1) ^ " CASCADE";

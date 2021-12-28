@@ -185,9 +185,16 @@ function main()
 		conn1.connect( "");			// creates new connection with default parameters (connection string)
 
 		//remove any existing test databases
-		conn1.dbdelete( dbname2);
-		conn1.dbdelete( dbname3);
-		conn1.dbdelete( dbname4);
+		for (var dbname : dbname2 ^ FM ^ dbname3 ^ FM ^ dbname4) {
+			var conn2;
+			if (conn2.connect(dbname)) {
+				conn2.disconnect();
+				printl("verify delete", dbname);
+				printl("======================");
+				if (not conn1.dbdelete(dbname))
+					outputl(conn1.lasterror());
+			}
+		}
 
 		printl("verify CANNOT connect to non-existent deleted database2");
 		printl("=======================================================");
