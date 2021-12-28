@@ -132,7 +132,7 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 
 #define DEBUG_LOG_SQL1                                                                                             \
 	if (DBTRACE) {                                                                                              \
-		((this->assigned() ? *this : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).squote())).logputl("SQL1 "); \
+		((this->assigned() ? (this->substr(1,50)) : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).substr(1,50).squote())).logputl("SQL1 "); \
 	}
 //#else
 //#define DEBUG_LOG_SQL
@@ -1938,7 +1938,7 @@ bool var::createfile(const var& filename) const {
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
 	// sql ^= " TABLE " ^ filename.convert(".","_");
 	if (filename.substr(-5, 5) == "_temp")
-		sql ^= " TEMP ";
+		sql ^= " TEMPORARY ";
 	//sql ^= " TABLE " + filename2;
 	sql ^= " TABLE " ^ get_normal_filename(filename);
 	// sql ^= " (key bytea primary key, data bytea)";
@@ -1976,7 +1976,15 @@ bool var::deletefile(const var& filename) const {
 		//filename.errputl("==== Connection cache NONE    = ");
 	}
 
+	// False if file does not exist
+	// Avoid generating sql errors since they abort transations
+	if (!var().open(filename, *this)) {
+		this->errputl(filename ^ " cannot be deleted because it does not exist. ");
+		return false;
+	}
+
 	var sql = "DROP TABLE " ^ filename.a(1) ^ " CASCADE";
+	//var sql = "DROP TABLE IF EXISTS " ^ filename.a(1) ^ " CASCADE";
 
 	if (this->assigned())
 		return this->sqlexec(sql);
@@ -2093,11 +2101,11 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
 	//and their column names appended with a colon (:)
 	var stage2_calculated = fieldname[-1] == ":";
-	var stage2_filename = "SELECT_TEMP_STAGE2_CURSOR_" ^ cursor.a(1);
+	var stage2_filename = "SELECT_CURSOR_STAGE2_" ^ cursor.a(1);
 
 	if (stage2_calculated) {
 		fieldname.splicer(-1, 1, "");
-		//create a pseudo look up ... except that SELECT_TEMP_CURSOR_n has the fields stored in sql columns and not in the usual data column
+		//create a pseudo look up ... except that SELECT_CURSOR_STAGE2 has the fields stored in sql columns and not in the usual data column
 		stage2_calculated = "@ANS=XLATE(\"" ^ stage2_filename ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 		stage2_calculated.logputl("stage2_calculated simulation --------------------->");
 	}
@@ -2263,7 +2271,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 		}
 
 		// simple join or stage2 but not on multivalued
-		// stage2_calculated="@ANS=XLATE(\"SELECT_STAGE2_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
+		// stage2_calculated="@ANS=XLATE(\"SELECT_CURSOR_STAGE2_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 		else if ((!ismv1 || stage2_calculated) && functionx.substr(1, 11).ucase() == "@ANS=XLATE(") {
 			functionx = functionx.a(1, 1);
 
@@ -3366,7 +3374,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				//currently tobool requires only text input
 				//TODO some way to detect DATE SYMBOLIC FIELDS and not hack special dict words!
 				//doesnt work on multivalued fields - results in:
-				//exodus_tobool(SELECT_STAGE2_CURSOR_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
+				//exodus_tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				//TODO work out better way of determining DATE/TIME that must be tested versus null
 				if (dictexpression.index("FULLY_") || (!dictexpression.index("exodus_extract") && dictexpression.index("_DATE")))
 					dictexpression ^= " is not null";
@@ -3743,13 +3751,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	if (this->hasnext()) {
 
 		//create a temporary sql table to hold the preselected keys
-		var temptablename = "SELECT_TEMP_CURSOR_" ^ this->a(1);
-		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-		if (true)
-			createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
-		else
-			createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
+		var temptablename = "SELECT_CURSOR_" ^ this->a(1);
+		//var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
+		//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
+		var createtablesql = "CREATE TEMPORARY TABLE IF NOT EXISTS " ^ temptablename ^ "\n";
 		createtablesql ^= " (KEY TEXT)\n";
+		createtablesql ^= ";DELETE FROM " ^ temptablename ^ "\n";
 		var errmsg;
 		if (!this->sqlexec(createtablesql, errmsg)) {
 			throw MVDBException(errmsg);
@@ -3829,6 +3836,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//	exodus::logputl(sql);
 
 	// first close any existing cursor with the same name, otherwise cannot create  new cursor
+    // Avoid generating sql errors since they abort transations
 	if (this->cursorexists()) {
 		var sql = "";
 		sql ^= "CLOSE cursor1_";
@@ -3895,7 +3903,8 @@ void var::clearselect() {
 	// if (DBTRACE)
 	//	exodus::logputl("DBTRACE: ::clearselect() for " ^ listname);
 
-	// dont close cursor unless it exists otherwise sql error aborts any transaction
+	// Dont close cursor unless it exists otherwise sql error aborts any transaction
+    // Avoid generating sql errors since they abort transations
 	// if (not this->cursorexists())
 	if (not this->cursorexists())
 		return;
@@ -3908,7 +3917,7 @@ void var::clearselect() {
 	//delete any temporary sql table created to hold preselected keys
 	//if (this->assigned())
 	//{
-	//	var temptablename="PRESELECT_TEMP_CURSOR_" ^ this->a(1);
+	//	var temptablename="PRESELECT_CURSOR_" ^ this->a(1);
 	//	var deletetablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//	if (!this->sqlexec(deletetablesql, errors))
 	//	{
@@ -4268,6 +4277,7 @@ bool var::hasnext() {
 	}
 
 	//TODO avoid this trip to the database somehow?
+    // Avoid generating sql errors since they abort transations
 	if (!this->cursorexists())
 		return false;
 
@@ -4487,6 +4497,11 @@ bool var::readnext(var& record, var& key, var& valueno) {
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
+
+	//TODO avoid this trip to the database somehow?
+    // Avoid generating sql errors since they abort transations
+	if (!this->cursorexists())
+		return false;
 
 	PGResult pgresult;
 	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
@@ -4738,6 +4753,8 @@ bool var::cursorexists() {
 	// could allow undefined usage since *this isnt used?
 	// THISISSTRING()
 
+    // Avoid generating sql errors since they abort transations
+
 	// default cursor is ""
 	this->unassigned("");
 
@@ -4984,13 +5001,13 @@ static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
 			default:
 
 				//#if TRACING >= 1
-				if (sql.field(" ", 1) != "FETCH") {
+				//if (sql.field(" ", 1) != "FETCH") {
 					var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
 					var("ERROR: mvdbpostgres pqexec " ^
 						var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
 						var(PQresultErrorMessage(pgresult)))
 						.errputl();
-				}
+				//}
 				//#endif
 
 				// this is defaulted above for safety

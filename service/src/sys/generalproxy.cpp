@@ -79,6 +79,20 @@ function main() {
 
 	} else if (mode eq "TRANTEST") {
 
+		/* TRANTEST - check speed and accuracy of "concurrent" updates by mass updating a single record.
+
+		Simply add 1 to a field 1 of record key "1", 100 times in file exodus_trantest
+
+		The Total: *MUST* go up by the expected number even if multiple browsers are running concurrently
+
+		e.g. TWO browsers (not two tabs of one browser) running the test CONCURRENTLY using 10 repeats
+		*MUST* increase the Total: by 2 x 10 x 100 = 2000
+
+		The speed seems to go down a lot after thousands of update, perhaps due to postgresql needing
+		a VACUUM to remove the historical versions of the updates records since it never actually
+		overwrites the original data blocks.
+		*/
+
 		var transactions = "exodus_trantest";
 		if (not open(transactions,transactions))
 			createfile(transactions);
