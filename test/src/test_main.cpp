@@ -2453,6 +2453,49 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(osdelete(tempfilename0));
 	assert(not osfile(tempfilename0));
 
+	{
+
+		printl("\nTest pop()/popper()");
+
+		var x = "abc";
+
+		assert(x.pop() eq "ab");
+		assert(x eq "abc");
+
+		assert(x.popper() eq "ab");
+		assert(x eq "ab");
+
+		assert(x.popper() eq "a");
+		assert(x eq "a");
+
+		assert(x.popper() eq "");
+		assert(x eq "");
+
+		assert(x.popper() eq "");
+		assert(x eq "");
+
+		assert(var("abc").pop() eq "ab");
+		assert(var("ab").pop() eq "a");
+		assert(var("a").pop() eq "");
+		assert(var("").pop() eq "");
+
+		//test pops bytes not text characters
+		//text three byte utf8
+		var euro="€";
+		assert(oconv(euro,"HEX")=="E282AC");
+		euro.popper();
+		assert(oconv(euro,"HEX")=="E282");
+		euro.popper();
+		assert(oconv(euro,"HEX")=="E2");
+
+		//test procedural free functions
+		var y = "abc";
+		assert(popper(y) eq "ab");
+		assert(y eq "ab");
+		assert(pop(y) eq "a");
+		assert(y eq "ab");
+	}
+
 //	var().stop();
 
 // cannot connectlocal in main and thread until pipes are numbered

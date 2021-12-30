@@ -274,7 +274,7 @@ exit:
 	while (true) {
 		///BREAK;
 		if (not(("." ^ VM ^ FM).index(emaillog[-1]))) break;
-		emaillog.splicer(-1, 1, "");
+		emaillog.popper();
 	}//loop;
 
 	//always email to self
@@ -294,7 +294,7 @@ exit:
 	while (true) {
 		///BREAK;
 		if (not(("." ^ VM ^ FM).index(emaillog[-1]))) break;
-		emaillog.splicer(-1, 1, "");
+		emaillog.popper();
 	}//loop;
 
 	return 0;

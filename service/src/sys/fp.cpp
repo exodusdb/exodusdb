@@ -17,7 +17,7 @@ function main(in type, in inx, in mode, out outx) {
 				while (true) {
 					///BREAK;
 					if (not(outx.length() gt 2 and (outx[-1] eq "0"))) break;
-					outx.splicer(-1, 1, "");
+					outx.popper();
 				}//loop;
 
 			} else if (exp gt 0) {

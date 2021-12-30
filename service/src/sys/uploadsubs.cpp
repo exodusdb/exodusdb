@@ -533,7 +533,7 @@ nextline:
 					grec ^= dictid ^ " ";
 					dictrec.write(dictfile, dictid);
 				} //coln;
-				grec.splicer(-1, 1, "");
+				grec.popper();
 				("G" ^ FM ^ FM ^ grec).write(dictfile, dictcolprefix);
 				("G" ^ FM ^ FM ^ grec).write(dictfile, "@CRT");
 

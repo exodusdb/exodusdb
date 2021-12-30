@@ -95,7 +95,7 @@ function main(in mode, io logtime, in menu) {
 		//remove any trailing . from 10. etc which is valid syntax for hosts.allow
 		hosts.swapper("." ^ SVM, SVM);
 		if (hosts[-1] eq ".") {
-			hosts.splicer(-1, 1, "");
+			hosts.popper();
 		}
 
 		//exodus can login from

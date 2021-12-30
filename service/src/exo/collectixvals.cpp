@@ -54,7 +54,7 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 	if (orderby)
 		indexvalues.converter(VM,FM);
 	else
-		indexvalues.splicer(-1, 1, "");
+		indexvalues.popper();
 
 	//return value in PSEUDO
 	transfer(indexvalues, PSEUDO);

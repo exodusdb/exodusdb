@@ -21,7 +21,7 @@ function main(in pluralnoun) {
 		} else if (temp2.substr(-4,4) == "CHES") {
 			temp.splicer(-2, 2, "");
 		} else {
-			temp.splicer(-1, 1, "");
+			temp.popper();
 		}
 
 	//comment to help c++ decompiler
@@ -30,7 +30,7 @@ function main(in pluralnoun) {
 		if (temp2[-1] == "S") {
 			//ANALYSIS, DOS
 			if ((temp2.substr(-2,2) ne "IS") and (temp2.substr(-2,2) ne "OS")) {
-				temp.splicer(-1, 1, "");
+				temp.popper();
 			}
 		}
 

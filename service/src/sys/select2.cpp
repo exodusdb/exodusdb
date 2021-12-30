@@ -233,7 +233,7 @@ nocommon:
 		while (true) {
 			///BREAK;
 			if (not(dictids[-1] eq FM)) break;
-			dictids.splicer(-1, 1, "");
+			dictids.popper();
 		}//loop;
 		if (dictids eq "") {
 			dictids = "ID";

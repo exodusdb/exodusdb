@@ -73,7 +73,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 						bilingual ^= trim(field(lang1line, "|", partn) ^  " " ^ field(lang2line, "|", partn)) ^ "|";
 					}
 					//bilingual[-1,1]="";
-					bilingual.splicer(-1, 1, "");
+					bilingual.popper();
 					lang.r(fn, bilingual);
 				}
 			} //fn;

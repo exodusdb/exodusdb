@@ -982,7 +982,7 @@ readlink1:
 		while (true) {
 			///BREAK;
 			if (not(USER0[-1] eq FM)) break;
-			request_.splicer(-1, 1, "");
+			request_.popper();
 		}//loop;
 		//swap '%FF' with rm  in request
 		//swap '%FE' with fm in request
@@ -1210,7 +1210,7 @@ subroutine requestinit() {
 	if (request2 eq "JOURNALS") {
 		request2 = "JOURNALS";
 		if (request3.count("*") eq 3 and (request3[-1] eq "*")) {
-			request3.splicer(-1, 1, "");
+			request3.popper();
 		}
 	}
 

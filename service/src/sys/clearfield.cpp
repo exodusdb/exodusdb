@@ -35,10 +35,10 @@ function main() {
 	var cleartovalue = SENTENCE.field("/", 2, 9999);
 	if ((cleartovalue[1] eq DQ) and (cleartovalue[-1] eq DQ)) {
 		cleartovalue.splicer(1, 1, "");
-		cleartovalue.splicer(-1, 1, "");
+		cleartovalue.popper();
 	} else if ((cleartovalue[1] eq "'") and (cleartovalue[-1] eq "'")) {
 		cleartovalue.splicer(1, 1, "");
-		cleartovalue.splicer(-1, 1, "");
+		cleartovalue.popper();
 	}
 	if (options.index("I")) {
 		cleartovalue = cleartovalue.invert();
@@ -141,7 +141,7 @@ next:
 			while (true) {
 				///BREAK;
 				if (not(RECORD and ((FM ^ VM ^ SVM).index(RECORD[-1])))) break;
-				RECORD.splicer(-1, 1, "");
+				RECORD.popper();
 			}//loop;
 			if (RECORD eq "") {
 				file.deleterecord(ID);

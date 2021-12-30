@@ -913,7 +913,7 @@ nextreport:
 	} else {
 		//Description:\tUbuntu 18.04.3 LTS\n
 		ver = shell2("lsb_release -d").field(var().chr(9), 2).trim();
-		ver.splicer(-1, 1, "");
+		ver.popper();
 
 		//CPU(s):              2
 		//Thread(s) per core:  1
@@ -955,7 +955,7 @@ nextreport:
 			cpu.trimmer();
 		}
 		if (cpu[-1] eq FM) {
-			cpu.splicer(-1, 1, "");
+			cpu.popper();
 		}
 
 		//Name.

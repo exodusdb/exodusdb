@@ -188,7 +188,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	while (true) {
 		///BREAK;
 		if (not(html and (var("\r\n").index(html[-1])))) break;
-		html.splicer(-1, 1, "");
+		html.popper();
 	}//loop;
 
 	if (authorised("EDIT PRINTOUTS", xx)) {
@@ -333,7 +333,7 @@ subroutine getcompanyconfig(io html, io mode) {
 			//FULL http path to images so EMAIL/OFFICE programs can get images
 			var url = SYSTEM.a(114, 1);
 			if (url[-1] eq "/") {
-				url.splicer(-1, 1, "");
+				url.popper();
 			}
 
 			//path to uploaded company logo files

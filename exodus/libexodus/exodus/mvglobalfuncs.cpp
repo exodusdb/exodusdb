@@ -436,6 +436,14 @@ DLL_PUBLIC var splice(const var& instring, const int start1, const int length, c
 	return instring.splice(start1, length, str);
 }
 
+DLL_PUBLIC var& popper(var& instring) {
+	return instring.popper();
+}
+
+DLL_PUBLIC var pop(const var& instring) {
+	return instring.pop();
+}
+
 DLL_PUBLIC var& quoter(var& instring) {
 	return instring.quoter();
 }

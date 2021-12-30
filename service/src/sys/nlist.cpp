@@ -1153,10 +1153,10 @@ x1exit:
 	}
 
 	if (breakcolns[-1] eq FM) {
-		breakcolns.splicer(-1, 1, "");
+		breakcolns.popper();
 	}
 	if (breakopts[-1] eq FM) {
-		breakopts.splicer(-1, 1, "");
+		breakopts.popper();
 	}
 
 	//make underline and column title underline
@@ -1336,7 +1336,7 @@ x1exit:
 		while (true) {
 			///BREAK;
 			if (not(colhdg and ((" " ^ FM).index(colhdg[-1])))) break;
-			colhdg.splicer(-1, 1, "");
+			colhdg.popper();
 		}//loop;
 	}
 
@@ -1373,7 +1373,7 @@ x1exit:
 		headtabcols = " <col style=\"text-align:left\"/>" ^ VM ^ "<col style=\"text-align: left;font-weight:bold\"/>";
 		//allow 8 max pair of headtab columns
 		headtabcols = (headtabcols ^ VM).str(8);
-		headtabcols.splicer(-1, 1, "");
+		headtabcols.popper();
 
 		tt ^= "<colgroup>" "\r\n" ^ headtabcols.swap(VM, "\r\n") ^ "</colgroup>";
 
@@ -1984,7 +1984,7 @@ subroutine getquotedword2() {
 	gosub getword();
 	if (((DQ ^ "'").index(word[1])) and (word[1] eq word[-1])) {
 		word.splicer(1, 1, "");
-		word.splicer(-1, 1, "");
+		word.popper();
 	} else {
 		call mssg(lastword ^ " must be followed by a quoted phrase");
 	}

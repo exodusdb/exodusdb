@@ -634,7 +634,7 @@ nextvn:
 		while (true) {
 			///BREAK;
 			if (not(line[-1] eq FM)) break;
-			line.splicer(-1, 1, "");
+			line.popper();
 		}//loop;
 
 		//suppress output of empty amv rows

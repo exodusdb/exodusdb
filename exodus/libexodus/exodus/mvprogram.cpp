@@ -187,7 +187,7 @@ bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
 
 		//reqivalues
 		if (op == "in" and ovalue[1] == "(" and ovalue[-1] == ")") {
-			ovalue.splicer(1, 1, "").splicer(-1, 1, "");
+			ovalue.splicer(1, 1, "").popper();
 			ovalue.swapper("', '", VM);
 			ovalue.trimmerb().trimmerf().unquoter();
 			//ovalue.convert(VM,"]").outputl("ovalue=");
@@ -1768,14 +1768,14 @@ var ExodusProgramBase::singular(const var& pluralnoun) {
 		} else if (temp.substr(-4, 4) == "CHES") {
 			temp.splicer(-2, 2, "");
 		} else if (1) {
-			temp.splicer(-1, 1, "");
+			temp.popper();
 		}
 	} else {
 
 		if (temp[-1] == "S") {
 			// analysis, dos
 			if (temp.substr(-2, 2) != "IS" && temp.substr(-2, 2) != "OS")
-				temp.splicer(-1, 1, "");
+				temp.popper();
 		}
 	}
 
@@ -2063,7 +2063,7 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion) {
 			//remove brackets
 			subconversion.substrer(2);
 			if (subconversion[-1] == "]")
-				subconversion.splicer(-1, 1, "");
+				subconversion.popper();
 
 			//determine the function name
 			var functionname = subconversion.field(",").lcase();
@@ -2402,7 +2402,7 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 
 		var perc = input1[-1];
 		if (perc eq "%") {
-			input1.splicer(-1, 1, "");
+			input1.popper();
 		} else {
 			perc = "";
 		}

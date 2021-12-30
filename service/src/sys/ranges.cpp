@@ -84,7 +84,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 			///BREAK;
 			if (not(var("0123456789").index(lastchar))) break;
 			startx.splicer(1, 0, lastchar);
-			prefix.splicer(-1, 1, "");
+			prefix.popper();
 		}//loop;
 
 		//range of numbers
@@ -102,7 +102,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 				///BREAK;
 				if (not(var("0123456789").index(lastchar))) break;
 				finish.splicer(1, 0, lastchar);
-				tt.splicer(-1, 1, "");
+				tt.popper();
 			}//loop;
 
 			if (finish lt startx) {

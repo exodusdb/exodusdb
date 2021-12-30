@@ -189,6 +189,8 @@ DLL_PUBLIC var& raiser(var& instring);
 DLL_PUBLIC ND var raise(const var& instring);
 DLL_PUBLIC var& splicer(var& instring, const int start1, const int length, const var& str);
 DLL_PUBLIC ND var splice(const var& instring, const int start1, const int length, const var& str);
+DLL_PUBLIC var& popper(var& instring);
+DLL_PUBLIC ND var pop(const var& instring);
 DLL_PUBLIC var& quoter(var& instring);
 DLL_PUBLIC ND var quote(const var& instring);
 DLL_PUBLIC var& unquoter(var& instring);

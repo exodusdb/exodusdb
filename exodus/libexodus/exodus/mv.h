@@ -1158,6 +1158,7 @@ class DLL_PUBLIC var final {
 	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING);
 	var& splicer(const int start1, const int length, const var& str);
 	var& splicer(const int start1, const var& str);
+	var& popper();
 	var& quoter();
 	var& squoter();
 	var& unquoter();
@@ -1193,6 +1194,7 @@ class DLL_PUBLIC var final {
 	ND var& replace(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING) &&;
 	ND var& splice(const int start1, const int length, const var& str) &&;
 	ND var& splice(const int start1, const var& str) &&;
+	ND var& pop() &&;
 	ND var& quote() &&;
 	ND var& squote() &&;
 	ND var& unquote() &&;
@@ -1228,6 +1230,7 @@ class DLL_PUBLIC var final {
 	ND var replace(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING) const&;
 	ND var splice(const int start1, const int length, const var& str) const&;
 	ND var splice(const int start1, const var& str) const&;
+	ND var pop() const&;
 	ND var quote() const&;
 	ND var squote() const&;
 	ND var unquote() const&;

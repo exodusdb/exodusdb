@@ -452,7 +452,7 @@ forcedemail:
 				var arg = line.field(" ", 2, 9999);
 				if (arg[1] eq DQ) {
 					arg.splicer(1, 1, "");
-					arg.splicer(-1, 1, "");
+					arg.popper();
 				}
 
 				if (opt eq "-r") {

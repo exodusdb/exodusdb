@@ -709,7 +709,7 @@ bool var::attach(const var& filenames) {
 				filenames2 ^= filename ^ FM;
 			}
 		}
-		filenames2.splicer(-1, 1, "");
+		filenames2.popper();
 	}
 	else {
 		filenames2 = filenames;
@@ -2105,7 +2105,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 	var stage2_filename = "SELECT_CURSOR_STAGE2_" ^ cursor.a(1);
 
 	if (stage2_calculated) {
-		fieldname.splicer(-1, 1, "");
+		fieldname.popper();
 		//create a pseudo look up ... except that SELECT_CURSOR_STAGE2 has the fields stored in sql columns and not in the usual data column
 		stage2_calculated = "@ANS=XLATE(\"" ^ stage2_filename ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 		stage2_calculated.logputl("stage2_calculated simulation --------------------->");
@@ -2334,7 +2334,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 					xlatekeyexpression = "exodus_extract_text(";
 					xlatekeyexpression ^= filename ^ ".data";
 					xlatekeyexpression ^= ", " ^ xlatefromfieldname.substr(9);
-					xlatekeyexpression.splicer(-1, 1, "");
+					xlatekeyexpression.popper();
 					xlatekeyexpression ^=
 						var(", 0").str(3 - xlatekeyexpression.count(',')) ^ ")";
 				} else if (xlatefromfieldname.trim().substr(1, 10).lcase() == "field(@id|") {
@@ -2346,7 +2346,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 				// (xlatefromfieldname.substr(1,8)=="FIELD(@ID)
 				else if (xlatefromfieldname[1] == "{") {
 					xlatefromfieldname =
-						xlatefromfieldname.substr(2).splicer(-1, 1, "");
+						xlatefromfieldname.substr(2).popper();
 					xlatekeyexpression = get_dictexpression(cursor,
 						filename, filename, dictfilename, dictfile,
 						xlatefromfieldname, joins, unnests, selects, ismv, forsort);
@@ -2572,7 +2572,7 @@ var getword(var& remainingwords, var& ucword) {
 			//put single closing paren back on the pending words
 			remainingwords.splicer(1, 0, ") ");
 			//return word without trailing paren )
-			word1.splicer(-1, 1, "");
+			word1.popper();
 		}
 	}
 
@@ -3279,7 +3279,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				if (dictexpression.index("to_tsvector(")) {
 					//dont create exodus_tobool(to_tsvector(...
 					dictexpression.swapper("to_tsvector('simple',","");
-					dictexpression.splicer(-1, 1, "");
+					dictexpression.popper();
 					dictexpression_isvector = false;
 				}
 
@@ -3367,7 +3367,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				if (dictexpression.index("to_tsvector(")) {
 					//dont create exodus_tobool(to_tsvector(...
 					dictexpression.swapper("to_tsvector('simple',","");
-					dictexpression.splicer(-1, 1, "");
+					dictexpression.popper();
 					//TRACE(dictexpression)
 					dictexpression_isvector = false;
 				}
@@ -3442,7 +3442,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 					expression ^= dictexpression ^ " COLLATE \"C\"";
 					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
-				expression.splicer(-1, "");
+				expression.popper();
 				expression.swapper(FM, " OR ");
 				value = expression;
 
@@ -3569,7 +3569,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 						values ^= "(" ^ partvalue ^ ")";
 						values ^= FM;
 					}
-					values.splicer(-1,1,"");
+					values.popper();
 					values.swapper(FM, "|");
 					value = values.squote();
 				}
@@ -5212,7 +5212,7 @@ nextdict:
 	if (nsvs) {
 		sql.trimmerb();
 		if (sql[-1] == ",")
-			sql.splicer(-1, 1, "");
+			sql.popper();
 	}else{
 		sql ^= " *";
 	}
@@ -5220,7 +5220,7 @@ nextdict:
 	if (nvars) {
 		sql2.trimmerb();
 		if (sql2[-1] == ",")
-			sql2.splicer(-1, 1, "");
+			sql2.popper();
 	}
 
 	sql ^= crlf ^ " from " ^ datafileprefix ^ sqlfilename;

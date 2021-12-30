@@ -25,7 +25,7 @@ function main(io css, in version="") {
 
 	//remove trailing EOL characters
 	//while (var("\r\n").index(css[-1], 1))
-	//	css.splicer(-1, 1, "");
+	//	css.popper();
 
 	var thcolor = SYSTEM.a(46, 1);
 	var tdcolor = SYSTEM.a(46, 2);

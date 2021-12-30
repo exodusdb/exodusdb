@@ -1099,7 +1099,7 @@ var var::unique() const {
 		if (not delimiter)
 			break;
 	}  // loop;
-	//result.splicer(-1, 1, "");
+	//result.popper();
 	if (not result.var_str.empty())
 		result.var_str.pop_back();
 
@@ -1391,6 +1391,29 @@ var& var::splicer(const int start1, const var& newstr) {
 
 	return *this;
 }
+
+
+// pop() remove last byte of string
+var var::pop() const& {
+	return var(*this).popper();
+}
+
+// on temporary do in place
+var& var::pop() && {
+	return this->popper();
+}
+
+// in-place
+var& var::popper() {
+	THISIS("var& var::popper()")
+	THISISSTRINGMUTATOR()
+
+	if (!this->var_str.empty())
+		this->var_str.pop_back();
+
+	return *this;
+}
+
 
 var& var::transfer(var& destinationvar) {
 	THISIS("var& var::transfer(var& destinationvar)")
