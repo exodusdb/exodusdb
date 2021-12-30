@@ -2005,14 +2005,14 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 			// work/efficiently if (stdfs::is_directory(dir_itr->status() ) )
 			if (stdfs::is_directory(*dir_itr)) {
 				if (getfolders)
-					filelist ^= FM ^ dir_itr->path().filename().string();
+					filelist ^= dir_itr->path().filename().string() ^ FM;
 			}
 			// is_regular is only in boost > 1.34
 			// else if (stdfs::is_regular(dir_itr->status() ) )
 			else  // if (stdfs::is_regular(dir_itr->status() ) )
 			{
 				if (getfiles)
-					filelist ^= FM ^ dir_itr->path().filename().string();
+					filelist ^= dir_itr->path().filename().string() ^ FM;
 			}
 			// else
 			//{
@@ -2032,8 +2032,9 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 
 	// delete first separator
 	// NB splice is 1 based
-	if (filelist != "")
-		filelist.splicer(1, 1, "");
+	//if (filelist != "")
+	//	filelist.splicer(1, 1, "");
+	filelist.popper();
 
 	return filelist;
 }

@@ -54,7 +54,7 @@ var var::iconv(const char* convstr) const {
 	THISISSTRING()
 
 	// empty string in, empty string out
-	if (var_typ & VARTYP_STR && var_str.length() == 0)
+	if (var_typ & VARTYP_STR && var_str.size() == 0)
 		return "";
 
 	// REMOVE the remove logic out of the L# R# and T# here
@@ -78,7 +78,7 @@ var var::iconv(const char* convstr) const {
 				part = this->substr2(charn, terminator);
 				// if len(part) or terminator then
 
-				if (part.var_typ & VARTYP_STR && part.var_str.length() == 0) {
+				if (part.var_typ & VARTYP_STR && part.var_str.size() == 0) {
 				} else
 					output ^= part.iconv_D(convstr);
 
@@ -104,7 +104,7 @@ var var::iconv(const char* convstr) const {
 				// if len(part) or terminator then
 
 				// null string
-				if (part.var_typ & VARTYP_STR && part.var_str.length() == 0) {
+				if (part.var_typ & VARTYP_STR && part.var_str.size() == 0) {
 				}
 
 				// do convstr on a number
@@ -164,7 +164,7 @@ var var::iconv(const char* convstr) const {
 		// HEX
 		case 'H':
 			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.length() == 0)
+			if (var_typ & VARTYP_STR && var_str.size() == 0)
 				return "";
 
 			// TODO allow high end separators in without conversion (instead of failing as
@@ -234,7 +234,7 @@ var var::oconv_T(const var& format) const {
 
 	// get padding character from "L(?)" or space
 	char fillchar;
-	if (format.var_str.length() >= 4 && format.var_str[1] == '(' && format.var_str[3] == ')')
+	if (format.var_str.size() >= 4 && format.var_str[1] == '(' && format.var_str[3] == ')')
 		fillchar = format.var_str[2];
 	else
 		fillchar = ' ';
@@ -260,7 +260,7 @@ var var::oconv_T(const var& format) const {
 			part.trimmerf().trimmerb();
 
 			// simple processing if part is less than width
-			int partlen = part.length();
+			int partlen = part.var_str.size();
 			if (partlen <= width) {
 
 				// output ^= part;
@@ -282,7 +282,7 @@ var var::oconv_T(const var& format) const {
 
 				var word = part.field(" ", wordn, 1);
 
-				int wordlen = word.length();
+				int wordlen = word.var_str.size();
 
 				if (wordn > 1) {
 					if (!wordlen)
@@ -312,7 +312,7 @@ var var::oconv_T(const var& format) const {
 							var nextword =
 								part.field(" ", wordn + 1, 1);
 
-							int nextwordlen = nextword.length();
+							int nextwordlen = nextword.var_str.size();
 							if (nextwordlen + 1 > remaining)
 								break;
 
@@ -352,7 +352,7 @@ var var::oconv_MD(const char* conversion) const {
 	// 2. non-numeric string
 	// 3. plain "MD" conversion without any trailing digits
 	size_t convlen = strlen(conversion);
-	if (((this->var_typ & VARTYP_STR) && !var_str.length()) || !(this->isnum()) || convlen <= 2)
+	if (((this->var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || convlen <= 2)
 		return *this;
 
 	// default conversion options
@@ -465,19 +465,32 @@ convert:
 
 	// rounding
 	newmv = newmv.round(ndecimals);
+	newmv.createString();
 
-	var part1 = newmv.field(".", 1);
-	var part2 = newmv.field(".", 2);
-	int part2len = part2.length();
+	//var part1 = newmv.field(".", 1);
+	//var part2 = newmv.field(".", 2);
+	std::string part1;
+	std::string part2;
+	std::string::size_type decpos = newmv.var_str.find('.');
+	if (decpos == std::string::npos) {
+		part1 = newmv.var_str;
+		part2 = "";
+	} else {
+		part1 = newmv.var_str.substr(0, decpos);
+		part2 = newmv.var_str.substr(decpos + 1);
+	}
+
+	int part2len = part2.size();
 
 	// thousand separators
 	if (septhousands) {
-		int part1len = part1.length();
+		int part1len = part1.size();
 		if (part1len > 3) {
-			var thousandsep = (conversion[1] == 'C') ? '.' : ',';
-			var minii = part1[1] == "-" ? 2 : 1;
+			char thousandsep = (conversion[1] == 'C') ? '.' : ',';
+			int minii = part1.front() == '-' ? 2 : 1;
 			for (int ii = part1len - 2; ii > minii; ii -= 3) {
-				part1.splicer(ii, 0, thousandsep);
+				//part1.splicer(ii, 0, thousandsep);
+				part1.insert(ii - 1, 1, thousandsep);
 			}
 		}
 	}
@@ -485,14 +498,21 @@ convert:
 	// fixed decimals
 	if (ndecimals > 0) {
 		// append decimal point
-		part1 ^= (conversion[1] == 'C') ? ',' : '.';
+		//part1 ^= (conversion[1] == 'C') ? ',' : '.';
+		part1.push_back((conversion[1] == 'C') ? ',' : '.');
 
 		if (ndecimals == part2len)
-			part1 ^= part2;
-		else if (ndecimals > part2len)
-			part1 ^= part2 ^ std::string(ndecimals - part2len, '0');
+			//part1 ^= part2;
+			part1.append(part2);
+
+		else if (ndecimals > part2len) 
+			//part1 ^= part2 ^ std::string(ndecimals - part2len, '0');
+			part1.append(part2).append(std::string(ndecimals - part2len, '0'));
+
 		else /*if (ndecimals < part2len)*/
-			part1 ^= part2.substr(1, ndecimals);
+			//part1 ^= part2.substr(1, ndecimals);
+			part1.append(part2.substr(0, ndecimals));
+
 	}
 
 	// trailing minus, DB or CR or wrap negative with "<...>"
@@ -501,39 +521,50 @@ convert:
 			break;
 
 		case '<':
-			if (part1[1] == "-") {
-				part1.splicer(1, 1, "<");
-				part1 ^= ">";
+			if (part1.front() == '-') {
+				part1.front() = '<';
+				part1.push_back('>');
 			}
 			break;
 
 		case '-':
-			if (part1[1] == "-") {
-				part1.splicer(1, 1, "");
-				part1 ^= "-";
+			if (part1.front() == '-') {
+				part1.erase(0, 1);
+				part1.push_back('-');
 			} else
-				part1 ^= " ";
+				part1.push_back(' ');
 			break;
 
 		case 'C':
-			if (part1[1] == "-") {
-				part1.splicer(1, 1, "");
-				part1 ^= "CR";
-			} else
-				part1 ^= "DR";
+			if (part1.front() == '-') {
+				part1.erase(0,1);
+				//CR
+				part1.push_back('C');
+				part1.push_back('R');
+			} else {
+				//DR
+				part1.push_back('D');
+				part1.push_back('R');
+			}
 			break;
 
 		case 'D':
-			if (part1[1] == "-") {
-				part1.splicer(1, 1, "");
-				part1 ^= "DR";
-			} else
-				part1 ^= "CR";
+			if (part1.front() == '-') {
+				part1.erase(0,1);
+				//DR
+				part1.push_back('D');
+				part1.push_back('R');
+			} else {
+				//CR
+				part1.push_back('C');
+				part1.push_back('R');
+			}
 			break;
+
 	}
 
 	if (prefixchar != '\0')
-		part1.splicer(1, 0, prefixchar);
+		part1.insert(0, 1, prefixchar);
 
 	return part1;
 }
@@ -552,7 +583,7 @@ var var::oconv_LRC(const var& format) const {
 
 	// get padding character from "L(?)" or space
 	char fillchar;
-	if (format.var_str.length() >= 4 && format.var_str[1] == '(' && format.var_str[3] == ')')
+	if (format.var_str.size() >= 4 && format.var_str[1] == '(' && format.var_str[3] == ')')
 		fillchar = format.var_str[2];
 	else
 		fillchar = ' ';
@@ -574,7 +605,7 @@ var var::oconv_LRC(const var& format) const {
 
 		if (width) {
 
-			remaining = width - part.length();
+			remaining = width - part.var_str.size();
 			if (remaining > 0) {
 				if (just == "L") {
 					// output ^= part;
@@ -595,7 +626,7 @@ var var::oconv_LRC(const var& format) const {
 			} else {
 				if (just == "R") {
 					// take the last n characters
-					output ^= part.var_str.substr(part.var_str.length() - width,
+					output ^= part.var_str.substr(part.var_str.size() - width,
 												  width);
 				} else	// L or C
 				{
@@ -655,7 +686,7 @@ var var::oconv(const char* conversion) const {
 				part = this->substr2(charn, terminator);
 				// if len(part) or terminator then
 
-				if (part.var_typ & VARTYP_STR && part.var_str.length() == 0) {
+				if (part.var_typ & VARTYP_STR && part.var_str.size() == 0) {
 				} else if (!part.isnum())
 					output ^= part;
 				else
@@ -683,10 +714,10 @@ var var::oconv(const char* conversion) const {
 				// if len(part) or terminator then
 
 				// null string
-				// if (part.var_typ&VARTYP_STR && part.var_str.length()==0)
+				// if (part.var_typ&VARTYP_STR && part.var_str.size()==0)
 				//	{}
 				bool notemptystring =
-					!(part.var_typ & VARTYP_STR && part.var_str.length() == 0);
+					!(part.var_typ & VARTYP_STR && part.var_str.size() == 0);
 
 				// MR ... character replacement
 				if (*conversionchar == 'R') {
@@ -768,7 +799,7 @@ var var::oconv(const char* conversion) const {
 		case 'H':
 
 			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.length() == 0)
+			if (var_typ & VARTYP_STR && var_str.size() == 0)
 				return "";
 
 			// check 2nd character is E, 3rd character is X and next character is null, or a
@@ -800,7 +831,7 @@ var var::oconv(const char* conversion) const {
 
 		case 'B':
 			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.length() == 0)
+			if (var_typ & VARTYP_STR && var_str.size() == 0)
 				return "";
 			if (this->toBool())
 				return var(conversion).substr(2).field(",", 1);
@@ -863,7 +894,7 @@ var var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 								'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 	std::string result;
-	int nchars = this->length();
+	int nchars = this->var_str.size();
 	for (int charn = 0; charn < nchars; ++charn) {
 		char const byte = this->var_str[charn];
 		result += hex_chars[(byte & 0xF0) >> 4];
@@ -895,7 +926,7 @@ var var::iconv_HEX(const int ioratio) const {
 	// 8 hex digits to one wchar of size 4
 
 	// empty string in, empty string out
-	size_t endposn = var_str.length();
+	size_t endposn = var_str.size();
 	if (!endposn)
 		return "";
 

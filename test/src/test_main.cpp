@@ -933,6 +933,56 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(osbwrite("78","t_temp1234.txt",offs));
 //	abort("stopping");
 
+	{
+		assert(oconv(1234.56, "MD0").outputl() eq "1235");
+		assert(oconv(1234, "MD0").outputl() eq "1234");
+
+		assert(var(123.45).oconv("MD20P<").outputl() eq "123.45");
+		assert(var(123.45).oconv("MD20P-").outputl() eq "123.45 ");
+		assert(var(123.45).oconv("MD20PD").outputl() eq "123.45CR");
+		assert(var(123.45).oconv("MD20PC").outputl() eq "123.45DR");
+
+		assert(var(-123.45).oconv("MD20P<").outputl() eq "<123.45>");
+		assert(var(-123.45).oconv("MC20P-").outputl() eq "123,45-");
+		assert(var(-123.45).oconv("MD20PD").outputl() eq "123.45DR");
+		assert(var(-123.45).oconv("MD20PC").outputl() eq "123.45CR");
+
+		assert(var(-123).oconv("MD20P<").outputl() eq "<123.00>");
+		assert(var(-123.4).oconv("MD20P<").outputl() eq "<123.40>");
+		assert(var(-123.451).oconv("MC20P-").outputl() eq "123,45-");
+
+		assert(var(-123456789.123).oconv("MC20P-,").outputl() eq "123.456.789,12-");
+		assert(var(-23456789.123).oconv("MC20P-,").outputl() eq "23.456.789,12-");
+		assert(var(-3456789.123).oconv("MC20P-,").outputl() eq "3.456.789,12-");
+
+		assert(var(-123456789.123456).oconv("MC60P-,").outputl() eq "123.456.789,123456-");
+
+
+
+		assert(oconv(".56", "MD0").outputl() eq "1");
+
+		assert(var(".45").oconv("MD20P<").outputl() eq "0.45");
+		assert(var(".45").oconv("MD20P-").outputl() eq "0.45 ");
+		assert(var(".45").oconv("MD20PD").outputl() eq "0.45CR");
+		assert(var(".45").oconv("MD20PC").outputl() eq "0.45DR");
+
+		assert(var("-.45").oconv("MD20P<").outputl() eq "<0.45>");
+		assert(var("-.45").oconv("MC20P-").outputl() eq "0,45-");
+		assert(var("-.45").oconv("MD20PD").outputl() eq "0.45DR");
+		assert(var("-.45").oconv("MD20PC").outputl() eq "0.45CR");
+
+		assert(var("-123").oconv("MD20P<").outputl() eq "<123.00>");
+		assert(var("-123.4").oconv("MD20P<").outputl() eq "<123.40>");
+		assert(var("-123.451").oconv("MC20P-").outputl() eq "123,45-");
+
+		assert(var("-123456789.123").oconv("MC20P-,").outputl() eq "123.456.789,12-");
+		assert(var("-23456789.123").oconv("MC20P-,").outputl() eq "23.456.789,12-");
+		assert(var("-3456789.123").oconv("MC20P-,").outputl() eq "3.456.789,12-");
+
+		assert(var("-123456789.123456").oconv("MC60P-,").outputl() eq "123.456.789,123456-");
+
+	}
+
 	printl("test_main says 'Hello World!'");
 	//assert(setxlocale("fr_FR.utf8"));
 	//assert(setxlocale(1036));
