@@ -121,7 +121,7 @@ function onefile(in filename, in maxndifferences) {
 	var pick_sep;
 	var temp,sep2;
 
-	var funcnames="EXTRACT,REPLACE,INSERT,DELETE,==,!=,<,<=,>,>=,FIELD,ISNUM,FMT,OCONV,LOCATE,LOCATEUSING,LOCATEBY,LOCATEBYUSING,SUBSTR";
+	var funcnames="EXTRACT,REPLACE,INSERT,DELETE,==,!=,<,<=,>,>=,FIELD,ISNUM,FMT,OCONV,LOCATE,LOCATEUSING,LOCATEBY,LOCATEBYUSING,SUBSTR,SPLICER1,SPLICER2";
 	var funcno;
 
 	data.converter("\r\n",_FM_ _FM_);
@@ -132,7 +132,7 @@ function onefile(in filename, in maxndifferences) {
 	for (var line : data) {
 		if (not line)
 			continue;
-
+errputl(line);
 		lineno++;
 
 		//printl(line);
@@ -340,6 +340,18 @@ function onefile(in filename, in maxndifferences) {
 
 		case 19:
 			result=ARG0.substr(ARG1, ARG2);
+			break;
+
+		//SPLICER1 x[y]=a
+		case 20:
+			result=ARG0;
+			result.splicer(ARG1, ARG3);
+			break;
+
+		//SPLICER2 x[y,z]=a
+		case 21:
+			result=ARG0;
+			result.splicer(ARG1, ARG2, ARG3);
 			break;
 
 		default:

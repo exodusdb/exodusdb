@@ -1275,7 +1275,7 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 	ISSTRING(newstr)
 
 	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
-
+/*
 	unsigned int start1b;
 	if (start1 > 0) {
 		start1b = start1;
@@ -1286,24 +1286,83 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 	} else
 		start1b = 1;
 
+	std::cerr << "start1b == " << start1b << std::endl;
+
 	unsigned int lengthb;
-	if (length >= 0)
+	if (length >= 0) {
 		lengthb = length;
-	else {
+		std::cerr << "lengthb ++ " << lengthb << std::endl;
+
+	} else {
 		// cannot go before start of string
 		if ((start1b + length) <= 0) {
-			start1b = 1;
+		//if ((start1b + length) <= 1) {
 			lengthb = start1b;
+			start1b = 1;
+			std::cerr << "start1b <= " << start1b << std::endl;
+			std::cerr << "lengthb <= " << lengthb << std::endl;
 		} else {
+			std::cerr << "start1b .. " << start1b << std::endl;
+			std::cerr << "lengthb .. " << lengthb << std::endl;
 			start1b += length + 1;
 			lengthb = -length;
+			if (start1b == 0) {
+				start1b = 1;
+				lengthb -=1;
+			}
+			std::cerr << "start1b >> " << start1b << std::endl;
+			std::cerr << "lengthb >> " << lengthb << std::endl;
 		}
 	}
 
-	if (start1b > var_str.length())
+	if ((start1b-1) >= var_str.length())
 		var_str += newstr.var_str;
 	else
 		var_str.replace(start1b - 1, lengthb, newstr.var_str);
+
+*/
+	int start0;
+	int lengthb;
+
+	// First work out start index from start position
+	// Depends on length of string, if position is negative
+	if (start1 < 0)
+		// abcdef[-3,2] -> abcdef[4,2] ie de
+		start0 = var_str.length() + start1;
+	else
+		start0 = start1 - 1;
+
+	// Negative start index means 0
+	// abcdef[-8,2] -> abcdef[1,2] ie ab
+	if (start0 < 0)
+		start0 = 0;
+
+	// Negative length simply moves the start char backwards
+	// and the length is up to and including the start char
+	if (length < 0) {
+
+		// abcdef[4,-2]  -> abcdef[3,2]
+		// abcdef[4,-99] -> abcdef[1,4]
+
+		//int start0_save = start0;
+		lengthb = start0 + 1;
+
+		start0 = start0 + length + 1;
+		if (start0 < 0) {
+			start0 = 0;
+			//lengthb = start0_save + 1;
+		} else
+			lengthb = -length;
+
+		//std::cerr << "start0  = " << start0  << std::endl;
+		//std::cerr << "lengthb = " << lengthb << std::endl;
+	} else
+		lengthb = length;
+
+	if (uint(start0) >= var_str.length())
+		var_str += newstr.var_str;
+	else
+		var_str.replace(start0, lengthb, newstr.var_str);
 
 	return *this;
 }
@@ -1315,7 +1374,7 @@ var& var::splicer(const int start1, const var& newstr) {
 	ISSTRING(newstr)
 
 	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
-	uint start1b;
+	int start1b;
 	if (start1 > 0)
 		start1b = start1;
 	else if (start1 < 0) {
@@ -1325,7 +1384,7 @@ var& var::splicer(const int start1, const var& newstr) {
 	} else
 		start1b = 1;
 
-	if (start1b > var_str.length())
+	if (uint(start1b) > var_str.length())
 		var_str += newstr.var_str;
 	else
 		var_str.replace(start1b - 1, var_str.length(), newstr.var_str);
