@@ -954,7 +954,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 	// Cache the filehandle so future opens return the same
 	// Similar code in dbattach and open
-	thread_file_handles[filename2] = this->var_str;
+	thread_file_handles[filename2] = var_str;
 	//this->errputl("==== Connection cache ADDED   = ");
 
 	if (DBTRACE) {
@@ -983,7 +983,7 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno) {
 	if (!this->read(filehandle, key))
 		return false;
 
-	this->var_str = this->a(fieldno).var_str;
+	var_str = this->a(fieldno).var_str;
 	return true;
 }
 
@@ -1002,12 +1002,12 @@ bool var::reado(const var& filehandle, const var& key) {
 	if (!cachedrecord.empty()) {
 		// key.logputl("cache read " ^ filehandle.a(1) ^ "=");
 		//(*this) = cachedrecord;
-		this->var_str = cachedrecord;
-		this->var_typ = VARTYP_STR;
+		var_str = cachedrecord;
+		var_typ = VARTYP_STR;
 
 		//this->lasterror();
 
-		return not this->var_str.empty();
+		return not var_str.empty();
 	}
 
 	// ordinary read
@@ -1031,7 +1031,7 @@ bool var::writeo(const var& filehandle, const var& key) const {
 	int mvconn_no = get_mvconn_no_or_default(filehandle);
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed");
-	thread_connections.putrecord(mvconn_no, filehandle.a(1).var_str, key.var_str, this->var_str);
+	thread_connections.putrecord(mvconn_no, filehandle.a(1).var_str, key.var_str, var_str);
 
 	return true;
 }
@@ -1059,17 +1059,17 @@ bool var::read(const var& filehandle, const var& key) {
 
 	//amending var_str invalidates all flags
 	//var_typ = VARTYP_STR;
-	//this->var_typ = VARTYP_UNA;
-	//this->var_str.resize(0);
+	//var_typ = VARTYP_UNA;
+	//var_str.resize(0);
 
 	// LEAVE RECORD UNTOUCHED UNLESS RECORD IS SUCCESSFULLY READ
 	// initialise the record to unassigned (actually empty string at the moment)
 	// unless record and key are the same variable
 	// in which case allow failure to read to leave the record (key) untouched
 	//if (this != &key) {
-	//	this->var_typ = VARTYP_UNA;
-	//	//this->var_typ = VARTYP_STR;
-	//	this->var_str.resize(0);
+	//	var_typ = VARTYP_UNA;
+	//	//var_typ = VARTYP_STR;
+	//	var_str.resize(0);
 	//}
 
 	// lower case key if reading from dictionary
@@ -1111,8 +1111,8 @@ bool var::read(const var& filehandle, const var& key) {
 			return false;
 
 		// *this = "";
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
+		var_str.clear();
+		var_typ = VARTYP_STR;
 
 		var keyn;
 		int ntuples = PQntuples(pgresult);
@@ -1125,16 +1125,16 @@ bool var::read(const var& filehandle, const var& key) {
 						if (!this->locatebyusing("AR", FM_, key, keyn))
 							this->inserter(keyn, key);
 					} else {
-						this->var_str.append(key.var_str);
-						this->var_str.push_back(FM_);
+						var_str.append(key.var_str);
+						var_str.push_back(FM_);
 					}
 				}
 			}
 		}
 
 		//remove any trailing FM
-		if (this->var_str.back() == FM_)
-			this->var_str.pop_back();
+		if (var_str.back() == FM_)
+			var_str.pop_back();
 
 		//this->lasterror();
 
@@ -1511,7 +1511,7 @@ bool var::write(const var& filehandle, const var& key) const {
 	ISSTRING(key)
 
 	// std::string key2=key.var_str;
-	// std::string data2=this->var_str;
+	// std::string data2=var_str;
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
 
@@ -1596,7 +1596,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	filehandle.deleteo(key);
 
 	// std::string key2=key.var_str;
-	// std::string data2=this->var_str;
+	// std::string data2=var_str;
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
 
@@ -1672,7 +1672,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	filehandle.deleteo(key);
 
 	// std::string key2=key.var_str;
-	// std::string data2=this->var_str;
+	// std::string data2=var_str;
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
 
@@ -1743,7 +1743,7 @@ bool var::deleterecord(const var& key) const {
 	std::string key2 = key.normalize().var_str;
 
 	// filehandle dos or DOS means osread/oswrite/osdelete
-	if (this->var_str.size() == 3 && (this->var_str == "dos" || this->var_str == "DOS")) {
+	if (var_str.size() == 3 && (var_str == "dos" || var_str == "DOS")) {
 		//return this->osdelete(key2);
 		//use osfilenames unnormalised so we can read and write as is
 		return this->osdelete(key);
@@ -2713,8 +2713,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	//?allow undefined usage like var xyz=xyz.select();
 	if (var_typ & VARTYP_MASK) {
 		// throw MVUndefined("selectx()");
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
+		var_str.clear();
+		var_typ = VARTYP_STR;
 	}
 
 	// fieldnames.logputl("fieldnames=");
@@ -2723,8 +2723,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	// default to ""
 	if (!(var_typ & VARTYP_STR)) {
 		if (!var_typ) {
-			this->var_str.clear();
-			this->var_typ = VARTYP_STR;
+			var_str.clear();
+			var_typ = VARTYP_STR;
 		} else
 			this->createString();
 	}
@@ -4323,8 +4323,8 @@ bool var::readnext(var& key, var& valueno) {
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK) {
 		// throw MVUndefined("readnext()");
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
+		var_str.clear();
+		var_typ = VARTYP_STR;
 	}
 
 	// default cursor is ""
@@ -4422,8 +4422,8 @@ bool var::readnext(var& record, var& key, var& valueno) {
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
 		// throw MVUndefined("readnext()");
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
+		var_str.clear();
+		var_typ = VARTYP_STR;
 	}
 
 	// default cursor is ""

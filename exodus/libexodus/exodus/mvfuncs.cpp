@@ -149,8 +149,8 @@ var& var::input() {
 	THISIS("bool var::input()")
 	THISISDEFINED()
 
-	this->var_str.clear();
-	this->var_typ = VARTYP_STR;
+	var_str.clear();
+	var_typ = VARTYP_STR;
 
 	//LOCKIOSTREAM
 
@@ -172,8 +172,8 @@ var& var::input(const var& prompt) {
 
 	var default_input = this->assigned() ? (*this) : "";
 
-	this->var_str.clear();
-	this->var_typ = VARTYP_STR;
+	var_str.clear();
+	var_typ = VARTYP_STR;
 
 	//output any prompt and flush
 	if (prompt.length())
@@ -206,8 +206,8 @@ var& var::inputn(const int nchars) {
 
 	//LOCKIOSTREAM
 
-	this->var_str.clear();
-	this->var_typ = VARTYP_STR;
+	var_str.clear();
+	var_typ = VARTYP_STR;
 
 	//declare function in getkey.cpp
 	int getkey(void);
@@ -309,7 +309,7 @@ bool var::assigned() const {
 	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
 	// variables to functions in the functors on gcc THISISDEFINED()
 
-	if (this->var_typ & VARTYP_MASK)
+	if (var_typ & VARTYP_MASK)
 		return false;
 
 	return var_typ != VARTYP_UNA;
@@ -320,7 +320,7 @@ bool var::unassigned() const {
 	// THISIS("bool var::unassigned() const")
 	// THISISDEFINED()
 
-	if (this->var_typ & VARTYP_MASK)
+	if (var_typ & VARTYP_MASK)
 		return true;
 
 	return !var_typ;
@@ -715,8 +715,8 @@ var& var::trimmerf(const char* trimchar) {
 
 	if (start_pos == std::string::npos) {
 		// *this = "";
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
+		var_str.clear();
+		var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -749,8 +749,8 @@ var& var::trimmerb(const char* trimchar) {
 
 	if (end_pos == std::string::npos) {
 		// *this = "";
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
+		var_str.clear();
+		var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -789,8 +789,8 @@ var& var::trimmer(const char* trimchar) {
 	// if all blanks return empty string
 	if (start_pos == std::string::npos) {
 		// *this = "";
-		this->var_str.clear();
-		this->var_typ = VARTYP_STR;
+		var_str.clear();
+		var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1409,8 +1409,8 @@ var& var::popper() {
 	THISIS("var& var::popper()")
 	THISISSTRINGMUTATOR()
 
-	if (!this->var_str.empty())
-		this->var_str.pop_back();
+	if (!var_str.empty())
+		var_str.pop_back();
 
 	return *this;
 }
@@ -1444,8 +1444,8 @@ var& var::transfer(var& destinationvar) {
 	destinationvar.var_int = var_int;
 	destinationvar.var_dbl = var_dbl;
 
-	this->var_str.clear();
-	this->var_typ = VARTYP_STR;
+	var_str.clear();
+	var_typ = VARTYP_STR;
 
 	return destinationvar;
 }
@@ -1754,17 +1754,17 @@ bool var::isnum(void) const {
 	THISISDEFINED()
 
 	// is numeric already
-	if (this->var_typ & VARTYP_INTDBL)
+	if (var_typ & VARTYP_INTDBL)
 		return true;
 
 	// is known not numeric already
 	// maybe put this first if comparison operations on strings are more frequent than numeric
 	// operations on numbers
-	if (this->var_typ & VARTYP_NAN)
+	if (var_typ & VARTYP_NAN)
 		return false;
 
 	// not assigned error
-	if (!this->var_typ)
+	if (!var_typ)
 		throw MVUnassigned("isnum()");
 
 	// if not a number and not unassigned then it is an unknown string
@@ -1795,7 +1795,7 @@ bool var::isnum(void) const {
 	//if (strlen > 33) {
 	//play safe
 	if (strlen > 48) {
-		this->var_typ = VARTYP_NANSTR;
+		var_typ = VARTYP_NANSTR;
 		return false;
 	}
 
@@ -1805,7 +1805,7 @@ bool var::isnum(void) const {
 		// . 2E		number 30-39
 		if (cc > '9')  // for sure not a number
 		{
-			this->var_typ = VARTYP_NANSTR;
+			var_typ = VARTYP_NANSTR;
 			return false;
 		}
 		if (cc >= '0') {
@@ -1815,7 +1815,7 @@ bool var::isnum(void) const {
 				case '.':
 					if (point)	// 2nd point - is non-numeric
 					{
-						this->var_typ = VARTYP_NANSTR;
+						var_typ = VARTYP_NANSTR;
 						return false;
 					}
 					point = true;
@@ -1826,14 +1826,14 @@ bool var::isnum(void) const {
 					// non-numeric if +/- is not the first character or is the only
 					// character
 					if (ii) {
-						this->var_typ = VARTYP_NANSTR;
+						var_typ = VARTYP_NANSTR;
 						return false;
 					}
 					break;
 
 				// any other character mean non-numeric
 				default:
-					this->var_typ = VARTYP_NANSTR;
+					var_typ = VARTYP_NANSTR;
 					return false;
 			}
 		}
@@ -1854,14 +1854,14 @@ bool var::isnum(void) const {
 	if (!digit) {
 
 		// must be at least one digit unless zero length string
-		if (not this->var_str.empty()) {
-			this->var_typ = VARTYP_NANSTR;
+		if (not var_str.empty()) {
+			var_typ = VARTYP_NANSTR;
 			return false;
 		}
 
 		// zero length string is integer 0
-		this->var_int = 0;
-		this->var_typ = VARTYP_INTSTR;
+		var_int = 0;
+		var_typ = VARTYP_INTSTR;
 		return true;
 	}
 
@@ -1889,17 +1889,17 @@ bool var::isnum(void) const {
 			///		std::string result(var_str.begin(),var_str.end());
 			///		var_dbl=atof(result.c_str());
 			//      var_dbl = strtod(var_str.c_str(), 0);
-			//      this->var_dbl = std::stod(var_str.c_str(), 0);
+			//      var_dbl = std::stod(var_str.c_str(), 0);
 
 #if defined(HAS_FASTFLOAT)
 			//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
 
-			char* first = this->var_str.data();
+			char* first = var_str.data();
 			first += *first == '+';
-			auto [p, ec] = fast_float::from_chars(first, this->var_str.data() + this->var_str.size(), this->var_dbl, fast_float::chars_format::fixed);
+			auto [p, ec] = fast_float::from_chars(first, var_str.data() + var_str.size(), var_dbl, fast_float::chars_format::fixed);
 			if (ec != std::errc()) {
 				//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
-				this->var_typ = VARTYP_NANSTR;
+				var_typ = VARTYP_NANSTR;
 				return false;
 			}
 
@@ -1907,9 +1907,9 @@ bool var::isnum(void) const {
 
 			//std::cout << "from_chars decimal iconv" << var_str << std::endl;
 
-			auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data() + this->var_str.size(), this->var_dbl);
+			auto [p, ec] = std::from_chars(var_str.data(), var_str.data() + var_str.size(), var_dbl);
 			if (ec != std::errc()) {
-				this->var_typ = VARTYP_NANSTR;
+				var_typ = VARTYP_NANSTR;
 				return false;
 			}
 
@@ -1917,8 +1917,8 @@ bool var::isnum(void) const {
 
 			//std::cout << "ryu_parse decimal iconv" << var_str << std::endl;
 
-			//Status status = s2d(this->var_str.c_str(), this->var_dbl);
-			Status status = s2d_n(this->var_str.data(), int(this->var_str.size()), &this->var_dbl);
+			//Status status = s2d(var_str.c_str(), var_dbl);
+			Status status = s2d_n(var_str.data(), int(var_str.size()), &var_dbl);
 			//  SUCCESS,
 			//  INPUT_TOO_SHORT,
 			//  INPUT_TOO_LONG,
@@ -1931,11 +1931,11 @@ bool var::isnum(void) const {
 			//std::cout << "std::stod decimal iconv" << var_str << std::endl;
 
 			//boring old std::stod currently (2021) much slower than fastfloat
-			this->var_dbl = std::stod(this->var_str);
+			var_dbl = std::stod(var_str);
 
 #endif
 
-			this->var_typ = VARTYP_DBLSTR;
+			var_typ = VARTYP_DBLSTR;
 
 		}
 
@@ -1955,17 +1955,17 @@ bool var::isnum(void) const {
 			//v.isnum();//+49ns (76ns) using atol BEST
 
 #if 1
-			//this->var_int = std::stol(var_str.c_str(), 0, 10);
-			//this->var_int = std::stol(this->var_str);
-			this->var_int = std::atol(this->var_str.c_str());  //fastest gcc 10.2
+			//var_int = std::stol(var_str.c_str(), 0, 10);
+			//var_int = std::stol(var_str);
+			var_int = std::atol(var_str.c_str());  //fastest gcc 10.2
 #else
-			auto [p, ec] = std::from_chars(this->var_str.data(), this->var_str.data() + this->var_str.size(), this->var_int);
+			auto [p, ec] = std::from_chars(var_str.data(), var_str.data() + var_str.size(), var_int);
 			if (ec != std::errc()) {
-				this->var_typ = VARTYP_NANSTR;
+				var_typ = VARTYP_NANSTR;
 				return false;
 			}
 #endif
-			this->var_typ = VARTYP_INTSTR;
+			var_typ = VARTYP_INTSTR;
 		}
 
 	}
@@ -1973,7 +1973,7 @@ bool var::isnum(void) const {
 	//catch (std::out_of_range) could be too many digits eg (a very long string of digits)
 	catch (...) {
 		//throw MVError("Cannot convert '" ^ *this ^ "' to long int");
-		this->var_typ = VARTYP_NANSTR;
+		var_typ = VARTYP_NANSTR;
 		return false;
 	}
 

@@ -352,7 +352,7 @@ var var::oconv_MD(const char* conversion) const {
 	// 2. non-numeric string
 	// 3. plain "MD" conversion without any trailing digits
 	size_t convlen = strlen(conversion);
-	if (((this->var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || convlen <= 2)
+	if (((var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || convlen <= 2)
 		return *this;
 
 	// default conversion options
@@ -894,9 +894,9 @@ var var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 								'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 	std::string result;
-	int nchars = this->var_str.size();
+	int nchars = var_str.size();
 	for (int charn = 0; charn < nchars; ++charn) {
-		char const byte = this->var_str[charn];
+		char const byte = var_str[charn];
 		result += hex_chars[(byte & 0xF0) >> 4];
 		result += hex_chars[(byte & 0x0F) >> 0];
 	}

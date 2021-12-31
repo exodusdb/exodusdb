@@ -13,8 +13,8 @@ bool var::getcursor() const {
 	THISISDEFINED()
 
 	// returns empty string if fails
-	this->var_str.clear();
-	this->var_typ = VARTYP_STR;
+	var_str.clear();
+	var_typ = VARTYP_STR;
 
 	return false;
 
@@ -99,7 +99,7 @@ bool var::getcursor() const {
 	//x.oconv("HEX").outputl("x=");
 	//y.oconv("HEX").outputl("y=");
 
-	this->var_str = this->at(x, y).var_str;
+	var_str = this->at(x, y).var_str;
 
 	std::cout << var_str << std::endl;
 

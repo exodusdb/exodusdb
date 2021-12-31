@@ -1495,7 +1495,7 @@ var& var::operator^(const var& vstr) {
 	THISISSTRING()
 	ISSTRING(vstr)
 
-	this->var_str += vstr.var_str;
+	var_str += vstr.var_str;
 
 	return *this;
 }
@@ -1505,7 +1505,7 @@ var& var::operator^(const char* cstr) {
 	THISIS("var& var::operator^(const char& cstr)")
 	THISISSTRING()
 
-	this->var_str += cstr;
+	var_str += cstr;
 
 	return *this;
 }
@@ -1515,7 +1515,7 @@ var& var::operator^(const std::string& stdstr) {
 	THISISSTRING()
 	ISSTRING(stdstr)
 
-	this->var_str += stdstr.var_str;
+	var_str += stdstr.var_str;
 
 	return *this;
 }

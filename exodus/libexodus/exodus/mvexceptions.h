@@ -85,25 +85,25 @@ THE SOFTWARE.
 // see long comment on ISDEFINED
 #define THISISDEFINED()                                       \
 	/*std::cout<< functionname << " " <<var_typ<<std::endl;*/ \
-	if (/*(!this) ||*/ this->var_typ & VARTYP_MASK)           \
+	if (/*(!this) ||*/ var_typ & VARTYP_MASK)           \
 		throw MVUndefined("var in " ^ var(functionname));
 
 // includes isdefined
 #define THISISASSIGNED() \
 	THISISDEFINED()      \
-	if (!this->var_typ)  \
+	if (!var_typ)  \
 		throw MVUnassigned("var in " ^ var(functionname));
 
 // includes isdefined directly and checks assigned if not string
 #define THISISSTRINGMUTATOR() \
 	THISISSTRING()            \
-	this->var_typ = VARTYP_STR;	 //reset all flags
+	var_typ = VARTYP_STR;	 //reset all flags
 
 // includes isdefined directly and checks assigned if not string
 #define THISISSTRING()                                         \
 	THISISDEFINED()                                            \
-	if (!(this->var_typ & VARTYP_STR)) {                       \
-		if (!this->var_typ)                                    \
+	if (!(var_typ & VARTYP_STR)) {                       \
+		if (!var_typ)                                    \
 			throw MVUnassigned("var in " ^ var(functionname)); \
 		this->createString();                                  \
 	};

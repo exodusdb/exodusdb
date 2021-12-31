@@ -1667,10 +1667,10 @@ class DLL_PUBLIC var final {
 	//END - free function to create an interator -> end
 	DLL_PUBLIC friend var_iter end(const var& v);
 
-	bool THIS_IS_DBCONN() const { return ((this->var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
-	bool THIS_IS_OSFILE() const { return ((this->var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
-	// bool THIS_IS_DBCONN() const	{ return this->var_typ & VARTYP_DBCONN; }
-	// bool THIS_IS_OSFILE() const	{ return this->var_typ & VARTYP_OSFILE; }
+	bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
+	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
+	// bool THIS_IS_DBCONN() const	{ return var_typ & VARTYP_DBCONN; }
+	// bool THIS_IS_OSFILE() const	{ return var_typ & VARTYP_OSFILE; }
 
 };	// of class "var"
 
