@@ -227,7 +227,8 @@ var& var::inputn(const int nchars) {
 			if (int1 < 0)
 				break;
 
-			var_str += int1;
+			//var_str += int1;
+			var_str.push_back(int1);
 		}
 	}
 
@@ -253,11 +254,12 @@ var& var::inputn(const int nchars) {
 			//	break;
 
 			// add the character to the output
-			var_str += int1;
+			//var_str += int1;
+			var_str.push_back(int1);
 
 			// quit if got the desired number of characters
 			//nchars cannot be negative at this point
-			if (var_str.length() >= uint(nchars))
+			if (var_str.size() >= uint(nchars))
 				break;
 		}
 
@@ -472,7 +474,6 @@ bool var::toBool() const {
 
 		// non-numeric strings are true unless zero length
 		if (var_typ & VARTYP_NAN)
-			// return (bool)(var_str.length()!=0);
 			return !var_str.empty();
 
 		// doubles are true unless zero
@@ -570,7 +571,7 @@ var var::length() const {
 	THISIS("var var::length() const")
 	THISISSTRING()
 
-	return int(var_str.length());
+	return int(var_str.size());
 }
 
 // synonym for length for compatibility with pick's len()
@@ -578,7 +579,7 @@ var var::len() const {
 	THISIS("var var::len() const")
 	THISISSTRING()
 
-	return int(var_str.length());
+	return int(var_str.size());
 }
 
 const char* var::data() const {
@@ -800,7 +801,7 @@ var& var::trimmer(const char* trimchar) {
 	// find the last non blank
 	std::string::size_type end_pos;
 	// end_pos=var_str.find_last_not_of(trimchar);
-	end_pos = var_str.find_last_not_of(trimchar, var_str.length() - 1);
+	end_pos = var_str.find_last_not_of(trimchar, var_str.size() - 1);
 
 	// erase trailing spaces
 	var_str.erase(end_pos + 1);
@@ -1111,7 +1112,7 @@ var var::seq() const {
 	THISIS("var var::seq() const")
 	THISISSTRING()
 
-	if (var_str.length() == 0)
+	if (var_str.empty())
 		return 0;
 
 	int byteno = var_str[0];
@@ -1126,7 +1127,7 @@ var var::textseq() const {
 	THISIS("var var::textseq() const")
 	THISISSTRING()
 	/*
-		if (var_str.length()==0)
+		if (var_str.empty())
 			return 0;
 
 		int byteno=var_str[0];
@@ -1181,7 +1182,7 @@ var& var::quoter() {
 
 	// NB this is std::string "replace" not var field replace
 	var_str.replace(0, 0, "\"");
-	var_str += '"';
+	var_str.push_back('"');
 	return *this;
 }
 
@@ -1202,7 +1203,7 @@ var& var::squoter() {
 
 	// NB this is std::string "replace" not var field replace
 	var_str.replace(0, 0, "'");
-	var_str += '\'';
+	var_str.push_back('\'');
 	return *this;
 }
 
@@ -1226,7 +1227,7 @@ var& var::unquoter() {
 	// characters
 
 	// no change if no length
-	size_t len = var_str.length();
+	size_t len = var_str.size();
 	if (len < 2)
 		return *this;
 
@@ -1280,7 +1281,7 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 	if (start1 > 0) {
 		start1b = start1;
 	} else if (start1 < 0) {
-		start1b = var_str.length() + start1 + 1;
+		start1b = var_str.size() + start1 + 1;
 		if (start1b < 1)
 			start1b = 1;
 	} else
@@ -1315,7 +1316,7 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 		}
 	}
 
-	if ((start1b-1) >= var_str.length())
+	if ((start1b-1) >= var_str.size())
 		var_str += newstr.var_str;
 	else
 		var_str.replace(start1b - 1, lengthb, newstr.var_str);
@@ -1328,7 +1329,7 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 	// Depends on length of string, if position is negative
 	if (start1 < 0)
 		// abcdef[-3,2] -> abcdef[4,2] ie de
-		start0 = var_str.length() + start1;
+		start0 = var_str.size() + start1;
 	else
 		start0 = start1 - 1;
 
@@ -1359,7 +1360,7 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 	} else
 		lengthb = length;
 
-	if (uint(start0) >= var_str.length())
+	if (uint(start0) >= var_str.size())
 		var_str += newstr.var_str;
 	else
 		var_str.replace(start0, lengthb, newstr.var_str);
@@ -1378,16 +1379,16 @@ var& var::splicer(const int start1, const var& newstr) {
 	if (start1 > 0)
 		start1b = start1;
 	else if (start1 < 0) {
-		start1b = int(var_str.length()) + start1 + 1;
+		start1b = int(var_str.size()) + start1 + 1;
 		if (start1b < 1)
 			start1b = 1;
 	} else
 		start1b = 1;
 
-	if (uint(start1b) > var_str.length())
+	if (uint(start1b) > var_str.size())
 		var_str += newstr.var_str;
 	else
-		var_str.replace(start1b - 1, var_str.length(), newstr.var_str);
+		var_str.replace(start1b - 1, var_str.size(), newstr.var_str);
 
 	return *this;
 }
@@ -1414,6 +1415,22 @@ var& var::popper() {
 	return *this;
 }
 
+
+/* Failed attempt to get compiler to call different functions depending on specific arguments
+
+template<class T1, class T2, class T3>
+var& splicerx(T1 start1, T2 length, const T3 str) {
+	return this->splice(start1, length, var(str));
+};
+
+// Specialise splicer(-1, 1, "") to call popper()
+// Sadly compiler never chooses this one over the main template
+template<const int = -1, const int = 1, const char* = "">
+var& splicerx(const int start1, const int length, const char* c) {
+       this->outputl("testing");
+       return this->popper();
+};
+*/
 
 var& var::transfer(var& destinationvar) {
 	THISIS("var& var::transfer(var& destinationvar)")
@@ -1482,7 +1499,7 @@ var var::str(const int num) const {
 	if (num < 0)
 		return newstr;
 
-	int basestrlen = int(var_str.length());
+	int basestrlen = int(var_str.size());
 	if (basestrlen == 1)
 		newstr.var_str.resize(num, var_str.at(0));
 	else if (basestrlen)
@@ -1764,8 +1781,8 @@ bool var::isnum(void) const {
 	// Suggestion: statistically, non numeric strings are postfixed by numbers but not prefixed.
 	// Example, natural names for DB tables are CUSTOMERS1 and REPORT2009, but not 1CUSTOMER and
 	// 2009REPORT
-	//	for (int ii=(int)var_str.length()-1;ii>=0;--ii)
-	int strlen = var_str.length();
+	//	for (int ii=(int)var_str.size()-1;ii>=0;--ii)
+	int strlen = var_str.size();
 
 	//very long strings, even if numeric, are deemed not numeric because they cannot be converted to double/long int
 	//if (strlen > 30) {
@@ -1837,7 +1854,7 @@ bool var::isnum(void) const {
 	if (!digit) {
 
 		// must be at least one digit unless zero length string
-		if (this->var_str.length()) {
+		if (not this->var_str.empty()) {
 			this->var_typ = VARTYP_NANSTR;
 			return false;
 		}
@@ -1984,7 +2001,7 @@ const var& var::put(std::ostream& ostream1) const {
 	// verify conversion to UTF8
 	// std::string tempstr=(*this).toString();
 
-	ostream1.write(var_str.data(), (std::streamsize)var_str.length());
+	ostream1.write(var_str.data(), (std::streamsize)var_str.size());
 	return *this;
 }
 
@@ -2133,7 +2150,7 @@ var var::dcount(const var& substrx) const {
 	THISISSTRING()
 	ISSTRING(substrx)
 
-	if (var_str.length() == 0)
+	if (var_str.empty())
 		return 0;
 
 	return count(substrx) + 1;
@@ -2151,7 +2168,7 @@ var var::count(const var& substrx) const {
 	if (substrx.var_str == "")
 		return 0;
 
-	std::string::size_type substr_len = substrx.var_str.length();
+	std::string::size_type substr_len = substrx.var_str.size();
 
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = 0;
@@ -2215,7 +2232,7 @@ var var::index(const var& substrx, const int occurrenceno) const {
 		return var(0);
 
 	std::string::size_type start_pos = 0;
-	std::string::size_type substr_len = substrx.var_str.length();
+	std::string::size_type substr_len = substrx.var_str.size();
 
 	// negative and 0th occurrence mean the first
 	int countdown = occurrenceno >= 1 ? occurrenceno : 1;
@@ -2536,7 +2553,7 @@ var var::at(const int columnno) const {
 	if (columnno > 0) {
 		std::string tempstr = "\x1B[";
 		tempstr += intToString(columnno);
-		tempstr += "G";
+		tempstr.push_back('G');
 		return tempstr;
 	}
 	// clear the screen and home the cursor
@@ -2568,9 +2585,9 @@ var var::at(const int columnno, const int rowno) const {
 
 	std::string tempstr = "\x1B[";
 	tempstr += intToString(rowno);
-	tempstr += ";";
+	tempstr.push_back(';');
 	tempstr += intToString(columnno);
-	tempstr += "H";
+	tempstr.push_back('H');
 	return tempstr;
 }
 

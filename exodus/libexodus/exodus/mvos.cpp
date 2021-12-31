@@ -569,7 +569,7 @@ void var::initrnd() const {
 		seed = 1;
 		for (size_t ii = 0; ii < this->var_str.size(); ii++)
 			seed *= this->var_str[ii];
-		// seed=MurmurHash64((char*)this->var_str.data(),int(this->var_str.length()*sizeof(char)),0);
+		// seed=MurmurHash64((char*)this->var_str.data(),int(this->var_str.size()*sizeof(char)),0);
 	}
 	// set the new seed
 	// logputl("Seeding random number generator to " ^ (*this));
@@ -806,8 +806,8 @@ var& var::swapper(const var& what, const var& with) {
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return *this;
-		this->var_str.replace(start_pos, what.var_str.length(), with.var_str);
-		start_pos += with.var_str.length();
+		this->var_str.replace(start_pos, what.var_str.size(), with.var_str);
+		start_pos += with.var_str.size();
 	}
 
 	return *this;
@@ -862,7 +862,7 @@ bool var::osgetenv(const var& envvarname) {
 	ISSTRING(envvarname)
 
 	// return whole environment if blank envvarname
-	if (envvarname.var_str.length() == 0) {
+	if (envvarname.var_str.empty()) {
 
 		this->var_str.clear();
 		var_typ = VARTYP_STR;
@@ -1311,7 +1311,7 @@ bool var::oswrite(const var& osfilename, const var& codepage) const {
 		std::string tempstr = boost::locale::conv::from_utf<char>(this->var_str, codepage.var_str);
 		myfile.write(tempstr.data(), int(tempstr.length()));
 	} else {
-		myfile.write(this->var_str.data(), int(this->var_str.length()));
+		myfile.write(this->var_str.data(), int(this->var_str.size()));
 	}
 	bool failed = myfile.fail();
 	myfile.close();
@@ -1357,7 +1357,7 @@ bool var::osbwrite(const var& osfilevar, var& offset) const {
 			static_cast<long>(offset.toInt()));	 // avoid warning, see comments to seekg()
 
 	// NB but write length goes by number of wide characters (not bytes)
-	pmyfile->write(this->var_str.data(), int(this->var_str.length()));
+	pmyfile->write(this->var_str.data(), int(this->var_str.size()));
 
 	// on windows, fstream will try to convert to current locale codepage so
 	// if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
@@ -1529,7 +1529,7 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize) {
 		int nextrabytes = count_excess_UTF8_bytes(this->var_str);
 		if (nextrabytes) {
 			offset -= nextrabytes;
-			this->var_str.resize(this->var_str.length() - nextrabytes);
+			this->var_str.resize(this->var_str.size() - nextrabytes);
 		}
 	}
 

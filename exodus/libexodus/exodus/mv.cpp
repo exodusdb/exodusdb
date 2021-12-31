@@ -539,7 +539,7 @@ var& var::operator^=(const char char1) & {
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
-	var_str += char1;
+	var_str.push_back(char1);
 	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
@@ -967,17 +967,17 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs) {
 				return true;
 			// otherwise if either is empty then return eq false
 			//(since empty string is ONLY eq to another empty string)
-			if (lhs.var_str.length() == 0)
+			if (lhs.var_str.empty())
 				// different from MVlt
 				return false;
-			if (rhs.var_str.length() == 0)
+			if (rhs.var_str.empty())
 				// SAME as MVlt
 				return false;
 			// otherwise go on to test numerically then literally
 		} else {
 			// if rhs isnt a string and lhs is empty then eq is false
 			//(after checking that rhs is actually assigned)
-			if (lhs.var_str.length() == 0) {
+			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
 					// throw MVUnassigned("eq(rhs)");
 					ISASSIGNED(rhs)
@@ -989,7 +989,7 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs) {
 	} else {
 		// if lhs isnt a string and rhs is an empty string then return eq false
 		//(after checking that lhs is actually assigned)
-		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.length() == 0)) {
+		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
 				// throw MVUnassigned("eq(lhs)");
 				ISASSIGNED(lhs)
@@ -1084,17 +1084,17 @@ DLL_PUBLIC bool MVlt(const var& lhs, const var& rhs) {
 				return false;
 			// otherwise if either is empty then return eq false
 			//(since empty string is ONLY eq to another empty string)
-			if (lhs.var_str.length() == 0)
+			if (lhs.var_str.empty())
 				// different from MVeq
 				return true;
-			if (rhs.var_str.length() == 0)
+			if (rhs.var_str.empty())
 				// SAME as MVeq
 				return false;
 			// otherwise go on to test numerically then literally
 		} else {
 			// if rhs isnt a string and lhs is empty then eq is false
 			// after checking that rhs is actually assigned
-			if (lhs.var_str.length() == 0) {
+			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
 					// throw MVUnassigned("eq(rhs)");
 					ISASSIGNED(rhs)
@@ -1106,7 +1106,7 @@ DLL_PUBLIC bool MVlt(const var& lhs, const var& rhs) {
 	} else {
 		// if lhs isnt a string and rhs is an empty string then return eq false
 		// after checking that lhs is actually assigned
-		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.length() == 0)) {
+		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
 				// throw MVUnassigned("eq(lhs)");
 				ISASSIGNED(lhs)
@@ -1163,7 +1163,7 @@ DLL_PUBLIC bool MVlt(const var& lhs, const int int2) {
 	if (lhs.var_typ & VARTYP_STR) {
 		// if rhs isnt a string and lhs is empty then eq is false
 		// after checking that rhs is actually assigned
-		if (lhs.var_str.length() == 0) {
+		if (lhs.var_str.empty()) {
 			// different from MVeq
 			return true;
 		}
@@ -1204,7 +1204,7 @@ DLL_PUBLIC bool MVlt(const int int1, const var& rhs) {
 
 	// 1. both empty or identical strings returns eq. one empty results false
 	if (rhs.var_typ & VARTYP_STR) {
-		if (rhs.var_str.length() == 0)
+		if (rhs.var_str.empty())
 			// SAME as MVeq
 			return false;
 		// otherwise go on to test numerically then literally
@@ -1805,7 +1805,7 @@ std::string dblToString(double double1) {
 #ifdef USE_RYU
 		//single zero if none
 		//if (s.size() == std::size_t(minus))
-		if (s.size() == 0 || s == "-")
+		if (s.empty() || s == "-")
 			s.push_back('0');
 #endif
 #endif

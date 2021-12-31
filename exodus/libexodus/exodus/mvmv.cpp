@@ -60,7 +60,7 @@ var var::field(const var& separatorx, const int fieldnx, const int nfieldsx) con
 	int nfields = nfieldsx > 0 ? nfieldsx : 1;
 
 	// separator might be multi-byte ... esp. for non-ASCII
-	std::string::size_type len_separator = separatorx.var_str.length();
+	std::string::size_type len_separator = separatorx.var_str.size();
 
 	// FIND FIELD
 
@@ -84,7 +84,7 @@ var var::field(const var& separatorx, const int fieldnx, const int nfieldsx) con
 		end_pos = var_str.find(separatorx.var_str, end_pos);
 		// past of of string?
 		if (end_pos == std::string::npos) {
-			return this->var_str.substr(start_pos, var_str.length() - start_pos);
+			return this->var_str.substr(start_pos, var_str.size() - start_pos);
 		}
 		// end_pos++;
 		end_pos += len_separator;
@@ -128,7 +128,7 @@ var& var::fieldstorer(const var& separator0, const int fieldnx, const int nfield
 	}
 
 	// handle multibyte/non-ASCII separators
-	std::string::size_type separator_len = separator0.var_str.length();
+	std::string::size_type separator_len = separator0.var_str.size();
 
 	int fieldno;
 	if (fieldnx > 0)
@@ -498,7 +498,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		if (valueno || subvalueno)
 			fieldno = 1;
 		else {
-			return locateat(var_str, target, (size_t)0, var_str.length(), ordermode,
+			return locateat(var_str, target, (size_t)0, var_str.size(), ordermode,
 							usingchar, setting);
 		}
 	}
@@ -523,7 +523,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 	std::string::size_type field_end_pos;
 	field_end_pos = var_str.find(FM_, start_pos);
 	if (field_end_pos == std::string::npos)
-		field_end_pos = var_str.length();
+		field_end_pos = var_str.size();
 
 	// FIND VALUE
 
@@ -874,7 +874,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 	std::string::size_type field_end_pos;
 	field_end_pos = var_str.find(FM_, start_pos);
 	if (field_end_pos == std::string::npos)
-		field_end_pos = var_str.length();
+		field_end_pos = var_str.size();
 
 	// FIND VALUE
 
@@ -991,7 +991,7 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 		// find the end of the field (or string)
 		field_end_pos = var_str.find(FM_, start_pos);
 		if (field_end_pos == std::string::npos)
-			field_end_pos = var_str.length();
+			field_end_pos = var_str.size();
 	}
 
 	////////////// FIND VALUE ///////////////////
@@ -1004,7 +1004,7 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 	} else if (valueno == 0 && subvalueno == 0) {
 		if (fieldno > 1)
 			start_pos--;
-		else if (field_end_pos < var_str.length())
+		else if (field_end_pos < var_str.size())
 			field_end_pos++;
 		var_str.erase(start_pos, field_end_pos - start_pos);
 		return *this;
@@ -1117,9 +1117,10 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement) {
 	// negative means append
 	if (fieldno < 0) {
 		// append a FM_ only if there is existing data
-		if (var_str.length() != 0)
-			var_str += FM_;
-		start_pos = var_str.length();
+		if (not var_str.empty())
+			//var_str += FM_;
+			var_str.push_back(FM_);
+		start_pos = var_str.size();
 		field_end_pos = start_pos;
 	} else {
 
@@ -1130,7 +1131,7 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement) {
 			// past of of string?
 			if (start_pos == std::string::npos) {
 				var_str.append(fieldno - fieldn2, FM_);
-				// start_pos=var_str.length();
+				// start_pos=var_str.size();
 				// fieldn2=fieldno
 				break;
 			}
@@ -1140,12 +1141,12 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement) {
 
 		// find the end of the field (or string)
 		if (start_pos == std::string::npos) {
-			start_pos = var_str.length();
+			start_pos = var_str.size();
 			field_end_pos = start_pos;
 		} else {
 			field_end_pos = var_str.find(FM_, start_pos);
 			if (field_end_pos == std::string::npos)
-				field_end_pos = var_str.length();
+				field_end_pos = var_str.size();
 		}
 	}
 
@@ -1285,7 +1286,8 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 
 	// 0,0,0 is like 1,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {
-		if (var_str.length())
+		//if (var_str.size())
+		if (not var_str.empty())
 			var_str.insert(0, insertion.var_str + FM_);
 		else
 			var_str = insertion.var_str;
@@ -1301,10 +1303,11 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 	// negative means append
 	if (fieldno < 0) {
 		// append a FM_ only if there is existing data
-		if (var_str.length() != 0)
-			var_str += FM_;
+		if (not var_str.empty())
+			//var_str += FM_;
+			var_str.push_back(FM_);
 		pad = true;
-		start_pos = var_str.length();
+		start_pos = var_str.size();
 		field_end_pos = start_pos;
 	} else {
 		// find the starting position of the field or append enough FM_ to satisfy
@@ -1315,7 +1318,7 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 			if (start_pos == std::string::npos) {
 				pad = true;
 				var_str.append(fieldno - fieldn2, FM_);
-				// start_pos=var_str.length();
+				// start_pos=var_str.size();
 				// fieldn2=fieldno
 				break;
 			}
@@ -1325,12 +1328,12 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 
 		// find the end of the field (or string)
 		if (start_pos == std::string::npos) {
-			start_pos = var_str.length();
+			start_pos = var_str.size();
 			field_end_pos = start_pos;
 		} else {
 			field_end_pos = var_str.find(FM_, start_pos);
 			if (field_end_pos == std::string::npos)
-				field_end_pos = var_str.length();
+				field_end_pos = var_str.size();
 		}
 	}
 
@@ -1347,7 +1350,7 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 		value_end_pos = field_end_pos;
 		pad = true;
 	} else if (valueno == 0 && subvalueno == 0) {
-		if (!pad && var_str.length())
+		if (!pad && !var_str.empty())
 			var_str.insert(start_pos, _FM_);
 		var_str.insert(start_pos, insertion.var_str);
 		return *this;
@@ -1523,7 +1526,7 @@ var& var::substr(const int startindex1, const int length) && {
 // in-place
 var& var::substrer(const int startindex1) {
 	// TODO look at using erase to speed up
-	return this->substrer(startindex1, (int)var_str.length());
+	return this->substrer(startindex1, (int)var_str.size());
 }
 
 //[x,y]
@@ -1533,7 +1536,7 @@ var& var::substrer(const int startindex1, const int length) {
 	THISISSTRINGMUTATOR()
 
 	// return "" for ""
-	int max = (int)var_str.length();
+	int max = (int)var_str.size();
 	if (max == 0) {
 		this->var_str.clear();
 		return *this;
@@ -1615,7 +1618,7 @@ var var::operator[](const int charno) const {
 	THISIS("var var::operator[](const int charno) const")
 	THISISSTRING()
 
-	int nchars = int(var_str.length());
+	int nchars = int(var_str.size());
 
 	// beyond end of string return ""
 	// get this test out of the way first since it only has to be done later on anyway
@@ -1798,8 +1801,8 @@ var var::substr(const int startindex1, const var& delimiterchars, int& endindex)
 
 	// domain check max startindex1
 	// handle after end of string
-	if (start_pos >= var_str.length()) {
-		endindex = int(var_str.length() + 1);
+	if (start_pos >= var_str.size()) {
+		endindex = int(var_str.size() + 1);
 		return "";
 	}
 
@@ -1809,8 +1812,8 @@ var var::substr(const int startindex1, const var& delimiterchars, int& endindex)
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
-		endindex = int(var_str.length() + 1);
-		return this->var_str.substr(start_pos, var_str.length() - start_pos);
+		endindex = int(var_str.size() + 1);
+		return this->var_str.substr(start_pos, var_str.size() - start_pos);
 	}
 
 	// return the index of the dicovered delimiter
@@ -1849,7 +1852,7 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 
 	// domain check
 	// handle after end of string
-	if (start_pos >= var_str.length()) {
+	if (start_pos >= var_str.size()) {
 		delimiterno = 0;
 		return "";
 		//return returnable;
@@ -1862,10 +1865,10 @@ var var::substr2(var& startindex1, var& delimiterno) const {
 	// past of of string?
 	if (end_pos == std::string::npos) {
 		// wont work if string is the maximum string length but that cant occur
-		startindex1 = (int)(var_str.length() + 2);
+		startindex1 = (int)(var_str.size() + 2);
 		delimiterno = 0;
-		return this->var_str.substr(start_pos, var_str.length() - start_pos);
-		//returnable = (this->var_str.substr(start_pos, var_str.length() - start_pos));
+		return this->var_str.substr(start_pos, var_str.size() - start_pos);
+		//returnable = (this->var_str.substr(start_pos, var_str.size() - start_pos));
 		//return returnable;
 	}
 
@@ -2001,7 +2004,7 @@ var var::sum() const {
 		} else {
 
 			ISSTRING(accum)
-			if (accum.var_str.size() > 0) {
+			if (not accum.var_str.empty()) {
 
 				//fix decimal places
 				accum = accum.round(maxndecimals);
@@ -2017,7 +2020,7 @@ var var::sum() const {
 					accum.var_str.pop_back();
 
 				//reinstate a single zero
-				if (accum.var_str.size() == 0)
+				if (accum.var_str.empty())
 					accum.var_str = '0';
 
 				outstr ^= accum;

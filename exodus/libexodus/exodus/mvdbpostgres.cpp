@@ -846,7 +846,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	var filename2 = get_normal_filename(filename);
 
 	// filename dos or DOS  means osread/oswrite/osdelete
-	if (filename2.var_str.length() == 3 && filename2.var_str == "dos") {
+	if (filename2.var_str.size() == 3 && filename2.var_str == "dos") {
 		(*this) = "dos";
 		return true;
 	}
@@ -1007,7 +1007,7 @@ bool var::reado(const var& filehandle, const var& key) {
 
 		//this->lasterror();
 
-		return this->var_str.length() > 0;
+		return not this->var_str.empty();
 	}
 
 	// ordinary read
@@ -1081,7 +1081,7 @@ bool var::read(const var& filehandle, const var& key) {
 	std::string key2 = key.normalize().var_str;
 
 	// filehandle dos or DOS means osread/oswrite/osdelete
-	if (filehandle.var_str.length() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
+	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
 		//return this->osread(key2);  //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
 		return this->osread(key);  //.convert("\\",OSSLASH));
@@ -1222,7 +1222,7 @@ var var::hash(const unsigned long long modulus) const {
 	// uint64_t
 	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 	uint64_t hash64 =
-		MurmurHash64((char*)var_str.data(), int(var_str.length() * sizeof(char)), 0);
+		MurmurHash64((char*)var_str.data(), int(var_str.size() * sizeof(char)), 0);
 	if (modulus)
 		return var_int = hash64 % modulus;
 	else
@@ -1519,7 +1519,7 @@ bool var::write(const var& filehandle, const var& key) const {
 	filehandle.deleteo(key2);
 
 	// filehandle dos or DOS means osread/oswrite/osdelete
-	if (filehandle.var_str.length() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
+	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
 		//this->oswrite(key2);	 //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
 		this->oswrite(key);	 //.convert("\\",OSSLASH));
@@ -1743,7 +1743,7 @@ bool var::deleterecord(const var& key) const {
 	std::string key2 = key.normalize().var_str;
 
 	// filehandle dos or DOS means osread/oswrite/osdelete
-	if (this->var_str.length() == 3 && (this->var_str == "dos" || this->var_str == "DOS")) {
+	if (this->var_str.size() == 3 && (this->var_str == "dos" || this->var_str == "DOS")) {
 		//return this->osdelete(key2);
 		//use osfilenames unnormalised so we can read and write as is
 		return this->osdelete(key);

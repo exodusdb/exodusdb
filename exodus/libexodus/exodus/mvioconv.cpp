@@ -54,7 +54,7 @@ var var::iconv(const char* convstr) const {
 	THISISSTRING()
 
 	// empty string in, empty string out
-	if (var_typ & VARTYP_STR && var_str.size() == 0)
+	if (var_typ & VARTYP_STR && var_str.empty())
 		return "";
 
 	// REMOVE the remove logic out of the L# R# and T# here
@@ -78,7 +78,7 @@ var var::iconv(const char* convstr) const {
 				part = this->substr2(charn, terminator);
 				// if len(part) or terminator then
 
-				if (part.var_typ & VARTYP_STR && part.var_str.size() == 0) {
+				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				} else
 					output ^= part.iconv_D(convstr);
 
@@ -104,7 +104,7 @@ var var::iconv(const char* convstr) const {
 				// if len(part) or terminator then
 
 				// null string
-				if (part.var_typ & VARTYP_STR && part.var_str.size() == 0) {
+				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				}
 
 				// do convstr on a number
@@ -164,7 +164,7 @@ var var::iconv(const char* convstr) const {
 		// HEX
 		case 'H':
 			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.size() == 0)
+			if (var_typ & VARTYP_STR && var_str.empty())
 				return "";
 
 			// TODO allow high end separators in without conversion (instead of failing as
@@ -686,7 +686,7 @@ var var::oconv(const char* conversion) const {
 				part = this->substr2(charn, terminator);
 				// if len(part) or terminator then
 
-				if (part.var_typ & VARTYP_STR && part.var_str.size() == 0) {
+				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				} else if (!part.isnum())
 					output ^= part;
 				else
@@ -714,10 +714,10 @@ var var::oconv(const char* conversion) const {
 				// if len(part) or terminator then
 
 				// null string
-				// if (part.var_typ&VARTYP_STR && part.var_str.size()==0)
+				// if (part.var_typ&VARTYP_STR && part.var_str.empty())
 				//	{}
 				bool notemptystring =
-					!(part.var_typ & VARTYP_STR && part.var_str.size() == 0);
+					!(part.var_typ & VARTYP_STR && part.var_str.empty());
 
 				// MR ... character replacement
 				if (*conversionchar == 'R') {
@@ -799,7 +799,7 @@ var var::oconv(const char* conversion) const {
 		case 'H':
 
 			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.size() == 0)
+			if (var_typ & VARTYP_STR && var_str.empty())
 				return "";
 
 			// check 2nd character is E, 3rd character is X and next character is null, or a
@@ -831,7 +831,7 @@ var var::oconv(const char* conversion) const {
 
 		case 'B':
 			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.size() == 0)
+			if (var_typ & VARTYP_STR && var_str.empty())
 				return "";
 			if (this->toBool())
 				return var(conversion).substr(2).field(",", 1);
