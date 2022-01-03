@@ -2691,6 +2691,7 @@ void to_extract_text(var& dictexpression) {
 				dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
 				dictexpression.replacer("^exodus_extract_sort\\(", "exodus_extract_text\\(");
 				dictexpression.replacer("^exodus_extract_date\\(", "exodus_extract_text\\(");
+				dictexpression.replacer("^exodus_extract_time\\(", "exodus_extract_text\\(");
 				dictexpression.replacer("^exodus_extract_datetime\\(", "exodus_extract_text\\(");
 }
 
