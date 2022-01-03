@@ -5,6 +5,13 @@ var verbose;
 var dictfilename;
 var dictfile;
 var dictrec;
+var errors = "";
+
+//time and compare the following. they are are same when using the pgexodus extension written in c
+//assert(var().sqlexec("select key from ads order by exodus_extract_text(data,1,0,0)"));
+//assert(var().sqlexec("select key from ads order by split_part(data, E'\x1E', 1)"));
+//but the pgsql implementation of exodus_extract_text (contained in this program) is significantly slower.
+bool use_pgexodus_extension = true; //inconvenient but 30% faster that using pgsql functions
 
 function main() {
 
@@ -80,13 +87,6 @@ function main() {
 	/////////////////////////////
 	if (doall) {
 
-		var().sqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;");
-
-		var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_time_array(data text, fn int, vn int, sn int);");
-		//create dict.all file
-
-		//create exodus pgsql functions
-
 		var sqltemplate =
 			R"V0G0N(
 CREATE OR REPLACE FUNCTION
@@ -99,11 +99,67 @@ $sqlcode
 END;
 $$
 LANGUAGE 'plpgsql'
-IMMUTABLE
+IMMUTABLE STRICT
 SECURITY
 DEFINER
 COST 10;
 )V0G0N";
+
+		// Drop obsolete functions
+		var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);");
+
+		// Create Natural Order Collation
+		var().sqlexec("DROP COLLATION IF EXISTS exodus_natural;");
+		var().sqlexec("CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);");
+
+		if (use_pgexodus_extension) {
+
+			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);");
+			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);");
+			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);");
+			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_time(text, int4, int4, int4);");
+			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_datetime(text, int4, int4, int4);");
+
+			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_count(text, text);");
+
+			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;");
+			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_sort' LANGUAGE C IMMUTABLE;");
+			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4) RETURNS float8 AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;");
+			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4) RETURNS date AS 'pgexodus', 'exodus_extract_date' LANGUAGE C IMMUTABLE STRICT;");
+			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4) RETURNS interval AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;");
+			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;");
+
+			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_count(text, text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;");
+
+		} else {
+
+			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);");
+
+			//exodus_extract_text<fn,vn,sn> returns an sql text type
+			do_sql("exodus_extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+
+			//NOT implemented in pgsql. ::select uses COLLATE instead
+			//exodus_extract_sortt<fn,vn,sn> returns an sql text type
+			//do_sql("exodus_extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+
+			//exodus_extract_date<fn,vn,sn> returns an sql data type
+			do_sql("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
+
+			//exodus_extract_time<fn,vn,sn> returns an sql time type
+			do_sql("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
+
+			//exodus_extract_date<fn,vn,sn> returns an sql data type
+			do_sql("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
+
+			//exodus_extract_number<fn,vn,sn> returns an sql float8 type
+			do_sql("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
+
+			//exodus_count(str,ch) returns an int
+			do_sql("exodus_count(data text, ch text)", "integer", exodus_count_sql, sqltemplate);
+
+		}
+
+		//create exodus pgsql functions
 
 		//exodus_trim (leading, trailing and excess inner spaces)
 		var trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
@@ -181,7 +237,20 @@ COST 10;
 		}
 	}
 
-	return 0;
+	if (errors)
+		errors.errputl("\nErrors: ");
+
+	return errors ne "";
+}
+
+subroutine replace_FM_etc(io sql) {
+	sql.replacer(R"(\bRM\b)",  R"(E'\\x1F')");
+	sql.replacer(R"(\bFM\b)",  R"(E'\\x1E')");
+	sql.replacer(R"(\bVM\b)",  R"(E'\\x1D')");
+	sql.replacer(R"(\bSM\b)",  R"(E'\\x1C')");
+	sql.replacer(R"(\bSVM\b)", R"(E'\\x1C')");
+	sql.replacer(R"(\bTM\b)",  R"(E'\\x1B')");
+	sql.replacer(R"(\bSTM\b)", R"(E'\\x1A')");
 }
 
 subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
@@ -195,13 +264,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 
 	functionsql.swapper("$sqlcode", sql);
 
-	functionsql.replacer("\\bRM\\b", "chr(31)");
-	functionsql.replacer("\\bFM\\b", "chr(30)");
-	functionsql.replacer("\\bVM\\b", "chr(29)");
-	functionsql.replacer("\\bSM\\b", "chr(28)");
-	functionsql.replacer("\\bSVM\\b", "chr(28)");
-	functionsql.replacer("\\bTM\\b", "chr(27)");
-	functionsql.replacer("\\bSTM\\b", "chr(26)");
+	replace_FM_etc(functionsql);
 
 	if (verbose)
 		functionsql.outputl();
@@ -239,15 +302,20 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	}
 
 	if (errmsg) {
-		if (not verbose) {
-			//functionsql.outputl();
-			int nlines = count(functionsql, "\n");
-			for (int linen = 1; linen <= nlines; ++linen) {
-				printl(linen - 2 + 2, ". ", field(functionsql, "\n", linen));
-			}
-			printl();
-		}
-		errmsg.outputl();
+
+		oswrite(functionsql, "dict2sql.err");
+
+		errors ^= functionname_and_args.field("(", 1) ^ " ";
+
+//		if (not verbose) {
+//			//functionsql.outputl();
+//			int nlines = count(functionsql, "\n");
+//			for (int linen = 1; linen <= nlines; ++linen) {
+//				errputl(linen - 2 + 2, ". ", field(functionsql, "\n", linen));
+//			}
+//			errputl();
+//		}
+		errmsg.errputl();
 	}
 	if (reindexrequired) {
 		//drop any index using the previous function
@@ -356,6 +424,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		chars ^= "\\x1B";  //TM
 		chars ^= "\\x1C";  //SVM
 		chars ^= "\\x1F";  //RM
+
 		sourcecode.r(1, -1,
 					 "/"
 					 "*pgsql");
@@ -422,12 +491,12 @@ $RETVAR := array_to_string
    FROM
     unnest
     (
-     string_to_array($SOURCEKEY_EXPR,chr(29))
+     string_to_array($SOURCEKEY_EXPR,E'\x1D')
     )
    LEFT JOIN
     $TARGETFILE on $TARGETFILE.key = unnest
  ),
- chr(29),
+ E'\x1D',
  ''
 );
 )V0G0N";
@@ -448,9 +517,9 @@ $RETVAR :=
 	// e.g.
 	// xlate=xlate jobs 2 14
 	// ->
-	// ans:=split_part(jobs.data,chr(30),14)
+	// ans:=split_part(jobs.data,E'\x1E',14)
 	// FROM jobs
-	// WHERE jobs.key=split_part($2,chr(30),2);
+	// WHERE jobs.key=split_part($2,E'\x1E',2);
 	//
 	// fromfn and tofn can be functions
 	// "from" expression has access to source file data in variable $2 (argument 2)
@@ -484,7 +553,7 @@ $RETVAR :=
 				//source file field number or expression for key to target file
 				//if key field numeric then extract from source file date
 				if (source_key_expr.isnum())
-					source_key_expr = "split_part($2,chr(30)," ^ source_key_expr ^ ")";
+					source_key_expr = "split_part($2,E'\\x1E'," ^ source_key_expr ^ ")";
 
 				//target file field number or expression (omit optional ; on the end)
 				if (target_expr == 0)
@@ -492,7 +561,7 @@ $RETVAR :=
 				else if (target_expr == "''")
 					target_expr = target_filename ^ ".data";
 				else if (target_expr.isnum())
-					target_expr = "split_part(" ^ target_filename ^ ".data,chr(30)," ^ target_expr ^ ")";
+					target_expr = "split_part(" ^ target_filename ^ ".data,E'\\x1E'," ^ target_expr ^ ")";
 
 				//line=targetvariablename^" := ";
 				//if (ismv) {
@@ -518,13 +587,7 @@ $RETVAR :=
 		}
 	}
 
-	sql.replacer("\\bRM\\b", "chr(31)");
-	sql.replacer("\\bFM\\b", "chr(30)");
-	sql.replacer("\\bVM\\b", "chr(29)");
-	sql.replacer("\\bSM\\b", "chr(28)");
-	sql.replacer("\\bSVM\\b", "chr(28)");
-	sql.replacer("\\bTM\\b", "chr(27)");
-	sql.replacer("\\bSTM\\b", "chr(26)");
+	replace_FM_etc(sql);
 
 	//convert to text
 	sql.trimmerf(VM).trimmerb(VM);
@@ -940,5 +1003,159 @@ EXCEPTION WHEN others THEN
  RETURN $1;
 END;
 )V0G0N";
+
+//exodus_extract_text -> text
+var exodus_extract_text_sql =
+	R"V0G0N(
+ if fn < 1 then
+  return data;
+ end if;
+
+ if vn < 1 then
+  return split_part(data, E'\x1E', fn);
+ end if;
+
+ if sn < 1 then
+  return split_part(split_part(data, E'\x1E', fn), E'\x1D', vn);
+ end if;
+
+  return split_part(split_part(split_part(data, E'\x1E', fn), E'\x1D', vn), E'\x1C', sn);
+)V0G0N";
+
+//exodus_extract_date -> date SIMILAR CODE in extract_number, extract_date and extract_time
+var exodus_extract_date_sql =
+	R"V0G0N(
+DECLARE
+ ans text;
+BEGIN
+
+ if fn < 1 then
+  return case when text = '' then NULL else '1967/12/31'::date + text::int end;
+ end if;
+
+ ans = split_part(data, E'\x1E', fn);
+
+ if vn < 1 then
+  return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
+ end if;
+
+ ans = split_part(ans, E'\x1D', vn);
+
+ if sn < 1 then
+  return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
+ end if;
+
+ ans = split_part(ans, E'\x1C', sn);
+
+ return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
+
+END;
+)V0G0N";
+
+//exodus_extract_time -> interval SIMILAR CODE in extract_number, extract_date and extract_time
+var exodus_extract_time_sql =
+	R"V0G0N(
+DECLARE
+ ans text;
+BEGIN
+
+ if fn < 1 then
+  return case when text = '' then NULL else make_interval(secs => data::int) end;
+ end if;
+
+ ans = split_part(data, E'\x1E', fn);
+
+ if vn < 1 then
+  return case when ans = '' then NULL else make_interval(secs => ans::int) end;
+ end if;
+
+ ans = split_part(ans, E'\x1D', vn);
+
+ if sn < 1 then
+  return case when ans = '' then NULL else make_interval(secs => ans::int) end;
+ end if;
+
+ ans = split_part(ans, E'\x1C', sn);
+
+ return case when ans = '' then NULL else make_interval(secs => ans::int) end;
+
+END;
+)V0G0N";
+
+//exodus_extract_datetime -> timestamp SIMILAR CODE in extract_number, extract_date and extract_time
+var exodus_extract_datetime_sql =
+	R"V0G0N(
+DECLARE
+ ans text;
+BEGIN
+
+ if fn < 1 then
+  ans := data;
+ else
+  ans = split_part(data, E'\x1E', fn);
+  if vn >= 1 then
+   ans := split_part(ans, E'\x1D', vn);
+   if sn >= 1 then
+    ans := split_part(ans, E'\x1C', sn);
+   end if;
+  end if;
+ end if;
+
+ if ans = '' then
+  return NULL;
+ else
+  return to_timestamp((split_part(ans,'.',1)::int-732)*86400 + split_part(ans,'.',2)::int);
+ end if;
+
+END;
+)V0G0N";
+
+//exodus_extract_number -> number SIMILAR CODE in extract_number, extract_date and extract_time
+var exodus_extract_number_sql =
+	R"V0G0N(
+DECLARE
+ ans text;
+BEGIN
+
+ if fn < 1 then
+  return case when text = '' then 0 else text::float8 end;
+ end if;
+
+ ans = split_part(data, E'\x1E', fn);
+
+ if vn < 1 then
+  return case when ans = '' then 0 else ans::float8 end;
+ end if;
+
+ ans = split_part(ans, E'\x1D', vn);
+
+ if sn < 1 then
+  return case when ans = '' then 0 else ans::float8  end;
+ end if;
+
+ ans = split_part(ans, E'\x1C', sn);
+
+ return case when ans = '' then 0 else ans::float8 end;
+
+END;
+)V0G0N";
+
+//exodus_count
+var exodus_count_sql =
+	R"V0G0N(
+BEGIN
+
+ return (CHAR_LENGTH(data) - CHAR_LENGTH(REPLACE(data, ch, '')));
+
+END;
+)V0G0N";
+
+subroutine rawsqlexec(in sql) {
+	var errormsg;
+	if (not var().sqlexec(sql, errormsg)) {
+		errors ^= "\n" ^ errormsg;
+	}
+	return;
+}
 
 programexit()
