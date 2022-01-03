@@ -82,6 +82,8 @@ Lines: 190125 differences: 2 Max differences: 2
 
 	if (totndifferences < 1)
 		printl("Test passed");
+	else
+		printl("Test failed with ", totndifferences, "differences");
 
 	return totndifferences;
 }
@@ -132,7 +134,7 @@ function onefile(in filename, in maxndifferences) {
 	for (var line : data) {
 		if (not line)
 			continue;
-errputl(line);
+//errputl(line);
 		lineno++;
 
 		//printl(line);
@@ -377,6 +379,8 @@ errputl(line);
 
 	if (ndifferences <= maxndifferences)
 		ndifferences = 0;
+	else
+		ndifferences -= maxndifferences;
 
 	return ndifferences;
 }

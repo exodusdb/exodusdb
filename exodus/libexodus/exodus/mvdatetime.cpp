@@ -497,6 +497,7 @@ var var::oconv_MT(const char* conversion) const {
 	const char* conversionchar = conversion;
 	int timesecs;
 
+	// Analyse conversion characters
 	while (*conversionchar) {
 
 		switch (*conversionchar) {
@@ -526,13 +527,15 @@ var var::oconv_MT(const char* conversion) const {
 				showsecs = true;
 				break;
 
-			// Any other character is the separator
+			// Any other character is the separator. First one only.
 			default:
 				sepchar = *conversionchar;
+				goto after_analyse_conversion;
 				break;
 		}
 		conversionchar++;
 	}
+after_analyse_conversion:
 
 	if (input_is_hours) {
 		// if input is integer or decimal hours then convert by *3600 to integer seconds
