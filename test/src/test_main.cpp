@@ -2253,11 +2253,13 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(time2.oconv("MT").outputl() eq "12:01");
 	assert(time2.oconv("MTH").outputl() eq "12:01PM");
 	assert(time2.oconv("MTS").outputl() eq "12:01:01");
-	assert(time2.oconv("MTSH").outputl() eq "12H01H01");
+	//assert(time2.oconv("MTSH").outputl() eq "12H01H01");
+	assert(time2.oconv("MTSH").outputl() eq "12:01:01PM");
 	assert(time2.oconv("MTx") eq "12x01");
 	assert(time2.oconv("MTHx") eq "12x01PM");
 	assert(time2.oconv("MTSx") eq "12x01x01");
-	assert(time2.oconv("MTSHx") eq "12H01H01");
+	//assert(time2.oconv("MTSHx") eq "1201H01");
+	assert(time2.oconv("MTSHx") eq "12x01x01PM");
 
 	time2=0;
 	assert(time2.oconv("MT").outputl() eq "00:00");
@@ -2291,6 +2293,16 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//NB 27:46:40 NOT ROUNDED UP TO 27:47 because mins like on clock
 	assert(var(100000).oconv("MTU").outputl() eq "27:46");
 	assert(var(100000).oconv("MTUS").outputl() eq "27:46:40");
+
+    //wrap around next midnight is 00:00
+    assert(var(86400).oconv("MTS").outputl() eq "00:00:00");
+
+    //wrap around 24 hours * 2 -> 00:00
+    assert(var(86400*2).oconv("MTS").outputl() eq "00:00:00");
+
+    //U = Unlimited hours
+    assert(var(86400*2).oconv("MTUS").outputl() eq "48:00:00");
+    assert(var(86400*100).oconv("MTUS").outputl() eq "2400:00:00");
 
 	//test some decimal hours based time
 	assert(var(0).oconv("MT2").outputl() eq "00:00");

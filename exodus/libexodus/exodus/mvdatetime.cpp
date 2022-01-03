@@ -438,9 +438,11 @@ var var::oconv_D(const char* conversion) const {
 		ss << sepchar;
 	}
 
-	// day first
-	if (alphamonth && not yearfirst)
+	//determine if day first if not forced
+	if (not dayfirst && alphamonth && not yearfirst)
 		dayfirst = true;
+
+	// day first
 	if (dayfirst) {
 		ss.width(2);
 		ss << ymd.day;
@@ -490,69 +492,58 @@ var var::oconv_MT(const char* conversion) const {
 	bool twelvehour = false;
 	bool unlimited = false;	 // incompatible with twelvehour
 	bool showsecs = false;
-	// bool decimalhours = false;
+	bool input_is_hours = false;
 	char sepchar = ':';
 	const char* conversionchar = conversion;
 	int timesecs;
 
-	// guess 1st option is most often zero/ie most conversions are MT only and short circuit
-	if (!(*conversionchar)) {
-		timesecs = this->round();
+	while (*conversionchar) {
 
-		// interpret conversion characters
+		switch (*conversionchar) {
+
+			case '2':
+				input_is_hours = true;
+				break;
+
+			// U to indicate unlimited hours
+			case 'U':
+				unlimited = true;
+				break;
+
+			// Z to convert 0 to ""
+			case 'Z':
+				if (!(*this))
+					return "";
+				break;
+
+			// H to indicate AM/PM
+			case 'H':
+				twelvehour = true;
+				break;
+
+			// S to show seconds
+			case 'S':
+				showsecs = true;
+				break;
+
+			// Any other character is the separator
+			default:
+				sepchar = *conversionchar;
+				break;
+		}
+		conversionchar++;
+	}
+
+	if (input_is_hours) {
+		// if input is integer or decimal hours then convert by *3600 to integer seconds
+		timesecs = ((*this) * 3600).round();
 	} else {
-
-		// first may be an 2 to indicate input is integer or decimal hours
-		// if so, convert by *3600 to seconds
-		if (*conversionchar == '2') {
-			++conversionchar;
-			timesecs = (3600 * (*this)).round();
-
-			// if not, just get the seconds
-		} else {
-			timesecs = round();
-		}
-
-		// first may be a U to indicate unlimited hours
-		if (*conversionchar == 'U') {
-			++conversionchar;
-			unlimited = true;
-		}
-
-		// next may be a Z to convert 0 to ""
-		if (*conversionchar == 'Z') {
-			if (!timesecs)
-				return "";
-			++conversionchar;
-		}
-
-		// next may be an H to indicate AM/PM
-		if (*conversionchar == 'H') {
-			++conversionchar;
-			twelvehour = true;
-		}
-
-		// next may be an S to show seconds
-		if (*conversionchar == 'S') {
-			++conversionchar;
-			showsecs = true;
-		}
-		/* dont allow H after S
-				//next may be an H to indicate unlimited time eg 25:00
-				if (*conversionchar=='H')
-				{
-					++conversionchar;
-					twelvehour=true;
-				}
-		*/
-		// first of remaining characters is the separator. remainder are ignored
-		if (*conversionchar) {
-			sepchar = *conversionchar;
-		}
+		// otherwise round any decimal seconds to integer
+		timesecs = round();
 	}
 
 	// standardise times <0 and >=86400 to one day ie 0-85399 seconds
-	var negative;
+	bool negative;
 	if (unlimited) {
 		negative = timesecs < 0;
 		if (negative)
@@ -579,42 +570,54 @@ var var::oconv_MT(const char* conversion) const {
 		}
 	}
 
-	// TODO two digit formatting in C instead of var
-
-	// two digit hours
 	var newmv;
+	newmv.var_typ = VARTYP_STR;
+
+	//hours first
 	if (unlimited) {
+		//unlimited hours
 		if (negative)
-			newmv = "-";
-		else
-			newmv = "";
+			newmv.var_str = "-";
+		//else
+		//	newmv = "";
 		if (hours < 10)
-			newmv ^= "0";
+			newmv.var_str.push_back('0');
 		newmv ^= hours;
-	} else
-		newmv = ("00" ^ var(hours)).substr(-2);
+	} else {
+		// two digit hours
+		//newmv = ("00" ^ var(hours)).substr(-2);
+		newmv.var_str.push_back('0' + hours / 10);
+		newmv.var_str.push_back('0' + hours % 10);
+	}
 
 	// separator
-	newmv ^= sepchar;
+	newmv.var_str.push_back(sepchar);
 
 	// two digit minutes
-	newmv ^= ("00" ^ var(mins)).substr(-2);
+	//newmv ^= ("00" ^ var(mins)).substr(-2);
+	newmv.var_str.push_back('0' + mins / 10);
+	newmv.var_str.push_back('0' + mins % 10);
 
 	if (showsecs) {
 
 		// separator
-		newmv ^= sepchar;
+		newmv.var_str.push_back(sepchar);
 
 		// two digit seconds
-		newmv ^= ("00" ^ var(secs)).substr(-2);
+		//newmv ^= ("00" ^ var(secs)).substr(-2);
+		newmv.var_str.push_back('0' + secs / 10);
+		newmv.var_str.push_back('0' + secs % 10);
 	}
 
-	// AM/PM
+	// optional AM/PM suffix
 	if (twelvehour) {
-		if (am)
-			newmv ^= "AM";
-		else
-			newmv ^= "PM";
+		if (am) {
+			newmv.var_str.push_back('A');
+			newmv.var_str.push_back('M');
+		} else {
+			newmv.var_str.push_back('P');
+			newmv.var_str.push_back('M');
+		}
 	}
 
 	return newmv;

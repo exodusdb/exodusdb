@@ -37,6 +37,7 @@ function main()
 	TRACE(response.field(RM,2))
 	assert(response.field(RM,2)=="{NULL,1968-01-01}");
 	var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);",response);
+	printl(response);
 	assert(response.field(RM,2)=="{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
 
 	var filename="xo_test_db_temp1";

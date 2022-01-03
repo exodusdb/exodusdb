@@ -946,11 +946,19 @@ var exodus_todays_date_sql =
 var exodus_extract_date_array_sql =
 	R"V0G0N(
 DECLARE
- dates text := exodus_extract_text(data,fn,vn,sn);
+ dates text;
  date text;
- ndates int := exodus_count(dates,VM)+(dates!='')::int;
+ ndates int;
  date_array date[];
 BEGIN
+
+ if fn < 1 then
+  dates := data;
+ else
+  dates := split_part(data, E'\x1E', fn);
+ end if;
+
+ ndates := exodus_count(dates,VM)+(dates!='')::int;
  for daten in 1..ndates loop
   date := split_part(dates,VM,daten);
   if date = '' then
@@ -968,11 +976,18 @@ END;
 var exodus_extract_time_array_sql =
 	R"V0G0N(
 DECLARE
- times text := exodus_extract_text(data,fn,vn,sn);
+ times text;
  timex text;
- ntimes int := exodus_count(times,VM)+(times!='')::int;
+ ntimes int;
  time_array interval[];
 BEGIN
+ if fn < 1 then
+  times := data;
+ else
+  times := split_part(data, E'\x1E', fn);
+ end if;
+
+ ntimes := exodus_count(times,VM)+(times!='')::int;
  for timen in 1..ntimes loop
   timex := split_part(times,VM,timen);
   if timex = '' then
