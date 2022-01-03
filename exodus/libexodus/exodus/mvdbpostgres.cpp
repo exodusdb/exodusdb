@@ -2915,6 +2915,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				continue;
 			}
 
+			//use postgres collation instead of exodus_extract_sort
+			if (dictexpression.contains("exodus_extract_sort")) {
+				dictexpression.swapper("exodus_extract_sort", "exodus_extract_text");
+				dictexpression ^= " COLLATE exodus_natural";
+			}
+
 			orderclause ^= ",\n " ^ dictexpression;
 
 			if (ucword == "BY-DSND")
@@ -2979,7 +2985,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 								  dictfile, word1, joins, unnests, selects, ismv, forsort);
-			var usingnaturalorder = dictexpression.index("exodus_extract_sort");
+			var usingnaturalorder = dictexpression.index("exodus_extract_sort") or dictexpression.index("exodus_natural");
 			var dictid = word1;
 
 			//var dictexpression_isarray=dictexpression.index("string_to_array(");

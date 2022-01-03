@@ -121,10 +121,19 @@ install(TARGETS exodus DESTINATION lib)
 ### install some of exodus' include files so programs can be written in exodus c++ ###
 
 install(FILES
- exodus.h exodusmacros.h mvenvironment.h mv.h
- exodusfuncs.h mvexceptions.h
+ mv.h
+ exodus.h
+ exodusmacros.h
+ mvenvironment.h
+ exodusfuncs.h
+ mvexceptions.h
  #mvimpl.h mvipc.h mvconfig.h mvlink.h
- mvfunctor.h program.h library.h dict.h common.h mvprogram.h
+ mvfunctor.h
+ program.h
+ library.h
+ dict.h
+ common.h
+ mvprogram.h
  ioconv_custom.h
 DESTINATION include/exodus)
 

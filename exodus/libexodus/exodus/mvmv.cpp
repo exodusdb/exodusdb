@@ -1440,6 +1440,8 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 
 bool var::starts(const var& vstr) const {
 	THISIS("bool var::starts(const var& v) const")
+	//THISIS(__PRETTY_FUNCTION__)
+	//      bool exodus::var::starts(const exodus::var&) const
 	THISISSTRING()
 	ISSTRING(vstr)
 	return var_str.starts_with(vstr.var_str);
@@ -1457,6 +1459,7 @@ bool var::contains(const var& vstr) const {
 	THISISSTRING()
 	ISSTRING(vstr)
 	return var_str.find(vstr.var_str) != std::string::npos;
+	//C++23 return var_str.contains(vstr.var_str);
 }
 
 bool var::starts(const char* cstr) const {
@@ -1475,16 +1478,17 @@ bool var::contains(const char* cstr) const {
 	THISIS("bool var::contains(const char* cstr) const")
 	THISISSTRING()
 	return var_str.find(cstr) != std::string::npos;
+	//C++23 return var_str.contains(cstr);
 }
 
 bool var::starts(const char c) const {
-	THISIS("bool var::starts(const char c) const noexcept")
+	THISIS("bool var::starts(const char c) const")
 	THISISSTRING()
 	return var_str.starts_with(c);
 }
 
 bool var::ends(const char c) const {
-	THISIS("bool var::ends(const char c) const noexcept")
+	THISIS("bool var::ends(const char c) const")
 	THISISSTRING()
 	return var_str.ends_with(c);
 }
@@ -1493,6 +1497,7 @@ bool var::contains(const char c) const {
 	THISIS("bool var::contains(const char c) const")
 	THISISSTRING()
 	return var_str.find(c) != std::string::npos;
+	//C++23 return var_str.contains(c);
 }
 
 /////////
