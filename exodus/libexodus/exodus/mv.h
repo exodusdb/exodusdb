@@ -1153,6 +1153,7 @@ class DLL_PUBLIC var final {
 	// all return var& and are not const)
 
 	var& converter(const var& oldchars, const var& newchars);
+	var& converter(const char* oldchars, const char* newchars);
 	var& textconverter(const var& oldchars, const var& newchars);
 	var& swapper(const var& whatstr, const var& withstr);
 	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING);

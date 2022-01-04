@@ -1360,10 +1360,15 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 	} else
 		lengthb = length;
 
-	if (uint(start0) >= var_str.size())
-		var_str += newstr.var_str;
-	else
-		var_str.replace(start0, lengthb, newstr.var_str);
+	if (uint(start0) >= var_str.size()) {
+		//if (newstr.var_str.size())
+			var_str += newstr.var_str;
+	} else {
+		//if (newstr.var_str.size())
+			var_str.replace(start0, lengthb, newstr.var_str);
+		//else
+		//	var_str.erase(start0,lengthb);
+	}
 
 	return *this;
 }
@@ -1679,6 +1684,16 @@ var& var::converter(const var& oldchars, const var& newchars) {
 	ISSTRING(newchars)
 
 	converter_helper(var_str, oldchars.var_str, newchars.var_str);
+
+	return *this;
+}
+
+// in-place for const char*
+var& var::converter(const char* oldchars, const char* newchars) {
+	THISIS("var& var::converter(const char* oldchars, const char* newchars)")
+	THISISSTRINGMUTATOR()
+
+	converter_helper(var_str, std::string(oldchars), std::string(newchars));
 
 	return *this;
 }
