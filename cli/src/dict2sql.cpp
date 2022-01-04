@@ -8,10 +8,14 @@ var dictrec;
 var errors = "";
 
 //time and compare the following. they are are same when using the pgexodus extension written in c
+//
 //assert(var().sqlexec("select key from ads order by exodus_extract_text(data,1,0,0)"));
 //assert(var().sqlexec("select key from ads order by split_part(data, E'\x1E', 1)"));
+//
 //but the pgsql implementation of exodus_extract_text (contained in this program) is significantly slower.
-bool use_pgexodus_extension = true; //inconvenient but 30% faster that using pgsql functions
+//
+//bool use_pgexodus_extension = false; //convenient but 25% slower than using pgexodus.so c function  extension
+bool use_pgexodus_extension = true; //inconvenient but 30% faster than using pgsql functions
 
 function main() {
 
@@ -65,6 +69,11 @@ function main() {
 	verbose = index(OPTIONS, 'V');
 	var doall = true;
 
+	if (filenames.a(1) eq "pgsql") {
+		use_pgexodus_extension = false;
+		filenames.remover(1);
+	}
+
 	if (filenames) {
 		doall = false;
 		if (filenames.substr(1, 5) ne "dict.")
@@ -114,22 +123,28 @@ COST 10;
 
 		if (use_pgexodus_extension) {
 
-			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);");
-			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);");
-			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);");
-			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_time(text, int4, int4, int4);");
-			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_datetime(text, int4, int4, int4);");
+	        var sqltemplate =
+            R"V0G0N(
+CREATE OR REPLACE FUNCTION $functionname_and_args
+RETURNS $return_type
+AS 'pgexodus', '$functionname'
+LANGUAGE 'c'
+IMMUTABLE STRICT
+SECURITY
+DEFINER
+COST 10;
+)V0G0N";
 
-			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_count(text, text);");
+			do_sql("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+			do_sql("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
 
-			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;");
-			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_sort' LANGUAGE C IMMUTABLE;");
-			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4) RETURNS float8 AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;");
-			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4) RETURNS date AS 'pgexodus', 'exodus_extract_date' LANGUAGE C IMMUTABLE STRICT;");
-			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4) RETURNS interval AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;");
-			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;");
+			do_sql("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
 
-			rawsqlexec("CREATE OR REPLACE FUNCTION exodus_count(text, text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;");
+			do_sql("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate);
+			do_sql("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate);
+			do_sql("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate);
+
+			do_sql("exodus_count(data text, countchar text)","integer", "", sqltemplate);
 
 		} else {
 
@@ -260,6 +275,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	var functionsql = sqltemplate;
 
 	functionsql.swapper("$functionname_and_args", functionname_and_args);
+	functionsql.swapper("$functionname", functionname_and_args.field("(", 1));
 	functionsql.swapper("$return_type", return_sqltype);
 
 	functionsql.swapper("$sqlcode", sql);

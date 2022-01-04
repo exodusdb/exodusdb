@@ -42,7 +42,7 @@ CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn i
 CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 -- returns zero for zero length strings
 CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4) RETURNS float8 AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_count(text, text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;
 
 DROP COLLATION IF EXISTS exodus_natural;
 CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
@@ -74,7 +74,7 @@ CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn i
 CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 -- returns zero for zero length strings
 CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4) RETURNS float8 AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_count(text, text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;
 
 DROP COLLATION IF EXISTS exodus_natural;
 CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
