@@ -1045,7 +1045,7 @@ DECLARE
 BEGIN
 
  if fn < 1 then
-  return case when text = '' then NULL else '1967/12/31'::date + text::int end;
+  return case when data = '' then NULL else '1967/12/31'::date + data::int end;
  end if;
 
  ans = split_part(data, E'\x1E', fn);
