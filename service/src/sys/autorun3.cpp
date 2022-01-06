@@ -675,11 +675,18 @@ nextsign:
 		}
 		body.swapper(FM, var().chr(13));
 
-		SYSTEM.r(117, forceemail);
+		// Option to force the actual email recipient
+		var system117 = SYSTEM.a(117);
+		if (forceemail)
+			SYSTEM.r(117, forceemail);
+
 		print(" Emailing ", toaddress, ":");
 		call sendmail(toaddress, ccaddress, subject, body, attachfilename, "", errormsg);
 		print("done");
-		SYSTEM.r(117, "");
+
+		// Restore original forced email or lack thereof
+		SYSTEM.r(117, system117);
+
 		if (errormsg and errormsg ne "OK") {
 			//call msg(errormsg)
 			call sysmsg(errormsg);
