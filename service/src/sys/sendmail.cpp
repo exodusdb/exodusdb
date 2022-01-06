@@ -138,6 +138,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	} else {
 		toaddress = toaddress0;
 
+		// TODO All these neosys.com emails to be configurable in SYSTEM
+
 		if (toaddress eq "TBQBB")
 			toaddress = "support@neosys.com";
 

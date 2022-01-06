@@ -344,6 +344,8 @@ preventsameday:
 	if (sys.document.a(27) ne "") {
 		sys.document.r(27, sys.document.a(27) - 1);
 	}
+
+	// Delete once-off documents
 	if (sys.document.a(27) ne "" and not(sys.document.a(27))) {
 		sys.documents.deleterecord(docid);
 
@@ -356,6 +358,13 @@ preventsameday:
 	//so this is mainly for testing on client systems
 	forceemail = sys.document.a(30);
 	//if not(forceemail) and @username='EXODUS' then forceemail=devATexodus
+
+	// On disabled systems all autorun documents except once-off documents
+	// go to neosys.com and do NOT go to the actual users
+	// TODO Use a configurable email from SYSTEM
+	if (not(sys.document.a(27)) && var("../../disabled.cfg").osfile())
+		forceemail = devatexodus;
+
 	//report is always run as the document owning user
 	var runasusercode = sys.document.a(1);
 	var userx;
