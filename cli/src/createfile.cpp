@@ -1,13 +1,14 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	var filenames = COMMAND.field(FM, 2, 999999);
 
 	if (not filenames) {
 		stop("Syntax is createfile filename filename ...\ndict files are named dict.filename");
 	}
+
 	var result = 0;
 	var nfiles = dcount(filenames, FM);
 	for (var filen = 1; filen <= nfiles; ++filen) {
@@ -22,6 +23,8 @@ programinit()
 		}
 		printl(filename);
 	}
+
+	//why 1??
 	return 1;
 }
 

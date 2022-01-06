@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	var timestarted = time();
 

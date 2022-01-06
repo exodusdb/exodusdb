@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	//default to previous edit/compile - similar code in edic and compile
 	//check command syntax
@@ -15,6 +15,7 @@ programinit()
 			abort("Syntax is 'edic osfilename'");
 		}
 	}
+
 	if (not osdir(edic_hist_dir))
 		osmkdir(edic_hist_dir);
 	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS, edic_hist))
@@ -428,6 +429,7 @@ programinit()
 			break;
 		}
 	}
+
 	return 0;
 }
 

@@ -23,7 +23,7 @@ THE SOFTWARE.
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");
 	printl("http://www.opensource.org/licenses/mit-license.php");

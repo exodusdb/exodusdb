@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	var filename = COMMAND.a(2);
 
@@ -34,6 +34,7 @@ programinit()
 	} while (sep);
 
 	printl(ndeleted ^ " record(s) deleted.");
+
 	return 0;
 }
 

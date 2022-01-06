@@ -8,6 +8,7 @@ function main() {
 	if (dbname and not connection.connect(dbname)) {
 		abort(lasterror());
 	}
+
 	printl(connection.listfiles().convert(FM, "\n"));
 
 	return 0;

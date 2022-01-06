@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	//init:
 	var reqfile = COMMAND.a(2);

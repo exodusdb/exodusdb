@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	const var EXODUS_FUNCTOR_MAXNARGS = 20;
 	//var outfilename="genfunctors.h";

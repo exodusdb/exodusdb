@@ -1,7 +1,9 @@
 #include <exodus/program.h>
 programinit()
 
-	/*
+/* This program is not in use currently */
+
+/*
 template1 is the default database that is used to create all new databases.
 
 Annoyingly we cannot simply do the following
@@ -17,7 +19,7 @@ so we do this instead
 3. add pgexodus functions to template1 database (for all future database creations)
 */
 
-	function main() {
+function main() {
 
 	printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");
 	printl("Licence: http://www.opensource.org/licenses/mit-license.php");

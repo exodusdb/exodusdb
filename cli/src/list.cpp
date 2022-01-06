@@ -5,6 +5,7 @@ programinit()
 #ifdef EXO_NOHTML
 #define xselect select
 #define timedate2 timedate
+
 #else
 #include <addunits.h>
 #include <colrowspan.h>
@@ -23,207 +24,207 @@ programinit()
 
 #include "printtx.hpp"
 
-	//#include <gen_common.h>
+//#include <gen_common.h>
 
 	var copyright;
-var showborder;		 //num
-var headtabperpage;	 //num
-var ulchar;
-var nblocks;  //num
-var blockn;	  //num
-var fromdate;
-var fromtime;
-var usecols;  //num
-var decimalchar;
-var html;  //num
-var td0;
-var nbsp;
-var td;
-var tdx;
-var th;
-var thx;
-var tr;
-var trx;
-var tt;	 //num
-var tdz;
-var thcolor;
-var tdcolor;
-var reportfont;
-var printptr;  //num
-var cssver;	   //num
-var sentencex;
-var maxncols;  //num
-var maxnrecs;
-var preselect;	//num
-var keylist;	//num
-var crtx;		//num
-var idsupp;		//num
-var dblspc;		//num
-var detsupp;	//num
-var gtotsupp;	//num
-var gtotreq;	//num
-var nobase;		//num
-var rawtable;	//num
-var silent;		//num
-var dictvoc;
-dim colname;
-dim coldict;
-dim mcol;
-dim pcol;
-dim ccol;
-dim scol;
-dim icol;
-var bheadfn;  //num
-var coln;	  //num
-var head;
-var foot2;
-var nbreaks;  //num
-var breakcolns;
-var breakopts;
-var pagebreaks;
-var headtab;
-var hrown;	//num
-var hcoln;	//num
-var replacements;
-var nreplacements;	 //num
-var topmargin;		 //num
-var totalflag;		 //num
-var breakonflag;	 //num
-var anytotals;		 //num
-var multirowcolhdg;	 //num
-var limits;
-var nlimits;  //num
-var ignorewords;
-var emailtoid;
-var emailccid;
-var emailsubjectid;
-var emailto;
-var emailcc;
-var emailsubject;
-var nextemailto;
-var nextemailcc;
-var nextemailsubject;
-var ss;
-var wordn;	//num
-var word;
-var filename;
-var dictfilename;
-var xx;
-var printtxmark;
-var nextword;
-var dictrec;
-var limitx;
-var lastword;
-var title;
-var value;
-var tcoln;	//num
-var nn;
-var ii;	 //num
-var tt2;
-var charx;
-var charn;	 //num
-var ncols;	 //num
-var breakn;	 //num
-var underline;
-var colul;
-var bar;
-var tx;
-var srcfile;
-dim breakcount;
-dim breaktotal;
-dim breakvalue;
-dim oldbreakvalue;
-var colhdg;
-var coltags;
-var style;
-var coln2;	  //num
-var vmcount;  //num
-var thproperties;
-var align;
-var clientmark;
-var posttheadmark;
-var headtabcols;
-var mode;
-var headtabstyle;
-var orighead;
-var v69;
-var v70;
-var v71;
-var dictid;
-var limitn;	 //num
-var recn;	 //num
-var lastid;
-var readerr;  //num
-var fns;
-var nfns;
-var nmvs;  //num
-var fnn;   //num
-var fn;
-var limitvals;
-var mvx;
-var newhead;
-var printfilename;
-var breakleveln;		//num
-var leveln;				//num
-var previousmarklevel;	//num
-var newmarklevel;		//num
-var str1;
-var str2;
-var str3;
-var tx1;
-var oconvx;
-var bodyln;	 //num
-var bottomline;
-var lastrecord;	 //num
-var printfile;
-var storewordn;
-var storecharn;
-var storeword;
-var storedictrec;
-var startcharn;	 //num
-var searchchar;
-var letterhead;
-var wordexpanded;  //num
-var breakcoln;
-var storetx;
-var anycell;  //num
-var lastblockn;
-var underline2;
-var cell;  //num
-var colbreakn;
-var bottomline2;
-var char1;	//num
-var char2;	//num
-var char3;
-var body;
-var tt3;
-var xxerrmsg;
-var ownprintfile;  //num
-var ptx_filenamelen;
-var ptx_random;
-var pagelns;
-var realpagen;	//num
-var pagen;		//num
-var newpage;	//num
-var rfmt;
-var foot;
-var ntxlns;	   //num
-var nbodylns;  //num
-var ptx_temp;
-var headx;
-var newpagetag;
-var ptx_css;
-var stylennx;  //num
-var htmltitle;
-var head_or_foot;
-var footx;
-var head1;
-var optioncharn;  //num
-var optionchars;
-var optionchar;
-var newoptions;
-var printtx_ii;	 //num
-var spaceoptionsize;
+	var showborder;		 //num
+	var headtabperpage;	 //num
+	var ulchar;
+	var nblocks;  //num
+	var blockn;	  //num
+	var fromdate;
+	var fromtime;
+	var usecols;  //num
+	var decimalchar;
+	var html;  //num
+	var td0;
+	var nbsp;
+	var td;
+	var tdx;
+	var th;
+	var thx;
+	var tr;
+	var trx;
+	var tt;	 //num
+	var tdz;
+	var thcolor;
+	var tdcolor;
+	var reportfont;
+	var printptr;  //num
+	var cssver;	   //num
+	var sentencex;
+	var maxncols;  //num
+	var maxnrecs;
+	var preselect;	//num
+	var keylist;	//num
+	var crtx;		//num
+	var idsupp;		//num
+	var dblspc;		//num
+	var detsupp;	//num
+	var gtotsupp;	//num
+	var gtotreq;	//num
+	var nobase;		//num
+	var rawtable;	//num
+	var silent;		//num
+	var dictvoc;
+	dim colname;
+	dim coldict;
+	dim mcol;
+	dim pcol;
+	dim ccol;
+	dim scol;
+	dim icol;
+	var bheadfn;  //num
+	var coln;	  //num
+	var head;
+	var foot2;
+	var nbreaks;  //num
+	var breakcolns;
+	var breakopts;
+	var pagebreaks;
+	var headtab;
+	var hrown;	//num
+	var hcoln;	//num
+	var replacements;
+	var nreplacements;	 //num
+	var topmargin;		 //num
+	var totalflag;		 //num
+	var breakonflag;	 //num
+	var anytotals;		 //num
+	var multirowcolhdg;	 //num
+	var limits;
+	var nlimits;  //num
+	var ignorewords;
+	var emailtoid;
+	var emailccid;
+	var emailsubjectid;
+	var emailto;
+	var emailcc;
+	var emailsubject;
+	var nextemailto;
+	var nextemailcc;
+	var nextemailsubject;
+	var ss;
+	var wordn;	//num
+	var word;
+	var filename;
+	var dictfilename;
+	var xx;
+	var printtxmark;
+	var nextword;
+	var dictrec;
+	var limitx;
+	var lastword;
+	var title;
+	var value;
+	var tcoln;	//num
+	var nn;
+	var ii;	 //num
+	var tt2;
+	var charx;
+	var charn;	 //num
+	var ncols;	 //num
+	var breakn;	 //num
+	var underline;
+	var colul;
+	var bar;
+	var tx;
+	var srcfile;
+	dim breakcount;
+	dim breaktotal;
+	dim breakvalue;
+	dim oldbreakvalue;
+	var colhdg;
+	var coltags;
+	var style;
+	var coln2;	  //num
+	var vmcount;  //num
+	var thproperties;
+	var align;
+	var clientmark;
+	var posttheadmark;
+	var headtabcols;
+	var mode;
+	var headtabstyle;
+	var orighead;
+	var v69;
+	var v70;
+	var v71;
+	var dictid;
+	var limitn;	 //num
+	var recn;	 //num
+	var lastid;
+	var readerr;  //num
+	var fns;
+	var nfns;
+	var nmvs;  //num
+	var fnn;   //num
+	var fn;
+	var limitvals;
+	var mvx;
+	var newhead;
+	var printfilename;
+	var breakleveln;		//num
+	var leveln;				//num
+	var previousmarklevel;	//num
+	var newmarklevel;		//num
+	var str1;
+	var str2;
+	var str3;
+	var tx1;
+	var oconvx;
+	var bodyln;	 //num
+	var bottomline;
+	var lastrecord;	 //num
+	var printfile;
+	var storewordn;
+	var storecharn;
+	var storeword;
+	var storedictrec;
+	var startcharn;	 //num
+	var searchchar;
+	var letterhead;
+	var wordexpanded;  //num
+	var breakcoln;
+	var storetx;
+	var anycell;  //num
+	var lastblockn;
+	var underline2;
+	var cell;  //num
+	var colbreakn;
+	var bottomline2;
+	var char1;	//num
+	var char2;	//num
+	var char3;
+	var body;
+	var tt3;
+	var xxerrmsg;
+	var ownprintfile;  //num
+	var ptx_filenamelen;
+	var ptx_random;
+	var pagelns;
+	var realpagen;	//num
+	var pagen;		//num
+	var newpage;	//num
+	var rfmt;
+	var foot;
+	var ntxlns;	   //num
+	var nbodylns;  //num
+	var ptx_temp;
+	var headx;
+	var newpagetag;
+	var ptx_css;
+	var stylennx;  //num
+	var htmltitle;
+	var head_or_foot;
+	var footx;
+	var head1;
+	var optioncharn;  //num
+	var optionchars;
+	var optionchar;
+	var newoptions;
+	var printtx_ii;	 //num
+	var spaceoptionsize;
 
 function main() {
 	//

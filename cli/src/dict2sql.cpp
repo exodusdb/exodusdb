@@ -1,21 +1,21 @@
 #include <exodus/program.h>
 programinit()
 
-var verbose;
-var dictfilename;
-var dictfile;
-var dictrec;
-var errors = "";
+	var verbose;
+	var dictfilename;
+	var dictfile;
+	var dictrec;
+	var errors = "";
 
-//time and compare the following. they are are same when using the pgexodus extension written in c
-//
-//assert(var().sqlexec("select key from ads order by exodus_extract_text(data,1,0,0)"));
-//assert(var().sqlexec("select key from ads order by split_part(data, E'\x1E', 1)"));
-//
-//but the pgsql implementation of exodus_extract_text (contained in this program) is significantly slower.
-//
-//bool use_pgexodus_extension = false; //convenient but 25% slower than using pgexodus.so c function  extension
-bool use_pgexodus_extension = true; //inconvenient but 30% faster than using pgsql functions
+	//time and compare the following. they are are same when using the pgexodus extension written in c
+	//
+	//assert(var().sqlexec("select key from ads order by exodus_extract_text(data,1,0,0)"));
+	//assert(var().sqlexec("select key from ads order by split_part(data, E'\x1E', 1)"));
+	//
+	//but the pgsql implementation of exodus_extract_text (contained in this program) is significantly slower.
+	//
+	//bool use_pgexodus_extension = false; //convenient but 25% slower than using pgexodus.so c function  extension
+	bool use_pgexodus_extension = true; //inconvenient but 30% faster than using pgsql functions
 
 function main() {
 
@@ -96,8 +96,7 @@ function main() {
 	/////////////////////////////
 	if (doall) {
 
-		var sqltemplate =
-			R"V0G0N(
+		var sqltemplate = R"V0G0N(
 CREATE OR REPLACE FUNCTION
 $functionname_and_args
 RETURNS $return_type
@@ -495,8 +494,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 
 	var xlatetemplate;
 	if (ismv)
-		xlatetemplate =
-			R"V0G0N(
+		xlatetemplate = R"V0G0N(
 -- $COMMENT
 $RETVAR := array_to_string
 (
@@ -645,8 +643,8 @@ $sqlcode
 }  //onedictid
 
 //exodus_field_remove
-var field_remove_sql =
-	R"V0G0N(
+
+	var field_remove_sql = R"V0G0N(
 DECLARE
  charn int;
  nchars int;
@@ -702,8 +700,8 @@ END;
 )V0G0N";
 
 //exodus_field_replace
-var field_replace_sql =
-	R"V0G0N(
+
+	var field_replace_sql = R"V0G0N(
 DECLARE
  charn int;
  nchars int;
@@ -770,8 +768,8 @@ END;
 )V0G0N";
 
 //exodus_split
-var split_sql =
-	R"V0G0N(
+
+	var split_sql = R"V0G0N(
 DECLARE
  inputx text;
  temp text;
@@ -822,8 +820,8 @@ END;
 )V0G0N";
 
 //exodus_unique
-var unique_sql =
-	R"V0G0N(
+
+	var unique_sql = R"V0G0N(
 DECLARE
 	-- The variable used to track iteration over "with_array".
 	loop_offset integer;
@@ -861,8 +859,8 @@ END;
 )V0G0N";
 
 //exodus_locate
-var locate_sql =
-	R"V0G0N(
+
+	var locate_sql = R"V0G0N(
 DECLARE
  searchstrarray text [];
  nfields int;
@@ -892,8 +890,8 @@ END;
 )V0G0N";
 
 //exodus_isnum -> bool
-var isnum_sql =
-	R"V0G0N(
+
+	var isnum_sql = R"V0G0N(
 DECLARE
  tt numeric;
 BEGIN
@@ -916,8 +914,8 @@ END;
 )V0G0N";
 
 //exodus_tobool -> bool
-var text_tobool_sql =
-	R"V0G0N(
+
+	var text_tobool_sql = R"V0G0N(
 DECLARE
  tt numeric;
 BEGIN
@@ -944,8 +942,8 @@ END;
 )V0G0N";
 
 //exodus_tobool(numeric) -> bool
-var numeric_tobool_sql =
-	R"V0G0N(
+
+	var numeric_tobool_sql = R"V0G0N(
 BEGIN
  return $1 != 0;
 END;
@@ -959,8 +957,8 @@ var exodus_todays_date_sql =
 
 //exodus_extract_date_array -> date[]
 //almost identical code in exodus_extract_time_array
-var exodus_extract_date_array_sql =
-	R"V0G0N(
+
+var exodus_extract_date_array_sql =	R"V0G0N(
 DECLARE
  dates text;
  date text;
@@ -989,8 +987,8 @@ END;
 
 //exodus_extract_time_array -> interval[]
 //almost identical code in exodus_extract_date_array
-var exodus_extract_time_array_sql =
-	R"V0G0N(
+
+	var exodus_extract_time_array_sql = R"V0G0N(
 DECLARE
  times text;
  timex text;
@@ -1018,8 +1016,8 @@ END;
 )V0G0N";
 
 //exodus_addcent4 -> text
-var exodus_addcent4_sql =
-	R"V0G0N(
+
+	var exodus_addcent4_sql = R"V0G0N(
 DECLARE
  year int;
 BEGIN
@@ -1036,8 +1034,8 @@ END;
 )V0G0N";
 
 //exodus_extract_text -> text
-var exodus_extract_text_sql =
-	R"V0G0N(
+
+	var exodus_extract_text_sql = R"V0G0N(
  if fn < 1 then
   return data;
  end if;
@@ -1054,8 +1052,8 @@ var exodus_extract_text_sql =
 )V0G0N";
 
 //exodus_extract_date -> date SIMILAR CODE in extract_number, extract_date and extract_time
-var exodus_extract_date_sql =
-	R"V0G0N(
+
+	var exodus_extract_date_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1084,8 +1082,8 @@ END;
 )V0G0N";
 
 //exodus_extract_time -> interval SIMILAR CODE in extract_number, extract_date and extract_time
-var exodus_extract_time_sql =
-	R"V0G0N(
+
+	var exodus_extract_time_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1114,8 +1112,8 @@ END;
 )V0G0N";
 
 //exodus_extract_datetime -> timestamp SIMILAR CODE in extract_number, extract_date and extract_time
-var exodus_extract_datetime_sql =
-	R"V0G0N(
+
+	var exodus_extract_datetime_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1142,8 +1140,8 @@ END;
 )V0G0N";
 
 //exodus_extract_number -> number SIMILAR CODE in extract_number, extract_date and extract_time
-var exodus_extract_number_sql =
-	R"V0G0N(
+
+	var exodus_extract_number_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1172,8 +1170,8 @@ END;
 )V0G0N";
 
 //exodus_count
-var exodus_count_sql =
-	R"V0G0N(
+
+	var exodus_count_sql = R"V0G0N(
 BEGIN
 
  return (CHAR_LENGTH(data) - CHAR_LENGTH(REPLACE(data, ch, '')));

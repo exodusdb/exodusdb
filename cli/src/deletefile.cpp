@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	var filenames = COMMAND.field(FM, 2, 999999);
 

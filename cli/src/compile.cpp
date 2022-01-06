@@ -1,7 +1,7 @@
 #include <list>
 #include <thread>
 
-static inline int ncompilationfailures;
+static inline int ncompilationfailures; //allow threads to indicate failure
 
 #include <exodus/program.h>
 programinit()

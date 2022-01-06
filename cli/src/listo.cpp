@@ -1,4 +1,5 @@
-/*
+/* obsoletee replaced by list.cpp and nlist.cpp
+
 //Exodus Copyright (c) 2009 Stephen Bush
 //Licence http://www.opensource.org/licenses/mit-license.php
 
