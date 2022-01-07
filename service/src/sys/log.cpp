@@ -47,7 +47,16 @@ function main(in programname0, in text0) {
 	text2.converter("|", VM);
 	text2 = trim(text2, VM);
 
-	if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
+	// Open or create a LOG file per year
+	// TODO use only one file and clear old entries perhaps once a year
+	//if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
+	var logfilename = "LOG" ^ year;
+	if (not log.open(logfilename)) {
+		createfile(logfilename);
+		if (not log.open(logfilename))
+			log = "";
+	}
+	if (log) {
 
 getlogkey:
 		time = ostime();

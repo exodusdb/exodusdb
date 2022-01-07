@@ -1168,6 +1168,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
 		if (OPTIONS)
 			COMMAND.splicer(-(OPTIONS.length()), OPTIONS.length(), "");
+		COMMAND.trimmerb(FM_);
 
 		// load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();

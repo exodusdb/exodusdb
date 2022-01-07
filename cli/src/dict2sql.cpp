@@ -1,3 +1,45 @@
+/*
+	dict2sql - Install dictionary pgsql functions and exodus extensions
+
+	SYNTAX
+
+		dict2sql [EXTENSIONS] [FILENAME,...] [DICTID]
+
+	EXTENSIONS
+
+		Optional or can be "pgsql" or "pgexodus".
+
+		Normally this is not required since they are installed during installa
+
+		"pgexodus" requires postgres SUPERUSER permissions.
+
+		"pgsql" very easy to install but maybe 25% SLOWER than using pgexodus.so c function  extension
+
+		"pgexodus" - inconvenient due to requirement to install extension in server
+		and require super user rights but 30% FASTER than using pgsql functions
+
+	FILENAME
+
+		Optional. If omitted then all dictionary files will be processed.
+
+		Use comma to separate multiple files WITHOUT any spaces.
+
+	DICTID
+
+		If provided then only that dictionary item will be processed.
+
+*/
+
+/*
+	time and compare the following. they are are same when using the pgexodus extension written in c
+
+	assert(var().sqlexec("select key from ads order by exodus_extract_text(data,1,0,0)"));
+	assert(var().sqlexec("select key from ads order by split_part(data, E'\x1E', 1)"));
+
+	but the pgsql implementation of exodus_extract_text (contained in this program) is significantly slower.
+
+*/
+
 #include <exodus/program.h>
 programinit()
 
@@ -7,15 +49,7 @@ programinit()
 	var dictrec;
 	var errors = "";
 
-	//time and compare the following. they are are same when using the pgexodus extension written in c
-	//
-	//assert(var().sqlexec("select key from ads order by exodus_extract_text(data,1,0,0)"));
-	//assert(var().sqlexec("select key from ads order by split_part(data, E'\x1E', 1)"));
-	//
-	//but the pgsql implementation of exodus_extract_text (contained in this program) is significantly slower.
-	//
-	//bool use_pgexodus_extension = false; //convenient but 25% slower than using pgexodus.so c function  extension
-	bool use_pgexodus_extension = true; //inconvenient but 30% faster than using pgsql functions
+	var install_exodus_extensions = "";
 
 function main() {
 
@@ -69,8 +103,8 @@ function main() {
 	verbose = index(OPTIONS, 'V');
 	var doall = true;
 
-	if (filenames.a(1) eq "pgsql") {
-		use_pgexodus_extension = false;
+	if (locateusing(",", filenames.a(1), "pgsql,pgexodus")) {
+		install_exodus_extensions = filenames.a(1);
 		filenames.remover(1);
 	}
 
@@ -113,14 +147,14 @@ DEFINER
 COST 10;
 )V0G0N";
 
-		// Drop obsolete functions
-		var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);");
+		// Drop obsolete functions - ignore errors
+		//var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);");
 
 		// Create Natural Order Collation
 		var().sqlexec("DROP COLLATION IF EXISTS exodus_natural;");
 		var().sqlexec("CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);");
 
-		if (use_pgexodus_extension) {
+		if (install_exodus_extensions eq "pgexodus") {
 
 	        var sqltemplate =
             R"V0G0N(
@@ -145,7 +179,7 @@ COST 10;
 
 			do_sql("exodus_count(data text, countchar text)","integer", "", sqltemplate);
 
-		} else {
+		} else if (install_exodus_extensions eq "pgsql") {
 
 			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);");
 
