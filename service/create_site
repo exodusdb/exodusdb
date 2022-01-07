@@ -37,16 +37,39 @@ set -eux
 : If installing into /root/ then allow cd into /root - but no read access of course
 : =================================================================================
 :
-	[ ${EXODUS:0:6} = /root/ ] && chmod o+x /root
+	if [ ${EXODUS:0:6} = /root/ ]; then
+		chmod o+x /root
+	fi
 
 :
 : Install apache and php if not already installed
 : ===============================================
 :
-	if which apachectl && which php; then true; else
+	if ! which apachectl || ! which php; then
 		sudo apt install -y apache2 php php-xml
 		sudo a2enmod rewrite ssl
 		sudo /etc/init.d/apache2 restart
+	fi
+
+:
+: Configure php.ini - increase limits
+: ===================================
+:
+	PHP_CONF_DIR=`php --ini|grep '/etc/php/[0-9.]*' -o | head -n1`
+	PHP_EXODUS_INI=${PHP_CONF_DIR}/apache2/conf.d/00-exodus.ini
+:
+	if [ ! -e $PHP_EXODUS_INI ]; then
+		cat > ${PHP_EXODUS_INI} <<-V0G0N
+			[exodus]
+			; defaults
+			; max_execution_time = 30
+			; upload_max_filesize = 2M
+			; post_max_size = 8M
+
+			max_execution_time = 606
+			upload_max_filesize = 50M
+			post_max_size = 50M
+		V0G0N
 	fi
 
 :
