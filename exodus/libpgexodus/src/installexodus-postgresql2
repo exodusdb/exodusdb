@@ -1,26 +1,28 @@
 #!/bin/bash
 
-#you need to run this script as root eg
+#you need to run this script as postgres user eg
 # sudo su postgres ./installexodus-postgresql2
 #or be able to login as postgres (often disabled)
 # su postgres ./installexodus-postgresql2
 
-#should be postgres
-/usr/bin/whoami
+# Must be postgres
+:
+	/usr/bin/whoami
 
 ##allow local tcp/ip login (not required on debian/ubuntu and co)
 #change "ident sameuser" to "md5" for all/all/127.0.0.1/32
 #host    all         all         127.0.0.1/32          ident sameuser
 #host    all         all         127.0.0.1/32          md5
-cd $HOME
-if [ -f ./data/pg_hba.conf ]; then
-        test -f ./data/pg_hba.conf.preexodus || cp ./data/pg_hba.conf ./data/pg_hba.conf.preexodus
-        cp ./data/pg_hba.conf ./data/pg_hba.conf.lastexodus
-        egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ./data/pg_hba.conf.lastexodus > ./data/pg_hba.conf
-        echo host all all 127.0.0.1/32 md5 >> ./data/pg_hba.conf
-fi
 
-psql -U postgres -d template1 << EOF2
+	cd $HOME
+	if [ -f ./data/pg_hba.conf ]; then
+		test -f ./data/pg_hba.conf.preexodus || cp ./data/pg_hba.conf ./data/pg_hba.conf.preexodus
+		cp ./data/pg_hba.conf ./data/pg_hba.conf.lastexodus
+		egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ./data/pg_hba.conf.lastexodus > ./data/pg_hba.conf
+		echo host all all 127.0.0.1/32 md5 >> ./data/pg_hba.conf
+	fi
+
+	psql -U postgres -d template1 << EOF2
 
 \connect template1
 SET client_min_messages = warning;
@@ -28,31 +30,37 @@ SET client_min_messages = warning;
 DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_time(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_datetime(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_count(text, text);
 
+DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
 
-CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;
-CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_sort' LANGUAGE C IMMUTABLE;
+CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4)     RETURNS text AS 'pgexodus', 'exodus_extract_text'          LANGUAGE C IMMUTABLE;
+-- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text AS 'pgexodus', 'exodus_extract_sort'          LANGUAGE C IMMUTABLE;
 -- Remaining functions are STRICT therefore never get called with NULLS -- also return NULL if passed zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4) RETURNS date AS 'pgexodus', 'exodus_extract_date' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4) RETURNS interval AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4)     RETURNS date AS 'pgexodus', 'exodus_extract_date'          LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4)     RETURNS interval AS 'pgexodus', 'exodus_extract_time'      LANGUAGE C IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 -- returns zero for zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4) RETURNS float8 AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4)   RETURNS float8 AS 'pgexodus', 'exodus_extract_number'      LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text)                       RETURNS integer AS 'pgexodus', 'exodus_count'              LANGUAGE C IMMUTABLE STRICT;
 
-DROP COLLATION IF EXISTS exodus_natural;
-CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
-
-CREATE ROLE exodus LOGIN
+CREATE ROLE exodus
+ LOGIN
  PASSWORD 'somesillysecret'
  CREATEDB CREATEROLE;
+
 CREATE DATABASE exodus
  WITH ENCODING='UTF8'
    OWNER=exodus;
+
+CREATE SCHEMA dict
+ AUTHORIZATION exodus;
+
+DROP COLLATION IF EXISTS exodus_natural;
+CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
 
 \connect exodus
 SET client_min_messages = warning;
@@ -60,32 +68,33 @@ SET client_min_messages = warning;
 DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_time(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_datetime(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_count(text, text);
 
+DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
 
-CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;
-CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4) RETURNS text AS 'pgexodus', 'exodus_extract_sort' LANGUAGE C IMMUTABLE;
+CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4)     RETURNS text AS 'pgexodus', 'exodus_extract_text'          LANGUAGE C IMMUTABLE;
+-- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text AS 'pgexodus', 'exodus_extract_sort'          LANGUAGE C IMMUTABLE;
 -- Remaining functions are STRICT therefore never get called with NULLS -- also return NULL if passed zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4) RETURNS date AS 'pgexodus', 'exodus_extract_date' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4) RETURNS interval AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4)     RETURNS date AS 'pgexodus', 'exodus_extract_date'          LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4)     RETURNS interval AS 'pgexodus', 'exodus_extract_time'      LANGUAGE C IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 -- returns zero for zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4) RETURNS float8 AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4)   RETURNS float8 AS 'pgexodus', 'exodus_extract_number'      LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text)                       RETURNS integer AS 'pgexodus', 'exodus_count'              LANGUAGE C IMMUTABLE STRICT;
 
 DROP COLLATION IF EXISTS exodus_natural;
 CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
 ALTER COLLATION exodus_natural OWNER TO exodus;
 
-ALTER FUNCTION public.exodus_count(text, text) OWNER TO exodus;
-ALTER FUNCTION public.exodus_extract_date(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_text(text, integer, integer, integer)     OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_date(text, integer, integer, integer)     OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_time(text, integer, integer, integer)     OWNER TO exodus;
 ALTER FUNCTION public.exodus_extract_datetime(text, integer, integer, integer) OWNER TO exodus;
-ALTER FUNCTION public.exodus_extract_number(text, integer, integer, integer) OWNER TO exodus;
-ALTER FUNCTION public.exodus_extract_text(text, integer, integer, integer) OWNER TO exodus;
-ALTER FUNCTION public.exodus_extract_time(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_number(text, integer, integer, integer)   OWNER TO exodus;
+ALTER FUNCTION public.exodus_count(text, text)                                 OWNER TO exodus;
 
 \df exodus*
 \dO

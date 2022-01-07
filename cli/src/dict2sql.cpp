@@ -43,13 +43,13 @@
 #include <exodus/program.h>
 programinit()
 
-	var verbose;
-	var dictfilename;
-	var dictfile;
-	var dictrec;
-	var errors = "";
+var verbose;
+var dictfilename;
+var dictfile;
+var dictrec;
+var errors = "";
 
-	var install_exodus_extensions = "";
+var install_exodus_extensions = "";
 
 function main() {
 
@@ -114,7 +114,7 @@ function main() {
 			filenames.splicer(1, 0, "dict.");
 	} else {
 		var dictdbname = "";
-		osgetenv("EXO_DICT",dictdbname);
+		osgetenv("EXO_DICT", dictdbname);
 		if (not dictdbname)
 			//must be the same in mvdbpostgres.cpp and dict2sql
 			dictdbname = "exodus";
@@ -156,8 +156,8 @@ COST 10;
 
 		if (install_exodus_extensions eq "pgexodus") {
 
-	        var sqltemplate =
-            R"V0G0N(
+			var sqltemplate =
+				R"V0G0N(
 CREATE OR REPLACE FUNCTION $functionname_and_args
 RETURNS $return_type
 AS 'pgexodus', '$functionname'
@@ -169,15 +169,12 @@ COST 10;
 )V0G0N";
 
 			do_sql("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-			do_sql("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-
-			do_sql("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
-
+			//do_sql("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
 			do_sql("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate);
 			do_sql("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate);
 			do_sql("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate);
-
-			do_sql("exodus_count(data text, countchar text)","integer", "", sqltemplate);
+			do_sql("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
+			do_sql("exodus_count(data text, countchar text)", "integer", "", sqltemplate);
 
 		} else if (install_exodus_extensions eq "pgsql") {
 
@@ -203,8 +200,7 @@ COST 10;
 			do_sql("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
 
 			//exodus_count(str,ch) returns an int
-			do_sql("exodus_count(data text, ch text)", "integer", exodus_count_sql, sqltemplate);
-
+			do_sql("exodus_count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
 		}
 
 		//create exodus pgsql functions
@@ -292,12 +288,12 @@ COST 10;
 }
 
 subroutine replace_FM_etc(io sql) {
-	sql.replacer(R"(\bRM\b)",  R"(E'\\x1F')");
-	sql.replacer(R"(\bFM\b)",  R"(E'\\x1E')");
-	sql.replacer(R"(\bVM\b)",  R"(E'\\x1D')");
-	sql.replacer(R"(\bSM\b)",  R"(E'\\x1C')");
+	sql.replacer(R"(\bRM\b)", R"(E'\\x1F')");
+	sql.replacer(R"(\bFM\b)", R"(E'\\x1E')");
+	sql.replacer(R"(\bVM\b)", R"(E'\\x1D')");
+	sql.replacer(R"(\bSM\b)", R"(E'\\x1C')");
 	sql.replacer(R"(\bSVM\b)", R"(E'\\x1C')");
-	sql.replacer(R"(\bTM\b)",  R"(E'\\x1B')");
+	sql.replacer(R"(\bTM\b)", R"(E'\\x1B')");
 	sql.replacer(R"(\bSTM\b)", R"(E'\\x1A')");
 }
 
@@ -321,9 +317,9 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	//decide if reindex is required - only if function has changed
 	var reindexrequired = false;
 	var oldfunction;
-	var functionname=field(functionname_and_args,"(",1).lcase();
-	var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'",oldfunction);
-	oldfunction.substrer(oldfunction.index("\n")+1);
+	var functionname = field(functionname_and_args, "(", 1).lcase();
+	var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
+	oldfunction.substrer(oldfunction.index("\n") + 1);
 	if (oldfunction and not functionsql.index(oldfunction)) {
 		reindexrequired = true;
 		//TRACE(functionsql)
@@ -356,14 +352,14 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 
 		errors ^= functionname_and_args.field("(", 1) ^ " ";
 
-//		if (not verbose) {
-//			//functionsql.outputl();
-//			int nlines = count(functionsql, "\n");
-//			for (int linen = 1; linen <= nlines; ++linen) {
-//				errputl(linen - 2 + 2, ". ", field(functionsql, "\n", linen));
-//			}
-//			errputl();
-//		}
+		//		if (not verbose) {
+		//			//functionsql.outputl();
+		//			int nlines = count(functionsql, "\n");
+		//			for (int linen = 1; linen <= nlines; ++linen) {
+		//				errputl(linen - 2 + 2, ". ", field(functionsql, "\n", linen));
+		//			}
+		//			errputl();
+		//		}
 		errmsg.errputl();
 	}
 	if (reindexrequired) {
@@ -374,12 +370,11 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 		var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
 		var fieldname = filename.convert(LOWERCASE, "").trim("_");
 		filename = filename.convert(UPPERCASE, "").trim("_");
-		if (filename.listindexes(filename,fieldname)) {
+		if (filename.listindexes(filename, fieldname)) {
 			logputl("Deleting index " ^ filename ^ " " ^ fieldname);
 			filename.deleteindex(fieldname);
 			logputl("Creating index " ^ filename ^ " " ^ fieldname);
 			filename.createindex(fieldname);
-
 		}
 	}
 
@@ -678,7 +673,7 @@ $sqlcode
 
 //exodus_field_remove
 
-	var field_remove_sql = R"V0G0N(
+var field_remove_sql = R"V0G0N(
 DECLARE
  charn int;
  nchars int;
@@ -735,7 +730,7 @@ END;
 
 //exodus_field_replace
 
-	var field_replace_sql = R"V0G0N(
+var field_replace_sql = R"V0G0N(
 DECLARE
  charn int;
  nchars int;
@@ -803,7 +798,7 @@ END;
 
 //exodus_split
 
-	var split_sql = R"V0G0N(
+var split_sql = R"V0G0N(
 DECLARE
  inputx text;
  temp text;
@@ -855,7 +850,7 @@ END;
 
 //exodus_unique
 
-	var unique_sql = R"V0G0N(
+var unique_sql = R"V0G0N(
 DECLARE
 	-- The variable used to track iteration over "with_array".
 	loop_offset integer;
@@ -894,7 +889,7 @@ END;
 
 //exodus_locate
 
-	var locate_sql = R"V0G0N(
+var locate_sql = R"V0G0N(
 DECLARE
  searchstrarray text [];
  nfields int;
@@ -925,7 +920,7 @@ END;
 
 //exodus_isnum -> bool
 
-	var isnum_sql = R"V0G0N(
+var isnum_sql = R"V0G0N(
 DECLARE
  tt numeric;
 BEGIN
@@ -949,7 +944,7 @@ END;
 
 //exodus_tobool -> bool
 
-	var text_tobool_sql = R"V0G0N(
+var text_tobool_sql = R"V0G0N(
 DECLARE
  tt numeric;
 BEGIN
@@ -977,7 +972,7 @@ END;
 
 //exodus_tobool(numeric) -> bool
 
-	var numeric_tobool_sql = R"V0G0N(
+var numeric_tobool_sql = R"V0G0N(
 BEGIN
  return $1 != 0;
 END;
@@ -992,7 +987,7 @@ var exodus_todays_date_sql =
 //exodus_extract_date_array -> date[]
 //almost identical code in exodus_extract_time_array
 
-var exodus_extract_date_array_sql =	R"V0G0N(
+var exodus_extract_date_array_sql = R"V0G0N(
 DECLARE
  dates text;
  date text;
@@ -1022,7 +1017,7 @@ END;
 //exodus_extract_time_array -> interval[]
 //almost identical code in exodus_extract_date_array
 
-	var exodus_extract_time_array_sql = R"V0G0N(
+var exodus_extract_time_array_sql = R"V0G0N(
 DECLARE
  times text;
  timex text;
@@ -1051,7 +1046,7 @@ END;
 
 //exodus_addcent4 -> text
 
-	var exodus_addcent4_sql = R"V0G0N(
+var exodus_addcent4_sql = R"V0G0N(
 DECLARE
  year int;
 BEGIN
@@ -1069,7 +1064,7 @@ END;
 
 //exodus_extract_text -> text
 
-	var exodus_extract_text_sql = R"V0G0N(
+var exodus_extract_text_sql = R"V0G0N(
  if fn < 1 then
   return data;
  end if;
@@ -1087,7 +1082,7 @@ END;
 
 //exodus_extract_date -> date SIMILAR CODE in extract_number, extract_date and extract_time
 
-	var exodus_extract_date_sql = R"V0G0N(
+var exodus_extract_date_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1117,7 +1112,7 @@ END;
 
 //exodus_extract_time -> interval SIMILAR CODE in extract_number, extract_date and extract_time
 
-	var exodus_extract_time_sql = R"V0G0N(
+var exodus_extract_time_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1147,7 +1142,7 @@ END;
 
 //exodus_extract_datetime -> timestamp SIMILAR CODE in extract_number, extract_date and extract_time
 
-	var exodus_extract_datetime_sql = R"V0G0N(
+var exodus_extract_datetime_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1175,7 +1170,7 @@ END;
 
 //exodus_extract_number -> number SIMILAR CODE in extract_number, extract_date and extract_time
 
-	var exodus_extract_number_sql = R"V0G0N(
+var exodus_extract_number_sql = R"V0G0N(
 DECLARE
  ans text;
 BEGIN
@@ -1205,7 +1200,7 @@ END;
 
 //exodus_count
 
-	var exodus_count_sql = R"V0G0N(
+var exodus_count_sql = R"V0G0N(
 BEGIN
 
  return (CHAR_LENGTH(data) - CHAR_LENGTH(REPLACE(data, ch, '')));
