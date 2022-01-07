@@ -52,15 +52,15 @@ CREATE ROLE exodus
  PASSWORD 'somesillysecret'
  CREATEDB CREATEROLE;
 
-CREATE DATABASE exodus
- WITH ENCODING='UTF8'
-   OWNER=exodus;
-
 CREATE SCHEMA dict
  AUTHORIZATION exodus;
 
 DROP COLLATION IF EXISTS exodus_natural;
 CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
+
+CREATE DATABASE exodus
+ WITH ENCODING='UTF8'
+   OWNER=exodus;
 
 \connect exodus
 SET client_min_messages = warning;
@@ -95,6 +95,9 @@ ALTER FUNCTION public.exodus_extract_time(text, integer, integer, integer)     O
 ALTER FUNCTION public.exodus_extract_datetime(text, integer, integer, integer) OWNER TO exodus;
 ALTER FUNCTION public.exodus_extract_number(text, integer, integer, integer)   OWNER TO exodus;
 ALTER FUNCTION public.exodus_count(text, text)                                 OWNER TO exodus;
+
+CREATE SCHEMA dict;
+ALTER SCHEMA dict OWNER TO exodus;
 
 \df exodus*
 \dO

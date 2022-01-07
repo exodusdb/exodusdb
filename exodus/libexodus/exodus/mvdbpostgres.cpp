@@ -1400,6 +1400,9 @@ bool var::sqlexec(const var& sql) const {
 		//skip table does not exist because it is very normal to check if table exists
 		//if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || DBTRACE)
 		//	response.logputl();
+
+		// For now, all sqlexec calls that do not accept a response have any error response sent to cerr
+		response.errputl();
 	}
 	return ok;
 }
@@ -1635,24 +1638,20 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	// 1);				// ask for binary results
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK) {
-#if TRACING >= 1
 		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 					 ", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
 					 var(PQerrorMessage(pgconn));
 		//errmsg.errputl();
 		throw MVDBException(errmsg);
-#endif
 		return false;
 	}
 
 	// if not updated 1 then fail
 	if (strcmp(PQcmdTuples(pgresult), "1") != 0) {
-#if TRACING >= 3
 		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
 			.errputl();
-#endif
 		return false;
 	}
 
@@ -1725,6 +1724,10 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 
 	// if not updated 1 then fail
 	if (strcmp(PQcmdTuples(pgresult), "1") != 0) {
+		var("ERROR: mvdbpostgres insertrecord(" ^ filehandle.convert(_FM_, "^") ^
+			", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
+			var(PQerrorMessage(pgconn)))
+			.errputl();
 		return false;
 	}
 
@@ -1789,11 +1792,10 @@ bool var::deleterecord(const var& key) const {
 	// if not updated 1 then fail
 	bool result;
 	if (strcmp(PQcmdTuples(pgresult), "1") != 0) {
-#if TRACING >= 3
-		var("var::deleterecord(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^
-			") failed. Record does not exist")
-			.errputl();
-#endif
+		if (DBTRACE)
+			var("var::deleterecord(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^
+				") failed. Record does not exist")
+				.errputl();
 		result = false;
 	} else
 		result = true;
@@ -1971,7 +1973,7 @@ bool var::deletefile(const var& filename) const {
 	// False if file does not exist
 	// Avoid generating sql errors since they abort transations
 	if (!var().open(filename, *this)) {
-		this->errputl(filename ^ " cannot be deleted because it does not exist. ");
+		//this->errputl(filename ^ " cannot be deleted because it does not exist. ");
 		return false;
 	}
 
@@ -2088,12 +2090,10 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 
 				throw MVDBException("get_dictexpression() cannot open " ^
 									dictfilename.quote());
-#if TRACING >= 1
 				var(
 					"ERROR: mvdbpostgres get_dictexpression() cannot open " ^
 					dictfilename.quote())
 					.errputl();
-#endif
 				return "";
 			}
 		}
@@ -2356,13 +2356,11 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 					// throw  MVDBException("get_dictexpression() " ^
 					// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
 					// DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
-#if TRACING >= 1
 					var("ERROR: mvdbpostgres get_dictexpression() " ^
 						filename.quote() ^ " " ^ fieldname.quote() ^
 						" - INVALID DICTIONARY EXPRESSION - " ^
 						dictrec.a(8).quote())
 						.errputl();
-#endif
 					return "";
 				}
 
@@ -2439,12 +2437,10 @@ exodus_call:
 		// throw  filename ^ " " ^ fieldname ^ " - INVALID DICTIONARY ITEM";
 		// throw  MVDBException("get_dictexpression(" ^ filename.quote() ^ ", " ^
 		// fieldname.quote() ^ ") invalid dictionary type " ^ dicttype.quote());
-#if TRACING >= 1
 		var("ERROR: mvdbpostgres get_dictexpression(" ^ filename.quote() ^ ", " ^
 			fieldname.quote() ^ ") invalid dictionary type " ^
 			dicttype.quote())
 			.errputl();
-#endif
 		return "";
 	}
 

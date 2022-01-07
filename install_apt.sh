@@ -63,89 +63,42 @@ set -euxo pipefail
 	cd ~/exodus
 	cmake .
 :
-: Clean all unless suppressed. In case half-built e.g.with wrong boost libs
+: Clean all - unless suppressed for speed. Required in case half-built with wrong libs somehow.
 :
-	[ $NOCLEAN ] || make clean
+	[ ${NOCLEAN:-} ] || make clean
 	cmake .
 
 :
-: Make all
+: Make all exodus lib, cli and pgexodus
 :
 	make -j `nproc`
 :
-: Install all
+: Install all exodus lib and cli
 :
 	sudo make install
+
 :
 : 2. Installing Postgres and Configuring it for Exodus
 : ====================================================
 :
-: Install the postgresql client package and restart postgresql
+: Install the postgresql client package
 :
-	#yum -y install postgresql-server
-	sudo DEBIAN_FRONTEND=noninteractive \
-	apt-get -y install postgresql postgresql-client
-	#/etc/init.d/postgresql reload
-	#sudo /etc/init.d/postgresql reload
-	sudo /etc/init.d/postgresql restart
+        #yum -y install postgresql-server
+        sudo DEBIAN_FRONTEND=noninteractive \
+        apt-get -y install postgresql postgresql-client
 :
-: Remove all the following since replicated in pgexodus install scripts
+: Restart postgres
 :
-#: Create a script file to install pgexodus extension functions
-#: as postgres superuser into the template1 database.
-#: Also create exodus user and database, and dict schema in template1
-#:
-#:
-#	cat > /tmp/exoduspg.input << EOF
-##!/bin/bash
-#
-#psql -U postgres -d template1 << EOF2
-#\connect template1
-#SET client_min_messages = warning;
-#
-#CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4)     RETURNS text      AS 'pgexodus', 'exodus_extract_text'     LANGUAGE C IMMUTABLE;
-#-- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text      AS 'pgexodus', 'exodus_extract_sort'     LANGUAGE C IMMUTABLE;
-#-- Remaining functions are STRICT therefore never get called with NULLS also return NULL if passed zero length strings
-#-- CREATE OR REPLACE FUNCTION exodus_extract_text2(data text, fn int4, vn int4, sn int4) RETURNS text      AS 'pgexodus', 'exodus_extract_text2'    LANGUAGE C IMMUTABLE STRICT;
-#CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;
-#CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4)     RETURNS interval  AS 'pgexodus', 'exodus_extract_time'     LANGUAGE C IMMUTABLE STRICT;
-#CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
-#-- Following return 0 for zero length strings
-#CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4)   RETURNS float8    AS 'pgexodus', 'exodus_extract_number'   LANGUAGE C IMMUTABLE STRICT;
-#CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text)                       RETURNS integer   AS 'pgexodus', 'exodus_count'            LANGUAGE C IMMUTABLE;
-#
-#CREATE ROLE exodus
-# LOGIN
-# PASSWORD 'somesillysecret'
-# CREATEDB CREATEROLE;
-#
-#CREATE SCHEMA dict
-# AUTHORIZATION exodus;
-#
-#CREATE COLLATION IF NOT EXISTS exodus_natural
-# (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
-#
-#CREATE DATABASE exodus
-# WITH ENCODING='UTF8'
-# OWNER=exodus;
-#
-#\df exodus*
-#\q
-#EOF2
-#
-#EOF
-#:
-#: Run the script just created
-#:
-#	chmod a+xr /tmp/exoduspg.input
-#	sudo su postgres -c "/tmp/exoduspg.input"
-#	rm /tmp/exoduspg.input
-#:
-#: Remove the script
-#:
-#	#/etc/init.d/postgresql reload
-#	#sudo /etc/init.d/postgresql reload
-#	sudo /etc/init.d/postgresql restart
+        #/etc/init.d/postgresql reload
+        #sudo /etc/init.d/postgresql reload
+        sudo /etc/init.d/postgresql restart
+
+:
+: make install again to install pgexodus extension and functions, and exodus user and database
+:
+        cd ~/exodus
+        make install
+
 :
 : 3. Configuring Exodus for Postgres
 : ==================================
@@ -161,6 +114,7 @@ set -euxo pipefail
 :
 : 4. Add some postgres utility functions
 : ======================================
+:
 : one of the exodus cli programs
 :
 	dict2sql
