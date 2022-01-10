@@ -187,9 +187,9 @@ function main()
 
 		//remove any existing test databases
 		for (var dbname : dbname2 ^ FM ^ dbname3 ^ FM ^ dbname4) {
-			var conn2;
-			if (conn2.connect(dbname)) {
-				conn2.disconnect();
+			var conndb2;
+			if (conndb2.connect(dbname)) {
+				conndb2.disconnect();
 				printl("verify delete", dbname);
 				printl("======================");
 				if (not conn1.dbdelete(dbname))
@@ -209,7 +209,7 @@ function main()
 
 	}
 
-	{	// Lets test"
+	{	// Lets test" WITHOUT transaction
 		//	global connect/disconnect
 		//	locks/unlocks
 		//	createfile/deletefile
@@ -228,6 +228,7 @@ function main()
 
 		//check 1 is still locked and can be unlocked and relocked
 		assert(not file.lock( "1"));
+		assert(not file.statustrans());
 		assert(file.unlock( "1"));
 		assert(file.lock( "1"));
 
@@ -249,6 +250,49 @@ function main()
 		disconnect();		// global connection
 	}
 
+	{	// Lets test" WITH trsnsaction
+		//	global connect/disconnect
+		//	locks/unlocks
+		//	createfile/deletefile
+		connect();			// global connection
+		begintrans();
+		var file = "NANOTABLE";
+		deletefile(file);
+		assert( createfile( file));
+
+		//check 1 can be locked and CAN BE relocked since in a transaction
+		assert(file.lock( "1") == 1);
+		assert(file.lock( "1") == 2);
+
+		//check 2 can be locked and CAN BE relocked since in a transaction
+		assert(file.lock( "2") == 1);
+		assert(file.lock( "2") == 2);
+
+		//check 1 is still locked
+		assert(file.lock( "1"));
+		assert(file.statustrans());
+		assert(not file.unlock( "1")); // check CANNOT unlock inside transactions
+		assert(file.lock( "1"));
+
+		//check 2 is still locked and CANNOT be unlocked inside transactions
+		assert(file.lock( "2"));
+		assert(not file.unlock( "2")); //CANNOT unlock unside trsnsactions
+		assert(file.lock( "2"));
+
+		//check unlockall
+		//Note: this unlocks locks on ALL FILES locks on the same connection
+		//NOT just the locks on the file in question
+		//TODO make it work per file and per connection?
+		assert(not file.unlockall()); //should do nothing inside transactions
+		assert(file.lock( "1"));
+		assert(file.lock( "2"));
+
+		assert( deletefile( file));
+		committrans();
+
+		disconnect();		// global connection
+	}
+
 	{
 		printl("create dbs exodus2 and exodus3");
 		var conn1;
@@ -257,22 +301,22 @@ function main()
 		assert(conn1.dbcreate(dbname3));
 
 		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
-		var conn2,conn3;
+		var conndb2,conndb3;
 		var table2="TABLE2";
 		var table3="TABLE3";
-		assert(conn2.connect(dbname2));
-		assert(conn3.connect(dbname3));
-		assert(not table2.open("TABLE2",conn2));
-		assert(not table3.open("TABLE3",conn3));
+		assert(conndb2.connect(dbname2));
+		assert(conndb3.connect(dbname3));
+		assert(not table2.open("TABLE2",conndb2));
+		assert(not table3.open("TABLE3",conndb3));
 		printl(table2);
 		printl(table3);
-		assert(conn2.createfile(table2));
-		assert(conn3.createfile(table3));
-		assert(not table2.open(table2,conn3));
-		assert(not table3.open(table3,conn2));
+		assert(conndb2.createfile(table2));
+		assert(conndb3.createfile(table3));
+		assert(not table2.open(table2,conndb3));
+		assert(not table3.open(table3,conndb2));
 
-		assert(table2.open(table2,conn2));
-		assert(table3.open(table3,conn3));
+		assert(table2.open(table2,conndb2));
+		assert(table3.open(table3,conndb3));
 		assert(write( "2.1111", table2, "2.111"));
 		assert(write( "3.1111", table3, "3.111"));
 		assert(write( "2.2222", table2, "2.222"));
@@ -285,12 +329,12 @@ function main()
 		assert(! read( tt, table2, "3.111"));
 
 		//test locks are per connection
-		assert(conn2.createfile("TESTLOCKS"));
-		assert(conn3.createfile("TESTLOCKS"));
+		assert(conndb2.createfile("TESTLOCKS"));
+		assert(conndb3.createfile("TESTLOCKS"));
 		var testlocks2;
 		var testlocks3;
-		assert(testlocks2.open("TESTLOCKS",conn2));
-		assert(testlocks3.open("TESTLOCKS",conn3));
+		assert(testlocks2.open("TESTLOCKS",conndb2));
+		assert(testlocks3.open("TESTLOCKS",conndb3));
 		assert(testlocks2.lock("123"));
 		assert(testlocks3.lock("123"));
 		assert(not testlocks2.lock("123"));
@@ -300,50 +344,53 @@ function main()
 		assert(testlocks2.lock("123"));
 		assert(testlocks3.lock("123"));
 
-		conn2.disconnect();
-		conn3.disconnect();
+		conndb2.disconnect();
+		conndb3.disconnect();
 	}
 	{
 		//test with two connections to the same database that locks work between the two
-		var conn2a, conn2b;
-		assert(conn2a.connect(dbname2));
-		assert(conn2b.connect(dbname2));
+		var conndb2a, conndb2b;
+		assert(conndb2a.connect(dbname2));
+		assert(conndb2b.connect(dbname2));
 		var table2a,table2b;
-		assert(table2a.open("TABLE2",conn2a));
-		assert(table2b.open("TABLE2",conn2b));
+		assert(table2a.open("TABLE2",conndb2a));
+		assert(table2b.open("TABLE2",conndb2b));
 
-		//lock on one connection
+		//lock on TABLE2 on db2
 		assert(table2a.lock("123X"));
-		//should fail on the other
+
+		//cannot repeat lock
+		assert(not table2a.lock("123X"));
+
+		//cannot unlock if not locked
+		assert(not table2b.unlock("123X"));
+
+		//lock "same" file and key lock on same db DIFFERENT connection
 		assert(not table2b.lock("123X"));
 
-		//should only be able to unlock on the connection that it was locked on
-		assert(table2b.unlock("123X"));//this actually FAILS to unlock
-		//should still fail
-		assert(not table2b.lock("123X"));
-
-		//unlocking on one connection
+		//unlocking on original connection
 		assert(table2a.unlock("123X"));
-		//should allow the other connection to lock
+
+		//should remove lock on the other connection since it is the same database
 		assert(table2b.lock("123X"));
 
-		conn2a.disconnect();
-		conn2b.disconnect();
+		conndb2a.disconnect();
+		conndb2b.disconnect();
 	}
 	{
 		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
-		var conn2, conn3;
-		assert(conn2.connect(dbname2));
-		assert(conn3.connect(dbname3));
+		var conndb2, conndb3;
+		assert(conndb2.connect(dbname2));
+		assert(conndb3.connect(dbname3));
 		var table2,table3;
-		assert( table2.open("TABLE2",conn2));
-		assert( table3.open("TABLE3",conn3));
+		assert( table2.open("TABLE2",conndb2));
+		assert( table3.open("TABLE3",conndb3));
 
-		conn2.begintrans();
+		conndb2.begintrans();
 		printl("select table2");
 		table2.select();
 
-		conn3.begintrans();
+		conndb3.begintrans();
 		printl("select table3");
 		table3.select();
 		var record2, id2, record3, id3;
@@ -366,15 +413,15 @@ function main()
 
 /* rather slow to check so skip
 		printl("check CANNOT delete databases while a connection is open");
-		//NB try to delete db2 from conn3 and vice versa
-		assert(not conn3.dbdelete(dbname2));
-		assert(not conn2.dbdelete(dbname3));
+		//NB try to delete db2 from conndb3 and vice versa
+		assert(not conndb3.dbdelete(dbname2));
+		assert(not conndb2.dbdelete(dbname3));
 */
-		conn2.committrans();
-		conn3.committrans();
+		conndb2.committrans();
+		conndb3.committrans();
 
-		conn2.disconnect();
-		conn3.disconnect();
+		conndb2.disconnect();
+		conndb3.disconnect();
 
 		printl("check copy db exodus2b to exodus4b");
 		var conn4;
@@ -751,6 +798,43 @@ dict(AGE_IN_YEARS) {
 	//rollbacktrans();
 
     }
+
+	{
+	    // Create a temporary file (ending _temp)
+	    var filename = "xo_test_trans_temp";
+	    var file;
+	    assert(not open(filename to file));
+
+	    //deletefile(filename); //should never exist since temporary
+	    assert(createfile(filename));
+
+	    // Check open/read/write
+	    assert(open(filename to file));
+	    assert(write(1 on file,1));
+	    assert(read(RECORD from file,1));
+	    assert(RECORD eq 1);
+
+	    // Start transaction
+	    assert(begintrans());
+
+	    // Check write within transaction can be seen within transaction
+	    assert(write(11 on file,1));
+	    assert(read(RECORD from file,1));
+	    assert(RECORD eq 11);
+
+	    // Rollback
+	    assert(rollbacktrans());
+
+	    // Check rollback reverts write
+	    assert(read(RECORD from file,1));
+	    assert(RECORD eq 1);
+
+	    // Check temporary files are deleted on closing connection
+	    disconnect();
+	    //disconnectall();
+	    connect();
+	    assert(not open(filename to file));
+	}
 
 	printl("Test passed");
 

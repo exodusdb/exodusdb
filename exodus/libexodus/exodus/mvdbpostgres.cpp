@@ -112,7 +112,6 @@ static var defaultconninfo =
 // MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
 // TODO so make sure that we dont use exit(n) anywhere in the programs!
 static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
-	//PGconn* pgp = (PGconn*)pgconn;
 	auto pgconn2 = pgconn;
     // at this point we have good new connection to database
     if (DBTRACE) {
@@ -166,19 +165,20 @@ std::string getresult(PGresult* pgresult, int rown, int coln) {
 	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
 }
 
-//given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
+// Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 var get_normal_filename(const var& filename_or_handle) {
 	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
 }
 
-// used to detect sselect command words that are values like quoted words or plain numbers. eg "xxx"
-// 'xxx' 123 .123 +123 -123
+// Detect sselect command words that are values like quoted words or plain numbers.
+// eg "xxx" 'xxx' 123 .123 +123 -123
 static const var valuechars("\"'.0123456789-+");
 
+// Get a unique lock number per filename & key to communicate to other connections
 uint64_t mvdbpostgres_hash_filename_and_key(const var& filehandle, const var& key) {
 
 	std::string fileandkey = get_normal_filename(filehandle);
-	fileandkey.append(" ");
+	fileandkey.push_back(' ');
 	fileandkey.append(key.normalize());
 
 	// TODO .. provide endian identical version
@@ -688,7 +688,7 @@ bool var::connect(const var& conninfo) {
 	// this turns off the notice when creating tables with a primary key
 	// DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
 	//this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"));
-	this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "NOTICE"));
+	this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"));
 
 	return true;
 }
@@ -896,12 +896,16 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 	var tablename;
 	var schema;
+	var and_schema_clause;
 	if (filename2.index(".")) {
 		schema = filename2.field(".",1);
 		tablename = filename2.field(".",2,999);
+		and_schema_clause = " AND table_schema = " ^ schema.squote();
 	} else {
 		schema = "public";
 		tablename = filename2;
+		//no schema filter allows opening temporary files with exist in various pg_temp_xxxx schemata
+		and_schema_clause = "";
 	}
 	// 1. look in information_schema.tables
 	var sql =
@@ -910,7 +914,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		EXISTS	(\
     		SELECT 	table_name\
     		FROM 	information_schema.tables\
-    		WHERE   table_name = '" ^ tablename ^ "' AND table_schema = '" ^ schema ^ "'\
+    		WHERE   table_name = " ^ tablename.squote() ^ and_schema_clause ^ "\
 				)";
 	var result;
 	connection2.sqlexec(sql, result);
@@ -1099,7 +1103,6 @@ bool var::read(const var& filehandle, const var& key) {
 	if (key == "%RECORDS%") {
 		var sql = "SELECT key from " ^ get_normal_filename(filehandle) ^ ";";
 
-		//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 		auto pgconn = get_pgconnection(filehandle);
 		if (pgconn == NULL)
 			return false;
@@ -1229,7 +1232,13 @@ var var::hash(const unsigned long long modulus) const {
 		return var_int = hash64;
 }
 
+// Returns
+// 0  - Failure
+// 1  - Success
+// "" - Failure - already locked and not in a transaction
+// 2  - Success - already locked and in a transaction
 var var::lock(const var& key) const {
+
 	// on postgres, repeated locks for the same thing (from the same connection) succeed and
 	// stack up they need the same number of unlocks (from the same connection) before other
 	// connections can take the lock unlock returns true if a lock (your lock) was released and
@@ -1239,21 +1248,27 @@ var var::lock(const var& key) const {
 	THISISDEFINED()
 	ISSTRING(key)
 
-	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
-
-	// check if already lock in current connection
-
-	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
-	//ConnectionLocks* connection_locks = (ConnectionLocks*)this->get_lock_table();
+	PGconn* pgconn = get_pgconnection(*this);
+	if (!pgconn)
+		return false;
 
 	auto mvconnection = get_mvconnection(*this);
 
-	if (mvconnection) {
-		// if already in local lock table then dont lock on database
-		// since postgres stacks up multiple locks
-		// whereas multivalue databases dont
-		if (mvconnection->connection_locks.find(hash64) != mvconnection->connection_locks.end())
-			return "";
+	// TODO consider preventing begintrans if lock cache not empty
+	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
+
+	// if already in lock cache
+	//
+	// then OUTSIDE transaction then FAIL with "" to indicate already locked
+	//
+	// then INSIDE transaction then SUCCEED with 2 to indicate already locked
+	//
+	// postgres allows and stacks up multiple locks whereas multivalue databases dont
+	if (mvconnection->connection_locks.contains(hash64)) {
+		if (mvconnection->in_transaction)
+			return 2; //SUCCESS TYPE ALREADY CACHED
+		else
+			return ""; //FAILURE TYPE ALREADY CACHED
 	}
 
 	// parameter array
@@ -1266,49 +1281,40 @@ var var::lock(const var& key) const {
 	paramLengths[0] = sizeof(uint64_t);
 	paramFormats[0] = 1;  // binary
 
-	const char* sql = "SELECT PG_TRY_ADVISORY_LOCK($1)";
+	// Locks outside transactions remain for the duration of the connection and can be unlocked/relocked or unlockall'd
+	// Locks inside transactions are unlockable and automatically unlocked on commit/rollback
+	const char* sql = (mvconnection->in_transaction) ? "SELECT PG_TRY_ADVISORY_XACT_LOCK($1)" : "SELECT PG_TRY_ADVISORY_LOCK($1)";
 
-	// DEBUG_LOG_SQL1
+	// Debugging
 	if (DBTRACE)
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLL ");
 
-	//"this" is a filehandle - get its connection
-	//PGconn* pgconn = (PGconn*)this->connection();
-	PGconn* pgconn = get_pgconnection(*this);
-	if (!pgconn)
-		return false;
-
+	// Call postgres
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										 /* one param */
 											NULL,										 /* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary pgresults */
 
+	// Handle serious errors
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1) {
 		var errmsg = "lock(" ^ (*this) ^ ", " ^ key ^ ")\n" ^
 					 var(PQerrorMessage(pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 					 var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 					 var(PQntuples(pgresult));
-		//errmsg.errputl();
 		throw MVDBException(errmsg);
-		return false;
 	}
 
-	bool lockedok = *PQgetvalue(pgresult, 0, 0) != 0;
-
-	// add it to the local lock table so we can detect double locking locally
-	// since postgres will stack up repeated locks by the same process
-	if (lockedok && mvconnection) {
-		// register that it is locked
-//#ifdef USE_MAP_FOR_UNORDERED
+	// Add to lock cache if successful
+	if (*PQgetvalue(pgresult, 0, 0) != 0) {
 		std::pair<const uint64_t, int> lock(hash64, 0);
 		mvconnection->connection_locks.insert(lock);
-//#else
-//		mvconnection->connection_locks->insert(hash64);
-//#endif
+		return 1;
 	}
 
-	return lockedok;
+	// Otherwise indicate failure
+	return 0;
+
 }
 
 bool var::unlock(const var& key) const {
@@ -1319,79 +1325,85 @@ bool var::unlock(const var& key) const {
 
 	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
 
-	// remove from local current connection connection_locks
-	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
+	auto pgconn = get_pgconnection(*this);
+	if (!pgconn)
+		return false;
+
 	auto mvconnection = get_mvconnection(*this);
 
-	if (mvconnection) {
-		// if not in local connection_locks then no need to unlock on database
-		if (mvconnection->connection_locks.find(hash64) == mvconnection->connection_locks.end())
-			return true;
-		// register that it is unlocked
-		mvconnection->connection_locks.erase(hash64);
-	}
+	// Unlock inside transaction has no effect
+	if (mvconnection->in_transaction)
+		return false;
+
+	// If not in lock cache then return false
+	if (!mvconnection->connection_locks.contains(hash64))
+		return false;
+
+	// Remove from lock cache
+	mvconnection->connection_locks.erase(hash64);
 
 	// parameter array
 	const char* paramValues[1];
 	int paramLengths[1];
 	int paramFormats[1];
 
-	//$1=advisory_lock
 	paramValues[0] = (char*)&hash64;
 	paramLengths[0] = sizeof(uint64_t);
 	paramFormats[0] = 1;
 
+	// $1=hashed filename and key
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
-	// DEBUG_LOG_SQL
 	if (DBTRACE)
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLU ");
 
-	//"this" is a filehandle - get its connection
-	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
-	if (!pgconn)
-		return false;
-
+	// Call postgres
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										 /* one param */
 											NULL,										 /* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary results */
 
-	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1) {
+	// Handle serious errors
+	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK) {
 		var errmsg = "unlock(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^ ")\n" ^
 					 var(PQerrorMessage(pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 					 var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 					 var(PQntuples(pgresult));
-		//errmsg.errputl();
 		throw MVDBException(errmsg);
-		return false;
 	}
 
-	return true;
+	// Should return true
+	return PQntuples(pgresult) == 1;
 }
 
 bool var::unlockall() const {
-	// THISIS("void var::unlockall() const")
+	THISIS("void var::unlockall() const")
+	THISISDEFINED()
 
-	// check if any locks
-	//	ConnectionLocks* connection_locks=tss_connection_lockss.get();
-	//ConnectionLocks* connection_locks = (ConnectionLocks*)this->get_lock_table();
+	auto pgconn = get_pgconnection(*this);
+	if (!pgconn)
+		return false;
+
 	auto mvconnection = get_mvconnection(*this);
-	if (mvconnection) {
-		// if local lock table is empty then dont unlock all database
-		if (mvconnection->connection_locks.begin() == mvconnection->connection_locks.end())
-			// TODO indicate in some global variable "OWN LOCK"
-			return true;
-		// register all unlocked locked
-		mvconnection->connection_locks.clear();
-	}
 
+	// Locks in transactions cannot be cleared
+	if (mvconnection->in_transaction)
+		return false;
+
+	// If lock cache is empty already then return true
+	if (mvconnection->connection_locks.empty())
+		return true;
+
+	// Clear the lock cache
+	mvconnection->connection_locks.clear();
+
+	// Should return true
 	return this->sqlexec("SELECT PG_ADVISORY_UNLOCK_ALL()");
+
 }
 
-// returns only success or failure
+// returns only success or failure so any response is logged and saved for future lasterror() call
 bool var::sqlexec(const var& sql) const {
 	var response = -1;	//no response required
 	bool ok = this->sqlexec(sql, response);
@@ -1412,7 +1424,6 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 	THISIS("bool var::sqlexec(const var& sqlcmd, var& response) const")
 	ISSTRING(sqlcmd)
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (!pgconn) {
 		response = "Error: sqlexec cannot find thread database connection";
@@ -1555,7 +1566,6 @@ bool var::write(const var& filehandle, const var& key) const {
 	sql ^= " ON CONFLICT (key)";
 	sql ^= " DO UPDATE SET data = $2";
 
-	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 	auto pgconn = get_pgconnection(filehandle);
 	if (!pgconn)
 		return false;
@@ -1620,7 +1630,6 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 
 	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
-	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 	auto pgconn = get_pgconnection(filehandle);
 	if (!pgconn)
 		return false;
@@ -1693,7 +1702,6 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	var sql =
 		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 
-	//PGconn* pgconn = (PGconn*)filehandle.get_pgconnection();
 	auto pgconn = get_pgconnection(filehandle);
 	if (!pgconn)
 		return false;
@@ -1764,7 +1772,6 @@ bool var::deleterecord(const var& key) const {
 
 	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (!pgconn)
 		return false;
@@ -1814,52 +1821,193 @@ void var::clearcache() const {
 	return;
 }
 
+/* How do transactions work in EXODUS?
+
+1. Visibilty of updates you make in a transaction
+
+Before you commit, any and all updates you make will not be read by any other connection.
+
+After you commit, any and all updates that you made will be immediately readable by all other connections regardless of whether they are in a transaction or not.
+
+Other connections can choose to be in a transaction mode where they CANNOT read any updates made after the commencement of their transaction. This allows reports to be consistent. NO IMPLEMENTED YET
+
+2. Visibility of other transactions while in a transaction.
+
+During your transaction on a connection by default you can will read any and all committed updates from other connections immediately they occur.
+
+Optionally you can be in a transaction mode where you will NOT read any updates made by other transactions after the commencement of your transaction.
+
+3. Lock visibility
+
+Locks are essentially independent of transactions and can be seen by other connections in real time.
+
+However, locks placed during a transaction cannot be unlocked and are automatically released after you commit. Unlock commands are therefore ignored.
+
+Within transactions, lock requests for locks that have already been obtained SUCCEED. This is the opposite of repeated locks outside of transactions which FAIL.
+
+4. How to coordinate updates between asynchronous processes using locks.
+
+	This process allows multiple asynchronous processes to update the database concurrently/in parallel as long as they are updating different data.
+
+	a. Start a transaction
+
+	b. Acquire an agreed lock appropriate for the data in c. and d.,
+	   OR wait for a limited period of time,
+	   OR or cancel the whole process i.e. rollback to to the state at a.
+
+	c. Read the data
+	d. Write the data
+
+	e. Repeat from b. as required for multiple updates
+
+	e. Commit the transaction (will also release all locks)
+
+	Generally *LOCK BEFORE READ* and *WRITE BEFORE UNLOCK* so that all READ and WRITE operations are "protected" by locks.
+
+	Locks form a barrier between changed state.
+
+	In the above, WRITE encompasses INSERT, UPDATE and DELETE.
+
+5. Postgres facilities used
+
+	Transaction isolation level used is the default:
+
+		READ COMMITTED (default)
+
+		SERIALIZABLE or REPEATABLE READ - pending implementation to facilite consistent reports based on snapshots
+
+		See https://www.postgresql.org/docs/12/sql-set-transaction.html
+
+	Locks are obtained and released:
+
+		Outside a transaction using pg_try_advisory_lock() and pg_try_advisory_unlock()
+
+		Inside a transaction  using pg_try_advisory_xact_lock() and commit or rollback.
+
+		See https://www.postgresql.org/docs/12/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS
+
+6. How Postgres handles versioning
+
+	Summary explanation: https://vladmihalcea.com/how-does-mvcc-multi-version-concurrency-control-work/
+
+	Detailed explanation: https://www.interdb.jp/pg/pgsql05.html
+
+	PostgreSQL stores all row versions in the table data structure.
+
+	This is called MVCC and postgres uses a version of it called "Snapshot Isolation".
+
+	It never updates existing rows, only adds new rows and marks the old rows as "deleted".
+
+	Automatic and manual VACUUM processes remove stale deleted rows at convenient times.
+
+	Every row has two additional columns:
+
+		t_xmin - the transaction id that inserted the record
+		t_xmax - the transaction id that deleted the row, if deleted.
+
+	Transaction id is an ever increasing 32 bit integer so it is possible to determine the
+	state of the database "as at" any transaction id. Every query eg SELECT gets its
+	own transaction id. Wrap around to zero after approx. 4.2 billion transactions is inevitable
+	and the concept of before and after is not absolute.
+
+	See SELECT txid_current();
+
+	Every row also has the following control info.
+
+		t_cid - holds the command id (cid), which means how many SQL commands were executed
+		        before this command was executed within the current transaction beginning from 0.
+
+		t_ctid - holds the tuple identifier (tid) that points to itself or a new tuple replacing it.
+
+*/
+
 // If this is opened SQL connection, pass connection ID to sqlexec
 bool var::begintrans() const {
 	THISIS("bool var::begintrans() const")
 	THISISDEFINED()
 
+	// Clear the record cache
 	this->clearcache();
 
 	// begin a transaction
-	return this->sqlexec("BEGIN");
+	//if (!this->sqlexec("BEGIN"))
+	if (!this->sqlexec("BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED"))
+		return false;
+
+	auto mvconnection = get_mvconnection(*this);
+
+	// Change status
+	// ESSENTIAL Used to change locking type to PER TRANSACTION
+	// so all locks persist until after commit i.e. cannot be specifically unlocked
+	mvconnection->in_transaction = true;
+
+	return true;
+
 }
 
 bool var::rollbacktrans() const {
 	THISIS("bool var::rollbacktrans() const")
 	THISISDEFINED()
 
+	// Clear the record cache
 	this->clearcache();
 
 	// Rollback a transaction
-	return this->sqlexec("ROLLBACK");
+	if (!this->sqlexec("ROLLBACK"))
+		return false;
+
+	auto mvconnection = get_mvconnection(*this);
+
+	// Change status
+	mvconnection->in_transaction = false;
+
+    // Clear the lock cache
+    mvconnection->connection_locks.clear();
+
+	return true;
 }
 
 bool var::committrans() const {
 	THISIS("bool var::committrans() const")
 	THISISDEFINED()
 
+	// Clear the record cache
 	this->clearcache();
 
 	// end (commit) a transaction
-	return this->sqlexec("END");
+	if (!this->sqlexec("END"))
+		return false;
+
+	auto mvconnection = get_mvconnection(*this);
+
+	// Change status
+	mvconnection->in_transaction = false;
+
+    // Clear the lock cache
+    mvconnection->connection_locks.clear();
+
+	return true;
+
 }
 
 bool var::statustrans() const {
 	THISIS("bool var::statustrans() const")
 	THISISDEFINED()
+//
+//	auto pgconn = get_pgconnection(*this);
+//	if (!pgconn) {
+//		this->lasterror("db connection " ^ var(get_mvconn_no(*this)) ^ "not opened");
+//		return false;
+//	}
+//
+//	//this->lasterror();
+//
+//	// only idle is considered to be not in a transaction
+//	return (PQtransactionStatus(pgconn) != PQTRANS_IDLE);
 
-	//PGconn* pgconn = (PGconn*)this->connection();
-	auto pgconn = get_pgconnection(*this);
-	if (!pgconn) {
-		this->lasterror("db connection " ^ var(get_mvconn_no(*this)) ^ "not opened");
-		return false;
-	}
+	auto mvconnection = get_mvconnection(*this);
+	return mvconnection->in_transaction;
 
-	//this->lasterror();
-
-	// only idle is considered to be not in a transaction
-	return (PQtransactionStatus(pgconn) != PQTRANS_IDLE);
 }
 
 // sample code
@@ -4285,7 +4433,6 @@ bool var::hasnext() {
 	if (!this->cursorexists())
 		return false;
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL) {
 		// this->clearselect();
@@ -4497,7 +4644,6 @@ bool var::readnext(var& record, var& key, var& valueno) {
 		}
 	}
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
@@ -4690,7 +4836,6 @@ var var::listfiles() const {
 	sql ^= " UNION SELECT matviewname as table_name, schemaname as table_schema from pg_matviews";
 	sql ^= " WHERE schemaname " ^ schemafilter;
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
@@ -4725,7 +4870,6 @@ var var::dblist() const {
 
 	var sql = "SELECT datname FROM pg_database";
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
@@ -4767,7 +4911,6 @@ bool var::cursorexists() {
 	var sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ this->a(1).convert(".", "_") ^ "'";
 	// var sql="SELECT name from pg_cursors";
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
@@ -4815,7 +4958,6 @@ var var::listindexes(const var& filename0, const var& fieldname0) const {
 		" AND indisprimary != 't'"
 		");";
 
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";
@@ -4871,7 +5013,6 @@ var var::reccount(const var& filename0) const {
 	sql ^= filename.a(1).lcase();
 	sql ^= "';";
 
-	//PGconn* pgconn = (PGconn*)filename.get_pgconnection();
 	auto pgconn = get_pgconnection(filename);
 	if (pgconn == NULL)
 		return "";
@@ -4909,7 +5050,6 @@ var var::flushindex(const var& filename) const {
 	// sql.logputl("sql=");
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
-	//PGconn* pgconn = (PGconn*)this->connection();
 	auto pgconn = get_pgconnection(*this);
 	if (pgconn == NULL)
 		return "";

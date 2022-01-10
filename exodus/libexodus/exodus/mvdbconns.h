@@ -63,6 +63,8 @@ class MVConnection	 // used as 'second' in pair, stored in connection map
 
 	std::string conninfo;
 
+	bool in_transaction = false;
+
 };
 
 //using CONN_MAP = std::map<int, MVConnection>;
