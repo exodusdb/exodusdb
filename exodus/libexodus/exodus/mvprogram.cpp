@@ -1570,6 +1570,8 @@ var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& re
 
 	//	var noptions = options.count(FM) + (options != "");
 	var options = optionsx;
+	if (not options)
+		options = "Yes" _VM_ "No";
 	options.converter(VM ^ "|", FM ^ FM);
 	var noptions = options.dcount(FM);
 	for (int optionn = 1; optionn <= noptions; optionn++) {
