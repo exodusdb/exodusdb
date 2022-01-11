@@ -1706,14 +1706,14 @@ lock:
 		// fail if unexpired persistent lock exists in LOCKS file
 		// on the same connection as file
 
-		var locks;
-		if (locks.open("LOCKS", file)) {
+		var leaselocks;
+		if (leaselocks.open("LOCKS", file)) {
 
 			var filename_for_locks = (filename.assigned() && filename) ? filename : file.a(1);
 			var lockfilekey = filename_for_locks ^ "*" ^ keyx;
 
 			var lockrec;
-			if (lockrec.read(locks, lockfilekey)) {
+			if (lockrec.read(leaselocks, lockfilekey)) {
 
 				//current dos time
 				//convert to Windows based date/time (ndays since 1/1/1900)
@@ -1723,7 +1723,7 @@ lock:
 
 				//remove lock if expired
 				if (lockrec.a(1) <= dostime) {
-					locks.deleterecord(lockfilekey);
+					leaselocks.deleterecord(lockfilekey);
 					lockrec = "";
 				}
 

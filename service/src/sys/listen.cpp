@@ -1,4 +1,3 @@
-
 #include <exodus/library.h>
 libraryinit()
 
@@ -71,7 +70,8 @@ var nrequests;//num
 var timeoutsecs;//num
 var sysmode;
 var origprivilege;
-var locks;
+var locks1;
+var leaselocks;
 var onactive;//num
 var bakpars;
 var datex;
@@ -193,8 +193,8 @@ var sublockrec;
 var code;//num
 var nextbfs;
 var handle;
-var keyorfilename;
-var fmc;//num
+//var keyorfilename;
+//var fmc;//num
 var msg0;
 var positive;
 var posmsg;
@@ -399,7 +399,7 @@ function main() {
 
 	//image=''
 
-	if (not(openfile("LOCKS", locks, "DEFINITIONS", 1))) {
+	if (not(openfile("LOCKS", locks1, "DEFINITIONS", 1))) {
 		call fsmsg();
 		gosub exit();
 	}
@@ -535,8 +535,8 @@ nextsearch:
 
 	//on win95 this runs at same speed in full screen or windowed
 
-	locks.unlock( "REQUEST*" ^ linkfilename1);
-	locks.unlock( "REQUEST*" ^ replyfilename);
+	locks1.unlock( "REQUEST*" ^ linkfilename1);
+	locks1.unlock( "REQUEST*" ^ replyfilename);
 	//print 'unlock locks,REQUEST*':linkfilename1
 	//print 'unlock locks,REQUEST*':replyfilename
 	call listen5("UNLOCKLONGPROCESS");
@@ -791,7 +791,7 @@ nextsearch0:
 
 		//"U" = unlock all locks
 		if (charx eq "U") {
-			clearfile(locks);
+			clearfile(locks1);
 			//unlock all
 			//if tracing then
 			printl(" ", "ALL LOCKS RELEASED");
@@ -936,7 +936,7 @@ gotlink:
 
 		//lock it to prevent other listeners from processing it
 		//unlock locks,'REQUEST*':linkfilename1
-		if (not(lockrecord("", locks, "REQUEST*" ^ linkfilename1, xx))) {
+		if (not(lockrecord("", locks1, "REQUEST*" ^ linkfilename1, xx))) {
 			if (tracing) {
 				printl("CANNOT LOCK LOCKS,", ("REQUEST*" ^ linkfilename1).quote());
 			}
@@ -1026,7 +1026,7 @@ readlink1:
 
 		//lock the replyfilename to prevent other listeners from processing it
 		//unlock locks,'REQUEST*':replyfilename
-		if (not(lockrecord("", locks, "REQUEST*" ^ replyfilename, xx))) {
+		if (not(lockrecord("", locks1, "REQUEST*" ^ replyfilename, xx))) {
 			//if tracing then print 'CANNOT LOCK LOCKS,':quote('REQUEST*':replyfilename)
 			goto nextlinkfile;
 		}
@@ -1755,7 +1755,12 @@ subroutine process() {
 		//since their status is dependent on the master lock status
 		masterlock = request6;
 
-		gosub lock();
+		if (not(file.open(filename, ""))) {
+			gosub badfile();
+			return;
+		}
+		leaselocks = "";
+		gosub leaselock();
 		sessionid.transfer(USER1);
 
 	} else if (request1 eq "UNLOCK") {
@@ -1766,7 +1771,12 @@ subroutine process() {
 		keyx = request3;
 		sessionid = request4;
 
-		gosub unlock();
+		if (not(file.open(filename, ""))) {
+			gosub badfile();
+			return;
+		}
+		leaselocks = "";
+		gosub leaseunlock();
 
 	//read a record
 	} else if ((request1 eq "READ" or request1 eq "READO") or request1 eq "READU") {
@@ -1813,6 +1823,7 @@ subroutine process() {
 			gosub badfile();
 			return;
 		}
+		leaselocks = "";
 
 		keyx0 = keyx;
 		preread = triggers.a(1);
@@ -1870,7 +1881,7 @@ getnextkey:
 
 			masterlock = "";
 
-			gosub lock();
+			gosub leaselock();
 
 			//if cannot lock then get next key
 			if (USER3 eq "NOT OK" and autokey) {
@@ -1907,7 +1918,7 @@ getnextkey:
 				if (badcomp) {
 noupdate:
 					if (sessionid) {
-						gosub unlock();
+						gosub leaseunlock();
 					}
 					sessionid = "";
 					//after unlock which sets response to OK
@@ -1936,8 +1947,8 @@ noupdate:
 				//no spaces in new keys
 				//allow in multipart keys on the assumption that they are old keys with spaces
 				if ((withlock and keyx.index(" ")) and not(keyx.index("*"))) {
-					//if sessionid then gosub unlock
-					gosub unlock();
+					//if sessionid then gosub leaseunlock
+					gosub leaseunlock();
 					//msg='Error: ':quote(params<1>):' must not contain a space character'
 					call listen4(28, USER3, keyx);
 					gosub fmtresp();
@@ -1952,7 +1963,7 @@ noupdate:
 					//must provide a key unless locking
 					if (not(authorised(filetitle2 ^ " CREATE", createnotallowed))) {
 						if (sessionid) {
-							gosub unlock();
+							gosub leaseunlock();
 						}
 						response_ = createnotallowed;
 						gosub fmtresp();
@@ -2009,7 +2020,7 @@ noupdate:
 			win.datafile = filename;
 			if (not(DICT.open("DICT." ^ win.datafile))) {
 				if (sessionid) {
-					gosub unlock();
+					gosub leaseunlock();
 				}
 				//response=quote('DICT.':datafile):' CANNOT BE OPENED'
 				call listen4(9, USER3, "DICT." ^ win.datafile);
@@ -2040,7 +2051,7 @@ noupdate:
 			//if reset>=5 or msg then
 			if (win.reset ge 5 or ((msg_ and (win.reset ne -1)))) {
 				if (withlock) {
-					gosub unlock();
+					gosub leaseunlock();
 					//wlocked=0
 				}
 				//if msg then msg='Error: ':msg
@@ -2064,7 +2075,7 @@ noupdate:
 						keyx2 = keyx;
 						keyx = lockkeyx;
 
-						gosub unlock();
+						gosub leaseunlock();
 
 						keyx = keyx2;
 					}
@@ -2097,7 +2108,7 @@ noupdate:
 			if (sessionid and not(win.wlocked)) {
 
 				storeresponse = USER3;
-				gosub unlock();
+				gosub leaseunlock();
 				response_ = storeresponse;
 
 				//remove session id
@@ -2195,9 +2206,16 @@ noupdate:
 			return;
 		}
 
-		//make sure that the record is already locked to the user
+		//TODO consider using RELOCKING to do the following leaselock check/update
+		//     and or getting a properlock before doing it
+
+		// Open the leaselocks on the same connection as the data file
+		if (not openleaselocks(win.srcfile))
+			return;
+
+		//make sure that the record is already leaselocked to the user
 		lockkey = filename ^ "*" ^ ID;
-		if (not(lockrec.read(locks, lockkey))) {
+		if (not(lockrec.read(leaselocks, lockkey))) {
 			lockrec = FM ^ FM ^ FM ^ FM ^ "NO LOCK RECORD";
 		}
 		if (sessionid ne lockrec.a(5)) {
@@ -2207,20 +2225,20 @@ noupdate:
 			return;
 		}
 
-		//update the lock session time
+		//update the leaselock session time
 		//similar code in lock: and write:
 		gosub getdostime();
 		lockduration = defaultlockmins / (24 * 60);
 		lockrec.r(1, lockduration + dostime);
 		lockrec.r(2, dostime);
-		lockrec.write(locks, lockkey);
+		lockrec.write(leaselocks, lockkey);
 
 		//get a proper lock on the file
-		//possibly not necessary as the locks file entry will prevent other programs
+		//possibly not necessary as the leaselocks file entry will prevent other programs
 		//proper lock will prevent index mfs hanging on write
 
 		win.valid = 1;
-		gosub properlk();
+		gosub properlock();
 		if (not(win.valid)) {
 			return;
 		}
@@ -2245,7 +2263,7 @@ noupdate:
 					olddatetime = win.orec.a(datetimefn);
 					newdatetime = RECORD.a(datetimefn);
 					if (olddatetime and olddatetime ne newdatetime) {
-						gosub properunlk();
+						gosub properunlock();
 						//response='Somebody else has updated this record.|Your update cannot be applied.':'|The time stamp does not agree'
 						call listen4(13, response_);
 						gosub fmtresp();
@@ -2266,7 +2284,7 @@ emptyrecorderror:
 				//response='Write empty data record is disallowed.'
 				call listen4(14, USER3);
 badwrite:
-				gosub properunlk();
+				gosub properunlock();
 				gosub fmtresp();
 				return;
 			}
@@ -2283,7 +2301,7 @@ badwrite:
 			//readv datetimefn from @dict,'DATE_TIME',2 then
 			// if @record<datetimefn> ne orec<datetimefn> then
 			//  response='Somebody else has updated this record.|Your update cannot be applied'
-			//  gosub properunlk
+			//  gosub properunlock
 			//  gosub fmtresp
 			//  return
 			//  end
@@ -2298,7 +2316,7 @@ badwrite:
 			}
 
 			if (not(win.valid)) {
-				gosub properunlk();
+				gosub properunlock();
 				USER3 = msg_;
 				gosub fmtresp();
 				return;
@@ -2312,8 +2330,8 @@ badwrite:
 			//journal.subs4 unlocks and it works fine and will leave lock hanging if it does not
 			if (ID ne keyx) {
 
-				gosub unlock();
-				gosub properunlk();
+				gosub leaseunlock();
+				gosub properunlock();
 
 				keyx = ID;
 
@@ -2323,12 +2341,12 @@ badwrite:
 				masterlock = "";
 
 				lockmins = defaultlockmins;
-				gosub lock();
+				gosub leaselock();
 				if (response_ ne "OK") {
 					return;
 				}
 
-				gosub properlk();
+				gosub properlock();
 				if (not(win.valid)) {
 					return;
 				}
@@ -2343,7 +2361,7 @@ badwrite:
 			}
 
 			//failsafe in case prewrite unlocks key?
-			//gosub properlk
+			//gosub properlock
 
 			replacewrite = triggers.a(5);
 			if (replacewrite) {
@@ -2417,7 +2435,7 @@ badwrite:
 				DATA = "";
 			}
 			if (not(win.valid)) {
-				gosub properunlk();
+				gosub properunlock();
 				response_ = USER4;
 				gosub fmtresp();
 				return;
@@ -2442,13 +2460,13 @@ badwrite:
 		//remove LOCKS file entry
 		if (request1 ne "WRITE") {
 
-			locks.deleterecord(lockkey);
+			leaselocks.deleterecord(lockkey);
 
 			//unlock local lock
 			win.srcfile.unlock( keyx);
 
 		} else {
-			gosub properunlk();
+			gosub properunlock();
 		}
 
 		//even postwrite/postdelete can now set invalid (to indicate invalid mode etc)
@@ -2729,7 +2747,7 @@ subroutine gettimeouttime() {
 	return;
 }
 
-subroutine properlk() {
+subroutine properlock() {
 	//must lock it properly otherwise indexing will try to lock it and fail
 	//because it is only in the LOCKS file and not properly locked
 	win.valid = 1;
@@ -2757,7 +2775,7 @@ subroutine properlk() {
 	return;
 }
 
-subroutine properunlk() {
+subroutine properunlock() {
 	//NB i think that shadow.mfs is NOT programmed to remove the locks file entry
 
 	//must unlock it properly otherwise indexing will try to lock it and fail
@@ -2775,7 +2793,7 @@ subroutine properunlk() {
 	return;
 }
 
-subroutine lock() {
+subroutine leaselock() {
 	//called from LOCK/RELOCK/READU (and WRITE if prewrite changes the key)
 
 	//cannot do update security check here, have to do it AFTER
@@ -2805,9 +2823,13 @@ subroutine lock() {
 		return;
 	}
 
+	// Open the leaselocks on the same connection as the data file
+	if (not openleaselocks(file))
+		return;
+
 	USER3 = "";
 	if (request1 eq "RELOCK") {
-		gosub lockit();
+		gosub rawlock();
 	} else {
 		if (lockrecord(filename, file, keyx, xx)) {
 			state = 1;
@@ -2828,7 +2850,7 @@ subroutine lock() {
 
 	//check locks file
 	lockkey = filename ^ "*" ^ keyx;
-	if (lockrec.read(locks, lockkey)) {
+	if (lockrec.read(leaselocks, lockkey)) {
 
 		//handle a subsidiary lock (has master lock details)
 		//very similar code in LISTEN and SHADOW.MFS
@@ -2839,7 +2861,7 @@ subroutine lock() {
 
 			//if masterlock is missing or doesnt have the same session id
 			//then the subsidiary is considered to have expired
-			if (not(lockrec.read(locks, masterlockkey))) {
+			if (not(lockrec.read(leaselocks, masterlockkey))) {
 				goto nolock;
 			}
 			if (lockrec.a(5) ne sublockrec.a(5)) {
@@ -2864,7 +2886,7 @@ subroutine lock() {
 
 			//other lock has timed out so ok
 			//no need to delete as will be overwritten below
-			//delete locks,lockkey
+			//delete leaselocks,lockkey
 
 		}
 
@@ -2885,7 +2907,7 @@ nolock:
 	if (masterlock) {
 
 		//fail if masterlock is missing or doesnt have the right session id
-		if (not(tt.read(locks, masterlock.field("*", 1, 2)))) {
+		if (not(tt.read(leaselocks, masterlock.field("*", 1, 2)))) {
 			goto nolock;
 		}
 		if (tt.a(5) ne masterlock.field("*", 3)) {
@@ -2902,7 +2924,7 @@ nolock:
 	//convert minutes to fraction of one day (windows time format)
 	lockduration = lockmins / (24 * 60);
 
-	//write the lock in the locks file
+	//write the lock in the leaselocks file
 	lockrec = "";
 
 	//similar code in lock: and write:
@@ -2921,7 +2943,7 @@ nolock:
 	FILEERRORMODE = 1;
 	FILEERROR = "";
 	response_ = "OK";
-	lockrec.write(locks, lockkey);
+	lockrec.write(leaselocks, lockkey);
 	if (FILEERROR) {
 		call fsmsg();
 		gosub geterrorresponse();
@@ -2933,7 +2955,7 @@ lockexit:
 
 	//unlock file,keyx
 	if (request1 eq "RELOCK") {
-		gosub unlockit();
+		gosub rawunlock();
 	} else {
 		file.unlock( keyx);
 	}
@@ -2941,40 +2963,42 @@ lockexit:
 	return;
 }
 
-subroutine lockit() {
+subroutine rawlock() {
 	//attempt to lock the record
 	//bypass ordinary lock,file,key process otherwise
 	//the lock record will be checked - and in this case
 	//we our own lock record to be present
-	code = 5;
-	nextbfs = "";
-	handle = file;
+	//code = 5;
+	//nextbfs = "";
+	//handle = file;
 
 	/*
 	//handle=handle[-1,'B':vm]
 	handle = field2(handle, VM, -1);
 	*/
 
-	keyorfilename = keyx;
-	fmc = 2;
-	gosub lockit2(code, nextbfs, handle, keyorfilename, fmc, state);
+	//keyorfilename = keyx;
+	//fmc = 2;
+	//gosub rawlock2(code, nextbfs, handle, keyorfilename, fmc, state);
+	call rtp57(5, "", file, keyx, 2, xx, state);
 	return;
 }
 
-subroutine unlockit() {
+subroutine rawunlock() {
 	//unlock file,keyx
-	code = 6;
-	gosub lockit2(code, nextbfs, handle, keyorfilename, fmc, state);
+	//code = 6;
+	//gosub rawlock2(code, nextbfs, handle, keyorfilename, fmc, state);
+	call rtp57(6, "", file, keyx, 2, xx, state);
 	return;
 }
 
-subroutine lockit2(in code, in nextbfs, io handle, in keyorfilename, in fmc, io state) {
-
-	//called from lockit and unlockit
-	call rtp57(code, nextbfs, handle, keyorfilename, fmc, xx, state);
-
-	return;
-}
+//subroutine rawlock2(in code, in nextbfs, io handle, in keyorfilename, in fmc, io state) {
+//
+//	//called from rawlock and rawunlock
+//	call rtp57(code, nextbfs, handle, keyorfilename, fmc, xx, state);
+//
+//	return;
+//}
 
 subroutine badfile() {
 	//response='Error: ':quote(filename):' file does not exist'
@@ -2982,7 +3006,19 @@ subroutine badfile() {
 	return;
 }
 
-subroutine unlock() {
+function openleaselocks(in file) {
+
+	// Open the leaselocks on the same connection as the data file
+	if (not(leaselocks.open("LOCKS", file))) {
+		response_="Error: LOCKS for " ^ file ^ " cannot be opened.";
+		//call listen4(9, USER3, win.datafile);
+		return false;
+	}
+
+	return true;
+}
+
+subroutine leaseunlock() {
 
 	//sessionid is used as a check that only the locker can unlock
 	if (not(file.open(filename, ""))) {
@@ -2990,8 +3026,12 @@ subroutine unlock() {
 		return;
 	}
 
+	// Open the leaselocks on the same connection as the data file
+	if (not openleaselocks(file))
+		return;
+
 	//lock file,keyx
-	gosub lockit();
+	gosub rawlock();
 	if (not state) {
 		//zzz perhaps should try again a few times in case somebody else
 		//is trying to lock but failing because of our remote lock
@@ -3004,7 +3044,7 @@ subroutine unlock() {
 	lockkey = filename ^ "*" ^ keyx;
 	FILEERRORMODE = 1;
 	FILEERROR = "";
-	if (not(lockrec.read(locks, lockkey))) {
+	if (not(lockrec.read(leaselocks, lockkey))) {
 		lockrec = "";
 	}
 	if (not lockrec) {
@@ -3039,7 +3079,7 @@ subroutine unlock() {
 	FILEERRORMODE = 1;
 	FILEERROR = "";
 	USER3 = "OK";
-	locks.deleterecord(lockkey);
+	leaselocks.deleterecord(lockkey);
 
 	if (FILEERROR) {
 		call fsmsg();
@@ -3048,7 +3088,7 @@ subroutine unlock() {
 
 unlockexit:
 
-	gosub unlockit();
+	gosub rawunlock();
 
 	return;
 }
@@ -3117,7 +3157,7 @@ subroutine filesecurity() {
 }
 
 subroutine addlockholder() {
-	if (tt.read(locks, filename ^ "*" ^ keyx)) {
+	if (tt.read(leaselocks, filename ^ "*" ^ keyx)) {
 		//if tt<6> then read tt from locks,field(tt<6>,'*',1,2) else null
 		response_ ^= ", LOCKHOLDER: " ^ (tt.a(4).quote());
 
