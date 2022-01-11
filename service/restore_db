@@ -53,10 +53,10 @@ set -euxo pipefail
 : Kill any test process running the target database
 : =================================================
 :
-	for PIDFILENAME in /run/serve_$APP_CODE/$TEST_EXO_DATA.pid
-	do
+	PIDFILENAME=/run/serve_${APP_CODE}/${APP_CODE}_test@${DB_CODE}.pid
+	if [ -f $PIDFILENAME ]; then
 		kill -TERM `cat $PIDFILENAME` || true
-	done
+	fi
 
 :
 : Kill any existing connections to the target database
@@ -73,10 +73,11 @@ set -euxo pipefail
 	sudo -u postgres dropdb --if-exists $TEST_EXO_DATA
 
 :
-: Create the target database initially as a copy of template1 database
-: ====================================================================
+: Create the target database as empty
+: ===================================
 :
-	sudo -u postgres createdb --owner exodus --template template1 $TEST_EXO_DATA
+	#sudo -u postgres createdb --owner exodus --template template1 $TEST_EXO_DATA
+	sudo -u postgres createdb --owner exodus --template template0 $TEST_EXO_DATA
 
 :
 : Restore into the target database
