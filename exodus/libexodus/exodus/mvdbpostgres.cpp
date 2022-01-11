@@ -54,29 +54,17 @@ THE SOFTWARE.
 //		- improve modularity of the Exodus platform;
 //		- allow easy expanding to other DB engines.
 
-#ifndef DEBUG
-#define TRACING 1
-//#define TRACING 5
-#else
-#define TRACING 2
-#endif
-
 #if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
 #define WIN32_LEAN_AND_MEAN
 #include <DelayImp.h>
 #include <windows.h>
-// doesnt seem to work, add them to visual studio project delayload section using semicolons or
-// special linker options #pragma comment(linker, "/DelayLoad:libpq.dll")
 #else
-//# define __try try
-//# define __except catch
 #endif
 
 #include <cstring>	//for strcmp strlen
 #include <iostream>
 
 // see exports.txt for all PQ functions
-//#include <postgresql/libpq-fe.h>//in postgres/include
 #include <libpq-fe.h>  //in postgres/include
 
 //#include <arpa/inet.h>//for ntohl()
@@ -96,17 +84,6 @@ static var defaultconninfo =
 	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
 	"password=somesillysecret connect_timeout=10";
 
-// bool startipc();
-
-// DBTRACE is set in exodus_main (console programs) but not when used as a plain library
-// so initialise it on the fly. assume that it will usually be less than one for not tracing
-//#define GETDBTRACE (DBTRACE >= 0 && getdbtrace())
-//bool getdbtrace() {
-//	if (DBTRACE == 0)
-//		DBTRACE = var().osgetenv("EXO_DBTRACE") ? 1 : -1;
-//	return DBTRACE > 0;
-//}
-
 // Deleter function to close connection and connection cache object
 // this is also called in the destructor of MVConnectionsCache
 // MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
@@ -123,20 +100,9 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 					//	delete pgp;
 }
 
-//#if TRACING >= 5
-#define DEBUG_LOG_SQL                  \
-	if (DBTRACE) {                  \
-		sql.squote().logputl("SQL0 "); \
-	}
+#define DEBUG_LOG_SQL if (DBTRACE) sql.squote().logputl("SQL0 ");
 
-#define DEBUG_LOG_SQL1                                                                                             \
-	if (DBTRACE) {                                                                                              \
-		((this->assigned() ? (this->substr(1,50)) : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).substr(1,50).squote())).logputl("SQL1 "); \
-	}
-//#else
-//#define DEBUG_LOG_SQL
-//#define DEBUG_LOG_SQL1
-//#endif
+#define DEBUG_LOG_SQL1 if (DBTRACE) {((this->assigned() ? (this->substr(1,50)) : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).substr(1,50).squote())).logputl("SQL1 ");}
 
 // this front end C interface is based on postgres
 // http://www.postgresql.org/docs/8.2/static/libpq-exec.html
@@ -185,7 +151,7 @@ uint64_t mvdbpostgres_hash_filename_and_key(const var& filehandle, const var& ke
 	// required if and when exodus processes connect to postgres on a DIFFERENT host
 	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
 	// SAME host
-	return MurmurHash64((char*)fileandkey.data(), int(fileandkey.length() * sizeof(char)), 0);
+	return MurmurHash64((char*)fileandkey.data(), int(fileandkey.size() * sizeof(char)), 0);
 
 }
 
@@ -329,58 +295,6 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 	return mvconn_no;
 }
 
-/*
-int get_mvconn_no_or_default(const var& dbhandle) {
-
-	// first return connection id if this is a connection handle
-	//	if (THIS_IS_DBCONN())
-	//		return (int) var_int;
-
-	int mvconn_no2 = get_mvconn_no(dbhandle);
-	if (mvconn_no2)
-		return mvconn_no2;
-
-	// otherwise return thread default connection id
-	int mvconn_no = thread_default_data_mvconn_no;
-	mvconn_no2 = 0;
-	if (mvconn_no) {
-		mvconn_no2 = mvconn_no;
-		//(var("get_mvconn_no_or_default found default thread connection id ") ^
-		// mvconn_no2).logputl();
-	}
-
-	// otherwise do a default connect and do setdefaultconnection
-	else {
-		//std::cerr << "get_mvconn_no_or_default didnt find default thread connection" << std::endl;
-		// id");
-		var conn1;
-		if (conn1.connect()) {
-
-			//conn1.setdefaultconnectionid();
-		    // connection number should be in field 2
-		    mvconn_no2 = get_mvconn_no(conn1);
-
-		    // save current connection handle number as thread specific handle no
-		    thread_default_data_mvconn_no = mvconn_no;
-			if (DBTRACE) {
-				var(mvconn_no).logputl("DBTR NEW DEFAULT CONN FOR DATA ");
-			}
-		}
-	}
-
-	// turn this into a db connection (int holds the connection number)
-	// leave any string in place but prevent it being used as a number
-	// var_int = mvconn_no2;
-	////var_str = ""; does it ever need initialising?
-	// var_typ = VARTYP_NANSTR_DBCONN;
-
-	// save the connection id
-	// this->r(2,mvconn_no2);
-
-	return mvconn_no2;
-}
-*/
-
 // var::get_pgconnection()
 // 1. return the associated db connection
 // this could be a previously opened filevar, a previous connected connectionvar
@@ -402,7 +316,6 @@ PGconn* get_pgconnection(const var& dbhandle) {
 
 	// otherwise error
 	if (!mvconn_no)
-		//throw MVDBException("pgconnection() requested when not connected. dbhandle:" ^ dbhandle);
 		throw MVDBException("pgconnection() requested when not connected.");
 
 	if (DBTRACE) {
@@ -423,6 +336,7 @@ MVConnection* get_mvconnection(const var& dbhandle) {
 	int mvconn_no = get_mvconn_no_or_default(dbhandle);
 	if (!mvconn_no)
 		throw MVDBException("get_mvconnection() attempted when not connected");
+
 	return thread_connections.get_mvconnection(mvconn_no);
 }
 
@@ -594,14 +508,11 @@ bool var::connect(const var& conninfo) {
 
 #if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
 		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) {
-#if TRACING >= 1
 			var libname = "libpq.dl";
 			// var libname="libpq.so";
 			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
 				". Verify configuration PATH contains postgres's \\bin.";
-			//errmsg.errputl();
 			this->lasterror(errmsg);
-#endif
 			return false;
 		};
 #else
@@ -624,19 +535,13 @@ bool var::connect(const var& conninfo) {
 	// failed to connect so return false
 	if (PQstatus(pgconn) != CONNECTION_OK) {
 
-		//#if TRACING >= 3
 		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
-		//errmsg ^= " ERROR: mvdbpostgres connect() Postgres connection configuration "
-		//	"missing or incorrect. Please login.";
-		//TODO remove password=somesillysecret
-		//errmsg ^= " " ^ fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********");
 
-		//#endif
-		//errmsg.errputl();
 		this->lasterror(errmsg);
 
 		// required even if connect fails according to docs
 		PQfinish(pgconn);
+
 		return false;
 	}
 
@@ -645,6 +550,7 @@ bool var::connect(const var& conninfo) {
 	if (!PQisthreadsafe()) {
 		// TODO only abort if environmentn>0
 		throw MVDBException("connect(): Postgres PQ library is not threadsafe");
+
 	}
 #endif
 
@@ -1001,6 +907,7 @@ bool var::reado(const var& filehandle, const var& key) {
 	int mvconn_no = get_mvconn_no_or_default(filehandle);
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed");
+
 	std::string cachedrecord =
 		thread_connections.getrecord(mvconn_no, filehandle.a(1).var_str, key.var_str);
 	if (!cachedrecord.empty()) {
@@ -1035,6 +942,7 @@ bool var::writeo(const var& filehandle, const var& key) const {
 	int mvconn_no = get_mvconn_no_or_default(filehandle);
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed");
+
 	thread_connections.putrecord(mvconn_no, filehandle.a(1).var_str, key.var_str, var_str);
 
 	return true;
@@ -1050,6 +958,7 @@ bool var::deleteo(const var& key) const {
 	int mvconn_no = get_mvconn_no_or_default(*this);
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed");
+
 	thread_connections.delrecord(mvconn_no, this->a(1).var_str, key.var_str);
 
 	return true;
@@ -1096,7 +1005,6 @@ bool var::read(const var& filehandle, const var& key) {
 		var errmsg = "read(...) filename not specified, probably not opened.";
 		this->lasterror(errmsg);
 		throw MVDBException(errmsg);
-		return false;
 	}
 
 	// reading a magic special key returns all keys in the file in natural order
@@ -1149,16 +1057,9 @@ bool var::read(const var& filehandle, const var& key) {
 	if (!pgconn)
 		return false;
 
-	//$parameter array
-	const char* paramValues[1];
-	int paramLengths[1];
-	// int		paramFormats[1];
-	// uint32_t	binaryIntVal;
-
-	//$1=key
-	paramValues[0] = key2.data();
-	paramLengths[0] = int(key2.length());
-	// paramFormats[0]=1;
+	// Parameter array
+	const char* paramValues[] = {key2.data()};
+	int paramLengths[] = {int(key2.size())};
 
 	var sql = "SELECT data FROM " ^ get_normal_filename(filehandle) ^ " WHERE key = $1";
 
@@ -1170,9 +1071,8 @@ bool var::read(const var& filehandle, const var& key) {
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
-	// paramFormats,
-	// 1);	  /* ask for binary results */
 
+	// Handle serious errors
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK) {
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		var errmsg =
@@ -1184,7 +1084,6 @@ bool var::read(const var& filehandle, const var& key) {
 		;
 		this->lasterror(errmsg);
 		throw MVDBException(errmsg);
-		// return false;
 	}
 
 	if (PQntuples(pgresult) < 1) {
@@ -1196,17 +1095,13 @@ bool var::read(const var& filehandle, const var& key) {
 		return false;
 	}
 
+	// A serious error
 	if (PQntuples(pgresult) > 1) {
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
 		throw MVDBException(errmsg);
-		//errmsg.errputl();
-		//this->lasterror(errmsg);
-		//return false;
 	}
 
 	*this = getresult(pgresult, 0, 0);
-
-	//this->lasterror();
 
 	return true;
 }
@@ -1223,7 +1118,7 @@ var var::hash(const unsigned long long modulus) const {
 	// std::string tempstr=this->normalize();
 
 	// uint64_t
-	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
+	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.size()*sizeof(wchar_t)),0);
 	uint64_t hash64 =
 		MurmurHash64((char*)var_str.data(), int(var_str.size() * sizeof(char)), 0);
 	if (modulus)
@@ -1271,15 +1166,10 @@ var var::lock(const var& key) const {
 			return ""; //FAILURE TYPE ALREADY CACHED
 	}
 
-	// parameter array
-	const char* paramValues[1];
-	int paramLengths[1];
-	int paramFormats[1];
-
-	//$1=advisory_lock
-	paramValues[0] = (char*)&hash64;
-	paramLengths[0] = sizeof(uint64_t);
-	paramFormats[0] = 1;  // binary
+	// Parameter array
+	const char* paramValues[] = {(char*)&hash64};
+	int paramLengths[] = {sizeof(uint64_t)};
+	int paramFormats[] = {1};  // binary
 
 	// Locks outside transactions remain for the duration of the connection and can be unlocked/relocked or unlockall'd
 	// Locks inside transactions are unlockable and automatically unlocked on commit/rollback
@@ -1342,14 +1232,10 @@ bool var::unlock(const var& key) const {
 	// Remove from lock cache
 	mvconnection->connection_locks.erase(hash64);
 
-	// parameter array
-	const char* paramValues[1];
-	int paramLengths[1];
-	int paramFormats[1];
-
-	paramValues[0] = (char*)&hash64;
-	paramLengths[0] = sizeof(uint64_t);
-	paramFormats[0] = 1;
+	// Parameter array
+	const char* paramValues[] = {(char*)&hash64};
+	int paramLengths[] = {sizeof(uint64_t)};
+	int paramFormats[] = {1};//binary
 
 	// $1=hashed filename and key
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
@@ -1540,22 +1426,6 @@ bool var::write(const var& filehandle, const var& key) const {
 		return true;
 	}
 
-	// a 2 parameter array
-	const char* paramValues[2];
-	int paramLengths[2];
-	// int		paramFormats[2];
-
-	//$1 key
-	// paramValues[0] = key2.data();
-	paramValues[0] = key2.data();
-	paramLengths[0] = int(key2.length());
-	// paramFormats[0] = 1;//binary
-
-	//$2 data
-	paramValues[1] = data2.data();
-	paramLengths[1] = int(data2.length());
-	// paramFormats[1] = 1;//binary
-
 	var sql;
 
 	// Note cannot use postgres PREPARE/EXECUTE with parameterised filename
@@ -1570,6 +1440,10 @@ bool var::write(const var& filehandle, const var& key) const {
 	if (!pgconn)
 		return false;
 
+	// Parameter array
+	const char* paramValues[] = {key2.data(), data2.data()};
+	int paramLengths[] = {int(key2.size()), int(data2.size())};
+
 	DEBUG_LOG_SQL1
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
@@ -1579,17 +1453,14 @@ bool var::write(const var& filehandle, const var& key) const {
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
-	// paramFormats,
-	// 1);				// ask for binary results
 
+	// Handle serious errors
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK) {
 		var errmsg = var("ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
 						 ", " ^ key ^ ") failed: PQresultStatus=" ^
 						 var(PQresultStatus(pgresult)) ^ " " ^
 						 var(PQerrorMessage(pgconn)));
-		//errmsg.errputl();
 		throw MVDBException(errmsg);
-		//return false;
 	}
 
 	// if not updated 1 then fail
@@ -1613,20 +1484,9 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
 
-	// a 2 parameter array
-	const char* paramValues[2];
-	int paramLengths[2];
-	// int		 paramFormats[2];
-
-	//$1=key
-	paramValues[0] = key2.data();
-	paramLengths[0] = int(key2.length());
-	// paramFormats[0] = 1;//binary
-
-	//$2=data
-	paramValues[1] = data2.data();
-	paramLengths[1] = int(data2.length());
-	// paramFormats[1] = 1;//binary
+	// Parameter array
+	const char* paramValues[] = {key2.data(), data2.data()};
+	int paramLengths[] = {int(key2.size()), int(data2.size())};
 
 	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
@@ -1643,16 +1503,13 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
-	// paramFormats,	// bytea
-	// 1);				// ask for binary results
 
+	// Handle serious errors
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK) {
 		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 					 ", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
 					 var(PQerrorMessage(pgconn));
-		//errmsg.errputl();
 		throw MVDBException(errmsg);
-		return false;
 	}
 
 	// if not updated 1 then fail
@@ -1684,20 +1541,9 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
 
-	// a 2 parameter array
-	const char* paramValues[2];
-	int paramLengths[2];
-	// int		 paramFormats[2];
-
-	//$1=key
-	paramValues[0] = key2.data();
-	paramLengths[0] = int(key2.length());
-	// paramFormats[0] = 1;//binary
-
-	//$2=data
-	paramValues[1] = data2.data();
-	paramLengths[1] = int(data2.length());
-	// paramFormats[1] = 1;//binary
+	// Parameter array
+	const char* paramValues[] = {key2.data(), data2.data()};
+	int paramLengths[] = {int(key2.size()), int(data2.size())};
 
 	var sql =
 		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
@@ -1715,19 +1561,14 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
-	// paramFormats,	// bytea
-	// 1);				// ask for binary results
 
+	// Handle serious errors
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK) {
-#if TRACING >= 3
 		var errmsg = "ERROR: mvdbpostgres insertrecord(" ^
 					 filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
 					 var(PQntuples(pgresult)) ^ " " ^
 					 var(PQerrorMessage(pgconn));
-		//errmsg.errputl();
 		throw MVDBException(errmsg);
-#endif
-		return false;
 	}
 
 	// if not updated 1 then fail
@@ -1760,15 +1601,9 @@ bool var::deleterecord(const var& key) const {
 		return this->osdelete(key);
 	}
 
-	// a one parameter array
-	const char* paramValues[1];
-	int paramLengths[1];
-	// int		 paramFormats[1];
-
-	//$1=key
-	paramValues[0] = key2.data();
-	paramLengths[0] = int(key2.length());
-	// paramFormats[0] = 1;//binary
+	// Parameter array
+	const char* paramValues[] = {key2.data()};
+	int paramLengths[] = {int(key2.size())};
 
 	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
@@ -1782,18 +1617,13 @@ bool var::deleterecord(const var& key) const {
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
-	// paramFormats,
-	// 1);	  /* ask for binary results */
 
+	// Handle serious errors
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK) {
-		//#if TRACING >= 1
 		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
 					 ", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
 					 var(PQerrorMessage(pgconn));
-		//errmsg.errputl();
 		throw MVDBException(errmsg);
-		//#endif
-		return false;
 	}
 
 	// if not updated 1 then fail
@@ -1817,6 +1647,7 @@ void var::clearcache() const {
 	int mvconn_no = get_mvconn_no_or_default(*this);
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed in clearcache");
+
 	thread_connections.clearrecordcache(mvconn_no);
 	return;
 }
@@ -2162,18 +1993,6 @@ inline void unquoter_inline(var& string) {
 		string = string.substr(2, string.length() - 2);
 }
 
-/*
-inline void tosqldate(var &datestr, const var &dateformat)
-{
-	// TODO! create global date format accessible from select
-	var idate = datestr.iconv("D/E");
-	if (idate)
-		datestr = idate.oconv("DJ");
-	else
-		throw MVDBException(datestr ^ " cannot be recognised as a date");
-}
-*/
-
 inline void tosqlstring(var& string1) {
 
 	// if double quoted then convert to sql style single quoted strings
@@ -2238,11 +2057,12 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 
 				throw MVDBException("get_dictexpression() cannot open " ^
 									dictfilename.quote());
-				var(
-					"ERROR: mvdbpostgres get_dictexpression() cannot open " ^
-					dictfilename.quote())
-					.errputl();
-				return "";
+
+//				var(
+//					"ERROR: mvdbpostgres get_dictexpression() cannot open " ^
+//					dictfilename.quote())
+//					.errputl();
+//				return "";
 			}
 		}
 	}
@@ -2292,7 +2112,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 							// mvdbpostgres get_dictexpression() cannot
 							// read " ^ fieldname.quote() ^ " from " ^
 							// actualdictfile.quote());
-							return "";
+							//return "";
 						}
 					}
 				}
@@ -2469,6 +2289,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 					var xlatetargetdictfile;
 					if (!xlatetargetdictfile.open(xlatetargetdictfilename))
 						throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ functionx);
+
 					sqlexpression = get_dictexpression(cursor, 
 						filename, xlatetargetfilename, xlatetargetdictfilename,
 						xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
@@ -2817,6 +2638,7 @@ bool var::saveselect(const var& filename) {
 	// clear or create any existing saveselect file with the same name
 	if (!this->createfile(filename))
 		throw MVDBException("saveselect cannot create file " ^ filename);
+
 	var file;
 	if (!file.open(filename, (*this)))
 		throw MVDBException("saveselect cannot open file " ^ filename);
@@ -3002,8 +2824,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			if (!dictfile.open("dict." ^ dictfilename)) {
 				throw MVDBException("select() dict_" ^ dictfilename ^
 									" file cannot be opened");
-				// exodus::errputl("ERROR: mvdbpostgres select() dict_" ^
-				// dictfilename ^ " file cannot be opened"); return "";
+
 			}
 			continue;
 		}
@@ -4116,11 +3937,6 @@ bool readnextx(const var& cursor, PGResult& pgresult, PGconn* pgconn, bool forwa
 	// sqlexec();
 	if (!get_pgresult(sql, pgresult, pgconn)) {
 
-		// var errmsg=var(PQresultErrorMessage(pgresult));
-		// throw MVDBException(errmsg);
-		// cursor.clearselect();
-		// return false;
-
 		var errmsg = var(PQresultErrorMessage(pgresult));
 		// errmsg.logputl("errmsg=");
 		// var(pgresult).logputl("pgresult=");
@@ -4350,6 +4166,7 @@ bool var::makelist(const var& listname, const var& keys) {
 		var lists = *this;
 		if (!lists.open("LISTS"))
 			throw MVDBException("makelist() LISTS file cannot be opened");
+
 		keys.write(lists, listname);
 		return true;
 	}
@@ -4406,6 +4223,7 @@ bool var::hasnext() {
 		var lists = *this;
 		if (!lists.open("LISTS"))
 			throw MVDBException("hasnext() LISTS file cannot be opened");
+
 		var listno = this->a(4);
 		listno++;
 		listid.fieldstorer("*", 2, 1, listno);
@@ -4694,6 +4512,8 @@ bool var::readnext(var& record, var& key, var& valueno) {
 		//this->lasterror(errmsg);
 		//throw MVDBException(errmsg);
 		// return false;
+
+		// Dont throw an error, just return empty record. why?
 		record = "";
 	} else {
 		record = getresult(pgresult, 0, 2);
@@ -4806,19 +4626,6 @@ bool var::deleteindex(const var& fieldname0) const {
 	return result;
 }
 
-/*
-http://www.petefreitag.com/item/666.cfm
-information_schema is am SQL-92 standard for accessinging information about the tables etc in a
-database
-	* Microsoft SQL Server - Supported in Version 7 and up
-	* MySQL - Supported in Version 5 and up
-	* PostgreSQL - Supported in Version 7.4 and up
-
-	* Oracle - Does not appear to be supported
-	* Apache Derby - NOT Supported As of Version 10.3
-	* DB2 - NOT supported?
-*/
-
 var var::listfiles() const {
 	THISIS("var var::listfiles() const")
 	THISISDEFINED()
@@ -4896,6 +4703,7 @@ var var::dblist() const {
 	return dbnames.sort();
 }
 
+//TODO avoid round trip to server to check this somehow or avoid calling it all the time
 bool var::cursorexists() {
 	// THISIS("var var::cursorexists() const")
 	// could allow undefined usage since *this isnt used?
@@ -5084,10 +4892,9 @@ static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
 	pgresult = pgresult;
 	*/
 
-	// parameter array but no parameters
+	// Parameter array with no parameters
 	const char* paramValues[1];
 	int paramLengths[1];
-	// int		 paramFormats[1];
 
 	// will contain any pgresult IF successful
 	pgresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
@@ -5095,67 +4902,39 @@ static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
 							paramValues, paramLengths,
 							0,	 // text arguments
 							0);	 // text results
-	// paramFormats,
-	// 1);	  /* ask for binary results */
 
 	// NO! pgresult is returned to caller to extract any data
 
 	if (!pgresult) {
-#if TRACING >= 1
 		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
-#endif
 
 		return false;
 	} else {
 		switch (PQresultStatus(pgresult)) {
-			case PGRES_COMMAND_OK:
-#if TRACING >= 3
-				const char* str_res;
-				str_res = PQcmdTuples(pgresult);
-				if (strlen(str_res) > 0) {
-					var("Command executed OK, " ^ var(str_res) ^ " rows.").logputl();
-				} else {
-					var("Command executed OK, 0 rows.").logputl();
-				}
-#endif
 
+			case PGRES_COMMAND_OK:
 				return true;
 
 			case PGRES_TUPLES_OK:
-
-#if TRACING >= 3
-				var(sql ^ "\nSelect executed OK, " ^ var(PQntuples(pgresult)) ^
-					" rows found.")
-					.logputl();
-#endif
-
 				return PQntuples(pgresult) > 0;
 
 			case PGRES_NONFATAL_ERROR:
 
-				//#if TRACING >= 1
 				var("ERROR: mvdbpostgres SQL non-fatal error code " ^
 					var(PQresStatus(PQresultStatus(pgresult))) ^ ", " ^
 					var(PQresultErrorMessage(pgresult)))
 					.errputl();
-				//#endif
 
 				return true;
 
 			default:
 
-				//#if TRACING >= 1
-				//if (sql.field(" ", 1) != "FETCH") {
-					var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
-					var("ERROR: mvdbpostgres pqexec " ^
-						var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
-						var(PQresultErrorMessage(pgresult)))
-						.errputl();
-				//}
-				//#endif
+				var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
+				var("ERROR: mvdbpostgres pqexec " ^
+					var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
+					var(PQresultErrorMessage(pgresult)))
+					.errputl();
 
-				// this is defaulted above for safety
-				// retcode=0;
 				return false;
 		}
 
