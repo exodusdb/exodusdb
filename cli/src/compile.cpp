@@ -70,11 +70,12 @@ function main() {
 	force = index(OPTIONS,"F");
 
 	//var ncpus = osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ", 1);
-	var ncpus = osshellread("grep -c ^processor /proc/cpuinfo").convert("\r\n","");
-	if (ncpus)
-		max_nthreads = ncpus * 1.5;
-	else
-		max_nthreads = 2;
+	//var ncpus = osshellread("grep -c ^processor /proc/cpuinfo").convert("\r\n","");
+	//if (ncpus)
+	//	max_nthreads = ncpus * 1.5;
+	//else
+	//	max_nthreads = 2;
+	var max_nthreads = int(std::thread::hardware_concurrency());
 	if (verbose)
 		printl("max threads = ", max_nthreads);
 
