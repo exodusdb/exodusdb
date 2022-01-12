@@ -463,9 +463,10 @@ while (1) {
 				//only attempt to autostart once
 				$gautostartdatabase = false;
 
-				//no autostart
-				$config = ReadAll("{$exodusrootpath}EXODUS//NET.CFG");
-				if (strpos($config, "AUTOSTART=YES") !== false) {
+				//autostart option
+				//$config = preg_replace('/\s*=\s*/','=', ReadAll("{$exodusrootpath/net.cfg"));
+				//if (stripos($config, "autostart=yes") !== false) {
+				if (is_file("$gdatalocation/autostart.cfg")) {
 
 					//extend waiting time to allow database to start (by 30 seconds?)
 					$waituntil = time() + $gsecondstowaitforreceipt * 2;
@@ -475,7 +476,7 @@ while (1) {
 
 					//where to write the run request
 					//D:\exodus\EXODUS\~9337586.RUN
-					$runrequestfilename = $exodusrootpath . "EXODUS" . $gslash . $linkfilename0 . ".RUN";
+					$runrequestfilename = "$exodusrootpath/work/$linkfilename0.run";
 
 					if (!WriteAll($runrequestfilename, $connectstring)) {
 						$response = "Could not write $runrequestfilename";

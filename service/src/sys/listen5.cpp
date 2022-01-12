@@ -25,8 +25,8 @@ var request3;
 var request4;
 var request5;
 var request6;
-var filenamesx;
-var filename;
+//var filenamesx;
+//var filename;
 var processes;
 var tt;
 var xx;
@@ -115,16 +115,12 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	if (request1 eq "RUNS") {
 
-		//db start commands
-		if (VOLUMES) {
-			var initdir="*.RUN";
-			filenamesx = initdir.oslistf();
-		} else {
-			filenamesx = oslistf("*.run");
-		}
+		//db start commands from xhttp.php
+		var filenamesx = oslistf("*.run");
 
-		for (var filen = 1; filen <= 9999; ++filen) {
-			filename = filenamesx.a(filen);
+		//for (var filen = 1; filen <= 9999; ++filen) {
+		for (var filename : filenamesx) {
+			//filename = filenamesx.a(filen);
 			///BREAK;
 			if (not filename) break;
 			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
@@ -134,13 +130,30 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					//dont start if there is a database stop command
 					if (not((tt.a(1).lcase() ^ ".end").osfile())) {
 						if (tt.a(5)) {
-							//garbagecollect;
-							tt = "CMD /C START EXODUS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
+							//var cmd = "CMD /C START EXODUS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
+
+							//TRACE: tt="tamra2^EXODUS^^^ADAGENCY^/root/hosts/tamra/data/tamra2/~4025798^"
+							//TRACE: osgetenv("EXO_SERVICE_CODE")="agy_live@tamra"
+
+							//var application = tt.a(5).substr(1,3).lcase();
+							var app_code = osgetenv("EXO_SERVICE_CODE").field("_",1);
+							if (not app_code)
+								app_code = osgetenv("APP_CODE");
+
+							var database = tt.a(1);
+							var mode="live";
+							if (database.ends("_test")) {
+								mode = "test";
+								database.splicer(-5, "");
+							}
+
+							var cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
 							//printl(at(0), at(-4), var().time().oconv("MTS"), " ", tt);
 							if (TERMINAL)
 								print(at(-40));
-							printl(var().time().oconv("MTS"), " ", tt);
-							tt.osshell();
+							printl(var().time().oconv("MTS"), " ", cmd);
+
+							cmd.osshell();
 						}
 						filename.osdelete();
 					}
@@ -502,7 +515,7 @@ nextpatch:;
 	} else if (request1.substr(1, 8) eq "GETINDEX") {
 
 		iodat_ = "";
-		filename = request2;
+		var filename = request2;
 		var fieldname = request3;
 		var prefix = request4;
 		var sortby = request5;
@@ -525,7 +538,7 @@ nextpatch:;
 
 		if (filename eq "JOURNALS" or filename eq "JOURNALS") {
 		} else {
-			gosub fileaccesscheck();
+			gosub fileaccesscheck(filename);
 			if (USER3) {
 				return 0;
 			}
@@ -632,7 +645,7 @@ getvalues:
 			filename0.converter(".", "_");
 			filename0.swapper("MEDIA_TYPE", "JOB_TYPE");
 		}
-		filename = filename0.field(" ", 1);
+		var filename = filename0.field(" ", 1);
 		var sortselect = request3;
 		var dictids = request4;
 		var options = request5;
@@ -648,7 +661,7 @@ getvalues:
 			return 0;
 		}
 
-		gosub fileaccesscheck();
+		gosub fileaccesscheck(filename);
 		if (USER3) {
 			return 0;
 		}
@@ -894,7 +907,7 @@ subroutine getdostime() {
 	return;
 }
 
-subroutine fileaccesscheck() {
+subroutine fileaccesscheck(in filename) {
 	USER3 = "";
 
 	var securityfilename = filename;
@@ -953,12 +966,7 @@ subroutine deleteoldfiles() {
 	}
 
 	//for each suitable file
-	if (VOLUMES) {
-		var initdir=filespec;
-		filenamesx = initdir.oslistf();
-	} else {
-		filenamesx = oslistf(filespec);
-	}
+	var filenamesx = oslistf(filespec);
 
 nextfiles:
 	if (filenamesx) {
@@ -966,13 +974,8 @@ nextfiles:
 		//get the file time
 		var filename0 = filenamesx.field(FM, 1);
 		filenamesx.splicer(1, filenamesx.field(FM, 1).length() + 1, "");
-		if (VOLUMES) {
-			if (not filenamesx) {
-				filenamesx = initdir.oslistf();
-			}
-		}
 
-		filename = inpath ^ filename0;
+		var filename = inpath ^ filename0;
 
 		//replaced by databasecode.SVR
 		//if filename0='GLOBAL.SVR' then goto deleteit
