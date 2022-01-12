@@ -82,7 +82,7 @@ set -eux
 	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
 	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus_live
 	EXO_DATA=exodus EXO_DICT=exodus sync_dat
-	EXO_DATA=exodus_live EXO_DICT=exodus_live sync_dat
+	EXO_DATA=exodus EXO_DICT=exodus_live sync_dat
 
 :
 : Configure the exodus service
