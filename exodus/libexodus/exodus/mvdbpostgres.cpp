@@ -155,38 +155,38 @@ uint64_t mvdbpostgres_hash_filename_and_key(const var& filehandle, const var& ke
 
 }
 
+// PGResult is a RAII/SBRM container of a PGresult pointer and calls PQclear on destruction
+// TODO perhaps replace PGResult to a smart pointer something like
+//using MVResult = std::unique_ptr<PGresult, decltype(&PQclear)>;
 class PGResult {
 
-	// Save pgresultptr in this class and to guarantee that it will be PQClear'ed on function
-	// exit PGResult clearer(pgresult);
-
-	// owns the PGresult object on the stack
+	// Owns the PGresult object on the stack. Initially none.
 	PGresult* pgresult_ = nullptr;
 
    public:
-	//default constructor
+
+	// Default constructor results in a nullptr
 	PGResult() = default;
 
-	// constructor from a PGresult*
+	// Allow construction from a PGresult*
 	PGResult(PGresult* pgresult)
 		: pgresult_(pgresult) {
-		// var("Got pgresult ... ").output();
 	}
 
-	// assignment from a PGresult*
+	// Allow assignment from a PGresult*
 	void operator=(PGresult* pgresult) {
 		pgresult_ = pgresult;
-		// var("Got pgresult ... ").output();
 	}
 
-	// implicit conversion to a PGresult*
+	// Allow implicit conversion to a PGresult*
+	// No tiresome .get() required as in unique_ptr
 	operator PGresult*() const {
 		return pgresult_;
-	};
+	}
 
-	// destructor calls PQClear
+	// Destructor calls PQClear
+	// This the whole point of having PGResult
 	~PGResult() {
-		// var("Cleared pgresult").logputl();
 		if (pgresult_ != nullptr)
 			PQclear(pgresult_);
 	}
@@ -624,7 +624,6 @@ bool var::attach(const var& filenames) {
 	// cache file handles in thread_file_handles
 	var notattached_filenames = "";
 	for (var filename : filenames2) {
-		//thread_file_handles[filename] = (filename ^ FM ^ mvconn_no).toString();
 		var filename2 = get_normal_filename(filename);
 		var file;
 		if (file.open(filename2,*this)) {
@@ -655,7 +654,6 @@ void var::detach(const var& filenames) {
 	ISSTRING(filenames)
 
 	for (var filename : filenames) {
-		//std::string filename2 = get_normal_filename(filename);
 		// Similar code in detach and deletefile
 		thread_file_handles.erase(get_normal_filename(filename));
 	}
@@ -748,7 +746,6 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
 	var filename2 = get_normal_filename(filename);
 
 	// filename dos or DOS  means osread/oswrite/osdelete
@@ -1911,17 +1908,10 @@ bool var::createfile(const var& filename) const {
 	// behavior is ON COMMIT DELETE ROWS. However, the default behavior in PostgreSQL is ON
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
-	//std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").var_str;
-	//std::string filename2 = get_normal_filename(filename);
-
 	var sql = "CREATE";
-	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
-	// sql ^= " TABLE " ^ filename.convert(".","_");
 	if (filename.substr(-5, 5) == "_temp")
 		sql ^= " TEMPORARY ";
-	//sql ^= " TABLE " + filename2;
 	sql ^= " TABLE " ^ get_normal_filename(filename);
-	// sql ^= " (key bytea primary key, data bytea)";
 	sql ^= " (key text primary key, data text)";
 
 	if (this->assigned())
@@ -2037,32 +2027,24 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 
 	var fieldname = fieldname0.convert(".", "_");
 	var actualdictfile = dictfile;
+
+	// Open dict.xxxx or dict.voc on the default dict connection or throw an error
 	if (!actualdictfile) {
+
+		// The dictionary of all dict. files is dict.voc. Used when selecting any dict. file.
 		var dictfilename;
 		if (mainfilename.substr(1, 5).lcase() == "dict.")
 			dictfilename = "dict.voc";
 		else
 			dictfilename = "dict." ^ mainfilename;
 
-		// we should open it through the same connection, as this->was opened, not any
-		// default connection
-		// int mvconn_no = 0;
-		// if (THIS_IS_DBCONN())
-		//	mvconn_no = (int) var_int;
-		// initialise the actualdictfilename to the same connection as (*this)
-		//actualdictfile = (*this);
+		// If dict .mainfile is not available, use dict.voc
 		if (!actualdictfile.open(dictfilename)) {
 			dictfilename = "dict.voc";
 			if (!actualdictfile.open(dictfilename)) {
 
 				throw MVDBException("get_dictexpression() cannot open " ^
 									dictfilename.quote());
-
-//				var(
-//					"ERROR: mvdbpostgres get_dictexpression() cannot open " ^
-//					dictfilename.quote())
-//					.errputl();
-//				return "";
 			}
 		}
 	}
@@ -2229,9 +2211,6 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 			sqlexpression ^= ", ";
 			sqlexpression ^= get_fileexpression(mainfilename, filename, "data");
 			sqlexpression ^= ")";
-			// sqlexpression^="::bytea";
-
-			// return sqlexpression;
 		}
 
 		//handle below.
@@ -2357,10 +2336,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 				//RIGHT JOIN MUST BE IDENTICAL ELSE WHERE TO PREVENT DUPLICATION
 				var join_part1 = stage2_calculated ? "RIGHT" : "LEFT";
 				join_part1 ^= " JOIN " ^ xlatetargetfilename ^ " ON ";
-				// var join_part2=xlatekeyexpression ^ "::text = " ^
-				// xlatetargetfilename ^ ".key"; var join_part2=xlatetargetfilename
-				// ^
-				// ".key = " ^ xlatekeyexpression ^ "::bytea";
+
 				var join_part2 =
 					xlatetargetfilename ^ ".key = " ^ xlatekeyexpression;
 				// only allow one join per file for now.
@@ -2388,10 +2364,6 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 exodus_call:
 			sqlexpression = "'" ^ fieldname ^ "'";
 			int environmentn = 1;  // getenvironmentn()
-			// sqlexpression="exodus_call('exodusservice-" ^ getprocessn() ^ "." ^
-			// environmentn ^ "'::bytea, '" ^ dictfilename.lcase() ^ "'::bytea, '" ^
-			// fieldname.lcase() ^ "'::bytea, "^ filename ^ ".key, " ^ filename ^
-			// ".data,0,0)";
 			sqlexpression = "exodus_call('exodusservice-" ^ getprocessn() ^ "." ^
 							environmentn ^ "', '" ^ dictfilename.lcase() ^ "', '" ^
 							fieldname.lcase() ^ "', " ^ filename ^ ".key, " ^ filename ^
@@ -2461,14 +2433,6 @@ exodus_call:
 		{
 
 			// use the fieldname as a sql column name
-
-			// convert multivalues to array
-			// if (from.substr(-7)=="::bytea")
-			//	from.splicer(-7,7,"");
-
-			// fieldname.logputl("fieldname=");
-			// filename.logputl("filename=");
-			// mainfilename.logputl("mainfilename=");
 
 			// if a mv field requires a join then add it to the SELECT clause
 			// since not known currently how to to do mv joins in the FROM clause
@@ -4305,69 +4269,6 @@ bool var::readnext(var& key, var& valueno) {
 	return this->readnext(record, key, valueno);
 }
 
-//	PGconn* pgconn = (PGconn*)this->connection();
-//	if (pgconn == NULL)
-//	{
-//		this->clearselect();
-//		return false;
-//	}
-//
-//	PGResult pgresult;
-//	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
-//
-//	//__asm__("int3");
-//
-//	if (not ok)
-//	{
-//		// end the transaction and quit
-//		// no more
-//		// committrans();
-//		this->clearselect();
-//		return false;
-//	}
-//
-//	/* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by
-//	calling pqexecparams flagged for binary
-//	//even in the case where there are no parameters and pqexec could be used.
-//
-//	//eg 90001 is 9.0.1
-//	int pgserverversion=PQserverVersion(pgconn);
-//	if (pgserverversion>=90001) {
-//		var(pgserverversion).logputl();
-//		//unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);
-//		size_t to_length;
-//		unsigned char* unescaped = PQunescapeBytea((const unsigned char*)
-//	PQgetvalue(pgresult, 0, 0), &to_length); if (*unescaped)
-//			key=stringfromUTF8((UTF8*)unescaped, to_length);
-//		PQfreemem(unescaped);
-//		return true;
-//	}
-//*/
-//	// get the key from the first column
-//	// char* data = PQgetvalue(pgresult, 0, 0);
-//	// int datalen = PQgetlength(pgresult, 0, 0);
-//	// key=std::string(data,datalen);
-//	key = getresult(pgresult, 0, 0);
-//	// key.output("key=").len().logputl(" len=");
-//
-//	//recursive call to skip any meta data with keys starting and ending %
-//	//eg keys like "%RECORDS%" (without the quotes)
-//	//similar code in readnext()
-//    if (key[1] == "%" && key[-1] == "%") {
-//		return this->readnext(key, valueno);
-//	}
-//
-//	// vn is second column
-//	// record is third column
-//	if (PQnfields(pgresult) > 1)
-//		// valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
-//		valueno = getresult(pgresult, 0, 1);
-//	else
-//		valueno = 0;
-//
-//	return true;
-//}
-
 /*how to access multiple records and fields*/
 #if 0
 	/* first, print out the attribute names */
@@ -4566,9 +4467,9 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 		return false;
 
 		/*
-		// add a new index field
+
+		// add a manually calculated index field
 		var index_fieldname = "index_" ^ fieldname;
-		// sql="alter table " ^ filename ^ " add " ^ index_fieldname ^ " bytea";
 		sql = "alter table " ^ filename ^ " add " ^ index_fieldname ^ " text";
 		if (not var().sqlexec(sql))
 		{
@@ -4585,7 +4486,8 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 			return false;
 		}
 		dictexpression = index_fieldname;
-	*/
+		*/
+
 	}
 
 	// create postgres index
@@ -4880,8 +4782,7 @@ var var::flushindex(const var& filename) const {
 // used for sql commands that require no parameters
 // returns 1 for success
 // returns 0 for failure
-// WARNING in either case caller MUST PQclear(pgresult)
-//static bool get_pgresult(const var& sql, PGresultptr& pgresult, PGconn* pgconn)
+// pgresult is returned to caller to extract any data and call PQclear(pgresult) in destructor of PGResult
 static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
 	DEBUG_LOG_SQL
 
@@ -4903,279 +4804,43 @@ static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
 							0,	 // text arguments
 							0);	 // text results
 
-	// NO! pgresult is returned to caller to extract any data
-
+	// Handle serious error. Why not throw?
 	if (!pgresult) {
 		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
-
 		return false;
-	} else {
-		switch (PQresultStatus(pgresult)) {
+	}
 
-			case PGRES_COMMAND_OK:
-				return true;
+	switch (PQresultStatus(pgresult)) {
 
-			case PGRES_TUPLES_OK:
-				return PQntuples(pgresult) > 0;
+		case PGRES_COMMAND_OK:
+			return true;
 
-			case PGRES_NONFATAL_ERROR:
+		case PGRES_TUPLES_OK:
+			return PQntuples(pgresult) > 0;
 
-				var("ERROR: mvdbpostgres SQL non-fatal error code " ^
-					var(PQresStatus(PQresultStatus(pgresult))) ^ ", " ^
-					var(PQresultErrorMessage(pgresult)))
-					.errputl();
+		case PGRES_NONFATAL_ERROR:
 
-				return true;
+			var("ERROR: mvdbpostgres SQL non-fatal error code " ^
+				var(PQresStatus(PQresultStatus(pgresult))) ^ ", " ^
+				var(PQresultErrorMessage(pgresult)))
+				.errputl();
 
-			default:
+			return true;
 
-				var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
-				var("ERROR: mvdbpostgres pqexec " ^
-					var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
-					var(PQresultErrorMessage(pgresult)))
-					.errputl();
+		default:
 
-				return false;
-		}
+			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
+			var("ERROR: mvdbpostgres pqexec " ^
+				var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
+				var(PQresultErrorMessage(pgresult)))
+				.errputl();
 
-		// should never get here
+			return false;
 	}
 
 	// should never get here
 	return false;
 
-} /* pqexec */
-
-/* create sql view from dict
-#include <exodus/mv.h>
-using namespace exodus;
-
-int main() {
-
-	var crlf="\r\n";
-
-	var textfile;
-	var dictfilename;
-	var extractvarno;
-	var expression;
-
-	//datafileprefix='DATA_'
-	var datafileprefix = "";
-	//viewsuffix='_VIEW'
-	var viewsuffix = "";
-	var viewprefix = "VIEW_";
-	//syntax is DICT2SQL filename,...�volumename
-
-	var filename = filenames.a(filen);
-	if (filename == "")
-		goto exit;
-
-	var sqlfilename = filename;
-	sqlfilename.converter(".", "_");
-
-	if (filename.substr(1, 5) == "DICT.")
-		dictfilename = "DICT.ACCESSIBLE_COLUMNS";
-	else
-		dictfilename = "DICT." ^ filename;
-	}
-
-	if (_DICT.open(dictfilename, ""))
-		var("SSELECT " ^ dictfilename ^ " BY TYPE BY FMC BY PART (S)").perform();
-	else
-		var().clearselect();
-
-		sql ^= crlf ^ "-- DROP TABLE " ^ datafileprefix ^ sqlfilename;
-		sql ^= crlf ^ "-- ;";
-
-		sql ^= crlf ^ "CREATE TABLE " ^ datafileprefix ^ sqlfilename;
-		sql ^= crlf ^ "(";
-		sql ^= crlf ^ " key bytea primary key,";
-		sql ^= crlf ^ " data bytea";
-		sql ^= crlf ^ ")";
-		sql ^= crlf ^ ";";
-
-		sql ^= crlf ^ "--DROP VIEW " ^ viewprefix ^ sqlfilename ^ viewsuffix;
-		sql ^= crlf ^ "--;";
-
-		//sql:=crlf:'CREATE OR REPLACE VIEW ':viewprefix:sqlfilename:viewsuffix:' AS SELECT
-' sql ^= crlf ^ "CREATE VIEW " ^ viewprefix ^ sqlfilename ^ viewsuffix ^ " AS SELECT ";
-
-		var nsvs = 0;
-
-		//table and view for multivalues
-		var anyvar = 0;
-		var nvars = 0;
-		var sql2 = "";
-		sql2 ^= crlf ^ "-- DROP TABLE " ^ datafileprefix ^ sqlfilename ^ "_LINES";
-		sql2 ^= crlf ^ "-- ;";
-
-		sql2 ^= crlf ^ var("CREATE TABLE ").oconv(datafileprefix) ^ sqlfilename ^ "_LINES";
-		sql2 ^= crlf ^ "(";
-		sql2 ^= crlf ^ " key bytea,";
-		sql2 ^= crlf ^ " lineno integer,";
-		sql2 ^= crlf ^ " PRIMARY KEY (key, lineno)";
-		sql2 ^= crlf ^ ")";
-		sql2 ^= crlf ^ ";";
-
-		sql2 ^= crlf ^ "--DROP VIEW " ^ viewprefix ^ sqlfilename ^ "_LINES" ^ viewsuffix;
-		sql2 ^= crlf ^ "--;";
-
-		//sql:=crlf:'CREATE OR REPLACE VIEW ':viewprefix:sqlfilename:'_LINES':viewsuffix:'
-AS SELECT ' sql2 ^= crlf ^ "CREATE VIEW " ^ viewprefix ^ sqlfilename ^ "_LINES" ^ viewsuffix ^ " AS
-SELECT ";
-
-		var ndicts = 0;
-
-nextdict:
-	while (true)
-	{
-		var dictid;
-		if (!dictid.readnext())
-			break;
-
-		var dict;
-		if (!(dict.read(_DICT, dictid)))
-			continue;
-
-		if (dictfilename == "DICT.ACCESSIBLE_COLUMNS") {
-			if (dictid == "TABLE_NAME")
-				goto continue;
-			//ordinary dictionaries dictid is not multipart
-			if (dictid == "COLUMN_NAME")
-				dict.replacer(5, 0, 0, "");
-		}
-
-		dictitem2sql(dict,sql);
-
-		if (dict.a(1) not_eq "F")
-			continue;
-
-		//skip duplicates
-		//if dict<28> then continue
-
-		ndicts += 1;
-
-		//sql^=crlf;
-
-		var ismv = dict.a(4)[1] == "M";
-		if (ismv) {
-			anyvar = 1;
-			extractvarno = "lineno";
-		}else{
-			extractvarno = "0";
-		}
-
-		if (dict.a(2) == "0") {
-			if (not dict.a(5)) {
-				expression = "key";
-			}else{
-				//needs pgexodus function not written as yet
-				//sql:='text_field(key,"*",':dict<5>:')'
-				//postgres only probably
-				expression = "split_part(key,\'*\'," ^ dict.a(5) ^ ")";
-			}
-		}else{
-			//if dict<7> then
-			//needs pgexodus functions installed in server
-			expression = "exodus_extract_text(data," ^ dict.a(2) ^ "," ^ extractvarno ^
-",0)";
-			//end else
-			// sql:='bytea_a(data,':dict<2>:',':extractvarno:',0)'
-			// end
-		}
-
-		var conversion = dict.a(7);
-		if (conversion.substr(1, 9) == "[DATETIME") {
-			expression.swapper("exodus_extract_text(", "exodus_extract_datetime(");
-
-		}else if (conversion[1] == "D" or conversion.substr(1, 5) == "[DATE") {
-			//expression[1,0]="date '1967-12-31' + cast("
-			//expression:=' as integer)'
-			expression.swapper("exodus_extract_text(", "exodus_extract_date(");
-
-		}else if (conversion == "[NUMBER,0]" or dict.a(11) == "0N" or (dict.a(11)).substr(1,
-3) == "0N_") { expression.splicer(1, 0, "cast("); expression ^= " as integer)";
-			//zero length string to be treated as null
-			expression.swapper("exodus_extract_text(", "exodus_extract_text2(");
-
-		}else if (conversion.substr(1, 2) == "MD" or conversion.substr(1, 7) == "[NUMBER" or
-(dict.a(11)).substr(1, 7) == "[NUMBER" or dict.a(12) == "FLOAT" or (dict.a(11)).index("0N", 1)) {
-			expression.splicer(1, 0, "cast(");
-			expression ^= " as float)";
-			//zero length string to be treated as null
-			expression.swapper("exodus_extract_text(", "exodus_extract_text2(");
-
-		}else if (conversion.substr(1, 2) == "MT" or conversion.substr(1, 5) == "[TIME") {
-			//expression[1,0]="cast("
-			//expression:=' as interval)'
-			expression.swapper("exodus_extract_text(", "exodus_extract_time(");
-
-		}else if (dict.a(9) == "R") {
-			//expression[1,0]="cast("
-			//expression:=' as numeric)'
-			//zero length string to be treated as null
-			expression.swapper("exodus_extract_text(", "exodus_extract_text2(");
-
-		}
-
-		if (ismv) {
-			nvars += 1;
-			sql2 ^= crlf ^ expression ^ " as " ^ dictid;
-			sql2 ^= ", ";
-		}else{
-			nsvs += 1;
-			sql ^= crlf ^ expression ^ " as " ^ dictid;
-			sql ^= ", ";
-		}
-
-	}//dicts
-
-
-	if (nsvs) {
-		sql.trimmerb();
-		if (sql[-1] == ",")
-			sql.popper();
-	}else{
-		sql ^= " *";
-	}
-
-	if (nvars) {
-		sql2.trimmerb();
-		if (sql2[-1] == ",")
-			sql2.popper();
-	}
-
-	sql ^= crlf ^ " from " ^ datafileprefix ^ sqlfilename;
-	sql ^= crlf ^ ";";
-
-	if (anyvar) {
-
-		sql2 ^= crlf ^ " from " ^ datafileprefix ^ sqlfilename ^ "_LINES";
-		sql2 ^= crlf ^ " LEFT JOIN " ^ datafileprefix ^ sqlfilename;
-		sql2 ^= " ON " ^ datafileprefix ^ sqlfilename ^ "_LINES.KEY = " ^ datafileprefix ^
-sqlfilename ^ ".key"; sql2 ^= crlf ^ ";";
-
-		sql ^= crlf ^ sql2;
-		sql2 = "";
-	}
-
-	sql ^= crlf ^ "COMMIT;";
-
-	sql.swapper(_FM, crlf);
-
-	if (!textptr)
-		sql.splicer(1, 0, "BEGIN;" ^ (crlf));
-
-	osbwritex(sql, textfile, textfilename, textptr);
-	textptr += sql.length();
-
-	sql = "";
-
-	var().stop();
 }
-
-}
-
-*/
 
 }  // namespace exodus
