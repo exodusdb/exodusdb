@@ -89,12 +89,16 @@ set -euxo pipefail
 	if [[  $OPTIONS =~ "V" ]]; then
 
 		if dbcomp $LIVE_EXO_DATA $TEST_EXO_DATA {S}; then
-
 			:
-			: Flag success if no differences except in status/log files
-			: =========================================================
+			: Flag success - no differences except in status/log files
+			: ========================================================
 			:
 				touch "$HOME/hosts/$LIVE_EXO_DATA/data/$LIVE_EXO_DATA/params2"
+        else
+            :
+            : Flag fail - differences found
+            : =============================
+            :
 		fi
 	fi
 
