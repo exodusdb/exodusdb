@@ -268,8 +268,8 @@ COST 10;
 
 	if (doall) {
 		//ignore error if doesnt exist
-		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW dict.all"))
-			rawsqlexec("DROP VIEW dict.all");
+		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW IF EXISTS dict.all"))
+			rawsqlexec("DROP VIEW IF EXISTS dict.all");
 
 		if (filenames.index(FM)) {
 			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
@@ -1214,7 +1214,7 @@ END;
 )V0G0N";
 
 subroutine rawsqlexec(in sql) {
-	printl(sql);
+	printl(sql.field("\n",3));
 	var errormsg;
 	if (not var().sqlexec(sql, errormsg)) {
 		errors ^= "\n" ^ errormsg;
@@ -1223,7 +1223,7 @@ subroutine rawsqlexec(in sql) {
 }
 
 subroutine rawsqlexec(in sql, out errormsg) {
-	printl(sql);
+	printl(sql.field("\n",3));
 	var().sqlexec(sql, errormsg);
 	return;
 }
