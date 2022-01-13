@@ -56,6 +56,7 @@ set -euxo pipefail
 : Refresh git in case reinstalling
 :
 	cd ~/exodus
+	git stash
 	git pull
 :
 : Config make with all cpus in parallel
