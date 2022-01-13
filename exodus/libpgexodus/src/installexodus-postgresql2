@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euxo pipefail
 
 #you need to run this script as postgres user eg
 # sudo su postgres ./installexodus-postgresql2
@@ -23,47 +24,23 @@
 	fi
 
 	psql -U postgres -d template1 << EOF2
-
 \connect template1
 SET client_min_messages = warning;
-
-DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_time(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_datetime(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_count(text, text);
-
-DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
-
-CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4)     RETURNS text AS 'pgexodus', 'exodus_extract_text'          LANGUAGE C IMMUTABLE;
--- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text AS 'pgexodus', 'exodus_extract_sort'          LANGUAGE C IMMUTABLE;
--- Remaining functions are STRICT therefore never get called with NULLS -- also return NULL if passed zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4)     RETURNS date AS 'pgexodus', 'exodus_extract_date'          LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4)     RETURNS interval AS 'pgexodus', 'exodus_extract_time'      LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
--- returns zero for zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4)   RETURNS float8 AS 'pgexodus', 'exodus_extract_number'      LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text)                       RETURNS integer AS 'pgexodus', 'exodus_count'              LANGUAGE C IMMUTABLE STRICT;
 
 CREATE ROLE exodus
  LOGIN
  PASSWORD 'somesillysecret'
  CREATEDB CREATEROLE;
 
-CREATE SCHEMA dict
- AUTHORIZATION exodus;
+CREATE SCHEMA dict;
+ALTER SCHEMA dict
+ OWNER TO exodus;
 
 DROP COLLATION IF EXISTS exodus_natural;
-CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
-
-CREATE DATABASE exodus
- WITH ENCODING='UTF8'
-   OWNER=exodus;
-
-\connect exodus
-SET client_min_messages = warning;
+CREATE COLLATION exodus_natural
+ (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
+ALTER COLLATION exodus_natural
+ OWNER TO exodus;
 
 DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);
@@ -72,22 +49,14 @@ DROP FUNCTION IF EXISTS exodus_extract_datetime(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_count(text, text);
 
-DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);
-DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
-
-CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4)     RETURNS text AS 'pgexodus', 'exodus_extract_text'          LANGUAGE C IMMUTABLE;
--- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text AS 'pgexodus', 'exodus_extract_sort'          LANGUAGE C IMMUTABLE;
+CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4)     RETURNS text      AS 'pgexodus', 'exodus_extract_text'     LANGUAGE C IMMUTABLE;
 -- Remaining functions are STRICT therefore never get called with NULLS -- also return NULL if passed zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4)     RETURNS date AS 'pgexodus', 'exodus_extract_date'          LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4)     RETURNS interval AS 'pgexodus', 'exodus_extract_time'      LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4)     RETURNS interval  AS 'pgexodus', 'exodus_extract_time'     LANGUAGE C IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 -- returns zero for zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4)   RETURNS float8 AS 'pgexodus', 'exodus_extract_number'      LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text)                       RETURNS integer AS 'pgexodus', 'exodus_count'              LANGUAGE C IMMUTABLE STRICT;
-
-DROP COLLATION IF EXISTS exodus_natural;
-CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
-ALTER COLLATION exodus_natural OWNER TO exodus;
+CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4)   RETURNS float8    AS 'pgexodus', 'exodus_extract_number'   LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text)                       RETURNS integer   AS 'pgexodus', 'exodus_count'            LANGUAGE C IMMUTABLE STRICT;
 
 ALTER FUNCTION public.exodus_extract_text(text, integer, integer, integer)     OWNER TO exodus;
 ALTER FUNCTION public.exodus_extract_date(text, integer, integer, integer)     OWNER TO exodus;
@@ -96,11 +65,76 @@ ALTER FUNCTION public.exodus_extract_datetime(text, integer, integer, integer) O
 ALTER FUNCTION public.exodus_extract_number(text, integer, integer, integer)   OWNER TO exodus;
 ALTER FUNCTION public.exodus_count(text, text)                                 OWNER TO exodus;
 
+-- Obsolete functions
+DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
+-- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text AS 'pgexodus', 'exodus_extract_sort'          LANGUAGE C IMMUTABLE;
+
+CREATE DATABASE exodus
+ WITH ENCODING='UTF8'
+ OWNER=exodus;
+
+\connect exodus
+SET client_min_messages = warning;
+
 CREATE SCHEMA dict;
-ALTER SCHEMA dict OWNER TO exodus;
+ALTER SCHEMA dict
+ OWNER TO exodus;
+
+DROP COLLATION IF EXISTS exodus_natural;
+CREATE COLLATION exodus_natural
+ (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
+ALTER COLLATION exodus_natural
+ OWNER TO exodus;
+
+DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_time(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_datetime(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_number(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_count(text, text);
+
+CREATE OR REPLACE FUNCTION exodus_extract_text(data text, fn int4, vn int4, sn int4)     RETURNS text      AS 'pgexodus', 'exodus_extract_text'     LANGUAGE C IMMUTABLE;
+-- Remaining functions are STRICT therefore never get called with NULLS -- also return NULL if passed zero length strings
+CREATE OR REPLACE FUNCTION exodus_extract_date(data text, fn int4, vn int4, sn int4)     RETURNS date      AS 'pgexodus', 'exodus_extract_date'     LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_time(data text, fn int4, vn int4, sn int4)     RETURNS interval  AS 'pgexodus', 'exodus_extract_time'     LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_datetime(data text, fn int4, vn int4, sn int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
+-- returns zero for zero length strings
+CREATE OR REPLACE FUNCTION exodus_extract_number(data text, fn int4, vn int4, sn int4)   RETURNS float8    AS 'pgexodus', 'exodus_extract_number'   LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_count(data text, countchar text)                       RETURNS integer   AS 'pgexodus', 'exodus_count'            LANGUAGE C IMMUTABLE STRICT;
+
+ALTER FUNCTION public.exodus_extract_text(text, integer, integer, integer)     OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_date(text, integer, integer, integer)     OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_time(text, integer, integer, integer)     OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_datetime(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_number(text, integer, integer, integer)   OWNER TO exodus;
+ALTER FUNCTION public.exodus_count(text, text)                                 OWNER TO exodus;
+
+-- Obsolete functions
+DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);
+DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
+-- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text AS 'pgexodus', 'exodus_extract_sort'          LANGUAGE C IMMUTABLE;
 
 \df exodus*
 \dO
 
 \q
 EOF2
+
+: ===========================================================================================================
+: The above SQL is in /exodus/libpgexodus/src/installexodus-postgresql2
+: and is triplicated for template1 db, exodus db and in the exodus dict2sql cli program.
+:
+: KEEP ALL THREE COPIES OF THE SQL IDENTICAL OTHERWISE DESCREPANCIES AND BUGS WILL OCCUR.
+:
+: TODO deduplicate the three copies of the same SQL somehow. Replace this script with dict2sql perhaps.
+:
+: EXO_DATA=template1 dict2sql pgexodus
+: EXO_DATA=exodus dict2sql pgexodus
+: ===========================================================================================================:
+: template1 is used by postgres to create all new databases if no template not specified at time of creation.
+: template0 can be used to create completely empty new databases.
+: ===========================================================================================================
+: Initially exodus is a copy of template1 but subsequent installations must update both to keep both in sync.
+: Other exodus databases already created can be updated using EXO_DATA=xxxxxxxx dict2sql pgexodus.
+: ===========================================================================================================
