@@ -809,6 +809,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		tablename = filename2;
 		//no schema filter allows opening temporary files with exist in various pg_temp_xxxx schemata
 		and_schema_clause = "";
+		and_schema_clause = " AND table_schema != 'dict'";
 	}
 	// 1. look in information_schema.tables
 	var sql =
