@@ -1822,6 +1822,8 @@ function* exodusfilepopup(filename, cols, coln, sortselectionclause, many, filte
         maxnrecs = 2000
 
     //get the data from the server
+	sortselectionclause = sortselectionclause.replace(/[\r\n]/g, ' ')
+	collist = collist.replace(/[\r\n]/g, ' ')
     db.request = 'CACHE\rSELECT\r' + filename.toUpperCase() + '\r' + sortselectionclause + '\r' + collist + '\rXML\r' + maxnrecs
     //db.request='CACHE\rSELECT\r'+filename.toUpperCase()+'\r'+sortselectionclause+'\r'+collist+' ID'
     if (!(yield* db.send())) {
