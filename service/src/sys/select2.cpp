@@ -153,7 +153,7 @@ nocommon:
 	response = "OK";
 	var file;
 	if (not(file.open(filename, ""))) {
-		response = "Error: " ^ (filename.quote()) ^ " file is not available";
+		response = "Error: select2: " ^ (filename.quote()) ^ " file is not available";
 
 		//abort
 		gosub exit();
@@ -164,7 +164,7 @@ nocommon:
 	if (linkfilename2) {
 		call oswrite("", linkfilename2);
 		if (not(linkfile2.osopen(linkfilename2))) {
-			response = "Error: " ^ (linkfilename2.quote()) ^ " cannot open output file";
+			response = "Error: select2: " ^ (linkfilename2.quote()) ^ " cannot open output file";
 
 			//abort
 			gosub exit();
@@ -185,7 +185,7 @@ nocommon:
 
 	//check no @ in xml dict ids because cannot return xml tag with @
 	if (xml and dictids.index("@")) {
-		response = "Error: XML dictids cannot contain @ characters in SELECT2";
+		response = "Error: select2: XML dictids cannot contain @ characters";
 
 		//abort
 		gosub exit();
@@ -205,7 +205,7 @@ nocommon:
 	var dictrecs = "";
 
 	if (not(DICT.open("DICT." ^ dictfilename))) {
-		response = "Error: " ^ (("DICT." ^ filename).quote()) ^ " file is not available";
+		response = "Error: select2: " ^ (("DICT." ^ filename).quote()) ^ " file is not available";
 
 		//abort
 		gosub exit();
@@ -248,7 +248,7 @@ nocommon:
 						dictrec = "F,0,No,,,,,,L,15,";
 						dictrec.converter(",", FM);
 					} else {
-						response = "Error: " ^ (dictid.quote()) ^ " IS MISSING FROM DICT." ^ filename;
+						response = "Error: select2: " ^ (dictid.quote()) ^ " IS MISSING FROM DICT." ^ filename ^ " in SELECT2";
 
 						//abort
 						gosub exit();
