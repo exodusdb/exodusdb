@@ -235,7 +235,7 @@ function main() {
 	headtabperpage = 1;
 
 	if (TERMINAL) {
-		return osshell("TERM= " ^ COMMAND.convert(FM, " ") ^ " | pager --quit-if-one-screen");
+		return osshell("TERM= " ^ COMMAND.convert(FM, " ") ^ " | pager --chop-long-lines --quit-if-one-screen");
 	}
 
 //	if (USERNAME eq "EXODUS") {
