@@ -234,10 +234,14 @@ function main() {
 	showborder = 0;
 	headtabperpage = 1;
 
-	if (USERNAME eq "EXODUS") {
-		var(SENTENCE).oswrite("NLIST");
+	if (TERMINAL) {
+		return osshell("TERM= " ^ COMMAND.convert(FM, " ") ^ " | pager --quit-if-one-screen");
 	}
 
+//	if (USERNAME eq "EXODUS") {
+//		var(SENTENCE).oswrite("NLIST");
+//	}
+//
 	//	#include <general_common.h>
 	//global all
 	//for printtx
@@ -1519,29 +1523,29 @@ nextrec:
 		}
 	}
 
-	//readnext key
-	FILEERRORMODE = 1;
-	FILEERROR = "";
+//	//readnext key
+//	FILEERRORMODE = 1;
+//	FILEERROR = "";
 
 	//if (not(readnext(ID, MV))) {
 	if (not(readnext(RECORD, ID, MV))) {
-		FILEERRORMODE = 0;
-		if (STATUS) {
-			tx = "*** Fatal Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
-			gosub printtx();
-			stop();
-		}
-		if (FILEERROR.a(1) eq 421) {
-			tx = "Operation aborted by user.";
-			gosub printtx();
-			stop();
-		}
-		if (FILEERROR and FILEERROR.a(1) ne 111) {
-			tx = "*** Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
-			gosub printtx();
-			readerr += 1;
-			stop();
-		}
+//		FILEERRORMODE = 0;
+//		if (STATUS) {
+//			tx = "*** Fatal Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
+//			gosub printtx();
+//			stop();
+//		}
+//		if (FILEERROR.a(1) eq 421) {
+//			tx = "Operation aborted by user.";
+//			gosub printtx();
+//			stop();
+//		}
+//		if (FILEERROR and FILEERROR.a(1) ne 111) {
+//			tx = "*** Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
+//			gosub printtx();
+//			readerr += 1;
+//			stop();
+//		}
 		goto x2exit;
 	}
 
