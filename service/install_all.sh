@@ -117,7 +117,8 @@ set -eux
 : Configure postfix
 : =================
 :
-	postconf myhostname=$SITE_NAME
+	#JE: Postfix config done in install.neosys1 script
+	#postconf myhostname=$SITE_NAME
 	#postconf relayhost=?
 	#postconf inet_interfaces=all|loopback-only?
 
