@@ -103,16 +103,19 @@ function main() {
 	verbose = index(OPTIONS, 'V');
 	var doall = true;
 
+	// Option to install standard exodus functions
 	if (locateusing(",", filenames.a(1), "pgsql,pgexodus")) {
 		install_exodus_extensions = filenames.a(1);
 		filenames.remover(1);
+		doall = false;
 	}
 
 	if (filenames) {
 		doall = false;
 		if (filenames.substr(1, 5) ne "dict.")
 			filenames.splicer(1, 0, "dict.");
-	} else {
+
+	} else if (doall) {
 		var dictdbname = "";
 		osgetenv("EXO_DICT", dictdbname);
 		if (not dictdbname)
@@ -126,11 +129,7 @@ function main() {
 		filenames = dictconnection.listfiles();
 	}
 
-	//quit if not doing all files
-	/////////////////////////////
-	if (doall) {
-
-		var sqltemplate = R"V0G0N(
+	var sqltemplate = R"V0G0N(
 CREATE OR REPLACE FUNCTION
 $functionname_and_args
 RETURNS $return_type
@@ -147,17 +146,19 @@ DEFINER
 COST 10;
 )V0G0N";
 
-		// Drop obsolete functions - ignore errors
-		//var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);");
+	// Drop obsolete functions - ignore errors
+	//var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);");
 
-		// Create Natural Order Collation
-		var().sqlexec("DROP COLLATION IF EXISTS exodus_natural;");
-		var().sqlexec("CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);");
+	// Create Natural Order Collation if installing extensions
+	if (install_exodus_extensions) {
+		rawsqlexec("DROP COLLATION IF EXISTS exodus_natural;");
+		rawsqlexec("CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);");
+	}
 
-		if (install_exodus_extensions eq "pgexodus") {
+	if (install_exodus_extensions eq "pgexodus") {
 
-			var sqltemplate =
-				R"V0G0N(
+		var sqltemplate =
+			R"V0G0N(
 CREATE OR REPLACE FUNCTION $functionname_and_args
 RETURNS $return_type
 AS 'pgexodus', '$functionname'
@@ -168,86 +169,90 @@ DEFINER
 COST 10;
 )V0G0N";
 
-			do_sql("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-			//do_sql("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-			do_sql("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate);
-			do_sql("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate);
-			do_sql("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate);
-			do_sql("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
-			do_sql("exodus_count(data text, countchar text)", "integer", "", sqltemplate);
+		create_function("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+		//create_function("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+		create_function("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate);
+		create_function("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate);
+		create_function("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate);
+		create_function("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
+		create_function("exodus_count(data text, countchar text)", "integer", "", sqltemplate);
 
-		} else if (install_exodus_extensions eq "pgsql") {
+	} else if (install_exodus_extensions eq "pgsql") {
 
-			//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);");
+		//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);");
 
-			//exodus_extract_text<fn,vn,sn> returns an sql text type
-			do_sql("exodus_extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+		//exodus_extract_text<fn,vn,sn> returns an sql text type
+		create_function("exodus_extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
 
-			//NOT implemented in pgsql. ::select uses COLLATE instead
-			//exodus_extract_sortt<fn,vn,sn> returns an sql text type
-			//do_sql("exodus_extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+		//NOT implemented in pgsql. ::select uses COLLATE instead
+		//exodus_extract_sortt<fn,vn,sn> returns an sql text type
+		//create_function("exodus_extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
 
-			//exodus_extract_date<fn,vn,sn> returns an sql data type
-			do_sql("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
+		//exodus_extract_date<fn,vn,sn> returns an sql data type
+		create_function("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
 
-			//exodus_extract_time<fn,vn,sn> returns an sql time type
-			do_sql("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
+		//exodus_extract_time<fn,vn,sn> returns an sql time type
+		create_function("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
 
-			//exodus_extract_date<fn,vn,sn> returns an sql data type
-			do_sql("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
+		//exodus_extract_date<fn,vn,sn> returns an sql data type
+		create_function("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
 
-			//exodus_extract_number<fn,vn,sn> returns an sql float8 type
-			do_sql("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
+		//exodus_extract_number<fn,vn,sn> returns an sql float8 type
+		create_function("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
 
-			//exodus_count(str,ch) returns an int
-			do_sql("exodus_count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
-		}
+		//exodus_count(str,ch) returns an int
+		create_function("exodus_count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
+	}
+
+	// Various exodus pgsql utility functions
+	/////////////////////////////////////////
+	if (doall) {
 
 		//create exodus pgsql functions
 
 		//exodus_trim (leading, trailing and excess inner spaces)
 		var trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
-		do_sql("exodus_trim(data text)", "text", trimsql, sqltemplate);
+		create_function("exodus_trim(data text)", "text", trimsql, sqltemplate);
 
 		//exodus_field_replace (a field)
-		do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
+		create_function("exodus_field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
 
 		//exodus_field_remove (a field)
-		do_sql("exodus_field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
+		create_function("exodus_field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
 
 		//exodus_split 123.45USD -> 123.45
-		do_sql("exodus_split(data text)", "text", split_sql, sqltemplate);
+		create_function("exodus_split(data text)", "text", split_sql, sqltemplate);
 
 		//exodus_unique (fields)
 		//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
-		do_sql("exodus_unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
+		create_function("exodus_unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
 
 		//exodus_locate -> int
-		do_sql("exodus_locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
+		create_function("exodus_locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
 
 		//exodus_isnum -> bool
-		do_sql("exodus_isnum(instring text)", "bool", isnum_sql, sqltemplate);
+		create_function("exodus_isnum(instring text)", "bool", isnum_sql, sqltemplate);
 
 		//exodus_tobool(text) -> bool
-		do_sql("exodus_tobool(instring text)", "bool", text_tobool_sql, sqltemplate);
+		create_function("exodus_tobool(instring text)", "bool", text_tobool_sql, sqltemplate);
 
 		//exodus_tobool(numeric) -> bool
-		do_sql("exodus_tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
+		create_function("exodus_tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
 
 		//exodus_date -> int (today's date as a number according to pickos)
-		do_sql("exodus_date()", "int", exodus_todays_date_sql, sqltemplate);
+		create_function("exodus_date()", "int", exodus_todays_date_sql, sqltemplate);
 
 		//exodus_extract_date_array -> date[]
-		do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
+		create_function("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
 
 		//return time as interval which can handle times like 25:00
 		//exodus_extract_time_array -> time[]
-		//do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
+		//create_function("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
 		//exodus_extract_time_array -> time[]
-		do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
+		create_function("exodus_extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
 
 		//exodus_addcent4 -> text
-		do_sql("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
+		create_function("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
 	}
 
 	//create global view of all dicts in "dict.all"
@@ -255,16 +260,16 @@ COST 10;
 	if (doall)
 		viewsql ^= "CREATE MATERIALIZED VIEW dict.all AS\n";
 
-	//do one or many/all files
-	//int nfiles = dcount(filenames, FM);
-	//for (int filen = 1; filen <= nfiles; ++filen)
+	// ========================
+	// Do one or many/all files
+	// ========================
 	for (var filename : filenames)
 		onefile(filename, dictid, viewsql);
 
 	if (doall) {
 		//ignore error if doesnt exist
 		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW dict.all"))
-			var().sqlexec("DROP VIEW dict.all");
+			rawsqlexec("DROP VIEW dict.all");
 
 		if (filenames.index(FM)) {
 			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
@@ -297,7 +302,7 @@ subroutine replace_FM_etc(io sql) {
 	sql.replacer(R"(\bSTM\b)", R"(E'\\x1A')");
 }
 
-subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
+subroutine create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
 
 	printl(functionname_and_args, " -> ", return_sqltype);
 
@@ -329,7 +334,7 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 	//create the function
 	var errmsg;
 	//supposedly this is on the default connection
-	var().sqlexec(functionsql, errmsg);
+	rawsqlexec(functionsql, errmsg);
 
 	//do drop function first if suggested
 	if (errmsg.index("DROP FUNCTION")) {
@@ -340,10 +345,10 @@ subroutine do_sql(in functionname_and_args, in return_sqltype, in sql, in sqltem
 
 		reindexrequired = true;
 
-		var().sqlexec(dropsql, errmsg);
+		rawsqlexec(dropsql, errmsg);
 		errmsg.outputl();
 
-		var().sqlexec(functionsql, errmsg);
+		rawsqlexec(functionsql, errmsg);
 	}
 
 	if (errmsg) {
@@ -657,7 +662,7 @@ $sqlcode
  )V0G0N";
 
 	//upload pgsql function to postgres
-	do_sql(dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
+	create_function(dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
 
 	// delete calc_fields
 
@@ -1209,10 +1214,17 @@ END;
 )V0G0N";
 
 subroutine rawsqlexec(in sql) {
+	printl(sql);
 	var errormsg;
 	if (not var().sqlexec(sql, errormsg)) {
 		errors ^= "\n" ^ errormsg;
 	}
+	return;
+}
+
+subroutine rawsqlexec(in sql, out errormsg) {
+	printl(sql);
+	var().sqlexec(sql, errormsg);
 	return;
 }
 
