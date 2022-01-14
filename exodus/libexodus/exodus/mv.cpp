@@ -33,12 +33,18 @@ THE SOFTWARE.
 #include <vector>
 #include <charconv>//for to_chars
 
+#if __GNUC__ >= 11
+#define USE_TO_CHARS
+#else
+
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
 //sstream/printf 1234.5678 -> "1234.5678" 1800ns
 #if __has_include(<ryu/ryu.h>)
 #define USE_RYU
 #include <ryu/ryu.h>
+#endif
+
 #endif
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
@@ -1649,7 +1655,6 @@ std::string dblToString(double double1) {
 	//Precision on fixed output only controls the precision after the decimal point
 	//so the precision needs to be huge to cater for very small numbers eg < 10E-20
 
-#define USE_TO_CHARS
 #ifdef USE_TO_CHARS
 	std::array<char, 24> chars;
 
@@ -1665,7 +1670,7 @@ std::string dblToString(double double1) {
 	if (epos == std::string::npos)
 		return s;
 
-#elif USE_RYU
+#elif defined(USE_RYU)
 
 	//std::cout << "ryu_printf decimal oconv" << std::endl;
 

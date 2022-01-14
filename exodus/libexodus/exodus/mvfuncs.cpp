@@ -64,7 +64,7 @@ Binary    Hex          Comments
 #if __has_include(<fast_float/fast_float.h>)
 #define HAS_FASTFLOAT
 #include <fast_float/fast_float.h>
-#define STD_OR_FASTFLOAT fastfloat
+#define STD_OR_FASTFLOAT fast_float
 #endif
 
 #if __has_include(<ryu/ryu.h>)
