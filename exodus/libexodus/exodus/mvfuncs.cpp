@@ -54,15 +54,24 @@ Binary    Hex          Comments
 // - for parsing (from_chars), the Eisel-Lemire algorithm is much faster than the technique used here.
 // I would have used it if it were available back then!"
 //
+//double only available in gcc 11 onwards. msvc has it from 2017 or 19
+#if __GNUC__ >= 11
+#define USE_CHARCONV
+#define STD_OR_FASTFLOAT std
+#else
+
 //https://github.com/fastfloat/fast_float
 #if __has_include(<fast_float/fast_float.h>)
 #define HAS_FASTFLOAT
 #include <fast_float/fast_float.h>
+#define STD_OR_FASTFLOAT fastfloat
 #endif
 
 #if __has_include(<ryu/ryu.h>)
 #define HAS_RYU
 #include <ryu/ryu.h>
+#endif
+
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
@@ -1906,19 +1915,19 @@ bool var::isnum(void) const {
 			//      var_dbl = strtod(var_str.c_str(), 0);
 			//      var_dbl = std::stod(var_str.c_str(), 0);
 
-#if defined(HAS_FASTFLOAT)
+#if defined(HAS_FASTFLOAT) or defined(USE_CHARCONV)
 			//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
 
 			char* first = var_str.data();
 			first += *first == '+';
-			auto [p, ec] = fast_float::from_chars(first, var_str.data() + var_str.size(), var_dbl, fast_float::chars_format::fixed);
+			auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, var_str.data() + var_str.size(), var_dbl, STD_OR_FASTFLOAT::chars_format::fixed);
 			if (ec != std::errc()) {
 				//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
 				var_typ = VARTYP_NANSTR;
 				return false;
 			}
 
-#elif defined(USE_CHARCONV)	 //double only available in gcc 11 onwards. msvc has it from 2017 or 19
+#elif defined(USE_CHARCONV)
 
 			//std::cout << "from_chars decimal iconv" << var_str << std::endl;
 

@@ -69,10 +69,10 @@ function killidle() {
 : =============
 
 :
-: Check postgresql 12 is installed
-: ================================
+: Check postgresql is installed
+: =============================
 :
-	test -d /etc/postgresql/12/main/conf.d
+	test -d /etc/postgresql/*/main/conf.d
 
 :
 : Show connections idle > 1 min

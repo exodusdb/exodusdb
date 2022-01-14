@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <limits>
 #include <sstream>
 #include <vector>
+#include <charconv>//for to_chars
 
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
@@ -1648,7 +1649,23 @@ std::string dblToString(double double1) {
 	//Precision on fixed output only controls the precision after the decimal point
 	//so the precision needs to be huge to cater for very small numbers eg < 10E-20
 
-#ifdef USE_RYU
+#define USE_TO_CHARS
+#ifdef USE_TO_CHARS
+	std::array<char, 24> chars;
+
+	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1);
+	if (ec != std::errc())
+		throw MVNonNumeric("Cannot convert double1 to 24 characters");
+
+	//std::cout << std::string_view
+	//	(chars.data(), ptr);              // C++20, uses string_view(first, last)
+		//   (str.data(), ptr - str.data()); // C++17, uses string_view(ptr, length)
+	std::string s = std::string(chars.data(), ptr - chars.data());
+	const std::size_t epos = s.find('e');
+	if (epos == std::string::npos)
+		return s;
+
+#elif USE_RYU
 
 	//std::cout << "ryu_printf decimal oconv" << std::endl;
 
@@ -1714,6 +1731,7 @@ std::string dblToString(double double1) {
 #endif
 	//std::cout << s << std::endl;
 
+	//NOT USE_RYU
 #else  //1800ns
 
 	//std::cout << "std:sstream decimal oconv" << std::endl;

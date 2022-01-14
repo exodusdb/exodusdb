@@ -6,6 +6,7 @@ www/3/general
 www/3/jobs
 www/3/media
 www/favicon.ico
+www/exodus/images/theme2/exodusm.png
 www/exodus/images/theme2/neosysm2.png
 www/exodus/images/theme2/neosyss.png
 systemctl.daemon-reload.required

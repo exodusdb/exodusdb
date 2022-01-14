@@ -224,16 +224,31 @@ function main()
 		//1. precision 16 using sstring. SLOW (1850ns)
 		//2. full precision using VERY FAST ryu algorithm (450ns)
 		//full accuracy of ryu shows why calculations always must be rounded after every calculation because every calculation introduces more inaccuracies.
-		printl(var(10.0/3.0));
+		TRACE(var(10.0/3.0))
+		printl(var(10.0/3.0).length());
+
+		//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
+		assert(var(10.0/3.0).toString() == "3.3333333333333335");
+
+		//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
+		//assert(var(10.0/3.0).toString() == "3.333333333333333");
+
 		assert(
 			var(10.0/3.0).toString()
 			//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
 			==  "3.333333333333333"
+
 			||
 			var(10.0/3.0).toString()
 			//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
 			==  "3.3333333333333335"
+
+//			||
+//			var(10.0/3.0).toString()
+//			//g++11 to_chars implementation full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
+//			==  "3.333333333333335"
 		);
+
 		assert(var(10.0/3.0*2.0).toString() == "6.666666666666667");
 		assert(var(10.0/3.0*3.0).toString() == "10");
 
