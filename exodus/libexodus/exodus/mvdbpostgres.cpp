@@ -750,7 +750,9 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 	// filename dos or DOS  means osread/oswrite/osdelete
 	if (filename2.var_str.size() == 3 && filename2.var_str == "dos") {
-		(*this) = "dos";
+		//(*this) = "dos";
+		var_str = "dos";
+		var_typ = VARTYP_NANSTR;
 		return true;
 	}
 
@@ -774,9 +776,10 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 				//var(cached_file_handle).errputl("==== Connection cache INVALID = ");
 			} else {
 				//var(cached_file_handle).errputl("==== Connection cache VALID   = ");
-				(*this) = cached_file_handle;
+				var_str = cached_file_handle;
+				var_typ = VARTYP_NANSTR;
 				if (DBTRACE)
-					this->logputl("DBTR open() attached ");
+					this->logputl("DBTR open() cached or attached ");
 				return true;
 			}
 		}
@@ -787,15 +790,9 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 	}
 
-	// *
-
-	//check filename2 is a valid table or view etc.
-	//var sql="select '" ^ filename2 ^ "'::regclass";
-	//if (! connection.sqlexec(sql))
-
-	if (DBTRACE) {
-		connection2.logputl("DBTR var::open-1 ");
-	}
+	//if (DBTRACE) {
+	//	connection2.logputl("DBTR var::open-1 ");
+	//}
 
 	var tablename;
 	var schema;
@@ -808,7 +805,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 		schema = "public";
 		tablename = filename2;
 		//no schema filter allows opening temporary files with exist in various pg_temp_xxxx schemata
-		and_schema_clause = "";
+		//and_schema_clause = "";
 		and_schema_clause = " AND table_schema != 'dict'";
 	}
 	// 1. look in information_schema.tables
@@ -824,9 +821,9 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	connection2.sqlexec(sql, result);
 	//result.convert(RM,"|").logputl("result=");
 
-	if (DBTRACE) {
-		connection2.logputl("DBTR var::open-2 ");
-	}
+	//if (DBTRACE) {
+	//	connection2.logputl("DBTR var::open-2 ");
+	//}
 
 	// 2. look in materialised views
 	// select matviewname from pg_matviews where matviewname = '...';
@@ -859,17 +856,17 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 	// var becomes a filehandle containing the filename and connection no
 	(*this) = filename2 ^ FM ^ get_mvconn_no_or_default(connection2);
+	filename2.var_str.push_back(FM_);
+	filename2.var_str.append(std::to_string(get_mvconn_no_or_default(connection2)));
+	var_str = filename2.var_str;
+	var_typ = VARTYP_NANSTR;
 
 	// Cache the filehandle so future opens return the same
 	// Similar code in dbattach and open
 	thread_file_handles[filename2] = var_str;
-	//this->errputl("==== Connection cache ADDED   = ");
 
-	if (DBTRACE) {
+	if (DBTRACE)
 		this->logputl("DBTR var::open-3 ");
-	}
-
-	// logputl("opened filehandle");
 
 	return true;
 }
@@ -883,15 +880,17 @@ void var::close() {
 }
 
 bool var::readv(const var& filehandle, const var& key, const int fieldno) {
-	THISIS("bool var::readv(const var& filehandle,const var& key,const int fieldno)")
-	THISISDEFINED()
-	ISSTRING(filehandle)
-	ISSTRING(key)
+	//THISIS("bool var::readv(const var& filehandle,const var& key,const int fieldno)")
+	//THISISDEFINED()
+	//ISSTRING(filehandle)
+	//ISSTRING(key)
 
 	if (!this->read(filehandle, key))
 		return false;
 
 	var_str = this->a(fieldno).var_str;
+	var_typ = VARTYP_STR;
+
 	return true;
 }
 
@@ -906,17 +905,20 @@ bool var::reado(const var& filehandle, const var& key) {
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed");
 
+	// Attempt to get record from the cache
+	// TODO cache non-existent records as empty
 	std::string cachedrecord =
 		thread_connections.getrecord(mvconn_no, filehandle.a(1).var_str, key.var_str);
 	if (!cachedrecord.empty()) {
-		// key.logputl("cache read " ^ filehandle.a(1) ^ "=");
+
 		//(*this) = cachedrecord;
-		var_str = cachedrecord;
+		var_str = std::move(cachedrecord);
 		var_typ = VARTYP_STR;
 
 		//this->lasterror();
 
-		return not var_str.empty();
+		return true;
+
 	}
 
 	// ordinary read
