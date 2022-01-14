@@ -128,11 +128,25 @@ set -eux
 :
 : https://wkhtmltopdf.org/downloads.html
 :
-: 20.04 bionic or focal
+: 20.04/bionic and 18.04/focal are available
+:
+: 22.04/jammy not available as at 2022/01/14
 :
 	RELEASE=`lsb_release -cs`
-	curl -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb
+	if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
+:
+: Fall back to bionic which works on 22.04/jammy, at least on the simple html test below.
+:
+		RELEASE=bionic
+		curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb
+	fi
+:
+: Install the deb package
+:
 	dpkg -i wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb || true
+:
+: The package is missing dependencies but those will and must be fixed as follows:
+:
 	apt -y --fix-broken install
 :
 : Verify html2pdf works
@@ -141,7 +155,6 @@ set -eux
 	printf "<html><body>Nothing Special</body></html>\n" > wkhtmltopdf.html
 	/usr/local/bin/wkhtmltopdf --enable-local-file-access wkhtmltopdf.html wkhtmltopdf.pdf
 	rm wkhtmltopdf.html wkhtmltopdf.pdf
-
 
 :
 : Determine local ip number for info
