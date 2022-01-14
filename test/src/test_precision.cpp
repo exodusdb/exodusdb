@@ -15,7 +15,13 @@
 
 //fastfloat supports ICONV
 //convert ASCII decimal to double ("ICONV")
-#if __has_include (<fast_float/fast_float.h>)
+
+#if __GNUC__ >= 11
+#define USE_TO_CHARS
+#endif
+
+#ifdef _USE_TOCHARS
+#elif __has_include (<fast_float/fast_float.h>)
 #define HAS_FASTFLOAT
 #include <fast_float/fast_float.h>
 #endif
@@ -79,7 +85,11 @@ function main() {
 		assert(((var("9.36749") + 0) ^ "x") == "9.36749x");
 
 		printl( var(1234567890123456789.)  ^ "x");
-#ifdef HAS_RYU
+		printl( var(12345678901234567890.)  ^ "x");
+#ifdef USE_TO_CHARS
+		assert((var(1234567890123456789.)  ^ "x") == "1234567890123456768x");
+		assert((var(12345678901234567890.) ^ "x") == "12345678901234567168x");
+#elif defined(HAS_RYU)
 		assert((var(1234567890123456789.)  ^ "x") == "1234567890123456800x");
 		assert((var(12345678901234567890.) ^ "x") == "12345678901234567000x");
 #else
@@ -128,11 +138,18 @@ function main() {
 		dv1 = dd1;
 		dv2 = "1234567890.00005678d";
 		sv1 = dv1 ^ "x";
-#ifndef USE_RYU_D2S
-		sv2 = "1234567890.000057x";
-#else
+		TRACE(var(dd1))
+		TRACE(var(dv1))
+		TRACE(var(dv2))
+#if defined(USE_RYU_D2S) or defined(USE_TO_CHARS)
 		sv2 = "1234567890.0000567x";//ryu
+#else
+		sv2 = "1234567890.000057x";
 #endif
+		TRACE(sv1)
+		TRACE(sv2)
+		//concat:  1234567890.0000567x
+		//Target:  1234567890.000057x
 		gosub out();
 		assert(sv1 == sv2);
 
@@ -188,10 +205,10 @@ function main() {
 		dv1 = dd1;
 		dv2="12345678901234567890123456789.0d";
 		sv1=dv1^"x";
-#ifndef USE_RYU_D2S
-		sv2="12345678901234570000000000000x";
-#else
+#if defined(USE_RYU_D2S) or defined(USE_TO_CHARS)
 		sv2="12345678901234568000000000000x";//ryu
+#else
+		sv2="12345678901234570000000000000x";
 #endif
 		gosub out();
 		assert(sv1 == sv2);
@@ -201,10 +218,10 @@ function main() {
 		dv1 = dd1;
 		dv2="99999999999999.9d";
 		sv1=dv1^"x";
-#ifndef USE_RYU_D2S
-		sv2="99999999999999.91x";
-#else
+#if defined(USE_RYU_D2S) or defined(USE_TO_CHARS)
 		sv2="99999999999999.9x";//ryu
+#else
+		sv2="99999999999999.91x";
 #endif
 		gosub out();
 		assert(sv1 == sv2);
@@ -212,10 +229,10 @@ function main() {
 		//test2 tests both positive and negative round trip chars to chars
 
         assert(test2("00000000000000000000.00000000000000000000",                   "0x"));
-#ifndef USE_RYU_D2S
-		assert(test2("00000000000000000000.00000000000000000001",                   "0.000000000000000000009999999999999999x"));
-#else
+#if defined(USE_RYU_D2S) or defined(USE_TO_CHARS)
 		assert(test2("00000000000000000000.00000000000000000001",                   "0.00000000000000000001x"));//ryu
+#else
+		assert(test2("00000000000000000000.00000000000000000001",                   "0.000000000000000000009999999999999999x"));
 #endif
 		assert(test2("00000000000000000000.00000000000000000012",                   "0.00000000000000000012x"));
 		assert(test2("00000000000000000000.00000000000000000123",                   "0.00000000000000000123x"));
@@ -233,7 +250,7 @@ function main() {
 		assert(test2("00000000000000000000.00000123456789012345",                   "0.00000123456789012345x"));
 		assert(test2("00000000000000000000.00001234567890123456",                   "0.00001234567890123456x"));
 
-#ifdef USE_RYU_D2S
+#if defined(USE_RYU_D2S) or defined(USE_TO_CHARS)
 		assert(test2("00000000000000000000.000000000000000000012345678901234567",   "0.000000000000000000012345678901234567x"));
 		assert(test2("00000000000000000000.00000000000000000012345678901234567",    "0.00000000000000000012345678901234568x"));
 		assert(test2("00000000000000000000.0000000000000000012345678901234567",     "0.0000000000000000012345678901234566x"));
@@ -274,8 +291,13 @@ function main() {
 		assert(test2("00001234567890123456.78901000000000000000",    "1234567890123456.8x"));
 		assert(test2("00012345678901234567.89010000000000000000",   "12345678901234568x"));
 		assert(test2("00123456789012345678.90100000000000000000",  "123456789012345680x"));
+#ifdef USE_TO_CHARS
+		assert(test2("01234567890123456789.01000000000000000000", "1234567890123456768x"));
+		assert(test2("12345678901234567890.10000000000000000000","12345678901234567168x"));
+#else
 		assert(test2("01234567890123456789.01000000000000000000", "1234567890123456800x"));
 		assert(test2("12345678901234567890.10000000000000000000","12345678901234567000x"));
+#endif
 
 #else //not USE_RYU_D2S
 		assert(test2("00000000000000000000.000000000000000000012345678901234567",   "0.00000000000000000001234567890123457x"));
@@ -415,10 +437,10 @@ function main() {
 
 	assert(var(1e-11f).toString() == "0.000000000009999999960041972");
 	printl(var(1e-11));
-#ifndef USE_RYU_D2S
-	assert(var(1e-11).toString() == "0.000000000009999999999999999");
-#else
+#if defined(USE_RYU_D2S) or defined(USE_TO_CHARS)
 	assert(var(1e-11).toString() == "0.00000000001");//ryu
+#else
+	assert(var(1e-11).toString() == "0.000000000009999999999999999");
 #endif
 	assert(var(1e-12f).toString() == "0.0000000000009999999960041972");
 	assert(var(1e-12 ).toString() == "0.000000000001");
@@ -466,10 +488,10 @@ function main() {
 	assert((var(1/pwr(10,26)) ^ "x") =="0.000000000000000000000000009999999999999999x");//poorer calculation of 1/10^26
 
 	printl(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x"));
-#ifndef USE_RYU_D2S
-	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x") == "0.000000000000000000000000000000000000000001434929627468613x");
-#else
+#if defined(USE_RYU_D2S) or defined(USE_TO_CHARS)
 	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x") == "0.0000000000000000000000000000000000000000014349296274686127x");//ryu
+#else
+	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x") == "0.000000000000000000000000000000000000000001434929627468613x");
 #endif
 	assert(var(pwr(10,-26)) == var(1/pwr(10,26)));
 
