@@ -45,7 +45,7 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
-include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
+include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR} ../../../fast_float/include)
 
 ### BOOST ###
 #############
