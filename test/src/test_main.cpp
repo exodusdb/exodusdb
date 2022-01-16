@@ -389,15 +389,62 @@ function main()
 	var csvre2="bc.ef";
 	assert(match(csvline2,csvre2).convert(_FM_ _VM_,"^]")=="bcdef^bcdef");
 
+	//Gives the following error when using std::regex. No such error with boost:regex
+	//Error: Invalid regex "(?:^|,)(?=[^"]|(")?)"?((?(1)[^"]*|[^,"]*))"?(?=,|$)" "Invalid special open parenthesis."
+	//
 	//not asserted but a complicated CSV match
 	var csvline=R"(123,2.99,AMO024,Title,"Description, more info",,123987564)";
 	var csvre=R"tag((?:^|,)(?=[^"]|(")?)"?((?(1)[^"]*|[^,"]*))"?(?=,|$))tag";
-	assert(match(csvline,csvre).convert(_FM_ _VM_,"^]")==R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
 
-	//unicode case insensitive finding
-	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","i").convert(_FM_ _VM_,"^]")=="αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");
-	//unicode case sensitive NOT finding
-	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(_FM_ _VM_,"^]")=="");
+#define BOOST_REGEX 1
+	{
+
+        // \d \D and [:number:]
+        assert(var("a1b23c99").replace("\\d", "N") == "aNbNNcNN");
+        assert(var("a1b23c99").replace("\\D", "N") == "N1N23N99");
+		if (BOOST_REGEX) {
+	        assert(var("a1b23c99").replace("[[:number:]]", "N") == "aNbNNcNN");
+    	    assert(var("a1b23c99").replace("[^[:number:]]", "N") == "N1N23N99");
+		}
+
+        // [:alnum:] = letters and numbers. No _
+		if (BOOST_REGEX) {
+	        assert(var("a1b2_ \n3c99").replace("[[:alnum:]]", "N").outputl() == "NNNN_ \nNNNN");
+    	    assert(var("a1b2_ \n3c99").replace("[^[:alnum:]]", "N").outputl() == "a1b2NNN3c99");
+		}
+
+        // \w and \W in alnum + _
+        assert(var("a1b2_ \n3c99").replace("\\w", "N").outputl() == "NNNNN \nNNNN");
+        assert(var("a1b2_ \n3c99").replace("\\W", "N").outputl() == "a1b2_NN3c99");
+		if (BOOST_REGEX) {
+	        assert(var("a1b2_ \n3c99").replace("[_[:alnum:]]", "N").outputl() == "NNNNN \nNNNN");
+    	    assert(var("a1b2_ \n3c99").replace("[^_[:alnum:]]", "N").outputl() == "a1b2_NN3c99");
+		}
+
+        // \s \S and [[:space:]]  means whitespace
+        assert(var("a1b2_ \n3c99").replace("\\s", "N").outputl() == "a1b2_NN3c99");
+        assert(var("a1b2_ \n3c99").replace("\\S", "N").outputl() == "NNNNN \nNNNN");
+		if (BOOST_REGEX) {
+    	    assert(var("a1b2_ \n3c99").replace("[[:space:]]", "N").outputl() == "a1b2_NN3c99");
+	        assert(var("a1b2_ \n3c99").replace("[^[:space:]]", "N").outputl() == "NNNNN \nNNNN");
+		}
+
+        if (BOOST_REGEX) {
+            // \{Number}
+            assert(var("a1b2_ \n3c99").replace("\\p{Number}", "N").outputl() == "aNbN_ \nNcNN");
+        }
+
+	}
+
+	if (BOOST_REGEX) {
+		assert(match(csvline,csvre).convert(_FM_ _VM_,"^]")==R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
+
+		//unicode case insensitive finding
+		assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","i").convert(_FM_ _VM_,"^]")=="αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");
+
+		//unicode case sensitive NOT finding
+		assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(_FM_ _VM_,"^]")=="");
+	}
 
 	var r1 = _FM_ "0.123";
 	assert(r1.replace("([\x1A-\x1F]-?)0.","$1.") == _FM_ ".123");
@@ -405,11 +452,21 @@ function main()
     assert(r2.replace("([\x1A-\x1F]-?)0.","$1.") == _STM_ "-.123");
 
 	//replacing unicode style numbers characters using javascript style regex
-	assert(var("Ⅻ").replace(R"(\p{Number})","yes")=="yes");
-	assert(var("⅝").replace(R"(\p{Number})","yes")=="yes");
+	//assert(var("Ⅻ").replace(R"(\p{Number})","yes")=="yes");
+	//assert(var("⅝").replace(R"(\p{Number})","yes")=="yes");
+	assert(var("1").replace(R"([[:digit:]])","yes")=="yes");
+	if (BOOST_REGEX) {
+		assert(var("Ⅻ").replace(R"(\p{Number})","yes")=="yes");
+		assert(var("⅝").replace(R"(\p{Number})","yes")=="yes");
+
+		//assert(var("Ⅻ").replace(R"(\p{Number})","yes").outputl()!="yes");
+		//assert(var("⅝").replace(R"(\p{Number})","yes").outputl()!="yes");
+		assert(var("Ⅻ").replace(R"([[:digit:]])","yes").outputl()!="yes");
+		assert(var("⅝").replace(R"([[:digit:]])","yes").outputl()!="yes");
+	}
 
 	//test glob matching using * ? eg *.* and *.??? etc
-        assert(var("test.htm").match("*.*","w")		=="test.htm");
+        assert(var("test.htm").match("*.*","w").outputl()		=="test.htm");
         assert(var("test.htm").match("*","w")		=="test.htm");
         assert(var("test.htm").match(".*","w")		=="");
         assert(var("test.htm").match(".","w")		=="");
@@ -820,13 +877,15 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(replace("abcd","b.","xyz").outputl() eq "axyzd");//right case to convert
 	assert(replace("abc","B.","xyz").outputl() eq "abc"); //wrong case to convert
 	assert(replace("abcd","B.","xyz","i").outputl() eq "axyzd");//case insensitive converts
-	assert(replace("abc","b.","xyz","l").outputl() eq "abc");//literal wont convert
+	if (BOOST_REGEX)
+		assert(replace("abc","b.","xyz","l").outputl() eq "abc");//literal wont convert
 
 	//simple test of case sensitive/insensitive swap
 	assert(swap("abc","b","xyz").outputl() eq "axyzc");//will convert right case
 	assert(swap("abc","B","xyz").outputl() eq "abc");//wont convert wrong case
 	assert(replace("abc","B","xyz","i").outputl() eq "axyzc");//will convert case insensitive
-	assert(replace("ab*c","B*","xyz","il").outputl() eq "axyzc");//will convert case insensitive but not regex
+	if (BOOST_REGEX)
+		assert(replace("ab*c","B*","xyz","il").outputl() eq "axyzc");//will convert case insensitive but not regex
 
 	assert(swap("abababab","ab","x").outputl() eq "xxxx");
 	assert(replace("abababab","ab","x").outputl() eq "xxxx");//regex
@@ -1274,10 +1333,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv(digits,"MRA") eq "");
 	assert(oconv(digits,"MR/A") eq digits);
 //#ifndef __APPLE__
-	assert(oconv(digits,"MRN") eq digits);
-	assert(oconv(digits,"MRB") eq digits);
-	assert(oconv(digits,"MR/N") eq "");
-	assert(oconv(digits,"MR/B") eq "");
+	if (BOOST_REGEX) {
+		assert(oconv(digits,"MRN") eq digits);
+		assert(oconv(digits,"MRB") eq digits);
+		assert(oconv(digits,"MR/N") eq "");
+		assert(oconv(digits,"MR/B") eq "");
+	}
 //#endif
 	assert(oconv("abc .DEF","MRU") eq "ABC .DEF");
 	assert(oconv("abc .DEF","MRL") eq "abc .def");
@@ -1300,15 +1361,18 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv(uppercase,"MRU") eq uppercase);
 	assert(oconv(lowercase,"MRL") eq lowercase);
 
-	oconv(letters,"MRA").outputl("Expected:"^letters^" Actual:");
-	oconv(letters,"MRN").outputl("Expected:\"\" Actual:");
-	oconv(letters,"MRB").outputl("Expected:"^letters^" Actual:");
-	assert(oconv(letters,"MRA") eq letters);
-	assert(oconv(letters,"MRN") eq "");
-	assert(oconv(letters,"MRB") eq letters);
-	assert(oconv(letters,"MR/A") eq "");
-	assert(oconv(letters,"MR/N") eq letters);
-	assert(oconv(letters,"MR/B") eq "");
+	TRACE(letters)
+	if (BOOST_REGEX) {
+		oconv(letters,"MRA").outputl("Expected:"^letters^" Actual:");
+		oconv(letters,"MRN").outputl("Expected:\"\" Actual:");
+		oconv(letters,"MRB").outputl("Expected:"^letters^" Actual:");
+		assert(oconv(letters,"MRA") eq letters);
+		assert(oconv(letters,"MRN") eq "");
+		assert(oconv(letters,"MRB") eq letters);
+		assert(oconv(letters,"MR/A") eq "");
+		assert(oconv(letters,"MR/N") eq letters);
+		assert(oconv(letters,"MR/B") eq "");
+	}
 
 	//lambda function
 	auto testinvert=[](var cc)
