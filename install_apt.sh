@@ -20,7 +20,8 @@ set -euxo pipefail
 :
 : Tested on:
 :
-: Ubuntu 20.04.1 LTS
+: Ubuntu 22.04 Ubuntu Jammy Jellyfish (development branch)
+: Ubuntu 20.04.3 LTS
 :
 : No longer tested:
 :
