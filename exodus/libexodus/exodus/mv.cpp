@@ -599,7 +599,7 @@ var var::operator++(int) & {
 tryagain:
 	// prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<mvint_t>::max())
+		if (var_int == std::numeric_limits<decltype(var_int)>::max())
 			throw MVIntOverflow("operator++");
 		priorvalue = var(var_int);
 		var_int++;
@@ -639,7 +639,7 @@ var var::operator--(int) & {
 tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<mvint_t>::min())
+		if (var_int == std::numeric_limits<decltype(var_int)>::min())
 			throw MVIntUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
@@ -676,7 +676,7 @@ var& var::operator++() & {
 tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<mvint_t>::max())
+		if (var_int == std::numeric_limits<decltype(var_int)>::max())
 			throw MVIntOverflow("operator++");
 		var_int++;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -710,7 +710,7 @@ var& var::operator--() & {
 tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<mvint_t>::min())
+		if (var_int == std::numeric_limits<decltype(var_int)>::min())
 			throw MVIntUnderflow("operator--");
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -931,7 +931,7 @@ inline bool almost_equal_not_zero(double x, double y, int ulp)
 		|| std::fabs(x-y) < std::numeric_limits<double>::min();
 }
 
-inline bool almost_equal(double x, mvint_t y, int ulp)
+inline bool almost_equal(double x, decltype(var_int) y, int ulp)
 {
 	if (y == 0)
 		return (std::abs(x) < SMALLEST_NUMBER);

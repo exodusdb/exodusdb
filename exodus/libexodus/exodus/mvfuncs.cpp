@@ -1481,9 +1481,9 @@ const var& var::exchange(const var& var2) const {
 	ISDEFINED(var2)
 
 	// intermediary copies of var2
-	VARTYP mvtypex = var2.var_typ;
-	mvint_t mvintx = var2.var_int;
-	double mvdblx = var2.var_dbl;
+	auto mvtypex = var2.var_typ;
+	auto mvintx = var2.var_int;
+	auto mvdblx = var2.var_dbl;
 
 	// do string first since it is the largest and most likely to fail
 	var_str.swap(var2.var_str);
@@ -2420,7 +2420,7 @@ var var::mod(const int divisor) const {
 	//	result += divisor;
 	//return result;
 
-	double double1 = double(var_int);
+	auto double1 = double(var_int);
 	return double1 - std::floor(double1 / divisor) * divisor;
 }
 

@@ -667,6 +667,7 @@ function main() {
 	//printl(v/0);
 
 	{
+		using mvint_t = long long;
 		var minint = std::numeric_limits<mvint_t>::min();
 		var maxint = std::numeric_limits<mvint_t>::max();
 

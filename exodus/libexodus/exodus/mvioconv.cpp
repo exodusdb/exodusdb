@@ -756,7 +756,7 @@ var var::oconv(const char* conversion) const {
 
 								//convert decimal to long
 								if (!(part.var_typ & VARTYP_INT)) {
-									part = part.round();  //actually to mvint_t i.e. long long int
+									part = part.round();  //actually to var_int i.e. long long int
 									part.toLong();
 								}
 

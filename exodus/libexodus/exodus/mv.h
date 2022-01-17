@@ -125,11 +125,6 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 #define or ||
 #endif
 
-//#include <exodus/mviter.h>
-
-// http://www.viva64.com/content/articles/64-bit-development/?f=20_issues_of_porting_C++_code_on_the_64-bit_platform.html
-using mvint_t = long long;
-
 #if __clang_major__ != 10
 #define ND [[nodiscard]]
 #else
@@ -393,11 +388,25 @@ VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OS
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
 class DLL_PUBLIC var final {
 
-   public:
+	///////////////////////
+	// PRIVATE DATA MEMBERS
+	///////////////////////
+
+   private:
+	// 1. not using pimpl idiom in order to maximise performance
+	// 2. all mutable because asking for a string can create it from an integer and vice versa
+	mutable std::string var_str; //32 bytes on g++
+	mutable long long   var_int; //8 bytes/64 bits - currently defined as a long long
+	mutable double      var_dbl; //8 bytes/64 buts - double
+	mutable VARTYP      var_typ; //actually a uint which will be 4 bytes
+							     //mutable uint padding1;
+							     //mutable long int padding2;
+
 	///////////////
 	// CONSTRUCTORS
 	///////////////
 
+   public:
 	// default constructor
 	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
 	var();
@@ -558,6 +567,7 @@ class DLL_PUBLIC var final {
 	// c++11 still allows implicit conversion in places where bool is definitely required ie in
 	// if (xx) or aa && bb but we do not use is because allowing implicit conversion to bool in
 	// argument lists is convenient explicit
+	//explicit operator bool() const;
 	operator bool() const;
 	//#endif
 
@@ -1578,27 +1588,6 @@ class DLL_PUBLIC var final {
 	var debug(const var& DEFAULT_EMPTY_STRING) const;
 
 	var logoff() const;
-
-	// DATA MEMBERS (all private)
-	//////////////
-
-   private:
-// 1. not using pimpl idiom in order to maximise performance
-// 2. all mutable because asking for a string can create it from an integer and vice versa
-// 3. warning C4251: xxx needs to have dll-interface to be used by clients of class yyy
-#ifdef _MSC_VER
-#pragma warning(disable : 4251)
-#endif
-	mutable std::string var_str;  //32 bytes
-#ifdef _MSC_VER
-#pragma warning(4 : 4251)
-#endif
-	mutable mvint_t var_int;  //8 bytes/64 bits - currently defined as a long long
-	mutable double var_dbl;	  //8 bytes/64 buts - double
-	// initialise type last
-	mutable VARTYP var_typ;	 //actually a uint which will be 4 bytes
-							 //mutable uint padding1;
-							 //mutable long int padding2;
 
 	// PRIVATE MEMBER FUNCTIONS
 	//////////////////////////
