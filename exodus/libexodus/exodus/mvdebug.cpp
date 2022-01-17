@@ -123,9 +123,9 @@ void addbacktraceline(const var& frameno, const var& sourcefilename, const var& 
 
 	// suppress confusing and unhelpful exodus macros
 	//if ((line.substr(1,12) == "programexit(" || line.substr(1,12) == "libraryexit(" || line.substr(1,10) == "classexit(") or
-	if (line.match("^(program|library|class)(init|exit)\\(") or
-		(line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
-		return;
+	//if (line.match("^(program|library|class)(init|exit)\\(") or
+	//	(line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
+	//	return;
 
 #ifdef TRACING
 	line.errputl();

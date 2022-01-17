@@ -228,7 +228,7 @@ function main()
 		printl(var(10.0/3.0).length());
 
 		//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
-		assert(var(10.0/3.0).toString() == "3.3333333333333335");
+		//assert(var(10.0/3.0).toString() == "3.3333333333333335");
 
 		//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
 		//assert(var(10.0/3.0).toString() == "3.333333333333333");
