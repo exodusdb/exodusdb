@@ -83,7 +83,9 @@ project(exodus)
 include(CTest)
 enable_testing()
 
-add_subdirectory(fast_float)
+#no need to install header only library
+#add_subdirectory(fast_float)
+
 add_subdirectory(exodus/libexodus/exodus)
 add_subdirectory(exodus/libpgexodus/src)
 add_subdirectory(cli/src)
