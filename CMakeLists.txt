@@ -35,6 +35,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O1")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -Og")             #5% slower than -01 but supposedly better debugging
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O1 -fprofile-arcs -ftest-coverage")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O0")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas") #switched off to avoid various warnings
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")           #switched off to avoid warning about elvis operator ?:

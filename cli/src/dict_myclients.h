@@ -30,8 +30,8 @@ class efb_dict_myclients : public ExodusFunctorBase {
 		//define a function type (pExodusProgramBaseMemberFunction)
 		//that can call the shared library object member function
 		//with the right arguments and returning a var or void
-		typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
-
+		//typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+		using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
 		//call the shared library object main function with the right args,
 		// returning a var or void
 		//return CALLMEMBERFUNCTION(*(efb_dict_myclients.pobject_),

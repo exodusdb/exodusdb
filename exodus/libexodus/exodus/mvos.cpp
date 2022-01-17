@@ -20,18 +20,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <algorithm>  //for count in osrename
+//#include <algorithm>  //for count in osrename
 #include <fstream>
 #include <iostream>
 #include <locale>
 #include <mutex>
 #include <filesystem>
-#include <regex>
+#include <fnmatch.h> //for fnmatch() globbing
+#include <chrono>
 
 //used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>
 
-#include <boost/thread/thread.hpp> // for posix_time
+//#include <boost/thread/thread.hpp> // for posix_time
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
@@ -113,7 +115,8 @@ bool checknotabsoluterootfolder(std::string dirname) {
 	//if (!dirname.ends_with(OSSLASH_))
 	//	return true;
 	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
-		 std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
+		 //std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
+		 var(dirname).count(OSSLASH_) < 3) ||
 		(SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_))) {
 		std::cout
 			<< "Forced removal/renaming of top two level directories by absolute path is "
@@ -1086,37 +1089,37 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 		spec = path.field2(OSSLASH, -1);
 		path = path.substr(1, path.length() - spec.length());
 
-		// escape all the regex special characters that are found in the strint
-		// except the * ? which are glob special characters
-		// regex concept here is ([specialchars]) replace with \$1 where $1 will be any of
-		// the special chars note inside brackets, only  ^ - and ] are special characters
-		// inside [] char alternative to include a ] in the list of characters inside [] it
-		// must be the first character like []otherchars] of course all back slashes must be
-		// doubled up in c++ source code
-		spec.replacer("([][\\\\(){}|^$.+])", "\\\\$1");
-
-		// glob * becomes .* in regex matching any number of any characters
-		spec.swapper("*", ".*");
-
-		// glob ? becomes . in regex matching any one character
-		spec.swapper("?", ".");
+//		// escape all the regex special characters that are found in the strint
+//		// except the * ? which are glob special characters
+//		// regex concept here is ([specialchars]) replace with \$1 where $1 will be any of
+//		// the special chars note inside brackets, only  ^ - and ] are special characters
+//		// inside [] char alternative to include a ] in the list of characters inside [] it
+//		// must be the first character like []otherchars] of course all back slashes must be
+//		// doubled up in c++ source code
+//		spec.replacer("([][\\\\(){}|^$.+])", "\\\\$1");
+//
+//		// glob * becomes .* in regex matching any number of any characters
+//		spec.swapper("*", ".*");
+//
+//		// glob ? becomes . in regex matching any one character
+//		spec.swapper("?", ".");
 	}
 
-	bool filter = false;
-	// std_boost::regex re;
-	std::regex re;
-	if (spec) {
-		try {
-			// Set up the regular expression for case-insensitivity
-			// re.assign(toTstring(spec).c_str(), std_boost::regex_constants::icase);
-			re.assign(spec.toString().c_str(), std::regex_constants::icase);
-			filter = true;
-		} catch (std::regex_error& e) {
-			std::cout << spec.var_str << " is not a valid regular expression: \""
-					  << e.what() << "\"" << std::endl;
-			return "";
-		}
-	}
+//	bool filter = false;
+//	// std_boost::reregex re;
+//	std::regex re;
+//	if (spec) {
+//		try {
+//			// Set up the regular expression for case-insensitivity
+//			// re.assign(toTstring(spec).c_str(), std_boost::regex_constants::icase);
+//			re.assign(spec.toString().c_str(), std::regex_constants::icase);
+//			filter = true;
+//		} catch (std::regex_error& e) {
+//			std::cout << spec.var_str << " is not a valid regular expression: \""
+//					  << e.what() << "\"" << std::endl;
+//			return "";
+//		}
+//	}
 
 	bool getfiles = true;
 	bool getfolders = true;
@@ -1153,22 +1156,12 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 			std::cerr << "'" << path.to_path_string() << "' path : " << error_code.message() << std::endl;
 			return filelist;
 		}
-		//std::filesystem::path path1 = std::filesystem::path(".");
-		//std::clog << "path1='" << path1 << "'" <<std::endl;
 
-		//std::filesystem::path path_cwd = std::filesystem::current_path();
-		//std::clog << "path_cwd='" << path_cwd << "'" <<std::endl;
-
-		//std::filesystem::path pathx = std::filesystem::path(path.to_path_string().c_str());
-		//std::filesystem::path pathx = std::filesystem::current_path();
-		//std::filesystem::path pathx = std::filesystem::path(".");
-		//std::clog << "pathx='" << pathx << "'" <<std::endl;
-		//full_path =
-		//    std::filesystem::absolute(pathx);
-		//std::clog << "pathx='" << pathx << "'" <<std::endl;
 	}
-	//std::clog << "fullpath='" << full_path << "'" <<std::endl;
+	if (spec == "*")
+		spec = "";
 
+	//std::clog << "fullpath='" << full_path << "'" <<std::endl;
 	// quit if it isnt a folder
 	if (!std::filesystem::is_directory(full_path))
 		return filelist;
@@ -1185,10 +1178,15 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 			// also is_directory(dir_itr->status()) changed to is_directory(*dir_itr)
 			// to avoid compile errors on boost 1.33
 			// http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
-			if (filter && !std::regex_match(dir_itr->path().filename().string(), re))
+			//if (filter && !std::regex_match(dir_itr->path().filename().string(), re))
+			//TRACE(dir_itr->path().filename().string())
+			//TRACE(spec)
+			//if (spec && !var(dir_itr->path().filename().string()).match(spec, "w"))
+			//TRACE(dir_itr->path().filename().string())
+			//TRACE(spec)
+			if (spec && fnmatch(spec.var_str.c_str(), dir_itr->path().filename().c_str(), 0) != 0)
 				continue;
 
-			// using .leaf instead of .status provided in boost 1.34 .. but does it
 			// work/efficiently if (std::filesystem::is_directory(dir_itr->status() ) )
 			if (std::filesystem::is_directory(*dir_itr)) {
 				if (getfolders)
@@ -1217,10 +1215,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 		}
 	}
 
-	// delete first separator
-	// NB splice is 1 based
-	//if (filelist != "")
-	//	filelist.splicer(1, 1, "");
+	// delete last separator
 	filelist.popper();
 
 	return filelist;

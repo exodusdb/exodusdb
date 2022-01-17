@@ -499,6 +499,10 @@ bool ExodusProgramBase::readnext(var& record, var& key, var& valueno) {
 }
 
 bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, const var& key) {
+
+	if (not filename_or_handle_or_command.assigned() || not key.assigned())
+		throw MVUnassigned("bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, const var& key)");
+
 	if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
 		var command = filename_or_handle_or_command.a(1);
 

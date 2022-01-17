@@ -34,9 +34,17 @@ function main() {
 		silent = 1;
 
 	if (not open(filename to file)) {
+
+		printl("Creating", filename);
+
 		createfile(filename);
-		assert(open(filename to file));
+
+		open(filename to file);
+
+		assert(file);
+
 	}
+	assert(file);
 
 	PROCESSNO = COMMAND.a(2);
 
@@ -53,6 +61,8 @@ function main() {
 
 		if (ok)
 			printl("Test passed");
+
+		deletefile(filename);
 
 		return not ok;
 	}

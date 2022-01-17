@@ -2449,8 +2449,35 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 	if (not SLASH_IS_BACKSLASH) {
 
+		//TRACE: dir1=".gitignore^a.out^alloc_traits.h.gcov^allocator.h.gcov^basic_string.h.gcov^basic_string.tcc.gcov^calblur8.html^char_traits.h.gcov^cmake_install.cmake^CMakeCache.txt^CMakeFiles^CMakeLists.txt^cpp_type_traits.h.gcov^CTestTestfile.cmake^DartConfiguration.tcl^exodusfuncs.h.gcov^exprtk.cpp^genregress2.cpp^gthr-default.h.gcov^hashtable_policy.h.gcov^hashtable.h.gcov^iomanip.gcov^ios_base.h.gcov^Makefile^move.h.gcov^mv.h.gcov^new_allocator.h.gcov^p4.cpp^ptr_traits.h.gcov^simple_decimal_conversion.h.gcov^std_mutex.h.gcov^stl_algobase.h.gcov^stl_iterator_base_funcs.h.gcov^stl_iterator_base_types.h.gcov^string_conversions.h.gcov^t_calblur8utf8.html^t_codep.bin^t_cp_allo.txt^t_cp_allo4.txt^t_EN_RU_UA.txt^t_GreekEnglFile.txt^t_GreekLocalFile.txt^t_GreekUTF-8File.txt^t_temp1234.txt^t_temp5.txt^t_test_MIXTURE.txt^t_test_OUTPUT_1251.txt^t_test_OUTPUT_UTF8.txt^t_utf-8-test.txt^t_utf8copy.html^t_utf8utf8.html^t_x.txt^test_asyncupd^test_asyncupd.cpp^test_comp^test_comp.cpp^test_db^test_db.cpp^test_dict^test_dict.cpp^test_dim^test_dim.cpp^test_isnum^test_isnum.cpp^test_main^test_main.1^test_main.2^test_main.cpp^test_main.out^test_math^test_math.cpp^test_mod^test_more^test_more.cpp^test_multilang^test_multilang.cpp^test_mvfuncs^test_mvfuncs.cpp^test_mvmv^test_mvmv.cpp^test_numfmt^test_numfmt.cpp^test_osopen^test_osopen.cpp^test_precision^test_precision.cpp^test_regress^test_regress.cpp^test_select^test_select.cpp^test_sort^test_sort.cpp^test_sortarray^test_sortarray.cpp^test_zzzclean^test_zzzclean.cpp^Testing^tests^type_traits.gcov^type_traits.h.gcov^unordered_map.h.gcov^utf-8-test.txt^utf8.html^x^y^z"
+
 		//unordered files and directories
-		assert(oslist("*").convert(FM,"") == osshellread("ls . -AU1").convert("\n\r",""));
+		var dir1 = oslist("*").sort();
+		var dir2 = osshellread("ls . -AU1").convert("\n\r", _FM_).trim(FM_).sort();
+		//TRACE(dir1)
+		//TRACE(dir2)
+		assert(dir1 eq dir2);
+
+		//unordered directories
+		var dirs = oslistd("*").sort();
+		TRACE(dirs)
+		assert(dir1 ne dirs);
+
+		//unordered files
+		var files = oslistf("*").sort();
+		TRACE(files)
+		assert(dir1 ne files);
+
+		//check oslist = oslistd ^ oslistf (both sorted)
+		dir2 = (dirs ^ FM ^ files).sort();
+		assert(dir1 eq dir2);
+
+		// ls xxx*.yyy returns a sorted list regardless of the -U unordered option
+		dir1 = oslist("test_*.cpp").sort();
+		dir2 = osshellread("ls test_*.cpp -AU1").convert("\n\r", _FM_ ).trim(FM_).sort();
+		TRACE(dir1)
+		TRACE(dir2)
+		assert(dir1 eq dir2);
 
 		//files (not directories)
 		assert(oslistf("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . ! -type d -printf '%f\n'").convert("\n\r",""));

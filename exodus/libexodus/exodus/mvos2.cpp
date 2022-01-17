@@ -108,7 +108,8 @@ void var::initrnd() const {
 
 	// Get a seed for the RNG
 	uint64_t seed;
-	if (this->isnum()) {
+	if (this->unassigned()) {
+	} else if (this->isnum()) {
 
 		// Seed from number
 		seed = this->toLong();
