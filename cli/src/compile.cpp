@@ -804,8 +804,8 @@ could generate the following overloads in the lib's .h header
 					//develop additional function calls to allow constants to be provided for io/out arguments
 					// ie allow out variables to be ignored if not required
 					//funcargdecl2 example:	in arg1=var(), out arg2=var(), out arg3=var()
-					//funcargstype example:	in,out,out
-					//funcargs example: 	arg1,arg2,arg3
+					//funcargstype example:	IN,OUT,OUT
+					//funcargs example: 	ARG1,ARG2,ARG3
 					var add_funcargsdecl = funcargsdecl2;
 					var add_funcargs = funcargs;
 					var add_vars = "";
@@ -952,7 +952,7 @@ var inclusion=
 "\r\nExodusFunctorBase efb_funcx;"
 "\r\n"
 "\r\n//a member function with the right arguments, returning a var or void"
-"\r\nvarorvoid funcx(in arg1=var(), out arg2=var(), out arg3=var())"
+"\r\nVARORVOID funcx(in arg1=var(), out arg2=var(), out arg3=var())"
 "\r\n{"
 "\r\n"
 "\r\n //first time link to the shared lib and create/cache an object from it"
@@ -963,13 +963,13 @@ var inclusion=
 "\r\n //define a function type (pExodusProgramBaseMemberFunction)"
 "\r\n //that can call the shared library object member function"
 "\r\n //with the right arguments and returning a var or void"
-"\r\n typedef varorvoid (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,out,out);"
+"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
 "\r\n"
 "\r\n //call the shared library object main function with the right args,"
 "\r\n // returning a var or void"
 "\r\n callorreturn CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
 "\r\n ((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
-"\r\n  (arg1,arg2,arg3);"
+"\r\n  (ARG1,ARG2,ARG3);"
 "\r\n"
 "\r\n}";
 */
@@ -1009,7 +1009,8 @@ var inclusion=
 						"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
 						"\r\n //that can call the shared library object member function"
 						"\r\n //with the right arguments and returning a var or void"
-						"\r\n typedef varorvoid (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,out,out);"
+						//"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
+						"\r\n using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> VARORVOID;"
 						"\r\n"
 						"\r\n //call the shared library object main function with the right args,"
 						"\r\n // returning a var or void"
@@ -1019,7 +1020,7 @@ var inclusion=
 						"\r\n {before_call}"
 						"\r\n return CALLMEMBERFUNCTION(*(this->pobject_),"
 						"\r\n ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
-						"\r\n  (arg1,arg2,arg3);"
+						"\r\n  (ARG1,ARG2,ARG3);"
 						"\r\n {after_call}"
 						"\r\n"
 						"\r\n}"
@@ -1029,9 +1030,9 @@ var inclusion=
 					swapper(inclusion, "funcx", field2(libname, OSSLASH, -1));
 					//swapper(example,"exodusprogrambasecreatedelete_",funcname);
 					swapper(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
-					swapper(inclusion, "in,out,out", funcargstype);
-					swapper(inclusion, "arg1,arg2,arg3", funcargs);
-					swapper(inclusion, "varorvoid", returnsvarorvoid);
+					swapper(inclusion, "IN,OUT,OUT", funcargstype);
+					swapper(inclusion, "ARG1,ARG2,ARG3", funcargs);
+					swapper(inclusion, "VARORVOID", returnsvarorvoid);
 					swapper(inclusion, "callorreturn", callorreturn);
 					swapper(inclusion, "{additional_funcs}", add_funcs);
 
