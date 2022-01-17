@@ -4502,10 +4502,16 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	sql ^= dictexpression;
 	sql ^= ")";
 
-	bool result = this->sqlexec(sql);
-	if (!result)
-		this->lasterror().errputl();
-	return result;
+	var response = "";
+	if (!this->sqlexec(sql, response)) {
+		//ERROR:  cannot create index on foreign table "clients"
+		//sqlstate:42809 CREATE INDEX index__suppliers__SEQUENCE_XREF ON suppliers USING GIN (to_tsvector('simple',dict_suppliers_SEQUENCE_XREF(suppliers.key, suppliers.data)))
+		if (!response.index("sqlstate:42809"))
+			response.errputl();
+		return false;
+	}
+
+	return true;
 }
 
 bool var::deleteindex(const var& fieldname0) const {
