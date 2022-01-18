@@ -15,7 +15,7 @@ message("--EXODUS TEST CMAKE INIT --")
 
 #allow relative link directories
 cmake_policy(SET CMP0015 NEW)
-include_directories(../../exodus/libexodus)
+include_directories(../../exodus/libexodus ../../fast_float/include)
 #link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 link_directories(../../exodus/libexodus/exodus)
 
