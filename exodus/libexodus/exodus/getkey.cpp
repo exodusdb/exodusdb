@@ -43,7 +43,7 @@ int getkey(void) {
 
 	tv.tv_sec = 0;
 	tv.tv_usec = 10000;	 // small 0.01 msec delay
-	select(1, NULL, NULL, NULL, &tv);
+	select(1, nullptr, nullptr, nullptr, &tv);
 
 	if (error == 0)
 		error = (read(fd, &ch, 1) != 1);  // get char from stdin

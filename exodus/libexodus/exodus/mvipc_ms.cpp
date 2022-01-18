@@ -184,8 +184,8 @@ int MVipc(const int environmentn, var& pgconnparams) {
 
 	if (bInitOk) {
 		// give the security descriptor a Null Dacl
-		// done using the  "TRUE, (PACL)NULL" here
-		BOOL bSetOk = SetSecurityDescriptorDacl(&SD, TRUE, (PACL)NULL, FALSE);
+		// done using the  "TRUE, (PACL)nullptr" here
+		BOOL bSetOk = SetSecurityDescriptorDacl(&SD, TRUE, (PACL)nullptr, FALSE);
 		if (bSetOk) {
 
 			// Make the security attributes point
@@ -214,12 +214,12 @@ int MVipc(const int environmentn, var& pgconnparams) {
 
 		// Create an event object for this instance.
 
-		hEvents[i] = CreateEvent(NULL,	 // default security attribute
+		hEvents[i] = CreateEvent(nullptr,	 // default security attribute
 								 TRUE,	 // manual-reset event
 								 TRUE,	 // initial state = signaled
-								 NULL);	 // unnamed event object
+								 nullptr);	 // unnamed event object
 
-		if (hEvents[i] == NULL) {
+		if (hEvents[i] == nullptr) {
 			wprintf(L"MVipc() CreateEvent failed. WINAPI Error: %d.\n", GetLastError());
 			return false;
 		}

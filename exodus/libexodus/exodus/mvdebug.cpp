@@ -364,7 +364,7 @@ var backtrace() {
 
 		//Open the command for reading
 		fp = popen(oscmd.toString().c_str(), "r");
-		if (fp == NULL)
+		if (fp == nullptr)
 		{
 			fprintf(stderr,"Failed to run command\n" );
 			return "";
@@ -375,7 +375,7 @@ var backtrace() {
 	#endif
 
 		//Read the output a line at a time - output it.
-		while (fgets(path, sizeof(path)-1, fp) != NULL)
+		while (fgets(path, sizeof(path)-1, fp) != nullptr)
 		{
 
 	#ifdef TRACING

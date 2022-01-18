@@ -112,25 +112,25 @@ namespace exodus {
 // default constructor.  probably followed by .init(libname,funcname,mv)
 ExodusFunctorBase::ExodusFunctorBase()
 	// TODO optimise by only initialise one and detect usage on that only
-	: mv_(NULL), libraryname_(""), functionname_(""), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
+	: mv_(nullptr), libraryname_(""), functionname_(""), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
 // constructor to provide everything immediately
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv)
-	: mv_(&mv), libraryname_(libname), functionname_(funcname), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
+	: mv_(&mv), libraryname_(libname), functionname_(funcname), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
 // constructor to provide library name and function immediately
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname)
-	: mv_(NULL), libraryname_(libname), functionname_(funcname), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
+	: mv_(nullptr), libraryname_(libname), functionname_(funcname), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
 // constructor to provide environment immediately. probably followed by .init(libname,funcname)
 ExodusFunctorBase::ExodusFunctorBase(MvEnvironment& mv)
-	: mv_(&mv), libraryname_(""), functionname_(""), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
+	: mv_(&mv), libraryname_(""), functionname_(""), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
@@ -150,7 +150,7 @@ bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunction
 	// call a function in the library to create one of its "exodus program" objects
 	// nb we MUST call the same library to delete it
 	// so that the same memory management routine is called to create and delete it.
-	// pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+	// pfunction_ return a pobject_ if pobject_ is passed in nullptr (using mv as an init argument)
 	// or deletes a pobject_ if not
 
 	// generate an error here to debug
@@ -160,7 +160,7 @@ bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunction
 	// pobject_->main();
 	//((*pobject_).*(pmemberfunction_))();
 	// CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
-	if (pobject_ == NULL || pmemberfunction_ == NULL)
+	if (pobject_ == nullptr || pmemberfunction_ == nullptr)
 		return false;
 
 #if TRACING >= 3
@@ -169,7 +169,7 @@ bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunction
 	return true;
 }
 
-// called from every library .h file if _pmemberfunction is NULL
+// called from every library .h file if _pmemberfunction is nullptr
 // atm designed to be called once only the first time an external function is called
 // assuming library and function names and mv are already set
 bool ExodusFunctorBase::init() {
@@ -181,7 +181,7 @@ bool ExodusFunctorBase::init() {
 	// call a function in the library to create one of its "exodus program" objects
 	// nb we MUST call the same library to delete it
 	// so that the same memory management routine is called to create and delete it.
-	// pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+	// pfunction_ return a pobject_ if pobject_ is passed in nullptr (using mv as an init argument)
 	// or deletes a pobject_ if not
 
 	// generate an error here to debug
@@ -191,7 +191,7 @@ bool ExodusFunctorBase::init() {
 	// pobject_->main();
 	//((*pobject_).*(pmemberfunction_))();
 	// CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
-	if (pobject_ == NULL || pmemberfunction_ == NULL) {
+	if (pobject_ == nullptr || pmemberfunction_ == nullptr) {
 #if TRACING >= 1
 		std::cout << "mvfunctor:init() NOK " << libraryname_ << ", " << functionname_ << std::endl;
 #endif
@@ -226,7 +226,7 @@ bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunct
 		// call a function in the library to create one of its "exodus program" objects
 		// nb we MUST call the same library to delete it
 		// so that the same memory management routine is called to create and delete it.
-		// pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init
+		// pfunction_ return a pobject_ if pobject_ is passed in nullptr (using mv as an init
 		// argument)
 		// or deletes a pobject_ if not
 
@@ -238,7 +238,7 @@ bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunct
 		// pobject_->main();
 		//((*pobject_).*(pmemberfunction_))();
 		// CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
-		if (pobject_ == NULL || pmemberfunction_ == NULL) {
+		if (pobject_ == nullptr || pmemberfunction_ == nullptr) {
 			return false;
 
 #if TRACING >= 1
@@ -397,7 +397,7 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 		var(dlsym_error).outputl();
 #endif
 
-	if (plibrary_ == NULL) {
+	if (plibrary_ == nullptr) {
 		//#if TRACING >= 1
 		//		std::cerr << "mvfunctor:openlib: <<< ko <<< " << libraryfilename_ << std::endl;
 		//#endif
@@ -455,7 +455,7 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname) {
 		var(dlsym_error).outputl();
 #endif
 
-	if (pfunction_ == NULL) {
+	if (pfunction_ == nullptr) {
 		//#if TRACING >= 1
 		//		std::cout << "mvfunctor:openfunc: <<< ko <<< " << libraryname_ << " " << newfunctionname
 		//			  << std::endl;
@@ -525,14 +525,14 @@ void ExodusFunctorBase::closelib() {
 	closefunc();
 
 	// close any existing connection to the (cached) library
-	if (plibrary_ != NULL) {
+	if (plibrary_ != nullptr) {
 		//#if TRACING >= 2
 		//		std::cout << "mvfunctor:CLOSED LIBRARY  " << libraryname_ << " " << plibrary_ << std::endl;
 		//#endif
 		//dlclose((library_t)plibrary_);
 
 		// record the library share no longer exists
-		plibrary_ = NULL;
+		plibrary_ = nullptr;
 
 	} else {
 		//#if TRACING >= 5
@@ -548,14 +548,14 @@ void ExodusFunctorBase::closefunc() {
 	// the *library* function must be called to delete the object that it created
 	//(cant delete the object in the main process since it might have a different memory
 	// allocator)
-	if (pobject_ != NULL) {
+	if (pobject_ != nullptr) {
 #if TRACING >= 2
 		std::cout << "mvfunctor:CLOSED function " << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
 #endif
 		// second call will delete
 		pfunction_(pobject_, *mv_, pmemberfunction_);
 		// record the object no longer exists
-		pobject_ = NULL;
+		pobject_ = nullptr;
 
 	} else {
 #if TRACING >= 5

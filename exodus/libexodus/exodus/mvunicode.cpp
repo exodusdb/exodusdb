@@ -42,7 +42,7 @@ bool var::setxlocale() const {
 	// LCID locale_lcid=1032;//Greek
 	// LCID locale_lcid=1055;//Turkish
 
-	return SetThreadLocale((*this).toInt()) != NULL;
+	return SetThreadLocale((*this).toInt()) != nullptr;
 
 #else
 	THISIS("bool var::setxlocale() const")
@@ -52,11 +52,11 @@ bool var::setxlocale() const {
 	// TODO do this in thread creation
 	// TODO destroy threalocale in thread destruction *OTHERWISE MEMORY LEAK
 	// to avoid checking on every setxlocale
-	if (uselocale(NULL) == uselocale(LC_GLOBAL_LOCALE))
+	if (uselocale(nullptr) == uselocale(LC_GLOBAL_LOCALE))
 		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
 
-	return setlocale(LC_ALL, (*this).toString().c_str()) != NULL;
-	// return setlocale(LC_CTYPE,(*this).toString().c_str())!=NULL;
+	return setlocale(LC_ALL, (*this).toString().c_str()) != nullptr;
+	// return setlocale(LC_CTYPE,(*this).toString().c_str())!=nullptr;
 
 #endif
 }
@@ -67,7 +67,7 @@ var& var::getxlocale() {
 	return *this;
 #else
 	// return "";
-	*this = var(setlocale(LC_ALL, NULL));
+	*this = var(setlocale(LC_ALL, nullptr));
 	return *this;
 #endif
 }

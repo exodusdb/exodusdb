@@ -1150,7 +1150,7 @@ from http://stackoverflow.com/questions/143174/c-c-how-to-obtain-the-full-path-o
 
 Windows:
 
-int bytes = GetModuleFileName(NULL, pBuf, len);
+int bytes = GetModuleFileName(nullptr, pBuf, len);
 if(bytes == 0)
 	return -1;
 else

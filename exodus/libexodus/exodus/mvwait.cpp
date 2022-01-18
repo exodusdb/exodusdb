@@ -154,7 +154,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
 	//Allocate memory for watch descriptors
 	// or crash
 	wd = (int*)calloc(argc, sizeof(int));
-	if (wd == NULL) {
+	if (wd == nullptr) {
 		perror("mvwait: calloc");
 		exit(EXIT_FAILURE);
 	}
@@ -195,16 +195,16 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
 		//Make sure we exit cleanly
 		// memset(&sa, 0, sizeof(struct sigaction));
 		// sa.sa_handler = sighandler;
-		// sigaction(SIGINT, &sa, NULL);
-		// sigaction(SIGQUIT, &sa, NULL);
-		// sigaction(SIGTERM, &sa, NULL);
+		// sigaction(SIGINT, &sa, nullptr);
+		// sigaction(SIGQUIT, &sa, nullptr);
+		// sigaction(SIGTERM, &sa, nullptr);
 
 		//This is needed to be able to tcsetattr() after a hangup (Ctrl-C)
 		//see tcsetattr() on POSIX
 
 		// memset(&sa, 0, sizeof(struct sigaction));
 		// sa.sa_handler = SIG_IGN;
-		// sigaction(SIGTTOU, &sa, NULL);
+		// sigaction(SIGTTOU, &sa, nullptr);
 
 		// Set stdin mode
 		// a) non-canonical (i.e. characterwise not linewise input)

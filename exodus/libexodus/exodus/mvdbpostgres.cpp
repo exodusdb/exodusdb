@@ -187,7 +187,7 @@ class PGResult {
 	// Destructor calls PQClear
 	// This the whole point of having PGResult
 	~PGResult() {
-		if (pgresult_ != nullptr)
+		if (pgresult_)
 			PQclear(pgresult_);
 	}
 };
@@ -771,7 +771,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 
 			// Make sure the connection is still valid otherwise redo the open
 			auto pgconn = get_pgconnection(cached_file_handle);
-			if (pgconn == NULL) {
+			if (! pgconn) {
 				thread_file_handles.erase(filename2);
 				//var(cached_file_handle).errputl("==== Connection cache INVALID = ");
 			} else {
@@ -1012,7 +1012,7 @@ bool var::read(const var& filehandle, const var& key) {
 		var sql = "SELECT key from " ^ get_normal_filename(filehandle) ^ ";";
 
 		auto pgconn = get_pgconnection(filehandle);
-		if (pgconn == NULL)
+		if (! pgconn)
 			return false;
 
 		PGResult pgresult;
@@ -1067,7 +1067,7 @@ bool var::read(const var& filehandle, const var& key) {
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(), 1, /* one param */
-											NULL,					/* let the backend deduce param type */
+											nullptr,					/* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
@@ -1183,7 +1183,7 @@ var var::lock(const var& key) const {
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										 /* one param */
-											NULL,										 /* let the backend deduce param type */
+											nullptr,										 /* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary pgresults */
 
 	// Handle serious errors
@@ -1247,7 +1247,7 @@ bool var::unlock(const var& key) const {
 	PGResult pgresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										 /* one param */
-											NULL,										 /* let the backend deduce param type */
+											nullptr,										 /* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary results */
 
 	// Handle serious errors
@@ -1449,7 +1449,7 @@ bool var::write(const var& filehandle, const var& key) const {
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,	   // two params (key and data)
-											NULL,  // let the backend deduce param type
+											nullptr,  // let the backend deduce param type
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
@@ -1499,7 +1499,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,	   // two params (key and data)
-											NULL,  // let the backend deduce param type
+											nullptr,  // let the backend deduce param type
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
@@ -1557,7 +1557,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,	   // two params (key and data)
-											NULL,  // let the backend deduce param type
+											nullptr,  // let the backend deduce param type
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
@@ -1613,7 +1613,7 @@ bool var::deleterecord(const var& key) const {
 
 	DEBUG_LOG_SQL1
 	PGResult pgresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
-											NULL,								   /* let the backend deduce param type */
+											nullptr,								   /* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,	 // text arguments
 											0);	 // text results
@@ -2012,7 +2012,7 @@ inline var get_fileexpression(const var& mainfilename, const var& filename, cons
 	//return filename.convert(".", "_") ^ "." ^ keyordata;
 	return get_normal_filename(filename) ^ "." ^ keyordata;
 
-	// if you dont use STRICT in the postgres function declaration/definitions then NULL
+	// if you dont use STRICT in the postgres function declaration/definitions then nullptr
 	// parameters do not abort functions
 
 	// use COALESCE function in case this is a joined but missing record (and therefore null)
@@ -2424,7 +2424,7 @@ exodus_call:
 		else {
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
-			// Note 3rd argument '' means convert empty multivalues to NULL in the array
+			// Note 3rd argument '' means convert empty multivalues to nullptr in the array
 			// otherwise conversion to float will fail
 			if (isnumeric)
 				sqlexpression ^= "::float8[]";
@@ -3286,7 +3286,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			// Filter Stage 8 - DUMMY OP AND VALUE SAVE IF NOT PROVIDED
 			///////////////////////////////////////////////////////////
 
-			// missing op and value means NOT '' or NOT 0 or NOT NULL
+			// missing op and value means NOT '' or NOT 0 or NOT nullptr
 			// WITH CLIENT_TYPE
 			if (op == "" && value == "") {
 				//op = "<>";
@@ -4159,6 +4159,7 @@ bool var::makelist(const var& listname, const var& keys) {
 	return true;
 }
 
+//bool var::hasnext() const {
 bool var::hasnext() {
 
 	// var xx;
@@ -4219,7 +4220,7 @@ bool var::hasnext() {
 		return false;
 
 	auto pgconn = get_pgconnection(*this);
-	if (pgconn == NULL) {
+	if (! pgconn) {
 		// this->clearselect();
 		return false;
 	}
@@ -4367,7 +4368,7 @@ bool var::readnext(var& record, var& key, var& valueno) {
 	}
 
 	auto pgconn = get_pgconnection(*this);
-	if (pgconn == NULL)
+	if (! pgconn)
 		return "";
 
 	//TODO avoid this trip to the database somehow?
@@ -4555,7 +4556,7 @@ var var::listfiles() const {
 	sql ^= " WHERE schemaname " ^ schemafilter;
 
 	auto pgconn = get_pgconnection(*this);
-	if (pgconn == NULL)
+	if (! pgconn)
 		return "";
 
 	PGResult pgresult;
@@ -4589,7 +4590,7 @@ var var::dblist() const {
 	var sql = "SELECT datname FROM pg_database";
 
 	auto pgconn = get_pgconnection(*this);
-	if (pgconn == NULL)
+	if (! pgconn)
 		return "";
 
 	PGResult pgresult;
@@ -4631,7 +4632,7 @@ bool var::cursorexists() {
 	// var sql="SELECT name from pg_cursors";
 
 	auto pgconn = get_pgconnection(*this);
-	if (pgconn == NULL)
+	if (! pgconn)
 		return "";
 
 	PGResult pgresult;
@@ -4678,7 +4679,7 @@ var var::listindexes(const var& filename0, const var& fieldname0) const {
 		");";
 
 	auto pgconn = get_pgconnection(*this);
-	if (pgconn == NULL)
+	if (! pgconn)
 		return "";
 
 	// execute command or return empty string
@@ -4733,7 +4734,7 @@ var var::reccount(const var& filename0) const {
 	sql ^= "';";
 
 	auto pgconn = get_pgconnection(filename);
-	if (pgconn == NULL)
+	if (! pgconn)
 		return "";
 
 	// execute command or return empty string
@@ -4770,7 +4771,7 @@ var var::flushindex(const var& filename) const {
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
 	auto pgconn = get_pgconnection(*this);
-	if (pgconn == NULL)
+	if (! pgconn)
 		return "";
 
 	// execute command or return empty string
@@ -4808,7 +4809,7 @@ static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
 
 	// will contain any pgresult IF successful
 	pgresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
-							NULL,									  /* let the backend deduce param type */
+							nullptr,									  /* let the backend deduce param type */
 							paramValues, paramLengths,
 							0,	 // text arguments
 							0);	 // text results

@@ -45,5 +45,5 @@ gen_common&& gen=reinterpret_cast<gen_common&&> (*mv.labelledcommon[gen_common_n
 operator)
 //gen_common*
 
-//#define gen_isdefined (mv.labelledcommon[gen_common_no] != NULL)
+//#define gen_isdefined (mv.labelledcommon[gen_common_no] != nullptr)
 */

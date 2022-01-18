@@ -20,11 +20,11 @@ ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 //	,
 //	cache_dictid_(""),
 //	cache_perform_libid_(""),
-//	dict_exodusfunctorbase_(NULL){};
+//	dict_exodusfunctorbase_(nullptr){};
 {
 	cache_dictid_ = "";
 	cache_perform_libid_ = "";
-	dict_exodusfunctorbase_ = NULL;
+	dict_exodusfunctorbase_ = nullptr;
 }
 #pragma GCC diagnostic pop
 
@@ -393,7 +393,7 @@ bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
 					ovalues = oconv(ivalues,ioconvs(fieldn)).squoter();
 				}
 				else
-					ovalues = "NULL";
+					ovalues = "nullptr";
 			}
 			else {
 				//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
@@ -558,7 +558,7 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[ma
 
 	/*
 	SUBROUTINE PUSH.SELECT(V1, V2, V3, V4)
-	11 NULL
+	11 nullptr
 	12 *STOPLINECOUNT
 	13 *STARTLINECOUNT
 	14 *STOPLINECOUNT
@@ -588,7 +588,7 @@ bool ExodusProgramBase::popselect([[maybe_unused]] const var& v1, var& v2, [[may
 	return true;
 	/*
 	SUBROUTINE POP.SELECT(V1, V2, V3, V4)
-	11 NULL
+	11 nullptr
 	12 *STOPLINECOUNT
 	13 *STARTLINECOUNT
 	14 *STOPLINECOUNT
@@ -1426,7 +1426,7 @@ baddict:
 			dict_exodusfunctorbase_ = dict_function_cache[cachekey];
 			// if (dict_exodusfunctorbase_) {
 			//	delete dict_exodusfunctorbase_;
-			//	dict_exodusfunctorbase_=NULL;
+			//	dict_exodusfunctorbase_=nullptr;
 			//}
 
 			// if not in cache then create new one

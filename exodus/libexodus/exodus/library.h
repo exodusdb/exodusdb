@@ -61,8 +61,8 @@ _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")
 		pExodusProgramBaseMemberFunction& pmemberfunction) {                                   \
 		if (pexodusprogrambase) {                                                              \
 			delete pexodusprogrambase;                                                         \
-			pexodusprogrambase = NULL;                                                         \
-			pmemberfunction = NULL;                                                            \
+			pexodusprogrambase = nullptr;                                                         \
+			pmemberfunction = nullptr;                                                            \
 		} else {                                                                               \
 			pexodusprogrambase = new CLASSNAME##ExodusProgram(mv);                             \
 			_Pragma("GCC diagnostic push")                                                     \

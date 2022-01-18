@@ -7,7 +7,7 @@
 
 namespace exodus {
 
-bool var::getcursor() const {
+bool var::getcursor() {
 
 	THISIS("bool var::getcursor() const")
 	THISISDEFINED()

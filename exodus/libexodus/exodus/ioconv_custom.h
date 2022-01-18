@@ -23,9 +23,9 @@ class efb_ioconv_custom : public ExodusFunctorBase {
 		// passing current standard variables in mv
 		// first time link to the shared lib and create/cache an object from it
 		// passing current standard variables in mv
-		// if (efb_getlang.pmemberfunction_==NULL)
+		// if (efb_getlang.pmemberfunction_==nullptr)
 		// efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
-		if (this->pmemberfunction_ == NULL)
+		if (this->pmemberfunction_ == nullptr)
 			this->init();
 
 		// define a function type (pExodusProgramBaseMemberFunction)

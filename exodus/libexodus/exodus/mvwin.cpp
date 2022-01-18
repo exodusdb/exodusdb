@@ -21,7 +21,7 @@ var getexecpath() {
 	DWORD nSize = MAX_PATH;
 	TCHAR filename[MAX_PATH];
 
-	int bytes = GetModuleFileName(NULL, filename, nSize);
+	int bytes = GetModuleFileName(nullptr, filename, nSize);
 	if (bytes == 0)
 		return L"";
 	else {

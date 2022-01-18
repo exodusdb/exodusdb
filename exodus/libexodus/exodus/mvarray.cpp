@@ -344,7 +344,7 @@ dim& dim::sort(bool reverse) {
 }
 
 //sorting var - using temporary dim
-var var::sort(const var& separator) {
+var var::sort(const var& separator) const{
 	THISIS("var var::sort(const var& separator=UNASSIGNED)")
 	THISISSTRING()
 	ISSTRING(separator)

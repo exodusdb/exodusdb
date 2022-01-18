@@ -477,7 +477,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		// and throw if not found
 		const char* ordercodes = "ALARDLDR";
 		const char* orderindex = strstr(ordercodes, ordercode);
-		if (orderindex == NULL)
+		if (orderindex == nullptr)
 			throw MVError("locateby('" ^ var(ordercode) ^ "') is invalid");
 
 		// convert the memory address to the char position within the codes

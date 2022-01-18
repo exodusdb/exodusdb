@@ -119,7 +119,7 @@ THE SOFTWARE.
 	}                                                                      \
 	;
 
-#define iscommon(COMMONNAME) ((&COMMONNAME) != NULL)
+#define iscommon(COMMONNAME) ((&COMMONNAME) != nullptr)
 
 // simplify declaration of function/subroutine arguments
 // eg. allow "function xyz(in arg1, out arg2)"

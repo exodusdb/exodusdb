@@ -23,16 +23,16 @@ bool haskey(int milliseconds = 0) {
 	/* Make sure we exit cleanly */
 	// memset(&sa, 0, sizeof(struct sigaction));
 	// sa.sa_handler = sighandler;
-	// sigaction(SIGINT, &sa, NULL);
-	// sigaction(SIGQUIT, &sa, NULL);
-	// sigaction(SIGTERM, &sa, NULL);
+	// sigaction(SIGINT, &sa, nullptr);
+	// sigaction(SIGQUIT, &sa, nullptr);
+	// sigaction(SIGTERM, &sa, nullptr);
 
 	/* This is needed to be able to tcsetattr() after a hangup (Ctrl-C)
 	 * see tcsetattr() on POSIX
 	 */
 	// memset(&sa, 0, sizeof(struct sigaction));
 	// sa.sa_handler = SIG_IGN;
-	// sigaction(SIGTTOU, &sa, NULL);
+	// sigaction(SIGTTOU, &sa, nullptr);
 
 	/* Set stdin mode
 	a) non-canonical (i.e. characterwise not linewise input)

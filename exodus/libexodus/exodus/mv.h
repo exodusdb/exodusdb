@@ -354,7 +354,7 @@ VTC(VARTYP_NAN, 0x8)
 
 // following are numeric
 VTC(VARTYP_OSFILE, 0x10)
-VTC(VARTYP_DBCONN, 0x20)
+//VTC(VARTYP_DBCONN, 0x20)
 
 // flag combinations
 VTC(VARTYP_INTDBL, VARTYP_INT | VARTYP_DBL)
@@ -364,13 +364,14 @@ VTC(VARTYP_NANSTR, VARTYP_NAN | VARTYP_STR)
 VTC(VARTYP_NOTNUMFLAGS, ~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN))
 
 VTC(VARTYP_NANSTR_OSFILE, VARTYP_NANSTR | VARTYP_OSFILE)
-VTC(VARTYP_NANSTR_DBCONN, VARTYP_NANSTR | VARTYP_DBCONN)
+//VTC(VARTYP_NANSTR_DBCONN, VARTYP_NANSTR | VARTYP_DBCONN)
 
 //VTC(VARTYP_DESTRUCTED, 0xFFFFF0)
 
 // const char mvtypemask=0x80;
 //VTC(VARTYP_MASK, 0x80)
-VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE | VARTYP_DBCONN))
+//VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE | VARTYP_DBCONN))
+VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE))
 
 //prevent or allow assignment to var to return a reference to the var
 //preventing will stop accidental usage of = instead of == in if() clauses
@@ -975,12 +976,12 @@ class DLL_PUBLIC var final {
 	// OS TIME/DATE
 	///////////////
 
-	var date() const;
-	var time() const;
-	var timedate() const;
+	ND var date() const;
+	ND var time() const;
+	ND var timedate() const;
 	void ossleep(const int milliseconds) const;
 	var oswait(const int milliseconds, const var& directory) const;
-	var ostime() const;
+	ND var ostime() const;
 #ifdef SWIG
 #define DEFAULT_EMPTY_STRING
 #define DEFAULT_DOT
@@ -1029,11 +1030,11 @@ class DLL_PUBLIC var final {
 	// CURSOR
 	/////////
 
-	var at(const int columnorcode) const;
-	var at(const int column, const int row) const;
-	bool getcursor() const;
+	ND var at(const int columnorcode) const;
+	ND var at(const int column, const int row) const;
+	bool getcursor();
 	void setcursor() const;
-	var getprompt() const;
+	ND var getprompt() const;
 	void setprompt() const;
 
 	// STANDARD INPUT
@@ -1043,7 +1044,7 @@ class DLL_PUBLIC var final {
 	var& input();
 	var& input(const var& prompt);
 	var& inputn(const int nchars);
-	bool eof() const;
+	ND bool eof() const;
 	bool echo(const int on_off) const;
 
 	friend std::istream& operator>>(std::istream& istream1, var& var1);
@@ -1057,13 +1058,13 @@ class DLL_PUBLIC var final {
 	// VARIABLE CONTROL
 	///////////////////
 
-	bool assigned() const;
-	bool unassigned() const;
+	ND bool assigned() const;
+	ND bool unassigned() const;
 	var& unassigned(const var& defaultvalue);
 
 	var& transfer(var& destinationvar);
 	const var& exchange(const var& var2) const;
-	var clone() const;
+	ND var clone() const;
 
 	/*no implemented yet
 	var rawvarmemory() const;
@@ -1078,33 +1079,33 @@ class DLL_PUBLIC var final {
 	// MATH/BOOLEAN
 	///////////////
 
-	var abs() const;
-	var mod(const var& divisor) const;
-	var mod(const int divisor) const;
-	var pwr(const var& exponent) const;
-	var rnd() const;
+	ND var abs() const;
+	ND var mod(const var& divisor) const;
+	ND var mod(const int divisor) const;
+	ND var pwr(const var& exponent) const;
+	ND var rnd() const;
 	void initrnd() const;
-	var exp() const;
-	var sqrt() const;
-	var sin() const;
-	var cos() const;
-	var tan() const;
-	var atan() const;
-	var loge() const;
+	ND var exp() const;
+	ND var sqrt() const;
+	ND var sin() const;
+	ND var cos() const;
+	ND var tan() const;
+	ND var atan() const;
+	ND var loge() const;
 	// integer() represents pick int() because int() is reserved word in c/c++
 	// Note that integer like pick int() is the same as floor()
 	// whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any
 	// fractional decimal places) to get the usual c/c++ effect use toInt() (although toInt()
 	// returns an int instead of a var like normal exodus functions)
-	var integer() const;
-	var floor() const;
-	var round(const int ndecimals = 0) const;
+	ND var integer() const;
+	ND var floor() const;
+	ND var round(const int ndecimals = 0) const;
 
 	// LOCALE
 	/////////
 
 	bool setxlocale() const;
-	var& getxlocale();
+	ND var& getxlocale();
 
 	// STRING CREATION
 	//////////////////
@@ -1112,46 +1113,46 @@ class DLL_PUBLIC var final {
 	//	var chr() const;
 	// version 1 chr - only char 0 - 255 returned in a single byte
 	// bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
-	var chr(const int num) const;  // ASCII
+	ND var chr(const int num) const;  // ASCII
 	// version 2 textchr - returns utf8 byte sequences for all unicode code points
 	// not uint so to get utf codepoints > 2^63 must provide negative ints
 	// not providing implicit constructor from var to uint due to getting ambigious conversions
 	// since int and uint are parallel priority in c++ implicit conversions
-	var textchr(const int num) const;  // UTF8
-	var str(const int num) const;
-	var space() const;
+	ND var textchr(const int num) const;  // UTF8
+	ND var str(const int num) const;
+	ND var space() const;
 
 	// STRING INFO
 	//////////////
 
 	// bool match(const var& matchstr,const var& options DEFAULT_EMPTY_STRING) const;
-	var match(const var& matchstr, const var& options DEFAULT_EMPTY_STRING) const;
-	var seq() const;	  // ASCII
-	var textseq() const;  // TEXT
-	var dcount(const var& substrx) const;
-	var count(const var& substrx) const;
+	ND var match(const var& matchstr, const var& options DEFAULT_EMPTY_STRING) const;
+	ND var seq() const;	  // ASCII
+	ND var textseq() const;  // TEXT
+	ND var dcount(const var& substrx) const;
+	ND var count(const var& substrx) const;
 #ifndef SWIGPERL
 	// swig-perl chokes on this one character version with "SWIG_AsVal_char not defined" so skip
 	// it for now (can use slow var& version) do something similar to the python config in
 	// exodus.i
-	var count(const char charx) const;
+	ND var count(const char charx) const;
 #endif
-	var length() const;
-	var len() const;
+	ND var length() const;
+	ND var len() const;
 	const char* data() const;
 	bool isnum() const;
 
-	bool starts(const var& vstr) const;
-	bool starts(const char* cstr) const;
-	bool starts(const char c) const;
+	ND bool starts(const var& vstr) const;
+	ND bool starts(const char* cstr) const;
+	ND bool starts(const char c) const;
 
-	bool ends(const var& vstr) const;
-	bool ends(const char* cstr) const;
-	bool ends(const char c) const;
+	ND bool ends(const var& vstr) const;
+	ND bool ends(const char* cstr) const;
+	ND bool ends(const char c) const;
 
-	bool contains(const var& vstr) const;
-	bool contains(const char* cstr) const;
-	bool contains(const char c) const;
+	ND bool contains(const var& vstr) const;
+	ND bool contains(const char* cstr) const;
+	ND bool contains(const char c) const;
 
 	//static member for speed on std strings
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
@@ -1272,9 +1273,9 @@ class DLL_PUBLIC var final {
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
-	dim split(const var& separator DEFAULT_EMPTY_STRING) const;
+	ND dim split(const var& separator DEFAULT_EMPTY_STRING) const;
 
-	var sort(const var& separator DEFAULT_EMPTY_STRING);
+	ND var sort(const var& separator DEFAULT_EMPTY_STRING) const;
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -1359,9 +1360,9 @@ class DLL_PUBLIC var final {
 	// SAME AS ABOVE ON TEMPORARIES
 	///////////////////////////////
 
-	var& insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) &&;
-	var& insert(const int fieldno, const int valueno, const var& insertion) &&;
-	var& insert(const int fieldno, const var& insertion) &&;
+	ND var& insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) &&;
+	ND var& insert(const int fieldno, const int valueno, const var& insertion) &&;
+	ND var& insert(const int fieldno, const var& insertion) &&;
 
 	// MV STRING FILTERS
 	////////////////////
@@ -1509,6 +1510,7 @@ class DLL_PUBLIC var final {
 	bool select(const var& sortselectclause DEFAULT_EMPTY_STRING);
 	void clearselect();
 
+	//ND bool hasnext() const;
 	ND bool hasnext();
 	bool readnext(var& key);
 	bool readnext(var& key, var& valueno);
@@ -1657,7 +1659,7 @@ class DLL_PUBLIC var final {
 	//END - free function to create an interator -> end
 	DLL_PUBLIC friend var_iter end(const var& v);
 
-	bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
+	//bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
 	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
 	// bool THIS_IS_DBCONN() const	{ return var_typ & VARTYP_DBCONN; }
 	// bool THIS_IS_OSFILE() const	{ return var_typ & VARTYP_OSFILE; }

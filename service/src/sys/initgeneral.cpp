@@ -533,7 +533,7 @@ nextreport:
 			call log2("*inform user and close", logtime);
 			msg = var("594F552043414E4E4F5420555345204E454F53595320534F465457415245204F4E205448495320434F4D50555445527C554E54494C20594F5520484156452054484520415554484F5249534154494F4E204E554D4245522E").iconv("HEX2");
 
-			var().chr(7).output().str(3);
+			//var().chr(7).output().str(3);
 			call note(msg);
 			perform("OFF");
 			var().logoff();

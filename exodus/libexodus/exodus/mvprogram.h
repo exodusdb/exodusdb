@@ -182,7 +182,7 @@ class ExodusProgramBase {
 
 	//cache_dictid_ = "";
 	//cache_perform_libid_ = "";
-	//dict_exodusfunctorbase_ = NULL;
+	//dict_exodusfunctorbase_ = nullptr;
 
 	// used by perform to call libraries WITH NO ARGUMENTS
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;

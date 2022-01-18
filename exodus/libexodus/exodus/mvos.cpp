@@ -189,11 +189,11 @@ bool var::osshellread(const var& oscmd) {
 	//"r" means read
 	std::FILE* pfile = popen(oscmd.to_cmd_string().c_str(), "r");
 	// return a code to indicate program failure. but can this ever happen?
-	if (pfile == NULL)
+	if (pfile == nullptr)
 		return false;
 	// TODO buffer overflow check
 	char cstr1[4096] = {0x0};
-	while (std::fgets(cstr1, sizeof(cstr1), pfile) != NULL) {
+	while (std::fgets(cstr1, sizeof(cstr1), pfile) != nullptr) {
 		// std::printf("%s\n", result);
 		// cannot trust that standard input is convertable from utf8
 		// output.var_str+=wstringfromUTF8((const UTF8*)result,strlen(result));
@@ -217,7 +217,7 @@ bool var::osshellwrite(const var& writestr) const {
 	//"w" means read
 	std::FILE* cmd = popen(this->to_cmd_string().c_str(), "w");
 	// return a code to indicate program failure. but can this ever happen?
-	if (cmd == NULL)
+	if (cmd == nullptr)
 		return 1;
 
 	// decided not to convert slashes here .. may be the wrong decision
