@@ -875,7 +875,9 @@ could generate the following overloads in the lib's .h header
 						outbound_args.substrer(3);
 
 						//build a function with all the new arguments and dummy variables
-						add_func ^= "\r\n\r\nvar operator() (" ^ inbound_args ^ ") {";
+						add_func ^= "\r\n";
+						add_func ^= "\r\n// Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn == 2 ? "" : "s");
+						add_func ^= "\r\nvar operator() (" ^ inbound_args ^ ") {";
 						add_func ^= "\r\n" ^ func_body;
 						add_func ^= " return operator()(" ^ outbound_args ^ ");";
 						add_func ^= "\r\n}";
@@ -949,7 +951,7 @@ could generate the following overloads in the lib's .h header
 var inclusion=
 "\r\n"
 "\r\n//a member variable/object to cache a pointer/object for the shared library function"
-"\r\nExodusFunctorBase efb_funcx;"
+"\r\nExodusFunctorBase Functor_funcx;"
 "\r\n"
 "\r\n//a member function with the right arguments, returning a var or void"
 "\r\nVARORVOID funcx(in arg1=var(), out arg2=var(), out arg3=var())"
@@ -957,8 +959,8 @@ var inclusion=
 "\r\n"
 "\r\n //first time link to the shared lib and create/cache an object from it"
 "\r\n //passing current standard variables in mv"
-"\r\n if (efb_funcx.pmemberfunction_==NULL)"
-"\r\n  efb_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
+"\r\n if (Functor_funcx.pmemberfunction_==NULL)"
+"\r\n  Functor_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
 "\r\n"
 "\r\n //define a function type (pExodusProgramBaseMemberFunction)"
 "\r\n //that can call the shared library object member function"
@@ -967,8 +969,8 @@ var inclusion=
 "\r\n"
 "\r\n //call the shared library object main function with the right args,"
 "\r\n // returning a var or void"
-"\r\n callorreturn CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
-"\r\n ((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
+"\r\n callorreturn CALLMEMBERFUNCTION(*(Functor_funcx.pobject_),"
+"\r\n ((pExodusProgramBaseMemberFunction) (Functor_funcx.pmemberfunction_)))"
 "\r\n  (ARG1,ARG2,ARG3);"
 "\r\n"
 "\r\n}";
@@ -979,44 +981,37 @@ var inclusion=
 					//public inheritance only so we can directly access mv in mvprogram.cpp for oconv/iconv. should perhaps be private inheritance and mv set using .init(mv)
 					var inclusion =
 						"\r\n"
-						"\r\n//a member variable/object to cache a pointer/object for the shared library function"
-						"\r\n//ExodusFunctorBase efb_funcx;"
-						"\r\nclass efb_funcx : public ExodusFunctorBase"
+						"\r\n// A 'functor' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
+						"\r\nclass Functor_funcx : public ExodusFunctorBase"
 						"\r\n{"
 						"\r\npublic:"
 						"\r\n"
-						"\r\nefb_funcx(MvEnvironment& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+						"\r\nFunctor_funcx(MvEnvironment& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
 						"\r\n"
-						"\r\nefb_funcx& operator=(const var& newlibraryname) {"
+						"\r\n// Allow assignment of library name to override the default"
+						"\r\nFunctor_funcx& operator=(const var& newlibraryname) {"
 						"\r\n        closelib();"
 						"\r\n        libraryname_=newlibraryname.toString();"
 						"\r\n        return (*this);"
 						"\r\n}"
 						"\r\n"
-						"\r\n//a member function with the right arguments, returning a var or void"
+						"\r\n// A member function with the right arguments, returning a var or void"
 						"\r\nvar operator() (in arg1=var(), out arg2=var(), out arg3=var())"
 						"\r\n{"
 						"\r\n"
-						"\r\n //first time link to the shared lib and create/cache an object from it"
-						"\r\n //passing current standard variables in mv"
-						"\r\n //first time link to the shared lib and create/cache an object from it"
-						"\r\n //passing current standard variables in mv"
-						"\r\n //if (efb_getlang.pmemberfunction_==NULL)"
-						"\r\n // efb_getlang.init(\"getlang\",\"exodusprogrambasecreatedelete_\",mv);"
+						"\r\n // First call will link to the shared lib and create/cache an object from it"
+						"\r\n // passing current standard variables in mv"
 						"\r\n if (this->pmemberfunction_==NULL)"
 						"\r\n  this->init();"
 						"\r\n"
-						"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
-						"\r\n //that can call the shared library object member function"
-						"\r\n //with the right arguments and returning a var or void"
+						"\r\n // Define a function type (pExodusProgramBaseMemberFunction)"
+						"\r\n // that can call the shared library object member function"
+						"\r\n // with the right arguments and returning a var or void"
 						//"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
 						"\r\n using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> VARORVOID;"
 						"\r\n"
-						"\r\n //call the shared library object main function with the right args,"
-						"\r\n // returning a var or void"
-						"\r\n //callorreturn CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
-						"\r\n //((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
-						"\r\n // (mode);"
+						"\r\n // Call the shared library object main function with the right args,"
+						"\r\n //  returning a var or void"
 						"\r\n {before_call}"
 						"\r\n return CALLMEMBERFUNCTION(*(this->pobject_),"
 						"\r\n ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
@@ -1026,7 +1021,10 @@ var inclusion=
 						"\r\n}"
 						"{additional_funcs}"
 						"\r\n};"
-						"\r\nefb_funcx funcx{mv};";
+						"\r\n"
+						"\r\n// A functor object of the above type that allows function call syntax to access"
+						"\r\n// an Exodus program/function initialized with the current mv environment."
+						"\r\nFunctor_funcx funcx{mv};";
 					swapper(inclusion, "funcx", field2(libname, OSSLASH, -1));
 					//swapper(example,"exodusprogrambasecreatedelete_",funcname);
 					swapper(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
