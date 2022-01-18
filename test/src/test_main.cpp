@@ -1782,35 +1782,53 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//assert(aa2 eq "aa");
 	//assert(aa3 eq "aa");
 
-	//string seed
-	initrnd("cccc");
-	printl(rnd(1000000000));
-	initrnd("cccc");
-	assert(rnd(1000000000)==231348803);
+	{
+		//string seed
+		initrnd("cccc");
+		var r1 =rnd(1'000'000'000);
+		//test reseed
+		initrnd("cccc");
+		assert(rnd(1'000'000'000) eq r1);
 
-	//slightly different string seed
-	initrnd("cccd");
-	printl(rnd(1000000000));
-	initrnd("cccd");
-	assert(rnd(1000000000)==610052346);
+		//slightly different string seed
+		initrnd("cccd");
+		assert(rnd(1'000'000'000) ne r1);
 
-	//integer seed
-	//initrnd(123457);
-	//printl(rnd(1000000000));
-	initrnd(123457);
-	assert(rnd(1000000000)==466803956);
+		//slightly different max int
+		initrnd("cccd");
+		assert(rnd(1'000'000'001) ne r1);
 
-	//slightly different integer seed
-	//initrnd(123458);
-	//printl(rnd(1000000000));
-	initrnd(123458);
-	assert(rnd(1000000000)==191396791);
+	}
 
-	//initrnd treats floats as integers so same result as above
-	//initrnd(123458.2);
-	//printl(rnd(1000000000));
-	initrnd(123458.2);
-	assert(rnd(1000000000)==191396791);
+	{
+		//int seed
+		initrnd(123456);
+		var r1 =rnd(1'000'000'000);
+
+		//test reseed is the same
+		initrnd(123456);
+		assert(rnd(1'000'000'000)==r1);
+
+		//test reseed with string of int is the same
+		initrnd("123456");
+		assert(rnd(1'000'000'000)==r1);
+
+		//test reseed with double of int is the same
+		initrnd(123456.4);
+		assert(rnd(1'000'000'000)==r1);
+
+		//test reseed with double of int is the same
+		initrnd(123456.6);
+		assert(rnd(1'000'000'000)==r1);
+
+		//slightly different seed
+		initrnd(123457);
+		assert(rnd(1'000'000'000) ne r1);
+
+		//slightly different max int DOESNT CHANGE RESULT!
+		//initrnd(123456);
+		//assert(rnd(1'000'000'001) ne r1);
+	}
 
 	var tempinp;
 //	input("Press Enter ...",tempinp);
