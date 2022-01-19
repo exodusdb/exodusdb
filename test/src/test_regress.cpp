@@ -150,7 +150,7 @@ function onefile(in filename, in maxndifferences) {
 
 		switch (int(funcno)) {
 		case 1:// a/extract
-			result=ARG0(ARG1,ARG2,ARG3);
+			result=ARG0.a(ARG1,ARG2,ARG3);
 			break;
 
 		case 2:// r/replace

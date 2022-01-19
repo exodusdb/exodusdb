@@ -264,6 +264,9 @@ although convention recommends making the temporary inside the function).
 #include <cstdint>
 
 class var_brackets_proxy;
+class var_proxy1;
+class var_proxy2;
+class var_proxy3;
 
 class VARTYP {
    public:
@@ -336,42 +339,38 @@ class VARTYP {
 // with their correct values otherwise any such var, when used later on, will throw Unassigned
 // Variable Used since its var_typ will be zero
 
-#define VTC(VARNAME, VARVALUE) inline const uint VARNAME{VARVALUE};
+//#define VTC(VARNAME, VARVALUE) inline const uint VARNAME{VARVALUE};
 
 // throw an exception if used an unassigned variable
-// inline const VARTYP VARTYP_UNA =0x0;
-VTC(VARTYP_UNA, 0x0)
+inline const uint VARTYP_UNA {0x0};
 
 // assigned string - unknown if numeric or not
-VTC(VARTYP_STR, 0x1)
+inline const uint VARTYP_STR {0x1};
 
-// following are numeric
-VTC(VARTYP_INT, 0x2)
-VTC(VARTYP_DBL, 0x4)
+// following indicate that the var is numeric
+inline const uint VARTYP_INT {0x2};
+inline const uint VARTYP_DBL {0x4};
 
-// indicated known non-numeric string
-VTC(VARTYP_NAN, 0x8)
+// indicates known non-numeric string
+inline const uint VARTYP_NAN {0x8};
 
-// following are numeric
-VTC(VARTYP_OSFILE, 0x10)
-//VTC(VARTYP_DBCONN, 0x20)
+// following indicates that the int is an os file handle
+inline const uint VARTYP_OSFILE {0x10};
+//inline const uint VARTYP_DBCONN {0x20};
 
-// flag combinations
-VTC(VARTYP_INTDBL, VARTYP_INT | VARTYP_DBL)
-VTC(VARTYP_INTSTR, VARTYP_INT | VARTYP_STR)
-VTC(VARTYP_DBLSTR, VARTYP_DBL | VARTYP_STR)
-VTC(VARTYP_NANSTR, VARTYP_NAN | VARTYP_STR)
-VTC(VARTYP_NOTNUMFLAGS, ~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN))
+// various useful flag combinations
+inline const uint VARTYP_INTDBL {VARTYP_INT | VARTYP_DBL};
+inline const uint VARTYP_INTSTR {VARTYP_INT | VARTYP_STR};
+inline const uint VARTYP_DBLSTR {VARTYP_DBL | VARTYP_STR};
+inline const uint VARTYP_NANSTR {VARTYP_NAN | VARTYP_STR};
+inline const uint VARTYP_NOTNUMFLAGS {~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN)};
 
-VTC(VARTYP_NANSTR_OSFILE, VARTYP_NANSTR | VARTYP_OSFILE)
-//VTC(VARTYP_NANSTR_DBCONN, VARTYP_NANSTR | VARTYP_DBCONN)
+inline const uint VARTYP_NANSTR_OSFILE {VARTYP_NANSTR | VARTYP_OSFILE};
+//inline const uint VARTYP_NANSTR_DBCONN {VARTYP_NANSTR | VARTYP_DBCONN};
 
-//VTC(VARTYP_DESTRUCTED, 0xFFFFF0)
+//inline const uint VARTYP_DESTRUCTED {0xFFFFF0};
 
-// const char mvtypemask=0x80;
-//VTC(VARTYP_MASK, 0x80)
-//VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE | VARTYP_DBCONN))
-VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE))
+inline const uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE)};
 
 //prevent or allow assignment to var to return a reference to the var
 //preventing will stop accidental usage of = instead of == in if() clauses
@@ -540,8 +539,14 @@ class DLL_PUBLIC var final {
 	// and C++ uses bool and int conversion in certain cases to convert to int and bool
 	// therefore have chosen to make both bool and int "const" since they dont make
 	// and changes to the base object.
+	// provide a reference to the (long long) int inside a var
+	// This allows passing by reference to the guts of var for speed
+	// it is safe because changing the int has no side effects
 //#define HASINTREFOP
-#ifndef HASINTREFOP
+#ifdef HASINTREFOP
+	operator int&() const;
+	operator double&() const;
+#else
 	operator int() const;
 	operator double() const;
 #endif
@@ -592,14 +597,6 @@ class DLL_PUBLIC var final {
 	// allow the use of any cstring function
 	// var::operator const char*();
 
-	// provide a reference to the (long long) int inside a var
-	// This allows passing by reference to the guts of var for speed
-	// it is safe because changing the int has no side effects
-#ifdef HASINTREFOP
-	operator int&() const;
-	operator double&() const;
-#endif
-
 	// string - replicates toString()
 	// would allow the usage of any std::string function but may result
 	// in a lot of compilation failures due to "ambiguous overload"
@@ -635,7 +632,15 @@ class DLL_PUBLIC var final {
 	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0);
 
 	//the following produces a temporary on the rhs
+//#define VAR_FUNCTOR_EXTRACTS
+//#ifdef VAR_FUNCTOR_ONLY_EXTRACTS
 	var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const;
+//#else
+	var_proxy1 operator()(int fieldno);
+	var_proxy2 operator()(int fieldno, int valueno);
+	var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
+//endif
+
 	// DONT declare this so we force use of the above const version that produces a temporary
 	//var& operator()(int fieldno, int valueno = 0, int subvalueno = 0);
 	/* SADLY no way to get a different operator() function called when on the left hand side of assign
@@ -1732,6 +1737,87 @@ class DLL_PUBLIC var_iter {
 
 	//iter++
 	var_iter operator++();
+};
+
+//class var_proxy
+class DLL_PUBLIC var_proxy1 {
+
+   private:
+
+	var* var_;
+	mutable int fn_ = 0;
+
+	var_proxy1() = delete;
+
+   public:
+
+	//constructor
+	var_proxy1(var* var1, int fn) : var_(var1), fn_(fn) {};
+
+	//implicit conversion to var if on the right hand side
+	operator var() const {
+		return var_->a(fn_);
+	}
+
+	//operator assign = old pick replace but with round instead of angle brackets
+	void operator=(const var& replacement){
+		var_->r(fn_, replacement);
+	}
+};
+
+//class var_proxy
+class DLL_PUBLIC var_proxy2 {
+
+   private:
+
+	var* var_;
+	mutable int fn_ = 0;
+	mutable int vn_ = 0;
+
+	var_proxy2() = delete;
+
+   public:
+
+	//constructor
+	var_proxy2(var* var1, int fn, int vn) : var_(var1), fn_(fn), vn_(vn) {};
+
+	//implicit conversion to var if on the right hand side
+	operator var() const {
+		return var_->a(fn_, vn_);
+	}
+
+	//operator assign = old pick replace but with round instead of angle brackets
+	void operator=(const var& replacement){
+		var_->r(fn_, vn_, replacement);
+	}
+};
+
+//class var_proxy
+class DLL_PUBLIC var_proxy3 {
+
+   private:
+
+	var* var_;
+	mutable int fn_ = 0;
+	mutable int vn_ = 0;
+	mutable int sn_ = 0;
+
+	var_proxy3() = delete;
+
+   public:
+
+	//constructor
+	var_proxy3(var* var1, int fn, int vn = 0, int sn = 0) : var_(var1), fn_(fn), vn_(vn), sn_(sn) {};
+
+	//implicit conversion to var if on the right hand side
+	operator var() const {
+		return var_->a(fn_, vn_, sn_);
+	}
+
+	//operator assign = old pick replace but with round instead of angle brackets
+	void operator=(const var& replacement){
+		var_->r(fn_, vn_, sn_, replacement);
+	}
 };
 
 //class var_brackets_proxy

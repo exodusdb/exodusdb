@@ -1384,27 +1384,27 @@ baddict:
 	} else
 		newlibfunc = false;
 
-	var dicttype = cache_dictrec_(1);
-	bool ismv = cache_dictrec_(4)[1] == "M";
+	var dicttype = cache_dictrec_.a(1);
+	bool ismv = cache_dictrec_.a(4)[1] == "M";
 
 	// F type dictionaries
 	if (dicttype == "F") {
 
 		// check field number is numeric
-		var fieldno = cache_dictrec_(2);
+		var fieldno = cache_dictrec_.a(2);
 		if (!fieldno.isnum())
 			return "";
 
 		// field no > 0
 		if (fieldno) {
 			if (ismv)
-				return RECORD(fieldno, MV);
+				return RECORD.a(fieldno, MV);
 			else
-				return RECORD(fieldno);
+				return RECORD.a(fieldno);
 
 			// field no 0
 		} else {
-			var keypart = cache_dictrec_(5);
+			var keypart = cache_dictrec_.a(5);
 			if (keypart && keypart.isnum())
 				return ID.field("*", keypart);
 			else

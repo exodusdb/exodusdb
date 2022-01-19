@@ -916,7 +916,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		//check can write characters 1-255 out as bytes using C locale
 		oswrite(data,"t_x.txt");
-		assert(osfile("t_x.txt")(1) eq nbinarychars);
+		assert(osfile("t_x.txt").a(1) eq nbinarychars);
 
 		//check can read in bytes as characters using C locale
 		var data2;
@@ -1201,7 +1201,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//check can write greek unicode characters to Greek codepage
 		assert(Greek_sas.oswrite(greektestfilename,"Greek"));
 		//check 3 (wide) characters output as 3 bytes
-		assert(osfile(greektestfilename)(1) eq 3);
+		assert(osfile(greektestfilename).a(1) eq 3);
 		//check can read greek wide unicode characters from greek codepage
 		var rec2;
 		assert(rec2.osread(greektestfilename,"Greek"));
@@ -2723,7 +2723,7 @@ subroutine internal_subroutine_xyzz(in xyzz)
 	//var xx;
 	//printl(xx);
 	//false && xyzz;
-	assert(xyzz(2,2,2) eq "b22");
+	assert(xyzz.a(2,2,2) eq "b22");
 	return;
 }
 

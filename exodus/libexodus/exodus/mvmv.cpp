@@ -814,25 +814,35 @@ bool var::locateusing(const var& usingchar, const var& target, var& setting, con
 // EXTRACT
 //////////
 
-// 1. round bracket syntax for convenience since PickOS <> angle bracket syntax not possible in C++
-// xxx=yyy(1,2,3)
-// declared default value=0 and subvalue=0
-var var::operator()(int fieldno, int valueno, int subvalueno) const {
-	//std::cout << "var" << std::endl;
+// Syntax 1. Round bracket syntax for convenience since PickOS <> angle bracket syntax not possible in C++
+//           xxx=yyy(1,2,3)
+//#ifdef VAR_FUNCTOR_ONLY_EXTRACTS
+var var::operator()(int fieldno, int valueno/*=0*/, int subvalueno/*=0*/) const {
 	return a(fieldno, valueno, subvalueno);
 }
+//#else
+//var functor that returns a var_proxy1 that EXTRACTS AND REPLACES.
+var_proxy1 var::operator()(int fieldno) {
+        return var_proxy1(this, fieldno);
+}
+var_proxy2 var::operator()(int fieldno, int valueno) {
+        return var_proxy2(this, fieldno, valueno);
+}
+var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
+        return var_proxy3(this, fieldno, valueno, subvalueno);
+}
+//#endif
 
-// 2. old "extract()" function
-// xxx = extract(yyy,1,2,3)
-// declared default value=0 and subvalue=0
-var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) const {
+// Syntax 2. Old "extract()" function in either procedural or OO style.
+//           xxx = extract(yyy, 1, 2, 3)
+//        or xxx = yyy.extract(1, 2, 3)
+var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 	return a(argfieldn, argvaluen, argsubvaluen);
 }
 
-// 3. abbreviated xxxx.a(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
-// xxx = yyy.a(1,2,3)
-// declared default value=0 and subvalue=0
-var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) const {
+// Syntax 3. Abbreviated xxxx.a(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
+//           xxx = yyy.a(1,2,3)
+var var::a(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 	THISIS(
 		"var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) "
 		"const")
