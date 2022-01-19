@@ -507,7 +507,7 @@ var& var::operator^=(const var& rhs) & {
 	ISSTRING(rhs)
 
 	// tack it onto our string
-	var_str += rhs.var_str;
+	var_str.append(rhs.var_str);
 	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;

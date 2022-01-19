@@ -23,6 +23,10 @@ THE SOFTWARE.
 #ifndef MV_H
 #define MV_H 1
 
+#define VARREF var&
+#define CVR const var&
+#define TVR var&&
+
 // prevent swig perl linking errors about win32_abort win32_select win32_connect
 #if defined(SWIGPERL)
 #if defined connect
@@ -73,89 +77,22 @@ THE SOFTWARE.
 #endif
 #endif
 
-// TODO .rounder(n), .round(n) and round(x,n) functions something like the following
-// round .5 up and -.5 down to nearest integer as per pick financial rounding concept
-// 1234.5678
-// n=2 gives 1234.57
-// n=0 gives 1235
-// n=-2 gives 1200
-// storage could be changed to integer if n<=0 or left probably better since likely to be added to
-// other similar ints thereafter if (var_dbl>=0) var_dbl=long long int(var_dbl+0.5) else
-// var_dbl=long
-// long int(var_dbl-0.5);
-
-/*		gcc	msc
-was for 32bit (needs revising after int became long long (64bit/8byte even in 32bit impl)
-sizeof
-char:	1	1
-char:4	2
-string:	4	32
-wstring:4	32
-int:	4	4
-double:	8	8
-var:	20	48
-*/
-
-/* this has been resolved somehow without removing the automatic conversion to int:
-Remove automatic conversion to int which takes precedence over the automatic conversion to bool
-and therefore causes a non-numeric error if you include a non-numeric value in an if statement like
-
- aa="xx"
- if (aa) {}
-
-*/
-
-// only for some emergency debugging
-#include <iostream>
-
-#include <iosfwd>
 #include <string>
-#include <vector>
 
-#include <mutex>
-
-// questionable MS language "extensions" disable some standard C++ keywords ... restore them
-// http://members.ozemail.com.au/~geoffch/samples/programming/msvc/cl/options/z$e.htm
-// complete list of c/c++ keywords is
-// and, and_eq, bitand, bitor, compl, not, not_eq, or, or_eq, xor and xor_eq
-#ifdef _MSC_VER
-#define and &&
-#define not_eq !=
-#define not !
-#define or ||
-#endif
-
+// ND macro [[no_discard]]
 #if __clang_major__ != 10
 #define ND [[nodiscard]]
 #else
 #define ND
 #endif
 
-//#define VISIBLE_FMS "_]\[Z"  //PickOS standard
-//#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
-//#define VISIBLE_FMS "_^]}`~"   //all uncommon in data. _ ^ ] are identical to pickos
-#define VISIBLE_FMS "_^]}|~"  //all uncommon in data. _ ^ ] are identical to pickos
-#define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
-
-namespace exodus {
-
-//#define SMALLEST_NUMBER 1e-13
-//0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
-//#define SMALLEST_NUMBER 1e-10
-//#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
-constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
-
-// the var versions of the above (without leading or trailing _)
-// are defined AFTER the class declaration of "var"
-
-// Decided to use ASCII characters 0x18-0x1F instead of the classic 00F8-00FF which are latin
-// accented characters
-
-// would be 256 if RM was character number 255. is 1F+1 used in var::remove()
-#define LASTDELIMITERCHARNOPLUS1 0x20
+// Decided to use ASCII characters 0x1A-0x1F for PickOS separator chars
+// instead of PickOS 0xFA-0xFF which are illegal utf-8 bytes
 
 // also defined in extract.c and exodusmacros.h
+
+// the var versions of the following (without leading or trailing _)
+// are defined AFTER the class declaration of "var"
 
 // leading and trailing _ char* versions of classic pick delimiters
 // also in ADECOM
@@ -190,13 +127,31 @@ constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 #define DQ_ '\"'
 #define SQ_ '\''
 
-// the argument for utf16 http://www.unicode.org/notes/tn12/ (utf8/32 cannot handle binary because
-// of illegal byte sequences) win32/java/icu/python is utf16 but situation is not so clear on unix
-// (where char is 32bit) but see http://std.dkuug.dk/JTC1/SC22/WG14/www/docs/n1040.pdf for <uchar.h>
+// Would be 256 if RM was character number 255.
+// Last delimiter character is 0x1F (RM)
+// Used in var::remove()
+#define LASTDELIMITERCHARNOPLUS1 0x20
 
-//#define LOCKIOSTREAM std::lock_guard<std::mutex> guard(global_mutex_threadstream);
-#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
-static std::mutex global_mutex_threadstream;
+//#define VISIBLE_FMS "_]\[Z"  //PickOS standard
+//#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
+//#define VISIBLE_FMS "_^]}`~"   //all uncommon in data. first 3 (_ ^ ]) are identical to pickos
+#define VISIBLE_FMS "_^]}|~"  //all uncommon in data. _ ^ ] are identical to pickos
+
+// Useful TRACE() function for debugging
+#define TRACE(EXPRESSION) \
+	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
+
+namespace exodus {
+
+//#define SMALLEST_NUMBER 1e-13
+//0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
+//#define SMALLEST_NUMBER 1e-10
+//#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
+constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
+
+////#define LOCKIOSTREAM std::lock_guard<std::mutex> guard(global_mutex_threadstream);
+//#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
+//static std::mutex global_mutex_threadstream;
 
 class dim;
 class var_iter;
@@ -213,7 +168,7 @@ std::string dblToString(double double1);
 
 #endif
 
-//#define arg const var& - too likely to conflict with things eg in postgres library
+//#define arg CVR - too likely to conflict with things eg in postgres library
 //#define call - conflicts with dynamic so/dll load/call
 
 // most help from Thinking in C++ Volume 1 Chapter 12
@@ -260,8 +215,6 @@ although convention recommends making the temporary inside the function).
 // double:	8
 // char:		4
 // var:		56
-
-#include <cstdint>
 
 class var_brackets_proxy;
 class var_proxy1;
@@ -412,18 +365,18 @@ class DLL_PUBLIC var final {
 	var();
 
 	// copy constructor
-	var(const var& fromvar);  // = default;
+	var(CVR fromvar);  // = default;
 
 	// move constructor
-	var(var&& fromvar) noexcept;  // = default;
+	var(TVR fromvar) noexcept;  // = default;
 
 	// copy assignment constructor
-	VOID_OR_VARREF operator=(const var& fromvar) &;	 // = default;
-	//var& operator=(const var &) && = delete; //disable assign to temporaries
+	VOID_OR_VARREF operator=(CVR fromvar) &;	 // = default;
+	//VARREF operator=(const var &) && = delete; //disable assign to temporaries
 
 	// move assignment
-	VOID_OR_VARREF operator=(var&& fromvar) & noexcept;	 // = default;
-	//var& operator=(var&& fromvar) && noexcept = delete;	 // disable move to temporaries
+	VOID_OR_VARREF operator=(TVR fromvar) & noexcept;	 // = default;
+	//VARREF operator=(TVR fromvar) && noexcept = delete;	 // disable move to temporaries
 
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
@@ -642,7 +595,7 @@ class DLL_PUBLIC var final {
 //endif
 
 	// DONT declare this so we force use of the above const version that produces a temporary
-	//var& operator()(int fieldno, int valueno = 0, int subvalueno = 0);
+	//VARREF operator()(int fieldno, int valueno = 0, int subvalueno = 0);
 	/* SADLY no way to get a different operator() function called when on the left hand side of assign
 	therefore not possible to create syntax like "xyz(1,2)="xx";" to REPLACE fields, values and
 	subvalues so operator() is defined only for the more common xyz=extract(1,2,3); i.e. on the right
@@ -674,283 +627,283 @@ class DLL_PUBLIC var final {
 	VOID_OR_VARREF operator=(const std::string&&) &;
 
 	// ^=var|int|double|char|char*|std::string& - only allow lvalue
-	var& operator^=(const var&) &;
-	var& operator^=(const int) &;
-	var& operator^=(const double) &;
-	var& operator^=(const char) &;
-	var& operator^=(const char*) &;
-	var& operator^=(const std::string&) &;
+	VARREF operator^=(CVR) &;
+	VARREF operator^=(const int) &;
+	VARREF operator^=(const double) &;
+	VARREF operator^=(const char) &;
+	VARREF operator^=(const char*) &;
+	VARREF operator^=(const std::string&) &;
 
 	// increment/decrement as postfix - only allow lvalue
 	var operator++(int) &;
 	var operator--(int) &;
 
 	// increment/decrement as prefix - only allow lvalue
-	var& operator++() &;
-	var& operator--() &;
+	VARREF operator++() &;
+	VARREF operator--() &;
 
 	//+=var|int|double - only allow lvalue
-	var& operator+=(const var&) &;
-	var& operator+=(int) &;
-	var& operator+=(double) &;
+	VARREF operator+=(CVR) &;
+	VARREF operator+=(int) &;
+	VARREF operator+=(double) &;
 
 	//-=var|int|double - only allow lvalue
-	var& operator-=(const var&) &;
-	var& operator-=(int) &;
-	var& operator-=(double) &;
+	VARREF operator-=(CVR) &;
+	VARREF operator-=(int) &;
+	VARREF operator-=(double) &;
 
 	/////////////
 	// BINARY OPS
 	/////////////
 
-	//var& operator^(const var&);
-	//var& operator^(const char*);
-	//var& operator^(const std::string&);
+	//VARREF operator^(CVR);
+	//VARREF operator^(const char*);
+	//VARREF operator^(const std::string&);
 
 	//////////
 	// FRIENDS
 	//////////
 
-	DLL_PUBLIC ND friend var MVplus(const var&);
-	DLL_PUBLIC ND friend var MVminus(const var&);
-	DLL_PUBLIC ND friend bool MVnot(const var&);
+	DLL_PUBLIC ND friend var MVplus(CVR);
+	DLL_PUBLIC ND friend var MVminus(CVR);
+	DLL_PUBLIC ND friend bool MVnot(CVR);
 
-	DLL_PUBLIC ND friend var MVadd(const var& lhs, const var& rhs);
-	DLL_PUBLIC ND friend var MVsub(const var& lhs, const var& rhs);
-	DLL_PUBLIC ND friend var MVmul(const var& lhs, const var& rhs);
-	DLL_PUBLIC ND friend var MVdiv(const var& lhs, const var& rhs);
-	DLL_PUBLIC ND friend var MVmod(const var& lhs, const var& rhs);
+	DLL_PUBLIC ND friend var MVadd(CVR lhs, CVR rhs);
+	DLL_PUBLIC ND friend var MVsub(CVR lhs, CVR rhs);
+	DLL_PUBLIC ND friend var MVmul(CVR lhs, CVR rhs);
+	DLL_PUBLIC ND friend var MVdiv(CVR lhs, CVR rhs);
+	DLL_PUBLIC ND friend var MVmod(CVR lhs, CVR rhs);
 
-	DLL_PUBLIC ND friend var MVcat(const var& lhs, const var& rhs);
-	DLL_PUBLIC ND friend var MVcat(const var& lhs, const char* cstr);
-	DLL_PUBLIC ND friend var MVcat(const var& lhs, const char char2);
-	DLL_PUBLIC ND friend var MVcat(const char* cstr, const var& rhs);
+	DLL_PUBLIC ND friend var MVcat(CVR lhs, CVR rhs);
+	DLL_PUBLIC ND friend var MVcat(CVR lhs, const char* cstr);
+	DLL_PUBLIC ND friend var MVcat(CVR lhs, const char char2);
+	DLL_PUBLIC ND friend var MVcat(const char* cstr, CVR rhs);
 
-	DLL_PUBLIC ND friend bool MVeq(const var& lhs, const var& rhs);
-	DLL_PUBLIC ND friend bool MVlt(const var& lhs, const var& rhs);
+	DLL_PUBLIC ND friend bool MVeq(CVR lhs, CVR rhs);
+	DLL_PUBLIC ND friend bool MVlt(CVR lhs, CVR rhs);
 	// following specialisations done for speed of var in for loops
-	DLL_PUBLIC ND friend bool MVlt(const var& lhs, const int);
-	DLL_PUBLIC ND friend bool MVlt(const int int1, const var& rhs);
+	DLL_PUBLIC ND friend bool MVlt(CVR lhs, const int);
+	DLL_PUBLIC ND friend bool MVlt(const int int1, CVR rhs);
 
 	//== and !=
 	//TODO consider replacing by operator<=> and replacing MVeq and MVlt by MVcmp
 	//or provide more specialisations of MVeq and MVlt
 
-	DLL_PUBLIC friend bool operator==(const var& lhs, const var& rhs) { return MVeq(lhs, rhs); }
-	DLL_PUBLIC friend bool operator==(const var& lhs, const char* cstr2) { return MVeq(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator==(const var& lhs, const char char2) { return MVeq(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator==(const var& lhs, const int int2) { return MVeq(lhs, var(int2)); }
-	DLL_PUBLIC friend bool operator==(const var& lhs, const double double2) { return MVeq(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator==(const var& lhs, const bool bool2) { return MVeq(lhs, var(bool2)); }
-	DLL_PUBLIC friend bool operator==(const char* cstr1, const var& rhs) { return MVeq(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator==(const char char1, const var& rhs) { return MVeq(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator==(const int int1, const var& rhs) { return MVeq(rhs, var(int1)); }
-	DLL_PUBLIC friend bool operator==(const double double1, const var& rhs) { return MVeq(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator==(const bool bool1, const var& rhs) { return MVeq(rhs, var(bool1)); }
+	DLL_PUBLIC friend bool operator==(CVR lhs, CVR rhs) { return MVeq(lhs, rhs); }
+	DLL_PUBLIC friend bool operator==(CVR lhs, const char* cstr2) { return MVeq(lhs, var(cstr2)); }
+	DLL_PUBLIC friend bool operator==(CVR lhs, const char char2) { return MVeq(lhs, var(char2)); }
+	DLL_PUBLIC friend bool operator==(CVR lhs, const int int2) { return MVeq(lhs, var(int2)); }
+	DLL_PUBLIC friend bool operator==(CVR lhs, const double double2) { return MVeq(lhs, var(double2)); }
+	DLL_PUBLIC friend bool operator==(CVR lhs, const bool bool2) { return MVeq(lhs, var(bool2)); }
+	DLL_PUBLIC friend bool operator==(const char* cstr1, CVR rhs) { return MVeq(rhs, var(cstr1)); }
+	DLL_PUBLIC friend bool operator==(const char char1, CVR rhs) { return MVeq(rhs, var(char1)); }
+	DLL_PUBLIC friend bool operator==(const int int1, CVR rhs) { return MVeq(rhs, var(int1)); }
+	DLL_PUBLIC friend bool operator==(const double double1, CVR rhs) { return MVeq(rhs, var(double1)); }
+	DLL_PUBLIC friend bool operator==(const bool bool1, CVR rhs) { return MVeq(rhs, var(bool1)); }
 
-	DLL_PUBLIC friend bool operator!=(const var& lhs, const var& rhs) { return !MVeq(lhs, rhs); }
-	DLL_PUBLIC friend bool operator!=(const var& lhs, const char* cstr2) { return !MVeq(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator!=(const var& lhs, const char char2) { return !MVeq(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator!=(const var& lhs, const int int2) { return !MVeq(lhs, var(int2)); }
-	DLL_PUBLIC friend bool operator!=(const var& lhs, const double double2) { return !MVeq(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator!=(const var& lhs, const bool bool2) { return !MVeq(lhs, var(bool2)); }
-	DLL_PUBLIC friend bool operator!=(const char* cstr1, const var& rhs) { return !MVeq(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator!=(const char char1, const var& rhs) { return !MVeq(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator!=(const int int1, const var& rhs) { return !MVeq(rhs, var(int1)); }
-	DLL_PUBLIC friend bool operator!=(const double double1, const var& rhs) { return !MVeq(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator!=(const bool bool1, const var& rhs) { return !MVeq(rhs, var(bool1)); }
+	DLL_PUBLIC friend bool operator!=(CVR lhs, CVR rhs) { return !MVeq(lhs, rhs); }
+	DLL_PUBLIC friend bool operator!=(CVR lhs, const char* cstr2) { return !MVeq(lhs, var(cstr2)); }
+	DLL_PUBLIC friend bool operator!=(CVR lhs, const char char2) { return !MVeq(lhs, var(char2)); }
+	DLL_PUBLIC friend bool operator!=(CVR lhs, const int int2) { return !MVeq(lhs, var(int2)); }
+	DLL_PUBLIC friend bool operator!=(CVR lhs, const double double2) { return !MVeq(lhs, var(double2)); }
+	DLL_PUBLIC friend bool operator!=(CVR lhs, const bool bool2) { return !MVeq(lhs, var(bool2)); }
+	DLL_PUBLIC friend bool operator!=(const char* cstr1, CVR rhs) { return !MVeq(rhs, var(cstr1)); }
+	DLL_PUBLIC friend bool operator!=(const char char1, CVR rhs) { return !MVeq(rhs, var(char1)); }
+	DLL_PUBLIC friend bool operator!=(const int int1, CVR rhs) { return !MVeq(rhs, var(int1)); }
+	DLL_PUBLIC friend bool operator!=(const double double1, CVR rhs) { return !MVeq(rhs, var(double1)); }
+	DLL_PUBLIC friend bool operator!=(const bool bool1, CVR rhs) { return !MVeq(rhs, var(bool1)); }
 
 	//< V<= > >=
-	DLL_PUBLIC friend bool operator<(const var& lhs, const var& rhs) { return MVlt(lhs, rhs); }
-	DLL_PUBLIC friend bool operator<(const var& lhs, const char* cstr2) { return MVlt(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator<(const var& lhs, const char char2) { return MVlt(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator<(const var& lhs, const int int2) { return MVlt(lhs, int2); }
-	DLL_PUBLIC friend bool operator<(const var& lhs, const double double2) { return MVlt(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator<(const char* cstr1, const var& rhs) { return MVlt(var(cstr1), rhs); }
-	DLL_PUBLIC friend bool operator<(const char char1, const var& rhs) { return MVlt(var(char1), rhs); }
-	DLL_PUBLIC friend bool operator<(const int int1, const var& rhs) { return MVlt(int1, rhs); }
-	DLL_PUBLIC friend bool operator<(const double double1, const var& rhs) { return MVlt(var(double1), rhs); }
-	DLL_PUBLIC friend bool operator<(const bool bool1, const var& rhs) { return MVlt(var(bool1), rhs); }
+	DLL_PUBLIC friend bool operator<(CVR lhs, CVR rhs) { return MVlt(lhs, rhs); }
+	DLL_PUBLIC friend bool operator<(CVR lhs, const char* cstr2) { return MVlt(lhs, var(cstr2)); }
+	DLL_PUBLIC friend bool operator<(CVR lhs, const char char2) { return MVlt(lhs, var(char2)); }
+	DLL_PUBLIC friend bool operator<(CVR lhs, const int int2) { return MVlt(lhs, int2); }
+	DLL_PUBLIC friend bool operator<(CVR lhs, const double double2) { return MVlt(lhs, var(double2)); }
+	DLL_PUBLIC friend bool operator<(const char* cstr1, CVR rhs) { return MVlt(var(cstr1), rhs); }
+	DLL_PUBLIC friend bool operator<(const char char1, CVR rhs) { return MVlt(var(char1), rhs); }
+	DLL_PUBLIC friend bool operator<(const int int1, CVR rhs) { return MVlt(int1, rhs); }
+	DLL_PUBLIC friend bool operator<(const double double1, CVR rhs) { return MVlt(var(double1), rhs); }
+	DLL_PUBLIC friend bool operator<(const bool bool1, CVR rhs) { return MVlt(var(bool1), rhs); }
 
-	DLL_PUBLIC friend bool operator>=(const var& lhs, const var& rhs) { return !MVlt(lhs, rhs); }
-	DLL_PUBLIC friend bool operator>=(const var& lhs, const char* cstr2) { return !MVlt(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator>=(const var& lhs, const char char2) { return !MVlt(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator>=(const var& lhs, const int int2) { return !MVlt(lhs, int2); }
-	DLL_PUBLIC friend bool operator>=(const var& lhs, const double double2) { return !MVlt(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator>=(const char* cstr1, const var& rhs) { return !MVlt(var(cstr1), rhs); }
-	DLL_PUBLIC friend bool operator>=(const char char1, const var& rhs) { return !MVlt(var(char1), rhs); }
-	DLL_PUBLIC friend bool operator>=(const int int1, const var& rhs) { return !MVlt(int1, rhs); }
-	DLL_PUBLIC friend bool operator>=(const double double1, const var& rhs) { return !MVlt(var(double1), rhs); }
-	DLL_PUBLIC friend bool operator>=(const bool bool1, const var& rhs) { return !MVlt(var(bool1), rhs); }
+	DLL_PUBLIC friend bool operator>=(CVR lhs, CVR rhs) { return !MVlt(lhs, rhs); }
+	DLL_PUBLIC friend bool operator>=(CVR lhs, const char* cstr2) { return !MVlt(lhs, var(cstr2)); }
+	DLL_PUBLIC friend bool operator>=(CVR lhs, const char char2) { return !MVlt(lhs, var(char2)); }
+	DLL_PUBLIC friend bool operator>=(CVR lhs, const int int2) { return !MVlt(lhs, int2); }
+	DLL_PUBLIC friend bool operator>=(CVR lhs, const double double2) { return !MVlt(lhs, var(double2)); }
+	DLL_PUBLIC friend bool operator>=(const char* cstr1, CVR rhs) { return !MVlt(var(cstr1), rhs); }
+	DLL_PUBLIC friend bool operator>=(const char char1, CVR rhs) { return !MVlt(var(char1), rhs); }
+	DLL_PUBLIC friend bool operator>=(const int int1, CVR rhs) { return !MVlt(int1, rhs); }
+	DLL_PUBLIC friend bool operator>=(const double double1, CVR rhs) { return !MVlt(var(double1), rhs); }
+	DLL_PUBLIC friend bool operator>=(const bool bool1, CVR rhs) { return !MVlt(var(bool1), rhs); }
 
-	DLL_PUBLIC friend bool operator>(const var& lhs, const var& rhs) { return MVlt(rhs, lhs); }
-	DLL_PUBLIC friend bool operator>(const var& lhs, const char* cstr2) { return MVlt(var(cstr2), lhs); }
-	DLL_PUBLIC friend bool operator>(const var& lhs, const char char2) { return MVlt(var(char2), lhs); }
-	DLL_PUBLIC friend bool operator>(const var& lhs, const int int2) { return MVlt(int2, lhs); }
-	DLL_PUBLIC friend bool operator>(const var& lhs, const double double2) { return MVlt(var(double2), lhs); }
-	DLL_PUBLIC friend bool operator>(const char* cstr1, const var& rhs) { return MVlt(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator>(const char char1, const var& rhs) { return MVlt(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator>(const int int1, const var& rhs) { return MVlt(rhs, int1); }
-	DLL_PUBLIC friend bool operator>(const double double1, const var& rhs) { return MVlt(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator>(const bool bool1, const var& rhs) { return MVlt(rhs, var(bool1)); }
+	DLL_PUBLIC friend bool operator>(CVR lhs, CVR rhs) { return MVlt(rhs, lhs); }
+	DLL_PUBLIC friend bool operator>(CVR lhs, const char* cstr2) { return MVlt(var(cstr2), lhs); }
+	DLL_PUBLIC friend bool operator>(CVR lhs, const char char2) { return MVlt(var(char2), lhs); }
+	DLL_PUBLIC friend bool operator>(CVR lhs, const int int2) { return MVlt(int2, lhs); }
+	DLL_PUBLIC friend bool operator>(CVR lhs, const double double2) { return MVlt(var(double2), lhs); }
+	DLL_PUBLIC friend bool operator>(const char* cstr1, CVR rhs) { return MVlt(rhs, var(cstr1)); }
+	DLL_PUBLIC friend bool operator>(const char char1, CVR rhs) { return MVlt(rhs, var(char1)); }
+	DLL_PUBLIC friend bool operator>(const int int1, CVR rhs) { return MVlt(rhs, int1); }
+	DLL_PUBLIC friend bool operator>(const double double1, CVR rhs) { return MVlt(rhs, var(double1)); }
+	DLL_PUBLIC friend bool operator>(const bool bool1, CVR rhs) { return MVlt(rhs, var(bool1)); }
 
-	DLL_PUBLIC friend bool operator<=(const var& lhs, const var& rhs) { return !MVlt(rhs, lhs); }
-	DLL_PUBLIC friend bool operator<=(const var& lhs, const char* cstr2) { return !MVlt(var(cstr2), lhs); }
-	DLL_PUBLIC friend bool operator<=(const var& lhs, const char char2) { return !MVlt(var(char2), lhs); }
-	DLL_PUBLIC friend bool operator<=(const var& lhs, const int int2) { return !MVlt(int2, lhs); }
-	DLL_PUBLIC friend bool operator<=(const var& lhs, const double double2) { return !MVlt(var(double2), lhs); }
-	DLL_PUBLIC friend bool operator<=(const char* cstr1, const var& rhs) { return !MVlt(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator<=(const char char1, const var& rhs) { return !MVlt(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator<=(const int int1, const var& rhs) { return !MVlt(rhs, int1); }
-	DLL_PUBLIC friend bool operator<=(const double double1, const var& rhs) { return !MVlt(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator<=(const bool bool1, const var& rhs) { return !MVlt(rhs, var(bool1)); }
+	DLL_PUBLIC friend bool operator<=(CVR lhs, CVR rhs) { return !MVlt(rhs, lhs); }
+	DLL_PUBLIC friend bool operator<=(CVR lhs, const char* cstr2) { return !MVlt(var(cstr2), lhs); }
+	DLL_PUBLIC friend bool operator<=(CVR lhs, const char char2) { return !MVlt(var(char2), lhs); }
+	DLL_PUBLIC friend bool operator<=(CVR lhs, const int int2) { return !MVlt(int2, lhs); }
+	DLL_PUBLIC friend bool operator<=(CVR lhs, const double double2) { return !MVlt(var(double2), lhs); }
+	DLL_PUBLIC friend bool operator<=(const char* cstr1, CVR rhs) { return !MVlt(rhs, var(cstr1)); }
+	DLL_PUBLIC friend bool operator<=(const char char1, CVR rhs) { return !MVlt(rhs, var(char1)); }
+	DLL_PUBLIC friend bool operator<=(const int int1, CVR rhs) { return !MVlt(rhs, int1); }
+	DLL_PUBLIC friend bool operator<=(const double double1, CVR rhs) { return !MVlt(rhs, var(double1)); }
+	DLL_PUBLIC friend bool operator<=(const bool bool1, CVR rhs) { return !MVlt(rhs, var(bool1)); }
 
 	//PLUS
-	DLL_PUBLIC friend var operator+(const var& lhs, const var& rhs) { return MVadd(lhs, rhs); }
-	DLL_PUBLIC friend var operator+(const var& lhs, const char* cstr2) { return MVadd(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator+(const var& lhs, const char char2) { return MVadd(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator+(const var& lhs, const int int2) { return MVadd(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator+(const var& lhs, const double double2) { return MVadd(lhs, var(double2)); }
-	//DLL_PUBLIC friend var operator+(const var& lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
-	DLL_PUBLIC friend var operator+(const char* cstr1, const var& rhs) { return MVadd(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator+(const char char1, const var& rhs) { return MVadd(var(char1), rhs); }
-	DLL_PUBLIC friend var operator+(const int int1, const var& rhs) { return MVadd(var(int1), rhs); }
-	DLL_PUBLIC friend var operator+(const double double1, const var& rhs) { return MVadd(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator+(const bool bool1, const var& rhs) { return MVadd(var(bool1), rhs); }
+	DLL_PUBLIC friend var operator+(CVR lhs, CVR rhs) { return MVadd(lhs, rhs); }
+	DLL_PUBLIC friend var operator+(CVR lhs, const char* cstr2) { return MVadd(lhs, var(cstr2)); }
+	DLL_PUBLIC friend var operator+(CVR lhs, const char char2) { return MVadd(lhs, var(char2)); }
+	DLL_PUBLIC friend var operator+(CVR lhs, const int int2) { return MVadd(lhs, var(int2)); }
+	DLL_PUBLIC friend var operator+(CVR lhs, const double double2) { return MVadd(lhs, var(double2)); }
+	//DLL_PUBLIC friend var operator+(CVR lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
+	DLL_PUBLIC friend var operator+(const char* cstr1, CVR rhs) { return MVadd(var(cstr1), rhs); }
+	DLL_PUBLIC friend var operator+(const char char1, CVR rhs) { return MVadd(var(char1), rhs); }
+	DLL_PUBLIC friend var operator+(const int int1, CVR rhs) { return MVadd(var(int1), rhs); }
+	DLL_PUBLIC friend var operator+(const double double1, CVR rhs) { return MVadd(var(double1), rhs); }
+	//DLL_PUBLIC friend var operator+(const bool bool1, CVR rhs) { return MVadd(var(bool1), rhs); }
 	//rvalues
-	//DLL_PUBLIC friend var operator+(var&& lhs, const var& rhs) { return lhs+=rhs; }
-	//DLL_PUBLIC friend var operator+(var&& lhs, const char* cstr2) { return lhs+=char2; }
-	//DLL_PUBLIC friend var operator+(var&& lhs, const int int2) { return lhs+=int2; }
-	//DLL_PUBLIC friend var operator+(var&& lhs, const double double2) { return lhs+=double2; }
-	//DLL_PUBLIC friend var operator+(var&& lhs, const bool bool2) { return lhs+=bool2; }
+	//DLL_PUBLIC friend var operator+(TVR lhs, CVR rhs) { return lhs+=rhs; }
+	//DLL_PUBLIC friend var operator+(TVR lhs, const char* cstr2) { return lhs+=char2; }
+	//DLL_PUBLIC friend var operator+(TVR lhs, const int int2) { return lhs+=int2; }
+	//DLL_PUBLIC friend var operator+(TVR lhs, const double double2) { return lhs+=double2; }
+	//DLL_PUBLIC friend var operator+(TVR lhs, const bool bool2) { return lhs+=bool2; }
 	//warning: ISO C++ says that these are ambiguous, even though the worst conversion for the first is better than the worst conversion for the second:
 	//the following 3 (not 4) are excluded to avoid the above wrning from gcc 7
-	//DLL_PUBLIC friend var operator+(const char* cstr1, var&& rhs) { return rhs+=char1; }
-	//DLL_PUBLIC friend var operator+(const int int1, var&& rhs) { return rhs+=int1; }
-	//DLL_PUBLIC friend var operator+(const double double1, var&& rhs) { return rhs+=double1; }
-	//DLL_PUBLIC friend var operator+(const bool bool1, var&& rhs) { return rhs+=bool1; }
+	//DLL_PUBLIC friend var operator+(const char* cstr1, TVR rhs) { return rhs+=char1; }
+	//DLL_PUBLIC friend var operator+(const int int1, TVR rhs) { return rhs+=int1; }
+	//DLL_PUBLIC friend var operator+(const double double1, TVR rhs) { return rhs+=double1; }
+	//DLL_PUBLIC friend var operator+(const bool bool1, TVR rhs) { return rhs+=bool1; }
 
 	//MINUS
-	DLL_PUBLIC friend var operator-(const var& lhs, const var& rhs) { return MVsub(lhs, rhs); }
-	DLL_PUBLIC friend var operator-(const var& lhs, const char* cstr2) { return MVsub(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator-(const var& lhs, const char char2) { return MVsub(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator-(const var& lhs, const int int2) { return MVsub(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator-(const var& lhs, const double double2) { return MVsub(lhs, var(double2)); }
-	//DLL_PUBLIC friend var operator-(const var& lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
-	DLL_PUBLIC friend var operator-(const char* cstr1, const var& rhs) { return MVsub(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator-(const char char1, const var& rhs) { return MVsub(var(char1), rhs); }
-	DLL_PUBLIC friend var operator-(const int int1, const var& rhs) { return MVsub(var(int1), rhs); }
-	DLL_PUBLIC friend var operator-(const double double1, const var& rhs) { return MVsub(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator-(const bool bool1, const var& rhs) { return MVsub(var(bool1), rhs); }
+	DLL_PUBLIC friend var operator-(CVR lhs, CVR rhs) { return MVsub(lhs, rhs); }
+	DLL_PUBLIC friend var operator-(CVR lhs, const char* cstr2) { return MVsub(lhs, var(cstr2)); }
+	DLL_PUBLIC friend var operator-(CVR lhs, const char char2) { return MVsub(lhs, var(char2)); }
+	DLL_PUBLIC friend var operator-(CVR lhs, const int int2) { return MVsub(lhs, var(int2)); }
+	DLL_PUBLIC friend var operator-(CVR lhs, const double double2) { return MVsub(lhs, var(double2)); }
+	//DLL_PUBLIC friend var operator-(CVR lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
+	DLL_PUBLIC friend var operator-(const char* cstr1, CVR rhs) { return MVsub(var(cstr1), rhs); }
+	DLL_PUBLIC friend var operator-(const char char1, CVR rhs) { return MVsub(var(char1), rhs); }
+	DLL_PUBLIC friend var operator-(const int int1, CVR rhs) { return MVsub(var(int1), rhs); }
+	DLL_PUBLIC friend var operator-(const double double1, CVR rhs) { return MVsub(var(double1), rhs); }
+	//DLL_PUBLIC friend var operator-(const bool bool1, CVR rhs) { return MVsub(var(bool1), rhs); }
 	//rvalues
-	DLL_PUBLIC friend var operator-(var&& lhs, const var& rhs) { return lhs -= rhs; }
-	DLL_PUBLIC friend var operator-(var&& lhs, const char* cstr2) { return lhs -= var(cstr2); }
-	DLL_PUBLIC friend var operator-(var&& lhs, const char char2) { return lhs -= var(char2); }
-	DLL_PUBLIC friend var operator-(var&& lhs, const int int2) { return lhs -= int2; }
-	DLL_PUBLIC friend var operator-(var&& lhs, const double double2) { return lhs -= double2; }
+	DLL_PUBLIC friend var operator-(TVR lhs, CVR rhs) { return lhs -= rhs; }
+	DLL_PUBLIC friend var operator-(TVR lhs, const char* cstr2) { return lhs -= var(cstr2); }
+	DLL_PUBLIC friend var operator-(TVR lhs, const char char2) { return lhs -= var(char2); }
+	DLL_PUBLIC friend var operator-(TVR lhs, const int int2) { return lhs -= int2; }
+	DLL_PUBLIC friend var operator-(TVR lhs, const double double2) { return lhs -= double2; }
 
 	//MULTIPLY
-	DLL_PUBLIC friend var operator*(const var& lhs, const var& rhs) { return MVmul(lhs, rhs); }
-	DLL_PUBLIC friend var operator*(const var& lhs, const char* cstr2) { return MVmul(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator*(const var& lhs, const char char2) { return MVmul(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator*(const var& lhs, const int int2) { return MVmul(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator*(const var& lhs, const double double2) { return MVmul(lhs, var(double2)); }
-	//DLL_PUBLIC friend var operator*(const var& lhs, const bool bool2) { return MVmul(lhs, var(bool2)); }
-	DLL_PUBLIC friend var operator*(const char* cstr1, const var& rhs) { return MVmul(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator*(const char char1, const var& rhs) { return MVmul(var(char1), rhs); }
-	DLL_PUBLIC friend var operator*(const int int1, const var& rhs) { return MVmul(var(int1), rhs); }
-	DLL_PUBLIC friend var operator*(const double double1, const var& rhs) { return MVmul(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator*(const bool bool1, const var& rhs) { return MVmul(var(bool1), rhs); }
+	DLL_PUBLIC friend var operator*(CVR lhs, CVR rhs) { return MVmul(lhs, rhs); }
+	DLL_PUBLIC friend var operator*(CVR lhs, const char* cstr2) { return MVmul(lhs, var(cstr2)); }
+	DLL_PUBLIC friend var operator*(CVR lhs, const char char2) { return MVmul(lhs, var(char2)); }
+	DLL_PUBLIC friend var operator*(CVR lhs, const int int2) { return MVmul(lhs, var(int2)); }
+	DLL_PUBLIC friend var operator*(CVR lhs, const double double2) { return MVmul(lhs, var(double2)); }
+	//DLL_PUBLIC friend var operator*(CVR lhs, const bool bool2) { return MVmul(lhs, var(bool2)); }
+	DLL_PUBLIC friend var operator*(const char* cstr1, CVR rhs) { return MVmul(var(cstr1), rhs); }
+	DLL_PUBLIC friend var operator*(const char char1, CVR rhs) { return MVmul(var(char1), rhs); }
+	DLL_PUBLIC friend var operator*(const int int1, CVR rhs) { return MVmul(var(int1), rhs); }
+	DLL_PUBLIC friend var operator*(const double double1, CVR rhs) { return MVmul(var(double1), rhs); }
+	//DLL_PUBLIC friend var operator*(const bool bool1, CVR rhs) { return MVmul(var(bool1), rhs); }
 	//rvalues - pending implementation of var*=
-	//DLL_PUBLIC friend var operator*(var&& lhs, const var& rhs) { return lhs*=rhs; }
-	//DLL_PUBLIC friend var operator*(var&& lhs, const char* cstr2) { return lhs*=var(cstr2); }
-	//DLL_PUBLIC friend var operator*(var&& lhs, const char char2) { return lhs*=var(char2); }
-	//DLL_PUBLIC friend var operator*(var&& lhs, const int int2) { return lhs*=int2; }
-	//DLL_PUBLIC friend var operator*(var&& lhs, const double double2) { return lhs*=double2; }
+	//DLL_PUBLIC friend var operator*(TVR lhs, CVR rhs) { return lhs*=rhs; }
+	//DLL_PUBLIC friend var operator*(TVR lhs, const char* cstr2) { return lhs*=var(cstr2); }
+	//DLL_PUBLIC friend var operator*(TVR lhs, const char char2) { return lhs*=var(char2); }
+	//DLL_PUBLIC friend var operator*(TVR lhs, const int int2) { return lhs*=int2; }
+	//DLL_PUBLIC friend var operator*(TVR lhs, const double double2) { return lhs*=double2; }
 
 	//DIVIDE
-	DLL_PUBLIC friend var operator/(const var& lhs, const var& rhs) { return MVdiv(lhs, rhs); }
-	DLL_PUBLIC friend var operator/(const var& lhs, const char* cstr2) { return MVdiv(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator/(const var& lhs, const char char2) { return MVdiv(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator/(const var& lhs, const int int2) { return MVdiv(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator/(const var& lhs, const double double2) { return MVdiv(lhs, var(double2)); }
+	DLL_PUBLIC friend var operator/(CVR lhs, CVR rhs) { return MVdiv(lhs, rhs); }
+	DLL_PUBLIC friend var operator/(CVR lhs, const char* cstr2) { return MVdiv(lhs, var(cstr2)); }
+	DLL_PUBLIC friend var operator/(CVR lhs, const char char2) { return MVdiv(lhs, var(char2)); }
+	DLL_PUBLIC friend var operator/(CVR lhs, const int int2) { return MVdiv(lhs, var(int2)); }
+	DLL_PUBLIC friend var operator/(CVR lhs, const double double2) { return MVdiv(lhs, var(double2)); }
 	// disallow divide by boolean to prevent possible runtime divide by zero
-	// DLL_PUBLIC friend var operator/ (const var&     lhs    ,const bool     bool2   ){return
+	// DLL_PUBLIC friend var operator/ (CVR     lhs    ,const bool     bool2   ){return
 	// MVdiv(lhs,var(bool2)  );}
-	DLL_PUBLIC friend var operator/(const char* cstr1, const var& rhs) { return MVdiv(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator/(const char char1, const var& rhs) { return MVdiv(var(char1), rhs); }
-	DLL_PUBLIC friend var operator/(const int int1, const var& rhs) { return MVdiv(var(int1), rhs); }
-	DLL_PUBLIC friend var operator/(const double double1, const var& rhs) { return MVdiv(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator/(const bool bool1, const var& rhs) { return MVdiv(var(bool1), rhs); }
+	DLL_PUBLIC friend var operator/(const char* cstr1, CVR rhs) { return MVdiv(var(cstr1), rhs); }
+	DLL_PUBLIC friend var operator/(const char char1, CVR rhs) { return MVdiv(var(char1), rhs); }
+	DLL_PUBLIC friend var operator/(const int int1, CVR rhs) { return MVdiv(var(int1), rhs); }
+	DLL_PUBLIC friend var operator/(const double double1, CVR rhs) { return MVdiv(var(double1), rhs); }
+	//DLL_PUBLIC friend var operator/(const bool bool1, CVR rhs) { return MVdiv(var(bool1), rhs); }
 
 	//MODULO
-	DLL_PUBLIC friend var operator%(const var& lhs, const var& rhs) { return MVmod(lhs, rhs); }
-	DLL_PUBLIC friend var operator%(const var& lhs, const char* cstr2) { return MVmod(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator%(const var& lhs, const char char2) { return MVmod(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator%(const var& lhs, const int int2) { return MVmod(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator%(const var& lhs, const double double2) { return MVmod(lhs, var(double2)); }
+	DLL_PUBLIC friend var operator%(CVR lhs, CVR rhs) { return MVmod(lhs, rhs); }
+	DLL_PUBLIC friend var operator%(CVR lhs, const char* cstr2) { return MVmod(lhs, var(cstr2)); }
+	DLL_PUBLIC friend var operator%(CVR lhs, const char char2) { return MVmod(lhs, var(char2)); }
+	DLL_PUBLIC friend var operator%(CVR lhs, const int int2) { return MVmod(lhs, var(int2)); }
+	DLL_PUBLIC friend var operator%(CVR lhs, const double double2) { return MVmod(lhs, var(double2)); }
 	// disallow divide by boolean to prevent possible runtime divide by zero
-	// DLL_PUBLIC friend var operator% (const var&     lhs    ,const bool    bool2   ){return
+	// DLL_PUBLIC friend var operator% (CVR     lhs    ,const bool    bool2   ){return
 	// MVmod(lhs,var(bool2)  );}
-	DLL_PUBLIC friend var operator%(const char* cstr1, const var& rhs) { return MVmod(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator%(const char char1, const var& rhs) { return MVmod(var(char1), rhs); }
-	DLL_PUBLIC friend var operator%(const int int1, const var& rhs) { return MVmod(var(int1), rhs); }
-	DLL_PUBLIC friend var operator%(const double double1, const var& rhs) { return MVmod(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator%(const bool bool1, const var& rhs) { return MVmod(var(bool1), rhs); }
+	DLL_PUBLIC friend var operator%(const char* cstr1, CVR rhs) { return MVmod(var(cstr1), rhs); }
+	DLL_PUBLIC friend var operator%(const char char1, CVR rhs) { return MVmod(var(char1), rhs); }
+	DLL_PUBLIC friend var operator%(const int int1, CVR rhs) { return MVmod(var(int1), rhs); }
+	DLL_PUBLIC friend var operator%(const double double1, CVR rhs) { return MVmod(var(double1), rhs); }
+	//DLL_PUBLIC friend var operator%(const bool bool1, CVR rhs) { return MVmod(var(bool1), rhs); }
 
 	//CONCATENATE
 	// NB do *NOT* support concatenate with bool or vice versa!
 	// to avoid compiler doing wrong precendence issue between ^ and logical operators
-	DLL_PUBLIC friend var operator^(const var& lhs, const var& rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const var& lhs, const var& rhs)" << std::endl;
+	DLL_PUBLIC friend var operator^(CVR lhs, CVR rhs) {
+		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, CVR rhs)" << std::endl;
 		return MVcat(lhs, rhs);
 	}
 	//remove this to avoid some gcc ambiguous warnings although it means concat std:string will create a temp var
-	//DLL_PUBLIC friend var operator^(const var& lhs, const std::string str2) {
-	//	std::clog << "DLL_PUBLIC friend var operator^(const var& lhs, const std::string str2)" << std::endl;
+	//DLL_PUBLIC friend var operator^(CVR lhs, const std::string str2) {
+	//	std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const std::string str2)" << std::endl;
 	//	return MVcat(lhs, var(str2));
 	//}
-	DLL_PUBLIC friend var operator^(const var& lhs, const char* cstr) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const var& lhs, const char* cstr)" << std::endl;
+	DLL_PUBLIC friend var operator^(CVR lhs, const char* cstr) {
+		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const char* cstr)" << std::endl;
 		//return MVcat(lhs, var(cstr));
 		return MVcat(lhs, cstr);
 	}
-	DLL_PUBLIC friend var operator^(const var& lhs, const char char2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const var& lhs, const char char2)" << std::endl;
+	DLL_PUBLIC friend var operator^(CVR lhs, const char char2) {
+		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const char char2)" << std::endl;
 		return MVcat(lhs, char2);
 	}
-	DLL_PUBLIC friend var operator^(const var& lhs, const int int2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const var& lhs, const int int2)" << std::endl;
+	DLL_PUBLIC friend var operator^(CVR lhs, const int int2) {
+		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const int int2)" << std::endl;
 		return MVcat(lhs, var(int2));
 	}
-	DLL_PUBLIC friend var operator^(const var& lhs, const double double2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const var& lhs, const double double2)" << std::endl;
+	DLL_PUBLIC friend var operator^(CVR lhs, const double double2) {
+		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const double double2)" << std::endl;
 		return MVcat(lhs, var(double2));
 	}
-	DLL_PUBLIC friend var operator^(const char* cstr, const var& rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const char* cstr, const var& rhs)" << std::endl;
+	DLL_PUBLIC friend var operator^(const char* cstr, CVR rhs) {
+		//std::clog << "DLL_PUBLIC friend var operator^(const char* cstr, CVR rhs)" << std::endl;
 		return MVcat(cstr, rhs);
 	}
-	DLL_PUBLIC friend var operator^(const char char1, const var& rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const char char1, const var& rhs)" << std::endl;
+	DLL_PUBLIC friend var operator^(const char char1, CVR rhs) {
+		//std::clog << "DLL_PUBLIC friend var operator^(const char char1, CVR rhs)" << std::endl;
 		return MVcat(var(char1), rhs);
 	}
-	DLL_PUBLIC friend var operator^(const int int1, const var& rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const int int1, const var& rhs)" << std::endl;
+	DLL_PUBLIC friend var operator^(const int int1, CVR rhs) {
+		//std::clog << "DLL_PUBLIC friend var operator^(const int int1, CVR rhs)" << std::endl;
 		return MVcat(var(int1), rhs);
 	}
-	DLL_PUBLIC friend var operator^(const double double1, const var& rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const double double1, const var& rhs)" << std::endl;
+	DLL_PUBLIC friend var operator^(const double double1, CVR rhs) {
+		//std::clog << "DLL_PUBLIC friend var operator^(const double double1, CVR rhs)" << std::endl;
 		return MVcat(var(double1), rhs);
 	}
 	//temporaries (rvalues)
-	DLL_PUBLIC friend var operator^(var&& lhs, const var& rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(var&& lhs, const var& rhs)" << std::endl;
+	DLL_PUBLIC friend var operator^(TVR lhs, CVR rhs) {
+		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, CVR rhs)" << std::endl;
 		return lhs ^= rhs;
 		//return std::move(lhs) ^= rhs;
 	}
-	DLL_PUBLIC friend var operator^(var&& lhs, const char* cstr2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(var&& lhs, const char* cstr2)" << std::endl;
+	DLL_PUBLIC friend var operator^(TVR lhs, const char* cstr2) {
+		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const char* cstr2)" << std::endl;
 		/*
     	var x="abcdefghijklmnop";//59ns
     	//var y(x);// (114ns)
@@ -960,23 +913,23 @@ class DLL_PUBLIC var final {
 		return lhs ^= cstr2;
 		//return std::move(lhs) ^= cstr2;
 	}
-	DLL_PUBLIC friend var operator^(var&& lhs, const char char2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(var&& lhs, const char char2)" << std::endl;
+	DLL_PUBLIC friend var operator^(TVR lhs, const char char2) {
+		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const char char2)" << std::endl;
 		return lhs ^= char2;
 	}
-	DLL_PUBLIC friend var operator^(var&& lhs, const int int2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(var&& lhs, const int int2)" << std::endl;
+	DLL_PUBLIC friend var operator^(TVR lhs, const int int2) {
+		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const int int2)" << std::endl;
 		return lhs ^= int2;
 	}
-	DLL_PUBLIC friend var operator^(var&& lhs, const double double2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(var&& lhs, const double double2)" <<std::endl;
+	DLL_PUBLIC friend var operator^(TVR lhs, const double double2) {
+		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const double double2)" <<std::endl;
 		return lhs ^= double2;
 	}
 
 	// unary operators +var -var !var
-	DLL_PUBLIC ND friend var operator+(const var& var1) { return MVplus(var1); }
-	DLL_PUBLIC ND friend var operator-(const var& var1) { return MVminus(var1); }
-	DLL_PUBLIC ND friend bool operator!(const var& var1) { return MVnot(var1); }
+	DLL_PUBLIC ND friend var operator+(CVR var1) { return MVplus(var1); }
+	DLL_PUBLIC ND friend var operator-(CVR var1) { return MVminus(var1); }
+	DLL_PUBLIC ND friend bool operator!(CVR var1) { return MVnot(var1); }
 
 	// OS TIME/DATE
 	///////////////
@@ -985,7 +938,7 @@ class DLL_PUBLIC var final {
 	ND var time() const;
 	ND var timedate() const;
 	void ossleep(const int milliseconds) const;
-	var oswait(const int milliseconds, const var& directory) const;
+	var oswait(const int milliseconds, CVR directory) const;
 	ND var ostime() const;
 #ifdef SWIG
 #define DEFAULT_EMPTY_STRING
@@ -1005,32 +958,32 @@ class DLL_PUBLIC var final {
 	/////////
 
 	//to stdout/cout
-	const var& output() const;	 //output without line ending, without flush
-	const var& outputl() const;	 //output without a line ending and flush
-	const var& outputt() const;	 //output with a tab and flush
+	CVR output() const;	 //output without line ending, without flush
+	CVR outputl() const;	 //output without a line ending and flush
+	CVR outputt() const;	 //output with a tab and flush
 
 	//as above but with var1 prefixed
-	const var& output(const var& var1) const;
-	const var& outputl(const var& var1) const;
-	const var& outputt(const var& var1) const;
+	CVR output(CVR var1) const;
+	CVR outputl(CVR var1) const;
+	CVR outputt(CVR var1) const;
 
 	//to stdlog/clog
-	const var& logput() const;
-	const var& logputl() const;
+	CVR logput() const;
+	CVR logputl() const;
 
 	//as above but with var1 prefixed
-	const var& logput(const var& var1) const;
-	const var& logputl(const var& var1) const;
+	CVR logput(CVR var1) const;
+	CVR logputl(CVR var1) const;
 
 	//to stderr/cerr
-	const var& errput() const;
-	const var& errputl() const;
+	CVR errput() const;
+	CVR errputl() const;
 
 	//as above but with var1 prefixed
-	const var& errput(const var& var1) const;
-	const var& errputl(const var& var1) const;
+	CVR errput(CVR var1) const;
+	CVR errputl(CVR var1) const;
 
-	const var& put(std::ostream& ostream1) const;
+	CVR put(std::ostream& ostream1) const;
 
 	// CURSOR
 	/////////
@@ -1046,29 +999,29 @@ class DLL_PUBLIC var final {
 	/////////////////
 
 	bool hasinput(int milliseconds = 0);
-	var& input();
-	var& input(const var& prompt);
-	var& inputn(const int nchars);
+	VARREF input();
+	VARREF input(CVR prompt);
+	VARREF inputn(const int nchars);
 	ND bool eof() const;
 	bool echo(const int on_off) const;
 
-	friend std::istream& operator>>(std::istream& istream1, var& var1);
+	friend std::istream& operator>>(std::istream& istream1, VARREF var1);
 
 	friend std::ostream& operator<<(std::ostream& ostream1, var var1);
 	//causes ambiguous overload for some unknown reason despite being a hidden friend
-	//friend std::ostream& operator<<(std::ostream& ostream1, var&& var1);
+	//friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
 
-	// friend bool operator<<(const var&);
+	// friend bool operator<<(CVR);
 
 	// VARIABLE CONTROL
 	///////////////////
 
 	ND bool assigned() const;
 	ND bool unassigned() const;
-	var& unassigned(const var& defaultvalue);
+	VARREF unassigned(CVR defaultvalue);
 
-	var& transfer(var& destinationvar);
-	const var& exchange(const var& var2) const;
+	VARREF transfer(VARREF destinationvar);
+	CVR exchange(CVR var2) const;
 	ND var clone() const;
 
 	/*no implemented yet
@@ -1085,9 +1038,9 @@ class DLL_PUBLIC var final {
 	///////////////
 
 	ND var abs() const;
-	ND var mod(const var& divisor) const;
+	ND var mod(CVR divisor) const;
 	ND var mod(const int divisor) const;
-	ND var pwr(const var& exponent) const;
+	ND var pwr(CVR exponent) const;
 	ND var rnd() const;
 	void initrnd() const;
 	ND var exp() const;
@@ -1110,7 +1063,7 @@ class DLL_PUBLIC var final {
 	/////////
 
 	bool setxlocale() const;
-	ND var& getxlocale();
+	ND VARREF getxlocale();
 
 	// STRING CREATION
 	//////////////////
@@ -1130,15 +1083,15 @@ class DLL_PUBLIC var final {
 	// STRING INFO
 	//////////////
 
-	// bool match(const var& matchstr,const var& options DEFAULT_EMPTY_STRING) const;
-	ND var match(const var& matchstr, const var& options DEFAULT_EMPTY_STRING) const;
+	// bool match(CVR matchstr,CVR options DEFAULT_EMPTY_STRING) const;
+	ND var match(CVR matchstr, CVR options DEFAULT_EMPTY_STRING) const;
 	ND var seq() const;	  // ASCII
 	ND var textseq() const;  // TEXT
-	ND var dcount(const var& substrx) const;
-	ND var count(const var& substrx) const;
+	ND var dcount(CVR substrx) const;
+	ND var count(CVR substrx) const;
 #ifndef SWIGPERL
 	// swig-perl chokes on this one character version with "SWIG_AsVal_char not defined" so skip
-	// it for now (can use slow var& version) do something similar to the python config in
+	// it for now (can use slow VARREF version) do something similar to the python config in
 	// exodus.i
 	ND var count(const char charx) const;
 #endif
@@ -1147,15 +1100,15 @@ class DLL_PUBLIC var final {
 	const char* data() const;
 	bool isnum() const;
 
-	ND bool starts(const var& vstr) const;
+	ND bool starts(CVR vstr) const;
 	ND bool starts(const char* cstr) const;
 	ND bool starts(const char c) const;
 
-	ND bool ends(const var& vstr) const;
+	ND bool ends(CVR vstr) const;
 	ND bool ends(const char* cstr) const;
 	ND bool ends(const char c) const;
 
-	ND bool contains(const var& vstr) const;
+	ND bool contains(CVR vstr) const;
 	ND bool contains(const char* cstr) const;
 	ND bool contains(const char c) const;
 
@@ -1166,87 +1119,87 @@ class DLL_PUBLIC var final {
 	// STRING MUTATORS
 	//////////////////
 
-	// all return var& and are not const)
+	// all return VARREF and are not const)
 
-	var& converter(const var& oldchars, const var& newchars);
-	var& converter(const char* oldchars, const char* newchars);
-	var& textconverter(const var& oldchars, const var& newchars);
-	var& swapper(const var& whatstr, const var& withstr);
-	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING);
-	var& splicer(const int start1, const int length, const var& str);
-	var& splicer(const int start1, const var& str);
-	var& popper();
-	var& quoter();
-	var& squoter();
-	var& unquoter();
-	var& ucaser();		// utf8
-	var& lcaser();		// utf8
-	var& tcaser();		// utf8
-	var& fcaser();		// utf8
-	var& normalizer();	// utf8
-	var& inverter();	// utf8
-	var& trimmer(const char* trimchar DEFAULT_SPACE);
-	var& trimmerf(const char* trimchar DEFAULT_SPACE);
-	var& trimmerb(const char* trimchar DEFAULT_SPACE);
-	var& trimmer(const var& trimchar);
-	var& trimmer(const var& trimchar, const var& options);
-	var& trimmerf(const var& trimchar);
-	var& trimmerb(const var& trimchar);
-	var& fieldstorer(const var& sepchar, const int fieldno, const int nfields, const var& replacement);
-	var& substrer(const int startindex);
-	var& substrer(const int startindex, const int length);
+	VARREF converter(CVR oldchars, CVR newchars);
+	VARREF converter(const char* oldchars, const char* newchars);
+	VARREF textconverter(CVR oldchars, CVR newchars);
+	VARREF swapper(CVR whatstr, CVR withstr);
+	VARREF replacer(CVR regexstr, CVR replacementstr, CVR options DEFAULT_EMPTY_STRING);
+	VARREF splicer(const int start1, const int length, CVR str);
+	VARREF splicer(const int start1, CVR str);
+	VARREF popper();
+	VARREF quoter();
+	VARREF squoter();
+	VARREF unquoter();
+	VARREF ucaser();		// utf8
+	VARREF lcaser();		// utf8
+	VARREF tcaser();		// utf8
+	VARREF fcaser();		// utf8
+	VARREF normalizer();	// utf8
+	VARREF inverter();	// utf8
+	VARREF trimmer(const char* trimchar DEFAULT_SPACE);
+	VARREF trimmerf(const char* trimchar DEFAULT_SPACE);
+	VARREF trimmerb(const char* trimchar DEFAULT_SPACE);
+	VARREF trimmer(CVR trimchar);
+	VARREF trimmer(CVR trimchar, CVR options);
+	VARREF trimmerf(CVR trimchar);
+	VARREF trimmerb(CVR trimchar);
+	VARREF fieldstorer(CVR sepchar, const int fieldno, const int nfields, CVR replacement);
+	VARREF substrer(const int startindex);
+	VARREF substrer(const int startindex, const int length);
 
-	//var& sorter(const var& separator DEFAULT_EMPTY_STRING);
+	//VARREF sorter(CVR separator DEFAULT_EMPTY_STRING);
 
-	var& lowerer();
-	var& raiser();
-	var& cropper();
+	VARREF lowerer();
+	VARREF raiser();
+	VARREF cropper();
 
 	// SAME ON TEMPORARIES
 	//////////////////////
 
-	ND var& convert(const var& oldchars, const var& newchars) &&;
-	ND var& textconvert(const var& oldchars, const var& newchars) &&;
-	ND var& swap(const var& whatstr, const var& withstr) &&;
-	ND var& replace(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING) &&;
-	ND var& splice(const int start1, const int length, const var& str) &&;
-	ND var& splice(const int start1, const var& str) &&;
-	ND var& pop() &&;
-	ND var& quote() &&;
-	ND var& squote() &&;
-	ND var& unquote() &&;
-	ND var& ucase() &&;		 // utf8
-	ND var& lcase() &&;		 // utf8
-	ND var& tcase() &&;		 // utf8
-	ND var& fcase() &&;		 // utf8
-	ND var& normalize() &&;	 // utf8
-	ND var& invert() &&;	 // utf8
-	ND var& trim(const char* trimchar DEFAULT_SPACE) &&;
-	ND var& trimf(const char* trimchar DEFAULT_SPACE) &&;
-	ND var& trimb(const char* trimchar DEFAULT_SPACE) &&;
-	ND var& trim(const var& trimchar) &&;
-	ND var& trim(const var& trimchar, const var& options) &&;
-	ND var& trimf(const var& trimchar) &&;
-	ND var& trimb(const var& trimchar) &&;
-	ND var& fieldstore(const var& sepchar, const int fieldno, const int nfields, const var& replacement) &&;
-	ND var& substr(const int startindex) &&;
-	ND var& substr(const int startindex, const int length) &&;
+	ND VARREF convert(CVR oldchars, CVR newchars) &&;
+	ND VARREF textconvert(CVR oldchars, CVR newchars) &&;
+	ND VARREF swap(CVR whatstr, CVR withstr) &&;
+	ND VARREF replace(CVR regexstr, CVR replacementstr, CVR options DEFAULT_EMPTY_STRING) &&;
+	ND VARREF splice(const int start1, const int length, CVR str) &&;
+	ND VARREF splice(const int start1, CVR str) &&;
+	ND VARREF pop() &&;
+	ND VARREF quote() &&;
+	ND VARREF squote() &&;
+	ND VARREF unquote() &&;
+	ND VARREF ucase() &&;		 // utf8
+	ND VARREF lcase() &&;		 // utf8
+	ND VARREF tcase() &&;		 // utf8
+	ND VARREF fcase() &&;		 // utf8
+	ND VARREF normalize() &&;	 // utf8
+	ND VARREF invert() &&;	 // utf8
+	ND VARREF trim(const char* trimchar DEFAULT_SPACE) &&;
+	ND VARREF trimf(const char* trimchar DEFAULT_SPACE) &&;
+	ND VARREF trimb(const char* trimchar DEFAULT_SPACE) &&;
+	ND VARREF trim(CVR trimchar) &&;
+	ND VARREF trim(CVR trimchar, CVR options) &&;
+	ND VARREF trimf(CVR trimchar) &&;
+	ND VARREF trimb(CVR trimchar) &&;
+	ND VARREF fieldstore(CVR sepchar, const int fieldno, const int nfields, CVR replacement) &&;
+	ND VARREF substr(const int startindex) &&;
+	ND VARREF substr(const int startindex, const int length) &&;
 
-	ND var& lower() &&;
-	ND var& raise() &&;
-	ND var& crop() &&;
+	ND VARREF lower() &&;
+	ND VARREF raise() &&;
+	ND VARREF crop() &&;
 
 	// SAME BUT NON-MUTATING
 	////////////////////////
 
 	// all are const
 
-	ND var convert(const var& oldchars, const var& newchars) const&;
-	ND var textconvert(const var& oldchars, const var& newchars) const&;
-	ND var swap(const var& whatstr, const var& withstr) const&;
-	ND var replace(const var& regexstr, const var& replacementstr, const var& options DEFAULT_EMPTY_STRING) const&;
-	ND var splice(const int start1, const int length, const var& str) const&;
-	ND var splice(const int start1, const var& str) const&;
+	ND var convert(CVR oldchars, CVR newchars) const&;
+	ND var textconvert(CVR oldchars, CVR newchars) const&;
+	ND var swap(CVR whatstr, CVR withstr) const&;
+	ND var replace(CVR regexstr, CVR replacementstr, CVR options DEFAULT_EMPTY_STRING) const&;
+	ND var splice(const int start1, const int length, CVR str) const&;
+	ND var splice(const int start1, CVR str) const&;
 	ND var pop() const&;
 	ND var quote() const&;
 	ND var squote() const&;
@@ -1260,11 +1213,11 @@ class DLL_PUBLIC var final {
 	ND var trim(const char* trimchar DEFAULT_SPACE) const&;
 	ND var trimf(const char* trimchar DEFAULT_SPACE) const&;
 	ND var trimb(const char* trimchar DEFAULT_SPACE) const&;
-	ND var trim(const var& trimchar) const&;
-	ND var trim(const var& trimchar, const var& options) const&;
-	ND var trimf(const var& trimchar) const&;
-	ND var trimb(const var& trimchar) const&;
-	ND var fieldstore(const var& sepchar, const int fieldno, const int nfields, const var& replacement) const&;
+	ND var trim(CVR trimchar) const&;
+	ND var trim(CVR trimchar, CVR options) const&;
+	ND var trimf(CVR trimchar) const&;
+	ND var trimb(CVR trimchar) const&;
+	ND var fieldstore(CVR sepchar, const int fieldno, const int nfields, CVR replacement) const&;
 
 	ND var lower() const&;
 	ND var raise() const&;
@@ -1278,9 +1231,9 @@ class DLL_PUBLIC var final {
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
-	ND dim split(const var& separator DEFAULT_EMPTY_STRING) const;
+	ND dim split(CVR separator DEFAULT_EMPTY_STRING) const;
 
-	ND var sort(const var& separator DEFAULT_EMPTY_STRING) const;
+	ND var sort(CVR separator DEFAULT_EMPTY_STRING) const;
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -1300,7 +1253,7 @@ class DLL_PUBLIC var final {
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
-	var substr(const int startindex, const var& delimiterchars, int& endindex) const;
+	var substr(const int startindex, CVR delimiterchars, int& endindex) const;
 
 	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
 	// of mixed combinations of multivalues/subvalues and text marks
@@ -1312,27 +1265,27 @@ class DLL_PUBLIC var final {
 	// returns the delimiter no (1-6)
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
 	// startstopindex to after tne end of the string and returns delimiter no 0 NOTE that it
-	// does NOT remove anything from the source string var remove(var& startindex, var&
+	// does NOT remove anything from the source string var remove(VARREF startindex, VARREF
 	// delimiterno) const;
-	var substr2(var& startstopindex, var& delimiterno) const;
+	var substr2(VARREF startstopindex, VARREF delimiterno) const;
 
-	ND var index(const var& substr, const int occurrenceno = 1) const;
-	ND var index2(const var& substr, const int startchar1 = 1) const;
-	ND var field(const var& substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
+	ND var index(CVR substr, const int occurrenceno = 1) const;
+	ND var index2(CVR substr, const int startchar1 = 1) const;
+	ND var field(CVR substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
 	// version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO
 	// should probably make field() do this
-	ND var field2(const var& substrx, const int fieldnx, const int nfieldsx = 1) const;
+	ND var field2(CVR substrx, const int fieldnx, const int nfieldsx = 1) const;
 
 	// I/O CONVERSION
 	/////////////////
 
 	ND var oconv(const char* convstr) const;
-	ND var oconv(const var& convstr) const;
+	ND var oconv(CVR convstr) const;
 	ND var iconv(const char* convstr) const;
-	ND var iconv(const var& convstr) const;
+	ND var iconv(CVR convstr) const;
 
-	ND var from_codepage(const var& codepage) const;
-	ND var to_codepage(const var& codepage) const;
+	ND var from_codepage(CVR codepage) const;
+	ND var to_codepage(CVR codepage) const;
 
 	// CLASSIC MV STRING FUNCTIONS
 	/////////////////////////////
@@ -1341,14 +1294,14 @@ class DLL_PUBLIC var final {
 	// something better it was called replace() in pickos but we are now using "replace()" to
 	// change substrings using regex (similar to the old pickos swap function) its mutator function
 	// is .r()
-	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, const var& replacement) const;
-	ND var pickreplace(const int fieldno, const int valueno, const var& replacement) const;
-	ND var pickreplace(const int fieldno, const var& replacement) const;
+	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const;
+	ND var pickreplace(const int fieldno, const int valueno, CVR replacement) const;
+	ND var pickreplace(const int fieldno, CVR replacement) const;
 
 	// cf mutator inserter()
-	ND var insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) const&;
-	ND var insert(const int fieldno, const int valueno, const var& insertion) const&;
-	ND var insert(const int fieldno, const var& insertion) const&;
+	ND var insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) const&;
+	ND var insert(const int fieldno, const int valueno, CVR insertion) const&;
+	ND var insert(const int fieldno, CVR insertion) const&;
 
 	/// remove() was delete() in pickos
 	// var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
@@ -1365,21 +1318,21 @@ class DLL_PUBLIC var final {
 	// SAME AS ABOVE ON TEMPORARIES
 	///////////////////////////////
 
-	ND var& insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) &&;
-	ND var& insert(const int fieldno, const int valueno, const var& insertion) &&;
-	ND var& insert(const int fieldno, const var& insertion) &&;
+	ND VARREF insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) &&;
+	ND VARREF insert(const int fieldno, const int valueno, CVR insertion) &&;
+	ND VARREF insert(const int fieldno, CVR insertion) &&;
 
 	// MV STRING FILTERS
 	////////////////////
 
 	ND var sum() const;
 	ND var sumall() const;
-	ND var sum(const var& sepchar) const;
+	ND var sum(CVR sepchar) const;
 
 	// binary ops + - * / : on mv strings 10]20]30
 	// e.g. var("10]20]30").mv("+","2]3]4")
 	// result is "12]23]34"
-	ND var mv(const char* opcode, const var& var2) const;
+	ND var mv(const char* opcode, CVR var2) const;
 
 	// MV STRING MUTATORS
 	////////////////////
@@ -1392,79 +1345,79 @@ class DLL_PUBLIC var final {
 	//  xyz.r(10,"abc");
 
 	// r() is short for replacer() since it is probably the most common var function after a()
-	var& r(const int fieldno, const int valueno, const int subvalueno, const var& replacement);
-	var& r(const int fieldno, const int valueno, const var& replacement);
-	var& r(const int fieldno, const var& replacement);
+	VARREF r(const int fieldno, const int valueno, const int subvalueno, CVR replacement);
+	VARREF r(const int fieldno, const int valueno, CVR replacement);
+	VARREF r(const int fieldno, CVR replacement);
 
-	var& inserter(const int fieldno, const int valueno, const int subvalueno, const var& insertion);
-	var& inserter(const int fieldno, const int valueno, const var& insertion);
-	var& inserter(const int fieldno, const var& insertion);
+	VARREF inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion);
+	VARREF inserter(const int fieldno, const int valueno, CVR insertion);
+	VARREF inserter(const int fieldno, CVR insertion);
 
-	// var& eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
-	var& remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
+	// VARREF eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
+	VARREF remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
 	//-er version could be extract and erase in one go
-	// var& extracter(int fieldno,int valueno=0,int subvalueno=0) const;
+	// VARREF extracter(int fieldno,int valueno=0,int subvalueno=0) const;
 
 	// MV STRING LOCATORS
 	////////////////////
 
 	// should these be like extract, replace, insert, delete
 	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY_STRING)
-	ND bool locate(const var& target) const;
-	bool locate(const var& target, var& setting) const;
-	bool locate(const var& target, var& setting, const int fieldno, const int valueno = 0) const;
+	ND bool locate(CVR target) const;
+	bool locate(CVR target, VARREF setting) const;
+	bool locate(CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
 
-	bool locateusing(const var& usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
-	bool locateusing(const var& usingchar, const var& target) const;
+	bool locateusing(CVR usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	bool locateusing(CVR usingchar, CVR target) const;
 
 	// locateby without fieldno or valueno arguments uses character VM
-	bool locateby(const char* ordercode, const var& target, var& setting) const;
-	bool locateby(const var& ordercode, const var& target, var& setting) const;
+	bool locateby(const char* ordercode, CVR target, VARREF setting) const;
+	bool locateby(CVR ordercode, CVR target, VARREF setting) const;
 	// locateby with fieldno=0 uses character FM
-	bool locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno = 0) const;
-	bool locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno = 0) const;
+	bool locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
+	bool locateby(CVR ordercode, CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
 
 	// locatebyusing
-	bool locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
-	bool locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	bool locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	bool locatebyusing(CVR ordercode, CVR usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// DATABASE MANAGEMENT
 	/////////////////////
 
-	bool dbcreate(const var& dbname) const;
+	bool dbcreate(CVR dbname) const;
 	ND var dblist() const;
-	bool dbcopy(const var& from_dbname, const var& to_dbname) const;
-	bool dbdelete(const var& dbname) const;
+	bool dbcopy(CVR from_dbname, CVR to_dbname) const;
+	bool dbdelete(CVR dbname) const;
 
-	bool createfile(const var& filename) const;
-	bool renamefile(const var& filename, const var& newfilename) const;
-	bool deletefile(const var& filename) const;
-	bool clearfile(const var& filename) const;
+	bool createfile(CVR filename) const;
+	bool renamefile(CVR filename, CVR newfilename) const;
+	bool deletefile(CVR filename) const;
+	bool clearfile(CVR filename) const;
 	ND var listfiles() const;
 
-	bool createindex(const var& fieldname, const var& dictfile DEFAULT_EMPTY_STRING) const;
-	bool deleteindex(const var& fieldname) const;
-	ND var listindexes(const var& filename DEFAULT_EMPTY_STRING, const var& fieldname DEFAULT_EMPTY_STRING) const;
+	bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY_STRING) const;
+	bool deleteindex(CVR fieldname) const;
+	ND var listindexes(CVR filename DEFAULT_EMPTY_STRING, CVR fieldname DEFAULT_EMPTY_STRING) const;
 
-	bool sqlexec(const var& sqlcmd) const;
-	bool sqlexec(const var& sqlcmd, var& response) const;
+	bool sqlexec(CVR sqlcmd) const;
+	bool sqlexec(CVR sqlcmd, VARREF response) const;
 
 	// bool selftest() const;
 	ND var version() const;
 
 	ND var lasterror() const;
-	void lasterror(const var& msg) const;
+	void lasterror(CVR msg) const;
 
 
 	// DATABASE ACCESS
 	/////////////////
 
-	bool connect(const var& conninfo DEFAULT_EMPTY_STRING);
+	bool connect(CVR conninfo DEFAULT_EMPTY_STRING);
 	void disconnect();
 	void disconnectall();
 
-	bool attach(const var& filenames);
-	void detach(const var& filenames);
+	bool attach(CVR filenames);
+	void detach(CVR filenames);
 
 	// var() is a db connection or default connection
 	bool begintrans() const;
@@ -1473,82 +1426,82 @@ class DLL_PUBLIC var final {
 	bool statustrans() const;
 	void clearcache() const;
 
-	ND var reccount(const var& filename DEFAULT_EMPTY_STRING) const;
-	var flushindex(const var& filename DEFAULT_EMPTY_STRING) const;
+	ND var reccount(CVR filename DEFAULT_EMPTY_STRING) const;
+	var flushindex(CVR filename DEFAULT_EMPTY_STRING) const;
 
-	bool open(const var& dbfilename, const var& connection DEFAULT_EMPTY_STRING);
+	bool open(CVR dbfilename, CVR connection DEFAULT_EMPTY_STRING);
 	void close();
 
 	// 1=ok, 0=failed, ""=already locked
-	var lock(const var& key) const;
-	// void unlock(const var& key) const;
+	var lock(CVR key) const;
+	// void unlock(CVR key) const;
 	// void unlockall() const;
-	bool unlock(const var& key) const;
+	bool unlock(CVR key) const;
 	bool unlockall() const;
 
 	// db file i/o
-	bool read(const var& filehandle, const var& key);
-	bool write(const var& filehandle, const var& key) const;
-	bool deleterecord(const var& key) const;
-	bool updaterecord(const var& filehandle, const var& key) const;
-	bool insertrecord(const var& filehandle, const var& key) const;
+	bool read(CVR filehandle, CVR key);
+	bool write(CVR filehandle, CVR key) const;
+	bool deleterecord(CVR key) const;
+	bool updaterecord(CVR filehandle, CVR key) const;
+	bool insertrecord(CVR filehandle, CVR key) const;
 
 	// specific db field i/o
-	bool readv(const var& filehandle, const var& key, const int fieldno);
-	bool writev(const var& filehandle, const var& key, const int fieldno) const;
+	bool readv(CVR filehandle, CVR key, const int fieldno);
+	bool writev(CVR filehandle, CVR key, const int fieldno) const;
 
 	// cached db file i/o
-	bool reado(const var& filehandle, const var& key);
-	bool writeo(const var& filehandle, const var& key) const;
-	bool deleteo(const var& key) const;
+	bool reado(CVR filehandle, CVR key);
+	bool writeo(CVR filehandle, CVR key) const;
+	bool deleteo(CVR key) const;
 
 	// MvEnvironment function now to allow access to RECORD ID DICT etc. and call external
 	// functions
 	// var calculate() const;
 
-	ND var xlate(const var& filename, const var& fieldno, const char* mode) const;
-	ND var xlate(const var& filename, const var& fieldno, const var& mode) const;
+	ND var xlate(CVR filename, CVR fieldno, const char* mode) const;
+	ND var xlate(CVR filename, CVR fieldno, CVR mode) const;
 
 	// DATABASE SORT/SELECT
 	//////////////////////
 
-	bool select(const var& sortselectclause DEFAULT_EMPTY_STRING);
+	bool select(CVR sortselectclause DEFAULT_EMPTY_STRING);
 	void clearselect();
 
 	//ND bool hasnext() const;
 	ND bool hasnext();
-	bool readnext(var& key);
-	bool readnext(var& key, var& valueno);
-	bool readnext(var& record, var& key, var& valueno);
+	bool readnext(VARREF key);
+	bool readnext(VARREF key, VARREF valueno);
+	bool readnext(VARREF record, VARREF key, VARREF valueno);
 
-	bool savelist(const var& listname);
-	bool getlist(const var& listname);
-	bool makelist(const var& listname, const var& keys);
-	bool deletelist(const var& listname) const;
-	bool formlist(const var& keys, const var& fieldno = 0);
+	bool savelist(CVR listname);
+	bool getlist(CVR listname);
+	bool makelist(CVR listname, CVR keys);
+	bool deletelist(CVR listname) const;
+	bool formlist(CVR keys, CVR fieldno = 0);
 
-	bool saveselect(const var& filename);
+	bool saveselect(CVR filename);
 
 	// OS FILE SYSTEM
 	/////////////////
 
 	bool osopen() const;
-	bool osopen(const var& filename, const var& locale DEFAULT_EMPTY_STRING) const;
-	bool osbread(const var& osfilevar, var& offset, const int length);
-	bool osbread(const var& osfilevar, const var& offset, const int length);
-	bool osbwrite(const var& osfilevar, var& offset) const;
-	bool osbwrite(const var& osfilevar, const var& offset) const;
+	bool osopen(CVR filename, CVR locale DEFAULT_EMPTY_STRING) const;
+	bool osbread(CVR osfilevar, VARREF offset, const int length);
+	bool osbread(CVR osfilevar, CVR offset, const int length);
+	bool osbwrite(CVR osfilevar, VARREF offset) const;
+	bool osbwrite(CVR osfilevar, CVR offset) const;
 	void osclose() const;
-	bool osread(const var& osfilename, const var& codepage DEFAULT_EMPTY_STRING);
-	bool oswrite(const var& osfilename, const var& codepage DEFAULT_EMPTY_STRING) const;
+	bool osread(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING);
+	bool oswrite(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING) const;
 	bool osdelete() const;
-	bool osdelete(const var& osfilename) const;
-	bool osrename(const var& newosdir_or_filename) const;
-	bool oscopy(const var& to_osfilename) const;
-	bool osmove(const var& to_osfilename) const;
-	ND var oslist(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING, const int mode = 0) const;
-	ND var oslistf(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING) const;
-	ND var oslistd(const var& path DEFAULT_DOT, const var& wildcard DEFAULT_EMPTY_STRING) const;
+	bool osdelete(CVR osfilename) const;
+	bool osrename(CVR newosdir_or_filename) const;
+	bool oscopy(CVR to_osfilename) const;
+	bool osmove(CVR to_osfilename) const;
+	ND var oslist(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_EMPTY_STRING, const int mode = 0) const;
+	ND var oslistf(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_EMPTY_STRING) const;
+	ND var oslistd(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_EMPTY_STRING) const;
 	ND var osfile() const;
 	ND var osdir() const;
 	bool osmkdir() const;
@@ -1556,7 +1509,7 @@ class DLL_PUBLIC var final {
 	// TODO check for threadsafe
 	ND var ospid() const;
 	ND var oscwd() const;
-	bool oscwd(const var& newpath) const;
+	bool oscwd(CVR newpath) const;
 	void osflush() const;
 
 	// TODO add performance enhancing char* argumented versions of many os functions
@@ -1564,20 +1517,20 @@ class DLL_PUBLIC var final {
 	// same again but this time allowing native strings without needing automatic conversion of
 	// var->char* this is to only to avoid convertion too and from var but will usage of hard
 	// coded filenames etc really be in fast loops and performance related? perhaps only provide
-	bool osread(const char* osfilename, const var& codepage DEFAULT_EMPTY_STRING);
+	bool osread(const char* osfilename, CVR codepage DEFAULT_EMPTY_STRING);
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
 
 	bool suspend() const;
 	bool osshell() const;
-	bool osshellread(const var& oscmd);
-	bool osshellwrite(const var& oscmd) const;
+	bool osshellread(CVR oscmd);
+	bool osshellwrite(CVR oscmd) const;
 	ND var ostempdirname() const;
 	ND var ostempfilename() const;
 
-	bool osgetenv(const var& name);
-	bool ossetenv(const var& name) const;
+	bool osgetenv(CVR name);
+	bool ossetenv(CVR name) const;
 
 	// EXECUTE/PERFORM CONTROL
 	/////////////////////////
@@ -1588,11 +1541,11 @@ class DLL_PUBLIC var final {
 	// chain should be similar to one of the above?
 	// var chain() const;
 
-	void stop(const var& text DEFAULT_EMPTY_STRING) const;
-	void abort(const var& text DEFAULT_EMPTY_STRING) const;
-	void abortall(const var& text DEFAULT_EMPTY_STRING) const;
+	void stop(CVR text DEFAULT_EMPTY_STRING) const;
+	void abort(CVR text DEFAULT_EMPTY_STRING) const;
+	void abortall(CVR text DEFAULT_EMPTY_STRING) const;
 
-	var debug(const var& DEFAULT_EMPTY_STRING) const;
+	var debug(CVR DEFAULT_EMPTY_STRING) const;
 
 	var logoff() const;
 
@@ -1603,7 +1556,7 @@ class DLL_PUBLIC var final {
 	void createString() const;
 
 	bool cursorexists();
-	bool selectx(const var& fieldnames, const var& sortselectclause);
+	bool selectx(CVR fieldnames, CVR sortselectclause);
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default
 	// connection string On return *this contains connection ID and type VARTYP_NANSTR_DBCONN
@@ -1621,15 +1574,15 @@ class DLL_PUBLIC var final {
 	//void* get_lock_table() const;
 	//void* get_mvconnection() const;
 
-	var build_conn_info(const var& conninfo) const;
+	var build_conn_info(CVR conninfo) const;
 
-	//var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& froms, var& selects, var& ismv, bool forsort_or_select_or_index = false) const;
+	//var getdictexpression(CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname, VARREF joins, VARREF froms, VARREF selects, VARREF ismv, bool forsort_or_select_or_index = false) const;
 
 	// TODO check if can speed up by returning reference to converted self like MC
 	// left/right justification
-	var oconv_LRC(const var& format) const;
+	var oconv_LRC(CVR format) const;
 	// text justification
-	var oconv_T(const var& format) const;
+	var oconv_T(CVR format) const;
 	// date
 	var oconv_D(const char* conversion) const;
 	// time
@@ -1637,7 +1590,7 @@ class DLL_PUBLIC var final {
 	// decimal
 	var oconv_MD(const char* conversion) const;
 	// character replacement
-	var& oconv_MR(const char* conversion);
+	VARREF oconv_MR(const char* conversion);
 	// hex
 	var oconv_HEX(const int ioratio) const;
 
@@ -1651,18 +1604,18 @@ class DLL_PUBLIC var final {
 	const std::string to_path_string() const;
 	const std::string to_cmd_string() const;
 
-	//var& localeAwareChangeCase(const int lowerupper);
+	//VARREF localeAwareChangeCase(const int lowerupper);
 
-	std::fstream* osopenx(const var& osfilename, const var& locale) const;
+	std::fstream* osopenx(CVR osfilename, CVR locale) const;
 
 	friend class dim;
 	friend class var_iter;
 
 	//BEGIN - free function to create an iterator -> begin
-	DLL_PUBLIC friend var_iter begin(const var& v);
+	DLL_PUBLIC friend var_iter begin(CVR v);
 
 	//END - free function to create an interator -> end
-	DLL_PUBLIC friend var_iter end(const var& v);
+	DLL_PUBLIC friend var_iter end(CVR v);
 
 	//bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
 	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
@@ -1671,7 +1624,7 @@ class DLL_PUBLIC var final {
 
 };	// of class "var"
 
-// NB we should probably NEVER add operator^(var& var1, bool)
+// NB we should probably NEVER add operator^(VARREF var1, bool)
 // this is a trick to avoid a problem that exodus concat operator
 // has the wrong precedence versus the logical operators
 // a ^ b > c //we should prevent this from compiling because
@@ -1689,30 +1642,30 @@ class DLL_PUBLIC var final {
 // or, if you do want to concatenate the result of a comparison do this
 // a^var(b>c)
 
-DLL_PUBLIC ND bool MVeq(const var& var1, const var& var2);
-DLL_PUBLIC ND bool MVlt(const var& var1, const var& var2);
+DLL_PUBLIC ND bool MVeq(CVR var1, CVR var2);
+DLL_PUBLIC ND bool MVlt(CVR var1, CVR var2);
 
-DLL_PUBLIC ND bool MVlt(const var& var1, const int int2);
-DLL_PUBLIC ND bool MVlt(const int int1, const var& var2);
+DLL_PUBLIC ND bool MVlt(CVR var1, const int int2);
+DLL_PUBLIC ND bool MVlt(const int int1, CVR var2);
 
-//DLL_PUBLIC ND var MVplus(const var& var1);
-//DLL_PUBLIC ND var MVminus(const var& var1);
-//DLL_PUBLIC ND bool MVnot(const var& var1);
+//DLL_PUBLIC ND var MVplus(CVR var1);
+//DLL_PUBLIC ND var MVminus(CVR var1);
+//DLL_PUBLIC ND bool MVnot(CVR var1);
 
-DLL_PUBLIC ND var MVadd(const var& var1, const var& var2);
+DLL_PUBLIC ND var MVadd(CVR var1, CVR var2);
 
-DLL_PUBLIC ND var MVmul(const var& var1, const var& var2);
+DLL_PUBLIC ND var MVmul(CVR var1, CVR var2);
 
-DLL_PUBLIC ND var MVdiv(const var& var1, const var& var2);
+DLL_PUBLIC ND var MVdiv(CVR var1, CVR var2);
 
 #ifndef SWIG
 DLL_PUBLIC ND double exodusmodulus(const double v1, const double v2);
 #endif
 
-DLL_PUBLIC ND var MVmod(const var& var1, const var& var2);
+DLL_PUBLIC ND var MVmod(CVR var1, CVR var2);
 
 // var^var reassign logical xor to be std::string concatenate!!!
-//DLL_PUBLIC ND var MVcat(const var& var1, const var& var2);
+//DLL_PUBLIC ND var MVcat(CVR var1, CVR var2);
 
 //class var_iter
 class DLL_PUBLIC var_iter {
@@ -1727,7 +1680,7 @@ class DLL_PUBLIC var_iter {
 	var_iter() = default;
 
 	//construct from var
-	var_iter(const var& v);
+	var_iter(CVR v);
 
 	//check iter != iter (i.e. iter != string::npos)
 	bool operator!=(var_iter& vi);
@@ -1739,13 +1692,13 @@ class DLL_PUBLIC var_iter {
 	var_iter operator++();
 };
 
-//class var_proxy
+//class var_proxy1 - replace or extract fn
 class DLL_PUBLIC var_proxy1 {
 
    private:
 
 	var* var_;
-	mutable int fn_ = 0;
+	mutable int fn_;
 
 	var_proxy1() = delete;
 
@@ -1760,19 +1713,19 @@ class DLL_PUBLIC var_proxy1 {
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
-	void operator=(const var& replacement){
+	void operator=(CVR replacement){
 		var_->r(fn_, replacement);
 	}
 };
 
-//class var_proxy
+//class var_proxy2 - replace or extract fn, sn
 class DLL_PUBLIC var_proxy2 {
 
    private:
 
 	var* var_;
-	mutable int fn_ = 0;
-	mutable int vn_ = 0;
+	mutable int fn_;
+	mutable int vn_;
 
 	var_proxy2() = delete;
 
@@ -1787,20 +1740,20 @@ class DLL_PUBLIC var_proxy2 {
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
-	void operator=(const var& replacement){
+	void operator=(CVR replacement){
 		var_->r(fn_, vn_, replacement);
 	}
 };
 
-//class var_proxy
+//class var_proxy3 - replace or extract fn, vn, sn
 class DLL_PUBLIC var_proxy3 {
 
    private:
 
 	var* var_;
-	mutable int fn_ = 0;
-	mutable int vn_ = 0;
-	mutable int sn_ = 0;
+	mutable int fn_;
+	mutable int vn_;
+	mutable int sn_;
 
 	var_proxy3() = delete;
 
@@ -1815,10 +1768,12 @@ class DLL_PUBLIC var_proxy3 {
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
-	void operator=(const var& replacement){
+	void operator=(CVR replacement){
 		var_->r(fn_, vn_, sn_, replacement);
 	}
 };
+
+class dim_iter;
 
 //class var_brackets_proxy
 class DLL_PUBLIC var_brackets_proxy {
@@ -1836,65 +1791,7 @@ class DLL_PUBLIC var_brackets_proxy {
 //class dim
 class DLL_PUBLIC dim {
 
-   public:
-	dim(int nrows, int ncols = 1);
-
-	bool redim(int nrows, int ncols = 1);
-
-	var join(const var& sepchar = FM_) const;
-
-	// parenthesis operators often come in pairs
-	ND var& operator()(int rowno, int colno = 1);
-
-	// following const version is called if we do () on a dim which was defined as const xx
-	ND var& operator()(int rowno, int colno = 1) const;
-
-	// Q: why is this commented out?
-	// A: we dont want to COPY vars out of an array when using it in rhs expression
-	// var operator() (int row, int col=1) const;
-
-	// destructor to (NOT VIRTUAL to save space since not expected to be a base class)
-	// protected to prevent deriving from var since wish to save space and not provide virtual
-	// destructor http://www.gotw.ca/publications/mill18.htm
-	~dim();
-
-	dim& operator=(const dim& sourcedim);
-
-	//=var
-	// The assignment operator should always return a reference to *this.
-	// cant be (const var& var1) because seems to cause a problem with var1=var2 in function
-	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
-	// contruction see also ^= etc
-	dim& operator=(const var& sourcevar);
-	dim& operator=(const int sourceint);
-	dim& operator=(const double sourcedbl);
-
-	// allow default construction for class variables later resized in class methods
-	dim();
-
-	// see also var::split
-	// return the number of fields
-	var split(const var& var1, const var& separator DEFAULT_EMPTY_STRING);
-	dim& sort(bool reverse = false);
-
-	bool read(const var& filehandle, const var& key);
-
-	bool write(const var& filehandle, const var& key) const;
-
-	// following is implemented on the dim class now
-	// dim dimarray2();
-	//
-
-	// move constructor
-	dim(dim&& sourcedim) noexcept;
-
    private:
-	// Disable copy constructor (why? to stop inefficient copies?)
-	// Copy constructor
-	dim(const dim& sourcedim);
-
-	dim& init(const var& var1);
-
 	int nrows_, ncols_;
 	// NOTE: trying to implement data_ as boost smart array pointer (boost::scoped_array<var>
 	// data_;) raises warning: as dim is DLL_PUBLIC, boost library should have DLL interface.
@@ -1913,23 +1810,127 @@ class DLL_PUBLIC dim {
 	var* data_;
 	bool initialised_;
 
+   public:
+	dim(int nrows, int ncols = 1);
+
+	bool redim(int nrows, int ncols = 1);
+
+	var join(CVR sepchar = FM_) const;
+
+	// parenthesis operators often come in pairs
+	ND VARREF operator()(int rowno, int colno = 1);
+
+	// following const version is called if we do () on a dim which was defined as const xx
+	ND VARREF operator()(int rowno, int colno = 1) const;
+
+	var rows() const;
+	var cols() const;
+
+	// Q: why is this commented out?
+	// A: we dont want to COPY vars out of an array when using it in rhs expression
+	// var operator() (int row, int col=1) const;
+
+	// destructor to (NOT VIRTUAL to save space since not expected to be a base class)
+	// protected to prevent deriving from var since wish to save space and not provide virtual
+	// destructor http://www.gotw.ca/publications/mill18.htm
+	~dim();
+
+	dim& operator=(const dim& sourcedim);
+
+	//=var
+	// The assignment operator should always return a reference to *this.
+	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
+	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
+	// contruction see also ^= etc
+	dim& operator=(CVR sourcevar);
+	dim& operator=(const int sourceint);
+	dim& operator=(const double sourcedbl);
+
+	// allow default construction for class variables later resized in class methods
+	dim();
+
+	// see also var::split
+	// return the number of fields
+	var split(CVR var1, CVR separator DEFAULT_EMPTY_STRING);
+	dim& sort(bool reverse = false);
+
+	bool read(CVR filehandle, CVR key);
+	bool write(CVR filehandle, CVR key) const;
+
+	bool osread(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING);
+	bool oswrite(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING) const;
+
+	// following is implemented on the dim class now
+	// dim dimarray2();
+	//
+
+	// move constructor
+	dim(dim&& sourcedim) noexcept;
+
+	friend class dim_iter;
+
+	//BEGIN - free function to create an iterator -> begin
+	DLL_PUBLIC friend dim_iter begin(const dim& d);
+
+	//END - free function to create an interator -> end
+	DLL_PUBLIC friend dim_iter end(const dim& d);
+
+   private:
+	// Disable copy constructor (why? to stop inefficient copies?)
+	// Copy constructor
+	dim(const dim& sourcedim);
+
+	dim& init(CVR var1);
+
 };	// of class "dim"
 
-// must be after class declaration
+//class dim_iter
+class DLL_PUBLIC dim_iter {
 
-inline const var FM = _FM_;
-inline const var VM = _VM_;
-inline const var SM = _SM_;
-inline const var SVM = _SVM_;
-inline const var TM = _TM_;
-inline const var STM = _STM_;
+   private:
 
-inline const var IM = _IM_;
-inline const var RM = _RM_;
-inline const var AM = _AM_;
+	const dim* data;
 
-inline const var DQ = _DQ_;
-inline const var SQ = _SQ_;
+	//start from 1 ignoring element 0
+	int index = 1;
+
+   public:
+
+	//default constructor
+	dim_iter() = default;
+
+	//construct from dim
+	dim_iter(const dim& d);
+
+	//check iter != iter (i.e. iter != string::npos)
+	bool operator!=(const dim_iter& d);
+
+	//dereference iter
+	operator var*();
+
+	//iter++
+	dim_iter operator++();
+
+	//iter--
+	dim_iter operator--();
+
+	void end();
+};
+
+// var versions of separator characters. Must be after class declaration
+inline const var FM = FM_;
+inline const var VM = VM_;
+inline const var SM = SM_;
+inline const var SVM = SVM_;
+inline const var TM = TM_;
+inline const var STM = STM_;
+
+inline const var IM = IM_;
+inline const var RM = RM_;
+inline const var AM = AM_;
+
+inline const var DQ = DQ_;
+inline const var SQ = SQ_;
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 inline const var OSSLASH = "\\";
@@ -1941,11 +1942,7 @@ inline const char OSSLASH_ = '/';
 #define SLASH_IS_BACKSLASH false
 #endif
 
-// being global const means that ucase() and lcase()
-// can only be fixed for ASCII
-// perhaps make a version of ucase/lcase that
-// receives an MvEnvironment in the parameters.
-// CF LOWERCASE which is
+// ASCII definition. Not used in ucase()/lcase() which handle unicode.
 inline const var LOWERCASE_ = "abcdefghijklmnopqrstuvwxyz";
 inline const var UPPERCASE_ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -1955,13 +1952,7 @@ inline const var PLATFORM_ = "x64";
 inline const var PLATFORM_ = "x86";
 #endif
 
-//#ifndef EXO_MV_CPP
-//	extern
-//	DLL_PUBLIC int DBTRACE;
-//#else
-//	DLL_PUBLIC int DBTRACE=false;
-//#endif
-
+// A global flag used in mvdbpostgres
 [[maybe_unused]] static inline int DBTRACE=var().osgetenv("EXO_DBTRACE");
 
 // following are all not thread safe since they are at global scope and not const
@@ -2021,15 +2012,15 @@ DLL_PUBLIC inline exodus::var EXECPATH2 = "";
 DLL_PUBLIC inline bool TERMINATE_req = false;
 DLL_PUBLIC inline bool RELOAD_req = false;
 
-//void DLL_PUBLIC output(const var& var1);
-//void DLL_PUBLIC outputl(const var& var1 DEFAULT_EMPTY_STRING);
-//void DLL_PUBLIC outputt(const var& var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC output(CVR var1);
+//void DLL_PUBLIC outputl(CVR var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC outputt(CVR var1 DEFAULT_EMPTY_STRING);
 
-//void DLL_PUBLIC errput(const var& var1);
-//void DLL_PUBLIC errputl(const var& var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC errput(CVR var1);
+//void DLL_PUBLIC errputl(CVR var1 DEFAULT_EMPTY_STRING);
 
-//void DLL_PUBLIC logput(const var& var1);
-//void DLL_PUBLIC logputl(const var& var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC logput(CVR var1);
+//void DLL_PUBLIC logputl(CVR var1 DEFAULT_EMPTY_STRING);
 
 var DLL_PUBLIC backtrace();
 
@@ -2050,7 +2041,7 @@ var DLL_PUBLIC getexecpath();
 // but doesnt get stack since stop() is called normally
 class DLL_PUBLIC MVStop {
    public:
-	explicit MVStop(const var& var1 DEFAULT_EMPTY_STRING);
+	explicit MVStop(CVR var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -2058,7 +2049,7 @@ class DLL_PUBLIC MVStop {
 // but doesnt get stack since abort() is called normally
 class DLL_PUBLIC MVAbort {
    public:
-	explicit MVAbort(const var& var1 DEFAULT_EMPTY_STRING);
+	explicit MVAbort(CVR var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -2066,7 +2057,7 @@ class DLL_PUBLIC MVAbort {
 // but doesnt get stack since abortall() is called normally
 class DLL_PUBLIC MVAbortAll {
    public:
-	explicit MVAbortAll(const var& var1 DEFAULT_EMPTY_STRING);
+	explicit MVAbortAll(CVR var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -2074,7 +2065,7 @@ class DLL_PUBLIC MVAbortAll {
 // but doesnt get stack since abortall() is called normally
 class DLL_PUBLIC MVLogoff {
    public:
-	explicit MVLogoff(const var& var1 DEFAULT_EMPTY_STRING);
+	explicit MVLogoff(CVR var1 DEFAULT_EMPTY_STRING);
 	var description;
 };
 
@@ -2082,7 +2073,7 @@ class DLL_PUBLIC MVLogoff {
 // exceptions generally
 class DLL_PUBLIC MVError {
    public:
-	explicit MVError(const var& description);
+	explicit MVError(CVR description);
 	var description;
 	var stack;
 };
@@ -2090,19 +2081,19 @@ class DLL_PUBLIC MVError {
 // clang-format off
 
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
-class DLL_PUBLIC MVDivideByZero		: public MVError {public: explicit MVDivideByZero         (const var& var1    );};
-class DLL_PUBLIC MVNonNumeric		: public MVError {public: explicit MVNonNumeric           (const var& var1    );};
-class DLL_PUBLIC MVIntOverflow		: public MVError {public: explicit MVIntOverflow          (const var& var1    );};
-class DLL_PUBLIC MVIntUnderflow		: public MVError {public: explicit MVIntUnderflow         (const var& var1    );};
-class DLL_PUBLIC MVOutOfMemory		: public MVError {public: explicit MVOutOfMemory          (const var& var1    );};
-class DLL_PUBLIC MVUnassigned		: public MVError {public: explicit MVUnassigned           (const var& var1    );};
-class DLL_PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined            (const var& var1    );};
-class DLL_PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (const var& var1    );};
-class DLL_PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (const var& var1    );};
-class DLL_PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (const var& var1    );};
-class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (const var& var1 DEFAULT_EMPTY_STRING);};
+class DLL_PUBLIC MVDivideByZero		: public MVError {public: explicit MVDivideByZero         (CVR var1    );};
+class DLL_PUBLIC MVNonNumeric		: public MVError {public: explicit MVNonNumeric           (CVR var1    );};
+class DLL_PUBLIC MVIntOverflow		: public MVError {public: explicit MVIntOverflow          (CVR var1    );};
+class DLL_PUBLIC MVIntUnderflow		: public MVError {public: explicit MVIntUnderflow         (CVR var1    );};
+class DLL_PUBLIC MVOutOfMemory		: public MVError {public: explicit MVOutOfMemory          (CVR var1    );};
+class DLL_PUBLIC MVUnassigned		: public MVError {public: explicit MVUnassigned           (CVR var1    );};
+class DLL_PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined            (CVR var1    );};
+class DLL_PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
+class DLL_PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (CVR var1    );};
+class DLL_PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (CVR var1    );};
+class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_EMPTY_STRING);};
 class DLL_PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
-class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(const var& var1    );};
+class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(CVR var1    );};
 class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};
 
 // clang-format on
@@ -2113,7 +2104,5 @@ var operator""_var(unsigned long long int i);
 var operator""_var(long double d);
 
 }  // namespace exodus
-
-//#include <exodus/mvlibs.h>
 
 #endif	// MV_H

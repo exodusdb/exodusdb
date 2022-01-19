@@ -29,6 +29,8 @@ Binary    Hex          Comments
 11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
 */
 
+#include <mutex> //for lock_guard
+
 #if __has_include(<signal.h>)
 #include <signal.h>	 //for raise(SIGTRAP)
 #endif
@@ -99,6 +101,9 @@ bool desynced_with_stdio = false;
 // TODO check that all string increase operations dont crash the system
 
 namespace exodus {
+
+static std::mutex global_mutex_threadstream;
+#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
 
 int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html

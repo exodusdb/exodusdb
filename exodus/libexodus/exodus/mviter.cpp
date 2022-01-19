@@ -19,6 +19,10 @@
 
 namespace exodus {
 
+///////////
+// var_iter
+///////////
+
 //CONSTRUCTOR from a var (ie begin())
 var_iter::var_iter(const var& v)
 	: data(&v){}
@@ -83,4 +87,56 @@ DLL_PUBLIC var_iter end([[maybe_unused]] const var& v) {
 	return var_iter();
 }
 
+///////////
+// dim_iter
+///////////
+
+//CONSTRUCTOR from a dim (ie begin())
+dim_iter::dim_iter(const dim& d)
+	: data(&d){}
+
+//check iter != iter (i.e. iter != end()
+bool dim_iter::operator!=(const dim_iter& di) {
+	return this->index != di.index;
+}
+
+//CONVERSION - conversion to var
+dim_iter::operator var*() {
+	return &data->data_[index];
+}
+
+//INCREMENT
+dim_iter dim_iter::operator++() {
+
+	index++;
+
+	return *this;
+}
+
+//DECREMENT
+dim_iter dim_iter::operator--() {
+
+	index--;
+
+	return *this;
+}
+
+void dim_iter::end() {
+	index = data->nrows_ * data->ncols_ + 1;
+}
+
+//BEGIN - free function to create an iterator -> begin
+DLL_PUBLIC dim_iter begin(const dim& d) {
+	return dim_iter(d);
+}
+
+//END - free function to create an interator -> end
+DLL_PUBLIC dim_iter end(const dim& d) {
+	dim_iter di(d);
+	di.end();
+	return di;
+}
+
 }  //namespace exodus
+
+

@@ -67,7 +67,7 @@ dim::dim(int rows, int cols)
 }
 
 bool dim::read(const var& filehandle, const var& key) {
-	THISIS("bool dim::matread(const var& filehandle, const var& key)")
+	THISIS("bool dim::read(const var& filehandle, const var& key)")
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
@@ -89,12 +89,64 @@ bool dim::read(const var& filehandle, const var& key) {
 }
 
 bool dim::write(const var& filehandle, const var& key) const {
-	THISIS("bool dim::matwrite(const var& filehandle, const var& key) const")
+	THISIS("bool dim::write(const var& filehandle, const var& key) const")
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
 	var temprecord = this->join();
 	return temprecord.write(filehandle, key);
+}
+
+bool dim::osread(const var& osfilename, const var& codepage /*=0*/) {\
+	THISIS("bool dim::osread(const var& osfilename, const var& codepage = \"\")")
+	ISSTRING(osfilename)
+	ISSTRING(codepage)
+
+	var txt;
+	if (not txt.osread(osfilename, codepage))
+		return false;
+
+	int n = this->split(txt, '\n');
+
+	// If the first line ended with \r\n then we need to remove trailing \r from every element
+	if (!this->data_[1].var_str.empty() && this->data_[1].var_str.back() == '\r') {
+		for (int i = 1; i <= n; i++) {
+			if (!this->data_[i].var_str.empty())
+				//Assume all \n were preceeded by \r. No standalone \n chars.
+				this->data_[i].var_str.pop_back();
+		}
+	}
+
+	return true;
+}
+
+bool dim::oswrite(const var& osfilename, const var& codepage /*=0*/) const {
+	THISIS("bool dim::oswrite(const var& osfilename, const var& codepage = \"\")")
+	ISSTRING(osfilename)
+	ISSTRING(codepage)
+
+	//TODO option for linesep to be \r\n
+	static char linesep = '\n';
+
+	var txt = this->join(linesep);
+
+	// Join suppresses trailing empty elements
+	// So append a trailing linesep since text files should end with one
+	txt.var_str.push_back(linesep);
+
+	return txt.oswrite(osfilename, codepage);
+}
+
+var dim::rows() const {
+	if (!this->initialised_)
+		throw MVArrayNotDimensioned();
+	return nrows_;
+}
+
+var dim::cols() const {
+	if (!this->initialised_)
+		throw MVArrayNotDimensioned();
+	return ncols_;
 }
 
 bool dim::redim(int rows, int cols) {
@@ -294,7 +346,7 @@ var dim::split(const var& str1, const var& separator) {
 	std::string::size_type start_pos = 0;
 	std::string::size_type next_pos = 0;
 	int fieldno;
-	for (fieldno = 1; fieldno <= this->nrows_;) {
+	for (fieldno = 1; fieldno <= this->nrows_;/*no limit*/) {
 
 		// find the next FM delimiter
 		//next_pos = str1.var_str.find(FM_, start_pos);
@@ -311,6 +363,7 @@ var dim::split(const var& str1, const var& separator) {
 
 		start_pos = next_pos + sepsize;
 		fieldno++;
+
 	}
 
 	int nfields = fieldno;

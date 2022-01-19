@@ -44,6 +44,12 @@ THE SOFTWARE.
 // add global function type syntax to the exodus users
 namespace exodus {
 
+// Removed to reduce compile time of exodus programs. Use .output() .errput() and .logput() for threadsafe output.
+// print() errput() logput() to output all arguments together in a thread-safe manner
+//static std::mutex global_mutex_threadstream;
+//#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
+#define LOCKIOSTREAM
+
 DLL_PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno);
 
 DLL_PUBLIC ND var osgetenv(const var& name = "");
@@ -381,7 +387,8 @@ DLL_PUBLIC void printt() {
 // printt(...) default sep is tab. always adds a sep (tab) on the end. No flush
 template <auto sep = '\t', typename... Printable>
 DLL_PUBLIC void printt(const Printable&... values) {
-	LOCKIOSTREAM((std::cout << values << sep), ...);
+	LOCKIOSTREAM
+	((std::cout << values << sep), ...);
 }
 
 //output
@@ -390,13 +397,15 @@ DLL_PUBLIC void printt(const Printable&... values) {
 // output() BINARY TRANSPARENT version of print(). No automatic separators. No flush
 template <typename... Printable>
 DLL_PUBLIC void output(const Printable&... value) {
-	LOCKIOSTREAM(var(value).output(), ...);
+	LOCKIOSTREAM
+	(var(value).output(), ...);
 }
 
 // outputl() BINARY TRANSPARENT version of printl(). No automatic separators. No flush
 template <typename... Printable>
 DLL_PUBLIC void outputl(const Printable&... value) {
-	LOCKIOSTREAM(var(value).output(), ...);
+	LOCKIOSTREAM
+	(var(value).output(), ...);
 	var("").outputl();
 }
 

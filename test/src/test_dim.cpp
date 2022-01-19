@@ -162,6 +162,31 @@ function main() {
 	assert(array.a(6)=="620]610]62]61");
 	assert(array.a(7)=="720]710]72]71");
 
+	//test reading and writing text files into and from dim arrays
+	{
+		var osfilename="t_dim_rw.txt";
+		var txt = "a\nb\n\nc";
+		assert(oswrite(txt on osfilename));
+
+		// test reading a test file into a dim array
+		dim d1;
+		assert(d1.osread(osfilename));
+		assert(d1.join("\n") eq txt);
+
+		// Test writing a dim array to a text file
+		d1(3) = "bb";
+		TRACE(d1.join());
+		txt = "a\nb\nbb\nc\n";
+		TRACE(txt);
+		assert(d1.oswrite(osfilename));
+		assert(d1.osread(osfilename));
+		TRACE(d1.join("\n"));
+		//assert((d1.join("\n") ^ "\n") eq txt);
+		assert(d1.join("\n") eq txt);
+
+		//assert(osdelete(osfilename));
+	}
+
 	printl("Test passed");
 
 	return 0;
