@@ -2422,6 +2422,7 @@ exodus_call:
 		if (sqlexpression.substr(1, 20) == "exodus_extract_date(" || sqlexpression.substr(1, 20) == "exodus_extract_time(")
 			sqlexpression.splicer(20, 0, "_array");
 		else {
+			sqlexpression.replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
 			// Note 3rd argument '' means convert empty multivalues to nullptr in the array
