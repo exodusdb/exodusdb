@@ -36,7 +36,7 @@ inline std::wstring fromutf8(const char* start, const int length) {
 }
 
 // this function is started as a thread by startipc()
-int MVipc(const int environmentn, var& pgconnparams);
+int MVipc(const int environmentn, VARREF pgconnparams);
 
 void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars, std::string& response, ExodusFunctorBase& exodusfunctorbase);
 

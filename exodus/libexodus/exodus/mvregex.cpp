@@ -126,8 +126,8 @@ var var::iconv_MT() const {
 
 // OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
 // regular expressions for ICONV_MC
-var& var::oconv_MR(const char* conversionchar) {
-	//THISIS("var& var::oconv_MR(const char* conversionchar)")
+VARREF var::oconv_MR(const char* conversionchar) {
+	//THISIS("VARREF var::oconv_MR(const char* conversionchar)")
 	//THISISSTRING()
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 
@@ -238,7 +238,7 @@ var& var::oconv_MR(const char* conversionchar) {
 	return *this;
 }
 
-syntax_flags_typ get_regex_syntax_flags(const var& options) {
+syntax_flags_typ get_regex_syntax_flags(CVR options) {
 	// determine options from string
 
 	// default
@@ -277,11 +277,11 @@ syntax_flags_typ get_regex_syntax_flags(const var& options) {
 }
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::match(const var& matchstr, const var& options) const {
+var var::match(CVR matchstr, CVR options) const {
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
 	// https:www.debuggex.com
 
-	THISIS("bool var::match(const var& matchstr, const var& options) const")
+	THISIS("bool var::match(CVR matchstr, CVR options) const")
 	THISISSTRING()
 	ISSTRING(matchstr)
 
@@ -430,19 +430,19 @@ var var::match(const var& matchstr, const var& options) const {
 }
 
 // simple case sensitive substr replacement
-var var::swap(const var& what, const var& with) const& {
+var var::swap(CVR what, CVR with) const& {
 	var newmv = *this;
 	return newmv.swapper(what, with);
 }
 
 // on temporaries
-var& var::swap(const var& what, const var& with) && {
+VARREF var::swap(CVR what, CVR with) && {
 	return this->swapper(what, with);
 }
 
 // in-place
-var& var::swapper(const var& what, const var& with) {
-	THISIS("var& var::swapper(const var& what, const var& with)")
+VARREF var::swapper(CVR what, CVR with) {
+	THISIS("VARREF var::swapper(CVR what, CVR with)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(what)
 	ISSTRING(with)
@@ -467,20 +467,20 @@ var& var::swapper(const var& what, const var& with) {
 
 //regex based string replacement
 // only here really because boost regex is included here for file matching
-var var::replace(const var& regexstr, const var& replacementstr, const var& options) const& {
+var var::replace(CVR regexstr, CVR replacementstr, CVR options) const& {
 	var newmv = *this;
 	return newmv.replacer(regexstr, replacementstr, options);
 }
 
 // on temporary
-var& var::replace(const var& regexstr, const var& replacementstr, const var& options) && {
+VARREF var::replace(CVR regexstr, CVR replacementstr, CVR options) && {
 	return this->replacer(regexstr, replacementstr, options);
 }
 
 // in-place
-var& var::replacer(const var& regexstr, const var& replacementstr, const var& options) {
+VARREF var::replacer(CVR regexstr, CVR replacementstr, CVR options) {
 	THISIS(
-		"var& var::replacer(const var& regexstr, const var& replacementstr, const var& "
+		"VARREF var::replacer(CVR regexstr, CVR replacementstr, CVR "
 		"options)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(regexstr)

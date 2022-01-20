@@ -118,7 +118,7 @@ BOOL ConnectToNewClient(HANDLE, LPOVERLAPPED);
 PIPEINST Pipe[INSTANCES];
 HANDLE hEvents[INSTANCES];
 
-int MVipc(const int environmentn, var& pgconnparams) {
+int MVipc(const int environmentn, VARREF pgconnparams) {
 
 	// TODO
 

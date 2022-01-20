@@ -103,7 +103,7 @@ var var::rnd() const {
 }
 
 void var::initrnd() const {
-	THISIS("void var::initrnd(const var& seed) const")
+	THISIS("void var::initrnd(CVR seed) const")
 	THISISDEFINED()
 
 	// Get a seed for the RNG
@@ -135,8 +135,8 @@ void var::initrnd() const {
 	thread_RNG = std::make_unique<RNG_typ>(seed);
 }
 
-bool var::osgetenv(const var& envvarname) {
-	THISIS("bool var::osgetenv(const var& envvarname)")
+bool var::osgetenv(CVR envvarname) {
+	THISIS("bool var::osgetenv(CVR envvarname)")
 	THISISDEFINED()
 	ISSTRING(envvarname)
 
@@ -170,8 +170,8 @@ bool var::osgetenv(const var& envvarname) {
 	return true;
 }
 
-bool var::ossetenv(const var& envvarname) const {
-	THISIS("bool var::ossetenv(const var& envvarname) const")
+bool var::ossetenv(CVR envvarname) const {
+	THISIS("bool var::ossetenv(CVR envvarname) const")
 	THISISSTRING()
 	ISSTRING(envvarname)
 

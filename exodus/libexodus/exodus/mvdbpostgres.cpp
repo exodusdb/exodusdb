@@ -132,7 +132,7 @@ std::string getresult(PGresult* pgresult, int rown, int coln) {
 }
 
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
-var get_normal_filename(const var& filename_or_handle) {
+var get_normal_filename(CVR filename_or_handle) {
 	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
 }
 
@@ -141,7 +141,7 @@ var get_normal_filename(const var& filename_or_handle) {
 static const var valuechars("\"'.0123456789-+");
 
 // Get a unique lock number per filename & key to communicate to other connections
-uint64_t mvdbpostgres_hash_filename_and_key(const var& filehandle, const var& key) {
+uint64_t mvdbpostgres_hash_filename_and_key(CVR filehandle, CVR key) {
 
 	std::string fileandkey = get_normal_filename(filehandle);
 	fileandkey.push_back(' ');
@@ -192,7 +192,7 @@ class PGResult {
 	}
 };
 
-int get_mvconn_no(const var& dbhandle) {
+int get_mvconn_no(CVR dbhandle) {
 
 	if (!dbhandle.assigned()) {
 		// var("get_mvconn_no() returning 0 - unassigned").logputl();
@@ -209,7 +209,7 @@ int get_mvconn_no(const var& dbhandle) {
 	return 0;
 }
 
-int get_mvconn_no_or_default(const var& dbhandle) {
+int get_mvconn_no_or_default(CVR dbhandle) {
 
 	int mvconn_no = get_mvconn_no(dbhandle);
 	if (mvconn_no)
@@ -307,7 +307,7 @@ int get_mvconn_no_or_default(const var& dbhandle) {
 // NB in case 2 and 3 the connection id is recorded in the var
 // use void pointer to avoid need for including postgres headers in mv.h or any fancy class
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-PGconn* get_pgconnection(const var& dbhandle) {
+PGconn* get_pgconnection(CVR dbhandle) {
 
 	// var("--- connection ---").logputl();
 	// get the connection associated with *this
@@ -332,7 +332,7 @@ PGconn* get_pgconnection(const var& dbhandle) {
 }
 
 // gets lock_table, associated with connection, associated with this object
-MVConnection* get_mvconnection(const var& dbhandle) {
+MVConnection* get_mvconnection(CVR dbhandle) {
 	int mvconn_no = get_mvconn_no_or_default(dbhandle);
 	if (!mvconn_no)
 		throw MVDBException("get_mvconnection() attempted when not connected");
@@ -340,9 +340,9 @@ MVConnection* get_mvconnection(const var& dbhandle) {
 	return thread_connections.get_mvconnection(mvconn_no);
 }
 
-void var::lasterror(const var& msg) const {
+void var::lasterror(CVR msg) const {
 	// no checking for speed
-	// THISIS("void var::lasterror(const var& msg")
+	// THISIS("void var::lasterror(CVR msg")
 	// ISSTRING(msg)
 
 	// tcache_get (tc_idx=12) at malloc.c:2943
@@ -358,7 +358,7 @@ var var::lasterror() const {
 	return thread_dblasterror ?: "";
 }
 
-static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn);
+static bool get_pgresult(CVR sql, PGResult& pgresult, PGconn* pgconn);
 
 #if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
@@ -409,7 +409,7 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 
 #endif
 
-var var::build_conn_info(const var& conninfo) const {
+var var::build_conn_info(CVR conninfo) const {
 	// priority is
 	// 1) given parameters //or last connection parameters
 	// 2) individual environment parameters
@@ -475,8 +475,8 @@ var var::build_conn_info(const var& conninfo) const {
 
 // var connection;
 // connection.connect2("dbname=exodusbase");
-bool var::connect(const var& conninfo) {
-	THISIS("bool var::connect(const var& conninfo")
+bool var::connect(CVR conninfo) {
+	THISIS("bool var::connect(CVR conninfo")
 	// nb dont log/trace or otherwise output the full connection info without HIDING the
 	// password
 	THISISDEFINED()
@@ -600,8 +600,8 @@ bool var::connect(const var& conninfo) {
 }
 
 // conn1.attach("filename1^filename2...");
-bool var::attach(const var& filenames) {
-	THISIS("bool var::attach(const var& filenames")
+bool var::attach(CVR filenames) {
+	THISIS("bool var::attach(CVR filenames")
 	THISISDEFINED()
 	ISSTRING(filenames)
 
@@ -648,8 +648,8 @@ bool var::attach(const var& filenames) {
 }
 
 // conn1.detach("filename1^filename2...");
-void var::detach(const var& filenames) {
-	THISIS("bool var::detach(const var& filenames")
+void var::detach(CVR filenames) {
+	THISIS("bool var::detach(CVR filenames")
 	THISISDEFINED()
 	ISSTRING(filenames)
 
@@ -741,8 +741,8 @@ void var::disconnectall() {
 // if (not file.open(filename)) ...
 
 // connection is optional and default connection may be used instead
-bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
-	THISIS("bool var::open(const var& filename, const var& connection)")
+bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
+	THISIS("bool var::open(CVR filename, CVR connection)")
 	THISISDEFINED()
 	ISSTRING(filename)
 
@@ -879,8 +879,8 @@ void var::close() {
 	*/
 }
 
-bool var::readv(const var& filehandle, const var& key, const int fieldno) {
-	//THISIS("bool var::readv(const var& filehandle,const var& key,const int fieldno)")
+bool var::readv(CVR filehandle, CVR key, const int fieldno) {
+	//THISIS("bool var::readv(CVR filehandle,CVR key,const int fieldno)")
 	//THISISDEFINED()
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
@@ -894,8 +894,8 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno) {
 	return true;
 }
 
-bool var::reado(const var& filehandle, const var& key) {
-	THISIS("bool var::reado(const var& filehandle,const var& key)")
+bool var::reado(CVR filehandle, CVR key) {
+	THISIS("bool var::reado(CVR filehandle,CVR key)")
 	THISISDEFINED()
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -931,8 +931,8 @@ bool var::reado(const var& filehandle, const var& key) {
 	return result;
 }
 
-bool var::writeo(const var& filehandle, const var& key) const {
-	THISIS("bool var::writeo(const var& filehandle,const var& key)")
+bool var::writeo(CVR filehandle, CVR key) const {
+	THISIS("bool var::writeo(CVR filehandle,CVR key)")
 	THISISSTRING()
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -948,8 +948,8 @@ bool var::writeo(const var& filehandle, const var& key) const {
 	return true;
 }
 
-bool var::deleteo(const var& key) const {
-	THISIS("bool var::deleteo(const var& key)")
+bool var::deleteo(CVR key) const {
+	THISIS("bool var::deleteo(CVR key)")
 	THISISSTRING()
 	ISSTRING(key)
 
@@ -964,8 +964,8 @@ bool var::deleteo(const var& key) const {
 	return true;
 }
 
-bool var::read(const var& filehandle, const var& key) {
-	THISIS("bool var::read(const var& filehandle,const var& key)")
+bool var::read(CVR filehandle, CVR key) {
+	THISIS("bool var::read(CVR filehandle,CVR key)")
 	THISISDEFINED()
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1132,14 +1132,14 @@ var var::hash(const unsigned long long modulus) const {
 // 1  - Success
 // "" - Failure - already locked and not in a transaction
 // 2  - Success - already locked and in a transaction
-var var::lock(const var& key) const {
+var var::lock(CVR key) const {
 
 	// on postgres, repeated locks for the same thing (from the same connection) succeed and
 	// stack up they need the same number of unlocks (from the same connection) before other
 	// connections can take the lock unlock returns true if a lock (your lock) was released and
 	// false if you dont have the lock NB return "" if ALREADY locked on this connection
 
-	THISIS("var var::lock(const var& key) const")
+	THISIS("var var::lock(CVR key) const")
 	THISISDEFINED()
 	ISSTRING(key)
 
@@ -1207,9 +1207,9 @@ var var::lock(const var& key) const {
 
 }
 
-bool var::unlock(const var& key) const {
+bool var::unlock(CVR key) const {
 
-	THISIS("void var::unlock(const var& key) const")
+	THISIS("void var::unlock(CVR key) const")
 	THISISDEFINED()
 	ISSTRING(key)
 
@@ -1290,7 +1290,7 @@ bool var::unlockall() const {
 }
 
 // returns only success or failure so any response is logged and saved for future lasterror() call
-bool var::sqlexec(const var& sql) const {
+bool var::sqlexec(CVR sql) const {
 	var response = -1;	//no response required
 	bool ok = this->sqlexec(sql, response);
 	if (!ok) {
@@ -1306,8 +1306,8 @@ bool var::sqlexec(const var& sql) const {
 }
 
 // returns success or failure, and response = data or errmsg (response can be preset to max number of tuples)
-bool var::sqlexec(const var& sqlcmd, var& response) const {
-	THISIS("bool var::sqlexec(const var& sqlcmd, var& response) const")
+bool var::sqlexec(CVR sqlcmd, VARREF response) const {
+	THISIS("bool var::sqlexec(CVR sqlcmd, VARREF response) const")
 	ISSTRING(sqlcmd)
 
 	auto pgconn = get_pgconnection(*this);
@@ -1374,11 +1374,11 @@ bool var::sqlexec(const var& sqlcmd, var& response) const {
 
 // writev writes a specific field number in a record
 //(why it is "writev" instead of "writef" isnt known!
-bool var::writev(const var& filehandle, const var& key, const int fieldno) const {
+bool var::writev(CVR filehandle, CVR key, const int fieldno) const {
 	if (fieldno <= 0)
 		return write(filehandle, key);
 
-	THISIS("bool var::writev(const var& filehandle,const var& key,const int fieldno) const")
+	THISIS("bool var::writev(CVR filehandle,CVR key,const int fieldno) const")
 	// will be duplicated in read and write but do here to present the correct function name on
 	// error
 	THISISSTRING()
@@ -1400,12 +1400,12 @@ bool var::writev(const var& filehandle, const var& key, const int fieldno) const
 }
 
 /* "prepared statement" version doesnt seem to make much difference approx -10% - possibly because
-two field file is so simple bool var::write(const var& filehandle,const var& key) const {}
+two field file is so simple bool var::write(CVR filehandle,CVR key) const {}
 */
 
 //"update if present or insert if not" is handled in postgres using ON CONFLICT clause
-bool var::write(const var& filehandle, const var& key) const {
-	THISIS("bool var::write(const var& filehandle, const var& key) const")
+bool var::write(CVR filehandle, CVR key) const {
+	THISIS("bool var::write(CVR filehandle, CVR key) const")
 	THISISSTRING()
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1470,8 +1470,8 @@ bool var::write(const var& filehandle, const var& key) const {
 
 //"updaterecord" is non-standard for pick - but allows "write only if already exists" logic
 
-bool var::updaterecord(const var& filehandle, const var& key) const {
-	THISIS("bool var::updaterecord(const var& filehandle,const var& key) const")
+bool var::updaterecord(CVR filehandle, CVR key) const {
+	THISIS("bool var::updaterecord(CVR filehandle,CVR key) const")
 	THISISSTRING()
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1527,8 +1527,8 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 //"insertrecord" is non-standard for pick - but allows faster writes under "write only if doesnt
 // already exist" logic
 
-bool var::insertrecord(const var& filehandle, const var& key) const {
-	THISIS("bool var::insertrecord(const var& filehandle,const var& key) const")
+bool var::insertrecord(CVR filehandle, CVR key) const {
+	THISIS("bool var::insertrecord(CVR filehandle,CVR key) const")
 	THISISSTRING()
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1583,8 +1583,8 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	return true;
 }
 
-bool var::deleterecord(const var& key) const {
-	THISIS("bool var::deleterecord(const var& key) const")
+bool var::deleterecord(CVR key) const {
+	THISIS("bool var::deleterecord(CVR key) const")
 	THISISSTRING()
 	ISSTRING(key)
 
@@ -1850,12 +1850,12 @@ bool var::statustrans() const {
 // connectionhandle.connect("connection string pars");
 // connectionhandle.dbcreate("mynewdb");
 
-bool var::dbcreate(const var& dbname) const {
+bool var::dbcreate(CVR dbname) const {
 	return this->dbcopy(var(""), dbname);
 }
 
-bool var::dbcopy(const var& from_dbname, const var& to_dbname) const {
-	THISIS("bool var::dbcreate(const var& from_dbname, const var& to_dbname)")
+bool var::dbcopy(CVR from_dbname, CVR to_dbname) const {
+	THISIS("bool var::dbcreate(CVR from_dbname, CVR to_dbname)")
 	THISISDEFINED()
 	ISSTRING(from_dbname)
 	ISSTRING(to_dbname)
@@ -1892,16 +1892,16 @@ bool var::dbcopy(const var& from_dbname, const var& to_dbname) const {
 
 }
 
-bool var::dbdelete(const var& dbname) const {
-	THISIS("bool var::dbdelete(const var& dbname)")
+bool var::dbdelete(CVR dbname) const {
+	THISIS("bool var::dbdelete(CVR dbname)")
 	THISISDEFINED()
 	ISSTRING(dbname)
 
 	return this->sqlexec("DROP DATABASE " ^ dbname);
 }
 
-bool var::createfile(const var& filename) const {
-	THISIS("bool var::createfile(const var& filename)")
+bool var::createfile(CVR filename) const {
+	THISIS("bool var::createfile(CVR filename)")
 	THISISDEFINED()
 	ISSTRING(filename)
 
@@ -1923,8 +1923,8 @@ bool var::createfile(const var& filename) const {
 		return filename.sqlexec(sql);
 }
 
-bool var::renamefile(const var& filename, const var& newfilename) const {
-	THISIS("bool var::renamefile(const var& filename, const var& newfilename)")
+bool var::renamefile(CVR filename, CVR newfilename) const {
+	THISIS("bool var::renamefile(CVR filename, CVR newfilename)")
 	THISISDEFINED()
 	ISSTRING(filename)
 	ISSTRING(newfilename)
@@ -1937,8 +1937,8 @@ bool var::renamefile(const var& filename, const var& newfilename) const {
 		return filename.sqlexec(sql);
 }
 
-bool var::deletefile(const var& filename) const {
-	THISIS("bool var::deletefile(const var& filename)")
+bool var::deletefile(CVR filename) const {
+	THISIS("bool var::deletefile(CVR filename)")
 	THISISDEFINED()
 	ISSTRING(filename)
 
@@ -1967,8 +1967,8 @@ bool var::deletefile(const var& filename) const {
 		return filename.sqlexec(sql);
 }
 
-bool var::clearfile(const var& filename) const {
-	THISIS("bool var::clearfile(const var& filename)")
+bool var::clearfile(CVR filename) const {
+	THISIS("bool var::clearfile(CVR filename)")
 	THISISDEFINED()
 	ISSTRING(filename)
 
@@ -1979,14 +1979,14 @@ bool var::clearfile(const var& filename) const {
 		return filename.sqlexec(sql);
 }
 
-inline void unquoter_inline(var& string) {
+inline void unquoter_inline(VARREF string) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
 	if (quotecharacters.index(string[1]))
 		string = string.substr(2, string.length() - 2);
 }
 
-inline void tosqlstring(var& string1) {
+inline void tosqlstring(VARREF string1) {
 
 	// if double quoted then convert to sql style single quoted strings
 	// double up any internal single quotes
@@ -2000,7 +2000,7 @@ inline void tosqlstring(var& string1) {
 	}
 }
 
-inline var get_fileexpression(const var& mainfilename, const var& filename, const var& keyordata) {
+inline var get_fileexpression(CVR mainfilename, CVR filename, CVR keyordata) {
 
 	// evade warning: unused parameter mainfilename
 	if (false && mainfilename) {
@@ -2022,7 +2022,7 @@ inline var get_fileexpression(const var& mainfilename, const var& filename, cons
 	// "coalesce(" ^ expression ^", ''::text)";
 }
 
-var get_dictexpression(const var& cursor, const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& unnests, var& selects, var& ismv, bool forsort) {
+var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, VARREF ismv, bool forsort) {
 
 	//cursor is required to join any calculated fields in any second pass
 
@@ -2252,7 +2252,7 @@ var get_dictexpression(const var& cursor, const var& mainfilename, const var& fi
 			if (xlatemode == "X" || xlatemode == "C") {
 
 				// determine the expression in the xlate target file
-				// var& todictexpression=sqlexpression;
+				// VARREF todictexpression=sqlexpression;
 				if (xlatetargetfieldname.isnum()) {
 					sqlexpression =
 						"exodus_extract_text(" ^
@@ -2480,8 +2480,8 @@ exodus_call:
 	return sqlexpression;
 }
 
-// var getword(var& remainingwords, const var& joinvalues=false)
-var getword(var& remainingwords, var& ucword) {
+// var getword(VARREF remainingwords, CVR joinvalues=false)
+var getword(VARREF remainingwords, VARREF ucword) {
 
 	// gets the next word
 	// or a series of words separated by FM while they are numbers or quoted strings)
@@ -2584,8 +2584,8 @@ var getword(var& remainingwords, var& ucword) {
 	return word1;
 }
 
-bool var::saveselect(const var& filename) {
-	THISIS("bool var::saveselect(const var& filename) const")
+bool var::saveselect(CVR filename) {
+	THISIS("bool var::saveselect(CVR filename) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	// THISISDEFINED()
 	ISSTRING(filename)
@@ -2620,7 +2620,7 @@ bool var::saveselect(const var& filename) {
 	return recn > 0;
 }
 
-void to_extract_text(var& dictexpression) {
+void to_extract_text(VARREF dictexpression) {
 				dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
 				dictexpression.replacer("^exodus_extract_sort\\(", "exodus_extract_text\\(");
 				dictexpression.replacer("^exodus_extract_date\\(", "exodus_extract_text\\(");
@@ -2628,8 +2628,8 @@ void to_extract_text(var& dictexpression) {
 				dictexpression.replacer("^exodus_extract_datetime\\(", "exodus_extract_text\\(");
 }
 
-bool var::select(const var& sortselectclause) {
-	THISIS("bool var::select(const var& sortselectclause) const")
+bool var::select(CVR sortselectclause) {
+	THISIS("bool var::select(CVR sortselectclause) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	THISISDEFINED()
 	ISSTRING(sortselectclause)
@@ -2642,7 +2642,7 @@ bool var::select(const var& sortselectclause) {
 
 // currently only called from select, selectrecord and getlist
 // TODO merge into plain select()
-bool var::selectx(const var& fieldnames, const var& sortselectclause) {
+bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// private - and arguments are left unchecked for speed
 	//?allow undefined usage like var xyz=xyz.select();
 	if (var_typ & VARTYP_MASK) {
@@ -3357,7 +3357,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			if (op == "]") {
 
 				var expression = "";
-				for (var& subvalue : value) {
+				for (VARREF subvalue : value) {
 					/* ordinary UTF8 collation strangely doesnt sort single punctuation characters along with phrases starting with the same
 					   so we will use C collation which does. All so that we can use BETWEEN instead of LIKE to support STARTING WITH syntax
 
@@ -3890,7 +3890,7 @@ void var::clearselect() {
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 // bool readnextx(const std::string& cursor, PGresultptr& pgresult)
 // called by readnext (and perhaps hasnext/select to implement LISTACTIVE)
-bool readnextx(const var& cursor, PGResult& pgresult, PGconn* pgconn, bool forwards) {
+bool readnextx(CVR cursor, PGResult& pgresult, PGconn* pgconn, bool forwards) {
 	var sql;
 	if (forwards)
 		sql = "FETCH NEXT in cursor1_" ^ cursor.a(1).convert(".", "_");
@@ -3950,8 +3950,8 @@ bool readnextx(const var& cursor, PGResult& pgresult, PGconn* pgconn, bool forwa
 	return true;
 }
 
-bool var::deletelist(const var& listname) const {
-	THISIS("bool var::deletelist(const var& listname) const")
+bool var::deletelist(CVR listname) const {
+	THISIS("bool var::deletelist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	// THISISDEFINED()
 	ISSTRING(listname)
@@ -3980,9 +3980,9 @@ bool var::deletelist(const var& listname) const {
 	return true;
 }
 
-bool var::savelist(const var& listname) {
+bool var::savelist(CVR listname) {
 
-	THISIS("bool var::savelist(const var& listname)")
+	THISIS("bool var::savelist(CVR listname)")
 	//?allow undefined usage like var xyz=xyz.select();
 	// THISISDEFINED()
 	ISSTRING(listname)
@@ -4041,8 +4041,8 @@ bool var::savelist(const var& listname) {
 	return listno > 0;
 }
 
-bool var::getlist(const var& listname) {
-	THISIS("bool var::getlist(const var& listname) const")
+bool var::getlist(CVR listname) {
+	THISIS("bool var::getlist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	// THISISDEFINED()
 	ISSTRING(listname)
@@ -4084,8 +4084,8 @@ bool var::getlist(const var& listname) {
 }
 
 //TODO make it work for multiple keys or select list
-bool var::formlist(const var& keys, const var& fieldno) {
-	THISIS("bool var::formlist(const var& keys, const var& fieldno)")
+bool var::formlist(CVR keys, CVR fieldno) {
+	THISIS("bool var::formlist(CVR keys, CVR fieldno)")
 	//?allow undefined usage like var xyz=xyz.select();
 	THISISSTRING()
 	ISSTRING(keys)
@@ -4115,8 +4115,8 @@ bool var::formlist(const var& keys, const var& fieldno) {
 // since the most common usage is to omit listname in which case the keys will be used to simulate a
 // SELECT statement Making a list can be done simply by writing the keys into the list file without
 // using this function
-bool var::makelist(const var& listname, const var& keys) {
-	THISIS("bool var::makelist(const var& listname)")
+bool var::makelist(CVR listname, CVR keys) {
+	THISIS("bool var::makelist(CVR listname)")
 	//?allow undefined usage like var xyz=xyz.select();
 	THISISDEFINED()
 	ISSTRING(listname)
@@ -4249,12 +4249,12 @@ bool var::hasnext() {
 	return true;
 }
 
-bool var::readnext(var& key) {
+bool var::readnext(VARREF key) {
 	var valueno;
 	return this->readnext(key, valueno);
 }
 
-bool var::readnext(var& key, var& valueno) {
+bool var::readnext(VARREF key, VARREF valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK) {
@@ -4266,7 +4266,7 @@ bool var::readnext(var& key, var& valueno) {
 	// default cursor is ""
 	this->unassigned("");
 
-	THISIS("bool var::readnext(var& key, var& valueno) const")
+	THISIS("bool var::readnext(VARREF key, VARREF valueno) const")
 	THISISSTRING()
 
 	var record;
@@ -4290,7 +4290,7 @@ bool var::readnext(var& key, var& valueno) {
 	}
 #endif
 
-bool var::readnext(var& record, var& key, var& valueno) {
+bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
@@ -4302,7 +4302,7 @@ bool var::readnext(var& record, var& key, var& valueno) {
 	// default cursor is ""
 	this->unassigned("");
 
-	THISIS("bool var::readnext(var& record, var& key, var& valueno) const")
+	THISIS("bool var::readnext(VARREF record, VARREF key, VARREF valueno) const")
 	THISISSTRING()
 	ISDEFINED(key)
 	ISDEFINED(record)
@@ -4427,8 +4427,8 @@ bool var::readnext(var& record, var& key, var& valueno) {
 	return true;
 }
 
-bool var::createindex(const var& fieldname0, const var& dictfile) const {
-	THISIS("bool var::createindex(const var& fieldname, const var& dictfile) const")
+bool var::createindex(CVR fieldname0, CVR dictfile) const {
+	THISIS("bool var::createindex(CVR fieldname, CVR dictfile) const")
 	THISISSTRING()
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
@@ -4515,8 +4515,8 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	return true;
 }
 
-bool var::deleteindex(const var& fieldname0) const {
-	THISIS("bool var::deleteindex(const var& fieldname) const")
+bool var::deleteindex(CVR fieldname0) const {
+	THISIS("bool var::deleteindex(CVR fieldname) const")
 	THISISSTRING()
 	ISSTRING(fieldname0)
 
@@ -4649,8 +4649,8 @@ bool var::cursorexists() {
 	return ok;
 }
 
-var var::listindexes(const var& filename0, const var& fieldname0) const {
-	THISIS("var var::listindexes(const var& filename) const")
+var var::listindexes(CVR filename0, CVR fieldname0) const {
+	THISIS("var var::listindexes(CVR filename) const")
 	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
 	ISSTRING(filename0)
@@ -4717,8 +4717,8 @@ var var::listindexes(const var& filename0, const var& fieldname0) const {
 	return indexnames;
 }
 
-var var::reccount(const var& filename0) const {
-	THISIS("var var::reccount(const var& filename_or_handle_or_null) const")
+var var::reccount(CVR filename0) const {
+	THISIS("var var::reccount(CVR filename_or_handle_or_null) const")
 	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
 	ISSTRING(filename0)
@@ -4754,9 +4754,9 @@ var var::reccount(const var& filename0) const {
 	return reccount;
 }
 
-var var::flushindex(const var& filename) const {
+var var::flushindex(CVR filename) const {
 	THISIS(
-		"var var::flushindex(const var& filename="
+		"var var::flushindex(CVR filename="
 		") const")
 	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
@@ -4793,7 +4793,7 @@ var var::flushindex(const var& filename) const {
 // returns 1 for success
 // returns 0 for failure
 // pgresult is returned to caller to extract any data and call PQclear(pgresult) in destructor of PGResult
-static bool get_pgresult(const var& sql, PGResult& pgresult, PGconn* pgconn) {
+static bool get_pgresult(CVR sql, PGResult& pgresult, PGconn* pgconn) {
 	DEBUG_LOG_SQL
 
 	/* dont use PQexec because is cannot be told to return binary results

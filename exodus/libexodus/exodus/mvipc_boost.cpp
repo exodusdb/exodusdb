@@ -92,7 +92,7 @@ void closeipcqueues(const std::string& requestqueuename, const std::string& resp
 }
 
 // this function is started as a thread by startipc()
-int MVipc(const int environmentn, var& pgconnparams) {
+int MVipc(const int environmentn, VARREF pgconnparams) {
 
 	// TODO prevent or handle SELECT in dictionary functions
 

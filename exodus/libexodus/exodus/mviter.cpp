@@ -6,7 +6,7 @@
 //
 //Example:
 //
-// for (const var& v : dynstr) {...}
+// for (CVR v : dynstr) {...}
 //
 //Warning: updating the string probably invalidates the iterator! It is a byte pointer into the string.
 //
@@ -24,7 +24,7 @@ namespace exodus {
 ///////////
 
 //CONSTRUCTOR from a var (ie begin())
-var_iter::var_iter(const var& v)
+var_iter::var_iter(CVR v)
 	: data(&v){}
 
 //check iter != iter (i.e. iter != end()
@@ -78,12 +78,12 @@ var_iter var_iter::operator++() {
 }
 
 //BEGIN - free function to create an iterator -> begin
-DLL_PUBLIC var_iter begin(const var& v) {
+DLL_PUBLIC var_iter begin(CVR v) {
 	return var_iter(v);
 }
 
 //END - free function to create an interator -> end
-DLL_PUBLIC var_iter end([[maybe_unused]] const var& v) {
+DLL_PUBLIC var_iter end([[maybe_unused]] CVR v) {
 	return var_iter();
 }
 

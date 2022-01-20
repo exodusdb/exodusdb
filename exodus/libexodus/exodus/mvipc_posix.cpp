@@ -157,7 +157,7 @@ void closeipcqueues(int sock, std::string& socketpath) {
 }
 
 // this function is started as a thread by startipc()
-int MVipc(const int environmentn, var& pgconnparams) {
+int MVipc(const int environmentn, VARREF pgconnparams) {
 
 	// flag to connect NOT to be recursive and open yet another ipc thread
 	tss_ipcstarted.reset(new bool(true));

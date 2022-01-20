@@ -11,9 +11,9 @@ namespace exodus {
 class ExodusProgramBase {
 
    public:
-	using in = const var&;
-	using io = var&;
-	using out = var&;
+	using in = const var&; // CVR;
+	using io = var&;       // VARREF;
+	using out = var&;      // VARREF;
 	using let = const var;
 
 #include <exodus/ioconv_custom.h>
@@ -55,124 +55,124 @@ class ExodusProgramBase {
 	MvEnvironment& mv;
 
 	// work on CURSOR
-	bool select(const var& sortselectclause_or_filehandle DEFAULT_EMPTY_STRING);
+	bool select(CVR sortselectclause_or_filehandle DEFAULT_STRING);
 	bool hasnext();
-	bool readnext(var& key);
-	bool readnext(var& key, var& valueno);
-	bool readnext(var& record, var& key, var& valueno);
-	bool pushselect(const var& v1, var& v2, var& v3, var& v4);
-	bool popselect(const var& v1, var& v2, var& v3, var& v4);
+	bool readnext(VARREF key);
+	bool readnext(VARREF key, VARREF valueno);
+	bool readnext(VARREF record, VARREF key, VARREF valueno);
+	bool pushselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
+	bool popselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
 	void clearselect();
-	bool deleterecord(const var& filename_or_handle_or_command, const var& key DEFAULT_EMPTY_STRING);
+	bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULT_STRING);
 
-	bool savelist(const var& listname);
-	bool getlist(const var& listname);
-	bool formlist(const var& filename_or_command, const var& keys = "", const var fieldno = 0);
-	bool makelist(const var& listname, const var& keys);
-	bool deletelist(const var& listname);
+	bool savelist(CVR listname);
+	bool getlist(CVR listname);
+	bool formlist(CVR filename_or_command, CVR keys = "", const var fieldno = 0);
+	bool makelist(CVR listname, CVR keys);
+	bool deletelist(CVR listname);
 
-	void note(const var& msg, const var& options = "") const;
-	void note(const var& msg, const var& options, var& buffer, const var& params = "") const;
-	void mssg(const var& msg, const var& options = "") const;
-	void mssg(const var& msg, const var& options, var& buffer, const var& params = "") const;
+	void note(CVR msg, CVR options = "") const;
+	void note(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
+	void mssg(CVR msg, CVR options = "") const;
+	void mssg(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
 
-	var authorised(const var& task0, var& msg, const var& defaultlock = "", const var& username0 = "");
-	var authorised(const var& task0);
+	var authorised(CVR task0, VARREF msg, CVR defaultlock = "", CVR username0 = "");
+	var authorised(CVR task0);
 	void readuserprivs() const;
 	void writeuserprivs() const;
 
-	var capitalise(const var& str0, const var& mode = var(), const var& wordseps = var()) const;
+	var capitalise(CVR str0, CVR mode = var(), CVR wordseps = var()) const;
 
-	var libinfo(const var& command);
-	var perform(const var& sentence);
-	void chain(const var& libraryname);
-	var execute(const var& sentence);
+	var libinfo(CVR command);
+	var perform(CVR sentence);
+	void chain(CVR libraryname);
+	var execute(CVR sentence);
 
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library?
-	var calculate(const var& dictid);
-	var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv = 0);
+	var calculate(CVR dictid);
+	var calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mv = 0);
 
-	var xlate(const var& filename, const var& key, const var& fieldno_or_name, const var& mode);
+	var xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mode);
 	// moved to exodusprogrambase
-	// var perform(const var& sentence);
+	// var perform(CVR sentence);
 
 	// ditto
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library? var
-	// calculate(const var& dictid); var calculate(const var& dictid, const var& dictfile, const
-	// var& id, const var& record, const var& mv=0);
+	// calculate(CVR dictid); var calculate(CVR dictid, CVR dictfile, const
+	// VARREF id, CVR record, CVR mv=0);
 
-	var otherusers(const var& param);
-	var otherdatasetusers(const var& param);
+	var otherusers(CVR param);
+	var otherdatasetusers(CVR param);
 
 	// moved to mvprogram
-	// var capitalise(const var& str0, const var& mode=var(), const var& wordseps=var()) const;
-	////var capitalise(const var& str0, const var& mode="", const var& wordseps="") const;
+	// var capitalise(CVR str0, CVR mode=var(), CVR wordseps=var()) const;
+	////var capitalise(CVR str0, CVR mode="", CVR wordseps="") const;
 
 	void debug() const;
 	bool fsmsg(
-		const var& msg = "") const;	 // always returns false so can be used like return fsmsg();
-	var sysvar(const var& var1, const var& var2, const var& mv3, const var& mv4);
-	void setprivilege(const var& var1);
+		CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
+	var sysvar(CVR var1, CVR var2, CVR mv3, CVR mv4);
+	void setprivilege(CVR var1);
 
 	// NB does not return record yet
-	bool lockrecord(const var& filename, var& file, const var& keyx, const var& recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
-	// bool lockrecord(const var& xfilename, const var& xfile, const var& keyx, const var&
-	// recordx, const var& waitsecs, const bool allowduplicate=false) const;
-	bool lockrecord(const var& filename, var& file, const var& keyx) const;
-	bool unlockrecord(const var& filename, var& file, const var& key) const;
+	bool lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
+	// bool lockrecord(CVR xfilename, CVR xfile, CVR keyx, CVR
+	// recordx, CVR waitsecs, const bool allowduplicate=false) const;
+	bool lockrecord(CVR filename, VARREF file, CVR keyx) const;
+	bool unlockrecord(CVR filename, VARREF file, CVR key) const;
 	//unlock all
 	bool unlockrecord() const;
 
-	var decide(const var& question, const var& options) const;
-	var decide(const var& question, const var& options, var& reply, const int defaultreply = 1) const;
+	var decide(CVR question, CVR options) const;
+	var decide(CVR question, CVR options, VARREF reply, const int defaultreply = 1) const;
 
-	void savescreen(var& origscrn, var& origattr) const;
-	// void ostime(var& ostimenow) const;
+	void savescreen(VARREF origscrn, VARREF origattr) const;
+	// void ostime(VARREF ostimenow) const;
 	var keypressed(int milliseconds = 0) const;
 	bool esctoexit() const;
 
-	//	bool oswritex(const var& str, const var& filename) const;
-	//	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var&
-	// offset) const; 	bool osbreadx(var& str1, const var& filehandle, const var& filename,
-	// const int offset, const int length); 	bool osbreadx(var& str1, const var&
-	// filehandle, const var& filename, var& offset, const int length);
+	//	bool oswritex(CVR str, CVR filename) const;
+	//	bool osbwritex(CVR str1, CVR filehandle, CVR filename, VARREF
+	// offset) const; 	bool osbreadx(VARREF str1, CVR filehandle, CVR filename,
+	// const int offset, const int length); 	bool osbreadx(VARREF str1, CVR
+	// filehandle, CVR filename, VARREF offset, const int length);
 
 	// moved to external function
-	// bool authorised(const var& task, var& msg, const var& defaultlock="");
-	// bool authorised(const var& task);
+	// bool authorised(CVR task, VARREF msg, CVR defaultlock="");
+	// bool authorised(CVR task);
 	// void readuserprivs();
 	// void writeuserprivs();
-	// void sysmsg(const var& msg);
-	// var sendmail(const var& toaddress, const var& subject, const var& body0, const var&
-	// attachfilename, const var& deletex, var& errormsg);
+	// void sysmsg(CVR msg);
+	// var sendmail(CVR toaddress, CVR subject, CVR body0, CVR
+	// attachfilename, CVR deletex, VARREF errormsg);
 
-	var singular(const var& pluralnoun);
-	void flushindex(const var& filename);
-	var encrypt2(const var& encrypt0) const;
-	var xmlquote(const var& str) const;
-	var loginnet(const var& dataset, const var& username, var& cookie, var& msg);
+	var singular(CVR pluralnoun);
+	void flushindex(CVR filename);
+	var encrypt2(CVR encrypt0) const;
+	var xmlquote(CVR str) const;
+	var loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg);
 	var AT(const int code) const;
 	var AT(const int x, const int y) const;
 
-	var handlefilename(const var& handle);
-	var memspace(const var& requiredmemspace);
+	var handlefilename(CVR handle);
+	var memspace(CVR requiredmemspace);
 
 	// was MVDB
-	var getuserdept(const var& usercode);
+	var getuserdept(CVR usercode);
 
-	var oconv(const var& input, const var& conversion);
-	var iconv(const var& input, const var& conversion);
+	var oconv(CVR input, CVR conversion);
+	var iconv(CVR input, CVR conversion);
 
-	var invertarray(const var& input, const var& force0 = (0));
-	void sortarray(var& array, const var& fns = 0, const var& orderby0 = "");
+	var invertarray(CVR input, CVR force0 = (0));
+	void sortarray(VARREF array, CVR fns = 0, CVR orderby0 = "");
 
-	var elapsedtimetext(const var& fromdate, const var& fromtime);
-	var elapsedtimetext(const var& fromdate, const var& fromtime, var& uptodate, var& uptotime);
+	var elapsedtimetext(CVR fromdate, CVR fromtime);
+	var elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime);
 
    private:
-	var number(const var& type, const var& input0, const var& ndecs0, var& output);
+	var number(CVR type, CVR input0, CVR ndecs0, VARREF output);
 	// used by calculate to call dict libraries
 	mutable ExodusFunctorBase* dict_exodusfunctorbase_;
 	// TODO cache many not just one

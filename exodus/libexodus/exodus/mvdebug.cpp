@@ -98,7 +98,7 @@ class MyStackWalker : public StackWalker {
 
 namespace exodus {
 
-void addbacktraceline(const var& frameno, const var& sourcefilename, const var& lineno, var& returnlines) {
+void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
 
 	//#ifdef TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");

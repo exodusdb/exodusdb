@@ -10,7 +10,7 @@ class Functor_ioconv_custom : public ExodusFunctorBase {
 		: ExodusFunctorBase("ioconv_custom", "exodusprogrambasecreatedelete_", mv) {
 	}
 
-	Functor_ioconv_custom& operator=(const var& newlibraryname) {
+	Functor_ioconv_custom& operator=(CVR newlibraryname) {
 		closelib();
 		libraryname_ = newlibraryname.toString();
 		return (*this);

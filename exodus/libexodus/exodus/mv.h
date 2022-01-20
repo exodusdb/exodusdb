@@ -1,3 +1,5 @@
+#ifndef MV_H
+#define MV_H 1
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -20,32 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef MV_H
-#define MV_H 1
-
 #define VARREF var&
 #define CVR const var&
 #define TVR var&&
 
-// prevent swig perl linking errors about win32_abort win32_select win32_connect
-#if defined(SWIGPERL)
-#if defined connect
-#undef connect
-#endif
-#if defined select
-#undef select
-#endif
-#if defined abort
-#undef abort
-#endif
-#endif
-
 #define EXODUS_RELEASE "21.03"
 #define EXODUS_PATCH "21.03.0"
-
-// if installing with autotools then for latest version of boost and other installation macro
-// download the snapshot from here. AX_BOOST_DATE_TIME etc
-// http://git.savannah.gnu.org/gitweb/?p=autoconf-archive.git;a=tree;f=m4
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
@@ -149,27 +131,9 @@ namespace exodus {
 //#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
 constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 
-////#define LOCKIOSTREAM std::lock_guard<std::mutex> guard(global_mutex_threadstream);
-//#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
-//static std::mutex global_mutex_threadstream;
-
 class dim;
 class var_iter;
 class var__extractreplace;
-// class PFstream;
-
-#ifndef SWIG
-
-// TODO ensure locale doesnt produce like 123.456,78
-std::string intToString(int int1);
-
-// TODO ensure locale doesnt produce like 123.456,78
-std::string dblToString(double double1);
-
-#endif
-
-//#define arg CVR - too likely to conflict with things eg in postgres library
-//#define call - conflicts with dynamic so/dll load/call
 
 // most help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
@@ -292,8 +256,6 @@ class VARTYP {
 // with their correct values otherwise any such var, when used later on, will throw Unassigned
 // Variable Used since its var_typ will be zero
 
-//#define VTC(VARNAME, VARVALUE) inline const uint VARNAME{VARVALUE};
-
 // throw an exception if used an unassigned variable
 inline const uint VARTYP_UNA {0x0};
 
@@ -333,7 +295,7 @@ inline const uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_D
 #define VOID_OR_VARREF void
 #define VOID_OR_THIS
 #else
-#define VOID_OR_VARREF "var&"
+#define VOID_OR_VARREF "VARREF"
 #define VOID_OR_THIS "*this"
 #endif
 
@@ -451,6 +413,8 @@ class DLL_PUBLIC var final {
 	///////////////////////
 
 	bool toBool() const;
+
+	char toChar() const;
 
 	// standard c/c++ int() in other words simply take the number to the left of the point. -1.5
 	// becomes -1 and 1.5 becomes 1
@@ -587,11 +551,11 @@ class DLL_PUBLIC var final {
 	//the following produces a temporary on the rhs
 //#define VAR_FUNCTOR_EXTRACTS
 //#ifdef VAR_FUNCTOR_ONLY_EXTRACTS
-	var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const;
+	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const;
 //#else
-	var_proxy1 operator()(int fieldno);
-	var_proxy2 operator()(int fieldno, int valueno);
-	var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
+	ND var_proxy1 operator()(int fieldno);
+	ND var_proxy2 operator()(int fieldno, int valueno);
+	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
 //endif
 
 	// DONT declare this so we force use of the above const version that produces a temporary
@@ -606,12 +570,12 @@ class DLL_PUBLIC var final {
 	//////////////
 
 	// extract a character first=1 last=-1 etc
-	var operator[](const int charno) const;
+	ND var operator[](const int charno) const;
 
 	/* sadly this all works EXCEPT that var[99].anymethod doesnt work
 	so would have to implement all var methods on the proxy object
-	var_brackets_proxy operator[](int charno) const&;
-	var operator[](int charno) &&;
+	ND var_brackets_proxy operator[](int charno) const&;
+	ND var operator[](int charno) &&;
 	*/
 
 	///////////////////
@@ -941,12 +905,12 @@ class DLL_PUBLIC var final {
 	var oswait(const int milliseconds, CVR directory) const;
 	ND var ostime() const;
 #ifdef SWIG
-#define DEFAULT_EMPTY_STRING
+#define DEFAULT_STRING
 #define DEFAULT_DOT
 #define DEFAULT_SPACE
 #define DEFAULT_VM
 #else
-#define DEFAULT_EMPTY_STRING = ""
+#define DEFAULT_STRING = ""
 #define DEFAULT_DOT = "."
 #define DEFAULT_SPACE = " "
 #define DEFAULT_VM = VM_
@@ -1024,16 +988,6 @@ class DLL_PUBLIC var final {
 	CVR exchange(CVR var2) const;
 	ND var clone() const;
 
-	/*no implemented yet
-	var rawvarmemory() const;
-	void clear();
-	void clearcommon();
-//	var bitand(const var) const;
-//	var bitor(const var) const;
-//	var bitxor(const var) const;
-	var bitnot() const;
-	*/
-
 	// MATH/BOOLEAN
 	///////////////
 
@@ -1083,8 +1037,8 @@ class DLL_PUBLIC var final {
 	// STRING INFO
 	//////////////
 
-	// bool match(CVR matchstr,CVR options DEFAULT_EMPTY_STRING) const;
-	ND var match(CVR matchstr, CVR options DEFAULT_EMPTY_STRING) const;
+	// bool match(CVR matchstr,CVR options DEFAULT_STRING) const;
+	ND var match(CVR matchstr, CVR options DEFAULT_STRING) const;
 	ND var seq() const;	  // ASCII
 	ND var textseq() const;  // TEXT
 	ND var dcount(CVR substrx) const;
@@ -1125,7 +1079,7 @@ class DLL_PUBLIC var final {
 	VARREF converter(const char* oldchars, const char* newchars);
 	VARREF textconverter(CVR oldchars, CVR newchars);
 	VARREF swapper(CVR whatstr, CVR withstr);
-	VARREF replacer(CVR regexstr, CVR replacementstr, CVR options DEFAULT_EMPTY_STRING);
+	VARREF replacer(CVR regexstr, CVR replacementstr, CVR options DEFAULT_STRING);
 	VARREF splicer(const int start1, const int length, CVR str);
 	VARREF splicer(const int start1, CVR str);
 	VARREF popper();
@@ -1149,7 +1103,7 @@ class DLL_PUBLIC var final {
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
 
-	//VARREF sorter(CVR separator DEFAULT_EMPTY_STRING);
+	//VARREF sorter(CVR separator DEFAULT_STRING);
 
 	VARREF lowerer();
 	VARREF raiser();
@@ -1161,7 +1115,7 @@ class DLL_PUBLIC var final {
 	ND VARREF convert(CVR oldchars, CVR newchars) &&;
 	ND VARREF textconvert(CVR oldchars, CVR newchars) &&;
 	ND VARREF swap(CVR whatstr, CVR withstr) &&;
-	ND VARREF replace(CVR regexstr, CVR replacementstr, CVR options DEFAULT_EMPTY_STRING) &&;
+	ND VARREF replace(CVR regexstr, CVR replacementstr, CVR options DEFAULT_STRING) &&;
 	ND VARREF splice(const int start1, const int length, CVR str) &&;
 	ND VARREF splice(const int start1, CVR str) &&;
 	ND VARREF pop() &&;
@@ -1197,7 +1151,7 @@ class DLL_PUBLIC var final {
 	ND var convert(CVR oldchars, CVR newchars) const&;
 	ND var textconvert(CVR oldchars, CVR newchars) const&;
 	ND var swap(CVR whatstr, CVR withstr) const&;
-	ND var replace(CVR regexstr, CVR replacementstr, CVR options DEFAULT_EMPTY_STRING) const&;
+	ND var replace(CVR regexstr, CVR replacementstr, CVR options DEFAULT_STRING) const&;
 	ND var splice(const int start1, const int length, CVR str) const&;
 	ND var splice(const int start1, CVR str) const&;
 	ND var pop() const&;
@@ -1231,9 +1185,9 @@ class DLL_PUBLIC var final {
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
-	ND dim split(CVR separator DEFAULT_EMPTY_STRING) const;
+	ND dim split(CVR separator DEFAULT_STRING) const;
 
-	ND var sort(CVR separator DEFAULT_EMPTY_STRING) const;
+	ND var sort(CVR separator DEFAULT_STRING) const;
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -1362,7 +1316,7 @@ class DLL_PUBLIC var final {
 	////////////////////
 
 	// should these be like extract, replace, insert, delete
-	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY_STRING)
+	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_STRING)
 	ND bool locate(CVR target) const;
 	bool locate(CVR target, VARREF setting) const;
 	bool locate(CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
@@ -1395,9 +1349,9 @@ class DLL_PUBLIC var final {
 	bool clearfile(CVR filename) const;
 	ND var listfiles() const;
 
-	bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY_STRING) const;
+	bool createindex(CVR fieldname, CVR dictfile DEFAULT_STRING) const;
 	bool deleteindex(CVR fieldname) const;
-	ND var listindexes(CVR filename DEFAULT_EMPTY_STRING, CVR fieldname DEFAULT_EMPTY_STRING) const;
+	ND var listindexes(CVR filename DEFAULT_STRING, CVR fieldname DEFAULT_STRING) const;
 
 	bool sqlexec(CVR sqlcmd) const;
 	bool sqlexec(CVR sqlcmd, VARREF response) const;
@@ -1412,7 +1366,7 @@ class DLL_PUBLIC var final {
 	// DATABASE ACCESS
 	/////////////////
 
-	bool connect(CVR conninfo DEFAULT_EMPTY_STRING);
+	bool connect(CVR conninfo DEFAULT_STRING);
 	void disconnect();
 	void disconnectall();
 
@@ -1426,10 +1380,10 @@ class DLL_PUBLIC var final {
 	bool statustrans() const;
 	void clearcache() const;
 
-	ND var reccount(CVR filename DEFAULT_EMPTY_STRING) const;
-	var flushindex(CVR filename DEFAULT_EMPTY_STRING) const;
+	ND var reccount(CVR filename DEFAULT_STRING) const;
+	var flushindex(CVR filename DEFAULT_STRING) const;
 
-	bool open(CVR dbfilename, CVR connection DEFAULT_EMPTY_STRING);
+	bool open(CVR dbfilename, CVR connection DEFAULT_STRING);
 	void close();
 
 	// 1=ok, 0=failed, ""=already locked
@@ -1465,7 +1419,7 @@ class DLL_PUBLIC var final {
 	// DATABASE SORT/SELECT
 	//////////////////////
 
-	bool select(CVR sortselectclause DEFAULT_EMPTY_STRING);
+	bool select(CVR sortselectclause DEFAULT_STRING);
 	void clearselect();
 
 	//ND bool hasnext() const;
@@ -1486,22 +1440,22 @@ class DLL_PUBLIC var final {
 	/////////////////
 
 	bool osopen() const;
-	bool osopen(CVR filename, CVR locale DEFAULT_EMPTY_STRING) const;
+	bool osopen(CVR filename, CVR locale DEFAULT_STRING) const;
 	bool osbread(CVR osfilevar, VARREF offset, const int length);
 	bool osbread(CVR osfilevar, CVR offset, const int length);
 	bool osbwrite(CVR osfilevar, VARREF offset) const;
 	bool osbwrite(CVR osfilevar, CVR offset) const;
 	void osclose() const;
-	bool osread(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING);
-	bool oswrite(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING) const;
+	bool osread(CVR osfilename, CVR codepage DEFAULT_STRING);
+	bool oswrite(CVR osfilename, CVR codepage DEFAULT_STRING) const;
 	bool osdelete() const;
 	bool osdelete(CVR osfilename) const;
 	bool osrename(CVR newosdir_or_filename) const;
 	bool oscopy(CVR to_osfilename) const;
 	bool osmove(CVR to_osfilename) const;
-	ND var oslist(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_EMPTY_STRING, const int mode = 0) const;
-	ND var oslistf(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_EMPTY_STRING) const;
-	ND var oslistd(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_EMPTY_STRING) const;
+	ND var oslist(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING, const int mode = 0) const;
+	ND var oslistf(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING) const;
+	ND var oslistd(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING) const;
 	ND var osfile() const;
 	ND var osdir() const;
 	bool osmkdir() const;
@@ -1517,7 +1471,7 @@ class DLL_PUBLIC var final {
 	// same again but this time allowing native strings without needing automatic conversion of
 	// var->char* this is to only to avoid convertion too and from var but will usage of hard
 	// coded filenames etc really be in fast loops and performance related? perhaps only provide
-	bool osread(const char* osfilename, CVR codepage DEFAULT_EMPTY_STRING);
+	bool osread(const char* osfilename, CVR codepage DEFAULT_STRING);
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
@@ -1541,11 +1495,11 @@ class DLL_PUBLIC var final {
 	// chain should be similar to one of the above?
 	// var chain() const;
 
-	void stop(CVR text DEFAULT_EMPTY_STRING) const;
-	void abort(CVR text DEFAULT_EMPTY_STRING) const;
-	void abortall(CVR text DEFAULT_EMPTY_STRING) const;
+	void stop(CVR text DEFAULT_STRING) const;
+	void abort(CVR text DEFAULT_STRING) const;
+	void abortall(CVR text DEFAULT_STRING) const;
 
-	var debug(CVR DEFAULT_EMPTY_STRING) const;
+	var debug(CVR DEFAULT_STRING) const;
 
 	var logoff() const;
 
@@ -1555,7 +1509,7 @@ class DLL_PUBLIC var final {
    private:
 	void createString() const;
 
-	bool cursorexists();
+	ND bool cursorexists();
 	bool selectx(CVR fieldnames, CVR sortselectclause);
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default
@@ -1574,39 +1528,39 @@ class DLL_PUBLIC var final {
 	//void* get_lock_table() const;
 	//void* get_mvconnection() const;
 
-	var build_conn_info(CVR conninfo) const;
+	ND var build_conn_info(CVR conninfo) const;
 
 	//var getdictexpression(CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname, VARREF joins, VARREF froms, VARREF selects, VARREF ismv, bool forsort_or_select_or_index = false) const;
 
 	// TODO check if can speed up by returning reference to converted self like MC
 	// left/right justification
-	var oconv_LRC(CVR format) const;
+	ND var oconv_LRC(CVR format) const;
 	// text justification
-	var oconv_T(CVR format) const;
+	ND var oconv_T(CVR format) const;
 	// date
-	var oconv_D(const char* conversion) const;
+	ND var oconv_D(const char* conversion) const;
 	// time
-	var oconv_MT(const char* conversion) const;
+	ND var oconv_MT(const char* conversion) const;
 	// decimal
-	var oconv_MD(const char* conversion) const;
+	ND var oconv_MD(const char* conversion) const;
 	// character replacement
-	VARREF oconv_MR(const char* conversion);
+	ND VARREF oconv_MR(const char* conversion);
 	// hex
-	var oconv_HEX(const int ioratio) const;
+	ND var oconv_HEX(const int ioratio) const;
 
 	// faster primitive arguments
-	var iconv_D(const char* conversion) const;
+	ND var iconv_D(const char* conversion) const;
 	// var iconv_MT(const char* conversion) const;
-	var iconv_MT() const;
-	var iconv_MD(const char* conversion) const;
-	var iconv_HEX(const int ioratio) const;
+	ND var iconv_MT() const;
+	ND var iconv_MD(const char* conversion) const;
+	ND var iconv_HEX(const int ioratio) const;
 
-	const std::string to_path_string() const;
-	const std::string to_cmd_string() const;
+	ND const std::string to_path_string() const;
+	ND const std::string to_cmd_string() const;
 
 	//VARREF localeAwareChangeCase(const int lowerupper);
 
-	std::fstream* osopenx(CVR osfilename, CVR locale) const;
+	ND std::fstream* osopenx(CVR osfilename, CVR locale) const;
 
 	friend class dim;
 	friend class var_iter;
@@ -1815,7 +1769,7 @@ class DLL_PUBLIC dim {
 
 	bool redim(int nrows, int ncols = 1);
 
-	var join(CVR sepchar = FM_) const;
+	ND var join(CVR sepchar = FM_) const;
 
 	// parenthesis operators often come in pairs
 	ND VARREF operator()(int rowno, int colno = 1);
@@ -1823,8 +1777,8 @@ class DLL_PUBLIC dim {
 	// following const version is called if we do () on a dim which was defined as const xx
 	ND VARREF operator()(int rowno, int colno = 1) const;
 
-	var rows() const;
-	var cols() const;
+	ND var rows() const;
+	ND var cols() const;
 
 	// Q: why is this commented out?
 	// A: we dont want to COPY vars out of an array when using it in rhs expression
@@ -1851,14 +1805,14 @@ class DLL_PUBLIC dim {
 
 	// see also var::split
 	// return the number of fields
-	var split(CVR var1, CVR separator DEFAULT_EMPTY_STRING);
+	var split(CVR var1, CVR separator DEFAULT_STRING);
 	dim& sort(bool reverse = false);
 
 	bool read(CVR filehandle, CVR key);
 	bool write(CVR filehandle, CVR key) const;
 
-	bool osread(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING);
-	bool oswrite(CVR osfilename, CVR codepage DEFAULT_EMPTY_STRING) const;
+	bool osread(CVR osfilename, CVR codepage DEFAULT_STRING);
+	bool oswrite(CVR osfilename, CVR codepage DEFAULT_STRING) const;
 
 	// following is implemented on the dim class now
 	// dim dimarray2();
@@ -2013,27 +1967,27 @@ DLL_PUBLIC inline bool TERMINATE_req = false;
 DLL_PUBLIC inline bool RELOAD_req = false;
 
 //void DLL_PUBLIC output(CVR var1);
-//void DLL_PUBLIC outputl(CVR var1 DEFAULT_EMPTY_STRING);
-//void DLL_PUBLIC outputt(CVR var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC outputl(CVR var1 DEFAULT_STRING);
+//void DLL_PUBLIC outputt(CVR var1 DEFAULT_STRING);
 
 //void DLL_PUBLIC errput(CVR var1);
-//void DLL_PUBLIC errputl(CVR var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC errputl(CVR var1 DEFAULT_STRING);
 
 //void DLL_PUBLIC logput(CVR var1);
-//void DLL_PUBLIC logputl(CVR var1 DEFAULT_EMPTY_STRING);
+//void DLL_PUBLIC logputl(CVR var1 DEFAULT_STRING);
 
-var DLL_PUBLIC backtrace();
+DLL_PUBLIC ND var backtrace();
 
 #ifndef SWIG
 std::string naturalorder(const std::string& string1);
 #endif
 
-int DLL_PUBLIC getenvironmentn();
-void DLL_PUBLIC setenvironmentn(const int environmentn);
+DLL_PUBLIC ND int getenvironmentn();
+DLL_PUBLIC void setenvironmentn(const int environmentn);
 
-int DLL_PUBLIC getenvironmentn();
-var DLL_PUBLIC getprocessn();
-var DLL_PUBLIC getexecpath();
+DLL_PUBLIC ND int getenvironmentn();
+DLL_PUBLIC ND var getprocessn();
+DLL_PUBLIC ND var getexecpath();
 
 // mv exceptions
 
@@ -2041,7 +1995,7 @@ var DLL_PUBLIC getexecpath();
 // but doesnt get stack since stop() is called normally
 class DLL_PUBLIC MVStop {
    public:
-	explicit MVStop(CVR var1 DEFAULT_EMPTY_STRING);
+	explicit MVStop(CVR var1 DEFAULT_STRING);
 	var description;
 };
 
@@ -2049,7 +2003,7 @@ class DLL_PUBLIC MVStop {
 // but doesnt get stack since abort() is called normally
 class DLL_PUBLIC MVAbort {
    public:
-	explicit MVAbort(CVR var1 DEFAULT_EMPTY_STRING);
+	explicit MVAbort(CVR var1 DEFAULT_STRING);
 	var description;
 };
 
@@ -2057,7 +2011,7 @@ class DLL_PUBLIC MVAbort {
 // but doesnt get stack since abortall() is called normally
 class DLL_PUBLIC MVAbortAll {
    public:
-	explicit MVAbortAll(CVR var1 DEFAULT_EMPTY_STRING);
+	explicit MVAbortAll(CVR var1 DEFAULT_STRING);
 	var description;
 };
 
@@ -2065,7 +2019,7 @@ class DLL_PUBLIC MVAbortAll {
 // but doesnt get stack since abortall() is called normally
 class DLL_PUBLIC MVLogoff {
    public:
-	explicit MVLogoff(CVR var1 DEFAULT_EMPTY_STRING);
+	explicit MVLogoff(CVR var1 DEFAULT_STRING);
 	var description;
 };
 
@@ -2091,7 +2045,7 @@ class DLL_PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined    
 class DLL_PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
 class DLL_PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (CVR var1    );};
 class DLL_PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (CVR var1    );};
-class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_EMPTY_STRING);};
+class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_STRING);};
 class DLL_PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
 class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(CVR var1    );};
 class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};

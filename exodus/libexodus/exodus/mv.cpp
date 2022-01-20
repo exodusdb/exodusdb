@@ -121,16 +121,16 @@ var::var()
 }
 
 // copy constructor
-var::var(const var& rhs)
+var::var(CVR rhs)
 	: var_str(rhs.var_str),
 	  var_int(rhs.var_int),
 	  var_dbl(rhs.var_dbl),
 	  var_typ(rhs.var_typ){
 		  // use initializers (why?) and only check afterwards if copiedvar was assigned
-		  THISIS("var::var(const var& rhs)")
+		  THISIS("var::var(CVR rhs)")
 			  ISASSIGNED(rhs)
 
-		  //std::clog << "copy ctor const var&" << std::endl;
+		  //std::clog << "copy ctor CVR" << std::endl;
 
 		  // not a pointer anymore for speed
 		  // priv=new pimpl;
@@ -142,10 +142,10 @@ var::var(const var& rhs)
 	  var_int(rhs.var_int),
 	  var_dbl(rhs.var_dbl),
 	  var_typ(rhs.var_typ) {
-	//std::clog << "move ctor var&& noexcept" << std::endl;
+	//std::clog << "move ctor TVR noexcept" << std::endl;
 
 	// skip this for speed since temporararies are unlikely to be unassigned
-	// THISIS("var::var(var&& rhs) noexcept")
+	// THISIS("var::var(TVR rhs) noexcept")
 	// ISASSIGNED(rhs)
 }
 
@@ -218,1370 +218,6 @@ var::var(const char* charstart, const size_t nchars)
 	: var_str(charstart, nchars),
 	  var_typ(VARTYP_STR) {}
 
-// EXPLICIT AND AUTOMATIC CONVERSIONS
-////////////////////////////////////
-
-// someone recommends not to create more than one automatic converter
-// to avoid the compiler error "ambiguous conversion"
-//(explicit means it is not automatic)
-
-// allow conversion to string (IS THIS USED FOR ANYTHING AT THE MOMENT?
-// allows the usage of any string function
-var::operator std::string() const {
-	THISIS("var::operator std::string")
-	THISISSTRING()
-	return var_str;
-}
-
-var::operator void*() const {
-	THISIS("var::operator void*() const")
-	// could be skipped for speed if can be proved there is no way in c++ syntax that would
-	// result in an attempt to convert an uninitialised object to void* since there is a bool
-	// conversion when does c++ use automatic conversion to void* note that exodus operator !
-	// uses (void*) trial elimination of operator void* seems to cause no problems but without
-	// full regression testing
-	THISISDEFINED()
-
-	return (void*)toBool();
-}
-
-// supposed to be replaced with automatic void() and made explicit but just seems to force int
-// conversion during "if (var)" necessary to allow var to be used standalone in "if (xxx)" but see
-// mv.h for discussion of using void* instead of bool #ifndef _MSC_VER
-var::operator bool() const {
-	return toBool();
-}
-
-/*
-var::operator const char*() const
-{
-	return toString().c_str();
-}
-*/
-
-#ifndef HASINTREFOP
-var::operator int() const {
-	THISIS("var::operator int() const")
-	//converts string or double to int using pickos int() which is floor()
-	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
-	THISISINTEGER()
-	return int(var_int);
-}
-
-var::operator double() const {
-	THISIS("var::operator double() const")
-	THISISDECIMAL()
-	return var_dbl;
-}
-
-#else
-var::operator int&() const {
-	THISIS("var::operator mv_int_t&()")
-	//converts string or double to int using pickos int() which is floor()
-	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
-	THISISINTEGER()
-	// TODO check that converting mvint_t (which is long long) to int doesnt cause any practical
-	// problems) PROBABLY WILL! since we are returning a non const reference which allows
-	// callers to set the int directly then clear any decimal and string cache flags which would
-	// be invalid after setting the int alone
-	//var_typ |= VARTYP_INT;
-	return (int&)var_int;
-}
-var::operator double&() const {
-	THISIS("var::operator double&()")
-	THISISDECIMAL()
-	// since we are returning a non const reference which allows callers to set the dbl directly
-	// then clear any int and string cache flags which would be invalid after setting the dbl
-	// alone
-	//var_typ |= VARTYP_DBL;
-	return (double&)var_dbl;
-}
-#endif
-
-// remove because causes "ambiguous" with -short_wchar on linux
-/*
-var::operator unsigned int() const
-{
-	THISIS("var::operator int() const")
-	THISISDEFINED()
-
-	do
-	{
-		//prioritise int since conversion to int perhaps more likely to be an int already
-		if (var_typ&VARTYP_INT)
-			return var_int;
-		if (var_typ&VARTYP_DBL)
-			return int(var_dbl);
-		if (var_typ&VARTYP_NAN)
-			throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
-		if (!(var_typ))
-		{
-			THISISASSIGNED()
-			throw MVUnassigned("int(var)");
-		}
-	}
-	//must be string - try to convert to numeric
-	while (isnum());
-
-	THISISNUMERIC()
-	throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
-
-}
-*/
-
-/*
-//necessary to allow use of var inside STL containers
-var::operator size_t() const
-{
-	return (size_t) operator int();
-}
-*/
-
-/*
-var::operator const char*()
-{
-	if (var_typ&VARTYP_MASK)
-		throw MVUndefined("const char*()");
-	cout<<"CONVERT: operator const char*() returns '"<<var_str.c_str()<<"'\n";
-	return var_str.c_str();
-}
-*/
-
-// UNARY OPERATORS
-/////////////////
-
-// copy assignment
-// var1 = var2
-// The assignment operator should always return a reference to *this.
-// cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
-// unfortunately causes problem of passing var by value and thereby unnecessary contruction
-// see also ^= etc
-VOID_OR_VARREF var::operator=(const var& rhs) & {
-	THISIS("var& var::operator= (const var& rhs) &")
-	THISISDEFINED()	 //could be skipped for speed?
-	ISASSIGNED(rhs)
-
-	//std::clog << "copy assignment" <<std::endl;
-
-	// important not to self assign
-	if (this == &rhs)
-		return VOID_OR_THIS;
-
-	// copy everything across
-	var_str = rhs.var_str;
-	var_dbl = rhs.var_dbl;
-	var_int = rhs.var_int;
-	var_typ = rhs.var_typ;
-
-	return VOID_OR_THIS;
-}
-
-// move assignment
-// var = temporary var
-VOID_OR_VARREF var::operator=(var&& rhs) & noexcept {
-	// skip this for speed?
-	// THISIS("var& var::operator= (var rhs)")
-	// THISISDEFINED()
-
-	// skip this for speed since temporararies are unlikely to be unassigned
-	// THISIS("var::var(var&& rhs) noexcept")
-	// ISASSIGNED(rhs)
-
-	//std::clog << "move assignment" <<std::endl;
-
-	// important not to self assign
-	if (this == &rhs)
-		return VOID_OR_THIS;
-
-	// move everything over
-	var_str = std::move(rhs.var_str);
-	var_dbl = rhs.var_dbl;
-	var_int = rhs.var_int;
-	var_typ = rhs.var_typ;
-
-	return VOID_OR_THIS;
-}
-
-//=int
-// The assignment operator should always return a reference to *this.
-VOID_OR_VARREF var::operator=(const int int1) & {
-	// THISIS("var& var::operator= (const int int1)")
-	// protect against unlikely syntax as follows:
-	// var undefinedassign=undefinedassign=123';
-	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
-	// THISISDEFINED()
-
-	var_int = int1;
-	var_typ = VARTYP_INT;  // reset to one unique type
-
-	return VOID_OR_THIS;
-}
-
-//=double
-// The assignment operator should always return a reference to *this.
-VOID_OR_VARREF var::operator=(const double double1) & {
-	// THISIS("var& var::operator= (const double double1)")
-	// protect against unlikely syntax as follows:
-	// var undefinedassign=undefinedassign=9.9';
-	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
-	// THISISDEFINED()
-
-	var_dbl = double1;
-	var_typ = VARTYP_DBL;  // reset to one unique type
-
-	return VOID_OR_THIS;
-}
-
-//=char
-// The assignment operator should always return a reference to *this.
-VOID_OR_VARREF var::operator=(const char char2) & {
-
-	THISIS("var& var::operator= (const char char2) &")
-	// protect against unlikely syntax as follows:
-	// var undefinedassign=undefinedassign=L'X';
-	// this causes crash due to bad memory access due to setting string that doesnt exist
-	// slows down all string settings so consider NOT CHECKING in production code
-	THISISDEFINED()	 // ALN:TODO: this definition kind of misleading, try to find
-	// ALN:TODO: or change name to something like: THISISNOTDEAD :)
-	// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
-
-	var_str = char2;
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return VOID_OR_THIS;
-}
-
-//=char*
-// The assignment operator should always return a reference to *this.
-VOID_OR_VARREF var::operator=(const char* cstr) & {
-	THISIS("var& var::operator= (const char* cstr2) &")
-	// protect against unlikely syntax as follows:
-	// var undefinedassign=undefinedassign="xxx";
-	// this causes crash due to bad memory access due to setting string that doesnt exist
-	// slows down all string settings so consider NOT CHECKING in production code
-	THISISDEFINED()
-
-	var_str = cstr;
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return VOID_OR_THIS;
-}
-
-//=std::string variable (lvalue)
-// The assignment operator should always return a reference to *this.
-VOID_OR_VARREF var::operator=(const std::string& string2) & {
-
-	THISIS("var& var::operator= (const std::string& string2) &")
-	// protect against unlikely syntax as follows:
-	// var undefinedassign=undefinedassign=std::string("xxx"";
-	// this causes crash due to bad memory access due to setting string that doesnt exist
-	// slows down all string settings so consider NOT CHECKING in production code
-	THISISDEFINED()
-	var_str = string2;
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return VOID_OR_THIS;
-}
-//=std::string temporary (rvalue)
-// The assignment operator should always return a reference to *this.
-VOID_OR_VARREF var::operator=(const std::string&& string2) & {
-
-	THISIS("var& var::operator= (const std::string&& string2) &")
-	// protect against unlikely syntax as follows:
-	// var undefinedassign=undefinedassign=std::string("xxx"";
-	// this causes crash due to bad memory access due to setting string that doesnt exist
-	// slows down all string settings so consider NOT CHECKING in production code
-	THISISDEFINED()
-	var_str = std::move(string2);
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return VOID_OR_THIS;
-}
-//^= is not templated since slightly slower to go through the creation of an var()
-
-//^=var
-// The assignment operator should always return a reference to *this.
-var& var::operator^=(const var& rhs) & {
-	THISIS("var& var::operator^=(const var& rhs) &")
-	THISISSTRING()
-	ISSTRING(rhs)
-
-	// tack it onto our string
-	var_str.append(rhs.var_str);
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
-
-//^=int
-// The assignment operator should always return a reference to *this.
-var& var::operator^=(const int int1) & {
-	THISIS("var& var::operator^= (const int int1) &")
-	THISISSTRING()
-
-	// var_str+=var(int1).var_str;
-	var_str += intToString(int1);
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
-
-//^=double
-// The assignment operator should always return a reference to *this.
-var& var::operator^=(const double double1) & {
-	THISIS("var& var::operator^= (const double double1) &")
-	THISISSTRING()
-
-	// var_str+=var(int1).var_str;
-	var_str += dblToString(double1);
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
-
-//^=char
-// The assignment operator should always return a reference to *this.
-var& var::operator^=(const char char1) & {
-	THISIS("var& var::operator^= (const char char1) &")
-	THISISSTRING()
-
-	// var_str+=var(int1).var_str;
-	var_str.push_back(char1);
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
-
-//^=char*
-// The assignment operator should always return a reference to *this.
-var& var::operator^=(const char* cstr) & {
-	THISIS("var& var::operator^= (const char* cstr) &")
-	THISISSTRING()
-
-	// var_str+=var(int1).var_str;
-	// var_str+=std::string(char1);
-	var_str += cstr;
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
-
-//^=std::string
-// The assignment operator should always return a reference to *this.
-var& var::operator^=(const std::string& string1) & {
-	THISIS("var& var::operator^= (const std::string string1) &")
-	THISISSTRING()
-
-	// var_str+=var(int1).var_str;
-	var_str += string1;
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
-
-// not handled by inbuilt conversion of var to long long& on the rhs
-
-//#ifndef HASINTREFOP
-//#else
-
-// You must *not* make the postfix version return the 'this' object by reference
-// *** YOU HAVE BEEN WARNED ***
-
-// not returning void so is usable in expressions
-// int argument indicates that this is POSTFIX override v++
-var var::operator++(int) & {
-	THISIS("var var::operator++ (int) &")
-	// full check done below to avoid double checking number type
-	THISISDEFINED()
-
-	var priorvalue;
-
-tryagain:
-	// prefer int since ++ nearly always on integers
-	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			throw MVIntOverflow("operator++");
-		priorvalue = var(var_int);
-		var_int++;
-		var_typ = VARTYP_INT;  // reset to one unique type
-
-	} else if (var_typ & VARTYP_DBL) {
-		priorvalue = var_dbl;
-		var_dbl++;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-
-	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
-		if (isnum())
-			goto tryagain;
-
-		//trigger MVNonNumeric
-		THISISNUMERIC()
-
-	} else {
-		//trigger MVUnassigned
-		THISISNUMERIC()
-	}
-
-	// NO DO NOT! return *this ... postfix return a temporary!!! eg var(*this)
-	return priorvalue;
-}
-
-// not returning void so is usable in expressions
-// int argument indicates that this is POSTFIX override v--
-var var::operator--(int) & {
-	THISIS("var var::operator-- (int) & ")
-	// full check done below to avoid double checking number type
-	THISISDEFINED()
-
-	var priorvalue;
-
-tryagain:
-	// prefer int since -- nearly always on integers
-	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			throw MVIntUnderflow("operator--");
-		priorvalue = var(var_int);
-		var_int--;
-		var_typ = VARTYP_INT;  // reset to one unique type
-
-	} else if (var_typ & VARTYP_DBL) {
-		priorvalue = var_dbl;
-		var_dbl--;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-
-	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
-		if (isnum())
-			goto tryagain;
-
-		//trigger MVNonNumeric
-		THISISNUMERIC()
-
-	} else {
-		//trigger MVUnassigned
-		THISISNUMERIC()
-	}
-
-	return priorvalue;
-}
-
-// not returning void so is usable in expressions
-// no argument indicates that this is prefix override ++var
-var& var::operator++() & {
-	THISIS("var var::operator++ () &")
-	// full check done below to avoid double checking number type
-	THISISDEFINED()
-
-tryagain:
-	// prefer int since -- nearly always on integers
-	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			throw MVIntOverflow("operator++");
-		var_int++;
-		var_typ = VARTYP_INT;  // reset to one unique type
-	} else if (var_typ & VARTYP_DBL) {
-		var_dbl++;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
-		if (isnum())
-			goto tryagain;
-
-		//trigger MVNonNumeric
-		THISISNUMERIC()
-
-	} else {
-		//trigger MVUnassigned
-		THISISNUMERIC()
-	}
-
-	// OK to return *this in prefix ++
-	return *this;
-}
-
-// not returning void so is usable in expressions
-// no argument indicates that this is prefix override --var
-var& var::operator--() & {
-	THISIS("var& var::operator-- () &")
-	// full check done below to avoid double checking number type
-	THISISDEFINED()
-
-tryagain:
-	// prefer int since -- nearly always on integers
-	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			throw MVIntUnderflow("operator--");
-		var_int--;
-		var_typ = VARTYP_INT;  // reset to one unique type
-
-	} else if (var_typ & VARTYP_DBL) {
-		var_dbl--;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-
-	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
-		if (isnum())
-			goto tryagain;
-
-		//trigger MVNonNumeric
-		THISISNUMERIC()
-
-	} else {
-		//trigger MVUnassigned
-		THISISNUMERIC()
-	}
-
-	// OK to return *this in prefix --
-	return *this;
-}
-
-//+=var (very similar to version with on rhs)
-// provided to disambiguate syntax like var1+=var2
-var& var::operator+=(int int1) & {
-	THISIS("var& var::operator+= (int int1) &")
-	THISISDEFINED()
-
-tryagain:
-
-	// dbl target
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		//+= int or dbl from source
-		var_dbl += int1;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// int target
-	else if (var_typ & VARTYP_INT) {
-		var_int += int1;
-		var_typ = VARTYP_INT;  // reset to one unique type
-		return *this;
-	}
-
-	// last case(s) should be much less frequent since result of attempt to
-	// convert strings to number is cached and only needs to be done once
-
-	// nan (dont bother with this here because it is exceptional and will be caught below anyway
-	// else if (var_typ&VARTYP_NAN)
-	//	throw MVNonNumeric("var::+= " ^ *this);
-
-	// try to convert to numeric
-	if (isnum())
-		goto tryagain;
-
-	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
-}
-
-//-=var (very similar to version with on rhs)
-// provided to disambiguate syntax like var1+=var2
-var& var::operator-=(int int1) & {
-	THISIS("var& var::operator-= (int int1) &")
-	THISISDEFINED()
-
-tryagain:
-	// dbl target
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		var_dbl -= int1;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// int target
-	else if (var_typ & VARTYP_INT) {
-		var_int -= int1;
-		var_typ = VARTYP_INT;  // reset to one unique type
-		return *this;
-	}
-
-	// try to convert to numeric
-	if (isnum())
-		goto tryagain;
-
-	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 128) ^ "-= ");
-}
-
-// allow varx+=1.5 to compile
-var& var::operator+=(double dbl1) & {
-	(*this) += var(dbl1);
-	return *this;
-}
-
-var& var::operator-=(double dbl1) & {
-	(*this) -= var(dbl1);
-	return *this;
-}
-
-//+=var
-var& var::operator+=(const var& rhs) & {
-	THISIS("var& var::operator+= (const var& rhs) &")
-	THISISDEFINED()
-
-tryagain:
-
-	// dbl target
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		ISNUMERIC(rhs)
-		//+= int or dbl from source
-		var_dbl += (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// int target
-	else if (var_typ & VARTYP_INT) {
-		ISNUMERIC(rhs)
-		// int source
-		if (rhs.var_typ & VARTYP_INT) {
-			var_int += rhs.var_int;
-			var_typ = VARTYP_INT;  // reset to one unique type
-			return *this;
-		}
-		// dbl source, convert target to dbl
-		var_dbl = var_int + rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// last case(s) should be much less frequent since result of attempt to
-	// convert strings to number is cached and only needs to be done once
-
-	// nan (dont bother with this here because it is exceptional and will be caught below anyway
-	// else if (var_typ&VARTYP_NAN)
-	//	throw MVNonNumeric("var::+= " ^ *this);
-
-	// try to convert to numeric
-	if (isnum())
-		goto tryagain;
-
-	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
-}
-
-//-=var
-var& var::operator-=(const var& rhs) & {
-	THISIS("var& var::operator-= (const var& rhs) &")
-	THISISDEFINED()
-
-tryagain:
-
-	// int target
-	if (var_typ & VARTYP_INT) {
-		ISNUMERIC(rhs)
-		// int source
-		if (rhs.var_typ & VARTYP_INT) {
-			var_int -= rhs.var_int;
-			var_typ = VARTYP_INT;  // reset to one unique type
-			return *this;
-		}
-		// dbl source, convert target to dbl
-		var_dbl = var_int - rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// dbl target
-	else if (var_typ & VARTYP_DBL) {
-		ISNUMERIC(rhs)
-		//-= int or dbl from source
-		var_dbl -= (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// last case(s) should be much less frequent since result of attempt to
-	// convert strings to number is cached and only needs to be done once
-
-	// nan (dont bother with this here because it is exceptional and will be caught below anyway
-	// else if (var_typ&VARTYP_NAN)
-	//	throw MVNonNumeric("var::-= " ^ *this);
-
-	// try to convert to numeric
-	if (isnum())
-		goto tryagain;
-
-	THISISNUMERIC()
-	throw MVNonNumeric(substr(1, 128) ^ "-= ");
-}
-
-//#endif
-
-/* more accurate way of comparing two decimals using EPSILON and ulp
-   not using it simply to make better emulation of pickos at least initially
-
-//comparing floating point numbers is a VERY complex matter since c++ double uses BINARY NOT DECIMAL
-//
-//https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
-//
-//https://www.theregister.com/2006/08/12/floating_point_approximation/
-//https://www.theregister.com/2006/09/20/floating_point_numbers_2/
-//
-//derived from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
-inline bool almost_equal_not_zero(double x, double y, int ulp)
-{
-	// the machine epsilon has to be scaled to the magnitude of the values used
-	// and multiplied by the desired precision in ULPs (units in the last place)
-	return std::fabs(x-y) <= std::numeric_limits<double>::epsilon() * std::fabs(x+y) * ulp
-		// unless the result is subnormal
-		|| std::fabs(x-y) < std::numeric_limits<double>::min();
-}
-
-inline bool almost_equal(double x, decltype(var_int) y, int ulp)
-{
-	if (y == 0)
-		return (std::abs(x) < SMALLEST_NUMBER);
-	else
-		return almost_equal_not_zero(x, double(y), ulp);
-}
-
-inline bool almost_equal(double x, double y, int ulp)
-{
-	if (y == 0.0)
-		return (std::abs(x) < SMALLEST_NUMBER);
-	else if (x == 0.0)
-		return (std::abs(y) < SMALLEST_NUMBER);
-	else
-		return almost_equal_not_zero(x, y, ulp);
-}
-*/
-
-inline bool almost_equal(double x, double y, int) {
-	//crude pickos method
-	return (std::abs(x - y) < SMALLEST_NUMBER);
-}
-
-// almost identical code in MVeq and MVlt except where noted
-// NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs) {
-	THISIS("bool MVeq(const var& lhs,const var& rhs)")
-	ISDEFINED(lhs)
-	ISDEFINED(rhs)
-
-	// NB empty string is always less than anything except another empty string
-
-	// 1. BOTH EMPTY or IDENTICAL STRINGS returns TRUE one empty results false
-	if (lhs.var_typ & VARTYP_STR) {
-		if (rhs.var_typ & VARTYP_STR) {
-			// we have two strings
-			// if they are both the same (including both empty) then eq is true
-			if (lhs.var_str == rhs.var_str)
-				// different from MVlt
-				return true;
-			// otherwise if either is empty then return eq false
-			//(since empty string is ONLY eq to another empty string)
-			if (lhs.var_str.empty())
-				// different from MVlt
-				return false;
-			if (rhs.var_str.empty())
-				// SAME as MVlt
-				return false;
-			// otherwise go on to test numerically then literally
-		} else {
-			// if rhs isnt a string and lhs is empty then eq is false
-			//(after checking that rhs is actually assigned)
-			if (lhs.var_str.empty()) {
-				if (!rhs.var_typ) {
-					// throw MVUnassigned("eq(rhs)");
-					ISASSIGNED(rhs)
-				}
-				// different from MVlt
-				return false;
-			}
-		}
-	} else {
-		// if lhs isnt a string and rhs is an empty string then return eq false
-		//(after checking that lhs is actually assigned)
-		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
-			if (!lhs.var_typ) {
-				// throw MVUnassigned("eq(lhs)");
-				ISASSIGNED(lhs)
-			}
-			// SAME as MVlt
-			return false;
-		}
-	}
-
-	// 2. BOTH NUMERIC STRINGS
-	// exact match on decimal numbers is often inaccurate since they are approximations of real
-	// numbers
-	// match on decimal in preference to int
-	if (lhs.isnum() && rhs.isnum()) {
-		//if (lhs.var_typ & VARTYP_INT)
-		if (lhs.var_typ & VARTYP_DBL) {
-
-			//DOUBLE v DOUBLE
-			//if (rhs.var_typ & VARTYP_INT)
-			if (rhs.var_typ & VARTYP_DBL) {
-				// different from MVlt
-
-				//return (lhs.var_intd == rhs.var_intd);
-
-				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-				//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
-				return almost_equal(lhs.var_dbl, rhs.var_dbl, 2);
-			}
-
-			//DOUBLE V INT
-			else {
-				// different from MVlt (uses absolute)
-				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-
-				//return (lhs.var_int == rhs.var_dbl);
-				//return (std::abs(lhs.var_dbl - double(rhs.var_int)) < SMALLEST_NUMBER);
-				return almost_equal(lhs.var_dbl, rhs.var_int, 2);
-			}
-		}
-
-		//INT v DOUBLE
-		//if (rhs.var_typ & VARTYP_INTd)
-		if (rhs.var_typ & VARTYP_DBL) {
-			// different from MVlt (uses absolute)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-
-			//return (lhs.var_dbl == rhs.var_int);
-			//return (std::abs(double(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
-			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
-			//put lhs int 2nd argument to invoke the fastest implmentation
-			return almost_equal(rhs.var_dbl, lhs.var_int, 2);
-		}
-
-		//INT v INT
-		else {
-			// different from MVlt (uses absolute)
-
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (lhs.var_dbl == rhs.var_dbl);
-			//return (std::abs(lhs.var_dbl-rhs.var_dbl) < SMALLEST_NUMBER);
-
-			return (lhs.var_int == rhs.var_int);
-		}
-	}
-
-	// 3. BOTH NON-NUMERIC STRINGS
-	if (!(lhs.var_typ & VARTYP_STR))
-		lhs.createString();
-	if (!(rhs.var_typ & VARTYP_STR))
-		rhs.createString();
-	// different from MVlt
-	//return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) == 0;
-	return lhs.var_str == rhs.var_str;
-}
-
-// almost identical between MVeq and MVlt except where noted
-// NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVlt(const var& lhs, const var& rhs) {
-	THISIS("bool MVlt(const var& lhs,const var& rhs)")
-	ISDEFINED(lhs)
-	ISDEFINED(rhs)
-
-	// NB empty string is always less than anything except another empty string
-
-	// 1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_typ & VARTYP_STR) {
-		if (rhs.var_typ & VARTYP_STR) {
-			// we have two strings
-			// if they are both the same (including both empty) then eq is true
-			if (lhs.var_str == rhs.var_str)
-				// different from MVeq
-				return false;
-			// otherwise if either is empty then return eq false
-			//(since empty string is ONLY eq to another empty string)
-			if (lhs.var_str.empty())
-				// different from MVeq
-				return true;
-			if (rhs.var_str.empty())
-				// SAME as MVeq
-				return false;
-			// otherwise go on to test numerically then literally
-		} else {
-			// if rhs isnt a string and lhs is empty then eq is false
-			// after checking that rhs is actually assigned
-			if (lhs.var_str.empty()) {
-				if (!rhs.var_typ) {
-					// throw MVUnassigned("eq(rhs)");
-					ISASSIGNED(rhs)
-				}
-				// different from MVeq
-				return true;
-			}
-		}
-	} else {
-		// if lhs isnt a string and rhs is an empty string then return eq false
-		// after checking that lhs is actually assigned
-		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
-			if (!lhs.var_typ) {
-				// throw MVUnassigned("eq(lhs)");
-				ISASSIGNED(lhs)
-			}
-			// SAME as MVeq
-			return false;
-		}
-	}
-
-	// 2. both numerical strings
-	if (lhs.isnum() && rhs.isnum()) {
-		if (lhs.var_typ & VARTYP_INT) {
-			if (rhs.var_typ & VARTYP_INT)
-				// different from MVeq
-				return (lhs.var_int < rhs.var_int);
-			else
-				// different from MVeq
-				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-				//return (double(lhs.var_int) < rhs.var_dbl);
-				return (rhs.var_dbl - double(lhs.var_int)) >= SMALLEST_NUMBER;
-			//return ((rhs.var_dbl - double(lhs.var_int) >= SMALLEST_NUMBER);
-		}
-		if (rhs.var_typ & VARTYP_INT)
-			// different from MVeq
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (lhs.var_dbl < double(rhs.var_int));
-			return (double(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
-		else
-			// different from MVeq
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (lhs.var_dbl < rhs.var_dbl);
-			return (rhs.var_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
-	}
-
-	// 3. either or both non-numerical strings
-	if (!(lhs.var_typ & VARTYP_STR))
-		lhs.createString();
-	if (!(rhs.var_typ & VARTYP_STR))
-		rhs.createString();
-	// different from MVeq
-	// return lhs.var_str<rhs.var_str;
-	return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) < 0;
-}
-
-// similar to MVeq and MVlt - this is the var<int version for speed
-// NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVlt(const var& lhs, const int int2) {
-	THISIS("bool MVlt(const var& lhs,const int int2)")
-	ISDEFINED(lhs)
-
-	// NB empty string is always less than anything except another empty string
-
-	// 1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_typ & VARTYP_STR) {
-		// if rhs isnt a string and lhs is empty then eq is false
-		// after checking that rhs is actually assigned
-		if (lhs.var_str.empty()) {
-			// different from MVeq
-			return true;
-		}
-	}
-
-	// 2. both numerical strings
-	do {
-		if (lhs.var_typ & VARTYP_INT)
-			// different from MVeq
-			return (lhs.var_int < int2);
-
-		if (lhs.var_typ & VARTYP_DBL)
-			// different from MVeq
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (lhs.var_dbl < int2);
-			return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
-		//return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
-	}
-	// go back and try again if can be converted to number
-	while (lhs.isnum());
-
-	// 3. either or both non-numerical strings
-	if (!(lhs.var_typ & VARTYP_STR)) {
-		// lhs.createString();
-		ISSTRING(lhs)
-	}
-	// different from MVeq
-	return lhs.var_str < intToString(int2);
-}
-
-// similar to MVeq and MVlt - this is the int<var version for speed
-// NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVlt(const int int1, const var& rhs) {
-	THISIS("bool MVlt(const int int1,const var& rhs)")
-	ISDEFINED(rhs)
-
-	// NB empty string is always less than anything except another empty string
-
-	// 1. both empty or identical strings returns eq. one empty results false
-	if (rhs.var_typ & VARTYP_STR) {
-		if (rhs.var_str.empty())
-			// SAME as MVeq
-			return false;
-		// otherwise go on to test numerically then literally
-	}
-
-	// 2. both numerical strings
-	do {
-		if (rhs.var_typ & VARTYP_INT)
-			// different from MVeq
-			return (int1 < rhs.var_int);
-		if (rhs.var_typ & VARTYP_DBL) {
-			// different from MVeq
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (int1 < rhs.var_dbl);
-			return (rhs.var_dbl - double(int1)) >= SMALLEST_NUMBER;
-		}
-	}
-	// go back and try again if can be converted to number
-	while (rhs.isnum());
-
-	// 3. either or both non-numerical strings
-	if (!(rhs.var_typ & VARTYP_STR)) {
-		// lhs.createString();
-		ISSTRING(rhs)
-	}
-	// different from MVeq
-	return intToString(int1) < rhs.var_str;
-}
-// SEE ALSO MV2.CPP
-
-//+var
-//DLL_PUBLIC var operator+(const var& var1)
-var MVplus(const var& var1) {
-	THISIS("var operator+(const var& var1)")
-	ISDEFINED(var1)
-
-	do {
-		// dbl
-		if (var1.var_typ & VARTYP_DBL)
-			return var1.var_dbl;
-
-		// int
-		if (var1.var_typ & VARTYP_INT)
-			return var1.var_int;
-
-		// unassigned
-		if (!var1.var_typ) {
-			ISASSIGNED(var1)
-			throw MVUnassigned("+()");
-		}
-	}
-	// must be string - try to convert to numeric
-	while (var1.isnum());
-
-	// non-numeric
-	ISNUMERIC(var1)
-	// will never get here
-	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
-}
-
-//-var (identical to +var above except for two additional - signs)
-//DLL_PUBLIC var operator-(const var& var1)
-var MVminus(const var& var1) {
-	THISIS("var operator-(const var& var1)")
-	ISDEFINED(var1)
-
-	do {
-		// dbl
-		if (var1.var_typ & VARTYP_DBL)
-			return -var1.var_dbl;
-
-		// int
-		if (var1.var_typ & VARTYP_INT)
-			return -var1.var_int;
-
-		// unassigned
-		if (!var1.var_typ) {
-			ISASSIGNED(var1)
-			throw MVUnassigned("+()");
-		}
-	}
-	// must be string - try to convert to numeric
-	while (var1.isnum());
-
-	// non-numeric
-	ISNUMERIC(var1)
-	// will never get here
-	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
-}
-
-//! var
-//DLL_PUBLIC bool operator!(const var& var1)
-bool MVnot(const var& var1) {
-	THISIS("bool operator!(const var& var1)")
-	ISASSIGNED(var1)
-
-	// might need converting to work on void pointer
-	// if bool replaced with void* (or made explicit instead of implict)
-	// is there really any difference since the bool and void operators are defined identically?
-	// return !(bool)(var1);
-	return !(void*)(var1);
-}
-
-var MVadd(const var& lhs, const var& rhs) {
-	THISIS("var operator+(const var& lhs,const var& rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
-
-	//identical code in MVadd and MVsub except for +/-
-	//identical code in MVadd, MVsub, MVmul except for +,-,*
-	if (lhs.var_typ & VARTYP_DBL)
-		return lhs.var_dbl + ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
-	else if (rhs.var_typ & VARTYP_DBL)
-		return lhs.var_int + rhs.var_dbl;
-	else
-		return lhs.var_int + rhs.var_int;
-}
-
-var MVsub(const var& lhs, const var& rhs) {
-	THISIS("var operator-(const var& lhs,const var& rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
-
-	//identical code in MVadd, MVsub, MVmul except for +,-,*
-	if (lhs.var_typ & VARTYP_DBL)
-		return lhs.var_dbl - ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
-	else if (rhs.var_typ & VARTYP_DBL)
-		return lhs.var_int - rhs.var_dbl;
-	else
-		return lhs.var_int - rhs.var_int;
-}
-
-var MVmul(const var& lhs, const var& rhs) {
-	THISIS("var operator*(const var& lhs,const var& rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
-
-	//identical code in MVadd, MVsub, MVmul except for +,-,*
-	if (lhs.var_typ & VARTYP_DBL)
-		return lhs.var_dbl * ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
-	else if (rhs.var_typ & VARTYP_DBL)
-		return lhs.var_int * rhs.var_dbl;
-	else
-		return lhs.var_int * rhs.var_int;
-}
-
-var MVdiv(const var& lhs, const var& rhs) {
-	THISIS("var operator/(const var& lhs,const var& rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
-
-	// always returns a double because 10/3 must be 3.3333333
-
-	if (lhs.var_typ & VARTYP_DBL) {
-		// 1. double ... double
-		if (rhs.var_typ & VARTYP_DBL) {
-			if (!rhs.var_dbl)
-				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return lhs.var_dbl / rhs.var_dbl;
-		}
-		// 2. double ... int
-		else {
-			if (!rhs.var_int)
-				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return lhs.var_dbl / rhs.var_int;
-		}
-	}
-	// 3. int ... double
-	else if (rhs.var_typ & VARTYP_DBL) {
-		if (!rhs.var_dbl)
-			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
-	}
-	// 4. int ... int
-	else {
-		if (!rhs.var_int)
-			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		return static_cast<double>(lhs.var_int) / rhs.var_int;
-	}
-}
-
-double exodusmodulus(const double top, const double bottom) {
-#define USE_PICKOS_MODULUS
-#ifdef USE_PICKOS_MODULUS
-
-	// note that exodus var int() is floor function as per pickos standard
-	// whereas c/c++ int() function is round to nearest even number (negative or positive)
-
-	//https://pickos.neosys.com/x/pAEz.html
-	//var(i) - (int(var(i)/var(j)) * var(j))) ... where int() is pickos int() (i.e. floor)
-	return top - double(floor(top / bottom) * bottom);
-
-#else
-	//return top - double(int(top / bottom) * bottom);
-	//return top % bottom;//doesnt compile (doubles)
-
-	//fmod - The floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where n is x/y with its fractional part truncated.
-	//https://en.cppreference.com/w/c/numeric/math/fmod
-	//return std::fmod(top,bottom);
-
-	//remainder - The IEEE floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where the value n is the integral value nearest the exact value x/y. When |n-x/y| = ½, the value n is chosen to be even.
-	//https://en.cppreference.com/w/c/numeric/math/remainder
-	return std::remainder(top, bottom);
-
-#endif
-}
-
-var MVmod(const var& lhs, const var& rhs) {
-	THISIS("var operator%(const var& lhs,const var& rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
-
-	//returns an integer var IIF both arguments are integer vars
-	//otherwise returns a double var
-
-	if (lhs.var_typ & VARTYP_DBL) {
-		// 1. double ... double
-		if (rhs.var_typ & VARTYP_DBL) {
-			if (!rhs.var_dbl)
-				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return exodusmodulus(lhs.var_dbl, rhs.var_dbl);
-		}
-		// 2. double ... int
-		else {
-			if (!rhs.var_int)
-				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return exodusmodulus(lhs.var_dbl, rhs.var_int);
-		}
-	}
-	// 3. int ... double
-	else if (rhs.var_typ & VARTYP_DBL) {
-		if (!rhs.var_dbl)
-			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		return exodusmodulus(lhs.var_int, rhs.var_dbl);
-	}
-	// 4. int ... int
-	else {
-		if (!rhs.var_int)
-			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		//return exodusmodulus(lhs.var_int, rhs.var_int);
-		return lhs.var_int % rhs.var_int;
-	}
-}
-
-// var^var we reassign the logical xor operator ^ to be string concatenate!!!
-// slightly wrong precedence but at least we have a reliable concat operator to replace the + which
-// is now reserved for forced ADDITION both according to fundamental PickOS principle
-var MVcat(const var& lhs, const var& rhs) {
-	THISIS("var operator^(const var& lhs,const var& rhs)")
-	ISSTRING(lhs)
-	ISSTRING(rhs)
-
-	return lhs.var_str + rhs.var_str;
-}
-
-var MVcat(const var& lhs, const char* cstr) {
-	THISIS("var operator^(const var& lhs,const char* cstr)")
-	ISSTRING(lhs)
-
-	return lhs.var_str + cstr;
-}
-
-var MVcat(const char* cstr, const var& rhs) {
-	THISIS("var operator^(const char* cstr, const var& rhs)")
-	ISSTRING(rhs)
-
-	return cstr + rhs.var_str;
-}
-
-var MVcat(const var& lhs, const char char2) {
-	THISIS("var operator^(const var& lhs,const char char2)")
-	ISSTRING(lhs)
-
-	return lhs.var_str + char2;
-}
-/*
-
-var& var::operator^(const var& vstr) {
-	THISIS("var& var::operator^(const var& vstr)")
-	THISISSTRING()
-	ISSTRING(vstr)
-
-	var_str += vstr.var_str;
-
-	return *this;
-}
-
-var& var::operator^(const char* cstr) {
-	std::clog <<("var operator^(const char& cstr)") << std::endl;
-	THISIS("var& var::operator^(const char& cstr)")
-	THISISSTRING()
-
-	var_str += cstr;
-
-	return *this;
-}
-
-var& var::operator^(const std::string& stdstr) {
-	THISIS("var& var::operator^(const std::string& stdstr)");
-	THISISSTRING()
-	ISSTRING(stdstr)
-
-	var_str += stdstr.var_str;
-
-	return *this;
-}
-*/
-
-//#if defined __MINGW32__
-// allow use of cout<<var
-//pass by value (make a copy) because we are going to convert FM to ^ etc
-//TODO provide a version that works on temporaries?
-//DLL_PUBLIC
-std::ostream& operator<<(std::ostream& ostream1, var var1) {
-	THISIS("std::ostream& operator<< (std::ostream& ostream1, var var1)")
-	ISSTRING(var1)
-
-	//replace various unprintable field marks with unusual ASCII characters
-	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
-	//std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
-	// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
-	std::string str = "\x1E\x1D\x1C\x1B\x1A\x1F";  //order by frequency of occurrence
-	for (auto& c : var1.var_str) {
-		if (c >= 0x1A && c <= 0x1F)
-			c = "|\x1B}]^~"[c - 0x1A];
-	}
-
-	// use toString() to avoid creating a constructor which logs here recursively
-	// should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-	ostream1 << var1.var_str;
-	return ostream1;
-}
-
-std::istream& operator>>(std::istream& istream1, var& var1) {
-	THISIS("std::istream& operator>> (std::istream& istream1,var& var1)")
-	ISDEFINED(var1)
-
-	std::string tempstr;
-	istream1 >> std::noskipws >> tempstr;
-
-	var1.var_typ = VARTYP_STR;
-	// this would verify all input is valid utf8
-	// var1.var_str=boost::locale::conv::utf_to_utf<char>(tempstr)
-	var1.var_str = tempstr;
-	return istream1;
-}
-
-//#endif
-
-std::string intToString(int int1) {
-
-	//600ns
-	// NB plain stringstream causes a memory leak in msvc8 before sp1
-	//std::ostringstream ss;
-	//ss << int1;
-	//// debuggFUNCTION&& cout<<"intToString(int "<<int1<<") returns '"<<s<<"'\n";
-	//return ss.str();
-
-	//40ns
-	return std::to_string(int1);
-}
-
 // TODO ensure locale doesnt produce like 123.456,78
 // see 1997 http://www.cantrip.org/locale.html
 std::string dblToString(double double1) {
@@ -1589,63 +225,6 @@ std::string dblToString(double double1) {
 	//std::cout << abs(double1) << std::endl;
 	//std::cout << double(0.000'000'001) << std::endl;
 	//std::cout << (std::abs(double1)<double(0.000'000'001)) << std::endl;
-
-	/*
-
-	//fixed to precision six
-	//return std::to_string(double1);
-
-	// see intToString for choice of ostringstream for implementation
-	// NB plain stringstream causes a memory leak in msvc8 before sp1
-	std::ostringstream stringstream1;
-	//if precision is changed, also change testmain
-
-	//stringstream1.precision(16);
-	//use precision 14 to avoid 1.1-1 = 1.000000000000001
-    stringstream1 << std::fixed;
-
-	std::string str1;
-	double abs_double1 = std::abs(double1);
-
-	//evade scientific format for small numbers
-	if (abs_double1 < 0.0001d) {
-
-		//treat very small numbers as zero
-		//if (std::abs(double1)<double(0.000'000'000'1))
-		//if (std::abs(double1)<double(0.000'000'000'000'001))
-		if (std::abs(double1)<0.000'000'000'000'1d)
-			return "0";
-
-		stringstream1.precision(14-std::log10(double1));
-		//stringstream1.precision(14);
-
-	} else if (abs_double1>1000000) {
-		stringstream1.precision(14-std::log10(double1));
-		//stringstream1.precision(6);
-
-	} else {
-		//stringstream1.precision(14-std::log10(double1));
-		stringstream1.precision(14);
-	}
-
-	//std::clog << double1 << " " << std::log10(double1) << std::endl;
-    stringstream1 << double1;
-    str1 = stringstream1.str();
-    while (str1.back() == '0')
-	    str1.pop_back();
-	if (str1.back() == '.')
-		str1.pop_back();
-
-	return str1;
-	*/
-
-	/*
-	std::vector<char> buf(64); // note +1 for null terminator
-	//std::snprintf(&buf[0], buf.size(), "%.16g", double1);
-	std::snprintf(&buf[0], buf.size(), "%.17g", double1);
-
-	return std::string(buf.data());
-	*/
 
 	int minus = double1 < 0 ? 1 : 0;
 
@@ -1894,9 +473,1393 @@ removetrailing:
 	return s;
 }
 
+// mainly called in ISSTRING when not already a string
+void var::createString() const {
+	// THISIS("void var::createString() const")
+	// TODO ensure ISDEFINED is called everywhere in advance
+	// to avoid wasting time doing multiple calls to ISDEFINED
+	// THISISDEFINED()
+
+	// dbl - create string from dbl
+	// prefer double
+	if (var_typ & VARTYP_DBL) {
+		var_str = dblToString(var_dbl);
+		var_typ |= VARTYP_STR;
+		return;
+	}
+
+	// int - create string from int
+	if (var_typ & VARTYP_INT) {
+		// loss of precision if var_int is long long
+		var_str = std::to_string(int(var_int));
+		var_typ |= VARTYP_STR;
+		return;
+	}
+	// already a string (unlikely since only called when not a string)
+	if (var_typ & VARTYP_STR) {
+		return;
+	}
+
+	// treat any other case as unassigned
+	//(usually var_typ & VARTYP_UNA)
+	throw MVUnassigned("createString()");
+}
+
+
+// EXPLICIT AND AUTOMATIC CONVERSIONS
+////////////////////////////////////
+
+// someone recommends not to create more than one automatic converter
+// to avoid the compiler error "ambiguous conversion"
+//(explicit means it is not automatic)
+
+// allow conversion to string (IS THIS USED FOR ANYTHING AT THE MOMENT?
+// allows the usage of any string function
+var::operator std::string() const {
+	THISIS("var::operator std::string")
+	THISISSTRING()
+	return var_str;
+}
+
+var::operator void*() const {
+	THISIS("var::operator void*() const")
+	// could be skipped for speed if can be proved there is no way in c++ syntax that would
+	// result in an attempt to convert an uninitialised object to void* since there is a bool
+	// conversion when does c++ use automatic conversion to void* note that exodus operator !
+	// uses (void*) trial elimination of operator void* seems to cause no problems but without
+	// full regression testing
+	THISISDEFINED()
+
+	return (void*)toBool();
+}
+
+// supposed to be replaced with automatic void() and made explicit but just seems to force int
+// conversion during "if (var)" necessary to allow var to be used standalone in "if (xxx)" but see
+// mv.h for discussion of using void* instead of bool #ifndef _MSC_VER
+var::operator bool() const {
+	return toBool();
+}
+
+/*
+var::operator const char*() const
+{
+	return toString().c_str();
+}
+*/
+
+#ifndef HASINTREFOP
+var::operator int() const {
+	THISIS("var::operator int() const")
+	//converts string or double to int using pickos int() which is floor()
+	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
+	THISISINTEGER()
+	return int(var_int);
+}
+
+var::operator double() const {
+	THISIS("var::operator double() const")
+	THISISDECIMAL()
+	return var_dbl;
+}
+
+#else
+var::operator int&() const {
+	THISIS("var::operator mv_int_t&()")
+	//converts string or double to int using pickos int() which is floor()
+	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
+	THISISINTEGER()
+	// TODO check that converting mvint_t (which is long long) to int doesnt cause any practical
+	// problems) PROBABLY WILL! since we are returning a non const reference which allows
+	// callers to set the int directly then clear any decimal and string cache flags which would
+	// be invalid after setting the int alone
+	//var_typ |= VARTYP_INT;
+	return (int&)var_int;
+}
+var::operator double&() const {
+	THISIS("var::operator double&()")
+	THISISDECIMAL()
+	// since we are returning a non const reference which allows callers to set the dbl directly
+	// then clear any int and string cache flags which would be invalid after setting the dbl
+	// alone
+	//var_typ |= VARTYP_DBL;
+	return (double&)var_dbl;
+}
+#endif
+
+// remove because causes "ambiguous" with -short_wchar on linux
+/*
+var::operator unsigned int() const
+{
+	THISIS("var::operator int() const")
+	THISISDEFINED()
+
+	do
+	{
+		//prioritise int since conversion to int perhaps more likely to be an int already
+		if (var_typ&VARTYP_INT)
+			return var_int;
+		if (var_typ&VARTYP_DBL)
+			return int(var_dbl);
+		if (var_typ&VARTYP_NAN)
+			throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
+		if (!(var_typ))
+		{
+			THISISASSIGNED()
+			throw MVUnassigned("int(var)");
+		}
+	}
+	//must be string - try to convert to numeric
+	while (isnum());
+
+	THISISNUMERIC()
+	throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
+
+}
+*/
+
+/*
+//necessary to allow use of var inside STL containers
+var::operator size_t() const
+{
+	return (size_t) operator int();
+}
+*/
+
+/*
+var::operator const char*()
+{
+	if (var_typ&VARTYP_MASK)
+		throw MVUndefined("const char*()");
+	cout<<"CONVERT: operator const char*() returns '"<<var_str.c_str()<<"'\n";
+	return var_str.c_str();
+}
+*/
+
+// UNARY OPERATORS
+/////////////////
+
+// copy assignment
+// var1 = var2
+// The assignment operator should always return a reference to *this.
+// cant be (CVR rhs) because seems to cause a problem with var1=var2 in function parameters
+// unfortunately causes problem of passing var by value and thereby unnecessary contruction
+// see also ^= etc
+VOID_OR_VARREF var::operator=(CVR rhs) & {
+	THISIS("VARREF var::operator= (CVR rhs) &")
+	THISISDEFINED()	 //could be skipped for speed?
+	ISASSIGNED(rhs)
+
+	//std::clog << "copy assignment" <<std::endl;
+
+	// important not to self assign
+	if (this == &rhs)
+		return VOID_OR_THIS;
+
+	// copy everything across
+	var_str = rhs.var_str;
+	var_dbl = rhs.var_dbl;
+	var_int = rhs.var_int;
+	var_typ = rhs.var_typ;
+
+	return VOID_OR_THIS;
+}
+
+// move assignment
+// var = temporary var
+VOID_OR_VARREF var::operator=(TVR rhs) & noexcept {
+	// skip this for speed?
+	// THISIS("VARREF var::operator= (var rhs)")
+	// THISISDEFINED()
+
+	// skip this for speed since temporararies are unlikely to be unassigned
+	// THISIS("var::var(TVR rhs) noexcept")
+	// ISASSIGNED(rhs)
+
+	//std::clog << "move assignment" <<std::endl;
+
+	// important not to self assign
+	if (this == &rhs)
+		return VOID_OR_THIS;
+
+	// move everything over
+	var_str = std::move(rhs.var_str);
+	var_dbl = rhs.var_dbl;
+	var_int = rhs.var_int;
+	var_typ = rhs.var_typ;
+
+	return VOID_OR_THIS;
+}
+
+//=int
+// The assignment operator should always return a reference to *this.
+VOID_OR_VARREF var::operator=(const int int1) & {
+	// THISIS("VARREF var::operator= (const int int1)")
+	// protect against unlikely syntax as follows:
+	// var undefinedassign=undefinedassign=123';
+	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
+	// THISISDEFINED()
+
+	var_int = int1;
+	var_typ = VARTYP_INT;  // reset to one unique type
+
+	return VOID_OR_THIS;
+}
+
+//=double
+// The assignment operator should always return a reference to *this.
+VOID_OR_VARREF var::operator=(const double double1) & {
+	// THISIS("VARREF var::operator= (const double double1)")
+	// protect against unlikely syntax as follows:
+	// var undefinedassign=undefinedassign=9.9';
+	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
+	// THISISDEFINED()
+
+	var_dbl = double1;
+	var_typ = VARTYP_DBL;  // reset to one unique type
+
+	return VOID_OR_THIS;
+}
+
+//=char
+// The assignment operator should always return a reference to *this.
+VOID_OR_VARREF var::operator=(const char char2) & {
+
+	THISIS("VARREF var::operator= (const char char2) &")
+	// protect against unlikely syntax as follows:
+	// var undefinedassign=undefinedassign=L'X';
+	// this causes crash due to bad memory access due to setting string that doesnt exist
+	// slows down all string settings so consider NOT CHECKING in production code
+	THISISDEFINED()	 // ALN:TODO: this definition kind of misleading, try to find
+	// ALN:TODO: or change name to something like: THISISNOTDEAD :)
+	// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
+
+	var_str = char2;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return VOID_OR_THIS;
+}
+
+//=char*
+// The assignment operator should always return a reference to *this.
+VOID_OR_VARREF var::operator=(const char* cstr) & {
+	THISIS("VARREF var::operator= (const char* cstr2) &")
+	// protect against unlikely syntax as follows:
+	// var undefinedassign=undefinedassign="xxx";
+	// this causes crash due to bad memory access due to setting string that doesnt exist
+	// slows down all string settings so consider NOT CHECKING in production code
+	THISISDEFINED()
+
+	var_str = cstr;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return VOID_OR_THIS;
+}
+
+//=std::string variable (lvalue)
+// The assignment operator should always return a reference to *this.
+VOID_OR_VARREF var::operator=(const std::string& string2) & {
+
+	THISIS("VARREF var::operator= (const std::string& string2) &")
+	// protect against unlikely syntax as follows:
+	// var undefinedassign=undefinedassign=std::string("xxx"";
+	// this causes crash due to bad memory access due to setting string that doesnt exist
+	// slows down all string settings so consider NOT CHECKING in production code
+	THISISDEFINED()
+	var_str = string2;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return VOID_OR_THIS;
+}
+//=std::string temporary (rvalue)
+// The assignment operator should always return a reference to *this.
+VOID_OR_VARREF var::operator=(const std::string&& string2) & {
+
+	THISIS("VARREF var::operator= (const std::string&& string2) &")
+	// protect against unlikely syntax as follows:
+	// var undefinedassign=undefinedassign=std::string("xxx"";
+	// this causes crash due to bad memory access due to setting string that doesnt exist
+	// slows down all string settings so consider NOT CHECKING in production code
+	THISISDEFINED()
+	var_str = std::move(string2);
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return VOID_OR_THIS;
+}
+//^= is not templated since slightly slower to go through the creation of an var()
+
+//^=var
+// The assignment operator should always return a reference to *this.
+VARREF var::operator^=(CVR rhs) & {
+	THISIS("VARREF var::operator^=(CVR rhs) &")
+	THISISSTRING()
+	ISSTRING(rhs)
+
+	// tack it onto our string
+	var_str.append(rhs.var_str);
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+//^=int
+// The assignment operator should always return a reference to *this.
+VARREF var::operator^=(const int int1) & {
+	THISIS("VARREF var::operator^= (const int int1) &")
+	THISISSTRING()
+
+	// var_str+=var(int1).var_str;
+	var_str += std::to_string(int1);
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+//^=double
+// The assignment operator should always return a reference to *this.
+VARREF var::operator^=(const double double1) & {
+	THISIS("VARREF var::operator^= (const double double1) &")
+	THISISSTRING()
+
+	// var_str+=var(int1).var_str;
+	var_str += dblToString(double1);
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+//^=char
+// The assignment operator should always return a reference to *this.
+VARREF var::operator^=(const char char1) & {
+	THISIS("VARREF var::operator^= (const char char1) &")
+	THISISSTRING()
+
+	// var_str+=var(int1).var_str;
+	var_str.push_back(char1);
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+//^=char*
+// The assignment operator should always return a reference to *this.
+VARREF var::operator^=(const char* cstr) & {
+	THISIS("VARREF var::operator^= (const char* cstr) &")
+	THISISSTRING()
+
+	// var_str+=var(int1).var_str;
+	// var_str+=std::string(char1);
+	var_str += cstr;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+//^=std::string
+// The assignment operator should always return a reference to *this.
+VARREF var::operator^=(const std::string& string1) & {
+	THISIS("VARREF var::operator^= (const std::string string1) &")
+	THISISSTRING()
+
+	// var_str+=var(int1).var_str;
+	var_str += string1;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+// not handled by inbuilt conversion of var to long long& on the rhs
+
+//#ifndef HASINTREFOP
+//#else
+
+// You must *not* make the postfix version return the 'this' object by reference
+// *** YOU HAVE BEEN WARNED ***
+
+// not returning void so is usable in expressions
+// int argument indicates that this is POSTFIX override v++
+var var::operator++(int) & {
+	THISIS("var var::operator++ (int) &")
+	// full check done below to avoid double checking number type
+	THISISDEFINED()
+
+	var priorvalue;
+
+tryagain:
+	// prefer int since ++ nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::max())
+			throw MVIntOverflow("operator++");
+		priorvalue = var(var_int);
+		var_int++;
+		var_typ = VARTYP_INT;  // reset to one unique type
+
+	} else if (var_typ & VARTYP_DBL) {
+		priorvalue = var_dbl;
+		var_dbl++;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+
+	} else if (var_typ & VARTYP_STR) {
+		// try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		//trigger MVNonNumeric
+		THISISNUMERIC()
+
+	} else {
+		//trigger MVUnassigned
+		THISISNUMERIC()
+	}
+
+	// NO DO NOT! return *this ... postfix return a temporary!!! eg var(*this)
+	return priorvalue;
+}
+
+// not returning void so is usable in expressions
+// int argument indicates that this is POSTFIX override v--
+var var::operator--(int) & {
+	THISIS("var var::operator-- (int) & ")
+	// full check done below to avoid double checking number type
+	THISISDEFINED()
+
+	var priorvalue;
+
+tryagain:
+	// prefer int since -- nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::min())
+			throw MVIntUnderflow("operator--");
+		priorvalue = var(var_int);
+		var_int--;
+		var_typ = VARTYP_INT;  // reset to one unique type
+
+	} else if (var_typ & VARTYP_DBL) {
+		priorvalue = var_dbl;
+		var_dbl--;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+
+	} else if (var_typ & VARTYP_STR) {
+		// try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		//trigger MVNonNumeric
+		THISISNUMERIC()
+
+	} else {
+		//trigger MVUnassigned
+		THISISNUMERIC()
+	}
+
+	return priorvalue;
+}
+
+// not returning void so is usable in expressions
+// no argument indicates that this is prefix override ++var
+VARREF var::operator++() & {
+	THISIS("var var::operator++ () &")
+	// full check done below to avoid double checking number type
+	THISISDEFINED()
+
+tryagain:
+	// prefer int since -- nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::max())
+			throw MVIntOverflow("operator++");
+		var_int++;
+		var_typ = VARTYP_INT;  // reset to one unique type
+	} else if (var_typ & VARTYP_DBL) {
+		var_dbl++;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+	} else if (var_typ & VARTYP_STR) {
+		// try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		//trigger MVNonNumeric
+		THISISNUMERIC()
+
+	} else {
+		//trigger MVUnassigned
+		THISISNUMERIC()
+	}
+
+	// OK to return *this in prefix ++
+	return *this;
+}
+
+// not returning void so is usable in expressions
+// no argument indicates that this is prefix override --var
+VARREF var::operator--() & {
+	THISIS("VARREF var::operator-- () &")
+	// full check done below to avoid double checking number type
+	THISISDEFINED()
+
+tryagain:
+	// prefer int since -- nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::min())
+			throw MVIntUnderflow("operator--");
+		var_int--;
+		var_typ = VARTYP_INT;  // reset to one unique type
+
+	} else if (var_typ & VARTYP_DBL) {
+		var_dbl--;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+
+	} else if (var_typ & VARTYP_STR) {
+		// try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		//trigger MVNonNumeric
+		THISISNUMERIC()
+
+	} else {
+		//trigger MVUnassigned
+		THISISNUMERIC()
+	}
+
+	// OK to return *this in prefix --
+	return *this;
+}
+
+//+=var (very similar to version with on rhs)
+// provided to disambiguate syntax like var1+=var2
+VARREF var::operator+=(int int1) & {
+	THISIS("VARREF var::operator+= (int int1) &")
+	THISISDEFINED()
+
+tryagain:
+
+	// dbl target
+	// prefer double
+	if (var_typ & VARTYP_DBL) {
+		//+= int or dbl from source
+		var_dbl += int1;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+		return *this;
+	}
+
+	// int target
+	else if (var_typ & VARTYP_INT) {
+		var_int += int1;
+		var_typ = VARTYP_INT;  // reset to one unique type
+		return *this;
+	}
+
+	// last case(s) should be much less frequent since result of attempt to
+	// convert strings to number is cached and only needs to be done once
+
+	// nan (dont bother with this here because it is exceptional and will be caught below anyway
+	// else if (var_typ&VARTYP_NAN)
+	//	throw MVNonNumeric("var::+= " ^ *this);
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	THISISNUMERIC()
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+}
+
+//-=var (very similar to version with on rhs)
+// provided to disambiguate syntax like var1+=var2
+VARREF var::operator-=(int int1) & {
+	THISIS("VARREF var::operator-= (int int1) &")
+	THISISDEFINED()
+
+tryagain:
+	// dbl target
+	// prefer double
+	if (var_typ & VARTYP_DBL) {
+		var_dbl -= int1;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+		return *this;
+	}
+
+	// int target
+	else if (var_typ & VARTYP_INT) {
+		var_int -= int1;
+		var_typ = VARTYP_INT;  // reset to one unique type
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	THISISNUMERIC()
+	throw MVNonNumeric(substr(1, 128) ^ "-= ");
+}
+
+// allow varx+=1.5 to compile
+VARREF var::operator+=(double dbl1) & {
+	(*this) += var(dbl1);
+	return *this;
+}
+
+VARREF var::operator-=(double dbl1) & {
+	(*this) -= var(dbl1);
+	return *this;
+}
+
+//+=var
+VARREF var::operator+=(CVR rhs) & {
+	THISIS("VARREF var::operator+= (CVR rhs) &")
+	THISISDEFINED()
+
+tryagain:
+
+	// dbl target
+	// prefer double
+	if (var_typ & VARTYP_DBL) {
+		ISNUMERIC(rhs)
+		//+= int or dbl from source
+		var_dbl += (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+		return *this;
+	}
+
+	// int target
+	else if (var_typ & VARTYP_INT) {
+		ISNUMERIC(rhs)
+		// int source
+		if (rhs.var_typ & VARTYP_INT) {
+			var_int += rhs.var_int;
+			var_typ = VARTYP_INT;  // reset to one unique type
+			return *this;
+		}
+		// dbl source, convert target to dbl
+		var_dbl = var_int + rhs.var_dbl;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+		return *this;
+	}
+
+	// last case(s) should be much less frequent since result of attempt to
+	// convert strings to number is cached and only needs to be done once
+
+	// nan (dont bother with this here because it is exceptional and will be caught below anyway
+	// else if (var_typ&VARTYP_NAN)
+	//	throw MVNonNumeric("var::+= " ^ *this);
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	THISISNUMERIC()
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+}
+
+//-=var
+VARREF var::operator-=(CVR rhs) & {
+	THISIS("VARREF var::operator-= (CVR rhs) &")
+	THISISDEFINED()
+
+tryagain:
+
+	// int target
+	if (var_typ & VARTYP_INT) {
+		ISNUMERIC(rhs)
+		// int source
+		if (rhs.var_typ & VARTYP_INT) {
+			var_int -= rhs.var_int;
+			var_typ = VARTYP_INT;  // reset to one unique type
+			return *this;
+		}
+		// dbl source, convert target to dbl
+		var_dbl = var_int - rhs.var_dbl;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+		return *this;
+	}
+
+	// dbl target
+	else if (var_typ & VARTYP_DBL) {
+		ISNUMERIC(rhs)
+		//-= int or dbl from source
+		var_dbl -= (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+		return *this;
+	}
+
+	// last case(s) should be much less frequent since result of attempt to
+	// convert strings to number is cached and only needs to be done once
+
+	// nan (dont bother with this here because it is exceptional and will be caught below anyway
+	// else if (var_typ&VARTYP_NAN)
+	//	throw MVNonNumeric("var::-= " ^ *this);
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	THISISNUMERIC()
+	throw MVNonNumeric(substr(1, 128) ^ "-= ");
+}
+
+//#endif
+
+/* more accurate way of comparing two decimals using EPSILON and ulp
+   not using it simply to make better emulation of pickos at least initially
+
+//comparing floating point numbers is a VERY complex matter since c++ double uses BINARY NOT DECIMAL
+//
+//https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+//
+//https://www.theregister.com/2006/08/12/floating_point_approximation/
+//https://www.theregister.com/2006/09/20/floating_point_numbers_2/
+//
+//derived from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
+inline bool almost_equal_not_zero(double x, double y, int ulp)
+{
+	// the machine epsilon has to be scaled to the magnitude of the values used
+	// and multiplied by the desired precision in ULPs (units in the last place)
+	return std::fabs(x-y) <= std::numeric_limits<double>::epsilon() * std::fabs(x+y) * ulp
+		// unless the result is subnormal
+		|| std::fabs(x-y) < std::numeric_limits<double>::min();
+}
+
+inline bool almost_equal(double x, decltype(var_int) y, int ulp)
+{
+	if (y == 0)
+		return (std::abs(x) < SMALLEST_NUMBER);
+	else
+		return almost_equal_not_zero(x, double(y), ulp);
+}
+
+inline bool almost_equal(double x, double y, int ulp)
+{
+	if (y == 0.0)
+		return (std::abs(x) < SMALLEST_NUMBER);
+	else if (x == 0.0)
+		return (std::abs(y) < SMALLEST_NUMBER);
+	else
+		return almost_equal_not_zero(x, y, ulp);
+}
+*/
+
+inline bool almost_equal(double x, double y, int) {
+	//crude pickos method
+	return (std::abs(x - y) < SMALLEST_NUMBER);
+}
+
+// almost identical code in MVeq and MVlt except where noted
+// NOTE doubles compare only to 0.0001 accuracy)
+DLL_PUBLIC bool MVeq(CVR lhs, CVR rhs) {
+	THISIS("bool MVeq(CVR lhs,CVR rhs)")
+	ISDEFINED(lhs)
+	ISDEFINED(rhs)
+
+	// NB empty string is always less than anything except another empty string
+
+	// 1. BOTH EMPTY or IDENTICAL STRINGS returns TRUE one empty results false
+	if (lhs.var_typ & VARTYP_STR) {
+		if (rhs.var_typ & VARTYP_STR) {
+			// we have two strings
+			// if they are both the same (including both empty) then eq is true
+			if (lhs.var_str == rhs.var_str)
+				// different from MVlt
+				return true;
+			// otherwise if either is empty then return eq false
+			//(since empty string is ONLY eq to another empty string)
+			if (lhs.var_str.empty())
+				// different from MVlt
+				return false;
+			if (rhs.var_str.empty())
+				// SAME as MVlt
+				return false;
+			// otherwise go on to test numerically then literally
+		} else {
+			// if rhs isnt a string and lhs is empty then eq is false
+			//(after checking that rhs is actually assigned)
+			if (lhs.var_str.empty()) {
+				if (!rhs.var_typ) {
+					// throw MVUnassigned("eq(rhs)");
+					ISASSIGNED(rhs)
+				}
+				// different from MVlt
+				return false;
+			}
+		}
+	} else {
+		// if lhs isnt a string and rhs is an empty string then return eq false
+		//(after checking that lhs is actually assigned)
+		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
+			if (!lhs.var_typ) {
+				// throw MVUnassigned("eq(lhs)");
+				ISASSIGNED(lhs)
+			}
+			// SAME as MVlt
+			return false;
+		}
+	}
+
+	// 2. BOTH NUMERIC STRINGS
+	// exact match on decimal numbers is often inaccurate since they are approximations of real
+	// numbers
+	// match on decimal in preference to int
+	if (lhs.isnum() && rhs.isnum()) {
+		//if (lhs.var_typ & VARTYP_INT)
+		if (lhs.var_typ & VARTYP_DBL) {
+
+			//DOUBLE v DOUBLE
+			//if (rhs.var_typ & VARTYP_INT)
+			if (rhs.var_typ & VARTYP_DBL) {
+				// different from MVlt
+
+				//return (lhs.var_intd == rhs.var_intd);
+
+				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+				//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+				return almost_equal(lhs.var_dbl, rhs.var_dbl, 2);
+			}
+
+			//DOUBLE V INT
+			else {
+				// different from MVlt (uses absolute)
+				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+
+				//return (lhs.var_int == rhs.var_dbl);
+				//return (std::abs(lhs.var_dbl - double(rhs.var_int)) < SMALLEST_NUMBER);
+				return almost_equal(lhs.var_dbl, rhs.var_int, 2);
+			}
+		}
+
+		//INT v DOUBLE
+		//if (rhs.var_typ & VARTYP_INTd)
+		if (rhs.var_typ & VARTYP_DBL) {
+			// different from MVlt (uses absolute)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+
+			//return (lhs.var_dbl == rhs.var_int);
+			//return (std::abs(double(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
+			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
+			//put lhs int 2nd argument to invoke the fastest implmentation
+			return almost_equal(rhs.var_dbl, lhs.var_int, 2);
+		}
+
+		//INT v INT
+		else {
+			// different from MVlt (uses absolute)
+
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl == rhs.var_dbl);
+			//return (std::abs(lhs.var_dbl-rhs.var_dbl) < SMALLEST_NUMBER);
+
+			return (lhs.var_int == rhs.var_int);
+		}
+	}
+
+	// 3. BOTH NON-NUMERIC STRINGS
+	if (!(lhs.var_typ & VARTYP_STR))
+		lhs.createString();
+	if (!(rhs.var_typ & VARTYP_STR))
+		rhs.createString();
+	// different from MVlt
+	//return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) == 0;
+	return lhs.var_str == rhs.var_str;
+}
+
+// almost identical between MVeq and MVlt except where noted
+// NOTE doubles compare only to 0.0001 accuracy)
+DLL_PUBLIC bool MVlt(CVR lhs, CVR rhs) {
+	THISIS("bool MVlt(CVR lhs,CVR rhs)")
+	ISDEFINED(lhs)
+	ISDEFINED(rhs)
+
+	// NB empty string is always less than anything except another empty string
+
+	// 1. both empty or identical strings returns eq. one empty results false
+	if (lhs.var_typ & VARTYP_STR) {
+		if (rhs.var_typ & VARTYP_STR) {
+			// we have two strings
+			// if they are both the same (including both empty) then eq is true
+			if (lhs.var_str == rhs.var_str)
+				// different from MVeq
+				return false;
+			// otherwise if either is empty then return eq false
+			//(since empty string is ONLY eq to another empty string)
+			if (lhs.var_str.empty())
+				// different from MVeq
+				return true;
+			if (rhs.var_str.empty())
+				// SAME as MVeq
+				return false;
+			// otherwise go on to test numerically then literally
+		} else {
+			// if rhs isnt a string and lhs is empty then eq is false
+			// after checking that rhs is actually assigned
+			if (lhs.var_str.empty()) {
+				if (!rhs.var_typ) {
+					// throw MVUnassigned("eq(rhs)");
+					ISASSIGNED(rhs)
+				}
+				// different from MVeq
+				return true;
+			}
+		}
+	} else {
+		// if lhs isnt a string and rhs is an empty string then return eq false
+		// after checking that lhs is actually assigned
+		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
+			if (!lhs.var_typ) {
+				// throw MVUnassigned("eq(lhs)");
+				ISASSIGNED(lhs)
+			}
+			// SAME as MVeq
+			return false;
+		}
+	}
+
+	// 2. both numerical strings
+	if (lhs.isnum() && rhs.isnum()) {
+		if (lhs.var_typ & VARTYP_INT) {
+			if (rhs.var_typ & VARTYP_INT)
+				// different from MVeq
+				return (lhs.var_int < rhs.var_int);
+			else
+				// different from MVeq
+				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+				//return (double(lhs.var_int) < rhs.var_dbl);
+				return (rhs.var_dbl - double(lhs.var_int)) >= SMALLEST_NUMBER;
+			//return ((rhs.var_dbl - double(lhs.var_int) >= SMALLEST_NUMBER);
+		}
+		if (rhs.var_typ & VARTYP_INT)
+			// different from MVeq
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl < double(rhs.var_int));
+			return (double(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
+		else
+			// different from MVeq
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl < rhs.var_dbl);
+			return (rhs.var_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
+	}
+
+	// 3. either or both non-numerical strings
+	if (!(lhs.var_typ & VARTYP_STR))
+		lhs.createString();
+	if (!(rhs.var_typ & VARTYP_STR))
+		rhs.createString();
+	// different from MVeq
+	// return lhs.var_str<rhs.var_str;
+	return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) < 0;
+}
+
+// similar to MVeq and MVlt - this is the var<int version for speed
+// NOTE doubles compare only to 0.0001 accuracy)
+DLL_PUBLIC bool MVlt(CVR lhs, const int int2) {
+	THISIS("bool MVlt(CVR lhs,const int int2)")
+	ISDEFINED(lhs)
+
+	// NB empty string is always less than anything except another empty string
+
+	// 1. both empty or identical strings returns eq. one empty results false
+	if (lhs.var_typ & VARTYP_STR) {
+		// if rhs isnt a string and lhs is empty then eq is false
+		// after checking that rhs is actually assigned
+		if (lhs.var_str.empty()) {
+			// different from MVeq
+			return true;
+		}
+	}
+
+	// 2. both numerical strings
+	do {
+		if (lhs.var_typ & VARTYP_INT)
+			// different from MVeq
+			return (lhs.var_int < int2);
+
+		if (lhs.var_typ & VARTYP_DBL)
+			// different from MVeq
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl < int2);
+			return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
+		//return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
+	}
+	// go back and try again if can be converted to number
+	while (lhs.isnum());
+
+	// 3. either or both non-numerical strings
+	if (!(lhs.var_typ & VARTYP_STR)) {
+		// lhs.createString();
+		ISSTRING(lhs)
+	}
+	// different from MVeq
+	return lhs.var_str < std::to_string(int2);
+}
+
+// similar to MVeq and MVlt - this is the int<var version for speed
+// NOTE doubles compare only to 0.0001 accuracy)
+DLL_PUBLIC bool MVlt(const int int1, CVR rhs) {
+	THISIS("bool MVlt(const int int1,CVR rhs)")
+	ISDEFINED(rhs)
+
+	// NB empty string is always less than anything except another empty string
+
+	// 1. both empty or identical strings returns eq. one empty results false
+	if (rhs.var_typ & VARTYP_STR) {
+		if (rhs.var_str.empty())
+			// SAME as MVeq
+			return false;
+		// otherwise go on to test numerically then literally
+	}
+
+	// 2. both numerical strings
+	do {
+		if (rhs.var_typ & VARTYP_INT)
+			// different from MVeq
+			return (int1 < rhs.var_int);
+		if (rhs.var_typ & VARTYP_DBL) {
+			// different from MVeq
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (int1 < rhs.var_dbl);
+			return (rhs.var_dbl - double(int1)) >= SMALLEST_NUMBER;
+		}
+	}
+	// go back and try again if can be converted to number
+	while (rhs.isnum());
+
+	// 3. either or both non-numerical strings
+	if (!(rhs.var_typ & VARTYP_STR)) {
+		// lhs.createString();
+		ISSTRING(rhs)
+	}
+	// different from MVeq
+	return std::to_string(int1) < rhs.var_str;
+}
+// SEE ALSO MV2.CPP
+
+//+var
+//DLL_PUBLIC var operator+(CVR var1)
+var MVplus(CVR var1) {
+	THISIS("var operator+(CVR var1)")
+	ISDEFINED(var1)
+
+	do {
+		// dbl
+		if (var1.var_typ & VARTYP_DBL)
+			return var1.var_dbl;
+
+		// int
+		if (var1.var_typ & VARTYP_INT)
+			return var1.var_int;
+
+		// unassigned
+		if (!var1.var_typ) {
+			ISASSIGNED(var1)
+			throw MVUnassigned("+()");
+		}
+	}
+	// must be string - try to convert to numeric
+	while (var1.isnum());
+
+	// non-numeric
+	ISNUMERIC(var1)
+	// will never get here
+	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
+}
+
+//-var (identical to +var above except for two additional - signs)
+//DLL_PUBLIC var operator-(CVR var1)
+var MVminus(CVR var1) {
+	THISIS("var operator-(CVR var1)")
+	ISDEFINED(var1)
+
+	do {
+		// dbl
+		if (var1.var_typ & VARTYP_DBL)
+			return -var1.var_dbl;
+
+		// int
+		if (var1.var_typ & VARTYP_INT)
+			return -var1.var_int;
+
+		// unassigned
+		if (!var1.var_typ) {
+			ISASSIGNED(var1)
+			throw MVUnassigned("+()");
+		}
+	}
+	// must be string - try to convert to numeric
+	while (var1.isnum());
+
+	// non-numeric
+	ISNUMERIC(var1)
+	// will never get here
+	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
+}
+
+//! var
+//DLL_PUBLIC bool operator!(CVR var1)
+bool MVnot(CVR var1) {
+	THISIS("bool operator!(CVR var1)")
+	ISASSIGNED(var1)
+
+	// might need converting to work on void pointer
+	// if bool replaced with void* (or made explicit instead of implict)
+	// is there really any difference since the bool and void operators are defined identically?
+	// return !(bool)(var1);
+	return !(void*)(var1);
+}
+
+var MVadd(CVR lhs, CVR rhs) {
+	THISIS("var operator+(CVR lhs,CVR rhs)")
+	ISNUMERIC(lhs)
+	ISNUMERIC(rhs)
+
+	//identical code in MVadd and MVsub except for +/-
+	//identical code in MVadd, MVsub, MVmul except for +,-,*
+	if (lhs.var_typ & VARTYP_DBL)
+		return lhs.var_dbl + ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
+	else if (rhs.var_typ & VARTYP_DBL)
+		return lhs.var_int + rhs.var_dbl;
+	else
+		return lhs.var_int + rhs.var_int;
+}
+
+var MVsub(CVR lhs, CVR rhs) {
+	THISIS("var operator-(CVR lhs,CVR rhs)")
+	ISNUMERIC(lhs)
+	ISNUMERIC(rhs)
+
+	//identical code in MVadd, MVsub, MVmul except for +,-,*
+	if (lhs.var_typ & VARTYP_DBL)
+		return lhs.var_dbl - ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
+	else if (rhs.var_typ & VARTYP_DBL)
+		return lhs.var_int - rhs.var_dbl;
+	else
+		return lhs.var_int - rhs.var_int;
+}
+
+var MVmul(CVR lhs, CVR rhs) {
+	THISIS("var operator*(CVR lhs,CVR rhs)")
+	ISNUMERIC(lhs)
+	ISNUMERIC(rhs)
+
+	//identical code in MVadd, MVsub, MVmul except for +,-,*
+	if (lhs.var_typ & VARTYP_DBL)
+		return lhs.var_dbl * ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
+	else if (rhs.var_typ & VARTYP_DBL)
+		return lhs.var_int * rhs.var_dbl;
+	else
+		return lhs.var_int * rhs.var_int;
+}
+
+var MVdiv(CVR lhs, CVR rhs) {
+	THISIS("var operator/(CVR lhs,CVR rhs)")
+	ISNUMERIC(lhs)
+	ISNUMERIC(rhs)
+
+	// always returns a double because 10/3 must be 3.3333333
+
+	if (lhs.var_typ & VARTYP_DBL) {
+		// 1. double ... double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			return lhs.var_dbl / rhs.var_dbl;
+		}
+		// 2. double ... int
+		else {
+			if (!rhs.var_int)
+				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			return lhs.var_dbl / rhs.var_int;
+		}
+	}
+	// 3. int ... double
+	else if (rhs.var_typ & VARTYP_DBL) {
+		if (!rhs.var_dbl)
+			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+								 "')");
+		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
+	}
+	// 4. int ... int
+	else {
+		if (!rhs.var_int)
+			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+								 "')");
+		return static_cast<double>(lhs.var_int) / rhs.var_int;
+	}
+}
+
+double exodusmodulus(const double top, const double bottom) {
+#define USE_PICKOS_MODULUS
+#ifdef USE_PICKOS_MODULUS
+
+	// note that exodus var int() is floor function as per pickos standard
+	// whereas c/c++ int() function is round to nearest even number (negative or positive)
+
+	//https://pickos.neosys.com/x/pAEz.html
+	//var(i) - (int(var(i)/var(j)) * var(j))) ... where int() is pickos int() (i.e. floor)
+	return top - double(floor(top / bottom) * bottom);
+
+#else
+	//return top - double(int(top / bottom) * bottom);
+	//return top % bottom;//doesnt compile (doubles)
+
+	//fmod - The floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where n is x/y with its fractional part truncated.
+	//https://en.cppreference.com/w/c/numeric/math/fmod
+	//return std::fmod(top,bottom);
+
+	//remainder - The IEEE floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where the value n is the integral value nearest the exact value x/y. When |n-x/y| = ½, the value n is chosen to be even.
+	//https://en.cppreference.com/w/c/numeric/math/remainder
+	return std::remainder(top, bottom);
+
+#endif
+}
+
+var MVmod(CVR lhs, CVR rhs) {
+	THISIS("var operator%(CVR lhs,CVR rhs)")
+	ISNUMERIC(lhs)
+	ISNUMERIC(rhs)
+
+	//returns an integer var IIF both arguments are integer vars
+	//otherwise returns a double var
+
+	if (lhs.var_typ & VARTYP_DBL) {
+		// 1. double ... double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			return exodusmodulus(lhs.var_dbl, rhs.var_dbl);
+		}
+		// 2. double ... int
+		else {
+			if (!rhs.var_int)
+				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			return exodusmodulus(lhs.var_dbl, rhs.var_int);
+		}
+	}
+	// 3. int ... double
+	else if (rhs.var_typ & VARTYP_DBL) {
+		if (!rhs.var_dbl)
+			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+								 "')");
+		return exodusmodulus(lhs.var_int, rhs.var_dbl);
+	}
+	// 4. int ... int
+	else {
+		if (!rhs.var_int)
+			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+								 "')");
+		//return exodusmodulus(lhs.var_int, rhs.var_int);
+		return lhs.var_int % rhs.var_int;
+	}
+}
+
+// var^var we reassign the logical xor operator ^ to be string concatenate!!!
+// slightly wrong precedence but at least we have a reliable concat operator to replace the + which
+// is now reserved for forced ADDITION both according to fundamental PickOS principle
+var MVcat(CVR lhs, CVR rhs) {
+	THISIS("var operator^(CVR lhs,CVR rhs)")
+	ISSTRING(lhs)
+	ISSTRING(rhs)
+
+	return lhs.var_str + rhs.var_str;
+}
+
+var MVcat(CVR lhs, const char* cstr) {
+	THISIS("var operator^(CVR lhs,const char* cstr)")
+	ISSTRING(lhs)
+
+	return lhs.var_str + cstr;
+}
+
+var MVcat(const char* cstr, CVR rhs) {
+	THISIS("var operator^(const char* cstr, CVR rhs)")
+	ISSTRING(rhs)
+
+	return cstr + rhs.var_str;
+}
+
+var MVcat(CVR lhs, const char char2) {
+	THISIS("var operator^(CVR lhs,const char char2)")
+	ISSTRING(lhs)
+
+	return lhs.var_str + char2;
+}
+/*
+
+VARREF var::operator^(CVR vstr) {
+	THISIS("VARREF var::operator^(CVR vstr)")
+	THISISSTRING()
+	ISSTRING(vstr)
+
+	var_str += vstr.var_str;
+
+	return *this;
+}
+
+VARREF var::operator^(const char* cstr) {
+	std::clog <<("var operator^(const char& cstr)") << std::endl;
+	THISIS("VARREF var::operator^(const char& cstr)")
+	THISISSTRING()
+
+	var_str += cstr;
+
+	return *this;
+}
+
+VARREF var::operator^(const std::string& stdstr) {
+	THISIS("VARREF var::operator^(const std::string& stdstr)");
+	THISISSTRING()
+	ISSTRING(stdstr)
+
+	var_str += stdstr.var_str;
+
+	return *this;
+}
+*/
+
+//#if defined __MINGW32__
+// allow use of cout<<var
+//pass by value (make a copy) because we are going to convert FM to ^ etc
+//TODO provide a version that works on temporaries?
+//DLL_PUBLIC
+std::ostream& operator<<(std::ostream& ostream1, var var1) {
+	THISIS("std::ostream& operator<< (std::ostream& ostream1, var var1)")
+	ISSTRING(var1)
+
+	//replace various unprintable field marks with unusual ASCII characters
+	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
+	//std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
+	// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
+	std::string str = "\x1E\x1D\x1C\x1B\x1A\x1F";  //order by frequency of occurrence
+	for (auto& c : var1.var_str) {
+		if (c >= 0x1A && c <= 0x1F)
+			c = "|\x1B}]^~"[c - 0x1A];
+	}
+
+	// use toString() to avoid creating a constructor which logs here recursively
+	// should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
+	ostream1 << var1.var_str;
+	return ostream1;
+}
+
+std::istream& operator>>(std::istream& istream1, VARREF var1) {
+	THISIS("std::istream& operator>> (std::istream& istream1,VARREF var1)")
+	ISDEFINED(var1)
+
+	std::string tempstr;
+	istream1 >> std::noskipws >> tempstr;
+
+	var1.var_typ = VARTYP_STR;
+	// this would verify all input is valid utf8
+	// var1.var_str=boost::locale::conv::utf_to_utf<char>(tempstr)
+	var1.var_str = tempstr;
+	return istream1;
+}
+
+//#endif
+
 var backtrace();
 
-MVError::MVError(const var& description_)
+MVError::MVError(CVR description_)
 	: description(description_) {
 	// capture the stack at point of creation i.e. when thrown
 	this->stack = backtrace();
@@ -1911,39 +1874,39 @@ MVError::MVError(const var& description_)
 	}
 }
 
-MVUnassigned ::MVUnassigned(const var& var1)
+MVUnassigned ::MVUnassigned(CVR var1)
 	: MVError("MVUnassigned:" ^ var1) {}
-MVDivideByZero ::MVDivideByZero(const var& var1)
+MVDivideByZero ::MVDivideByZero(CVR var1)
 	: MVError("MVDivideByZero:" ^ var1) {}
-MVNonNumeric ::MVNonNumeric(const var& var1)
+MVNonNumeric ::MVNonNumeric(CVR var1)
 	: MVError("MVNonNumeric:" ^ var1) {}
-MVIntOverflow ::MVIntOverflow(const var& var1)
+MVIntOverflow ::MVIntOverflow(CVR var1)
 	: MVError("MVIntOverflow:" ^ var1) {}
-MVIntUnderflow ::MVIntUnderflow(const var& var1)
+MVIntUnderflow ::MVIntUnderflow(CVR var1)
 	: MVError("MVIntUnderflow:" ^ var1) {}
-MVUndefined ::MVUndefined(const var& var1)
+MVUndefined ::MVUndefined(CVR var1)
 	: MVError("MVUndefined:" ^ var1) {}
-MVOutOfMemory ::MVOutOfMemory(const var& var1)
+MVOutOfMemory ::MVOutOfMemory(CVR var1)
 	: MVError("MVOutOfMemory:" ^ var1) {}
-MVInvalidPointer ::MVInvalidPointer(const var& var1)
+MVInvalidPointer ::MVInvalidPointer(CVR var1)
 	: MVError("MVInvalidPointer:" ^ var1) {}
-MVDBException ::MVDBException(const var& var1)
+MVDBException ::MVDBException(CVR var1)
 	: MVError("MVDBException:" ^ var1) {}
-MVNotImplemented ::MVNotImplemented(const var& var1)
+MVNotImplemented ::MVNotImplemented(CVR var1)
 	: MVError("MVNotImplemented:" ^ var1) {}
-MVDebug ::MVDebug(const var& var1)
+MVDebug ::MVDebug(CVR var1)
 	: MVError("MVDebug" ^ var1) {}
-MVStop ::MVStop(const var& var1)
+MVStop ::MVStop(CVR var1)
 	: description(var1) {}
-MVAbort ::MVAbort(const var& var1)
+MVAbort ::MVAbort(CVR var1)
 	: description(var1) {}
-MVAbortAll ::MVAbortAll(const var& var1)
+MVAbortAll ::MVAbortAll(CVR var1)
 	: description(var1) {}
-MVLogoff ::MVLogoff(const var& var1)
+MVLogoff ::MVLogoff(CVR var1)
 	: description(var1) {}
 MVArrayDimensionedZero ::MVArrayDimensionedZero()
 	: MVError("MVArrayDimensionedZero:") {}
-MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(const var& var1)
+MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(CVR var1)
 	: MVError("MVArrayIndexOutOfBounds:" ^ var1) {
 }
 MVArrayNotDimensioned ::MVArrayNotDimensioned()

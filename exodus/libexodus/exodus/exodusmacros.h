@@ -123,16 +123,16 @@ THE SOFTWARE.
 
 // simplify declaration of function/subroutine arguments
 // eg. allow "function xyz(in arg1, out arg2)"
-// instead of "function xyz(const var& arg1, var& arg2)"
+// instead of "function xyz(CVR arg1, VARREF arg2)"
 // NB out parameters must be variables not constants
 // so the above function *cannot* be called with a string or number for the 2nd argument
 // abc=xyz(100,200);//wont compile
 // Can be declared in exodus namespace which is useful since "in" and "out" could easily
 // occur in other libraries.
 namespace exodus {
-using in = const var&;
-using io = var&;
-using out = var&;
+using in = const var&; // CVR;
+using io = var&;       // VARREF;
+using out = var&;      // VARREF;
 }  // namespace exodus
 
 // forcibly redefine "eq" even if already previously defined in some other library like iostream

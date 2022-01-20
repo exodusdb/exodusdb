@@ -37,7 +37,7 @@ namespace exodus {
 ///////////////
 
 // FIELD2()
-var var::field2(const var& separator, const int fieldno, const int nfields) const {
+var var::field2(CVR separator, const int fieldno, const int nfields) const {
 	if (fieldno >= 0)
 		return field(separator, fieldno, nfields);
 
@@ -46,8 +46,8 @@ var var::field2(const var& separator, const int fieldno, const int nfields) cons
 
 // FIELD()
 // var.field(separator,fieldno,nfields)
-var var::field(const var& separatorx, const int fieldnx, const int nfieldsx) const {
-	THISIS("var var::field(const var& separatorx,const int fieldnx,const int nfieldsx) const")
+var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
+	THISIS("var var::field(CVR separatorx,const int fieldnx,const int nfieldsx) const")
 	THISISSTRING()
 	ISSTRING(separatorx)
 
@@ -101,20 +101,20 @@ var var::field(const var& separatorx, const int fieldnx, const int nfieldsx) con
 /////////////
 
 // var.fieldstore(separator,fieldno,nfields,replacement)
-var var::fieldstore(const var& separator, const int fieldnx, const int nfieldsx, const var& replacementx) const& {
+var var::fieldstore(CVR separator, const int fieldnx, const int nfieldsx, CVR replacementx) const& {
 	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 }
 
 // on temporary
-var& var::fieldstore(const var& separator, const int fieldnx, const int nfieldsx, const var& replacementx) && {
+VARREF var::fieldstore(CVR separator, const int fieldnx, const int nfieldsx, CVR replacementx) && {
 	return this->fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 }
 
 // in-place
-var& var::fieldstorer(const var& separator0, const int fieldnx, const int nfieldsx, const var& replacementx) {
+VARREF var::fieldstorer(CVR separator0, const int fieldnx, const int nfieldsx, CVR replacementx) {
 	THISIS(
-		"var& var::fieldstorer(const var& separator0,const int fieldnx,const int nfieldsx, "
-		"const var& replacementx)")
+		"VARREF var::fieldstorer(CVR separator0,const int fieldnx,const int nfieldsx, "
+		"CVR replacementx)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(separator0)
 
@@ -214,7 +214,7 @@ var& var::fieldstorer(const var& separator0, const int fieldnx, const int nfield
 /////////
 
 // hardcore string locate function given a section of a string and all parameters
-inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const char order, const std::string& usingchar, var& setting) {
+inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const char order, const std::string& usingchar, VARREF setting) {
 	// private - assume everything is defined/assigned correctly
 
 	//
@@ -462,7 +462,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 }
 
 // locate within extraction
-inline bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, const std::string& usingchar, var& setting, int fieldno, int valueno, const int subvalueno) {
+inline bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, const std::string& usingchar, VARREF setting, int fieldno, int valueno, const int subvalueno) {
 	// private - assume everything is defined/assigned correctly
 
 	// any negatives at all returns ""
@@ -628,9 +628,9 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 }
 
 // default locate using VM
-bool var::locate(const var& target, var& setting) const {
+bool var::locate(CVR target, VARREF setting) const {
 	THISIS(
-		"bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const "
+		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
 		"int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
@@ -639,9 +639,9 @@ bool var::locate(const var& target, var& setting) const {
 	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
 }
 
-bool var::locate(const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locate(CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 	THISIS(
-		"bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const "
+		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
 		"int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
@@ -662,8 +662,8 @@ bool var::locate(const var& target, var& setting, const int fieldno, const int v
 }
 
 // without setting
-bool var::locate(const var& target) const {
-	THISIS("bool var::locate(const var& target")
+bool var::locate(CVR target) const {
+	THISIS("bool var::locate(CVR target")
 	THISISSTRING()
 	ISSTRING(target)
 
@@ -676,21 +676,21 @@ bool var::locate(const var& target) const {
 ////////////
 
 // 1. rare syntax where the order is given as a variable
-bool var::locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locateby(CVR ordercode, CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 }
 
 // 2. no fieldno or valueno means locate using character VM
 // caters for the rare syntax where the order is given as a variable
-bool var::locateby(const var& ordercode, const var& target, var& setting) const {
+bool var::locateby(CVR ordercode, CVR target, VARREF setting) const {
 	return locateby(ordercode.toString().c_str(), target, setting);
 }
 
 // 3. no fieldno or valueno means locate using character VM
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locateby(const char* ordercode, const var& target, var& setting) const {
-	THISIS("bool var::locateby(const char* ordercode, const var& target, var& setting) const")
+bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
+	THISIS("bool var::locateby(const char* ordercode, CVR target, VARREF setting) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -709,9 +709,9 @@ bool var::locateby(const char* ordercode, const var& target, var& setting) const
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 	THISIS(
-		"bool var::locateby(const char* ordercode, const var& target, var& setting, const "
+		"bool var::locateby(const char* ordercode, CVR target, VARREF setting, const "
 		"int fieldno, const int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
@@ -744,10 +744,10 @@ bool var::locateby(const char* ordercode, const var& target, var& setting, const
 ///////////////////
 
 // 1. rare syntax where the order is given as a variable
-bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locatebyusing(CVR ordercode, CVR usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
-		"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& "
-		"target, var& setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
+		"bool var::locatebyusing(CVR ordercode, CVR usingchar, CVR "
+		"target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	ISSTRING(ordercode)
 	ISSTRING(usingchar)
 	ISSTRING(target)
@@ -760,10 +760,10 @@ bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& t
 
 // 2. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
-		"bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& "
-		"target, var& setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
+		"bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR "
+		"target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -785,8 +785,8 @@ bool var::locatebyusing(const char* ordercode, const char* usingchar, const var&
 ///////////////
 
 // 1. simple version
-bool var::locateusing(const var& usingchar, const var& target) const {
-	THISIS("bool var::locateusing(const var& usingchar, const var& target) const")
+bool var::locateusing(CVR usingchar, CVR target) const {
+	THISIS("bool var::locateusing(CVR usingchar, CVR target) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISSTRING(usingchar)
@@ -797,9 +797,9 @@ bool var::locateusing(const var& usingchar, const var& target) const {
 }
 
 // 2. specify field/value/subvalue and return position
-bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locateusing(CVR usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 	THISIS(
-		"bool var::locateusing(const var& usingchar, const var& target, var& setting, const "
+		"bool var::locateusing(CVR usingchar, CVR target, VARREF setting, const "
 		"int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
@@ -963,8 +963,8 @@ var var::remove(const int fieldno, const int valueno, const int subvalueno) cons
 }
 
 // 2. remove in place
-var& var::remover(int fieldno, int valueno, int subvalueno) {
-	THISIS("var& var::remover(int fieldno,int valueno,int subvalueno)")
+VARREF var::remover(int fieldno, int valueno, int subvalueno) {
+	THISIS("VARREF var::remover(int fieldno,int valueno,int subvalueno)")
 	THISISSTRINGMUTATOR()
 
 	// return "" if replacing 0,0,0
@@ -1087,28 +1087,28 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 // PICKREPLACE int int int var
 ///////////////////////////////////////////
 
-var var::pickreplace(const int fieldno, const int valueno, const int subvalueno, const var& replacement) const {
+var var::pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const {
 	return var(*this).r(fieldno, valueno, subvalueno, replacement);
 }
 
-var var::pickreplace(const int fieldno, const int valueno, const var& replacement) const {
+var var::pickreplace(const int fieldno, const int valueno, CVR replacement) const {
 	return var(*this).r(fieldno, valueno, 0, replacement);
 }
 
-var var::pickreplace(const int fieldno, const var& replacement) const {
+var var::pickreplace(const int fieldno, CVR replacement) const {
 	return var(*this).r(fieldno, 0, 0, replacement);
 }
 
-var& var::r(const int fieldno, const int valueno, const var& replacement) {
+VARREF var::r(const int fieldno, const int valueno, CVR replacement) {
 	return r(fieldno, valueno, 0, replacement);
 }
 
-var& var::r(const int fieldno, const var& replacement) {
+VARREF var::r(const int fieldno, CVR replacement) {
 	return r(fieldno, 0, 0, replacement);
 }
 
-var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement) {
-	THISIS("var& var::r(int fieldno,int valueno,int subvalueno,const var& replacement)")
+VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
+	THISIS("VARREF var::r(int fieldno,int valueno,int subvalueno,CVR replacement)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(replacement)
 
@@ -1247,50 +1247,50 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement) {
 // INSERT int int int var
 ///////////////////////////////////////////
 
-var var::insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) const& {
+var var::insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) const& {
 	return var(*this).inserter(fieldno, valueno, subvalueno, insertion);
 }
 
 // given only field and value numbers
-var var::insert(const int fieldno, const int valueno, const var& insertion) const& {
+var var::insert(const int fieldno, const int valueno, CVR insertion) const& {
 	return this->insert(fieldno, valueno, 0, insertion);
 }
 
 // given only field number
-var var::insert(const int fieldno, const var& insertion) const& {
+var var::insert(const int fieldno, CVR insertion) const& {
 	return this->insert(fieldno, 0, 0, insertion);
 }
 
 // on temporary
-var& var::insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) && {
+VARREF var::insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) && {
 	return this->inserter(fieldno, valueno, subvalueno, insertion);
 }
 
 // on temporary - given only field and value number
-var& var::insert(const int fieldno, const int valueno, const var& insertion) && {
+VARREF var::insert(const int fieldno, const int valueno, CVR insertion) && {
 	return this->inserter(fieldno, valueno, 0, insertion);
 }
 
 // on temporary - given only field number
-var& var::insert(const int fieldno, const var& insertion) && {
+VARREF var::insert(const int fieldno, CVR insertion) && {
 	return this->inserter(fieldno, 0, 0, insertion);
 }
 
 // in-place - given field and value no
-var& var::inserter(const int fieldno, const int valueno, const var& insertion) {
+VARREF var::inserter(const int fieldno, const int valueno, CVR insertion) {
 	return this->inserter(fieldno, valueno, 0, insertion);
 }
 
 // in-place given only field no
-var& var::inserter(const int fieldno, const var& insertion) {
+VARREF var::inserter(const int fieldno, CVR insertion) {
 	return this->inserter(fieldno, 0, 0, insertion);
 }
 
 //in-place - given everything
-var& var::inserter(const int fieldno, const int valueno, const int subvalueno, const var& insertion) {
+VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
 	THISIS(
-		"var& var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
-		"var& insertion)")
+		"VARREF var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
+		"VARREF insertion)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(insertion)
 
@@ -1448,24 +1448,24 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 //starting is equivalent to x::index(y) == 1
 //contains is equivalent to x::index(y) != 0
 
-bool var::starts(const var& vstr) const {
-	THISIS("bool var::starts(const var& v) const")
+bool var::starts(CVR vstr) const {
+	THISIS("bool var::starts(CVR v) const")
 	//THISIS(__PRETTY_FUNCTION__)
-	//      bool exodus::var::starts(const exodus::var&) const
+	//      bool exodus::var::starts(const exodus::VARREF) const
 	THISISSTRING()
 	ISSTRING(vstr)
 	return var_str.starts_with(vstr.var_str);
 }
 
-bool var::ends(const var& vstr) const {
-	THISIS("bool var::ends(const var& vstr) const")
+bool var::ends(CVR vstr) const {
+	THISIS("bool var::ends(CVR vstr) const")
 	THISISSTRING()
 	ISSTRING(vstr)
 	return var_str.ends_with(vstr.var_str);
 }
 
-bool var::contains(const var& vstr) const {
-	THISIS("bool var::contains(const var& vstr) const")
+bool var::contains(CVR vstr) const {
+	THISIS("bool var::contains(CVR vstr) const")
 	THISISSTRING()
 	ISSTRING(vstr)
 	return var_str.find(vstr.var_str) != std::string::npos;
@@ -1522,7 +1522,7 @@ var var::substr(const int startindex1) const& {
 }
 
 // on temporary
-var& var::substr(const int startindex1) && {
+VARREF var::substr(const int startindex1) && {
 	return this->substrer(startindex1);
 }
 
@@ -1534,20 +1534,20 @@ var var::substr(const int startindex1, const int length) const& {
 }
 
 // on temporary
-var& var::substr(const int startindex1, const int length) && {
+VARREF var::substr(const int startindex1, const int length) && {
 	return this->substrer(startindex1, length);
 }
 
 // in-place
-var& var::substrer(const int startindex1) {
+VARREF var::substrer(const int startindex1) {
 	// TODO look at using erase to speed up
 	return this->substrer(startindex1, (int)var_str.size());
 }
 
 //[x,y]
 // var.s(start,length) substring
-var& var::substrer(const int startindex1, const int length) {
-	THISIS("var& var::substrer(const int startindex1,const int length)")
+VARREF var::substrer(const int startindex1, const int length) {
+	THISIS("VARREF var::substrer(const int startindex1,const int length)")
 	THISISSTRINGMUTATOR()
 
 	// return "" for ""
@@ -1679,8 +1679,8 @@ var var::operator[](const int charno) const {
 
 // performs an operation + - * / : on two multivalued strings in parallel
 // returning a multivalued string of the results
-var var::mv(const char* opcode, const var& var2) const {
-	THISIS("var var::multivalued(const char* opcode, const var& var2) const")
+var var::mv(const char* opcode, CVR var2) const {
+	THISIS("var var::multivalued(const char* opcode, CVR var2) const")
 	THISISSTRING()
 	ISSTRING(var2)
 
@@ -1799,8 +1799,8 @@ getnextp2:
 // returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
 // COL2() in pickos) NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var var::substr(const int startindex1, const var& delimiterchars, int& endindex) const {
-	THISIS("var var::substr(const int startindex1, var& delimiterchars, int& endindex) const")
+var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const {
+	THISIS("var var::substr(const int startindex1, VARREF delimiterchars, int& endindex) const")
 	THISISSTRING()
 	ISSTRING(delimiterchars)
 
@@ -1846,8 +1846,8 @@ var var::substr(const int startindex1, const var& delimiterchars, int& endindex)
 // returns the characters up to the next delimiter
 // delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6 or 0 if not found
 // NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var var::substr2(var& startindex1, var& delimiterno) const {
-	THISIS("var var::substr2(var& startindex1, var& delimiterno) const")
+var var::substr2(VARREF startindex1, VARREF delimiterno) const {
+	THISIS("var var::substr2(VARREF startindex1, VARREF delimiterno) const")
 	THISISSTRING()
 	ISNUMERIC(startindex1)
 	ISDEFINED(delimiterno)
@@ -2053,8 +2053,8 @@ var var::sum() const {
 	return outstr;	//NRVO hopefully since single named return
 }
 
-var var::sum(const var& separator) const {
-	THISIS("var var::sum(const var& separator) const")
+var var::sum(CVR separator) const {
+	THISIS("var var::sum(CVR separator) const")
 	THISISSTRING()
 
 	var result = 0;

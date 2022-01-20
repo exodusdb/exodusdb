@@ -52,15 +52,15 @@ namespace exodus {
 
 DLL_PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno);
 
-DLL_PUBLIC ND var osgetenv(const var& name = "");
-DLL_PUBLIC bool osgetenv(const var& name, var& value);
-DLL_PUBLIC bool ossetenv(const var& name, const var& value);
+DLL_PUBLIC ND var osgetenv(CVR name = "");
+DLL_PUBLIC bool osgetenv(CVR name, VARREF value);
+DLL_PUBLIC bool ossetenv(CVR name, CVR value);
 DLL_PUBLIC ND var ostempdirname();
 DLL_PUBLIC ND var ostempfilename();
-DLL_PUBLIC ND bool assigned(const var& var2);
-DLL_PUBLIC ND bool unassigned(const var& var2);
-DLL_PUBLIC var& transfer(var& fromvar, var& tovar);
-DLL_PUBLIC var& exchange(var& var1, var& var2);
+DLL_PUBLIC ND bool assigned(CVR var2);
+DLL_PUBLIC ND bool unassigned(CVR var2);
+DLL_PUBLIC VARREF transfer(VARREF fromvar, VARREF tovar);
+DLL_PUBLIC VARREF exchange(VARREF var1, VARREF var2);
 DLL_PUBLIC ND var date();
 DLL_PUBLIC ND var time();
 DLL_PUBLIC ND var timedate();
@@ -70,281 +70,281 @@ DLL_PUBLIC ND var ostime();
 DLL_PUBLIC void breakon();
 DLL_PUBLIC void breakoff();
 
-DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale DEFAULTNULL);
-DLL_PUBLIC void osclose(const var& osfilevar);
+DLL_PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, CVR locale DEFAULTNULL);
+DLL_PUBLIC void osclose(CVR osfilevar);
 
-//DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& offset, const int length,
+//DLL_PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length,
 //			const bool adjust = true);
-//DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& offset, const int length,
+//DLL_PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length,
 //			const bool adjust = true);
 
-//DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& offset,
+//DLL_PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset,
 //			 const bool adjust = true);
-//DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& offset,
+//DLL_PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset,
 //			 const bool adjust = true);
-DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& offset, const int length);
-DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& offset, const int length);
-DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& offset);
-DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& offset);
+DLL_PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length);
+DLL_PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
+DLL_PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
+DLL_PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset);
 
-DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& codepage DEFAULTNULL);
-DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& codepage DEFAULTNULL);
-DLL_PUBLIC ND var osread(const var& osfilename);
+DLL_PUBLIC bool oswrite(CVR data, CVR osfilename, CVR codepage DEFAULTNULL);
+DLL_PUBLIC bool osread(VARREF data, CVR osfilename, CVR codepage DEFAULTNULL);
+DLL_PUBLIC ND var osread(CVR osfilename);
 
-DLL_PUBLIC bool osdelete(const var& osfilename);
-DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename);
-DLL_PUBLIC bool oscopy(const var& fromosdir_or_filename, const var& newosdir_or_filename);
-DLL_PUBLIC bool osmove(const var& fromosdir_or_filename, const var& newosdir_or_filename);
+DLL_PUBLIC bool osdelete(CVR osfilename);
+DLL_PUBLIC bool osrename(CVR oldosdir_or_filename, CVR newosdir_or_filename);
+DLL_PUBLIC bool oscopy(CVR fromosdir_or_filename, CVR newosdir_or_filename);
+DLL_PUBLIC bool osmove(CVR fromosdir_or_filename, CVR newosdir_or_filename);
 
-DLL_PUBLIC ND var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode = 0);
-DLL_PUBLIC ND var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
-DLL_PUBLIC ND var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
-DLL_PUBLIC ND var osfile(const var& filename);
-DLL_PUBLIC ND var osdir(const var& filename);
-DLL_PUBLIC bool osmkdir(const var& dirname);
-DLL_PUBLIC bool osrmdir(const var& dirname, const bool evenifnotempty = false);
+DLL_PUBLIC ND var oslist(CVR path DEFAULTDOT, CVR wildcard DEFAULTNULL, const int mode = 0);
+DLL_PUBLIC ND var oslistf(CVR path DEFAULTDOT, CVR wildcard DEFAULTNULL);
+DLL_PUBLIC ND var oslistd(CVR path DEFAULTDOT, CVR wildcard DEFAULTNULL);
+DLL_PUBLIC ND var osfile(CVR filename);
+DLL_PUBLIC ND var osdir(CVR filename);
+DLL_PUBLIC bool osmkdir(CVR dirname);
+DLL_PUBLIC bool osrmdir(CVR dirname, const bool evenifnotempty = false);
 DLL_PUBLIC ND var oscwd();
-DLL_PUBLIC var oscwd(const var& dirname);
+DLL_PUBLIC var oscwd(CVR dirname);
 DLL_PUBLIC void osflush();
 DLL_PUBLIC ND var ospid();
-DLL_PUBLIC var suspend(const var& command);
-DLL_PUBLIC bool osshell(const var& command);
-DLL_PUBLIC var osshellread(const var& command);
-DLL_PUBLIC bool osshellread(var& readstr, const var& command);
-DLL_PUBLIC bool osshellwrite(const var& writestr, const var& command);
-DLL_PUBLIC void stop(const var& text DEFAULTNULL);
-DLL_PUBLIC void abort(const var& text DEFAULTNULL);	 // dont confuse with abort() which is standard c/c++
-DLL_PUBLIC void abortall(const var& text DEFAULTNULL);
-DLL_PUBLIC var execute(const var& command);
-// DLL_PUBLIC var chain(const var& command);
+DLL_PUBLIC var suspend(CVR command);
+DLL_PUBLIC bool osshell(CVR command);
+DLL_PUBLIC var osshellread(CVR command);
+DLL_PUBLIC bool osshellread(VARREF readstr, CVR command);
+DLL_PUBLIC bool osshellwrite(CVR writestr, CVR command);
+DLL_PUBLIC void stop(CVR text DEFAULTNULL);
+DLL_PUBLIC void abort(CVR text DEFAULTNULL);	 // dont confuse with abort() which is standard c/c++
+DLL_PUBLIC void abortall(CVR text DEFAULTNULL);
+DLL_PUBLIC var execute(CVR command);
+// DLL_PUBLIC var chain(CVR command);
 DLL_PUBLIC var logoff();
 DLL_PUBLIC void debug();
 
-DLL_PUBLIC bool setxlocale(const var& locale);
+DLL_PUBLIC bool setxlocale(CVR locale);
 DLL_PUBLIC ND var getxlocale();
 
 //replace by templates with variable number of arguments
-//void print(const var& var2);
-//void printl(const var& var2 DEFAULTNULL);
-//void printt(const var& var2 DEFAULTNULL);
+//void print(CVR var2);
+//void printl(CVR var2 DEFAULTNULL);
+//void printt(CVR var2 DEFAULTNULL);
 
 // MATH/BOOLEAN
-DLL_PUBLIC ND var abs(const var& num1);
-DLL_PUBLIC ND var pwr(const var& base, const var& exponent);
-DLL_PUBLIC ND var exp(const var& power);
-DLL_PUBLIC ND var sqrt(const var& num1);
-DLL_PUBLIC ND var sin(const var& degrees);
-DLL_PUBLIC ND var cos(const var& degrees);
-DLL_PUBLIC ND var tan(const var& degrees);
-DLL_PUBLIC ND var atan(const var& degrees);
-DLL_PUBLIC ND var loge(const var& num1);
+DLL_PUBLIC ND var abs(CVR num1);
+DLL_PUBLIC ND var pwr(CVR base, CVR exponent);
+DLL_PUBLIC ND var exp(CVR power);
+DLL_PUBLIC ND var sqrt(CVR num1);
+DLL_PUBLIC ND var sin(CVR degrees);
+DLL_PUBLIC ND var cos(CVR degrees);
+DLL_PUBLIC ND var tan(CVR degrees);
+DLL_PUBLIC ND var atan(CVR degrees);
+DLL_PUBLIC ND var loge(CVR num1);
 // integer() represents pick int() because int() is reserved word in c/c++
 // Note that integer like pick int() is the same as floor()
 // whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any fractional
 // decimal places) to get the usual c/c++ effect use toInt() (although toInt() returns an int
 // instead of a var like normal exodus functions)
-DLL_PUBLIC ND var integer(const var& num1);
-DLL_PUBLIC ND var floor(const var& num1);
-DLL_PUBLIC ND var round(const var& num1, const int ndecimals = 0);
+DLL_PUBLIC ND var integer(CVR num1);
+DLL_PUBLIC ND var floor(CVR num1);
+DLL_PUBLIC ND var round(CVR num1, const int ndecimals = 0);
 
 DLL_PUBLIC ND var rnd(const int number);
-DLL_PUBLIC void initrnd(const var& seed);
-DLL_PUBLIC ND var mod(const var& dividend, const int divisor);
-DLL_PUBLIC ND var mod(const var& dividend, const var& divisor);
+DLL_PUBLIC void initrnd(CVR seed);
+DLL_PUBLIC ND var mod(CVR dividend, const int divisor);
+DLL_PUBLIC ND var mod(CVR dividend, CVR divisor);
 
 DLL_PUBLIC ND var at(const int columnorcode);
-DLL_PUBLIC ND var at(const var& column, const var& row);
+DLL_PUBLIC ND var at(CVR column, CVR row);
 DLL_PUBLIC ND var getcursor();
-DLL_PUBLIC void setcursor(const var& cursor);
+DLL_PUBLIC void setcursor(CVR cursor);
 DLL_PUBLIC ND var getprompt();
-DLL_PUBLIC void setprompt(const var& prompt);
+DLL_PUBLIC void setprompt(CVR prompt);
 DLL_PUBLIC bool echo(const int on_off);
 
-//DLL_PUBLIC var& input();
-//DLL_PUBLIC var& input(var& intostr);
-//DLL_PUBLIC var& input(const var& prompt, var& intostr);
-//DLL_PUBLIC var& inputn(var& intostr, const int nchars);
+//DLL_PUBLIC VARREF input();
+//DLL_PUBLIC VARREF input(VARREF intostr);
+//DLL_PUBLIC VARREF input(CVR prompt, VARREF intostr);
+//DLL_PUBLIC VARREF inputn(VARREF intostr, const int nchars);
 DLL_PUBLIC var input();
-DLL_PUBLIC var input(const var& prompt);
+DLL_PUBLIC var input(CVR prompt);
 DLL_PUBLIC var inputn(const int nchars);
 
-DLL_PUBLIC ND var len(const var& var2);
-DLL_PUBLIC ND var length(const var& var2);
-DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars);
-DLL_PUBLIC ND var convert(const var& instring, const var& oldchars, const var& newchars);
-DLL_PUBLIC var& textconverter(var& instring, const var& oldchars, const var& newchars);
-DLL_PUBLIC ND var textconvert(const var& instring, const var& oldchars, const var& newchars);
-DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr);
-DLL_PUBLIC ND var swap(const var& instring, const var& oldstr, const var& newstr);
-DLL_PUBLIC var& replacer(var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
-DLL_PUBLIC ND var replace(const var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
-DLL_PUBLIC var& ucaser(var& instring);
-DLL_PUBLIC ND var ucase(const var& instring);
-DLL_PUBLIC var& lcaser(var& instring);
-DLL_PUBLIC ND var lcase(const var& instring);
-DLL_PUBLIC var& tcaser(var& instring);
-DLL_PUBLIC ND var fcase(const var& instring);
-DLL_PUBLIC var& tcaser(var& instring);
-DLL_PUBLIC ND var fcase(const var& instring);
-DLL_PUBLIC ND var unique(const var& instring);
-DLL_PUBLIC var& inverter(var& instring);
-DLL_PUBLIC ND var invert(const var& instring);
-DLL_PUBLIC var& lowerer(var& instring);
-DLL_PUBLIC ND var lower(const var& instring);
-DLL_PUBLIC var& raiser(var& instring);
-DLL_PUBLIC ND var raise(const var& instring);
-DLL_PUBLIC var& splicer(var& instring, const int start1, const int length, const var& str);
-DLL_PUBLIC ND var splice(const var& instring, const int start1, const int length, const var& str);
-DLL_PUBLIC var& popper(var& instring);
-DLL_PUBLIC ND var pop(const var& instring);
-DLL_PUBLIC var& quoter(var& instring);
-DLL_PUBLIC ND var quote(const var& instring);
-DLL_PUBLIC var& unquoter(var& instring);
-DLL_PUBLIC ND var unquote(const var& instring);
-DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar, const int fieldno, const int nfields, const var& replacement);
-DLL_PUBLIC ND var fieldstore(const var& instring, const var& sepchar, const int fieldno, const int nfields, const var& replacement);
-DLL_PUBLIC var& trimmer(var& instring, const char* trimchars DEFAULTSPACE);
-DLL_PUBLIC var& trimmer(var& instring, const var& trimchars, const var& options);
-DLL_PUBLIC ND var trim(const var& instring, const char* trimchars DEFAULTSPACE);
-DLL_PUBLIC var& trimmerf(var& instring, const char* trimchars DEFAULTSPACE);
-DLL_PUBLIC ND var trimf(const var& instring, const char* trimchars DEFAULTSPACE);
-DLL_PUBLIC var& trimmerb(var& instring, const char* trimchars DEFAULTSPACE);
-DLL_PUBLIC ND var trimb(const var& instring, const char* trimchars DEFAULTSPACE);
-DLL_PUBLIC var& trimmer(var& instring, const var& trimchars);
-DLL_PUBLIC ND var trim(const var& instring, const var& trimchars);
-DLL_PUBLIC ND var trim(const var& instring, const var& trimchars, const var& options);
-DLL_PUBLIC var& trimmerf(var& instring, const var& trimchars);
-DLL_PUBLIC ND var trimf(const var& instring, const var& trimchars);
-DLL_PUBLIC var& trimmerb(var& instring, const var& trimchars);
-DLL_PUBLIC ND var trimb(const var& instring, const var& trimchars);
-DLL_PUBLIC ND var crop(const var& instring);
-DLL_PUBLIC var cropper(var& instring);
-DLL_PUBLIC ND var chr(const var& integer);
+DLL_PUBLIC ND var len(CVR var2);
+DLL_PUBLIC ND var length(CVR var2);
+DLL_PUBLIC VARREF converter(VARREF instring, CVR oldchars, CVR newchars);
+DLL_PUBLIC ND var convert(CVR instring, CVR oldchars, CVR newchars);
+DLL_PUBLIC VARREF textconverter(VARREF instring, CVR oldchars, CVR newchars);
+DLL_PUBLIC ND var textconvert(CVR instring, CVR oldchars, CVR newchars);
+DLL_PUBLIC VARREF swapper(VARREF instring, CVR oldstr, CVR newstr);
+DLL_PUBLIC ND var swap(CVR instring, CVR oldstr, CVR newstr);
+DLL_PUBLIC VARREF replacer(VARREF instring, CVR oldstr, CVR newstr, CVR options DEFAULTNULL);
+DLL_PUBLIC ND var replace(CVR instring, CVR oldstr, CVR newstr, CVR options DEFAULTNULL);
+DLL_PUBLIC VARREF ucaser(VARREF instring);
+DLL_PUBLIC ND var ucase(CVR instring);
+DLL_PUBLIC VARREF lcaser(VARREF instring);
+DLL_PUBLIC ND var lcase(CVR instring);
+DLL_PUBLIC VARREF tcaser(VARREF instring);
+DLL_PUBLIC ND var fcase(CVR instring);
+DLL_PUBLIC VARREF tcaser(VARREF instring);
+DLL_PUBLIC ND var fcase(CVR instring);
+DLL_PUBLIC ND var unique(CVR instring);
+DLL_PUBLIC VARREF inverter(VARREF instring);
+DLL_PUBLIC ND var invert(CVR instring);
+DLL_PUBLIC VARREF lowerer(VARREF instring);
+DLL_PUBLIC ND var lower(CVR instring);
+DLL_PUBLIC VARREF raiser(VARREF instring);
+DLL_PUBLIC ND var raise(CVR instring);
+DLL_PUBLIC VARREF splicer(VARREF instring, const int start1, const int length, CVR str);
+DLL_PUBLIC ND var splice(CVR instring, const int start1, const int length, CVR str);
+DLL_PUBLIC VARREF popper(VARREF instring);
+DLL_PUBLIC ND var pop(CVR instring);
+DLL_PUBLIC VARREF quoter(VARREF instring);
+DLL_PUBLIC ND var quote(CVR instring);
+DLL_PUBLIC VARREF unquoter(VARREF instring);
+DLL_PUBLIC ND var unquote(CVR instring);
+DLL_PUBLIC VARREF fieldstorer(VARREF instring, CVR sepchar, const int fieldno, const int nfields, CVR replacement);
+DLL_PUBLIC ND var fieldstore(CVR instring, CVR sepchar, const int fieldno, const int nfields, CVR replacement);
+DLL_PUBLIC VARREF trimmer(VARREF instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC VARREF trimmer(VARREF instring, CVR trimchars, CVR options);
+DLL_PUBLIC ND var trim(CVR instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC VARREF trimmerf(VARREF instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC ND var trimf(CVR instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC VARREF trimmerb(VARREF instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC ND var trimb(CVR instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC VARREF trimmer(VARREF instring, CVR trimchars);
+DLL_PUBLIC ND var trim(CVR instring, CVR trimchars);
+DLL_PUBLIC ND var trim(CVR instring, CVR trimchars, CVR options);
+DLL_PUBLIC VARREF trimmerf(VARREF instring, CVR trimchars);
+DLL_PUBLIC ND var trimf(CVR instring, CVR trimchars);
+DLL_PUBLIC VARREF trimmerb(VARREF instring, CVR trimchars);
+DLL_PUBLIC ND var trimb(CVR instring, CVR trimchars);
+DLL_PUBLIC ND var crop(CVR instring);
+DLL_PUBLIC var cropper(VARREF instring);
+DLL_PUBLIC ND var chr(CVR integer);
 DLL_PUBLIC ND var chr(const int integer);
-DLL_PUBLIC ND var textchr(const var& integer);
+DLL_PUBLIC ND var textchr(CVR integer);
 DLL_PUBLIC ND var textchr(const int integer);
-DLL_PUBLIC ND var match(const var& instring, const var& matchstr, const var& options DEFAULTNULL);
-DLL_PUBLIC ND var seq(const var& char1);
-DLL_PUBLIC ND var textseq(const var& char1);
-DLL_PUBLIC ND var str(const var& instring, const int number);
+DLL_PUBLIC ND var match(CVR instring, CVR matchstr, CVR options DEFAULTNULL);
+DLL_PUBLIC ND var seq(CVR char1);
+DLL_PUBLIC ND var textseq(CVR char1);
+DLL_PUBLIC ND var str(CVR instring, const int number);
 DLL_PUBLIC ND var space(const int number);
-DLL_PUBLIC ND var dcount(const var& instring, const var& substrx);
-DLL_PUBLIC ND var count(const var& instring, const var& substrx);
-DLL_PUBLIC ND var substr(const var& instring, const int startx);
-DLL_PUBLIC ND var substr(const var& instring, const int startx, const int length);
-DLL_PUBLIC var substrer(var& instring, const int startx);
-DLL_PUBLIC var substrer(var& instring, const int startx, const int length);
-DLL_PUBLIC ND var index(const var& instring, const var& substr, const int occurrenceno = 1);
-DLL_PUBLIC ND var index2(const var& instring, const var& substr, const int startcharno = 1);
-DLL_PUBLIC ND var field(const var& instring, const var& substrx, const int fieldnx, const int nfieldsx = 1);
-DLL_PUBLIC ND var field2(const var& instring, const var& substrx, const int fieldnx, const int nfieldsx = 1);
+DLL_PUBLIC ND var dcount(CVR instring, CVR substrx);
+DLL_PUBLIC ND var count(CVR instring, CVR substrx);
+DLL_PUBLIC ND var substr(CVR instring, const int startx);
+DLL_PUBLIC ND var substr(CVR instring, const int startx, const int length);
+DLL_PUBLIC var substrer(VARREF instring, const int startx);
+DLL_PUBLIC var substrer(VARREF instring, const int startx, const int length);
+DLL_PUBLIC ND var index(CVR instring, CVR substr, const int occurrenceno = 1);
+DLL_PUBLIC ND var index2(CVR instring, CVR substr, const int startcharno = 1);
+DLL_PUBLIC ND var field(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx = 1);
+DLL_PUBLIC ND var field2(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx = 1);
 // moved to mvprogram to allow custom conversions like "[DATE]"
-// DLL_PUBLIC var oconv(const var& instring, const char* conversion);
-// DLL_PUBLIC var oconv(const var& instring, const var& conversion);
-// DLL_PUBLIC var iconv(const var& instring, const char* conversion);
-// DLL_PUBLIC var iconv(const var& instring, const var& conversion);
-DLL_PUBLIC bool connect(const var& connectionstring DEFAULTNULL);
+// DLL_PUBLIC var oconv(CVR instring, const char* conversion);
+// DLL_PUBLIC var oconv(CVR instring, CVR conversion);
+// DLL_PUBLIC var iconv(CVR instring, const char* conversion);
+// DLL_PUBLIC var iconv(CVR instring, CVR conversion);
+DLL_PUBLIC bool connect(CVR connectionstring DEFAULTNULL);
 DLL_PUBLIC void disconnect();
 DLL_PUBLIC void disconnectall();
 DLL_PUBLIC ND var lasterror();
 
-DLL_PUBLIC bool dbcreate(const var& dbname);
+DLL_PUBLIC bool dbcreate(CVR dbname);
 DLL_PUBLIC ND var dblist();
-DLL_PUBLIC bool dbcopy(const var& from_dbname, const var& to_dbname);
-DLL_PUBLIC bool dbdelete(const var& dbname);
+DLL_PUBLIC bool dbcopy(CVR from_dbname, CVR to_dbname);
+DLL_PUBLIC bool dbdelete(CVR dbname);
 
-DLL_PUBLIC bool createfile(const var& filename);
-DLL_PUBLIC bool deletefile(const var& filename_or_handle);
-DLL_PUBLIC bool clearfile(const var& filename_or_handle);
-DLL_PUBLIC bool renamefile(const var& filename, const var& newfilename);
+DLL_PUBLIC bool createfile(CVR filename);
+DLL_PUBLIC bool deletefile(CVR filename_or_handle);
+DLL_PUBLIC bool clearfile(CVR filename_or_handle);
+DLL_PUBLIC bool renamefile(CVR filename, CVR newfilename);
 DLL_PUBLIC ND var listfiles();
-DLL_PUBLIC ND var reccount(const var& filename_or_handle);
-DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL, const var& dictfilename DEFAULTNULL);
-DLL_PUBLIC bool deleteindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL);
-DLL_PUBLIC ND var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL);
+DLL_PUBLIC ND var reccount(CVR filename_or_handle);
+DLL_PUBLIC bool createindex(CVR filename_or_handle, CVR fieldname DEFAULTNULL, CVR dictfilename DEFAULTNULL);
+DLL_PUBLIC bool deleteindex(CVR filename_or_handle, CVR fieldname DEFAULTNULL);
+DLL_PUBLIC ND var listindexes(CVR filename DEFAULTNULL, CVR fieldname DEFAULTNULL);
 DLL_PUBLIC bool begintrans();
 DLL_PUBLIC bool statustrans();
 DLL_PUBLIC bool rollbacktrans();
 DLL_PUBLIC bool committrans();
-DLL_PUBLIC bool lock(const var& filehandle, const var& key);
-DLL_PUBLIC void unlock(const var& filehandle, const var& key);
+DLL_PUBLIC bool lock(CVR filehandle, CVR key);
+DLL_PUBLIC void unlock(CVR filehandle, CVR key);
 DLL_PUBLIC void unlockall();
-DLL_PUBLIC bool open(const var& filename, var& filehandle);
-DLL_PUBLIC bool open(const var& filename);
-// DLL_PUBLIC bool open(const var& dictdata, const var& filename, var& filehandle);
-DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key);
-DLL_PUBLIC bool reado(var& record, const var& filehandle, const var& key);
-DLL_PUBLIC bool matread(dim& dimrecord, const var& filehandle, const var& key);
-DLL_PUBLIC bool readv(var& record, const var& filehandle, const var& key, const var& fieldnumber);
-DLL_PUBLIC bool write(const var& record, const var& filehandle, const var& key);
-DLL_PUBLIC bool matwrite(const dim& dimrecord, const var& filehandle, const var& key);
-DLL_PUBLIC bool writev(const var& record, const var& filehandle, const var& key, const int fieldno);
-DLL_PUBLIC bool updaterecord(const var& record, const var& filehandle, const var& key);
-DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle, const var& key);
+DLL_PUBLIC bool open(CVR filename, VARREF filehandle);
+DLL_PUBLIC bool open(CVR filename);
+// DLL_PUBLIC bool open(CVR dictdata, CVR filename, VARREF filehandle);
+DLL_PUBLIC bool read(VARREF record, CVR filehandle, CVR key);
+DLL_PUBLIC bool reado(VARREF record, CVR filehandle, CVR key);
+DLL_PUBLIC bool matread(dim& dimrecord, CVR filehandle, CVR key);
+DLL_PUBLIC bool readv(VARREF record, CVR filehandle, CVR key, CVR fieldnumber);
+DLL_PUBLIC bool write(CVR record, CVR filehandle, CVR key);
+DLL_PUBLIC bool matwrite(const dim& dimrecord, CVR filehandle, CVR key);
+DLL_PUBLIC bool writev(CVR record, CVR filehandle, CVR key, const int fieldno);
+DLL_PUBLIC bool updaterecord(CVR record, CVR filehandle, CVR key);
+DLL_PUBLIC bool insertrecord(CVR record, CVR filehandle, CVR key);
 
 // moved to mvprogram so they have access to default cursor in mv.CURSOR
-// DLL_PUBLIC bool select(const var& sortselectclause DEFAULTNULL);
+// DLL_PUBLIC bool select(CVR sortselectclause DEFAULTNULL);
 // DLL_PUBLIC void clearselect();
-// DLL_PUBLIC bool readnext(var& key);
-// DLL_PUBLIC bool readnext(var& key, var& valueno);
-// DLL_PUBLIC bool readnext(var& record, var& key, var& value);
-// DLL_PUBLIC bool deleterecord(const var& filename_or_handle_or_command, const var& key DEFAULTNULL);
+// DLL_PUBLIC bool readnext(VARREF key);
+// DLL_PUBLIC bool readnext(VARREF key, VARREF valueno);
+// DLL_PUBLIC bool readnext(VARREF record, VARREF key, VARREF value);
+// DLL_PUBLIC bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULTNULL);
 
-DLL_PUBLIC ND var xlate(const var& filename, const var& key, const var& fieldno, const char* mode);
-DLL_PUBLIC ND var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);
-DLL_PUBLIC var substr2(const var& fromstr, var& startx, var& delimiterno);
+DLL_PUBLIC ND var xlate(CVR filename, CVR key, CVR fieldno, const char* mode);
+DLL_PUBLIC ND var xlate(CVR filename, CVR key, CVR fieldno, CVR mode);
+DLL_PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno);
 
-DLL_PUBLIC var split(const var& sourcevar, dim& destinationdim);
-DLL_PUBLIC ND dim split(const var& sourcevar);
+DLL_PUBLIC var split(CVR sourcevar, dim& destinationdim);
+DLL_PUBLIC ND dim split(CVR sourcevar);
 DLL_PUBLIC ND var join(const dim& sourcedim);
 
-DLL_PUBLIC ND var pickreplace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
-DLL_PUBLIC ND var pickreplace(const var& instring, const int fieldno, const int valueno, const var& replacement);
-DLL_PUBLIC ND var pickreplace(const var& instring, const int fieldno, const var& replacement);
+DLL_PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
+DLL_PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement);
+DLL_PUBLIC ND var pickreplace(CVR instring, const int fieldno, CVR replacement);
 
-DLL_PUBLIC ND var extract(const var& instring, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0);
+DLL_PUBLIC ND var extract(CVR instring, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0);
 
-DLL_PUBLIC ND var insert(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion);
-DLL_PUBLIC ND var insert(const var& instring, const int fieldno, const int valueno, const var& insertion);
-DLL_PUBLIC ND var insert(const var& instring, const int fieldno, const var& insertion);
+DLL_PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
+DLL_PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, CVR insertion);
+DLL_PUBLIC ND var insert(CVR instring, const int fieldno, CVR insertion);
 
-// DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno=0, const int
+// DLL_PUBLIC var erase(CVR instring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-DLL_PUBLIC ND var remove(const var& instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
+DLL_PUBLIC ND var remove(CVR instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
 
-DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
-DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const var& replacement);
-DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const var& replacement);
+DLL_PUBLIC VARREF pickreplacer(VARREF instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
+DLL_PUBLIC VARREF pickreplacer(VARREF instring, const int fieldno, const int valueno, CVR replacement);
+DLL_PUBLIC VARREF pickreplacer(VARREF instring, const int fieldno, CVR replacement);
 
-DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion);
-DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const var& insertion);
-DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion);
+DLL_PUBLIC VARREF inserter(VARREF instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
+DLL_PUBLIC VARREF inserter(VARREF instring, const int fieldno, const int valueno, CVR insertion);
+DLL_PUBLIC VARREF inserter(VARREF instring, const int fieldno, CVR insertion);
 
-// DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno=0, const int
+// DLL_PUBLIC VARREF eraser(VARREF instring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
+DLL_PUBLIC VARREF remover(VARREF instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
 
 // locate & locateby without fieldno or valueno arguments uses character VM as separator character
 // locate & locateby with fieldno=0 uses character FM
 // locate & locateby with fieldno>0 uses character VM
 // locate & locateby with valueno>0 uses character SM
 
-DLL_PUBLIC ND bool locate(const var& target, const var& instring);
-DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting);
-DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0);
+DLL_PUBLIC ND bool locate(CVR target, CVR instring);
+DLL_PUBLIC bool locate(CVR target, CVR instring, VARREF setting);
+DLL_PUBLIC bool locate(CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
 
-DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting);
-DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0);
+DLL_PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting);
+DLL_PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
 
-DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting);
-DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0);
+DLL_PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting);
+DLL_PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
 
-DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring);
-DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting);
-DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0, const int subvalueno = 0);
+DLL_PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring);
+DLL_PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting);
+DLL_PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0, const int subvalueno = 0);
 
-DLL_PUBLIC ND var sum(const var& instring, const var& sepchar);
-DLL_PUBLIC ND var sum(const var& instring);
+DLL_PUBLIC ND var sum(CVR instring, CVR sepchar);
+DLL_PUBLIC ND var sum(CVR instring);
 
 // std::cout
 ////////////

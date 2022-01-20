@@ -66,8 +66,8 @@ dim::dim(int rows, int cols)
 	//std::cout<< "created[] " << data_ << std::endl;
 }
 
-bool dim::read(const var& filehandle, const var& key) {
-	THISIS("bool dim::read(const var& filehandle, const var& key)")
+bool dim::read(CVR filehandle, CVR key) {
+	THISIS("bool dim::read(CVR filehandle, CVR key)")
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
@@ -88,8 +88,8 @@ bool dim::read(const var& filehandle, const var& key) {
 	return true;
 }
 
-bool dim::write(const var& filehandle, const var& key) const {
-	THISIS("bool dim::write(const var& filehandle, const var& key) const")
+bool dim::write(CVR filehandle, CVR key) const {
+	THISIS("bool dim::write(CVR filehandle, CVR key) const")
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
@@ -97,14 +97,16 @@ bool dim::write(const var& filehandle, const var& key) const {
 	return temprecord.write(filehandle, key);
 }
 
-bool dim::osread(const var& osfilename, const var& codepage /*=0*/) {\
-	THISIS("bool dim::osread(const var& osfilename, const var& codepage = \"\")")
+bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
+	THISIS("bool dim::osread(CVR osfilename, CVR codepage = \"\")")
 	ISSTRING(osfilename)
 	ISSTRING(codepage)
 
 	var txt;
-	if (not txt.osread(osfilename, codepage))
+	if (not txt.osread(osfilename, codepage)) {
+		var().lasterror(osfilename.quote() ^ " cannot be osread.");
 		return false;
+	}
 
 	int n = this->split(txt, '\n');
 
@@ -120,8 +122,8 @@ bool dim::osread(const var& osfilename, const var& codepage /*=0*/) {\
 	return true;
 }
 
-bool dim::oswrite(const var& osfilename, const var& codepage /*=0*/) const {
-	THISIS("bool dim::oswrite(const var& osfilename, const var& codepage = \"\")")
+bool dim::oswrite(CVR osfilename, CVR codepage /*=0*/) const {
+	THISIS("bool dim::oswrite(CVR osfilename, CVR codepage = \"\")")
 	ISSTRING(osfilename)
 	ISSTRING(codepage)
 
@@ -187,7 +189,7 @@ bool dim::redim(int rows, int cols) {
 
 // the same () function is called regardless of being on LHS or RHS
 // second version is IDENTICAL except for lack of const (used only on "const dim")
-var& dim::operator()(int rowno, int colno) {
+VARREF dim::operator()(int rowno, int colno) {
 
 	// check bounds
 	if (rowno > nrows_)
@@ -201,7 +203,7 @@ var& dim::operator()(int rowno, int colno) {
 	return data_[ncols_ * (rowno - 1) + colno];
 }
 
-var& dim::operator()(int rowno, int colno) const {
+VARREF dim::operator()(int rowno, int colno) const {
 
 	// check bounds
 	if (rowno > nrows_ || rowno < 0)
@@ -216,7 +218,7 @@ var& dim::operator()(int rowno, int colno) const {
 	return data_[ncols_ * (rowno - 1) + colno];
 }
 
-dim& dim::init(const var& sourcevar) {
+dim& dim::init(CVR sourcevar) {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	int arraysize = nrows_ * ncols_ + 1;
@@ -238,7 +240,7 @@ dim& dim::operator=(const dim& sourcedim) {
 	return *this;
 }
 
-dim& dim::operator=(const var& sourcevar) {
+dim& dim::operator=(CVR sourcevar) {
 	//if (!initialised_)
 	//	throw MVArrayNotDimensioned();
 	this->init(sourcevar);
@@ -259,7 +261,7 @@ dim& dim::operator=(const double sourcedbl) {
 	return *this;
 }
 
-var dim::join(const var& sepchar) const {
+var dim::join(CVR sepchar) const {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	int arraysize = nrows_ * ncols_;
@@ -306,7 +308,7 @@ var dim::join(const var& sepchar) const {
 }
 
 // dim=var.split()
-dim var::split(const var& separator) const {
+dim var::split(CVR separator) const {
 
 	//TODO provide a version that can split on any utf8 character
 	// should use dim's move constructor to place the array directly in place avoiding a slow
@@ -320,8 +322,8 @@ dim var::split(const var& separator) const {
 
 // number=dim.split(varstr)
 // returns number of elements
-var dim::split(const var& str1, const var& separator) {
-	THISIS("var dim::split(const var& var1, const var& separator=\"\")")
+var dim::split(CVR str1, CVR separator) {
+	THISIS("var dim::split(CVR var1, CVR separator=\"\")")
 	ISSTRING(str1)
 	ISSTRING(separator)
 
@@ -397,8 +399,8 @@ dim& dim::sort(bool reverse) {
 }
 
 //sorting var - using temporary dim
-var var::sort(const var& separator) const{
-	THISIS("var var::sort(const var& separator=UNASSIGNED)")
+var var::sort(CVR separator) const{
+	THISIS("var var::sort(CVR separator=UNASSIGNED)")
 	THISISSTRING()
 	ISSTRING(separator)
 

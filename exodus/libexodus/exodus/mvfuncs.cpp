@@ -155,7 +155,7 @@ bool var::hasinput(int milliseconds) {
 }
 
 //binary safe version (except nl/eof?) with little or no editing except backspace and no default
-var& var::input() {
+VARREF var::input() {
 	THISIS("bool var::input()")
 	THISISDEFINED()
 
@@ -173,8 +173,8 @@ var& var::input() {
 
 // input with prompt allows default value and editing
 // but is not binary safe because we allow line editing when there is a prompt (even if empty)
-var& var::input(const var& prompt) {
-	THISIS("bool var::input(const var& prompt")
+VARREF var::input(CVR prompt) {
+	THISIS("bool var::input(CVR prompt")
 	THISISDEFINED()
 	ISSTRING(prompt)
 
@@ -210,7 +210,7 @@ var& var::input(const var& prompt) {
 
 // for nchars, use int instead of var to trigger error at point of calling not here
 // not binary safe if nchars = 0 because we allow line editing assuming terminal console
-var& var::inputn(const int nchars) {
+VARREF var::inputn(const int nchars) {
 	THISIS("bool var::inputn(const int nchars")
 	THISISDEFINED()
 
@@ -280,8 +280,8 @@ var& var::inputn(const int nchars) {
 	return *this;
 }
 
-void var::stop(const var& text) const {
-	THISIS("void var::stop(const var& text) const")
+void var::stop(CVR text) const {
+	THISIS("void var::stop(CVR text) const")
 	ISSTRING(text)
 
 	// exit(0);
@@ -289,22 +289,22 @@ void var::stop(const var& text) const {
 }
 
 /*
-//swig for perl wants it on windows!void var::win32_abort(const var& text) const
+//swig for perl wants it on windows!void var::win32_abort(CVR text) const
 {
 	abort(text);
 }
 */
 
-void var::abort(const var& text) const {
-	THISIS("void var::abort(const var& text) const")
+void var::abort(CVR text) const {
+	THISIS("void var::abort(CVR text) const")
 	ISSTRING(text)
 
 	// exit(1);
 	throw MVAbort(text);
 }
 
-void var::abortall(const var& text) const {
-	THISIS("void var::abortall(const var& text) const")
+void var::abortall(CVR text) const {
+	THISIS("void var::abortall(CVR text) const")
 	ISSTRING(text)
 
 	// exit(1);
@@ -336,12 +336,12 @@ bool var::unassigned() const {
 	return !var_typ;
 }
 
-var& var::unassigned(const var& defaultvalue) {
+VARREF var::unassigned(CVR defaultvalue) {
 
 	// see explanation above in assigned
 	// THISISDEFINED()
 
-	THISIS("var& var::unassigned(const var& defaultvalue) const")
+	THISIS("VARREF var::unassigned(CVR defaultvalue) const")
 	ISASSIGNED(defaultvalue)
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -529,36 +529,14 @@ double var::toDouble() const {
 	return var_dbl;
 }
 
-// mainly called in ISSTRING when not already a string
-void var::createString() const {
-	// THISIS("void var::createString() const")
-	// TODO ensure ISDEFINED is called everywhere in advance
-	// to avoid wasting time doing multiple calls to ISDEFINED
-	// THISISDEFINED()
+char var::toChar() const {
+	THISIS("char var::toChar() const")
+	THISISSTRING()
 
-	// dbl - create string from dbl
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		var_str = dblToString(var_dbl);
-		var_typ |= VARTYP_STR;
-		return;
-	}
+	if (var_str.empty())
+		return '\0';
 
-	// int - create string from int
-	if (var_typ & VARTYP_INT) {
-		// loss of precision if var_int is long long
-		var_str = intToString(int(var_int));
-		var_typ |= VARTYP_STR;
-		return;
-	}
-	// already a string (unlikely since only called when not a string)
-	if (var_typ & VARTYP_STR) {
-		return;
-	}
-
-	// treat any other case as unassigned
-	//(usually var_typ & VARTYP_UNA)
-	throw MVUnassigned("createString()");
+	return var_str[0];
 }
 
 // temporary var can return move its string into the output
@@ -623,15 +601,15 @@ void var::from_u32string(std::u32string u32_source) const {
 	var_str = boost::locale::conv::utf_to_utf<char>(u32_source);
 }
 
-var var::trim(const var& trimchar) const& {
-	THISIS("var var::trim(const var& trimchar) const")
+var var::trim(CVR trimchar) const& {
+	THISIS("var var::trim(CVR trimchar) const")
 	ISSTRING(trimchar)
 
 	return trim(trimchar.var_str.c_str());
 }
 
-var var::trim(const var& trimchar, const var& options) const& {
-	THISIS("var var::trim(const var& trimchar, const var& options) const")
+var var::trim(CVR trimchar, CVR options) const& {
+	THISIS("var var::trim(CVR trimchar, CVR options) const")
 	ISSTRING(trimchar)
 	ISSTRING(options)
 
@@ -645,15 +623,15 @@ var var::trim(const var& trimchar, const var& options) const& {
 	return trim(trimchar.var_str.c_str());
 }
 
-var& var::trimmer(const var& trimchar) {
-	THISIS("var& var::trimmer(const var& trimchar)")
+VARREF var::trimmer(CVR trimchar) {
+	THISIS("VARREF var::trimmer(CVR trimchar)")
 	ISSTRING(trimchar)
 
 	return trimmer(trimchar.var_str.c_str());
 }
 
-var& var::trimmer(const var& trimchar, const var& options) {
-	THISIS("var var::trimmer(const var& trimchar, const var& options) const")
+VARREF var::trimmer(CVR trimchar, CVR options) {
+	THISIS("var var::trimmer(CVR trimchar, CVR options) const")
 	ISSTRING(trimchar)
 	ISSTRING(options)
 
@@ -667,36 +645,36 @@ var& var::trimmer(const var& trimchar, const var& options) {
 	return trimmer(trimchar.var_str.c_str());
 }
 
-var var::trimf(const var& trimchar) const& {
-	THISIS("var var::trimf(const var& trimchar) const")
+var var::trimf(CVR trimchar) const& {
+	THISIS("var var::trimf(CVR trimchar) const")
 	ISSTRING(trimchar)
 
 	return trimf(trimchar.var_str.c_str());
 }
 
-var& var::trimmerf(const var& trimchar) {
-	THISIS("var& var::trimmerf(const var& trimchar)")
+VARREF var::trimmerf(CVR trimchar) {
+	THISIS("VARREF var::trimmerf(CVR trimchar)")
 	ISSTRING(trimchar)
 
 	return trimmerf(trimchar.var_str.c_str());
 }
 
 // trimb - trim backward trailing chars
-var var::trimb(const var& trimchar) const& {
-	THISIS("var var::trimb(const var& trimchar) const")
+var var::trimb(CVR trimchar) const& {
+	THISIS("var var::trimb(CVR trimchar) const")
 	ISSTRING(trimchar)
 
 	return trimb(trimchar.var_str.c_str());
 }
 
 // on temporary
-var& var::trimb(const var& trimchar) && {
+VARREF var::trimb(CVR trimchar) && {
 	return this->trimmerb(trimchar);
 }
 
 //in place
-var& var::trimmerb(const var& trimchar) {
-	THISIS("var& var::trimmerb(const var& trimchar)")
+VARREF var::trimmerb(CVR trimchar) {
+	THISIS("VARREF var::trimmerb(CVR trimchar)")
 	ISSTRING(trimchar)
 
 	return trimmerb(trimchar.var_str.c_str());
@@ -711,13 +689,13 @@ var var::trimf(const char* trimchar) const& {
 }
 
 // on temporary
-var& var::trimf(const char* trimchar) && {
+VARREF var::trimf(const char* trimchar) && {
 	return this->trimmerf(trimchar);
 }
 
 // in-place
-var& var::trimmerf(const char* trimchar) {
-	THISIS("var& var::trimmerf(const char* trimchar)")
+VARREF var::trimmerf(const char* trimchar) {
+	THISIS("VARREF var::trimmerf(const char* trimchar)")
 	THISISSTRINGMUTATOR()
 
 	std::string::size_type start_pos;
@@ -745,13 +723,13 @@ var var::trimb(const char* trimchar) const& {
 }
 
 // on temporary
-var& var::trimb(const char* trimchar) && {
+VARREF var::trimb(const char* trimchar) && {
 	return this->trimmerb(trimchar);
 }
 
 // in-place
-var& var::trimmerb(const char* trimchar) {
-	THISIS("var& var::trimmerb(const char* trimchar)")
+VARREF var::trimmerb(const char* trimchar) {
+	THISIS("VARREF var::trimmerb(const char* trimchar)")
 	THISISSTRINGMUTATOR()
 
 	std::string::size_type end_pos;
@@ -779,17 +757,17 @@ var var::trim(const char* trimchar) const& {
 }
 
 // on temporary
-var& var::trim(const char* trimchar) && {
+VARREF var::trim(const char* trimchar) && {
 	return this->trimmer(trimchar);
 }
 
 // in-place
-var& var::trimmer(const char* trimchar) {
+VARREF var::trimmer(const char* trimchar) {
 
 	// reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
 
-	THISIS("var& var::trimmer(const char* trimchar)")
+	THISIS("VARREF var::trimmer(const char* trimchar)")
 	THISISSTRINGMUTATOR()
 
 	// find the first non blank
@@ -848,13 +826,13 @@ var var::invert() const& {
 }
 
 // on temporary
-var& var::invert() && {
+VARREF var::invert() && {
 	return this->inverter();
 }
 
 // in-place
-var& var::inverter() {
-	THISIS("var& var::inverter()")
+VARREF var::inverter() {
+	THISIS("VARREF var::inverter()")
 	THISISSTRINGMUTATOR()
 
 	// xor each unicode code point, with the bits we want to toggle ... ie the bottom 8
@@ -882,13 +860,13 @@ var var::ucase() const& {
 }
 
 // on temporary
-var& var::ucase() && {
+VARREF var::ucase() && {
 	return this->ucaser();
 }
 
 // in-place
-var& var::ucaser() {
-	THISIS("var& var::ucaser()")
+VARREF var::ucaser() {
+	THISIS("VARREF var::ucaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
@@ -930,13 +908,13 @@ var var::lcase() const& {
 }
 
 // on temporary
-var& var::lcase() && {
+VARREF var::lcase() && {
 	return this->lcaser();
 }
 
 // in-place
-var& var::lcaser() {
-	THISIS("var& var::lcaser()")
+VARREF var::lcaser() {
+	THISIS("VARREF var::lcaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
@@ -969,13 +947,13 @@ var var::tcase() const& {
 }
 
 // on temporary
-var& var::tcase() && {
+VARREF var::tcase() && {
 	return this->tcaser();
 }
 
 // in-place
-var& var::tcaser() {
-	THISIS("var& var::tcaser()")
+VARREF var::tcaser() {
+	THISIS("VARREF var::tcaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
@@ -1007,13 +985,13 @@ var var::fcase() const& {
 }
 
 // on temporary
-var& var::fcase() && {
+VARREF var::fcase() && {
 	return this->fcaser();
 }
 
 // in-place
-var& var::fcaser() {
-	THISIS("var& var::fcaser()")
+VARREF var::fcaser() {
+	THISIS("VARREF var::fcaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
@@ -1053,13 +1031,13 @@ var var::normalize() const& {
 }
 
 // on temporary
-var& var::normalize() && {
+VARREF var::normalize() && {
 	return this->normalizer();
 }
 
 // in-place
-var& var::normalizer() {
-	THISIS("var& var::normalizer()")
+VARREF var::normalizer() {
+	THISIS("VARREF var::normalizer()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
@@ -1181,13 +1159,13 @@ var var::quote() const& {
 }
 
 // on temporary
-var& var::quote() && {
+VARREF var::quote() && {
 	return this->quoter();
 }
 
 // in-place
-var& var::quoter() {
-	THISIS("var& var::quoter()")
+VARREF var::quoter() {
+	THISIS("VARREF var::quoter()")
 	THISISSTRINGMUTATOR()
 
 	// NB this is std::string "replace" not var field replace
@@ -1202,13 +1180,13 @@ var var::squote() const& {
 }
 
 // on temporary
-var& var::squote() && {
+VARREF var::squote() && {
 	return this->squoter();
 }
 
 // in-place
-var& var::squoter() {
-	THISIS("var& var::squoter()")
+VARREF var::squoter() {
+	THISIS("VARREF var::squoter()")
 	THISISSTRINGMUTATOR()
 
 	// NB this is std::string "replace" not var field replace
@@ -1223,13 +1201,13 @@ var var::unquote() const& {
 }
 
 // on temporary
-var& var::unquote() && {
+VARREF var::unquote() && {
 	return this->unquoter();
 }
 
 // in-place
-var& var::unquoter() {
-	THISIS("var& var::unquoter()")
+VARREF var::unquoter() {
+	THISIS("VARREF var::unquoter()")
 	THISISSTRINGMUTATOR()
 
 	// removes MATCHING beginning and terminating " or ' characters
@@ -1260,28 +1238,28 @@ var& var::unquoter() {
 }
 
 //splice() remove/replace/insert part of a string with another string
-var var::splice(const int start1, const int length, const var& newstr) const& {
+var var::splice(const int start1, const int length, CVR newstr) const& {
 	return var(*this).splicer(start1, length, newstr);
 }
 
 // on temporary
-var& var::splice(const int start1, const int length, const var& newstr) && {
+VARREF var::splice(const int start1, const int length, CVR newstr) && {
 	return this->splicer(start1, length, newstr);
 }
 
 // splice() remove/replace/insert part of a string (up to the end) with another string
-var var::splice(const int start1, const var& newstr) const& {
+var var::splice(const int start1, CVR newstr) const& {
 	return var(*this).splicer(start1, newstr);
 }
 
 // on temporary
-var& var::splice(const int start1, const var& newstr) && {
+VARREF var::splice(const int start1, CVR newstr) && {
 	return this->splicer(start1, newstr);
 }
 
 // in-place
-var& var::splicer(const int start1, const int length, const var& newstr) {
-	THISIS("var& var::splicer(const int start1,const int length,const var& newstr)")
+VARREF var::splicer(const int start1, const int length, CVR newstr) {
+	THISIS("VARREF var::splicer(const int start1,const int length,CVR newstr)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
 
@@ -1384,8 +1362,8 @@ var& var::splicer(const int start1, const int length, const var& newstr) {
 }
 
 // in-place
-var& var::splicer(const int start1, const var& newstr) {
-	THISIS("var& var::splicer(const int start1, const var& newstr)")
+VARREF var::splicer(const int start1, CVR newstr) {
+	THISIS("VARREF var::splicer(const int start1, CVR newstr)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
 
@@ -1415,13 +1393,13 @@ var var::pop() const& {
 }
 
 // on temporary do in place
-var& var::pop() && {
+VARREF var::pop() && {
 	return this->popper();
 }
 
 // in-place
-var& var::popper() {
-	THISIS("var& var::popper()")
+VARREF var::popper() {
+	THISIS("VARREF var::popper()")
 	THISISSTRINGMUTATOR()
 
 	if (!var_str.empty())
@@ -1434,21 +1412,21 @@ var& var::popper() {
 /* Failed attempt to get compiler to call different functions depending on specific arguments
 
 template<class T1, class T2, class T3>
-var& splicerx(T1 start1, T2 length, const T3 str) {
+VARREF splicerx(T1 start1, T2 length, const T3 str) {
 	return this->splice(start1, length, var(str));
 };
 
 // Specialise splicer(-1, 1, "") to call popper()
 // Sadly compiler never chooses this one over the main template
 template<const int = -1, const int = 1, const char* = "">
-var& splicerx(const int start1, const int length, const char* c) {
+VARREF splicerx(const int start1, const int length, const char* c) {
        this->outputl("testing");
        return this->popper();
 };
 */
 
-var& var::transfer(var& destinationvar) {
-	THISIS("var& var::transfer(var& destinationvar)")
+VARREF var::transfer(VARREF destinationvar) {
+	THISIS("VARREF var::transfer(VARREF destinationvar)")
 	// transfer even unassigned vars (but not uninitialised ones)
 	//THISISDEFINED()
 	THISISASSIGNED()
@@ -1466,7 +1444,7 @@ var& var::transfer(var& destinationvar) {
 }
 
 var var::clone() const {
-	THISIS("var var::clone(var& destinationvar)")
+	THISIS("var var::clone(VARREF destinationvar)")
 	// clone even unassigned vars!
 	THISISDEFINED()
 
@@ -1480,8 +1458,8 @@ var var::clone() const {
 }
 
 // kind of const needed in calculatex
-const var& var::exchange(const var& var2) const {
-	THISIS("var& var::exchange(var& var2)")
+CVR var::exchange(CVR var2) const {
+	THISIS("VARREF var::exchange(VARREF var2)")
 	THISISASSIGNED()
 	ISDEFINED(var2)
 
@@ -1542,13 +1520,13 @@ var var::crop() const& {
 }
 
 // on temporary
-var& var::crop() && {
+VARREF var::crop() && {
 	return this->cropper();
 }
 
 // in-place
-var& var::cropper() {
-	THISIS("var& var::cropper()")
+VARREF var::cropper() {
+	THISIS("VARREF var::cropper()")
 	THISISSTRINGMUTATOR()
 
 	std::string newstr;
@@ -1599,13 +1577,13 @@ var var::lower() const& {
 }
 
 // on temporary
-var& var::lower() && {
+VARREF var::lower() && {
 	return this->lowerer();
 }
 
 // in-place
-var& var::lowerer() {
-	THISIS("var& var::lowerer()")
+VARREF var::lowerer() {
+	THISIS("VARREF var::lowerer()")
 	THISISSTRING()
 
 	// note: rotate lowest sep to highest
@@ -1621,13 +1599,13 @@ var var::raise() const& {
 }
 
 // on temporary
-var& var::raise() && {
+VARREF var::raise() && {
 	return this->raiser();
 }
 
 // in-place
-var& var::raiser() {
-	THISIS("var& var::raiser()")
+VARREF var::raiser() {
+	THISIS("VARREF var::raiser()")
 	THISISSTRING()
 
 	// note: rotate highest sep to lowest
@@ -1670,8 +1648,8 @@ void converter_helper(T& var_str, const T& oldchars, const T& newchars) {
 
 // convert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
-var var::convert(const var& oldchars, const var& newchars) const& {
-	THISIS("var var::convert(const var& oldchars,const var& newchars) const")
+var var::convert(CVR oldchars, CVR newchars) const& {
+	THISIS("var var::convert(CVR oldchars,CVR newchars) const")
 	THISISSTRING()
 
 	// return var(*this).converter(oldchars,newchars);
@@ -1680,15 +1658,15 @@ var var::convert(const var& oldchars, const var& newchars) const& {
 }
 
 // on temporary
-var& var::convert(const var& oldchars, const var& newchars) && {
+VARREF var::convert(CVR oldchars, CVR newchars) && {
 	//dont check if defined/assigned since temporaries very unlikely to be so
 
 	return this->converter(oldchars, newchars);
 }
 
 // in-place
-var& var::converter(const var& oldchars, const var& newchars) {
-	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
+VARREF var::converter(CVR oldchars, CVR newchars) {
+	THISIS("VARREF var::converter(CVR oldchars,CVR newchars)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(oldchars)
 	ISSTRING(newchars)
@@ -1699,8 +1677,8 @@ var& var::converter(const var& oldchars, const var& newchars) {
 }
 
 // in-place for const char*
-var& var::converter(const char* oldchars, const char* newchars) {
-	THISIS("var& var::converter(const char* oldchars, const char* newchars)")
+VARREF var::converter(const char* oldchars, const char* newchars) {
+	THISIS("VARREF var::converter(const char* oldchars, const char* newchars)")
 	THISISSTRINGMUTATOR()
 
 	converter_helper(var_str, std::string(oldchars), std::string(newchars));
@@ -1710,23 +1688,23 @@ var& var::converter(const char* oldchars, const char* newchars) {
 
 // textconvert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
-var var::textconvert(const var& oldchars, const var& newchars) const& {
-	THISIS("var var::textconvert(const var& oldchars,const var& newchars) const")
+var var::textconvert(CVR oldchars, CVR newchars) const& {
+	THISIS("var var::textconvert(CVR oldchars,CVR newchars) const")
 	THISISSTRING()
 
 	return var(*this).textconverter(oldchars, newchars);
 }
 
 // on temporary
-var& var::textconvert(const var& oldchars, const var& newchars) && {
+VARREF var::textconvert(CVR oldchars, CVR newchars) && {
 	//dont check if defined/assigned since temporaries very unlikely to be so
 
 	return this->textconverter(oldchars, newchars);
 }
 
 // in-place
-var& var::textconverter(const var& oldchars, const var& newchars) {
-	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
+VARREF var::textconverter(CVR oldchars, CVR newchars) {
+	THISIS("VARREF var::converter(CVR oldchars,CVR newchars)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(oldchars)
 	ISSTRING(newchars)
@@ -2001,8 +1979,8 @@ bool var::isnum(void) const {
 /////////
 
 //warning put() is not threadsafe whereas output(), errput() and logput() are threadsafe
-const var& var::put(std::ostream& ostream1) const {
-	THISIS("const var& var::put(std::ostream& ostream1) const")
+CVR var::put(std::ostream& ostream1) const {
+	THISIS("CVR var::put(std::ostream& ostream1) const")
 	THISISSTRING()
 
 	// prevent output to cout suppressing output to cout (by non-exodus routines)
@@ -2024,14 +2002,14 @@ const var& var::put(std::ostream& ostream1) const {
 ///////////////////////////////////////////////////
 
 // output() buffered threadsafe output to standard output
-const var& var::output() const {
+CVR var::output() const {
 	LOCKIOSTREAM
 	return this->put(std::cout);
 }
 
 // outputl() flushed threadsafe output to standard output
 // adds \n and flushes so is slower than output("\n")
-const var& var::outputl() const {
+CVR var::outputl() const {
 	LOCKIOSTREAM
 	this->put(std::cout);
 	std::cout << std::endl;
@@ -2040,7 +2018,7 @@ const var& var::outputl() const {
 
 // outputt() buffered threadsafe output to standard output
 // adds \t
-const var& var::outputt() const {
+CVR var::outputt() const {
 	LOCKIOSTREAM
 	this->put(std::cout);
 	std::cout << '\t';
@@ -2048,14 +2026,14 @@ const var& var::outputt() const {
 }
 
 // overloaded output() outputs a prefix str
-const var& var::output(const var& str) const {
+CVR var::output(CVR str) const {
 	LOCKIOSTREAM
 	str.put(std::cout);
 	return this->put(std::cout);
 }
 
 // oveloaded outputl() outputs a prefix str
-const var& var::outputl(const var& str) const {
+CVR var::outputl(CVR str) const {
 	LOCKIOSTREAM
 	str.put(std::cout);
 	this->put(std::cout);
@@ -2064,7 +2042,7 @@ const var& var::outputl(const var& str) const {
 }
 
 // overloaded outputt() outputs a prefix str
-const var& var::outputt(const var& str) const {
+CVR var::outputt(CVR str) const {
 	LOCKIOSTREAM
 	std::cout << "\t";
 	str.put(std::cout);
@@ -2077,7 +2055,7 @@ const var& var::outputt(const var& str) const {
 ////////////////////////////////////////////////////
 
 // errput() unbuffered threadsafe output to standard error
-const var& var::errput() const {
+CVR var::errput() const {
 	LOCKIOSTREAM
 	//return put(std::cerr);
 	std::cerr << *this;
@@ -2086,7 +2064,7 @@ const var& var::errput() const {
 
 // errputl() unbuffered threadsafe output to standard error
 // adds "\n"
-const var& var::errputl() const {
+CVR var::errputl() const {
 	LOCKIOSTREAM
 	//this->put(std::cerr);
 	std::cerr << *this;
@@ -2095,7 +2073,7 @@ const var& var::errputl() const {
 }
 
 // overloaded errput outputs a prefix str
-const var& var::errput(const var& str) const {
+CVR var::errput(CVR str) const {
 	LOCKIOSTREAM
 	//str.put(std::cerr);
 	//return this->put(std::cerr);
@@ -2105,7 +2083,7 @@ const var& var::errput(const var& str) const {
 }
 
 // overloaded errputl outputs a prefix str
-const var& var::errputl(const var& str) const {
+CVR var::errputl(CVR str) const {
 	LOCKIOSTREAM
 	//str.put(std::cerr);
 	//this->put(std::cerr);
@@ -2119,7 +2097,7 @@ const var& var::errputl(const var& str) const {
 ///////////////////////////////////////////////////////////////////////////
 
 // logput() buffered threadsafe output to standard log
-const var& var::logput() const {
+CVR var::logput() const {
 	LOCKIOSTREAM
 	//this->put(std::clog);
 	std::clog << *this;
@@ -2128,7 +2106,7 @@ const var& var::logput() const {
 }
 
 // logput() flushed threadsafe output to standard log
-const var& var::logputl() const {
+CVR var::logputl() const {
 	LOCKIOSTREAM
 	//this->put(std::clog);
 	std::clog << *this;
@@ -2137,7 +2115,7 @@ const var& var::logputl() const {
 }
 
 // overloaded logput with a prefix str
-const var& var::logput(const var& str) const {
+CVR var::logput(CVR str) const {
 	LOCKIOSTREAM
 	//str.put(std::clog);
 	std::clog << str;
@@ -2146,7 +2124,7 @@ const var& var::logput(const var& str) const {
 }
 
 // overloaded logputl with a prefix str
-const var& var::logputl(const var& str) const {
+CVR var::logputl(CVR str) const {
 	LOCKIOSTREAM
 	//str.put(std::clog);
 	//this->put(std::clog);
@@ -2160,8 +2138,8 @@ const var& var::logputl(const var& str) const {
 // DCOUNT
 ////////
 // TODO make a char and char version for speed
-var var::dcount(const var& substrx) const {
-	THISIS("var var::dcount(const var& substrx) const")
+var var::dcount(CVR substrx) const {
+	THISIS("var var::dcount(CVR substrx) const")
 	THISISSTRING()
 	ISSTRING(substrx)
 
@@ -2175,8 +2153,8 @@ var var::dcount(const var& substrx) const {
 // COUNT
 ///////
 
-var var::count(const var& substrx) const {
-	THISIS("var var::count(const var& substrx) const")
+var var::count(CVR substrx) const {
+	THISIS("var var::count(CVR substrx) const")
 	THISISSTRING()
 	ISSTRING(substrx)
 
@@ -2216,8 +2194,8 @@ var var::count(const char charx) const {
 	}
 }
 
-var var::index2(const var& substrx, const int startchar1) const {
-	THISIS("var var::index2(const var& substrx,const int startchar1) const")
+var var::index2(CVR substrx, const int startchar1) const {
+	THISIS("var var::index2(CVR substrx,const int startchar1) const")
 	THISISSTRING()
 	ISSTRING(substrx)
 
@@ -2235,8 +2213,8 @@ var var::index2(const var& substrx, const int startchar1) const {
 	return var((int)start_pos + 1);
 }
 
-var var::index(const var& substrx, const int occurrenceno) const {
-	THISIS("var var::index(const var& substrx,const int occurrenceno) const")
+var var::index(CVR substrx, const int occurrenceno) const {
+	THISIS("var var::index(CVR substrx,const int occurrenceno) const")
 	THISISSTRING()
 	ISSTRING(substrx)
 
@@ -2276,7 +2254,7 @@ var var::index(const var& substrx, const int occurrenceno) const {
 	return 0;
 }
 
-var var::debug(const var& var1) const {
+var var::debug(CVR var1) const {
 	// THISIS("var var::debug() const")
 
 	std::clog << "var::debug(" << var1 << ")" << std::endl;
@@ -2334,8 +2312,8 @@ var var::abs() const {
 	throw MVError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::mod(const var& divisor) const {
-	THISIS("var var::mod(const var& divisor) const")
+var var::mod(CVR divisor) const {
+	THISIS("var var::mod(CVR divisor) const")
 	THISISNUMERIC()
 	ISNUMERIC(divisor)
 
@@ -2394,7 +2372,7 @@ var var::mod(const int divisor) const {
 	THISIS("var var::mod(const int divisor) const")
 	THISISNUMERIC()
 
-	// see ::mod(const var& divisor) for comments about c++11 % operator
+	// see ::mod(CVR divisor) for comments about c++11 % operator
 
 	// prefer double dividend
 	if (var_typ & VARTYP_DBL) {
@@ -2518,8 +2496,8 @@ var var::sqrt() const {
 	throw MVError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::pwr(const var& exponent) const {
-	THISIS("var var::pwr(const var& exponent) const")
+var var::pwr(CVR exponent) const {
+	THISIS("var var::pwr(CVR exponent) const")
 	THISISNUMERIC()
 	ISNUMERIC(exponent)
 
@@ -2567,7 +2545,7 @@ var var::at(const int columnno) const {
 	// move to columnno
 	if (columnno > 0) {
 		std::string tempstr = "\x1B[";
-		tempstr += intToString(columnno);
+		tempstr += std::to_string(columnno);
 		tempstr.push_back('G');
 		return tempstr;
 	}
@@ -2599,9 +2577,9 @@ var var::at(const int columnno, const int rowno) const {
 	// THISIS("var var::at(const int columnno,const int rowno) const")
 
 	std::string tempstr = "\x1B[";
-	tempstr += intToString(rowno);
+	tempstr += std::to_string(rowno);
 	tempstr.push_back(';');
-	tempstr += intToString(columnno);
+	tempstr += std::to_string(columnno);
 	tempstr.push_back('H');
 	return tempstr;
 }
@@ -2622,8 +2600,8 @@ void var::setprompt() const {
 	return;
 }
 
-var var::xlate(const var& filename, const var& fieldno, const var& mode) const {
-	THISIS("var var::xlate(const var& filename,const var& fieldno, const var& mode) const")
+var var::xlate(CVR filename, CVR fieldno, CVR mode) const {
+	THISIS("var var::xlate(CVR filename,CVR fieldno, CVR mode) const")
 	ISSTRING(mode)
 
 	return xlate(filename, fieldno, mode.var_str.c_str());
@@ -2632,8 +2610,8 @@ var var::xlate(const var& filename, const var& fieldno, const var& mode) const {
 // TODO provide a version with int fieldno to handle the most frequent case
 // although may also support dictid (of target file) instead of fieldno
 
-var var::xlate(const var& filename, const var& fieldno, const char* mode) const {
-	THISIS("var var::xlate(const var& filename,const var& fieldno, const char* mode) const")
+var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
+	THISIS("var var::xlate(CVR filename,CVR fieldno, const char* mode) const")
 	THISISSTRING()
 	ISSTRING(filename)
 	// fieldnames are supported as mvprogram::xlate

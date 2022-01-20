@@ -31,8 +31,8 @@ static const int HEX_PER_CHAR = sizeof(char) * 2;
 
 namespace exodus {
 
-var var::iconv(const var& convstr) const {
-	THISIS("var var::iconv(const var& convstr) const")
+var var::iconv(CVR convstr) const {
+	THISIS("var var::iconv(CVR convstr) const")
 	ISSTRING(convstr)
 
 	return iconv(convstr.var_str.c_str());
@@ -217,7 +217,7 @@ var var::iconv(const char* convstr) const {
 	return *this;
 }
 
-var var::oconv_T(const var& format) const {
+var var::oconv_T(CVR format) const {
 
 	// expecting only "T#99" with no mask at the moment
 
@@ -569,7 +569,7 @@ convert:
 	return part1;
 }
 
-var var::oconv_LRC(const var& format) const {
+var var::oconv_LRC(CVR format) const {
 
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
@@ -647,8 +647,8 @@ var var::oconv_LRC(const var& format) const {
 	return output;
 }
 
-var var::oconv(const var& conversion) const {
-	THISIS("var var::oconv(const var& conversion) const")
+var var::oconv(CVR conversion) const {
+	THISIS("var var::oconv(CVR conversion) const")
 	THISISDEFINED()
 	ISSTRING(conversion)
 

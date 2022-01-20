@@ -32,11 +32,11 @@ ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 DLL_PUBLIC
 ExodusProgramBase::~ExodusProgramBase(){}
 
-var ExodusProgramBase::libinfo(const var& command) {
+var ExodusProgramBase::libinfo(CVR command) {
 	return var(perform_exodusfunctorbase_.libfilename(command.toString())).osfile();
 }
 
-bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
+bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 	//TRACE(sortselectclause_or_filehandle)
 
@@ -440,15 +440,15 @@ bool ExodusProgramBase::select(const var& sortselectclause_or_filehandle) {
 	return result;
 }
 
-bool ExodusProgramBase::savelist(const var& listname) {
+bool ExodusProgramBase::savelist(CVR listname) {
 	return CURSOR.savelist(listname.field(" ", 1));
 }
 
-bool ExodusProgramBase::getlist(const var& listname) {
+bool ExodusProgramBase::getlist(CVR listname) {
 	return CURSOR.getlist(listname.field(" ", 1));
 }
 
-bool ExodusProgramBase::formlist(const var& filename_or_command, const var& keys /*=""*/, const var fieldno /*=0*/) {
+bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, const var fieldno /*=0*/) {
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
 	if (filename2[-1] eq ")") {
@@ -470,11 +470,11 @@ bool ExodusProgramBase::formlist(const var& filename_or_command, const var& keys
 	return CURSOR.formlist(keys2, fieldno);
 }
 
-bool ExodusProgramBase::makelist(const var& listname, const var& keys) {
+bool ExodusProgramBase::makelist(CVR listname, CVR keys) {
 	return CURSOR.makelist(listname.field(" ", 1), keys);
 }
 
-bool ExodusProgramBase::deletelist(const var& listname) {
+bool ExodusProgramBase::deletelist(CVR listname) {
 	return CURSOR.deletelist(listname.field(" ", 1));
 }
 
@@ -486,22 +486,22 @@ bool ExodusProgramBase::hasnext() {
 	return CURSOR.hasnext();
 }
 
-bool ExodusProgramBase::readnext(var& key) {
+bool ExodusProgramBase::readnext(VARREF key) {
 	return CURSOR.readnext(key);
 }
 
-bool ExodusProgramBase::readnext(var& key, var& valueno) {
+bool ExodusProgramBase::readnext(VARREF key, VARREF valueno) {
 	return CURSOR.readnext(key, valueno);
 }
 
-bool ExodusProgramBase::readnext(var& record, var& key, var& valueno) {
+bool ExodusProgramBase::readnext(VARREF record, VARREF key, VARREF valueno) {
 	return CURSOR.readnext(record, key, valueno);
 }
 
-bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, const var& key) {
+bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key) {
 
 	if (not filename_or_handle_or_command.assigned() || not key.assigned())
-		throw MVUnassigned("bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, const var& key)");
+		throw MVUnassigned("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
 
 	if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
 		var command = filename_or_handle_or_command.a(1);
@@ -546,7 +546,7 @@ bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, c
 	//return filehandle.deleterecord(key);
 }
 
-bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4) {
+bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_unused]] VARREF v3, [[maybe_unused]] VARREF v4) {
 
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR++;
@@ -581,7 +581,7 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[ma
 	*/
 }
 
-bool ExodusProgramBase::popselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4) {
+bool ExodusProgramBase::popselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_unused]] VARREF v3, [[maybe_unused]] VARREF v4) {
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR--;
 	v2.transfer(CURSOR);
@@ -619,19 +619,19 @@ bool ExodusProgramBase::popselect([[maybe_unused]] const var& v1, var& v2, [[may
 	*/
 }
 
-void ExodusProgramBase::note(const var& msg, const var& options) const {
+void ExodusProgramBase::note(CVR msg, CVR options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
-void ExodusProgramBase::note(const var& msg, const var& options, var& buffer, const var& params) const {
+void ExodusProgramBase::note(CVR msg, CVR options, VARREF buffer, CVR params) const {
 	mssg(msg, options, buffer, params);
 }
 
-void ExodusProgramBase::mssg(const var& msg, const var& options) const {
+void ExodusProgramBase::mssg(CVR msg, CVR options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
-void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, const var& params) const {
+void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) const {
 
 	//skip if just "downing" a previous "upped" message
 	if (options.index("D")) {
@@ -708,12 +708,12 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, co
 	}
 }
 
-var ExodusProgramBase::authorised(const var& task0) {
+var ExodusProgramBase::authorised(CVR task0) {
 	var msg;
 	return authorised(task0, msg);
 }
 
-var ExodusProgramBase::authorised(const var& task0, var& msg, const var& defaultlock, const var& username0) {
+var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR username0) {
 
 	var username;
 	var msgusername;
@@ -965,7 +965,7 @@ void ExodusProgramBase::writeuserprivs() const {
 	return;
 }
 
-var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& wordseps0) const {
+var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 
 	var string2;
 
@@ -1075,7 +1075,7 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 	return string2;
 }
 
-var ExodusProgramBase::execute(const var& sentence) {
+var ExodusProgramBase::execute(CVR sentence) {
 
 	var v1, v2, v3, v4;
 	pushselect(v1, v2, v3, v4);
@@ -1089,13 +1089,13 @@ var ExodusProgramBase::execute(const var& sentence) {
 	return result;
 }
 
-void ExodusProgramBase::chain(const var& libraryname) {
+void ExodusProgramBase::chain(CVR libraryname) {
 	CHAIN = libraryname;
 	var().stop();
 }
 
-var ExodusProgramBase::perform(const var& sentence) {
-	// THISIS("var ExodusProgramBase::perform(const var& sentence)")
+var ExodusProgramBase::perform(CVR sentence) {
+	// THISIS("var ExodusProgramBase::perform(CVR sentence)")
 	// ISSTRING(sentence)
 
 	// return ID^"*"^dictid;
@@ -1244,7 +1244,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 	return ANS;
 }
 
-var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fieldno_or_name, const var& mode) {
+var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mode) {
 
 	// TODO implement additional MV argument
 
@@ -1308,7 +1308,7 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 	return results;
 }
 
-var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mvno) {
+var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mvno) {
 
 	//dictid @ID/@id is hard coded to return ID
 	//to avoid incessant lookup in main file dictionary and then defaulting to dict.voc
@@ -1334,8 +1334,8 @@ var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const v
 	return result;
 }
 
-var ExodusProgramBase::calculate(const var& dictid) {
-	// THISIS("var ExodusProgramBase::calculate(const var& dictid)")
+var ExodusProgramBase::calculate(CVR dictid) {
+	// THISIS("var ExodusProgramBase::calculate(CVR dictid)")
 	// ISSTRING(dictid)
 
 	// return ID^"*"^dictid;
@@ -1487,7 +1487,7 @@ bool ExodusProgramBase::unlockrecord() const {
 	return unlockrecord("", xx, "");
 }
 
-bool ExodusProgramBase::unlockrecord(const var& filename, var& file0, const var& key) const {
+bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const {
 	var file;
 	if (file0.unassigned())
 		file = "";
@@ -1526,12 +1526,12 @@ void ExodusProgramBase::debug() const {
 	return;
 }
 
-bool ExodusProgramBase::fsmsg(const var& msg) const {
+bool ExodusProgramBase::fsmsg(CVR msg) const {
 	mssg(msg ^ var().lasterror());
 	return false;
 }
 
-var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3, const var& var4) {
+var ExodusProgramBase::sysvar(CVR var1, CVR var2, CVR var3, CVR var4) {
 
 	std::cout << "sysvar() do nothing:";
 	//	var reply;
@@ -1543,7 +1543,7 @@ var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3,
 	}
 }
 
-void ExodusProgramBase::setprivilege(const var& var1) {
+void ExodusProgramBase::setprivilege(CVR var1) {
 
 	PRIVILEGE = var1;
 	std::cout << "setprivilege(" << var1 << ") do nothing" << std::endl;
@@ -1552,12 +1552,12 @@ void ExodusProgramBase::setprivilege(const var& var1) {
 	return;
 }
 
-var ExodusProgramBase::decide(const var& question, const var& options) const {
+var ExodusProgramBase::decide(CVR question, CVR options) const {
 	var reply = "";
 	return decide(question, options, reply, 1);
 }
 
-var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& reply, const int defaultreply) const {
+var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const int defaultreply) const {
 
 	// If default reply is 0 then there is no default
 	// and pressing Enter returns "" and reply is set to 0
@@ -1628,7 +1628,7 @@ inp:
 	return options.a(reply);
 }
 
-void ExodusProgramBase::savescreen(var& origscrn, var& origattr) const {
+void ExodusProgramBase::savescreen(VARREF origscrn, VARREF origattr) const {
 	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
 
 	// evade warning: unused parameter
@@ -1658,7 +1658,7 @@ bool ExodusProgramBase::esctoexit() const {
 	return key[-1].ucase() == "N";
 }
 
-var ExodusProgramBase::otherusers(const var& param) {
+var ExodusProgramBase::otherusers(CVR param) {
 	std::cout << "ExodusProgramBase::otherusers not implemented yet";
 	return var("");
 
@@ -1667,7 +1667,7 @@ var ExodusProgramBase::otherusers(const var& param) {
 	}
 }
 
-var ExodusProgramBase::otherdatasetusers(const var& param) {
+var ExodusProgramBase::otherdatasetusers(CVR param) {
 	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
 	return var("");
 
@@ -1676,12 +1676,12 @@ var ExodusProgramBase::otherdatasetusers(const var& param) {
 	}
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx) const {
+bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx) const {
 	var record;
 	return (bool)lockrecord(filename, file, keyx, record);
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx, const var& recordx, const int waitsecs0, const bool allowduplicate) const {
+bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs0, const bool allowduplicate) const {
 
 	// linemark
 	// common /shadow.mfs/
@@ -1757,7 +1757,7 @@ lock:
 	return true;
 }
 
-var ExodusProgramBase::singular(const var& pluralnoun) {
+var ExodusProgramBase::singular(CVR pluralnoun) {
 
 	var temp = pluralnoun;
 
@@ -1789,13 +1789,13 @@ var ExodusProgramBase::singular(const var& pluralnoun) {
 	return temp;
 }
 
-void ExodusProgramBase::flushindex(const var& /*filename*/) {
+void ExodusProgramBase::flushindex(CVR /*filename*/) {
 	//std::cout << "ExodusProgramBase::std::flushindex not implemented yet, " << filename
 	//	  << std::endl;
 	return;
 }
 
-var ExodusProgramBase::encrypt2(const var& encrypt0) const {
+var ExodusProgramBase::encrypt2(CVR encrypt0) const {
 
 	var encrypt = encrypt0;
 	var encryptkey = 1234567;
@@ -1823,7 +1823,7 @@ var ExodusProgramBase::encrypt2(const var& encrypt0) const {
 	return encrypt;
 }
 
-var ExodusProgramBase::xmlquote(const var& string0) const {
+var ExodusProgramBase::xmlquote(CVR string0) const {
 
 	var string1;
 
@@ -1845,7 +1845,7 @@ var ExodusProgramBase::xmlquote(const var& string0) const {
 	return string1.quote();
 }
 
-var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& cookie, var& msg) {
+var ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg) {
 
 	// evade warning: unused parameter
 	if (false && dataset) {
@@ -1990,15 +1990,15 @@ var ExodusProgramBase::AT(const int x, const int y) const {
 	return var().at(x, y);
 }
 
-var ExodusProgramBase::handlefilename(const var& handle) {
+var ExodusProgramBase::handlefilename(CVR handle) {
 	return handle.a(1);
 }
 
-var ExodusProgramBase::memspace([[maybe_unused]] const var& requiredmemory) {
+var ExodusProgramBase::memspace([[maybe_unused]] CVR requiredmemory) {
 	return 999999999;
 }
 
-var ExodusProgramBase::getuserdept(const var& usercode) {
+var ExodusProgramBase::getuserdept(CVR usercode) {
 	// locate the user in the list of users
 	var usern;
 	if (!(SECURITY.a(1).locate(usercode, usern))) {
@@ -2027,7 +2027,7 @@ var ExodusProgramBase::getuserdept(const var& usercode) {
 	return ANS;
 }
 
-var ExodusProgramBase::oconv(const var& input0, const var& conversion) {
+var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 
 	// call user conversion routine
 	// almost identical code in var::oconv and var::iconv
@@ -2121,7 +2121,7 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion) {
 	return result;
 }
 
-var ExodusProgramBase::iconv(const var& input, const var& conversion) {
+var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 
 	// call user conversion routine
 	// almost identical code in var::oconv and var::iconv
@@ -2174,7 +2174,7 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 	return result;
 }
 
-var ExodusProgramBase::invertarray(const var& input, const var& force0 /*=0*/) {
+var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 	//c sys in,=(0)
 
 	var force = force0.unassigned() ? var(0) : force0;
@@ -2207,13 +2207,13 @@ var ExodusProgramBase::invertarray(const var& input, const var& force0 /*=0*/) {
 }
 
 //automatic upto date/time
-var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime) {
+var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime) {
 	var uptodate, uptotime;
 	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);
 }
 
 //given from and to
-var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime, var& uptodate, var& uptotime) {
+var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime) {
 	//c sys in,in,io,io
 
 	var text = "";
@@ -2313,7 +2313,7 @@ zero:
 	return text;
 }
 
-var ExodusProgramBase::number(const var& type, const var& input0, const var& ndecs0, var& output) {
+var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 	//function main(in type, in input0, in ndecs0, out output) {
 	//c xxx in,in,in,out
 
@@ -2475,7 +2475,7 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 	return 0;
 }
 
-void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby0) {
+void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 	//function main(io array, in fns=0, in orderby0="") {
 	//c sys io,0,""
 

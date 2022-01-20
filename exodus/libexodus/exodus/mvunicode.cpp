@@ -61,7 +61,7 @@ bool var::setxlocale() const {
 #endif
 }
 
-var& var::getxlocale() {
+VARREF var::getxlocale() {
 #if defined(_MSC_VER) && defined(UNICODE)
 	*this = (int)GetThreadLocale();
 	return *this;
