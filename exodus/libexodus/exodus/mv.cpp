@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 #if __GNUC__ >= 11
 #define USE_TO_CHARS
+#include <array>
 #else
 
 //ryu            1234.5678 -> "1234.5678" 500ns
