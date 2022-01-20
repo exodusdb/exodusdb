@@ -687,7 +687,8 @@ exodus_extract_date(PG_FUNCTION_ARGS)
 	//prepare a c str
 	if (outlen>=20)
 	{
-		elog(ERROR, "pgexodus exodus_extract_date cannot convert more than 20 characters to an integer date");
+		//ignore bad data
+		//elog(ERROR, "pgexodus exodus_extract_date cannot convert more than 20 characters to an integer date");
 		PG_RETURN_NULL();
 	}
 
@@ -734,7 +735,8 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 	//prepare a c str
 	if (outlen>=20)
 	{
-		elog(ERROR, "pgexodus exodus_extract_time cannot convert more than 20 characters to an integer");
+		//ignore bad data
+		//elog(ERROR, "pgexodus exodus_extract_time cannot convert more than 20 characters to an integer");
 		PG_RETURN_NULL();
 	}
 	intstr[20]='\0';
@@ -793,7 +795,8 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 	//prepare a c str
 	if (outlen>=20)
 	{
-		elog(ERROR, "pgexodus exodus_extract_time cannot convert more than 20 characters to an integer time");
+		//ignore bad data
+		//elog(ERROR, "pgexodus exodus_extract_time cannot convert more than 20 characters to an integer time");
 		PG_RETURN_NULL();
 	}
 
@@ -840,7 +843,8 @@ exodus_extract_datetime(PG_FUNCTION_ARGS)
 	//prepare a c str
 	if (outlen>=20)
 	{
-		elog(ERROR, "pgexodus exodus_extract_datetime cannot convert more than 20 characters to an integer");
+		//ignore bad data
+		//elog(ERROR, "pgexodus exodus_extract_datetime cannot convert more than 20 characters to an integer");
 		PG_RETURN_NULL();
 	}
 	datetimestr[20]='\0';
@@ -885,7 +889,8 @@ exodus_extract_number(PG_FUNCTION_ARGS)
 	//prepare a c str
 	if (outlen>=20)
 	{
-		elog(ERROR, "pgexodus exodus_extract_number cannot convert more than 20 characters to an integer");
+		//ignore bad data
+		//elog(ERROR, "pgexodus exodus_extract_number cannot convert more than 20 characters to an integer");
 		PG_RETURN_NULL();
 	}
 	doublestr[20]='\0';
