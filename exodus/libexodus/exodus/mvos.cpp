@@ -864,7 +864,7 @@ bool var::osdelete(CVR osfilename) const {
 	THISISDEFINED()
 	ISSTRING(osfilename)
 	osfilename.osclose();  // in case this is cached opened file handle
-	if (!std::remove(osfilename.to_path_string().c_str())) {
+	if (std::remove(osfilename.to_path_string().c_str())) {
 		this->lasterror(this->quote() ^ " failed to osdelete");
 		return false;
 	}
