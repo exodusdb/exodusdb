@@ -306,8 +306,15 @@ var var::oconv_D(const char* conversion) const {
 
 	// get a ymd object for the desired date
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/date_time/gregorian.html#date_time.gregorian.date_class
+	int pickdayno = this->floor().toInt();
+	//limit to 01 JAN 1400 - 31 DEC 9999
+	if (pickdayno < -207456)
+		pickdayno = -207456;
+	if (pickdayno > 2933628)
+		pickdayno = 2933628;
+
 	boost::gregorian::date desired_date =
-		pick_epoch_date + boost::gregorian::days((*this).floor().toInt());
+		pick_epoch_date + boost::gregorian::days(pickdayno);
 	boost::gregorian::date::ymd_type ymd = desired_date.year_month_day();
 	// boost::gregorian::date::ymd_type
 	// ymd=boost::gregorian::gregorian_calendar::from_day_number(1000u/*+PICK_UNIX_DAY_OFFSET*/);
