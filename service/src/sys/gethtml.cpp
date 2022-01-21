@@ -136,7 +136,9 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		var svg = "";
 		if (qr_text) {
 
-			var cmd = "qrencode --size=2 --type=SVG '" ^ qr_text ^ "'";
+			var qr_body = qr_text.a(1);
+			var qr_tip = qr_text.a(2) ^ qr_body;
+			var cmd = "qrencode --size=2 --type=SVG " ^ qr_body.squote();
 			svg = osshellread(cmd);
 
 			//remove everything like xml and comments before the opening <svg tag
@@ -153,7 +155,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 			"#tooltip1 a span { display: none; color: #FFFFFF; }\n"
 			"#tooltip1 a:hover span { display: block; position: absolute; white-space: nowrap; background-color: #222; left: 20px; top: 20px; color: #FFFFFF; padding: 0 5px; font-size:170%}\n"
 			"</style>\n"
-			"<p id='tooltip1'><a>" ^ svg ^ "<span> " ^ qr_text.swap("\n","<br />") ^ "</span></a></p>";
+			"<p id='tooltip1'><a>" ^ svg ^ "<span> " ^ qr_tip.swap("\n","<br />") ^ "</span></a></p>";
 		}
 
 		html.swapper("%QR%", svg);
