@@ -147,6 +147,7 @@ var var::ostempfilename() const {
 	var tempfilename = this->ostempdirname();
 
 	char* tmp;
+	// TODO ensure tmp is deleted automatically using RAII/SBRM
 	tmp = new char[strlen(tempfilename.var_str.c_str()) + 8];
 	strcpy(tmp, tempfilename.var_str.c_str());
 	strcat(tmp, "~XXXXXX");

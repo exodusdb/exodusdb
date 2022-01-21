@@ -21,7 +21,7 @@ link_directories(../../exodus/libexodus/exodus)
 
 #turn off optimisation since compile time of test_main currently becomes 60 seconds
 #TODO look at breaking test_main main function into many smaller functions
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 #file(GLOB files "test_*.cpp")
 file(GLOB_RECURSE files CONFIGURE_DEPENDS "test_*.cpp")

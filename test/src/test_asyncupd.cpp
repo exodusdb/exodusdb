@@ -25,26 +25,18 @@ function main() {
 	}
 
 	// Will FAIL without locking
-	var no_locking = OPTIONS.count("L");
+	var use_locking = not OPTIONS.count("L");
 
 	// Will work with and without transactions
-	var no_transaction = OPTIONS.count("T");
+	var use_transaction = not OPTIONS.count("T");
 
 	if (not TERMINAL)
 		silent = 1;
 
 	if (not open(filename to file)) {
-
-		printl("Creating", filename);
-
 		createfile(filename);
-
-		open(filename to file);
-
-		assert(file);
-
+		assert(open(filename to file));
 	}
-	assert(file);
 
 	PROCESSNO = COMMAND.a(2);
 
@@ -52,17 +44,16 @@ function main() {
 	// and exit
 	if (not PROCESSNO) {
 
-		// Test WITH transactions (ie WITHOUT T option!)
-		var ok = test("");
+		// Test WITH any given options
+		// or test with NO options (ie with transactions and locking)
+		var ok = test(OPTIONS);
 
-		// Test WITHOUT transactions (i.e. WITH T option!)
-		if (ok)
+		// If no given options then test WITHOUT transactions (i.e. WITH T option!)
+		if (ok and not OPTIONS)
 			ok = test("T");
 
 		if (ok)
 			printl("Test passed");
-
-		deletefile(filename);
 
 		return not ok;
 	}
@@ -75,10 +66,10 @@ function main() {
 	while (n < max and not esctoexit()) {
 
 		// Start transaction
-		if (not no_transaction)
+		if (use_transaction)
 			assert(begintrans());
 
-		if (no_locking || lock(file, key)) {
+		if (not use_locking || lock(file, key)) {
 
 			if (not read(RECORD from file, key))
 				RECORD = "";
@@ -95,20 +86,22 @@ function main() {
 
 			write(RECORD on file, key);
 
-			if (not no_locking)
+			if (use_locking)
 				unlock(file,key);
 
 			if (not silent)
 				printl(PROCESSNO, RECORD);
 
 			// Commit transaction
-			if (not no_transaction)
+			if (use_transaction)
 				assert(committrans());
 
 		} else {
 			//printl("Cannot lock", PROCESSNO);
-			if (not no_transaction)
+			if (use_transaction)
 				assert(rollbacktrans());
+			//errputl(PROCESSNO, "Sleeping");
+			ossleep(100);
 		}
 
 	}
@@ -157,4 +150,3 @@ function test(in option) {
 }
 
 programexit()
-

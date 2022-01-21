@@ -61,7 +61,7 @@ const char* longdayofweeks =
 #endif
 
 // work out the pick epoch date
-static boost::gregorian::date pick_epoch_date = boost::gregorian::date(1967, 12, 31);
+inline static auto pick_epoch_date = boost::gregorian::date(1967, 12, 31);
 
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
@@ -83,8 +83,8 @@ void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& 
 	// convert to local date
 	boost::gregorian::date filedate = localptimex.date();
 	// convert to mv days since 31/12/1967
-	boost::gregorian::date dayzero(1967, 12, 31);  // an arbitrary date
-	mvdate = (filedate - dayzero).days();
+	//boost::gregorian::date dayzero(1967, 12, 31);  // an arbitrary date
+	mvdate = (filedate - pick_epoch_date).days();
 
 	return;
 }

@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 #include <iostream>
 
+/////////////////////////////////////////////
 // WINDOWS
+/////////////////////////////////////////////
 
 // portable shared/dynamic library macros
 // makes linux dlopen, dlsym, dlclose syntax work on windows
@@ -70,8 +72,12 @@ using library_t = HINSTANCE;
 #define EXODUSLIBPREFIX
 #define EXODUSLIBEXT ".dll"
 
-#else
+/////////////////////////////////////////////
+// LINUX
+/////////////////////////////////////////////
 
+#else
+#define DLERROR
 #include <dlfcn.h>
 using library_t = void*;
 #define EXODUSLIBPREFIX "~/lib/lib"
@@ -345,12 +351,12 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 
 	closelib();
 
-#ifdef dlerror
+#ifdef DLERROR
 	dlerror();
 #endif
 
 	{
-		//no need for this?
+		//no need for this if dlcache is per mv and is therefore effectively threadlocal?
 		LOCKDLCACHE
 
 		//look for library in cache
@@ -372,7 +378,7 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 		if (not exo_HOME.osgetenv("EXO_HOME"))
 			exo_HOME.osgetenv("HOME");
 		libraryfilename_.replace(0, 1, exo_HOME.toString());
-		//var(libraryfilename_).outputl();
+		//var(libraryfilename_).logputl();
 	}
 
 	FILE* file = fopen(libraryfilename_.c_str(), "r");
@@ -381,7 +387,7 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 	else
 		libraryfilename_ = "lib" + newlibraryname + EXODUSLIBEXT;
 
-	// var(libraryfilename_).outputl();
+	// var(libraryfilename_).logputl();
 
 	// RTLD_NOW
 	// All necessary relocations shall be performed when the object is first loaded.
@@ -391,10 +397,11 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 	// RTLD_LAZY|RTLD_LOCAL may be a better option
 	plibrary_ = (void*)dlopen(libraryfilename_.c_str(), RTLD_NOW);
 
-#ifdef dlerror
+#ifdef DLERROR
+	///root/lib/libdict_invoices.so: undefined symbol: _ZN6exodus14ostempfilenameEv
 	const char* dlsym_error = dlerror();
 	if (dlsym_error)
-		var(dlsym_error).outputl();
+		var(dlsym_error).errputl();
 #endif
 
 	if (plibrary_ == nullptr) {
@@ -404,7 +411,8 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 		// std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
 		var libraryfilename = libraryfilename_;
 		if (libraryfilename.osfile())
-			throw MVError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info)");
+			throw MVError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
+			^ libraryfilename ^ "' to check its sublibs are available. Also run 'nm -C " ^ libraryfilename ^ "' to check its content.)");
 		else
 			throw MVError(libraryfilename ^ " does not exist or cannot be found.");
 		return false;
@@ -439,20 +447,20 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname) {
 	// close any existing function
 	closefunc();
 
-#ifdef dlerror
+#ifdef DLERROR
 	dlerror();
 #endif
 
-	// var(libraryfilename_)^" "^var(newfunctionname).outputl();
+	// var(libraryfilename_)^" "^var(newfunctionname).logputl();
 
 	// pfunction_ = (void*) dlsym((library_t) plibrary_, newfunctionname.c_str());
 	pfunction_ = (ExodusProgramBaseCreateDeleteFunction)dlsym((library_t)plibrary_,
 															  newfunctionname.c_str());
 
-#ifdef dlerror
+#ifdef DLERROR
 	const char* dlsym_error = dlerror();
 	if (dlsym_error)
-		var(dlsym_error).outputl();
+		var(dlsym_error).errputl();
 #endif
 
 	if (pfunction_ == nullptr) {
