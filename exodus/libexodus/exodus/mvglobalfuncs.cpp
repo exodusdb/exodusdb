@@ -230,6 +230,14 @@ DLL_PUBLIC bool osshellread(VARREF readstr, CVR command) {
 	return readstr.osshellread(command);
 }
 
+DLL_PUBLIC var ostempfilename() {
+	return var().ostempfilename();
+}
+
+DLL_PUBLIC var ostempdirname() {
+	return var().ostempdirname();
+}
+
 // example: osshellwrite(command,inputforcommand);
 // for now returns nothing since popen cannot write and tell success
 DLL_PUBLIC bool osshellwrite(CVR writestr, CVR command) {
