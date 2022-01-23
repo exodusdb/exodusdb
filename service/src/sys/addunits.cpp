@@ -60,10 +60,10 @@ function main(in a0, io bb, in sep) {
 						ndecs = bndecs;
 					}
 					if (anum.isnum() and bnum.isnum()) {
-						bb.r(1, bn, (bnum + anum).oconv("MD" ^ ndecs ^ "0P") ^ acode);
+						pickreplacer(bb, 1, bn, (bnum + anum).oconv("MD" ^ ndecs ^ "0P") ^ acode);
 					}
 				} else {
-					bb.r(1, bn, acode);
+					pickreplacer(bb, 1, bn, acode);
 				}
 				break;
 			}

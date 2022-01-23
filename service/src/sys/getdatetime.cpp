@@ -75,12 +75,11 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 exit:
 /////
 	if (SENTENCE eq "GETDATETIME") {
-		var msg = "";
-		msg.r(-1, "User:   " ^ localdate.oconv("D"));
+		var msg = "User:   " ^ localdate.oconv("D");
 		msg ^= " " ^ localtime.oconv("MTH");
-		msg.r(-1, "Server: " ^ sysdate.oconv("D"));
+		msg ^= FM ^ "Server: " ^ sysdate.oconv("D");
 		msg ^= " " ^ systime.oconv("MTH");
-		msg.r(-1, "GMT/UTC:" ^ utcdate.oconv("D"));
+		msg ^= FM ^ "GMT/UTC:" ^ utcdate.oconv("D");
 		msg ^= " " ^ utctime.oconv("MTH");
 		call note(msg);
 	}

@@ -66,8 +66,8 @@ getlogkey:
 		}
 
 		var entry = programname;
-		entry.r(2, text2);
-		entry.r(3, SYSTEM.a(17));
+		pickreplacer(entry, 2, text2);
+		pickreplacer(entry, 3, SYSTEM.a(17));
 		entry.write(log, logkey);
 	}
 
@@ -84,9 +84,9 @@ getlogkey:
 		var subject = "EXODUS Log: " ^ SYSTEM.a(17) ^ " " ^ programname;
 
 		var body = "";
-		body.r(-1, "Date=" ^ var().date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local");
-		body.r(-1, "Server=" ^ SYSTEM.a(44).trim());
-		body.r(-1, "Install=" ^ oscwd());
+		body ^= FM ^ "Date=" ^ var().date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local";
+		body ^= FM ^ "Server=" ^ SYSTEM.a(44).trim();
+		body ^= FM ^ "Install=" ^ oscwd();
 		//osread ver from 'general\version.dat' then
 		var verfilename = "general/version.dat";
 		if (VOLUMES) {
@@ -94,15 +94,15 @@ getlogkey:
 			verfilename.converter("/", "\\");
 		}
 		if (ver.osread(verfilename)) {
-			body.r(-1, "Version=" ^ ver.a(1));
+			body ^= FM ^ "Version=" ^ ver.a(1);
 		}
-		body.r(-1, "Database=" ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17));
-		body.r(-1, "Process=" ^ SYSTEM.a(24));
-		body.r(-1, "User=" ^ USERNAME);
-		body.r(-1, "Station=" ^ xstation);
-		body.r(-1, "Source=" ^ programname);
+		body ^= FM ^ "Database=" ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17);
+		body ^= FM ^ "Process=" ^ SYSTEM.a(24);
+		body ^= FM ^ "User=" ^ USERNAME;
+		body ^= FM ^ "Station=" ^ xstation;
+		body ^= FM ^ "Source=" ^ programname;
 
-		body.r(-1, FM ^ text2);
+		body ^= FM ^ FM ^ text2;
 
 		body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
 		body.converter("\n", "");
