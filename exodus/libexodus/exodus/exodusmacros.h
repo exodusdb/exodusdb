@@ -85,7 +85,7 @@ THE SOFTWARE.
 #endif
 #else
 #if __GNUC__ >= 4
-// use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
+// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
 #define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((visibility("default")))
 #define DLL_LOCAL __attribute__((visibility("hidden")))
 #else

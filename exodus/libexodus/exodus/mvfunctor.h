@@ -103,7 +103,7 @@ using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
 // programs
 using ExodusProgramBaseCreateDeleteFunction = auto (*)(pExodusProgramBase&, MvEnvironment&, pExodusProgramBaseMemberFunction&) -> void;
 
-class DLL_PUBLIC ExodusFunctorBase {
+class PUBLIC ExodusFunctorBase {
 
    public:
 	ExodusFunctorBase();

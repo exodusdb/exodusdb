@@ -510,7 +510,7 @@ forcedemail:
                 " filename=" ^ attachfilename_only.quote() ^ "\r\n\r\n";
 			headers ^= mimetext;
 
-			TRACE(headers)
+			//TRACE(headers)
 
 			// Output the headers
 			var tempfilename = var().ostempfilename();

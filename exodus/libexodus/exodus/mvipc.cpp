@@ -53,7 +53,7 @@ THE SOFTWARE.
 //#include <exodus/xfunctorf6.h>
 #include <exodus/mvfunctor.h>
 
-DLL_PUBLIC
+PUBLIC
 boost::thread_specific_ptr<int> tss_environmentns;
 
 //#define BUFSIZE 1048576

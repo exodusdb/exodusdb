@@ -78,12 +78,12 @@ var_iter var_iter::operator++() {
 }
 
 //BEGIN - free function to create an iterator -> begin
-DLL_PUBLIC var_iter begin(CVR v) {
+PUBLIC var_iter begin(CVR v) {
 	return var_iter(v);
 }
 
 //END - free function to create an interator -> end
-DLL_PUBLIC var_iter end([[maybe_unused]] CVR v) {
+PUBLIC var_iter end([[maybe_unused]] CVR v) {
 	return var_iter();
 }
 
@@ -126,12 +126,12 @@ void dim_iter::end() {
 }
 
 //BEGIN - free function to create an iterator -> begin
-DLL_PUBLIC dim_iter begin(const dim& d) {
+PUBLIC dim_iter begin(const dim& d) {
 	return dim_iter(d);
 }
 
 //END - free function to create an interator -> end
-DLL_PUBLIC dim_iter end(const dim& d) {
+PUBLIC dim_iter end(const dim& d) {
 	dim_iter di(d);
 	di.end();
 	return di;

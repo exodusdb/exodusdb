@@ -36,25 +36,25 @@ THE SOFTWARE.
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 #ifdef BUILDING_LIBRARY
 #ifdef __GNUC__
-#define DLL_PUBLIC __attribute__((dllexport))
+#define PUBLIC __attribute__((dllexport))
 #else
-#define DLL_PUBLIC __declspec(dllexport)  // Note: actually gcc seems to also support this syntax.
+#define PUBLIC __declspec(dllexport)  // Note: actually gcc seems to also support this syntax.
 #endif
 #else
 #ifdef __GNUC__
-#define DLL_PUBLIC __attribute__((dllimport))
+#define PUBLIC __attribute__((dllimport))
 #else
-#define DLL_PUBLIC __declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
+#define PUBLIC __declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
 #endif
 #endif
 #define DLL_LOCAL
 #else
 #if __GNUC__ >= 4
-// use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
-#define DLL_PUBLIC __attribute__((visibility("default")))
+// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
+#define PUBLIC __attribute__((visibility("default")))
 #define DLL_LOCAL __attribute__((visibility("hidden")))
 #else
-#define DLL_PUBLIC
+#define PUBLIC
 #define DLL_LOCAL
 #endif
 #endif
@@ -301,7 +301,7 @@ inline const uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_D
 
 // class var
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
-class DLL_PUBLIC var final {
+class PUBLIC var final {
 
 	///////////////////////
 	// PRIVATE DATA MEMBERS
@@ -628,246 +628,246 @@ class DLL_PUBLIC var final {
 	// FRIENDS
 	//////////
 
-	DLL_PUBLIC ND friend var MVplus(CVR);
-	DLL_PUBLIC ND friend var MVminus(CVR);
-	DLL_PUBLIC ND friend bool MVnot(CVR);
+	PUBLIC ND friend var MVplus(CVR);
+	PUBLIC ND friend var MVminus(CVR);
+	PUBLIC ND friend bool MVnot(CVR);
 
-	DLL_PUBLIC ND friend var MVadd(CVR lhs, CVR rhs);
-	DLL_PUBLIC ND friend var MVsub(CVR lhs, CVR rhs);
-	DLL_PUBLIC ND friend var MVmul(CVR lhs, CVR rhs);
-	DLL_PUBLIC ND friend var MVdiv(CVR lhs, CVR rhs);
-	DLL_PUBLIC ND friend var MVmod(CVR lhs, CVR rhs);
+	PUBLIC ND friend var MVadd(CVR lhs, CVR rhs);
+	PUBLIC ND friend var MVsub(CVR lhs, CVR rhs);
+	PUBLIC ND friend var MVmul(CVR lhs, CVR rhs);
+	PUBLIC ND friend var MVdiv(CVR lhs, CVR rhs);
+	PUBLIC ND friend var MVmod(CVR lhs, CVR rhs);
 
-	DLL_PUBLIC ND friend var MVcat(CVR lhs, CVR rhs);
-	DLL_PUBLIC ND friend var MVcat(CVR lhs, const char* cstr);
-	DLL_PUBLIC ND friend var MVcat(CVR lhs, const char char2);
-	DLL_PUBLIC ND friend var MVcat(const char* cstr, CVR rhs);
+	PUBLIC ND friend var MVcat(CVR lhs, CVR rhs);
+	PUBLIC ND friend var MVcat(CVR lhs, const char* cstr);
+	PUBLIC ND friend var MVcat(CVR lhs, const char char2);
+	PUBLIC ND friend var MVcat(const char* cstr, CVR rhs);
 
-	DLL_PUBLIC ND friend bool MVeq(CVR lhs, CVR rhs);
-	DLL_PUBLIC ND friend bool MVlt(CVR lhs, CVR rhs);
+	PUBLIC ND friend bool MVeq(CVR lhs, CVR rhs);
+	PUBLIC ND friend bool MVlt(CVR lhs, CVR rhs);
 	// following specialisations done for speed of var in for loops
-	DLL_PUBLIC ND friend bool MVlt(CVR lhs, const int);
-	DLL_PUBLIC ND friend bool MVlt(const int int1, CVR rhs);
+	PUBLIC ND friend bool MVlt(CVR lhs, const int);
+	PUBLIC ND friend bool MVlt(const int int1, CVR rhs);
 
 	//== and !=
 	//TODO consider replacing by operator<=> and replacing MVeq and MVlt by MVcmp
 	//or provide more specialisations of MVeq and MVlt
 
-	DLL_PUBLIC friend bool operator==(CVR lhs, CVR rhs) { return MVeq(lhs, rhs); }
-	DLL_PUBLIC friend bool operator==(CVR lhs, const char* cstr2) { return MVeq(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator==(CVR lhs, const char char2) { return MVeq(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator==(CVR lhs, const int int2) { return MVeq(lhs, var(int2)); }
-	DLL_PUBLIC friend bool operator==(CVR lhs, const double double2) { return MVeq(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator==(CVR lhs, const bool bool2) { return MVeq(lhs, var(bool2)); }
-	DLL_PUBLIC friend bool operator==(const char* cstr1, CVR rhs) { return MVeq(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator==(const char char1, CVR rhs) { return MVeq(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator==(const int int1, CVR rhs) { return MVeq(rhs, var(int1)); }
-	DLL_PUBLIC friend bool operator==(const double double1, CVR rhs) { return MVeq(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator==(const bool bool1, CVR rhs) { return MVeq(rhs, var(bool1)); }
+	PUBLIC friend bool operator==(CVR lhs, CVR rhs) { return MVeq(lhs, rhs); }
+	PUBLIC friend bool operator==(CVR lhs, const char* cstr2) { return MVeq(lhs, var(cstr2)); }
+	PUBLIC friend bool operator==(CVR lhs, const char char2) { return MVeq(lhs, var(char2)); }
+	PUBLIC friend bool operator==(CVR lhs, const int int2) { return MVeq(lhs, var(int2)); }
+	PUBLIC friend bool operator==(CVR lhs, const double double2) { return MVeq(lhs, var(double2)); }
+	PUBLIC friend bool operator==(CVR lhs, const bool bool2) { return MVeq(lhs, var(bool2)); }
+	PUBLIC friend bool operator==(const char* cstr1, CVR rhs) { return MVeq(rhs, var(cstr1)); }
+	PUBLIC friend bool operator==(const char char1, CVR rhs) { return MVeq(rhs, var(char1)); }
+	PUBLIC friend bool operator==(const int int1, CVR rhs) { return MVeq(rhs, var(int1)); }
+	PUBLIC friend bool operator==(const double double1, CVR rhs) { return MVeq(rhs, var(double1)); }
+	PUBLIC friend bool operator==(const bool bool1, CVR rhs) { return MVeq(rhs, var(bool1)); }
 
-	DLL_PUBLIC friend bool operator!=(CVR lhs, CVR rhs) { return !MVeq(lhs, rhs); }
-	DLL_PUBLIC friend bool operator!=(CVR lhs, const char* cstr2) { return !MVeq(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator!=(CVR lhs, const char char2) { return !MVeq(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator!=(CVR lhs, const int int2) { return !MVeq(lhs, var(int2)); }
-	DLL_PUBLIC friend bool operator!=(CVR lhs, const double double2) { return !MVeq(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator!=(CVR lhs, const bool bool2) { return !MVeq(lhs, var(bool2)); }
-	DLL_PUBLIC friend bool operator!=(const char* cstr1, CVR rhs) { return !MVeq(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator!=(const char char1, CVR rhs) { return !MVeq(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator!=(const int int1, CVR rhs) { return !MVeq(rhs, var(int1)); }
-	DLL_PUBLIC friend bool operator!=(const double double1, CVR rhs) { return !MVeq(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator!=(const bool bool1, CVR rhs) { return !MVeq(rhs, var(bool1)); }
+	PUBLIC friend bool operator!=(CVR lhs, CVR rhs) { return !MVeq(lhs, rhs); }
+	PUBLIC friend bool operator!=(CVR lhs, const char* cstr2) { return !MVeq(lhs, var(cstr2)); }
+	PUBLIC friend bool operator!=(CVR lhs, const char char2) { return !MVeq(lhs, var(char2)); }
+	PUBLIC friend bool operator!=(CVR lhs, const int int2) { return !MVeq(lhs, var(int2)); }
+	PUBLIC friend bool operator!=(CVR lhs, const double double2) { return !MVeq(lhs, var(double2)); }
+	PUBLIC friend bool operator!=(CVR lhs, const bool bool2) { return !MVeq(lhs, var(bool2)); }
+	PUBLIC friend bool operator!=(const char* cstr1, CVR rhs) { return !MVeq(rhs, var(cstr1)); }
+	PUBLIC friend bool operator!=(const char char1, CVR rhs) { return !MVeq(rhs, var(char1)); }
+	PUBLIC friend bool operator!=(const int int1, CVR rhs) { return !MVeq(rhs, var(int1)); }
+	PUBLIC friend bool operator!=(const double double1, CVR rhs) { return !MVeq(rhs, var(double1)); }
+	PUBLIC friend bool operator!=(const bool bool1, CVR rhs) { return !MVeq(rhs, var(bool1)); }
 
 	//< V<= > >=
-	DLL_PUBLIC friend bool operator<(CVR lhs, CVR rhs) { return MVlt(lhs, rhs); }
-	DLL_PUBLIC friend bool operator<(CVR lhs, const char* cstr2) { return MVlt(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator<(CVR lhs, const char char2) { return MVlt(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator<(CVR lhs, const int int2) { return MVlt(lhs, int2); }
-	DLL_PUBLIC friend bool operator<(CVR lhs, const double double2) { return MVlt(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator<(const char* cstr1, CVR rhs) { return MVlt(var(cstr1), rhs); }
-	DLL_PUBLIC friend bool operator<(const char char1, CVR rhs) { return MVlt(var(char1), rhs); }
-	DLL_PUBLIC friend bool operator<(const int int1, CVR rhs) { return MVlt(int1, rhs); }
-	DLL_PUBLIC friend bool operator<(const double double1, CVR rhs) { return MVlt(var(double1), rhs); }
-	DLL_PUBLIC friend bool operator<(const bool bool1, CVR rhs) { return MVlt(var(bool1), rhs); }
+	PUBLIC friend bool operator<(CVR lhs, CVR rhs) { return MVlt(lhs, rhs); }
+	PUBLIC friend bool operator<(CVR lhs, const char* cstr2) { return MVlt(lhs, var(cstr2)); }
+	PUBLIC friend bool operator<(CVR lhs, const char char2) { return MVlt(lhs, var(char2)); }
+	PUBLIC friend bool operator<(CVR lhs, const int int2) { return MVlt(lhs, int2); }
+	PUBLIC friend bool operator<(CVR lhs, const double double2) { return MVlt(lhs, var(double2)); }
+	PUBLIC friend bool operator<(const char* cstr1, CVR rhs) { return MVlt(var(cstr1), rhs); }
+	PUBLIC friend bool operator<(const char char1, CVR rhs) { return MVlt(var(char1), rhs); }
+	PUBLIC friend bool operator<(const int int1, CVR rhs) { return MVlt(int1, rhs); }
+	PUBLIC friend bool operator<(const double double1, CVR rhs) { return MVlt(var(double1), rhs); }
+	PUBLIC friend bool operator<(const bool bool1, CVR rhs) { return MVlt(var(bool1), rhs); }
 
-	DLL_PUBLIC friend bool operator>=(CVR lhs, CVR rhs) { return !MVlt(lhs, rhs); }
-	DLL_PUBLIC friend bool operator>=(CVR lhs, const char* cstr2) { return !MVlt(lhs, var(cstr2)); }
-	DLL_PUBLIC friend bool operator>=(CVR lhs, const char char2) { return !MVlt(lhs, var(char2)); }
-	DLL_PUBLIC friend bool operator>=(CVR lhs, const int int2) { return !MVlt(lhs, int2); }
-	DLL_PUBLIC friend bool operator>=(CVR lhs, const double double2) { return !MVlt(lhs, var(double2)); }
-	DLL_PUBLIC friend bool operator>=(const char* cstr1, CVR rhs) { return !MVlt(var(cstr1), rhs); }
-	DLL_PUBLIC friend bool operator>=(const char char1, CVR rhs) { return !MVlt(var(char1), rhs); }
-	DLL_PUBLIC friend bool operator>=(const int int1, CVR rhs) { return !MVlt(int1, rhs); }
-	DLL_PUBLIC friend bool operator>=(const double double1, CVR rhs) { return !MVlt(var(double1), rhs); }
-	DLL_PUBLIC friend bool operator>=(const bool bool1, CVR rhs) { return !MVlt(var(bool1), rhs); }
+	PUBLIC friend bool operator>=(CVR lhs, CVR rhs) { return !MVlt(lhs, rhs); }
+	PUBLIC friend bool operator>=(CVR lhs, const char* cstr2) { return !MVlt(lhs, var(cstr2)); }
+	PUBLIC friend bool operator>=(CVR lhs, const char char2) { return !MVlt(lhs, var(char2)); }
+	PUBLIC friend bool operator>=(CVR lhs, const int int2) { return !MVlt(lhs, int2); }
+	PUBLIC friend bool operator>=(CVR lhs, const double double2) { return !MVlt(lhs, var(double2)); }
+	PUBLIC friend bool operator>=(const char* cstr1, CVR rhs) { return !MVlt(var(cstr1), rhs); }
+	PUBLIC friend bool operator>=(const char char1, CVR rhs) { return !MVlt(var(char1), rhs); }
+	PUBLIC friend bool operator>=(const int int1, CVR rhs) { return !MVlt(int1, rhs); }
+	PUBLIC friend bool operator>=(const double double1, CVR rhs) { return !MVlt(var(double1), rhs); }
+	PUBLIC friend bool operator>=(const bool bool1, CVR rhs) { return !MVlt(var(bool1), rhs); }
 
-	DLL_PUBLIC friend bool operator>(CVR lhs, CVR rhs) { return MVlt(rhs, lhs); }
-	DLL_PUBLIC friend bool operator>(CVR lhs, const char* cstr2) { return MVlt(var(cstr2), lhs); }
-	DLL_PUBLIC friend bool operator>(CVR lhs, const char char2) { return MVlt(var(char2), lhs); }
-	DLL_PUBLIC friend bool operator>(CVR lhs, const int int2) { return MVlt(int2, lhs); }
-	DLL_PUBLIC friend bool operator>(CVR lhs, const double double2) { return MVlt(var(double2), lhs); }
-	DLL_PUBLIC friend bool operator>(const char* cstr1, CVR rhs) { return MVlt(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator>(const char char1, CVR rhs) { return MVlt(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator>(const int int1, CVR rhs) { return MVlt(rhs, int1); }
-	DLL_PUBLIC friend bool operator>(const double double1, CVR rhs) { return MVlt(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator>(const bool bool1, CVR rhs) { return MVlt(rhs, var(bool1)); }
+	PUBLIC friend bool operator>(CVR lhs, CVR rhs) { return MVlt(rhs, lhs); }
+	PUBLIC friend bool operator>(CVR lhs, const char* cstr2) { return MVlt(var(cstr2), lhs); }
+	PUBLIC friend bool operator>(CVR lhs, const char char2) { return MVlt(var(char2), lhs); }
+	PUBLIC friend bool operator>(CVR lhs, const int int2) { return MVlt(int2, lhs); }
+	PUBLIC friend bool operator>(CVR lhs, const double double2) { return MVlt(var(double2), lhs); }
+	PUBLIC friend bool operator>(const char* cstr1, CVR rhs) { return MVlt(rhs, var(cstr1)); }
+	PUBLIC friend bool operator>(const char char1, CVR rhs) { return MVlt(rhs, var(char1)); }
+	PUBLIC friend bool operator>(const int int1, CVR rhs) { return MVlt(rhs, int1); }
+	PUBLIC friend bool operator>(const double double1, CVR rhs) { return MVlt(rhs, var(double1)); }
+	PUBLIC friend bool operator>(const bool bool1, CVR rhs) { return MVlt(rhs, var(bool1)); }
 
-	DLL_PUBLIC friend bool operator<=(CVR lhs, CVR rhs) { return !MVlt(rhs, lhs); }
-	DLL_PUBLIC friend bool operator<=(CVR lhs, const char* cstr2) { return !MVlt(var(cstr2), lhs); }
-	DLL_PUBLIC friend bool operator<=(CVR lhs, const char char2) { return !MVlt(var(char2), lhs); }
-	DLL_PUBLIC friend bool operator<=(CVR lhs, const int int2) { return !MVlt(int2, lhs); }
-	DLL_PUBLIC friend bool operator<=(CVR lhs, const double double2) { return !MVlt(var(double2), lhs); }
-	DLL_PUBLIC friend bool operator<=(const char* cstr1, CVR rhs) { return !MVlt(rhs, var(cstr1)); }
-	DLL_PUBLIC friend bool operator<=(const char char1, CVR rhs) { return !MVlt(rhs, var(char1)); }
-	DLL_PUBLIC friend bool operator<=(const int int1, CVR rhs) { return !MVlt(rhs, int1); }
-	DLL_PUBLIC friend bool operator<=(const double double1, CVR rhs) { return !MVlt(rhs, var(double1)); }
-	DLL_PUBLIC friend bool operator<=(const bool bool1, CVR rhs) { return !MVlt(rhs, var(bool1)); }
+	PUBLIC friend bool operator<=(CVR lhs, CVR rhs) { return !MVlt(rhs, lhs); }
+	PUBLIC friend bool operator<=(CVR lhs, const char* cstr2) { return !MVlt(var(cstr2), lhs); }
+	PUBLIC friend bool operator<=(CVR lhs, const char char2) { return !MVlt(var(char2), lhs); }
+	PUBLIC friend bool operator<=(CVR lhs, const int int2) { return !MVlt(int2, lhs); }
+	PUBLIC friend bool operator<=(CVR lhs, const double double2) { return !MVlt(var(double2), lhs); }
+	PUBLIC friend bool operator<=(const char* cstr1, CVR rhs) { return !MVlt(rhs, var(cstr1)); }
+	PUBLIC friend bool operator<=(const char char1, CVR rhs) { return !MVlt(rhs, var(char1)); }
+	PUBLIC friend bool operator<=(const int int1, CVR rhs) { return !MVlt(rhs, int1); }
+	PUBLIC friend bool operator<=(const double double1, CVR rhs) { return !MVlt(rhs, var(double1)); }
+	PUBLIC friend bool operator<=(const bool bool1, CVR rhs) { return !MVlt(rhs, var(bool1)); }
 
 	//PLUS
-	DLL_PUBLIC friend var operator+(CVR lhs, CVR rhs) { return MVadd(lhs, rhs); }
-	DLL_PUBLIC friend var operator+(CVR lhs, const char* cstr2) { return MVadd(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator+(CVR lhs, const char char2) { return MVadd(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator+(CVR lhs, const int int2) { return MVadd(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator+(CVR lhs, const double double2) { return MVadd(lhs, var(double2)); }
-	//DLL_PUBLIC friend var operator+(CVR lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
-	DLL_PUBLIC friend var operator+(const char* cstr1, CVR rhs) { return MVadd(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator+(const char char1, CVR rhs) { return MVadd(var(char1), rhs); }
-	DLL_PUBLIC friend var operator+(const int int1, CVR rhs) { return MVadd(var(int1), rhs); }
-	DLL_PUBLIC friend var operator+(const double double1, CVR rhs) { return MVadd(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator+(const bool bool1, CVR rhs) { return MVadd(var(bool1), rhs); }
+	PUBLIC friend var operator+(CVR lhs, CVR rhs) { return MVadd(lhs, rhs); }
+	PUBLIC friend var operator+(CVR lhs, const char* cstr2) { return MVadd(lhs, var(cstr2)); }
+	PUBLIC friend var operator+(CVR lhs, const char char2) { return MVadd(lhs, var(char2)); }
+	PUBLIC friend var operator+(CVR lhs, const int int2) { return MVadd(lhs, var(int2)); }
+	PUBLIC friend var operator+(CVR lhs, const double double2) { return MVadd(lhs, var(double2)); }
+	//PUBLIC friend var operator+(CVR lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
+	PUBLIC friend var operator+(const char* cstr1, CVR rhs) { return MVadd(var(cstr1), rhs); }
+	PUBLIC friend var operator+(const char char1, CVR rhs) { return MVadd(var(char1), rhs); }
+	PUBLIC friend var operator+(const int int1, CVR rhs) { return MVadd(var(int1), rhs); }
+	PUBLIC friend var operator+(const double double1, CVR rhs) { return MVadd(var(double1), rhs); }
+	//PUBLIC friend var operator+(const bool bool1, CVR rhs) { return MVadd(var(bool1), rhs); }
 	//rvalues
-	//DLL_PUBLIC friend var operator+(TVR lhs, CVR rhs) { return lhs+=rhs; }
-	//DLL_PUBLIC friend var operator+(TVR lhs, const char* cstr2) { return lhs+=char2; }
-	//DLL_PUBLIC friend var operator+(TVR lhs, const int int2) { return lhs+=int2; }
-	//DLL_PUBLIC friend var operator+(TVR lhs, const double double2) { return lhs+=double2; }
-	//DLL_PUBLIC friend var operator+(TVR lhs, const bool bool2) { return lhs+=bool2; }
+	//PUBLIC friend var operator+(TVR lhs, CVR rhs) { return lhs+=rhs; }
+	//PUBLIC friend var operator+(TVR lhs, const char* cstr2) { return lhs+=char2; }
+	//PUBLIC friend var operator+(TVR lhs, const int int2) { return lhs+=int2; }
+	//PUBLIC friend var operator+(TVR lhs, const double double2) { return lhs+=double2; }
+	//PUBLIC friend var operator+(TVR lhs, const bool bool2) { return lhs+=bool2; }
 	//warning: ISO C++ says that these are ambiguous, even though the worst conversion for the first is better than the worst conversion for the second:
 	//the following 3 (not 4) are excluded to avoid the above wrning from gcc 7
-	//DLL_PUBLIC friend var operator+(const char* cstr1, TVR rhs) { return rhs+=char1; }
-	//DLL_PUBLIC friend var operator+(const int int1, TVR rhs) { return rhs+=int1; }
-	//DLL_PUBLIC friend var operator+(const double double1, TVR rhs) { return rhs+=double1; }
-	//DLL_PUBLIC friend var operator+(const bool bool1, TVR rhs) { return rhs+=bool1; }
+	//PUBLIC friend var operator+(const char* cstr1, TVR rhs) { return rhs+=char1; }
+	//PUBLIC friend var operator+(const int int1, TVR rhs) { return rhs+=int1; }
+	//PUBLIC friend var operator+(const double double1, TVR rhs) { return rhs+=double1; }
+	//PUBLIC friend var operator+(const bool bool1, TVR rhs) { return rhs+=bool1; }
 
 	//MINUS
-	DLL_PUBLIC friend var operator-(CVR lhs, CVR rhs) { return MVsub(lhs, rhs); }
-	DLL_PUBLIC friend var operator-(CVR lhs, const char* cstr2) { return MVsub(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator-(CVR lhs, const char char2) { return MVsub(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator-(CVR lhs, const int int2) { return MVsub(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator-(CVR lhs, const double double2) { return MVsub(lhs, var(double2)); }
-	//DLL_PUBLIC friend var operator-(CVR lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
-	DLL_PUBLIC friend var operator-(const char* cstr1, CVR rhs) { return MVsub(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator-(const char char1, CVR rhs) { return MVsub(var(char1), rhs); }
-	DLL_PUBLIC friend var operator-(const int int1, CVR rhs) { return MVsub(var(int1), rhs); }
-	DLL_PUBLIC friend var operator-(const double double1, CVR rhs) { return MVsub(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator-(const bool bool1, CVR rhs) { return MVsub(var(bool1), rhs); }
+	PUBLIC friend var operator-(CVR lhs, CVR rhs) { return MVsub(lhs, rhs); }
+	PUBLIC friend var operator-(CVR lhs, const char* cstr2) { return MVsub(lhs, var(cstr2)); }
+	PUBLIC friend var operator-(CVR lhs, const char char2) { return MVsub(lhs, var(char2)); }
+	PUBLIC friend var operator-(CVR lhs, const int int2) { return MVsub(lhs, var(int2)); }
+	PUBLIC friend var operator-(CVR lhs, const double double2) { return MVsub(lhs, var(double2)); }
+	//PUBLIC friend var operator-(CVR lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
+	PUBLIC friend var operator-(const char* cstr1, CVR rhs) { return MVsub(var(cstr1), rhs); }
+	PUBLIC friend var operator-(const char char1, CVR rhs) { return MVsub(var(char1), rhs); }
+	PUBLIC friend var operator-(const int int1, CVR rhs) { return MVsub(var(int1), rhs); }
+	PUBLIC friend var operator-(const double double1, CVR rhs) { return MVsub(var(double1), rhs); }
+	//PUBLIC friend var operator-(const bool bool1, CVR rhs) { return MVsub(var(bool1), rhs); }
 	//rvalues
-	DLL_PUBLIC friend var operator-(TVR lhs, CVR rhs) { return lhs -= rhs; }
-	DLL_PUBLIC friend var operator-(TVR lhs, const char* cstr2) { return lhs -= var(cstr2); }
-	DLL_PUBLIC friend var operator-(TVR lhs, const char char2) { return lhs -= var(char2); }
-	DLL_PUBLIC friend var operator-(TVR lhs, const int int2) { return lhs -= int2; }
-	DLL_PUBLIC friend var operator-(TVR lhs, const double double2) { return lhs -= double2; }
+	PUBLIC friend var operator-(TVR lhs, CVR rhs) { return lhs -= rhs; }
+	PUBLIC friend var operator-(TVR lhs, const char* cstr2) { return lhs -= var(cstr2); }
+	PUBLIC friend var operator-(TVR lhs, const char char2) { return lhs -= var(char2); }
+	PUBLIC friend var operator-(TVR lhs, const int int2) { return lhs -= int2; }
+	PUBLIC friend var operator-(TVR lhs, const double double2) { return lhs -= double2; }
 
 	//MULTIPLY
-	DLL_PUBLIC friend var operator*(CVR lhs, CVR rhs) { return MVmul(lhs, rhs); }
-	DLL_PUBLIC friend var operator*(CVR lhs, const char* cstr2) { return MVmul(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator*(CVR lhs, const char char2) { return MVmul(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator*(CVR lhs, const int int2) { return MVmul(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator*(CVR lhs, const double double2) { return MVmul(lhs, var(double2)); }
-	//DLL_PUBLIC friend var operator*(CVR lhs, const bool bool2) { return MVmul(lhs, var(bool2)); }
-	DLL_PUBLIC friend var operator*(const char* cstr1, CVR rhs) { return MVmul(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator*(const char char1, CVR rhs) { return MVmul(var(char1), rhs); }
-	DLL_PUBLIC friend var operator*(const int int1, CVR rhs) { return MVmul(var(int1), rhs); }
-	DLL_PUBLIC friend var operator*(const double double1, CVR rhs) { return MVmul(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator*(const bool bool1, CVR rhs) { return MVmul(var(bool1), rhs); }
+	PUBLIC friend var operator*(CVR lhs, CVR rhs) { return MVmul(lhs, rhs); }
+	PUBLIC friend var operator*(CVR lhs, const char* cstr2) { return MVmul(lhs, var(cstr2)); }
+	PUBLIC friend var operator*(CVR lhs, const char char2) { return MVmul(lhs, var(char2)); }
+	PUBLIC friend var operator*(CVR lhs, const int int2) { return MVmul(lhs, var(int2)); }
+	PUBLIC friend var operator*(CVR lhs, const double double2) { return MVmul(lhs, var(double2)); }
+	//PUBLIC friend var operator*(CVR lhs, const bool bool2) { return MVmul(lhs, var(bool2)); }
+	PUBLIC friend var operator*(const char* cstr1, CVR rhs) { return MVmul(var(cstr1), rhs); }
+	PUBLIC friend var operator*(const char char1, CVR rhs) { return MVmul(var(char1), rhs); }
+	PUBLIC friend var operator*(const int int1, CVR rhs) { return MVmul(var(int1), rhs); }
+	PUBLIC friend var operator*(const double double1, CVR rhs) { return MVmul(var(double1), rhs); }
+	//PUBLIC friend var operator*(const bool bool1, CVR rhs) { return MVmul(var(bool1), rhs); }
 	//rvalues - pending implementation of var*=
-	//DLL_PUBLIC friend var operator*(TVR lhs, CVR rhs) { return lhs*=rhs; }
-	//DLL_PUBLIC friend var operator*(TVR lhs, const char* cstr2) { return lhs*=var(cstr2); }
-	//DLL_PUBLIC friend var operator*(TVR lhs, const char char2) { return lhs*=var(char2); }
-	//DLL_PUBLIC friend var operator*(TVR lhs, const int int2) { return lhs*=int2; }
-	//DLL_PUBLIC friend var operator*(TVR lhs, const double double2) { return lhs*=double2; }
+	//PUBLIC friend var operator*(TVR lhs, CVR rhs) { return lhs*=rhs; }
+	//PUBLIC friend var operator*(TVR lhs, const char* cstr2) { return lhs*=var(cstr2); }
+	//PUBLIC friend var operator*(TVR lhs, const char char2) { return lhs*=var(char2); }
+	//PUBLIC friend var operator*(TVR lhs, const int int2) { return lhs*=int2; }
+	//PUBLIC friend var operator*(TVR lhs, const double double2) { return lhs*=double2; }
 
 	//DIVIDE
-	DLL_PUBLIC friend var operator/(CVR lhs, CVR rhs) { return MVdiv(lhs, rhs); }
-	DLL_PUBLIC friend var operator/(CVR lhs, const char* cstr2) { return MVdiv(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator/(CVR lhs, const char char2) { return MVdiv(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator/(CVR lhs, const int int2) { return MVdiv(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator/(CVR lhs, const double double2) { return MVdiv(lhs, var(double2)); }
+	PUBLIC friend var operator/(CVR lhs, CVR rhs) { return MVdiv(lhs, rhs); }
+	PUBLIC friend var operator/(CVR lhs, const char* cstr2) { return MVdiv(lhs, var(cstr2)); }
+	PUBLIC friend var operator/(CVR lhs, const char char2) { return MVdiv(lhs, var(char2)); }
+	PUBLIC friend var operator/(CVR lhs, const int int2) { return MVdiv(lhs, var(int2)); }
+	PUBLIC friend var operator/(CVR lhs, const double double2) { return MVdiv(lhs, var(double2)); }
 	// disallow divide by boolean to prevent possible runtime divide by zero
-	// DLL_PUBLIC friend var operator/ (CVR     lhs    ,const bool     bool2   ){return
+	// PUBLIC friend var operator/ (CVR     lhs    ,const bool     bool2   ){return
 	// MVdiv(lhs,var(bool2)  );}
-	DLL_PUBLIC friend var operator/(const char* cstr1, CVR rhs) { return MVdiv(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator/(const char char1, CVR rhs) { return MVdiv(var(char1), rhs); }
-	DLL_PUBLIC friend var operator/(const int int1, CVR rhs) { return MVdiv(var(int1), rhs); }
-	DLL_PUBLIC friend var operator/(const double double1, CVR rhs) { return MVdiv(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator/(const bool bool1, CVR rhs) { return MVdiv(var(bool1), rhs); }
+	PUBLIC friend var operator/(const char* cstr1, CVR rhs) { return MVdiv(var(cstr1), rhs); }
+	PUBLIC friend var operator/(const char char1, CVR rhs) { return MVdiv(var(char1), rhs); }
+	PUBLIC friend var operator/(const int int1, CVR rhs) { return MVdiv(var(int1), rhs); }
+	PUBLIC friend var operator/(const double double1, CVR rhs) { return MVdiv(var(double1), rhs); }
+	//PUBLIC friend var operator/(const bool bool1, CVR rhs) { return MVdiv(var(bool1), rhs); }
 
 	//MODULO
-	DLL_PUBLIC friend var operator%(CVR lhs, CVR rhs) { return MVmod(lhs, rhs); }
-	DLL_PUBLIC friend var operator%(CVR lhs, const char* cstr2) { return MVmod(lhs, var(cstr2)); }
-	DLL_PUBLIC friend var operator%(CVR lhs, const char char2) { return MVmod(lhs, var(char2)); }
-	DLL_PUBLIC friend var operator%(CVR lhs, const int int2) { return MVmod(lhs, var(int2)); }
-	DLL_PUBLIC friend var operator%(CVR lhs, const double double2) { return MVmod(lhs, var(double2)); }
+	PUBLIC friend var operator%(CVR lhs, CVR rhs) { return MVmod(lhs, rhs); }
+	PUBLIC friend var operator%(CVR lhs, const char* cstr2) { return MVmod(lhs, var(cstr2)); }
+	PUBLIC friend var operator%(CVR lhs, const char char2) { return MVmod(lhs, var(char2)); }
+	PUBLIC friend var operator%(CVR lhs, const int int2) { return MVmod(lhs, var(int2)); }
+	PUBLIC friend var operator%(CVR lhs, const double double2) { return MVmod(lhs, var(double2)); }
 	// disallow divide by boolean to prevent possible runtime divide by zero
-	// DLL_PUBLIC friend var operator% (CVR     lhs    ,const bool    bool2   ){return
+	// PUBLIC friend var operator% (CVR     lhs    ,const bool    bool2   ){return
 	// MVmod(lhs,var(bool2)  );}
-	DLL_PUBLIC friend var operator%(const char* cstr1, CVR rhs) { return MVmod(var(cstr1), rhs); }
-	DLL_PUBLIC friend var operator%(const char char1, CVR rhs) { return MVmod(var(char1), rhs); }
-	DLL_PUBLIC friend var operator%(const int int1, CVR rhs) { return MVmod(var(int1), rhs); }
-	DLL_PUBLIC friend var operator%(const double double1, CVR rhs) { return MVmod(var(double1), rhs); }
-	//DLL_PUBLIC friend var operator%(const bool bool1, CVR rhs) { return MVmod(var(bool1), rhs); }
+	PUBLIC friend var operator%(const char* cstr1, CVR rhs) { return MVmod(var(cstr1), rhs); }
+	PUBLIC friend var operator%(const char char1, CVR rhs) { return MVmod(var(char1), rhs); }
+	PUBLIC friend var operator%(const int int1, CVR rhs) { return MVmod(var(int1), rhs); }
+	PUBLIC friend var operator%(const double double1, CVR rhs) { return MVmod(var(double1), rhs); }
+	//PUBLIC friend var operator%(const bool bool1, CVR rhs) { return MVmod(var(bool1), rhs); }
 
 	//CONCATENATE
 	// NB do *NOT* support concatenate with bool or vice versa!
 	// to avoid compiler doing wrong precendence issue between ^ and logical operators
-	DLL_PUBLIC friend var operator^(CVR lhs, CVR rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, CVR rhs)" << std::endl;
+	PUBLIC friend var operator^(CVR lhs, CVR rhs) {
+		//std::clog << "PUBLIC friend var operator^(CVR lhs, CVR rhs)" << std::endl;
 		return MVcat(lhs, rhs);
 	}
 	//remove this to avoid some gcc ambiguous warnings although it means concat std:string will create a temp var
-	//DLL_PUBLIC friend var operator^(CVR lhs, const std::string str2) {
-	//	std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const std::string str2)" << std::endl;
+	//PUBLIC friend var operator^(CVR lhs, const std::string str2) {
+	//	std::clog << "PUBLIC friend var operator^(CVR lhs, const std::string str2)" << std::endl;
 	//	return MVcat(lhs, var(str2));
 	//}
-	DLL_PUBLIC friend var operator^(CVR lhs, const char* cstr) {
-		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const char* cstr)" << std::endl;
+	PUBLIC friend var operator^(CVR lhs, const char* cstr) {
+		//std::clog << "PUBLIC friend var operator^(CVR lhs, const char* cstr)" << std::endl;
 		//return MVcat(lhs, var(cstr));
 		return MVcat(lhs, cstr);
 	}
-	DLL_PUBLIC friend var operator^(CVR lhs, const char char2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const char char2)" << std::endl;
+	PUBLIC friend var operator^(CVR lhs, const char char2) {
+		//std::clog << "PUBLIC friend var operator^(CVR lhs, const char char2)" << std::endl;
 		return MVcat(lhs, char2);
 	}
-	DLL_PUBLIC friend var operator^(CVR lhs, const int int2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const int int2)" << std::endl;
+	PUBLIC friend var operator^(CVR lhs, const int int2) {
+		//std::clog << "PUBLIC friend var operator^(CVR lhs, const int int2)" << std::endl;
 		return MVcat(lhs, var(int2));
 	}
-	DLL_PUBLIC friend var operator^(CVR lhs, const double double2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(CVR lhs, const double double2)" << std::endl;
+	PUBLIC friend var operator^(CVR lhs, const double double2) {
+		//std::clog << "PUBLIC friend var operator^(CVR lhs, const double double2)" << std::endl;
 		return MVcat(lhs, var(double2));
 	}
-	DLL_PUBLIC friend var operator^(const char* cstr, CVR rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const char* cstr, CVR rhs)" << std::endl;
+	PUBLIC friend var operator^(const char* cstr, CVR rhs) {
+		//std::clog << "PUBLIC friend var operator^(const char* cstr, CVR rhs)" << std::endl;
 		return MVcat(cstr, rhs);
 	}
-	DLL_PUBLIC friend var operator^(const char char1, CVR rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const char char1, CVR rhs)" << std::endl;
+	PUBLIC friend var operator^(const char char1, CVR rhs) {
+		//std::clog << "PUBLIC friend var operator^(const char char1, CVR rhs)" << std::endl;
 		return MVcat(var(char1), rhs);
 	}
-	DLL_PUBLIC friend var operator^(const int int1, CVR rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const int int1, CVR rhs)" << std::endl;
+	PUBLIC friend var operator^(const int int1, CVR rhs) {
+		//std::clog << "PUBLIC friend var operator^(const int int1, CVR rhs)" << std::endl;
 		return MVcat(var(int1), rhs);
 	}
-	DLL_PUBLIC friend var operator^(const double double1, CVR rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(const double double1, CVR rhs)" << std::endl;
+	PUBLIC friend var operator^(const double double1, CVR rhs) {
+		//std::clog << "PUBLIC friend var operator^(const double double1, CVR rhs)" << std::endl;
 		return MVcat(var(double1), rhs);
 	}
 	//temporaries (rvalues)
-	DLL_PUBLIC friend var operator^(TVR lhs, CVR rhs) {
-		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, CVR rhs)" << std::endl;
+	PUBLIC friend var operator^(TVR lhs, CVR rhs) {
+		//std::clog << "PUBLIC friend var operator^(TVR lhs, CVR rhs)" << std::endl;
 		return lhs ^= rhs;
 		//return std::move(lhs) ^= rhs;
 	}
-	DLL_PUBLIC friend var operator^(TVR lhs, const char* cstr2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const char* cstr2)" << std::endl;
+	PUBLIC friend var operator^(TVR lhs, const char* cstr2) {
+		//std::clog << "PUBLIC friend var operator^(TVR lhs, const char* cstr2)" << std::endl;
 		/*
     	var x="abcdefghijklmnop";//59ns
     	//var y(x);// (114ns)
@@ -877,23 +877,23 @@ class DLL_PUBLIC var final {
 		return lhs ^= cstr2;
 		//return std::move(lhs) ^= cstr2;
 	}
-	DLL_PUBLIC friend var operator^(TVR lhs, const char char2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const char char2)" << std::endl;
+	PUBLIC friend var operator^(TVR lhs, const char char2) {
+		//std::clog << "PUBLIC friend var operator^(TVR lhs, const char char2)" << std::endl;
 		return lhs ^= char2;
 	}
-	DLL_PUBLIC friend var operator^(TVR lhs, const int int2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const int int2)" << std::endl;
+	PUBLIC friend var operator^(TVR lhs, const int int2) {
+		//std::clog << "PUBLIC friend var operator^(TVR lhs, const int int2)" << std::endl;
 		return lhs ^= int2;
 	}
-	DLL_PUBLIC friend var operator^(TVR lhs, const double double2) {
-		//std::clog << "DLL_PUBLIC friend var operator^(TVR lhs, const double double2)" <<std::endl;
+	PUBLIC friend var operator^(TVR lhs, const double double2) {
+		//std::clog << "PUBLIC friend var operator^(TVR lhs, const double double2)" <<std::endl;
 		return lhs ^= double2;
 	}
 
 	// unary operators +var -var !var
-	DLL_PUBLIC ND friend var operator+(CVR var1) { return MVplus(var1); }
-	DLL_PUBLIC ND friend var operator-(CVR var1) { return MVminus(var1); }
-	DLL_PUBLIC ND friend bool operator!(CVR var1) { return MVnot(var1); }
+	PUBLIC ND friend var operator+(CVR var1) { return MVplus(var1); }
+	PUBLIC ND friend var operator-(CVR var1) { return MVminus(var1); }
+	PUBLIC ND friend bool operator!(CVR var1) { return MVnot(var1); }
 
 	// OS TIME/DATE
 	///////////////
@@ -969,9 +969,9 @@ class DLL_PUBLIC var final {
 	ND bool eof() const;
 	bool echo(const int on_off) const;
 
-	friend std::istream& operator>>(std::istream& istream1, VARREF var1);
+	PUBLIC friend std::istream& operator>>(std::istream& istream1, VARREF var1);
 
-	friend std::ostream& operator<<(std::ostream& ostream1, var var1);
+	PUBLIC friend std::ostream& operator<<(std::ostream& ostream1, var var1);
 	//causes ambiguous overload for some unknown reason despite being a hidden friend
 	//friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
 
@@ -1566,10 +1566,10 @@ class DLL_PUBLIC var final {
 	friend class var_iter;
 
 	//BEGIN - free function to create an iterator -> begin
-	DLL_PUBLIC friend var_iter begin(CVR v);
+	PUBLIC friend var_iter begin(CVR v);
 
 	//END - free function to create an interator -> end
-	DLL_PUBLIC friend var_iter end(CVR v);
+	PUBLIC friend var_iter end(CVR v);
 
 	//bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
 	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
@@ -1596,33 +1596,33 @@ class DLL_PUBLIC var final {
 // or, if you do want to concatenate the result of a comparison do this
 // a^var(b>c)
 
-DLL_PUBLIC ND bool MVeq(CVR var1, CVR var2);
-DLL_PUBLIC ND bool MVlt(CVR var1, CVR var2);
+PUBLIC ND bool MVeq(CVR var1, CVR var2);
+PUBLIC ND bool MVlt(CVR var1, CVR var2);
 
-DLL_PUBLIC ND bool MVlt(CVR var1, const int int2);
-DLL_PUBLIC ND bool MVlt(const int int1, CVR var2);
+PUBLIC ND bool MVlt(CVR var1, const int int2);
+PUBLIC ND bool MVlt(const int int1, CVR var2);
 
-//DLL_PUBLIC ND var MVplus(CVR var1);
-//DLL_PUBLIC ND var MVminus(CVR var1);
-//DLL_PUBLIC ND bool MVnot(CVR var1);
+//PUBLIC ND var MVplus(CVR var1);
+//PUBLIC ND var MVminus(CVR var1);
+//PUBLIC ND bool MVnot(CVR var1);
 
-DLL_PUBLIC ND var MVadd(CVR var1, CVR var2);
+PUBLIC ND var MVadd(CVR var1, CVR var2);
 
-DLL_PUBLIC ND var MVmul(CVR var1, CVR var2);
+PUBLIC ND var MVmul(CVR var1, CVR var2);
 
-DLL_PUBLIC ND var MVdiv(CVR var1, CVR var2);
+PUBLIC ND var MVdiv(CVR var1, CVR var2);
 
 #ifndef SWIG
-DLL_PUBLIC ND double exodusmodulus(const double v1, const double v2);
+PUBLIC ND double exodusmodulus(const double v1, const double v2);
 #endif
 
-DLL_PUBLIC ND var MVmod(CVR var1, CVR var2);
+PUBLIC ND var MVmod(CVR var1, CVR var2);
 
 // var^var reassign logical xor to be std::string concatenate!!!
-//DLL_PUBLIC ND var MVcat(CVR var1, CVR var2);
+//PUBLIC ND var MVcat(CVR var1, CVR var2);
 
 //class var_iter
-class DLL_PUBLIC var_iter {
+class PUBLIC var_iter {
 
 	const var* data;
 	std::string::size_type index = 0;
@@ -1647,7 +1647,7 @@ class DLL_PUBLIC var_iter {
 };
 
 //class var_proxy1 - replace or extract fn
-class DLL_PUBLIC var_proxy1 {
+class PUBLIC var_proxy1 {
 
    private:
 
@@ -1673,7 +1673,7 @@ class DLL_PUBLIC var_proxy1 {
 };
 
 //class var_proxy2 - replace or extract fn, sn
-class DLL_PUBLIC var_proxy2 {
+class PUBLIC var_proxy2 {
 
    private:
 
@@ -1700,7 +1700,7 @@ class DLL_PUBLIC var_proxy2 {
 };
 
 //class var_proxy3 - replace or extract fn, vn, sn
-class DLL_PUBLIC var_proxy3 {
+class PUBLIC var_proxy3 {
 
    private:
 
@@ -1730,7 +1730,7 @@ class DLL_PUBLIC var_proxy3 {
 class dim_iter;
 
 //class var_brackets_proxy
-class DLL_PUBLIC var_brackets_proxy {
+class PUBLIC var_brackets_proxy {
    public:
 	std::string& str1;
 	mutable int charindex1;
@@ -1743,12 +1743,12 @@ class DLL_PUBLIC var_brackets_proxy {
 };
 
 //class dim
-class DLL_PUBLIC dim {
+class PUBLIC dim {
 
    private:
 	int nrows_, ncols_;
 	// NOTE: trying to implement data_ as boost smart array pointer (boost::scoped_array<var>
-	// data_;) raises warning: as dim is DLL_PUBLIC, boost library should have DLL interface.
+	// data_;) raises warning: as dim is PUBLIC, boost library should have DLL interface.
 	// Choices: 1) leave memory allocation as is (refuse from scoped_array, or
 	// 2) use pimpl metaphor with slight decrease in performance.
 	// Constructors of dim are very simple, no exception expected between 'new' and return from
@@ -1824,10 +1824,10 @@ class DLL_PUBLIC dim {
 	friend class dim_iter;
 
 	//BEGIN - free function to create an iterator -> begin
-	DLL_PUBLIC friend dim_iter begin(const dim& d);
+	PUBLIC friend dim_iter begin(const dim& d);
 
 	//END - free function to create an interator -> end
-	DLL_PUBLIC friend dim_iter end(const dim& d);
+	PUBLIC friend dim_iter end(const dim& d);
 
    private:
 	// Disable copy constructor (why? to stop inefficient copies?)
@@ -1839,7 +1839,7 @@ class DLL_PUBLIC dim {
 };	// of class "dim"
 
 //class dim_iter
-class DLL_PUBLIC dim_iter {
+class PUBLIC dim_iter {
 
    private:
 
@@ -1917,83 +1917,83 @@ inline const var PLATFORM_ = "x86";
 
 #ifndef EXO_MV_CPP
 extern
-DLL_PUBLIC var _STATUS;
+PUBLIC var _STATUS;
 #else
-DLL_PUBLIC var _STATUS="";
+PUBLIC var _STATUS="";
 #endif
 
 #ifndef EXO_MV_CPP
 extern
-DLL_PUBLIC exodus::var EXECPATH;
+PUBLIC exodus::var EXECPATH;
 #else
-DLL_PUBLIC exodus::var EXECPATH="";
+PUBLIC exodus::var EXECPATH="";
 #endif
 
 //FM separated words or quoted phrases from command line. quote marks are retained.
 //trailing options in () or {} are stripped off and available in OPTIONS
 #ifndef EXO_MV_CPP
 extern
-DLL_PUBLIC exodus::var COMMAND;
+PUBLIC exodus::var COMMAND;
 #else
-DLL_PUBLIC exodus::var COMMAND="";
+PUBLIC exodus::var COMMAND="";
 #endif
 
 #ifndef EXO_MV_CPP
 extern
-DLL_PUBLIC exodus::var OPTIONS;
+PUBLIC exodus::var OPTIONS;
 #else
-DLL_PUBLIC exodus::var OPTIONS="";
+PUBLIC exodus::var OPTIONS="";
 #endif
 
 //see also COMMAND and OPTIONS
 #ifndef EXO_MV_CPP
 extern
-DLL_PUBLIC exodus::var SENTENCE;
+PUBLIC exodus::var SENTENCE;
 #else
-DLL_PUBLIC exodus::var SENTENCE="";
+PUBLIC exodus::var SENTENCE="";
 #endif
 */
 
 // this is left a global copy for backtrace to get at it
 //#ifndef EXO_MV_CPP
 //	extern
-//	DLL_PUBLIC exodus::var EXECPATH2;
+//	PUBLIC exodus::var EXECPATH2;
 //#else
-//	DLL_PUBLIC exodus::var EXECPATH2="";
+//	PUBLIC exodus::var EXECPATH2="";
 //#endif
-DLL_PUBLIC inline exodus::var EXECPATH2 = "";
+PUBLIC inline exodus::var EXECPATH2 = "";
 
-DLL_PUBLIC inline bool TERMINATE_req = false;
-DLL_PUBLIC inline bool RELOAD_req = false;
+PUBLIC inline bool TERMINATE_req = false;
+PUBLIC inline bool RELOAD_req = false;
 
-//void DLL_PUBLIC output(CVR var1);
-//void DLL_PUBLIC outputl(CVR var1 DEFAULT_STRING);
-//void DLL_PUBLIC outputt(CVR var1 DEFAULT_STRING);
+//void PUBLIC output(CVR var1);
+//void PUBLIC outputl(CVR var1 DEFAULT_STRING);
+//void PUBLIC outputt(CVR var1 DEFAULT_STRING);
 
-//void DLL_PUBLIC errput(CVR var1);
-//void DLL_PUBLIC errputl(CVR var1 DEFAULT_STRING);
+//void PUBLIC errput(CVR var1);
+//void PUBLIC errputl(CVR var1 DEFAULT_STRING);
 
-//void DLL_PUBLIC logput(CVR var1);
-//void DLL_PUBLIC logputl(CVR var1 DEFAULT_STRING);
+//void PUBLIC logput(CVR var1);
+//void PUBLIC logputl(CVR var1 DEFAULT_STRING);
 
-DLL_PUBLIC ND var backtrace();
+PUBLIC ND var backtrace();
 
 #ifndef SWIG
 std::string naturalorder(const std::string& string1);
 #endif
 
-DLL_PUBLIC ND int getenvironmentn();
-DLL_PUBLIC void setenvironmentn(const int environmentn);
+PUBLIC ND int getenvironmentn();
+PUBLIC void setenvironmentn(const int environmentn);
 
-DLL_PUBLIC ND int getenvironmentn();
-DLL_PUBLIC ND var getprocessn();
-DLL_PUBLIC ND var getexecpath();
+PUBLIC ND int getenvironmentn();
+PUBLIC ND var getprocessn();
+PUBLIC ND var getexecpath();
 
 // mv exceptions
 
 // MVStop is similar to MVError
 // but doesnt get stack since stop() is called normally
-class DLL_PUBLIC MVStop {
+class PUBLIC MVStop {
    public:
 	explicit MVStop(CVR var1 DEFAULT_STRING);
 	var description;
@@ -2001,7 +2001,7 @@ class DLL_PUBLIC MVStop {
 
 // MVAbort is similar to MVError
 // but doesnt get stack since abort() is called normally
-class DLL_PUBLIC MVAbort {
+class PUBLIC MVAbort {
    public:
 	explicit MVAbort(CVR var1 DEFAULT_STRING);
 	var description;
@@ -2009,7 +2009,7 @@ class DLL_PUBLIC MVAbort {
 
 // MVAbortAll is similar to MVError
 // but doesnt get stack since abortall() is called normally
-class DLL_PUBLIC MVAbortAll {
+class PUBLIC MVAbortAll {
    public:
 	explicit MVAbortAll(CVR var1 DEFAULT_STRING);
 	var description;
@@ -2017,7 +2017,7 @@ class DLL_PUBLIC MVAbortAll {
 
 // MVLogoff is similar to MVError
 // but doesnt get stack since abortall() is called normally
-class DLL_PUBLIC MVLogoff {
+class PUBLIC MVLogoff {
    public:
 	explicit MVLogoff(CVR var1 DEFAULT_STRING);
 	var description;
@@ -2025,7 +2025,7 @@ class DLL_PUBLIC MVLogoff {
 
 // provide a public base exception for all other exceptions so exodus programmers can catch mv
 // exceptions generally
-class DLL_PUBLIC MVError {
+class PUBLIC MVError {
    public:
 	explicit MVError(CVR description);
 	var description;
@@ -2035,27 +2035,27 @@ class DLL_PUBLIC MVError {
 // clang-format off
 
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
-class DLL_PUBLIC MVDivideByZero		: public MVError {public: explicit MVDivideByZero         (CVR var1    );};
-class DLL_PUBLIC MVNonNumeric		: public MVError {public: explicit MVNonNumeric           (CVR var1    );};
-class DLL_PUBLIC MVIntOverflow		: public MVError {public: explicit MVIntOverflow          (CVR var1    );};
-class DLL_PUBLIC MVIntUnderflow		: public MVError {public: explicit MVIntUnderflow         (CVR var1    );};
-class DLL_PUBLIC MVOutOfMemory		: public MVError {public: explicit MVOutOfMemory          (CVR var1    );};
-class DLL_PUBLIC MVUnassigned		: public MVError {public: explicit MVUnassigned           (CVR var1    );};
-class DLL_PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined            (CVR var1    );};
-class DLL_PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
-class DLL_PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (CVR var1    );};
-class DLL_PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (CVR var1    );};
-class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_STRING);};
-class DLL_PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
-class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(CVR var1    );};
-class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};
+class PUBLIC MVDivideByZero		: public MVError {public: explicit MVDivideByZero         (CVR var1    );};
+class PUBLIC MVNonNumeric		: public MVError {public: explicit MVNonNumeric           (CVR var1    );};
+class PUBLIC MVIntOverflow		: public MVError {public: explicit MVIntOverflow          (CVR var1    );};
+class PUBLIC MVIntUnderflow		: public MVError {public: explicit MVIntUnderflow         (CVR var1    );};
+class PUBLIC MVOutOfMemory		: public MVError {public: explicit MVOutOfMemory          (CVR var1    );};
+class PUBLIC MVUnassigned		: public MVError {public: explicit MVUnassigned           (CVR var1    );};
+class PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined            (CVR var1    );};
+class PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
+class PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (CVR var1    );};
+class PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (CVR var1    );};
+class PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_STRING);};
+class PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
+class PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(CVR var1    );};
+class PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};
 
 // clang-format on
 
 //user defined literals suffix _var
-var operator""_var(const char* cstr, std::size_t size);
-var operator""_var(unsigned long long int i);
-var operator""_var(long double d);
+PUBLIC var operator""_var(const char* cstr, std::size_t size);
+PUBLIC var operator""_var(unsigned long long int i);
+PUBLIC var operator""_var(long double d);
 
 }  // namespace exodus
 

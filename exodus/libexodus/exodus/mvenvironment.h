@@ -39,8 +39,8 @@ THE SOFTWARE.
 namespace exodus {
 
 // to avoid gcc 4 "warning: type attributes are honored only at type definition"
-// dont declare DLL_PUBLIC on forward declarations
-// class DLL_PUBLIC MvEnvironment;
+// dont declare PUBLIC on forward declarations
+// class PUBLIC MvEnvironment;
 class MvEnvironment;
 
 /*
@@ -48,10 +48,10 @@ const static int NTHREADS = 1;
 
 #ifdef EXO_MVENVIRONMENT_CPP
 // plus 1 to allow for main thread to have its own
-DLL_PUBLIC
+PUBLIC
 std::vector<MvEnvironment*> global_environments(NTHREADS + 1);
 #else
-extern DLL_PUBLIC std::vector<MvEnvironment*> global_environments;
+extern PUBLIC std::vector<MvEnvironment*> global_environments;
 #endif
 */
 
@@ -60,7 +60,7 @@ class LabelledCommon {
 	virtual ~LabelledCommon(){};
 };
 
-class DLL_PUBLIC MvEnvironment {
+class PUBLIC MvEnvironment {
    public:
 	virtual ~MvEnvironment();
 

@@ -13,8 +13,8 @@ namespace exodus {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
+
 // constructor with an mvenvironment
-DLL_PUBLIC
 ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 	: mv(inmv)
 //	,
@@ -29,13 +29,13 @@ ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 #pragma GCC diagnostic pop
 
 // destructor
-DLL_PUBLIC
 ExodusProgramBase::~ExodusProgramBase(){}
 
 var ExodusProgramBase::libinfo(CVR command) {
 	return var(perform_exodusfunctorbase_.libfilename(command.toString())).osfile();
 }
 
+// select
 bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 	//TRACE(sortselectclause_or_filehandle)
@@ -440,14 +440,17 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	return result;
 }
 
+// savelist
 bool ExodusProgramBase::savelist(CVR listname) {
 	return CURSOR.savelist(listname.field(" ", 1));
 }
 
+// getlist
 bool ExodusProgramBase::getlist(CVR listname) {
 	return CURSOR.getlist(listname.field(" ", 1));
 }
 
+// formlist
 bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, const var fieldno /*=0*/) {
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
@@ -470,82 +473,94 @@ bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, cons
 	return CURSOR.formlist(keys2, fieldno);
 }
 
+// makelist
 bool ExodusProgramBase::makelist(CVR listname, CVR keys) {
 	return CURSOR.makelist(listname.field(" ", 1), keys);
 }
 
+// deletelist
 bool ExodusProgramBase::deletelist(CVR listname) {
 	return CURSOR.deletelist(listname.field(" ", 1));
 }
 
+// clearselect
 void ExodusProgramBase::clearselect() {
 	CURSOR.clearselect();
 }
 
+// hasnext
 bool ExodusProgramBase::hasnext() {
 	return CURSOR.hasnext();
 }
 
+// readnext 1
 bool ExodusProgramBase::readnext(VARREF key) {
 	return CURSOR.readnext(key);
 }
 
+// readnext 2
 bool ExodusProgramBase::readnext(VARREF key, VARREF valueno) {
 	return CURSOR.readnext(key, valueno);
 }
 
+// readnext 3
 bool ExodusProgramBase::readnext(VARREF record, VARREF key, VARREF valueno) {
 	return CURSOR.readnext(record, key, valueno);
 }
 
+// deleterecord
 bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key) {
 
 	if (not filename_or_handle_or_command.assigned() || not key.assigned())
 		throw MVUnassigned("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
 
-	if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
-		var command = filename_or_handle_or_command.a(1);
+	// Simple deleterecord
+	//if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
+	if (not filename_or_handle_or_command.index(" ") and key.length() != 0)
+		return filename_or_handle_or_command.deleterecord(key);
 
-		var filename = command.field(" ", 1);
+	// Complex deleterecord command
 
-		//if any keys provided (remove quotes if present)
-		int nwords = command.dcount(" ");
+	var command = filename_or_handle_or_command.a(1);
 
-		//find and skip final options like (S)
-		bool silent = false;
-		if (command[-1] == ")" || command[-1] == "}") {
-			silent = command.field2(" ", -1).index("S");
-			nwords--;
-		}
+	var filename = command.field(" ", 1);
 
-		if (nwords >= 2) {
-			for (int wordn = 2; wordn <= nwords; ++wordn) {
-				var key = command.field(" ", wordn).unquote();
-				if (filename.deleterecord(key)) {
-					silent || key.quote().outputl("Deleted ");
-				} else {
-					silent || key.quote().errputl("NOT deleted ");
-				}
-			}
-		}
-		//delete keys provided in a select list
-		else {
-			var key;
-			while (CURSOR.readnext(key)) {
-				if (filename.deleterecord(key)) {
-					silent || key.quote().outputl("Deleted ");
-				} else {
-					silent || key.quote().errputl("NOT deleted ");
-				}
-			}
-		}
-		return true;
+	//if any keys provided (remove quotes if present)
+	int nwords = command.dcount(" ");
+
+	//find and skip final options like (S)
+	bool silent = false;
+	if (command[-1] == ")" || command[-1] == "}") {
+		silent = command.field2(" ", -1).index("S");
+		nwords--;
 	}
 
-	return filename_or_handle_or_command.deleterecord(key);
+	if (nwords >= 2) {
+		for (int wordn = 2; wordn <= nwords; ++wordn) {
+			var key = command.field(" ", wordn).unquote();
+			if (filename.deleterecord(key)) {
+				silent || key.quote().outputl("Deleted ");
+			} else {
+				silent || key.quote().errputl("NOT deleted ");
+			}
+		}
+	}
+	//delete keys provided in a select list
+	else {
+		var key;
+		while (CURSOR.readnext(key)) {
+			if (filename.deleterecord(key)) {
+				silent || key.quote().outputl("Deleted ");
+			} else {
+				silent || key.quote().errputl("NOT deleted ");
+			}
+		}
+	}
+	return true;
 	//return filehandle.deleterecord(key);
 }
 
+// pushselect
 bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_unused]] VARREF v3, [[maybe_unused]] VARREF v4) {
 
 	// CURSOR.quote().outputl("CURSOR=");
@@ -581,6 +596,7 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_u
 	*/
 }
 
+// popselect
 bool ExodusProgramBase::popselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_unused]] VARREF v3, [[maybe_unused]] VARREF v4) {
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR--;
@@ -619,18 +635,24 @@ bool ExodusProgramBase::popselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_un
 	*/
 }
 
+// note 2
 void ExodusProgramBase::note(CVR msg, CVR options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
+
+// note 4
 void ExodusProgramBase::note(CVR msg, CVR options, VARREF buffer, CVR params) const {
 	mssg(msg, options, buffer, params);
 }
 
+// mssg 2
 void ExodusProgramBase::mssg(CVR msg, CVR options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
+
+// mssg 4
 void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) const {
 
 	//skip if just "downing" a previous "upped" message
@@ -708,11 +730,13 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 	}
 }
 
+// authorised 1
 var ExodusProgramBase::authorised(CVR task0) {
 	var msg;
 	return authorised(task0, msg);
 }
 
+// authorised 4
 var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR username0) {
 
 	var username;
@@ -950,6 +974,7 @@ notallowed:
 	return 1;
 }
 
+// readuserprivs
 void ExodusProgramBase::readuserprivs() const {
 	if (not DEFINITIONS or not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 		SECURITY = "";
@@ -957,14 +982,16 @@ void ExodusProgramBase::readuserprivs() const {
 	return;
 }
 
-void ExodusProgramBase::writeuserprivs() const {
+// writeuserprivs
+bool ExodusProgramBase::writeuserprivs() const {
 	SECURITY.r(9, "");
 	if (DEFINITIONS) {
-		SECURITY.write(DEFINITIONS, "SECURITY");
+		return SECURITY.write(DEFINITIONS, "SECURITY");
 	}
-	return;
+	return true;
 }
 
+// capitalise
 var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 
 	var string2;
@@ -1075,6 +1102,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 	return string2;
 }
 
+// execute
 var ExodusProgramBase::execute(CVR sentence) {
 
 	var v1, v2, v3, v4;
@@ -1089,11 +1117,13 @@ var ExodusProgramBase::execute(CVR sentence) {
 	return result;
 }
 
+// chain
 void ExodusProgramBase::chain(CVR libraryname) {
 	CHAIN = libraryname;
 	var().stop();
 }
 
+// perform
 var ExodusProgramBase::perform(CVR sentence) {
 	// THISIS("var ExodusProgramBase::perform(CVR sentence)")
 	// ISSTRING(sentence)
@@ -1244,6 +1274,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 	return ANS;
 }
 
+// xlate
 var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mode) {
 
 	// TODO implement additional MV argument
@@ -1308,6 +1339,7 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mod
 	return results;
 }
 
+// calculate 4
 var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mvno) {
 
 	//dictid @ID/@id is hard coded to return ID
@@ -1334,6 +1366,7 @@ var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, C
 	return result;
 }
 
+// calculate 1
 var ExodusProgramBase::calculate(CVR dictid) {
 	// THISIS("var ExodusProgramBase::calculate(CVR dictid)")
 	// ISSTRING(dictid)
@@ -1481,12 +1514,13 @@ baddict:
 	return "";
 }
 
-//unlock all
+// unlockrecord 0 = unlock all
 bool ExodusProgramBase::unlockrecord() const {
 	var xx;
 	return unlockrecord("", xx, "");
 }
 
+// unlockrecord
 bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const {
 	var file;
 	if (file0.unassigned())
@@ -1515,6 +1549,7 @@ bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const 
 	return 1;
 }
 
+// debug
 void ExodusProgramBase::debug() const {
 
 	var reply;
@@ -1526,11 +1561,13 @@ void ExodusProgramBase::debug() const {
 	return;
 }
 
+// fsmg
 bool ExodusProgramBase::fsmsg(CVR msg) const {
 	mssg(msg ^ var().lasterror());
 	return false;
 }
 
+// sysvar
 var ExodusProgramBase::sysvar(CVR var1, CVR var2, CVR var3, CVR var4) {
 
 	std::cout << "sysvar() do nothing:";
@@ -1543,6 +1580,7 @@ var ExodusProgramBase::sysvar(CVR var1, CVR var2, CVR var3, CVR var4) {
 	}
 }
 
+// setprivilege
 void ExodusProgramBase::setprivilege(CVR var1) {
 
 	PRIVILEGE = var1;
@@ -1552,11 +1590,13 @@ void ExodusProgramBase::setprivilege(CVR var1) {
 	return;
 }
 
+// decide 2
 var ExodusProgramBase::decide(CVR question, CVR options) const {
 	var reply = "";
 	return decide(question, options, reply, 1);
 }
 
+// decide 4
 var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const int defaultreply) const {
 
 	// If default reply is 0 then there is no default
@@ -1628,6 +1668,7 @@ inp:
 	return options.a(reply);
 }
 
+// savescreen
 void ExodusProgramBase::savescreen(VARREF origscrn, VARREF origattr) const {
 	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
 
@@ -1636,10 +1677,12 @@ void ExodusProgramBase::savescreen(VARREF origscrn, VARREF origattr) const {
 	}
 }
 
+// keypressed
 var ExodusProgramBase::keypressed(int milliseconds) const {
 	return var().hasinput(milliseconds);
 }
 
+// esctoexzit
 bool ExodusProgramBase::esctoexit() const {
 	if (not keypressed())
 		return false;
@@ -1658,6 +1701,7 @@ bool ExodusProgramBase::esctoexit() const {
 	return key[-1].ucase() == "N";
 }
 
+// otherusers
 var ExodusProgramBase::otherusers(CVR param) {
 	std::cout << "ExodusProgramBase::otherusers not implemented yet";
 	return var("");
@@ -1667,6 +1711,7 @@ var ExodusProgramBase::otherusers(CVR param) {
 	}
 }
 
+// otherdatasetusers
 var ExodusProgramBase::otherdatasetusers(CVR param) {
 	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
 	return var("");
@@ -1676,11 +1721,13 @@ var ExodusProgramBase::otherdatasetusers(CVR param) {
 	}
 }
 
+// lockrecord 3
 bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx) const {
 	var record;
-	return (bool)lockrecord(filename, file, keyx, record);
+	return lockrecord(filename, file, keyx, record);
 }
 
+// lockrecord 6
 bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs0, const bool allowduplicate) const {
 
 	// linemark
@@ -1736,6 +1783,8 @@ lock:
 				else {
 					if (locked)
 						file.unlock(keyx);
+
+					// failure due to leaselock fails immediately regardless of waitsecs
 					return 0;
 				}
 			}
@@ -1757,6 +1806,7 @@ lock:
 	return true;
 }
 
+// singular
 var ExodusProgramBase::singular(CVR pluralnoun) {
 
 	var temp = pluralnoun;
@@ -1789,12 +1839,14 @@ var ExodusProgramBase::singular(CVR pluralnoun) {
 	return temp;
 }
 
+// flushindex
 void ExodusProgramBase::flushindex(CVR /*filename*/) {
 	//std::cout << "ExodusProgramBase::std::flushindex not implemented yet, " << filename
 	//	  << std::endl;
 	return;
 }
 
+// encrypt2
 var ExodusProgramBase::encrypt2(CVR encrypt0) const {
 
 	var encrypt = encrypt0;
@@ -1823,6 +1875,7 @@ var ExodusProgramBase::encrypt2(CVR encrypt0) const {
 	return encrypt;
 }
 
+// xmlquote
 var ExodusProgramBase::xmlquote(CVR string0) const {
 
 	var string1;
@@ -1845,7 +1898,8 @@ var ExodusProgramBase::xmlquote(CVR string0) const {
 	return string1.quote();
 }
 
-var ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg) {
+// loginnet
+bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg) {
 
 	// evade warning: unused parameter
 	if (false && dataset) {
@@ -1980,24 +2034,29 @@ var ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARREF
 	 */
 }
 
+// AT 1
 var ExodusProgramBase::AT(const int code) const {
 	// should depend on terminal type
 	return var().at(code);
 }
 
+// AT 2
 var ExodusProgramBase::AT(const int x, const int y) const {
 	// should depend on terminal type
 	return var().at(x, y);
 }
 
+// handlefilename
 var ExodusProgramBase::handlefilename(CVR handle) {
 	return handle.a(1);
 }
 
-var ExodusProgramBase::memspace([[maybe_unused]] CVR requiredmemory) {
-	return 999999999;
-}
+//// memspace
+//var ExodusProgramBase::memspace([[maybe_unused]] CVR requiredmemory) {
+//	return 999999999;
+//}
 
+//getuserdept
 var ExodusProgramBase::getuserdept(CVR usercode) {
 	// locate the user in the list of users
 	var usern;
@@ -2027,6 +2086,7 @@ var ExodusProgramBase::getuserdept(CVR usercode) {
 	return ANS;
 }
 
+// oconv
 var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 
 	// call user conversion routine
@@ -2121,6 +2181,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 	return result;
 }
 
+// iconv
 var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 
 	// call user conversion routine
@@ -2174,45 +2235,13 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 	return result;
 }
 
-var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
-	//c sys in,=(0)
-
-	var force = force0.unassigned() ? var(0) : force0;
-
-	var output = "";
-	var nfs = input.count(FM) + (input ne "");
-	//for force to work, the first field must have full number of vns
-	var maxnvs = 0;
-	for (var fn = 1; fn <= nfs; ++fn) {
-		var fieldx = input.field(FM, fn);
-		if (fieldx.length() or force) {
-			var nvs = fieldx.count(VM) + 1;
-			if (force) {
-				if (nvs > maxnvs) {
-					maxnvs = nvs;
-				}
-			} else {
-				maxnvs = nvs;
-			}
-			for (var vn = 1; vn <= maxnvs; ++vn) {
-				var cell = fieldx.field(VM, vn);
-				if (cell.length() or force) {
-					output.r(vn, fn, cell);
-				}
-			};	//vn;
-		}
-	};	//fn;
-
-	return output;
-}
-
-//automatic upto date/time
+// elapsedtimetext 2 - automatic upto date/time
 var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime) {
 	var uptodate, uptotime;
 	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);
 }
 
-//given from and to
+// elapsedtimetext 4 - given from and to
 var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime) {
 	//c sys in,in,io,io
 
@@ -2313,6 +2342,7 @@ zero:
 	return text;
 }
 
+// number
 var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 	//function main(in type, in input0, in ndecs0, out output) {
 	//c xxx in,in,in,out
@@ -2475,6 +2505,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 	return 0;
 }
 
+// sortarray
 void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 	//function main(io array, in fns=0, in orderby0="") {
 	//c sys io,0,""
@@ -2536,6 +2567,39 @@ void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 	}  //fnn;
 
 	return;
+}
+
+// invertarray
+var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
+	//c sys in,=(0)
+
+	var force = force0.unassigned() ? var(0) : force0;
+
+	var output = "";
+	var nfs = input.count(FM) + (input ne "");
+	//for force to work, the first field must have full number of vns
+	var maxnvs = 0;
+	for (var fn = 1; fn <= nfs; ++fn) {
+		var fieldx = input.field(FM, fn);
+		if (fieldx.length() or force) {
+			var nvs = fieldx.count(VM) + 1;
+			if (force) {
+				if (nvs > maxnvs) {
+					maxnvs = nvs;
+				}
+			} else {
+				maxnvs = nvs;
+			}
+			for (var vn = 1; vn <= maxnvs; ++vn) {
+				var cell = fieldx.field(VM, vn);
+				if (cell.length() or force) {
+					output.r(vn, fn, cell);
+				}
+			};	//vn;
+		}
+	};	//fn;
+
+	return output;
 }
 
 }  // namespace exodus

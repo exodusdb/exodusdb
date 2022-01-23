@@ -1246,7 +1246,7 @@ inline bool almost_equal(double x, double y, int) {
 
 // almost identical code in MVeq and MVlt except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVeq(CVR lhs, CVR rhs) {
+PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 	THISIS("bool MVeq(CVR lhs,CVR rhs)")
 	ISDEFINED(lhs)
 	ISDEFINED(rhs)
@@ -1363,7 +1363,7 @@ DLL_PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 
 // almost identical between MVeq and MVlt except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVlt(CVR lhs, CVR rhs) {
+PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 	THISIS("bool MVlt(CVR lhs,CVR rhs)")
 	ISDEFINED(lhs)
 	ISDEFINED(rhs)
@@ -1449,7 +1449,7 @@ DLL_PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 
 // similar to MVeq and MVlt - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVlt(CVR lhs, const int int2) {
+PUBLIC bool MVlt(CVR lhs, const int int2) {
 	THISIS("bool MVlt(CVR lhs,const int int2)")
 	ISDEFINED(lhs)
 
@@ -1492,7 +1492,7 @@ DLL_PUBLIC bool MVlt(CVR lhs, const int int2) {
 
 // similar to MVeq and MVlt - this is the int<var version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-DLL_PUBLIC bool MVlt(const int int1, CVR rhs) {
+PUBLIC bool MVlt(const int int1, CVR rhs) {
 	THISIS("bool MVlt(const int int1,CVR rhs)")
 	ISDEFINED(rhs)
 
@@ -1532,7 +1532,7 @@ DLL_PUBLIC bool MVlt(const int int1, CVR rhs) {
 // SEE ALSO MV2.CPP
 
 //+var
-//DLL_PUBLIC var operator+(CVR var1)
+//PUBLIC var operator+(CVR var1)
 var MVplus(CVR var1) {
 	THISIS("var operator+(CVR var1)")
 	ISDEFINED(var1)
@@ -1562,7 +1562,7 @@ var MVplus(CVR var1) {
 }
 
 //-var (identical to +var above except for two additional - signs)
-//DLL_PUBLIC var operator-(CVR var1)
+//PUBLIC var operator-(CVR var1)
 var MVminus(CVR var1) {
 	THISIS("var operator-(CVR var1)")
 	ISDEFINED(var1)
@@ -1592,7 +1592,7 @@ var MVminus(CVR var1) {
 }
 
 //! var
-//DLL_PUBLIC bool operator!(CVR var1)
+//PUBLIC bool operator!(CVR var1)
 bool MVnot(CVR var1) {
 	THISIS("bool operator!(CVR var1)")
 	ISASSIGNED(var1)
@@ -1821,7 +1821,7 @@ VARREF var::operator^(const std::string& stdstr) {
 // allow use of cout<<var
 //pass by value (make a copy) because we are going to convert FM to ^ etc
 //TODO provide a version that works on temporaries?
-//DLL_PUBLIC
+//PUBLIC
 std::ostream& operator<<(std::ostream& ostream1, var var1) {
 	THISIS("std::ostream& operator<< (std::ostream& ostream1, var var1)")
 	ISSTRING(var1)

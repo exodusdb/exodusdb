@@ -56,7 +56,7 @@ Pointers to members have different representations; cannot cast between them
 _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")
 
 #define libraryexit(CLASSNAME)                                                                 \
-	classexit(CLASSNAME) extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete_##CLASSNAME( \
+	classexit(CLASSNAME) extern "C" PUBLIC void exodusprogrambasecreatedelete_##CLASSNAME( \
 		pExodusProgramBase& pexodusprogrambase, MvEnvironment& mv,                             \
 		pExodusProgramBaseMemberFunction& pmemberfunction) {                                   \
 		if (pexodusprogrambase) {                                                              \

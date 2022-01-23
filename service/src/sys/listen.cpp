@@ -586,7 +586,8 @@ nextsearch0:
 
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
-	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
+	//tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
+	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
 		output(at(-40), tt, " : ");
 	} else {
@@ -694,7 +695,8 @@ nextsearch0:
 	//place a lock to indicate processing
 	//should really retry in case blocked by other processes checking it
 	//call rtp57(syslock, '', '', trim(@station):processno, '', '', '')
-	call lockrecord("PROCESSES", processes, processno, "", 999999);
+	if (not lockrecord("PROCESSES", processes, processno, "", 999999))
+		var().logoff();
 
 	//pause forever while any quiet time process (eg hourly backup) is working
 	//maybe not necessary on test data

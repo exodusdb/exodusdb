@@ -8,7 +8,8 @@
 
 namespace exodus {
 
-class ExodusProgramBase {
+//class ExodusProgramBase
+class PUBLIC ExodusProgramBase {
 
    public:
 	using in = const var&; // CVR;
@@ -18,17 +19,14 @@ class ExodusProgramBase {
 
 #include <exodus/ioconv_custom.h>
 
-	DLL_PUBLIC
-	ExodusProgramBase(MvEnvironment& inmv);
-	DLL_PUBLIC
-	ExodusProgramBase(MvEnvironment&& inmv) = delete;
+	PUBLIC ExodusProgramBase(MvEnvironment& inmv);
+	PUBLIC 	ExodusProgramBase(MvEnvironment&& inmv) = delete;
 
 	// doing virtual isnt much use because external functions (which are based on
 	// ExodusProgramBase) need to have complete freedom of arguments to main(...) virtual var
 	// main();
 
-	DLL_PUBLIC
-	virtual ~ExodusProgramBase();
+	PUBLIC virtual ~ExodusProgramBase();
 
 	// mv.xyz is going to be used a lot by exodus programmers for exodus "global variables"
 	// eg mv.RECORD mv.DICT
@@ -55,45 +53,45 @@ class ExodusProgramBase {
 	MvEnvironment& mv;
 
 	// work on CURSOR
-	bool select(CVR sortselectclause_or_filehandle DEFAULT_STRING);
-	bool hasnext();
-	bool readnext(VARREF key);
-	bool readnext(VARREF key, VARREF valueno);
-	bool readnext(VARREF record, VARREF key, VARREF valueno);
-	bool pushselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
-	bool popselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
-	void clearselect();
-	bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULT_STRING);
+	PUBLIC bool select(CVR sortselectclause_or_filehandle DEFAULT_STRING);
+	PUBLIC ND bool hasnext();
+	PUBLIC bool readnext(VARREF key);
+	PUBLIC bool readnext(VARREF key, VARREF valueno);
+	PUBLIC bool readnext(VARREF record, VARREF key, VARREF valueno);
+	PUBLIC bool pushselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
+	PUBLIC bool popselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
+	PUBLIC void clearselect();
+	PUBLIC bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULT_STRING);
 
-	bool savelist(CVR listname);
-	bool getlist(CVR listname);
-	bool formlist(CVR filename_or_command, CVR keys = "", const var fieldno = 0);
-	bool makelist(CVR listname, CVR keys);
-	bool deletelist(CVR listname);
+	PUBLIC bool savelist(CVR listname);
+	PUBLIC bool getlist(CVR listname);
+	PUBLIC bool formlist(CVR filename_or_command, CVR keys = "", const var fieldno = 0);
+	PUBLIC bool makelist(CVR listname, CVR keys);
+	PUBLIC bool deletelist(CVR listname);
 
-	void note(CVR msg, CVR options = "") const;
-	void note(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
-	void mssg(CVR msg, CVR options = "") const;
-	void mssg(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
+	PUBLIC void note(CVR msg, CVR options = "") const;
+	PUBLIC void note(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
+	PUBLIC void mssg(CVR msg, CVR options = "") const;
+	PUBLIC void mssg(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
 
-	var authorised(CVR task0, VARREF msg, CVR defaultlock = "", CVR username0 = "");
-	var authorised(CVR task0);
-	void readuserprivs() const;
-	void writeuserprivs() const;
+	PUBLIC var authorised(CVR task0, VARREF msg, CVR defaultlock = "", CVR username0 = "");
+	PUBLIC var authorised(CVR task0);
+	PUBLIC void readuserprivs() const;
+	PUBLIC bool writeuserprivs() const;
 
-	var capitalise(CVR str0, CVR mode = var(), CVR wordseps = var()) const;
+	PUBLIC ND var capitalise(CVR str0, CVR mode = var(), CVR wordseps = var()) const;
 
 	var libinfo(CVR command);
-	var perform(CVR sentence);
-	void chain(CVR libraryname);
-	var execute(CVR sentence);
+	PUBLIC var perform(CVR sentence);
+	PUBLIC void chain(CVR libraryname);
+	PUBLIC var execute(CVR sentence);
 
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library?
-	var calculate(CVR dictid);
-	var calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mv = 0);
+	PUBLIC ND var calculate(CVR dictid);
+	PUBLIC ND var calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mv = 0);
 
-	var xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mode);
+	PUBLIC ND var xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mode);
 	// moved to exodusprogrambase
 	// var perform(CVR sentence);
 
@@ -103,35 +101,34 @@ class ExodusProgramBase {
 	// calculate(CVR dictid); var calculate(CVR dictid, CVR dictfile, const
 	// VARREF id, CVR record, CVR mv=0);
 
-	var otherusers(CVR param);
-	var otherdatasetusers(CVR param);
+	PUBLIC ND var otherusers(CVR param);
+	PUBLIC ND var otherdatasetusers(CVR param);
 
 	// moved to mvprogram
 	// var capitalise(CVR str0, CVR mode=var(), CVR wordseps=var()) const;
 	////var capitalise(CVR str0, CVR mode="", CVR wordseps="") const;
 
-	void debug() const;
-	bool fsmsg(
-		CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
-	var sysvar(CVR var1, CVR var2, CVR mv3, CVR mv4);
-	void setprivilege(CVR var1);
+	PUBLIC void debug() const;
+	PUBLIC bool fsmsg(CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
+	PUBLIC ND var sysvar(CVR var1, CVR var2, CVR mv3, CVR mv4);
+	PUBLIC void setprivilege(CVR var1);
 
 	// NB does not return record yet
-	bool lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
+	PUBLIC ND bool lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
 	// bool lockrecord(CVR xfilename, CVR xfile, CVR keyx, CVR
 	// recordx, CVR waitsecs, const bool allowduplicate=false) const;
-	bool lockrecord(CVR filename, VARREF file, CVR keyx) const;
-	bool unlockrecord(CVR filename, VARREF file, CVR key) const;
+	PUBLIC ND bool lockrecord(CVR filename, VARREF file, CVR keyx) const;
+	PUBLIC bool unlockrecord(CVR filename, VARREF file, CVR key) const;
 	//unlock all
-	bool unlockrecord() const;
+	PUBLIC bool unlockrecord() const;
 
-	var decide(CVR question, CVR options) const;
-	var decide(CVR question, CVR options, VARREF reply, const int defaultreply = 1) const;
+	PUBLIC ND var decide(CVR question, CVR options) const;
+	PUBLIC var decide(CVR question, CVR options, VARREF reply, const int defaultreply = 1) const;
 
-	void savescreen(VARREF origscrn, VARREF origattr) const;
+	PUBLIC void savescreen(VARREF origscrn, VARREF origattr) const;
 	// void ostime(VARREF ostimenow) const;
-	var keypressed(int milliseconds = 0) const;
-	bool esctoexit() const;
+	PUBLIC var keypressed(int milliseconds = 0) const;
+	PUBLIC ND bool esctoexit() const;
 
 	//	bool oswritex(CVR str, CVR filename) const;
 	//	bool osbwritex(CVR str1, CVR filehandle, CVR filename, VARREF
@@ -148,28 +145,28 @@ class ExodusProgramBase {
 	// var sendmail(CVR toaddress, CVR subject, CVR body0, CVR
 	// attachfilename, CVR deletex, VARREF errormsg);
 
-	var singular(CVR pluralnoun);
-	void flushindex(CVR filename);
-	var encrypt2(CVR encrypt0) const;
-	var xmlquote(CVR str) const;
-	var loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg);
-	var AT(const int code) const;
-	var AT(const int x, const int y) const;
+	PUBLIC ND var singular(CVR pluralnoun);
+	PUBLIC void flushindex(CVR filename);
+	PUBLIC ND var encrypt2(CVR encrypt0) const;
+	PUBLIC ND var xmlquote(CVR str) const;
+	PUBLIC ND bool loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg);
+	PUBLIC ND var AT(const int code) const;
+	PUBLIC ND var AT(const int x, const int y) const;
 
-	var handlefilename(CVR handle);
-	var memspace(CVR requiredmemspace);
+	PUBLIC ND var handlefilename(CVR handle);
+	//PUBLIC ND var memspace(CVR requiredmemspace);
 
 	// was MVDB
-	var getuserdept(CVR usercode);
+	PUBLIC ND var getuserdept(CVR usercode);
 
-	var oconv(CVR input, CVR conversion);
-	var iconv(CVR input, CVR conversion);
+	PUBLIC ND var oconv(CVR input, CVR conversion);
+	PUBLIC ND var iconv(CVR input, CVR conversion);
 
-	var invertarray(CVR input, CVR force0 = (0));
-	void sortarray(VARREF array, CVR fns = 0, CVR orderby0 = "");
+	PUBLIC ND var invertarray(CVR input, CVR force0 = (0));
+	PUBLIC void sortarray(VARREF array, CVR fns = 0, CVR orderby0 = "");
 
-	var elapsedtimetext(CVR fromdate, CVR fromtime);
-	var elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime);
+	PUBLIC ND var elapsedtimetext(CVR fromdate, CVR fromtime);
+	PUBLIC ND var elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime);
 
    private:
 	var number(CVR type, CVR input0, CVR ndecs0, VARREF output);

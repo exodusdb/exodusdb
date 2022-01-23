@@ -577,7 +577,6 @@ const char* var::data() const {
 	return var_str.data();
 }
 
-DLL_PUBLIC
 std::u32string var::to_u32string() const {
 	// for speed, dont validate
 	// THISIS("std::u32string var::to_u32string() const")
@@ -591,7 +590,6 @@ std::u32string var::to_u32string() const {
 	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
 }
 
-DLL_PUBLIC
 void var::from_u32string(std::u32string u32_source) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
