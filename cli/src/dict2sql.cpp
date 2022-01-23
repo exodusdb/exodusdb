@@ -9,7 +9,7 @@
 
 		Optional or can be "pgsql" or "pgexodus".
 
-		Normally this is not required since they are installed during installa
+		Normally this is not required since they are installed during installation
 
 		"pgexodus" requires postgres SUPERUSER permissions.
 

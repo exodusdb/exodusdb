@@ -674,9 +674,9 @@ dict(AGE_IN_YEARS) {
 	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","dict.XO_MARKETS","NAME");
 
 	var dictrec="";
-	dictrec.r(1,"F");
-	dictrec.r(2,"3");
-	dictrec.r(3,"Brand Code");
+	dictrec(1) = "F";
+	dictrec(2) = "3";
+	dictrec(3) = "Brand Code";
 	if (not dictrec.write("dict.XO_ADS","BRAND_CODE"))
 		printl("cannot write dict_ads, BRAND_CODE");
 	//oo style

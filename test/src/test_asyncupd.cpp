@@ -82,7 +82,7 @@ function main() {
 				n = o + 1;
 			}
 
-			RECORD.r(PROCESSNO, n);
+			RECORD(PROCESSNO) = n;
 
 			write(RECORD on file, key);
 

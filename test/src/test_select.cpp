@@ -28,15 +28,15 @@ function main() {
 		for (var ii = 1; ii <= 12; ++ii) {
 
 			ID = "F" ^ ii;
-			rr.r(2, ii);
-			rr.r(3, ID);
-			rr.r(9, "L");
-			rr.r(10, "10");
+			rr(2) = ii;
+			rr(3) = ID;
+			rr(9) = "L";
+			rr(10) = "10";
 
 			printl(ID);
 			rr.write(dictvoc, ID);
 
-			rr.r(4, "M");
+			rr(4) = "M";
 			ID ^= "M";
 			printl(ID);
 			rr.write(dictvoc, ID);

@@ -146,9 +146,9 @@ function main() {
 
 	var array="";
 
-	array.r(3,  1  ^VM ^2  ^VM ^20  ^VM ^10);
-	array.r(6,  61 ^VM ^62 ^VM ^620 ^VM ^610);
-	array.r(7,  71 ^VM ^72 ^VM ^720 ^VM ^710);
+	array(3) =  1  ^VM ^2  ^VM ^20  ^VM ^10;
+	array(6) =  61 ^VM ^62 ^VM ^620 ^VM ^610;
+	array(7) =  71 ^VM ^72 ^VM ^720 ^VM ^710;
 
 	array.convert(VM^FM,"]\n").outputl();
 

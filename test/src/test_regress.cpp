@@ -154,7 +154,7 @@ function onefile(in filename, in maxndifferences) {
 			break;
 
 		case 2:// r/replace
-			result=ARG0.r(ARG1,ARG2,ARG3,ARG4);
+			result=ARG0.pickreplace(ARG1, ARG2, ARG3, ARG4);
 			break;
 
 		case 3://insert
@@ -300,7 +300,7 @@ function onefile(in filename, in maxndifferences) {
 					subrec.converter(pick_sep,sep);
 					//TRACE(lineno ^ ". " ^ sep ^ " " ^ seq(sep) ^ " " ^ seq(pick_sep));
 				}
-				rec.r(LOCATE_FN,LOCATE_VN,LOCATE_SN,subrec);
+				rec(LOCATE_FN, LOCATE_VN, LOCATE_SN) = subrec;
 				//TRACE(lineno ^ ". " ^ rec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM_ _FM_ _VM_ _SM_ _TM_ _STM_) ^ " ... " ^ sep ^ " " ^ seq(sep));
 			}
 			*/

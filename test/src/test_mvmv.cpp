@@ -536,14 +536,17 @@ function main() {
 	//.r()
 
 	//plain replace subvalue in the middle of subvalues
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2,2,2,"n222") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2,2,2,"n222") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
+	var v123 = "f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_;
+	assert(v123.r(2, 2, 2, "n222") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
+	v123(2, 2, 2) = "n222";
+	assert(v123 == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
+	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "n222") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
 	//plain replace subvalue in the middle of subvalues with null, smaller and larger
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2,2,2,"") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "" _SM_);
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2,2,2,"x") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "x" _SM_);
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2,2,2,"xyz123") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "xyz123" _SM_);
+	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "" _SM_);
+	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "x") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "x" _SM_);
+	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "xyz123") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "xyz123" _SM_);
 
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2,"xyz123") == "f100" _FM_ "xyz123");
+	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, "xyz123") == "f100" _FM_ "xyz123");
 
 	//replace field zero
 	assert(rec.pickreplace(0,"f000") == "f000");
@@ -1008,7 +1011,7 @@ function main() {
 	assert(m1.mv(":",m2).convert(VM,"]")=="1100]2200]300]4");
 
 	printl();
-	m2.r(1,4,400);
+	m2(1, 4) = 400;
 	m2.convert(VM,"]").outputl("m2=");
 	printl(m1.mv("/",m2).convert(VM,"]"));
 	printl("should be \"0.01]0.01]0]0.01\"");
@@ -1095,4 +1098,3 @@ function test_sum(in instr)
 }
 
 programexit()
-
