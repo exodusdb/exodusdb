@@ -376,7 +376,7 @@ function main() {
 		trx = "</tr>";
 		tt = SYSTEM.a(2);
 		tt.swapper(".txt", ".htm");
-		SYSTEM.r(2, tt);
+		SYSTEM(2) = tt;
 	} else {
 		td0 = "";
 		td = "";
@@ -630,7 +630,7 @@ nextkey:
 		//field or NO
 		ss ^= " " ^ word;
 		if (limitx) {
-			limits.r(1, nlimits, word);
+			limits(1, nlimits) = word;
 			if (not(dictrec.reado(DICT, word))) {
 				call mssg(word ^ " is not a valid dictionary item");
 				stop();
@@ -640,7 +640,7 @@ nextkey:
 				call mssg(word ^ " limit must be a multivalued dict item");
 				stop();
 			}
-			limits.r(4, nlimits, tt);
+			limits(4, nlimits) = tt;
 		}
 
 		//negate next comparision
@@ -656,7 +656,7 @@ nextkey:
 			gosub getword();
 			ss ^= " " ^ word;
 			if (limitx) {
-				limits.r(2, nlimits, word);
+				limits(2, nlimits) = word;
 			}
 		}
 
@@ -690,7 +690,7 @@ nextkey:
 					if (word eq "") {
 						word = "\"\"";
 					}
-					limits.r(3, nlimits, -1, word);
+					limits(3, nlimits, -1) = word;
 				}
 				{}
 			}  //loop;
@@ -794,7 +794,7 @@ nextkey:
 		//automatic labelling with dictionary title
 		if (word[1] eq "{") {
 			tt = word.substr(2, word.length() - 2);
-			replacements.r(-1, tt);
+			replacements(-1) = tt;
 			nreplacements += 1;
 			if (not(tt.reado(DICT, tt))) {
 				if (not(tt.reado(dictvoc, tt))) {
@@ -826,8 +826,8 @@ nextkey:
 		//double any single quotes to avoid them being understood as options
 		title.swapper("'", "''");
 
-		headtab.r(hrown, tcoln, title.convert(FM ^ VM, "  "));
-		headtab.r(hrown, tcoln + 1, value);
+		headtab(hrown, tcoln) = title.convert(FM ^ VM, "  ");
+		headtab(hrown, tcoln + 1) = value;
 		hrown += 1;
 
 	} else if (word eq "HEADING" and dictrec.a(3) ne "HEADING") {
@@ -854,9 +854,9 @@ nextkey:
 		//skip if detsupp2 and column is being skipped
 		if (not(coldict(coln).unassigned())) {
 			gosub getquotedword();
-			coldict(coln).r(9, word[1]);
-			coldict(coln).r(10, word.substr(3, 9999));
-			coldict(coln).r(11, word);
+			coldict(coln)(9) = word[1];
+			coldict(coln)(10) = word.substr(3, 9999);
+			coldict(coln)(11) = word;
 		}
 
 		//colhead
@@ -869,7 +869,7 @@ nextkey:
 		//skip if detsupp2 and column is being skipped
 		if (not(coldict(coln).unassigned())) {
 			word.converter("|", VM);
-			coldict(coln).r(3, word);
+			coldict(coln)(3) = word;
 		}
 
 	} else if (word eq "OC" or word eq "OCONV") {
@@ -883,7 +883,7 @@ nextkey:
 			if (html) {
 				word.swapper("[DATE]", "[DATE,*]");
 			}
-			coldict(coln).r(7, word);
+			coldict(coln)(7) = word;
 		}
 
 	} else if (word eq "ID-SUPP" or word eq "IS") {
@@ -941,11 +941,11 @@ nextkey:
 			for (ii = 1; ii <= nn; ++ii) {
 				tt = dictrec.a(3, ii);
 				if (dictrec.a(10) and tt.length() gt dictrec.a(10)) {
-					dictrec.r(10, tt.length());
+					dictrec(10) = tt.length();
 				}
 			};	//ii;
 
-			dictrec.r(bheadfn, "");
+			dictrec(bheadfn) = "";
 
 			if (detsupp lt 2) {
 				if (not(totalflag or breakonflag)) {
@@ -956,17 +956,17 @@ nextkey:
 					} else {
 						tt = " class=\"BHEAD2\"";
 					}
-					dictrec.r(bheadfn, tt);
+					dictrec(bheadfn) = tt;
 				}
 			}
 
 			//total required ?
 			if (totalflag) {
 				totalflag = 0;
-				dictrec.r(12, 1);
+				dictrec(12) = 1;
 				anytotals = 1;
 			} else {
-				dictrec.r(12, 0);
+				dictrec(12) = 0;
 			}
 
 			if (html) {
@@ -975,9 +975,9 @@ nextkey:
 				if (tt eq "[DATE,4]") {
 					tt = "[DATE,4*]";
 				}
-				dictrec.r(7, tt);
+				dictrec(7) = tt;
 				if (tt eq "[DATE,*]") {
-					dictrec.r(9, "R");
+					dictrec(9) = "R";
 				}
 			}
 			coldict(coln) = dictrec;
@@ -987,12 +987,12 @@ nextkey:
 			if (not html) {
 				tt = coldict(coln).a(9) ^ "#" ^ coldict(coln).a(10);
 			}
-			coldict(coln).r(11, tt);
+			coldict(coln)(11) = tt;
 
 			//this could be a break-on column and have break-on options
 			//if coln=breakcolns<1> then
 			if (breakonflag) {
-				coldict(coln).r(13, 1);
+				coldict(coln)(13) = 1;
 				breakonflag = 0;
 
 				if (nextword[1] eq DQ) {
@@ -1003,7 +1003,7 @@ nextkey:
 					if (tt) {
 
 						//suppress columns that appear in the heading
-						coldict(coln).r(10, 0);
+						coldict(coln)(10) = 0;
 
 						//pagebreakcolns<1,-1>=coln
 
@@ -1031,8 +1031,8 @@ nextkey:
 								hcoln = 1;
 							}
 							tcoln = (hcoln - 1) * 2 + 1;
-							headtab.r(hrown, tcoln, coldict(coln).a(3).convert(VM, " ") ^ nbsp ^ ":");
-							headtab.r(hrown, tcoln + 1, "'B" ^ tt2 ^ "'");
+							headtab(hrown, tcoln) = coldict(coln).a(3).convert(VM, " ") ^ nbsp ^ ":";
+							headtab(hrown, tcoln + 1) = "'B" ^ tt2 ^ "'";
 							hrown += 1;
 						}
 
@@ -1041,7 +1041,7 @@ nextkey:
 									 "B" ^
 										 tt2 ^ "'");
 					}
-					breakopts.r(1, word);
+					breakopts(1) = word;
 				}
 			}
 		}
@@ -1050,7 +1050,7 @@ dictrecexit:;
 
 	} else if (word eq "IGNOREWORD") {
 		gosub getword();
-		ignorewords.r(1, -1, word);
+		ignorewords(1, -1) = word;
 
 	} else {
 		//sys.messages W156
@@ -1128,11 +1128,11 @@ x1exit:
 		} else {
 			tt = coldict(1).a(9) ^ "#" ^ coldict(1).a(10);
 		}
-		coldict(1).r(11, tt);
+		coldict(1)(11) = tt;
 
 		//increment the list of breaking columns by one as well
 		for (breakn = 1; breakn <= nbreaks; ++breakn) {
-			breakcolns.r(breakn, breakcolns.a(breakn) + 1);
+			breakcolns(breakn) = breakcolns.a(breakn) + 1;
 		};	//breakn;
 
 		//and the page break colns
@@ -1204,7 +1204,7 @@ x1exit:
 
 		//suppress drilldown if no totals or breakdown
 		if (not(anytotals) or not(nbreaks)) {
-			coldict(coln).r(bheadfn, "");
+			coldict(coln)(bheadfn) = "";
 		}
 
 		if (coldict(coln).a(10)) {
@@ -1222,7 +1222,7 @@ x1exit:
 				// tt:=' style=':quote(tt3)
 				// end
 
-				thproperties.r(coln2, tt);
+				thproperties(coln2) = tt;
 
 				//without the MULTIROW_COLHDG keyword,
 				//vm indicates folding, \\ indicates rows in column headings
@@ -1232,14 +1232,14 @@ x1exit:
 				}
 				tt.swapper("\\\\", VM);
 
-				colhdg.r(coln2, tt);
+				colhdg(coln2) = tt;
 				if (tt.count(VM) gt vmcount) {
 					vmcount = tt.count(VM);
 				}
 
 				//swap vm with '<br />' in colhdg
 
-				coltags.r(-1, " <col");
+				coltags(-1) = " <col";
 				align = coldict(coln).a(9);
 				if (align eq "R") {
 					//if index(coldict(coln)<7>,'[NUMBER',1) then
@@ -1272,7 +1272,7 @@ x1exit:
 
 			} else {
 				for (ii = 1; ii <= 9; ++ii) {
-					colhdg.r(ii, colhdg.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ");
+					colhdg(ii) = colhdg.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ";
 				};	//ii;
 			}
 		}
@@ -1360,10 +1360,10 @@ x1exit:
 
 		//supertable to ensure any heading is as wide as the body of the report
 		if (showborder) {
-			head.r(-1, "<table{%20}border=1{%20}style=\"border-width:3px\"{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>");
+			head(-1) = "<table{%20}border=1{%20}style=\"border-width:3px\"{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>";
 		} else {
 			//head:='<table{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>'
-			head.r(-1, "<table{%20}align=center><tr><td>");
+			head(-1) = "<table{%20}align=center><tr><td>";
 		}
 	}
 
@@ -1445,7 +1445,7 @@ nextdict:
 					tt = dictrec.a(2);
 					if (tt) {
 						if (not(limits.a(5, limitn).locateusing(SVM, tt, xx))) {
-							limits.r(5, limitn, -1, dictrec.a(2));
+							limits(5, limitn, -1) = dictrec.a(2);
 						}
 					}
 				}
@@ -1885,7 +1885,7 @@ x2exit:
 	bodyln = 1;
 
 	if (html and not(bottomline.unassigned())) {
-		tx.r(-1, FM ^ bottomline ^ FM);
+		tx(-1) = FM ^ bottomline ^ FM;
 	}
 	//tx:=bottomline:fm:fm
 
@@ -1919,10 +1919,10 @@ x2exit:
 	if (html) {
 
 		if (not detsupp) {
-			tx.r(-1, "<script type=\"text/javascript\">" ^ FM ^ " togglendisplayed=" ^ nblocks ^ FM ^ "</script>");
+			tx(-1) = "<script type=\"text/javascript\">" ^ FM ^ " togglendisplayed=" ^ nblocks ^ FM ^ "</script>";
 		}
 
-		tx.r(-1, "<script type=\"text/javascript\">" ^ FM);
+		tx(-1) = "<script type=\"text/javascript\">" ^ FM;
 		tx ^= "function nwin(key,url,readonly) {";
 		tx ^= "gwindowopenparameters={};";
 		tx ^= "if (readonly) gwindowopenparameters.readonlymode=true;";
@@ -1947,8 +1947,8 @@ x2bexit:
 	//if html then tx<-1>='</div></body></html>'
 	//close supertable div and html
 	if (html) {
-		tx.r(-1, "</td></tr></table>");
-		tx.r(-1, "</div></body></html>");
+		tx(-1) = "</td></tr></table>";
+		tx(-1) = "</div></body></html>";
 	}
 
 	gosub printtx();
@@ -2432,14 +2432,14 @@ subroutine printbreaks() {
 			}
 			bottomline.transfer(bottomline2);
 
-			tx.r(-1, bottomline2);
+			tx(-1) = bottomline2;
 
 			if (foot2) {
-				tx.r(-1, foot2);
+				tx(-1) = foot2;
 			}
 
 			//close supertable
-			tx.r(-1, "</td></tr></table>");
+			tx(-1) = "</td></tr></table>";
 		}
 		if (tx) {
 

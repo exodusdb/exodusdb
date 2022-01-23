@@ -282,7 +282,7 @@ programinit()
 		nbsp = "&nbsp;";
 		tt = SYSTEM.a(2);
 		tt.swapper(".txt", ".htm");
-		SYSTEM.r(2, tt);
+		SYSTEM(2) = tt;
 		printer1.html = 1;
 	} else {
 		tr = "";
@@ -323,7 +323,7 @@ programinit()
 				var key = field(dictrec, "|", 1);
 				var rec = field(dictrec, "|", 2, 9999);
 				if (key.a(1) == "F")
-					rec.r(28, 0, 0, 1);	 //master
+					rec(28, 0, 0) = 1;	 //master
 				//printl(key ^ ": " ^ rec);
 				write(rec.convert("|", FM), dict_voc, key);
 			}
@@ -444,7 +444,7 @@ phraseinit:
 		//field or NO
 		ss ^= " " ^ word;
 		if (limit)
-			limits.r(1, nlimits, word);
+			limits(1, nlimits) = word;
 
 		//negate next comparision
 		if (var("not,ne,<>").locateusing(",", nextword, xx)) {
@@ -458,7 +458,7 @@ phraseinit:
 			gosub getword();
 			ss ^= " " ^ word;
 			if (limit)
-				limits.r(2, nlimits, word);
+				limits(2, nlimits) = word;
 		}
 
 		//with x between y and z
@@ -489,7 +489,7 @@ phraseinit:
 					if (word eq "")
 						word = "\"\"";
 					//append a subvalue
-					limits.r(3, nlimits, -1, word);
+					limits(3, nlimits, -1) = word;
 				}
 			}  //loop;
 		}
@@ -558,9 +558,9 @@ phraseinit:
 		gosub getword();
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
-		coldict(int(coln)).r(9, word[1]);
-		coldict(coln).r(10, word[3]);
-		coldict(coln).r(11, word);
+		coldict(int(coln))(9) = word[1];
+		coldict(coln)(10) = word[3];
+		coldict(coln)(11) = word;
 
 		//colhead
 	} else if (word eq "colhead") {
@@ -569,7 +569,7 @@ phraseinit:
 		if (coldict(coln).assigned()) {
 			word.unquoter();
 			word.converter("|", VM);
-			coldict(coln).r(3, word);
+			coldict(coln)(3) = word;
 		}
 
 	} else if (word eq "oconv") {
@@ -578,7 +578,7 @@ phraseinit:
 		word.splicer(-1, 1, "");
 		if (html)
 			word.swapper("[DATE]", "[DATE,*]");
-		coldict(coln).r(7, word);
+		coldict(coln)(7) = word;
 
 	} else if (word eq "id-supp" or word eq "IS") {
 		idsupp = 1;
@@ -598,7 +598,7 @@ phraseinit:
 
 			//pick A equ F
 			if (dictrec.a(1) eq "A")
-				dictrec.r(1, "F");
+				dictrec(1) = "F";
 
 			//suppress untotalled columns if doing detsupp2
 			if (detsupp eq 2) {
@@ -620,7 +620,7 @@ phraseinit:
 				tt = dictrec.a(3, ii);
 				var f10 = dictrec.a(10);
 				if (f10 == "" or (f10 and tt.length() > f10))
-					dictrec.r(10, tt.length());
+					dictrec(10) = tt.length();
 			};	//ii;
 
 			if (detsupp < 2) {
@@ -628,26 +628,26 @@ phraseinit:
 					tt = " id=\"BHEAD\"";
 					if (detsupp)
 						tt ^= " style=\"display:none\"";
-					dictrec.r(14, tt);
+					dictrec(14) = tt;
 				}
 			}
 
 			//total required ?
 			if (totalflag) {
 				totalflag = 0;
-				dictrec.r(12, 1);
+				dictrec(12) = 1;
 				anytotals = 1;
 			} else
-				dictrec.r(12, 0);
+				dictrec(12) = 0;
 
 			if (html) {
 				tt = dictrec.a(7);
 				tt.swapper("[DATE]", "[DATE,*]");
 				if (tt eq "[DATE,4]")
 					tt = "[DATE,4*]";
-				dictrec.r(7, tt);
+				dictrec(7) = tt;
 				if (tt eq "[DATE,*]")
-					dictrec.r(9, "R");
+					dictrec(9) = "R";
 			}
 			coldict(coln) = dictrec;
 
@@ -659,26 +659,26 @@ phraseinit:
 				if (tt)
 					tt ^= "#" ^ coldict(coln).a(10);
 			}
-			coldict(coln).r(11, tt);
+			coldict(coln)(11) = tt;
 
 			//this could be a break-on column and have break-on options
 			//if coln=breakcolns<1> then
 			if (breakonflag) {
-				coldict(coln).r(13, 1);
+				coldict(coln)(13) = 1;
 				breakonflag = 0;
 				if (nextword[1] eq DQ) {
 					gosub getword();
 					//zzz break options
 					if (word.index("B", 1))
 						pagebreakcoln = coln;
-					breakoptions.r(1, word);
+					breakoptions(1) = word;
 				}
 			}
 		}
 
 	} else if (word eq "ignoreword") {
 		gosub getword();
-		ignorewords.r(1, -1, word);
+		ignorewords(1, -1) = word;
 
 		//@LPTR word is skipped if not located in MD/DICT.MD
 	} else if (word eq "@lptr" or word eq "@crt") {
@@ -757,11 +757,11 @@ x1exit:
 		else
 			tt = coldict(1).a(9) ^ "#" ^ coldict(1).a(10);
 
-		coldict(1).r(11, tt);
+		coldict(1)(11) = tt;
 
 		//increment the list of breaking columns by one as well
 		for (var breakn = 1; breakn <= nbreaks; breakn++)
-			breakcolns.r(breakn, breakcolns.a(breakn) + 1);
+			breakcolns(breakn) = breakcolns.a(breakn) + 1;
 		pagebreakcoln += 1;
 	}
 
@@ -827,7 +827,7 @@ x1exit:
 
 		//suppress drilldown if no totals or breakdown
 		if (not anytotals or not nbreaks)
-			coldict(coln).r(14, "");
+			coldict(coln)(14) = "";
 
 		if (wcol(coln)) {
 			if (html) {
@@ -839,10 +839,10 @@ x1exit:
 				if (not usecols)
 					tt ^= coldict(coln).a(14);
 				tt ^= ">" ^ coldict(coln).a(3) ^ "</th>";
-				colheading.r(coln2, tt);
+				colheading(coln2) = tt;
 
 				colheading.swapper(VM, "<br />");
-				coltags.r(-1, "<col");
+				coltags(-1) = "<col";
 				var align = coldict(coln).a(9);
 				if (align eq "R") {
 					//if index(coldict(coln)<7>,'[NUMBER',1) then
@@ -861,7 +861,7 @@ x1exit:
 				coltags ^= " />";
 			} else {
 				for (var ii = 1; ii <= 9; ++ii)
-					colheading.r(ii, colheading.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ");
+					colheading(ii) = colheading.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ";
 			}
 		}
 	}

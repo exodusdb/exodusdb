@@ -480,11 +480,11 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		//note postgres string prefix E'...'
 		// E is required to enable \xFF hex decoding
 		//LIMIT TO 1000 characters since postgres index limit is around 2700 BYTES
-		sourcecode.r(1, -1, "ans:=upper(translate(substring(" ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid.lcase() ^ "(key,data),0,1000)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));");
+		sourcecode(1, -1) = "ans:=upper(translate(substring(" ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid.lcase() ^ "(key,data),0,1000)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));";
 		sourcecode.r(1, -1,
 					 "*"
 					 "/");
-		dictrec.r(8, sourcecode);
+		dictrec(8) = sourcecode;
 
 		//write the sql to the dictionary record so the availablily of pgsql is visible to var::selectx
 		dictrec.write(dictfile, dictid);
@@ -631,7 +631,7 @@ $RETVAR :=
 				line.swapper("$TARGET_EXPR", target_expr);
 				//line.outputl("sql=");
 			}
-			sql.r(1, ln, line);
+			sql(1, ln) = line;
 		}
 	}
 

@@ -133,15 +133,15 @@ function main() {
 		var searched = exodusincludepath;
 		if (!osdir(exodusincludepath)) {
 			exodusincludepath = exodusbinpath ^ "\\..\\exodus\\exodus";
-			searched.r(-1, exodusincludepath);
+			searched(-1) = exodusincludepath;
 		}
 		if (!osdir(exodusincludepath)) {
 			exodusincludepath = exodusbinpath ^ "\\..\\..\\exodus\\exodus";
-			searched.r(-1, exodusincludepath);
+			searched(-1) = exodusincludepath;
 		}
 		if (!osfile(exodusincludepath ^ "\\exodus\\exodus.h")) {
 			exodusincludepath = osgetenv("EXO_INCLUDE");
-			searched.r(-1, exodusincludepath);
+			searched(-1) = exodusincludepath;
 			if (!osfile(exodusincludepath ^ "\\exodus.h")) {
 				errputl("Couldnt find exodus include path (exodus.h)");
 				errputl(searched.swap(FM, "\n"));
