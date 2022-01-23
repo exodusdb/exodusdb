@@ -67,7 +67,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			line1.swapper("</TD>", "</th>");
 			line1.swapper("<td>", "<th>");
 			line1.swapper("</td>", "</th>");
-			datax.r(1, line1);
+			datax(1) = line1;
 		}
 
 		//prefix
@@ -93,7 +93,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		if (lastline.index("<TD>" ^ sys.glang.a(28))) {
 			lastline.swapper("TD>", "TH>");
 			lastline.swapper("td>", "th>");
-			datax.r(nlines, lastline);
+			datax(nlines) = lastline;
 		}
 
 		datax.converter(FM ^ VM, "");
@@ -136,9 +136,9 @@ function main(in mode, io datax, in params0="", in params20="") {
 						if (tt2[1] eq "=") {
 							tt2.splicer(1, 1, "");
 						}
-						data2.r(ln, td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx);
+						data2(ln) = td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx;
 					} else {
-						data2.r(ln, "<td colspan=2>" ^ line ^ tdx);
+						data2(ln) = "<td colspan=2>" ^ line ^ tdx;
 					}
 				} //ln;
 
@@ -146,7 +146,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				data2.splicer(1, 0, "<table class=\"hashtable\">" ^ tr);
 				data2 ^= trx ^ "</table>";
 
-				datax.r(1, vn, data2);
+				datax(1, vn) = data2;
 
 			}
 
@@ -376,7 +376,7 @@ subroutine fill(io datax) {
 	for (var ii = 1; ii <= nn; ++ii) {
 		for (var i2 = 1; i2 <= n2; ++i2) {
 			if (datax.a(ii, i2) eq "") {
-				datax.r(ii, i2, filler);
+				datax(ii, i2) = filler;
 			}
 		} //i2;
 	} //ii;

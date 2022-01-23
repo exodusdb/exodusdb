@@ -95,15 +95,15 @@ postuploadfail:
 				msg = (dictid ^ "_ARCHIVED").quote() ^ " is missing from " ^ dictfilename ^ " in upload.subs";
 				goto postuploadfail;
 			}
-			fns.r(ii, fn);
+			fns(ii) = fn;
 		} //ii;
 
 		var ii2 = rec.a(fns.a(1)).count(VM) + (rec.a(fns.a(1)) ne "");
-		rec.r(fns.a(1), ii2, targetfilename);
-		rec.r(fns.a(2), ii2, newstatus);
-		rec.r(fns.a(3), ii2, USERNAME);
-		rec.r(fns.a(4), ii2, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
-		rec.r(fns.a(5), ii2, STATION);
+		rec(fns.a(1), ii2) = targetfilename;
+		rec(fns.a(2), ii2) = newstatus;
+		rec(fns.a(3), ii2) = USERNAME;
+		rec(fns.a(4), ii2) = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+		rec(fns.a(5), ii2) = STATION;
 
 		rec.write(file, key);
 
@@ -198,7 +198,7 @@ postuploadfail:
 						msg = "(uploadroot)" ^ subfolder;
 					}
 					msg ^= " upload folder cannot be created";
-					msg.r(-1, errors);
+					msg(-1) = errors;
 					return invalid(msg);
 				}
 
@@ -280,13 +280,13 @@ postuploadfail:
 			for (var uploadn = 1; uploadn <= nuploads; ++uploadn) {
 				var uploadfilename = uploadfilenames.a(uploadn);
 				uploadfilename = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
-				uploadfilenames.r(uploadn, uploadfilename);
+				uploadfilenames(uploadn) = uploadfilename;
 			} //uploadn;
 			uploadfilenames.converter(FM, VM);
 
 		}
 
-		USER1.r(2, uploadfilenames);
+		USER1(2) = uploadfilenames;
 
 		//no longer required since updated in PLAN.SUBS POSTREAD
 		//since VIEW/OPENUPLOAD is no longer being called automatically after upload
@@ -392,7 +392,7 @@ postuploadfail:
 			importcode.splicer(-tt.length() - 1, 999, "");
 		}
 		importcode.converter(" .", "--");
-		RECORD.r(11, importcode);
+		RECORD(11) = importcode;
 
 		//if dirlist2(uploadroot:uploadpath) then
 		// msg=quote(uploadroot:uploadpath:' file cannot be found')
@@ -459,7 +459,7 @@ nextline:
 						var tt = line.index("  ");
 						///BREAK;
 						if (not tt) break;
-						cols.r(-1, line.substr(1, tt - 1) ^ VM ^ offset);
+						cols(-1) = line.substr(1, tt - 1) ^ VM ^ offset;
 						for (ptr = tt; ptr <= 999999; ++ptr) {
 							///BREAK;
 							if (line[ptr + 1] ne " ") break;
@@ -506,9 +506,9 @@ nextline:
 
 				for (var coln = 1; coln <= ncols; ++coln) {
 					var dictrec = "F";
-					dictrec.r(2, coln + fieldoffset);
-					dictrec.r(3, capitalise(cols.a(coln, 1)));
-					dictrec.r(10, "10");
+					dictrec(2) = coln + fieldoffset;
+					dictrec(3) = capitalise(cols.a(coln, 1));
+					dictrec(10) = "10";
 					var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1).convert(" ", "_").ucase();
 
 					var CONV = "";
@@ -526,9 +526,9 @@ nextline:
 							}
 						}
 					} //ii;
-					cols.r(coln, 4, CONV);
-					dictrec.r(7, CONV);
-					dictrec.r(9, just);
+					cols(coln, 4) = CONV;
+					dictrec(7) = CONV;
+					dictrec(9) = just;
 
 					grec ^= dictid ^ " ";
 					dictrec.write(dictfile, dictid);
@@ -542,9 +542,9 @@ nextline:
 						keydictid = dictcolprefix ^ "_TEMPKEY";
 					}
 					var tt = "S" ^ FM ^ FM ^ keydictid;
-					tt.r(8, keyfunction);
-					tt.r(9, "R");
-					tt.r(10, 10);
+					tt(8) = keyfunction;
+					tt(9) = "R";
+					tt(10) = 10;
 
 					tt.write(dictfile, keydictid);
 				}
@@ -582,18 +582,18 @@ nextline:
 						}
 					}
 				}
-				rec.r(coln + fieldoffset, cell);
+				rec(coln + fieldoffset) = cell;
 			} //coln;
 
 			key = importcode ^ "*" ^ linenox;
 			if (importfilenamefn) {
-				rec.r(importfilenamefn, uploadpath);
+				rec(importfilenamefn) = uploadpath;
 			}
 			if (importcodefn) {
-				rec.r(importcodefn, importcode);
+				rec(importcodefn) = importcode;
 			}
 			if (linenofn) {
-				rec.r(linenofn, linenox);
+				rec(linenofn) = linenox;
 			}
 			//TODO once (on record one) should really check that any
 			//columns defined in the keydict as {} fields EXIST in the dictfile
@@ -690,7 +690,7 @@ subroutine lockfile() {
 	if (not(lockrecord(filename, file, key, recordx, waitsecs, allowduplicate))) {
 		gosub unlockfile();
 		msg = "Cannot upload at the moment because";
-		msg.r(-1, filename ^ " " ^ (key.quote()) ^ " is being updated by ");
+		msg(-1) = filename ^ " " ^ (key.quote()) ^ " is being updated by ";
 		var lockuser = (filename ^ "*" ^ key).xlate("LOCKS", 4, "X");
 		if (lockuser) {
 			msg ^= lockuser;

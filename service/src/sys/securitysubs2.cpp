@@ -41,10 +41,10 @@ function main(in mode) {
 					var oldlock = oldlocks.a(1, oldtaskn);
 					if (newlock ne oldlock) {
 						//changed
-						emailtx2.r(-1, FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock);
+						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock;
 					}
 				} else {
-					emailtx2.r(-1, FM ^ "Task : " ^ task ^ " *CREATED*" ^ FM ^ "Lock : " ^ newlock);
+					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CREATED*" ^ FM ^ "Lock : " ^ newlock;
 				}
 			}
 		} //taskn;
@@ -55,7 +55,7 @@ function main(in mode) {
 			if (task) {
 				if (not(newtasks.locate(task, newtaskn))) {
 					var oldlock = oldlocks.a(1, taskn);
-					emailtx2.r(-1, FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock);
+					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
 				}
 			}
 		} //taskn;
@@ -126,9 +126,9 @@ function main(in mode) {
 
 		if (t10.a(1).locate("POSTING", tn)) {
 			if (newuserprivs.a(11, tn) eq "") {
-				newuserprivs.r(11, tn, "UA");
+				newuserprivs(11, tn) = "UA";
 			}
-			t10.r(1, tn, "JOURNAL POST");
+			t10(1, tn) = "JOURNAL POST";
 		}
 		//swap vm:'POSTING' with vm:'JOURNAL POST' in t10
 		t10.swapper(VM ^ "REPOSTING", VM ^ "JOURNAL REPOST");
@@ -159,18 +159,18 @@ function main(in mode) {
 		}//loop;
 
 		t10.trimmer();
-		newuserprivs.r(10, t10);
+		newuserprivs(10) = t10;
 
 		call log2("*make sure all users have access to company file", logtime);
 		if (newuserprivs.a(10).locate("COMPANY ACCESS", vn)) {
 			if (newuserprivs.a(11, vn) eq "AA") {
-				newuserprivs.r(11, vn, "");
+				newuserprivs(11, vn) = "";
 			}
 		}
 
 		call log2("*delete some obsolete tasks", logtime);
 		var obsoletetasks = "COMPANY ACCESS PARTIAL";
-		obsoletetasks.r(-1, "MARKET ACCESS PARTIAL");
+		obsoletetasks(-1) = "MARKET ACCESS PARTIAL";
 		for (var ii = 1; ii <= 9999; ++ii) {
 			var tt = obsoletetasks.a(ii);
 			///BREAK;
@@ -183,13 +183,13 @@ function main(in mode) {
 
 		//ensure certain documents cannot be deleted
 		if (newuserprivs.a(10).locate("JOB ORDER DELETE", taskn)) {
-			newuserprivs.r(11, taskn, "EXODUS");
+			newuserprivs(11, taskn) = "EXODUS";
 		}
 		if (newuserprivs.a(10).locate("JOB ESTIMATE DELETE", taskn)) {
-			newuserprivs.r(11, taskn, "EXODUS");
+			newuserprivs(11, taskn) = "EXODUS";
 		}
 		if (newuserprivs.a(10).locate("JOB DELETE", taskn)) {
-			newuserprivs.r(11, taskn, "EXODUS");
+			newuserprivs(11, taskn) = "EXODUS";
 		}
 
 		call log2("*delete any superfluous tasks", logtime);

@@ -42,25 +42,25 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 	nsecs -= minutes * 60;
 
 	if (weeks) {
-		text.r(-1, weeks ^ " week");
+		text(-1) = weeks ^ " week";
 		if (weeks ne 1) {
 			text ^= "s";
 		}
 	}
 	if (days) {
-		text.r(-1, days ^ " day");
+		text(-1) = days ^ " day";
 		if (days ne 1) {
 			text ^= "s";
 		}
 	}
 	if (hours) {
-		text.r(-1, hours ^ " hour");
+		text(-1) = hours ^ " hour";
 		if (hours ne 1) {
 			text ^= "s";
 		}
 	}
 	if (minutes) {
-		text.r(-1, minutes ^ " min");
+		text(-1) = minutes ^ " min";
 		if (minutes ne 1) {
 			text ^= "s";
 		}
@@ -77,21 +77,21 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 				}
 			}
 			if (nsecs) {
-				text.r(-1, nsecs ^ " sec");
+				text(-1) = nsecs ^ " sec";
 				if (nsecs ne 1) {
 					text ^= "s";
 				}
 			} else if (not(minutes)) {
 zero:
-				text.r(-1, "< 1 ms");
+				text(-1) = "< 1 ms";
 			} else {
-				text.r(-1, "exactly");
+				text(-1) = "exactly";
 			}
 		} else {
 			if (not(minutes)) {
 				goto zero;
 			}
-			text.r(3, "exactly");
+			text(3) = "exactly";
 		}
 	}
 

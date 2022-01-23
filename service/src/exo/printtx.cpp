@@ -99,7 +99,7 @@ function main(io tx, in mode="", in modevalue="") {
 		}
 
 		//call setptr('prn':char(0),1)
-		SYSTEM.r(3, 1);
+		SYSTEM(3) = 1;
 
 		//if no printfile assume command mode and make an output file name
 		printfilename = SYSTEM.a(2);
@@ -110,7 +110,7 @@ function main(io tx, in mode="", in modevalue="") {
 		//if (printfilename == "") {
 		//	printfilename = var("9999999999").rnd().substr(-8,8);
 		//	printfilename = printfilename ^ (html ? ".htm" : ".5~txt");
-		//	SYSTEM.r(2, printfilename);
+		//	SYSTEM(2) = printfilename;
 		//	ownprintfile = 1;
 		//}
 
@@ -125,7 +125,7 @@ function main(io tx, in mode="", in modevalue="") {
 			var t2 = (var(10).pwr(15)).rnd().substr(1,8);
 			printfilename.splicer(-tt, tt, t2 ^ ".htm");
 
-			SYSTEM.r(2, printfilename);
+			SYSTEM(2) = printfilename;
 		}
 
 		//open printout file
@@ -364,7 +364,7 @@ subroutine getheadfoot() {
 		if (not(head1.substr(-6,6) == "&nbsp;")) break;
 			head1.splicer(-6, 6, "");
 		}//loop;
-		headx.r(1, head1);
+		headx(1) = head1;
 		head1 = "";
 	}
 

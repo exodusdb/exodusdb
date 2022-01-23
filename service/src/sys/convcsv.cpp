@@ -183,7 +183,7 @@ function main(in sentence0, in select0="", in filters0="") {
 				if (dictrec.a(1) eq "G") {
 					temp = dictrec.a(3);
 					temp.converter(VM ^ " ", FM ^ FM);
-					notexportable.r(ii, temp);
+					notexportable(ii) = temp;
 				}
 			}
 		} //ii;
@@ -229,7 +229,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
 	if ((outfilename.substr(-4, 4)).lcase() eq ".htm") {
 		outfilename.splicer(-3, 3, "xls");
-		SYSTEM.r(2, outfilename);
+		SYSTEM(2) = outfilename;
 	}
 	var excel = (outfilename.substr(-3, 3)).lcase() eq "xls";
 
@@ -297,7 +297,7 @@ nextdict:
 		if (dictid eq "LINE_NO") {
 			coln += 1;
 			dictids(coln) = dictid;
-			headingx.r(coln, "Line No.");
+			headingx(coln) = "Line No.";
 			fmtxs(coln) = "R";
 			dictrecs(coln) = "";
 		} else {
@@ -314,7 +314,7 @@ nextdict:
 				fmtxs(coln) = dict.a(9)[1];
 
 				if (raw) {
-					headingx.r(coln, dictid);
+					headingx(coln) = dictid;
 				} else {
 
 					//extract title
@@ -332,7 +332,7 @@ nextdict:
 
 					//swap ' code' with '' in title
 
-					headingx.r(coln, title.trim());
+					headingx(coln) = title.trim();
 				}
 
 				//extract file
@@ -347,7 +347,7 @@ nextdict:
 					var title = headingx.a(coln);
 					if (title.ucase().substr(-5, 5) eq " CODE") {
 						title.splicer(-5, 5, "");
-						headingx.r(coln, title);
+						headingx(coln) = title;
 					}
 				}
 
@@ -706,14 +706,14 @@ subroutine exit() {
 	//ignore errors like "uconv cannot be found" for now
 	//otherwise will have to install cygwin uconv everywhere and add to installations
 	//call msg(errors)
-	SYSTEM.r(34, 1);
+	SYSTEM(34) = 1;
 	gosub exit3();
 	return;
 }
 
 subroutine exit2() {
 	//general result code
-	SYSTEM.r(34, 0);
+	SYSTEM(34) = 0;
 	gosub exit3();
 	return;
 }

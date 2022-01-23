@@ -263,12 +263,12 @@ nocommon:
 
 			//pick A is revelation F
 			if (dictrec.a(1) eq "A") {
-				dictrec.r(1, "F");
+				dictrec(1) = "F";
 				}
 
 			dictrec = lower(dictrec);
-			dictrecs.r(dictidn, dictrec);
-			oconvsx.r(dictidn, dictrec.a(1, 7));
+			dictrecs(dictidn) = dictrec;
+			oconvsx(dictidn) = dictrec.a(1, 7);
 		} //dictidn;
 	}
 
@@ -463,7 +463,7 @@ nextrec:
 
 		//prevent reading passwords postread and postwrite
 		if (filename eq "DEFINITIONS" and ID eq "SECURITY") {
-			RECORD.r(4, "");
+			RECORD(4) = "";
 		}
 
 		///
@@ -500,7 +500,7 @@ nextrec:
 				//cell=quote(str(cell,10))
 				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^ ">" "\r\n";
 			} else {
-				row.r(1, dictidn, cell);
+				row(1, dictidn) = cell;
 			}
 		} //dictidn;
 

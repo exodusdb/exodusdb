@@ -126,10 +126,10 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		} else {
 			var msg = "STEP 1 OK. Mail for " ^ toaddress ^ " accepted by mail server.";
 			params.converter("\r\n", FM);
-			msg.r(-1, FM ^ "Sent using:" ^ FM ^ params);
-			msg.r(-1, "STEP 2. Now check if actually received by recipient to verify");
-			msg.r(-1, " that the mail server can actually deliver email to " ^ toaddress);
-			msg.r(-1, " and that " ^ toaddress ^ " can receive email from the server" ^ FM);
+			msg(-1) = FM ^ "Sent using:" ^ FM ^ params;
+			msg(-1) = "STEP 2. Now check if actually received by recipient to verify";
+			msg(-1) = " that the mail server can actually deliver email to " ^ toaddress;
+			msg(-1) = " and that " ^ toaddress ^ " can receive email from the server" ^ FM;
 			msg = msg.oconv("T#75");
 			msg.converter(TM, FM);
 			call note(msg);
@@ -227,7 +227,7 @@ forcedemail:
 		params2.converter("\r\n", _FM_ _FM_);
 		for (var ii = 1; ii <= 9; ++ii) {
 			if (params2.a(ii)) {
-				params1.r(ii, params2.a(ii));
+				params1(ii) = params2.a(ii);
 			}
 		} //ii;
 	} //filen;
@@ -238,27 +238,27 @@ forcedemail:
 		if (not sysname) {
 			sysname = "unknown";
 		}
-		params1.r(1, sysname ^ "@neosys.com");
+		params1(1) = sysname ^ "@neosys.com";
 	}
 	if (params1.a(2) eq "") {
-		params1.r(2, "mailout.neosys.com");
+		params1(2) = "mailout.neosys.com";
 	}
 	if (params1.a(3) eq "") {
-		params1.r(3, "2500");
+		params1(3) = "2500";
 	}
 
 	params = "";
-	params.r(-1, "fromaddress=" ^ params1.a(1));
-	params.r(-1, "smtphostname=" ^ params1.a(2));
-	params.r(-1, "smtpportno=" ^ params1.a(3));
-	params.r(-1, "smtptimeoutsecs=" ^ params1.a(4));
-	params.r(-1, "smtpusessl=" ^ params1.a(5));
-	params.r(-1, "smtpauthtype=" ^ params1.a(6));
-	params.r(-1, "smtpuserid=" ^ params1.a(7));
-	params.r(-1, "smtppassword=" ^ params1.a(8));
+	params(-1) = "fromaddress=" ^ params1.a(1);
+	params(-1) = "smtphostname=" ^ params1.a(2);
+	params(-1) = "smtpportno=" ^ params1.a(3);
+	params(-1) = "smtptimeoutsecs=" ^ params1.a(4);
+	params(-1) = "smtpusessl=" ^ params1.a(5);
+	params(-1) = "smtpauthtype=" ^ params1.a(6);
+	params(-1) = "smtpuserid=" ^ params1.a(7);
+	params(-1) = "smtppassword=" ^ params1.a(8);
 
 	if (replyto) {
-		params.r(-1, "replyto=" ^ replyto);
+		params(-1) = "replyto=" ^ replyto;
 	}
 
 	var msgsize = 0;
@@ -342,18 +342,18 @@ forcedemail:
 		subject.splicer(1, 0, "EXODUS: ");
 	}
 
-	params.r(-1, "toaddress=" ^ (toaddress.quote()));
+	params(-1) = "toaddress=" ^ (toaddress.quote());
 	if (ccaddress) {
-		params.r(-1, "ccaddress=" ^ (ccaddress.quote()));
+		params(-1) = "ccaddress=" ^ (ccaddress.quote());
 	}
-	params.r(-1, "subject=" ^ (subject.quote()));
-	params.r(-1, "body=" ^ (body.quote()));
+	params(-1) = "subject=" ^ (subject.quote());
+	params(-1) = "body=" ^ (body.quote());
 
 	if (attachfilename) {
-		params.r(-1, "attachfilename=" ^ (attachfilename.quote()));
+		params(-1) = "attachfilename=" ^ (attachfilename.quote());
 	}
 	if (deletex) {
-		params.r(-1, "deleteaftersend=" ^ (deletex.quote()));
+		params(-1) = "deleteaftersend=" ^ (deletex.quote());
 	}
 	params ^= FM;
 
@@ -584,9 +584,9 @@ TRACE(offset)
 		}
 		if (not(errormsg.osread(errorfilename))) {
 			errormsg = "Unknown error in sendmail.js Failed to complete";
-			errormsg.r(-1, cmd);
+			errormsg(-1) = cmd;
 			//errormsg<-1>=params 'T#60'
-			errormsg.r(-1, params);
+			errormsg(-1) = params;
 		}
 	} else {
 		if (errormsg eq "") {
@@ -607,12 +607,12 @@ TRACE(offset)
 
 	var details = "To:       " ^ toaddress;
 	if (ccaddress) {
-		details.r(-1, "cc:       " ^ ccaddress);
+		details(-1) = "cc:       " ^ ccaddress;
 	}
-	details.r(-1, "Subject:  " ^ subject);
-	details.r(-1, "Size:     " ^ oconv(msgsize, "[XBYTES]"));
+	details(-1) = "Subject:  " ^ subject;
+	details(-1) = "Size:     " ^ oconv(msgsize, "[XBYTES]");
 
-	errormsg.r(1, errormsg.a(1).trim());
+	errormsg(1) = errormsg.a(1).trim();
 	//in what situation can it return OK+message ??
 	if (errormsg.a(1) eq "OK") {
 		errormsg.remover(1);
@@ -625,13 +625,13 @@ TRACE(offset)
 		//if ccaddress then
 		// errormsg<-1>='cc:       ':ccaddress
 		// end
-		errormsg.r(-1, FM ^ details);
-		errormsg.r(-1, FM ^ "Server:   " ^ params1.a(2));
-		errormsg.r(-1, "Port:     " ^ params1.a(3));
-		errormsg.r(-1, "UseSSL:   " ^ params1.a(5));
-		errormsg.r(-1, "AuthType: " ^ params1.a(6));
-		errormsg.r(-1, "UserID:   " ^ params1.a(7));
-		errormsg.r(-1, "Password:");
+		errormsg(-1) = FM ^ details;
+		errormsg(-1) = FM ^ "Server:   " ^ params1.a(2);
+		errormsg(-1) = "Port:     " ^ params1.a(3);
+		errormsg(-1) = "UseSSL:   " ^ params1.a(5);
+		errormsg(-1) = "AuthType: " ^ params1.a(6);
+		errormsg(-1) = "UserID:   " ^ params1.a(7);
+		errormsg(-1) = "Password:";
 		if (params1.a(8)) {
 			errormsg ^= "********";
 		}
@@ -663,17 +663,17 @@ subroutine addlinks2osfilename() {
 	if (body) {
 		body ^= FM;
 	}
-	body.r(-1, "Your report is too large to email. (" ^ oconv(osfilesize, "[XBYTES]") ^ ", max " ^ oconv(maxemailsize, "[XBYTES]") ^ ")");
-	body.r(-1, "but you can download it by clicking the following link.");
-	body.r(-1, FM ^ "*Link is only available for ONE HOUR from creation*");
+	body(-1) = "Your report is too large to email. (" ^ oconv(osfilesize, "[XBYTES]") ^ ", max " ^ oconv(maxemailsize, "[XBYTES]") ^ ")";
+	body(-1) = "but you can download it by clicking the following link.";
+	body(-1) = FM ^ "*Link is only available for ONE HOUR from creation*";
 	var nlinks = SYSTEM.a(114).count(VM) + 1;
 	for (var linkn = 1; linkn <= nlinks; ++linkn) {
 		body ^= FM;
 		var linkdesc = SYSTEM.a(115, linkn);
 		if (linkdesc) {
-			body.r(-1, linkdesc);
+			body(-1) = linkdesc;
 		}
-		body.r(-1, SYSTEM.a(114, linkn) ^ tt);
+		body(-1) = SYSTEM.a(114, linkn) ^ tt;
 	} //linkn;
 	return;
 }

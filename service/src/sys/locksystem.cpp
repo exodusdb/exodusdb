@@ -114,8 +114,8 @@ checkotherusers:
 
 lockit:
 	msg = "YOU CANNOT USE THE SYSTEM AT THE MOMENT";
-	msg.r(-1, "BECAUSE SOMEBODY ELSE IS PERFORMING A PROCESS");
-	msg.r(-1, "THAT REQUIRES EXCLUSIVE USE OF THE SYSTEM");
+	msg(-1) = "BECAUSE SOMEBODY ELSE IS PERFORMING A PROCESS";
+	msg(-1) = "THAT REQUIRES EXCLUSIVE USE OF THE SYSTEM";
 
 	if (dataset) {
 
@@ -130,7 +130,7 @@ lockit:
 
 			//msg2=msg
 			if (dataset) {
-				msg.r(-1, dataset.quote() ^ "- SYSTEM IS LOCKED");
+				msg(-1) = dataset.quote() ^ "- SYSTEM IS LOCKED";
 			}
 invalidx:
 			options = "Retry|Cancel";

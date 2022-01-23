@@ -203,17 +203,17 @@ subroutine getdatasets() {
 		tt.converter("/", OSSLASH);
 		if (not(tt.osfile())) {
 			datasetname = "*" ^ datasetname;
-			datasetparams.r(1, datasetn, 1, datasetname);
+			datasetparams(1, datasetn, 1) = datasetname;
 		}
-		datasetcodes.r(1, datasetn, datasetcode);
-		datasetnames.r(1, datasetn, datasetname);
+		datasetcodes(1, datasetn) = datasetcode;
+		datasetnames(1, datasetn) = datasetname;
 		tt = "../data/" ^ temp.a(1, 1, 2).lcase() ^ "/params2";
 		tt.converter("/", OSSLASH);
 		if (not(lastbackup.osread(tt))) {
 			lastbackup = "";
 		}
 		lastbackup = lastbackup.a(2);
-		datasetparams.r(1, datasetn, 4, lastbackup.oconv("D"));
+		datasetparams(1, datasetn, 4) = lastbackup.oconv("D");
 	}//datasetn;
 
 	return;

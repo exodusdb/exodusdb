@@ -301,7 +301,8 @@ nextmv:
 			if (nn gt nrowvals) {
 				nrowvals = nn;
 			}
-			rowvals.r(rowfn, tt);
+			//rowvals(rowfn) = tt;
+			pickreplacer(rowvals, rowfn, tt);
 		} //rowfn;
 	} else {
 		rowvals = "Total";
@@ -328,7 +329,8 @@ nextmv:
 				} else {
 					tt = rowvals.a(rowfn, 1);
 				}
-				rowval.r(1, 1, rowfn, tt);
+				//rowval(1, 1, rowfn) = tt;
+				pickreplacer(rowval, 1, 1, rowfn, tt);
 			} //rowfn;
 		} else {
 			rowval = rowvals;
@@ -341,7 +343,7 @@ toobig:
 				clearselect();
 				msg = "Crosstab too complex. Please simplify your request.";
 				if (filename eq "STATISTICS") {
-					msg.r(-1, "Perhaps choose Columns=Date and dont select Session or IP No.");
+					msg(-1) = "Perhaps choose Columns=Date and dont select Session or IP No.";
 				}
 				call mssg(msg);
 				stop();
@@ -377,13 +379,16 @@ toobig:
 			}
 
 			oldval = output.a(rown + 1, coln + 1);
-			output.r(rown + 1, coln + 1, oldval + datavals);
-			output.r(1, 1, output.a(1, 1) + 1);
+			//output(rown + 1, coln + 1) = oldval + datavals;
+			//output(1, 1) = output.a(1, 1) + 1;
+			pickreplacer(output, rown + 1, coln + 1, oldval + datavals);
+			pickreplacer(output, 1, 1, output.a(1, 1) + 1);
 
 			//total column at the end
 			if (not totcol) {
 				oldval = output.a(rown + 1, ncols + 2);
-				output.r(rown + 1, ncols + 2, oldval + datavals);
+				//output(rown + 1, ncols + 2) = oldval + datavals;
+				pickreplacer(output, rown + 1, ncols + 2, oldval + datavals);
 			}
 
 		} //colvaln;
@@ -406,38 +411,38 @@ exit:
 		if (colconv) {
 			//ncolvals=count(allcolvals,vm)+1
 			for (coln = 1; coln <= ncols; ++coln) {
-				output.r(1, 1 + coln, oconv(output.a(1, 1 + coln), colconv));
+				output(1, 1 + coln) = oconv(output.a(1, 1 + coln), colconv);
 			} //coln;
 		}
 	}
 
 	if (totcol) {
-		output.r(1, 1 + coln, datadict.a(3));
+		output(1, 1 + coln) = datadict.a(3);
 	} else {
 		for (coln = 1; coln <= ncols; ++coln) {
-			output.r(1, 1 + coln, coldict.a(3) ^ " " ^ output.a(1, 1 + coln));
+			output(1, 1 + coln) = coldict.a(3) ^ " " ^ output.a(1, 1 + coln);
 		} //coln;
-		output.r(1, ncols + 2, "Total " ^ datadict.a(3));
+		output(1, ncols + 2) = "Total " ^ datadict.a(3);
 	}
 
 	for (rown = 1; rown <= nrows; ++rown) {
 		if (output.length() + allrowvals.length() gt 65000) {
 			goto toobig;
 		}
-		output.r(rown + 1, 1, allrowvals.a(1, rown));
+		output(rown + 1, 1) = allrowvals.a(1, rown);
 	} //rown;
 
 	//format the row title values
-	output.r(1, 1, 1, "");
+	output(1, 1, 1) = "";
 	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 		//output<1,1,rowfn>=rowfields<1,rowfn>
-		output.r(1, 1, rowfn, rowdict(rowfn).a(3));
+		output(1, 1, rowfn) = rowdict(rowfn).a(3);
 
 		rowconv = rowdict(rowfn).a(7);
 		if (rowconv) {
 			//nrows=count(allrowvals,vm)+(allrowvals<>'')
 			for (rown = 1; rown <= nrows; ++rown) {
-				output.r(rown + 1, 1, rowfn, oconv(output.a(rown + 1, 1, rowfn), rowconv));
+				output(rown + 1, 1, rowfn) = oconv(output.a(rown + 1, 1, rowfn), rowconv);
 			} //rown;
 		}
 

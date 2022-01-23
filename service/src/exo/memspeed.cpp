@@ -50,9 +50,9 @@ function main() {
 	}//loop;
 
 	var msg = "";
-	msg.r(-1, "MEMSPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed);
-	msg.r(-1, "More is faster.");
-	msg.r(-1, "Typical speed for an entry level server in 2007 was 1");
+	msg(-1) = "MEMSPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed;
+	msg(-1) = "More is faster.";
+	msg(-1) = "Typical speed for an entry level server in 2007 was 1";
 
 	call mssg(msg.oconv("L#60"));
 
@@ -84,4 +84,3 @@ subroutine getspeed() {
 }
 
 programexit()
-

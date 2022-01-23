@@ -340,9 +340,9 @@ preventsameday:
 
 	//register that the document has been processed
 	//even if nobody present to be emailed
-	sys.document.r(13, currdatetime);
+	sys.document(13) = currdatetime;
 	if (sys.document.a(27) ne "") {
-		sys.document.r(27, sys.document.a(27) - 1);
+		sys.document(27) = sys.document.a(27) - 1;
 	}
 
 	// Delete once-off documents
@@ -378,7 +378,7 @@ preventsameday:
 	//allow running as EXODUS and emailing to sysmsg@neosys.com
 	if (userx.a(7) eq "" and runasusercode eq "EXODUS") {
 		userx = "EXODUS";
-		userx.r(7, sysmsgatexodus);
+		userx(7) = sysmsgatexodus;
 	}
 
 	//HAS RECIPIENTS
@@ -416,7 +416,7 @@ preventsameday:
 
 			//skip if user has no email address
 			if (userx.a(7) eq "" and usercode eq "EXODUS") {
-				userx.r(7, sysmsgatexodus);
+				userx(7) = sysmsgatexodus;
 			}
 			useraddress = userx.a(7);
 			if (useraddress) {
@@ -450,7 +450,7 @@ adduseraddress:
 						if (backwards) {
 							toaddress.inserter(1, useraddress);
 						} else {
-							toaddress.r(-1, useraddress);
+							toaddress(-1) = useraddress;
 						}
 					}
 				}
@@ -492,9 +492,9 @@ nextuser:;
 		call cropper(sys.document);
 		var origdocument = sys.document;
 
-		sys.document.r(2, title);
-		sys.document.r(5, lower(module ^ "PROXY" ^ FM ^ USER0));
-		sys.document.r(6, lower(datax));
+		sys.document(2) = title;
+		sys.document(5) = lower(module ^ "PROXY" ^ FM ^ USER0);
+		sys.document(6) = lower(datax);
 
 		call cropper(datax);
 		if (sys.document ne origdocument) {
@@ -531,10 +531,10 @@ nextuser:;
 
 	//become the user so security is relative to the document "owner"
 	var connection = "VERSION 3";
-	connection.r(2, "0.0.0.0");
-	connection.r(3, "SERVER");
-	connection.r(4, "");
-	connection.r(5, "");
+	connection(2) = "0.0.0.0";
+	connection(3) = "SERVER";
+	connection(4) = "";
+	connection(5) = "";
 	call listen2("BECOMEUSERANDCONNECTION", runasusercode, "", connection, xx);
 
 	//request='EXECUTE':fm:'GENERAL':fm:'GETREPORT':fm:docid
@@ -625,7 +625,7 @@ nextsign:
 			}
 
 			body = "";
-			body.r(-1, response_);
+			body(-1) = response_;
 			if (USER3.substr(1, 6) eq "Error:") {
 				response_.splicer(1, 6, "Result:");
 			}
@@ -634,8 +634,8 @@ nextsign:
 				var(response_).oswrite("xyz.xyz");
 			}
 			//swap 'Error:' with 'Result:' in body
-			body.r(-1, ("Document: " ^ sys.document.a(2) ^ " (" ^ docid ^ ")").trim());
-			body.r(-1, "Database: " ^ SYSTEM.a(23) ^ " (" ^ SYSTEM.a(17) ^ ")");
+			body(-1) = ("Document: " ^ sys.document.a(2) ^ " (" ^ docid ^ ")").trim();
+			body(-1) = "Database: " ^ SYSTEM.a(23) ^ " (" ^ SYSTEM.a(17) ^ ")";
 			//swap '%RESULT%' with '* ' in subject
 			subject.swapper("%RESULT%", "");
 
@@ -678,14 +678,14 @@ nextsign:
 		// Option to force the actual email recipient
 		var system117 = SYSTEM.a(117);
 		if (forceemail)
-			SYSTEM.r(117, forceemail);
+			SYSTEM(117) = forceemail;
 
 		print(" Emailing ", toaddress, ":");
 		call sendmail(toaddress, ccaddress, subject, body, attachfilename, "", errormsg);
 		print("done");
 
 		// Restore original forced email or lack thereof
-		SYSTEM.r(117, system117);
+		SYSTEM(117) = system117;
 
 		if (errormsg and errormsg ne "OK") {
 			//call msg(errormsg)
@@ -719,12 +719,12 @@ subroutine exec() {
 	//turn interactive off in case running from command line
 	//to avoid any reports prompting for input here
 	var s33 = SYSTEM.a(33);
-	SYSTEM.r(33, 1);
+	SYSTEM(33) = 1;
 
 	gosub exec2();
 
 	//restore interactivity status
-	SYSTEM.r(33, s33);
+	SYSTEM(33) = s33;
 
 	return;
 }
@@ -733,7 +733,7 @@ subroutine exec2() {
 	requeststarttime = ostime();
 	//system<25>=requeststarttime
 	//allow autorun processes to run for ever
-	SYSTEM.r(25, "");
+	SYSTEM(25) = "";
 	request_ = USER0.field(FM, 3, 99999);
 
 	//localtime=mod(time()+@sw<1>,86400)
@@ -763,7 +763,7 @@ subroutine exec2() {
 	//tt=printfilename[-1,'B.']
 	tt = field2(printfilename, ".", -1);
 	printfilename.splicer(-tt.length(), tt.length(), "htm");
-	SYSTEM.r(2, printfilename);
+	SYSTEM(2) = printfilename;
 	//if tracing then
 	// print datasetcode:' Waiting for output:':
 	// end
@@ -782,11 +782,11 @@ subroutine exec2() {
 		iodat_ = linkfilename2;
 	}
 
-	SYSTEM.r(117, forceemail);
+	SYSTEM(117) = forceemail;
 
 	execute(voccmd);
 
-	SYSTEM.r(117, "");
+	SYSTEM(117) = "";
 
 	//discard any stored input
 	DATA = "";
@@ -795,8 +795,8 @@ subroutine exec2() {
 	//@user4='R18.6'
 	if (msg_.index("R18.6")) {
 		var halt = 1;
-		USER4.r(-1, "Corrupt temporary file. Restart Needed.");
-		msg_.r(-1, "EXODUS.NET TERMINATED");
+		USER4(-1) = "Corrupt temporary file. Restart Needed.";
+		msg_(-1) = "EXODUS.NET TERMINATED";
 	}
 
 	//convert error message

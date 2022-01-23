@@ -67,7 +67,8 @@ function main(io colhdg, in thproperties, in nobase0) {
 				///BREAK;
 				if (not((coln2 le ncols2 and t3 eq tt) and t3 ne nocell)) break;
 				colspan += 1;
-				colhdg.r(coln2, rown, nocell);
+				//colhdg(coln2, rown) = nocell;
+				pickreplacer(colhdg, coln2, rown, nocell);
 			}//loop;
 
 			//if usecols else t:=coldict(coln)<14>
@@ -83,7 +84,8 @@ function main(io colhdg, in thproperties, in nobase0) {
 					///BREAK;
 					if (not((rown2 le nrows and ((t3 eq tt or t3 eq ""))) and t3 ne nocell)) break;
 					rowspan += 1;
-					colhdg.r(coln, rown2, nocell);
+					//colhdg(coln, rown2) = nocell;
+					pickreplacer(colhdg, coln, rown2, nocell);
 				}//loop;
 
 				if (rowspan gt 1) {
@@ -92,7 +94,8 @@ function main(io colhdg, in thproperties, in nobase0) {
 			}
 
 			t2 ^= ">" ^ tt ^ "</th>";
-			colhdg.r(coln, rown, t2);
+			//colhdg(coln, rown) = t2;
+			pickreplacer(colhdg, coln, rown, t2);
 
 			coln += colspan - 1;
 

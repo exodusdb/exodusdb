@@ -32,7 +32,7 @@ function main() {
 	var nn = ANS.count(VM) + 1;
 	for (var ii = 1; ii <= nn; ++ii) {
 		if (ANS.a(1, ii) eq RECORD.a(1, ii)) {
-			ANS.r(1, ii, "");
+			ANS(1, ii) = "";
 		}
 	} //ii;
 	return ANS;
@@ -68,7 +68,7 @@ function main() {
 	for (var ii = 1; ii <= nn; ++ii) {
 		var logindate = ANS.a(1, ii).floor();
 		if (logindate) {
-			ANS.r(1, ii, (var().date() - logindate).oconv("MD00P"));
+			ANS(1, ii) = (var().date() - logindate).oconv("MD00P");
 		}
 	} //ii;
 	return ANS;
@@ -104,7 +104,7 @@ function main() {
 	for (var ii = 1; ii <= nn; ++ii) {
 		var passworddate = ANS.a(1, ii);
 		if (passworddate) {
-			ANS.r(1, ii, (var().date() - passworddate).oconv("MD00P"));
+			ANS(1, ii) = (var().date() - passworddate).oconv("MD00P");
 		}
 	} //ii;
 	return ANS;
@@ -118,13 +118,13 @@ libraryinit(process_comment2)
 function main() {
 	ANS = "";
 	if (ID.field("*", 2) eq SYSTEM.a(32)) {
-		ANS.r(1, -1, "Current user session");
+		ANS(1, -1) = "Current user session";
 	}
 	if (RECORD.a(3).trim() eq STATION.trim()) {
-		ANS.r(1, -1, "Current workstation");
+		ANS(1, -1) = "Current workstation";
 	}
 	if (RECORD.a(5) eq USERNAME) {
-		ANS.r(1, -1, "Current user");
+		ANS(1, -1) = "Current user";
 		}
 	return ANS;
 }
@@ -187,7 +187,7 @@ function main() {
 		var usercode = usercodes.a(1, usern);
 		if (usercode) {
 			if (emails.a(1, usern) eq "") {
-				usercodes.r(1, usern, "<B>" ^ usercode ^ "</B>");
+				usercodes(1, usern) = "<B>" ^ usercode ^ "</B>";
 			}
 		}
 	} //usern;
@@ -204,7 +204,7 @@ function main() {
 	var nusers = usercodes.count(VM) + 1;
 	for (var usern = 1; usern <= nusers; ++usern) {
 		if (emails.a(1, usern) eq "") {
-			usercodes.r(1, usern, "");
+			usercodes(1, usern) = "";
 		}
 	} //usern;
 	return usercodes;

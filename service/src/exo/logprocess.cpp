@@ -63,8 +63,8 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 			processrec = "";
 		}
 		if (not(FILEERROR)) {
-			processrec.r(11, var().date());
-			processrec.r(12, var().time());
+			processrec(11) = var().date();
+			processrec(12) = var().time();
 
 			processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
 
@@ -87,23 +87,23 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 				gosub newprocessid( processid);
 			}
 
-			processrec.r(11, var().date());
-			processrec.r(12, var().time());
+			processrec(11) = var().date();
+			processrec(12) = var().time();
 
 		}
 
 		if (processcategory) {
-			processrec.r(6, processcategory);
+			processrec(6) = processcategory;
 		}
 
 		if (processparameters) {
-			processrec.r(7, processparameters);
+			processrec(7) = processparameters;
 		}
 		if (processresult) {
-			processrec.r(13, processresult);
+			processrec(13) = processresult;
 		}
 		if (processcomments) {
-			processrec.r(14, processcomments);
+			processrec(14) = processcomments;
 		}
 
 		processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
@@ -128,11 +128,11 @@ subroutine newprocessid(io processid) {
 	if (not xx) break;
 	}//loop;
 
-	processrec.r(1, var().date());
-	processrec.r(2, timex);
-	processrec.r(3, STATION.trim());
-	processrec.r(4, SYSTEM.a(17));
-	processrec.r(5, USERNAME);
+	processrec(1) = var().date();
+	processrec(2) = timex;
+	processrec(3) = STATION.trim();
+	processrec(4) = SYSTEM.a(17);
+	processrec(5) = USERNAME;
 	return;
 
 }

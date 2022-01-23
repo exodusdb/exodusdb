@@ -90,7 +90,7 @@ function main(in mode0) {
 			if (not(userrec.a(17))) {
 				var changelogkey = "USER*" ^ USERNAME;
 				if (changelog.read(DEFINITIONS, changelogkey)) {
-					userrec.r(17, changelog.a(8));
+					userrec(17) = changelog.a(8);
 					userrec.a(17).writev(users, USERNAME, 17);
 
 					var("").writev(DEFINITIONS, changelogkey, 8);
@@ -100,12 +100,12 @@ function main(in mode0) {
 
 			//mode<2>=changelog<7>
 			//list all items in changelog since the EXODUS version in the user file
-			mode.r(3, userrec.a(17));
+			mode(3) = userrec.a(17);
 
 			//fix a problem where people were missing most changes
 			//due to sv being represented as : eg user:support:technical
 			if (mode.a(3) and mode.a(3) lt 14773) {
-				mode.r(3, 14153);
+				mode(3) = 14153;
 			}
 
 		} else {
@@ -136,23 +136,23 @@ function main(in mode0) {
 			//swap 'Support' with 'Technical' in tt
 			//mode<2>=tt
 			if (menucodes.index("FINANCE")) {
-				mode.r(2, -1, "Finance");
+				mode(2, -1) = "Finance";
 			}
 			if (menucodes.index("MEDIA")) {
-				mode.r(2, -1, "Media");
+				mode(2, -1) = "Media";
 			}
 			if (menucodes.index("JOBS")) {
-				mode.r(2, -1, "Jobs");
+				mode(2, -1) = "Jobs";
 			}
 			if (menucodes.index("TIMESHEETS")) {
-				mode.r(2, -1, "Timesheets");
+				mode(2, -1) = "Timesheets";
 			}
 			if (menucodes.index("SUPPORT")) {
-				mode.r(2, -1, "Technical");
+				mode(2, -1) = "Technical";
 			}
 
 			//everybody gets User Interface changes
-			mode.r(2, -1, "User Interface");
+			mode(2, -1) = "User Interface";
 
 			//if no preferences then no whats new
 			//if mode<2> else
@@ -179,7 +179,7 @@ function main(in mode0) {
 		//make a suitable output filename based on the responsefilename
 		var temp = PRIORITYINT.a(100);
 		temp.splicer(-1, 1, "htm");
-		SYSTEM.r(2, temp);
+		SYSTEM(2) = temp;
 
 		//get new items in new filename and return the filename in @ans
 		gosub list();
@@ -220,7 +220,7 @@ subroutine select0() {
 		tt.converter(FM, VM);
 		if (not(tt.locateby("AR", mode.a(3), versionn))) {
 			if (versionn gt 1) {
-				mode.r(3, USER1.a(versionn - 1));
+				mode(3) = USER1.a(versionn - 1);
 			}
 		}
 	}
@@ -418,7 +418,7 @@ subroutine getversiondates() {
 		idate = versionlog.a(ii, 1).field(" ", 2, 3).iconv("D");
 		//itime=iconv(field(versionlog,' ',1),'MT')
 		if (not(versiondata.locateusing(FM, idate, xx))) {
-			versiondata.r(-1, idate);
+			versiondata(-1) = idate;
 		}
 	} //ii;
 

@@ -117,7 +117,7 @@ updateprivs:
 					taskn -= 1;
 				}
 			}
-			SECURITY.r(10, taskn, defaultlock);
+			SECURITY(10, taskn) = defaultlock;
 			if (renaming) {
 				//skip warning except for live databases included in startup
 				if (not(SYSTEM.a(61))) {
@@ -132,7 +132,7 @@ updateprivs:
 			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
 				tt = SECURITY.a(11, taskn2);
 			}
-			SECURITY.r(11, taskn, tt);
+			SECURITY(11, taskn) = tt;
 			goto updateprivs;
 		}
 
@@ -277,7 +277,7 @@ subroutine readuserprivs() {
 }
 
 subroutine writeuserprivs() {
-	SECURITY.r(9, "");
+	SECURITY(9) = "";
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
 		if (VOLUMES) {
 			SECURITY.invert().write(DEFINITIONS, "SECURITY");

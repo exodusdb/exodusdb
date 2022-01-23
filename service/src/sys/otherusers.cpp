@@ -127,7 +127,7 @@ function main(in databasecode0="", in usercode0="") {
 			//end of database or user code provided
 		}
 
-		otherusercodes.r(1, -1, lockid);
+		otherusercodes(1, -1) = lockid;
 
 		returndata += 1;
 
@@ -140,8 +140,8 @@ nextlock:;
 	}
 
 	if (returndata) {
-		returndata.r(2, otherusercodes);
-		returndata.r(3, curruserlockid);
+		returndata(2) = otherusercodes;
+		returndata(3) = curruserlockid;
 	}
 
 	for (var ii = 1; ii <= 9999; ++ii) {
@@ -152,7 +152,7 @@ nextlock:;
 		if (not(curruserlockid.isnum())) {
 			usercode -= (usercode / 10).floor();
 		}
-		returndata.r(2, ii, "PROCESS" ^ usercode);
+		returndata(2, ii) = "PROCESS" ^ usercode;
 	} //ii;
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {

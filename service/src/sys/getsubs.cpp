@@ -124,10 +124,10 @@ nextdoc:
 
 		}
 
-		RECORD.r(101, raise(RECORD.a(6)));
+		RECORD(101) = raise(RECORD.a(6));
 
 		if (RECORD.a(8) eq "") {
-			RECORD.r(8, RECORD.a(3) ^ "." ^ RECORD.a(4).oconv("R(0)#5"));
+			RECORD(8) = RECORD.a(3) ^ "." ^ RECORD.a(4).oconv("R(0)#5");
 		}
 
 	} else if (mode eq "PREWRITE") {
@@ -146,15 +146,15 @@ nextdoc:
 
 		//move fields 101 onwards into field 6 (after lowering)
 		//and remove fields 101 onwards
-		RECORD.r(6, lower(RECORD.field(FM, 101, 9999)));
+		RECORD(6) = lower(RECORD.field(FM, 101, 9999));
 		RECORD = RECORD.field(FM, 1, 100);
 
 		if (RECORD.a(1) eq "") {
-			RECORD.r(1, USERNAME);
+			RECORD(1) = USERNAME;
 		}
-		RECORD.r(3, var().date());
-		RECORD.r(4, var().time());
-		RECORD.r(7, APPLICATION);
+		RECORD(3) = var().date();
+		RECORD(4) = var().time();
+		RECORD(7) = APPLICATION;
 
 		//update exodus standard (in case doing this on the programming system)
 		//the programming standard is installed into all clients

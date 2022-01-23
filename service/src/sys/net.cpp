@@ -25,7 +25,7 @@ function main() {
 
 	PSEUDO = "";
 	USER4 = "";
-	PRIORITYINT.r(100, "");
+	PRIORITYINT(100) = "";
 	var dbcode = SYSTEM.a(17);
 	if (dbcode eq "") {
 		dbcode = "DEFAULT";
@@ -42,7 +42,7 @@ listen:
 
 	//forces OFF in listen on esc
 	if (cmd.field(" ",1) ne "LISTEN") {
-		SYSTEM.r(33, 1);
+		SYSTEM(33) = 1;
 	}
 
 	if (osgetenv("EXO_DEBUG"))
@@ -59,7 +59,7 @@ listen:
 	//unlock all
 	var xx = unlockrecord();
 
-	SYSTEM.r(33, "");
+	SYSTEM(33) = "";
 
 	//trim off uninteresting back trace into listen
 	//leave for now in case of errors in listen while converting to exodus
@@ -71,8 +71,8 @@ listen:
 	if (USER4.substr(1, 7) eq "RESTART") {
 
 		if (USER4 eq "RESTART $LISTEN") {
-			SYSTEM.r(100, 3, "");
-			SYSTEM.r(33, s33);
+			SYSTEM(100, 3) = "";
+			SYSTEM(33) = s33;
 			goto listen;
 		}
 
@@ -98,18 +98,18 @@ listen:
 	//check lists and indexing files are not corrupted and zero them if they are
 	//listen selects the locks file every 10 secs and may detect corruption
 	s33 = SYSTEM.a(33);
-	SYSTEM.r(33, 1);
+	SYSTEM(33) = 1;
 	//call checkfile"LISTS");
 	//call checkfile"!INDEXING");
 	//call checkfile"LOCKS");
-	SYSTEM.r(33, s33);
+	SYSTEM(33) = s33;
 
 	//detect memory corruption?
 	var halt = 0;
 	if (USER4.index("R18.6")) {
 		halt = 1;
-		USER4.r(-1, "Corrupt temporary file. Restart Needed.");
-		USER4.r(-1, "exodus.net TERMINATED");
+		USER4(-1) = "Corrupt temporary file. Restart Needed.";
+		USER4(-1) = "exodus.net TERMINATED";
 	}
 	if (USER4.ucase().index("NOT ENOUGH MEMORY")) {
 		halt = 1;
@@ -211,13 +211,13 @@ listen:
 			if (sys.address) {
 
 				var body = "Server=" ^ SYSTEM.a(44).trim();
-				body.r(-1, "Client=" ^ STATION.trim());
-				body.r(-1, "User=" ^ USERNAME.trim());
+				body(-1) = "Client=" ^ STATION.trim();
+				body(-1) = "User=" ^ USERNAME.trim();
 				//osread ver from 'general\version.dat' then
 				var verfilename = "general/version.dat";
 				verfilename.converter("/", OSSLASH);
 				if (ver.osread(verfilename)) {
-					body.r(-1, "EXODUS Ver:" ^ ver.a(1));
+					body(-1) = "EXODUS Ver:" ^ ver.a(1);
 					}
 
 				//too slow so ignore it
@@ -289,7 +289,7 @@ listen:
 
 	//restore the original settings
 	//noninteractive avoids any further messages on OFF command
-	SYSTEM.r(33, s33);
+	SYSTEM(33) = s33;
 	if (SYSTEM.a(43)) {
 		USERNAME=(SYSTEM.a(43));
 	}

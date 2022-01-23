@@ -131,10 +131,10 @@ function main() {
 
 		//if testing, style borders of td and divs for visual insight
 		if (testing) {
-			allhtml.r(-1, "<style>");
-			allhtml.r(-1, "td {border:dotted 1px #EEEEEE;}");
-			allhtml.r(-1, "div {border:dashed 1px lightgrey;}");
-			allhtml.r(-1, "</style>");
+			allhtml(-1) = "<style>";
+			allhtml(-1) = "td {border:dotted 1px #EEEEEE;}";
+			allhtml(-1) = "div {border:dashed 1px lightgrey;}";
+			allhtml(-1) = "</style>";
 		}
 
 		var ncomps = compcodes.count(",") + 1;
@@ -144,16 +144,16 @@ function main() {
 			var compcode = compcodes.field(",", compn);
 			call gethtml(mode, html, compcode);
 
-			allhtml.r(-1, "<br />Company " ^ compcode ^ " from " ^ mode);
-			allhtml.r(-1, "<br />");
+			allhtml(-1) = "<br />Company " ^ compcode ^ " from " ^ mode;
+			allhtml(-1) = "<br />";
 
 			//if not testing then wrap html in hr for clarity
 			//if testing else allhtml<-1>='<hr/>'
-			allhtml.r(-1, html);
+			allhtml(-1) = html;
 			//if testing else allhtml<-1>='<hr/>'
 
 		} //compn;
-		allhtml.r(-1, "Press F5 to refresh any images just uploaded.");
+		allhtml(-1) = "Press F5 to refresh any images just uploaded.";
 		allhtml.swapper(FM, "\r\n");
 		var(allhtml).oswrite(SYSTEM.a(2));
 		gosub postproc();
@@ -183,8 +183,8 @@ function main() {
 		//by ensuring the user is currently logged in to one or other database
 		if ((USERNAME ne "EXODUS" and copydb ne SYSTEM.a(17)) and todb ne SYSTEM.a(17)) {
 			USER4 = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
-			msg_.r(-1, "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote()));
-			USER4.r(-1, "but you are currently logged in to database " ^ (SYSTEM.a(17).quote()));
+			msg_(-1) = "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote());
+			USER4(-1) = "but you are currently logged in to database " ^ (SYSTEM.a(17).quote());
 			call mssg(msg_);
 			stop();
 		}
@@ -282,7 +282,7 @@ function main() {
 
 				call securitysubs("GENERATEPASSWORD");
 				newpassword = ANS;
-				userrec.r(4, newpassword);
+				userrec(4) = newpassword;
 
 			}
 
@@ -327,7 +327,7 @@ function main() {
 		var ccaddrs = "";
 		var subject = "EXODUS Password Reset";
 		var body = "User: " ^ ID;
-		body.r(-1, "Your new password is " ^ newpassword);
+		body(-1) = "Your new password is " ^ newpassword;
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
 	} else if (mode eq "MAKEUPLOADPATH") {
@@ -389,7 +389,7 @@ setcodepagecase:
 			temp.swapper(RM, "%FF");
 			temp.swapper(FM, "%FE");
 			temp.swapper(VM, "%FD");
-			recordx.r(1, fn, temp);
+			recordx(1, fn) = temp;
 
 			recordx.write(sys.alanguage, "GENERAL*" ^ codepage);
 
@@ -565,7 +565,7 @@ nextrep:
 				temp.swapper("&", "&amp;");
 				temp.swapper("<", "&lt;");
 				temp.swapper(">", "&gt;");
-				report.r(2, temp);
+				report(2) = temp;
 
 				//!dont send instructions since takes up space and not needed
 				//DO send now to have info in requestlog
@@ -574,10 +574,10 @@ nextrep:
 				report.converter(VM, RM);
 				var nn = report.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
-					data_.r(ii, repn, report.a(ii));
+					data_(ii, repn) = report.a(ii);
 				} //ii;
 
-				USER1.r(9, repn, reportid);
+				USER1(9, repn) = reportid;
 
 	//print repn,data<1>
 			}
@@ -626,7 +626,7 @@ nextrep:
 
 		//TODO security
 
-		doc.r(6, lower(USER1));
+		doc(6) = lower(USER1);
 
 		doc.write(sys.documents, USER0.a(2));
 
@@ -655,12 +655,12 @@ nextrep:
 		}
 
 		var description = doc.a(2);
-		doc.r(2, description ^ " (Copy)");
+		doc(2) = description ^ " (Copy)";
 
 		//prevent copy from appearing like a exodus standard
-		doc.r(10, "");
+		doc(10) = "";
 
-		doc.r(1, USERNAME);
+		doc(1) = USERNAME;
 		doc.write(sys.documents, ID);
 
 		data_ = ID ^ FM ^ doc;
@@ -700,7 +700,7 @@ nextrep:
 		for (fn = 1; fn <= 999; ++fn) {
 			var tt = USER1.a(fn);
 			if (tt) {
-				PSEUDO.r(fn, tt);
+				PSEUDO(fn) = tt;
 			}
 		} //fn;
 		data_ = "";

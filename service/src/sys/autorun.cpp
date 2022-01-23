@@ -29,10 +29,10 @@ function main() {
 		execute(sentencex ^ " (X" ^ options);
 
 		//resume being the original user and station
-		SYSTEM.r(33, origsysmode);
+		SYSTEM(33) = origsysmode;
 		var connection = "VERSION 3";
-		connection.r(2, origstation);
-		connection.r(3, origstation);
+		connection(2) = origstation;
+		connection(3) = origstation;
 		call listen2("BECOMEUSERANDCONNECTION", origuser, "", connection, xx);
 
 		stop();

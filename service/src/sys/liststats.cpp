@@ -127,10 +127,10 @@ function main() {
 				///BREAK;
 				if (not(row1.a(1, coln) eq row2.a(1, coln))) break;
 				replaced = 1;
-				row2.r(1, coln, "-");
+				row2(1, coln) = "-";
 			} //coln;
 			if (replaced) {
-				output.r(rown, row2);
+				output(rown) = row2;
 			}
 		} //rown;
 	}
@@ -254,10 +254,10 @@ function main() {
 
 	} else {
 
-		SYSTEM.r(3, 1);
+		SYSTEM(3) = 1;
 		var sys2 = SYSTEM.a(2);
 		sys2.splicer(-3, 3, "xls");
-		SYSTEM.r(2, sys2);
+		SYSTEM(2) = sys2;
 		output.swapper(FM, "\r\n");
 		output.swapper(VM, "\t");
 		call oswrite(output, SYSTEM.a(2));

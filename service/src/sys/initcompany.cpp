@@ -46,30 +46,30 @@ function main(in nextcompanycode) {
 		}
 	} else {
 		sys.company = "";
-		sys.company.r(2, var().date().oconv("D2/E").field("/", 2, 2));
+		sys.company(2) = var().date().oconv("D2/E").field("/", 2, 2);
 	}
 
 	//in LISTEN2 and INIT.COMPANY
 	var companystyle = sys.company.a(70);
 	if (companystyle) {
-		SYSTEM.r(46, companystyle);
+		SYSTEM(46) = companystyle;
 	}
 
 	//clientmark
 	if (sys.company.a(27)) {
 		if (VOLUMES) {
-			sys.company.r(27, sys.company.a(27).invert());
+			sys.company(27) = sys.company.a(27).invert();
 		}
-		SYSTEM.r(14, sys.company.a(27));
-		SYSTEM.r(8, "");
+		SYSTEM(14) = sys.company.a(27);
+		SYSTEM(8) = "";
 	} else {
-		SYSTEM.r(14, SYSTEM.a(36));
+		SYSTEM(14) = SYSTEM.a(36);
 	}
 
 	//if company code2 is not specified then use company code IF alphabetic
 	if (not(sys.company.a(28))) {
 		if (sys.gcurrcompany.match("^[A-Za-z]*$")) {
-			sys.company.r(28, sys.gcurrcompany);
+			sys.company(28) = sys.gcurrcompany;
 		}
 	}
 
@@ -137,10 +137,10 @@ function main(in nextcompanycode) {
 	}
 
 	if (not(sys.company.a(4))) {
-		sys.company.r(4, sys.company.a(5));
+		sys.company(4) = sys.company.a(5);
 	}
 	if (not(sys.company.a(5))) {
-		sys.company.r(5, sys.company.a(4));
+		sys.company(5) = sys.company.a(4);
 	}
 	//if intercurrency conversion account is blank then
 	//trial balance balances in base currency but not for each currency separately
@@ -150,21 +150,21 @@ function main(in nextcompanycode) {
 	//this was not a good idea but remains compatible with older code
 	//TODO remove and change all other code
 	if (sys.company.a(4, 1, 2)) {
-		sys.company.r(4, sys.company.a(4, 1, 2));
+		sys.company(4) = sys.company.a(4, 1, 2);
 	}
 	if (sys.company.a(5, 1, 2)) {
-		sys.company.r(5, sys.company.a(5, 1, 2));
+		sys.company(5) = sys.company.a(5, 1, 2);
 	}
 	if (sys.company.a(12, 1, 2)) {
-		sys.company.r(12, sys.company.a(12, 1, 2));
+		sys.company(12) = sys.company.a(12, 1, 2);
 	}
 	//taxaccno=company<19>
 	if (sys.company.a(19, 1, 2)) {
-		sys.company.r(19, sys.company.a(19, 1, 2));
+		sys.company(19) = sys.company.a(19, 1, 2);
 	}
 
 	//save base currency for general use
-	SYSTEM.r(134, sys.company.a(3));
+	SYSTEM(134) = sys.company.a(3);
 
 	//number format (@USER2)
 	if (not(ndec.readv(sys.currencies, sys.company.a(3), 3))) {
@@ -197,7 +197,7 @@ function main(in nextcompanycode) {
 		if (not((maxperiod.match("^\\d*$") and maxperiod gt 0) and maxperiod le 99)) {
 			maxperiod = 12;
 		}
-		sys.company.r(6, "[DATEPERIOD," ^ firstmonth ^ "," ^ maxperiod ^ "]");
+		sys.company(6) = "[DATEPERIOD," ^ firstmonth ^ "," ^ maxperiod ^ "]";
 	}
 
 	return 1;

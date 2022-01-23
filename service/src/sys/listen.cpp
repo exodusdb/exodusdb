@@ -379,7 +379,7 @@ function main() {
 	printl();
 	printl("Station : ", STATION, "  Process : ", processno, "  Dir : ", oscwd());
 
-	SYSTEM.r(33, 1);
+	SYSTEM(33) = 1;
 
 	timeoutsecs = SYSTEM.a(33, 5);
 	if (not(timeoutsecs.isnum())) {
@@ -391,7 +391,7 @@ function main() {
 	sysmode = origsysmode;
 	if (sysmode eq "") {
 		sysmode = SYSTEM.a(33);
-		SYSTEM.r(33, "1");
+		SYSTEM(33) = "1";
 	}
 
 	origprivilege = PRIVILEGE;
@@ -503,16 +503,16 @@ nextrequest:
 	win.registerx = "";//dim
 
 	//forcedemail
-	SYSTEM.r(117, "");
+	SYSTEM(117) = "";
 
 	//no interruptfilename
-	SYSTEM.r(6, "");
+	SYSTEM(6) = "";
 
 	TCLSTACK = TCLSTACK.field(FM, 1, 10);
 	/*
 	execute("RESET");
 	*/
-	SYSTEM.r(33, 1);
+	SYSTEM(33) = 1;
 	RECORD = "";
 	ID = "";
 	MV = 0;
@@ -599,8 +599,8 @@ nextsearch0:
 	//prevent sleep in esc.to.exit
 	//garbagecollect;
 	timenow = ostime();
-	SYSTEM.r(25, timenow);
-	SYSTEM.r(26, timenow);
+	SYSTEM(25) = timenow;
+	SYSTEM(26) = timenow;
 
 	//check for a variety of reasons to restart including
 	//corrupt system record
@@ -729,7 +729,7 @@ nextsearch0:
 
 	//switch into interactive mode to check for operator input
 	s33 = SYSTEM.a(33);
-	SYSTEM.r(33, "");
+	SYSTEM(33) = "";
 
 	//check for esc key to exit
 	//if esc.to.exit() then gosub exit
@@ -771,7 +771,7 @@ nextsearch0:
 	if (charx eq PRIORITYINT.a(2)) {
 		cmd = "";
 		cmd.input(oscwd() ^ " Command? ");
-		SYSTEM.r(2,"");
+		SYSTEM(2) = "";
 		if (not libinfo(cmd.field(" "))) {
 			errputl(cmd.field(" "), " does not exist.");
 		} else {
@@ -813,7 +813,7 @@ nextsearch0:
 
 	//switch back to not interactive mode
 	////////////////////////////////////
-	SYSTEM.r(33, s33);
+	SYSTEM(33) = s33;
 
 	//gosub getbakpars
 	call getbackpars(bakpars);
@@ -925,7 +925,7 @@ gotlink:
 	//get the earliest time possible for the log
 	requestdate = var().date();
 	requesttime = ostime();
-	SYSTEM.r(25, requesttime);
+	SYSTEM(25) = requesttime;
 
 	gosub gettimeouttime();
 
@@ -1122,8 +1122,8 @@ subroutine requestinit() {
 	//if connection<1>='::1' then connection<1>='127.0.0.1'
 	connection.swapper(FM ^ "::1", FM ^ "127.0.0.1");
 	connection.converter(FM, VM);
-	connection.r(1, 10, username);
-	SYSTEM.r(40, connection);
+	connection(1, 10) = username;
+	SYSTEM(40) = connection;
 	ipno = connection.a(1, 2);
 	netid = connection.a(1, 5);
 
@@ -1138,7 +1138,7 @@ subroutine requestinit() {
 
 	request1.ucaser();
 	if (request1 eq "LOGIN") {
-		USER0.r(5, request_.a(2));
+		USER0(5) = request_.a(2);
 	}
 	//convert @lower.case to @upper.case in request
 	request2 = USER0.a(5);
@@ -1179,7 +1179,7 @@ subroutine requestinit() {
 		t2 = "CONVLOG";
 		call listen5(t2, logx, xx, yy);
 		logx.converter("^", FM);
-		logx.r(1, request1);
+		logx(1) = request1;
 		if (logx.a(1)) {
 			tt ^= " Req1=" ^ (logx.a(1).quote());
 		}
@@ -1240,7 +1240,7 @@ subroutine requestinit() {
 
 	//save the response file name
 	//so that if listen fails then NET the calling program can still respond
-	PRIORITYINT.r(100, linkfilename3);
+	PRIORITYINT(100) = linkfilename3;
 
 	linkfile2size = linkfilename2.osfile().a(1);
 	if (linkfile2size gt maxstrlen) {
@@ -1423,7 +1423,7 @@ cannotopenlinkfile2:
 	//and assume that identity if ok
 	call listen2("VALIDATE" ^ FM ^ request1, username, password, connection, invaliduser, dataset);
 
-	SYSTEM.r(2, linkfilename2);
+	SYSTEM(2) = linkfilename2;
 
 	//get the current program stack
 	//stack=""
@@ -2137,7 +2137,7 @@ noupdate:
 
 		//prevent reading passwords postread and postwrite
 		if (filename eq "DEFINITIONS" and keyx eq "SECURITY") {
-			iodat_.r(4, "");
+			iodat_(4) = "";
 		}
 
 		call cropper(USER1);
@@ -2231,8 +2231,8 @@ noupdate:
 		//similar code in lock: and write:
 		gosub getdostime();
 		lockduration = defaultlockmins / (24 * 60);
-		lockrec.r(1, lockduration + dostime);
-		lockrec.r(2, dostime);
+		lockrec(1) = lockduration + dostime;
+		lockrec(2) = dostime;
 		lockrec.write(leaselocks, lockkey);
 
 		//get a proper lock on the file
@@ -2397,7 +2397,7 @@ badwrite:
 
 			//prevent reading passwords postread and postwrite
 			if (filename eq "DEFINITIONS" and keyx eq "SECURITY") {
-				iodat_.r(4, "");
+				iodat_(4) = "";
 			}
 
 		} else if (request1 eq "DELETE") {
@@ -2539,14 +2539,14 @@ badwrite:
 		//tt=field2(printfilename,'.',-1)
 		//printfilename[-len(tt),len(tt)]='htm'
 		printfilename.splicer(-1, 1, "htm");
-		SYSTEM.r(2, printfilename);
+		SYSTEM(2) = printfilename;
 
 		//provide interruptfilename
 		//esc.to.exit will return 1 if it finds this file
 		//clear it if running non-interruptable processes and giveway maybe called
 		tt = linkfilename2;
 		tt.splicer(-1, 1, "5");
-		SYSTEM.r(6, tt);
+		SYSTEM(6) = tt;
 
 		//execute the program
 		USER3 = "OK";
@@ -2575,7 +2575,7 @@ badwrite:
 
 		//reformat for reqlog
 		voccmd.splicer(-5, 5, "");
-		USER0.r(1, voccmd ^ "_" ^ request_.a(1));
+		USER0(1) = voccmd ^ "_" ^ request_.a(1);
 
 		//discard any stored input
 		DATA = "";
@@ -2680,7 +2680,7 @@ subroutine exit() {
 
 	//get into interactive mode
 	//system<33>=origsysmode
-	SYSTEM.r(33, "");
+	SYSTEM(33) = "";
 	//call setprivilegeorigprivilege);
 	if (request1.substr(1, 7) eq "RESTART") {
 		USER4 = request1;
@@ -2930,18 +2930,18 @@ nolock:
 	lockrec = "";
 
 	//similar code in lock: and write:
-	lockrec.r(1, lockduration + dostime);
-	lockrec.r(2, dostime);
+	lockrec(1) = lockduration + dostime;
+	lockrec(2) = dostime;
 
 	//lockrec<3>=if connection then connection<1,2> else @station
 	if (connection) {
-		lockrec.r(3, connection.a(1, 2));
+		lockrec(3) = connection.a(1, 2);
 	} else {
-		lockrec.r(3, STATION);
+		lockrec(3) = STATION;
 	}
-	lockrec.r(4, USERNAME);
-	lockrec.r(5, newsessionid);
-	lockrec.r(6, masterlock);
+	lockrec(4) = USERNAME;
+	lockrec(5) = newsessionid;
+	lockrec(6) = masterlock;
 	FILEERRORMODE = 1;
 	FILEERROR = "";
 	response_ = "OK";
@@ -3208,9 +3208,9 @@ subroutine updreqlog() {
 
 	tt = username ^ FM ^ ipno ^ FM ^ netid ^ FM ^ FM ^ responsetime ^ FM ^ rawresponse.a(1);
 	if (request_.a(1) eq "EXECUTE") {
-		tt.r(11, USER0.a(2) ^ "_" ^ request_.a(3) ^ FM ^ USER0.field(FM, 4, 9999));
+		tt(11) = USER0.a(2) ^ "_" ^ request_.a(3) ^ FM ^ USER0.field(FM, 4, 9999);
 	} else {
-		tt.r(11, request_);
+		tt(11) = request_;
 	}
 
 	logid = datasetcode ^ "*" ^ requestdate ^ "*" ^ requesttime ^ "*" ^ processno;

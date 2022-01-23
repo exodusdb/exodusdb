@@ -64,7 +64,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			if (not(line1.index("<thead"))) {
 				line1 = FM ^ "<thead>" ^ FM ^ line1;
 			}
-			dataio.r(1, line1);
+			dataio(1) = line1;
 		}
 
 		//prefix
@@ -86,7 +86,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		if (lastline.index("<td>" ^ sys.glang.a(28))) {
 			lastline.swapper("TD>", "th>");
 			lastline.swapper("td>", "th>");
-			dataio.r(nlines, lastline);
+			dataio(nlines) = lastline;
 		}
 
 		//convert fm:vm to '' in dataio
@@ -131,9 +131,9 @@ function main(in mode, io dataio, in params0="", in params20="") {
 						if (tt2[1] eq "=") {
 							tt2.splicer(1, 1, "");
 						}
-						datax.r(ln, td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx);
+						datax(ln) = td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx;
 					} else {
-						datax.r(ln, "<td colspan=2>" ^ line ^ tdx);
+						datax(ln) = "<td colspan=2>" ^ line ^ tdx;
 					}
 				} //ln;
 
@@ -141,7 +141,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				datax.splicer(1, 0, "<table class=\"hashtable\">" ^ tr);
 				datax ^= trx ^ "</table>";
 
-				dataio.r(1, vn, datax);
+				dataio(1, vn) = datax;
 
 			}
 

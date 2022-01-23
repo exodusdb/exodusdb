@@ -40,7 +40,7 @@ function main() {
 	createfile("STATISTICS");
 	createfile("CHANGELOG");
 
-	SYSTEM.r(33,"X");
+	SYSTEM(33) = "X";
 
 	//module
 	APPLICATION="EXODUS";
@@ -53,21 +53,21 @@ function main() {
 	var databasecode=osgetenv("EXO_DATA");
 	if (not databasecode)
 		databasecode = "exodus";
-	SYSTEM.r(17,databasecode);
+	SYSTEM(17) = databasecode;
 
 	//process no
-	SYSTEM.r(24,PROCESSNO);
+	SYSTEM(24) = PROCESSNO;
 
 	//system mode
-	SYSTEM.r(33,1,"1");
+	SYSTEM(33, 1) = "1";
 	//user
-	SYSTEM.r(17,"exodus");//database code
-	SYSTEM.r(23,"EXODUS");//database name
-	SYSTEM.r(33,2,"EXODUS");//connection
-	SYSTEM.r(33,3,"EXODUS");
+	SYSTEM(17) = "exodus";//database code
+	SYSTEM(23) = "EXODUS";//database name
+	SYSTEM(33, 2) = "EXODUS";//connection
+	SYSTEM(33, 3) = "EXODUS";
 
 	//f5 key
-	PRIORITYINT.r(2,"x");
+	PRIORITYINT(2) = "x";
 
 	//create database dir
 	var datadir="../data/";
@@ -93,17 +93,18 @@ function main() {
 	var agp="";
 	if (not read(agp,"DEFINITIONS","AGENCY.PARAMS")) {
 		agp=invert("DEVELOPMENT DATABASE");
-		agp.r(4,1);//short dates
-		//agp.r(5,1);//split extras
-		agp.r(7,1);//wording on schedules
+		agp(4) = 1;//short dates
+		//agp(5) = 1;//split extras
+		agp(7) = 1;//wording on schedules
 		write(agp,"DEFINITIONS","AGENCY.PARAMS");
 	}
 	*/
 
 	//exodus pass
 	var rec="";
-	printl(hashpass("ALSOWINE"));
-	write(rec.r(7,hashpass("ALSOWINE")),"DEFINITIONS","EXODUS");
+	//printl(hashpass("ALSOWINE"));
+	rec(7) = hashpass("ALSOWINE");
+	write(rec on "DEFINITIONS","EXODUS");
 
 	//call initgeneral();
 	perform("initgeneral LOGIN");

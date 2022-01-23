@@ -65,26 +65,26 @@ readmenu:
 	//all menus - not in order
 	var menus = "SUPPORT";
 	if (APPLICATION eq "ACCOUNTS" or APPLICATION eq "ADAGENCY") {
-		menus.r(1, -1, "FINANCE");
+		menus(1, -1) = "FINANCE";
 	}
 
 	if (APPLICATION eq "ADAGENCY") {
 
-		menus.r(1, -1, "ANALYSIS");
+		menus(1, -1) = "ANALYSIS";
 
 		//MEDIA is always a candidate since it is difficult
 		//to work out exc
-		menus.r(1, -1, "MEDIA");
+		menus(1, -1) = "MEDIA";
 
 		//JOBS menu is only a candidate if they can access jobs
 		//unfortunately media probably have job access to attach jobs
 		if (authorised("JOB ACCESS", msg, "")) {
-			menus.r(1, -1, "JOBS");
+			menus(1, -1) = "JOBS";
 		}
 
 		//TIMESHEETS menu is only a candidate if then can access timesheets
 		if (authorised("TIMESHEET ACCESS", msg, "")) {
-			menus.r(1, -1, "TIMESHEETS");
+			menus(1, -1) = "TIMESHEETS";
 		}
 
 	}
@@ -132,7 +132,7 @@ deleteit:
 	}
 
 	//everybody gets the HELP menu
-	menus.r(1, -1, "HELP");
+	menus(1, -1) = "HELP";
 
 	//determine the company
 
@@ -144,7 +144,7 @@ deleteit:
 		allcomps = "";
 nextcomp:
 		if (readnext(compcodex)) {
-			allcomps.r(-1, compcodex);
+			allcomps(-1) = compcodex;
 			goto nextcomp;
 		}
 	}
@@ -164,7 +164,7 @@ nextcomp:
 				companypositive = "#";
 			}
 			if (authorised(companypositive ^ "COMPANY ACCESS " ^ (compcode.quote()), xx, "")) {
-				compcodes.r(-1, compcode);
+				compcodes(-1) = compcode;
 			}
 
 		} //ii;
@@ -299,9 +299,9 @@ nextcomp:
 		msg ^= ndays ^ " day" ^ var("s").substr(1, ndays ne 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
 		msg.swapper("(0", "(");
-		msg.r(-1, "EXODUS recommends that you \"BACKUP\" your data ");
-		msg.r(-1, "regularly to prevent total loss of data due to");
-		msg.r(-1, "power failure, disk damage or other accidents.");
+		msg(-1) = "EXODUS recommends that you \"BACKUP\" your data ";
+		msg(-1) = "regularly to prevent total loss of data due to";
+		msg(-1) = "power failure, disk damage or other accidents.";
 	}
 
 	return 0;

@@ -78,7 +78,7 @@ function main(in mode) {
 			temp.converter(UPPERCASE ^ "0123456789", "");
 			if (temp) {
 				msg = ID.quote() ^ " user doesnt exist and new usercodes";
-				msg.r(-1, "must be alphanumeric characters only");
+				msg(-1) = "must be alphanumeric characters only";
 				return invalid(msg);
 			}
 		}
@@ -92,13 +92,13 @@ function main(in mode) {
 			//and they would not have been able to login with it.
 			if (not(RECORD.a(36))) {
 				var lastlogindate = RECORD.a(13).field(".", 1);
-				RECORD.r(36, lastlogindate);
+				RECORD(36) = lastlogindate;
 			}
 			var expirydate = RECORD.a(36) + expirydays;
-			RECORD.r(37, expirydate);
+			RECORD(37) = expirydate;
 		} else {
 			//indicate no expiry
-			RECORD.r(37, "");
+			RECORD(37) = "";
 		}
 
 	} else if (mode eq "VAL.EMAIL") {
@@ -218,22 +218,22 @@ function main(in mode) {
 				if (not(authorised("AUTHORISATION UPDATE", xx))) {
 					//expiry date
 					if (win.orec.a(35)) {
-						RECORD.r(35, win.orec.a(35));
+						RECORD(35) = win.orec.a(35);
 					}
 					//password date
 					if (win.orec.a(36)) {
-						RECORD.r(36, win.orec.a(36));
+						RECORD(36) = win.orec.a(36);
 					}
 					//tt=@record<19>
 					//swap 'Default' with '' in tt
 					//username
-					RECORD.r(1, win.orec.a(1));
+					RECORD(1) = win.orec.a(1);
 					//department
-					RECORD.r(5, win.orec.a(5));
+					RECORD(5) = win.orec.a(5);
 					//email
-					RECORD.r(7, win.orec.a(7));
+					RECORD(7) = win.orec.a(7);
 					//department2
-					RECORD.r(21, win.orec.a(21));
+					RECORD(21) = win.orec.a(21);
 				}
 
 			}
@@ -274,14 +274,14 @@ function main(in mode) {
 			var newipnos = RECORD.a(40);
 			var newemailaddress = RECORD.a(7);
 
-			SECURITY.r(1, usern, ID);
+			SECURITY(1, usern) = ID;
 			//userprivs<2,usern>=newkeys
 			//userprivs<3,usern>=newexpirydate
 			//userprivs<4,usern>=newpass
 			//userprivs<5,usern>=newhourlyrate
-			SECURITY.r(6, usern, newipnos);
-			SECURITY.r(7, usern, newemailaddress);
-			SECURITY.r(8, usern, newusername);
+			SECURITY(6, usern) = newipnos;
+			SECURITY(7, usern) = newemailaddress;
+			SECURITY(8, usern) = newusername;
 
 		}
 
@@ -294,10 +294,10 @@ function main(in mode) {
 		if (resetpassword lt 2) {
 
 			//email address
-			SECURITY.r(7, usern, RECORD.a(7));
+			SECURITY(7, usern) = RECORD.a(7);
 
 			//user name
-			SECURITY.r(8, usern, RECORD.a(1));
+			SECURITY(8, usern) = RECORD.a(1);
 
 		}
 
@@ -311,13 +311,13 @@ function main(in mode) {
 			ans = win.is;
 
 			//save the encrypted bit in case we cannot update userprivs
-			RECORD.r(4, ans.a(7));
+			RECORD(4) = ans.a(7);
 
 			//update security if managed to lock it
 			if (resetpassword lt 2) {
 				ans.converter(FM, TM);
 				var tt = "<hidden>" ^ SVM ^ ans;
-				SECURITY.r(4, usern, tt);
+				SECURITY(4, usern) = tt;
 			}
 
 		}
@@ -329,7 +329,7 @@ function main(in mode) {
 				SECURITY.write(DEFINITIONS, "SECURITY");
 			}
 			//no need on user if on userprivs
-			RECORD.r(4, "");
+			RECORD(4) = "";
 		}
 
 		//new password cause entry in users log to renable login if blocked
@@ -347,7 +347,7 @@ function main(in mode) {
 			}
 			RECORD.inserter(18, 1, text);
 
-			RECORD.r(36, datetime);
+			RECORD(36) = datetime;
 		}
 
 		//sort holidays in reverse order
@@ -453,7 +453,7 @@ subroutine updatemirror() {
 	mirror = RECORD.fieldstore(FM, 31, 3, "");
 	var username = RECORD.a(1).ucase();
 	var mirrorkey = "%" ^ username ^ "%";
-	mirror.r(1, ID);
+	mirror(1) = ID;
 	mirror.write(win.srcfile, mirrorkey);
 	return;
 }
@@ -495,7 +495,7 @@ subroutine getdepts() {
 			text.trimmer();
 			if (text and text ne "---") {
 				if (not(depts.locateusing(FM, text, deptn))) {
-					depts.r(-1, text);
+					depts(-1) = text;
 				}
 			}
 		}

@@ -94,18 +94,18 @@ stage2:
 	var datekept = var().date() - ndayskept;
 
 	var tx = "TRIM REQUESTLOG";
-	tx.r(-1, "");
-	tx.r(-1, "Max size desired      " ^ oconv(maxsize, "[XBYTES]"));
-	tx.r(-1, ("Last " ^ perioddays ^ " days").oconv("L#22") ^ oconv(periodsize, "[XBYTES]"));
-	tx.r(-1, "");
-	tx.r(-1, "No. of days to keep   " ^ ndayskept);
-	tx.r(-1, "Delete upto           " ^ oconv(datekept - 1, "[DATE,4*]"));
-	tx.r(-1, "");
-	tx.r(-1, "Minimum date found    " ^ oconv(mindate, "[DATE,4*]"));
+	tx(-1) = "";
+	tx(-1) = "Max size desired      " ^ oconv(maxsize, "[XBYTES]");
+	tx(-1) = ("Last " ^ perioddays ^ " days").oconv("L#22") ^ oconv(periodsize, "[XBYTES]");
+	tx(-1) = "";
+	tx(-1) = "No. of days to keep   " ^ ndayskept;
+	tx(-1) = "Delete upto           " ^ oconv(datekept - 1, "[DATE,4*]");
+	tx(-1) = "";
+	tx(-1) = "Minimum date found    " ^ oconv(mindate, "[DATE,4*]");
 
 	if (mindate ge datekept) {
-		tx.r(-1, "");
-		tx.r(-1, "No need to delete anything");
+		tx(-1) = "";
+		tx(-1) = "No need to delete anything";
 		tx.swapper(FM, "\r\n");
 		printl();
 		printl(tx);
@@ -133,8 +133,8 @@ nextrec2:
 		} else {
 			tt = "Deletable";
 		}
-		tx.r(-1, "");
-		tx.r(-1, tt.oconv("L#22") ^ ndeleted ^ " records - " ^ oconv(sizedeleted, "[XBYTES]"));
+		tx(-1) = "";
+		tx(-1) = tt.oconv("L#22") ^ ndeleted ^ " records - " ^ oconv(sizedeleted, "[XBYTES]");
 
 		//call sysmsg(tx)
 		call log("TRIMREQUESTLOG", tx);

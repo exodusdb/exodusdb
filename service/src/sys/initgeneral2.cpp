@@ -84,7 +84,7 @@ function main(in mode, io logtime, in menu) {
 		hosts.converter(" ", "");
 		var nn = hosts.count(FM) + 1;
 		for (var ln = nn; ln >= 1; --ln) {
-			hosts.r(ln, hosts.a(ln).field("#", 1));
+			hosts(ln) = hosts.a(ln).field("#", 1);
 		} //ln;
 
 		//remove blank lines and convert fm to sm
@@ -162,8 +162,8 @@ function main(in mode, io logtime, in menu) {
 			if (enventry) {
 				tt = enventry.field("=", 1);
 				if (not(SYSTEM.a(12).locate(tt, vn))) {
-					SYSTEM.r(12, vn, tt);
-					SYSTEM.r(13, vn, enventry.field("=", 2, 99999));
+					SYSTEM(12, vn) = tt;
+					SYSTEM(13, vn) = enventry.field("=", 2, 99999);
 				}
 			}
 		} //ii;
@@ -193,11 +193,11 @@ function main(in mode, io logtime, in menu) {
 				if (not(var("\\/").index(tt[-1]))) {
 					tt ^= "/";
 				}
-				baselinks.r(1, linkn, tt);
+				baselinks(1, linkn) = tt;
 			}
 		} //linkn;
-		SYSTEM.r(114, baselinks);
-		SYSTEM.r(115, baselinkdescs);
+		SYSTEM(114) = baselinks;
+		SYSTEM(115) = baselinkdescs;
 
 	} else if (mode eq "COMPRESSLOGS") {
 
@@ -271,10 +271,10 @@ nextuser:
 			if (not(SECURITY.a(1).locate(userid, usern))) {
 				goto nextuser;
 			}
-			userx.r(40, SECURITY.a(6, usern));
-			userx.r(41, SECURITY.a(2, usern));
-			origuser.r(40, origuser.a(40));
-			origuser.r(41, origuser.a(41));
+			userx(40) = SECURITY.a(6, usern);
+			userx(41) = SECURITY.a(2, usern);
+			origuser(40) = origuser.a(40);
+			origuser(41) = origuser.a(41);
 			if (userx ne origuser) {
 				userx.write(users, userid);
 				//user<1>=userid

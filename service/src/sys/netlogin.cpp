@@ -41,7 +41,7 @@ function main(in mode0) {
 
 	//prevent time out
 	var timeoutx = SYSTEM.a(22);
-	SYSTEM.r(22, "");
+	SYSTEM(22) = "";
 
 	var nfailures = "";
 	var nallowable = 3;
@@ -77,9 +77,9 @@ function main(in mode0) {
 	if (not(SYSTEM.a(15))) {
 		if (SECURITY.a(1).locate("MASTER", usern)) {
 			if (SECURITY.a(4, usern, 2).field(TM, 7) eq "") {
-				SYSTEM.r(22, 1000000);
+				SYSTEM(22) = 1000000;
 				userx = "MASTER";
-				SYSTEM.r(15, 1);
+				SYSTEM(15) = 1;
 				ok = 1;
 				goto okfail;
 			}
@@ -188,7 +188,7 @@ fail:
 		//allowed in but no access to authorisation screen
 		ok = keyx eq secid(lockx, 132456);
 		if (ok) {
-			SYSTEM.r(21, "1");
+			SYSTEM(21) = "1";
 			goto okfail;
 		}
 
@@ -252,12 +252,12 @@ okfail:
 		//print char(7):char(7):char(7):
 		msg = "EXODUS SECURITY|";
 
-		msg.r(-1, "Either the name or the password");
-		msg.r(-1, "that you entered is NOT CORRECT.");
-		msg.r(-1, "(maybe you made a typing error)|");
+		msg(-1) = "Either the name or the password";
+		msg(-1) = "that you entered is NOT CORRECT.";
+		msg(-1) = "(maybe you made a typing error)|";
 
 		if (nfailures lt nallowable) {
-			msg.r(-1, "PLEASE TRY AGAIN.|");
+			msg(-1) = "PLEASE TRY AGAIN.|";
 		}
 		call mssg(msg);
 
@@ -274,12 +274,12 @@ okfail:
 		sysrec = "";
 	}
 	if (USERNAME eq "EXODUS") {
-		sysrec.r(4, 0);
+		sysrec(4) = 0;
 	}
 	//call setprivilegesysrec.a(4));
 
 	//break on
-	SYSTEM.r(22, timeoutx);
+	SYSTEM(22) = timeoutx;
 
 	//if mode='SLEEP' then
 	// call mssg('','DB',buff,'')

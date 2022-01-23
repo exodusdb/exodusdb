@@ -114,7 +114,7 @@ getlogkey:
 	}
 
 	//restore interactivity
-	SYSTEM.r(33, s33);
+	SYSTEM(33) = s33;
 
 	return 0;
 }

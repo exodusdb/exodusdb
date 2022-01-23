@@ -71,7 +71,7 @@ function main() {
 		var nprocesslocks = SYSTEM.a(9) - 1;
 		if (nprocesslocks) {
 			longprocesslockno = otherusers2(nprocesslocks);
-			SYSTEM.r(48, longprocesslockno);
+			SYSTEM(48) = longprocesslockno;
 		}else{
 			longprocesslockno = 0;
 		}
@@ -93,7 +93,7 @@ function main() {
 	//save the time last slept or return to avoid checking otherusers all the time
 	//garbagecollect;
 	nowtime=ostime().round(2);
-	SYSTEM.r(26, nowtime);
+	SYSTEM(26) = nowtime;
 
 	//do this after the delay so that parent processes that do not abort
 	//still get delayed

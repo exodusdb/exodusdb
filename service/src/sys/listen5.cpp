@@ -222,7 +222,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					ANS = "RESTART " ^ ospath;
 					return 0;
 				} else {
-					SYSTEM.r(100, ii, newtime);
+					SYSTEM(100, ii) = newtime;
 				}
 			}
 		} //ii;
@@ -241,7 +241,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					}
 						//comment to solve c++ decomp problem
 				} else {
-					SYSTEM.r(100, 3, listen);
+					SYSTEM(100, 3) = listen;
 				}
 			}
 		}
@@ -380,11 +380,11 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				var subject = rec.a(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
 				var body = subject ^ " " ^ patchfilename ^ FM;
 				if (skipreason) {
-					body.r(-1, FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM);
+					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
 				}
 				var nfiles = rec.a(3).count(VM) + 1;
 				for (var filen = 1; filen <= nfiles; ++filen) {
-					body.r(-1, rec.a(3, filen) ^ " " ^ rec.a(4, filen) ^ "  " ^ rec.a(5, filen));
+					body(-1) = rec.a(3, filen) ^ " " ^ rec.a(4, filen) ^ "  " ^ rec.a(5, filen);
 				} //filen;
 
 				//message EXODUS only
@@ -596,8 +596,8 @@ getvalues:
 						USER1.remover(1, ii);
 						iodat_.remover(2, ii);
 						if (not active) {
-							USER1.r(1, nn2, execcode);
-							iodat_.r(2, nn2, reason);
+							USER1(1, nn2) = execcode;
+							iodat_(2, nn2) = reason;
 						}
 						ii -= 1;
 						nn -= 1;
@@ -612,7 +612,7 @@ getvalues:
 			}
 
 			//1=force vm to ensure xml has empty not missing tags
-			iodat_.r(2, 1, USER1.a(2, 1));
+			iodat_(2, 1) = USER1.a(2, 1);
 			iodat_ = invertarray(USER1, 1);
 
 		}
@@ -728,7 +728,7 @@ nextlock:
 					goto nextlock;
 				}
 				nlocks += 1;
-				select2data.r(nlocks, 1, lockx.a(4) ^ VM ^ lockx.a(3) ^ VM ^ lockid.field("*", 1) ^ VM ^ lockid.field("*", 2, 999));
+				select2data(nlocks, 1) = lockx.a(4) ^ VM ^ lockx.a(3) ^ VM ^ lockid.field("*", 1) ^ VM ^ lockid.field("*", 2, 999);
 				goto nextlock;
 			}
 		}
@@ -796,7 +796,7 @@ nextlock:
 			xx = "";
 			call rtp57(lockmode, "", xx, tt, "", yy, zz);
 			call rtp57(unlockmode, "", xx, tt, "", yy, zz);
-			SYSTEM.r(48, "");
+			SYSTEM(48) = "";
 		}
 
 	} else if (request1 eq "STOPDB") {

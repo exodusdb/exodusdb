@@ -185,9 +185,9 @@ nochequeformat:
 				}
 
 				//flag a new record despite being copied
-				RECORD.r(10, "");
-				RECORD.r(11, "");
-				RECORD.r(14, "");
+				RECORD(10) = "";
+				RECORD(11) = "";
+				RECORD(14) = "";
 
 			}
 
@@ -302,7 +302,7 @@ preventupdate:
 				if (temp.read(win.srcfile, "CHEQUEDESIGN*DEFAULT")) {
 					var temp2;
 					if (temp2.read(win.srcfile, "CHEQUEDESIGN*" ^ temp.a(1, 1))) {
-						temp2.r(14, "");
+						temp2(14) = "";
 						temp2.write(win.srcfile, "CHEQUEDESIGN*" ^ temp.a(1, 1));
 					}
 				}
@@ -351,9 +351,9 @@ preventupdate:
 			if (RECORD.a(48) ne win.orec.a(48)) {
 				call anydata("", anydataexists);
 				if (anydataexists) {
-					RECORD.r(48, win.orec.a(48));
+					RECORD(48) = win.orec.a(48);
 					msg = "You cannot change Invoice Number Sequence after data is entered";
-					msg.r(-1, "That change has been ignored.");
+					msg(-1) = "That change has been ignored.";
 					call note(msg);
 				}
 			}
@@ -416,12 +416,12 @@ preventupdate:
 
 			//save the requester if requested createads
 			if (RECORD.a(125) ne win.orec.a(125)) {
-				RECORD.r(128, USERNAME);
+				RECORD(128) = USERNAME;
 			}
 
 			//obfuscate the mark
 			if (VOLUMES) {
-				RECORD.r(1, RECORD.a(1).invert());
+				RECORD(1) = RECORD.a(1).invert();
 			}
 
 		}
@@ -448,7 +448,7 @@ preventupdate:
 			tt.converter(VM, "");
 			tt.swapper("Default", "");
 			if (tt eq "") {
-				RECORD.r(46, "");
+				RECORD(46) = "";
 			}
 
 			//write backup rec on definitions
@@ -458,7 +458,7 @@ preventupdate:
 				if (not(tt.readv(DEFINITIONS, backupkey, 1))) {
 					tt = "";
 				}
-				backuprec.r(1, tt);
+				backuprec(1) = tt;
 
 				backuprec.write(DEFINITIONS, backupkey);
 				smtpkey = "SMTP.CFG";
@@ -474,7 +474,7 @@ preventupdate:
 			//warning if backup drive does not exist/cannot be written to
 			var backupdrives = RECORD.a(77);
 			if (RECORD.a(82) ne RECORD.a(77)) {
-				backupdrives.r(-1, RECORD.a(82));
+				backupdrives(-1) = RECORD.a(82);
 			}
 			for (var driven = 1; driven <= 999; ++driven) {
 				var drive = backupdrives.a(driven)[1];
@@ -510,14 +510,14 @@ preventupdate:
 			var oldhostname = win.orec.a(57);
 			var newhostname = RECORD.a(57);
 			if (newhostname and newhostname ne oldhostname) {
-				SYSTEM.r(57, newhostname);
+				SYSTEM(57) = newhostname;
 				//in INIT.GENERAL and DEFINITION.SUBS
 				if (var("ddns.cmd").osfile()) {
 					perform("STARTDDNS");
 				}
 			}
 
-			SYSTEM.r(58, RECORD.a(58));
+			SYSTEM(58) = RECORD.a(58);
 			gosub reorderdbs();
 
 			return 0;
@@ -664,14 +664,14 @@ subroutine reorderdbs() {
 		var db = dblist.a(1, dbn);
 		var dbcode = db.a(1, 1, 2);
 		if (not(newdbcodes.locate(dbcode, newdbcoden))) {
-			newdbcodes.r(1, newdbcoden, dbcode);
+			newdbcodes(1, newdbcoden) = dbcode;
 		}
-		newdblist.r(1, newdbcoden, db);
+		newdblist(1, newdbcoden) = db;
 	} //dbn;
 
 	//replace substitution and dblist
 	var newdbdir = dbdir;
-	newdbdir.r(1, substitution ^ " " ^ newdblist);
+	newdbdir(1) = substitution ^ " " ^ newdblist;
 
 	//convert to DOS
 	if (newdbdir[-1] ne FM) {
@@ -691,65 +691,65 @@ subroutine postreadfix() {
 	if (ID eq "AGENCY.PARAMS") {
 
 		if (VOLUMES) {
-			RECORD.r(1, RECORD.a(1).invert());
+			RECORD(1) = RECORD.a(1).invert();
 		}
 
 		if (RECORD.a(55) eq "") {
-			RECORD.r(55, "Budget");
+			RECORD(55) = "Budget";
 		}
 		if (RECORD.a(56) eq "") {
-			RECORD.r(56, "F/cast");
+			RECORD(56) = "F/cast";
 		}
 		if (RECORD.a(72) eq "") {
-			RECORD.r(72, "Media Plan");
+			RECORD(72) = "Media Plan";
 		}
 		if (RECORD.a(73) eq "") {
-			RECORD.r(73, "Media Schedule");
+			RECORD(73) = "Media Schedule";
 		}
 		if (RECORD.a(74) eq "") {
-			RECORD.r(74, "Estimate");
+			RECORD(74) = "Estimate";
 		}
 
 		if (RECORD.a(49) eq "") {
-			RECORD.r(49, "<NUMBER>");
+			RECORD(49) = "<NUMBER>";
 		}
 		if (RECORD.a(49, 1, 2) eq "") {
-			RECORD.r(49, 1, 2, "2000.01");
+			RECORD(49, 1, 2) = "2000.01";
 		}
 		if (RECORD.a(50) eq "") {
-			RECORD.r(50, "<NUMBER>");
+			RECORD(50) = "<NUMBER>";
 		}
 		if (RECORD.a(50, 1, 2) eq "") {
-			RECORD.r(50, 1, 2, "2000.01");
+			RECORD(50, 1, 2) = "2000.01";
 		}
 
 		//done in agency.subs getnextid
 		if (RECORD.a(53) eq "") {
-			RECORD.r(53, "<NUMBER>");
+			RECORD(53) = "<NUMBER>";
 		}
 		if (RECORD.a(63) eq "") {
-			RECORD.r(63, "<NUMBER>");
+			RECORD(63) = "<NUMBER>";
 		}
 		if (RECORD.a(69) eq "") {
-			RECORD.r(69, "<NUMBER>");
+			RECORD(69) = "<NUMBER>";
 		}
 		if (RECORD.a(70) eq "") {
-			RECORD.r(70, "<NUMBER>");
+			RECORD(70) = "<NUMBER>";
 		}
 		if (RECORD.a(71) eq "") {
-			RECORD.r(71, "<NUMBER>");
+			RECORD(71) = "<NUMBER>";
 		}
 
 		if (RECORD.a(25) eq "") {
-			RECORD.r(25, "ACC<YEAR>");
+			RECORD(25) = "ACC<YEAR>";
 		}
 		if (RECORD.a(26) eq "") {
-			RECORD.r(26, "WIP<YEAR>");
+			RECORD(26) = "WIP<YEAR>";
 		}
 
 		//copy schedule footer to plan footer
 		if (not(RECORD.a(34))) {
-			RECORD.r(34, RECORD.a(11));
+			RECORD(34) = RECORD.a(11);
 		}
 
 	}

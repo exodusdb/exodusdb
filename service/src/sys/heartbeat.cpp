@@ -72,7 +72,7 @@ function main(in mode, in status0="") {
 				tt = "";
 			}
 			if (tt.a(1).count(VM) lt 10) {
-				tt.r(1, -1, processno);
+				tt(1, -1) = processno;
 				tt.write(DEFINITIONS, "ERROR*PROCESSNO");
 				call sysmsg(processno.quote() ^ "Non-numeric processno in HEARTBEAT " ^ userlockid);
 			}
@@ -80,14 +80,14 @@ function main(in mode, in status0="") {
 
 		var process = SYSTEM;
 		//remove environment variables because mostly the same and waste space
-		process.r(12, "");
-		process.r(13, "");
+		process(12) = "";
+		process(13) = "";
 		//garbagecollect;
-		process.r(27, (var().date() + 24873 + var().time() / 86400).oconv("MD50P"));
-		process.r(51, APPLICATION);
+		process(27) = (var().date() + 24873 + var().time() / 86400).oconv("MD50P");
+		process(51) = APPLICATION;
 		//can never be closed while this is running
-		process.r(52, "");
-		process.r(53, status);
+		process(52) = "";
+		process(53) = status;
 
 		process.write(processes, processno);
 

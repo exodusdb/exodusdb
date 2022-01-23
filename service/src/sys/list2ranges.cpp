@@ -16,7 +16,7 @@ function main(io listitems) {
 
 	//convert single periods to single period ranges
 	for (var ii = 1; ii <= nn; ++ii) {
-		listitems.r(1, ii, 2, listitems.a(1, ii, 1));
+		listitems(1, ii, 2) = listitems.a(1, ii, 1);
 	} //ii;
 
 	//merge ranges if consecutive
@@ -28,7 +28,7 @@ function main(io listitems) {
 		listitem1.converter(".", "");
 		listitem2.converter(".", "");
 		if (listitem1 + 1 eq listitem2) {
-			listitems.r(1, ii - 1, 2, listitems.a(1, ii, 2));
+			listitems(1, ii - 1, 2) = listitems.a(1, ii, 2);
 			listitems.remover(1, ii);
 			nn -= 1;
 		}
@@ -39,7 +39,7 @@ function main(io listitems) {
 		var tt = listitems.a(1, ii);
 		var tt1 = tt.a(1, 1, 1);
 		if (tt1 eq tt.a(1, 1, 2)) {
-			listitems.r(1, ii, tt1);
+			listitems(1, ii) = tt1;
 		}
 	} //ii;
 

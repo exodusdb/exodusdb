@@ -119,7 +119,7 @@ tryagain:
 
 	}
 
-	locklist.r(-1, lockitem);
+	locklist(-1) = lockitem;
 
 	return 1;
 }
@@ -159,7 +159,7 @@ subroutine unlockall(io locklist, io msg) {
 		var lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
 		if (filename ne filename2) {
 			if (not(lockfile.open(filename, ""))) {
-				msg.r(-1, filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL");
+				msg(-1) = filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL";
 				lockfile = "";
 			}
 			filename2 = filename;

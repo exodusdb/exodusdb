@@ -46,23 +46,23 @@ function main(in module, in mode, in stationery) {
 		gosub check_exists_and_maybe_convert(module, mode, stationery, outfile);
 
 		//save back into list in case htm file converted to pdf and changed name
-		outfiles.r(1, filen, outfile);
+		outfiles(1, filen) = outfile;
 
 		//save the web ui "data" in ../../data/ format
 		//TODO web gui to be smarter in accepting files like */data/xxxx/yyyy.htm
 		var t2 = OSSLASH;
 		var tt = outfile.index(t2 ^ "data" ^ t2);
 		if (tt) {
-			USER1.r(1, filen, ".." ^ t2 ^ ".." ^ outfile.substr(tt, 999999));
+			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.substr(tt, 999999);
 		} else {
-			data_.r(1, filen, outfile);
+			data_(1, filen) = outfile;
 		}
 
 	} //filen;
 
 	USER1.converter(VM, ";");
 	//convert vm to ';' in outfiles
-	SYSTEM.r(2, outfiles);
+	SYSTEM(2) = outfiles;
 
 	//if returning many files then always return ok, with any messages as warnings
 	if (nfiles gt 1) {
@@ -86,7 +86,7 @@ fileok:
 		if (stationery gt 2) {
 			call convpdf(outfile, stationery, errors);
 			if (errors) {
-				USER4.r(-1, errors);
+				USER4(-1) = errors;
 			}
 		}
 

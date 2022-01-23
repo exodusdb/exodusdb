@@ -80,30 +80,30 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	if (mode.index("READ")) {
 		//1/2
 		if (preread) {
-			triggers.r(1, preread ^ FM ^ prereadmode);
+			triggers(1) = preread ^ FM ^ prereadmode;
 		}
 		//3/4
 		if (postread) {
-			triggers.r(3, postread ^ FM ^ postreadmode);
+			triggers(3) = postread ^ FM ^ postreadmode;
 		}
 		//5/6
 		if (replaceread) {
-			triggers.r(5, replaceread ^ FM ^ "READ");
+			triggers(5) = replaceread ^ FM ^ "READ";
 		}
 	} else if (mode.index("WRITE")) {
 		if (updatesubs) {
-			triggers.r(1, updatesubs ^ FM ^ "PREWRITE");
-			triggers.r(3, updatesubs ^ FM ^ "POSTWRITE");
+			triggers(1) = updatesubs ^ FM ^ "PREWRITE";
+			triggers(3) = updatesubs ^ FM ^ "POSTWRITE";
 			if (replacewrite) {
-				triggers.r(5, updatesubs ^ FM ^ "WRITE");
+				triggers(5) = updatesubs ^ FM ^ "WRITE";
 			}
 		}
 	} else if (mode.index("DELETE")) {
 		if (updatesubs) {
-			triggers.r(1, updatesubs ^ FM ^ "PREDELETE");
-			triggers.r(3, updatesubs ^ FM ^ "POSTDELETE");
+			triggers(1) = updatesubs ^ FM ^ "PREDELETE";
+			triggers(3) = updatesubs ^ FM ^ "POSTDELETE";
 			if (replacedelete) {
-				triggers.r(5, updatesubs ^ FM ^ "DELETE");
+				triggers(5) = updatesubs ^ FM ^ "DELETE";
 			}
 		}
 	} else if (mode eq "LOCK") {
@@ -127,7 +127,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 			var tt = triggers.a(ii);
 			tt.lcaser();
 			tt.converter(".", "");
-			triggers.r(ii, tt);
+			triggers(ii) = tt;
 		}//ii;
 	}
 

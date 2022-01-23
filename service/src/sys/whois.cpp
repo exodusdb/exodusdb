@@ -68,7 +68,7 @@ function main(in mode, in ipno, out text) {
 	//ZZZ should really detect net ranges like /24 and .*
 	//allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
 	call readhostsallow(allowedips);
-	allowedips.r(-1, SYSTEM.a(39));
+	allowedips(-1) = SYSTEM.a(39);
 	allowedips.converter(FM ^ VM ^ "," "\r\n", var(100).space());
 	if (allowedips.locateusing(" ", ipno, xx)) {
 returnzero:

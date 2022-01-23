@@ -111,7 +111,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 			//password is email address when resetting
 			if (tt.locate(password.ucase(), usern)) {
 				//only if email address occurs more than once
-				tt.r(1, usern, "");
+				tt(1, usern) = "";
 				tt.converter("; ", VM);
 				if (not(tt.locate(password.ucase(), xx))) {
 					username = SECURITY.a(1, usern);
@@ -334,7 +334,7 @@ passfail:
 					}
 
 					//cache the users's converted valid ip nos (ending in ' ')
-					SECURITY.r(6, usern, validips);
+					SECURITY(6, usern) = validips;
 
 				}
 
@@ -503,7 +503,7 @@ passwordexpired:
 
 						//the word "automatic" hardcoded in browser to unlock and lose any work
 						var tt = "You have been automatically logged out due to another login as " ^ (username.quote());
-						tt.r(-1, "Please login or try again later.");
+						tt(-1) = "Please login or try again later.";
 
 						//refuse browser change
 						if (connection.a(1, 6) ne userx.a(39, 6)) {
@@ -568,9 +568,9 @@ passwordexpired:
 
 										body = "This is an automated email from your EXODUS database " ^ SYSTEM.a(17, 1);
 										body ^= " recording a successful login from the ip number " ^ ipno;
-										body.r(-1, "by " ^ userx.a(1) ^ " (" ^ username ^ ")");
+										body(-1) = "by " ^ userx.a(1) ^ " (" ^ username ^ ")";
 										//not in the last 100 login ips
-										body.r(-1, FM ^ "You will not be notified of any further successful logins by " ^ username ^ " from this ip number for a while.");
+										body(-1) = FM ^ "You will not be notified of any further successful logins by " ^ username ^ " from this ip number for a while.";
 
 										if (whoistx) {
 											gosub addwhoistx();
@@ -590,8 +590,8 @@ passwordexpired:
 
 							body = "Welcome to EXODUS!";
 							//in security.subs and listen2
-							body.r(1, -1, VM ^ "Browser configuration *REQUIRED*");
-							body.r(1, -1, "http://userwiki.neosys.com/index.php/gettingstarted");
+							body(1, -1) = VM ^ "Browser configuration *REQUIRED*";
+							body(1, -1) = "http://userwiki.neosys.com/index.php/gettingstarted";
 
 							//add whoistx for non-lan ipnos
 							call whois("", ipno, whoistx);
@@ -705,7 +705,7 @@ validateexit2:
 							call securitysubs("GENERATEPASSWORD");
 							newpassword = win.is;
 
-							RECORD.r(4, newpassword);
+							RECORD(4) = newpassword;
 
 							//request5='New password emailed to ':@record<7>
 
@@ -770,9 +770,9 @@ validateexit2:
 				//trim long user records
 				if (RECORD.length() gt 5000) {
 					var nitems = RECORD.a(15).count(VM) + 1;
-					RECORD.r(15, RECORD.a(15).field(VM, 1, nitems - 5));
-					RECORD.r(16, RECORD.a(16).field(VM, 1, nitems - 5));
-					RECORD.r(18, RECORD.a(18).field(VM, 1, nitems - 5));
+					RECORD(15) = RECORD.a(15).field(VM, 1, nitems - 5);
+					RECORD(16) = RECORD.a(16).field(VM, 1, nitems - 5);
+					RECORD(18) = RECORD.a(18).field(VM, 1, nitems - 5);
 				}
 
 				//update without locking if not resetting password ?!
@@ -796,11 +796,11 @@ validateexit2:
 					var ccaddrs = "";
 					var subject = "EXODUS Password Reset";
 					body = "";
-					body.r(-1, "Hi! Your new password is " ^ newpassword);
-					body.r(-1, FM ^ "* Your usercode is " ^ ID);
-					body.r(-1, FM ^ "This is for");
-					body.r(-1, "Database: " ^ SYSTEM.a(23) ^ " (" ^ SYSTEM.a(17) ^ ")");
-					body.r(-1, "System: " ^ SYSTEM.a(44));
+					body(-1) = "Hi! Your new password is " ^ newpassword;
+					body(-1) = FM ^ "* Your usercode is " ^ ID;
+					body(-1) = FM ^ "This is for";
+					body(-1) = "Database: " ^ SYSTEM.a(23) ^ " (" ^ SYSTEM.a(17) ^ ")";
+					body(-1) = "System: " ^ SYSTEM.a(44);
 
 					body.swapper(FM, "\r\n");
 					call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
@@ -898,12 +898,12 @@ validateexit2:
 				//to avoid garbagecollect delay required to avoid MD conversion bug
 				//by not doing 'MD50P'
 				//statistic<1>=(date()+time()/86400) 'MD50P'
-				statistic.r(1, (var().date() + var().time() / 86400).substr(1, 12));
+				statistic(1) = (var().date() + var().time() / 86400).substr(1, 12);
 				if (word2 ne "RELOCK") {
-					statistic.r(2, statistic.a(2) + 1);
+					statistic(2) = statistic.a(2) + 1;
 				}
 				//enable fast stats without cross database user access
-				statistic.r(3, userrec.a(5));
+				statistic(3) = userrec.a(5);
 				statistic.write(statistics, key);
 			}
 
@@ -959,7 +959,7 @@ validateexit2:
 			//convert old data
 			if (userrec.a(13) ne userrec.a(15, 1) and userrec.a(18) eq "") {
 				if (userrec.a(15) and not(userrec.a(18))) {
-					userrec.r(18, "OK");
+					userrec(18) = "OK";
 				}
 				userrec.inserter(15, 1, userrec.a(13));
 				userrec.inserter(16, 1, userrec.a(14));
@@ -969,8 +969,8 @@ validateexit2:
 			//save current login
 			//datetime=(date():'.':time() 'R(0)#5')+0
 			var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
-			userrec.r(13, datetime);
-			userrec.r(14, SYSTEM.a(40, 2));
+			userrec(13) = datetime;
+			userrec(14) = SYSTEM.a(40, 2);
 
 			//save historical logins
 			userrec.inserter(15, 1, userrec.a(13));
@@ -978,16 +978,16 @@ validateexit2:
 			userrec.inserter(18, 1, "OK");
 
 			//only keep the last 100 logins
-			userrec.r(15, userrec.a(15).field(VM, 1, 100));
-			userrec.r(16, userrec.a(16).field(VM, 1, 100));
-			userrec.r(18, userrec.a(18).field(VM, 1, 100));
+			userrec(15) = userrec.a(15).field(VM, 1, 100);
+			userrec(16) = userrec.a(16).field(VM, 1, 100);
+			userrec(18) = userrec.a(18).field(VM, 1, 100);
 
 			if (authcompcodes) {
-				userrec.r(33, authcompcodes);
+				userrec(33) = authcompcodes;
 			}
 
 			//connection
-			userrec.r(39, request4);
+			userrec(39) = request4;
 
 			userrec.write(users, username);
 
@@ -1010,7 +1010,7 @@ validateexit2:
 		//////////////////////////////////////////////////////////////////////
 		//VERY IMPORTANT TO AVOID LONG RUNNING SYSTEM PROCESSES FROM TIMING OUT
 		//////////////////////////////////////////////////////////////////////
-		SYSTEM.r(25, "");
+		SYSTEM(25) = "";
 
 		//determine the responsefile name from the printfilename
 		//responsefilename=system<2>
@@ -1035,7 +1035,7 @@ validateexit2:
 		call ossleep(1000*2);
 
 		//indicate that response has been made
-		SYSTEM.r(2, "");
+		SYSTEM(2) = "";
 
 	} else {
 		printl(request1.quote(), " invalid request in LISTEN2");
@@ -1063,12 +1063,12 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	STATION=(tt);
 
 	//restore default style
-	SYSTEM.r(46, SYSTEM.a(47));
+	SYSTEM(46) = SYSTEM.a(47);
 
 	//in LISTEN2 and INIT.COMPANY
 	var companystyle = sys.company.a(70);
 	if (companystyle) {
-		SYSTEM.r(46, companystyle);
+		SYSTEM(46) = companystyle;
 	}
 
 	//get user style
@@ -1091,10 +1091,10 @@ subroutine becomeuserandconnection(in request2, in request4) {
 			var chkauth = 0;
 			if (chkauth) {
 				fields = "";
-				fields.r(1, "REPORT HEAD COLOR");
-				fields.r(2, "REPORT BODY COLOR");
-				fields.r(3, "REPORT FONT NAME");
-				fields.r(8, "REPORT FONT SIZE");
+				fields(1) = "REPORT HEAD COLOR";
+				fields(2) = "REPORT BODY COLOR";
+				fields(3) = "REPORT FONT NAME";
+				fields(8) = "REPORT FONT SIZE";
 			}
 
 			var runstyles = SYSTEM.a(46);
@@ -1127,10 +1127,10 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				} else if (tt2 eq "Default") {
 				} else if (tt2 eq "100") {
 				} else {
-					runstyles.r(1, vn, tt2);
+					runstyles(1, vn) = tt2;
 				}
 			} //vn;
-			SYSTEM.r(46, runstyles);
+			SYSTEM(46) = runstyles;
 			//system<10,1>=userrec<1>
 			//system<10,2>=userrec<7>
 
@@ -1142,9 +1142,9 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 subroutine addwhoistx() {
 	if (whoistx) {
-		body.r(-1, FM ^ "\"whois\" ip number " ^ ipno ^ " information:");
-		body.r(-1, FM ^ whoistx);
-		body.r(-1, FM ^ "end of " "\"whois\" ip number " ^ ipno ^ " information:");
+		body(-1) = FM ^ "\"whois\" ip number " ^ ipno ^ " information:";
+		body(-1) = FM ^ whoistx;
+		body(-1) = FM ^ "end of " "\"whois\" ip number " ^ ipno ^ " information:";
 	}
 	return;
 }

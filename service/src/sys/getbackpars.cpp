@@ -59,7 +59,7 @@ function main(out bakpars, in process0=var()) {
 	if (tt.osread("backup.cfg")) {
 		for (var ii = 1; ii <= 99; ++ii) {
 			if (tt.a(ii).length()) {
-				bakpars.r(ii, tt.a(ii));
+				bakpars(ii) = tt.a(ii);
 			}
 		} //ii;
 	}
@@ -69,7 +69,7 @@ function main(out bakpars, in process0=var()) {
 	if (tt.osread(configfilename)) {
 		for (var ii = 1; ii <= 99; ++ii) {
 			if (tt.a(ii).length()) {
-				bakpars.r(ii, tt.a(ii));
+				bakpars(ii) = tt.a(ii);
 			}
 		} //ii;
 	}
@@ -78,39 +78,39 @@ function main(out bakpars, in process0=var()) {
 		//if bakpars<3>='' then bakpars<3>='2:00'
 		//if bakpars<4>='' then bakpars<4>='2:05'
 		if (minbaktime_ eq "") {
-			bakpars.r(3, "1:00");
+			bakpars(3) = "1:00";
 		}
 		if (maxbaktime_ eq "") {
-			bakpars.r(4, "1:05");
+			bakpars(4) = "1:05";
 		}
 		if (not(minbaktime_.isnum())) {
-			bakpars.r(3, minbaktime_.iconv("MT"));
+			bakpars(3) = minbaktime_.iconv("MT");
 		}
 		if (not(maxbaktime_.isnum())) {
-			bakpars.r(4, maxbaktime_.iconv("MT"));
+			bakpars(4) = maxbaktime_.iconv("MT");
 		}
 		if (bakdows_ eq "") {
-			bakpars.r(5, "1234567");
+			bakpars(5) = "1234567";
 		}
 	} else {
 		//suppress on exodus
-		bakpars.r(3, -1);
-		bakpars.r(4, -1);
+		bakpars(3) = -1;
+		bakpars(4) = -1;
 	}
 
 	//fix bug in data entry that allows : and :: to be entered
 	if (bakdisk_[1] eq ":") {
-		bakpars.r(7, "");
+		bakpars(7) = "";
 	}
 	if (bakdisk2_[1] eq ":") {
-		bakpars.r(12, "");
+		bakpars(12) = "";
 	}
 
 	if (not(bakdisk_)) {
-		bakpars.r(7, "C:");
+		bakpars(7) = "C:";
 	}
 	if (bakdisk2_ eq "") {
-		bakpars.r(12, bakdisk_);
+		bakpars(12) = bakdisk_;
 	}
 
 	//backup depending on configuration file
@@ -121,7 +121,7 @@ function main(out bakpars, in process0=var()) {
 	if (dbcodes and VOLUMES) {
 
 		//databases to be excluded
-		bakpars.r(8, "");
+		bakpars(8) = "";
 
 		//decide backup required or not by indicating testdata
 		if (dbcodes.locate(dbcode, dbn)) {
@@ -130,7 +130,7 @@ function main(out bakpars, in process0=var()) {
 			tt = 0;
 		}
 		//test/nonlive data
-		bakpars.r(11, not(tt));
+		bakpars(11) = not(tt);
 
 	//otherwise backup depending on backup.cfg etc
 	} else {
@@ -149,7 +149,7 @@ function main(out bakpars, in process0=var()) {
 					testdata = 0;
 				}
 			}
-			bakpars.r(11, testdata);
+			bakpars(11) = testdata;
 		}
 
 	}

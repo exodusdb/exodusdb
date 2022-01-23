@@ -344,7 +344,7 @@ function main() {
 
 		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {
 		//gosub change2
-			ANS.r(1, -1, tx);
+			ANS(1, -1) = tx;
 		}
 
 	//if index(tx,'MSG(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) ) then
@@ -515,7 +515,7 @@ function main() {
 	for (var ii = 1; ii <= nfields; ++ii) {
 	//if trim(x(i))[1,1]='*' then x(i)=''
 		if (RECORD.a(ii).trim()[1] eq "*") {
-			RECORD.r(ii, "");
+			RECORD(ii) = "";
 		}
 	} //ii;
 	//@record=matunparse(x)

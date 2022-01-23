@@ -24,8 +24,8 @@ function main() {
 
 	var filename = SENTENCE.field(" ", 2);
 	var syntax = "Syntax is:";
-	syntax.r(-1, "CLEARFIELD filename fieldnoorname ... /\"clear to value\"");
-	syntax.r(-1, "eg CLEARFIELD TASKS STATUS /\"Completed\"");
+	syntax(-1) = "CLEARFIELD filename fieldnoorname ... /\"clear to value\"";
+	syntax(-1) = "eg CLEARFIELD TASKS STATUS /\"Completed\"";
 	if (not filename) {
 		call mssg(syntax);
 		stop();
@@ -80,14 +80,14 @@ tryagain:
 					} else if (dict.a(1) eq "G") {
 						var tt = dict.a(3);
 						tt.converter(" ", FM);
-						fns.r(ii, tt);
+						fns(ii) = tt;
 						nfields = fns.count(FM) + 1;
 						goto tryagain;
 					}
 				}
 			}
 			if (fn.isnum()) {
-				fns.r(ii, fn);
+				fns(ii) = fn;
 			} else {
 				call mssg(SENTENCE ^ "|FIELD NUMBER " ^ fn ^ " IS NOT NUMERIC AND|NOT AN \"F\" DICTIONARY ITEM!?" ^ FM ^ FM ^ syntax);
 				stop();
@@ -134,7 +134,8 @@ next:
 		for (var ii = 1; ii <= nfields; ++ii) {
 			if (RECORD.a(fns.a(ii)) ne cleartovalue2) {
 				cleared = 1;
-				RECORD.r(fns.a(ii), cleartovalue2);
+				//RECORD(fns.a(ii)) = cleartovalue2;
+				pickreplacer(RECORD, fns.a(ii), cleartovalue2);
 			}
 		} //ii;
 		if (cleared) {

@@ -71,11 +71,11 @@ function main() {
 	if (not runasusercode) {
 syntax:
 		msg = "Syntax is";
-		msg.r(-1, "CREATEALERT alertid module alerttype runhours,...:rundoms,...");
-		msg.r(-1, "runasusercode {targetusercode,...} {testemail} (options)");
-		msg.r(-1, FM ^ "module=GENERAL/FINANCE/AGENCY/MEDIA/JOB");
-		msg.r(-1, "6 required parameters plus {} means optional");
-		msg.r(-1, "options: O=Overwrite R=Remove S=Silent ROS=forget lastruntime");
+		msg(-1) = "CREATEALERT alertid module alerttype runhours,...:rundoms,...";
+		msg(-1) = "runasusercode {targetusercode,...} {testemail} (options)";
+		msg(-1) = FM ^ "module=GENERAL/FINANCE/AGENCY/MEDIA/JOB";
+		msg(-1) = "6 required parameters plus {} means optional";
+		msg(-1) = "options: O=Overwrite R=Remove S=Silent ROS=forget lastruntime";
 		call mssg(msg);
 		stop();
 	}
@@ -98,9 +98,9 @@ syntax:
 	tt.converter(":0123456789," ^ VM, "");
 	if (tt) {
 		msg = runhours.quote() ^ " invalid runhours/rundates";
-		msg.r(-1, "Examples:");
-		msg.r(-1, "2,17 for noon and 5pm");
-		msg.r(-1, "2,17:7,14 for noon and 5pm on the 7th and 14th");
+		msg(-1) = "Examples:";
+		msg(-1) = "2,17 for noon and 5pm";
+		msg(-1) = "2,17:7,14 for noon and 5pm on the 7th and 14th";
 		call mssg(msg);
 		stop();
 	}
@@ -139,16 +139,16 @@ syntax:
 	var docid = alertid;
 
 	sys.document = "";
-	sys.document.r(30, testemail);
-	sys.document.r(22, runhours.field(":", 1));
-	sys.document.r(23, runhours.field(":", 2));
-	sys.document.r(24, runhours.field(":", 3));
-	sys.document.r(25, runhours.field(":", 4));
-	sys.document.r(26, runhours.field(":", 5));
-	sys.document.r(27, runhours.field(":", 6));
+	sys.document(30) = testemail;
+	sys.document(22) = runhours.field(":", 1);
+	sys.document(23) = runhours.field(":", 2);
+	sys.document(24) = runhours.field(":", 3);
+	sys.document(25) = runhours.field(":", 4);
+	sys.document(26) = runhours.field(":", 5);
+	sys.document(27) = runhours.field(":", 6);
 	//document<28>=
-	sys.document.r(31, module);
-	sys.document.r(32, alerttype);
+	sys.document(31) = module;
+	sys.document(32) = alerttype;
 
 	call autorun2("WRITE", title, module, request, datax, runasusercode, targetusercodes, sys.document, docid, msg);
 

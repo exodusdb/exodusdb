@@ -35,7 +35,7 @@ function main() {
 		dfs ^= ".txt";
 		}
 	var prnfile = dfs;
-	SYSTEM.r(2, prnfile);
+	SYSTEM(2) = prnfile;
 
 	//redirect printed output to a dos file
 	call oswrite("", prnfile);
@@ -43,14 +43,14 @@ function main() {
 	//check file has been prepared
 	if (not(prnfile.osfile())) {
 		var msg = "OUTPUT FILE FOR PRINTOUT CANNOT BE CREATED.";
-		msg.r(-1, "|" ^ (DQ ^ (oscwd() ^ prnfile ^ DQ)) ^ "|");
+		msg(-1) = "|" ^ (DQ ^ (oscwd() ^ prnfile ^ DQ)) ^ "|";
 		call mssg(msg);
 		var().stop();
 	}
 
 	//equ getflag to system<3>;*1=printing program has reset setptr to prn and done its own printing
 	//called program can set it to 1 or 0 or leave as ''
-	SYSTEM.r(3, "");
+	SYSTEM(3) = "";
 
 	//put up a message
 	if (not OPTIONS.index("S"))
@@ -70,7 +70,7 @@ function main() {
 		dfs = prnfile;
 	}
 
-	SYSTEM.r(2, "");
+	SYSTEM(2) = "";
 	var filelen = prnfile.osfile().a(1);
 
 	//fail if print file less than 2 characters long

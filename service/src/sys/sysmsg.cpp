@@ -165,24 +165,24 @@ function main(in msg0, in subject0="", in username0="") {
 		var l9 = "L#9";
 		body = "";
 		//body<-1>='Message=':fm:msg
-		body.r(-1, msg);
+		body(-1) = msg;
 		body ^= FM;
-		body.r(-1, oconv("Server:", l9) ^ SYSTEM.a(44).trim());
-		body.r(-1, oconv("Install:", l9) ^ oscwd());
+		body(-1) = oconv("Server:", l9) ^ SYSTEM.a(44).trim();
+		body(-1) = oconv("Install:", l9) ^ oscwd();
 		//osread ver from 'general\version.dat' then
 		var verfilename = "general/version.dat";
 		verfilename.converter("/", OSSLASH);
 		if (ver.osread(verfilename)) {
-			body.r(-1, oconv("Version:", l9) ^ ver.a(1));
+			body(-1) = oconv("Version:", l9) ^ ver.a(1);
 		}
-		body.r(-1, oconv("Database:", l9) ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17));
-		body.r(-1, oconv("Process:", l9) ^ SYSTEM.a(24));
-		body.r(-1, oconv("Client:", l9) ^ STATION.trim());
+		body(-1) = oconv("Database:", l9) ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17);
+		body(-1) = oconv("Process:", l9) ^ SYSTEM.a(24);
+		body(-1) = oconv("Client:", l9) ^ STATION.trim();
 		//blank IP No indicates not in a web request
 		if (SYSTEM.a(40, 2)) {
-			body.r(-1, oconv("IP No:", l9) ^ SYSTEM.a(40, 2));
+			body(-1) = oconv("IP No:", l9) ^ SYSTEM.a(40, 2);
 		}
-		body.r(-1, oconv("User:", l9) ^ username.trim());
+		body(-1) = oconv("User:", l9) ^ username.trim();
 		if (userfullname and userfullname.trim().ucase() ne username) {
 			body ^= " (" ^ userfullname ^ ")";
 		}
@@ -199,35 +199,35 @@ function main(in msg0, in subject0="", in username0="") {
 		if (agent) {
 
 			call htmllib2("OCONV.AGENT.OS", agent);
-			body.r(-1, oconv("O/S:", l9) ^ agent);
+			body(-1) = oconv("O/S:", l9) ^ agent;
 
 			agent = SYSTEM.a(40, 6);
 			call htmllib("OCONV.AGENT.BROWSER", agent);
-			body.r(-1, oconv("Browser:", l9) ^ agent);
+			body(-1) = oconv("Browser:", l9) ^ agent;
 
 		}
 
 		if (addhw) {
-			body.r(-1, oconv("@hw:", l9) ^ HW);
+			body(-1) = oconv("@hw:", l9) ^ HW;
 		}
 
 		var temp = SYSTEM.a(132);
 		if (temp) {
-			SYSTEM.r(132, "");
+			SYSTEM(132) = "";
 		} else {
 			//call returnstacktemp);
 		}
-		body.r(-1, oconv("Stack:", l9) ^ temp);
+		body(-1) = oconv("Stack:", l9) ^ temp;
 
 		if (USER0) {
 			temp = USER0;
 			temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, "`^]}\\~");
-			body.r(-1, oconv("Request:", l9) ^ temp);
+			body(-1) = oconv("Request:", l9) ^ temp;
 		}
 
 		//body<-1>='Message:' l9:fm:msg
 		if (ID) {
-			body.r(-1, oconv("@ID:", l9) ^ ID);
+			body(-1) = oconv("@ID:", l9) ^ ID;
 		}
 
 		if (USER1) {
@@ -241,12 +241,12 @@ function main(in msg0, in subject0="", in username0="") {
 			temp.swapper("\\", "%5C");
 			temp.swapper("~", "%7E");
 			temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, "`^]}\\~");
-			body.r(-1, oconv("Data:", l9) ^ temp);
+			body(-1) = oconv("Data:", l9) ^ temp;
 		}
 
 		var requeststarttime = SYSTEM.a(25);
 		if (requeststarttime) {
-			body.r(-1, oconv("Duration:", l9) ^ elapsedtimetext(var().date(), requeststarttime));
+			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(var().date(), requeststarttime);
 		}
 
 		body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
@@ -256,11 +256,11 @@ function main(in msg0, in subject0="", in username0="") {
 
 	//limit max 60 sysmsg emails per hour
 	var params = "";
-	params.r(1, 60);
-	params.r(2, 60);
-	params.r(3, 60);
-	params.r(4, "DOS");
-	params.r(5, "sysmsg.$rr");
+	params(1) = 60;
+	params(2) = 60;
+	params(3) = 60;
+	params(4) = "DOS";
+	params(5) = "sysmsg.$rr";
 	var exceedmsg = "SYSMSG email suppressed because > 60 in last 60 mins";
 	//call roundrobin('ONEVENT',params,result,errormsg)
 	call roundrobin("ONEVENT", params, result, xx);

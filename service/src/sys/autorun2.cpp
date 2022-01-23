@@ -61,7 +61,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//default runtime to once
 	if (not(sys.document.field(FM, 20, 10).convert(FM, ""))) {
 		//run once now
-		sys.document.r(27, 1);
+		sys.document(27) = 1;
 	}
 
 	var fullrequest = module ^ "PROXY" ^ FM ^ request;
@@ -128,7 +128,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 						if (seniorfirst) {
 							targetusercodes.inserter(1, 1, tt);
 						} else {
-							targetusercodes.r(1, -1, tt);
+							targetusercodes(1, -1) = tt;
 						}
 					}
 				}
@@ -166,17 +166,17 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	//got all data, prepare autorun document
 
-	sys.document.r(2, title);
-	sys.document.r(5, lower(fullrequest));
-	sys.document.r(6, lower(datax));
-	sys.document.r(1, runasusercode);
-	sys.document.r(14, targetusercodes);
+	sys.document(2) = title;
+	sys.document(5) = lower(fullrequest);
+	sys.document(6) = lower(datax);
+	sys.document(1) = runasusercode;
+	sys.document(14) = targetusercodes;
 
-	sys.document.r(7, APPLICATION);
-	sys.document.r(3, var().date());
-	sys.document.r(4, var().time());
+	sys.document(7) = APPLICATION;
+	sys.document(3) = var().date();
+	sys.document(4) = var().time();
 	if (sys.document.a(12) eq "") {
-		sys.document.r(12, 1);
+		sys.document(12) = 1;
 	}
 
 	//email delivery - save if report successful or not run
@@ -185,7 +185,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		//to force rerun delete and recreate
 		var olddoc;
 		if (olddoc.read(sys.documents, docid)) {
-			sys.document.r(13, olddoc.a(13));
+			sys.document(13) = olddoc.a(13);
 		}
 	} else {
 		var saveid = ID;

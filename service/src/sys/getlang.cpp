@@ -59,13 +59,13 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 				nn = n1;
 			}
 			for (var fn = 1; fn <= nn; ++fn) {
-				//lang.r(fn, (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim());
+				//lang(fn) = (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim();
 				var lang1line = lang1.a(fn);
 				var lang2line = lang2.a(fn);
 				var nparts = dcount(lang1line, "|");
 				if (nparts eq 1) {
 					//eg English Arabic
-					lang.r(fn, (lang1line ^ " " ^ lang2line).trim());
+					lang(fn) = (lang1line ^ " " ^ lang2line).trim();
 				} else {
 					//eg January Janvier|February Fevruar| etc.
 					var bilingual = "";
@@ -74,7 +74,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 					}
 					//bilingual[-1,1]="";
 					bilingual.popper();
-					lang.r(fn, bilingual);
+					lang(fn) = bilingual;
 				}
 			} //fn;
 		} else {
@@ -128,7 +128,7 @@ exit:
 				if (tt eq "\"\"") {
 					tt = "";
 				}
-				lang.r(fn, custlang.a(fn));
+				lang(fn) = custlang.a(fn);
 			}
 		} //fn;
 	}
@@ -143,8 +143,8 @@ exit:
 				codepage = "";
 			}
 getupperlower:
-			lang.r(9, codepage.a(1, 9));
-			lang.r(10, codepage.a(1, 10));
+			lang(9) = codepage.a(1, 9);
+			lang(10) = codepage.a(1, 10);
 
 		//central european including poland
 		} else if (codepage eq "852") {
@@ -160,7 +160,7 @@ getupperlower:
 	//swap '(Base)' with '(':base.currency:')' in lang
 	lang.swapper("(Base)", "(" ^ SYSTEM.a(134) ^ ")");
 
-	lang.r(100, languagecode);
+	lang(100) = languagecode;
 	return 0;
 }
 
@@ -207,7 +207,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 			for (var ii = 1; ii <= nn; ++ii) {
 				var tt = lang.a(ii).field(var().chr(170), 2);
 				if (tt) {
-					lang.r(ii, tt);
+					lang(ii) = tt;
 				}
 			} //ii;
 		}

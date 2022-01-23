@@ -39,11 +39,11 @@ function main(in mode, in params, io result, io msg) {
 
 		//here we have maximum of 6 events per last 6x6 seconds
 		var params2 = "";
-		params2.r(1, 6);
-		params2.r(2, 6);
-		params2.r(3, 6);
-		params2.r(4, "DOS");
-		params2.r(5, "TEST.DAT");
+		params2(1) = 6;
+		params2(2) = 6;
+		params2(3) = 6;
+		params2(4) = "DOS";
+		params2(5) = "TEST.DAT";
 		//osdelete params2<5>
 
 		printl();
@@ -102,12 +102,12 @@ function main(in mode, in params, io result, io msg) {
 		//nb start from lastperiodn+1 to avoid clearing current period multiple times
 		//ie clear only on the first time that we arrive in it
 		for (var periodn = lastperiodn + 1; periodn <= currentperiodn; ++periodn) {
-			roundrobin.r(2, periodn.mod(periodsperwindow_) + 1, "");
+			roundrobin(2, periodn.mod(periodsperwindow_) + 1) = "";
 		} //periodn;
 
 		//record the current period as the last period so that in the next call
 		//we can clear skipped periods (but not the current period again)
-		roundrobin.r(1, currentperiodn);
+		roundrobin(1) = currentperiodn;
 		var currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
 
 		if (roundrobin.a(2).sum() lt maxeventsperwindow_) {
@@ -115,7 +115,7 @@ function main(in mode, in params, io result, io msg) {
 			result = 1;
 
 			//increment the current number of events in the current period
-			roundrobin.r(2, currentbreakn, roundrobin.a(2, currentbreakn) + 1);
+			roundrobin(2, currentbreakn) = roundrobin.a(2, currentbreakn) + 1;
 
 		} else {
 			result = 0;

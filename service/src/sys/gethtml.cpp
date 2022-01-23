@@ -55,7 +55,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 				{}
 			}
 			if (VOLUMES) {
-				letterheadcompany.r(27, letterheadcompany.a(27).invert());
+				letterheadcompany(27) = letterheadcompany.a(27).invert();
 			}
 		}
 	}
@@ -264,12 +264,12 @@ subroutine getcompanyconfig(io html, io mode) {
 
 	//start a one row 100% width table to aid formatting
 	if (usetable) {
-		tab.r(-1, "<table width=100% cellspacing=0 cellpadding=0 borderpadding=0");
+		tab(-1) = "<table width=100% cellspacing=0 cellpadding=0 borderpadding=0";
 		tab ^= " style=\"border-collapse:collapse\"";
 		tab ^= ">";
-		tab.r(-1, " <tr>");
+		tab(-1) = " <tr>";
 	} else {
-		tab.r(-1, "<div>");
+		tab(-1) = "<div>";
 	}
 
 	for (var coln = 1; coln <= ncols; ++coln) {
@@ -285,8 +285,8 @@ subroutine getcompanyconfig(io html, io mode) {
 
 		//start a new TD
 		if (usetable) {
-			tab.r(-1, "");
-			tab.r(-1, "  <td");
+			tab(-1) = "";
+			tab(-1) = "  <td";
 			tab ^= " width=" ^ (100 / ncols).floor() ^ "%";
 			tab ^= ">";
 		}
@@ -348,7 +348,7 @@ subroutine getcompanyconfig(io html, io mode) {
 			var fullimageurl = url ^ imagepath ^ imagefilename;
 			var relativeimagefilename = "../.." ^ imagepath ^ imagefilename;
 
-			tab.r(-1, "   <img src=" ^ (fullimageurl.quote()) ^ " alt=" ^ (fullimageurl.quote()));
+			tab(-1) = "   <img src=" ^ (fullimageurl.quote()) ^ " alt=" ^ (fullimageurl.quote());
 			var sq = "'";
 			tab ^= " onerror=\"this.onerror=null;this.src=" ^ sq ^ relativeimagefilename ^ sq ^ ";\"";
 			tab ^= " style=\"margin:0;border:0\"";
@@ -377,22 +377,22 @@ subroutine getcompanyconfig(io html, io mode) {
 		if (text) {
 			text.swapper(TM, "<br />" "\r\n");
 			tab ^= div;
-			tab.r(-1, text);
+			tab(-1) = text;
 			tab ^= divx;
 		}
 
 		if (usetable) {
-			tab.r(-1, "  </td>");
+			tab(-1) = "  </td>";
 		}
 
 	} //coln;
 
 	if (usetable) {
-		tab.r(-1, "");
-		tab.r(-1, " </tr>");
-		tab.r(-1, "</table>");
+		tab(-1) = "";
+		tab(-1) = " </tr>";
+		tab(-1) = "</table>";
 	} else {
-		tab.r(-1, "</div>");
+		tab(-1) = "</div>";
 	}
 
 	html = tab;

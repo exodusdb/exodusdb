@@ -169,14 +169,14 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		} else {
 			//wgetrc<-1>='output_document=':tempfilename2
 			if (httpsbug) {
-				wgetrc.r(-1, "check-certificate=off");
+				wgetrc(-1) = "check-certificate=off";
 			}
-			wgetrc.r(-1, "logfile=" ^ logfilename);
-			wgetrc.r(-1, "cache=off");
-			wgetrc.r(-1, "referer=" ^ referer);
-			wgetrc.r(-1, "tries=3");
-			wgetrc.r(-1, "timeout=10");
-			wgetrc.r(-1, "background=on");
+			wgetrc(-1) = "logfile=" ^ logfilename;
+			wgetrc(-1) = "cache=off";
+			wgetrc(-1) = "referer=" ^ referer;
+			wgetrc(-1) = "tries=3";
+			wgetrc(-1) = "timeout=10";
+			wgetrc(-1) = "background=on";
 		}
 
 		//http proxy
@@ -190,8 +190,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				cmd ^= " --proxy=on";
 				cmd ^= " --execute http_proxy=" ^ SYSTEM.a(56, 1);
 			} else {
-				wgetrc.r(-1, "use_proxy=on");
-				wgetrc.r(-1, "http_proxy=" ^ SYSTEM.a(56, 1));
+				wgetrc(-1) = "use_proxy=on";
+				wgetrc(-1) = "http_proxy=" ^ SYSTEM.a(56, 1);
 			}
 
 			if (SYSTEM.a(56, 3)) {
@@ -199,8 +199,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 					cmd ^= " --proxy-user=" ^ SYSTEM.a(56, 3);
 					cmd ^= " --proxy-password=" ^ SYSTEM.a(56, 4);
 				} else {
-					wgetrc.r(-1, "proxy_user=" ^ SYSTEM.a(56, 3));
-					wgetrc.r(-1, "proxy_password=" ^ SYSTEM.a(56, 4));
+					wgetrc(-1) = "proxy_user=" ^ SYSTEM.a(56, 3);
+					wgetrc(-1) = "proxy_password=" ^ SYSTEM.a(56, 4);
 				}
 			}
 
@@ -213,8 +213,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				cmd ^= " --user=" ^ httpuser;
 				cmd ^= " --password=" ^ httppass;
 			} else {
-				wgetrc.r(-1, "user=" ^ httpuser);
-				wgetrc.r(-1, "password=" ^ httppass);
+				wgetrc(-1) = "user=" ^ httpuser;
+				wgetrc(-1) = "password=" ^ httppass;
 				}
 			}
 
@@ -227,7 +227,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			if (post) {
 				cmd ^= " -O " ^ tempfilename2;
 			} else {
-				wgetrc.r(-1, "output_document=" ^ tempfilename2);
+				wgetrc(-1) = "output_document=" ^ tempfilename2;
 			}
 		}
 

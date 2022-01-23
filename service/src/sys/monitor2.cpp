@@ -258,7 +258,7 @@ nextstatistic:
 			hourn = (hourn - 1).mod(24) + 1;
 			for (ii = 1; ii <= 3; ++ii) {
 				if (not(usertab(hourn, ii).locate(netid(ii), tt))) {
-					usertab(hourn, ii).r(1, -1, netid(ii));
+					usertab(hourn, ii)(1, -1) = netid(ii);
 				}
 			} //ii;
 
@@ -292,15 +292,15 @@ nextprocess:
 			goto nextprocess;
 		}
 		if (not(dbasecodes.a(1).locate(dbasecode, dbasen))) {
-			dbasecodes.r(1, dbasen, dbasecode);
+			dbasecodes(1, dbasen) = dbasecode;
 		}
-		dbasesystems.r(1, dbasen, RECORD.a(51));
+		dbasesystems(1, dbasen) = RECORD.a(51);
 		status = calculate("STATUS");
 		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
 			//statusn will be 6
-			processcount.r(20, dbasen, status);
+			processcount(20, dbasen) = status;
 		}
-		processcount.r(statusn, dbasen, processcount.a(statusn, dbasen) + 1);
+		processcount(statusn, dbasen) = processcount.a(statusn, dbasen) + 1;
 
 		//works out if backup is required from ok processes by preference
 		//use hung and maintenance processes if no ok processes
@@ -312,12 +312,12 @@ nextprocess:
 			call getbackpars(bakpars, RECORD);
 
 			//not suppressed and not test (non-live)
-			backuprequired.r(1, dbasen, not(bakpars.a(9)) and not(bakpars.a(11)));
+			backuprequired(1, dbasen) = not(bakpars.a(9)) and not(bakpars.a(11));
 
 			//no backups required if database processes are all automatically started
 			//except BASIC which we presume is used to startup and backup data.bak
 			if (SYSTEM.a(58) eq "" and dbasecode ne "BASIC") {
-				backuprequired.r(1, dbasen, 0);
+				backuprequired(1, dbasen) = 0;
 			}
 
 			//work out backup targets (data and uploads)
@@ -326,13 +326,13 @@ nextprocess:
 				tt = bakpars.a(7);
 				//backpars 12 (upload backup target) can be 0 to suppress
 				if (bakpars.a(12) and bakpars.a(12) ne bakpars.a(7)) {
-					tt.r(1, 1, 2, bakpars.a(12));
+					tt(1, 1, 2) = bakpars.a(12);
 				}
 				//backuptime
 				if (tt) {
-					tt.r(1, 1, 3, bakpars.a(3));
+					tt(1, 1, 3) = bakpars.a(3);
 				}
-				backuprequired.r(1, dbasen, tt);
+				backuprequired(1, dbasen) = tt;
 			}
 
 		}
@@ -365,7 +365,7 @@ nextprocess:
 			nok = secs lt 600;
 			//otherwise flag hung
 			if (not nok) {
-				processcount.r(2, dbasen, 1);
+				processcount(2, dbasen) = 1;
 			}
 		}
 		description = dbasecode;
@@ -506,7 +506,7 @@ nextprocess:
 				tpath ^= "/backups/sql/" ^ dbasecode.lcase() ^ ".sql.gz";
 				tpath.converter("/", OSSLASH);
 
-				paramrec.r(3, tpath.osfile().a(1));
+				paramrec(3) = tpath.osfile().a(1);
 			}
 			lastbackupsize = paramrec.a(3);
 			if (lastbackupsize) {
@@ -531,7 +531,7 @@ nextprocess:
 			}
 
 			if (not(backupdrives.a(1).locate(backupdrive, backupdriven))) {
-				backupdrives.r(1, backupdriven, backupdrive);
+				backupdrives(1, backupdriven) = backupdrive;
 
 				//ensure something is on the target
 				//otherwise diskfreespace fails
@@ -544,7 +544,7 @@ nextprocess:
 				if (freespace eq 999999999) {
 					freespace = 0;
 				}
-				backupdrives.r(2, backupdriven, freespace);
+				backupdrives(2, backupdriven) = freespace;
 
 				/*
 				testdata = var().date() ^ FM ^ var().time();
@@ -571,7 +571,7 @@ nextprocess:
 					description ^= " impossible!!";
 				} else {
 					//present
-					backupdrives.r(3, backupdriven, 1);
+					backupdrives(3, backupdriven) = 1;
 
 					//determine next backup filename
 					//similar in MONITOR2 and FILEMAN
@@ -622,9 +622,9 @@ nextprocess:
 										}
 										body = "It is time to change the EXODUS backup media (e.g. USB Flash Drive)";
 										if (localtime lt 43200) {
-											body.r(-1, FM ^ "Please change it " "before 12:00 midday today.");
+											body(-1) = FM ^ "Please change it " "before 12:00 midday today.";
 										} else {
-											body.r(-1, FM ^ "Please change it " "before 00:00 midnight tonight.");
+											body(-1) = FM ^ "Please change it " "before 00:00 midnight tonight.";
 										}
 										printl(body);
 										body.swapper(FM, var().chr(13));
@@ -648,7 +648,7 @@ nextprocess:
 			}
 
 			//accumulate size of existing backups that will be deleted and overwritten
-			backupdrives.r(4, backupdriven, backupdrives.a(4, backupdriven) + lastbackupsize);
+			backupdrives(4, backupdriven) = backupdrives.a(4, backupdriven) + lastbackupsize;
 
 		}
 
@@ -731,7 +731,7 @@ nextdbasen:;
 				upgradefilename83 = upgradefilename83.a(6).substr(22, 999).trim().field(" ", 2);
 				upgradefiledir = upgradefilename83.osfile();
 				if (upgradefiledir) {
-					SYSTEM.r(112, upgradefilename83);
+					SYSTEM(112) = upgradefilename83;
 				}
 			}
 		}
@@ -827,7 +827,7 @@ nextdbasen:;
 			line = result.a(ii).trim();
 			line.swapper("IPV4 ADDRESS", "IP ADDRESS");
 			if (line.substr(1, 10) eq "IP ADDRESS") {
-				ips.r(-1, line.field(":", 2).trim().field("(", 1));
+				ips(-1) = line.field(":", 2).trim().field("(", 1);
 			//only display the first
 				goto gotip;
 			}
@@ -898,11 +898,11 @@ gotip:
 	//report and prevent further checking/reporting for an hour
 	//unless somehow forced
 	if (msg) {
-		monitordata.r(1, currenttime.a(1) + 1 / 24.0);
+		monitordata(1) = currenttime.a(1) + 1 / 24.0;
 		call sysmsg(msg);
 	} else {
 		//register checked at current time
-		monitordata.r(1, currenttime);
+		monitordata(1) = currenttime;
 	}
 
 	//NOTE and errors in hostnames and connectivity timeouts/response etc

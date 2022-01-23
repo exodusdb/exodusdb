@@ -113,7 +113,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = "Unknown message " ^ (msgno.quote()) ^ " in LISTEN";
 		return 0;
 	case 31:
-		msg.r(-1, "INTERNAL ERROR Closing current EXODUS server process");
+		msg(-1) = "INTERNAL ERROR Closing current EXODUS server process";
 		return 0;
 	case 32:
 		msg = "LISTEN:EXECUTE: Module name is missing from request";

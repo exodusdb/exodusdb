@@ -145,7 +145,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 			if (not listid) {
 				range.splicer(1, 1, "");
-				ranges.r(ii, range);
+				ranges(ii) = range;
 			}
 
 		//not range
