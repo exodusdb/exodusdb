@@ -160,6 +160,15 @@ function main()
 	assert(s1 eq "2");
 	assert(s2 eq "1");
 */
+
+	var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
+	assert(seps.lower() == _FM_ _VM_ _SM_ _TM_ _STM_);
+	assert(seps.lower().raise() == seps);
+
+	seps = _FM_ _VM_ _SM_ _TM_ _STM_;
+	assert(seps.raise() == _RM_ _FM_ _VM_ _SM_ _TM_);
+	assert(seps.raise().lower() == seps);
+
 	s1="1";
 	s2="2";
 	assert(transfer(s1,s2) eq "1");

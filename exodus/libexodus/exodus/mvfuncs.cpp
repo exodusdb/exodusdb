@@ -1585,8 +1585,11 @@ VARREF var::lowerer() {
 	THISISSTRING()
 
 	// note: rotate lowest sep to highest
-	/// TODO consider converting lowest sep to char 0
-	this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _FM_ _VM_ _SM_ _TM_ _STM_ _RM_);
+	//this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _FM_ _VM_ _SM_ _TM_ _STM_ _RM_);
+
+	//bottom marks get crushed together but STM is infrequently used
+	// reversible by raiser only if no STM chars are present - which are not common
+	this->converter(_RM_ _FM_ _VM_ _SM_ _TM_, _FM_ _VM_ _SM_ _TM_ _STM_);
 
 	return *this;
 }
@@ -1607,8 +1610,12 @@ VARREF var::raiser() {
 	THISISSTRING()
 
 	// note: rotate highest sep to lowest
-	// TODO consider converting highest sep to char 0
-	this->converter(_FM_ _VM_ _SM_ _TM_ _STM_ _RM_, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+	// advantage is it is reversible by lowerer but the problem is that the smallest delimiter becomes the largest
+	//this->converter(_FM_ _VM_ _SM_ _TM_ _STM_ _RM_, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+
+	// top two marks get crushed together but RM is rarely used
+	// reversible by lowerer only if no RM are present - which are rare
+	this->converter(_FM_ _VM_ _SM_ _TM_ _STM_, _RM_ _FM_ _VM_ _SM_ _TM_);
 
 	return *this;
 }
