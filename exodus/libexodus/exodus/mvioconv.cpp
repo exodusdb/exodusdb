@@ -543,8 +543,8 @@ convert:
 				part1.push_back('R');
 			} else {
 				//DR
-				part1.push_back('D');
-				part1.push_back('R');
+				part1.push_back(' ');
+				part1.push_back(' ');
 			}
 			break;
 
@@ -553,11 +553,11 @@ convert:
 				part1.erase(0,1);
 				//DR
 				part1.push_back('D');
-				part1.push_back('R');
+				part1.push_back('B');
 			} else {
 				//CR
-				part1.push_back('C');
-				part1.push_back('R');
+				part1.push_back(' ');
+				part1.push_back(' ');
 			}
 			break;
 
