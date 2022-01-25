@@ -20,16 +20,16 @@ set -euxo pipefail
 :
 : Tested on:
 :
-: Ubuntu 22.04 Ubuntu Jammy Jellyfish (development branch)
-: Ubuntu 20.04.3 LTS
+: "Ubuntu 22.04 Ubuntu Jammy Jellyfish (development branch)"
+: "Ubuntu 20.04.3 LTS"
 :
 : No longer tested:
 :
-: Ubuntu 18.04.1 LTS
-: Ubuntu 10.04.2 LTS
-: Linux lucid64 2.6.32-31-server #61-Ubuntu SMP Fri Apr 8 19:44:42 UTC 2011 x86_64 GNU/Linux
-: Debian GNU/Linux 6.0 \n \l
-: Linux debian32 2.6.32-5-686 #1 SMP Wed May 18 07:08:50 UTC 2011 i686 GNU/Linux
+: "Ubuntu 18.04.1 LTS"
+: "Ubuntu 10.04.2 LTS"
+: "Linux lucid64 2.6.32-31-server" #61-Ubuntu SMP Fri Apr 8 19:44:42 UTC 2011 x86_64 GNU/Linux
+: "Debian GNU/Linux 6.0 \n \l"
+: "Linux debian32 2.6.32-5-686" #1 SMP Wed May 18 07:08:50 UTC 2011 i686 GNU/Linux
 :
 :
 : 1. Building and Installing Exodus
