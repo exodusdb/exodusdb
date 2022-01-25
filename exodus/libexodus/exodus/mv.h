@@ -1918,7 +1918,13 @@ public:
 		//Iterator operator++(int_t) { Iterator tmp = *this; ++(*this); return tmp; }
 
 		// Allow checking two Iterators for inequality
-		friend bool operator!= (const Iterator& a, const Iterator& b) { return a.int_ != b.int_; };
+		//friend bool operator!= (const Iterator& a, const Iterator& b) { return a.int_ != b.int_; };
+		friend bool operator!= (const Iterator& a, const Iterator& b) {
+			//var (a.int_).errputl("A ");
+			//var (b.int_).errputl("B ");
+			// Once the moving int is equal to OR GREATER THAN the target then the result is TRUE ie NOT EQUAL
+			// This caters for the situation "for (var x : (10, 8)" which would otherwise loop incorrectly
+			return a.int_ < b.int_; };
 
 	};
 
