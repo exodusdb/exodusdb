@@ -60,7 +60,7 @@ function main(in databasecode0="", in usercode0="") {
 
 	//FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
 
-	for (var lockno = 1; lockno <= 100; ++lockno) {
+	for (var lockno : range(1, 100)) {
 
 		var lockid = lockprefix ^ lockno;
 
@@ -144,7 +144,7 @@ nextlock:;
 		returndata(3) = curruserlockid;
 	}
 
-	for (var ii = 1; ii <= 9999; ++ii) {
+	for (var ii : range(1, 9999)) {
 		usercode = returndata.a(2, ii);
 		///BREAK;
 		if (not usercode) break;

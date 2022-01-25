@@ -107,7 +107,7 @@ function main() {
 		var ntrans = 100;
 		//printl();
 		//printl("TRANTEST 1.", PROCESSNO);
-		for (var recn=1; recn le ntrans; recn++) {
+		for (var recn : range(1, ntrans)) {
 			//if (TERMINAL and recn % 100)
 			//	printl(recn);
 			if (not read(RECORD, transactions, ID))
@@ -138,7 +138,7 @@ function main() {
 		}
 
 		var ncomps = compcodes.count(",") + 1;
-		for (var compn = 1; compn <= ncomps; ++compn) {
+		for (var compn : range(1, ncomps)) {
 
 			mode = "HEAD";
 			var compcode = compcodes.field(",", compn);
@@ -349,7 +349,7 @@ function main() {
 		data_ = "";
 		//have to skip char zero it seems to be treated as string terminator
 		//somewhere on the way to the browser (not in revelation)
-		for (var ii = 1; ii <= 255; ++ii) {
+		for (var ii : range(1, 255)) {
 			USER1 ^= var().chr(ii);
 		} //ii;
 		//data='xxx'
@@ -573,7 +573,7 @@ nextrep:
 
 				report.converter(VM, RM);
 				var nn = report.count(FM) + 1;
-				for (var ii = 1; ii <= nn; ++ii) {
+				for (var ii : range(1, nn)) {
 					data_(ii, repn) = report.a(ii);
 				} //ii;
 
@@ -595,7 +595,7 @@ nextrep:
 		var docnos = request_.a(2);
 
 		var ndocs = docnos.count(VM) + 1;
-		for (var docn = 1; docn <= ndocs; ++docn) {
+		for (var docn : range(1, ndocs)) {
 			ID = docnos.a(1, docn);
 			if (ID) {
 				if (RECORD.read(sys.documents, ID)) {

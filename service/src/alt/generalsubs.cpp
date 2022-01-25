@@ -195,7 +195,7 @@ subroutine getdatasets() {
 	datasetcodes = "";
 	var datasetnames = "";
 
-	for (var datasetn = 1; datasetn <= ndatasets; ++datasetn) {
+	for (var datasetn : range(1, ndatasets)) {
 		var temp = datasetparams.a(1, datasetn);
 		var datasetcode = temp.a(1, 1, 2);
 		var datasetname = temp.a(1, 1, 1);

@@ -31,6 +31,33 @@ programinit()
 function main()
 {
 
+	// range based for loop
+	{
+		var tot = 0;
+		var count= 0;
+		for (var ii : range(1,10)) {
+			tot += ii;
+			count++;
+		}
+		assert(tot eq 55);
+		assert(count eq 10);
+	}
+
+	// range based field iteration
+	{
+	    var fields = _FM_ "aaa" _FM_ _FM_ "bb" _FM_ ;
+	    var count = 0;
+	    for (var field : fields) {
+	        count++;
+	        assert(count le 5);
+	        assert(count ne 1 or field eq "");
+	        assert(count ne 2 or field eq "aaa");
+	        assert(count ne 3 or field eq "");
+	        assert(count ne 4 or field eq "bb");
+	        assert(count ne 5 or field eq "");
+	    }
+	}
+
 	var xyz;
 	//xyz=xyz;
 	printl("\nTest catching MVError");
@@ -204,13 +231,15 @@ function main()
 	//test single character extraction
 	var expected="a" _FM_ "a" _FM_ "b" _FM_ "a" _FM_ "a" _FM_ "b" _FM_ "";
 	var tempstr2="ab";
-	for (var ii=-3; ii<=3; ++ii)
+	for (var ii : range(-3, 3)) {
 		assert(tempstr2[ii] eq expected.a(ii+4));
+	}
 
 	//test single character extraction on ""
 	tempstr2="";
-	for (var ii=-3; ii<=3; ++ii)
+	for (var ii : range(-3, 3)) {
 		assert(tempstr2[ii] eq "");
+	}
 
 	var str0="  xxx  xxx  ";
 	var str1;
@@ -831,10 +860,12 @@ function main()
 	assert(oconv(14591,"DL") eq "31");
 
 	//check times around noon and midnight round trip ok
-	for (var ii=0; ii<=61 ; ++ii)
+	for (var ii : range(0, 61)) {
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
-	for (var ii=43200-61; ii<=43200+61 ; ++ii)
+	}
+	for (var ii : range(43200-61, 43200+61)) {
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
+	}
 
 	//check oconv does multivalues
 	assert(var("60" _RM_ "120").oconv("MT")=="00:01" _RM_ "00:02");
@@ -847,7 +878,7 @@ function main()
 	//test that some random times iconv/oconv roundtrip ok
 	initrnd(1000);
 	var timex;
-	for (int ii=1; ii<1000; ++ii) {
+	for (int ii = 1; ii <= 1000; ++ii) {
 		timex=rnd(18600);
 //		timex.oconv("MTHS").output(" ").iconv("MTHS").outputl(" ");
 		assert(timex.oconv("MTHS").iconv("MTHS") eq timex);
@@ -1220,7 +1251,7 @@ function main()
 //		abort("Couldnt init thread 0");
 
 	printl("\nPrint out 1st 256 unicode characters and their hashes");
-	for (var ii=0;ii<256;ii++) {
+	for (var ii : range(0, 255)) {
 		var xx=chr(ii);
 		print(ii ^ ":" ^ xx ^ " " ^ xx.hash() ^ " ");
 	}
@@ -1228,10 +1259,10 @@ function main()
 
 	printl("Checking time oconv/iconv roundtrip for time (seconds) =0 to 86400");
 	//initrnd(999);
-	//for (int ii=0; ii<86400; ++ii) {
+	//for (int ii = 0; ii <= 86400-1; ++ii) {
 	//	var time=ii;
 	var started=ostime();
-	for (var itime=0; itime<86400; ++itime) {
+	for (var itime : range(0, 86399)) {
 //		itime.outputl("itime=").oconv("MTHS").outputl("otime=").iconv("MTHS").outputl("itime=");
 		assert(itime.oconv("MTHS").iconv("MTHS") eq itime);
 		assert(itime.oconv("MTS").iconv("MTS") eq itime);

@@ -1,3 +1,6 @@
+#include <boost/range/irange.hpp>
+//#include <iostream> //only for debugging
+
 #include <mv.h>
 
 //mv_iter class enables c++ range based programming over a dynamic array
@@ -24,66 +27,73 @@ namespace exodus {
 ///////////
 
 //CONSTRUCTOR from a var (ie begin())
-var_iter::var_iter(CVR v)
-	: data(&v){}
+var_iter::var_iter(CVR var1)
+	: pvar_(&var1){
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
+}
 
 //check iter != iter (i.e. iter != end()
-bool var_iter::operator!=([[maybe_unused]] var_iter& vi) {
-	//no need to use vi since the end is always string::npos;
-	return this->index != std::string::npos;
+bool var_iter::operator!=([[maybe_unused]] var_iter& var_iter1) {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	//no need to use var_iter1 since the end is always string::npos;
+	return this->startpos_ != std::string::npos;
 }
 
 //CONVERSION - conversion to var
-var_iter::operator var*() {
+var var_iter::operator*() const {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 
 	//find the end of the field if not already known
-	if (index2 == std::string::npos) {
-		index2 = data->var_str.find(FM_, index);
+	if (endpos_ == std::string::npos) {
+		endpos_ = pvar_->var_str.find(FM_, startpos_);
 	}
 
 	//extract the field
-	if (index2 == std::string::npos)
-		field = data->var_str.substr(index);
+	if (endpos_ == std::string::npos)
+		return pvar_->var_str.substr(startpos_);
 	else
-		field = data->var_str.substr(index, index2 - index);
-
-	return &field;
+		return pvar_->var_str.substr(startpos_, endpos_ - startpos_);
 }
 
 //INCREMENT
 var_iter var_iter::operator++() {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 
 	//find the end of the field if not already found from a call to above CONVERSION
-	if (index2 == std::string::npos)
-		index2 = data->var_str.find(FM_, index);
+	if (endpos_ == std::string::npos)
+		endpos_ = pvar_->var_str.find(FM_, startpos_);
 
 	//move up to the next field
-	index = index2;
+	startpos_ = endpos_;
 
 	//skip over any FM character
-	if (index != std::string::npos) {
+	if (startpos_ != std::string::npos) {
 		//max str size = 9223372036854775807
 		//string npos = 18446744073709551615
 		//we will ignore the fact that we could be processing
 		//a string of maximum size with a terminating FM
 		//and incrementing would take us past maximum string size
 		//but not beyond "no position" npos.
-		index++;
+		startpos_++;
 	}
 
 	//indicate that the end of the next field is not yet known
-	index2 = std::string::npos;
+	endpos_ = std::string::npos;
 
 	return *this;
 }
 
 //BEGIN - free function to create an iterator -> begin
-PUBLIC var_iter begin(CVR v) {
-	return var_iter(v);
+PUBLIC var_iter begin(CVR var1) {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	return var_iter(var1);
 }
 
 //END - free function to create an interator -> end
-PUBLIC var_iter end([[maybe_unused]] CVR v) {
+PUBLIC var_iter end([[maybe_unused]] CVR var1) {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	// No need to use var1 since the end is always string::npos
+	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos;
 	return var_iter();
 }
 
@@ -92,23 +102,24 @@ PUBLIC var_iter end([[maybe_unused]] CVR v) {
 ///////////
 
 //CONSTRUCTOR from a dim (ie begin())
-dim_iter::dim_iter(const dim& d)
-	: data(&d){}
+dim_iter::dim_iter(const dim& d1)
+	: pdim_(&d1){}
 
 //check iter != iter (i.e. iter != end()
-bool dim_iter::operator!=(const dim_iter& di) {
-	return this->index != di.index;
+bool dim_iter::operator!=(const dim_iter& dim_iter1) {
+	return this->index_ != dim_iter1.index_;
 }
 
 //CONVERSION - conversion to var
-dim_iter::operator var*() {
-	return &data->data_[index];
+//dim_iter::operator var*() {
+var& dim_iter::operator*() {
+	return pdim_->data_[index_];
 }
 
 //INCREMENT
 dim_iter dim_iter::operator++() {
 
-	index++;
+	index_++;
 
 	return *this;
 }
@@ -116,25 +127,25 @@ dim_iter dim_iter::operator++() {
 //DECREMENT
 dim_iter dim_iter::operator--() {
 
-	index--;
+	index_--;
 
 	return *this;
 }
 
 void dim_iter::end() {
-	index = data->nrows_ * data->ncols_ + 1;
+	index_ = pdim_->nrows_ * pdim_->ncols_ + 1;
 }
 
 //BEGIN - free function to create an iterator -> begin
-PUBLIC dim_iter begin(const dim& d) {
-	return dim_iter(d);
+PUBLIC dim_iter begin(const dim& d1) {
+	return dim_iter(d1);
 }
 
 //END - free function to create an interator -> end
-PUBLIC dim_iter end(const dim& d) {
-	dim_iter di(d);
-	di.end();
-	return di;
+PUBLIC dim_iter end(const dim& d1) {
+	dim_iter diter1(d1);
+	diter1.end();
+	return diter1;
 }
 
 }  //namespace exodus

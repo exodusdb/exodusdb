@@ -11,7 +11,7 @@ function main(in input0) {
 	dim temp;
 	var nfields=temp.split(input0);
 	dim temp2(nfields);
-	for (int ii=1;ii<=nfields;ii++) {
+	for (int ii = 1; ii <= nfields; ii++) {
 		temp2(nfields-ii+1)=temp(ii);
 	}
 	return temp2.join();

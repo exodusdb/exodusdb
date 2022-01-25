@@ -508,7 +508,7 @@ nextuser:;
 	//check if runasuser is authorised to run the task
 	if (authtasks) {
 		var ntasks = authtasks.count(VM) + 1;
-		for (var taskn = 1; taskn <= ntasks; ++taskn) {
+		for (var taskn : range(1, ntasks)) {
 			var task = authtasks.a(1, taskn);
 			if (not(authorised(task, msg_, "", runasusercode))) {
 				USER4 = runasusercode.quote() ^ " is not authorised to do " ^ task;

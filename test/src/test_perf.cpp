@@ -1,4 +1,6 @@
+#include <boost/range/irange.hpp>
 #include <cassert>
+
 #include <exodus/program.h>
 programinit()
 
@@ -88,6 +90,54 @@ Intel(R) Xeon(R) CPU E5620  @ 2.40GHz (2010)
         }
         printl(round((ostime() - started - setup_time) / nn * 1E9), "ns", test);
     }
+
+
+	// Test integer loops
+	{
+		int nn = 100'000'000;
+
+		printl();
+		printl("Testing simple integer for loops");
+		printl("--------------------------------");
+
+		for (int s = 0; s <= 4; s++) {
+
+			int i1 = 0;
+			printl();
+			var started = ostime();
+
+			switch (s) {
+
+			break; case 0:
+				printl("Exp: 45ns - old var method - for (var;;)");
+				for (var i2 = 0; i2 <= nn; i2++)
+					{i1 = i2;};
+
+			break; case 1:
+				printl("Exp: 20ns - new var method - for (var:range)");
+				for (var i2 : range(0 to nn))
+					{i1 = i2;};
+
+			break; case 2:
+				printl("Exp: 0.84ns - old int method - for (int;;)");
+				for (int i2 = 0; i2 <= nn; i2++)
+					{i1 = i2;};
+
+			break; case 3:
+				printl("Exp: 0.84ns - new int method - for (int:range)");
+				for (int i2 : range(0 to nn))
+					{i1 = i2;};
+
+			break; case 4:
+				printl("Exp: 0.84ns - new int method using boost - for (int:range)");
+				for (int i2 : boost::irange(0, nn))
+					{i1 = i2;};
+			}
+			var ended = ostime();
+			if (i1)
+				printl("Act:", ((ended - started) / int(nn) * 1e9).round(3), "ns");
+		}
+	}
 
     printl();
 	printl("Test passed");

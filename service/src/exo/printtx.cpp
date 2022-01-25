@@ -306,7 +306,7 @@ subroutine convoptions() {
 			optionchars ^= optionchar;
 		}
 		var newoptions = "";
-		for (var ii = 1; ii <= optionchars.length(); ++ii) {
+		for (var ii : range(1, optionchars.length())) {
 			var optionchar = optionchars[ii];
 			if (optionchar == "T") {
 				newoptions ^= timedate();

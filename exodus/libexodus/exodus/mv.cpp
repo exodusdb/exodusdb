@@ -131,19 +131,20 @@ var::var(CVR rhs)
 		  THISIS("var::var(CVR rhs)")
 			  ISASSIGNED(rhs)
 
-		  //std::clog << "copy ctor CVR" << std::endl;
+		  //std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 
 		  // not a pointer anymore for speed
 		  // priv=new pimpl;
 	  }
 
-	  // move constructor
-	  var::var(var && rhs) noexcept
+// move constructor
+ var::var(var && rhs) noexcept
 	: var_str(std::move(rhs.var_str)),
 	  var_int(rhs.var_int),
 	  var_dbl(rhs.var_dbl),
 	  var_typ(rhs.var_typ) {
-	//std::clog << "move ctor TVR noexcept" << std::endl;
+
+	//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
 
 	// skip this for speed since temporararies are unlikely to be unassigned
 	// THISIS("var::var(TVR rhs) noexcept")

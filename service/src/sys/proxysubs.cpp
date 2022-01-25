@@ -39,7 +39,7 @@ function main(in module, in mode, in stationery) {
 	outfiles.converter(";", VM);
 	data_ = outfiles;
 	var nfiles = outfiles.count(VM) + (outfiles ne "");
-	for (var filen = 1; filen <= nfiles; ++filen) {
+	for (var filen : range(1, nfiles)) {
 
 		outfile = outfiles.a(1, filen);
 

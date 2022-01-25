@@ -71,7 +71,7 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 		var nfields = fieldnameornos.count(FM) + (fieldnameornos ne "");
 
 		var nkeys = keys.count(FM) + (keys ne "");
-		for (var keyn = 1; keyn <= nkeys; ++keyn) {
+		for (var keyn : range(1, nkeys)) {
 			var keyx = keys.a(keyn);
 
 			if (mode eq "LOCK") {
@@ -95,7 +95,7 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 
 			} else if (mode eq "UPDATE") {
 
-				for (var fieldn = 1; fieldn <= nfields; ++fieldn) {
+				for (var fieldn : range(1, nfields)) {
 
 					var fieldnameorno = fieldnameornos.a(fieldn);
 

@@ -22,7 +22,7 @@ function main(in mode, in datasetcode, out result) {
 	printl();
 	printl("Waiting up to 120 seconds for other ", datasetcode, " processes to close:");
 	var ii = "";
-	for (var ii = 1; ii <= 120; ++ii) {
+	for (var ii : range(1, 120)) {
 		///BREAK;
 		if (not(otherusers(datasetcode))) break;
 		print(".");

@@ -26,7 +26,7 @@ function main() {
 		} else {
 
 		//look for the user in the same group as the active user
-			for (var usern2 = usern; usern2 <= 9999; ++usern2) {
+			for (var usern2 : range(usern, 9999)) {
 				userx = SECURITY.a(1, usern2);
 				///BREAK;
 				if (not((userx and userx ne "---") and userx ne ID)) break;

@@ -249,7 +249,7 @@ notallowed:
 	locks.trimmer();
 	var nlocks = locks.count(" ") + 1;
 
-	for (var lockn = 1; lockn <= nlocks; ++lockn) {
+	for (var lockn : range(1, nlocks)) {
 		var lockx = locks.field(" ", lockn);
 		if (keys.locateusing(" ", lockx, temp)) {
 		} else {

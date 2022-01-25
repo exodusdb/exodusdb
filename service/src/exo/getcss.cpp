@@ -152,7 +152,7 @@ function toggle(t,mode)
  if (t.tagName) t=[t]
  if (!t.length) return
  var display="none"
- for (var i=t.length-1;i>=0;i--) {
+ for (var i = t.length-1; i>=0; i--) {
   if (t[i].style.display == "") {
    t[i].style.display = "none";
   } else {
@@ -192,7 +192,7 @@ window.onload=function (){
  //gwindowopenparameters.readonlymode=true
  var links=document.getElementsByTagName('a')
  var vhtm
- for (var ii=0;ii<links.length;++ii){
+ for ( var ii=0;ii<links.length;++ii){
   var href=links[ii].href.toString()
   if (href.indexOf('nwin')<0)
    continue
@@ -262,7 +262,7 @@ function toggle(t,mode)
  if (t.tagName) t=[t]
  if (!t.length) return
  var display="none"
- for (var i=t.length-1;i>=0;i--) {
+ for (var i = t.length-1; i>=0; i--) {
   if (t[i].style.display == "") {
    t[i].style.display = "none";
   } else {

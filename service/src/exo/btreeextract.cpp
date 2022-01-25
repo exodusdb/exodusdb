@@ -42,7 +42,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	} else {
 		var nparts = parts.count("&") + 1;
 		//parts.outputl("parts=");
-		for (var partn = 1; partn <= nparts; ++partn) {
+		for (var partn : range(1, nparts)) {
 			var part = parts.field("&", partn);
 			var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
 			//selectcmd.outputl("selectcmd=");

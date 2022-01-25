@@ -581,7 +581,7 @@ function main() {
 		if (not(osfile(srcfilename)) and not(srcfilename.index(OSSLASH))) {
 			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
 			var npaths = dcount(paths, ":");
-			for (var pathn = 1; pathn < npaths; pathn++) {
+			for (var pathn = 1; pathn <= npaths -1; pathn++) {
 				var srcfilename2 = paths.field(":", pathn) ^ "/" ^ srcfilename;
 				if (osfile(srcfilename2)) {
 					srcfilename = srcfilename2;
@@ -1511,7 +1511,7 @@ function set_environment() {
 	var searched = "";
 	var batfilename = "";
 
-	for (var ii = 1;; ++ii) {
+	for (var ii = 1; ii <= 999999; ++ii) {
 
 		var msvs = searchdirs.a(ii);
 		if (not msvs)

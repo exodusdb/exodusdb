@@ -3358,7 +3358,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (op == "]") {
 
 				var expression = "";
-				for (VARREF subvalue : value) {
+				// value is a FM separated list here so "subvalue" is a field
+				for (var subvalue : value) {
 					/* ordinary UTF8 collation strangely doesnt sort single punctuation characters along with phrases starting with the same
 					   so we will use C collation which does. All so that we can use BETWEEN instead of LIKE to support STARTING WITH syntax
 

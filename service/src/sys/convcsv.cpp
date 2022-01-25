@@ -73,7 +73,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	}
 	if (nfilters) {
 		filters.redim(3, nfilters);
-		for (var filtern = 1; filtern <= nfilters; ++filtern) {
+		for (var filtern : range(1, nfilters)) {
 			filters(1, filtern) = filterfields.a(1, filtern).convert(SVM, VM);
 			filters(3, filtern) = filtervalues.a(1, filtern).convert(SVM, VM);
 		} //filtern;
@@ -177,7 +177,7 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	//expand any group fields in notexportable
 	if (notexportable) {
-		for (var ii = 1; ii <= notexportable.count(FM) + 1; ++ii) {
+		for (var ii : range(1, notexportable.count(FM) + 1)) {
 			var dictrec;
 			if (dictrec.read(DICT, notexportable.a(ii))) {
 				if (dictrec.a(1) eq "G") {
@@ -474,7 +474,7 @@ nextrec:
 	var maxvn = 1;
 
 	//skip multivalues
-	for (var filtern = 1; filtern <= nfilters; ++filtern) {
+	for (var filtern : range(1, nfilters)) {
 		var value = calculate(filters(1, filtern));
 		if (filters(3, filtern).length()) {
 
@@ -501,7 +501,7 @@ nextrec:
 			end;
 	*/
 
-	for (var coln = 1; coln <= ncols; ++coln) {
+	for (var coln : range(1, ncols)) {
 		MV = mvx;
 		dictid = dictids(coln);
 		temp = "";
@@ -516,7 +516,7 @@ nextrec:
 	//get the data
 	rec = "";//dim
 	var anydata = 0;
-	for (var coln = 1; coln <= ncols; ++coln) {
+	for (var coln : range(1, ncols)) {
 		MV = mvx;
 		dictid = dictids(coln);
 		if (dictid eq "LINE_NO") {
@@ -547,7 +547,7 @@ nextvn:
 		}
 
 		//conversions
-		for (var coln = 1; coln <= ncols; ++coln) {
+		for (var coln : range(1, ncols)) {
 
 			//choose the right mv
 			if (dictids(coln) eq "LINE_NO") {

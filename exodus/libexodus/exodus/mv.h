@@ -78,11 +78,11 @@ THE SOFTWARE.
 
 // leading and trailing _ char* versions of classic pick delimiters
 // also in ADECOM
-#define _RM_ "\x1F"	  // Record Mark
-#define _FM_ "\x1E"	  // Field Mark
-#define _VM_ "\x1D"	  // Value Mark
-#define _SM_ "\x1C"	  // Subvalue Mark
-#define _TM_ "\x1B"	  // Text Mark
+#define _RM_ "\x1F"      // Record Mark
+#define _FM_ "\x1E"      // Field Mark
+#define _VM_ "\x1D"      // Value Mark
+#define _SM_ "\x1C"      // Subvalue Mark
+#define _TM_ "\x1B"      // Text Mark
 #define _STM_ "\x1A"  // Subtext Mark
 
 // aliases for different implementations of multivalue
@@ -94,12 +94,12 @@ THE SOFTWARE.
 #define _SQ_ "\'"
 
 // trailing _ char versions of classic pick delimiters
-#define RM_ '\x1F'	 // Record Mark
-#define FM_ '\x1E'	 // Field Mark
-#define VM_ '\x1D'	 // Value Mark
-#define SM_ '\x1C'	 // Subvalue Mark
-#define TM_ '\x1B'	 // Text Mark
-#define STM_ '\x1A'	 // Subtext Mark
+#define RM_ '\x1F'     // Record Mark
+#define FM_ '\x1E'     // Field Mark
+#define VM_ '\x1D'     // Value Mark
+#define SM_ '\x1C'     // Subvalue Mark
+#define TM_ '\x1B'     // Text Mark
+#define STM_ '\x1A'     // Subtext Mark
 
 // aliases for different implementations of multivalue
 #define IM_ RM_
@@ -174,11 +174,11 @@ although convention recommends making the temporary inside the function).
 // http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
 
 // on linux, size is 56 bytes
-// string:	32
-// int:		8
-// double:	8
-// char:		4
-// var:		56
+// string:    32
+// int:        8
+// double:    8
+// char:        4
+// var:        56
 
 class var_brackets_proxy;
 class var_proxy1;
@@ -246,7 +246,8 @@ class VARTYP {
 	// mutable
 	//TODO check if initialisation required here or can speed up by removing and assuming set everywhere required
 	uint flags_{0};
-};
+
+}; // class VARTYP
 
 // WARNING these VARTYP constants must be initialised before any var variables are
 // NOT they are declared inline which presumably makes them the same in all compilation units
@@ -314,8 +315,8 @@ class PUBLIC var final {
 	mutable long long   var_int; //8 bytes/64 bits - currently defined as a long long
 	mutable double      var_dbl; //8 bytes/64 buts - double
 	mutable VARTYP      var_typ; //actually a uint which will be 4 bytes
-							     //mutable uint padding1;
-							     //mutable long int padding2;
+	                             //mutable uint padding1;
+	                             //mutable long int padding2;
 
 	///////////////
 	// CONSTRUCTORS
@@ -333,12 +334,12 @@ class PUBLIC var final {
 	var(TVR fromvar) noexcept;  // = default;
 
 	// copy assignment constructor
-	VOID_OR_VARREF operator=(CVR fromvar) &;	 // = default;
+	VOID_OR_VARREF operator=(CVR fromvar) &;     // = default;
 	//VARREF operator=(const var &) && = delete; //disable assign to temporaries
 
 	// move assignment
-	VOID_OR_VARREF operator=(TVR fromvar) & noexcept;	 // = default;
-	//VARREF operator=(TVR fromvar) && noexcept = delete;	 // disable move to temporaries
+	VOID_OR_VARREF operator=(TVR fromvar) & noexcept;     // = default;
+	//VARREF operator=(TVR fromvar) && noexcept = delete;     // disable move to temporaries
 
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
@@ -354,7 +355,7 @@ class PUBLIC var final {
 	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S, std::string>>>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	var(S&& fromstr)
-		: var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR){};
+	    : var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR){};
 
 #else
 
@@ -380,13 +381,13 @@ class PUBLIC var final {
 
 	// from char
 #ifndef SWIG
-	//	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
+	//    MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char) noexcept;
 #endif
 
 	// from char memory block
 	//
-	//	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
+	//    MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr, const size_t nchars);
 
 	// from bool
@@ -426,7 +427,7 @@ class PUBLIC var final {
 	std::u32string to_u32string() const;
 	void from_u32string(std::u32string) const;
 
-	std::string toString() &&;			   //for temporary vars
+	std::string toString() &&;               //for temporary vars
 	const std::string& toString() const&;  //for non-temporaries
 
 	// weird version for perl that outputs "" if undefined
@@ -824,8 +825,8 @@ class PUBLIC var final {
 	}
 	//remove this to avoid some gcc ambiguous warnings although it means concat std:string will create a temp var
 	//PUBLIC friend var operator^(CVR lhs, const std::string str2) {
-	//	std::clog << "PUBLIC friend var operator^(CVR lhs, const std::string str2)" << std::endl;
-	//	return MVcat(lhs, var(str2));
+	//    std::clog << "PUBLIC friend var operator^(CVR lhs, const std::string str2)" << std::endl;
+	//    return MVcat(lhs, var(str2));
 	//}
 	PUBLIC friend var operator^(CVR lhs, const char* cstr) {
 		//std::clog << "PUBLIC friend var operator^(CVR lhs, const char* cstr)" << std::endl;
@@ -922,9 +923,9 @@ class PUBLIC var final {
 	/////////
 
 	//to stdout/cout
-	CVR output() const;	 //output without line ending, without flush
-	CVR outputl() const;	 //output without a line ending and flush
-	CVR outputt() const;	 //output with a tab and flush
+	CVR output() const;      //output without line ending, without flush
+	CVR outputl() const;     //output without a line ending and flush
+	CVR outputt() const;     //output with a tab and flush
 
 	//as above but with var1 prefixed
 	CVR output(CVR var1) const;
@@ -1022,7 +1023,7 @@ class PUBLIC var final {
 	// STRING CREATION
 	//////////////////
 
-	//	var chr() const;
+	// var chr() const;
 	// version 1 chr - only char 0 - 255 returned in a single byte
 	// bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
 	ND var chr(const int num) const;  // ASCII
@@ -1039,8 +1040,8 @@ class PUBLIC var final {
 
 	// bool match(CVR matchstr,CVR options DEFAULT_STRING) const;
 	ND var match(CVR matchstr, CVR options DEFAULT_STRING) const;
-	ND var seq() const;	  // ASCII
-	ND var textseq() const;  // TEXT
+	ND var seq() const;     // ASCII
+	ND var textseq() const; // TEXT
 	ND var dcount(CVR substrx) const;
 	ND var count(CVR substrx) const;
 #ifndef SWIGPERL
@@ -1086,12 +1087,12 @@ class PUBLIC var final {
 	VARREF quoter();
 	VARREF squoter();
 	VARREF unquoter();
-	VARREF ucaser();		// utf8
-	VARREF lcaser();		// utf8
-	VARREF tcaser();		// utf8
-	VARREF fcaser();		// utf8
-	VARREF normalizer();	// utf8
-	VARREF inverter();	// utf8
+	VARREF ucaser();        // utf8
+	VARREF lcaser();        // utf8
+	VARREF tcaser();        // utf8
+	VARREF fcaser();        // utf8
+	VARREF normalizer();    // utf8
+	VARREF inverter();    // utf8
 	VARREF trimmer(const char* trimchar DEFAULT_SPACE);
 	VARREF trimmerf(const char* trimchar DEFAULT_SPACE);
 	VARREF trimmerb(const char* trimchar DEFAULT_SPACE);
@@ -1122,12 +1123,12 @@ class PUBLIC var final {
 	ND VARREF quote() &&;
 	ND VARREF squote() &&;
 	ND VARREF unquote() &&;
-	ND VARREF ucase() &&;		 // utf8
-	ND VARREF lcase() &&;		 // utf8
-	ND VARREF tcase() &&;		 // utf8
-	ND VARREF fcase() &&;		 // utf8
-	ND VARREF normalize() &&;	 // utf8
-	ND VARREF invert() &&;	 // utf8
+	ND VARREF ucase() &&;     // utf8
+	ND VARREF lcase() &&;     // utf8
+	ND VARREF tcase() &&;     // utf8
+	ND VARREF fcase() &&;     // utf8
+	ND VARREF normalize() &&; // utf8
+	ND VARREF invert() &&;    // utf8
 	ND VARREF trim(const char* trimchar DEFAULT_SPACE) &&;
 	ND VARREF trimf(const char* trimchar DEFAULT_SPACE) &&;
 	ND VARREF trimb(const char* trimchar DEFAULT_SPACE) &&;
@@ -1158,12 +1159,12 @@ class PUBLIC var final {
 	ND var quote() const&;
 	ND var squote() const&;
 	ND var unquote() const&;
-	ND var ucase() const&;		// utf8
-	ND var lcase() const&;		// utf8
-	ND var tcase() const&;		// utf8
-	ND var fcase() const&;		// utf8
-	ND var normalize() const&;	// utf8
-	ND var invert() const&;		// utf8
+	ND var ucase() const&;        // utf8
+	ND var lcase() const&;        // utf8
+	ND var tcase() const&;        // utf8
+	ND var fcase() const&;        // utf8
+	ND var normalize() const&;    // utf8
+	ND var invert() const&;        // utf8
 	ND var trim(const char* trimchar DEFAULT_SPACE) const&;
 	ND var trimf(const char* trimchar DEFAULT_SPACE) const&;
 	ND var trimb(const char* trimchar DEFAULT_SPACE) const&;
@@ -1573,10 +1574,10 @@ class PUBLIC var final {
 
 	//bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
 	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
-	// bool THIS_IS_DBCONN() const	{ return var_typ & VARTYP_DBCONN; }
-	// bool THIS_IS_OSFILE() const	{ return var_typ & VARTYP_OSFILE; }
+	// bool THIS_IS_DBCONN() const    { return var_typ & VARTYP_DBCONN; }
+	// bool THIS_IS_OSFILE() const    { return var_typ & VARTYP_OSFILE; }
 
-};	// of class "var"
+};    // class "var"
 
 // NB we should probably NEVER add operator^(VARREF var1, bool)
 // this is a trick to avoid a problem that exodus concat operator
@@ -1624,10 +1625,9 @@ PUBLIC ND var MVmod(CVR var1, CVR var2);
 //class var_iter
 class PUBLIC var_iter {
 
-	const var* data;
-	std::string::size_type index = 0;
-	std::string::size_type index2 = std::string::npos;
-	var field;
+	const var* pvar_;
+	mutable std::string::size_type startpos_ = 0;
+	mutable std::string::size_type endpos_ = std::string::npos;
 
    public:
 	//default constructor
@@ -1639,12 +1639,13 @@ class PUBLIC var_iter {
 	//check iter != iter (i.e. iter != string::npos)
 	bool operator!=(var_iter& vi);
 
-	//dereference iter
-	operator var*();
+	//convert to var
+	var operator*() const;
 
 	//iter++
 	var_iter operator++();
-};
+
+}; // class var_iter
 
 //class var_proxy1 - replace or extract fn
 class PUBLIC var_proxy1 {
@@ -1670,7 +1671,8 @@ class PUBLIC var_proxy1 {
 	void operator=(CVR replacement){
 		var_->r(fn_, replacement);
 	}
-};
+
+}; // class var_proxy1
 
 //class var_proxy2 - replace or extract fn, sn
 class PUBLIC var_proxy2 {
@@ -1697,7 +1699,8 @@ class PUBLIC var_proxy2 {
 	void operator=(CVR replacement){
 		var_->r(fn_, vn_, replacement);
 	}
-};
+
+}; // class var_proxy2
 
 //class var_proxy3 - replace or extract fn, vn, sn
 class PUBLIC var_proxy3 {
@@ -1725,7 +1728,8 @@ class PUBLIC var_proxy3 {
 	void operator=(CVR replacement){
 		var_->r(fn_, vn_, sn_, replacement);
 	}
-};
+
+}; // class var_proxy3
 
 class dim_iter;
 
@@ -1836,31 +1840,38 @@ class PUBLIC dim {
 
 	dim& init(CVR var1);
 
-};	// of class "dim"
+}; // class dim
+
+// Note that "for (var& var1: dim1)" with & allows direct access and update into the elements of the array dim1 via varx
+// whereaS "for (var var1 : dim1)" gives a copy of each element which is slower allows updating var1 without updating dim1
+// Both cases are useful
 
 //class dim_iter
 class PUBLIC dim_iter {
 
    private:
 
-	const dim* data;
+	const dim* pdim_;
 
-	//start from 1 ignoring element 0
-	int index = 1;
+	// Start from 1 ignoring element 0
+	int index_ = 1;
 
    public:
 
-	//default constructor
+	// Default constructor
 	dim_iter() = default;
 
-	//construct from dim
-	dim_iter(const dim& d);
+	// Construct from dim
+	dim_iter(const dim& d1);
 
-	//check iter != iter (i.e. iter != string::npos)
-	bool operator!=(const dim_iter& d);
+	// Check iter != iter (i.e. iter != string::npos)
+	bool operator!=(const dim_iter& dim_iter1);
 
-	//dereference iter
-	operator var*();
+	// Dereference iter to a var&
+	// return a reference to the actual dim element so it can be updated
+	// iif use var& instead of var in "for (var& : dim1)"
+	//operator var*();
+	var& operator*();
 
 	//iter++
 	dim_iter operator++();
@@ -1869,6 +1880,57 @@ class PUBLIC dim_iter {
 	dim_iter operator--();
 
 	void end();
+
+}; // class dim_iter
+
+
+// class range
+// Represents an interable range of ints (int_iter)
+// Lower case class name so we can use in syntax like
+// "for (int i : range(1 to 10))"
+// https://www.internalpointers.com/post/writing-custom-iterators-modern-cpp
+#define INT_T int
+class PUBLIC range
+{
+	using int_t = INT_T;
+
+	int first_;
+	int last_;
+
+public:
+
+	// Represent an incrementable and comparable int
+	class Iterator
+	{
+		int int_;
+
+	public:
+
+		// Construct from an int
+		Iterator(int_t int1) : int_(int1) {};
+
+		// Return our int
+		int_t operator*() const { return int_; }
+
+		// Increment our int and return it
+		Iterator& operator++() { int_++; return *this; }
+
+		//Iterator operator++(int_t) { Iterator tmp = *this; ++(*this); return tmp; }
+
+		// Allow checking two Iterators for inequality
+		friend bool operator!= (const Iterator& a, const Iterator& b) { return a.int_ != b.int_; };
+
+	};
+
+	// Construct a range from two ints
+	range( int_t first, int_t last) : first_(first), last_(last + 1) {};
+
+	// Return our first int
+	Iterator begin() { return Iterator(first_); }
+
+	// Return our last int
+	Iterator end()   { return Iterator(last_); }
+
 };
 
 // var versions of separator characters. Must be after class declaration
@@ -2035,20 +2097,20 @@ class PUBLIC MVError {
 // clang-format off
 
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
-class PUBLIC MVDivideByZero		: public MVError {public: explicit MVDivideByZero         (CVR var1    );};
-class PUBLIC MVNonNumeric		: public MVError {public: explicit MVNonNumeric           (CVR var1    );};
-class PUBLIC MVIntOverflow		: public MVError {public: explicit MVIntOverflow          (CVR var1    );};
-class PUBLIC MVIntUnderflow		: public MVError {public: explicit MVIntUnderflow         (CVR var1    );};
-class PUBLIC MVOutOfMemory		: public MVError {public: explicit MVOutOfMemory          (CVR var1    );};
-class PUBLIC MVUnassigned		: public MVError {public: explicit MVUnassigned           (CVR var1    );};
-class PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined            (CVR var1    );};
-class PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
-class PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (CVR var1    );};
-class PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (CVR var1    );};
-class PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_STRING);};
-class PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
+class PUBLIC MVDivideByZero         : public MVError {public: explicit MVDivideByZero         (CVR var1    );};
+class PUBLIC MVNonNumeric           : public MVError {public: explicit MVNonNumeric           (CVR var1    );};
+class PUBLIC MVIntOverflow          : public MVError {public: explicit MVIntOverflow          (CVR var1    );};
+class PUBLIC MVIntUnderflow         : public MVError {public: explicit MVIntUnderflow         (CVR var1    );};
+class PUBLIC MVOutOfMemory          : public MVError {public: explicit MVOutOfMemory          (CVR var1    );};
+class PUBLIC MVUnassigned           : public MVError {public: explicit MVUnassigned           (CVR var1    );};
+class PUBLIC MVUndefined            : public MVError {public: explicit MVUndefined            (CVR var1    );};
+class PUBLIC MVInvalidPointer       : public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
+class PUBLIC MVDBException          : public MVError {public: explicit MVDBException          (CVR var1    );};
+class PUBLIC MVNotImplemented       : public MVError {public: explicit MVNotImplemented       (CVR var1    );};
+class PUBLIC MVDebug                : public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_STRING);};
+class PUBLIC MVArrayDimensionedZero : public MVError {public: explicit MVArrayDimensionedZero (                   );};
 class PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(CVR var1    );};
-class PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};
+class PUBLIC MVArrayNotDimensioned  : public MVError {public: explicit MVArrayNotDimensioned  (                   );};
 
 // clang-format on
 
@@ -2059,4 +2121,4 @@ PUBLIC var operator""_var(long double d);
 
 }  // namespace exodus
 
-#endif	// MV_H
+#endif    // MV_H

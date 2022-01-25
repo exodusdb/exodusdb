@@ -39,7 +39,7 @@ function main()
 	assert(cursor eq "\x1b[1;1H" or cursor eq "");
 
 	//should show 1;1 in top left
-	for (var ii = 0;ii<13;++ii) {
+	for (var ii : range(0, 12)) {
 		print(at(ii,ii));
 		print(getcursor().substr(2));
 	}
@@ -847,7 +847,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//test all 8 bit bytes can be written and read
 	var tx="";
 	var tx2;
-	for (int ii=0;ii<65536;ii++)
+	for (int ii = 0; ii <= 65535; ii++)
 		tx^=chr(ii);
 
 	//output to binary - check roundtrip
@@ -910,8 +910,9 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		//make a string of first 256 (excluding 0 for the time being!)
 		var data=chr(0);
-		for (var ii=1;ii<nbinarychars;++ii)
+		for (var ii : range(1, nbinarychars-1)) {
 			data^=chr(ii);
+		}
 		assert(len(data) eq nbinarychars);
 
 		//check can write characters 1-255 out as bytes using C locale
@@ -1013,12 +1014,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		assert(var(123.45).oconv("MD20P<").outputl() eq "123.45");
 		assert(var(123.45).oconv("MD20P-").outputl() eq "123.45 ");
-		assert(var(123.45).oconv("MD20PD").outputl() eq "123.45CR");
-		assert(var(123.45).oconv("MD20PC").outputl() eq "123.45DR");
+		assert(var(123.45).oconv("MD20PD").outputl() eq "123.45  ");
+		assert(var(123.45).oconv("MD20PC").outputl() eq "123.45  ");
 
 		assert(var(-123.45).oconv("MD20P<").outputl() eq "<123.45>");
 		assert(var(-123.45).oconv("MC20P-").outputl() eq "123,45-");
-		assert(var(-123.45).oconv("MD20PD").outputl() eq "123.45DR");
+		assert(var(-123.45).oconv("MD20PD").outputl() eq "123.45DB");
 		assert(var(-123.45).oconv("MD20PC").outputl() eq "123.45CR");
 
 		assert(var(-123).oconv("MD20P<").outputl() eq "<123.00>");
@@ -1037,12 +1038,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		assert(var(".45").oconv("MD20P<").outputl() eq "0.45");
 		assert(var(".45").oconv("MD20P-").outputl() eq "0.45 ");
-		assert(var(".45").oconv("MD20PD").outputl() eq "0.45CR");
-		assert(var(".45").oconv("MD20PC").outputl() eq "0.45DR");
+		assert(var(".45").oconv("MD20PD").outputl() eq "0.45  ");
+		assert(var(".45").oconv("MD20PC").outputl() eq "0.45  ");
 
 		assert(var("-.45").oconv("MD20P<").outputl() eq "<0.45>");
 		assert(var("-.45").oconv("MC20P-").outputl() eq "0,45-");
-		assert(var("-.45").oconv("MD20PD").outputl() eq "0.45DR");
+		assert(var("-.45").oconv("MD20PD").outputl() eq "0.45DB");
 		assert(var("-.45").oconv("MD20PC").outputl() eq "0.45CR");
 
 		assert(var("-123").oconv("MD20P<").outputl() eq "<123.00>");
@@ -1095,10 +1096,10 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv(150000,   "MD24")          == "15.00");
 	assert(oconv(1234,     "MD2$")          == "$12.34");
 	assert(oconv(-1234,    "MD2$")          == "$-12.34");
-	assert(oconv(1234,     "MD2$C")         == "$12.34DR");
-	assert(oconv(1234,     "MD2$D")         == "$12.34CR");
+	assert(oconv(1234,     "MD2$C")         == "$12.34  ");
+	assert(oconv(1234,     "MD2$D")         == "$12.34  ");
 	assert(oconv(-1234,    "MD2$C")         == "$12.34CR");
-	assert(oconv(-1234,    "MD2$D")         == "$12.34DR");
+	assert(oconv(-1234,    "MD2$D")         == "$12.34DB");
 	assert(oconv(-1234,    "MD1-")          == "123.4-");
 	//assert(oconv(1234,     "MD2,10*")       == "*****12.34");
 	assert(oconv(500,      "MD0#")          == "#500");
@@ -1407,7 +1408,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	testinvert("␚ ␛ ␜ ␝ ␞ ␟");
 
 	//check invert is reversible for all bytes (only ASCII bytes are inverted)
-	for (var ii=0;ii<=0x1FFFF;ii++) {
+	for (var ii : range(0, 0x1FFFF)) {
 		var cc=textchr(ii);
 		if (cc.len())
 			testinvert(cc);
@@ -1513,7 +1514,7 @@ function test_codepage(in codepage, in lang) {
 	printl("---------- " ^ lang ^ " " ^ codepage ^ " ----------");
 
 	var v256="";
-	for (int ii=0;ii<=255;++ii)
+	for (int ii = 0; ii <= 255; ++ii)
 		v256 ^= chr(ii);
 	oswrite(v256,"t_codep.bin");
 	assert(osfile("t_codep.bin").a(1)==256);

@@ -10,7 +10,7 @@ function main(in numerators, in denominator, in sep) {
 	}
 	dim output;
 	var nn=output.split(numerators.convert(sep,FM));
-	for (int ii=1;ii<=nn;++ii) {
+	for (int ii = 1; ii <= nn; ++ii) {
 		//null or zero elements remain null or zero
 		if (output(ii)) {
 			output(ii)=output(ii)/denominator;

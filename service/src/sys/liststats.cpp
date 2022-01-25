@@ -123,7 +123,7 @@ function main() {
 			var row2 = row1;
 			row1 = output.a(rown - 1);
 			var replaced = 0;
-			for (var coln = 1; coln <= nrowfields; ++coln) {
+			for (var coln : range(1, nrowfields)) {
 				///BREAK;
 				if (not(row1.a(1, coln) eq row2.a(1, coln))) break;
 				replaced = 1;
@@ -158,7 +158,7 @@ function main() {
 
 		tx ^= "<thead>";
 
-		for (var coln = 1; coln <= ncols; ++coln) {
+		for (var coln : range(1, ncols)) {
 			tx ^= "<col";
 			if (coln gt nrowfields) {
 				tx ^= " align=right";
@@ -171,7 +171,7 @@ function main() {
 		} //coln;
 
 		tx ^= tr;
-		for (var coln = 1; coln <= ncols; ++coln) {
+		for (var coln : range(1, ncols)) {
 			var cell = output.a(1, coln);
 			if (not(cell.length())) {
 				cell = nbsp;
@@ -186,15 +186,15 @@ function main() {
 
 		tx ^= "</thead>";
 
-		for (var rown = 2; rown <= nrows; ++rown) {
+		for (var rown : range(2, nrows)) {
 			var row = output.a(rown);
 			var rowtx = "";
-			for (var coln = 1; coln <= ncols; ++coln) {
+			for (var coln : range(1, ncols)) {
 				var cell = row.a(1, coln);
 				if (dedup and coln le nrowfields) {
 					if (cell ne "-") {
 						var rowspan = 1;
-						for (var rown2 = rown + 1; rown2 <= nrows; ++rown2) {
+						for (var rown2 : range(rown + 1, nrows)) {
 							///BREAK;
 							if (not(output.a(rown2, coln) eq "-")) break;
 							rowspan += 1;

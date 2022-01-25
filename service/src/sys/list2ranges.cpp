@@ -15,7 +15,7 @@ function main(io listitems) {
 	var nn = listitems.count(VM) + 1;
 
 	//convert single periods to single period ranges
-	for (var ii = 1; ii <= nn; ++ii) {
+	for (var ii : range(1, nn)) {
 		listitems(1, ii, 2) = listitems.a(1, ii, 1);
 	} //ii;
 
@@ -35,7 +35,7 @@ function main(io listitems) {
 	} //ii;
 
 	//convert single period ranges to single periods
-	for (var ii = 1; ii <= nn; ++ii) {
+	for (var ii : range(1, nn)) {
 		var tt = listitems.a(1, ii);
 		var tt1 = tt.a(1, 1, 1);
 		if (tt1 eq tt.a(1, 1, 2)) {

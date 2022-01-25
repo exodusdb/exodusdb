@@ -58,7 +58,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 			} else {
 				nn = n1;
 			}
-			for (var fn = 1; fn <= nn; ++fn) {
+			for (var fn : range(1, nn)) {
 				//lang(fn) = (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim();
 				var lang1line = lang1.a(fn);
 				var lang2line = lang2.a(fn);
@@ -69,7 +69,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 				} else {
 					//eg January Janvier|February Fevruar| etc.
 					var bilingual = "";
-					for (var partn = 1; partn <= nparts; partn++) {
+					for (var partn : range(1, nparts)) {
 						bilingual ^= trim(field(lang1line, "|", partn) ^  " " ^ field(lang2line, "|", partn)) ^ "|";
 					}
 					//bilingual[-1,1]="";
@@ -122,7 +122,7 @@ exit:
 	var custlang;
 	if (custlang.read(DEFINITIONS, "LANGUAGE*" ^ langkey)) {
 		nn = custlang.count(FM) + 1;
-		for (var fn = 1; fn <= nn; ++fn) {
+		for (var fn : range(1, nn)) {
 			var tt = custlang.a(fn);
 			if (tt.length()) {
 				if (tt eq "\"\"") {
@@ -204,7 +204,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 		//strip out English pretext
 		if (lang.index(var().chr(170))) {
 			nn = lang.count(FM) + 1;
-			for (var ii = 1; ii <= nn; ++ii) {
+			for (var ii : range(1, nn)) {
 				var tt = lang.a(ii).field(var().chr(170), 2);
 				if (tt) {
 					lang(ii) = tt;

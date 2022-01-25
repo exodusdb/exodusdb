@@ -8,6 +8,38 @@ function main() {
 
 	//dim array
 
+	{
+		dim d1;
+		d1.split("aa" _FM_ "bb");
+		var count = 0;
+		for (var v1 : d1) {
+		//for (var& v1 : d1) {
+			count++;
+			assert(count ne 1 or v1 eq "aa");
+			assert(count ne 2 or v1 eq "bb");
+			if (count eq 2)
+				v1 = "cc"; //will have no effect on d1
+		}
+		TRACE(d1.join());
+		assert(d1.join() eq "aa" _FM_ "bb");//d1 not updated
+	}
+
+	{
+		dim d1;
+		d1.split("aa" _FM_ "bb");
+		var count = 0;
+		//for (var v1 : d1) {
+		for (var& v1 : d1) {
+			count++;
+			assert(count ne 1 or v1 eq "aa");
+			assert(count ne 2 or v1 eq "bb");
+			if (count eq 2)
+				v1 = "cc"; //will update d1
+		}
+		TRACE(d1.join());
+		assert(d1.join() eq "aa" _FM_ "cc");//d1 updated
+	}
+
 	dim a9;
 	var a10;
 	//check global split returns number of elements and an array out
@@ -69,27 +101,31 @@ function main() {
 
 	dim a7(2,3);
 
-	for (int ii=1;ii<=2;++ii)
-		for (int jj=1;jj<=3;++jj)
+	for (int ii = 1; ii <= 2; ++ii) {
+		for (int jj = 1; jj <= 3; ++jj) {
 			a7(ii,jj)=ii^var(".")^jj;
+		}
+	}
 
 	dim a8(4,5);
-	for (int ii=1;ii<=4;++ii)
-		for (int jj=1;jj<=5;++jj)
+	for (int ii = 1; ii <= 4; ++ii) {
+		for (int jj = 1; jj <= 5; ++jj) {
 			a8(ii,jj)=ii^var(".")^jj;
-
+		}
+	}
 	a8=2.2;
 
-	for (int ii=1;ii<=4;++ii) {
-		for (int jj=1;jj<=5;++jj)
+	for (int ii = 1; ii <= 4; ++ii) {
+		for (int jj = 1; jj <= 5; ++jj) {
 			a8(ii,jj).outputt("=");
+		}
 //		printl();
 	}
 
 	a8=a7;
 
-	for (int ii=1;ii<=2;++ii) {
-		for (int jj=1;jj<=3;++jj) {
+	for (int ii =1 ; ii <= 2; ++ii) {
+		for (int jj = 1; jj <= 3; ++jj) {
 			a8(ii,jj).outputt("=");
 			assert(a8(ii,jj)==a7(ii,jj));
 //		printl();
@@ -116,17 +152,19 @@ function main() {
 	dim arr1(3), arr2(3,3);
 	arr1(0)=0;
 	arr1(0,0)=0;
-	for (int ii=1; ii<=3; ++ii) {
+	for (int ii = 1; ii <= 3; ++ii) {
 		arr1(ii)=ii;
-		for (int jj=1; jj<=3; ++jj)
+		for (int jj = 1; jj <= 3; ++jj) {
 			arr2(ii,jj)=ii*3+jj;
+		}
 	}
 	assert(arr1(0) eq "0");
 	assert(arr1(0,0) eq "0");
-	for (int ii=1; ii<=3; ++ii) {
+	for (int ii = 1; ii <= 3; ++ii) {
 		assert(arr1(ii) eq ii);
-	for (int jj=1; jj<=3; ++jj)
-		assert(arr2(ii,jj) eq ii*3+jj);
+		for (int jj = 1; jj <= 3; ++jj) {
+			assert(arr2(ii,jj) eq ii*3+jj);
+		}
 	}
 
 /* 

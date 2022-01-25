@@ -367,7 +367,7 @@ updateversion:
 	call log2("*copy any new data records", logtime);
 	var bp;
 	if (bp.open("GBP", "")) {
-		for (var ii = 1; ii <= 9999; ++ii) {
+		for (var ii : range(1, 9999)) {
 			var rec;
 			if (not(rec.read(bp, "$DATA." ^ ii))) {
 				rec = "";
@@ -412,7 +412,7 @@ updateversion:
 	call log2("*reattach data", logtime);
 	var volumesx = VOLUMES;
 	var nvolumes = VOLUMES.count(FM) + 1;
-	for (var volumen = 1; volumen <= nvolumes; ++volumen) {
+	for (var volumen : range(1, nvolumes)) {
 		var volume = volumesx.a(volumen);
 		var tpath = "../" "DATA" "/";
 		tpath.converter("/", OSSLASH);
@@ -1058,7 +1058,7 @@ nextreport:
 		var locations = SYSTEM.a(50);
 		locations(1, -1) = "C:\\CYGWIN\\BIN\\,\\CYGWIN\\BIN\\,..\\..\\CYGWIN\\BIN\\";
 		var nn = locations.count(",") + 1;
-		for (var ii = 1; ii <= nn; ++ii) {
+		for (var ii : range(1, nn)) {
 			var location = locations.field(",", ii);
 			if (location[-1] ne "\\") {
 				location ^= "\\";
@@ -1223,7 +1223,7 @@ getproxy:
 		call log2("*zzz should create full user record not just the name", logtime);
 		var usercodes = SECURITY.a(1);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
-		for (var usern = 1; usern <= nusers; ++usern) {
+		for (var usern : range(1, nusers)) {
 			var userx = usercodes.a(1, usern);
 			if (not(userx.index("---"))) {
 				userx.writev(users, userx, 1);
@@ -1445,7 +1445,7 @@ getproxy:
 
 	call log2("*make global per installation files", logtime);
 	var filenamesx = "PROCESSES,STATISTICS,REQUESTLOG";
-	for (var ii = 1; ii <= 999; ++ii) {
+	for (var ii : range(1, 999)) {
 		var filename = filenamesx.field(",", ii);
 		///BREAK;
 		if (not filename) break;
@@ -1477,7 +1477,7 @@ getproxy:
 	var attach = "";
 	var foreign_dbno;
 	//group filenames by foreign dbname
-	for (let foreignfile : foreignfiles) {
+	for (var foreignfile : foreignfiles) {
 		var foreign_dbname = foreignfile.a(1, 1);
 		if (not foreign_dbname)
 			continue;
@@ -1489,7 +1489,7 @@ getproxy:
 	//attach filenames per foreign dbname
 	var foreign_dbnames = attach.a(1).convert(VM, FM);
 	foreign_dbno = 0;
-	for (let foreign_dbname : foreign_dbnames) {
+	for (var foreign_dbname : foreign_dbnames) {
 		if (not(foreign_dbname))
 			continue;
 		var foreign_dbconn;
@@ -1934,7 +1934,7 @@ subroutine getsystem() {
 	//parameters in the exodus\system file override params from definitions
 	//ie global installation parameters override dataset parameters
 	var ni = systemx.count(FM) + 1;
-	for (var ii = 1; ii <= ni; ++ii) {
+	for (var ii : range(1, ni)) {
 		if (systemx.a(ii).length()) {
 			SYSTEM(ii) = systemx.a(ii);
 		}

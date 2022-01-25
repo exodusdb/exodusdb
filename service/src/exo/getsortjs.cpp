@@ -83,7 +83,7 @@ function sorttable(event)
 
  var dateregex=/ ?(\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
  var periodregex=/ ?(\d{1,2})\/(\d{4})/g
- for (var ii=fromrown;ii<=uptorown;++ii){
+ for ( var ii=fromrown;ii<=uptorown;++ii){
   var cell=rows[ii].cells[coln]
   if (cell.getAttribute('sortvalue'))
    break

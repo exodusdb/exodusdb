@@ -191,7 +191,7 @@ function main() {
 			if (verbose)
 				paths.outputl("paths=");
 			var npaths = dcount(paths, ":");
-			for (var pathn = 1; pathn < npaths; pathn++) {
+			for (var pathn = 1; pathn <= npaths - 1; pathn++) {
 				var filename2 = paths.field(":", pathn) ^ "/" ^ filename;
 				if (verbose)
 					filename2.outputl("osfilename=");

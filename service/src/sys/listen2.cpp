@@ -189,7 +189,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				//TODO implement the same on bad usernames to avoid
 				//different response to good versus bad usernames
 				//which would allow detection of valid usernames
-				for (var failn = 1; failn <= 999999; ++failn) {
+				for (var failn : range(1, 999999)) {
 					var tt = userx.a(18, failn);
 					///BREAK;
 					if (not(tt ne "" and tt.substr(1, 2) ne "OK")) break;
@@ -1098,7 +1098,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 			}
 
 			var runstyles = SYSTEM.a(46);
-			for (var vn = 1; vn <= 9; ++vn) {
+			for (var vn : range(1, 9)) {
 				var tt2 = styles.a(1, vn);
 
 				//skip user styles if not authorised

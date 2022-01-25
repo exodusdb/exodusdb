@@ -760,8 +760,9 @@ x1exit:
 		coldict(1)(11) = tt;
 
 		//increment the list of breaking columns by one as well
-		for (var breakn = 1; breakn <= nbreaks; breakn++)
+		for (var breakn = 1; breakn <= nbreaks; breakn++) {
 			breakcolns(breakn) = breakcolns.a(breakn) + 1;
+		}
 		pagebreakcoln += 1;
 	}
 
@@ -860,8 +861,9 @@ x1exit:
 					coltags ^= coldict(coln).a(14);
 				coltags ^= " />";
 			} else {
-				for (var ii = 1; ii <= 9; ++ii)
+				for (var ii = 1; ii <= 9; ++ii) {
 					colheading(ii) = colheading.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ";
+				}
 			}
 		}
 	}

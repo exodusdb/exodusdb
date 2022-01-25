@@ -474,7 +474,7 @@ function main() {
 	printl(msecs,"msecs");
 
 	// 1/1 to 1/10^20
-	for (var i=0; i<30; ++i) {
+	for (var i : range(0, 29)) {
 		printl(i,var(pwr(10,-i)));
 		printl(i,var(1/pwr(10,i)));
 	}
@@ -545,4 +545,3 @@ function test2(const std::string str1, const std::string str2 = std::string()) {
 }
 
 programexit()
-

@@ -20,7 +20,7 @@ function main(in multipliers1, in multipliers2, in sep) {
 	//remember is 1 based
 
 	//deal with the common elements first for speed
-	for (int ii=1;ii<=min_nn;++ii) {
+	for (int ii = 1; ii <= min_nn; ++ii) {
 		//return nulls where both nulls
 		//otherwise multiply, treating nulls as zeros
 		if (array1(ii).length() and array2(ii).length()) {
@@ -31,7 +31,7 @@ function main(in multipliers1, in multipliers2, in sep) {
 	}
 
 	//deal with the remaining elements which must all be null or zero
-	for (int ii=min_nn+1;ii<=max_nn;++ii) {
+	for (int ii = min_nn+1; ii <= max_nn; ++ii) {
 		//return nulls where nulls
 		//return zeros otherwise
 		if (ii>nn1) {

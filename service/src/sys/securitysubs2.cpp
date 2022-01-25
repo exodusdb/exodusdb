@@ -171,7 +171,7 @@ function main(in mode) {
 		call log2("*delete some obsolete tasks", logtime);
 		var obsoletetasks = "COMPANY ACCESS PARTIAL";
 		obsoletetasks(-1) = "MARKET ACCESS PARTIAL";
-		for (var ii = 1; ii <= 9999; ++ii) {
+		for (var ii : range(1, 9999)) {
 			var tt = obsoletetasks.a(ii);
 			///BREAK;
 			if (not tt) break;

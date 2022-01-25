@@ -23,7 +23,7 @@ function main(in filenames0, out result) {
 
 	var nfiles = filenamesx.count(VM) + 1;
 
-	for (var filen = 1; filen <= nfiles; ++filen) {
+	for (var filen : range(1, nfiles)) {
 
 		filename = filenamesx.a(1, filen);
 		gosub getnrecs();

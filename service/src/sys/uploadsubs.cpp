@@ -85,7 +85,7 @@ postuploadfail:
 		var dictids = "VERSION*STATUS*USERNAME*DATETIME*STATION";
 		var fns = "";
 		var dictfilename = "DICT." ^ filename;
-		for (var ii = 1; ii <= 99; ++ii) {
+		for (var ii : range(1, 99)) {
 			var dictid = dictids.field("*", ii);
 
 			///BREAK;
@@ -164,7 +164,7 @@ postuploadfail:
 
 		//otherwise make the folders in parent order
 		var nsubfolders = uploadpath.count(OSSLASH);
-		for (var subfoldern = 1; subfoldern <= nsubfolders; ++subfoldern) {
+		for (var subfoldern : range(1, nsubfolders)) {
 			var subfolder = uploadpath.field(OSSLASH, 1, subfoldern);
 			//call subdirs(uploadroot:subfolder:char(0),result)
 			//if result else
@@ -286,7 +286,7 @@ postuploadfail:
 			var nuploads = uploadfilenames.count(FM) + 1;
 
 			var ndeep = virtualfilebase.count(OSSLASH) + 1;
-			for (var uploadn = 1; uploadn <= nuploads; ++uploadn) {
+			for (var uploadn : range(1, nuploads)) {
 				var uploadfilename = uploadfilenames.a(uploadn);
 				uploadfilename = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
 				uploadfilenames(uploadn) = uploadfilename;
@@ -515,7 +515,7 @@ nextline:
 					dictrec.write(dictfile, "LINE_NO");
 				}
 
-				for (var coln = 1; coln <= ncols; ++coln) {
+				for (var coln : range(1, ncols)) {
 					var dictrec = "F";
 					dictrec(2) = coln + fieldoffset;
 					dictrec(3) = capitalise(cols.a(coln, 1));
@@ -525,7 +525,7 @@ nextline:
 					var CONV = "";
 					var just = "L";
 					var nn = dictid.count("_") + 1;
-					for (var ii = 1; ii <= nn; ++ii) {
+					for (var ii : range(1, nn)) {
 						var word = dictid.field("_", ii);
 						if (datewords.locate(word, xx)) {
 							CONV = "[DATE,4*]";
@@ -567,7 +567,7 @@ nextline:
 			}
 
 			var rec = "";
-			for (var coln = 1; coln <= ncols; ++coln) {
+			for (var coln : range(1, ncols)) {
 				var col = cols.a(coln);
 				if (csv) {
 					cell = line.a(1, coln);
