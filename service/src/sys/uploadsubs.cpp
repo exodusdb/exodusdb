@@ -223,10 +223,15 @@ postuploadfail:
 
 	} else if (mode.field(".", 1) eq "OPENUPLOAD") {
 
+		//MODE eg = "OPENUPLOAD.test\upload\jobs\j1003\7.Selection_206.png"
+
 		data_ = virtualroot;
 		//data<2>=filenames
 
-		var virtualfilebase = mode.field(".", 2, 9999).lcase();
+		//var virtualfilebase = mode.field(".", 2, 9999).lcase(); //done below
+		var virtualfilebase = mode.field(".", 2, 9999);
+
+		// Convert \ and / to OSSLASH
 		virtualfilebase.converter("\\", "/");
 		virtualfilebase.converter("/", OSSLASH);
 		//fixed in UI now
@@ -239,6 +244,10 @@ postuploadfail:
 			//uploadpath='*'
 			//virtualfilebase='*'
 		}
+
+		//lcase upload path (not filenames which must retain case)
+		var filename = virtualfilebase.field2(OSSLASH, -1 , 1 );
+		virtualfilebase.lcaser().splicer(-len(filename), filename);
 
 		//search for extensions
 		//may be only one extension now
@@ -311,6 +320,8 @@ postuploadfail:
 		if (not(authorised("UPLOAD DELETE", msg, ""))) {
 			return invalid(msg);
 		}
+
+		//MODE eg = "DELETEUPLOAD.test\upload\jobs\j1003\7.Selection_206.png"
 
 		//similar in VERIFY AND DELETEUPLOAD
 		var uploadpath = mode.field(".", 2, 9999).lcase();
