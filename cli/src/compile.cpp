@@ -1,7 +1,12 @@
 #include <list>
 #include <thread>
+#include <atomic>
 
 static inline int ncompilationfailures; //allow threads to indicate failure
+
+//TODO find a better way to maximise concurrent compilations
+// instead of opening one thread per compilation
+std::atomic<int> atomic_count;
 
 #include <exodus/program.h>
 programinit()
@@ -1255,6 +1260,56 @@ function static compile(
 	in installcmd,
 	in manifest) {
 
+	atomic_count++;
+
+	var result = compile2(
+	verbose,
+	objfileextension,
+	binfileextension,
+	binfilename,
+	objfilename0,
+	outputdir,
+	windows,
+	posix,
+	updateinusebinposix,
+	compiler,
+	srcfilename,
+	basicoptions,
+	compileoptions,
+	outputoption,
+	linkoptions,
+	//ncompilationfailures0,
+	isprogram,
+	installcmd,
+	manifest);
+
+	atomic_count--;
+
+	return result;
+
+}
+
+function static compile2(
+	in verbose,
+	in objfileextension,
+	in binfileextension,
+	in binfilename,
+	in objfilename0,
+	in outputdir,
+	in windows,
+	in posix,
+	in updateinusebinposix,
+	in compiler,
+	in srcfilename,
+	in basicoptions,
+	in compileoptions,
+	in outputoption,
+	in linkoptions,
+	//in ncompilationfailures0,
+	in isprogram,
+	in installcmd,
+	in manifest) {
+
 #if EXODUS_EXPORT_USING_DEF
 	//add .def file to linker so that functions get exported without "c++ name decoration"
 	//then the runtime loader dlsym() can find the functions by their original (undecorated) name
@@ -1651,7 +1706,16 @@ function make_include_dir(in incdir) {
 
 subroutine limit_threads(in maxn_threads) {
 
-	//remove terminated threads
+	if (maxn_threads) {
+		while (atomic_count > maxn_threads) {
+			//errputl("atomic count", atomic_count);
+			ossleep(100);
+		}
+		return;
+	}
+
+	//errputl("subroutine limit_threads", maxn_threads);
+	//remove terminated threads (ones that have already been joined)
 	threadlist.remove_if([](const std::thread& th) { return !th.joinable(); });
 
 	//quit if the number of active threads is < maxn_threads
@@ -1662,6 +1726,7 @@ subroutine limit_threads(in maxn_threads) {
 	//or, if maxn_threads == 0 then wait on all active threads for completion
 	for (std::thread& th : threadlist) {
 		if (th.joinable()) {
+			//errputl("Joining a thread at random.");
 			th.join();
 			if (maxn_threads)
 				break;
