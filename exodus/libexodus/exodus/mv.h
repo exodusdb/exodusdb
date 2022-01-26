@@ -323,48 +323,102 @@ class PUBLIC var final {
 	///////////////
 
    public:
+
 	// default constructor
 	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
-	var();
+	//var();
+	// defined in class for inline/optimisation
+	// default constructor to allow definition unassigned "var mv";
+	var()
+		: var_typ(VARTYP_UNA) {
+		//std::cout << "ctor()" << std::endl;
+
+		// int xyz=3;
+		// WARNING neither initialisers nor constructors are called in the following case !!!
+		// var xxx=xxx.somefunction()
+		// known as "undefined usage of uninitialised variable";
+		// and not even a compiler warning in msvc8 or g++4.1.2
+
+		// so the following test is put everywhere to protect against this type of accidental
+		// programming if (var_typ&VARTYP_MASK) throw MVUndefined("funcname()"); should really
+		// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
+		// decimal 1111binary this could be removed in production code perhaps
+
+		// debuggCONSTRUCT&&cout<<"CONSTRUCT: var()\n";
+
+		// not a pointer anymore for speed
+		// priv=new pimpl;
+
+		// moved here from pimpl constructor
+		// moved up to initializer
+		// var_typ=VARTYP_UNA;
+	}
 
 	// copy constructor
 	var(CVR fromvar);  // = default;
 
 	// move constructor
-	var(TVR fromvar) noexcept;  // = default;
+	// var(TVR fromvar) noexcept;  // = default;
+	// defined in class for inline/optimisation
+	// move constructor
+	var(TVR rhs) noexcept
+		: var_str(std::move(rhs.var_str)),
+		var_int(rhs.var_int),
+		var_dbl(rhs.var_dbl),
+		var_typ(rhs.var_typ) {
 
-	// copy assignment constructor
-	VOID_OR_VARREF operator=(CVR fromvar) &;     // = default;
-	//VARREF operator=(const var &) && = delete; //disable assign to temporaries
+		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
 
-	// move assignment
-	VOID_OR_VARREF operator=(TVR fromvar) & noexcept;     // = default;
-	//VARREF operator=(TVR fromvar) && noexcept = delete;     // disable move to temporaries
+		// skip this for speed since temporararies are unlikely to be unassigned
+		// THISIS("var::var(TVR rhs) noexcept")
+		// ISASSIGNED(rhs)
+	}
 
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
-//	~var();
-// DESTRUCTOR
-/////////////
-~var() {
-	//std::cout << "dtor:" << var_str << std::endl;
+	//~var();
+	// Inline for speed but slows compilation unless optimising switched off
+	~var() {
+		//std::cout << "dtor:" << var_str << std::endl;
 
-	// not a pimpl style pointer anymore for speed
-	// delete priv;
+		// not a pimpl style pointer anymore for speed
+		// delete priv;
 
-	// try to ensure any memory is not later recognises as initialised memory
-	//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
-	// compilers allow without warning) this could be removed in production code perhaps set all
-	// unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax
-	// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
-	// variables var_typ=(char)0xFFFFFFF0;
-	var_typ = VARTYP_MASK;
-}
-
+		// try to ensure any memory is not later recognises as initialised memory
+		//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
+		// compilers allow without warning) this could be removed in production code perhaps set all
+		// unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax
+		// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
+		// variables var_typ=(char)0xFFFFFFF0;
+		var_typ = VARTYP_MASK;
+	}
 
 	////////////////////
 	// CONSTRUCTORS FROM
 	////////////////////
+
+	// ctor for char
+	// defined in class for inline/optimisation
+	// use initializers since cannot fail (but could find how to init the char1)
+	var(const char char1) noexcept
+		: var_str(1, char1),
+		  var_typ(VARTYP_STR) {}
+
+	// constructor for char*
+	// defined in class for inline/optimisation
+	// use initializers since cannot fail unless out of memory
+	var(const char* cstr1)
+		: var_str(cstr1),
+		  var_typ(VARTYP_STR) {
+		//std::cout << "ctor char* :" <<var_str << std::endl;
+
+		// protect against null pointer
+		// probably already crashed from var_str initialiser above
+		if (cstr1 == 0) {
+			// THISIS("var::var(const char* cstr1)")
+			throw ("Null pointer in var(const char*)");
+		}
+	}
 
 //#define ALL_IN_ONE_STRING_CONSTRUCTOR
 #ifdef ALL_IN_ONE_STRING_CONSTRUCTOR
@@ -380,51 +434,211 @@ class PUBLIC var final {
 	//
 	// swig java duplicates this with var(std::string&) above
 #if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
-	var(const std::string& str1);
-	var(std::string&& str1) noexcept;
+
 	//in c++20 but not g++ v9.3
 	//constexpr var(const std::string& str1);
-#endif
+
+	// constructor for const std::string
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail unless out of memory
+	var(const std::string& str1)
+		// this would validate all strings as being UTF8?
+		//: var_str(boost::locale::conv::utf_to_utf<char>(str1))
+		: var_str(str1),
+		  var_typ(VARTYP_STR) {}
+
+	// constructor for temporary std::string
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail unless out of memory
+	var(std::string&& str1) noexcept
+		: var_str(std::move(str1)),
+		  var_typ(VARTYP_STR) {}
 
 #endif
 
-#ifndef SWIGJAVA
-	// constructor for char*
-	// place first before char so SWIG isnt tempted to use char to acquire strings resulting in
-	// ONE character strings)
-	//	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-	var(const char*);
 #endif
 
-	// from char
-#ifndef SWIG
-	//    MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-	var(const char) noexcept;
-#endif
+//#ifndef SWIGJAVA
+//	// constructor for char*
+//	// place first before char so SWIG isnt tempted to use char to acquire strings resulting in
+//	// ONE character strings)
+//	//	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
+//	var(const char*);
+//#endif
+//
+//	// from char
+//#ifndef SWIG
+//	//    MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
+//	var(const char) noexcept;
+//#endif
 
-	// from char memory block
-	//
-	//    MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-	var(const char* cstr, const size_t nchars);
+	// constructor for bool
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const bool bool1) noexcept
+		: var_int(bool1),
+		  var_typ(VARTYP_INT) {}
 
-	// from bool
-	//
-	var(const bool bool1) noexcept;
+	// constructor for int
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const int int1) noexcept
+		: var_int(int1),
+		  var_typ(VARTYP_INT) {}
 
-	// from int
-	//
-	var(const int) noexcept;
+	// constructor for long long
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const long long longlong1) noexcept
+		: var_int(longlong1),
+		  var_typ(VARTYP_INT) {}
 
-	// from long long
-	//
-	// suppressing for now since ambiguous with int
-	//#if 0
-	var(const long long) noexcept;
-	//#endif
+	// constructor for double
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const double double1) noexcept
+		: var_dbl(double1),
+		  var_typ(VARTYP_DBL) {}
 
-	// from double
-	//
-	var(const double) noexcept;
+	// ctor for memory block
+	// defined in class for inline/optimisation
+	// dont use initialisers and TODO protect against out of memory in expansion to string
+	var(const char* charstart, const size_t nchars)
+		: var_str(charstart, nchars),
+		  var_typ(VARTYP_STR) {}
+
+/////////////
+// ASSIGNMENT
+/////////////
+
+	// copy assignment constructor
+	VOID_OR_VARREF operator=(CVR fromvar) &;     // = default;
+	//VARREF operator=(const var &) && = delete; //disable assign to temporaries
+
+	// move assignment
+	// defined in class for inline/optimisation
+	// var = temporary var
+	VOID_OR_VARREF operator=(TVR rhs) & noexcept {
+		// skip this for speed?
+		// THISIS("VARREF operator= (var rhs)")
+		// THISISDEFINED()
+
+		// skip this for speed since temporararies are unlikely to be unassigned
+		// THISIS("var::var(TVR rhs) noexcept")
+		// ISASSIGNED(rhs)
+
+		//std::clog << "move assignment" <<std::endl;
+
+		// important not to self assign
+		if (this == &rhs)
+			return VOID_OR_THIS;
+
+		// move everything over
+		var_str = std::move(rhs.var_str);
+		var_dbl = rhs.var_dbl;
+		var_int = rhs.var_int;
+		var_typ = rhs.var_typ;
+
+		return VOID_OR_THIS;
+	}
+
+	//=int
+	// The assignment operator should always return a reference to *this.
+	VOID_OR_VARREF operator=(const int int1) & {
+		// THISIS("VARREF operator= (const int int1)")
+		// protect against unlikely syntax as follows:
+		// var undefinedassign=undefinedassign=123';
+		// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
+		// THISISDEFINED()
+
+		var_int = int1;
+		var_typ = VARTYP_INT;  // reset to one unique type
+
+		return VOID_OR_THIS;
+	}
+
+	//=double
+	// The assignment operator should always return a reference to *this.
+	VOID_OR_VARREF operator=(const double double1) & {
+		// THISIS("VARREF operator= (const double double1)")
+		// protect against unlikely syntax as follows:
+		// var undefinedassign=undefinedassign=9.9';
+		// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
+		// THISISDEFINED()
+
+		var_dbl = double1;
+		var_typ = VARTYP_DBL;  // reset to one unique type
+
+		return VOID_OR_THIS;
+	}
+
+	//=char
+	// The assignment operator should always return a reference to *this.
+	VOID_OR_VARREF operator=(const char char2) & {
+
+		//THISIS("VARREF operator= (const char char2) &")
+		// protect against unlikely syntax as follows:
+		// var undefinedassign=undefinedassign=L'X';
+		// this causes crash due to bad memory access due to setting string that doesnt exist
+		// slows down all string settings so consider NOT CHECKING in production code
+		//THISISDEFINED()	 // ALN:TODO: this definition kind of misleading, try to find
+		// ALN:TODO: or change name to something like: THISISNOTDEAD :)
+		// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
+
+		var_str = char2;
+		var_typ = VARTYP_STR;  // reset to one unique type
+
+		return VOID_OR_THIS;
+	}
+
+	//=char*
+	// The assignment operator should always return a reference to *this.
+	VOID_OR_VARREF operator=(const char* cstr) & {
+		//THISIS("VARREF operator= (const char* cstr2) &")
+		// protect against unlikely syntax as follows:
+		// var undefinedassign=undefinedassign="xxx";
+		// this causes crash due to bad memory access due to setting string that doesnt exist
+		// slows down all string settings so consider NOT CHECKING in production code
+		//THISISDEFINED()
+
+		var_str = cstr;
+		var_typ = VARTYP_STR;  // reset to one unique type
+
+		return VOID_OR_THIS;
+	}
+
+	//=std::string variable (lvalue)
+	// The assignment operator should always return a reference to *this.
+	VOID_OR_VARREF operator=(const std::string& string2) & {
+
+		//THISIS("VARREF operator= (const std::string& string2) &")
+		// protect against unlikely syntax as follows:
+		// var undefinedassign=undefinedassign=std::string("xxx"";
+		// this causes crash due to bad memory access due to setting string that doesnt exist
+		// slows down all string settings so consider NOT CHECKING in production code
+		//THISISDEFINED()
+		var_str = string2;
+		var_typ = VARTYP_STR;  // reset to one unique type
+
+		return VOID_OR_THIS;
+	}
+
+	//=std::string temporary (rvalue)
+	// The assignment operator should always return a reference to *this.
+	VOID_OR_VARREF operator=(const std::string&& string2) & {
+
+		//THISIS("VARREF operator= (const std::string&& string2) &")
+		// protect against unlikely syntax as follows:
+		// var undefinedassign=undefinedassign=std::string("xxx"";
+		// this causes crash due to bad memory access due to setting string that doesnt exist
+		// slows down all string settings so consider NOT CHECKING in production code
+		//THISISDEFINED()
+
+		var_str = std::move(string2);
+		var_typ = VARTYP_STR;  // reset to one unique type
+
+		return VOID_OR_THIS;
+	}
 
 	///////////////////////
 	// NAMED CONVERSIONS TO
@@ -596,17 +810,9 @@ class PUBLIC var final {
 	ND var operator[](int charno) &&;
 	*/
 
-	///////////////////
-	// ASSIGN OPERATORS
-	///////////////////
-
-	//=int|double|char|char*|std::string&|std::string&& - only allow lvalue
-	VOID_OR_VARREF operator=(const int) &;
-	VOID_OR_VARREF operator=(const double) &;
-	VOID_OR_VARREF operator=(const char) &;
-	VOID_OR_VARREF operator=(const char*) &;
-	VOID_OR_VARREF operator=(const std::string&) &;
-	VOID_OR_VARREF operator=(const std::string&&) &;
+	////////////////////////
+	// SELF ASSIGN OPERATORS
+	////////////////////////
 
 	// ^=var|int|double|char|char*|std::string& - only allow lvalue
 	VARREF operator^=(CVR) &;
@@ -1864,6 +2070,7 @@ class PUBLIC dim {
 // Both cases are useful
 
 //class dim_iter
+// defined in header to be inlined for performance which is critical
 class PUBLIC dim_iter {
 
    private:
@@ -1906,6 +2113,7 @@ class PUBLIC dim_iter {
 // Lower case class name so we can use in syntax like
 // "for (int i : range(1 to 10))"
 // https://www.internalpointers.com/post/writing-custom-iterators-modern-cpp
+// defined in header to be inlined for performance which is critical
 #define INT_T int
 class PUBLIC range
 {

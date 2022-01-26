@@ -681,8 +681,10 @@ function main() {
 		try {++maxint             ;uncaught="MVIntUnderflow";}  catch (MVIntOverflow e){};
 		try {minint--             ;uncaught="MVIntUnderflow";}  catch (MVIntUnderflow e){};
 		try {maxint++             ;uncaught="MVIntUnderflow";}  catch (MVIntOverflow e){};
-
+#define SAFE_DESTRUCTOR
+#ifdef SAFE_DESTRUCTOR
 		try {var v = v+1          ;uncaught="MVUndefined";}     catch (MVUndefined e){} catch (MVUnassigned e){};
+#endif
 		//unfortunately throw causes cmake test to fail so we skip them
 		//try {throw MVDBException("test");uncaught="MVDBException";}  catch (MVDBException e){};
 		//try {throw MVDebug("test");uncaught="MVDebug";}              catch (MVDebug e){};

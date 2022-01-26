@@ -75,6 +75,8 @@ function main()
 		print(error.description);
 	}
 
+#define SAFE_DESTRUCTOR
+#ifdef SAFE_DESTRUCTOR
 	printl("\nVerify that exodus catches c++ defect at runtime");
 	try {
 		var abc=abc+1;
@@ -97,6 +99,7 @@ function main()
 		//assert(false);
 		throw;
 	}
+#endif
 
 	//this turns on tracing SQL statements to postgres
 	//DBTRACE=true;
