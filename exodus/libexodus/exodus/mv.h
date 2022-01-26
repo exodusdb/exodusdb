@@ -357,23 +357,6 @@ class PUBLIC var final {
 	// copy constructor
 	var(CVR fromvar);  // = default;
 
-	// move constructor
-	// var(TVR fromvar) noexcept;  // = default;
-	// defined in class for inline/optimisation
-	// move constructor
-	var(TVR rhs) noexcept
-		: var_str(std::move(rhs.var_str)),
-		var_int(rhs.var_int),
-		var_dbl(rhs.var_dbl),
-		var_typ(rhs.var_typ) {
-
-		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
-
-		// skip this for speed since temporararies are unlikely to be unassigned
-		// THISIS("var::var(TVR rhs) noexcept")
-		// ISASSIGNED(rhs)
-	}
-
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
 	//~var();
@@ -397,6 +380,110 @@ class PUBLIC var final {
 	// CONSTRUCTORS FROM
 	////////////////////
 
+//#define INLINE_CONSTRUCTION
+#ifndef INLINE_CONSTRUCTION
+
+	// move constructor
+	// var(TVR fromvar) noexcept;  // = default;
+	// defined in class for inline/optimisation
+	// move constructor
+	var(TVR rhs) noexcept;
+
+	// constructor for bool
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const bool bool1) noexcept;
+
+	// constructor for int
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const int int1) noexcept;
+
+	// constructor for long long
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const long long longlong1) noexcept;
+
+	// constructor for double
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const double double1) noexcept;
+
+	// ctor for char
+	// defined in class for inline/optimisation
+	// use initializers since cannot fail (but could find how to init the char1)
+	var(const char char1) noexcept;
+
+	// constructor for char*
+	// defined in class for inline/optimisation
+	// use initializers since cannot fail unless out of memory
+	var(const char* cstr1);
+
+	//in c++20 but not g++ v9.3
+	//constexpr var(const std::string& str1);
+
+	// ctor for memory block
+	// defined in class for inline/optimisation
+	// dont use initialisers and TODO protect against out of memory in expansion to string
+	var(const char* charstart, const size_t nchars);
+
+	// constructor for const std::string
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail unless out of memory
+	var(const std::string& str1);
+
+	// constructor for temporary std::string
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail unless out of memory
+	var(std::string&& str1) noexcept;
+
+#else // INLINE_CONSTRUCTION
+
+	// move constructor
+	// var(TVR fromvar) noexcept;  // = default;
+	// defined in class for inline/optimisation
+	// move constructor
+	var(TVR rhs) noexcept
+		: var_str(std::move(rhs.var_str)),
+		var_int(rhs.var_int),
+		var_dbl(rhs.var_dbl),
+		var_typ(rhs.var_typ) {
+
+		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
+
+		// skip this for speed since temporararies are unlikely to be unassigned
+		// THISIS("var::var(TVR rhs) noexcept")
+		// ISASSIGNED(rhs)
+	}
+
+	// constructor for bool
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const bool bool1) noexcept
+		: var_int(bool1),
+		  var_typ(VARTYP_INT) {}
+
+	// constructor for int
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const int int1) noexcept
+		: var_int(int1),
+		  var_typ(VARTYP_INT) {}
+
+	// constructor for long long
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const long long longlong1) noexcept
+		: var_int(longlong1),
+		  var_typ(VARTYP_INT) {}
+
+	// constructor for double
+	// defined in class for inline/optimisation
+	// just use initializers since cannot fail
+	var(const double double1) noexcept
+		: var_dbl(double1),
+		  var_typ(VARTYP_DBL) {}
+
 	// ctor for char
 	// defined in class for inline/optimisation
 	// use initializers since cannot fail (but could find how to init the char1)
@@ -419,6 +506,13 @@ class PUBLIC var final {
 			throw ("Null pointer in var(const char*)");
 		}
 	}
+
+	// ctor for memory block
+	// defined in class for inline/optimisation
+	// dont use initialisers and TODO protect against out of memory in expansion to string
+	var(const char* charstart, const size_t nchars)
+		: var_str(charstart, nchars),
+		  var_typ(VARTYP_STR) {}
 
 //#define ALL_IN_ONE_STRING_CONSTRUCTOR
 #ifdef ALL_IN_ONE_STRING_CONSTRUCTOR
@@ -472,48 +566,45 @@ class PUBLIC var final {
 //	var(const char) noexcept;
 //#endif
 
-	// constructor for bool
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const bool bool1) noexcept
-		: var_int(bool1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for int
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const int int1) noexcept
-		: var_int(int1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for long long
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const long long longlong1) noexcept
-		: var_int(longlong1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for double
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const double double1) noexcept
-		: var_dbl(double1),
-		  var_typ(VARTYP_DBL) {}
-
-	// ctor for memory block
-	// defined in class for inline/optimisation
-	// dont use initialisers and TODO protect against out of memory in expansion to string
-	var(const char* charstart, const size_t nchars)
-		: var_str(charstart, nchars),
-		  var_typ(VARTYP_STR) {}
+#endif //not INLINE_CONSTRUCTION
 
 /////////////
 // ASSIGNMENT
 /////////////
 
+	// The assignment operator should always return a reference to *this.
+
 	// copy assignment constructor
-	VOID_OR_VARREF operator=(CVR fromvar) &;     // = default;
+	VOID_OR_VARREF operator=(CVR fromvar) &;
 	//VARREF operator=(const var &) && = delete; //disable assign to temporaries
+
+//#define INLINE_ASSIGNMENT
+#ifndef INLINE_ASSIGNMENT
+
+	// move assignment
+	// defined in class for inline/optimisation
+	// var = temporary var
+	VOID_OR_VARREF operator=(TVR rhs) & noexcept;
+
+	// int assignment
+	VOID_OR_VARREF operator=(const int int1) &;
+
+	// double assignment
+	VOID_OR_VARREF operator=(const double double1) &;
+
+	// char assignment
+	VOID_OR_VARREF operator=(const char char2) &;
+
+	// char* assignment
+	VOID_OR_VARREF operator=(const char* cstr) &;
+
+	// std::string assignment from variable (lvalue)
+	VOID_OR_VARREF operator=(const std::string& string2) &;
+
+	// std::string assignment from temporary (rvalue)
+	VOID_OR_VARREF operator=(const std::string&& string2) &;
+
+# else // INLINE_ASSIGNMENT
 
 	// move assignment
 	// defined in class for inline/optimisation
@@ -542,7 +633,7 @@ class PUBLIC var final {
 		return VOID_OR_THIS;
 	}
 
-	//=int
+	// int assignment
 	// The assignment operator should always return a reference to *this.
 	VOID_OR_VARREF operator=(const int int1) & {
 		// THISIS("VARREF operator= (const int int1)")
@@ -557,7 +648,7 @@ class PUBLIC var final {
 		return VOID_OR_THIS;
 	}
 
-	//=double
+	// double assignment
 	// The assignment operator should always return a reference to *this.
 	VOID_OR_VARREF operator=(const double double1) & {
 		// THISIS("VARREF operator= (const double double1)")
@@ -572,7 +663,7 @@ class PUBLIC var final {
 		return VOID_OR_THIS;
 	}
 
-	//=char
+	// char assignment
 	// The assignment operator should always return a reference to *this.
 	VOID_OR_VARREF operator=(const char char2) & {
 
@@ -591,7 +682,7 @@ class PUBLIC var final {
 		return VOID_OR_THIS;
 	}
 
-	//=char*
+	// char* assignment
 	// The assignment operator should always return a reference to *this.
 	VOID_OR_VARREF operator=(const char* cstr) & {
 		//THISIS("VARREF operator= (const char* cstr2) &")
@@ -607,7 +698,7 @@ class PUBLIC var final {
 		return VOID_OR_THIS;
 	}
 
-	//=std::string variable (lvalue)
+	// std::string assignment from variable (lvalue)
 	// The assignment operator should always return a reference to *this.
 	VOID_OR_VARREF operator=(const std::string& string2) & {
 
@@ -623,7 +714,7 @@ class PUBLIC var final {
 		return VOID_OR_THIS;
 	}
 
-	//=std::string temporary (rvalue)
+	// std::string assignment from temporary (rvalue)
 	// The assignment operator should always return a reference to *this.
 	VOID_OR_VARREF operator=(const std::string&& string2) & {
 
@@ -639,6 +730,8 @@ class PUBLIC var final {
 
 		return VOID_OR_THIS;
 	}
+
+#endif // INLINE_ASSIGNMENT
 
 	///////////////////////
 	// NAMED CONVERSIONS TO
