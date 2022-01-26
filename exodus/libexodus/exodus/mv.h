@@ -343,7 +343,24 @@ class PUBLIC var final {
 
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
-	~var();
+//	~var();
+// DESTRUCTOR
+/////////////
+~var() {
+	//std::cout << "dtor:" << var_str << std::endl;
+
+	// not a pimpl style pointer anymore for speed
+	// delete priv;
+
+	// try to ensure any memory is not later recognises as initialised memory
+	//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
+	// compilers allow without warning) this could be removed in production code perhaps set all
+	// unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax
+	// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
+	// variables var_typ=(char)0xFFFFFFF0;
+	var_typ = VARTYP_MASK;
+}
+
 
 	////////////////////
 	// CONSTRUCTORS FROM
