@@ -45,6 +45,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 	for (const var rown : range(1, nrows)) {
 
 		for (var coln = 1; coln <= ncols2; coln++) {
+		// Reverted because we do need to skip coln's
 		//for (const var coln : range(1, ncols2)) {
 
 			var tt = colhdg.a(coln, rown);
