@@ -35,6 +35,8 @@ function test(in str, in str2o = "") {
 	// 0 != ''
 	//and
 	// '' |= 0
+	TRACE(str)
+	TRACE(double(str))
 	if (len(str) == 0) {
 		assert((str + 0)   !=  str);
 		assert( str        != (str + 0));

@@ -564,6 +564,64 @@ function main()
 		assert(var("-9.9").isnum());
 	}
 
+	{
+		assert(var("9e9").isnum());
+		assert(var("-9e9").isnum());
+		assert(var("-9e-9").isnum());
+		assert(!var("e").isnum());
+		assert(!var("9e").isnum());
+		assert(!var("e9").isnum());
+
+		assert(var("+9e-9").isnum());
+		assert(var("9e+9").isnum());
+
+		assert(var("9e9").isnum());
+		assert(var("-9e9").isnum());
+		assert(var("-9e-9").isnum());
+		assert(!var("e").isnum());
+		assert(!var("9e").isnum());
+		assert(!var("e9").isnum());
+
+
+		assert(!var("9e9.").isnum());
+		assert(!var("-9e9.").isnum());
+		assert(!var("-9e-9.").isnum());
+		assert(!var("e.").isnum());
+		assert(!var("9e.").isnum());
+		assert(!var("e9.").isnum());
+
+		assert(!var("+9e-9.").isnum());
+		assert(!var("9e+9.").isnum());
+
+		assert(!var("9e9.").isnum());
+		assert(!var("-9e9.").isnum());
+		assert(!var("-9e-9.").isnum());
+		assert(!var("e.").isnum());
+		assert(!var("9e.").isnum());
+		assert(!var("e9.").isnum());
+
+
+		assert(!var("++123").isnum());
+		assert(!var("+-123").isnum());
+		assert(!var("--123").isnum());
+		assert(!var("-+123").isnum());
+
+		assert(var("+123").isnum());
+		assert(var("+123").isnum());
+		assert(var("-123").isnum());
+		assert(var("-123").isnum());
+
+		assert(!var("+123-").isnum());
+		assert(!var("+123-").isnum());
+		assert(!var("-123-").isnum());
+		assert(!var("-123-").isnum());
+
+		assert(!var("+123+").isnum());
+		assert(!var("+123+").isnum());
+		assert(!var("-123+").isnum());
+		assert(!var("-123+").isnum());
+	}
+
 	printl("OK");
 
 	end = end.timedate();

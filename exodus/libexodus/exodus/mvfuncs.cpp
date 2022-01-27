@@ -1775,11 +1775,6 @@ bool var::isnum(void) const {
 	if (!var_typ)
 		throw MVUnassigned("isnum()");
 
-	// if not a number and not unassigned then it is an unknown string
-
-	bool point = false;
-	bool digit = false;
-
 	// otherwise find test
 	// a number is optional minus followed by digits and max of one decimal point
 	// NB going backwards - for speed?
@@ -1791,6 +1786,19 @@ bool var::isnum(void) const {
 	// 2009REPORT
 	//	for (int ii=(int)var_str.size()-1;ii>=0;--ii)
 	int strlen = var_str.size();
+
+	// Empty string is zero. Leave the string as "".
+	if (strlen == 0) {
+		var_int = 0;
+		var_typ = VARTYP_INTSTR;
+		return true;
+	}
+
+/*
+	// if not a number and not unassigned then it is an unknown string
+
+	bool point = false;
+	bool digit = false;
 
 	//very long strings, even if numeric, are deemed not numeric because they cannot be converted to double/long int
 	//if (strlen > 30) {
@@ -1872,12 +1880,63 @@ bool var::isnum(void) const {
 		var_typ = VARTYP_INTSTR;
 		return true;
 	}
+*/
+
+	//detect if NAN, floating point or integer
+	// We need to detect NAN asap because strings comparison always attempts to compare numerically.
+	bool floating = false;
+	bool has_sign = false;
+	for (int ii = 0; ii < strlen; ii++) {
+		char cc = var_str[ii];
+
+		// +   2B
+		// -   2D
+		// .   2E
+		// 0-9 30-39
+		// E   45
+		// e   65
+
+		// Ideally we put the most divisive test first
+		// but, assuming that non-numeric strings are tested more frequently
+		// then following is perhaps not the best choice.
+		if (cc >= '0' and cc <= '9')
+			continue;
+
+		switch (cc) {
+
+		case '.':
+			floating = true;
+			break;
+
+		case '-':
+		case '+':
+			// Disallow more than one sign
+			// Disallow a single + since it will be trimmed off below
+			if (has_sign) {
+				var_typ = VARTYP_NANSTR;
+				return false;
+			}
+			has_sign = true;
+			break;
+
+		case 'e':
+		case 'E':
+			floating = true;
+			// Allow a sign again after any e/E
+			has_sign = false;
+			break;
+
+		default:
+			var_typ = VARTYP_NANSTR;
+			return false;
+		}
+	}
 
 	// get and save the number as double or (long) int
 	try {
 
 		//double
-		if (point) {
+		if (floating) {
 			// var_dbl=_wtof(var_str.c_str());
 			// var_dbl=_wtof(var_str.c_str());
 			// TODO optimise with code based on the following idea?
@@ -1903,9 +1962,12 @@ bool var::isnum(void) const {
 			//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
 
 			char* first = var_str.data();
+			char* last = first + strlen;
+			// Allow leading + to be compatible with javascript
 			first += *first == '+';
-			auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, var_str.data() + var_str.size(), var_dbl, STD_OR_FASTFLOAT::chars_format::fixed);
-			if (ec != std::errc()) {
+			//auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, var_str.data() + var_str.size(), var_dbl, STD_OR_FASTFLOAT::chars_format::fixed);
+			auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, last, var_dbl);
+			if (ec != std::errc() || p != last) {
 				//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
 				var_typ = VARTYP_NANSTR;
 				return false;
@@ -1921,8 +1983,10 @@ bool var::isnum(void) const {
 			//  INPUT_TOO_SHORT,
 			//  INPUT_TOO_LONG,
 			//  MALFORMED_INPUT
-			if (status != SUCCESS)
+			if (status != SUCCESS) {
+				var_typ = VARTYP_NANSTR;
 				return false;
+			}
 
 #else
 
@@ -1952,13 +2016,17 @@ bool var::isnum(void) const {
 			//v.isnum();//+54ns (81ns) using charconv from_chars int
 			//v.isnum();//+49ns (76ns) using atol BEST
 
-#if 1
+#if 0
 			//var_int = std::stol(var_str.c_str(), 0, 10);
 			//var_int = std::stol(var_str);
 			var_int = std::atol(var_str.c_str());  //fastest gcc 10.2
 #else
-			auto [p, ec] = std::from_chars(var_str.data(), var_str.data() + var_str.size(), var_int);
-			if (ec != std::errc()) {
+			char* first = var_str.data();
+			char* last = first + strlen;
+			// Allow leading + to be compatible with javascript
+			first += *first == '+';
+			auto [p, ec] = std::from_chars(first, last, var_int);
+			if (ec != std::errc() || p != last) {
 				var_typ = VARTYP_NANSTR;
 				return false;
 			}

@@ -527,6 +527,7 @@ function main()
 		var xx3="1234.5678";
 		assert(xx3+1==1235.5678);
 
+		TRACE(oconv("","MD20P"))
 		assert(oconv("","MD20P")=="");
 		assert(oconv("X","MD20P")=="X");
 		assert(oconv("0","MD20P")=="0.00");

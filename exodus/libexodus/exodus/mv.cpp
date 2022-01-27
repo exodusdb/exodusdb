@@ -411,6 +411,17 @@ std::string dblToString(double double1) {
 
 	auto exponent = stoi(s.substr(epos + 1));
 
+	//leave exponent in if like 1.23456E-6
+	//otherwise convert things like 1.23456E3 to 1234.56
+	//1.23456E0 -> 1.23456
+	//1.23456E-1 -> 0.123456
+	//1.23456E-6 -> 0.00000123456
+	//1.23456E-7 -> 1.23456E-7
+	//1.23456E1 -> 12.3456
+	//1.23456E1 -> 12.3456
+	if (exponent < -6)
+		return s;
+
 	if (epos != std::string::npos)
 		s.erase(epos);
 
