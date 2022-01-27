@@ -23,9 +23,9 @@ OPTIONS
 		x.r(fn, vn, replacement);     -> x(fn, vn)     = replacement;
 		x.r(fn, vn, sn, replacement); -> x(fn, vn, sn) = replacement;
 
-	F Convert for (var x = ... -> for (var x : range(...
+	F Convert for (const var x = ... -> for (var x : range(...
 
-		for (var x = a; x <= b; ++x) -> for (var x : range(a to b))
+		for (const var x = a; x <= b; ++x) -> for (var x : range(a to b))
 */
 
 function main() {
@@ -162,7 +162,7 @@ function main() {
 				//printl("part3 :", part3.quote());
 				//printl("varname :", varname.quote(), ",", varname2.quote(), "starting :", starting.quote(), "compare :" ^ compare.quote(), "ending :", ending.quote());
 				if (not fail) {
-					line2.splicer(pos, 99999, "for (var " ^ varname ^ " : range(" ^ starting ^ ", " ^ ending ^ ")) {");
+					line2.splicer(pos, 99999, "for (const var " ^ varname ^ " : range(" ^ starting ^ ", " ^ ending ^ ")) {");
 				}
 
 				if (not line2.index(" : range(")) {

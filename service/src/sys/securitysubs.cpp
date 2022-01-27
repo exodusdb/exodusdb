@@ -633,7 +633,7 @@ function main(in mode) {
 					var otherkeys = "";
 					if (invisiblekeys) {
 						var nkeys = invisiblekeys.count(VM) + 1;
-						for (var keyn : range(1, nkeys)) {
+						for (const var keyn : range(1, nkeys)) {
 							var keyx = invisiblekeys.a(1, keyn);
 							if (not(otherkeys.a(1).locate(keyx, xx))) {
 								if (not(visiblekeys.a(1).locate(keyx, xx))) {
@@ -649,7 +649,7 @@ function main(in mode) {
 				}
 
 				//delete higher and lower users if not allowed
-				for (var fn : range(1, 8)) {
+				for (const var fn : range(1, 8)) {
 					RECORD(fn) = RECORD.a(fn).field(VM, startn_, nn);
 				} //fn;
 
@@ -693,7 +693,7 @@ function main(in mode) {
 		if (not interactive) {
 
 			//group separators act as data in intranet client forcing menu and passwords
-			for (var fn : range(1, 2)) {
+			for (const var fn : range(1, 2)) {
 				var temp = RECORD.a(fn);
 				temp.swapper("---", "");
 				RECORD(fn) = temp;
@@ -865,7 +865,7 @@ function main(in mode) {
 			if (startn_) {
 				var nn = endn_ - startn_ + 1;
 				var nvms = RECORD.a(1).count(VM);
-				for (var fn : range(1, 8)) {
+				for (const var fn : range(1, 8)) {
 					var temp = RECORD.a(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
 					RECORD(fn) = origfullrec_.a(fn).fieldstore(VM, startn_, -nn, temp);
@@ -876,7 +876,7 @@ function main(in mode) {
 			var tasks = origfullrec_.a(10);
 			var locks = origfullrec_.a(11);
 			var ntasks = tasks.count(VM) + (tasks ne "");
-			for (var taskn : range(1, ntasks)) {
+			for (const var taskn : range(1, ntasks)) {
 				var task = tasks.a(1, taskn);
 				if (task) {
 					if (not(win.orec.a(10).locate(task, newtaskn))) {
@@ -986,7 +986,7 @@ function main(in mode) {
 					var osysrec = "";
 
 					//new users look for legacy menu in following (lower rank) users
-					for (var usern2 : range(usern + 1, nusers)) {
+					for (const var usern2 : range(usern + 1, nusers)) {
 						var usercode2 = usercodes.a(1, usern2);
 						if (usercode2) {
 							if (not(menuid.readv(users, usercode2, 34))) {
@@ -1139,7 +1139,7 @@ function main(in mode) {
 			//email new users if requested to do so
 			if (newusers and emailnewusers_) {
 				var nn = newusers.count(FM) + 1;
-				for (var ii : range(1, nn)) {
+				for (const var ii : range(1, nn)) {
 
 					if (USERNAME eq "EXODUS") {
 						replyto = "support@neosys.com";
@@ -1176,7 +1176,7 @@ function main(in mode) {
 					var baselinkdescs = SYSTEM.a(115);
 					var nlinks = baselinks.count(VM) + (baselinks ne "");
 					if (nlinks) {
-						for (var linkn : range(1, nlinks)) {
+						for (const var linkn : range(1, nlinks)) {
 							body(1, -1) = baselinkdescs.a(1, linkn) ^ " " ^ baselinks.a(1, linkn);
 							//if @account='ACCOUNTS' then body:='?ACCOUNTS'
 						} //linkn;
@@ -1252,7 +1252,7 @@ function main(in mode) {
 			var expirydate = expirydates.a(1, ii);
 			if (expirydate) {
 				if (expirydate le var().date()) {
-					for (var fn : range(1, 9)) {
+					for (const var fn : range(1, 9)) {
 						var tt = temprec.a(fn);
 						if (tt) {
 							temprec(fn) = tt.remove(1, ii, 0);
@@ -1270,7 +1270,7 @@ function main(in mode) {
 			if (usercode) {
 				if (temprec.a(8, ii) eq "" or temprec.a(7, ii) eq "") {
 					if (temprec.a(1, ii - 1) eq "") {
-						for (var fn : range(1, 9)) {
+						for (const var fn : range(1, 9)) {
 							var tt = temprec.a(fn);
 							if (tt) {
 								temprec(fn) = tt.remove(1, ii, 0);
@@ -1289,7 +1289,7 @@ function main(in mode) {
 			//trim any multivalued fields with more than nusers multivalues
 			var nusers = temprec.a(1).count(VM) + 1;
 			var nfs = temprec.count(FM) + 1;
-			for (var fn : range(1, nfs)) {
+			for (const var fn : range(1, nfs)) {
 				temprec(fn) = temprec.a(fn).field(VM, 1, nusers);
 			} //fn;
 			temprec = invertarray(reverse(invertarray(temprec)));
@@ -1348,7 +1348,7 @@ function main(in mode) {
 		var locks = SECURITY.a(11);
 		var ntasks = tasks.count(VM) + 1;
 		var lasttask = "";
-		for (var taskn : range(1, ntasks)) {
+		for (const var taskn : range(1, ntasks)) {
 			var task = tasks.a(1, taskn);
 			if (authorised(task, xx)) {
 				ok = 1;
@@ -1362,7 +1362,7 @@ function main(in mode) {
 
 				//shorten duplicated task names
 				var task2 = task;
-				for (var ii : range(1, 9)) {
+				for (const var ii : range(1, 9)) {
 					var temp = task.field(" ", ii);
 					if (temp) {
 						if (temp eq lasttask.field(" ", ii)) {
@@ -1497,7 +1497,7 @@ subroutine generatepassword() {
 	var vowels = "AEIOUY";
 	consonants.converter(vowels ^ "QX", "");
 	newpassword = "";
-	for (var ii : range(1, minpasswordchars_ / 2)) {
+	for (const var ii : range(1, minpasswordchars_ / 2)) {
 		newpassword ^= consonants[consonants.length().rnd() + 1];
 		newpassword ^= vowels[vowels.length().rnd() + 1];
 	} //ii;
@@ -1604,7 +1604,7 @@ subroutine cleartemp() {
 	//22 possible menus (no longer since menus moved to users field <34>
 	//23 other user codes
 	//24 other keys
-	for (var ii : range(20, 24)) {
+	for (const var ii : range(20, 24)) {
 		RECORD(ii) = "";
 	} //ii;
 	return;
@@ -1623,7 +1623,7 @@ subroutine getemailtx() {
 
 	//build up log email for sysmsg
 	var tx = "";
-	for (var fieldn : range(1, nuserfields)) {
+	for (const var fieldn : range(1, nuserfields)) {
 		var fieldx = userfields.a(fieldn);
 		var fn = fieldx.a(1, 2);
 		var old = oconv(origuserrec.a(fn), fieldx.a(1, 3));

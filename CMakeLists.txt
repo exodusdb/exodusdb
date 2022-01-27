@@ -44,7 +44,13 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native -O1")
 # Turn off some warnings
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-cast-function-type")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden") # Force g++ to hide by default
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")               # Link time optimisation. very slow and no observed performance increase
+
+#root@de1:~/exodus/cli/src# ll /usr/local/lib/libexodus.so* -h
+#lrwxrwxrwx 1 root root  18 Sep 11 15:37 /usr/local/lib/libexodus.so -> libexodus.so.21.03
+#-rw-r--r-- 1 root root 32M Jan 27 04:49 /usr/local/lib/libexodus.so.21.03
 
 message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 

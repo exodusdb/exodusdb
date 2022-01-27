@@ -33,7 +33,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 
 	//determine nrows
 	var nrows = 1;
-	for (var coln : range(1, ncols2)) {
+	for (const var coln : range(1, ncols2)) {
 		var tt = colhdg.a(coln).count(VM) + 1;
 		if (tt gt nrows) {
 			nrows = tt;
@@ -42,9 +42,10 @@ function main(io colhdg, in thproperties, in nobase0) {
 
 	var thprop = thproperties;
 	var nocell = "%~%";
-	for (var rown : range(1, nrows)) {
+	for (const var rown : range(1, nrows)) {
 
-		for (var coln : range(1, ncols2)) {
+		for (var coln = 1; coln <= ncols2; coln++) {
+		//for (const var coln : range(1, ncols2)) {
 
 			var tt = colhdg.a(coln, rown);
 			if (tt eq nocell) {

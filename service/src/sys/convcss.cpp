@@ -19,7 +19,7 @@ function main(in mode, in tableid, in in0, out outx) {
 	var align = "left";
 
 	var ncols = inp.count(VM) + 1;
-	for (var coln : range(1, ncols)) {
+	for (const var coln : range(1, ncols)) {
 		var tt = inp.a(1, coln);
 
 		if (tt.index("left")) {

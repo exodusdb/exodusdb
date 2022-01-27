@@ -339,7 +339,7 @@ function main() {
 	datax.ucaser();
 	datax.converter(DQ, "'");
 	ANS = "";
-	for (var fn : range(1, nn)) {
+	for (const var fn : range(1, nn)) {
 		var tx = datax.a(fn).trim();
 
 		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {
@@ -512,7 +512,7 @@ function main() {
 
 	//dim x(nfields)
 	//matparse @record into x
-	for (var ii : range(1, nfields)) {
+	for (const var ii : range(1, nfields)) {
 	//if trim(x(i))[1,1]='*' then x(i)=''
 		if (RECORD.a(ii).trim()[1] eq "*") {
 			RECORD(ii) = "";

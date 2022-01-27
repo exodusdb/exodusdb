@@ -34,7 +34,7 @@ function main(in a0, io bb, in sep) {
 	}
 
 	var na = aa.count(VM) + (aa ne "");
-	for (var an : range(1, na)) {
+	for (const var an : range(1, na)) {
 
 		var anum = split(aa.a(1, an), acode);
 		var bcode = "";

@@ -435,7 +435,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 subroutine hash(in salt, in max, out hashcode) {
 
 	hashcode = salt;
-	for (var ii : range(1, text.length())) {
+	for (const var ii : range(1, text.length())) {
 		hashcode = (hashcode * (text[ii]).seq()).mod(max);
 	} //ii;
 	return;

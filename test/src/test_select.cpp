@@ -25,7 +25,7 @@ function main() {
 	}
 	if (not read(RECORD,dictvoc,"F1M")) {
 		var rr = "F";
-		for (var ii : range(1, 12)) {
+		for (const var ii : range(1, 12)) {
 
 			ID = "F" ^ ii;
 			rr(2) = ii;

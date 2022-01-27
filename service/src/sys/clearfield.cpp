@@ -62,7 +62,7 @@ function main() {
 	var nfields = fns.count(FM) + 1;
 
 	//check numeric
-	for (var ii : range(1, nfields)) {
+	for (const var ii : range(1, nfields)) {
 tryagain:
 		var fn = fns.a(ii);
 		//prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0
@@ -131,7 +131,7 @@ next:
 		}
 
 		var cleared = 0;
-		for (var ii : range(1, nfields)) {
+		for (const var ii : range(1, nfields)) {
 			if (RECORD.a(fns.a(ii)) ne cleartovalue2) {
 				cleared = 1;
 				//RECORD(fns.a(ii)) = cleartovalue2;

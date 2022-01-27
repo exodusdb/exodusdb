@@ -665,7 +665,7 @@ var::operator const char*()
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
 VOID_OR_VARREF var::operator=(CVR rhs) & {
-	THISIS("VARREF var::operator= (CVR rhs) &")
+	THISIS("VARREF var::operator=(CVR rhs) &")
 	THISISDEFINED()	 //could be skipped for speed?
 	ISASSIGNED(rhs)
 
@@ -835,7 +835,7 @@ VARREF var::operator^=(CVR rhs) & {
 //^=int
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const int int1) & {
-	THISIS("VARREF var::operator^= (const int int1) &")
+	THISIS("VARREF var::operator^=(const int int1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -848,7 +848,7 @@ VARREF var::operator^=(const int int1) & {
 //^=double
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const double double1) & {
-	THISIS("VARREF var::operator^= (const double double1) &")
+	THISIS("VARREF var::operator^=(const double double1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -861,7 +861,7 @@ VARREF var::operator^=(const double double1) & {
 //^=char
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const char char1) & {
-	THISIS("VARREF var::operator^= (const char char1) &")
+	THISIS("VARREF var::operator^=(const char char1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -874,7 +874,7 @@ VARREF var::operator^=(const char char1) & {
 //^=char*
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const char* cstr) & {
-	THISIS("VARREF var::operator^= (const char* cstr) &")
+	THISIS("VARREF var::operator^=(const char* cstr) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -888,7 +888,7 @@ VARREF var::operator^=(const char* cstr) & {
 //^=std::string
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const std::string& string1) & {
-	THISIS("VARREF var::operator^= (const std::string string1) &")
+	THISIS("VARREF var::operator^=(const std::string string1) &")
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
@@ -909,7 +909,7 @@ VARREF var::operator^=(const std::string& string1) & {
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
 var var::operator++(int) & {
-	THISIS("var var::operator++ (int) &")
+	THISIS("var var::operator++(int) &")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -949,7 +949,7 @@ tryagain:
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v--
 var var::operator--(int) & {
-	THISIS("var var::operator-- (int) & ")
+	THISIS("var var::operator--(int) & ")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -988,7 +988,7 @@ tryagain:
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override ++var
 VARREF var::operator++() & {
-	THISIS("var var::operator++ () &")
+	THISIS("var var::operator++() &")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -1022,7 +1022,7 @@ tryagain:
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
 VARREF var::operator--() & {
-	THISIS("VARREF var::operator-- () &")
+	THISIS("VARREF var::operator--() &")
 	// full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -1057,8 +1057,8 @@ tryagain:
 
 //+=var (very similar to version with on rhs)
 // provided to disambiguate syntax like var1+=var2
-VARREF var::operator+=(int int1) & {
-	THISIS("VARREF var::operator+= (int int1) &")
+VARREF var::operator+=(const int int1) & {
+	THISIS("VARREF var::operator+=(const int int1) &")
 	THISISDEFINED()
 
 tryagain:
@@ -1094,10 +1094,29 @@ tryagain:
 	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
+//+='1' (very similar to version with on rhs)
+// provided to disambiguate syntax like var1 += '1'
+
+VARREF var::operator+=(const char char1) & {
+	THISIS("VARREF var::operator+=(const char char1) &")
+	var charx = char1;
+	ISNUMERIC(charx)
+	return this->operator+=(int(charx.var_int));
+}
+
+//-='1' (very similar to version with on rhs)
+// provided to disambiguate syntax like var1 -= '1'
+VARREF var::operator-=(const char char1) & {
+	THISIS("VARREF var::operator-=(const char char1) &")
+	var charx = char1;
+	ISNUMERIC(charx)
+	return this->operator-=(int(charx.var_int));
+}
+
 //-=var (very similar to version with on rhs)
 // provided to disambiguate syntax like var1+=var2
-VARREF var::operator-=(int int1) & {
-	THISIS("VARREF var::operator-= (int int1) &")
+VARREF var::operator-=(const int int1) & {
+	THISIS("VARREF var::operator-=(int int1) &")
 	THISISDEFINED()
 
 tryagain:
@@ -1125,19 +1144,19 @@ tryagain:
 }
 
 // allow varx+=1.5 to compile
-VARREF var::operator+=(double dbl1) & {
+VARREF var::operator+=(const double dbl1) & {
 	(*this) += var(dbl1);
 	return *this;
 }
 
-VARREF var::operator-=(double dbl1) & {
+VARREF var::operator-=(const double dbl1) & {
 	(*this) -= var(dbl1);
 	return *this;
 }
 
 //+=var
 VARREF var::operator+=(CVR rhs) & {
-	THISIS("VARREF var::operator+= (CVR rhs) &")
+	THISIS("VARREF var::operator+=(CVR rhs) &")
 	THISISDEFINED()
 
 tryagain:
@@ -1184,7 +1203,7 @@ tryagain:
 
 //-=var
 VARREF var::operator-=(CVR rhs) & {
-	THISIS("VARREF var::operator-= (CVR rhs) &")
+	THISIS("VARREF var::operator-=(CVR rhs) &")
 	THISISDEFINED()
 
 tryagain:
@@ -1853,7 +1872,7 @@ VARREF var::operator^(const std::string& stdstr) {
 //TODO provide a version that works on temporaries?
 //PUBLIC
 std::ostream& operator<<(std::ostream& ostream1, var var1) {
-	THISIS("std::ostream& operator<< (std::ostream& ostream1, var var1)")
+	THISIS("std::ostream& operator<<(std::ostream& ostream1, var var1)")
 	ISSTRING(var1)
 
 	//replace various unprintable field marks with unusual ASCII characters
@@ -1873,7 +1892,7 @@ std::ostream& operator<<(std::ostream& ostream1, var var1) {
 }
 
 std::istream& operator>>(std::istream& istream1, VARREF var1) {
-	THISIS("std::istream& operator>> (std::istream& istream1,VARREF var1)")
+	THISIS("std::istream& operator>>(std::istream& istream1,VARREF var1)")
 	ISDEFINED(var1)
 
 	std::string tempstr;

@@ -32,7 +32,7 @@ function main(in type, in in0, in mode, out output) {
 	}
 
 	//convert "&" to &amp;
-	for (var ii : range(1, 99999)) {
+	for (const var ii : range(1, 99999)) {
 		var charn = output.index("&", ii);
 
 		///BREAK;

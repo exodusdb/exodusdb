@@ -22,13 +22,14 @@ function main(in mode, in datasetcode, out result) {
 	printl();
 	printl("Waiting up to 120 seconds for other ", datasetcode, " processes to close:");
 	var ii = "";
-	for (var ii : range(1, 120)) {
+	for (const var ii : range(1, 120)) {
 		///BREAK;
 		if (not(otherusers(datasetcode))) break;
 		print(".");
 		call ossleep(1000*1);
 		if (esctoexit()) {
-			ii = 99999;
+			//ii = 99999;
+			break;
 		}
 	} //ii;
 

@@ -101,7 +101,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 	} else if (mode eq "HASHTABLE") {
 
 		var nv = dataio.count(VM) + 1;
-		for (var vn : range(1, nv)) {
+		for (const var vn : range(1, nv)) {
 			var datax = dataio.a(1, vn);
 
 			//insert a break before all space+#
@@ -115,7 +115,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			var nlines = datax.count(FM) + 1;
 			if (nlines gt 1) {
 
-				for (var ln : range(1, nlines)) {
+				for (const var ln : range(1, nlines)) {
 					var line = datax.a(ln).trim();
 					if (line[1] eq "#") {
 						line.splicer(1, 1, "");

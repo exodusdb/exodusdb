@@ -35,7 +35,7 @@ function main()
 	{
 		var tot = 0;
 		var count= 0;
-		for (var ii : range(1,10)) {
+		for (const var ii : range(1,10)) {
 			tot += ii;
 			count++;
 		}
@@ -234,13 +234,13 @@ function main()
 	//test single character extraction
 	var expected="a" _FM_ "a" _FM_ "b" _FM_ "a" _FM_ "a" _FM_ "b" _FM_ "";
 	var tempstr2="ab";
-	for (var ii : range(-3, 3)) {
+	for (const var ii : range(-3, 3)) {
 		assert(tempstr2[ii] eq expected.a(ii+4));
 	}
 
 	//test single character extraction on ""
 	tempstr2="";
-	for (var ii : range(-3, 3)) {
+	for (const var ii : range(-3, 3)) {
 		assert(tempstr2[ii] eq "");
 	}
 
@@ -863,10 +863,10 @@ function main()
 	assert(oconv(14591,"DL") eq "31");
 
 	//check times around noon and midnight round trip ok
-	for (var ii : range(0, 61)) {
+	for (const var ii : range(0, 61)) {
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
 	}
-	for (var ii : range(43200-61, 43200+61)) {
+	for (const var ii : range(43200-61, 43200+61)) {
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
 	}
 
@@ -1254,7 +1254,7 @@ function main()
 //		abort("Couldnt init thread 0");
 
 	printl("\nPrint out 1st 256 unicode characters and their hashes");
-	for (var ii : range(0, 255)) {
+	for (const var ii : range(0, 255)) {
 		var xx=chr(ii);
 		print(ii ^ ":" ^ xx ^ " " ^ xx.hash() ^ " ");
 	}
@@ -1265,7 +1265,7 @@ function main()
 	//for (int ii = 0; ii <= 86400-1; ++ii) {
 	//	var time=ii;
 	var started=ostime();
-	for (var itime : range(0, 86399)) {
+	for (const var itime : range(0, 86399)) {
 //		itime.outputl("itime=").oconv("MTHS").outputl("otime=").iconv("MTHS").outputl("itime=");
 		assert(itime.oconv("MTHS").iconv("MTHS") eq itime);
 		assert(itime.oconv("MTS").iconv("MTS") eq itime);

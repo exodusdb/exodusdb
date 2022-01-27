@@ -925,13 +925,19 @@ class PUBLIC var final {
 
 	//+=var|int|double - only allow lvalue
 	VARREF operator+=(CVR) &;
-	VARREF operator+=(int) &;
-	VARREF operator+=(double) &;
+	VARREF operator+=(const int) &;
+	VARREF operator+=(const double) &;
+	VARREF operator+=(const char) &;
+	//VARREF operator+=(const char*) &;
+	//VARREF operator+=(const std::string&) &;
 
 	//-=var|int|double - only allow lvalue
 	VARREF operator-=(CVR) &;
-	VARREF operator-=(int) &;
-	VARREF operator-=(double) &;
+	VARREF operator-=(const int) &;
+	VARREF operator-=(const double) &;
+	VARREF operator-=(const char) &;
+	//VARREF operator-=(const char*) &;
+	//VARREF operator-=(const std::string&) &;
 
 	/////////////
 	// BINARY OPS
@@ -966,33 +972,35 @@ class PUBLIC var final {
 	PUBLIC ND friend bool MVlt(CVR lhs, const int);
 	PUBLIC ND friend bool MVlt(const int int1, CVR rhs);
 
+	// clang-format off
+
 	//== and !=
 	//TODO consider replacing by operator<=> and replacing MVeq and MVlt by MVcmp
 	//or provide more specialisations of MVeq and MVlt
 
-	PUBLIC friend bool operator==(CVR lhs, CVR rhs) { return MVeq(lhs, rhs); }
-	PUBLIC friend bool operator==(CVR lhs, const char* cstr2) { return MVeq(lhs, var(cstr2)); }
-	PUBLIC friend bool operator==(CVR lhs, const char char2) { return MVeq(lhs, var(char2)); }
-	PUBLIC friend bool operator==(CVR lhs, const int int2) { return MVeq(lhs, var(int2)); }
-	PUBLIC friend bool operator==(CVR lhs, const double double2) { return MVeq(lhs, var(double2)); }
-	PUBLIC friend bool operator==(CVR lhs, const bool bool2) { return MVeq(lhs, var(bool2)); }
-	PUBLIC friend bool operator==(const char* cstr1, CVR rhs) { return MVeq(rhs, var(cstr1)); }
-	PUBLIC friend bool operator==(const char char1, CVR rhs) { return MVeq(rhs, var(char1)); }
-	PUBLIC friend bool operator==(const int int1, CVR rhs) { return MVeq(rhs, var(int1)); }
-	PUBLIC friend bool operator==(const double double1, CVR rhs) { return MVeq(rhs, var(double1)); }
-	PUBLIC friend bool operator==(const bool bool1, CVR rhs) { return MVeq(rhs, var(bool1)); }
+	PUBLIC friend bool operator==(CVR          lhs,   CVR          rhs)   { return MVeq(lhs, rhs); }
+	PUBLIC friend bool operator==(CVR          lhs,   const char*  cstr2) { return MVeq(lhs, var(cstr2)); }
+	PUBLIC friend bool operator==(CVR          lhs,   const char   char2) { return MVeq(lhs, var(char2)); }
+	PUBLIC friend bool operator==(CVR          lhs,   const int    int2)  { return MVeq(lhs, var(int2)); }
+	PUBLIC friend bool operator==(CVR          lhs,   const double dbl2)  { return MVeq(lhs, var(dbl2)); }
+	PUBLIC friend bool operator==(CVR          lhs,   const bool   bool2) { return MVeq(lhs, var(bool2)); }
+	PUBLIC friend bool operator==(const char*  cstr1, CVR          rhs)   { return MVeq(rhs, var(cstr1)); }
+	PUBLIC friend bool operator==(const char   char1, CVR          rhs)   { return MVeq(rhs, var(char1)); }
+	PUBLIC friend bool operator==(const int    int1,  CVR          rhs)   { return MVeq(rhs, var(int1)); }
+	PUBLIC friend bool operator==(const double dbl1,  CVR          rhs)   { return MVeq(rhs, var(dbl1)); }
+	PUBLIC friend bool operator==(const bool   bool1, CVR          rhs)   { return MVeq(rhs, var(bool1)); }
 
-	PUBLIC friend bool operator!=(CVR lhs, CVR rhs) { return !MVeq(lhs, rhs); }
-	PUBLIC friend bool operator!=(CVR lhs, const char* cstr2) { return !MVeq(lhs, var(cstr2)); }
-	PUBLIC friend bool operator!=(CVR lhs, const char char2) { return !MVeq(lhs, var(char2)); }
-	PUBLIC friend bool operator!=(CVR lhs, const int int2) { return !MVeq(lhs, var(int2)); }
-	PUBLIC friend bool operator!=(CVR lhs, const double double2) { return !MVeq(lhs, var(double2)); }
-	PUBLIC friend bool operator!=(CVR lhs, const bool bool2) { return !MVeq(lhs, var(bool2)); }
-	PUBLIC friend bool operator!=(const char* cstr1, CVR rhs) { return !MVeq(rhs, var(cstr1)); }
-	PUBLIC friend bool operator!=(const char char1, CVR rhs) { return !MVeq(rhs, var(char1)); }
-	PUBLIC friend bool operator!=(const int int1, CVR rhs) { return !MVeq(rhs, var(int1)); }
-	PUBLIC friend bool operator!=(const double double1, CVR rhs) { return !MVeq(rhs, var(double1)); }
-	PUBLIC friend bool operator!=(const bool bool1, CVR rhs) { return !MVeq(rhs, var(bool1)); }
+	PUBLIC friend bool operator!=(CVR          lhs,   CVR          rhs)   { return !MVeq(lhs, rhs); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const char*  cstr2) { return !MVeq(lhs, var(cstr2)); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const char   char2) { return !MVeq(lhs, var(char2)); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const int    int2)  { return !MVeq(lhs, var(int2)); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const double dbl2)  { return !MVeq(lhs, var(dbl2)); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const bool   bool2) { return !MVeq(lhs, var(bool2)); }
+	PUBLIC friend bool operator!=(const char*  cstr1, CVR          rhs)   { return !MVeq(rhs, var(cstr1)); }
+	PUBLIC friend bool operator!=(const char   char1, CVR          rhs)   { return !MVeq(rhs, var(char1)); }
+	PUBLIC friend bool operator!=(const int    int1,  CVR          rhs)   { return !MVeq(rhs, var(int1)); }
+	PUBLIC friend bool operator!=(const double dbl1,  CVR          rhs)   { return !MVeq(rhs, var(dbl1)); }
+	PUBLIC friend bool operator!=(const bool   bool1, CVR          rhs)   { return !MVeq(rhs, var(bool1)); }
 
 	//< V<= > >=
 	PUBLIC friend bool operator<(CVR lhs, CVR rhs) { return MVlt(lhs, rhs); }
@@ -1040,16 +1048,16 @@ class PUBLIC var final {
 	PUBLIC friend bool operator<=(const bool bool1, CVR rhs) { return !MVlt(rhs, var(bool1)); }
 
 	//PLUS
-	PUBLIC friend var operator+(CVR lhs, CVR rhs) { return MVadd(lhs, rhs); }
-	PUBLIC friend var operator+(CVR lhs, const char* cstr2) { return MVadd(lhs, var(cstr2)); }
-	PUBLIC friend var operator+(CVR lhs, const char char2) { return MVadd(lhs, var(char2)); }
-	PUBLIC friend var operator+(CVR lhs, const int int2) { return MVadd(lhs, var(int2)); }
-	PUBLIC friend var operator+(CVR lhs, const double double2) { return MVadd(lhs, var(double2)); }
-	//PUBLIC friend var operator+(CVR lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
-	PUBLIC friend var operator+(const char* cstr1, CVR rhs) { return MVadd(var(cstr1), rhs); }
-	PUBLIC friend var operator+(const char char1, CVR rhs) { return MVadd(var(char1), rhs); }
-	PUBLIC friend var operator+(const int int1, CVR rhs) { return MVadd(var(int1), rhs); }
-	PUBLIC friend var operator+(const double double1, CVR rhs) { return MVadd(var(double1), rhs); }
+	PUBLIC friend var operator+(CVR lhs, CVR          rhs)     { return MVadd(lhs, rhs); }
+	PUBLIC friend var operator+(CVR lhs, const char*  cstr2)   { var t = lhs; t += cstr2;   return t; }
+	PUBLIC friend var operator+(CVR lhs, const char   char2)   { var t = lhs; t += char2;   return t; }
+	PUBLIC friend var operator+(CVR lhs, const int    int2)    { var t = lhs; t += int2;    return t; }
+	PUBLIC friend var operator+(CVR lhs, const double double2) { var t = lhs; t += double2; return t; }
+	//PUBLIC friend var operator+(CVR lhs, const bool  bool2)    { return MVadd(lhs, var(bool2)); }
+	PUBLIC friend var operator+(const char*  cstr1,   CVR rhs) { var t = rhs; t += cstr1;   return t; }
+	PUBLIC friend var operator+(const char   char1,   CVR rhs) { var t = rhs; t += char1;   return t; }
+	PUBLIC friend var operator+(const int    int1,    CVR rhs) { var t = rhs; t += int1;    return t; }
+	PUBLIC friend var operator+(const double double1, CVR rhs) { var t = rhs; t += double1; return t; }
 	//PUBLIC friend var operator+(const bool bool1, CVR rhs) { return MVadd(var(bool1), rhs); }
 	//rvalues
 	//PUBLIC friend var operator+(TVR lhs, CVR rhs) { return lhs+=rhs; }
@@ -1065,23 +1073,24 @@ class PUBLIC var final {
 	//PUBLIC friend var operator+(const bool bool1, TVR rhs) { return rhs+=bool1; }
 
 	//MINUS
-	PUBLIC friend var operator-(CVR lhs, CVR rhs) { return MVsub(lhs, rhs); }
-	PUBLIC friend var operator-(CVR lhs, const char* cstr2) { return MVsub(lhs, var(cstr2)); }
-	PUBLIC friend var operator-(CVR lhs, const char char2) { return MVsub(lhs, var(char2)); }
-	PUBLIC friend var operator-(CVR lhs, const int int2) { return MVsub(lhs, var(int2)); }
-	PUBLIC friend var operator-(CVR lhs, const double double2) { return MVsub(lhs, var(double2)); }
-	//PUBLIC friend var operator-(CVR lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
-	PUBLIC friend var operator-(const char* cstr1, CVR rhs) { return MVsub(var(cstr1), rhs); }
-	PUBLIC friend var operator-(const char char1, CVR rhs) { return MVsub(var(char1), rhs); }
-	PUBLIC friend var operator-(const int int1, CVR rhs) { return MVsub(var(int1), rhs); }
-	PUBLIC friend var operator-(const double double1, CVR rhs) { return MVsub(var(double1), rhs); }
+	PUBLIC friend var operator-(CVR lhs, CVR          rhs)     { return MVsub(lhs, rhs); }
+	PUBLIC friend var operator-(CVR lhs, const char*  cstr2)   { var t = lhs; t -= cstr2;   return t; }
+	PUBLIC friend var operator-(CVR lhs, const char   char2)   { var t = lhs; t -= char2;   return t; }
+	PUBLIC friend var operator-(CVR lhs, const int    int2)    { var t = lhs; t -= int2;    return t; }
+	PUBLIC friend var operator-(CVR lhs, const double double2) { var t = lhs; t -= double2; return t; }
+	//PUBLIC friend var operator-(CVR lhs, const bool  bool2)    { return MVadd(lhs, var(bool2)); }
+	PUBLIC friend var operator-(const char*  cstr1,   CVR rhs) { return MVsub(cstr1,   rhs );}
+	PUBLIC friend var operator-(const char   char1,   CVR rhs) { return MVsub(char1,   rhs );}
+	PUBLIC friend var operator-(const int    int1,    CVR rhs) { return MVsub(int1,    rhs );}
+	PUBLIC friend var operator-(const double double1, CVR rhs) { return MVsub(double1, rhs );}
 	//PUBLIC friend var operator-(const bool bool1, CVR rhs) { return MVsub(var(bool1), rhs); }
-	//rvalues
-	PUBLIC friend var operator-(TVR lhs, CVR rhs) { return lhs -= rhs; }
-	PUBLIC friend var operator-(TVR lhs, const char* cstr2) { return lhs -= var(cstr2); }
-	PUBLIC friend var operator-(TVR lhs, const char char2) { return lhs -= var(char2); }
-	PUBLIC friend var operator-(TVR lhs, const int int2) { return lhs -= int2; }
-	PUBLIC friend var operator-(TVR lhs, const double double2) { return lhs -= double2; }
+
+	//MINUS rvalues
+	PUBLIC friend var operator-(TVR lhs, CVR          rhs   ){ return lhs -= rhs   ;}
+	PUBLIC friend var operator-(TVR lhs, const char*  cstr2 ){ return lhs -= cstr2 ;}
+	PUBLIC friend var operator-(TVR lhs, const char   char2 ){ return lhs -= char2 ;}
+	PUBLIC friend var operator-(TVR lhs, const int    int2  ){ return lhs -= int2  ;}
+	PUBLIC friend var operator-(TVR lhs, const double dbl2  ){ return lhs -= dbl2  ;}
 
 	//MULTIPLY
 	PUBLIC friend var operator*(CVR lhs, CVR rhs) { return MVmul(lhs, rhs); }
@@ -1211,6 +1220,8 @@ class PUBLIC var final {
 	PUBLIC ND friend var operator+(CVR var1) { return MVplus(var1); }
 	PUBLIC ND friend var operator-(CVR var1) { return MVminus(var1); }
 	PUBLIC ND friend bool operator!(CVR var1) { return MVnot(var1); }
+
+	// clang-format on
 
 	// OS TIME/DATE
 	///////////////
@@ -2230,13 +2241,13 @@ public:
 		// Return our int
 		int_t operator*() const { return int_; }
 
-		// Increment our int and return it
+		// Increment our int
 		Iterator& operator++() { int_++; return *this; }
 
 		//Iterator operator++(int_t) { Iterator tmp = *this; ++(*this); return tmp; }
 
-		// Allow checking two Iterators for inequality
-		//friend bool operator!= (const Iterator& a, const Iterator& b) { return a.int_ != b.int_; };
+		// Allow checking if an iterator is AT OR BEYOND the end of the range
+		// WARNING declare "operator!=" but actually use the "<" operator to compare!
 		friend bool operator!= (const Iterator& a, const Iterator& b) {
 			//var (a.int_).errputl("A ");
 			//var (b.int_).errputl("B ");

@@ -101,7 +101,7 @@ function main(in mode, in params, io result, io msg) {
 		//clear any skipped periods since last update
 		//nb start from lastperiodn+1 to avoid clearing current period multiple times
 		//ie clear only on the first time that we arrive in it
-		for (var periodn : range(lastperiodn + 1, currentperiodn)) {
+		for (const var periodn : range(lastperiodn + 1, currentperiodn)) {
 			roundrobin(2, periodn.mod(periodsperwindow_) + 1) = "";
 		} //periodn;
 

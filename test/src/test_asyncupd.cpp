@@ -118,7 +118,7 @@ function test(in option) {
 
 		var cmd = "";
 		var options = OPTIONS.convert("{}", "") ^ option;
-		for (var processn : range(1, nprocesses)) {
+		for (const var processn : range(1, nprocesses)) {
 			// Hard code path so make test can find it without any installation
 			cmd ^= "./test_asyncupd " ^ processn ^ " {" ^ options ^ "} & ";
 		}

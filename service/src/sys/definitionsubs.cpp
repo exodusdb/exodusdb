@@ -217,7 +217,7 @@ nochequeformat:
 			var fieldname = ID.field("*", 3);
 			call collectixvals(filename, fieldname);
 			var nn = PSEUDO.count(FM) + 1;
-			for (var ii : range(1, nn)) {
+			for (const var ii : range(1, nn)) {
 				var val = PSEUDO.a(ii);
 				if (val) {
 					if (not(RECORD.a(1).locateby("AL", val, vn))) {
@@ -359,7 +359,7 @@ preventupdate:
 			}
 
 			//check authorised to set posting
-			for (var fn : range(100, 102)) {
+			for (const var fn : range(100, 102)) {
 				var usercode = RECORD.a(fn);
 				if (usercode) {
 					if (not(SECURITY.a(1).locate(usercode, xx))) {
@@ -476,7 +476,7 @@ preventupdate:
 			if (RECORD.a(82) ne RECORD.a(77)) {
 				backupdrives(-1) = RECORD.a(82);
 			}
-			for (var driven : range(1, 999)) {
+			for (const var driven : range(1, 999)) {
 				var drive = backupdrives.a(driven)[1];
 				///BREAK;
 				if (not drive) break;
@@ -660,7 +660,7 @@ subroutine reorderdbs() {
 	//if not found in new order then append in order found
 	var ndbs = dblist.count(VM) + 1;
 	var newdblist = "";
-	for (var dbn : range(1, ndbs)) {
+	for (const var dbn : range(1, ndbs)) {
 		var db = dblist.a(1, dbn);
 		var dbcode = db.a(1, 1, 2);
 		if (not(newdbcodes.locate(dbcode, newdbcoden))) {

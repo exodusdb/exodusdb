@@ -121,7 +121,7 @@ function main(in mode, io logtime, in menu) {
 		configips.converter(" ", SVM);
 		configips.swapper(".*", "");
 		nn = configips.count(SVM) + (configips ne "");
-		for (var ii : range(nn, 1)) {
+		for (const var ii : range(nn, 1)) {
 			var ipno = configips.a(1, 1, ii);
 			if (ipno.field(".", 1) eq "10") {
 				{}
@@ -157,7 +157,7 @@ function main(in mode, io logtime, in menu) {
 		var environment = osgetenv();
 		environment.converter("\r\n", FM);
 		var nenv = environment.count(FM) + 1;
-		for (var ii : range(1, nenv)) {
+		for (const var ii : range(1, nenv)) {
 			var enventry = environment.a(ii);
 			if (enventry) {
 				tt = enventry.field("=", 1);
@@ -183,7 +183,7 @@ function main(in mode, io logtime, in menu) {
 			baselinkdescs = "Pending Configuration";
 		}
 		var nlinks = baselinks.count(VM) + (baselinks ne "");
-		for (var linkn : range(1, nlinks)) {
+		for (const var linkn : range(1, nlinks)) {
 			tt = baselinks.a(1, linkn);
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).lcase();
@@ -348,7 +348,7 @@ nextuser:
 		if (VOLUMES) {
 			var temps = oslistf("..\\vdm*.tmp");
 			var ntemps = temps.count(FM) + (temps ne "");
-			for (var tempn : range(1, ntemps)) {
+			for (const var tempn : range(1, ntemps)) {
 				("..\\" ^ temps.a(tempn)).osdelete();
 			} //tempn;
 		}

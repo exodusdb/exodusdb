@@ -106,8 +106,11 @@ Intel(R) Xeon(R) CPU E5620  @ 2.40GHz (2010)
 		printl("Testing simple integer for loops");
 		printl("--------------------------------");
 
-		int ncases = 18;
-		for (int casen = 0; casen <= ncases; casen++) {
+		int firstcasen = COMMAND.a(2);
+		if (not firstcasen)
+			firstcasen = 0;
+		int ncases = 19;
+		for (int casen = firstcasen; casen <= ncases; casen++) {
 
 			int nn = 100'000'000;
 
@@ -116,7 +119,7 @@ Intel(R) Xeon(R) CPU E5620  @ 2.40GHz (2010)
 //			char c1 = '\0';
 //			char* cp1 = nullptr;
 			bool b1;
-			var v1;
+			var v1 = 0;
 			std::string ss1 = "x";
 
 			printl();
@@ -132,7 +135,7 @@ Intel(R) Xeon(R) CPU E5620  @ 2.40GHz (2010)
 
 			break; case 1:
 				printl("Exp: 20     ns - new var method - for (var:range)");
-				for (var v2 : range(0 to nn))
+				for (const var v2 : range(0 to nn))
 					{i1 = v2;};
 
 			break; case 2:
@@ -219,6 +222,11 @@ Intel(R) Xeon(R) CPU E5620  @ 2.40GHz (2010)
 				printl("Exp: 11    ns - assign from std::string");
 				for (int i2 = 0; i2 <= nn; i2++)
 					{v1 = ss1;};
+
+			break; case 19:
+				printl("Exp: 11    ns - var + int + test");
+				for (int i2 = 0; i2 <= nn; i2++)
+					{b1 = (v1 + i2).assigned();};
 
 			}
 			var ended = ostime();

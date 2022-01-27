@@ -127,7 +127,7 @@ function main(in mode) {
 
 				//strip out the domain names
 				var nn = sysemails.count(" ") + 1;
-				for (var ii : range(1, nn)) {
+				for (const var ii : range(1, nn)) {
 					var word = sysemails.field(" ", ii);
 					word = field2(word, "@", -1);
 					//remove smtp. mailout. etc from smtp host domain
@@ -149,7 +149,7 @@ function main(in mode) {
 			var emails = win.is.lcase();
 			emails.converter(FM ^ VM ^ SVM ^ ", ", ";;;;;");
 			var nn = emails.count(";") + 1;
-			for (var ii : range(1, nn)) {
+			for (const var ii : range(1, nn)) {
 				var email = emails.field(";", ii);
 				if (email) {
 					var emaildomain = email.field("@", 2);
@@ -266,7 +266,7 @@ function main(in mode) {
 			}
 
 			//insert an empty user
-			for (var fn : range(1, 9)) {
+			for (const var fn : range(1, 9)) {
 				SECURITY.inserter(fn, usern, "");
 			} //fn;
 

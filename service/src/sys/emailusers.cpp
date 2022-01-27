@@ -204,7 +204,7 @@ nextuser:
 	if (not(ok) and groupids) {
 		if (groupword) {
 			//eq search for MEDIA in user department like MEDIA BUYER
-			for (var groupn : range(1, ngroups)) {
+			for (const var groupn : range(1, ngroups)) {
 				ok = userx.a(5).index(groupids.a(1, groupn));
 				///BREAK;
 				if (not(not(ok))) break;

@@ -43,7 +43,8 @@ function main(in msg0, io time0) {
 		}
 
 		//try multiple start points in case hit middle of multibyte character
-		for (var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
+		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
+		//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
 			call osbread(datax, logfile, ptr, 1024);
 			//if any data then break out of loop
 			if (datax.length()) {

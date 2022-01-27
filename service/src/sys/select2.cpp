@@ -94,7 +94,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	if (linkfilename2) {
 		hexx.redim(8);
 		//changed to allow language characters to pass through x80-xF9
-		for (var ii : range(249, 255)) {
+		for (const var ii : range(249, 255)) {
 			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
 		} //ii;
 	}
@@ -239,7 +239,7 @@ nocommon:
 			dictids = "ID";
 		}
 		ndictids = dictids.count(FM) + 1;
-		for (var dictidn : range(1, ndictids)) {
+		for (const var dictidn : range(1, ndictids)) {
 			var dictid = dictids.a(dictidn);
 			var dictrec;
 			if (not(dictrec.read(DICT, dictid))) {
@@ -408,7 +408,7 @@ nextrec:
 	}
 
 	//filter out unwanted multivalues that the stupid rev sortselect leaves in
-	for (var limitfieldn : range(1, nlimitfields)) {
+	for (const var limitfieldn : range(1, nlimitfields)) {
 		var value = calculate(limitfields.a(1, limitfieldn));
 		var reqvalue = limitvalues.a(1, limitfieldn);
 		var limitcheck = limitchecks.a(1, limitfieldn);
@@ -481,7 +481,7 @@ nextrec:
 	} else {
 		row = "";
 
-		for (var dictidn : range(1, ndictids)) {
+		for (const var dictidn : range(1, ndictids)) {
 			var dictid = dictids.a(dictidn);
 			var dictid2 = dictid;
 			dictid2.converter("@", "");
@@ -535,7 +535,7 @@ nextrec:
 
 			rowpart.swapper("%", "%25");
 			//changed to allow language characters to pass through x80-xF9
-			for (var ii : range(249, 255)) {
+			for (const var ii : range(249, 255)) {
 				rowpart.swapper(var().chr(ii), hexx(ii - 249));
 			} //ii;
 

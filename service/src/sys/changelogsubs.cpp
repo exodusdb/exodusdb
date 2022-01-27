@@ -414,7 +414,7 @@ subroutine getversiondates() {
 	versionlog.converter("\r\n", FM);
 	var nn = versionlog.count(FM) + (versionlog ne "");
 	var versiondata = "";
-	for (var ii : range(1, nn)) {
+	for (const var ii : range(1, nn)) {
 		idate = versionlog.a(ii, 1).field(" ", 2, 3).iconv("D");
 		//itime=iconv(field(versionlog,' ',1),'MT')
 		if (not(versiondata.locateusing(FM, idate, xx))) {

@@ -648,6 +648,22 @@ function main() {
 	assert((1.0 >= v2));
 	assert((true >= v2));
 
+	{
+		var v1 = 10;
+		v1 += '1';
+		assert(v1 eq 11);
+		v1 += "1";
+		assert(v1 eq 12);
+		v1 -= '1';
+		assert(v1 eq 11);
+		v1 -= "1";
+		assert(v1 eq 10);
+//		v1 *= '2';
+//		assert(v1 eq 20);
+//		v1 /= '4';
+//		assert(v1 eq 5);
+	}
+
 	// + add
 	assert((v1 + v2) == 2);
 	assert((v1 + "1.0") == 2);
@@ -981,6 +997,34 @@ function main() {
 		assert(x.a(1) == 0);
 
 	}
+
+	{
+		assert('1' + var(1.1) == 2.1);
+		assert("1" + var(1.1) == 2.1);
+		assert("1.1" + var(1.3) == 2.4);
+		assert(1 + var(2.1) == 3.1);
+		assert(1.1 + var(2.1) == 3.2);
+
+		assert(var(1.1) + '1' == 2.1);
+		assert(var(1.1) + "1" == 2.1);
+		assert(var(1.3) + "1.1" == 2.4);
+		assert(var(2.1) + 1 == 3.1);
+		assert(var(2.1) + 1.1 == 3.2);
+
+		assert('1' - var(1.1) == -0.1);
+		assert("1" - var(1.1) == -0.1);
+		assert("1.1" - var(1.3) == -0.2);
+		assert(1 - var(2.1) == -1.1);
+		assert(1.1 - var(2.1) == -1.0 );
+
+		assert(var(1.1) - '1' == 0.1);
+		assert(var(1.1) - "1" == 0.1);
+		assert(var(1.3) - "1.1" == 0.2);
+		assert(var(2.1) - 1 == 1.1);
+		assert(var(2.1) - 1.1 == 1.0);
+
+	}
+
 	printl("Test passed");
 
 	return 0;

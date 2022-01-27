@@ -118,7 +118,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		//db start commands from xhttp.php
 		var filenamesx = oslistf("*.run");
 
-		//for (var filen : range(1, 9999)) {
+		//for (const var filen : range(1, 9999)) {
 		for (var filename : filenamesx) {
 			//filename = filenamesx.a(filen);
 			///BREAK;
@@ -212,7 +212,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		ospaths ^= "," ^ exohome ^ "/dat/";
 		ospaths.converter("/", OSSLASH);
 		var npaths = dcount(ospaths, ",");
-		for (var ii : range(1, npaths)) {
+		for (const var ii : range(1, npaths)) {
 			var ospath = ospaths.field(",",ii);
 			//order is significant
 			var newtime = (ospath[-1] eq OSSLASH) ? ospath.osdir().a(3) : ospath.osfile().a(3);
@@ -279,7 +279,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		var patchdirs = "../DATA/" ^ SYSTEM.a(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
 		patchdirs.converter("/", OSSLASH);
 
-		for (var patchn : range(1, 3)) {
+		for (const var patchn : range(1, 3)) {
 
 			//skip if no patch file or not dated today
 			var patchfilename = patchdirs.a(patchn) ^ patchcode ^ ".1";
@@ -383,7 +383,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
 				}
 				var nfiles = rec.a(3).count(VM) + 1;
-				for (var filen : range(1, nfiles)) {
+				for (const var filen : range(1, nfiles)) {
 					body(-1) = rec.a(3, filen) ^ " " ^ rec.a(4, filen) ^ "  " ^ rec.a(5, filen);
 				} //filen;
 

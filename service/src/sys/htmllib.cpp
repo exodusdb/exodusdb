@@ -106,7 +106,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 	} else if (mode eq "HASHTABLE") {
 
 		var nv = datax.count(VM) + 1;
-		for (var vn : range(1, nv)) {
+		for (const var vn : range(1, nv)) {
 			var data2 = datax.a(1, vn);
 
 			//insert a break before all space+#
@@ -120,7 +120,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			var nlines = data2.count(FM) + 1;
 			if (nlines gt 1) {
 
-				for (var ln : range(1, nlines)) {
+				for (const var ln : range(1, nlines)) {
 					var line = data2.a(ln).trim();
 					if (line[1] eq "#") {
 						line.splicer(1, 1, "");
@@ -365,7 +365,7 @@ subroutine fill(io datax) {
 
 		//find max number of columns
 	var n2 = 0;
-	for (var ii : range(1, nn)) {
+	for (const var ii : range(1, nn)) {
 		var tt = datax.a(ii).count(VM) + 1;
 		if (tt gt n2) {
 			n2 = tt;
@@ -373,8 +373,8 @@ subroutine fill(io datax) {
 	} //ii;
 
 		//make sure all columns are filled
-	for (var ii : range(1, nn)) {
-		for (var i2 : range(1, n2)) {
+	for (const var ii : range(1, nn)) {
+		for (const var i2 : range(1, n2)) {
 			if (datax.a(ii, i2) eq "") {
 				datax(ii, i2) = filler;
 			}

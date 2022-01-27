@@ -152,7 +152,7 @@ nextcomp:
 	//build a list of authorised companies
 	var compcodes = "";
 	if (APPLICATION eq "ADAGENCY") {
-		for (var ii : range(1, 9999)) {
+		for (const var ii : range(1, 9999)) {
 			compcode = allcomps.a(ii);
 			///BREAK;
 			if (not compcode) break;

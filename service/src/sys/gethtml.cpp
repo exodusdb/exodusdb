@@ -176,11 +176,12 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		var tags = "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
 		var ntags = tags.count(",") + 1;
 		var html2 = html.lcase();
-		for (var tagn : range(1, ntags)) {
+		for (const var tagn : range(1, ntags)) {
 			var tag = tags.field(",", tagn);
 			if (html2.count("<" ^ tag ^ ">") + html2.count("<" ^ tag ^ " ") ne html2.count("</" ^ tag ^ ">")) {
 				html = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
-				tagn = ntags;
+				//tagn = ntags;
+				break;
 			}
 		} //tagn;
 
@@ -228,7 +229,7 @@ subroutine getcompanyconfig(io html, io mode) {
 	html = "";
 
 	var ncols = 0;
-	for (var fn : range(61, 66)) {
+	for (const var fn : range(61, 66)) {
 		tt = letterheadcompany.a(fn);
 		if (tt) {
 			//call max(count(tt,vm)+1,ncols,ncols)
@@ -272,7 +273,7 @@ subroutine getcompanyconfig(io html, io mode) {
 		tab(-1) = "<div>";
 	}
 
-	for (var coln : range(1, ncols)) {
+	for (const var coln : range(1, ncols)) {
 
 		var align = aligns.a(1, coln);
 		var imagetype = imagetypes.a(1, coln);

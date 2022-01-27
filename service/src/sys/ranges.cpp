@@ -64,7 +64,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	var nn = ranges.count(FM) + (ranges ne "");
 
 	var allchars = "";
-	for (var ii : range(32, 255)) {
+	for (const var ii : range(32, 255)) {
 		allchars ^= var().chr(ii);
 	} //ii;
 	allchars.converter("0123456789-", "");
@@ -111,7 +111,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 				return 0;
 			}
 			var range2 = "";
-			for (var i2 : range(startx, finish)) {
+			for (const var i2 : range(startx, finish)) {
 				if (esctoexit()) {
 					goto exit;
 				}

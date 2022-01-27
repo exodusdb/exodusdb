@@ -474,7 +474,7 @@ function main() {
 	printl(msecs,"msecs");
 
 	// 1/1 to 1/10^20
-	for (var i : range(0, 29)) {
+	for (const var i : range(0, 29)) {
 		printl(i,var(pwr(10,-i)));
 		printl(i,var(1/pwr(10,i)));
 	}

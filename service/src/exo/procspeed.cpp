@@ -62,7 +62,7 @@ function main() {
 
 subroutine getspeed() {
 	time1 = ostime();
-	for (var ii : range(1, nn)) {
+	for (const var ii : range(1, nn)) {
 		xx = ii;
 	} //ii;
 	time2 = ostime();

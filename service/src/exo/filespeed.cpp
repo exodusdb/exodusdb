@@ -96,7 +96,7 @@ nexttest:
 
 	//print
 	//print 'Writing 1Kb records'
-	for (var ii : range(1, nreps)) {
+	for (const var ii : range(1, nreps)) {
 //		if (esctoexit()) {
 //			goto exit;
 //		}
@@ -106,7 +106,7 @@ nexttest:
 
 	//print
 	//print 'Deleting 1Kb records'
-	for (var ii : range(1, nreps)) {
+	for (const var ii : range(1, nreps)) {
 //		if (esctoexit()) {
 //			goto exit;
 //		}

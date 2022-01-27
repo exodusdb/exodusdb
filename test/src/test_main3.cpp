@@ -40,7 +40,7 @@ function main()
 	    assert(cursor eq "\x1b[1;1H" or cursor eq "");
 
 	    //should show 1;1 in top left
-	    for (var ii : range(0, 12)) {
+	    for (const var ii : range(0, 12)) {
 	        print(at(ii,ii));
 	        print(getcursor().substr(2));
 	    }

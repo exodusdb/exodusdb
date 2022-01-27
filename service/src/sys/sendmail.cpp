@@ -219,13 +219,13 @@ forcedemail:
 	//global override
 	var filenamesx = "smtp.cfg" ^ VM ^ "../../smtp.cfg";
 	filenamesx.converter("/", OSSLASH);
-	for (var filen : range(1, 2)) {
+	for (const var filen : range(1, 2)) {
 		call osread(params2, filenamesx.a(1, filen));
 		//cut off after end of file character
 		//params2=field(params2,char(26),1)
 		params2.swapper("\r\n", "\r");
 		params2.converter("\r\n", _FM_ _FM_);
-		for (var ii : range(1, 9)) {
+		for (const var ii : range(1, 9)) {
 			if (params2.a(ii)) {
 				params1(ii) = params2.a(ii);
 			}
@@ -448,7 +448,7 @@ forcedemail:
 		if (attachfilename) {
 			var headers = "";
 			var nn = cmd.count(VM) + 1;
-			for (var ii : range(2, nn)) {
+			for (const var ii : range(2, nn)) {
 				var line = cmd.a(1, ii);
 				var opt = line.field(" ", 1);
 				var arg = line.field(" ", 2, 9999);
@@ -667,7 +667,7 @@ subroutine addlinks2osfilename() {
 	body(-1) = "but you can download it by clicking the following link.";
 	body(-1) = FM ^ "*Link is only available for ONE HOUR from creation*";
 	var nlinks = SYSTEM.a(114).count(VM) + 1;
-	for (var linkn : range(1, nlinks)) {
+	for (const var linkn : range(1, nlinks)) {
 		body ^= FM;
 		var linkdesc = SYSTEM.a(115, linkn);
 		if (linkdesc) {

@@ -126,7 +126,7 @@ syntax:
 
 	if (authtasks) {
 		var ntasks = authtasks.count(VM) + 1;
-		for (var taskn : range(1, ntasks)) {
+		for (const var taskn : range(1, ntasks)) {
 			var task = authtasks.a(1, taskn);
 			if (not(authorised(task, msg, "", runasusercode))) {
 				msg = "\"Runas\" user is not authorised to do " ^ task ^ FM ^ FM ^ msg;

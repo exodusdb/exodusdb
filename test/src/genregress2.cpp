@@ -16,13 +16,13 @@ function main() {
 
 	var n1 = 3;
 	var n2 = 5;
-	for (var nchars_source : range(0, n1)) {
+	for (const var nchars_source : range(0, n1)) {
 		var source = substr("123456789", 1, nchars_source);
 
-		for (var nchars_insert : range(0, n1)) {
+		for (const var nchars_insert : range(0, n1)) {
 			var insert = substr("abcdefghi", 1, nchars_insert);
 
-			for (var ii : range(-n2, n2)) {
+			for (const var ii : range(-n2, n2)) {
 
 				var expression = "splice(" ^ source.quote() ^ "," ^ ii ^ "," ^ insert.quote() ^ ")";
 				//TRACE(expression);
@@ -33,7 +33,7 @@ function main() {
 				printt(value, "SPLICER1", source, ii, "", insert);
 				printl();
 
-				for (var jj : range(-n2, n2)) {
+				for (const var jj : range(-n2, n2)) {
 
 					var expression = "splice(" ^ source.quote() ^ "," ^ ii ^ "," ^ jj ^ "," ^ insert.quote() ^ ")";
 					//TRACE(expression);

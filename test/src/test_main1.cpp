@@ -492,7 +492,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		//make a string of first 256 (excluding 0 for the time being!)
 		var data=chr(0);
-		for (var ii : range(1, nbinarychars-1)) {
+		for (const var ii : range(1, nbinarychars-1)) {
 			data^=chr(ii);
 		}
 		assert(len(data) eq nbinarychars);
@@ -889,7 +889,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	testinvert("␚ ␛ ␜ ␝ ␞ ␟");
 
 	//check invert is reversible for all bytes (only ASCII bytes are inverted)
-	for (var ii : range(0, 0x1FFFF)) {
+	for (const var ii : range(0, 0x1FFFF)) {
 		var cc=textchr(ii);
 		if (cc.len())
 			testinvert(cc);
