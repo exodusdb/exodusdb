@@ -661,9 +661,29 @@ function main()
 
 	}
 
+	{
+		test_amountunit("1.23456E-6USD", 1.23456E-6, "USD");
+		test_amountunit("", "", "");
+		test_amountunit("E", "", "E");
+		test_amountunit("123", 123, "");
+		test_amountunit("123X", 123, "X");
+		test_amountunit("123 ", 123, " ");
+		test_amountunit("123.456XYZZZZ", 123.456, "XYZZZZ");
+
+	}
+
 	printl("Test passed");
 
 	return 0;
+}
+
+bool test_amountunit(in input, in amount, in unitcode) {
+	printl(input.quote(), amount.quote(), unitcode.quote());
+	var unitcode2;
+	if (not amountunit(input, unitcode2) eq amount)
+		return false;
+	return unitcode2 eq unitcode;
+
 }
 
 programexit()

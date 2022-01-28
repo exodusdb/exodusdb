@@ -1,8 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <split.h>
-
 var acode;
 
 function main(in a0, io bb, in sep) {
@@ -36,7 +34,7 @@ function main(in a0, io bb, in sep) {
 	var na = aa.count(VM) + (aa ne "");
 	for (const var an : range(1, na)) {
 
-		var anum = split(aa.a(1, an), acode);
+		var anum = amountunit(aa.a(1, an), acode);
 		var bcode = "";
 
 		var nb = bb.count(VM) + (bb ne "");
@@ -48,7 +46,7 @@ function main(in a0, io bb, in sep) {
 			bn += 1;
 			///BREAK;
 			if (not(bn le nb)) break;
-			var bnum = split(bb.a(1, bn), bcode);
+			var bnum = amountunit(bb.a(1, bn), bcode);
 			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
 
 			if (bcode eq acode) {

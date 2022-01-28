@@ -2602,4 +2602,52 @@ var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 	return output;
 }
 
+// amountunit 1
+var ExodusProgramBase::amountunit(in input0) {
+	var unitcode;
+	return amountunit(input0, unitcode);
+}
+
+// amountunit 2
+var ExodusProgramBase::amountunit(in input0, out unitx) {
+	//c sys in,out
+
+	/*
+	unitx = input0;
+	unitx.converter(" -.0123456789", "");
+
+	var inputx = input0;
+	//convert ' ABCDEFGHIJKLMNOPQRSTUVWXYZ' to '' in inputx
+	//patsalides db PT0303 base currency code contains $,
+	//must be removed otherwise B16 in journal.subs4
+	inputx.converter(" ABCDEFGHIJKLMNOPQRSTUVWXYZ$", "");
+
+	return inputx;
+
+	*/
+
+	// New method should be faster and allow
+
+	// 1.23456E-6USD -> 1.23456E-6    USD
+	// USD              ""            USD
+	// 1                1             ""
+
+	// Find the last digit
+	std::string s = input0.toString();
+	std::size_t pos = s.find_last_of("0123456789");
+	if (pos == std::string::npos) {
+		unitx = "";
+		return input0;
+	}
+
+	// Everything after the last digit is the unit
+	// example "1ABC" pos = 0 and unit -> ABC
+	unitx = s.substr(pos + 1);
+
+	// Everything up to and including the last digit is the number
+	// example 1.23456E-6 -> 1.23456E-6
+	return s.substr(0, pos + 1);
+
+}
+
 }  // namespace exodus
