@@ -1,3 +1,4 @@
+#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <boost/range/irange.hpp>
 #include <cassert>
 
@@ -92,11 +93,12 @@ Intel(R) Xeon(R) CPU E5620  @ 2.40GHz (2010)
 
     test = "Time conversion of double var 12345.67 to string and return length (Using RYU D2S on Ubuntu 20.04/g++v9.3 and std::to_chars on Ubuntu 22.04/g++v11.2)";
     {
+		int dummy;
         var started = ostime();
         for (int ii=0;ii < nn; ii++) {
-           var(12345.67).length();
+           dummy = var(12345.67).length();
         }
-        printl(round((ostime() - started - setup_time) / nn * 1E9), "ns", test);
+        printl(round((ostime() - started - setup_time) / nn * 1E9), "ns", test, dummy);
     }
 
 
