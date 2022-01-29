@@ -33,6 +33,30 @@ function main()
 {
 
 	{
+		var unitx;
+		//printl("x", amountunit("USD",ID), "y", ID.quote());
+		var amount = amountunit("USD",unitx);
+		printl("amount:", amount.quote(), "unit:", unitx.quote());
+
+		assert(test_amountunit("1.23456E-6USD", 1.23456E-6, "USD"));
+		assert(test_amountunit("", "", ""));
+		assert(test_amountunit(" ", "", " "));
+		assert(test_amountunit("E", "", "E"));
+		assert(test_amountunit("E-", "", "E-"));
+		assert(test_amountunit("E-3", "E-3", ""));
+		assert(test_amountunit("123", 123, ""));
+		assert(test_amountunit("123X", 123, "X"));
+		assert(test_amountunit("123 ", 123, " "));
+
+		// Check spaces
+		assert(test_amountunit("123.456XYZZZZ", 123.456, "XYZZZZ"));
+		assert(test_amountunit(" 123.456XYZZZZ", " 123.456", "XYZZZZ"));
+		assert(test_amountunit("123.456 XYZZZZ", 123.456, " XYZZZZ"));
+		assert(test_amountunit("123.456XYZZZZ ", 123.456, "XYZZZZ "));
+
+	}
+
+	{
 	    //stop("Test passed");
 
 	    print(at(-1));
@@ -546,27 +570,21 @@ function main()
 
 	}
 
-	{
-		test_amountunit("1.23456E-6USD", 1.23456E-6, "USD");
-		test_amountunit("", "", "");
-		test_amountunit("E", "", "E");
-		test_amountunit("123", 123, "");
-		test_amountunit("123X", 123, "X");
-		test_amountunit("123 ", 123, " ");
-		test_amountunit("123.456XYZZZZ", 123.456, "XYZZZZ");
-
-	}
-
 	printl("Test passed");
 
 	return 0;
 }
 
 bool test_amountunit(in input, in amount, in unitcode) {
-	printl(input.quote(), amount.quote(), unitcode.quote());
+
+	printl("amountunit :", input.quote(), "amount :", amount.quote(), "unit :", unitcode.quote());
+
+	// Check amount
 	var unitcode2;
 	if (amountunit(input, unitcode2) ne amount)
 		return false;
+
+	// Check unit
 	return unitcode2 eq unitcode;
 
 }
