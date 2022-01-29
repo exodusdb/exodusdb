@@ -31,27 +31,30 @@ THE SOFTWARE.
 #include <limits>
 #include <sstream>
 #include <vector>
-#include <charconv>//for to_chars
 
-#if __GNUC__ >= 11
-#define USE_TO_CHARS
-#include <array>
-#else
-
-// Use ryu if GNUC < 11 and ryu include available
-//ryu            1234.5678 -> "1234.5678" 500ns
-//ryu_printf     1234.5678 -> "1234.5678" 800ns
-//sstream/printf 1234.5678 -> "1234.5678" 1800ns
-#if __has_include(<ryu/ryu.h>)
-#define USE_RYU
-#include <ryu/ryu.h>
-#endif
-
-#endif
+//#include <charconv>//for to_chars
+//
+//#if __GNUC__ >= 11
+//#define USE_TO_CHARS
+//#include <array>
+//#else
+//
+//// Use ryu if GNUC < 11 and ryu include available
+////ryu            1234.5678 -> "1234.5678" 500ns
+////ryu_printf     1234.5678 -> "1234.5678" 800ns
+////sstream/printf 1234.5678 -> "1234.5678" 1800ns
+//#if __has_include(<ryu/ryu.h>)
+//#define USE_RYU
+//#include <ryu/ryu.h>
+//#endif
+//
+//#endif
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
+
+#include "exodus/mvd2s.cpp"
 
 namespace exodus {
 
@@ -237,6 +240,7 @@ var::var(CVR rhs)
 
 #endif // not INLINE_CONSTRUCTION
 
+/*
 // TODO ensure locale doesnt produce like 123.456,78
 // see 1997 http://www.cantrip.org/locale.html
 std::string dblToString(double double1) {
@@ -411,15 +415,8 @@ std::string dblToString(double double1) {
 
 	auto exponent = stoi(s.substr(epos + 1));
 
-	//leave exponent in if like 1.23456E-6
-	//otherwise convert things like 1.23456E3 to 1234.56
-	//1.23456E0 -> 1.23456
-	//1.23456E-1 -> 0.123456
-	//1.23456E-6 -> 0.00000123456
-	//1.23456E-7 -> 1.23456E-7
-	//1.23456E1 -> 12.3456
-	//1.23456E1 -> 12.3456
-	if (exponent < -6)
+	//leave exponent in if exponent is <= -7 or >= +13
+	if (exponent < -6 or exponent > 12)
 		return s;
 
 	if (epos != std::string::npos)
@@ -502,6 +499,7 @@ removetrailing:
 
 	return s;
 }
+*/
 
 // mainly called in ISSTRING when not already a string
 void var::createString() const {
@@ -513,7 +511,7 @@ void var::createString() const {
 	// dbl - create string from dbl
 	// prefer double
 	if (var_typ & VARTYP_DBL) {
-		var_str = dblToString(var_dbl);
+		var_str = mvd2s(var_dbl);
 		var_typ |= VARTYP_STR;
 		return;
 	}
@@ -863,7 +861,7 @@ VARREF var::operator^=(const double double1) & {
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
-	var_str += dblToString(double1);
+	var_str += mvd2s(double1);
 	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;

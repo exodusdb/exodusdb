@@ -2626,16 +2626,38 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 
 	*/
 
-	// New method should be faster and allow
+	// TODO Consider runtime Non-numeric or other error if amount or unit is missing
+	// TODO Consider runtime error (Non-numeric?) if amount is not numeric
 
+	// New method based on finding the last digit. Doesnt allow digits in unit codes.
+
+	// Input            Amount        Unit
+	// -----            ------        ----
 	// 1.23456E-6USD -> 1.23456E-6    USD
 	// USD              ""            USD
 	// 1                1             ""
 
+	// 123.45e7USD
+	// 123.45e+07USD
+	// 123.45e-07USD
+	// 123.45M3 cubic meters TODO
+	// 123.45e10M3 cubic meters TODO
+	// 123e10 means e+10 and no unit
+
 	// Find the last digit
 	std::string s = input0.toString();
 	std::size_t pos = s.find_last_of("0123456789");
+
+	// If no digits are found, then return amount as "" and all input as unit
+	// TODO Non-numeric error?
 	if (pos == std::string::npos) {
+		unitx = input0;
+		return "";
+	}
+
+	// If last char is digit, then return all as amount and unit is "
+	// TODO Non-numeric error?
+	if (pos + 1 == s.size()) {
 		unitx = "";
 		return input0;
 	}
@@ -2646,6 +2668,7 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 
 	// Everything up to and including the last digit is the number
 	// example 1.23456E-6 -> 1.23456E-6
+	// TODO Non-numeric error?
 	return s.substr(0, pos + 1);
 
 }
