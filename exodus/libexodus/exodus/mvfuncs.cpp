@@ -504,7 +504,7 @@ bool var::toBool() const {
 		}
 
 		// must be string - try to convert to numeric and do all tests again
-		isnum();
+		this->isnum();
 	};
 }
 
@@ -1736,6 +1736,8 @@ VARREF var::textconverter(CVR oldchars, CVR newchars) {
 	return *this;
 }
 
+// RULES need updating since we are now allowing E/e scientific notation
+//
 // numeric is one of four regular expressions or zero length string
 //^$			zero length string
 //[+-]?9+		eg 999
@@ -1761,129 +1763,32 @@ bool var::isnum(void) const {
 	// to save the probably double check here
 	THISISDEFINED()
 
-	// is numeric already
+	// Known to be numeric already
 	if (var_typ & VARTYP_INTDBL)
 		return true;
 
-	// is known not numeric already
+	// Known to be not numeric already
 	// maybe put this first if comparison operations on strings are more frequent than numeric
 	// operations on numbers
 	if (var_typ & VARTYP_NAN)
 		return false;
 
-	// not assigned error
+	// Not assigned error
 	if (!var_typ)
 		throw MVUnassigned("isnum()");
 
-	// otherwise find test
-	// a number is optional minus followed by digits and max of one decimal point
-	// NB going backwards - for speed?
-	// TODO: check if going backwards is slow for variable width multi-byte character strings
-	// and replace with forward scanning
-
-	// Suggestion: statistically, non numeric strings are postfixed by numbers but not prefixed.
-	// Example, natural names for DB tables are CUSTOMERS1 and REPORT2009, but not 1CUSTOMER and
-	// 2009REPORT
-	//	for (int ii=(int)var_str.size()-1;ii>=0;--ii)
-	int strlen = var_str.size();
-
 	// Empty string is zero. Leave the string as "".
+	int strlen = var_str.size();
 	if (strlen == 0) {
 		var_int = 0;
 		var_typ = VARTYP_INTSTR;
 		return true;
 	}
 
-/*
-	// if not a number and not unassigned then it is an unknown string
-
-	bool point = false;
-	bool digit = false;
-
-	//very long strings, even if numeric, are deemed not numeric because they cannot be converted to double/long int
-	//if (strlen > 30) {
-	//allow "-0.0000000000009094947017729282" which can come from a calculation on doubles producing a double
-	//allow "-0.00000000000004263256414560601" which can come from
-	//if (strlen > 31) {
-	//allow "-0.00000000000004263256414560601" which can come from a calculation on doubles producing a double
-	//if (strlen > 32) {
-    //allow "-0.000000000000018207657603852567"
-	//if (strlen > 33) {
-	//play safe
-	if (strlen > 48) {
-		var_typ = VARTYP_NANSTR;
-		return false;
-	}
-
-	for (int ii = 0; ii < strlen; ii++) {
-		char cc = var_str[ii];
-		// + 2B		- 2D
-		// . 2E		number 30-39
-		if (cc > '9')  // for sure not a number
-		{
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-		if (cc >= '0') {
-			digit = true;
-		} else {
-			switch (cc) {
-				case '.':
-					if (point)	// 2nd point - is non-numeric
-					{
-						var_typ = VARTYP_NANSTR;
-						return false;
-					}
-					point = true;
-					break;
-
-				case '-':
-				case '+':
-					// non-numeric if +/- is not the first character or is the only
-					// character
-					if (ii) {
-						var_typ = VARTYP_NANSTR;
-						return false;
-					}
-					break;
-
-				// any other character mean non-numeric
-				default:
-					var_typ = VARTYP_NANSTR;
-					return false;
-			}
-		}
-	}
-
-	// strategy:
-	// Only test the length of string once in the relatively common cases (ie where
-	// the string fails numeric testing or there is at least one digit in the string)
-	// Only in the rarer cases of the string being zero length
-	//(or being one of special cases + - . +. -.) will the length be checked twice
-	// digit=false
-	// test length zero so no loop
-	// if (!digit)
-	//  test length zero again
-
-	// perhaps slightly unusual cases here
-	// zero length string and strings like + - . +. -.
-	if (!digit) {
-
-		// must be at least one digit unless zero length string
-		if (not var_str.empty()) {
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-
-		// zero length string is integer 0
-		var_int = 0;
-		var_typ = VARTYP_INTSTR;
-		return true;
-	}
-*/
-
-	//detect if NAN, floating point or integer
-	// We need to detect NAN asap because strings comparison always attempts to compare numerically.
+	// Preparse the string to detect if integer or decimal or many types of non-numeric
+	// We need to detect NAN ASAP because string comparison always attempts to compare numerically.
+	// The parsing does not need to be perfect since we will rely
+	// on from_chars for the final parsing
 	bool floating = false;
 	bool has_sign = false;
 	for (int ii = 0; ii < strlen; ii++) {
@@ -1910,9 +1815,9 @@ bool var::isnum(void) const {
 
 		case '-':
 		case '+':
-			// Disallow more than one sign
+			// Disallow more than one sign eg "+-999"
 			// Disallow a single + since it will be trimmed off below
-			if (has_sign) {
+			if (has_sign or strlen == 0) {
 				var_typ = VARTYP_NANSTR;
 				return false;
 			}
@@ -1932,118 +1837,38 @@ bool var::isnum(void) const {
 		}
 	}
 
-	// get and save the number as double or (long) int
-	try {
+	char* first = var_str.data();
+	char* last = first + strlen;
 
-		//double
-		if (floating) {
-			// var_dbl=_wtof(var_str.c_str());
-			// var_dbl=_wtof(var_str.c_str());
-			// TODO optimise with code based on the following idea?
-			/*
-			union switchitup
-			{
-				char bigletter;
-				char smalletters[sizeof(char)/sizeof(char)];
-			} abcd;
-			abcd.bigletter=0x0035;
-			std::cout<<atoi(abcd.smalletters)<<std::endl;
-			*/
+	// Skip leading + to be compatible with javascript
+	// from_chars does not allow it.
+	first += *first == '+';
 
-			// http://www.globalyzer.com/gi/help/gihelp/unsafeMethod/atof.htm :
-			// "... _wtof is supported only on Windows platforms"
-			// "... Recommended Replacements: ANSI UTF-16 strtod"
-			///		std::string result(var_str.begin(),var_str.end());
-			///		var_dbl=atof(result.c_str());
-			//      var_dbl = strtod(var_str.c_str(), 0);
-			//      var_dbl = std::stod(var_str.c_str(), 0);
+	if (floating) {
 
-#if defined(HAS_FASTFLOAT) or defined(USE_CHARCONV)
-			//std::cout << "fastfloat decimal iconv" << var_str << std::endl;
-
-			char* first = var_str.data();
-			char* last = first + strlen;
-			// Allow leading + to be compatible with javascript
-			first += *first == '+';
-			//auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, var_str.data() + var_str.size(), var_dbl, STD_OR_FASTFLOAT::chars_format::fixed);
-			auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, last, var_dbl);
-			if (ec != std::errc() || p != last) {
-				//std::cerr << "parsing failure\n"; return EXIT_FAILURE;
-				var_typ = VARTYP_NANSTR;
-				return false;
-			}
-
-#elif defined(HAS_RYU)
-
-			//std::cout << "ryu_parse decimal iconv" << var_str << std::endl;
-
-			//Status status = s2d(var_str.c_str(), var_dbl);
-			Status status = s2d_n(var_str.data(), int(var_str.size()), &var_dbl);
-			//  SUCCESS,
-			//  INPUT_TOO_SHORT,
-			//  INPUT_TOO_LONG,
-			//  MALFORMED_INPUT
-			if (status != SUCCESS) {
-				var_typ = VARTYP_NANSTR;
-				return false;
-			}
-
-#else
-
-			//std::cout << "std::stod decimal iconv" << var_str << std::endl;
-
-			//boring old std::stod currently (2021) much slower than fastfloat
-			var_dbl = std::stod(var_str);
-
-#endif
-
-			var_typ = VARTYP_DBLSTR;
-
+		// to double
+		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, last, var_dbl);
+		if (ec != std::errc() || p != last) {
+			var_typ = VARTYP_NANSTR;
+			return false;
 		}
 
-		//long int
-		else {
-			// var_int=_wtoi(var_str.c_str());
-			// TODO optimise
+		// indicate that the var is a string and a double
+		var_typ = VARTYP_DBLSTR;
 
-			// change from
-			///		std::string result(var_str.begin(),var_str.end());
-			///		var_int=atoi(result.c_str());
-			//var_int = strtol(var_str.c_str(), 0, 10);
+	} else {
 
-			//var v="1234";//27ns
-			//v.isnum();//+78ns (105ns) using stol 0 10
-			//v.isnum();//+54ns (81ns) using charconv from_chars int
-			//v.isnum();//+49ns (76ns) using atol BEST
-
-#if 0
-			//var_int = std::stol(var_str.c_str(), 0, 10);
-			//var_int = std::stol(var_str);
-			var_int = std::atol(var_str.c_str());  //fastest gcc 10.2
-#else
-			char* first = var_str.data();
-			char* last = first + strlen;
-			// Allow leading + to be compatible with javascript
-			first += *first == '+';
-			auto [p, ec] = std::from_chars(first, last, var_int);
-			if (ec != std::errc() || p != last) {
-				var_typ = VARTYP_NANSTR;
-				return false;
-			}
-#endif
-			var_typ = VARTYP_INTSTR;
+		// to long int
+		auto [p, ec] = std::from_chars(first, last, var_int);
+		if (ec != std::errc() || p != last) {
+			var_typ = VARTYP_NANSTR;
+			return false;
 		}
 
+		// indicate that the var is a string and a long int
+		var_typ = VARTYP_INTSTR;
 	}
 
-	//catch (std::out_of_range) could be too many digits eg (a very long string of digits)
-	catch (...) {
-		//throw MVError("Cannot convert '" ^ *this ^ "' to long int");
-		var_typ = VARTYP_NANSTR;
-		return false;
-	}
-
-	// indicate isNumeric
 	return true;
 }
 
