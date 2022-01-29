@@ -555,6 +555,22 @@ function main() {
 	assert(123_var == "0123.0");
 	assert(123.456_var == "0123.4560");
 
+	assert(var(1000.1)       .toString() == "1000.1");
+	assert(var(1000)         .toString() == "1000");
+	assert(var(10'000'000)   .toString() == "10000000");
+	assert(var(0.0001)       .toString() == "0.0001");
+	//assert(var(0.000'000'01) .toString() == "0.00000001");
+	TRACE(var(0.000'000'01))
+	assert(var(0.000'000'01) .toString() == "1E-8");
+
+	assert(var(-1000.1)      .toString() == "-1000.1");
+	assert(var(-1000)        .toString() == "-1000");
+	assert(var(-10'000'000)  .toString() == "-10000000");
+	assert(var(-0.0001)      .toString() == "-0.0001");
+	//assert(var(-0.000'000'01).toString() == "-0.00000001");
+	TRACE(var(-0.000'000'01))
+	assert(var(-0.000'000'01).toString() == "-1E-8");
+
 	var v1 = 1;
 	var v2 = 1;
 
