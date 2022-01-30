@@ -465,7 +465,7 @@ convert:
 
 	// rounding
 	newmv = newmv.round(ndecimals);
-	newmv.createString();
+	//newmv.createString();
 
 	//var part1 = newmv.field(".", 1);
 	//var part2 = newmv.field(".", 2);

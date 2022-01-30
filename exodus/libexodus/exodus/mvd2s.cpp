@@ -25,7 +25,7 @@ THE SOFTWARE.
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
 //sstream/printf 1234.5678 -> "1234.5678" 1800ns
 
-// 1. TO_CHARS
+// 1. TO_CHARS from Ubuntu 22.04
 #if __GNUC__ >= 11
 #define USE_TO_CHARS
 #include <charconv>
@@ -61,14 +61,26 @@ std::string mvd2s(double double1) {
 
 	// 1) USE_TO_CHARS
 
+	// Use the low level high performance double to chars converter
+	// https://en.cppreference.com/w/cpp/utility/to_chars
+
 	std::array<char, 24> chars;
-
+	//auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::scientific);
 	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1);
-	if (ec != std::errc())
-		throw MVNonNumeric("Cannot convert double1 to 24 characters");
 
+	// Throw if non-numeric
+	if (ec != std::errc())
+		throw MVNonNumeric("mvd2s: Cannot convert double to 24 characters");
+
+	// Convert to a string. Hopefully using small string optimisation (SSO)
 	std::string s = std::string(chars.data(), ptr - chars.data());
+
+	return s;
+
+	// Find the exponent if any
 	const std::size_t epos = s.find('e');
+
+	// We are done if there is no exponent
 	if (epos == std::string::npos)
 		return s;
 

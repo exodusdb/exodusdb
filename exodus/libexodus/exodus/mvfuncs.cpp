@@ -67,9 +67,9 @@ Binary    Hex          Comments
 #define USE_CHARCONV
 #define STD_OR_FASTFLOAT std
 
-#elif __has_include(<ryu/ryu.h>)
-#define HAS_RYU
-#include <ryu/ryu.h>
+//#elif __has_include(<ryu/ryu.h>)
+//#define HAS_RYU
+//#include <ryu/ryu.h>
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
@@ -401,6 +401,8 @@ var var::round(const int ndecimals) const {
 	 1.0= 1.0
 	*/
 
+	//var_str is always set on return
+
 	// if n=0 could save the integer conversion here but would require mentality to save BOTH
 	// int and double currently its possible since space is reserved for both but this may
 	// change
@@ -421,6 +423,7 @@ var var::round(const int ndecimals) const {
 			//result=*this;
 			result.var_int = var_int;
 			result.var_typ = VARTYP_INT;
+			result.createString();
 			return result;
 		}
 		// loss of precision if var_int is long long

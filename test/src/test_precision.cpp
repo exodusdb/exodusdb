@@ -4,9 +4,9 @@
 #include <iomanip>
 #include <cmath>
 
-// 1. TO_CHARS
+// 1. TO_CHARS from Ubuntu 22.04
 #if __GNUC__ >= 11
-#define USE_TO_CHARS
+#define USE_TO_CHARS_G
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
@@ -77,58 +77,66 @@ function main() {
 		assert( (var(9.36749)        ^ "x").outputl() == "9.36749x");
 		assert(((var("9.36749") + 0) ^ "x").outputl() == "9.36749x");
 
-		printl( var(1234567890123456789.)  ^ "x");
-		printl( var(12345678901234567890.)  ^ "x");
-#ifdef USE_TO_CHARS
+#ifdef USE_TO_CHARS_G
 		assert((var(1234567890123456789.)  ^ "x").outputl() == "1234567890123456768x");
 		assert((var(12345678901234567890.) ^ "x").outputl() == "12345678901234567168x");
 
-		printl( var("999999999999999.9")    + 0);
-		//           999999999999999.875
-		assert((var("999999999999999.9")    + 0).outputl().toString() == "9.999999999999999e14");
-		printl( var("9999999999999999.9")   + 0);
-		assert((var("9999999999999999.9")   + 0).outputl().toString() == "1.0e16");
+		assert((var("999999999999999.9")    + 0).outputl().toString() == "999999999999999.9");
+		assert((var("9999999999999999.9")   + 0).outputl().toString() == "1e+16");
+
+#elif defined(USE_TO_CHARS_S)
+		assert((var(1234567890123456789.)  ^ "x").outputl() == "1.2345678901234568e+18x");
+		assert((var(12345678901234567890.) ^ "x").outputl() == "1.2345678901234567e+19x");
+
+		assert((var("999999999999999.9")    + 0).outputl().toString() == "9.999999999999999e+14");
+		//assert((var("9999999999999999.9")   + 0).outputl().toString() == "1.0e16");
+		assert((var("9999999999999999.9")   + 0).outputl().toString() == "1e+16");
 
 #elif defined(USE_RYU)
 		assert((var(1234567890123456789.)  ^ "x").outputl() == "1.2345678901234568e+18x");
 		assert((var(12345678901234567890.) ^ "x").outputl() == "1.2345678901234567e+19x");
 #else
+		assert(var(1234567890.0)               .outputl().squote() eq "'1234567890'");
+		assert(var(1234567890123.0)            .outputl().squote() eq "'1234567890123'");
+		assert(var(12345678901234.0)           .outputl().squote() eq "'1.2345678901234e+13'");
+		assert(var(123456789012345.0)          .outputl().squote() eq "'1.23456789012345e+14'");
+
 		assert((var(1234567890123456789.)  ^ "x").outputl() == "1.234567890123457e+18x");
 		assert((var(12345678901234567890.) ^ "x").outputl() == "1.234567890123457e+19x");
 #endif
-		printl( var("999999999999999.9")    + 0);
-		//           999999999999999.875
+
+#ifndef USE_TO_CHARS_G
 		assert((var("999999999999999.9")    + 0).outputl().toString() == "9.999999999999999e+14");
 		printl(var(9999999999999999.9).toDouble());
 		TRACE( var("9999999999999999.9")   + 0);
 		//assert((var("9999999999999999.9")   + 0).outputl().toString() == "1.0e+16");
 		assert((var("9999999999999999.9")   + 0).outputl().toString() == "1.0e+16");
+#endif
 
 //#endif
 
-		//ryu conversion of ASCII numbers to doubles REJECTS too precise numbers that cannot be round tripped
-		// why are these ok now?
-		//assert( ! var("99999999999999999.9").isnum());
-		assert(var("99999999999999999.9").outputl().isnum());
-		//assert( ! var("0.999999999999999999").isnum());
-		assert( var("0.999999999999999999").outputl().isnum());
-
 		assert(   var("9999999999999999.9").outputl().isnum());
 		assert(   var("0.99999999999999999").outputl().isnum());
+
+#ifdef USE_TO_CHARS_G
+		assert((var("99999999999999999.9")  + 0).outputl().toString() == "1e+17");
+		assert((var("999999999999999999.9")  + 0).outputl().toString() == "1e+18");
+
+		assert((var(999999999999999.9)    ^ "x").outputl() == "999999999999999.9x");
+		assert((var(9999999999999999.9)   ^ "x").outputl() == "1e+16x");
+		assert((var(99999999999999999.9)  ^ "x").outputl() == "1e+17x");
+		assert((var(999999999999999999.9) ^ "x").outputl() == "1e+18x");
+#else
 		assert((var("99999999999999999.9")  + 0).outputl().toString() == "1.0e+17");
 		assert((var("999999999999999999.9")  + 0).outputl().toString() == "1.0e+18");
-
-		assert(var(10)/var(3).outputl() == "3.3333333333333333");
-
-		printl(var(999999999999999.9)    ^ "x");
-		printl(var(9999999999999999.9)    ^ "x");
-		printl(var(99999999999999999.9)    ^ "x");
-		printl(var(999999999999999999.9)    ^ "x");
 
 		assert((var(999999999999999.9)    ^ "x").outputl() == "9.999999999999999e+14x");
 		assert((var(9999999999999999.9)   ^ "x").outputl() == "1.0e+16x");
 		assert((var(99999999999999999.9)  ^ "x").outputl() == "1.0e+17x");
 		assert((var(999999999999999999.9) ^ "x").outputl() == "1.0e+18x");
+#endif
+
+		assert(var(10)/var(3).outputl() == "3.3333333333333333");
 
 		printl("\ntoo many decimal points get ROUNDED");
 		dd1 = 0.00005678901234567890;
@@ -136,7 +144,11 @@ function main() {
 		dv2 = "0.00005678901234567890d";
 		sv1 = dv1^"x";
 		//var sv2 = "0.00005678901235x";
+#ifdef USE_TO_CHARS_G
+		sv2 = "5.67890123456789e-05x";
+#else
 		sv2 = "0.0000567890123456789x";
+#endif
 		gosub out();
 		assert(sv1 == sv2);
 
@@ -149,7 +161,7 @@ function main() {
 		TRACE(var(dv1))
 		TRACE(var(dv2))
 
-#ifdef USE_RYU
+#if defined(USE_TO_CHARS_G) or defined(USE_RYU)
 		sv2 = "1234567890.0000567x";
 #else
 		sv2 = "1234567890.000057x";
@@ -166,7 +178,11 @@ function main() {
 		dv1 = dd1;
 		dv2 = "0.00005678d";
 		sv1 = dv1^"x";
+#ifdef USE_TO_CHARS_G
+		sv2 = "5.678e-05x";
+#else
 		sv2 = "0.00005678x";
+#endif
 		gosub out();
 		assert(sv1 == sv2);
 
@@ -175,7 +191,11 @@ function main() {
 		dv1 = dd1;
 		dv2="0.0000000000001d";
 		sv1 = dv1^"x";
+#ifdef USE_TO_CHARS_G
+		sv2="1e-13x";
+#else
 		sv2="1.0e-13x";
+#endif
 		gosub out();
 		assert(sv1 == sv2);
 
@@ -205,7 +225,11 @@ function main() {
 		dv2="999999999999999999.9d";
 		sv1=dv1^"x";
 		//sv2="1E18x";
+#ifdef USE_TO_CHARS_G
+		sv2="1e+18x";
+#else
 		sv2="1.0e+18x";
+#endif
 		gosub out();
 		assert(sv1 == sv2);
 
@@ -214,7 +238,7 @@ function main() {
 		dv1 = dd1;
 		dv2="12345678901234567890123456789.0d";
 		sv1=dv1^"x";
-#ifdef USE_RYU
+#if defined(USE_TO_CHARS_G) or defined(USE_RYU)
 		sv2="1.2345678901234568e+28x";
 #else
 		sv2="1.234567890123457e+28x";
@@ -227,7 +251,9 @@ function main() {
 		dv1 = dd1;
 		dv2="99999999999999.9d";
 		sv1=dv1^"x";
-#ifdef USE_RYU
+#ifdef USE_TO_CHARS_G
+		sv2="99999999999999.9x";
+#elif defined(USE_RYU)
 		sv2="9.99999999999999e+13x";
 #else
 		sv2="9.999999999999991e+13x";
@@ -274,7 +300,9 @@ function main() {
 		assert(test2("-02.00", "-2x"));
 		//assert(test2("+02.00", "+2x"));
 
-#if defined(USE_RYU) or defined(USE_TO_CHARS)
+#if defined(USE_TO_CHARS_G)
+		assert(test2("00000000000000000000.00000000000000000001",                   "1e-20x"));//ryu
+#elif defined(USE_RYU)
 		//assert(test2("00000000000000000000.00000000000000000001",                   "0.00000000000000000001x"));//ryu
 		assert(test2("00000000000000000000.00000000000000000001",                   "1.0e-20x"));//ryu
 #else
@@ -311,7 +339,7 @@ function main() {
 		assert(test2("00000000000000000000.00000001234567890123",                   "1.234567890123e-08x"));
 		assert(test2("00000000000000000000.00000012345678901234",                   "1.2345678901234e-07x"));
 
-#if defined(USE_RYU) or defined(USE_TO_CHARS)
+#if defined(USE_TO_CHARS_G) or defined(USE_RYU)
 		//assert(test2("00000000000000000000.000000000000000000012345678901234567",   "0.000000000000000000012345678901234567x"));
 		//assert(test2("00000000000000000000.00000000000000000012345678901234567",    "0.00000000000000000012345678901234568x"));
 		//assert(test2("00000000000000000000.0000000000000000012345678901234567",     "0.0000000000000000012345678901234566x"));
@@ -326,8 +354,8 @@ function main() {
 		//assert(test2("00000000000000000000.0000000012345678901234567",              "0.0000000012345678901234566x"));
 		//assert(test2("00000000000000000000.000000012345678901234567",               "0.000000012345678901234567x"));
 		//assert(test2("00000000000000000000.00000012345678901234567",                "0.00000012345678901234566x"));
-		assert(test2("00000000000000000000.0000012345678901234567",                 "0.0000012345678901234567x"));
-		assert(test2("00000000000000000000.000012345678901234567",                  "0.000012345678901234568x"));
+		//assert(test2("00000000000000000000.0000012345678901234567",                 "0.0000012345678901234567x"));
+		//assert(test2("00000000000000000000.000012345678901234567",                  "0.000012345678901234568x"));
 
 		assert(test2("00000000000000000000.000000000000000000012345678901234567",   "1.2345678901234567e-20x"));
 		assert(test2("00000000000000000000.00000000000000000012345678901234567",    "1.2345678901234568e-19x"));
@@ -344,8 +372,13 @@ function main() {
 		assert(test2("00000000000000000000.000000012345678901234567",               "1.2345678901234567e-08x"));
 		assert(test2("00000000000000000000.00000012345678901234567",                "1.2345678901234566e-07x"));
 
+#ifdef USE_TO_CHARS_G
+		assert(test2("00000000000000000000.0000012345678901234567",                 "1.2345678901234567e-06x"));
+		assert(test2("00000000000000000000.000012345678901234567",                  "1.2345678901234568e-05x"));
+#else
 		assert(test2("00000000000000000000.0000012345678901234567",                 "0.0000012345678901234567x"));
 		assert(test2("00000000000000000000.000012345678901234567",                  "0.000012345678901234568x"));
+#endif
 
 		assert(test2("00000000000000000000.00012345678901234567",                   "0.00012345678901234567x"));
 		assert(test2("00000000000000000000.00123456789012345678",                   "0.0012345678901234567x"));
@@ -365,15 +398,20 @@ function main() {
 		assert(test2("00000000012345678901.23456789010000000000",         "12345678901.234568x"));
 		assert(test2("00000000123456789012.34567890100000000000",        "123456789012.34567x"));
 		assert(test2("00000001234567890123.45678901000000000000",       "1234567890123.4568x"));
+#ifdef USE_TO_CHARS_G
+		assert(test2("00000012345678901234.56789010000000000000",      "12345678901234.568x"));
+		assert(test2("00000123456789012345.67890100000000000000",     "123456789012345.67x"));
+		assert(test2("00001234567890123456.78901000000000000000",    "1234567890123456.8x"));
+		assert(test2("00012345678901234567.89010000000000000000",   "12345678901234568x"));
+		assert(test2("00123456789012345678.90100000000000000000",  "123456789012345680x"));
+		assert(test2("01234567890123456789.01000000000000000000", "1234567890123456768x"));
+		assert(test2("12345678901234567890.10000000000000000000","12345678901234567168x"));
+#else
 		assert(test2("00000012345678901234.56789010000000000000",      "1.2345678901234568e+13x"));
 		assert(test2("00000123456789012345.67890100000000000000",     "1.2345678901234567e+14x"));
 		assert(test2("00001234567890123456.78901000000000000000",    "1.2345678901234568e+15x"));
 		assert(test2("00012345678901234567.89010000000000000000",   "1.2345678901234568e+16x"));
 		assert(test2("00123456789012345678.90100000000000000000",  "1.2345678901234568e+17x"));
-#ifdef USE_TO_CHARS
-		assert(test2("01234567890123456789.01000000000000000000", "1234567890123456768x"));
-		assert(test2("12345678901234567890.10000000000000000000","12345678901234567168x"));
-#else
 		assert(test2("01234567890123456789.01000000000000000000", "1.2345678901234568e+18x"));
 		assert(test2("12345678901234567890.10000000000000000000","1.2345678901234567e+19x"));
 #endif
@@ -558,7 +596,9 @@ function main() {
 	assert(var(1e-11f).outputl().toString() == "9.999999960041972e-12");
 	printl(var(1e-11));
 
-#ifdef USE_RYU
+#ifdef USE_TO_CHARS_G
+	assert(var(1e-11).outputl().toString() == "1e-11");
+#elif defined(USE_RYU)
 	assert(var(1e-11).outputl().toString() == "1.0e-11");
 #else
 	assert(var(1e-11).outputl().toString() == "9.999999999999999e-12");
@@ -571,11 +611,18 @@ function main() {
 	//assert(var(1e-14 ).outputl().toString() == "0.00000000000001");
 
 	assert(var(1e-12f).outputl().toString() == "9.999999960041972e-13");
-	assert(var(1e-12 ).outputl().toString() == "1.0e-12");
 	assert(var(1e-13f).outputl().toString() == "9.9999998245167e-14");
-	assert(var(1e-13 ).outputl().toString() == "1.0e-13");
 	assert(var(1e-14f).outputl().toString() == "9.9999998245167e-15");
+
+#ifdef USE_TO_CHARS_G
+	assert(var(1e-12 ).outputl().toString() == "1e-12");
+	assert(var(1e-13 ).outputl().toString() == "1e-13");
+	assert(var(1e-14 ).outputl().toString() == "1e-14");
+#else
+	assert(var(1e-12 ).outputl().toString() == "1.0e-12");
+	assert(var(1e-13 ).outputl().toString() == "1.0e-13");
 	assert(var(1e-14 ).outputl().toString() == "1.0e-14");
+#endif
 
 	for (int i=-1000; i<=1000; ++i) {
 		std::stringstream ss;
@@ -609,11 +656,16 @@ function main() {
 
 	//assert((var(pwr(10,-26)) ^ "x").outputl() =="0.00000000000000000000000001x");//better calculation of 10^-26
 	//assert((var(1/pwr(10,26)) ^ "x").outputl() =="0.000000000000000000000000009999999999999999x");//poorer calculation of 1/10^26
+#ifdef USE_TO_CHARS_G
+	assert((var(pwr(10,-26)) ^ "x").outputl() =="1e-26x");//better calculation of 10^-26
+#else
 	assert((var(pwr(10,-26)) ^ "x").outputl() =="1.0e-26x");//better calculation of 10^-26
+#endif
 	assert((var(1/pwr(10,26)) ^ "x").outputl() =="9.999999999999999e-27x");//poorer calculation of 1/10^26
 
+
 	printl(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x"));
-#if defined(USE_RYU) or defined(USE_TO_CHARS)
+#if defined(USE_RYU) or defined(USE_TO_CHARS_G)
 	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x").outputl() == "1.4349296274686127e-42x");//ryu 
 #else
 	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x").outputl() == "1.434929627468613e-42x");//sstream
@@ -624,24 +676,65 @@ function main() {
 	//assert((var(1/pwr(10,26)) ^ "x").outputl() == "0.000000000000000000000000009999999999999999x");
 	//assert((var(pwr(10,-27)) ^ "x")  == "0.000000000000000000000000001x");
 
+#ifdef USE_TO_CHARS_G
+	assert((var(pwr(10,-26)) ^ "x").output()  == "1e-26x");
+	assert((var(pwr(10,-27)) ^ "x").output()  == "1e-27x");
+#else
 	assert((var(pwr(10,-26)) ^ "x").output()  == "1.0e-26x");
-	assert((var(1/pwr(10,26)) ^ "x").outputl() == "9.999999999999999e-27x");
 	assert((var(pwr(10,-27)) ^ "x").output()  == "1.0e-27x");
+#endif
+	assert((var(1/pwr(10,26)) ^ "x").outputl() == "9.999999999999999e-27x");
 
 	{
 		assert(var(1000.1)       .outputl().toString() == "1000.1");
 		assert(var(1000)         .outputl().toString() == "1000");
 		assert(var(10'000'000)   .outputl().toString() == "10000000");
+#ifdef USE_TO_CHARS_G
+		assert(var(0.0001)       .outputl().toString() == "1e-04");
+		assert(var(0.000'000'01) .outputl().toString() == "1e-08");
+		assert(var(-0.000'000'01).outputl().toString() == "-1e-08");
+		assert(var(-0.0001)      .outputl().toString() == "-1e-04");
+#else
 		assert(var(0.0001)       .outputl().toString() == "0.0001");
-		//assert(var(0.000'000'01) .outputl().toString() == "0.00000001");
 		assert(var(0.000'000'01) .outputl().toString() == "1.0e-08");
+		assert(var(-0.000'000'01).outputl().toString() == "-1.0e-08");
+		assert(var(-0.0001)      .outputl().toString() == "-0.0001");
+#endif
 
 		assert(var(-1000.1)      .outputl().toString() == "-1000.1");
 		assert(var(-1000)        .outputl().toString() == "-1000");
 		assert(var(-10'000'000)  .outputl().toString() == "-10000000");
-		assert(var(-0.0001)      .outputl().toString() == "-0.0001");
-		//assert(var(-0.000'000'01).outputl().toString() == "-0.00000001");
-		assert(var(-0.000'000'01).outputl().toString() == "-1.0e-08");
+	}
+
+	{
+		assert(var(1)       .oconv("MD60PZ").squote().outputl() eq "'1.000000'");
+		printl("MD60Z means suppress zeros and zero means numbers smaller than 0.0001");
+		printl("TODO only suppress if all are 0");
+		assert(var(0.000001).oconv("MD60PZ").squote().outputl() eq "''");
+		assert(var(0.00001) .oconv("MD60PZ").squote().outputl() eq "''");
+		assert(var(0.0001)  .oconv("MD60PZ").squote().outputl() eq "'0.000100'");
+
+		assert(var(0.000001).oconv("MD60P").squote().outputl() eq "'0.000001'");
+		assert(var(0.00001) .oconv("MD60P").squote().outputl() eq "'0.000010'");
+		assert(var(0.0001)  .oconv("MD60P").squote().outputl() eq "'0.000100'");
+
+		assert(var(-0.000001).oconv("MD60P").squote().outputl() eq "'-0.000001'");
+		assert(var(-0.00001) .oconv("MD60P").squote().outputl() eq "'-0.000010'");
+		assert(var(-0.0001)  .oconv("MD60P").squote().outputl() eq "'-0.000100'");
+
+	}
+
+	{
+		assert(var("0") .round(10).outputl().squote() eq "'0.0000000000'");
+		assert(var("0") .round(10).outputl().squote() eq "'0.0000000000'");
+		assert(var("0.").round(10).outputl().squote() eq "'0.0000000000'");
+		assert(var(".0").round(10).outputl().squote() eq "'0.0000000000'");
+
+		assert(var(0) .round(10).outputl().squote() eq "'0.0000000000'");
+		assert(var(0) .round(10).outputl().squote() eq "'0.0000000000'");
+		assert(var(0.).round(10).outputl().squote() eq "'0.0000000000'");
+		assert(var(.0).round(10).outputl().squote() eq "'0.0000000000'");
+
 	}
 
 	printl("Test passed");
