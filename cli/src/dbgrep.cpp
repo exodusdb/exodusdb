@@ -8,19 +8,28 @@ function main() {
 	var reqtext = COMMAND.a(3);
 	var padding = COMMAND.a(4);
 
-	if (not(reqfile or reqtext)) {
+	bool hasreqtext = reqtext.len();
+	if (not hasreqtext) {
 		errputl("syntax: dbgrep filename text");
 		errputl("        dbgrep - text");
 		//stop();
 	}
 
+	bool caseinsensitive = OPTIONS.index("I");
+	if (caseinsensitive)
+		reqtext.lcaser();
+
+	if (not padding)
+		padding = 256;
+
+	var colored_reqtext=reqtext;
+	if (TERMINAL)
+				colored_reqtext = "\033[1;31m" ^ reqtext ^ "\033[0m";
+
 	// get filenames
 	var filenames = listfiles();
-	var nfiles = filenames.dcount(FM);
 
-	for (int filen = 1; filen <= nfiles; ++filen) {
-
-		var filename = filenames.a(filen);
+	for (var filename : filenames) {
 
 		if (filename.index("preselect") or filename.index("select_stage2"))
 			continue;
@@ -36,32 +45,43 @@ function main() {
 			continue;
 		}
 
-		file.select();
+		file.select("SELECT " ^ filename ^ " (SR)");
 
 		var nresults = 1;
-		var key;
-		while (file.readnext(key)) {
+		while (file.readnext(RECORD, ID, MV)) {
 
-			// get record or skip
-			var data;
-			if (not(data.read(file, key))) {
-				//abort(key.quote()^" is missing from " ^ file.quote());
-				continue;
+			if (esctoexit())
+				stop();
+
+//			// get record or skip
+//			var RECORD;
+//			if (not(RECORD.read(file, ID))) {
+//				//abort(ID.quote()^" is missing from " ^ file.quote());
+//				continue;
+//			}
+
+			if (caseinsensitive) {
+				RECORD.lcaser();
+				ID.lcaser();
 			}
 
-			if (reqtext and (not(data.lcase().index(reqtext.lcase())) or not(key.lcase().index(reqtext.lcase())))) {
+			if (not RECORD.index(reqtext) and not ID.index(reqtext)) {
 				continue;
 			}
 
 			// padding & startpos used to contextualise found reqtext
-			var startpos = data.index(reqtext);
+			var startpos = RECORD.index(reqtext);
+			var startpos2 = startpos - padding;
+			if (startpos2 < 1) {
+				padding += startpos2;
+				startpos = 1;
+			}
+			//var leftcontext = RECORD.substr(startpos - padding, padding).field2(FM, -1);
+			var leftcontext = RECORD.substr(startpos2, padding).field2(FM, -1);
+			var rightcontext = RECORD.substr(startpos + length(reqtext), padding).a(1);
 
-			var leftcontext = data.substr(startpos - padding, padding);
-			var rightcontext = data.substr(startpos + length(reqtext), padding);
-
-			var context = leftcontext ^ "\033[1;31m" ^ reqtext ^ "\033[0m" ^ rightcontext;
-
-			var(filename ^ " : " ^ key ^ " :: " ^ context).outputl();
+			printl(filename, ID, leftcontext ^ colored_reqtext ^ rightcontext);
+			//var(filename ^ " : " ^ ID ^ " :: " ^ context).outputl();
 		}
 	}
 
