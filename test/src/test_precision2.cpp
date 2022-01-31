@@ -61,31 +61,18 @@ function main() {
 
 	{	// generated code pasted back in
 
-#ifdef USE_TO_CHARS_G
 		assert(var( 1e-200 ).squote().outputl() eq  "'1e-200'" );
 		assert(var( 1e-101 ).squote().outputl() eq  "'1e-101'" );
 		assert(var( 1e-100 ).squote().outputl() eq  "'1e-100'" );
 		assert(var( 1e-99 ).squote().outputl() eq  "'1e-99'" );
-		assert(var( 1e-10 ).squote().outputl() eq  "'1e-10'" );
-		assert(var( 1e-09 ).squote().outputl() eq  "'1e-09'" );
-		assert(var( 1e-08 ).squote().outputl() eq  "'1e-08'" );
-		assert(var( 1e-07 ).squote().outputl() eq  "'1e-07'" );
-		assert(var( 1e-06 ).squote().outputl() eq  "'1e-06'" );
-		assert(var( 1e-05 ).squote().outputl() eq  "'1e-05'" );
-		assert(var( 0.0001 ).squote().outputl() eq  "'1e-04'" );
-#else
-		assert(var( 1e-200 ).squote().outputl() eq  "'1.0e-200'" );
-		assert(var( 1e-101 ).squote().outputl() eq  "'1.0e-101'" );
-		assert(var( 1e-100 ).squote().outputl() eq  "'1.0e-100'" );
-		assert(var( 1e-99 ).squote().outputl() eq  "'1.0e-99'" );
-		assert(var( 1e-10 ).squote().outputl() eq  "'1.0e-10'" );
-		assert(var( 1e-09 ).squote().outputl() eq  "'1.0e-09'" );
-		assert(var( 1e-08 ).squote().outputl() eq  "'1.0e-08'" );
-		assert(var( 1e-07 ).squote().outputl() eq  "'1.0e-07'" );
+		assert(var( 1e-10 ).squote().outputl() eq  "'0.0000000001'" );
+		assert(var( 1e-09 ).squote().outputl() eq  "'0.000000001'" );
+		assert(var( 1e-08 ).squote().outputl() eq  "'0.00000001'" );
+		assert(var( 1e-07 ).squote().outputl() eq  "'0.0000001'" );
 		assert(var( 1e-06 ).squote().outputl() eq  "'0.000001'" );
 		assert(var( 1e-05 ).squote().outputl() eq  "'0.00001'" );
 		assert(var( 0.0001 ).squote().outputl() eq  "'0.0001'" );
-#endif
+
 		assert(var( 0.001 ).squote().outputl() eq  "'0.001'" );
 		assert(var( 0.01 ).squote().outputl() eq  "'0.01'" );
 		assert(var( 0.1 ).squote().outputl() eq  "'0.1'" );
@@ -95,11 +82,8 @@ function main() {
 		assert(var( 100.0 ).squote().outputl() eq  "'100'" );
 		assert(var( 1000.0 ).squote().outputl() eq  "'1000'" );
 		assert(var( 10000.0 ).squote().outputl() eq  "'10000'" );
-#ifdef USE_TO_CHARS_G
-		assert(var( 100000.0 ).squote().outputl() eq  "'1e+05'" );
-#else
 		assert(var( 100000.0 ).squote().outputl() eq  "'100000'" );
-#endif
+
 		assert(var( 1 ).squote().outputl() eq  "'1'" );
 		assert(var( 10 ).squote().outputl() eq  "'10'" );
 		assert(var( 100 ).squote().outputl() eq  "'100'" );
@@ -108,8 +92,9 @@ function main() {
 
 #ifdef USE_TO_CHARS_G
 		printl();
-		printl("DIFFERENT FORMATTING FOR INT AND DOUBLE?! to_chars(in) to_chars(double)");
-		assert(var( 100000.0 ).squote().outputl() eq  "'1e+05'" );
+		//printl("DIFFERENT FORMATTING FOR INT AND DOUBLE?! to_chars(in) to_chars(double)");
+		//assert(var( 100000.0 ).squote().outputl() eq  "'1e+05'" );
+		assert(var( 100000.0 ).squote().outputl() eq  "'100000'" );
 		assert(var( 100000 ).squote().outputl() eq  "'100000'" );
 
 		printl();
@@ -117,27 +102,16 @@ function main() {
 		assert(var( 100000 ).squote().outputl() eq  "'100000'" );
 #endif
 
-#ifdef USE_TO_CHARS_G
-		assert(var( 1e+06 ).squote().outputl() eq  "'1e+06'" );
-		assert(var( 1e+07 ).squote().outputl() eq  "'1e+07'" );
-		assert(var( 1e+08 ).squote().outputl() eq  "'1e+08'" );
-		assert(var( 1e+09 ).squote().outputl() eq  "'1e+09'" );
-		assert(var( 1e+10 ).squote().outputl() eq  "'1e+10'" );
-		assert(var( 1e+99 ).squote().outputl() eq  "'1e+99'" );
-		assert(var( 1e+100 ).squote().outputl() eq  "'1e+100'" );
-		assert(var( 1e+101 ).squote().outputl() eq  "'1e+101'" );
-		assert(var( 1e+200 ).squote().outputl() eq  "'1e+200'" );
-#else
 		assert(var( 1e+06 ).squote().outputl() eq  "'1000000'" );
 		assert(var( 1e+07 ).squote().outputl() eq  "'10000000'" );
 		assert(var( 1e+08 ).squote().outputl() eq  "'100000000'" );
 		assert(var( 1e+09 ).squote().outputl() eq  "'1000000000'" );
 		assert(var( 1e+10 ).squote().outputl() eq  "'10000000000'" );
-		assert(var( 1e+99 ).squote().outputl() eq  "'1.0e+99'" );
-		assert(var( 1e+100 ).squote().outputl() eq  "'1.0e+100'" );
-		assert(var( 1e+101 ).squote().outputl() eq  "'1.0e+101'" );
-		assert(var( 1e+200 ).squote().outputl() eq  "'1.0e+200'" );
-#endif
+		assert(var( 1e+99 ).squote().outputl() eq  "'1e+99'" );
+		assert(var( 1e+100 ).squote().outputl() eq  "'1e+100'" );
+		assert(var( 1e+101 ).squote().outputl() eq  "'1e+101'" );
+		assert(var( 1e+200 ).squote().outputl() eq  "'1e+200'" );
+
 	}
 
 	{

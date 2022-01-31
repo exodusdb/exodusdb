@@ -41,6 +41,8 @@ THE SOFTWARE.
 #include <sstream>
 #endif
 
+#include <limits> //for std::numeric_limits<double>::digits10
+
 namespace exodus {
 
 std::string mvd2s(double double1) {
@@ -66,7 +68,7 @@ std::string mvd2s(double double1) {
 
 	std::array<char, 24> chars;
 	//auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::scientific);
-	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1);
+	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::general, std::numeric_limits<double>::digits10 + 1);
 
 	// Throw if non-numeric
 	if (ec != std::errc())
@@ -75,7 +77,7 @@ std::string mvd2s(double double1) {
 	// Convert to a string. Hopefully using small string optimisation (SSO)
 	std::string s = std::string(chars.data(), ptr - chars.data());
 
-	return s;
+//	return s;
 
 	// Find the exponent if any
 	const std::size_t epos = s.find('e');
@@ -205,7 +207,9 @@ std::string mvd2s(double double1) {
 #define ALWAYS_VIA_SCIENTIFIC
 #ifdef ALWAYS_VIA_SCIENTIFIC
 	//use digits10 if using scientific because we automatically get one additional on the left
-	ss.precision(15);
+	//ss.precision(15);
+    ss.precision(std::numeric_limits<double>::digits10);
+    //ss.precision(16);
 	ss << std::scientific;
 #else
 	//use digits10 +1 if not using auto formatting (scientific for large/small numbers)
@@ -263,20 +267,23 @@ std::string mvd2s(double double1) {
 		return s;
 	}
 
-	//////////////////////////////////////////////////
-	//leave exponent in if exponent is <= -7 or >= +13
-	//////////////////////////////////////////////////
-	if (exponent < -6 or exponent > 12) {
+	////////////////////////////////////////////
+	//leave exponent in if abs(exponent) is > 15
+	////////////////////////////////////////////
+	//if (exponent < -6 or exponent > 12) {
+	//if (abs(exponent> > 15) {
+	if (std::abs(exponent) > std::numeric_limits<double>::digits10) {
 
 		//remove trailing zeros
 		while (s.back() == '0')
 			s.pop_back();
 		if (s.back() == '.')
-			s.push_back('0');
-			//s.pop_back();
+			//s.push_back('0');
+			s.pop_back();
 
-		//append the exponent again
+		//append the exponent text
 		s.append(exponent_text);
+
 		return s;
 	}
 
@@ -308,9 +315,7 @@ std::string mvd2s(double double1) {
 			//insert decimal point
 			s.insert(exponent + minus + 1, 1, '.');
 
-#ifndef USE_RYU_D2S
 			goto removetrailing;
-#endif
 		}
 
 		//negative exponent
@@ -325,7 +330,6 @@ std::string mvd2s(double double1) {
 		//insert decimal point
 		s.insert(1 + minus, 1, '.');
 
-#ifndef USE_RYU_D2S
 removetrailing:
 		//remove trailing zeros
 		while (s.back() == '0')
@@ -337,7 +341,6 @@ removetrailing:
 		//remove trailing decimal point
 		if (s.back() == '.')
 			s.pop_back();
-#endif
 	}
 
 	return s;
