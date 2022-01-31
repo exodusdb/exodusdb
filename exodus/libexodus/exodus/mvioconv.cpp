@@ -360,7 +360,7 @@ var var::oconv_MD(const char* conversion) const {
 	int movedecs = -1;
 	bool dontmovepoint = false;
 	bool septhousands = false;
-	//bool z_flag = false;
+	bool z_flag = false;
 	char trailer = '\0';
 	char prefixchar = '\0';
 
@@ -429,9 +429,9 @@ var var::oconv_MD(const char* conversion) const {
 
 			case 'Z':
 				//Z means return empty string in the case of zero
-				//z_flag = true;
-				if (!(this->toBool()))
-					return "";
+				z_flag = true;
+				//if (!(this->toBool()))
+				//	return "";
 				break;
 
 			case 'X':
@@ -466,6 +466,12 @@ convert:
 	// rounding
 	newmv = newmv.round(ndecimals);
 	//newmv.createString();
+
+	// Option to suppress zeros - if no digits 1-9
+	if (z_flag and newmv.var_str.find_first_of("123456789") == std::string::npos) {
+		newmv.var_str.clear();
+		return newmv;
+	}
 
 	//var part1 = newmv.field(".", 1);
 	//var part2 = newmv.field(".", 2);
