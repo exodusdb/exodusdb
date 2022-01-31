@@ -84,12 +84,6 @@ Binary    Hex          Comments
 //#include <iostream> //cin and cout
 //#include <memory>   //for unique_ptr
 
-#ifndef M_PI
-//#define M_PI 3.14159265358979323846f
-#define M_PI 3.14159265
-// 2643383279502884197169399375105820974944592307816406286208998f;
-#endif
-
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
@@ -354,182 +348,6 @@ VARREF var::unassigned(CVR defaultvalue) {
 		*this = defaultvalue;
 	}
 	return *this;
-}
-
-// pick int() is actually the same as floor. using integer() instead of int() because int is a
-// reserved word in c/c++ for int datatype
-var var::integer() const {
-	THISIS("var var::integer() const")
-	THISISINTEGER()
-	/*
-	//pick integer means floor()
-	//-1.0=-1
-	//-0.9=-1
-	//-0.5=-1
-	//-0.1=-1
-	// 0  =0
-	// 0.1=0
-	// 0.5=0
-	// 0.9=0
-	// 1.0=1
-
-
-	// floor
-	var_int = std::floor(var_dbl);
-	var_typ |= VARTYP_INT;
-*/
-	return var_int;
-}
-
-// integer and floor are the same
-var var::floor() const {
-	THISIS("var var::floor() const")
-	THISISINTEGER()
-	return var_int;
-}
-
-var var::round(const int ndecimals) const {
-	/*pick round rounds positive .5 up to 1 and negative .5 down to -1 etc
-	-1.0=-1
-	-0.9=-1
-	-0.5=-1
-	-0.1= 0
-	 0  = 0
-	 0.1= 0
-	 0.5= 1.0
-	 0.9= 1.0
-	 1.0= 1.0
-	*/
-
-	//var_str is always set on return
-
-	// if n=0 could save the integer conversion here but would require mentality to save BOTH
-	// int and double currently its possible since space is reserved for both but this may
-	// change
-
-	THISIS("var var::round() const")
-	THISISNUMERIC()
-
-	var result;
-
-	double fromdouble;
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		fromdouble = var_dbl;
-	}
-	//otherwise use var_int
-	else {
-		if (not ndecimals) {
-			//result=*this;
-			result.var_int = var_int;
-			result.var_typ = VARTYP_INT;
-			result.createString();
-			return result;
-		}
-		// loss of precision if var_int is long long
-		fromdouble = double(var_int);
-	}
-
-	//unfortunately c+ round(double) does not work well with decimal numbers
-	//because some decimal numbers ending .5 are represented in binary
-	//internally as .499999999999999965234
-	//which will round DOWN not up
-	//
-	//For example 6000.50/5 is 300.025 really but
-	//in binary it is 300.024999999999999
-	//
-	//Therefore we must do manual rounding up where
-	//adding 0.5 closely agrees with the next higher integer
-	//
-	//both pickdb and c++ rounding tie break goes away from zero.
-
-	int scale = std::pow(10.0, ndecimals);
-
-	double scaled_double = fromdouble * scale;
-
-	double ceil2 = std::ceil(scaled_double);
-
-	double diff = (scaled_double + 0.5) - ceil2;
-
-	//if very close to 0.5 mark then round up/down using ceil/floor
-	double rounded_double;
-	if (std::abs(diff) < SMALLEST_NUMBER) {
-		if (fromdouble >= 0)
-			rounded_double = ceil2 / scale;
-		else
-			rounded_double = std::floor(scaled_double) / scale;
-	}
-	//otherwise use standard rounding
-	else {
-		rounded_double = std::round(scaled_double) / scale;
-	}
-	std::stringstream ss;
-	ss.precision(ndecimals);
-	ss << std::fixed << rounded_double;
-
-	result.var_str = ss.str();
-	result.var_typ = VARTYP_STR;
-
-	return result;
-}
-
-bool var::toBool() const {
-	THISIS("bool var::toBool() const")
-	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
-	// syntax as follows: var xx=xx?11:22;
-	THISISDEFINED()
-
-	// identical code in void* and bool except returns void* and bool respectively
-	while (true) {
-		// ints are true except for zero
-		if (var_typ & VARTYP_INT)
-			return (bool)(var_int != 0);
-
-		// non-numeric strings are true unless zero length
-		if (var_typ & VARTYP_NAN)
-			return !var_str.empty();
-
-		// doubles are true unless zero
-		// check double first dbl on guess that tests will be most often on financial
-		// numbers
-		// TODO should we consider very small numbers to be the same as zero?
-		if (var_typ & VARTYP_DBL)
-			//return (bool)(var_dbl != 0);
-			//return std::abs(var_dbl)>=0.00000000001;
-			//pickos print (0.00001 or 0)    ... prints 0 (bool)
-			//pickos print (0.00005=0.00006) ... prints 0 (==)
-			//pickos print (0.00005<0.00006) ... prints 1 (<)
-			return std::abs(var_dbl) >= SMALLEST_NUMBER;
-
-		if (!(var_typ)) {
-			THISISASSIGNED()
-			throw MVUnassigned("toBool()");
-		}
-
-		// must be string - try to convert to numeric and do all tests again
-		this->isnum();
-	};
-}
-
-int var::toInt() const {
-	THISIS("int var::toInt() const")
-	THISISINTEGER()
-
-	return static_cast<int>(var_int);
-}
-
-long long var::toLong() const {
-	THISIS("int var::toLong() const")
-	THISISINTEGER()
-
-	return static_cast<long long>(var_int);
-}
-
-double var::toDouble() const {
-	THISIS("double var::toDouble() const")
-	THISISDECIMAL()
-
-	return var_dbl;
 }
 
 char var::toChar() const {
@@ -1739,142 +1557,6 @@ VARREF var::textconverter(CVR oldchars, CVR newchars) {
 	return *this;
 }
 
-// RULES need updating since we are now allowing E/e scientific notation
-//
-// numeric is one of four regular expressions or zero length string
-//^$			zero length string
-//[+-]?9+		eg 999
-//[+-]?9+.		eg 999.
-//[+-]?.9+		eg .999
-//[+-]?9+.9+	eg 999.999
-// where the last four examples may also have a + or - character prefix
-
-// be careful that the following are NOT numeric. regexp [+-]?[.]?
-// + - . +. -.
-
-// rules
-// 0. zero length string is numeric integer 0
-// 1. any + or - must be the first character
-// 2. point may occur 0 or 1 times
-// 3. digits (0-9) must occur 1 or more times (but see rule 0.)
-// 4. all characters mean non-numeric
-
-bool var::isnum(void) const {
-
-	THISIS("bool var::isnum(void) const")
-	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
-	// to save the probably double check here
-	THISISDEFINED()
-
-	// Known to be numeric already
-	if (var_typ & VARTYP_INTDBL)
-		return true;
-
-	// Known to be not numeric already
-	// maybe put this first if comparison operations on strings are more frequent than numeric
-	// operations on numbers
-	if (var_typ & VARTYP_NAN)
-		return false;
-
-	// Not assigned error
-	if (!var_typ)
-		throw MVUnassigned("isnum()");
-
-	// Empty string is zero. Leave the string as "".
-	int strlen = var_str.size();
-	if (strlen == 0) {
-		var_int = 0;
-		var_typ = VARTYP_INTSTR;
-		return true;
-	}
-
-	// Preparse the string to detect if integer or decimal or many types of non-numeric
-	// We need to detect NAN ASAP because string comparison always attempts to compare numerically.
-	// The parsing does not need to be perfect since we will rely
-	// on from_chars for the final parsing
-	bool floating = false;
-	bool has_sign = false;
-	for (int ii = 0; ii < strlen; ii++) {
-		char cc = var_str[ii];
-
-		// +   2B
-		// -   2D
-		// .   2E
-		// 0-9 30-39
-		// E   45
-		// e   65
-
-		// Ideally we put the most divisive test first
-		// but, assuming that non-numeric strings are tested more frequently
-		// then following is perhaps not the best choice.
-		if (cc >= '0' and cc <= '9')
-			continue;
-
-		switch (cc) {
-
-		case '.':
-			floating = true;
-			break;
-
-		case '-':
-		case '+':
-			// Disallow more than one sign eg "+-999"
-			// Disallow a single + since it will be trimmed off below
-			if (has_sign or strlen == 0) {
-				var_typ = VARTYP_NANSTR;
-				return false;
-			}
-			has_sign = true;
-			break;
-
-		case 'e':
-		case 'E':
-			floating = true;
-			// Allow a sign again after any e/E
-			has_sign = false;
-			break;
-
-		default:
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-	}
-
-	char* first = var_str.data();
-	char* last = first + strlen;
-
-	// Skip leading + to be compatible with javascript
-	// from_chars does not allow it.
-	first += *first == '+';
-
-	if (floating) {
-
-		// to double
-		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, last, var_dbl);
-		if (ec != std::errc() || p != last) {
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-
-		// indicate that the var is a string and a double
-		var_typ = VARTYP_DBLSTR;
-
-	} else {
-
-		// to long int
-		auto [p, ec] = std::from_chars(first, last, var_int);
-		if (ec != std::errc() || p != last) {
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-
-		// indicate that the var is a string and a long int
-		var_typ = VARTYP_INTSTR;
-	}
-
-	return true;
-}
-
 /////////
 // output
 /////////
@@ -2195,296 +1877,6 @@ var var::logoff() const {
 	throw MVLogoff();
 }
 
-var var::abs() const {
-	THISIS("var var::abs() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		if (var_dbl < 0)
-			return -var_dbl;
-		return (*this);
-	} else {
-		if (var_int < 0)
-			return -var_int;
-		return var_int;
-	}
-	// cannot get here
-	throw MVError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::mod(CVR divisor) const {
-	THISIS("var var::mod(CVR divisor) const")
-	THISISNUMERIC()
-	ISNUMERIC(divisor)
-
-	// NB NOT using c++ % operator which until c++11 had undefined behaviour if divisor was negative
-	// from c++11 % the sign of the result after a negative divisor is always the same as the
-	// dividend
-
-    //following is what c++ fmod does (a mathematical concept)
-    //assert(mod(-2.3,var(1.499)).round(3).outputl() eq -0.801);
-    //assert(mod(2.3,var(-1.499)).round(3).outputl() eq 0.801);
-    //BUT arev and qm ensure that the result is somewhere from 0 up to or down to
-    //(but not including) the divisor
-
-	// prefer double dividend
-	if (var_typ & VARTYP_DBL) {
-
-		// use divisor's double if available otherwise create it from divisor's int/long
-		if (!(divisor.var_typ & VARTYP_DBL)) {
-			divisor.var_dbl = double(divisor.var_int);
-			//divisor.var_typ = divisor.var_typ & VARTYP_DBL;
-		}
-
-mod_doubles:
-	    //method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
-		//if ((var_dbl < 0 && divisor.var_dbl >= 0) ||
-		//	(divisor.var_dbl < 0 && var_dbl >= 0)) {
-		//	return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
-		//}
-		//else {
-		//	return fmod(var_dbl, divisor.var_dbl);
-		//}
-
-		return var_dbl - std::floor(var_dbl / divisor.var_dbl) * divisor.var_dbl;
-	}
-
-	// prefer double divisor
-	if (divisor.var_typ & VARTYP_DBL) {
-		var_dbl = double(var_int);
-		//var_typ = var_typ & VARTYP_DBL;
-		goto mod_doubles;
-	}
-
-	//both ints/longs
-
-	//if ((var_int < 0 && divisor.var_int >= 0) ||
-	//	(divisor.var_int < 0 && var_int >= 0))
-	//	return (var_int % divisor.var_int) + divisor.var_int;
-	//else
-	//	return var_int % divisor.var_int;
-
-	double double1 = double(var_int);
-	return double1 - std::floor(double1 / divisor.var_int) * divisor.var_int;
-}
-
-var var::mod(const int divisor) const {
-	THISIS("var var::mod(const int divisor) const")
-	THISISNUMERIC()
-
-	// see ::mod(CVR divisor) for comments about c++11 % operator
-
-	// prefer double dividend
-	if (var_typ & VARTYP_DBL) {
-		//if ((var_dbl < 0 && divisor >= 0) || (divisor < 0 && var_dbl >= 0)) {
-		//	// multivalue version of mod
-		//	double divisor2 = double(divisor);
-		//	return fmod(var_dbl, divisor2) + divisor2;
-		//} else
-		//	return fmod(var_dbl, double(divisor));
-
-		//double divisor2 = double(divisor);
-		//double result = fmod(var_dbl, divisor2);
-		//if (result < 0 && divisor2 > 0)
-		//	result += divisor2;
-		//return result;
-
-		return var_dbl - std::floor(var_dbl / divisor) * divisor;
-	}
-
-	//if ((var_int < 0 && divisor >= 0) || (divisor < 0 && var_int >= 0))
-	//	// multivalue version of mod
-	//	return (var_int % divisor) + divisor;
-	//else
-	//	return var_int % divisor;
-
-	//mvint_t result = var_int % divisor;
-	//if (result < 0 && divisor > 0)
-	//	result += divisor;
-	//return result;
-
-	auto double1 = double(var_int);
-	return double1 - std::floor(double1 / divisor) * divisor;
-}
-
-/*
-	var sqrt() const;
-	var loge() const;
-*/
-
-var var::sin() const {
-	THISIS("var var::sin() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::sin(var_dbl * M_PI / 180);
-	else
-		return std::sin(double(var_int) * M_PI / 180);
-
-	// cannot get here
-	throw MVError("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::cos() const {
-	THISIS("var var::cos() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::cos(var_dbl * M_PI / 180);
-	else
-		return std::cos(double(var_int) * M_PI / 180);
-
-	// cannot get here
-	throw MVError("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::tan() const {
-	THISIS("var var::tan() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::tan(var_dbl * M_PI / 180);
-	else
-		return std::tan(double(var_int) * M_PI / 180);
-
-	// cannot get here
-	throw MVError("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::atan() const {
-	THISIS("var var::atan() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::atan(var_dbl) / M_PI * 180;
-	else
-		return std::atan(double(var_int)) / M_PI * 180;
-
-	// cannot get here
-	throw MVError("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::loge() const {
-	THISIS("var var::loge() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::log(var_dbl);
-	else
-		return std::log(double(var_int));
-
-	// cannot get here
-	throw MVError("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::sqrt() const {
-	THISIS("var var::sqrt() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::sqrt(var_dbl);
-
-	//	if (var_typ & VARTYP_INT)
-	return std::sqrt(double(var_int));
-
-	throw MVError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::pwr(CVR exponent) const {
-	THISIS("var var::pwr(CVR exponent) const")
-	THISISNUMERIC()
-	ISNUMERIC(exponent)
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::pow(var_dbl, exponent.toDouble());
-	else
-		return std::pow(double(var_int), exponent.toDouble());
-
-	// cannot get here
-	throw MVError("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-var var::exp() const {
-	THISIS("var var::exp() const")
-	THISISNUMERIC()
-
-	// prefer double
-	if (var_typ & VARTYP_DBL)
-		return std::exp(var_dbl);
-	else
-		return std::exp(double(var_int));
-
-	// cannot get here
-	throw MVError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
-}
-
-// WARNING/ pickos column and row numbering is 0 based but
-// in exodus we move to 1 based numbering to be consistent with
-// c/c++/linux/terminal standards. hopefully not too inconvenient
-
-var var::at(const int columnno) const {
-	// THISIS("var var::at(const int columnno) const")
-
-	// hard coded for xterm at the moment
-	// http://www.xfree86.org/current/ctlseqs.html
-
-	// move to columnno 0
-	if (columnno == 0)
-		// return "\x1b[G";
-		return "\r";  // works on more terminals
-
-	//return "";
-
-	// move to columnno
-	if (columnno > 0) {
-		std::string tempstr = "\x1B[";
-		tempstr += std::to_string(columnno);
-		tempstr.push_back('G');
-		return tempstr;
-	}
-	// clear the screen and home the cursor
-	if (columnno == -1)
-		return "\x1B[2J\x1B[H";
-	// return "\x0c";//works on more terminals
-
-	// move the cursor to top left home
-	if (columnno == -2)
-		return "\x1B[H";
-
-	// clear from cursor to end of screen
-	if (columnno == -3)
-		return "\x1B[J";
-
-	// clear from cursor to end of line
-	if (columnno == -4)
-		return "\x1B[0K";
-
-	// clear line and move cursor to columnno 0
-	if (columnno == -40)
-		return "\r\x1B[K";
-
-	return "";
-}
-
-var var::at(const int columnno, const int rowno) const {
-	// THISIS("var var::at(const int columnno,const int rowno) const")
-
-	std::string tempstr = "\x1B[";
-	tempstr += std::to_string(rowno);
-	tempstr.push_back(';');
-	tempstr += std::to_string(columnno);
-	tempstr.push_back('H');
-	return tempstr;
-}
-
 var var::getprompt() const {
 	THISIS("var var::getprompt() const")
 	THISISDEFINED()
@@ -2583,6 +1975,65 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 	}
 	//response.convert(FM^VM,"^]").outputl("RESPONSE=");
 	return response;
+}
+
+// WARNING/ pickos column and row numbering is 0 based but
+// in exodus we move to 1 based numbering to be consistent with
+// c/c++/linux/terminal standards. hopefully not too inconvenient
+
+var var::at(const int columnno, const int rowno) const {
+	// THISIS("var var::at(const int columnno,const int rowno) const")
+
+	std::string tempstr = "\x1B[";
+	tempstr += std::to_string(rowno);
+	tempstr.push_back(';');
+	tempstr += std::to_string(columnno);
+	tempstr.push_back('H');
+	return tempstr;
+}
+
+var var::at(const int columnno) const {
+	// THISIS("var var::at(const int columnno) const")
+
+	// hard coded for xterm at the moment
+	// http://www.xfree86.org/current/ctlseqs.html
+
+	// move to columnno 0
+	if (columnno == 0)
+		// return "\x1b[G";
+		return "\r";  // works on more terminals
+
+	//return "";
+
+	// move to columnno
+	if (columnno > 0) {
+		std::string tempstr = "\x1B[";
+		tempstr += std::to_string(columnno);
+		tempstr.push_back('G');
+		return tempstr;
+	}
+	// clear the screen and home the cursor
+	if (columnno == -1)
+		return "\x1B[2J\x1B[H";
+	// return "\x0c";//works on more terminals
+
+	// move the cursor to top left home
+	if (columnno == -2)
+		return "\x1B[H";
+
+	// clear from cursor to end of screen
+	if (columnno == -3)
+		return "\x1B[J";
+
+	// clear from cursor to end of line
+	if (columnno == -4)
+		return "\x1B[0K";
+
+	// clear line and move cursor to columnno 0
+	if (columnno == -40)
+		return "\r\x1B[K";
+
+	return "";
 }
 
 }  // namespace exodus

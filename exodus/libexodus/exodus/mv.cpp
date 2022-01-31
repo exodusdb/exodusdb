@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
-#include "exodus/mvd2s.cpp"
-
 namespace exodus {
 
 // most help from Thinking in C++ Volume 1 Chapter 12
@@ -216,39 +214,6 @@ var::var(CVR rhs)
 		  var_typ(VARTYP_STR) {}
 
 #endif // not INLINE_CONSTRUCTION
-
-// mainly called in ISSTRING when not already a string
-void var::createString() const {
-	// THISIS("void var::createString() const")
-	// TODO ensure ISDEFINED is called everywhere in advance
-	// to avoid wasting time doing multiple calls to ISDEFINED
-	// THISISDEFINED()
-
-	// dbl - create string from dbl
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		var_str = mvd2s(var_dbl);
-		var_typ |= VARTYP_STR;
-		return;
-	}
-
-	// int - create string from int
-	if (var_typ & VARTYP_INT) {
-		// loss of precision if var_int is long long
-		var_str = std::to_string(int(var_int));
-		var_typ |= VARTYP_STR;
-		return;
-	}
-	// already a string (unlikely since only called when not a string)
-	if (var_typ & VARTYP_STR) {
-		return;
-	}
-
-	// treat any other case as unassigned
-	//(usually var_typ & VARTYP_UNA)
-	throw MVUnassigned("createString()");
-}
-
 
 // EXPLICIT AND AUTOMATIC CONVERSIONS
 ////////////////////////////////////
@@ -577,8 +542,11 @@ VARREF var::operator^=(const double double1) & {
 	THISISSTRING()
 
 	// var_str+=var(int1).var_str;
-	var_str += mvd2s(double1);
-	var_typ = VARTYP_STR;  // reset to one unique type
+	//var_str += mvd2s(double1);
+	//var_typ = VARTYP_STR;  // reset to one unique type
+	var temp(double1);
+	temp.createString();
+	var_str += std::move(temp.var_str);
 
 	return *this;
 }

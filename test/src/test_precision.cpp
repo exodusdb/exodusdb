@@ -728,24 +728,6 @@ programexit()
 	}
 
 	{
-		assert(var(1)       .oconv("MD60PZ").squote().outputl() eq "'1.000000'");
-		printl("MD60Z means suppress zeros and zero means numbers smaller than 0.0001");
-		printl("TODO only suppress if all are 0");
-		assert(var(0.000001).oconv("MD60PZ").squote().outputl() eq "''");
-		assert(var(0.00001) .oconv("MD60PZ").squote().outputl() eq "''");
-		assert(var(0.0001)  .oconv("MD60PZ").squote().outputl() eq "'0.000100'");
-
-		assert(var(0.000001).oconv("MD60P").squote().outputl() eq "'0.000001'");
-		assert(var(0.00001) .oconv("MD60P").squote().outputl() eq "'0.000010'");
-		assert(var(0.0001)  .oconv("MD60P").squote().outputl() eq "'0.000100'");
-
-		assert(var(-0.000001).oconv("MD60P").squote().outputl() eq "'-0.000001'");
-		assert(var(-0.00001) .oconv("MD60P").squote().outputl() eq "'-0.000010'");
-		assert(var(-0.0001)  .oconv("MD60P").squote().outputl() eq "'-0.000100'");
-
-	}
-
-	{
 		assert(var("0") .round(10).outputl().squote() eq "'0.0000000000'");
 		assert(var("0") .round(10).outputl().squote() eq "'0.0000000000'");
 		assert(var("0.").round(10).outputl().squote() eq "'0.0000000000'");
