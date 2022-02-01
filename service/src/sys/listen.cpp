@@ -1352,7 +1352,8 @@ cannotopenlinkfile2:
 			}
 
 			//read whole file upto limit
-			call osbread(USER1, linkfile2, 0, maxstrlen);
+			var offset_zero = 0;
+			call osbread(USER1, linkfile2, offset_zero, maxstrlen);
 
 			//unescape
 			//for ii=0 to 255

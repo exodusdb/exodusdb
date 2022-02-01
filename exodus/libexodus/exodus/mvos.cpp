@@ -520,11 +520,13 @@ bool var::oswrite(CVR osfilename, CVR codepage) const {
 	return !failed;
 }
 
+#ifdef VAR_OSBREADWRITE_CONST_OFFSET
 // a version that accepts a const offset ie ignores return value
 //bool var::osbwrite(CVR osfilevar, CVR offset, const bool adjust) const
 bool var::osbwrite(CVR osfilevar, CVR offset) const {
 	return this->osbwrite(osfilevar, const_cast<VARREF>(offset));
 }
+#endif
 
 //NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
 //osbread and osbwrite rely on the locale being passed in on the osopen stage
@@ -586,6 +588,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 	return true;
 }
 
+#ifdef VAR_OSBREADWRITE_CONST_OFFSET
 // a version that ignores output of offset
 //VARREF var::osbread(CVR osfilevar, CVR offset, const int bytesize,
 //		  const bool adjust)
@@ -595,6 +598,7 @@ bool var::osbread(CVR osfilevar, CVR offset, const int bytesize) {
 	//	offset_nonconst=offset;
 	return this->osbread(osfilevar, const_cast<VARREF>(offset), bytesize);
 }
+#endif
 
 ssize_t count_excess_UTF8_bytes(std::string& str) {
 

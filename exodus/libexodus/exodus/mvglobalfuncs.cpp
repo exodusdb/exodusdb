@@ -98,6 +98,7 @@ PUBLIC bool osbread(VARREF data, CVR filehandle, VARREF offset, const int length
 	return data.osbread(filehandle, offset, length);
 }
 
+#ifdef VAR_OSBREADWRITE_CONST_OFFSET
 // 4 argument version for statement format BUT ALLOWING offset TO BE A CONSTANT ie output
 // ignored osbread(data from x at y length z) PUBLIC VARREF osbread(VARREF data, CVR
 // filehandle, const int offset, const int length)
@@ -106,6 +107,7 @@ PUBLIC bool osbread(VARREF data, CVR filehandle, VARREF offset, const int length
 PUBLIC bool osbread(VARREF data, CVR filehandle, CVR offset, const int length) {
 	return data.osbread(filehandle, const_cast<VARREF>(offset), length);
 }
+#endif
 
 //PUBLIC bool osbwrite(CVR data, CVR filehandle, VARREF offset,
 //			 const bool adjust = true)
@@ -113,11 +115,13 @@ PUBLIC bool osbwrite(CVR data, CVR filehandle, VARREF offset) {
 	return data.osbwrite(filehandle, offset);
 }
 
+#ifdef VAR_OSBREADWRITE_CONST_OFFSET
 //PUBLIC bool osbwrite(CVR data, CVR filehandle, CVR offset,
 //			 const bool adjust)
 PUBLIC bool osbwrite(CVR data, CVR filehandle, CVR offset) {
 	return data.osbwrite(filehandle, const_cast<VARREF>(offset));
 }
+#endif
 
 // two argument version returns success/failure to be used in if statement
 // target variable first to be like "osread x from y else" and "read x from y else"

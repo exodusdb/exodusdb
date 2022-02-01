@@ -1770,9 +1770,12 @@ class PUBLIC var final {
 	bool osopen() const;
 	bool osopen(CVR filename, CVR locale DEFAULT_STRING) const;
 	bool osbread(CVR osfilevar, VARREF offset, const int length);
-	bool osbread(CVR osfilevar, CVR offset, const int length);
 	bool osbwrite(CVR osfilevar, VARREF offset) const;
+//#define VAR_OSBREADWRITE_CONST_OFFSET
+#ifdef VAR_OSBREADWRITE_CONST_OFFSET
+	bool osbread(CVR osfilevar, CVR offset, const int length);
 	bool osbwrite(CVR osfilevar, CVR offset) const;
+#endif
 	void osclose() const;
 	bool osread(CVR osfilename, CVR codepage DEFAULT_STRING);
 	bool oswrite(CVR osfilename, CVR codepage DEFAULT_STRING) const;

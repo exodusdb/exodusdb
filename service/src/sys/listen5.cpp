@@ -60,6 +60,7 @@ var bakpars;
 var msg2;
 var fileattributes;
 var filetime;
+var offset_zero;
 
 function main(in request1, in request2in, in request3in, in request4in, in request5in, in request6in) {
 	//c sys in,in,in,in,in,in
@@ -301,7 +302,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 
 			//verify correct file heading and determine patchid from the file
-			call osbread(firstblock, patchfile, 0, 65000);
+			offset_zero = 0;
+			call osbread(firstblock, patchfile, offset_zero, 65000);
 			patchid = firstblock.a(2).substr(6, 9999);
 			if (firstblock.a(1) ne "00000DEFINITIONS" or patchid.substr(1, 8) ne "INSTALL*") {
 				goto nextpatch;

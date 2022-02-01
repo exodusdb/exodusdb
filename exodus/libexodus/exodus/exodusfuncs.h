@@ -83,10 +83,11 @@ PUBLIC void osclose(CVR osfilevar);
 //PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset,
 //			 const bool adjust = true);
 PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length);
-PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
 PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
+#ifdef VAR_OSBREADWRITE_CONST_OFFSET
+PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
 PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset);
-
+#endif
 PUBLIC bool oswrite(CVR data, CVR osfilename, CVR codepage DEFAULTNULL);
 PUBLIC bool osread(VARREF data, CVR osfilename, CVR codepage DEFAULTNULL);
 PUBLIC ND var osread(CVR osfilename);
