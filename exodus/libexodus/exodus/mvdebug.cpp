@@ -251,6 +251,9 @@ var backtrace() {
 		if (objaddress.length() > 9)
 			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
 
+		if (objfilename.index("libc.so") or objfilename.index("libexodus.so"))
+			continue;
+
 #ifdef TRACING
 		objfilename.errput("objfilename=");
 		objaddress.errputl(" objaddress=");
@@ -284,8 +287,10 @@ var backtrace() {
 		////////////////////////
 		//temp = temp.osshellread();
 		var temp;
-		temp.osshellread("objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-						 objaddress ^ " --disassemble -l " ^ objfilename);
+		var cmd = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
+						 objaddress ^ " --disassemble -l " ^ objfilename;
+		//cmd.errputl();
+		temp.osshellread(cmd);
 		////////////////////////
 
 		temp.converter("\r\n", _FM_ _FM_);
