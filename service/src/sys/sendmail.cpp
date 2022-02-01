@@ -402,7 +402,8 @@ forcedemail:
 			tt = "";
 			if (bodyfile.osopen(body.substr(2, 999))) {
 				//osbread tt from bodyfile at 0 length 100
-				call osbread(tt, bodyfile, 0, 100);
+				var offset = 0;
+				call osbread(tt, bodyfile, offset, 100);
 			}
 		} else {
 			tt = body.substr(1, 20);

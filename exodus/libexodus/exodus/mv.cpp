@@ -256,24 +256,9 @@ var::operator const char*() const
 }
 */
 
-#ifndef HASINTREFOP
-var::operator int() const {
-	THISIS("var::operator int() const")
-	//converts string or double to int using pickos int() which is floor()
-	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
-	THISISINTEGER()
-	return int(var_int);
-}
-
-var::operator double() const {
-	THISIS("var::operator double() const")
-	THISISDECIMAL()
-	return var_dbl;
-}
-
-#else
+#ifdef HASINTREFOP
 var::operator int&() const {
-	THISIS("var::operator mv_int_t&()")
+	THISIS("var::operator int&()")
 	//converts string or double to int using pickos int() which is floor()
 	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
 	THISISINTEGER()
@@ -282,7 +267,12 @@ var::operator int&() const {
 	// callers to set the int directly then clear any decimal and string cache flags which would
 	// be invalid after setting the int alone
 	//var_typ |= VARTYP_INT;
-	return (int&)var_int;
+	return static_cast<int&>(var_int);
+}
+var::operator long long&() const {
+	THISIS("var::operator long long&()")
+	THISISINTEGER()
+	return static_cast<long long&>(var_int);
 }
 var::operator double&() const {
 	THISIS("var::operator double&()")
@@ -291,8 +281,29 @@ var::operator double&() const {
 	// then clear any int and string cache flags which would be invalid after setting the dbl
 	// alone
 	//var_typ |= VARTYP_DBL;
-	return (double&)var_dbl;
+	return static_cast<double&>(var_dbl);
 }
+#else
+var::operator int() const {
+	THISIS("var::operator int() const")
+	//converts string or double to int using pickos int() which is floor()
+	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
+	THISISINTEGER()
+	return static_cast<int>(var_int);
+}
+
+var::operator long long() const {
+	THISIS("var::operator long long() const")
+	THISISINTEGER()
+	return static_cast<long long>(var_int);
+}
+
+var::operator double() const {
+	THISIS("var::operator double() const")
+	THISISDECIMAL()
+	return static_cast<double>(var_dbl);
+}
+
 #endif
 
 // remove because causes "ambiguous" with -short_wchar on linux

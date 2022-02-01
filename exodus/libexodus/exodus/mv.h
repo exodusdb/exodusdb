@@ -309,6 +309,7 @@ class PUBLIC var final {
 	///////////////////////
 
    private:
+
 	// 1. not using pimpl idiom in order to maximise performance
 	// 2. all mutable because asking for a string can create it from an integer and vice versa
 	mutable std::string var_str; //32 bytes on g++
@@ -787,9 +788,11 @@ class PUBLIC var final {
 //#define HASINTREFOP
 #ifdef HASINTREFOP
 	operator int&() const;
+	explicit operator long long&() const;
 	operator double&() const;
 #else
 	operator int() const;
+	explicit operator long long() const;
 	operator double() const;
 #endif
 
@@ -1777,6 +1780,7 @@ class PUBLIC var final {
 	bool osbwrite(CVR osfilevar, CVR offset) const;
 #endif
 	void osclose() const;
+
 	bool osread(CVR osfilename, CVR codepage DEFAULT_STRING);
 	bool oswrite(CVR osfilename, CVR codepage DEFAULT_STRING) const;
 	bool osdelete() const;
@@ -1784,6 +1788,7 @@ class PUBLIC var final {
 	bool osrename(CVR newosdir_or_filename) const;
 	bool oscopy(CVR to_osfilename) const;
 	bool osmove(CVR to_osfilename) const;
+
 	ND var oslist(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING, const int mode = 0) const;
 	ND var oslistf(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING) const;
 	ND var oslistd(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING) const;
@@ -1791,6 +1796,7 @@ class PUBLIC var final {
 	ND var osdir() const;
 	bool osmkdir() const;
 	bool osrmdir(bool evenifnotempty = false) const;
+
 	// TODO check for threadsafe
 	ND var ospid() const;
 	ND var oscwd() const;
