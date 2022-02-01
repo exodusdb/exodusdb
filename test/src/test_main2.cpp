@@ -405,16 +405,6 @@ function main()
 	var nonexistentfile=OSSLASH^"129834192784";
 	assert(!osopen(nonexistentfile,nonexistentfile));
 
-	//round
-
-	printl(round(var("6000.50")/20,2));
-	assert(round(var("6000.50")/20,2)==300.03);
-	assert(round(var("-6000.50")/20,2)==-300.03);
-	assert(round(var(6000.50)/20,2)==300.03);
-	assert(round(var(-6000.50)/20,2)==-300.03);
-	assert(round(var(6000.50f)/20,2)==300.03);
-	assert(round(var(-6000.50f)/20,2)==-300.03);
-
 	//math.h seems to have been included in one of the boost or other special headers
 	//in this main.cpp file and that causes confusion between math.h and exodus.h sin() and other functions.
 	//we resolved the issue here by being specific about the namespace

@@ -1,4 +1,6 @@
 #include <cassert>
+#include <iomanip> // for setprecision
+#include <cmath> // for nextafter
 
 // 1. TO_CHARS from Ubuntu 22.04
 #if __GNUC__ >= 11
@@ -133,6 +135,20 @@ function main() {
 		assert(!var( "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ).isnum());
 		assert(!var( "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ).isnum());
 		assert(!var( "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ).isnum());
+	}
+
+	{
+		printl("Exact decimal representation of 0.3 is not exactly 0.3");
+		std::cout << "0.3 approx. " << std::fixed << std::setprecision(100) << 0.3 << std::endl;
+		std::cout << "0.3 next    " << std::fixed << std::setprecision(100) << std::nextafter(0.3, 0.4) << std::endl;
+		std::cout << "jump        " << std::fixed << std::setprecision(100) << std::nextafter(0.3, 0.4) - 0.3 << std::endl;
+	}
+
+	{
+		printl("Exact decimal representation of 0.1 is not exactly 0.3");
+		std::cout << "0.1 approx. " << std::fixed << std::setprecision(100) << 0.1 << std::endl;
+		std::cout << "0.1 next    " << std::fixed << std::setprecision(100) << std::nextafter(0.1, 0.0) << std::endl;
+		std::cout << "jump       " << std::fixed << std::setprecision(100) << std::nextafter(0.1, 0.0) - 0.1 << std::endl;
 	}
 
 	printl("Test passed");

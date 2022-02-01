@@ -112,7 +112,7 @@ std::string mvd2s(double double1) {
 
 	// 1) USE_TO_CHARS
 
-	// Use the low level high performance double to chars converter
+	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars
 
 	std::array<char, 24> chars;
@@ -484,17 +484,15 @@ var var::round(const int ndecimals) const {
 	//
 	//both pickdb and c++ rounding tie break goes away from zero.
 
-	int scale = std::pow(10.0, ndecimals);
-
+	double scale = std::pow(10.0, ndecimals);
 	double scaled_double = fromdouble * scale;
-
 	double ceil2 = std::ceil(scaled_double);
-
 	double diff = (scaled_double + 0.5) - ceil2;
-
 	//if very close to 0.5 mark then round up/down using ceil/floor
 	double rounded_double;
-	if (std::abs(diff) < SMALLEST_NUMBER) {
+	//if (std::abs(diff) < SMALLEST_NUMBER) {
+	//if (std::abs(diff) < 0.000'000'000'000'1) {
+	if (std::abs(diff) < 0.000'000'000'1) {
 		if (fromdouble >= 0)
 			rounded_double = ceil2 / scale;
 		else
@@ -504,16 +502,44 @@ var var::round(const int ndecimals) const {
 	else {
 		rounded_double = std::round(scaled_double) / scale;
 	}
-	std::stringstream ss;
-	ss.precision(ndecimals);
-	ss << std::fixed << rounded_double;
 
+	//TRACE(ndecimals)
+	//TRACE(fromdouble)
+	//TRACE(scale)
+	//TRACE(scaled_double)
+	//TRACE(scaled_double + 0.5)
+	//TRACE(ceil)
+	//TRACE(diff)
+	//TRACE(rounded_double)
+
+#ifdef USE_TO_CHARS
+
+	// Use the new low level high performance double to chars converter
+	// https://en.cppreference.com/w/cpp/utility/to_chars
+
+	std::array<char, 24> chars;
+	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), rounded_double, std::chars_format::fixed, ndecimals >= 0 ? ndecimals : 0);
+
+	// Throw if non-numeric
+	if (ec != std::errc())
+		throw MVNonNumeric("var::round: Cannot convert double to 24 characters");
+
+	// Convert to a string. Hopefully using small string optimisation (SSO)
+	result.var_str = std::string(chars.data(), ptr - chars.data());
+
+#else
+	// We might use ryu here if installed but will not bother as to_chars(double) is built-in to g++v11 in Ubuntu 22.04
+	std::stringstream ss;
+	ss.precision(ndecimals >= 0 ? ndecimals : 0);
+	ss << std::fixed << rounded_double;
 	result.var_str = ss.str();
+
+#endif
+
 	result.var_typ = VARTYP_STR;
 
 	return result;
 }
-
 
 // pick int() is actually the same as floor. using integer() instead of int() because int is a
 // reserved word in c/c++ for int datatype

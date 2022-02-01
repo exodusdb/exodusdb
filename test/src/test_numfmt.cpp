@@ -1,13 +1,16 @@
 #undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-//ryu support ICONV and OCONV but we only use its OCONV
-//1. convert ASCII decimal to double ("ICONV")
-//2. convert double to ASCII decimal ("OCONV")
-#if __has_include(<ryu/ryu.h>)
-#define HAS_RYU
-#define USE_RYU_D2S//if using d2s not d2exp in mv.cpp
-//#include <ryu/ryu.h>
+// 1. TO_CHARS from Ubuntu 22.04
+#if __GNUC__ >= 11
+#define USE_TO_CHARS_G
+
+// 2. RYU
+#elif __has_include(<ryu/ryu.h>)
+#define USE_RYU
+
+// 3. STRINGSTREAM
+#else
 #endif
 
 #include <exodus/program.h>
@@ -63,7 +66,7 @@ function test(in str, in str2o = "") {
 	//var z=quote(str2);
 	//if (quote(str+0) != quote(str2))
 	//	debug();
-#ifdef USE_RYU_D2S
+#ifdef USE_RYU
 	assert(quote(str+0) == quote(str2));//RYU converts 99.9+0 (99.90000000000000006) to 99.9
 #else
 	assert((str+0) == str2);//numerical comparison to avoid 99.9+0 = 99.90000000000000006 without using RYU
