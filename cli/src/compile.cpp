@@ -1,12 +1,15 @@
-#include <list>
+//#include <list>
+//#include <thread>
+//#include <atomic>
+//std::atomic<int> atomic_count;
+
+// Create a threadpool of suitable size
 #include <thread>
-#include <atomic>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/post.hpp>
+boost::asio::thread_pool pool(std::thread::hardware_concurrency());
 
 static inline int ncompilationfailures; //allow threads to indicate failure
-
-//TODO find a better way to maximise concurrent compilations
-// instead of opening one thread per compilation
-std::atomic<int> atomic_count;
 
 #include <exodus/program.h>
 programinit()
@@ -36,8 +39,8 @@ programinit()
 	var windows;
 	var exodus_include_dir_info = "";
 	var nasterisks = 0;
-	var max_nthreads;
-	std::list<std::thread> threadlist;
+//	var max_nthreads;
+//	std::list<std::thread> threadlist;
 
 function main() {
 
@@ -80,9 +83,9 @@ function main() {
 	//	max_nthreads = ncpus * 1.5;
 	//else
 	//	max_nthreads = 2;
-	var max_nthreads = int(std::thread::hardware_concurrency());
-	if (verbose)
-		printl("max threads = ", max_nthreads);
+	//var max_nthreads = int(std::thread::hardware_concurrency());
+	//if (verbose)
+	//	printl("max threads = ", max_nthreads);
 
 	//extract filenames
 	var filenames = field(command, FM, 2, 999999999);
@@ -1201,37 +1204,64 @@ var inclusion=
 
 		//WARNING: all parameters must be copyable into the thread ie assigned or defaulted
 		manifest = "";
-		//std::thread thread1 = std::thread(compile,
-		threadlist.push_back(
-			std::thread(
-				compile,
-				verbose,
-				objfileextension,
-				binfileextension,
-				binfilename,
-				objfilename,
-				outputdir,
-				windows,
-				posix,
-				updateinusebinposix,
-				compiler,
-				srcfilename,
-				basicoptions,
-				compileoptions,
-				outputoption,
-				linkoptions,
-				//ncompilationfailures,
-				isprogram,
-				installcmd,
-				manifest));
-		//thread1.join();
-		limit_threads(max_nthreads);
+//		//std::thread thread1 = std::thread(compile,
+//		threadlist.push_back(
+//			std::thread(
+//				compile,
+//				verbose,
+//				objfileextension,
+//				binfileextension,
+//				binfilename,
+//				objfilename,
+//				outputdir,
+//				windows,
+//				posix,
+//				updateinusebinposix,
+//				compiler,
+//				srcfilename,
+//				basicoptions,
+//				compileoptions,
+//				outputoption,
+//				linkoptions,
+//				//ncompilationfailures,
+//				isprogram,
+//				installcmd,
+//				manifest));
+//		//thread1.join();
+//		limit_threads(max_nthreads);
+
+		boost::asio::post(
+			pool,
+			[=]() {
+				call compile(
+					verbose,
+					objfileextension,
+					binfileextension,
+					binfilename,
+					objfilename,
+					outputdir,
+					windows,
+					posix,
+					updateinusebinposix,
+					compiler,
+					srcfilename,
+					basicoptions,
+					compileoptions,
+					outputoption,
+					linkoptions,
+					//ncompilationfailures,
+					isprogram,
+					installcmd,
+					manifest
+				);
+			}
+		);
 
 	}  //fileno
 
 	//join any outstanding threads before terminating
-	limit_threads(0);
-
+//	limit_threads(0);
+	pool.join();
 
 	if (nasterisks)
 		printl();
@@ -1260,7 +1290,7 @@ function static compile(
 	in installcmd,
 	in manifest) {
 
-	atomic_count++;
+//	atomic_count++;
 
 	var result = compile2(
 	verbose,
@@ -1283,7 +1313,7 @@ function static compile(
 	installcmd,
 	manifest);
 
-	atomic_count--;
+//	atomic_count--;
 
 	return result;
 
@@ -1704,35 +1734,35 @@ function make_include_dir(in incdir) {
 	return true;
 }
 
-subroutine limit_threads(in maxn_threads) {
-
-	if (maxn_threads) {
-		while (atomic_count > maxn_threads) {
-			//errputl("atomic count", atomic_count);
-			ossleep(100);
-		}
-		return;
-	}
-
-	//errputl("subroutine limit_threads", maxn_threads);
-	//remove terminated threads (ones that have already been joined)
-	threadlist.remove_if([](const std::thread& th) { return !th.joinable(); });
-
-	//quit if the number of active threads is < maxn_threads
-	if (int(threadlist.size()) <= maxn_threads)
-		return;
-
-	//find an active thread to wait for completion
-	//or, if maxn_threads == 0 then wait on all active threads for completion
-	for (std::thread& th : threadlist) {
-		if (th.joinable()) {
-			//errputl("Joining a thread at random.");
-			th.join();
-			if (maxn_threads)
-				break;
-		}
-	}
-}
+//subroutine limit_threads(in maxn_threads) {
+//
+//	if (maxn_threads) {
+//		while (atomic_count > maxn_threads) {
+//			//errputl("atomic count", atomic_count);
+//			ossleep(100);
+//		}
+//		return;
+//	}
+//
+//	//errputl("subroutine limit_threads", maxn_threads);
+//	//remove terminated threads (ones that have already been joined)
+//	threadlist.remove_if([](const std::thread& th) { return !th.joinable(); });
+//
+//	//quit if the number of active threads is < maxn_threads
+//	if (int(threadlist.size()) <= maxn_threads)
+//		return;
+//
+//	//find an active thread to wait for completion
+//	//or, if maxn_threads == 0 then wait on all active threads for completion
+//	for (std::thread& th : threadlist) {
+//		if (th.joinable()) {
+//			//errputl("Joining a thread at random.");
+//			th.join();
+//			if (maxn_threads)
+//				break;
+//		}
+//	}
+//}
 
 function is_newer(in new_file_info, in old_file_info) {
 
