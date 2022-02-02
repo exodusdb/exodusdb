@@ -683,8 +683,7 @@ function main() {
 				//locale = alllocales.field(" ", localen);
 				if (locale2 ne "utf8") {
 					if (not setxlocale(locale2)) {
-						//continue;
-						return;
+						continue;
 					}
 					setxlocale(origlocale);
 				}
@@ -739,7 +738,7 @@ function main() {
 			var headertext = "";
 			converter(text, crlf, FM ^ FM);
 			dim text2;
-			//var nlines = split(text, text2);
+			var nlines = split(text, text2);
 
 	#if EXODUS_EXPORT_USING_DEF
 			var deftext = "";
