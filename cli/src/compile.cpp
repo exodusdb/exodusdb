@@ -7,9 +7,11 @@
 #include <thread>
 #include <boost/asio/thread_pool.hpp>
 #include <boost/asio/post.hpp>
-boost::asio::thread_pool pool(std::thread::hardware_concurrency());
+boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency());
 
-static inline int ncompilationfailures; //allow threads to indicate failure
+//allow threads to indicate failure
+#include <atomic>
+std::atomic<int> atomic_ncompilation_failures;
 
 #include <exodus/program.h>
 programinit()
@@ -103,25 +105,25 @@ function main() {
 	if (not exo_HOME)
 		exo_HOME = osgetenv("HOME");
 
-	var compiler;
+	var compiler = "";
 	var basicoptions = osgetenv("CPP_OPTIONS");
 	if (basicoptions and verbose)
 		printl("Using CPP_OPTIONS environment variable " ^ basicoptions.quote());
 	var linkoptions = false;
-	var manifest;
-	var binoptions;
-	var liboptions;
+	var manifest = "";
+	var binoptions = "";
+	var liboptions = "";
 
-	var bindir;
-	var libdir;
-	var incdir;
+	var bindir = "";
+	var libdir = "";
+	var incdir = "";
 	//var homedir=osgetenv("HOME");
 
-	var installcmd;
+	var installcmd = "";
 	var outputoption = "";
-	var objfileextension;
-	var binfileextension;
-	var libfileextension;
+	var objfileextension = "";
+	var binfileextension = "";
+	var libfileextension = "";
 	var libfileprefix = "";
 
 	//you can allow updating inuse binaries in posix but with some messages
@@ -483,10 +485,9 @@ function main() {
 	if (libdir[-1] != OSSLASH)
 		libdir ^= OSSLASH;
 
-	//var ncompilationfailures=0;
 	for (var fileno = 1; fileno <= nfiles; ++fileno) {
 
-		var text = "";
+		//var text = "";
 		var filebase;
 
 		//get the next file name
@@ -614,244 +615,298 @@ function main() {
 			}
 		}
 
-		//get file text
-		if (verbose)
-			printl("sourcefilename=", srcfilename);
-		else if (not silent)
-			printl(srcfilename);
-		else if (silent eq 1) {
-			nasterisks++;
-			print("*");
-			osflush();
-		}
-
-		var srcfileinfo = osfile(srcfilename);
-		if (!srcfileinfo) {
-			srcfilename.errputl("srcfile doesnt exist: ");
-			continue;
-		}
-
-		var alllocales = "utf8 en_US.iso88591 en_GB.iso88591";
-		var locales = "";
-		var nlocales = dcount(alllocales, " ");
-		var locale;
-		var origlocale = getxlocale();
-		for (var localen = 1; localen <= nlocales; localen++) {
-
-			//check all but utf8 and skip those not existing
-			//use dpkg-reconfigure locales to get more
-			locale = alllocales.field(" ", localen);
-			if (locale ne "utf8") {
-				if (not setxlocale(locale))
-					continue;
-				setxlocale(origlocale);
-			}
-
-			locales ^= " " ^ locale;
-
-			if (text.osread(srcfilename, locale))
-				break;
-		}
-		if (not text) {
-			srcfilename.errput("Cant read/convert srcfile:");
-			errputl(" Encoding issue? unusual characters? - tried " ^ locales);
-			errputl("Use 'dpkg-reconfigure locale' to get more");
-			continue;
-		}
-
-		//determine if program or subroutine/function
-		var isprogram =
-			index(text, "<exodus/program.h>") or index(text, "int main(") or index(text, "program()");
-		if (verbose)
-			printl("Type=", isprogram ? "Program" : "Subroutine");
-		var outputdir;
-		var compileoptions;
-		var binfilename = filebase;
-		var objfilename = filebase;
-		if (isprogram) {
-			binfilename ^= binfileextension;
-			objfilename ^= objfileextension;
-			outputdir = bindir;
-			compileoptions = binoptions;
-		} else {
-			//binfilename^=binfileextension;
-			binfilename ^= libfileextension;
-			objfilename ^= libfileextension;
-			if (libfileprefix) {
-				//binfilename=libfileprefix^binfilename;
-				//objfilename=libfileprefix^objfilename;
-				var nfields = binfilename.dcount(OSSLASH);
-				binfilename = fieldstore(binfilename, OSSLASH, nfields, 1, libfileprefix ^ field(binfilename, OSSLASH, nfields));
-				nfields = objfilename.dcount(OSSLASH);
-				objfilename = fieldstore(objfilename, OSSLASH, nfields, 1, libfileprefix ^ field(objfilename, OSSLASH, nfields));
-			}
-			outputdir = libdir;
-			compileoptions = liboptions;
-		}
-
-		//and, for subroutines and functions, create header file (even if compilation not successful)
-		var crlf = "\r\n";
-		var headertext = "";
-		converter(text, crlf, FM ^ FM);
-		dim text2;
-		var nlines = split(text, text2);
-
-#if EXODUS_EXPORT_USING_DEF
-		var deftext = "";
-		var defordinal = 0;
-#endif
-		//detect libraryinit
-		var useclassmemberfunctions = false;
-
-		for (int ln = 1; ln <= nlines; ++ln) {
-			var line = trimf(text2(ln));
-			var word1 = line.field(" ", 1);
-
-			//for external subroutines (dll/so libraries), build up .h
-			// and maybe .def file text
-			if (not isprogram and word1.substr(1, 11) eq "libraryinit")
-				useclassmemberfunctions = true;
-
-			if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine")) {
-
-				//extract out the function declaration in including arguments
-				//eg "function xyz(in arg1, out arg2)"
-				var funcdecl = line.field("{", 1);
-
-				var funcname = funcdecl.field(" ", 2).field("(", 1);
-
-#if EXODUS_EXPORT_USING_DEF
-				++defordinal;
-				deftext ^= crlf ^ " " ^ funcname ^ " @" ^ defordinal;
-#endif
-				if (loadtimelinking) {
-					headertext ^= crlf ^ funcdecl ^ ";";
-				} else {
-					var libname = filebase;
-					var returnsvarorvoid = (word1 == "function") ? "var" : "void";
-					var callorreturn = (word1 == "function") ? "return" : "call";
-					var funcreturnvoid = (word1 == "function") ? 0 : 1;
-					var funcargsdecl = funcdecl.field("(", 2, 999999);
-					//funcargsdecl=funcargsdecl.field(")",1);
-					int level = 0;
-					int charn;
-					for (charn = 1; charn <= len(funcargsdecl); ++charn) {
-						var ch = funcargsdecl.substr(charn, 1);
-						if (ch eq ")") {
-							if (level eq 0)
-								break;
-							--level;
-						} else if (ch eq "(")
-							++level;
-					}
-					funcargsdecl.substrer(1, charn - 1);
-
-					//replace comment outs like /*arg1*/ with arg1
-					funcargsdecl.replacer(
-									"/"
-									"\\*",
-									"")
-						.replacer(
-							"\\*"
-							"/",
-							"");
-
-					//work out the function arguments without declaratives
-					//to be inserted in the calling brackets.
-					var funcargs = "";
-					//default to one template argument for functors with zero arguments
-
-					var nodefaults = index(funcargsdecl, "=") eq 0;
-					var funcargsdecl2 = funcargsdecl;
-
-					var funcargstype = "int";
-					if (useclassmemberfunctions)
-						funcargstype = "";
-
-					int nargs = dcount(funcargsdecl, ",");
-
-					/* no longer generate default arguments using a dumb process since some pedantic compilers eg g++ 4.2.1 on osx 10.6 refuse to default non-constant parameters (io/out)
-for now, programmers can still manually define defaults eg "func1(in arg1=var(), in arg2=var())"
-
-new possibility can default ALL arguments regardless of i/o status:
-eg:
-	var lib1(in aaa,out bbb)
-could generate the following overloads in the lib's .h header
-	var lib1(in aaa){var bbb;return lib1(aaa,bbb);}
-	var lib1(){var aaa;var bbb;return lib1(aaa,bbb);}
-
+		// Post to the thread pool a lambda expression that does the rest of the work
+		//
+		// WARNING!!! ALL CAPTURED VARIABLES MUST BE INITIALISED IN ADVANCE!
+		// OTHERWISE WILL GET MVUNASSIGNED ERROR AT RUNTIME
+		//
+		// "this" means capture member variables by reference?
+		// "=" means capture local variables by value. MAKE SURE ALL ARE ASSIGNED!
+		//
+		boost::asio::post(
+			threadpool1,
+			[
+				=, this
+/*				basicoptions,
+				bindir,
+				binfileextension,
+				binoptions,
+				compiler,
+				filebase,
+				incdir,
+				installcmd,
+				libdir,
+				libfileextension,
+				libfileprefix,
+				liboptions,
+				linkoptions,
+				loadtimelinking,
+				manifest,
+				objfileextension,
+				outputoption,
+				srcfilename,
+				updateinusebinposix
 */
-					nodefaults = 0;
-					for (int argn = 1; argn <= nargs; ++argn) {
-						var funcarg = field(funcargsdecl, ',', argn).trim();
+			]() mutable -> void {
 
-						//remove any default arguments (after =)
-						//TODO verify this is ok with <exodus/mvlink.h> method below
+			//get file text
+			if (verbose)
+				printl("sourcefilename=", srcfilename);
+			else if (not silent)
+				printl(srcfilename);
+			else if (silent eq 1) {
+				nasterisks++;
+				print("*");
+				osflush();
+			}
 
-						funcarg = field(funcarg, "=", 1).trim();
+			var srcfileinfo = osfile(srcfilename);
+			if (!srcfileinfo) {
+				srcfilename.errputl("srcfile doesnt exist: ");
+				//continue;
+				return;
+			}
 
-						//default all if all are var (in io out)
-						if (nodefaults) {
-							if (var("in io out").locateusing(" ", funcarg.field(" ", 1)))
-								fieldstorer(funcargsdecl2, ",", argn, 1, funcarg ^ "=var()");
-							else
-								//reset to original if anything except in io out
-								funcargsdecl2 = funcargsdecl;
-						}
+			// Try reading the source text is various locales
+			var text;
+			var alllocales = "utf8" _FM_ "en_US.iso88591" _FM_ "en_GB.iso88591";
+			var locales = "";
+			//var nlocales = dcount(alllocales, " ");
+			var locale;
+			var origlocale = getxlocale();
+			//for (var localen = 1; localen <= nlocales; localen++) {
+			//for (var locale : alllocales) {
+			for (var locale2 : alllocales) {
 
-						//assume the last word (by spaces) is the variable name
-						fieldstorer(funcargs, ',', argn, 1, funcarg.field2(" ", -1));
-
-						//assume everything except the last word (by spaces) is the variable type
-						//wrap it in brackets otherwise when filling in missing parameters
-						//the syntax could be wrong/fail to compile eg "const var&()" v. "(const var&)()"
-						var argtype = field(funcarg, " ", 1, dcount(funcarg, " ") - 1);
-						fieldstorer(funcargstype, ',', argn, 1, argtype);
+				//check all but utf8 and skip those not existing
+				//use dpkg-reconfigure locales to get more
+				//locale = alllocales.field(" ", localen);
+				if (locale2 ne "utf8") {
+					if (not setxlocale(locale2)) {
+						//continue;
+						return;
 					}
+					setxlocale(origlocale);
+				}
 
-					//develop additional function calls to allow constants to be provided for io/out arguments
-					// ie allow out variables to be ignored if not required
-					//funcargdecl2 example:	in arg1=var(), out arg2=var(), out arg3=var()
-					//funcargstype example:	IN,OUT,OUT
-					//funcargs example: 	ARG1,ARG2,ARG3
-					var add_funcargsdecl = funcargsdecl2;
-					var add_funcargs = funcargs;
-					var add_vars = "";
-					var add_funcs = "";
-					var add_func = "";
-					var can_default = true;
+				locales ^= " " ^ locale2;
 
-					//build nargs additional functions to cater for optional arguments in DOS
+				if (text.osread(srcfilename, locale2)) {
+					locale = locale2;
+					break;
+				}
+			}
+			if (not text) {
+				srcfilename.errput("Cant read/convert srcfile:");
+				errputl(" Encoding issue? unusual characters? - tried " ^ locales);
+				errputl("Use 'dpkg-reconfigure locale' to get more");
+				//continue;
+				return;
+			}
 
-					for (int maxargn = 1; maxargn <= nargs; ++maxargn) {
+			//determine if program or subroutine/function
+			var isprogram =
+				index(text, "<exodus/program.h>") or index(text, "int main(") or index(text, "program()");
+			if (verbose)
+				printl("Type=", isprogram ? "Program" : "Subroutine");
+			var outputdir;
+			var compileoptions;
+			var binfilename = filebase;
+			var objfilename = filebase;
+			if (isprogram) {
+				binfilename ^= binfileextension;
+				objfilename ^= objfileextension;
+				outputdir = bindir;
+				compileoptions = binoptions;
+			} else {
+				//binfilename^=binfileextension;
+				binfilename ^= libfileextension;
+				objfilename ^= libfileextension;
+				if (libfileprefix) {
+					//binfilename=libfileprefix^binfilename;
+					//objfilename=libfileprefix^objfilename;
+					var nfields = binfilename.dcount(OSSLASH);
+					binfilename = fieldstore(binfilename, OSSLASH, nfields, 1, libfileprefix ^ field(binfilename, OSSLASH, nfields));
+					nfields = objfilename.dcount(OSSLASH);
+					objfilename = fieldstore(objfilename, OSSLASH, nfields, 1, libfileprefix ^ field(objfilename, OSSLASH, nfields));
+				}
+				outputdir = libdir;
+				compileoptions = liboptions;
+			}
 
-						var inbound_args = "";
-						var outbound_args = "";
-						var func_body = "";
-						var skip_func = false;
+			//and, for subroutines and functions, create header file (even if compilation not successful)
+			var crlf = "\r\n";
+			var headertext = "";
+			converter(text, crlf, FM ^ FM);
+			dim text2;
+			var nlines = split(text, text2);
 
-						//build a function with fewer arguments than the full set
+	#if EXODUS_EXPORT_USING_DEF
+			var deftext = "";
+			var defordinal = 0;
+	#endif
+			//detect libraryinit
+			var useclassmemberfunctions = false;
+
+			for (int ln = 1; ln <= nlines; ++ln) {
+				var line = trimf(text2(ln));
+				var word1 = line.field(" ", 1);
+
+				//for external subroutines (dll/so libraries), build up .h
+				// and maybe .def file text
+				if (not isprogram and word1.substr(1, 11) eq "libraryinit")
+					useclassmemberfunctions = true;
+
+				if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine")) {
+
+					//extract out the function declaration in including arguments
+					//eg "function xyz(in arg1, out arg2)"
+					var funcdecl = line.field("{", 1);
+
+					var funcname = funcdecl.field(" ", 2).field("(", 1);
+
+	#if EXODUS_EXPORT_USING_DEF
+					++defordinal;
+					deftext ^= crlf ^ " " ^ funcname ^ " @" ^ defordinal;
+	#endif
+					if (loadtimelinking) {
+						headertext ^= crlf ^ funcdecl ^ ";";
+					} else {
+						var libname = filebase;
+						var returnsvarorvoid = (word1 == "function") ? "var" : "void";
+						var callorreturn = (word1 == "function") ? "return" : "call";
+						var funcreturnvoid = (word1 == "function") ? 0 : 1;
+						var funcargsdecl = funcdecl.field("(", 2, 999999);
+						//funcargsdecl=funcargsdecl.field(")",1);
+						int level = 0;
+						int charn;
+						for (charn = 1; charn <= len(funcargsdecl); ++charn) {
+							var ch = funcargsdecl.substr(charn, 1);
+							if (ch eq ")") {
+								if (level eq 0)
+									break;
+								--level;
+							} else if (ch eq "(")
+								++level;
+						}
+						funcargsdecl.substrer(1, charn - 1);
+
+						//replace comment outs like /*arg1*/ with arg1
+						funcargsdecl.replacer(
+										"/"
+										"\\*",
+										"")
+							.replacer(
+								"\\*"
+								"/",
+								"");
+
+						//work out the function arguments without declaratives
+						//to be inserted in the calling brackets.
+						var funcargs = "";
+						//default to one template argument for functors with zero arguments
+
+						var nodefaults = index(funcargsdecl, "=") eq 0;
+						var funcargsdecl2 = funcargsdecl;
+
+						var funcargstype = "int";
+						if (useclassmemberfunctions)
+							funcargstype = "";
+
+						int nargs = dcount(funcargsdecl, ",");
+
+						/* no longer generate default arguments using a dumb process since some pedantic compilers eg g++ 4.2.1 on osx 10.6 refuse to default non-constant parameters (io/out)
+	for now, programmers can still manually define defaults eg "func1(in arg1=var(), in arg2=var())"
+
+	new possibility can default ALL arguments regardless of i/o status:
+	eg:
+		var lib1(in aaa,out bbb)
+	could generate the following overloads in the lib's .h header
+		var lib1(in aaa){var bbb;return lib1(aaa,bbb);}
+		var lib1(){var aaa;var bbb;return lib1(aaa,bbb);}
+
+	*/
+						nodefaults = 0;
 						for (int argn = 1; argn <= nargs; ++argn) {
+							var funcarg = field(funcargsdecl, ',', argn).trim();
 
-							//work out the variable name and default
-							var argname = funcargs.field(",", argn);
-							var argname2 = argname;
+							//remove any default arguments (after =)
+							//TODO verify this is ok with <exodus/mvlink.h> method below
 
-							//work out the argtype
-							var argtype = funcargstype.field(",", argn);
+							funcarg = field(funcarg, "=", 1).trim();
 
-							//io/out cannot at the moment have defaults
-							var argdefault = funcargsdecl2.field(",", argn).field("=", 2);
-
-							//do not generate functions for numbers of arguments that are equivalent to defaulted arguments in main function
-							if (argdefault ne "" and argn eq maxargn) {
-								skip_func = true;
-								break;
+							//default all if all are var (in io out)
+							if (nodefaults) {
+								if (var("in io out").locateusing(" ", funcarg.field(" ", 1)))
+									fieldstorer(funcargsdecl2, ",", argn, 1, funcarg ^ "=var()");
+								else
+									//reset to original if anything except in io out
+									funcargsdecl2 = funcargsdecl;
 							}
 
-							if (argn < maxargn) {
-								inbound_args ^= ", " ^ argtype ^ " " ^ argname;
-								if (argdefault ne "") {
+							//assume the last word (by spaces) is the variable name
+							fieldstorer(funcargs, ',', argn, 1, funcarg.field2(" ", -1));
+
+							//assume everything except the last word (by spaces) is the variable type
+							//wrap it in brackets otherwise when filling in missing parameters
+							//the syntax could be wrong/fail to compile eg "const var&()" v. "(const var&)()"
+							var argtype = field(funcarg, " ", 1, dcount(funcarg, " ") - 1);
+							fieldstorer(funcargstype, ',', argn, 1, argtype);
+						}
+
+						//develop additional function calls to allow constants to be provided for io/out arguments
+						// ie allow out variables to be ignored if not required
+						//funcargdecl2 example:	in arg1=var(), out arg2=var(), out arg3=var()
+						//funcargstype example:	IN,OUT,OUT
+						//funcargs example: 	ARG1,ARG2,ARG3
+						var add_funcargsdecl = funcargsdecl2;
+						var add_funcargs = funcargs;
+						var add_vars = "";
+						var add_funcs = "";
+						var add_func = "";
+						var can_default = true;
+
+						//build nargs additional functions to cater for optional arguments in DOS
+
+						for (int maxargn = 1; maxargn <= nargs; ++maxargn) {
+
+							var inbound_args = "";
+							var outbound_args = "";
+							var func_body = "";
+							var skip_func = false;
+
+							//build a function with fewer arguments than the full set
+							for (int argn = 1; argn <= nargs; ++argn) {
+
+								//work out the variable name and default
+								var argname = funcargs.field(",", argn);
+								var argname2 = argname;
+
+								//work out the argtype
+								var argtype = funcargstype.field(",", argn);
+
+								//io/out cannot at the moment have defaults
+								var argdefault = funcargsdecl2.field(",", argn).field("=", 2);
+
+								//do not generate functions for numbers of arguments that are equivalent to defaulted arguments in main function
+								if (argdefault ne "" and argn eq maxargn) {
+									skip_func = true;
+									break;
+								}
+
+								if (argn < maxargn) {
+									inbound_args ^= ", " ^ argtype ^ " " ^ argname;
+									if (argdefault ne "") {
+										//build a new non-constant dummy variable name to be used as unassigned argument to the real function
+										argname2 = argname ^ "_" ^ argtype;
+										//declare it
+										func_body ^= " var " ^ argname2;
+										//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
+										if (argdefault ne "" and argdefault ne "var()")
+											func_body ^= " = " ^ argdefault;
+										func_body ^= ";\r\n";
+									}
+								} else {
 									//build a new non-constant dummy variable name to be used as unassigned argument to the real function
 									argname2 = argname ^ "_" ^ argtype;
 									//declare it
@@ -861,412 +916,379 @@ could generate the following overloads in the lib's .h header
 										func_body ^= " = " ^ argdefault;
 									func_body ^= ";\r\n";
 								}
-							} else {
-								//build a new non-constant dummy variable name to be used as unassigned argument to the real function
-								argname2 = argname ^ "_" ^ argtype;
-								//declare it
-								func_body ^= " var " ^ argname2;
-								//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
-								if (argdefault ne "" and argdefault ne "var()")
-									func_body ^= " = " ^ argdefault;
-								func_body ^= ";\r\n";
+								outbound_args ^= ", " ^ argname2;
 							}
-							outbound_args ^= ", " ^ argname2;
+
+							//functions are not generated in some cases
+							if (skip_func)
+								//continue;
+								return;
+
+							//remove initial commas
+							inbound_args.substrer(3);
+							outbound_args.substrer(3);
+
+							//build a function with all the new arguments and dummy variables
+							add_func ^= "\r\n";
+							add_func ^= "\r\n// Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn == 2 ? "" : "s");
+							add_func ^= "\r\nvar operator() (" ^ inbound_args ^ ") {";
+							add_func ^= "\r\n" ^ func_body;
+							add_func ^= " return operator()(" ^ outbound_args ^ ");";
+							add_func ^= "\r\n}";
 						}
 
-						//functions are not generated in some cases
-						if (skip_func)
-							continue;
+						/*
+						//check arguments backwards, from right to left
+						for (int argn=nargs; argn > 0; --argn) {
 
-						//remove initial commas
-						inbound_args.substrer(3);
-						outbound_args.substrer(3);
+							//work out the variable name and default
+							var vname = funcargs.field(",", argn);
 
-						//build a function with all the new arguments and dummy variables
-						add_func ^= "\r\n";
-						add_func ^= "\r\n// Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn == 2 ? "" : "s");
-						add_func ^= "\r\nvar operator() (" ^ inbound_args ^ ") {";
-						add_func ^= "\r\n" ^ func_body;
-						add_func ^= " return operator()(" ^ outbound_args ^ ");";
-						add_func ^= "\r\n}";
-					}
+							//io out cannot at the moment have defaults TODO
+							var vdefault = funcargsdecl2.field(",",argn).field("=", 2);
 
-					/*
-					//check arguments backwards, from right to left
-					for (int argn=nargs; argn > 0; --argn) {
+							var vtype=funcargstype.field(",",argn);
 
-						//work out the variable name and default
-						var vname = funcargs.field(",", argn);
+							//if (vtype ne "io" and vtype ne "out") {
+							//	//prevent next left argument from defaulting
+							//	can_default=vdefault ne "";
+							//
+							//only process io/out arguments
+							//} else
+							{
 
-						//io out cannot at the moment have defaults TODO
-						var vdefault = funcargsdecl2.field(",",argn).field("=", 2);
+								//can default const var&
+								if (!vdefault)
+									vdefault = "var()";
 
-						var vtype=funcargstype.field(",",argn);
+								//change the type of the incoming argument to allow constants
+								var new_inargdecl = " in "^vname;
+								if (can_default and vdefault)
+									new_inargdecl ^= "=" ^ vdefault;
+								add_funcargsdecl.fieldstorer(",", argn, 1, new_inargdecl);
 
-						//if (vtype ne "io" and vtype ne "out") {
-						//	//prevent next left argument from defaulting
-						//	can_default=vdefault ne "";
-						//
-						//only process io/out arguments
-						//} else
-						{
+								//build a new non-constant dummy variable name to be used as io/out argument of the real function
+								if (vtype eq "out" or vtype eq "io") {
+									var vname2 = vname ^ "_" ^ vtype;
+									//1. assign ie copy the incoming constant to it
+									add_vars ^= " var " ^ vname2 ^ ";\r\n";
+									add_vars ^= " if ("^vname ^ ".assigned()) " ^ vname2 ^ "=" ^ vname ^ ";\r\n";
+									//2. use it as an argument to the standard function
+									add_funcargs.fieldstorer(",", argn, 1, vname2);
+								}
+								//build a new function that calls the standard function
 
-							//can default const var&
-							if (!vdefault)
-								vdefault = "var()";
+								//if the argument is an io/out type, and is not the first argument, then output (append) any function built to date
+								//but do not build a new function with the modified argument (it will be built when arg=1 or an earlier arg is type io/out)
+								if (argn>1 and (vtype eq "out" or vtype eq "io")) {
+									add_funcs ^= add_func;
+									add_func="";//in case two io/out args next to each other? TODO check if two io/out next to each other works ok
 
-							//change the type of the incoming argument to allow constants
-							var new_inargdecl = " in "^vname;
-							if (can_default and vdefault)
-								new_inargdecl ^= "=" ^ vdefault;
-							add_funcargsdecl.fieldstorer(",", argn, 1, new_inargdecl);
-
-							//build a new non-constant dummy variable name to be used as io/out argument of the real function
-							if (vtype eq "out" or vtype eq "io") {
-								var vname2 = vname ^ "_" ^ vtype;
-								//1. assign ie copy the incoming constant to it
-								add_vars ^= " var " ^ vname2 ^ ";\r\n";
-								add_vars ^= " if ("^vname ^ ".assigned()) " ^ vname2 ^ "=" ^ vname ^ ";\r\n";
-								//2. use it as an argument to the standard function
-								add_funcargs.fieldstorer(",", argn, 1, vname2);
-							}
-							//build a new function that calls the standard function
-
-							//if the argument is an io/out type, and is not the first argument, then output (append) any function built to date
-							//but do not build a new function with the modified argument (it will be built when arg=1 or an earlier arg is type io/out)
-							if (argn>1 and (vtype eq "out" or vtype eq "io")) {
-								add_funcs ^= add_func;
-								add_func="";//in case two io/out args next to each other? TODO check if two io/out next to each other works ok
-
-							//if the argument is an "in" type, or is argument 1, then build a function with all the modified arguments so far
-							//REPLACING and previously built function, but do not actually output it, since multiple earlier "in" args may be defaulted.
-							} else {
-								//build a function with all the new arguments and dummy variables
-								add_func = "\r\n\r\nvar operator() (" ^ add_funcargsdecl ^ ") {";
-								add_func ^= "\r\n" ^ add_vars;
-								add_func ^= " return operator()(" ^ add_funcargs ^ ");";
-								add_func ^= "\r\n}";
+								//if the argument is an "in" type, or is argument 1, then build a function with all the modified arguments so far
+								//REPLACING and previously built function, but do not actually output it, since multiple earlier "in" args may be defaulted.
+								} else {
+									//build a function with all the new arguments and dummy variables
+									add_func = "\r\n\r\nvar operator() (" ^ add_funcargsdecl ^ ") {";
+									add_func ^= "\r\n" ^ add_vars;
+									add_func ^= " return operator()(" ^ add_funcargs ^ ");";
+									add_func ^= "\r\n}";
+								}
 							}
 						}
-					}
-					*/
-					add_funcs ^= add_func;
-					if (add_funcs)
-						add_funcs ^= "\r\n";
+						*/
+						add_funcs ^= add_func;
+						if (add_funcs)
+							add_funcs ^= "\r\n";
 
-					/*
-//new method using member functions to call external functions with mv environment
-var inclusion=
-"\r\n"
-"\r\n//a member variable/object to cache a pointer/object for the shared library function"
-"\r\nExodusFunctorBase Functor_funcx;"
-"\r\n"
-"\r\n//a member function with the right arguments, returning a var or void"
-"\r\nVARORVOID funcx(in arg1=var(), out arg2=var(), out arg3=var())"
-"\r\n{"
-"\r\n"
-"\r\n //first time link to the shared lib and create/cache an object from it"
-"\r\n //passing current standard variables in mv"
-"\r\n if (Functor_funcx.pmemberfunction_==NULL)"
-"\r\n  Functor_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
-"\r\n"
-"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
-"\r\n //that can call the shared library object member function"
-"\r\n //with the right arguments and returning a var or void"
-"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
-"\r\n"
-"\r\n //call the shared library object main function with the right args,"
-"\r\n // returning a var or void"
-"\r\n callorreturn CALLMEMBERFUNCTION(*(Functor_funcx.pobject_),"
-"\r\n ((pExodusProgramBaseMemberFunction) (Functor_funcx.pmemberfunction_)))"
-"\r\n  (ARG1,ARG2,ARG3);"
-"\r\n"
-"\r\n}";
-*/
+						/*
+	//new method using member functions to call external functions with mv environment
+	var inclusion=
+	"\r\n"
+	"\r\n//a member variable/object to cache a pointer/object for the shared library function"
+	"\r\nExodusFunctorBase Functor_funcx;"
+	"\r\n"
+	"\r\n//a member function with the right arguments, returning a var or void"
+	"\r\nVARORVOID funcx(in arg1=var(), out arg2=var(), out arg3=var())"
+	"\r\n{"
+	"\r\n"
+	"\r\n //first time link to the shared lib and create/cache an object from it"
+	"\r\n //passing current standard variables in mv"
+	"\r\n if (Functor_funcx.pmemberfunction_==NULL)"
+	"\r\n  Functor_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
+	"\r\n"
+	"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
+	"\r\n //that can call the shared library object member function"
+	"\r\n //with the right arguments and returning a var or void"
+	"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
+	"\r\n"
+	"\r\n //call the shared library object main function with the right args,"
+	"\r\n // returning a var or void"
+	"\r\n callorreturn CALLMEMBERFUNCTION(*(Functor_funcx.pobject_),"
+	"\r\n ((pExodusProgramBaseMemberFunction) (Functor_funcx.pmemberfunction_)))"
+	"\r\n  (ARG1,ARG2,ARG3);"
+	"\r\n"
+	"\r\n}";
+	*/
 
-					//new method using member functions to call external functions with mv environment
-					//using a functor class that allows library name changing
-					//public inheritance only so we can directly access mv in mvprogram.cpp for oconv/iconv. should perhaps be private inheritance and mv set using .init(mv)
-					var inclusion =
-						"\r\n"
-						"\r\n// A 'functor' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
-						"\r\n"
-						"\r\nclass Functor_funcx : private ExodusFunctorBase"
-						"\r\n{"
-						"\r\npublic:"
-						"\r\n"
-						"\r\n// A constructor providing:"
-						"\r\n// 1. the name of the shared library to open,"
-						"\r\n// 2. the name of the function within the shared library that will create an exodus program object,"
-						"\r\n// 3. and the current program's mv environment to share with it."
-						"\r\nFunctor_funcx(MvEnvironment& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
-						"\r\n"
-						"\r\n// Allow assignment of library name to override the default constructed"
-						"\r\nFunctor_funcx& operator=(const var& newlibraryname) {"
-						"\r\n        closelib();"
-						"\r\n        libraryname_=newlibraryname.toString();"
-						"\r\n        return (*this);"
-						"\r\n}"
-						"\r\n"
-						"\r\n// A callable member function with the right arguments, returning a var or void"
-						"\r\nvar operator() (in arg1=var(), out arg2=var(), out arg3=var())"
-						"\r\n{"
-						"\r\n"
-						"\r\n // The first call will link to the shared lib and create/cache an object from it."
-						"\r\n // passing current standard variables in mv"
-						"\r\n if (this->pmemberfunction_==NULL)"
-						"\r\n  this->init();"
-						"\r\n"
-						"\r\n // Define a function type (pExodusProgramBaseMemberFunction)"
-						"\r\n // that can call the shared library object member function"
-						"\r\n // with the right arguments and returning a var or void"
-						//"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
-						"\r\n using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> VARORVOID;"
-						"\r\n"
-						"\r\n // Call the shared library object main function with the right args,"
-						"\r\n //  returning a var or void"
-						"\r\n {before_call}"
-						"\r\n return CALLMEMBERFUNCTION(*(this->pobject_),"
-						"\r\n ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
-						"\r\n  (ARG1,ARG2,ARG3);"
-						"\r\n {after_call}"
-						"\r\n"
-						"\r\n}"
-						"{additional_funcs}"
-						"\r\n};"
-						"\r\n"
-						"\r\n// A functor object of the above type that allows function call syntax to access"
-						"\r\n// an Exodus program/function initialized with the current mv environment."
-						"\r\nFunctor_funcx funcx{mv};";
-					swapper(inclusion, "funcx", field2(libname, OSSLASH, -1));
-					//swapper(example,"exodusprogrambasecreatedelete_",funcname);
-					swapper(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
-					swapper(inclusion, "IN,OUT,OUT", funcargstype);
-					swapper(inclusion, "ARG1,ARG2,ARG3", funcargs);
-					swapper(inclusion, "VARORVOID", returnsvarorvoid);
-					swapper(inclusion, "callorreturn", callorreturn);
-					swapper(inclusion, "{additional_funcs}", add_funcs);
+						//new method using member functions to call external functions with mv environment
+						//using a functor class that allows library name changing
+						//public inheritance only so we can directly access mv in mvprogram.cpp for oconv/iconv. should perhaps be private inheritance and mv set using .init(mv)
+						var inclusion =
+							"\r\n"
+							"\r\n// A 'functor' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
+							"\r\n"
+							"\r\nclass Functor_funcx : private ExodusFunctorBase"
+							"\r\n{"
+							"\r\npublic:"
+							"\r\n"
+							"\r\n// A constructor providing:"
+							"\r\n// 1. the name of the shared library to open,"
+							"\r\n// 2. the name of the function within the shared library that will create an exodus program object,"
+							"\r\n// 3. and the current program's mv environment to share with it."
+							"\r\nFunctor_funcx(MvEnvironment& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+							"\r\n"
+							"\r\n// Allow assignment of library name to override the default constructed"
+							"\r\nFunctor_funcx& operator=(const var& newlibraryname) {"
+							"\r\n        closelib();"
+							"\r\n        libraryname_=newlibraryname.toString();"
+							"\r\n        return (*this);"
+							"\r\n}"
+							"\r\n"
+							"\r\n// A callable member function with the right arguments, returning a var or void"
+							"\r\nvar operator() (in arg1=var(), out arg2=var(), out arg3=var())"
+							"\r\n{"
+							"\r\n"
+							"\r\n // The first call will link to the shared lib and create/cache an object from it."
+							"\r\n // passing current standard variables in mv"
+							"\r\n if (this->pmemberfunction_==NULL)"
+							"\r\n  this->init();"
+							"\r\n"
+							"\r\n // Define a function type (pExodusProgramBaseMemberFunction)"
+							"\r\n // that can call the shared library object member function"
+							"\r\n // with the right arguments and returning a var or void"
+							//"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
+							"\r\n using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> VARORVOID;"
+							"\r\n"
+							"\r\n // Call the shared library object main function with the right args,"
+							"\r\n //  returning a var or void"
+							"\r\n {before_call}"
+							"\r\n return CALLMEMBERFUNCTION(*(this->pobject_),"
+							"\r\n ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
+							"\r\n  (ARG1,ARG2,ARG3);"
+							"\r\n {after_call}"
+							"\r\n"
+							"\r\n}"
+							"{additional_funcs}"
+							"\r\n};"
+							"\r\n"
+							"\r\n// A functor object of the above type that allows function call syntax to access"
+							"\r\n// an Exodus program/function initialized with the current mv environment."
+							"\r\nFunctor_funcx funcx{mv};";
+						swapper(inclusion, "funcx", field2(libname, OSSLASH, -1));
+						//swapper(example,"exodusprogrambasecreatedelete_",funcname);
+						swapper(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
+						swapper(inclusion, "IN,OUT,OUT", funcargstype);
+						swapper(inclusion, "ARG1,ARG2,ARG3", funcargs);
+						swapper(inclusion, "VARORVOID", returnsvarorvoid);
+						swapper(inclusion, "callorreturn", callorreturn);
+						swapper(inclusion, "{additional_funcs}", add_funcs);
 
-					if (text.index("-Wcast-function-type")) {
-						swapper(inclusion, "{before_call}",
-								"#pragma GCC diagnostic push"
-								"\r\n #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
-						swapper(inclusion, "{after_call}",
-								"#pragma GCC diagnostic pop");
-					} else {
-						swapper(inclusion, "\r\n {before_call}", "");
-						swapper(inclusion, "\r\n {after_call}", "");
-					}
-					var usepredefinedfunctor = nargs <= EXODUS_FUNCTOR_MAXNARGS;
-					if (useclassmemberfunctions) {
-						if (funcname eq "main")
-							headertext ^= inclusion;
-					}
+						if (text.index("-Wcast-function-type")) {
+							swapper(inclusion, "{before_call}",
+									"#pragma GCC diagnostic push"
+									"\r\n #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
+							swapper(inclusion, "{after_call}",
+									"#pragma GCC diagnostic pop");
+						} else {
+							swapper(inclusion, "\r\n {before_call}", "");
+							swapper(inclusion, "\r\n {after_call}", "");
+						}
+						var usepredefinedfunctor = nargs <= EXODUS_FUNCTOR_MAXNARGS;
+						if (useclassmemberfunctions) {
+							if (funcname eq "main")
+								headertext ^= inclusion;
+						}
 
-					else if (usepredefinedfunctor) {
-						//example output for a subroutine with 1 argument of "in" (const var&)
-						//ending of s1 and S1 indicates subroutine of one argument
-						//#include "xmvfunctors1.h"
-						//ExodusFunctorS1<in> func2("func2","func2");
+						else if (usepredefinedfunctor) {
+							//example output for a subroutine with 1 argument of "in" (const var&)
+							//ending of s1 and S1 indicates subroutine of one argument
+							//#include "xmvfunctors1.h"
+							//ExodusFunctorS1<in> func2("func2","func2");
 
-						var functype = funcreturnvoid ? "s" : "f";
+							var functype = funcreturnvoid ? "s" : "f";
 
-						var funcdecl = "ExodusFunctor" ^ functype.ucase() ^ nargs ^ "<" ^ funcargstype ^ "> ";
-						funcdecl ^= funcname ^ "(" ^ libname.quote() ^ "," ^ funcname.quote() ^ ");";
+							var funcdecl = "ExodusFunctor" ^ functype.ucase() ^ nargs ^ "<" ^ funcargstype ^ "> ";
+							funcdecl ^= funcname ^ "(" ^ libname.quote() ^ "," ^ funcname.quote() ^ ");";
 
-						//dont include more than once in the header file
-						//function might appear more than once if declared and defined separately
-						if (not index(headertext, funcdecl)) {
+							//dont include more than once in the header file
+							//function might appear more than once if declared and defined separately
+							if (not index(headertext, funcdecl)) {
+								headertext ^= crlf;
+								headertext ^= crlf;
+								var includefunctor = "#include <exodus/xfunctor" ^ functype ^ nargs ^ ".h>" ^ crlf;
+								if (not index(headertext, includefunctor))
+									headertext ^= includefunctor;
+								headertext ^= funcdecl;
+							}
+
+						} else {
 							headertext ^= crlf;
-							headertext ^= crlf;
-							var includefunctor = "#include <exodus/xfunctor" ^ functype ^ nargs ^ ".h>" ^ crlf;
-							if (not index(headertext, includefunctor))
-								headertext ^= includefunctor;
-							headertext ^= funcdecl;
+							headertext ^= "#define EXODUSLIBNAME " ^ libname.quote() ^ crlf;
+							headertext ^= "#define EXODUSFUNCNAME " ^ funcname.quote() ^ crlf;
+							headertext ^= "#define EXODUSFUNCNAME0 " ^ funcname ^ crlf;
+							headertext ^= "#define EXODUSFUNCRETURN " ^ returnsvarorvoid ^ crlf;
+							headertext ^= "#define EXODUSFUNCRETURNVOID " ^ funcreturnvoid ^ crlf;
+							headertext ^= "#define EXODUSfuncargsdecl " ^ funcargsdecl ^ crlf;
+							headertext ^= "#define EXODUSfuncargs " ^ funcargs ^ crlf;
+							headertext ^= "#define EXODUSFUNCTORCLASSNAME ExodusFunctor_" ^ funcname ^ crlf;
+							headertext ^= "#define EXODUSFUNCTYPE ExodusDynamic_" ^ funcname ^ crlf;
+							//headertext^="#define EXODUSCLASSNAME Exodus_Functor_Class_"^funcname^crlf;
+							headertext ^= "#include <exodus/mvlink.h>" ^ crlf;
+							//undefs are automatic at the end of mvlink.h to allow multiple inclusion
 						}
-
-					} else {
-						headertext ^= crlf;
-						headertext ^= "#define EXODUSLIBNAME " ^ libname.quote() ^ crlf;
-						headertext ^= "#define EXODUSFUNCNAME " ^ funcname.quote() ^ crlf;
-						headertext ^= "#define EXODUSFUNCNAME0 " ^ funcname ^ crlf;
-						headertext ^= "#define EXODUSFUNCRETURN " ^ returnsvarorvoid ^ crlf;
-						headertext ^= "#define EXODUSFUNCRETURNVOID " ^ funcreturnvoid ^ crlf;
-						headertext ^= "#define EXODUSfuncargsdecl " ^ funcargsdecl ^ crlf;
-						headertext ^= "#define EXODUSfuncargs " ^ funcargs ^ crlf;
-						headertext ^= "#define EXODUSFUNCTORCLASSNAME ExodusFunctor_" ^ funcname ^ crlf;
-						headertext ^= "#define EXODUSFUNCTYPE ExodusDynamic_" ^ funcname ^ crlf;
-						//headertext^="#define EXODUSCLASSNAME Exodus_Functor_Class_"^funcname^crlf;
-						headertext ^= "#include <exodus/mvlink.h>" ^ crlf;
-						//undefs are automatic at the end of mvlink.h to allow multiple inclusion
-					}
-				}
-			}
-
-			//build up list of loadtime libraries required by linker
-			if (loadtimelinking and word1 eq "#include") {
-				var word2 = line.field(" ", 2);
-				if (word2[1] == DQ) {
-					word2 = word2.substr(2, word2.len() - 2);
-					if (word2.substr(-2, 2) eq ".h")
-						word2.splicer(-2, 2, "");
-					//libnames^=" "^word2;
-					if (compiler == "cl")
-						linkoptions ^= " " ^ word2 ^ ".lib";
-				}
-			}
-		}
-		//generate headers even for executables that do not really need them
-		//so that we can find the path to the source code for executables
-		//so that we can edic and compile by simple file name without paths
-		//if (headertext) {
-		{
-			var abs_srcfilename = srcfilename;
-			if (abs_srcfilename[1] != OSSLASH)
-				abs_srcfilename.splicer(1, 0, oscwd() ^ OSSLASH);
-			var filebaseend = filebase.field2(OSSLASH, -1);
-			headertext.splicer(1, 0, "#define EXODUSDLFUNC_" ^ ucase(filebaseend) ^ "_H");
-			headertext.splicer(1, 0, OSSLASH ^ OSSLASH ^ "#ifndef EXODUSDLFUNC_" ^ ucase(filebaseend) ^ "_H" ^ crlf);
-			headertext.splicer(1, 0, OSSLASH ^ OSSLASH ^ "generated by exodus \"compile " ^ abs_srcfilename ^ DQ ^ crlf);
-			//headertext.splicer(1,0,OSSLASH^OSSLASH^"generated by exodus \"compile "^field2(filebase,OSSLASH,-1)^DQ^crlf);
-			headertext ^= crlf ^ "//#endif" ^ crlf;
-			//var headerfilename=filebase^".h";
-			var headerfilename = incdir ^ OSSLASH ^ filebaseend ^ ".h";
-
-			//create include directory if doesnt already exist
-			call make_include_dir(incdir);
-
-			if (verbose)
-				print("header file " ^ headerfilename ^ " ");
-
-			//check if changed
-			var headertext2;
-			osread(headertext2, headerfilename, locale);
-			if (headertext2 ne headertext) {
-
-				//over/write if changed
-				oswrite(headertext, headerfilename, locale);
-
-				//verify written ok
-				osread(headertext2, headerfilename, locale);
-				if (headertext2 ne headertext)
-					errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale " ^ locale);
-				else if (verbose)
-					printl("generated or updated.");
-
-			} else if (verbose)
-				printl("already generated and is up to date.");
-		}
-
-		//skip compilation if generateheadersonly option
-		if (generateheadersonly)
-			continue;
-
-		//skip compilation if
-		var outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
-		//TRACE(outputdir ^ OSSLASH ^ field2(binfilename, OSSLASH, -1))
-		//TRACE(srcfileinfo)
-		//TRACE(exodus_include_dir_info)
-		//TRACE(outfileinfo)
-		if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo,srcfileinfo) && is_newer(outfileinfo,exodus_include_dir_info)) {
-
-			// Recompile is required if any include file is younger than the current output binary
-			bool recompile_required = false;
-			// TODO recode to find #index directly instead of by line since includes are generally only in the first part of a program
-			for (var line : text) {
-
-				// Skip lines unlike "#include <printplans7.h>"
-				if (! line.index("#include"))
-					continue;
-
-				// Acquire include file date/time
-				var incfilename=incdir ^ OSSLASH ^ line.field("<",2).field(">",1);
-				var incfileinfo = osfile(incfilename);
-				//TRACE(incfilename);
-				//TRACE(incfileinfo);
-
-				if (incfileinfo) {
-					if (is_newer(incfileinfo, outfileinfo)) {
-						recompile_required = true;
-						break;
 					}
 				}
 
+				//build up list of loadtime libraries required by linker
+				if (loadtimelinking and word1 eq "#include") {
+					var word2 = line.field(" ", 2);
+					if (word2[1] == DQ) {
+						word2 = word2.substr(2, word2.len() - 2);
+						if (word2.substr(-2, 2) eq ".h")
+							word2.splicer(-2, 2, "");
+						//libnames^=" "^word2;
+						if (compiler == "cl")
+							linkoptions ^= " " ^ word2 ^ ".lib";
+					}
+				}
 			}
+			//generate headers even for executables that do not really need them
+			//so that we can find the path to the source code for executables
+			//so that we can edic and compile by simple file name without paths
+			//if (headertext) {
+			{
+				var abs_srcfilename = srcfilename;
+				if (abs_srcfilename[1] != OSSLASH)
+					abs_srcfilename.splicer(1, 0, oscwd() ^ OSSLASH);
+				var filebaseend = filebase.field2(OSSLASH, -1);
+				headertext.splicer(1, 0, "#define EXODUSDLFUNC_" ^ ucase(filebaseend) ^ "_H");
+				headertext.splicer(1, 0, OSSLASH ^ OSSLASH ^ "#ifndef EXODUSDLFUNC_" ^ ucase(filebaseend) ^ "_H" ^ crlf);
+				headertext.splicer(1, 0, OSSLASH ^ OSSLASH ^ "generated by exodus \"compile " ^ abs_srcfilename ^ DQ ^ crlf);
+				//headertext.splicer(1,0,OSSLASH^OSSLASH^"generated by exodus \"compile "^field2(filebase,OSSLASH,-1)^DQ^crlf);
+				headertext ^= crlf ^ "//#endif" ^ crlf;
+				//var headerfilename=filebase^".h";
+				var headerfilename = incdir ^ OSSLASH ^ filebaseend ^ ".h";
 
-			//only skip if all headers are older than the current output file
-			if (! recompile_required) {
+				//create include directory if doesnt already exist
+				call make_include_dir(incdir);
+
 				if (verbose)
-					printl("Skipping compilation since the output file is newer than both the source code, its include files and libexodus, and no (F)orce option provided.");
-				continue;
-			}
-		}
+					print("header file " ^ headerfilename ^ " ");
 
-		//WARNING: all parameters must be copyable into the thread ie assigned or defaulted
-		manifest = "";
-//		//std::thread thread1 = std::thread(compile,
-//		threadlist.push_back(
-//			std::thread(
-//				compile,
-//				verbose,
-//				objfileextension,
-//				binfileextension,
-//				binfilename,
-//				objfilename,
-//				outputdir,
-//				windows,
-//				posix,
-//				updateinusebinposix,
-//				compiler,
-//				srcfilename,
-//				basicoptions,
-//				compileoptions,
-//				outputoption,
-//				linkoptions,
-//				//ncompilationfailures,
-//				isprogram,
-//				installcmd,
-//				manifest));
-//		//thread1.join();
-//		limit_threads(max_nthreads);
+				//check if changed
+				var headertext2;
+				osread(headertext2, headerfilename, locale);
+				if (headertext2 ne headertext) {
 
-		boost::asio::post(
-			pool,
-			[=]() {
-				call compile(
-					verbose,
-					objfileextension,
-					binfileextension,
-					binfilename,
-					objfilename,
-					outputdir,
-					windows,
-					posix,
-					updateinusebinposix,
-					compiler,
-					srcfilename,
-					basicoptions,
-					compileoptions,
-					outputoption,
-					linkoptions,
-					//ncompilationfailures,
-					isprogram,
-					installcmd,
-					manifest
-				);
+					//over/write if changed
+					oswrite(headertext, headerfilename, locale);
+
+					//verify written ok
+					osread(headertext2, headerfilename, locale);
+					if (headertext2 ne headertext)
+						errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale " ^ locale);
+					else if (verbose)
+						printl("generated or updated.");
+
+				} else if (verbose)
+					printl("already generated and is up to date.");
 			}
-		);
+
+			//skip compilation if generateheadersonly option
+			if (generateheadersonly)
+				//continue;
+				return;
+
+			//skip compilation if
+			var outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
+			//TRACE(outputdir ^ OSSLASH ^ field2(binfilename, OSSLASH, -1))
+			//TRACE(srcfileinfo)
+			//TRACE(exodus_include_dir_info)
+			//TRACE(outfileinfo)
+			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo,srcfileinfo) && is_newer(outfileinfo,exodus_include_dir_info)) {
+
+				// Recompile is required if any include file is younger than the current output binary
+				bool recompile_required = false;
+				// TODO recode to find #index directly instead of by line since includes are generally only in the first part of a program
+				for (var line : text) {
+
+					// Skip lines unlike "#include <printplans7.h>"
+					if (! line.index("#include"))
+						continue;
+
+					// Acquire include file date/time
+					var incfilename=incdir ^ OSSLASH ^ line.field("<",2).field(">",1);
+					var incfileinfo = osfile(incfilename);
+					//TRACE(incfilename);
+					//TRACE(incfileinfo);
+
+					if (incfileinfo) {
+						if (is_newer(incfileinfo, outfileinfo)) {
+							recompile_required = true;
+							break;
+						}
+					}
+
+				}
+
+				//only skip if all headers are older than the current output file
+				if (! recompile_required) {
+					if (verbose)
+						printl("Skipping compilation since the output file is newer than both the source code, its include files and libexodus, and no (F)orce option provided.");
+					//continue;
+					return;
+				}
+			}
+
+			manifest = "";
+
+			// Compile separated out as a separate function in order to be passed to a thread
+			// Now the caller is itself a lambda expression that is passed to a thread
+			// and the call does not really need to be separated out.
+			call compile(
+				verbose,
+				objfileextension,
+				binfileextension,
+				binfilename,
+				objfilename,
+				outputdir,
+				windows,
+				posix,
+				updateinusebinposix,
+				compiler,
+				srcfilename,
+				basicoptions,
+				compileoptions,
+				outputoption,
+				linkoptions,
+				isprogram,
+				installcmd,
+				manifest
+			);
+		} // end of lambda
+
+		); // end of boost::asio::post function
 
 	}  //fileno
 
 	//join any outstanding threads before terminating
 //	limit_threads(0);
-	pool.join();
+	threadpool1.join();
 
 	if (nasterisks)
 		printl();
 
-	return ncompilationfailures > 0;
+	return atomic_ncompilation_failures > 0;
 }  //main
 
 function static compile(
@@ -1285,7 +1307,6 @@ function static compile(
 	in compileoptions,
 	in outputoption,
 	in linkoptions,
-	//in ncompilationfailures0,
 	in isprogram,
 	in installcmd,
 	in manifest) {
@@ -1308,7 +1329,6 @@ function static compile(
 	compileoptions,
 	outputoption,
 	linkoptions,
-	//ncompilationfailures0,
 	isprogram,
 	installcmd,
 	manifest);
@@ -1335,7 +1355,6 @@ function static compile2(
 	in compileoptions,
 	in outputoption,
 	in linkoptions,
-	//in ncompilationfailures0,
 	in isprogram,
 	in installcmd,
 	in manifest) {
@@ -1357,7 +1376,6 @@ function static compile2(
 	}
 #endif
 
-	//var ncompilationfailures = ncompilationfailures0;
 	var objfilename = objfilename0;
 
 	if (verbose) {
@@ -1408,7 +1426,7 @@ function static compile2(
 	var compileroutput;
 	var compileok = osshellread(compileroutput, compilecmd);
 	if (not compileok) {
-		ncompilationfailures++;
+		atomic_ncompilation_failures++;
 	}
 
 	//handle compiler output
@@ -1439,7 +1457,7 @@ function static compile2(
 	var newobjfileinfo = osfile(objfilename);
 	if (not newobjfileinfo) {
 		if (compileok)
-			ncompilationfailures++;
+			atomic_ncompilation_failures++;
 		errputl(oscwd());
 		objfilename.errputl("Error: Cannot output file ");
 		//var("Press Enter").input();
@@ -1499,7 +1517,7 @@ function static compile2(
 						osclose(outputpathandfile);
 
 					} else if (windows or (posix and not updateinusebinposix)) {
-						ncompilationfailures++;
+						atomic_ncompilation_failures++;
 						outputpathandfile.errput("Error: Cannot update ");
 						errput(" In use or insufficient rights (2)");
 						if (windows)
