@@ -651,7 +651,7 @@ function main() {
 
 			//get file text
 			if (verbose)
-				printl("sourcefilename=", srcfilename);
+				printl("thread: sourcefilename=", srcfilename);
 			else if (not silent)
 				printl(srcfilename);
 			else if (silent eq 1) {
@@ -739,7 +739,7 @@ function main() {
 			var headertext = "";
 			converter(text, crlf, FM ^ FM);
 			dim text2;
-			var nlines = split(text, text2);
+			//var nlines = split(text, text2);
 
 	#if EXODUS_EXPORT_USING_DEF
 			var deftext = "";
@@ -748,8 +748,9 @@ function main() {
 			//detect libraryinit
 			var useclassmemberfunctions = false;
 
-			for (int ln = 1; ln <= nlines; ++ln) {
-				var line = trimf(text2(ln));
+//			for (int ln = 1; ln <= nlines; ++ln) {
+//				var line = trimf(text2(ln));
+			for (const var& line : text2) {
 				var word1 = line.field(" ", 1);
 
 				//for external subroutines (dll/so libraries), build up .h
@@ -921,8 +922,7 @@ function main() {
 
 							//functions are not generated in some cases
 							if (skip_func)
-								//continue;
-								return;
+								continue;
 
 							//remove initial commas
 							inbound_args.substrer(3);
