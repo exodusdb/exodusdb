@@ -227,9 +227,11 @@ function main() {
 		//basicoptions^=" -O1";
 		//basicoptions^=" -O3";
 		//-Og means optimise but has compatible with gdb
-		if (not optimise)
-			optimise = "g";
-		basicoptions ^= " -O" ^ optimise;
+		if (optimise) {
+			if (optimise eq 1)
+				optimise = "g";
+			basicoptions ^= " -O" ^ optimise;
+		}
 		//}
 
 		//how to output to a named file
@@ -485,6 +487,8 @@ function main() {
 	if (libdir[-1] != OSSLASH)
 		libdir ^= OSSLASH;
 
+	var srcfilenames = "";
+
 	for (var fileno = 1; fileno <= nfiles; ++fileno) {
 
 		//var text = "";
@@ -615,6 +619,29 @@ function main() {
 			}
 		}
 
+		srcfilenames ^= srcfilename ^ FM;
+
+	}
+	srcfilenames.popper();
+
+	// Sort by file size so that the largest files start compiling first
+	// and therefore hold up the completion of all compilations the least.
+	// This is assuming parallel compilationss.
+	// Note that the compilation rate (compiled files per second) is slow
+	// to start with but speeds up towards the end on the smaller files.
+	var filesizes = "";
+	for (var srcfilename : srcfilenames)
+		filesizes ^= osfile(srcfilename).a(1) ^ VM;
+	filesizes.popper();
+	//sort array wants parallel mv fields
+	srcfilenames.converter(FM, VM);
+	srcfilenames ^= FM ^ filesizes;
+	//sort by field 2 which is file sizes and drag field 1 into the same order
+	call sortarray(srcfilenames, "2" _VM_ "1", "DR");
+	srcfilenames = srcfilenames.a(1).convert(VM, FM);
+
+	for (var srcfilename : srcfilenames) {
+
 		// Post to the thread pool a lambda expression that does the rest of the work
 		//
 		// WARNING!!! ALL CAPTURED VARIABLES MUST BE INITIALISED IN ADVANCE!
@@ -632,7 +659,6 @@ function main() {
 				binfileextension,
 				binoptions,
 				compiler,
-				filebase,
 				incdir,
 				installcmd,
 				libdir,
@@ -659,6 +685,9 @@ function main() {
 				print("*");
 				osflush();
 			}
+
+			var fileext = srcfilename.field2(".", -1).lcase();
+			var filebase = srcfilename.splice(-len(fileext) - 1, "");
 
 			var srcfileinfo = osfile(srcfilename);
 			if (!srcfileinfo) {
