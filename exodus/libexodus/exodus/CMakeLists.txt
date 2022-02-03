@@ -126,7 +126,6 @@ install(FILES
  exodusmacros.h
  mvenvironment.h
  exodusfuncs.h
- mvexceptions.h
  #mvimpl.h mvipc.h mvconfig.h mvlink.h
  mvfunctor.h
  program.h
