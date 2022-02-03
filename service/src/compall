@@ -35,7 +35,10 @@ set -eux
 : Compile EXODUS service
 : ======================
 :
-	compile alt exo sys {S${COMPILER_OPTIONS}}
+: O - optimize level 1
+: S - silent. Only stars
+:
+	compile alt exo sys {OS${COMPILER_OPTIONS}}
 
 :
 : Install dat files

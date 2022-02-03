@@ -27,6 +27,7 @@ THE SOFTWARE.
 #define MVEXCEPTIONS_H 1
 
 #include <cmath>  //for floor
+#include <iostream> //only for debuggin
 
 /* not using this c++20 feature until established if it requires a runtime overhead or not
 //https://en.cppreference.com/w/cpp/utility/source_location/function_name
@@ -38,7 +39,8 @@ THE SOFTWARE.
 */
 
 // to insert code at front of every var member function
-#define THISIS(OBJECT) static const char* functionname = OBJECT;
+#define THISIS(OBJECT) [[maybe_unused]] static const char* functionname = OBJECT;\
+//	std::clog << functionname << std::endl;
 
 // TRY TO PREVENT var abc=abc+1; at runtime since compilers DONT BLOCK IT!!
 // prevent var x=f(x); of any kind since compilers dont block it but runtime behaviour is undefined
@@ -48,89 +50,122 @@ THE SOFTWARE.
 // be copied var undefinedassign=undefinedassign=11; risk it? to enable speed since copy constuction
 // is so frequent var xyz=xyz="xxx"; Unhandled exception at 0x0065892c in service.exe: 0xC0000005:
 // Access violation writing location 0xcccccccc. other words ccould be ISCONSTRUCTED or ISALIVE
-#ifndef EXO_NOCHECKDEFINED
-#define ISDEFINED(VARNAME)             \
-	if (VARNAME.var_typ & VARTYP_MASK) \
-		throw MVUndefined(var(#VARNAME) ^ " in " ^ var(functionname));
-#else
-#define ISDEFINED(VARNAME) \
-	{}
-#endif
+/*
+#define ISDEFINED(VARNAME)                                                  \
+    if (VARNAME.var_typ & VARTYP_MASK)                                      \
+        throw MVUndefined(var(#VARNAME) ^ " in " ^ var(functionname));
+*/
+//#define ISDEFINED(VARNAME) VARNAME.assertDefined(var(#VARNAME) ^ " in " ^ var(functionname));
+//#define ISDEFINED(VARNAME) VARNAME.assertDefined(functionname);
+// WARNING: MUST not use any var when checking Undefined
+// otherwise will get recursion/segfault
+#define ISDEFINED(VARNAME) VARNAME.assertDefined(#VARNAME);
 
 // includes isdefined
-#define ISASSIGNED(VARNAME) \
-	ISDEFINED(VARNAME)      \
-	if (!VARNAME.var_typ)   \
-		throw MVUnassigned(var(#VARNAME) ^ " in " ^ var(functionname));
+/*
+#define ISASSIGNED(VARNAME)                                                 \
+    ISDEFINED(VARNAME)                                                      \
+    if (!VARNAME.var_typ)                                                   \
+        throw MVUnassigned(var(#VARNAME) ^ " in " ^ var(functionname));
+*/
+//#define ISASSIGNED(VARNAME) VARNAME.assertAssigned(var(functionname) ^ " " ^ var(#VARNAME));
+#define ISASSIGNED(VARNAME) VARNAME.assertAssigned(#VARNAME);
 
 // includes isdefined directly and checks assigned if not string
+/*
 #define ISSTRING(VARNAME)                                                   \
-	ISDEFINED(VARNAME)                                                      \
-	if (!(VARNAME.var_typ & VARTYP_STR)) {                                  \
-		if (!VARNAME.var_typ)                                               \
-			throw MVUnassigned(var(#VARNAME) ^ " in " ^ var(functionname)); \
-		VARNAME.createString();                                             \
-	};
+    ISDEFINED(VARNAME)                                                      \
+    if (!(VARNAME.var_typ & VARTYP_STR)) {                                  \
+        if (!VARNAME.var_typ)                                               \
+            throw MVUnassigned(var(#VARNAME) ^ " in " ^ var(functionname)); \
+        VARNAME.createString();                                             \
+    };
+*/
+//#define ISSTRING(VARNAME) VARNAME.assertString(var(#VARNAME) ^ " in " ^ var(functionname));
+#define ISSTRING(VARNAME) VARNAME.assertString(#VARNAME);
 
 // includes isassigned which includes ISDEFINED
+/*
 #define ISNUMERIC(VARNAME)                                                      \
-	ISASSIGNED(VARNAME)                                                         \
-	if (!VARNAME.isnum())                                                       \
-		throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME) ^ " is " ^ \
-						   VARNAME.substr(1, 128).quote());
+    ISASSIGNED(VARNAME)                                                         \
+    if (!VARNAME.isnum())                                                       \
+        throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME) ^ " is " ^ \
+                           VARNAME.substr(1, 128).quote());
+*/
+//#define ISNUMERIC(VARNAME) VARNAME.assertNumeric(var(functionname) ^ " : " ^ var(#VARNAME) ^);
+#define ISNUMERIC(VARNAME) VARNAME.assertNumeric(#VARNAME);
+
+//#define ISNUMERIC(VARNAME) VARNAME.assertNumeric(functionname);
 
 // in some bizarre case we cant show contents of variable so put the following line instead of the
-// last one above 	throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME));
+// last one above     throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME));
 
 // see long comment on ISDEFINED
-#define THISISDEFINED()                                       \
-	/*std::cout<< functionname << " " <<var_typ<<std::endl;*/ \
-	if (/*(!this) ||*/ var_typ & VARTYP_MASK)           \
-		throw MVUndefined("var in " ^ var(functionname));
+/*
+#define THISISDEFINED()                                        \
+    if (var_typ & VARTYP_MASK)                  \
+        throw MVUndefined("var in " ^ var(functionname));
+*/
+#define THISISDEFINED() assertDefined(functionname);
 
 // includes isdefined
-#define THISISASSIGNED() \
-	THISISDEFINED()      \
-	if (!var_typ)  \
-		throw MVUnassigned("var in " ^ var(functionname));
+/*
+#define THISISASSIGNED()                                       \
+    THISISDEFINED()                                            \
+    if (!var_typ)                                              \
+        throw MVUnassigned("var in " ^ var(functionname));
+*/
+#define THISISASSIGNED() assertAssigned(functionname);
 
 // includes isdefined directly and checks assigned if not string
-#define THISISSTRINGMUTATOR() \
-	THISISSTRING()            \
-	var_typ = VARTYP_STR;	 //reset all flags
+#define THISISSTRINGMUTATOR()                                  \
+    THISISSTRING()                                             \
+    var_typ = VARTYP_STR;     //reset all flags
 
 // includes isdefined directly and checks assigned if not string
+/*
 #define THISISSTRING()                                         \
-	THISISDEFINED()                                            \
-	if (!(var_typ & VARTYP_STR)) {                       \
-		if (!var_typ)                                    \
-			throw MVUnassigned("var in " ^ var(functionname)); \
-		this->createString();                                  \
-	};
+    THISISDEFINED()                                            \
+    if (!(var_typ & VARTYP_STR)) {                             \
+        if (!var_typ)                                          \
+            throw MVUnassigned("var in " ^ var(functionname)); \
+        this->createString();                                  \
+    };
+*/
+#define THISISSTRING() assertString(functionname);
 
 //NB always try to convert strings to doubles first. in isnum()
-#define THISISNUMERIC() \
-	if (!this->isnum()) \
-		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1, 128).quote());
+/*#define THISISNUMERIC()                                        \
+    if (!this->isnum())                                        \
+        throw MVNonNumeric(var(functionname) ^                 \
+        " : var is " ^ this->substr(1, 128).quote());
+*/
+#define THISISNUMERIC() assertNumeric(functionname);
 
 //NB always try to convert strings to doubles first. in isnum()
-#define THISISDECIMAL()                                       \
-	if (!this->isnum())                                       \
-		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
-						   this->substr(1, 128).quote());      \
-	if (!(var_typ & VARTYP_DBL)) {                            \
-		var_dbl = double(var_int);                            \
-		var_typ |= VARTYP_DBL;                                \
-	}
+/*
+#define THISISDECIMAL()                                        \
+    if (!this->isnum())                                        \
+        throw MVNonNumeric(var(functionname) ^ " : var is " ^  \
+                           this->substr(1, 128).quote());      \
+    if (!(var_typ & VARTYP_DBL)) {                             \
+        var_dbl = double(var_int);                             \
+        var_typ |= VARTYP_DBL;                                 \
+    }
+*/
+#define THISISDECIMAL() assertDecimal(functionname);
 
 //NB always try to convert strings to doubles first. in isnum()
-#define THISISINTEGER()                                       \
-	if (!this->isnum())                                       \
-		throw MVNonNumeric(var(functionname) ^ " : var is " ^ \
-						   this->substr(1, 128).quote());      \
-	if (!(var_typ & VARTYP_INT)) {                            \
-		var_int = std::floor(var_dbl);                        \
-		var_typ |= VARTYP_INT;                                \
-	}
+/*
+#define THISISINTEGER()                                        \
+    if (!this->isnum())                                        \
+        throw MVNonNumeric(var(functionname) ^ " : var is " ^  \
+                           this->substr(1, 128).quote());      \
+    if (!(var_typ & VARTYP_INT)) {                             \
+        var_int = std::floor(var_dbl);                         \
+        var_typ |= VARTYP_INT;                                 \
+    }
+*/
+#define THISISINTEGER() assertInteger(functionname);
 
 #endif /*MVEXCEPTIONS_H*/

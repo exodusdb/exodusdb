@@ -60,6 +60,7 @@ THE SOFTWARE.
 #endif
 
 #include <string>
+#include <cmath>  //for floor
 
 // ND macro [[no_discard]]
 #if __clang_major__ != 10
@@ -186,26 +187,30 @@ class var_proxy2;
 class var_proxy3;
 
 class VARTYP {
+
+   private:
+
+	uint flags_ = 0;
+
    public:
-	// constructors from uint and it
-	// VARTYP(uint rhs) {flags=rhs;std::cout<<"uint32 ctor "<< rhs << std::endl;};
-	// VARTYP(int rhs) {flags=rhs;std::cout<<"int ctor "<< rhs << std::endl;if (rhs==9999) throw
-	// "kjhkjhkkjh";};
+
+	// constructor from uint
 	VARTYP(uint rhs)
 		: flags_(rhs){};
 
-	// copy constructor
-	// VARTYP(const VARTYP& rhs) {flags=rhs.flags;std::cout<<"copy ctor "<< rhs.flags <<
-	// std::endl;};
-	// will be defaulted so no need to define
-	//(if defined then also need to define other constructors)
-	//VARTYP(const VARTYP& rhs) : flags_(rhs.flags_){};
-
 	// default constructor
-	// VARTYP() : flags(0) {};
-	// VARTYP() {flags=0;std::cout<<"def ctor1"<<std::endl;};
-	// VARTYP() : flags{} {std::cout<<"def ctor2"<<std::endl;};
-	// VARTYP() flags(0) {};
+	VARTYP() = default;
+	//VARTYP() : flags(0) {
+	//    std::cout<<"def ctor2"
+	//    << std::endl;
+	//};
+
+	// copy constructor
+	VARTYP(const VARTYP& rhs) = default;
+	//VARTYP(const VARTYP& rhs) : flags(rhs.flags) {
+	//    std::cout<<"copy ctor "<< rhs.flags
+	//    << std::endl;
+	//};
 
 	// assign
 	VARTYP& operator=(const uint newflags) {
@@ -213,39 +218,24 @@ class VARTYP {
 		return *this;
 	};
 
-	// bitwise mutators
-	VARTYP& operator^=(const uint rhs) {
-		flags_ ^= rhs;
-		return *this;
-	};
-	VARTYP& operator|=(const uint rhs) {
-		flags_ |= rhs;
-		return *this;
-	};
-	VARTYP& operator&=(const uint rhs) {
-		flags_ &= rhs;
-		return *this;
-	};
+	// bitwise mutators: xor, or, and
+	VARTYP& operator^=(const uint rhs) {flags_ ^= rhs; return *this; }
+	VARTYP& operator|=(const uint rhs) {flags_ |= rhs; return *this; }
+	VARTYP& operator&=(const uint rhs) {flags_ &= rhs; return *this; }
 
-	// logical comparison
-	ND bool operator==(const uint rhs) const { return flags_ == rhs; };
-	ND bool operator!=(const uint rhs) const { return flags_ != rhs; };
-	ND bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; };
-	ND bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; };
+	// logical comparison with int and self
+	ND bool operator==(const uint rhs) const {return flags_ == rhs; };
+	ND bool operator!=(const uint rhs) const {return flags_ != rhs; };
+	ND bool operator==(const VARTYP rhs) const {return flags_ == rhs.flags_; };
+	ND bool operator!=(const VARTYP rhs) const {return flags_ != rhs.flags_; };
 
 	// bitwise accessors
-	VARTYP operator&(const uint rhs) const { return uint(flags_ & rhs); };
-	VARTYP operator|(const uint rhs) const { return uint(flags_ | rhs); };
-	VARTYP operator~() const { return VARTYP(~flags_); };
+	VARTYP operator&(const uint rhs) const {return uint(flags_ & rhs); }
+	VARTYP operator|(const uint rhs) const {return uint(flags_ | rhs); }
+	VARTYP operator~() const { return VARTYP(~flags_); }
 
-	// boolean - not explicit so we can do "if (var_type==something)"
-	operator bool() const { return flags_ != 0; };
-
-	// private:
-	// initialisation
-	// mutable
-	//TODO check if initialisation required here or can speed up by removing and assuming set everywhere required
-	uint flags_{0};
+	// boolean - not explicit so we can do "if (var_typ)"
+	operator bool() const { return flags_ != 0; }
 
 }; // class VARTYP
 
@@ -258,35 +248,35 @@ class VARTYP {
 // Variable Used since its var_typ will be zero
 
 // throw an exception if used an unassigned variable
-inline const uint VARTYP_UNA {0x0};
+constexpr uint VARTYP_UNA {0x0};
 
 // assigned string - unknown if numeric or not
-inline const uint VARTYP_STR {0x1};
+constexpr uint VARTYP_STR {0x1};
 
 // following indicate that the var is numeric
-inline const uint VARTYP_INT {0x2};
-inline const uint VARTYP_DBL {0x4};
+constexpr uint VARTYP_INT {0x2};
+constexpr uint VARTYP_DBL {0x4};
 
 // indicates known non-numeric string
-inline const uint VARTYP_NAN {0x8};
+constexpr uint VARTYP_NAN {0x8};
 
 // following indicates that the int is an os file handle
-inline const uint VARTYP_OSFILE {0x10};
-//inline const uint VARTYP_DBCONN {0x20};
+constexpr uint VARTYP_OSFILE {0x10};
+//constexpr uint VARTYP_DBCONN {0x20};
 
 // various useful flag combinations
-inline const uint VARTYP_INTDBL {VARTYP_INT | VARTYP_DBL};
-inline const uint VARTYP_INTSTR {VARTYP_INT | VARTYP_STR};
-inline const uint VARTYP_DBLSTR {VARTYP_DBL | VARTYP_STR};
-inline const uint VARTYP_NANSTR {VARTYP_NAN | VARTYP_STR};
-inline const uint VARTYP_NOTNUMFLAGS {~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN)};
+constexpr uint VARTYP_INTDBL {VARTYP_INT | VARTYP_DBL};
+constexpr uint VARTYP_INTSTR {VARTYP_INT | VARTYP_STR};
+constexpr uint VARTYP_DBLSTR {VARTYP_DBL | VARTYP_STR};
+constexpr uint VARTYP_NANSTR {VARTYP_NAN | VARTYP_STR};
+constexpr uint VARTYP_NOTNUMFLAGS {~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN)};
 
-inline const uint VARTYP_NANSTR_OSFILE {VARTYP_NANSTR | VARTYP_OSFILE};
-//inline const uint VARTYP_NANSTR_DBCONN {VARTYP_NANSTR | VARTYP_DBCONN};
+constexpr uint VARTYP_NANSTR_OSFILE {VARTYP_NANSTR | VARTYP_OSFILE};
+//constexpr uint VARTYP_NANSTR_DBCONN {VARTYP_NANSTR | VARTYP_DBCONN};
 
-//inline const uint VARTYP_DESTRUCTED {0xFFFFF0};
+//constexpr uint VARTYP_DESTRUCTED {0xFFFFF0};
 
-inline const uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE)};
+constexpr uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE)};
 
 //prevent or allow assignment to var to return a reference to the var
 //preventing will stop accidental usage of = instead of == in if() clauses
@@ -300,6 +290,9 @@ inline const uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_D
 #define VOID_OR_THIS "*this"
 #endif
 
+#define INLINE inline //this is the default anyway
+//#define INLINE __attribute__ ((noinline)) //use this to reduce compllation speed and object size
+
 // class var
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
 class PUBLIC var final {
@@ -312,10 +305,10 @@ class PUBLIC var final {
 
 	// 1. not using pimpl idiom in order to maximise performance
 	// 2. all mutable because asking for a string can create it from an integer and vice versa
-	mutable std::string var_str; //32 bytes on g++
+	mutable std::string var_str; //32 bytes on g++. is default constructed to empty string
 	mutable long long   var_int; //8 bytes/64 bits - currently defined as a long long
 	mutable double      var_dbl; //8 bytes/64 buts - double
-	mutable VARTYP      var_typ; //actually a uint which will be 4 bytes
+	mutable VARTYP      var_typ; //actually a uint which will be 4 bytes. default initialised to 0.
 	                             //mutable uint padding1;
 	                             //mutable long int padding2;
 
@@ -330,7 +323,8 @@ class PUBLIC var final {
 	//var();
 	// defined in class for inline/optimisation
 	// default constructor to allow definition unassigned "var mv";
-	var()
+	var() = default;
+/*	var()
 		: var_typ(VARTYP_UNA) {
 		//std::cout << "ctor()" << std::endl;
 
@@ -354,9 +348,23 @@ class PUBLIC var final {
 		// moved up to initializer
 		// var_typ=VARTYP_UNA;
 	}
+*/
 
-	// copy constructor
-	var(CVR fromvar);  // = default;
+	// copy constructor - cant default because we need to throw if rhs is unassigned
+	// copy constructor - not inline merely because of lack of THISIS etc in mv.h
+	//__attribute__ ((noinline)) var(CVR rhs)
+	INLINE var(CVR rhs)
+		: var_str(rhs.var_str),
+		var_int(rhs.var_int),
+		var_dbl(rhs.var_dbl),
+		var_typ(rhs.var_typ) {
+
+		// use initializers and only check afterwards if copiedvar was assigned (why?)
+		rhs.assertAssigned("var::var(CVR rhs)");
+
+		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
+	}
+
 
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
@@ -381,137 +389,78 @@ class PUBLIC var final {
 	// CONSTRUCTORS FROM
 	////////////////////
 
-//#define INLINE_CONSTRUCTION
-#ifndef INLINE_CONSTRUCTION
-
 	// move constructor
-	// var(TVR fromvar) noexcept;  // = default;
-	// defined in class for inline/optimisation
-	// move constructor
-	var(TVR rhs) noexcept;
-
-	// constructor for bool
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const bool bool1) noexcept;
-
-	// constructor for int
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const int int1) noexcept;
-
-	// constructor for long long
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const long long longlong1) noexcept;
-
-	// constructor for double
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var(const double double1) noexcept;
-
-	// ctor for char
-	// defined in class for inline/optimisation
-	// use initializers since cannot fail (but could find how to init the char1)
-	var(const char char1) noexcept;
+	INLINE var(TVR fromvar) = default;
+	//	// var(TVR fromvar) noexcept;  // = default;
+	//	// defined in class for inline/optimisation
+	//	// move constructor
+	//	var(TVR rhs) noexcept
+	//		: var_str(std::move(rhs.var_str)),
+	//		var_int(rhs.var_int),
+	//		var_dbl(rhs.var_dbl),
+	//		var_typ(rhs.var_typ) {
+	//
+	//		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
+	//
+	//		// skip this for speed since temporararies are unlikely to be unassigned
+	//		// THISIS("var::var(TVR rhs) noexcept")
+	//		// ISASSIGNED(rhs)
+	//	}
 
 	// constructor for char*
-	// defined in class for inline/optimisation
 	// use initializers since cannot fail unless out of memory
-	var(const char* cstr1);
+	INLINE var(const char* cstr1)
+	    : var_str(cstr1),
+	      var_typ(VARTYP_STR) {
+	    //std::cout << "ctor char* :" <<var_str << std::endl;
 
-	//in c++20 but not g++ v9.3
-	//constexpr var(const std::string& str1);
-
-	// ctor for memory block
-	// defined in class for inline/optimisation
-	// dont use initialisers and TODO protect against out of memory in expansion to string
-	var(const char* charstart, const size_t nchars);
-
-	// constructor for const std::string
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail unless out of memory
-	var(const std::string& str1);
-
-	// constructor for temporary std::string
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail unless out of memory
-	var(std::string&& str1) noexcept;
-
-#else // INLINE_CONSTRUCTION
-
-	// move constructor
-	// var(TVR fromvar) noexcept;  // = default;
-	// defined in class for inline/optimisation
-	// move constructor
-	var(TVR rhs) noexcept
-		: var_str(std::move(rhs.var_str)),
-		var_int(rhs.var_int),
-		var_dbl(rhs.var_dbl),
-		var_typ(rhs.var_typ) {
-
-		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
-
-		// skip this for speed since temporararies are unlikely to be unassigned
-		// THISIS("var::var(TVR rhs) noexcept")
-		// ISASSIGNED(rhs)
+	    // protect against null pointer
+	    // probably already crashed from var_str initialiser above
+	    if (cstr1 == 0) {
+	        // THISIS("var::var(const char* cstr1)")
+	        throw ("Null pointer in var::var(const char*)");
+	    }
 	}
 
 	// constructor for bool
 	// defined in class for inline/optimisation
 	// just use initializers since cannot fail
-	var(const bool bool1) noexcept
+	INLINE var(const bool bool1) noexcept
 		: var_int(bool1),
 		  var_typ(VARTYP_INT) {}
 
 	// constructor for int
 	// defined in class for inline/optimisation
 	// just use initializers since cannot fail
-	var(const int int1) noexcept
+	INLINE var(const int int1) noexcept
 		: var_int(int1),
 		  var_typ(VARTYP_INT) {}
 
 	// constructor for long long
 	// defined in class for inline/optimisation
 	// just use initializers since cannot fail
-	var(const long long longlong1) noexcept
+	INLINE var(const long long longlong1) noexcept
 		: var_int(longlong1),
 		  var_typ(VARTYP_INT) {}
 
 	// constructor for double
 	// defined in class for inline/optimisation
 	// just use initializers since cannot fail
-	var(const double double1) noexcept
+	INLINE var(const double double1) noexcept
 		: var_dbl(double1),
 		  var_typ(VARTYP_DBL) {}
 
 	// ctor for char
 	// defined in class for inline/optimisation
 	// use initializers since cannot fail (but could find how to init the char1)
-	var(const char char1) noexcept
+	INLINE var(const char char1) noexcept
 		: var_str(1, char1),
 		  var_typ(VARTYP_STR) {}
-
-	// constructor for char*
-	// defined in class for inline/optimisation
-	// use initializers since cannot fail unless out of memory
-	var(const char* cstr1)
-		: var_str(cstr1),
-		  var_typ(VARTYP_STR) {
-		//std::cout << "ctor char* :" <<var_str << std::endl;
-
-		// protect against null pointer
-		// probably already crashed from var_str initialiser above
-		if (cstr1 == 0) {
-			// THISIS("var::var(const char* cstr1)")
-			throw ("Null pointer in var(const char*)");
-		}
-	}
 
 	// ctor for memory block
 	// defined in class for inline/optimisation
 	// dont use initialisers and TODO protect against out of memory in expansion to string
-	var(const char* charstart, const size_t nchars)
+	INLINE var(const char* charstart, const size_t nchars)
 		: var_str(charstart, nchars),
 		  var_typ(VARTYP_STR) {}
 
@@ -520,7 +469,7 @@ class PUBLIC var final {
 	//accepts l and r values
 	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S, std::string>>>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	var(S&& fromstr)
+	INLINE var(S&& fromstr)
 	    : var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR){};
 
 #else
@@ -536,7 +485,7 @@ class PUBLIC var final {
 	// constructor for const std::string
 	// defined in class for inline/optimisation
 	// just use initializers since cannot fail unless out of memory
-	var(const std::string& str1)
+	INLINE var(const std::string& str1)
 		// this would validate all strings as being UTF8?
 		//: var_str(boost::locale::conv::utf_to_utf<char>(str1))
 		: var_str(str1),
@@ -545,7 +494,7 @@ class PUBLIC var final {
 	// constructor for temporary std::string
 	// defined in class for inline/optimisation
 	// just use initializers since cannot fail unless out of memory
-	var(std::string&& str1) noexcept
+	INLINE var(std::string&& str1) noexcept
 		: var_str(std::move(str1)),
 		  var_typ(VARTYP_STR) {}
 
@@ -567,8 +516,6 @@ class PUBLIC var final {
 //	var(const char) noexcept;
 //#endif
 
-#endif //not INLINE_CONSTRUCTION
-
 /////////////
 // ASSIGNMENT
 /////////////
@@ -579,38 +526,10 @@ class PUBLIC var final {
 	VOID_OR_VARREF operator=(CVR fromvar) &;
 	//VARREF operator=(const var &) && = delete; //disable assign to temporaries
 
-//#define INLINE_ASSIGNMENT
-#ifndef INLINE_ASSIGNMENT
-
 	// move assignment
 	// defined in class for inline/optimisation
 	// var = temporary var
-	VOID_OR_VARREF operator=(TVR rhs) & noexcept;
-
-	// int assignment
-	VOID_OR_VARREF operator=(const int int1) &;
-
-	// double assignment
-	VOID_OR_VARREF operator=(const double double1) &;
-
-	// char assignment
-	VOID_OR_VARREF operator=(const char char2) &;
-
-	// char* assignment
-	VOID_OR_VARREF operator=(const char* cstr) &;
-
-	// std::string assignment from variable (lvalue)
-	VOID_OR_VARREF operator=(const std::string& string2) &;
-
-	// std::string assignment from temporary (rvalue)
-	VOID_OR_VARREF operator=(const std::string&& string2) &;
-
-# else // INLINE_ASSIGNMENT
-
-	// move assignment
-	// defined in class for inline/optimisation
-	// var = temporary var
-	VOID_OR_VARREF operator=(TVR rhs) & noexcept {
+	INLINE VOID_OR_VARREF operator=(TVR rhs) & noexcept {
 		// skip this for speed?
 		// THISIS("VARREF operator= (var rhs)")
 		// THISISDEFINED()
@@ -636,7 +555,7 @@ class PUBLIC var final {
 
 	// int assignment
 	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF operator=(const int int1) & {
+	INLINE VOID_OR_VARREF operator=(const int int1) & {
 		// THISIS("VARREF operator= (const int int1)")
 		// protect against unlikely syntax as follows:
 		// var undefinedassign=undefinedassign=123';
@@ -651,7 +570,7 @@ class PUBLIC var final {
 
 	// double assignment
 	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF operator=(const double double1) & {
+	INLINE VOID_OR_VARREF operator=(const double double1) & {
 		// THISIS("VARREF operator= (const double double1)")
 		// protect against unlikely syntax as follows:
 		// var undefinedassign=undefinedassign=9.9';
@@ -666,7 +585,7 @@ class PUBLIC var final {
 
 	// char assignment
 	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF operator=(const char char2) & {
+	INLINE VOID_OR_VARREF operator=(const char char2) & {
 
 		//THISIS("VARREF operator= (const char char2) &")
 		// protect against unlikely syntax as follows:
@@ -685,7 +604,7 @@ class PUBLIC var final {
 
 	// char* assignment
 	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF operator=(const char* cstr) & {
+	INLINE VOID_OR_VARREF operator=(const char* cstr) & {
 		//THISIS("VARREF operator= (const char* cstr2) &")
 		// protect against unlikely syntax as follows:
 		// var undefinedassign=undefinedassign="xxx";
@@ -701,7 +620,7 @@ class PUBLIC var final {
 
 	// std::string assignment from variable (lvalue)
 	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF operator=(const std::string& string2) & {
+	INLINE VOID_OR_VARREF operator=(const std::string& string2) & {
 
 		//THISIS("VARREF operator= (const std::string& string2) &")
 		// protect against unlikely syntax as follows:
@@ -717,7 +636,7 @@ class PUBLIC var final {
 
 	// std::string assignment from temporary (rvalue)
 	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF operator=(const std::string&& string2) & {
+	INLINE VOID_OR_VARREF operator=(const std::string&& string2) & {
 
 		//THISIS("VARREF operator= (const std::string&& string2) &")
 		// protect against unlikely syntax as follows:
@@ -731,8 +650,6 @@ class PUBLIC var final {
 
 		return VOID_OR_THIS;
 	}
-
-#endif // INLINE_ASSIGNMENT
 
 	///////////////////////
 	// NAMED CONVERSIONS TO
@@ -1840,10 +1757,59 @@ class PUBLIC var final {
 
 	var logoff() const;
 
+	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
-	//////////////////////////
+	///////////////////////////
 
    private:
+
+	void throwUndefined(CVR message) const;
+	void throwUnassigned(CVR message) const;
+	void throwNonNumeric(CVR message) const;
+
+	// WARNING: MUST not use any var when checking Undefined
+	// otherwise will get recursion/segfault
+	INLINE void assertDefined(const char* message) const {
+		if (var_typ & VARTYP_MASK)
+			throwUndefined(message);
+	}
+
+	INLINE void assertAssigned(const char* message) const {
+		assertDefined(message);
+		if (!var_typ)
+			throwUnassigned(message);
+	}
+
+	INLINE void assertNumeric(const char* message) const {
+		if (!this->isnum())
+			throwNonNumeric(var(message) ^ " data: " ^ this->substr(1, 128).quote());
+	}
+
+	INLINE void assertDecimal(const char* message) const {
+		assertNumeric(message);
+		if (!(var_typ & VARTYP_DBL)) {
+			var_dbl = double(var_int);
+			var_typ |= VARTYP_DBL;
+		}
+	}
+
+	INLINE void assertInteger(const char* message) const {
+		assertNumeric(message);
+		if (!(var_typ & VARTYP_INT)) {
+			var_int = std::floor(var_dbl);
+			var_typ |= VARTYP_INT;
+		}
+	}
+
+	INLINE void assertString(const char* message) const {
+		assertDefined(message);
+		if (!(var_typ & VARTYP_STR)) {
+			if (!var_typ)
+				throwUnassigned(message);
+			this->createString();
+		};
+	}
+
 	void createString() const;
 
 	ND bool cursorexists();
@@ -2294,12 +2260,12 @@ inline const var SQ = SQ_;
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 inline const var OSSLASH = "\\";
-inline const char OSSLASH_ = '\\';
-#define SLASH_IS_BACKSLASH true
+constexpr char OSSLASH_ = '\\';
+constexpr bool SLASH_IS_BACKSLASH = true;
 #else
 inline const var OSSLASH = "/";
-inline const char OSSLASH_ = '/';
-#define SLASH_IS_BACKSLASH false
+constexpr char OSSLASH_ = '/';
+constexpr bool SLASH_IS_BACKSLASH = false;
 #endif
 
 // ASCII definition. Not used in ucase()/lcase() which handle unicode.
@@ -2458,7 +2424,7 @@ class PUBLIC MVArrayNotDimensioned  : public MVError {public: explicit MVArrayNo
 
 // clang-format on
 
-//user defined literals suffix _var
+//user defined literals suffix _var for c_str, long long int and double
 PUBLIC var operator""_var(const char* cstr, std::size_t size);
 PUBLIC var operator""_var(unsigned long long int i);
 PUBLIC var operator""_var(long double d);

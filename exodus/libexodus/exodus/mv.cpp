@@ -53,170 +53,31 @@ namespace exodus {
 // currently the default priv object initialisation of mvint to 0 is inefficient since is ALSO
 // assigned in most var constructions
 
-//// DESTRUCTOR
-//// defined in class for inline/optimisation
-///////////////
-//var::~var() {
-//	//std::cout << "dtor:" << var_str << std::endl;
+void var::throwUndefined(CVR message) const {
+	throw MVUndefined(message);
+}
+
+void var::throwUnassigned(CVR message) const {
+	throw MVUnassigned(message);
+}
+
+void var::throwNonNumeric(CVR message) const {
+	throw MVNonNumeric(message);
+}
+
+//// copy constructor - not inline merely because of lack of THISIS etc in mv.h
+//var::var(CVR rhs)
+//	: var_str(rhs.var_str),
+//	var_int(rhs.var_int),
+//	var_dbl(rhs.var_dbl),
+//	var_typ(rhs.var_typ) {
 //
-//	// not a pimpl style pointer anymore for speed
-//	// delete priv;
+//	// use initializers and only check afterwards if copiedvar was assigned (why?)
+//	THISIS("var::var(CVR rhs)")
+//	ISASSIGNED(rhs)
 //
-//	// try to ensure any memory is not later recognises as initialised memory
-//	//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
-//	// compilers allow without warning) this could be removed in production code perhaps set all
-//	// unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax
-//	// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
-//	// variables var_typ=(char)0xFFFFFFF0;
-//	//var_typ = VARTYP_MASK;
+//	//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 //}
-
-// CONSTRUCTORS
-//////////////
-
-//// default constructor to allow definition unassigned "var mv";
-//// defined in class for inline/optimisation
-//var::var()
-//	: var_typ(VARTYP_UNA) {
-//	//std::cout << "ctor()" << std::endl;
-//
-//	// int xyz=3;
-//	// WARNING neither initialisers nor constructors are called in the following case !!!
-//	// var xxx=xxx.somefunction()
-//	// known as "undefined usage of uninitialised variable";
-//	// and not even a compiler warning in msvc8 or g++4.1.2
-//
-//	// so the following test is put everywhere to protect against this type of accidental
-//	// programming if (var_typ&VARTYP_MASK) throw MVUndefined("funcname()"); should really
-//	// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
-//	// decimal 1111binary this could be removed in production code perhaps
-//
-//	// debuggCONSTRUCT&&cout<<"CONSTRUCT: var()\n";
-//
-//	// not a pointer anymore for speed
-//	// priv=new pimpl;
-//
-//	// moved here from pimpl constructor
-//	// moved up to initializer
-//	// var_typ=VARTYP_UNA;
-//}
-
-// copy constructor
-var::var(CVR rhs)
-	: var_str(rhs.var_str),
-	  var_int(rhs.var_int),
-	  var_dbl(rhs.var_dbl),
-	  var_typ(rhs.var_typ){
-		  // use initializers (why?) and only check afterwards if copiedvar was assigned
-		  THISIS("var::var(CVR rhs)")
-			  ISASSIGNED(rhs)
-
-		  //std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
-
-		  // not a pointer anymore for speed
-		  // priv=new pimpl;
-	  }
-
-#ifndef INLINE_CONSTRUCTION
-
-	// move constructor
-	// var(TVR fromvar) noexcept;  // = default;
-	// defined in class for inline/optimisation
-	// move constructor
-	var::var(TVR rhs) noexcept
-		: var_str(std::move(rhs.var_str)),
-		var_int(rhs.var_int),
-		var_dbl(rhs.var_dbl),
-		var_typ(rhs.var_typ) {
-
-		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
-
-		// skip this for speed since temporararies are unlikely to be unassigned
-		// THISIS("var::var(TVR rhs) noexcept")
-		// ISASSIGNED(rhs)
-	}
-
-	// constructor for bool
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var::var(const bool bool1) noexcept
-		: var_int(bool1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for int
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var::var(const int int1) noexcept
-		: var_int(int1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for long long
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var::var(const long long longlong1) noexcept
-		: var_int(longlong1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for double
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
-	var::var(const double double1) noexcept
-		: var_dbl(double1),
-		  var_typ(VARTYP_DBL) {}
-
-	// ctor for char
-	// defined in class for inline/optimisation
-	// use initializers since cannot fail (but could find how to init the char1)
-	var::var(const char char1) noexcept
-		: var_str(1, char1),
-		  var_typ(VARTYP_STR) {}
-
-	// constructor for char*
-	// defined in class for inline/optimisation
-	// use initializers since cannot fail unless out of memory
-	var::var(const char* cstr1)
-		: var_str(cstr1),
-		  var_typ(VARTYP_STR) {
-		//std::cout << "ctor char* :" <<var_str << std::endl;
-
-		// protect against null pointer
-		// probably already crashed from var_str initialiser above
-		if (cstr1 == 0) {
-			// THISIS("var::var(const char* cstr1)")
-			throw ("Null pointer in var::var(const char*)");
-		}
-	}
-
-	// ctor for memory block
-	// defined in class for inline/optimisation
-	// dont use initialisers and TODO protect against out of memory in expansion to string
-	var::var(const char* charstart, const size_t nchars)
-		: var_str(charstart, nchars),
-		  var_typ(VARTYP_STR) {}
-
-	//in c++20 but not g++ v9.3
-	//constexpr var::var(const std::string& str1);
-
-	// constructor for const std::string
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail unless out of memory
-	var::var(const std::string& str1)
-		// this would validate all strings as being UTF8?
-		//: var_str(boost::locale::conv::utf_to_utf<char>(str1))
-		: var_str(str1),
-		  var_typ(VARTYP_STR) {}
-
-	// constructor for temporary std::string
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail unless out of memory
-	var::var(std::string&& str1) noexcept
-		: var_str(std::move(str1)),
-		  var_typ(VARTYP_STR) {}
-
-#endif // not INLINE_CONSTRUCTION
-
-// EXPLICIT AND AUTOMATIC CONVERSIONS
-////////////////////////////////////
 
 // someone recommends not to create more than one automatic converter
 // to avoid the compiler error "ambiguous conversion"
@@ -249,41 +110,6 @@ var::operator bool() const {
 	return toBool();
 }
 
-/*
-var::operator const char*() const
-{
-	return toString().c_str();
-}
-*/
-
-#ifdef HASINTREFOP
-var::operator int&() const {
-	THISIS("var::operator int&()")
-	//converts string or double to int using pickos int() which is floor()
-	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
-	THISISINTEGER()
-	// TODO check that converting mvint_t (which is long long) to int doesnt cause any practical
-	// problems) PROBABLY WILL! since we are returning a non const reference which allows
-	// callers to set the int directly then clear any decimal and string cache flags which would
-	// be invalid after setting the int alone
-	//var_typ |= VARTYP_INT;
-	return static_cast<int&>(var_int);
-}
-var::operator long long&() const {
-	THISIS("var::operator long long&()")
-	THISISINTEGER()
-	return static_cast<long long&>(var_int);
-}
-var::operator double&() const {
-	THISIS("var::operator double&()")
-	THISISDECIMAL()
-	// since we are returning a non const reference which allows callers to set the dbl directly
-	// then clear any int and string cache flags which would be invalid after setting the dbl
-	// alone
-	//var_typ |= VARTYP_DBL;
-	return static_cast<double&>(var_dbl);
-}
-#else
 var::operator int() const {
 	THISIS("var::operator int() const")
 	//converts string or double to int using pickos int() which is floor()
@@ -303,57 +129,6 @@ var::operator double() const {
 	THISISDECIMAL()
 	return static_cast<double>(var_dbl);
 }
-
-#endif
-
-// remove because causes "ambiguous" with -short_wchar on linux
-/*
-var::operator unsigned int() const
-{
-	THISIS("var::operator int() const")
-	THISISDEFINED()
-
-	do
-	{
-		//prioritise int since conversion to int perhaps more likely to be an int already
-		if (var_typ&VARTYP_INT)
-			return var_int;
-		if (var_typ&VARTYP_DBL)
-			return int(var_dbl);
-		if (var_typ&VARTYP_NAN)
-			throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
-		if (!(var_typ))
-		{
-			THISISASSIGNED()
-			throw MVUnassigned("int(var)");
-		}
-	}
-	//must be string - try to convert to numeric
-	while (isnum());
-
-	THISISNUMERIC()
-	throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
-
-}
-*/
-
-/*
-//necessary to allow use of var inside STL containers
-var::operator size_t() const
-{
-	return (size_t) operator int();
-}
-*/
-
-/*
-var::operator const char*()
-{
-	if (var_typ&VARTYP_MASK)
-		throw MVUndefined("const char*()");
-	cout<<"CONVERT: operator const char*() returns '"<<var_str.c_str()<<"'\n";
-	return var_str.c_str();
-}
-*/
 
 /////////////
 // ASSIGNMENT
@@ -384,135 +159,6 @@ VOID_OR_VARREF var::operator=(CVR rhs) & {
 
 	return VOID_OR_THIS;
 }
-
-#ifndef INLINE_ASSIGNMENT
-
-	// move assignment
-	// defined in class for inline/optimisation
-	// var = temporary var
-	VOID_OR_VARREF var::operator=(TVR rhs) & noexcept {
-		// skip this for speed?
-		// THISIS("VARREF var::operator= (var rhs)")
-		// THISISDEFINED()
-
-		// skip this for speed since temporararies are unlikely to be unassigned
-		// THISIS("var::var(TVR rhs) noexcept")
-		// ISASSIGNED(rhs)
-
-		//std::clog << "move assignment" <<std::endl;
-
-		// important not to self assign
-		if (this == &rhs)
-			return VOID_OR_THIS;
-
-		// move everything over
-		var_str = std::move(rhs.var_str);
-		var_dbl = rhs.var_dbl;
-		var_int = rhs.var_int;
-		var_typ = rhs.var_typ;
-
-		return VOID_OR_THIS;
-	}
-
-	// int assignment
-	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF var::operator=(const int int1) & {
-		// THISIS("VARREF var::operator= (const int int1)")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=123';
-		// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
-		// THISISDEFINED()
-
-		var_int = int1;
-		var_typ = VARTYP_INT;  // reset to one unique type
-
-		return VOID_OR_THIS;
-	}
-
-	// double assignment
-	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF var::operator=(const double double1) & {
-		// THISIS("VARREF var::operator= (const double double1)")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=9.9';
-		// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
-		// THISISDEFINED()
-
-		var_dbl = double1;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-
-		return VOID_OR_THIS;
-	}
-
-	// char assignment
-	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF var::operator=(const char char2) & {
-
-		//THISIS("VARREF var::operator= (const char char2) &")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=L'X';
-		// this causes crash due to bad memory access due to setting string that doesnt exist
-		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()	 // ALN:TODO: this definition kind of misleading, try to find
-		// ALN:TODO: or change name to something like: THISISNOTDEAD :)
-		// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
-
-		var_str = char2;
-		var_typ = VARTYP_STR;  // reset to one unique type
-
-		return VOID_OR_THIS;
-	}
-
-	// char* assignment
-	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF var::operator=(const char* cstr) & {
-		//THISIS("VARREF var::operator= (const char* cstr2) &")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign="xxx";
-		// this causes crash due to bad memory access due to setting string that doesnt exist
-		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()
-
-		var_str = cstr;
-		var_typ = VARTYP_STR;  // reset to one unique type
-
-		return VOID_OR_THIS;
-	}
-
-	// std::string assignment from variable (lvalue)
-	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF var::operator=(const std::string& string2) & {
-
-		//THISIS("VARREF var::operator= (const std::string& string2) &")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=std::string("xxx"";
-		// this causes crash due to bad memory access due to setting string that doesnt exist
-		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()
-		var_str = string2;
-		var_typ = VARTYP_STR;  // reset to one unique type
-
-		return VOID_OR_THIS;
-	}
-
-	// std::string assignment from temporary (rvalue)
-	// The assignment operator should always return a reference to *this.
-	VOID_OR_VARREF var::operator=(const std::string&& string2) & {
-
-		//THISIS("VARREF var::operator= (const std::string&& string2) &")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=std::string("xxx"";
-		// this causes crash due to bad memory access due to setting string that doesnt exist
-		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()
-
-		var_str = std::move(string2);
-		var_typ = VARTYP_STR;  // reset to one unique type
-
-		return VOID_OR_THIS;
-	}
-
-#endif // not INLINE_ASSIGNMENT
 
 // UNARY OPERATORS
 //////////////////
@@ -602,12 +248,8 @@ VARREF var::operator^=(const std::string& string1) & {
 	return *this;
 }
 
-// not handled by inbuilt conversion of var to long long& on the rhs
-
-//#ifndef HASINTREFOP
-//#else
-
 // You must *not* make the postfix version return the 'this' object by reference
+//
 // *** YOU HAVE BEEN WARNED ***
 
 // not returning void so is usable in expressions
@@ -1677,4 +1319,5 @@ var operator""_var(unsigned long long int i) {
 var operator""_var(long double d) {
 	return var(double(d));
 }
+
 }  // namespace exodus
