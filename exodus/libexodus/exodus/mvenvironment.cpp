@@ -27,7 +27,6 @@
 
 // avoid this unless absolutely necessary then possible to move this file out of exodus var library
 //(stick to throwing MVError with a suitable error message)
-//#include <exodus/mvexceptions.h>
 
 namespace exodus {
 

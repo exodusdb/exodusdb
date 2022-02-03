@@ -23,7 +23,6 @@ THE SOFTWARE.
 #include <algorithm>
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 // based on http://geneura.ugr.es/~jmerelo/c++-faq/operator-overloading.html#faq-13.8
 
@@ -67,9 +66,10 @@ dim::dim(int rows, int cols)
 }
 
 bool dim::read(CVR filehandle, CVR key) {
+
 	THISIS("bool dim::read(CVR filehandle, CVR key)")
-	ISSTRING(filehandle)
-	ISSTRING(key)
+	filehandle.assertString(functionname);
+	key.assertString(functionname);
 
 	var temprecord;
 	if (!temprecord.read(filehandle, key))
@@ -89,18 +89,20 @@ bool dim::read(CVR filehandle, CVR key) {
 }
 
 bool dim::write(CVR filehandle, CVR key) const {
+
 	THISIS("bool dim::write(CVR filehandle, CVR key) const")
-	ISSTRING(filehandle)
-	ISSTRING(key)
+	filehandle.assertString(functionname);
+	key.assertString(functionname);
 
 	var temprecord = this->join();
 	return temprecord.write(filehandle, key);
 }
 
 bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
+
 	THISIS("bool dim::osread(CVR osfilename, CVR codepage = \"\")")
-	ISSTRING(osfilename)
-	ISSTRING(codepage)
+	osfilename.assertString(functionname);
+	codepage.assertString(functionname);
 
 	var txt;
 	if (not txt.osread(osfilename, codepage)) {
@@ -123,9 +125,10 @@ bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
 }
 
 bool dim::oswrite(CVR osfilename, CVR codepage /*=0*/) const {
+
 	THISIS("bool dim::oswrite(CVR osfilename, CVR codepage = \"\")")
-	ISSTRING(osfilename)
-	ISSTRING(codepage)
+	osfilename.assertString(functionname);
+	codepage.assertString(functionname);
 
 	//TODO option for linesep to be \r\n
 	static char linesep = '\n';
@@ -323,9 +326,10 @@ dim var::split(CVR separator) const {
 // number=dim.split(varstr)
 // returns number of elements
 var dim::split(CVR str1, CVR separator) {
+
 	THISIS("var dim::split(CVR var1, CVR separator=\"\")")
-	ISSTRING(str1)
-	ISSTRING(separator)
+	str1.assertString(functionname);
+	separator.assertString(functionname);
 
 	//TODO template another version to be fast for single byte separator esp. default FM_
 	//var sep = separator.var_str.size() ? separator : FM_;
@@ -400,9 +404,10 @@ dim& dim::sort(bool reverse) {
 
 //sorting var - using temporary dim
 var var::sort(CVR separator) const{
+
 	THISIS("var var::sort(CVR separator=UNASSIGNED)")
-	THISISSTRING()
-	ISSTRING(separator)
+	assertString(functionname);
+	separator.assertString(functionname);
 
 	//perhaps has slow but sorts alphanumerically by testing var<var
 	//eg bb cc aa 2 10 -> aa bb cc 10 2

@@ -24,7 +24,6 @@ THE SOFTWARE.
 #include <cstring>	  //for strlen strstr
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 namespace exodus {
 
@@ -47,9 +46,10 @@ var var::field2(CVR separator, const int fieldno, const int nfields) const {
 // FIELD()
 // var.field(separator,fieldno,nfields)
 var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
+
 	THISIS("var var::field(CVR separatorx,const int fieldnx,const int nfieldsx) const")
-	THISISSTRING()
-	ISSTRING(separatorx)
+	assertString(functionname);
+	separatorx.assertString(functionname);
 
 	if (separatorx.var_str == "") {
 		//return "";
@@ -112,11 +112,12 @@ VARREF var::fieldstore(CVR separator, const int fieldnx, const int nfieldsx, CVR
 
 // in-place
 VARREF var::fieldstorer(CVR separator0, const int fieldnx, const int nfieldsx, CVR replacementx) {
+
 	THISIS(
 		"VARREF var::fieldstorer(CVR separator0,const int fieldnx,const int nfieldsx, "
 		"CVR replacementx)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(separator0)
+	assertStringMutator(functionname);
+	separator0.assertString(functionname);
 
 	std::string separator = separator0.var_str;
 	if (separator == "") {
@@ -231,7 +232,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	// probably be switched off as unnecessary and slow behaviour for EXODUS applications
 	if (order) {
 		// THISIS(...)
-		// ISSTRING(usingchar)
+		// usingchar.assertString(functionname);
 		//bool result = locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting);
 		//if (result)
 		//	return result;
@@ -629,23 +630,25 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 
 // default locate using VM
 bool var::locate(CVR target, VARREF setting) const {
+
 	THISIS(
 		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
 		"int valueno/*=0*/) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISDEFINED(setting)
+	assertString(functionname);
+	target.assertString(functionname);
+	setting.assertDefined(functionname);
 
 	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
 }
 
 bool var::locate(CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
+
 	THISIS(
 		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
 		"int valueno/*=0*/) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISDEFINED(setting)
+	assertString(functionname);
+	target.assertString(functionname);
+	setting.assertDefined(functionname);
 
 	std::string usingchar;
 	if (valueno != 0)
@@ -663,9 +666,10 @@ bool var::locate(CVR target, VARREF setting, const int fieldno, const int valuen
 
 // without setting
 bool var::locate(CVR target) const {
+
 	THISIS("bool var::locate(CVR target")
-	THISISSTRING()
-	ISSTRING(target)
+	assertString(functionname);
+	target.assertString(functionname);
 
 	var setting;
 	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
@@ -690,10 +694,11 @@ bool var::locateby(CVR ordercode, CVR target, VARREF setting) const {
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
 bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
+
 	THISIS("bool var::locateby(const char* ordercode, CVR target, VARREF setting) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISDEFINED(setting)
+	assertString(functionname);
+	target.assertString(functionname);
+	setting.assertDefined(functionname);
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -710,12 +715,13 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
 bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
+
 	THISIS(
 		"bool var::locateby(const char* ordercode, CVR target, VARREF setting, const "
 		"int fieldno, const int valueno/*=0*/) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISDEFINED(setting)
+	assertString(functionname);
+	target.assertString(functionname);
+	setting.assertDefined(functionname);
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -745,12 +751,13 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int 
 
 // 1. rare syntax where the order is given as a variable
 bool var::locatebyusing(CVR ordercode, CVR usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+
 	THISIS(
 		"bool var::locatebyusing(CVR ordercode, CVR usingchar, CVR "
 		"target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
-	ISSTRING(ordercode)
-	ISSTRING(usingchar)
-	ISSTRING(target)
+	ordercode.assertString(functionname);
+	usingchar.assertString(functionname);
+	target.assertString(functionname);
 
 	// return locatebyusing(ordercode.toString().c_str(), usingchar.toString().c_str(), target,
 	// setting, fieldno, valueno);
@@ -761,12 +768,13 @@ bool var::locatebyusing(CVR ordercode, CVR usingchar, CVR target, VARREF setting
 // 2. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
 bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+
 	THISIS(
 		"bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR "
 		"target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISDEFINED(setting)
+	assertString(functionname);
+	target.assertString(functionname);
+	setting.assertDefined(functionname);
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -786,11 +794,12 @@ bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target
 
 // 1. simple version
 bool var::locateusing(CVR usingchar, CVR target) const {
+
 	THISIS("bool var::locateusing(CVR usingchar, CVR target) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISSTRING(usingchar)
-	// ISDEFINED(setting)
+	assertString(functionname);
+	target.assertString(functionname);
+	usingchar.assertString(functionname);
+	// setting.assertDefined(functionname);
 
 	var setting = "";
 	return locatex(var_str, target.var_str, "", usingchar.var_str, setting, 0, 0, 0);
@@ -798,13 +807,14 @@ bool var::locateusing(CVR usingchar, CVR target) const {
 
 // 2. specify field/value/subvalue and return position
 bool var::locateusing(CVR usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+
 	THISIS(
 		"bool var::locateusing(CVR usingchar, CVR target, VARREF setting, const "
 		"int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISSTRING(usingchar)
-	ISDEFINED(setting)
+	assertString(functionname);
+	target.assertString(functionname);
+	usingchar.assertString(functionname);
+	setting.assertDefined(functionname);
 
 	return locatex(var_str, target.var_str, "", usingchar.var_str, setting, fieldno, valueno,
 				   subvalueno);
@@ -843,10 +853,11 @@ var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsu
 // Syntax 3. Abbreviated xxxx.a(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
 //           xxx = yyy.a(1,2,3)
 var var::a(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
+
 	THISIS(
 		"var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) "
 		"const")
-	THISISSTRING()
+	assertString(functionname);
 
 	// any negatives at all returns ""
 	// done inline since unusual
@@ -964,8 +975,9 @@ var var::remove(const int fieldno, const int valueno, const int subvalueno) cons
 
 // 2. remove in place
 VARREF var::remover(int fieldno, int valueno, int subvalueno) {
+
 	THISIS("VARREF var::remover(int fieldno,int valueno,int subvalueno)")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	// return "" if replacing 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {
@@ -1108,9 +1120,10 @@ VARREF var::r(const int fieldno, CVR replacement) {
 }
 
 VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
+
 	THISIS("VARREF var::r(int fieldno,int valueno,int subvalueno,CVR replacement)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(replacement)
+	assertStringMutator(functionname);
+	replacement.assertString(functionname);
 
 	// return whole thing if replace 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {
@@ -1288,11 +1301,12 @@ VARREF var::inserter(const int fieldno, CVR insertion) {
 
 //in-place - given everything
 VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
+
 	THISIS(
 		"VARREF var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
 		"VARREF insertion)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(insertion)
+	assertStringMutator(functionname);
+	insertion.assertString(functionname);
 
 	// 0,0,0 is like 1,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {
@@ -1449,63 +1463,72 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 //contains is equivalent to x::index(y) != 0
 
 bool var::starts(CVR vstr) const {
+
 	THISIS("bool var::starts(CVR v) const")
 	//THISIS(__PRETTY_FUNCTION__)
 	//      bool exodus::var::starts(const exodus::VARREF) const
-	THISISSTRING()
-	ISSTRING(vstr)
+	assertString(functionname);
+	vstr.assertString(functionname);
 	return var_str.starts_with(vstr.var_str);
 }
 
 bool var::ends(CVR vstr) const {
+
 	THISIS("bool var::ends(CVR vstr) const")
-	THISISSTRING()
-	ISSTRING(vstr)
+	assertString(functionname);
+	vstr.assertString(functionname);
 	return var_str.ends_with(vstr.var_str);
 }
 
 bool var::contains(CVR vstr) const {
+
 	THISIS("bool var::contains(CVR vstr) const")
-	THISISSTRING()
-	ISSTRING(vstr)
+	assertString(functionname);
+	vstr.assertString(functionname);
 	return var_str.find(vstr.var_str) != std::string::npos;
 	//C++23 return var_str.contains(vstr.var_str);
 }
 
 bool var::starts(const char* cstr) const {
+
 	THISIS("bool var::starts(const char* cstr) const")
-	THISISSTRING()
+	assertString(functionname);
 	return var_str.starts_with(cstr);
 }
 
 bool var::ends(const char* cstr) const {
+
 	THISIS("bool var::ends(const char* cstr) const")
-	THISISSTRING()
+	assertString(functionname);
 	return var_str.ends_with(cstr);
 }
 
 bool var::contains(const char* cstr) const {
+
 	THISIS("bool var::contains(const char* cstr) const")
-	THISISSTRING()
+	assertString(functionname);
 	return var_str.find(cstr) != std::string::npos;
 	//C++23 return var_str.contains(cstr);
 }
 
 bool var::starts(const char c) const {
+
 	THISIS("bool var::starts(const char c) const")
-	THISISSTRING()
+	assertString(functionname);
 	return var_str.starts_with(c);
 }
 
 bool var::ends(const char c) const {
+
 	THISIS("bool var::ends(const char c) const")
-	THISISSTRING()
+	assertString(functionname);
 	return var_str.ends_with(c);
 }
 
 bool var::contains(const char c) const {
+
 	THISIS("bool var::contains(const char c) const")
-	THISISSTRING()
+	assertString(functionname);
 	return var_str.find(c) != std::string::npos;
 	//C++23 return var_str.contains(c);
 }
@@ -1547,8 +1570,9 @@ VARREF var::substrer(const int startindex1) {
 //[x,y]
 // var.s(start,length) substring
 VARREF var::substrer(const int startindex1, const int length) {
+
 	THISIS("VARREF var::substrer(const int startindex1,const int length)")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	// return "" for ""
 	int max = (int)var_str.size();
@@ -1630,8 +1654,9 @@ var var::operator[](int charno) &&
 // var.c(charno) character
 var var::operator[](const int charno) const {
 	//std::cout << "rvalue" <<std::endl;
+
 	THISIS("var var::operator[](const int charno) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	int nchars = int(var_str.size());
 
@@ -1680,9 +1705,10 @@ var var::operator[](const int charno) const {
 // performs an operation + - * / : on two multivalued strings in parallel
 // returning a multivalued string of the results
 var var::mv(const char* opcode, CVR var2) const {
+
 	THISIS("var var::multivalued(const char* opcode, CVR var2) const")
-	THISISSTRING()
-	ISSTRING(var2)
+	assertString(functionname);
+	var2.assertString(functionname);
 
 	var outstr = "";
 	var mv1;
@@ -1800,9 +1826,10 @@ getnextp2:
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
 // COL2() in pickos) NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
 var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const {
+
 	THISIS("var var::substr(const int startindex1, VARREF delimiterchars, int& endindex) const")
-	THISISSTRING()
-	ISSTRING(delimiterchars)
+	assertString(functionname);
+	delimiterchars.assertString(functionname);
 
 	std::string::size_type start_pos = startindex1 - 1;
 
@@ -1847,10 +1874,11 @@ var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const 
 // delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6 or 0 if not found
 // NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
 var var::substr2(VARREF startindex1, VARREF delimiterno) const {
+
 	THISIS("var var::substr2(VARREF startindex1, VARREF delimiterno) const")
-	THISISSTRING()
-	ISNUMERIC(startindex1)
-	ISDEFINED(delimiterno)
+	assertString(functionname);
+	startindex1.assertNumeric(functionname);
+	delimiterno.assertDefined(functionname);
 
 	int startindex0 = startindex1.toInt() - 1;
 	std::string::size_type start_pos = (startindex0 >= 0) ? startindex0 : 0;
@@ -1906,8 +1934,9 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 // SUM
 /////
 var var::sumall() const {
+
 	THISIS("var var::sumall()")
-	THISISSTRING()
+	assertString(functionname);
 
 	// Add up all numbers regardless of separators or levels (multilevel)
 	// Limit the number of decimal places in returned value to the max found in the input
@@ -1943,8 +1972,9 @@ var var::sumall() const {
 }
 
 var var::sum() const {
+
 	THISIS("var var::sum()")
-	THISISSTRING()
+	assertString(functionname);
 
 	// Limit the number of decimal places in returned value to the max found in the input
 	// assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66") == 0);
@@ -2018,7 +2048,7 @@ var var::sum() const {
 
 		} else {
 
-			ISSTRING(accum)
+			accum.assertString(functionname);
 			if (not accum.var_str.empty()) {
 
 				//fix decimal places
@@ -2054,8 +2084,9 @@ var var::sum() const {
 }
 
 var var::sum(CVR separator) const {
+
 	THISIS("var var::sum(CVR separator) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	var result = 0;
 	int nn = this->dcount(separator);

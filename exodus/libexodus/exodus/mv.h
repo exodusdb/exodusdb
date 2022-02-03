@@ -290,6 +290,8 @@ constexpr uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL 
 #define VOID_OR_THIS "*this"
 #endif
 
+#define THISIS(FUNC_DESC) [[maybe_unused]] static const char* functionname = FUNC_DESC;
+
 #define INLINE inline //this is the default anyway
 //#define INLINE __attribute__ ((noinline)) //use this to reduce compllation speed and object size
 
@@ -1808,6 +1810,14 @@ class PUBLIC var final {
 				throwUnassigned(message);
 			this->createString();
 		};
+	}
+
+	INLINE void assertStringMutator(const char* message) const {
+		assertString(message);
+		// Very important:
+		// Reset all flags to ensure they are evaluated again
+		// after string mutation
+		var_typ = VARTYP_STR;
 	}
 
 	void createString() const;

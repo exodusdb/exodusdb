@@ -1126,7 +1126,7 @@ void ExodusProgramBase::chain(CVR libraryname) {
 // perform
 var ExodusProgramBase::perform(CVR sentence) {
 	// THISIS("var ExodusProgramBase::perform(CVR sentence)")
-	// ISSTRING(sentence)
+	// sentence.assertString(functionname);
 
 	// return ID^"*"^dictid;
 
@@ -1369,7 +1369,7 @@ var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, C
 // calculate 1
 var ExodusProgramBase::calculate(CVR dictid) {
 	// THISIS("var ExodusProgramBase::calculate(CVR dictid)")
-	// ISSTRING(dictid)
+	// dictid.assertString(functionname);
 
 	// return ID^"*"^dictid;
 

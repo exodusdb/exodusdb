@@ -86,7 +86,6 @@ Binary    Hex          Comments
 
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
-#include <exodus/mvexceptions.h>
 #include <exodus/mvlocale.h>
 
 // std::ios::sync_with_stdio(false);
@@ -134,7 +133,7 @@ var var::version() const {
 
 bool var::eof() const {
 	// THISIS("bool var::eof() const")
-	// THISISDEFINED()
+	// assertDefined(functionname);
 
 	return (std::cin.eof());
 }
@@ -150,8 +149,9 @@ bool var::hasinput(int milliseconds) {
 
 //binary safe version (except nl/eof?) with little or no editing except backspace and no default
 VARREF var::input() {
+
 	THISIS("bool var::input()")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	var_str.clear();
 	var_typ = VARTYP_STR;
@@ -168,9 +168,10 @@ VARREF var::input() {
 // input with prompt allows default value and editing
 // but is not binary safe because we allow line editing when there is a prompt (even if empty)
 VARREF var::input(CVR prompt) {
+
 	THISIS("bool var::input(CVR prompt")
-	THISISDEFINED()
-	ISSTRING(prompt)
+	assertDefined(functionname);
+	prompt.assertString(functionname);
 
 	//LOCKIOSTREAM
 
@@ -205,8 +206,9 @@ VARREF var::input(CVR prompt) {
 // for nchars, use int instead of var to trigger error at point of calling not here
 // not binary safe if nchars = 0 because we allow line editing assuming terminal console
 VARREF var::inputn(const int nchars) {
+
 	THISIS("bool var::inputn(const int nchars")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	//LOCKIOSTREAM
 
@@ -275,8 +277,9 @@ VARREF var::inputn(const int nchars) {
 }
 
 void var::stop(CVR text) const {
+
 	THISIS("void var::stop(CVR text) const")
-	ISSTRING(text)
+	text.assertString(functionname);
 
 	// exit(0);
 	throw MVStop(text);
@@ -290,16 +293,18 @@ void var::stop(CVR text) const {
 */
 
 void var::abort(CVR text) const {
+
 	THISIS("void var::abort(CVR text) const")
-	ISSTRING(text)
+	text.assertString(functionname);
 
 	// exit(1);
 	throw MVAbort(text);
 }
 
 void var::abortall(CVR text) const {
+
 	THISIS("void var::abortall(CVR text) const")
-	ISSTRING(text)
+	text.assertString(functionname);
 
 	// exit(1);
 	throw MVAbort(text);
@@ -311,7 +316,7 @@ bool var::assigned() const {
 	// treat undefined as unassigned
 	// undefined is a state where we are USING the variable before its contructor has been
 	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
-	// variables to functions in the functors on gcc THISISDEFINED()
+	// variables to functions in the functors on gcc assertDefined(functionname);
 
 	if (var_typ & VARTYP_MASK)
 		return false;
@@ -322,7 +327,7 @@ bool var::assigned() const {
 bool var::unassigned() const {
 	// see explanation above in assigned
 	// THISIS("bool var::unassigned() const")
-	// THISISDEFINED()
+	// assertDefined(functionname);
 
 	if (var_typ & VARTYP_MASK)
 		return true;
@@ -333,10 +338,11 @@ bool var::unassigned() const {
 VARREF var::unassigned(CVR defaultvalue) {
 
 	// see explanation above in assigned
-	// THISISDEFINED()
+	// assertDefined(functionname);
+
 
 	THISIS("VARREF var::unassigned(CVR defaultvalue) const")
-	ISASSIGNED(defaultvalue)
+	defaultvalue.assertAssigned(functionname);
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	// if (var_typ & VARTYP_MASK)
@@ -351,8 +357,9 @@ VARREF var::unassigned(CVR defaultvalue) {
 }
 
 char var::toChar() const {
+
 	THISIS("char var::toChar() const")
-	THISISSTRING()
+	assertString(functionname);
 
 	if (var_str.empty())
 		return '\0';
@@ -362,38 +369,43 @@ char var::toChar() const {
 
 // temporary var can return move its string into the output
 std::string var::toString() && {
+
 	THISIS("std::string var::toString() &&")
-	THISISSTRING()
+	assertString(functionname);
 
 	return std::move(var_str);
 }
 
 // non-temporary var can return a const ref to its string
 const std::string& var::toString() const& {
+
 	THISIS("std::string var::toString() const&")
-	THISISSTRING()
+	assertString(functionname);
 
 	return var_str;
 }
 
 var var::length() const {
+
 	THISIS("var var::length() const")
-	THISISSTRING()
+	assertString(functionname);
 
 	return int(var_str.size());
 }
 
 // synonym for length for compatibility with pick's len()
 var var::len() const {
+
 	THISIS("var var::len() const")
-	THISISSTRING()
+	assertString(functionname);
 
 	return int(var_str.size());
 }
 
 const char* var::data() const {
+
 	THISIS("const char* var::data() const")
-	THISISSTRING()
+	assertString(functionname);
 
 	return var_str.data();
 }
@@ -401,7 +413,7 @@ const char* var::data() const {
 std::u32string var::to_u32string() const {
 	// for speed, dont validate
 	// THISIS("std::u32string var::to_u32string() const")
-	// THISISSTRING()
+	// assertString(functionname);
 
 	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
 	// simple var=var copy of the following data
@@ -414,23 +426,25 @@ std::u32string var::to_u32string() const {
 void var::from_u32string(std::u32string u32_source) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
-	// THISISDEFINED()
+	// assertDefined(functionname);
 	var_typ = VARTYP_STR;
 
 	var_str = boost::locale::conv::utf_to_utf<char>(u32_source);
 }
 
 var var::trim(CVR trimchar) const& {
+
 	THISIS("var var::trim(CVR trimchar) const")
-	ISSTRING(trimchar)
+	trimchar.assertString(functionname);
 
 	return trim(trimchar.var_str.c_str());
 }
 
 var var::trim(CVR trimchar, CVR options) const& {
+
 	THISIS("var var::trim(CVR trimchar, CVR options) const")
-	ISSTRING(trimchar)
-	ISSTRING(options)
+	trimchar.assertString(functionname);
+	options.assertString(functionname);
 
 	if (options == "F") {
 		return trimf(trimchar.var_str.c_str());
@@ -443,16 +457,18 @@ var var::trim(CVR trimchar, CVR options) const& {
 }
 
 VARREF var::trimmer(CVR trimchar) {
+
 	THISIS("VARREF var::trimmer(CVR trimchar)")
-	ISSTRING(trimchar)
+	trimchar.assertString(functionname);
 
 	return trimmer(trimchar.var_str.c_str());
 }
 
 VARREF var::trimmer(CVR trimchar, CVR options) {
+
 	THISIS("var var::trimmer(CVR trimchar, CVR options) const")
-	ISSTRING(trimchar)
-	ISSTRING(options)
+	trimchar.assertString(functionname);
+	options.assertString(functionname);
 
 	if (options == "F") {
 		return trimmerf(trimchar.var_str.c_str());
@@ -465,23 +481,26 @@ VARREF var::trimmer(CVR trimchar, CVR options) {
 }
 
 var var::trimf(CVR trimchar) const& {
+
 	THISIS("var var::trimf(CVR trimchar) const")
-	ISSTRING(trimchar)
+	trimchar.assertString(functionname);
 
 	return trimf(trimchar.var_str.c_str());
 }
 
 VARREF var::trimmerf(CVR trimchar) {
+
 	THISIS("VARREF var::trimmerf(CVR trimchar)")
-	ISSTRING(trimchar)
+	trimchar.assertString(functionname);
 
 	return trimmerf(trimchar.var_str.c_str());
 }
 
 // trimb - trim backward trailing chars
 var var::trimb(CVR trimchar) const& {
+
 	THISIS("var var::trimb(CVR trimchar) const")
-	ISSTRING(trimchar)
+	trimchar.assertString(functionname);
 
 	return trimb(trimchar.var_str.c_str());
 }
@@ -493,16 +512,18 @@ VARREF var::trimb(CVR trimchar) && {
 
 //in place
 VARREF var::trimmerb(CVR trimchar) {
+
 	THISIS("VARREF var::trimmerb(CVR trimchar)")
-	ISSTRING(trimchar)
+	trimchar.assertString(functionname);
 
 	return trimmerb(trimchar.var_str.c_str());
 }
 
 //trimf() - trim leading spaces/character
 var var::trimf(const char* trimchar) const& {
+
 	THISIS("var var::trimf(const char* trimchar) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	return var(*this).trimmerf(trimchar);
 }
@@ -514,8 +535,9 @@ VARREF var::trimf(const char* trimchar) && {
 
 // in-place
 VARREF var::trimmerf(const char* trimchar) {
+
 	THISIS("VARREF var::trimmerf(const char* trimchar)")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	std::string::size_type start_pos;
 	start_pos = var_str.find_first_not_of(trimchar);
@@ -535,8 +557,9 @@ VARREF var::trimmerf(const char* trimchar) {
 
 // trimb() - trim backward (trailing) spaces/character
 var var::trimb(const char* trimchar) const& {
+
 	THISIS("var var::trimb(const char* trimchar) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	return var(*this).trimmerb(trimchar);
 }
@@ -548,8 +571,9 @@ VARREF var::trimb(const char* trimchar) && {
 
 // in-place
 VARREF var::trimmerb(const char* trimchar) {
+
 	THISIS("VARREF var::trimmerb(const char* trimchar)")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	std::string::size_type end_pos;
 	end_pos = var_str.find_last_not_of(trimchar);
@@ -569,8 +593,9 @@ VARREF var::trimmerb(const char* trimchar) {
 
 //trim() - remove leading, trailing and excess internal spaces/character
 var var::trim(const char* trimchar) const& {
+
 	THISIS("var var::trim(const char* trimchar) const&")
-	THISISSTRING()
+	assertString(functionname);
 
 	return var(*this).trimmer(trimchar);
 }
@@ -586,8 +611,9 @@ VARREF var::trimmer(const char* trimchar) {
 	// reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
 
+
 	THISIS("VARREF var::trimmer(const char* trimchar)")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	// find the first non blank
 	std::string::size_type start_pos;
@@ -651,8 +677,9 @@ VARREF var::invert() && {
 
 // in-place
 VARREF var::inverter() {
+
 	THISIS("VARREF var::inverter()")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	// xor each unicode code point, with the bits we want to toggle ... ie the bottom 8
 	// since we will keep inversion within the same 256 byte pages of unicode codepoints
@@ -685,9 +712,10 @@ VARREF var::ucase() && {
 
 // in-place
 VARREF var::ucaser() {
+
 	THISIS("VARREF var::ucaser()")
-	//THISISSTRINGMUTATOR()
-	THISISSTRING()
+	//assertStringMutator(functionname);
+	assertString(functionname);
 
 	// optimise for ASCII
 	// try ASCII uppercase to start with for speed
@@ -733,9 +761,10 @@ VARREF var::lcase() && {
 
 // in-place
 VARREF var::lcaser() {
+
 	THISIS("VARREF var::lcaser()")
-	//THISISSTRINGMUTATOR()
-	THISISSTRING()
+	//assertStringMutator(functionname);
+	assertString(functionname);
 
 	// return localeAwareChangeCase(1);
 
@@ -772,9 +801,10 @@ VARREF var::tcase() && {
 
 // in-place
 VARREF var::tcaser() {
+
 	THISIS("VARREF var::tcaser()")
-	//THISISSTRINGMUTATOR()
-	THISISSTRING()
+	//assertStringMutator(functionname);
+	assertString(functionname);
 
 	init_boost_locale1();
 
@@ -810,9 +840,10 @@ VARREF var::fcase() && {
 
 // in-place
 VARREF var::fcaser() {
+
 	THISIS("VARREF var::fcaser()")
-	//THISISSTRINGMUTATOR()
-	THISISSTRING()
+	//assertStringMutator(functionname);
+	assertString(functionname);
 
 	init_boost_locale1();
 
@@ -856,9 +887,10 @@ VARREF var::normalize() && {
 
 // in-place
 VARREF var::normalizer() {
+
 	THISIS("VARREF var::normalizer()")
-	//THISISSTRINGMUTATOR()
-	THISISSTRING()
+	//assertStringMutator(functionname);
+	assertString(functionname);
 
 	// optimise for ASCII which needs no normalisation
 	if (is_ascii(var_str))
@@ -877,8 +909,9 @@ VARREF var::normalizer() {
 }
 
 var var::unique() const {
+
 	THISIS("var var::unique()")
-	THISISSTRING()
+	assertString(functionname);
 
 	// linemark
 	var result = "";
@@ -916,8 +949,9 @@ var var::unique() const {
 
 // BINARY - 1st byte
 var var::seq() const {
+
 	THISIS("var var::seq() const")
-	THISISSTRING()
+	assertString(functionname);
 
 	if (var_str.empty())
 		return 0;
@@ -931,8 +965,9 @@ var var::seq() const {
 
 // UTF8 - 1st UTF code point
 var var::textseq() const {
+
 	THISIS("var var::textseq() const")
-	THISISSTRING()
+	assertString(functionname);
 	/*
 		if (var_str.empty())
 			return 0;
@@ -984,8 +1019,9 @@ VARREF var::quote() && {
 
 // in-place
 VARREF var::quoter() {
+
 	THISIS("VARREF var::quoter()")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	// NB this is std::string "replace" not var field replace
 	var_str.replace(0, 0, "\"");
@@ -1005,8 +1041,9 @@ VARREF var::squote() && {
 
 // in-place
 VARREF var::squoter() {
+
 	THISIS("VARREF var::squoter()")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	// NB this is std::string "replace" not var field replace
 	var_str.replace(0, 0, "'");
@@ -1026,8 +1063,9 @@ VARREF var::unquote() && {
 
 // in-place
 VARREF var::unquoter() {
+
 	THISIS("VARREF var::unquoter()")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	// removes MATCHING beginning and terminating " or ' characters
 	// also removes a SINGLE " or ' on the grounds that you probably want to eliminate all such
@@ -1078,9 +1116,10 @@ VARREF var::splice(const int start1, CVR newstr) && {
 
 // in-place
 VARREF var::splicer(const int start1, const int length, CVR newstr) {
+
 	THISIS("VARREF var::splicer(const int start1,const int length,CVR newstr)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(newstr)
+	assertStringMutator(functionname);
+	newstr.assertString(functionname);
 
 	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
 /*
@@ -1182,9 +1221,10 @@ VARREF var::splicer(const int start1, const int length, CVR newstr) {
 
 // in-place
 VARREF var::splicer(const int start1, CVR newstr) {
+
 	THISIS("VARREF var::splicer(const int start1, CVR newstr)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(newstr)
+	assertStringMutator(functionname);
+	newstr.assertString(functionname);
 
 	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
 	int start1b;
@@ -1218,8 +1258,9 @@ VARREF var::pop() && {
 
 // in-place
 VARREF var::popper() {
+
 	THISIS("VARREF var::popper()")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	if (!var_str.empty())
 		var_str.pop_back();
@@ -1245,11 +1286,12 @@ VARREF splicerx(const int start1, const int length, const char* c) {
 */
 
 VARREF var::transfer(VARREF destinationvar) {
+
 	THISIS("VARREF var::transfer(VARREF destinationvar)")
 	// transfer even unassigned vars (but not uninitialised ones)
-	//THISISDEFINED()
-	THISISASSIGNED()
-	ISDEFINED(destinationvar)
+	//assertDefined(functionname);
+	assertAssigned(functionname);
+	destinationvar.assertDefined(functionname);
 
 	destinationvar.var_str.swap(var_str);
 	destinationvar.var_typ = var_typ;
@@ -1263,9 +1305,10 @@ VARREF var::transfer(VARREF destinationvar) {
 }
 
 var var::clone() const {
+
 	THISIS("var var::clone(VARREF destinationvar)")
 	// clone even unassigned vars!
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	var clone;
 	clone.var_typ = var_typ;
@@ -1278,9 +1321,10 @@ var var::clone() const {
 
 // kind of const needed in calculatex
 CVR var::exchange(CVR var2) const {
+
 	THISIS("VARREF var::exchange(VARREF var2)")
-	THISISASSIGNED()
-	ISDEFINED(var2)
+	assertAssigned(functionname);
+	var2.assertDefined(functionname);
 
 	// intermediary copies of var2
 	auto mvtypex = var2.var_typ;
@@ -1304,8 +1348,9 @@ CVR var::exchange(CVR var2) const {
 }
 
 var var::str(const int num) const {
+
 	THISIS("var var::str(const int num) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	var newstr = "";
 	if (num < 0)
@@ -1322,8 +1367,9 @@ var var::str(const int num) const {
 }
 
 var var::space() const {
+
 	THISIS("var var::space() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	var newstr = "";
 	int nspaces = this->round().toInt();
@@ -1345,8 +1391,9 @@ VARREF var::crop() && {
 
 // in-place
 VARREF var::cropper() {
+
 	THISIS("VARREF var::cropper()")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	std::string newstr;
 
@@ -1402,8 +1449,9 @@ VARREF var::lower() && {
 
 // in-place
 VARREF var::lowerer() {
+
 	THISIS("VARREF var::lowerer()")
-	THISISSTRING()
+	assertString(functionname);
 
 	// note: rotate lowest sep to highest
 	//this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _FM_ _VM_ _SM_ _TM_ _STM_ _RM_);
@@ -1427,8 +1475,9 @@ VARREF var::raise() && {
 
 // in-place
 VARREF var::raiser() {
+
 	THISIS("VARREF var::raiser()")
-	THISISSTRING()
+	assertString(functionname);
 
 	// note: rotate highest sep to lowest
 	// advantage is it is reversible by lowerer but the problem is that the smallest delimiter becomes the largest
@@ -1475,8 +1524,9 @@ void converter_helper(T& var_str, const T& oldchars, const T& newchars) {
 // convert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
 var var::convert(CVR oldchars, CVR newchars) const& {
+
 	THISIS("var var::convert(CVR oldchars,CVR newchars) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	// return var(*this).converter(oldchars,newchars);
 	var temp = var(*this).converter(oldchars, newchars);
@@ -1492,10 +1542,11 @@ VARREF var::convert(CVR oldchars, CVR newchars) && {
 
 // in-place
 VARREF var::converter(CVR oldchars, CVR newchars) {
+
 	THISIS("VARREF var::converter(CVR oldchars,CVR newchars)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(oldchars)
-	ISSTRING(newchars)
+	assertStringMutator(functionname);
+	oldchars.assertString(functionname);
+	newchars.assertString(functionname);
 
 	converter_helper(var_str, oldchars.var_str, newchars.var_str);
 
@@ -1504,8 +1555,9 @@ VARREF var::converter(CVR oldchars, CVR newchars) {
 
 // in-place for const char*
 VARREF var::converter(const char* oldchars, const char* newchars) {
+
 	THISIS("VARREF var::converter(const char* oldchars, const char* newchars)")
-	THISISSTRINGMUTATOR()
+	assertStringMutator(functionname);
 
 	converter_helper(var_str, std::string(oldchars), std::string(newchars));
 
@@ -1515,8 +1567,9 @@ VARREF var::converter(const char* oldchars, const char* newchars) {
 // textconvert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
 var var::textconvert(CVR oldchars, CVR newchars) const& {
+
 	THISIS("var var::textconvert(CVR oldchars,CVR newchars) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	return var(*this).textconverter(oldchars, newchars);
 }
@@ -1530,10 +1583,11 @@ VARREF var::textconvert(CVR oldchars, CVR newchars) && {
 
 // in-place
 VARREF var::textconverter(CVR oldchars, CVR newchars) {
+
 	THISIS("VARREF var::converter(CVR oldchars,CVR newchars)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(oldchars)
-	ISSTRING(newchars)
+	assertStringMutator(functionname);
+	oldchars.assertString(functionname);
+	newchars.assertString(functionname);
 
 	// all ASCII -> bytewise conversion for speed
 	if (is_ascii(oldchars.var_str) && is_ascii(newchars.var_str)) {
@@ -1563,8 +1617,9 @@ VARREF var::textconverter(CVR oldchars, CVR newchars) {
 
 //warning put() is not threadsafe whereas output(), errput() and logput() are threadsafe
 CVR var::put(std::ostream& ostream1) const {
+
 	THISIS("CVR var::put(std::ostream& ostream1) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	// prevent output to cout suppressing output to cout (by non-exodus routines)
 	// http://gcc.gnu.org/ml/gcc-bugs/2006-05/msg01196.html
@@ -1722,9 +1777,10 @@ CVR var::logputl(CVR str) const {
 ////////
 // TODO make a char and char version for speed
 var var::dcount(CVR substrx) const {
+
 	THISIS("var var::dcount(CVR substrx) const")
-	THISISSTRING()
-	ISSTRING(substrx)
+	assertString(functionname);
+	substrx.assertString(functionname);
 
 	if (var_str.empty())
 		return 0;
@@ -1737,9 +1793,10 @@ var var::dcount(CVR substrx) const {
 ///////
 
 var var::count(CVR substrx) const {
+
 	THISIS("var var::count(CVR substrx) const")
-	THISISSTRING()
-	ISSTRING(substrx)
+	assertString(functionname);
+	substrx.assertString(functionname);
 
 	if (substrx.var_str == "")
 		return 0;
@@ -1761,8 +1818,9 @@ var var::count(CVR substrx) const {
 }
 
 var var::count(const char charx) const {
+
 	THISIS("var var::count(const char charx) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = 0;
@@ -1778,9 +1836,10 @@ var var::count(const char charx) const {
 }
 
 var var::index2(CVR substrx, const int startchar1) const {
+
 	THISIS("var var::index2(CVR substrx,const int startchar1) const")
-	THISISSTRING()
-	ISSTRING(substrx)
+	assertString(functionname);
+	substrx.assertString(functionname);
 
 	if (substrx.var_str == "")
 		return var(0);
@@ -1797,9 +1856,10 @@ var var::index2(CVR substrx, const int startchar1) const {
 }
 
 var var::index(CVR substrx, const int occurrenceno) const {
+
 	THISIS("var var::index(CVR substrx,const int occurrenceno) const")
-	THISISSTRING()
-	ISSTRING(substrx)
+	assertString(functionname);
+	substrx.assertString(functionname);
 
 	//TODO implement negative occurenceno as meaning backwards from the end
 	//eg -1 means the last occurrence
@@ -1869,7 +1929,7 @@ var var::debug(CVR var1) const {
 
 var var::logoff() const {
 	// THISIS("var var::logoff() const")
-	// THISISSTRING("var.logoff()")
+	// THIS"var.logoff()".assertString(functionname);
 
 	//LOCKIOSTREAM
 	//std::cout << "var::logoff not implemented yet " << std::endl;
@@ -1878,24 +1938,27 @@ var var::logoff() const {
 }
 
 var var::getprompt() const {
+
 	THISIS("var var::getprompt() const")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	std::cout << "var::getprompt() not implemented yet " << std::endl;
 	return "";
 }
 
 void var::setprompt() const {
+
 	THISIS("void var::setprompt() const")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	std::cout << "var::setprompt() not implemented yet " << std::endl;
 	return;
 }
 
 var var::xlate(CVR filename, CVR fieldno, CVR mode) const {
+
 	THISIS("var var::xlate(CVR filename,CVR fieldno, CVR mode) const")
-	ISSTRING(mode)
+	mode.assertString(functionname);
 
 	return xlate(filename, fieldno, mode.var_str.c_str());
 }
@@ -1904,13 +1967,14 @@ var var::xlate(CVR filename, CVR fieldno, CVR mode) const {
 // although may also support dictid (of target file) instead of fieldno
 
 var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
+
 	THISIS("var var::xlate(CVR filename,CVR fieldno, const char* mode) const")
-	THISISSTRING()
-	ISSTRING(filename)
+	assertString(functionname);
+	filename.assertString(functionname);
 	// fieldnames are supported as mvprogram::xlate
 	// but not here in var::xlate which only supports field numbers since it has no
 	// access to dictionaries
-	ISNUMERIC(fieldno)
+	fieldno.assertNumeric(functionname);
 
 	// open the file (skip this for now since sql doesnt need "open"
 	var file;

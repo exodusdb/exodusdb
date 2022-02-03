@@ -20,7 +20,6 @@
 #endif
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 namespace exodus {
 
@@ -45,8 +44,9 @@ bool var::setxlocale() const {
 	return SetThreadLocale((*this).toInt()) != nullptr;
 
 #else
+
 	THISIS("bool var::setxlocale() const")
-	THISISSTRING()
+	assertString(functionname);
 
 	// make a thread local locale if not done already
 	// TODO do this in thread creation

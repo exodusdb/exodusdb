@@ -4,14 +4,14 @@
 #include <unistd.h>
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 namespace exodus {
 
 bool var::getcursor() {
 
+
 	THISIS("bool var::getcursor() const")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	// returns empty string if fails
 	var_str.clear();
@@ -108,8 +108,9 @@ bool var::getcursor() {
 }
 
 void var::setcursor() const {
+
 	THISIS("void var::setcursor() const")
-	THISISSTRING()
+	assertString(functionname);
 
 	std::cout << (*this) << std::flush;
 

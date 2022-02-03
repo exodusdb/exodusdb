@@ -64,7 +64,6 @@ const char* longdayofweeks =
 inline static auto pick_epoch_date = boost::gregorian::date(1967, 12, 31);
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 namespace exodus {
 

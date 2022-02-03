@@ -47,7 +47,6 @@ THE SOFTWARE.
 #include <exodus/mvipc.h>
 
 //#include <exodus/mvenvironment.h>
-#include <exodus/mvexceptions.h>
 
 // using namespace exodus;
 //#include <exodus/xfunctorf6.h>

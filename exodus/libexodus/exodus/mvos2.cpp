@@ -27,7 +27,6 @@ THE SOFTWARE.
 #include <unistd.h> //for getpid
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 
 // to get whole environment
@@ -36,8 +35,9 @@ extern char** environ;
 namespace exodus {
 
 void var::ossleep(const int milliseconds) const {
+
 	THISIS("void var::ossleep(const int milliseconds) const")
-	THISISDEFINED()	 // not needed if *this not used
+	assertDefined(functionname);	 // not needed if *this not used
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 
@@ -81,8 +81,9 @@ thread_local std::unique_ptr<RNG_typ> thread_RNG;
 
 // PickOS returns pseudo random integers in the range of 0-4 for rnd(5)
 var var::rnd() const {
+
 	THISIS("var var::rnd() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// Create a base generator per thread on the heap. Will be destroyed on thread termination.
 	if (not thread_RNG.get())
@@ -103,8 +104,9 @@ var var::rnd() const {
 }
 
 void var::initrnd() const {
+
 	THISIS("void var::initrnd(CVR seed) const")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	// Get a seed for the RNG
 	uint64_t seed;
@@ -136,9 +138,10 @@ void var::initrnd() const {
 }
 
 bool var::osgetenv(CVR envvarname) {
+
 	THISIS("bool var::osgetenv(CVR envvarname)")
-	THISISDEFINED()
-	ISSTRING(envvarname)
+	assertDefined(functionname);
+	envvarname.assertString(functionname);
 
 	// return whole environment if blank envvarname
 	if (envvarname.var_str.empty()) {
@@ -171,9 +174,10 @@ bool var::osgetenv(CVR envvarname) {
 }
 
 bool var::ossetenv(CVR envvarname) const {
+
 	THISIS("bool var::ossetenv(CVR envvarname) const")
-	THISISSTRING()
-	ISSTRING(envvarname)
+	assertString(functionname);
+	envvarname.assertString(functionname);
 
 //#ifdef _MSC_VER
 #ifndef setenv

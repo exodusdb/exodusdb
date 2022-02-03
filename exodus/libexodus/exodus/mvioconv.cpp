@@ -24,7 +24,6 @@ THE SOFTWARE.
 #include <sstream>
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 static const int HEX_PER_CHAR = sizeof(char) * 2;
 // using namespace std;
@@ -32,8 +31,9 @@ static const int HEX_PER_CHAR = sizeof(char) * 2;
 namespace exodus {
 
 var var::iconv(CVR convstr) const {
+
 	THISIS("var var::iconv(CVR convstr) const")
-	ISSTRING(convstr)
+	convstr.assertString(functionname);
 
 	return iconv(convstr.var_str.c_str());
 }
@@ -50,8 +50,9 @@ The result in internal format
 
 */
 var var::iconv(const char* convstr) const {
+
 	THISIS("var var::iconv(const char* convstr) const")
-	THISISSTRING()
+	assertString(functionname);
 
 	// empty string in, empty string out
 	if (var_typ & VARTYP_STR && var_str.empty())
@@ -654,9 +655,10 @@ var var::oconv_LRC(CVR format) const {
 }
 
 var var::oconv(CVR conversion) const {
+
 	THISIS("var var::oconv(CVR conversion) const")
-	THISISDEFINED()
-	ISSTRING(conversion)
+	assertDefined(functionname);
+	conversion.assertString(functionname);
 
 	return oconv(conversion.var_str.c_str());
 }
@@ -666,10 +668,11 @@ var var::oconv(CVR conversion) const {
 // a narrow char* version? possibly most oconvs will come from variables (eg read from dicts) so
 // will be string format
 var var::oconv(const char* conversion) const {
+
 	THISIS("var var::oconv(const char* conversion) const")
 	// TODO this should be THISISASSIGNED since no point converting numbers to strings for many
 	// oconvs
-	THISISSTRING()
+	assertString(functionname);
 
 	// REMOVE the remove logic out of the L# R# and T# here
 

@@ -90,7 +90,6 @@ THE SOFTWARE.
 #endif
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 namespace exodus {
 
@@ -401,7 +400,7 @@ void var::createString() const {
 	// THISIS("void var::createString() const")
 	// TODO ensure ISDEFINED is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISDEFINED
-	// THISISDEFINED()
+	// assertDefined(functionname);
 
 	// dbl - create string from dbl
 	// prefer double
@@ -448,8 +447,9 @@ var var::round(const int ndecimals) const {
 	// int and double currently its possible since space is reserved for both but this may
 	// change
 
+
 	THISIS("var var::round() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	var result;
 
@@ -544,8 +544,9 @@ var var::round(const int ndecimals) const {
 // pick int() is actually the same as floor. using integer() instead of int() because int is a
 // reserved word in c/c++ for int datatype
 var var::integer() const {
+
 	THISIS("var var::integer() const")
-	THISISINTEGER()
+	assertInteger(functionname);
 	/*
 	//pick integer means floor()
 	//-1.0=-1
@@ -568,16 +569,18 @@ var var::integer() const {
 
 // integer and floor are the same
 var var::floor() const {
+
 	THISIS("var var::floor() const")
-	THISISINTEGER()
+	assertInteger(functionname);
 	return var_int;
 }
 
 bool var::toBool() const {
+
 	THISIS("bool var::toBool() const")
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	// identical code in void* and bool except returns void* and bool respectively
 	while (true) {
@@ -602,7 +605,7 @@ bool var::toBool() const {
 			return std::abs(var_dbl) >= SMALLEST_NUMBER;
 
 		if (!(var_typ)) {
-			THISISASSIGNED()
+			assertAssigned(functionname);
 			throw MVUnassigned("toBool()");
 		}
 
@@ -612,22 +615,25 @@ bool var::toBool() const {
 }
 
 int var::toInt() const {
+
 	THISIS("int var::toInt() const")
-	THISISINTEGER()
+	assertInteger(functionname);
 
 	return static_cast<int>(var_int);
 }
 
 long long var::toLong() const {
+
 	THISIS("int var::toLong() const")
-	THISISINTEGER()
+	assertInteger(functionname);
 
 	return static_cast<long long>(var_int);
 }
 
 double var::toDouble() const {
+
 	THISIS("double var::toDouble() const")
-	THISISDECIMAL()
+	assertDecimal(functionname);
 
 	return var_dbl;
 }
@@ -654,10 +660,11 @@ double var::toDouble() const {
 
 bool var::isnum(void) const {
 
+
 	THISIS("bool var::isnum(void) const")
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	// Known to be numeric already
 	if (var_typ & VARTYP_INTDBL)

@@ -23,7 +23,6 @@ THE SOFTWARE.
 #include <cmath>
 
 #include <mv.h>
-#include <mvexceptions.h>
 
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
@@ -34,8 +33,9 @@ THE SOFTWARE.
 namespace exodus {
 
 var var::abs() const {
+
 	THISIS("var var::abs() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL) {
@@ -52,9 +52,10 @@ var var::abs() const {
 }
 
 var var::mod(CVR divisor) const {
+
 	THISIS("var var::mod(CVR divisor) const")
-	THISISNUMERIC()
-	ISNUMERIC(divisor)
+	assertNumeric(functionname);
+	divisor.assertNumeric(functionname);
 
 	// NB NOT using c++ % operator which until c++11 had undefined behaviour if divisor was negative
 	// from c++11 % the sign of the result after a negative divisor is always the same as the
@@ -108,8 +109,9 @@ mod_doubles:
 }
 
 var var::mod(const int divisor) const {
+
 	THISIS("var var::mod(const int divisor) const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// see ::mod(CVR divisor) for comments about c++11 % operator
 
@@ -152,8 +154,9 @@ var var::mod(const int divisor) const {
 */
 
 var var::sin() const {
+
 	THISIS("var var::sin() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)
@@ -166,8 +169,9 @@ var var::sin() const {
 }
 
 var var::cos() const {
+
 	THISIS("var var::cos() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)
@@ -180,8 +184,9 @@ var var::cos() const {
 }
 
 var var::tan() const {
+
 	THISIS("var var::tan() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)
@@ -194,8 +199,9 @@ var var::tan() const {
 }
 
 var var::atan() const {
+
 	THISIS("var var::atan() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)
@@ -208,8 +214,9 @@ var var::atan() const {
 }
 
 var var::loge() const {
+
 	THISIS("var var::loge() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)
@@ -222,8 +229,9 @@ var var::loge() const {
 }
 
 var var::sqrt() const {
+
 	THISIS("var var::sqrt() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)
@@ -236,9 +244,10 @@ var var::sqrt() const {
 }
 
 var var::pwr(CVR exponent) const {
+
 	THISIS("var var::pwr(CVR exponent) const")
-	THISISNUMERIC()
-	ISNUMERIC(exponent)
+	assertNumeric(functionname);
+	exponent.assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)
@@ -251,8 +260,9 @@ var var::pwr(CVR exponent) const {
 }
 
 var var::exp() const {
+
 	THISIS("var var::exp() const")
-	THISISNUMERIC()
+	assertNumeric(functionname);
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)

@@ -46,7 +46,6 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #endif
 
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 #include "mvhandles.h"
 
 namespace exodus {
@@ -56,7 +55,7 @@ namespace exodus {
 // var var::iconv_MT(const char* conversion) const
 var var::iconv_MT() const {
 	//THISIS("var var::iconv_MT() const")
-	//THISISSTRING()
+	//assertString(functionname);
 	// ignore everything else and just get first three groups of digits "99 99 99"
 	// remove leading and trailing non-digits and replace internal strings of non-digits with
 	// single space
@@ -128,7 +127,7 @@ var var::iconv_MT() const {
 // regular expressions for ICONV_MC
 VARREF var::oconv_MR(const char* conversionchar) {
 	//THISIS("VARREF var::oconv_MR(const char* conversionchar)")
-	//THISISSTRING()
+	//assertString(functionname);
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 
 	// abort if no 3rd char
@@ -281,9 +280,10 @@ var var::match(CVR matchstr, CVR options) const {
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
 	// https:www.debuggex.com
 
+
 	THISIS("bool var::match(CVR matchstr, CVR options) const")
-	THISISSTRING()
-	ISSTRING(matchstr)
+	assertString(functionname);
+	matchstr.assertString(functionname);
 
 	// wild cards like
 	// *.* or *.???
@@ -442,10 +442,11 @@ VARREF var::swap(CVR what, CVR with) && {
 
 // in-place
 VARREF var::swapper(CVR what, CVR with) {
+
 	THISIS("VARREF var::swapper(CVR what, CVR with)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(what)
-	ISSTRING(with)
+	assertStringMutator(functionname);
+	what.assertString(functionname);
+	with.assertString(functionname);
 
 	// nothing to do if oldstr is ""
 	if (what.var_str.empty())
@@ -479,13 +480,14 @@ VARREF var::replace(CVR regexstr, CVR replacementstr, CVR options) && {
 
 // in-place
 VARREF var::replacer(CVR regexstr, CVR replacementstr, CVR options) {
+
 	THISIS(
 		"VARREF var::replacer(CVR regexstr, CVR replacementstr, CVR "
 		"options)")
-	THISISSTRINGMUTATOR()
-	ISSTRING(regexstr)
-	ISSTRING(replacementstr)
-	ISSTRING(options)
+	assertStringMutator(functionname);
+	regexstr.assertString(functionname);
+	replacementstr.assertString(functionname);
+	options.assertString(functionname);
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 

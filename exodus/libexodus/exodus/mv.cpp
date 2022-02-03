@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 namespace exodus {
 
@@ -73,8 +72,9 @@ void var::throwNonNumeric(CVR message) const {
 //	var_typ(rhs.var_typ) {
 //
 //	// use initializers and only check afterwards if copiedvar was assigned (why?)
-//	THISIS("var::var(CVR rhs)")
-//	ISASSIGNED(rhs)
+//
+	THISIS("var::var(CVR rhs)")
+//	rhs.assertAssigned(functionname);
 //
 //	//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 //}
@@ -86,19 +86,21 @@ void var::throwNonNumeric(CVR message) const {
 // allow conversion to string (IS THIS USED FOR ANYTHING AT THE MOMENT?
 // allows the usage of any string function
 var::operator std::string() const {
+
 	THISIS("var::operator std::string")
-	THISISSTRING()
+	assertString(functionname);
 	return var_str;
 }
 
 var::operator void*() const {
+
 	THISIS("var::operator void*() const")
 	// could be skipped for speed if can be proved there is no way in c++ syntax that would
 	// result in an attempt to convert an uninitialised object to void* since there is a bool
 	// conversion when does c++ use automatic conversion to void* note that exodus operator !
 	// uses (void*) trial elimination of operator void* seems to cause no problems but without
 	// full regression testing
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	return (void*)toBool();
 }
@@ -111,22 +113,25 @@ var::operator bool() const {
 }
 
 var::operator int() const {
+
 	THISIS("var::operator int() const")
 	//converts string or double to int using pickos int() which is floor()
 	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
-	THISISINTEGER()
+	assertInteger(functionname);
 	return static_cast<int>(var_int);
 }
 
 var::operator long long() const {
+
 	THISIS("var::operator long long() const")
-	THISISINTEGER()
+	assertInteger(functionname);
 	return static_cast<long long>(var_int);
 }
 
 var::operator double() const {
+
 	THISIS("var::operator double() const")
-	THISISDECIMAL()
+	assertDecimal(functionname);
 	return static_cast<double>(var_dbl);
 }
 
@@ -141,9 +146,10 @@ var::operator double() const {
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
 VOID_OR_VARREF var::operator=(CVR rhs) & {
+
 	THISIS("VARREF var::operator=(CVR rhs) &")
-	THISISDEFINED()	 //could be skipped for speed?
-	ISASSIGNED(rhs)
+	assertDefined(functionname);	 //could be skipped for speed?
+	rhs.assertAssigned(functionname);
 
 	//std::clog << "copy assignment" <<std::endl;
 
@@ -168,9 +174,10 @@ VOID_OR_VARREF var::operator=(CVR rhs) & {
 //^=var
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(CVR rhs) & {
+
 	THISIS("VARREF var::operator^=(CVR rhs) &")
-	THISISSTRING()
-	ISSTRING(rhs)
+	assertString(functionname);
+	rhs.assertString(functionname);
 
 	// tack it onto our string
 	var_str.append(rhs.var_str);
@@ -182,8 +189,9 @@ VARREF var::operator^=(CVR rhs) & {
 //^=int
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const int int1) & {
+
 	THISIS("VARREF var::operator^=(const int int1) &")
-	THISISSTRING()
+	assertString(functionname);
 
 	// var_str+=var(int1).var_str;
 	var_str += std::to_string(int1);
@@ -195,8 +203,9 @@ VARREF var::operator^=(const int int1) & {
 //^=double
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const double double1) & {
+
 	THISIS("VARREF var::operator^=(const double double1) &")
-	THISISSTRING()
+	assertString(functionname);
 
 	// var_str+=var(int1).var_str;
 	//var_str += mvd2s(double1);
@@ -211,8 +220,9 @@ VARREF var::operator^=(const double double1) & {
 //^=char
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const char char1) & {
+
 	THISIS("VARREF var::operator^=(const char char1) &")
-	THISISSTRING()
+	assertString(functionname);
 
 	// var_str+=var(int1).var_str;
 	var_str.push_back(char1);
@@ -224,8 +234,9 @@ VARREF var::operator^=(const char char1) & {
 //^=char*
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const char* cstr) & {
+
 	THISIS("VARREF var::operator^=(const char* cstr) &")
-	THISISSTRING()
+	assertString(functionname);
 
 	// var_str+=var(int1).var_str;
 	// var_str+=std::string(char1);
@@ -238,8 +249,9 @@ VARREF var::operator^=(const char* cstr) & {
 //^=std::string
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const std::string& string1) & {
+
 	THISIS("VARREF var::operator^=(const std::string string1) &")
-	THISISSTRING()
+	assertString(functionname);
 
 	// var_str+=var(int1).var_str;
 	var_str += string1;
@@ -255,9 +267,10 @@ VARREF var::operator^=(const std::string& string1) & {
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
 var var::operator++(int) & {
+
 	THISIS("var var::operator++(int) &")
 	// full check done below to avoid double checking number type
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	var priorvalue;
 
@@ -281,11 +294,11 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		THISISNUMERIC()
+		assertNumeric(functionname);
 
 	} else {
 		//trigger MVUnassigned
-		THISISNUMERIC()
+		assertNumeric(functionname);
 	}
 
 	// NO DO NOT! return *this ... postfix return a temporary!!! eg var(*this)
@@ -295,9 +308,10 @@ tryagain:
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v--
 var var::operator--(int) & {
+
 	THISIS("var var::operator--(int) & ")
 	// full check done below to avoid double checking number type
-	THISISDEFINED()
+	assertDefined(functionname);
 
 	var priorvalue;
 
@@ -321,11 +335,11 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		THISISNUMERIC()
+		assertNumeric(functionname);
 
 	} else {
 		//trigger MVUnassigned
-		THISISNUMERIC()
+		assertNumeric(functionname);
 	}
 
 	return priorvalue;
@@ -334,9 +348,10 @@ tryagain:
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override ++var
 VARREF var::operator++() & {
+
 	THISIS("var var::operator++() &")
 	// full check done below to avoid double checking number type
-	THISISDEFINED()
+	assertDefined(functionname);
 
 tryagain:
 	// prefer int since -- nearly always on integers
@@ -354,11 +369,11 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		THISISNUMERIC()
+		assertNumeric(functionname);
 
 	} else {
 		//trigger MVUnassigned
-		THISISNUMERIC()
+		assertNumeric(functionname);
 	}
 
 	// OK to return *this in prefix ++
@@ -368,9 +383,10 @@ tryagain:
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
 VARREF var::operator--() & {
+
 	THISIS("VARREF var::operator--() &")
 	// full check done below to avoid double checking number type
-	THISISDEFINED()
+	assertDefined(functionname);
 
 tryagain:
 	// prefer int since -- nearly always on integers
@@ -390,11 +406,11 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		THISISNUMERIC()
+		assertNumeric(functionname);
 
 	} else {
 		//trigger MVUnassigned
-		THISISNUMERIC()
+		assertNumeric(functionname);
 	}
 
 	// OK to return *this in prefix --
@@ -404,8 +420,9 @@ tryagain:
 //+=var (very similar to version with on rhs)
 // provided to disambiguate syntax like var1+=var2
 VARREF var::operator+=(const int int1) & {
+
 	THISIS("VARREF var::operator+=(const int int1) &")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 tryagain:
 
@@ -436,7 +453,7 @@ tryagain:
 	if (isnum())
 		goto tryagain;
 
-	THISISNUMERIC()
+	assertNumeric(functionname);
 	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
@@ -444,26 +461,29 @@ tryagain:
 // provided to disambiguate syntax like var1 += '1'
 
 VARREF var::operator+=(const char char1) & {
+
 	THISIS("VARREF var::operator+=(const char char1) &")
 	var charx = char1;
-	ISNUMERIC(charx)
+	charx.assertNumeric(functionname);
 	return this->operator+=(int(charx.var_int));
 }
 
 //-='1' (very similar to version with on rhs)
 // provided to disambiguate syntax like var1 -= '1'
 VARREF var::operator-=(const char char1) & {
+
 	THISIS("VARREF var::operator-=(const char char1) &")
 	var charx = char1;
-	ISNUMERIC(charx)
+	charx.assertNumeric(functionname);
 	return this->operator-=(int(charx.var_int));
 }
 
 //-=var (very similar to version with on rhs)
 // provided to disambiguate syntax like var1+=var2
 VARREF var::operator-=(const int int1) & {
+
 	THISIS("VARREF var::operator-=(int int1) &")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 tryagain:
 	// dbl target
@@ -485,7 +505,7 @@ tryagain:
 	if (isnum())
 		goto tryagain;
 
-	THISISNUMERIC()
+	assertNumeric(functionname);
 	throw MVNonNumeric(substr(1, 128) ^ "-= ");
 }
 
@@ -502,15 +522,16 @@ VARREF var::operator-=(const double dbl1) & {
 
 //+=var
 VARREF var::operator+=(CVR rhs) & {
+
 	THISIS("VARREF var::operator+=(CVR rhs) &")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 tryagain:
 
 	// dbl target
 	// prefer double
 	if (var_typ & VARTYP_DBL) {
-		ISNUMERIC(rhs)
+		rhs.assertNumeric(functionname);
 		//+= int or dbl from source
 		var_dbl += (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
 		var_typ = VARTYP_DBL;  // reset to one unique type
@@ -519,7 +540,7 @@ tryagain:
 
 	// int target
 	else if (var_typ & VARTYP_INT) {
-		ISNUMERIC(rhs)
+		rhs.assertNumeric(functionname);
 		// int source
 		if (rhs.var_typ & VARTYP_INT) {
 			var_int += rhs.var_int;
@@ -543,20 +564,21 @@ tryagain:
 	if (isnum())
 		goto tryagain;
 
-	THISISNUMERIC()
+	assertNumeric(functionname);
 	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 //-=var
 VARREF var::operator-=(CVR rhs) & {
+
 	THISIS("VARREF var::operator-=(CVR rhs) &")
-	THISISDEFINED()
+	assertDefined(functionname);
 
 tryagain:
 
 	// int target
 	if (var_typ & VARTYP_INT) {
-		ISNUMERIC(rhs)
+		rhs.assertNumeric(functionname);
 		// int source
 		if (rhs.var_typ & VARTYP_INT) {
 			var_int -= rhs.var_int;
@@ -571,7 +593,7 @@ tryagain:
 
 	// dbl target
 	else if (var_typ & VARTYP_DBL) {
-		ISNUMERIC(rhs)
+		rhs.assertNumeric(functionname);
 		//-= int or dbl from source
 		var_dbl -= (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
 		var_typ = VARTYP_DBL;  // reset to one unique type
@@ -589,7 +611,7 @@ tryagain:
 	if (isnum())
 		goto tryagain;
 
-	THISISNUMERIC()
+	assertNumeric(functionname);
 	throw MVNonNumeric(substr(1, 128) ^ "-= ");
 }
 
@@ -642,9 +664,10 @@ inline bool almost_equal(double x, double y, int) {
 // almost identical code in MVeq and MVlt except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
 PUBLIC bool MVeq(CVR lhs, CVR rhs) {
+
 	THISIS("bool MVeq(CVR lhs,CVR rhs)")
-	ISDEFINED(lhs)
-	ISDEFINED(rhs)
+	lhs.assertDefined(functionname);
+	rhs.assertDefined(functionname);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -671,7 +694,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
 					// throw MVUnassigned("eq(rhs)");
-					ISASSIGNED(rhs)
+					rhs.assertAssigned(functionname);
 				}
 				// different from MVlt
 				return false;
@@ -683,7 +706,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
 				// throw MVUnassigned("eq(lhs)");
-				ISASSIGNED(lhs)
+				lhs.assertAssigned(functionname);
 			}
 			// SAME as MVlt
 			return false;
@@ -759,9 +782,10 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 // almost identical between MVeq and MVlt except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
 PUBLIC bool MVlt(CVR lhs, CVR rhs) {
+
 	THISIS("bool MVlt(CVR lhs,CVR rhs)")
-	ISDEFINED(lhs)
-	ISDEFINED(rhs)
+	lhs.assertDefined(functionname);
+	rhs.assertDefined(functionname);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -788,7 +812,7 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
 					// throw MVUnassigned("eq(rhs)");
-					ISASSIGNED(rhs)
+					rhs.assertAssigned(functionname);
 				}
 				// different from MVeq
 				return true;
@@ -800,7 +824,7 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
 				// throw MVUnassigned("eq(lhs)");
-				ISASSIGNED(lhs)
+				lhs.assertAssigned(functionname);
 			}
 			// SAME as MVeq
 			return false;
@@ -845,8 +869,9 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 // similar to MVeq and MVlt - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
 PUBLIC bool MVlt(CVR lhs, const int int2) {
+
 	THISIS("bool MVlt(CVR lhs,const int int2)")
-	ISDEFINED(lhs)
+	lhs.assertDefined(functionname);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -879,7 +904,7 @@ PUBLIC bool MVlt(CVR lhs, const int int2) {
 	// 3. either or both non-numerical strings
 	if (!(lhs.var_typ & VARTYP_STR)) {
 		// lhs.createString();
-		ISSTRING(lhs)
+		lhs.assertString(functionname);
 	}
 	// different from MVeq
 	return lhs.var_str < std::to_string(int2);
@@ -888,8 +913,9 @@ PUBLIC bool MVlt(CVR lhs, const int int2) {
 // similar to MVeq and MVlt - this is the int<var version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
 PUBLIC bool MVlt(const int int1, CVR rhs) {
+
 	THISIS("bool MVlt(const int int1,CVR rhs)")
-	ISDEFINED(rhs)
+	rhs.assertDefined(functionname);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -919,7 +945,7 @@ PUBLIC bool MVlt(const int int1, CVR rhs) {
 	// 3. either or both non-numerical strings
 	if (!(rhs.var_typ & VARTYP_STR)) {
 		// lhs.createString();
-		ISSTRING(rhs)
+		rhs.assertString(functionname);
 	}
 	// different from MVeq
 	return std::to_string(int1) < rhs.var_str;
@@ -929,8 +955,9 @@ PUBLIC bool MVlt(const int int1, CVR rhs) {
 //+var
 //PUBLIC var operator+(CVR var1)
 var MVplus(CVR var1) {
+
 	THISIS("var operator+(CVR var1)")
-	ISDEFINED(var1)
+	var1.assertDefined(functionname);
 
 	do {
 		// dbl
@@ -943,7 +970,7 @@ var MVplus(CVR var1) {
 
 		// unassigned
 		if (!var1.var_typ) {
-			ISASSIGNED(var1)
+			var1.assertAssigned(functionname);
 			throw MVUnassigned("+()");
 		}
 	}
@@ -951,7 +978,7 @@ var MVplus(CVR var1) {
 	while (var1.isnum());
 
 	// non-numeric
-	ISNUMERIC(var1)
+	var1.assertNumeric(functionname);
 	// will never get here
 	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
 }
@@ -959,8 +986,9 @@ var MVplus(CVR var1) {
 //-var (identical to +var above except for two additional - signs)
 //PUBLIC var operator-(CVR var1)
 var MVminus(CVR var1) {
+
 	THISIS("var operator-(CVR var1)")
-	ISDEFINED(var1)
+	var1.assertDefined(functionname);
 
 	do {
 		// dbl
@@ -973,7 +1001,7 @@ var MVminus(CVR var1) {
 
 		// unassigned
 		if (!var1.var_typ) {
-			ISASSIGNED(var1)
+			var1.assertAssigned(functionname);
 			throw MVUnassigned("+()");
 		}
 	}
@@ -981,7 +1009,7 @@ var MVminus(CVR var1) {
 	while (var1.isnum());
 
 	// non-numeric
-	ISNUMERIC(var1)
+	var1.assertNumeric(functionname);
 	// will never get here
 	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
 }
@@ -989,8 +1017,9 @@ var MVminus(CVR var1) {
 //! var
 //PUBLIC bool operator!(CVR var1)
 bool MVnot(CVR var1) {
+
 	THISIS("bool operator!(CVR var1)")
-	ISASSIGNED(var1)
+	var1.assertAssigned(functionname);
 
 	// might need converting to work on void pointer
 	// if bool replaced with void* (or made explicit instead of implict)
@@ -1000,9 +1029,10 @@ bool MVnot(CVR var1) {
 }
 
 var MVadd(CVR lhs, CVR rhs) {
+
 	THISIS("var operator+(CVR lhs,CVR rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
+	lhs.assertNumeric(functionname);
+	rhs.assertNumeric(functionname);
 
 	//identical code in MVadd and MVsub except for +/-
 	//identical code in MVadd, MVsub, MVmul except for +,-,*
@@ -1015,9 +1045,10 @@ var MVadd(CVR lhs, CVR rhs) {
 }
 
 var MVsub(CVR lhs, CVR rhs) {
+
 	THISIS("var operator-(CVR lhs,CVR rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
+	lhs.assertNumeric(functionname);
+	rhs.assertNumeric(functionname);
 
 	//identical code in MVadd, MVsub, MVmul except for +,-,*
 	if (lhs.var_typ & VARTYP_DBL)
@@ -1029,9 +1060,10 @@ var MVsub(CVR lhs, CVR rhs) {
 }
 
 var MVmul(CVR lhs, CVR rhs) {
+
 	THISIS("var operator*(CVR lhs,CVR rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
+	lhs.assertNumeric(functionname);
+	rhs.assertNumeric(functionname);
 
 	//identical code in MVadd, MVsub, MVmul except for +,-,*
 	if (lhs.var_typ & VARTYP_DBL)
@@ -1043,9 +1075,10 @@ var MVmul(CVR lhs, CVR rhs) {
 }
 
 var MVdiv(CVR lhs, CVR rhs) {
+
 	THISIS("var operator/(CVR lhs,CVR rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
+	lhs.assertNumeric(functionname);
+	rhs.assertNumeric(functionname);
 
 	// always returns a double because 10/3 must be 3.3333333
 
@@ -1108,9 +1141,10 @@ double exodusmodulus(const double top, const double bottom) {
 }
 
 var MVmod(CVR lhs, CVR rhs) {
+
 	THISIS("var operator%(CVR lhs,CVR rhs)")
-	ISNUMERIC(lhs)
-	ISNUMERIC(rhs)
+	lhs.assertNumeric(functionname);
+	rhs.assertNumeric(functionname);
 
 	//returns an integer var IIF both arguments are integer vars
 	//otherwise returns a double var
@@ -1152,39 +1186,44 @@ var MVmod(CVR lhs, CVR rhs) {
 // slightly wrong precedence but at least we have a reliable concat operator to replace the + which
 // is now reserved for forced ADDITION both according to fundamental PickOS principle
 var MVcat(CVR lhs, CVR rhs) {
+
 	THISIS("var operator^(CVR lhs,CVR rhs)")
-	ISSTRING(lhs)
-	ISSTRING(rhs)
+	lhs.assertString(functionname);
+	rhs.assertString(functionname);
 
 	return lhs.var_str + rhs.var_str;
 }
 
 var MVcat(CVR lhs, const char* cstr) {
+
 	THISIS("var operator^(CVR lhs,const char* cstr)")
-	ISSTRING(lhs)
+	lhs.assertString(functionname);
 
 	return lhs.var_str + cstr;
 }
 
 var MVcat(const char* cstr, CVR rhs) {
+
 	THISIS("var operator^(const char* cstr, CVR rhs)")
-	ISSTRING(rhs)
+	rhs.assertString(functionname);
 
 	return cstr + rhs.var_str;
 }
 
 var MVcat(CVR lhs, const char char2) {
+
 	THISIS("var operator^(CVR lhs,const char char2)")
-	ISSTRING(lhs)
+	lhs.assertString(functionname);
 
 	return lhs.var_str + char2;
 }
 /*
 
 VARREF var::operator^(CVR vstr) {
+
 	THISIS("VARREF var::operator^(CVR vstr)")
-	THISISSTRING()
-	ISSTRING(vstr)
+	assertString(functionname);
+	vstr.assertString(functionname);
 
 	var_str += vstr.var_str;
 
@@ -1193,8 +1232,9 @@ VARREF var::operator^(CVR vstr) {
 
 VARREF var::operator^(const char* cstr) {
 	std::clog <<("var operator^(const char& cstr)") << std::endl;
+
 	THISIS("VARREF var::operator^(const char& cstr)")
-	THISISSTRING()
+	assertString(functionname);
 
 	var_str += cstr;
 
@@ -1202,9 +1242,10 @@ VARREF var::operator^(const char* cstr) {
 }
 
 VARREF var::operator^(const std::string& stdstr) {
+
 	THISIS("VARREF var::operator^(const std::string& stdstr)");
-	THISISSTRING()
-	ISSTRING(stdstr)
+	assertString(functionname);
+	stdstr.assertString(functionname);
 
 	var_str += stdstr.var_str;
 
@@ -1218,8 +1259,9 @@ VARREF var::operator^(const std::string& stdstr) {
 //TODO provide a version that works on temporaries?
 //PUBLIC
 std::ostream& operator<<(std::ostream& ostream1, var var1) {
+
 	THISIS("std::ostream& operator<<(std::ostream& ostream1, var var1)")
-	ISSTRING(var1)
+	var1.assertString(functionname);
 
 	//replace various unprintable field marks with unusual ASCII characters
 	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
@@ -1238,8 +1280,9 @@ std::ostream& operator<<(std::ostream& ostream1, var var1) {
 }
 
 std::istream& operator>>(std::istream& istream1, VARREF var1) {
+
 	THISIS("std::istream& operator>>(std::istream& istream1,VARREF var1)")
-	ISDEFINED(var1)
+	var1.assertDefined(functionname);
 
 	std::string tempstr;
 	istream1 >> std::noskipws >> tempstr;

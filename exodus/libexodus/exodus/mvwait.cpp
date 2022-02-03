@@ -5,7 +5,6 @@
 
 #include <exodus/cargs.h>
 #include <exodus/mv.h>
-#include <exodus/mvexceptions.h>
 
 //similar code in haskey.cpp and mvwait.cpp
 
@@ -300,10 +299,11 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
 }
 
 var var::oswait(const int milliseconds, CVR directory) const {
+
 	THISIS("void var::oswait(const int milliseconds, const var directory) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-	//THISISDEFINED() // not needed if *this not used
-	ISSTRING(directory)
+	//assertDefined(functionname); // not needed if *this not used
+	directory.assertString(functionname);
 
 	Cargs cargs(FM ^ directory);
 
