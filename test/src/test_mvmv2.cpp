@@ -455,12 +455,15 @@ function main() {
 	//check trailing zeros are eliminated
 	assert(test_sum("1.2345|2|3|4|5|6|-.2345")	== "21");
 
+	//check trailing zeros are not eliminated
+	assert(test_sum("100|200")	== "300");
+
 	//test strange combinations
-	assert(test_sum("^-1]1")== "^0");
-	assert(test_sum("]^-1]1")== "0^0");
-	assert(test_sum("]7^-1]1")== "7^0");
-	assert(test_sum("]7.10^-1]1")== "7.1^0");
-	assert(test_sum("]7.00^-1]1")== "7^0");
+	assert(test_sum("^-1]1").outputl()== "^0");
+	assert(test_sum("]^-1]1").outputl()== "0^0");
+	assert(test_sum("]7^-1]1").outputl()== "7^0");
+	assert(test_sum("]7.10^-1]1").outputl()== "7.1^0");
+	assert(test_sum("]7.00^-1]1").outputl()== "7^0");
 
 	/////////////////////////
 	//.mv() +++ --- *** /// :

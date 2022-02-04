@@ -2051,24 +2051,26 @@ var var::sum() const {
 			accum.assertString(functionname);
 			if (not accum.var_str.empty()) {
 
-				//fix decimal places
+				// Fix decimal places
 				accum = accum.round(maxndecimals);
 
-				//verify that round returns a string var
+				// Check round returned a string
+				accum.assertString(functionname);
 
-				//remove trailing zeros
-				while (accum.var_str.back() == '0')
-					accum.var_str.pop_back();
+				// Remove trailing zeros if floating point is present
+                if (accum.var_str.find('.') != std::string::npos) {
 
-				//remove trailing .
-				if (accum.var_str.back() == '.')
-					accum.var_str.pop_back();
+                    //remove trailing zeros
+                    while (accum.var_str.back() == '0')
+                        accum.var_str.pop_back();
 
-				//reinstate a single zero
-				if (accum.var_str.empty())
-					accum.var_str = '0';
+                    //reinstate trailing zero after decimal point
+                    if (accum.var_str.back() == '.')
+                        accum.var_str.pop_back();
+                }
 
-				outstr ^= accum;
+				outstr.var_str.append(accum.var_str);
+
 			}
 
 			if (nextsep) {
