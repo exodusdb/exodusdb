@@ -115,10 +115,10 @@ THE SOFTWARE.
 // Used in var::remove()
 #define LASTDELIMITERCHARNOPLUS1 0x20
 
-//#define VISIBLE_FMS "_]\[Z"  //PickOS standard
+//#define VISIBLE_FMS "_]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
-//#define VISIBLE_FMS "_^]}`~"   //all uncommon in data. first 3 (_ ^ ]) are identical to pickos
-#define VISIBLE_FMS "_^]}|~"  //all uncommon in data. _ ^ ] are identical to pickos
+//#define VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
+#define VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
 
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
@@ -325,8 +325,8 @@ class PUBLIC var final {
 	//var();
 	// defined in class for inline/optimisation
 	// default constructor to allow definition unassigned "var mv";
-	var() = default;
-/*	var()
+	// var() = default;
+	var()
 		: var_typ(VARTYP_UNA) {
 		//std::cout << "ctor()" << std::endl;
 
@@ -350,7 +350,6 @@ class PUBLIC var final {
 		// moved up to initializer
 		// var_typ=VARTYP_UNA;
 	}
-*/
 
 	// copy constructor - cant default because we need to throw if rhs is unassigned
 	// copy constructor - not inline merely because of lack of THISIS etc in mv.h
@@ -367,7 +366,10 @@ class PUBLIC var final {
 		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 	}
 
-
+#define VAR_SAFE_DESTRUCTOR
+#ifndef VAR_SAFE_DESTRUCTOR
+	~var() = default;
+#else
 	// destructor - sets var_typ undefined
 	//WARNING: non-virtual destructor - so cannot create derived classes
 	//~var();
@@ -386,6 +388,7 @@ class PUBLIC var final {
 		// variables var_typ=(char)0xFFFFFFF0;
 		var_typ = VARTYP_MASK;
 	}
+#endif
 
 	////////////////////
 	// CONSTRUCTORS FROM
@@ -425,49 +428,38 @@ class PUBLIC var final {
 	}
 
 	// constructor for bool
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
 	INLINE var(const bool bool1) noexcept
 		: var_int(bool1),
 		  var_typ(VARTYP_INT) {}
 
 	// constructor for int
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
 	INLINE var(const int int1) noexcept
 		: var_int(int1),
 		  var_typ(VARTYP_INT) {}
 
 	// constructor for long long
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
 	INLINE var(const long long longlong1) noexcept
 		: var_int(longlong1),
 		  var_typ(VARTYP_INT) {}
 
 	// constructor for double
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail
 	INLINE var(const double double1) noexcept
 		: var_dbl(double1),
 		  var_typ(VARTYP_DBL) {}
 
 	// ctor for char
-	// defined in class for inline/optimisation
-	// use initializers since cannot fail (but could find how to init the char1)
 	INLINE var(const char char1) noexcept
 		: var_str(1, char1),
 		  var_typ(VARTYP_STR) {}
 
 	// ctor for memory block
-	// defined in class for inline/optimisation
-	// dont use initialisers and TODO protect against out of memory in expansion to string
 	INLINE var(const char* charstart, const size_t nchars)
 		: var_str(charstart, nchars),
 		  var_typ(VARTYP_STR) {}
 
 //#define ALL_IN_ONE_STRING_CONSTRUCTOR
 #ifdef ALL_IN_ONE_STRING_CONSTRUCTOR
+
 	//accepts l and r values
 	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S, std::string>>>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
@@ -476,17 +468,10 @@ class PUBLIC var final {
 
 #else
 
-	// from std::string
-	//
-	// swig java duplicates this with var(std::string&) above
-#if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
-
 	//in c++20 but not g++ v9.3
 	//constexpr var(const std::string& str1);
 
 	// constructor for const std::string
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail unless out of memory
 	INLINE var(const std::string& str1)
 		// this would validate all strings as being UTF8?
 		//: var_str(boost::locale::conv::utf_to_utf<char>(str1))
@@ -494,29 +479,23 @@ class PUBLIC var final {
 		  var_typ(VARTYP_STR) {}
 
 	// constructor for temporary std::string
-	// defined in class for inline/optimisation
-	// just use initializers since cannot fail unless out of memory
 	INLINE var(std::string&& str1) noexcept
 		: var_str(std::move(str1)),
 		  var_typ(VARTYP_STR) {}
 
 #endif
 
-#endif
-
-//#ifndef SWIGJAVA
-//	// constructor for char*
-//	// place first before char so SWIG isnt tempted to use char to acquire strings resulting in
-//	// ONE character strings)
-//	//	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-//	var(const char*);
-//#endif
-//
-//	// from char
-//#ifndef SWIG
-//	//    MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-//	var(const char) noexcept;
-//#endif
+	// Constructor for initializer_list<int, double, cstr etc.>
+	template <class T>
+	var(std::initializer_list<T> list)
+		: var_typ(VARTYP_STR) {
+		for (auto item : list) {
+			(*this) ^= item;
+			var_str.push_back(FM_);
+		}
+		if (!var_str.empty())
+			var_str.pop_back();
+	}
 
 /////////////
 // ASSIGNMENT
@@ -2077,13 +2056,23 @@ class PUBLIC dim {
 	// to provide exodus programmer greater/easier visibility into dimensiorned arrays when
 	// debugging (cannot use boost scoped pointer here because mv.h is required by exodus
 	// programmer who should not need boost)
-	var* data_;
-	bool initialised_;
+	var* data_ = nullptr;
+	bool initialised_ = false;
 
    public:
 	dim(int nrows, int ncols = 1);
 
 	bool redim(int nrows, int ncols = 1);
+
+    // Constructor from initializer_list for (int, double, cstr etc.)
+	template<class T>
+	dim(std::initializer_list<T> list) {
+		redim(list.size(), 1);
+		int itemno = 1;
+		for (auto item : list) {
+			this->data_[itemno++] = item;
+		}
+	}
 
 	ND var join(CVR sepchar = FM_) const;
 

@@ -62,7 +62,7 @@ dim::dim(int rows, int cols)
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
 	data_ = new var[rows * cols + 1];
-	//std::cout<< "created[] " << data_ << std::endl;
+	//var(rows * cols + 1).errputl("created dim[] ");
 }
 
 bool dim::read(CVR filehandle, CVR key) {

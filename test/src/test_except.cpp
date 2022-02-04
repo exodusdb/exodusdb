@@ -26,8 +26,7 @@ function main() {
 		try {++maxint             ;uncaught="MVIntUnderflow";}  catch (MVIntOverflow e){};
 		try {minint--             ;uncaught="MVIntUnderflow";}  catch (MVIntUnderflow e){};
 		try {maxint++             ;uncaught="MVIntUnderflow";}  catch (MVIntOverflow e){};
-#define SAFE_DESTRUCTOR
-#ifdef SAFE_DESTRUCTOR
+#ifdef VAR_SAFE_DESTRUCTOR
 		try {var v = v+1          ;uncaught="MVUndefined";}     catch (MVUndefined e){} catch (MVUnassigned e){};
 #endif
 		//unfortunately throw causes cmake test to fail so we skip them
@@ -41,7 +40,7 @@ function main() {
 		try {var().abort(99)      ;uncaught="MVAbort";}                catch (MVAbort e){printl("Caught MVAbort");};
 		//for some currently unknown reason this cannot be caught despite being almost identical to abort
 		//try {var().abortall()   ;uncaught="MVAbortAll";}             catch (MVAbortAll e){printl("Caught MVAbortAll");};
-		try {logoff()             ;uncaught="MVLogoff";}               catch (MVLogoff e){};
+		try {logoff()             ;uncaught="MVLogoff";}               catch (MVLogoff e){printl("Caught MVlogoff");};
 
 		if (uncaught) {
 			printl(uncaught);

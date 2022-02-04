@@ -75,12 +75,11 @@ function main()
 		print(error.description);
 	}
 
-#define SAFE_DESTRUCTOR
-#ifdef SAFE_DESTRUCTOR
+#ifdef VAR_SAFE_DESTRUCTOR
 	printl("\nVerify that exodus catches c++ defect at runtime");
 	try {
 		var abc=abc+1;
-		//should never get here because above should cause a runtime undefined error
+		printl("should never get here because above should cause a runtime undefined error");
 		assert(false);
 	}
 	catch (MVUndefined mve) {

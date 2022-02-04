@@ -1352,7 +1352,7 @@ MVArrayNotDimensioned ::MVArrayNotDimensioned()
 	: MVError("MVArrayNotDimensioned") {}
 
 var operator""_var(const char* cstr, std::size_t size) {
-	return var(cstr, size);
+	return var(cstr, size).convert(VISIBLE_FMS, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
 }
 
 var operator""_var(unsigned long long int i) {
