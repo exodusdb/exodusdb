@@ -2,7 +2,7 @@
 libraryinit()
 
 function main(out v1, out v2, out v3, out v4, out v5, out v6) {
-	v1=var().getcursor();
+	v1 = getcursor();
 	SENTENCE.transfer(v2);
 	RECORD.transfer(v3);
 	ID.transfer(v4);

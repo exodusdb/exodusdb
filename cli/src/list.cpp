@@ -1627,7 +1627,7 @@ nextrec:
 	if (not(silent) and not(printfilename.unassigned())) {
 		//put.cursor(cursor)
 		if (printfilename and TERMINAL) {
-			print(var().at(0), var().at(-4), recn, ". ", ID, " ", MV);
+			print(AT(-40), recn, ". ", ID, " ", MV);
 		}
 	}
 
@@ -2470,7 +2470,7 @@ subroutine addstr() {
 		str3 ^= (str1.length() - str2.length()).space();
 	}
 	for (ii = 1; ii <= str1.length(); ++ii) {
-		char1 = (str1[ii]).trim();
+		char1 = str1.at(ii).trim();
 		if (char1 ne "") {
 			char2 = str3[ii];
 			if (char2 eq " ") {

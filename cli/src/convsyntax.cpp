@@ -214,7 +214,7 @@ function hide_subsyntax(in line, io pos, in hidden_char) {
 	bool inquotes = false;
 	while (++pos <= line.len()) {
 
-		char c = line[pos].toChar();
+		char c = line.at(pos).toChar();
 
 		if (c == '(' and not inquotes)
 			depth++;

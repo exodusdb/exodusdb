@@ -290,7 +290,8 @@ var dim::join(CVR sepchar) const {
 
 	//when sepchar is one byte (usual case), use push_back for speed
 	if (sepchar.length() == 1) {
-		char sepbyte = *sepchar[1].data();
+		//char sepbyte = *sepchar[1].data();
+		char sepbyte = sepchar.var_str[0];
 
 		// append any additional elements
 		for (int ii = 2; ii <= nn; ++ii) {

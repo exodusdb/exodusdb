@@ -55,7 +55,7 @@ nextrec1:
 
 	recn += 1;
 	if (TERMINAL)
-		output(at(-40), recn, ". ", ID);
+		output(AT(-40), recn, ". ", ID);
 
 	reqdate = ID.field("*", 2);
 	if (reqdate lt mindate) {
@@ -148,7 +148,7 @@ nextrec2:
 
 	recn += 1;
 	if (TERMINAL)
-		output(at(-40), recn, ". ", ID);
+		output(AT(-40), recn, ". ", ID);
 
 	reqdate = ID.field("*", 2);
 

@@ -451,7 +451,7 @@ nextrec:
 	recn += 1;
 
 	if (TERMINAL)
-		output(at(-40), recn, ". ");
+		output(AT(-40), recn, ". ");
 
 	//get the record
 	if (not(RECORD.read(file, ID))) {

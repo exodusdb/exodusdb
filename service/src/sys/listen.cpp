@@ -589,7 +589,7 @@ nextsearch0:
 	//tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
-		output(at(-40), tt, " : ");
+		output(AT(-40), tt, " : ");
 	} else {
 		var(tt).oswrite("process." ^ processno);
 	}
@@ -1079,7 +1079,7 @@ subroutine requestinit() {
 	nrequests += 1;
 
 	if (VOLUMES) {
-		output(at(-40), var().time().oconv("MTS"), " ");
+		output(AT(-40), var().time().oconv("MTS"), " ");
 	} else {
 		//similar in listen and log2
 		print(processno, ": ");
@@ -1422,6 +1422,7 @@ cannotopenlinkfile2:
 
 	//validate username and password ('LOGIN' gets special treatment)
 	//and assume that identity if ok
+	//invaliduser will be "" if valid and a response message if not
 	call listen2("VALIDATE" ^ FM ^ request1, username, password, connection, invaliduser, dataset);
 
 	SYSTEM(2) = linkfilename2;

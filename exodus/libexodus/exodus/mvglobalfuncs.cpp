@@ -282,32 +282,6 @@ PUBLIC void debug() {
 	var().debug();
 }
 
-PUBLIC var at(const int columnorcode) {
-	return var().at(columnorcode);
-}
-
-PUBLIC var at(CVR column, CVR row) {
-	return var().at(column, row);
-}
-
-PUBLIC var getcursor() {
-	var cursor;
-	cursor.getcursor();
-	return cursor;
-}
-
-PUBLIC void setcursor(CVR cursor) {
-	cursor.setcursor();
-}
-
-PUBLIC var getprompt() {
-	return var().getprompt();
-}
-
-PUBLIC void setprompt(CVR prompt) {
-	prompt.setprompt();
-}
-
 PUBLIC bool echo(const int on_off) {
 	return var().echo(on_off);
 }

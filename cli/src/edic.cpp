@@ -182,7 +182,7 @@ function main() {
 		if (not index(field2(filename, OSSLASH, -1), "."))
 			filename ^= ".cpp";
 
-		var iscompilable = filename.field2(".", -1)[1].lcase() ne "h";
+		var iscompilable = filename.field2(".", -1).at(1).lcase() ne "h";
 
 		//search paths and convert to absolute filename
 		//similar code in edic.cpp and compile.cpp
@@ -304,7 +304,7 @@ function main() {
 			}
 
 			//ensure ends in eol
-			if (blankfile[1] ne "\n")
+			if (blankfile.at(1) ne "\n")
 				blankfile ^= "\n";
 
 			//convert to DOS format on Windows

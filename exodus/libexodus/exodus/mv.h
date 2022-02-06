@@ -181,10 +181,10 @@ although convention recommends making the temporary inside the function).
 // char:        4
 // var:        56
 
-class var_brackets_proxy;
 class var_proxy1;
 class var_proxy2;
 class var_proxy3;
+//class var_brackets_proxy;
 
 class VARTYP {
 
@@ -643,15 +643,19 @@ class PUBLIC var final {
 	// standard c/c++ int() in other words simply take the number to the left of the point. -1.5
 	// becomes -1 and 1.5 becomes 1
 	int toInt() const;
+
 	long long toLong() const;
 
 	double toDouble() const;
 
 	std::u32string to_u32string() const;
+
 	void from_u32string(std::u32string) const;
 
 	std::string toString() &&;               //for temporary vars
-	const std::string& toString() const&;  //for non-temporaries
+
+	//Be careful not to retain the reference beyond the scope of the var
+	const std::string& toString() const&;  //for non-temporaries.
 
 	// weird version for perl that outputs "" if undefined
 	std::string toString2() const;
@@ -775,7 +779,7 @@ class PUBLIC var final {
 	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0);
 
 	//the following produces a temporary on the rhs
-//#define VAR_FUNCTOR_EXTRACTS
+//#define VAR_FUNCTOR_ONLY_EXTRACTS
 //#ifdef VAR_FUNCTOR_ONLY_EXTRACTS
 	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const;
 //#else
@@ -795,14 +799,17 @@ class PUBLIC var final {
 	// BRACKETS []
 	//////////////
 
-	// extract a character first=1 last=-1 etc
+	// Extract a character from a constant var
+	// first=1 last=-1 etc.
 	ND var operator[](const int charno) const;
 
-	/* sadly this all works EXCEPT that var[99].anymethod doesnt work
-	so would have to implement all var methods on the proxy object
-	ND var_brackets_proxy operator[](int charno) const&;
-	ND var operator[](int charno) &&;
-	*/
+	// Synonym. Named member function.
+	ND var at(const int charno) const;
+
+	// sadly this all works EXCEPT that var[99].anymethod doesnt work
+	// so would have to implement all var methods and free functions on the proxy object
+	//ND var_brackets_proxy operator[](int charno);
+	//ND var operator[](int charno) &&;
 
 	////////////////////////
 	// SELF ASSIGN OPERATORS
@@ -1177,16 +1184,6 @@ class PUBLIC var final {
 	CVR errputl(CVR var1) const;
 
 	CVR put(std::ostream& ostream1) const;
-
-	// CURSOR
-	/////////
-
-	ND var at(const int columnorcode) const;
-	ND var at(const int column, const int row) const;
-	bool getcursor();
-	void setcursor() const;
-	ND var getprompt() const;
-	void setprompt() const;
 
 	// STANDARD INPUT
 	/////////////////
@@ -1856,6 +1853,7 @@ class PUBLIC var final {
 
 	friend class dim;
 	friend class var_iter;
+	//friend class var_brackets_proxy;
 
 	//BEGIN - free function to create an iterator -> begin
 	PUBLIC friend var_iter begin(CVR v);
@@ -2023,19 +2021,6 @@ class PUBLIC var_proxy3 {
 }; // class var_proxy3
 
 class dim_iter;
-
-//class var_brackets_proxy
-class PUBLIC var_brackets_proxy {
-   public:
-	std::string& str1;
-	mutable int charindex1;
-
-	//implicit conversion to var
-	operator var() const;
-
-	//operator assign a char
-	void operator=(char char1);
-};
 
 //class dim
 class PUBLIC dim {

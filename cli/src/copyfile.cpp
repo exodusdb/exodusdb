@@ -217,7 +217,7 @@ function main() {
 
 			//user interrupt
 			if (not mod(recn,1000)) {
-				//print(at(-40), sourcefilename, recn ^ ".", ID);
+				//print(AT(-40), sourcefilename, recn ^ ".", ID);
 				if (esctoexit())
 					abort("");
 			}
@@ -271,7 +271,7 @@ function main() {
 			}
 		}
 
-		print(at(-40));
+		print(AT(-40));
 		//if (nsame or nchanged or nnew) {
 		if (nchanged or nnew) {
 			printl("Same:",nsame,"Changed:",nchanged, "New:",nnew);
@@ -300,7 +300,7 @@ function getrec() {
 
 		if (result) {
 			recn++;
-			print(at(-40) ^ recn ^ ".", ID);
+			print(AT(-40) ^ recn ^ ".", ID);
 		}
 
 		return result;
@@ -387,7 +387,7 @@ function getrec() {
 	gosub unescape_sql(RECORD);
 	//TRACE(ID)
 
-	print(at(-40) ^ recn ^ ".", ID);
+	print(AT(-40) ^ recn ^ ".", ID);
 
 	return true;
 }

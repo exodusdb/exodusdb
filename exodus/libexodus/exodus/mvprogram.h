@@ -150,8 +150,15 @@ class PUBLIC ExodusProgramBase {
 	ND var encrypt2(CVR encrypt0) const;
 	ND var xmlquote(CVR str) const;
 	ND bool loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg);
+
 	ND var AT(const int code) const;
 	ND var AT(const int x, const int y) const;
+
+	ND var getcursor();
+	void setcursor(CVR cursor) const;
+
+	ND var getprompt() const;
+	void setprompt(CVR prompt) const;
 
 	ND var handlefilename(CVR handle);
 	//ND var memspace(CVR requiredmemspace);

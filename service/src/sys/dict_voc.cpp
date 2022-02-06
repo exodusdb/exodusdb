@@ -116,7 +116,7 @@ function main() {
 	call conv2utf8(msg, RECUR0, "");
 	RECUR1 += 1;
 	if (TERMINAL)
-		output(at(-40), RECUR1, ". ", RECCOUNT);
+		output(AT(-40), RECUR1, ". ", RECCOUNT);
 	ANS = msg;
 	if (not ANS) {
 		ANS = RECORD ne origrecord or ID ne origid;

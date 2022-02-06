@@ -149,9 +149,9 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							}
 
 							var cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
-							//printl(at(0), at(-4), var().time().oconv("MTS"), " ", tt);
+							//printl(AT(-40), var().time().oconv("MTS"), " ", tt);
 							if (TERMINAL)
-								print(at(-40));
+								print(AT(-40));
 							printl(var().time().oconv("MTS"), " ", cmd);
 
 							cmd.osshell();
@@ -738,7 +738,7 @@ nextlock:
 		if (tracing) {
 			printl();
 		} else {
-			print(at(0, 1));
+			print(AT(0, 1));
 		}
 		var nn = select2data.count(FM);
 		var maxlines = 20;

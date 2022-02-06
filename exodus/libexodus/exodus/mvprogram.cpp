@@ -1698,7 +1698,7 @@ bool ExodusProgramBase::esctoexit() const {
 	//key.outputl("key=");
 	//key.oconv("HEX").outputl("key=");
 
-	return key[-1].ucase() == "N";
+	return key.at(-1).ucase() == "N";
 }
 
 // otherusers
@@ -2034,16 +2034,63 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 	 */
 }
 
-// AT 1
-var ExodusProgramBase::AT(const int code) const {
-	// should depend on terminal type
-	return var().at(code);
+// WARNING/ pickos column and row numbering is 0 based but
+// in exodus we move to 1 based numbering to be consistent with
+// c/c++/linux/terminal standards. hopefully not too inconvenient
+
+var ExodusProgramBase::AT(const int columnno, const int rowno) const {
+	// THISIS("var var::at(const int columnno,const int rowno) const")
+
+	std::string tempstr = "\x1B[";
+	tempstr += std::to_string(rowno);
+	tempstr.push_back(';');
+	tempstr += std::to_string(columnno);
+	tempstr.push_back('H');
+	return tempstr;
 }
 
-// AT 2
-var ExodusProgramBase::AT(const int x, const int y) const {
-	// should depend on terminal type
-	return var().at(x, y);
+var ExodusProgramBase::AT(const int columnno) const {
+	// THISIS("var var::at(const int columnno) const")
+
+	// hard coded for xterm at the moment
+	// http://www.xfree86.org/current/ctlseqs.html
+
+	// move to columnno 0
+	if (columnno == 0)
+		// return "\x1b[G";
+		return "\r";  // works on more terminals
+
+	//return "";
+
+	// move to columnno
+	if (columnno > 0) {
+		std::string tempstr = "\x1B[";
+		tempstr += std::to_string(columnno);
+		tempstr.push_back('G');
+		return tempstr;
+	}
+	// clear the screen and home the cursor
+	if (columnno == -1)
+		return "\x1B[2J\x1B[H";
+	// return "\x0c";//works on more terminals
+
+	// move the cursor to top left home
+	if (columnno == -2)
+		return "\x1B[H";
+
+	// clear from cursor to end of screen
+	if (columnno == -3)
+		return "\x1B[J";
+
+	// clear from cursor to end of line
+	if (columnno == -4)
+		return "\x1B[0K";
+
+	// clear line and move cursor to columnno 0
+	if (columnno == -40)
+		return "\r\x1B[K";
+
+	return "";
 }
 
 // handlefilename
@@ -2408,7 +2455,8 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 			ndecs = output.field(".", 2).length();
 		}
 		if (ndecs eq "BASE") {
-			fmtx = "MD" ^ BASEFMT[3] ^ "0P";
+			//fmtx = "MD" ^ BASEFMT[3] ^ "0P";
+			fmtx = "MD" ^ BASEFMT.at(3) ^ "0P";
 		} else {
 			fmtx = "MD" ^ ndecs ^ "0P";
 		}

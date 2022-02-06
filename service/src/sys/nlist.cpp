@@ -1641,7 +1641,7 @@ nextrec:
 			//first recn will be 2
 			//similar in recinit and x2exit
 			if (TERMINAL) {
-				output(at(-40), recn, ". ", ID, " ", MV);
+				output(AT(-40), recn, ". ", ID, " ", MV);
 				osflush();
 			}
 		}
@@ -1884,7 +1884,7 @@ x2exit:
 
 	//similar in recinit and x2exit
 	if (TERMINAL) {
-		output(at(-40), recn, ". ");
+		output(AT(-40), recn, ". ");
 		osflush();
 	}
 

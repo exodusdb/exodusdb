@@ -59,18 +59,18 @@ function main()
 	{
 	    //stop("Test passed");
 
-	    print(at(-1));
+	    print(AT(-1));
 	    var cursor=getcursor();
 	    //no cursor if no terminal
 	    assert(cursor eq "\x1b[1;1H" or cursor eq "");
 
 	    //should show 1;1 in top left
 	    for (const var ii : range(0, 12)) {
-	        print(at(ii,ii));
+	        print(AT(ii,ii));
 	        print(getcursor().substr(2));
 	    }
 
-	    print(at(7,24));
+	    print(AT(7,24));
 	    cursor=getcursor();
 	    assert(cursor eq "\x1b[24;7H" or cursor eq "");
 

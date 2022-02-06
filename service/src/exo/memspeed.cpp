@@ -27,7 +27,7 @@ function main() {
 		gosub getspeed();
 		ntries += 1;
 		//if ntries>2 and secs then
-		print(ntries, at(-4), at(0));
+		print(ntries, AT(-40));
 		if (secs) {
 
 			print(ntries, " ");

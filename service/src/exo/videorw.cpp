@@ -15,7 +15,6 @@ function main(in x, in y, in x2, in y2, in readwrite, io buffer) {
 	if (readwrite=="R") {
 		buffer="";
 	} else if (readwrite=="W") {
-		//print(at(x,y),buffer);
 	}
 
 	return 0;

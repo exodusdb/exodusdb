@@ -1639,23 +1639,16 @@ VARREF var::substrer(const int startindex1, const int length) {
 	return *this;
 }
 
-/*
-var_brackets_proxy var::operator[](int charno) const&
-{
-        std::cout << "lvalue" <<std::endl;
-        return var_brackets_proxy{var_str,charno};
+var var::operator[](int charno) const {
+	return this->at(charno);
 }
 
-//[x]
-var var::operator[](int charno) &&
-{
-*/
-
 // var.c(charno) character
-var var::operator[](const int charno) const {
+//var var::operator[](const int charno) const {
+var var::at(const int charno) const {
 	//std::cout << "rvalue" <<std::endl;
 
-	THISIS("var var::operator[](const int charno) const")
+	THISIS("var var::at(const int charno) const")
 	assertString(functionname);
 
 	int nchars = int(var_str.size());

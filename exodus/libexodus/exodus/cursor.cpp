@@ -4,20 +4,13 @@
 #include <unistd.h>
 
 #include <exodus/mv.h>
+#include <mvprogram.h>
 
 namespace exodus {
 
-bool var::getcursor() {
+var ExodusProgramBase::getcursor() {
 
-
-	THISIS("bool var::getcursor() const")
-	assertDefined(functionname);
-
-	// returns empty string if fails
-	var_str.clear();
-	var_typ = VARTYP_STR;
-
-	return false;
+	return "";
 
 	//false if stdin is not a terminal
 	if (!isatty(fileno(stdin))) {
@@ -27,7 +20,7 @@ bool var::getcursor() {
 	std::clog << "is a tty" << std::endl;
 
 	//force out any previous cursor control characters
-	this->osflush();
+	var().osflush();
 
 	// Output
 	/////////
@@ -95,25 +88,27 @@ bool var::getcursor() {
 	var y = response.field(";", 1).substr(3);
 	var x = response.field(";", 2).field("R");
 
-	x.outputl("x=");
-	y.outputl("y=");
+	//x.outputl("x=");
+	//y.outputl("y=");
 	//x.oconv("HEX").outputl("x=");
 	//y.oconv("HEX").outputl("y=");
 
-	var_str = this->at(x, y).var_str;
+	return AT(x, y);
 
-	std::cout << var_str << std::endl;
-
-	return true;
 }
 
-void var::setcursor() const {
+void ExodusProgramBase::setcursor(CVR cursor) const {
+	std::cout << cursor << std::flush;
+	return;
+}
 
-	THISIS("void var::setcursor() const")
-	assertString(functionname);
+var ExodusProgramBase::getprompt() const {
+	std::cout << "ExodusProgramBase::getprompt() not implemented yet " << std::endl;
+	return "";
+}
 
-	std::cout << (*this) << std::flush;
-
+void ExodusProgramBase::setprompt(CVR /*prompt*/) const {
+	std::cout << "ExodusProgramBase::setprompt() not implemented yet " << std::endl;
 	return;
 }
 

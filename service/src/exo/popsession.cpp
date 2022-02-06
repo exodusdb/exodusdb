@@ -11,7 +11,7 @@ function main(io v1, io v2, io v3, io v4, io v5, io v6) {
         MV.transfer(v6);
         //v6 ^= RM ^ INSERT ^ RM ^ CURATR();
 */
-	v1.setcursor();
+	setcursor(v1);
 	v1 = "";
 	v2.transfer(SENTENCE);
 	v3.transfer(RECORD);

@@ -90,19 +90,20 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 	var isdevsys = var("exodus.id").osfile();
 
+	// will return "" in request5 if valid or an error response message
 	if (request1.a(1) eq "VALIDATE") {
 
 		var username = request2;
 		var password = request3;
 		var connection = request4;
 		var dataset = request6;
-		var word2 = request1.a(2);
+		var origrequest1 = request1.a(2);
 
 		//1. ANYBODY can request password reset with their email address
 		//2. email addresses are not secret and usernames are guessable
 		//3. magic character in password on logins causes password reset if email
 		//as the password. Therefore NO @ characters in passwords
-		var passwordreset = word2 eq "LOGIN" and password.index("@");
+		var passwordreset = origrequest1 eq "LOGIN" and password.index("@");
 
 		//determine username from emailaddress
 		//only for users with single, unique emails
@@ -341,7 +342,7 @@ passfail:
 				//check allowed access to this database - or exit
 				//only checking during LOGIN. TODO is this ok?
 				//no longer has to be done after setting @username
-				if (word2 eq "LOGIN") {
+				if (origrequest1 eq "LOGIN") {
 					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.a(17).quote()), msg_, "", username))) {
 						invalidlogin = USER4;
 						goto validateexit;
@@ -479,7 +480,7 @@ passwordexpired:
 
 				//check not concurrent use of same username - or exit
 				//allowing relock for now on duplicate logins TODO block them
-				if (word2 ne "LOGIN" and word2 ne "RELOCK") {
+				if (origrequest1 ne "LOGIN" and origrequest1 ne "RELOCK") {
 					//if connection ne user<39> then
 					//ONLY CHECKING IP NUMBER FOR NOW
 					//if we check session number then it causes problem for multiple
@@ -534,7 +535,7 @@ passwordexpired:
 				}
 
 				//send email to user and IT on first or novel ipno logins (not EXODUS)
-				if (word2 eq "LOGIN") {
+				if (origrequest1 eq "LOGIN") {
 					if (username ne "EXODUS" or isdevsys) {
 
 						var ulogins = userx.a(18);
@@ -664,6 +665,11 @@ validateexit2:
 				text ^= "\r\n" " Database: " ^ SYSTEM.a(17);
 			} else {
 				text = invalidlogin;
+
+				// Early exit if relocking since we dont want lots of errors and emails
+				if (origrequest1 == "RELOCK") {
+					return 0;
+				}
 
 				if (failn gt maxnfails) {
 					var tt = failn + 1;
@@ -899,7 +905,7 @@ validateexit2:
 				//by not doing 'MD50P'
 				//statistic<1>=(date()+time()/86400) 'MD50P'
 				statistic(1) = (var().date() + var().time() / 86400).substr(1, 12);
-				if (word2 ne "RELOCK") {
+				if (origrequest1 ne "RELOCK") {
 					statistic(2) = statistic.a(2) + 1;
 				}
 				//enable fast stats without cross database user access
