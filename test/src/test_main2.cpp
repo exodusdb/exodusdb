@@ -56,6 +56,10 @@ function main()
 	        assert(count ne 4 or field eq "bb");
 	        assert(count ne 5 or field eq "");
 	    }
+	    var empty = "";
+	    for (var field : empty) {
+			assert(false && var("Should never get here for empty range string"));
+	    }
 	}
 
 	var xyz;

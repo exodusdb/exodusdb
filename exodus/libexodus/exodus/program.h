@@ -40,9 +40,9 @@
 		int result = 0;                                                                                         \
 		PROGRAMNAME##ExodusProgram exodusprogram1(mv);                                                          \
 		if (osgetenv("EXO_DEBUG")) {                                                                            \
-			errputl("INIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);                                  \
+			errputl("Debug Init Thread:", PROCESSNO, #PROGRAMNAME, SENTENCE);                                   \
 			result = exodusprogram1.main().toInt();                                                             \
-			errputl("EXIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);                                  \
+			errputl("Debug Exit Thread:", PROCESSNO, #PROGRAMNAME, SENTENCE);                                   \
 		} else {                                                                                                \
 			try {                                                                                               \
 				result = exodusprogram1.main().toInt();                                                         \

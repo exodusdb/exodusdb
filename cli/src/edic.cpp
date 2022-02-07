@@ -182,7 +182,9 @@ function main() {
 		if (not index(field2(filename, OSSLASH, -1), "."))
 			filename ^= ".cpp";
 
-		var iscompilable = filename.field2(".", -1).at(1).lcase() ne "h";
+		//allow compiler to copy .h files to ~/inc dir
+		//var iscompilable = filename.field2(".", -1).at(1).lcase() ne "h";
+		var iscompilable = true;//filename.field2(".", -1)[1].lcase() ne "h";
 
 		//search paths and convert to absolute filename
 		//similar code in edic.cpp and compile.cpp

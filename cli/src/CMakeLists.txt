@@ -38,8 +38,47 @@ endif()
 ### DONT FORGET TO ADD TO ALL STAGES (1, 2 AND 3) ###
 
 # bin #
+#compile.cpp
+#list.cpp
+#listo.cpp
+#dict2sql.cpp
+#edic.cpp
+#configexodus.cpp
+#copyfile.cpp
+#exodus.cpp
+#dbattach.cpp
+#convsyntax.cpp
+#testsort.cpp
+#edir.cpp
+#sync_dat.cpp
+#dbcomp.cpp
+#genfunctors.cpp
+#dbgrep.cpp
+#createindex.cpp
+#listdict.cpp
+#deleteindex.cpp
+#delete.cpp
+#createfile.cpp
+#deletefile.cpp
+#dict_xo_clients.cpp
+#clearfile.cpp
+#dbdelete.cpp
+#dbcopy.cpp
+#dbcreate.cpp
+#listindexes.cpp
+#listfiles.cpp
+#dblist.cpp
 
+#largest first
 add_executable(compile compile.cpp)
+add_executable(list list.cpp printtx.hpp)
+add_executable(dict2sql dict2sql.cpp)
+add_executable(edic edic.cpp)
+add_executable(configexodus configexodus.cpp)
+add_executable(copyfile copyfile.cpp)
+
+add_executable(listfiles listfiles.cpp)
+add_executable(listdict listdict.cpp)
 add_executable(createfile createfile.cpp)
 add_executable(createindex createindex.cpp)
 
@@ -53,18 +92,11 @@ add_executable(dbattach dbattach.cpp)
 
 add_executable(delete delete.cpp)
 add_executable(clearfile clearfile.cpp)
-add_executable(copyfile copyfile.cpp)
 add_executable(deletefile deletefile.cpp)
 add_executable(deleteindex deleteindex.cpp)
 add_executable(edir edir.cpp)
-add_executable(edic edic.cpp)
-add_executable(dict2sql dict2sql.cpp)
-add_executable(list list.cpp printtx.hpp)
-add_executable(listfiles listfiles.cpp)
-add_executable(listdict listdict.cpp)
 add_executable(listindexes listindexes.cpp)
 add_executable(testsort testsort.cpp)
-add_executable(configexodus configexodus.cpp)
 add_executable(sync_dat sync_dat.cpp)
 add_executable(convsyntax convsyntax.cpp)
 
@@ -81,7 +113,14 @@ add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
 
 #dl is needed for dynamic link library code
 
+# Largest first
 target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
+target_link_libraries(list exodus stdc++fs ${LIBS})
+target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
+target_link_libraries(edic exodus stdc++fs ${LIBS})
+target_link_libraries(configexodus exodus stdc++fs ${LIBS})
+target_link_libraries(copyfile exodus stdc++fs ${LIBS})
+
 target_link_libraries(createfile exodus stdc++fs ${LIBS})
 target_link_libraries(createindex exodus stdc++fs ${LIBS})
 
@@ -95,20 +134,15 @@ target_link_libraries(dbattach exodus stdc++fs ${LIBS})
 
 target_link_libraries(delete exodus stdc++fs ${LIBS})
 target_link_libraries(clearfile exodus stdc++fs ${LIBS})
-target_link_libraries(copyfile exodus stdc++fs ${LIBS})
 target_link_libraries(deletefile exodus stdc++fs ${LIBS})
 target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
 target_link_libraries(edir exodus stdc++fs ${LIBS})
-target_link_libraries(edic exodus stdc++fs ${LIBS})
-target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
 #target_link_libraries(number exodus stdc++fs ${LIBS})
 target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
-target_link_libraries(list exodus stdc++fs ${LIBS})
 target_link_libraries(listfiles exodus stdc++fs ${LIBS})
 target_link_libraries(listdict exodus stdc++fs ${LIBS})
 target_link_libraries(listindexes exodus stdc++fs ${LIBS})
 target_link_libraries(testsort exodus stdc++fs ${LIBS})
-target_link_libraries(configexodus exodus stdc++fs ${LIBS})
 target_link_libraries(sync_dat exodus stdc++fs ${LIBS})
 target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
 

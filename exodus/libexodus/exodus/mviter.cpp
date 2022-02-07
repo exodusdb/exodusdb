@@ -29,6 +29,8 @@ namespace exodus {
 //CONSTRUCTOR from a var (ie begin())
 var_iter::var_iter(CVR var1)
 	: pvar_(&var1){
+	if (!var1.length())
+		startpos_ = std::string::npos;
 	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 }
 
