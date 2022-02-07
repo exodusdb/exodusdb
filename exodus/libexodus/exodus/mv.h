@@ -2049,16 +2049,16 @@ class PUBLIC dim {
 
 	bool redim(int nrows, int ncols = 1);
 
-    // Constructor from initializer_list for (int, double, cstr etc.)
-	template<class T>
-	dim(std::initializer_list<T> list) {
-		redim(list.size(), 1);
-		int itemno = 1;
-		for (auto item : list) {
-			this->data_[itemno++] = item;
-		}
-	}
-
+//    // Constructor from initializer_list for (int, double, cstr etc.)
+//	template<class T>
+//	dim(std::initializer_list<T> list) {
+//		redim(list.size(), 1);
+//		int itemno = 1;
+//		for (auto item : list) {
+//			this->data_[itemno++] = item;
+//		}
+//	}
+//
 	ND var join(CVR sepchar = FM_) const;
 
 	// parenthesis operators often come in pairs
