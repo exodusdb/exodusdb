@@ -1026,9 +1026,7 @@ bool var::read(CVR filehandle, CVR key) {
 			return false;
 
 		PGResult pgresult;
-		bool ok = get_pgresult(sql, pgresult, pgconn);
-
-		if (!ok)
+		if (!get_pgresult(sql, pgresult, pgconn))
 			return false;
 
 		// *this = "";
@@ -1306,8 +1304,7 @@ bool var::unlockall() const {
 // returns only success or failure so any response is logged and saved for future lasterror() call
 bool var::sqlexec(CVR sql) const {
 	var response = -1;	//no response required
-	bool ok = this->sqlexec(sql, response);
-	if (!ok) {
+	if (!this->sqlexec(sql, response)) {
 		this->lasterror(response);
 		//skip table does not exist because it is very normal to check if table exists
 		//if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || DBTRACE)
@@ -1315,8 +1312,9 @@ bool var::sqlexec(CVR sql) const {
 
 		// For now, all sqlexec calls that do not accept a response have any error response sent to cerr
 		response.errputl();
+		return false;
 	}
-	return ok;
+	return true;
 }
 
 // returns success or failure, and response = data or errmsg (response can be preset to max number of tuples)
@@ -4267,19 +4265,14 @@ bool var::hasnext() {
 
 	//PGresultptr pgresult;
 	PGResult pgresult;
-	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
-
-	if (!ok) {
-		// this->clearselect();
+	if (!readnextx(*this, pgresult, pgconn, /*forwards=*/true))
 		return false;
-	}
 
 	/////////////////////////////////
 	// now restore the cursor back one
 	/////////////////////////////////
 
 	PGResult pgresult2;
-	//ok =
 	readnextx(*this, pgresult2, pgconn, /*forwards=*/false);
 
 	// Note that moving backwards on the first record fails because it returns no rows since it
@@ -4419,9 +4412,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 		return false;
 
 	PGResult pgresult;
-	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
-
-	if (!ok) {
+	if (!readnextx(*this, pgresult, pgconn, /*forwards=*/true)) {
 		// end the transaction
 		// no more
 		// committrans();
@@ -4605,9 +4596,7 @@ var var::listfiles() const {
 		return "";
 
 	PGResult pgresult;
-	bool ok = get_pgresult(sql, pgresult, pgconn);
-
-	if (!ok)
+	if (!get_pgresult(sql, pgresult, pgconn))
 		return "";
 
 	var filenames = "";
@@ -4640,9 +4629,7 @@ var var::dblist() const {
 		return "";
 
 	PGResult pgresult;
-	auto ok = get_pgresult(sql, pgresult, pgconn);
-
-	if (!ok)
+	if (!get_pgresult(sql, pgresult, pgconn))
 		return "";
 
 	var dbnames = "";
@@ -4682,12 +4669,10 @@ bool var::cursorexists() {
 		return "";
 
 	PGResult pgresult;
-	bool ok = get_pgresult(sql, pgresult, pgconn);
-
-	if (!ok)
+	if (!get_pgresult(sql, pgresult, pgconn))
 		return false;
 
-	ok = PQntuples(pgresult) > 0;
+	bool ok = PQntuples(pgresult) > 0;
 
 	// if (DBTRACE)
 	//	exodus::logputl("DBTRACE: ::cursorexists() is " ^ var(ok));
@@ -4731,9 +4716,7 @@ var var::listindexes(CVR filename0, CVR fieldname0) const {
 
 	// execute command or return empty string
 	PGResult pgresult;
-	bool ok = get_pgresult(sql, pgresult, pgconn);
-
-	if (!ok)
+	if (!get_pgresult(sql, pgresult, pgconn))
 		return "";
 
 	var tt;
@@ -4787,9 +4770,7 @@ var var::reccount(CVR filename0) const {
 
 	// execute command or return empty string
 	PGResult pgresult;
-	bool ok = get_pgresult(sql, pgresult, pgconn);
-
-	if (!ok)
+	if (!get_pgresult(sql, pgresult, pgconn))
 		return "";
 
 	var reccount = "";
@@ -4825,9 +4806,7 @@ var var::flushindex(CVR filename) const {
 
 	// execute command or return empty string
 	PGResult pgresult;
-	bool ok = get_pgresult(sql, pgresult, pgconn);
-
-	if (!ok)
+	if (!get_pgresult(sql, pgresult, pgconn))
 		return "";
 
 	var flushresult = "";
