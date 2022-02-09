@@ -8846,6 +8846,12 @@ function* document_onpaste(event) {
     event = getevent(event)
     var element = event.target
 
+    //prevent paste into readonly
+    var msg = element.getAttribute('exodusreadonly')
+    if (msg) {
+        exoduscancelevent()
+        return yield* exodusinvalid(msg)
+
     //only supporting form_paste in first column
     if (!element.getAttribute('exodusisfirstinputcolumn')) {
         //perform normal paste before any yielding is done which loses it
@@ -8877,12 +8883,6 @@ function* document_onpaste(event) {
     //in case we selected a text node
     if (!element.getAttribute && element.parentNode.getAttribute)
         element = element.parentElement
-
-    //prevent paste into readonly
-    var msg = element.getAttribute('exodusreadonly')
-    if (msg) {
-        exoduscancelevent()
-        return yield* exodusinvalid(msg)
     }
 
     //the following doesnt seem to simulate pasting anymore
