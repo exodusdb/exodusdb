@@ -73,7 +73,7 @@ void var::throwNonNumeric(CVR message) const {
 //
 //	// use initializers and only check afterwards if copiedvar was assigned (why?)
 //
-	THISIS("var::var(CVR rhs)")
+//	THISIS("var::var(CVR rhs)")
 //	rhs.assertAssigned(functionname);
 //
 //	//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
@@ -83,15 +83,22 @@ void var::throwNonNumeric(CVR message) const {
 // to avoid the compiler error "ambiguous conversion"
 //(explicit means it is not automatic)
 
-// allow conversion to string (IS THIS USED FOR ANYTHING AT THE MOMENT?
-// allows the usage of any string function
+/**
+* Automatic conversion to std::string
+* @return std::string
+*/
 var::operator std::string() const {
 
-	THISIS("var::operator std::string")
+	THISIS("var::operator std::string()")
 	assertString(functionname);
+
 	return var_str;
 }
 
+/**
+* Automatic conversion to bool expressed as void*
+* @return void* 0 or 1
+*/
 var::operator void*() const {
 
 	THISIS("var::operator void*() const")

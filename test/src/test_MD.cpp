@@ -85,6 +85,12 @@ function main()
 
 		assert(oconv("","MD20P")=="");
 		assert(oconv("","MD20PZ")=="");
+
+//assert(var(L"123456").outputl() eq "123456");
+
+		TRACE(_VM_ "0" _VM_ _VM_)
+		TRACE("MD20PZ")
+		TRACE(oconv(_VM_ "0" _VM_ _VM_,"MD20PZ"));
 		assert(oconv(_VM_ "0" _VM_ _VM_,"MD20PZ")== _VM_ _VM_ _VM_);
 
 		assert(oconv(1234.567,"MC20PZ")=="1234,57");

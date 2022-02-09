@@ -1,3 +1,4 @@
+#include <iostream>
 #ifndef MV_H
 #define MV_H 1
 /*
@@ -305,57 +306,52 @@ class PUBLIC var final {
 
    private:
 
-	// 1. not using pimpl idiom in order to maximise performance
-	// 2. all mutable because asking for a string can create it from an integer and vice versa
-	mutable std::string var_str; //32 bytes on g++. is default constructed to empty string
-	mutable long long   var_int; //8 bytes/64 bits - currently defined as a long long
-	mutable double      var_dbl; //8 bytes/64 buts - double
-	mutable VARTYP      var_typ; //actually a uint which will be 4 bytes. default initialised to 0.
-	                             //mutable uint padding1;
-	                             //mutable long int padding2;
+	// Understanding size of bytes, characters, integers and floating point
+	// See https://en.cppreference.com/w/cpp/language/types
 
-	///////////////
-	// CONSTRUCTORS
-	///////////////
+	// All mutable because asking for a string can create it from an integer and vice versa
+	mutable std::string var_str; // 32 bytes on g++. is default constructed to empty string
+	mutable long long   var_int; // 8 bytes/64 bits - currently defined as a long long
+	mutable double      var_dbl; // 8 bytes/64 buts - double
+	mutable VARTYP      var_typ; // Default initialised to VARTYP_UNA
+	                             // Actually a uint which will be 4 bytes
+
+
+	////////////////////
+	// MAIN CONSTRUCTORS
+	////////////////////
 
    public:
 
-	// default constructor
+	// 1. Default constructor. Can default as string and var_typ haev constructors
+	//////////////////////////
+	//
 	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
-	//var();
-	// defined in class for inline/optimisation
-	// default constructor to allow definition unassigned "var mv";
-	// var() = default;
-	var()
-		: var_typ(VARTYP_UNA) {
-		//std::cout << "ctor()" << std::endl;
+	//
+	var() = default;
+//	var()
+//		: var_typ(VARTYP_UNA) {
+//		//std::cout << "ctor()" << std::endl;
+//
+//		// int xyz=3;
+//		// WARNING neither initialisers nor constructors are called in the following case !!!
+//		// var xxx=xxx.somefunction()
+//		// known as "undefined usage of uninitialised variable";
+//		// and not even a compiler warning in msvc8 or g++4.1.2
+//
+//		// so the following test is put everywhere to protect against this type of accidental
+//		// programming if (var_typ&VARTYP_MASK) throw MVUndefined("funcname()"); should really
+//		// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
+//		// decimal 1111binary this could be removed in production code perhaps
+//
+//	}
 
-		// int xyz=3;
-		// WARNING neither initialisers nor constructors are called in the following case !!!
-		// var xxx=xxx.somefunction()
-		// known as "undefined usage of uninitialised variable";
-		// and not even a compiler warning in msvc8 or g++4.1.2
-
-		// so the following test is put everywhere to protect against this type of accidental
-		// programming if (var_typ&VARTYP_MASK) throw MVUndefined("funcname()"); should really
-		// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
-		// decimal 1111binary this could be removed in production code perhaps
-
-		// debuggCONSTRUCT&&cout<<"CONSTRUCT: var()\n";
-
-		// not a pointer anymore for speed
-		// priv=new pimpl;
-
-		// moved here from pimpl constructor
-		// moved up to initializer
-		// var_typ=VARTYP_UNA;
-	}
-
-	// copy constructor - cant default because we need to throw if rhs is unassigned
-	// copy constructor - not inline merely because of lack of THISIS etc in mv.h
-	//__attribute__ ((noinline)) var(CVR rhs)
-	INLINE var(CVR rhs)
-		: var_str(rhs.var_str),
+	// 2. Copy constructor. Cant use default because we need to throw if rhs is unassigned
+	///////////////////////
+	//
+	var(CVR rhs)
+		:
+		var_str(rhs.var_str),
 		var_int(rhs.var_int),
 		var_dbl(rhs.var_dbl),
 		var_typ(rhs.var_typ) {
@@ -366,36 +362,10 @@ class PUBLIC var final {
 		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 	}
 
-#define VAR_SAFE_DESTRUCTOR
-#ifndef VAR_SAFE_DESTRUCTOR
-	~var() = default;
-#else
-	// destructor - sets var_typ undefined
-	//WARNING: non-virtual destructor - so cannot create derived classes
-	//~var();
-	// Inline for speed but slows compilation unless optimising switched off
-	~var() {
-		//std::cout << "dtor:" << var_str << std::endl;
-
-		// not a pimpl style pointer anymore for speed
-		// delete priv;
-
-		// try to ensure any memory is not later recognises as initialised memory
-		//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
-		// compilers allow without warning) this could be removed in production code perhaps set all
-		// unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax
-		// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
-		// variables var_typ=(char)0xFFFFFFF0;
-		var_typ = VARTYP_MASK;
-	}
-#endif
-
-	////////////////////
-	// CONSTRUCTORS FROM
-	////////////////////
-
-	// move constructor
-	INLINE var(TVR fromvar) = default;
+	// 3. Move constructor. Can default assuming that temporaries are unlikely to be unassigned
+	///////////////////////
+	//
+	var(TVR fromvar) = default;
 	//	// var(TVR fromvar) noexcept;  // = default;
 	//	// defined in class for inline/optimisation
 	//	// move constructor
@@ -412,80 +382,190 @@ class PUBLIC var final {
 	//		// ISASSIGNED(rhs)
 	//	}
 
-	// constructor for char*
-	// use initializers since cannot fail unless out of memory
-	INLINE var(const char* cstr1)
-	    : var_str(cstr1),
-	      var_typ(VARTYP_STR) {
-	    //std::cout << "ctor char* :" <<var_str << std::endl;
+	// 4. Destructor. We need to set var_typ to undefined for safety.
+	/////////////////
+	//
+	// sets var_typ undefined
+	//
+	// WARNING: non-virtual destructor - so cannot create derived classes
+	// Inline for speed but slows compilation unless optimising switched off
+#define VAR_SAFE_DESTRUCTOR
+#ifdef VAR_SAFE_DESTRUCTOR
+	~var() {
+		//std::cout << "dtor:" << var_str << std::endl;
 
-	    // protect against null pointer
-	    // probably already crashed from var_str initialiser above
-	    if (cstr1 == 0) {
-	        // THISIS("var::var(const char* cstr1)")
-	        throw ("Null pointer in var::var(const char*)");
-	    }
+		// not a pimpl style pointer anymore for speed
+		// delete priv;
+
+		// try to ensure any memory is not later recognises as initialised memory
+		//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
+		// compilers allow without warning) this could be removed in production code perhaps set all
+		// unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax
+		// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
+		// variables var_typ=(char)0xFFFFFFF0;
+		var_typ = VARTYP_MASK;
 	}
-
-	// constructor for bool
-	INLINE var(const bool bool1) noexcept
-		: var_int(bool1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for int
-	INLINE var(const int int1) noexcept
-		: var_int(int1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for long long
-	INLINE var(const long long longlong1) noexcept
-		: var_int(longlong1),
-		  var_typ(VARTYP_INT) {}
-
-	// constructor for double
-	INLINE var(const double dbl1) noexcept
-		: var_dbl(dbl1),
-		  var_typ(VARTYP_DBL) {}
-
-	// ctor for char
-	INLINE var(const char char1) noexcept
-		: var_str(1, char1),
-		  var_typ(VARTYP_STR) {}
-
-	// ctor for memory block
-	INLINE var(const char* charstart, const size_t nchars)
-		: var_str(charstart, nchars),
-		  var_typ(VARTYP_STR) {}
-
-//#define ALL_IN_ONE_STRING_CONSTRUCTOR
-#ifdef ALL_IN_ONE_STRING_CONSTRUCTOR
-
-	//accepts l and r values
-	template <typename S, typename = std::enable_if_t<std::is_convertible_v<S, std::string>>>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	INLINE var(S&& fromstr)
-	    : var_str(std::forward<S>(fromstr)), var_typ(VARTYP_STR){};
-
 #else
-
-	//in c++20 but not g++ v9.3
-	//constexpr var(const std::string& str1);
-
-	// constructor for const std::string
-	INLINE var(const std::string& str1)
-		// this would validate all strings as being UTF8?
-		//: var_str(boost::locale::conv::utf_to_utf<char>(str1))
-		: var_str(str1),
-		  var_typ(VARTYP_STR) {}
-
-	// constructor for temporary std::string
-	INLINE var(std::string&& str1) noexcept
-		: var_str(std::move(str1)),
-		  var_typ(VARTYP_STR) {}
-
+	~var() = default;
 #endif
 
-	// Constructor for initializer_list<int, double, cstr etc.>
+
+	///////////////////
+	// INT CONSTRUCTORS
+	///////////////////
+
+	/*
+		bool
+		char
+		signed char
+		unsigned char
+		wchar_t
+		char8_t (C++20)
+		char16_t (C++11)
+		char32_t (C++11)
+		short
+		unsigned short
+		int
+		unsigned int
+		long
+		unsigned long
+		long long (C++11)
+		unsigned long long (C++11)
+	*/
+
+	// int
+	//////
+	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	INLINE var(I rhs)
+		:
+		var_int(rhs),
+		var_typ(VARTYP_INT) {
+		//std::cerr << "var(int)" << std::endl;
+	}
+
+
+	//////////////////////
+	// DOUBLE CONSTRUCTORS
+	//////////////////////
+
+	// float, double, long double
+	/////////////////////////////
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	INLINE var(F rhs)
+		:
+		var_dbl(rhs),
+		var_typ(VARTYP_DBL){
+			//std::cerr << "var(dbl)" << std::endl;
+	}
+
+
+	//////////////////////
+	// STRING CONSTRUCTORS
+	//////////////////////
+
+	// string_view
+	//////////////
+	// Accepts l and r values efficiently hopefully
+	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	INLINE var(S&& fromstr)
+	    :
+		var_str(std::forward<S>(fromstr)),
+		var_typ(VARTYP_STR) {
+		//std::cerr << "var(str)" << std::endl;
+	}
+
+	// memory block
+	///////////////
+	INLINE var(const char* charstart, const size_t nchars)
+		:
+		var_str(charstart, nchars),
+		var_typ(VARTYP_STR) {
+		//std::cerr << "var(mem)" << std::endl;
+	}
+
+	// char
+	///////
+	//must be separate from uint contructor to get a string/char not an int/ character number
+	INLINE var(const char char1) noexcept
+		:
+		var_str(1, char1),
+		var_typ(VARTYP_STR) {
+			//std::cerr << "var(char)" << std::endl;
+	}
+
+
+	////////////////////////////////
+	// STRING CONSTRUCTORS FROM WIDE
+	////////////////////////////////
+
+	// Via u32string_view
+	// Accepts l and r values efficiently hopefully
+	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	INLINE var(W&& fromstr)
+	    :
+		var_typ(VARTYP_STR) {
+		//std::cerr << "TEMPLATE " << __PRETTY_FUNCTION__ << std::endl;
+		this->from_u32string(fromstr);
+	}
+
+	// const std::wstring&
+	//////////////////////
+	var(const std::wstring& wstr1);
+
+	// wchar*
+	/////////
+	INLINE var(const wchar_t* wcstr1)
+		: var_typ(VARTYP_STR) {
+
+		// protect against null pointer
+		if (wcstr1 == 0)
+			throw ("Null pointer in var::var(const wchar_t*)");
+
+		(*this) = var(std::wstring(wcstr1));
+	}
+
+// Cant provide these and support L'x' since it they are ambiguous with char when creating var from ints
+//
+//	// wchar
+//  ////////
+//	INLINE explicit var(wchar_t wchar1)
+//		: var_typ(VARTYP_STR) {
+//
+//		(*this) = var(std::wstring(1, wchar1));
+//	}
+//
+//	// char32_t char
+//  ////////////////
+//	INLINE var(char32_t u32char)
+//		: var_typ(VARTYP_STR) {
+//
+//		this->from_u32string(std::u32string(1, u32char));
+//	}
+//
+//	// char8_t char
+//  ///////////////
+//	INLINE var(char8_t u8char)
+//		: var_typ(VARTYP_STR) {
+//
+//		this->var_str = std::string(1, u8char);
+//	}
+
+//	// const std::u32string&
+//  ////////////////////////
+//	var(const std::u32string&& u32str1);
+//	//	this->from_u32string(str1);
+
+
+	////////////////////////////////////////////
+	// GENERAL CONSTRUCTOR FROM INITIALIZER LIST
+	////////////////////////////////////////////
+
+	// int, double, cstr etc.
+	/////////////////////////
 	template <class T>
 	var(std::initializer_list<T> list)
 		: var_typ(VARTYP_STR) {
@@ -497,9 +577,180 @@ class PUBLIC var final {
 			var_str.pop_back();
 	}
 
-/////////////
-// ASSIGNMENT
-/////////////
+
+	///////////////////////
+	// NAMED CONVERSIONS TO
+	///////////////////////
+
+	bool toBool() const;
+
+	char toChar() const;
+
+	// standard c/c++ int() in other words simply take the number to the left of the point. -1.5
+	// becomes -1 and 1.5 becomes 1
+	int toInt() const;
+
+	long long toLong() const;
+
+	double toDouble() const;
+
+	std::u32string to_u32string() const;
+
+	//void from_u32string(std::u32string) const;
+
+	std::string toString() &&;               //for temporary vars
+
+	//Be careful not to retain the reference beyond the scope of the var
+	const std::string& toString() const&;  //for non-temporaries.
+
+	// weird version for perl that outputs "" if undefined
+	std::string toString2() const;
+
+
+	///////////////////////////
+	// AUTOMATIC CONVERSIONS TO
+	///////////////////////////
+
+	// someone recommends not to create more than one automatic converter
+	// to avoid the compiler error "ambiguous conversion"
+	// explicit keyword only works on conversion TO var not conversion FROM var
+
+	// commented to allow conversion to int
+	// if you uncomment this then also uncomment the definition in var.cpp
+	// unfortunately int takes precedence over bool somehow (unless both const/not const?)
+	// so if x is not numeric "if (x)" gives a non-numeric error.
+	// automatic conversion to int would be nice to avoid large numbers of specialised function
+	// calls I think like var::extract(int, int, int);
+
+	// automatic conversion to int
+	// necessary to allow conversion to int in many functions like extract(x,y,z)
+
+	// if you uncomment this then also uncomment the definition in var.cpp
+	// uncommented to allow simpler functions
+	// NB const probably determines priority of choice between automatic conversion
+	// and C++ uses bool and int conversion in certain cases to convert to int and bool
+	// therefore have chosen to make both bool and int "const" since they dont make
+	// and changes to the base object.
+	// provide a reference to the (long long) int inside a var
+	// This allows passing by reference to the guts of var for speed
+	// it is safe because changing the int has no side effects
+//#define HASINTREFOP
+#ifdef HASINTREFOP
+	operator int&() const;
+	explicit operator long long&() const;
+	operator double&() const;
+#else
+	operator int() const;
+	explicit operator long long() const;
+	operator double() const;
+#endif
+
+	// remove because causes "ambiguous" with -short_wchar on linux
+	// operator unsigned int() const;
+
+	// recommended to provide automatic conversion to VOID POINTER instead of direct to bool
+	// since void* is auto converted to bool nicely for natural "if (xyz)" syntax
+	// and doesnt suffer the "ambiguous bool promotion to int" issue that automatic conversion
+	// to bool has why this is working here now is probably because of non-portable compiler
+	// characteristics or lack of source examples Note: The boost::shared_ptr class support an
+	// implicit conversion to bool which is free from unintended conversion to arithmetic types.
+	// http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=297
+	// necessary to allow var to be used standalone in "if (xxx)" but see mv.h for discussion of
+	// using void* instead of bool
+	operator void*() const;
+
+	// this stops using var as indexes of arrays on msvc since msvc converts bool and int
+	// ambiguous to index number g++ seems happy to make int higher and unambigous with bool but
+	// probably non-standard c++ msvc (at least) cant do without this since it seems unwilling
+	// to convert void* as a bool therefore we include it and restrict indexing on ints and not
+	// var eg for (int ii=0 .... instead of for (var ii=0 ... #ifndef _MSVC explicit new in
+	// c++11 still allows implicit conversion in places where bool is definitely required ie in
+	// if (xx) or aa && bb but we do not use is because allowing implicit conversion to bool in
+	// argument lists is convenient explicit
+	//explicit operator bool() const;
+	operator bool() const;
+	//#endif
+
+	// NB && and || operators are NOT overloaded because var is set to convert to boolean
+	// automatically this is fortunate because "shortcircuiting" of && and || doesnt happen when
+	// overloaded
+
+	// operator size_t() const;
+
+	// Perhaps should NOT allow automatic convertion to char* since it assumes a conversion to
+	// utf8 and cannot hold char(0) perhaps and force people to use something like .utf8() or
+	// .toString().c_char() This was added to allow the arguments of osread type functions which
+	// need cstrings to be cstrings so that calls with fixed filenames etc dont require a
+	// conversion to var and back again The other solution would be to declare a parallel set of
+	// function with var arguments operator const char*() const;
+
+	// convert to c_str may or may not be necessary in order to do wcout<<var
+	// NB not needed because we overide the << operator itself
+	// and causes a problem with unwanted conversions to strings
+	// maybe should throw an error is 0x00 present in the string
+	// allow the use of any cstring function
+	// var::operator const char*();
+
+	// string - replicates toString()
+	// would allow the usage of any std::string function but may result
+	// in a lot of compilation failures due to "ambiguous overload"
+	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
+	// for now prevent this to ensure efficient programming
+	//explicit
+	operator std::string() const;
+
+	operator std::u32string() const {
+		return this->to_u32string();
+	}
+
+	// allow conversion to char (takes first char or char 0 if zero length string)
+	// would allow the usage of any char function but may result
+	// in a lot of compilation failures due to "ambiguous overload"
+	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
+	// operator char() const;
+
+	// BRACKETS ()
+	/////////////
+
+	// extract using () int int int (alternative to .a() and extract())
+	// instead of xyz=abc.extract(1,2,3);
+	// sadly there is no way to use pick/mv angle brackets like "abc<1,2,3>"
+	// and [] brackets would only allow one dimension eg abc[1]
+
+	// TODO implement abc(1,2,3)="xyz"; or abc.a(1,2,3)="xyz";
+	// An idea is that var::operator() will produce a "specialvar" that will
+	// perform extract if a var is wanted or a replace if assignment is done
+	// but it hasnt been established if it is possible to make the specialvar behave like a
+	// normal var in all situation eg would the following work? var1(1,2,3).outputl(); also the
+	// creation and deletion of the temp object may hit performance. One alternative would be to
+	// use () only for extraction (and [] only for replacement of fields?)
+
+	// dynamic array extract/replace eg: abc=xyz(1,2,3) and xyz(1,2,3)="abc";
+	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0) const;
+	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0);
+
+	//the following produces a temporary on the rhs
+//#define VAR_FUNCTOR_ONLY_EXTRACTS
+//#ifdef VAR_FUNCTOR_ONLY_EXTRACTS
+	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const;
+//#else
+	ND var_proxy1 operator()(int fieldno);
+	ND var_proxy2 operator()(int fieldno, int valueno);
+	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
+//endif
+
+	// DONT declare this so we force use of the above const version that produces a temporary
+	//VARREF operator()(int fieldno, int valueno = 0, int subvalueno = 0);
+	/* SADLY no way to get a different operator() function called when on the left hand side of assign
+	therefore not possible to create syntax like "xyz(1,2)="xx";" to REPLACE fields, values and
+	subvalues so operator() is defined only for the more common xyz=extract(1,2,3); i.e. on the right
+	hand side. http://codepad.org/MzzhlRkb
+	*/
+
+
+	/////////////
+	// ASSIGNMENT
+	/////////////
 
 	// The assignment operator should always return a reference to *this.
 
@@ -632,170 +883,8 @@ class PUBLIC var final {
 		return VOID_OR_THIS;
 	}
 
-	///////////////////////
-	// NAMED CONVERSIONS TO
-	///////////////////////
 
-	bool toBool() const;
-
-	char toChar() const;
-
-	// standard c/c++ int() in other words simply take the number to the left of the point. -1.5
-	// becomes -1 and 1.5 becomes 1
-	int toInt() const;
-
-	long long toLong() const;
-
-	double toDouble() const;
-
-	std::u32string to_u32string() const;
-
-	void from_u32string(std::u32string) const;
-
-	std::string toString() &&;               //for temporary vars
-
-	//Be careful not to retain the reference beyond the scope of the var
-	const std::string& toString() const&;  //for non-temporaries.
-
-	// weird version for perl that outputs "" if undefined
-	std::string toString2() const;
-
-	///////////////////////////
-	// AUTOMATIC CONVERSIONS TO
-	///////////////////////////
-
-	// someone recommends not to create more than one automatic converter
-	// to avoid the compiler error "ambiguous conversion"
-	// explicit keyword only works on conversion TO var not conversion FROM var
-
-	// commented to allow conversion to int
-	// if you uncomment this then also uncomment the definition in var.cpp
-	// unfortunately int takes precedence over bool somehow (unless both const/not const?)
-	// so if x is not numeric "if (x)" gives a non-numeric error.
-	// automatic conversion to int would be nice to avoid large numbers of specialised function
-	// calls I think like var::extract(int, int, int);
-
-	// automatic conversion to int
-	// necessary to allow conversion to int in many functions like extract(x,y,z)
-
-	// if you uncomment this then also uncomment the definition in var.cpp
-	// uncommented to allow simpler functions
-	// NB const probably determines priority of choice between automatic conversion
-	// and C++ uses bool and int conversion in certain cases to convert to int and bool
-	// therefore have chosen to make both bool and int "const" since they dont make
-	// and changes to the base object.
-	// provide a reference to the (long long) int inside a var
-	// This allows passing by reference to the guts of var for speed
-	// it is safe because changing the int has no side effects
-//#define HASINTREFOP
-#ifdef HASINTREFOP
-	operator int&() const;
-	explicit operator long long&() const;
-	operator double&() const;
-#else
-	operator int() const;
-	explicit operator long long() const;
-	operator double() const;
-#endif
-
-	// remove because causes "ambiguous" with -short_wchar on linux
-	// operator unsigned int() const;
-
-	// recommended to provide automatic conversion to VOID POINTER instead of direct to bool
-	// since void* is auto converted to bool nicely for natural "if (xyz)" syntax
-	// and doesnt suffer the "ambiguous bool promotion to int" issue that automatic conversion
-	// to bool has why this is working here now is probably because of non-portable compiler
-	// characteristics or lack of source examples Note: The boost::shared_ptr class support an
-	// implicit conversion to bool which is free from unintended conversion to arithmetic types.
-	// http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=297
-	// necessary to allow var to be used standalone in "if (xxx)" but see mv.h for discussion of
-	// using void* instead of bool
-	operator void*() const;
-
-	// this stops using var as indexes of arrays on msvc since msvc converts bool and int
-	// ambiguous to index number g++ seems happy to make int higher and unambigous with bool but
-	// probably non-standard c++ msvc (at least) cant do without this since it seems unwilling
-	// to convert void* as a bool therefore we include it and restrict indexing on ints and not
-	// var eg for (int ii=0 .... instead of for (var ii=0 ... #ifndef _MSVC explicit new in
-	// c++11 still allows implicit conversion in places where bool is definitely required ie in
-	// if (xx) or aa && bb but we do not use is because allowing implicit conversion to bool in
-	// argument lists is convenient explicit
-	//explicit operator bool() const;
-	operator bool() const;
-	//#endif
-
-	// NB && and || operators are NOT overloaded because var is set to convert to boolean
-	// automatically this is fortunate because "shortcircuiting" of && and || doesnt happen when
-	// overloaded
-
-	// operator size_t() const;
-
-	// Perhaps should NOT allow automatic convertion to char* since it assumes a conversion to
-	// utf8 and cannot hold char(0) perhaps and force people to use something like .utf8() or
-	// .toString().c_char() This was added to allow the arguments of osread type functions which
-	// need cstrings to be cstrings so that calls with fixed filenames etc dont require a
-	// conversion to var and back again The other solution would be to declare a parallel set of
-	// function with var arguments operator const char*() const;
-
-	// convert to c_str may or may not be necessary in order to do wcout<<var
-	// NB not needed because we overide the << operator itself
-	// and causes a problem with unwanted conversions to strings
-	// maybe should throw an error is 0x00 present in the string
-	// allow the use of any cstring function
-	// var::operator const char*();
-
-	// string - replicates toString()
-	// would allow the usage of any std::string function but may result
-	// in a lot of compilation failures due to "ambiguous overload"
-	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
-	// for now prevent this to ensure efficient programming
-	//explicit
-	operator std::string() const;
-
-	// allow conversion to char (takes first char or char 0 if zero length string)
-	// would allow the usage of any char function but may result
-	// in a lot of compilation failures due to "ambiguous overload"
-	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
-	// operator char() const;
-
-	// BRACKETS ()
-	/////////////
-
-	// extract using () int int int (alternative to .a() and extract())
-	// instead of xyz=abc.extract(1,2,3);
-	// sadly there is no way to use pick/mv angle brackets like "abc<1,2,3>"
-	// and [] brackets would only allow one dimension eg abc[1]
-
-	// TODO implement abc(1,2,3)="xyz"; or abc.a(1,2,3)="xyz";
-	// An idea is that var::operator() will produce a "specialvar" that will
-	// perform extract if a var is wanted or a replace if assignment is done
-	// but it hasnt been established if it is possible to make the specialvar behave like a
-	// normal var in all situation eg would the following work? var1(1,2,3).outputl(); also the
-	// creation and deletion of the temp object may hit performance. One alternative would be to
-	// use () only for extraction (and [] only for replacement of fields?)
-
-	// dynamic array extract/replace eg: abc=xyz(1,2,3) and xyz(1,2,3)="abc";
-	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0) const;
-	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0);
-
-	//the following produces a temporary on the rhs
-//#define VAR_FUNCTOR_ONLY_EXTRACTS
-//#ifdef VAR_FUNCTOR_ONLY_EXTRACTS
-	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const;
-//#else
-	ND var_proxy1 operator()(int fieldno);
-	ND var_proxy2 operator()(int fieldno, int valueno);
-	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
-//endif
-
-	// DONT declare this so we force use of the above const version that produces a temporary
-	//VARREF operator()(int fieldno, int valueno = 0, int subvalueno = 0);
-	/* SADLY no way to get a different operator() function called when on the left hand side of assign
-	therefore not possible to create syntax like "xyz(1,2)="xx";" to REPLACE fields, values and
-	subvalues so operator() is defined only for the more common xyz=extract(1,2,3); i.e. on the right
-	hand side. http://codepad.org/MzzhlRkb
-	*/
-
+	//////////////
 	// BRACKETS []
 	//////////////
 
@@ -803,13 +892,14 @@ class PUBLIC var final {
 	// first=1 last=-1 etc.
 	ND var operator[](const int charno) const;
 
-	// Synonym. Named member function.
+	// Named member function of operator[]
 	ND var at(const int charno) const;
 
 	// sadly this all works EXCEPT that var[99].anymethod doesnt work
 	// so would have to implement all var methods and free functions on the proxy object
 	//ND var_brackets_proxy operator[](int charno);
 	//ND var operator[](int charno) &&;
+
 
 	////////////////////////
 	// SELF ASSIGN OPERATORS
@@ -822,14 +912,6 @@ class PUBLIC var final {
 	VARREF operator^=(const char) &;
 	VARREF operator^=(const char*) &;
 	VARREF operator^=(const std::string&) &;
-
-	// increment/decrement as postfix - only allow lvalue
-	var operator++(int) &;
-	var operator--(int) &;
-
-	// increment/decrement as prefix - only allow lvalue
-	VARREF operator++() &;
-	VARREF operator--() &;
 
 	//+=var|int|double - only allow lvalue
 	VARREF operator+=(CVR) &;
@@ -847,6 +929,19 @@ class PUBLIC var final {
 	//VARREF operator-=(const char*) &;
 	//VARREF operator-=(const std::string&) &;
 
+
+	//////////////////////
+	// INCREMENT/DECREMENT
+	//////////////////////
+
+	// increment/decrement as postfix - only allow lvalue
+	var operator++(int) &;
+	var operator--(int) &;
+
+	// increment/decrement as prefix - only allow lvalue
+	VARREF operator++() &;
+	VARREF operator--() &;
+
 	/////////////
 	// BINARY OPS
 	/////////////
@@ -854,6 +949,7 @@ class PUBLIC var final {
 	//VARREF operator^(CVR);
 	//VARREF operator^(const char*);
 	//VARREF operator^(const std::string&);
+
 
 	//////////
 	// FRIENDS
@@ -1750,6 +1846,9 @@ class PUBLIC var final {
 		// after string mutation
 		var_typ = VARTYP_STR;
 	}
+
+	// Constructor
+	void from_u32string(std::u32string u32str) const;
 
 	void createString() const;
 

@@ -3,6 +3,9 @@
 #include <functional>
 #include <limits>
 
+#include <string> //for ""_s suffix
+using namespace std::string_literals;
+
 #include <exodus/program.h>
 
 template <class A, class B>
@@ -166,6 +169,77 @@ function main() {
 //		assert(osread(tfilename) eq (d.join('\n') ^ '\n'));
 //
 //	}
+
+	{
+		// bool -> int
+		assert((var(true) ^ "x").outputl() eq "1x");
+		assert((var(false) ^ "x").outputl() eq "0x");
+
+		// char -> str
+		assert((var(char('A')) ^ "x").outputl() eq "Ax");
+
+		// signed char -> int
+		assert((var((signed char)('A')) ^ "x").outputl() eq "65x"); //numeric character -> int
+
+		// unsigned char -> int
+		assert((var((unsigned char)('A')) ^ "x").outputl() eq "65x"); //numeric character -> int
+
+		// std string suffix -> str
+		assert((var("AB"s) ^ "x").outputl() eq "ABx");
+
+		// char -> str
+		assert((var('A') ^ "x").outputl() eq "Ax");
+
+		assert(var("🍌").outputl("banana cstr = ").oconv("HEX").outputl("hex = ") eq "F09F8D8C");
+
+		// multibyte chars
+		printl("6) Ordinary multicharacter literal, e.g. 'AB', is conditionally-supported, has type int and implementation-defined value.");
+
+		//works but as an integer not as a char
+		//var('🍌').outputl("banana char(?) = ").oconv("HEX").outputl("hex = ");
+		//assert(var('🍌').outputl("banana cstr = ").oconv("HEX").outputl("hex = ") eq "F09F8D8C");
+
+		// Cannot provide var constructor for wide character -> string so they come in as ints at the moment
+		assert(var(u8'A').outputl("u8=") eq "65");
+		assert(var(L'A').outputl("L=") eq "65");
+		assert(var(u'A').outputl("u=") eq "65");
+		assert(var(U'A').outputl("U=") eq "65");
+		//  assert((var(u8'A') ^ "x").outputl() eq "Ax"); //char8_t is integer but not string convertible so we need a specific converter
+		//  assert((var(L'A') ^ "x").outputl() eq "Ax"); //wchar_t is integer but not string convertible so we need a specific converter
+		//  assert((var(u'A') ^ "x").outputl() eq "Ax"); //wchar_t is integer but not string convertible so we need a specific converter
+		//  assert((var(U'A') ^ "x").outputl() eq "Ax"); //wchar_t is integer but not string convertible so we need a specific converter
+
+		// short -> int
+		assert((var(short(65)) ^ "x").outputl() eq "65x");
+
+		// unsigned short -> int
+		assert((var((unsigned short)(65)) ^ "x").outputl() eq "65x");
+		assert((var(65) ^ "x").outputl() eq "65x");
+
+		// unsigned int -> int
+		assert((var(int(65)) ^ "x").outputl() eq "65x");
+		assert((var((unsigned int)(65)) ^ "x").outputl() eq "65x");
+
+		// unsigned long -> int
+		assert((var(65L) ^ "x").outputl() eq "65x");
+		assert((var((unsigned long)(65L)) ^ "x").outputl() eq "65x");
+
+		// unsigned long long -> int
+		assert((var(65LL) ^ "x").outputl() eq "65x");
+		assert((var((unsigned long long)(65L)) ^ "x").outputl() eq "65x");
+
+		// float -> dbl
+		assert((var(123.456f).round(3) ^ "x").outputl() eq "123.456x");
+		assert((var(123.0f) ^ "x").outputl() eq "123x");
+
+		// double -> dbl
+		assert((var(123.456).round(3) ^ "x").outputl() eq "123.456x");
+		assert((var(123.0) ^ "x").outputl() eq "123x");
+
+		// long double -> dbl
+		assert((var(123.456L).round(3) ^ "x").outputl() eq "123.456x");
+		assert((var(123.0L) ^ "x").outputl() eq "123x");
+	}
 
 	printl("Test passed");
 

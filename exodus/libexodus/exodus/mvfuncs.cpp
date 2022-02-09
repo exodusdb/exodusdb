@@ -88,6 +88,10 @@ Binary    Hex          Comments
 //#include <exodus/mvutf.h>
 #include <exodus/mvlocale.h>
 
+// Keep doxygen happy
+#undef DEFAULT_SPACE
+#define DEFAULT_SPACE
+
 // std::ios::sync_with_stdio(false);
 bool desynced_with_stdio = false;
 
@@ -411,9 +415,9 @@ const char* var::data() const {
 }
 
 std::u32string var::to_u32string() const {
-	// for speed, dont validate
-	// THISIS("std::u32string var::to_u32string() const")
-	// assertString(functionname);
+
+	 THISIS("std::u32string var::to_u32string() const")
+	 assertString(functionname);
 
 	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
 	// simple var=var copy of the following data
@@ -423,13 +427,19 @@ std::u32string var::to_u32string() const {
 	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
 }
 
-void var::from_u32string(std::u32string u32_source) const {
+void var::from_u32string(std::u32string u32str) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
 	// assertDefined(functionname);
 	var_typ = VARTYP_STR;
 
-	var_str = boost::locale::conv::utf_to_utf<char>(u32_source);
+	var_str = boost::locale::conv::utf_to_utf<char>(u32str);
+}
+
+// CONSTRUCTOR from const std::u32string
+var::var(const std::wstring& wstr1) {
+	var_typ = VARTYP_STR;
+	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
 var var::trim(CVR trimchar) const& {
@@ -520,7 +530,7 @@ VARREF var::trimmerb(CVR trimchar) {
 }
 
 //trimf() - trim leading spaces/character
-var var::trimf(const char* trimchar) const& {
+var var::trimf(const char* trimchar DEFAULT_SPACE) const& {
 
 	THISIS("var var::trimf(const char* trimchar) const")
 	assertString(functionname);
@@ -529,12 +539,12 @@ var var::trimf(const char* trimchar) const& {
 }
 
 // on temporary
-VARREF var::trimf(const char* trimchar) && {
+VARREF var::trimf(const char* trimchar DEFAULT_SPACE) && {
 	return this->trimmerf(trimchar);
 }
 
 // in-place
-VARREF var::trimmerf(const char* trimchar) {
+VARREF var::trimmerf(const char* trimchar DEFAULT_SPACE) {
 
 	THISIS("VARREF var::trimmerf(const char* trimchar)")
 	assertStringMutator(functionname);
@@ -556,7 +566,7 @@ VARREF var::trimmerf(const char* trimchar) {
 }
 
 // trimb() - trim backward (trailing) spaces/character
-var var::trimb(const char* trimchar) const& {
+var var::trimb(const char* trimchar DEFAULT_SPACE) const& {
 
 	THISIS("var var::trimb(const char* trimchar) const")
 	assertString(functionname);
@@ -565,12 +575,12 @@ var var::trimb(const char* trimchar) const& {
 }
 
 // on temporary
-VARREF var::trimb(const char* trimchar) && {
+VARREF var::trimb(const char* trimchar DEFAULT_SPACE) && {
 	return this->trimmerb(trimchar);
 }
 
 // in-place
-VARREF var::trimmerb(const char* trimchar) {
+VARREF var::trimmerb(const char* trimchar DEFAULT_SPACE) {
 
 	THISIS("VARREF var::trimmerb(const char* trimchar)")
 	assertStringMutator(functionname);
@@ -592,7 +602,7 @@ VARREF var::trimmerb(const char* trimchar) {
 }
 
 //trim() - remove leading, trailing and excess internal spaces/character
-var var::trim(const char* trimchar) const& {
+var var::trim(const char* trimchar DEFAULT_SPACE) const& {
 
 	THISIS("var var::trim(const char* trimchar) const&")
 	assertString(functionname);
@@ -601,12 +611,12 @@ var var::trim(const char* trimchar) const& {
 }
 
 // on temporary
-VARREF var::trim(const char* trimchar) && {
+VARREF var::trim(const char* trimchar DEFAULT_SPACE) && {
 	return this->trimmer(trimchar);
 }
 
 // in-place
-VARREF var::trimmer(const char* trimchar) {
+VARREF var::trimmer(const char* trimchar DEFAULT_SPACE) {
 
 	// reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
@@ -686,16 +696,18 @@ VARREF var::inverter() {
 	// TODO invert directly in the UTF8 bytes - requires some cleverness
 
 	// convert to char32.t string - four bytes per code point
-	std::u32string u32string1 = to_u32string();
+	//std::u32string u32string1 = this->to_u32string();
+	std::u32string u32str1(*this);
 
 	// invert only the lower 8 bits to keep the resultant code points within the same unicode
 	// 256 byte page
-	for (auto& c : u32string1)
+	for (auto& c : u32str1)
 		c ^= char32_t(255);
 	;
 
 	// convert back to utf8
-	this->from_u32string(u32string1);
+	//this->from_u32string(u32str1);
+	*this = var(u32str1);
 
 	return *this;
 }
@@ -1598,15 +1610,16 @@ VARREF var::textconverter(CVR oldchars, CVR newchars) {
 	else {
 
 		// convert everything to from UTF8 to wide string
-		std::u32string u32_var_str = this->to_u32string();
+		std::u32string u32str1 = this->to_u32string();
 		std::u32string u32_oldchars = oldchars.to_u32string();
 		std::u32string u32_newchars = newchars.to_u32string();
 
 		// convert the wide characters
-		converter_helper(u32_var_str, u32_oldchars, u32_newchars);
+		converter_helper(u32str1, u32_oldchars, u32_newchars);
 
 		// convert the string back to UTF8 from wide string
-		this->from_u32string(u32_var_str);
+		//this->from_u32string(u32str1);
+		*this = var(u32str1);
 	}
 	return *this;
 }

@@ -359,7 +359,7 @@ var var::oconv_D(const char* conversion) const {
 				++conversionchar;
 				if (*conversionchar == 'A')
 					return &longmths[ymd.month * 11 - 10];
-				return var(ymd.month);
+				return var(int(ymd.month));
 
 			// Not AREV
 			// DW returns day of week number number 1-7 Mon-Sun
@@ -390,7 +390,7 @@ var var::oconv_D(const char* conversion) const {
 			// Not AREV
 			// DD day of month
 			case 'D':
-				return var(ymd.day);
+				return var(int(ymd.day));
 
 			// Not AREV
 			// DQ returns quarter number
@@ -410,7 +410,7 @@ var var::oconv_D(const char* conversion) const {
 
 			// DL LAST day of month
 			case 'L':
-				return var(desired_date.end_of_month().day());
+				return var(int(desired_date.end_of_month().day()));
 
 			default:
 				sepchar = *conversionchar;

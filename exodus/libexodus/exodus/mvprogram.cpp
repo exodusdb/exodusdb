@@ -1514,41 +1514,6 @@ baddict:
 	return "";
 }
 
-// unlockrecord 0 = unlock all
-bool ExodusProgramBase::unlockrecord() const {
-	var xx;
-	return unlockrecord("", xx, "");
-}
-
-// unlockrecord
-bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const {
-	var file;
-	if (file0.unassigned())
-		file = "";
-	else
-		file = file0;
-
-	if (file == "") {
-		var().unlockall();
-		return 1;
-	}
-
-	// remove persistentlock
-	// common /shadow.mfs/
-	// shfilenames,shhandles,shadow.file,shsession.no,locks,spare1,spare2,spare3 done by
-	// shadow.mfs
-
-	// remove actual lock
-	file.unlock(key);
-
-	return 1;
-
-	// evade warning: unused parameter
-	if (filename) {
-	}
-	return 1;
-}
-
 // debug
 void ExodusProgramBase::debug() const {
 
@@ -1793,6 +1758,10 @@ lock:
 		return 1;
 	} else {
 		if (waitsecs) {
+
+			if ((waitsecs0 - waitsecs) >  30)
+	            var("").logputl("Locking file : " ^ file.a(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
+
 			var().ossleep(1000);
 			waitsecs -= 1;
 			goto lock;
@@ -1804,6 +1773,41 @@ lock:
 	(false || filename || recordx);
 
 	return true;
+}
+
+// unlockrecord 0 = unlock all
+bool ExodusProgramBase::unlockrecord() const {
+	var xx;
+	return unlockrecord("", xx, "");
+}
+
+// unlockrecord
+bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const {
+	var file;
+	if (file0.unassigned())
+		file = "";
+	else
+		file = file0;
+
+	if (file == "") {
+		var().unlockall();
+		return 1;
+	}
+
+	// remove persistentlock
+	// common /shadow.mfs/
+	// shfilenames,shhandles,shadow.file,shsession.no,locks,spare1,spare2,spare3 done by
+	// shadow.mfs
+
+	// remove actual lock
+	file.unlock(key);
+
+	return 1;
+
+	// evade warning: unused parameter
+	if (filename) {
+	}
+	return 1;
 }
 
 // singular

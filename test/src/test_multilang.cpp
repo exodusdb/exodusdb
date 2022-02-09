@@ -25,8 +25,8 @@ function main()
 	//	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
 	var utf8_html = "utf8.html";
 	var buf;
-	buf.osread( utf8_html);				// read with built in UTF8 conversion wstringfromUTF8()
-	buf.oswrite( "t_utf8copy.html");			// write with built in UTF8 conversion
+	buf.osread( utf8_html); //default external and internal format is utf8
+	buf.oswrite( "t_utf8copy.html");
 	cmd="diff " ^ utf8_html ^ " t_utf8copy.html";
 	printl(cmd);
 	assert(osshell(cmd));
@@ -126,30 +126,53 @@ function main()
 	BUF_18_12.outputl( "BUF_18_12=");
 	BUF_30_23.outputl( "BUF_30_23=");
 
-	// Lets test osbwrite() with position update and UTF8
+	{
+		assert(var(L"abc") eq "abc");
+		assert(var(L"Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.") eq "Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.");
+		var x = L"Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.";
+		assert(x.replace("[[:alnum:]]","").convert(", ", "").outputl() == "/.");
+
+		assert(oswrite(L"Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.", "t_file"));
+		assert(osfile("t_file"));
+		assert(osread("t_file") eq x);
+	}
+
 	var OUTPUT_file = "t_test_OUTPUT_UTF8.txt";
 	oswrite( "", OUTPUT_file, "utf8");
 	position = 5;
 	assert( osbwrite( L"1234567890", OUTPUT_file, position));
+	assert(position eq 15);
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
+	assert(position eq 26);
 	assert( osbwrite( "����� �� 22 �������", OUTPUT_file, position));
+	assert(position eq 46);
 	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
+	assert(position eq 57);
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
+	assert(position eq 68);
 	position = 10;
 	assert( osbwrite( L"XYZ", OUTPUT_file, position));
+	assert(position eq 13);
 
 	// Lets test osbwrite() with position update and default locale (1251)
 	OUTPUT_file = "t_test_OUTPUT_1251.txt";
 	oswrite( "", OUTPUT_file, "");
 	position = 5;
 	assert( osbwrite( L"1234567890", OUTPUT_file, position));
+	assert(position eq 15);
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
+	assert(position eq 26);
 	assert( osbwrite( "����� �� 22 �������", OUTPUT_file, position));
+	assert(position eq 46);
 	assert( osbwrite( "����� �� 22 ��������", OUTPUT_file, position));
+	assert(position eq 66);
 	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
+	assert(position eq 77);
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
+	assert(position eq 88);
 	position = 10;
 	assert( osbwrite( L"XYZ", OUTPUT_file, position));
+	assert(position eq 13);
 
 
 	printl("Test passed");

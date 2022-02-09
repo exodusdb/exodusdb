@@ -152,6 +152,18 @@ function main() {
     assert(oconv(3,"MX") == "3");
     assert(oconv(3.5,"MX") == "4");
 
+	{
+		assert(var(' ').oconv("HEX").outputl() eq "20");
+		assert(var(uint(48)).oconv("HEX").outputl() eq "3438");
+		assert(oconv(uint(48), "HEX").outputl() eq "3438");
+		assert(oconv(uint(128), "HEX").outputl() eq "313238");
+
+		assert(var(uint(128)).oconv("MX").outputl() eq "80");
+		assert(var(uint(48)).oconv("MX").outputl() eq "30");
+		assert(("x" ^ var(uint(256)).oconv("MX")).outputl() eq "x100");
+		assert(("x" ^ var(uint(255)).oconv("MX")).outputl() eq "xFF");
+	}
+
 	printl("Test passed");
 
 	return 0;

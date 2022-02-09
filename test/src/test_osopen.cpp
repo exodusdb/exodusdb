@@ -19,7 +19,7 @@ function main() {
 	var length=4;
 	assert(osbread(data,filex,offset,length));
 
-	assert(data == "xyz");
+	assert(data.outputl() == "xyz");
 
 	assert(osdelete(filename));
 	assert(not osfile(filename));

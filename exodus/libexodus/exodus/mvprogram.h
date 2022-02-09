@@ -1,10 +1,10 @@
 #ifndef MVPROGRAM_H
 #define MVPROGRAM_H
 
+#include <unordered_map>
+
 #include <exodus/mvenvironment.h>
 //#include <exodus/mvfunctor.h>
-
-#include <unordered_map>
 
 namespace exodus {
 
@@ -12,10 +12,13 @@ namespace exodus {
 class PUBLIC ExodusProgramBase {
 
    public:
-	using in = const var&; // CVR;
-	using io = var&;       // VARREF;
-	using out = var&;      // VARREF;
-	using let = const var;
+
+	using in  = const var&; // "CVR"    means "Const Var Reference"
+	using io  =       var&; // "VARREF" means "Var Reference"
+	using out =       var&; // "VARREF" means "Var Reference"
+
+	using let =       var ; // "let" behaves like javascript "let" ie. it is scoped ... but so is exodus var
+	using con = const var ; // "CV"     means "Constant Var" e.g. con x = "";
 
 #include <exodus/ioconv_custom.h>
 

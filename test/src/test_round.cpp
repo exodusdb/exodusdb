@@ -100,15 +100,13 @@ function main() {
 		assert(round(-0.1) eq 0);
 
 		//round
-		printl(var("6000.50")/20); //300.025
-		printl(round(var("6000.50")/20,2)); //300.02
 
-		assert(round(var("6000.50")/20,2)==300.03);
-		assert(round(var("-6000.50")/20,2)==-300.03);
-		assert(round(var(6000.50)/20,2)==300.03);
-		assert(round(var(-6000.50)/20,2)==-300.03);
-		assert(round(var(6000.50f)/20,2)==300.03);
-		assert(round(var(-6000.50f)/20,2)==-300.03);
+		assert(round(var("6000.50")/20,2).outputl()==300.03);
+		assert(round(var("-6000.50")/20,2).outputl()==-300.03);
+		assert(round(var(6000.50)/20,2).outputl()==300.03);
+		assert(round(var(-6000.50)/20,2).outputl()==-300.03);
+		assert(round(var(6000.50f)/20,2).outputl()==300.03);
+		assert(round(var(-6000.50f)/20,2).outputl()==-300.03);
 	}
 	printl("Test passed");
 
