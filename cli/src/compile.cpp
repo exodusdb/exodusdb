@@ -75,7 +75,7 @@ function main() {
 	silent = count(OPTIONS, "S");
 	debugging = not index(OPTIONS, "R");  //no symbols for backtrace
 	//the backtrace seems to work fine with release mode at least in vs2005
-	optimise = count(OPTIONS, "O");				//prevents backtrace
+	optimise = count(OPTIONS, "O") - count(OPTIONS, "-");				//prevents backtrace
 	generateheadersonly = index(OPTIONS, "H");	//prevents backtrace
 	force = index(OPTIONS,"F");
 
@@ -227,7 +227,7 @@ function main() {
 		//basicoptions^=" -O1";
 		//basicoptions^=" -O3";
 		//-Og means optimise but has compatible with gdb
-		if (optimise) {
+		if (optimise > 0) {
 			if (optimise eq 1)
 				optimise = "g";
 			basicoptions ^= " -O" ^ optimise;
