@@ -1,8 +1,0 @@
-448c448
-< 		$this->_cPtr=$r;
----
-> 		//$this->_cPtr=$r;
-2092c2092
-< 		$this->_cPtr=$r;
----
-> 		//$this->_cPtr=$r;
