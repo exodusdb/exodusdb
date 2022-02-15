@@ -38,7 +38,7 @@ function main() {
 	{
 		var v=1;
 		v++;
-		assert(v == 2);
+		assert(v.outputl("v=") == 2);
 		v = 1;
 		assert(v++ == 1);
 		v = 1;
@@ -47,7 +47,7 @@ function main() {
 	{
 		var v=1.1;
 		v++;
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = 1.1;
 		assert(v++ == 1.1);
 		v = 1.1;
@@ -56,7 +56,7 @@ function main() {
 	{
 		var v="1";
 		v++;
-		assert(v == 2);
+		assert(v.outputl("v=") == 2);
 		v = "1";
 		assert(v++ == 1);
 		v = "1";
@@ -65,7 +65,7 @@ function main() {
 	{
 		var v="1.1";
 		v++;
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = "1.1";
 		assert(v++ == 1.1);
 		v = "1.1";
@@ -76,7 +76,7 @@ function main() {
 	{
 		var v=3;
 		v--;
-		assert(v == 2);
+		assert(v.outputl("v=") == 2);
 		v = 3;
 		assert(v-- == 3);
 		v = 3;
@@ -85,7 +85,7 @@ function main() {
 	{
 		var v=3.1;
 		v--;
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = 3.1;
 		assert(v-- == 3.1);
 		v = 3.1;
@@ -94,7 +94,7 @@ function main() {
 	{
 		var v="3";
 		v--;
-		assert(v == 2);
+		assert(v.outputl("v=") == 2);
 		v = "3";
 		assert(v-- == 3);
 		v = "3";
@@ -103,7 +103,7 @@ function main() {
 	{
 		var v="3.1";
 		v--;
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = "3.1";
 		assert(v-- == 3.1);
 		v = "3.1";
@@ -156,130 +156,181 @@ function main() {
 	{
 		var v = 3;
 		v += 1;
-		assert(v == 4);
+		assert(v.outputl("v=") == 4);
 		v = 3;
 		v += 1.1;
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
 		v = 3;
 		v += "1.1";
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
+		v = 3;
+		v += '1';
+		assert(v.outputl("v=") == 4);
+		v = 3;
+		v += true;
+		assert(v.outputl("v=") == 4);
+		v = 3;
+		v += false;
+		assert(v.outputl("v=") == 3);
+
 		//
 		v = 3;
 		v += var(1);
-		assert(v == 4);
+		assert(v.outputl("v=") == 4);
 		v = 3;
 		v += var(1.1);
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
 		v = 3;
 		v += var("1.1");
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
 	}
 	{
 		var v = 3.1;
 		v += 1;
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
 		v = 3.1;
 		v += 1.1;
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
 		v = 3.1;
 		v += "1.1";
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
+		v = 3;
+		v += '1';
+		assert(v.outputl("v=") == 4);
+		v = 3.1;
+		v += true;
+		assert(v.outputl("v=") == 4.1);
+		v = 3.1;
+		v += false;
+		assert(v.outputl("v=") == 3.1);
+
 		//
 		v = 3.1;
 		v += var(1);
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
 		v = 3.1;
 		v += var(1.1);
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
 		v = 3.1;
 		v += var("1.1");
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
 	}
 	{
 		var v = "3.1";
 		v += 1;
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
 		v = "3.1";
 		v += 1.1;
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
 		v = "3.1";
 		v += "1.1";
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
+
 		//
 		v = "3.1";
 		v += var(1);
-		assert(v == 4.1);
+		assert(v.outputl("v=") == 4.1);
 		v = "3.1";
 		v += var(1.1);
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
 		v = "3.1";
 		v += var("1.1");
-		assert(v == 4.2);
+		assert(v.outputl("v=") == 4.2);
 	}
 
 	//-=
 	{
 		var v = 3;
 		v -= 1;
-		assert(v == 2);
+		assert(v.outputl("v=") == 2);
 		v = 3;
 		v -= 1.1;
-		assert(v == 1.9);
+		assert(v.outputl("v=") == 1.9);
 		v = 3;
 		v -= "1.1";
-		assert(v == 1.9);
+		assert(v.outputl("v=") == 1.9);
+		v = 3;
+		v -= '1';
+		assert(v.outputl("v=") == 2);
+		v = 3;
+		v -= true;
+		assert(v.outputl("v=") == 2);
+		v = 3;
+		v -= false;
+		assert(v.outputl("v=") == 3);
+
 		//
 		v = 3;
 		v -= var(1);
-		assert(v == 2);
+		assert(v.outputl("v=") == 2);
 		v = 3;
 		v -= var(1.1);
-		assert(v == 1.9);
+		assert(v.outputl("v=") == 1.9);
 		v = 3;
 		v -= var("1.1");
-		assert(v == 1.9);
+		assert(v.outputl("v=") == 1.9);
 	}
 	{
 		var v = 3.1;
 		v -= 1;
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = 3.1;
 		v -= 1.1;
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
 		v = 3.1;
 		v -= "1.1";
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
+		v = 3.1;
+		v -= '1';
+		assert(v.outputl("v=") == 2.1);
+		v = 3.1;
+		v -= true;
+		assert(v.outputl("v=") == 2.1);
+		v = 3.1;
+		v -= false;
+		assert(v.outputl("v=") == 3.1);
+
 		//
 		v = 3.1;
 		v -= var(1);
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = 3.1;
 		v -= var(1.1);
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
 		v = 3.1;
 		v -= var("1.1");
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
 	}
 	{
 		var v = "3.1";
 		v -= 1;
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = "3.1";
 		v -= 1.1;
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
 		v = "3.1";
 		v -= "1.1";
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
+		v = "3.1";
+		v += '1';
+		assert(v.outputl("v=") == 4.1);
+		v = "3.1";
+		v += true;
+		assert(v.outputl("v=") == 4.1);
+		v = "3.1";
+		v += false;
+		assert(v.outputl("v=") == 3.1);
+
 		//
 		v = "3.1";
 		v -= var(1);
-		assert(v == 2.1);
+		assert(v.outputl("v=") == 2.1);
 		v = "3.1";
 		v -= var(1.1);
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
 		v = "3.1";
 		v -= var("1.1");
-		assert(v == 2.0);
+		assert(v.outputl("v=") == 2.0);
 	}
 
 
@@ -515,6 +566,10 @@ function main() {
 		assert(var("1x") < "2x");
 		assert(var("1.1x") < "2.1x");
 
+	}
+
+	{
+		assert(!(var("22.1x") < 211.1));
 	}
 
 	assert(+var(123)    == 123);
@@ -762,12 +817,12 @@ function main() {
 	assert(v1 == '2');
 	assert(v1 == 2);
 	assert(v1 == 2.0);
-	assert(!(v1 == true));
+	assert((v1 == true));//v1.toBool()
 	assert(!("2.0" == v2));
 	assert(!('2' == v2));
 	assert(!(2 == v2));
 	assert(!(2.0 == v2));
-	assert(!(true == v2));
+	assert(!(true != v2));//v1.toBool()
 
 	// != ne
 	assert(v1 != v2);
@@ -775,12 +830,12 @@ function main() {
 	assert(v1 != '3');
 	assert(v1 != 3);
 	assert(v1 != 3.0);
-	assert(v1 != true);
+	assert(v1 == true);;//v1.toBool()
 	assert("2.0" != v2);
 	assert('2' != v2);
 	assert(2 != v2);
 	assert(2.0 != v2);
-	assert(true != v2);
+	assert(true == v2);;
 
 	// < lt
 	assert((v1 < v2));
@@ -793,7 +848,7 @@ function main() {
 	assert(('2' < v2));
 	assert((2 < v2));
 	assert((2.0 < v2));
-	assert((true < v2));
+	assert(!(true < v2));
 
 	// <= le
 	assert((v1 <= v2));
@@ -801,7 +856,7 @@ function main() {
 	assert((v1 <= '3'));
 	assert((v1 <= 3));
 	assert((v1 <= 3.0));
-	assert(!(v1 <= true));
+	assert((v1 <= true));
 	assert(("2.0" <= v2));
 	assert(('2' <= v2));
 	assert((2 <= v2));
@@ -814,7 +869,7 @@ function main() {
 	assert(!(v1 > '3'));
 	assert(!(v1 > 3));
 	assert(!(v1 > 3.0));
-	assert((v1 > true));
+	assert(!(v1 > true));
 	assert(!("2.0" > v2));
 	assert(!('2' > v2));
 	assert(!(2 > v2));
@@ -832,7 +887,7 @@ function main() {
 	assert(!('2' >= v2));
 	assert(!(2 >= v2));
 	assert(!(2.0 >= v2));
-	assert(!(true >= v2));
+	assert((true >= v2));
 
 	// + add
 	assert((v1 + v2) == 5);
@@ -932,6 +987,147 @@ function main() {
 	assert(v1-- == 4);
 	assert(v1 == 3);
 	assert(--v1 == 2);
+
+	var i = 3;
+	var d = 7.5;
+	var z = "";
+	var si = "8";
+	var sd = "7.7";
+	var sn = "xyz";
+
+	//compare all different kinds of lhs with rhs double
+
+	{
+		//empty string is never equal to any double
+		assert(var("") != 3.3);
+		assert(var("") != 0.0);
+
+		var xi = "";
+		TRACE(xi.toInt())
+		xi.dump("xi");
+		assert(xi != 0.0);
+
+		var xd = "";
+		TRACE(xd.toDouble())
+		xd.dump("xd");
+		assert(xd != 0.0);
+
+		assert(var(0.0) == 0.0);
+		assert(var(3.3) == 3.3);
+		assert(var(-3.3) == -3.3);
+		assert(var(3.4) != 3.3);
+
+		assert(var("0.0") == 0.0);
+		assert(var("3.3") == 3.3);
+		assert(var("-3.3") == -3.3);
+		assert(var("3.4") != 3.3);
+
+		assert(var(0) == 0.0);
+		assert(var(0) != 3.3);
+		assert(var(4) != 3.3);
+		assert(var(3) == 3.0);
+		assert(var(-3) == -3.0);
+
+		assert(var("0") == 0.0);
+		assert(var("0") != 3.3);
+		assert(var("4") != 3.3);
+		assert(var("3") == 3.0);
+		assert(var("-3") == -3.0);
+
+		assert(var("xxxx") != 3.0);
+
+	}
+	{
+		//empty string is never equal to any double
+		assert(var("") != 3);
+		assert(var("") != 0);
+
+		var xi = "";
+		TRACE(xi.toInt())
+		xi.dump("xi");
+		assert(xi != 0);
+
+		var xd = "";
+		TRACE(xd.toDouble())
+		xd.dump("xd");
+		assert(xd != 0);
+
+		assert(var(0) == 0);
+		assert(var(0.) == 0);
+		assert(var(3.) == 3);
+		assert(var(-3.) == -3);
+		assert(var(4.) != 3);
+
+		assert(var("0.0") == 0);
+		assert(var("3.") == 3);
+		assert(var("-3.") == -3);
+		assert(var("3.0") != 0);
+
+		assert(var(0) == 0);
+		assert(var(0) == -0);
+		assert(var(0) != 3);
+		assert(var(4) != 3);
+		assert(var(3) == 3);
+		assert(var(-3) == -3);
+
+		assert(var("0") == 0);
+		assert(var("-0") == 0);
+		assert(var("0") != 3);
+		assert(var("4") != 3);
+		assert(var("3") == 3);
+		assert(var("-3") == -3);
+
+		assert(var("xxxx") != 3);
+		assert(var("xxxx") != 0);
+		assert(var("xxxx") != -0);
+
+	}
+
+	// Test comparison with bool true/false
+	{
+		assert(var("") == false);
+		assert(var("0") == false);
+		assert(var("0.") == false);
+		assert(var("0.0") == false);
+
+		assert(var("x") == true);
+		assert(var("10") == true);
+		assert(var("10.") == true);
+		assert(var("10.0") == true);
+	}
+	{
+		assert(false == var(""));
+		assert(false == var("0"));
+		assert(false == var("0."));
+		assert(false == var("0.0"));
+
+		assert(true == var("x"));
+		assert(true == var("10"));
+		assert(true == var("10."));
+		assert(true == var("10.0"));
+	}
+	{
+		assert(var("") != true);
+		assert(var("0") != true);
+		assert(var("0.") != true);
+		assert(var("0.0") != true);
+
+		assert(var("x") != false);
+		assert(var("10") != false);
+		assert(var("10.") != false);
+		assert(var("10.0") != false);
+	}
+	{
+		assert(true != var(""));
+		assert(true != var("0"));
+		assert(true != var("0."));
+		assert(true != var("0.0"));
+
+		assert(false != var("x"));
+		assert(false != var("10"));
+		assert(false != var("10."));
+		assert(false != var("10.0"));
+	}
 
 	{
 		var x=1;

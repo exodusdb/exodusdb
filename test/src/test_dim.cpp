@@ -4,6 +4,27 @@
 #include <exodus/program.h>
 programinit()
 
+
+	// Sadly "Non-static data members can only be initialized with member initializer list or with a default member initializer."
+	// dim ww(100);
+	// dim registerx(10);
+	//
+	// Compiles but initializes to 0
+	//
+	dim ww{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	dim registerx{0,0,0,0,0,0,0,0,0,0};
+	//
+	// Solution is to use default constructor and dimension in a default constructor of this common array
+	//
+	//dim ww;
+	//dim registerx;
+	//
+	// Default constructor to properly dimension the dim arrays
+	//ExodusProgram() {
+	//	ww.redim(100);
+	//	registerx.redim(10);
+	//}
+
 function main() {
 
 	//dim array
@@ -223,6 +244,134 @@ function main() {
 		assert(d1.join("\n") eq txt);
 
 		//assert(osdelete(osfilename));
+	}
+
+	//constr nrows
+	{
+		dim x(4);
+		TRACE(x.rows())
+		TRACE(x.cols())
+		assert(x.rows() eq 4);
+		assert(x.cols() eq 1);
+
+		//set each element to "x"
+		x = "x";
+		TRACE(x.join())
+
+		//check join uses FM
+		assert(x.join() eq "x^x^x^x"_var);
+
+		//set each element to ""
+		x = "";
+
+		//check join trims trailing FM
+		assert(x.join() eq "");
+
+	}
+
+	//constr nrows, ncols
+	{
+		dim x(2,3);
+		TRACE(x.rows())
+		TRACE(x.cols())
+		assert(x.rows() eq 2);
+		assert(x.cols() eq 3);
+
+		//set each element to "x"
+		x = "x";
+		TRACE(x.join())
+
+		//check join uses FM
+		assert(x.join() eq "x^x^x^x^x^x"_var);
+
+		//set each element to ""
+		x = "";
+
+		//check join trims trailing FM
+		assert(x.join() eq "");
+
+	}
+
+	// CONSTRUCT ASSIGN = {}
+
+	// 1
+	{
+		dim x = {3};
+		TRACE(x.rows())
+		TRACE(x.cols())
+		TRACE(x.join())
+		assert(x.join() eq "3"_var);
+		x = "x";
+		assert(x.join() eq "x"_var);
+		assert(x.rows() eq 1);
+		assert(x.cols() eq 1);
+	}
+
+	// 2
+	{
+		dim x = {3,4};
+		TRACE(x.rows())
+		TRACE(x.cols())
+		TRACE(x.join())
+		assert(x.join() eq "3^4"_var);
+		x = "x";
+		assert(x.join() eq "x^x"_var);
+		assert(x.rows() eq 2);
+		assert(x.cols() eq 1);
+	}
+
+	// 3
+	{
+		dim x = {3,4,5};
+		TRACE(x.rows())
+		TRACE(x.cols())
+		TRACE(x.join())
+		assert(x.join() eq "3^4^5"_var);
+		x = "x";
+		assert(x.join() eq "x^x^x"_var);
+		assert(x.rows() eq 3);
+		assert(x.cols() eq 1);
+	}
+
+	// CONSTRUCT PLAIN {}
+
+	// 1
+	{
+		dim x{3};
+		TRACE(x.rows())
+		TRACE(x.cols())
+		TRACE(x.join())
+		assert(x.join() eq "3");
+		x = "x";
+		assert(x.join() eq "x");
+		assert(x.rows() eq 1);
+		assert(x.cols() eq 1);
+	}
+
+	// 2
+	{
+		dim x{3,4};
+		TRACE(x.rows())
+		TRACE(x.cols())
+		TRACE(x.join())
+		assert(x.join() eq "3^4"_var);
+		x = "x";
+		assert(x.join() eq "x^x"_var);
+		assert(x.rows() eq 2);
+		assert(x.cols() eq 1);
+	}
+
+	// 3
+	{
+		dim x{3,4,5};
+		TRACE(x.rows())
+		TRACE(x.cols())
+		TRACE(x.join())
+		assert(x.join() eq "3^4^5"_var);
+		x = "x";
+		assert(x.join() eq "x^x^x"_var);
+		assert(x.rows() eq 3);
+		assert(x.cols() eq 1);
 	}
 
 	printl("Test passed");

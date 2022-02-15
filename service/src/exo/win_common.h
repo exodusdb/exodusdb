@@ -37,8 +37,26 @@ commoninit(win,win_common_no)
 	var reproc = "";
 	var postproc = "";
 	var preproc = "";
-	dim ww {100};
-	dim registerx {10};
+
+	// Sadly "Non-static data members can only be initialized with member initializer list or with a default member initializer."
+	// dim ww(100);
+	// dim registerx(10);
+	//
+	// Compiles but initializes to 0
+	//
+	// dim ww{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	// dim registerx{0,0,0,0,0,0,0,0,0,0};
+	//
+	// Solution is to use default constructor and dimension in a default constructor of this common array
+	//
+	dim ww;
+	dim registerx;
+	//
+	// Default constructor to properly dimension the dim arrays
+	win_common() {
+		ww.redim(100);
+		registerx.redim(10);
+	}
 
 commonexit(win,win_common_no)
 

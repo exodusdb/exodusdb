@@ -131,6 +131,7 @@ function main()
 
 	    v=123456;
 	    v=v/1000;
+		TRACE(v)
 	    assert(int(v) != v);
 	    assert(int(v) == 123);
 	    assert(double(v) == v);

@@ -55,7 +55,7 @@ namespace exodus {
 // var var::iconv_MT(const char* conversion) const
 var var::iconv_MT() const {
 	//THISIS("var var::iconv_MT() const")
-	//assertString(functionname);
+	//assertString(function_sig);
 	// ignore everything else and just get first three groups of digits "99 99 99"
 	// remove leading and trailing non-digits and replace internal strings of non-digits with
 	// single space
@@ -127,7 +127,7 @@ var var::iconv_MT() const {
 // regular expressions for ICONV_MC
 VARREF var::oconv_MR(const char* conversionchar) {
 	//THISIS("VARREF var::oconv_MR(const char* conversionchar)")
-	//assertString(functionname);
+	//assertString(function_sig);
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 
 	// abort if no 3rd char
@@ -237,7 +237,7 @@ VARREF var::oconv_MR(const char* conversionchar) {
 	return *this;
 }
 
-syntax_flags_typ get_regex_syntax_flags(CVR options) {
+syntax_flags_typ get_regex_syntax_flags(SV options) {
 	// determine options from string
 
 	// default
@@ -246,7 +246,8 @@ syntax_flags_typ get_regex_syntax_flags(CVR options) {
 	syntax_flags_typ regex_syntax_flags = std_boost::regex_constants::collate;
 
 	// i = icase
-	if (options.index("i"))
+	//if (options.index("i"))
+	if (options.find('i') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::icase;
 
 	// m = multiline (TODO should be present c++17 onwards)
@@ -261,14 +262,16 @@ syntax_flags_typ get_regex_syntax_flags(CVR options) {
 
 	// e = extended
 	// Use the extended POSIX regular expression grammar
-	if (options.index("e"))
+	//if (options.index("e"))
+	if (options.find('e') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::extended;
 
 	// l - literal TODO manually implement
 	// ignore all usual regex special characters
 	// BOOST only option
 #ifdef USE_BOOST
-	if (options.index("l"))
+	//if (options.index("l"))
+	if (options.find('l') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::literal;
 #endif
 
@@ -276,20 +279,21 @@ syntax_flags_typ get_regex_syntax_flags(CVR options) {
 }
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::match(CVR matchstr, CVR options) const {
+var var::match(CVR matchstr, SV options) const {
+
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
 	// https:www.debuggex.com
 
-
-	THISIS("bool var::match(CVR matchstr, CVR options) const")
-	assertString(functionname);
-	matchstr.assertString(functionname);
+	THISIS("bool var::match(CVR matchstr, SV options) const")
+	assertString(function_sig);
+	matchstr.assertString(function_sig);
 
 	// wild cards like
 	// *.* or *.???
 	// *abcde
 	// abcde*
-	if (options.index("w")) {
+	//if (options.index("w")) {
+	if (options.find("w") != std::string::npos) {
 
 		// rules of glob - converting glob to regex
 
@@ -430,37 +434,37 @@ var var::match(CVR matchstr, CVR options) const {
 }
 
 // simple case sensitive substr replacement
-var var::swap(CVR what, CVR with) const& {
+var var::swap(SV what, SV with) const& {
 	var newmv = *this;
 	return newmv.swapper(what, with);
 }
 
 // on temporaries
-VARREF var::swap(CVR what, CVR with) && {
+VARREF var::swap(SV what, SV with) && {
 	return this->swapper(what, with);
 }
 
 // in-place
-VARREF var::swapper(CVR what, CVR with) {
+VARREF var::swapper(SV what, SV with) {
 
-	THISIS("VARREF var::swapper(CVR what, CVR with)")
-	assertStringMutator(functionname);
-	what.assertString(functionname);
-	with.assertString(functionname);
+	THISIS("VARREF var::swapper(SV what, SV with)")
+	assertStringMutator(function_sig);
+	//what.assertString(function_sig);
+	//with.assertString(function_sig);
 
 	// nothing to do if oldstr is ""
-	if (what.var_str.empty())
+	if (what.empty())
 		return *this;
 
 	// find the starting position of the field or return
 	std::string::size_type start_pos = 0;
 	while (true) {
-		start_pos = var_str.find(what.var_str, start_pos);
+		start_pos = var_str.find(what, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return *this;
-		var_str.replace(start_pos, what.var_str.size(), with.var_str);
-		start_pos += with.var_str.size();
+		var_str.replace(start_pos, what.size(), with);
+		start_pos += with.size();
 	}
 
 	return *this;
@@ -468,26 +472,24 @@ VARREF var::swapper(CVR what, CVR with) {
 
 //regex based string replacement
 // only here really because boost regex is included here for file matching
-var var::replace(CVR regexstr, CVR replacementstr, CVR options) const& {
+var var::replace(CVR regexstr, CVR replacementstr, SV options) const& {
 	var newmv = *this;
 	return newmv.replacer(regexstr, replacementstr, options);
 }
 
 // on temporary
-VARREF var::replace(CVR regexstr, CVR replacementstr, CVR options) && {
+VARREF var::replace(CVR regexstr, CVR replacementstr, SV options) && {
 	return this->replacer(regexstr, replacementstr, options);
 }
 
 // in-place
-VARREF var::replacer(CVR regexstr, CVR replacementstr, CVR options) {
+VARREF var::replacer(CVR regexstr, CVR replacementstr, SV options) {
 
 	THISIS(
-		"VARREF var::replacer(CVR regexstr, CVR replacementstr, CVR "
-		"options)")
-	assertStringMutator(functionname);
-	regexstr.assertString(functionname);
-	replacementstr.assertString(functionname);
-	options.assertString(functionname);
+		"VARREF var::replacer(CVR regexstr, CVR replacementstr, SV options)")
+	assertStringMutator(function_sig);
+	regexstr.assertString(function_sig);
+	replacementstr.assertString(function_sig);
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 

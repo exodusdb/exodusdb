@@ -187,6 +187,7 @@ var var::iconv_D(const char* conversion) const {
 
 	const int maxparts = 9;
 	int parts[maxparts];
+	parts[0] = 0;
 	int partn = -1;
 
 	int month = 0;

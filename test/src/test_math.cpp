@@ -144,47 +144,47 @@ subroutine test2(in as, in bs) {
 	ai.toInt();
 	bi.toInt();
 
-	var a,b,c;
+	var va,vb,vc;
 
 	//plus
-	a=ai;
-	b=bi;
-	c=a+b;
+	va=ai;
+	vb=bi;
+	vc=va+vb;
 	z=as+bs;
-	printl(a,"+",b,"=",c,"should be",z, c == z ? "ok" : "FAIL");
-	assert(c == z);
-
-	//minus
-	a=ai;
-	b=bi;
-	c=a-b;
-	z=as-bs;
-	printl(a,"-",b,"=",c,"should be",z, c == z ? "ok" : "FAIL");
-	assert(c == z);
+	printl(va,"+",vb,"=",vc,"add should be",z, vc == z ? "ok" : "FAIL");
+	assert(vc == z);
 
 	//multiply
-	a=ai;
-	b=bi;
-	c=a*b;
+	va=ai;
+	vb=bi;
+	vc=va*vb;
 	z=as*bs;
-	printl(a,"*",b,"=",c,"should be",z, c == z ? "ok" : "FAIL");
-	assert(c == z);
+	printl(va,"*",vb,"=",vc,"mul should be",z, vc == z ? "ok" : "FAIL");
+	assert(vc == z);
+
+	//minus
+	va=ai;
+	vb=bi;
+	vc=va-vb;
+	z=as-bs;
+	printl(va,"-",vb,"=",vc,"sub should be",z, vc == z ? "ok" : "FAIL");
+	assert(vc == z);
 
 	//divide
-	a=ai;
-	b=bi;
-	c=a/b;
+	va=ai;
+	vb=bi;
+	vc=va/vb;
 	z=as/bs;
-	printl(a,"/",b,"=",c,"should be",z, c == z ? "ok" : "FAIL");
-	assert(c == z);
+	printl(va,"/",vb,"=",vc,"div be",z, vc == z ? "ok" : "FAIL");
+	assert(vc == z);
 
 	//modulus
-	a=ai;
-	b=bi;
-	c=a%b;
+	va=ai;
+	vb=bi;
+	vc=va%vb;
 	z=as%bs;
-	printl(a,"%",b,"=",c,"should be",z, c == z ? "ok" : "FAIL");
-	assert(c == z);
+	printl(va,"%",vb,"=",vc,"mod be",z, vc == z ? "ok" : "FAIL");
+	assert(vc == z);
 
 	return;
 }

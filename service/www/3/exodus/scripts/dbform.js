@@ -8849,8 +8849,13 @@ function* document_onpaste(event) {
     //prevent paste into readonly
     var msg = element.getAttribute('exodusreadonly')
     if (msg) {
+		//Generic message for read-only fields
+		if (msg == 'true') {
+			msg = 'This is a read-only field'
+		}
         exoduscancelevent()
-        return yield* exodusinvalid(msg)
+   	    return yield* exodusinvalid(msg)
+	}
 
     //only supporting form_paste in first column
     if (!element.getAttribute('exodusisfirstinputcolumn')) {
@@ -8883,7 +8888,6 @@ function* document_onpaste(event) {
     //in case we selected a text node
     if (!element.getAttribute && element.parentNode.getAttribute)
         element = element.parentElement
-    }
 
     //the following doesnt seem to simulate pasting anymore
     //so we rely on early return above to perform normal paste

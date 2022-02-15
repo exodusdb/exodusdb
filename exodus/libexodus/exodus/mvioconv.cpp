@@ -33,7 +33,7 @@ namespace exodus {
 var var::iconv(CVR convstr) const {
 
 	THISIS("var var::iconv(CVR convstr) const")
-	convstr.assertString(functionname);
+	convstr.assertString(function_sig);
 
 	return iconv(convstr.var_str.c_str());
 }
@@ -52,7 +52,7 @@ The result in internal format
 var var::iconv(const char* convstr) const {
 
 	THISIS("var var::iconv(const char* convstr) const")
-	assertString(functionname);
+	assertString(function_sig);
 
 	// empty string in, empty string out
 	if (var_typ & VARTYP_STR && var_str.empty())
@@ -657,8 +657,8 @@ var var::oconv_LRC(CVR format) const {
 var var::oconv(CVR conversion) const {
 
 	THISIS("var var::oconv(CVR conversion) const")
-	assertDefined(functionname);
-	conversion.assertString(functionname);
+	assertDefined(function_sig);
+	conversion.assertString(function_sig);
 
 	return oconv(conversion.var_str.c_str());
 }
@@ -672,7 +672,7 @@ var var::oconv(const char* conversion) const {
 	THISIS("var var::oconv(const char* conversion) const")
 	// TODO this should be THISISASSIGNED since no point converting numbers to strings for many
 	// oconvs
-	assertString(functionname);
+	assertString(function_sig);
 
 	// REMOVE the remove logic out of the L# R# and T# here
 

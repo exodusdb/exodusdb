@@ -119,10 +119,10 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
 	var temptablename = "SELECT_CURSOR_STAGE2_" ^ CURSOR.a(1);
-	//var createtablesql = "";
-	//createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
+	var createtablesql = "";
+	createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
-	var createtablesql = "CREATE TEMPORARY TABLE IF NOT EXISTS " ^ temptablename ^ "(\n";
+	createtablesql ^= "CREATE TEMPORARY TABLE IF NOT EXISTS " ^ temptablename ^ "(\n";
 	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
 
 	//prepare to insert sql records
@@ -265,7 +265,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		//clear the table in case we are reusing it
 		createtablesql ^= ";DELETE FROM " ^ temptablename ^ ";\n";
 
-	//create the temporary table
+		//create the temporary table
 		CURSOR.sqlexec(createtablesql);
 	} else
 		baseinsertsql = "";
@@ -1126,7 +1126,7 @@ void ExodusProgramBase::chain(CVR libraryname) {
 // perform
 var ExodusProgramBase::perform(CVR sentence) {
 	// THISIS("var ExodusProgramBase::perform(CVR sentence)")
-	// sentence.assertString(functionname);
+	// sentence.assertString(function_sig);
 
 	// return ID^"*"^dictid;
 
@@ -1369,7 +1369,7 @@ var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, C
 // calculate 1
 var ExodusProgramBase::calculate(CVR dictid) {
 	// THISIS("var ExodusProgramBase::calculate(CVR dictid)")
-	// dictid.assertString(functionname);
+	// dictid.assertString(function_sig);
 
 	// return ID^"*"^dictid;
 

@@ -1176,6 +1176,7 @@ function main()
 //  xx.inverter();
 
 	var env=osgetenv("");
+	printl(env);
 	assert(osgetenv("PATH"));
 	assert(osgetenv("HOME"));
 	env="Steve";

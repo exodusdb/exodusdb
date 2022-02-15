@@ -47,15 +47,12 @@ dim::~dim() {
 	delete[] data_;
 }
 
-// move contructor
-dim::dim(dim&& sourcedim) noexcept {
-	nrows_ = sourcedim.nrows_;
-	ncols_ = sourcedim.ncols_;
-	initialised_ = sourcedim.ncols_;
-	data_ = sourcedim.data_;
-}
+// constructor - rows only
+//dim::dim(const int rows)
+//	: dim(rows, 1) {}
 
-dim::dim(int rows, int cols)
+// constructor - rows and columns
+dim::dim(const int rows, const int cols)
 	: nrows_(rows), ncols_(cols), initialised_(true)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
@@ -65,11 +62,19 @@ dim::dim(int rows, int cols)
 	//var(rows * cols + 1).errputl("created dim[] ");
 }
 
+// move contructor
+dim::dim(dim&& sourcedim) noexcept {
+	nrows_ = sourcedim.nrows_;
+	ncols_ = sourcedim.ncols_;
+	initialised_ = sourcedim.ncols_;
+	data_ = sourcedim.data_;
+}
+
 bool dim::read(CVR filehandle, CVR key) {
 
 	THISIS("bool dim::read(CVR filehandle, CVR key)")
-	filehandle.assertString(functionname);
-	key.assertString(functionname);
+	filehandle.assertString(function_sig);
+	key.assertString(function_sig);
 
 	var temprecord;
 	if (!temprecord.read(filehandle, key))
@@ -91,8 +96,8 @@ bool dim::read(CVR filehandle, CVR key) {
 bool dim::write(CVR filehandle, CVR key) const {
 
 	THISIS("bool dim::write(CVR filehandle, CVR key) const")
-	filehandle.assertString(functionname);
-	key.assertString(functionname);
+	filehandle.assertString(function_sig);
+	key.assertString(function_sig);
 
 	var temprecord = this->join();
 	return temprecord.write(filehandle, key);
@@ -101,8 +106,8 @@ bool dim::write(CVR filehandle, CVR key) const {
 bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
 
 	THISIS("bool dim::osread(CVR osfilename, CVR codepage = \"\")")
-	osfilename.assertString(functionname);
-	codepage.assertString(functionname);
+	osfilename.assertString(function_sig);
+	codepage.assertString(function_sig);
 
 	var txt;
 	if (not txt.osread(osfilename, codepage)) {
@@ -127,8 +132,8 @@ bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
 bool dim::oswrite(CVR osfilename, CVR codepage /*=0*/) const {
 
 	THISIS("bool dim::oswrite(CVR osfilename, CVR codepage = \"\")")
-	osfilename.assertString(functionname);
-	codepage.assertString(functionname);
+	osfilename.assertString(function_sig);
+	codepage.assertString(function_sig);
 
 	//TODO option for linesep to be \r\n
 	static char linesep = '\n';
@@ -329,8 +334,8 @@ dim var::split(CVR separator) const {
 var dim::split(CVR str1, CVR separator) {
 
 	THISIS("var dim::split(CVR var1, CVR separator=\"\")")
-	str1.assertString(functionname);
-	separator.assertString(functionname);
+	str1.assertString(function_sig);
+	separator.assertString(function_sig);
 
 	//TODO template another version to be fast for single byte separator esp. default FM_
 	//var sep = separator.var_str.size() ? separator : FM_;
@@ -407,8 +412,8 @@ dim& dim::sort(bool reverse) {
 var var::sort(CVR separator) const{
 
 	THISIS("var var::sort(CVR separator=UNASSIGNED)")
-	assertString(functionname);
-	separator.assertString(functionname);
+	assertString(function_sig);
+	separator.assertString(function_sig);
 
 	//perhaps has slow but sorts alphanumerically by testing var<var
 	//eg bb cc aa 2 10 -> aa bb cc 10 2

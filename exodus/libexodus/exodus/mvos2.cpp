@@ -37,7 +37,7 @@ namespace exodus {
 void var::ossleep(const int milliseconds) const {
 
 	THISIS("void var::ossleep(const int milliseconds) const")
-	assertDefined(functionname);	 // not needed if *this not used
+	assertDefined(function_sig);	 // not needed if *this not used
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 
@@ -83,7 +83,7 @@ thread_local std::unique_ptr<RNG_typ> thread_RNG;
 var var::rnd() const {
 
 	THISIS("var var::rnd() const")
-	assertNumeric(functionname);
+	assertNumeric(function_sig);
 
 	// Create a base generator per thread on the heap. Will be destroyed on thread termination.
 	if (not thread_RNG.get())
@@ -105,8 +105,8 @@ var var::rnd() const {
 
 void var::initrnd() const {
 
-	THISIS("void var::initrnd(CVR seed) const")
-	assertDefined(functionname);
+	THISIS("void var::initrnd() const")
+	assertDefined(function_sig);
 
 	// Get a seed for the RNG
 	uint64_t seed;
@@ -137,17 +137,19 @@ void var::initrnd() const {
 	thread_RNG = std::make_unique<RNG_typ>(seed);
 }
 
-bool var::osgetenv(CVR envvarname) {
+bool var::osgetenv(const char* envvarname) {
 
-	THISIS("bool var::osgetenv(CVR envvarname)")
-	assertDefined(functionname);
-	envvarname.assertString(functionname);
+	THISIS("bool var::osgetenv(const char* envvarname)")
+	assertDefined(function_sig);
+	//assertStringMutator(function_sig);
+	//envvarname.assertString(function_sig);
 
 	// return whole environment if blank envvarname
-	if (envvarname.var_str.empty()) {
+	//if (envvarname.var_str.empty()) {
+	if (*envvarname == 0) {
 
 		var_str.clear();
-		var_typ = VARTYP_STR;
+		//var_typ = VARTYP_STR;
 
 		int i = 1;
 		char* s = *environ;
@@ -163,21 +165,26 @@ bool var::osgetenv(CVR envvarname) {
 
 	//TIP if you cant seem to osgetenv vars set in bash, then ensure you set them in bash with "export"
 
-	const char* cvalue = std::getenv(envvarname.var_str.c_str());
+	//const char* cvalue = std::getenv(envvarname.var_str.c_str());
+	const char* cvalue = std::getenv(envvarname);
 	if (cvalue == 0) {
 		var_str.clear();
 		var_typ = VARTYP_STR;
 		return false;
-	} else
-		*this = var(cvalue);
+	}
+
+	// *this = var(cvalue);
+	var_str = cvalue;
+	var_typ = VARTYP_STR;
+
 	return true;
 }
 
-bool var::ossetenv(CVR envvarname) const {
+bool var::ossetenv(const char* envvarname) const {
 
-	THISIS("bool var::ossetenv(CVR envvarname) const")
-	assertString(functionname);
-	envvarname.assertString(functionname);
+	THISIS("bool var::ossetenv(const char* envvarname) const")
+	assertString(function_sig);
+	//envvarname.assertString(function_sig);
 
 //#ifdef _MSC_VER
 #ifndef setenv
@@ -205,7 +212,8 @@ bool var::ossetenv(CVR envvarname) const {
 
 	//char winenv[1024];
 	char* env = (char*)malloc(1024);
-	snprintf(env, 1024, "%s=%s", envvarname.var_str.c_str(), var_str.c_str());
+	//snprintf(env, 1024, "%s=%s", envvarname.var_str.c_str(), var_str.c_str());
+	snprintf(env, 1024, "%s=%s", envvarname, var_str.c_str());
 	//std::cout << winenv;
 	int result = putenv(env);
 

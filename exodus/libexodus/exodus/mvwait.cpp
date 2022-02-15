@@ -302,8 +302,8 @@ var var::oswait(const int milliseconds, CVR directory) const {
 
 	THISIS("void var::oswait(const int milliseconds, const var directory) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-	//assertDefined(functionname); // not needed if *this not used
-	directory.assertString(functionname);
+	//assertDefined(function_sig); // not needed if *this not used
+	directory.assertString(function_sig);
 
 	Cargs cargs(FM ^ directory);
 

@@ -283,7 +283,8 @@ function main() {
 	assert(var(10.0/3)*3==10);
 	assert(var(10.0/3*3)==10);
 	assert(var(10.0)/var(3)*3==10);
-	assert(var(10.0)/var(3)*var(3)==10);
+	TRACE((var(10.0)/var(3)).outputl()*var(3).outputl())
+	assert((var(10.0)/var(3)).outputl()*var(3).outputl()==10);
 
 	//on exodus/c++ all numbers different by 0.0001 are considered the same
 	//whereas on pick/arev they are considered different down to 

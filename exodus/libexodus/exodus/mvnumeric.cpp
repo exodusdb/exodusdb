@@ -400,7 +400,7 @@ void var::createString() const {
 	// THISIS("void var::createString() const")
 	// TODO ensure ISDEFINED is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISDEFINED
-	// assertDefined(functionname);
+	// assertDefined(function_sig);
 
 	// dbl - create string from dbl
 	// prefer double
@@ -449,7 +449,7 @@ var var::round(const int ndecimals) const {
 
 
 	THISIS("var var::round() const")
-	assertNumeric(functionname);
+	assertNumeric(function_sig);
 
 	var result;
 
@@ -546,7 +546,7 @@ var var::round(const int ndecimals) const {
 var var::integer() const {
 
 	THISIS("var var::integer() const")
-	assertInteger(functionname);
+	assertInteger(function_sig);
 	/*
 	//pick integer means floor()
 	//-1.0=-1
@@ -571,7 +571,7 @@ var var::integer() const {
 var var::floor() const {
 
 	THISIS("var var::floor() const")
-	assertInteger(functionname);
+	assertInteger(function_sig);
 	return var_int;
 }
 
@@ -580,7 +580,7 @@ bool var::toBool() const {
 	THISIS("bool var::toBool() const")
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
-	assertDefined(functionname);
+	assertDefined(function_sig);
 
 	// identical code in void* and bool except returns void* and bool respectively
 	while (true) {
@@ -605,7 +605,7 @@ bool var::toBool() const {
 			return std::abs(var_dbl) >= SMALLEST_NUMBER;
 
 		if (!(var_typ)) {
-			assertAssigned(functionname);
+			assertAssigned(function_sig);
 			throw MVUnassigned("toBool()");
 		}
 
@@ -617,7 +617,7 @@ bool var::toBool() const {
 int var::toInt() const {
 
 	THISIS("int var::toInt() const")
-	assertInteger(functionname);
+	assertInteger(function_sig);
 
 	return static_cast<int>(var_int);
 }
@@ -625,7 +625,7 @@ int var::toInt() const {
 long long var::toLong() const {
 
 	THISIS("int var::toLong() const")
-	assertInteger(functionname);
+	assertInteger(function_sig);
 
 	return static_cast<long long>(var_int);
 }
@@ -633,7 +633,7 @@ long long var::toLong() const {
 double var::toDouble() const {
 
 	THISIS("double var::toDouble() const")
-	assertDecimal(functionname);
+	assertDecimal(function_sig);
 
 	return var_dbl;
 }
@@ -664,7 +664,7 @@ bool var::isnum(void) const {
 	THISIS("bool var::isnum(void) const")
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here
-	assertDefined(functionname);
+	assertDefined(function_sig);
 
 	// Known to be numeric already
 	if (var_typ & VARTYP_INTDBL)

@@ -64,7 +64,56 @@ void var::throwNonNumeric(CVR message) const {
 	throw MVNonNumeric(message);
 }
 
-//// copy constructor - not inline merely because of lack of THISIS etc in mv.h
+CVR var::dump(SV text) const {
+	std::clog << "DUMP: " << text << " ";
+	if (var_typ & VARTYP_STR)
+		std::clog << "str: \"" << var_str << "\" ";
+	if (var_typ & VARTYP_INT)
+		std::clog << "int:" << var_int << " ";
+	if (var_typ & VARTYP_DBL)
+		std::clog << "dbl:" << var_dbl << " ";
+	std::clog << "typ:" << var_typ << std::endl;
+	return *this;
+}
+
+VARREF var::dump(SV text) {
+	std::clog << "DUMP: " << text << " ";
+	if (var_typ & VARTYP_STR)
+		std::clog << "str: \"" << var_str << "\" ";
+	if (var_typ & VARTYP_INT)
+		std::clog << "int:" << var_int << " ";
+	if (var_typ & VARTYP_DBL)
+		std::clog << "dbl:" << var_dbl << " ";
+	std::clog << "typ:" << var_typ << std::endl;
+	return *this;
+}
+
+double exodusmodulus(const double top, const double bottom) {
+#define USE_PICKOS_MODULUS
+#ifdef USE_PICKOS_MODULUS
+
+	// note that exodus var int() is floor function as per pickos standard
+	// whereas c/c++ int() function is round to nearest even number (negative or positive)
+
+	//https://pickos.neosys.com/x/pAEz.html
+	//var(i) - (int(var(i)/var(j)) * var(j))) ... where int() is pickos int() (i.e. floor)
+	return top - static_cast<double>(floor(top / bottom) * bottom);
+
+#else
+	//return top - static_cast<double>(int(top / bottom) * bottom);
+	//return top % bottom;//doesnt compile (doubles)
+
+	//fmod - The floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where n is x/y with its fractional part truncated.
+	//https://en.cppreference.com/w/c/numeric/math/fmod
+	//return std::fmod(top,bottom);
+
+	//remainder - The IEEE floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where the value n is the integral value nearest the exact value x/y. When |n-x/y| = ½, the value n is chosen to be even.
+	//https://en.cppreference.com/w/c/numeric/math/remainder
+	return std::remainder(top, bottom);
+
+#endif
+}
+
 //var::var(CVR rhs)
 //	: var_str(rhs.var_str),
 //	var_int(rhs.var_int),
@@ -73,8 +122,7 @@ void var::throwNonNumeric(CVR message) const {
 //
 //	// use initializers and only check afterwards if copiedvar was assigned (why?)
 //
-//	THISIS("var::var(CVR rhs)")
-//	rhs.assertAssigned(functionname);
+//	rhs.assertAssigned(__PRETTY_FUNCTION__);
 //
 //	//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 //}
@@ -83,64 +131,75 @@ void var::throwNonNumeric(CVR message) const {
 // to avoid the compiler error "ambiguous conversion"
 //(explicit means it is not automatic)
 
-/**
-* Automatic conversion to std::string
-* @return std::string
-*/
-var::operator std::string() const {
+///**
+//* Automatic conversion to std::string
+//* @return std::string
+//*/
+//var::operator std::string() const {
+//
+//	assertString(__PRETTY_FUNCTION__);
+//
+//	return var_str;
+//}
 
-	THISIS("var::operator std::string()")
-	assertString(functionname);
+///**
+//* Automatic conversion to std::string_view
+//* @return std::string_view
+//*/
+//var::operator std::string_view() const {
+//
+//	assertString(__PRETTY_FUNCTION__);
+//
+//	return std::string_view(var_str);
+//}
 
-	return var_str;
-}
+///**
+//* Automatic conversion to bool expressed as void*
+//* @return void* 0 or 1
+//*/
+//var::operator void*() const {
+//
+//	// result in an attempt to convert an uninitialised object to void* since there is a bool
+//	// conversion when does c++ use automatic conversion to void* note that exodus operator !
+//	// uses (void*) trial elimination of operator void* seems to cause no problems but without
+//	// full regression testing
+//	assertDefined(__PRETTY_FUNCTION__);
+//
+//	return (void*)toBool();
+//}
 
-/**
-* Automatic conversion to bool expressed as void*
-* @return void* 0 or 1
-*/
-var::operator void*() const {
+//// supposed to be replaced with automatic void() and made explicit but just seems to force int
+//// conversion during "if (var)" necessary to allow var to be used standalone in "if (xxx)" but see
+//// mv.h for discussion of using void* instead of bool #ifndef _MSC_VER
+//var::operator bool() const {
+//	return toBool();
+//}
 
-	THISIS("var::operator void*() const")
-	// could be skipped for speed if can be proved there is no way in c++ syntax that would
-	// result in an attempt to convert an uninitialised object to void* since there is a bool
-	// conversion when does c++ use automatic conversion to void* note that exodus operator !
-	// uses (void*) trial elimination of operator void* seems to cause no problems but without
-	// full regression testing
-	assertDefined(functionname);
-
-	return (void*)toBool();
-}
-
-// supposed to be replaced with automatic void() and made explicit but just seems to force int
-// conversion during "if (var)" necessary to allow var to be used standalone in "if (xxx)" but see
-// mv.h for discussion of using void* instead of bool #ifndef _MSC_VER
-var::operator bool() const {
-	return toBool();
-}
-
-var::operator int() const {
-
-	THISIS("var::operator int() const")
-	//converts string or double to int using pickos int() which is floor()
-	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
-	assertInteger(functionname);
-	return static_cast<int>(var_int);
-}
-
-var::operator long long() const {
-
-	THISIS("var::operator long long() const")
-	assertInteger(functionname);
-	return static_cast<long long>(var_int);
-}
-
-var::operator double() const {
-
-	THISIS("var::operator double() const")
-	assertDecimal(functionname);
-	return static_cast<double>(var_dbl);
-}
+//var::operator int() const {
+//
+//	//converts string or double to int using pickos int() which is floor()
+//	//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
+//	assertInteger(__PRETTY_FUNCTION__);
+//	return static_cast<int>(var_int);
+//}
+//
+//var::operator long long() const {
+//
+//	assertInteger(__PRETTY_FUNCTION__);
+//	return static_cast<long long>(var_int);
+//}
+//
+//var::operator double() const {
+//
+//	assertDecimal(__PRETTY_FUNCTION__);
+//	return static_cast<double>(var_dbl);
+//}
+//
+//var::operator long double() const {
+//
+//	assertDecimal(__PRETTY_FUNCTION__);
+//	return static_cast<long double>(var_dbl);
+//}
 
 /////////////
 // ASSIGNMENT
@@ -154,9 +213,8 @@ var::operator double() const {
 // see also ^= etc
 VOID_OR_VARREF var::operator=(CVR rhs) & {
 
-	THISIS("VARREF var::operator=(CVR rhs) &")
-	assertDefined(functionname);	 //could be skipped for speed?
-	rhs.assertAssigned(functionname);
+	assertDefined(__PRETTY_FUNCTION__);	 //could be skipped for speed?
+	rhs.assertAssigned(__PRETTY_FUNCTION__);
 
 	//std::clog << "copy assignment" <<std::endl;
 
@@ -182,9 +240,8 @@ VOID_OR_VARREF var::operator=(CVR rhs) & {
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(CVR rhs) & {
 
-	THISIS("VARREF var::operator^=(CVR rhs) &")
-	assertString(functionname);
-	rhs.assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
+	rhs.assertString(__PRETTY_FUNCTION__);
 
 	// tack it onto our string
 	var_str.append(rhs.var_str);
@@ -197,8 +254,7 @@ VARREF var::operator^=(CVR rhs) & {
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const int int1) & {
 
-	THISIS("VARREF var::operator^=(const int int1) &")
-	assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
 
 	// var_str+=var(int1).var_str;
 	var_str += std::to_string(int1);
@@ -211,8 +267,7 @@ VARREF var::operator^=(const int int1) & {
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const double double1) & {
 
-	THISIS("VARREF var::operator^=(const double double1) &")
-	assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
 
 	// var_str+=var(int1).var_str;
 	//var_str += mvd2s(double1);
@@ -228,8 +283,7 @@ VARREF var::operator^=(const double double1) & {
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const char char1) & {
 
-	THISIS("VARREF var::operator^=(const char char1) &")
-	assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
 
 	// var_str+=var(int1).var_str;
 	var_str.push_back(char1);
@@ -242,8 +296,7 @@ VARREF var::operator^=(const char char1) & {
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const char* cstr) & {
 
-	THISIS("VARREF var::operator^=(const char* cstr) &")
-	assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
 
 	// var_str+=var(int1).var_str;
 	// var_str+=std::string(char1);
@@ -257,8 +310,7 @@ VARREF var::operator^=(const char* cstr) & {
 // The assignment operator should always return a reference to *this.
 VARREF var::operator^=(const std::string& string1) & {
 
-	THISIS("VARREF var::operator^=(const std::string string1) &")
-	assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
 
 	// var_str+=var(int1).var_str;
 	var_str += string1;
@@ -275,9 +327,8 @@ VARREF var::operator^=(const std::string& string1) & {
 // int argument indicates that this is POSTFIX override v++
 var var::operator++(int) & {
 
-	THISIS("var var::operator++(int) &")
 	// full check done below to avoid double checking number type
-	assertDefined(functionname);
+	assertDefined(__PRETTY_FUNCTION__);
 
 	var priorvalue;
 
@@ -301,11 +352,11 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
 		//trigger MVUnassigned
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
 	// NO DO NOT! return *this ... postfix return a temporary!!! eg var(*this)
@@ -316,9 +367,8 @@ tryagain:
 // int argument indicates that this is POSTFIX override v--
 var var::operator--(int) & {
 
-	THISIS("var var::operator--(int) & ")
 	// full check done below to avoid double checking number type
-	assertDefined(functionname);
+	assertDefined(__PRETTY_FUNCTION__);
 
 	var priorvalue;
 
@@ -342,11 +392,11 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
 		//trigger MVUnassigned
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
 	return priorvalue;
@@ -356,9 +406,8 @@ tryagain:
 // no argument indicates that this is prefix override ++var
 VARREF var::operator++() & {
 
-	THISIS("var var::operator++() &")
 	// full check done below to avoid double checking number type
-	assertDefined(functionname);
+	assertDefined(__PRETTY_FUNCTION__);
 
 tryagain:
 	// prefer int since -- nearly always on integers
@@ -376,11 +425,11 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
 		//trigger MVUnassigned
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
 	// OK to return *this in prefix ++
@@ -391,9 +440,8 @@ tryagain:
 // no argument indicates that this is prefix override --var
 VARREF var::operator--() & {
 
-	THISIS("VARREF var::operator--() &")
 	// full check done below to avoid double checking number type
-	assertDefined(functionname);
+	assertDefined(__PRETTY_FUNCTION__);
 
 tryagain:
 	// prefer int since -- nearly always on integers
@@ -413,98 +461,537 @@ tryagain:
 			goto tryagain;
 
 		//trigger MVNonNumeric
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
 		//trigger MVUnassigned
-		assertNumeric(functionname);
+		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
 	// OK to return *this in prefix --
 	return *this;
 }
 
-//+=var (very similar to version with on rhs)
-// provided to disambiguate syntax like var1+=var2
-VARREF var::operator+=(const int int1) & {
+//////////////
+// SELF ASSIGN
+//////////////
 
-	THISIS("VARREF var::operator+=(const int int1) &")
-	assertDefined(functionname);
+//////
+// VAR
+//////
+
+// ADD VAR
+
+VARREF var::operator+=(CVR rhs) &{
+
+	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
 tryagain:
 
-	// dbl target
-	// prefer double
+	// lhs double
 	if (var_typ & VARTYP_DBL) {
-		//+= int or dbl from source
-		var_dbl += int1;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+		// use rhs double if available otherwise use its int
+		var_dbl += (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : rhs.var_int;
+		// reset lhs to one unique type
+		var_typ = VARTYP_DBL;
 		return *this;
 	}
 
-	// int target
+	// lhs int
+	else if (var_typ & VARTYP_INT) {
+
+		// rhs double
+		if (rhs.var_typ & VARTYP_DBL) {
+			var_dbl = var_int + rhs.var_dbl;
+			// reset lhs to one unique type
+			var_typ = VARTYP_DBL;
+			return *this;
+		}
+
+		// both are ints
+		var_int += rhs.var_int;
+		// reset lhs to one unique type
+		var_typ = VARTYP_INT;
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+}
+
+// MULTIPLY VAR
+
+VARREF var::operator*=(CVR rhs) &{
+
+	rhs.assertNumeric(__PRETTY_FUNCTION__);
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+		// use rhs double if available otherwise use its int
+		var_dbl *= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : rhs.var_int;
+		// reset lhs to one unique type
+		var_typ = VARTYP_DBL;
+		return *this;
+	}
+
+	// lhs int
+	else if (var_typ & VARTYP_INT) {
+
+		// rhs double
+		if (rhs.var_typ & VARTYP_DBL) {
+			var_dbl = var_int * rhs.var_dbl;
+			// reset lhs to one unique type
+			var_typ = VARTYP_DBL;
+			return *this;
+		}
+
+		// both are ints
+		var_int *= rhs.var_int;
+		// reset lhs to one unique type
+		var_typ = VARTYP_INT;
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+}
+
+// SUBTRACT VAR
+
+VARREF var::operator-=(CVR rhs) &{
+
+	rhs.assertNumeric(__PRETTY_FUNCTION__);
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+		// use rhs double if available otherwise use its int
+		var_dbl -= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : rhs.var_int;
+		// reset lhs to one unique type
+		var_typ = VARTYP_DBL;
+		return *this;
+	}
+
+	// lhs int
+	else if (var_typ & VARTYP_INT) {
+
+		// use rhs double if available
+		if (rhs.var_typ & VARTYP_DBL) {
+			var_dbl = var_int - rhs.var_dbl;
+			// reset lhs to one unique type
+			var_typ = VARTYP_DBL;
+			return *this;
+		}
+
+		// both are ints
+		var_int -= rhs.var_int;
+		// reset lhs to one unique type
+		var_typ = VARTYP_INT;
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+}
+
+
+// DIVIDE VAR
+
+VARREF var::operator/=(CVR rhs) &{
+
+	// Always returns a double because
+	// 10/3 must be 3.3333333
+
+	rhs.assertNumeric(__PRETTY_FUNCTION__);
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+
+		// rhs double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			var_dbl /= rhs.var_dbl;
+		}
+
+		// rhs double
+		else {
+			if (!rhs.var_int)
+				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			var_dbl /= rhs.var_int;
+		}
+
+	}
+
+	// lhs int
+	else if (var_typ & VARTYP_INT) {
+
+		// rhs double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+								 "')");
+			var_dbl = static_cast<double>(this->var_int) / rhs.var_dbl;
+		}
+
+		// both are ints - must return a double
+		else {
+			if (!rhs.var_int)
+				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				"')");
+			var_dbl = static_cast<double>(this->var_int) / rhs.var_int;
+		}
+
+	}
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	// reset lhs to one unique type
+	var_typ = VARTYP_DBL;
+
+	return *this;
+}
+
+
+// MODULO VAR
+
+VARREF var::operator%=(CVR rhs) &{
+
+	rhs.assertNumeric(__PRETTY_FUNCTION__);
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+
+		// rhs double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			var_dbl = exodusmodulus(var_dbl, rhs.var_dbl);
+		}
+
+		// rhs double
+		else {
+			if (!rhs.var_int)
+				throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+									 "')");
+			var_dbl = exodusmodulus(var_dbl, rhs.var_int);
+		}
+
+		// reset lhs to one unique type
+		var_typ = VARTYP_DBL;
+		return *this;
+	}
+
+	// lhs int
+	else if (var_typ & VARTYP_INT) {
+
+		// rhs double
+		if (rhs.var_typ & VARTYP_DBL) {
+			if (!rhs.var_dbl)
+				throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+								 "')");
+			var_dbl = exodusmodulus(var_int, rhs.var_dbl);
+
+			// reset lhs to one unique type
+			var_typ = VARTYP_DBL;
+			return *this;
+		}
+
+		// both are ints - must return a int
+		if (!rhs.var_int)
+			throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+								 "')");
+		var_int = this->var_int % rhs.var_int;
+
+		// reset lhs to one unique type
+		var_typ = VARTYP_INT;
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+}
+
+
+/////////
+// DOUBLE
+/////////
+
+// ADD DOUBLE
+
+VARREF var::operator+=(const double dbl1) &{
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL)
+		var_dbl += dbl1;
+
+	// lhs int
+	else if (var_typ & VARTYP_INT)
+		var_dbl = static_cast<double>(var_int) + dbl1;
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else {
+		assertNumeric(__PRETTY_FUNCTION__);
+		// Cant get here
+		throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	}
+
+	// reset to one unique type
+	var_typ = VARTYP_DBL;
+
+	return *this;
+}
+
+// MULTIPLY DOUBLE
+
+VARREF var::operator*=(const double dbl1) &{
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL)
+		var_dbl *= dbl1;
+
+	// lhs int
+	else if (var_typ & VARTYP_INT)
+		var_dbl = var_int * dbl1;
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	// reset to one unique type
+	var_typ = VARTYP_DBL;
+
+	return *this;
+}
+
+// SUBTRACT DOUBLE
+
+VARREF var::operator-=(const double dbl1) &{
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL)
+		var_dbl -= dbl1;
+
+	// lhs int
+	else if (var_typ & VARTYP_INT)
+		var_dbl = var_int - dbl1;
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	// reset to one unique type
+	var_typ = VARTYP_DBL;
+
+	return *this;
+}
+
+
+// DIVIDE DOUBLE
+
+VARREF var::operator/=(const double dbl1) &{
+
+	if (!dbl1)
+		throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ dbl1 ^
+		"')");
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL)
+		var_dbl /= dbl1;
+
+	// lhs int
+	else if (var_typ & VARTYP_INT)
+		var_dbl = static_cast<double>(var_int) / dbl1;
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	// reset to one unique type
+	var_typ = VARTYP_DBL;
+
+	return *this;
+}
+
+
+// MODULO DOUBLE
+
+VARREF var::operator%=(const double dbl1) &{
+
+	if (!dbl1)
+		throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ dbl1 ^
+		"')");
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL)
+		var_dbl = exodusmodulus(var_dbl, dbl1);
+
+	// lhs int
+	else if (var_typ & VARTYP_INT)
+		var_dbl = exodusmodulus(var_int, dbl1);
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	// reset to one unique type
+	var_typ = VARTYP_DBL;
+
+	return *this;
+}
+
+
+//////
+// INT
+//////
+
+// ADD INT
+
+VARREF var::operator+=(const int int1) &{
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+		var_dbl += int1;
+		// reset to one unique type
+		var_typ = VARTYP_DBL;
+		return *this;
+	}
+
+	// both int
 	else if (var_typ & VARTYP_INT) {
 		var_int += int1;
-		var_typ = VARTYP_INT;  // reset to one unique type
+		// reset to one unique type
+		var_typ = VARTYP_INT;
 		return *this;
 	}
-
-	// last case(s) should be much less frequent since result of attempt to
-	// convert strings to number is cached and only needs to be done once
-
-	// nan (dont bother with this here because it is exceptional and will be caught below anyway
-	// else if (var_typ&VARTYP_NAN)
-	//	throw MVNonNumeric("var::+= " ^ *this);
 
 	// try to convert to numeric
 	if (isnum())
 		goto tryagain;
 
-	assertNumeric(functionname);
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
 	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
-//+='1' (very similar to version with on rhs)
-// provided to disambiguate syntax like var1 += '1'
+// MULTIPLY INT
 
-VARREF var::operator+=(const char char1) & {
-
-	THISIS("VARREF var::operator+=(const char char1) &")
-	var charx = char1;
-	charx.assertNumeric(functionname);
-	return this->operator+=(int(charx.var_int));
-}
-
-//-='1' (very similar to version with on rhs)
-// provided to disambiguate syntax like var1 -= '1'
-VARREF var::operator-=(const char char1) & {
-
-	THISIS("VARREF var::operator-=(const char char1) &")
-	var charx = char1;
-	charx.assertNumeric(functionname);
-	return this->operator-=(int(charx.var_int));
-}
-
-//-=var (very similar to version with on rhs)
-// provided to disambiguate syntax like var1+=var2
-VARREF var::operator-=(const int int1) & {
-
-	THISIS("VARREF var::operator-=(int int1) &")
-	assertDefined(functionname);
+VARREF var::operator*=(const int int1) &{
 
 tryagain:
-	// dbl target
-	// prefer double
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+		var_dbl *= int1;
+		// reset to one unique type
+		var_typ = VARTYP_DBL;
+		return *this;
+	}
+
+	// both int
+	else if (var_typ & VARTYP_INT) {
+		var_int *= int1;
+		// reset to one unique type
+		var_typ = VARTYP_INT;
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+}
+
+//SUBTRACT INT
+
+VARREF var::operator-=(const int int1) &{
+
+tryagain:
+
+	// lhs double
 	if (var_typ & VARTYP_DBL) {
 		var_dbl -= int1;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+		// reset to one unique type
+		var_typ = VARTYP_DBL;
 		return *this;
 	}
 
-	// int target
+	// both int
 	else if (var_typ & VARTYP_INT) {
 		var_int -= int1;
-		var_typ = VARTYP_INT;  // reset to one unique type
+		// reset to one unique type
+		var_typ = VARTYP_INT;
 		return *this;
 	}
 
@@ -512,117 +999,198 @@ tryagain:
 	if (isnum())
 		goto tryagain;
 
-	assertNumeric(functionname);
-	throw MVNonNumeric(substr(1, 128) ^ "-= ");
-}
+	assertNumeric(__PRETTY_FUNCTION__);
 
-// allow varx+=1.5 to compile
-VARREF var::operator+=(const double dbl1) & {
-	(*this) += var(dbl1);
-	return *this;
-}
-
-VARREF var::operator-=(const double dbl1) & {
-	(*this) -= var(dbl1);
-	return *this;
-}
-
-//+=var
-VARREF var::operator+=(CVR rhs) & {
-
-	THISIS("VARREF var::operator+=(CVR rhs) &")
-	assertDefined(functionname);
-
-tryagain:
-
-	// dbl target
-	// prefer double
-	if (var_typ & VARTYP_DBL) {
-		rhs.assertNumeric(functionname);
-		//+= int or dbl from source
-		var_dbl += (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// int target
-	else if (var_typ & VARTYP_INT) {
-		rhs.assertNumeric(functionname);
-		// int source
-		if (rhs.var_typ & VARTYP_INT) {
-			var_int += rhs.var_int;
-			var_typ = VARTYP_INT;  // reset to one unique type
-			return *this;
-		}
-		// dbl source, convert target to dbl
-		var_dbl = var_int + rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-		return *this;
-	}
-
-	// last case(s) should be much less frequent since result of attempt to
-	// convert strings to number is cached and only needs to be done once
-
-	// nan (dont bother with this here because it is exceptional and will be caught below anyway
-	// else if (var_typ&VARTYP_NAN)
-	//	throw MVNonNumeric("var::+= " ^ *this);
-
-	// try to convert to numeric
-	if (isnum())
-		goto tryagain;
-
-	assertNumeric(functionname);
+	// Cant get here
 	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
-//-=var
-VARREF var::operator-=(CVR rhs) & {
 
-	THISIS("VARREF var::operator-=(CVR rhs) &")
-	assertDefined(functionname);
+//DIVIDE INT
+
+VARREF var::operator/=(const int int1) &{
+
+	// Always return double
+
+	if (!int1)
+		throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ int1 ^
+		"')");
 
 tryagain:
 
-	// int target
-	if (var_typ & VARTYP_INT) {
-		rhs.assertNumeric(functionname);
-		// int source
-		if (rhs.var_typ & VARTYP_INT) {
-			var_int -= rhs.var_int;
-			var_typ = VARTYP_INT;  // reset to one unique type
-			return *this;
-		}
-		// dbl source, convert target to dbl
-		var_dbl = var_int - rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+	// lhs double
+	if (var_typ & VARTYP_DBL)
+		var_dbl /= int1;
+
+	// both int
+	else if (var_typ & VARTYP_INT)
+		var_dbl = static_cast<double>(var_int) / int1;
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	// reset to one unique type
+	var_typ = VARTYP_DBL;
+	return *this;
+}
+
+
+//MODULO INT
+
+VARREF var::operator%=(const int int1) &{
+
+	if (!int1)
+		throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ int1 ^
+		"')");
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+		var_dbl = exodusmodulus(var_dbl, int1);
+		// reset to one unique type
+		var_typ = VARTYP_DBL;
 		return *this;
 	}
 
-	// dbl target
-	else if (var_typ & VARTYP_DBL) {
-		rhs.assertNumeric(functionname);
-		//-= int or dbl from source
-		var_dbl -= (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+	// both int
+	else if (var_typ & VARTYP_INT) {
+		var_int %= int1;
+		// reset to one unique type
+		var_typ = VARTYP_INT;
 		return *this;
 	}
-
-	// last case(s) should be much less frequent since result of attempt to
-	// convert strings to number is cached and only needs to be done once
-
-	// nan (dont bother with this here because it is exceptional and will be caught below anyway
-	// else if (var_typ&VARTYP_NAN)
-	//	throw MVNonNumeric("var::-= " ^ *this);
 
 	// try to convert to numeric
 	if (isnum())
 		goto tryagain;
 
-	assertNumeric(functionname);
-	throw MVNonNumeric(substr(1, 128) ^ "-= ");
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw MVNonNumeric(substr(1, 128) ^ "+= ");
 }
 
-//#endif
+
+///////
+// CHAR
+///////
+
+// ADD CHAR
+
+VARREF var::operator+=(const char char1) &{
+	(*this) += var(char1);
+	return *this;
+}
+
+// MULTIPLY CHAR
+
+VARREF var::operator*=(const char char1) &{
+	(*this) *= var(char1);
+	return *this;
+}
+
+// SUBTRACT CHAR
+
+VARREF var::operator-=(const char char1) &{
+	(*this) -= var(char1);
+	return *this;
+}
+
+
+// DIVIDE CHAR
+
+VARREF var::operator/=(const char char1) &{
+	(*this) /= var(char1);
+	return *this;
+}
+
+
+// MODULO CHAR
+
+VARREF var::operator%=(const char char1) &{
+	(*this) %= var(char1);
+	return *this;
+}
+
+
+///////
+// CSTR
+///////
+
+// ADD CSTR
+
+VARREF var::operator+=(const char* chars1) &{
+	(*this) += var(chars1);
+	return *this;
+}
+
+// MULTIPLY CSTR
+
+VARREF var::operator*=(const char* chars1) &{
+	(*this) *= var(chars1);
+	return *this;
+}
+
+// SUBTRACT CSTR
+
+VARREF var::operator-=(const char* chars1) &{
+	(*this) -= var(chars1);
+	return *this;
+}
+
+// DIVIDE CSTR
+
+VARREF var::operator/=(const char* chars1) &{
+	(*this) /= var(chars1);
+	return *this;
+}
+
+// MODULO CSTR
+
+VARREF var::operator%=(const char* chars1) &{
+	(*this) %= var(chars1);
+	return *this;
+}
+
+///////
+// BOOL
+///////
+
+// ADD BOOL
+
+VARREF var::operator+=(const bool bool1) &{
+	if (bool1)
+		(*this)++;
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+	return *this;
+}
+
+// MULTIPLY BOOL
+
+VARREF var::operator*=(const bool bool1) &{
+	assertNumeric(__PRETTY_FUNCTION__);
+	if (!bool1) {
+		var_int = 0;
+		var_typ = VARTYP_INT;
+	}
+	return *this;
+}
+
+// SUBTRACT BOOL
+
+VARREF var::operator-=(const bool bool1) &{
+	if (bool1)
+		(*this)--;
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+	return *this;
+}
 
 /* more accurate way of comparing two decimals using EPSILON and ulp
    not using it simply to make better emulation of pickos at least initially
@@ -649,7 +1217,7 @@ inline bool almost_equal(double x, decltype(var_int) y, int ulp)
 	if (y == 0)
 		return (std::abs(x) < SMALLEST_NUMBER);
 	else
-		return almost_equal_not_zero(x, double(y), ulp);
+		return almost_equal_not_zero(x, static_cast<double>(y), ulp);
 }
 
 inline bool almost_equal(double x, double y, int ulp)
@@ -668,13 +1236,31 @@ inline bool almost_equal(double x, double y, int) {
 	return (std::abs(x - y) < SMALLEST_NUMBER);
 }
 
+PUBLIC bool MVlt_bool(const bool lhs, const bool rhs) {
+
+	//return true if lhs is "less true" than rhs
+
+	//true  < true  -> false
+	//true  < false -> false
+	//false < true  -> TRUE
+	//false < false -> false
+	//
+	//     rhs: true    false
+	// lhs:     ----    -----
+	// true     false   false
+	// false    TRUE    false
+
+	//std::clog << lhs << " " << rhs << " " << (rhs && !lhs) << std::endl;
+	return rhs && !lhs;
+
+}
+
 // almost identical code in MVeq and MVlt except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
 PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 
-	THISIS("bool MVeq(CVR lhs,CVR rhs)")
-	lhs.assertDefined(functionname);
-	rhs.assertDefined(functionname);
+	lhs.assertDefined(__PRETTY_FUNCTION__);
+	rhs.assertDefined(__PRETTY_FUNCTION__);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -701,7 +1287,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
 					// throw MVUnassigned("eq(rhs)");
-					rhs.assertAssigned(functionname);
+					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
 				// different from MVlt
 				return false;
@@ -713,7 +1299,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
 				// throw MVUnassigned("eq(lhs)");
-				lhs.assertAssigned(functionname);
+				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
 			// SAME as MVlt
 			return false;
@@ -746,7 +1332,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 				//return (lhs.var_int == rhs.var_dbl);
-				//return (std::abs(lhs.var_dbl - double(rhs.var_int)) < SMALLEST_NUMBER);
+				//return (std::abs(lhs.var_dbl - static_cast<double>(rhs.var_int)) < SMALLEST_NUMBER);
 				return almost_equal(lhs.var_dbl, rhs.var_int, 2);
 			}
 		}
@@ -758,7 +1344,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
-			//return (std::abs(double(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
+			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
 			return almost_equal(rhs.var_dbl, lhs.var_int, 2);
@@ -790,9 +1376,8 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 // NOTE doubles compare only to 0.0001 accuracy)
 PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 
-	THISIS("bool MVlt(CVR lhs,CVR rhs)")
-	lhs.assertDefined(functionname);
-	rhs.assertDefined(functionname);
+	lhs.assertDefined(__PRETTY_FUNCTION__);
+	rhs.assertDefined(__PRETTY_FUNCTION__);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -819,7 +1404,7 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
 					// throw MVUnassigned("eq(rhs)");
-					rhs.assertAssigned(functionname);
+					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
 				// different from MVeq
 				return true;
@@ -831,7 +1416,7 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
 				// throw MVUnassigned("eq(lhs)");
-				lhs.assertAssigned(functionname);
+				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
 			// SAME as MVeq
 			return false;
@@ -847,15 +1432,15 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 			else
 				// different from MVeq
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-				//return (double(lhs.var_int) < rhs.var_dbl);
-				return (rhs.var_dbl - double(lhs.var_int)) >= SMALLEST_NUMBER;
-			//return ((rhs.var_dbl - double(lhs.var_int) >= SMALLEST_NUMBER);
+				//return (static_cast<double>(lhs.var_int) < rhs.var_dbl);
+				return (rhs.var_dbl - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
+			//return ((rhs.var_dbl - static_cast<double>(lhs.var_int) >= SMALLEST_NUMBER);
 		}
 		if (rhs.var_typ & VARTYP_INT)
 			// different from MVeq
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (lhs.var_dbl < double(rhs.var_int));
-			return (double(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
+			//return (lhs.var_dbl < static_cast<double>(rhs.var_int));
+			return (static_cast<double>(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
 		else
 			// different from MVeq
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
@@ -875,352 +1460,414 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 
 // similar to MVeq and MVlt - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVlt(CVR lhs, const int int2) {
+PUBLIC bool MVlt_int(CVR lhs, const int int2) {
 
-	THISIS("bool MVlt(CVR lhs,const int int2)")
-	lhs.assertDefined(functionname);
+	lhs.assertDefined(__PRETTY_FUNCTION__);
 
-	// NB empty string is always less than anything except another empty string
-
-	// 1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_typ & VARTYP_STR) {
-		// if rhs isnt a string and lhs is empty then eq is false
-		// after checking that rhs is actually assigned
-		if (lhs.var_str.empty()) {
-			// different from MVeq
+	// Empty string is always less than anything except another empty string
+	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty())
 			return true;
-		}
-	}
 
-	// 2. both numerical strings
+	// LHS numerical?
 	do {
+
+		//compare int is already available
 		if (lhs.var_typ & VARTYP_INT)
-			// different from MVeq
 			return (lhs.var_int < int2);
 
+		//otherwise compare dbl
 		if (lhs.var_typ & VARTYP_DBL)
-			// different from MVeq
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (lhs.var_dbl < int2);
-			return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
-		//return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
+			return (static_cast<double>(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
 	}
+
 	// go back and try again if can be converted to number
+	// Will check unassigned
 	while (lhs.isnum());
 
-	// 3. either or both non-numerical strings
-	if (!(lhs.var_typ & VARTYP_STR)) {
-		// lhs.createString();
-		lhs.assertString(functionname);
-	}
-	// different from MVeq
+	// Non-numerical lhs
 	return lhs.var_str < std::to_string(int2);
+
 }
 
-// similar to MVeq and MVlt - this is the int<var version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVlt(const int int1, CVR rhs) {
+PUBLIC bool MVlt_int(const int int1, CVR rhs) {
 
-	THISIS("bool MVlt(const int int1,CVR rhs)")
-	rhs.assertDefined(functionname);
+	rhs.assertDefined(__PRETTY_FUNCTION__);
+
+	// Empty string is always less than anything except another empty string
+	if (rhs.var_typ & VARTYP_STR && rhs.var_str.empty())
+			return false;
+
+	// RHS numerical?
+	do {
+
+		//compare int if already available
+		if (rhs.var_typ & VARTYP_INT)
+			return (int1 < rhs.var_int);
+
+		//otherwise compare dbl
+		if (rhs.var_typ & VARTYP_DBL) {
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			return (rhs.var_dbl - static_cast<double>(int1)) >= SMALLEST_NUMBER;
+		}
+	}
+	// go back and try again if can be converted to number
+	// Will check unassigned
+	while (rhs.isnum());
+
+	// Non-numerical rhs
+	return std::to_string(int1) < rhs.var_str;
+}
+
+// NOTE doubles compare only to 0.0001 accuracy)
+PUBLIC bool MVlt_dbl(CVR lhs, const double dbl2) {
+
+	lhs.assertDefined(__PRETTY_FUNCTION__);
+
+	// Empty string is always less than anything except another empty string
+	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty())
+		return true;
+
+	// 2. LHS numerical?
+	do {
+
+		// LHS DBL
+		if (lhs.var_typ & VARTYP_DBL)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			return (dbl2 - lhs.var_dbl) >= SMALLEST_NUMBER;
+
+		// LHS INT
+		if (lhs.var_typ & VARTYP_INT)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			return (dbl2 - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
+
+	}
+	// go back and try again if can be converted to number
+	// will throw if unassigned
+	while (lhs.isnum());
+
+	// Non-numerical lhs
+	return lhs.var_str < std::to_string(dbl2);
+
+}
+
+// NOTE doubles compare only to 0.0001 accuracy)
+PUBLIC bool MVlt_dbl(const double dbl1, CVR rhs) {
+
+	rhs.assertDefined(__PRETTY_FUNCTION__);
+
+	// Empty string is always less than anything except another empty string
+	if (rhs.var_typ & VARTYP_STR && rhs.var_str.empty())
+		return false;
+
+	// RHS Numerical?
+	do {
+
+		// RHS double
+		if (rhs.var_typ & VARTYP_DBL)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			return (rhs.var_dbl - dbl1) >= SMALLEST_NUMBER;
+
+		// RHS int
+		if (rhs.var_typ & VARTYP_INT)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			return (static_cast<double>(rhs.var_int) - dbl1) >= SMALLEST_NUMBER;
+
+	}
+	// go back and try again if can be converted to number
+	// Will check assigned
+	while (rhs.isnum());
+
+	// Non-numerical rhs
+	return std::to_string(dbl1) < rhs.var_str;
+}
+
+// NOTE doubles compare only to 0.0001 accuracy)
+PUBLIC bool MVeq_dbl(CVR lhs, const double dbl1) {
+
+	lhs.assertDefined(__PRETTY_FUNCTION__);
 
 	// NB empty string is always less than anything except another empty string
 
-	// 1. both empty or identical strings returns eq. one empty results false
-	if (rhs.var_typ & VARTYP_STR) {
-		if (rhs.var_str.empty())
-			// SAME as MVeq
-			return false;
-		// otherwise go on to test numerically then literally
+	// 1. EMPTY STRING always false
+	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
+		//std::clog << "MVeq_dbl 1. Empty string can never equal any number" << std::endl;
+		return false;
 	}
 
-	// 2. both numerical strings
 	do {
-		if (rhs.var_typ & VARTYP_INT)
-			// different from MVeq
-			return (int1 < rhs.var_int);
-		if (rhs.var_typ & VARTYP_DBL) {
-			// different from MVeq
+
+		// 2. LHS DBL
+		if (lhs.var_typ & VARTYP_DBL) {
+
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (int1 < rhs.var_dbl);
-			return (rhs.var_dbl - double(int1)) >= SMALLEST_NUMBER;
+			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+			//std::clog << "MVeq_dbl 2. lhs double " << lhs.var_dbl << " compare to double " << dbl1 << std::endl;
+			return almost_equal(lhs.var_dbl, dbl1, 2);
+
+		}
+
+		// 3. LHS INT
+		else if (lhs.var_typ & VARTYP_INT) {
+
+			// LHS INT
+			// different from MVlt (uses absolute)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+
+			//return (lhs.var_dbl == rhs.var_int);
+			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
+			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
+			//put lhs int 2nd argument to invoke the fastest implmentation
+			//std::clog << "MVeq_dbl 3. lhs int " << lhs.var_int << " compare to double " << dbl1 << std::endl;
+			return almost_equal(dbl1, lhs.var_int, 2);
+
 		}
 	}
-	// go back and try again if can be converted to number
-	while (rhs.isnum());
+	// try to convert to numeric string
+	while (lhs.isnum());
 
-	// 3. either or both non-numerical strings
-	if (!(rhs.var_typ & VARTYP_STR)) {
-		// lhs.createString();
-		rhs.assertString(functionname);
-	}
-	// different from MVeq
-	return std::to_string(int1) < rhs.var_str;
+	// 4. NON-NUMERIC STRING - always false
+	//std::clog << "MVeq_dbl 4. Non-numeric string can never equal any number" << std::endl;;
+	return false;
+
 }
-// SEE ALSO MV2.CPP
 
-//+var
-//PUBLIC var operator+(CVR var1)
-var MVplus(CVR var1) {
+// NOTE doubles compare only to 0.0001 accuracy)
+PUBLIC bool MVeq_int(CVR lhs, const int int1) {
 
-	THISIS("var operator+(CVR var1)")
-	var1.assertDefined(functionname);
+	lhs.assertDefined(__PRETTY_FUNCTION__);
+
+	// 1. EMPTY STRING always false
+	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
+		//std::clog << "MVeq_int 1. Empty string can never equal any number" << std::endl;
+		return false;
+	}
+
+	do {
+
+		// 2. LHS DBL
+		if (lhs.var_typ & VARTYP_DBL) {
+
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+			//std::clog << "MVeq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
+			return almost_equal(lhs.var_dbl, int1, 2);
+
+		}
+
+		// 3. LHS INT
+		else if (lhs.var_typ & VARTYP_INT) {
+			//std::clog << "MVeq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
+			return lhs.var_int == int1;
+
+		}
+	}
+	// try to convert to numeric string
+	while (lhs.isnum());
+
+	// 4. NON-NUMERIC STRING - always false
+	//std::clog << "MVeq_int 4. Non-numeric string can never equal any number" << std::endl;;
+	return false;
+
+}
+
+// +var
+var var::operator+() const{
+
+	assertDefined(__PRETTY_FUNCTION__);
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	return *this;
+}
+
+// -var
+var var::operator-() const{
+
+	assertDefined(__PRETTY_FUNCTION__);
 
 	do {
 		// dbl
-		if (var1.var_typ & VARTYP_DBL)
-			return var1.var_dbl;
+		if (var_typ & VARTYP_DBL)
+			return -var_dbl;
 
 		// int
-		if (var1.var_typ & VARTYP_INT)
-			return var1.var_int;
+		if (var_typ & VARTYP_INT)
+			return -var_int;
 
-		// unassigned
-		if (!var1.var_typ) {
-			var1.assertAssigned(functionname);
-			throw MVUnassigned("+()");
-		}
 	}
 	// must be string - try to convert to numeric
-	while (var1.isnum());
+	while (this->isnum());
 
 	// non-numeric
-	var1.assertNumeric(functionname);
+	this->assertNumeric(__PRETTY_FUNCTION__);
 	// will never get here
-	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
+	throw MVNonNumeric("+(" ^ this->substr(1, 128) ^ ")");
 }
 
-//-var (identical to +var above except for two additional - signs)
-//PUBLIC var operator-(CVR var1)
-var MVminus(CVR var1) {
+// !var
+bool var::operator!() const {
 
-	THISIS("var operator-(CVR var1)")
-	var1.assertDefined(functionname);
-
-	do {
-		// dbl
-		if (var1.var_typ & VARTYP_DBL)
-			return -var1.var_dbl;
-
-		// int
-		if (var1.var_typ & VARTYP_INT)
-			return -var1.var_int;
-
-		// unassigned
-		if (!var1.var_typ) {
-			var1.assertAssigned(functionname);
-			throw MVUnassigned("+()");
-		}
-	}
-	// must be string - try to convert to numeric
-	while (var1.isnum());
-
-	// non-numeric
-	var1.assertNumeric(functionname);
-	// will never get here
-	throw MVNonNumeric("+(" ^ var1.substr(1, 128) ^ ")");
+	return !this->toBool();
 }
 
-//! var
-//PUBLIC bool operator!(CVR var1)
-bool MVnot(CVR var1) {
+// Replaced by operator+=
+//var MVadd(CVR lhs, CVR rhs) {
+//
+//	lhs.assertNumeric(__PRETTY_FUNCTION__);
+//	rhs.assertNumeric(__PRETTY_FUNCTION__);
+//
+//	//identical code in MVadd and MVsub except for +/-
+//	//identical code in MVadd, MVsub, MVmul except for +,-,*
+//	if (lhs.var_typ & VARTYP_DBL)
+//		return lhs.var_dbl + ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int));
+//	else if (rhs.var_typ & VARTYP_DBL)
+//		return lhs.var_int + rhs.var_dbl;
+//	else
+//		return lhs.var_int + rhs.var_int;
+//}
 
-	THISIS("bool operator!(CVR var1)")
-	var1.assertAssigned(functionname);
+// Replaced by operator-=
+//var MVsub(CVR lhs, CVR rhs) {
+//
+//	lhs.assertNumeric(__PRETTY_FUNCTION__);
+//	rhs.assertNumeric(__PRETTY_FUNCTION__);
+//
+//	//identical code in MVadd, MVsub, MVmul except for +,-,*
+//	if (lhs.var_typ & VARTYP_DBL)
+//		return lhs.var_dbl - ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int));
+//	else if (rhs.var_typ & VARTYP_DBL)
+//		return lhs.var_int - rhs.var_dbl;
+//	else
+//		return lhs.var_int - rhs.var_int;
+//}
 
-	// might need converting to work on void pointer
-	// if bool replaced with void* (or made explicit instead of implict)
-	// is there really any difference since the bool and void operators are defined identically?
-	// return !(bool)(var1);
-	return !(void*)(var1);
-}
+// Replaced by operator*=
+//var MVmul(CVR lhs, CVR rhs) {
+//
+//	lhs.assertNumeric(__PRETTY_FUNCTION__);
+//	rhs.assertNumeric(__PRETTY_FUNCTION__);
+//
+//	//identical code in MVadd, MVsub, MVmul except for +,-,*
+//	if (lhs.var_typ & VARTYP_DBL)
+//		return lhs.var_dbl * ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int));
+//	else if (rhs.var_typ & VARTYP_DBL)
+//		return lhs.var_int * rhs.var_dbl;
+//	else
+//		return lhs.var_int * rhs.var_int;
+//}
 
-var MVadd(CVR lhs, CVR rhs) {
+// Replaced by operator/=
+//var MVdiv(CVR lhs, CVR rhs) {
+//
+//	lhs.assertNumeric(__PRETTY_FUNCTION__);
+//	rhs.assertNumeric(__PRETTY_FUNCTION__);
+//
+//	// always returns a double because 10/3 must be 3.3333333
+//
+//	if (lhs.var_typ & VARTYP_DBL) {
+//		// 1. double ... double
+//		if (rhs.var_typ & VARTYP_DBL) {
+//			if (!rhs.var_dbl)
+//				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//									 "')");
+//			return lhs.var_dbl / rhs.var_dbl;
+//		}
+//		// 2. double ... int
+//		else {
+//			if (!rhs.var_int)
+//				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//									 "')");
+//			return lhs.var_dbl / rhs.var_int;
+//		}
+//	}
+//	// 3. int ... double
+//	else if (rhs.var_typ & VARTYP_DBL) {
+//		if (!rhs.var_dbl)
+//			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//								 "')");
+//		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
+//	}
+//	// 4. int ... int
+//	else {
+//		if (!rhs.var_int)
+//			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//								 "')");
+//		return static_cast<double>(lhs.var_int) / rhs.var_int;
+//	}
+//}
+//
 
-	THISIS("var operator+(CVR lhs,CVR rhs)")
-	lhs.assertNumeric(functionname);
-	rhs.assertNumeric(functionname);
-
-	//identical code in MVadd and MVsub except for +/-
-	//identical code in MVadd, MVsub, MVmul except for +,-,*
-	if (lhs.var_typ & VARTYP_DBL)
-		return lhs.var_dbl + ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
-	else if (rhs.var_typ & VARTYP_DBL)
-		return lhs.var_int + rhs.var_dbl;
-	else
-		return lhs.var_int + rhs.var_int;
-}
-
-var MVsub(CVR lhs, CVR rhs) {
-
-	THISIS("var operator-(CVR lhs,CVR rhs)")
-	lhs.assertNumeric(functionname);
-	rhs.assertNumeric(functionname);
-
-	//identical code in MVadd, MVsub, MVmul except for +,-,*
-	if (lhs.var_typ & VARTYP_DBL)
-		return lhs.var_dbl - ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
-	else if (rhs.var_typ & VARTYP_DBL)
-		return lhs.var_int - rhs.var_dbl;
-	else
-		return lhs.var_int - rhs.var_int;
-}
-
-var MVmul(CVR lhs, CVR rhs) {
-
-	THISIS("var operator*(CVR lhs,CVR rhs)")
-	lhs.assertNumeric(functionname);
-	rhs.assertNumeric(functionname);
-
-	//identical code in MVadd, MVsub, MVmul except for +,-,*
-	if (lhs.var_typ & VARTYP_DBL)
-		return lhs.var_dbl * ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : double(rhs.var_int));
-	else if (rhs.var_typ & VARTYP_DBL)
-		return lhs.var_int * rhs.var_dbl;
-	else
-		return lhs.var_int * rhs.var_int;
-}
-
-var MVdiv(CVR lhs, CVR rhs) {
-
-	THISIS("var operator/(CVR lhs,CVR rhs)")
-	lhs.assertNumeric(functionname);
-	rhs.assertNumeric(functionname);
-
-	// always returns a double because 10/3 must be 3.3333333
-
-	if (lhs.var_typ & VARTYP_DBL) {
-		// 1. double ... double
-		if (rhs.var_typ & VARTYP_DBL) {
-			if (!rhs.var_dbl)
-				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return lhs.var_dbl / rhs.var_dbl;
-		}
-		// 2. double ... int
-		else {
-			if (!rhs.var_int)
-				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return lhs.var_dbl / rhs.var_int;
-		}
-	}
-	// 3. int ... double
-	else if (rhs.var_typ & VARTYP_DBL) {
-		if (!rhs.var_dbl)
-			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
-	}
-	// 4. int ... int
-	else {
-		if (!rhs.var_int)
-			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		return static_cast<double>(lhs.var_int) / rhs.var_int;
-	}
-}
-
-double exodusmodulus(const double top, const double bottom) {
-#define USE_PICKOS_MODULUS
-#ifdef USE_PICKOS_MODULUS
-
-	// note that exodus var int() is floor function as per pickos standard
-	// whereas c/c++ int() function is round to nearest even number (negative or positive)
-
-	//https://pickos.neosys.com/x/pAEz.html
-	//var(i) - (int(var(i)/var(j)) * var(j))) ... where int() is pickos int() (i.e. floor)
-	return top - double(floor(top / bottom) * bottom);
-
-#else
-	//return top - double(int(top / bottom) * bottom);
-	//return top % bottom;//doesnt compile (doubles)
-
-	//fmod - The floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where n is x/y with its fractional part truncated.
-	//https://en.cppreference.com/w/c/numeric/math/fmod
-	//return std::fmod(top,bottom);
-
-	//remainder - The IEEE floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where the value n is the integral value nearest the exact value x/y. When |n-x/y| = ½, the value n is chosen to be even.
-	//https://en.cppreference.com/w/c/numeric/math/remainder
-	return std::remainder(top, bottom);
-
-#endif
-}
-
-var MVmod(CVR lhs, CVR rhs) {
-
-	THISIS("var operator%(CVR lhs,CVR rhs)")
-	lhs.assertNumeric(functionname);
-	rhs.assertNumeric(functionname);
-
-	//returns an integer var IIF both arguments are integer vars
-	//otherwise returns a double var
-
-	if (lhs.var_typ & VARTYP_DBL) {
-		// 1. double ... double
-		if (rhs.var_typ & VARTYP_DBL) {
-			if (!rhs.var_dbl)
-				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return exodusmodulus(lhs.var_dbl, rhs.var_dbl);
-		}
-		// 2. double ... int
-		else {
-			if (!rhs.var_int)
-				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			return exodusmodulus(lhs.var_dbl, rhs.var_int);
-		}
-	}
-	// 3. int ... double
-	else if (rhs.var_typ & VARTYP_DBL) {
-		if (!rhs.var_dbl)
-			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		return exodusmodulus(lhs.var_int, rhs.var_dbl);
-	}
-	// 4. int ... int
-	else {
-		if (!rhs.var_int)
-			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		//return exodusmodulus(lhs.var_int, rhs.var_int);
-		return lhs.var_int % rhs.var_int;
-	}
-}
+// Replaced by operator%=
+//var MVmod(CVR lhs, CVR rhs) {
+//
+//	lhs.assertNumeric(__PRETTY_FUNCTION__);
+//	rhs.assertNumeric(__PRETTY_FUNCTION__);
+//
+//	//returns an integer var IIF both arguments are integer vars
+//	//otherwise returns a double var
+//
+//	if (lhs.var_typ & VARTYP_DBL) {
+//		// 1. double ... double
+//		if (rhs.var_typ & VARTYP_DBL) {
+//			if (!rhs.var_dbl)
+//				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//									 "')");
+//			return exodusmodulus(lhs.var_dbl, rhs.var_dbl);
+//		}
+//		// 2. double ... int
+//		else {
+//			if (!rhs.var_int)
+//				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//									 "')");
+//			return exodusmodulus(lhs.var_dbl, rhs.var_int);
+//		}
+//	}
+//	// 3. int ... double
+//	else if (rhs.var_typ & VARTYP_DBL) {
+//		if (!rhs.var_dbl)
+//			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//								 "')");
+//		return exodusmodulus(lhs.var_int, rhs.var_dbl);
+//	}
+//	// 4. int ... int
+//	else {
+//		if (!rhs.var_int)
+//			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+//								 "')");
+//		//return exodusmodulus(lhs.var_int, rhs.var_int);
+//		return lhs.var_int % rhs.var_int;
+//	}
+//}
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
 // slightly wrong precedence but at least we have a reliable concat operator to replace the + which
 // is now reserved for forced ADDITION both according to fundamental PickOS principle
-var MVcat(CVR lhs, CVR rhs) {
+var MVcat_var_var(CVR lhs, CVR rhs) {
 
-	THISIS("var operator^(CVR lhs,CVR rhs)")
-	lhs.assertString(functionname);
-	rhs.assertString(functionname);
+	lhs.assertString(__PRETTY_FUNCTION__);
+	rhs.assertString(__PRETTY_FUNCTION__);
 
 	return lhs.var_str + rhs.var_str;
 }
 
-var MVcat(CVR lhs, const char* cstr) {
+var MVcat_var_cstr(CVR lhs, const char* cstr) {
 
-	THISIS("var operator^(CVR lhs,const char* cstr)")
-	lhs.assertString(functionname);
+	lhs.assertString(__PRETTY_FUNCTION__);
 
 	return lhs.var_str + cstr;
 }
 
-var MVcat(const char* cstr, CVR rhs) {
+var MVcat_cstr_var(const char* cstr, CVR rhs) {
 
-	THISIS("var operator^(const char* cstr, CVR rhs)")
-	rhs.assertString(functionname);
+	rhs.assertString(__PRETTY_FUNCTION__);
 
 	return cstr + rhs.var_str;
 }
 
-var MVcat(CVR lhs, const char char2) {
+var MVcat_var_char(CVR lhs, const char char2) {
 
-	THISIS("var operator^(CVR lhs,const char char2)")
-	lhs.assertString(functionname);
+	lhs.assertString(__PRETTY_FUNCTION__);
 
 	return lhs.var_str + char2;
 }
@@ -1228,9 +1875,8 @@ var MVcat(CVR lhs, const char char2) {
 
 VARREF var::operator^(CVR vstr) {
 
-	THISIS("VARREF var::operator^(CVR vstr)")
-	assertString(functionname);
-	vstr.assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
+	vstr.assertString(__PRETTY_FUNCTION__);
 
 	var_str += vstr.var_str;
 
@@ -1240,8 +1886,7 @@ VARREF var::operator^(CVR vstr) {
 VARREF var::operator^(const char* cstr) {
 	std::clog <<("var operator^(const char& cstr)") << std::endl;
 
-	THISIS("VARREF var::operator^(const char& cstr)")
-	assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
 
 	var_str += cstr;
 
@@ -1250,9 +1895,8 @@ VARREF var::operator^(const char* cstr) {
 
 VARREF var::operator^(const std::string& stdstr) {
 
-	THISIS("VARREF var::operator^(const std::string& stdstr)");
-	assertString(functionname);
-	stdstr.assertString(functionname);
+	assertString(__PRETTY_FUNCTION__);
+	stdstr.assertString(__PRETTY_FUNCTION__);
 
 	var_str += stdstr.var_str;
 
@@ -1267,8 +1911,7 @@ VARREF var::operator^(const std::string& stdstr) {
 //PUBLIC
 std::ostream& operator<<(std::ostream& ostream1, var var1) {
 
-	THISIS("std::ostream& operator<<(std::ostream& ostream1, var var1)")
-	var1.assertString(functionname);
+	var1.assertString(__PRETTY_FUNCTION__);
 
 	//replace various unprintable field marks with unusual ASCII characters
 	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
@@ -1288,8 +1931,7 @@ std::ostream& operator<<(std::ostream& ostream1, var var1) {
 
 std::istream& operator>>(std::istream& istream1, VARREF var1) {
 
-	THISIS("std::istream& operator>>(std::istream& istream1,VARREF var1)")
-	var1.assertDefined(functionname);
+	var1.assertDefined(__PRETTY_FUNCTION__);
 
 	std::string tempstr;
 	istream1 >> std::noskipws >> tempstr;
@@ -1367,7 +2009,7 @@ var operator""_var(unsigned long long int i) {
 }
 
 var operator""_var(long double d) {
-	return var(double(d));
+	return var(static_cast<double>(d));
 }
 
 }  // namespace exodus

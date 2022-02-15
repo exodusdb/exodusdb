@@ -46,7 +46,7 @@ bool var::setxlocale() const {
 #else
 
 	THISIS("bool var::setxlocale() const")
-	assertString(functionname);
+	assertString(function_sig);
 
 	// make a thread local locale if not done already
 	// TODO do this in thread creation

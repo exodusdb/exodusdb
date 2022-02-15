@@ -517,6 +517,7 @@ function main() {
 			var targetfilename = incdir ^ OSSLASH ^ srcfilename.field2(OSSLASH, -1);
 			if (osread(targetfilename) != osread(srcfilename)) {
 				if (not srcfilename.oscopy(targetfilename)) {
+					atomic_ncompilation_failures++;
 					errputl(" Error: Could not copy '" ^ srcfilename ^ "' to '" ^ targetfilename ^ "'");
 				} else if (not silent) {
 					printl(srcfilename);
@@ -640,6 +641,8 @@ function main() {
 	call sortarray(srcfilenames, "2" _VM_ "1", "DR");
 	srcfilenames = srcfilenames.a(1).convert(VM, FM);
 
+	// This loop consists of a single function call
+	// with a very long lambda function argument
 	for (var srcfilename : srcfilenames) {
 
 		// Post to the thread pool a lambda expression that does the rest of the work
@@ -691,6 +694,7 @@ function main() {
 
 			var srcfileinfo = osfile(srcfilename);
 			if (!srcfileinfo) {
+				atomic_ncompilation_failures++;
 				srcfilename.errputl("srcfile doesnt exist: ");
 				//continue;
 				return;
@@ -725,6 +729,7 @@ function main() {
 				}
 			}
 			if (not text) {
+				atomic_ncompilation_failures++;
 				srcfilename.errput("Cant read/convert srcfile:");
 				errputl(" Encoding issue? unusual characters? - tried " ^ locales);
 				errputl("Use 'dpkg-reconfigure locale' to get more");
@@ -1223,8 +1228,10 @@ function main() {
 
 					//verify written ok
 					osread(headertext2, headerfilename, locale);
-					if (headertext2 ne headertext)
+					if (headertext2 ne headertext) {
+						atomic_ncompilation_failures++;
 						errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale " ^ locale);
+					}
 					else if (verbose)
 						printl("generated or updated.");
 
@@ -1424,6 +1431,7 @@ function static compile2(
 		if (osopen(objfilename, objfilename))
 			osclose(objfilename);
 		else if (windows or (posix and not updateinusebinposix)) {
+			atomic_ncompilation_failures++;
 			objfilename.errput("Error: objectfile cannot be updated. (1) Insufficient rights on ");
 			if (windows)
 				errput(" or cannot compile programs while in use or blocked by anti-virus/anti-malware");
@@ -1587,6 +1595,7 @@ function static compile2(
 				if (SLASH_IS_BACKSLASH and PLATFORM_ ne "x64") {
 					if (true or (isprogram and manifest)) {
 						if (not oscopy(objfilename ^ ".manifest", outputpathandfile ^ ".manifest")) {
+							atomic_ncompilation_failures++;
 						}  //errputl("ERROR: Failed to "^cmd);
 					} else {
 						osdelete(objfilename ^ ".manifest");
