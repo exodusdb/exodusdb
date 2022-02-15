@@ -1716,6 +1716,13 @@ bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx, CVR reco
 	}
 
 lock:
+
+	// Fail if global terminate or reload requested
+	if (TERMINATE_req or RELOAD_req) {
+		var("").errputl("Lock request for " ^ file.a(1).quote() ^ ", " ^ keyx.quote() ^ " failed because 'terminate' or 'reload' requested.");
+		return false;
+	}
+
 	var locked = file.lock(keyx);
 	if (locked || (allowduplicate && locked eq "")) {
 
@@ -1760,7 +1767,7 @@ lock:
 		if (waitsecs) {
 
 			if ((waitsecs0 - waitsecs) >  30)
-	            var("").logputl("Locking file : " ^ file.a(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
+	            var("").errputl("Locking file : " ^ file.a(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
 
 			var().ossleep(1000);
 			waitsecs -= 1;
