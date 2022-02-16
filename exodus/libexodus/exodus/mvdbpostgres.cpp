@@ -1136,6 +1136,8 @@ var var::hash(const unsigned long long modulus) const {
 		return var_int = hash64;
 }
 
+// file doesnt not have to exist since all locks are actually numerical hashes
+//
 // Returns
 // 0  - Failure
 // 1  - Success
@@ -1187,7 +1189,7 @@ var var::lock(CVR key) const {
 
 	// Debugging
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLL ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	PGResult pgresult = PQexecParams(pgconn,
@@ -1252,7 +1254,7 @@ bool var::unlock(CVR key) const {
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1", (*this) ^ " " ^ key)).logputl("SQLU ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	PGResult pgresult = PQexecParams(pgconn,
