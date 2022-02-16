@@ -1,8 +1,0 @@
-#!/bin/sh
-#COMPILERCODE="-xgcc42-mt"
-COMPILERCODE="$1"
-./configure --with-boost-libdir=/usr/local/lib \
---with-boost-date-time=boost_date_time$COMPILERCODE \
---with-boost-filesystem=boost_filesystem$COMPILERCODE \
---with-boost-regex=boost_regex$COMPILERCODE \
---with-boost-thread=boost_thread$COMPILERCODE
