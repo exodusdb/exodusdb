@@ -412,7 +412,8 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 		var libraryfilename = libraryfilename_;
 		if (libraryfilename.osfile())
 			throw MVError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
-			^ libraryfilename ^ "' to check its sublibs are available. Also run 'nm -C " ^ libraryfilename ^ "' to check its content.)");
+			^ libraryfilename ^ "' to check its sublibs are available. Also run 'nm -C " ^ libraryfilename ^ "' to check its content.)"
+			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exodus::var::var()");
 		else
 			throw MVError(libraryfilename ^ " does not exist or cannot be found.");
 		return false;
