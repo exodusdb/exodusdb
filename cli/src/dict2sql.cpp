@@ -157,7 +157,7 @@ COST 10;
 
 	if (install_exodus_extensions eq "pgexodus") {
 
-		var sqltemplate =
+		var sqltemplate_strict =
 			R"V0G0N(
 CREATE OR REPLACE FUNCTION $functionname_and_args
 RETURNS $return_type
@@ -169,13 +169,16 @@ DEFINER
 COST 10;
 )V0G0N";
 
+		var sqltemplate = sqltemplate_strict.swap(" STRICT", "");
+
 		create_function("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-		//create_function("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-		create_function("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate);
-		create_function("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate);
-		create_function("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate);
 		create_function("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
 		create_function("exodus_count(data text, countchar text)", "integer", "", sqltemplate);
+
+		//create_function("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+		create_function("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate_strict);
+		create_function("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate_strict);
+		create_function("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate_strict);
 
 	} else if (install_exodus_extensions eq "pgsql") {
 
