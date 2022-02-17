@@ -3804,6 +3804,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	if (maxnrecs && !calc_fields)
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
+	// Final catch of obsolete function replaced by COLLATE keyword
+	sql.replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
+
 	//sql.logputl("sql=");
 
 	// DEBUG_LOG_SQL
