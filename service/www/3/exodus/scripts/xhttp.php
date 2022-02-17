@@ -42,7 +42,7 @@ $gsecondstowaitforstart = 30;
 
 $cannotfinddatabaseresponse = 'ERROR: SERVER CONFIGURATION ERROR - CANNOT FIND DATABASE ON SERVER';
 $databasestoppedresponse = "The database service is stopped.\r\rPlease try again later or ask your\rtechnical support staff to start it.";
-$norequestresponse = 'ERROR: NO REQUEST';
+$norequestresponse = 'ERROR: NO REQUEST 1';
 $nodataresponse = 'ERROR: NO DATA';
 $invaliddatapathresponse = 'ERROR: CANNOT WRITE TO ';
 

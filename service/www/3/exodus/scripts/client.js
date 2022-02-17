@@ -2121,7 +2121,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
     //request is required
     if (this.request == '') {
         this.data = ''
-        this.response = ('ERROR: NO REQUEST')
+        this.response = ('ERROR: NO REQUEST 2')
         this.response = this.response.replace(/"/g, "'")
         this.result = ''
         return (0)
@@ -2221,7 +2221,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
     //request is required
     if (this.request == '') {
         this.data = ''
-        this.response = ('ERROR: NO REQUEST')
+        this.response = ('ERROR: NO REQUEST 3')
         this.response = this.response.replace(/"/g, "'")
         this.result = ''
         this.requesting = false
