@@ -293,6 +293,9 @@ function main()
 		disconnect();		// global connection
 	}
 
+	var table2name = "TABLE2";
+	var table3name = "TABLE2";
+
 	{
 		printl("create dbs exodus2 and exodus3");
 		var conn1;
@@ -302,18 +305,31 @@ function main()
 
 		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
 		var conndb2,conndb3;
-		var table2="TABLE2";
-		var table3="TABLE3";
+		//var table2="TABLE2";
+		//var table3="TABLE3";
+		var table2=table2name;
+		var table3=table3name;
 		assert(conndb2.connect(dbname2));
 		assert(conndb3.connect(dbname3));
-		assert(not table2.open("TABLE2",conndb2));
-		assert(not table3.open("TABLE3",conndb3));
+		assert(not table2.open(table2name,conndb2));
+		assert(not table3.open(table3name,conndb3));
 		printl(table2);
 		printl(table3);
 		assert(conndb2.createfile(table2));
 		assert(conndb3.createfile(table3));
-		assert(not table2.open(table2,conndb3));
-		assert(not table3.open(table3,conndb2));
+
+		if (table2name ne table3name) {
+			assert(not table2.open(table2,conndb3));
+			assert(not table3.open(table3,conndb2));
+		}
+
+		//check created on the right db
+		assert(conndb2.createfile(table2 ^ "_db2"));
+		assert(conndb3.createfile(table3 ^ "_db3"));
+		var table2x;
+		var table3x;
+		assert(not table2x.open(table2 ^ "_db2",conndb3));
+		assert(not table3x.open(table3 ^ "_db3",conndb2));
 
 		assert(table2.open(table2,conndb2));
 		assert(table3.open(table3,conndb3));
@@ -353,8 +369,8 @@ function main()
 		assert(conndb2a.connect(dbname2));
 		assert(conndb2b.connect(dbname2));
 		var table2a,table2b;
-		assert(table2a.open("TABLE2",conndb2a));
-		assert(table2b.open("TABLE2",conndb2b));
+		assert(table2a.open(table2name,conndb2a));
+		assert(table2b.open(table3name,conndb2b));
 
 		//lock on TABLE2 on db2
 		assert(table2a.lock("123X"));
@@ -377,21 +393,23 @@ function main()
 		conndb2a.disconnect();
 		conndb2b.disconnect();
 	}
+	//var table2name = "TABLE2";
+	//var table3name = "TABLE2";
 	{
 		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
 		var conndb2, conndb3;
 		assert(conndb2.connect(dbname2));
 		assert(conndb3.connect(dbname3));
 		var table2,table3;
-		assert( table2.open("TABLE2",conndb2));
-		assert( table3.open("TABLE3",conndb3));
+		assert( table2.open(table2name,conndb2));
+		assert( table3.open(table3name,conndb3));
 
 		conndb2.begintrans();
-		printl("select table2");
+		printl("select db2 " ^ table2name);
 		table2.select();
 
 		conndb3.begintrans();
-		printl("select table3");
+		printl("select db3 " ^ table3name);
 		table3.select();
 		var record2, id2, record3, id3;
 
@@ -401,10 +419,10 @@ function main()
 		//	printl("couldnt readnext table23");
 
 		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
-		assert(record2 eq "2.1111" and id2 eq "2.111" and record3 eq "3.1111" and id3 eq "3.111");
+		assert(record2.outputl() eq "2.1111" and id2.outputl() eq "2.111" and record3.outputl() eq "3.1111" and id3.outputl() eq "3.111");
 
 		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
-		assert(record2 eq "2.2222" and id2 eq "2.222" and record3 eq "3.2222" and id3 eq "3.222");
+		assert(record2.outputl() eq "2.2222" and id2.outputl() eq "2.222" and record3.outputl() eq "3.2222" and id3.outputl() eq "3.222");
 
 		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
 		assert(record2 eq "2.3333" and id2 eq "2.333" and record3 eq "3.3333" and id3 eq "3.333");
@@ -430,7 +448,7 @@ function main()
 		assert(conn4.connect( dbname4));
 		printl("check can open table2 on copied database exodus4");
 		var table2b,table3b;
-		assert( table2b.open( "TABLE2",conn4));
+		assert( table2b.open( table2name,conn4));
 
 		///test attach
 		{

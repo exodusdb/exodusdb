@@ -1560,6 +1560,7 @@ fixcompany:
 			goto fixnextcompany;
 		}
 	}
+	clearselect();
 
 	var menu = "";
 
