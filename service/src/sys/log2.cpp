@@ -65,7 +65,7 @@ function main(in msg0, io time0) {
 	}
 
 	var entry = "";
-	if (VOLUMES) {
+	if (TERMINAL) {
 		//entry:=oconv(date(),'D2-J')
 		entry = var().date().oconv("D2-E");
 		entry = entry.substr(-2, 2) ^ "-" ^ entry.substr(1, 5);
@@ -77,7 +77,7 @@ function main(in msg0, io time0) {
 	//entry:=sep:sep:sep:sep
 	entry ^= sep_ ^ msg0;
 
-	if (VOLUMES) {
+	if (TERMINAL) {
 		printl(entry);
 	}
 
