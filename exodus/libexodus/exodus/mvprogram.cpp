@@ -412,8 +412,10 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//ID.outputl("stage1 ok ");
 
-		//replace final comma with a closing bracket
-		insertsql.splicer(-1, 1, ")");
+		// Replace final comma with a closing bracket and additional SQL
+		// Ignore any duplicates due to multivalues
+		// TODO insert stage2 records with MV as par of the key?
+		insertsql.splicer(-1, 1, ") ON CONFLICT (key) DO NOTHING");
 
 		//insertsql.outputl();
 
