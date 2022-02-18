@@ -325,14 +325,15 @@ class PUBLIC var final {
 	                             // Actually a uint which will be 4 bytes
 
 
-	////////////////////
-	// MAIN CONSTRUCTORS
-	////////////////////
+	///////////////////////////
+	// SPECIAL MEMBER FUNCTIONS
+	///////////////////////////
 
    public:
 
-	// 1. Default constructor. Can default as string and var_typ haev constructors
-	//////////////////////////
+	/////////////////////////
+	// 1. Default constructor - Can default as string and var_typ haev constructors
+	/////////////////////////
 	//
 	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
 	//
@@ -354,44 +355,9 @@ class PUBLIC var final {
 //
 //	}
 
-	// 2. Copy constructor. Cant use default because we need to throw if rhs is unassigned
-	///////////////////////
-	//
-	var(CVR rhs)
-		:
-		var_str(rhs.var_str),
-		var_int(rhs.var_int),
-		var_dbl(rhs.var_dbl),
-		var_typ(rhs.var_typ) {
-
-		// use initializers and only check afterwards if copiedvar was assigned (why?)
-		rhs.assertAssigned("var::var(CVR rhs)");
-
-		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
-	}
-
-	// 3. Move constructor. Can default assuming that temporaries are unlikely to be unassigned
-	///////////////////////
-	//
-	var(TVR fromvar) = default;
-	//	// var(TVR fromvar) noexcept;  // = default;
-	//	// defined in class for inline/optimisation
-	//	// move constructor
-	//	var(TVR rhs) noexcept
-	//		: var_str(std::move(rhs.var_str)),
-	//		var_int(rhs.var_int),
-	//		var_dbl(rhs.var_dbl),
-	//		var_typ(rhs.var_typ) {
-	//
-	//		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
-	//
-	//		// skip this for speed since temporararies are unlikely to be unassigned
-	//		// THISIS("var::var(TVR rhs) noexcept")
-	//		// ISASSIGNED(rhs)
-	//	}
-
-	// 4. Destructor. We need to set var_typ to undefined for safety.
-	/////////////////
+	////////////////
+	// 2. Destructor - We need to set var_typ to undefined for safety.
+	////////////////
 	//
 	// sets var_typ undefined
 	//
@@ -417,6 +383,103 @@ class PUBLIC var final {
 	~var() = default;
 #endif
 
+	//////////////////////
+	// 3. Copy constructor - Cant use default because we need to throw if rhs is unassigned
+	//////////////////////
+	//
+	var(CVR rhs)
+		:
+		var_str(rhs.var_str),
+		var_int(rhs.var_int),
+		var_dbl(rhs.var_dbl),
+		var_typ(rhs.var_typ) {
+
+		// for speed, use initializers and only check afterwards if copiedvar was assigned
+		rhs.assertAssigned(__PRETTY_FUNCTION__);
+
+		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
+	}
+
+	/////////////////////
+	// 4. copy assignment - by ref
+	/////////////////////
+
+	// Not using copy assignment by value (copy-and-swap idiom)
+	// because Howard Hinnant recommends against in our case
+
+	// The assignment operator should always return a reference to *this.
+
+	VOID_OR_VARREF operator=(CVR rhs) & {
+
+		assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
+		rhs.assertAssigned(__PRETTY_FUNCTION__);
+
+		//std::clog << "copy assignment by reference" <<std::endl;
+
+		// important not to self assign
+		// TODO remove for speed?
+		if (this == &rhs)
+			return VOID_OR_THIS;
+
+		// copy everything across
+		var_str = rhs.var_str;
+		var_dbl = rhs.var_dbl;
+		var_int = rhs.var_int;
+		var_typ = rhs.var_typ;
+
+		return VOID_OR_THIS;
+	}
+
+	//////////////////////
+	// 5. move constructor - Can default assuming that temporaries are unlikely to be undefined or unassigned
+	//////////////////////
+	//
+	var(TVR fromvar) noexcept = default;
+	//	// var(TVR fromvar) noexcept;  // = default;
+	//	// defined in class for inline/optimisation
+	//	// move constructor
+	//	var(TVR rhs) noexcept
+	//		: var_str(std::move(rhs.var_str)),
+	//		var_int(rhs.var_int),
+	//		var_dbl(rhs.var_dbl),
+	//		var_typ(rhs.var_typ) {
+	//
+	//		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
+	//
+	//		// skip this for speed since temporararies are unlikely to be unassigned
+	//		// THISIS("var::var(TVR rhs) noexcept")
+	//		// ISASSIGNED(rhs)
+	//	}
+
+	/////////////////////
+	// 6. move assignment
+	/////////////////////
+
+	// defined in class for inline/optimisation
+	// var = temporary var
+	INLINE VOID_OR_VARREF operator=(TVR rhs) & noexcept {
+
+		// skip these for speed since temporararies are unlikely to be undefined or unassigned
+		// THISIS("VARREF operator=(TVR rhs) & noexcept")
+		// THISISDEFINED()
+		// ISASSIGNED(rhs)
+
+		//std::clog << "move assignment" <<std::endl;
+
+		// important not to self assign
+		// TODO remove for speed?
+		if (this == &rhs)
+			return VOID_OR_THIS;
+
+		// move everything over
+		var_str = std::move(rhs.var_str);
+		var_dbl = rhs.var_dbl;
+		var_int = rhs.var_int;
+		var_typ = rhs.var_typ;
+
+		return VOID_OR_THIS;
+	}
+
 
 	///////////////////
 	// INT CONSTRUCTORS
@@ -440,9 +503,6 @@ class PUBLIC var final {
 		long long (C++11)
 		unsigned long long (C++11)
 	*/
-
-	// int
-	//////
 	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	INLINE var(I rhs)
@@ -457,10 +517,13 @@ class PUBLIC var final {
 	// DOUBLE CONSTRUCTORS
 	//////////////////////
 
-	// float, double, long double
-	/////////////////////////////
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	/*
+		float,
+		double,
+		long double
+	*/
 	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	INLINE var(F rhs)
 		:
 		var_dbl(rhs),
@@ -473,9 +536,12 @@ class PUBLIC var final {
 	// STRING CONSTRUCTORS
 	//////////////////////
 
-	// string_view
-	//////////////
-	// Accepts l and r values efficiently hopefully
+	/*
+		// Accepts l and r values efficiently hopefully
+		std::string,
+		std::string_view,
+		char*,
+	*/
 	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	INLINE var(S&& fromstr)
@@ -509,8 +575,14 @@ class PUBLIC var final {
 	// STRING CONSTRUCTORS FROM WIDE
 	////////////////////////////////
 
-	// Via u32string_view
-	// Accepts l and r values efficiently hopefully
+	/*
+		// Accepts l and r values efficiently hopefully
+		std::u32string,
+		std::u32string_view,
+		u32char*,
+		u32char
+	*/
+
 	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	INLINE var(W&& fromstr)
@@ -806,37 +878,6 @@ class PUBLIC var final {
 	/////////////
 
 	// The assignment operator should always return a reference to *this.
-
-	// copy assignment constructor
-	VOID_OR_VARREF operator=(CVR fromvar) &;
-	//VARREF operator=(const var &) && = delete; //disable assign to temporaries
-
-	// move assignment
-	// defined in class for inline/optimisation
-	// var = temporary var
-	INLINE VOID_OR_VARREF operator=(TVR rhs) & noexcept {
-		// skip this for speed?
-		// THISIS("VARREF operator= (var rhs)")
-		// THISISDEFINED()
-
-		// skip this for speed since temporararies are unlikely to be unassigned
-		// THISIS("var::var(TVR rhs) noexcept")
-		// ISASSIGNED(rhs)
-
-		//std::clog << "move assignment" <<std::endl;
-
-		// important not to self assign
-		if (this == &rhs)
-			return VOID_OR_THIS;
-
-		// move everything over
-		var_str = std::move(rhs.var_str);
-		var_dbl = rhs.var_dbl;
-		var_int = rhs.var_int;
-		var_typ = rhs.var_typ;
-
-		return VOID_OR_THIS;
-	}
 
 	// int assignment
 	// The assignment operator should always return a reference to *this.

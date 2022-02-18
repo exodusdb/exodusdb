@@ -205,32 +205,32 @@ double exodusmodulus(const double top, const double bottom) {
 // ASSIGNMENT
 /////////////
 
-// copy assignment
-// var1 = var2
-// The assignment operator should always return a reference to *this.
-// cant be (CVR rhs) because seems to cause a problem with var1=var2 in function parameters
-// unfortunately causes problem of passing var by value and thereby unnecessary contruction
-// see also ^= etc
-VOID_OR_VARREF var::operator=(CVR rhs) & {
-
-	assertDefined(__PRETTY_FUNCTION__);	 //could be skipped for speed?
-	rhs.assertAssigned(__PRETTY_FUNCTION__);
-
-	//std::clog << "copy assignment" <<std::endl;
-
-	// important not to self assign
-	if (this == &rhs)
-		return VOID_OR_THIS;
-
-	// copy everything across
-	var_str = rhs.var_str;
-	var_dbl = rhs.var_dbl;
-	var_int = rhs.var_int;
-	var_typ = rhs.var_typ;
-
-	return VOID_OR_THIS;
-}
-
+//// copy assignment
+//// var1 = var2
+//// The assignment operator should always return a reference to *this.
+//// cant be (CVR rhs) because seems to cause a problem with var1=var2 in function parameters
+//// unfortunately causes problem of passing var by value and thereby unnecessary contruction
+//// see also ^= etc
+//VOID_OR_VARREF var::operator=(CVR rhs) & {
+//
+//	assertDefined(__PRETTY_FUNCTION__);	 //could be skipped for speed?
+//	rhs.assertAssigned(__PRETTY_FUNCTION__);
+//
+//	//std::clog << "copy assignment" <<std::endl;
+//
+//	// important not to self assign
+//	if (this == &rhs)
+//		return VOID_OR_THIS;
+//
+//	// copy everything across
+//	var_str = rhs.var_str;
+//	var_dbl = rhs.var_dbl;
+//	var_int = rhs.var_int;
+//	var_typ = rhs.var_typ;
+//
+//	return VOID_OR_THIS;
+//}
+//
 // UNARY OPERATORS
 //////////////////
 
