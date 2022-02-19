@@ -33,7 +33,7 @@ namespace exodus {
 var var::iconv(CVR convstr) const {
 
 	THISIS("var var::iconv(CVR convstr) const")
-	convstr.assertString(function_sig);
+	ISSTRING(convstr)
 
 	return iconv(convstr.var_str.c_str());
 }
@@ -658,7 +658,7 @@ var var::oconv(CVR conversion) const {
 
 	THISIS("var var::oconv(CVR conversion) const")
 	assertDefined(function_sig);
-	conversion.assertString(function_sig);
+	ISSTRING(conversion)
 
 	return oconv(conversion.var_str.c_str());
 }

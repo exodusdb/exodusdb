@@ -286,7 +286,7 @@ var var::match(CVR matchstr, SV options) const {
 
 	THISIS("bool var::match(CVR matchstr, SV options) const")
 	assertString(function_sig);
-	matchstr.assertString(function_sig);
+	ISSTRING(matchstr)
 
 	// wild cards like
 	// *.* or *.???
@@ -449,8 +449,8 @@ VARREF var::swapper(SV what, SV with) {
 
 	THISIS("VARREF var::swapper(SV what, SV with)")
 	assertStringMutator(function_sig);
-	//what.assertString(function_sig);
-	//with.assertString(function_sig);
+	//ISSTRING(what)
+	//ISSTRING(with)
 
 	// nothing to do if oldstr is ""
 	if (what.empty())
@@ -488,8 +488,8 @@ VARREF var::replacer(CVR regexstr, CVR replacementstr, SV options) {
 	THISIS(
 		"VARREF var::replacer(CVR regexstr, CVR replacementstr, SV options)")
 	assertStringMutator(function_sig);
-	regexstr.assertString(function_sig);
-	replacementstr.assertString(function_sig);
+	ISSTRING(regexstr)
+	ISSTRING(replacementstr)
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 

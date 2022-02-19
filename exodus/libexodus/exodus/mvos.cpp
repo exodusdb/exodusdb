@@ -78,7 +78,7 @@ std::locale get_locale(CVR locale_name)	// throw (MVError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
 	// THISIS("std::locale get_locale(CVR locale_name)")
-	// locale_name.assertString(function_sig);
+	// ISSTRING(locale_name)
 
 	if (not locale_name.length() || locale_name == "utf8") {
 		std::locale old_locale;
@@ -184,7 +184,7 @@ bool var::osshellread(CVR oscmd) {
 	THISIS("var var::osshellread() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
-	oscmd.assertString(function_sig);
+	ISSTRING(oscmd)
 
 	// default is to return empty string in any case
 	var_str.clear();
@@ -221,7 +221,7 @@ bool var::osshellwrite(CVR writestr) const {
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
-	writestr.assertString(function_sig);
+	ISSTRING(writestr)
 
 	//"w" means read
 	std::FILE* cmd = popen(this->to_cmd_string().c_str(), "w");
@@ -258,7 +258,7 @@ bool var::osopen(CVR osfilename, CVR locale) const {
 
 	THISIS("bool var::osopen(CVR osfilename, CVR locale)")
 	assertDefined(function_sig);
-	osfilename.assertString(function_sig);
+	ISSTRING(osfilename)
 
 	// if reopening an osfile that is already opened then close and reopen
 	// dont call if not necessary
@@ -297,8 +297,8 @@ std::fstream* var::osopenx(CVR osfilename, CVR locale) const {
 
 		// delay checking until necessary
 		THISIS("bool var::osopenx(CVR osfilename, CVR locale)")
-		osfilename.assertString(function_sig);
-		locale.assertString(function_sig);
+		ISSTRING(osfilename)
+		ISSTRING(locale)
 
 		pmyfile = new std::fstream;
 
@@ -379,7 +379,7 @@ WINDOWS-1258
 bool var::osread(CVR osfilename, CVR codepage) {
 
 	THISIS("bool var::osread(CVR osfilename, CVR codepage")
-	osfilename.assertString(function_sig);
+	ISSTRING(osfilename)
 	return osread(osfilename.to_path_string().c_str(), codepage);
 }
 
@@ -477,7 +477,7 @@ var var::to_codepage(CVR codepage) const {
 		"bool var::to_codepage(CVR codepage="
 		") const")
 	assertString(function_sig);
-	codepage.assertString(function_sig);
+	ISSTRING(codepage)
 
 	//from utf8 to codepage
 	return boost::locale::conv::from_utf<char>(var_str, codepage.var_str);
@@ -489,7 +489,7 @@ var var::from_codepage(CVR codepage) const {
 		"bool var::from_codepage(CVR codepage="
 		") const")
 	assertString(function_sig);
-	codepage.assertString(function_sig);
+	ISSTRING(codepage)
 
 	//to utf from codepage
 	return boost::locale::conv::to_utf<char>(var_str, codepage.var_str);
@@ -504,7 +504,7 @@ bool var::oswrite(CVR osfilename, CVR codepage) const {
 		"bool var::oswrite(CVR osfilename, CVR codepage="
 		") const")
 	assertString(function_sig);
-	osfilename.assertString(function_sig);
+	ISSTRING(osfilename)
 
 	// get a file structure
 	std::ofstream myfile;
@@ -549,10 +549,10 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 		"bool var::osbwrite(CVR osfilevar, VARREF offset) "
 		"const")
 	assertString(function_sig);
-	offset.assertNumeric(function_sig);
+	ISNUMERIC(offset)
 
 	// test the following only if necessary in osopenx
-	// osfilename.assertString(function_sig);
+	// ISSTRING(osfilename)
 
 	// get the buffered file handle/open on the fly
 	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
@@ -672,10 +672,10 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 
 	THISIS("bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize")
 	assertDefined(function_sig);
-	offset.assertNumeric(function_sig);
+	ISNUMERIC(offset)
 
 	// will be done if necessary in osopenx()
-	// osfilename.assertString(function_sig);
+	// ISSTRING(osfilename)
 
 	// default is to return empty string in any case
 	var_str.clear();
@@ -774,7 +774,7 @@ bool var::osrename(CVR newosdir_or_filename) const {
 
 	THISIS("bool var::osrename(CVR newosdir_or_filename) const")
 	assertString(function_sig);
-	newosdir_or_filename.assertString(function_sig);
+	ISSTRING(newosdir_or_filename)
 
 	// prevent overwrite of existing file
 	// ACQUIRE
@@ -800,7 +800,7 @@ bool var::oscopy(CVR to_osfile_or_dirname) const {
 
 	THISIS("bool var::oscopy(CVR to_osfile_or_dirname) const")
 	assertString(function_sig);
-	to_osfile_or_dirname.assertString(function_sig);
+	ISSTRING(to_osfile_or_dirname)
 
 	std::filesystem::path frompathx(this->to_path_string().c_str());
 	std::filesystem::path topathx(to_osfile_or_dirname.to_path_string().c_str());
@@ -832,7 +832,7 @@ bool var::osmove(CVR newosdir_or_filename) const {
 
 	THISIS("bool var::osmove(CVR newosdir_or_filename) const")
 	assertString(function_sig);
-	newosdir_or_filename.assertString(function_sig);
+	ISSTRING(newosdir_or_filename)
 
 	// prevent overwrite of existing file
 	// ACQUIRE
@@ -882,7 +882,7 @@ bool var::osdelete(CVR osfilename) const {
 
 	THISIS("bool var::osdelete(CVR osfilename) const")
 	assertDefined(function_sig);
-	osfilename.assertString(function_sig);
+	ISSTRING(osfilename)
 	osfilename.osclose();  // in case this is cached opened file handle
 	if (std::remove(osfilename.to_path_string().c_str())) {
 		this->lasterror(this->quote() ^ " failed to osdelete");
@@ -1130,8 +1130,8 @@ var var::oslist(CVR path0, CVR spec0, const int mode) const {
 
 	THISIS("var var::oslist(CVR path, CVR spec, const int mode) const")
 	assertDefined(function_sig);
-	path0.assertString(function_sig);
-	spec0.assertString(function_sig);
+	ISSTRING(path0)
+	ISSTRING(spec0)
 
 	// returns an fm separated list of files and/or folders
 
@@ -1285,7 +1285,7 @@ bool var::oscwd(const char* newpath) const {
 	THISIS("var var::oscwd(const char* newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
 	assertDefined(function_sig);	 // not needed if *this not used
-	//newpath.assertString(function_sig);
+	//ISSTRING(newpath)
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
 	// wont compile on boost 1.33 so comment it out and make non-functional

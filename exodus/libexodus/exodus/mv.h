@@ -301,6 +301,11 @@ constexpr uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL 
 
 #define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
 
+#define ISDEFINED(VARNAME) VARNAME.assertDefined(function_sig, #VARNAME);
+#define ISASSIGNED(VARNAME) VARNAME.assertAssigned(function_sig, #VARNAME);
+#define ISSTRING(VARNAME) VARNAME.assertString(function_sig, #VARNAME);
+#define ISNUMERIC(VARNAME) VARNAME.assertNumeric(function_sig, #VARNAME);
+
 #define INLINE inline //this is the default anyway
 //#define INLINE __attribute__ ((noinline)) //use this to reduce compllation speed and object size
 
@@ -1959,24 +1964,24 @@ class PUBLIC var final {
 
 	// WARNING: MUST not use any var when checking Undefined
 	// otherwise will get recursion/segfault
-	INLINE void assertDefined(const char* message) const {
+	INLINE void assertDefined(const char* message, const char* varname = "") const {
 		if (var_typ & VARTYP_MASK)
-			throwUndefined(message);
+			throwUndefined(var(varname) ^ " in " ^ message);
 	}
 
-	INLINE void assertAssigned(const char* message) const {
-		assertDefined(message);
+	INLINE void assertAssigned(const char* message, const char* varname = "") const {
+		assertDefined(message, varname);
 		if (!var_typ)
-			throwUnassigned(message);
+			throwUnassigned(var(varname) ^ " in " ^ message);
 	}
 
-	INLINE void assertNumeric(const char* message) const {
+	INLINE void assertNumeric(const char* message, const char* varname = "") const {
 		if (!this->isnum())
-			throwNonNumeric(var(message) ^ " data: " ^ this->substr(1, 128).quote());
+			throwNonNumeric(var(varname) ^ " in " ^ var(message) ^ " data: " ^ this->substr(1, 128).quote());
 	}
 
-	INLINE void assertDecimal(const char* message) const {
-		assertNumeric(message);
+	INLINE void assertDecimal(const char* message, const char* varname = "") const {
+		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_DBL)) {
 			var_dbl = double(var_int);
 			// Add double flag
@@ -1984,8 +1989,8 @@ class PUBLIC var final {
 		}
 	}
 
-	INLINE void assertInteger(const char* message) const {
-		assertNumeric(message);
+	INLINE void assertInteger(const char* message, const char* varname = "") const {
+		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {
 			var_int = std::floor(var_dbl);
 			// Add int flag
@@ -1993,17 +1998,17 @@ class PUBLIC var final {
 		}
 	}
 
-	INLINE void assertString(const char* message) const {
-		assertDefined(message);
+	INLINE void assertString(const char* message, const char* varname = "") const {
+		assertDefined(message, varname);
 		if (!(var_typ & VARTYP_STR)) {
 			if (!var_typ)
-				throwUnassigned(message);
+				throwUnassigned(var(varname) ^ " in " ^ message);
 			this->createString();
 		};
 	}
 
-	INLINE void assertStringMutator(const char* message) const {
-		assertString(message);
+	INLINE void assertStringMutator(const char* message, const char* varname = "") const {
+		assertString(message, varname);
 		// Very important:
 		// Reset all flags to ensure they are evaluated again
 		// after string mutation

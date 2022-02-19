@@ -55,7 +55,7 @@ var var::mod(CVR divisor) const {
 
 	THISIS("var var::mod(CVR divisor) const")
 	assertNumeric(function_sig);
-	divisor.assertNumeric(function_sig);
+	ISNUMERIC(divisor)
 
 	// NB NOT using c++ % operator which until c++11 had undefined behaviour if divisor was negative
 	// from c++11 % the sign of the result after a negative divisor is always the same as the
@@ -247,7 +247,7 @@ var var::pwr(CVR exponent) const {
 
 	THISIS("var var::pwr(CVR exponent) const")
 	assertNumeric(function_sig);
-	exponent.assertNumeric(function_sig);
+	ISNUMERIC(exponent)
 
 	// prefer double
 	if (var_typ & VARTYP_DBL)

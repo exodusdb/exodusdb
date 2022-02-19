@@ -142,7 +142,7 @@ bool var::osgetenv(const char* envvarname) {
 	THISIS("bool var::osgetenv(const char* envvarname)")
 	assertDefined(function_sig);
 	//assertStringMutator(function_sig);
-	//envvarname.assertString(function_sig);
+	//ISSTRING(envvarname)
 
 	// return whole environment if blank envvarname
 	//if (envvarname.var_str.empty()) {
@@ -184,7 +184,7 @@ bool var::ossetenv(const char* envvarname) const {
 
 	THISIS("bool var::ossetenv(const char* envvarname) const")
 	assertString(function_sig);
-	//envvarname.assertString(function_sig);
+	//ISSTRING(envvarname)
 
 //#ifdef _MSC_VER
 #ifndef setenv

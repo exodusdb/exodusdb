@@ -73,8 +73,8 @@ dim::dim(dim&& sourcedim) noexcept {
 bool dim::read(CVR filehandle, CVR key) {
 
 	THISIS("bool dim::read(CVR filehandle, CVR key)")
-	filehandle.assertString(function_sig);
-	key.assertString(function_sig);
+	ISSTRING(filehandle)
+	ISSTRING(key)
 
 	var temprecord;
 	if (!temprecord.read(filehandle, key))
@@ -96,8 +96,8 @@ bool dim::read(CVR filehandle, CVR key) {
 bool dim::write(CVR filehandle, CVR key) const {
 
 	THISIS("bool dim::write(CVR filehandle, CVR key) const")
-	filehandle.assertString(function_sig);
-	key.assertString(function_sig);
+	ISSTRING(filehandle)
+	ISSTRING(key)
 
 	var temprecord = this->join();
 	return temprecord.write(filehandle, key);
@@ -106,8 +106,8 @@ bool dim::write(CVR filehandle, CVR key) const {
 bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
 
 	THISIS("bool dim::osread(CVR osfilename, CVR codepage = \"\")")
-	osfilename.assertString(function_sig);
-	codepage.assertString(function_sig);
+	ISSTRING(osfilename)
+	ISSTRING(codepage)
 
 	var txt;
 	if (not txt.osread(osfilename, codepage)) {
@@ -132,8 +132,8 @@ bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
 bool dim::oswrite(CVR osfilename, CVR codepage /*=0*/) const {
 
 	THISIS("bool dim::oswrite(CVR osfilename, CVR codepage = \"\")")
-	osfilename.assertString(function_sig);
-	codepage.assertString(function_sig);
+	ISSTRING(osfilename)
+	ISSTRING(codepage)
 
 	//TODO option for linesep to be \r\n
 	static char linesep = '\n';
@@ -334,8 +334,8 @@ dim var::split(CVR separator) const {
 var dim::split(CVR str1, CVR separator) {
 
 	THISIS("var dim::split(CVR var1, CVR separator=\"\")")
-	str1.assertString(function_sig);
-	separator.assertString(function_sig);
+	ISSTRING(str1)
+	ISSTRING(separator)
 
 	//TODO template another version to be fast for single byte separator esp. default FM_
 	//var sep = separator.var_str.size() ? separator : FM_;
@@ -413,7 +413,7 @@ var var::sort(CVR separator) const{
 
 	THISIS("var var::sort(CVR separator=UNASSIGNED)")
 	assertString(function_sig);
-	separator.assertString(function_sig);
+	ISSTRING(separator)
 
 	//perhaps has slow but sorts alphanumerically by testing var<var
 	//eg bb cc aa 2 10 -> aa bb cc 10 2

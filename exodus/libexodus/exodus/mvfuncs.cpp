@@ -180,7 +180,7 @@ VARREF var::input(CVR prompt) {
 
 	THISIS("bool var::input(CVR prompt")
 	assertDefined(function_sig);
-	prompt.assertString(function_sig);
+	ISSTRING(prompt)
 
 	//LOCKIOSTREAM
 
@@ -288,7 +288,7 @@ VARREF var::inputn(const int nchars) {
 void var::stop(CVR text) const {
 
 	THISIS("void var::stop(CVR text) const")
-	text.assertString(function_sig);
+	ISSTRING(text)
 
 	// exit(0);
 	throw MVStop(text);
@@ -304,7 +304,7 @@ void var::stop(CVR text) const {
 void var::abort(CVR text) const {
 
 	THISIS("void var::abort(CVR text) const")
-	text.assertString(function_sig);
+	ISSTRING(text)
 
 	// exit(1);
 	throw MVAbort(text);
@@ -313,7 +313,7 @@ void var::abort(CVR text) const {
 void var::abortall(CVR text) const {
 
 	THISIS("void var::abortall(CVR text) const")
-	text.assertString(function_sig);
+	ISSTRING(text)
 
 	// exit(1);
 	throw MVAbort(text);
@@ -325,7 +325,7 @@ bool var::assigned() const {
 	// treat undefined as unassigned
 	// undefined is a state where we are USING the variable before its contructor has been
 	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
-	// variables to functions in the functors on gcc assertDefined(function_sig);
+	// variables to functions in the functors on ISDEFINED(gcc)
 
 	if (var_typ & VARTYP_MASK)
 		return false;
@@ -351,7 +351,7 @@ VARREF var::unassigned(CVR defaultvalue) {
 
 
 	THISIS("VARREF var::unassigned(CVR defaultvalue) const")
-	defaultvalue.assertAssigned(function_sig);
+	ISASSIGNED(defaultvalue)
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	// if (var_typ & VARTYP_MASK)
@@ -450,7 +450,7 @@ var::var(const std::wstring& wstr1) {
 var var::trim(CVR trimchar) const& {
 
 	THISIS("var var::trim(CVR trimchar) const")
-	trimchar.assertString(function_sig);
+	ISSTRING(trimchar)
 
 	return trim(trimchar.var_str.c_str());
 }
@@ -458,8 +458,8 @@ var var::trim(CVR trimchar) const& {
 var var::trim(CVR trimchar, CVR options) const& {
 
 	THISIS("var var::trim(CVR trimchar, CVR options) const")
-	trimchar.assertString(function_sig);
-	options.assertString(function_sig);
+	ISSTRING(trimchar)
+	ISSTRING(options)
 
 	if (options == "F") {
 		return trimf(trimchar.var_str.c_str());
@@ -474,7 +474,7 @@ var var::trim(CVR trimchar, CVR options) const& {
 VARREF var::trimmer(CVR trimchar) {
 
 	THISIS("VARREF var::trimmer(CVR trimchar)")
-	trimchar.assertString(function_sig);
+	ISSTRING(trimchar)
 
 	return trimmer(trimchar.var_str.c_str());
 }
@@ -482,8 +482,8 @@ VARREF var::trimmer(CVR trimchar) {
 VARREF var::trimmer(CVR trimchar, CVR options) {
 
 	THISIS("var var::trimmer(CVR trimchar, CVR options) const")
-	trimchar.assertString(function_sig);
-	options.assertString(function_sig);
+	ISSTRING(trimchar)
+	ISSTRING(options)
 
 	if (options == "F") {
 		return trimmerf(trimchar.var_str.c_str());
@@ -498,7 +498,7 @@ VARREF var::trimmer(CVR trimchar, CVR options) {
 var var::trimf(CVR trimchar) const& {
 
 	THISIS("var var::trimf(CVR trimchar) const")
-	trimchar.assertString(function_sig);
+	ISSTRING(trimchar)
 
 	return trimf(trimchar.var_str.c_str());
 }
@@ -506,7 +506,7 @@ var var::trimf(CVR trimchar) const& {
 VARREF var::trimmerf(CVR trimchar) {
 
 	THISIS("VARREF var::trimmerf(CVR trimchar)")
-	trimchar.assertString(function_sig);
+	ISSTRING(trimchar)
 
 	return trimmerf(trimchar.var_str.c_str());
 }
@@ -515,7 +515,7 @@ VARREF var::trimmerf(CVR trimchar) {
 var var::trimb(CVR trimchar) const& {
 
 	THISIS("var var::trimb(CVR trimchar) const")
-	trimchar.assertString(function_sig);
+	ISSTRING(trimchar)
 
 	return trimb(trimchar.var_str.c_str());
 }
@@ -529,7 +529,7 @@ VARREF var::trimb(CVR trimchar) && {
 VARREF var::trimmerb(CVR trimchar) {
 
 	THISIS("VARREF var::trimmerb(CVR trimchar)")
-	trimchar.assertString(function_sig);
+	ISSTRING(trimchar)
 
 	return trimmerb(trimchar.var_str.c_str());
 }
@@ -1136,7 +1136,7 @@ VARREF var::splicer(const int start1, const int length, SV insertstr) {
 
 	THISIS("VARREF var::splicer(const int start1,const int length, SV insertstr)")
 	assertStringMutator(function_sig);
-	//insertstr.assertString(function_sig);
+	//ISSTRING(insertstr)
 
 	int start0;
 	int lengthb;
@@ -1194,7 +1194,7 @@ VARREF var::splicer(const int start1, SV insertstr) {
 
 	THISIS("VARREF var::splicer(const int start1, SV insertstr)")
 	assertStringMutator(function_sig);
-	//insertstr.assertString(function_sig);
+	//ISSTRING(insertstr)
 
 	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
 	int start1b;
@@ -1260,7 +1260,7 @@ VARREF var::transfer(VARREF destinationvar) {
 	// transfer even unassigned vars (but not uninitialised ones)
 	//assertDefined(function_sig);
 	assertAssigned(function_sig);
-	destinationvar.assertDefined(function_sig);
+	ISDEFINED(destinationvar)
 
 	destinationvar.var_str.swap(var_str);
 	destinationvar.var_typ = var_typ;
@@ -1278,7 +1278,7 @@ CVR var::exchange(CVR var2) const {
 
 	THISIS("VARREF var::exchange(VARREF var2)")
 	assertAssigned(function_sig);
-	var2.assertDefined(function_sig);
+	ISDEFINED(var2)
 
 	// intermediary copies of var2
 	auto mvtypex = var2.var_typ;
@@ -1735,7 +1735,7 @@ var var::dcount(CVR substrx) const {
 
 	THISIS("var var::dcount(CVR substrx) const")
 	assertString(function_sig);
-	substrx.assertString(function_sig);
+	ISSTRING(substrx)
 
 	if (var_str.empty())
 		return 0;
@@ -1751,7 +1751,7 @@ var var::count(CVR substrx) const {
 
 	THISIS("var var::count(CVR substrx) const")
 	assertString(function_sig);
-	substrx.assertString(function_sig);
+	ISSTRING(substrx)
 
 	if (substrx.var_str == "")
 		return 0;
@@ -1794,7 +1794,7 @@ var var::index2(CVR substrx, const int startchar1) const {
 
 	THISIS("var var::index2(CVR substrx,const int startchar1) const")
 	assertString(function_sig);
-	substrx.assertString(function_sig);
+	ISSTRING(substrx)
 
 	if (substrx.var_str == "")
 		return var(0);
@@ -1814,7 +1814,7 @@ var var::index(CVR substrx, const int occurrenceno) const {
 
 	THISIS("var var::index(CVR substrx,const int occurrenceno) const")
 	assertString(function_sig);
-	substrx.assertString(function_sig);
+	ISSTRING(substrx)
 
 	//TODO implement negative occurenceno as meaning backwards from the end
 	//eg -1 means the last occurrence
@@ -1895,7 +1895,7 @@ var var::logoff() const {
 var var::xlate(CVR filename, CVR fieldno, CVR mode) const {
 
 	THISIS("var var::xlate(CVR filename,CVR fieldno, CVR mode) const")
-	mode.assertString(function_sig);
+	ISSTRING(mode)
 
 	return xlate(filename, fieldno, mode.var_str.c_str());
 }
@@ -1907,11 +1907,11 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 
 	THISIS("var var::xlate(CVR filename,CVR fieldno, const char* mode) const")
 	assertString(function_sig);
-	filename.assertString(function_sig);
+	ISSTRING(filename)
 	// fieldnames are supported as mvprogram::xlate
 	// but not here in var::xlate which only supports field numbers since it has no
 	// access to dictionaries
-	fieldno.assertNumeric(function_sig);
+	ISNUMERIC(fieldno)
 
 	// open the file (skip this for now since sql doesnt need "open"
 	var file;

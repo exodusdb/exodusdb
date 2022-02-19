@@ -49,7 +49,7 @@ var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
 
 	THISIS("var var::field(CVR separatorx,const int fieldnx,const int nfieldsx) const")
 	assertString(function_sig);
-	separatorx.assertString(function_sig);
+	ISSTRING(separatorx)
 
 	if (separatorx.var_str == "") {
 		//return "";
@@ -117,7 +117,7 @@ VARREF var::fieldstorer(CVR separator0, const int fieldnx, const int nfieldsx, C
 		"VARREF var::fieldstorer(CVR separator0,const int fieldnx,const int nfieldsx, "
 		"CVR replacementx)")
 	assertStringMutator(function_sig);
-	separator0.assertString(function_sig);
+	ISSTRING(separator0)
 
 	std::string separator = separator0.var_str;
 	if (separator == "") {
@@ -232,7 +232,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	// probably be switched off as unnecessary and slow behaviour for EXODUS applications
 	if (order) {
 		// THISIS(...)
-		// usingchar.assertString(function_sig);
+		// ISSTRING(usingchar)
 		//bool result = locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting);
 		//if (result)
 		//	return result;
@@ -635,8 +635,8 @@ bool var::locate(CVR target, VARREF setting) const {
 		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
 		"int valueno/*=0*/) const")
 	assertString(function_sig);
-	target.assertString(function_sig);
-	setting.assertDefined(function_sig);
+	ISSTRING(target)
+	ISDEFINED(setting)
 
 	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
 }
@@ -647,8 +647,8 @@ bool var::locate(CVR target, VARREF setting, const int fieldno, const int valuen
 		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
 		"int valueno/*=0*/) const")
 	assertString(function_sig);
-	target.assertString(function_sig);
-	setting.assertDefined(function_sig);
+	ISSTRING(target)
+	ISDEFINED(setting)
 
 	std::string usingchar;
 	if (valueno != 0)
@@ -669,7 +669,7 @@ bool var::locate(CVR target) const {
 
 	THISIS("bool var::locate(CVR target")
 	assertString(function_sig);
-	target.assertString(function_sig);
+	ISSTRING(target)
 
 	var setting;
 	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
@@ -697,8 +697,8 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
 
 	THISIS("bool var::locateby(const char* ordercode, CVR target, VARREF setting) const")
 	assertString(function_sig);
-	target.assertString(function_sig);
-	setting.assertDefined(function_sig);
+	ISSTRING(target)
+	ISDEFINED(setting)
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -720,8 +720,8 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int 
 		"bool var::locateby(const char* ordercode, CVR target, VARREF setting, const "
 		"int fieldno, const int valueno/*=0*/) const")
 	assertString(function_sig);
-	target.assertString(function_sig);
-	setting.assertDefined(function_sig);
+	ISSTRING(target)
+	ISDEFINED(setting)
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -755,8 +755,8 @@ bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target
 		"bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR "
 		"target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	assertString(function_sig);
-	target.assertString(function_sig);
-	setting.assertDefined(function_sig);
+	ISSTRING(target)
+	ISDEFINED(setting)
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -779,7 +779,7 @@ bool var::locateusing(const char* usingchar, CVR target) const {
 
 	THISIS("bool var::locateusing(const char* usingchar, CVR target) const")
 	assertString(function_sig);
-	target.assertString(function_sig);
+	ISSTRING(target)
 
 	var setting = "";
 	return locatex(var_str, target.var_str, "", usingchar, setting, 0, 0, 0);
@@ -792,8 +792,8 @@ bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const i
 		"bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const "
 		"int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	assertString(function_sig);
-	target.assertString(function_sig);
-	setting.assertDefined(function_sig);
+	ISSTRING(target)
+	ISDEFINED(setting)
 
 	return locatex(var_str, target.var_str, "", usingchar, setting, fieldno, valueno,
 				   subvalueno);
@@ -1102,7 +1102,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 
 	THISIS("VARREF var::r(int fieldno,int valueno,int subvalueno,CVR replacement)")
 	assertStringMutator(function_sig);
-	replacement.assertString(function_sig);
+	ISSTRING(replacement)
 
 	// return whole thing if replace 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {
@@ -1285,7 +1285,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 		"VARREF var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
 		"VARREF insertion)")
 	assertStringMutator(function_sig);
-	insertion.assertString(function_sig);
+	ISSTRING(insertion)
 
 	// 0,0,0 is like 1,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {
@@ -1447,7 +1447,7 @@ bool var::starts(CVR vstr) const {
 	//THISIS(__PRETTY_FUNCTION__)
 	//      bool exodus::var::starts(const exodus::VARREF) const
 	assertString(function_sig);
-	vstr.assertString(function_sig);
+	ISSTRING(vstr)
 	return var_str.starts_with(vstr.var_str);
 }
 
@@ -1455,7 +1455,7 @@ bool var::ends(CVR vstr) const {
 
 	THISIS("bool var::ends(CVR vstr) const")
 	assertString(function_sig);
-	vstr.assertString(function_sig);
+	ISSTRING(vstr)
 	return var_str.ends_with(vstr.var_str);
 }
 
@@ -1463,7 +1463,7 @@ bool var::contains(CVR vstr) const {
 
 	THISIS("bool var::contains(CVR vstr) const")
 	assertString(function_sig);
-	vstr.assertString(function_sig);
+	ISSTRING(vstr)
 	return var_str.find(vstr.var_str) != std::string::npos;
 	//C++23 return var_str.contains(vstr.var_str);
 }
@@ -1681,7 +1681,7 @@ var var::mv(const char* opcode, CVR var2) const {
 
 	THISIS("var var::multivalued(const char* opcode, CVR var2) const")
 	assertString(function_sig);
-	var2.assertString(function_sig);
+	ISSTRING(var2)
 
 	var outstr = "";
 	var mv1;
@@ -1802,7 +1802,7 @@ var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const 
 
 	THISIS("var var::substr(const int startindex1, VARREF delimiterchars, int& endindex) const")
 	assertString(function_sig);
-	delimiterchars.assertString(function_sig);
+	ISSTRING(delimiterchars)
 
 	std::string::size_type start_pos = startindex1 - 1;
 
@@ -1850,8 +1850,8 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 
 	THISIS("var var::substr2(VARREF startindex1, VARREF delimiterno) const")
 	assertString(function_sig);
-	startindex1.assertNumeric(function_sig);
-	delimiterno.assertDefined(function_sig);
+	ISNUMERIC(startindex1)
+	ISDEFINED(delimiterno)
 
 	int startindex0 = startindex1.toInt() - 1;
 	std::string::size_type start_pos = (startindex0 >= 0) ? startindex0 : 0;
@@ -2021,14 +2021,14 @@ var var::sum() const {
 
 		} else {
 
-			accum.assertString(function_sig);
+			ISSTRING(accum)
 			if (not accum.var_str.empty()) {
 
 				// Fix decimal places
 				accum = accum.round(maxndecimals);
 
 				// Check round returned a string
-				accum.assertString(function_sig);
+				ISSTRING(accum)
 
 				// Remove trailing zeros if floating point is present
                 if (accum.var_str.find('.') != std::string::npos) {
