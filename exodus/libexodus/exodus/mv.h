@@ -414,26 +414,27 @@ class PUBLIC var final {
 
 	// The assignment operator should always return a reference to *this.
 
-	VOID_OR_VARREF operator=(CVR rhs) & {
-
-		assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
-		rhs.assertAssigned(__PRETTY_FUNCTION__);
-
-		//std::clog << "copy assignment by reference" <<std::endl;
-
-		// important not to self assign
-		// TODO remove for speed?
-		if (this == &rhs)
-			return VOID_OR_THIS;
-
-		// copy everything across
-		var_str = rhs.var_str;
-		var_dbl = rhs.var_dbl;
-		var_int = rhs.var_int;
-		var_typ = rhs.var_typ;
-
-		return VOID_OR_THIS;
-	}
+	var& operator=(CVR rhs) = default;
+//	VOID_OR_VARREF operator=(CVR rhs) & {
+//
+//		assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
+//		rhs.assertAssigned(__PRETTY_FUNCTION__);
+//
+//		//std::clog << "copy assignment by reference" <<std::endl;
+//
+//		// important not to self assign
+//		// TODO remove for speed?
+//		if (this == &rhs)
+//			return VOID_OR_THIS;
+//
+//		// copy everything across
+//		var_str = rhs.var_str;
+//		var_dbl = rhs.var_dbl;
+//		var_int = rhs.var_int;
+//		var_typ = rhs.var_typ;
+//
+//		return VOID_OR_THIS;
+//	}
 
 	//////////////////////
 	// 5. move constructor - Can default assuming that temporaries are unlikely to be undefined or unassigned
@@ -462,28 +463,29 @@ class PUBLIC var final {
 
 	// defined in class for inline/optimisation
 	// var = temporary var
-	INLINE VOID_OR_VARREF operator=(TVR rhs) & noexcept {
-
-		// skip these for speed since temporararies are unlikely to be undefined or unassigned
-		// THISIS("VARREF operator=(TVR rhs) & noexcept")
-		// THISISDEFINED()
-		// ISASSIGNED(rhs)
-
-		//std::clog << "move assignment" <<std::endl;
-
-		// important not to self assign
-		// TODO remove for speed?
-		if (this == &rhs)
-			return VOID_OR_THIS;
-
-		// move everything over
-		var_str = std::move(rhs.var_str);
-		var_dbl = rhs.var_dbl;
-		var_int = rhs.var_int;
-		var_typ = rhs.var_typ;
-
-		return VOID_OR_THIS;
-	}
+	var& operator=(TVR rhs) noexcept = default;
+//	INLINE VOID_OR_VARREF operator=(TVR rhs) & noexcept {
+//
+//		// skip these for speed since temporararies are unlikely to be undefined or unassigned
+//		// THISIS("VARREF operator=(TVR rhs) & noexcept")
+//		// THISISDEFINED()
+//		// ISASSIGNED(rhs)
+//
+//		//std::clog << "move assignment" <<std::endl;
+//
+//		// important not to self assign
+//		// TODO remove for speed?
+//		if (this == &rhs)
+//			return VOID_OR_THIS;
+//
+//		// move everything over
+//		var_str = std::move(rhs.var_str);
+//		var_dbl = rhs.var_dbl;
+//		var_int = rhs.var_int;
+//		var_typ = rhs.var_typ;
+//
+//		return VOID_OR_THIS;
+//	}
 
 
 	///////////////////
