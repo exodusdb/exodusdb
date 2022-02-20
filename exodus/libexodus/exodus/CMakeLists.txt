@@ -82,10 +82,11 @@ add_library(exodus SHARED
 # mvutf.cpp
 # ConvertUTF.c
 # mvlocale.cpp
- mv.cpp mvnumeric.cpp mvmath.cpp mvmv.cpp mvprogram.cpp mvdim.cpp mvdatetime.cpp mvdebug.cpp mviter.cpp
+ mvdbpostgres.cpp mvregex.cpp mvos.cpp mvos2.cpp mvprogram.cpp mvmv.cpp
+ mv.cpp mvnumeric.cpp mvmath.cpp mvdim.cpp mvdatetime.cpp mvdebug.cpp mviter.cpp
  mvfuncs.cpp mvioconv.cpp
- mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
- mvos.cpp mvos2.cpp mvregex.cpp mvwait.cpp mvunicode.cpp mvposix.cpp mvfunctor.cpp mvbrackets.cpp
+ mvenvironment.cpp mvglobalfuncs.cpp
+ mvwait.cpp mvunicode.cpp mvposix.cpp mvfunctor.cpp mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
  MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp
  mvhandles.cpp mvdbconns.cpp mvprocessno.cpp
