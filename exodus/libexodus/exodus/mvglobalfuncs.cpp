@@ -1108,7 +1108,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
 	if (mv.OPTIONS)
 		mv.COMMAND.splicer(-(mv.OPTIONS.length()), mv.OPTIONS.length(), "");
-	mv.COMMAND.trimmerb(FM_);
+	mv.COMMAND.trimmerb(_FM_);
 
 	var temp;
 	// DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;

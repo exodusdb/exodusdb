@@ -447,233 +447,199 @@ var::var(const std::wstring& wstr1) {
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
-var var::trim(CVR trimchar) const& {
+// trim leading trimchars from a given string
+inline void trimmerf_helper(std::string& instr, SV trimchars) {
 
-	THISIS("var var::trim(CVR trimchar) const")
-	ISSTRING(trimchar)
+	auto start_pos = instr.find_first_not_of(trimchars);
 
-	return trim(trimchar.var_str.c_str());
-}
-
-var var::trim(CVR trimchar, CVR options) const& {
-
-	THISIS("var var::trim(CVR trimchar, CVR options) const")
-	ISSTRING(trimchar)
-	ISSTRING(options)
-
-	if (options == "F") {
-		return trimf(trimchar.var_str.c_str());
-	} else if (options == "B") {
-		return trimb(trimchar.var_str.c_str());
-	} else if (options == "FB") {
-		return trimf(trimchar.var_str.c_str()).trimb(trimchar.var_str.c_str());
-	}
-	return trim(trimchar.var_str.c_str());
-}
-
-VARREF var::trimmer(CVR trimchar) {
-
-	THISIS("VARREF var::trimmer(CVR trimchar)")
-	ISSTRING(trimchar)
-
-	return trimmer(trimchar.var_str.c_str());
-}
-
-VARREF var::trimmer(CVR trimchar, CVR options) {
-
-	THISIS("var var::trimmer(CVR trimchar, CVR options) const")
-	ISSTRING(trimchar)
-	ISSTRING(options)
-
-	if (options == "F") {
-		return trimmerf(trimchar.var_str.c_str());
-	} else if (options == "B") {
-		return trimmerb(trimchar.var_str.c_str());
-	} else if (options == "FB") {
-		return trimmerf(trimchar.var_str.c_str()).trimmerb(trimchar.var_str.c_str());
-	}
-	return trimmer(trimchar.var_str.c_str());
-}
-
-var var::trimf(CVR trimchar) const& {
-
-	THISIS("var var::trimf(CVR trimchar) const")
-	ISSTRING(trimchar)
-
-	return trimf(trimchar.var_str.c_str());
-}
-
-VARREF var::trimmerf(CVR trimchar) {
-
-	THISIS("VARREF var::trimmerf(CVR trimchar)")
-	ISSTRING(trimchar)
-
-	return trimmerf(trimchar.var_str.c_str());
-}
-
-// trimb - trim backward trailing chars
-var var::trimb(CVR trimchar) const& {
-
-	THISIS("var var::trimb(CVR trimchar) const")
-	ISSTRING(trimchar)
-
-	return trimb(trimchar.var_str.c_str());
-}
-
-// on temporary
-VARREF var::trimb(CVR trimchar) && {
-	return this->trimmerb(trimchar);
-}
-
-//in place
-VARREF var::trimmerb(CVR trimchar) {
-
-	THISIS("VARREF var::trimmerb(CVR trimchar)")
-	ISSTRING(trimchar)
-
-	return trimmerb(trimchar.var_str.c_str());
-}
-
-//trimf() - trim leading spaces/character
-var var::trimf(const char* trimchar DEFAULT_SPACE) const& {
-
-	THISIS("var var::trimf(const char* trimchar) const")
-	assertString(function_sig);
-
-	return var(*this).trimmerf(trimchar);
-}
-
-// on temporary
-VARREF var::trimf(const char* trimchar DEFAULT_SPACE) && {
-	return this->trimmerf(trimchar);
-}
-
-// in-place
-VARREF var::trimmerf(const char* trimchar DEFAULT_SPACE) {
-
-	THISIS("VARREF var::trimmerf(const char* trimchar)")
-	assertStringMutator(function_sig);
-
-	std::string::size_type start_pos;
-	start_pos = var_str.find_first_not_of(trimchar);
-
+	// Early exit
 	if (start_pos == std::string::npos) {
-		// *this = "";
-		var_str.clear();
-		var_typ = VARTYP_STR;
-		return *this;
+		instr.clear();
+		return;
 	}
 
 	// return var(var_str.substr(start_pos));
-	var_str.erase(0, start_pos);
+	instr.erase(0, start_pos);
+
+	return;
+}
+
+inline void trimmerb_helper(std::string& instr, SV trimchars) {
+
+	std::size_t end_pos = instr.find_last_not_of(trimchars);
+
+	// Early exit
+	if (end_pos == std::string::npos) {
+		instr.clear();
+		return;
+	}
+
+	// return var(var_str.substr(0,end_pos+1));
+	instr.erase(end_pos + 1);
+
+	return;
+}
+
+inline void trimmerm_helper(std::string& instr, SV trimchars) {
+
+	// ONLY works after trimming leading (F)ront and trailing (B)ack spaces
+
+	// find the starting position of any embedded trimchars
+	auto start_pos = std::string::npos;
+	while (true) {
+
+		// find a trimchars
+		start_pos = instr.find_last_of(trimchars, start_pos);
+
+		// Early exit
+		// if no (more) trimchars then return the string
+		if (start_pos == std::string::npos || start_pos <= 0)
+			return;
+
+		// find the first non-trimchar thereafter
+		auto end_pos = instr.find_last_not_of(trimchars, start_pos - 1);
+
+		// if first non trimchars character is not one before the trimchars
+		if (end_pos < start_pos - 1) {
+			instr.erase(end_pos + 1, start_pos - end_pos - 1);
+		}
+
+		if (end_pos <= 0)
+			break;
+
+		start_pos = end_pos - 1;
+	}
+
+	return;
+}
+
+var var::trim(SV trimchars, SV options) const& {
+
+	THISIS("var var::trim(SV trimchars, SV options) const&")
+	assertStringMutator(function_sig);
+
+	return var(*this).trimmer(trimchars, options);
+}
+
+VARREF var::trimmer(SV trimchars, SV options) {
+
+	THISIS("var var::trimmer(SV trimchars, SV options) const")
+	assertStringMutator(function_sig);
+
+	// Front only
+	if (options == "F") {
+		trimmerf_helper(var_str, trimchars);
+	}
+
+	// Back only
+	else if (options == "B") {
+		trimmerb_helper(var_str, trimchars);
+
+	}
+
+	// Front and Back, no Middle
+	else if (options == "FB") {
+		// back and front
+		trimmerb_helper(var_str, trimchars);
+		trimmerf_helper(var_str, trimchars);
+
+	}
+
+	// Front, Back and Middle
+	else {
+		// b, m, f for speed
+		trimmerb_helper(var_str, trimchars);
+		//trimmerm_helper(var_str, trimchars);
+		trimmerf_helper(var_str, trimchars);
+		// Sadly m must be last
+		trimmerm_helper(var_str, trimchars);
+	}
+
+	return *this;
+}
+
+//trimf() - trim leading spaces/character
+var var::trimf(SV trimchars DEFAULT_SPACE) const& {
+
+	THISIS("var var::trimf(SV trimchars) const&")
+	assertStringMutator(function_sig);
+
+	var rvo = *this;
+
+	trimmerf_helper(rvo.var_str, trimchars);
+
+	return rvo;
+}
+
+// in-place
+VARREF var::trimmerf(SV trimchars DEFAULT_SPACE) {
+
+	THISIS("VARREF var::trimmerf(SV trimchars)")
+	assertStringMutator(function_sig);
+
+	trimmerf_helper(var_str, trimchars);
 
 	return *this;
 }
 
 // trimb() - trim backward (trailing) spaces/character
-var var::trimb(const char* trimchar DEFAULT_SPACE) const& {
+var var::trimb(SV trimchars DEFAULT_SPACE) const& {
 
-	THISIS("var var::trimb(const char* trimchar) const")
-	assertString(function_sig);
+	THISIS("var var::trimb(SV trimchars) const&")
+	assertStringMutator(function_sig);
 
-	return var(*this).trimmerb(trimchar);
-}
+	var rvo = *this;
 
-// on temporary
-VARREF var::trimb(const char* trimchar DEFAULT_SPACE) && {
-	return this->trimmerb(trimchar);
+	trimmerb_helper(rvo.var_str, trimchars);
+
+	return rvo;
 }
 
 // in-place
-VARREF var::trimmerb(const char* trimchar DEFAULT_SPACE) {
+VARREF var::trimmerb(SV trimchars DEFAULT_SPACE) {
 
-	THISIS("VARREF var::trimmerb(const char* trimchar)")
+	THISIS("VARREF var::trimmerb(SV trimchars)")
 	assertStringMutator(function_sig);
 
-	std::string::size_type end_pos;
-	end_pos = var_str.find_last_not_of(trimchar);
-
-	if (end_pos == std::string::npos) {
-		// *this = "";
-		var_str.clear();
-		var_typ = VARTYP_STR;
-		return *this;
-	}
-
-	// return var(var_str.substr(0,end_pos+1));
-	var_str.erase(end_pos + 1);
+	trimmerb_helper(var_str, trimchars);
 
 	return *this;
 }
 
 //trim() - remove leading, trailing and excess internal spaces/character
-var var::trim(const char* trimchar DEFAULT_SPACE) const& {
+var var::trim(SV trimchars DEFAULT_SPACE) const& {
 
-	THISIS("var var::trim(const char* trimchar) const&")
-	assertString(function_sig);
+	THISIS("var var::trim(SV trimchars) const&")
+	assertStringMutator(function_sig);
 
-	return var(*this).trimmer(trimchar);
-}
+	var rvo = *this;
 
-// on temporary
-VARREF var::trim(const char* trimchar DEFAULT_SPACE) && {
-	return this->trimmer(trimchar);
+	// Similar code in various places
+	trimmerb_helper(rvo.var_str, trimchars);
+	//trimmerm_helper(rvo.var_str, trimchars);
+	trimmerf_helper(rvo.var_str, trimchars);
+	//trimmerm only works after f and b trimchars are removed
+	trimmerm_helper(rvo.var_str, trimchars);
+
+	return rvo;
 }
 
 // in-place
-VARREF var::trimmer(const char* trimchar DEFAULT_SPACE) {
+VARREF var::trimmer(SV trimchars DEFAULT_SPACE) {
 
 	// reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
 
-	THISIS("VARREF var::trimmer(const char* trimchar)")
+	THISIS("VARREF var::trimmer(SV trimchars)")
 	assertStringMutator(function_sig);
 
-	// find the first non blank
-	std::string::size_type start_pos;
-	start_pos = var_str.find_first_not_of(trimchar);
+	// Similar code in various places
+	trimmerb_helper(var_str, trimchars);
+	//trimmerm_helper(var_str, trimchars);
+	trimmerf_helper(var_str, trimchars);
+	//trimmerm only works after f and b trimchars are removed
+	trimmerm_helper(var_str, trimchars);
 
-	// if all blanks return empty string
-	if (start_pos == std::string::npos) {
-		// *this = "";
-		var_str.clear();
-		var_typ = VARTYP_STR;
-		return *this;
-	}
-
-	// erase leading spaces
-	if (start_pos != 0)
-		var_str.erase(0, start_pos);
-
-	// find the last non blank
-	std::string::size_type end_pos;
-	// end_pos=var_str.find_last_not_of(trimchar);
-	end_pos = var_str.find_last_not_of(trimchar, var_str.size() - 1);
-
-	// erase trailing spaces
-	var_str.erase(end_pos + 1);
-
-	// find the starting position of any embedded spaces
-	start_pos = std::string::npos;
-	while (true) {
-		// find a space
-		start_pos = var_str.find_last_of(trimchar, start_pos);
-
-		// if no (more) spaces then return the string
-		if (start_pos == std::string::npos || start_pos <= 0)
-			return *this;
-
-		// find the first non-space thereafter
-		end_pos = var_str.find_last_not_of(trimchar, start_pos - 1);
-
-		// if first non space character is not one before the space
-		if (end_pos < start_pos - 1) {
-			var_str.erase(end_pos + 1, start_pos - end_pos - 1);
-		}
-		if (end_pos <= 0)
-			break;
-		start_pos = end_pos - 1;
-	}
 	return *this;
 }
 

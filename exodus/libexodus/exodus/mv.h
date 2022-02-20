@@ -1539,13 +1539,10 @@ class PUBLIC var final {
 	VARREF fcaser();        // utf8
 	VARREF normalizer();    // utf8
 	VARREF inverter();    // utf8
-	VARREF trimmer(const char* trimchar DEFAULT_SPACE);
-	VARREF trimmerf(const char* trimchar DEFAULT_SPACE);
-	VARREF trimmerb(const char* trimchar DEFAULT_SPACE);
-	VARREF trimmer(CVR trimchar);
-	VARREF trimmer(CVR trimchar, CVR options);
-	VARREF trimmerf(CVR trimchar);
-	VARREF trimmerb(CVR trimchar);
+	VARREF trimmer(SV trimchars DEFAULT_SPACE);
+	VARREF trimmerf(SV trimchars DEFAULT_SPACE);
+	VARREF trimmerb(SV trimchars DEFAULT_SPACE);
+	VARREF trimmer(SV trimchars, SV options);
 	VARREF fieldstorer(CVR sepchar, const int fieldno, const int nfields, CVR replacement);
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
@@ -1575,13 +1572,10 @@ class PUBLIC var final {
 	ND VARREF fcase() &&;     // utf8
 	ND VARREF normalize() &&; // utf8
 	ND VARREF invert() &&;    // utf8
-	ND VARREF trim(const char* trimchar DEFAULT_SPACE) &&;
-	ND VARREF trimf(const char* trimchar DEFAULT_SPACE) &&;
-	ND VARREF trimb(const char* trimchar DEFAULT_SPACE) &&;
-	ND VARREF trim(CVR trimchar) &&;
-	ND VARREF trim(CVR trimchar, CVR options) &&;
-	ND VARREF trimf(CVR trimchar) &&;
-	ND VARREF trimb(CVR trimchar) &&;
+	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return this->trimmer(trimchars);};
+	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return this->trimmerf(trimchars);};
+	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return this->trimmerb(trimchars);};
+	ND VARREF trim(SV trimchars, SV options) && {return this->trimmer(trimchars, options);};
 	ND VARREF fieldstore(CVR sepchar, const int fieldno, const int nfields, CVR replacement) &&;
 	ND VARREF substr(const int startindex) &&;
 	ND VARREF substr(const int startindex, const int length) &&;
@@ -1611,13 +1605,10 @@ class PUBLIC var final {
 	ND var fcase() const&;        // utf8
 	ND var normalize() const&;    // utf8
 	ND var invert() const&;        // utf8
-	ND var trim(const char* trimchar DEFAULT_SPACE) const&;
-	ND var trimf(const char* trimchar DEFAULT_SPACE) const&;
-	ND var trimb(const char* trimchar DEFAULT_SPACE) const&;
-	ND var trim(CVR trimchar) const&;
-	ND var trim(CVR trimchar, CVR options) const&;
-	ND var trimf(CVR trimchar) const&;
-	ND var trimb(CVR trimchar) const&;
+	ND var trim(SV trimchars DEFAULT_SPACE) const&;
+	ND var trimf(SV trimchars DEFAULT_SPACE) const&;
+	ND var trimb(SV trimchars DEFAULT_SPACE) const&;
+	ND var trim(SV trimchars, SV options) const&;
 	ND var fieldstore(CVR sepchar, const int fieldno, const int nfields, CVR replacement) const&;
 
 	ND var lower() const&;
