@@ -1672,9 +1672,7 @@ class PUBLIC var final {
 	/////////////////
 
 	ND var oconv(const char* convstr) const;
-	ND var oconv(CVR convstr) const;
 	ND var iconv(const char* convstr) const;
-	ND var iconv(CVR convstr) const;
 
 	ND var from_codepage(CVR codepage) const;
 	ND var to_codepage(CVR codepage) const;

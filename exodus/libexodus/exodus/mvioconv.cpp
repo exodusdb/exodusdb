@@ -30,13 +30,13 @@ static const int HEX_PER_CHAR = sizeof(char) * 2;
 
 namespace exodus {
 
-var var::iconv(CVR convstr) const {
-
-	THISIS("var var::iconv(CVR convstr) const")
-	ISSTRING(convstr)
-
-	return iconv(convstr.var_str.c_str());
-}
+//var var::iconv(CVR convstr) const {
+//
+//	THISIS("var var::iconv(CVR convstr) const")
+//	ISSTRING(convstr)
+//
+//	return iconv(convstr.var_str.c_str());
+//}
 
 /**
 converts from external format to internal depending on conversion
@@ -654,14 +654,14 @@ var var::oconv_LRC(CVR format) const {
 	return output;
 }
 
-var var::oconv(CVR conversion) const {
-
-	THISIS("var var::oconv(CVR conversion) const")
-	assertDefined(function_sig);
-	ISSTRING(conversion)
-
-	return oconv(conversion.var_str.c_str());
-}
+//var var::oconv(CVR conversion) const {
+//
+//	THISIS("var var::oconv(CVR conversion) const")
+//	assertDefined(function_sig);
+//	ISSTRING(conversion)
+//
+//	return oconv(conversion.var_str.c_str());
+//}
 
 // fast version for common programming example where conversion is provided as a hard coded string
 // but application programs source code is usually going to usually be "D2" and not "D2" so provide
