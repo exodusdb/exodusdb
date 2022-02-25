@@ -2528,10 +2528,19 @@ class PUBLIC MVArrayNotDimensioned  : public MVError {public: explicit MVArrayNo
 
 // clang-format on
 
-//user defined literals suffix _var for c_str, long long int and double
-PUBLIC var operator""_var(const char* cstr, std::size_t size);
-PUBLIC var operator""_var(unsigned long long int i);
-PUBLIC var operator""_var(long double d);
+//inline avoids hitting ODR rule
+ND inline var operator""_var(const char* cstr, std::size_t size) {
+	return var(cstr, size).convert(VISIBLE_FMS, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+}
+
+ND inline var operator""_var(unsigned long long int i) {
+	return var(int64_t(i));
+}
+
+ND inline var operator""_var(long double d) {
+	return var(static_cast<double>(d));
+}
+
 
 }  // namespace exodus
 
