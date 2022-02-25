@@ -202,24 +202,51 @@ var dictfile;
 var compcode;
 var logid;
 
+var nextconnection;
+
 function main() {
-	//
-	//c sys
 
 	#include <system_common.h>
-	//global all
 
-	//finance?!
-	//$insert abp,common
+	if (main_init()) {
 
-	//see LISTEN2 for commands
+		// Main loop
+		while (true) {
 
-	//notes
-	//use ABORT or ABORT ALL to terminate EXECUTED programs to clear out program stack
+			// May call autorun
+			if (not loop_init())
+				break;
 
-	//ed ub
+			gosub wait();
 
-	//clearcommon();
+			//process one request file
+			if (got_link()) {
+
+				gosub request_init();
+
+				gosub process();
+
+				if (not request_exit())
+					break;
+			}
+
+			if (!loop_exit())
+				break;
+
+		}
+
+	}
+
+	gosub main_exit();
+
+	stop();
+
+	//never gets here
+	return 0;
+
+}
+
+function main_init() {
 
     //use app specific version of listen3
     if (APPLICATION ne "EXODUS") {
@@ -345,7 +372,8 @@ function main() {
 	webpath.converter("/", OSSLASH);
 	if (not(voc.open("VOC", ""))) {
 		call fsmsg();
-		gosub exit();
+		//gosub main_exit();
+		return false;
 	}
 
 	inpath = webpath ^ datasetcode ^ "/";
@@ -401,7 +429,8 @@ function main() {
 
 	if (not(openfile("LOCKS", locks1, "DEFINITIONS", 1))) {
 		call fsmsg();
-		gosub exit();
+		//gosub main_exit();
+		return false;
 	}
 
 	gosub gettimeouttime();
@@ -488,12 +517,13 @@ function main() {
 	stack = "";
 	//call programstackstack);
 
-	var nextconnection;
 	nextconnection.connect(getenv("EXO_DATA"));
 
-////////////
-nextrequest:
-////////////
+	return true;
+
+} // main_init
+
+function loop_init() {
 
 	//disconnect any connections added while processing requests
 	nextconnection.disconnectall();
@@ -525,7 +555,7 @@ nextrequest:
 
 	//linkfilename1=''
 
-nextsearch:
+//nextsearch:
 ///////////
 
 	//BREAK ON;
@@ -545,7 +575,12 @@ nextsearch:
 
 nextsearch0:
 ////////////
-	if (TERMINATE_req or RELOAD_req) {printl("Closing PROCESSNO " ^ PROCESSNO);return 0;}
+
+	if (TERMINATE_req or RELOAD_req) {
+		printl("Closing PROCESSNO " ^ PROCESSNO);
+		return false;
+	}
+
 	var().clearcache();
 
 	//restore the program stack
@@ -609,8 +644,9 @@ nextsearch0:
 	call listen5("CHECKRESTART");
 	if (ANS) {
 		request1 = ANS;
-		gosub exit();
-		stop();
+		//gosub main_exit();
+		//stop();
+		return false;
 	}
 
 	//start *.RUN commands (start processes)
@@ -643,6 +679,12 @@ nextsearch0:
 		//autorun might have run so avoid processing another request without resetting
 		goto nextsearch0;
 	}
+
+	return true;
+
+} // loop_init
+
+subroutine wait() {
 
 	//garbagecollect;
 	//if index(drive(),':',1) then exe='.exe' else exe=''
@@ -706,19 +748,11 @@ nextsearch0:
 		}
 	}
 
-	//if got file then quit
-	if (linkfilename1.osfile()) {
+	return;
 
-		//flush
-		//osopen linkfilename1 to linkfile1 else
-		// call ossleep(1000*1/10)
-		// if tracing then print 'CANNOT OPEN ':quote(linkfilename1)
-		// goto nextrequest
-		// end
-		//goto requestinit
-		linkfilenames = linkfilename0;
-		goto gotlink;
-	}
+} // wait
+
+function loop_exit() {
 
 	//timeout if no activity
 	dostime = ostime();
@@ -754,7 +788,8 @@ nextsearch0:
 		if (reply eq INTCONST.a(1)) {
 			//space to defeat ANSI control chars after pressing Esc
 			print(" ");
-			gosub exit();
+			//gosub main_exit();
+			return false;
 		}
 		if (reply eq INTCONST.a(7)) {
 			charx = reply;
@@ -843,11 +878,13 @@ nextsearch0:
 		if (patched) {
 			request1 = "RESTART PATCHED";
 
-			gosub exit();
+			//gosub main_exit();
+			return false;
 		}
 
 		//monitor might have run so avoid processing another request without resetting
-		goto nextsearch0;
+		//goto nextsearch0;
+		return true;
 	}
 
 	//run autorun, syncdata and clear old files once a minute
@@ -908,7 +945,8 @@ backup:
 			}
 			PSEUDO ^= " " ^ bakpars.a(7) ^ " " ^ bakpars.a(12);
 			if (msg_) {
-				stop();
+				//stop();
+				return false;
 			}
 
 		}
@@ -917,10 +955,63 @@ backup:
 
 	call listen5("DELETEOLDFILES", "*.*", inpath, "", "");
 
-	goto nextsearch0;
+	return true;
 
-gotlink:
-////////
+} //loop_exit()
+
+subroutine main_exit() {
+
+	if (logfilename) {
+		logfile.osclose();
+	}
+
+	//remove lock indicating processing
+	//gosub sysunlock
+
+	call listen5("UNLOCKLONGPROCESS");
+
+	var().unlockall();
+
+	//call restorescreenorigscrn, origattr);
+
+	//remove flag that this dataset is being served ("listened")
+	//osdelete inpath:serverflagfilename
+
+	//get into interactive mode
+	//system<33>=origsysmode
+	SYSTEM(33) = "";
+	//call setprivilegeorigprivilege);
+	if (request1.substr(1, 7) eq "RESTART") {
+		USER4 = request1;
+		//return to net which will restart LISTEN
+		//stop();
+		return;
+	}
+
+	//break off
+	//break on
+
+	//esc does this
+	if ((origsysmode or request1 eq "STOPDB") or halt) {
+		//break off
+		perform("OFF");
+		var().logoff();
+	}
+
+	//msg is @user4
+	msg_ = "TERMINATED OK";
+
+	//stop();
+	return;
+
+}
+
+function got_link() {
+
+	if (not linkfilename1.osfile())
+		return false;
+
+	linkfilenames = linkfilename0;
 
 	//get the earliest time possible for the log
 	requestdate = var().date();
@@ -942,7 +1033,7 @@ gotlink:
 			if (tracing) {
 				printl("CANNOT LOCK LOCKS,", ("REQUEST*" ^ linkfilename1).quote());
 			}
-			goto nextlinkfile;
+			continue;
 		}
 	//print 'lock locks,REQUEST*':linkfilename1
 
@@ -953,7 +1044,7 @@ gotlink:
 			if (tracing) {
 				printl("CANNOT OPEN RW ", linkfilename1.quote());
 			}
-			goto nextlinkfile;
+			continue;
 		}
 
 		//get the .1 file which contains the request
@@ -1030,8 +1121,8 @@ readlink1:
 		//unlock locks,'REQUEST*':replyfilename
 		if (not(lockrecord("", locks1, "REQUEST*" ^ replyfilename, xx))) {
 			//if tracing then print 'CANNOT LOCK LOCKS,':quote('REQUEST*':replyfilename)
-			goto nextlinkfile;
-		}
+			continue;
+			}
 
 	//print 'lock locks,REQUEST*':replyfilename
 
@@ -1060,21 +1151,16 @@ deleterequest:
 		//unlock locks,'REQUEST*':linkfilename1
 
 		//found a good one so process it
-		gosub requestinit();
-
-		goto nextrequest;
-
-nextlinkfile:
-		{}
+		//gosub onerequest();
+		return true;
 
 	} //linkfilen;
 
-	goto nextsearch;
+	return false;
 
-	return "";
-}
+} // got_link
 
-subroutine requestinit() {
+subroutine request_init() {
 
 	nrequests += 1;
 
@@ -1427,16 +1513,16 @@ cannotopenlinkfile2:
 
 	SYSTEM(2) = linkfilename2;
 
-	//get the current program stack
-	//stack=""
-	//call program.stack(stack)
 	RECORD = "";
 	ID = "";
 	MV = 0;
 
-	//call listen5("PROCESSINIT");
+	return;
+}
 
-	//gosub process();
+subroutine process() {
+
+	// Call process2 wrapped inside a transaction
 
 	// ACID Transactions and record locking
 	// ------------------------------------
@@ -1481,12 +1567,23 @@ cannotopenlinkfile2:
 	// 1. No writes are visible to other processes until transaction is committed
 	// 2. All reads see records that have been committed by other transactions up to the time of the read operation.
 
+	// Postgresql lock types
+	//
+	// Exodus does not use postgres table, page or row locks. It uses "advisory" locks.
+	// Within transactions Exodus uses pg_try_advisory_xact_lock()
+	// Outside transactions Exodus uses pg_try_advisory_lock()
+	// Summary: https://www.postgresql.org/docs/12/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS
+	// Details: https://www.postgresql.org/docs/12/explicit-locking.html#ADVISORY-LOCKS
+
+	// Process the request - inside a transaction or not
+	//////////////////////
+
 	// Without try/catch so will break into debugger
 	if (osgetenv("EXO_DEBUG")) {
 
 		// Identical below
 		begintrans();
-		gosub process();
+		gosub process2();
 		if (not committrans())
 			USER3 = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ USER3;
 	}
@@ -1496,7 +1593,7 @@ cannotopenlinkfile2:
 
 		// Identical above
 		begintrans();
-		gosub process();
+		gosub process2();
 		if (not committrans())
 			USER3 = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ USER3;
 	}
@@ -1505,247 +1602,14 @@ cannotopenlinkfile2:
 		USER3 = mverror.description ^ FM ^ mverror.stack;
 	}
 
-	//call listen5("PROCESSEXIT");
-
-	//restore the program stack
-	//limit on 299 "programs" and dictionary entries count as 1!!!
-	//call program.stack(stack)
-
-	//goto requestexit
-
-	////////////
-	//requestexit:
-	////////////
-
-	call listen5("UNLOCKLONGPROCESS");
-
-	//1. failsafe unlock everything that might still be locked
-	//2. a very few processes rely on all locks being released
-	//   eg autorun2 locks so that autoruns are not processed until
-	//   the request completes
-	//3. generally all processes are careful to unlock what they have locked
-	//   but crashed processes will not do this
-
-	var().unlockall();
-
-	//in case any select list left open
-	clearselect();
-
-	if (response_ eq "") {
-		call listen4(1, USER3);
-	}
-
-	if (response_.index("ERROR NO:")) {
-		call log("LISTEN", USER3);
-	}
-
-	USERNAME=(listenusername);
-	//call sysvar('SET',109,110,listenstation)
-	//call sysvar_109_110('SET',listenstation)
-	STATION=(listenstation);
-
-	//if ucase(response[1,6])='ERROR:' then iodat=''
-
-	//have to call it here as well :(
-	responsetime = ostime();
-	secs = ((responsetime - requesttime).oconv("MD60P")) + 0;
-	if (secs lt 0) {
-		secs += 86400;
-	}
-
-	tt = response_.ucase();
-	if ((tt.index("R18.6") or tt.index("RTP20 MISSING")) or tt.index("TOO MANY LEVELS OF TCL")) {
-		halt = 1;
-		//response<-1>='INTERNAL ERROR Closing current EXODUS server process'
-		call listen4(1, USER3);
-		call sysmsg(response_);
-	}
-
-	rawresponse = USER3;
-	rawresponse.converter("\r\n", "|");
-
-	gosub updreqlog();
-
-	if (logfilename) {
-		logx = "\r\n" "<Response ProcessingSecs=" ^ (secs.quote()) ^ ">";
-		gosub writelogx2();
-
-		//convert non ascii to hexcode
-		logx = response_;
-		if (VOLUMES) {
-			//HEXX4
-				/*;
-				swap '%' with '%25' in logx;
-				for ii=128 to 255;
-					swap char(ii) with HEXX(ii) in logx;
-					next ii;
-				for ii=0 to 15;
-					swap char(ii) with HEXX(ii) in logx;
-					next ii;
-				for ii=24 to 31;
-					swap char(ii) with HEXX(ii) in logx;
-					next ii;
-				*/
-			//encode %->%25 %00-%0F %18-%1F %FA-%FF
-			call hexcode(1, logx);
-		}
-		gosub writelogx();
-
-		logx = "</Response>";
-		iodatlen = iodat_.length();
-		if (iodatlen) {
-			logx ^= "\r\n" "<DataOut>";
-		}
-		gosub writelogx2();
-
-	}
-
-	if (USER1 eq "%DIRECTOUTPUT%") {
-
-		logx = iodat_;
-		//convert '%' to '%25' in logx
-		logx.swapper("%", "%25");
-		gosub writelogx();
-
-	} else {
-
-		call oswrite("", linkfilename2);
-		if (linkfile2.osopen(linkfilename2)) {
-
-			//split into blocks and convert to escape chars
-			datx = "";//dim
-			ptr = 0;
-			for (blockn = 1; blockn <= nblocks; ++blockn) {
-				blk = USER1.substr(1, outblocksize);
-				iodat_.splicer(1, outblocksize, "");
-				///BREAK;
-				if (not(blk.length())) break;
-
-				//in LISTEN and SELECT2 for direct output
-
-				if (VOLUMES) {
-
-					//HEXX5
-						/*;
-						swap '%' with '%25' in blk;
-						//changed to allow language characters to pass through x80-xF9
-						for ii=249 to 255;
-							swap char(ii) with HEXX(ii) in blk;
-							//should not be done per block but is code economic
-							swap char(ii) with HEXX(ii) in response;
-							next ii;
-
-						//is the following really necessary?
-						for ii=0 to 15;
-							swap char(ii) with HEXX(ii) in blk;
-							//should not be done per block but is code economic
-							swap char(ii) with HEXX(ii) in response;
-							next ii;
-						for ii=24 to 31;
-							swap char(ii) with HEXX(ii) in blk;
-							//should not be done per block but is code economic
-							swap char(ii) with HEXX(ii) in response;
-							next ii;
-						*/
-
-					//encode %->%25 %00-%0F %18-%1F %FA-%FF
-					call hexcode(1, blk);
-					call hexcode(1, USER3);
-
-				}
-
-				//convert some things for XML log
-				//swap '&' with '%26' in blk
-				//swap '"' with '%22' in blk
-				//swap '<' with '%3C' in blk
-				//swap '>' with '%3E' in blk
-
-				call osbwrite(blk, linkfile2, ptr);
-
-				if (logfilename) {
-					blk.transfer(logx);
-					gosub writelogx();
-				}
-
-				blk = "";
-
-			} //blockn;
-
-			linkfile2.osclose();
-
-		} else {
-
-			//response='ERROR: LISTEN cannot create temp ':linkfilename2
-			call listen4(22, response_, linkfilename2);
-
-		}
-
-	}
-
-	//try to flush file open
-	if (linkfile2.osopen(linkfilename2)) {
-		linkfile2.osclose();
-	}
-
-	if (logfilename) {
-
-		logx = "";
-		if (iodatlen) {
-			logx ^= "</DataOut>";
-		}
-		logx ^= "\r\n" "</Message>" "\r\n";
-		gosub writelogx2();
-
-		gosub writelogxclose();
-
-	}
-
-	//swap '|' with char(13) in response
-	//swap fm with char(13) in response
-
-	//write the response
-	call oswrite(USER3, linkfilename3);
-
-	//trace responded
-	responsetime = ostime();
-	if (tracing) {
-		//tt=''
-		//call program.stack(tt)
-		//tt=count(tt,fm)+1:'/':count(tt,fm)+1
-		tt = " " ^ oconv((responsetime - requesttime).mod(86400), "[NUMBER,2]") ^ "s ";
-		//seconds
-		tt ^= rawresponse.a(1, 1).field("|", 1).a(1, 1);
-		if (tt.index("<")) {
-			call htmllib2("STRIPTAGS", tt);
-		}
-		tt.swapper("SESSIONID ", "");
-		printl(tt);
-		//print linkfilename1
-	}
-
-	//flush
-	//suspend 'dir>nul'
-
-	//if tracing then print
-
-	if (halt) {
-		gosub exit();
-	}
-
-	if (response_ eq "OK") {
-		if (request1 eq "STOPDB" or request1.substr(1, 7) eq "RESTART") {
-			gosub exit();
-		}
-	}
-
-	//goto nextrequest
 	return;
-}
 
-subroutine process() {
+} // process
+
+subroutine process2() {
 
 	//process the input
-	//////////////////
+	///////////////////
 
 	//failure in LISTEN above
 	if (listenfailure) {
@@ -2606,7 +2470,7 @@ badwrite:
 		//request, iodat and response are now passed and returned in @user0,1 and 3
 		//other messages are passed back in @user4
 		//execute instead of call prevents program crashes from crashing LISTEN
-		//changed now that dataset and password are removed in requestinit
+		//changed now that dataset and password are removed in request()
 		//request=field(request,fm,firstrequestfieldn+2,99999)
 		USER0 = request_.field(FM, 3, 99999);
 
@@ -2708,51 +2572,244 @@ badwrite:
 	//put no code here because some returns above will short cut it
 
 	return;
-}
 
-subroutine exit() {
+} // process2
 
-	if (logfilename) {
-		logfile.osclose();
-	}
+function request_exit() {
 
-	//remove lock indicating processing
-	//gosub sysunlock
+	// Handle the response
+	//////////////////////
+
+	////////////
+	//requestexit:
+	////////////
 
 	call listen5("UNLOCKLONGPROCESS");
 
+	//1. failsafe unlock everything that might still be locked
+	//2. a very few processes rely on all locks being released
+	//   eg autorun2 locks so that autoruns are not processed until
+	//   the request completes
+	//3. generally all processes are careful to unlock what they have locked
+	//   but crashed processes will not do this
+
 	var().unlockall();
 
-	//call restorescreenorigscrn, origattr);
+	//in case any select list left open
+	clearselect();
 
-	//remove flag that this dataset is being served ("listened")
-	//osdelete inpath:serverflagfilename
-
-	//get into interactive mode
-	//system<33>=origsysmode
-	SYSTEM(33) = "";
-	//call setprivilegeorigprivilege);
-	if (request1.substr(1, 7) eq "RESTART") {
-		USER4 = request1;
-		//return to net which will restart LISTEN
-		stop();
+	if (response_ eq "") {
+		call listen4(1, USER3);
 	}
 
-	//break off
-	//break on
-
-	//esc does this
-	if ((origsysmode or request1 eq "STOPDB") or halt) {
-		//break off
-		perform("OFF");
-		var().logoff();
+	if (response_.index("ERROR NO:")) {
+		call log("LISTEN", USER3);
 	}
 
-	//msg is @user4
-	msg_ = "TERMINATED OK";
+	USERNAME=(listenusername);
+	//call sysvar('SET',109,110,listenstation)
+	//call sysvar_109_110('SET',listenstation)
+	STATION=(listenstation);
 
-	stop();
-}
+	//if ucase(response[1,6])='ERROR:' then iodat=''
+
+	//have to call it here as well :(
+	responsetime = ostime();
+	secs = ((responsetime - requesttime).oconv("MD60P")) + 0;
+	if (secs lt 0) {
+		secs += 86400;
+	}
+
+	tt = response_.ucase();
+	if ((tt.index("R18.6") or tt.index("RTP20 MISSING")) or tt.index("TOO MANY LEVELS OF TCL")) {
+		halt = 1;
+		//response<-1>='INTERNAL ERROR Closing current EXODUS server process'
+		call listen4(1, USER3);
+		call sysmsg(response_);
+	}
+
+	rawresponse = USER3;
+	rawresponse.converter("\r\n", "|");
+
+	gosub updreqlog();
+
+	if (logfilename) {
+		logx = "\r\n" "<Response ProcessingSecs=" ^ (secs.quote()) ^ ">";
+		gosub writelogx2();
+
+		//convert non ascii to hexcode
+		logx = response_;
+		if (VOLUMES) {
+			//HEXX4
+				/*;
+				swap '%' with '%25' in logx;
+				for ii=128 to 255;
+					swap char(ii) with HEXX(ii) in logx;
+					next ii;
+				for ii=0 to 15;
+					swap char(ii) with HEXX(ii) in logx;
+					next ii;
+				for ii=24 to 31;
+					swap char(ii) with HEXX(ii) in logx;
+					next ii;
+				*/
+			//encode %->%25 %00-%0F %18-%1F %FA-%FF
+			call hexcode(1, logx);
+		}
+		gosub writelogx();
+
+		logx = "</Response>";
+		iodatlen = iodat_.length();
+		if (iodatlen) {
+			logx ^= "\r\n" "<DataOut>";
+		}
+		gosub writelogx2();
+
+	}
+
+	if (USER1 eq "%DIRECTOUTPUT%") {
+
+		logx = iodat_;
+		//convert '%' to '%25' in logx
+		logx.swapper("%", "%25");
+		gosub writelogx();
+
+	} else {
+
+		call oswrite("", linkfilename2);
+		if (linkfile2.osopen(linkfilename2)) {
+
+			//split into blocks and convert to escape chars
+			datx = "";//dim
+			ptr = 0;
+			for (blockn = 1; blockn <= nblocks; ++blockn) {
+				blk = USER1.substr(1, outblocksize);
+				iodat_.splicer(1, outblocksize, "");
+				///BREAK;
+				if (not(blk.length())) break;
+
+				//in LISTEN and SELECT2 for direct output
+
+				if (VOLUMES) {
+
+					//HEXX5
+						/*;
+						swap '%' with '%25' in blk;
+						//changed to allow language characters to pass through x80-xF9
+						for ii=249 to 255;
+							swap char(ii) with HEXX(ii) in blk;
+							//should not be done per block but is code economic
+							swap char(ii) with HEXX(ii) in response;
+							next ii;
+
+						//is the following really necessary?
+						for ii=0 to 15;
+							swap char(ii) with HEXX(ii) in blk;
+							//should not be done per block but is code economic
+							swap char(ii) with HEXX(ii) in response;
+							next ii;
+						for ii=24 to 31;
+							swap char(ii) with HEXX(ii) in blk;
+							//should not be done per block but is code economic
+							swap char(ii) with HEXX(ii) in response;
+							next ii;
+						*/
+
+					//encode %->%25 %00-%0F %18-%1F %FA-%FF
+					call hexcode(1, blk);
+					call hexcode(1, USER3);
+
+				}
+
+				//convert some things for XML log
+				//swap '&' with '%26' in blk
+				//swap '"' with '%22' in blk
+				//swap '<' with '%3C' in blk
+				//swap '>' with '%3E' in blk
+
+				call osbwrite(blk, linkfile2, ptr);
+
+				if (logfilename) {
+					blk.transfer(logx);
+					gosub writelogx();
+				}
+
+				blk = "";
+
+			} //blockn;
+
+			linkfile2.osclose();
+
+		} else {
+
+			//response='ERROR: LISTEN cannot create temp ':linkfilename2
+			call listen4(22, response_, linkfilename2);
+
+		}
+
+	}
+
+	//try to flush file open
+	if (linkfile2.osopen(linkfilename2)) {
+		linkfile2.osclose();
+	}
+
+	if (logfilename) {
+
+		logx = "";
+		if (iodatlen) {
+			logx ^= "</DataOut>";
+		}
+		logx ^= "\r\n" "</Message>" "\r\n";
+		gosub writelogx2();
+
+		gosub writelogxclose();
+
+	}
+
+	//swap '|' with char(13) in response
+	//swap fm with char(13) in response
+
+	//write the response
+	call oswrite(USER3, linkfilename3);
+
+	//trace responded
+	responsetime = ostime();
+	if (tracing) {
+		//tt=''
+		//call program.stack(tt)
+		//tt=count(tt,fm)+1:'/':count(tt,fm)+1
+		tt = " " ^ oconv((responsetime - requesttime).mod(86400), "[NUMBER,2]") ^ "s ";
+		//seconds
+		tt ^= rawresponse.a(1, 1).field("|", 1).a(1, 1);
+		if (tt.index("<")) {
+			call htmllib2("STRIPTAGS", tt);
+		}
+		tt.swapper("SESSIONID ", "");
+		printl(tt);
+		//print linkfilename1
+	}
+
+	//flush
+	//suspend 'dir>nul'
+
+	//if tracing then print
+
+	if (halt) {
+		//gosub main_exit();
+		return false;
+	}
+
+	if (response_ eq "OK") {
+		if (request1 eq "STOPDB" or request1.substr(1, 7) eq "RESTART") {
+			//gosub main_exit();
+			return false;
+		}
+	}
+
+	return true;
+
+} // request_exit
 
 subroutine geterrorresponse() {
 	fileerrorx = FILEERROR;
