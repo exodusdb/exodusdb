@@ -54,6 +54,9 @@ THE SOFTWARE.
 //		- improve modularity of the Exodus platform;
 //		- allow easy expanding to other DB engines.
 
+#include <unordered_map>
+#include <map>
+
 #if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
 #define WIN32_LEAN_AND_MEAN
 #include <DelayImp.h>
@@ -275,7 +278,9 @@ class MVresult {
 	}
 };
 
-thread_local std::unordered_map<std::string, MVresult> thread_mvresults;
+//very few entries so map will be much faster than unordered_map
+//thread_local std::unordered_map<std::string, MVresult> thread_mvresults;
+thread_local std::map<std::string, MVresult> thread_mvresults;
 
 int get_mvconn_no(CVR dbhandle) {
 
