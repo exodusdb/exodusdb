@@ -412,7 +412,7 @@ void var::createString() const {
 
 	// int - create string from int
 	if (var_typ & VARTYP_INT) {
-		// loss of precision if var_int is long long
+		// loss of precision if var_int is int64_t
 		var_str = std::to_string(int(var_int));
 		var_typ |= VARTYP_STR;
 		return;
@@ -467,7 +467,7 @@ var var::round(const int ndecimals) const {
 			result.createString();
 			return result;
 		}
-		// loss of precision if var_int is long long
+		// loss of precision if var_int is uint64_t
 		fromdouble = double(var_int);
 	}
 
@@ -622,12 +622,12 @@ int var::toInt() const {
 	return static_cast<int>(var_int);
 }
 
-long long var::toLong() const {
+long long int var::toLong() const {
 
 	THISIS("int var::toLong() const")
 	assertInteger(function_sig);
 
-	return static_cast<long long>(var_int);
+	return static_cast<long long int>(var_int);
 }
 
 double var::toDouble() const {

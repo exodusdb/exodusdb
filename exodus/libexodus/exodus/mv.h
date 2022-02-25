@@ -324,7 +324,7 @@ class PUBLIC var final {
 
 	// All mutable because asking for a string can create it from an integer and vice versa
 	mutable std::string var_str; // 32 bytes on g++. is default constructed to empty string
-	mutable long long   var_int; // 8 bytes/64 bits - currently defined as a long long
+	mutable int64_t     var_int; // 8 bytes/64 bits - currently defined as a long long
 	mutable double      var_dbl; // 8 bytes/64 buts - double
 	mutable VARTYP      var_typ; // Default initialised to VARTYP_UNA
 	                             // Actually a uint which will be 4 bytes
@@ -1618,7 +1618,7 @@ class PUBLIC var final {
 	// OTHER STRING ACCESS
 	//////////////////////
 
-	ND var hash(const unsigned long long modulus = 0) const;
+	ND var hash(const uint64_t modulus = 0) const;
 	ND var unique() const;
 
 	// CONVERT TO DIM (returns a dim)

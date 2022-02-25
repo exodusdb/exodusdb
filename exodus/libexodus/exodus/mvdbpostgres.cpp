@@ -1202,7 +1202,7 @@ bool var::read(CVR filehandle, CVR key) {
 	return true;
 }
 
-var var::hash(const unsigned long long modulus) const {
+var var::hash(const uint64_t modulus) const {
 
 	THISIS("var var::hash() const")
 	assertDefined(function_sig);

@@ -18,7 +18,7 @@ behaviour and not be forced into alphabetic sorting of numbers eg 10,2.
 If possible we also wish mixed alphanumerics to be sorted reasonably eg A2,A10 (ie not A10,A2).
 
 NB the following is based on 32 bit ints and floats but the same techniques can be applied to 64 bit
-doubles, mapping them to some 64-bit ints like long long int.
+doubles, mapping them to some 64-bit ints like uint64_t.
 
 long int http://en.wikipedia.org/wiki/Long_integer
 long long int is from C99 and is required to be at least 64 bits
@@ -150,10 +150,10 @@ A1-2	<	A01-10	multi-level number sort
 */
 
 void appenddouble2sortstring(const double& double1, std::ostringstream& stringstream1) {
-	assert(sizeof(double) == sizeof(long long int));
+	assert(sizeof(double) == sizeof(int64_t));
 
 	// view the double as an 64 bit integer
-	long long int integer1 = *(long long int*)&double1;
+	uint64_t integer1 = *(uint64_t*)&double1;
 
 	if (integer1 < 0)
 		// invert the negative numbers and clear the high bit so that

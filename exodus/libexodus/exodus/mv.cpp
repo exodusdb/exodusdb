@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 #include <iostream>
 
-#include <cassert>
+//#include <cassert>
 #include <limits>
 #include <sstream>
 #include <vector>
