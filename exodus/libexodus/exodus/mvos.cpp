@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <filesystem>
 #include <fnmatch.h> //for fnmatch() globbing
 #include <chrono>
+#include <unistd.h> //for close()
 
 //used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>
@@ -130,35 +131,82 @@ bool checknotabsoluterootfolder(std::string dirname) {
 	return true;
 }
 
+// Returns with trailing OSSLASH
 var var::ostempdirname() const {
 	std::error_code error_code;
+	//TODO handle error code specifically
 	std::string dirname = std::string(std::filesystem::temp_directory_path(error_code));
 	if (dirname.back() != OSSLASH_)
 		dirname.push_back(OSSLASH_);
 	return dirname;
 }
 
-//this will actually create files liek /tmp/~XXXXXX that should be deleted if not used
-var var::ostempfilename() const {
-	//TODO replace with mkstemp
-	//https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
-	//return std::string(std::tmpnam(nullptr));
-	var tempfilename = this->ostempdirname();
+// This function in Ubuntu/g++ returns *sequential* temporary file names which is perhaps not good
+// A temporary file is actually created and deleted just to get a name that can be created by other processes.
+// Any files created by the caller must be deleted or will hang around in /tmp unless reboot etc.
+//
+// PROBLEM:
+// The file/filename returned could also be created by othet process because we are closing/deleting the file immediately.
+//
+// SOLUTION:
+// TODO 1. Remove this function from exodus
+//         REPLACE it with some kind of osopen(anonymoustempfile) that must be osclosed and will exist but can never be referred to by name
+//         You could create ANOTHER file with the same name but that would be a different inode/file in the file system.
+//      2. Provide osopen without filename to get a filehandle without name that will be automatically deleted when osclose is called.
+//
+// Linux's temporary file philosophy is to unlink temporary files immediately (remove dir entry) so they cannot be opened by other processes
+// and will automatically be fully deleted when the file handle is closed/process terminates.
+//
 
-	char* tmp;
-	// TODO ensure tmp is deleted automatically using RAII/SBRM
-	tmp = new char[strlen(tempfilename.var_str.c_str()) + 8];
-	strcpy(tmp, tempfilename.var_str.c_str());
-	strcat(tmp, "~XXXXXX");
-	int fd;
-	if ((fd = mkstemp(tmp)) == -1) {
-		delete tmp;
-		//fprintf(stderr, "Failed creating temp file.\n");
-		return "nope";
-	}
-	tempfilename = tmp;
-	delete tmp;
-	return tempfilename;
+//var var::ostempfilename() const {
+//
+//	// Linux immediately unlinks the temporary file so it exists without a name.
+//	// the actual file is automatically deleted from the file system when the file handle is closed/process is closed.
+//	std::FILE* tempfile = std::tmpfile();
+//
+//	// Linux-specific method to acquire the tmpfile name
+//  // BUT FILE WILL NOT EXIST SINCE IT IS UNLINKED IMMEDIATELY AND FULLY DELETED ON FCLOSE BELOW
+//	var tempfilename;
+//	namespace fs = std::filesystem;
+//	tempfilename.var_str = fs::read_symlink(fs::path("/proc/self/fd") / std::to_string(fileno(tempfile)));
+//	tempfilename.var_typ = VARTYP_STR;
+//	if (auto pos = tempfilename.var_str.find(' '); pos != std::string::npos)
+//		tempfilename.var_str.resize(pos);
+//
+//	// We close the file handle because this function returns temporary file names, not handles
+//	// and would leak file handles if we did not.
+//	fclose(tempfile);
+//
+//	return tempfilename;
+//
+//}
+
+// This function actually creates a file which must be cleaned up by the caller
+// The filenames are random names
+// TODO is this threadsafe?
+var var::ostempfilename() const {
+
+	//https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
+
+	// Create a char* template of the temporary file name desired
+	// (2*26+10)^6 possible filenames = 56,800,235,584
+	// Note that 64 bit hash = 1.84467440737e+19 combinations
+	var rvo_tempfilename = this->ostempdirname() ^ "~exoXXXXXX";
+	std::vector<char> buffer(rvo_tempfilename.var_str.begin(), rvo_tempfilename.var_str.end());
+	buffer.push_back('\0');
+
+	// Linux only function to create a temporary file
+	int fd_or_error;
+	if ((fd_or_error = mkstemp(&buffer[0])) == -1)
+		throw MVError(var(__PRETTY_FUNCTION__) ^ " - Cannot create tempfilename " ^ rvo_tempfilename.quote());
+
+	// Must close or we will leak file handles because this badly designed function returns a name not a handle
+	::close(fd_or_error);
+
+	// Get the actual generated temporary file name
+	rvo_tempfilename.var_str = buffer.data();
+
+	return rvo_tempfilename;
 }
 
 bool var::suspend() const {
