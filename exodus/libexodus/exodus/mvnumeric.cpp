@@ -484,6 +484,9 @@ var var::round(const int ndecimals) const {
 	//
 	//both pickdb and c++ rounding tie break goes away from zero.
 
+	if (std::abs(fromdouble) < 0.000'000'000'1)
+		fromdouble = 0;
+
 	double scale = std::pow(10.0, ndecimals);
 	double scaled_double = fromdouble * scale;
 	double ceil2 = std::ceil(scaled_double);
