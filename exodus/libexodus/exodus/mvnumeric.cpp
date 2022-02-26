@@ -412,8 +412,7 @@ void var::createString() const {
 
 	// int - create string from int
 	if (var_typ & VARTYP_INT) {
-		// loss of precision if var_int is int64_t
-		var_str = std::to_string(int(var_int));
+		var_str = std::to_string(var_int);
 		var_typ |= VARTYP_STR;
 		return;
 	}

@@ -467,7 +467,9 @@ void SIGINT_handler(int sig) {
 		} else if (cmd1 == "D") {
 			// duplicated in init and B
 			var pid = getpid();
-			var("gdb -p " ^ pid).osshell();
+			var cmd = "gdb -p " ^ pid;
+			cmd.logputl();
+			cmd.osshell();
 		} else if (cmd1 == "A") {
 			// fprintf(stderr,"To continue from here in GDB: \"signal 0\"\n");
 			raise(SIGABRT);
