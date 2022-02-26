@@ -25,7 +25,9 @@ set -eux
 : Remove any _test suffix from DB_CODE to get the working host dir
 : ================================================================
 :
-	SITE_DIR=${DB_CODE%_test}
+	if [ -z ${SITE_DIR:-} ]; then
+		SITE_DIR=${DB_CODE%_test}
+	fi
 
 :
 : Check Syntax
