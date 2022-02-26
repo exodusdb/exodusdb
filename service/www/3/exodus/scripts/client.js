@@ -1984,8 +1984,8 @@ function* exodusdblink_login(username, password, dataset, system) {
         var question = 'Your session has timed out\nor been lost to another login or another computer or browser\nor the server has been restarted.'
         //current work is cleared without option to recover if detect login on another computer or browser
         if (glocked && gchangesmade)
-            question += '\n\nWarning! Your current work on ' + gkey + ' will be lost if you quit.'
-        question += '\n\nLogin again?'
+            question += '\n\nWarning! Your current work on ' + gkey + ' will be lost if you dont resume login.'
+        question += '\n\nResume login?'
         if (!(yield* exodusyesno(question, 1))) {
 
             //switch to login window
