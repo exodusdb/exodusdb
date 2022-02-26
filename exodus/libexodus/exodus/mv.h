@@ -1021,36 +1021,36 @@ class PUBLIC var final {
 	// Add
 	VARREF operator+=(const int) &;
 	VARREF operator+=(const double) &;
-	VARREF operator+=(const char) &;
-	VARREF operator+=(const char*) &;
+	VARREF operator+=(const char  char1) &{(*this) += var(char1);return *this;}
+	VARREF operator+=(const char* chars) &{(*this) += var(chars);return *this;}
 	VARREF operator+=(const bool) &;
 
 	// Multiply
 	VARREF operator*=(const int) &;
 	VARREF operator*=(const double) &;
-	VARREF operator*=(const char) &;
-	VARREF operator*=(const char*) &;
+	VARREF operator*=(const char  char1) &{(*this) *= var(char1);return *this;}
+	VARREF operator*=(const char* chars) &{(*this) *= var(chars);return *this;}
 	VARREF operator*=(const bool) &;
 
 	// Subtract
 	VARREF operator-=(const int) &;
 	VARREF operator-=(const double) &;
-	VARREF operator-=(const char) &;
-	VARREF operator-=(const char*) &;
+	VARREF operator-=(const char  char1) &{(*this) -= var(char1);return *this;}
+	VARREF operator-=(const char* chars) &{(*this) -= var(chars);return *this;}
 	VARREF operator-=(const bool) &;
 
 	// Divide
 	VARREF operator/=(const int) &;
 	VARREF operator/=(const double) &;
-	VARREF operator/=(const char) &;
-	VARREF operator/=(const char*) &;
+	VARREF operator/=(const char  char1) &{(*this) /= var(char1);return *this;}
+	VARREF operator/=(const char* chars) &{(*this) /= var(chars);return *this;}
 	VARREF operator/=(const bool) &;
 
 	// Modulo
 	VARREF operator%=(const int) &;
 	VARREF operator%=(const double) &;
-	VARREF operator%=(const char) &;
-	VARREF operator%=(const char*) &;
+	VARREF operator%=(const char  char1) &{(*this) %= var(char1);return *this;}
+	VARREF operator%=(const char* chars) &{(*this) %= var(chars);return *this;}
 	VARREF operator%=(const bool) &;
 
 	// Concat
@@ -1080,7 +1080,7 @@ class PUBLIC var final {
 
 	var operator+() const;
 	var operator-() const;
-	bool operator!() const;
+	bool operator!() const {return !this->toBool();}
 
 	/////////////
 	// BINARY OPS

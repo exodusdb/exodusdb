@@ -292,8 +292,6 @@ function main() {
 	}
 
 	{
-	    printl("p1 says 'Hello World!'");
-
 	    std::string s = "abc";
 	    assert(std::string(var(s)) == s);
 	    assert(func_s(var(s)) == s);

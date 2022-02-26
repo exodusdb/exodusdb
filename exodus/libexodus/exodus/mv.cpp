@@ -1077,87 +1077,6 @@ tryagain:
 
 
 ///////
-// CHAR
-///////
-
-// ADD CHAR
-
-VARREF var::operator+=(const char char1) &{
-	(*this) += var(char1);
-	return *this;
-}
-
-// MULTIPLY CHAR
-
-VARREF var::operator*=(const char char1) &{
-	(*this) *= var(char1);
-	return *this;
-}
-
-// SUBTRACT CHAR
-
-VARREF var::operator-=(const char char1) &{
-	(*this) -= var(char1);
-	return *this;
-}
-
-
-// DIVIDE CHAR
-
-VARREF var::operator/=(const char char1) &{
-	(*this) /= var(char1);
-	return *this;
-}
-
-
-// MODULO CHAR
-
-VARREF var::operator%=(const char char1) &{
-	(*this) %= var(char1);
-	return *this;
-}
-
-
-///////
-// CSTR
-///////
-
-// ADD CSTR
-
-VARREF var::operator+=(const char* chars1) &{
-	(*this) += var(chars1);
-	return *this;
-}
-
-// MULTIPLY CSTR
-
-VARREF var::operator*=(const char* chars1) &{
-	(*this) *= var(chars1);
-	return *this;
-}
-
-// SUBTRACT CSTR
-
-VARREF var::operator-=(const char* chars1) &{
-	(*this) -= var(chars1);
-	return *this;
-}
-
-// DIVIDE CSTR
-
-VARREF var::operator/=(const char* chars1) &{
-	(*this) /= var(chars1);
-	return *this;
-}
-
-// MODULO CSTR
-
-VARREF var::operator%=(const char* chars1) &{
-	(*this) %= var(chars1);
-	return *this;
-}
-
-///////
 // BOOL
 ///////
 
@@ -1703,12 +1622,6 @@ var var::operator-() const{
 	this->assertNumeric(__PRETTY_FUNCTION__);
 	// will never get here
 	throw MVNonNumeric("+(" ^ this->substr(1, 128) ^ ")");
-}
-
-// !var
-bool var::operator!() const {
-
-	return !this->toBool();
 }
 
 // Replaced by operator+=
