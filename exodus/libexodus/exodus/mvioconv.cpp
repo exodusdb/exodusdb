@@ -766,7 +766,8 @@ var var::oconv(const char* conversion) const {
 								//convert decimal to long
 								if (!(part.var_typ & VARTYP_INT)) {
 									part = part.round();  //actually to var_int i.e. int64_t
-									part.toLong();
+									//part.toLong();
+									part.toInt();
 								}
 
 								//convert to hex

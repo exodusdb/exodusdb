@@ -616,21 +616,22 @@ bool var::toBool() const {
 	};
 }
 
-int var::toInt() const {
+int64_t var::toInt() const {
 
-	THISIS("int var::toInt() const")
+	THISIS("int64_t var::toInt() const")
 	assertInteger(function_sig);
 
-	return static_cast<int>(var_int);
+	//return static_cast<int>(var_int);
+	return var_int;
 }
 
-long long int var::toLong() const {
-
-	THISIS("int var::toLong() const")
-	assertInteger(function_sig);
-
-	return static_cast<long long int>(var_int);
-}
+//long long int var::toLong() const {
+//
+//	THISIS("int var::toLong() const")
+//	assertInteger(function_sig);
+//
+//	return static_cast<long long int>(var_int);
+//}
 
 double var::toDouble() const {
 

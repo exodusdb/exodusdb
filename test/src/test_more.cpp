@@ -310,7 +310,7 @@ function main() {
 	    assert(func_s(var(v)) == v);
 
 	    assert(func_i(var(v)) == v);
-	    assert(func_li(var(v).toLong()) == v.toLong());
+	    assert(func_li(var(v).toInt()) == v.toInt());
 
 	    assert(func_d(var(v)) == v);
 	    assert(func_ld(var(v)) == v.toDouble());

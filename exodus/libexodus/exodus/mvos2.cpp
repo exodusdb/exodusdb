@@ -114,7 +114,8 @@ void var::initrnd() const {
 	} else if (this->isnum()) {
 
 		// Seed from number
-		seed = this->toLong();
+		//seed = this->toLong();
+		seed = this->toInt();
 
 	} else if (var_typ & VARTYP_STR) {
 

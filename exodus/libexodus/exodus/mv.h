@@ -675,9 +675,9 @@ class PUBLIC var final {
 
 	// standard c/c++ int() in other words simply take the number to the left of the point. -1.5
 	// becomes -1 and 1.5 becomes 1
-	int toInt() const;
+	int64_t toInt() const;
 
-	long long toLong() const;
+	//long long toLong() const;
 
 	double toDouble() const;
 
@@ -768,7 +768,6 @@ class PUBLIC var final {
 		// conversion when does c++ use automatic conversion to void* note that exodus operator !
 		// uses (void*) trial elimination of operator void* seems to cause no problems but without
 		// full regression testing
-		assertDefined(__PRETTY_FUNCTION__);
 		return (void*)this->toBool();
 	}
 
