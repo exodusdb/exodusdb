@@ -772,9 +772,9 @@ function loop_exit() {
 	//charx=ucase(charx[1,1])
 	//charx=charx[1,1]
 
-	//esc or 'q' on linux
+	//esc or "q" on linux
 	tt = INTCONST.a(1, 1);
-	if (charx.index(tt)) {
+	if (charx.lcase().index(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.swapper(var().chr(27), "Esc");
 		call mssg(" You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
@@ -791,6 +791,7 @@ function loop_exit() {
 			//gosub main_exit();
 			return false;
 		}
+		// "x"
 		if (reply eq INTCONST.a(7)) {
 			charx = reply;
 		}
@@ -803,7 +804,7 @@ function loop_exit() {
 	// end
 
 	//f5 or 'x' on linux
-	if (charx eq PRIORITYINT.a(2)) {
+	if (charx.lcase() eq PRIORITYINT.a(2)) {
 		cmd = "";
 		cmd.input(oscwd() ^ " Command? ");
 		SYSTEM(2) = "";
@@ -819,7 +820,7 @@ function loop_exit() {
 		osflush();
 	}
 
-	//f10
+	//f10 or "x" on linux
 	if (charx eq INTCONST.a(7)) {
 		execute("RUNMENU " ^ ENVIRONSET.a(37));
 	}
