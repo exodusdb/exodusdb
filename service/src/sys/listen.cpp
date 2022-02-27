@@ -108,7 +108,7 @@ var linkfilen;//num
 var linkfile1;
 var timex;
 var ntries;//num
-var listenfailure;//num
+//var listenfailure;//num
 var connection;
 var dataset;
 var username;
@@ -222,9 +222,9 @@ function main() {
 			//process one request file
 			if (got_link()) {
 
-				gosub request_init();
-
-				gosub process();
+				if (request_init()) {
+					gosub process();
+				}
 
 				if (not request_exit())
 					break;
@@ -1161,7 +1161,7 @@ deleterequest:
 
 } // got_link
 
-subroutine request_init() {
+function request_init() {
 
 	nrequests += 1;
 
@@ -1184,7 +1184,7 @@ subroutine request_init() {
 	//to avoid multiple processes going on active for only one request
 	onactive = 0;
 
-	listenfailure = 0;
+	var request_init_ok = true;
 
 	//cut off the initial connection info fields
 	tt = request_.a(1);
@@ -1406,7 +1406,7 @@ subroutine request_init() {
 				iodat_ = "";
 				//response='Error: Maximum record size of ':maxstrlen '[XBYTES]':' exceeded in LISTEN'
 				call listen4(2, response_, maxstrlen);
-				listenfailure = 1;
+				request_init_ok = false;
 
 			//otherwise join the blocks
 			} else {
@@ -1420,7 +1420,7 @@ subroutine request_init() {
 		//cannot open linkfilename2 means no iodat
 		} else {
 cannotopenlinkfile2:
-			listenfailure = 1;
+			request_init_ok = false;
 			USER1 = "";
 			//response='Error: LISTEN cannot open ':linkfilename2
 			call listen4(3, USER3, linkfilename2);
@@ -1518,7 +1518,7 @@ cannotopenlinkfile2:
 	ID = "";
 	MV = 0;
 
-	return;
+	return request_init_ok;
 }
 
 subroutine process() {
@@ -1612,11 +1612,13 @@ subroutine process2() {
 	//process the input
 	///////////////////
 
-	//failure in LISTEN above
-	if (listenfailure) {
+//	//failure in LISTEN above
+//	if (listenfailure) {
+//
+//	//invalid username or password or connection
+//	} else 
 
-	//invalid username or password or connection
-	} else if (invaliduser) {
+	if (invaliduser) {
 		USER1 = "";
 		USER3 = invaliduser;
 
