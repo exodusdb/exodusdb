@@ -110,6 +110,52 @@ function main() {
 
 	}
 
+	{
+		printl();
+		printl("Check can convert string of largest int '9223372036854775807' to actual integer");
+		var x = "9223372036854775807";
+		x.dump();
+		assert(x.toInt() == (9223372036854775000 + 807));
+		x.dump();
+	}
+
+	{
+		printl();
+		printl("Check can convert string of minimum int '9223372036854775807' to actual integer");
+		var x = "-9223372036854775808";
+		x.dump();
+		assert(x.toInt() == -9223372036854775000-808);
+		x.dump();
+	}
+
+	{
+		printl();
+		printl("Ensure int less than min int is non-numeric");
+		var x = "-9223372036854775809";
+		x.dump();
+		try {
+			assert(x.toInt());
+			assert(false);//should not get here
+		} catch (MVNonNumeric e) {
+			printl("OK", e.description);
+		}
+		x.dump();
+	}
+
+	{
+		printl();
+		printl("Ensure int more than max int is non-numeric");
+		var x = "9223372036854775808";
+		x.dump();
+		try {
+			assert(x.toInt());
+			assert(false);//should not get here
+		} catch (MVNonNumeric e) {
+			printl("OK", e.description);
+		}
+		x.dump();
+	}
+
 	printl("Test passed");
 
 	return 0;
