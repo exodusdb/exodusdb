@@ -4,7 +4,7 @@
 //std::atomic<int> atomic_count;
 
 // Create a threadpool of suitable size
-#include <thread>
+#include <thread> //gcc_link_options -lpthread
 #include <boost/asio/thread_pool.hpp>
 #include <boost/asio/post.hpp>
 boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency());
@@ -51,7 +51,7 @@ function main() {
 	if (dcount(COMMAND, FM) < 2) {
 		var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
 		if (osread(COMMAND, edic_hist)) {
-			OPTIONS = COMMAND.a(2);
+			//OPTIONS = COMMAND.a(2);
 			COMMAND = raise(COMMAND.a(1));
 		//} else {
 		//	abort("Syntax is 'compile osfilename'");
@@ -209,7 +209,8 @@ function main() {
 		//if (debugging)
 		//	linkoptions=" -lexodus-gd";
 		//else
-		linkoptions = " -lexodus -lstdc++fs -lpthread";
+		//linkoptions = " -lexodus -lstdc++fs -lpthread";
+		linkoptions = " -lexodus -lstdc++fs";
 
 		//always look in header install path eg ~/inc
 		basicoptions ^= " -I" ^ incdir;
@@ -1202,6 +1203,13 @@ function main() {
 					}
 				}
 			}
+
+			// embedded linker options
+			if (var pos = text.index("/" "/gcc_link_options"); pos) {
+				pos += 18;
+				linkoptions ^= text.substr2(pos, pos);
+			}
+
 			// Generate headers even for executables that do not really need them
 			// so that we can find the path to the source code for executables
 			// so that we can edic and compile by simple file name without paths
