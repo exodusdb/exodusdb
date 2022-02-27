@@ -582,6 +582,27 @@ function main() {
 
 	}
 
+	{
+		printl();
+		printl("Check var_proxy1 can be used directly as a bool");
+		var x = "xxx^0"_var;
+		assert(x(1) and not x(2));
+	}
+
+	{
+		printl();
+		printl("Check var_proxy2 can be used directly as a bool");
+		var x = "xxx^0]0]1"_var;
+		assert(x(2, 3) and not x(2, 2));
+	}
+
+	{
+		printl();
+		printl("Check var_proxy3 can be used directly as a bool");
+		var x = "xxx^0]0]0}0}1"_var;
+		assert(x(2, 3, 3) and not x(2, 3, 2));
+	}
+
 	printl("Test passed");
 
 	return 0;
