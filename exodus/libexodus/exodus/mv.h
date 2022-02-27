@@ -38,21 +38,29 @@ THE SOFTWARE.
 //https://quuxplusone.github.io/blog/2021/11/09/pass-string-view-by-value/
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+
 #ifdef BUILDING_LIBRARY
+
 #ifdef __GNUC__
 #define PUBLIC __attribute__((dllexport))
 #else
 #define PUBLIC __declspec(dllexport)  // Note: actually gcc seems to also support this syntax.
 #endif
-#else
+
+#else //not BUILDING LIBRARY
+
 #ifdef __GNUC__
 #define PUBLIC __attribute__((dllimport))
 #else
 #define PUBLIC __declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
 #endif
+
 #endif
+
 #define DLL_LOCAL
+
 #else
+
 #if __GNUC__ >= 4
 // use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
 #define PUBLIC __attribute__((visibility("default")))
@@ -61,6 +69,7 @@ THE SOFTWARE.
 #define PUBLIC
 #define DLL_LOCAL
 #endif
+
 #endif
 
 #include <string>
@@ -1085,10 +1094,14 @@ class PUBLIC var final {
 	// BINARY OPS
 	/////////////
 
-	// Implemented as free friend functions below
+	// declared and defined free friend functions below
 
-	CVR dump(SV text DEFAULT_STRING) const;
-	VARREF dump(SV text DEFAULT_STRING);
+	// Note that all or most of these do not actually need to be friends since they either utilise friended helpers
+	// or are implemented in terms of self assign operators eg (a+b) is implemented as var(a)+=b
+	//
+	// they could be defined outide of var class but we leave them in for clarity
+	//
+	// note that the friend word is required to define free functions inside a class even if they do not need to be friends
 
 	//////////////////
 	// ITERATOR FRIEND
@@ -1939,6 +1952,9 @@ class PUBLIC var final {
 	void abortall(CVR text DEFAULT_STRING) const;
 
 	var debug(CVR DEFAULT_STRING) const;
+
+	CVR dump(SV text DEFAULT_STRING) const;
+	VARREF dump(SV text DEFAULT_STRING);
 
 	var logoff() const;
 

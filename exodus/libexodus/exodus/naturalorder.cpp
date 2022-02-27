@@ -153,7 +153,7 @@ void appenddouble2sortstring(const double& double1, std::ostringstream& stringst
 	assert(sizeof(double) == sizeof(int64_t));
 
 	// view the double as an 64 bit integer
-	uint64_t integer1 = *(uint64_t*)&double1;
+	int64_t integer1 = *(int64_t*)&double1;
 
 	if (integer1 < 0)
 		// invert the negative numbers and clear the high bit so that
