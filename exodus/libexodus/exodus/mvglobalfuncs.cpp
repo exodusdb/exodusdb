@@ -126,7 +126,7 @@ PUBLIC bool osbwrite(CVR data, CVR filehandle, CVR offset) {
 // two argument version returns success/failure to be used in if statement
 // target variable first to be like "osread x from y else" and "read x from y else"
 // unfortunately different from osgetenv which is the reverse
-PUBLIC bool osread(VARREF data, CVR osfilename, CVR codepage) {
+PUBLIC bool osread(VARREF data, CVR osfilename, const char* codepage) {
 	return data.osread(osfilename, codepage);
 }
 
@@ -140,7 +140,7 @@ PUBLIC var osread(CVR osfilename) {
 }
 
 // oswrite x on y else
-PUBLIC bool oswrite(CVR data, CVR osfilename, CVR codepage = "") {
+PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage = "") {
 	return data.oswrite(osfilename, codepage);
 }
 

@@ -424,17 +424,17 @@ WINDOWS-1258
 // no binary conversion is performed on input unless
 // codepage is provided then exodus converts from the
 // specified codepage (not locale) on input to utf-8 internally
-bool var::osread(CVR osfilename, CVR codepage) {
+bool var::osread(CVR osfilename, const char* codepage) {
 
-	THISIS("bool var::osread(CVR osfilename, CVR codepage")
+	THISIS("bool var::osread(CVR osfilename, const char* codepage")
 	ISSTRING(osfilename)
 	return osread(osfilename.to_path_string().c_str(), codepage);
 }
 
-bool var::osread(const char* osfilename, CVR codepage) {
+bool var::osread(const char* osfilename, const char* codepage) {
 
 
-	THISIS("bool var::osread(const char* osfilename, CVR codepage")
+	THISIS("bool var::osread(const char* osfilename, const char* codepage")
 	assertDefined(function_sig);
 
 	// osread returns empty string in any case
@@ -512,44 +512,44 @@ bool var::osread(const char* osfilename, CVR codepage) {
 	// var_str=std::string(memblock.get(), (unsigned int) bytesize);
 	// SJB Done 20190604
 
-	if (codepage)
+	if (*codepage)
 		// var_str=boost::locale::conv::to_utf<char>(var_str,"ISO-8859-5")};
-		var_str = boost::locale::conv::to_utf<char>(var_str, codepage.var_str);
+		var_str = boost::locale::conv::to_utf<char>(var_str, codepage);
 
 	return true;
 }
 
-var var::to_codepage(CVR codepage) const {
+var var::to_codepage(const char* codepage) const {
 
 	THISIS(
-		"bool var::to_codepage(CVR codepage="
+		"bool var::to_codepage(const char* codepage="
 		") const")
 	assertString(function_sig);
-	ISSTRING(codepage)
+//	ISSTRING(codepage)
 
 	//from utf8 to codepage
-	return boost::locale::conv::from_utf<char>(var_str, codepage.var_str);
+	return boost::locale::conv::from_utf<char>(var_str, codepage);
 }
 
-var var::from_codepage(CVR codepage) const {
+var var::from_codepage(const char* codepage) const {
 
 	THISIS(
-		"bool var::from_codepage(CVR codepage="
+		"bool var::from_codepage(const char* codepage="
 		") const")
 	assertString(function_sig);
-	ISSTRING(codepage)
+//	ISSTRING(codepage)
 
 	//to utf from codepage
-	return boost::locale::conv::to_utf<char>(var_str, codepage.var_str);
+	return boost::locale::conv::to_utf<char>(var_str, codepage);
 }
 
 // no binary conversion is performed on output unless
 // codepage is provided (not locale) then exodus assumes internally
 // utf-8 and converts all output to the specified codepage
-bool var::oswrite(CVR osfilename, CVR codepage) const {
+bool var::oswrite(CVR osfilename, const char* codepage) const {
 
 	THISIS(
-		"bool var::oswrite(CVR osfilename, CVR codepage="
+		"bool var::oswrite(CVR osfilename, const char* codepage="
 		") const")
 	assertString(function_sig);
 	ISSTRING(osfilename)
@@ -566,8 +566,8 @@ bool var::oswrite(CVR osfilename, CVR codepage) const {
 	}
 
 	// write out the full string or fail
-	if (codepage) {
-		std::string tempstr = boost::locale::conv::from_utf<char>(var_str, codepage.var_str);
+	if (*codepage) {
+		std::string tempstr = boost::locale::conv::from_utf<char>(var_str, codepage);
 		myfile.write(tempstr.data(), int(tempstr.length()));
 	} else {
 		myfile.write(var_str.data(), int(var_str.size()));

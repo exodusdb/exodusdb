@@ -1686,8 +1686,8 @@ class PUBLIC var final {
 	ND var oconv(const char* convstr) const;
 	ND var iconv(const char* convstr) const;
 
-	ND var from_codepage(CVR codepage) const;
-	ND var to_codepage(CVR codepage) const;
+	ND var from_codepage(const char* codepage) const;
+	ND var to_codepage(const char* codepage) const;
 
 	// CLASSIC MV STRING FUNCTIONS
 	/////////////////////////////
@@ -1896,8 +1896,8 @@ class PUBLIC var final {
 #endif
 	void osclose() const;
 
-	bool osread(CVR osfilename, CVR codepage DEFAULT_STRING);
-	bool oswrite(CVR osfilename, CVR codepage DEFAULT_STRING) const;
+	bool osread(CVR osfilename, const char* codepage DEFAULT_STRING);
+	bool oswrite(CVR osfilename, const char* codepage DEFAULT_STRING) const;
 	bool osdelete() const;
 	bool osdelete(CVR osfilename) const;
 	bool osrename(CVR newosdir_or_filename) const;
@@ -1923,7 +1923,7 @@ class PUBLIC var final {
 	// same again but this time allowing native strings without needing automatic conversion of
 	// var->char* this is to only to avoid convertion too and from var but will usage of hard
 	// coded filenames etc really be in fast loops and performance related? perhaps only provide
-	bool osread(const char* osfilename, CVR codepage DEFAULT_STRING);
+	bool osread(const char* osfilename, const char* codepage DEFAULT_STRING);
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
@@ -2155,7 +2155,7 @@ class PUBLIC var_proxy1 {
 	}
 
 	//operator bool
-	operator bool() const {
+	explicit operator bool() const {
 		return var_->a(fn_);
 	}
 
@@ -2188,7 +2188,7 @@ class PUBLIC var_proxy2 {
 	}
 
 	//operator bool
-	operator bool() const {
+	explicit operator bool() const {
 		return var_->a(fn_, vn_);
 	}
 
@@ -2311,8 +2311,8 @@ class PUBLIC dim {
 	bool read(CVR filehandle, CVR key);
 	bool write(CVR filehandle, CVR key) const;
 
-	bool osread(CVR osfilename, CVR codepage DEFAULT_STRING);
-	bool oswrite(CVR osfilename, CVR codepage DEFAULT_STRING) const;
+	bool osread(CVR osfilename, const char* codepage DEFAULT_STRING);
+	bool oswrite(CVR osfilename, const char* codepage DEFAULT_STRING) const;
 
 	// following is implemented on the dim class now
 	// dim dimarray2();

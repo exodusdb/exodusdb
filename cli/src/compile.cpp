@@ -1251,9 +1251,9 @@ function main() {
 
 						errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale: " ^ locale
 							^ ". Perhaps multiple files with the same name.\n"
-							^ " 1: " ^ headertext(1) ^ "\n"
-							^ " 2: " ^ headertext2(2) ^ "\n"
-							^ " 3: " ^ headertext3(3));
+							^ " 1: " ^ headertext.a(1) ^ "\n"
+							^ " 2: " ^ headertext2.a(2) ^ "\n"
+							^ " 3: " ^ headertext3.a(3));
 					}
 					else if (verbose)
 						printl("generated or updated.");

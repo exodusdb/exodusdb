@@ -88,8 +88,8 @@ PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
 PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
 PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset);
 #endif
-PUBLIC bool oswrite(CVR data, CVR osfilename, CVR codepage DEFAULTNULL);
-PUBLIC bool osread(VARREF data, CVR osfilename, CVR codepage DEFAULTNULL);
+PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage DEFAULTNULL);
+PUBLIC bool osread(VARREF data, CVR osfilename, const char* codepage DEFAULTNULL);
 PUBLIC ND var osread(CVR osfilename);
 
 PUBLIC bool osdelete(CVR osfilename);

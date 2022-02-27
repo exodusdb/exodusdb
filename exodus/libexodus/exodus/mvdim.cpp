@@ -103,11 +103,11 @@ bool dim::write(CVR filehandle, CVR key) const {
 	return temprecord.write(filehandle, key);
 }
 
-bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
+bool dim::osread(CVR osfilename, const char* codepage /*=0*/) {\
 
-	THISIS("bool dim::osread(CVR osfilename, CVR codepage = \"\")")
+	THISIS("bool dim::osread(CVR osfilename, const char* codepage = \"\")")
 	ISSTRING(osfilename)
-	ISSTRING(codepage)
+//	ISSTRING(codepage)
 
 	var txt;
 	if (not txt.osread(osfilename, codepage)) {
@@ -129,11 +129,11 @@ bool dim::osread(CVR osfilename, CVR codepage /*=0*/) {\
 	return true;
 }
 
-bool dim::oswrite(CVR osfilename, CVR codepage /*=0*/) const {
+bool dim::oswrite(CVR osfilename, const char* codepage /*=0*/) const {
 
-	THISIS("bool dim::oswrite(CVR osfilename, CVR codepage = \"\")")
+	THISIS("bool dim::oswrite(CVR osfilename, const char* codepage = \"\")")
 	ISSTRING(osfilename)
-	ISSTRING(codepage)
+//	ISSTRING(codepage)
 
 	//TODO option for linesep to be \r\n
 	static char linesep = '\n';
