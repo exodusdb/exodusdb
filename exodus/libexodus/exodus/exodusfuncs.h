@@ -70,7 +70,7 @@ PUBLIC ND var ostime();
 PUBLIC void breakon();
 PUBLIC void breakoff();
 
-PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, CVR locale DEFAULTNULL);
+PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, const char* locale DEFAULTNULL);
 PUBLIC void osclose(CVR osfilevar);
 
 //PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length,
@@ -97,9 +97,9 @@ PUBLIC bool osrename(CVR oldosdir_or_filename, CVR newosdir_or_filename);
 PUBLIC bool oscopy(CVR fromosdir_or_filename, CVR newosdir_or_filename);
 PUBLIC bool osmove(CVR fromosdir_or_filename, CVR newosdir_or_filename);
 
-PUBLIC ND var oslist(CVR path DEFAULTDOT, CVR wildcard DEFAULTNULL, const int mode = 0);
-PUBLIC ND var oslistf(CVR path DEFAULTDOT, CVR wildcard DEFAULTNULL);
-PUBLIC ND var oslistd(CVR path DEFAULTDOT, CVR wildcard DEFAULTNULL);
+PUBLIC ND var oslist(CVR path DEFAULTDOT, CVR globpattern DEFAULTNULL, const int mode = 0);
+PUBLIC ND var oslistf(CVR path DEFAULTDOT, CVR globpattern DEFAULTNULL);
+PUBLIC ND var oslistd(CVR path DEFAULTDOT, CVR globpattern DEFAULTNULL);
 PUBLIC ND var osfile(CVR filename);
 PUBLIC ND var osdir(CVR filename);
 PUBLIC bool osmkdir(CVR dirname);
@@ -121,7 +121,7 @@ PUBLIC var execute(CVR command);
 PUBLIC var logoff();
 PUBLIC void debug();
 
-PUBLIC bool setxlocale(CVR locale);
+PUBLIC bool setxlocale(const char* locale);
 PUBLIC ND var getxlocale();
 
 //replace by templates with variable number of arguments

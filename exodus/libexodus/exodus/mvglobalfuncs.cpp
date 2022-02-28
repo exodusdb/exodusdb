@@ -27,8 +27,8 @@ THE SOFTWARE.
 
 namespace exodus {
 
-PUBLIC bool setxlocale(CVR locale) {
-	return locale.setxlocale();
+PUBLIC bool setxlocale(const char* locale) {
+	return var(locale).setxlocale();
 }
 
 PUBLIC var getxlocale() {
@@ -79,7 +79,7 @@ PUBLIC void breakoff() {
 }
 
 // osopen x to y else
-PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, CVR locale) {
+PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, const char* locale) {
 	return osfilevar.osopen(osfilename, locale);
 }
 
@@ -164,16 +164,16 @@ PUBLIC bool osmove(CVR fromosfilename, CVR to_osfilename) {
 	return fromosfilename.osmove(to_osfilename);
 }
 
-PUBLIC var oslist(CVR path, CVR wildcard, const int mode) {
-	return var().oslist(path, wildcard, mode);
+PUBLIC var oslist(CVR path, CVR globpattern, const int mode) {
+	return var().oslist(path, globpattern, mode);
 }
 
-PUBLIC var oslistf(CVR path, CVR wildcard) {
-	return var().oslistf(path, wildcard);
+PUBLIC var oslistf(CVR path, CVR globpattern) {
+	return var().oslistf(path, globpattern);
 }
 
-PUBLIC var oslistd(CVR path, CVR wildcard) {
-	return var().oslistd(path, wildcard);
+PUBLIC var oslistd(CVR path, CVR globpattern) {
+	return var().oslistd(path, globpattern);
 }
 
 PUBLIC var osfile(CVR filename) {

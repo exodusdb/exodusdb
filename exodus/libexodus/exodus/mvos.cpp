@@ -75,13 +75,13 @@ namespace exodus {
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
 //		~MvHandlesCache for h_cache closes/deletes all registered objects.
 
-std::locale get_locale(CVR locale_name)	// throw (MVError)
+std::locale get_locale(const char* locale_name)	// throw (MVError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
-	// THISIS("std::locale get_locale(CVR locale_name)")
+	// THISIS("std::locale get_locale(const char* locale_name)")
 	// ISSTRING(locale_name)
 
-	if (not locale_name.length() || locale_name == "utf8") {
+	if (not *locale_name || strcmp(locale_name, "utf8") == 0) {
 		std::locale old_locale;
 
 		//https://exceptionshub.com/read-unicode-utf-8-file-into-wstring.html
@@ -93,8 +93,8 @@ std::locale get_locale(CVR locale_name)	// throw (MVError)
 		return utf8_locale;
 	} else {
 		try {
-			if (locale_name.length()) {
-				std::locale mylocale(locale_name.toString().c_str());
+			if (*locale_name) {
+				std::locale mylocale(locale_name);
 				return mylocale;
 			} else {
 				// dont trust default locale since on osx 10.5.6 it fails!
@@ -102,7 +102,7 @@ std::locale get_locale(CVR locale_name)	// throw (MVError)
 				return mylocale;
 			}
 		} catch (std::runtime_error& re) {
-			throw MVError("get_locale cannot create locale for " ^ locale_name);
+			throw MVError("get_locale cannot create locale for " ^ var(locale_name));
 		}
 	}
 }
@@ -302,9 +302,9 @@ bool var::osopen() const {
 	return this->osopenx(*this, "") != 0;
 }
 
-bool var::osopen(CVR osfilename, CVR locale) const {
+bool var::osopen(CVR osfilename, const char* locale) const {
 
-	THISIS("bool var::osopen(CVR osfilename, CVR locale)")
+	THISIS("bool var::osopen(CVR osfilename, const char* locale)")
 	assertDefined(function_sig);
 	ISSTRING(osfilename)
 
@@ -320,7 +320,7 @@ static void del_fstream(void* handle) {
 	delete (std::fstream*)handle;
 }
 
-std::fstream* var::osopenx(CVR osfilename, CVR locale) const {
+std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 
 	// IDENTICAL code in osbread and osbwrite
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
@@ -344,9 +344,9 @@ std::fstream* var::osopenx(CVR osfilename, CVR locale) const {
 	if (pmyfile == 0) {
 
 		// delay checking until necessary
-		THISIS("bool var::osopenx(CVR osfilename, CVR locale)")
+		THISIS("bool var::osopenx(CVR osfilename, const char* locale)")
 		ISSTRING(osfilename)
-		ISSTRING(locale)
+		//ISSTRING(locale)
 
 		pmyfile = new std::fstream;
 
@@ -1160,73 +1160,42 @@ var var::osdir() const {
 	};
 }
 
-var var::oslistf(CVR path, CVR spec) const {
-	return this->oslist(path, spec, 1);
+var var::oslistf(CVR path, CVR globpattern) const {
+	return this->oslist(path, globpattern, 1);
 }
 
-var var::oslistd(CVR path, CVR spec) const {
-	return this->oslist(path, spec, 2);
+var var::oslistd(CVR path, CVR globpattern) const {
+	return this->oslist(path, globpattern, 2);
 }
 
 /*
-*@param	path	A directory or blank for current working directory. If spec if empty then the last part (after any slashes) is used as spec.
-*@param	spec	Optional glob like "*",  "*.*", "*.???" etc. (CASE INSENSITIVE)
+*@param	path	A directory or blank for current working directory. If globpattern if empty then the last part (after any slashes) is used as globpattern.
+*@param	globpattern	Optional glob like "*",  "*.*", "*.???" etc. (CASE INSENSITIVE)
 *@param	mode	1=files only, 2=directories only, otherwise both.
 *@returns		List of directory and/or filenames depending on mode. fm separator
 */
-var var::oslist(CVR path0, CVR spec0, const int mode) const {
+var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
 
-	THISIS("var var::oslist(CVR path, CVR spec, const int mode) const")
+	THISIS("var var::oslist(CVR path, CVR globpattern, const int mode) const")
 	assertDefined(function_sig);
 	ISSTRING(path0)
-	ISSTRING(spec0)
+	ISSTRING(globpattern0)
 
 	// returns an fm separated list of files and/or folders
 
 	// http://www.boost.org/libs/filesystem/example/simple_ls.cpp
 
 	var path = path0.to_path_string();
-	var spec;
-	if (spec0.length()) {
-		spec = spec0;
+	var globpattern;
+	if (globpattern0.length()) {
+		globpattern = globpattern0;
 	}
 	// file globbing can and must be passed as tail end of path
 	// perhaps could use <glob.h> in linux instead of regex
 	else {
-		spec = path.field2(OSSLASH, -1);
-		path = path.substr(1, path.length() - spec.length());
-
-//		// escape all the regex special characters that are found in the strint
-//		// except the * ? which are glob special characters
-//		// regex concept here is ([specialchars]) replace with \$1 where $1 will be any of
-//		// the special chars note inside brackets, only  ^ - and ] are special characters
-//		// inside [] char alternative to include a ] in the list of characters inside [] it
-//		// must be the first character like []otherchars] of course all back slashes must be
-//		// doubled up in c++ source code
-//		spec.replacer("([][\\\\(){}|^$.+])", "\\\\$1");
-//
-//		// glob * becomes .* in regex matching any number of any characters
-//		spec.swapper("*", ".*");
-//
-//		// glob ? becomes . in regex matching any one character
-//		spec.swapper("?", ".");
+		globpattern = path.field2(OSSLASH, -1);
+		path = path.substr(1, path.length() - globpattern.length());
 	}
-
-//	bool filter = false;
-//	// std_boost::reregex re;
-//	std::regex re;
-//	if (spec) {
-//		try {
-//			// Set up the regular expression for case-insensitivity
-//			// re.assign(toTstring(spec).c_str(), std_boost::regex_constants::icase);
-//			re.assign(spec.toString().c_str(), std::regex_constants::icase);
-//			filter = true;
-//		} catch (std::regex_error& e) {
-//			std::cout << spec.var_str << " is not a valid regular expression: \""
-//					  << e.what() << "\"" << std::endl;
-//			return "";
-//		}
-//	}
 
 	bool getfiles = true;
 	bool getfolders = true;
@@ -1236,24 +1205,7 @@ var var::oslist(CVR path0, CVR spec0, const int mode) const {
 		getfiles = false;
 
 	var filelist = "";
-	//#if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
-	//#define LEAForFILENAME path().filename().string()
-	//#define COMMAstd::filesystemNATIVE
-	//#else
-	//#define LEAForFILENAME leaf()
-	//#define COMMAstd::filesystemNATIVE ,std::filesystem::native
-	//#endif
-	// get handle to folder
-	// wpath or path before boost 1.34
-	// std::filesystem::wpath full_path(std::filesystem::initial_path<std::filesystem::wpath>());
-	// full_path = std::filesystem::system_complete(std::filesystem::wpath(toTstring(path), std::filesystem::native ));
-	// std::filesystem::path full_path(std::filesystem::initial_path());
-	// initial_path always return the cwd at the time it is first called which is almost useless
 	std::filesystem::path full_path(std::filesystem::current_path());
-	//full_path =
-	//    std::filesystem::system_complete(std::filesystem::path(path.to_path_string().c_str() COMMAstd::filesystemNATIVE));
-	//full_path =
-	//    std::filesystem::absolute(std::filesystem::path(path.to_path_string().c_str()));
 	if (path.length()) {
 		//full_path = std::filesystem::absolute(std::filesystem::path(path.to_path_string().c_str()));
 		std::error_code error_code;
@@ -1265,33 +1217,23 @@ var var::oslist(CVR path0, CVR spec0, const int mode) const {
 		}
 
 	}
-	if (spec == "*")
-		spec = "";
+	if (globpattern == "*")
+		globpattern = "";
 
 	//std::clog << "fullpath='" << full_path << "'" <<std::endl;
+
 	// quit if it isnt a folder
 	if (!std::filesystem::is_directory(full_path))
 		return filelist;
 
-	// errno=0;
-	// std::filesystem::wdirectory_iterator end_iter;
-	// for (std::filesystem::wdirectory_iterator dir_itr(full_path );
 	std::filesystem::directory_iterator end_iter;
 	for (std::filesystem::directory_iterator dir_itr(full_path); dir_itr != end_iter; ++dir_itr) {
 		try {
 
 			// skip unwanted items
-			// dir_itr->path().leaf()  changed to dir_itr->leaf() in three places
-			// also is_directory(dir_itr->status()) changed to is_directory(*dir_itr)
-			// to avoid compile errors on boost 1.33
-			// http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
-			//if (filter && !std::regex_match(dir_itr->path().filename().string(), re))
 			//TRACE(dir_itr->path().filename().string())
-			//TRACE(spec)
-			//if (spec && !var(dir_itr->path().filename().string()).match(spec, "w"))
-			//TRACE(dir_itr->path().filename().string())
-			//TRACE(spec)
-			if (spec && fnmatch(spec.var_str.c_str(), dir_itr->path().filename().c_str(), 0) != 0)
+			//TRACE(globpattern)
+			if (globpattern && fnmatch(globpattern.var_str.c_str(), dir_itr->path().filename().c_str(), 0) != 0)
 				continue;
 
 			// work/efficiently if (std::filesystem::is_directory(dir_itr->status() ) )
@@ -1299,18 +1241,10 @@ var var::oslist(CVR path0, CVR spec0, const int mode) const {
 				if (getfolders)
 					filelist ^= dir_itr->path().filename().string() ^ FM;
 			}
-			// is_regular is only in boost > 1.34
-			// else if (std::filesystem::is_regular(dir_itr->status() ) )
-			else  // if (std::filesystem::is_regular(dir_itr->status() ) )
-			{
+			else {
 				if (getfiles)
 					filelist ^= dir_itr->path().filename().string() ^ FM;
 			}
-			// else
-			//{
-			//  //++other_count;
-			//  //std::cout << dir_itr->path().leaf() << " [other]\n";
-			//}
 		} catch (const std::exception& ex) {
 			// evade warning: unused variable
 			if (false)
@@ -1328,23 +1262,16 @@ var var::oslist(CVR path0, CVR spec0, const int mode) const {
 	return filelist;
 }
 
-bool var::oscwd(const char* newpath) const {
+bool var::oscwd(CVR newpath) const {
 
 	THISIS("var var::oscwd(const char* newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
 	assertDefined(function_sig);	 // not needed if *this not used
-	//ISSTRING(newpath)
-
-	// http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
-	// wont compile on boost 1.33 so comment it out and make non-functional
-	// until we have a reliable way to detect boost version
-	// boost::filesystem::current_path(newpath.toString());
-
-	// return oscwd();
+	ISSTRING(newpath)
 
 	try {
-		//std::filesystem::current_path(newpath.toString());
-		std::filesystem::current_path(newpath);
+		std::filesystem::current_path(newpath.to_path_string());
+		//std::filesystem::current_path(newpath);
 	} catch (...) {
 		// filesystem error: cannot set current path: No such file or directory
 		// ignore all errors

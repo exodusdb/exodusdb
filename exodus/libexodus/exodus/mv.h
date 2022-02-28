@@ -1886,7 +1886,7 @@ class PUBLIC var final {
 	/////////////////
 
 	bool osopen() const;
-	bool osopen(CVR filename, CVR locale DEFAULT_STRING) const;
+	bool osopen(CVR filename, const char* locale DEFAULT_STRING) const;
 	bool osbread(CVR osfilevar, VARREF offset, const int length);
 	bool osbwrite(CVR osfilevar, VARREF offset) const;
 //#define VAR_OSBREADWRITE_CONST_OFFSET
@@ -1904,9 +1904,9 @@ class PUBLIC var final {
 	bool oscopy(CVR to_osfilename) const;
 	bool osmove(CVR to_osfilename) const;
 
-	ND var oslist(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING, const int mode = 0) const;
-	ND var oslistf(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING) const;
-	ND var oslistd(CVR path DEFAULT_DOT, CVR wildcard DEFAULT_STRING) const;
+	ND var oslist(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_STRING, const int mode = 0) const;
+	ND var oslistf(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_STRING) const;
+	ND var oslistd(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_STRING) const;
 	ND var osfile() const;
 	ND var osdir() const;
 	bool osmkdir() const;
@@ -1915,7 +1915,7 @@ class PUBLIC var final {
 	// TODO check for threadsafe
 	ND var ospid() const;
 	ND var oscwd() const;
-	bool oscwd(const char* newpath) const;
+	bool oscwd(CVR newpath) const;
 	void osflush() const;
 
 	// TODO add performance enhancing char* argumented versions of many os functions
@@ -2077,7 +2077,7 @@ class PUBLIC var final {
 
 	//VARREF localeAwareChangeCase(const int lowerupper);
 
-	ND std::fstream* osopenx(CVR osfilename, CVR locale) const;
+	ND std::fstream* osopenx(CVR osfilename, const char* locale) const;
 
 	//bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
 	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
@@ -2217,12 +2217,12 @@ class PUBLIC var_proxy3 {
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
-	void operator=(CVR replacement) {
+	void operator=(SV replacement) {
 		var_->r(fn_, vn_, sn_, replacement);
 	}
 
 	//operator bool
-	operator bool() const {
+	explicit operator bool() const {
 		return var_->a(fn_, vn_, sn_);
 	}
 
