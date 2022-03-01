@@ -1617,6 +1617,7 @@ convcompany:
 			}
 		}
 	}
+	clearselect();
 
 	call log2("*get the company description", logtime);
 	sys.company = "";

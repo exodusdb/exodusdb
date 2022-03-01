@@ -2217,7 +2217,7 @@ class PUBLIC var_proxy3 {
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
-	void operator=(SV replacement) {
+	void operator=(CVR replacement) {
 		var_->r(fn_, vn_, sn_, replacement);
 	}
 
