@@ -1944,4 +1944,77 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 	return response;
 }
 
+var var::numberinwords(CVR langname_or_locale_id) {
+
+	THISIS("var var::numberinwords(in number, in langname_or_locale_id)")
+	assertNumeric(function_sig);
+	langname_or_locale_id.assertString(function_sig);
+
+	var exo_languages =
+		"english" _VM_
+		"arabic" _VM_
+		"greek" _VM_
+		"spanish" _VM_
+		"french";
+
+	var iso_languages =
+		"en_GB" _VM_
+		"ar_AE" _VM_
+		"el_CY" _VM_
+		"es_US" _VM_
+		"fr_FR";
+
+	// Determine locale_id
+	//const char* locale_name = "ar_AE.utf8";
+	var langn;
+	var langcode;
+	if (exo_languages.locate(langname_or_locale_id.lcase(),langn))
+		langcode = iso_languages(1, langn);
+	else if (langname_or_locale_id == "")
+		langcode = "en_GB";
+	else
+		langcode = langname_or_locale_id;
+
+	// Verify locale_id exists and create it
+	//var locale_id = langcode ^ ".UTF-8";
+	var locale_id = langcode ^ ".utf8";
+	var ok;
+	try {
+		std::locale mylocale(locale_id.toString());
+		ok = true;
+	} catch (std::runtime_error& re) {
+		ok = false;
+	}
+
+	// otherwise try to generate it and try again
+	// otherwise use default probably english
+	if (not ok) {
+		var("locale_id " ^ locale_id.quote() ^ " does not exist. Trying to generate it.").errputl();
+		var cmd = "locale-gen " ^ locale_id;
+		cmd.errputl();
+		cmd.osshell();
+		try {
+			// Try again after attempted generation of locale
+			std::locale mylocale(locale_id.toString());
+		} catch (std::runtime_error& re) {
+			// Fall back to default locale
+			std::locale mylocale("");
+		}
+	}
+
+	// Create the right language locale
+	//TRACE(locale_id);
+	boost::locale::generator locale_generator1;
+	std::locale locale1=locale_generator1(locale_id.toString());
+
+	// create a locale imbued stringstream
+	std::ostringstream ss;
+	ss.imbue(locale1);
+
+    ss << boost::locale::as::spellout << this->toDouble();
+
+	return ss.str();
+
+}
+
 }  // namespace exodus

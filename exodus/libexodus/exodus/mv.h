@@ -1492,6 +1492,8 @@ class PUBLIC var final {
 	ND var str(const int num) const;
 	ND var space() const;
 
+	ND var numberinwords(CVR languagename_or_locale_id DEFAULT_STRING);
+
 	// STRING INFO
 	//////////////
 

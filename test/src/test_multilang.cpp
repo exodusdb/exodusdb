@@ -174,6 +174,35 @@ function main()
 	assert( osbwrite( L"XYZ", OUTPUT_file, position));
 	assert(position eq 13);
 
+	{
+		assert(var(123456.789).numberinwords("").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
+		assert(var(123456.789).numberinwords("english").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
+		assert(var(123456.789).numberinwords("greek").outputl() eq "εκατόν είκοσι τρεις χίλιάδες τετρακόσια πενήντα έξι κόμμα επτά οκτώ εννέα");
+		assert(var(123456.789).numberinwords("arabic").outputl() eq "مائة و ثلاثة و عشرون ألف و أربعة مائة و ستة و خمسون فاصل سبعة ثمانية تسعة");
+		assert(var(123456.789).numberinwords("french").outputl() eq "cent vingt-trois mille quatre cent cinquante-six virgule sept huit neuf");
+		assert(var(123456.789).numberinwords("spanish").outputl() eq "ciento veintitrés mil cuatrocientos cincuenta y seis punto siete ocho nueve");
+
+		assert(var(-123456.789).numberinwords("").outputl() eq "minus one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
+		assert(var(-123456.789).numberinwords("english").outputl() eq "minus one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
+		assert(var(-123456.789).numberinwords("greek").outputl() eq "μείον εκατόν είκοσι τρεις χίλιάδες τετρακόσια πενήντα έξι κόμμα επτά οκτώ εννέα");
+		assert(var(-123456.789).numberinwords("arabic").outputl() eq "ناقص مائة و ثلاثة و عشرون ألف و أربعة مائة و ستة و خمسون فاصل سبعة ثمانية تسعة");
+		assert(var(-123456.789).numberinwords("french").outputl() eq "moins cent vingt-trois mille quatre cent cinquante-six virgule sept huit neuf");
+		assert(var(-123456.789).numberinwords("spanish").outputl() eq "menos ciento veintitrés mil cuatrocientos cincuenta y seis punto siete ocho nueve");
+
+		assert(var(10000000000000).numberinwords("").outputl() eq "ten trillion");
+		assert(var(10000000000000).numberinwords("english").outputl() eq "ten trillion");
+		assert(var(10000000000000).numberinwords("greek").outputl() eq "δέκα τρισεκατομμύρια");
+		assert(var(10000000000000).numberinwords("arabic").outputl() eq "عشرة ترليون");
+		assert(var(10000000000000).numberinwords("french").outputl() eq "dix billions");
+		assert(var(10000000000000).numberinwords("spanish").outputl() eq "diez billones");
+
+		assert(var(1.2345678901).numberinwords("").outputl() eq "one point two three four five six seven eight nine zero one");
+		assert(var(1.2345678901).numberinwords("english").outputl() eq "one point two three four five six seven eight nine zero one");
+		assert(var(1.2345678901).numberinwords("greek").outputl() eq "ένα κόμμα δύο τρία τέσσερα πέντε έξι επτά οκτώ εννέα μηδέν ένα");
+		assert(var(1.2345678901).numberinwords("arabic").outputl() eq "واحد فاصل إثنان ثلاثة أربعة خمسة ستة سبعة ثمانية تسعة صفر واحد");
+		assert(var(1.2345678901).numberinwords("french").outputl() eq "un virgule deux trois quatre cinq six sept huit neuf zéro un");
+		assert(var(1.2345678901).numberinwords("spanish").outputl() eq "uno punto dos tres cuatro cinco seis siete ocho nueve cero uno");
+	}
 
 	printl("Test passed");
 

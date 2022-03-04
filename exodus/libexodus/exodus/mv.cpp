@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 //#include <cassert>
 #include <limits>
-#include <sstream>
+//#include <sstream>
 #include <vector>
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
