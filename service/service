@@ -1,13 +1,15 @@
 #!/bin/bash
 set -eu
 
-: ======================================================================
-: Service commands start, stop, restart, reload, status, enable, disable
-: ======================================================================
+: =================================================================================
+: Service commands start, stop, restart, reload, status, is-active, enable, disable
+: =================================================================================
 :
-: 'Syntax is ./service DB_CODE start|stop|restart|reload|status|enable|disable [test|live]'
+: 'Syntax is ./service DB_CODE start|stop|restart|reload|status|is-active|enable|disable [test|live]'
 :
 : 'Environment variable: $APP_CODE Defaults to "exo". Used for prefix on services'
+:
+: 'Output can be active, inactive, failed'
 :
 	APP_CODE=${APP_CODE:-exo}
 :

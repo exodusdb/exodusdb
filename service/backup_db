@@ -9,7 +9,7 @@ set -euxo pipefail
 :
 : '  ./backup_db DBNAME [OPTIONS...] [BACKUPDIR] [RESTOREDB_SUFFIX]'
 :
-: 'OPTIONS are (B)ackup, (R)estore, (V)erify'
+: 'OPTIONS are (B)ackup, (R)estore, (V)erify, (D)elete'
 : '          Defaults to BRV'
 :
 : 'BACKUPDIR defaults to ~/hosts/$LIVE_EXO_DATA/work'
@@ -31,6 +31,8 @@ set -euxo pipefail
 	NEW_BACKUP_DIR=${3:-~/hosts/$LIVE_EXO_DATA/work}
 
 	RESTOREDB_SUFFIX=${4:-test}
+
+	SITE_DIR=${SITE_DIR:-$LIVE_EXO_DATA}
 
 :
 : Init
@@ -64,7 +66,7 @@ set -euxo pipefail
 		: Detect if test database is running
 		: ==================================
 		:
-			./service ${LIVE_EXO_DATA} is-active test && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
+			./service ${LIVE_EXO_DATA} is-active test &> /dev/null && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
 
 		:
 		: Stop the test database if it is running
@@ -93,13 +95,21 @@ set -euxo pipefail
 			: Flag success - no differences except in status/log files
 			: ========================================================
 			:
-				touch "$HOME/hosts/$LIVE_EXO_DATA/data/$LIVE_EXO_DATA/params2"
+				touch "$HOME/hosts/$SITE_DIR/data/$LIVE_EXO_DATA/params2"
         else
             :
             : Flag fail - differences found
             : =============================
             :
 		fi
+	fi
+
+:
+: Optionally delete the restored test database
+: ============================================
+:
+	if [[ $OPTIONS =~ "D" ]]; then
+		dbdelete $TEST_EXO_DATA
 	fi
 
 :

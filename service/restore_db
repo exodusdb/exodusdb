@@ -35,7 +35,7 @@ set -euxo pipefail
 : Detect if target is running
 : ===========================
 :
-	./service ${LIVE_EXO_DATA} is-active test && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
+	./service ${LIVE_EXO_DATA} is-active test &> /dev/null && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
 
 :
 : Stop the target database

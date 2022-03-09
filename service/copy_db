@@ -31,7 +31,7 @@ set -euxo pipefail
 : Verify that source service is NOT running otherwise we cannot copy it using dbcopy
 : ==================================================================================
 :
-	if ./service ${SOURCE_SERVICE} is-active $SOURCE_TYPE; then
+	if ./service ${SOURCE_SERVICE} is-active $SOURCE_TYPE &> /dev/null ; then
 		echo "SOURCE_EXO_DATA is running so it cannot be copied" 1>&2
 		exit 1
 	fi
@@ -56,7 +56,7 @@ set -euxo pipefail
 : Detect if target service is running so we can restart after copying
 : ===================================================================
 :
-	./service ${TARGET_SERVICE} is-active $TARGET_TYPE && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
+	./service ${TARGET_SERVICE} is-active $TARGET_TYPE &> /dev/null && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
 
 :
 : Stop the target service if it is running so we can drop its database
