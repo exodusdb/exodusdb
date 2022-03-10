@@ -17,7 +17,7 @@ function main() {
 		);
 
 	// Allow for first argument to be an os file path
-	if (COMMAND.index(OSSLASH))
+	if (COMMAND.a(2).index(OSSLASH))
 		COMMAND.inserter(2,"DOS");
 
 	var filename = COMMAND.a(2).convert(".", "_");
