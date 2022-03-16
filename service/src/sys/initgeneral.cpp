@@ -657,7 +657,11 @@ nextreport:
 	//server mode (not interactive)
 	s33 = SYSTEM.a(33);
 	//currdatasetname
-	SYSTEM(23) = oldsystem.a(23);
+    SYSTEM(23) = oldsystem.a(23);
+    var tt = osread("../data/" ^ oldsystem.a(17) ^ "/name");
+    if (tt){
+        SYSTEM(23) = tt;
+    }
 	//process/connection number
 	SYSTEM(24) = oldsystem.a(24);
 	//datasetno
