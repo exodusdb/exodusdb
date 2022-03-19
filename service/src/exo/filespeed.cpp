@@ -23,7 +23,6 @@ function main() {
 		tempfilename = "BENCHMARK.FILESPEED";
 	}
 
-
 	//locate tempfilename in @files using @fm setting x then
 	if (deletefilex) {
 		deletefile(tempfilename ^ " (S)");

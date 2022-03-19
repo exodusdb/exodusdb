@@ -1985,7 +1985,7 @@ function* exodusdblink_login(username, password, dataset, system) {
         //current work is cleared without option to recover if detect login on another computer or browser
         if (glocked && gchangesmade)
             question += '\n\nWarning! Your current work on ' + gkey + ' will be lost if you dont resume login.'
-        question += '\n\nResume login?'
+        question += '\n\nResume login as ' + gusername + '?'
         if (!(yield* exodusyesno(question, 1))) {
 
             //switch to login window
