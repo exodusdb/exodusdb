@@ -104,7 +104,7 @@ function main() {
 	var doall = true;
 
 	// Option to install standard exodus functions
-	if (locateusing(",", filenames.a(1), "pgsql,pgexodus")) {
+	if (locateusing(",", filenames.a(1), "pgsql,pgexodus,exodus")) {
 		install_exodus_extensions = filenames.a(1);
 		filenames.remover(1);
 		doall = false;
@@ -130,9 +130,7 @@ function main() {
 	}
 
 	var sqltemplate = R"V0G0N(
-CREATE OR REPLACE FUNCTION
-$functionname_and_args
-RETURNS $return_type
+CREATE OR REPLACE FUNCTION $functionname_and_args RETURNS $return_type
 AS
 $$
 BEGIN
@@ -149,18 +147,39 @@ COST 10;
 	// Drop obsolete functions - ignore errors
 	//var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);");
 
-	// Create Natural Order Collation if installing extensions
+	// Install general exodus requirements
 	if (install_exodus_extensions) {
+
+		// Create Natural Order Collation
 		rawsqlexec("DROP COLLATION IF EXISTS exodus_natural;");
 		rawsqlexec("CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);");
+
+		// Clearing unaccent extension and functions (and full text indexes)
+		//drop extension unaccent;
+		//drop function immutable_unaccent(text) cascade;
+
+		// Add the unaccent extension and functions
+        // Maybe better to use the last option "mydict" in the following link
+        // https://dba.stackexchange.com/questions/177020/creating-a-case-insensitive-and-accent-diacritics-insensitive-search-on-a-field
+		rawsqlexec("CREATE EXTENSION IF NOT EXISTS unaccent");
+		//
+		rawsqlexec(
+			"CREATE OR REPLACE FUNCTION public.immutable_unaccent(text) RETURNS text\n"
+			"AS\n"
+			"$func$\n"
+			"SELECT public.unaccent('public.unaccent', $1)\n"
+			"  -- schema-qualify function and dictionary\n"
+			"$func$  LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT");
+		//
+		rawsqlexec("ALTER FUNCTION public.immutable_unaccent(text) OWNER TO exodus");
+
 	}
 
 	if (install_exodus_extensions eq "pgexodus") {
 
 		var sqltemplate_strict =
 			R"V0G0N(
-CREATE OR REPLACE FUNCTION $functionname_and_args
-RETURNS $return_type
+CREATE OR REPLACE FUNCTION $functionname_and_args RETURNS $return_type
 AS 'pgexodus', '$functionname'
 LANGUAGE 'c'
 IMMUTABLE STRICT
@@ -645,24 +664,22 @@ $RETVAR :=
 	sql.converter(VM, "\n");
 
 	var sqltemplate =
-		R"V0G0N(CREATE OR REPLACE FUNCTION
- $functionname_and_args
- RETURNS $return_type
- AS
- $$
-  DECLARE
-   ans text;
-  BEGIN
+		R"V0G0N(CREATE OR REPLACE FUNCTION $functionname_and_args  RETURNS $return_type
+AS
+$$
+DECLARE
+ ans text;
+BEGIN
 $sqlcode
   RETURN ans;
-  END;
- $$
- LANGUAGE 'plpgsql'
- IMMUTABLE
- SECURITY
- DEFINER
- COST 10;
- )V0G0N";
+ END;
+$$
+LANGUAGE 'plpgsql'
+IMMUTABLE
+SECURITY
+DEFINER
+COST 10;
+)V0G0N";
 
 	//upload pgsql function to postgres
 	create_function(dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
@@ -1217,7 +1234,7 @@ END;
 )V0G0N";
 
 subroutine rawsqlexec(in sql) {
-	printl(sql.field("\n",3));
+	printl(sql.field("RETURNS", 1));
 	var errormsg;
 	if (not var().sqlexec(sql, errormsg)) {
 		errors ^= "\n" ^ errormsg;
@@ -1226,7 +1243,7 @@ subroutine rawsqlexec(in sql) {
 }
 
 subroutine rawsqlexec(in sql, out errormsg) {
-	printl(sql.field("\n",3));
+	printl(sql.field("RETURNS", 1));
 	var().sqlexec(sql, errormsg);
 	return;
 }

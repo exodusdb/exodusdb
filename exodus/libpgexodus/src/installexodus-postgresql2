@@ -32,7 +32,7 @@ CREATE ROLE exodus
  PASSWORD 'somesillysecret'
  CREATEDB CREATEROLE;
 
-CREATE SCHEMA dict;
+CREATE SCHEMA IF NOT EXISTS dict;
 ALTER SCHEMA dict
  OWNER TO exodus;
 
@@ -41,6 +41,8 @@ CREATE COLLATION exodus_natural
  (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);
 ALTER COLLATION exodus_natural
  OWNER TO exodus;
+
+CREATE EXTENSION IF NOT EXISTS unaccent;
 
 DROP FUNCTION IF EXISTS exodus_extract_text(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_date(text, int4, int4, int4);
@@ -70,6 +72,15 @@ DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);
 DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
 -- CREATE OR REPLACE FUNCTION exodus_extract_sort(data text, fn int4, vn int4, sn int4)  RETURNS text AS 'pgexodus', 'exodus_extract_sort'          LANGUAGE C IMMUTABLE;
 
+-- unaccent extension and functions
+CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE OR REPLACE FUNCTION public.immutable_unaccent(text) RETURNS text AS
+\$func\$
+SELECT public.unaccent('public.unaccent', \$1)
+  -- schema-qualify function and dictionary
+\$func\$  LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT;
+ALTER FUNCTION public.immutable_unaccent(text) OWNER TO exodus;
+
 CREATE DATABASE exodus
  WITH ENCODING='UTF8'
  OWNER=exodus;
@@ -77,7 +88,7 @@ CREATE DATABASE exodus
 \connect exodus
 SET client_min_messages = warning;
 
-CREATE SCHEMA dict;
+CREATE SCHEMA IF NOT EXISTS dict;
 ALTER SCHEMA dict
  OWNER TO exodus;
 
@@ -117,6 +128,15 @@ DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);
 
 \df exodus*
 \dO
+
+-- unaccent extension and functions
+CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE OR REPLACE FUNCTION public.immutable_unaccent(text) RETURNS text AS
+\$func\$
+SELECT public.unaccent('public.unaccent', \$1)
+  -- schema-qualify function and dictionary
+\$func\$  LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT;
+ALTER FUNCTION public.immutable_unaccent(text) OWNER TO exodus;
 
 \q
 EOF2

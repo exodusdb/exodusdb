@@ -36,7 +36,7 @@ function main() {
 	if (not open(filename, file))
 		stop("Cannot open file " ^ filename);
 
-	//get the record from the database
+	//get the record from the database (or filesystem if "filename" is "DOS")
 	var origrecord;
 	if (not read(origrecord, file, key)) {
 		//check if exists in upper or lower case
