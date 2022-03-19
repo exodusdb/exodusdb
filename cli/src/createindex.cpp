@@ -5,10 +5,23 @@ function main() {
 
 	var force = OPTIONS.index("F");
 	var indexnames = COMMAND.field(FM, 2, 999999);
-	var nindexes = dcount(indexnames, FM);
 
-	if (not nindexes)
-		abort("Syntax is 'createindex filename__fieldname ... {F=Force}'");
+	if (not indexnames)
+		abort("Syntax is 'createindex [filename] [filename__]fieldname... {F=Force}'");
+
+	if (indexnames eq "xref") {
+		indexnames = var().listindexes();
+		var indexnames2 = "";
+		for (auto index : indexnames) {
+			if (index.ends("_xref")) 
+				indexnames2 ^= index ^ FM;
+		}
+		indexnames = indexnames2.pop();
+		indexnames.swapper(VM, "__");
+		printl(indexnames);
+	}
+
+	var nindexes = dcount(indexnames, FM);
 
 	var result = 0;
 
