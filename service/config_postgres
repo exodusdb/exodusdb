@@ -30,6 +30,7 @@ function showmax() {
 	sudo -u postgres psql <<-V0G0N
 		show max_connections;
 		show shared_buffers;
+		show random_page_cost;
 V0G0N
 }
 

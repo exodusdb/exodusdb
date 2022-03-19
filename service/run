@@ -101,7 +101,9 @@ set -eux
 : Stop the background process
 : ===========================
 :
-	if [ "$SERVICE_SUFFIX" = "test" ]; then
+	RESTART_AFTER=
+	if [ "$SERVICE_SUFFIX" = "test" ] && sudo systemctl is-active $FULL_SERVICE_CODE > /dev/null; then
+		RESTART_AFTER=yes
 		sudo systemctl stop $FULL_SERVICE_CODE
 	fi
 
@@ -132,10 +134,15 @@ set -eux
 	gdb -ex "set print inferior-events off" -ex run --args serve_${APP_CODE} $DB_CODE $OPTIONS
 
 :
+: Check if background service should be restarted
+: ===============================================
+:
+	if [ $RESTART_AFTER ]; then
+
+:
 : After debugging is finished, resume the normal background service
 : =================================================================
 :
-	if [ "$SERVICE_SUFFIX" = "test" ]; then
 		sudo systemctl start $FULL_SERVICE_CODE
 	fi
 
