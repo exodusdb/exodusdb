@@ -161,6 +161,7 @@ var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 //}
 
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
+// Normalise all alternative utf8 encodings of the same unicode points so they are identical
 var get_normal_filename(CVR filename_or_handle) {
 	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
 }
@@ -169,17 +170,22 @@ var get_normal_filename(CVR filename_or_handle) {
 // eg "xxx" 'xxx' 123 .123 +123 -123
 static const var valuechars("\"'.0123456789-+");
 
-// Get a unique lock number per filename & key to communicate to other connections
+// Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
+// TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
 uint64_t mvdbpostgres_hash_filename_and_key(CVR filehandle, CVR key) {
 
+	// Use the pure filename and disregard any connection number
 	std::string fileandkey = get_normal_filename(filehandle);
+
+	// Separate the filename from the key to avoid alternative interpretations
+	// eg "FILENAMEKEY" could be FILE, NAMEKEY or FILENAME, KEY
+	// but "FILENAME KEY" can only be one thing
 	fileandkey.push_back(' ');
+
+	// Append the key
+	// Normalise all alternative utf8 encodings of the same unicode points so they hash identically
 	fileandkey.append(key.normalize().toString());
 
-	// TODO .. provide endian identical version
-	// required if and when exodus processes connect to postgres on a DIFFERENT host
-	// although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the
-	// SAME host
 	return MurmurHash64((char*)fileandkey.data(), int(fileandkey.size() * sizeof(char)), 0);
 
 }
@@ -2419,7 +2425,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 					xlatekeyexpression ^= ", " ^ xlatefromfieldname.substr(9);
 					xlatekeyexpression.popper();
 					xlatekeyexpression ^=
-						var(", 0").str(3 - xlatekeyexpression.count(',')) ^ ")";
+						var(", 0").str(3 - xlatekeyexpression.count(",")) ^ ")";
 				} else if (xlatefromfieldname.trim().substr(1, 10).lcase() == "field(@id|") {
 					xlatekeyexpression = "split_part(";
 					xlatekeyexpression ^= filename ^ ".key,'*',";

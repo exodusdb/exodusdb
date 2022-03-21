@@ -756,7 +756,8 @@ dict(AGE_IN_YEARS) {
 #endif
 
     var myclients;
-    if (myclients.open("myclients")) {
+	var clients_filename = "xo_clients";
+    if (myclients.open(clients_filename)) {
 
 	    printl();
     	printl("The following section requires data created by testsort.cpp");
@@ -765,10 +766,10 @@ dict(AGE_IN_YEARS) {
 
         //begintrans();
 
-        if (var().open("myclients"))
-                printl("Could open myclients");
+        if (var().open(clients_filename))
+                printl("Could open " ^ clients_filename);
         else
-                printl("Could NOT open myclients");
+                printl("Could NOT open " ^ clients_filename);
 
         printl();
         printl("1. test full output with no selection clause or preselect");
@@ -779,14 +780,14 @@ dict(AGE_IN_YEARS) {
 
 	printl();
         printl("2. test with default cursor (unassigned var) - select clause needs filename");
-        myclients.select("select myclients with type 'B'");
+        myclients.select("select " ^ clients_filename ^ " with type 'B'");
         while(myclients.readnext(key)) {
                 key.outputl("t2 key=");
         }
 
         printl();
         printl("3. tests with named cursor (assigned var) - if is file name then select clause can omit filename");
-        myclients="myclients";
+        myclients=clients_filename;
         printl("test preselect affects following select");
         myclients.select("with type 'B'");
         printl("Normally the following select would output all records but it only shows the preselected ones (2)");

@@ -834,7 +834,7 @@ var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsu
 var var::a(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 
 	THISIS(
-		"var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) "
+		"var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) "
 		"const")
 	assertString(function_sig);
 
