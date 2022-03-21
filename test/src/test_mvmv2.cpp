@@ -569,15 +569,15 @@ function main() {
 		assert(! var("left").contains("ex"));
 
 		//char
-		assert(var("leftx").starts('l'));
-		assert(var("xleft").ends('t'));
-		assert(var("xleft").contains('t'));
-		assert(var("xleft").contains('e'));
-		assert(var("xleft").contains('x'));
-
-		assert(! var("leftx").starts('x'));
-		assert(! var("xleft").ends('x'));
-		assert(! var("xleft").contains('y'));
+//		assert(var("leftx").starts('l'));
+//		assert(var("xleft").ends('t'));
+//		assert(var("xleft").contains('t'));
+//		assert(var("xleft").contains('e'));
+//		assert(var("xleft").contains('x'));
+//
+//		assert(! var("leftx").starts('x'));
+//		assert(! var("xleft").ends('x'));
+//		assert(! var("xleft").contains('y'));
 
 
 	}

@@ -1697,38 +1697,62 @@ CVR var::logputl(CVR str) const {
 // DCOUNT
 ////////
 // TODO make a char and char version for speed
-var var::dcount(CVR substrx) const {
+var var::dcount(SV substrx) const {
 
-	THISIS("var var::dcount(CVR substrx) const")
+	THISIS("var var::dcount(SV substrx) const")
 	assertString(function_sig);
-	ISSTRING(substrx)
+	//ISSTRING(substrx)
 
 	if (var_str.empty())
 		return 0;
 
-	return count(substrx) + 1;
+	return this->count(substrx) + 1;
 }
 
 ///////
 // COUNT
 ///////
 
-var var::count(CVR substrx) const {
+//var var::count(CVR substrx) const {
+//
+//	THISIS("var var::count(CVR substrx) const")
+//	assertString(function_sig);
+//	ISSTRING(substrx)
+//
+//	if (substrx.var_str == "")
+//		return 0;
+//
+//	std::string::size_type substr_len = substrx.var_str.size();
+//
+//	// find the starting position of the field or return ""
+//	std::string::size_type start_pos = 0;
+//	int fieldno = 0;
+//	while (true) {
+//		start_pos = var_str.find(substrx.var_str, start_pos);
+//		// past of of string?
+//		if (start_pos == std::string::npos)
+//			return fieldno;
+//		// start_pos++;
+//		start_pos += substr_len;
+//		fieldno++;
+//	}
+//}
+//
+var var::count(SV substrx) const {
 
 	THISIS("var var::count(CVR substrx) const")
 	assertString(function_sig);
-	ISSTRING(substrx)
 
-	if (substrx.var_str == "")
+	if (substrx.empty())
 		return 0;
 
-	std::string::size_type substr_len = substrx.var_str.size();
+	std::string::size_type substr_len = substrx.size();
 
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = 0;
 	int fieldno = 0;
 	while (true) {
-		start_pos = var_str.find(substrx.var_str, start_pos);
+		start_pos = var_str.find(substrx, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return fieldno;
@@ -1738,23 +1762,23 @@ var var::count(CVR substrx) const {
 	}
 }
 
-var var::count(const char charx) const {
-
-	THISIS("var var::count(const char charx) const")
-	assertString(function_sig);
-
-	// find the starting position of the field or return ""
-	std::string::size_type start_pos = 0;
-	int fieldno = 0;
-	while (true) {
-		start_pos = var_str.find_first_of(charx, start_pos);
-		// past of of string?
-		if (start_pos == std::string::npos)
-			return fieldno;
-		start_pos++;
-		fieldno++;
-	}
-}
+//var var::count(const char charx) const {
+//
+//	THISIS("var var::count(const char charx) const")
+//	assertString(function_sig);
+//
+//	// find the starting position of the field or return ""
+//	std::string::size_type start_pos = 0;
+//	int fieldno = 0;
+//	while (true) {
+//		start_pos = var_str.find_first_of(charx, start_pos);
+//		// past of of string?
+//		if (start_pos == std::string::npos)
+//			return fieldno;
+//		start_pos++;
+//		fieldno++;
+//	}
+//}
 
 var var::index2(CVR substrx, const int startchar1) const {
 

@@ -1501,30 +1501,17 @@ class PUBLIC var final {
 	ND var match(CVR matchstr, SV options DEFAULT_STRING) const;
 	ND var seq() const;     // ASCII
 	ND var textseq() const; // TEXT
-	ND var dcount(CVR substrx) const;
-	ND var count(CVR substrx) const;
-#ifndef SWIGPERL
-	// swig-perl chokes on this one character version with "SWIG_AsVal_char not defined" so skip
-	// it for now (can use slow VARREF version) do something similar to the python config in
-	// exodus.i
-	ND var count(const char charx) const;
-#endif
+	ND var dcount(SV str) const;
+	ND var count(SV str) const;
+	//ND var count(const char charx) const;
 	ND var length() const;
 	ND var len() const;
 	const char* data() const;
 	bool isnum() const;
 
-	ND bool starts(CVR vstr) const;
-	ND bool starts(const char* cstr) const;
-	ND bool starts(const char c) const;
-
-	ND bool ends(CVR vstr) const;
-	ND bool ends(const char* cstr) const;
-	ND bool ends(const char c) const;
-
-	ND bool contains(CVR vstr) const;
-	ND bool contains(const char* cstr) const;
-	ND bool contains(const char c) const;
+	ND bool starts(SV str) const;
+	ND bool ends(SV str) const;
+	ND bool contains(SV str) const;
 
 	//static member for speed on std strings
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);

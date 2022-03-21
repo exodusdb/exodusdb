@@ -130,7 +130,7 @@ function main() {
 		//remove trailing lf or cr or crlf
 		trimmerb(text2, "\r\n");
 
-		//convert to record format
+		//convert to original format
 		text2.swapper("\n", sepchar);
 		text2.swapper("\\r", "\r");
 		text2.swapper("\\n", "\n");

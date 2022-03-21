@@ -1441,76 +1441,73 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 //starting is equivalent to x::index(y) == 1
 //contains is equivalent to x::index(y) != 0
 
-bool var::starts(CVR vstr) const {
+bool var::starts(SV sv) const {
 
-	THISIS("bool var::starts(CVR v) const")
+	THISIS("bool var::starts(SV sv) const")
 	//THISIS(__PRETTY_FUNCTION__)
 	//      bool exodus::var::starts(const exodus::VARREF) const
 	assertString(function_sig);
-	ISSTRING(vstr)
-	return var_str.starts_with(vstr.var_str);
+	return var_str.starts_with(sv);
 }
 
-bool var::ends(CVR vstr) const {
+bool var::ends(SV sv) const {
 
-	THISIS("bool var::ends(CVR vstr) const")
+	THISIS("bool var::ends(SV sv) const")
 	assertString(function_sig);
-	ISSTRING(vstr)
-	return var_str.ends_with(vstr.var_str);
+	return var_str.ends_with(sv);
 }
 
-bool var::contains(CVR vstr) const {
+bool var::contains(SV sv) const {
 
-	THISIS("bool var::contains(CVR vstr) const")
+	THISIS("bool var::contains(SV sv) const")
 	assertString(function_sig);
-	ISSTRING(vstr)
-	return var_str.find(vstr.var_str) != std::string::npos;
+	return var_str.find(sv) != std::string::npos;
 	//C++23 return var_str.contains(vstr.var_str);
 }
 
-bool var::starts(const char* cstr) const {
-
-	THISIS("bool var::starts(const char* cstr) const")
-	assertString(function_sig);
-	return var_str.starts_with(cstr);
-}
-
-bool var::ends(const char* cstr) const {
-
-	THISIS("bool var::ends(const char* cstr) const")
-	assertString(function_sig);
-	return var_str.ends_with(cstr);
-}
-
-bool var::contains(const char* cstr) const {
-
-	THISIS("bool var::contains(const char* cstr) const")
-	assertString(function_sig);
-	return var_str.find(cstr) != std::string::npos;
-	//C++23 return var_str.contains(cstr);
-}
-
-bool var::starts(const char c) const {
-
-	THISIS("bool var::starts(const char c) const")
-	assertString(function_sig);
-	return var_str.starts_with(c);
-}
-
-bool var::ends(const char c) const {
-
-	THISIS("bool var::ends(const char c) const")
-	assertString(function_sig);
-	return var_str.ends_with(c);
-}
-
-bool var::contains(const char c) const {
-
-	THISIS("bool var::contains(const char c) const")
-	assertString(function_sig);
-	return var_str.find(c) != std::string::npos;
-	//C++23 return var_str.contains(c);
-}
+//bool var::starts(const char* cstr) const {
+//
+//	THISIS("bool var::starts(const char* cstr) const")
+//	assertString(function_sig);
+//	return var_str.starts_with(cstr);
+//}
+//
+//bool var::ends(const char* cstr) const {
+//
+//	THISIS("bool var::ends(const char* cstr) const")
+//	assertString(function_sig);
+//	return var_str.ends_with(cstr);
+//}
+//
+//bool var::contains(const char* cstr) const {
+//
+//	THISIS("bool var::contains(const char* cstr) const")
+//	assertString(function_sig);
+//	return var_str.find(cstr) != std::string::npos;
+//	//C++23 return var_str.contains(cstr);
+//}
+//
+//bool var::starts(const char c) const {
+//
+//	THISIS("bool var::starts(const char c) const")
+//	assertString(function_sig);
+//	return var_str.starts_with(c);
+//}
+//
+//bool var::ends(const char c) const {
+//
+//	THISIS("bool var::ends(const char c) const")
+//	assertString(function_sig);
+//	return var_str.ends_with(c);
+//}
+//
+//bool var::contains(const char c) const {
+//
+//	THISIS("bool var::contains(const char c) const")
+//	assertString(function_sig);
+//	return var_str.find(c) != std::string::npos;
+//	//C++23 return var_str.contains(c);
+//}
 
 /////////
 // SUBSTR
