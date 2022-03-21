@@ -116,7 +116,7 @@ bool checknotabsoluterootfolder(std::string dirname) {
 	//	return true;
 	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
 		 //std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
-		 var(dirname).count(OSSLASH_) < 3) ||
+		 var(dirname).count(OSSLASH) < 3) ||
 		(SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_))) {
 
 		std::cerr
