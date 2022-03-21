@@ -804,16 +804,31 @@ dict(AGE_IN_YEARS) {
 	//while(myclients.readnext(key)) {
 	//	key.outputl("t4 key=");
 	//}
-	myclients.readnext(key);
-	assert(key=="SB1");
-	myclients.readnext(key);
-	assert(key=="JB2");
-	myclients.readnext(key);
-	assert(key=="SB001");
-	myclients.readnext(key);
-	assert(key=="SB001");
-	//committrans();
-	//rollbacktrans();
+		myclients.readnext(key);
+		assert(key=="SB1");
+		myclients.readnext(key);
+		assert(key=="JB2");
+		myclients.readnext(key);
+		assert(key=="SB001");
+		myclients.readnext(key);
+		assert(key=="SB001");
+		//committrans();
+		//rollbacktrans();
+
+		assert(write("Client XB1" on myclients, "XB1"));
+		assert(write("Client XB2" on myclients, "XB2"));
+
+		// Check mvprogram's xlate using X and C mode9
+		assert(xlate(clients_filename, "XB1", 1, "C") eq "Client XB1");
+		assert(xlate(clients_filename, "XB1x", 1, "X") eq "");
+		assert(xlate(clients_filename, "XB1x", 1, "C") eq "XB1x");
+
+		// var::xlate multivalues using VM
+		keys = "XB1]XB2"_var;
+		assert(keys.xlate(clients_filename, 1, "X").outputl() eq "Client XB1]Client XB2"_var);
+
+		assert(deleterecord(myclients, "XB1"));
+		assert(deleterecord(myclients, "XB2"));
 
     }
 

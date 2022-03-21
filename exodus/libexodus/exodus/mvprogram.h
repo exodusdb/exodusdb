@@ -94,7 +94,7 @@ class PUBLIC ExodusProgramBase {
 	ND var calculate(CVR dictid);
 	ND var calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mv = 0);
 
-	ND var xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mode);
+	ND var xlate(CVR filename, CVR key, CVR fieldno_or_name, const char* mode);
 	// moved to exodusprogrambase
 	// var perform(CVR sentence);
 

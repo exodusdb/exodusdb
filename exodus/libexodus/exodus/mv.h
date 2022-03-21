@@ -1849,7 +1849,6 @@ class PUBLIC var final {
 	// var calculate() const;
 
 	ND var xlate(CVR filename, CVR fieldno, const char* mode) const;
-	ND var xlate(CVR filename, CVR fieldno, CVR mode) const;
 
 	// DATABASE SORT/SELECT
 	//////////////////////

@@ -1882,14 +1882,7 @@ var var::logoff() const {
 	throw MVLogoff();
 }
 
-var var::xlate(CVR filename, CVR fieldno, CVR mode) const {
-
-	THISIS("var var::xlate(CVR filename,CVR fieldno, CVR mode) const")
-	ISSTRING(mode)
-
-	return xlate(filename, fieldno, mode.var_str.c_str());
-}
-
+// fieldno can be "" to return the whole record (0 returns the key)
 // TODO provide a version with int fieldno to handle the most frequent case
 // although may also support dictid (of target file) instead of fieldno
 
@@ -1934,7 +1927,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 			// no record and mode C returns the key
 			// gcc warning: comparison with string literal results in unspecified
 			// behaviour if (mode=="C")
-			if (*mode == *"C")
+			if (*mode == 'C')
 				response ^= key;
 
 			// no record and mode X or anything else returns ""

@@ -1277,7 +1277,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 }
 
 // xlate
-var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mode) {
+var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const char* mode) {
 
 	// TODO implement additional MV argument
 
@@ -1312,7 +1312,7 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, CVR mod
 			// TODO what if key is multivalued?
 
 			// handle record not found and mode C
-			if (mode == "C" && record == keyx) {
+			if (*mode == 'C' && record == keyx) {
 				results.r(keyn, key);
 				continue;
 			}
