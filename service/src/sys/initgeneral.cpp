@@ -922,14 +922,15 @@ nextreport:
 		//CPU(s):              2
 		//Thread(s) per core:  1
 		//Core(s) per socket:  2
-		var nthreads = (((shell2("lscpu|grep \"Thread(s) per core\"")).field(":", 2)).field(var().chr(10), 1)).trim();
-		var ncpus = (((shell2("lscpu|grep \"CPU(s)\"")).field(":", 2)).field(var().chr(10), 1)).trim();
-		if (nthreads.isnum() and ncpus.isnum()) {
-			SYSTEM(9) = nthreads * ncpus;
-		} else {
-			SYSTEM(9) = 1;
-		}
-
+		//var nthreads_percpu = (((shell2("lscpu|grep \"Thread(s) per core\"")).field(":", 2)).field(var().chr(10), 1)).trim();
+		//var ncpus = (((shell2("lscpu|grep \"CPU(s)\"")).field(":", 2)).field(var().chr(10), 1)).trim();
+		//if (nthreads_percpu.isnum() and ncpus.isnum()) {
+		//	SYSTEM(9) = nthreads_percpu * ncpus;
+		var ncpus = shell2("nproc").field("\n").trim();
+		if (not ncpus or not ncpus.isnum())
+			ncpus = 1;
+		SYSTEM(9) = ncpus;
+		TRACE(SYSTEM(9))
 	}
 
 	//save VER
