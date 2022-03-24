@@ -472,21 +472,21 @@ VARREF var::swapper(SV what, SV with) {
 
 //regex based string replacement
 // only here really because boost regex is included here for file matching
-var var::replace(CVR regexstr, CVR replacementstr, SV options) const& {
+var var::regex_replace(CVR regexstr, CVR replacementstr, SV options) const& {
 	var newmv = *this;
-	return newmv.replacer(regexstr, replacementstr, options);
+	return newmv.regex_replacer(regexstr, replacementstr, options);
 }
 
 // on temporary
-VARREF var::replace(CVR regexstr, CVR replacementstr, SV options) && {
-	return this->replacer(regexstr, replacementstr, options);
+VARREF var::regex_replace(CVR regexstr, CVR replacementstr, SV options) && {
+	return this->regex_replacer(regexstr, replacementstr, options);
 }
 
 // in-place
-VARREF var::replacer(CVR regexstr, CVR replacementstr, SV options) {
+VARREF var::regex_replacer(CVR regexstr, CVR replacementstr, SV options) {
 
 	THISIS(
-		"VARREF var::replacer(CVR regexstr, CVR replacementstr, SV options)")
+		"VARREF var::regex_replacer(CVR regexstr, CVR replacementstr, SV options)")
 	assertStringMutator(function_sig);
 	ISSTRING(regexstr)
 	ISSTRING(replacementstr)

@@ -337,13 +337,13 @@ PUBLIC var swap(CVR instring, CVR from, CVR to) {
 	return newstring.swap(from, to);
 }
 
-PUBLIC VARREF replacer(VARREF instring, CVR regexstr, CVR replacementstr, CVR options = "") {
-	return instring.replacer(regexstr, replacementstr, options);
+PUBLIC VARREF regex_replacer(VARREF instring, CVR regexstr, CVR replacementstr, CVR options = "") {
+	return instring.regex_replacer(regexstr, replacementstr, options);
 }
 
-PUBLIC var replace(CVR instring, CVR regexstr, CVR replacementstr, CVR options = "") {
+PUBLIC var regex_replace(CVR instring, CVR regexstr, CVR replacementstr, CVR options = "") {
 	var newstring = instring;
-	return newstring.replacer(regexstr, replacementstr, options);
+	return newstring.regex_replacer(regexstr, replacementstr, options);
 }
 
 PUBLIC VARREF ucaser(VARREF instring) {

@@ -554,7 +554,7 @@ var var::build_conn_info(CVR conninfo) const {
 			envconn ^= " user=" ^ temp;
 
 		if (temp.osgetenv("EXO_DATA") && temp) {
-			envconn.replacer(R"(dbname\s*=\s*\w*)", "");
+			envconn.regex_replacer(R"(dbname\s*=\s*\w*)", "");
 			envconn ^= " dbname=" ^ temp;
 		}
 
@@ -597,7 +597,7 @@ bool var::connect(CVR conninfo) {
 
 	if (DBTRACE) {
 		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
-		conninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
+		conninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
 	}
 
 	PGconn* pgconn;
@@ -665,7 +665,7 @@ bool var::connect(CVR conninfo) {
 	this->r(3, mvconn_no);
 
 	if (DBTRACE) {
-		fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect() OK ");
+		fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect() OK ");
 		this->logput("DBTR var::connect() OK ");
 		std::clog << " " << pgconn << std::endl;
 	}
@@ -2561,7 +2561,7 @@ exodus_call:
 		if (sqlexpression.substr(1, 20) == "exodus_extract_date(" || sqlexpression.substr(1, 20) == "exodus_extract_time(")
 			sqlexpression.splicer(20, 0, "_array");
 		else {
-			sqlexpression.replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
+			sqlexpression.regex_replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
 			// Note 3rd argument '' means convert empty multivalues to nullptr in the array
@@ -2762,11 +2762,11 @@ bool var::saveselect(CVR filename) {
 }
 
 void to_extract_text(VARREF dictexpression) {
-				dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
-				dictexpression.replacer("^exodus_extract_sort\\(", "exodus_extract_text\\(");
-				dictexpression.replacer("^exodus_extract_date\\(", "exodus_extract_text\\(");
-				dictexpression.replacer("^exodus_extract_time\\(", "exodus_extract_text\\(");
-				dictexpression.replacer("^exodus_extract_datetime\\(", "exodus_extract_text\\(");
+				dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
+				dictexpression.regex_replacer("^exodus_extract_sort\\(", "exodus_extract_text\\(");
+				dictexpression.regex_replacer("^exodus_extract_date\\(", "exodus_extract_text\\(");
+				dictexpression.regex_replacer("^exodus_extract_time\\(", "exodus_extract_text\\(");
+				dictexpression.regex_replacer("^exodus_extract_datetime\\(", "exodus_extract_text\\(");
 }
 
 bool var::select(CVR sortselectclause) {
@@ -3520,7 +3520,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					 %RECORDS% | RECORDS
 					 +RECORDS+ | +RECORDS+
 					*/
-					dictexpression.replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
+					dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
 					expression ^= dictexpression ^ " COLLATE \"C\"";
 					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
@@ -3808,8 +3808,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	//actualfieldnames.logputl("actualfieldnames=");
 	//actualfieldnames.swapper("key", actualfilename ^ ".key");
 	//actualfieldnames.swapper("data", actualfilename ^ ".data");
-	actualfieldnames.replacer("\\bkey\\b", actualfilename ^ ".key");
-	actualfieldnames.replacer("\\bdata\\b", actualfilename ^ ".data");
+	actualfieldnames.regex_replacer("\\bkey\\b", actualfilename ^ ".key");
+	actualfieldnames.regex_replacer("\\bdata\\b", actualfilename ^ ".data");
 
 	// DISTINCT has special fieldnames
 	if (distinctfieldnames)
@@ -3914,7 +3914,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
 	// Final catch of obsolete function that was replaced by COLLATE keyword
-	sql.replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
+	sql.regex_replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
 
 	//sql.logputl("sql=");
 

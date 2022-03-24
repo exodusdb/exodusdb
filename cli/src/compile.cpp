@@ -834,11 +834,11 @@ function main() {
 						funcargsdecl.substrer(1, charn - 1);
 
 						//replace comment outs like /*arg1*/ with arg1
-						funcargsdecl.replacer(
+						funcargsdecl.regex_replacer(
 										"/"
 										"\\*",
 										"")
-							.replacer(
+							.regex_replacer(
 								"\\*"
 								"/",
 								"");

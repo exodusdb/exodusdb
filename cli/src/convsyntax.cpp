@@ -62,7 +62,7 @@ function main() {
 				var line2 = hide_subsyntax(line, pos, ',');
 
 				//x(fn) = y;
-				line2.replacer(
+				line2.regex_replacer(
 					"([\\w()]+)"	// (1) A variable or variable with brackets containing a variable
 					"\\.r\\("		// The .r( syntax
 					"([^,]+)"		// (2) Everything up to the only comma is the FN
@@ -72,7 +72,7 @@ function main() {
 				, R"(\1(\2) = \3;)");
 
 				//x(fn, vn) = y;
-				line2.replacer(
+				line2.regex_replacer(
 					"([\\w()]+)"	// (1) A variable or variable with brackets containing a variable
 					"\\.r\\("		// The .r( syntax
 					"([^,]+)"		// (2) Everything up to the first comma is the FN
@@ -84,7 +84,7 @@ function main() {
 				, R"(\1(\2, \3) = \4;)");
 
 				//x(fn, vm , sn) = y;
-				line2.replacer(
+				line2.regex_replacer(
 					"([\\w()]+)"	// (1) A variable or variable with brackets containing a variable
 					"\\.r\\("		// The .r( syntax
 					"([^,]+)"		// (2) Everything up to the first comma is the FN

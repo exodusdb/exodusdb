@@ -1527,7 +1527,7 @@ class PUBLIC var final {
 	//VARREF converter(const char* oldchars, const char* newchars);
 	VARREF textconverter(SV oldchars, SV newchars);
 	VARREF swapper(SV whatstr, SV withstr);
-	VARREF replacer(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING);
+	VARREF regex_replacer(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING);
 	VARREF splicer(const int start1, const int length, SV insertstr);
 	VARREF splicer(const int start1, SV insertstr);
 	VARREF popper();
@@ -1560,7 +1560,7 @@ class PUBLIC var final {
 	ND VARREF convert(SV oldchars, SV newchars) &&;
 	ND VARREF textconvert(SV oldchars, SV newchars) &&;
 	ND VARREF swap(SV whatstr, SV withstr) &&;
-	ND VARREF replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING) &&;
+	ND VARREF regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING) &&;
 	ND VARREF splice(const int start1, const int length, SV insertstr) &&;
 	ND VARREF splice(const int start1, SV insertstr) &&;
 	ND VARREF pop() &&;
@@ -1593,7 +1593,7 @@ class PUBLIC var final {
 	ND var convert(SV oldchars, SV newchars) const&;
 	ND var textconvert(SV oldchars, SV newchars) const&;
 	ND var swap(SV whatstr, SV withstr) const&;
-	ND var replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING) const&;
+	ND var regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING) const&;
 	ND var splice(const int start1, const int length, SV insertstr) const&;
 	ND var splice(const int start1, SV insertstr) const&;
 	ND var pop() const&;

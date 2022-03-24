@@ -315,13 +315,13 @@ COST 10;
 }
 
 subroutine replace_FM_etc(io sql) {
-	sql.replacer(R"(\bRM\b)", R"(E'\\x1F')");
-	sql.replacer(R"(\bFM\b)", R"(E'\\x1E')");
-	sql.replacer(R"(\bVM\b)", R"(E'\\x1D')");
-	sql.replacer(R"(\bSM\b)", R"(E'\\x1C')");
-	sql.replacer(R"(\bSVM\b)", R"(E'\\x1C')");
-	sql.replacer(R"(\bTM\b)", R"(E'\\x1B')");
-	sql.replacer(R"(\bSTM\b)", R"(E'\\x1A')");
+	sql.regex_replacer(R"(\bRM\b)", R"(E'\\x1F')");
+	sql.regex_replacer(R"(\bFM\b)", R"(E'\\x1E')");
+	sql.regex_replacer(R"(\bVM\b)", R"(E'\\x1D')");
+	sql.regex_replacer(R"(\bSM\b)", R"(E'\\x1C')");
+	sql.regex_replacer(R"(\bSVM\b)", R"(E'\\x1C')");
+	sql.regex_replacer(R"(\bTM\b)", R"(E'\\x1B')");
+	sql.regex_replacer(R"(\bSTM\b)", R"(E'\\x1A')");
 }
 
 subroutine create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
