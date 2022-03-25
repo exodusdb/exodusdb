@@ -735,7 +735,7 @@ function main()
 	assert(iconv("24 00 00","MT") eq "");
 
 	//http://www.regular-expressions.info/examples.html
-	assert(replace("Steve Bush Bash bish","B.","Ru","ri") eq "Steve Rush Rush Rush");
+	assert(regex_replace("Steve Bush Bash bish","B.","Ru","ri") eq "Steve Rush Rush Rush");
 
 	assert(oconv("Aa019KK","HEX") eq "41613031394B4B");
 	assert(oconv("Aa019KK","HEX2") eq "41613031394B4B");

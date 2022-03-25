@@ -325,8 +325,8 @@ function main() {
 		assert(var(1.01).converter(".", "_").outputl().toString() eq "1_01");
 		assert(var(1.01).textconverter(".", "_").outputl().toString() eq "1_01");
 		assert(var(1.01).swapper(".", "_").outputl().toString() eq "1_01");
-		assert(var(1.01).replacer(".", "_").outputl().toString() eq "____");
-		assert(var(1.01).replacer(".", "_" , "").outputl().toString() eq "____");
+		assert(var(1.01).regex_replacer(".", "_").outputl().toString() eq "____");
+		assert(var(1.01).regex_replacer(".", "_" , "").outputl().toString() eq "____");
 		assert(var(1.01).splicer(2, 1, "_").outputl().toString() eq "1_01");
 		assert(var(1.01).splicer(-1, "_").outputl().toString() eq "1.0_");
 		assert(var(1.01).popper().outputl().toString() eq "1.0");
