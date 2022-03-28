@@ -930,7 +930,6 @@ nextreport:
 		if (not ncpus or not ncpus.isnum())
 			ncpus = 1;
 		SYSTEM(9) = ncpus;
-		TRACE(SYSTEM(9))
 	}
 
 	//save VER
