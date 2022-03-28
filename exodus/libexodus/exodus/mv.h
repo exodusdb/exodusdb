@@ -1886,8 +1886,8 @@ class PUBLIC var final {
 
 	bool osread(CVR osfilename, const char* codepage DEFAULT_STRING);
 	bool oswrite(CVR osfilename, const char* codepage DEFAULT_STRING) const;
-	bool osdelete() const;
-	bool osdelete(CVR osfilename) const;
+	bool osremove() const;
+	bool osremove(CVR osfilename) const;
 	bool osrename(CVR newosdir_or_filename) const;
 	bool oscopy(CVR to_osfilename) const;
 	bool osmove(CVR to_osfilename) const;

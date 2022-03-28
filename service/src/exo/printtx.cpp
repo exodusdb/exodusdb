@@ -46,7 +46,7 @@ function main(io tx, in mode="", in modevalue="") {
 		if (mode eq "init") {
 			printptr=0;
 			if (printfilename.assigned() && printfilename) {
-				printfilename.osdelete();
+				printfilename.osremove();
 			}
 
 		//trigger new page on next print
@@ -118,7 +118,7 @@ function main(io tx, in mode="", in modevalue="") {
 		if (html and printfilename and printfilename.substr(-4,4).lcase() ne ".htm") {
 
 			printfilename.osclose();
-			printfilename.osdelete();
+			printfilename.osremove();
 
 			//create a new filename
 			var tt = (field2(printfilename, "\\", -1)).length();

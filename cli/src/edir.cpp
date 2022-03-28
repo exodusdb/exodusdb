@@ -177,7 +177,7 @@ function main() {
 	}
 
 	//clean up any temporary file
-	osdelete(temposfilename);
+	osremove(temposfilename);
 
 	return 0;
 }

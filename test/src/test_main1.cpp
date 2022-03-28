@@ -249,7 +249,7 @@ function main()
 //fails on ubuntu 13.10x64
 	assert(osread(charin,testfilename));
 	//assert(charin eq charout);
-	assert(osdelete(testfilename));
+	assert(osremove(testfilename));
 
 
 	//check conversion from and to codepages
@@ -332,7 +332,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	osread(tx2,"test_main.$1","ISO-8859-5");
 	//assert(tx2==tx);
 
-	osdelete("test_main.$1");
+	osremove("test_main.$1");
 
 	//hash
 	var("xyz").hash(1000).outputl("hash(1000) of \"xyz\"=");
@@ -584,11 +584,11 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	var record5;
 	tempfilename5="t_temp7657.txt";
 	assert(oswrite("",tempfilename5));
-	assert(osdelete(tempfilename5));
+	assert(osremove(tempfilename5));
 
 	//check we cannot write to a non-existent file
-	//osdelete(tempfilename5); //make sure the file doesnt exist
-	assert(not osfile(tempfilename5) or osdelete(tempfilename5));
+	//osremove(tempfilename5); //make sure the file doesnt exist
+	assert(not osfile(tempfilename5) or osremove(tempfilename5));
 	var offset=2;
 	assert(not osbwrite("34",tempfilename5,offset));
 	osclose(tempfilename5);
@@ -606,7 +606,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 	assert(osread(record5,tempfilename5));
 	assert(record5.oconv("HEX2") eq "00003738");
-	assert(osdelete(tempfilename5));
+	assert(osremove(tempfilename5));
 
 	if (SLASH_IS_BACKSLASH) {
 		//check cannot write non-codepage characters
@@ -617,7 +617,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		assert(osopen(tempfilename5,tempfilename5,"Greek"));
 		offset=2;
 		assert(osbwrite(GreekSmallFinalSigma,tempfilename5,offset));
-		assert(osdelete(tempfilename5));
+		assert(osremove(tempfilename5));
 	}
 
 	//character replacement

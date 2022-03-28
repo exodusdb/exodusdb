@@ -370,7 +370,7 @@ function main() {
 				//delete the skeleton
 				printl("File unchanged. Not saving.");
 				if (newfile)
-					osdelete(filename);
+					osremove(filename);
 				//move to the next file
 				break;
 			}
@@ -412,7 +412,7 @@ function main() {
 			//if any errors then loop back to edit again
 			var errors;
 			if (osread(errors, compileoutputfilename, "utf8")) {
-				osdelete(compileoutputfilename);
+				osremove(compileoutputfilename);
 				if (OSSLASH ne "/")
 					print(errors);
 

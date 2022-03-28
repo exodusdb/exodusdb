@@ -349,7 +349,7 @@ nextuser:
 			var temps = oslistf("..\\vdm*.tmp");
 			var ntemps = temps.count(FM) + (temps ne "");
 			for (const var tempn : range(1, ntemps)) {
-				("..\\" ^ temps.a(tempn)).osdelete();
+				("..\\" ^ temps.a(tempn)).osremove();
 			} //tempn;
 		}
 

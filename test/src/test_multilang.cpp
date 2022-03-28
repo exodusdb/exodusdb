@@ -272,7 +272,7 @@ programexit()
 //	oswrite("",tempfilename5);
 //	 assert( osbwrite("78",tempfilename5,2));
 //	 osclose(tempfilename5);
-//	 osdelete(tempfilename5);
+//	 osremove(tempfilename5);
 //
 //	tempfilename5 = "t_tempfilename6.txt";
 //	oswrite("",tempfilename5);

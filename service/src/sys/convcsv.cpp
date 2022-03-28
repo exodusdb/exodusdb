@@ -233,7 +233,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	}
 	var excel = (outfilename.substr(-3, 3)).lcase() eq "xls";
 
-	outfilename.osdelete();
+	outfilename.osremove();
 	if (outfilename.osfile()) {
 		var msg = "CANNOT EXPORT BECAUSE " ^ outfilename ^ " IS ALREADY|OPEN IN ANOTHER PROGRAM, OR CANNOT BE ACCESSED";
 		call mssg(msg);
@@ -413,7 +413,7 @@ nextdict:
 		call xselect(tt);
 		if (not LISTACTIVE) {
 			outfile.osclose();
-			outfilename.osdelete();
+			outfilename.osremove();
 			call mssg("No records found");
 			return 0;
 		}

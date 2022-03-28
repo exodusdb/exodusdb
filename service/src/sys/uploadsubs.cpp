@@ -632,7 +632,7 @@ nextline:
 
 subroutine cleanup() {
 	osfile.osclose();
-	temposfilename83.osdelete();
+	temposfilename83.osremove();
 	ANS = nimported;
 	return;
 }

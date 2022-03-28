@@ -21,7 +21,7 @@ function main() {
 
 	assert(data.outputl() == "xyz");
 
-	assert(osdelete(filename));
+	assert(osremove(filename));
 	assert(not osfile(filename));
 
 	printl("Test passed");

@@ -33,7 +33,7 @@ function main(in mode, in datasetcode, out result) {
 		}
 	} //ii;
 
-	shutdownfilename.osdelete();
+	shutdownfilename.osremove();
 
 	if (ii ge 120) {
 		result = 0;

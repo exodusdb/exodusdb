@@ -243,7 +243,7 @@ function main() {
 		//assert((d1.join("\n") ^ "\n") eq txt);
 		assert(d1.join("\n") eq txt);
 
-		//assert(osdelete(osfilename));
+		//assert(osremove(osfilename));
 	}
 
 	//constr nrows

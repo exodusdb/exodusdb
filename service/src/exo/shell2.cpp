@@ -11,7 +11,7 @@ function main(in cmd, out errors) {
 	var output = osshellread(cmd^" 2> " ^ tempfilename);
 
 	errors=osread(tempfilename);
-	osdelete(tempfilename);
+	osremove(tempfilename);
 
 	return output;
 }

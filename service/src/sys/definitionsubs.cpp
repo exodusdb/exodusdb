@@ -497,7 +497,7 @@ preventupdate:
 					tempfilename.converter("/", OSSLASH);
 					var(var().date()).oswrite(tempfilename);
 					if (tt.osread(tempfilename)) {
-						tempfilename.osdelete();
+						tempfilename.osremove();
 					} else {
 						call note("Note: Cannot write to backup drive " ^ drive);
 					}
@@ -566,7 +566,7 @@ preventupdate:
 
 			//get from operating system
 			if (ID ne "SYSTEM") {
-				ID.osdelete();
+				ID.osremove();
 			}
 
 			return 0;

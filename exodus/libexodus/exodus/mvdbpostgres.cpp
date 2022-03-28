@@ -850,7 +850,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 	var filename2 = get_normal_filename(filename);
 
-	// filename dos or DOS  means osread/oswrite/osdelete
+	// filename dos or DOS  means osread/oswrite/osremove
 	if (filename2.var_str.size() == 3 && filename2.var_str == "dos") {
 		//(*this) = "dos";
 		var_str = "dos";
@@ -1102,7 +1102,7 @@ bool var::read(CVR filehandle, CVR key) {
 	//	key2=key.var_str;
 	std::string key2 = key.normalize().var_str;
 
-	// filehandle dos or DOS means osread/oswrite/osdelete
+	// filehandle dos or DOS means osread/oswrite/osremove
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
 		//return this->osread(key2);  //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
@@ -1534,7 +1534,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	// clear any cache
 	filehandle.deleteo(key2);
 
-	// filehandle dos or DOS means osread/oswrite/osdelete
+	// filehandle dos or DOS means osread/oswrite/osremove
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
 		//this->oswrite(key2);	 //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
@@ -1713,11 +1713,11 @@ bool var::deleterecord(CVR key) const {
 	// std::string key2=key.var_str;
 	std::string key2 = key.normalize().var_str;
 
-	// filehandle dos or DOS means osread/oswrite/osdelete
+	// filehandle dos or DOS means osread/oswrite/osremove
 	if (var_str.size() == 3 && (var_str == "dos" || var_str == "DOS")) {
-		//return this->osdelete(key2);
+		//return this->osremove(key2);
 		//use osfilenames unnormalised so we can read and write as is
-		return this->osdelete(key);
+		return this->osremove(key);
 	}
 
 	// Parameter array

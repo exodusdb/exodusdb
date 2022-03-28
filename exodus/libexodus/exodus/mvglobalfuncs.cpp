@@ -144,9 +144,9 @@ PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage = "") {
 	return data.oswrite(osfilename, codepage);
 }
 
-// if osdelete x else
-PUBLIC bool osdelete(CVR osfilename) {
-	return osfilename.osdelete();
+// if osremove x else
+PUBLIC bool osremove(CVR osfilename) {
+	return osfilename.osremove();
 }
 
 // if osrename x to y else

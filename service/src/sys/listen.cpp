@@ -694,7 +694,7 @@ subroutine wait() {
 	cmd ^= " " ^ inpath ^ "*.1 " ^ waitsecs ^ " " ^ sleepms ^ " " ^ serverend;
 
 	linkfilename1 = inpath ^ "neos" ^ processno.oconv("R(0)#4") ^ ".0";
-	linkfilename1.osdelete();
+	linkfilename1.osremove();
 	if (linkfilename1.osfile()) {
 		if (tracing) {
 			printl("CANNOT DELETE ", linkfilename1, " GENERATING ANOTHER");
@@ -976,7 +976,7 @@ subroutine main_exit() {
 	//call restorescreenorigscrn, origattr);
 
 	//remove flag that this dataset is being served ("listened")
-	//osdelete inpath:serverflagfilename
+	//osremove inpath:serverflagfilename
 
 	//get into interactive mode
 	//system<33>=origsysmode
@@ -1131,7 +1131,7 @@ readlink1:
 		ntries = 0;
 deleterequest:
 		linkfile1.osclose();
-		linkfilename1.osdelete();
+		linkfilename1.osremove();
 		if (linkfilename1.osfile()) {
 			var().osflush();
 			//garbagecollect;
@@ -1482,7 +1482,7 @@ cannotopenlinkfile2:
 
 	if (linkfile2.osopen(linkfilename2)) {
 		linkfile2.osclose();
-		linkfilename2.osdelete();
+		linkfilename2.osremove();
 		//osread response from linkfilename3 else response=''
 	}
 
@@ -2560,7 +2560,7 @@ badwrite:
 	} else if (request1 eq "BACKUP") {
 
 		//trigger additional processes that should fail due to backup lock
-		(inpath ^ serverflagfilename).osdelete();
+		(inpath ^ serverflagfilename).osremove();
 
 		call listen5(request1);
 

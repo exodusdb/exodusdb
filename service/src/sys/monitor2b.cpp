@@ -219,7 +219,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 
 		if (cleanup) {
-			logfilename.osdelete();
+			logfilename.osremove();
 		}
 
 		//UPDATE also gets a response
@@ -278,9 +278,9 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 
 			if (cleanup) {
-				(tempfilename ^ ".CMD").osdelete();
+				(tempfilename ^ ".CMD").osremove();
 				//cannot delete postdata until command has executed
-				//osdelete datafilename
+				//osremove datafilename
 			}
 
 		} else {
@@ -319,9 +319,9 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 
 			if (cleanup) {
-				cmdfilename.osdelete();
-				wgetrcfilename.osdelete();
-				errorfilename.osdelete();
+				cmdfilename.osremove();
+				wgetrcfilename.osremove();
+				errorfilename.osremove();
 			}
 
 		}
@@ -346,7 +346,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 		if (datax.osread(tempfilename2)) {
 			if (cleanup) {
-				tempfilename2.osdelete();
+				tempfilename2.osremove();
 			}
 		} else {
 			datax = "";
@@ -387,7 +387,7 @@ badresponse:
 		//from here on the response is ok
 		msg = "";
 		if (cleanup) {
-			logfilename.osdelete();
+			logfilename.osremove();
 		}
 
 		datax = datax.field(",", 14, 999999);
@@ -403,7 +403,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 
 	if (log.osread(logfilename)) {
 		if (cleanup) {
-			logfilename.osdelete();
+			logfilename.osremove();
 		}
 		log.converter("\r\n", FM ^ FM);
 		log.swapper("<br />", FM);

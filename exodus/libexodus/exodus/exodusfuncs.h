@@ -92,7 +92,7 @@ PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage DEFAULTNULL);
 PUBLIC bool osread(VARREF data, CVR osfilename, const char* codepage DEFAULTNULL);
 PUBLIC ND var osread(CVR osfilename);
 
-PUBLIC bool osdelete(CVR osfilename);
+PUBLIC bool osremove(CVR osfilename);
 PUBLIC bool osrename(CVR oldosdir_or_filename, CVR newosdir_or_filename);
 PUBLIC bool oscopy(CVR fromosdir_or_filename, CVR newosdir_or_filename);
 PUBLIC bool osmove(CVR fromosdir_or_filename, CVR newosdir_or_filename);

@@ -296,7 +296,7 @@ function main() {
 		}
 	}
 	call osread(pidrec, pidfilename);
-	//osdelete pidfilename
+	//osremove pidfilename
 	if (pidrec) {
 		SYSTEM(54, 5) = pidrec.a(1);
 	}
@@ -1047,7 +1047,7 @@ nextreport:
 		tt = (path ^ "upload.dl_").osfile();
 		if (tt) {
 			if (tt ne (path ^ "upload.dll").osfile()) {
-				call osdelete(path ^ "upload.dll");
+				call osremove(path ^ "upload.dll");
 				if (not((path ^ "upload.dll").osfile())) {
 					//call shell('ren ':path:'upload.dl_ upload.dll')
 					osshell("copy " ^ path ^ "upload.dl_ " ^ path ^ "upload.dll");

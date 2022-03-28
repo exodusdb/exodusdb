@@ -299,7 +299,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		}
 
 		//delete any existing pgexodus.dll. restart service if cannot initially delete
-		if (osfile(targetfilename) and not osdelete(targetfilename)) {
+		if (osfile(targetfilename) and not osremove(targetfilename)) {
 			//determine postgres service name
 			var pgversion = osshellread("pg_config --version").field(" ", 2).field(".", 1, 2);
 			var servicename = (pgversion < 9) ? "pgsql" : "postgresql";
@@ -313,7 +313,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 				if (not osshell("NET START " ^ servicename))
 					printl("Cant restart " ^ servicename ^ ". Please restart it manually");
 			}
-			if (not osdelete(targetfilename))
+			if (not osremove(targetfilename))
 				printl("Cant delete existing pgexodus.dll plugin");
 		}
 

@@ -113,7 +113,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		}
 
 		//delete the temporary
-		tempfilename.osdelete();
+		tempfilename.osremove();
 
 	}
 

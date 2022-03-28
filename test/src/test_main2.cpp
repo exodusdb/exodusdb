@@ -1136,7 +1136,7 @@ function main()
 	//check copying to a new file
 	var tempfilename2=tempfilename^2;
 	if (osfile(tempfilename2))
-	assert(osdelete(tempfilename2));
+	assert(osremove(tempfilename2));
 	assert(oscopy(tempfilename,tempfilename2));
 	assert(osfile(tempfilename2) eq info);
 
@@ -1192,7 +1192,7 @@ function main()
 	assert(osfile(tempfilename0));
 	assert(osread(temprecord from tempfilename0));
 	assert(temprecord eq "123");
-	assert(osdelete(tempfilename0));
+	assert(osremove(tempfilename0));
 	assert(not osfile(tempfilename0));
 
 	{

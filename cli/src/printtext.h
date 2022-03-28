@@ -81,7 +81,7 @@ class printtext {
 			if (html and printfilename.substr(-4, 4) not_eq ".htm") {
 
 				printfilename.osclose();
-				printfilename.osdelete();
+				printfilename.osremove();
 
 				//create a new filename
 				var tt = (field2(printfilename, "\\", -1)).length();

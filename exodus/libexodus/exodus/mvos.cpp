@@ -908,12 +908,12 @@ bool var::osmove(CVR newosdir_or_filename) const {
 		}
 
 		//then try to delete original
-		if (this->osdelete())
+		if (this->osremove())
 			return true;
 		else {
 
 			//otherwise delete the target too
-			newosdir_or_filename.osdelete();
+			newosdir_or_filename.osremove();
 			this->lasterror(this->quote() ^ " failed to oscopy (2) to " ^ newosdir_or_filename.quote());
 			return false;
 		}
@@ -922,18 +922,18 @@ bool var::osmove(CVR newosdir_or_filename) const {
 	return true;
 }
 
-bool var::osdelete() const {
-	return osdelete(*this);
+bool var::osremove() const {
+	return osremove(*this);
 }
 
-bool var::osdelete(CVR osfilename) const {
+bool var::osremove(CVR osfilename) const {
 
-	THISIS("bool var::osdelete(CVR osfilename) const")
+	THISIS("bool var::osremove(CVR osfilename) const")
 	assertDefined(function_sig);
 	ISSTRING(osfilename)
 	osfilename.osclose();  // in case this is cached opened file handle
 	if (std::remove(osfilename.to_path_string().c_str())) {
-		this->lasterror(this->quote() ^ " failed to osdelete");
+		this->lasterror(this->quote() ^ " failed to osremove");
 		return false;
 	}
 	return true;

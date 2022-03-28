@@ -66,7 +66,7 @@ function main() {
 
 			//delete any existing newfilename in case left from some crash
 			if (osfile(newfilename)) {
-				if (not osdelete(newfilename))
+				if (not osremove(newfilename))
 				printl("Could not delete existing file ", newfilename);
 			}
 

@@ -555,7 +555,7 @@ nextprocess:
 					if (not(tt.osread(testfile))) {
 						tt = "";
 					}
-					testfile.osdelete();
+					testfile.osremove();
 				} else {
 					tt = "";
 				}

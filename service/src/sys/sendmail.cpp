@@ -542,7 +542,7 @@ TRACE(offset)
 			// Reconstruct the complete input for sendmail
 			//tempfilename.osrename(bodyfilename);
 			tempfilename.oscopy(bodyfilename);
-			tempfilename.osdelete();
+			tempfilename.osremove();
 
 		}
 
@@ -567,10 +567,10 @@ TRACE(offset)
 	//pcperform 'CMD /c ':cmd
 
 	if (bodyfilename) {
-		bodyfilename.osdelete();
+		bodyfilename.osremove();
 	}
 	if (paramfilename) {
-		paramfilename.osdelete();
+		paramfilename.osremove();
 	}
 
 	if (errormsg) {
@@ -603,7 +603,7 @@ TRACE(offset)
 	errormsg.converter(TM, FM);
 
 	if (errorfilename) {
-		errorfilename.osdelete();
+		errorfilename.osremove();
 	}
 
 	var details = "To:       " ^ toaddress;

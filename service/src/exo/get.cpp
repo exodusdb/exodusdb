@@ -76,7 +76,7 @@ function main() {
 	//fail if print file less than 2 characters long
 	if (filelen < 2) {
 nooutput:
-		dfs.osdelete();
+		dfs.osremove();
 		var().stop();
 	}
 
@@ -94,13 +94,13 @@ nooutput:
 	//copy print file to public documents if necessary
 	//if prnfile ne dfs then
 	// call shell('COPY /b ':PRNFILE:' ':dfS)
-	// osdelete prnfile
+	// osremove prnfile
 	// end
 
 	//convert text to html
 	//if not(html) then
 	// call convfiletype(dfs,dfs2,'HTM')
-	// osdelete dfs
+	// osremove dfs
 	// dfs=dfs2
 	// end
 

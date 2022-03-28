@@ -1499,9 +1499,9 @@ function static compile2(
 			// leave for editor
 			compileroutput.outputl();
 		//			else
-		//				osdelete(compileoutputfilename);
+		//				osremove(compileoutputfilename);
 		//leave for editor
-		//osdelete(compileoutputfilename);
+		//osremove(compileoutputfilename);
 		var charn = index(compileroutput, ": error:");
 		if (charn) {
 			startatlineno = compileroutput.substr(charn - 9, 9);
@@ -1552,7 +1552,7 @@ function static compile2(
 					cmd ^= " -outputresource:" ^ objfilename ^ ";" ^ (isprogram ? "1" : "2");
 					cmd ^= " 1> nul >2 nul";
 					//if (osshell(cmd)==0)
-					osdelete(objfilename ^ ".manifest");
+					osremove(objfilename ^ ".manifest");
 				}
 			}
 
@@ -1595,7 +1595,7 @@ function static compile2(
 					printl(cmd);
 				osshell(cmd);
 				if (osfile(outputpathandfile) and osfile(objfilename))
-					osdelete(outputpathandfile);
+					osremove(outputpathandfile);
 				//if (!oscopy(objfilename,outputpathandfile))
 				//	printl("ERROR: Failed to "^cmd);
 
@@ -1621,8 +1621,8 @@ function static compile2(
 							atomic_ncompilation_failures++;
 						}  //errputl("ERROR: Failed to "^cmd);
 					} else {
-						osdelete(objfilename ^ ".manifest");
-						osdelete(outputpathandfile ^ ".manifest");
+						osremove(objfilename ^ ".manifest");
+						osremove(outputpathandfile ^ ".manifest");
 					}
 				}
 			}
@@ -1781,15 +1781,15 @@ function set_environment() {
 
 	*/
 	}
-	osdelete(tempfilenamebase ^ ".cmd");
-	osdelete(tempfilenamebase ^ ".$$$");
+	osremove(tempfilenamebase ^ ".cmd");
+	osremove(tempfilenamebase ^ ".$$$");
 	if (verbose) {
 		var errtemp;
 		if (osread(errtemp, tempfilenamebase ^ ".$2")) {
 			//printl(errtemp);
 		}
 	}
-	osdelete(tempfilenamebase ^ ".$2");
+	osremove(tempfilenamebase ^ ".$2");
 
 	return true;
 }

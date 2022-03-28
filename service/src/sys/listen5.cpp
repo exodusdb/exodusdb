@@ -156,7 +156,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 							cmd.osshell();
 						}
-						filename.osdelete();
+						filename.osremove();
 					}
 				}
 				xx = unlockrecord("", processes, "START*" ^ filename);
@@ -843,12 +843,12 @@ nextlock:
 			if (otherusersx) {
 				//response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, response_, otherusersx);
-				request3.osdelete();
+				request3.osremove();
 			} else {
 				osshell("NET STOP EXODUSSERVICE");
 
 				if (request2.substr(1, 7) eq "RESTART") {
-					request3.osdelete();
+					request3.osremove();
 					osshell("NET START EXODUSSERVICE");
 				}
 
@@ -856,7 +856,7 @@ nextlock:
 			}
 
 			if (request2.index("ALL")) {
-				request4.osdelete();
+				request4.osremove();
 			}
 		}
 
@@ -986,11 +986,11 @@ nextfiles:
 
 			//a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.substr(-2, 2) eq ".4") {
-				filename.osdelete();
+				filename.osremove();
 				filename.splicer(-1, 1, "2");
-				filename.osdelete();
+				filename.osremove();
 				filename.splicer(-1, 1, "3");
-				filename.osdelete();
+				filename.osremove();
 
 			} else {
 				if (filename.substr(-4, 4) eq ".TMP") {
@@ -1002,7 +1002,7 @@ nextfiles:
 				filetime = fileattributes.a(2) * 24 * 60 * 60 + fileattributes.a(3);
 				if (((filename.substr(-4, 4)).index(".")) and filetime le deletetime) {
 deleteit:
-					filename.osdelete();
+					filename.osremove();
 				} else {
 				}
 			}

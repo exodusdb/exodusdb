@@ -47,7 +47,7 @@ subroutine printtx() {
 		if (html and ((printfilename.substr(-4,4)).lcase() ne ".htm")) {
 
 			printfilename.osclose();
-			printfilename.osdelete();
+			printfilename.osremove();
 
 			//create a new filename
 			var ptx_filenamelen = (field2(printfilename, "\\", -1)).length();

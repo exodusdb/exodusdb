@@ -44,7 +44,7 @@ function main(in mode, in params, io result, io msg) {
 		params2(3) = 6;
 		params2(4) = "DOS";
 		params2(5) = "TEST.DAT";
-		//osdelete params2<5>
+		//osremove params2<5>
 
 		printl();
 		while (true) {
