@@ -639,9 +639,16 @@ nextreport:
 	tt2 = 1;
 	gosub getsystem();
 
-	//c++ only
-	SYSTEM(58) = oslistd("../data/").convert(FM,VM);
-	SYSTEM.fieldstorer(FM, 59, 5, "");
+	////c++ only
+	//SYSTEM(58) = oslistd("../data/").convert(FM,VM);
+	//SYSTEM.fieldstorer(FM, 59, 5, "");
+    //update dbcodes with dir dbcodes if dbcodes in sys cfg file contain lcase
+    var ttdbcodes = SYSTEM.a(58).convert("abcdefghijklmnopqrstuvwx","").length();
+    if(ttdbcodes eq SYSTEM.a(58).length()){
+        //c++ only
+        SYSTEM(58) = oslistd("../data/").convert(FM,VM);
+        SYSTEM.fieldstorer(FM, 59, 5, "");
+	}
 
 	call log2("*restore session parameters", logtime);
 	//restore IMMEDIATELY to avoid bugs creeping in

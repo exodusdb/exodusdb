@@ -316,7 +316,8 @@ nextprocess:
 
 			//no backups required if database processes are all automatically started
 			//except BASIC which we presume is used to startup and backup data.bak
-			if (SYSTEM.a(58) eq "" and dbasecode ne "BASIC") {
+			//if (SYSTEM.a(58) eq "" and dbasecode ne "BASIC") {
+			if (SYSTEM.a(58) eq "") {
 				backuprequired(1, dbasen) = 0;
 			}
 
