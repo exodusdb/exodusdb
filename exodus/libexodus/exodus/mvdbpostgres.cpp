@@ -2536,7 +2536,9 @@ exodus_call:
 	if ((ismv1 and !forsort) || fieldname.substr(-4).ucase() == "XREF") {
 		//this is the sole creation of to_tsvector in mvdbpostgres.cpp
 		//it will be used like to_tsvector(...) @@ to_tsquery(...)
-		sqlexpression = "to_tsvector('simple', immutable_unaccent(" ^ sqlexpression ^ "))";
+		if (fieldname.substr(-4).ucase() == "XREF")
+			sqlexpression = "immutable_unaccent(" ^ sqlexpression ^ ")";
+		sqlexpression = "to_tsvector('simple', " ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('simple', " ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
 		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
@@ -3673,8 +3675,11 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
 				//this is the sole occurrence of to_tsquery in mvdbpostgres.cpp
 				//it will be used like to_tsvector(...) @@ to_tsquery(...)
-				if (value)
-					value = "to_tsquery('simple', unaccent(" ^ value ^ "))";
+				if (value) {
+					if (dictexpression_isfulltext)
+						value = "unaccent(" ^ value ^ ")";
+					value = "to_tsquery('simple', " ^ value ^ ")";
+				}
 					//value = "to_tsquery('simple', " ^ value ^ ")";
 				//value = "to_tsquery('english'," ^ value ^ ")";
 
