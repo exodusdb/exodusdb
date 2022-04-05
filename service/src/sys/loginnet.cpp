@@ -289,7 +289,9 @@ nextcomp:
 	if (not(paramrec.osread(paramfilename))) {
 		return 0;
 	}
-	var lastbackupdate = paramrec.a(2);
+	//var lastbackupdate = paramrec.a(2);
+	//backup_db script updates params2 date/time
+	var lastbackupdate = paramfilename.osfile().a(2);
 
 	//if lastbackupdate and lastbackupdate lt date()-1 then
 	//assume backup on same day (ie after last midnight)
