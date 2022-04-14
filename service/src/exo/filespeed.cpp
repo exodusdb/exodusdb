@@ -99,7 +99,7 @@ nexttest:
 //		if (esctoexit()) {
 //			goto exit;
 //		}
-		print(AT(0), "W", ii);
+//		print(AT(0), "W", ii);
 		rec.write(tempfile, ii);
 	}//ii;
 
@@ -109,7 +109,7 @@ nexttest:
 //		if (esctoexit()) {
 //			goto exit;
 //		}
-		print(AT(0), "D", ii);
+//		print(AT(0), "D", ii);
 		tempfile.deleterecord(ii);
 	}//ii;
 
