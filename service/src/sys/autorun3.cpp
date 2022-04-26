@@ -89,14 +89,14 @@ function main(in docids0="", in options0="") {
 		return 0;
 	}
 
-	if (not(sys.markets.open("MARKETS", ""))) {
-		if (not(APPLICATION eq "ACCOUNTS")) {
-			call fsmsg();
-		}
-		sys.markets = "";
-		return 0;
-	}
-
+	//if (not(sys.markets.open("MARKETS", ""))) {
+	//	if (not(APPLICATION eq "ACCOUNTS")) {
+	//		call fsmsg();
+	//	}
+	//	sys.markets = "";
+	//	return 0;
+	//}
+	
 	var datasetcode = SYSTEM.a(17);
 	if (not datasetcode) {
 		printl("========== DATASETCODE MISSING ==========");
@@ -177,6 +177,11 @@ readdoc:
 		//call ossleep(1000*1)
 		goto nextdoc;
 	}
+
+    //skip List of Current Users on ACCOUNTS systems
+    if (APPLICATION eq "ACCOUNTS" and docid eq "CURRUSERS") {
+        goto nextdoc;
+    }
 
 	//only do saved and enabled documents for now
 	//0/1 saved disabled/enabled. Blank=Ordinary documents
