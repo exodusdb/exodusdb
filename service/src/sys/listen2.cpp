@@ -190,25 +190,15 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				//TODO implement the same on bad usernames to avoid
 				//different response to good versus bad usernames
 				//which would allow detection of valid usernames
-				//for (failn : range(1, 999999)) {
-				//cant use range based for
-				for (failn = 1; failn <= 999999; failn++) {
+				for (const var failn : range(1, 999999)) {
 					var tt = userx.a(18, failn);
 					///BREAK;
-					//if (not(tt ne "" and tt.substr(1, 2) ne "OK")) break;
-					//count failures upto latest OK login
-					if (tt eq "" or tt.substr(1,2) eq "OK") {
-					  break;
-					}
+					if (not(tt ne "" and tt.substr(1, 2) ne "OK")) break;
 				} //failn;
 				//do normal authorisation to show type of failure - but fail even if ok
 				//if failn>=maxnfails then
 				// goto validateexit
 				// end
-				//too many consecutive fails
-				if (failn gt maxnfails) {
-					goto validateexit;
-				}
 
 				//check account expiry
 				if (userx.a(35) and var().date() ge userx.a(35)) {
