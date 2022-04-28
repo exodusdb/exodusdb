@@ -190,7 +190,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				//TODO implement the same on bad usernames to avoid
 				//different response to good versus bad usernames
 				//which would allow detection of valid usernames
-				for (const var failn : range(1, 999999)) {
+				for (failn = 1; failn <= 999999; failn++) {
 					var tt = userx.a(18, failn);
 					///BREAK;
 					if (not(tt ne "" and tt.substr(1, 2) ne "OK")) break;
@@ -199,7 +199,10 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				//if failn>=maxnfails then
 				// goto validateexit
 				// end
-
+				//too many consecutive fails
+                if (failn gt maxnfails) {
+                   goto validateexit;
+                }
 				//check account expiry
 				if (userx.a(35) and var().date() ge userx.a(35)) {
 
@@ -672,8 +675,8 @@ validateexit2:
 				}
 
 				if (failn gt maxnfails) {
-					var tt = failn + 1;
-					realreason = "Too many consecutive login failures: " ^ tt ^ ", max is " ^ maxnfails;
+					//var tt = failn + 1;
+					realreason = "Too many consecutive login failures: " ^ failn ^ ", max is " ^ maxnfails;
 					invalidlogin ^= "\r\n" ^ (username.quote()) ^ " login is disabled pending password reset by an administrator";
 					if (userx.a(7)) {
 						invalidlogin ^= "\r\n" "or user requesting a password reset to " ^ userx.a(7);
