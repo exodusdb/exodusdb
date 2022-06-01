@@ -20,6 +20,8 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
+#include <window.hpp>
+
 var stationery;
 var mode;
 var html;
@@ -244,6 +246,69 @@ function main() {
 			call mssg("No users can be found to email,|or some problem with email server");
 		}
 		USER1 = "";
+
+	} else if (mode eq "CREATEDATABASE") {
+		//For patsalides
+
+		if (not(authorised("DATASET CREATE",msg_))) {
+		    stop();
+		}
+
+		var targetdbname = USER1.a(1);
+		var targetdbcode = USER1.a(2).lcase();
+		var sourcedbcode = USER1.a(3).lcase();
+
+		var sourcedatadir = "../data/" ^ sourcedbcode;
+		var targetdatadir = "../data/" ^ targetdbcode;
+
+		var dbcodes = dblist();
+
+		//check source database exists
+		if (not locateusing(FM, sourcedbcode, dbcodes)) {
+			return invalid("Source database doesn't exists.");
+		}
+
+		//check new database and data dir dont already exist
+		if (locateusing(FM, targetdbcode, dbcodes)) {
+			return invalid("Sorry, " ^ targetdbcode.quote() ^ " already exists");
+		}
+
+		//stop source live service
+		if (not osshell("systemctl stop agy_live@" ^ sourcedbcode)) {
+			return invalid("Cannot stop " ^ sourcedbcode ^ "'s service");
+		}
+
+		//Copy source db to target db
+        // ERROR:  CREATE DATABASE cannot run inside a transaction block
+        //if (not dbcopy(sourcedbcode,targetdbcode)) {
+		osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode);
+
+		//start source live service
+		osshell("systemctl start agy_live@" ^ sourcedbcode);
+
+		//check target db created
+		var newdbcodes = dblist();
+		if (not locateusing(FM, targetdbcode, newdbcodes)) {
+			return invalid(targetdbname ^ targetdbcode.quote() ^ " not created");
+		}
+
+		//copy source data dir to new target data dir
+		oscopy(sourcedatadir, targetdatadir);
+		if (not osdir(targetdatadir)) {
+			return invalid("Error in creating target data directory");
+		}
+
+		//skip - target image dir created on first upload
+
+		//update database name file
+		if (not	oswrite(targetdbname, "../data/" ^ targetdbcode ^ "/name")) {
+			return invalid("Cannot update database file name");
+		}
+
+		//email confirmaion
+		call sysmsg("", targetdbname ^ " - (" ^ targetdbcode ^ ") created");
+
+		response_ = "OK Database " ^ targetdbname ^ " " ^ targetdbcode.quote() ^ " has been created.";
 
 	} else if (mode eq "VAL.EMAIL") {
 		win.is = request_;

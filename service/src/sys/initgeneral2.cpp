@@ -395,6 +395,10 @@ nextuser:
 		href = "../exodus/usagestatistics.htm";
 		call menusubs("ADDITEM", menutx, item, href);
 
+        item = "_Create Database";
+        href = "../exodus/createdatabase.htm";
+        call menusubs("ADDITEM", menutx, item, href);
+
 		call menusubs("ADDSEP", menutx);
 
 		if (VOLUMES) {
