@@ -264,6 +264,10 @@ function* login_onclick() {
             //cannot set cookie in modal dialog so this also has to be done in caller (clientfunctions)
             var temp = 'dataset=' + datasetx
 
+		     //mv.APPLICATION
+		     gsystem = exodusgetcookie2('ap', '', glogincode)
+		     document.cookie = 'EXODUSsystem=' + gsystem
+
             if (gautologin_element.checked) {
                 temp += '&u=' + gusername_element.value
                 temp += '&p=' + gpassword_element.value

@@ -281,6 +281,8 @@ nextcomp:
 	var ans = ANS;
 	cookie ^= "&wn=" ^ ans;
 
+    cookie ^= "&ap=" ^ APPLICATION;
+
 	//call backupreminder(dataset,msg)
 
 	//osread paramrec from '..\data\':lcase(dataset):'\params2' else return
