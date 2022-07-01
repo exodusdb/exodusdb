@@ -96,7 +96,6 @@ set -euxo pipefail
 			: ========================================================
 			:
 				touch "$HOME/hosts/$SITE_DIR/data/$LIVE_EXO_DATA/params2"
-				cp -a ~/hosts/${LIVE_EXO_DATA}/data/{${LIVE_EXO_DATA},${TEST_EXO_DATA}}/params2
         else
             :
             : Flag fail - differences found
