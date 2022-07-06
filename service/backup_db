@@ -95,7 +95,7 @@ set -euxo pipefail
 			: Flag success - no differences except in status/log files
 			: ========================================================
 			:
-				touch "~/hosts/$SITE_DIR/data/$LIVE_EXO_DATA/params2"
+				touch ~/hosts/$SITE_DIR/data/$LIVE_EXO_DATA/params2
 
                 if [ -d ~/hosts/$SITE_DIR/data/$TEST_EXO_DATA ];then
 
