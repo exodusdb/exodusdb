@@ -264,10 +264,6 @@ function* login_onclick() {
             //cannot set cookie in modal dialog so this also has to be done in caller (clientfunctions)
             var temp = 'dataset=' + datasetx
 
-		     //mv.APPLICATION
-		     gsystem = exodusgetcookie2('ap', '', glogincode)
-		     document.cookie = 'EXODUSsystem=' + gsystem
-
             if (gautologin_element.checked) {
                 temp += '&u=' + gusername_element.value
                 temp += '&p=' + gpassword_element.value
@@ -287,6 +283,13 @@ function* login_onclick() {
             //temporary cookie for menu, gcompany etc
             exodussetcookie(glogincode, 'EXODUS2', db.data)
 
+            //mv.APPLICATION
+            var tt = exodusgetcookie2('ap', '', glogincode)
+            if (tt) {
+                gsystem = tt;
+            }
+
+            document.cookie = 'EXODUSsystem=' + gsystem
             //temporary cookie for password
             //gsystem=ghref[2]
             //if (!gsystem) gsystem='ADAGENCY'
