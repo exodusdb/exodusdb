@@ -10,10 +10,10 @@ function main() {
 	//quit if arguments
 	if (dcount(COMMAND, FM) < 2)
 		abort(
-			"Syntax is:"
-			"\nedir DBFILENAME KEY [FIELDNO]"
-			"\nor"
-			"\nedir OSFILEPATH [LINENO]"
+			"Syntax is:\n"
+			"edir DBFILENAME KEY [FIELDNO]\n"
+			"or"
+			"edir OSFILEPATH [LINENO]"
 		);
 
 	// Allow for first argument to be an os file path
@@ -63,6 +63,8 @@ function main() {
 		if (line_sep ne FM)
 			record=origrecord.swap(line_sep, FM);
 	}
+	if (filename eq "DOS")
+		line_sep = "\n";
 
 	//var text = origrecord.a(fieldno);
 	var text = record.a(fieldno);
@@ -138,15 +140,15 @@ function main() {
 
 		if (text2 ne text) {
 
-			if (line_sep)
-				text2.swapper(FM, line_sep);
-
 			//print("Ok to update? ");
 			//var reply=inputl();
 			var reply = "Y";
 
 			//var newrecord = fieldno ? origrecord.r(fieldno, text2) : text2;
 			var newrecord = fieldno ? record.r(fieldno, text2) : text2;
+
+			if (line_sep ne FM)
+				newrecord.swapper(FM, line_sep);
 
 			//keep trying to update - perhaps futilely
 			//at least temp file will be left in the directory
