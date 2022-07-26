@@ -13,12 +13,13 @@ class PUBLIC ExodusProgramBase {
 
    public:
 
+	// Function arguments
 	using in  = const var&; // "CVR"    means "Const Var Reference"
 	using io  =       var&; // "VARREF" means "Var Reference"
 	using out =       var&; // "VARREF" means "Var Reference"
 
-	using let =       var ; // "let" behaves like javascript "let" ie. it is scoped ... but so is exodus var
-	using con = const var ; // "CV"     means "Constant Var" e.g. con x = "";
+	// Constant var
+	using let = const var ; // "CV"     means "Constant Var" e.g. let x = 100;
 
 #include <exodus/ioconv_custom.h>
 
