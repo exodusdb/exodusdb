@@ -83,7 +83,21 @@ set -euxo pipefail
 : Restore into the target database
 : ================================
 :
-	zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz | sudo -u postgres psql $TEST_EXO_DATA > /dev/null
+	#zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz | sudo -u postgres psql $TEST_EXO_DATA > /dev/null
+:   Suppress various "No function matches ..." errors since functions may not be loaded in dependency order
+:   Example:
+	#ERROR:  function dict_journals_year_period(text, text) does not exist
+	#LINE 3:   '20' || dict_journals_year_period(key,data)
+	#                  ^
+	#HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+	#QUERY:  SELECT split_part(key,'*',1) || '*' || split_part(key,'*',2)
+	#  || '*' ||
+	#  '20' || dict_journals_year_period(key,data)
+	#CONTEXT:  PL/pgSQL function public.dict_journals_company_journal_year_period(text,text) line 9 at assignment
+:
+	zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz |\
+	sudo -u postgres psql $TEST_EXO_DATA 2>&1 >/dev/null |\
+	(egrep -v '(^ERROR:  function |^LINE [0-9]+: |^  |^HINT:  No function matches |QUERY: |CONTEXT: )' || true)
 
 :
 : Create all pgsql functions
