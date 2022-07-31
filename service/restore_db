@@ -85,7 +85,7 @@ set -euxo pipefail
 :
 	#zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz | sudo -u postgres psql $TEST_EXO_DATA > /dev/null
 :   Suppress various "No function matches ..." errors since functions may not be loaded in dependency order
-:   Example:
+	#Example:
 	#ERROR:  function dict_journals_year_period(text, text) does not exist
 	#LINE 3:   '20' || dict_journals_year_period(key,data)
 	#                  ^
@@ -97,7 +97,7 @@ set -euxo pipefail
 :
 	zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz |\
 	sudo -u postgres psql $TEST_EXO_DATA 2>&1 >/dev/null |\
-	(egrep -v '(^ERROR:  function |^LINE [0-9]+: |^  |^HINT:  No function matches |QUERY: |CONTEXT: )' || true)
+	(egrep -v '(^ERROR:  function |^LINE [0-9]+: |^  |^HINT:  No function matches |^QUERY: |^CONTEXT: )' || true)
 
 :
 : Create all pgsql functions
