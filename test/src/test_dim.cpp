@@ -160,12 +160,13 @@ function main() {
 	assert(a7.join() eq ("xx"^FM^"bb"));
 
 	dim arrx(2,2),arry;
-	arrx(1,1)="xx";
-	assert(arrx(1,1) eq "xx");
+	arrx = "";
+	arrx(1,1)="11";
+	assert(arrx(1,1) eq "11");
 	arrx(1,2)=arrx(1,1);
-	assert(arrx(1,2) eq "xx");
+	assert(arrx(1,2) eq "11");
 	arry=arrx;
-	assert(arry(1,1) eq "xx");
+	assert(arry(1,2) eq "11");
 
 	//using mv dimensioned arrays
 	//mv dimensioned arrays have a zero element that is

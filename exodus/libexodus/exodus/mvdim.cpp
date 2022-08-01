@@ -230,7 +230,8 @@ dim& dim::init(CVR sourcevar) {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	int arraysize = nrows_ * ncols_ + 1;
-	for (int ii = 0; ii < arraysize; ii++)
+	//for (int ii = 0; ii < arraysize; ii++)
+	for (int ii = 1; ii < arraysize; ii++)
 		data_[ii] = sourcevar;
 	return *this;
 }
@@ -243,8 +244,10 @@ dim& dim::operator=(const dim& sourcedim) {
 	this->redim(sourcedim.nrows_, sourcedim.ncols_);
 
 	int ncells = nrows_ * ncols_ + 1;
-	for (int celln = 0; celln < ncells; ++celln)
-		data_[celln] = sourcedim.data_[celln].clone();
+	//for (int celln = 0; celln < ncells; ++celln)
+	for (int celln = 1; celln < ncells; ++celln)
+		//data_[celln] = sourcedim.data_[celln].clone();
+		data_[celln] = sourcedim.data_[celln];
 	return *this;
 }
 
@@ -258,7 +261,7 @@ dim& dim::operator=(CVR sourcevar) {
 dim& dim::operator=(const int sourceint) {
 	//if (!initialised_)
 	//	throw MVArrayNotDimensioned();
-	init(sourceint);
+	this->init(sourceint);
 	return *this;
 }
 
