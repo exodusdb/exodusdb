@@ -78,8 +78,8 @@
 				result = OPTIONS.index("I") ? 0 : 999;                                                          \
 			}*/                                                                                                 \
 		}                                                                                                       \
-		/*TODO disconnect ALL connections of this thread*/                                                      \
-		/*var("PROCESSES").deleterecord(PROCESSNO);*/                                                           \
+		/*disconnect ALL connections of this thread*/                                                           \
+		disconnectall();                                                                                        \
 		disconnect();                                                                                           \
 		if (OPTIONS.index("I"))                                                                                 \
 			result = 0;                                                                                         \
