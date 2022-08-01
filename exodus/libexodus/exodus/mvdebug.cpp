@@ -126,6 +126,8 @@ void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF return
 	//if (line.match("^(program|library|class)(init|exit)\\(") or
 	//	(line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
 	//	return;
+	if (line.match("^(program|library|class)(init|exit)\\("))
+		return;
 
 #ifdef TRACING
 	line.errputl();

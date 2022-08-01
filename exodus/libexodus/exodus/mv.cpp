@@ -1858,6 +1858,7 @@ std::istream& operator>>(std::istream& istream1, VARREF var1) {
 
 //#endif
 
+// Forward declaration of free function defined in mvdebug.cpp
 var backtrace();
 
 MVError::MVError(CVR description_)
@@ -1867,7 +1868,7 @@ MVError::MVError(CVR description_)
 	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
 
 	//break into debugger if EXO_DEBUG is set to non-zero
-	//therwise allow catch at a higher level or abort
+	//otherwise allow catch at a higher level or terminate
 	var exo_debug;
 	exo_debug.osgetenv("EXO_DEBUG");
 	if (exo_debug) {
