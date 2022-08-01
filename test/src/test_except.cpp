@@ -16,6 +16,17 @@ function main() {
 		var minint = std::numeric_limits<mvint_t>::min();
 		var maxint = std::numeric_limits<mvint_t>::max();
 
+        var unass;
+
+		try {var v = unass        ;assert(false && "copy constructor from unassigned lvalue");}    catch (MVUnassigned e){};
+		try {var v;v = unass      ;assert(false && "copy assign from unassigned lvalue");}    catch (MVUnassigned e){};
+
+		//move ALLOWS use of unassigned without throwing for performance since temporaries are unlikeley to be unassigned
+//		try {var v = var()        ;assert(false && "move constructor from unassigned rvalue");}    catch (MVUnassigned e){};
+//		try {var v;v = var()      ;assert(false && "move assign from unassigned rvalue");}    catch (MVUnassigned e){};
+		try {var v = var()        ;} catch (MVUnassigned e){assert(false && "move constructor from unassigned rvalue");};
+		try {var v;v = var()      ;} catch (MVUnassigned e){assert(false && "move assign from unassigned rvalue");};
+
 		var uncaught = "";
 
 		try {throw MVError("test");uncaught="MVError";}         catch (MVError e){};

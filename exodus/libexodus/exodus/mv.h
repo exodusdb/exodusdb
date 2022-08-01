@@ -408,42 +408,46 @@ class PUBLIC var final {
 		var_dbl(rhs.var_dbl),
 		var_typ(rhs.var_typ) {
 
-		// for speed, use initializers and only check afterwards if copiedvar was assigned
+		// use initializers for speed? and only check afterwards if rhs was assigned
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
 
 		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 	}
 
 	/////////////////////
-	// 4. copy assignment - by ref
+	// 4. copy assignment - from lvalue
 	/////////////////////
 
 	// Not using copy assignment by value (copy-and-swap idiom)
 	// because Howard Hinnant recommends against in our case
 
-	// The assignment operator should always return a reference to *this.
+	// Prevent assigning to temporaries
+	INLINE VOID_OR_VARREF operator=(CVR rhs) && = delete;
 
-	var& operator=(CVR rhs) = default;
-//	VOID_OR_VARREF operator=(CVR rhs) & {
-//
-//		assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
-//		rhs.assertAssigned(__PRETTY_FUNCTION__);
-//
-//		//std::clog << "copy assignment by reference" <<std::endl;
-//
-//		// important not to self assign
-//		// TODO remove for speed?
-//		if (this == &rhs)
-//			return VOID_OR_THIS;
-//
-//		// copy everything across
-//		var_str = rhs.var_str;
-//		var_dbl = rhs.var_dbl;
-//		var_int = rhs.var_int;
-//		var_typ = rhs.var_typ;
-//
-//		return VOID_OR_THIS;
-//	}
+	// var& operator=(CVR rhs) & = default;
+	// Cannot use default copy assignment because
+	// a) it returns a value allowing accidental use of "=" instead of == in if statements
+	// b) doesnt check if rhs is assigned
+	INLINE VOID_OR_VARREF operator=(CVR rhs) & {
+
+		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
+		rhs.assertAssigned(__PRETTY_FUNCTION__);
+
+		//std::clog << "copy assignment by reference" <<std::endl;
+
+		// Prevent self assign
+		// Removed for speed since we assume std::string handles it ok
+		//if (this == &rhs)
+		//	return VOID_OR_THIS;
+
+		// copy everything across
+		var_str = rhs.var_str;
+		var_dbl = rhs.var_dbl;
+		var_int = rhs.var_int;
+		var_typ = rhs.var_typ;
+
+		return VOID_OR_THIS;
+	}
 
 	//////////////////////
 	// 5. move constructor - Can default assuming that temporaries are unlikely to be undefined or unassigned
@@ -467,34 +471,40 @@ class PUBLIC var final {
 	//	}
 
 	/////////////////////
-	// 6. move assignment
+	// 6. move assignment - from rvalue/temporary
 	/////////////////////
 
 	// defined in class for inline/optimisation
-	// var = temporary var
-	var& operator=(TVR rhs) noexcept = default;
-//	INLINE VOID_OR_VARREF operator=(TVR rhs) & noexcept {
-//
-//		// skip these for speed since temporararies are unlikely to be undefined or unassigned
-//		// THISIS("VARREF operator=(TVR rhs) & noexcept")
-//		// THISISDEFINED()
-//		// ISASSIGNED(rhs)
-//
-//		//std::clog << "move assignment" <<std::endl;
-//
-//		// important not to self assign
-//		// TODO remove for speed?
-//		if (this == &rhs)
-//			return VOID_OR_THIS;
-//
-//		// move everything over
-//		var_str = std::move(rhs.var_str);
-//		var_dbl = rhs.var_dbl;
-//		var_int = rhs.var_int;
-//		var_typ = rhs.var_typ;
-//
-//		return VOID_OR_THIS;
-//	}
+
+	// Prevent assigning to temporaries
+	INLINE VOID_OR_VARREF operator=(TVR rhs) && noexcept = delete;
+
+	// Cannot use default move assignment because
+	// a) it returns a value allowing accidental use of "=" in if statements instead of ==
+	// b) doesnt check if rhs is assigned (less important for temporaries which are rarely unassigned)
+	//var& operator=(TVR rhs) & noexcept = default;
+	INLINE VOID_OR_VARREF operator=(TVR rhs) & {
+
+		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
+
+		// Removed for speed like move constructor since temporaries are unlikely to be unassigned
+		//rhs.assertAssigned(__PRETTY_FUNCTION__);
+
+		//std::clog << "move assignment" <<std::endl;
+
+		// Prevent self assign
+		// Removed for speed since we assume std::string handles it ok
+		//if (this == &rhs)
+		//	return VOID_OR_THIS;
+
+		// move everything over
+		var_str = std::move(rhs.var_str);
+		var_dbl = rhs.var_dbl;
+		var_int = rhs.var_int;
+		var_typ = rhs.var_typ;
+
+		return VOID_OR_THIS;
+	}
 
 
 	///////////////////
