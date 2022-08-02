@@ -20,12 +20,14 @@ function main() {
 }
 libraryexit(department)
 
+
 libraryinit(last_access_time)
 //---------------------------
 function main() {
 	return (RECORD.a(1) * 86400 + SW.a(1)).mod(86400);
 }
 libraryexit(last_access_time)
+
 
 libraryinit(user_browser)
 //-----------------------
@@ -35,6 +37,7 @@ function main() {
 }
 libraryexit(user_browser)
 
+
 libraryinit(user_code)
 //--------------------
 function main() {
@@ -43,6 +46,7 @@ function main() {
 	return ANS;
 }
 libraryexit(user_code)
+
 
 libraryinit(user_name)
 //--------------------
@@ -58,3 +62,4 @@ function main() {
 	return ANS;
 }
 libraryexit(user_name)
+

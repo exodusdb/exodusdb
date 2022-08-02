@@ -8,7 +8,13 @@ function main() {
 	ANS.swapper(SVM, ", ");
 	return ANS;
 }
+/*pgsql
+	ans := exodus_extract_text(DATA, 2, 0, 0);
+	ans := replace(ans, VM, ', ');
+	ans := replace(ans, SM, ', ');
+*/
 libraryexit(keywords)
+
 
 libraryinit(text2)
 //----------------
@@ -22,3 +28,4 @@ function main() {
 	return ANS;
 }
 libraryexit(text2)
+

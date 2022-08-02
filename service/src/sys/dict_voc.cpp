@@ -11,6 +11,7 @@ function main() {
 }
 libraryexit(alines)
 
+
 libraryinit(all)
 //--------------
 function main() {
@@ -18,6 +19,7 @@ function main() {
 	return ans;
 }
 libraryexit(all)
+
 
 libraryinit(alluppercase)
 //-----------------------
@@ -39,6 +41,7 @@ function main() {
 }
 libraryexit(alluppercase)
 
+
 libraryinit(alpha)
 //----------------
 function main() {
@@ -47,6 +50,7 @@ function main() {
 	return ANS;
 }
 libraryexit(alpha)
+
 
 libraryinit(anydebug)
 //-------------------
@@ -86,6 +90,7 @@ function main() {
 }
 libraryexit(anydebug)
 
+
 libraryinit(caseratio)
 //--------------------
 function main() {
@@ -103,6 +108,7 @@ function main() {
 	return ANS;
 }
 libraryexit(caseratio)
+
 
 libraryinit(conv2utf8)
 //--------------------
@@ -127,12 +133,14 @@ function main() {
 }
 libraryexit(conv2utf8)
 
+
 libraryinit(count)
 //----------------
 function main() {
 	return 1;
 }
 libraryexit(count)
+
 
 libraryinit(c_args)
 //-----------------
@@ -145,6 +153,7 @@ function main() {
 }
 libraryexit(c_args)
 
+
 libraryinit(data)
 //---------------
 function main() {
@@ -154,6 +163,7 @@ function main() {
 }
 libraryexit(data)
 
+
 libraryinit(datetime_created)
 //---------------------------
 function main() {
@@ -161,9 +171,9 @@ function main() {
 }
 libraryexit(datetime_created)
 
+
 libraryinit(different)
 //--------------------
-
 #include <sys_common.h>
 
 var rec;
@@ -221,6 +231,7 @@ changed:
 }
 libraryexit(different)
 
+
 libraryinit(display2)
 //-------------------
 function main() {
@@ -230,12 +241,14 @@ function main() {
 }
 libraryexit(display2)
 
+
 libraryinit(dt)
 //-------------
 function main() {
 	return var().date();
 }
 libraryexit(dt)
+
 
 libraryinit(executive_email)
 //--------------------------
@@ -281,9 +294,9 @@ function main() {
 }
 libraryexit(executive_email)
 
+
 libraryinit(executive_name)
 //-------------------------
-
 function main() {
 	//ans={EXECUTIVE_CODE}
 	//ans2=ans
@@ -313,9 +326,9 @@ function main() {
 }
 libraryexit(executive_name)
 
+
 libraryinit(field)
 //----------------
-
 function main() {
 	if (not RECUR0) {
 		call mssg("WHICH FIELD NUMBER ?", "R", RECUR0, "");
@@ -323,6 +336,7 @@ function main() {
 	return RECORD.a(RECUR0);
 }
 libraryexit(field)
+
 
 libraryinit(findall)
 //------------------
@@ -381,12 +395,14 @@ function main() {
 }
 libraryexit(findall)
 
+
 libraryinit(iscpp)
 //----------------
 function main() {
 	return RECORD.a(2).substr(1, 3) eq "*c ";
 }
 libraryexit(iscpp)
+
 
 libraryinit(key1)
 //---------------
@@ -395,12 +411,14 @@ function main() {
 }
 libraryexit(key1)
 
+
 libraryinit(key2)
 //---------------
 function main() {
 	return ID.field("*", 2);
 }
 libraryexit(key2)
+
 
 libraryinit(key3)
 //---------------
@@ -409,12 +427,14 @@ function main() {
 }
 libraryexit(key3)
 
+
 libraryinit(key4)
 //---------------
 function main() {
 	return ID.field("*", 4);
 }
 libraryexit(key4)
+
 
 libraryinit(keylen)
 //-----------------
@@ -423,12 +443,14 @@ function main() {
 }
 libraryexit(keylen)
 
+
 libraryinit(keysize)
 //------------------
 function main() {
 	return ID.length();
 }
 libraryexit(keysize)
+
 
 libraryinit(linemarks)
 //--------------------
@@ -446,6 +468,7 @@ function main() {
 }
 libraryexit(linemarks)
 
+
 libraryinit(lines)
 //----------------
 function main() {
@@ -455,13 +478,14 @@ function main() {
 }
 libraryexit(lines)
 
+
 libraryinit(log_message2)
 //-----------------------
-
 function main() {
 	return trim(RECORD.a(2), VM);
 }
 libraryexit(log_message2)
+
 
 libraryinit(log_source1)
 //----------------------
@@ -470,12 +494,14 @@ function main() {
 }
 libraryexit(log_source1)
 
+
 libraryinit(mv)
 //-------------
 function main() {
 	return MV;
 }
 libraryexit(mv)
+
 
 libraryinit(nfields)
 //------------------
@@ -484,6 +510,7 @@ function main() {
 }
 libraryexit(nfields)
 
+
 libraryinit(nfields0)
 //-------------------
 function main() {
@@ -491,6 +518,7 @@ function main() {
 	return RECORD.trim().count(" ") + 1;
 }
 libraryexit(nfields0)
+
 
 libraryinit(nfields00)
 //--------------------
@@ -528,6 +556,7 @@ function main() {
 }
 libraryexit(nfields00)
 
+
 libraryinit(nlines)
 //-----------------
 function main() {
@@ -538,6 +567,7 @@ function main() {
 	return ANS;
 }
 libraryexit(nlines)
+
 
 libraryinit(num)
 //--------------
@@ -550,12 +580,14 @@ function main() {
 }
 libraryexit(num)
 
+
 libraryinit(objectcodetype)
 //-------------------------
 function main() {
 	return RECORD.a(1).seq();
 }
 libraryexit(objectcodetype)
+
 
 libraryinit(program_date)
 //-----------------------
@@ -565,6 +597,7 @@ function main() {
 }
 libraryexit(program_date)
 
+
 libraryinit(recnum)
 //-----------------
 function main() {
@@ -573,12 +606,14 @@ function main() {
 }
 libraryexit(recnum)
 
+
 libraryinit(record)
 //-----------------
 function main() {
 	return RECORD;
 }
 libraryexit(record)
+
 
 libraryinit(size)
 //---------------
@@ -587,12 +622,14 @@ function main() {
 }
 libraryexit(size)
 
+
 libraryinit(spacer)
 //-----------------
 function main() {
 	return "";
 }
 libraryexit(spacer)
+
 
 libraryinit(temp)
 //---------------
@@ -601,6 +638,7 @@ function main() {
 }
 libraryexit(temp)
 
+
 libraryinit(time)
 //---------------
 function main() {
@@ -608,9 +646,9 @@ function main() {
 }
 libraryexit(time)
 
+
 libraryinit(timedate)
 //-------------------
-
 #include <sys_common.h>
 
 function main() {
@@ -628,12 +666,14 @@ function main() {
 }
 libraryexit(timedate)
 
+
 libraryinit(username)
 //-------------------
 function main() {
 	return USERNAME;
 }
 libraryexit(username)
+
 
 libraryinit(username_created)
 //---------------------------
@@ -642,9 +682,9 @@ function main() {
 }
 libraryexit(username_created)
 
+
 libraryinit(version)
 //------------------
-
 function main() {
 	if (DICT.index("VOC")) {
 		ANS = xlate(RECORD.a(3), "$" ^ RECORD.a(4), "VERSION", "X");
@@ -659,9 +699,11 @@ function main() {
 }
 libraryexit(version)
 
+
 libraryinit(version_date)
 //-----------------------
 function main() {
 	return calculate("VERSION").trim().field(" ", 2, 3).iconv("D");
 }
 libraryexit(version_date)
+

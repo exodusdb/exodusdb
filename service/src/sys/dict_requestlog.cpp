@@ -19,13 +19,15 @@ function main() {
 }
 libraryexit(secs)
 
+
 libraryinit(seq)
 //--------------
 function main() {
 	return ID;
-	/*pgsql;
-	return key;
-	*/
 	return ANS;
 }
+/*pgsql
+	return key;
+*/
 libraryexit(seq)
+

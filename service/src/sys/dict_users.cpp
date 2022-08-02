@@ -50,6 +50,7 @@ unknown:
 }
 libraryexit(authorised)
 
+
 libraryinit(authorised_job_update)
 //--------------------------------
 #include <authorised.h>
@@ -67,6 +68,7 @@ function main() {
 }
 libraryexit(authorised_job_update)
 
+
 libraryinit(authorised_journal_post)
 //----------------------------------
 #include <authorised.h>
@@ -83,6 +85,7 @@ function main() {
 }
 libraryexit(authorised_journal_post)
 
+
 libraryinit(authorised_task_access)
 //---------------------------------
 #include <authorised.h>
@@ -98,6 +101,7 @@ function main() {
 	return ANS;
 }
 libraryexit(authorised_task_access)
+
 
 libraryinit(authorised_task_create)
 //---------------------------------
@@ -116,6 +120,7 @@ function main() {
 }
 libraryexit(authorised_task_create)
 
+
 libraryinit(authorised_timesheet_administration)
 //----------------------------------------------
 #include <authorised.h>
@@ -132,12 +137,14 @@ function main() {
 }
 libraryexit(authorised_timesheet_administration)
 
+
 libraryinit(dept_and_user_name)
 //-----------------------------
 function main() {
 	return RECORD.a(5) ^ " - " ^ RECORD.a(1);
 }
 libraryexit(dept_and_user_name)
+
 
 libraryinit(is_department)
 //------------------------
@@ -146,16 +153,17 @@ function main() {
 		return 1;
 	}
 	return "";
-	/*pgsql;
-	if split_part(data,FM,5) = key then;
-		ANS='1';
-	else;
-		ANS='';
-	end if;
-	*/
 	return ANS;
 }
+/*pgsql
+	if split_part(data,FM,5) = key then
+		ANS='1';
+	else
+		ANS='';
+	end if;
+*/
 libraryexit(is_department)
+
 
 libraryinit(keys)
 //---------------
@@ -174,6 +182,7 @@ function main() {
 }
 libraryexit(keys)
 
+
 libraryinit(last_browser)
 //-----------------------
 #include <htmllib2.h>
@@ -185,6 +194,7 @@ function main() {
 }
 libraryexit(last_browser)
 
+
 libraryinit(last_os)
 //------------------
 #include <htmllib2.h>
@@ -195,6 +205,7 @@ function main() {
 	return ans;
 }
 libraryexit(last_os)
+
 
 libraryinit(live_user_with_email)
 //-------------------------------
@@ -213,9 +224,11 @@ function main() {
 }
 libraryexit(live_user_with_email)
 
+
 libraryinit(user_and_dept_name)
 //-----------------------------
 function main() {
 	return RECORD.a(1) ^ " - " ^ RECORD.a(5);
 }
 libraryexit(user_and_dept_name)
+

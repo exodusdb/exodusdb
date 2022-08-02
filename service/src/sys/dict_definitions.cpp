@@ -7,6 +7,7 @@ function main() {
 }
 libraryexit(chequedesign_account_name)
 
+
 libraryinit(chequedesign_is_default)
 //----------------------------------
 function main() {
@@ -18,12 +19,14 @@ function main() {
 }
 libraryexit(chequedesign_is_default)
 
+
 libraryinit(email_address)
 //------------------------
 function main() {
 	return RECORD.a(1).xlate("USERS", 7, "X");
 }
 libraryexit(email_address)
+
 
 libraryinit(full_name)
 //--------------------
@@ -39,12 +42,14 @@ function main() {
 }
 libraryexit(full_name)
 
+
 libraryinit(key1)
 //---------------
 function main() {
 	return ID.field("*", 1);
 }
 libraryexit(key1)
+
 
 libraryinit(key2)
 //---------------
@@ -53,12 +58,14 @@ function main() {
 }
 libraryexit(key2)
 
+
 libraryinit(last_browser)
 //-----------------------
 function main() {
 	return xlate("USERS", calculate("USER_CODE_WITH_EMAIL"), "LAST_BROWSER", "X");
 }
 libraryexit(last_browser)
+
 
 libraryinit(last_login_age)
 //-------------------------
@@ -75,12 +82,14 @@ function main() {
 }
 libraryexit(last_login_age)
 
+
 libraryinit(last_login_date_time)
 //-------------------------------
 function main() {
 	return calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");
 }
 libraryexit(last_login_date_time)
+
 
 libraryinit(last_login_location)
 //------------------------------
@@ -89,12 +98,14 @@ function main() {
 }
 libraryexit(last_login_location)
 
+
 libraryinit(last_os)
 //------------------
 function main() {
 	return xlate("USERS", calculate("USER_CODE_WITH_EMAIL"), "LAST_OS", "X");
 }
 libraryexit(last_os)
+
 
 libraryinit(password_age)
 //-----------------------
@@ -110,6 +121,7 @@ function main() {
 	return ANS;
 }
 libraryexit(password_age)
+
 
 libraryinit(process_comment2)
 //---------------------------
@@ -130,12 +142,14 @@ function main() {
 }
 libraryexit(process_comment2)
 
+
 libraryinit(process_count)
 //------------------------
 function main() {
 	return 1;
 }
 libraryexit(process_count)
+
 
 libraryinit(process_duration)
 //---------------------------
@@ -160,12 +174,14 @@ function main() {
 }
 libraryexit(process_duration)
 
+
 libraryinit(process_weekcommencing)
 //---------------------------------
 function main() {
 	return RECORD.a(1) - ((RECORD.a(1) - 1).mod(7));
 }
 libraryexit(process_weekcommencing)
+
 
 libraryinit(reverse_the_users)
 //----------------------------
@@ -176,6 +192,7 @@ function main() {
 	return ANS;
 }
 libraryexit(reverse_the_users)
+
 
 libraryinit(user_code_html)
 //-------------------------
@@ -195,6 +212,7 @@ function main() {
 }
 libraryexit(user_code_html)
 
+
 libraryinit(user_code_with_email)
 //-------------------------------
 function main() {
@@ -210,3 +228,4 @@ function main() {
 	return usercodes;
 }
 libraryexit(user_code_with_email)
+

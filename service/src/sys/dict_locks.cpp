@@ -7,9 +7,9 @@ function main() {
 }
 libraryexit(key2)
 
+
 libraryinit(lock_expired)
 //-----------------------
-
 var dostime;//num
 
 function main() {
@@ -20,3 +20,4 @@ function main() {
 	return RECORD.a(1) le dostime;
 }
 libraryexit(lock_expired)
+

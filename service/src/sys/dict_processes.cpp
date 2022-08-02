@@ -2,7 +2,6 @@
 
 libraryinit(last_updated2)
 //------------------------
-
 var uptodate;
 var uptotime;
 
@@ -52,6 +51,7 @@ function main() {
 }
 libraryexit(last_updated2)
 
+
 libraryinit(maintenance)
 //----------------------
 function main() {
@@ -64,12 +64,14 @@ function main() {
 }
 libraryexit(maintenance)
 
+
 libraryinit(pid)
 //--------------
 function main() {
 	return RECORD.a(54, 5);
 }
 libraryexit(pid)
+
 
 libraryinit(status)
 //-----------------
@@ -112,3 +114,4 @@ function main() {
 	return ANS;
 }
 libraryexit(status)
+
