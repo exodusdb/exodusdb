@@ -27,7 +27,7 @@ function main() {
 		"\n"
 		"SOURCE can be a database name or an sql file containing COPY data like that produced by pg_dump\n"
 		"\n"
-		"TARGET can be a database name or a dir path ending /\n"
+		"TARGET can be a database name or an OS dir path ending /\n"
 		"\n"
 		"SOURCE and TARGET must be followed by : otherwise the default database will used.\n"
 		"\n"
@@ -42,6 +42,8 @@ function main() {
 		//"D - Delete causes any records in the target which dont exist in the source to be deleted.\n"
 		//"\n"
 		"C - Create is required if the target file does not exist and should be created. Implies Overwrite and New.\n"
+		"\n"
+		"R - Leave raw vm/sm/tm when copying to OS dir\n"
 		"\n";
 
 		abort(syntax);
@@ -66,6 +68,12 @@ function main() {
 		allow_overwrite = 1;
 		allow_new = 1;
 	}
+
+	// Raw option
+	var txt5fmt = "TX";
+	// Raw option only converts FM to NL and leaves VM SM TM STM as are
+	if (OPTIONS.index("R"))
+		txt5fmt ^= "1";
 
 	//parse source
 	var sourcename = "";
@@ -197,7 +205,8 @@ function main() {
 
 			// Duplicate code in main() and getrec()
 			targetdir = targetname ^ targetfilename ^ "/";
-			osmkdir(targetdir);
+			if (not osdir(targetdir) and not osmkdir(targetdir))
+				abort(targetdir.quote() ^ " dir could not be created");
 		}
 
 		// Speed up updates
@@ -229,7 +238,8 @@ function main() {
 				exists = oldrec.read(file2,ID);
 			} else {
 				exists = oldrec.osread(targetdir ^ ID);
-				gosub escape_text(RECORD);
+				//escape into special txt format
+				RECORD = RECORD.oconv(txt5fmt);
 			}
 			if (exists) {
 
@@ -358,7 +368,8 @@ function getrec() {
 			// Duplicate code in main() and getrec()
 			else {
 				targetdir = targetname ^ targetfilename ^ "/";
-				osmkdir(targetdir);
+				if (not osdir(targetdir) and not osmkdir(targetdir))
+					abort(targetdir.quote() ^ " dir could not be created.");
 			}
 
 			continue;
@@ -390,36 +401,6 @@ function getrec() {
 	print(AT(-40) ^ recn ^ ".", ID);
 
 	return true;
-}
-
-//WARNING: KEEP AS REVERSE OF unescape_text() IN sync_dat.cpp
-subroutine escape_text(io record) {
-
-	//escape backslashes
-	record.swapper("\\", "\\\\");
-
-	//escape new lines
-	record.swapper("\n", "\\n");
-
-	//replace FM with new lines
-	record.converter(FM, "\n");
-
-	return;
-}
-
-//identical code in copyfile and sync_dat
-subroutine unescape_text(io record) {
-
-	//replace new lines with FM
-	record.converter("\n", FM);
-
-	//unescape new lines
-	record.swapper("\\n", "\n");
-
-	//unescape backslashes
-	record.swapper("\\\\", "\\");
-
-	return;
 }
 
 subroutine unescape_sql(io arg1) {

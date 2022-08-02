@@ -6,17 +6,20 @@ programinit()
 
 function main() {
 
-	var datpath = COMMAND.a(2);
+	var homedir;
+	if (not homedir.osgetenv("EXO_HOME"))
+		homedir = osgetenv("HOME");
 
+	var datpath = COMMAND.a(2);
 	if (not datpath) {
-		//datpath = osgetenv("EXO_HOME") ^ "/dat";
-		if (not datpath.osgetenv("EXO_HOME"))
-			datpath = osgetenv("HOME");
-		datpath ^= "/dat";
+		datpath = homedir ^ "/dat";
 	}
 
 	var force = index(OPTIONS, "F");
+	var generate_dict_cpp = index(OPTIONS, "G");
 	var verbose = index(OPTIONS, "V");
+
+	var txtfmt = "TX";
 
 	// Skip if no definitions file
 	var definitions;
@@ -72,7 +75,10 @@ function main() {
 			}
 		}
 
-		// Process each file/record in the subdir
+		var isdict = generate_dict_cpp and dbfilename.starts("dict.");
+		var newcpptext = "#include <exodus/library.h>\n";
+
+		// Process each dat file/record in the subdir
 		var osfilenames = oslistf(dirpath ^ "*");
 		for (var osfilename : osfilenames) {
 
@@ -84,19 +90,66 @@ function main() {
 			if (ID.starts(".") or ID.ends(".swp"))
 				continue;
 
-			// Skip files/records which are not newer
+			// Get the dat record
 			var filepath = dirpath ^ ID;
+			if (not osread(RECORD from filepath)) {
+				errputl("Error: sync_dat cannot read " ^ ID ^ " from " ^ filepath);
+				continue;
+			}
+
+			// unescape to convert from txt to pickos format.
+			RECORD = RECORD.iconv(txtfmt);
+
+			// Add it to newcpptext
+			if (isdict and RECORD.a(1) eq "S") {
+
+				// dict intro
+				var line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
+				newcpptext ^= line1 ^ "\n";
+				newcpptext ^= "/" "/" ^ str("-", len(line1) - 3) ^ "\n";
+
+				var dictsrc = RECORD(8);
+				dictsrc.converter(VM, "\n");
+
+				// Add dict function intro
+				var addfunctionmain = not dictsrc.index("function main()");
+				if (addfunctionmain) {
+					newcpptext ^= "function main() {\n";
+
+					// Add closing brace before pgsql , if present
+					var t = dictsrc.index("\n/*pgsql");
+					if (t) {
+						dictsrc.splicer(t, 1, "}\n");
+						addfunctionmain = false;
+					}
+				}
+//TRACE(ID)
+//TRACE(dictsrc)
+//stop();
+				newcpptext ^= dictsrc ^ "\n";
+
+				// Close function main if not already done
+				if (addfunctionmain)
+					newcpptext ^= "}\n";
+
+				// dict outro
+				newcpptext ^= "libraryexit(" ^ ID.lcase() ^ ")\n\n";
+
+			}
+
+			// Skip files/records which are not newer
 			if (not force and not is_newer(osfile(filepath))) {
 				if (verbose)
 					printl("Not newer", dbfilename, ID);
 				continue;
 			}
 
-			if (not osread(RECORD from filepath)) {
-				errputl("Error: sync_dat cannot read " ^ ID ^ " from " ^ filepath);
-				continue;
-			}
-			gosub unescape_text(RECORD);
+			// Moved up so we can generate complete dict_xxxxxxxx.cpp source
+			//if (not osread(RECORD from filepath)) {
+			//	errputl("Error: sync_dat cannot read " ^ ID ^ " from " ^ filepath);
+			//	continue;
+			//}
+			//gosub unescape_text(RECORD);
 
 			//get any existing record
 			var oldrecord;
@@ -121,8 +174,36 @@ function main() {
 				if (not osshell(cmd))
 					errputl("Error: sync_dat: In dict2sql for " ^ ID ^ " in " ^ dbfilename);
 			}
+
+
+		} // next dat file
+
+		if (isdict) {
+			var dictcppfilename = "dict_" ^ dirname;
+
+			var incfilename = homedir ^ "/inc/" ^ dbfilename.convert(".", "_") ^ ".h";
+
+			var incfiletext;
+			if (not osread(incfiletext from incfilename)) {
+				//abort("sync_dat cannot read " ^ incfilename);
+				errputl("sync_dat cannot read " ^ incfilename);
+				continue;
+			}
+
+			dictcppfilename = incfiletext.field(DQ, 2).field(" ", 2);
+			var oldcpptext;
+			if (not osread(oldcpptext from dictcppfilename))
+				oldcpptext = "";
+
+			if (newcpptext ne oldcpptext) {
+				//if (not oswrite(newcpptext on dbfilename))
+				if (not oswrite(newcpptext on dictcppfilename))
+					abort("sync_dat cannot write " ^ dictcppfilename);
+				printl("Updated", dictcppfilename);
+			}
 		}
-	}
+
+	} // next dat dir
 
 	// Record the current sync date and time
 	if (definitions)
@@ -145,22 +226,6 @@ function is_newer(in fsinfo) {
 
     return fsinfo.a(3) > last_sync_time;
 
-}
-
-//WARNING: KEEP AS REVERSE OF escape_text() IN COPYFILE
-//identical code in copyfile and sync_dat
-subroutine unescape_text(io record) {
-
-	//replace new lines with FM
-	record.converter("\n", FM);
-
-	//unescape new lines
-	record.swapper("\\n", "\n");
-
-	//unescape backslashes
-	record.swapper("\\\\", "\\");
-
-	return;
 }
 
 programexit()
