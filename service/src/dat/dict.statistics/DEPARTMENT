@@ -5,7 +5,20 @@ S
 
 
 
-@ans=@record<3>*may be missing try to get from user fileif @ans else @ans=xlate('USERS',field(@id,'*',3),5,'X')*use database as better than blank/unknownif @ans else if field(@id,'*',3)='EXODUS' then  @ans='EXODUS' end else  @ans=field(@id,'*',1)  end end
+	ANS = RECORD.a(3);\
+	//may be missing try to get from user file\
+	if (not ANS) {\
+		ANS = ID.field("*", 3).xlate("USERS", 5, "X");\
+	}\
+	//use database as better than blank/unknown\
+	if (not ANS) {\
+		if (ID.field("*", 3) eq "EXODUS") {\
+			ANS = "EXODUS";\
+		} else {\
+			ANS = ID.field("*", 1);\
+		}\
+	}\
+	return ANS;
 T
 20
 

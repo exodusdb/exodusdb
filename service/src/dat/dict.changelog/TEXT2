@@ -5,7 +5,13 @@ S
 
 
 
-@ans=@record<3>distrib=@record<5>convert @svm to ':' in distribif distrib and not(index(distrib,'User',1)) then @ans[1,0]=field(distrib,':',1):': '
+	ANS = RECORD.a(3);\
+	var distrib = RECORD.a(5);\
+	distrib.converter(SVM, ":");\
+	if (distrib and not(distrib.index("User"))) {\
+		ANS.splicer(1, 0, distrib.field(":", 1) ^ ": ");\
+	}\
+	return ANS;
 T
 60
 

@@ -5,7 +5,9 @@ S
 
 
 
-declare function trim2@ans=trim2(@record<2>,@vm)
+function main() {\
+	return trim(RECORD.a(2), VM);\
+}
 T
 30
 

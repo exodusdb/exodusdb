@@ -5,7 +5,44 @@ S
 
 
 
-*NB add any new statuses to MONITORING programif @record<52> then @ans='Closed' return @ans endcall processlocking('ISLOCKED',@id,islocked)if not(islocked) and @volumes then @ans='Crashed' return @ans enddostimenow=date()+24873+time()/86400*10 minshungtime=10.0*60/86400r33=@record<33>if r33 and (dostimenow-@record<27>) gt hungtime then if @VOLUMES then  @ans='Hung' end else  @ans='Closed'  end return @ans endif r33 then @ans='OK'end else @ans='Maintenance' endif @record<53> then @ans:=' ':@record<53>return @ans
+#include <processlocking.h>\
+\
+var islocked;\
+\
+function main() {\
+	//NB add any new statuses to MONITORING program\
+	if (RECORD.a(52)) {\
+		ANS = "Closed";\
+		return ANS;\
+	}\
+	call processlocking("ISLOCKED", ID, islocked);\
+	if (not(islocked) and VOLUMES) {\
+		ANS = "Crashed";\
+		return ANS;\
+	}\
+\
+	var dostimenow = var().date() + 24873 + var().time() / 86400;\
+	//10 mins\
+	var hungtime = 10 * 60 / 86400.0;\
+	var r33 = RECORD.a(33);\
+	if (r33 and (dostimenow - RECORD.a(27) gt hungtime)) {\
+		if (VOLUMES) {\
+			ANS = "Hung";\
+		} else {\
+			ANS = "Closed";\
+		}\
+		return ANS;\
+	}\
+	if (r33) {\
+		ANS = "OK";\
+	} else {\
+		ANS = "Maintenance";\
+	}\
+	if (RECORD.a(53)) {\
+		ANS ^= " " ^ RECORD.a(53);\
+	}\
+	return ANS;\
+}
 L
 10
 

@@ -1,11 +1,12 @@
 S
 
-UsernameCreated
+Username\
+Created
 S
 
 
 
-@ans={USERNAME_UPDATED}<1,1>
+	return calculate("USERNAME_UPDATED").a(1, 1);
 L
 10
 

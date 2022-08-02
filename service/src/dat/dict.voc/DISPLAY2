@@ -5,7 +5,9 @@ S
 
 
 
-@ans=@record<3>convert @vm to ' ' in @ans
+	ANS = RECORD.a(3);\
+	ANS.converter(VM, " ");\
+	return ANS;
 T
 13
 

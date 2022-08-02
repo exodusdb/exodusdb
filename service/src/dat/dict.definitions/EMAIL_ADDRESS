@@ -5,7 +5,7 @@ M1
 
 
 
-@ans=xlate('USERS',@record<1>,7,'X')
+	return RECORD.a(1).xlate("USERS", 7, "X");
 T
 20
 

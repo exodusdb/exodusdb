@@ -5,7 +5,7 @@ S
 
 
 
-@ans=1
+	return 1;
 R
 10
 

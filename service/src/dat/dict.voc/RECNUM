@@ -5,7 +5,8 @@ S
 
 
 
-*@reccount is the same thing@ANS=@REC.COUNT
+	//@reccount is the same thing\
+	return RECCOUNT;
 L
 10
 

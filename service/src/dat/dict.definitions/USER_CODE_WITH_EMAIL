@@ -5,7 +5,16 @@ M
 
 
 
-usercodes=@record<1,@mv>emails=@record<7,@mv>nusers=count(usercodes,@vm)+1for usern=1 to nusers if emails<1,usern>='' then  usercodes<1,usern>=''  end next usernreturn usercodes
+	var usercodes = RECORD.a(1, MV);\
+	var emails = RECORD.a(7, MV);\
+\
+	var nusers = usercodes.count(VM) + 1;\
+	for (const var usern : range(1, nusers)) {\
+		if (emails.a(1, usern) eq "") {\
+			usercodes(1, usern) = "";\
+		}\
+	} //usern;\
+	return usercodes;
 L
 10
 

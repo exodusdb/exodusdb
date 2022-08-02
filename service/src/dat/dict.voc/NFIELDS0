@@ -5,7 +5,8 @@ S
 
 
 
-convert \\\\FE20\\\\ to \\\\20FE\\\\ in @record@ans=count(trim(@record),' ')+1
+	RECORD.converter(_FM_ " ", " " _FM_);\
+	return RECORD.trim().count(" ") + 1;
 L
 10
 

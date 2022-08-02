@@ -1,11 +1,28 @@
 S
 
-DurationHrs:Min:Sec
+Duration\
+Hrs:Min:Sec
 S
 
 
 
-secsperday=24*60*60uptodate=@record<11>uptotime=@record<12>if uptodate='' then uptodate=date()if uptotime='' then uptotime=time()daysecs=(uptodate-@record<1>)*secsperdaytimesecs=uptotime-@record<2>totsecs=daysecs+timesecshours=int(totsecs/60/60)mins=mod(int(totsecs/60),60)secs=int(mod(totsecs,60))@ans=hours:':':mins 'R(0)#2':':':secs 'R(0)#2':'.':field(totsecs,'.',2) 'R#2'
+	var secsperday = 24 * 60 * 60;\
+	var uptodate = RECORD.a(11);\
+	var uptotime = RECORD.a(12);\
+	if (uptodate eq "") {\
+		uptodate = var().date();\
+	}\
+	if (uptotime eq "") {\
+		uptotime = var().time();\
+	}\
+	var daysecs = (uptodate - RECORD.a(1)) * secsperday;\
+	var timesecs = uptotime - RECORD.a(2);\
+	var totsecs = daysecs + timesecs;\
+\
+	var hours = (totsecs / 60 / 60).floor();\
+	var mins = ((totsecs / 60).floor()).mod(60);\
+	var secs = totsecs.mod(60).floor();\
+	return hours ^ ":" ^ mins.oconv("R(0)#2") ^ ":" ^ secs.oconv("R(0)#2") ^ "." ^ totsecs.field(".", 2).oconv("R#2");
 R
 12
 

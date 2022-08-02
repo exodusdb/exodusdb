@@ -5,7 +5,11 @@ S
 0
 
 
-@ANS=COUNT(@RECORD,@FM)+1IF @RECORD EQ '' THEN @ANS=0
+	ANS = RECORD.count(FM) + 1;\
+	if (RECORD eq "") {\
+		ANS = 0;\
+	}\
+	return ANS;
 R
 6
 

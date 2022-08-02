@@ -5,7 +5,13 @@ S
 
 
 
-ans=@record<39,6>call htmllib2('OCONV.AGENT.BROWSER',ans)return ans
+#include <htmllib2.h>\
+\
+function main() {\
+	var ans = RECORD.a(39, 6);\
+	call htmllib2("OCONV.AGENT.BROWSER", ans);\
+	return ans;\
+}
 T
 20
 

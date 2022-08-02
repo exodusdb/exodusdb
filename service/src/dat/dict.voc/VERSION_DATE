@@ -5,7 +5,7 @@ S
 
 
 [DATE,4]
-@ans=iconv(field(trim({VERSION}),' ',2,3),'D')
+	return calculate("VERSION").trim().field(" ", 2, 3).iconv("D");
 R
 10
 

@@ -5,7 +5,9 @@ S
 0
 
 
-@ANS=@RECORDCONVERT \\\\FFFEFDFCFBFAF9F8\\\\ TO '' IN @ANS
+	ANS = RECORD;\
+	ANS.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ "\u07f9\u07f8", "");\
+	return ANS;
 L
 10
 

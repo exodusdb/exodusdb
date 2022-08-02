@@ -5,7 +5,61 @@ S
 
 
 
-$INSERT GBP,GENERAL.COMMON*COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE*IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999**IF @RECCOUNT LT LAST.RECCOUNT THEN**  FN=''**  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')*fn='QFILE'OPEN '',FN TO COMPARE.FILE ELSE STOP 'CANNOT OPEN ':FN*ENDLAST.RECCOUNT = @RECCOUNTREAD REC FROM COMPARE.FILE, @ID THEN  IF @RECORD EQ REC THEN @ANS = '' ELSE   IF @ID[1,1]='$' THEN    REC.DATETIME=FIELD2(@RECORD,@FM,-1)    REC.DATETIME=TRIM(FIELD(REC.DATETIME,' ',2,9)):' ':FIELD(REC.DATETIME,' ',1)    REC.DATETIME=ICONV(REC.DATETIME,'DT')    CMP.DATETIME=FIELD2(REC,@FM,-1)    CMP.DATETIME=TRIM(FIELD(CMP.DATETIME,' ',2,9)):' ':FIELD(CMP.DATETIME,' ',1)    CMP.DATETIME=ICONV(CMP.DATETIME,'DT')    IF REC.DATETIME AND CMP.DATETIME ELSE GOTO CHANGED    IF REC.DATETIME EQ CMP.DATETIME THEN GOTO CHANGED    IF REC.DATETIME GT CMP.DATETIME THEN     @ANS='REPLACES'    END ELSE     @ANS='REPLACED'     END   END ELSECHANGED:    @ANS = 'CHANGED'    END   ENDEND ELSE  @ANS = 'NEW REC'END
+#include <sys_common.h>\
+\
+var rec;\
+\
+function main() {\
+	#include <system_common.h>\
+\
+	//COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE\
+	//IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999\
+	//!IF @RECCOUNT LT LAST.RECCOUNT THEN\
+	//!  FN=''\
+	//!  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')\
+	//\
+\
+	var fn = "QFILE";\
+	var comparefile;\
+	if (not(comparefile.open(fn))) {\
+		printl("CANNOT OPEN " ^ fn);\
+		stop();\
+	}\
+\
+	//END\
+	var lastreccount = RECCOUNT;\
+	if (rec.reado(comparefile, ID)) {\
+		if (RECORD eq rec) {\
+			ANS = "";\
+		} else {\
+			if (ID[1] eq "$") {\
+				var recdatetime = field2(RECORD, FM, -1);\
+				recdatetime = recdatetime.field(" ", 2, 9).trim() ^ " " ^ recdatetime.field(" ", 1);\
+				recdatetime = recdatetime.iconv("DT");\
+				var cmpdatetime = field2(rec, FM, -1);\
+				cmpdatetime = cmpdatetime.field(" ", 2, 9).trim() ^ " " ^ cmpdatetime.field(" ", 1);\
+				cmpdatetime = cmpdatetime.iconv("DT");\
+				if (not(recdatetime and cmpdatetime)) {\
+					goto changed;\
+				}\
+				if (recdatetime eq cmpdatetime) {\
+					goto changed;\
+				}\
+				if (recdatetime gt cmpdatetime) {\
+					ANS = "REPLACES";\
+				} else {\
+					ANS = "REPLACED";\
+				}\
+			} else {\
+changed:\
+				ANS = "CHANGED";\
+			}\
+		}\
+	} else {\
+		ANS = "NEW REC";\
+	}\
+	return ANS;\
+}
 R
 1
 

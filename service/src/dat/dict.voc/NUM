@@ -5,7 +5,11 @@ S
 0
 
 
-@ANS=@IDHOLD=@IDCONVERT '0123456789' TO '' IN HOLDCONVERT HOLD TO '' IN @ANS
+	ANS = ID;\
+	var hold = ID;\
+	hold.converter("0123456789", "");\
+	ANS.converter(hold, "");\
+	return ANS;
 R
 10
 

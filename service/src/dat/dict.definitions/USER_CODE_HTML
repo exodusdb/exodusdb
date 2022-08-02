@@ -5,7 +5,18 @@ M1
 
 
 
-usercodes={USERS}emails=xlate('USERS',usercodes,7,'X')nusers=count(usercodes,@vm)+1for usern=1 to nusers usercode=usercodes<1,usern> if usercode then  if emails<1,usern>='' then   usercodes<1,usern>='<B>':usercode:'</B>'   end  end next usernreturn usercodes
+	var usercodes = calculate("USERS");\
+	var emails = usercodes.xlate("USERS", 7, "X");\
+	var nusers = usercodes.count(VM) + 1;\
+	for (const var usern : range(1, nusers)) {\
+		var usercode = usercodes.a(1, usern);\
+		if (usercode) {\
+			if (emails.a(1, usern) eq "") {\
+				usercodes(1, usern) = "<B>" ^ usercode ^ "</B>";\
+			}\
+		}\
+	} //usern;\
+	return usercodes;
 T
 20
 

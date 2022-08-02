@@ -5,7 +5,59 @@ M
 
 
 
-if @record<1> then data=@record<8> convert @vm to @fm in dataend else data=@record endn=count(data,@fm)+1convert @lower.case to @upper.case in dataconvert '"' to "'" in data@ans=''for fn=1 to n tx=trim(data<fn>) if index(tx,'xlate(',1) and (index(tx,"','C')",1) or index(tx,"','X')",1)) then  *gosub change2  @ans<1,-1>=tx  end *if index(tx,'MSG(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) ) then * gosub change * @ans<1,-1>=tx * end *if index(tx,'NOTE(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) or index(tx,",'T",1)) then * gosub change * @ans<1,-1>=tx * end next fnreturn @ans/*change: tx=data<fn> swap 'MSG(' with 'msg2(' in tx declare function decide2 if decide2(@id:@fm:tx:'','',reply,2) else stop if reply=1 then  open 'TEMP' to file else call fsmsg();stop  *writev tx on file,@id,fn  if @record<1>='S' then   @record<8,fn>=tx  end else   @record<fn>=tx   end  write @record on file,@id  end return*/
+var datax;\
+\
+function main() {\
+	if (RECORD.a(1)) {\
+		datax = RECORD.a(8);\
+		datax.converter(VM, FM);\
+	} else {\
+		datax = RECORD;\
+	}\
+	var nn = datax.count(FM) + 1;\
+	datax.ucaser();\
+	datax.converter(DQ, "'");\
+	ANS = "";\
+	for (const var fn : range(1, nn)) {\
+		var tx = datax.a(fn).trim();\
+\
+		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {\
+		//gosub change2\
+			ANS(1, -1) = tx;\
+		}\
+\
+	//if index(tx,'MSG(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) ) then\
+	// gosub change\
+	// @ans<1,-1>=tx\
+	// end\
+\
+	//if index(tx,'NOTE(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) or index(tx,",'T",1)) then\
+	// gosub change\
+	// @ans<1,-1>=tx\
+	// end\
+\
+	} //fn;\
+	return ANS;\
+	/*;\
+	change:\
+		tx=data<fn>;\
+		swap 'MSG(' with 'msg2(' in tx;\
+		declare function decide2;\
+		if decide2(@id:@fm:tx:'','',reply,2) else stop;\
+		if reply=1 then;\
+			open 'TEMP' to file else call fsmsg();stop;\
+			//writev tx on file,@id,fn\
+			if @record<1>='S' then;\
+				@record<8,fn>=tx;\
+			end else;\
+				@record<fn>=tx;\
+				end;\
+			write @record on file,@id;\
+			end;\
+		return 0;\
+	*/\
+	return ANS;\
+}
 T
 60
 

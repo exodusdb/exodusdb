@@ -5,7 +5,15 @@ S
 
 
 
-usercode=field(@id,'*',3)@ans=xlate('USERS',usercode,1,'X')if @ans='' then @ans=usercode swap ' ' with '_' in @ansend else if @ans<>usercode then @ans:=' (':usercode:')' end
+	var usercode = ID.field("*", 3);\
+	ANS = usercode.xlate("USERS", 1, "X");\
+	if (ANS eq "") {\
+		ANS = usercode;\
+		ANS.swapper(" ", "_");\
+	} else if (ANS ne usercode) {\
+		ANS ^= " (" ^ usercode ^ ")";\
+	}\
+	return ANS;
 T
 20
 

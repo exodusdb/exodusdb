@@ -5,7 +5,9 @@ S
 
 
 
-@ans=field(@id,'*',3)swap ' ' with '_' in @ans
+	ANS = ID.field("*", 3);\
+	ANS.swapper(" ", "_");\
+	return ANS;
 L
 10
 

@@ -5,7 +5,12 @@ S
 
 
 
-if @record<33> then @ans='' else @ans='Yes'
+	if (RECORD.a(33)) {\
+		ANS = "";\
+	} else {\
+		ANS = "Yes";\
+	}\
+	return ANS;
 L
 10
 

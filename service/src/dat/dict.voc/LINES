@@ -5,7 +5,9 @@ M
 0
 
 
-@ANS=@RECORDCONVERT @FM TO @VM IN @ANS
+	ANS = RECORD;\
+	ANS.converter(FM, VM);\
+	return ANS;
 L
 60
 

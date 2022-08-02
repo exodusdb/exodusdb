@@ -5,7 +5,22 @@ S
 
 
 
-convert @lower.case to @upper.case in @recordreturn @record*@ANS=@RECORD*convert @lower.case to @upper.case in @ansANS=@RECORDconvert @lower.case to @upper.case in ans*can cause out of memory*1. doesnt help*declare function memspace*mem=memspace(999999)*2. dont pass back in @ans variable seems to solve it!*transfer @ans to ans*if you return something then it uses it, otherwise it uses what is in @ansreturn @record
+function main() {\
+	RECORD.ucaser();\
+	return RECORD;\
+	//@ANS=@RECORD\
+	//convert @lower.case to @upper.case in @ans\
+	var ans = RECORD;\
+	ans.ucaser();\
+	//can cause out of memory\
+	//1. doesnt help\
+	//declare function memspace\
+	//mem=memspace(999999)\
+	//2. dont pass back in @ans variable seems to solve it!\
+	//transfer @ans to ans\
+	//if you return something then it uses it, otherwise it uses what is in @ans\
+	return RECORD;\
+}
 T
 30
 

@@ -5,7 +5,25 @@ S
 
 
 
-origrecord=@recordorigid=@idcall conv2utf8(msg,@recur0,'')@recur1+=1print @(0):@(-4):@recur1:'. ':@rec.count:@ans=msgif @ans else @ans=@record<>origrecord or @id<>origid end*restore otherwise select will not find it again@id=origid
+#include <conv2utf8.h>\
+\
+var msg;\
+\
+function main() {\
+	var origrecord = RECORD;\
+	var origid = ID;\
+	call conv2utf8(msg, RECUR0, "");\
+	RECUR1 += 1;\
+	if (TERMINAL)\
+		output(AT(-40), RECUR1, ". ", RECCOUNT);\
+	ANS = msg;\
+	if (not ANS) {\
+		ANS = RECORD ne origrecord or ID ne origid;\
+	}\
+	//restore otherwise select will not find it again\
+	ID = origid;\
+	return ANS;\
+}
 T
 10
 

@@ -1,11 +1,23 @@
 S
 
-AuthorisedTask Access
+Authorised\
+Task Access
 S
 
 
 
-declare function securityif security('TASK ACCESS',msg,'',@id) then @ans=1end else @ans=0 end
+#include <authorised.h>\
+\
+var msg;\
+\
+function main() {\
+	if (authorised("TASK ACCESS", msg, "", ID)) {\
+		ANS = 1;\
+	} else {\
+		ANS = 0;\
+	}\
+	return ANS;\
+}
 L
 10
 

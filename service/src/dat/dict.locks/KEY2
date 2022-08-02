@@ -5,7 +5,7 @@ S
 
 
 
-@ans=field(@id,'*',2,999)
+	return ID.field("*", 2, 999);
 L
 20
 

@@ -5,7 +5,12 @@ S
 
 
 
-return @id/*pgsqlreturn key;*/
+	return ID;\
+	return ANS;\
+\
+/*pgsql\
+	return key;\
+*/
 R
 10
 

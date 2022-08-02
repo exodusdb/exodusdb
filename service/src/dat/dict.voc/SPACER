@@ -5,7 +5,7 @@ S
 
 
 
-@ans=''
+	return "";
 L
 10
 

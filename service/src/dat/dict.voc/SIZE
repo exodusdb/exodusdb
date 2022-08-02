@@ -5,7 +5,7 @@ S
 
 
 
-@ANS=LEN(@RECORD) + LEN(@ID) + 5
+	return RECORD.length() + ID.length() + 5;
 R
 8
 

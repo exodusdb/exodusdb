@@ -5,7 +5,7 @@ S
 
 
 
-@ANS=@RECORD
+	return RECORD;
 T
 30
 

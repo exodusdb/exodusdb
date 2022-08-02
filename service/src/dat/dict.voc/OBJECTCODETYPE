@@ -5,7 +5,7 @@ S
 
 
 
-@ans=seq(@record<1>)
+	return RECORD.a(1).seq();
 L
 10
 

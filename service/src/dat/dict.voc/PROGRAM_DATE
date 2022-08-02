@@ -5,7 +5,8 @@ S
 
 
 [DATE,4]
-ans={TIMEDATE}@ans=iconv(ans[11,99],'D')
+	var ans = calculate("TIMEDATE");\
+	return ans.substr(11, 99).iconv("D");
 R
 12
 

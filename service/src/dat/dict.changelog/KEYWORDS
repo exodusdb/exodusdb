@@ -1,1 +1,37 @@
-SKeywordsS@ans=@record<2>swap @vm with ", " in @ansswap @svm with ", " in @ans/*pgsql ans := exodus_extract_text(DATA, 2, 0, 0); ans := replace(ans, VM, ', '); ans := replace(ans, SM, ', ');*/L200
+S
+
+Keywords
+S
+
+
+
+	ANS = RECORD.a(2);\
+	ANS.swapper(VM, ", ");\
+	ANS.swapper(SVM, ", ");\
+	return ANS;\
+\
+/*pgsql\
+	ans := exodus_extract_text(DATA, 2, 0, 0);\
+	ans := replace(ans, VM, ', ');\
+	ans := replace(ans, SM, ', ');\
+*/
+L
+20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

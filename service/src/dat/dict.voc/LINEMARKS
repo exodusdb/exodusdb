@@ -5,7 +5,16 @@ S
 
 
 
-if index('$*',@id[1,1],1) then return ''end else if index(@record,'linemark',1) then tt=@record convert ' ' to @fm in tt return index(tt,@fm:'linemark',1)end else @ans=0 endreturn @ans
+	if (var("$*").index(ID[1])) {\
+		return "";\
+	} else if (RECORD.index("linemark")) {\
+		var tt = RECORD;\
+		tt.converter(" ", FM);\
+		return tt.index(FM ^ "linemark");\
+	} else {\
+		ANS = 0;\
+	}\
+	return ANS;
 L
 10
 

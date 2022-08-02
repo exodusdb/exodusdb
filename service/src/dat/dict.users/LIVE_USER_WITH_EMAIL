@@ -5,7 +5,17 @@ S
 
 
 
-if @record<7> then expired=@record<35> if expired and expired<=date() then  @ans=0 end else  @ans=1  endend else @ans='' end
+	if (RECORD.a(7)) {\
+		var expired = RECORD.a(35);\
+		if (expired and expired le var().date()) {\
+			ANS = 0;\
+		} else {\
+			ANS = 1;\
+		}\
+	} else {\
+		ANS = "";\
+	}\
+	return ANS;
 L
 10
 

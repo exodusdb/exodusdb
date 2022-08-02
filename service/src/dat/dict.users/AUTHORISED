@@ -5,7 +5,52 @@ S
 
 
 
-$insert gbp,general.commonif @id='EXODUS' then goto unknownlocate @username in userprivs<1> setting usern then if security('TIMESHEET ADMINISTRATOR') then  ans=1  return ans  end *may not be allowed to access higher users/groups if usern>@record<11> then  ans=security('AUTHORISATION UPDATE HIGHER GROUPS') end else  *look for the user in the same group as the active user  for usern2=usern to 9999   user=userprivs<1,usern2>  while user and user<>'---' and user ne @id   next usern2  *if found then same group therefore ok  if user=@id then   ans=1  end else   *not found therefore possibly not allowed access   ans=security('AUTHORISATION UPDATE LOWER GROUPS')   end  endend elseunknown: ans=(@username='EXODUS') endreturn ans
+#include <authorised.h>\
+\
+#include <sys_common.h>\
+\
+var usern;\
+var ans;//num\
+var userx;\
+\
+function main() {\
+	#include <system_common.h>\
+	if (ID eq "EXODUS") {\
+		goto unknown;\
+	}\
+	if (SECURITY.a(1).locate(USERNAME, usern)) {\
+		if (authorised("TIMESHEET ADMINISTRATOR")) {\
+			ans = 1;\
+			return ans;\
+		}\
+	//may not be allowed to access higher users/groups\
+		if (usern gt RECORD.a(11)) {\
+			ans = authorised("AUTHORISATION UPDATE HIGHER GROUPS");\
+		} else {\
+\
+		//look for the user in the same group as the active user\
+			for (const var usern2 : range(usern, 9999)) {\
+				userx = SECURITY.a(1, usern2);\
+				///BREAK;\
+				if (not((userx and userx ne "---") and userx ne ID)) break;\
+			} //usern2;\
+\
+		//if found then same group therefore ok\
+			if (userx eq ID) {\
+				ans = 1;\
+			} else {\
+\
+			//not found therefore possibly not allowed access\
+				ans = authorised("AUTHORISATION UPDATE LOWER GROUPS");\
+\
+			}\
+		}\
+	} else {\
+unknown:\
+		ans = USERNAME eq "EXODUS";\
+	}\
+	return ans;\
+}
 L
 10
 

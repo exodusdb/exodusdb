@@ -1,11 +1,12 @@
 S
 
-ChequeA/c Name
+Cheque\
+A/c Name
 S
 
 
 
-@ans=xlate('ACCOUNTS',field(@id,'*',2),1,'X')
+	return ID.field("*", 2).xlate("ACCOUNTS", 1, "X");
 T
 20
 

@@ -5,7 +5,7 @@ TIME
 
 
 MTHS
-@ANS=FIELD(DIR(@ID),@FM,3)
+	return ID.osfile().field(FM, 3);
 L
 9
 

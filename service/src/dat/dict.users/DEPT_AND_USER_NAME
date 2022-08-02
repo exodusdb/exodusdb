@@ -5,7 +5,7 @@ S
 
 
 
-@ans=@record<5>:' - ':@record<1>
+	return RECORD.a(5) ^ " - " ^ RECORD.a(1);
 T
 30
 

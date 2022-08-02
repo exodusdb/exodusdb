@@ -5,7 +5,21 @@ S
 
 
 
-common /system/ system@ans=''if field(@id,'*',2)=system<32> then @ans<1,-1>='Current user session'if trim(@record<3>)=trim(@station) then @ans<1,-1>='Current workstation'if @record<5>=@username then @ans<1,-1>='Current user'
+#include <sys_common.h>\
+\
+function main() {\
+	ANS = "";\
+	if (ID.field("*", 2) eq SYSTEM.a(32)) {\
+		ANS(1, -1) = "Current user session";\
+	}\
+	if (RECORD.a(3).trim() eq STATION.trim()) {\
+		ANS(1, -1) = "Current workstation";\
+	}\
+	if (RECORD.a(5) eq USERNAME) {\
+		ANS(1, -1) = "Current user";\
+		}\
+	return ANS;\
+}
 T
 30
 

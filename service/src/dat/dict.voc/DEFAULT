@@ -8,7 +8,10 @@ S
 
 L
 10
-"NULL""CURRENT""USER"'"'0X'"'
+"NULL"\
+"CURRENT"\
+"USER"\
+'"'0X'"'
 VARCHAR
 
 

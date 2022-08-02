@@ -1,11 +1,16 @@
 S
 
-ChequeIs Default
+Cheque\
+Is Default
 S
 
 
 
-@ans=@record<14>if @ans then @ans='Default'
+	ANS = RECORD.a(14);\
+	if (ANS) {\
+		ANS = "Default";\
+	}\
+	return ANS;
 L
 1
 

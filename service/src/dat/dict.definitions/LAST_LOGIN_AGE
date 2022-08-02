@@ -1,11 +1,20 @@
 S
 
-Last LoginAge (days)
+Last Login\
+Age (days)
 M1
 
 
 
-@ans=xlate('USERS',{USER_CODE_WITH_EMAIL},13,'X')nn=count(@ans,@vm)+1for ii=1 to nn logindate=int(@ans<1,ii>) if logindate then  @ans<1,ii>=(date()-logindate) 'MD00P'  end next
+	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");\
+	var nn = ANS.count(VM) + 1;\
+	for (const var ii : range(1, nn)) {\
+		var logindate = ANS.a(1, ii).floor();\
+		if (logindate) {\
+			ANS(1, ii) = (var().date() - logindate).oconv("MD00P");\
+		}\
+	} //ii;\
+	return ANS;
 R
 5
 

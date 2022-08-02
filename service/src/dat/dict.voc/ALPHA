@@ -5,7 +5,9 @@ S
 0
 
 
-@ANS=@IDCONVERT '0123456789' TO '' IN @ANS
+	ANS = ID;\
+	ANS.converter("0123456789", "");\
+	return ANS;
 L
 10
 

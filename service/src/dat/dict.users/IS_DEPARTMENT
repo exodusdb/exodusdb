@@ -5,7 +5,19 @@ S
 
 
 
-if @record<5> eq @id then return 1 endreturn ''/*pgsqlif split_part(data,FM,5) = key then ANS='1';else ANS='';end if;*/
+	if (RECORD.a(5) eq ID) {\
+		return 1;\
+	}\
+	return "";\
+	return ANS;\
+\
+/*pgsql\
+	if split_part(data,FM,5) = key then\
+		ANS='1';\
+	else\
+		ANS='';\
+	end if;\
+*/
 L
 10
 

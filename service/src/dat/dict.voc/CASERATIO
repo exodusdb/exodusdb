@@ -5,7 +5,18 @@ S
 
 
 MD00P
-x=@recordconvert @lower.case to '' in xy=@recordconvert @upper.case to '' in yu=len(@record)-len(y)l=len(@record)-len(x)if u>l then @ans=u/(l+1) else @ans=-(l/(u+1))
+	var xx = RECORD;\
+	xx.converter(LOWERCASE, "");\
+	var yy = RECORD;\
+	yy.converter(UPPERCASE, "");\
+	var uu = RECORD.length() - yy.length();\
+	var ll = RECORD.length() - xx.length();\
+	if (uu gt ll) {\
+		ANS = uu / (ll + 1);\
+	} else {\
+		ANS = -(ll / (uu + 1));\
+	}\
+	return ANS;
 R
 10
 

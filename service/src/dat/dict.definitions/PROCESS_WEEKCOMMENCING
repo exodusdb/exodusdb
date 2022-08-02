@@ -1,11 +1,12 @@
 S
 
-WeekStarting
+Week\
+Starting
 S
 
 
 [DATE,4]
-@ANS=@record<1>-mod(@RECORD<1>-1,7)
+	return RECORD.a(1) - ((RECORD.a(1) - 1).mod(7));
 R
 10
 

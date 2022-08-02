@@ -5,7 +5,7 @@ S
 
 
 [TIME2]
-@ans=mod(@record<1>*86400+@sw<1>,86400)
+	return (RECORD.a(1) * 86400 + SW.a(1)).mod(86400);
 R
 10
 

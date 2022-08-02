@@ -5,7 +5,7 @@ S
 
 
 
-@ans=@record<54,5>
+	return RECORD.a(54, 5);
 R
 5
 

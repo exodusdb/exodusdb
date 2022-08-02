@@ -1,11 +1,23 @@
 S
 
-AuthorisedTimesheet Administration
+Authorised\
+Timesheet Administration
 S
 
 
 
-declare function securityif security('TIMESHEET ADMINISTRATION',msg,'',@id) then @ans=1end else @ans=0 end
+#include <authorised.h>\
+\
+var msg;\
+\
+function main() {\
+	if (authorised("TIMESHEET ADMINISTRATION", msg, "", ID)) {\
+		ANS = 1;\
+	} else {\
+		ANS = 0;\
+	}\
+	return ANS;\
+}
 L
 10
 

@@ -1,11 +1,12 @@
 S
 
-Date TimeCreated
+Date Time\
+Created
 S
 
 
 [DATETIME]
-@ans={DATETIME_UPDATED}<1,1>
+	return calculate("DATETIME_UPDATED").a(1, 1);
 R
 20
 

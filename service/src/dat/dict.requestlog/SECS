@@ -5,7 +5,19 @@ S
 
 
 
-responsetime=@record<5>if len(responsetime) then @ans=@record<5>-field(@id,'*',3) if @ans<0 then @ans+=86400 *garbagecollect @ans=oconv(@ans,'MD20P')+0end else *blank if no response time (crashed) @ans='' end
+	var responsetime = RECORD.a(5);\
+	if (responsetime.length()) {\
+		ANS = RECORD.a(5) - ID.field("*", 3);\
+		if (ANS lt 0) {\
+			ANS += 86400;\
+		}\
+	//garbagecollect\
+		ANS = (ANS.oconv("MD20P")) + 0;\
+	} else {\
+	//blank if no response time (crashed)\
+		ANS = "";\
+	}\
+	return ANS;
 R
 10
 

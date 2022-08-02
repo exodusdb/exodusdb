@@ -5,7 +5,7 @@ S
 0
 
 D2-
-@ANS=DATE()
+	return var().date();
 L
 10
 (D)

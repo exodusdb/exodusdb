@@ -5,7 +5,8 @@ S
 
 
 
-ANS=@ID:@FM:@RECORDreturn ans
+	var ans = ID ^ FM ^ RECORD;\
+	return ans;
 L
 20
 

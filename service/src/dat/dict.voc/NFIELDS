@@ -5,7 +5,7 @@ S
 
 
 
-@ans=count(@record,@fm)+1
+	return RECORD.count(FM) + 1;
 R
 10
 

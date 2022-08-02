@@ -5,7 +5,12 @@ S
 
 
 
-declare function invertarray,reverse@record=invertarray(reverse(invertarray(@record)))
+#include <reverse.h>\
+\
+function main() {\
+	RECORD = invertarray(reverse(invertarray(RECORD)));\
+	return ANS;\
+}
 L
 0
 

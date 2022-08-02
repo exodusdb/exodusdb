@@ -5,7 +5,19 @@ S
 
 
 
-$insert gbp,general.commonlocate @id in userprivs<1> setting usern then @ans=userprivs<2,usern>end else @ans='' end
+#include <sys_common.h>\
+\
+var usern;\
+\
+function main() {\
+	#include <system_common.h>\
+	if (SECURITY.a(1).locate(ID, usern)) {\
+		ANS = SECURITY.a(2, usern);\
+	} else {\
+		ANS = "";\
+	}\
+	return ANS;\
+}
 L
 20
 

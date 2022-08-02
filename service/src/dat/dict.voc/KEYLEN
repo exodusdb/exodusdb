@@ -5,7 +5,7 @@ S
 
 
 
-@ans=len(@id)
+	return ID.length();
 R
 10
 

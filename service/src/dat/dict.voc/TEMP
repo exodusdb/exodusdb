@@ -5,7 +5,7 @@ S
 
 
 
-@ans=count(@record,'xlate(')
+	return RECORD.count("xlate(");
 R
 10
 
