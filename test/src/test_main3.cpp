@@ -57,6 +57,56 @@ function main()
 	}
 
 	{
+
+		assert(oconv("12345","L#6")                 eq "12345 ");
+		assert(oconv("12345","R(*)#8")              eq "***12345");
+		assert(oconv("ABCDEFG","R#4")               eq "DEFG");
+		assert(oconv("ABCD","C#6")                  eq " ABCD ");
+		assert(oconv(6666,"D2-")                    eq "04-01-86");
+		//assert(oconv("1234567890","L(###)###-####") eq "(123)456-7890");
+
+		//TX
+
+		//FM
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _FM_ "ABC", "X\\\\nY\\nZ\nABC"));
+		//VM
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _VM_ "ABC", "X\\\\nY\\nZ\\\nABC"));
+		//SM
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _SM_ "ABC", "X\\\\nY\\nZ\\\\\nABC"));
+		//TM
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _TM_ "ABC", "X\\\\nY\\nZ\\\\\\\nABC"));
+		//STM
+		assert(test_ioconv_TX("TX", "X" "\\n" "Y" "\n" "Z" _STM_ "ABC", "X" "\\\\n" "Y" "\\n" "Z" "\\\\\\\\\n" "ABC"));
+
+		assert(test_ioconv_TX("TX", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _RM_ "\n" "\\\n" "\\\\\n" "\\\\\\\n" "\\\\\\\\\n"));
+
+		// \n, literal "\n" and literal "\\n"
+		assert(test_ioconv_TX("TX", "\n", "\\n"));
+		assert(test_ioconv_TX("TX", "\\n", "\\\\n"));
+		assert(test_ioconv_TX("TX", "\\\\n", "\\\\\\n"));
+		assert(test_ioconv_TX("TX", "\n\\n\\\\n\\\\n", "\\n\\\\n\\\\\\n\\\\\\n"));
+
+		// trailing backslashes need escaping too
+		assert(test_ioconv_TX("TX", "ABC\\" _FM_ "DEF", "ABC{Back_Slash}\nDEF"));
+
+		//TX1 (raw = FM only)
+
+		//FM
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _FM_ "ABC", "X\\\\nY\\nZ\nABC"));
+		//VM
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _VM_ "ABC", "X\\\\nY\\nZ" _VM_ "ABC"));
+		//SM
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _SM_ "ABC", "X\\\\nY\\nZ" _SM_ "ABC"));
+		//TM
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _TM_ "ABC", "X\\\\nY\\nZ" _TM_ "ABC"));
+		//STM
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _STM_ "ABC", "X\\\\nY\\nZ" _STM_ "ABC"));
+
+		assert(test_ioconv_TX("TXR", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _RM_ "\n" _VM_ _SM_ _TM_ _STM_));
+
+	}
+
+	{
 	    //stop("Test passed");
 
 	    print(AT(-1));
@@ -588,6 +638,26 @@ bool test_amountunit(in input, in amount, in unitcode) {
 	// Check unit
 	return unitcode2 eq unitcode;
 
+}
+
+function test_ioconv_TX(in fmt, in rec, in txt) {
+
+	TRACE(fmt)
+	TRACE(rec)
+	TRACE(txt)
+	TRACE(oconv(rec, fmt))
+
+	if (rec.oconv(fmt) ne txt)
+		return false;
+
+	TRACE(iconv(txt, fmt))
+	if (txt.iconv(fmt) ne rec)
+		return false;
+
+	if (rec.oconv(fmt).iconv(fmt) ne rec)
+		return false;
+
+	return true;
 }
 
 programexit()

@@ -2062,6 +2062,7 @@ class PUBLIC var final {
 	ND VARREF oconv_MR(const char* conversion);
 	// hex
 	ND var oconv_HEX(const int ioratio) const;
+	ND var oconv_TX(const int raw = 0) const;
 
 	// faster primitive arguments
 	ND var iconv_D(const char* conversion) const;
@@ -2069,6 +2070,7 @@ class PUBLIC var final {
 	ND var iconv_MT() const;
 	ND var iconv_MD(const char* conversion) const;
 	ND var iconv_HEX(const int ioratio) const;
+	ND var iconv_TX(const int raw = 0) const;
 
 	ND const std::string to_path_string() const;
 	ND const std::string to_cmd_string() const;

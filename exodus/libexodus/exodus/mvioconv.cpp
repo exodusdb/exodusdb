@@ -153,10 +153,18 @@ var var::iconv(const char* convstr) const {
 			return output;
 			break;
 
-		// iconv L#, R#, T#, C# do nothing
+		// iconv L#, R#, T#, C# do nothing. TX converts text to record format
 		case 'L':
 		case 'R':
 		case 'T':
+			// TX
+			// TX1 TX2 TX3 TX4 TX5 for progressive conversion starting with FM
+			++conversionchar;
+			if (*conversionchar == 'X') {
+				++conversionchar;
+				return iconv_TX(*conversionchar);
+			}
+			[[fallthrough]];
 		case 'C':
 			// return "";
 			return convstr;
@@ -791,6 +799,9 @@ var var::oconv(const char* conversion) const {
 			return output;
 			break;
 
+		//TODO implement masking eg.
+		// oconv("1234567890","L(###)###-####") -> "(123)456-7890"
+
 		// L#, R#, C#
 		// format even empty strings
 		case 'L':
@@ -802,7 +813,15 @@ var var::oconv(const char* conversion) const {
 		// T#
 		// format even empty strings
 		case 'T':
-			return oconv_T(conversion);
+			++conversionchar;
+			// TX
+			// TX1 TX2 TX3 TX4 TX5 for progressive conversion starting with FM
+			if (*conversionchar == 'X') {
+				++conversionchar;
+				return oconv_TX(*conversionchar);
+			}
+			else
+				return oconv_T(conversion);
 			break;
 
 		// HEX (unlike pickos, it converts high separator characters)
@@ -871,6 +890,72 @@ var var::oconv(const char* conversion) const {
 	// unknown conversions are simply ignored in pickos
 	return *this;
 }
+
+var var::oconv_TX(const int raw) const {
+
+	var txt = this->var_str;
+
+	// Backslashes before NL are going to be used to indicate VM, SM etc
+	// so we have to escape them somehow first
+	// for usual case skip if no backslashes are present
+	if (txt.var_str.find('\\') != std::string::npos)
+		txt.regex_replacer("\\\\([" _FM_ _VM_ _SM_ _TM_ _STM_ "])", "{Back_Slash}\\1");
+
+	// "\n" -> "\\n"
+	txt.swapper("\\n", "\\\\n");
+
+	// LF -> literal "\n"
+	txt.swapper("\n", "\\n");
+
+	// FM -> LF
+	txt.converter(_FM_, "\n");
+
+	// VM -> \ + LF
+	// SM -> \\ + LF
+	// TM -> \\\ + LF
+	// STM -> \\\\ + LF
+	if (not raw) {
+		txt.swapper(_VM_, "\\\n");
+		txt.swapper(_SM_, "\\\\\n");
+		txt.swapper(_TM_, "\\\\\\\n");
+		txt.swapper(_STM_, "\\\\\\\\\n");
+	}
+
+	return txt;
+}
+
+var var::iconv_TX(const int raw) const {
+
+	var record = this->var_str;
+	// \ + LF -> VM
+	// \\ + LF -> SM
+	// \\ + LF -> TM
+	// \\\ + LF -> STM
+	if (not raw) {
+		record.swapper("\\\\\\\\\n", _STM_);
+		record.swapper("\\\\\\\n", _TM_);
+		record.swapper("\\\\\n", _SM_);
+		record.swapper("\\\n", _VM_);
+	}
+
+	// LF -> FM
+	record.converter("\n", _FM_);
+
+	// "\n" -> LF
+	record.swapper("\\n", "\n");
+
+	// "\\n" -> "\n"
+	record.swapper("\\\n", "\\n");
+
+	// unescape backslash before FM
+	// so we have to escape them somehow first
+	// for usual case skip if no { is present
+	if (record.var_str.find('{') != std::string::npos)
+		record.regex_replacer("{Back_Slash}([" _FM_ _VM_ _SM_ _TM_ _STM_ "])", "\\\\" "\\1");
+
+	return record;
+}
+
 
 var var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 

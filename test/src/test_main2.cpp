@@ -734,6 +734,14 @@ function main()
 	assert(iconv("xx11yy12zz13P","MT") eq 83533);
 	assert(iconv("24 00 00","MT") eq "");
 
+	assert(oconv("12345","L#6")                 eq "12345 ");
+	assert(oconv("12345","R(*)#8")              eq "***12345");
+	assert(oconv("ABCDEFG","R#4")               eq "DEFG");
+	assert(oconv("ABCD","C#6")                  eq " ABCD ");
+	assert(oconv(6666,"D2-")                    eq "04-01-86");
+	// Pending implementation of masking
+	//assert(oconv("1234567890","L(###)###-####") eq "(123)456-7890");
+
 	//http://www.regular-expressions.info/examples.html
 	assert(regex_replace("Steve Bush Bash bish","B.","Ru","ri") eq "Steve Rush Rush Rush");
 
