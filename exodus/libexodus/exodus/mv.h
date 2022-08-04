@@ -104,6 +104,7 @@ THE SOFTWARE.
 #define _AM_ _FM_
 #define _SVM_ _SM_
 
+#define _BS_ "\\"
 #define _DQ_ "\""
 #define _SQ_ "\'"
 
@@ -120,6 +121,7 @@ THE SOFTWARE.
 #define AM_ FM_
 #define SVM_ SM_
 
+#define BS_ '\\'
 #define DQ_ '\"'
 #define SQ_ '\''
 
@@ -2449,6 +2451,7 @@ inline const var IM = IM_;
 inline const var RM = RM_;
 inline const var AM = AM_;
 
+inline const var BS = BS_;
 inline const var DQ = DQ_;
 inline const var SQ = SQ_;
 

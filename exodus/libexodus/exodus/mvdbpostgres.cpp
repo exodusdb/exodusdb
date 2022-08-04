@@ -2361,10 +2361,16 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 		// simple join or stage2 but not on multivalued
 		// stage2_calculated="@ANS=XLATE(\"SELECT_CURSOR_STAGE2_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
-		else if ((!ismv1 || stage2_calculated) && functionx.substr(1, 11).ucase() == "@ANS=XLATE(") {
-			functionx = functionx.a(1, 1);
+		// expect things like
+		//@ans=xlate('ACCOUNTS',@record<8,@mv>,21,'X')
+		//@ans=xlate('ACCOUNTS',@record<2,1,2>,1,'X')
+		//@ans=xlate('ADDRESSES',@id,2,'X')
+		//@ans=xlate('SCHEDULES',field(@id,'.',1),'YEAR_PERIOD','C')
+		//@ans=xlate('CURRENCIES',{CURRENCY_CODE},1,'X')
+		else if ((!ismv1 || stage2_calculated) && functionx.trimf("\t ").substr(1, 13).lcase() == "/" "/@ans=xlate(") {
 
-			functionx.splicer(1, 11, "");
+			functionx = functionx.a(1, 1).trimf("\t ");
+			functionx.splicer(1, 13, "");
 
 			// allow for <1,@mv> in arg3 by replacing comma with |
 			functionx.swapper(",@mv", "|@mv");

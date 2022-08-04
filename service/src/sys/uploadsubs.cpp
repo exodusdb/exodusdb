@@ -721,7 +721,7 @@ subroutine unlockfile() {
 subroutine parseline(io line) {
 
 	//preserve escaped quotes
-	line.swapper("\\\"", "&quote;");
+	line.swapper(_BS_ _DQ_, "&quote;");
 
 	//preserve commas inside quotes
 	nquotes = line.count(DQ);

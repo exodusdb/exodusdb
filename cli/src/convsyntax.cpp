@@ -3,15 +3,15 @@ programinit()
 
 /*
 
- convr2a  Convert EXODUS cpp "r()" style replacement syntax to assign
+ convsyntax  Convert various EXODUS cpp syntax
 
 SYNTAX
 
-	convr2a SOURCEFILENAME ... {OPTION}
+	convsyntax SOURCEFILENAME ... {OPTION}
 
 EXAMPLE
 
-	conv_r2a ~/neosys/src/ASTERISK/ASTERISK.cpp {U}
+	conv_syntax ~/neosys/src/ASTERISK/ASTERISK.cpp {U}
 
 OPTIONS
 
