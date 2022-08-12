@@ -309,7 +309,7 @@ COST 10;
 	}
 
 	if (errors)
-		errors.errputl("\nErrors: ");
+		errors.errputl("\ndict2sql Errors: ");
 
 	return errors ne "";
 }
@@ -468,6 +468,8 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 			dict_returns = "float";
 	}
 
+	var function_name_and_args = dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)";
+
 	//auto generate pgsql code for ..._XREF dict records (full text)
 	if (sourcecode.substr(1, 11) == "CALL XREF({") {
 
@@ -526,7 +528,14 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 
 		return;
 	}
-	var sql = sourcecode.substr(pos + 8);
+	var delim;
+	//var sql = sourcecode.substr(pos + 8);
+	// Move pos to point to the start of the first line AFTER the / *pgsql line
+	// thereby ignoring any "arguments" on the first line
+	var temp = sourcecode.substr2(pos, delim);
+
+	// Extract the pgsql function source code
+	var sql = sourcecode.substr(pos);
 
 	//printl(dictfilename, " ",dictid, " > sql");
 
@@ -574,42 +583,83 @@ $RETVAR := array_to_string
 		xlatetemplate =
 			R"V0G0N(
  --$COMMENT
-$RETVAR :=
+ temp_xlate_key := $SOURCEKEY_EXPR;
+ $RETVAR :=
   $TARGET_EXPR
   FROM $TARGETFILE
-  WHERE $TARGETFILE.key=$SOURCEKEY_EXPR;
-  $RETVAR := coalesce($RETVAR,'');
+  WHERE $TARGETFILE.key = temp_xlate_key;
+ $RETVAR := coalesce($RETVAR,$COALESCE_TO);
 )V0G0N";
 
+	sql.swapper("\t", " ");
 	// expand lines like the following to sql
-	// (all spaces are MANDATORY)
-	// ans := xlate filename fromfn tofn
+	// (inner single spaces are MANDATORY)
+	//  varx := xlate filename fromfield tofield mode
+	// or
+	//  varx = xlate filename fromfield tofield mode
 	// e.g.
-	// xlate=xlate jobs 2 14
+	//  companycode = xlate jobs 2 14 X
 	// ->
 	// ans:=split_part(jobs.data,E'\x1E',14)
 	// FROM jobs
 	// WHERE jobs.key=split_part($2,E'\x1E',2);
 	//
-	// fromfn and tofn can be functions
-	// "from" expression has access to source file data in variable $2 (argument 2)
-	// "to" expression has access to target file data eg invoices.data
-	//      and '' means whole record eg invoices.data
-	//	and "0" means key (which is not useful)
+	// fromfield and tofield can be fn or fn,vn or fn,vn,sn or any pgsql expression including functions
+	//
+	// "from" expression has access to source file key and data in variables $1 $2 (arguments 1 and 2)
+	// "to" expression has access to target file key and data eg invoices.key and invoices.data
+	// to '' means whole record eg invoices.data
+	// to 0 means key (which is not useful)
+	//
+	// tofield can be a dict id in the target file as long as the dict item has a pgsql function
+	//
+	// mode can be X, C or omitted
+	// X returns '' if target record is missing
+	// C returns the target key unconvered is target record is missing
 	int nlines = dcount(sql, VM);
 	for (int ln = 1; ln <= nlines; ++ln) {
 		var line = sql.a(1, ln).trim();
-		if (line.substr(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {
+		//if (line.substr(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {
+		if (line.substr(1, 2) != "--" && field(line, " ", 2, 2).match(":?= xlate")) {
 
 			//line.printl("xlate=");
 
 			//eg ans
 			var targetvariablename = line.field(" ", 1);
 
-			//target file name eg jobs
-			var target_filename = line.field(" ", 4);
+			// Arg 1 - Target file name
+			// e.g. JOBS
+			var target_filename = line.field(" ", 4).lcase();
+
+			// Arg 2 - Target key source
+			// e.g. 3 for field 3 of source data
+			// xxxx for a pgsql variable
+			// Anything else is a pgsql expression
+			// NO SPACES ALLOWED
+			// $1 is pgsql variable containing the key
+			// $2 is pgsql variable containing the data record
+			// 'XYZ' literals in single quotes
+			// e.g. split_part($1,'*',2) to use part of the key ($1)
+			// e.g. exodus_extract_text($2,3,2,1) to use part of the data record ($2)
+			// e.g. jobinvno||'**'||companycode using concatentated pgsql variables
+			// e.g. split_part(split_part(split_part($2,FM,2),VM,1),SVM,2) another way to use
 			var source_key_expr = line.field(" ", 5);
+
+			// Arg 3 - Target field number, name or expression
+			// NO SPACES ALLOWED
+			// e.g.
+			// 3 for field 3
+			// 3,2 for value 2 of field 3
+			// 3,2,1 for subvalue 1 of value 2 of field 3
+			// e.g. complicated expression assuming target file name xxxxxxxx
+			// coalesce(nullif(split_part(xxxxxxxx.data,FM,20),''),unnest)
 			var target_expr = line.field(" ", 6).field(";", 1);
+
+			// Arg 4 - Mode - What to do if record doesnt exist
+			// C = return key of target record
+			// X or anything else = return empty string
+			var xlate_mode = line.field(" ", 7).field(";", 1);
+
 			//TRACE(dictid)
 			//TRACE(reqdictid)
 			//allow xlate job in jobs_text because it is for dict_production_orders section
@@ -620,18 +670,118 @@ $RETVAR :=
 			if (lcase(var("dict.") ^ target_filename) eq dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
 				line = " -- Sorry. In " ^ target_filename ^ ", " ^ dictid ^ " you cannot xlate to same file due to pgsql bug.\n -- " ^ line;
 			} else {
+
+				// Source key expression
+				////////////////////////
+
 				//source file field number or expression for key to target file
 				//if key field numeric then extract from source file date
 				if (source_key_expr.isnum())
 					source_key_expr = "split_part($2,E'\\x1E'," ^ source_key_expr ^ ")";
 
+				// 3,2 <field,value,subvalue>
+				else if (source_key_expr.match("^\\d+,\\d+$")) {
+					source_key_expr = "exodus_extract_text($2," ^ source_key_expr ^ ",0)";
+				}
+
+				// 3,2,1 <field,value,subvalue>
+				else if (source_key_expr.match("^\\d+,\\d+,\\d+$")) {
+					source_key_expr = "exodus_extract_text($2," ^ source_key_expr ^ ")";
+				}
+
+				// Target field expression
+				//////////////////////////
+
 				//target file field number or expression (omit optional ; on the end)
 				if (target_expr == 0)
 					target_expr = target_filename ^ ".key";
+
+				// '' -> whole record
 				else if (target_expr == "''")
 					target_expr = target_filename ^ ".data";
+
+				// 3 <field>
 				else if (target_expr.isnum())
 					target_expr = "split_part(" ^ target_filename ^ ".data,E'\\x1E'," ^ target_expr ^ ")";
+
+				// 3,2 <field,value,subvalue>
+				else if (target_expr.match("^\\d+,\\d+$")) {
+					target_expr = "exodus_extract_text(" ^ target_filename ^ ".data," ^ target_expr ^ ",0)";
+				}
+
+				// 3,2,1 <field,value,subvalue>
+				else if (target_expr.match("^\\d+,\\d+,\\d+$")) {
+					target_expr = "exodus_extract_text(" ^ target_filename ^ ".data," ^ target_expr ^ ")";
+
+				// target field is a dictionary name
+				// If it is an S type dictionary field with a pgsql function
+				// You can write this:
+				//  ans := xlate SUPPLIERS 3 company_code;
+				// instead of this:
+				//  ans := xlate SUPPLIERS 3 dict_suppliers_company_code(suppliers.key,suppliers.data);
+				} else if (target_expr.match(
+					"^"           // Match at the beginning
+					"[a-zA-Z]"    // valid starting character
+					"\\w*"        // Match zero or more of characters - [a-zA-Z0-9_], after the beginning
+					"$"           // Till the end
+					)) {
+
+					// Check that the dict file item exists and does have a pgsql function
+					var errmsg = "Error in " ^ dictfilename ^ " " ^ dictid ^ " xlate target. ";
+					var target_dictfilename = "dict." ^ target_filename;
+					var target_dictfile;
+					if (not open(target_dictfilename to target_dictfile)) {
+						errmsg ^= target_dictfilename.quote() ^ " file does not exist.";
+						errmsg.errputl();
+						errors ^= "\n" ^ errmsg;
+						return;
+					}
+					var dictrec;
+					if (not read(dictrec from target_dictfile, target_expr)) {
+						if (not read(dictrec from target_dictfile, target_expr.ucase())) {
+							if (not read(dictrec from target_dictfile, target_expr.lcase())) {
+								errmsg ^= target_dictfilename ^ " " ^ target_expr.quote() ^ " item does not exist.";
+								errmsg.errputl();
+								errors ^= "\n" ^ errmsg;
+								return;
+							}
+						}
+					}
+					if (not dictrec.a(8).index("/" "*pgsql")) {
+						errmsg ^= target_dictfilename ^ " " ^ target_expr.quote() ^ " item does not have a pgsql section.";
+						errmsg.errputl();
+						errors ^= "\n" ^ errmsg;
+						return;
+					}
+
+					// Call the dict function matching the given field name
+					// e.g. dict_suppliers_company_code(suppliers.key,suppliers.data)
+					target_expr = "dict_" ^ target_filename ^ "_" ^ target_expr ^ "(" ^ target_filename ^ ".key," ^ target_filename ^ ".data)";
+				}
+
+				else {
+					// Otherwise target_expr must be a pgsql expression
+					// working on the target key and record
+					// Use it "as is"
+				}
+
+				// xlate mode X or C
+				////////////////////
+
+				if (not locate(xlate_mode, "]X]C"_var)) {
+					var errmsg = "Error in " ^ dictfilename ^ " " ^ dictid ^ " xlate mode " ^ xlate_mode.quote() ^ ". 4th argument must be X, C or omitted.";
+					errmsg.errputl();
+					errors ^= "\n" ^ errmsg;
+					return;
+				}
+
+				// As per pickos xlate function 4th argument
+				// Option C return the key unchanged if no xlate record exists
+				// Option X (or anything else) return empty string
+				var coalesce_to = xlate_mode eq "C" ? "temp_xlate_key" : "''";
+
+				// Convert macros
+				/////////////////
 
 				//line=targetvariablename^" := ";
 				//if (ismv) {
@@ -651,7 +801,9 @@ $RETVAR :=
 				line.swapper("$TARGETFILE", target_filename);
 				line.swapper("$SOURCEKEY_EXPR", source_key_expr);
 				line.swapper("$TARGET_EXPR", target_expr);
+				line.swapper("$COALESCE_TO", coalesce_to);
 				//line.outputl("sql=");
+
 			}
 			sql(1, ln) = line;
 		}
@@ -669,6 +821,7 @@ AS
 $$
 DECLARE
  ans text;
+ temp_xlate_key text;
 BEGIN
 $sqlcode
   RETURN ans;
@@ -681,8 +834,15 @@ DEFINER
 COST 10;
 )V0G0N";
 
+	// Remove unnecessary declaration of temp_xlate_key
+	// from the above standard sql template if not needed
+	if (not sql.index("temp_xlate_key") ) {
+		sqltemplate.swapper("\n temp_xlate_key text;","");
+	}
+
 	//upload pgsql function to postgres
-	create_function(dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
+	//create_function(dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
+	create_function(function_name_and_args, dict_returns, sql, sqltemplate);
 
 	// delete calc_fields
 
