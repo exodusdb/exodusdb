@@ -49,7 +49,7 @@ function main() {
 	begintrans();
 
 	// Process each subdir in turn. each one represents a db file.
-	var dirnames = oslistd(datpath ^ "/*");
+	var dirnames = oslistd(datpath ^ "/*").sort();
 	for (var dirname : dirnames) {
 
 		var dirpath = datpath ^ "/" ^ dirname ^ "/";
@@ -75,11 +75,11 @@ function main() {
 			}
 		}
 
-		var isdict = generate_dict_cpp and dbfilename.starts("dict.");
+		var add2cpp = generate_dict_cpp and dbfilename.starts("dict.");
 		var newcpptext = "#include <exodus/library.h>\n";
 
 		// Process each dat file/record in the subdir
-		var osfilenames = oslistf(dirpath ^ "*");
+		var osfilenames = oslistf(dirpath ^ "*").sort();
 		for (var osfilename : osfilenames) {
 
 			ID = osfilename;
@@ -101,7 +101,7 @@ function main() {
 			RECORD = RECORD.iconv(txtfmt);
 
 			// Add it to newcpptext
-			if (isdict and RECORD.a(1) eq "S") {
+			if (add2cpp and RECORD.a(1) eq "S") {
 
 				// dict intro
 				var line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
@@ -119,7 +119,7 @@ function main() {
 					// Add closing brace before pgsql , if present
 					var t = dictsrc.index("\n/*pgsql");
 					if (t) {
-						dictsrc.splicer(t, 1, "}\n");
+						dictsrc.splicer(t, 1, "\n}\n");
 						addfunctionmain = false;
 					}
 				}
@@ -178,7 +178,7 @@ function main() {
 
 		} // next dat file
 
-		if (isdict) {
+		if (add2cpp) {
 			var dictcppfilename = "dict_" ^ dirname;
 
 			var incfilename = homedir ^ "/inc/" ^ dbfilename.convert(".", "_") ^ ".h";
@@ -200,6 +200,8 @@ function main() {
 				if (not oswrite(newcpptext on dictcppfilename))
 					abort("sync_dat cannot write " ^ dictcppfilename);
 				printl("Updated", dictcppfilename);
+				if (not osshell("compile " ^ dictcppfilename))
+					abort("sync_dat could not compile " ^ dictcppfilename);
 			}
 		}
 

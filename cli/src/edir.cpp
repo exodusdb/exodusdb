@@ -22,7 +22,8 @@ function main() {
 	if (COMMAND.a(2).index(OSSLASH))
 		COMMAND.inserter(2,"DOS");
 
-	var filename = COMMAND.a(2).convert(".", "_");
+	//var filename = COMMAND.a(2).convert(".", "_");
+	var filename = COMMAND.a(2);
 	ID = COMMAND.a(3).unquote().unquote();	 //spaces are quoted
 	var fieldno = COMMAND.a(4);
 
@@ -139,15 +140,9 @@ function main() {
 					printl(filename ^ " " ^ ID ^ " > db");
 
 					//generate/update database functions if saved a symbolic dictionary record
-					var x = filename.substr(1, 5) == "dict.";
-					var y = newrecord.a(1) eq "S";
-					var z = newrecord.a(8).index(
-						"/"
-						"*pgsql");
 					if (filename.substr(1, 5) == "dict." and newrecord.a(1) eq "S" and newrecord.a(8).index("/"
 																											"*pgsql")) {
 						var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
-						//oscmd.outputl("oscmd=");
 						osshell(oscmd);
 					}
 
