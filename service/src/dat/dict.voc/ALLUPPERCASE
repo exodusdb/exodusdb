@@ -5,22 +5,10 @@ S
 
 
 
-function main() {\
-	RECORD.ucaser();\
-	return RECORD;\
-	//@ANS=@RECORD\
-	//convert @lower.case to @upper.case in @ans\
-	var ans = RECORD;\
-	ans.ucaser();\
-	//can cause out of memory\
-	//1. doesnt help\
-	//declare function memspace\
-	//mem=memspace(999999)\
-	//2. dont pass back in @ans variable seems to solve it!\
-	//transfer @ans to ans\
-	//if you return something then it uses it, otherwise it uses what is in @ans\
-	return RECORD;\
-}
+	return RECORD.ucaser();\
+/*pgsql\
+    return upper(data);\
+*/
 T
 30
 

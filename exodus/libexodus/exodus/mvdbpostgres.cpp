@@ -163,7 +163,9 @@ var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 // Normalise all alternative utf8 encodings of the same unicode points so they are identical
 var get_normal_filename(CVR filename_or_handle) {
-	return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
+	//return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
+	// No longer convert . in filenames to _
+	return filename_or_handle.a(1).normalize().lcase();
 }
 
 // Detect sselect command words that are values like quoted words or plain numbers.
@@ -937,9 +939,8 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	    		SELECT 	matviewname as table_name\
 	    		FROM 	pg_matviews\
 	    		WHERE\
-						matviewname = '" ^
-			filename2 ^
-			"'\
+						schemaname = '" ^ schema ^ "'\
+						and matviewname = '" ^ tablename ^	"'\
 					)\
 		";
 		connection2.sqlexec(sql, result);
@@ -2216,10 +2217,14 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			if (!dictrec.read(actualdictfile, fieldname)) {
 				// try in voc lowercase
 				fieldname.lcaser();
-				if (not dictrec.read("dict.voc", fieldname)) {
+				if (dictrec.read("dict.voc", fieldname)) {
+					actualdictfile = "dict.voc";
+				} else {
 					// try in voc uppercase
 					fieldname.ucaser();
-					if (not dictrec.read("dict.voc", fieldname)) {
+					if (dictrec.read("dict.voc", fieldname)) {
+						actualdictfile = "dict.voc";
+					} else {
 						if (fieldname == "@ID" || fieldname == "ID")
 							dictrec = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^
 									  FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
@@ -2269,7 +2274,8 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 	var sqlexpression;
 	if (dicttype == "F") {
-		// key field
+
+		// Field 0 means key field
 		if (!fieldno) {
 
 			if (forsort && !isdate && !istime)
@@ -2282,7 +2288,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				// filename, "key") ^ ", 'UTF8')";
 				sqlexpression = get_fileexpression(mainfilename, filename, "key");
 
-			// multipart key
+			// Multipart key - extract relevent field based on "*" separator
 			var keypartn = dictrec.a(5);
 			if (keypartn) {
 				sqlexpression =
@@ -2303,7 +2309,8 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 					"exodus_extract_time(" ^ sqlexpression ^ ",0,0,0)";
 
 			return sqlexpression;
-		}
+
+		} // of key field, Fieldno = 0
 
 		var extractargs =
 			get_fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
@@ -2329,37 +2336,86 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 		else
 			sqlexpression = "exodus_extract_text(" ^ extractargs;
-	} else if (dicttype == "S") {
 
-		var functionx = dictrec.a(8).trim();
+	} // of dict type F
+
+	else if (dicttype == "S") {
+
+		var function_src = dictrec.a(8).trim();
+
+		var pgsql_pos = function_src.index("/" "*pgsql");
 
 		// sql expression available
+		///////////////////////////
 		sqlexpression = dictrec.a(17);
 		if (sqlexpression) {
 			// return sqlexpression;
 		}
 
 		// sql function available
+		/////////////////////////
 		// eg dict_schedules_PROGRAM_POSITION(key text, data text)
-		else if (functionx.index("/"
-								 "*pgsql")) {
+		else if (pgsql_pos) {
 
 			// plsql function name assumed to be like "dictfilename_FIELDNAME()"
 			sqlexpression = get_normal_filename(actualdictfile).swap("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
 
-			// function arguments are (key,data)
-			sqlexpression ^= get_fileexpression(mainfilename, filename, "key");
-			sqlexpression ^= ", ";
-			sqlexpression ^= get_fileexpression(mainfilename, filename, "data");
-			sqlexpression ^= ")";
+			// function arguments are (key,data) by default
+
+			// Extract pgsql_line1
+			var delim;
+			var pgsql_line1 = function_src.substr2(pgsql_pos, delim);
+
+//			var keydictid = pgsql_line1.field(" ", 2);
+//			if (keydictid) {
+//				sqlexpression ^= get_dictexpression(
+//					cursor, filename, filename, dictfilename, dictfile,
+//					keydictid, joins, unnests, selects, ismv, forsort
+//				);
+//
+//			} else {
+//				sqlexpression ^= get_fileexpression(mainfilename, filename, "key");
+//			}
+//
+//			// 2nd arg is FILENAME.data
+//			sqlexpression ^= ", ";
+//			sqlexpression ^= get_fileexpression(mainfilename, filename, "data");
+
+			var args = pgsql_line1.field(" ",2,99);
+			if (not args.length())
+				args = "key data";
+			else if (not args.index(' '))
+				args ^= " data";
+
+			// The first and 2nd arguments can be SOME_DICTID otherwise
+			// the 1st defaults to FILENAME.key
+			// the 2nd defaults to FILENAME.data
+			// e.g.
+			// / *pgsql BRAND_CODE
+			args.converter(" ", _FM_);
+			for (const var& arg : args) {
+				if (arg == "key" or arg == "data") {
+					sqlexpression ^= get_fileexpression(mainfilename, filename, arg);
+				} else {
+					sqlexpression ^= get_dictexpression(
+						cursor, filename, filename, dictfilename, dictfile,
+						arg, joins, unnests, selects, ismv, forsort
+					);
+				}
+				sqlexpression ^= ", ";
+			}
+
+			sqlexpression.splicer(-2, 2, ")");
+
 		}
 
-		//handle below.
+		// Multivalued stage2 handled below
 		else if (stage2_calculated && ismv1) {
 			sqlexpression = stage2_filename ^ "." ^ fieldname ^ "_calc";
 		}
 
-		// simple join or stage2 but not on multivalued
+		// Simple join using XLATE command but not on multivalued unless stage2
+		///////////////////////////////////////////////
 		// stage2_calculated="@ANS=XLATE(\"SELECT_CURSOR_STAGE2_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 		// expect things like
 		//@ans=xlate('ACCOUNTS',@record<8,@mv>,21,'X')
@@ -2367,136 +2423,141 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		//@ans=xlate('ADDRESSES',@id,2,'X')
 		//@ans=xlate('SCHEDULES',field(@id,'.',1),'YEAR_PERIOD','C')
 		//@ans=xlate('CURRENCIES',{CURRENCY_CODE},1,'X')
-		else if ((!ismv1 || stage2_calculated) && functionx.trimf("\t ").substr(1, 13).lcase() == "/" "/@ans=xlate(") {
+		else if ((!ismv1 || stage2_calculated) && function_src.trimf("\t ").substr(1, 13).lcase() == "/" "/@ans=xlate(") {
 
-			functionx = functionx.a(1, 1).trimf("\t ");
-			functionx.splicer(1, 13, "");
+			function_src = function_src.a(1, 1).trimf("\t ");
+			function_src.splicer(1, 13, "");
 
-			// allow for <1,@mv> in arg3 by replacing comma with |
-			functionx.swapper(",@mv", "|@mv");
+			// Hide comma in arg3 like <1,@mv>
+			function_src.swapper(",@mv", "|@mv");
 
-			//allow for field(@id,'*',x) in arg2 by replacing commas with |
-			functionx.swapper(",'*',", "|'*'|");
+			// Hide commas in arg2 like field(@id,'*',x)
+			function_src.swapper(",'*',", "|'*'|");
 
-			// arg1 filename
-			var xlatetargetfilename = functionx.field(",", 1).trim().convert(".", "_");
+			// arg1 = filename
+			var xlatetargetfilename = function_src.field(",", 1).trim().convert(".", "_");
 			unquoter_inline(xlatetargetfilename);
 
-			// arg2 key
-			var xlatefromfieldname = functionx.field(",", 2).trim();
+			// arg2 = key
+			var xlatefromfieldname = function_src.field(",", 2).trim();
 
-			// arg3 target field number/name
-			var xlatetargetfieldname = functionx.field(",", 3).trim().unquoter();
+			// arg3 = target field number/name
+			var xlatetargetfieldname = function_src.field(",", 3).trim().unquoter();
 
-			// arg4 mode X or C
-			var xlatemode = functionx.field(",", 4).trim().convert("'\" )", "");
+			// arg4 = mode X or C
+			var xlatemode = function_src.field(",", 4).trim().convert("'\" )", "");
 
-			// if the fourth field is 'X', "X", "C" or 'C' then
-			// assume we have a good simple xlate functionx and can convert to a JOIN
-			if (xlatemode == "X" || xlatemode == "C") {
-
-				// determine the expression in the xlate target file
-				// VARREF todictexpression=sqlexpression;
-				if (xlatetargetfieldname.isnum()) {
-					sqlexpression =
-						"exodus_extract_text(" ^
-						get_fileexpression(mainfilename, xlatetargetfilename,
-									   "data") ^
-						", " ^ xlatetargetfieldname ^ ", 0, 0)";
-				} else if (stage2_calculated) {
-					sqlexpression = xlatetargetfieldname;
-				} else {
-					// var dictxlatetofile=xlatetargetfilename;
-					// if (!dictxlatetofile.open("DICT",xlatetargetfilename))
-					//	throw MVDBException("get_dictexpression() DICT" ^
-					// xlatetargetfilename ^ " file cannot be opened"); var
-					// ismv;
-					var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
-					var xlatetargetdictfile;
-					if (!xlatetargetdictfile.open(xlatetargetdictfilename))
-						throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ functionx);
-
-					sqlexpression = get_dictexpression(cursor,
-						filename, xlatetargetfilename, xlatetargetdictfilename,
-						xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
-						selects, ismv, forsort);
-				}
-
-				// determine the join details
-				var xlatekeyexpression = "";
-				//xlatefromfieldname.logputl("xlatefromfieldname=");
-				if (xlatefromfieldname.trim().substr(1, 8).lcase() == "@record<") {
-					xlatekeyexpression = "exodus_extract_text(";
-					xlatekeyexpression ^= filename ^ ".data";
-					xlatekeyexpression ^= ", " ^ xlatefromfieldname.substr(9);
-					xlatekeyexpression.popper();
-					xlatekeyexpression ^=
-						var(", 0").str(3 - xlatekeyexpression.count(",")) ^ ")";
-				} else if (xlatefromfieldname.trim().substr(1, 10).lcase() == "field(@id|") {
-					xlatekeyexpression = "split_part(";
-					xlatekeyexpression ^= filename ^ ".key,'*',";
-					xlatekeyexpression ^= xlatefromfieldname.field("|", 3).field(")", 1) ^ ")";
-				}
-				// TODO				if
-				// (xlatefromfieldname.substr(1,8)=="FIELD(@ID)
-				else if (xlatefromfieldname[1] == "{") {
-					xlatefromfieldname =
-						xlatefromfieldname.substr(2).popper();
-					xlatekeyexpression = get_dictexpression(cursor,
-						filename, filename, dictfilename, dictfile,
-						xlatefromfieldname, joins, unnests, selects, ismv, forsort);
-				} else if (xlatefromfieldname == "@ID") {
-					xlatekeyexpression = filename ^ ".key";
-				} else {
-					// throw  MVDBException("get_dictexpression() " ^
-					// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
-					// DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
-					var("ERROR: mvdbpostgres get_dictexpression() " ^
-						filename.quote() ^ " " ^ fieldname.quote() ^
-						" - INVALID DICTIONARY EXPRESSION - " ^
-						dictrec.a(8).quote())
-						.errputl();
-					return "";
-				}
-
-				//if the xlate key expression is stage2_calculated then
-				//indicate that the whole dictid expression is stage2_calculated
-				//and do not do any join
-				if (xlatekeyexpression.index("exodus_call")) {
-					sqlexpression = "exodus_call(";
-					return sqlexpression;
-				}
-
-				fromjoin = true;
-
-				// joins needs to follow "FROM mainfilename" clause
-				// except for joins based on mv fields which need to follow the
-				// unnest function
-				var joinsectionn = ismv ? 2 : 1;
-
-				// add the join
-				///similar code above/below
-				//main file is on the left
-				//secondary file is on the right
-				//normally we want all records on the left (main file) and any secondary file records that exist ... LEFT JOIN
-				//if joining to stage2_calculated field file then we want only records that exist in the stage2_calculated fields file ... RIGHT JOIN (could be INNER JOIN)
-				//RIGHT JOIN MUST BE IDENTICAL ELSE WHERE TO PREVENT DUPLICATION
-				var join_part1 = stage2_calculated ? "RIGHT" : "LEFT";
-				join_part1 ^= " JOIN " ^ xlatetargetfilename ^ " ON ";
-
-				var join_part2 =
-					xlatetargetfilename ^ ".key = " ^ xlatekeyexpression;
-				// only allow one join per file for now.
-				// TODO allow multiple joins to the same file via different keys
-				if (!joins.a(joinsectionn).index(join_part1))
-					joins.r(joinsectionn, -1, join_part1 ^ join_part2);
-
-				return sqlexpression;
-			} else {
+			// Error if fourth field is not "X", "C" or 'C'
+			if (xlatemode != "X" && xlatemode != "C") {
 				// not xlate X or C
 				goto exodus_call;
 			}
-		}
+
+			// Assume we have a good simple xlate function_src and can convert to a JOIN
+			// Determine the expression in the xlate target file
+			// VARREF todictexpression=sqlexpression;
+			if (xlatetargetfieldname.isnum()) {
+				sqlexpression =
+					"exodus_extract_text(" ^
+					get_fileexpression(mainfilename, xlatetargetfilename,
+								   "data") ^
+					", " ^ xlatetargetfieldname ^ ", 0, 0)";
+
+			} else if (stage2_calculated) {
+				sqlexpression = xlatetargetfieldname;
+
+			} else {
+				// var dictxlatetofile=xlatetargetfilename;
+				// if (!dictxlatetofile.open("DICT",xlatetargetfilename))
+				//	throw MVDBException("get_dictexpression() DICT" ^
+				// xlatetargetfilename ^ " file cannot be opened"); var
+				// ismv;
+				var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
+				var xlatetargetdictfile;
+				if (!xlatetargetdictfile.open(xlatetargetdictfilename))
+					throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ function_src);
+
+				sqlexpression = get_dictexpression(cursor,
+					filename, xlatetargetfilename, xlatetargetdictfilename,
+					xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
+					selects, ismv, forsort);
+			}
+
+			// determine the join details
+			var xlatekeyexpression = "";
+			//xlatefromfieldname.logputl("xlatefromfieldname=");
+			if (xlatefromfieldname.trim().substr(1, 8).lcase() == "@record<") {
+				xlatekeyexpression = "exodus_extract_text(";
+				xlatekeyexpression ^= filename ^ ".data";
+				xlatekeyexpression ^= ", " ^ xlatefromfieldname.substr(9);
+				xlatekeyexpression.popper();
+				xlatekeyexpression ^=
+					var(", 0").str(3 - xlatekeyexpression.count(",")) ^ ")";
+			} else if (xlatefromfieldname.trim().substr(1, 10).lcase() == "field(@id|") {
+				xlatekeyexpression = "split_part(";
+				xlatekeyexpression ^= filename ^ ".key,'*',";
+				xlatekeyexpression ^= xlatefromfieldname.field("|", 3).field(")", 1) ^ ")";
+			}
+
+			// TODO				if
+			// (xlatefromfieldname.substr(1,8)=="FIELD(@ID)
+			else if (xlatefromfieldname[1] == "{") {
+				xlatefromfieldname =
+					xlatefromfieldname.substr(2).popper();
+				xlatekeyexpression = get_dictexpression(cursor,
+					filename, filename, dictfilename, dictfile,
+					xlatefromfieldname, joins, unnests, selects, ismv, forsort);
+
+			} else if (xlatefromfieldname.lcase() == "@id") {
+				xlatekeyexpression = filename ^ ".key";
+
+			} else {
+				// throw  MVDBException("get_dictexpression() " ^
+				// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
+				// DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
+				var("ERROR: mvdbpostgres get_dictexpression() " ^
+					filename.quote() ^ " " ^ fieldname.quote() ^
+					" - INVALID DICTIONARY EXPRESSION - " ^
+					dictrec.a(8).quote())
+					.errputl();
+				return "";
+			}
+
+			//if the xlate key expression is stage2_calculated then
+			//indicate that the whole dictid expression is stage2_calculated
+			//and do not do any join
+			if (xlatekeyexpression.index("exodus_call")) {
+				sqlexpression = "exodus_call(";
+				return sqlexpression;
+			}
+
+			fromjoin = true;
+
+			// joins needs to follow "FROM mainfilename" clause
+			// except for joins based on mv fields which need to follow the
+			// unnest function
+			var joinsectionn = ismv ? 2 : 1;
+
+			// add the join
+			///similar code above/below
+			//main file is on the left
+			//secondary file is on the right
+			//normally we want all records on the left (main file) and any secondary file records that exist ... LEFT JOIN
+			//if joining to stage2_calculated field file then we want only records that exist in the stage2_calculated fields file ... RIGHT JOIN (could be INNER JOIN)
+			//RIGHT JOIN MUST BE IDENTICAL ELSE WHERE TO PREVENT DUPLICATION
+			var join_part1 = stage2_calculated ? "RIGHT" : "LEFT";
+			join_part1 ^= " JOIN " ^ xlatetargetfilename ^ " ON ";
+
+			var join_part2 =
+				xlatetargetfilename ^ ".key = " ^ xlatekeyexpression;
+			// only allow one join per file for now.
+			// TODO allow multiple joins to the same file via different keys
+			if (!joins.a(joinsectionn).index(join_part1))
+				joins.r(joinsectionn, -1, join_part1 ^ join_part2);
+
+			return sqlexpression;
+
+		} //of dict type S
 
 		// FOLLOWING IS CURRENTLY DISABLED
 		// if we get here then we were unable to work out any sql expression or function

@@ -1417,6 +1417,12 @@ template <class T1, class T2, class T3>
 void string_converter(T1& var_str, const T2 oldchars, const T3 newchars) {
 	typename T1::size_type pos = T1::npos;
 
+	// Optimise for single character replacement
+	// No observable speedup
+	//if (oldchars.length() == 1 and newchars.length() == 1) {
+	//	std::replace(var_str.begin(), var_str.end(), oldchars[0], newchars[0]);
+	//}
+
 	while (true) {
 		// locate (backwards) any of the from characters
 		// because we might be removing characters

@@ -3,6 +3,7 @@
 libraryinit(chequedesign_account_name)
 //------------------------------------
 function main() {
+	//@ans=xlate('ACCOUNTS',field(@id,'*',2),1,'X')
 	return ID.field("*", 2).xlate("ACCOUNTS", 1, "X");
 }
 libraryexit(chequedesign_account_name)
@@ -23,6 +24,7 @@ libraryexit(chequedesign_is_default)
 libraryinit(email_address)
 //------------------------
 function main() {
+	//@ans=xlate('USERS',@record<1>,7,'X')
 	return RECORD.a(1).xlate("USERS", 7, "X");
 }
 libraryexit(email_address)

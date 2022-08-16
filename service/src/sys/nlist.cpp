@@ -1060,22 +1060,14 @@ dictrecexit:;
 		ignorewords(1, -1) = word;
 
 	} else {
-		//sys.messages W156
-		tt = "|\"%1%\" is an unrecognized word.";
-		tt.swapper("%1%", word);
+		tt = word.quote() ^ " is an unrecognized word.";
 		if (interactive_) {
-			if (VOLUMES) {
-				tt ^= "|Please correct the word by retyping it|or pressing [F4] to edit it.|Press [Esc] to re-start.|";
-			} else {
-				tt ^= " Replace with? (Esc, Enter to cancel):";
-			}
+			tt ^= " Replace with? (Enter to cancel):";
 		}
-		call mssg(tt, "RE", word, word);
-		if (word eq "\x1B") {
+		var oldword = word;
+		call mssg(tt, "RCE", word, "");
+		if (word eq oldword or word eq "\x1B") {
 			stop();
-		}
-		if (VOLUMES) {
-			word.ucaser();
 		}
 		gosub getwordexit();
 		goto phraseinit;

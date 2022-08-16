@@ -375,7 +375,7 @@ function onefile(in filename, in maxndifferences) {
 
 	}
 
-	printl("Lines:",lineno,"differences:",ndifferences,"Max differences:",maxndifferences);
+	printl("Lines:",lineno,"differences:",ndifferences,"Max differences allowed:",maxndifferences);
 
 	if (ndifferences <= maxndifferences)
 		ndifferences = 0;

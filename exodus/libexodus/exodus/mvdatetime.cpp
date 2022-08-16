@@ -120,7 +120,7 @@ var var::ostime() const {
 	boost::posix_time::time_duration localtimeofdaynow = localtimenow.time_of_day();
 
 	//#ifdef BOOST_HAS_FRACTIONAL_SECONDS
-	return (localtimeofdaynow.total_nanoseconds() / 1000000000.0);
+	return (localtimeofdaynow.total_nanoseconds() / 1'000'000'000.0);
 	/*
 	#else
 		struct timeval tv;

@@ -456,6 +456,13 @@ VARREF var::swapper(SV what, SV with) {
 	if (what.empty())
 		return *this;
 
+	// Optimise for single character replacement
+	// No measurable speedup
+	//if (what.size() == 1 and with.size() == 1) {
+	//	std::replace(var_str.begin(), var_str.end(), what[0], with[0]);
+	//	return *this;
+	//}
+
 	// find the starting position of the field or return
 	std::string::size_type start_pos = 0;
 	while (true) {

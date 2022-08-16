@@ -24,21 +24,10 @@ libraryexit(all)
 libraryinit(alluppercase)
 //-----------------------
 function main() {
-	RECORD.ucaser();
-	return RECORD;
-	//@ANS=@RECORD
-	//convert @lower.case to @upper.case in @ans
-	var ans = RECORD;
-	ans.ucaser();
-	//can cause out of memory
-	//1. doesnt help
-	//declare function memspace
-	//mem=memspace(999999)
-	//2. dont pass back in @ans variable seems to solve it!
-	//transfer @ans to ans
-	//if you return something then it uses it, otherwise it uses what is in @ans
-	return RECORD;
-}
+	return RECORD.ucaser();}
+/*pgsql
+    return upper(data);
+*/
 libraryexit(alluppercase)
 
 
@@ -91,6 +80,18 @@ function main() {
 libraryexit(anydebug)
 
 
+libraryinit(c_args)
+//-----------------
+function main() {
+	ANS = RECORD.a(2);
+	if (ANS.substr(1, 3) ne "*c ") {
+		ANS = "";
+	}
+	return ANS;
+}
+libraryexit(c_args)
+
+
 libraryinit(caseratio)
 //--------------------
 function main() {
@@ -140,18 +141,6 @@ function main() {
 	return 1;
 }
 libraryexit(count)
-
-
-libraryinit(c_args)
-//-----------------
-function main() {
-	ANS = RECORD.a(2);
-	if (ANS.substr(1, 3) ne "*c ") {
-		ANS = "";
-	}
-	return ANS;
-}
-libraryexit(c_args)
 
 
 libraryinit(data)
@@ -297,6 +286,7 @@ libraryexit(executive_email)
 
 libraryinit(executive_name)
 //-------------------------
+	//@ans=xlate('USERS',{EXECUTIVE_CODE},1,'C')
 function main() {
 	//ans={EXECUTIVE_CODE}
 	//ans2=ans
@@ -394,6 +384,23 @@ function main() {
 	return ANS;
 }
 libraryexit(findall)
+
+
+libraryinit(full_brand_name)
+//--------------------------
+function main() {
+	var brandcode = calculate("BRAND_CODE");
+	var brand = brandcode.xlate("BRANDS", "", "X");
+	var ans = brand.a(2);
+	var brandcode1 = brand.a(8);
+	brandcode1.converter(SVM, VM);
+	brandcode1 = brandcode1.a(1, 1);
+	if (brandcode1 and brandcode1 ne brandcode) {
+		ans.splicer(1, 0, brandcode1.xlate("BRANDS", 2, "X") ^ " ");
+	}
+	return ans; 
+}
+libraryexit(full_brand_name)
 
 
 libraryinit(iscpp)
