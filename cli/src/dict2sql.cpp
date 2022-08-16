@@ -375,7 +375,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 
 	if (errmsg) {
 
-		oswrite(functionsql, "dict2sql.err");
+		//oswrite(functionsql, "dict2sql.err");
 
 		errors ^= functionname_and_args.field("(", 1) ^ " ";
 
