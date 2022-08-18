@@ -48,6 +48,14 @@ const char* longdayofweeks =
 	"SATURDAY\0 "
 	"SUNDAY\0   ";
 
+// ostime, osdate, osfile, osdir should return dates and times in UTC or local TZ
+//#define RETURN_LOCAL_TZ_TIME
+#ifdef RETURN_LOCAL_TZ_TIME
+#define LOCAL_OR_UNIVERSAL(DATE_OR_TIME) local_##DATE_OR_TIME
+#else
+#define LOCAL_OR_UNIVERSAL(DATE_OR_TIME) universal_##DATE_OR_TIME
+#endif
+
 #include "boost/date_time/c_local_time_adjustor.hpp"
 #include "boost/date_time/gregorian/gregorian.hpp"
 #include "boost/date_time/local_time_adjustor.hpp"
@@ -69,21 +77,27 @@ namespace exodus {
 
 void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime) {
 
+#ifdef RETURN_LOCAL_TZ_TIME
+	// Convert to local timezone of current machine
 	// http://www.boost.org/doc/html/date_time/examples.html#date_time.examples.local_utc_conversion
-	using local_adj = boost::date_time::c_local_adjustor<boost::posix_time::ptime>;
+	// This local adjustor depends on the machine TZ settings-- highly dangerous!
+	// Uses c_time(time_t) to do the conversion via integer seconds since UNIX epoch 1/1/1970
+	// https://www.boost.org/doc/libs/1_80_0/boost/date_time/c_local_time_adjustor.hpp
+	using local_adjustor = boost::date_time::c_local_adjustor<boost::posix_time::ptime>;
+	boost::posix_time::ptime ptimex2 = local_adjustor::utc_to_local(ptimex);
+#else
+#define ptimex2 ptimex
+#endif
 
-	// convert to local timezone of current machine
-	boost::posix_time::ptime localptimex = local_adj::utc_to_local(ptimex);
+	// Return pickos time (integer seconds since last midnight)
+	boost::posix_time::time_duration time_of_day = ptimex2.time_of_day();
+	mvtime = time_of_day.hours() * 3600 + time_of_day.minutes() * 60 + time_of_day.seconds();
 
-	// convert to local time of day
-	boost::posix_time::time_duration timeofday = localptimex.time_of_day();
-	mvtime = timeofday.hours() * 3600 + timeofday.minutes() * 60 + timeofday.seconds();
-
-	// convert to local date
-	boost::gregorian::date filedate = localptimex.date();
-	// convert to mv days since 31/12/1967
+	// Return pickos date (integer days since 31/12/1967)
+	boost::gregorian::date gdate = ptimex2.date();
+	// Convert to mv days since 31/12/1967
 	//boost::gregorian::date dayzero(1967, 12, 31);  // an arbitrary date
-	mvdate = (filedate - pick_epoch_date).days();
+	mvdate = (gdate - pick_epoch_date).days();
 
 	return;
 }
@@ -93,16 +107,16 @@ var var::date() const {
 
 	// http://www.boost.org/doc/html/date_time/examples.html#date_time.examples.days_alive
 	// static const boost::gregorian::date dayzero(1967,12,31); //an arbitrary date
-	boost::gregorian::date today = boost::gregorian::day_clock::local_day();
-	return int((today - pick_epoch_date).days());
+	boost::gregorian::date gdate_today = boost::gregorian::day_clock::LOCAL_OR_UNIVERSAL(day)();
+	return int((gdate_today - pick_epoch_date).days());
 }
 
 var var::time() const {
 	// returns number of whole seconds since midnight
-	boost::posix_time::time_duration localtimeofdaynow =
-		boost::posix_time::second_clock::local_time().time_of_day();
-	return int(localtimeofdaynow.hours() * 3600 + localtimeofdaynow.minutes() * 60 +
-			   localtimeofdaynow.seconds());
+	boost::posix_time::time_duration time_of_day =
+		boost::posix_time::second_clock::LOCAL_OR_UNIVERSAL(time)().time_of_day();
+	return int(time_of_day.hours() * 3600 + time_of_day.minutes() * 60 +
+			   time_of_day.seconds());
 }
 
 var var::timedate() const {
@@ -116,46 +130,11 @@ var var::timedate() const {
 var var::ostime() const {
 	// return decimal seconds since midnight up to micro or nano second accuracy
 
-	boost::posix_time::ptime localtimenow = boost::posix_time::microsec_clock::local_time();
-	boost::posix_time::time_duration localtimeofdaynow = localtimenow.time_of_day();
+	boost::posix_time::ptime ptimex = boost::posix_time::microsec_clock::LOCAL_OR_UNIVERSAL(time)();
+	boost::posix_time::time_duration time_of_day = ptimex.time_of_day();
 
-	//#ifdef BOOST_HAS_FRACTIONAL_SECONDS
-	return (localtimeofdaynow.total_nanoseconds() / 1'000'000'000.0);
-	/*
-	#else
-		struct timeval tv;
-		gettimeofday(&tv, (struct timezone *) 0);
-	    return double(localtimeofdaynow.total_seconds())+double(tv.tv_usec)/1000000.0;
-	#endif
-	*/
+	return (time_of_day.total_nanoseconds() / 1'000'000'000.0);
 }
-
-/*
-// Checks keyboard buffer (stdin) and returns key
-// pressed, or -1 for no key pressed
-int var::keypressed(int delayusecs) const
-{
-    char keypressed;
-    struct timeval waittime;
-    int num_chars_read;
-    struct fd_set mask;
-    FD_SET(0, &mask);
-
-    waittime.tv_sec = 0;
-    waittime.tv_usec = delayusecs;
-    if (std::select (1, &mask, 0, 0, &waittime))
-    {
-	num_chars_read = std::read (0, &keypressed, 1);
-	if (num_chars_read == 1)
-	{
-		cin.putback(keypressed);
-	    return (keypressed);
-	}
-    }
-
-    return 0;
-}
-*/
 
 var var::iconv_D(const char* conversion) const {
 

@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 //#include <algorithm>  //for count in osrename
 #include <fstream>
 #include <iostream>
@@ -847,21 +850,6 @@ bool var::oscopy(CVR to_osfile_or_dirname) const {
 
 	std::filesystem::path frompathx(this->to_path_string().c_str());
 	std::filesystem::path topathx(to_osfile_or_dirname.to_path_string().c_str());
-	/*
-	try
-	{
-		// will not overwrite so this is redundant
-		// option to overwrite is not in initial versions of boost copy_file
-		if (std::filesystem::exists(topathx))
-			return false;
-
-		std::filesystem::copy_file(frompathx, topathx);
-	}
-	catch (...)
-	{
-		return false;
-	}
-	*/
 	//https://en.cppreference.com/w/cpp/filesystem/copy
 	std::error_code error_code;
 	copy(frompathx, topathx,
@@ -1002,7 +990,6 @@ std::time_t to_time_t(TP tp) {
 }
 
 // in MVdatetime.cpp
-//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
 void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
 //WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
 //void ptime2mvdatetime(const std::filesystem::file_time_type& ptimex, int& mvdate, int& mvtime);
@@ -1014,41 +1001,78 @@ var var::osfile() const {
 
 	// get a handle and return "" if doesnt exist or isnt a regular file
 	try {
-		// boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		std::filesystem::path pathx(this->to_path_string().c_str());
 
-		if (!std::filesystem::exists(pathx))
-			return "";
-		// is_regular is only in boost > 1.34
-		// if (! std::filesystem::is_regular(pathx)) return "";
-		if (std::filesystem::is_directory(pathx))
-			return "";
+		// Using low level interface instead of std::filesystem to avoid multiple call to stat
+		// 7,430 ns/op instead of  18,500 ns/op
 
-		//not using low level interface
 		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
 
 		// SIMILAR CODE IN OSFILE AND OSDIR
+		struct stat fileInfo;
 
-		// get last write datetime
-		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(std::filesystem::last_write_time(pathx));
-		std::filesystem::file_time_type file_time = std::filesystem::last_write_time(pathx);
-		std::time_t last_write_time = to_time_t(file_time);
+		// Get stat info or quit
+		if (stat(this->to_path_string().c_str(), &fileInfo) != 0)
+			return "";
+
+		// Quit if is dir
+		if ((fileInfo.st_mode & S_IFMT) == S_IFDIR)
+			return "";
 
 		// convert to posix time
-		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-		//std::filesystem::file_time_type ptimex = std::filesystem::last_write_time(pathx);
+		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(fileInfo.st_mtime);
 
-		// convert posix time to mv date and time
-		//TODO Currently returns local date/time. Should it not be UTC?
+		// convert posix time to pickos integer date and time
 		int mvdate, mvtime;
 		ptime2mvdatetime(ptimex, mvdate, mvtime);
 
 		//file_size() is only available for files not directories
-		return int(std::filesystem::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
+		return int(fileInfo.st_size) ^ FM ^ mvdate ^ FM ^ int(mvtime);
+
 	} catch (...) {
 		return "";
 	};
 }
+
+// Old slower implementation using std:filesystem that requires multiple calls to stat
+//var var::osfile() const {
+//
+//	THISIS("var var::osfile() const")
+//	assertString(function_sig);
+//
+//	// get a handle and return "" if doesnt exist or isnt a regular file
+//	try {
+//		std::filesystem::path pathx(this->to_path_string().c_str());
+//
+//		if (!std::filesystem::exists(pathx))
+//			return "";
+//		// if (! std::filesystem::is_regular(pathx)) return "";
+//		if (std::filesystem::is_directory(pathx))
+//			return "";
+//
+//		//not using low level interface
+//		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
+//
+//		// SIMILAR CODE IN OSFILE AND OSDIR
+//
+//		// get last write datetime
+//		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(std::filesystem::last_write_time(pathx));
+//		std::filesystem::file_time_type file_time = std::filesystem::last_write_time(pathx);
+//		std::time_t last_write_time = to_time_t(file_time);
+//
+//		// convert to posix time
+//		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+//		//std::filesystem::file_time_type ptimex = std::filesystem::last_write_time(pathx);
+//
+//		// convert posix time to mv date and time
+//		int mvdate, mvtime;
+//		ptime2mvdatetime(ptimex, mvdate, mvtime);
+//
+//		//file_size() is only available for files not directories
+//		return int(std::filesystem::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
+//	} catch (...) {
+//		return "";
+//	};
+//}
 
 bool var::osmkdir() const {
 
@@ -1119,27 +1143,24 @@ var var::osdir() const {
 	// std::filesystem::wpath pathx(toTstring((*this)).c_str());
 	try {
 
-		// boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		std::filesystem::path pathx(this->to_path_string().c_str());
+		// Using low level interface instead of std::filesystem to avoid multiple call to stat
+		// 7,430 ns/op instead of  18,500 ns/op
 
-		if (!std::filesystem::exists(pathx))
-			return "";
-		if (!std::filesystem::is_directory(pathx))
-			return "";
-
-		//not using low level interface
 		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
 
 		// SIMILAR CODE IN OSFILE AND OSDIR
+		struct stat dirInfo;
 
-		// get last write datetime
-		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(std::filesystem::last_write_time(pathx));
-		std::filesystem::file_time_type file_time = std::filesystem::last_write_time(pathx);
-		std::time_t last_write_time = to_time_t(file_time);
+		// Get stat info or quit
+		if (stat(this->to_path_string().c_str(), &dirInfo) != 0)
+			return "";
+
+		// Quit if is not dir
+		if ((dirInfo.st_mode & S_IFMT) != S_IFDIR)
+			return "";
 
 		// convert to posix time
-		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-		//std::filesystem::file_time_type ptimex = std::filesystem::last_write_time(pathx);
+		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(dirInfo.st_mtime);
 
 		// convert posix time to mv date and time
 		int mvdate, mvtime;
@@ -1153,6 +1174,50 @@ var var::osdir() const {
 		return "";
 	};
 }
+
+// old slower implementation using std::filesystem
+//var var::osdir() const {
+//
+//	THISIS("var var::osdir() const")
+//	assertString(function_sig);
+//
+//	// get a handle and return "" if doesnt exist or is NOT a directory
+//	// std::filesystem::wpath pathx(toTstring((*this)).c_str());
+//	try {
+//
+//		std::filesystem::path pathx(this->to_path_string().c_str());
+//
+//		if (!std::filesystem::exists(pathx))
+//			return "";
+//		if (!std::filesystem::is_directory(pathx))
+//			return "";
+//
+//		//not using low level interface
+//		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
+//
+//		// SIMILAR CODE IN OSFILE AND OSDIR
+//
+//		// get last write datetime
+//		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(std::filesystem::last_write_time(pathx));
+//		std::filesystem::file_time_type file_time = std::filesystem::last_write_time(pathx);
+//		std::time_t last_write_time = to_time_t(file_time);
+//
+//		// convert to posix time
+//		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+//		//std::filesystem::file_time_type ptimex = std::filesystem::last_write_time(pathx);
+//
+//		// convert posix time to mv date and time
+//		int mvdate, mvtime;
+//		ptime2mvdatetime(ptimex, mvdate, mvtime);
+//
+//		//file_size() is only available for files not directories
+//		//return int(std::filesystem::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
+//		return FM ^ mvdate ^ FM ^ int(mvtime);
+//
+//	} catch (...) {
+//		return "";
+//	};
+//}
 
 var var::oslistf(CVR path, CVR globpattern) const {
 	return this->oslist(path, globpattern, 1);
