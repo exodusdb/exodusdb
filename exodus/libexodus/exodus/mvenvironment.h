@@ -32,10 +32,6 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvfunctor.h>
 
-// for labelled commons if not using array
-//#include <map>
-//#include <boost/any.hpp>
-
 namespace exodus {
 
 // to avoid gcc 4 "warning: type attributes are honored only at type definition"

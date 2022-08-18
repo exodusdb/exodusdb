@@ -21,8 +21,6 @@
 #define MVDBCONNS_H
 
 #include <libpq-fe.h>  //in postgres/include
-//#include <boost/thread/mutex.hpp>
-//#define USE_MAP_FOR_UNORDERED
 //#include <map>
 #include <unordered_map>
 
@@ -100,8 +98,6 @@ class MVConnections {
 	// cache container to hold connections
 	CONN_MAP conntbl;
 
-	// mutex to coordinate updates
-	//mutable boost::mutex mvconnections_mutex;
 };
 
 }  // namespace exodus

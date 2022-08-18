@@ -1,4 +1,3 @@
-//#include <boost/algorithm/string.hpp>
 //#include <wctype.h>
 
 #if defined(_MSC_VER)
@@ -7,9 +6,6 @@
 #else
 #include <string.h>
 #endif
-
-//#include <boost/scoped_array.hpp>
-//#include <boost/algorithm/string.hpp>
 
 #include <locale.h>
 #ifdef __APPLE__

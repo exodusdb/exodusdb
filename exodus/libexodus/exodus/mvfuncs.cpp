@@ -84,8 +84,6 @@ Binary    Hex          Comments
 //#include <iostream> //cin and cout
 //#include <memory>   //for unique_ptr
 
-#include <boost/utility/string_view.hpp>
-
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvlocale.h>

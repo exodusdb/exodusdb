@@ -33,7 +33,6 @@ THE SOFTWARE.
 //used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>
 
-//#include <boost/thread/thread.hpp> // for posix_time
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <exodus/mv.h>
@@ -468,9 +467,6 @@ bool var::osread(const char* osfilename, const char* codepage) {
 
 	// reserve memory - now reading directly into var_str
 	// get file size * wchar memory to load the file or fail
-	// boost::scoped_array<char> memblock(new char [bytesize]);
-	// std::unique_ptr<char[]> memblock(new char[bytesize]);
-	// if (memblock==0)
 	try {
 		// emergency memory - will be deleted at } - useful if OOM
 		std::unique_ptr<char[]> emergencymemory(new char[16384]);
@@ -765,7 +761,6 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// var((int) pmyfile->tellg()).outputl("2 tellg=");
 
 	// get a memory block to read into
-	// boost::scoped_array<char> memblock(new char [bytesize]);
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	//std::unique_ptr memblock(new char[bytesize]);
 	if (memblock == 0)
@@ -1085,7 +1080,6 @@ bool var::osrmdir(bool evenifnotempty) const {
 	// get a handle and return "" if doesnt exist or is NOT a directory
 	try {
 
-		// boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		std::filesystem::path pathx(this->to_path_string().c_str());
 
 		if (!std::filesystem::exists(pathx)) {
@@ -1292,8 +1286,6 @@ var var::oscwd() const {
 	//"[Note: When portable behavior is required, use complete(). When operating system
 	// dependent behavior is required, use system_complete()."
 
-	// http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
-	// std::string currentpath=boost::filesystem::current_path().string();
 	std::string currentpath = std::filesystem::current_path().string();
 
 	return var(currentpath).convert("/", OSSLASH);
