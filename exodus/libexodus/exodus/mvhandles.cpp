@@ -6,8 +6,8 @@
 #define INSIDE_MVHANDLES_CPP  // global obj in "mvhandles.h"
 #include "mvhandles.h"
 
-#include <boost/thread/mutex.hpp>
-boost::mutex mvhandles_mutex;
+#include <mutex>
+std::mutex mvhandles_mutex;
 
 #define HANDLES_CACHE_SIZE 3
 
@@ -21,7 +21,7 @@ MvHandlesCache::MvHandlesCache()
 
 int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
 	assert(del);
-	boost::mutex::scoped_lock lock(mvhandles_mutex);
+	std::scoped_lock lock(mvhandles_mutex);
 
 	int ix;
 	for (ix = 0; ix < (int)conntbl.size(); ix++)
@@ -38,14 +38,14 @@ int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTRO
 }
 
 CACHED_HANDLE MvHandlesCache::get_handle(int index, std::string name) {
-	boost::mutex::scoped_lock lock(mvhandles_mutex);
+	std::scoped_lock lock(mvhandles_mutex);
 	return (conntbl[index].deleter == nullptr) || (conntbl[index].extra != name)
 			   ? nullptr
 			   : conntbl[index].handle;
 }
 
 void MvHandlesCache::del_handle(int index) {
-	boost::mutex::scoped_lock lock(mvhandles_mutex);
+	std::scoped_lock lock(mvhandles_mutex);
 	assert(conntbl[index].deleter);
 	if (conntbl[index].deleter) {
 		conntbl[index].deleter(conntbl[index].handle);
@@ -57,7 +57,7 @@ void MvHandlesCache::del_handle(int index) {
 MvHandlesCache::~MvHandlesCache() {
 
 	// crashes on linux and multithreaded destructor cant exist so  dont lock
-	// boost::mutex::scoped_lock lock(mvhandles_mutex);
+	// std::scoped_lock lock(mvhandles_mutex);
 
 	int ix;
 	for (ix = 0; ix < (int)conntbl.size(); ix++)
