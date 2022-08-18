@@ -6,6 +6,42 @@ programinit()
 
 function main() {
 
+	if (index(OPTIONS, "H")) {
+		logputl(
+			"NAME\n"
+			"\n"
+			"    sync_dat\n"
+			"\n"
+			"DESCRIPTION\n"
+			"\n"
+			"    Copies dat files into database files.\n"
+			"    Generates and compiles dict_*.cpp files.\n"
+			"\n"
+			"SYNTAX\n"
+			"\n"
+			"    sync_dat [datpath] [filename]... [{OPTIONS}]\n"
+			"\n"
+			"    datpath defaults to $EXO_HOME/dat or $HOME/dat\n"
+			"\n"
+			"OPTIONS {inside braces}\n"
+			"\n"
+			"    F = Force. Dont skip dirs/files older than\n"
+			"               last sync_dat recorded in DEFINITIONS file\n"
+			"\n"
+			"    G = Also generate and compile dict_*.cpp\n"
+			"\n"
+			"EXAMPLES\n"
+			"\n"
+			"    sync_dat # Do all dat files not done already\n"
+			"\n"
+			"    sync_dat {FG} # Do all dat files\n"
+			"                  # Generate/compile dict*.cpp files.\n"
+			"\n"
+			"    sync_dat '' voc dict.voc # Just the voc and dict.voc files\n"
+		);
+		stop();
+	}
+
 	var homedir;
 	if (not homedir.osgetenv("EXO_HOME"))
 		homedir = osgetenv("HOME");
@@ -14,6 +50,8 @@ function main() {
 	if (not datpath) {
 		datpath = homedir ^ "/dat";
 	}
+
+	var dirnames = COMMAND.field(FM, 3, 999999);
 
 	var force = index(OPTIONS, "F");
 	var generate_dict_cpp = index(OPTIONS, "G");
@@ -38,6 +76,9 @@ function main() {
 
 	// Skip if nothing new
 	var datinfo = osdir(datpath);
+	if (not datinfo) {
+		abort("Error: syncdat: " ^ datpath.quote() ^ " dat dir missing");
+	}
 	var dirtext = "sync_dat: " ^ datpath ^ " " ^ datinfo.a(2).oconv("D-Y") ^ " " ^ datinfo.a(3).oconv("MTS");
 	if (not force and not is_newer(datinfo)) {
 		if (verbose)
@@ -49,7 +90,9 @@ function main() {
 	begintrans();
 
 	// Process each subdir in turn. each one represents a db file.
-	var dirnames = oslistd(datpath ^ "/*").sort();
+	if (not dirnames) {
+		dirnames = oslistd(datpath ^ "/*").sort();
+	}
 	for (var dirname : dirnames) {
 
 		var dirpath = datpath ^ "/" ^ dirname ^ "/";
@@ -120,6 +163,7 @@ function main() {
 					var t = dictsrc.index("\n/*pgsql");
 					if (t) {
 						dictsrc.splicer(t, 1, "\n}\n");
+						dictsrc.swapper("\n\n}", "\n}");
 						addfunctionmain = false;
 					}
 				}
@@ -129,8 +173,11 @@ function main() {
 				newcpptext ^= dictsrc ^ "\n";
 
 				// Close function main if not already done
-				if (addfunctionmain)
+				if (addfunctionmain) {
+					if (newcpptext[-1] ne "\n")
+						newcpptext ^= '\n';
 					newcpptext ^= "}\n";
+				}
 
 				// dict outro
 				newcpptext ^= "libraryexit(" ^ ID.lcase() ^ ")\n\n";
@@ -195,12 +242,19 @@ function main() {
 			if (not osread(oldcpptext from dictcppfilename))
 				oldcpptext = "";
 
+			// Update
 			if (newcpptext ne oldcpptext) {
 				//if (not oswrite(newcpptext on dbfilename))
 				if (not oswrite(newcpptext on dictcppfilename))
 					abort("sync_dat cannot write " ^ dictcppfilename);
 				printl("Updated", dictcppfilename);
-				if (not osshell("compile " ^ dictcppfilename))
+			}
+
+			// Compile
+			if (force or newcpptext ne oldcpptext) {
+				var cmd = "compile " ^ dictcppfilename;
+				printl(cmd);
+				if (not osshell(cmd))
 					abort("sync_dat could not compile " ^ dictcppfilename);
 			}
 		}

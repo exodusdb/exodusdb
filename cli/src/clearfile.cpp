@@ -6,7 +6,7 @@ programinit()
 	var filenames = COMMAND.field(FM, 2, 999999);
 
 	if (not filenames)
-		stop("Syntax is clearfile filename filename ...\ndict files are named dict_filename");
+		stop("Syntax is clearfile filename...");
 
 	var nfiles = dcount(filenames, FM);
 	for (var filen = 1; filen <= nfiles; ++filen) {
