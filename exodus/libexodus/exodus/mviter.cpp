@@ -1,6 +1,3 @@
-#include <boost/range/irange.hpp>
-//#include <iostream> //only for debugging
-
 #include <mv.h>
 
 //mv_iter class enables c++ range based programming over a dynamic array

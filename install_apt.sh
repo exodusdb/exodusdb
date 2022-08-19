@@ -47,7 +47,12 @@ set -euxo pipefail
 		cmake \
 		postgresql-server-dev-all \
 		g++ build-essential \
-		libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
+		libboost-regex-dev libboost-locale-dev
+		# Will be automatically installed
+		# atomic chrono date-time serialization system thread
+		#
+		# was:
+		#libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
 :
 : Download exodus if not already present
 :
