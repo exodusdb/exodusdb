@@ -397,10 +397,9 @@ removetrailing:
 
 // mainly called in ISSTRING when not already a string
 void var::createString() const {
-	// THISIS("void var::createString() const")
 	// TODO ensure ISDEFINED is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISDEFINED
-	// assertDefined(function_sig);
+	// this->assertDefined(__PRETTY_FUNCTION__);
 
 	// dbl - create string from dbl
 	// prefer double
@@ -447,8 +446,7 @@ var var::round(const int ndecimals) const {
 	// change
 
 
-	THISIS("var var::round() const")
-	assertNumeric(function_sig);
+	this->assertNumeric(__PRETTY_FUNCTION__);
 
 	var result;
 
@@ -547,8 +545,8 @@ var var::round(const int ndecimals) const {
 // reserved word in c/c++ for int datatype
 var var::integer() const {
 
-	THISIS("var var::integer() const")
-	assertInteger(function_sig);
+	this->assertInteger(__PRETTY_FUNCTION__);
+
 	/*
 	//pick integer means floor()
 	//-1.0=-1
@@ -572,17 +570,18 @@ var var::integer() const {
 // integer and floor are the same
 var var::floor() const {
 
-	THISIS("var var::floor() const")
-	assertInteger(function_sig);
+	this->assertInteger(__PRETTY_FUNCTION__);
+
+	// 123.999 -> 123
+	// -123.999 -> -124
 	return var_int;
 }
 
 bool var::toBool() const {
 
-	THISIS("bool var::toBool() const")
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
-	assertDefined(function_sig);
+	this->assertDefined(__PRETTY_FUNCTION__);
 
 	// identical code in void* and bool except returns void* and bool respectively
 	while (true) {
@@ -607,7 +606,7 @@ bool var::toBool() const {
 			return std::abs(var_dbl) >= SMALLEST_NUMBER;
 
 		if (!(var_typ)) {
-			assertAssigned(function_sig);
+			this->assertAssigned(__PRETTY_FUNCTION__);
 			throw MVUnassigned("toBool()");
 		}
 
@@ -618,8 +617,7 @@ bool var::toBool() const {
 
 int64_t var::toInt() const {
 
-	THISIS("int64_t var::toInt() const")
-	assertInteger(function_sig);
+	this->assertInteger(__PRETTY_FUNCTION__);
 
 	//return static_cast<int>(var_int);
 	return var_int;
@@ -627,16 +625,14 @@ int64_t var::toInt() const {
 
 //long long int var::toLong() const {
 //
-//	THISIS("int var::toLong() const")
-//	assertInteger(function_sig);
+//	this->assertInteger(__PRETTY_FUNCTION__);
 //
 //	return static_cast<long long int>(var_int);
 //}
 
 double var::toDouble() const {
 
-	THISIS("double var::toDouble() const")
-	assertDecimal(function_sig);
+	this->assertDecimal(__PRETTY_FUNCTION__);
 
 	return var_dbl;
 }
@@ -664,10 +660,9 @@ double var::toDouble() const {
 bool var::isnum(void) const {
 
 
-	THISIS("bool var::isnum(void) const")
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here
-	assertDefined(function_sig);
+	this->assertDefined(__PRETTY_FUNCTION__);
 
 	// Known to be numeric already
 	if (var_typ & VARTYP_INTDBL)

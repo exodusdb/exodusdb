@@ -36,7 +36,7 @@ THE SOFTWARE.
 //used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+//#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <exodus/mv.h>
 #include "mvhandles.h"
@@ -981,57 +981,62 @@ const std::string var::to_cmd_string() const {
 	return this->field(" ", 1).to_path_string() + " " + this->field(" ", 2, 999999).toString();
 }
 
-//convert some clock to time_t (for osfile() and osdir()
-template <typename TP>
-std::time_t to_time_t(TP tp) {
-	using namespace std::chrono;
-	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
-	return system_clock::to_time_t(sctp);
-}
-
-// in MVdatetime.cpp
-void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
+// utility defined in mvdatetime.cpp
+//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
 //WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
 //void ptime2mvdatetime(const std::filesystem::file_time_type& ptimex, int& mvdate, int& mvtime);
+void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
 
 var var::osfile() const {
 
-	THISIS("var var::osfile() const")
-	assertString(function_sig);
+	// SIMILAR CODE IN OSFILE AND OSDIR
+
+	assertString(__PRETTY_FUNCTION__);
 
 	// get a handle and return "" if doesnt exist or isnt a regular file
 	try {
+
+		// Why use stat instead of std::filesystem?
+		// https://eklitzke.org/std-filesystem-last-write-time
 
 		// Using low level interface instead of std::filesystem to avoid multiple call to stat
 		// 7,430 ns/op instead of  18,500 ns/op
 
 		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
 
-		// SIMILAR CODE IN OSFILE AND OSDIR
-		struct stat fileInfo;
+		struct stat statinfo;
 
 		// Get stat info or quit
-		if (stat(this->to_path_string().c_str(), &fileInfo) != 0)
+		if (stat(this->to_path_string().c_str(), &statinfo) != 0)
 			return "";
 
 		// Quit if is dir
-		if ((fileInfo.st_mode & S_IFMT) == S_IFDIR)
+		if ((statinfo.st_mode & S_IFMT) == S_IFDIR)
 			return "";
 
-		// convert to posix time
-		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(fileInfo.st_mtime);
+		// Identical code in osfile and osdir
 
-		// convert posix time to pickos integer date and time
-		int mvdate, mvtime;
-		ptime2mvdatetime(ptimex, mvdate, mvtime);
+		// convert c style time_t to pickos integer date and time
+		int pick_date, pick_time;
+		//boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(statinfo.st_mtime);
+		//ptime2mvdatetime(ptimex, pick_date, pick_time);
+		time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
 
 		//file_size() is only available for files not directories
-		return int(fileInfo.st_size) ^ FM ^ mvdate ^ FM ^ int(mvtime);
+		return int(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
 
 	} catch (...) {
 		return "";
 	};
 }
+
+//convert some clock to time_t (for osfile() and osdir()
+//template <typename TP>
+//std::time_t to_time_t(TP tp) {
+//	using namespace std::chrono;
+//	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
+//	return system_clock::to_time_t(sctp);
+//}
 
 // Old slower implementation using std:filesystem that requires multiple calls to stat
 //var var::osfile() const {
@@ -1136,39 +1141,42 @@ bool var::osrmdir(bool evenifnotempty) const {
 
 var var::osdir() const {
 
-	THISIS("var var::osdir() const")
-	assertString(function_sig);
+	// SIMILAR CODE IN OSFILE AND OSDIR
+
+	assertString(__PRETTY_FUNCTION__);
 
 	// get a handle and return "" if doesnt exist or is NOT a directory
 	// std::filesystem::wpath pathx(toTstring((*this)).c_str());
 	try {
+
+		// Why use stat instead of std::filesystem?
+		// https://eklitzke.org/std-filesystem-last-write-time
 
 		// Using low level interface instead of std::filesystem to avoid multiple call to stat
 		// 7,430 ns/op instead of  18,500 ns/op
 
 		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
 
-		// SIMILAR CODE IN OSFILE AND OSDIR
-		struct stat dirInfo;
+		struct stat statinfo;
 
 		// Get stat info or quit
-		if (stat(this->to_path_string().c_str(), &dirInfo) != 0)
+		if (stat(this->to_path_string().c_str(), &statinfo) != 0)
 			return "";
 
 		// Quit if is not dir
-		if ((dirInfo.st_mode & S_IFMT) != S_IFDIR)
+		if ((statinfo.st_mode & S_IFMT) != S_IFDIR)
 			return "";
 
-		// convert to posix time
-		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(dirInfo.st_mtime);
+		// Identical code in osfile and osdir
 
-		// convert posix time to mv date and time
-		int mvdate, mvtime;
-		ptime2mvdatetime(ptimex, mvdate, mvtime);
+		// convert c style time_t to pickos integer date and time
+		int pick_date, pick_time;
+		//boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(statinfo.st_mtime);
+		//ptime2mvdatetime(ptimex, pick_date, pick_time);
+		time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
 
 		//file_size() is only available for files not directories
-		//return int(std::filesystem::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
-		return FM ^ mvdate ^ FM ^ int(mvtime);
+		return int(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
 
 	} catch (...) {
 		return "";

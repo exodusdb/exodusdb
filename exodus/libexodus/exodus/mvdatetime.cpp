@@ -23,6 +23,8 @@ THE SOFTWARE.
 #ifndef MVDATETIME_H
 #define MVDATETIME_H
 
+// ostime, osdate, osfile, osdir should return dates and times in UTC
+
 #define PICK_UNIX_DAY_OFFSET -732
 
 const char* shortmths = "JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
@@ -48,18 +50,12 @@ const char* longdayofweeks =
 	"SATURDAY\0 "
 	"SUNDAY\0   ";
 
-// ostime, osdate, osfile, osdir should return dates and times in UTC or local TZ
-//#define RETURN_LOCAL_TZ_TIME
-#ifdef RETURN_LOCAL_TZ_TIME
-#define LOCAL_OR_UNIVERSAL(DATE_OR_TIME) local_##DATE_OR_TIME
-#else
-#define LOCAL_OR_UNIVERSAL(DATE_OR_TIME) universal_##DATE_OR_TIME
-#endif
+#include <chrono>
 
-#include "boost/date_time/c_local_time_adjustor.hpp"
-#include "boost/date_time/gregorian/gregorian.hpp"
-#include "boost/date_time/local_time_adjustor.hpp"
-#include "boost/date_time/posix_time/posix_time.hpp"
+#include <cstring>
+#include <sstream>
+
+#include <exodus/gregorian.h>
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 //   #include <time.h>
@@ -68,55 +64,60 @@ const char* longdayofweeks =
 #include <sys/time.h>
 #endif
 
-// work out the pick epoch date
-inline static auto pick_epoch_date = boost::gregorian::date(1967, 12, 31);
-
 #include <exodus/mv.h>
 
 namespace exodus {
 
-void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime) {
+/**************************
+	time_t_to_pick_dat_time
+**************************/
 
-#ifdef RETURN_LOCAL_TZ_TIME
-	// Convert to local timezone of current machine
-	// http://www.boost.org/doc/html/date_time/examples.html#date_time.examples.local_utc_conversion
-	// This local adjustor depends on the machine TZ settings-- highly dangerous!
-	// Uses c_time(time_t) to do the conversion via integer seconds since UNIX epoch 1/1/1970
-	// https://www.boost.org/doc/libs/1_80_0/boost/date_time/c_local_time_adjustor.hpp
-	using local_adjustor = boost::date_time::c_local_adjustor<boost::posix_time::ptime>;
-	boost::posix_time::ptime ptimex2 = local_adjustor::utc_to_local(ptimex);
-#else
-#define ptimex2 ptimex
-#endif
+// Utility to convert a c time_t structure to pick integer date and time
 
-	// Return pickos time (integer seconds since last midnight)
-	boost::posix_time::time_duration time_of_day = ptimex2.time_of_day();
-	mvtime = time_of_day.hours() * 3600 + time_of_day.minutes() * 60 + time_of_day.seconds();
+void time_t_to_pick_date_time(const time_t time, int* pick_date, int* pick_time) noexcept {
 
-	// Return pickos date (integer days since 31/12/1967)
-	boost::gregorian::date gdate = ptimex2.date();
-	// Convert to mv days since 31/12/1967
-	//boost::gregorian::date dayzero(1967, 12, 31);  // an arbitrary date
-	mvdate = (gdate - pick_epoch_date).days();
+	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
 
-	return;
+    const auto duration_since_epoch = std::chrono::system_clock::from_time_t(time).time_since_epoch();
+    //TRACE(duration_since_epoch.count())
+
+//    using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>>;
+//    const auto duration_in_days = std::chrono::duration_cast<days>(duration_since_epoch);
+//    idate = duration_in_days.count();
+
+    using secs = std::chrono::duration<int, std::ratio_multiply<std::chrono::seconds::period, std::ratio<1>>>;
+    const auto duration_in_secs = std::chrono::duration_cast<secs>(duration_since_epoch);
+    *pick_time = duration_in_secs.count() % 86400;
+
+	*pick_date = (duration_in_secs.count() / 86400) - PICK_UNIX_DAY_OFFSET;
+
 }
 
 var var::date() const {
 	// returns number of days since the pick date epoch 31/12/1967
 
-	// http://www.boost.org/doc/html/date_time/examples.html#date_time.examples.days_alive
-	// static const boost::gregorian::date dayzero(1967,12,31); //an arbitrary date
-	boost::gregorian::date gdate_today = boost::gregorian::day_clock::LOCAL_OR_UNIVERSAL(day)();
-	return int((gdate_today - pick_epoch_date).days());
+	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
+
+    const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
+
+	using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>>;
+	const auto duration_in_days = std::chrono::duration_cast<days>(duration_since_epoch);
+	return duration_in_days.count() - PICK_UNIX_DAY_OFFSET;
+
 }
 
 var var::time() const {
 	// returns number of whole seconds since midnight
-	boost::posix_time::time_duration time_of_day =
-		boost::posix_time::second_clock::LOCAL_OR_UNIVERSAL(time)().time_of_day();
-	return int(time_of_day.hours() * 3600 + time_of_day.minutes() * 60 +
-			   time_of_day.seconds());
+
+
+	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
+
+    const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
+
+    using secs = std::chrono::duration<int, std::ratio_multiply<std::chrono::seconds::period, std::ratio<1>>>;
+    const auto duration_in_secs = std::chrono::duration_cast<secs>(duration_since_epoch);
+    return duration_in_secs.count() % 86400;
+
 }
 
 var var::timedate() const {
@@ -130,10 +131,14 @@ var var::timedate() const {
 var var::ostime() const {
 	// return decimal seconds since midnight up to micro or nano second accuracy
 
-	boost::posix_time::ptime ptimex = boost::posix_time::microsec_clock::LOCAL_OR_UNIVERSAL(time)();
-	boost::posix_time::time_duration time_of_day = ptimex.time_of_day();
+	// ms accuracy
+	//uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	//return now % 86400000000 / 1000000.0;
 
-	return (time_of_day.total_nanoseconds() / 1'000'000'000.0);
+	// ns accuracy
+	uint64_t now = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	return now % 86400000000000 / 1000000000.0;
+
 }
 
 var var::iconv_D(const char* conversion) const {
@@ -269,12 +274,28 @@ var var::iconv_D(const char* conversion) const {
 			year += 2000;
 	}
 
-	try {
-		boost::gregorian::date thisdate(year, month, day);
-		return int((thisdate - pick_epoch_date).days());
-	} catch (...) {
+	// Chekck month
+	if (month < 1 or month > 12)
 		return "";
+
+	// Table of max gregorian day per month
+    constexpr const int maxdays_by_month[] = {
+							31,28,31,//Jan, Feb, Mar
+							30,31,30,//Apr, May, Jun
+							31,31,30,//Jul, Aug, Sep
+							31,30,31 //Oct, Nov, Dec
+						};
+
+	// Check day per month
+	if (day > maxdays_by_month[month - 1] || day < 1) {
+		// Allow an exception for Feb 29 on leap years
+		if (not (day == 29 and month == 2 and hinnant::gregorian::is_leap(year)))
+			return "";
 	}
+
+	// Convert to pick integer date which is the number of days since 1967-12-31
+	return hinnant::gregorian::days_from_civil(year, month, day) - PICK_UNIX_DAY_OFFSET;
+
 }
 
 var var::oconv_D(const char* conversion) const {
@@ -284,19 +305,13 @@ var var::oconv_D(const char* conversion) const {
 	// pick date uses floor()ie 1.9=1 and -1.9=-2
 
 	// get a ymd object for the desired date
-	// http://www.boost.org/doc/libs/1_39_0/doc/html/date_time/gregorian.html#date_time.gregorian.date_class
-	int pickdayno = this->floor().toInt();
-	//limit to 01 JAN 1400 - 31 DEC 9999
-	if (pickdayno < -207456)
-		pickdayno = -207456;
-	if (pickdayno > 2933628)
-		pickdayno = 2933628;
+	int pickdayno = this->floor();
+	int unixdayno = pickdayno + PICK_UNIX_DAY_OFFSET;
 
-	boost::gregorian::date desired_date =
-		pick_epoch_date + boost::gregorian::days(pickdayno);
-	boost::gregorian::date::ymd_type ymd = desired_date.year_month_day();
-	// boost::gregorian::date::ymd_type
-	// ymd=boost::gregorian::gregorian_calendar::from_day_number(1000u/*+PICK_UNIX_DAY_OFFSET*/);
+	int civil_year;
+	unsigned civil_month;
+	unsigned civil_day;
+	std::tie(civil_year, civil_month, civil_day) = hinnant::gregorian::civil_from_days(unixdayno);
 
 	// defaults
 	bool alphamonth = true;
@@ -338,16 +353,14 @@ var var::oconv_D(const char* conversion) const {
 			case 'M':
 				++conversionchar;
 				if (*conversionchar == 'A')
-					return &longmths[ymd.month * 11 - 10];
-				return var(int(ymd.month));
+					return &longmths[civil_month * 11 - 10];
+				return var(int(civil_month));
 
 			// Not AREV
 			// DW returns day of week number number 1-7 Mon-Sun
 			// DWA returns the day of week name
 			case 'W':
 				// calculate directly from pick date (construction of date above is wasted
-				// time) there appears to be only a name of day of week accessor in boost
-				// date and no number of day of accessor
 				dow = (((*this).floor() - 1) % 7) + 1;
 				++conversionchar;
 				if (*conversionchar == 'A')
@@ -370,17 +383,18 @@ var var::oconv_D(const char* conversion) const {
 			// Not AREV
 			// DD day of month
 			case 'D':
-				return var(int(ymd.day));
+				return var(int(civil_day));
 
 			// Not AREV
 			// DQ returns quarter number
 			case 'Q':
-				return var(int((ymd.month - 1) / 3) + 1);
+				return var(int((civil_month - 1) / 3) + 1);
 
 			// Not AREV
 			// DJ returns day of year
 			case 'J':
-				return int(desired_date.day_of_year());
+				//return int(desired_date.day_of_year());
+				return unixdayno - hinnant::gregorian::days_from_civil(civil_year, 1, 1) + 1;
 
 			// iso year format - at the beginning
 			case 'S':
@@ -390,7 +404,8 @@ var var::oconv_D(const char* conversion) const {
 
 			// DL LAST day of month
 			case 'L':
-				return var(int(desired_date.end_of_month().day()));
+				//return var(int(desired_date.end_of_month().day()));
+				return var(int(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
 
 			default:
 				sepchar = *conversionchar;
@@ -407,7 +422,7 @@ var var::oconv_D(const char* conversion) const {
 	// trim the right n year digits since width() will pad but not cut (is this really the C++
 	// way?)
 	std::stringstream yearstream;
-	yearstream << ymd.year;
+	yearstream << civil_year;
 	std::string yearstring = yearstream.str();
 	int yearstringerase = int(yearstring.length() - yeardigits);
 	if (yearstringerase > 0)
@@ -416,7 +431,7 @@ var var::oconv_D(const char* conversion) const {
 	// year first
 	if (yearfirst) {
 		ss.width(yeardigits);
-		// ss << ymd.year;
+		// ss << civil_year;
 		// above doesnt cut down number of characters
 		ss << yearstring;
 		if (yearonly)
@@ -431,30 +446,30 @@ var var::oconv_D(const char* conversion) const {
 	// day first
 	if (dayfirst) {
 		ss.width(2);
-		ss << ymd.day;
+		ss << civil_day;
 		ss << sepchar;
 	}
 
 	// month
 	if (alphamonth) {
 		// ss.width(3);
-		ss << &shortmths[ymd.month * 4 - 4];
+		ss << &shortmths[civil_month * 4 - 4];
 	} else {
 		ss.width(2);
-		ss << int(ymd.month);
+		ss << int(civil_month);
 	}
 
 	// day last
 	if (!dayfirst) {
 		ss << sepchar;
 		ss.width(2);
-		ss << ymd.day;
+		ss << civil_day;
 	}
 
 	// year last
 	if (!yearfirst && yeardigits) {
 		ss << sepchar;
-		// ss << ymd.year;
+		// ss << civil_year;
 		// above doesnt cut down number of characters
 		ss.width(yeardigits);
 		ss << yearstring;

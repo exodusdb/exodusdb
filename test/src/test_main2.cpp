@@ -565,7 +565,40 @@ function main()
 	assert(var("31-1-2008").iconv("DE") eq "14641");
 	assert(var("31/JAN/2008").iconv("DE") eq "14641");
 	assert(var("JAN/31/2008").iconv("DE") eq "14641");
-	assert(var("29 FEB 2008").iconv("D") eq "14670");
+
+	assert(var("29 FEB 1900").iconv("D") eq "");               //centuries not divisible by 400 are not leap years
+	assert(var("29 FEB 2000").iconv("D").outputl() eq "11748");//centuries divisible by 400 are leap years
+	assert(var("29 FEB 2008").iconv("D") eq "14670");          //years divisible by 4 are leap years
+	assert(var("29 FEB 2009").iconv("D") eq "");               // years not divisible 4 are leap years
+
+	assert(var("30 FEB 1900").iconv("D") eq "");
+	assert(var("30 FEB 2000").iconv("D") eq "");
+	assert(var("30 FEB 2008").iconv("D") eq "");
+	assert(var("30 FEB 2009").iconv("D") eq "");
+
+	assert(var("31 FEB 1900").iconv("D") eq "");
+	assert(var("31 FEB 2000").iconv("D") eq "");
+	assert(var("31 FEB 2008").iconv("D") eq "");
+	assert(var("31 FEB 2009").iconv("D") eq "");
+
+	assert(var("32 JAN 1900").iconv("D") eq "");
+	assert(var("32 JAN 2000").iconv("D") eq "");
+	assert(var("32 JAN 2008").iconv("D") eq "");
+	assert(var("32 JAN 2009").iconv("D") eq "");
+
+	// Check which months have 31 and which do not
+	assert(var("31-01-2000").iconv("DE").outputl() eq "11719");
+	assert(var("31-02-2000").iconv("DE").outputl() eq "");
+	assert(var("31-03-2000").iconv("DE").outputl() eq "11779");
+	assert(var("31-04-2000").iconv("DE").outputl() eq "");
+	assert(var("31-05-2000").iconv("DE").outputl() eq "11840");
+	assert(var("31-06-2000").iconv("DE").outputl() eq "");
+	assert(var("31-07-2000").iconv("DE").outputl() eq "11901");
+	assert(var("31-08-2000").iconv("DE").outputl() eq "11932");
+	assert(var("31-09-2000").iconv("DE").outputl() eq "");
+	assert(var("31-10-2000").iconv("DE").outputl() eq "11993");
+	assert(var("31-11-2000").iconv("DE").outputl() eq "");
+	assert(var("31-12-2000").iconv("DE").outputl() eq "12054");
 
 	assert(var("32/1/2008").iconv("DE") eq "");
 	assert(var("30/2/2008").iconv("DE") eq "");
