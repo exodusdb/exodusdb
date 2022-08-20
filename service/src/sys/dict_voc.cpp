@@ -24,7 +24,8 @@ libraryexit(all)
 libraryinit(alluppercase)
 //-----------------------
 function main() {
-	return RECORD.ucaser();}
+	return RECORD.ucaser();
+}
 /*pgsql
     return upper(data);
 */
@@ -241,6 +242,7 @@ libraryexit(dt)
 
 libraryinit(executive_email)
 //--------------------------
+	//@ans=xlate('USERS',{EXECUTIVE_CODE},7,'C')
 function main() {
 	var executivecode = calculate("EXECUTIVE_CODE");
 	executivecode.ucaser();
@@ -398,8 +400,25 @@ function main() {
 	if (brandcode1 and brandcode1 ne brandcode) {
 		ans.splicer(1, 0, brandcode1.xlate("BRANDS", 2, "X") ^ " ");
 	}
-	return ans; 
+	return ans;
 }
+/*pgsql BRAND_CODE
+DECLARE
+	brandcode text;
+	brand text;
+	brandcode2 text;
+	brandname2 text;
+BEGIN
+	brandcode := key;
+	brand := xlate BRANDS brandcode ''
+	ans := split_part(brand,FM,2);
+	brandcode2 := exodus_extract_text(brand,8,1,1);
+	if brandcode2 != '' and brandcode2 != brandcode then
+		brandname2 := xlate BRANDS brandcode2 2
+		ans := brandname2 || ' ' || ans;
+	end if;
+END;
+*/
 libraryexit(full_brand_name)
 
 
