@@ -61,33 +61,29 @@ ConnectionRecordCache* MVConnections::get_recordcache(int index) const {
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-std::string MVConnections::getrecord(const int connid, const std::string filename, const std::string key) const {
+std::string MVConnections::getrecord(const int connid, uint64_t file_and_key) const {
 	auto connection_readcache = get_recordcache(connid);
-	std::string filenameandkey = filename + "|" + key;
-	auto cacheentry = connection_readcache->find(filenameandkey);
+	auto cacheentry = connection_readcache->find(file_and_key);
 	if (cacheentry == connection_readcache->end())
 		return "";
 
-	return connection_readcache->at(filenameandkey);
+	return connection_readcache->at(file_and_key);
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-void MVConnections::putrecord(const int connid, const std::string filename, const std::string key, const std::string& record) {
+void MVConnections::putrecord(const int connid, uint64_t file_and_key, const std::string& record) {
 	auto connection_readcache = get_recordcache(connid);
-	std::string filenameandkey = filename + "|" + key;
-	//(*connection_readcache)[filenameandkey] = record;
-	connection_readcache->insert_or_assign(filenameandkey, record);
+	connection_readcache->insert_or_assign(file_and_key, record);
 	return;
 }
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
-void MVConnections::delrecord(const int connid, const std::string filename, const std::string key) {
+void MVConnections::delrecord(const int connid, uint64_t file_and_key) {
 	auto connection_readcache = get_recordcache(connid);
-	std::string filenameandkey = filename + "|" + key;
 	//(*connection_readcache)[filenameandkey] = "";
 	//connection_readcache->erase(filenameandkey);
-	connection_readcache->insert_or_assign(filenameandkey, "");
+	connection_readcache->insert_or_assign(file_and_key, "");
 	return;
 }
 

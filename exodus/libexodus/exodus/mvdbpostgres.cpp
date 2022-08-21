@@ -54,7 +54,11 @@ THE SOFTWARE.
 //		- improve modularity of the Exodus platform;
 //		- allow easy expanding to other DB engines.
 
-#include <unordered_map>
+// Using map for caches instead of unordered_map since it is faster
+// up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
+// and perhaps even more since it doesnt require hashing time.
+// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
+//#include <unordered_map>
 #include <map>
 
 #if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
@@ -122,12 +126,18 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 // explain select * from testview where field1  > 'aaaaaaaaa';
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
+// THREAD_LOCAL data
 thread_local int thread_default_data_mvconn_no = 0;
 thread_local int thread_default_dict_mvconn_no = 0;
 //thread_local var thread_connparams = "";
 thread_local var thread_dblasterror = "";
 thread_local MVConnections thread_connections(connection_DELETER_AND_DESTROYER);
-thread_local std::unordered_map<std::string, std::string> thread_file_handles;
+thread_local std::map<std::string, std::string> thread_file_handles;
+
+//very few entries so map will be much faster than unordered_map
+//thread_local std::unordered_map<std::string, MVresult> thread_mvresults;
+class MVresult;
+thread_local std::map<std::string, MVresult> thread_mvresults;
 
 //std::string getpgresultcell(PGresult* pgresult, int rown, int coln) {
 //	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
@@ -174,7 +184,7 @@ static const var valuechars("\"'.0123456789-+");
 
 // Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
 // TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
-uint64_t mvdbpostgres_hash_filename_and_key(CVR filehandle, CVR key) {
+uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
 
 	// Use the pure filename and disregard any connection number
 	std::string fileandkey = get_normal_filename(filehandle);
@@ -285,10 +295,6 @@ class MVresult {
 		}
 	}
 };
-
-//very few entries so map will be much faster than unordered_map
-//thread_local std::unordered_map<std::string, MVresult> thread_mvresults;
-thread_local std::map<std::string, MVresult> thread_mvresults;
 
 int get_mvconn_no(CVR dbhandle) {
 
@@ -724,16 +730,16 @@ bool var::attach(CVR filenames) {
 	// cache file handles in thread_file_handles
 	var notattached_filenames = "";
 	for (var filename : filenames2) {
-		var filename2 = get_normal_filename(filename);
+		var normal_filename = get_normal_filename(filename);
 		var file;
-		if (file.open(filename2,*this)) {
+		if (file.open(normal_filename,*this)) {
 			// Similar code in dbattach and open
-			thread_file_handles[filename2] = file.var_str;
+			thread_file_handles[normal_filename] = file.var_str;
 			if (DBTRACE)
 				file.logputl("DBTR var::attach() ");
 		}
 		else {
-			notattached_filenames ^= filename2 ^ " ";
+			notattached_filenames ^= normal_filename ^ " ";
 		}
 	}
 
@@ -850,10 +856,10 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
-	var filename2 = get_normal_filename(filename);
+	var normal_filename = get_normal_filename(filename);
 
 	// filename dos or DOS  means osread/oswrite/osremove
-	if (filename2.var_str.size() == 3 && filename2.var_str == "dos") {
+	if (normal_filename.var_str.size() == 3 && normal_filename.var_str == "dos") {
 		//(*this) = "dos";
 		var_str = "dos";
 		var_typ = VARTYP_NANSTR;
@@ -868,15 +874,15 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	else {
 
 		// Or use any preopened or preattached file handle if available
-	    auto entry = thread_file_handles.find(filename2);
+	    auto entry = thread_file_handles.find(normal_filename);
     	if (entry != thread_file_handles.end()) {
-			//(*this) = thread_file_handles.at(filename2);
+			//(*this) = thread_file_handles.at(normal_filename);
 			auto cached_file_handle = entry->second;
 
 			// Make sure the connection is still valid otherwise redo the open
 			auto pgconn = get_pgconnection(cached_file_handle);
 			if (! pgconn) {
-				thread_file_handles.erase(filename2);
+				thread_file_handles.erase(normal_filename);
 				//var(cached_file_handle).errputl("==== Connection cache INVALID = ");
 			} else {
 				//var(cached_file_handle).errputl("==== Connection cache VALID   = ");
@@ -890,7 +896,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 		// Or determine connection from filename in case filename is a handle
 		//use default data or dict connection
-		connection2 = filename2;
+		connection2 = normal_filename;
 
 	}
 
@@ -901,13 +907,13 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	var tablename;
 	var schema;
 	var and_schema_clause;
-	if (filename2.index(".")) {
-		schema = filename2.field(".",1);
-		tablename = filename2.field(".",2,999);
+	if (normal_filename.index(".")) {
+		schema = normal_filename.field(".",1);
+		tablename = normal_filename.field(".",2,999);
 		and_schema_clause = " AND table_schema = " ^ schema.squote();
 	} else {
 		schema = "public";
-		tablename = filename2;
+		tablename = normal_filename;
 		//no schema filter allows opening temporary files with exist in various pg_temp_xxxx schemata
 		//and_schema_clause = "";
 		and_schema_clause = " AND table_schema != 'dict'";
@@ -958,15 +964,15 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	//this->lasterror();
 
 	// var becomes a filehandle containing the filename and connection no
-	(*this) = filename2 ^ FM ^ get_mvconn_no_or_default(connection2);
-	filename2.var_str.push_back(FM_);
-	filename2.var_str.append(std::to_string(get_mvconn_no_or_default(connection2)));
-	var_str = filename2.var_str;
+	(*this) = normal_filename ^ FM ^ get_mvconn_no_or_default(connection2);
+	normal_filename.var_str.push_back(FM_);
+	normal_filename.var_str.append(std::to_string(get_mvconn_no_or_default(connection2)));
+	var_str = normal_filename.var_str;
 	var_typ = VARTYP_NANSTR;
 
 	// Cache the filehandle so future opens return the same
 	// Similar code in dbattach and open
-	thread_file_handles[filename2] = var_str;
+	thread_file_handles[normal_filename] = var_str;
 
 	if (DBTRACE)
 		this->logputl("DBTR var::open-3 ");
@@ -1014,8 +1020,9 @@ bool var::reado(CVR filehandle, CVR key) {
 
 	// Attempt to get record from the cache
 	// TODO cache non-existent records as empty
+	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
 	std::string cachedrecord =
-		thread_connections.getrecord(mvconn_no, filehandle.a(1).var_str, key.var_str);
+		thread_connections.getrecord(mvconn_no, hash64);
 	if (!cachedrecord.empty()) {
 
 		//(*this) = cachedrecord;
@@ -1051,7 +1058,8 @@ bool var::writeo(CVR filehandle, CVR key) const {
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed");
 
-	thread_connections.putrecord(mvconn_no, filehandle.a(1).var_str, key.var_str, var_str);
+	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
+	thread_connections.putrecord(mvconn_no, hash64, var_str);
 
 	return true;
 }
@@ -1068,7 +1076,8 @@ bool var::deleteo(CVR key) const {
 	if (!mvconn_no)
 		throw MVDBException("get_mvconn_no() failed");
 
-	thread_connections.delrecord(mvconn_no, this->a(1).var_str, key.var_str);
+	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
+	thread_connections.delrecord(mvconn_no, hash64);
 
 	return true;
 }
@@ -1262,7 +1271,7 @@ var var::lock(CVR key) const {
 	auto mvconnection = get_mvconnection(*this);
 
 	// TODO consider preventing begintrans if lock cache not empty
-	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
+	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
 
 	// if already in lock cache
 	//
@@ -1326,7 +1335,7 @@ bool var::unlock(CVR key) const {
 	assertDefined(function_sig);
 	ISSTRING(key)
 
-	auto hash64 = mvdbpostgres_hash_filename_and_key(*this, key);
+	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
 
 	auto pgconn = get_pgconnection(*this);
 	if (!pgconn)
@@ -1492,7 +1501,6 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 bool var::writev(CVR filehandle, CVR key, const int fieldno) const {
 	if (fieldno <= 0)
 		return write(filehandle, key);
-
 
 	THISIS("bool var::writev(CVR filehandle,CVR key,const int fieldno) const")
 	// will be duplicated in read and write but do here to present the correct function name on

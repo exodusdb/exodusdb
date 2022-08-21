@@ -25,7 +25,14 @@ THE SOFTWARE.
 
 #undef eq
 #include <iostream>
-#include <unordered_map>
+
+// Using map for dllib cache instead of unordered_map since it is faster
+// up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
+// and perhaps even more since it doesnt require hashing time.
+// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
+//#include <unordered_map>
+#include <map>
+
 #include <vector>
 #define eq ==
 
@@ -190,7 +197,8 @@ class PUBLIC MvEnvironment {
 	// init() opens it. destructor closes it
 	int processnolockfd = 0;
 
-	std::unordered_map<std::string, void*> dlopen_cache;
+	//std::unordered_map<std::string, void*> dlopen_cache;
+	std::map<std::string, void*> dlopen_cache;
 };
 
 }  // namespace exodus

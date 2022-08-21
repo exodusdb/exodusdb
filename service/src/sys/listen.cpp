@@ -808,15 +808,23 @@ function loop_exit() {
 		cmd = "";
 		cmd.input(oscwd() ^ " Command? ");
 		SYSTEM(2) = "";
+
+		// Check if something like ~/lib/libxxxxxxxx.so exists where xxxxxxxx is the first word of the command
 		if (not libinfo(cmd.field(" "))) {
 			errputl(cmd.field(" "), " does not exist.");
+
 		} else {
 			try {
-				var username=USERNAME;USERNAME="EXODUS";
+
+				// Execute the command as user EXODUS
+				var username=USERNAME;
+				USERNAME="EXODUS";
 				execute(cmd);
 				USERNAME=username;
+
 			} catch (MVError e) {errputl(e.description);}
 		}
+
 		osflush();
 	}
 

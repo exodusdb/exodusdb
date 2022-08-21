@@ -94,6 +94,8 @@ function main()
 		assert(xyz.reado(filename,k1));
 		assert(xyz == "123");
 
+		//not testing deleteo because write and delete always call it?
+
 		//deleting a record deletes it from both real and cache file
 		assert(deleterecord(filename,k1));
 		assert(not xyz.read(filename,k1));

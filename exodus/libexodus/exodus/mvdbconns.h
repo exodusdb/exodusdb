@@ -21,16 +21,21 @@
 #define MVDBCONNS_H
 
 #include <libpq-fe.h>  //in postgres/include
-//#include <map>
+
+// Using map generally instead of unordered_map since it is faster
+// up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
+// and perhaps even more since it doesnt require hashing time.
+// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
+#include <map>
 #include <unordered_map>
 
-using ConnectionLocks = std::unordered_map<uint64_t, int>;
+using ConnectionLocks = std::map<uint64_t, int>;
 
 namespace exodus {
 
 using DELETER_AND_DESTROYER = void (*)(PGconn*);
 
-using ConnectionRecordCache = std::unordered_map<std::string, std::string>;
+using ConnectionRecordCache = std::unordered_map<uint64_t, std::string>;
 
 class MVConnection	 // used as 'second' in pair, stored in connection map
 {
@@ -65,8 +70,8 @@ class MVConnection	 // used as 'second' in pair, stored in connection map
 
 };
 
-//using CONN_MAP = std::map<int, MVConnection>;
-using CONN_MAP = std::unordered_map<int, MVConnection>;
+using CONN_MAP = std::map<int, MVConnection>;
+//using CONN_MAP = std::unordered_map<int, MVConnection>;
 
 class MVConnections {
    public:
@@ -83,9 +88,9 @@ class MVConnections {
 	PGconn* get_pgconnection(int index) const;
 	MVConnection* get_mvconnection(int index) const;
 	ConnectionRecordCache* get_recordcache(int index) const;
-	std::string getrecord(const int connid, const std::string filename, const std::string key) const;
-	void putrecord(const int connid, const std::string filename, const std::string key, const std::string& record);
-	void delrecord(const int connid, const std::string filename, const std::string key);
+	std::string getrecord(const int connid, uint64_t file_and_key) const;
+	void putrecord(const int connid, uint64_t file_and_key, const std::string& record);
+	void delrecord(const int connid, uint64_t file_and_key);
 	void clearrecordcache(const int connid);
 
    private:

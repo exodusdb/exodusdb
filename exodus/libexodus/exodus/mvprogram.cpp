@@ -17,14 +17,9 @@ namespace exodus {
 // constructor with an mvenvironment
 ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 	: mv(inmv)
-//	,
-//	cache_dictid_(""),
-//	cache_perform_libid_(""),
-//	dict_exodusfunctorbase_(nullptr){};
 {
-	cache_dictid_ = "";
-	cache_perform_libid_ = "";
-	dict_exodusfunctorbase_ = nullptr;
+	cached_dictid_ = "";
+	cached_dictexodusfunctorbase_ = nullptr;
 }
 #pragma GCC diagnostic pop
 
@@ -1208,12 +1203,12 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 		// load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();
-		std::string str_libname = libid.toString();
-		if (!perform_exodusfunctorbase_.initsmf(str_libname.c_str(),
+		std::string libname = libid.toString();
+		if (!perform_exodusfunctorbase_.initsmf(libname.c_str(),
 												"exodusprogrambasecreatedelete_",
 												true  // forcenew each perform/execute
 												)) {
-			USER4 ^= "perform() Cannot find shared library \"" + str_libname +
+			USER4 ^= "perform() Cannot find shared library \"" + libname +
 					 "\", or \"libraryexit()\" is not present in it.";
 			// throw MVError(USER4);
 			// return "";
@@ -1375,18 +1370,24 @@ var ExodusProgramBase::calculate(CVR dictid) {
 
 	// return ID^"*"^dictid;
 
-	// get the dictionary record so we know how to extract the correct field or call the right
-	// library
-	bool newlibfunc;
+	// Get the dictionary record so we know how to extract the correct field
+	// or call the right library
 	bool indictvoc = false;
-	if (cache_dictid_ != (DICT.a(1) ^ " " ^ dictid)) {
+	bool newlibfunc = false;
+	std::string curr_dictid = std::string(dictid) + _RM_ + DICT.a(1).toString();
+	if (cached_dictid_ != curr_dictid) {
+		cached_dictid_ = "";
 		newlibfunc = true;
+
 		if (not DICT)
 			throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 						  ") DICT file variable has not been set");
-		if (not cache_dictrec_.reado(DICT, dictid)) {
+
+		if (not cached_dictrec_.reado(DICT, dictid)) {
+
 			// try lower case
-			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
+			if (not cached_dictrec_.reado(DICT, dictid.lcase())) {
+
 				// try dict.voc
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
 				if (not dictvoc.open("dict.voc")) {
@@ -1395,9 +1396,9 @@ baddict:
 								  ") dictionary record not in DICT " ^
 								  DICT.a(1).quote() ^ " nor in dict.voc");
 				}
-				if (not cache_dictrec_.reado(dictvoc, dictid)) {
+				if (not cached_dictrec_.reado(dictvoc, dictid)) {
 					// try lower case
-					if (not cache_dictrec_.reado(dictvoc, dictid.lcase())) {
+					if (not cached_dictrec_.reado(dictvoc, dictid.lcase())) {
 						goto baddict;
 					}
 				}
@@ -1407,26 +1408,25 @@ baddict:
 			// regardless of file xxxxxxxx/voc and upper/lower case key
 			// as if it was found in the initial file,key requested
 			// this will save repeated drill down searching on every access.
-			cache_dictrec_.r(16, indictvoc);
-			cache_dictrec_.writeo(DICT, dictid);
+			cached_dictrec_.r(16, indictvoc);
+			cached_dictrec_.writeo(DICT, dictid);
 		}
-		cache_dictid_ = DICT.a(1) ^ " " ^ dictid;
+		cached_dictid_ = curr_dictid;
 
 		//detect from the cached record if it came from dict.voc
 		//so we can choose the libdict_voc if so
-		indictvoc = cache_dictrec_.a(16);
+		indictvoc = cached_dictrec_.a(16);
 
-	} else
-		newlibfunc = false;
+	}
 
-	var dicttype = cache_dictrec_.a(1);
-	bool ismv = cache_dictrec_.a(4)[1] == "M";
+	var dicttype = cached_dictrec_.a(1);
+	bool ismv = cached_dictrec_.a(4)[1] == "M";
 
 	// F type dictionaries
 	if (dicttype == "F") {
 
 		// check field number is numeric
-		var fieldno = cache_dictrec_.a(2);
+		var fieldno = cached_dictrec_.a(2);
 		if (!fieldno.isnum())
 			return "";
 
@@ -1439,46 +1439,46 @@ baddict:
 
 			// field no 0
 		} else {
-			var keypart = cache_dictrec_.a(5);
+			var keypart = cached_dictrec_.a(5);
 			if (keypart && keypart.isnum())
 				return ID.field("*", keypart);
 			else
 				return ID;
 		}
 	} else if (dicttype == "S") {
-		// TODO deduplicate various exodusfunctorbase code spread around calculate mvipc*
-		// etc
 		if (newlibfunc) {
 
-			std::string str_libname;
+			std::string libname;
 			if (indictvoc)
-				str_libname = "dict_voc";
+				libname = "dict_voc";
 			else
-				str_libname = DICT.a(1).lcase().convert(".", "_").toString();
+				libname = DICT.a(1).lcase().convert(".", "_").toString();
 
 			// get from cache
-			std::string cachekey = dictid.lcase().toString() + "_" + str_libname;
-			dict_exodusfunctorbase_ = dict_function_cache[cachekey];
+			std::string functorcachekey = dictid.lcase().toString() + "_" + libname;
+			cached_dictexodusfunctorbase_ = cached_dict_functions[functorcachekey];
 			// if (dict_exodusfunctorbase_) {
 			//	delete dict_exodusfunctorbase_;
 			//	dict_exodusfunctorbase_=nullptr;
 			//}
 
-			// if not in cache then create new one
-			if (!dict_exodusfunctorbase_) {
+			// if not in cache then create new one and save it in the cache
+			if (!cached_dictexodusfunctorbase_) {
 				// var(cachekey).outputl("cachekey=");
-				dict_exodusfunctorbase_ = new ExodusFunctorBase;
-				dict_function_cache[cachekey] = dict_exodusfunctorbase_;
+
+				cached_dictexodusfunctorbase_ = new ExodusFunctorBase;
+				cached_dict_functions[functorcachekey] = cached_dictexodusfunctorbase_;
+
 				// wire up the the library linker to have the current mvenvironment
 				// if (!dict_exodusfunctorbase_.mv_)
-				dict_exodusfunctorbase_->mv_ = (&mv);
+				cached_dictexodusfunctorbase_->mv_ = (&mv);
 
 				std::string str_funcname =
 					("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
-				if (!dict_exodusfunctorbase_->initsmf(str_libname.c_str(),
+				if (!cached_dictexodusfunctorbase_->initsmf(libname.c_str(),
 													  str_funcname.c_str()))
 					throw MVError("ExodusProgramBase::calculate() Cannot find Library " +
-								  str_libname + ", or function " +
+								  libname + ", or function " +
 								  dictid.lcase() + " is not present");
 			}
 		}
@@ -1499,9 +1499,9 @@ baddict:
 
 		// call the shared library object main function with the right args (none for
 		// dicts), returning a var std::cout<<"precal"<<std::endl;
-		ANS = CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_->pobject_),
+		ANS = CALLMEMBERFUNCTION(*(cached_dictexodusfunctorbase_->pobject_),
 								 ((pExodusProgramBaseMemberFunction)(
-									 dict_exodusfunctorbase_->pmemberfunction_)))();
+									 cached_dictexodusfunctorbase_->pmemberfunction_)))();
 		// std::cout<<"postcal"<<std::endl;
 
 		// restore the MV if necessary

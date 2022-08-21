@@ -1,7 +1,12 @@
 #ifndef MVPROGRAM_H
 #define MVPROGRAM_H
 
-#include <unordered_map>
+// Using map for dict function cache instead of unordered_map since it is faster
+// up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
+// and perhaps even more since it doesnt require hashing time.
+// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
+//#include <unordered_map>
+#include <map>
 
 #include <exodus/mvenvironment.h>
 //#include <exodus/mvfunctor.h>
@@ -184,21 +189,16 @@ class PUBLIC ExodusProgramBase {
 
    private:
 	var number(CVR type, CVR input0, CVR ndecs0, VARREF output);
-	// used by calculate to call dict libraries
-	mutable ExodusFunctorBase* dict_exodusfunctorbase_;
-	// TODO cache many not just one
-	mutable var cache_dictid_;
-	mutable var cache_dictrec_;
-	std::unordered_map<std::string, ExodusFunctorBase*> dict_function_cache;
 
-	//cache_dictid_ = "";
-	//cache_perform_libid_ = "";
-	//dict_exodusfunctorbase_ = nullptr;
+	// used by calculate to call dict libraries
+	mutable std::string cached_dictid_;
+	mutable var cached_dictrec_;
+	mutable ExodusFunctorBase* cached_dictexodusfunctorbase_;
+	std::map<std::string, ExodusFunctorBase*> cached_dict_functions;
 
 	// used by perform to call libraries WITH NO ARGUMENTS
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;
-	// TODO cache many not just one
-	mutable var cache_perform_libid_;
+	//mutable var cached_perform_libid_;
 };
 
 }  // namespace exodus

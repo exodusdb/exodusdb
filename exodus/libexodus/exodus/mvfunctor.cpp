@@ -325,7 +325,6 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 std::string ExodusFunctorBase::libfilename(std::string libraryname) const {
 
 	//look for lib file in ~/lib/libXXXXXX.so
-	//otherwise just default library libXXXXXX.so
 	std::string libfilename = EXODUSLIBPREFIX + libraryname + EXODUSLIBEXT;
 	if (libfilename[0] == '~') {
 		// env string is copied into string so following getenv usage is safe
@@ -370,22 +369,22 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 	}
 
 	//look for lib file in ~/lib/libXXXXXX.so
-	//otherwise just default library libXXXXXX.so
-	libraryfilename_ = EXODUSLIBPREFIX + newlibraryname + EXODUSLIBEXT;
-	if (libraryfilename_[0] == '~') {
-		// env string is copied into string so following getenv usage is safe
-		var exo_HOME;
-		if (not exo_HOME.osgetenv("EXO_HOME"))
-			exo_HOME.osgetenv("HOME");
-		libraryfilename_.replace(0, 1, exo_HOME.toString());
-		//var(libraryfilename_).logputl();
-	}
+//	libraryfilename_ = EXODUSLIBPREFIX + newlibraryname + EXODUSLIBEXT;
+//	if (libraryfilename_[0] == '~') {
+//		// env string is copied into string so following getenv usage is safe
+//		var exo_HOME;
+//		if (not exo_HOME.osgetenv("EXO_HOME"))
+//			exo_HOME.osgetenv("HOME");
+//		libraryfilename_.replace(0, 1, exo_HOME.toString());
+//		//var(libraryfilename_).logputl();
+//	}
+	libraryfilename_ = libfilename(newlibraryname);
 
-	FILE* file = fopen(libraryfilename_.c_str(), "r");
-	if (file)
-		fclose(file);
-	else
-		libraryfilename_ = "lib" + newlibraryname + EXODUSLIBEXT;
+//	FILE* file = fopen(libraryfilename_.c_str(), "r");
+//	if (file)
+//		fclose(file);
+//	else
+//		libraryfilename_ = "lib" + newlibraryname + EXODUSLIBEXT;
 
 	// var(libraryfilename_).logputl();
 
