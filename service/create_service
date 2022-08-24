@@ -90,14 +90,14 @@ set -eux
 		[Unit]
 		Description=$SERVICE_CODE@%i Service
 		After=network.target postgresql.service
-		StartLimitBurst=3
-		StartLimitIntervalSec=30
+		#StartLimitBurst=10
+		StartLimitIntervalSec=0
 		#
 		[Service]
 		Type=simple
 		#Restart=on-failure
 		Restart=always
-		RestartSec=1
+		RestartSec=5
 		PIDFile=/run/neo/$SERVICE_CODE@%i.pid
 		User=$USER
 		WorkingDirectory=$WORK_DIR2
