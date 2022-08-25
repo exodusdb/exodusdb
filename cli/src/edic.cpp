@@ -30,6 +30,7 @@ function main() {
 	var editor = osgetenv("VISUAL");
 	var linenopattern = "$LINENO ";
 	if (not editor)
+		// get nano on linux possibly
 		editor.osgetenv("EDITOR");
 
 	//TODO simplify this editor finding code
@@ -154,7 +155,7 @@ function main() {
 	}
 
 	//editor="vi";
-	editor.swapper("nano ", "nano --positionlog --const --nowrap --autoindent --suspend +$LINENO ");
+	editor.regex_replacer("^[^ ]*\\bnano\\b", "nano --positionlog --const --suspend +$LINENO");
 	//editor.swapper("nano ", "nano --positionlog --const --nowrap --autoindent --suspend --speller=compile +$LINENO ");
 
 	if (editor.index("nano"))
@@ -386,17 +387,17 @@ function main() {
 
 			//build the compiler command
 			var compiler = "compile";
-			var compileoptions = "";
-			var compilecmd = compiler ^ " " ^ filename.quote() ^ compileoptions;
+			var compileoptions = "{C}";
+			var compilecmd = compiler ^ " " ^ filename.quote() ^ " " ^ compileoptions;
 
 			//capture the output
 			var compileoutputfilename = filename;
 			compileoutputfilename ^= ".~";
 			//var compileoutputfilename=filename ^ ".2";
-			//if (OSSLASH eq "/")
-			//   compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
-			//else
-			//    compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
+			if (OSSLASH eq "/")
+			   compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
+			else
+			    compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
 
 			//call the compiler
 			if (verbose)
@@ -418,22 +419,33 @@ function main() {
 
 				startatlineno = "";
 				//gnu style error lines
-				var charn = index(errors, ": error:");
-				if (charn) {
-					startatlineno = errors.substr(charn - 9, 9);
+				var matches = errors.match("\\w" ^ filename ^ ":(\\d+):(\\d+):");
+				if (matches) {
 
 					//printl(startatlineno);
-					startatlineno = startatlineno.field2(":", 2);
+					//startatlineno = startatlineno.field2(":", 2);
+					startatlineno = matches.a(1,2);
+
+					// skip column because nano treats tab as one column
+					//startatlineno ^= "," ^ matches.a(1,3);
+
 					//printl(startatlineno);
 					//msvc style error lines
 					//test.cpp(6) : error C2143: syntax error : missing ';' before '}'
-				} else if (charn = index(errors, ") : error ");charn) {
-					startatlineno = errors.substr(charn - 10, 10).field2("(", 2);
+//				} else if (charn = index(errors, ") : error ");charn) {
+//					startatlineno = errors.substr(charn - 10, 10).field2("(", 2);
+
 				}
 				if (startatlineno) {
-					print("Press Enter to re-edit at line " ^ startatlineno ^ " ... ");
-					var().input("");
-					continue;
+
+					print("Re-edit at line " ^ startatlineno ^ "? (Y/n)");
+					osflush();
+
+					if (inputn(1).convert("Yy\n","") eq "")
+						continue;
+
+					printl();
+					abort("");
 				}
 			}
 			print(compileoutputfilename);

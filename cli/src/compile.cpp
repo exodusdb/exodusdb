@@ -78,6 +78,7 @@ function main() {
 	optimise = count(OPTIONS, "O") - count(OPTIONS, "-");				//prevents backtrace
 	generateheadersonly = index(OPTIONS, "H");	//prevents backtrace
 	force = index(OPTIONS,"F");
+	var color_option = index(OPTIONS,"C");
 
 	//var ncpus = osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ", 1);
 	//var ncpus = osshellread("grep -c ^processor /proc/cpuinfo").convert("\r\n","");
@@ -234,6 +235,9 @@ function main() {
 			basicoptions ^= " -O" ^ optimise;
 		}
 		//}
+
+		if (color_option)
+			basicoptions ^= " -fdiagnostics-color=always";
 
 		//how to output to a named file
 		outputoption = " -o ";
