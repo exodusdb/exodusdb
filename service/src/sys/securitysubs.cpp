@@ -1612,7 +1612,7 @@ subroutine cleartemp() {
 
 subroutine getemailtx() {
 	//dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
-	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-4, 4) ne "TEST")) and not(var("exodus.id").osfile())) {
+	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-5) ne "_test")) and not(var("exodus.id").osfile())) {
 		return;
 	}
 

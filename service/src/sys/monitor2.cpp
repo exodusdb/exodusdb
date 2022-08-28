@@ -9,15 +9,15 @@ libraryinit()
 #include <getdatetime.h>
 #include <sendmail.h>
 #include <sysmsg.h>
-#include <upgrade.h>
+//#include <upgrade.h>
 
 #include <sys_common.h>
 
 var checkinterval;//num
 var forced;
-var upgradeready;//num
+//var upgradeready;//num
 var anyusers;//num
-var upgradefilename;
+//var upgradefilename;
 var processes;
 var request;
 var tempfilename;
@@ -94,12 +94,12 @@ var deletingsize;//num
 var hostdescriptions;
 var versionnote;
 var versiondate;
-var upgradefilename83;
-var upgradefiledir;
-var longupgradefilename;
+//var upgradefilename83;
+//var upgradefiledir;
+//var longupgradefilename;
 var errors;
-var upgradex;
-var upgradefiledatetime;
+//var upgradex;
+//var upgradefiledatetime;
 var wgetoutput;
 var jj;//num
 var osver;
@@ -111,7 +111,7 @@ var ips;
 var line;
 var nips;//num
 var maxips;//num
-var upgflagfile;
+//var upgflagfile;
 
 function main() {
 	//c sys
@@ -133,10 +133,10 @@ function main() {
 		return 0;
 		}
 
-	upgradeready = 0;
+	//upgradeready = 0;
 	//only counts web users
 	anyusers = 0;
-	upgradefilename = "upgrade.php";
+	//upgradefilename = "upgrade.php";
 
 	if (not(processes.open("PROCESSES", ""))) {
 		call fsmsg();
@@ -397,7 +397,7 @@ nextprocess:
 		//not if this is a test database (only those with codes ending in TEST')
 		//unless configured to all it
 		first = 1;
-		if ((((SYSTEM.a(17, 1).substr(-4, 4) ne "TEST") or SYSTEM.a(126)) and nok lt minreq) and nhung lt 5) {
+		if ((((SYSTEM.a(17, 1).substr(-5) ne "_test") or SYSTEM.a(126)) and nok lt minreq) and nhung lt 5) {
 			//if locksystem('LOCK',dbasecode) then
 				//unlock immediately to enable startup - which will fail if anyone locks
 				//call locksystem('UNLOCK',dbasecode)
@@ -715,61 +715,61 @@ nextdbasen:;
 	tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
-	//dont allow upgrades by test databases
-	if ((var(0) and SYSTEM.a(124)) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
-
-		//get upgrade file details
-		upgradefilename83 = SYSTEM.a(112);
-		upgradefiledir = upgradefilename83.osfile();
-		//get and cache upgradefilename83
-		//ie the dos 8.3 version of upgrade.php@data=xxxxxxxx_999999
-		if (not upgradefiledir) {
-			//get the 8.3 filename version
-			longupgradefilename = upgradefilename ^ "@data=" ^ installid;
-			upgradefilename83 = shell2("dir " ^ (longupgradefilename.quote()) ^ " /x /l", errors);
-			if (not errors) {
-				upgradefilename83.converter("\r\n", FM);
-				upgradefilename83 = upgradefilename83.a(6).substr(22, 999).trim().field(" ", 2);
-				upgradefiledir = upgradefilename83.osfile();
-				if (upgradefiledir) {
-					SYSTEM(112) = upgradefilename83;
-				}
-			}
-		}
-
-		//note if upgrade ready to be be installed (currently after nightly backup)
-		if (upgradefiledir) {
-			if (not(upgradex.read(processes, "%UPGRADE%"))) {
-				upgradex = "";
-			}
-			upgradefiledatetime = (upgradefiledir.a(2) + upgradefiledir.a(3) / 86400).oconv("MD50P");
-			//TODO make this only work for newer files? currently allows downgrading
-			if (upgradex.a(2) ne upgradefiledatetime) {
-				//check wget output file to see if is fully downloaded (100%) or "NO NEWER"
-				tt = upgradefilename;
-				tt.splicer(-3, 3, "$wg");
-				call osread(wgetoutput, tt);
-				if (wgetoutput.ucase().index(" NO NEWER ") or wgetoutput.index("100%")) {
-					upgradefiledir = upgradefilename83.osfile();
-					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
-					//tt=upgradefiledir<2> 'D2/J'
-					tt = upgradefiledir.a(2).oconv("D2/E");
-					tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
-					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.a(3).oconv("MT");
-					upgradeready = 1;
-				} else if (wgetoutput.ucase().index(" ERROR 404")) {
-				} else if (wgetoutput.ucase().index(" failed: Unknown host.")) {
-					printl("DNS cant resolve upgrade host name");
-				} else if (2) {
-					if (not(var("exodus.id").osfile())) {
-						print("upgrade downloading");
-					}
-				}
-				{}
-			}
-		}
-
-	}
+//	//dont allow upgrades by test databases
+//	if (false and SYSTEM.a(124)) and (SYSTEM.a(17).substr(-5) ne "_test")) {
+//
+//		//get upgrade file details
+//		upgradefilename83 = SYSTEM.a(112);
+//		upgradefiledir = upgradefilename83.osfile();
+//		//get and cache upgradefilename83
+//		//ie the dos 8.3 version of upgrade.php@data=xxxxxxxx_999999
+//		if (not upgradefiledir) {
+//			//get the 8.3 filename version
+//			longupgradefilename = upgradefilename ^ "@data=" ^ installid;
+//			upgradefilename83 = shell2("dir " ^ (longupgradefilename.quote()) ^ " /x /l", errors);
+//			if (not errors) {
+//				upgradefilename83.converter("\r\n", FM);
+//				upgradefilename83 = upgradefilename83.a(6).substr(22, 999).trim().field(" ", 2);
+//				upgradefiledir = upgradefilename83.osfile();
+//				if (upgradefiledir) {
+//					SYSTEM(112) = upgradefilename83;
+//				}
+//			}
+//		}
+//
+//		//note if upgrade ready to be be installed (currently after nightly backup)
+//		if (upgradefiledir) {
+//			if (not(upgradex.read(processes, "%UPGRADE%"))) {
+//				upgradex = "";
+//			}
+//			upgradefiledatetime = (upgradefiledir.a(2) + upgradefiledir.a(3) / 86400).oconv("MD50P");
+//			//TODO make this only work for newer files? currently allows downgrading
+//			if (upgradex.a(2) ne upgradefiledatetime) {
+//				//check wget output file to see if is fully downloaded (100%) or "NO NEWER"
+//				tt = upgradefilename;
+//				tt.splicer(-3, 3, "$wg");
+//				call osread(wgetoutput, tt);
+//				if (wgetoutput.ucase().index(" NO NEWER ") or wgetoutput.index("100%")) {
+//					upgradefiledir = upgradefilename83.osfile();
+//					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
+//					//tt=upgradefiledir<2> 'D2/J'
+//					tt = upgradefiledir.a(2).oconv("D2/E");
+//					tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
+//					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.a(3).oconv("MT");
+//					upgradeready = 1;
+//				} else if (wgetoutput.ucase().index(" ERROR 404")) {
+//				} else if (wgetoutput.ucase().index(" failed: Unknown host.")) {
+//					printl("DNS cant resolve upgrade host name");
+//				} else if (2) {
+//					if (not(var("exodus.id").osfile())) {
+//						print("upgrade downloading");
+//					}
+//				}
+//				{}
+//			}
+//		}
+//
+//	}
 
 	//show local time
 	hostdescriptions ^= " - At:" ^ var().time().oconv("MT");
@@ -879,19 +879,19 @@ gotip:
 		call monitor2b("WRITE", request, tempfilename, datax, msg);
 	}
 
-	//also look to get any upgrade file
-	//TODO put this on a less frequent check since it will only be
-	//updated after the nightly backup usually *unless last hour users are 0/0/0
-	//dont allow upgrades by test databases
-	if ((var(0) and SYSTEM.a(124)) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
-		if (msg) {
-		} else {
-			msg = "";
-			if (cidx) {
-				call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
-			}
-		}
-	}
+//	//also look to get any upgrade file
+//	//TODO put this on a less frequent check since it will only be
+//	//updated after the nightly backup usually *unless last hour users are 0/0/0
+//	//dont allow upgrades by test databases
+//	if (false and SYSTEM.a(124)) and SYSTEM.a(17).substr(-5) ne "_test")) {
+//		if (msg) {
+//		} else {
+//			msg = "";
+//			if (cidx) {
+//				call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
+//			}
+//		}
+//	}
 
 	//any error is going to be up front like error in parameters or missing wget
 	//errors in hostnames and connectivity must be obtained
@@ -913,19 +913,19 @@ gotip:
 	//update the monitor status
 	monitordata.write(processes, monitorkey);
 
-	//optional upgrade immediate if no web users in the last hour
-	//and no other parallel installation upgrades started in last 1 mins
-	//parallel means installations next to each other in the same folder
-	upgflagfile = "../../UPGRADE.$$$";
-	upgflagfile.converter("/", OSSLASH);
-	if ((upgradeready and not(anyusers)) and ((var().time() - upgflagfile.osfile().a(3)).abs() gt 60)) {
-		call oswrite("", upgflagfile);
-		//close all other processes, upgrade, close and restart
-		call upgrade("R");
-		perform("OFF");
-		var().logoff();
-	}
-
+//	//optional upgrade immediate if no web users in the last hour
+//	//and no other parallel installation upgrades started in last 1 mins
+//	//parallel means installations next to each other in the same folder
+//	upgflagfile = "../../UPGRADE.$$$";
+//	upgflagfile.converter("/", OSSLASH);
+//	if ((upgradeready and not(anyusers)) and ((var().time() - upgflagfile.osfile().a(3)).abs() gt 60)) {
+//		call oswrite("", upgflagfile);
+//		//close all other processes, upgrade, close and restart
+//		call upgrade("R");
+//		perform("OFF");
+//		var().logoff();
+//	}
+//
 	/////
 	//exit:
 	/////

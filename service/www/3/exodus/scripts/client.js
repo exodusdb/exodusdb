@@ -2306,7 +2306,6 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
         var xhttpaborted = false
 
         //g because perhaps will be a global variable
-        //var gasynchronous=guseyield && !isMSIE && (gusername=='EXODUS' || (typeof gdataset != 'undefined' && gdataset.slice(-4) == 'TEST'))
         var gasynchronous = guseyield && !(gonunload || gonbeforeunload)
         if (gasynchronous) {
 
@@ -2840,8 +2839,6 @@ function* exodusdecide(question, data, cols, returncoln, defaultreply, many, inv
 
     //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
 
-    //if (guseyield && gdataset.slice(-4)=='TEST')
-    //if (guseyield)
     var results = yield* exodusconfirm2(dialogargs)
     if (typeof results == 'undefined')
         results = ''
@@ -2867,7 +2864,6 @@ function rearray(array) {
 function* exodusdecide2(question, data, cols, returncoln, defaultreply, many) {
 
     //new in-window style popup
-    //if (gdataset.slice(-4)=='TEST') {
     if (guseyield) {
 
         //if row columns are not numeric then convert numeric return column number into named column in data rows
@@ -4927,7 +4923,8 @@ function systemerror(functionname, e) {
     if (!gonunload)
         alert('System Error in ' + functionname + '\n' + msg)
     //if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
-    if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
+    //if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
+    if (gstepping || (gusername == 'EXODUS'))
         exodus_javascript_system_error
 }
 

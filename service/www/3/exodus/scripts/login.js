@@ -205,7 +205,8 @@ function* login_onclick() {
 
     var datasetx = exodusgetdropdown(gdataset_element)
 
-    if (datasetx.substr(-4,4).toUpperCase() != 'TEST')
+	// Remember the last database logged into if not a test database
+    if (datasetx.substr(-5) != '_test')
        exodussetcookie('EXODUS','dataset',datasetx,'',true)
 
     if (!gusername_element.value) {

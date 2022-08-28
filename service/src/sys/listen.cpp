@@ -301,7 +301,7 @@ function main_init() {
 	defaultlockmins = 5;
 
 	datasetcode = SYSTEM.a(17);
-	live = datasetcode.ucase().substr(-4, 4) ne "TEST";
+	live = datasetcode.ucase().substr(-5) ne "_test";
 	processno = SYSTEM.a(24);
 
 	neopath = "../exodus/";

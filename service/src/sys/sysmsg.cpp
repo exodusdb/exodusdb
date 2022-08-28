@@ -123,7 +123,7 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 
 	//sysmsg is not emailed to admins if testdata or user is EXODUS
-	if (USERNAME eq "EXODUS" or (SYSTEM.a(17).substr(-4, 4) eq "TEST")) {
+	if (USERNAME eq "EXODUS" or (SYSTEM.a(17).substr(-5) eq "_test")) {
 
 		//this is disabled to ensure that all errors caused by EXODUS support
 		//are logged normally

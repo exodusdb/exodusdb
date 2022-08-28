@@ -64,7 +64,7 @@ function main(in mode, in html, io mark) {
 				mark ^= "</a>";
 			}
 			//mark:='</small>'
-			if (SYSTEM.a(17).substr(-4, 4) eq "TEST") {
+			if (SYSTEM.a(17).substr(-5) eq "_test") {
 				mark = "<span style=\"color:red\">" ^ mark ^ " - " ^ SYSTEM.a(17) ^ "</span>";
 			}
 		}

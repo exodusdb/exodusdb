@@ -289,7 +289,7 @@ function main() {
 		pidfilename = SYSTEM.a(54, 5) ^ ".pid";
 	} else {
 		pidfilename = "/run/neo/neo@" ^ SYSTEM.a(17);
-		if (SYSTEM.a(17).substr(-4, 4) eq "TEST") {
+		if (SYSTEM.a(17).substr(-5) eq "_test") {
 			pidfilename.swapper("neo@", "tst@");
 			pidfilename.swapper("_test", "");
 			pidfilename ^= ".pid";

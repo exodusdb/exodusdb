@@ -10,6 +10,7 @@ function* system_dict_datasetcode(di, many, orcurrent, test) {
     if (typeof test == 'undefined')
         test = '""'
     di.popup = 'yield* system_pop_datasetcode(' + many + ',' + orcurrent + ')'
+	di.lowercase = true;
     di.validation = 'yield* system_val_datasetcode(' + many + ',' + orcurrent + ',' + test + ')'
     di.length = 8;
 }
@@ -48,9 +49,9 @@ function* system_val_datasetcode(many, orcurrent, test) {
         return yield* exodusinvalid('You cannot choose CURRENT and other datasets')
 
     if (typeof test == 'boolean') {
-        if (test && gvalue && gvalue.substr(-4) != 'TEST')
+        if (test && gvalue && gvalue.substr(-5) != '_test')
             return yield* exodusinvalid('You can only choose TEST databases here')
-        else if (!test && gvalue.substr(-4) == 'TEST')
+        else if (!test && gvalue.substr(-5) == '_test')
             return yield* exodusinvalid('You cannot choose TEST databases here')
     }
 
