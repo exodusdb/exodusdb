@@ -5,7 +5,7 @@ S
 
 
 
-	ANS = RECORD.a(3);\
+	ANS = RECORD.f(3);\
 	ANS.converter(VM, " ");\
 	return ANS;
 T

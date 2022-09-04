@@ -61,7 +61,7 @@ class printtext {
 			SYSTEM.r(3, 1);
 
 			//if no printfilename assume command mode and make an output file name
-			printfilename = SYSTEM.a(2);
+			printfilename = SYSTEM.f(2);
 			if (html.unassigned()) {
 				html = printfilename.substr(-4, 4) eq ".htm";
 			}
@@ -143,7 +143,7 @@ class printtext {
 			pagen += 1;
 
 			//var().getcursor();
-			//cout << _AW.a(30)<< var().cursor(36, _CRTHIGH / 2)<< "Page"<< " "<< realpagen<< ".";
+			//cout << _AW.f(30)<< var().cursor(36, _CRTHIGH / 2)<< "Page"<< " "<< realpagen<< ".";
 			//cursor.setcursor();
 
 			//insert page break except on first page
@@ -198,7 +198,7 @@ class printtext {
 					style = "";
 				if (style)
 					css.swapper("</style>", style ^ "</style>");
-				var htmltitle = (headx.a(1)).field("\'", 1, 1);
+				var htmltitle = (headx.f(1)).field("\'", 1, 1);
 				if (htmltitle[1] == "<")
 					htmltitle = (htmltitle.field(">", 2, 1)).field("<", 1, 1);
 				tx.splicer(1, 0, "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head>\n<body style=\"background-color:#ffffff\">\n<div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
@@ -335,7 +335,7 @@ class printtext {
 		}
 
 		if (html) {
-			var head1 = headx.a(1);
+			var head1 = headx.f(1);
 			head1.swapper(" ", "&nbsp;");
 			head1.converter("~", " ");
 			while (head1.substr(-6, 6) == "&nbsp;") {

@@ -53,7 +53,7 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 	// end
 
 	if (processid == "") {
-		processid = SYSTEM.a(4);
+		processid = SYSTEM.f(4);
 	}
 
 	if (processcategory == "HEARTBEAT") {
@@ -131,7 +131,7 @@ subroutine newprocessid(io processid) {
 	processrec(1) = var().date();
 	processrec(2) = timex;
 	processrec(3) = STATION.trim();
-	processrec(4) = SYSTEM.a(17);
+	processrec(4) = SYSTEM.f(17);
 	processrec(5) = USERNAME;
 	return;
 

@@ -6,7 +6,7 @@ S
 
 
 function main() {\
-	return trim(RECORD.a(2), VM);\
+	return trim(RECORD.f(2), VM);\
 }
 T
 30

@@ -114,11 +114,11 @@ function main(in databasecode0="", in usercode0="") {
 					goto nextlock;
 				}
 
-				if (databasecode and process.a(17) ne databasecode) {
+				if (databasecode and process.f(17) ne databasecode) {
 					goto nextlock;
 				}
 
-				if (usercode and process.a(40, 10) ne usercode) {
+				if (usercode and process.f(40, 10) ne usercode) {
 					goto nextlock;
 				}
 
@@ -145,7 +145,7 @@ nextlock:;
 	}
 
 	for (const var ii : range(1, 9999)) {
-		usercode = returndata.a(2, ii);
+		usercode = returndata.f(2, ii);
 		///BREAK;
 		if (not usercode) break;
 		usercode = usercode.substr(6, 9999);
@@ -156,7 +156,7 @@ nextlock:;
 	} //ii;
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
-		call note(returndata.a(1) ^ " other users");
+		call note(returndata.f(1) ^ " other users");
 	}
 
 	return returndata;

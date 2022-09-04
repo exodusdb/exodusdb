@@ -824,7 +824,7 @@ PUBLIC bool clearfile(CVR filename_or_handle) {
 }
 
 PUBLIC bool renamefile(CVR filename_or_handle, CVR newfilename) {
-	return filename_or_handle.renamefile(filename_or_handle.a(1), newfilename);
+	return filename_or_handle.renamefile(filename_or_handle.f(1), newfilename);
 }
 
 PUBLIC bool createindex(CVR filename_or_handle, CVR fieldname, CVR dictfilename) {
@@ -954,7 +954,7 @@ PUBLIC var pickreplace(CVR instring, const int fieldno, CVR replacement) {
 }
 
 PUBLIC var extract(CVR instring, const int fieldno, const int valueno, const int subvalueno) {
-	return instring.a(fieldno, valueno, subvalueno);
+	return instring.f(fieldno, valueno, subvalueno);
 }
 
 PUBLIC var insert(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion) {

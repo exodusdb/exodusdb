@@ -6,7 +6,7 @@ S
 
 
 [DATE,4]
-	return RECORD.a(1) - ((RECORD.a(1) - 1).mod(7));
+	return RECORD.f(1) - ((RECORD.f(1) - 1).mod(7));
 R
 10
 

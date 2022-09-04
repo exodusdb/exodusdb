@@ -54,7 +54,7 @@ nextbuild:
 			if (not(RECORD.read(win.srcfile, ID))) {
 				goto nextbuild;
 			}
-			if (RECORD.a(subfn) eq "") {
+			if (RECORD.f(subfn) eq "") {
 				goto nextbuild;
 			}
 			deleting = 0;
@@ -64,7 +64,7 @@ nextbuild:
 		}
 
 	} else if (mode eq "PREWRITE") {
-		if (win.orec.a(subfn) eq RECORD.a(subfn)) {
+		if (win.orec.f(subfn) eq RECORD.f(subfn)) {
 			return 0;
 		}
 		validating = 1;
@@ -127,7 +127,7 @@ nextbuild:
 		gosub unlockall(locklist);
 
 	} else if (mode eq "POSTWRITE") {
-		if (win.orec.a(subfn) eq RECORD.a(subfn)) {
+		if (win.orec.f(subfn) eq RECORD.f(subfn)) {
 			return 0;
 		}
 		validating = 0;
@@ -154,9 +154,9 @@ nextbuild:
 subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterfn, io locklist) {
 
 	if (deleting) {
-		mastercode = win.orec.a(subfn);
+		mastercode = win.orec.f(subfn);
 	} else {
-		mastercode = RECORD.a(subfn);
+		mastercode = RECORD.f(subfn);
 	}
 	if (mastercode eq "") {
 		return;
@@ -176,7 +176,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 		var masterrecord;
 		if (masterrecord.read(masterfile, mastercode)) {
 			var origmasterrecord = masterrecord;
-			if (masterrecord.a(masterfn).locateby("AL", ID, vn)) {
+			if (masterrecord.f(masterfn).locateby("AL", ID, vn)) {
 				if (deleting) {
 					masterrecord.remover(masterfn, vn);
 				}

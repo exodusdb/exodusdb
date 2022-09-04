@@ -18,7 +18,7 @@ function main() {
 	var usetransaction=true;
 
 	if (deletefilex) {
-		tempfilename = "BENCHMARK" ^ SYSTEM.a(24);
+		tempfilename = "BENCHMARK" ^ SYSTEM.f(24);
 	}else{
 		tempfilename = "BENCHMARK.FILESPEED";
 	}

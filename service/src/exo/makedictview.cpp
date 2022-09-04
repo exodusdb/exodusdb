@@ -6,7 +6,7 @@ function main() {
 	var filenames=listfiles();
 	//var nfiles=filenames.count(FM);
 	//for ( var filen=1;filen<=nfiles;filen++) {
-	//	var filename=filenames.a(filen);
+	//	var filename=filenames.f(filen);
 	for (var filename : filenames) {
 		if (filename.substr(1,5) ne "DICT.")
 			continue;

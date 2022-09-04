@@ -54,7 +54,7 @@ function main() {
 
 	//put up a message
 	if (not OPTIONS.index("S"))
-		printl("Making a new document/report " ^ SYSTEM.a(2) ^ ":");
+		printl("Making a new document/report " ^ SYSTEM.f(2) ^ ":");
 
 	var timestarted = var().time();
 
@@ -65,13 +65,13 @@ function main() {
 
 	//redirect printed output back to the printer
 	//program may change the output file
-	if (SYSTEM.a(2) ne prnfile) {
-		prnfile = SYSTEM.a(2);
+	if (SYSTEM.f(2) ne prnfile) {
+		prnfile = SYSTEM.f(2);
 		dfs = prnfile;
 	}
 
 	SYSTEM(2) = "";
-	var filelen = prnfile.osfile().a(1);
+	var filelen = prnfile.osfile().f(1);
 
 	//fail if print file less than 2 characters long
 	if (filelen < 2) {
@@ -81,7 +81,7 @@ nooutput:
 	}
 
 	//fail if only spaces output
-	if (not SYSTEM.a(3)) {
+	if (not SYSTEM.f(3)) {
 		var offset = 0;
 		call osbread(temp, prnfile,  offset, 1024);
 		//convert \200d0a0c1a\ to '' in temp

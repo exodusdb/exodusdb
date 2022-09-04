@@ -52,7 +52,7 @@ ok:
 			if (mode eq "L") {
 
 				var tt = inx.oconv("D4/E");
-				var mth = glang.a(2).field("|", tt.field("/", 2));
+				var mth = glang.f(2).field("|", tt.field("/", 2));
 				var day = tt.field("/", 1);
 				var year = tt.field("/", 3);
 				//if 1 then

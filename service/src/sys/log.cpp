@@ -19,7 +19,7 @@ var ver;
 function main(in programname0, in text0) {
 	//c sys
 
-	var s33 = SYSTEM.a(33);
+	var s33 = SYSTEM.f(33);
 
 	if (programname0.unassigned()) {
 		programname = "";
@@ -37,7 +37,7 @@ function main(in programname0, in text0) {
 
 	var year = var().date().oconv("D").substr(-4, 4);
 	if (s33) {
-		xstation = SYSTEM.a(40, 2);
+		xstation = SYSTEM.f(40, 2);
 		} else {
 		xstation = STATION.trim();
 	}
@@ -67,7 +67,7 @@ getlogkey:
 
 		var entry = programname;
 		pickreplacer(entry, 2, text2);
-		pickreplacer(entry, 3, SYSTEM.a(17));
+		pickreplacer(entry, 3, SYSTEM.f(17));
 		entry.write(log, logkey);
 	}
 
@@ -77,15 +77,15 @@ getlogkey:
 	//get backup parameters
 	call getbackpars(bakpars);
 
-	var emailaddrs = bakpars.a(14);
+	var emailaddrs = bakpars.f(14);
 	if ((programname ne "SYSMSG" and programname ne "SENDMAIL") and emailaddrs) {
 
 		//determine subject
-		var subject = "EXODUS Log: " ^ SYSTEM.a(17) ^ " " ^ programname;
+		var subject = "EXODUS Log: " ^ SYSTEM.f(17) ^ " " ^ programname;
 
 		var body = "";
 		body ^= FM ^ "Date=" ^ var().date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local";
-		body ^= FM ^ "Server=" ^ SYSTEM.a(44).trim();
+		body ^= FM ^ "Server=" ^ SYSTEM.f(44).trim();
 		body ^= FM ^ "Install=" ^ oscwd();
 		//osread ver from 'general\version.dat' then
 		var verfilename = "general/version.dat";
@@ -94,10 +94,10 @@ getlogkey:
 			verfilename.converter("/", "\\");
 		}
 		if (ver.osread(verfilename)) {
-			body ^= FM ^ "Version=" ^ ver.a(1);
+			body ^= FM ^ "Version=" ^ ver.f(1);
 		}
-		body ^= FM ^ "Database=" ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17);
-		body ^= FM ^ "Process=" ^ SYSTEM.a(24);
+		body ^= FM ^ "Database=" ^ SYSTEM.f(45).trim() ^ " " ^ SYSTEM.f(17);
+		body ^= FM ^ "Process=" ^ SYSTEM.f(24);
 		body ^= FM ^ "User=" ^ USERNAME;
 		body ^= FM ^ "Station=" ^ xstation;
 		body ^= FM ^ "Source=" ^ programname;

@@ -51,8 +51,8 @@ function main() {
 	if (dcount(COMMAND, FM) < 2) {
 		var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
 		if (osread(COMMAND, edic_hist)) {
-			//OPTIONS = COMMAND.a(2);
-			COMMAND = raise(COMMAND.a(1));
+			//OPTIONS = COMMAND.f(2);
+			COMMAND = raise(COMMAND.f(1));
 		//} else {
 		//	abort("Syntax is 'compile osfilename'");
 		}
@@ -502,7 +502,7 @@ function main() {
 		var filebase;
 
 		//get the next file name
-		var srcfilename = filenames.a(fileno).unquote();
+		var srcfilename = filenames.f(fileno).unquote();
 		if (not srcfilename)
 			continue;
 
@@ -646,14 +646,14 @@ function main() {
 	// to start with but speeds up towards the end on the smaller files.
 	var filesizes = "";
 	for (var srcfilename : srcfilenames)
-		filesizes ^= osfile(srcfilename).a(1) ^ VM;
+		filesizes ^= osfile(srcfilename).f(1) ^ VM;
 	filesizes.popper();
 	//sort array wants parallel mv fields
 	srcfilenames.converter(FM, VM);
 	srcfilenames ^= FM ^ filesizes;
 	//sort by field 2 which is file sizes and drag field 1 into the same order
 	call sortarray(srcfilenames, "2" _VM_ "1", "DR");
-	srcfilenames = srcfilenames.a(1).convert(VM, FM);
+	srcfilenames = srcfilenames.f(1).convert(VM, FM);
 
 	// This loop consists of a single function call
 	// with a very long lambda function argument
@@ -1257,9 +1257,9 @@ function main() {
 
 						errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale: " ^ locale
 							^ ". Perhaps multiple files with the same name.\n"
-							^ " 1: " ^ headertext.a(1) ^ "\n"
-							^ " 2: " ^ headertext2.a(2) ^ "\n"
-							^ " 3: " ^ headertext3.a(3));
+							^ " 1: " ^ headertext.f(1) ^ "\n"
+							^ " 2: " ^ headertext2.f(2) ^ "\n"
+							^ " 3: " ^ headertext3.f(3));
 					}
 					else if (verbose)
 						printl("generated or updated.");
@@ -1682,7 +1682,7 @@ function set_environment() {
 
 	for (const var ii : range(1, 999999)) {
 
-		var msvs = searchdirs.a(ii);
+		var msvs = searchdirs.f(ii);
 		if (not msvs)
 			break;
 
@@ -1853,8 +1853,8 @@ function make_include_dir(in incdir) {
 
 function is_newer(in new_file_info, in old_file_info) {
 
-	int new_file_date = new_file_info.a(2);
-	int old_file_date = old_file_info.a(2);
+	int new_file_date = new_file_info.f(2);
+	int old_file_date = old_file_info.f(2);
 
 	if (new_file_date > old_file_date)
 		return true;
@@ -1862,7 +1862,7 @@ function is_newer(in new_file_info, in old_file_info) {
 	if (new_file_date < old_file_date)
 		return false;
 
-	return new_file_info.a(3) > old_file_info.a(3);
+	return new_file_info.f(3) > old_file_info.f(3);
 
 }
 

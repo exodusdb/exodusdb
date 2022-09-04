@@ -62,11 +62,11 @@ function main()
 	var EN_RU_UA_file = "t_EN_RU_UA.txt";
 	oswrite(EN_RU_UA_utf8, EN_RU_UA_file, cyrillic_cp);
 	printl(osfile(EN_RU_UA_file));
-	assert(osfile(EN_RU_UA_file).a(1) == 49);
+	assert(osfile(EN_RU_UA_file).f(1) == 49);
 
 	//convert write cp1251 WITHOUT code page - will go out unchanged
 	oswrite(EN_RU_UA_cp1251, EN_RU_UA_file);
-	assert(osfile(EN_RU_UA_file).a(1) == 49);
+	assert(osfile(EN_RU_UA_file).f(1) == 49);
 
 	//read it with code page
 	var EN_RU_UA_txt2;

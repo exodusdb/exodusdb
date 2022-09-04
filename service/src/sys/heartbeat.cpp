@@ -71,7 +71,7 @@ function main(in mode, in status0="") {
 			if (not(tt.read(DEFINITIONS, "ERROR*THREADNO"))) {
 				tt = "";
 			}
-			if (tt.a(1).count(VM) lt 10) {
+			if (tt.f(1).count(VM) lt 10) {
 				tt(1, -1) = processno;
 				tt.write(DEFINITIONS, "ERROR*THREADNO");
 				call sysmsg(processno.quote() ^ "Non-numeric processno in HEARTBEAT " ^ userlockid);
@@ -97,7 +97,7 @@ function main(in mode, in status0="") {
 
 	var parentdir = "../../";
 	parentdir.converter("/", OSSLASH);
-	if ((((SYSTEM.a(17).lcase() ^ ".end").osfile()) or var("global.end").osfile()) or ((parentdir ^ SYSTEM.a(123).lcase() ^ ".end").osfile())) {
+	if ((((SYSTEM.f(17).lcase() ^ ".end").osfile()) or var("global.end").osfile()) or ((parentdir ^ SYSTEM.f(123).lcase() ^ ".end").osfile())) {
 		perform("OFF");
 		var().logoff();
 	}

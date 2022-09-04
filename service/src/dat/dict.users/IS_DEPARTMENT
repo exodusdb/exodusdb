@@ -5,7 +5,7 @@ S
 
 
 
-	if (RECORD.a(5) eq ID) {\
+	if (RECORD.f(5) eq ID) {\
 		return 1;\
 	}\
 	return "";\

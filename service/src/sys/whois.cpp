@@ -68,7 +68,7 @@ function main(in mode, in ipno, out text) {
 	//ZZZ should really detect net ranges like /24 and .*
 	//allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
 	call readhostsallow(allowedips);
-	allowedips(-1) = SYSTEM.a(39);
+	allowedips(-1) = SYSTEM.f(39);
 	allowedips.converter(FM ^ VM ^ "," "\r\n", var(100).space());
 	if (allowedips.locateusing(" ", ipno, xx)) {
 returnzero:
@@ -79,7 +79,7 @@ returnzero:
     if (true) {
         text = "http:/" "/geoiplookup.net/ip/" ^ ipno;
     } else {
-		cmd = SYSTEM.a(50);
+		cmd = SYSTEM.f(50);
 
 		//check cygwin whois present otherwise quit
 		//WARNING TODO: check ternary op following;
@@ -94,7 +94,7 @@ returnzero:
 
 		//dont wait for a long time - in case internet access is blocked
 		if ((cmd ^ "timeout.exe").osfile()) {
-			cmd.splicer(1, 0, SYSTEM.a(50) ^ "timeout 5 ");
+			cmd.splicer(1, 0, SYSTEM.f(50) ^ "timeout 5 ");
 		}
 
 		//capture the output of the whois command

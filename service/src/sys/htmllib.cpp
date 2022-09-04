@@ -60,7 +60,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		//trth='<TR><TD>'
 		if (params2) {
 			//trth='<TH>'
-			var line1 = datax.a(1);
+			var line1 = datax.f(1);
 			line1.swapper("</TR>", "</tr>");
 			line1.swapper("</tr>", "</TR></THEAD><TBODY>");
 			line1.swapper("<TD>", "<th>");
@@ -88,9 +88,9 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 		//highlight last row if a total
 		var nlines = datax.count(FM) + 1;
-		var lastline = datax.a(nlines);
+		var lastline = datax.f(nlines);
 	//Total
-		if (lastline.index("<TD>" ^ sys.glang.a(28))) {
+		if (lastline.index("<TD>" ^ sys.glang.f(28))) {
 			lastline.swapper("TD>", "TH>");
 			lastline.swapper("td>", "th>");
 			datax(nlines) = lastline;
@@ -107,7 +107,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 		var nv = datax.count(VM) + 1;
 		for (const var vn : range(1, nv)) {
-			var data2 = datax.a(1, vn);
+			var data2 = datax.f(1, vn);
 
 			//insert a break before all space+#
 			data2.swapper(" #", FM ^ "#");
@@ -121,7 +121,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			if (nlines gt 1) {
 
 				for (const var ln : range(1, nlines)) {
-					var line = data2.a(ln).trim();
+					var line = data2.f(ln).trim();
 					if (line[1] eq "#") {
 						line.splicer(1, 1, "");
 						//if colon : present then before colon is the tag name
@@ -366,7 +366,7 @@ subroutine fill(io datax) {
 		//find max number of columns
 	var n2 = 0;
 	for (const var ii : range(1, nn)) {
-		var tt = datax.a(ii).count(VM) + 1;
+		var tt = datax.f(ii).count(VM) + 1;
 		if (tt gt n2) {
 			n2 = tt;
 		}
@@ -375,7 +375,7 @@ subroutine fill(io datax) {
 		//make sure all columns are filled
 	for (const var ii : range(1, nn)) {
 		for (const var i2 : range(1, n2)) {
-			if (datax.a(ii, i2) eq "") {
+			if (datax.f(ii, i2) eq "") {
 				datax(ii, i2) = filler;
 			}
 		} //i2;

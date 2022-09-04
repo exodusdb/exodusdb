@@ -97,11 +97,11 @@ function main(in docids0="", in options0="") {
 	//	return 0;
 	//}
 	
-	var datasetcode = SYSTEM.a(17);
+	var datasetcode = SYSTEM.f(17);
 	if (not datasetcode) {
 		printl("========== DATASETCODE MISSING ==========");
 	}
-	var islivedb = not(SYSTEM.a(61));
+	var islivedb = not(SYSTEM.f(61));
 
 	//allow one autorun per database - hopefully this wont overload the server
 	var lockfilename = "DOCUMENTS";
@@ -153,7 +153,7 @@ nextdoc:
 	}
 	if (docids) {
 		docn += 1;
-		docid = docids.a(docn);
+		docid = docids.f(docn);
 		if (not docid) {
 			gosub exit(lockfilename, lockfile, lockkey);
 			return 0;
@@ -185,7 +185,7 @@ readdoc:
 
 	//only do saved and enabled documents for now
 	//0/1 saved disabled/enabled. Blank=Ordinary documents
-	if (not(sys.document.a(12))) {
+	if (not(sys.document.f(12))) {
 		goto nextdoc;
 	}
 
@@ -211,7 +211,7 @@ currdatetime:
 		//would be faster to work out nextdatetime once initially - but how to do it?
 		//if not(docids) and currdatetime<nextdatetime then goto nextdoc
 
-		var lastdatetime = sys.document.a(13);
+		var lastdatetime = sys.document.f(13);
 
 		//skip if already run in the last 60 minutes. this is an easy way
 		//to avoid reruns but maximum scheduling frequency is hourly
@@ -246,7 +246,7 @@ currdatetime:
 		}
 
 		//hour of day restrictions
-		var hours = restrictions.a(2);
+		var hours = restrictions.f(2);
 		if (hours ne "") {
 			var hournow = itime.oconv("MT").substr(1, 2) + 0;
 
@@ -286,8 +286,8 @@ preventsameday:
 		var date = idate.oconv("D/E");
 
 		//day of month restrictions
-		if (restrictions.a(3)) {
-			if (not(restrictions.a(3).locate(date.field("/", 1) + 0, xx))) {
+		if (restrictions.f(3)) {
+			if (not(restrictions.f(3).locate(date.field("/", 1) + 0, xx))) {
 				if (logging) {
 					printl("wrong day of month");
 				}
@@ -296,8 +296,8 @@ preventsameday:
 		}
 
 		//month of year restrictions
-		if (restrictions.a(4)) {
-			if (not(restrictions.a(4).locate(date.field("/", 2) + 0, xx))) {
+		if (restrictions.f(4)) {
+			if (not(restrictions.f(4).locate(date.field("/", 2) + 0, xx))) {
 				if (logging) {
 					printl("wrong month");
 				}
@@ -306,8 +306,8 @@ preventsameday:
 		}
 
 		//day of week restrictions
-		if (restrictions.a(5)) {
-			if (not(restrictions.a(5).locate((idate - 1).mod(7) + 1, xx))) {
+		if (restrictions.f(5)) {
+			if (not(restrictions.f(5).locate((idate - 1).mod(7) + 1, xx))) {
 				if (logging) {
 					printl("wrong day of week");
 				}
@@ -316,8 +316,8 @@ preventsameday:
 		}
 
 		//date restrictions
-		if (restrictions.a(6)) {
-			if (not(restrictions.a(6).locate(idate, xx))) {
+		if (restrictions.f(6)) {
+			if (not(restrictions.f(6).locate(idate, xx))) {
 				if (logging) {
 					printl("wrong date");
 				}
@@ -346,12 +346,12 @@ preventsameday:
 	//register that the document has been processed
 	//even if nobody present to be emailed
 	sys.document(13) = currdatetime;
-	if (sys.document.a(27) ne "") {
-		sys.document(27) = sys.document.a(27) - 1;
+	if (sys.document.f(27) ne "") {
+		sys.document(27) = sys.document.f(27) - 1;
 	}
 
 	// Delete once-off documents
-	if (sys.document.a(27) ne "" and not(sys.document.a(27))) {
+	if (sys.document.f(27) ne "" and not(sys.document.f(27))) {
 		sys.documents.deleterecord(docid);
 
 	} else {
@@ -361,17 +361,17 @@ preventsameday:
 	//force all emails to be routed to test address
 	//if on development system they are ALWAYS routed
 	//so this is mainly for testing on client systems
-	forceemail = sys.document.a(30);
+	forceemail = sys.document.f(30);
 	//if not(forceemail) and @username='EXODUS' then forceemail=devATexodus
 
 	// On disabled systems all autorun documents except once-off documents
 	// go to neosys.com and do NOT go to the actual users
 	// TODO Use a configurable email from SYSTEM
-	if (not(sys.document.a(27)) && var("../../disabled.cfg").osfile())
+	if (not(sys.document.f(27)) && var("../../disabled.cfg").osfile())
 		forceemail = devatexodus;
 
 	//report is always run as the document owning user
-	var runasusercode = sys.document.a(1);
+	var runasusercode = sys.document.f(1);
 	var userx;
 	if (not(userx.read(users, runasusercode))) {
 		if (not(runasusercode eq "EXODUS")) {
@@ -381,7 +381,7 @@ preventsameday:
 		userx = "";
 	}
 	//allow running as EXODUS and emailing to sysmsg@neosys.com
-	if (userx.a(7) eq "" and runasusercode eq "EXODUS") {
+	if (userx.f(7) eq "" and runasusercode eq "EXODUS") {
 		userx = "EXODUS";
 		userx(7) = sysmsgatexodus;
 	}
@@ -401,9 +401,9 @@ preventsameday:
 	//any output regardless of if they are on holiday
 
 	var ccaddress = "";
-	var usercodes = sys.document.a(14);
+	var usercodes = sys.document.f(14);
 	if (usercodes eq "") {
-		toaddress = userx.a(7);
+		toaddress = userx.f(7);
 	} else {
 		toaddress = "";
 		var nusers = usercodes.count(VM) + 1;
@@ -411,7 +411,7 @@ preventsameday:
 		for (var usern = nusers; usern >= 1; --usern) {
 
 			//get the user record
-			var usercode = usercodes.a(1, usern);
+			var usercode = usercodes.f(1, usern);
 			if (not(userx.read(users, usercode))) {
 				if (not(usercode eq "EXODUS")) {
 					goto nextuser;
@@ -420,10 +420,10 @@ preventsameday:
 			}
 
 			//skip if user has no email address
-			if (userx.a(7) eq "" and usercode eq "EXODUS") {
+			if (userx.f(7) eq "" and usercode eq "EXODUS") {
 				userx(7) = sysmsgatexodus;
 			}
-			useraddress = userx.a(7);
+			useraddress = userx.f(7);
 			if (useraddress) {
 
 				//if running as EXODUS always add user EXODUS
@@ -435,9 +435,9 @@ preventsameday:
 				//optionally skip people on holiday (even EXODUS unless running as EXODUS)
 				} else {
 
-					marketcode = userx.a(25);
+					marketcode = userx.f(25);
 					if (not marketcode) {
-						marketcode = sys.company.a(30, 1);
+						marketcode = sys.company.f(30, 1);
 					}
 					market = marketcode;
 					if (sys.markets) {
@@ -477,8 +477,8 @@ nextuser:;
 	}
 
 	//before running the document refresh the title, request and data
-	var module = sys.document.a(31);
-	var alerttype = sys.document.a(32);
+	var module = sys.document.f(31);
+	var alerttype = sys.document.f(32);
 
 	if (module and alerttype) {
 
@@ -514,7 +514,7 @@ nextuser:;
 	if (authtasks) {
 		var ntasks = authtasks.count(VM) + 1;
 		for (const var taskn : range(1, ntasks)) {
-			var task = authtasks.a(1, taskn);
+			var task = authtasks.f(1, taskn);
 			if (not(authorised(task, msg_, "", runasusercode))) {
 				USER4 = runasusercode.quote() ^ " is not authorised to do " ^ task;
 				printl(msg_);
@@ -544,9 +544,9 @@ nextuser:;
 
 	//request='EXECUTE':fm:'GENERAL':fm:'GETREPORT':fm:docid
 	//voccmd='GENERALPROXY'
-	request_ = raise("EXECUTE" ^ VM ^ sys.document.a(5));
+	request_ = raise("EXECUTE" ^ VM ^ sys.document.f(5));
 
-	iodat_ = raise(sys.document.a(6));
+	iodat_ = raise(sys.document.f(6));
 
 	//override the saved period with a current period
 
@@ -580,9 +580,9 @@ nextuser:;
 		gosub getdaysago();
 		USER1.swapper("{3WORKINGDAYSAGO}", xdate);
 	}
-	var closedperiod = sys.company.a(37);
+	var closedperiod = sys.company.f(37);
 	if (closedperiod) {
-		opendate = iconv(closedperiod, sys.company.a(6)) + 1;
+		opendate = iconv(closedperiod, sys.company.f(6)) + 1;
 	} else {
 		opendate = 11689;
 	}
@@ -616,13 +616,13 @@ nextsign:
 
 		var subject = "EXODUS";
 		//if repeatable then include report number to allow filtering
-		if (sys.document.a(27) eq "") {
+		if (sys.document.f(27) eq "") {
 			subject ^= " " ^ docid;
 		}
-		subject ^= ": %RESULT%" ^ sys.document.a(2);
+		subject ^= ": %RESULT%" ^ sys.document.f(2);
 
 		//email it
-		if (response_.substr(1, 2) ne "OK" or printfilename.osfile().a(1) lt 10) {
+		if (response_.substr(1, 2) ne "OK" or printfilename.osfile().f(1) lt 10) {
 
 			//plain "OK" with no file means nothing to email
 			if (USER3 eq "OK") {
@@ -639,8 +639,8 @@ nextsign:
 				var(response_).oswrite("xyz.xyz");
 			}
 			//swap 'Error:' with 'Result:' in body
-			body(-1) = ("Document: " ^ sys.document.a(2) ^ " (" ^ docid ^ ")").trim();
-			body(-1) = "Database: " ^ SYSTEM.a(23) ^ " (" ^ SYSTEM.a(17) ^ ")";
+			body(-1) = ("Document: " ^ sys.document.f(2) ^ " (" ^ docid ^ ")").trim();
+			body(-1) = "Database: " ^ SYSTEM.f(23) ^ " (" ^ SYSTEM.f(17) ^ ")";
 			//swap '%RESULT%' with '* ' in subject
 			subject.swapper("%RESULT%", "");
 
@@ -663,7 +663,7 @@ nextsign:
 			//if ucase(printfilename[-4,4])='.XLS' then
 			//locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
 			tt = (field2(printfilename, ".", -1)).lcase();
-			if (tt.index("htm") and sys.document.a(33) ne "2") {
+			if (tt.index("htm") and sys.document.f(33) ne "2") {
 				//insert body from file
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;
@@ -681,7 +681,7 @@ nextsign:
 		body.swapper(FM, var().chr(13));
 
 		// Option to force the actual email recipient
-		var system117 = SYSTEM.a(117);
+		var system117 = SYSTEM.f(117);
 		if (forceemail)
 			SYSTEM(117) = forceemail;
 
@@ -706,7 +706,7 @@ nextsign:
 
 subroutine exec() {
 
-	voccmd = USER0.a(2);
+	voccmd = USER0.f(2);
 
 	tracing = 1;
 
@@ -723,7 +723,7 @@ subroutine exec() {
 
 	//turn interactive off in case running from command line
 	//to avoid any reports prompting for input here
-	var s33 = SYSTEM.a(33);
+	var s33 = SYSTEM.f(33);
 	SYSTEM(33) = 1;
 
 	gosub exec2();
@@ -745,7 +745,7 @@ subroutine exec2() {
 	//print @(0):@(-4):localtime 'MTS':' AUTORUN ':docid:
 	//similar in LISTEN and AUTORUN
 	printl();
-	print(var().time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(FM, " "), " ", sys.document.a(2), ":");
+	print(var().time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(FM, " "), " ", sys.document.f(2), ":");
 
 	//print 'link',linkfilename2
 	//print 'request',request
@@ -783,7 +783,7 @@ subroutine exec2() {
 
 	//pass the output file in linkfilename2
 	//not good method, pass in system?
-	if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.a(1), xx)) {
+	if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.f(1), xx)) {
 		iodat_ = linkfilename2;
 	}
 
@@ -828,7 +828,7 @@ subroutine exec2() {
 			response_ = "No response from " ^ voccmd;
 		}
 sysmsgit:
-		call sysmsg("AUTORUN " ^ docid ^ " " ^ sys.document.a(2) ^ FM ^ USER3);
+		call sysmsg("AUTORUN " ^ docid ^ " " ^ sys.document.f(2) ^ FM ^ USER3);
 	}
 
 	call cropper(msg_);
@@ -850,7 +850,7 @@ sysmsgit:
 	rawresponse.converter("\r\n", "|");
 
 	//get the printfilename in case the print program changed it
-	printfilename = SYSTEM.a(2);
+	printfilename = SYSTEM.f(2);
 	//and close it in case print program didnt (try to avoid sendmail attach errors)
 	printfilename.osclose();
 	if (tt.osopen(printfilename)) {
@@ -904,7 +904,7 @@ subroutine fmtresp() {
 
 subroutine getdaysago() {
 	var weekend = "67";
-	marketcode = sys.company.a(30, 1);
+	marketcode = sys.company.f(30, 1);
 	if (marketcode) {
 		tt = marketcode.xlate("MARKETS", 9, "X");
 		if (tt) {

@@ -12,11 +12,11 @@ function main(io css, in version="") {
 	//<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	//<meta http-equiv="x-ua-compatible" content="IE=6" />
 
-	var charset = SYSTEM.a(127);
+	var charset = SYSTEM.f(127);
 	if (charset) {
 		css = "<meta http-equiv=\"content-type\" content=\"text/html;charset=" ^ charset ^ "\" />\n";
 	} else {
-		css = "<!-- no " ^ SYSTEM.a(17) ^ " charset found -->\n";
+		css = "<!-- no " ^ SYSTEM.f(17) ^ " charset found -->\n";
 	}
 
 	css ^= getvogonpoetry(version);
@@ -27,10 +27,10 @@ function main(io css, in version="") {
 	//while (var("\r\n").index(css[-1], 1))
 	//	css.popper();
 
-	var thcolor = SYSTEM.a(46, 1);
-	var tdcolor = SYSTEM.a(46, 2);
+	var thcolor = SYSTEM.f(46, 1);
+	var tdcolor = SYSTEM.f(46, 2);
 
-	var font = SYSTEM.a(46, 3);
+	var font = SYSTEM.f(46, 3);
 	if (font == "Default") {
 		font = "";
 	}
@@ -38,7 +38,7 @@ function main(io css, in version="") {
 		font ^= ",";
 	}
 
-	var fontsize = SYSTEM.a(46, 8);
+	var fontsize = SYSTEM.f(46, 8);
 	if (not fontsize) {
 		fontsize = 100;
 	}
@@ -61,7 +61,7 @@ function main(io css, in version="") {
 	css.swapper("exodusfont,", font);
 	css.swapper("exodussize", fontsize);
 
-	var agent = SYSTEM.a(40);
+	var agent = SYSTEM.f(40);
 	if (agent.index("MSIE 7", 1)) {
 		css.swapper("xborder-collapse", "border-collapse");
 	}

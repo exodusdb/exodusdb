@@ -40,7 +40,7 @@ function main(in mode0) {
 	//break off
 
 	//prevent time out
-	var timeoutx = SYSTEM.a(22);
+	var timeoutx = SYSTEM.f(22);
 	SYSTEM(22) = "";
 
 	var nfailures = "";
@@ -49,10 +49,10 @@ function main(in mode0) {
 	var speed = 0;
 
 	//autologin
-	if (SYSTEM.a(33)) {
+	if (SYSTEM.f(33)) {
 		//break on
-		userx = SYSTEM.a(33, 2).ucase();
-		password = SYSTEM.a(33, 3).ucase();
+		userx = SYSTEM.f(33, 2).ucase();
+		password = SYSTEM.f(33, 3).ucase();
 		goto chknameandpass;
 	}
 
@@ -74,9 +74,9 @@ function main(in mode0) {
 	//if there is a user called MASTER with no password then login automatically
 	// unless already automatically logged in
 	ok = 0;
-	if (not(SYSTEM.a(15))) {
-		if (SECURITY.a(1).locate("MASTER", usern)) {
-			if (SECURITY.a(4, usern, 2).field(TM, 7) eq "") {
+	if (not(SYSTEM.f(15))) {
+		if (SECURITY.f(1).locate("MASTER", usern)) {
+			if (SECURITY.f(4, usern, 2).field(TM, 7) eq "") {
 				SYSTEM(22) = 1000000;
 				userx = "MASTER";
 				SYSTEM(15) = 1;
@@ -128,8 +128,8 @@ fail:
 
 	//check the user name and password
 	ok = 0;
-	if (SECURITY.a(1).locate(userx, usern)) {
-		if (SECURITY.a(4, usern, 2).field(TM, 7) eq "") {
+	if (SECURITY.f(1).locate(userx, usern)) {
+		if (SECURITY.f(4, usern, 2).field(TM, 7) eq "") {
 			ok = 1;
 			goto okfail;
 		}
@@ -170,8 +170,8 @@ fail:
 
 		if (not(userx eq lockx.substr(1, userx.length()))) {
 			lockx = userx ^ " " ^ var(1000000).rnd();
-			if (SECURITY.a(1).locate(userx, usern)) {
-				lockx ^= " " ^ SECURITY.a(4, usern, 2).field(TM, 7).oconv("HEX2");
+			if (SECURITY.f(1).locate(userx, usern)) {
+				lockx ^= " " ^ SECURITY.f(4, usern, 2).field(TM, 7).oconv("HEX2");
 			}
 		}
 
@@ -212,15 +212,15 @@ chknameandpass:
 
 	//check the user name and password
 	ok = 0;
-	if (SECURITY.a(1).locate(userx, usern)) {
-		if (SECURITY.a(4, usern, 2).field(TM, 7) eq encryptx) {
+	if (SECURITY.f(1).locate(userx, usern)) {
+		if (SECURITY.f(4, usern, 2).field(TM, 7) eq encryptx) {
 			ok = 1;
 		} else {
 		}
 	}
 	//failed login not interactive still works
 	if (not(ok)) {
-		if (SYSTEM.a(33)) {
+		if (SYSTEM.f(33)) {
 			userx = APPLICATION;
 			ok = 1;
 		}
@@ -230,7 +230,7 @@ chknameandpass:
 	if (not ok) {
 		var sysrec;
 		if (sysrec.read(systemfile(), userx)) {
-			if (sysrec.a(7) eq encryptx and ((speed lt 2 or mode eq "SLEEP"))) {
+			if (sysrec.f(7) eq encryptx and ((speed lt 2 or mode eq "SLEEP"))) {
 				ok = 1;
 			}
 		}
@@ -240,9 +240,9 @@ okfail:
 	//handle failure
 	if (not ok) {
 
-		if (SYSTEM.a(33)) {
+		if (SYSTEM.f(33)) {
 			msg = "INVALID USERNAME OR PASSWORD " ^ (userx.quote());
-			call oswrite(msg, SYSTEM.a(33, 10) ^ ".$2");
+			call oswrite(msg, SYSTEM.f(33, 10) ^ ".$2");
 			//print char(12):char(7):msg
 			printl(msg);
 			var().logoff();
@@ -276,7 +276,7 @@ okfail:
 	if (USERNAME eq "EXODUS") {
 		sysrec(4) = 0;
 	}
-	//call setprivilegesysrec.a(4));
+	//call setprivilegesysrec.f(4));
 
 	//break on
 	SYSTEM(22) = timeoutx;

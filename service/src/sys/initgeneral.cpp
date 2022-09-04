@@ -102,7 +102,7 @@ function main() {
 	//equ getfilename to system<2>;*TRANSACTION printfile name while performing print program
 	//equ getflag to system<3>;*1=printing program has reset setptr to prn and done its own printing
 	//equ sessionid to system<4>;*SESSION WAS system<32>
-	var sessionid = SYSTEM.a(4);
+	var sessionid = SYSTEM.f(4);
 	//equ printptr to system<5>;*used in BP and GBP/MSG3. could be moved
 	//equ interruptfilename to system<6>
 	//equ html to system<7>;OBSOLETE 1=output html if possible;2=output html
@@ -148,7 +148,7 @@ function main() {
 	//accounting<3> for allocationorder
 	//accounting<4> for mv buffer of currency or unitcodes
 	//accounting<5> for mv buffer of fmts for <4>
-	var interactive = false; //not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.f(33));
 	//equ generalresultcode to system<34>
 	//equ nrequests=system<35>
 	//equ defaultclientmark to system<36>
@@ -253,7 +253,7 @@ function main() {
 	if (voc.open("VOC", "")) {
 		//timeout and crash out quickly otherwise might get unlimited processes
 		//this lock is in INIT.GENERAL and MONITOR2 (to avoid starting processes)
-		var initwaitsecs = SYSTEM.a(129);
+		var initwaitsecs = SYSTEM.f(129);
 		if (not initwaitsecs) {
 			//initwaitsecs = 110 + var(10).rnd();
 			//increase to 10 minutes to allow things like reindexing and trimrequestlog to finish
@@ -269,7 +269,7 @@ function main() {
 					msg = "INIT.GENERAL couldnt get exclusive lock. Quitting.";
 					//maybe a long upgrade process is running
 					call note(msg);
-					if (SYSTEM.a(33)) {
+					if (SYSTEM.f(33)) {
 						gosub failsys();
 					}
 					perform("OFF");
@@ -282,14 +282,14 @@ function main() {
 	var exodusid = var("exodus.id").osfile();
 
 	call log2("*determine the pid if possible", logtime);
-	if (not(SYSTEM.a(54))) {
-		SYSTEM(54) = SYSTEM.a(33);
+	if (not(SYSTEM.f(54))) {
+		SYSTEM(54) = SYSTEM.f(33);
 	}
 	if (VOLUMES) {
-		pidfilename = SYSTEM.a(54, 5) ^ ".pid";
+		pidfilename = SYSTEM.f(54, 5) ^ ".pid";
 	} else {
-		pidfilename = "/run/neo/neo@" ^ SYSTEM.a(17);
-		if (SYSTEM.a(17).substr(-5) eq "_test") {
+		pidfilename = "/run/neo/neo@" ^ SYSTEM.f(17);
+		if (SYSTEM.f(17).substr(-5) eq "_test") {
 			pidfilename.swapper("neo@", "tst@");
 			pidfilename.swapper("_test", "");
 			pidfilename ^= ".pid";
@@ -298,7 +298,7 @@ function main() {
 	call osread(pidrec, pidfilename);
 	//osremove pidfilename
 	if (pidrec) {
-		SYSTEM(54, 5) = pidrec.a(1);
+		SYSTEM(54, 5) = pidrec.f(1);
 	}
 
 	//check version of database versus version of program
@@ -317,10 +317,10 @@ function main() {
 			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
 			}
-			if (oldmethod and dbversion.a(1) eq "14334.5") {
+			if (oldmethod and dbversion.f(1) eq "14334.5") {
 			}
-			if (dbversion.a(1) gt dbdatetimerequired) {
-				msg = "Software version " ^ dbversion.a(1).oconv("D") ^ " " ^ dbversion.a(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
+			if (dbversion.f(1) gt dbdatetimerequired) {
+				msg = "Software version " ^ dbversion.f(1).oconv("D") ^ " " ^ dbversion.f(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
 				msg = msg.oconv("L#60");
 				//abort since db is advanced
 				if (not(interactive)) {
@@ -348,7 +348,7 @@ decideversion:
 						goto updateversion;
 					}
 				}
-			} else if (dbversion.a(1) lt dbdatetimerequired) {
+			} else if (dbversion.f(1) lt dbdatetimerequired) {
 updateversion:
 				dbversion = dbdatetimerequired;
 				dbversion(2) = dbdate;
@@ -374,8 +374,8 @@ updateversion:
 			}
 			///BREAK;
 			if (rec eq "") break;
-			var filename = rec.a(1);
-			var id = rec.a(2);
+			var filename = rec.f(1);
+			var id = rec.f(2);
 			rec = rec.field(FM, 3, 99999);
 			var file;
 			if (file.open(filename, "")) {
@@ -413,7 +413,7 @@ updateversion:
 	var volumesx = VOLUMES;
 	var nvolumes = VOLUMES.count(FM) + 1;
 	for (const var volumen : range(1, nvolumes)) {
-		var volume = volumesx.a(volumen);
+		var volume = volumesx.f(volumen);
 		var tpath = "../" "DATA" "/";
 		tpath.converter("/", OSSLASH);
 		if (volume.substr(1, 8) eq tpath) {
@@ -430,10 +430,10 @@ updateversion:
 	//call settime('')
 
 	call log2("*save the original username and station", logtime);
-	if (not(SYSTEM.a(43))) {
+	if (not(SYSTEM.f(43))) {
 		SYSTEM(43) = USERNAME;
 	}
-	if (not(SYSTEM.a(44))) {
+	if (not(SYSTEM.f(44))) {
 		SYSTEM(44) = STATION.trim();
 	}
 
@@ -445,7 +445,7 @@ updateversion:
 	}
 
 	call log2("*get user video table if any", logtime);
-	var temp = ENVIRONKEYS.a(2);
+	var temp = ENVIRONKEYS.f(2);
 	temp.converter(".", "");
 	if (colors.osread(temp ^ ".vid")) {
 		var color2;
@@ -459,7 +459,7 @@ updateversion:
 	}
 
 	call log2("*setup escape sequence for standard color and background", logtime);
-	temp = HW.a(3)[4] ^ HW.a(8)[4];
+	temp = HW.f(3)[4] ^ HW.f(8)[4];
 	if (temp eq "00") {
 		temp = "70";
 	}
@@ -469,7 +469,7 @@ updateversion:
 	AW(30) = tt;
 
 	call log2("*convert reports file", logtime);
-	if (SYSTEM.a(17) ne "DEVDTEST") {
+	if (SYSTEM.f(17) ne "DEVDTEST") {
 		var reports;
 		if (reports.open("REPORTS", "")) {
 			select(reports);
@@ -482,7 +482,7 @@ nextreport:
 					if (file.open(filename, "")) {
 						var keyx = reportkey.field("*", 2);
 						keyx.swapper("%2A", "*");
-						if (recordx.a(1) eq "%DELETED%") {
+						if (recordx.f(1) eq "%DELETED%") {
 							var rec;
 							if (rec.read(file, keyx)) {
 								//if rec<1>='EXODUS' then delete file,keyx
@@ -497,7 +497,7 @@ nextreport:
 							}
 							//only update documents if changed anything except update timedate
 							if (filename eq "DOCUMENTS") {
-								oldrecord(8) = recordx.a(8);
+								oldrecord(8) = recordx.f(8);
 							}
 							if (recordx ne oldrecord) {
 								recordx.write(file, keyx);
@@ -517,15 +517,15 @@ nextreport:
 		call note(msg);
 	}
 
-	var notherusers = otherusers("").a(1);
+	var notherusers = otherusers("").f(1);
 
 	call log2("*check/get authorisation", logtime);
-	if (SYSTEM.a(4) eq "" and not(SYSTEM.a(33))) {
+	if (SYSTEM.f(4) eq "" and not(SYSTEM.f(33))) {
 		var nusers = getauthorisation();
 		if (not nusers) {
 
 			call log2("*if sysmode then respond to response file and close", logtime);
-			if (SYSTEM.a(33)) {
+			if (SYSTEM.f(33)) {
 				gosub failsys();
 				stop();
 			}
@@ -545,7 +545,7 @@ nextreport:
 		if (nusers lt notherusers + 1) {
 			msg = var("4D4158494D554D20415554484F5249534544204E554D424552204F46205553455253204558434545444544").iconv("HEX2");
 			call note(msg);
-			if (SYSTEM.a(33)) {
+			if (SYSTEM.f(33)) {
 				gosub failsys();
 			}
 			perform("OFF");
@@ -573,7 +573,7 @@ nextreport:
 			{}
 		}
 	}
-	var lastdate = config.a(1);
+	var lastdate = config.f(1);
 	/*;
 		IF LASTDATE and interactive THEN;
 			IF DATE() LT LASTDATE OR DATE() GT (LASTDATE+14) THEN;
@@ -643,8 +643,8 @@ nextreport:
 	//SYSTEM(58) = oslistd("../data/").convert(FM,VM);
 	//SYSTEM.fieldstorer(FM, 59, 5, "");
     //update dbcodes with dir dbcodes if dbcodes in sys cfg file contain lcase
-    var ttdbcodes = SYSTEM.a(58).convert("abcdefghijklmnopqrstuvwx","").length();
-    if(ttdbcodes eq SYSTEM.a(58).length()){
+    var ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx","").length();
+    if(ttdbcodes eq SYSTEM.f(58).length()){
         //c++ only
         SYSTEM(58) = oslistd("../data/").convert(FM,VM);
         SYSTEM.fieldstorer(FM, 59, 5, "");
@@ -652,73 +652,73 @@ nextreport:
 
 	call log2("*restore session parameters", logtime);
 	//restore IMMEDIATELY to avoid bugs creeping in
-	SYSTEM(33) = oldsystem.a(33);
-	SYSTEM(1) = oldsystem.a(1);
+	SYSTEM(33) = oldsystem.f(33);
+	SYSTEM(1) = oldsystem.f(1);
 	//masterlogin
-	SYSTEM(15) = oldsystem.a(15);
+	SYSTEM(15) = oldsystem.f(15);
 	//cleaned
-	SYSTEM(16) = oldsystem.a(16);
-	SYSTEM(17) = oldsystem.a(17);
+	SYSTEM(16) = oldsystem.f(16);
+	SYSTEM(17) = oldsystem.f(17);
 	//sessionid
-	SYSTEM(4) = oldsystem.a(4);
+	SYSTEM(4) = oldsystem.f(4);
 	//server mode (not interactive)
-	s33 = SYSTEM.a(33);
+	s33 = SYSTEM.f(33);
 	//currdatasetname
-    SYSTEM(23) = oldsystem.a(23);
-    var tt = osread("../data/" ^ oldsystem.a(17) ^ "/name");
+    SYSTEM(23) = oldsystem.f(23);
+    var tt = osread("../data/" ^ oldsystem.f(17) ^ "/name");
     if (tt){
         SYSTEM(23) = tt;
     }
 	//process/connection number
-	SYSTEM(24) = oldsystem.a(24);
+	SYSTEM(24) = oldsystem.f(24);
 	//datasetno
-	SYSTEM(38) = oldsystem.a(38);
+	SYSTEM(38) = oldsystem.f(38);
 	//originalusername
-	SYSTEM(43) = oldsystem.a(43);
+	SYSTEM(43) = oldsystem.f(43);
 	//original station id
-	SYSTEM(44) = oldsystem.a(44);
+	SYSTEM(44) = oldsystem.f(44);
 	//globaldatasetid
-	SYSTEM(45) = oldsystem.a(45);
+	SYSTEM(45) = oldsystem.f(45);
 	//processlock
-	SYSTEM(48) = oldsystem.a(48);
-	SYSTEM(54) = oldsystem.a(54);
+	SYSTEM(48) = oldsystem.f(48);
+	SYSTEM(54) = oldsystem.f(54);
 	SYSTEM(133) = "GENERAL";
 
 	oldsystem = "";
 
 	//! system configuration defaults
 	// installation group
-	if (not(SYSTEM.a(123))) {
+	if (not(SYSTEM.f(123))) {
 		SYSTEM(123) = "GLOBAL";
 	}
 	// upgrades yes
-	if (SYSTEM.a(124) eq "") {
+	if (SYSTEM.f(124) eq "") {
 		SYSTEM(124) = 1;
 	}
 	//close after backup yes
-	if (not(SYSTEM.a(125))) {
+	if (not(SYSTEM.f(125))) {
 		SYSTEM(125) = 2;
 	}
 	//test should start missing processes
-	if (not(SYSTEM.a(126))) {
+	if (not(SYSTEM.f(126))) {
 		SYSTEM(126) = 0;
 	}
 
-	if (not(SYSTEM.a(57))) {
+	if (not(SYSTEM.f(57))) {
 		call log2("*determine systemid from old smtp sender name", logtime);
 		tpath = "../../";
 		tpath.converter("/", OSSLASH);
 		call osread(smtp, tpath ^ "smtp.cfg");
-		if (not(smtp.a(1))) {
+		if (not(smtp.f(1))) {
 			call osread(smtp, "smtp.cfg");
 		}
-		if (not(smtp.a(1))) {
+		if (not(smtp.f(1))) {
 			if (not(smtp.read(DEFINITIONS, "SMTP.CFG"))) {
 				{}
 			}
 		}
-		if (smtp.a(1)) {
-			var sysname = smtp.a(1).field("@", 1).lcase();
+		if (smtp.f(1)) {
+			var sysname = smtp.f(1).field("@", 1).lcase();
 			//remove all punctuation
 			sysname.converter("!\"#$%^&*()_+-=[]{};:@,./<>?", "");
 			SYSTEM(57) = sysname;
@@ -744,7 +744,7 @@ nextreport:
 
 	SYSTEM(111) = cid();
 	//try twice because was unreliable and is important
-	if (not(SYSTEM.a(111))) {
+	if (not(SYSTEM.f(111))) {
 		SYSTEM(111) = cid();
 	}
 
@@ -752,7 +752,7 @@ nextreport:
 
 	//<61>=testdb (not livedb)
 	call getbackpars(bakpars);
-	SYSTEM(61) = bakpars.a(11);
+	SYSTEM(61) = bakpars.f(11);
 
 	//call log2('*determine time offset')
 	//blank means dont offset - use system server timezone whatever it is
@@ -764,16 +764,16 @@ nextreport:
 	SW = "";
 	//now ONLY supporting display time different from server time on gmt/utc servers
 	//if sysgmtoffset
-	if (SYSTEM.a(120)) {
+	if (SYSTEM.f(120)) {
 		//if server not on gmt/utc and user tz is set then warning
 		//since a) usertime will be server time b) database will get non-gmt date/times
 		//if system<118> then
 		// call note('WARNING: User time zone ignored and|Database storing non-GMT/UTC date/time|because current server is not GMT/UTC (is ':system<120>:')')
 		// end
 	} else {
-		SW(1) = SYSTEM.a(118);
+		SW(1) = SYSTEM.f(118);
 		//if display time is not server/gmt/utc then adjust offset to server/gmt/utc
-		if (SW.a(1).length()) {
+		if (SW.f(1).length()) {
 			//system time offset is currently automatically determined by CID()
 			//CID will tell you the current server tz
 			//but should this be recorded in the dataset in case it is moved
@@ -803,7 +803,7 @@ nextreport:
 	}
 
 	call log2("*determine upload path", logtime);
-	tt = SYSTEM.a(49);
+	tt = SYSTEM.f(49);
 	if (tt eq "") {
 		//system<49>='..\images\'
 		var imagesdir = "../images/";
@@ -814,26 +814,26 @@ nextreport:
 		SYSTEM(49) = tt ^ OSSLASH;
 	}
 
-	if (not(SYSTEM.a(46, 1))) {
+	if (not(SYSTEM.f(46, 1))) {
 		SYSTEM(46, 1) = "#FFFF80";
 	}
-	if (not(SYSTEM.a(46, 2))) {
+	if (not(SYSTEM.f(46, 2))) {
 		SYSTEM(46, 2) = "#FFFFC0";
 	}
 	//if system<46,3> else system<46,3>=''
 
 	call log2("*backup the system default style", logtime);
-	SYSTEM(47) = SYSTEM.a(46);
+	SYSTEM(47) = SYSTEM.f(46);
 
 	//why is this called again?
 	call initgeneral2("GETENV", logtime);
 
 	call log2("*get codepage as an environment variable", logtime);
 	//will not override entries in SYSTEM.CFG
-	if (not(SYSTEM.a(12).locate("CODEPAGE", vn))) {
+	if (not(SYSTEM.f(12).locate("CODEPAGE", vn))) {
 
 		if (VOLUMES) {
-			tt = "../data/" ^ SYSTEM.a(17) ^ "/data.cfg";
+			tt = "../data/" ^ SYSTEM.f(17) ^ "/data.cfg";
 			tt.swapper("/", OSSLASH);
 			if (not(datacfg.osread(tt))) {
 				tt = "../data/data.cfg";
@@ -844,7 +844,7 @@ nextreport:
 			}
 			if (datacfg) {
 				datacfg.converter("\r\n", _FM_ _FM_);
-				codepage = datacfg.a(1).trim();
+				codepage = datacfg.f(1).trim();
 			} else {
 				var output = shell2("mode CON:", xx);
 				output = trim(output.convert("\r\n", FM ^ FM), FM);
@@ -860,7 +860,7 @@ nextreport:
 
 		//used in readcss for output reports and documents
 		//<meta http-equiv="content-type" content="text/html;charset=..." />
-		if (SYSTEM.a(127) eq "") {
+		if (SYSTEM.f(127) eq "") {
 			//tt=''
 			//if codepage=720 then tt='windows-1256'
 			//if codepage=737 then tt='windows-1253'
@@ -940,7 +940,7 @@ nextreport:
 	}
 
 	//save VER
-	if (not(SYSTEM.a(12).locate("VER", tt))) {
+	if (not(SYSTEM.f(12).locate("VER", tt))) {
 		{}
 	}
 	SYSTEM(12, tt) = "VER";
@@ -981,8 +981,8 @@ nextreport:
 		cpu.swapper("CPU", "");
 		cpu.converter("-", " ");
 		var nsockets = cpu.count(FM) + 1;
-		var nlogical = SYSTEM.a(9);
-		cpu = cpu.a(1).trim() ^ " ";
+		var nlogical = SYSTEM.f(9);
+		cpu = cpu.f(1).trim() ^ " ";
 		tt = nlogical / nsockets;
 		if (tt gt 1) {
 			cpu ^= nsockets ^ "x" ^ tt;
@@ -994,7 +994,7 @@ nextreport:
 	SYSTEM(12, -1) = "CPU";
 	SYSTEM(13, -1) = cpu;
 
-	var currdataset = SYSTEM.a(17);
+	var currdataset = SYSTEM.f(17);
 
 	/*;
 		if @volumes then;
@@ -1066,7 +1066,7 @@ nextreport:
 	//Windows Cygwin
 	if (VOLUMES) {
 		call log2("*find cygwin", logtime);
-		var locations = SYSTEM.a(50);
+		var locations = SYSTEM.f(50);
 		locations(1, -1) = "C:\\CYGWIN\\BIN\\,\\CYGWIN\\BIN\\,..\\..\\CYGWIN\\BIN\\";
 		var nn = locations.count(",") + 1;
 		for (const var ii : range(1, nn)) {
@@ -1098,7 +1098,7 @@ nextreport:
 	*/
 	if (VOLUMES) {
 		call log2("*find http proxy", logtime);
-		if (SYSTEM.a(56) eq "") {
+		if (SYSTEM.f(56) eq "") {
 			var cmd = "proxycfg";
 getproxy:
 			var result = shell2(cmd, errors).lcase();
@@ -1232,10 +1232,10 @@ getproxy:
 		}
 
 		call log2("*zzz should create full user record not just the name", logtime);
-		var usercodes = SECURITY.a(1);
+		var usercodes = SECURITY.f(1);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (const var usern : range(1, nusers)) {
-			var userx = usercodes.a(1, usern);
+			var userx = usercodes.f(1, usern);
 			if (not(userx.index("---"))) {
 				userx.writev(users, userx, 1);
 
@@ -1265,12 +1265,12 @@ getproxy:
 	call logprocess(sessionid, "LOGIN", "", "", "", "");
 	SYSTEM(4) = sessionid;
 
-	if (not(SYSTEM.a(22).length())) {
+	if (not(SYSTEM.f(22).length())) {
 		SYSTEM(22) = 300;
 	}
 
 	//call log2("*suppress background indexing if time out is active", logtime);
-	//if (SYSTEM.a(22)) {
+	//if (SYSTEM.f(22)) {
 	//	INDEXTIME = 0;
 	//}
 
@@ -1371,7 +1371,7 @@ getproxy:
 
 		call log2("*open processes own lists file", logtime);
 
-		var workdir = "NEOS" ^ SYSTEM.a(24).oconv("R(0)#4");
+		var workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
 		var workpath = "DATAVOL/" ^ workdir ^ "/";
 		workpath.converter("/", OSSLASH);
 
@@ -1489,16 +1489,16 @@ getproxy:
 	var foreign_dbno;
 	//group filenames by foreign dbname
 	for (var foreignfile : foreignfiles) {
-		var foreign_dbname = foreignfile.a(1, 1);
+		var foreign_dbname = foreignfile.f(1, 1);
 		if (not foreign_dbname)
 			continue;
-		var filename = foreignfile.a(1, 2);
+		var filename = foreignfile.f(1, 2);
 		if (not attach.locate(foreign_dbname, foreign_dbno, 1))
 			attach.inserter(1, foreign_dbno, foreign_dbname);
 		attach.inserter(2, foreign_dbno, -1, filename);
 	}
 	//attach filenames per foreign dbname
-	var foreign_dbnames = attach.a(1).convert(VM, FM);
+	var foreign_dbnames = attach.f(1).convert(VM, FM);
 	foreign_dbno = 0;
 	for (var foreign_dbname : foreign_dbnames) {
 		if (not(foreign_dbname))
@@ -1507,7 +1507,7 @@ getproxy:
 		if (not foreign_dbconn.connect(foreign_dbname))
 			abort("Error: serve_agy: Cannot connect attach to " ^ foreign_dbname.quote());
 		foreign_dbno++;
-		var foreign_filenames = attach.a(2, foreign_dbno);
+		var foreign_filenames = attach.f(2, foreign_dbno);
 		if (not foreign_dbconn.attach(foreign_filenames.convert(SM, FM))) {
 			var msg="Error: serve_agy: Cannot attach to " ^ foreign_filenames.convert(FM, " ") ^ " on " ^ foreign_dbconn;
 			msg.errputl();
@@ -1534,17 +1534,17 @@ fixnextcompany:
 		}
 
 		if (VOLUMES) {
-			sys.company(27) = sys.company.a(27).invert();
+			sys.company(27) = sys.company.f(27).invert();
 		}
 
 		//initialise with a recent company
-		tt = sys.company.a(2).field("/", 2);
+		tt = sys.company.f(2).field("/", 2);
 		if (tt gt maxyear) {
 			maxyear = tt;
 			sys.gcurrcompany = companycode;
 		}
 
-		var marketcode = sys.company.a(30);
+		var marketcode = sys.company.f(30);
 		if (marketcode) {
 			if (sys.markets.open("MARKETS", "")) {
 				var market;
@@ -1559,7 +1559,7 @@ fixnextcompany:
 
 		call log2("*remove obsolete period 13 from deloitte data", logtime);
 		if (sys.company.index("13X4WEEK,1/7,5")) {
-			tt = sys.company.a(16);
+			tt = sys.company.f(16);
 			tt.swapper("13/", "12/");
 			sys.company(16) = tt;
 fixcompany:
@@ -1613,7 +1613,7 @@ convcompany:
 	if (readnext(compcode)) {
 		var tempcompany;
 		if (tempcompany.read(sys.companies, compcode)) {
-			if (tempcompany.a(22) eq "") {
+			if (tempcompany.f(22) eq "") {
 				if (not numberformat) {
 					call decide("Which format do you want for numbers ?||(See \"NUMBER FORMAT\" on the company file)", "1.000,00 (dot for thousands)" ^ VM ^ "1,000.00 (comma for thousands)", reply);
 					if (reply eq 1) {
@@ -1651,19 +1651,19 @@ newdatasetid:
 		datasetid = datasetid.oconv("MX");
 		datasetid = (datasetid ^ datasetid ^ datasetid ^ datasetid).substr(1, 8);
 adddatasetcodename:
-		datasetid(2) = SYSTEM.a(23);
-		datasetid(3) = SYSTEM.a(17);
+		datasetid(2) = SYSTEM.f(23);
+		datasetid(3) = SYSTEM.f(17);
 		datasetid.write(DEFINITIONS, "GLOBALDATASETID");
 	}
-	if (datasetid.a(3) eq "" and SYSTEM.a(17)) {
+	if (datasetid.f(3) eq "" and SYSTEM.f(17)) {
 		goto adddatasetcodename;
 	}
 
 	//lock database to particular computers unless logging in as EXODUS
 	//if @username<>'EXODUS' and datasetid<4> then
 	//lock even to EXODUS to prevent installation where EXODUS pass is known
-	if (datasetid.a(4)) {
-		if (not(datasetid.a(4).locate(cid(), xx))) {
+	if (datasetid.f(4)) {
+		if (not(datasetid.f(4).locate(cid(), xx))) {
 			USER4 = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
 			gosub failsys();
 			stop();
@@ -1675,10 +1675,10 @@ adddatasetcodename:
 	//system<61>=bakpars<11>
 
 	//suggest change globaldatasetid if changed datasetname or datasetid
-	if (datasetid.a(2) ne SYSTEM.a(23) or datasetid.a(3) ne SYSTEM.a(17)) {
+	if (datasetid.f(2) ne SYSTEM.f(23) or datasetid.f(3) ne SYSTEM.f(17)) {
 		//if system<17>[-4,4]<>'TEST' and interactive and @username='EXODUS' then
-		if ((not(SYSTEM.a(61)) and interactive) and USERNAME eq "EXODUS") {
-			if (datasetid.a(1) ne "1EEC633B") {
+		if ((not(SYSTEM.f(61)) and interactive) and USERNAME eq "EXODUS") {
+			if (datasetid.f(1) ne "1EEC633B") {
 				call decide("This database has been copied or|the database name or code has been changed.|Is this going to be a unique new master database?", "Yes - Going to be a new independent database" ^ VM ^ "No - just backing up, renaming or recoding the database", reply, 2);
 				if (reply eq 1) {
 					goto newdatasetid;
@@ -1687,7 +1687,7 @@ adddatasetcodename:
 			goto adddatasetcodename;
 		}
 	}
-	SYSTEM(45) = datasetid.a(1);
+	SYSTEM(45) = datasetid.f(1);
 
 	//call log2('*check supported',logtime)
 	//if @username<>'EXODUS' then
@@ -1709,9 +1709,9 @@ adddatasetcodename:
 		if (not(userx.read(DEFINITIONS, "USER*" ^ USERNAME))) {
 			userx = "";
 		}
-		if (userx.a(4) and interactive) {
-			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.a(4) - 1).mod(7) + 1);
-			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.a(4).oconv("D") ^ " at " ^ userx.a(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.a(6).trim()).oconv("C#40") ^ "|");
+		if (userx.f(4) and interactive) {
+			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
+			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.f(4).oconv("D") ^ " at " ^ userx.f(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.f(6).trim()).oconv("C#40") ^ "|");
 		}
 
 		call log2("*save last login time", logtime);
@@ -1767,9 +1767,9 @@ nextdoc:
 		call log2("*convert codepage", logtime);
 		if (codepaging.osread("CODEPAGE.CFG")) {
 			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
-				codepage = "0" ^ FM ^ codepaging.a(2);
+				codepage = "0" ^ FM ^ codepaging.f(2);
 			}
-			if ((codepage.a(2) eq "737" and not(codepage.a(1))) and codepaging.a(3) eq "1253") {
+			if ((codepage.f(2) eq "737" and not(codepage.f(1))) and codepaging.f(3) eq "1253") {
 				perform("CONVGREEK (U)");
 			}
 		}
@@ -1811,7 +1811,7 @@ nextdoc:
 		//per installation or slow things done only in live
 		//so assuming test starts first then at least test is running
 		//live systems only
-		if (not(SYSTEM.a(61))) {
+		if (not(SYSTEM.f(61))) {
 			call initgeneral2("COMPRESSLOGS", logtime);
 			call initgeneral2("TRIMREQUESTLOG", logtime);
 			call initgeneral2("REORDERDBS", logtime);
@@ -1867,8 +1867,8 @@ nextdoc:
 			versioninstalled.write(DEFINITIONS, tt2);
 
 			//email users on live systems LISTED IN SYSTEM CONFIGURATION only
-			if (SYSTEM.a(58).locate(SYSTEM.a(17), xx)) {
-				if (not(SYSTEM.a(61))) {
+			if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
+				if (not(SYSTEM.f(61))) {
 					var idate = version.field(" ", 2, 4).iconv("D");
 					var itime = version.field(" ", 1).iconv("MT");
 					//tt=idate 'D/J':' ':itime 'MT'
@@ -1902,8 +1902,8 @@ nextdoc:
 		if (interactive and USERNAME ne "EXODUS.NET") {
 			call log2("*do a few escapes then F10 HOME to initialise the menu system", logtime);
 			//do home enter home to open the first menu at the first option
-			DATA ^= var().chr(27) ^ var().chr(27) ^ var().chr(27) ^ INTCONST.a(7);
-			DATA ^= MOVEKEYS.a(15) ^ var().chr(13) ^ MOVEKEYS.a(15);
+			DATA ^= var().chr(27) ^ var().chr(27) ^ var().chr(27) ^ INTCONST.f(7);
+			DATA ^= MOVEKEYS.f(15) ^ var().chr(13) ^ MOVEKEYS.f(15);
 
 			call log2("*if not interactive then start the required process", logtime);
 			//by pressing F5
@@ -1913,12 +1913,12 @@ nextdoc:
 			//chain 'RUNMENU LISTEN'
 
 			call log2("*indicate success to LOGIN", logtime);
-			if (SYSTEM.a(33, 10)) {
+			if (SYSTEM.f(33, 10)) {
 				//call oswrite('OK',system<33,10>:'.$2')
-				var("OK").oswrite(SYSTEM.a(33, 10) ^ ".$2");
+				var("OK").oswrite(SYSTEM.f(33, 10) ^ ".$2");
 			}
 
-			call log2("*chain to NET AUTO (" ^ SYSTEM.a(17) ^ ") INIT.GENERAL Quitting.", logtime);
+			call log2("*chain to NET AUTO (" ^ SYSTEM.f(17) ^ ") INIT.GENERAL Quitting.", logtime);
 			chain("NET AUTO");
 		}
 
@@ -1937,7 +1937,7 @@ subroutine getsystem() {
 	}
 
 	//ensure default style is null
-	var tt3 = systemx.a(46);
+	var tt3 = systemx.f(46);
 	tt3.converter(VM, "");
 	tt3.swapper("Default", "");
 	if (tt3 eq "") {
@@ -1948,13 +1948,13 @@ subroutine getsystem() {
 	//ie global installation parameters override dataset parameters
 	var ni = systemx.count(FM) + 1;
 	for (const var ii : range(1, ni)) {
-		if (systemx.a(ii).length()) {
-			SYSTEM(ii) = systemx.a(ii);
+		if (systemx.f(ii).length()) {
+			SYSTEM(ii) = systemx.f(ii);
 		}
 	} //ii;
 
 	//save config file time so can detect if restart required
-	SYSTEM(100, tt2) = tt.osfile().a(3);
+	SYSTEM(100, tt2) = tt.osfile().f(3);
 
 	return;
 }
@@ -1967,7 +1967,7 @@ subroutine failsys() {
 	call log2(tt, logtime);
 
 	//onscreen message
-	s33 = SYSTEM.a(33);
+	s33 = SYSTEM.f(33);
 	SYSTEM(33) = "";
 	call mssg(msg ^ "", "T3", yy, "");
 	SYSTEM(33) = s33;
@@ -1976,7 +1976,7 @@ subroutine failsys() {
 	msg.swapper(FM ^ FM, FM);
 	msg.converter(FM, "|");
 	//call oswrite(msg,system<33,10>:'.$2')
-	var(msg).oswrite(SYSTEM.a(33, 10) ^ ".$2");
+	var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2");
 
 	//and quit
 	perform("OFF");

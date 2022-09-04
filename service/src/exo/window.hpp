@@ -72,7 +72,7 @@ function security3(in op, in op2)
 
 function invalidq(in msg)
 {
-	return invalid(msg.splice(1, 0, (win.is.a(1, 1, 1)).quote() ^ " "));
+	return invalid(msg.splice(1, 0, (win.is.f(1, 1, 1)).quote() ^ " "));
 }
 
 function invalid()

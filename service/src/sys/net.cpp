@@ -26,7 +26,7 @@ function main() {
 	PSEUDO = "";
 	USER4 = "";
 	PRIORITYINT(100) = "";
-	var dbcode = SYSTEM.a(17);
+	var dbcode = SYSTEM.f(17);
 	if (dbcode eq "") {
 		dbcode = "DEFAULT";
 	}
@@ -38,7 +38,7 @@ function main() {
 
 listen:
 
-	var s33 = SYSTEM.a(33);
+	var s33 = SYSTEM.f(33);
 
 	//forces OFF in listen on esc
 	if (cmd.field(" ",1) ne "LISTEN") {
@@ -78,7 +78,7 @@ listen:
 		}
 
 		RELOAD_req = true;
-		printl("Reloading PROCESS ", SYSTEM.a(24));
+		printl("Reloading PROCESS ", SYSTEM.f(24));
 
 		stop();
 		////
@@ -98,7 +98,7 @@ listen:
 
 	//check lists and indexing files are not corrupted and zero them if they are
 	//listen selects the locks file every 10 secs and may detect corruption
-	s33 = SYSTEM.a(33);
+	s33 = SYSTEM.f(33);
 	SYSTEM(33) = 1;
 	//call checkfile"LISTS");
 	//call checkfile"!INDEXING");
@@ -148,7 +148,7 @@ listen:
 			//note new or changed media
 			tt = USER4.index("Media: ");
 			if (tt) {
-				subject ^= " " ^ (USER4.substr(tt + 7, 9999)).a(1);
+				subject ^= " " ^ (USER4.substr(tt + 7, 9999)).f(1);
 			}
 
 			//add success, WARNING or FAILURE
@@ -160,7 +160,7 @@ listen:
 				if (tt2.index("WARNING")) {
 					tt = "WARNING";
 				}
-				attachfilename = SYSTEM.a(42);
+				attachfilename = SYSTEM.f(42);
 			}
 			//no need for specific success message. most succeed, can find FAIL or WARN
 			//if tt='' then tt='Success'
@@ -182,7 +182,7 @@ listen:
 			if (VOLUMES) {
 				printl(USER4);
 			}
-			var techmsg = USER4.a(1).substr(1, 256);
+			var techmsg = USER4.f(1).substr(1, 256);
 			call sysmsg(USER4, techmsg);
 
 		}
@@ -194,12 +194,12 @@ listen:
 
 			//send email of error
 			//readv address from definitions,'BACKUP',6 else address=''
-			sys.address = bakpars.a(6);
-			if (bakpars.a(10)) {
+			sys.address = bakpars.f(6);
+			if (bakpars.f(10)) {
 				if (sys.address) {
 					sys.address ^= "/";
 				}
-				sys.address ^= bakpars.a(10);
+				sys.address ^= bakpars.f(10);
 			}
 			if (sys.address eq "") {
 				if (not(sys.address.readv(DEFINITIONS, "REPLICATION", 12))) {
@@ -211,14 +211,14 @@ listen:
 			}
 			if (sys.address) {
 
-				var body = "Server=" ^ SYSTEM.a(44).trim();
+				var body = "Server=" ^ SYSTEM.f(44).trim();
 				body(-1) = "Client=" ^ STATION.trim();
 				body(-1) = "User=" ^ USERNAME.trim();
 				//osread ver from 'general\version.dat' then
 				var verfilename = "general/version.dat";
 				verfilename.converter("/", OSSLASH);
 				if (ver.osread(verfilename)) {
-					body(-1) = "EXODUS Ver:" ^ ver.a(1);
+					body(-1) = "EXODUS Ver:" ^ ver.f(1);
 					}
 
 				//too slow so ignore it
@@ -259,8 +259,8 @@ listen:
 		if (PSEUDO.field(" ", 1) eq "BACKUP") {
 
 			//before termination do any copy to testdata etc
-			if (SYSTEM.a(58).locate(dbcode, tt)) {
-				if (SYSTEM.a(62, tt)) {
+			if (SYSTEM.f(58).locate(dbcode, tt)) {
+				if (SYSTEM.f(62, tt)) {
 					perform("COPYDB " ^ dbcode);
 				}
 			}
@@ -269,7 +269,7 @@ listen:
 			//why call not perform?
 			call upgrade();
 
-			if (SYSTEM.a(125)) {
+			if (SYSTEM.f(125)) {
 				perform("OFF");
 				var().logoff();
 			}
@@ -278,7 +278,7 @@ listen:
 	}
 
 	// Respond to web client e.g. program crash due to Variable not Assigned
-	var linkfilename3 = PRIORITYINT.a(100);
+	var linkfilename3 = PRIORITYINT.f(100);
 	if (linkfilename3) {
 		//cannot remove these since they may be codepage letters now
 		USER4.swapper("|", "\r\n");
@@ -291,12 +291,12 @@ listen:
 	//restore the original settings
 	//noninteractive avoids any further messages on OFF command
 	SYSTEM(33) = s33;
-	if (SYSTEM.a(43)) {
-		USERNAME=(SYSTEM.a(43));
+	if (SYSTEM.f(43)) {
+		USERNAME=(SYSTEM.f(43));
 	}
 	//if system<44> then call sysvar_109_110('SET',system<44>)
-	if (SYSTEM.a(44)) {
-		STATION=(SYSTEM.a(44));
+	if (SYSTEM.f(44)) {
+		STATION=(SYSTEM.f(44));
 	}
 
 	if (halt) {

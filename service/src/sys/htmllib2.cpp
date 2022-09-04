@@ -54,7 +54,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		dataio = "<tr><td>" ^ dataio ^ "</td></tr>";
 
 		if (params2) {
-			var line1 = dataio.a(1);
+			var line1 = dataio.f(1);
 			line1.swapper("</TR>", "</tr>");
 			line1.swapper("</tr>", "</tr>" ^ FM ^ "</thead>" ^ FM ^ "<tbody>");
 			line1.swapper("<td>", "<th>");
@@ -81,9 +81,9 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		//highlight last row if a total
 		var nlines = dataio.count(FM) + 1;
-		var lastline = dataio.a(nlines);
+		var lastline = dataio.f(nlines);
 	//Total
-		if (lastline.index("<td>" ^ sys.glang.a(28))) {
+		if (lastline.index("<td>" ^ sys.glang.f(28))) {
 			lastline.swapper("TD>", "th>");
 			lastline.swapper("td>", "th>");
 			dataio(nlines) = lastline;
@@ -102,7 +102,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		var nv = dataio.count(VM) + 1;
 		for (const var vn : range(1, nv)) {
-			var datax = dataio.a(1, vn);
+			var datax = dataio.f(1, vn);
 
 			//insert a break before all space+#
 			datax.swapper(" #", FM ^ "#");
@@ -116,7 +116,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			if (nlines gt 1) {
 
 				for (const var ln : range(1, nlines)) {
-					var line = datax.a(ln).trim();
+					var line = datax.f(ln).trim();
 					if (line[1] eq "#") {
 						line.splicer(1, 1, "");
 						//if colon : present then before colon is the tag name

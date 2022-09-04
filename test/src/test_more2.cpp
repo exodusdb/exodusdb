@@ -119,8 +119,8 @@ function main() {
 		assert(x++ == 1);
 		assert(x == 2);
 
-		//assert(x.a(1)++ == 1);//does not compile
-		//assert((x.a(1))++ == 1);//does not compile
+		//assert(x.f(1)++ == 1);//does not compile
+		//assert((x.f(1))++ == 1);//does not compile
 		//assert(x == 2);
 
 		x = 1;
@@ -128,8 +128,8 @@ function main() {
 		assert(x == 2);
 
 		x = 1;
-		//assert(++x.a(1) == 2);//does not compile
-		assert((++x).a(1) == 2);
+		//assert(++x.f(1) == 2);//does not compile
+		assert((++x).f(1) == 2);
 		assert(x == 2);
 
 		//DECREMENT
@@ -138,8 +138,8 @@ function main() {
 		assert(x-- == 1);
 		assert(x == 0);
 
-		//assert(x.a(1)-- == 1);//does not compile
-		//assert((x.a(1))-- == 1);//does not compile
+		//assert(x.f(1)-- == 1);//does not compile
+		//assert((x.f(1))-- == 1);//does not compile
 		assert(x == 0);
 
 		x = 1;
@@ -147,8 +147,8 @@ function main() {
 		assert(x == 0);
 
 		x = 1;
-		//assert(--x.a(1) == 2);//does not compile
-		assert((--x).a(1) == 0);
+		//assert(--x.f(1) == 2);//does not compile
+		assert((--x).f(1) == 0);
 		assert(x == 0);
 	}
 
@@ -1234,11 +1234,11 @@ function main() {
 		//rvalue
 
 		x=1;
-		//assert(x.a(1)++ == 1);//pointless. should not compile
-		assert(x.a(1) == 1);
-		//assert(++x.a(1) == 2);//will not compile because "." priority > "++"
-		assert((++x).a(1) == 2);
-		assert(x.a(1) == 2);
+		//assert(x.f(1)++ == 1);//pointless. should not compile
+		assert(x.f(1) == 1);
+		//assert(++x.f(1) == 2);//will not compile because "." priority > "++"
+		assert((++x).f(1) == 2);
+		assert(x.f(1) == 2);
 
 		//////////
 		//negative
@@ -1255,11 +1255,11 @@ function main() {
 		//rvalue
 
 		x=1;
-		//assert(x.a(1)-- == 1);//pointless. should not compile
-		assert(x.a(1) == 1);
-		//assert(--x.a(1) == 2);//will not compile because "." priority > "--"
-		assert((--x).a(1) == 0);
-		assert(x.a(1) == 0);
+		//assert(x.f(1)-- == 1);//pointless. should not compile
+		assert(x.f(1) == 1);
+		//assert(--x.f(1) == 2);//will not compile because "." priority > "--"
+		assert((--x).f(1) == 0);
+		assert(x.f(1) == 0);
 
 	}
 

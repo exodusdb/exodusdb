@@ -162,12 +162,12 @@ function main(in mode) {
 				win.wlocked = "";
 			}
 
-			if (not(RECORD.a(1))) {
+			if (not(RECORD.f(1))) {
 
 				var temp;
 				if (temp.read(win.srcfile, "CHEQUEDESIGN*DEFAULT")) {
 
-					if (not(RECORD.read(win.srcfile, "CHEQUEDESIGN*" ^ temp.a(1, 1)))) {
+					if (not(RECORD.read(win.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1)))) {
 						goto nochequeformat;
 					}
 
@@ -218,9 +218,9 @@ nochequeformat:
 			call collectixvals(filename, fieldname);
 			var nn = PSEUDO.count(FM) + 1;
 			for (const var ii : range(1, nn)) {
-				var val = PSEUDO.a(ii);
+				var val = PSEUDO.f(ii);
 				if (val) {
-					if (not(RECORD.a(1).locateby("AL", val, vn))) {
+					if (not(RECORD.f(1).locateby("AL", val, vn))) {
 						RECORD.inserter(1, vn, val);
 						RECORD.inserter(2, vn, "");
 						//any more in parallel
@@ -242,7 +242,7 @@ unlockdefinitions:
 			}
 
 			//always allowed to update or delete own records
-			if (RECORD.a(8) ne USERNAME) {
+			if (RECORD.f(8) ne USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
 				if (not(win.valid)) {
@@ -251,7 +251,7 @@ unlockdefinitions:
 			}
 
 			//prevent update or delete of EXODUS definitions
-			if ((win.wlocked and RECORD.a(8).index("EXODUS")) and not(USERNAME.index("EXODUS"))) {
+			if ((win.wlocked and RECORD.f(8).index("EXODUS")) and not(USERNAME.index("EXODUS"))) {
 preventupdate:
 				win.wlocked = 0;
 				xx = unlockrecord("DEFINITIONS", win.srcfile, ID);
@@ -295,15 +295,15 @@ preventupdate:
 				return invalid(msg);
 			}
 
-			if (RECORD.a(14)) {
+			if (RECORD.f(14)) {
 
 				//remove old default
 				var temp;
 				if (temp.read(win.srcfile, "CHEQUEDESIGN*DEFAULT")) {
 					var temp2;
-					if (temp2.read(win.srcfile, "CHEQUEDESIGN*" ^ temp.a(1, 1))) {
+					if (temp2.read(win.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1))) {
 						temp2(14) = "";
-						temp2.write(win.srcfile, "CHEQUEDESIGN*" ^ temp.a(1, 1));
+						temp2.write(win.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1));
 					}
 				}
 
@@ -320,7 +320,7 @@ preventupdate:
 			} else {
 
 				//remove as default (assume is this account)
-				if (win.orec.a(14)) {
+				if (win.orec.f(14)) {
 					win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 
 				}
@@ -335,7 +335,7 @@ preventupdate:
 		//this is also done in copygbp perhaps could be removed from there
 		//almost identical code in definition.subs and get.subs (for documents)
 		//field 10 in documents and definitions xxx*analdesign means the same
-		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.a(10)) {
+		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -348,10 +348,10 @@ preventupdate:
 		if (ID eq "AGENCY.PARAMS") {
 
 			//prevent changing "invno by company" after data is entered
-			if (RECORD.a(48) ne win.orec.a(48)) {
+			if (RECORD.f(48) ne win.orec.f(48)) {
 				call anydata("", anydataexists);
 				if (anydataexists) {
-					RECORD(48) = win.orec.a(48);
+					RECORD(48) = win.orec.f(48);
 					msg = "You cannot change Invoice Number Sequence after data is entered";
 					msg(-1) = "That change has been ignored.";
 					call note(msg);
@@ -360,13 +360,13 @@ preventupdate:
 
 			//check authorised to set posting
 			for (const var fn : range(100, 102)) {
-				var usercode = RECORD.a(fn);
+				var usercode = RECORD.f(fn);
 				if (usercode) {
-					if (not(SECURITY.a(1).locate(usercode, xx))) {
+					if (not(SECURITY.f(1).locate(usercode, xx))) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
-					if (usercode ne win.orec.a(fn)) {
+					if (usercode ne win.orec.f(fn)) {
 						//updater must themselves be authorised to post journals
 						if (not(authorised("JOURNAL POST", msg))) {
 							msg = "You are not authorised to change financial usercode" ^ FM ^ FM ^ msg;
@@ -381,9 +381,9 @@ preventupdate:
 				}
 			} //fn;
 
-			var t49 = field2(RECORD.a(49), VM, -1);
-			var t149 = field2(RECORD.a(149), VM, -1);
-			var t150 = field2(RECORD.a(150), VM, -1);
+			var t49 = field2(RECORD.f(49), VM, -1);
+			var t149 = field2(RECORD.f(149), VM, -1);
+			var t150 = field2(RECORD.f(150), VM, -1);
 			if (t49 and t49 eq t149) {
 				msg = "Media adjustment no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);
@@ -399,29 +399,29 @@ preventupdate:
 				return invalid(msg);
 			}
 
-			if ((RECORD.a(146) and not(RECORD.a(149))) or ((not(RECORD.a(146)) and RECORD.a(149)))) {
+			if ((RECORD.f(146) and not(RECORD.f(149))) or ((not(RECORD.f(146)) and RECORD.f(149)))) {
 				msg = "Media adjustment no pattern is required if media adjustment journal type is specified and vice versa";
 				return invalid(msg);
 			}
 
-			if ((RECORD.a(147) and not(RECORD.a(150))) or ((not(RECORD.a(147)) and RECORD.a(150)))) {
+			if ((RECORD.f(147) and not(RECORD.f(150))) or ((not(RECORD.f(147)) and RECORD.f(150)))) {
 				msg = "Media credit note no pattern is required if media credit note journal type is specified and vice versa";
 				return invalid(msg);
 			}
 
-			if (((RECORD.a(146) and RECORD.a(46) eq RECORD.a(146)) or ((RECORD.a(147) and RECORD.a(46) eq RECORD.a(147)))) or ((RECORD.a(147) and RECORD.a(146) eq RECORD.a(147)))) {
+			if (((RECORD.f(146) and RECORD.f(46) eq RECORD.f(146)) or ((RECORD.f(147) and RECORD.f(46) eq RECORD.f(147)))) or ((RECORD.f(147) and RECORD.f(146) eq RECORD.f(147)))) {
 				msg = "Media Accounting Voucher type codes must all be different (or left blank)";
 				return invalid(msg);
 			}
 
 			//save the requester if requested createads
-			if (RECORD.a(125) ne win.orec.a(125)) {
+			if (RECORD.f(125) ne win.orec.f(125)) {
 				RECORD(128) = USERNAME;
 			}
 
 			//obfuscate the mark
 			if (VOLUMES) {
-				RECORD(1) = RECORD.a(1).invert();
+				RECORD(1) = RECORD.f(1).invert();
 			}
 
 		}
@@ -444,7 +444,7 @@ preventupdate:
 			smtprec = RECORD.field(FM, 101, 9);
 
 			//ensure default style is null
-			tt = RECORD.a(46);
+			tt = RECORD.f(46);
 			tt.converter(VM, "");
 			tt.swapper("Default", "");
 			if (tt eq "") {
@@ -472,12 +472,12 @@ preventupdate:
 			}
 
 			//warning if backup drive does not exist/cannot be written to
-			var backupdrives = RECORD.a(77);
-			if (RECORD.a(82) ne RECORD.a(77)) {
-				backupdrives(-1) = RECORD.a(82);
+			var backupdrives = RECORD.f(77);
+			if (RECORD.f(82) ne RECORD.f(77)) {
+				backupdrives(-1) = RECORD.f(82);
 			}
 			for (const var driven : range(1, 999)) {
-				var drive = backupdrives.a(driven)[1];
+				var drive = backupdrives.f(driven)[1];
 				///BREAK;
 				if (not drive) break;
 				//TODO replace with checkwritable()
@@ -507,8 +507,8 @@ preventupdate:
 			//create/update ddns configuration if necessary
 			//actually only the ddns.cmd file really need be updated
 			//but atm it recreates everything from scratch
-			var oldhostname = win.orec.a(57);
-			var newhostname = RECORD.a(57);
+			var oldhostname = win.orec.f(57);
+			var newhostname = RECORD.f(57);
 			if (newhostname and newhostname ne oldhostname) {
 				SYSTEM(57) = newhostname;
 				//in INIT.GENERAL and DEFINITION.SUBS
@@ -517,7 +517,7 @@ preventupdate:
 				}
 			}
 
-			SYSTEM(58) = RECORD.a(58);
+			SYSTEM(58) = RECORD.f(58);
 			gosub reorderdbs();
 
 			return 0;
@@ -586,7 +586,7 @@ preventupdate:
 			}
 
 			//always allowed to delete own records
-			if (RECORD.a(8) ne USERNAME) {
+			if (RECORD.f(8) ne USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
 				if (not(win.valid)) {
@@ -598,7 +598,7 @@ preventupdate:
 
 		//remove default cheque design
 		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
-			if (RECORD.a(14)) {
+			if (RECORD.f(14)) {
 				win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 
 			}
@@ -607,7 +607,7 @@ preventupdate:
 		//update exodus standard (in case doing this on the programming system)
 		//%DELETED% ensures that deleted EXODUS documents get deleted
 		//on upgrading clients
-		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.a(10)) {
+		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -637,7 +637,7 @@ subroutine reorderdbs() {
 
 	//reorder dbs in ADAGENCY.VOL, ACCOUNTS.VOL etc
 	//according to dbs listed in configuration
-	var newdbcodes = SYSTEM.a(58);
+	var newdbcodes = SYSTEM.f(58);
 
 	//read the existing dbdir or silently quit
 	var dbdirfilename = APPLICATION.lcase() ^ ".vol";
@@ -653,16 +653,16 @@ subroutine reorderdbs() {
 	dbdir.converter(",*", SVM ^ VM);
 
 	//extract substitution and dblist from dbdir line 1
-	var substitution = dbdir.a(1).field(" ", 1);
-	var dblist = dbdir.a(1).field(" ", 2, 9999);
+	var substitution = dbdir.f(1).field(" ", 1);
+	var dblist = dbdir.f(1).field(" ", 2, 9999);
 
 	//create newdblist in order of given newdbcodes
 	//if not found in new order then append in order found
 	var ndbs = dblist.count(VM) + 1;
 	var newdblist = "";
 	for (const var dbn : range(1, ndbs)) {
-		var db = dblist.a(1, dbn);
-		var dbcode = db.a(1, 1, 2);
+		var db = dblist.f(1, dbn);
+		var dbcode = db.f(1, 1, 2);
 		if (not(newdbcodes.locate(dbcode, newdbcoden))) {
 			newdbcodes(1, newdbcoden) = dbcode;
 		}
@@ -691,65 +691,65 @@ subroutine postreadfix() {
 	if (ID eq "AGENCY.PARAMS") {
 
 		if (VOLUMES) {
-			RECORD(1) = RECORD.a(1).invert();
+			RECORD(1) = RECORD.f(1).invert();
 		}
 
-		if (RECORD.a(55) eq "") {
+		if (RECORD.f(55) eq "") {
 			RECORD(55) = "Budget";
 		}
-		if (RECORD.a(56) eq "") {
+		if (RECORD.f(56) eq "") {
 			RECORD(56) = "F/cast";
 		}
-		if (RECORD.a(72) eq "") {
+		if (RECORD.f(72) eq "") {
 			RECORD(72) = "Media Plan";
 		}
-		if (RECORD.a(73) eq "") {
+		if (RECORD.f(73) eq "") {
 			RECORD(73) = "Media Schedule";
 		}
-		if (RECORD.a(74) eq "") {
+		if (RECORD.f(74) eq "") {
 			RECORD(74) = "Estimate";
 		}
 
-		if (RECORD.a(49) eq "") {
+		if (RECORD.f(49) eq "") {
 			RECORD(49) = "<NUMBER>";
 		}
-		if (RECORD.a(49, 1, 2) eq "") {
+		if (RECORD.f(49, 1, 2) eq "") {
 			RECORD(49, 1, 2) = "2000.01";
 		}
-		if (RECORD.a(50) eq "") {
+		if (RECORD.f(50) eq "") {
 			RECORD(50) = "<NUMBER>";
 		}
-		if (RECORD.a(50, 1, 2) eq "") {
+		if (RECORD.f(50, 1, 2) eq "") {
 			RECORD(50, 1, 2) = "2000.01";
 		}
 
 		//done in agency.subs getnextid
-		if (RECORD.a(53) eq "") {
+		if (RECORD.f(53) eq "") {
 			RECORD(53) = "<NUMBER>";
 		}
-		if (RECORD.a(63) eq "") {
+		if (RECORD.f(63) eq "") {
 			RECORD(63) = "<NUMBER>";
 		}
-		if (RECORD.a(69) eq "") {
+		if (RECORD.f(69) eq "") {
 			RECORD(69) = "<NUMBER>";
 		}
-		if (RECORD.a(70) eq "") {
+		if (RECORD.f(70) eq "") {
 			RECORD(70) = "<NUMBER>";
 		}
-		if (RECORD.a(71) eq "") {
+		if (RECORD.f(71) eq "") {
 			RECORD(71) = "<NUMBER>";
 		}
 
-		if (RECORD.a(25) eq "") {
+		if (RECORD.f(25) eq "") {
 			RECORD(25) = "ACC<YEAR>";
 		}
-		if (RECORD.a(26) eq "") {
+		if (RECORD.f(26) eq "") {
 			RECORD(26) = "WIP<YEAR>";
 		}
 
 		//copy schedule footer to plan footer
-		if (not(RECORD.a(34))) {
-			RECORD(34) = RECORD.a(11);
+		if (not(RECORD.f(34))) {
+			RECORD(34) = RECORD.f(11);
 		}
 
 	}

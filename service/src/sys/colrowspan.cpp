@@ -34,7 +34,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 	//determine nrows
 	var nrows = 1;
 	for (const var coln : range(1, ncols2)) {
-		var tt = colhdg.a(coln).count(VM) + 1;
+		var tt = colhdg.f(coln).count(VM) + 1;
 		if (tt gt nrows) {
 			nrows = tt;
 		}
@@ -48,14 +48,14 @@ function main(io colhdg, in thproperties, in nobase0) {
 		// Reverted because we do need to skip coln's
 		//for (const var coln : range(1, ncols2)) {
 
-			var tt = colhdg.a(coln, rown);
+			var tt = colhdg.f(coln, rown);
 			if (tt eq nocell) {
 				goto nextcoln;
 			}
 
 			//t2='<th style="background-color:':thcolor:'"'
 			if (thproperties.index(FM)) {
-				thprop = thproperties.a(coln);
+				thprop = thproperties.f(coln);
 			}
 			t2 = "\r\n" " <th " ^ thprop;
 
@@ -65,7 +65,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 			//determine any colspan (duplicate cells to the right)
 			while (true) {
 				var coln2 = coln + colspan;
-				var t3 = colhdg.a(coln2, rown);
+				var t3 = colhdg.f(coln2, rown);
 				///BREAK;
 				if (not((coln2 le ncols2 and t3 eq tt) and t3 ne nocell)) break;
 				colspan += 1;
@@ -82,7 +82,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 				//determine any rowspan (duplicate cells below)
 				while (true) {
 					var rown2 = rown + rowspan;
-					var t3 = colhdg.a(coln, rown2);
+					var t3 = colhdg.f(coln, rown2);
 					///BREAK;
 					if (not((rown2 le nrows and ((t3 eq tt or t3 eq ""))) and t3 ne nocell)) break;
 					rowspan += 1;
@@ -115,7 +115,7 @@ nextcoln:;
 	//change all "(Base)" in dictionary column headings to the base currency
 	//unless the keyword NO-BASE is present in which case replace with blank
 	//this is useful if all the columns are base and no need to see the currency
-	t2 = sys.company.a(3);
+	t2 = sys.company.f(3);
 	if (t2) {
 		if (nobase) {
 			t2 = "";
@@ -123,7 +123,7 @@ nextcoln:;
 			t2 = "(" ^ t2 ^ ")";
 		}
 		colhdg.swapper("(Base)", t2);
-		colhdg.swapper("%BASE%", sys.company.a(3));
+		colhdg.swapper("%BASE%", sys.company.f(3));
 	}
 
 	return 0;

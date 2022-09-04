@@ -12,7 +12,7 @@ libraryexit(chequedesign_account_name)
 libraryinit(chequedesign_is_default)
 //----------------------------------
 function main() {
-	ANS = RECORD.a(14);
+	ANS = RECORD.f(14);
 	if (ANS) {
 		ANS = "Default";
 	}
@@ -25,7 +25,7 @@ libraryinit(email_address)
 //------------------------
 function main() {
 	//@ans=xlate('USERS',@record<1>,7,'X')
-	return RECORD.a(1).xlate("USERS", 7, "X");
+	return RECORD.f(1).xlate("USERS", 7, "X");
 }
 libraryexit(email_address)
 
@@ -33,10 +33,10 @@ libraryexit(email_address)
 libraryinit(full_name)
 //--------------------
 function main() {
-	ANS = RECORD.a(1).xlate("USERS", 1, "X");
+	ANS = RECORD.f(1).xlate("USERS", 1, "X");
 	var nn = ANS.count(VM) + 1;
 	for (const var ii : range(1, nn)) {
-		if (ANS.a(1, ii) eq RECORD.a(1, ii)) {
+		if (ANS.f(1, ii) eq RECORD.f(1, ii)) {
 			ANS(1, ii) = "";
 		}
 	} //ii;
@@ -75,7 +75,7 @@ function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");
 	var nn = ANS.count(VM) + 1;
 	for (const var ii : range(1, nn)) {
-		var logindate = ANS.a(1, ii).floor();
+		var logindate = ANS.f(1, ii).floor();
 		if (logindate) {
 			ANS(1, ii) = (var().date() - logindate).oconv("MD00P");
 		}
@@ -115,7 +115,7 @@ function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 36, "X");
 	var nn = ANS.count(VM) + 1;
 	for (const var ii : range(1, nn)) {
-		var passworddate = ANS.a(1, ii);
+		var passworddate = ANS.f(1, ii);
 		if (passworddate) {
 			ANS(1, ii) = (var().date() - passworddate).oconv("MD00P");
 		}
@@ -131,13 +131,13 @@ libraryinit(process_comment2)
 
 function main() {
 	ANS = "";
-	if (ID.field("*", 2) eq SYSTEM.a(32)) {
+	if (ID.field("*", 2) eq SYSTEM.f(32)) {
 		ANS(1, -1) = "Current user session";
 	}
-	if (RECORD.a(3).trim() eq STATION.trim()) {
+	if (RECORD.f(3).trim() eq STATION.trim()) {
 		ANS(1, -1) = "Current workstation";
 	}
-	if (RECORD.a(5) eq USERNAME) {
+	if (RECORD.f(5) eq USERNAME) {
 		ANS(1, -1) = "Current user";
 		}
 	return ANS;
@@ -157,16 +157,16 @@ libraryinit(process_duration)
 //---------------------------
 function main() {
 	var secsperday = 24 * 60 * 60;
-	var uptodate = RECORD.a(11);
-	var uptotime = RECORD.a(12);
+	var uptodate = RECORD.f(11);
+	var uptotime = RECORD.f(12);
 	if (uptodate eq "") {
 		uptodate = var().date();
 	}
 	if (uptotime eq "") {
 		uptotime = var().time();
 	}
-	var daysecs = (uptodate - RECORD.a(1)) * secsperday;
-	var timesecs = uptotime - RECORD.a(2);
+	var daysecs = (uptodate - RECORD.f(1)) * secsperday;
+	var timesecs = uptotime - RECORD.f(2);
 	var totsecs = daysecs + timesecs;
 
 	var hours = (totsecs / 60 / 60).floor();
@@ -180,7 +180,7 @@ libraryexit(process_duration)
 libraryinit(process_weekcommencing)
 //---------------------------------
 function main() {
-	return RECORD.a(1) - ((RECORD.a(1) - 1).mod(7));
+	return RECORD.f(1) - ((RECORD.f(1) - 1).mod(7));
 }
 libraryexit(process_weekcommencing)
 
@@ -203,9 +203,9 @@ function main() {
 	var emails = usercodes.xlate("USERS", 7, "X");
 	var nusers = usercodes.count(VM) + 1;
 	for (const var usern : range(1, nusers)) {
-		var usercode = usercodes.a(1, usern);
+		var usercode = usercodes.f(1, usern);
 		if (usercode) {
-			if (emails.a(1, usern) eq "") {
+			if (emails.f(1, usern) eq "") {
 				usercodes(1, usern) = "<B>" ^ usercode ^ "</B>";
 			}
 		}
@@ -218,12 +218,12 @@ libraryexit(user_code_html)
 libraryinit(user_code_with_email)
 //-------------------------------
 function main() {
-	var usercodes = RECORD.a(1, MV);
-	var emails = RECORD.a(7, MV);
+	var usercodes = RECORD.f(1, MV);
+	var emails = RECORD.f(7, MV);
 
 	var nusers = usercodes.count(VM) + 1;
 	for (const var usern : range(1, nusers)) {
-		if (emails.a(1, usern) eq "") {
+		if (emails.f(1, usern) eq "") {
 			usercodes(1, usern) = "";
 		}
 	} //usern;

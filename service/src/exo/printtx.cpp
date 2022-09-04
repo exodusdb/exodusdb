@@ -102,7 +102,7 @@ function main(io tx, in mode="", in modevalue="") {
 		SYSTEM(3) = 1;
 
 		//if no printfile assume command mode and make an output file name
-		printfilename = SYSTEM.a(2);
+		printfilename = SYSTEM.f(2);
 		if (html.unassigned()) {
 			html = printfilename.lcase().index(".htm");
 		}
@@ -254,7 +254,7 @@ printtx2:
 				css.swapper("</style>", style ^ "</style>");
 			}
 			//htmltitle=field(headx<1>,"'",1)
-			var htmltitle = headx.a(1);
+			var htmltitle = headx.f(1);
 			if (htmltitle[1] == "<") {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
@@ -357,7 +357,7 @@ subroutine getheadfoot() {
 	}
 
 	if (html) {
-		var head1 = headx.a(1);
+		var head1 = headx.f(1);
 		head1.swapper(" ", "&nbsp;");
 		head1.converter("~", " ");
 		while (true) {

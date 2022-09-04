@@ -13,7 +13,7 @@ var time2;//num
 function main(in msg0, io time0) {
 	//c sys in,io
 
-	var interactive = false; //not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.f(33));
 	if (interactive) {
 		return 0;
 	}
@@ -24,7 +24,7 @@ function main(in msg0, io time0) {
 		//logfilename=field(FIELD2(@rollout.file,'\',-1),'.',1):'.LOG'
 		logfilename = ROLLOUTFILE;
 		logfilename.splicer(-3, 3, "log");
-		logfilelength = logfilename.osfile().a(1);
+		logfilelength = logfilename.osfile().f(1);
 		if (not logfilelength) {
 			call oswrite("", logfilename);
 		}
@@ -73,7 +73,7 @@ function main(in msg0, io time0) {
 		//entry:=field(time2,'.',2) 'MD20P'
 	}
 	//similar in listen and log2
-	entry ^= SYSTEM.a(24) ^ ": " ^ (time2 - time0).oconv("MD20P");
+	entry ^= SYSTEM.f(24) ^ ": " ^ (time2 - time0).oconv("MD20P");
 	//entry:=sep:sep:sep:sep
 	entry ^= sep_ ^ msg0;
 

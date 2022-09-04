@@ -124,7 +124,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	//c++ variation
 	if (not(VOLUMES)) {
 		for (var ii = 1; ii <= 5; ii+=2) {
-			var tt = triggers.a(ii);
+			var tt = triggers.f(ii);
 			tt.lcaser();
 			tt.converter(".", "");
 			triggers(ii) = tt;

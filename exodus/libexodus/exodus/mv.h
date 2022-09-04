@@ -863,7 +863,7 @@ class PUBLIC var final {
 	// ROUND BRACKETS ()
 	////////////////////
 
-	// extract using () int int int (alternative to .a() and extract())
+	// extract using () int int int (alternative to .f() and extract())
 	// instead of xyz=abc.extract(1,2,3);
 	// sadly there is no way to use pick/mv angle brackets like "abc<1,2,3>"
 	// and [] brackets would only allow one dimension eg abc[1] (c++23 allows more than one)
@@ -879,7 +879,7 @@ class PUBLIC var final {
 	// 1. () on const vars will extract the desired field/value/subvalue as a proper var
 	// Note that all  function "in" arguments are const vars
 	// so will work perfectly with () extraction
-	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->a(fieldno, valueno, subvalueno);}
+	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
 	//ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
 
 	// DONT declare this so we force use of the above const version that produces a temporary
@@ -1729,12 +1729,12 @@ class PUBLIC var final {
 	// var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
 	ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
 
-	//.a(...) stands for .attribute(...) or extract(...)
+	//.f(...) stands for .attribute(...) or extract(...)
 	// pickos
 	// xxx=yyy<10>";
 	// becomes c++
-	// xxx=yyy.a(10);
-	ND var a(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	// xxx=yyy.f(10);
+	ND var f(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
 	ND var extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
 
 	// SAME AS ABOVE ON TEMPORARIES
@@ -2165,7 +2165,7 @@ class PUBLIC var_proxy1 {
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
-		return var_->a(fn_);
+		return var_->f(fn_);
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
@@ -2175,7 +2175,7 @@ class PUBLIC var_proxy1 {
 
 	//operator bool
 	explicit operator bool() const {
-		return var_->a(fn_);
+		return var_->f(fn_);
 	}
 
 }; // class var_proxy1
@@ -2198,7 +2198,7 @@ class PUBLIC var_proxy2 {
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
-		return var_->a(fn_, vn_);
+		return var_->f(fn_, vn_);
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
@@ -2208,7 +2208,7 @@ class PUBLIC var_proxy2 {
 
 	//operator bool
 	explicit operator bool() const {
-		return var_->a(fn_, vn_);
+		return var_->f(fn_, vn_);
 	}
 
 }; // class var_proxy2
@@ -2232,7 +2232,7 @@ class PUBLIC var_proxy3 {
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
-		return var_->a(fn_, vn_, sn_);
+		return var_->f(fn_, vn_, sn_);
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
@@ -2242,7 +2242,7 @@ class PUBLIC var_proxy3 {
 
 	//operator bool
 	explicit operator bool() const {
-		return var_->a(fn_, vn_, sn_);
+		return var_->f(fn_, vn_, sn_);
 	}
 
 }; // class var_proxy3

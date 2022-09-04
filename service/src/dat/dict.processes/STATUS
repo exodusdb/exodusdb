@@ -11,7 +11,7 @@ var islocked;\
 \
 function main() {\
 	//NB add any new statuses to MONITORING program\
-	if (RECORD.a(52)) {\
+	if (RECORD.f(52)) {\
 		ANS = "Closed";\
 		return ANS;\
 	}\
@@ -24,8 +24,8 @@ function main() {\
 	var dostimenow = var().date() + 24873 + var().time() / 86400;\
 	//10 mins\
 	var hungtime = 10 * 60 / 86400.0;\
-	var r33 = RECORD.a(33);\
-	if (r33 and (dostimenow - RECORD.a(27) gt hungtime)) {\
+	var r33 = RECORD.f(33);\
+	if (r33 and (dostimenow - RECORD.f(27) gt hungtime)) {\
 		if (VOLUMES) {\
 			ANS = "Hung";\
 		} else {\
@@ -38,8 +38,8 @@ function main() {\
 	} else {\
 		ANS = "Maintenance";\
 	}\
-	if (RECORD.a(53)) {\
-		ANS ^= " " ^ RECORD.a(53);\
+	if (RECORD.f(53)) {\
+		ANS ^= " " ^ RECORD.f(53);\
 	}\
 	return ANS;\
 }

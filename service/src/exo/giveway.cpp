@@ -15,7 +15,7 @@ function main() {
 	//otherwise infinite recursion
 
 	//quit if interactive
-	if (not SYSTEM.a(33)) {
+	if (not SYSTEM.f(33)) {
 		return 0;
 	}
 
@@ -35,7 +35,7 @@ function main() {
 	nowtime=ostime().round(2);
 	//if no start time then no aborting (in initialisation and may be converting)
 	//or running a long maintenance process that must not be aborted
-	var starttime = SYSTEM.a(25);
+	var starttime = SYSTEM.f(25);
 	if (starttime == "") {
 		abortafterseconds = 99999;
 	}
@@ -55,7 +55,7 @@ function main() {
 	//print 'long processing time: ':processingtime
 
 	//determine time since last sleep
-	var processingtime2 = nowtime - SYSTEM.a(26);
+	var processingtime2 = nowtime - SYSTEM.f(26);
 
 	//quit if not worked enough since last sleep
 
@@ -65,10 +65,10 @@ function main() {
 
 /*
 	//if otherusers2(system<9>) then
-	if (not SYSTEM.a(48)) {
+	if (not SYSTEM.f(48)) {
 
 		//allow (ncpus-1) processes to run at full speed
-		var nprocesslocks = SYSTEM.a(9) - 1;
+		var nprocesslocks = SYSTEM.f(9) - 1;
 		if (nprocesslocks) {
 			longprocesslockno = otherusers2(nprocesslocks);
 			SYSTEM(48) = longprocesslockno;

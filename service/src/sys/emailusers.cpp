@@ -30,7 +30,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	//global nn,ok,emails,expirydate,userx,usercode,toemails,ccemails
 	//global subject,body,replyto,nsent
 
-	var interactive = false; //not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.f(33));
 
 	//options
 	//R = REPLYTO=@username email address if exists
@@ -63,9 +63,9 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 			stop();
 		}
 
-		subject = "EXODUS Upgrade: " ^ SYSTEM.a(23);
-		if (SYSTEM.a(17) ne SYSTEM.a(23)) {
-			subject ^= " (" ^ SYSTEM.a(17) ^ ")";
+		subject = "EXODUS Upgrade: " ^ SYSTEM.f(23);
+		if (SYSTEM.f(17) ne SYSTEM.f(23)) {
+			subject ^= " (" ^ SYSTEM.f(17) ^ ")";
 		}
 
 		body = "";
@@ -115,16 +115,16 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 			replyto = "support@neosys.com";
 		} else {
 			var fromuser = xlate("USERS", USERNAME, "", "X");
-			replyto = fromuser.a(7);
-			var fromline = "From " ^ fromuser.a(1);
-			if (USERNAME ne fromuser.a(1)) {
+			replyto = fromuser.f(7);
+			var fromline = "From " ^ fromuser.f(1);
+			if (USERNAME ne fromuser.f(1)) {
 				fromline ^= " (" ^ USERNAME ^ ")";
 			}
 			subject.splicer(1, 0, fromline ^ " : ");
 		}
 	}
 
-	var usercodes = SECURITY.a(1);
+	var usercodes = SECURITY.f(1);
 	var nusers = usercodes.count(VM) + 1;
 	var usern = 0;
 	emaillog = "";
@@ -161,7 +161,7 @@ nextuser:
 	}
 
 	//skip empty users
-	usercode = usercodes.a(1, usern);
+	usercode = usercodes.f(1, usern);
 	if (usercode eq "") {
 		goto nextuser;
 	}
@@ -172,14 +172,14 @@ nextuser:
 	}
 
 	//not expired users
-	expirydate = userx.a(35);
+	expirydate = userx.f(35);
 	if (expirydate and expirydate le var().date()) {
 		goto nextuser;
 	}
 
 	//skip users with no email at all
 	//users may have 0 or more email addresses eg xyz@abc.com;123@345.com etc
-	emails = userx.a(7);
+	emails = userx.f(7);
 	if (emails eq "") {
 		goto nextuser;
 	}
@@ -205,13 +205,13 @@ nextuser:
 		if (groupword) {
 			//eq search for MEDIA in user department like MEDIA BUYER
 			for (const var groupn : range(1, ngroups)) {
-				ok = userx.a(5).index(groupids.a(1, groupn));
+				ok = userx.f(5).index(groupids.f(1, groupn));
 				///BREAK;
 				if (not(not(ok))) break;
 			} //groupn;
 		} else {
 			//exact groups
-			if (groupids.locate(userx.a(21), xx)) {
+			if (groupids.locate(userx.f(21), xx)) {
 				ok = 1;
 			}
 		}
@@ -226,7 +226,7 @@ nextuser:
 	emails.converter(";", VM);
 	nn = emails.count(VM) + (emails ne "");
 	for (var ii = nn; ii >= 1; --ii) {
-		var email = emails.a(1, ii);
+		var email = emails.f(1, ii);
 		if (alreadyemailed.locate(email, xx)) {
 			emails.remover(1, ii);
 			} else {
@@ -244,10 +244,10 @@ nextuser:
 	/////////
 	print(usercode, " ");
 
-	if (currdept and userx.a(5) ne currdept) {
+	if (currdept and userx.f(5) ne currdept) {
 		gosub sendemails(emaillog);
 	}
-	currdept = userx.a(5);
+	currdept = userx.f(5);
 
 	if (toemails eq "") {
 		toemails = emails;

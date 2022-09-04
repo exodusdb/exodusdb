@@ -71,7 +71,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 	for (var ii = nn; ii >= 1; --ii) {
 
-		var rangex = ranges.a(ii);
+		var rangex = ranges.f(ii);
 
 		//if enter something like P13/1000-2000 then
 		//prefix=P13/ start=1000 stop=2000
@@ -96,7 +96,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 			//finish=field(temp,'-',2)
 			var finish = "";
-			var tt = ranges.a(ii).field("-", 2);
+			var tt = ranges.f(ii).field("-", 2);
 			while (true) {
 				var lastchar = tt[-1];
 				///BREAK;

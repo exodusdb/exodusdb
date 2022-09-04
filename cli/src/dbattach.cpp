@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var dbname2 = COMMAND.a(2);
+	var dbname2 = COMMAND.f(2);
 	var filenames = COMMAND.field(FM, 3, 999999);
 
 	if (not dbname2 and not OPTIONS) {

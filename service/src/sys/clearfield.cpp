@@ -51,7 +51,7 @@ function main() {
 	if (not(DICT.open("DICT." ^ filename))) {
 		DICT = "";
 	}
-	var interactive = not(SYSTEM.a(33));
+	var interactive = not(SYSTEM.f(33));
 	nindexed = 0;
 
 	if (not fns) {
@@ -64,7 +64,7 @@ function main() {
 	//check numeric
 	for (const var ii : range(1, nfields)) {
 tryagain:
-		var fn = fns.a(ii);
+		var fn = fns.f(ii);
 		//prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0
 		if (not(fn)) {
 			call mssg(fn.quote() ^ " field number is not supported");
@@ -74,11 +74,11 @@ tryagain:
 			if (DICT) {
 				//readv fn from @dict,fns<i>,2 else null
 				var dict;
-				if (dict.read(DICT, fns.a(ii))) {
-					if (dict.a(1) eq "F") {
-						fn = dict.a(2);
-					} else if (dict.a(1) eq "G") {
-						var tt = dict.a(3);
+				if (dict.read(DICT, fns.f(ii))) {
+					if (dict.f(1) eq "F") {
+						fn = dict.f(2);
+					} else if (dict.f(1) eq "G") {
+						var tt = dict.f(3);
 						tt.converter(" ", FM);
 						fns(ii) = tt;
 						nfields = fns.count(FM) + 1;
@@ -132,10 +132,10 @@ next:
 
 		var cleared = 0;
 		for (const var ii : range(1, nfields)) {
-			if (RECORD.a(fns.a(ii)) ne cleartovalue2) {
+			if (RECORD.f(fns.f(ii)) ne cleartovalue2) {
 				cleared = 1;
-				//RECORD(fns.a(ii)) = cleartovalue2;
-				pickreplacer(RECORD, fns.a(ii), cleartovalue2);
+				//RECORD(fns.f(ii)) = cleartovalue2;
+				pickreplacer(RECORD, fns.f(ii), cleartovalue2);
 			}
 		} //ii;
 		if (cleared) {

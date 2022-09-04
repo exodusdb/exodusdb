@@ -61,7 +61,7 @@ function main(in mode0) {
 
 		gosub getdatasets();
 
-		if (not(datasetcodes.a(1).locate(win.is,xx))) {
+		if (not(datasetcodes.f(1).locate(win.is,xx))) {
 			msg = win.is.quote() ^ " is not a dataset";
 			return invalid(msg);
 		}
@@ -84,17 +84,17 @@ function main(in mode0) {
 	} else if (mode == "GETGROUPUSERS") {
 
 		var groupusers = "";
-		if (SECURITY.a(1).locate(USERNAME,usern0)) {
+		if (SECURITY.f(1).locate(USERNAME,usern0)) {
 			//add lower users in group
 			for (usern = usern0 + 1; usern <= 9999; ++usern) {
-				usercode = SECURITY.a(1, usern);
+				usercode = SECURITY.f(1, usern);
 				///BREAK;
 				if (not(usercode and usercode ne "---")) break;
 				groupusers ^= VM ^ usercode;
 			}//usern;
 			//add higher users in group
 			for (usern = usern0 - 1; usern >= 1; --usern) {
-				usercode = SECURITY.a(1, usern);
+				usercode = SECURITY.f(1, usern);
 				///BREAK;
 				if (not(usercode ne "---")) break;
 				groupusers ^= VM ^ usercode;
@@ -181,7 +181,7 @@ subroutine getdatasets() {
 	directory.converter(" " ^ FM, FM ^ " ");
 	var nvols = directory.count(FM) + 1;
 
-	datasetparams = directory.a(1);
+	datasetparams = directory.f(1);
 	if (not(datasetparams.index(","))) {
 		//CALL MSG('LINE 1 OF THE DOS FILE ':DOS.FILENAME:' IS INVALID')
 		//STOP
@@ -196,9 +196,9 @@ subroutine getdatasets() {
 	var datasetnames = "";
 
 	for (const var datasetn : range(1, ndatasets)) {
-		var temp = datasetparams.a(1, datasetn);
-		var datasetcode = temp.a(1, 1, 2);
-		var datasetname = temp.a(1, 1, 1);
+		var temp = datasetparams.f(1, datasetn);
+		var datasetcode = temp.f(1, 1, 2);
+		var datasetname = temp.f(1, 1, 1);
 		tt = "../data/" ^ datasetcode.lcase() ^ "/general/revmedia.lk";
 		tt.converter("/", OSSLASH);
 		if (not(tt.osfile())) {
@@ -207,12 +207,12 @@ subroutine getdatasets() {
 		}
 		datasetcodes(1, datasetn) = datasetcode;
 		datasetnames(1, datasetn) = datasetname;
-		tt = "../data/" ^ temp.a(1, 1, 2).lcase() ^ "/params2";
+		tt = "../data/" ^ temp.f(1, 1, 2).lcase() ^ "/params2";
 		tt.converter("/", OSSLASH);
 		if (not(lastbackup.osread(tt))) {
 			lastbackup = "";
 		}
-		lastbackup = lastbackup.a(2);
+		lastbackup = lastbackup.f(2);
 		datasetparams(1, datasetn, 4) = lastbackup.oconv("D");
 	}//datasetn;
 
@@ -222,7 +222,7 @@ subroutine getdatasets() {
 subroutine getuserdept2() {
 	//locate the user in the table
 	usercode = mode.field(",", 2);
-	if (not(SECURITY.a(1).locate(usercode,usern))) {
+	if (not(SECURITY.f(1).locate(usercode,usern))) {
 		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return;
@@ -233,14 +233,14 @@ subroutine getuserdept2() {
 	}
 
 	//locate divider, or usern+1
-	nusers = SECURITY.a(1).count(VM) + 1;
+	nusers = SECURITY.f(1).count(VM) + 1;
 	for (usern = 1; usern <= nusers; ++usern) {
 		///BREAK;
-		if (SECURITY.a(1, usern) == "---") break;
+		if (SECURITY.f(1, usern) == "---") break;
 	}//usern;
 
 	//get the department code
-	ANS = SECURITY.a(1, usern - 1);
+	ANS = SECURITY.f(1, usern - 1);
 	return;
 }
 

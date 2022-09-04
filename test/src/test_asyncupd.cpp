@@ -46,7 +46,7 @@ function main() {
 		assert(open(filename to file));
 	}
 
-	THREADNO = COMMAND.a(2);
+	THREADNO = COMMAND.f(2);
 
 	// Start multiple processes, wait for them to finish, and check result as expected
 	// and exit
@@ -85,7 +85,7 @@ function main() {
 			if (n eq "")
 				n = 1;
 			else {
-				var o = RECORD.a(THREADNO);
+				var o = RECORD.f(THREADNO);
 				assert(o eq n);
 				n = o + 1;
 			}

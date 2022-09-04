@@ -1896,7 +1896,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 			response ^= sep;
 
 		// read the record
-		var key = this->a(1, vn);
+		var key = this->f(1, vn);
 		var record;
 		if (!record.reado(file, key)) {
 			// if record doesnt exist then "", or original key if mode is "C"
@@ -1918,7 +1918,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 			// if (fieldno.isnum())
 
 			// throw non-numeric error if fieldno not numeric
-			response ^= record.a(fieldno);
+			response ^= record.f(fieldno);
 
 			// non-numeric fieldno - cannot call calculate from here
 			// return calculate(fieldno,filename,mode);

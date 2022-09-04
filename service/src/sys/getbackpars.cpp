@@ -22,19 +22,19 @@ function main(out bakpars, in process0=var()) {
 
 	//by test data means any non-live data that doesnt require backup
 
-	#define lastbakattemptdate_ bakpars.a(1)
-	#define minbaktime_ bakpars.a(3)
-	#define maxbaktime_ bakpars.a(4)
-	#define bakdows_ bakpars.a(5)
-	#define bakemails_ bakpars.a(6)
-	#define bakdisk_ bakpars.a(7)
-	#define bakexcludedatasets_ bakpars.a(8)
-	#define bakdisable_ bakpars.a(9)
-	#define bakdataemails_ bakpars.a(10)
-	#define baktestdata_ bakpars.a(11)
-	#define bakdisk2_ bakpars.a(12)
-	#define bakmediarotation_ bakpars.a(13)
-	#define logemail_ bakpars.a(14)
+	#define lastbakattemptdate_ bakpars.f(1)
+	#define minbaktime_ bakpars.f(3)
+	#define maxbaktime_ bakpars.f(4)
+	#define bakdows_ bakpars.f(5)
+	#define bakemails_ bakpars.f(6)
+	#define bakdisk_ bakpars.f(7)
+	#define bakexcludedatasets_ bakpars.f(8)
+	#define bakdisable_ bakpars.f(9)
+	#define bakdataemails_ bakpars.f(10)
+	#define baktestdata_ bakpars.f(11)
+	#define bakdisk2_ bakpars.f(12)
+	#define bakmediarotation_ bakpars.f(13)
+	#define logemail_ bakpars.f(14)
 
 	//backup params
 	//1=date last attempted
@@ -58,8 +58,8 @@ function main(out bakpars, in process0=var()) {
 	}
 	if (tt.osread("backup.cfg")) {
 		for (const var ii : range(1, 99)) {
-			if (tt.a(ii).length()) {
-				bakpars(ii) = tt.a(ii);
+			if (tt.f(ii).length()) {
+				bakpars(ii) = tt.f(ii);
 			}
 		} //ii;
 	}
@@ -68,8 +68,8 @@ function main(out bakpars, in process0=var()) {
 	configfilename.converter("/", OSSLASH);
 	if (tt.osread(configfilename)) {
 		for (const var ii : range(1, 99)) {
-			if (tt.a(ii).length()) {
-				bakpars(ii) = tt.a(ii);
+			if (tt.f(ii).length()) {
+				bakpars(ii) = tt.f(ii);
 			}
 		} //ii;
 	}
@@ -115,8 +115,8 @@ function main(out bakpars, in process0=var()) {
 
 	//backup depending on configuration file
 	//if any database listed there
-	var dbcode = process.a(17).lcase();
-	var dbcodes = process.a(58).lcase();
+	var dbcode = process.f(17).lcase();
+	var dbcodes = process.f(58).lcase();
 
 	if (dbcodes and VOLUMES) {
 
@@ -125,7 +125,7 @@ function main(out bakpars, in process0=var()) {
 
 		//decide backup required or not by indicating testdata
 		if (dbcodes.locate(dbcode, dbn)) {
-			tt = process.a(60, dbn);
+			tt = process.f(60, dbn);
 		} else {
 			tt = 0;
 		}
@@ -138,14 +138,14 @@ function main(out bakpars, in process0=var()) {
 		//autodetermine if it is "test" data
 		if (baktestdata_ eq "") {
 			var testdata = 1;
-			if ((process.a(17).substr(-5)) eq "_test") {
-			} else if (process.a(23).ucase().index("TRAINING")) {
-			} else if (process.a(23).ucase().index("TESTING")) {
+			if ((process.f(17).substr(-5)) eq "_test") {
+			} else if (process.f(23).ucase().index("TRAINING")) {
+			} else if (process.f(23).ucase().index("TESTING")) {
 			} else if (osfile("~/hosts/disabled.cfg")) {
 			} else {
 				//not otherwise specified then exclude database if in list of non-live data
 				//none-live could include test data or consolidated copies
-				if (not(bakexcludedatasets_.locate(process.a(17), xx))) {
+				if (not(bakexcludedatasets_.locate(process.f(17), xx))) {
 					testdata = 0;
 				}
 			}

@@ -26,7 +26,7 @@ function main(in mode, io logtime, in menu) {
 
 	#include <system_common.h>
 
-	call log2("*init.general2 " ^ mode.a(1), logtime);
+	call log2("*init.general2 " ^ mode.f(1), logtime);
 
 	if (mode eq "INSTALLNEWPASS") {
 
@@ -84,7 +84,7 @@ function main(in mode, io logtime, in menu) {
 		hosts.converter(" ", "");
 		var nn = hosts.count(FM) + 1;
 		for (var ln = nn; ln >= 1; --ln) {
-			hosts(ln) = hosts.a(ln).field("#", 1);
+			hosts(ln) = hosts.f(ln).field("#", 1);
 		} //ln;
 
 		//remove blank lines and convert fm to sm
@@ -114,7 +114,7 @@ function main(in mode, io logtime, in menu) {
 		//in the System Configuration file (even if 192.168 is config for true LAN)
 		//then EXODUS LOGINS FROM ANY *LISTED FULLY FORMED LAN IPS* WILL BE BLOCKED
 
-		var configips = SYSTEM.a(39);
+		var configips = SYSTEM.f(39);
 		if (configips eq "") {
 			configips = "192.168 10 172";
 		}
@@ -122,7 +122,7 @@ function main(in mode, io logtime, in menu) {
 		configips.swapper(".*", "");
 		nn = configips.count(SVM) + (configips ne "");
 		for (const var ii : range(nn, 1)) {
-			var ipno = configips.a(1, 1, ii);
+			var ipno = configips.f(1, 1, ii);
 			if (ipno.field(".", 1) eq "10") {
 				{}
 			} else if (ipno.field(".", 1) eq "172") {
@@ -157,14 +157,14 @@ function main(in mode, io logtime, in menu) {
 		let osenv = osgetenv().converter("\r\n", _FM_ _FM_ _FM_);
 //		var nenv = osenv.count(FM) + 1;
 //		for (const var ii : range(1, nenv)) {
-//			var enventry = osenv.a(ii);
+//			var enventry = osenv.f(ii);
 		for (let enventry : osenv) {
 			if (not enventry)
 				continue;
 			printl(THREADNO ^ ":", enventry);
 			var envkey = enventry.field("=", 1);
 			var envval = enventry.field("=", 2, 999999);
-			if (not(SYSTEM.a(12).locate(envkey, vn))) {
+			if (not(SYSTEM.f(12).locate(envkey, vn))) {
 				SYSTEM(12, vn) = envkey;
 				SYSTEM(13, vn) = envval;
 			}
@@ -176,8 +176,8 @@ function main(in mode, io logtime, in menu) {
 
 		//remove any obvious page addresses
 		//ensure ends in slash
-		var baselinks = SYSTEM.a(114);
-		var baselinkdescs = SYSTEM.a(115);
+		var baselinks = SYSTEM.f(114);
+		var baselinkdescs = SYSTEM.f(115);
 		if (not baselinks) {
 			var baselink = "System Configuration File";
 		}
@@ -186,7 +186,7 @@ function main(in mode, io logtime, in menu) {
 		}
 		var nlinks = baselinks.count(VM) + (baselinks ne "");
 		for (const var linkn : range(1, nlinks)) {
-			tt = baselinks.a(1, linkn);
+			tt = baselinks.f(1, linkn);
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).lcase();
 				if (tt2.substr(1, 4).index(".htm")) {
@@ -225,7 +225,7 @@ function main(in mode, io logtime, in menu) {
 		}
 
 		call log2("*compress logs with gzip", logtime);
-		var dbcode = SYSTEM.a(17);
+		var dbcode = SYSTEM.f(17);
 		var curryear = var().date().oconv("D").substr(-4, 4);
 		var minyear = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
@@ -241,7 +241,7 @@ function main(in mode, io logtime, in menu) {
 
 			filenamesx.converter("\\", "/");
 
-			var cygwinbin = SYSTEM.a(50);
+			var cygwinbin = SYSTEM.f(50);
 			var cmd = cygwinbin ^ "gzip " ^ filenamesx;
 
 			call log2("*compress logs with gzip to .gz" ^ filenamesx, logtime);
@@ -270,13 +270,13 @@ nextuser:
 				goto nextuser;
 			}
 			var origuser = userx;
-			if (not(SECURITY.a(1).locate(userid, usern))) {
+			if (not(SECURITY.f(1).locate(userid, usern))) {
 				goto nextuser;
 			}
-			userx(40) = SECURITY.a(6, usern);
-			userx(41) = SECURITY.a(2, usern);
-			origuser(40) = origuser.a(40);
-			origuser(41) = origuser.a(41);
+			userx(40) = SECURITY.f(6, usern);
+			userx(41) = SECURITY.f(2, usern);
+			origuser(40) = origuser.f(40);
+			origuser(41) = origuser.f(41);
 			if (userx ne origuser) {
 				userx.write(users, userid);
 				//user<1>=userid
@@ -323,7 +323,7 @@ nextuser:
 
 		perform("WINDOWSTUB DEFINITION.SUBS REORDERDBS");
 
-	} else if (mode.a(1) eq "LASTLOGWARNING") {
+	} else if (mode.f(1) eq "LASTLOGWARNING") {
 
 		var lastlog = mode.field(FM, 2, 999);
 		lastlog = trim(lastlog, FM);
@@ -351,7 +351,7 @@ nextuser:
 			var temps = oslistf("..\\vdm*.tmp");
 			var ntemps = temps.count(FM) + (temps ne "");
 			for (const var tempn : range(1, ntemps)) {
-				("..\\" ^ temps.a(tempn)).osremove();
+				("..\\" ^ temps.f(tempn)).osremove();
 			} //tempn;
 		}
 

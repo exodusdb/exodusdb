@@ -6,7 +6,7 @@ S
 
 
 	var usercode = ID.field("*", 3);\
-	return usercode.xlate("USERS", 39, "X").a(1, 6);
+	return usercode.xlate("USERS", 39, "X").f(1, 6);
 T
 20
 

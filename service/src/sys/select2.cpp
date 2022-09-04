@@ -222,9 +222,9 @@ nocommon:
 	} else {
 		call listen3(filename, "READ", realfilename, triggers);
 		//postread=triggers<3>
-		haspostread = triggers.a(3) ne "";
-		systemsubs = triggers.a(3);
-		postreadmode = triggers.a(4);
+		haspostread = triggers.f(3) ne "";
+		systemsubs = triggers.f(3);
+		postreadmode = triggers.f(4);
 	}
 
 	//check/get dict recs
@@ -240,7 +240,7 @@ nocommon:
 		}
 		ndictids = dictids.count(FM) + 1;
 		for (const var dictidn : range(1, ndictids)) {
-			var dictid = dictids.a(dictidn);
+			var dictid = dictids.f(dictidn);
 			var dictrec;
 			if (not(dictrec.read(DICT, dictid))) {
 				if (not(dictrec.read(dictvoc, dictid))) {
@@ -262,13 +262,13 @@ nocommon:
 			//if index('DI',dictrec<1>,1) then call dicti2a(dictrec)
 
 			//pick A is revelation F
-			if (dictrec.a(1) eq "A") {
+			if (dictrec.f(1) eq "A") {
 				dictrec(1) = "F";
 				}
 
 			dictrec = lower(dictrec);
 			dictrecs(dictidn) = dictrec;
-			oconvsx(dictidn) = dictrec.a(1, 7);
+			oconvsx(dictidn) = dictrec.f(1, 7);
 		} //dictidn;
 	}
 
@@ -363,10 +363,10 @@ nextrec:
 	if (givenkeys) {
 
 		givenkeyn += 1;
-		ID = sortselect.a(givenkeyn);
-		MV = ID.a(1, 2);
+		ID = sortselect.f(givenkeyn);
+		MV = ID.f(1, 2);
 		if (MV.length()) {
-			ID = ID.a(1, 1);
+			ID = ID.f(1, 1);
 		}
 
 	} else {
@@ -409,9 +409,9 @@ nextrec:
 
 	//filter out unwanted multivalues that the stupid rev sortselect leaves in
 	for (const var limitfieldn : range(1, nlimitfields)) {
-		var value = calculate(limitfields.a(1, limitfieldn));
-		var reqvalue = limitvalues.a(1, limitfieldn);
-		var limitcheck = limitchecks.a(1, limitfieldn);
+		var value = calculate(limitfields.f(1, limitfieldn));
+		var reqvalue = limitvalues.f(1, limitfieldn);
+		var limitcheck = limitchecks.f(1, limitfieldn);
 
 		if (limitcheck eq "EQ") {
 			if (value ne reqvalue) {
@@ -482,12 +482,12 @@ nextrec:
 		row = "";
 
 		for (const var dictidn : range(1, ndictids)) {
-			var dictid = dictids.a(dictidn);
+			var dictid = dictids.f(dictidn);
 			var dictid2 = dictid;
 			dictid2.converter("@", "");
 			var cell = calculate(dictid);
-			if (oconvsx.a(dictidn)) {
-				cell = oconv(cell, oconvsx.a(dictidn));
+			if (oconvsx.f(dictidn)) {
+				cell = oconv(cell, oconvsx.f(dictidn));
 			}
 			if (xml) {
 				//cell='X'

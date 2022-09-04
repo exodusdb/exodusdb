@@ -48,8 +48,8 @@ function main() {\
 	return 0;\
 	*/\
 \
-	var fromdate = RECORD.a(27).floor() - 24873;\
-	var fromtime = ("." ^ RECORD.a(27).field(".", 2)) * 86400;\
+	var fromdate = RECORD.f(27).floor() - 24873;\
+	var fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;\
 	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);\
 }
 T

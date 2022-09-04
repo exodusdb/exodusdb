@@ -5,8 +5,8 @@ function main() {
 
 	var timestarted = time();
 
-	var db1 = COMMAND.a(2);
-	var db2 = COMMAND.a(3);
+	var db1 = COMMAND.f(2);
+	var db2 = COMMAND.f(3);
 
 	var silent = OPTIONS.index("S");
 
@@ -88,7 +88,7 @@ function main() {
 
 			var rec2;
 			if (not read(rec2, file2, ID)) {
-				errputl(ID, " missing from", db2.a(1), filename);
+				errputl(ID, " missing from", db2.f(1), filename);
 				nerrors++;
 				continue;
 			}
@@ -104,14 +104,14 @@ function main() {
 
 				//temp suppress ads field 56
 				if (filename eq "ads") {
-					RECORD(56) = rec2.a(56);
+					RECORD(56) = rec2.f(56);
 					RECORD.swapper(".000", "");
 					rec2.swapper(".000", "");
 					RECORD.replacer("\\.00([\x1A-\x1F])", "$1");
 					rec2.replacer("\\.00([\x1A-\x1F])", "$1");
 				} else if (filename eq "brands") {
-					RECORD(14) = rec2.a(14);
-					RECORD(15) = rec2.a(15);
+					RECORD(14) = rec2.f(14);
+					RECORD(15) = rec2.f(15);
 				}
 
 				//if still different, output
@@ -128,8 +128,8 @@ function main() {
 					//if (nfs2 gt nfs)
 					//	nfs = nfs2;
 					for (let fn : range(1, std::max(nfs,nfs2))) {
-						var f1 = RECORD.a(fn);
-						var f2 = rec2.a(fn);
+						var f1 = RECORD.f(fn);
+						var f2 = rec2.f(fn);
 						if (f1 ne f2) {
 							errputl();
 							errputl(filename, " ", ID, " ", fn, "-", f1);

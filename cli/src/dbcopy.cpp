@@ -3,8 +3,8 @@ programinit()
 
 function main() {
 
-	var dbname1 = COMMAND.a(2);
-	var dbname2 = COMMAND.a(3);
+	var dbname1 = COMMAND.f(2);
+	var dbname2 = COMMAND.f(3);
 	if (not dbname1 or not dbname2)
 		abort("Syntax is dbcopy [from_dbname] [to_dbname] {S}");
 

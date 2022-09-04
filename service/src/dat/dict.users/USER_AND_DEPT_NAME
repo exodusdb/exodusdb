@@ -5,7 +5,7 @@ S
 
 
 
-	return RECORD.a(1) ^ " - " ^ RECORD.a(5);
+	return RECORD.f(1) ^ " - " ^ RECORD.f(5);
 T
 30
 

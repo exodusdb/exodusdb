@@ -28,7 +28,7 @@ function main() {
 	var indexn;
 	for (indexn = 1; indexn <= nindexes; ++indexn) {
 
-		var filename = indexnames.a(indexn);
+		var filename = indexnames.f(indexn);
 		if (not filename)
 			break;
 		var fieldname;
@@ -37,7 +37,7 @@ function main() {
 			fieldname = filename.substr(tt + 2);
 			filename = filename.substr(1, tt - 1);
 		} else {
-			fieldname = indexnames.a(indexn + 1);
+			fieldname = indexnames.f(indexn + 1);
 			indexn += 1;
 		}
 

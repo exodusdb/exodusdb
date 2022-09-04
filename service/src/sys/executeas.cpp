@@ -12,7 +12,7 @@ function main(in cmd, in username) {
 	#include <system_common.h>
 
 	if (username) {
-		if (not(SECURITY.a(1).locate(username, xx))) {
+		if (not(SECURITY.f(1).locate(username, xx))) {
 			call mssg(username.quote() ^ " user does not exist in executeas()");
 			return 0;
 		}

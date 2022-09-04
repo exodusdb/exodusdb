@@ -38,7 +38,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	}
 	msg = "";
 
-	var interactive = false; //not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.f(33));
 
 	if (var(0) and USERNAME eq "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
@@ -152,7 +152,7 @@ subroutine unlockall(io locklist, io msg) {
 	var filename2 = "";
 	var file = "";
 	for (lockn = 1; lockn <= 9999; ++lockn) {
-		lockitem = locklist.a(lockn);
+		lockitem = locklist.f(lockn);
 		///BREAK;
 		if (not lockitem) break;
 		var filename = lockitem.field(lockitemsep_, 1);

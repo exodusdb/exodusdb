@@ -113,9 +113,9 @@ var moddata = R"(
 
 		printl("mod", line);
 
-		var a = line.a(1,1);
-		var b = line.a(1,2);
-		var target = line.a(1,TARGET_COLN);
+		var a = line.f(1,1);
+		var b = line.f(1,2);
+		var target = line.f(1,TARGET_COLN);
 
 		// var % var
 		assert((a % b) == target);
@@ -174,7 +174,7 @@ var moddata = R"(
 
 		}
 
-		assert(std::remainder(line.a(1,1).toDouble(),line.a(1,2).toDouble()) == line.a(1,5));
+		assert(std::remainder(line.f(1,1).toDouble(),line.f(1,2).toDouble()) == line.f(1,5));
 
 	}
 

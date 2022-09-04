@@ -33,7 +33,7 @@ function main() {
 		var test;
 		//if (op=="LOCATEUSING") {
 		//	//0 1     LOCATEUSING     BCCCB   A               B               -1      -1      -1
-		//	test=locateusing(inputx.a(,
+		//	test=locateusing(inputx.f(,
 		//}
 		if (op=="OCONV") {
 			test=oconv(inputx,arg1);

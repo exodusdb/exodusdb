@@ -4,9 +4,9 @@ programinit()
 function main() {
 
 	//init:
-	var reqfile = COMMAND.a(2);
-	var reqtext = COMMAND.a(3);
-	var padding = COMMAND.a(4);
+	var reqfile = COMMAND.f(2);
+	var reqtext = COMMAND.f(3);
+	var padding = COMMAND.f(4);
 
 	bool hasreqtext = reqtext.len();
 	if (not hasreqtext) {
@@ -78,7 +78,7 @@ function main() {
 			}
 			//var leftcontext = RECORD.substr(startpos - padding, padding).field2(FM, -1);
 			var leftcontext = RECORD.substr(startpos2, padding).field2(FM, -1);
-			var rightcontext = RECORD.substr(startpos + length(reqtext), padding).a(1);
+			var rightcontext = RECORD.substr(startpos + length(reqtext), padding).f(1);
 
 			printl(filename, ID, leftcontext ^ colored_reqtext ^ rightcontext);
 			//var(filename ^ " : " ^ ID ^ " :: " ^ context).outputl();

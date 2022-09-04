@@ -36,7 +36,7 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 	//@sw<1> is the ADJUSTMENT to get user time from server time, therefore add
 	localtime = systime;
 	localdate = sysdate;
-	tt = SW.a(1);
+	tt = SW.f(1);
 	if (tt) {
 		localtime += tt;
 		if (localtime ge 86400) {
@@ -57,7 +57,7 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 	//following is irrelevent until we support user tz when server tz ISNT gmt/utc
 	//
 	//remove server tz to get gmt/utc. if server is ahead of gmt then serv tz is +
-	tt = SW.a(2);
+	tt = SW.f(2);
 	if (tt) {
 		utctime -= tt;
 		if (utctime ge 86400) {

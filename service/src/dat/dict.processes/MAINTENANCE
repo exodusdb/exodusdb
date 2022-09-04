@@ -5,7 +5,7 @@ S
 
 
 
-	if (RECORD.a(33)) {\
+	if (RECORD.f(33)) {\
 		ANS = "";\
 	} else {\
 		ANS = "Yes";\

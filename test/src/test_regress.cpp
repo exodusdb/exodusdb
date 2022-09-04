@@ -158,7 +158,7 @@ function onefile(in filename, in maxndifferences) {
 
 		switch (int(funcno)) {
 		case 1:// a/extract
-			result=ARG0.a(ARG1,ARG2,ARG3);
+			result=ARG0.f(ARG1,ARG2,ARG3);
 			break;
 
 		case 2:// r/replace
@@ -239,7 +239,7 @@ function onefile(in filename, in maxndifferences) {
 			//TRACE(LOCATE_VN)
 			//TRACE(LOCATE_SN)
 			sep = LOCATE_USING;
-			if (sep > RM && ARG0.a(1,1,1) ne ARG0) {
+			if (sep > RM && ARG0.f(1,1,1) ne ARG0) {
 				result = TARGET;
 			}
 			else {
@@ -258,7 +258,7 @@ function onefile(in filename, in maxndifferences) {
 			//TRACE(LOCATE_VN)
 			//TRACE(LOCATE_SN)
 			rec = ARG0;
-			subrec = rec.a(LOCATE_FN,LOCATE_VN,LOCATE_SN);
+			subrec = rec.f(LOCATE_FN,LOCATE_VN,LOCATE_SN);
 			what = LOCATE_WHAT;
 			sep = LOCATE_USING;
 
@@ -277,7 +277,7 @@ function onefile(in filename, in maxndifferences) {
 					sep2 = VM;
 			}
 			temp=(subrec ^ what).convert(sep2,"");
-			if (temp.a(1,1,1) ne temp) {
+			if (temp.f(1,1,1) ne temp) {
 				continue;
 			}
 
@@ -288,7 +288,7 @@ function onefile(in filename, in maxndifferences) {
 			/*
 			//if ordering and target/string contains field/value/marks then change to PICK seps to ensure compatible ordering
 			//except the sep field mark that is being used
-			if (subrec.a(1,1,1) ne subrec or what.a(1,1,1) ne what) {
+			if (subrec.f(1,1,1) ne subrec or what.f(1,1,1) ne what) {
 				converter(what,_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"\xFF\xFE\xFD\xFC\xFB\xFA");
 				converter(subrec,_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"\xFF\xFE\xFD\xFC\xFB\xFA");
 				//TRACE(lineno ^ ". subrec = " ^ subrec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM_ _FM_ _VM_ _SM_ _TM_ _STM_) ^ " ... " ^ sep ^ " " ^ seq(sep));

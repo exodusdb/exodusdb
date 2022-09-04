@@ -169,7 +169,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	rowdict.redim(20);
 	rowfieldismv.redim(20);
 	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
-		rowfield = rowfields.a(1, rowfn);
+		rowfield = rowfields.f(1, rowfn);
 		//selectcmd:=' BY ':rowfield
 		if (not(rowdict(rowfn).read(DICT, rowfield))) {
 			if (not(rowdict(rowfn).read(dictvoc, rowfield))) {
@@ -177,9 +177,9 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 				stop();
 			}
 		}
-		rowfieldismv(rowfn) = rowdict(rowfn).a(4) ne "S";
-		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).a(1) eq "F") {
-			prefixmvfn = rowdict(rowfn).a(2);
+		rowfieldismv(rowfn) = rowdict(rowfn).f(4) ne "S";
+		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).f(1) eq "F") {
+			prefixmvfn = rowdict(rowfn).f(2);
 		}
 	} //rowfn;
 
@@ -195,7 +195,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 			}
 		}
 
-		if (coldict.a(9) eq "R") {
+		if (coldict.f(9) eq "R") {
 			colorder = "AR";
 		} else {
 			colorder = "AL";
@@ -215,7 +215,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 nextprefix:
 ///////////
 		prefixn += 1;
-		prefix = prefixes.a(1, prefixn);
+		prefix = prefixes.f(1, prefixn);
 		if (not prefix) {
 			goto exit;
 		}
@@ -248,7 +248,7 @@ nextrecord:
 	}
 
 	if (prefixmvfn) {
-		tt = RECORD.a(prefixmvfn);
+		tt = RECORD.f(prefixmvfn);
 		nmvs = tt.count(VM) + (tt ne "");
 nextmv:
 ///////
@@ -264,7 +264,7 @@ nextmv:
 
 	if (filterdictid) {
 		if (filterdictid.isnum()) {
-			tt = RECORD.a(filterdictid, MV);
+			tt = RECORD.f(filterdictid, MV);
 		} else {
 			tt = calculate(filterdictid);
 		}
@@ -283,7 +283,7 @@ nextmv:
 	if (datafield.length() eq 0) {
 		datavals = 1;
 	} else if (datafield.match("^\\d*$")) {
-		datavals = RECORD.a(datafield);
+		datavals = RECORD.f(datafield);
 	} else {
 		datavals = calculate(datafield);
 	}
@@ -292,7 +292,7 @@ nextmv:
 	rowvals = "";
 	if (nrowfields) {
 		for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
-			fieldname = rowfields.a(1, rowfn);
+			fieldname = rowfields.f(1, rowfn);
 			tt = calculate(fieldname);
 			if (fieldname eq "HOUR") {
 				tt = ("00" ^ tt).substr(-2, 2);
@@ -325,9 +325,9 @@ nextmv:
 			rowval = "";
 			for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 				if (rowfieldismv(rowfn)) {
-					tt = rowvals.a(rowfn, rowvaln);
+					tt = rowvals.f(rowfn, rowvaln);
 				} else {
-					tt = rowvals.a(rowfn, 1);
+					tt = rowvals.f(rowfn, 1);
 				}
 				//rowval(1, 1, rowfn) = tt;
 				pickreplacer(rowval, 1, 1, rowfn, tt);
@@ -337,7 +337,7 @@ nextmv:
 		}
 
 		//determine which row to add into
-		if (not(allrowvals.a(1).locateby("AL", rowval, rown))) {
+		if (not(allrowvals.f(1).locateby("AL", rowval, rown))) {
 			if (allrowvals.length() + rowval.length() gt 65000) {
 toobig:
 				clearselect();
@@ -356,8 +356,8 @@ toobig:
 		for (colvaln = 1; colvaln <= ncolvals; ++colvaln) {
 
 			//determine which column to add into
-			colval = colvals.a(1, colvaln);
-			if (not(allcolvals.a(1).locateby(colorder, colval, coln))) {
+			colval = colvals.f(1, colvaln);
+			if (not(allcolvals.f(1).locateby(colorder, colval, coln))) {
 				ncols += 1;
 				if (allcolvals.length() + colval.length() gt 65000) {
 					goto toobig;
@@ -378,15 +378,15 @@ toobig:
 				goto toobig;
 			}
 
-			oldval = output.a(rown + 1, coln + 1);
+			oldval = output.f(rown + 1, coln + 1);
 			//output(rown + 1, coln + 1) = oldval + datavals;
-			//output(1, 1) = output.a(1, 1) + 1;
+			//output(1, 1) = output.f(1, 1) + 1;
 			pickreplacer(output, rown + 1, coln + 1, oldval + datavals);
-			pickreplacer(output, 1, 1, output.a(1, 1) + 1);
+			pickreplacer(output, 1, 1, output.f(1, 1) + 1);
 
 			//total column at the end
 			if (not totcol) {
-				oldval = output.a(rown + 1, ncols + 2);
+				oldval = output.f(rown + 1, ncols + 2);
 				//output(rown + 1, ncols + 2) = oldval + datavals;
 				pickreplacer(output, rown + 1, ncols + 2, oldval + datavals);
 			}
@@ -407,42 +407,42 @@ exit:
 /////
 	//format the column title values
 	if (not totcol) {
-		colconv = coldict.a(7);
+		colconv = coldict.f(7);
 		if (colconv) {
 			//ncolvals=count(allcolvals,vm)+1
 			for (coln = 1; coln <= ncols; ++coln) {
-				output(1, 1 + coln) = oconv(output.a(1, 1 + coln), colconv);
+				output(1, 1 + coln) = oconv(output.f(1, 1 + coln), colconv);
 			} //coln;
 		}
 	}
 
 	if (totcol) {
-		output(1, 1 + coln) = datadict.a(3);
+		output(1, 1 + coln) = datadict.f(3);
 	} else {
 		for (coln = 1; coln <= ncols; ++coln) {
-			output(1, 1 + coln) = coldict.a(3) ^ " " ^ output.a(1, 1 + coln);
+			output(1, 1 + coln) = coldict.f(3) ^ " " ^ output.f(1, 1 + coln);
 		} //coln;
-		output(1, ncols + 2) = "Total " ^ datadict.a(3);
+		output(1, ncols + 2) = "Total " ^ datadict.f(3);
 	}
 
 	for (rown = 1; rown <= nrows; ++rown) {
 		if (output.length() + allrowvals.length() gt 65000) {
 			goto toobig;
 		}
-		output(rown + 1, 1) = allrowvals.a(1, rown);
+		output(rown + 1, 1) = allrowvals.f(1, rown);
 	} //rown;
 
 	//format the row title values
 	output(1, 1, 1) = "";
 	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 		//output<1,1,rowfn>=rowfields<1,rowfn>
-		output(1, 1, rowfn) = rowdict(rowfn).a(3);
+		output(1, 1, rowfn) = rowdict(rowfn).f(3);
 
-		rowconv = rowdict(rowfn).a(7);
+		rowconv = rowdict(rowfn).f(7);
 		if (rowconv) {
 			//nrows=count(allrowvals,vm)+(allrowvals<>'')
 			for (rown = 1; rown <= nrows; ++rown) {
-				output(rown + 1, 1, rowfn) = oconv(output.a(rown + 1, 1, rowfn), rowconv);
+				output(rown + 1, 1, rowfn) = oconv(output.f(rown + 1, 1, rowfn), rowconv);
 			} //rown;
 		}
 

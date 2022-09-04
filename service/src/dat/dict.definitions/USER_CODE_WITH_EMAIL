@@ -5,12 +5,12 @@ M
 
 
 
-	var usercodes = RECORD.a(1, MV);\
-	var emails = RECORD.a(7, MV);\
+	var usercodes = RECORD.f(1, MV);\
+	var emails = RECORD.f(7, MV);\
 \
 	var nusers = usercodes.count(VM) + 1;\
 	for (const var usern : range(1, nusers)) {\
-		if (emails.a(1, usern) eq "") {\
+		if (emails.f(1, usern) eq "") {\
 			usercodes(1, usern) = "";\
 		}\
 	} //usern;\

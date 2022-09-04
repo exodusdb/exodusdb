@@ -5,7 +5,7 @@ S
 
 
 
-	ANS = RECORD.a(3);\
+	ANS = RECORD.f(3);\
 	//may be missing try to get from user file\
 	if (not ANS) {\
 		ANS = ID.field("*", 3).xlate("USERS", 5, "X");\

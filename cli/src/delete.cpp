@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var filename = COMMAND.a(2);
+	var filename = COMMAND.f(2);
 
 	var itemids = remove(COMMAND, 1, 0, 0);
 	remover(itemids, 1, 0, 0);

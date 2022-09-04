@@ -93,15 +93,15 @@ readmenu:
 	var nmenus = menus.count(VM) + 1;
 	//work backwards because we are deleting
 	for (var menun = nmenus; menun >= 1; --menun) {
-		var menu = menus.a(1, menun).ucase();
+		var menu = menus.f(1, menun).ucase();
 		if (menu) {
 			var menutask = "MENU " ^ menu;
-			if (not(SECURITY.a(10).locate(menutask, taskn))) {
+			if (not(SECURITY.f(10).locate(menutask, taskn))) {
 				taskn = 0;
 			}
 
 			//specifically locked or no legacy menus - only allow if authorised
-			if (oldmenus eq "" or ((menun and SECURITY.a(11, taskn).length()))) {
+			if (oldmenus eq "" or ((menun and SECURITY.f(11, taskn).length()))) {
 				if (not(authorised(menutask, xx))) {
 deleteit:
 					if (menus.locate(menu, menun2)) {
@@ -153,7 +153,7 @@ nextcomp:
 	var compcodes = "";
 	if (APPLICATION eq "ADAGENCY") {
 		for (const var ii : range(1, 9999)) {
-			compcode = allcomps.a(ii);
+			compcode = allcomps.f(ii);
 			///BREAK;
 			if (not compcode) break;
 			//if validcode2(compcode,'','',xx,yy) then compcodes<-1>=compcode
@@ -169,7 +169,7 @@ nextcomp:
 
 		} //ii;
 	} else {
-		compcodes = allcomps.a(1);
+		compcodes = allcomps.f(1);
 	}
 
 	//check there is at least one authorised company
@@ -179,7 +179,7 @@ nextcomp:
 	}
 
 	//initialise to the first authorised company
-	compcode = compcodes.a(1);
+	compcode = compcodes.f(1);
 	if (compcode) {
 		var tempcompany;
 		if (not(tempcompany.read(sys.companies, compcode))) {
@@ -198,7 +198,7 @@ nextcomp:
 	//market
 	//defmarketcode=if company<30> then company<30> else agp<37>;*market
 	//WARNING TODO: check ternary op following;
-	var defmarketcode = sys.company.a(30) ? sys.company.a(30) : SYSTEM.a(137);
+	var defmarketcode = sys.company.f(30) ? sys.company.f(30) : SYSTEM.f(137);
 	//if unassigned(markets) then markets=''
 	//TODO maybe use the market on the user file?
 	//markets is not open in finance only module
@@ -206,7 +206,7 @@ nextcomp:
 	var maincurrcode = "";
 	if (xx.open("MARKETS", "")) {
 		//defmarketcode=agp<37>
-		defmarketcode = SYSTEM.a(137);
+		defmarketcode = SYSTEM.f(137);
 		maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
 	}
 
@@ -216,7 +216,7 @@ nextcomp:
 	}
 	//if maincurrcode='' then maincurrcode=base.currency
 	if (maincurrcode eq "") {
-		maincurrcode = SYSTEM.a(134);
+		maincurrcode = SYSTEM.f(134);
 	}
 
 	//system<134> financial base.currency
@@ -233,10 +233,10 @@ nextcomp:
 
 	//period/year
 	//cookie:='&pd=':currperiod:'/':addcent4(curryear)
-	cookie ^= "&pd=" ^ SYSTEM.a(135) ^ "/" ^ addcent4(SYSTEM.a(136));
+	cookie ^= "&pd=" ^ SYSTEM.f(135) ^ "/" ^ addcent4(SYSTEM.f(136));
 
 	//cookie:='&bc=':base.currency
-	cookie ^= "&bc=" ^ SYSTEM.a(134);
+	cookie ^= "&bc=" ^ SYSTEM.f(134);
 
 	//base
 	cookie ^= "&bf=" ^ BASEFMT;
@@ -248,9 +248,9 @@ nextcomp:
 	cookie ^= "&ms=1000000";
 
 	//current datasetname
-	var temp = SYSTEM.a(23);
+	var temp = SYSTEM.f(23);
 	if (not temp) {
-		temp = SYSTEM.a(17);
+		temp = SYSTEM.f(17);
 	}
 	temp.swapper("&", " and ");
 	cookie ^= "&db=" ^ temp;
@@ -260,16 +260,16 @@ nextcomp:
 	cookie ^= "&sp=1";
 
 	//form color, font and fontsize
-	cookie ^= "&fc=" ^ SYSTEM.a(46, 5);
-	cookie ^= "&ff=" ^ SYSTEM.a(46, 6);
-	cookie ^= "&fs=" ^ SYSTEM.a(46, 7);
+	cookie ^= "&fc=" ^ SYSTEM.f(46, 5);
+	cookie ^= "&ff=" ^ SYSTEM.f(46, 6);
+	cookie ^= "&fs=" ^ SYSTEM.f(46, 7);
 
 	//date format
-	cookie ^= "&df=" ^ sys.company.a(10);
+	cookie ^= "&df=" ^ sys.company.f(10);
 
 	//first day of week
 	//tt=agp<13>+1
-	var tt = SYSTEM.a(138) + 1;
+	var tt = SYSTEM.f(138) + 1;
 	if (tt gt 7) {
 		tt = 1;
 	}
@@ -291,9 +291,9 @@ nextcomp:
 	if (not(paramrec.osread(paramfilename))) {
 		return 0;
 	}
-	//var lastbackupdate = paramrec.a(2);
+	//var lastbackupdate = paramrec.f(2);
 	//backup_db script updates params2 date/time
-	var lastbackupdate = paramfilename.osfile().a(2);
+	var lastbackupdate = paramfilename.osfile().f(2);
 
 	//if lastbackupdate and lastbackupdate lt date()-1 then
 	//assume backup on same day (ie after last midnight)

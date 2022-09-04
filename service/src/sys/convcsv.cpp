@@ -67,15 +67,15 @@ function main(in sentence0, in select0="", in filters0="") {
 	if (nfilters0.unassigned()) {
 		nfilters = 0;
 	} else {
-		filterfields = filters0.a(1);
-		filtervalues = filters0.a(3);
+		filterfields = filters0.f(1);
+		filtervalues = filters0.f(3);
 		nfilters = filterfields.count(FM) + (filterfields ne 0);
 	}
 	if (nfilters) {
 		filters.redim(3, nfilters);
 		for (const var filtern : range(1, nfilters)) {
-			filters(1, filtern) = filterfields.a(1, filtern).convert(SVM, VM);
-			filters(3, filtern) = filtervalues.a(1, filtern).convert(SVM, VM);
+			filters(1, filtern) = filterfields.f(1, filtern).convert(SVM, VM);
+			filters(3, filtern) = filtervalues.f(1, filtern).convert(SVM, VM);
 		} //filtern;
 	}
 
@@ -148,8 +148,8 @@ function main(in sentence0, in select0="", in filters0="") {
 	if (not(hasconverter.read(DEFINITIONS, "CONVERTER*" ^ filename))) {
 		hasconverter = "";
 	}
-	if (hasconverter.a(1)) {
-		tt = "CONVERTER." ^ hasconverter.a(1);
+	if (hasconverter.f(1)) {
+		tt = "CONVERTER." ^ hasconverter.f(1);
 		//c++ variation
 		if (not(VOLUMES)) {
 			tt.lcaser();
@@ -169,7 +169,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	var exportable = sentencex.field(" ", 3, 9999);
 	if (exportable) {
 		exportable.converter(" ", FM);
-		if (exportable.a(1) eq "EXCEPT") {
+		if (exportable.f(1) eq "EXCEPT") {
 			notexportable = exportable.field(FM, 2, 9999);
 			exportable = "";
 		}
@@ -179,9 +179,9 @@ function main(in sentence0, in select0="", in filters0="") {
 	if (notexportable) {
 		for (const var ii : range(1, notexportable.count(FM) + 1)) {
 			var dictrec;
-			if (dictrec.read(DICT, notexportable.a(ii))) {
-				if (dictrec.a(1) eq "G") {
-					temp = dictrec.a(3);
+			if (dictrec.read(DICT, notexportable.f(ii))) {
+				if (dictrec.f(1) eq "G") {
+					temp = dictrec.f(3);
 					temp.converter(VM ^ " ", FM ^ FM);
 					notexportable(ii) = temp;
 				}
@@ -194,8 +194,8 @@ function main(in sentence0, in select0="", in filters0="") {
 	if (not exportable) {
 
 		if (exportable.read(DICT, "EXPORTABLE")) {
-			if (exportable.a(1) eq "G") {
-				exportable = exportable.a(3);
+			if (exportable.f(1) eq "G") {
+				exportable = exportable.f(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
 			keyx = exportable.substr(1, exportable.index(FM ^ FM) - 1);
@@ -225,7 +225,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	exportable = tt ^ exportable2.field("%", 1);
 	exportable2 = exportable2.field("%", 2, 9999);
 
-	var outfilename = SYSTEM.a(2);
+	var outfilename = SYSTEM.f(2);
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
 	if ((outfilename.substr(-4, 4)).lcase() eq ".htm") {
 		outfilename.splicer(-3, 3, "xls");
@@ -306,19 +306,19 @@ nextdict:
 				//call dicti2a(dict)
 				coln += 1;
 			//if dict<2> matches '0N' then
-				var fn = dict.a(2);
+				var fn = dict.f(2);
 				if (fn gt nfields) {
 					nfields = fn;
 				}
 
-				fmtxs(coln) = dict.a(9)[1];
+				fmtxs(coln) = dict.f(9)[1];
 
 				if (raw) {
 					headingx(coln) = dictid;
 				} else {
 
 					//extract title
-					var title = dict.a(3).trim();
+					var title = dict.f(3).trim();
 					title.swapper("<WBR/>", "");
 					title.swapper("<wbr/>", " ");
 					title.converter(UPPERCASE ^ "|_" ^ VM, LOWERCASE ^ "   ");
@@ -328,7 +328,7 @@ nextdict:
 					//title[1,1]=t
 					title = capitalise(title);
 
-					title.swapper("(Base)", "(" ^ sys.company.a(3) ^ ")");
+					title.swapper("(Base)", "(" ^ sys.company.f(3) ^ ")");
 
 					//swap ' code' with '' in title
 
@@ -336,15 +336,15 @@ nextdict:
 				}
 
 				//extract file
-				if (dict.a(11)[1] eq "<") {
-					temp = dict.a(11).substr(2, 9999).field(">", 1);
+				if (dict.f(11)[1] eq "<") {
+					temp = dict.f(11).substr(2, 9999).field(">", 1);
 					xfilenames(coln) = temp;
 					if (not(xfiles(coln).open(temp, ""))) {
 						call mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
 						gosub exit2();
 						return 0;
 					}
-					var title = headingx.a(coln);
+					var title = headingx.f(coln);
 					if (title.ucase().substr(-5, 5) eq " CODE") {
 						title.splicer(-5, 5, "");
 						headingx(coln) = title;
@@ -352,8 +352,8 @@ nextdict:
 				}
 
 				//extract conversion
-				if (dict.a(7)) {
-					var oconvx = dict.a(7);
+				if (dict.f(7)) {
+					var oconvx = dict.f(7);
 
 					//force long date format
 					if (oconvx.index("DATE") or (oconvx[1] eq "D")) {
@@ -376,7 +376,7 @@ nextdict:
 					oconvxs(coln) = oconvx;
 				}
 
-				colgroups(coln) = dict.a(4)[1] eq "M";
+				colgroups(coln) = dict.f(4)[1] eq "M";
 				dictids(coln) = dictid;
 				dictrecs(coln) = dict;
 
@@ -505,7 +505,7 @@ nextrec:
 		MV = mvx;
 		dictid = dictids(coln);
 		temp = "";
-		if (dictid ne "LINE_NO" and dictrecs(coln).a(4) ne "S") {
+		if (dictid ne "LINE_NO" and dictrecs(coln).f(4) ne "S") {
 			temp = calculate(dictid).count(VM) + 1;
 			if (temp gt maxvn) {
 				maxvn = temp;
@@ -555,7 +555,7 @@ nextvn:
 			} else {
 				mvx = colgroups(coln);
 				if (mvx) {
-					rec(coln) = mvrec(coln).a(1, vn);
+					rec(coln) = mvrec(coln).f(1, vn);
 				}
 			}
 
@@ -570,9 +570,9 @@ nextvn:
 						var rec2;
 						if (rec2.read(xfiles(coln), cell)) {
 							if (xfilenames(coln) eq "BRANDS") {
-								cell = rec2.a(2, 1);
+								cell = rec2.f(2, 1);
 							} else {
-								cell = rec2.a(1);
+								cell = rec2.f(1);
 							}
 						}
 					}

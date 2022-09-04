@@ -61,7 +61,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 
 	//type 4 is expired
 	//////////////////
-	if (userx.a(35) and idate ge userx.a(35)) {
+	if (userx.f(35) and idate ge userx.f(35)) {
 		holidaytype = 4;
 		return;
 	}
@@ -72,20 +72,20 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	var dow = (idate - 1).mod(7) + 1;
 
 	//from user
-	var weekenddows = trim(userx.a(24), SVM);
+	var weekenddows = trim(userx.f(24), SVM);
 	if (not weekenddows) {
 
 		//else from market
-		weekenddows = trim(market.a(9), SVM);
+		weekenddows = trim(market.f(9), SVM);
 		if (not weekenddows) {
 
-			weekenddows = agp.a(95);
+			weekenddows = agp.f(95);
 
 			//else from global parameter "last day of week" plus the day before
 			if (not weekenddows) {
 				//weekenddows=agp<13>:sm:mod(agp<13>-1-1,7)+1
-				var tt = (agp.a(13) - 1 - 1).mod(7) + 1;
-				weekenddows = agp.a(13) ^ SVM ^ tt;
+				var tt = (agp.f(13) - 1 - 1).mod(7) + 1;
+				weekenddows = agp.f(13) ^ SVM ^ tt;
 			}
 		}
 	}
@@ -98,11 +98,11 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	///////////////////////////
 
 	//general holidays only from market currently
-	var holidays = market.a(7);
+	var holidays = market.f(7);
 	//if holidays else
 	// holidays=
 	// end
-	if (holidays.a(1).locate(idate, xx)) {
+	if (holidays.f(1).locate(idate, xx)) {
 		holidaytype = 2;
 		return;
 	}
@@ -111,14 +111,14 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	////////////////////////////
 
 	//personal holidays only from user currently
-	var fromdates = userx.a(22);
-	var uptodates = userx.a(23);
+	var fromdates = userx.f(22);
+	var uptodates = userx.f(23);
 	//from dates must be in reverse sorted order
-	if (not(fromdates.a(1).locateby("DR", idate, daten))) {
+	if (not(fromdates.f(1).locateby("DR", idate, daten))) {
 		{}
 	}
-	var uptodate = uptodates.a(1, daten);
-	if (uptodate and idate le uptodates.a(1, daten)) {
+	var uptodate = uptodates.f(1, daten);
+	if (uptodate and idate le uptodates.f(1, daten)) {
 		holidaytype = 3;
 		return;
 	}

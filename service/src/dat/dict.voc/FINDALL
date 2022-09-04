@@ -8,8 +8,8 @@ M
 var datax;\
 \
 function main() {\
-	if (RECORD.a(1)) {\
-		datax = RECORD.a(8);\
+	if (RECORD.f(1)) {\
+		datax = RECORD.f(8);\
 		datax.converter(VM, FM);\
 	} else {\
 		datax = RECORD;\
@@ -19,7 +19,7 @@ function main() {\
 	datax.converter(DQ, "'");\
 	ANS = "";\
 	for (const var fn : range(1, nn)) {\
-		var tx = datax.a(fn).trim();\
+		var tx = datax.f(fn).trim();\
 \
 		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {\
 		//gosub change2\

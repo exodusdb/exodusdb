@@ -66,17 +66,17 @@ function main() {
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
 	#include <system_common.h>
-	var interactive = not(SYSTEM.a(33));
+	var interactive = not(SYSTEM.f(33));
 
 	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {
 		call mssg(msg);
 		stop();
 	}
 
-	var rowfields = PSEUDO.a(1);
-	var colfield = PSEUDO.a(2);
-	var format = PSEUDO.a(3);
-	var datemode = PSEUDO.a(4);
+	var rowfields = PSEUDO.f(1);
+	var colfield = PSEUDO.f(2);
+	var format = PSEUDO.f(3);
+	var datemode = PSEUDO.f(4);
 
 	html = format eq 1;
 	var dedup = html;
@@ -114,18 +114,18 @@ function main() {
 	call crosstab(filename, rowfields, colfield, datafield, output);
 
 	var nrows = output.count(FM) + 1;
-	var ncols = output.a(1).count(VM) + 1;
+	var ncols = output.f(1).count(VM) + 1;
 
 	//de-duplicate
 	if (dedup) {
-		var row1 = output.a(nrows);
+		var row1 = output.f(nrows);
 		for (var rown = nrows; rown >= 3; --rown) {
 			var row2 = row1;
-			row1 = output.a(rown - 1);
+			row1 = output.f(rown - 1);
 			var replaced = 0;
 			for (const var coln : range(1, nrowfields)) {
 				///BREAK;
-				if (not(row1.a(1, coln) eq row2.a(1, coln))) break;
+				if (not(row1.f(1, coln) eq row2.f(1, coln))) break;
 				replaced = 1;
 				row2(1, coln) = "-";
 			} //coln;
@@ -172,7 +172,7 @@ function main() {
 
 		tx ^= tr;
 		for (const var coln : range(1, ncols)) {
-			var cell = output.a(1, coln);
+			var cell = output.f(1, coln);
 			if (not(cell.length())) {
 				cell = nbsp;
 			}
@@ -187,16 +187,16 @@ function main() {
 		tx ^= "</thead>";
 
 		for (const var rown : range(2, nrows)) {
-			var row = output.a(rown);
+			var row = output.f(rown);
 			var rowtx = "";
 			for (const var coln : range(1, ncols)) {
-				var cell = row.a(1, coln);
+				var cell = row.f(1, coln);
 				if (dedup and coln le nrowfields) {
 					if (cell ne "-") {
 						var rowspan = 1;
 						for (const var rown2 : range(rown + 1, nrows)) {
 							///BREAK;
-							if (not(output.a(rown2, coln) eq "-")) break;
+							if (not(output.f(rown2, coln) eq "-")) break;
 							rowspan += 1;
 						} //rown2;
 
@@ -213,7 +213,7 @@ function main() {
 						//convert to user name
 						if (coln eq usercoln) {
 							userx = xlate("USERS", cell, "", "X");
-							var tt = userx.a(1);
+							var tt = userx.f(1);
 							if (tt and cell ne tt) {
 								cell = tt ^ " (" ^ cell ^ ")";
 							}
@@ -224,7 +224,7 @@ function main() {
 						//browser after user
 						if (coln eq usercoln) {
 							rowtx ^= celltd;
-							var agent = userx.a(39, 6);
+							var agent = userx.f(39, 6);
 
 							call htmllib2("OCONV.AGENT", agent);
 
@@ -255,12 +255,12 @@ function main() {
 	} else {
 
 		SYSTEM(3) = 1;
-		var sys2 = SYSTEM.a(2);
+		var sys2 = SYSTEM.f(2);
 		sys2.splicer(-3, 3, "xls");
 		SYSTEM(2) = sys2;
 		output.swapper(FM, "\r\n");
 		output.swapper(VM, "\t");
-		call oswrite(output, SYSTEM.a(2));
+		call oswrite(output, SYSTEM.f(2));
 
 	}
 

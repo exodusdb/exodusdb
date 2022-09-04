@@ -47,7 +47,7 @@ function main(in mode, in html, io mark) {
 			//mark:=' '
 
 			//hyper link to client's email
-			link = SYSTEM.a(10, 2);
+			link = SYSTEM.f(10, 2);
 			if (link) {
 				mark ^= "<a href=\"";
 				mark ^= "mailto:" ^ link;
@@ -57,15 +57,15 @@ function main(in mode, in html, io mark) {
 		}
 
 		//client mark
-		mark ^= SYSTEM.a(14);
+		mark ^= SYSTEM.f(14);
 
 		if (html) {
 			if (link) {
 				mark ^= "</a>";
 			}
 			//mark:='</small>'
-			if (SYSTEM.a(17).substr(-5) eq "_test") {
-				mark = "<span style=\"color:red\">" ^ mark ^ " - " ^ SYSTEM.a(17) ^ "</span>";
+			if (SYSTEM.f(17).substr(-5) eq "_test") {
+				mark = "<span style=\"color:red\">" ^ mark ^ " - " ^ SYSTEM.f(17) ^ "</span>";
 			}
 		}
 

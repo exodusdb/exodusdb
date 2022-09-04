@@ -24,7 +24,7 @@ S
 	//matparse @record into x\
 	for (const var ii : range(1, nfields)) {\
 	//if trim(x(i))[1,1]='*' then x(i)=''\
-		if (RECORD.a(ii).trim()[1] eq "*") {\
+		if (RECORD.f(ii).trim()[1] eq "*") {\
 			RECORD(ii) = "";\
 		}\
 	} //ii;\

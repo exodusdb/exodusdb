@@ -20,7 +20,7 @@ programinit()
 
 function main() {
 
-	if (not COMMAND.a(2) or not COMMAND.a(3)) {
+	if (not COMMAND.f(2) or not COMMAND.f(3)) {
 
 		var syntax =
 		"Syntax is copyfile [SOURCE:][SOURCEFILENAME,...] [TARGET:][TARGETFILENAME] {OPTIONS}\n"
@@ -77,7 +77,7 @@ function main() {
 
 	//parse source
 	var sourcename = "";
-	var sourcefilenames = COMMAND.a(2);
+	var sourcefilenames = COMMAND.f(2);
 	if (index(sourcefilenames,":")) {
 		sourcename = field(sourcefilenames,":",1);
 		sourcefilenames = field(sourcefilenames,":",2);
@@ -91,7 +91,7 @@ function main() {
 
 	//parse target
 	targetname = "";
-	var targetfilenames = COMMAND.a(3);
+	var targetfilenames = COMMAND.f(3);
 	if (index(targetfilenames,":")) {
 		targetname = field(targetfilenames,":",1);
 		targetfilenames = field(targetfilenames,":",2);

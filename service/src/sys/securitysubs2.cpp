@@ -28,17 +28,17 @@ function main(in mode) {
 		var emailtx2 = "";
 
 		//email changed tasks
-		var newtasks = RECORD.a(10);
-		var newlocks = RECORD.a(11);
-		var oldtasks = origfullrec_.a(10);
-		var oldlocks = origfullrec_.a(11);
+		var newtasks = RECORD.f(10);
+		var newlocks = RECORD.f(11);
+		var oldtasks = origfullrec_.f(10);
+		var oldlocks = origfullrec_.f(11);
 		var ntasks = newtasks.count(VM) + (newtasks ne "");
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
-			var task = newtasks.a(1, taskn);
+			var task = newtasks.f(1, taskn);
 			if (task) {
-				var newlock = newlocks.a(1, taskn);
+				var newlock = newlocks.f(1, taskn);
 				if (oldtasks.locate(task, oldtaskn)) {
-					var oldlock = oldlocks.a(1, oldtaskn);
+					var oldlock = oldlocks.f(1, oldtaskn);
 					if (newlock ne oldlock) {
 						//changed
 						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock;
@@ -51,10 +51,10 @@ function main(in mode) {
 
 		ntasks = oldtasks.count(VM) + (oldtasks ne "");
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
-			var task = oldtasks.a(1, taskn);
+			var task = oldtasks.f(1, taskn);
 			if (task) {
 				if (not(newtasks.locate(task, newtaskn))) {
-					var oldlock = oldlocks.a(1, taskn);
+					var oldlock = oldlocks.f(1, taskn);
 					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
 				}
 			}
@@ -89,7 +89,7 @@ function main(in mode) {
 
 		//customisation to convert old databases at ptcy/patsalides
 		//which had blank passwords not allowed in the new system
-		if (SECURITY.a(1).locate("MICHAEL", xx)) {
+		if (SECURITY.f(1).locate("MICHAEL", xx)) {
 			if (newuserprivs.osread("PATSALID.CFG")) {
 				if (VOLUMES) {
 					newuserprivs = newuserprivs.invert();
@@ -97,7 +97,7 @@ function main(in mode) {
 			}
 		}
 
-		var t10 = newuserprivs.a(10);
+		var t10 = newuserprivs.f(10);
 
 		t10.converter(".", " ");
 
@@ -124,8 +124,8 @@ function main(in mode) {
 		t10.swapper(VM ^ "ANALYSIS ACCESS", VM ^ "BILLING REPORT ACCESS");
 		t10.swapper("LEDGER RE-OPEN", "LEDGER REOPEN");
 
-		if (t10.a(1).locate("POSTING", tn)) {
-			if (newuserprivs.a(11, tn) eq "") {
+		if (t10.f(1).locate("POSTING", tn)) {
+			if (newuserprivs.f(11, tn) eq "") {
 				newuserprivs(11, tn) = "UA";
 			}
 			t10(1, tn) = "JOURNAL POST";
@@ -162,8 +162,8 @@ function main(in mode) {
 		newuserprivs(10) = t10;
 
 		call log2("*make sure all users have access to company file", logtime);
-		if (newuserprivs.a(10).locate("COMPANY ACCESS", vn)) {
-			if (newuserprivs.a(11, vn) eq "AA") {
+		if (newuserprivs.f(10).locate("COMPANY ACCESS", vn)) {
+			if (newuserprivs.f(11, vn) eq "AA") {
 				newuserprivs(11, vn) = "";
 			}
 		}
@@ -172,40 +172,40 @@ function main(in mode) {
 		var obsoletetasks = "COMPANY ACCESS PARTIAL";
 		obsoletetasks(-1) = "MARKET ACCESS PARTIAL";
 		for (const var ii : range(1, 9999)) {
-			var tt = obsoletetasks.a(ii);
+			var tt = obsoletetasks.f(ii);
 			///BREAK;
 			if (not tt) break;
-			if (newuserprivs.a(10).locate(tt, taskn)) {
+			if (newuserprivs.f(10).locate(tt, taskn)) {
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			}
 		} //ii;
 
 		//ensure certain documents cannot be deleted
-		if (newuserprivs.a(10).locate("JOB ORDER DELETE", taskn)) {
+		if (newuserprivs.f(10).locate("JOB ORDER DELETE", taskn)) {
 			newuserprivs(11, taskn) = "EXODUS";
 		}
-		if (newuserprivs.a(10).locate("JOB ESTIMATE DELETE", taskn)) {
+		if (newuserprivs.f(10).locate("JOB ESTIMATE DELETE", taskn)) {
 			newuserprivs(11, taskn) = "EXODUS";
 		}
-		if (newuserprivs.a(10).locate("JOB DELETE", taskn)) {
+		if (newuserprivs.f(10).locate("JOB DELETE", taskn)) {
 			newuserprivs(11, taskn) = "EXODUS";
 		}
 
 		call log2("*delete any superfluous tasks", logtime);
-		var tasks = newuserprivs.a(10);
-		var locks = newuserprivs.a(11);
+		var tasks = newuserprivs.f(10);
+		var locks = newuserprivs.f(11);
 		var ntasks = tasks.count(VM) + (tasks ne "");
 		for (taskn = ntasks; taskn >= 1; --taskn) {
-			var lockx = locks.a(1, taskn);
-			var task = tasks.a(1, taskn);
+			var lockx = locks.f(1, taskn);
+			var task = tasks.f(1, taskn);
 			if (lockx eq "" and (task[-1] eq DQ)) {
 deletetask:
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			} else {
 				//delete duplicate tasks
-				if (tasks.a(1).locate(task, taskn2)) {
+				if (tasks.f(1).locate(task, taskn2)) {
 					if (taskn2 lt taskn) {
 						goto deletetask;
 					}

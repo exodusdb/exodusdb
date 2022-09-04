@@ -9,7 +9,7 @@ function main() {
 
 	var filename="t_hello.txt";
 	assert(oswrite("xyz", filename));
-	assert(osfile(filename).a(1) == 3);
+	assert(osfile(filename).f(1) == 3);
 
 	var filex;
 	assert(osopen(filename,filex));

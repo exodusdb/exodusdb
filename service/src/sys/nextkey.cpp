@@ -77,7 +77,7 @@ lockit:
 
 		nextno.write(keyfile, seqkey);
 	}
-	nextno = nextno.a(1);
+	nextno = nextno.f(1);
 
 	if (previous) {
 		nextno -= 1;

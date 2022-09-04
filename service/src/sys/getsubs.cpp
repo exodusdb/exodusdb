@@ -92,7 +92,7 @@ nextdoc:
 			return 0;
 		}
 
-		task = win.orec.a(5);
+		task = win.orec.f(5);
 		gosub gettaskprefix();
 
 		//dont know task at this point
@@ -104,7 +104,7 @@ nextdoc:
 		// end
 
 		//user can always modify own reports
-		if ((win.wlocked and RECORD.a(1)) and RECORD.a(1) ne USERNAME) {
+		if ((win.wlocked and RECORD.f(1)) and RECORD.f(1) ne USERNAME) {
 
 			//check if allowed to modify
 			if (taskprefix) {
@@ -116,7 +116,7 @@ nextdoc:
 			}
 
 			//always prevent users from editing documents designed by EXODUS
-			if (RECORD.a(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
+			if (RECORD.f(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
 				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				win.wlocked = 0;
@@ -124,17 +124,17 @@ nextdoc:
 
 		}
 
-		RECORD(101) = raise(RECORD.a(6));
+		RECORD(101) = raise(RECORD.f(6));
 
-		if (RECORD.a(8) eq "") {
-			RECORD(8) = RECORD.a(3) ^ "." ^ RECORD.a(4).oconv("R(0)#5");
+		if (RECORD.f(8) eq "") {
+			RECORD(8) = RECORD.f(3) ^ "." ^ RECORD.f(4).oconv("R(0)#5");
 		}
 
 	} else if (mode eq "PREWRITE") {
 
 		//check if allowed to create
 		if (win.orec eq "") {
-			task = RECORD.a(5);
+			task = RECORD.f(5);
 			gosub gettaskprefix();
 			if (taskprefix) {
 				if (not(authorised(taskprefix ^ " CREATE", msg, ""))) {
@@ -149,7 +149,7 @@ nextdoc:
 		RECORD(6) = lower(RECORD.field(FM, 101, 9999));
 		RECORD = RECORD.field(FM, 1, 100);
 
-		if (RECORD.a(1) eq "") {
+		if (RECORD.f(1) eq "") {
 			RECORD(1) = USERNAME;
 		}
 		RECORD(3) = var().date();
@@ -162,7 +162,7 @@ nextdoc:
 		//this is also done in copygbp perhaps could be removed from there
 		//almost identical code in definition.subs and get.subs (for documents)
 		//field 10 in documents and definitions xxx*analdesign means the same
-		if (USERNAME eq "EXODUS" and RECORD.a(10)) {
+		if (USERNAME eq "EXODUS" and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -175,11 +175,11 @@ nextdoc:
 
 	} else if (mode eq "PREDELETE") {
 
-		task = win.orec.a(5);
+		task = win.orec.f(5);
 		gosub gettaskprefix();
 
 		//user can always delete their own reports
-		if (RECORD.a(1) and RECORD.a(1) ne USERNAME) {
+		if (RECORD.f(1) and RECORD.f(1) ne USERNAME) {
 
 			//check if allowed to delete
 			if (taskprefix) {
@@ -189,7 +189,7 @@ nextdoc:
 			}
 
 			//always prevent users from deleting documents designed by EXODUS
-			if (RECORD.a(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
+			if (RECORD.f(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
 				msg = "You cannot delete report designs created by EXODUS";
 				return invalid(msg);
 			}
@@ -199,7 +199,7 @@ nextdoc:
 		//update exodus standard (in case doing this on the programming system)
 		//%DELETED% ensures that deleted EXODUS documents get deleted
 		//on upgrading clients
-		if (USERNAME eq "EXODUS" and RECORD.a(10)) {
+		if (USERNAME eq "EXODUS" and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;

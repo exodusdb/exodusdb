@@ -12,7 +12,7 @@ var reply;//num
 function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	//c sys in,out,out,out
 
-	var interactive = not(SYSTEM.a(33));
+	var interactive = not(SYSTEM.f(33));
 
 	if (startmode0.unassigned()) {
 		startmode = "";

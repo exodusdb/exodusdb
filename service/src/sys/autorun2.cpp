@@ -55,7 +55,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	if (title0) {
 		title = title0;
 	} else {
-		title = sys.document.a(1);
+		title = sys.document.f(1);
 	}
 
 	//default runtime to once
@@ -77,7 +77,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//determine the runas usercode if not specified
 	if (not runasusercode) {
 		//allow for runuser to be passed in document
-		runasusercode = sys.document.a(1);
+		runasusercode = sys.document.f(1);
 	}
 	if (runasusercode) {
 		var runasuser;
@@ -107,7 +107,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//send to the "run as" user and all users above in the same group
 	if (targetusercodes eq "") {
 		//allow for targetusers to be passed in document
-		targetusercodes = sys.document.a(14);
+		targetusercodes = sys.document.f(14);
 		//runasuser is NOT a target unless there are no recipients
 		//if targetusercodes='' then
 		// targetusercodes=runasusercode
@@ -118,12 +118,12 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	var initialtargetusercodes = targetusercodes;
 	if (targetusercodes eq "{GROUP}") {
 		var tt = runasusercode;
-		if (SECURITY.a(1).locate(tt, usern)) {
+		if (SECURITY.f(1).locate(tt, usern)) {
 			while (true) {
 				var userx;
 				if (userx.read(users, tt)) {
 					//only to users with emails
-					if (userx.a(7)) {
+					if (userx.f(7)) {
 						var seniorfirst = 1;
 						if (seniorfirst) {
 							targetusercodes.inserter(1, 1, tt);
@@ -133,7 +133,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 					}
 				}
 				usern -= 1;
-				tt = SECURITY.a(1, usern);
+				tt = SECURITY.f(1, usern);
 				///BREAK;
 				if (not((usern and tt) and tt ne "---")) break;
 			}//loop;
@@ -144,7 +144,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		if (targetusercodes) {
 			var nusers = targetusercodes.count(VM) + 1;
 			for (usern = nusers; usern >= 1; --usern) {
-				var usercode = targetusercodes.a(1, usern);
+				var usercode = targetusercodes.f(1, usern);
 				var userx;
 				if (not(userx.read(users, usercode))) {
 					if (not(usercode eq "EXODUS")) {
@@ -175,7 +175,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	sys.document(7) = APPLICATION;
 	sys.document(3) = var().date();
 	sys.document(4) = var().time();
-	if (sys.document.a(12) eq "") {
+	if (sys.document.f(12) eq "") {
 		sys.document(12) = 1;
 	}
 
@@ -185,7 +185,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		//to force rerun delete and recreate
 		var olddoc;
 		if (olddoc.read(sys.documents, docid)) {
-			sys.document(13) = olddoc.a(13);
+			sys.document(13) = olddoc.f(13);
 		}
 	} else {
 		var saveid = ID;

@@ -35,13 +35,13 @@ function main(in module, in mode, in stationery) {
 	#define response_ USER3
 	#define msg_ USER4
 
-	var outfiles = SYSTEM.a(2);
+	var outfiles = SYSTEM.f(2);
 	outfiles.converter(";", VM);
 	data_ = outfiles;
 	var nfiles = outfiles.count(VM) + (outfiles ne "");
 	for (const var filen : range(1, nfiles)) {
 
-		outfile = outfiles.a(1, filen);
+		outfile = outfiles.f(1, filen);
 
 		gosub check_exists_and_maybe_convert(module, mode, stationery, outfile);
 
@@ -79,7 +79,7 @@ function main(in module, in mode, in stationery) {
 subroutine check_exists_and_maybe_convert(in module, in mode, in stationery, io outfile) {
 
 	var diroutfile = outfile.osfile();
-	if (diroutfile.a(1) gt 5) {
+	if (diroutfile.f(1) gt 5) {
 fileok:
 
 		//convert to pdf

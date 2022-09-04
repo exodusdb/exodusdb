@@ -9,7 +9,7 @@ function main() {\
 	if (not RECUR0) {\
 		call mssg("WHICH FIELD NUMBER ?", "R", RECUR0, "");\
 	}\
-	return RECORD.a(RECUR0);\
+	return RECORD.f(RECUR0);\
 }
 L
 10

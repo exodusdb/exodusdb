@@ -52,7 +52,7 @@ function main(in mode) {
 	#include <system_common.h>
 	//global sysrec,lastfn,encryptx,newpassword
 
-	var interactive = false; //not(SYSTEM.a(33));
+	var interactive = false; //not(SYSTEM.f(33));
 
 	//SEE AUTHORISATION_DICT in UI
 	//@record/user grouped mvs
@@ -73,7 +73,7 @@ function main(in mode) {
 	//25=passwordautoexpirydays (also see system<128>)
 	//26=emailnewusers
 	#define minpasswordchars_ 4
-	#define emailnewusers_ RECORD.a(26)
+	#define emailnewusers_ RECORD.f(26)
 
 	#define tstore_ win.registerx(3)
 	#define updatelowergroups_ win.registerx(4)
@@ -103,8 +103,8 @@ function main(in mode) {
 	} else if (mode eq "PERP") {
 
 	} else if (mode eq "MAKESYSREC") {
-		userx = win.is.a(1);
-		newpassword = win.is.a(2);
+		userx = win.is.f(1);
+		newpassword = win.is.f(2);
 		sysrec = "";
 		passwordfn = 7;
 		lastfn = 9;
@@ -555,11 +555,11 @@ function main(in mode) {
 
 		//delete disallowed tasks (except all master type user to see all tasks)
 		if (not(updatehighergroups_ and updatelowergroups_)) {
-			var tasks = RECORD.a(10);
-			var locks = RECORD.a(11);
+			var tasks = RECORD.f(10);
+			var locks = RECORD.f(11);
 			var ntasks = tasks.count(VM) + (tasks ne "");
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
-				var task = tasks.a(1, taskn);
+				var task = tasks.f(1, taskn);
 				//WARNING TODO: check ternary op following;
 				var temp = task.substr(1, 10) eq "DOCUMENT: " ? "#" : "";
 				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
@@ -572,10 +572,10 @@ function main(in mode) {
 		//hide higher/lower users
 		if (not(curruser_.index("EXODUS"))) {
 
-			var usercodes = RECORD.a(1);
+			var usercodes = RECORD.f(1);
 			var nusers = usercodes.count(VM) + (usercodes ne "");
 
-			if (not(usercodes.a(1).locate(USERNAME, usern))) {
+			if (not(usercodes.f(1).locate(USERNAME, usern))) {
 				msg = USERNAME ^ " user not in in authorisation file";
 				return invalid(msg);
 				stop();
@@ -588,7 +588,7 @@ function main(in mode) {
 				startn_ = usern;
 				while (true) {
 					///BREAK;
-					if (not(startn_ gt 1 and (RECORD.a(2, startn_ - 1) eq ""))) break;
+					if (not(startn_ gt 1 and (RECORD.f(2, startn_ - 1) eq ""))) break;
 					startn_ -= 1;
 				}//loop;
 			}
@@ -600,7 +600,7 @@ function main(in mode) {
 				endn_ = usern;
 				while (true) {
 					///BREAK;
-					if (not(endn_ lt nusers and (RECORD.a(1, endn_ + 1) ne "---"))) break;
+					if (not(endn_ lt nusers and (RECORD.f(1, endn_ + 1) ne "---"))) break;
 					endn_ += 1;
 				}//loop;
 			}
@@ -614,19 +614,19 @@ function main(in mode) {
 				if (not interactive) {
 
 					//save hidden users for remote client in field 23
-					var temp = RECORD.a(1).field(VM, 1, startn_);
-					temp ^= VM ^ RECORD.a(1).field(VM, endn_ + 1, 9999);
+					var temp = RECORD.f(1).field(VM, 1, startn_);
+					temp ^= VM ^ RECORD.f(1).field(VM, endn_ + 1, 9999);
 					temp.converter(VM, ",");
 					RECORD(23) = temp;
 
 					//save hidden keys for remote client in field 23
 
-					var visiblekeys = RECORD.a(2).field(VM, startn_, nn);
+					var visiblekeys = RECORD.f(2).field(VM, startn_, nn);
 					visiblekeys.converter(",", VM);
 					visiblekeys = trim(visiblekeys, VM);
 
-					var invisiblekeys = RECORD.a(2).field(VM, 1, startn_);
-					invisiblekeys ^= VM ^ RECORD.a(2).field(VM, endn_ + 1, 9999);
+					var invisiblekeys = RECORD.f(2).field(VM, 1, startn_);
+					invisiblekeys ^= VM ^ RECORD.f(2).field(VM, endn_ + 1, 9999);
 					invisiblekeys.converter(",", VM);
 					invisiblekeys = trim(invisiblekeys, VM);
 
@@ -634,9 +634,9 @@ function main(in mode) {
 					if (invisiblekeys) {
 						var nkeys = invisiblekeys.count(VM) + 1;
 						for (const var keyn : range(1, nkeys)) {
-							var keyx = invisiblekeys.a(1, keyn);
-							if (not(otherkeys.a(1).locate(keyx, xx))) {
-								if (not(visiblekeys.a(1).locate(keyx, xx))) {
+							var keyx = invisiblekeys.f(1, keyn);
+							if (not(otherkeys.f(1).locate(keyx, xx))) {
+								if (not(visiblekeys.f(1).locate(keyx, xx))) {
 									otherkeys ^= VM ^ keyx;
 								}
 							}
@@ -650,7 +650,7 @@ function main(in mode) {
 
 				//delete higher and lower users if not allowed
 				for (const var fn : range(1, 8)) {
-					RECORD(fn) = RECORD.a(fn).field(VM, startn_, nn);
+					RECORD(fn) = RECORD.f(fn).field(VM, startn_, nn);
 				} //fn;
 
 			} else {
@@ -662,11 +662,11 @@ function main(in mode) {
 
 		//get the local passwords from the system file for users that exist there
 		//also get any user generated passwords
-		var usercodes = RECORD.a(1);
+		var usercodes = RECORD.f(1);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (usern = 1; usern <= nusers; ++usern) {
-			userx = usercodes.a(1, usern);
-			sysrec = RECORD.a(4, usern, 2);
+			userx = usercodes.f(1, usern);
+			sysrec = RECORD.f(4, usern, 2);
 			var pass = userx.xlate("USERS", 4, "X");
 			if (pass and pass ne sysrec.field(TM, 7)) {
 				RECORD(4, usern, 2) = sysrec.fieldstore(TM, 7, 1, pass);
@@ -686,7 +686,7 @@ function main(in mode) {
 
 		//enable flowing text keys in postread
 		//restore comma format in prewrite
-		var keys = RECORD.a(2);
+		var keys = RECORD.f(2);
 		keys.converter(",", " ");
 		RECORD(2) = keys;
 
@@ -694,7 +694,7 @@ function main(in mode) {
 
 			//group separators act as data in intranet client forcing menu and passwords
 			for (const var fn : range(1, 2)) {
-				var temp = RECORD.a(fn);
+				var temp = RECORD.f(fn);
 				temp.swapper("---", "");
 				RECORD(fn) = temp;
 			} //fn;
@@ -714,8 +714,8 @@ function main(in mode) {
 	} else if (mode eq "SAVE") {
 
 		//get/clear temporary storage
-		startn_ = RECORD.a(20);
-		endn_ = RECORD.a(21);
+		startn_ = RECORD.f(20);
+		endn_ = RECORD.f(21);
 
 		if (not interactive) {
 			if (not(origfullrec_.read(DEFINITIONS, "SECURITY"))) {
@@ -737,7 +737,7 @@ function main(in mode) {
 			}
 
 			//safety check
-			if (win.orec.a(20) ne startn_ or win.orec.a(21) ne endn_) {
+			if (win.orec.f(20) ne startn_ or win.orec.f(21) ne endn_) {
 
 				//trace
 				win.orec.write(DEFINITIONS, "SECURITY.OREC.BAD");
@@ -765,14 +765,14 @@ function main(in mode) {
 		gosub cleartemp();
 
 		//if locked then skip out
-		if (interactive and win.ww(2).a(18).count("P")) {
+		if (interactive and win.ww(2).f(18).count("P")) {
 			return 0;
 		}
 
 		if (not(interactive) or win.templatex eq "SECURITY") {
 
 			//check all users have names/passwords
-			var usercodes = RECORD.a(1);
+			var usercodes = RECORD.f(1);
 			usercodes.converter(" ", "-");
 			RECORD(1) = usercodes;
 			var nusers = usercodes.count(VM) + (usercodes ne "");
@@ -781,15 +781,15 @@ function main(in mode) {
 				//recover password
 				if (not interactive) {
 
-					userx = RECORD.a(1, usern);
+					userx = RECORD.f(1, usern);
 
-					newpassword = RECORD.a(4, usern);
+					newpassword = RECORD.f(4, usern);
 					if (newpassword and newpassword.length() lt 4) {
 						msg = userx.quote() ^ " user password cannot be less than " ^ minpasswordchars_;
 						return invalid(msg);
 					}
 
-					if (not(origfullrec_.a(1).locate(userx, ousern))) {
+					if (not(origfullrec_.f(1).locate(userx, ousern))) {
 						ousern = 0;
 					}
 
@@ -818,15 +818,15 @@ function main(in mode) {
 					} else {
 						//recover old password
 						if (ousern) {
-							var oldpassword = origfullrec_.a(4, ousern);
+							var oldpassword = origfullrec_.f(4, ousern);
 							RECORD(4, usern) = oldpassword;
 						}
 					}
 
 				}
 
-				if (not(RECORD.a(4, usern))) {
-					var username = RECORD.a(1, usern);
+				if (not(RECORD.f(4, usern))) {
+					var username = RECORD.f(1, usern);
 					if (not username) {
 						//msg='USER NAME IS MISSING IN LINE ':USERN
 						//goto invalid
@@ -834,7 +834,7 @@ function main(in mode) {
 						RECORD(4, usern) = username;
 					}
 					if (not(username.index("---") or username eq "BACKUP")) {
-						if (not(RECORD.a(7, usern))) {
+						if (not(RECORD.f(7, usern))) {
 							//msg=quote(username):'|You must first give a password to this user'
 							msg = username.quote() ^ "|You must give an email or password for this user";
 							return invalid(msg);
@@ -843,7 +843,7 @@ function main(in mode) {
 				}
 
 				//check ALL emails in one pass
-				win.is = RECORD.a(7);
+				win.is = RECORD.f(7);
 				call usersubs("VAL.EMAIL");
 				if (not(win.valid)) {
 					return 0;
@@ -852,9 +852,9 @@ function main(in mode) {
 			} //usern;
 
 			//mark empty users and keys with "---" to assist identification of groups
-			nusers = RECORD.a(1).count(VM) + (RECORD.a(1) ne "");
+			nusers = RECORD.f(1).count(VM) + (RECORD.f(1) ne "");
 			for (usern = 1; usern <= nusers; ++usern) {
-				var temp = RECORD.a(1, usern);
+				var temp = RECORD.f(1, usern);
 				if (temp eq "" or temp.index("---")) {
 					RECORD(1, usern) = "---";
 					RECORD(2, usern) = "---";
@@ -864,30 +864,30 @@ function main(in mode) {
 			//put back any hidden users
 			if (startn_) {
 				var nn = endn_ - startn_ + 1;
-				var nvms = RECORD.a(1).count(VM);
+				var nvms = RECORD.f(1).count(VM);
 				for (const var fn : range(1, 8)) {
-					var temp = RECORD.a(fn);
+					var temp = RECORD.f(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
-					RECORD(fn) = origfullrec_.a(fn).fieldstore(VM, startn_, -nn, temp);
+					RECORD(fn) = origfullrec_.f(fn).fieldstore(VM, startn_, -nn, temp);
 				} //fn;
 			}
 
 			//put back any hidden tasks
-			var tasks = origfullrec_.a(10);
-			var locks = origfullrec_.a(11);
+			var tasks = origfullrec_.f(10);
+			var locks = origfullrec_.f(11);
 			var ntasks = tasks.count(VM) + (tasks ne "");
 			for (const var taskn : range(1, ntasks)) {
-				var task = tasks.a(1, taskn);
+				var task = tasks.f(1, taskn);
 				if (task) {
-					if (not(win.orec.a(10).locate(task, newtaskn))) {
-						var lockx = locks.a(1, taskn);
+					if (not(win.orec.f(10).locate(task, newtaskn))) {
+						var lockx = locks.f(1, taskn);
 
 						//locate task in @record<10> by 'AL' setting newtaskn else null
 						//LOCKX=locks<1,taskn>
 						//@record=insert(@record,10,newtaskn,0,task)
 						//@record=insert(@record,11,newtaskn,0,LOCKX)
 
-						if (not(RECORD.a(10).locateby("AL", task, newtaskn))) {
+						if (not(RECORD.f(10).locateby("AL", task, newtaskn))) {
 							RECORD.inserter(10, newtaskn, task);
 							RECORD.inserter(11, newtaskn, lockx);
 						}
@@ -937,7 +937,7 @@ function main(in mode) {
 
 		//enable flowing text keys in postread
 		//restore comma format in prewrite
-		var keys = RECORD.a(2);
+		var keys = RECORD.f(2);
 		keys.converter(" ", ",");
 		RECORD(2) = keys;
 
@@ -965,29 +965,29 @@ function main(in mode) {
 			users = "";
 		}
 		//update users in the central system file if they exist there (direct login)
-		var usercodes = RECORD.a(1);
-		var useremails = RECORD.a(7);
-		var usernames = RECORD.a(8);
-		var userpasswords = RECORD.a(4);
+		var usercodes = RECORD.f(1);
+		var useremails = RECORD.f(7);
+		var usernames = RECORD.f(8);
+		var userpasswords = RECORD.f(4);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (usern = 1; usern <= nusers; ++usern) {
-			userx = usercodes.a(1, usern);
+			userx = usercodes.f(1, usern);
 
 			if (not(userx.index("---"))) {
 
 				//get the original and current system records
-				sysrec = RECORD.a(4, usern, 2);
+				sysrec = RECORD.f(4, usern, 2);
 				//locate user in orec<1> setting ousern then
 				var menuid = "";
-				if (origfullrec_.a(1).locate(userx, ousern)) {
+				if (origfullrec_.f(1).locate(userx, ousern)) {
 					//oSYSREC=orec<4,ousern,2>
-					var osysrec = origfullrec_.a(4, ousern, 2);
+					var osysrec = origfullrec_.f(4, ousern, 2);
 				} else {
 					var osysrec = "";
 
 					//new users look for legacy menu in following (lower rank) users
 					for (const var usern2 : range(usern + 1, nusers)) {
-						var usercode2 = usercodes.a(1, usern2);
+						var usercode2 = usercodes.f(1, usern2);
 						if (usercode2) {
 							if (not(menuid.readv(users, usercode2, 34))) {
 								menuid = "";
@@ -1015,7 +1015,7 @@ function main(in mode) {
 					var departmentcode2 = departmentcode;
 					departmentcode.converter("0123456789", "");
 
-					var username = usernames.a(1, usern);
+					var username = usernames.f(1, usern);
 					if (not username) {
 						username = userx;
 					}
@@ -1023,25 +1023,25 @@ function main(in mode) {
 					//update the user record
 					userrec(1) = username;
 					userrec(5) = departmentcode;
-					userrec(7) = useremails.a(1, usern);
+					userrec(7) = useremails.f(1, usern);
 					//userrec<8>=username
 					userrec(11) = usern;
 					userrec(21) = departmentcode2;
 					//expirydate
-					userrec(35) = RECORD.a(3, usern);
-					userrec(40) = RECORD.a(6, usern);
-					userrec(41) = RECORD.a(2, usern);
+					userrec(35) = RECORD.f(3, usern);
+					userrec(40) = RECORD.f(6, usern);
+					userrec(41) = RECORD.f(2, usern);
 
 					//new password cause entry in users log to renable login if blocked
 					//save historical logins/password resets in listen2 and security.subs
 					//similar in security.subs and user.subs
-					var userpass = userpasswords.a(1, usern);
-					var ouserpass = origfullrec_.a(4, ousern);
+					var userpass = userpasswords.f(1, usern);
+					var ouserpass = origfullrec_.f(4, ousern);
 					if (userpass ne ouserpass) {
 						//datetime=(date():'.':time() 'R(0)#5')+0
 						var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 						userrec.inserter(15, 1, datetime);
-						userrec.inserter(16, 1, SYSTEM.a(40, 2));
+						userrec.inserter(16, 1, SYSTEM.f(40, 2));
 
 						var text = "OK New password by " ^ USERNAME ^ ".";
 						userrec.inserter(18, 1, text);
@@ -1061,11 +1061,11 @@ function main(in mode) {
 	//and we still need to get the executive email if they are a user
 						var mirror = userrec.fieldstore(FM, 13, 5, "");
 						mirror = userrec.fieldstore(FM, 31, 3, "");
-						var mirrorkey = "%" ^ userrec.a(1).ucase() ^ "%";
+						var mirrorkey = "%" ^ userrec.f(1).ucase() ^ "%";
 						mirror(1) = userx;
 						mirror.write(users, mirrorkey);
 
-						isnew = origuserrec.a(1) eq "";
+						isnew = origuserrec.f(1) eq "";
 						//only warn about new users with emails (ignore creation of groups/testusers)
 						gosub getemailtx();
 
@@ -1093,13 +1093,13 @@ function main(in mode) {
 		} //usern;
 
 		//delete any deleted users from the system file for direct login
-		usercodes = win.orec.a(1);
+		usercodes = win.orec.f(1);
 		nusers = usercodes.count(VM) + (usercodes ne "");
 		for (usern = 1; usern <= nusers; ++usern) {
-			userx = usercodes.a(1, usern);
+			userx = usercodes.f(1, usern);
 			if (not(userx.index("---"))) {
 				if (userx and not(userx.index("EXODUS"))) {
-					if (not(RECORD.a(1).locate(userx, temp))) {
+					if (not(RECORD.f(1).locate(userx, temp))) {
 						if (userrec.read(users, userx)) {
 							if (users) {
 								users.deleterecord(userx);
@@ -1110,7 +1110,7 @@ function main(in mode) {
 							gosub getemailtx();
 						}
 						if (temp.read(systemfile(), userx)) {
-							if (temp.a(1) eq "USER") {
+							if (temp.f(1) eq "USER") {
 								systemfile().deleterecord(userx);
 
 							}
@@ -1147,7 +1147,7 @@ function main(in mode) {
 						replyto = USERNAME.xlate("USERS", 7, "X");
 					}
 
-					var toaddress = newusers.a(ii, 3);
+					var toaddress = newusers.f(ii, 3);
 					var ccaddress = replyto;
 
 					//also inform accounts although cancelled users are not emailed to accounts
@@ -1158,7 +1158,7 @@ function main(in mode) {
 						ccaddress ^= "accounts@neosys.com";
 					}
 
-					var subject = "EXODUS New User " ^ newusers.a(ii, 2) ^ " (" ^ newusers.a(ii, 1) ^ ")";
+					var subject = "EXODUS New User " ^ newusers.f(ii, 2) ^ " (" ^ newusers.f(ii, 1) ^ ")";
 
 					var body = "";
 					body(1, -1) = "A new EXODUS user account has been created for you.";
@@ -1172,12 +1172,12 @@ function main(in mode) {
 
 					body ^= VM;
 					body(1, -1) = "Login:";
-					var baselinks = SYSTEM.a(114);
-					var baselinkdescs = SYSTEM.a(115);
+					var baselinks = SYSTEM.f(114);
+					var baselinkdescs = SYSTEM.f(115);
 					var nlinks = baselinks.count(VM) + (baselinks ne "");
 					if (nlinks) {
 						for (const var linkn : range(1, nlinks)) {
-							body(1, -1) = baselinkdescs.a(1, linkn) ^ " " ^ baselinks.a(1, linkn);
+							body(1, -1) = baselinkdescs.f(1, linkn) ^ " " ^ baselinks.f(1, linkn);
 							//if @account='ACCOUNTS' then body:='?ACCOUNTS'
 						} //linkn;
 						body.swapper("Internet Explorer", "MS Edge");
@@ -1201,11 +1201,11 @@ function main(in mode) {
 						body(1, -1) = replyto;
 					}
 
-					body.swapper("%USERCODE%", newusers.a(ii, 1));
-					body.swapper("%USERNAME%", newusers.a(ii, 2));
+					body.swapper("%USERCODE%", newusers.f(ii, 1));
+					body.swapper("%USERNAME%", newusers.f(ii, 2));
 					body.swapper("%EMAIL%", toaddress);
-					body.swapper("%GROUP%", newusers.a(ii, 4));
-					body.swapper("%DATABASE%", SYSTEM.a(14, 1) ^ " (" ^ SYSTEM.a(17, 1) ^ ")");
+					body.swapper("%GROUP%", newusers.f(ii, 4));
+					body.swapper("%DATABASE%", SYSTEM.f(14, 1) ^ " (" ^ SYSTEM.f(17, 1) ^ ")");
 					body.swapper(VM, var().chr(13));
 
 					call sendmail(toaddress, ccaddress, subject, body, attachfilename, deletex, errormsg, replyto);
@@ -1246,14 +1246,14 @@ function main(in mode) {
 		temprec(4) = "";
 
 		//remove expired users
-		var expirydates = temprec.a(3);
+		var expirydates = temprec.f(3);
 		var nn = expirydates.count(VM) + 1;
 		for (var ii = nn; ii >= 1; --ii) {
-			var expirydate = expirydates.a(1, ii);
+			var expirydate = expirydates.f(1, ii);
 			if (expirydate) {
 				if (expirydate le var().date()) {
 					for (const var fn : range(1, 9)) {
-						var tt = temprec.a(fn);
+						var tt = temprec.f(fn);
 						if (tt) {
 							temprec(fn) = tt.remove(1, ii, 0);
 						}
@@ -1263,15 +1263,15 @@ function main(in mode) {
 		} //ii;
 
 		//remove empty groups
-		var usercodes = temprec.a(1);
+		var usercodes = temprec.f(1);
 		nn = usercodes.count(VM) + 1;
 		for (var ii = nn; ii >= 2; --ii) {
-			var usercode = usercodes.a(1, ii);
+			var usercode = usercodes.f(1, ii);
 			if (usercode) {
-				if (temprec.a(8, ii) eq "" or temprec.a(7, ii) eq "") {
-					if (temprec.a(1, ii - 1) eq "") {
+				if (temprec.f(8, ii) eq "" or temprec.f(7, ii) eq "") {
+					if (temprec.f(1, ii - 1) eq "") {
 						for (const var fn : range(1, 9)) {
-							var tt = temprec.a(fn);
+							var tt = temprec.f(fn);
 							if (tt) {
 								temprec(fn) = tt.remove(1, ii, 0);
 							}
@@ -1282,15 +1282,15 @@ function main(in mode) {
 		} //ii;
 
 		//add group marks
-		temprec(1) = temprec.a(1).swap(VM ^ VM, VM ^ "<hr/>" ^ VM);
+		temprec(1) = temprec.f(1).swap(VM ^ VM, VM ^ "<hr/>" ^ VM);
 
 		//reverse users so department shows at the top (and higher users at bottom sadly)
 		if (mode.field(".", 2) eq "USERS") {
 			//trim any multivalued fields with more than nusers multivalues
-			var nusers = temprec.a(1).count(VM) + 1;
+			var nusers = temprec.f(1).count(VM) + 1;
 			var nfs = temprec.count(FM) + 1;
 			for (const var fn : range(1, nfs)) {
-				temprec(fn) = temprec.a(fn).field(VM, 1, nusers);
+				temprec(fn) = temprec.f(fn).field(VM, 1, nusers);
 			} //fn;
 			temprec = invertarray(reverse(invertarray(temprec)));
 		}
@@ -1344,12 +1344,12 @@ function main(in mode) {
 
 		var tasks2 = "";
 		var locks2 = "";
-		var tasks = SECURITY.a(10);
-		var locks = SECURITY.a(11);
+		var tasks = SECURITY.f(10);
+		var locks = SECURITY.f(11);
 		var ntasks = tasks.count(VM) + 1;
 		var lasttask = "";
 		for (const var taskn : range(1, ntasks)) {
-			var task = tasks.a(1, taskn);
+			var task = tasks.f(1, taskn);
 			if (authorised(task, xx)) {
 				ok = 1;
 			} else {
@@ -1380,7 +1380,7 @@ function main(in mode) {
 				lasttask = task2;
 
 				tasks2 ^= VM ^ task;
-				locks2 ^= VM ^ locks.a(1, taskn);
+				locks2 ^= VM ^ locks.f(1, taskn);
 			}
 		} //taskn;
 		tasks2.splicer(1, 1, "");
@@ -1464,8 +1464,8 @@ function main(in mode) {
 }
 
 subroutine changepassx() {
-	var datax = RECORD.a(4, win.mvx);
-	sysrec = datax.a(1, 1, 2);
+	var datax = RECORD.f(4, win.mvx);
+	sysrec = datax.f(1, 1, 2);
 	//convert \FB\:\FA\:\F9\ to \FE\:\FD\:\FC\ in SYSREC
 	sysrec.converter(TM ^ STM ^ var().chr(249), FM ^ VM ^ SVM);
 	if (not sysrec) {
@@ -1509,9 +1509,9 @@ subroutine newpass3() {
 	win.valid = 0;
 	lastfn = 9;
 
-	if (sysrec.a(1) eq "USER" or sysrec eq "") {
+	if (sysrec.f(1) eq "USER" or sysrec eq "") {
 		passwordfn = 7;
-	} else if (sysrec.a(1) eq "ACCOUNT") {
+	} else if (sysrec.f(1) eq "ACCOUNT") {
 		passwordfn = 6;
 	} else {
 		call note("W123", "", xx, userx);
@@ -1525,21 +1525,21 @@ subroutine newpass3() {
 }
 
 subroutine makesysrec() {
-	if (not(sysrec.a(1))) {
+	if (not(sysrec.f(1))) {
 		if (passwordfn eq 7) {
 			sysrec(1) = "USER";
 		} else {
 			sysrec(1) = "ACCOUNT";
 		}
 	}
-	if (not(sysrec.a(2))) {
+	if (not(sysrec.f(2))) {
 		sysrec(2) = APPLICATION;
 	}
-	if (not(sysrec.a(5))) {
+	if (not(sysrec.f(5))) {
 		sysrec(5) = "EXODUS";
 	}
 	//if SYSREC<last.fn> else SYSREC<last.fn>='xxxxx'
-	if (not(sysrec.a(9))) {
+	if (not(sysrec.f(9))) {
 		sysrec(9) = "xxxxx";
 	}
 
@@ -1589,7 +1589,7 @@ subroutine makesysrec() {
 }
 
 subroutine gueststatus() {
-	if (SYSTEM.a(21)) {
+	if (SYSTEM.f(21)) {
 		msg = "YOU ARE A TEMPORARY GUEST|YOU CANNOT ACCESS AUTHORISATION";
 		gosub invalid(msg);
 	}
@@ -1612,22 +1612,22 @@ subroutine cleartemp() {
 
 subroutine getemailtx() {
 	//dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
-	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-5) ne "_test")) and not(var("exodus.id").osfile())) {
+	if ((userrec.f(7).ucase().index("@EXODUS.COM") and (SYSTEM.f(17, 1).substr(-5) ne "_test")) and not(var("exodus.id").osfile())) {
 		return;
 	}
 
 	//send to email about how to login to new users with email addresses
-	if (userrec.a(7) and isnew gt 0) {
-		newusers(-1) = userx ^ VM ^ userrec.a(1) ^ VM ^ userrec.a(7) ^ VM ^ userrec.a(5);
+	if (userrec.f(7) and isnew gt 0) {
+		newusers(-1) = userx ^ VM ^ userrec.f(1) ^ VM ^ userrec.f(7) ^ VM ^ userrec.f(5);
 	}
 
 	//build up log email for sysmsg
 	var tx = "";
 	for (const var fieldn : range(1, nuserfields)) {
-		var fieldx = userfields.a(fieldn);
-		var fn = fieldx.a(1, 2);
-		var old = oconv(origuserrec.a(fn), fieldx.a(1, 3));
-		var newx = oconv(userrec.a(fn), fieldx.a(1, 3));
+		var fieldx = userfields.f(fieldn);
+		var fn = fieldx.f(1, 2);
+		var old = oconv(origuserrec.f(fn), fieldx.f(1, 3));
+		var newx = oconv(userrec.f(fn), fieldx.f(1, 3));
 		if (newx ne old) {
 			var was = "was:";
 			//dedup ipnos and keys
@@ -1645,7 +1645,7 @@ subroutine getemailtx() {
 				was = "";
 			}
 			if ((newx ^ old).length()) {
-				tx(-1) = (fieldx.a(1, 1) ^ ":").oconv("L#10");
+				tx(-1) = (fieldx.f(1, 1) ^ ":").oconv("L#10");
 				tx ^= newx;
 				if (old or ((newx and not(isnew)))) {
 					tx(-1) = was.oconv("R#10") ^ old;
@@ -1665,12 +1665,12 @@ subroutine getemailtx() {
 		}
 
 		//always show user name, if different from user code
-		if (origuserrec.a(1) eq userrec.a(1) and userrec.a(1) ne userx) {
-			emailtx(-1) = var("User Name:").oconv("L#10") ^ userrec.a(1);
+		if (origuserrec.f(1) eq userrec.f(1) and userrec.f(1) ne userx) {
+			emailtx(-1) = var("User Name:").oconv("L#10") ^ userrec.f(1);
 		}
 		//always show user group
-		if (origuserrec.a(21) eq userrec.a(21)) {
-			emailtx(-1) = var("Group:").oconv("L#10") ^ userrec.a(21);
+		if (origuserrec.f(21) eq userrec.f(21)) {
+			emailtx(-1) = var("Group:").oconv("L#10") ^ userrec.f(21);
 		}
 		emailtx(-1) = tx;
 	}

@@ -21,7 +21,7 @@ function main(in nextcompanycode) {
         initcompany2 = "initcompany2_app" ;
     }
 
-	#define interactive_ not(SYSTEM.a(33))
+	#define interactive_ not(SYSTEM.f(33))
 
 	if (not(nextcompanycode.unassigned())) {
 
@@ -50,24 +50,24 @@ function main(in nextcompanycode) {
 	}
 
 	//in LISTEN2 and INIT.COMPANY
-	var companystyle = sys.company.a(70);
+	var companystyle = sys.company.f(70);
 	if (companystyle) {
 		SYSTEM(46) = companystyle;
 	}
 
 	//clientmark
-	if (sys.company.a(27)) {
+	if (sys.company.f(27)) {
 		if (VOLUMES) {
-			sys.company(27) = sys.company.a(27).invert();
+			sys.company(27) = sys.company.f(27).invert();
 		}
-		SYSTEM(14) = sys.company.a(27);
+		SYSTEM(14) = sys.company.f(27);
 		SYSTEM(8) = "";
 	} else {
-		SYSTEM(14) = SYSTEM.a(36);
+		SYSTEM(14) = SYSTEM.f(36);
 	}
 
 	//if company code2 is not specified then use company code IF alphabetic
-	if (not(sys.company.a(28))) {
+	if (not(sys.company.f(28))) {
 		if (sys.gcurrcompany.match("^[A-Za-z]*$")) {
 			sys.company(28) = sys.gcurrcompany;
 		}
@@ -75,7 +75,7 @@ function main(in nextcompanycode) {
 
 	//date format
 	DATEFMT = "D2/E";
-	var dateformat = sys.company.a(10);
+	var dateformat = sys.company.f(10);
 	if (dateformat eq "") {
 		DATEFMT = "D2/E";
 	} else if (dateformat.substr(1, 6) eq "31/01/") {
@@ -105,13 +105,13 @@ function main(in nextcompanycode) {
 
 	//in init.company and init.general
 
-	if (sys.glang eq "" or sys.company.a(14) ne oldcompany.a(14)) {
+	if (sys.glang eq "" or sys.company.f(14) ne oldcompany.f(14)) {
 		call getlang("GENERAL", "", "", sys.alanguage, sys.glang);
-		if (sys.glang.a(9)) {
-			UPPERCASE = sys.glang.a(9);
+		if (sys.glang.f(9)) {
+			UPPERCASE = sys.glang.f(9);
 		}
-		if (sys.glang.a(10)) {
-			LOWERCASE = sys.glang.a(10);
+		if (sys.glang.f(10)) {
+			LOWERCASE = sys.glang.f(10);
 		}
 		UPPERCASE.swapper("%FF", RM);
 		LOWERCASE.swapper("%FF", RM);
@@ -136,11 +136,11 @@ function main(in nextcompanycode) {
 
 	}
 
-	if (not(sys.company.a(4))) {
-		sys.company(4) = sys.company.a(5);
+	if (not(sys.company.f(4))) {
+		sys.company(4) = sys.company.f(5);
 	}
-	if (not(sys.company.a(5))) {
-		sys.company(5) = sys.company.a(4);
+	if (not(sys.company.f(5))) {
+		sys.company(5) = sys.company.f(4);
 	}
 	//if intercurrency conversion account is blank then
 	//trial balance balances in base currency but not for each currency separately
@@ -149,36 +149,36 @@ function main(in nextcompanycode) {
 	//convert currency gain/loss/conversion accounts and vat control to internal
 	//this was not a good idea but remains compatible with older code
 	//TODO remove and change all other code
-	if (sys.company.a(4, 1, 2)) {
-		sys.company(4) = sys.company.a(4, 1, 2);
+	if (sys.company.f(4, 1, 2)) {
+		sys.company(4) = sys.company.f(4, 1, 2);
 	}
-	if (sys.company.a(5, 1, 2)) {
-		sys.company(5) = sys.company.a(5, 1, 2);
+	if (sys.company.f(5, 1, 2)) {
+		sys.company(5) = sys.company.f(5, 1, 2);
 	}
-	if (sys.company.a(12, 1, 2)) {
-		sys.company(12) = sys.company.a(12, 1, 2);
+	if (sys.company.f(12, 1, 2)) {
+		sys.company(12) = sys.company.f(12, 1, 2);
 	}
 	//taxaccno=company<19>
-	if (sys.company.a(19, 1, 2)) {
-		sys.company(19) = sys.company.a(19, 1, 2);
+	if (sys.company.f(19, 1, 2)) {
+		sys.company(19) = sys.company.f(19, 1, 2);
 	}
 
 	//save base currency for general use
-	SYSTEM(134) = sys.company.a(3);
+	SYSTEM(134) = sys.company.f(3);
 
 	//number format (@USER2)
-	if (not(ndec.readv(sys.currencies, sys.company.a(3), 3))) {
+	if (not(ndec.readv(sys.currencies, sys.company.f(3), 3))) {
 		ndec = 2;
 	}
 	//default to dot for decimal point
 	BASEFMT = "MD";
 	//optional comma for decimal point
-	if (var("1.000,00|1000,00").locateusing("|", sys.company.a(22), temp)) {
+	if (var("1.000,00|1000,00").locateusing("|", sys.company.f(22), temp)) {
 		BASEFMT = "MC";
 	}
 	BASEFMT ^= ndec ^ "0P";
 	//optional comma to indicate delimiting of thousands (with comma MD OR dot MC)
-	if (var("1,000.00|1.000,00").locateusing("|", sys.company.a(22), temp)) {
+	if (var("1,000.00|1.000,00").locateusing("|", sys.company.f(22), temp)) {
 		BASEFMT ^= ",";
 	}
 
@@ -187,7 +187,7 @@ function main(in nextcompanycode) {
 
 	//dateperiod conversion in case not done in init.company2 above
 	//financial year dates
-	var financialyear = sys.company.a(6);
+	var financialyear = sys.company.f(6);
 	var firstmonth = financialyear.field(",", 1);
 	if (firstmonth.isnum()) {
 		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",", firstmonth, temp))) {

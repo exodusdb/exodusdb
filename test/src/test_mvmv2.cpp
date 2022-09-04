@@ -93,9 +93,9 @@ function main() {
 
 	//extraction
 	var da1="aa" _FM_ "b1" _VM_ "b2" _SM_ "b22" _FM_ "cc";
-	assert(da1.a(2) eq extract(da1,2));//this extracts field 2
-	assert(da1.a(2,2) eq extract(da1,2,2));//this extracts field 2, value 2
-	assert(da1.a(2,2,2) eq extract(da1,2,2,2));//this extracts field 2, value 2, subvalue 2
+	assert(da1.f(2) eq extract(da1,2));//this extracts field 2
+	assert(da1.f(2,2) eq extract(da1,2,2));//this extracts field 2, value 2
+	assert(da1.f(2,2,2) eq extract(da1,2,2,2));//this extracts field 2, value 2, subvalue 2
 
 	//extract or a() or plain ()
 	var xx = "11" _SM_ "111" _VM_ "12" _FM_ "22" _FM_ "31" _VM_ "321" _SM_ "322" _FM_;
@@ -113,26 +113,26 @@ function main() {
 	assert(extract(var("100" _FM_ "210" _VM_ "221" _SM_ "222" _SM_),2,2,2) == "222");
 
 	//another way
-	assert(xx.a(3,2,2) == "322");
+	assert(xx.f(3,2,2) == "322");
 	//yet another way
-	assert(xx.a(3,2,2) == "322");
+	assert(xx.f(3,2,2) == "322");
 
 	//strange requests
-	assert(xx.a(-1) == "");
-	assert(xx.a(-2) == "");
-	assert(xx.a(1,-1) == "");
-	assert(xx.a(1,1,-1) == "");
-	assert(xx.a(0,0,0) == xx);
-	assert(xx.a(0,2,0) == "12");
-	assert(xx.a(0,0,2) == "111");
+	assert(xx.f(-1) == "");
+	assert(xx.f(-2) == "");
+	assert(xx.f(1,-1) == "");
+	assert(xx.f(1,1,-1) == "");
+	assert(xx.f(0,0,0) == xx);
+	assert(xx.f(0,2,0) == "12");
+	assert(xx.f(0,0,2) == "111");
 
 	//missing fields
-	assert(xx.a(4,0,0) == "");
-	assert(xx.a(1,4,0) == "");
-	assert(xx.a(1,1,4) == "");
-	assert(xx.a(4,1,0) == "");
-	assert(xx.a(4,1,0) == "");
-	assert(xx.a(4,1,2) == "");
+	assert(xx.f(4,0,0) == "");
+	assert(xx.f(1,4,0) == "");
+	assert(xx.f(1,1,4) == "");
+	assert(xx.f(4,1,0) == "");
+	assert(xx.f(4,1,0) == "");
+	assert(xx.f(4,1,2) == "");
 
 	///////
 	//field

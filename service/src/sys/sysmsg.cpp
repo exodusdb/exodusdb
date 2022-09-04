@@ -32,8 +32,8 @@ function main(in msg0, in subject0="", in username0="") {
 	//not tested or used currently
 
 	#include <system_common.h>
-	var interactive = false; //not(SYSTEM.a(33));
-	var datasetcode = SYSTEM.a(17);
+	var interactive = false; //not(SYSTEM.f(33));
+	var datasetcode = SYSTEM.f(17);
 
 	//NB this routine is called automatically from msg()
 	//whenever the msg starts with SYSTEM ERROR
@@ -56,7 +56,7 @@ function main(in msg0, in subject0="", in username0="") {
 
 	if (not interactive) {
 		//print msg:', ':subjectin:', ':username
-		printl("sysmsg: ", subjectin, ", ", username, ", ", msg.a(1, 1).field("|", 1).a(1, 1));
+		printl("sysmsg: ", subjectin, ", ", username, ", ", msg.f(1, 1).field("|", 1).f(1, 1));
 	}
 
 	if (msg eq "" and subjectin) {
@@ -89,13 +89,13 @@ function main(in msg0, in subject0="", in username0="") {
 	var useremail = username.xlate("USERS", 7, "X").lcase();
 	var userfullname = username.xlate("USERS", 1, "X");
 	//if username='EXODUS' and @username<>'EXODUS' then
-	var emailaddrs = bakpars.a(6);
+	var emailaddrs = bakpars.f(6);
 	var ccaddrs = "";
-	if (bakpars.a(10)) {
+	if (bakpars.f(10)) {
 		if (emailaddrs) {
 			emailaddrs ^= "/";
 		}
-		emailaddrs ^= bakpars.a(10);
+		emailaddrs ^= bakpars.f(10);
 	}
 	emailaddrs = emailaddrs.field("/", 1);
 	//if emailaddrs='' then readv emailaddrs from definitions,'REPLICATION',12 else emailaddrs=''
@@ -123,7 +123,7 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 
 	//sysmsg is not emailed to admins if testdata or user is EXODUS
-	if (USERNAME eq "EXODUS" or (SYSTEM.a(17).substr(-5) eq "_test")) {
+	if (USERNAME eq "EXODUS" or (SYSTEM.f(17).substr(-5) eq "_test")) {
 
 		//this is disabled to ensure that all errors caused by EXODUS support
 		//are logged normally
@@ -152,7 +152,7 @@ function main(in msg0, in subject0="", in username0="") {
 	var subject = "EXODUS System: " ^ datasetcode;
 	var tt = msg.index("ERROR NO:");
 	if (tt) {
-		subject ^= " " ^ msg.substr(tt, 9999).a(1, 1, 1);
+		subject ^= " " ^ msg.substr(tt, 9999).f(1, 1, 1);
 	}
 	if (subjectin) {
 		subject ^= " " ^ subjectin;
@@ -167,20 +167,20 @@ function main(in msg0, in subject0="", in username0="") {
 		//body<-1>='Message=':fm:msg
 		body(-1) = msg;
 		body ^= FM;
-		body(-1) = oconv("Server:", l9) ^ SYSTEM.a(44).trim();
+		body(-1) = oconv("Server:", l9) ^ SYSTEM.f(44).trim();
 		body(-1) = oconv("Install:", l9) ^ oscwd();
 		//osread ver from 'general\version.dat' then
 		var verfilename = "general/version.dat";
 		verfilename.converter("/", OSSLASH);
 		if (ver.osread(verfilename)) {
-			body(-1) = oconv("Version:", l9) ^ ver.a(1);
+			body(-1) = oconv("Version:", l9) ^ ver.f(1);
 		}
-		body(-1) = oconv("Database:", l9) ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17);
-		body(-1) = oconv("Process:", l9) ^ SYSTEM.a(24);
+		body(-1) = oconv("Database:", l9) ^ SYSTEM.f(45).trim() ^ " " ^ SYSTEM.f(17);
+		body(-1) = oconv("Process:", l9) ^ SYSTEM.f(24);
 		body(-1) = oconv("Client:", l9) ^ STATION.trim();
 		//blank IP No indicates not in a web request
-		if (SYSTEM.a(40, 2)) {
-			body(-1) = oconv("IP No:", l9) ^ SYSTEM.a(40, 2);
+		if (SYSTEM.f(40, 2)) {
+			body(-1) = oconv("IP No:", l9) ^ SYSTEM.f(40, 2);
 		}
 		body(-1) = oconv("User:", l9) ^ username.trim();
 		if (userfullname and userfullname.trim().ucase() ne username) {
@@ -195,13 +195,13 @@ function main(in msg0, in subject0="", in username0="") {
 			}
 		}
 
-		var agent = SYSTEM.a(40, 6);
+		var agent = SYSTEM.f(40, 6);
 		if (agent) {
 
 			call htmllib2("OCONV.AGENT.OS", agent);
 			body(-1) = oconv("O/S:", l9) ^ agent;
 
-			agent = SYSTEM.a(40, 6);
+			agent = SYSTEM.f(40, 6);
 			call htmllib("OCONV.AGENT.BROWSER", agent);
 			body(-1) = oconv("Browser:", l9) ^ agent;
 
@@ -211,7 +211,7 @@ function main(in msg0, in subject0="", in username0="") {
 			body(-1) = oconv("@hw:", l9) ^ HW;
 		}
 
-		var temp = SYSTEM.a(132);
+		var temp = SYSTEM.f(132);
 		if (temp) {
 			SYSTEM(132) = "";
 		} else {
@@ -244,7 +244,7 @@ function main(in msg0, in subject0="", in username0="") {
 			body(-1) = oconv("Data:", l9) ^ temp;
 		}
 
-		var requeststarttime = SYSTEM.a(25);
+		var requeststarttime = SYSTEM.f(25);
 		if (requeststarttime) {
 			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(var().date(), requeststarttime);
 		}

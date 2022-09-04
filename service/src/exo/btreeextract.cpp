@@ -26,11 +26,11 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	if (false) print(dictfile);
 
 	//XREF should be able to do it all in one go
-	var fieldname = cmd.a(1, 1);
-	var parts = cmd.a(1, 2);
+	var fieldname = cmd.f(1, 1);
+	var parts = cmd.f(1, 2);
 	if (fieldname.substr(-4)=="XREF") {
 
-		parts = cmd.a(1).remove(1,1);
+		parts = cmd.f(1).remove(1,1);
 
 		//XREF sql was implemented as STARTING so ] was not required
 		parts.converter("]","");

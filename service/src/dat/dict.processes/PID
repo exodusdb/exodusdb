@@ -5,7 +5,7 @@ S
 
 
 
-	return RECORD.a(54, 5);
+	return RECORD.f(54, 5);
 R
 5
 

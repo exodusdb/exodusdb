@@ -9,7 +9,7 @@ M1
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");\
 	var nn = ANS.count(VM) + 1;\
 	for (const var ii : range(1, nn)) {\
-		var logindate = ANS.a(1, ii).floor();\
+		var logindate = ANS.f(1, ii).floor();\
 		if (logindate) {\
 			ANS(1, ii) = (var().date() - logindate).oconv("MD00P");\
 		}\

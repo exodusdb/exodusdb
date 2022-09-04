@@ -51,11 +51,11 @@ function main(in mode0) {
 		return 0;
 	}
 
-	if (mode.a(1) eq "SELECTANDLIST") {
+	if (mode.f(1) eq "SELECTANDLIST") {
 
 		//change to the user selected company
 		//merely to get the right letterhead
-		var compcode = mode.a(5);
+		var compcode = mode.f(5);
 		if (compcode) {
 			call initcompany(compcode);
 		}
@@ -71,10 +71,10 @@ function main(in mode0) {
 		gosub list();
 
 	//called from LOGIN.NET. not UI. UI calls SELECTANDLIST
-	} else if (mode.a(1) eq "WHATSNEW") {
+	} else if (mode.f(1) eq "WHATSNEW") {
 
-		var menucodes = mode.a(2);
-		mode = mode.a(1);
+		var menucodes = mode.f(2);
+		mode = mode.f(1);
 		ANS = "";
 
 		var users;
@@ -87,11 +87,11 @@ function main(in mode0) {
 
 			//backward compatible - can be deleted after all upgraded
 			//leave in case reloading ancient data
-			if (not(userrec.a(17))) {
+			if (not(userrec.f(17))) {
 				var changelogkey = "USER*" ^ USERNAME;
 				if (changelog.read(DEFINITIONS, changelogkey)) {
-					userrec(17) = changelog.a(8);
-					userrec.a(17).writev(users, USERNAME, 17);
+					userrec(17) = changelog.f(8);
+					userrec.f(17).writev(users, USERNAME, 17);
 
 					var("").writev(DEFINITIONS, changelogkey, 8);
 
@@ -100,11 +100,11 @@ function main(in mode0) {
 
 			//mode<2>=changelog<7>
 			//list all items in changelog since the EXODUS version in the user file
-			mode(3) = userrec.a(17);
+			mode(3) = userrec.f(17);
 
 			//fix a problem where people were missing most changes
 			//due to sv being represented as : eg user:support:technical
-			if (mode.a(3) and mode.a(3) lt 14773) {
+			if (mode.f(3) and mode.f(3) lt 14773) {
 				mode(3) = 14153;
 			}
 
@@ -122,7 +122,7 @@ function main(in mode0) {
 		gosub getcurrentversiondatetime();
 
 		//nothing to see if seen matches (or after?) currentversiondate
-		if (mode.a(3) ge currentversiondatetime) {
+		if (mode.f(3) ge currentversiondatetime) {
 			ANS = "";
 			return 0;
 		}
@@ -130,7 +130,7 @@ function main(in mode0) {
 		currentversiondatetime.writev(users, USERNAME, 17);
 
 		//build preferences from menus if not specified
-		if (not(mode.a(2))) {
+		if (not(mode.f(2))) {
 
 			//tt=capitalise(menucodes)
 			//swap 'Support' with 'Technical' in tt
@@ -177,24 +177,24 @@ function main(in mode0) {
 		}
 
 		//make a suitable output filename based on the responsefilename
-		var temp = PRIORITYINT.a(100);
+		var temp = PRIORITYINT.f(100);
 		temp.splicer(-1, 1, "htm");
 		SYSTEM(2) = temp;
 
 		//get new items in new filename and return the filename in @ans
 		gosub list();
-		ANS = SYSTEM.a(2);
+		ANS = SYSTEM.f(2);
 
 	//actually this is GETINSTALLEDVERSION DATES!
 	} else if (mode eq "GETVERSIONDATES") {
 
 		gosub getversiondates();
 
-	} else if (mode.a(1) eq "SELECT") {
+	} else if (mode.f(1) eq "SELECT") {
 
 		gosub select0();
 
-	} else if (mode.a(1) eq "LIST") {
+	} else if (mode.f(1) eq "LIST") {
 
 		gosub list();
 
@@ -210,7 +210,7 @@ subroutine select0() {
 	//get list of installed version dates
 	gosub getversiondates();
 
-	if (mode.a(3)) {
+	if (mode.f(3)) {
 		//data contains a list of installed version dates
 		//(not dates that upgrades were done!)
 		//get the first installed version date equal to or prior to the selected
@@ -218,9 +218,9 @@ subroutine select0() {
 		//locatebyusing() not available in c++
 		tt = data_;
 		tt.converter(FM, VM);
-		if (not(tt.locateby("AR", mode.a(3), versionn))) {
+		if (not(tt.locateby("AR", mode.f(3), versionn))) {
 			if (versionn gt 1) {
-				mode(3) = USER1.a(versionn - 1);
+				mode(3) = USER1.f(versionn - 1);
 			}
 		}
 	}
@@ -237,12 +237,12 @@ subroutine select() {
 
 	cmd = "SELECT CHANGELOG";
 	var andx = "";
-	if (USER1.a(1)) {
-		cmd ^= " WITH KEYWORD " ^ quote2(data_.a(1));
+	if (USER1.f(1)) {
+		cmd ^= " WITH KEYWORD " ^ quote2(data_.f(1));
 		andx = " AND";
 	}
-	if (USER1.a(2)) {
-		cmd ^= andx ^ " WITH DATE GE " ^ (data_.a(2).oconv("D4").quote());
+	if (USER1.f(2)) {
+		cmd ^= andx ^ " WITH DATE GE " ^ (data_.f(2).oconv("D4").quote());
 		andx = " AND";
 	}
 	if (USERNAME ne "EXODUS") {
@@ -276,16 +276,16 @@ subroutine list() {
 
 	var headingx = "What''s New in EXODUS";
 	gosub getcurrentversiondatetime();
-	if (data_.a(2)) {
+	if (data_.f(2)) {
 		//heading:=' version ':data<2> '[DATE,4*]':' -'
-		call daterangetext(USER1.a(2), currentversiondatetime, tt, sys.glang);
+		call daterangetext(USER1.f(2), currentversiondatetime, tt, sys.glang);
 		headingx ^= " : " ^ tt;
 	} else {
 		headingx ^= " Version : " ^ oconv(currentversiondatetime, "[DATE,4*]");
 	}
 
-	if (data_.a(1)) {
-		headingx ^= "'L'" ^ USER1.a(1);
+	if (data_.f(1)) {
+		headingx ^= "'L'" ^ USER1.f(1);
 		headingx.swapper(SVM, ", ");
 		headingx.swapper(VM, ", ");
 	}
@@ -399,7 +399,7 @@ subroutine getcurrentversiondatetime() {
 		if (temp eq "") {
 			temp = EXECPATH.osfile();
 			//19:05:55  18 NOV 2020
-			temp = temp.a(3).oconv("MTS") ^ " " ^ temp.a(2).oconv("D");
+			temp = temp.f(3).oconv("MTS") ^ " " ^ temp.f(2).oconv("D");
 		}
 	}
 	currentversiondatetime = temp.trim().field(" ", 2, 999).iconv("D");
@@ -415,7 +415,7 @@ subroutine getversiondates() {
 	var nn = versionlog.count(FM) + (versionlog ne "");
 	var versiondata = "";
 	for (const var ii : range(1, nn)) {
-		idate = versionlog.a(ii, 1).field(" ", 2, 3).iconv("D");
+		idate = versionlog.f(ii, 1).field(" ", 2, 3).iconv("D");
 		//itime=iconv(field(versionlog,' ',1),'MT')
 		if (not(versiondata.locateusing(FM, idate, xx))) {
 			versiondata(-1) = idate;

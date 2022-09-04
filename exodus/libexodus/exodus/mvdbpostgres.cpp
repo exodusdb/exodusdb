@@ -286,9 +286,9 @@ var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 // Normalise all alternative utf8 encodings of the same unicode points so they are identical
 var get_normal_filename(CVR filename_or_handle) {
-	//return filename_or_handle.a(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
+	//return filename_or_handle.f(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
 	// No longer convert . in filenames to _
-	return filename_or_handle.a(1).normalize().lcase();
+	return filename_or_handle.f(1).normalize().lcase();
 }
 
 // Detect sselect command words that are values like quoted words or plain numbers.
@@ -421,7 +421,7 @@ int get_mvconn_no(CVR dbhandle) {
 		// var("get_mvconn_no() returning 0 - unassigned").logputl();
 		return 0;
 	}
-	var mvconn_no = dbhandle.a(2);
+	var mvconn_no = dbhandle.f(2);
 	if (mvconn_no.isnum()) {
 		/// var("get_mvconn_no() returning " ^ mvconn_no).logputl();
 		return mvconn_no;
@@ -785,7 +785,7 @@ bool var::connect(CVR conninfo) {
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
-	if (not this->a(1))
+	if (not this->f(1))
 		//this->r(1,fullconninfo.field(" ",1));
 		this->r(1,fullconninfo.field2("dbname=",-1).field(" ",1));
 	this->r(2, mvconn_no);
@@ -864,7 +864,7 @@ bool var::attach(CVR filenames) {
 
 	//fail if anything not attached
 	if (notattached_filenames) {
-		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ (*this).a(1).quote();
+		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ (*this).f(1).quote();
 		this->lasterror(errmsg);
 		return false;
 	}
@@ -1117,7 +1117,7 @@ bool var::readv(CVR filehandle, CVR key, const int fieldno) {
 	if (!this->read(filehandle, key))
 		return false;
 
-	var_str = this->a(fieldno).var_str;
+	var_str = this->f(fieldno).var_str;
 	var_typ = VARTYP_STR;
 
 	return true;
@@ -2141,8 +2141,8 @@ bool var::deletefile(CVR filename) const {
 		//filename.errputl("::deletefile ==== Connection cache NONE    = ");
 	}
 
-	var sql = "DROP TABLE " ^ filename.a(1) ^ " CASCADE";
-	//var sql = "DROP TABLE IF EXISTS " ^ filename.a(1) ^ " CASCADE";
+	var sql = "DROP TABLE " ^ filename.f(1) ^ " CASCADE";
+	//var sql = "DROP TABLE IF EXISTS " ^ filename.f(1) ^ " CASCADE";
 
 	if (this->assigned())
 		return this->sqlexec(sql);
@@ -2156,7 +2156,7 @@ bool var::clearfile(CVR filename) const {
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
-	var sql = "DELETE FROM " ^ filename.a(1);
+	var sql = "DELETE FROM " ^ filename.f(1);
 	if (this->assigned())
 		return this->sqlexec(sql);
 	else
@@ -2239,7 +2239,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
 	//and their column names appended with a colon (:)
 	var stage2_calculated = fieldname[-1] == ":";
-	var stage2_filename = "SELECT_CURSOR_STAGE2_" ^ cursor.a(1);
+	var stage2_filename = "SELECT_CURSOR_STAGE2_" ^ cursor.f(1);
 
 	if (stage2_calculated) {
 		fieldname.popper();
@@ -2299,19 +2299,19 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		dictrec.r(8, stage2_calculated);
 	}
 
-	var dicttype = dictrec.a(1);
-	var fieldno = dictrec.a(2);
-	var conversion = dictrec.a(7);
+	var dicttype = dictrec.f(1);
+	var fieldno = dictrec.f(2);
+	var conversion = dictrec.f(7);
 
-	var isinteger = conversion == "[NUMBER,0]" || dictrec.a(11) == "0N" ||
-					dictrec.a(11).substr(1, 3) == "0N_";
+	var isinteger = conversion == "[NUMBER,0]" || dictrec.f(11) == "0N" ||
+					dictrec.f(11).substr(1, 3) == "0N_";
 	var isdecimal = conversion.substr(1, 2) == "MD" || conversion.substr(1, 7) == "[NUMBER" ||
-					dictrec.a(12) == "FLOAT" || dictrec.a(11).index("0N");
+					dictrec.f(12) == "FLOAT" || dictrec.f(11).index("0N");
 	//dont assume things that are R are numeric
 	//eg period 1/19 is right justified but not numeric and sql select will crash if ::float8 is used
-	//||dictrec.a(9) == "R";
-	var isnumeric = isinteger || isdecimal || dictrec.a(9) == "R";
-	var ismv1 = dictrec.a(4)[1] == "M";
+	//||dictrec.f(9) == "R";
+	var isnumeric = isinteger || isdecimal || dictrec.f(9) == "R";
+	var ismv1 = dictrec.f(4)[1] == "M";
 	var fromjoin = false;
 
 	var isdate = conversion[1] == "D" || conversion.substr(1, 5) == "[DATE";
@@ -2334,7 +2334,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				sqlexpression = get_fileexpression(mainfilename, filename, "key");
 
 			// Multipart key - extract relevent field based on "*" separator
-			var keypartn = dictrec.a(5);
+			var keypartn = dictrec.f(5);
 			if (keypartn) {
 				sqlexpression =
 					"split_part(" ^ sqlexpression ^ ", '*', " ^ keypartn ^ ")";
@@ -2386,13 +2386,13 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 	else if (dicttype == "S") {
 
-		var function_src = dictrec.a(8).trim();
+		var function_src = dictrec.f(8).trim();
 
 		var pgsql_pos = function_src.index("/" "*pgsql");
 
 		// sql expression available
 		///////////////////////////
-		sqlexpression = dictrec.a(17);
+		sqlexpression = dictrec.f(17);
 		if (sqlexpression) {
 			// return sqlexpression;
 		}
@@ -2461,7 +2461,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 		// Simple join using XLATE command but not on multivalued unless stage2
 		///////////////////////////////////////////////
-		// stage2_calculated="@ANS=XLATE(\"SELECT_CURSOR_STAGE2_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
+		// stage2_calculated="@ANS=XLATE(\"SELECT_CURSOR_STAGE2_" ^ this->f(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 		// expect things like
 		//@ans=xlate('ACCOUNTS',@record<8,@mv>,21,'X')
 		//@ans=xlate('ACCOUNTS',@record<2,1,2>,1,'X')
@@ -2470,7 +2470,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		//@ans=xlate('CURRENCIES',{CURRENCY_CODE},1,'X')
 		else if ((!ismv1 || stage2_calculated) && function_src.trimf("\t ").substr(1, 13).lcase() == "/" "/@ans=xlate(") {
 
-			function_src = function_src.a(1, 1).trimf("\t ");
+			function_src = function_src.f(1, 1).trimf("\t ");
 			function_src.splicer(1, 13, "");
 
 			// Hide comma in arg3 like <1,@mv>
@@ -2559,11 +2559,11 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			} else {
 				// throw  MVDBException("get_dictexpression() " ^
 				// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
-				// DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
+				// DICTIONARY EXPRESSION - " ^ dictrec.f(8).quote());
 				var("ERROR: mvdbpostgres get_dictexpression() " ^
 					filename.quote() ^ " " ^ fieldname.quote() ^
 					" - INVALID DICTIONARY EXPRESSION - " ^
-					dictrec.a(8).quote())
+					dictrec.f(8).quote())
 					.errputl();
 				return "";
 			}
@@ -2597,7 +2597,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				xlatetargetfilename ^ ".key = " ^ xlatekeyexpression;
 			// only allow one join per file for now.
 			// TODO allow multiple joins to the same file via different keys
-			if (!joins.a(joinsectionn).index(join_part1))
+			if (!joins.f(joinsectionn).index(join_part1))
 				joins.r(joinsectionn, -1, join_part1 ^ join_part2);
 
 			return sqlexpression;
@@ -2659,7 +2659,7 @@ exodus_call:
 		if (fieldname0[-1] == ":") {
 			var joinsectionn = 1;
 			var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
-			//if (!joins.a(joinsectionn).index(join))
+			//if (!joins.f(joinsectionn).index(join))
 			if (!joins.index(join))
 				joins.r(joinsectionn, -1, join);
 		}
@@ -2707,7 +2707,7 @@ exodus_call:
 
 				// dont include more than once, in case order by and filter on the same
 				// field
-				if (!selects.a(1).index(sqlexpression))
+				if (!selects.f(1).index(sqlexpression))
 					selects ^= ", " ^ sqlexpression;
 			} else {
 
@@ -2715,13 +2715,13 @@ exodus_call:
 				if (fieldname0[-1] == ":") {
 					var joinsectionn = 1;
 					var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
-					//if (!joins.a(joinsectionn).index(join))
+					//if (!joins.f(joinsectionn).index(join))
 					if (!joins.index(join))
 						joins.r(joinsectionn, -1, join);
 				}
 
 				// insert with SMs since expression can contain VMs
-				if (!unnests.a(2).locate(fieldname)) {
+				if (!unnests.f(2).locate(fieldname)) {
 					unnests.r(2, -1, fieldname);
 					unnests.r(3, -1, sqlexpression);
 				}
@@ -2959,7 +2959,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// filename can be omitted if calling like filename.select(...) or filehandle.select(...)
 	// nnn is optional limit to number of records returned
 	// TODO only convert \t\r\n outside single and double quotes
-	//var remaining = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
+	//var remaining = sortselectclause.f(1).convert("\t\r\n", "   ").trim();
 	var remaining = sortselectclause.convert("\t\r\n", "   ").trim();
 
 	// remaining.logputl("remaining=");
@@ -3096,7 +3096,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (dictexpression.index("exodus_call"))
 			//if (dictexpression == "true")
 			{
-				if (!calc_fields.a(1).locate(dictid)) {
+				if (!calc_fields.f(1).locate(dictid)) {
 					//++ncalc_fields;
 					calc_fields.r(1, -1, dictid);
 				}
@@ -3258,7 +3258,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 					//prevent WITH XXX appearing twice in the same sort/select clause
 					//unless and until implementeda
-					if (calc_fields.a(2, calc_fieldn))
+					if (calc_fields.f(2, calc_fieldn))
 						throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 
 					calc_fields.r(2, calc_fieldn, opid);
@@ -3513,9 +3513,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//calc_fields.r(1,ncalc_fields,dictid);
 				//calc_fields.r(2,ncalc_fields,op);
 				//calc_fields.r(3,ncalc_fields,value);
-				//dictid = calc_fields.a(1,n);
-				//op     = calc_fields.a(2,n);
-				//values  = calc_fields.a(3,n);
+				//dictid = calc_fields.f(1,n);
+				//op     = calc_fields.f(2,n);
+				//values  = calc_fields.f(3,n);
 
 				//almost identical code for exodus_call above/below
 				var calc_fieldn;
@@ -3523,7 +3523,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					//++ncalc_fields;
 					calc_fields.r(1, calc_fieldn, dictid);
 				}
-				if (calc_fields.a(2, calc_fieldn))
+				if (calc_fields.f(2, calc_fieldn))
 					throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 
 				//save the op
@@ -3914,7 +3914,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var listname = "";
 	// see also listname below
 	//	if (this->hasnext()) {
-	//		listname=this->a(1) ^ "_" ^ getprocessn() ^ "_tempx";
+	//		listname=this->f(1) ^ "_" ^ getprocessn() ^ "_tempx";
 	//		this->savelist(listname);
 	//		var savelistfilename="savelist_" ^ listname;
 	//		joins ^= " \nINNER JOIN\n " ^ savelistfilename ^ " ON " ^ actualfilename ^
@@ -3941,10 +3941,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	//selecting dict files would trigger this
 	//TRACE(*this)
 	//TRACE(actualfilename)
-	if (not this->a(2) || actualfilename.lcase().starts("dict.")) {
+	if (not this->f(2) || actualfilename.lcase().starts("dict.")) {
 		var actualfile;
 		if (actualfile.open(actualfilename))
-			this->r(2, actualfile.a(2));
+			this->r(2, actualfile.f(2));
 		//TRACE(actualfile)
 	}
 	//TRACE(*this)
@@ -3952,7 +3952,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	if (this->hasnext()) {
 
 		//create a temporary sql table to hold the preselected keys
-		var temptablename = "SELECT_CURSOR_" ^ this->a(1);
+		var temptablename = "SELECT_CURSOR_" ^ this->f(1);
 		//var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 		//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		var createtablesql = "CREATE TEMPORARY TABLE IF NOT EXISTS " ^ temptablename ^ "\n";
@@ -3970,7 +3970,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.swap("'", "''") ^ "')");
 		}
 
-		if (this->a(3))
+		if (this->f(3))
 			debug();
 		//must be empty!
 
@@ -3984,7 +3984,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// var sql="DECLARE cursor1_" ^ (*this) ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
 	// ^ " FROM ";
 	//TRACE(*this);
-	var sql = "DECLARE\n cursor1_" ^ this->a(1).convert(".", "_") ^ " SCROLL CURSOR WITH HOLD FOR";
+	var sql = "DECLARE\n cursor1_" ^ this->f(1).convert(".", "_") ^ " SCROLL CURSOR WITH HOLD FOR";
 
 	//SELECT - field/column names
 	sql ^= " \nSELECT\n " ^ actualfieldnames;
@@ -3995,26 +3995,26 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	sql ^= " \nFROM\n " ^ actualfilename;
 
 	//JOIN - (1)?
-	if (joins.a(1))
-		sql ^= " " ^ joins.a(1).convert(VM, "\n");
+	if (joins.f(1))
+		sql ^= " " ^ joins.f(1).convert(VM, "\n");
 
 	//UNNEST - mv fields
 	//mv fields get added to the FROM clause like "unnest() as xyz" allowing the use of xyz in WHERE/ORDER BY
 	//should only be one unnest (parallel mvs if more than one) since it is not clear how sselect by mv by mv2 should work if they are not in parallel
 	if (unnests) {
 		// unnest
-		sql ^= ",\n unnest(\n  " ^ unnests.a(3).swap(VM, ",\n  ") ^ "\n )";
+		sql ^= ",\n unnest(\n  " ^ unnests.f(3).swap(VM, ",\n  ") ^ "\n )";
 		// as fake tablename
 		sql ^= " with ordinality as mvtable1";
 		// brackets allow providing column names for use elsewhere
 		// and renaming of automatic column "ORDINAL" to "mv" for use in SELECT key,mv ...
 		// sql statement
-		sql ^= "( " ^ unnests.a(2).swap(VM, ", ") ^ ", mv)";
+		sql ^= "( " ^ unnests.f(2).swap(VM, ", ") ^ ", mv)";
 	}
 
 	//JOIN - related files
-	if (joins.a(2))
-		sql ^= " " ^ joins.a(2).convert(VM, "");
+	if (joins.f(2))
+		sql ^= " " ^ joins.f(2).convert(VM, "");
 
 	//WHERE - excludes calculated fields if doing stage 1 of a two stage sort/select
 	//TODO when doing stage2, skip "WITH/WITHOUT xxx" of stage1 fields
@@ -4046,9 +4046,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		sql ^= "CLOSE cursor1_";
 
 		if (this->assigned()) {
-			var cursorcode = this->a(1).convert(".", "_");
+			var cursorcode = this->f(1).convert(".", "_");
 			sql ^= cursorcode;
-			var cursorid = this->a(2) ^ "_" ^ cursorcode;
+			var cursorid = this->f(2) ^ "_" ^ cursorcode;
 			thread_mvresults.erase(cursorid);
 		}
 
@@ -4098,7 +4098,7 @@ void var::clearselect() {
 
 	/// if readnext through string
 	//3/4/5/6 setup in makelist. cleared in clearselect
-	//if (this->a(3) == "%MAKELIST%")
+	//if (this->f(3) == "%MAKELIST%")
 	{
 		this->r(6, "");
 		this->r(5, "");
@@ -4126,7 +4126,7 @@ void var::clearselect() {
 	//delete any temporary sql table created to hold preselected keys
 	//if (this->assigned())
 	//{
-	//	var temptablename="PRESELECT_CURSOR_" ^ this->a(1);
+	//	var temptablename="PRESELECT_CURSOR_" ^ this->f(1);
 	//	var deletetablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//	if (!this->sqlexec(deletetablesql, errors))
 	//	{
@@ -4137,8 +4137,8 @@ void var::clearselect() {
 	//}
 
 	//if (this->assigned())
-	var cursorcode = this->a(1).convert(".", "_");
-	var cursorid = this->a(2) ^ "_" ^ cursorcode;
+	var cursorcode = this->f(1).convert(".", "_");
+	var cursorid = this->f(2) ^ "_" ^ cursorcode;
 
 	// Clean up cursor cache
 	thread_mvresults.erase(cursorid);
@@ -4167,8 +4167,8 @@ void var::clearselect() {
 //bool readnextx(CVR cursor, PGresult* pgresult, PGconn* pgconn, int  nrows, int* rown) {
 bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, int* rown) {
 
-	var cursorcode = cursor.a(1).convert(".", "_");
-	var cursorid = cursor.a(2) ^ "_" ^ cursorcode;
+	var cursorcode = cursor.f(1).convert(".", "_");
+	var cursorid = cursor.f(2) ^ "_" ^ cursorcode;
 
 	MVresult* mvresult = nullptr;
 	auto entry = thread_mvresults.find(cursorid);
@@ -4484,7 +4484,7 @@ bool var::formlist(CVR keys, CVR fieldno) {
 
 	//optional field extract
 	if (fieldno)
-		record = record.a(fieldno).converter(VM, FM);
+		record = record.f(fieldno).converter(VM, FM);
 
 	this->makelist("", record);
 
@@ -4554,12 +4554,12 @@ bool var::hasnext() {
 
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
-	var listid = this->a(3);
+	var listid = this->f(3);
 	if (listid) {
-		var keyno = this->a(5);
+		var keyno = this->f(5);
 		keyno++;
 
-		var key_and_mv = this->a(6, keyno);
+		var key_and_mv = this->f(6, keyno);
 
 		// true if we have another key
 		if (key_and_mv.length())
@@ -4573,7 +4573,7 @@ bool var::hasnext() {
 		if (!lists.open("LISTS"))
 			throw MVDBException("hasnext() LISTS file cannot be opened");
 
-		var listno = this->a(4);
+		var listno = this->f(4);
 		listno++;
 		listid.fieldstorer("*", 2, 1, listno);
 
@@ -4666,7 +4666,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
-	var listid = this->a(3);
+	var listid = this->f(3);
 	if (listid) {
 
 		if (DBTRACE)
@@ -4674,10 +4674,10 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 
 		record = "";
 		while (true) {
-			var keyno = this->a(5);
+			var keyno = this->f(5);
 			keyno++;
 
-			var key_and_mv = this->a(6, keyno);
+			var key_and_mv = this->f(6, keyno);
 
 			// if no more keys, try to get next block of keys, otherwise return false
 			if (key_and_mv.length() == 0) {
@@ -4695,7 +4695,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 				if (!lists.open("LISTS"))
 					throw MVDBException("readnext() LISTS file cannot be opened");
 
-				var listno = this->a(4);
+				var listno = this->f(4);
 				listno++;
 				listid.fieldstorer("*", 2, 1, listno);
 
@@ -4718,8 +4718,8 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 			this->r(5, keyno);
 
 			// extract and return the key (and mv if present)
-			key = key_and_mv.a(1, 1, 1);
-			valueno = key_and_mv.a(1, 1, 2);
+			key = key_and_mv.f(1, 1, 1);
+			valueno = key_and_mv.f(1, 1, 2);
 			return true;
 		}
 	}
@@ -4816,7 +4816,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	//mv fields return in unnests, not dictexpression
 	//if (unnests)
 	//{
-	//	//dictexpression = unnests.a(3);
+	//	//dictexpression = unnests.f(3);
 	//	unnests.convert(FM,"^").logputl("unnests=");
 	//}
 
@@ -4984,8 +4984,8 @@ bool var::cursorexists() {
 	// default cursor is ""
 	this->unassigned("");
 
-	var cursorcode = this->a(1).convert(".", "_");
-	var cursorid = this->a(2) ^ "_" ^ cursorcode;
+	var cursorcode = this->f(1).convert(".", "_");
+	var cursorid = this->f(2) ^ "_" ^ cursorcode;
 
 	// true if exists in cursor cache
 	if (thread_mvresults.find(cursorid) != thread_mvresults.end())
@@ -5013,7 +5013,7 @@ var var::listindexes(CVR filename0, CVR fieldname0) const {
 	ISSTRING(filename0)
 	ISSTRING(fieldname0)
 
-	var filename = filename0.a(1);
+	var filename = filename0.f(1);
 	var fieldname = fieldname0.convert(".", "_");
 
 	// TODO for some reason doesnt return the exodus index_file__fieldname records
@@ -5056,7 +5056,7 @@ var var::listindexes(CVR filename0, CVR fieldname0) const {
 				tt = indexname.index("__");
 				if (tt) {
 					indexname.substrer(8, 999999).swapper("__", VM);
-					if (fieldname && indexname.a(1, 2) != lc_fieldname)
+					if (fieldname && indexname.f(1, 2) != lc_fieldname)
 						continue;
 
 					// indexnames^=FM^indexname;
@@ -5086,7 +5086,7 @@ var var::reccount(CVR filename0) const {
 		this->flushindex(filename);
 
 	var sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '";
-	sql ^= filename.a(1).lcase();
+	sql ^= filename.f(1).lcase();
 	sql ^= "';";
 
 	auto pgconn = get_pgconnection(filename);
@@ -5120,7 +5120,7 @@ var var::flushindex(CVR filename) const {
 	var sql = "VACUUM";
 	if (filename)
 		// attribute 1 in case passed a filehandle instead of just filename
-		sql ^= " " ^ filename.a(1).lcase();
+		sql ^= " " ^ filename.f(1).lcase();
 	sql ^= ";";
 	// sql.logputl("sql=");
 

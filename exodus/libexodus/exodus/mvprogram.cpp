@@ -66,7 +66,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	}
 
 	//we are done if there are no calculated fields!
-	var calc_fields = CURSOR.a(10);
+	var calc_fields = CURSOR.f(10);
 	if (!calc_fields) {
 		return true;
 		////////////
@@ -95,7 +95,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//debug
 	//calc_fields.convert(FM^VM^SM,"   ").outputl("calc=");
 
-	var dictfilename = calc_fields.a(5, 1);
+	var dictfilename = calc_fields.f(5, 1);
 
 	//debugging
 	var calc_fields_file = "";
@@ -116,7 +116,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//CREATE TABLE SELECT_STAGE2(
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
-	var temptablename = "SELECT_CURSOR_STAGE2_" ^ CURSOR.a(1);
+	var temptablename = "SELECT_CURSOR_STAGE2_" ^ CURSOR.f(1);
 	var createtablesql = "";
 	createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
@@ -133,7 +133,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//UPLOADS=''
 	//AUTHORISED<>''
 	//DEADLINE<='10/6/2019'
-	int nfields = calc_fields.a(1).dcount(VM);
+	int nfields = calc_fields.f(1).dcount(VM);
 	dim dictids(nfields);
 	dim opnos(nfields);
 	dim reqivalues(nfields);
@@ -145,12 +145,12 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//dictids
 
-		var dictid = calc_fields.a(1, fieldn);
+		var dictid = calc_fields.f(1, fieldn);
 
 		var dictrec;
 		if (not dictrec.reado(DICT,dictid))
 			dictrec="";
-		ioconvs(fieldn) = dictrec.a(7);
+		ioconvs(fieldn) = dictrec.f(7);
 
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
@@ -163,9 +163,9 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//ops
 
-		var ovalue = calc_fields.a(3, fieldn).convert(SM, VM).unquote();
+		var ovalue = calc_fields.f(3, fieldn).convert(SM, VM).unquote();
 
-		var op = calc_fields.a(2, fieldn);
+		var op = calc_fields.f(2, fieldn);
 
 		//multivalued selections are not well supported from mvdbpostgresql. handle the obvious cases"
 		if (ovalue.index(VM)) {
@@ -191,7 +191,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 			//ovalue.convert(VM,"]").outputl("ovalue=");
 		}
 
-		var ovalue2 = calc_fields.a(4, fieldn).unquote();
+		var ovalue2 = calc_fields.f(4, fieldn).unquote();
 
 		//iconv
 		var ivalue;
@@ -268,7 +268,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	} else
 		baseinsertsql = "";
 
-	int maxnrecs = calc_fields.a(6);
+	int maxnrecs = calc_fields.f(6);
 	int recn = 0;
 
 	//nextrecord:
@@ -521,7 +521,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 
 	// Complex deleterecord command
 
-	var command = filename_or_handle_or_command.a(1);
+	var command = filename_or_handle_or_command.f(1);
 
 	var filename = command.field(" ", 1);
 
@@ -655,7 +655,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options) const {
 // mssg 4
 void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) const {
 
-	var interactive = !SYSTEM.a(33);
+	var interactive = !SYSTEM.f(33);
 	if (interactive)
 		std::cout << var("----------------------------------------") << std::endl;
 
@@ -671,7 +671,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 
 	//swap %1, %2 etc with params
 	for (var ii = 1; ii <= 9; ++ii)
-		msg1.swapper("%" ^ ii, params.a(ii));
+		msg1.swapper("%" ^ ii, params.f(ii));
 
 	msg1.converter(_FM_ _VM_ "|", "\n\n\n").trimmer("\n");
 
@@ -822,7 +822,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	}
 
 	// find the task
-	if (SECURITY.a(10).locate(task, taskn)) {
+	if (SECURITY.f(10).locate(task, taskn)) {
 		if (deleting) {
 			// SECURITY.eraser(10, taskn);
 			// SECURITY.eraser(11, taskn);
@@ -833,7 +833,7 @@ updateprivs:
 			return 1;
 		} else if (renaming) {
 			// delete any existing rename target task
-			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
+			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
 				// SECURITY.eraser(10, taskn2);
 				// SECURITY.eraser(11, taskn2);
 				SECURITY.remover(10, taskn2);
@@ -849,8 +849,8 @@ updateprivs:
 			goto updateprivs;
 		} else if (updating) {
 			var tt = defaultlock;
-			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
-				tt = SECURITY.a(11, taskn2);
+			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
+				tt = SECURITY.f(11, taskn2);
 			}
 			SECURITY.r(11, taskn, tt);
 			goto updateprivs;
@@ -869,12 +869,12 @@ updateprivs:
 			// if (SECURITY.length() < 65000) {
 			if (true) {
 				var x = var();
-				if (not(SECURITY.a(10).locateby("A", task, taskn))) {
+				if (not(SECURITY.f(10).locateby("A", task, taskn))) {
 					var newlock = defaultlock;
 					// get locks on default task if present otherwise new locks
 					// are none
-					if (newlock and SECURITY.a(10).locate(newlock)) {
-						newlock = SECURITY.a(11, xx);
+					if (newlock and SECURITY.f(10).locate(newlock)) {
+						newlock = SECURITY.f(11, xx);
 					}
 					SECURITY.inserter(10, taskn, task);
 					SECURITY.inserter(11, taskn, newlock);
@@ -888,7 +888,7 @@ updateprivs:
 	}
 
 	// if no locks then pass ok unless positive locking required
-	var locks = SECURITY.a(11, taskn);
+	var locks = SECURITY.f(11, taskn);
 	if (locks == "") {
 		if (positive and not isadmin) {
 notallowed:
@@ -919,10 +919,10 @@ notallowed:
 
 	// find the user (add to bottom if not found)
 	// surely this is not necessary since users are in already
-	if (not(SECURITY.a(1).locate(username, usern))) {
+	if (not(SECURITY.f(1).locate(username, usern))) {
 		if (username != "EXODUS" and username != APPLICATION) {
 			gosub readuserprivs();
-			usern = (SECURITY.a(1)).count(VM) + (SECURITY.a(1) != "") + 1;
+			usern = (SECURITY.f(1)).count(VM) + (SECURITY.f(1) != "") + 1;
 			if (SECURITY.length() < 65000) {
 				var users;
 				if (not(users.open("USERS"))) {
@@ -942,7 +942,7 @@ notallowed:
 
 	// user must have all the keys for all the locks on this task
 	// following users up to first blank line also have the same keys
-	var keys = SECURITY.a(2).field(VM, usern, 999);
+	var keys = SECURITY.f(2).field(VM, usern, 999);
 	var temp = keys.index("---", 1);
 	if (temp) {
 		keys.splicer(temp - 1, 999, "");
@@ -1286,14 +1286,14 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 
 	var dictfile;
 	if (not is_fieldno) {
-		if (not dictfile.open("dict." ^ filename.a(1))) {
+		if (not dictfile.open("dict." ^ filename.f(1))) {
 			throw MVError("ExodusProgramBase::xlate(filename:" ^ filename ^ ", key:" ^ key ^ ",field:" ^ fieldno_or_name ^ ") - dict." ^ filename ^ " does not exist.");
 		}
 	}
 
 	for (var keyn = 1; keyn <= nkeys; ++keyn) {
 
-		var keyx = key.a(1, keyn);
+		var keyx = key.f(1, keyn);
 
 		// if ordinary numeric or "" fieldno
 		if (is_fieldno) {
@@ -1376,7 +1376,7 @@ var ExodusProgramBase::calculate(CVR dictid) {
 	// or call the right library
 	bool indictvoc = false;
 	bool newlibfunc = false;
-	std::string curr_dictid = std::string(dictid) + _RM_ + DICT.a(1).toString();
+	std::string curr_dictid = std::string(dictid) + _RM_ + DICT.f(1).toString();
 	if (cached_dictid_ != curr_dictid) {
 		cached_dictid_ = "";
 		newlibfunc = true;
@@ -1396,7 +1396,7 @@ var ExodusProgramBase::calculate(CVR dictid) {
 baddict:
 					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
-								  DICT.a(1).quote() ^ " nor in dict.voc");
+								  DICT.f(1).quote() ^ " nor in dict.voc");
 				}
 				if (not cached_dictrec_.reado(dictvoc, dictid)) {
 					// try lower case
@@ -1417,31 +1417,31 @@ baddict:
 
 		//detect from the cached record if it came from dict.voc
 		//so we can choose the libdict_voc if so
-		indictvoc = cached_dictrec_.a(16);
+		indictvoc = cached_dictrec_.f(16);
 
 	}
 
-	var dicttype = cached_dictrec_.a(1);
-	bool ismv = cached_dictrec_.a(4)[1] == "M";
+	var dicttype = cached_dictrec_.f(1);
+	bool ismv = cached_dictrec_.f(4)[1] == "M";
 
 	// F type dictionaries
 	if (dicttype == "F") {
 
 		// check field number is numeric
-		var fieldno = cached_dictrec_.a(2);
+		var fieldno = cached_dictrec_.f(2);
 		if (!fieldno.isnum())
 			return "";
 
 		// field no > 0
 		if (fieldno) {
 			if (ismv)
-				return RECORD.a(fieldno, MV);
+				return RECORD.f(fieldno, MV);
 			else
-				return RECORD.a(fieldno);
+				return RECORD.f(fieldno);
 
 			// field no 0
 		} else {
-			var keypart = cached_dictrec_.a(5);
+			var keypart = cached_dictrec_.f(5);
 			if (keypart && keypart.isnum())
 				return ID.field("*", keypart);
 			else
@@ -1454,7 +1454,7 @@ baddict:
 			if (indictvoc)
 				libname = "dict_voc";
 			else
-				libname = DICT.a(1).lcase().convert(".", "_").toString();
+				libname = DICT.f(1).lcase().convert(".", "_").toString();
 
 			// get from cache
 			std::string functorcachekey = dictid.lcase().toString() + "_" + libname;
@@ -1575,7 +1575,7 @@ var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const i
 	var question = questionx;
 	question.converter(STM ^ TM ^ SM ^ VM ^ "|" ^ FM, "\n\n\n\n\n\n");
 
-	var interactive = !SYSTEM.a(33);
+	var interactive = !SYSTEM.f(33);
 	if (interactive)
 		std::cout << var("========================================") << std::endl;
 
@@ -1592,7 +1592,7 @@ var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const i
 			std::cout << "*";
 		else
 			std::cout << " ";
-		std::cout << optionn << ". " << options.a(optionn) << std::endl;
+		std::cout << optionn << ". " << options.f(optionn) << std::endl;
 	}
 
 inp:
@@ -1634,7 +1634,7 @@ inp:
 		throw MVError(questionx ^ " Default reply must be 0-" ^ noptions);
 	}
 
-	return options.a(reply);
+	return options.f(reply);
 }
 
 // savescreen
@@ -1723,7 +1723,7 @@ lock:
 
 	// Fail if global terminate or reload requested
 	if (TERMINATE_req or RELOAD_req) {
-		var("").errputl("Lock request for " ^ file.a(1).quote() ^ ", " ^ keyx.quote() ^ " failed because 'terminate' or 'reload' requested.");
+		var("").errputl("Lock request for " ^ file.f(1).quote() ^ ", " ^ keyx.quote() ^ " failed because 'terminate' or 'reload' requested.");
 		return false;
 	}
 
@@ -1736,7 +1736,7 @@ lock:
 		var leaselocks;
 		if (leaselocks.open("LOCKS", file)) {
 
-			var filename_for_locks = (filename.assigned() && filename) ? filename : file.a(1);
+			var filename_for_locks = (filename.assigned() && filename) ? filename : file.f(1);
 			var lockfilekey = filename_for_locks ^ "*" ^ keyx;
 
 			var lockrec;
@@ -1749,7 +1749,7 @@ lock:
 				dostime = 24837 + var().date() + dostime / 24 / 3600;
 
 				//remove lock if expired
-				if (lockrec.a(1) <= dostime) {
+				if (lockrec.f(1) <= dostime) {
 					leaselocks.deleterecord(lockfilekey);
 					lockrec = "";
 				}
@@ -1771,7 +1771,7 @@ lock:
 		if (waitsecs) {
 
 			if ((waitsecs0 - waitsecs) >  30)
-	            var("").errputl("Locking file : " ^ file.a(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
+	            var("").errputl("Locking file : " ^ file.f(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
 
 			var().ossleep(1000);
 			waitsecs -= 1;
@@ -1939,11 +1939,11 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 	if (username == "EXODUS") {
 		menuid = "ADAGENCY";
 	} else {
-		if (!(SECURITY.a(1).locate(username, usern))) {
+		if (!(SECURITY.f(1).locate(username, usern))) {
 			msg = "Error: " ^ username.quote() ^ " user is missing";
 			return false;
 		}
-		menuid = SECURITY.a(3, usern);
+		menuid = SECURITY.f(3, usern);
 	}
 
 	var menu = "";
@@ -1962,10 +1962,10 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 		return false;
 	}
 
-	var menucodes = menu.a(6) ^ VM ^ "HELP";
+	var menucodes = menu.f(6) ^ VM ^ "HELP";
 	// remove local support menu
 	if (!authorised("SUPPORT MENU ACCESS", msg, "LS")) {
-		if (menucodes.a(1).locate("GENERA", menun))
+		if (menucodes.f(1).locate("GENERA", menun))
 			// menucodes.eraser(1, menun, 0);
 			menucodes.remover(1, menun, 0);
 	}
@@ -1993,13 +1993,13 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 
 	 if (APPLICATION ne "ACCOUNTS") {
 	 for (int ii = 1; ii <= 9999; ii++) {
-	 compcode = temp.a(ii);
+	 compcode = temp.f(ii);
 	 //until validcode('company',compcode)
 	 //BREAK;
 	 if (validcode2(compcode, "", "")) break;;
 	 };//ii;
 	 }else{
-	 compcode = temp.a(1);
+	 compcode = temp.f(1);
 	 }
 
 	 if (!compcode) {
@@ -2017,7 +2017,7 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 	 initcompany(compcode);
 
 	 force error here TODO: check trigraph following;
-	 var defmarketcode = (company.a(30)) ? (company.a(30)) : (agp.a(37));
+	 var defmarketcode = (company.f(30)) ? (company.f(30)) : (agp.f(37));
 	 //if unassigned(markets) then markets=''
 
 	 //markets is not open in finance only module
@@ -2037,7 +2037,7 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 	 cookie ^= "&bf=" ^ USER2;
 	 cookie ^= "&mk=" ^ defmarketcode;
 	 cookie ^= "&mc=" ^ maincurrcode;
-	 temp = SYSTEM.a(23);
+	 temp = SYSTEM.f(23);
 	 temp.swap("&", " and ");
 	 cookie ^= "&db=" ^ temp;
 
@@ -2110,7 +2110,7 @@ var ExodusProgramBase::AT(const int columnno) const {
 
 // handlefilename
 var ExodusProgramBase::handlefilename(CVR handle) {
-	return handle.a(1);
+	return handle.f(1);
 }
 
 //// memspace
@@ -2122,7 +2122,7 @@ var ExodusProgramBase::handlefilename(CVR handle) {
 var ExodusProgramBase::getuserdept(CVR usercode) {
 	// locate the user in the list of users
 	var usern;
-	if (!(SECURITY.a(1).locate(usercode, usern))) {
+	if (!(SECURITY.f(1).locate(usercode, usern))) {
 		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return ANS;
@@ -2133,17 +2133,17 @@ var ExodusProgramBase::getuserdept(CVR usercode) {
 	}
 
 	// locate divider, or usern+1
-	var nusers = (SECURITY.a(1)).count(VM) + 1;
+	var nusers = (SECURITY.f(1)).count(VM) + 1;
 	var usernx;
 	for (usernx = 1; usernx <= nusers; usernx++) {
 		// BREAK;
-		if (SECURITY.a(1, usernx) == "---")
+		if (SECURITY.f(1, usernx) == "---")
 			break;
 		;
 	};	// usern;
 
 	// get the department code
-	ANS = SECURITY.a(1, usernx - 1);
+	ANS = SECURITY.f(1, usernx - 1);
 
 	return ANS;
 }
@@ -2597,15 +2597,15 @@ void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 
 	var nfns = fns.count(VM) + 1;
 
-	var sortfn = fns.a(1, 1);
-	var unsorted = array.a(sortfn);
+	var sortfn = fns.f(1, 1);
+	var unsorted = array.f(sortfn);
 	var sorted = "";
 
 	//insert into a new array without other fields for speed
 	var newarray = "";
 	var nv = unsorted.count(VM) + (unsorted ne "");
 	for (var vn = 1; vn <= nv; ++vn) {
-		var value = unsorted.a(1, vn);
+		var value = unsorted.f(1, vn);
 		if (not(sorted.locateby(orderby, value, newvn))) {
 			{
 			}
@@ -2614,8 +2614,8 @@ void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 
 		//insert any parallel fields
 		for (var fnn = 2; fnn <= nfns; ++fnn) {
-			fn = fns.a(1, fnn);
-			var othervalue = array.a(fn, vn);
+			fn = fns.f(1, fnn);
+			var othervalue = array.f(fn, vn);
 			newarray.inserter(fn, newvn, othervalue);
 		};	//fnn;
 
@@ -2625,8 +2625,8 @@ void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 
 	//put any parallel fields back into the original array
 	for (var fnn = 2; fnn <= nfns; ++fnn) {
-		fn = fns.a(1, fnn);
-		array.r(fn, newarray.a(fn));
+		fn = fns.f(1, fnn);
+		array.r(fn, newarray.f(fn));
 	}  //fnn;
 
 	return;

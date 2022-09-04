@@ -121,7 +121,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 		//for (const var filen : range(1, 9999)) {
 		for (var filename : filenamesx) {
-			//filename = filenamesx.a(filen);
+			//filename = filenamesx.f(filen);
 			///BREAK;
 			if (not filename) break;
 			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
@@ -129,19 +129,19 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					tt.swapper("\r\n", FM);
 					tt.converter("\r\n", FM ^ FM);
 					//dont start if there is a database stop command
-					if (not((tt.a(1).lcase() ^ ".end").osfile())) {
-						if (tt.a(5)) {
-							//var cmd = "CMD /C START EXODUS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
+					if (not((tt.f(1).lcase() ^ ".end").osfile())) {
+						if (tt.f(5)) {
+							//var cmd = "CMD /C START EXODUS.JS /system " ^ tt.f(5) ^ " /database " ^ tt.f(1) ^ " /pid " ^ tt.f(6);
 
 							//TRACE: tt="tamra2^EXODUS^^^ADAGENCY^/root/hosts/tamra/data/tamra2/~4025798^"
 							//TRACE: osgetenv("EXO_SERVICE_CODE")="agy_live@tamra"
 
-							//var application = tt.a(5).substr(1,3).lcase();
+							//var application = tt.f(5).substr(1,3).lcase();
 							var app_code = osgetenv("EXO_SERVICE_CODE").field("_",1);
 							if (not app_code)
 								app_code = osgetenv("APP_CODE");
 
-							var database = tt.a(1);
+							var database = tt.f(1);
 							var mode="live";
 							if (database.ends("_test")) {
 								mode = "test";
@@ -184,7 +184,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		//delete files older than x
 		ageinsecs = request4;
 		if (not ageinsecs) {
-			ageinsecs = SYSTEM.a(28);
+			ageinsecs = SYSTEM.f(28);
 		}
 		if (ageinsecs eq "") {
 			ageinsecs = 60 * 60;
@@ -207,7 +207,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 		//detect system parameter changes and restart
 		//this has the effect of detecting corruption in system which inserts lines
-		var s100 = SYSTEM.a(100);
+		var s100 = SYSTEM.f(100);
 		var exohome=osgetenv("EXO_HOME");
 		var ospaths = "../../system.cfg,system.cfg";
 		ospaths ^= "," ^ exohome ^ "/dat/";
@@ -216,8 +216,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		for (const var ii : range(1, npaths)) {
 			var ospath = ospaths.field(",",ii);
 			//order is significant
-			var newtime = (ospath[-1] eq OSSLASH) ? ospath.osdir().a(3) : ospath.osfile().a(3);
-			var oldtime = s100.a(1, ii);
+			var newtime = (ospath[-1] eq OSSLASH) ? ospath.osdir().f(3) : ospath.osfile().f(3);
+			var oldtime = s100.f(1, ii);
 			if (newtime ne oldtime) {
 				if (oldtime) {
 					ANS = "RESTART " ^ ospath;
@@ -234,8 +234,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			var listen;
 			if (listen.read(gbp, "$LISTEN")) {
 				listen = field2(listen, FM, -1);
-				if (s100.a(1, 3)) {
-					if (s100.a(1, 3) ne listen) {
+				if (s100.f(1, 3)) {
+					if (s100.f(1, 3) ne listen) {
 						//this will only restart listen, not the whole process/thread
 						ANS = "RESTART $LISTEN";
 						return 0;
@@ -277,15 +277,15 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		//3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
 		//               > install in all active EXODUS database and installations
 		var patchcode = "NEOPATCH";
-		var patchdirs = "../DATA/" ^ SYSTEM.a(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
+		var patchdirs = "../DATA/" ^ SYSTEM.f(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
 		patchdirs.converter("/", OSSLASH);
 
 		for (const var patchn : range(1, 3)) {
 
 			//skip if no patch file or not dated today
-			var patchfilename = patchdirs.a(patchn) ^ patchcode ^ ".1";
+			var patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
 			var patchfileinfo = patchfilename.osfile();
-			if (patchfileinfo.a(2) lt var().date()) {
+			if (patchfileinfo.f(2) lt var().date()) {
 				goto nextpatch;
 			}
 
@@ -295,7 +295,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 
 			//ensure patch file is complete
-			offset = patchfileinfo.a(1) - 18;
+			offset = patchfileinfo.f(1) - 18;
 			call osbread(tt, patchfile, offset, 18);
 			if (tt ne ("!" ^ FM ^ "!END!OF!INSTALL!")) {
 				goto nextpatch;
@@ -304,8 +304,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//verify correct file heading and determine patchid from the file
 			offset_zero = 0;
 			call osbread(firstblock, patchfile, offset_zero, 65000);
-			patchid = firstblock.a(2).substr(6, 9999);
-			if (firstblock.a(1) ne "00000DEFINITIONS" or patchid.substr(1, 8) ne "INSTALL*") {
+			patchid = firstblock.f(2).substr(6, 9999);
+			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.substr(1, 8) ne "INSTALL*") {
 				goto nextpatch;
 			}
 
@@ -379,14 +379,14 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not skipemail) {
 
 				//list the files and records that were installed
-				var subject = rec.a(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
+				var subject = rec.f(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
 				var body = subject ^ " " ^ patchfilename ^ FM;
 				if (skipreason) {
 					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
 				}
-				var nfiles = rec.a(3).count(VM) + 1;
+				var nfiles = rec.f(3).count(VM) + 1;
 				for (const var filen : range(1, nfiles)) {
-					body(-1) = rec.a(3, filen) ^ " " ^ rec.a(4, filen) ^ "  " ^ rec.a(5, filen);
+					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
 				} //filen;
 
 				//message EXODUS only
@@ -487,8 +487,8 @@ nextpatch:;
 		//put username and database on the bottom line of the screen
 		var username = USERNAME.trim();
 	//username=rnd(1000000)
-		var s23 = SYSTEM.a(23);
-		var s17 = SYSTEM.a(17);
+		var s23 = SYSTEM.f(23);
+		var s17 = SYSTEM.f(17);
 		s23.converter(" ", FM);
 		//locate 'TEST' in s23 setting xx then username:='*' else
 		if (s23.locate("TESTDATA", xx)) {
@@ -507,7 +507,7 @@ nextpatch:;
 			}
 		}
 		// end
-		bottomline = (s17 ^ " " ^ SYSTEM.a(24)).oconv("L#40") ^ username.oconv("R#40");
+		bottomline = (s17 ^ " " ^ SYSTEM.f(24)).oconv("L#40") ^ username.oconv("R#40");
 		gosub printbottomline();
 
 	} else if (request1 eq "PROCESSEXIT") {
@@ -591,9 +591,9 @@ getvalues:
 			var nn = USER1.count(VM) + 1;
 			var nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
-				var execcode = iodat_.a(1, ii);
-				if (execstoplist.a(1).locate(execcode, stopn)) {
-					var reason = execstoplist.a(2, stopn);
+				var execcode = iodat_.f(1, ii);
+				if (execstoplist.f(1).locate(execcode, stopn)) {
+					var reason = execstoplist.f(2, stopn);
 					if (reason) {
 						USER1.remover(1, ii);
 						iodat_.remover(2, ii);
@@ -614,7 +614,7 @@ getvalues:
 			}
 
 			//1=force vm to ensure xml has empty not missing tags
-			iodat_(2, 1) = USER1.a(2, 1);
+			iodat_(2, 1) = USER1.f(2, 1);
 			iodat_ = invertarray(USER1, 1);
 
 		}
@@ -679,13 +679,13 @@ getvalues:
 			iodat_ = "";
 		}
 
-		call select2(filename0, SYSTEM.a(2), sortselect, dictids, options, USER1, response_, "", "", "", maxnrecs);
+		call select2(filename0, SYSTEM.f(2), sortselect, dictids, options, USER1, response_, "", "", "", maxnrecs);
 		//restore the program stack although this is done in LISTEN per request
 		//rev has a limit on 299 "programs" and dictionary entries count as 1 each!
 		//call program.stack(programstack)
 
 		if (msg_) {
-			USER3 = trim(USER4.a(1), FM);
+			USER3 = trim(USER4.f(1), FM);
 		} else {
 			iodat_ = "%DIRECTOUTPUT%";
 			//response='OK'
@@ -726,11 +726,11 @@ nextlock:
 		if (readnext(lockid)) {
 			var lockx;
 			if (lockx.read(locks, lockid)) {
-				if (lockx.a(1) lt dostime) {
+				if (lockx.f(1) lt dostime) {
 					goto nextlock;
 				}
 				nlocks += 1;
-				select2data(nlocks, 1) = lockx.a(4) ^ VM ^ lockx.a(3) ^ VM ^ lockid.field("*", 1) ^ VM ^ lockid.field("*", 2, 999);
+				select2data(nlocks, 1) = lockx.f(4) ^ VM ^ lockx.f(3) ^ VM ^ lockid.field("*", 1) ^ VM ^ lockid.field("*", 2, 999);
 				goto nextlock;
 			}
 		}
@@ -755,20 +755,20 @@ nextlock:
 		for (ii = 1; ii <= nn; ++ii) {
 			///BREAK;
 			if (tracing and nn gt 20) break;
-			var row = select2data.a(ii);
+			var row = select2data.f(ii);
 			if (not tracing) {
 				print("|");
 			}
-			tt = row.a(1, 1).trim();
+			tt = row.f(1, 1).trim();
 			if (not tracing) {
-				tt ^= " " ^ row.a(1, 3);
+				tt ^= " " ^ row.f(1, 3);
 			}
 			print(tt.oconv("L#19"));
 			if (not tracing) {
 				printl("|");
 			}
 			if (tracing) {
-				printl(" ", row.a(1, 2).oconv("L#19"), " ", row.a(1, 3).oconv("L#19"), " ", row.a(1, 4).oconv("L#19"));
+				printl(" ", row.f(1, 2).oconv("L#19"), " ", row.f(1, 3).oconv("L#19"), " ", row.f(1, 4).oconv("L#19"));
 			}
 		} //ii;
 
@@ -791,7 +791,7 @@ nextlock:
 
 		//NB ZZZ will hang if is not locked eg via unlock all
 		//unlock long process unlimited cpu time flag
-		tt = SYSTEM.a(48);
+		tt = SYSTEM.f(48);
 		if (tt) {
 			//unlock in request loop using lockkey stored in system<48> by giveway
 			//lock first to avoid hanging if try to unlock when not locked
@@ -833,7 +833,7 @@ nextlock:
 			var timex = var().time();
 			while (true) {
 				///BREAK;
-				if (not(otherusers().a(1) and ((var().time() - timex).abs() lt 30))) break;
+				if (not(otherusers().f(1) and ((var().time() - timex).abs() lt 30))) break;
 				call ossleep(1000*1);
 			}//loop;
 
@@ -869,13 +869,13 @@ nextlock:
 
 		//backup may respond to user itself if it starts
 		msg_ = "";
-		perform("FILEMAN BACKUP " ^ SYSTEM.a(17) ^ " " ^ bakpars.a(7));
+		perform("FILEMAN BACKUP " ^ SYSTEM.f(17) ^ " " ^ bakpars.f(7));
 
 		//if backup has already responded to user
 		//then quit and indicate to calling program that a backup has been done
 		//user will be emailed
-		if (SYSTEM.a(2) eq "") {
-			PSEUDO = "BACKUP2 " ^ bakpars.a(7);
+		if (SYSTEM.f(2) eq "") {
+			PSEUDO = "BACKUP2 " ^ bakpars.f(7);
 			if (USER4) {
 				stop();
 			}
@@ -948,7 +948,7 @@ subroutine printbottomline() {
 	} else {
 		yy = CRTHIGH;
 	}
-	call scrnio(0, yy, bottomline.substr(1, 80), esctoattr(ENVIRONSET.a(21)));
+	call scrnio(0, yy, bottomline.substr(1, 80), esctoattr(ENVIRONSET.f(21)));
 	return;
 }
 
@@ -999,7 +999,7 @@ nextfiles:
 				//and delete it if older than the cut off time
 				//and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
-				filetime = fileattributes.a(2) * 24 * 60 * 60 + fileattributes.a(3);
+				filetime = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
 				if (((filename.substr(-4, 4)).index(".")) and filetime le deletetime) {
 deleteit:
 					filename.osremove();

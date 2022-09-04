@@ -100,7 +100,7 @@ nousername0:
 	}
 
 	//find the task
-	if (SECURITY.a(10).locate(task, taskn)) {
+	if (SECURITY.f(10).locate(task, taskn)) {
 
 		if (deleting) {
 			SECURITY.remover(10, taskn);
@@ -110,7 +110,7 @@ updateprivs:
 			return 1;
 		} else if (renaming) {
 			//delete any existing rename target task
-			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
+			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
 				if (taskn2 lt taskn) {
@@ -120,8 +120,8 @@ updateprivs:
 			SECURITY(10, taskn) = defaultlock;
 			if (renaming) {
 				//skip warning except for live databases included in startup
-				if (not(SYSTEM.a(61))) {
-					if (SYSTEM.a(58).locate(SYSTEM.a(17), xx)) {
+				if (not(SYSTEM.f(61))) {
+					if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
 						call note("Task renamed:|Old: " ^ task ^ "|New: " ^ defaultlock);
 					}
 				}
@@ -129,8 +129,8 @@ updateprivs:
 			goto updateprivs;
 		} else if (updating) {
 			var tt = defaultlock;
-			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
-				tt = SECURITY.a(11, taskn2);
+			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
+				tt = SECURITY.f(11, taskn2);
 			}
 			SECURITY(11, taskn) = tt;
 			goto updateprivs;
@@ -159,19 +159,19 @@ updateprivs:
 		if (not noadd) {
 			gosub readuserprivs();
 			if (username eq "EXODUS") {
-				var interactive = false; //not(SYSTEM.a(33));
+				var interactive = false; //not(SYSTEM.f(33));
 				if (interactive) {
 					call note(task ^ "|TASK ADDED");
 				}
 			}
 			//if len(userprivs) lt 65000 then
 			if (SECURITY.length() lt maxstrsize_ - 530) {
-				if (not(SECURITY.a(10).locateby("AL", task, taskn))) {
+				if (not(SECURITY.f(10).locateby("AL", task, taskn))) {
 					if (defaultlock.unassigned()) {
 						newlock = "";
 					} else {
-						if (SECURITY.a(10).locate(defaultlock, xx)) {
-							newlock = SECURITY.a(11, xx);
+						if (SECURITY.f(10).locate(defaultlock, xx)) {
+							newlock = SECURITY.f(11, xx);
 						} else {
 							newlock = defaultlock;
 						}
@@ -185,7 +185,7 @@ updateprivs:
 	}
 
 	//if no locks then pass ok unless positive locking required
-	var locks = SECURITY.a(11, taskn);
+	var locks = SECURITY.f(11, taskn);
 	if (locks eq "") {
 
 		//not positive ok
@@ -234,12 +234,12 @@ notallowed:
 	}
 
 	//find the user
-	if (not(SECURITY.a(1).locate(username, usern))) {
+	if (not(SECURITY.f(1).locate(username, usern))) {
 	}
 
 	//user must have all the keys for all the locks on this task
 	//following users up to first blank line also have the same keys
-	var keys = SECURITY.a(2).field(VM, usern, 65535);
+	var keys = SECURITY.f(2).field(VM, usern, 65535);
 	var temp = keys.index("---");
 	if (temp) {
 		keys.splicer(temp - 1, 65535, "");

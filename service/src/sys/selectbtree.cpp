@@ -18,7 +18,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 
 	//analogous code whereever allpunctuation is used
 	//ED BP LISTSCHED AGENCY.SUBS SCHEDULES.DICT
-	var allpunctuation = SYSTEM.a(130);
+	var allpunctuation = SYSTEM.f(130);
 	texts.converter(allpunctuation, var(50).space());
 	var temp = texts.trim();
 
@@ -56,7 +56,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 		stop();
 	}
 	foundkeys.converter(VM, FM);
-	var listkey = "SELECTBTREE:" ^ SYSTEM.a(24);
+	var listkey = "SELECTBTREE:" ^ SYSTEM.f(24);
 	foundkeys.write(lists, listkey);
 	getlist("" ^ listkey ^ " (S)");
 	//delete lists,listkey

@@ -91,13 +91,13 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 	var isdevsys = var("exodus.id").osfile();
 
 	// will return "" in request5 if valid or an error response message
-	if (request1.a(1) eq "VALIDATE") {
+	if (request1.f(1) eq "VALIDATE") {
 
 		var username = request2;
 		var password = request3;
 		var connection = request4;
 		var dataset = request6;
-		var origrequest1 = request1.a(2);
+		var origrequest1 = request1.f(2);
 
 		//1. ANYBODY can request password reset with their email address
 		//2. email addresses are not secret and usernames are guessable
@@ -108,14 +108,14 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		//determine username from emailaddress
 		//only for users with single, unique emails
 		if (passwordreset) {
-			var tt = SECURITY.a(7).ucase();
+			var tt = SECURITY.f(7).ucase();
 			//password is email address when resetting
 			if (tt.locate(password.ucase(), usern)) {
 				//only if email address occurs more than once
 				tt(1, usern) = "";
 				tt.converter("; ", VM);
 				if (not(tt.locate(password.ucase(), xx))) {
-					username = SECURITY.a(1, usern);
+					username = SECURITY.f(1, usern);
 				}
 			}
 		}
@@ -171,7 +171,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		//NB if "EXODUS" is in Auth File then some user restrictions apply eg password/ips
 
 		//check username exists
-		if (not(SECURITY.a(1).locate(username, usern))) {
+		if (not(SECURITY.f(1).locate(username, usern))) {
 			usern = 0;
 		}
 
@@ -191,7 +191,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				//different response to good versus bad usernames
 				//which would allow detection of valid usernames
 				for (failn = 1; failn <= 999999; failn++) {
-					var tt = userx.a(18, failn);
+					var tt = userx.f(18, failn);
 					///BREAK;
 					if (not(tt ne "" and tt.substr(1, 2) ne "OK")) break;
 				} //failn;
@@ -204,7 +204,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
                    goto validateexit;
                 }
 				//check account expiry
-				if (userx.a(35) and var().date() ge userx.a(35)) {
+				if (userx.f(35) and var().date() ge userx.f(35)) {
 
 					realreason = "Login user account expired";
 
@@ -230,11 +230,11 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 			//use the password on the user if present by preference
 			//because new password might not have been put on authorisation file
 			//if the file was locked at the time user reset their password
-			userencrypt0 = userx.a(4, 1);
+			userencrypt0 = userx.f(4, 1);
 			if (userencrypt0 eq "") {
 				//TODO remove all encrypted passwords from userprivs and put all on user
 				//in PREWRITE new security
-				userencrypt0 = SECURITY.a(4, usern, 2).field(TM, 7);
+				userencrypt0 = SECURITY.f(4, usern, 2).field(TM, 7);
 			}
 
 			//check password is correct
@@ -261,7 +261,7 @@ passfail:
 				//4. standard LAN
 
 				//get the users own/cached valid ip nos (cleared every security read)
-				validips = SECURITY.a(6, usern);
+				validips = SECURITY.f(6, usern);
 
 				//+ in user ipnos means add to group user ip ranges
 				if (validips.index("+")) {
@@ -273,14 +273,14 @@ passfail:
 				//default users valid ipnos if not defined (or cached)
 				if (not validips) {
 
-					var nn = SECURITY.a(6).count(VM) + 1;
+					var nn = SECURITY.f(6).count(VM) + 1;
 
 					//get ipnos of group user
 					for (ii = usern + 1; ii <= nn; ++ii) {
 						///BREAK;
-						if (not(SECURITY.a(1, ii + 1) ne "---")) break;
+						if (not(SECURITY.f(1, ii + 1) ne "---")) break;
 					} //ii;
-					validips = SECURITY.a(6, ii);
+					validips = SECURITY.f(6, ii);
 
 					//+ in group ipnos means add to system config ip ranges
 					if (validips.index("+")) {
@@ -290,7 +290,7 @@ passfail:
 
 					//otherwise use system default
 					if (not validips) {
-						validips = SYSTEM.a(39);
+						validips = SYSTEM.f(39);
 
 						//+ in system config ipnos means add traditional private LAN ip ranges
 						if (validips.index("+")) {
@@ -346,7 +346,7 @@ passfail:
 				//only checking during LOGIN. TODO is this ok?
 				//no longer has to be done after setting @username
 				if (origrequest1 eq "LOGIN") {
-					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.a(17).quote()), msg_, "", username))) {
+					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.f(17).quote()), msg_, "", username))) {
 						invalidlogin = USER4;
 						goto validateexit;
 					}
@@ -356,7 +356,7 @@ checkip:
 ////////
 
 				//check is ip no is allowed - or exit
-				ipno = connection.a(1, 2);
+				ipno = connection.f(1, 2);
 
 				if (validips.trim() and ipno) {
 					//look for 192.168 first since most common
@@ -381,7 +381,7 @@ invalidip:
 					//prevent EXODUS from using CONFIGURED fully formed LAN ips
 					//which are deemed to be NAT routers possibly providing WAN access
 					//but EXODUS should not have unrestricted access from WAN
-					if (username eq "EXODUS" and not(SYSTEM.a(17).index("DEMO"))) {
+					if (username eq "EXODUS" and not(SYSTEM.f(17).index("DEMO"))) {
 						if (ip2 eq "192.168") {
 exoduslocalip:
 							if (validips.locateusing(" ", ipno, xx)) {
@@ -413,11 +413,11 @@ exoduslocalip:
 
 					//indicate ok but excessive failures to the user/sysadmins
 					invalidlogin = "Too many login failures - " ^ (username.quote()) ^ " is blocked";
-					if (userx.a(7)) {
+					if (userx.f(7)) {
 						invalidlogin ^= "|" ^ (username.quote()) ^ " can and must get a new password unless the account is expired";
 						invalidlogin ^= "|by clicking Password Reset on the EXODUS Login screen";
 						invalidlogin ^= "|and entering one of their email addresses as follows:";
-						invalidlogin ^= "|" ^ userx.a(7);
+						invalidlogin ^= "|" ^ userx.f(7);
 					} else {
 						invalidlogin ^= "|and has no email address assigned. An administrator must provide a new password for the user";
 					}
@@ -429,16 +429,16 @@ exoduslocalip:
 
 				if (username ne "EXODUS") {
 
-					var passworddate = userx.a(36);
+					var passworddate = userx.f(36);
 
 					//check password not expired if expiry days is configured
-					var passwordexpirydays = SECURITY.a(25);
+					var passwordexpirydays = SECURITY.f(25);
 					if (passwordexpirydays) {
 
 						//use the last login date if no password date (backward compatible)
 						//if no last login date then treat as password expired
 						if (not passworddate) {
-							passworddate = userx.a(13);
+							passworddate = userx.f(13);
 						}
 
 						//int() to ignore time of day so expiring in one day means they can
@@ -451,14 +451,14 @@ exoduslocalip:
 
 					//check not exceeded max nologin days
 					//default is 31 days from last login or password reset
-					maxnologindays = SYSTEM.a(128);
+					maxnologindays = SYSTEM.f(128);
 					if (maxnologindays eq "") {
 						maxnologindays = 31;
 					}
 
 					if (maxnologindays) {
 
-						lastlogindate = userx.a(13);
+						lastlogindate = userx.f(13);
 
 						//if password was reset more recently than last login date then use that
 						if (passworddate gt lastlogindate) {
@@ -503,28 +503,28 @@ passwordexpired:
 					//
 					//if session number agrees then dont test anything else
 					//this will allow ip number to change due to network proxy etc
-					if (connection.a(1, 5) ne userx.a(39, 5) and username ne "EXODUS") {
+					if (connection.f(1, 5) ne userx.f(39, 5) and username ne "EXODUS") {
 
 						//the word "automatic" hardcoded in browser to unlock and lose any work
 						var tt = "You have been automatically logged out due to another login as " ^ (username.quote());
 						tt(-1) = "Please login or try again later.";
 
 						//refuse browser change
-						if (connection.a(1, 6) ne userx.a(39, 6)) {
+						if (connection.f(1, 6) ne userx.f(39, 6)) {
 							invalidlogin = tt;
 							realreason = "Duplicate login.";
 							goto validateexit;
 						}
 
 						//refuse http/https change
-						if (connection.a(1, 4) ne userx.a(39, 4)) {
+						if (connection.f(1, 4) ne userx.f(39, 4)) {
 							invalidlogin = tt;
 							realreason = "Duplicate login .";
 							goto validateexit;
 						}
 
 						//refuse ip number change
-						if (connection.a(1, 2) ne userx.a(39, 2)) {
+						if (connection.f(1, 2) ne userx.f(39, 2)) {
 							invalidlogin = tt;
 							realreason = "Duplicate login";
 							goto validateexit;
@@ -541,7 +541,7 @@ passwordexpired:
 				if (origrequest1 eq "LOGIN") {
 					if (username ne "EXODUS" or isdevsys) {
 
-						var ulogins = userx.a(18);
+						var ulogins = userx.f(18);
 						if (ulogins.locate("OK", xx)) {
 
 							//if ipno unrestricted
@@ -550,10 +550,10 @@ passwordexpired:
 								//find a previous SUCCESSFUL login from same ipnet (ip part 1 & 2 only)
 								var isnewipnet = 1;
 								var ipno12 = ipno.field(".", 1, 2);
-								var uipnos = userx.a(16);
+								var uipnos = userx.f(16);
 								var nn = uipnos.count(VM);
 								for (ii = 1; ii <= nn; ++ii) {
-									if (ulogins.a(1, ii) eq "OK" and uipnos.a(1, ii).field(".", 1, 2) eq ipno12) {
+									if (ulogins.f(1, ii) eq "OK" and uipnos.f(1, ii).field(".", 1, 2) eq ipno12) {
 										isnewipnet = 0;
 									}
 									///BREAK;
@@ -570,9 +570,9 @@ passwordexpired:
 
 									if (whoistx ne "0") {
 
-										body = "This is an automated email from your EXODUS database " ^ SYSTEM.a(17, 1);
+										body = "This is an automated email from your EXODUS database " ^ SYSTEM.f(17, 1);
 										body ^= " recording a successful login from the ip number " ^ ipno;
-										body(-1) = "by " ^ userx.a(1) ^ " (" ^ username ^ ")";
+										body(-1) = "by " ^ userx.f(1) ^ " (" ^ username ^ ")";
 										//not in the last 100 login ips
 										body(-1) = FM ^ "You will not be notified of any further successful logins by " ^ username ^ " from this ip number for a while.";
 
@@ -580,7 +580,7 @@ passwordexpired:
 											gosub addwhoistx();
 										}
 
-										var subject = "Login on " ^ ipno ^ " by " ^ userx.a(1) ^ " - " ^ username;
+										var subject = "Login on " ^ ipno ^ " by " ^ userx.f(1) ^ " - " ^ username;
 										call sysmsg(body, subject, username);
 
 									}
@@ -603,7 +603,7 @@ passwordexpired:
 								gosub addwhoistx();
 							}
 
-							var subject = "First login of " ^ userx.a(1) ^ " - " ^ username;
+							var subject = "First login of " ^ userx.f(1) ^ " - " ^ username;
 
 							call sysmsg(body, subject, username);
 						}
@@ -627,7 +627,7 @@ passwordexpired:
 			}
 
 			//check password
-			if (sysrec.a(7) ne encrypt0) {
+			if (sysrec.f(7) ne encrypt0) {
 				realreason = "Wrong password";
 				goto validateexit;
 			}
@@ -665,7 +665,7 @@ validateexit2:
 				//text:=crlf:'1. ':password:' not known'
 				//text:=crlf:'2. no email known for ':username
 				text ^= "\r\n" ^ password ^ " and " ^ username ^ " are unrecognised or expired";
-				text ^= "\r\n" " Database: " ^ SYSTEM.a(17);
+				text ^= "\r\n" " Database: " ^ SYSTEM.f(17);
 			} else {
 				text = invalidlogin;
 
@@ -678,8 +678,8 @@ validateexit2:
 					//var tt = failn + 1;
 					realreason = "Too many consecutive login failures: " ^ failn ^ ", max is " ^ maxnfails;
 					invalidlogin ^= "\r\n" ^ (username.quote()) ^ " login is disabled pending password reset by an administrator";
-					if (userx.a(7)) {
-						invalidlogin ^= "\r\n" "or user requesting a password reset to " ^ userx.a(7);
+					if (userx.f(7)) {
+						invalidlogin ^= "\r\n" "or user requesting a password reset to " ^ userx.f(7);
 					}
 				}
 
@@ -702,8 +702,8 @@ validateexit2:
 						//!locate ucase(password) in ucase(@record<7>) using ';' setting xx then
 						//ONLY if user has an email address
 						//and account is not expired
-						var expirydate = RECORD.a(35);
-						if (RECORD.a(7) and ((expirydate eq "" or expirydate gt var().date()))) {
+						var expirydate = RECORD.f(35);
+						if (RECORD.f(7) and ((expirydate eq "" or expirydate gt var().date()))) {
 
 							//signify ok
 							passwordreset = 2;
@@ -739,7 +739,7 @@ validateexit2:
 					//datetime=(date():'.':time() 'R(0)#5')+0
 					var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 					RECORD.inserter(15, 1, datetime);
-					RECORD.inserter(16, 1, connection.a(1, 2));
+					RECORD.inserter(16, 1, connection.f(1, 2));
 					text.swapper("username and/or ", "");
 
 					var tt = text.field("|", 1);
@@ -778,10 +778,10 @@ validateexit2:
 
 				//trim long user records
 				if (RECORD.length() gt 5000) {
-					var nitems = RECORD.a(15).count(VM) + 1;
-					RECORD(15) = RECORD.a(15).field(VM, 1, nitems - 5);
-					RECORD(16) = RECORD.a(16).field(VM, 1, nitems - 5);
-					RECORD(18) = RECORD.a(18).field(VM, 1, nitems - 5);
+					var nitems = RECORD.f(15).count(VM) + 1;
+					RECORD(15) = RECORD.f(15).field(VM, 1, nitems - 5);
+					RECORD(16) = RECORD.f(16).field(VM, 1, nitems - 5);
+					RECORD(18) = RECORD.f(18).field(VM, 1, nitems - 5);
 				}
 
 				//update without locking if not resetting password ?!
@@ -801,15 +801,15 @@ validateexit2:
 
 					//send the new password to the user
 					//all email addresses not just the one used to get the reset new password
-					var emailaddrs = RECORD.a(7);
+					var emailaddrs = RECORD.f(7);
 					var ccaddrs = "";
 					var subject = "EXODUS Password Reset";
 					body = "";
 					body(-1) = "Hi! Your new password is " ^ newpassword;
 					body(-1) = FM ^ "* Your usercode is " ^ ID;
 					body(-1) = FM ^ "This is for";
-					body(-1) = "Database: " ^ SYSTEM.a(23) ^ " (" ^ SYSTEM.a(17) ^ ")";
-					body(-1) = "System: " ^ SYSTEM.a(44);
+					body(-1) = "Database: " ^ SYSTEM.f(23) ^ " (" ^ SYSTEM.f(17) ^ ")";
+					body(-1) = "System: " ^ SYSTEM.f(44);
 
 					body.swapper(FM, "\r\n");
 					call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
@@ -817,12 +817,12 @@ validateexit2:
 					//"Password Reset" is hardcoded in index.htm
 					request5 = "Password Reset ok:" "\r\n";
 					request5 ^= "\r\n";
-					request5 ^= "A new password for usercode " ^ (ID.quote()) ^ " for database " ^ (SYSTEM.a(17, 1).quote()) ^ "\r\n";
+					request5 ^= "A new password for usercode " ^ (ID.quote()) ^ " for database " ^ (SYSTEM.f(17, 1).quote()) ^ "\r\n";
 					request5 ^= "has been emailed to " ^ emailaddrs ^ "\r\n";
 					request5 ^= "\r\n";
 					request5 ^= "<b>Please check your email to get the new password then" "\r\n";
 					//request5:='login as user code ':quote(username):' using the new password.</b>'
-					request5 ^= "login as user code " ^ (username.quote()) ^ " to database " ^ (SYSTEM.a(17, 1).quote()) ^ "</b>";
+					request5 ^= "login as user code " ^ (username.quote()) ^ " to database " ^ (SYSTEM.f(17, 1).quote()) ^ "</b>";
 
 				}
 
@@ -844,7 +844,7 @@ validateexit2:
 					emailsubject.swapper("Failure", "Failure (" ^ failn ^ ")");
 				}
 
-				var fromipno = connection.a(1, 2);
+				var fromipno = connection.f(1, 2);
 				USER4 = "User: " ^ username ^ FM ^ "From IP: " ^ fromipno;
 
 				var cmd = "SELECT USERS BY-DSND LAST_LOGIN_DATETIME WITH LAST_LOGIN_LOCATION " ^ (fromipno.quote()) ^ " AND WITH @ID NOT STARTING \"%\"";
@@ -852,15 +852,15 @@ validateexit2:
 				var lastuser = "";
 				if (readnext(lastuserid)) {
 					if (lastuser.read(users, lastuserid)) {
-						msg_ ^= " (last login was " ^ lastuser.a(1);
-						if (lastuser.a(1)) {
-							if (lastuserid ne lastuser.a(1)) {
+						msg_ ^= " (last login was " ^ lastuser.f(1);
+						if (lastuser.f(1)) {
+							if (lastuserid ne lastuser.f(1)) {
 								USER4 ^= " (" ^ lastuserid ^ ")";
 							}
 						} else {
 							msg_ ^= lastuserid;
 						}
-						USER4 ^= " on " ^ oconv(lastuser.a(13), "[DATETIME,4*,MTS]") ^ ")";
+						USER4 ^= " on " ^ oconv(lastuser.f(13), "[DATETIME,4*,MTS]") ^ ")";
 					}
 					clearselect();
 				}
@@ -887,16 +887,16 @@ validateexit2:
 			//EXODUS may not have user record
 			//perhaps we need to switch back to users last company every request
 			//in which case even exodus could avoid random companies
-			ucomps = userx.a(33);
+			ucomps = userx.f(33);
 			gosub switchcompany();
 
 			//record stats per database/sessionid/username/ip per hour
 			var statistics;
 			if (statistics.open("STATISTICS", "")) {
 				var key = dataset;
-				key ^= "*" ^ connection.a(1, 5);
+				key ^= "*" ^ connection.f(1, 5);
 				key ^= "*" ^ username;
-				key ^= "*" ^ connection.a(1, 3);
+				key ^= "*" ^ connection.f(1, 3);
 				key ^= "*" ^ var().date();
 				var tt = (var().time() / 3600).floor() + 1;
 				key ^= "*" ^ tt;
@@ -909,10 +909,10 @@ validateexit2:
 				//statistic<1>=(date()+time()/86400) 'MD50P'
 				statistic(1) = (var().date() + var().time() / 86400).substr(1, 12);
 				if (origrequest1 ne "RELOCK") {
-					statistic(2) = statistic.a(2) + 1;
+					statistic(2) = statistic.f(2) + 1;
 				}
 				//enable fast stats without cross database user access
-				statistic(3) = userrec.a(5);
+				statistic(3) = userrec.f(5);
 				statistic.write(statistics, key);
 			}
 
@@ -966,12 +966,12 @@ validateexit2:
 			}
 
 			//convert old data
-			if (userrec.a(13) ne userrec.a(15, 1) and userrec.a(18) eq "") {
-				if (userrec.a(15) and not(userrec.a(18))) {
+			if (userrec.f(13) ne userrec.f(15, 1) and userrec.f(18) eq "") {
+				if (userrec.f(15) and not(userrec.f(18))) {
 					userrec(18) = "OK";
 				}
-				userrec.inserter(15, 1, userrec.a(13));
-				userrec.inserter(16, 1, userrec.a(14));
+				userrec.inserter(15, 1, userrec.f(13));
+				userrec.inserter(16, 1, userrec.f(14));
 				userrec.inserter(18, 1, "OK");
 			}
 
@@ -979,17 +979,17 @@ validateexit2:
 			//datetime=(date():'.':time() 'R(0)#5')+0
 			var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 			userrec(13) = datetime;
-			userrec(14) = SYSTEM.a(40, 2);
+			userrec(14) = SYSTEM.f(40, 2);
 
 			//save historical logins
-			userrec.inserter(15, 1, userrec.a(13));
-			userrec.inserter(16, 1, userrec.a(14));
+			userrec.inserter(15, 1, userrec.f(13));
+			userrec.inserter(16, 1, userrec.f(14));
 			userrec.inserter(18, 1, "OK");
 
 			//only keep the last 100 logins
-			userrec(15) = userrec.a(15).field(VM, 1, 100);
-			userrec(16) = userrec.a(16).field(VM, 1, 100);
-			userrec(18) = userrec.a(18).field(VM, 1, 100);
+			userrec(15) = userrec.f(15).field(VM, 1, 100);
+			userrec(16) = userrec.f(16).field(VM, 1, 100);
+			userrec(18) = userrec.f(18).field(VM, 1, 100);
 
 			if (authcompcodes) {
 				userrec(33) = authcompcodes;
@@ -1028,7 +1028,7 @@ validateexit2:
 		//responsefilename[-len(t),len(t)]='3'
 
 		//linkfilename3
-		var responsefilename = PRIORITYINT.a(100);
+		var responsefilename = PRIORITYINT.f(100);
 		if (not responsefilename) {
 			return 0;
 		}
@@ -1062,9 +1062,9 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	USERNAME=(username);
 
 	//set @station
-	var tt = connection.a(1, 2);
-	if (connection.a(1, 3) ne tt) {
-		tt ^= "_" ^ connection.a(1, 3);
+	var tt = connection.f(1, 2);
+	if (connection.f(1, 3) ne tt) {
+		tt ^= "_" ^ connection.f(1, 3);
 	}
 	tt.converter(". ", "_");
 	//call sysvar('SET',109,110,t)
@@ -1072,10 +1072,10 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	STATION=(tt);
 
 	//restore default style
-	SYSTEM(46) = SYSTEM.a(47);
+	SYSTEM(46) = SYSTEM.f(47);
 
 	//in LISTEN2 and INIT.COMPANY
-	var companystyle = sys.company.a(70);
+	var companystyle = sys.company.f(70);
 	if (companystyle) {
 		SYSTEM(46) = companystyle;
 	}
@@ -1086,12 +1086,12 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	if (users.open("USERS", "")) {
 		if (userrec.read(users, USERNAME)) {
 
-			ucomps = userrec.a(33);
+			ucomps = userrec.f(33);
 			gosub switchcompany();
 
-			var styles = userrec.a(19);
+			var styles = userrec.f(19);
 			styles.swapper("Default", "");
-			if (not(styles2.readv(users, userrec.a(21), 19))) {
+			if (not(styles2.readv(users, userrec.f(21), 19))) {
 				styles2 = "";
 			}
 
@@ -1106,13 +1106,13 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				fields(8) = "REPORT FONT SIZE";
 			}
 
-			var runstyles = SYSTEM.a(46);
+			var runstyles = SYSTEM.f(46);
 			for (const var vn : range(1, 9)) {
-				var tt2 = styles.a(1, vn);
+				var tt2 = styles.f(1, vn);
 
 				//skip user styles if not authorised
 				if (chkauth) {
-					var fieldname = fields.a(vn);
+					var fieldname = fields.f(vn);
 					if (fieldname) {
 						for (ii = 1; ii <= 3; ++ii) {
 							//USER UPDATE "REPORT"
@@ -1128,7 +1128,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 				//departmental default
 				if (not(tt2.length())) {
-					tt2 = styles2.a(1, vn);
+					tt2 = styles2.f(1, vn);
 				}
 
 				//dont copy defaults so the system default will apply
@@ -1160,7 +1160,7 @@ subroutine addwhoistx() {
 
 subroutine switchcompany() {
 	if (not(ucomps.locate(sys.gcurrcompany, xx))) {
-		var tc = ucomps.a(1, 1);
+		var tc = ucomps.f(1, 1);
 		if (xx.read(sys.companies, tc)) {
 			call initcompany(tc);
 		}

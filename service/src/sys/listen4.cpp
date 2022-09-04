@@ -22,7 +22,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = "Error: Response not set in LISTEN";
 		return 0;
 	case 2:
-		msg = "Error: Maximum record size of " ^ oconv(params.a(1), "[XBYTES]") ^ " exceeded in LISTEN";
+		msg = "Error: Maximum record size of " ^ oconv(params.f(1), "[XBYTES]") ^ " exceeded in LISTEN";
 		return 0;
 	case 3:
 		msg = "Error: LISTEN cannot open " ^ (params.quote());
@@ -51,7 +51,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = params.quote() ^ " file cannot be opened (10)";
 		return 0;
 	case 11:
-		msg = params.a(1) ^ " " ^ (params.a(2).quote()) ^ " is not allowed";
+		msg = params.f(1) ^ " " ^ (params.f(2).quote()) ^ " is not allowed";
 		return 0;
 	case 12:
 		msg = "Somebody has updated this record.|Your update cannot be applied." "|The session id does not agree " ^ (params.quote());
@@ -63,7 +63,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = "Write empty data record is disallowed.";
 		return 0;
 	case 15:
-		msg = "Cannot delete because " ^ (params.a(1).quote()) ^ " does not exist in the " ^ (params.a(2).quote()) ^ " file";
+		msg = "Cannot delete because " ^ (params.f(1).quote()) ^ " does not exist in the " ^ (params.f(2).quote()) ^ " file";
 		return 0;
 	case 16:
 		msg = "Error: " ^ (params.quote()) ^ " module is not available";
@@ -78,7 +78,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = "Error: Database already stopped/stopping";
 		return 0;
 	case 20:
-		msg = "Error: Could not terminate " ^ params.a(1) ^ " processes|" ^ params.a(2);
+		msg = "Error: Could not terminate " ^ params.f(1) ^ " processes|" ^ params.f(2);
 		return 0;
 	case 21:
 		msg = "Error: Unknown request " ^ (params.quote());
@@ -102,7 +102,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = "A new password has been emailed to you";
 		return 0;
 	case 28:
-		msg = "Error: " ^ (params.a(1).quote()) ^ " new record keys must not contain spaces";
+		msg = "Error: " ^ (params.f(1).quote()) ^ " new record keys must not contain spaces";
 		return 0;
 	case 29:
 	//29 and 30 the same

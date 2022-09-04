@@ -11,7 +11,7 @@ dict(name_and_type) {
 libraryinit(name_and_type)
 //--------------------
 function main() {
-	ANS = RECORD.a(1) ^ " (" ^ RECORD.a(2) ^ ")";
+	ANS = RECORD.f(1) ^ " (" ^ RECORD.f(2) ^ ")";
 	return ANS;	 //.outputl("ANS=");
 }
 //--------------------
@@ -21,7 +21,7 @@ libraryexit(name_and_type)
 libraryinit(name_and_code)
 //--------------------
 function main() {
-	ANS = RECORD.a(1) ^ " (" ^ ID ^ ")";
+	ANS = RECORD.f(1) ^ " (" ^ ID ^ ")";
 	return ANS;	 //.outputl("ANS=");
 }
 //--------------------

@@ -159,8 +159,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 
 		//testdata and user exodus - always email sysmsg@neosys.com
 		home.osgetenv("HOME");
-		//if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.a(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
-		if (not osfile("live.txt") or (SYSTEM.a(61) and USERNAME.ucase() eq "EXODUS")) {
+		//if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.f(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
+		if (not osfile("live.txt") or (SYSTEM.f(61) and USERNAME.ucase() eq "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:
@@ -174,8 +174,8 @@ forcedemail:
 
 		//each request can set a global forced email address
 		//for the duration of the request
-		} else if (SYSTEM.a(117)) {
-			forcedemailx = SYSTEM.a(117);
+		} else if (SYSTEM.f(117)) {
+			forcedemailx = SYSTEM.f(117);
 			goto forcedemail;
 		}
 
@@ -220,42 +220,42 @@ forcedemail:
 	var filenamesx = "smtp.cfg" ^ VM ^ "../../smtp.cfg";
 	filenamesx.converter("/", OSSLASH);
 	for (const var filen : range(1, 2)) {
-		call osread(params2, filenamesx.a(1, filen));
+		call osread(params2, filenamesx.f(1, filen));
 		//cut off after end of file character
 		//params2=field(params2,char(26),1)
 		params2.swapper("\r\n", "\r");
 		params2.converter("\r\n", _FM_ _FM_);
 		for (const var ii : range(1, 9)) {
-			if (params2.a(ii)) {
-				params1(ii) = params2.a(ii);
+			if (params2.f(ii)) {
+				params1(ii) = params2.f(ii);
 			}
 		} //ii;
 	} //filen;
 
 	//default exodus smtp parameters
-	if (not(params1.a(1))) {
-		var sysname = SYSTEM.a(57);
+	if (not(params1.f(1))) {
+		var sysname = SYSTEM.f(57);
 		if (not sysname) {
 			sysname = "unknown";
 		}
 		params1(1) = sysname ^ "@neosys.com";
 	}
-	if (params1.a(2) eq "") {
+	if (params1.f(2) eq "") {
 		params1(2) = "mailout.neosys.com";
 	}
-	if (params1.a(3) eq "") {
+	if (params1.f(3) eq "") {
 		params1(3) = "2500";
 	}
 
 	params = "";
-	params(-1) = "fromaddress=" ^ params1.a(1);
-	params(-1) = "smtphostname=" ^ params1.a(2);
-	params(-1) = "smtpportno=" ^ params1.a(3);
-	params(-1) = "smtptimeoutsecs=" ^ params1.a(4);
-	params(-1) = "smtpusessl=" ^ params1.a(5);
-	params(-1) = "smtpauthtype=" ^ params1.a(6);
-	params(-1) = "smtpuserid=" ^ params1.a(7);
-	params(-1) = "smtppassword=" ^ params1.a(8);
+	params(-1) = "fromaddress=" ^ params1.f(1);
+	params(-1) = "smtphostname=" ^ params1.f(2);
+	params(-1) = "smtpportno=" ^ params1.f(3);
+	params(-1) = "smtptimeoutsecs=" ^ params1.f(4);
+	params(-1) = "smtpusessl=" ^ params1.f(5);
+	params(-1) = "smtpauthtype=" ^ params1.f(6);
+	params(-1) = "smtpuserid=" ^ params1.f(7);
+	params(-1) = "smtppassword=" ^ params1.f(8);
 
 	if (replyto) {
 		params(-1) = "replyto=" ^ replyto;
@@ -266,7 +266,7 @@ forcedemail:
 	if (body[1] eq "@") {
 
 		osfilename = body.substr(2, 99999);
-		osfilesize = osfilename.osfile().a(1);
+		osfilesize = osfilename.osfile().f(1);
 
 		//convert to link if file is too big to email
 		if (osfilesize gt maxemailsize) {
@@ -285,7 +285,7 @@ forcedemail:
 	if (attachfilename) {
 		attachfilename.osclose();
 
-		osfilesize = attachfilename.osfile().a(1);
+		osfilesize = attachfilename.osfile().f(1);
 		if (osfilesize gt maxemailsize) {
 			osfilename = attachfilename;
 			gosub addlinks2osfilename();
@@ -306,7 +306,7 @@ forcedemail:
 		} else if (attachfilename.substr(1, 2) eq ".") {
 			attachfilename.splicer(1, 1, cwd);
 		}
-		msgsize += attachfilename.osfile().a(1);
+		msgsize += attachfilename.osfile().f(1);
 
 		attachfilename.swapper("\\", "\\\\");
 	}
@@ -383,7 +383,7 @@ forcedemail:
 		cmd ^= VM ^ "-s " ^ (subject.quote());
 
 		//from
-		var fromaddress = params1.a(1);
+		var fromaddress = params1.f(1);
 		cmd ^= VM ^ "-r " ^ (fromaddress.quote());
 
 		//optional cc address
@@ -450,7 +450,7 @@ forcedemail:
 			var headers = "";
 			var nn = cmd.count(VM) + 1;
 			for (const var ii : range(2, nn)) {
-				var line = cmd.a(1, ii);
+				var line = cmd.f(1, ii);
 				var opt = line.field(" ", 1);
 				var arg = line.field(" ", 2, 9999);
 				if (arg[1] eq DQ) {
@@ -523,7 +523,7 @@ forcedemail:
 /*
 			// Append a closing delimiter
 			var fileinfo = osfile(tempfilename);
-			var offset = fileinfo.a(1);
+			var offset = fileinfo.f(1);
 TRACE(offset)
 			var osfile;
 			if (osfile.osopen(tempfilename)) {
@@ -613,9 +613,9 @@ TRACE(offset)
 	details(-1) = "Subject:  " ^ subject;
 	details(-1) = "Size:     " ^ oconv(msgsize, "[XBYTES]");
 
-	errormsg(1) = errormsg.a(1).trim();
+	errormsg(1) = errormsg.f(1).trim();
 	//in what situation can it return OK+message ??
-	if (errormsg.a(1) eq "OK") {
+	if (errormsg.f(1) eq "OK") {
 		errormsg.remover(1);
 		call log("SENDMAIL", details);
 	} else {
@@ -627,13 +627,13 @@ TRACE(offset)
 		// errormsg<-1>='cc:       ':ccaddress
 		// end
 		errormsg(-1) = FM ^ details;
-		errormsg(-1) = FM ^ "Server:   " ^ params1.a(2);
-		errormsg(-1) = "Port:     " ^ params1.a(3);
-		errormsg(-1) = "UseSSL:   " ^ params1.a(5);
-		errormsg(-1) = "AuthType: " ^ params1.a(6);
-		errormsg(-1) = "UserID:   " ^ params1.a(7);
+		errormsg(-1) = FM ^ "Server:   " ^ params1.f(2);
+		errormsg(-1) = "Port:     " ^ params1.f(3);
+		errormsg(-1) = "UseSSL:   " ^ params1.f(5);
+		errormsg(-1) = "AuthType: " ^ params1.f(6);
+		errormsg(-1) = "UserID:   " ^ params1.f(7);
 		errormsg(-1) = "Password:";
-		if (params1.a(8)) {
+		if (params1.f(8)) {
 			errormsg ^= "********";
 		}
 
@@ -667,14 +667,14 @@ subroutine addlinks2osfilename() {
 	body(-1) = "Your report is too large to email. (" ^ oconv(osfilesize, "[XBYTES]") ^ ", max " ^ oconv(maxemailsize, "[XBYTES]") ^ ")";
 	body(-1) = "but you can download it by clicking the following link.";
 	body(-1) = FM ^ "*Link is only available for ONE HOUR from creation*";
-	var nlinks = SYSTEM.a(114).count(VM) + 1;
+	var nlinks = SYSTEM.f(114).count(VM) + 1;
 	for (const var linkn : range(1, nlinks)) {
 		body ^= FM;
-		var linkdesc = SYSTEM.a(115, linkn);
+		var linkdesc = SYSTEM.f(115, linkn);
 		if (linkdesc) {
 			body(-1) = linkdesc;
 		}
-		body(-1) = SYSTEM.a(114, linkn) ^ tt;
+		body(-1) = SYSTEM.f(114, linkn) ^ tt;
 	} //linkn;
 	return;
 }

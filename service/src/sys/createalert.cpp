@@ -23,16 +23,16 @@ function main() {
 	//cheap parser requires ~ for spaces
 	sentencex.converter(" ~", FM ^ " ");
 
-	var alertid = sentencex.a(2);
-	var module = sentencex.a(3);
-	var alerttype = sentencex.a(4);
-	var runhours = sentencex.a(5);
-	var runasusercode = sentencex.a(6);
+	var alertid = sentencex.f(2);
+	var module = sentencex.f(3);
+	var alerttype = sentencex.f(4);
+	var runhours = sentencex.f(5);
+	var runasusercode = sentencex.f(6);
 	//fixed to suppress at the moment TODO provide more control
 	var skipdaysoffandholidays = "*";
 
-	var targetusercodes = sentencex.a(7).convert(",", VM);
-	var testemail = sentencex.a(8);
+	var targetusercodes = sentencex.f(7).convert(",", VM);
+	var testemail = sentencex.f(8);
 
 	var options = SENTENCE.field("(", 2);
 	var silent = options.index("S");
@@ -127,7 +127,7 @@ syntax:
 	if (authtasks) {
 		var ntasks = authtasks.count(VM) + 1;
 		for (const var taskn : range(1, ntasks)) {
-			var task = authtasks.a(1, taskn);
+			var task = authtasks.f(1, taskn);
 			if (not(authorised(task, msg, "", runasusercode))) {
 				msg = "\"Runas\" user is not authorised to do " ^ task ^ FM ^ FM ^ msg;
 				call mssg(msg);

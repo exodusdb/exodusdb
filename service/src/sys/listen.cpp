@@ -262,8 +262,8 @@ function main_init() {
     logfilename = "";
 
 	portno = 5700;
-	if (SYSTEM.a(38)) {
-		portno += SYSTEM.a(38) - 1;
+	if (SYSTEM.f(38)) {
+		portno += SYSTEM.f(38) - 1;
 	}
 	//lastmonitortime=0
 	//dont call monitor for approx 60 seconds after startup
@@ -300,14 +300,14 @@ function main_init() {
 	//default to 5 mins. lock extension is done every 5/1.1 mins by the user interface
 	defaultlockmins = 5;
 
-	datasetcode = SYSTEM.a(17);
+	datasetcode = SYSTEM.f(17);
 	live = datasetcode.ucase().substr(-5) ne "_test";
-	//processno = SYSTEM.a(24);
+	//processno = SYSTEM.f(24);
 
 	neopath = "../exodus/";
 	neopath.converter("/", OSSLASH);
 	installend = "global.end";
-	serverend = "../../" ^ SYSTEM.a(123).lcase() ^ ".end";
+	serverend = "../../" ^ SYSTEM.f(123).lcase() ^ ".end";
 	serverend.converter("/", OSSLASH);
 	databaseend = datasetcode.lcase() ^ ".end";
 
@@ -359,7 +359,7 @@ function main_init() {
 	//make up a serverflagfilename
 	serverflagfilename = datasetcode ^ ".svr";
 
-	origsysmode = SYSTEM.a(33);
+	origsysmode = SYSTEM.f(33);
 
 	//webpath=field(origsentence,' ',3)
 	webpath = "";
@@ -400,7 +400,7 @@ function main_init() {
 	//if sysvar('SET',192,102,'R':('0000':THREADNO)[-5,5]:'.SFX') else null
 	//call sysvar_192_102"SET", "R" ^ ("0000" ^ THREADNO).substr(-5, 5) ^ ".SFX");
 
-	nrequests = SYSTEM.a(35) + 0;
+	nrequests = SYSTEM.f(35) + 0;
 
 	printl(var("-").str(50));
 	printl(THREADNO ^ ":", "EXODUS", datasetcode, oscwd());
@@ -408,7 +408,7 @@ function main_init() {
 
 	SYSTEM(33) = 1;
 
-	timeoutsecs = SYSTEM.a(33, 5);
+	timeoutsecs = SYSTEM.f(33, 5);
 	if (not(timeoutsecs.isnum())) {
 		timeoutsecs = "";
 	}
@@ -417,7 +417,7 @@ function main_init() {
 	//force into server mode - suppress interactive messages
 	sysmode = origsysmode;
 	if (sysmode eq "") {
-		sysmode = SYSTEM.a(33);
+		sysmode = SYSTEM.f(33);
 		SYSTEM(33) = "1";
 	}
 
@@ -473,7 +473,7 @@ function main_init() {
 	if (logfile.osopen(logfilename)) {
 
 		//append the logfile
-		logptr = logfilename.osfile().a(1);
+		logptr = logfilename.osfile().f(1);
 
 		//if the last bit closes the log, overwrite it to continue the log
 		//t2=logptr-6
@@ -718,7 +718,7 @@ subroutine wait() {
 	if (not(VOLUMES)) {
 		perform(cmd);
 
-	} else if (SYSTEM.a(29)) {
+	} else if (SYSTEM.f(29)) {
 		osshell(cmd);
 
 	} else {
@@ -761,7 +761,7 @@ function loop_exit() {
 	gosub flagserveractive();
 
 	//switch into interactive mode to check for operator input
-	s33 = SYSTEM.a(33);
+	s33 = SYSTEM.f(33);
 	SYSTEM(33) = "";
 
 	//check for esc key to exit
@@ -772,7 +772,7 @@ function loop_exit() {
 	//charx=charx[1,1]
 
 	//esc or "q" on linux
-	tt = INTCONST.a(1, 1);
+	tt = INTCONST.f(1, 1);
 	if (charx.lcase().index(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.swapper(var().chr(27), "Esc");
@@ -786,14 +786,14 @@ function loop_exit() {
 		reply.inputn(1);
 		echo(1);
 		call mssg("", "DB", buffer, "");
-		if (reply eq INTCONST.a(1)) {
+		if (reply eq INTCONST.f(1)) {
 			//space to defeat ANSI control chars after pressing Esc
 			print(" ");
 			//gosub main_exit();
 			return false;
 		}
 		// "x"
-		if (reply eq INTCONST.a(7)) {
+		if (reply eq INTCONST.f(7)) {
 			charx = reply;
 		}
 	}
@@ -805,7 +805,7 @@ function loop_exit() {
 	// end
 
 	//f5 or 'x' on linux
-	if (charx.lcase() eq PRIORITYINT.a(2)) {
+	if (charx.lcase() eq PRIORITYINT.f(2)) {
 		cmd = "";
 		cmd.input(oscwd() ^ " Command? ");
 		SYSTEM(2) = "";
@@ -836,8 +836,8 @@ function loop_exit() {
 	}
 
 	//f10 or "x" on linux
-	if (charx eq INTCONST.a(7)) {
-		execute("RUNMENU " ^ ENVIRONSET.a(37));
+	if (charx eq INTCONST.f(7)) {
+		execute("RUNMENU " ^ ENVIRONSET.f(37));
 		return true;
 	}
 
@@ -917,7 +917,7 @@ function loop_exit() {
 	if (var("Bb").index(charx)) {
 		goto backup;
 	}
-	if (var().time() ge bakpars.a(3) and var().time() le bakpars.a(4)) {
+	if (var().time() ge bakpars.f(3) and var().time() le bakpars.f(4)) {
 
 		//call log2('LISTEN: Backup time for ':datasetcode,logtime)
 
@@ -927,19 +927,19 @@ function loop_exit() {
 		dow = (var().date() - 1).mod(7) + 1;
 
 		//optionally perform backup and/or shutdown and not backed up today
-		if (bakpars.a(9)) {
+		if (bakpars.f(9)) {
 			//call log2('Backup is disabled',logtime)
 
-		} else if (var().date() eq bakpars.a(1)) {
+		} else if (var().date() eq bakpars.f(1)) {
 			//call log2('Backup already done today',logtime)
 
-		} else if (bakpars.a(11)) {
+		} else if (bakpars.f(11)) {
 			call log2("backup is suppressed. Quitting.", logtime);
 			perform("OFF");
 			var().logoff();
 
-		} else if (not(bakpars.a(5).index(dow))) {
-			call log2("Not right day of week " ^ bakpars.a(5) ^ " Logging off", logtime);
+		} else if (not(bakpars.f(5).index(dow))) {
+			call log2("Not right day of week " ^ bakpars.f(5) ^ " Logging off", logtime);
 			perform("OFF");
 			var().logoff();
 
@@ -950,7 +950,7 @@ function loop_exit() {
 backup:
 			//similar code in LISTEN and LISTEN2
 			USER4 = "";
-			cmd = "FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakpars.a(7) ^ " SYSTEM";
+			cmd = "FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakpars.f(7) ^ " SYSTEM";
 			call log2("Attempting backup " ^ cmd, logtime);
 			perform(cmd);
 
@@ -961,7 +961,7 @@ backup:
 			if (charx eq "b") {
 				PSEUDO ^= "2";
 			}
-			PSEUDO ^= " " ^ bakpars.a(7) ^ " " ^ bakpars.a(12);
+			PSEUDO ^= " " ^ bakpars.f(7) ^ " " ^ bakpars.f(12);
 			if (msg_) {
 				//stop();
 				return false;
@@ -1043,7 +1043,7 @@ function got_link() {
 	//find a request to process
 	for (linkfilen = 1; linkfilen <= nlinkfiles; ++linkfilen) {
 
-		linkfilename1 = inpath ^ linkfilenames.a(linkfilen);
+		linkfilename1 = inpath ^ linkfilenames.f(linkfilen);
 
 		//lock it to prevent other listeners from processing it
 		//unlock locks,'REQUEST*':linkfilename1
@@ -1117,7 +1117,7 @@ readlink1:
 		//replyfilename=ucase(request<1>)
 		//eg D:\EXODUS\DATA\DEVDTEST\|3130570.1
 		//eg /var/www/html/exodus2/EXODUS//data/BASIC/~9979714.1
-		replyfilename = request_.a(1);
+		replyfilename = request_.f(1);
 		USER0.remover(1);
 
 		//php requests that responses are to be written to linux file system files
@@ -1204,12 +1204,12 @@ function request_init() {
 	var request_init_ok = true;
 
 	//cut off the initial connection info fields
-	tt = request_.a(1);
+	tt = request_.f(1);
 	if (tt eq "VERSION 3") {
 		//nconnectionfields
-		tt = USER0.a(2) - 1;
+		tt = USER0.f(2) - 1;
 		request_.remover(2);
-	} else if (USER0.a(1) eq "VERSION 2") {
+	} else if (USER0.f(1) eq "VERSION 2") {
 		tt = 4;
 	} else {
 		tt = 0;
@@ -1218,9 +1218,9 @@ function request_init() {
 
 	USER0 = request_.field(FM, tt + 1, 999999);
 
-	datasetx = USER0.a(1).ucase();
-	username = request_.a(2).ucase();
-	password = USER0.a(3).ucase();
+	datasetx = USER0.f(1).ucase();
+	username = request_.f(2).ucase();
+	password = USER0.f(3).ucase();
 
 	//REMOTE_ADDR, REMOTE_HOST, HTTPS, SESSIONID
 	//if connection<1>='::1' then connection<1>='127.0.0.1'
@@ -1228,28 +1228,28 @@ function request_init() {
 	connection.converter(FM, VM);
 	connection(1, 10) = username;
 	SYSTEM(40) = connection;
-	ipno = connection.a(1, 2);
-	netid = connection.a(1, 5);
+	ipno = connection.f(1, 2);
+	netid = connection.f(1, 5);
 
 	firstrequestfieldn = 4;
-	request1 = request_.a(firstrequestfieldn);
+	request1 = request_.f(firstrequestfieldn);
 
 	//throw away initial request CACHE
 	if (request1 eq "CACHE") {
 		USER0.remover(firstrequestfieldn);
-		request1 = request_.a(firstrequestfieldn);
+		request1 = request_.f(firstrequestfieldn);
 	}
 
 	request1.ucaser();
 	if (request1 eq "LOGIN") {
-		USER0(5) = request_.a(2);
+		USER0(5) = request_.f(2);
 	}
 	//convert @lower.case to @upper.case in request
-	request2 = USER0.a(5);
-	request3 = request_.a(6);
-	request4 = USER0.a(7);
-	request5 = request_.a(8);
-	request6 = USER0.a(9);
+	request2 = USER0.f(5);
+	request3 = request_.f(6);
+	request4 = USER0.f(7);
+	request5 = request_.f(8);
+	request6 = USER0.f(9);
 
 	//remove dataset and password
 	request_ = USER0.field(FM, firstrequestfieldn, 99999);
@@ -1270,9 +1270,9 @@ function request_init() {
 		tt ^= " User=" ^ xmlquote(username);
 		tt ^= " File=" ^ xmlquote(field2(replyfilename, OSSLASH, -1));
 		//REMOTE_ADDR REMOTE_HOST HTTPS
-		tt ^= " IP_NO=" ^ xmlquote(connection.a(1, 2));
-		tt ^= " Host=" ^ xmlquote(connection.a(1, 3));
-		tt ^= " HTTPS=" ^ xmlquote(connection.a(1, 4));
+		tt ^= " IP_NO=" ^ xmlquote(connection.f(1, 2));
+		tt ^= " Host=" ^ xmlquote(connection.f(1, 3));
+		tt ^= " HTTPS=" ^ xmlquote(connection.f(1, 4));
 		tt ^= " Session=" ^ xmlquote(netid);
 		tt ^= ">" "\r\n";
 
@@ -1284,20 +1284,20 @@ function request_init() {
 		call listen5(t2, logx, xx, yy);
 		logx.converter("^", FM);
 		logx(1) = request1;
-		if (logx.a(1)) {
-			tt ^= " Req1=" ^ (logx.a(1).quote());
+		if (logx.f(1)) {
+			tt ^= " Req1=" ^ (logx.f(1).quote());
 		}
-		if (logx.a(2)) {
-			tt ^= " Req2=" ^ (logx.a(2).quote());
+		if (logx.f(2)) {
+			tt ^= " Req2=" ^ (logx.f(2).quote());
 		}
-		if (logx.a(3)) {
-			tt ^= " Req3=" ^ (logx.a(3).quote());
+		if (logx.f(3)) {
+			tt ^= " Req3=" ^ (logx.f(3).quote());
 		}
-		if (logx.a(4)) {
-			tt ^= " Req4=" ^ (logx.a(4).quote());
+		if (logx.f(4)) {
+			tt ^= " Req4=" ^ (logx.f(4).quote());
 		}
-		if (logx.a(5)) {
-			tt ^= " Req5=" ^ (logx.a(5).quote());
+		if (logx.f(5)) {
+			tt ^= " Req5=" ^ (logx.f(5).quote());
 		}
 		req6up = logx.field(FM, 6, 9999);
 		req6up.converter(FM, "^");
@@ -1329,9 +1329,9 @@ function request_init() {
 		//tt<firstrequestfieldn-3>=''
 		tt.converter(FM, " ");
 
-		t2 = connection.a(1, 2);
-		if (connection.a(1, 3) ne t2) {
-			t2 ^= " " ^ connection.a(1, 3);
+		t2 = connection.f(1, 2);
+		if (connection.f(1, 3) ne t2) {
+			t2 ^= " " ^ connection.f(1, 3);
 		}
 
 		print(t2.oconv("L#15"), tt, ":");
@@ -1346,7 +1346,7 @@ function request_init() {
 	//so that if listen fails then NET the calling program can still respond
 	PRIORITYINT(100) = linkfilename3;
 
-	linkfile2size = linkfilename2.osfile().a(1);
+	linkfile2size = linkfilename2.osfile().f(1);
 	if (linkfile2size gt maxstrlen) {
 
 		if (linkfile2.osopen(linkfilename2)) {
@@ -1730,7 +1730,7 @@ subroutine process2() {
 		readenv = request5;
 		win.templatex = readenv;
 		call listen3(filename, request1, filetitle, triggers);
-		postread = triggers.a(3);
+		postread = triggers.f(3);
 
 		//reduce chance of using old common
 		win.registerx = "";//dim
@@ -1763,13 +1763,13 @@ subroutine process2() {
 		leaselocks = "";
 
 		keyx0 = keyx;
-		preread = triggers.a(1);
+		preread = triggers.f(1);
 		if (preread) {
 			keyx.transfer(ID);
 			win.srcfile = file;
 			win.datafile = filename;
 			systemsubs = preread;
-			call systemsubs(triggers.a(2));
+			call systemsubs(triggers.f(2));
 			DATA = "";
 			ID.transfer(keyx);
 		}
@@ -1879,7 +1879,7 @@ noupdate:
 		} else {
 			//if @file.error<1>='100' then
 			//NO FILE ERROR FOR JBASE
-			if (not(FILEERROR) or FILEERROR.a(1) eq "100") {
+			if (not(FILEERROR) or FILEERROR.f(1) eq "100") {
 
 				//no spaces in new keys
 				//allow in multipart keys on the assumption that they are old keys with spaces
@@ -1974,7 +1974,7 @@ noupdate:
 			win.reset = 0;
 
 			systemsubs = postread;
-			call systemsubs(triggers.a(4));
+			call systemsubs(triggers.f(4));
 			DATA = "";
 
 	//restore this programs environment
@@ -2087,7 +2087,7 @@ noupdate:
 		readenv = request6;
 		win.templatex = readenv;
 		call listen3(filename, request1, filetitle, triggers);
-		prewrite = triggers.a(1);
+		prewrite = triggers.f(1);
 
 		//reduce chance of using old common
 		win.registerx = "";//dim
@@ -2155,9 +2155,9 @@ noupdate:
 		if (not(lockrec.read(leaselocks, lockkey))) {
 			lockrec = FM ^ FM ^ FM ^ FM ^ "NO LOCK RECORD";
 		}
-		if (sessionid ne lockrec.a(5)) {
+		if (sessionid ne lockrec.f(5)) {
 			//response='Somebody has updated this record.|Your update cannot be applied.':'|The session id does not agree ':quote(lockrec<5>)
-			call listen4(12, USER3, lockrec.a(5));
+			call listen4(12, USER3, lockrec.f(5));
 			gosub fmtresp();
 			return;
 		}
@@ -2196,9 +2196,9 @@ noupdate:
 			//b) provide record in DELETE
 			if (allcols ne "") {
 				if (dictrec.reado(allcols, filename ^ "*DATE_TIME")) {
-					datetimefn = dictrec.a(2);
-					olddatetime = win.orec.a(datetimefn);
-					newdatetime = RECORD.a(datetimefn);
+					datetimefn = dictrec.f(2);
+					olddatetime = win.orec.f(datetimefn);
+					newdatetime = RECORD.f(datetimefn);
 					if (olddatetime and olddatetime ne newdatetime) {
 						gosub properunlock();
 						//response='Somebody else has updated this record.|Your update cannot be applied.':'|The time stamp does not agree'
@@ -2248,7 +2248,7 @@ badwrite:
 			if (prewrite) {
 				//call @updatesubs('PREWRITE')
 				systemsubs = prewrite;
-				call systemsubs(triggers.a(2));
+				call systemsubs(triggers.f(2));
 				DATA = "";
 			}
 
@@ -2300,10 +2300,10 @@ badwrite:
 			//failsafe in case prewrite unlocks key?
 			//gosub properlock
 
-			replacewrite = triggers.a(5);
+			replacewrite = triggers.f(5);
 			if (replacewrite) {
 				systemsubs = replacewrite;
-				call systemsubs(triggers.a(6));
+				call systemsubs(triggers.f(6));
 				//in case it changes @record?
 				if (not(RECORD.read(win.srcfile, keyx))) {
 					RECORD = "";
@@ -2313,12 +2313,12 @@ badwrite:
 			}
 
 			//post write processing
-			postwrite = triggers.a(3);
+			postwrite = triggers.f(3);
 			if (postwrite) {
 				postroutine = 1;
 				//call @updatesubs('POSTWRITE')
 				systemsubs = postwrite;
-				call systemsubs(triggers.a(4));
+				call systemsubs(triggers.f(4));
 				DATA = "";
 			}
 
@@ -2337,7 +2337,7 @@ badwrite:
 
 		} else if (request1 eq "DELETE") {
 
-			predelete = triggers.a(1);
+			predelete = triggers.f(1);
 
 			//ensure that deletion works on the orig record
 			RECORD = win.orec;
@@ -2368,7 +2368,7 @@ badwrite:
 			if (predelete) {
 				//call @updatesubs('PREDELETE')
 				systemsubs = predelete;
-				call systemsubs(triggers.a(2));
+				call systemsubs(triggers.f(2));
 				DATA = "";
 			}
 			if (not(win.valid)) {
@@ -2381,11 +2381,11 @@ badwrite:
 			win.srcfile.deleterecord(keyx);
 
 			//post delete processing
-			postdelete = triggers.a(3);
+			postdelete = triggers.f(3);
 			if (postdelete) {
 				postroutine = 1;
 				systemsubs = postdelete;
-				call systemsubs(triggers.a(4));
+				call systemsubs(triggers.f(4));
 				DATA = "";
 			}
 
@@ -2497,10 +2497,10 @@ badwrite:
 
 		//pass the output file in linkfilename2
 		//not good method, pass in system?
-		if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.a(1), xx)) {
+		if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.f(1), xx)) {
 			iodat_ = linkfilename2;
 		}
-		if (request_.a(1).substr(1, 4) eq "VAL.") {
+		if (request_.f(1).substr(1, 4) eq "VAL.") {
 			USER1 = linkfilename2;
 		}
 
@@ -2510,7 +2510,7 @@ badwrite:
 
 		//reformat for reqlog
 		voccmd.splicer(-5, 5, "");
-		USER0(1) = voccmd ^ "_" ^ request_.a(1);
+		USER0(1) = voccmd ^ "_" ^ request_.f(1);
 
 		//discard any stored input
 		DATA = "";
@@ -2556,7 +2556,7 @@ badwrite:
 
 		//get the printfilename in case the print program changed it
 		//multiple files may be passed back in iodat/user1 see proxy checkoutputfileexisits
-		printfilename = SYSTEM.a(2);
+		printfilename = SYSTEM.f(2);
 		//if tracing then
 		// *print ' got it'
 		// print @(0):@(-4):
@@ -2802,7 +2802,7 @@ function request_exit() {
 		//tt=count(tt,fm)+1:'/':count(tt,fm)+1
 		tt = " " ^ oconv((responsetime - requesttime).mod(86400), "[NUMBER,2]") ^ "s ";
 		//seconds
-		tt ^= rawresponse.a(1, 1).field("|", 1).a(1, 1);
+		tt ^= rawresponse.f(1, 1).field("|", 1).f(1, 1);
 		if (tt.index("<")) {
 			call htmllib2("STRIPTAGS", tt);
 		}
@@ -2834,9 +2834,9 @@ function request_exit() {
 
 subroutine geterrorresponse() {
 //	fileerrorx = FILEERROR;
-//	USER3 = "Error: " ^ ("FS" ^ fileerrorx.a(1, 1)).xlate("SYS.MESSAGES", 11, "X");
-//	response_.swapper("%1%", handlefilename(fileerrorx.a(2, 1)));
-//	USER3.swapper("%2%", fileerrorx.a(2, 2));
+//	USER3 = "Error: " ^ ("FS" ^ fileerrorx.f(1, 1)).xlate("SYS.MESSAGES", 11, "X");
+//	response_.swapper("%1%", handlefilename(fileerrorx.f(2, 1)));
+//	USER3.swapper("%2%", fileerrorx.f(2, 2));
 	USER3 = "Error: " ^ FILEERROR;
 	gosub fmtresp();
 	return;
@@ -2985,9 +2985,9 @@ subroutine leaselock() {
 
 		//handle a subsidiary lock (has master lock details)
 		//very similar code in LISTEN and SHADOW.MFS
-		if (lockrec.a(6)) {
+		if (lockrec.f(6)) {
 
-			masterlockkey = lockrec.a(6).field("*", 1, 2);
+			masterlockkey = lockrec.f(6).field("*", 1, 2);
 			sublockrec = lockrec;
 
 			//if masterlock is missing or doesnt have the same session id
@@ -2995,7 +2995,7 @@ subroutine leaselock() {
 			if (not(lockrec.read(leaselocks, masterlockkey))) {
 				goto nolock;
 			}
-			if (lockrec.a(5) ne sublockrec.a(5)) {
+			if (lockrec.f(5) ne sublockrec.f(5)) {
 				goto nolock;
 			}
 
@@ -3003,14 +3003,14 @@ subroutine leaselock() {
 
 		//during RELOCK the session id will normally be the same
 		//unless someone else got the lock because relocking was suspended somehow
-		if (lockrec.a(5) ne newsessionid) {
+		if (lockrec.f(5) ne newsessionid) {
 
 			if (request1 eq "RELOCK") {
 				goto nolock;
 			}
 
 			//fail if other lock has not timed out
-			if (lockrec.a(1) gt dostime) {
+			if (lockrec.f(1) gt dostime) {
 				USER3 = "NOT OK";
 				goto lockexit;
 			}
@@ -3041,12 +3041,12 @@ nolock:
 		if (not(tt.read(leaselocks, masterlock.field("*", 1, 2)))) {
 			goto nolock;
 		}
-		if (tt.a(5) ne masterlock.field("*", 3)) {
+		if (tt.f(5) ne masterlock.field("*", 3)) {
 			goto nolock;
 		}
 
 		//subsidiary lock gets the same sessionid as the master
-		newsessionid = tt.a(5);
+		newsessionid = tt.f(5);
 
 	}
 
@@ -3064,7 +3064,7 @@ nolock:
 
 	//lockrec<3>=if connection then connection<1,2> else @station
 	if (connection) {
-		lockrec(3) = connection.a(1, 2);
+		lockrec(3) = connection.f(1, 2);
 	} else {
 		lockrec(3) = STATION;
 	}
@@ -3179,7 +3179,7 @@ subroutine leaseunlock() {
 		lockrec = "";
 	}
 	if (not lockrec) {
-		if (FILEERROR.a(1) eq 100) {
+		if (FILEERROR.f(1) eq 100) {
 			//lock is missing but ignore it
 			//because we are unlocking anyway
 			USER3 = "OK";
@@ -3190,7 +3190,7 @@ subroutine leaseunlock() {
 	}
 
 	//check that the current lock agrees with the session id provided
-	if (not(sessionid eq lockrec.a(5))) {
+	if (not(sessionid eq lockrec.f(5))) {
 
 		//cannot unlock because the lock belongs to somebody else
 		//response='Error: Cannot unlock - '
@@ -3290,7 +3290,7 @@ subroutine filesecurity() {
 subroutine addlockholder() {
 	if (tt.read(leaselocks, filename ^ "*" ^ keyx)) {
 		//if tt<6> then read tt from locks,field(tt<6>,'*',1,2) else null
-		response_ ^= ", LOCKHOLDER: " ^ (tt.a(4).quote());
+		response_ ^= ", LOCKHOLDER: " ^ (tt.f(4).quote());
 
 	}
 	return;
@@ -3335,9 +3335,9 @@ subroutine updreqlog() {
 	}
 	//if request1 eq 'RELOCK' then return
 
-	tt = username ^ FM ^ ipno ^ FM ^ netid ^ FM ^ FM ^ responsetime ^ FM ^ rawresponse.a(1);
-	if (request_.a(1) eq "EXECUTE") {
-		tt(11) = USER0.a(2) ^ "_" ^ request_.a(3) ^ FM ^ USER0.field(FM, 4, 9999);
+	tt = username ^ FM ^ ipno ^ FM ^ netid ^ FM ^ FM ^ responsetime ^ FM ^ rawresponse.f(1);
+	if (request_.f(1) eq "EXECUTE") {
+		tt(11) = USER0.f(2) ^ "_" ^ request_.f(3) ^ FM ^ USER0.field(FM, 4, 9999);
 	} else {
 		tt(11) = request_;
 	}

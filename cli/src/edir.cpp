@@ -19,13 +19,13 @@ function main() {
 		);
 
 	// Allow for first argument to be an os file path
-	if (COMMAND.a(2).index(OSSLASH))
+	if (COMMAND.f(2).index(OSSLASH))
 		COMMAND.inserter(2,"DOS");
 
-	//var filename = COMMAND.a(2).convert(".", "_");
-	var filename = COMMAND.a(2);
-	ID = COMMAND.a(3).unquote().unquote();	 //spaces are quoted
-	var fieldno = COMMAND.a(4);
+	//var filename = COMMAND.f(2).convert(".", "_");
+	var filename = COMMAND.f(2);
+	ID = COMMAND.f(3).unquote().unquote();	 //spaces are quoted
+	var fieldno = COMMAND.f(4);
 
 	// Raw
 	var txtfmt = "TX";
@@ -60,7 +60,7 @@ function main() {
 	if (not RECORD)
 		printl("New record");
 
-	var text = RECORD.a(fieldno);
+	var text = RECORD.f(fieldno);
 
 	// Treat VMs as FMs etc if editing a specific field
 	if (fieldno)
@@ -140,7 +140,7 @@ function main() {
 					printl(filename ^ " " ^ ID ^ " > db");
 
 					//generate/update database functions if saved a symbolic dictionary record
-					if (filename.substr(1, 5) == "dict." and newrecord.a(1) eq "S" and newrecord.a(8).index("/"
+					if (filename.substr(1, 5) == "dict." and newrecord.f(1) eq "S" and newrecord.f(8).index("/"
 																											"*pgsql")) {
 						var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
 						osshell(oscmd);

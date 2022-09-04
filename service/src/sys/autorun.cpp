@@ -24,7 +24,7 @@ function main() {
 	if (not(options.index("X"))) {
 		var origuser = USERNAME;
 		var origstation = STATION;
-		var origsysmode = SYSTEM.a(33);
+		var origsysmode = SYSTEM.f(33);
 
 		execute(sentencex ^ " (X" ^ options);
 

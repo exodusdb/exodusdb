@@ -45,8 +45,8 @@ function main() {
 	return 0;
 	*/
 
-	var fromdate = RECORD.a(27).floor() - 24873;
-	var fromtime = ("." ^ RECORD.a(27).field(".", 2)) * 86400;
+	var fromdate = RECORD.f(27).floor() - 24873;
+	var fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;
 	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);
 }
 libraryexit(last_updated2)
@@ -55,7 +55,7 @@ libraryexit(last_updated2)
 libraryinit(maintenance)
 //----------------------
 function main() {
-	if (RECORD.a(33)) {
+	if (RECORD.f(33)) {
 		ANS = "";
 	} else {
 		ANS = "Yes";
@@ -68,7 +68,7 @@ libraryexit(maintenance)
 libraryinit(pid)
 //--------------
 function main() {
-	return RECORD.a(54, 5);
+	return RECORD.f(54, 5);
 }
 libraryexit(pid)
 
@@ -81,7 +81,7 @@ var islocked;
 
 function main() {
 	//NB add any new statuses to MONITORING program
-	if (RECORD.a(52)) {
+	if (RECORD.f(52)) {
 		ANS = "Closed";
 		return ANS;
 	}
@@ -94,8 +94,8 @@ function main() {
 	var dostimenow = var().date() + 24873 + var().time() / 86400;
 	//10 mins
 	var hungtime = 10 * 60 / 86400.0;
-	var r33 = RECORD.a(33);
-	if (r33 and (dostimenow - RECORD.a(27) gt hungtime)) {
+	var r33 = RECORD.f(33);
+	if (r33 and (dostimenow - RECORD.f(27) gt hungtime)) {
 		if (VOLUMES) {
 			ANS = "Hung";
 		} else {
@@ -108,8 +108,8 @@ function main() {
 	} else {
 		ANS = "Maintenance";
 	}
-	if (RECORD.a(53)) {
-		ANS ^= " " ^ RECORD.a(53);
+	if (RECORD.f(53)) {
+		ANS ^= " " ^ RECORD.f(53);
 	}
 	return ANS;
 }

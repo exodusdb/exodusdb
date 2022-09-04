@@ -69,7 +69,7 @@ function main()
 //	fromstr.field(sep,start,n=1)
 //
 	{
-		assert("1a^2b^3c"_var.a(2).str(3) == "2b2b2b");
+		assert("1a^2b^3c"_var.f(2).str(3) == "2b2b2b");
 	}
 
 	/* UBUNTU locale-gen
@@ -171,7 +171,7 @@ function main()
 		}
 	}
 	utftest.len().outputl("len=");
-	assert(len(utftest)==osfile(utftestfilename).a(1));
+	assert(len(utftest)==osfile(utftestfilename).f(1));
 
 	//check invalid utf8 has no change oswrite/osread round trip
 	oswrite(utftest,"t_"^utftestfilename);
@@ -252,7 +252,7 @@ function main()
 	var testfilename="t_vm.txt";
 	var charout=GreekSmallGamma;//VM;
 	assert(oswrite(charout,testfilename));
-	assert(osfile(testfilename).a(1)==2);
+	assert(osfile(testfilename).f(1)==2);
 	var offsetx=0;
 	var testfilex;
 	assert(osopen(testfilename,testfilex));
@@ -306,7 +306,7 @@ function main()
 	assert(testdata.oconv("HEX2")=="CEB3CEB3");
 	assert(offsetx==4);
 
-//	assert(testfilename.osfile().a(1) eq 2);
+//	assert(testfilename.osfile().f(1) eq 2);
 	var charin;
 //fails on ubuntu 13.10x64
 	assert(osread(charin,testfilename));
@@ -428,7 +428,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		//check can write characters 1-255 out as bytes using C locale
 		oswrite(data,"t_x.txt");
-		assert(osfile("t_x.txt").a(1) eq nbinarychars);
+		assert(osfile("t_x.txt").f(1) eq nbinarychars);
 
 		//check can read in bytes as characters using C locale
 		var data2;
@@ -612,7 +612,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//check can write greek unicode characters to Greek codepage
 		assert(Greek_sas.oswrite(greektestfilename,"Greek"));
 		//check 3 (wide) characters output as 3 bytes
-		assert(osfile(greektestfilename).a(1) eq 3);
+		assert(osfile(greektestfilename).f(1) eq 3);
 		//check can read greek wide unicode characters from greek codepage
 		var rec2;
 		assert(rec2.osread(greektestfilename,"Greek"));
@@ -853,7 +853,7 @@ function test_codepage(in codepage, in lang) {
 	for (int ii = 0; ii <= 255; ++ii)
 		v256 ^= chr(ii);
 	oswrite(v256,"t_codep.bin");
-	assert(osfile("t_codep.bin").a(1)==256);
+	assert(osfile("t_codep.bin").f(1)==256);
 
 	//convert to utf8
 	var as_utf8a=v256.from_codepage(codepage);

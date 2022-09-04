@@ -9,8 +9,8 @@ function main() {
 	var edic_hist = edic_hist_dir ^ "edic_hist.txt";
 	if (dcount(COMMAND, FM) < 2) {
 		if (osread(COMMAND, edic_hist)) {
-			OPTIONS = COMMAND.a(2);
-			COMMAND = raise(COMMAND.a(1));
+			OPTIONS = COMMAND.f(2);
+			COMMAND = raise(COMMAND.f(1));
 		} else {
 			abort("Syntax is 'edic osfilename'");
 		}
@@ -167,7 +167,7 @@ function main() {
 	var filen = 0;
 	while (filen < nfiles) {
 		filen += 1;
-		var filename = filenames.a(filen).unquote();
+		var filename = filenames.f(filen).unquote();
 
 		if (not filename.length())
 			continue;
@@ -432,10 +432,10 @@ function main() {
 
 					//printl(startatlineno);
 					//startatlineno = startatlineno.field2(":", 2);
-					startatlineno = matches.a(1,2);
+					startatlineno = matches.f(1,2);
 
 					// skip column because nano treats tab as one column
-					//startatlineno ^= "," ^ matches.a(1,3);
+					//startatlineno ^= "," ^ matches.f(1,3);
 
 					//printl(startatlineno);
 					//msvc style error lines

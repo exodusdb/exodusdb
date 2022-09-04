@@ -21,11 +21,11 @@ function main(in mode, in params, io result, io msg) {
 	//means window of 60*60 seconds rolling every 60 seconds
 	//max events 60 and store in DOS EMAILS.DAT file so per installation
 	//could be DEFINITIONS EMAILS.ROUNDROBIN to be per database
-	#define secsperperiod_ params.a(1)
-	#define periodsperwindow_ params.a(2)
-	#define maxeventsperwindow_ params.a(3)
-	#define roundrobinfilename_ params.a(4)
-	#define roundrobinkey_ params.a(5)
+	#define secsperperiod_ params.f(1)
+	#define periodsperwindow_ params.f(2)
+	#define maxeventsperwindow_ params.f(3)
+	#define roundrobinfilename_ params.f(4)
+	#define roundrobinkey_ params.f(5)
 
 	result = "";
 	msg = "";
@@ -91,7 +91,7 @@ function main(in mode, in params, io result, io msg) {
 		//determine current and last timeperiod
 		//currentperiodn=date()*24*secsperperiod+mod(time(),secsperperiod)
 		var currentperiodn = ((var().date() * 24 * 60 * 60 + var().time()) / secsperperiod_).floor();
-		var lastperiodn = roundrobin.a(1);
+		var lastperiodn = roundrobin.f(1);
 
 		//prevent catch up longer than periodsperwindow (add 2 for safety)
 		if (currentperiodn - lastperiodn gt periodsperwindow_ + 2) {
@@ -110,12 +110,12 @@ function main(in mode, in params, io result, io msg) {
 		roundrobin(1) = currentperiodn;
 		var currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
 
-		if (roundrobin.a(2).sum() lt maxeventsperwindow_) {
+		if (roundrobin.f(2).sum() lt maxeventsperwindow_) {
 
 			result = 1;
 
 			//increment the current number of events in the current period
-			roundrobin(2, currentbreakn) = roundrobin.a(2, currentbreakn) + 1;
+			roundrobin(2, currentbreakn) = roundrobin.f(2, currentbreakn) + 1;
 
 		} else {
 			result = 0;

@@ -72,7 +72,7 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 
 		var nkeys = keys.count(FM) + (keys ne "");
 		for (const var keyn : range(1, nkeys)) {
-			var keyx = keys.a(keyn);
+			var keyx = keys.f(keyn);
 
 			if (mode eq "LOCK") {
 				if (not(lockrecord(filename, file, keyx, recordx, secstowaitforlock))) {
@@ -97,14 +97,14 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 
 				for (const var fieldn : range(1, nfields)) {
 
-					var fieldnameorno = fieldnameornos.a(fieldn);
+					var fieldnameorno = fieldnameornos.f(fieldn);
 
-					if (oldvalues.a(fieldn) ne newvalues.a(fieldn)) {
+					if (oldvalues.f(fieldn) ne newvalues.f(fieldn)) {
 						if (fieldnameorno.isnum()) {
-							newvalues.a(fieldn).writev(file, keyx, fieldnameorno);
+							newvalues.f(fieldn).writev(file, keyx, fieldnameorno);
 
 						} else {
-							upd ^= fieldnameorno ^ FM ^ keyx ^ FM ^ oldvalues.a(fieldn) ^ FM ^ newvalues.a(fieldn) ^ FM;
+							upd ^= fieldnameorno ^ FM ^ keyx ^ FM ^ oldvalues.f(fieldn) ^ FM ^ newvalues.f(fieldn) ^ FM;
 						}
 						cnt += 1;
 					}

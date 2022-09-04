@@ -50,7 +50,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		//look for local or cygwin wget.exe otherwise quit
 		//WARNING TODO: check ternary op following;
 		var exe = oscwd().index(":") ? ".exe" : "";
-		cmd = SYSTEM.a(50) ^ "wget" ^ exe;
+		cmd = SYSTEM.f(50) ^ "wget" ^ exe;
 		if (not(cmd.osfile())) {
 			httpsbug = 1;
 			cmd = "wget" ^ exe;
@@ -92,7 +92,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		//baseurl='https://monitor.hosts.neosys.com:4428/'
 		var baseurl = "https://monitor.hosts.neosys.com";
 		//add configured or default port
-		var monitorport = SYSTEM.a(131);
+		var monitorport = SYSTEM.f(131);
 		if (not monitorport) {
 			monitorport = 4428;
 		}
@@ -120,7 +120,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		if (request eq "UPDATE") {
 
-			authurl = SYSTEM.a(55);
+			authurl = SYSTEM.f(55);
 			if (not authurl) {
 				//authurl='http://monitor.neosys.com/monitor.php'
 				authurl = baseurl ^ "monitor.php";
@@ -134,11 +134,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			//sessionid is a hashcode of the day
 			//eg databaseid=FFFFFFFF&databasecode=XXXXXXXX&installationid=999999&sessionid=
 
-			var hostname = SYSTEM.a(57);
+			var hostname = SYSTEM.f(57);
 
 			//prepare params
-			params = "databaseid=" ^ SYSTEM.a(45);
-			params ^= "&databasecode=" ^ SYSTEM.a(17);
+			params = "databaseid=" ^ SYSTEM.f(45);
+			params ^= "&databasecode=" ^ SYSTEM.f(17);
 			params ^= "&installationid=" ^ cidx;
 			params ^= "&sessionid=" ^ sessionid;
 			params ^= "&request=" ^ request;
@@ -154,7 +154,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		//add basic wget commands
-		var referer = "exodusclient-" ^ SYSTEM.a(17) ^ "-" ^ cidx;
+		var referer = "exodusclient-" ^ SYSTEM.f(17) ^ "-" ^ cidx;
 		if (post) {
 			cmd ^= " --no-cache";
 			if (httpsbug) {
@@ -184,23 +184,23 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		//above option doesnt exist - must have http_proxy environment variable
 		//or in a .wgetrc file
 		//TODO exclude from proxy if in bypasslist in system<56,2>
-		if (SYSTEM.a(56)) {
+		if (SYSTEM.f(56)) {
 
 			if (post) {
 				cmd ^= " --proxy=on";
-				cmd ^= " --execute http_proxy=" ^ SYSTEM.a(56, 1);
+				cmd ^= " --execute http_proxy=" ^ SYSTEM.f(56, 1);
 			} else {
 				wgetrc(-1) = "use_proxy=on";
-				wgetrc(-1) = "http_proxy=" ^ SYSTEM.a(56, 1);
+				wgetrc(-1) = "http_proxy=" ^ SYSTEM.f(56, 1);
 			}
 
-			if (SYSTEM.a(56, 3)) {
+			if (SYSTEM.f(56, 3)) {
 				if (post) {
-					cmd ^= " --proxy-user=" ^ SYSTEM.a(56, 3);
-					cmd ^= " --proxy-password=" ^ SYSTEM.a(56, 4);
+					cmd ^= " --proxy-user=" ^ SYSTEM.f(56, 3);
+					cmd ^= " --proxy-password=" ^ SYSTEM.f(56, 4);
 				} else {
-					wgetrc(-1) = "proxy_user=" ^ SYSTEM.a(56, 3);
-					wgetrc(-1) = "proxy_password=" ^ SYSTEM.a(56, 4);
+					wgetrc(-1) = "proxy_user=" ^ SYSTEM.f(56, 3);
+					wgetrc(-1) = "proxy_password=" ^ SYSTEM.f(56, 4);
 				}
 			}
 
@@ -336,7 +336,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	} else if (mode eq "READ") {
 
-		var tt = tempfilename2.osfile().a(1);
+		var tt = tempfilename2.osfile().f(1);
 		//if tt gt 32000 then
 		if (tt gt maxstrsize_ / 2) {
 			datax = "";
@@ -362,7 +362,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		//verify echo
-		var expect = SYSTEM.a(45) ^ "," ^ SYSTEM.a(17) ^ "," ^ cidx ^ "," ^ sessionid;
+		var expect = SYSTEM.f(45) ^ "," ^ SYSTEM.f(17) ^ "," ^ cidx ^ "," ^ sessionid;
 		if (datax.field(",", 2, 4) ne expect) {
 			msg = "Bad response";
 			goto badresponse;

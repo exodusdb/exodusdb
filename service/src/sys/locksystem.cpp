@@ -26,7 +26,7 @@ function main(in mode0, in dataset0) {
 	//c sys
 	//global all
 
-	interactive = false; //not(SYSTEM.a(33));
+	interactive = false; //not(SYSTEM.f(33));
 	if (mode0.unassigned()) {
 		mode = "";
 	} else {
@@ -42,7 +42,7 @@ function main(in mode0, in dataset0) {
 	}
 
 	if (dataset eq "CURRENTDATASET") {
-		dataset = SYSTEM.a(17);
+		dataset = SYSTEM.f(17);
 		}
 
 	if (not(voc.open("VOC", ""))) {
@@ -69,11 +69,11 @@ function main(in mode0, in dataset0) {
 checkotherusers:
 	otherusersx = otherusers(dataset);
 	if (otherusersx) {
-		nn = otherusersx.a(1);
+		nn = otherusersx.f(1);
 		if (not interactive) {
 			return 0;
 		}
-		otherusersx = otherusersx.a(2);
+		otherusersx = otherusersx.f(2);
 		otherusersx.converter(VM, " ");
 
 		//t=if dataset then ' of dataset ':dataset else ''

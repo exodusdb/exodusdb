@@ -18,13 +18,13 @@ Procedural flavour: Function names on the left and parameters on the right.
 
 OO flavour: Does exactly the same thing but is perhaps easier to read from left to right in one pass:
 
-    xx.a(6).field("/",2).oconv("D2").outputl();
+    xx.f(6).field("/",2).oconv("D2").outputl();
 
-xx.a(6) stands for "xx<6>" in mv/pick. <> brackets cannot be used for functions in c++. "a" stands for "attribute".
+xx.f(6) stands for "xx<6>" in mv/pick. <> brackets cannot be used for functions in c++. "a" stands for "attribute".
 
 Hybrid:
 
-    printl(xx.a(6).field("/",2).oconv("D2"));
+    printl(xx.f(6).field("/",2).oconv("D2"));
 
 Comments about style:
 
@@ -346,7 +346,7 @@ function main() {
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	#define interactive not(SYSTEM.a(33))
+	#define interactive not(SYSTEM.f(33))
 
 	ulchar = "-";
 
@@ -452,7 +452,7 @@ function main() {
 	}
 
 	if (VOLUMES) {
-		if (SYSTEM.a(2) eq "") {
+		if (SYSTEM.f(2) eq "") {
 			perform("GET NEW " ^ SENTENCE);
 			stop();
 		}
@@ -460,7 +460,7 @@ function main() {
 
 		//if not DOS then dont force html or force output to file
 	} else {
-		html = SYSTEM.a(2).lcase().substr(-3, 3) eq "htm";
+		html = SYSTEM.f(2).lcase().substr(-3, 3) eq "htm";
 	}
 
 	if (html) {
@@ -473,7 +473,7 @@ function main() {
 		thx = "</th>";
 		tr = "<tr>";
 		trx = "</tr>";
-		tt = SYSTEM.a(2);
+		tt = SYSTEM.f(2);
 		tt.swapper(".txt", ".htm");
 		SYSTEM(2) = tt;
 	} else {
@@ -491,9 +491,9 @@ function main() {
 	//init1:
 	//////
 
-	thcolor = SYSTEM.a(46, 1);
-	tdcolor = SYSTEM.a(46, 2);
-	reportfont = SYSTEM.a(46, 3);
+	thcolor = SYSTEM.f(46, 1);
+	tdcolor = SYSTEM.f(46, 2);
+	reportfont = SYSTEM.f(46, 3);
 	//if tdcolor else tdcolor='#FFFFC0'
 	//if thcolor else thcolor='#FFFF80'
 
@@ -705,7 +705,7 @@ nextkey:
 		//determine if limited nrecs sorted by mv field (which needs preselect)
 		if ((maxnrecs and not(preselect)) and DICT) {
 			if (dictrec.reado(DICT, word)) {
-				preselect = dictrec.a(4)[1] eq "M";
+				preselect = dictrec.f(4)[1] eq "M";
 			}
 		}
 
@@ -733,7 +733,7 @@ nextkey:
 				call mssg(word ^ " is not a valid dictionary item");
 				stop();
 			}
-			tt = dictrec.a(4).field(".", 1);
+			tt = dictrec.f(4).field(".", 1);
 			if (tt[1] ne "M") {
 				call mssg(word ^ " limit must be a multivalued dict item");
 				stop();
@@ -900,7 +900,7 @@ nextkey:
 				}
 			}
 			if (title eq "") {
-				title = tt.a(3) ^ nbsp ^ ":";
+				title = tt.f(3) ^ nbsp ^ ":";
 			}
 		}
 
@@ -908,7 +908,7 @@ nextkey:
 		//find the next empty row
 		while (true) {
 			///BREAK;
-			if (not(headtab.a(hrown, tcoln) or (headtab.a(hrown, tcoln + 1))))
+			if (not(headtab.f(hrown, tcoln) or (headtab.f(hrown, tcoln + 1))))
 				break;
 			hrown += 1;
 		}  //loop;
@@ -927,7 +927,7 @@ nextkey:
 		headtab(hrown, tcoln + 1) = value;
 		hrown += 1;
 
-	} else if (word eq "HEADING" and dictrec.a(3) ne "HEADING") {
+	} else if (word eq "HEADING" and dictrec.f(3) ne "HEADING") {
 
 		gosub getquotedword();
 		head ^= word;
@@ -1013,7 +1013,7 @@ nextkey:
 
 	} else if (dictrec) {
 
-		if (var("FSDIA").index(dictrec.a(1))) {
+		if (var("FSDIA").index(dictrec.f(1))) {
 
 			//pick format dictionary
 			//if index('DI',dictrec<1>,1) then
@@ -1034,13 +1034,13 @@ nextkey:
 			colname(coln) = word;
 
 			//increase column width if column title needs it
-//			let nn = dictrec.a(3).count(VM) + 1;
+//			let nn = dictrec.f(3).count(VM) + 1;
 //			for (ii = 1; ii <= nn; ++ii) {
-//				tt = dictrec.a(3, ii);
-			if (dictrec.a(10)) {
-				let titles = dictrec.a(3).convert(VM, FM);
+//				tt = dictrec.f(3, ii);
+			if (dictrec.f(10)) {
+				let titles = dictrec.f(3).convert(VM, FM);
 				for (let part : titles) {
-					if (part.length() gt dictrec.a(10)) {
+					if (part.length() gt dictrec.f(10)) {
 						dictrec(10) = part.length();
 					}
 				};	//ii;
@@ -1071,7 +1071,7 @@ nextkey:
 			}
 
 			if (html) {
-				tt = dictrec.a(7);
+				tt = dictrec.f(7);
 				tt.swapper("[DATE]", "[DATE,*]");
 				if (tt eq "[DATE,4]") {
 					tt = "[DATE,4*]";
@@ -1086,7 +1086,7 @@ nextkey:
 			//store the format in a convenient place
 			tt = "";
 			if (not html) {
-				tt = coldict(coln).a(9) ^ "#" ^ coldict(coln).a(10);
+				tt = coldict(coln).f(9) ^ "#" ^ coldict(coln).f(10);
 			}
 			coldict(coln)(11) = tt;
 
@@ -1132,7 +1132,7 @@ nextkey:
 								hcoln = 1;
 							}
 							tcoln = (hcoln - 1) * 2 + 1;
-							headtab(hrown, tcoln) = coldict(coln).a(3).convert(VM, " ") ^ nbsp ^ ":";
+							headtab(hrown, tcoln) = coldict(coln).f(3).convert(VM, " ") ^ nbsp ^ ":";
 							headtab(hrown, tcoln + 1) = "'B" ^ tt2 ^ "'";
 							hrown += 1;
 						}
@@ -1223,13 +1223,13 @@ x1exit:
 		if (html) {
 			tt = "";
 		} else {
-			tt = coldict(1).a(9) ^ "#" ^ coldict(1).a(10);
+			tt = coldict(1).f(9) ^ "#" ^ coldict(1).f(10);
 		}
 		coldict(1)(11) = tt;
 
 		//increment the list of breaking columns by one as well
 		for (breakn = 1; breakn <= nbreaks; ++breakn) {
-			breakcolns(breakn) = breakcolns.a(breakn) + 1;
+			breakcolns(breakn) = breakcolns.f(breakn) + 1;
 		};	//breakn;
 
 		//and the page break colns
@@ -1255,14 +1255,14 @@ x1exit:
 		underline = "";
 		colul = "";
 		for (coln = 1; coln <= ncols; ++coln) {
-			if (coldict(coln).a(10)) {
-				if (coldict(coln).a(12)) {
+			if (coldict(coln).f(10)) {
+				if (coldict(coln).f(12)) {
 					tt = ulchar;
 				} else {
 					tt = " ";
 				}
-				underline ^= tt.str(coldict(coln).a(10)) ^ " ";
-				colul ^= ulchar.str(coldict(coln).a(10)) ^ " ";
+				underline ^= tt.str(coldict(coln).f(10)) ^ " ";
+				colul ^= ulchar.str(coldict(coln).f(10)) ^ " ";
 			}
 		};	//coln;
 		bar = ulchar.str(colul.length() - 1);
@@ -1304,12 +1304,12 @@ x1exit:
 			coldict(coln)(bheadfn) = "";
 		}
 
-		if (coldict(coln).a(10)) {
+		if (coldict(coln).f(10)) {
 			if (html) {
 				coln2 += 1;
 
 				//suppressing non-totalled columns may not work well with multi-row colhdg
-				tt = coldict(coln).a(bheadfn);
+				tt = coldict(coln).f(bheadfn);
 
 				//tt2=index(tt,'style="',1)
 				//tt3='background-color:':thcolor
@@ -1323,7 +1323,7 @@ x1exit:
 
 				//without the MULTIROW_COLHDG keyword,
 				//vm indicates folding, \\ indicates rows in column headings
-				tt = coldict(coln).a(3);
+				tt = coldict(coln).f(3);
 				if (not multirowcolhdg) {
 					tt.swapper(VM, "<br />");
 				}
@@ -1337,7 +1337,7 @@ x1exit:
 				//swap vm with '<br />' in colhdg
 
 				coltags(-1) = " <col";
-				align = coldict(coln).a(9);
+				align = coldict(coln).f(9);
 				if (align eq "R") {
 					//if index(coldict(coln)<7>,'[NUMBER',1) then
 					// *http://www.w3.org/TR/html401/struct/tables.html#adef-align-TD
@@ -1355,7 +1355,7 @@ x1exit:
 					align = "center";
 				}
 				if (usecols) {
-					coltags ^= coldict(coln).a(bheadfn);
+					coltags ^= coldict(coln).f(bheadfn);
 				}
 				coltags ^= " />";
 
@@ -1369,7 +1369,7 @@ x1exit:
 
 			} else {
 				for (ii = 1; ii <= 9; ++ii) {
-					colhdg(ii) = colhdg.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ";
+					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict(coln).f(3, ii), coldict(coln).f(11)) ^ " ";
 				};	//ii;
 			}
 		}
@@ -1534,15 +1534,15 @@ nextdict:
 			if (not(dictrec.reado(DICT, dictid))) {
 				goto nextdict;
 			}
-			if (dictrec.a(1) ne "F") {
+			if (dictrec.f(1) ne "F") {
 				goto nextdict;
 			}
 			for (limitn = 1; limitn <= nlimits; ++limitn) {
-				if (dictrec.a(4).field(".", 1) eq limits.a(4, limitn)) {
-					tt = dictrec.a(2);
+				if (dictrec.f(4).field(".", 1) eq limits.f(4, limitn)) {
+					tt = dictrec.f(2);
 					if (tt) {
-						if (not(limits.a(5, limitn).locateusing(SVM, tt, xx))) {
-							limits(5, limitn, -1) = dictrec.a(2);
+						if (not(limits.f(5, limitn).locateusing(SVM, tt, xx))) {
+							limits(5, limitn, -1) = dictrec.f(2);
 						}
 					}
 				}
@@ -1628,17 +1628,17 @@ nextrec:
 	if (not(readnext(RECORD, ID, MV))) {
 //		FILEERRORMODE = 0;
 //		if (STATUS) {
-//			tx = "*** Fatal Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
+//			tx = "*** Fatal Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
 //			gosub printtx();
 //			stop();
 //		}
-//		if (FILEERROR.a(1) eq 421) {
+//		if (FILEERROR.f(1) eq 421) {
 //			tx = "Operation aborted by user.";
 //			gosub printtx();
 //			stop();
 //		}
-//		if (FILEERROR and FILEERROR.a(1) ne 111) {
-//			tx = "*** Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
+//		if (FILEERROR and FILEERROR.f(1) ne 111) {
+//			tx = "*** Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
 //			gosub printtx();
 //			readerr += 1;
 //			stop();
@@ -1677,12 +1677,12 @@ nextrec:
 		for (limitn = 1; limitn <= nlimits; ++limitn) {
 
 			//find maximum mv number for the associated group of fns
-			fns = limits.a(5, limitn);
+			fns = limits.f(5, limitn);
 			nfns = fns.count(SVM) + (SVM ne "");
 			nmvs = 0;
 			for (fnn = 1; fnn <= nfns; ++fnn) {
-				fn = fns.a(1, 1, fnn);
-				tt = RECORD.a(fn);
+				fn = fns.f(1, 1, fnn);
+				tt = RECORD.f(fn);
 				if (tt.length()) {
 					tt = tt.count(VM) + 1;
 					if (tt gt nmvs) {
@@ -1691,16 +1691,16 @@ nextrec:
 				}
 			};	//fnn;
 
-			limitvals = calculate(limits.a(1, limitn));
+			limitvals = calculate(limits.f(1, limitn));
 			for (mvx = nmvs; mvx >= 1; --mvx) {
-				tt = limitvals.a(1, mvx);
+				tt = limitvals.f(1, mvx);
 				if (tt eq "") {
 					tt = "\"\"";
 				}
 				//locate tt in (limits<3,limitn>)<1,1> using sm setting xx else
-				if (not(limits.a(3, limitn).locateusing(SVM, tt, xx))) {
+				if (not(limits.f(3, limitn).locateusing(SVM, tt, xx))) {
 					for (fnn = 1; fnn <= nfns; ++fnn) {
-						RECORD.remover(fns.a(1, 1, fnn), mvx);
+						RECORD.remover(fns.f(1, 1, fnn), mvx);
 					};	//fnn;
 				}
 			};	//mvx;
@@ -1735,9 +1735,9 @@ nextrec:
 	for (coln = 1; coln <= ncols; ++coln) {
 		//  @mv=0
 
-		if (coldict(coln).a(9) eq "T" and not(html)) {
+		if (coldict(coln).f(9) eq "T" and not(html)) {
 
-			mcol(coln) = oconv(calculate(colname(coln)), coldict(coln).a(11));
+			mcol(coln) = oconv(calculate(colname(coln)), coldict(coln).f(11));
 
 		} else {
 
@@ -1766,7 +1766,7 @@ nextrec:
 		breakleveln = nbreaks;
 	} else {
 		for (leveln = nbreaks; leveln >= 1; --leveln) {
-			coln = breakcolns.a(leveln);
+			coln = breakcolns.f(leveln);
 			///BREAK;
 			if (scol(coln) ne breakvalue(coln))
 				break;
@@ -1799,7 +1799,7 @@ recexit:
 	//break totals - add at the bottom level (1)
 	for (coln = 1; coln <= ncols; ++coln) {
 		//only totalled columns
-		if (coldict(coln).a(12)) {
+		if (coldict(coln).f(12)) {
 			if (icol(coln)) {
 				if (html) {
 #ifndef EXO_NOHTML
@@ -1883,7 +1883,7 @@ recexit:
 		}
 		for (coln = 1; coln <= ncols; ++coln) {
 			tt = scol(coln);
-			oconvx = coldict(coln).a(7);
+			oconvx = coldict(coln).f(7);
 			if (oconvx) {
 				tt = oconv(tt, oconvx);
 				if (html) {
@@ -1894,9 +1894,9 @@ recexit:
 					}
 				}
 			}
-			if (coldict(coln).a(10)) {
+			if (coldict(coln).f(10)) {
 				if (not html) {
-					tt = oconv(tt, coldict(coln).a(11));
+					tt = oconv(tt, coldict(coln).f(11));
 				}
 				if (tt eq "") {
 					//tt=nbsp
@@ -2024,7 +2024,7 @@ x2exit:
 		tx ^= "gwindowopenparameters={};";
 		tx ^= "if (readonly) gwindowopenparameters.readonlymode=true;";
 		tx ^= "gwindowopenparameters.key=key;";
-		tx ^= "glogincode=\"" ^ SYSTEM.a(17) ^ "*" ^ USERNAME ^ "*\";";
+		tx ^= "glogincode=\"" ^ SYSTEM.f(17) ^ "*" ^ USERNAME ^ "*\";";
 		//tx:='window.open(url)}'
 		//similar code in NLIST and LEDGER2
 		tx ^= "var vhtm=window.opener.location.toString().split(\"/\");";
@@ -2084,7 +2084,7 @@ getnextword:
 	gosub getword2();
 
 	if (word.length()) {
-		if (ignorewords.a(1).locate(word, xx)) {
+		if (ignorewords.f(1).locate(word, xx)) {
 			goto getnextword;
 		}
 	}
@@ -2211,8 +2211,8 @@ subroutine getwordexit() {
 		word.splicer(-5, 5, "");
 	if (dictrec.reado(DICT, word)) {
 maindict:
-		if (dictrec.a(1) eq "G") {
-			tt = dictrec.a(3);
+		if (dictrec.f(1) eq "G") {
+			tt = dictrec.f(3);
 			tt.converter(VM, " ");
 			sentencex.splicer(startcharn, word.length(), tt);
 			charn = startcharn - 1;
@@ -2228,9 +2228,9 @@ dictvoc:
 		dictrec = "";
 		if (dictrec.reado(dictvoc, word)) {
 gotdictvoc:
-			if (dictrec.a(1) eq "RLIST") {
-				if (dictrec.a(4)) {
-					word = dictrec.a(4);
+			if (dictrec.f(1) eq "RLIST") {
+				if (dictrec.f(4)) {
+					word = dictrec.f(4);
 				}
 				dictrec = "";
 			}
@@ -2294,7 +2294,7 @@ subroutine printbreaks() {
 	//for leveln=breakleveln to 1 step -1
 
 	for (leveln = 1; leveln <= breakleveln; ++leveln) {
-		breakcoln = breakcolns.a(leveln);
+		breakcoln = breakcolns.f(leveln);
 
 		storetx = tx;
 		anycell = 0;
@@ -2352,7 +2352,7 @@ subroutine printbreaks() {
 		for (coln = 1; coln <= ncols; ++coln) {
 
 			//total column
-			if (coldict(coln).a(12)) {
+			if (coldict(coln).f(12)) {
 				cell = breaktotal(coln, leveln);
 
 				//add into the higher level
@@ -2380,7 +2380,7 @@ subroutine printbreaks() {
 				}
 
 				//format it
-				oconvx = coldict(coln).a(7);
+				oconvx = coldict(coln).f(7);
 				if (oconvx) {
 					cell = oconv(cell, oconvx);
 				}
@@ -2399,7 +2399,7 @@ subroutine printbreaks() {
 
 				//print the old break value
 				cell = breakvalue(coln);
-				oconvx = coldict(coln).a(7);
+				oconvx = coldict(coln).f(7);
 				if (oconvx) {
 					cell = oconv(cell, oconvx);
 				}
@@ -2408,7 +2408,7 @@ subroutine printbreaks() {
 				breakvalue(coln) = scol(coln);
 
 				//if coln=pagebreakcoln then
-				if (pagebreaks.a(coln)) {
+				if (pagebreaks.f(coln)) {
 
 					//rebuild the heading
 					if (newhead eq "") {
@@ -2428,7 +2428,7 @@ subroutine printbreaks() {
 
 					//insert the page break data
 					//swap "'B'" with tt in newhead
-					newhead.swapper(pagebreaks.a(coln), tt);
+					newhead.swapper(pagebreaks.f(coln), tt);
 				}
 
 				if (detsupp lt 2 and not(anytotals)) {
@@ -2442,7 +2442,7 @@ subroutine printbreaks() {
 
 				//if 1 or detsupp<2 then
 				//cell=oldbreakvalue(coln)
-				cell = oconv(oldbreakvalue(coln), coldict(coln).a(7));
+				cell = oconv(oldbreakvalue(coln), coldict(coln).f(7));
 				if (breakcolns.locateusing(FM, coln, colbreakn)) {
 					if (colbreakn lt leveln) {
 						cell = "Total";
@@ -2451,16 +2451,16 @@ subroutine printbreaks() {
 				// end
 			}
 
-			if (coldict(coln).a(10)) {
+			if (coldict(coln).f(10)) {
 				if (not(html)) {
-					cell = cell.substr(1, coldict(coln).a(10));
-					cell = oconv(cell, coldict(coln).a(11));
+					cell = cell.substr(1, coldict(coln).f(10));
+					cell = oconv(cell, coldict(coln).f(11));
 				} else {
 					tx ^= td0 ^ "<th";
 					if (not usecols) {
-						tx ^= coldict(coln).a(bheadfn);
+						tx ^= coldict(coln).f(bheadfn);
 					}
-					if (coldict(coln).a(9) eq "R") {
+					if (coldict(coln).f(9) eq "R") {
 						tx ^= " style=\"text-align:right\"";
 					}
 					tx ^= ">";
@@ -2490,7 +2490,7 @@ subroutine printbreaks() {
 
 		//option to suppress the current level
 		//or if this is the first record cannot be any totals before it.
-		if ((not(anycell) or breakopts.a(leveln).index("X")) or recn eq 1) {
+		if ((not(anycell) or breakopts.f(leveln).index("X")) or recn eq 1) {
 			tx = storetx;
 		}
 
@@ -2594,7 +2594,7 @@ subroutine newheadreplacements() {
 	//if index(newhead,'{',1) else return
 	//replace any {DICTID} in the heading
 	for (ii = 1; ii <= nreplacements; ++ii) {
-		dictid = replacements.a(ii);
+		dictid = replacements.f(ii);
 		tt = "{" ^ dictid ^ "}";
 		tt2 = calculate(dictid);
 		tt2.swapper("'", "''");
@@ -2633,7 +2633,7 @@ subroutine emailing() {
 
 		//body='NONE'
 		//attachfilename=system<2>
-		body = "@" ^ SYSTEM.a(2);
+		body = "@" ^ SYSTEM.f(2);
 
 		tt = emailto;
 		tt2 = emailcc;
@@ -2645,7 +2645,7 @@ subroutine emailing() {
 			tt3 = emailsubject;
 		} else {
 			//tt3='EXODUS: ':field(head<1,1,1>,"'",1)
-			tt3 = head.a(1, 1, 1).field("'", 1);
+			tt3 = head.f(1, 1, 1).field("'", 1);
 			if (tt3.index(">")) {
 				tt3 = field2(tt3, ">", -1);
 			}
@@ -2661,7 +2661,7 @@ subroutine emailing() {
 		}
 
 		printptr = 0;
-		var("").oswrite(SYSTEM.a(2));
+		var("").oswrite(SYSTEM.f(2));
 		//osopen system<2> to printfile else
 		// call msg(quote(system<2>):' failed to reopen')
 		// stop

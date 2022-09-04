@@ -46,7 +46,7 @@ function main() {
 	if (not homedir.osgetenv("EXO_HOME"))
 		homedir = osgetenv("HOME");
 
-	var datpath = COMMAND.a(2);
+	var datpath = COMMAND.f(2);
 	if (not datpath) {
 		datpath = homedir ^ "/dat";
 	}
@@ -71,15 +71,15 @@ function main() {
 	var definitions_key = "LAST_SYNC_DATE_TIME*DAT";
 	if (not definitions or not read(last_sync,definitions, definitions_key))
 		last_sync = "";
-	last_sync_date = last_sync.a(1);
-	last_sync_time = last_sync.a(2);
+	last_sync_date = last_sync.f(1);
+	last_sync_time = last_sync.f(2);
 
 	// Skip if nothing new
 	var datinfo = osdir(datpath);
 	if (not datinfo) {
 		abort("Error: syncdat: " ^ datpath.quote() ^ " dat dir missing");
 	}
-	var dirtext = "sync_dat: " ^ datpath ^ " " ^ datinfo.a(2).oconv("D-Y") ^ " " ^ datinfo.a(3).oconv("MTS");
+	var dirtext = "sync_dat: " ^ datpath ^ " " ^ datinfo.f(2).oconv("D-Y") ^ " " ^ datinfo.f(3).oconv("MTS");
 	if (not force and not is_newer(datinfo)) {
 		if (verbose)
 			printl(dirtext, "No change.");
@@ -102,7 +102,7 @@ function main() {
 //			var dirinfo = osdir(dirpath);
 //			if (not is_newer(dirinfo)) {
 //				if (verbose)
-//					printl("Nothing new in", dirpath, dirinfo.a(2).oconv("D-Y"), dirinfo.a(3).oconv("MTS"));
+//					printl("Nothing new in", dirpath, dirinfo.f(2).oconv("D-Y"), dirinfo.f(3).oconv("MTS"));
 //				continue;
 //			}
 //		}
@@ -144,7 +144,7 @@ function main() {
 			RECORD = RECORD.iconv(txtfmt);
 
 			// Add it to newcpptext
-			if (add2cpp and RECORD.a(1) eq "S") {
+			if (add2cpp and RECORD.f(1) eq "S") {
 
 				// dict intro
 				var line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
@@ -272,7 +272,7 @@ function main() {
 
 function is_newer(in fsinfo) {
 
-    int fsinfo_date = fsinfo.a(2);
+    int fsinfo_date = fsinfo.f(2);
 
     if (fsinfo_date > last_sync_date)
         return true;
@@ -280,7 +280,7 @@ function is_newer(in fsinfo) {
     if (fsinfo_date < last_sync_date)
         return false;
 
-    return fsinfo.a(3) > last_sync_time;
+    return fsinfo.f(3) > last_sync_time;
 
 }
 

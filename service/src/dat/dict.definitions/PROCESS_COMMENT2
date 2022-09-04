@@ -9,13 +9,13 @@ S
 \
 function main() {\
 	ANS = "";\
-	if (ID.field("*", 2) eq SYSTEM.a(32)) {\
+	if (ID.field("*", 2) eq SYSTEM.f(32)) {\
 		ANS(1, -1) = "Current user session";\
 	}\
-	if (RECORD.a(3).trim() eq STATION.trim()) {\
+	if (RECORD.f(3).trim() eq STATION.trim()) {\
 		ANS(1, -1) = "Current workstation";\
 	}\
-	if (RECORD.a(5) eq USERNAME) {\
+	if (RECORD.f(5) eq USERNAME) {\
 		ANS(1, -1) = "Current user";\
 		}\
 	return ANS;\

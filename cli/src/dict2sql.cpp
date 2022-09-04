@@ -98,14 +98,14 @@ function main() {
 	//for dicts if not default
 	var dictconnection = "";
 
-	var filenames = COMMAND.a(2).lcase();
-	var dictid = COMMAND.a(3);
+	var filenames = COMMAND.f(2).lcase();
+	var dictid = COMMAND.f(3);
 	verbose = index(OPTIONS, 'V');
 	var doall = true;
 
 	// Option to install standard exodus functions
-	if (locateusing(",", filenames.a(1), "pgsql,pgexodus,exodus")) {
-		install_exodus_extensions = filenames.a(1);
+	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
+		install_exodus_extensions = filenames.f(1);
 		filenames.remover(1);
 		doall = false;
 	}
@@ -447,12 +447,12 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		if (!dictrec.read(dictfile, dictid))
 			stop(quote(dictid) ^ " cannot be read in " ^ quote(dictfilename));
 	}
-	var sourcecode = dictrec.a(8);
-	var ismv = dictrec.a(4)[1] == "M";
+	var sourcecode = dictrec.f(8);
+	var ismv = dictrec.f(4)[1] == "M";
 
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
-	var conversion = dictrec.a(7);
+	var conversion = dictrec.f(7);
 	if (conversion.substr(1, 6) == "[DATE]" || conversion.substr(1, 6) == "[DATE," || conversion.substr(1, 6) == "[DATE2")
 		dict_returns = "date";
 	else if (conversion.substr(1, 9) == "[DATETIME")
@@ -620,7 +620,7 @@ $RETVAR := array_to_string
 	// C returns the target key unconvered is target record is missing
 	int nlines = dcount(sql, VM);
 	for (int ln = 1; ln <= nlines; ++ln) {
-		var line = sql.a(1, ln).trim();
+		var line = sql.f(1, ln).trim();
 		//if (line.substr(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {
 		if (line.substr(1, 2) != "--" && field(line, " ", 2, 2).match(":?= xlate")) {
 
@@ -749,7 +749,7 @@ $RETVAR := array_to_string
 							}
 						}
 					}
-					if (not dictrec.a(8).index("/" "*pgsql")) {
+					if (not dictrec.f(8).index("/" "*pgsql")) {
 						errmsg ^= target_dictfilename ^ " " ^ target_expr.quote() ^ " item does not have a pgsql section.";
 						errmsg.errputl();
 						errors ^= "\n" ^ errmsg;

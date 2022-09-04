@@ -215,9 +215,9 @@ var mv_backtrace() {
 		var line = "";
 		var linesource = "";
 		for (var ii2 = 1; ii2 < nn2; ++ii2) {
-			if (temp.a(ii2).index(".cpp")) {
-				line = temp.a(ii2);
-				linesource = temp.a(ii2 + 1);
+			if (temp.f(ii2).index(".cpp")) {
+				line = temp.f(ii2);
+				linesource = temp.f(ii2 + 1);
 			}
 		}
 
@@ -399,9 +399,9 @@ var mv_backtrace() {
 //		var line = "";
 //		var linesource = "";
 //		for (var ii2 = 1; ii2 < nn2; ++ii2) {
-//			if (temp.a(ii2).index(".cpp")) {
-//				line = temp.a(ii2);
-//				linesource = temp.a(ii2 + 1);
+//			if (temp.f(ii2).index(".cpp")) {
+//				line = temp.f(ii2);
+//				linesource = temp.f(ii2 + 1);
 //			}
 //		}
 //

@@ -10,7 +10,7 @@ var mode;
 function main(in mode0, in time, in date, io buffer, out msg) {
 	//c sys in,in,in,io,out
 
-	var interactive = not(SYSTEM.a(33));
+	var interactive = not(SYSTEM.f(33));
 	if (msg.unassigned()) {
 		msg = "";
 	}

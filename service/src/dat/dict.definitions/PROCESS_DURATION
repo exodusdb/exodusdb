@@ -7,16 +7,16 @@ S
 
 
 	var secsperday = 24 * 60 * 60;\
-	var uptodate = RECORD.a(11);\
-	var uptotime = RECORD.a(12);\
+	var uptodate = RECORD.f(11);\
+	var uptotime = RECORD.f(12);\
 	if (uptodate eq "") {\
 		uptodate = var().date();\
 	}\
 	if (uptotime eq "") {\
 		uptotime = var().time();\
 	}\
-	var daysecs = (uptodate - RECORD.a(1)) * secsperday;\
-	var timesecs = uptotime - RECORD.a(2);\
+	var daysecs = (uptodate - RECORD.f(1)) * secsperday;\
+	var timesecs = uptotime - RECORD.f(2);\
 	var totsecs = daysecs + timesecs;\
 \
 	var hours = (totsecs / 60 / 60).floor();\

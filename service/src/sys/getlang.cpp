@@ -29,7 +29,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 
 	var origlanguagecode = languagecode0;
 	if (not origlanguagecode) {
-		origlanguagecode = sys.company.a(14);
+		origlanguagecode = sys.company.f(14);
 		if (origlanguagecode eq "ENGLISH") {
 			origlanguagecode = "";
 		}
@@ -59,9 +59,9 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 				nn = n1;
 			}
 			for (const var fn : range(1, nn)) {
-				//lang(fn) = (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim();
-				var lang1line = lang1.a(fn);
-				var lang2line = lang2.a(fn);
+				//lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
+				var lang1line = lang1.f(fn);
+				var lang2line = lang2.f(fn);
 				var nparts = dcount(lang1line, "|");
 				if (nparts eq 1) {
 					//eg English Arabic
@@ -123,12 +123,12 @@ exit:
 	if (custlang.read(DEFINITIONS, "LANGUAGE*" ^ langkey)) {
 		nn = custlang.count(FM) + 1;
 		for (const var fn : range(1, nn)) {
-			var tt = custlang.a(fn);
+			var tt = custlang.f(fn);
 			if (tt.length()) {
 				if (tt eq "\"\"") {
 					tt = "";
 				}
-				lang(fn) = custlang.a(fn);
+				lang(fn) = custlang.f(fn);
 			}
 		} //fn;
 	}
@@ -143,8 +143,8 @@ exit:
 				codepage = "";
 			}
 getupperlower:
-			lang(9) = codepage.a(1, 9);
-			lang(10) = codepage.a(1, 10);
+			lang(9) = codepage.f(1, 9);
+			lang(10) = codepage.f(1, 10);
 
 		//central european including poland
 		} else if (codepage eq "852") {
@@ -158,7 +158,7 @@ getupperlower:
 	}
 
 	//swap '(Base)' with '(':base.currency:')' in lang
-	lang.swapper("(Base)", "(" ^ SYSTEM.a(134) ^ ")");
+	lang.swapper("(Base)", "(" ^ SYSTEM.f(134) ^ ")");
 
 	lang(100) = languagecode;
 	return 0;
@@ -198,14 +198,14 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 
 	//convert to FM if not a format record
 	//IF orig.progname<>'SORTORDER' and LANG<8>='' then
-	if (origprogname ne "SORTORDER" and lang.a(1).count(VM)) {
-		lang = raise(lang.a(1));
+	if (origprogname ne "SORTORDER" and lang.f(1).count(VM)) {
+		lang = raise(lang.f(1));
 
 		//strip out English pretext
 		if (lang.index(var().chr(170))) {
 			nn = lang.count(FM) + 1;
 			for (const var ii : range(1, nn)) {
-				var tt = lang.a(ii).field(var().chr(170), 2);
+				var tt = lang.f(ii).field(var().chr(170), 2);
 				if (tt) {
 					lang(ii) = tt;
 				}

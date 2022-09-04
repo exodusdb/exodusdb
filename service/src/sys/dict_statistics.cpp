@@ -3,7 +3,7 @@
 libraryinit(department)
 //---------------------
 function main() {
-	ANS = RECORD.a(3);
+	ANS = RECORD.f(3);
 	//may be missing try to get from user file
 	if (not ANS) {
 		ANS = ID.field("*", 3).xlate("USERS", 5, "X");
@@ -24,7 +24,7 @@ libraryexit(department)
 libraryinit(last_access_time)
 //---------------------------
 function main() {
-	return (RECORD.a(1) * 86400 + SW.a(1)).mod(86400);
+	return (RECORD.f(1) * 86400 + SW.f(1)).mod(86400);
 }
 libraryexit(last_access_time)
 
@@ -33,7 +33,7 @@ libraryinit(user_browser)
 //-----------------------
 function main() {
 	var usercode = ID.field("*", 3);
-	return usercode.xlate("USERS", 39, "X").a(1, 6);
+	return usercode.xlate("USERS", 39, "X").f(1, 6);
 }
 libraryexit(user_browser)
 

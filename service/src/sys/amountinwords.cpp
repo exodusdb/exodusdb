@@ -48,8 +48,8 @@ function main(in amountfmlanguage, in currcode0) {
 		}
 	}
 
-	amount = amountfmlanguage.a(1);
-	language = amountfmlanguage.a(2);
+	amount = amountfmlanguage.f(1);
+	language = amountfmlanguage.f(2);
 
 	amount.converter("-", "");
 	if (amount eq "") {
@@ -100,14 +100,14 @@ function main(in amountfmlanguage, in currcode0) {
 			words ^= " and ";
 		}
 		if (unitsx le 20) {
-			words ^= text.a(1, unitsx + 1);
+			words ^= text.f(1, unitsx + 1);
 		} else {
 		//IF UNITSx LE 20 THEN
 		// WORDS:=TEXT<1,UNITSx+1>
 		//end else
-			words ^= text.a(1, 19 + unitsx[-2]);
+			words ^= text.f(1, 19 + unitsx[-2]);
 			if (unitsx[-1] ne "0") {
-				words ^= "-" ^ text.a(1, unitsx[-1] + 1);
+				words ^= "-" ^ text.f(1, unitsx[-1] + 1);
 			}
 		}
 	}
@@ -120,14 +120,14 @@ function main(in amountfmlanguage, in currcode0) {
 			words ^= " and Cents " ^ amountinwords(cents);
 		}
 
-	} else if (amountcurrency.a(2)) {
-		words ^= " " ^ amountcurrency.a(1);
+	} else if (amountcurrency.f(2)) {
+		words ^= " " ^ amountcurrency.f(1);
 
 		//subunits
 		if (amount.floor() ne amount) {
 			words ^= " and ";
-			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.a(3) ^ "0PZ")).substr(2, 9999);
-			words ^= " " ^ amountcurrency.a(2);
+			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.f(3) ^ "0PZ")).substr(2, 9999);
+			words ^= " " ^ amountcurrency.f(2);
 		}
 
 	} else {
@@ -138,7 +138,7 @@ function main(in amountfmlanguage, in currcode0) {
 		}
 
 		if (amountcurrency) {
-			words ^= " " ^ amountcurrency.a(1);
+			words ^= " " ^ amountcurrency.f(1);
 		}
 
 	}
@@ -191,7 +191,7 @@ french:
 			words ^= " ";
 		}
 		if (unitsx le 20) {
-			words ^= text.a(1, unitsx + 1);
+			words ^= text.f(1, unitsx + 1);
 		} else {
 
 			tens = unitsx[-2];
@@ -204,7 +204,7 @@ french:
 			}
 
 			//tens
-			words ^= text.a(1, 19 + tens);
+			words ^= text.f(1, 19 + tens);
 
 			//ones
 			if (ones ne "0") {
@@ -213,7 +213,7 @@ french:
 				} else {
 					words ^= "-";
 				}
-				temp = text.a(1, ones + 1);
+				temp = text.f(1, ones + 1);
 				temp.lcaser();
 				words ^= temp;
 			}

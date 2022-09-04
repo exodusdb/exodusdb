@@ -85,16 +85,16 @@ function main(in mode) {
 
 		//password autoexpiry inform UI directly to allow warning
 		//without an additional request to the server to get the expiry days
-		var expirydays = SECURITY.a(25);
+		var expirydays = SECURITY.f(25);
 		if (expirydays) {
 			//password date default to lastlogin date
 			//if no login date then consider the account to have expired
 			//and they would not have been able to login with it.
-			if (not(RECORD.a(36))) {
-				var lastlogindate = RECORD.a(13).field(".", 1);
+			if (not(RECORD.f(36))) {
+				var lastlogindate = RECORD.f(13).field(".", 1);
 				RECORD(36) = lastlogindate;
 			}
-			var expirydate = RECORD.a(36) + expirydays;
+			var expirydate = RECORD.f(36) + expirydays;
 			RECORD(37) = expirydate;
 		} else {
 			//indicate no expiry
@@ -108,16 +108,16 @@ function main(in mode) {
 		//adminstrator email addresses
 		//tempting to also allow any domains held by admin emails but
 		//those could have special priviliges to blackberry etc
-		var sysemails = " " ^ SYSTEM.a(76);
-		sysemails ^= " " ^ SYSTEM.a(84);
-		sysemails ^= " " ^ SYSTEM.a(101);
-		sysemails ^= " " ^ SYSTEM.a(102);
+		var sysemails = " " ^ SYSTEM.f(76);
+		sysemails ^= " " ^ SYSTEM.f(84);
+		sysemails ^= " " ^ SYSTEM.f(101);
+		sysemails ^= " " ^ SYSTEM.f(102);
 		sysemails.converter(";,", "  ");
 		sysemails.trimmer();
 
 		//check all email addresses versus domain and email restrictions
 		//email domains is a space separated list of domains and/or email addresses
-		var emaildomains = SYSTEM.a(116).lcase();
+		var emaildomains = SYSTEM.f(116).lcase();
 		if (emaildomains) {
 			//admin *emails* (NOT DOMAINS) are specifically allowed
 			emaildomains ^= " " ^ sysemails;
@@ -174,9 +174,9 @@ function main(in mode) {
 			}
 		}
 
-		if (SECURITY.a(1).locate(ID, usern)) {
+		if (SECURITY.f(1).locate(ID, usern)) {
 			newuser = 0;
-			if (RECORD.a(4) and RECORD.a(4) ne win.orec.a(4)) {
+			if (RECORD.f(4) and RECORD.f(4) ne win.orec.f(4)) {
 				resetpassword = 1;
 			}
 		} else {
@@ -217,30 +217,30 @@ function main(in mode) {
 			if (win.orec) {
 				if (not(authorised("AUTHORISATION UPDATE", xx))) {
 					//expiry date
-					if (win.orec.a(35)) {
-						RECORD(35) = win.orec.a(35);
+					if (win.orec.f(35)) {
+						RECORD(35) = win.orec.f(35);
 					}
 					//password date
-					if (win.orec.a(36)) {
-						RECORD(36) = win.orec.a(36);
+					if (win.orec.f(36)) {
+						RECORD(36) = win.orec.f(36);
 					}
 					//tt=@record<19>
 					//swap 'Default' with '' in tt
 					//username
-					RECORD(1) = win.orec.a(1);
+					RECORD(1) = win.orec.f(1);
 					//department
-					RECORD(5) = win.orec.a(5);
+					RECORD(5) = win.orec.f(5);
 					//email
-					RECORD(7) = win.orec.a(7);
+					RECORD(7) = win.orec.f(7);
 					//department2
-					RECORD(21) = win.orec.a(21);
+					RECORD(21) = win.orec.f(21);
 				}
 
 			}
 		}
 
 		//verify email domains
-		win.is = RECORD.a(7);
+		win.is = RECORD.f(7);
 		call usersubs("VAL.EMAIL");
 		if (not(win.valid)) {
 			gosub unlocksec();
@@ -250,7 +250,7 @@ function main(in mode) {
 		//create new user in userprivs
 		if (newuser) {
 
-			var userdept = RECORD.a(21);
+			var userdept = RECORD.f(21);
 			if (not userdept) {
 				msg = "USER GROUP CODE is required to create new users";
 				gosub invalid(msg);
@@ -258,7 +258,7 @@ function main(in mode) {
 				return 0;
 			}
 
-			if (not(SECURITY.a(1).locate(userdept, usern))) {
+			if (not(SECURITY.f(1).locate(userdept, usern))) {
 				msg = (userdept ^ " USER GROUP does not exist").quote();
 				gosub invalid(msg);
 				gosub unlocksec();
@@ -270,9 +270,9 @@ function main(in mode) {
 				SECURITY.inserter(fn, usern, "");
 			} //fn;
 
-			var newusername = RECORD.a(1);
-			var newipnos = RECORD.a(40);
-			var newemailaddress = RECORD.a(7);
+			var newusername = RECORD.f(1);
+			var newipnos = RECORD.f(40);
+			var newemailaddress = RECORD.f(7);
 
 			SECURITY(1, usern) = ID;
 			//userprivs<2,usern>=newkeys
@@ -294,24 +294,24 @@ function main(in mode) {
 		if (resetpassword lt 2) {
 
 			//email address
-			SECURITY(7, usern) = RECORD.a(7);
+			SECURITY(7, usern) = RECORD.f(7);
 
 			//user name
-			SECURITY(8, usern) = RECORD.a(1);
+			SECURITY(8, usern) = RECORD.f(1);
 
 		}
 
 		//reencrypt new password
-		var ans = RECORD.a(4);
+		var ans = RECORD.f(4);
 		if ((newuser or resetpassword) and ans) {
 
-			win.is = ID ^ FM ^ ans.a(1);
+			win.is = ID ^ FM ^ ans.f(1);
 			//uses hasspass to encrypt
 			call securitysubs("MAKESYSREC");
 			ans = win.is;
 
 			//save the encrypted bit in case we cannot update userprivs
-			RECORD(4) = ans.a(7);
+			RECORD(4) = ans.f(7);
 
 			//update security if managed to lock it
 			if (resetpassword lt 2) {
@@ -338,10 +338,10 @@ function main(in mode) {
 			//datetime=(date():'.':time() 'R(0)#5')+0
 			var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 			RECORD.inserter(15, 1, datetime);
-			RECORD.inserter(16, 1, SYSTEM.a(40, 2));
+			RECORD.inserter(16, 1, SYSTEM.f(40, 2));
 
 			if (USERNAME eq APPLICATION) {
-				text = "OK New password sent to " ^ RECORD.a(7);
+				text = "OK New password sent to " ^ RECORD.f(7);
 			} else {
 				text = "OK New password set by " ^ USERNAME;
 			}
@@ -402,7 +402,7 @@ function main(in mode) {
 		if (not(decide("Which department do you want?", depts ^ "", reply))) {
 			return 0;
 		}
-		ANS = depts.a(reply);
+		ANS = depts.f(reply);
 		DATA ^= ANS ^ "\r";
 
 	} else if (mode eq "VAL.DEPARTMENT") {
@@ -434,7 +434,7 @@ subroutine getusern() {
 	if (ID eq "EXODUS") {
 		//usern remains unassigned to force an error if used later on
 	} else {
-		if (not(SECURITY.a(1).locate(ID, usern))) {
+		if (not(SECURITY.f(1).locate(ID, usern))) {
 			msg = ID.quote() ^ " User does not exist";
 			gosub invalid(msg);
 			return;
@@ -451,7 +451,7 @@ subroutine updatemirror() {
 	//and we still need to get the executive email if they are a user
 	var mirror = RECORD.fieldstore(FM, 13, 5, "");
 	mirror = RECORD.fieldstore(FM, 31, 3, "");
-	var username = RECORD.a(1).ucase();
+	var username = RECORD.f(1).ucase();
 	var mirrorkey = "%" ^ username ^ "%";
 	mirror(1) = ID;
 	mirror.write(win.srcfile, mirrorkey);
@@ -462,7 +462,7 @@ subroutine getuserdept2(in mode) {
 
 	//locate the user in the table
 	usercode = mode.field(",", 2);
-	if (not(SECURITY.a(1).locate(usercode, usern))) {
+	if (not(SECURITY.f(1).locate(usercode, usern))) {
 		if (usercode eq "EXODUS") {
 			ANS = "EXODUS";
 			return;
@@ -473,24 +473,24 @@ subroutine getuserdept2(in mode) {
 	}
 
 	//locate divider, or usern+1
-	var nusers1 = SECURITY.a(1).count(VM) + 1;
+	var nusers1 = SECURITY.f(1).count(VM) + 1;
 	for (usern += 1; usern <= nusers1; ++usern) {
 		///BREAK;
-		if (SECURITY.a(1, usern) eq "---") break;
+		if (SECURITY.f(1, usern) eq "---") break;
 	} //usern;
 
 	//get the department code
-	ANS = SECURITY.a(1, usern - 1);
+	ANS = SECURITY.f(1, usern - 1);
 	return;
 }
 
 subroutine getdepts() {
 	depts = "";
-	var nusers2 = SECURITY.a(1).count(VM) + 1;
+	var nusers2 = SECURITY.f(1).count(VM) + 1;
 	for (usern = 2; usern <= nusers2 + 1; ++usern) {
-		text = SECURITY.a(1, usern);
+		text = SECURITY.f(1, usern);
 		if (text eq "---" or text eq "") {
-			text = SECURITY.a(1, usern - 1);
+			text = SECURITY.f(1, usern - 1);
 			text.converter("0123456789", "");
 			text.trimmer();
 			if (text and text ne "---") {

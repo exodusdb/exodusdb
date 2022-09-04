@@ -33,7 +33,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	//TODO what about letterhead with vehicle logos?
 
 	//cant use global company info if not initialised in c++
-	hascompanies = SYSTEM.a(133);
+	hascompanies = SYSTEM.f(133);
 
 	compcode = "";
 	if (compcode0.unassigned()) {
@@ -55,7 +55,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 				{}
 			}
 			if (VOLUMES) {
-				letterheadcompany(27) = letterheadcompany.a(27).invert();
+				letterheadcompany(27) = letterheadcompany.f(27).invert();
 			}
 		}
 	}
@@ -99,21 +99,21 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 
 	//process the HTML, adding various macros
 
-	var clientmark = letterheadcompany.a(27);
+	var clientmark = letterheadcompany.f(27);
 	if (hascompanies) {
 		//if clientmark else clientmark=agp<1>
 		if (not clientmark) {
-			clientmark = SYSTEM.a(14);
+			clientmark = SYSTEM.f(14);
 		}
 	}
 	html.swapper("%AGENCY%", clientmark);
 
 	//similar code in GETHTML and GENERALMACROS TODO: use GENERALMACROS instead
 
-	html.swapper("%COMPANY_NAME%", letterheadcompany.a(1));
-	html.swapper("%TAX_REGISTRATION_NO%", letterheadcompany.a(21));
-	html.swapper("%TAX_REG_NO%", letterheadcompany.a(21));
-	html.swapper("%COMPANY_REG_NO%", letterheadcompany.a(59));
+	html.swapper("%COMPANY_NAME%", letterheadcompany.f(1));
+	html.swapper("%TAX_REGISTRATION_NO%", letterheadcompany.f(21));
+	html.swapper("%TAX_REG_NO%", letterheadcompany.f(21));
+	html.swapper("%COMPANY_REG_NO%", letterheadcompany.f(59));
 
 	var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 	tt = "L";
@@ -127,8 +127,8 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	html.swapper("%STATION%", STATION);
 
 	html.swapper("%DATAURL%", "%URL%/data/%DATABASE%");
-	html.swapper("%URL%", SYSTEM.a(114, 1));
-	html.swapper("%DATABASE%", SYSTEM.a(17, 1));
+	html.swapper("%URL%", SYSTEM.f(114, 1));
+	html.swapper("%DATABASE%", SYSTEM.f(17, 1));
 
 	// QR code (requires apt install qrencode)
 	if (html.index("%QR%")) {
@@ -136,8 +136,8 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		var svg = "";
 		if (qr_text) {
 
-			var qr_body = qr_text.a(1);
-			var qr_tip = qr_text.a(2) ^ qr_body;
+			var qr_body = qr_text.f(1);
+			var qr_tip = qr_text.f(2) ^ qr_body;
 			var cmd = "qrencode --size=2 --type=SVG " ^ qr_body.squote();
 			svg = osshellread(cmd);
 
@@ -230,7 +230,7 @@ subroutine getcompanyconfig(io html, io mode) {
 
 	var ncols = 0;
 	for (const var fn : range(61, 66)) {
-		tt = letterheadcompany.a(fn);
+		tt = letterheadcompany.f(fn);
 		if (tt) {
 			//call max(count(tt,vm)+1,ncols,ncols)
 			tt = tt.count(VM) + 1;
@@ -243,12 +243,12 @@ subroutine getcompanyconfig(io html, io mode) {
 		return;
 	}
 
-	var aligns = letterheadcompany.a(61);
-	var imagetypes = letterheadcompany.a(62);
-	var texts = letterheadcompany.a(63);
-	var fontsizes = letterheadcompany.a(64);
-	var imagecompcodes = letterheadcompany.a(65);
-	var textcompcodes = letterheadcompany.a(66);
+	var aligns = letterheadcompany.f(61);
+	var imagetypes = letterheadcompany.f(62);
+	var texts = letterheadcompany.f(63);
+	var fontsizes = letterheadcompany.f(64);
+	var imagecompcodes = letterheadcompany.f(65);
+	var textcompcodes = letterheadcompany.f(66);
 
 	var tab = "";
 
@@ -275,11 +275,11 @@ subroutine getcompanyconfig(io html, io mode) {
 
 	for (const var coln : range(1, ncols)) {
 
-		var align = aligns.a(1, coln);
-		var imagetype = imagetypes.a(1, coln);
-		var imagecompcode = imagecompcodes.a(1, coln);
-		var text = texts.a(1, coln);
-		var fontsize = fontsizes.a(1, coln);
+		var align = aligns.f(1, coln);
+		var imagetype = imagetypes.f(1, coln);
+		var imagecompcode = imagecompcodes.f(1, coln);
+		var text = texts.f(1, coln);
+		var fontsize = fontsizes.f(1, coln);
 		if (fontsize and fontsize.isnum()) {
 			fontsize ^= "%";
 		}
@@ -324,7 +324,7 @@ subroutine getcompanyconfig(io html, io mode) {
 				if (not(imagecomp.read(sys.companies, imagecompcode))) {
 					imagecomp = "";
 				}
-				imagetype = imagecomp.a(62, coln);
+				imagetype = imagecomp.f(62, coln);
 
 				mode ^= ", Col " ^ coln ^ " image from company " ^ imagecompcode;
 
@@ -334,14 +334,14 @@ subroutine getcompanyconfig(io html, io mode) {
 			}
 
 			//FULL http path to images so EMAIL/OFFICE programs can get images
-			var url = SYSTEM.a(114, 1);
+			var url = SYSTEM.f(114, 1);
 			if (url[-1] eq "/") {
 				url.popper();
 			}
 
 			//path to uploaded company logo files
-			//var imagepath = "/images/" ^ SYSTEM.a(17) ^ "/UPLOAD/COMPANIES/";
-			var imagepath = "/images/" ^ SYSTEM.a(17) ^ "/upload/companies/";
+			//var imagepath = "/images/" ^ SYSTEM.f(17) ^ "/UPLOAD/COMPANIES/";
+			var imagepath = "/images/" ^ SYSTEM.f(17) ^ "/upload/companies/";
 
 			//logo_companycode_coln .jpg .png /gif
 			var imagefilename = "logo_" ^ imagecompcode ^ "_" ^ coln ^ "." ^ imagetype;
@@ -359,7 +359,7 @@ subroutine getcompanyconfig(io html, io mode) {
 		}
 
 		//maybe get text from another company
-		var textcompcode = textcompcodes.a(1, coln);
+		var textcompcode = textcompcodes.f(1, coln);
 		if (textcompcode) {
 			//ignore any given text if textcompany given
 			text = "";
@@ -370,7 +370,7 @@ subroutine getcompanyconfig(io html, io mode) {
 				}
 			}
 			//get text from different company SAME COLUMN NO
-			text = textcompany.a(63, coln);
+			text = textcompany.f(63, coln);
 			mode ^= ", Col " ^ coln ^ " text from company " ^ textcompcode;
 		}
 
@@ -411,7 +411,7 @@ nextmodex:
 
 nextprefix:
 ///////////
-	keyx = prefix ^ modex.a(1, 1) ^ var(".htm").ucase();
+	keyx = prefix ^ modex.f(1, 1) ^ var(".htm").ucase();
 
 	if (not(html.read(DEFINITIONS, keyx))) {
 
@@ -422,7 +422,7 @@ nextprefix:
 		}
 
 		//try again with next mode and with company code prefix
-		if (modex.a(1, 2)) {
+		if (modex.f(1, 2)) {
 			modex = modex.field(VM, 2, 9999);
 			goto nextmodex;
 		}

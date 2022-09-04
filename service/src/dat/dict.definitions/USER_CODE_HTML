@@ -9,9 +9,9 @@ M1
 	var emails = usercodes.xlate("USERS", 7, "X");\
 	var nusers = usercodes.count(VM) + 1;\
 	for (const var usern : range(1, nusers)) {\
-		var usercode = usercodes.a(1, usern);\
+		var usercode = usercodes.f(1, usern);\
 		if (usercode) {\
-			if (emails.a(1, usern) eq "") {\
+			if (emails.f(1, usern) eq "") {\
 				usercodes(1, usern) = "<B>" ^ usercode ^ "</B>";\
 			}\
 		}\

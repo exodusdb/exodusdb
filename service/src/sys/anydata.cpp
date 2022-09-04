@@ -25,7 +25,7 @@ function main(in filenames0, out result) {
 
 	for (const var filen : range(1, nfiles)) {
 
-		filename = filenamesx.a(1, filen);
+		filename = filenamesx.f(1, filen);
 		gosub getnrecs();
 		if (nrecs) {
 			result = 1;

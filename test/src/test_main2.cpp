@@ -251,7 +251,7 @@ function main()
 	var expected="a" _FM_ "a" _FM_ "b" _FM_ "a" _FM_ "a" _FM_ "b" _FM_ "";
 	var tempstr2="ab";
 	for (const var ii : range(-3, 3)) {
-		assert(tempstr2[ii] eq expected.a(ii+4));
+		assert(tempstr2[ii] eq expected.f(ii+4));
 	}
 
 	//test single character extraction on ""
@@ -796,7 +796,7 @@ subroutine internal_subroutine_xyzz(in xyzz)
 	//var xx;
 	//printl(xx);
 	//false && xyzz;
-	assert(xyzz.a(2,2,2) eq "b22");
+	assert(xyzz.f(2,2,2) eq "b22");
 	return;
 }
 

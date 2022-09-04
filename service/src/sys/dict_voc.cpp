@@ -84,7 +84,7 @@ libraryexit(anydebug)
 libraryinit(c_args)
 //-----------------
 function main() {
-	ANS = RECORD.a(2);
+	ANS = RECORD.f(2);
 	if (ANS.substr(1, 3) ne "*c ") {
 		ANS = "";
 	}
@@ -157,7 +157,7 @@ libraryexit(data)
 libraryinit(datetime_created)
 //---------------------------
 function main() {
-	return calculate("DATETIME_UPDATED").a(1, 1);
+	return calculate("DATETIME_UPDATED").f(1, 1);
 }
 libraryexit(datetime_created)
 
@@ -225,7 +225,7 @@ libraryexit(different)
 libraryinit(display2)
 //-------------------
 function main() {
-	ANS = RECORD.a(3);
+	ANS = RECORD.f(3);
 	ANS.converter(VM, " ");
 	return ANS;
 }
@@ -267,12 +267,12 @@ function main() {
 			userx = xlate("USERS", executivecode.field(" ", 1), "", "X");
 		}
 
-		if (userx.a(35) and var().date() ge userx.a(35)) {
+		if (userx.f(35) and var().date() ge userx.f(35)) {
 		//expired
 			ANS = "";
 		} else {
 		//not expired
-			ANS = userx.a(7);
+			ANS = userx.f(7);
 		}
 
 	//runtime users email
@@ -325,7 +325,7 @@ function main() {
 	if (not RECUR0) {
 		call mssg("WHICH FIELD NUMBER ?", "R", RECUR0, "");
 	}
-	return RECORD.a(RECUR0);
+	return RECORD.f(RECUR0);
 }
 libraryexit(field)
 
@@ -335,8 +335,8 @@ libraryinit(findall)
 var datax;
 
 function main() {
-	if (RECORD.a(1)) {
-		datax = RECORD.a(8);
+	if (RECORD.f(1)) {
+		datax = RECORD.f(8);
 		datax.converter(VM, FM);
 	} else {
 		datax = RECORD;
@@ -346,7 +346,7 @@ function main() {
 	datax.converter(DQ, "'");
 	ANS = "";
 	for (const var fn : range(1, nn)) {
-		var tx = datax.a(fn).trim();
+		var tx = datax.f(fn).trim();
 
 		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {
 		//gosub change2
@@ -393,10 +393,10 @@ libraryinit(full_brand_name)
 function main() {
 	var brandcode = calculate("BRAND_CODE");
 	var brand = brandcode.xlate("BRANDS", "", "X");
-	var ans = brand.a(2);
-	var brandcode1 = brand.a(8);
+	var ans = brand.f(2);
+	var brandcode1 = brand.f(8);
 	brandcode1.converter(SVM, VM);
-	brandcode1 = brandcode1.a(1, 1);
+	brandcode1 = brandcode1.f(1, 1);
 	if (brandcode1 and brandcode1 ne brandcode) {
 		ans.splicer(1, 0, brandcode1.xlate("BRANDS", 2, "X") ^ " ");
 	}
@@ -425,7 +425,7 @@ libraryexit(full_brand_name)
 libraryinit(iscpp)
 //----------------
 function main() {
-	return RECORD.a(2).substr(1, 3) eq "*c ";
+	return RECORD.f(2).substr(1, 3) eq "*c ";
 }
 libraryexit(iscpp)
 
@@ -508,7 +508,7 @@ libraryexit(lines)
 libraryinit(log_message2)
 //-----------------------
 function main() {
-	return trim(RECORD.a(2), VM);
+	return trim(RECORD.f(2), VM);
 }
 libraryexit(log_message2)
 
@@ -516,7 +516,7 @@ libraryexit(log_message2)
 libraryinit(log_source1)
 //----------------------
 function main() {
-	return RECORD.a(1).field(" ", 1);
+	return RECORD.f(1).field(" ", 1);
 }
 libraryexit(log_source1)
 
@@ -568,7 +568,7 @@ function main() {
 	//matparse @record into x
 	for (const var ii : range(1, nfields)) {
 	//if trim(x(i))[1,1]='*' then x(i)=''
-		if (RECORD.a(ii).trim()[1] eq "*") {
+		if (RECORD.f(ii).trim()[1] eq "*") {
 			RECORD(ii) = "";
 		}
 	} //ii;
@@ -610,7 +610,7 @@ libraryexit(num)
 libraryinit(objectcodetype)
 //-------------------------
 function main() {
-	return RECORD.a(1).seq();
+	return RECORD.f(1).seq();
 }
 libraryexit(objectcodetype)
 
@@ -704,7 +704,7 @@ libraryexit(username)
 libraryinit(username_created)
 //---------------------------
 function main() {
-	return calculate("USERNAME_UPDATED").a(1, 1);
+	return calculate("USERNAME_UPDATED").f(1, 1);
 }
 libraryexit(username_created)
 
@@ -713,7 +713,7 @@ libraryinit(version)
 //------------------
 function main() {
 	if (DICT.index("VOC")) {
-		ANS = xlate(RECORD.a(3), "$" ^ RECORD.a(4), "VERSION", "X");
+		ANS = xlate(RECORD.f(3), "$" ^ RECORD.f(4), "VERSION", "X");
 	} else {
 		ANS = field2(RECORD, FM, -1);
 	//IF @ANS[1,1] = 'V' THEN

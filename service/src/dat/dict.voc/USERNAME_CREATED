@@ -6,7 +6,7 @@ S
 
 
 
-	return calculate("USERNAME_UPDATED").a(1, 1);
+	return calculate("USERNAME_UPDATED").f(1, 1);
 L
 10
 

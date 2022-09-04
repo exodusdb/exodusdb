@@ -86,7 +86,7 @@ function main() {
 		printl("Testing simple integer for loops");
 		printl("--------------------------------");
 
-		int firstcasen = COMMAND.a(2);
+		int firstcasen = COMMAND.f(2);
 		if (not firstcasen)
 			firstcasen = 0;
 

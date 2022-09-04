@@ -826,13 +826,13 @@ var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 //  or xxx = yyy.extract(1, 2, 3)
 //
 var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
-	return a(argfieldn, argvaluen, argsubvaluen);
+	return this->f(argfieldn, argvaluen, argsubvaluen);
 }
 
-// Abbreviated xxxx.a(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
-//     xxx = yyy.a(1,2,3)
+// Abbreviated xxxx.f(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
+//     xxx = yyy.f(1,2,3)
 //
-var var::a(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
+var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 
 	THISIS(
 		"var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) "

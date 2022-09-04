@@ -54,7 +54,7 @@ function main(in mode) {
 	#define data_ USER1
 
 	//determine upload directory
-	var uploadroot = SYSTEM.a(49);
+	var uploadroot = SYSTEM.f(49);
 	//if uploadroot='' then uploadroot='..\images\'
 	//if uploadroot[-1,1] ne '\' then uploadroot:='\'
 	var virtualroot = "../images/";
@@ -62,10 +62,10 @@ function main(in mode) {
 
 	if (mode eq "POSTUPLOAD") {
 
-		filename = request_.a(3);
-		key = USER0.a(4);
-		var targetfilename = request_.a(5);
-		var newstatus = USER0.a(6);
+		filename = request_.f(3);
+		key = USER0.f(4);
+		var targetfilename = request_.f(5);
+		var newstatus = USER0.f(6);
 
 		//lock it
 		gosub lockfile();
@@ -98,12 +98,12 @@ postuploadfail:
 			fns(ii) = fn;
 		} //ii;
 
-		var ii2 = rec.a(fns.a(1)).count(VM) + (rec.a(fns.a(1)) ne "");
-		rec(fns.a(1), ii2) = targetfilename;
-		rec(fns.a(2), ii2) = newstatus;
-		rec(fns.a(3), ii2) = USERNAME;
-		rec(fns.a(4), ii2) = var().date() ^ "." ^ var().time().oconv("R(0)#5");
-		rec(fns.a(5), ii2) = STATION;
+		var ii2 = rec.f(fns.f(1)).count(VM) + (rec.f(fns.f(1)) ne "");
+		rec(fns.f(1), ii2) = targetfilename;
+		rec(fns.f(2), ii2) = newstatus;
+		rec(fns.f(3), ii2) = USERNAME;
+		rec(fns.f(4), ii2) = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+		rec(fns.f(5), ii2) = STATION;
 
 		rec.write(file, key);
 
@@ -116,9 +116,9 @@ postuploadfail:
 		}
 
 		//additional option to check file and key is not locked
-		filename = request_.a(3);
-		key = USER0.a(4);
-		var ensurenotlocked = request_.a(5);
+		filename = request_.f(3);
+		key = USER0.f(4);
+		var ensurenotlocked = request_.f(5);
 		if (ensurenotlocked eq "undefined") {
 			ensurenotlocked = "";
 		}
@@ -264,7 +264,7 @@ postuploadfail:
 		//why does % come encoded as %25?
 		dirpatt.swapper("%25", "%");
 
-		if (USER0.a(3) eq "NEW") {
+		if (USER0.f(3) eq "NEW") {
 			if (oslistf(dirpatt)) {
 				var cmd = "rm " ^ (dirpatt.quote());
 				osshell(cmd);
@@ -287,7 +287,7 @@ postuploadfail:
 
 			var ndeep = virtualfilebase.count(OSSLASH) + 1;
 			for (const var uploadn : range(1, nuploads)) {
-				var uploadfilename = uploadfilenames.a(uploadn);
+				var uploadfilename = uploadfilenames.f(uploadn);
 				uploadfilename = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
 				uploadfilenames(uploadn) = uploadfilename;
 			} //uploadn;
@@ -352,24 +352,24 @@ postuploadfail:
 		}
 
 	} else if (mode eq "IMPORT") {
-		var uploadpath = RECORD.a(1);
-		var startatrown = RECORD.a(2);
-		var headertype = RECORD.a(3);
-		lengthx = RECORD.a(4);
-		filename = RECORD.a(5);
-		var dictfilename = RECORD.a(6);
-		var dictcolprefix = RECORD.a(7).ucase();
-		var keydictid = RECORD.a(8);
-		var keyfunction = RECORD.a(9);
+		var uploadpath = RECORD.f(1);
+		var startatrown = RECORD.f(2);
+		var headertype = RECORD.f(3);
+		lengthx = RECORD.f(4);
+		filename = RECORD.f(5);
+		var dictfilename = RECORD.f(6);
+		var dictcolprefix = RECORD.f(7).ucase();
+		var keydictid = RECORD.f(8);
+		var keyfunction = RECORD.f(9);
 		//reserve first 10 for non-imported additional info
-		var fieldoffset = RECORD.a(10);
-		var importcode = RECORD.a(11);
-		var linenofn = RECORD.a(12);
-		var importfilenamefn = RECORD.a(13);
-		var importcodefn = RECORD.a(14);
-		var datewords = RECORD.a(15);
-		var timewords = RECORD.a(16);
-		var validating = RECORD.a(17);
+		var fieldoffset = RECORD.f(10);
+		var importcode = RECORD.f(11);
+		var linenofn = RECORD.f(12);
+		var importfilenamefn = RECORD.f(13);
+		var importcodefn = RECORD.f(14);
+		var datewords = RECORD.f(15);
+		var timewords = RECORD.f(16);
+		var validating = RECORD.f(17);
 		osfile = "";
 
 		if (uploadpath.substr(3, 99999).index("..")) {
@@ -410,7 +410,7 @@ postuploadfail:
 		// goto invalid
 		// end
 
-		temposfilename83 = (SYSTEM.a(24) ^ var(1000000).rnd()).substr(1, 8) ^ "._IM";
+		temposfilename83 = (SYSTEM.f(24) ^ var(1000000).rnd()).substr(1, 8) ^ "._IM";
 
 		msg = (uploadroot ^ uploadpath).quote() ^ "\r\n";
 		msg = "Uploaded file cannot be found/copied" "\r\n";
@@ -518,9 +518,9 @@ nextline:
 				for (const var coln : range(1, ncols)) {
 					var dictrec = "F";
 					dictrec(2) = coln + fieldoffset;
-					dictrec(3) = capitalise(cols.a(coln, 1));
+					dictrec(3) = capitalise(cols.f(coln, 1));
 					dictrec(10) = "10";
-					var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1).convert(" ", "_").ucase();
+					var dictid = dictcolprefix ^ "_" ^ cols.f(coln, 1).convert(" ", "_").ucase();
 
 					var CONV = "";
 					var just = "L";
@@ -568,16 +568,16 @@ nextline:
 
 			var rec = "";
 			for (const var coln : range(1, ncols)) {
-				var col = cols.a(coln);
+				var col = cols.f(coln);
 				if (csv) {
-					cell = line.a(1, coln);
+					cell = line.f(1, coln);
 				} else {
-					cell = line.substr(col.a(1, 2), col.a(1, 3)).trimb();
+					cell = line.substr(col.f(1, 2), col.f(1, 3)).trimb();
 				}
 				if (cell.length()) {
-					if (col.a(1, 4)) {
+					if (col.f(1, 4)) {
 						var cell0 = cell;
-						var CONV = col.a(1, 4);
+						var CONV = col.f(1, 4);
 						if (CONV.index("TIME")) {
 						//if no : in time then assume is already seconds
 							if (cell.index(":")) {
