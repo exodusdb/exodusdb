@@ -19,12 +19,12 @@ class PUBLIC ExodusProgramBase {
    public:
 
 	// Function arguments
-	using in  = const var&; // "CVR"    means "Const Var Reference"
-	using io  =       var&; // "VARREF" means "Var Reference"
-	using out =       var&; // "VARREF" means "Var Reference"
+	using in  = const var&; // same as CVR
+	using io  =       var&; // same as VARREF
+	using out =       var&; // same as VARREF
 
 	// Constant var
-	using let = const var ; // "CV"     means "Constant Var" e.g. let x = 100;
+	using let = const var ; // same as CV
 
 #include <exodus/ioconv_custom.h>
 
@@ -62,7 +62,7 @@ class PUBLIC ExodusProgramBase {
 	MvEnvironment& mv;
 
 	// work on CURSOR
-	bool select(CVR sortselectclause_or_filehandle DEFAULT_STRING);
+	bool select(CVR sortselectclause_or_filehandle DEFAULT_EMPTY);
 	ND bool hasnext();
 	bool readnext(VARREF key);
 	bool readnext(VARREF key, VARREF valueno);
@@ -70,7 +70,7 @@ class PUBLIC ExodusProgramBase {
 	bool pushselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
 	bool popselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
 	void clearselect();
-	bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULT_STRING);
+	bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULT_EMPTY);
 
 	bool savelist(CVR listname);
 	bool getlist(CVR listname);
@@ -117,7 +117,7 @@ class PUBLIC ExodusProgramBase {
 	// var capitalise(CVR str0, CVR mode=var(), CVR wordseps=var()) const;
 	////var capitalise(CVR str0, CVR mode="", CVR wordseps="") const;
 
-	void debug() const;
+	//void debug() const;
 	bool fsmsg(CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
 	ND var sysvar(CVR var1, CVR var2, CVR mv3, CVR mv4);
 	void setprivilege(CVR var1);
@@ -163,7 +163,7 @@ class PUBLIC ExodusProgramBase {
 	ND var AT(const int code) const;
 	ND var AT(const int x, const int y) const;
 
-	ND var getcursor();
+	ND var getcursor() const;
 	void setcursor(CVR cursor) const;
 
 	ND var getprompt() const;

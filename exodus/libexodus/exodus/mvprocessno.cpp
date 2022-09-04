@@ -78,7 +78,7 @@ int getprocessno(const char* filename, int* fd) {
 			//			if (errno == EACCES || errno == EAGAIN) {
 			//				//printf("Already locked by another
 			// process\n");
-			//        		} else {
+			//          } else {
 			//				/* Handle unexpected error */;
 			//			}
 		} else {

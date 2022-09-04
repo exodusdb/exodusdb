@@ -25,6 +25,13 @@ function main() {
 		return 0;
 	}
 
+	//Skip if fast testing required
+	if (osgetenv("EXO_FAST_TEST")) {
+		printl("EXO_FAST_TEST - skipping test.");
+		printl("Test passed");
+		return 0;
+	}
+
 	// Will FAIL without locking
 	var use_locking = not OPTIONS.count("L");
 
@@ -39,11 +46,11 @@ function main() {
 		assert(open(filename to file));
 	}
 
-	PROCESSNO = COMMAND.a(2);
+	THREADNO = COMMAND.a(2);
 
 	// Start multiple processes, wait for them to finish, and check result as expected
 	// and exit
-	if (not PROCESSNO) {
+	if (not THREADNO) {
 
 		// Test WITH any given options
 		// or test with NO options (ie with transactions and locking)
@@ -61,7 +68,7 @@ function main() {
 
 	// Perform one process updates
 	if (silent < 2)
-		printl("Starting", PROCESSNO, OPTIONS);
+		printl("Starting", THREADNO, OPTIONS);
 
 	var n = "";
 	while (n < max and not esctoexit()) {
@@ -78,12 +85,12 @@ function main() {
 			if (n eq "")
 				n = 1;
 			else {
-				var o = RECORD.a(PROCESSNO);
+				var o = RECORD.a(THREADNO);
 				assert(o eq n);
 				n = o + 1;
 			}
 
-			RECORD(PROCESSNO) = n;
+			RECORD(THREADNO) = n;
 
 			write(RECORD on file, key);
 
@@ -91,24 +98,24 @@ function main() {
 				unlock(file,key);
 
 			if (not silent)
-				printl(PROCESSNO, RECORD);
+				printl(THREADNO, RECORD);
 
 			// Commit transaction
 			if (use_transaction)
 				assert(committrans());
 
 		} else {
-			//printl("Cannot lock", PROCESSNO);
+			//printl("Cannot lock", THREADNO);
 			if (use_transaction)
 				assert(rollbacktrans());
-			//errputl(PROCESSNO, "Sleeping");
+			//errputl(THREADNO, "Sleeping");
 			ossleep(100);
 		}
 
 	}
 
 	if (silent < 2)
-		printl("Finished", PROCESSNO, OPTIONS);
+		printl("Finished", THREADNO, OPTIONS);
 
 	return 0;
 }

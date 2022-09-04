@@ -33,6 +33,154 @@ function main()
 {
 
 	{
+		outputt("xxx","yyy");
+		outputl();
+		outputl("===\t===");
+
+		errput("aaa","bbb");
+		errputl();
+		errputl("---","---");
+
+		logput("111","222");
+		logputl();
+		logputl("...","...");
+	}
+
+	{
+		printl("Check randomness of rnd(10)");
+
+		var ntests = 1'000'000;
+		var n = 10;
+		dim d1(n);
+		d1 = 0;
+		d1(0) = 0;
+
+		for (auto i [[maybe_unused]] : range(1, ntests)) {
+			var r1 = rnd(n);
+			//print(r1,"");
+			d1(r1) += 1;
+		}
+		printl();
+
+		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
+		for (auto i : range(0, n-1)) {
+			printt(i, d1(i), "\n");
+			assert(d1(i) > ntests/n*0.99);
+			assert(d1(i) < ntests/n*1.01);
+		}
+
+	}
+
+	{
+		printl("Check randomness of rnd(-10)");
+
+		var ntests = 1'000'000;
+		var n = 10;
+		dim d1(n);
+		d1 = 0;
+		d1(0) = 0;
+
+		for (auto i [[maybe_unused]] : range(1, ntests)) {
+			//var r1 = rnd(n);
+			var r1 = -rnd(-n);
+			//print(r1,"");
+			d1(r1) += 1;
+		}
+		printl();
+
+		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
+		for (auto i : range(0, n-1)) {
+			printt(i, d1(i), "\n");
+			assert(d1(i) > ntests/n*0.99);
+			assert(d1(i) < ntests/n*1.01);
+		}
+
+	}
+
+	{
+		// no seed uses a random seed
+
+		var r1;
+
+		//int seed
+		initrnd();
+		r1 = rnd(1'000'000'000);
+
+		//test reseed is *not* the same
+		initrnd();
+		assert(rnd(1'000'000'000) != r1);
+	}
+
+	{
+		// seed 0 uses random seed
+		var r1;
+
+		//int seed
+		initrnd(0);
+		r1 = rnd(1'000'000'000);
+
+		//test reseed is *not* the same
+		initrnd(0);
+		assert(rnd(1'000'000'000) != r1);
+	}
+
+	{
+		printl("Prevent rnd always returning 0");
+		try { var x = rnd(0); assert(false); } catch (MVDivideByZero e) {};
+	}
+
+	{
+		// Random seed based on high res clock
+		initrnd();
+
+		//string seed
+		initrnd("cccc");
+		var r1 =rnd(1'000'000'000);
+		//test reseed
+		initrnd("cccc");
+		assert(rnd(1'000'000'000) eq r1);
+
+		//slightly different string seed
+		initrnd("cccd");
+		assert(rnd(1'000'000'000) ne r1);
+
+		//slightly different max int
+		initrnd("cccd");
+		assert(rnd(1'000'000'001) ne r1);
+
+	}
+
+	{
+		//int seed
+		initrnd(123456);
+		var r1 =rnd(1'000'000'000);
+
+		//test reseed is the same
+		initrnd(123456);
+		assert(rnd(1'000'000'000)==r1);
+
+		//test reseed with string of int is the same
+		initrnd("123456");
+		assert(rnd(1'000'000'000)==r1);
+
+		//test reseed with double of int is the same
+		initrnd(123456.4);
+		assert(rnd(1'000'000'000)==r1);
+
+		//test reseed with double of int is the same
+		initrnd(123456.6);
+		assert(rnd(1'000'000'000)==r1);
+
+		//slightly different seed
+		initrnd(123457);
+		assert(rnd(1'000'000'000) ne r1);
+
+		//slightly different max int DOESNT CHANGE RESULT!
+		//initrnd(123456);
+		//assert(rnd(1'000'000'001) ne r1);
+	}
+
+	{
 		var unitx;
 		//printl("x", amountunit("USD",ID), "y", ID.quote());
 		var amount = amountunit("USD",unitx);
@@ -62,7 +210,6 @@ function main()
 		assert(oconv("12345","R(*)#8")              eq "***12345");
 		assert(oconv("ABCDEFG","R#4")               eq "DEFG");
 		assert(oconv("ABCD","C#6")                  eq " ABCD ");
-		assert(oconv(6666,"D2-")                    eq "04-01-86");
 		//assert(oconv("1234567890","L(###)###-####") eq "(123)456-7890");
 
 		//TX
@@ -109,20 +256,34 @@ function main()
 	{
 	    //stop("Test passed");
 
-	    print(AT(-1));
-	    var cursor=getcursor();
-	    //no cursor if no terminal
-	    assert(cursor eq "\x1b[1;1H" or cursor eq "");
+		if (TERMINAL) {
 
-	    //should show 1;1 in top left
-	    for (const var ii : range(0, 12)) {
-	        print(AT(ii,ii));
-	        print(getcursor().substr(2));
-	    }
+			// getcursor may return "\x1b[0;0H" if not enabled
+		    print(AT(-1));
+		    var cursor=getcursor();
+			TRACE(cursor)
+		    //no cursor if no terminal
+		    assert(cursor eq "\x1b[1;1H" or cursor eq "" or cursor eq "\x1b[0;0H");
 
-	    print(AT(7,24));
-	    cursor=getcursor();
-	    assert(cursor eq "\x1b[24;7H" or cursor eq "");
+		    //should show 1;1 in top left
+		    for (const var ii : range(0, 12)) {
+		        print(AT(ii,ii));
+		        print(getcursor().substr(2));
+		    }
+
+		    print(AT(7,24));
+		    cursor=getcursor();
+			TRACE(cursor)
+		    assert(cursor eq "\x1b[24;7H" or cursor eq "" or cursor eq "\x1b[0;0H");
+
+			setcursor(cursor);
+		}
+
+		{
+			// Not implemented?
+			var x = getprompt();
+			setprompt(x);
+		}
 
 	    //check that we cannot assign or copy from an unassigned variable
 	    {
@@ -245,8 +406,17 @@ function main()
 	    std::cout << "Big     : " << big.capacity() << std::endl;
 
 	    //test tcase and fcase
-	    assert(var("top of the world").tcase()=="Top Of The World");
 	    printl(var("top of the world").tcase().fcase());
+
+		var g = "Grüßen";
+		assert(g.fcase() eq "grüssen");
+		assert(var("Grüßen").fcase() eq "grüssen");
+		assert(g.fcaser() eq "grüssen");
+
+	    var v="top of the world";
+		assert(v.tcase()=="Top Of The World");
+	    assert(var("top of the world").tcase()=="Top Of The World");
+		assert(v.tcaser()=="Top Of The World");
 
 	    printl(round(var("6000.50")/20,2));
 	    assert(round(var("6000.50")/20,2)==300.03);
@@ -513,7 +683,14 @@ function main()
 		logputl();
 		logputl("0", "1", "2", "l");
 		logputl("0", "1", "2", "l");
-
+	}
+	{
+		// These member functions do not get called by their free function equivalents
+		"xxxx"_var.errput();
+		"xxxx"_var.errputl();
+		"xxxx"_var.logputl();
+	}
+	{
 		assert(crop(_VM_ _FM_) eq "");
 		assert(crop("xxx" _VM_ _FM_) eq "xxx");
 		assert(crop("aaa" _VM_ _FM_ "bbb") eq ("aaa" _FM_ "bbb"));
@@ -527,6 +704,10 @@ function main()
 		assert(crop(_FM_ "aa" _VM_ _FM_ _VM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ _VM_ "bb");
 		assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_FM_ "aa" _FM_ "bb");
 		assert(crop(_FM_ _RM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_RM_ "aa" _FM_ "bb");
+
+		// crop temporaries
+		assert("^]^]^}^|^~^"_var.crop().outputl() eq "");
+		assert("a^b]^c]^d}^e|^f~^g"_var.crop().outputl() eq "a^b^c^d^e^f^g"_var);
 
 		var errmsg;
 		//if (not dbcreate("steve",errmsg))
@@ -583,10 +764,6 @@ function main()
 
 		//test remove
 
-		var rem="abc"^FM^"xyz";
-		var ptr=2;
-		var sep;
-
 		//bc|5|2
 		//xyz|9|0
 		//abc|5|2
@@ -594,27 +771,65 @@ function main()
 		//|999|0
 		//|999|0
 
-		var result=rem.substr2(ptr,sep);
-		assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
+		{
+			// member functions
 
-		result=rem.substr2(ptr,sep);
-		assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+			var rem="abc"^FM^"xyz";
+			var ptr=2;
+			var sep;
 
-		ptr=0;
+			var result=rem.substr2(ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
 
-		result=rem.substr2(ptr,sep);
-		assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
+			result=rem.substr2(ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
-		result=rem.substr2(ptr,sep);
-		assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+			ptr=0;
 
-		ptr=999;
+			result=rem.substr2(ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
 
-		result=rem.substr2(ptr,sep);
-		assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+			result=rem.substr2(ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
-		result=rem.substr2(ptr,sep);
-		assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+			ptr=999;
+
+			result=rem.substr2(ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+
+			result=rem.substr2(ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+		}
+
+		{
+			// free functions
+
+			var rem="abc"^FM^"xyz";
+			var ptr=2;
+			var sep;
+
+			var result=substr2(rem, ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
+
+			result=substr2(rem, ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+
+			ptr=0;
+
+			result=substr2(rem, ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
+
+			result=substr2(rem, ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+
+			ptr=999;
+
+			result=substr2(rem, ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+
+			result=substr2(rem, ptr,sep);
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+		}
 
 		//test unquote
 		assert(unquote("\"This is quoted?\"") eq "This is quoted?");
@@ -626,13 +841,13 @@ function main()
 	return 0;
 }
 
-bool test_amountunit(in input, in amount, in unitcode) {
+bool test_amountunit(in inputx, in amount, in unitcode) {
 
-	printl("amountunit :", input.quote(), "amount :", amount.quote(), "unit :", unitcode.quote());
+	printl("amountunit :", inputx.quote(), "amount :", amount.quote(), "unit :", unitcode.quote());
 
 	// Check amount
 	var unitcode2;
-	if (amountunit(input, unitcode2) ne amount)
+	if (amountunit(inputx, unitcode2) ne amount)
 		return false;
 
 	// Check unit

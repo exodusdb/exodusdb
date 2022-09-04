@@ -108,7 +108,7 @@ function main() {
 		ID = "1";
 		var ntrans = 100;
 		//printl();
-		//printl("TRANTEST 1.", PROCESSNO);
+		//printl("TRANTEST 1.", THREADNO);
 		for (const var recn : range(1, ntrans)) {
 			//if (TERMINAL and recn % 100)
 			//	printl(recn);
@@ -120,8 +120,8 @@ function main() {
 			}
 		}
 		//printl();
-		//printl("TRANTEST 2.", PROCESSNO);
-		response_ = "OK Process No. " ^ PROCESSNO ^ ", Total: " ^ (RECORD + 1);
+		//printl("TRANTEST 2.", THREADNO);
+		response_ = "OK Thread No. " ^ THREADNO ^ ", Total: " ^ (RECORD + 1);
 
 	} else if (mode.a(1) eq "PREVIEWLETTERHEAD") {
 

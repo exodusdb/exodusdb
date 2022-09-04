@@ -185,7 +185,7 @@ Example command line:
 	var title;
 	var value;
 	var tcoln;	//num
-	var nn;
+	//var nn;
 	var ii;	 //num
 	var tt2;
 	var charx;
@@ -1034,13 +1034,17 @@ nextkey:
 			colname(coln) = word;
 
 			//increase column width if column title needs it
-			nn = dictrec.a(3).count(VM) + 1;
-			for (ii = 1; ii <= nn; ++ii) {
-				tt = dictrec.a(3, ii);
-				if (dictrec.a(10) and tt.length() gt dictrec.a(10)) {
-					dictrec(10) = tt.length();
-				}
-			};	//ii;
+//			let nn = dictrec.a(3).count(VM) + 1;
+//			for (ii = 1; ii <= nn; ++ii) {
+//				tt = dictrec.a(3, ii);
+			if (dictrec.a(10)) {
+				let titles = dictrec.a(3).convert(VM, FM);
+				for (let part : titles) {
+					if (part.length() gt dictrec.a(10)) {
+						dictrec(10) = part.length();
+					}
+				};	//ii;
+			}
 
 			dictrec(bheadfn) = "";
 
@@ -1133,10 +1137,11 @@ nextkey:
 							hrown += 1;
 						}
 
-						pagebreaks.r(coln,
-									 "'"
-									 "B" ^
-										 tt2 ^ "'");
+//						pagebreaks.r(coln,
+//									 "'"
+//									 "B" ^
+//										 tt2 ^ "'");
+						pagebreaks(coln) = squote("B" ^ tt2);
 					}
 					breakopts(1) = word;
 				}

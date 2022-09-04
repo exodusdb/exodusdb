@@ -10,7 +10,7 @@ function main() {
 	// Quit if running under make since there are no tests
 	if (osgetenv("MAKELEVEL")) {
 	    printl();
-		printl("Test passed");
+		printl("Test passed - skipped because MAKELEVEL is set");
 	    return 0;
 	}
 
@@ -225,6 +225,7 @@ function main() {
 		}
 	}
 
+	// Ensure optimiser doesnt see as unused
 	printl(the_truth_hurts, some_dbl, some_char);
 
     printl();

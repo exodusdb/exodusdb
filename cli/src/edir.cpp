@@ -130,7 +130,7 @@ function main() {
 			//var reply=inputl();
 			var reply = "Y";
 
-			var newrecord = fieldno ? RECORD.r(fieldno, text2) : text2;
+			var newrecord = fieldno ? RECORD.pickreplace(fieldno, text2) : text2;
 
 			//keep trying to update - perhaps futilely
 			//at least temp file will be left in the directory

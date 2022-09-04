@@ -8,19 +8,22 @@
 
 namespace exodus {
 
-var ExodusProgramBase::getcursor() {
 
-	return "";
+bool var::isterminal() const {
+	return isatty(fileno(stdin));
+}
 
-	//false if stdin is not a terminal
-	if (!isatty(fileno(stdin))) {
-		std::clog << "not a tty" << std::endl;
-		return false;
-	}
-	std::clog << "is a tty" << std::endl;
+var ExodusProgramBase::getcursor() const {
+
+	//no cursor if stdin is not a terminal
+	if (not var().isterminal())
+		return "";
 
 	//force out any previous cursor control characters
 	var().osflush();
+
+	// quit because hangs sometimes
+	return AT(0,0);
 
 	// Output
 	/////////

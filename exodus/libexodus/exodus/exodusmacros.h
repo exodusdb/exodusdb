@@ -256,7 +256,7 @@ using out = var&;      // VARREF;
 #define LEVEL mv.LEVEL
 #define VOLUMES mv.VOLUMES
 
-#define PROCESSNO mv.PROCESSNO
+#define THREADNO mv.THREADNO
 #define CURSOR mv.CURSOR
 
 #endif	// EXODUSMACROS_H

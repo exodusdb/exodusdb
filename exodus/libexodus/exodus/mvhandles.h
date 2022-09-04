@@ -50,7 +50,7 @@ class MvHandlesCache {
 #ifndef INSIDE_MVHANDLES_CPP
 extern
 #endif								  // INSIDE_MVHANDLES_CPP
-	MvHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
+	thread_local MvHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
 
 }  // namespace exodus
 #endif	// MVHANDLES_H

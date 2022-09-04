@@ -23,6 +23,13 @@ function main() {
     }
 	TRACE(default_conn)
 
+	//Skip if fast testing required
+	if (osgetenv("EXO_FAST_TEST")) {
+		printl("EXO_FAST_TEST - skipping test.");
+		printl("Test passed");
+		return 0;
+	}
+
 	gosub cleanup();
 
 	printl("\n   --- create a specific database for dicts ---\n");

@@ -21,7 +21,8 @@ MvHandlesCache::MvHandlesCache()
 
 int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
 	assert(del);
-	std::scoped_lock lock(mvhandles_mutex);
+	// No longer need locking since mv_handlescache is thread_local
+	//std::lock_guard lock(mvhandles_mutex);
 
 	int ix;
 	for (ix = 0; ix < (int)conntbl.size(); ix++)
@@ -38,14 +39,14 @@ int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTRO
 }
 
 CACHED_HANDLE MvHandlesCache::get_handle(int index, std::string name) {
-	std::scoped_lock lock(mvhandles_mutex);
+	//std::lock_guard lock(mvhandles_mutex);
 	return (conntbl[index].deleter == nullptr) || (conntbl[index].extra != name)
 			   ? nullptr
 			   : conntbl[index].handle;
 }
 
 void MvHandlesCache::del_handle(int index) {
-	std::scoped_lock lock(mvhandles_mutex);
+	//std::lock_guard lock(mvhandles_mutex);
 	assert(conntbl[index].deleter);
 	if (conntbl[index].deleter) {
 		conntbl[index].deleter(conntbl[index].handle);
@@ -57,7 +58,7 @@ void MvHandlesCache::del_handle(int index) {
 MvHandlesCache::~MvHandlesCache() {
 
 	// crashes on linux and multithreaded destructor cant exist so  dont lock
-	// std::scoped_lock lock(mvhandles_mutex);
+	// std::lock_guard lock(mvhandles_mutex);
 
 	int ix;
 	for (ix = 0; ix < (int)conntbl.size(); ix++)

@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
+#include <exodusfuncs.h>
 
 namespace exodus {
 
@@ -43,12 +44,12 @@ PUBLIC bool unassigned(CVR var1) {
 	return !var1.assigned();
 }
 
-PUBLIC VARREF transfer(VARREF fromvar, VARREF tovar) {
-	return fromvar.transfer(tovar);
+PUBLIC void transfer(VARREF fromvar, VARREF tovar) {
+	fromvar.transfer(tovar);
 }
 
-PUBLIC CVR exchange(CVR var1, CVR var2) {
-	return var1.exchange(var2);
+PUBLIC void exchange(VARREF var1, VARREF var2) {
+	var1.exchange(var2);
 }
 
 PUBLIC var date() {
@@ -65,6 +66,10 @@ PUBLIC var timedate() {
 
 PUBLIC void ossleep(const int milliseconds) {
 	var().ossleep(milliseconds);
+}
+
+PUBLIC var oswait(const int milliseconds, CVR dirpath) {
+	return var().oswait(milliseconds, dirpath);
 }
 
 PUBLIC var ostime() {
@@ -140,7 +145,7 @@ PUBLIC var osread(CVR osfilename) {
 }
 
 // oswrite x on y else
-PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage = "") {
+PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage) {
 	return data.oswrite(osfilename, codepage);
 }
 
@@ -208,10 +213,6 @@ PUBLIC void osflush() {
 	return var().osflush();
 }
 
-PUBLIC var suspend(CVR command) {
-	return command.suspend();
-}
-
 // version to get return int (conventionally 0 means success, otherwise error)
 // example: if (osshell(somecommand)) { ...
 PUBLIC bool osshell(CVR command) {
@@ -238,8 +239,8 @@ PUBLIC var ostempfilename() {
 	return var().ostempfilename();
 }
 
-PUBLIC var ostempdirname() {
-	return var().ostempdirname();
+PUBLIC var ostempdirpath() {
+	return var().ostempdirpath();
 }
 
 // example: osshellwrite(command,inputforcommand);
@@ -282,8 +283,8 @@ PUBLIC void debug() {
 	var().debug();
 }
 
-PUBLIC bool echo(const int on_off) {
-	return var().echo(on_off);
+PUBLIC var backtrace() {
+	return var().backtrace();
 }
 
 PUBLIC var input() {
@@ -304,6 +305,24 @@ PUBLIC var inputn(const int nchars) {
 	return v;
 }
 
+
+PUBLIC ND bool isterminal() {
+	return var().isterminal();
+}
+
+PUBLIC ND bool hasinput(const int millisecs) {
+	return var().hasinput(millisecs);
+}
+
+PUBLIC ND bool eof() {
+	return var().eof();
+}
+
+PUBLIC bool echo(const int on_off) {
+	return var().echo(on_off);
+}
+
+
 PUBLIC var len(CVR var1) {
 	return var1.len();
 }
@@ -312,231 +331,260 @@ PUBLIC var length(CVR var1) {
 	return var1.length();
 }
 
-PUBLIC VARREF converter(VARREF instring, CVR oldchars, CVR newchars) {
-	return instring.converter(oldchars, newchars);
-}
 
+PUBLIC VARREF converter(VARREF iostring, CVR oldchars, CVR newchars) {
+	return iostring.converter(oldchars, newchars);
+}
 PUBLIC var convert(CVR instring, CVR oldchars, CVR newchars) {
 	return instring.convert(oldchars, newchars);
 }
 
-PUBLIC VARREF textconverter(VARREF instring, CVR oldchars, CVR newchars) {
-	return instring.textconverter(oldchars, newchars);
-}
 
+PUBLIC VARREF textconverter(VARREF iostring, CVR oldchars, CVR newchars) {
+	return iostring.textconverter(oldchars, newchars);
+}
 PUBLIC var textconvert(CVR instring, CVR oldchars, CVR newchars) {
 	return instring.textconvert(oldchars, newchars);
 }
 
-PUBLIC VARREF swapper(VARREF instring, CVR from, CVR to) {
-	return instring.swapper(from, to);
-}
 
+PUBLIC VARREF swapper(VARREF iostring, CVR from, CVR to) {
+	return iostring.swapper(from, to);
+}
 PUBLIC var swap(CVR instring, CVR from, CVR to) {
 	var newstring = instring;
 	return newstring.swap(from, to);
 }
 
-PUBLIC VARREF regex_replacer(VARREF instring, CVR regexstr, CVR replacementstr, CVR options = "") {
-	return instring.regex_replacer(regexstr, replacementstr, options);
-}
 
-PUBLIC var regex_replace(CVR instring, CVR regexstr, CVR replacementstr, CVR options = "") {
+PUBLIC VARREF regex_replacer(VARREF iostring, CVR regexstr, CVR replacementstr, CVR options) {
+	return iostring.regex_replacer(regexstr, replacementstr, options);
+}
+PUBLIC var regex_replace(CVR instring, CVR regexstr, CVR replacementstr, CVR options) {
 	var newstring = instring;
 	return newstring.regex_replacer(regexstr, replacementstr, options);
 }
 
-PUBLIC VARREF ucaser(VARREF instring) {
-	return instring.ucaser();
-}
 
+PUBLIC VARREF ucaser(VARREF iostring) {
+	return iostring.ucaser();
+}
 PUBLIC var ucase(CVR instring) {
 	return instring.ucase();
 }
 
-PUBLIC VARREF lcaser(VARREF instring) {
-	return instring.lcaser();
-}
 
+PUBLIC VARREF lcaser(VARREF iostring) {
+	return iostring.lcaser();
+}
 PUBLIC var lcase(CVR instring) {
 	return instring.lcase();
 }
 
-PUBLIC VARREF tcaser(VARREF instring) {
-	return instring.tcaser();
-}
 
+PUBLIC VARREF tcaser(VARREF iostring) {
+	return iostring.tcaser();
+}
 PUBLIC var tcase(CVR instring) {
 	return instring.tcase();
 }
 
-PUBLIC VARREF fcaser(VARREF instring) {
-	return instring.fcaser();
-}
 
+PUBLIC VARREF fcaser(VARREF iostring) {
+	return iostring.fcaser();
+}
 PUBLIC var fcase(CVR instring) {
 	return instring.fcase();
 }
 
-PUBLIC VARREF normalizer(VARREF instring) {
-	return instring.normalizer();
-}
 
+PUBLIC VARREF normalizer(VARREF iostring) {
+	return iostring.normalizer();
+}
 PUBLIC var normalize(CVR instring) {
 	return instring.normalize();
 }
 
+
+PUBLIC VARREF uniquer(VARREF iostring) {
+	return iostring.uniquer();
+}
 PUBLIC var unique(CVR instring) {
 	return instring.unique();
 }
 
-PUBLIC VARREF inverter(VARREF instring) {
+
+PUBLIC VARREF inverter(VARREF iostring) {
+	return iostring.inverter();
+}
+PUBLIC ND var invert(CVR instring) {
+	return var(instring).invert();
+}
+PUBLIC var invert(var&& instring) {
 	return instring.inverter();
 }
 
-PUBLIC var invert(CVR instring) {
-	return instring.invert();
-}
 
-PUBLIC VARREF lowerer(VARREF instring) {
-	return instring.lowerer();
+PUBLIC VARREF lowerer(VARREF iostring) {
+	return iostring.lowerer();
 }
-
 PUBLIC var lower(CVR instring) {
 	return instring.lower();
 }
 
-PUBLIC VARREF raiser(VARREF instring) {
-	return instring.raiser();
-}
 
+PUBLIC VARREF raiser(VARREF iostring) {
+	return iostring.raiser();
+}
 PUBLIC var raise(CVR instring) {
 	return instring.raise();
 }
 
-PUBLIC VARREF splicer(VARREF instring, const int start1, const int length, CVR str) {
-	return instring.splicer(start1, length, str);
-}
 
+PUBLIC VARREF splicer(VARREF iostring, const int start1, const int length, CVR str) {
+	return iostring.splicer(start1, length, str);
+}
 PUBLIC var splice(CVR instring, const int start1, const int length, CVR str) {
 	return instring.splice(start1, length, str);
 }
 
-PUBLIC VARREF popper(VARREF instring) {
-	return instring.popper();
+
+// length omitted
+PUBLIC VARREF splicer(VARREF iostring, const int start1, CVR str) {
+	return iostring.splicer(start1, str);
+}
+// length omitted
+PUBLIC var splice(CVR instring, const int start1, CVR str) {
+	return instring.splice(start1, str);
 }
 
+
+PUBLIC VARREF popper(VARREF iostring) {
+	return iostring.popper();
+}
 PUBLIC var pop(CVR instring) {
 	return instring.pop();
 }
 
-PUBLIC VARREF quoter(VARREF instring) {
-	return instring.quoter();
-}
 
+PUBLIC VARREF quoter(VARREF iostring) {
+	return iostring.quoter();
+}
 PUBLIC var quote(CVR instring) {
 	return instring.quote();
 }
 
-PUBLIC VARREF unquoter(VARREF instring) {
-	return instring.unquoter();
+PUBLIC VARREF squoter(VARREF iostring) {
+	return iostring.squoter();
+}
+PUBLIC var squote(CVR instring) {
+	return instring.squote();
 }
 
+
+PUBLIC VARREF unquoter(VARREF iostring) {
+	return iostring.unquoter();
+}
 PUBLIC var unquote(CVR instring) {
 	return instring.unquote();
 }
 
-PUBLIC VARREF fieldstorer(VARREF instring, CVR sepchar, const int fieldno, const int nfields, CVR replacement) {
-	return instring.fieldstorer(sepchar, fieldno, nfields, replacement);
-}
 
+PUBLIC VARREF fieldstorer(VARREF iostring, CVR sepchar, const int fieldno, const int nfields, CVR replacement) {
+	return iostring.fieldstorer(sepchar, fieldno, nfields, replacement);
+}
 PUBLIC var fieldstore(CVR instring, CVR sepchar, const int fieldno, const int nfields, CVR replacement) {
 	return instring.fieldstore(sepchar, fieldno, nfields, replacement);
 }
 
+
+PUBLIC VARREF cropper(VARREF iostring) {
+	return iostring.cropper();
+}
 PUBLIC var crop(CVR instring) {
 	return instring.crop();
 }
 
-PUBLIC var cropper(VARREF instring) {
-	return instring.cropper();
+
+PUBLIC VARREF trimmer(VARREF iostring, CVR trimchars, CVR options) {
+	return iostring.trimmer(trimchars, options);
+}
+PUBLIC var trim(CVR instring, CVR trimchars, CVR options) {
+
+	return instring.trim(trimchars, options);
 }
 
-PUBLIC VARREF trimmer(VARREF instring, const char* trimchars) {
-	return instring.trimmer(trimchars);
-}
 
+
+PUBLIC VARREF trimmer(VARREF iostring, const char* trimchars) {
+	return iostring.trimmer(trimchars);
+}
 PUBLIC var trim(CVR instring, const char* trimchars) {
 	return instring.trim(trimchars);
 }
 
-PUBLIC VARREF trimmerf(VARREF instring, const char* trimchars) {
-	return instring.trimmerf(trimchars);
+PUBLIC VARREF trimmerf(VARREF iostring, const char* trimchars) {
+	return iostring.trimmerf(trimchars);
 }
-
 PUBLIC var trimf(CVR instring, const char* trimchars) {
 	return instring.trimf(trimchars);
 }
 
-PUBLIC VARREF trimmerb(VARREF instring, const char* trimchars) {
-	return instring.trimmerb(trimchars);
+PUBLIC VARREF trimmerb(VARREF iostring, const char* trimchars) {
+	return iostring.trimmerb(trimchars);
 }
-
 PUBLIC var trimb(CVR instring, const char* trimchars) {
 	return instring.trimb(trimchars);
 }
 
-PUBLIC VARREF trimmer(VARREF instring, CVR trimchars) {
-	return instring.trimmer(trimchars);
+
+//PUBLIC VARREF trimmer(VARREF iostring, CVR trimchars) {
+//	return iostring.trimmer(trimchars);
+//}
+//PUBLIC var trim(CVR instring, CVR trimchars) {
+//	return instring.trim(trimchars);
+//}
+//
+//PUBLIC VARREF trimmerf(VARREF iostring, CVR trimchars) {
+//	return iostring.trimmerf(trimchars);
+//}
+//PUBLIC var trimf(CVR instring, CVR trimchars) {
+//	return instring.trimf(trimchars);
+//}
+//
+//PUBLIC VARREF trimmerb(VARREF iostring, CVR trimchars) {
+//	return iostring.trimmerb(trimchars);
+//}
+//PUBLIC var trimb(CVR instring, CVR trimchars) {
+//	return instring.trimb(trimchars);
+//}
+//
+
+PUBLIC VARREF sorter(VARREF iostring, SV sepchar) {
+	return iostring.sorter(sepchar);
+}
+PUBLIC ND var sort(CVR instring, SV sepchar) {
+	return instring.sort(sepchar);
 }
 
-PUBLIC VARREF trimmer(VARREF instring, CVR trimchars, CVR options) {
-	return instring.trimmer(trimchars, options);
-}
 
-PUBLIC var trim(CVR instring, CVR trimchars) {
-	return instring.trim(trimchars);
-}
-
-PUBLIC var trim(CVR instring, CVR trimchars, CVR options) {
-	return instring.trim(trimchars, options);
-}
-
-PUBLIC VARREF trimmerf(VARREF instring, CVR trimchars) {
-	return instring.trimmerf(trimchars);
-}
-
-PUBLIC var trimf(CVR instring, CVR trimchars) {
-	return instring.trimf(trimchars);
-}
-
-PUBLIC VARREF trimmerb(VARREF instring, CVR trimchars) {
-	return instring.trimmerb(trimchars);
-}
-
-PUBLIC var trimb(CVR instring, CVR trimchars) {
-	return instring.trimb(trimchars);
-}
-
-PUBLIC bool matread(dim& dimrecord, CVR filehandle, CVR key) {
+PUBLIC bool dimread(dim& dimrecord, CVR filehandle, CVR key) {
 	return dimrecord.read(filehandle, key);
 }
 
-PUBLIC bool matwrite(const dim& dimrecord, CVR filehandle, CVR key) {
+PUBLIC bool dimwrite(const dim& dimrecord, CVR filehandle, CVR key) {
 	return dimrecord.write(filehandle, key);
 }
 
-PUBLIC var split(CVR sourcevar, dim& destinationdim) {
-	return destinationdim.split(sourcevar);
+
+PUBLIC dim split(CVR sourcevar, SV sepchar) {
+	return sourcevar.split(sepchar);
 }
 
-PUBLIC dim split(CVR sourcevar) {
-	return sourcevar.split();
+PUBLIC var join(const dim& sourcedim, SV sepchar) {
+	return sourcedim.join(sepchar);
 }
 
-PUBLIC var join(const dim& sourcedim) {
-	return sourcedim.join();
-}
 
 PUBLIC var chr(CVR integer) {
 	return var().chr(integer);
@@ -620,7 +668,7 @@ PUBLIC var floor(CVR num1) {
 	return num1.floor();
 }
 
-PUBLIC var round(CVR num1, const int ndecimals = 0) {
+PUBLIC var round(CVR num1, const int ndecimals) {
 	return num1.round(ndecimals);
 }
 
@@ -629,15 +677,19 @@ PUBLIC var rnd(const int number) {
 }
 
 PUBLIC void initrnd(CVR seed) {
-	var(seed).initrnd();
+	seed.initrnd();
 }
 
-PUBLIC var mod(CVR dividend, CVR divisor) {
-	return dividend.mod(divisor);
+PUBLIC var mod(CVR dividend, CVR limit) {
+	return dividend.mod(limit);
 }
 
-PUBLIC var mod(CVR dividend, const int divisor) {
-	return dividend.mod(divisor);
+PUBLIC var mod(CVR dividend, const double limit) {
+	return dividend.mod(limit);
+}
+
+PUBLIC var mod(CVR dividend, const int limit) {
+	return dividend.mod(limit);
 }
 
 PUBLIC var space(const int number) {
@@ -660,12 +712,12 @@ PUBLIC var substr(CVR instring, const int startx, const int length) {
 	return instring.substr(startx, length);
 }
 
-PUBLIC var substrer(VARREF instring, const int startx) {
-	return instring.substrer(startx);
+PUBLIC VARREF substrer(VARREF iostring, const int startx) {
+	return iostring.substrer(startx);
 }
 
-PUBLIC var substrer(VARREF instring, const int startx, const int length) {
-	return instring.substrer(startx, length);
+PUBLIC VARREF substrer(VARREF iostring, const int startx, const int length) {
+	return iostring.substrer(startx, length);
 }
 
 PUBLIC var index(CVR instring, CVR substr, const int occurrenceno) {
@@ -857,6 +909,10 @@ PUBLIC bool write(CVR record, CVR filehandle, CVR key) {
 	return record.write(filehandle, key);
 }
 
+PUBLIC bool writeo(CVR record, CVR filehandle, CVR key) {
+	return record.writeo(filehandle, key);
+}
+
 PUBLIC bool writev(CVR record, CVR filehandle, CVR key, const int fieldno) {
 	return record.writev(filehandle, key, fieldno);
 }
@@ -890,13 +946,11 @@ PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno) {
 PUBLIC var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement) {
 	return instring.pickreplace(fieldno, valueno, subvalueno, replacement);
 }
-
 PUBLIC var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement) {
-	return instring.pickreplace(fieldno, valueno, 0, replacement);
+	return instring.pickreplace(fieldno, valueno, replacement);
 }
-
 PUBLIC var pickreplace(CVR instring, const int fieldno, CVR replacement) {
-	return instring.pickreplace(fieldno, 0, 0, replacement);
+	return instring.pickreplace(fieldno, replacement);
 }
 
 PUBLIC var extract(CVR instring, const int fieldno, const int valueno, const int subvalueno) {
@@ -906,13 +960,11 @@ PUBLIC var extract(CVR instring, const int fieldno, const int valueno, const int
 PUBLIC var insert(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
 	return instring.insert(fieldno, valueno, subvalueno, insertion);
 }
-
 PUBLIC var insert(CVR instring, const int fieldno, const int valueno, CVR insertion) {
-	return instring.insert(fieldno, valueno, 0, insertion);
+	return instring.insert(fieldno, valueno, insertion);
 }
-
 PUBLIC var insert(CVR instring, const int fieldno, CVR insertion) {
-	return instring.insert(fieldno, 0, 0, insertion);
+	return instring.insert(fieldno, insertion);
 }
 
 // PUBLIC var erase(CVR instring, const int fieldno, const int valueno, const int
@@ -922,34 +974,32 @@ PUBLIC var remove(CVR instring, const int fieldno, const int valueno, const int 
 	return instring.remove(fieldno, valueno, subvalueno);
 }
 
-PUBLIC VARREF pickreplacer(VARREF instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement) {
-	return instring.r(fieldno, valueno, subvalueno, replacement);
+PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR replacement) {
+	return iostring.r(fieldno, valueno, subvalueno, replacement);
+}
+PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, CVR replacement) {
+	return iostring.r(fieldno, valueno, replacement);
+}
+PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, CVR replacement) {
+	return iostring.r(fieldno, replacement);
 }
 
-PUBLIC VARREF pickreplacer(VARREF instring, const int fieldno, const int valueno, CVR replacement) {
-	return instring.r(fieldno, valueno, 0, replacement);
+PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
+	return iostring.inserter(fieldno, valueno, subvalueno, insertion);
 }
 
-PUBLIC VARREF pickreplacer(VARREF instring, const int fieldno, CVR replacement) {
-	return instring.r(fieldno, 0, 0, replacement);
+PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, CVR insertion) {
+	return iostring.inserter(fieldno, valueno, insertion);
 }
 
-PUBLIC VARREF inserter(VARREF instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
-	return instring.inserter(fieldno, valueno, subvalueno, insertion);
+PUBLIC VARREF inserter(VARREF iostring, const int fieldno, CVR insertion) {
+	return iostring.inserter(fieldno, insertion);
 }
 
-PUBLIC VARREF inserter(VARREF instring, const int fieldno, const int valueno, CVR insertion) {
-	return instring.inserter(fieldno, valueno, 0, insertion);
-}
-
-PUBLIC VARREF inserter(VARREF instring, const int fieldno, CVR insertion) {
-	return instring.inserter(fieldno, 0, 0, insertion);
-}
-
-// PUBLIC VARREF eraser(VARREF instring, const int fieldno, const int valueno, const int subvalueno)
-PUBLIC VARREF remover(VARREF instring, const int fieldno, const int valueno, const int subvalueno) {
-	// return instring.eraser(fieldno, valueno, subvalueno);
-	return instring.remover(fieldno, valueno, subvalueno);
+// PUBLIC VARREF eraser(VARREF iostring, const int fieldno, const int valueno, const int subvalueno)
+PUBLIC VARREF remover(VARREF iostring, const int fieldno, const int valueno, const int subvalueno) {
+	// return iostring.eraser(fieldno, valueno, subvalueno);
+	return iostring.remover(fieldno, valueno, subvalueno);
 }
 
 PUBLIC bool locate(CVR target, CVR instring) {
@@ -992,7 +1042,7 @@ PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting,
 	return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);
 }
 
-PUBLIC var sum(CVR instring, CVR sepchar) {
+PUBLIC var sum(CVR instring, SV sepchar) {
 	return instring.sum(sepchar);
 }
 
@@ -1013,7 +1063,7 @@ PUBLIC var listindexes(CVR filename, CVR fieldname) {
 }
 
 // one argument returns the contents of an envvar (empty name returns the whole environment)
-PUBLIC var osgetenv(CVR name = "") {
+PUBLIC var osgetenv(CVR name) {
 	var temp = "";
 	temp.osgetenv(name);
 	return temp;
@@ -1032,7 +1082,7 @@ PUBLIC bool ossetenv(CVR name, CVR value) {
 }
 
 PUBLIC
-int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno) {
+int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int threadno) {
 
 	// signal/interrupt handlers
 	// install_signals();
@@ -1041,7 +1091,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	//	tss_environmentns.reset(new int(0));
 	//	global_environments.resize(6);
 	//int environmentn = 0;
-	mv.init(environmentno);
+	mv.init(threadno);
 	// mv.DICT.outputl("DICT=");
 	//	global_environments[environmentn] = &mv;
 
@@ -1118,7 +1168,8 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 
 	//atexit(exodus_atexit);
 
-	mv.TERMINAL = osgetenv("TERM");
+	if (isterminal())
+		mv.TERMINAL = osgetenv("TERM");
 
 	return 0;
 }

@@ -216,7 +216,7 @@ function main() {
 		d.oswrite(tfilename);
 
 		//check roundtrip agrees
-		assert(osread(tfilename) eq (d.join('\n') ^ '\n'));
+		assert(osread(tfilename) eq (d.join("\n") ^ '\n'));
 
 	}
 
@@ -317,46 +317,53 @@ function main() {
 
 	}
 
+	{
+		printl("Check BYes,No");
+		assert(oconv(var(true),"BYes,No").outputl() eq "Yes");
+		assert(oconv(var(false),"BYes,No").outputl() eq "No");
+	}
+
 	//check convert from double to string
 	{
 		var x = var(123.456).convert(".", "_");
 		assert(x eq "123_456");
 
-		assert(var(1.01).converter(".", "_").outputl().toString() eq "1_01");
-		assert(var(1.01).textconverter(".", "_").outputl().toString() eq "1_01");
-		assert(var(1.01).swapper(".", "_").outputl().toString() eq "1_01");
-		assert(var(1.01).regex_replacer(".", "_").outputl().toString() eq "____");
-		assert(var(1.01).regex_replacer(".", "_" , "").outputl().toString() eq "____");
-		assert(var(1.01).splicer(2, 1, "_").outputl().toString() eq "1_01");
-		assert(var(1.01).splicer(-1, "_").outputl().toString() eq "1.0_");
-		assert(var(1.01).popper().outputl().toString() eq "1.0");
-		assert(var(1.01).quoter().outputl().toString() eq "\"1.01\"");
-		assert(var(1.01).squoter().outputl().toString() eq "'1.01'");
-		assert(var(1.01).unquoter().outputl().toString() eq "1.01");
-		assert(var(1.01).ucaser().outputl().toString() eq "1.01");        // utf8
-		assert(var(1.01).lcaser().outputl().toString() eq "1.01");        // utf8
-		assert(var(1.01).tcaser().outputl().toString() eq "1.01");        // utf8
-		assert(var(1.01).fcaser().outputl().toString() eq "1.01");        // utf8
-		assert(var(1.01).normalizer().outputl().toString() eq "1.01");    // utf8
-		assert(var(1.01).inverter().outputl().toString() eq "ÎÑÏÎ");    // utf8
-		assert(var(1.01).trimmer().outputl().toString() eq "1.01");
-		assert(var(1.01).trimmerf().outputl().toString() eq "1.01");
-		assert(var(1.01).trimmerb().outputl().toString() eq "1.01");
-		assert(var(1.01).trimmer(var(" ")).outputl().toString() eq "1.01");
-		assert(var(1.01).trimmer(var(" "), "FB").outputl().toString() eq "1.01");
-		assert(var(1.01).trimmerf(var(" ")).outputl().toString() eq "1.01");
-		assert(var(1.01).trimmerb(var(" ")).outputl().toString() eq "1.01");
-		assert(var(1.01).fieldstorer(".", 1, 1, "_").outputl().toString() eq "_.01");
-		assert(var(1.01).substrer(2,2).outputl().toString() eq ".0");
-		assert(var(1.01).substrer(3).outputl().toString() eq "01");
-		assert(var(1.01).substrer(1).outputl().toString() eq "1.01");
-
-		assert(var(1.01).sort().outputl().toString() eq "1.01");
-
-		assert(var(1.01).lowerer().outputl().toString() eq "1.01");
-		assert(var(1.01).raiser().outputl().toString() eq "1.01");
-		assert(var(1.01).cropper().outputl().toString() eq "1.01");
-
+	}
+	{
+		//check various xxxxxxxx-er functions
+		var v1_01;
+		v1_01=1.01; assert(converter(v1_01,".", "_").outputl().toString() eq "1_01");
+		v1_01=1.01; assert(textconverter(v1_01,".", "_").outputl().toString() eq "1_01");
+		v1_01=1.01; assert(swapper(v1_01,".", "_").outputl().toString() eq "1_01");
+		v1_01=1.01; assert(regex_replacer(v1_01,".", "_").outputl().toString() eq "____");
+		v1_01=1.01; assert(regex_replacer(v1_01,".", "_" , "").outputl().toString() eq "____");
+		v1_01=1.01; assert(splicer(v1_01,2, 1, "_").outputl().toString() eq "1_01");
+		v1_01=1.01; assert(splicer(v1_01,-1, "_").outputl().toString() eq "1.0_");
+		v1_01=1.01; assert(popper(v1_01).outputl().toString() eq "1.0");
+		v1_01=1.01; assert(quoter(v1_01).outputl().toString() eq "\"1.01\"");
+		v1_01=1.01; assert(squoter(v1_01).outputl().toString() eq "'1.01'");
+		v1_01=1.01; assert(unquoter(v1_01).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(ucaser(v1_01).outputl().toString() eq "1.01");        // utf8
+		v1_01=1.01; assert(lcaser(v1_01).outputl().toString() eq "1.01");        // utf8
+		v1_01=1.01; assert(tcaser(v1_01).outputl().toString() eq "1.01");        // utf8
+		v1_01=1.01; assert(fcaser(v1_01).outputl().toString() eq "1.01");        // utf8
+		v1_01=1.01; assert(normalizer(v1_01).outputl().toString() eq "1.01");    // utf8
+		v1_01=1.01; assert(inverter(v1_01).outputl().toString() eq "ÎÑÏÎ");    // utf8
+		v1_01=1.01; assert(trimmer(v1_01).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(trimmerf(v1_01).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(trimmerb(v1_01).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(trimmer(v1_01,var(" ")).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(trimmer(v1_01,var(" "), "FB").outputl().toString() eq "1.01");
+		v1_01=1.01; assert(trimmerf(v1_01,var(" ")).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(trimmerb(v1_01,var(" ")).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(fieldstorer(v1_01,".", 1, 1, "_").outputl().toString() eq "_.01");
+		v1_01=1.01; assert(substrer(v1_01,2,2).outputl().toString() eq ".0");
+		v1_01=1.01; assert(substrer(v1_01,3).outputl().toString() eq "01");
+		v1_01=1.01; assert(substrer(v1_01,1).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(sorter(v1_01).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(lowerer(v1_01).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(raiser(v1_01).outputl().toString() eq "1.01");
+		v1_01=1.01; assert(cropper(v1_01).outputl().toString() eq "1.01");
 	}
 
 	printl("Test passed");

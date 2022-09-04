@@ -92,13 +92,6 @@ class printtext {
 				SYSTEM.r(2, printfilename);
 			}
 
-			//open printout file
-			/*
-			oswrite("", printfilename);
-			if (!printfilename.osopen()) {
-				stop("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ printfilename.quote());
-			}
-*/
 			if (letterhead.unassigned()) {
 				if (html)
 					gosub gethtml("HEAD", letterhead, "");

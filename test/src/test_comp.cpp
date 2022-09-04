@@ -317,6 +317,70 @@ function main() {
 	assert((pwr(10.0,2)>0));//100
 	assert((pwr(10.0,3)>0));//1000
 
+	var smaller = SMALLEST_NUMBER - 0.000000000001;
+	var negative_smaller = - SMALLEST_NUMBER + 0.000000000001;
+
+	// var double
+
+	{
+		printl("Test var double > int 0");
+
+		printl("Smallest number is greater than 0");
+		assert(var(SMALLEST_NUMBER) > 0);
+
+		printl("Slightly smaller number is *not* greater than 0");
+		assert(not (var(smaller) > 0));
+	}
+	{
+		printl("Test var double > double");
+
+		printl("Smallest number is greater than 0");
+		assert(var(SMALLEST_NUMBER) > 0.0);
+
+		printl("Slightly smaller number is *not* greater than 0");
+		assert(not (var(smaller) > 0.0));
+	}
+
+	{
+		printl("Test var double > var int  0");
+
+		printl("Smallest number is greater than 0");
+		assert(var(SMALLEST_NUMBER) > var(0));
+
+		printl("Slightly smaller number is *not* greater than 0");
+		assert(not (var(smaller) > var(0)));
+	}
+	{
+		printl("Test var double > var double 0");
+
+		printl("Smallest number is greater than 0");
+		assert(var(SMALLEST_NUMBER) > var(0.0));
+
+		printl("Slightly smaller number is *not* greater than 0");
+		assert(not (var(smaller) > var(0.0)));
+	}
+
+	// <
+
+	{
+		printl("Test var double < var int  0");
+
+		printl("Smallest neg number is < than 0");
+		assert(var(-SMALLEST_NUMBER) < 0);
+
+		printl("Slightly smaller neg number is *not* < than 0");
+		assert(not (var(negative_smaller) < 0));
+	}
+	{
+		printl("Test var double < var double 0");
+
+		printl("Smallest number is < than 0.0");
+		assert(var(-SMALLEST_NUMBER) < var(0.0));
+
+		printl("Slightly smaller neg number is *not* greater than 0.0");
+		assert(not (var(negative_smaller) < var(0.0)));
+	}
+
 	printl("Test passed");
 
 	return 0;

@@ -13,20 +13,28 @@ function main() {
 	//TRACE(var("") < var("A"));  //is true (1)
 	//stop();
 
-	var filenames = remove(COMMAND,1);
+	var filenames = COMMAND.remove(1);
 
 	//var manual = filenames;
 
 	var exodusdir=osgetenv("GITHUB_WORKSPACE");
+
+	//Skip if fast testing required
+	if (osgetenv("EXO_FAST_TEST")) {
+		printl("EXO_FAST_TEST - skipping test.");
+		printl("Test passed");
+		return 0;
+	}
 
 	// skip regression testing for speed
 	// unless we are testing on github
 	// or manually testing specific files
 	if (not exodusdir) {
 		if (not filenames) {
-			printl("Test skipped for speed - command is 'test_regress ALL' for full testing");
-			printl("Test passed");
-			return 0;
+			//printl("Test skipped for speed - command is 'test_regress ALL' for full testing");
+			//printl("Test passed");
+			//return 0;
+			filenames = "ALL";
 		}
 		exodusdir = osgetenv("HOME") ^ OSSLASH ^ "exodus";
 	}
@@ -126,7 +134,7 @@ function onefile(in filename, in maxndifferences) {
 	var funcnames="EXTRACT,REPLACE,INSERT,DELETE,==,!=,<,<=,>,>=,FIELD,ISNUM,FMT,OCONV,LOCATE,LOCATEUSING,LOCATEBY,LOCATEBYUSING,SUBSTR,SPLICER1,SPLICER2";
 	var funcno;
 
-	data.converter("\r\n",_FM_ _FM_);
+	converter(data,"\r\n",_FM_ _FM_);
 	dim line2;
 	var result;
 
@@ -139,7 +147,7 @@ function onefile(in filename, in maxndifferences) {
 
 		//printl(line);
 
-		line.converter("\xFF\xFE\xFD\xFC\xFB\xFA", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+		converter(line,"\xFF\xFE\xFD\xFC\xFB\xFA", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
 
 		dim line2 = line.split("\t");
 		var funcname=line2(2);
@@ -281,8 +289,8 @@ function onefile(in filename, in maxndifferences) {
 			//if ordering and target/string contains field/value/marks then change to PICK seps to ensure compatible ordering
 			//except the sep field mark that is being used
 			if (subrec.a(1,1,1) ne subrec or what.a(1,1,1) ne what) {
-				what.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"\xFF\xFE\xFD\xFC\xFB\xFA");
-				subrec.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"\xFF\xFE\xFD\xFC\xFB\xFA");
+				converter(what,_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"\xFF\xFE\xFD\xFC\xFB\xFA");
+				converter(subrec,_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"\xFF\xFE\xFD\xFC\xFB\xFA");
 				//TRACE(lineno ^ ". subrec = " ^ subrec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM_ _FM_ _VM_ _SM_ _TM_ _STM_) ^ " ... " ^ sep ^ " " ^ seq(sep));
 				if (sep == "") {
 					if (LOCATE_SN)
@@ -296,8 +304,8 @@ function onefile(in filename, in maxndifferences) {
 				}
 				if (sep and sep <= RM) {
 					pick_sep = chr(seq(sep)+256-32);
-					what.converter(pick_sep,sep);
-					subrec.converter(pick_sep,sep);
+					converter(what,pick_sep,sep);
+					converter(subrec,pick_sep,sep);
 					//TRACE(lineno ^ ". " ^ sep ^ " " ^ seq(sep) ^ " " ^ seq(pick_sep));
 				}
 				rec(LOCATE_FN, LOCATE_VN, LOCATE_SN) = subrec;
@@ -347,13 +355,13 @@ function onefile(in filename, in maxndifferences) {
 		//SPLICER1 x[y]=a
 		case 20:
 			result=ARG0;
-			result.splicer(ARG1, ARG3);
+			splicer(result,ARG1, ARG3);
 			break;
 
 		//SPLICER2 x[y,z]=a
 		case 21:
 			result=ARG0;
-			result.splicer(ARG1, ARG2, ARG3);
+			splicer(result,ARG1, ARG2, ARG3);
 			break;
 
 		default:

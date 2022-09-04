@@ -99,8 +99,10 @@ bool desynced_with_stdio = false;
 
 namespace exodus {
 
-static std::mutex global_mutex_threadstream;
-#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
+// output/errput/logput not threadsafe but probably not a problem
+//inline std::mutex global_mutex_threadstream;
+//#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
+#define LOCKIOSTREAM
 
 int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
@@ -145,16 +147,20 @@ bool var::eof() const {
 	return (std::cin.eof());
 }
 
-bool var::hasinput(int milliseconds) {
+bool var::hasinput(int milliseconds) const {
 	//declare in haskey.cpp
 	bool haskey(int milliseconds);
 
-	LOCKIOSTREAM
+	//LOCKIOSTREAM
 
 	return haskey(milliseconds);
 }
 
-//binary safe version (except nl/eof?) with little or no editing except backspace and no default
+// Not in a terminal - Binary safe except for \n (\r\n for MS)
+//
+// In a terminal - Backspace and \n (\r\n for MS) are lost.
+//                 Pressing Ctrl+d (Ctrl+z fro MS) indicates eof
+//
 VARREF var::input() {
 
 	THISIS("bool var::input()")
@@ -165,15 +171,13 @@ VARREF var::input() {
 
 	//LOCKIOSTREAM
 
-	// pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
 	if (!std::cin.eof())
 		std::getline(std::cin, var_str);
 
 	return *this;
 }
 
-// input with prompt allows default value and editing
-// but is not binary safe because we allow line editing when there is a prompt (even if empty)
+// input with prompt allows default value and editing if isterminal
 VARREF var::input(CVR prompt) {
 
 	THISIS("bool var::input(CVR prompt")
@@ -192,7 +196,7 @@ VARREF var::input(CVR prompt) {
 		prompt.output().osflush();
 
 	//windows currently doesnt allow line editing
-	if (SLASH_IS_BACKSLASH) {
+	if (not this->isterminal() or SLASH_IS_BACKSLASH) {
 		this->input();
 	}
 
@@ -248,7 +252,8 @@ VARREF var::inputn(const int nchars) {
 	//input a certain number of characters input this var and return true if more than none
 	else if (nchars > 0) {
 
-		for (;;) {
+		while (!eof()) {
+
 			int int1;
 			{
 				//LOCKIOSTREAM
@@ -313,8 +318,8 @@ void var::abortall(CVR text) const {
 	THISIS("void var::abortall(CVR text) const")
 	ISSTRING(text)
 
-	// exit(1);
-	throw MVAbort(text);
+	// exit(2);
+	throw MVAbortAll(text);
 }
 
 bool var::assigned() const {
@@ -409,13 +414,13 @@ var var::len() const {
 	return int(var_str.size());
 }
 
-const char* var::data() const {
-
-	THISIS("const char* var::data() const")
-	assertString(function_sig);
-
-	return var_str.data();
-}
+//const char* var::data() const {
+//
+//	THISIS("const char* var::data() const")
+//	assertString(function_sig);
+//
+//	return var_str.data();
+//}
 
 std::u32string var::to_u32string() const {
 
@@ -665,17 +670,17 @@ VARREF var::inverter() {
 
 	// convert to char32.t string - four bytes per code point
 	//std::u32string u32string1 = this->to_u32string();
-	std::u32string u32str1(*this);
+	std::u32string u32_str1(*this);
 
 	// invert only the lower 8 bits to keep the resultant code points within the same unicode
 	// 256 byte page
-	for (auto& c : u32str1)
+	for (auto& c : u32_str1)
 		c ^= char32_t(255);
 	;
 
 	// convert back to utf8
-	//this->from_u32string(u32str1);
-	*this = var(u32str1);
+	//this->from_u32string(u32_str1);
+	*this = var(u32_str1);
 
 	return *this;
 }
@@ -719,12 +724,12 @@ VARREF var::ucaser() {
 
 	/*
 	int32_t ucasemap_utf8ToLower (
-			const UCaseMap *  	csm,
-			char *  	dest,
-			int32_t  	destCapacity,
-			const char *  	src,
-			int32_t  	srcLength,
-			UErrorCode *  	pErrorCode
+			const UCaseMap* csm,
+			char*           dest,
+			int32_t         destCapacity,
+			const char*     src,
+			int32_t         srcLength,
+			UErrorCode*     pErrorCode
 		)
 	*/
 }
@@ -802,13 +807,16 @@ VARREF var::tcaser() {
 }
 
 // fcase()
-// fold case - prepare for indexing/searching
+// fold case - standardise text for indexing/searching
 // https://www.w3.org/International/wiki/Case_folding
 // Note that accents are sometimes significant and sometime not. e.g. in French
 //  cote (rating)
 //  coté (highly regarded)
 //  côte (coast)
 //  côté (side)
+// Case Folding - is a process of converting a text to case independent representation.
+// For example case folding for a word "Grüßen" is "grüssen"
+// where the letter "ß" is represented in case independent way as "ss".
 var var::fcase() const& {
 	return var(*this).fcaser();
 }
@@ -889,6 +897,12 @@ VARREF var::normalizer() {
 	return *this;
 }
 
+// There is no memory or performance advantage for mutable call, only a consistent syntax for user
+VARREF var::uniquer() {
+	*this = this->unique();
+	return *this;
+}
+
 var var::unique() const {
 
 	THISIS("var var::unique()")
@@ -935,7 +949,7 @@ var var::seq() const {
 	assertString(function_sig);
 
 	if (var_str.empty())
-		return 0;
+		return "";
 
 	int byteno = var_str[0];
 	if (byteno >= 0)
@@ -949,16 +963,10 @@ var var::textseq() const {
 
 	THISIS("var var::textseq() const")
 	assertString(function_sig);
-	/*
-		if (var_str.empty())
-			return 0;
 
-		int byteno=var_str[0];
-		if (byteno>=0)
-			return byteno;
-		else
-			return byteno+256;
-	*/
+	if (var_str.empty())
+		return "";
+
 	// get four bytes from input string since in UTF8 a unicode code point may occupy up to 4
 	// bytes
 	std::u32string str1 = boost::locale::conv::utf_to_utf<char32_t>(var_str.substr(0, 4));
@@ -1240,8 +1248,9 @@ VARREF var::transfer(VARREF destinationvar) {
 // kind of const needed in calculatex
 CVR var::exchange(CVR var2) const {
 
-	THISIS("VARREF var::exchange(VARREF var2)")
-	assertAssigned(function_sig);
+	THISIS(__PRETTY_FUNCTION__)
+	// Works on unassigned vars
+	assertDefined(function_sig);
 	ISDEFINED(var2)
 
 	// intermediary copies of var2
@@ -1262,7 +1271,36 @@ CVR var::exchange(CVR var2) const {
 	var_int = mvintx;
 	var_dbl = mvdblx;
 
-	return var2;
+	return *this;
+}
+
+// version without const
+VARREF var::exchange(VARREF var2) {
+
+	THISIS(__PRETTY_FUNCTION__)
+	// Works on unassigned vars
+	assertDefined(function_sig);
+	ISDEFINED(var2)
+
+	// intermediary copies of var2
+	auto mvtypex = var2.var_typ;
+	auto mvintx = var2.var_int;
+	auto mvdblx = var2.var_dbl;
+
+	// do string first since it is the largest and most likely to fail
+	var_str.swap(var2.var_str);
+
+	// copy mv to var2
+	var2.var_typ = var_typ;
+	var2.var_int = var_int;
+	var2.var_dbl = var_dbl;
+
+	// copy intermediaries to mv
+	var_typ = mvtypex;
+	var_int = mvintx;
+	var_dbl = mvdblx;
+
+	return *this;
 }
 
 var var::str(const int num) const {
@@ -1271,15 +1309,18 @@ var var::str(const int num) const {
 	assertString(function_sig);
 
 	var newstr = "";
+
+	//negative num returns "" in loop below
 	if (num < 0)
 		return newstr;
 
 	int basestrlen = int(var_str.size());
-	if (basestrlen == 1)
+	if (basestrlen == 1) {
 		newstr.var_str.resize(num, var_str.at(0));
+	}
 	else if (basestrlen)
 		for (int ii = num; ii > 0; --ii)
-			newstr ^= var_str;
+			newstr.var_str.append(var_str);
 
 	return newstr;
 }
@@ -1518,7 +1559,7 @@ VARREF var::textconverter(SV oldchars, SV newchars) {
 	else {
 
 		// convert everything to from UTF8 to wide string
-		std::u32string u32str1 = this->to_u32string();
+		std::u32string u32_str1 = this->to_u32string();
 		//std::u32string u32_oldchars = var(oldchars).to_u32string();
 		//std::u32string u32_newchars = var(newchars).to_u32string();
 		//std::u32string u32_oldchars = boost::locale::conv::utf_to_utf<char32_t>(oldchars);
@@ -1527,11 +1568,11 @@ VARREF var::textconverter(SV oldchars, SV newchars) {
 		std::u32string u32_newchars = boost::locale::conv::utf_to_utf<char32_t>(std::string(newchars));
 
 		// convert the wide characters
-		string_converter(u32str1, u32_oldchars, u32_newchars);
+		string_converter(u32_str1, u32_oldchars, u32_newchars);
 
 		// convert the string back to UTF8 from wide string
-		//this->from_u32string(u32str1);
-		*this = var(u32str1);
+		//this->from_u32string(u32_str1);
+		*this = var(u32_str1);
 	}
 	return *this;
 }
@@ -1668,7 +1709,7 @@ CVR var::logput() const {
 	return *this;
 }
 
-// logput() flushed threadsafe output to standard log
+// logputl() flushed threadsafe output to standard log
 CVR var::logputl() const {
 	LOCKIOSTREAM
 	//this->put(std::clog);
@@ -1710,6 +1751,9 @@ var var::dcount(SV substrx) const {
 	if (var_str.empty())
 		return 0;
 
+	if (substrx.empty())
+		return "";
+
 	return this->count(substrx) + 1;
 }
 
@@ -1717,38 +1761,13 @@ var var::dcount(SV substrx) const {
 // COUNT
 ///////
 
-//var var::count(CVR substrx) const {
-//
-//	THISIS("var var::count(CVR substrx) const")
-//	assertString(function_sig);
-//	ISSTRING(substrx)
-//
-//	if (substrx.var_str == "")
-//		return 0;
-//
-//	std::string::size_type substr_len = substrx.var_str.size();
-//
-//	// find the starting position of the field or return ""
-//	std::string::size_type start_pos = 0;
-//	int fieldno = 0;
-//	while (true) {
-//		start_pos = var_str.find(substrx.var_str, start_pos);
-//		// past of of string?
-//		if (start_pos == std::string::npos)
-//			return fieldno;
-//		// start_pos++;
-//		start_pos += substr_len;
-//		fieldno++;
-//	}
-//}
-//
 var var::count(SV substrx) const {
 
 	THISIS("var var::count(CVR substrx) const")
 	assertString(function_sig);
 
 	if (substrx.empty())
-		return 0;
+		return "";
 
 	std::string::size_type substr_len = substrx.size();
 
@@ -1766,32 +1785,15 @@ var var::count(SV substrx) const {
 	}
 }
 
-//var var::count(const char charx) const {
-//
-//	THISIS("var var::count(const char charx) const")
-//	assertString(function_sig);
-//
-//	// find the starting position of the field or return ""
-//	std::string::size_type start_pos = 0;
-//	int fieldno = 0;
-//	while (true) {
-//		start_pos = var_str.find_first_of(charx, start_pos);
-//		// past of of string?
-//		if (start_pos == std::string::npos)
-//			return fieldno;
-//		start_pos++;
-//		fieldno++;
-//	}
-//}
-
+// 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
 var var::index2(CVR substrx, const int startchar1) const {
 
 	THISIS("var var::index2(CVR substrx,const int startchar1) const")
 	assertString(function_sig);
 	ISSTRING(substrx)
 
-	if (substrx.var_str == "")
-		return var(0);
+	if (substrx.var_str.empty())
+		return "";
 
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = startchar1 - 1;
@@ -1799,11 +1801,12 @@ var var::index2(CVR substrx, const int startchar1) const {
 
 	// past of of string?
 	if (start_pos == std::string::npos)
-		return var(0);
+		return 0;
 
 	return var((int)start_pos + 1);
 }
 
+// 1 based starting byte no of an occurrence or 0 if not present
 var var::index(CVR substrx, const int occurrenceno) const {
 
 	THISIS("var var::index(CVR substrx,const int occurrenceno) const")
@@ -1813,8 +1816,8 @@ var var::index(CVR substrx, const int occurrenceno) const {
 	//TODO implement negative occurenceno as meaning backwards from the end
 	//eg -1 means the last occurrence
 
-	if (substrx.var_str == "")
-		return var(0);
+	if (substrx.var_str.empty())
+		return "";
 
 	std::string::size_type start_pos = 0;
 	std::string::size_type substr_len = substrx.var_str.size();
@@ -1844,36 +1847,6 @@ var var::index(CVR substrx, const int occurrenceno) const {
 
 	// should never get here
 	return 0;
-}
-
-var var::debug(CVR var1) const {
-	// THISIS("var var::debug() const")
-
-	std::clog << "var::debug(" << var1 << ")" << std::endl;
-	//flush to ensure all stdout is visible
-	std::cout << std::flush;
-
-	//"good way to break into the debugger by causing a seg fault"
-	// *(int *)0 = 0;
-	// throw var("Debug Statement");
-
-#if __has_include(<signal.h>)
-	::raise(SIGTRAP);
-#elif 1
-	__asm__("int3");
-	//__asm__("int3");
-	//__asm__("int3");
-
-#elif defined(_MSC_VER)
-	// throw var("Debug Statement");
-	throw MVDebug(var1);
-
-// another way to break into the debugger by causing a seg fault
-#elif 0
-	*(int*)0 = 0;
-#endif
-
-	return "";
 }
 
 var var::logoff() const {

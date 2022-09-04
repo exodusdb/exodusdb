@@ -63,11 +63,11 @@ THE SOFTWARE.
 
 #if __GNUC__ >= 4
 // use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
-#define PUBLIC __attribute__((visibility("default")))
-#define DLL_LOCAL __attribute__((visibility("hidden")))
+#	define PUBLIC __attribute__((visibility("default")))
+#	define DLL_LOCAL __attribute__((visibility("hidden")))
 #else
-#define PUBLIC
-#define DLL_LOCAL
+#	define PUBLIC
+#	define DLL_LOCAL
 #endif
 
 #endif
@@ -205,12 +205,12 @@ class VARTYP {
 
    private:
 
-	uint flags_ = 0;
+	unsigned int flags_ = 0;
 
    public:
 
-	// constructor from uint
-	VARTYP(uint rhs)
+	// constructor from unsigned int
+	VARTYP(unsigned int rhs)
 		: flags_(rhs){};
 
 	// default constructor
@@ -228,25 +228,25 @@ class VARTYP {
 	//};
 
 	// assign
-	VARTYP& operator=(const uint newflags) {
+	VARTYP& operator=(const unsigned int newflags) {
 		flags_ = newflags;
 		return *this;
 	};
 
 	// bitwise mutators: xor, or, and
-	VARTYP& operator^=(const uint rhs) {flags_ ^= rhs; return *this; }
-	VARTYP& operator|=(const uint rhs) {flags_ |= rhs; return *this; }
-	VARTYP& operator&=(const uint rhs) {flags_ &= rhs; return *this; }
+	VARTYP& operator^=(const unsigned int rhs) {flags_ ^= rhs; return *this; }
+	VARTYP& operator|=(const unsigned int rhs) {flags_ |= rhs; return *this; }
+	VARTYP& operator&=(const unsigned int rhs) {flags_ &= rhs; return *this; }
 
 	// logical comparison with int and self
-	ND bool operator==(const uint rhs) const { return flags_ == rhs; };
-	ND bool operator!=(const uint rhs) const { return flags_ != rhs; };
+	ND bool operator==(const unsigned int rhs) const { return flags_ == rhs; };
+	ND bool operator!=(const unsigned int rhs) const { return flags_ != rhs; };
 	ND bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; };
 	ND bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; };
 
 	// bitwise accessors
-	VARTYP operator&(const uint rhs) const { return uint(flags_ & rhs); }
-	VARTYP operator|(const uint rhs) const { return uint(flags_ | rhs); }
+	VARTYP operator&(const unsigned int rhs) const { return flags_ & rhs; }
+	VARTYP operator|(const unsigned int rhs) const { return flags_ | rhs; }
 	VARTYP operator~() const { return VARTYP(~flags_); }
 
 	// int - not explicit so we can do "if (var_typ)"
@@ -263,40 +263,42 @@ class VARTYP {
 // Variable Used since its var_typ will be zero
 
 // throw an exception if used an unassigned variable
-constexpr uint VARTYP_UNA {0x0};
+constexpr unsigned int VARTYP_UNA {0x0};
 
 // assigned string - unknown if numeric or not
-constexpr uint VARTYP_STR {0x1};
+constexpr unsigned int VARTYP_STR {0x1};
 
 // following indicate that the var is numeric
-constexpr uint VARTYP_INT {0x2};
-constexpr uint VARTYP_DBL {0x4};
+constexpr unsigned int VARTYP_INT {0x2};
+constexpr unsigned int VARTYP_DBL {0x4};
 
 // indicates known non-numeric string
-constexpr uint VARTYP_NAN {0x8};
+constexpr unsigned int VARTYP_NAN {0x8};
 
 // following indicates that the int is an os file handle
-constexpr uint VARTYP_OSFILE {0x10};
-//constexpr uint VARTYP_DBCONN {0x20};
+constexpr unsigned int VARTYP_OSFILE {0x10};
+//constexpr unsigned int VARTYP_DBCONN {0x20};
 
 // various useful flag combinations
-constexpr uint VARTYP_INTDBL {VARTYP_INT | VARTYP_DBL};
-constexpr uint VARTYP_INTSTR {VARTYP_INT | VARTYP_STR};
-constexpr uint VARTYP_DBLSTR {VARTYP_DBL | VARTYP_STR};
-constexpr uint VARTYP_NANSTR {VARTYP_NAN | VARTYP_STR};
-constexpr uint VARTYP_NOTNUMFLAGS {~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN)};
+constexpr unsigned int VARTYP_INTDBL {VARTYP_INT | VARTYP_DBL};
+constexpr unsigned int VARTYP_INTSTR {VARTYP_INT | VARTYP_STR};
+constexpr unsigned int VARTYP_DBLSTR {VARTYP_DBL | VARTYP_STR};
+constexpr unsigned int VARTYP_NANSTR {VARTYP_NAN | VARTYP_STR};
+constexpr unsigned int VARTYP_NOTNUMFLAGS {~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN)};
 
-constexpr uint VARTYP_NANSTR_OSFILE {VARTYP_NANSTR | VARTYP_OSFILE};
-//constexpr uint VARTYP_NANSTR_DBCONN {VARTYP_NANSTR | VARTYP_DBCONN};
+constexpr unsigned int VARTYP_NANSTR_OSFILE {VARTYP_NANSTR | VARTYP_OSFILE};
+//constexpr unsigned int VARTYP_NANSTR_DBCONN {VARTYP_NANSTR | VARTYP_DBCONN};
 
-//constexpr uint VARTYP_DESTRUCTED {0xFFFFF0};
+//constexpr unsigned int VARTYP_DESTRUCTED {0xFFFFF0};
 
-constexpr uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE)};
+constexpr unsigned int VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE)};
 
-#define DEFAULT_STRING = ""
+#define DEFAULT_UNASSIGNED = var()
+#define DEFAULT_EMPTY = ""
 #define DEFAULT_DOT = "."
 #define DEFAULT_SPACE = " "
 #define DEFAULT_VM = VM_
+#define DEFAULT_NULL = nullptr
 
 //prevent or allow assignment to var to return a reference to the var
 //preventing will stop accidental usage of = instead of == in if() clauses
@@ -304,9 +306,11 @@ constexpr uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL 
 #define PREVENT_ASSIGN_IN_IF
 #ifdef PREVENT_ASSIGN_IN_IF
 #define VOID_OR_VARREF void
+#define VOID_OR_DIMREF void
 #define VOID_OR_THIS
 #else
 #define VOID_OR_VARREF "VARREF"
+#define VOID_OR_DIMREF "dim&"
 #define VOID_OR_THIS "*this"
 #endif
 
@@ -320,7 +324,7 @@ constexpr uint VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL 
 #define INLINE inline //this is the default anyway
 //#define INLINE __attribute__ ((noinline)) //use this to reduce compllation speed and object size
 
-// class var
+// class var final
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
 class PUBLIC var final {
 
@@ -338,7 +342,7 @@ class PUBLIC var final {
 	mutable int64_t     var_int; // 8 bytes/64 bits - currently defined as a long long
 	mutable double      var_dbl; // 8 bytes/64 buts - double
 	mutable VARTYP      var_typ; // Default initialised to VARTYP_UNA
-	                             // Actually a uint which will be 4 bytes
+	                             // Actually a unsigned int which will be 4 bytes
 
 
 	///////////////////////////
@@ -348,7 +352,7 @@ class PUBLIC var final {
    public:
 
 	/////////////////////////
-	// 1. Default constructor - Can default as string and var_typ haev constructors
+	// 1. Default constructor - Can default as string and var_typ have constructors
 	/////////////////////////
 	//
 	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
@@ -416,8 +420,29 @@ class PUBLIC var final {
 		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 	}
 
+	//////////////////////
+	// 4. move constructor - Can default assuming that temporaries are unlikely to be undefined or unassigned
+	//////////////////////
+	//
+	var(TVR fromvar) noexcept = default;
+	//	// var(TVR fromvar) noexcept;  // = default;
+	//	// defined in class for inline/optimisation
+	//	// move constructor
+	//	var(TVR rhs) noexcept
+	//		: var_str(std::move(rhs.var_str)),
+	//		var_int(rhs.var_int),
+	//		var_dbl(rhs.var_dbl),
+	//		var_typ(rhs.var_typ) {
+	//
+	//		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
+	//
+	//		// skip this for speed since temporararies are unlikely to be unassigned
+	//		// THISIS("var::var(TVR rhs) noexcept")
+	//		// ISASSIGNED(rhs)
+	//	}
+
 	/////////////////////
-	// 4. copy assignment - from lvalue
+	// 5. copy assignment - from lvalue
 	/////////////////////
 
 	// Not using copy assignment by value (copy-and-swap idiom)
@@ -450,27 +475,6 @@ class PUBLIC var final {
 
 		return VOID_OR_THIS;
 	}
-
-	//////////////////////
-	// 5. move constructor - Can default assuming that temporaries are unlikely to be undefined or unassigned
-	//////////////////////
-	//
-	var(TVR fromvar) noexcept = default;
-	//	// var(TVR fromvar) noexcept;  // = default;
-	//	// defined in class for inline/optimisation
-	//	// move constructor
-	//	var(TVR rhs) noexcept
-	//		: var_str(std::move(rhs.var_str)),
-	//		var_int(rhs.var_int),
-	//		var_dbl(rhs.var_dbl),
-	//		var_typ(rhs.var_typ) {
-	//
-	//		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
-	//
-	//		// skip this for speed since temporararies are unlikely to be unassigned
-	//		// THISIS("var::var(TVR rhs) noexcept")
-	//		// ISASSIGNED(rhs)
-	//	}
 
 	/////////////////////
 	// 6. move assignment - from rvalue/temporary
@@ -590,7 +594,7 @@ class PUBLIC var final {
 
 	// char
 	///////
-	//must be separate from uint contructor to get a string/char not an int/ character number
+	//must be separate from unsigned int contructor to get a string/char not an int/ character number
 	INLINE var(const char char1) noexcept
 		:
 		var_str(1, char1),
@@ -748,26 +752,21 @@ class PUBLIC var final {
 	explicit operator long long&() const;
 	operator double&() const;
 #else
-	operator int() const {
+
+	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	operator I() const {
 		//converts string or double to int using pickos int() which is floor()
 		//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
 		assertInteger(__PRETTY_FUNCTION__);
-		return static_cast<int>(var_int);
+		return static_cast<I>(var_int);
 	}
-	operator long long() const {
 
-		assertInteger(__PRETTY_FUNCTION__);
-		return static_cast<long long>(var_int);
-	}
-	operator double() const {
-
+	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	operator F() const {
 		assertDecimal(__PRETTY_FUNCTION__);
-		return static_cast<double>(var_dbl);
-	}
-	operator long double() const {
-
-		assertDecimal(__PRETTY_FUNCTION__);
-		return static_cast<long double>(var_dbl);
+		return static_cast<F>(var_dbl);
 	}
 
 #endif
@@ -861,43 +860,50 @@ class PUBLIC var final {
 	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
 	// operator char() const;
 
-	// BRACKETS ()
-	/////////////
+	// ROUND BRACKETS ()
+	////////////////////
 
 	// extract using () int int int (alternative to .a() and extract())
 	// instead of xyz=abc.extract(1,2,3);
 	// sadly there is no way to use pick/mv angle brackets like "abc<1,2,3>"
-	// and [] brackets would only allow one dimension eg abc[1]
+	// and [] brackets would only allow one dimension eg abc[1] (c++23 allows more than one)
 
-	// TODO implement abc(1,2,3)="xyz"; or abc.a(1,2,3)="xyz";
-	// An idea is that var::operator() will produce a "specialvar" that will
-	// perform extract if a var is wanted or a replace if assignment is done
-	// but it hasnt been established if it is possible to make the specialvar behave like a
-	// normal var in all situation eg would the following work? var1(1,2,3).outputl(); also the
-	// creation and deletion of the temp object may hit performance. One alternative would be to
-	// use () only for extraction (and [] only for replacement of fields?)
+	//SADLY no way to get a different operator() function called when on the left hand side of assign
+	//http://codepad.org/MzzhlRkb
 
-	// dynamic array extract/replace eg: abc=xyz(1,2,3) and xyz(1,2,3)="abc";
-	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0) const;
-	// var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0);
+	//subscript operators often come in pairs
+	//
+	// 1. const returning a value
+	// 2. non-const returning a reference or a proxy object
 
-	//the following produces a temporary on the rhs
-//#define VAR_FUNCTOR_ONLY_EXTRACTS
-//#ifdef VAR_FUNCTOR_ONLY_EXTRACTS
-	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const;
-//#else
-	ND var_proxy1 operator()(int fieldno);
-	ND var_proxy2 operator()(int fieldno, int valueno);
-	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
-//endif
+	// 1. () on const vars will extract the desired field/value/subvalue as a proper var
+	// Note that all  function "in" arguments are const vars
+	// so will work perfectly with () extraction
+	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->a(fieldno, valueno, subvalueno);}
+	//ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
 
 	// DONT declare this so we force use of the above const version that produces a temporary
 	//VARREF operator()(int fieldno, int valueno = 0, int subvalueno = 0);
-	/* SADLY no way to get a different operator() function called when on the left hand side of assign
-	therefore not possible to create syntax like "xyz(1,2)="xx";" to REPLACE fields, values and
-	subvalues so operator() is defined only for the more common xyz=extract(1,2,3); i.e. on the right
-	hand side. http://codepad.org/MzzhlRkb
-	*/
+
+	// 2. () on non-const vars produces a proxy which can be assigned to or converted to a var implicitly
+	// sadly the implicit conversion does not allow OO orientated syntax eg xyz(1,2).oconv("D")
+	//
+	//  var x = y(3);              will compile and work regardless of if y is const or not
+	//  var x = oconv(y(3), "D");  will also compile and work perfectly
+	//
+	//  var x = y(3).oconv("D");"  will not compile UNLESS y is const e.g function arg of type "in"
+	//
+	// The proxy object created by (1,2,3) on a non-const var does not have the member function "oconv"
+	//
+	//
+	ND var_proxy1 operator()(int fieldno);
+	ND var_proxy2 operator()(int fieldno, int valueno);
+	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
+	// non-const xxxx(fn,vn,sn) returns a proxy that can be aasigned to or implicitly converted to a var
+	//
+//	ND var_proxy1 operator()(int fieldno)                              & {return var_proxy1(this, fieldno);}
+//	ND var_proxy2 operator()(int fieldno, int valueno)                 & {return var_proxy2(this, fieldno, valueno);}
+//	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno) & {return var_proxy3(this, fieldno, valueno, subvalueno);}
 
 
 	/////////////
@@ -1068,10 +1074,10 @@ class PUBLIC var final {
 
 	// Modulo
 	VARREF operator%=(const int) &;
-	VARREF operator%=(const double) &;
+	VARREF operator%=(const double dbl1) &;
 	VARREF operator%=(const char  char1) &{(*this) %= var(char1);return *this;}
 	VARREF operator%=(const char* chars) &{(*this) %= var(chars);return *this;}
-	VARREF operator%=(const bool) &;
+	VARREF operator%=(const bool  bool1) &{(*this) %= var(bool1);return *this;}
 
 	// Concat
 	VARREF operator^=(const int) &;
@@ -1425,14 +1431,20 @@ class PUBLIC var final {
 	// STANDARD INPUT
 	/////////////////
 
-	bool hasinput(int milliseconds = 0);
 	VARREF input();
 	VARREF input(CVR prompt);
 	VARREF inputn(const int nchars);
+
+	ND bool isterminal() const;
+	ND bool hasinput(int milliseconds = 0) const;
 	ND bool eof() const;
 	bool echo(const int on_off) const;
 
-	PUBLIC ND friend std::istream& operator>>(std::istream& istream1, VARREF var1);
+
+	// IO STREAM FRIENDS
+	////////////////////
+
+	PUBLIC friend std::istream& operator>>(std::istream& istream1, VARREF var1);
 
 	PUBLIC friend std::ostream& operator<<(std::ostream& ostream1, var var1);
 	//causes ambiguous overload for some unknown reason despite being a hidden friend
@@ -1448,7 +1460,12 @@ class PUBLIC var final {
 	VARREF unassigned(CVR defaultvalue);
 
 	VARREF transfer(VARREF destinationvar);
-	CVR exchange(CVR var2) const;
+	// exchange is marked as const despite it swapping the var with var2
+	// Currently this is required in rare cases where functions like mvprogram::calculate
+	// temporarily require member variables to be something else but switch back before exiting
+	// if such function throws then it would leave the member variables in a changed state.
+	CVR exchange(CVR var2) const;//version that works on const vars
+	VARREF exchange(VARREF var2);//version that works on non-const vars
 	var clone() const {
 		var clone;
 		clone.var_typ = var_typ;
@@ -1463,6 +1480,7 @@ class PUBLIC var final {
 
 	ND var abs() const;
 	ND var mod(CVR divisor) const;
+	ND var mod(double divisor) const;
 	ND var mod(const int divisor) const;
 	ND var pwr(CVR exponent) const;
 	ND var rnd() const;
@@ -1497,20 +1515,20 @@ class PUBLIC var final {
 	// bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
 	ND var chr(const int num) const;  // ASCII
 	// version 2 textchr - returns utf8 byte sequences for all unicode code points
-	// not uint so to get utf codepoints > 2^63 must provide negative ints
-	// not providing implicit constructor from var to uint due to getting ambigious conversions
-	// since int and uint are parallel priority in c++ implicit conversions
+	// not unsigned int so to get utf codepoints > 2^63 must provide negative ints
+	// not providing implicit constructor from var to unsigned int due to getting ambigious conversions
+	// since int and unsigned int are parallel priority in c++ implicit conversions
 	ND var textchr(const int num) const;  // UTF8
 	ND var str(const int num) const;
 	ND var space() const;
 
-	ND var numberinwords(CVR languagename_or_locale_id DEFAULT_STRING);
+	ND var numberinwords(CVR languagename_or_locale_id DEFAULT_EMPTY);
 
 	// STRING INFO
 	//////////////
 
-	// bool match(CVR matchstr,CVR options DEFAULT_STRING) const;
-	ND var match(CVR matchstr, SV options DEFAULT_STRING) const;
+	// bool match(CVR matchstr,CVR options DEFAULT_EMPTY) const;
+	ND var match(CVR matchstr, SV options DEFAULT_EMPTY) const;
 	ND var seq() const;     // ASCII
 	ND var textseq() const; // TEXT
 	ND var dcount(SV str) const;
@@ -1518,7 +1536,7 @@ class PUBLIC var final {
 	//ND var count(const char charx) const;
 	ND var length() const;
 	ND var len() const;
-	const char* data() const;
+	//const char* data() const;
 	bool isnum() const;
 
 	ND bool starts(SV str) const;
@@ -1539,7 +1557,7 @@ class PUBLIC var final {
 	//VARREF converter(const char* oldchars, const char* newchars);
 	VARREF textconverter(SV oldchars, SV newchars);
 	VARREF swapper(SV whatstr, SV withstr);
-	VARREF regex_replacer(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING);
+	VARREF regex_replacer(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY);
 	VARREF splicer(const int start1, const int length, SV insertstr);
 	VARREF splicer(const int start1, SV insertstr);
 	VARREF popper();
@@ -1560,11 +1578,12 @@ class PUBLIC var final {
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
 
-	//VARREF sorter(CVR separator DEFAULT_STRING);
+	VARREF sorter(SV sepchar = _FM_);
 
 	VARREF lowerer();
 	VARREF raiser();
 	VARREF cropper();
+	VARREF uniquer();
 
 	// SAME ON TEMPORARIES
 	//////////////////////
@@ -1572,7 +1591,7 @@ class PUBLIC var final {
 	ND VARREF convert(SV oldchars, SV newchars) &&;
 	ND VARREF textconvert(SV oldchars, SV newchars) &&;
 	ND VARREF swap(SV whatstr, SV withstr) &&;
-	ND VARREF regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING) &&;
+	ND VARREF regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY) &&;
 	ND VARREF splice(const int start1, const int length, SV insertstr) &&;
 	ND VARREF splice(const int start1, SV insertstr) &&;
 	ND VARREF pop() &&;
@@ -1605,7 +1624,7 @@ class PUBLIC var final {
 	ND var convert(SV oldchars, SV newchars) const&;
 	ND var textconvert(SV oldchars, SV newchars) const&;
 	ND var swap(SV whatstr, SV withstr) const&;
-	ND var regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_STRING) const&;
+	ND var regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY) const&;
 	ND var splice(const int start1, const int length, SV insertstr) const&;
 	ND var splice(const int start1, SV insertstr) const&;
 	ND var pop() const&;
@@ -1636,9 +1655,9 @@ class PUBLIC var final {
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
-	ND dim split(CVR separator DEFAULT_STRING) const;
+	ND dim split(SV sepchar = _FM_) const;
 
-	ND var sort(CVR separator DEFAULT_STRING) const;
+	ND var sort(SV sepchar = _FM_) const;
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -1730,7 +1749,7 @@ class PUBLIC var final {
 
 	ND var sum() const;
 	ND var sumall() const;
-	ND var sum(CVR sepchar) const;
+	ND var sum(SV sepchar) const;
 
 	// binary ops + - * / : on mv strings 10]20]30
 	// e.g. var("10]20]30").mv("+","2]3]4")
@@ -1765,7 +1784,7 @@ class PUBLIC var final {
 	////////////////////
 
 	// should these be like extract, replace, insert, delete
-	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_STRING)
+	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY)
 	ND bool locate(CVR target) const;
 	bool locate(CVR target, VARREF setting) const;
 	bool locate(CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
@@ -1796,9 +1815,9 @@ class PUBLIC var final {
 	bool clearfile(CVR filename) const;
 	ND var listfiles() const;
 
-	bool createindex(CVR fieldname, CVR dictfile DEFAULT_STRING) const;
+	bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY) const;
 	bool deleteindex(CVR fieldname) const;
-	ND var listindexes(CVR filename DEFAULT_STRING, CVR fieldname DEFAULT_STRING) const;
+	ND var listindexes(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
 
 	bool sqlexec(CVR sqlcmd) const;
 	bool sqlexec(CVR sqlcmd, VARREF response) const;
@@ -1813,7 +1832,7 @@ class PUBLIC var final {
 	// DATABASE ACCESS
 	/////////////////
 
-	bool connect(CVR conninfo DEFAULT_STRING);
+	bool connect(CVR conninfo DEFAULT_EMPTY);
 	void disconnect();
 	void disconnectall();
 
@@ -1827,10 +1846,10 @@ class PUBLIC var final {
 	bool statustrans() const;
 	void clearcache() const;
 
-	ND var reccount(CVR filename DEFAULT_STRING) const;
-	var flushindex(CVR filename DEFAULT_STRING) const;
+	ND var reccount(CVR filename DEFAULT_EMPTY) const;
+	var flushindex(CVR filename DEFAULT_EMPTY) const;
 
-	bool open(CVR dbfilename, CVR connection DEFAULT_STRING);
+	bool open(CVR dbfilename, CVR connection DEFAULT_EMPTY);
 	void close();
 
 	// 1=ok, 0=failed, ""=already locked
@@ -1865,7 +1884,7 @@ class PUBLIC var final {
 	// DATABASE SORT/SELECT
 	//////////////////////
 
-	bool select(CVR sortselectclause DEFAULT_STRING);
+	bool select(CVR sortselectclause DEFAULT_EMPTY);
 	void clearselect();
 
 	//ND bool hasnext() const;
@@ -1880,13 +1899,12 @@ class PUBLIC var final {
 	bool deletelist(CVR listname) const;
 	bool formlist(CVR keys, CVR fieldno = 0);
 
-	bool saveselect(CVR filename);
+	//bool saveselect(CVR filename);
 
 	// OS FILE SYSTEM
 	/////////////////
 
-	bool osopen() const;
-	bool osopen(CVR filename, const char* locale DEFAULT_STRING) const;
+	bool osopen(CVR filename, const char* locale DEFAULT_EMPTY) const;
 	bool osbread(CVR osfilevar, VARREF offset, const int length);
 	bool osbwrite(CVR osfilevar, VARREF offset) const;
 //#define VAR_OSBREADWRITE_CONST_OFFSET
@@ -1896,17 +1914,17 @@ class PUBLIC var final {
 #endif
 	void osclose() const;
 
-	bool osread(CVR osfilename, const char* codepage DEFAULT_STRING);
-	bool oswrite(CVR osfilename, const char* codepage DEFAULT_STRING) const;
+	bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
+	bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
 	bool osremove() const;
 	bool osremove(CVR osfilename) const;
 	bool osrename(CVR newosdir_or_filename) const;
 	bool oscopy(CVR to_osfilename) const;
 	bool osmove(CVR to_osfilename) const;
 
-	ND var oslist(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_STRING, const int mode = 0) const;
-	ND var oslistf(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_STRING) const;
-	ND var oslistd(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_STRING) const;
+	ND var oslist(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY, const int mode = 0) const;
+	ND var oslistf(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY) const;
+	ND var oslistd(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY) const;
 	ND var osfile() const;
 	ND var osdir() const;
 	bool osmkdir() const;
@@ -1923,16 +1941,15 @@ class PUBLIC var final {
 	// same again but this time allowing native strings without needing automatic conversion of
 	// var->char* this is to only to avoid convertion too and from var but will usage of hard
 	// coded filenames etc really be in fast loops and performance related? perhaps only provide
-	bool osread(const char* osfilename, const char* codepage DEFAULT_STRING);
+	bool osread(const char* osfilename, const char* codepage DEFAULT_EMPTY);
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
 
-	bool suspend() const;
 	bool osshell() const;
 	bool osshellread(CVR oscmd);
 	bool osshellwrite(CVR oscmd) const;
-	ND var ostempdirname() const;
+	ND var ostempdirpath() const;
 	ND var ostempfilename() const;
 
 	bool osgetenv(const char* name);
@@ -1947,16 +1964,17 @@ class PUBLIC var final {
 	// chain should be similar to one of the above?
 	// var chain() const;
 
-	void stop(CVR text DEFAULT_STRING) const;
-	void abort(CVR text DEFAULT_STRING) const;
-	void abortall(CVR text DEFAULT_STRING) const;
-
-	var debug(CVR DEFAULT_STRING) const;
-
-	CVR dump(SV text DEFAULT_STRING) const;
-	VARREF dump(SV text DEFAULT_STRING);
+	void stop(CVR text DEFAULT_EMPTY) const;
+	void abort(CVR text DEFAULT_EMPTY) const;
+	void abortall(CVR text DEFAULT_EMPTY) const;
 
 	var logoff() const;
+
+	void debug(CVR DEFAULT_EMPTY) const;
+	ND var backtrace() const;
+
+	CVR dump(SV text DEFAULT_EMPTY) const;
+	VARREF dump(SV text DEFAULT_EMPTY);
 
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
@@ -2026,7 +2044,7 @@ class PUBLIC var final {
 
 	void createString() const;
 
-	ND bool cursorexists();
+	ND bool cursorexists();//database, not terminal
 	bool selectx(CVR fieldnames, CVR sortselectclause);
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default
@@ -2074,8 +2092,7 @@ class PUBLIC var final {
 	ND var iconv_HEX(const int ioratio) const;
 	ND var iconv_TX(const int raw = 0) const;
 
-	ND const std::string to_path_string() const;
-	ND const std::string to_cmd_string() const;
+	//ND const std::string to_path_string() const;
 
 	//VARREF localeAwareChangeCase(const int lowerupper);
 
@@ -2232,11 +2249,11 @@ class PUBLIC var_proxy3 {
 
 class dim_iter;
 
-//class dim
-class PUBLIC dim {
+//class dim final
+class PUBLIC dim final {
 
    private:
-	int nrows_, ncols_;
+	unsigned int nrows_, ncols_;
 	// NOTE: trying to implement data_ as boost smart array pointer (boost::scoped_array<var>
 	// data_;) raises warning: as dim is PUBLIC, boost library should have DLL interface.
 	// Choices: 1) leave memory allocation as is (refuse from scoped_array, or
@@ -2255,12 +2272,80 @@ class PUBLIC dim {
 	bool initialised_ = false;
 
    public:
-//	dim(const int nrows);
-	dim(const int nrows, const int ncols = 1);
 
-	bool redim(const int nrows, const int ncols = 1);
+	// TODO define in class for inline/optimisation
+
+	///////////////////////////
+	// SPECIAL MEMBER FUNCTIONS
+	///////////////////////////
+
+	/////////////////////////
+	// 1. Default constructor
+	/////////////////////////
+	//
+	// allow syntax "dim d;" to create an "unassigned" dim
+	// allow default construction for class variables later resized in class methods
+	dim();
+
+	////////////////
+	// 2. Destructor
+	////////////////
+
+	// destructor to (NOT VIRTUAL to save space since not expected to be a base class)
+	// protected to prevent deriving from var since wish to save space and not provide virtual
+	// destructor http://www.gotw.ca/publications/mill18.htm
+	~dim();
+
+	//////////////////////
+	// 3. Copy constructor - from lvalue
+	//////////////////////
+	//
+	dim(const dim& sourcedim);
+
+	//////////////////////
+	// 4. move constructor - from rvalue
+	//////////////////////
+	//
+	dim(dim&& sourcedim);
+
+	/////////////////////
+	// 5. copy assignment - from lvalue
+	/////////////////////
+
+	// Not using copy assignment by value (copy-and-swap idiom)
+	// because Howard Hinnant recommends against in our case
+
+	// Prevent assigning to temporaries
+	VOID_OR_DIMREF operator=(const dim& rhs) && = delete;
+
+	// var& operator=(CVR rhs) & = default;
+	// Cannot use default copy assignment because
+	// a) it returns a value allowing accidental use of "=" instead of == in if statements
+	// b) doesnt check if rhs is assigned
+	VOID_OR_DIMREF operator=(const dim& rhs) &;
+
+	/////////////////////
+	// 6. move assignment - from rvalue
+	/////////////////////
+
+	// Prevent assigning to temporaries
+	VOID_OR_DIMREF operator=(dim&& rhs) && noexcept = delete;
+
+	// Cannot use default move assignment because
+	// a) it returns a value allowing accidental use of "=" in if statements instead of ==
+	// b) doesnt check if rhs is assigned (less important for temporaries which are rarely unassigned)
+	//var& operator=(TVR rhs) & noexcept = default;
+	VOID_OR_DIMREF operator=(dim&& rhs) &;
+
+
+	// Constructor with number of rows and optional number of columns
+	/////////////////////////////////////////////////////////////////
+	dim(const unsigned int nrows, const unsigned int ncols = 1);
+
+	bool redim(const unsigned int nrows, const unsigned int ncols = 1);
 
     // Constructor from initializer_list for (int, double, cstr etc.)
+	/////////////////////////////////////////////////////////////////
 	template<class T>
 	dim(std::initializer_list<T> list) {
 		//std::clog << "iizer " << list.size() << std::endl;
@@ -2271,13 +2356,16 @@ class PUBLIC dim {
 		}
 	}
 
-	ND var join(CVR sepchar = FM_) const;
+	ND var join(SV sepchar = _FM_) const;
 
 	// parenthesis operators often come in pairs
-	ND VARREF operator()(int rowno, int colno = 1);
+	// returns a reference to one var of the array
+	// and so allows lhs assignment like d1(1,2) = "x";
+	// or if on the rhs then use as a normal expression
+	ND VARREF operator()(unsigned int rowno, unsigned int colno = 1);
 
-	// following const version is called if we do () on a dim which was defined as const xx
-	ND VARREF operator()(int rowno, int colno = 1) const;
+	//following const version is called if we do () on a dim which was defined as const xx
+	ND CVR operator()(unsigned int rowno, unsigned int colno = 1) const;
 
 	ND var rows() const;
 	ND var cols() const;
@@ -2286,42 +2374,29 @@ class PUBLIC dim {
 	// A: we dont want to COPY vars out of an array when using it in rhs expression
 	// var operator() (int row, int col=1) const;
 
-	// destructor to (NOT VIRTUAL to save space since not expected to be a base class)
-	// protected to prevent deriving from var since wish to save space and not provide virtual
-	// destructor http://www.gotw.ca/publications/mill18.htm
-	~dim();
-
-	dim& operator=(const dim& sourcedim);
-
 	//=var
 	// The assignment operator should always return a reference to *this.
 	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
 	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
 	// contruction see also ^= etc
-	dim& operator=(CVR sourcevar);
-	dim& operator=(const int sourceint);
-	dim& operator=(const double sourcedbl);
-
-	// allow default construction for class variables later resized in class methods
-	dim();
+	VOID_OR_DIMREF operator=(CVR sourcevar);
+	VOID_OR_DIMREF operator=(const int sourceint);
+	VOID_OR_DIMREF operator=(const double sourcedbl);
 
 	// see also var::split
 	// return the number of fields
-	var split(CVR var1, CVR separator DEFAULT_STRING);
+	var split(CVR var1, SV sepchar = _FM_);
 	dim& sort(bool reverse = false);
 
 	bool read(CVR filehandle, CVR key);
 	bool write(CVR filehandle, CVR key) const;
 
-	bool osread(CVR osfilename, const char* codepage DEFAULT_STRING);
-	bool oswrite(CVR osfilename, const char* codepage DEFAULT_STRING) const;
+	bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
+	bool oswrite(CVR osfilename,const char* codepage DEFAULT_EMPTY) const;
 
 	// following is implemented on the dim class now
 	// dim dimarray2();
 	//
-
-	// move constructor
-	dim(dim&& sourcedim) noexcept;
 
 	friend class dim_iter;
 
@@ -2332,9 +2407,6 @@ class PUBLIC dim {
 	PUBLIC ND friend dim_iter end(const dim& d);
 
    private:
-	// Disable copy constructor (why? to stop inefficient copies?)
-	// Copy constructor
-	dim(const dim& sourcedim);
 
 	dim& init(CVR var1);
 
@@ -2353,7 +2425,7 @@ class PUBLIC dim_iter {
 	const dim* pdim_;
 
 	// Start from 1 ignoring element 0
-	int index_ = 1;
+	unsigned int index_ = 1;
 
    public:
 
@@ -2384,6 +2456,7 @@ class PUBLIC dim_iter {
 
 
 // class range
+// provides "for (const var i : range(1,10))"
 // Represents an interable range of ints (int_iter)
 // Lower case class name so we can use in syntax like
 // "for (int i : range(1 to 10))"
@@ -2481,14 +2554,17 @@ inline const var PLATFORM_ = "x86";
 // This is left a global copy for backtrace to get at it
 PUBLIC inline exodus::var EXECPATH2 = "";
 
-PUBLIC ND var backtrace();
+PUBLIC void mv_savestack();
+PUBLIC ND var mv_backtrace();
 
 // Set by signals for threads to poll
 PUBLIC inline bool TERMINATE_req = false;
 PUBLIC inline bool RELOAD_req = false;
 
 #ifndef SWIG
-std::string naturalorder(const std::string& string1);
+PUBLIC ND std::string naturalorder(const std::string& string1);
+PUBLIC ND const std::string to_oscmd_string(CVR cmd);
+
 #endif
 
 PUBLIC ND int getenvironmentn();
@@ -2504,7 +2580,7 @@ PUBLIC ND var getexecpath();
 // but doesnt get stack since stop() is called normally
 class PUBLIC MVStop {
    public:
-	explicit MVStop(CVR var1 DEFAULT_STRING);
+	explicit MVStop(CVR var1 DEFAULT_EMPTY);
 	var description;
 };
 
@@ -2512,7 +2588,7 @@ class PUBLIC MVStop {
 // but doesnt get stack since abort() is called normally
 class PUBLIC MVAbort {
    public:
-	explicit MVAbort(CVR var1 DEFAULT_STRING);
+	explicit MVAbort(CVR var1 DEFAULT_EMPTY);
 	var description;
 };
 
@@ -2520,7 +2596,7 @@ class PUBLIC MVAbort {
 // but doesnt get stack since abortall() is called normally
 class PUBLIC MVAbortAll {
    public:
-	explicit MVAbortAll(CVR var1 DEFAULT_STRING);
+	explicit MVAbortAll(CVR var1 DEFAULT_EMPTY);
 	var description;
 };
 
@@ -2528,7 +2604,7 @@ class PUBLIC MVAbortAll {
 // but doesnt get stack since abortall() is called normally
 class PUBLIC MVLogoff {
    public:
-	explicit MVLogoff(CVR var1 DEFAULT_STRING);
+	explicit MVLogoff(CVR var1 DEFAULT_EMPTY);
 	var description;
 };
 
@@ -2538,7 +2614,6 @@ class PUBLIC MVError {
    public:
 	explicit MVError(CVR description);
 	var description;
-	var stack;
 };
 
 // clang-format off
@@ -2554,10 +2629,10 @@ class PUBLIC MVUndefined            : public MVError {public: explicit MVUndefin
 class PUBLIC MVInvalidPointer       : public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
 class PUBLIC MVDBException          : public MVError {public: explicit MVDBException          (CVR var1    );};
 class PUBLIC MVNotImplemented       : public MVError {public: explicit MVNotImplemented       (CVR var1    );};
-class PUBLIC MVDebug                : public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_STRING);};
-class PUBLIC MVArrayDimensionedZero : public MVError {public: explicit MVArrayDimensionedZero (                   );};
+class PUBLIC MVDebug                : public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_EMPTY);};
+class PUBLIC MVArrayDimensionedZero : public MVError {public: explicit MVArrayDimensionedZero (            );};
 class PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(CVR var1    );};
-class PUBLIC MVArrayNotDimensioned  : public MVError {public: explicit MVArrayNotDimensioned  (                   );};
+class PUBLIC MVArrayNotDimensioned  : public MVError {public: explicit MVArrayNotDimensioned  (            );};
 
 // clang-format on
 

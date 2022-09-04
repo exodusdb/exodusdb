@@ -151,20 +151,22 @@ function main(in mode, io logtime, in menu) {
 
 	} else if (mode eq "GETENV") {
 
-		call log2("*get environment", logtime);
+		call log2("*get osenv", logtime);
 
 		//nb will NOT overwrite any manual entries in SYSTEM.CFG
-		var environment = osgetenv();
-		environment.converter("\r\n", FM);
-		var nenv = environment.count(FM) + 1;
-		for (const var ii : range(1, nenv)) {
-			var enventry = environment.a(ii);
-			if (enventry) {
-				tt = enventry.field("=", 1);
-				if (not(SYSTEM.a(12).locate(tt, vn))) {
-					SYSTEM(12, vn) = tt;
-					SYSTEM(13, vn) = enventry.field("=", 2, 99999);
-				}
+		let osenv = osgetenv().converter("\r\n", _FM_ _FM_ _FM_);
+//		var nenv = osenv.count(FM) + 1;
+//		for (const var ii : range(1, nenv)) {
+//			var enventry = osenv.a(ii);
+		for (let enventry : osenv) {
+			if (not enventry)
+				continue;
+			printl(THREADNO ^ ":", enventry);
+			var envkey = enventry.field("=", 1);
+			var envval = enventry.field("=", 2, 999999);
+			if (not(SYSTEM.a(12).locate(envkey, vn))) {
+				SYSTEM(12, vn) = envkey;
+				SYSTEM(13, vn) = envval;
 			}
 		} //ii;
 

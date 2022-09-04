@@ -133,8 +133,71 @@ bool checknotabsoluterootfolder(std::string dirname) {
 	return true;
 }
 
+//const std::string var::to_path_string() const {
+//	var part2 = this->field(" ", 2, 999999);
+//	if (part2.length()) {
+//
+//#if defined WIN32 || defined _WIN32
+//		var part = this->field(" ", 1).convert("/", OSSLASH);
+//#else
+//		// printf("path=%s\n",this->convert("\\",OSSLASH).toString().c_str());
+//		var part = this->field(" ", 1).convert("\\", OSSLASH);
+//
+//		// very similar code below
+//		// standardise on ALL AND ONLY lower case os file and path names
+//		// in order to allow uppercase, will have to find and remove all uppercase in the
+//		// old source code
+//		/*
+//		var lcpart = part.lcase();
+//		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG" && !part.index("./data/"))
+//		{
+//			part.errputl("WARNING - UPPERCASE OS=");
+////			part = lcpart;
+//		}
+//		*/
+//#endif
+//		return part.toString() + " " + part2.toString();
+//	} else {
+//
+//#if defined WIN32 || defined _WIN32
+//		return this->convert("/", OSSLASH).toString();
+//#else
+//		// very similar code above
+//		// standardise on ALL AND ONLY lower case os file and path names
+//		// in order to allow uppercase, will have to find and remove all uppercase in the
+//		// old source code
+//		/*
+//		var lcthis = this->lcase();
+//		if (lcthis != (*this) && this->substr(-3,3) != ".LK" && this->substr(-3,3) != ".OV" && this->substr(-9) != "/DATA.CFG")
+//		{
+//			(*this).errputl("WARNING - UPPERCASE OS=");
+////			return lcthis.convert("\\", OSSLASH).toString();
+//		}
+//		*/
+//		return this->convert("\\", OSSLASH).toString();
+//#endif
+//	}
+//}
+
+const std::string to_path_string(CVR str1) {
+	return str1.toString();
+}
+
+const std::string to_oscmd_string(CVR cmd) {
+
+	// while converting from DOS convert all backslashes in first word to forward slashes on
+	// linux or leave as if exodus on windows
+
+	// warning if any backslashes unless at least one of them is followed by $ which indicates
+	// valid usage as an escape character aiming to recode all old windows-only code
+	if (cmd.index("\\") && !cmd.index("\\$"))
+		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
+
+	return to_path_string(cmd.field(" ", 1)) + " " + cmd.field(" ", 2, 999999).toString();
+}
+
 // Returns with trailing OSSLASH
-var var::ostempdirname() const {
+var var::ostempdirpath() const {
 	std::error_code error_code;
 	//TODO handle error code specifically
 	std::string dirname = std::string(std::filesystem::temp_directory_path(error_code));
@@ -193,7 +256,7 @@ var var::ostempfilename() const {
 	// Create a char* template of the temporary file name desired
 	// (2*26+10)^6 possible filenames = 56,800,235,584
 	// Note that 64 bit hash = 1.84467440737e+19 combinations
-	var rvo_tempfilename = this->ostempdirname() ^ "~exoXXXXXX";
+	var rvo_tempfilename = this->ostempdirpath() ^ "~exoXXXXXX";
 	std::vector<char> buffer(rvo_tempfilename.var_str.begin(), rvo_tempfilename.var_str.end());
 	buffer.push_back('\0');
 
@@ -211,10 +274,6 @@ var var::ostempfilename() const {
 	return rvo_tempfilename;
 }
 
-bool var::suspend() const {
-	return this->osshell();
-}
-
 bool var::osshell() const {
 
 	THISIS("var var::osshell() const")
@@ -223,7 +282,7 @@ bool var::osshell() const {
 	assertString(function_sig);
 
 	// breakoff();
-	int shellresult = system(this->to_cmd_string().c_str());
+	int shellresult = system(to_oscmd_string(*this).c_str());
 	// breakon();
 
 	return !shellresult;
@@ -243,13 +302,14 @@ bool var::osshellread(CVR oscmd) {
 	// fflush?
 
 	//"r" means read
-	std::FILE* pfile = popen(oscmd.to_cmd_string().c_str(), "r");
+	std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
 	// return a code to indicate program failure. but can this ever happen?
 	if (pfile == nullptr) {
 		this->lasterror(oscmd.quote() ^ " osshell failed.");
 		return false;
 	}
-	// TODO buffer overflow check
+
+	// Read everything into a single var string
 	char cstr1[4096] = {0x0};
 	while (std::fgets(cstr1, sizeof(cstr1), pfile) != nullptr) {
 		// std::printf("%s\n", result);
@@ -265,22 +325,22 @@ bool var::osshellread(CVR oscmd) {
 	return !pclose(pfile);
 }
 
-bool var::osshellwrite(CVR writestr) const {
+bool var::osshellwrite(CVR oscmd) const {
 
-	THISIS("var var::osshellwrite(CVR writestr) const")
+	THISIS("var var::osshellwrite(CVR oscmd) const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
-	ISSTRING(writestr)
+	ISSTRING(oscmd)
 
 	//"w" means read
-	std::FILE* cmd = popen(this->to_cmd_string().c_str(), "w");
+	std::FILE* cmd = popen(to_oscmd_string(oscmd).c_str(), "w");
 	// return a code to indicate program failure. but can this ever happen?
 	if (cmd == nullptr)
 		return 1;
 
 	// decided not to convert slashes here .. may be the wrong decision
-	fputs(writestr.toString().c_str(), cmd);
+	fputs(this->var_str.c_str(), cmd);
 
 	// return the process termination status
 	return !pclose(cmd);
@@ -291,19 +351,7 @@ void var::osflush() const {
 	return;
 }
 
-bool var::osopen() const {
-
-	THISIS("bool var::osopen()")
-	assertString(function_sig);
-
-	// if reopening an osfile that is already opened then close and reopen
-	// dont call if not necessary
-	if (THIS_IS_OSFILE())
-		osclose();
-
-	return this->osopenx(*this, "") != 0;
-}
-
+// optional locale (not the same as codepage)
 bool var::osopen(CVR osfilename, const char* locale) const {
 
 	THISIS("bool var::osopen(CVR osfilename, const char* locale)")
@@ -331,7 +379,7 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 	std::fstream* pmyfile = 0;
 	if (THIS_IS_OSFILE()) {
 		pmyfile =
-			(std::fstream*)mv_handles_cache.get_handle((int)var_int, var_str);
+			static_cast<std::fstream*>(mv_handles_cache.get_handle(static_cast<int>(var_int), var_str));
 		if (pmyfile == 0)  // nonvalid handle
 		{
 			var_int = 0;
@@ -352,18 +400,19 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 
 		pmyfile = new std::fstream;
 
-		pmyfile->imbue(get_locale(locale));
+		if (locale)
+			pmyfile->imbue(get_locale(locale));
 
 		// open the file for i/o (fail if the file doesnt exist and do NOT delete any
 		// existing file) binary and in/out to allow reading and writing from same file
 		// handle
-		pmyfile->open(osfilename.to_path_string().c_str(),
+		pmyfile->open(to_path_string(osfilename).c_str(),
 					  std::ios::out | std::ios::in | std::ios::binary);
 		if (!(*pmyfile)) {
 			//delete pmyfile;
 
 			//try to open read-only
-			pmyfile->open(osfilename.to_path_string().c_str(),
+			pmyfile->open(to_path_string(osfilename).c_str(),
 						  std::ios::in | std::ios::binary);
 			if (!(*pmyfile)) {
 				delete pmyfile;
@@ -430,11 +479,10 @@ bool var::osread(CVR osfilename, const char* codepage) {
 
 	THISIS("bool var::osread(CVR osfilename, const char* codepage")
 	ISSTRING(osfilename)
-	return osread(osfilename.to_path_string().c_str(), codepage);
+	return osread(to_path_string(osfilename).c_str(), codepage);
 }
 
 bool var::osread(const char* osfilename, const char* codepage) {
-
 
 	THISIS("bool var::osread(const char* osfilename, const char* codepage")
 	assertDefined(function_sig);
@@ -472,8 +520,8 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	// get file size * wchar memory to load the file or fail
 	try {
 		// emergency memory - will be deleted at } - useful if OOM
-		std::unique_ptr<char[]> emergencymemory(new char[16384]);
-		//std::unique_ptr emergencymemory(new char[16384]);
+		// cancelling this to avoid heap fragmentation and increase performance
+		//std::unique_ptr<char[]> emergencymemory(new char[16384]);
 
 		// resize the string to receive the whole file
 		var_str.resize(bytesize);
@@ -494,7 +542,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	bool failed = myfile.fail();
 
 	// in case we didnt read the whole file for some reason, remove garbage in the end of the
-	// string 	#pragma warning( disable: 4244 ) warning C4244: '=' : conversion from
+	// string #pragma warning( disable: 4244 ) warning C4244: '=' : conversion from
 	// 'std::streamoff' to 'unsigned int', possible loss of data
 	bytesize = (unsigned int)myfile.gcount();
 	var_str.resize(bytesize);
@@ -521,25 +569,35 @@ bool var::osread(const char* osfilename, const char* codepage) {
 var var::to_codepage(const char* codepage) const {
 
 	THISIS(
-		"bool var::to_codepage(const char* codepage="
+		"bool var::to_codepage(const char* codepage"
 		") const")
 	assertString(function_sig);
-//	ISSTRING(codepage)
+
+	// NB to_codepage UTF32 adds a BOM at the front eg FFFE0000
+	// conversion to UTF32BE and UTF32LE do not add but order is fixed
+	// BE Big Endian, Little Endian (Intel)
+	// little endian means adding small byte of number comes first
+	// see iconv -l | grep utf32 -i
 
 	//from utf8 to codepage
-	return boost::locale::conv::from_utf<char>(var_str, codepage);
+	//if (*codepage)
+		return boost::locale::conv::from_utf<char>(var_str, codepage);
+	//else
+	//	return var_str;
 }
 
 var var::from_codepage(const char* codepage) const {
 
 	THISIS(
-		"bool var::from_codepage(const char* codepage="
+		"bool var::from_codepage(const char* codepage"
 		") const")
 	assertString(function_sig);
-//	ISSTRING(codepage)
 
-	//to utf from codepage
-	return boost::locale::conv::to_utf<char>(var_str, codepage);
+	//to utf8 from codepage
+	//if (codepage)
+		return boost::locale::conv::to_utf<char>(var_str, codepage);
+	//else
+	//	return var_str;
 }
 
 // no binary conversion is performed on output unless
@@ -548,7 +606,7 @@ var var::from_codepage(const char* codepage) const {
 bool var::oswrite(CVR osfilename, const char* codepage) const {
 
 	THISIS(
-		"bool var::oswrite(CVR osfilename, const char* codepage="
+		"bool var::oswrite(CVR osfilename, const char* codepage"
 		") const")
 	assertString(function_sig);
 	ISSTRING(osfilename)
@@ -557,7 +615,7 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 	std::ofstream myfile;
 
 	// delete any previous file,
-	myfile.open(osfilename.to_path_string().c_str(),
+	myfile.open(to_path_string(osfilename).c_str(),
 				std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile) {
 		this->lasterror(osfilename.quote() ^ " osopen failed.");
@@ -567,9 +625,9 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 	// write out the full string or fail
 	if (*codepage) {
 		std::string tempstr = boost::locale::conv::from_utf<char>(var_str, codepage);
-		myfile.write(tempstr.data(), int(tempstr.length()));
+		myfile.write(tempstr.data(), tempstr.length());
 	} else {
-		myfile.write(var_str.data(), int(var_str.size()));
+		myfile.write(var_str.data(), var_str.size());
 	}
 	bool failed = myfile.fail();
 	myfile.close();
@@ -579,6 +637,9 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 #ifdef VAR_OSBREADWRITE_CONST_OFFSET
 // a version that accepts a const offset ie ignores return value
 //bool var::osbwrite(CVR osfilevar, CVR offset, const bool adjust) const
+// offset -1 appends by starting writing one byte after the current end of the file
+// offset -2 updates the last byte of the file.
+// etc.
 bool var::osbwrite(CVR osfilevar, CVR offset) const {
 	return this->osbwrite(osfilevar, const_cast<VARREF>(offset));
 }
@@ -610,17 +671,17 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 
 	// std::cout << pmyfile->getloc().name();
 
-	// NB seekp goes by bytes regardless of the fact that it is a wide stream
+	// NOTE 1/2 seekp goes by bytes regardless of the fact that it is a wide stream
 	// myfile.seekp (offset*sizeof(char));
 	// offset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
-	if (offset < 0)
-		pmyfile->seekp(std::ios_base::end);
+	if (offset < 0) {
+		pmyfile->seekp(offset.toInt() + 1, std::ios_base::end);
+    }
 	else
-		pmyfile->seekp(
-			static_cast<long>(offset.toInt()));	 // avoid warning, see comments to seekg()
+		pmyfile->seekp(offset.toInt());
 
-	// NB but write length goes by number of wide characters (not bytes)
-	pmyfile->write(var_str.data(), int(var_str.size()));
+	// NOTE 2/2 but write length goes by number of wide characters (not bytes)
+	pmyfile->write(var_str.data(), var_str.size());
 
 	// on windows, fstream will try to convert to current locale codepage so
 	// if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
@@ -787,7 +848,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// transfer the memory block to this variable's string
 	//(is is possible to read directly into string data() avoiding a memory copy?
 	// get the number of CHARACTERS read - utf8 bytes (except ASCII) convert to fewer wchar
-	// characters. int readsize = pmyfile->gcount(); 	#pragma warning( disable: 4244 )
+	// characters. int readsize = pmyfile->gcount(); #pragma warning( disable: 4244 )
 	// warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of
 	// data
 	var_str.assign(memblock.get(), (unsigned int)pmyfile->gcount());
@@ -822,41 +883,54 @@ bool var::osrename(CVR newosdir_or_filename) const {
 	assertString(function_sig);
 	ISSTRING(newosdir_or_filename)
 
+	std::string path1 = to_path_string(*this);
+	std::string path2 = to_path_string(newosdir_or_filename);
+
 	// prevent overwrite of existing file
-	// ACQUIRE
+    // ACQUIRE
 	std::ifstream myfile;
-	// binary?
-	myfile.open(newosdir_or_filename.to_path_string().c_str(), std::ios::binary);
+	myfile.open(path2.c_str(), std::ios::binary);
 	if (myfile) {
 		// RELEASE
 		myfile.close();
-		this->lasterror(newosdir_or_filename.quote() ^ " osrename failed to open new file.");
+		this->lasterror(newosdir_or_filename.quote() ^ " already exists. Cannot osrename " ^ this->quote());
 		return false;
 	}
 
 	// safety
-	if (!checknotabsoluterootfolder(toString()))
+	if (!checknotabsoluterootfolder(path1))
+		return false;
+	if (!checknotabsoluterootfolder(path2))
 		return false;
 
-	return !std::rename(this->to_path_string().c_str(),
-						newosdir_or_filename.to_path_string().c_str());
+	return !std::rename(path1.c_str(), path2.c_str());
 }
 
-bool var::oscopy(CVR to_osfile_or_dirname) const {
+bool var::oscopy(CVR newosdir_or_filename) const {
 
-	THISIS("bool var::oscopy(CVR to_osfile_or_dirname) const")
+	THISIS("bool var::oscopy(CVR newosdir_or_filename) const")
 	assertString(function_sig);
-	ISSTRING(to_osfile_or_dirname)
+	ISSTRING(newosdir_or_filename)
 
-	std::filesystem::path frompathx(this->to_path_string().c_str());
-	std::filesystem::path topathx(to_osfile_or_dirname.to_path_string().c_str());
+	std::string path1 = to_path_string(*this);
+	std::string path2 = to_path_string(newosdir_or_filename);
+
+    // copy recursively, overwriting
+	std::filesystem::path frompathx(path1.c_str());
+	std::filesystem::path topathx(path2.c_str());
 	//https://en.cppreference.com/w/cpp/filesystem/copy
 	std::error_code error_code;
 	copy(frompathx, topathx,
 		 std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive | std::filesystem::copy_options::copy_symlinks,
 		 error_code);
 
-	return !error_code;
+    // Handle error
+    if (error_code) {
+		this->lasterror("oscopy failed. " ^ this->quote() ^ " to " ^ newosdir_or_filename.quote());
+		return false;
+    }
+
+	return true;
 }
 
 bool var::osmove(CVR newosdir_or_filename) const {
@@ -865,11 +939,14 @@ bool var::osmove(CVR newosdir_or_filename) const {
 	assertString(function_sig);
 	ISSTRING(newosdir_or_filename)
 
-	// prevent overwrite of existing file
+	std::string path1 = to_path_string(*this);
+	std::string path2 = to_path_string(newosdir_or_filename);
+
+	// prevent overwrite of existing file or dir
 	// ACQUIRE
 	std::ifstream myfile;
 	// binary?
-	myfile.open(newosdir_or_filename.to_path_string().c_str(), std::ios::binary);
+	myfile.open(path2.c_str(), std::ios::binary);
 	if (myfile) {
 		// RELEASE
 		myfile.close();
@@ -877,36 +954,38 @@ bool var::osmove(CVR newosdir_or_filename) const {
 		return false;
 	}
 
-	// safety
-	if (!checknotabsoluterootfolder(this->toString()))
+	// Safety
+	if (!checknotabsoluterootfolder(path1))
+		return false;
+	if (!checknotabsoluterootfolder(path2))
 		return false;
 
-	// try to rename but will fail to move across file systems
-	if (!this->osrename(newosdir_or_filename)) {
+	// Try to rename but will fail to move across file systems
+	//////////////////////////////////////////////////////////
+	if (this->osrename(newosdir_or_filename))
+		return true;
 
-		//try to copy and delete instead
-		if (!this->oscopy(newosdir_or_filename)) {
-			this->lasterror(this->quote() ^ " failed to oscopy (1) to " ^ newosdir_or_filename.quote());
-			return false;
-		}
-
-		//then try to delete original
-		if (this->osremove())
-			return true;
-		else {
-
-			//otherwise delete the target too
-			newosdir_or_filename.osremove();
-			this->lasterror(this->quote() ^ " failed to oscopy (2) to " ^ newosdir_or_filename.quote());
-			return false;
-		}
-
+	// To copy and delete instead of move
+	////////////////////////////////////////
+	if (!this->oscopy(newosdir_or_filename)) {
+		this->lasterror(this->quote() ^ " failed to osmove to " ^ newosdir_or_filename.quote());
+		return false;
 	}
-	return true;
+
+	// Delete original only after copy to target is successful
+	if (this->osremove())
+		return true;
+
+    // Too dangerous to remove target in case of failure to delete source
+	//otherwise delete the target too
+	//newosdir_or_filename.osremove();
+
+	this->lasterror(this->quote() ^ " osmove failed to remove source after copying to " ^ newosdir_or_filename.quote());
+	return false;
 }
 
 bool var::osremove() const {
-	return osremove(*this);
+	return this->osremove(*this);
 }
 
 bool var::osremove(CVR osfilename) const {
@@ -915,70 +994,18 @@ bool var::osremove(CVR osfilename) const {
 	assertDefined(function_sig);
 	ISSTRING(osfilename)
 	osfilename.osclose();  // in case this is cached opened file handle
-	if (std::remove(osfilename.to_path_string().c_str())) {
-		this->lasterror(this->quote() ^ " failed to osremove");
+
+	// Prevent removal of dirs. Use osrmdir for that.
+	if (std::filesystem::is_directory(osfilename.toString())) {
+		this->lasterror(osfilename.quote() ^ " osremove failed - is a directory.");
+		return false;
+	}
+
+	if (std::remove(to_path_string(osfilename).c_str())) {
+		this->lasterror(osfilename.quote() ^ " failed to osremove");
 		return false;
 	}
 	return true;
-}
-
-const std::string var::to_path_string() const {
-	var part2 = this->field(" ", 2, 999999);
-	if (part2.length()) {
-
-#if defined WIN32 || defined _WIN32
-		var part = this->field(" ", 1).convert("/", OSSLASH);
-#else
-		// printf("path=%s\n",this->convert("\\",OSSLASH).toString().c_str());
-		var part = this->field(" ", 1).convert("\\", OSSLASH);
-
-		// very similar code below
-		// standardise on ALL AND ONLY lower case os file and path names
-		// in order to allow uppercase, will have to find and remove all uppercase in the
-		// old source code
-		/*
-		var lcpart = part.lcase();
-		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG" && !part.index("./data/"))
-		{
-			part.errputl("WARNING - UPPERCASE OS=");
-//			part = lcpart;
-		}
-		*/
-#endif
-		return part.toString() + " " + part2.toString();
-	} else {
-
-#if defined WIN32 || defined _WIN32
-		return this->convert("/", OSSLASH).toString();
-#else
-		// very similar code above
-		// standardise on ALL AND ONLY lower case os file and path names
-		// in order to allow uppercase, will have to find and remove all uppercase in the
-		// old source code
-		/*
-		var lcthis = this->lcase();
-		if (lcthis != (*this) && this->substr(-3,3) != ".LK" && this->substr(-3,3) != ".OV" && this->substr(-9) != "/DATA.CFG")
-		{
-			(*this).errputl("WARNING - UPPERCASE OS=");
-//			return lcthis.convert("\\", OSSLASH).toString();
-		}
-		*/
-		return this->convert("\\", OSSLASH).toString();
-#endif
-	}
-}
-
-const std::string var::to_cmd_string() const {
-
-	// while converting from DOS convert all backslashes in first word to forward slashes on
-	// linux or leave as if exodus on windows
-
-	// warning if any backslashes unless at least one of them is followed by $ which indicates
-	// valid usage as an escape character aiming to recode all old windows-only code
-	if (this->index("\\") && !this->index("\\$"))
-		this->errputl("WARNING BACKSLASHES IN OS COMMAND:");
-
-	return this->field(" ", 1).to_path_string() + " " + this->field(" ", 2, 999999).toString();
 }
 
 // utility defined in mvdatetime.cpp
@@ -1007,7 +1034,7 @@ var var::osfile() const {
 		struct stat statinfo;
 
 		// Get stat info or quit
-		if (stat(this->to_path_string().c_str(), &statinfo) != 0)
+		if (stat(to_path_string(*this).c_str(), &statinfo) != 0)
 			return "";
 
 		// Quit if is dir
@@ -1023,7 +1050,8 @@ var var::osfile() const {
 		time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
 
 		//file_size() is only available for files not directories
-		return int(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
+		//return static_cast<int>(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
+		return var(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
 
 	} catch (...) {
 		return "";
@@ -1046,7 +1074,7 @@ var var::osfile() const {
 //
 //	// get a handle and return "" if doesnt exist or isnt a regular file
 //	try {
-//		std::filesystem::path pathx(this->to_path_string().c_str());
+//		std::filesystem::path pathx(to_path_string(*this).c_str());
 //
 //		if (!std::filesystem::exists(pathx))
 //			return "";
@@ -1086,10 +1114,10 @@ bool var::osmkdir() const {
 
 	try {
 
-		std::filesystem::path pathx(this->to_path_string().c_str());
+		std::filesystem::path pathx(to_path_string(*this).c_str());
 
 		if (std::filesystem::exists(pathx))	{
-			this->lasterror(this->quote() ^ " osmkdir failed - already exists.");
+			this->lasterror(this->quote() ^ " osmkdir failed. Target already exists.");
 			return false;
 		}
 
@@ -1109,7 +1137,7 @@ bool var::osrmdir(bool evenifnotempty) const {
 	// get a handle and return "" if doesnt exist or is NOT a directory
 	try {
 
-		std::filesystem::path pathx(this->to_path_string().c_str());
+		std::filesystem::path pathx(to_path_string(*this).c_str());
 
 		if (!std::filesystem::exists(pathx)) {
 		this->lasterror(this->quote() ^ " osrmdir failed - does not exist.");
@@ -1160,7 +1188,7 @@ var var::osdir() const {
 		struct stat statinfo;
 
 		// Get stat info or quit
-		if (stat(this->to_path_string().c_str(), &statinfo) != 0)
+		if (stat(to_path_string(*this).c_str(), &statinfo) != 0)
 			return "";
 
 		// Quit if is not dir
@@ -1193,7 +1221,7 @@ var var::osdir() const {
 //	// std::filesystem::wpath pathx(toTstring((*this)).c_str());
 //	try {
 //
-//		std::filesystem::path pathx(this->to_path_string().c_str());
+//		std::filesystem::path pathx(to_path_string(*this).c_str());
 //
 //		if (!std::filesystem::exists(pathx))
 //			return "";
@@ -1252,7 +1280,7 @@ var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
 
 	// http://www.boost.org/libs/filesystem/example/simple_ls.cpp
 
-	var path = path0.to_path_string();
+	var path = to_path_string(path0);
 	var globpattern;
 	if (globpattern0.length()) {
 		globpattern = globpattern0;
@@ -1276,10 +1304,10 @@ var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
 	if (path.length()) {
 		//full_path = std::filesystem::absolute(std::filesystem::path(path.to_path_string().c_str()));
 		std::error_code error_code;
-		std::filesystem::path pathx = std::filesystem::path(path.to_path_string().c_str());
+		std::filesystem::path pathx = std::filesystem::path(to_path_string(path).c_str());
 		full_path = std::filesystem::absolute(pathx, error_code);
 		if (error_code) {
-			std::cerr << "'" << path.to_path_string() << "' path : " << error_code.message() << std::endl;
+			std::cerr << "'" << to_path_string(path) << "' path : " << error_code.message() << std::endl;
 			return filelist;
 		}
 
@@ -1337,7 +1365,7 @@ bool var::oscwd(CVR newpath) const {
 	ISSTRING(newpath)
 
 	try {
-		std::filesystem::current_path(newpath.to_path_string());
+		std::filesystem::current_path(to_path_string(newpath));
 		//std::filesystem::current_path(newpath);
 	} catch (...) {
 		// filesystem error: cannot set current path: No such file or directory

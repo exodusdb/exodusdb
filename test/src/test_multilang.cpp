@@ -127,14 +127,15 @@ function main()
 	BUF_30_23.outputl( "BUF_30_23=");
 
 	{
+		var tfilename = "t_test.txt";
 		assert(var(L"abc") eq "abc");
 		assert(var(L"Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.") eq "Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.");
 		var x = L"Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.";
 		assert(x.regex_replace("[[:alnum:]]","").convert(", ", "").outputl() == "/.");
 
-		assert(oswrite(L"Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.", "t_file"));
-		assert(osfile("t_file"));
-		assert(osread("t_file") eq x);
+		assert(oswrite(L"Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.", tfilename));
+		assert(osfile(tfilename));
+		assert(osread(tfilename) eq x);
 	}
 
 	var OUTPUT_file = "t_test_OUTPUT_UTF8.txt";
@@ -175,6 +176,8 @@ function main()
 	assert(position eq 13);
 
 	{
+		assert(var(123456.789).numberinwords("en_AU").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
+
 		assert(var(123456.789).numberinwords("").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 		assert(var(123456.789).numberinwords("english").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 		assert(var(123456.789).numberinwords("greek").outputl() eq "εκατόν είκοσι τρεις χίλιάδες τετρακόσια πενήντα έξι κόμμα επτά οκτώ εννέα");

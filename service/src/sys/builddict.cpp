@@ -93,11 +93,11 @@ function main() {
 
 subroutine definemacro() {
 	nmacros += 1;
-	macros.r(1, nmacros, blockid);
+	macros(1, nmacros) = blockid;
 	splitline = blockline.trim();
 	splitline.converter(" ", VM);
-	macros.r(2, nmacros, lower(splitline.field(VM, 4, 999999)));
-	macros.r(3, nmacros, lower(lower(block)));
+	macros(2, nmacros) = lower(splitline.field(VM, 4, 999999));
+	macros(3, nmacros) = lower(lower(block));
 	return;
 }
 
@@ -161,11 +161,11 @@ subroutine writedict() {
 		//var(dictids).oswrite("bdict");
 
 		var f8 = dictrec.a(8).trimb(VM);
-		dictrec.r(8, f8);
+		dictrec(8) = f8;
 		var origdictrec = dictrec;
 
 		// Update the source code
-		dictrec.r(8, block);
+		dictrec(8) = block;
 		if (suffixno)
 			dictrec.swapper("{||}", suffixno);
 
@@ -298,7 +298,7 @@ insertmline:
 								}
 								mline0.converter(" " ^ VM, VM ^ " ");
 								mline0 = str("\t", len(mline0) - len(mline0.trimf())) ^ mline0.trimf();
-								macrotext.r(mln, mline0);
+								macrotext(mln) = mline0;
 
 							} else {
 								if (mword1 eq "#ifdef") {
@@ -335,13 +335,13 @@ nextmln:;
 							continue;
 
 						if (not(allfields.locate(fieldname, fieldn))) {
-							allfields.r(1, -1, fieldname);
+							allfields(1, -1) = fieldname;
 							var tempdict;
 							if (tempdict.read(DICT, fieldname)) {
 								if (tempdict.a(1) eq "F") {
-									fields.r(1, -1, fieldname);
-									fields.r(2, -1, tempdict.a(2));
-									fields.r(3, -1, lower(tempdict.a(3)));
+									fields(1, -1) = fieldname;
+									fields(2, -1) = tempdict.a(2);
+									fields(3, -1) = lower(tempdict.a(3));
 								}
 							} else {
 								call mssg(fieldname.quote() ^ " field is missing from DICT " ^ DICT);
@@ -356,7 +356,7 @@ nextmln:;
 							var fieldname = fields.a(1, fieldn);
 							macrotext.swapper("{" ^ fieldname ^ "}", fieldname);
 							//swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext
-							equates.r(-1, "\t#define " ^ fieldname ^ "\tRECORD.a(" ^ fields.a(2, fieldn) ^ ")");
+							equates(-1) = "\t#define " ^ fieldname ^ "\tRECORD.a(" ^ fields.a(2, fieldn) ^ ")";
 						} //fieldn;
 						macrotext.splicer(1, 0, equates ^ FM);
 					}

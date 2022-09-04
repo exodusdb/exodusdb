@@ -474,7 +474,8 @@ convert:
 
 	// rounding
 	newmv = newmv.round(ndecimals);
-	//newmv.createString();
+	if (!(newmv.var_typ & VARTYP_STR))
+		newmv.createString();
 
 	// Option to suppress zeros - if no digits 1-9
 	if (z_flag and newmv.var_str.find_first_of("123456789") == std::string::npos) {

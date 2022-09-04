@@ -40,6 +40,18 @@ programinit()
 function main() {
 
 	printl("\n========= test_precision ==========");
+
+    {
+
+		printl("On 10 byte floats/doubles, 22/7 -> 3.14285714285714286");
+
+		// TODO may need adjustment when we switch from ryu to c++ std::to_chars()
+		printl("On exodus 8 byte doubles,  22/7 -> 3.142857142857143");
+		var v22 = 22;
+		var v7 = 7;
+		assert((v22/v7).toString() == "3.142857142857143");
+    }
+
 	{
 
 		assert(!var("123e+3e").isnum());

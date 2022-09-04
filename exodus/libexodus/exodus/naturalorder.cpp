@@ -4,6 +4,8 @@
 
 #include <cassert>
 
+#include <mv.h>
+
 namespace exodus {
 
 // select exodus_extract_text(data,1,0,0), exodus_extract_sort(data,1,0,0)
@@ -179,7 +181,7 @@ void appenddouble2sortstring(const double& double1, std::ostringstream& stringst
 	stringstream1 << integer1;
 }
 
-std::string naturalorder(const std::string& string1) {
+PUBLIC ND std::string naturalorder(const std::string& string1) {
 
 	// using goto here to break out of multiple embedded loops
 	// since c/c++ break/continue is unable to do this

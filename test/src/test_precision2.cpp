@@ -1,3 +1,4 @@
+#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 #include <iomanip> // for setprecision
 #include <cmath> // for nextafter

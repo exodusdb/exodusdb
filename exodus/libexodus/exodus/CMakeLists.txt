@@ -8,6 +8,21 @@ project(libexodus)
 #use CMakeList.txt options in parent directory
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
+#
+# Coverage testing
+#
+# See https://gcc.gnu.org/onlinedocs/gcc/Gcov-Data-Files.html
+#
+# test-coverage = generate gcno files at compile time
+# profile-arcs = generate gcda files at runtime
+#
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage -fprofile-arcs")
+
+#
+# Sanitizer
+#
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+
 #######################################
 # c++ version 17 or 20 if on Ubuntu 20+
 #######################################
@@ -82,15 +97,19 @@ add_library(exodus SHARED
 # mvutf.cpp
 # ConvertUTF.c
 # mvlocale.cpp
+
+# big ones first for efficient parallel compilation
  mvdbpostgres.cpp mvregex.cpp mvos.cpp mvos2.cpp mvprogram.cpp mvmv.cpp
  mv.cpp mvnumeric.cpp mvmath.cpp mvdim.cpp mvdatetime.cpp mvdebug.cpp mviter.cpp
  mvfuncs.cpp mvioconv.cpp
- mvenvironment.cpp mvglobalfuncs.cpp
+ mvenvironment.cpp exodusfuncs.cpp
  mvwait.cpp mvunicode.cpp mvposix.cpp mvfunctor.cpp mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
  MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp
  mvhandles.cpp mvdbconns.cpp mvprocessno.cpp
- getkey.cpp haskey.cpp echo.cpp cursor.cpp
+
+# little ones last for quick parallel finishing
+ term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")

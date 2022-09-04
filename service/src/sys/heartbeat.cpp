@@ -41,7 +41,7 @@ function main(in mode, in status0="") {
 		//WARNING: Before selection of dataset/init.general this is not available
 
 		//userlockid=sysvar('GET',109,134)
-		var userlockid = PROCESSNO;
+		var userlockid = THREADNO;
 
 		//on advanced revelation the pattern is U7906nnnn where 7906
 		// where 7906 appears to be the last 4 digits of the DOS serial() number
@@ -68,12 +68,12 @@ function main(in mode, in status0="") {
 
 		} else {
 			var tt;
-			if (not(tt.read(DEFINITIONS, "ERROR*PROCESSNO"))) {
+			if (not(tt.read(DEFINITIONS, "ERROR*THREADNO"))) {
 				tt = "";
 			}
 			if (tt.a(1).count(VM) lt 10) {
 				tt(1, -1) = processno;
-				tt.write(DEFINITIONS, "ERROR*PROCESSNO");
+				tt.write(DEFINITIONS, "ERROR*THREADNO");
 				call sysmsg(processno.quote() ^ "Non-numeric processno in HEARTBEAT " ^ userlockid);
 			}
 		}

@@ -427,7 +427,39 @@ void var::createString() const {
 
 var var::round(const int ndecimals) const {
 
-	/*pick round rounds positive .5 up to 1 and negative .5 down to -1 etc
+/*
+	"Round half away from zero" or "Commercial rounding"
+	https://en.wikipedia.org/wiki/Rounding#Round_half_away_from_zero
+
+	The other tie-breaking method commonly taught and used is the round half
+	away from zero (or round half toward infinity), namely:
+
+	If the fraction of x is exactly 0.5, then y = x + 0.5 if x is positive,
+	and y = x − 0.5 if x is negative.
+
+	For example, 23.5 gets rounded to 24, and −23.5 gets rounded to −24.
+
+	This can be more efficient on binary computers because only the first
+	omitted bit needs to be considered to determine if it rounds up (on a 1)
+	or down (on a 0). This is one method used when rounding to significant
+	figures due to its simplicity.
+
+	This method, also known as commercial rounding,[citation needed] treats
+	positive and negative values symmetrically, and therefore is free of
+	overall positive/negative bias if the original numbers are positive or
+	negative with equal probability. It does, however, still have bias away
+	from zero.
+
+	It is often used for currency conversions and price roundings (when the
+	amount is first converted into the smallest significant subdivision of
+	the currency, such as cents of a euro) as it is easy to explain by just
+	considering the first fractional digit, independently of supplementary
+	precision digits or sign of the amount (for strict equivalence between
+	the paying and recipient of the amount).
+*/
+
+/*
+	pickos round rounds positive .5 up to 1 and negative .5 down to -1 etc
 	-1.0=-1
 	-0.9=-1
 	-0.5=-1
@@ -437,7 +469,7 @@ var var::round(const int ndecimals) const {
 	 0.5= 1.0
 	 0.9= 1.0
 	 1.0= 1.0
-	*/
+*/
 
 	//var_str is always set on return
 
@@ -450,22 +482,31 @@ var var::round(const int ndecimals) const {
 
 	var result;
 
-	double fromdouble;
+	// Note that we cannot use var_int even if available since
+	// var_int may have been created from var_dbl using floor()
+
 	// prefer double
+	double fromdouble;
 	if (var_typ & VARTYP_DBL) {
 		fromdouble = var_dbl;
 	}
+
 	//otherwise use var_int
 	else {
+
+		//if zero decimal places required then use simply use the var_int
 		if (not ndecimals) {
 			//result=*this;
 			result.var_int = var_int;
 			result.var_typ = VARTYP_INT;
+			// We could precalculate the string and double very fast
+			// but they may not be required and be wasted effort
 			result.createString();
 			return result;
 		}
+
 		// loss of precision if var_int is uint64_t
-		fromdouble = double(var_int);
+		fromdouble = static_cast<double>(var_int);
 	}
 
 	//unfortunately c+ round(double) does not work well with decimal numbers

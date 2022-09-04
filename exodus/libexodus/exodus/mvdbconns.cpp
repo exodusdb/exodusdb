@@ -6,9 +6,9 @@
 //
 // NOTE_OSX: Changing order of member construction could cause warning under MacOSX, like:
 //	mvdbconns.h: In constructor 'exodus::MVConnections::MVConnections(void
-//(*)(PGconn*))': 	mvdbconns.h:57: warning: 'exodus::MVConnections::connection_id' will be
-// initialized after 	mvdbconns.h:56: warning:   'void (*
-// exodus::MVConnections::del)(PGconn*)' 	mvdbconns.cpp:15: warning:   when initialized here
+//(*)(PGconn*))': mvdbconns.h:57: warning: 'exodus::MVConnections::connection_id' will be
+// initialized after mvdbconns.h:56: warning:   'void (*
+// exodus::MVConnections::del)(PGconn*)' mvdbconns.cpp:15: warning:   when initialized here
 //
 #include "mv.h"
 //#define INSIDE_MVDBCONNS_CPP
@@ -22,7 +22,8 @@ MVConnections::MVConnections(DELETER_AND_DESTROYER del_)
 }
 
 int MVConnections::add_connection(PGconn* conn_to_cache, const std::string conninfo) {
-	//boost::mutex::scoped_lock lock(mvconnections_mutex);
+	// no longer need locking since mvconnections is thread_local
+	//std::lock_guard lock(mvconnections_mutex);
 
 	connection_id++;
 	conntbl[connection_id] = MVConnection(conn_to_cache, conninfo);
@@ -31,31 +32,31 @@ int MVConnections::add_connection(PGconn* conn_to_cache, const std::string conni
 
 PGconn* MVConnections::get_pgconnection(int index) const {
 
-	//boost::mutex::scoped_lock lock(mvconnections_mutex); 
+	//std::lock_guard lock(mvconnections_mutex); 
 
 	//for (auto pair : conntbl) {
 	//	std::clog << pair.first << ". " << (pair.second.connection) <<std::endl;
 	//}
 
-	//boost::mutex::scoped_lock lock(mvconnections_mutex);
+	//std::lock_guard lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (PGconn*)(iter == conntbl.end() ? 0 : iter->second.connection);
 }
 
 MVConnection* MVConnections::get_mvconnection(int index) const {
-	//boost::mutex::scoped_lock lock(mvconnections_mutex);
+	//std::lock_guard lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (MVConnection*)(iter == conntbl.end() ? 0 : &iter->second);
 }
 
 //ConnectionLocks* MVConnections::get_lock_table(int index) const {
-//	//boost::mutex::scoped_lock lock(mvconnections_mutex);
+//	//std::lock_guard lock(mvconnections_mutex);
 //	CONN_MAP::const_iterator iter = conntbl.find(index);
 //	return (ConnectionLocks*)(iter == conntbl.end() ? 0 : iter->second.connection_locks);
 //}
 
 ConnectionRecordCache* MVConnections::get_recordcache(int index) const {
-	//boost::mutex::scoped_lock lock(mvconnections_mutex);
+	//std::lock_guard lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (ConnectionRecordCache*)(iter == conntbl.end() ? 0 : &iter->second.connection_readcache);
 }
@@ -94,7 +95,7 @@ void MVConnections::clearrecordcache(const int connid) {
 }
 
 void MVConnections::del_connection(int index) {
-	//boost::mutex::scoped_lock lock(mvconnections_mutex);
+	//std::lock_guard lock(mvconnections_mutex);
 	CONN_MAP::iterator iter = conntbl.find(index);
 	if (iter != conntbl.end()) {
 		//	PGconn* p /*std::pair<int, void*> p*/ = ;
@@ -106,7 +107,7 @@ void MVConnections::del_connection(int index) {
 }
 
 void MVConnections::del_connections(int from_index) {
-	//boost::mutex::scoped_lock lock(mvconnections_mutex);
+	//std::lock_guard lock(mvconnections_mutex);
 	CONN_MAP::iterator ix;
 	ix = conntbl.begin();
 	while (ix != conntbl.end()) {
@@ -126,7 +127,7 @@ void MVConnections::del_connections(int from_index) {
 
 MVConnections::~MVConnections() {
 	// no need
-	// boost::mutex::scoped_lock lock(mvconnections_mutex);
+	// std::lock_guard lock(mvconnections_mutex);
 
 	CONN_MAP::iterator ix;
 	for (ix = conntbl.begin(); ix != conntbl.end(); ix++) {

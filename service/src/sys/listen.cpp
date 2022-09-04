@@ -37,7 +37,7 @@ var reqlog;
 var defaultlockmins;//num
 var datasetcode;
 var live;
-var processno;
+//var processno;
 var neopath;
 var installend;
 var serverend;
@@ -110,7 +110,7 @@ var timex;
 var ntries;//num
 //var listenfailure;//num
 var connection;
-var dataset;
+var datasetx;
 var username;
 var password;
 var ipno;
@@ -302,7 +302,7 @@ function main_init() {
 
 	datasetcode = SYSTEM.a(17);
 	live = datasetcode.ucase().substr(-5) ne "_test";
-	processno = SYSTEM.a(24);
+	//processno = SYSTEM.a(24);
 
 	neopath = "../exodus/";
 	neopath.converter("/", OSSLASH);
@@ -397,15 +397,14 @@ function main_init() {
 	tracing = 1;
 
 	//ensure unique sorttempfile
-	//if sysvar('SET',192,102,'R':('0000':processno)[-5,5]:'.SFX') else null
-	//call sysvar_192_102"SET", "R" ^ ("0000" ^ processno).substr(-5, 5) ^ ".SFX");
+	//if sysvar('SET',192,102,'R':('0000':THREADNO)[-5,5]:'.SFX') else null
+	//call sysvar_192_102"SET", "R" ^ ("0000" ^ THREADNO).substr(-5, 5) ^ ".SFX");
 
 	nrequests = SYSTEM.a(35) + 0;
 
-	printl(var("-").str(79));
-	printl("EXODUS.NET SERVICE ", processno, " STARTED ", var().timedate());
-	printl();
-	printl("Station : ", STATION, "  Process : ", processno, "  Dir : ", oscwd());
+	printl(var("-").str(50));
+	printl(THREADNO ^ ":", "EXODUS", datasetcode, oscwd());
+	printl(var("-").str(50));
 
 	SYSTEM(33) = 1;
 
@@ -467,7 +466,7 @@ function main_init() {
 		}
 	}
 
-	logfilename = logpath ^ "/" ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ ("00" ^ processno).substr(-2, 2);
+	logfilename = logpath ^ "/" ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ ("00" ^ THREADNO).substr(-2, 2);
 	logfilename ^= ".xml";
 	logfilename.converter("/", OSSLASH);
 
@@ -577,7 +576,7 @@ nextsearch0:
 ////////////
 
 	if (TERMINATE_req or RELOAD_req) {
-		printl("Closing PROCESSNO " ^ PROCESSNO);
+		printl("Closing THREADNO " ^ THREADNO);
 		return false;
 	}
 
@@ -621,15 +620,15 @@ nextsearch0:
 
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
-	//tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
-	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
+	//tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
+	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
 		output(AT(-40), tt, " : ");
 	} else {
-		var(tt).oswrite("process." ^ processno);
+		var(tt).oswrite("process." ^ THREADNO);
 	}
 
-	call unlockrecord("PROCESSES", processes, processno);
+	call unlockrecord("PROCESSES", processes, THREADNO);
 
 	//prevent sleep in esc.to.exit
 	//garbagecollect;
@@ -693,7 +692,7 @@ subroutine wait() {
 	//fast exit on server.end and install.end. database.end only checked every 10 secs
 	cmd ^= " " ^ inpath ^ "*.1 " ^ waitsecs ^ " " ^ sleepms ^ " " ^ serverend;
 
-	linkfilename1 = inpath ^ "neos" ^ processno.oconv("R(0)#4") ^ ".0";
+	linkfilename1 = inpath ^ "neos" ^ THREADNO.oconv("R(0)#4") ^ ".0";
 	linkfilename1.osremove();
 	if (linkfilename1.osfile()) {
 		if (tracing) {
@@ -736,8 +735,8 @@ subroutine wait() {
 
 	//place a lock to indicate processing
 	//should really retry in case blocked by other processes checking it
-	//call rtp57(syslock, '', '', trim(@station):processno, '', '', '')
-	if (not lockrecord("PROCESSES", processes, processno, "", 999999))
+	//call rtp57(syslock, '', '', trim(@station):THREADNO, '', '', '')
+	if (not lockrecord("PROCESSES", processes, THREADNO, "", 999999))
 		var().logoff();
 
 	//pause forever while any quiet time process (eg hourly backup) is working
@@ -777,13 +776,15 @@ function loop_exit() {
 	if (charx.lcase().index(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.swapper(var().chr(27), "Esc");
-		call mssg(" You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
+		call mssg("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
 		//loop
 		// input reply,-1:
 		//until reply
 		// call ossleep(1000*1)
 		// repeat
+		echo(0);
 		reply.inputn(1);
+		echo(1);
 		call mssg("", "DB", buffer, "");
 		if (reply eq INTCONST.a(1)) {
 			//space to defeat ANSI control chars after pressing Esc
@@ -826,11 +827,18 @@ function loop_exit() {
 		}
 
 		osflush();
+		return true;
+	}
+
+	if (charx == "\n") {
+		printl();
+		return true;
 	}
 
 	//f10 or "x" on linux
 	if (charx eq INTCONST.a(7)) {
 		execute("RUNMENU " ^ ENVIRONSET.a(37));
+		return true;
 	}
 
 	if (charx ne "") {
@@ -853,6 +861,7 @@ function loop_exit() {
 		// end
 
 		gosub gettimeouttime();
+		return true;
 	}
 
 	//switch back to not interactive mode
@@ -1177,7 +1186,7 @@ function request_init() {
 		output(AT(-40), var().time().oconv("MTS"), " ");
 	} else {
 		//similar in listen and log2
-		print(processno, ": ");
+		print(THREADNO ^ ": ");
 	}
 
 	//clear out buffers just to be sure
@@ -1209,7 +1218,7 @@ function request_init() {
 
 	USER0 = request_.field(FM, tt + 1, 999999);
 
-	dataset = USER0.a(1).ucase();
+	datasetx = USER0.a(1).ucase();
 	username = request_.a(2).ucase();
 	password = USER0.a(3).ucase();
 
@@ -1325,7 +1334,7 @@ function request_init() {
 			t2 ^= " " ^ connection.a(1, 3);
 		}
 
-		print(t2.oconv("L#15"), " ", tt, " : ");
+		print(t2.oconv("L#15"), tt, ":");
 	}
 
 	linkfilename2 = replyfilename;
@@ -1518,7 +1527,7 @@ cannotopenlinkfile2:
 	//validate username and password ('LOGIN' gets special treatment)
 	//and assume that identity if ok
 	//invaliduser will be "" if valid and a response message if not
-	call listen2("VALIDATE" ^ FM ^ request1, username, password, connection, invaliduser, dataset);
+	call listen2("VALIDATE" ^ FM ^ request1, username, password, connection, invaliduser, datasetx);
 
 	SYSTEM(2) = linkfilename2;
 
@@ -1608,7 +1617,8 @@ subroutine process() {
 	}
 	catch (MVError mverror) {
 		rollbacktrans();
-		USER3 = mverror.description ^ FM ^ mverror.stack;
+		// Similar code in net.cpp and listen.cpp
+		USER3 = mverror.description ^ FM ^ backtrace();
 	}
 
 	return;
@@ -1645,7 +1655,7 @@ subroutine process2() {
 	//username and password already validated above
 	} else if (request1 eq "LOGIN") {
 
-		call listen2(request1, dataset, username, connection, request5);
+		call listen2(request1, datasetx, username, connection, request5);
 
 	//find index values
 	//case request1[1,14]='GETINDEXVALUES'
@@ -2823,10 +2833,11 @@ function request_exit() {
 } // request_exit
 
 subroutine geterrorresponse() {
-	fileerrorx = FILEERROR;
-	USER3 = "Error: " ^ ("FS" ^ fileerrorx.a(1, 1)).xlate("SYS.MESSAGES", 11, "X");
-	response_.swapper("%1%", handlefilename(fileerrorx.a(2, 1)));
-	USER3.swapper("%2%", fileerrorx.a(2, 2));
+//	fileerrorx = FILEERROR;
+//	USER3 = "Error: " ^ ("FS" ^ fileerrorx.a(1, 1)).xlate("SYS.MESSAGES", 11, "X");
+//	response_.swapper("%1%", handlefilename(fileerrorx.a(2, 1)));
+//	USER3.swapper("%2%", fileerrorx.a(2, 2));
+	USER3 = "Error: " ^ FILEERROR;
 	gosub fmtresp();
 	return;
 }
@@ -3331,7 +3342,7 @@ subroutine updreqlog() {
 		tt(11) = request_;
 	}
 
-	logid = datasetcode ^ "*" ^ requestdate ^ "*" ^ requesttime ^ "*" ^ processno;
+	logid = datasetcode ^ "*" ^ requestdate ^ "*" ^ requesttime ^ "*" ^ THREADNO;
 	tt.write(reqlog, logid);
 
 	return;

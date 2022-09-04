@@ -53,7 +53,8 @@ listen:
 
 	}
 	catch (MVError mverror) {
-	    USER4 = mverror.description ^ FM ^ mverror.stack;
+		// Similar code in net.cpp and listen.cpp
+	    USER4 = mverror.description ^ FM ^ backtrace();
 	}
 
 	//unlock all

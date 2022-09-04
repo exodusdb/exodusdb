@@ -68,9 +68,9 @@ const char* longdayofweeks =
 
 namespace exodus {
 
-/**************************
-	time_t_to_pick_dat_time
-**************************/
+/***********************
+time_t_to_pick_date_time
+************************/
 
 // Utility to convert a c time_t structure to pick integer date and time
 
@@ -146,14 +146,33 @@ var var::iconv_D(const char* conversion) const {
 	// should perhaps ONLY implement only ISO8601 which is in xml
 	// yyyy-mm-ddTHH:MM:SS.SSS
 
+	// General pattern is:
+	// JUNK1
+	// (digitgroup | alphagroup)
+	// JUNK2
+	// (digitgroup | alphagroup)
+	// JUNK2
+	// (digitgroup | alphagroup)
+	//
+	// Where JUNK1 is [^A-Za-z0-9]*
+	// Where JUNK2 is [^A-Za-z0-9]+
+	// alphagroup is three letter month JAN-DEC case insensitive and can only appear once
+	// digitgroup is \d{1,2} and can only appear twice if alphagroup exists
+
+	// iconv of two digit years
+	// years 0-49 are assumed to be 2000-2049
+	// years 50-99 are assumed to be 1950-1999
+
+	static auto year_2000 = 2000;
+	static auto year_50 = 50;
+
 	// defaults
 	bool yearfirst = false;
 	bool dayfirst = false;
 
-	// 1st character must be D otherwise no conversion
 	const char* conversionchar = conversion;
-	if (*conversionchar != 'D')
-		return *this;
+//	if (*conversionchar != 'D')
+//		return *this;
 	++conversionchar;
 
 	while (*conversionchar) {
@@ -169,8 +188,8 @@ var var::iconv_D(const char* conversion) const {
 		++conversionchar;
 	}
 
-	const int maxparts = 9;
-	int parts[maxparts];
+	const int maxnparts = 3;
+	int parts[maxnparts];
 	parts[0] = 0;
 	int partn = -1;
 
@@ -183,20 +202,23 @@ var var::iconv_D(const char* conversion) const {
 
 			partn++;
 
-			// fail to convert if too many parts (should be only three really)
-			if (partn >= maxparts)
-				return "";
+			// Get the first digit as an int and skip to the next input byte
+			parts[partn] = (*iter++) - '0';
 
-			parts[partn] = 0;
-
-			do {
+			// Accumulate any additional digits as ints
+			// after multipying prior accumulation by 10
+			while (isdigit(*iter))
 				parts[partn] = (parts[partn] * 10) + ((*iter++) - '0');
-			} while (isdigit(*iter));
 
 			continue;
 		}
 
 		else if (::isalpha(*iter)) {
+
+			// Month letters can only appear once
+			if (month != 0)
+				return "";
+
 			std::string word;
 			do {
 				word.push_back(toupper(*iter++));
@@ -214,6 +236,10 @@ var var::iconv_D(const char* conversion) const {
 
 			continue;
 		}
+
+		// Fail if more than 2 parts if month exists or 3 parts if it doesnt
+		if ((month && partn == 1) || (partn == 2))
+			return "";
 
 		// skip all not alphanumeric characters
 		++iter;
@@ -267,14 +293,14 @@ var var::iconv_D(const char* conversion) const {
 	// TODO provide option to control cutover or base relative to current system year
 	// or refuse anything but four digit years
 	if (year <= 99) {
-		if (year >= 50) {
-			year += 1900;
-			std::cerr << "WARNING: 2 digit year >= 50 being converted to " << year << std::endl;
+		if (year >= year_50) {
+			year += year_2000 - 100;
+			std::cerr << "WARNING: 2 digit year >= " << year_50 << " being converted to " << year << std::endl;
 		} else
-			year += 2000;
+			year += year_2000;
 	}
 
-	// Chekck month
+	// Check month
 	if (month < 1 or month > 12)
 		return "";
 
@@ -286,9 +312,9 @@ var var::iconv_D(const char* conversion) const {
 							31,30,31 //Oct, Nov, Dec
 						};
 
-	// Check day per month
+	// Check max day per month
 	if (day > maxdays_by_month[month - 1] || day < 1) {
-		// Allow an exception for Feb 29 on leap years
+		// Fail if exceed max unless Feb 29 on leap years
 		if (not (day == 29 and month == 2 and hinnant::gregorian::is_leap(year)))
 			return "";
 	}
@@ -321,10 +347,10 @@ var var::oconv_D(const char* conversion) const {
 	// bool leadingzeros=true;
 	char sepchar = ' ';
 
-	// 1st character must be D otherwise no conversion
+	// this function is only called when the 1st character is "D"
 	const char* conversionchar = conversion;
-	if (*conversionchar != 'D')
-		return *this;
+//	if (*conversionchar != 'D')
+//		return *this;
 	++conversionchar;
 
 	// DY means year only unless followed by a separator character

@@ -56,7 +56,7 @@ function main() {
 	SYSTEM(17) = databasecode;
 
 	//process no
-	SYSTEM(24) = PROCESSNO;
+	SYSTEM(24) = THREADNO;
 
 	//system mode
 	SYSTEM(33, 1) = "1";

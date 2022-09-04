@@ -10,7 +10,7 @@ function main()
 
 	{
 		assert(oconv(1234.56, "MD0").outputl() eq "1235");
-		assert(oconv(1234, "MD0").outputl() eq "1234");
+		assert(oconv(1234, "MD0").outputl("1234,MD0=") eq "1234");
 
 		assert(var(123.45).oconv("MD20P<").outputl() eq "123.45");
 		assert(var(123.45).oconv("MD20P-").outputl() eq "123.45 ");

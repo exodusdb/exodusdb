@@ -194,19 +194,32 @@ function main()
 	assert(s2 eq "1");
 */
 
-	var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
-	assert(seps.lower() == _FM_ _VM_ _SM_ _TM_ _STM_);
-	assert(seps.lower().raise() == seps);
+	{
+		var x;
+		x.unassigned("zxc");
+		assert(x eq "zxc");
+	}
 
-	seps = _FM_ _VM_ _SM_ _TM_ _STM_;
-	assert(seps.raise() == _RM_ _FM_ _VM_ _SM_ _TM_);
-	assert(seps.raise().lower() == seps);
+	{
+		var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
+		assert(lower(seps) eq _FM_ _VM_ _SM_ _TM_ _STM_);
+		assert(lower(seps).raise() eq seps);
 
-	s1="1";
-	s2="2";
-	assert(transfer(s1,s2) eq "1");
-	assert(s1 eq "");
-	assert(s2 eq "1");
+		seps = _FM_ _VM_ _SM_ _TM_ _STM_;
+		assert(raise(seps) eq _RM_ _FM_ _VM_ _SM_ _TM_);
+		assert(raise(seps).lower() eq seps);
+	}
+
+	{
+		var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
+		var x = seps; lowerer(x); assert(x eq _FM_ _VM_ _SM_ _TM_ _STM_);
+		assert(raiser(x) eq seps);
+
+		seps = _FM_ _VM_ _SM_ _TM_ _STM_;
+		x=seps; raiser(x); assert(x eq _RM_ _FM_ _VM_ _SM_ _TM_);
+		lowerer(x); assert(x eq seps);
+
+	}
 
 	//replacing a section of a string:
 	//given start character number, number of characters to replace and a replacement string
@@ -221,7 +234,7 @@ function main()
 
 	//replacing a section of a string - method 2
 	a="abcde";
-	a.splicer(-2,-3,"xx");
+	splicer(a,-2,-3,"xx");
 	assert(a eq "axxe");
 
 	//replacing a section of a string - method 3 - but may be slower
@@ -338,60 +351,33 @@ function main()
 	assert(str1.trimmer(" ","FB") eq "xxx  xxx");
 	assert(str1 ne str0);
 
+	{
+		assert(trim("XYZabcXYZdefXYZ","XYZ").outputl() eq "abcZdef");
+		var x = "XYZabcXYZdefXYZ";
+		trimmer(x,"XYZ");
+		assert(x eq "abcZdef");
+	}
+
+	{
+		assert(trimf("XYZabcXYZdefXYZ","XYZ").outputl() eq "abcXYZdefXYZ");
+		var x = "XYZabcXYZdefXYZ";
+		trimmerf(x,"XYZ");
+		assert(x eq "abcXYZdefXYZ");
+	}
+
+	{
+		assert(trimb("XYZabcXYZdefXYZ","XYZ").outputl() eq "XYZabcXYZdef");
+		var x = "XYZabcXYZdefXYZ";
+		trimmerb(x,"XYZ");
+		assert(x eq "XYZabcXYZdef");
+	}
+
 	//test daisychaining assignments NOT ALLOWED - TO PREVENT = being used instead of == by mistake in if() clauses
 	//var aa1,aa2,aa3,aa4;
 	//aa1=aa2=aa3="aa";
 	//assert(aa1 eq "aa");
 	//assert(aa2 eq "aa");
 	//assert(aa3 eq "aa");
-
-	{
-		//string seed
-		initrnd("cccc");
-		var r1 =rnd(1'000'000'000);
-		//test reseed
-		initrnd("cccc");
-		assert(rnd(1'000'000'000) eq r1);
-
-		//slightly different string seed
-		initrnd("cccd");
-		assert(rnd(1'000'000'000) ne r1);
-
-		//slightly different max int
-		initrnd("cccd");
-		assert(rnd(1'000'000'001) ne r1);
-
-	}
-
-	{
-		//int seed
-		initrnd(123456);
-		var r1 =rnd(1'000'000'000);
-
-		//test reseed is the same
-		initrnd(123456);
-		assert(rnd(1'000'000'000)==r1);
-
-		//test reseed with string of int is the same
-		initrnd("123456");
-		assert(rnd(1'000'000'000)==r1);
-
-		//test reseed with double of int is the same
-		initrnd(123456.4);
-		assert(rnd(1'000'000'000)==r1);
-
-		//test reseed with double of int is the same
-		initrnd(123456.6);
-		assert(rnd(1'000'000'000)==r1);
-
-		//slightly different seed
-		initrnd(123457);
-		assert(rnd(1'000'000'000) ne r1);
-
-		//slightly different max int DOESNT CHANGE RESULT!
-		//initrnd(123456);
-		//assert(rnd(1'000'000'001) ne r1);
-	}
 
 	var tempinp;
 //	input("Press Enter ...",tempinp);
@@ -408,260 +394,154 @@ function main()
 	var nonexistentfile=OSSLASH^"129834192784";
 	assert(!osopen(nonexistentfile,nonexistentfile));
 
-	//math.h seems to have been included in one of the boost or other special headers
-	//in this main.cpp file and that causes confusion between math.h and exodus.h sin() and other functions.
-	//we resolved the issue here by being specific about the namespace
-	assert( exodus::sin(30).round(8) eq 0.5);
-	assert( exodus::cos(60).round(8) eq 0.5);
-	assert( exodus::tan(45).round(8) eq 1);
-	assert( exodus::atan(1).round(6) eq 45);
-
-	assert( exodus::abs(0)    eq 0);
-	assert( exodus::abs(30)   eq 30);
-	assert( exodus::abs(30.00) eq 30);
-	assert( exodus::abs(30.10) eq 30.1);
-	assert( exodus::abs(30.90) eq 30.9);
-
-	assert( exodus::abs(-0)    eq 0);
-	assert( exodus::abs(-30)   eq 30);
-	assert( exodus::abs(-30.00) eq 30);
-	assert( exodus::abs(-30.10) eq 30.1);
-	assert( exodus::abs(-30.90) eq 30.9);
-
-	assert( exodus::exp(1).round(9) eq 2.718281828);
-	assert( exodus::loge(1) eq 0);
-	assert( exodus::loge(2.718281828).round(9) eq 1);
-	assert( exodus::loge(10).round(9) eq 2.302585093);
-	assert( exodus::sqrt(100) eq 10);
-
 	var xx=osshellread("dir");
+
 	//xx.osread(xx);
-	/*
-	var inpz=input();
 
-	var inpx;
-	input(inpx);
+	var eof1 = var().eof();
 
-	var inpy;
-	input("prompt",inpy);
+	if (isterminal()) {
 
-	var inpq;
-	inputn(inpq,5);
-	*/
+		printl("We have a terminal. CANNOT check that input fails");
+
+		// Can change echo if is terminal
+		assert(echo(false));
+		assert(echo(true));
+
+		assert(getcursor() eq AT(0,0));
+		setcursor("");
+
+	}
+	else {
+		printl("We dont have a terminal. CAN check that input fails");
+
+		// 1. No prompt - free function
+		var inpz=input();
+		//assert(not inpz);
+
+		// 2. Prompt -  member function
+		var inpx;
+		assert(not inpx.input("prompt1"));
+		printl();
+
+		// 3. Prompt - free function
+		var inpy;
+		assert(not input("prompt2"));
+		printl();
+
+		// 4. nchars - free function
+		var inpq;
+		assert(not inputn(5));
+		printl();
+
+		// 5. std::cin
+		var cin_v1;
+		//assert(not std::cin >> cin_v1);
+		//var ok = std::cin >> cin_v1;
+		//assert(not ok);
+		//bool ok = std::cin >> cin_v1;
+		//assert(not ok);
+		printl("testing std::cin >> cin_v1; - press enter if hung");
+		osflush();
+		std::cin >> cin_v1;
+
+		// get some coverage but not really testing
+		assert(not inputn(-1));
+		assert(not hasinput());
+
+		// Cannot change echo if no terminal
+		assert(not echo(true));
+
+	}
 
 	ossetenv("XYZ","abc");
 	assert(osgetenv("XYZ") == "abc");
 
-	var dividend=100;
-	TRACE(mod(dividend,30));
-	assert(mod(dividend,30) eq 10);
-
-	assert(mod(-4,3)==2);
-	assert(mod(-3,3)==0);
-	assert(mod(-2,3)==1);
-	assert(mod(-1,3)==2);
-	assert(mod(-0,3)==0);
-	assert(mod(0,3)==0);
-	assert(mod(1,3)==1);
-	assert(mod(2,3)==2);
-	assert(mod(3,3)==0);
-	assert(mod(4,3)==1);
-
-	assert(mod(-4.0,3)==2);
-	assert(mod(-3.0,3)==0);
-	assert(mod(-2.0,3)==1);
-	assert(mod(-1.0,3)==2);
-	assert(mod(-0.0,3)==0);
-	assert(mod(0.0,3)==0);
-	assert(mod(1.0,3)==1);
-	assert(mod(2.0,3)==2);
-	assert(mod(3.0,3)==0);
-	assert(mod(4.0,3)==1);
-
-	assert(mod(-4.0,3.0)==2);
-	assert(mod(-3.0,3.0)==0);
-	assert(mod(-2.0,3.0)==1);
-	assert(mod(-1.0,3.0)==2);
-	assert(mod(-0.0,3.0)==0);
-	assert(mod(0.0,3.0)==0);
-	assert(mod(1.0,3.0)==1);
-	assert(mod(2.0,3.0)==2);
-	assert(mod(3.0,3.0)==0);
-	assert(mod(4.0,3.0)==1);
-
-	assert(mod(-4,3.0)==2);
-	assert(mod(-3,3.0)==0);
-	assert(mod(-2,3.0)==1);
-	assert(mod(-1,3.0)==2);
-	assert(mod(-0,3.0)==0);
-	assert(mod(0,3.0)==0);
-	assert(mod(1,3.0)==1);
-	assert(mod(2,3.0)==2);
-	assert(mod(3,3.0)==0);
-	assert(mod(4,3.0)==1);
-
-	//negative dividend
-/*
-	assert(mod(-4,-3)==-1);
-	assert(mod(-3,-3)==0);
-	assert(mod(-2,-3)==-2);
-	assert(mod(-1,-3)==-1);
-	assert(mod(-0,-3)==0);
-	assert(mod(0,-3)==0);
-	TRACE(mod(1,-3));
-	assert(mod(1,-3)==-2);
-	assert(mod(2,-3)==-1);
-	assert(mod(3,-3)==0);
-	assert(mod(4,-3)==-2);
-*/
-	assert(mod(-4.0,-3.0)==-1);
-	assert(mod(-3.0,-3.0)==0);
-	assert(mod(-2.0,-3.0)==-2);
-	assert(mod(-1.0,-3.0)==-1);
-	assert(mod(-0.0,-3.0)==0);
-	assert(mod(0.0,-3.0)==0);
-	TRACE(mod(1.0,-3.0));
-	TRACE(fmod(1.0,-3.0));
-	TRACE(1 % -3)
-	TRACE(-1 % 3)
-	assert(mod(1.0,-3.0)==-2);
-	assert(mod(2.0,-3.0)==-1);
-	assert(mod(3.0,-3.0)==0);
-	assert(mod(4.0,-3.0)==-2);
-
-	//check floating point modulo
-	TRACE(mod(2.3,var(1.499)).round(3));
-	assert(mod(2.3,var(1.499)).round(3) eq 0.801);
-	TRACE(mod(-2.3,var(-1.499)).round(3));
-	assert(mod(-2.3,var(-1.499)).round(3) eq -0.801);
-	TRACE(mod(-2.3,var(1.499)).round(3));
-	assert(mod(-2.3,var(1.499)).round(3) eq 0.698);
-	TRACE(mod(2.3,var(-1.499)).round(3));
-	assert(mod(2.3,var(-1.499)).round(3) eq -0.698);
-
 	assert(oconv(1234,"MD20P") eq "1234.00");
-	assert(var(10000).oconv("DY0") eq "");
 
 	assert(var("a")<var("B"));
-	assert(var(1000).oconv("MD80") eq "1000.00000000");
-	assert(var("31 JAN 2008").iconv("D") eq "14641");
-
-	assert(var("1/31/2008").iconv("D") eq 14641);
-	assert(var("2008/1/31").iconv("DS") eq "14641");
-
-	assert(var("JAN/31/2008").iconv("D") eq "14641");
-	assert(var("2008/JAN/31").iconv("DS") eq "14641");
-
-	assert(var("1/1/92").iconv("D/E") eq "8767");
-
-	assert(var("1/1/68").iconv("D/E") eq "1");
-	assert(var("31/12/67").iconv("D/E") eq "0");
-	assert(var("30/12/67").iconv("D/E") eq "-1");
-	assert(var("1/1/1900").iconv("D/E") eq "-24835");
-
-	assert(var("31/1/2008").iconv("DE") eq "14641");
-	assert(var("31/1/2008").iconv("D/E") eq "14641");
-	assert(var("31 1 2008").iconv("DE") eq "14641");
-	assert(var("31-1-2008").iconv("DE") eq "14641");
-	assert(var("31/JAN/2008").iconv("DE") eq "14641");
-	assert(var("JAN/31/2008").iconv("DE") eq "14641");
-
-	assert(var("29 FEB 1900").iconv("D") eq "");               //centuries not divisible by 400 are not leap years
-	assert(var("29 FEB 2000").iconv("D").outputl() eq "11748");//centuries divisible by 400 are leap years
-	assert(var("29 FEB 2008").iconv("D") eq "14670");          //years divisible by 4 are leap years
-	assert(var("29 FEB 2009").iconv("D") eq "");               // years not divisible 4 are leap years
-
-	assert(var("30 FEB 1900").iconv("D") eq "");
-	assert(var("30 FEB 2000").iconv("D") eq "");
-	assert(var("30 FEB 2008").iconv("D") eq "");
-	assert(var("30 FEB 2009").iconv("D") eq "");
-
-	assert(var("31 FEB 1900").iconv("D") eq "");
-	assert(var("31 FEB 2000").iconv("D") eq "");
-	assert(var("31 FEB 2008").iconv("D") eq "");
-	assert(var("31 FEB 2009").iconv("D") eq "");
-
-	assert(var("32 JAN 1900").iconv("D") eq "");
-	assert(var("32 JAN 2000").iconv("D") eq "");
-	assert(var("32 JAN 2008").iconv("D") eq "");
-	assert(var("32 JAN 2009").iconv("D") eq "");
-
-	// Check which months have 31 and which do not
-	assert(var("31-01-2000").iconv("DE").outputl() eq "11719");
-	assert(var("31-02-2000").iconv("DE").outputl() eq "");
-	assert(var("31-03-2000").iconv("DE").outputl() eq "11779");
-	assert(var("31-04-2000").iconv("DE").outputl() eq "");
-	assert(var("31-05-2000").iconv("DE").outputl() eq "11840");
-	assert(var("31-06-2000").iconv("DE").outputl() eq "");
-	assert(var("31-07-2000").iconv("DE").outputl() eq "11901");
-	assert(var("31-08-2000").iconv("DE").outputl() eq "11932");
-	assert(var("31-09-2000").iconv("DE").outputl() eq "");
-	assert(var("31-10-2000").iconv("DE").outputl() eq "11993");
-	assert(var("31-11-2000").iconv("DE").outputl() eq "");
-	assert(var("31-12-2000").iconv("DE").outputl() eq "12054");
-
-	assert(var("32/1/2008").iconv("DE") eq "");
-	assert(var("30/2/2008").iconv("DE") eq "");
-	assert(var("1/31/2008").iconv("DE") eq "");
-
-	//check uses yyyy-mm-dd format if data starts with four digit year
-	assert(iconv("2000-12-31","DE") == 12054);
-
-	assert(oconv(15036, "D")     == "01 MAR 2009");
-	assert(oconv(15036, "D2")    == "01 MAR 09");
-	assert(oconv(15036, "D4")    == "01 MAR 2009");
-
-	assert(oconv(15036, "D/")    == "03/01/2009");
-	assert(oconv(15036, "D2/")   == "03/01/09");
-	assert(oconv(15036, "D*")    == "03*01*2009");
-
-	assert(oconv(15036, "D/E")   == "01/03/2009");
-	assert(oconv(15036, "D2E")   == "01 MAR 09");
-	assert(oconv(15036, "D2/E")  == "01/03/09");
-
-	assert(oconv(15036, "DQ")   == "1");
-	assert(oconv(15036, "DW")   == "7");
-	assert(oconv(15036, "DWA")  == "SUNDAY");
 
 	//select("select test_alphanum with f1 between 20 and 21");
 	assert(oconv(10.1,"MD20") == "10.10");
 
-	/*
-	var alphanum1="Flat 10a";
-	var alphanum2="Flat 2b";
-	//Flat 2b is before Flat 10a
-	assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+	{
+		printl("Investigate the bytes of a double in hex for naturalorder");
+		double d2=1;
+		double d3=2;
+		if (d2<d3)
+			d2=d3;
+		union {double d1; char chars[8];};
+		for (d1=-5;d1<=5;++d1) {
+			print("Decimal ", d1, "= ");
+			for (unsigned int partn=0;partn<sizeof(chars);++partn) {
+				//var(chars[partn]).oconv("HEX").output();
+				//std::cout << std::hex << static_cast<unsigned int>(chars[partn]) << " " ;
+				print(oconv(chars[partn],"HEX"),"" );
+			}
+			printl();
+		}
+	}
 
-	alphanum1="Part A-10";
-	alphanum2="Part A-2";
-	//Part A-2 is before Part A-10
-	assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+	{
+		var alphanum1="Flat 10a";
+		var alphanum2="Flat 2b";
+		//Flat 2b is before Flat 10a
+		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
 
-	alphanum1="Part -10";
-	alphanum2="Part -2";
-	//Part -10 is before Part -2
-	assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		alphanum1="Part A-10";
+		alphanum2="Part A-2";
+		//Part A-2 is before Part A-10
+		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
 
-	alphanum1="-10";
-	alphanum2="-2";
-	//-10 is before -2
-	assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		alphanum1="Part -10";
+		alphanum2="Part -2";
+		//Part -10 is before Part -2
+		assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
 
-	alphanum1="-1.11";
-	alphanum2="-1.2";
-	//-1.2 is before -1.11
-	assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		alphanum1="-10";
+		alphanum2="-2";
+		//-10 is before -2
+		assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
 
-	alphanum1="01.10";
-	alphanum2="1.1";
-	//01.10 is equal to 1.1
-	assert(naturalorder(alphanum1.toString()) = naturalorder(alphanum2.toString()));
+		alphanum1="-1.11";
+		alphanum2="-1.2";
+		//-1.2 is before -1.11
+		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
 
-	alphanum1="A B C..C+";
-	alphanum2="A B C.C";
-	//A B C..C+ is before A B C.C
-	assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
-*/
+		alphanum1="01.10";
+		alphanum2="1.1";
+		//01.10 is equal to 1.1
+		assert(naturalorder(alphanum1.toString()) == naturalorder(alphanum2.toString()));
+
+		alphanum1="A B C..C+";
+		alphanum2="A B C.C";
+		//A B C..C+ is before A B C.C
+		assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+	}
+
+	{
+		//numbers in quotes?
+		var alphanum1="'2'";
+		var alphanum2="'10bbb22";
+		printl(naturalorder(alphanum1));
+		printl(naturalorder(alphanum2));
+		printl(oconv(naturalorder(alphanum1), "HEX"));
+		printl(oconv(naturalorder(alphanum2), "HEX"));
+//		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+	}
+
+	{
+		assert(naturalorder("10a") > naturalorder("2b"));
+
+		var sortable = naturalorder("-2 +2 -2.0 +2.0 -10 +10 -10.0 +10.0");
+		TRACE(sortable)
+		assert(sortable == "4000000000000009c000000000000004000000000000009c000000000000003fdc000000000009c024000000000003fdc000000000009c02400000000000");
+
+		assert(naturalorder("") eq "");
+		assert(var(naturalorder(" ")).dump() eq " ");
+		assert(var(naturalorder(" abc ")).dump() eq " abc ");
+
+	}
 
 	/*
 	for (double xx=-5;xx<=5;++xx)
@@ -674,22 +554,6 @@ function main()
 		cout<<xx<<" "<<ostringstream1.str()<<endl;
 	}
 	stop();
-	*/
-
-	//investigate the bytes of a double in hex for natural sort
-	/*
-	double d2=1;
-	double d3=2;
-	if (d2<d3)
-		d2=d3;
-	union {double d1; char chars[8];};
-	for (d1=-5;d1<=5;++d1) {
-		print(d1," ");
-		for (unsigned int partn=0;partn<sizeof(chars);++partn)
-			//var(chars[partn]).oconv("HEX").output();
-			std::cout << std::hex << int(chars[partn]) << " " ;
-		printl();
-	}
 	*/
 
 	//var steve;steve.input(1);
@@ -763,15 +627,11 @@ function main()
 	assert(oconv("ab","C#5") eq " ab  ");
 	assert(oconv("ab","C(0)#5") eq "0ab00");
 
-	assert(iconv("23 59 59","MT") eq 86399);
-	assert(iconv("xx11yy12zz13P","MT") eq 83533);
-	assert(iconv("24 00 00","MT") eq "");
-
 	assert(oconv("12345","L#6")                 eq "12345 ");
 	assert(oconv("12345","R(*)#8")              eq "***12345");
 	assert(oconv("ABCDEFG","R#4")               eq "DEFG");
 	assert(oconv("ABCD","C#6")                  eq " ABCD ");
-	assert(oconv(6666,"D2-")                    eq "04-01-86");
+
 	// Pending implementation of masking
 	//assert(oconv("1234567890","L(###)###-####") eq "(123)456-7890");
 
@@ -793,7 +653,6 @@ function main()
 	//anything invalid returns empty string
 	assert(var("XF").iconv("HEX").oconv("HEX") eq "");
 
-	var time1=var("10:10:10").iconv("MT");
 	assert(var("abcabdef").trim("abef") eq "cbd");
 	assert(var("abcabdef").trimf("abef").trimb("abef") eq "cabd");
 
@@ -830,7 +689,7 @@ function main()
 		error.description.outputl();
 	}
 */
-	assert(oconv(0,"D4") eq "31 DEC 1967");
+
 	assert(oconv("xxx","") eq "xxx");
 
 	assert(oconv("","MX") eq "");
@@ -844,350 +703,7 @@ function main()
 	assert(oconv("1.5","MX") eq "2");
 	assert(oconv("20" _FM_ "255","MX") eq ("14" _FM_ "FF"));
 
-	assert(oconv("","D") eq "");
-	assert(oconv("X","D") eq "X");
-	assert(oconv("-1.5","D") eq "29 DEC 1967");
-	assert(oconv("1.5","D") eq "01 JAN 1968");
-	assert(oconv("1.5" _FM_ "-1.5","D") eq ("01 JAN 1968" _FM_ "29 DEC 1967"));
 
-	assert(oconv(14276,"D").outputl() eq "31 JAN 2007");
-	assert(oconv(14276,"D2").outputl() eq "31 JAN 07");
-	assert(oconv(14276,"D4").outputl() eq "31 JAN 2007");
-	assert(oconv(14276,"D/").outputl() eq "01/31/2007");
-	assert(oconv(14276,"D ").outputl() eq "01 31 2007");
-	assert(oconv(14276,"D2/").outputl() eq "01/31/07");
-	assert(oconv(14276,"D2-").outputl() eq "01-31-07");
-	assert(oconv(14276,"D/").outputl() eq "01/31/2007");
-	assert(oconv(14276,"D/E").outputl() eq "31/01/2007");
-	assert(oconv(14276,"D2 E").outputl() eq "31 01 07");
-	assert(oconv(14276,"D S").outputl() eq "2007 01 31");
-	assert(oconv(14276,"DM").outputl() eq "1");
-	assert(oconv(14276,"DMA").outputl() eq "JANUARY");
-	assert(oconv(14276,"DW").outputl() eq "3");
-	assert(oconv(14276,"DWA").outputl() eq "WEDNESDAY");
-	assert(oconv(14276,"DY").outputl() eq "2007");
-	assert(oconv(14276,"DY2").outputl() eq "07");
-	assert(oconv(14276,"D2Y").outputl() eq "07 JAN 31");
-	assert(oconv(14276,"D5Y").outputl() eq "02007 JAN 31");
-	assert(oconv(14276,"DD").outputl() eq "31");
-	assert(oconv(14276,"DL").outputl() eq "31");
-	assert(oconv(14276,"DQ").outputl() eq "1");
-	assert(oconv(14276,"DJ").outputl() eq "31");
-
-	var feb29_2004=13209;//iconv("29 FEB 2004","D");
-	assert(oconv(feb29_2004,"DL") eq "29");
-
-	//check does multivalues
-	assert(oconv("14591" _VM_ _VM_ "14592", "D") eq "12 DEC 2007" _VM_ _VM_ "13 DEC 2007");
-	assert(oconv("14591" _FM_ _VM_ "14592", "D") eq "12 DEC 2007" _FM_ _VM_ "13 DEC 2007");
-
-	assert(oconv(14591,"D") eq "12 DEC 2007");
-	assert(oconv(14591,"D2/") eq "12/12/07");
-	assert(oconv(14591,"D2-") eq "12-12-07");
-	assert(oconv(14591,"D-") eq "12-12-2007");
-	assert(oconv(14591,"D2-") eq "12-12-07");
-	assert(oconv(14591,"DJ") eq "346");
-	assert(oconv(14591,"DM") eq "12");
-	assert(oconv(14591,"DMA") eq "DECEMBER");
-	assert(oconv(14591,"DW") eq "3");
-	assert(oconv(14591,"DWA") eq "WEDNESDAY");
-	assert(oconv(14591,"DY") eq "2007");
-	assert(oconv(14591,"DQ") eq "4");
-	assert(oconv(14591,"DD") eq "12");
-	assert(oconv(14591,"DL") eq "31");
-
-	//check times around noon and midnight round trip ok
-	for (const var ii : range(0, 61)) {
-		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
-	}
-	for (const var ii : range(43200-61, 43200+61)) {
-		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
-	}
-
-	//check oconv does multivalues
-	assert(var("60" _RM_ "120").oconv("MT")=="00:01" _RM_ "00:02");
-	assert(var("60" _FM_ "120").oconv("MT")=="00:01" _FM_ "00:02");
-	assert(var("60" _VM_ "120").oconv("MT")=="00:01" _VM_ "00:02");
-	assert(var("60" _SM_ "120").oconv("MT")=="00:01" _SM_ "00:02");
-	assert(var("60" _TM_ "120").oconv("MT")=="00:01" _TM_ "00:02");
-	assert(var("60" _STM_ "120").oconv("MT")=="00:01" _STM_ "00:02");
-
-	//test that some random times iconv/oconv roundtrip ok
-	initrnd(1000);
-	var timex;
-	for (int ii = 1; ii <= 1000; ++ii) {
-		timex=rnd(18600);
-//		timex.oconv("MTHS").output(" ").iconv("MTHS").outputl(" ");
-		assert(timex.oconv("MTHS").iconv("MTHS") eq timex);
-	}
-
-	//oconv(46622,"MTH").outputl("oconv 46622 MTH is" );
-	assert(oconv(46622,"MTH") eq "12:57PM");
-
-	assert(oconv(31653,"MT") eq "08:47");
-	assert(oconv(63306,"MT") eq "17:35");
-
-	assert(oconv(0,"MTH") eq "12:00AM");
-	assert(oconv(31653,"MT") eq "08:47");
-	assert(oconv(63306,"MTH") eq "05:35PM");
-	assert(oconv(31653,"MTS") eq "08:47:33");
-	assert(oconv(63306,"MTS") eq "17:35:06");
-	assert(oconv(63306,"MTHS") eq "05:35:06PM");
-	assert(oconv(63306,"MTS") eq "17:35:06");
-	assert(oconv(63306,"MTS.") eq "17.35.06");
-	assert(oconv(63306,"MTh") eq "17h35");
-
-	assert(oconv(61201,"MT") eq "17:00");
-	assert(oconv(61201,"MTS") eq "17:00:01");
-	assert(oconv(61201,"MTH") eq "05:00PM");
-	assert(oconv(61201,"MTHS") eq "05:00:01PM");
-
-	var time2=43261;
-	assert(time2.oconv("MT").outputl() eq "12:01");
-	assert(time2.oconv("MTH").outputl() eq "12:01PM");
-	assert(time2.oconv("MTS").outputl() eq "12:01:01");
-	//assert(time2.oconv("MTSH").outputl() eq "12H01H01");
-	assert(time2.oconv("MTSH").outputl() eq "12:01:01PM");
-	assert(time2.oconv("MTx") eq "12x01");
-	assert(time2.oconv("MTHx") eq "12x01PM");
-	assert(time2.oconv("MTSx") eq "12x01x01");
-	//assert(time2.oconv("MTSHx") eq "1201H01");
-	assert(time2.oconv("MTSHx") eq "12x01x01PM");
-
-	time2=0;
-	assert(time2.oconv("MT").outputl() eq "00:00");
-	assert(time2.oconv("MTH").outputl() eq "12:00AM");
-	assert(time2.oconv("MTS").outputl() eq "00:00:00");
-	assert(time2.oconv("MTHS").outputl() eq "12:00:00AM");
-
-	//negative time
-	time2=-1;
-	assert(time2.oconv("MT").outputl() eq "23:59");
-	assert(time2.oconv("MTH").outputl() eq "11:59PM");
-	assert(time2.oconv("MTS").outputl() eq "23:59:59");
-	assert(time2.oconv("MTHS").outputl() eq "11:59:59PM");
-	time2=-86400/2;
-	assert(time2.oconv("MT").outputl() eq "12:00");
-	assert(time2.oconv("MTH").outputl() eq "12:00PM");
-	assert(time2.oconv("MTS").outputl() eq "12:00:00");
-	assert(time2.oconv("MTHS").outputl() eq "12:00:00PM");
-	time2=-86400-1;
-	assert(time2.oconv("MT").outputl() eq "23:59");
-
-	//test some unlimited time
-	assert(var(-100).oconv("MTU").outputl() eq "-00:01");
-	assert(var(-100).oconv("MTUS").outputl() eq "-00:01:40");
-	assert(var(-10000).oconv("MTUS").outputl() eq "-02:46:40");
-
-	assert(var(100).oconv("MTU").outputl() eq "00:01");
-	assert(var(100).oconv("MTUS").outputl() eq "00:01:40");
-	assert(var(1000).oconv("MTUS").outputl() eq "00:16:40");
-	assert(var(10000).oconv("MTUS").outputl() eq "02:46:40");
-	//NB 27:46:40 NOT ROUNDED UP TO 27:47 because mins like on clock
-	assert(var(100000).oconv("MTU").outputl() eq "27:46");
-	assert(var(100000).oconv("MTUS").outputl() eq "27:46:40");
-
-    //wrap around next midnight is 00:00
-    assert(var(86400).oconv("MTS").outputl() eq "00:00:00");
-
-    //wrap around 24 hours * 2 -> 00:00
-    assert(var(86400*2).oconv("MTS").outputl() eq "00:00:00");
-
-    //U = Unlimited hours
-    assert(var(86400*2).oconv("MTUS").outputl() eq "48:00:00");
-    assert(var(86400*100).oconv("MTUS").outputl() eq "2400:00:00");
-
-	//test some decimal hours based time
-	assert(var(0).oconv("MT2").outputl() eq "00:00");
-	assert(var(0).oconv("MT2S").outputl() eq "00:00:00");
-	assert(var(0.25).oconv("MT2").outputl() eq "00:15");
-	assert(var(0.25).oconv("MT2S").outputl() eq "00:15:00");
-	assert(var(24).oconv("MT2S").outputl() eq "00:00:00");
-	assert(var(25).oconv("MT2S").outputl() eq "01:00:00");
-	assert(var(-25).oconv("MT2S").outputl() eq "23:00:00");
-
-	//test some UNLIMITED decimal hours based time
-	//NB negative unlimited time is symmetrical (unlike normal time_
-	//negative time could be useful to refer to previous dates
-	//but in a non-symmetrical fashion ie -1 means one second back into yesterday
-	//ie 23:59:59 ... not -00:00:01. negative hours could perhaps be used
-	//to credit hours in some imaginary volumetric numerical fashion
-	//The "symmetric" feature should perhaps be a SEPARATE option
-	//instead of being tied to the U unlimited option
-	assert(var(.01).oconv("MT2US").outputl() eq "00:00:36");
-	assert(var(-.01).oconv("MT2US").outputl() eq "-00:00:36");
-	assert(var(.25).oconv("MT2US").outputl() eq "00:15:00");
-	assert(var(-.25).oconv("MT2US").outputl() eq "-00:15:00");
-	assert(var(25).oconv("MT2US").outputl() eq "25:00:00");
-	assert(var(-25).oconv("MT2US").outputl() eq "-25:00:00");
-	assert(var(125.25).oconv("MT2US").outputl() eq "125:15:00");
-	printl(var(-125.25).oconv("MT2US"));
-	assert(var(-125.25).oconv("MT2US").outputl() eq "-125:15:00");
-	assert(var(9).oconv("MT2US").outputl() eq "09:00:00");
-	assert(var(-9).oconv("MT2US").outputl() eq "-09:00:00");
-
-//	assert(oconv(_FM_ "\x0035","HEX4") eq "00FE0035");
-	//assert(oconv(_FM_ "\x0035","HEX4") eq "07FE0035");
-	//assert(oconv(FM,"HEX4") eq "07FE");
-
-	assert(oconv(43260,"MT")    == "12:01");
-	assert(oconv(43260,"MTH")   == "12:01PM");
-	assert(oconv(43260,"MTS")   == "12:01:00");
-	assert(oconv(43260,"MTHS")  == "12:01:00PM");
-	assert(oconv(61200,"MT")    == "17:00");
-	assert(oconv(61200,"MTHS,") == "05,00,00PM");
-
-	//test copying files forced overwrite)
-    osmkdir("d1/d1");
-    oswrite("f1","d1/f1");
-    oswrite("f2","d1/f2");
-    oscopy("d1/f1","d1/f2");
-    var data;
-    osread(data,"d1/f2");
-    printl(data=="f1");
-
-	//test copying directories (recursive)
-    oswrite("f1","d1/d1/f1");
-    oscopy("d1","d2");
-    osread(data,"d2/d1/f1");
-    assert(data=="f1");
-
-    //cannot copy a directory to a file
-    assert(oscopy("d1","d2/d1/f1")==0);
-
-    osrmdir("d1",true);
-    osrmdir("d2",true);
-
-	osmkdir("test_main.1");
-	osmkdir("test_main.2");
-
-	if (not SLASH_IS_BACKSLASH) {
-
-		//TRACE: dir1=".gitignore^a.out^alloc_traits.h.gcov^allocator.h.gcov^basic_string.h.gcov^basic_string.tcc.gcov^calblur8.html^char_traits.h.gcov^cmake_install.cmake^CMakeCache.txt^CMakeFiles^CMakeLists.txt^cpp_type_traits.h.gcov^CTestTestfile.cmake^DartConfiguration.tcl^exodusfuncs.h.gcov^exprtk.cpp^genregress2.cpp^gthr-default.h.gcov^hashtable_policy.h.gcov^hashtable.h.gcov^iomanip.gcov^ios_base.h.gcov^Makefile^move.h.gcov^mv.h.gcov^new_allocator.h.gcov^p4.cpp^ptr_traits.h.gcov^simple_decimal_conversion.h.gcov^std_mutex.h.gcov^stl_algobase.h.gcov^stl_iterator_base_funcs.h.gcov^stl_iterator_base_types.h.gcov^string_conversions.h.gcov^t_calblur8utf8.html^t_codep.bin^t_cp_allo.txt^t_cp_allo4.txt^t_EN_RU_UA.txt^t_GreekEnglFile.txt^t_GreekLocalFile.txt^t_GreekUTF-8File.txt^t_temp1234.txt^t_temp5.txt^t_test_MIXTURE.txt^t_test_OUTPUT_1251.txt^t_test_OUTPUT_UTF8.txt^t_utf-8-test.txt^t_utf8copy.html^t_utf8utf8.html^t_x.txt^test_asyncupd^test_asyncupd.cpp^test_comp^test_comp.cpp^test_db^test_db.cpp^test_dict^test_dict.cpp^test_dim^test_dim.cpp^test_isnum^test_isnum.cpp^test_main^test_main.1^test_main.2^test_main.cpp^test_main.out^test_math^test_math.cpp^test_mod^test_more^test_more.cpp^test_multilang^test_multilang.cpp^test_mvfuncs^test_mvfuncs.cpp^test_mvmv^test_mvmv.cpp^test_numfmt^test_numfmt.cpp^test_osopen^test_osopen.cpp^test_precision^test_precision.cpp^test_regress^test_regress.cpp^test_select^test_select.cpp^test_sort^test_sort.cpp^test_sortarray^test_sortarray.cpp^test_zzzclean^test_zzzclean.cpp^Testing^tests^type_traits.gcov^type_traits.h.gcov^unordered_map.h.gcov^utf-8-test.txt^utf8.html^x^y^z"
-
-		//unordered files and directories
-		var dir1 = oslist("*").sort();
-		var dir2 = osshellread("ls . -AU1").convert("\n\r", _FM_).trim(_FM_).sort();
-		//TRACE(dir1)
-		//TRACE(dir2)
-		assert(dir1 eq dir2);
-
-		//unordered directories
-		var dirs = oslistd("*").sort();
-		//TRACE(dirs)
-		assert(dir1 ne dirs);
-
-		//unordered files
-		var files = oslistf("*").sort();
-		//TRACE(files)
-		assert(dir1 ne files);
-
-		//check oslist = oslistd ^ oslistf (both sorted)
-		dir2 = (dirs ^ FM ^ files).sort();
-		assert(dir1 eq dir2);
-
-		// ls xxx*.yyy returns a sorted list regardless of the -U unordered option
-		dir1 = oslist("test_*.cpp").sort();
-		dir2 = osshellread("ls test_*.cpp -AU1").convert("\n\r", _FM_ ).trim(_FM_).sort();
-		//TRACE(dir1)
-		//TRACE(dir2)
-		assert(dir1 eq dir2);
-
-		//files (not directories)
-		assert(oslistf("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . ! -type d -printf '%f\n'").convert("\n\r",""));
-
-		//directories (not files)
-		assert(oslistd("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . -type d -printf '%f\n\'").convert("\n\r",""));
-	}
-	osrmdir("test_main.1");
-	osrmdir("test_main.2");
-
-	printl();
-	assert(osdir(OSSLASH).match(_FM_ "\\d{5}" _FM_ "\\d{1,5}"));
-
-	//root directories
-
-	//check one step multilevel subfolder creation (requires boost version > ?)
-	var topdir1=OSSLASH^"exodus544";
-	var topdir1b=topdir1^"b";
-	var subdir2=topdir1^OSSLASH^"abcd";
-	var subdir2b=topdir1b^OSSLASH^"abcd";
-
-	var tempdir="exotemp746";
-	osrmdir(tempdir,true);
-
-	//try to remove any old versions (subdir first to avoid problems)
-	osrmdir(topdir1b,true);
-	osrmdir(topdir1);
-	osrmdir(subdir2b,true);
-	osrmdir(subdir2);
-
-	//need oermission to test root directory access
-	if (osmkdir(subdir2)) {
-
-		//assert(osmkdir(subdir2));
-
-		printl("\nCheck CANNOT rename multilevel root folders");
-		assert(not osrename(topdir1,topdir1b));
-
-		printl("\nCheck CANNOT force delete root folders");
-		assert(not osrmdir(topdir1,true));
-		printl();
-
-		//check can remove root folders one by one without force
-		assert(osrmdir(subdir2));
-		assert(osrmdir(topdir1));
-
-		//printl(osdir("c:\\config.sys"));
-
-		//relative directories ie not-root
-		if (osdir(tempdir))
-			assert(osrmdir(tempdir,true));
-
-		//check mkdir
-		assert(osmkdir(tempdir));
-		assert(osdir(tempdir));
-		assert(not osmkdir(tempdir));
-
-		//check rmdir
-		assert(osrmdir(tempdir));
-		assert(not osdir(tempdir));
-	}
-
-	//check writing a 1Mb file
-	//restrict to ascii characters so size on disk=number of characters in string
-	//also restrict to size 1 2 4 8 16 etc
-	//var str1="1234ABC\x0160";//Note: you have to prefix strings with L if you want to put multibyte hex chars
-	str1="1234ABCD";
-	var filesize=1024*1024/8;
-	printl(tempdir);
-	assert(osmkdir(tempdir));
-	assert(osrmdir(tempdir));
-	assert(osmkdir(tempdir));
-	var tempfilename=tempdir^OSSLASH^"temp1";
-	printl(tempfilename);
-	//printl(str(str1,filesize/len(str1)));
-	assert(oswrite(str(str1,filesize/len(str1)),tempfilename));
-	var filedate=date();
-	assert(osfile(tempfilename));
-	var info=osfile(tempfilename);
-	assert(info.a(1) eq filesize);
-	assert(info.a(2) eq filedate);
-
-	//check copying to a new file
-	var tempfilename2=tempfilename^2;
-	if (osfile(tempfilename2))
-	assert(osremove(tempfilename2));
-	assert(oscopy(tempfilename,tempfilename2));
-	assert(osfile(tempfilename2) eq info);
-
-	//check renaming
-	var tempfilename3=tempfilename^3;
-	assert(osrename(tempfilename2,tempfilename3));
-	assert(osfile(tempfilename3) eq info);
-
-	//check force delete of subdirectory
-	assert(osrmdir(tempdir,true));
 
 	var x;
 	var y;
@@ -1207,34 +723,6 @@ function main()
 	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " _FM_ "xx      "));
 
 	var sentence=sentence();
-
-    //wcout<<"main()"<<endl;
-    //MVSystem mvsystem;
-    //mvsystem.run();
-    //wcout<<"exit"<<endl;
-
-//    var xx="XXX";
-//  xx.inverter();
-
-	var env=osgetenv("");
-	printl(env);
-	assert(osgetenv("PATH"));
-	assert(osgetenv("HOME"));
-	env="Steve";
-	env.ossetenv("XYZ");
-	assert(osgetenv("XYZ"));
-
-//	var().debug();
-//	var xx=xx[1];
-
-	var temprecord;
-	var tempfilename0="tempfile";
-	assert(oswrite("123" on tempfilename0));
-	assert(osfile(tempfilename0));
-	assert(osread(temprecord from tempfilename0));
-	assert(temprecord eq "123");
-	assert(osremove(tempfilename0));
-	assert(not osfile(tempfilename0));
 
 	{
 
@@ -1266,9 +754,9 @@ function main()
 		//text three byte utf8
 		var euro="€";
 		assert(oconv(euro,"HEX")=="E282AC");
-		euro.popper();
+		popper(euro);
 		assert(oconv(euro,"HEX")=="E282");
-		euro.popper();
+		popper(euro);
 		assert(oconv(euro,"HEX")=="E2");
 
 		//test procedural free functions
@@ -1295,18 +783,6 @@ function main()
 	}
 	printl();
 
-	printl("Checking time oconv/iconv roundtrip for time (seconds) =0 to 86400");
-	//initrnd(999);
-	//for (int ii = 0; ii <= 86400-1; ++ii) {
-	//	var time=ii;
-	var started=ostime();
-	for (const var itime : range(0, 86399)) {
-//		itime.outputl("itime=").oconv("MTHS").outputl("otime=").iconv("MTHS").outputl("itime=");
-		assert(itime.oconv("MTHS").iconv("MTHS") eq itime);
-		assert(itime.oconv("MTS").iconv("MTS") eq itime);
-	}
-	var stopped=ostime();
-	errputl(stopped-started," seconds");
 	printl("test_main finished ok and exiting OK");
 	printl("Test passed");
 

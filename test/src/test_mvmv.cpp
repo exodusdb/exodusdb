@@ -22,6 +22,11 @@ function main() {
 	assert(greekstr2=="αβxxxβγδε");
 	assert(greekstr2.length()==15);
 
+	// First *byte* of a var may not be valid utf8
+	assert(var(greek5x4.toChar()).oconv("HEX").outputl() == "CE");
+
+	assert(textseq("") == "");
+
 	//fieldstorer
 	//in place - oo method
 	greekstr2=greek5x2;
@@ -117,42 +122,42 @@ function main() {
 	//more fieldstorer
 	{
 		var x="a b c d";
-		x.fieldstorer(" ",2,0,"yyy");
+		fieldstorer(x," ",2,0,"yyy");
 		printl(x);
 		assert(x == "a yyy b c d");
 
 		x="";
-		x.fieldstorer("|",2,0,"yyy");
+		fieldstorer(x,"|",2,0,"yyy");
 		printl(x);
 		assert(x == "|yyy");
 
 		x="";
-		x.fieldstorer("β",2,2,"y");
+		fieldstorer(x,"β",2,2,"y");
 		printl(x);
 		assert(x == "βyβ");
 
 		x="";
-		x.fieldstorer("β",3,1,"y");
+		fieldstorer(x,"β",3,1,"y");
 		printl(x);
 		assert(x == "ββy");
 
 		x="";
-		x.fieldstorer("β",3,2,"y");
+		fieldstorer(x,"β",3,2,"y");
 		printl(x);
 		assert(x == "ββyβ");
 
 		x="";
-		x.fieldstorer("β",3,2,"yyy");
+		fieldstorer(x,"β",3,2,"yyy");
 		printl(x);
 		assert(x == "ββyyyβ");
 
 		x="";
-		x.fieldstorer("β",3,3,"yyy");
+		fieldstorer(x,"β",3,3,"yyy");
 		printl(x);
 		assert(x == "ββyyyββ");
 
 		x="";
-		x.fieldstorer("β",3,4,"yyy");
+		fieldstorer(x,"β",3,4,"yyy");
 		printl(x);
 		assert(x == "ββyyyβββ");
 	}
@@ -162,6 +167,9 @@ function main() {
 	////////
 
 	var vn;
+
+	// BY cannot be XX
+	try {var x = "xyz"_var.locateby("XX", "xyz", MV);assert(false);} catch(MVError e){};
 
 	assert(var("f100" _FM_ "f210" _VM_ "" _VM_ "f230").locateby("AL", "", vn, 2));
 	assert(vn == 2);
@@ -199,6 +207,8 @@ function main() {
 	assert (vn==2);
 	//search in a subvalue using ","
 	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2").locateusing(",","s2",vn,2,2,2));
+	// free function
+	assert(locateusing(",", "s2", var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2"),vn,2,2,2));
 	assert (vn==3);
 	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2").locateusing(",","s2",vn,2,2,-2));
 	assert (vn==1);
@@ -237,6 +247,10 @@ function main() {
 	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn,1)||lbvn==4);
 	//fieldno given and =0 means search whole string using character FM
 	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("AL","A",lbvn,0)||lbvn==4);
+	// free function
+	assert(locateby("AL","A",var("1" _FM_ "10" _FM_ "2" _FM_ "B"),lbvn,0)||lbvn==4);
+	var order2 = "AL";
+	assert(locateby(order2,"A",var("1" _FM_ "10" _FM_ "2" _FM_ "B"),lbvn,0)||lbvn==4);
 
 	//search values within a field
 
@@ -322,8 +336,8 @@ function main() {
 	var locii;
 	var ascints="1 2 3 10 20 30 100 200 300";
 	var revints="300 200 100 30 20 10 3 2 1";
-	ascints.converter(" ",VM);
-	revints.converter(" ",VM);
+	converter(ascints," ",VM);
+	converter(revints," ",VM);
 	var ar="AR";
 	var locsep=",";
 
@@ -452,8 +466,8 @@ function main() {
 	assert(!revints.locateby("DL",321,locii));
 	assert(locii==1);
 
-	ascints.converter(VM,",");
-	revints.converter(VM,",");
+	converter(ascints,VM,",");
+	converter(revints,VM,",");
 
 	assert(ascints.locateusing(",",30));
 	assert(!ascints.locateusing(",",31));
@@ -465,8 +479,8 @@ function main() {
 	assert(locii==6);
 
 
-	ascints.converter(",",VM);
-	revints.converter(",",VM);
+	converter(ascints,",",VM);
+	converter(revints,",",VM);
 
 	assert(locate(10,ascints)==1);
 
@@ -500,8 +514,8 @@ function main() {
 	locateby("DL",21,revints,locii);
 	assert(locii==2);
 
-	ascints.converter(VM,",");
-	revints.converter(VM,",");
+	converter(ascints,VM,",");
+	converter(revints,VM,",");
 
 	assert(locateusing(",",30,ascints)==1);
 	assert(locateusing(",",31,ascints)==0);

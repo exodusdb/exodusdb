@@ -52,8 +52,8 @@ function main() {
 
 	printl("\nWrite the dictionary records to the dictionary");
 
-	var nrecs = dcount(dictrecs, FM);
-	for (var recn = 1; recn <= nrecs; ++recn) {
+	let nrecs = dcount(dictrecs, FM);
+	for (const var recn : range(1, nrecs)) {
 
 		var dictrec = extract(dictrecs, recn);
 
@@ -101,8 +101,8 @@ function main() {
 
 	printl("\nWrite the data records to the data file");
 
-	nrecs = dcount(recs, FM);
-	for (var recn = 1; recn <= nrecs; recn++) {
+	let nrecs2 = dcount(recs, FM);
+	for (const var recn : range(1, nrecs2)) {
 		var rec = extract(recs, recn);
 		var key = field(rec, "|", 1);
 		rec = field(rec, "|", 2, 9999);

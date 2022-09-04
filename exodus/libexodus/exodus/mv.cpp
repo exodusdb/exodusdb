@@ -65,53 +65,29 @@ void var::throwNonNumeric(CVR message) const {
 }
 
 CVR var::dump(SV text) const {
-	std::clog << "DUMP: " << text << " ";
-	if (var_typ & VARTYP_STR)
-		std::clog << "str: \"" << var_str << "\" ";
-	if (var_typ & VARTYP_INT)
-		std::clog << "int:" << var_int << " ";
-	if (var_typ & VARTYP_DBL)
-		std::clog << "dbl:" << var_dbl << " ";
-	std::clog << "typ:" << var_typ << std::endl;
+//	std::clog << "DUMP: " << text << " ";
+//	if (var_typ & VARTYP_STR)
+//		std::clog << "str: " _DQ_ << var(var_str).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS) << _DQ_ " ";
+//	if (var_typ & VARTYP_INT)
+//		std::clog << "int:" << var_int << " ";
+//	if (var_typ & VARTYP_DBL)
+//		std::clog << "dbl:" << var_dbl << " ";
+//	std::clog << "typ:" << var_typ << std::endl;
+	this->clone().dump(text);
 	return *this;
 }
 
 VARREF var::dump(SV text) {
 	std::clog << "DUMP: " << text << " ";
 	if (var_typ & VARTYP_STR)
-		std::clog << "str: \"" << var_str << "\" ";
+		//std::clog << "str: \"" << var_str << "\" ";
+		std::clog << "str: " _DQ_ << var(var_str).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS) << _DQ_ " ";
 	if (var_typ & VARTYP_INT)
-		std::clog << "int:" << var_int << " ";
+		std::clog << "int:" << var(var_int) << " ";
 	if (var_typ & VARTYP_DBL)
-		std::clog << "dbl:" << var_dbl << " ";
+		std::clog << "dbl:" << var(var_dbl) << " ";
 	std::clog << "typ:" << var_typ << std::endl;
 	return *this;
-}
-
-double exodusmodulus(const double top, const double bottom) {
-#define USE_PICKOS_MODULUS
-#ifdef USE_PICKOS_MODULUS
-
-	// note that exodus var int() is floor function as per pickos standard
-	// whereas c/c++ int() function is round to nearest even number (negative or positive)
-
-	//https://pickos.neosys.com/x/pAEz.html
-	//var(i) - (int(var(i)/var(j)) * var(j))) ... where int() is pickos int() (i.e. floor)
-	return top - static_cast<double>(floor(top / bottom) * bottom);
-
-#else
-	//return top - static_cast<double>(int(top / bottom) * bottom);
-	//return top % bottom;//doesnt compile (doubles)
-
-	//fmod - The floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where n is x/y with its fractional part truncated.
-	//https://en.cppreference.com/w/c/numeric/math/fmod
-	//return std::fmod(top,bottom);
-
-	//remainder - The IEEE floating-point remainder of the division operation x/y calculated by this function is exactly the value x - n*y, where the value n is the integral value nearest the exact value x/y. When |n-x/y| = ½, the value n is chosen to be even.
-	//https://en.cppreference.com/w/c/numeric/math/remainder
-	return std::remainder(top, bottom);
-
-#endif
 }
 
 //var::var(CVR rhs)
@@ -686,71 +662,9 @@ tryagain:
 // MODULO VAR
 
 VARREF var::operator%=(CVR rhs) &{
-
-	rhs.assertNumeric(__PRETTY_FUNCTION__);
-
-tryagain:
-
-	// lhs double
-	if (var_typ & VARTYP_DBL) {
-
-		// rhs double
-		if (rhs.var_typ & VARTYP_DBL) {
-			if (!rhs.var_dbl)
-				throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			var_dbl = exodusmodulus(var_dbl, rhs.var_dbl);
-		}
-
-		// rhs double
-		else {
-			if (!rhs.var_int)
-				throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-									 "')");
-			var_dbl = exodusmodulus(var_dbl, rhs.var_int);
-		}
-
-		// reset lhs to one unique type
-		var_typ = VARTYP_DBL;
-		return *this;
-	}
-
-	// lhs int
-	else if (var_typ & VARTYP_INT) {
-
-		// rhs double
-		if (rhs.var_typ & VARTYP_DBL) {
-			if (!rhs.var_dbl)
-				throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-			var_dbl = exodusmodulus(var_int, rhs.var_dbl);
-
-			// reset lhs to one unique type
-			var_typ = VARTYP_DBL;
-			return *this;
-		}
-
-		// both are ints - must return a int
-		if (!rhs.var_int)
-			throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-								 "')");
-		var_int = this->var_int % rhs.var_int;
-
-		// reset lhs to one unique type
-		var_typ = VARTYP_INT;
-		return *this;
-	}
-
-	// try to convert to numeric
-	if (isnum())
-		goto tryagain;
-
-	assertNumeric(__PRETTY_FUNCTION__);
-
-	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	*this = this->mod(rhs);
+	return *this;
 }
-
 
 /////////
 // DOUBLE
@@ -875,35 +789,10 @@ tryagain:
 
 // MODULO DOUBLE
 
-VARREF var::operator%=(const double dbl1) &{
-
-	if (!dbl1)
-		throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ dbl1 ^
-		"')");
-
-tryagain:
-
-	// lhs double
-	if (var_typ & VARTYP_DBL)
-		var_dbl = exodusmodulus(var_dbl, dbl1);
-
-	// lhs int
-	else if (var_typ & VARTYP_INT)
-		var_dbl = exodusmodulus(var_int, dbl1);
-
-	// try to convert to numeric
-	else if (isnum())
-		goto tryagain;
-
-	else
-		assertNumeric(__PRETTY_FUNCTION__);
-
-	// reset to one unique type
-	var_typ = VARTYP_DBL;
-
+VARREF var::operator%=(const double rhs) &{
+	*this = this->mod(rhs);
 	return *this;
 }
-
 
 //////
 // INT
@@ -1041,40 +930,10 @@ tryagain:
 
 //MODULO INT
 
-VARREF var::operator%=(const int int1) &{
-
-	if (!int1)
-		throw MVDivideByZero("mod('" ^ this->substr(1, 128) ^ "', '" ^ int1 ^
-		"')");
-
-tryagain:
-
-	// lhs double
-	if (var_typ & VARTYP_DBL) {
-		var_dbl = exodusmodulus(var_dbl, int1);
-		// reset to one unique type
-		var_typ = VARTYP_DBL;
-		return *this;
-	}
-
-	// both int
-	else if (var_typ & VARTYP_INT) {
-		var_int %= int1;
-		// reset to one unique type
-		var_typ = VARTYP_INT;
-		return *this;
-	}
-
-	// try to convert to numeric
-	if (isnum())
-		goto tryagain;
-
-	assertNumeric(__PRETTY_FUNCTION__);
-
-	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+VARREF var::operator%=(const int rhs) &{
+	*this = this->mod(rhs);
+	return *this;
 }
-
 
 ///////
 // BOOL
@@ -1620,138 +1479,10 @@ var var::operator-() const{
 
 	// non-numeric
 	this->assertNumeric(__PRETTY_FUNCTION__);
+
 	// will never get here
 	throw MVNonNumeric("+(" ^ this->substr(1, 128) ^ ")");
 }
-
-// Replaced by operator+=
-//var MVadd(CVR lhs, CVR rhs) {
-//
-//	lhs.assertNumeric(__PRETTY_FUNCTION__);
-//	rhs.assertNumeric(__PRETTY_FUNCTION__);
-//
-//	//identical code in MVadd and MVsub except for +/-
-//	//identical code in MVadd, MVsub, MVmul except for +,-,*
-//	if (lhs.var_typ & VARTYP_DBL)
-//		return lhs.var_dbl + ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int));
-//	else if (rhs.var_typ & VARTYP_DBL)
-//		return lhs.var_int + rhs.var_dbl;
-//	else
-//		return lhs.var_int + rhs.var_int;
-//}
-
-// Replaced by operator-=
-//var MVsub(CVR lhs, CVR rhs) {
-//
-//	lhs.assertNumeric(__PRETTY_FUNCTION__);
-//	rhs.assertNumeric(__PRETTY_FUNCTION__);
-//
-//	//identical code in MVadd, MVsub, MVmul except for +,-,*
-//	if (lhs.var_typ & VARTYP_DBL)
-//		return lhs.var_dbl - ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int));
-//	else if (rhs.var_typ & VARTYP_DBL)
-//		return lhs.var_int - rhs.var_dbl;
-//	else
-//		return lhs.var_int - rhs.var_int;
-//}
-
-// Replaced by operator*=
-//var MVmul(CVR lhs, CVR rhs) {
-//
-//	lhs.assertNumeric(__PRETTY_FUNCTION__);
-//	rhs.assertNumeric(__PRETTY_FUNCTION__);
-//
-//	//identical code in MVadd, MVsub, MVmul except for +,-,*
-//	if (lhs.var_typ & VARTYP_DBL)
-//		return lhs.var_dbl * ((rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int));
-//	else if (rhs.var_typ & VARTYP_DBL)
-//		return lhs.var_int * rhs.var_dbl;
-//	else
-//		return lhs.var_int * rhs.var_int;
-//}
-
-// Replaced by operator/=
-//var MVdiv(CVR lhs, CVR rhs) {
-//
-//	lhs.assertNumeric(__PRETTY_FUNCTION__);
-//	rhs.assertNumeric(__PRETTY_FUNCTION__);
-//
-//	// always returns a double because 10/3 must be 3.3333333
-//
-//	if (lhs.var_typ & VARTYP_DBL) {
-//		// 1. double ... double
-//		if (rhs.var_typ & VARTYP_DBL) {
-//			if (!rhs.var_dbl)
-//				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//									 "')");
-//			return lhs.var_dbl / rhs.var_dbl;
-//		}
-//		// 2. double ... int
-//		else {
-//			if (!rhs.var_int)
-//				throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//									 "')");
-//			return lhs.var_dbl / rhs.var_int;
-//		}
-//	}
-//	// 3. int ... double
-//	else if (rhs.var_typ & VARTYP_DBL) {
-//		if (!rhs.var_dbl)
-//			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//								 "')");
-//		return static_cast<double>(lhs.var_int) / rhs.var_dbl;
-//	}
-//	// 4. int ... int
-//	else {
-//		if (!rhs.var_int)
-//			throw MVDivideByZero("div('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//								 "')");
-//		return static_cast<double>(lhs.var_int) / rhs.var_int;
-//	}
-//}
-//
-
-// Replaced by operator%=
-//var MVmod(CVR lhs, CVR rhs) {
-//
-//	lhs.assertNumeric(__PRETTY_FUNCTION__);
-//	rhs.assertNumeric(__PRETTY_FUNCTION__);
-//
-//	//returns an integer var IIF both arguments are integer vars
-//	//otherwise returns a double var
-//
-//	if (lhs.var_typ & VARTYP_DBL) {
-//		// 1. double ... double
-//		if (rhs.var_typ & VARTYP_DBL) {
-//			if (!rhs.var_dbl)
-//				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//									 "')");
-//			return exodusmodulus(lhs.var_dbl, rhs.var_dbl);
-//		}
-//		// 2. double ... int
-//		else {
-//			if (!rhs.var_int)
-//				throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//									 "')");
-//			return exodusmodulus(lhs.var_dbl, rhs.var_int);
-//		}
-//	}
-//	// 3. int ... double
-//	else if (rhs.var_typ & VARTYP_DBL) {
-//		if (!rhs.var_dbl)
-//			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//								 "')");
-//		return exodusmodulus(lhs.var_int, rhs.var_dbl);
-//	}
-//	// 4. int ... int
-//	else {
-//		if (!rhs.var_int)
-//			throw MVDivideByZero("mod('" ^ lhs.substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
-//								 "')");
-//		//return exodusmodulus(lhs.var_int, rhs.var_int);
-//		return lhs.var_int % rhs.var_int;
-//	}
-//}
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
 // slightly wrong precedence but at least we have a reliable concat operator to replace the + which
@@ -1842,30 +1573,47 @@ std::ostream& operator<<(std::ostream& ostream1, var var1) {
 	return ostream1;
 }
 
-std::istream& operator>>(std::istream& istream1, VARREF var1) {
+std::istream& operator>>(std::istream& istream1, VARREF into_str1) {
 
-	var1.assertDefined(__PRETTY_FUNCTION__);
+	into_str1.assertDefined(__PRETTY_FUNCTION__);
 
-	std::string tempstr;
-	istream1 >> std::noskipws >> tempstr;
+	into_str1.var_str.clear();
+	into_str1.var_typ = VARTYP_STR;
 
-	var1.var_typ = VARTYP_STR;
+	//std::string tempstr;
+	istream1 >> std::noskipws >> into_str1.var_str;
+
 	// this would verify all input is valid utf8
-	// var1.var_str=boost::locale::conv::utf_to_utf<char>(tempstr)
-	var1.var_str = tempstr;
+	// into_str1.var_str=boost::locale::conv::utf_to_utf<char>(into_str1)
+
 	return istream1;
 }
 
 //#endif
 
-// Forward declaration of free function defined in mvdebug.cpp
+// Forward declaration of free functions defined in mvdebug.cpp
+void save_stack_addresses();
 var backtrace();
 
 MVError::MVError(CVR description_)
 	: description(description_) {
+
+	// WARNING any errors in this constructor
+	// will cause recursion and hang/segfault
+
+//	if (description.assigned())
+//		description.put(std::cerr);
+//	var("\n").put(std::cerr);
+
 	// capture the stack at point of creation i.e. when thrown
-	this->stack = backtrace();
-	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
+	mv_savestack();
+
+//	this->stack = mv_backtrace();
+//	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
+//	this->stack = "";
+
+//	stack.convert(FM, "\n").put(std::cerr);
+//	var("\n").put(std::cerr);
 
 	//break into debugger if EXO_DEBUG is set to non-zero
 	//otherwise allow catch at a higher level or terminate
@@ -1909,8 +1657,7 @@ MVLogoff ::MVLogoff(CVR var1)
 MVArrayDimensionedZero ::MVArrayDimensionedZero()
 	: MVError("MVArrayDimensionedZero:") {}
 MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(CVR var1)
-	: MVError("MVArrayIndexOutOfBounds:" ^ var1) {
-}
+	: MVError("MVArrayIndexOutOfBounds:" ^ var1) {}
 MVArrayNotDimensioned ::MVArrayNotDimensioned()
 	: MVError("MVArrayNotDimensioned") {}
 

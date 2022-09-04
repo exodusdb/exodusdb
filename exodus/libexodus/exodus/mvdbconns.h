@@ -73,11 +73,16 @@ class MVConnection	 // used as 'second' in pair, stored in connection map
 using CONN_MAP = std::map<int, MVConnection>;
 //using CONN_MAP = std::unordered_map<int, MVConnection>;
 
-class MVConnections {
+// "final" to avoid declaring the destructor as virtual as a precaution
+class MVConnections final {
    public:
+
 	// ctors/dctors
 	MVConnections(DELETER_AND_DESTROYER del_);
-	virtual ~MVConnections();
+
+	//class marked as final so no need for virtual
+	//virtual ~MVConnections();
+	~MVConnections();
 
 	// manipulators
 	int add_connection(PGconn* connection_with_file, const std::string conninfo);

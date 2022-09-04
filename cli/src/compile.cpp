@@ -494,7 +494,9 @@ function main() {
 
 	var srcfilenames = "";
 
-	for (var fileno = 1; fileno <= nfiles; ++fileno) {
+	// nfiles may increase during the loop as directories may be included
+	//for (const var fileno : range(1, nfiles)) {
+	for (var fileno = 1; fileno <= nfiles; fileno++) {
 
 		//var text = "";
 		var filebase;
@@ -599,8 +601,8 @@ function main() {
 		//SIMILAR CODE IN EDIC and COMPILE
 		if (not(osfile(srcfilename)) and not(srcfilename.index(OSSLASH))) {
 			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
-			var npaths = dcount(paths, ":");
-			for (var pathn = 1; pathn <= npaths -1; pathn++) {
+			let npaths = dcount(paths, ":");
+			for (const var pathn : range(1, npaths -1)) {
 				var srcfilename2 = paths.field(":", pathn) ^ "/" ^ srcfilename;
 				if (osfile(srcfilename2)) {
 					srcfilename = srcfilename2;
@@ -719,7 +721,7 @@ function main() {
 			//var nlocales = dcount(alllocales, " ");
 			var locale;
 			var origlocale = getxlocale();
-			//for (var localen = 1; localen <= nlocales; localen++) {
+			//for (const var localen : range(1, nlocales)) {
 			//for (var locale : alllocales) {
 			for (var locale2 : alllocales) {
 
@@ -783,8 +785,8 @@ function main() {
 			var crlf = "\r\n";
 			var headertext = "";
 			converter(text, crlf, FM ^ FM);
-			dim text2;
-			var nlines = split(text, text2);
+			dim text2 = split(text);
+			var nlines = text2.rows();
 
 	#if EXODUS_EXPORT_USING_DEF
 			var deftext = "";
@@ -1678,7 +1680,7 @@ function set_environment() {
 	var searched = "";
 	var batfilename = "";
 
-	for (var ii = 1; ii <= 999999; ++ii) {
+	for (const var ii : range(1, 999999)) {
 
 		var msvs = searchdirs.a(ii);
 		if (not msvs)
@@ -1761,12 +1763,15 @@ function set_environment() {
 		//	printl(result);
 		//printl(result);
 
-		dim vars;
-		var nvars = split(result.converter("\r\n", FM ^ FM), vars);
-		for (var varn = 1; varn <= nvars; ++varn) {
+		dim vars = split(result.converter("\r\n", FM ^ FM));
+//		let nvars = vars.rows();
+//		for (const var varn : range(1, nvars)) {
+//			ossetenv(
+//				field(vars(varn), '=', 1), field(vars(varn), '=', 2, 999999));
+//		}
+		for (let line : vars)
 			ossetenv(
-				field(vars(varn), '=', 1), field(vars(varn), '=', 2, 999999));
-		}
+				field(line, '=', 1), field(line, '=', 2, 999999));
 		/*
 		var value;
 		if (getparam(result,"PATH",value))

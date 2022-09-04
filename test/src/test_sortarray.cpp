@@ -21,7 +21,7 @@ function main() {
 	printl("-------------------");
 	array.convert(VM^FM ,"]\n").outputl();
 
-	array.converter(VM,"]");
+	converter(array,VM,"]");
 	assert(array.a(3)=="20]10]2]1");
 	assert(array.a(6)=="620]610]62]61");
 	assert(array.a(7)=="720]710]72]71");

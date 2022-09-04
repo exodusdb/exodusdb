@@ -193,9 +193,11 @@ function main() {
 			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
 			if (verbose)
 				paths.outputl("paths=");
-			var npaths = dcount(paths, ":");
-			for (var pathn = 1; pathn <= npaths - 1; pathn++) {
-				var filename2 = paths.field(":", pathn) ^ "/" ^ filename;
+//			let npaths = dcount(paths, ":");
+//			for (const var pathn : range(1, npaths - 1)) {
+//				var filename2 = paths.field(":", pathn) ^ "/" ^ filename;
+			for (let path : paths.convert(":", FM)) {
+				var filename2 = path ^ "/" ^ filename;
 				if (verbose)
 					filename2.outputl("osfilename=");
 				if (osfile(filename2)) {
@@ -394,8 +396,12 @@ function main() {
 			var compileoutputfilename = filename;
 			compileoutputfilename ^= ".~";
 			//var compileoutputfilename=filename ^ ".2";
-			if (OSSLASH eq "/")
-			   compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
+			if (OSSLASH eq "/") {
+				compilecmd ^= " 2>&1";
+				compilecmd ^= " | tee " ^ compileoutputfilename.quote();
+				compilecmd ^= " | pager --chop-long-lines --quit-if-one-screen";
+
+			}
 			else
 			    compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
 
@@ -418,7 +424,9 @@ function main() {
 					print(errors);
 
 				startatlineno = "";
-				//gnu style error lines
+				// gnu style error lines
+				// There's a de facto standard format for compiler or linter error messages,
+				// which is the same format as grep -n: FILE_NAME:LINE_NUMBER:MESSAGE
 				var matches = errors.match("\\w" ^ filename ^ ":(\\d+):(\\d+):");
 				if (matches) {
 
@@ -438,13 +446,16 @@ function main() {
 				}
 				if (startatlineno) {
 
-					print("Re-edit at line " ^ startatlineno ^ "? (Y/n)");
-					osflush();
-
-					if (inputn(1).convert("Yy\n","") eq "")
+					var reply = "";
+					for (;;) {
+						reply = "";
+						reply.input("Re-edit at line " ^ startatlineno ^ "? (Y/n)");
+						if (reply.convert("YyNn","") eq "")
+							break;
+					}
+					if (reply.convert("Yy","") eq "")
 						continue;
 
-					printl();
 					abort("");
 				}
 			}

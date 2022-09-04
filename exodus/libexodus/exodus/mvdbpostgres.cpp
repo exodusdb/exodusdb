@@ -44,15 +44,115 @@ THE SOFTWARE.
 
 ////ALN:TODO: REFACTORING NOTES
 // Proposed to split content of mvdbpostres.cpp into 3 layers (classic approach):
-//	mvdbfuncs.cpp - api things, like mvglobalfuncs.cpp
+//	mvdbfuncs.cpp - api things, like exedusfuncs.cpp
 //	mvdbdrv.cpp - base abstract class mv_db_drv or MvDbDrv to define db access operations (db
-// driver interface); 	mvdbdrvpostgres.cpp - subclass of mv_db_drv, specific to PostgreSQL things
+// driver interface); mvdbdrvpostgres.cpp - subclass of mv_db_drv, specific to PostgreSQL things
 // like
-// PGconn and PQfinish; 	mvdbdrvmsde.cpp - possible subclass of mv_db_drv, specific to MSDE (AKA
-// MSSQL Express); 	mvdblogic.cpp - intermediate processing (most of group 2) functions.
+// PGconn and PQfinish; mvdbdrvmsde.cpp - possible subclass of mv_db_drv, specific to MSDE (AKA
+// MSSQL Express); mvdblogic.cpp - intermediate processing (most of group 2) functions.
 // Proposed refactoring would:
 //		- improve modularity of the Exodus platform;
 //		- allow easy expanding to other DB engines.
+
+/* How do transactions work in EXODUS?
+
+1. Visibilty of updates you make in a transaction
+
+Before you commit, any and all updates you make will not be read by any other connection.
+
+After you commit, any and all updates that you made will be immediately readable by all other connections regardless of whether they are in a transaction or not.
+
+Other connections can choose to be in a transaction mode where they CANNOT read any updates made after the commencement of their transaction. This allows reports to be consistent. NO IMPLEMENTED YET
+
+2. Visibility of other transactions while in a transaction.
+
+During your transaction on a connection by default you can will read any and all committed updates from other connections immediately they occur.
+
+Optionally you can be in a transaction mode where you will NOT read any updates made by other transactions after the commencement of your transaction.
+
+3. Lock visibility
+
+Locks are essentially independent of transactions and can be seen by other connections in real time.
+
+However, locks placed during a transaction cannot be unlocked and are automatically released after you commit. Unlock commands are therefore ignored.
+
+Within transactions, lock requests for locks that have already been obtained SUCCEED. This is the opposite of repeated locks outside of transactions which FAIL.
+
+4. How to coordinate updates between asynchronous processes using locks.
+
+	This process allows multiple asynchronous processes to update the database concurrently/in parallel as long as they are updating different data.
+
+	a. Start a transaction
+
+	b. Acquire an agreed lock appropriate for the data in c. and d.,
+		OR wait for a limited period of time,
+		OR or cancel the whole process i.e. rollback to to the state at a.
+
+	c. Read the data
+	d. Write the data
+
+	e. Repeat from b. as required for multiple updates
+
+	e. Commit the transaction (will also release all locks)
+
+	Generally *LOCK BEFORE READ* and *WRITE BEFORE UNLOCK* so that all READ and WRITE operations are "protected" by locks.
+
+	Locks form a barrier between changed state.
+
+	In the above, WRITE encompasses INSERT, UPDATE and DELETE.
+
+5. Postgres facilities used
+
+	Transaction isolation level used is the default:
+
+		READ COMMITTED (default)
+
+		SERIALIZABLE or REPEATABLE READ - pending implementation to facilite consistent reports based on snapshots
+
+		See https://www.postgresql.org/docs/12/sql-set-transaction.html
+
+	Locks are obtained and released:
+
+		Outside a transaction using pg_try_advisory_lock() and pg_try_advisory_unlock()
+
+		Inside a transaction  using pg_try_advisory_xact_lock() and commit or rollback.
+
+		See https://www.postgresql.org/docs/12/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS
+
+6. How Postgres handles versioning
+
+	Summary explanation: https://vladmihalcea.com/how-does-mvcc-multi-version-concurrency-control-work/
+
+	Detailed explanation: https://www.interdb.jp/pg/pgsql05.html
+
+	PostgreSQL stores all row versions in the table data structure.
+
+	This is called MVCC and postgres uses a version of it called "Snapshot Isolation".
+
+	It never updates existing rows, only adds new rows and marks the old rows as "deleted".
+
+	Automatic and manual VACUUM processes remove stale deleted rows at convenient times.
+
+	Every row has two additional columns:
+
+		t_xmin - the transaction id that inserted the record
+		t_xmax - the transaction id that deleted the row, if deleted.
+
+	Transaction id is an ever increasing 32 bit integer so it is possible to determine the
+	state of the database "as at" any transaction id. Every query eg SELECT gets its
+	own transaction id. Wrap around to zero after approx. 4.2 billion transactions is inevitable
+	and the concept of before and after is not absolute.
+
+	See SELECT txid_current();
+
+	Every row also has the following control info.
+
+		t_cid - holds the command id (cid), which means how many SQL commands were executed
+				before this command was executed within the current transaction beginning from 0.
+
+		t_ctid - holds the tuple identifier (tid) that points to itself or a new tuple replacing it.
+
+*/
 
 // Using map for caches instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
@@ -76,7 +176,20 @@ THE SOFTWARE.
 
 //#include <arpa/inet.h>//for ntohl()
 
-#include "MurmurHash2_64.h"	 // it has included in mvdbconns.h (uint64_t defined)
+// All three hashing methods are about 80-90ns
+// but c++ std::hash is not guaranteed stable except within a single running process
+#define USE_MURMURHASH
+//#define USE_WYHASH
+#if defined (USE_WYHASH)
+#	include "wyhash.h"
+#elif defined(USE_MURMURHASH)
+#	include "MurmurHash2_64.h" // it has included in mvdbconns.h (uint64_t defined)
+#else
+	// c++ std Hash functions are only required to produce the same result for the same input within a single execution of a program;
+	// therefore different processes would not be able to perform coordinated record locking
+	// therefore we will use one of the above hashing functions which hash the same on different platforms (hopefully)
+	// C++ std hash functions are designed for use in c++ containers, nothing else.
+#endif
 
 #include <exodus/mv.h>
 #include <exodus/mvdbconns.h>  // placed as last include, causes boost header compiler errors
@@ -198,7 +311,13 @@ uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
 	// Normalise all alternative utf8 encodings of the same unicode points so they hash identically
 	fileandkey.append(key.normalize().toString());
 
-	return MurmurHash64((char*)fileandkey.data(), int(fileandkey.size() * sizeof(char)), 0);
+#if defined(USE_WYHASH)
+	return wyhash(fileandkey.data(), fileandkey.size(), 0, _wyp);
+#elif defined(USE_MURMURHASH)
+	return MurmurHash64(fileandkey.data(), fileandkey.size(), 0);
+#else
+	return std::hash<std::string>{}(fileandkey);
+#endif
 
 }
 
@@ -476,15 +595,15 @@ LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
 			printf("mvdbpostgres: %s was not found\n", pDelayLoadInfo->szDll);
 			break;
 			/*
-		   case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
-			  if (pdli->dlp.fImportByName) {
-					  printf("Function %s was not found in %sn",
-					  pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
-			  } else {
-			  printf("Function ordinal %d was not found in %sn",
-					  pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
-			  }
-			  break;
+			case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
+			if (pdli->dlp.fImportByName) {
+				printf("Function %s was not found in %sn",
+				pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
+			} else {
+			printf("Function ordinal %d was not found in %sn",
+				pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
+			}
+			break;
 		*/
 		default:
 			// Exception is not related to delay loading
@@ -874,8 +993,8 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	else {
 
 		// Or use any preopened or preattached file handle if available
-	    auto entry = thread_file_handles.find(normal_filename);
-    	if (entry != thread_file_handles.end()) {
+		auto entry = thread_file_handles.find(normal_filename);
+		if (entry != thread_file_handles.end()) {
 			//(*this) = thread_file_handles.at(normal_filename);
 			auto cached_file_handle = entry->second;
 
@@ -923,9 +1042,9 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 		"\
 		SELECT\
 		EXISTS	(\
-    		SELECT 	table_name\
-    		FROM 	information_schema.tables\
-    		WHERE   table_name = " ^ tablename.squote() ^ and_schema_clause ^ "\
+				SELECT table_name\
+				FROM   information_schema.tables\
+				WHERE  table_name = " ^ tablename.squote() ^ and_schema_clause ^ "\
 				)";
 	var result;
 	connection2.sqlexec(sql, result);
@@ -942,9 +1061,9 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 			"\
 			SELECT\
 			EXISTS	(\
-	    		SELECT 	matviewname as table_name\
-	    		FROM 	pg_matviews\
-	    		WHERE\
+				SELECT  matviewname as table_name\
+				FROM    pg_matviews\
+				WHERE\
 						schemaname = '" ^ schema ^ "'\
 						and matviewname = '" ^ tablename ^	"'\
 					)\
@@ -955,7 +1074,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	//failure if not found
 	if (result[-1] != "t") {
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
-					 ") file does not exist.";
+					") file does not exist.";
 		this->lasterror(errmsg);
 		return false;
 	}
@@ -1186,8 +1305,8 @@ bool var::read(CVR filehandle, CVR key) {
 											sql.var_str.c_str(), 1, /* one param */
 											nullptr,					/* let the backend deduce param type */
 											paramValues, paramLengths,
-											0,	 // text arguments
-											0);	 // text results
+											0,	// text arguments
+											0);	// text results
 
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_TUPLES_OK) {
@@ -1197,7 +1316,7 @@ bool var::read(CVR filehandle, CVR key) {
 		if (sqlstate == "42P01")
 			errmsg ^= " File doesnt exist";
 		else
-			errmsg ^= var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate;
+			errmsg ^= var(PQerrorMessage(pgconn)) ^ " SQLERROR:" ^ sqlstate;
 		;
 		this->lasterror(errmsg);
 		throw MVDBException(errmsg);
@@ -1208,7 +1327,7 @@ bool var::read(CVR filehandle, CVR key) {
 		// *this = "";
 
 		this->lasterror("ERROR: mvdbpostgres read() record does not exist " ^
-						   key.quote());
+					key.quote());
 		return false;
 	}
 
@@ -1237,8 +1356,15 @@ var var::hash(const uint64_t modulus) const {
 
 	// uint64_t
 	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.size()*sizeof(wchar_t)),0);
-	uint64_t hash64 =
-		MurmurHash64((char*)var_str.data(), int(var_str.size() * sizeof(char)), 0);
+
+#if defined(USE_WYHASH)
+	uint64_t hash64 = wyhash(var_str.data(), var_str.size(), 0, _wyp);
+#elif defined(USE_MURMURHASH)
+	uint64_t hash64 = MurmurHash64(var_str.data(), var_str.size(), 0);
+#else
+	uint64_t hash64 = std::hash<std::string>{}(var_str);
+#endif
+
 	if (modulus)
 		return var_int = hash64 % modulus;
 	else
@@ -1303,16 +1429,17 @@ var var::lock(CVR key) const {
 	// Call postgres
 	MVresult mvresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
-											sql, 1,										 /* one param */
-											nullptr,										 /* let the backend deduce param type */
+											sql, 1,                                      /* one param */
+											nullptr,                                     /* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary mvresults */
 
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_TUPLES_OK || PQntuples(mvresult) != 1) {
+		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
 		var errmsg = "lock(" ^ (*this) ^ ", " ^ key ^ ")\n" ^
-					 var(PQerrorMessage(pgconn)) ^ "\n" ^ "PQresultStatus=" ^
-					 var(PQresultStatus(mvresult)) ^ ", PQntuples=" ^
-					 var(PQntuples(mvresult));
+			var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+			var(PQresultStatus(mvresult)) ^ ", PQntuples=" ^
+			var(PQntuples(mvresult));
 		throw MVDBException(errmsg);
 	}
 
@@ -1368,16 +1495,17 @@ bool var::unlock(CVR key) const {
 	// Call postgres
 	MVresult mvresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
-											sql, 1,										 /* one param */
-											nullptr,										 /* let the backend deduce param type */
+											sql, 1,										/* one param */
+											nullptr,									/* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary results */
 
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_TUPLES_OK) {
+		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
 		var errmsg = "unlock(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^ ")\n" ^
-					 var(PQerrorMessage(pgconn)) ^ "\n" ^ "PQresultStatus=" ^
-					 var(PQresultStatus(mvresult)) ^ ", PQntuples=" ^
-					 var(PQntuples(mvresult));
+				var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+				var(PQresultStatus(mvresult)) ^ ", PQntuples=" ^
+				var(PQntuples(mvresult));
 		throw MVDBException(errmsg);
 	}
 
@@ -1545,9 +1673,9 @@ bool var::write(CVR filehandle, CVR key) const {
 
 	// filehandle dos or DOS means osread/oswrite/osremove
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
-		//this->oswrite(key2);	 //.convert("\\",OSSLASH));
+		//this->oswrite(key2); //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
-		this->oswrite(key);	 //.convert("\\",OSSLASH));
+		this->oswrite(key); //.convert("\\",OSSLASH));
 		return true;
 	}
 
@@ -1573,18 +1701,19 @@ bool var::write(CVR filehandle, CVR key) const {
 	MVresult mvresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
-											2,	   // two params (key and data)
-											nullptr,  // let the backend deduce param type
+											2,       // two params (key and data)
+											nullptr, // let the backend deduce param type
 											paramValues, paramLengths,
-											0,	 // text arguments
-											0);	 // text results
+											0,       // text arguments
+											0);      // text results
 
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_COMMAND_OK) {
-		var errmsg = var("ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
-						 ", " ^ key ^ ") failed: PQresultStatus=" ^
-						 var(PQresultStatus(mvresult)) ^ " " ^
-						 var(PQerrorMessage(pgconn)));
+		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
+		var errmsg = "ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
+					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+					var(PQresultStatus(mvresult)) ^ " " ^
+					var(PQerrorMessage(pgconn));
 		throw MVDBException(errmsg);
 	}
 
@@ -1624,17 +1753,18 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	MVresult mvresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
-											2,	   // two params (key and data)
+											2,        // two params (key and data)
 											nullptr,  // let the backend deduce param type
 											paramValues, paramLengths,
-											0,	 // text arguments
-											0);	 // text results
+											0,        // text arguments
+											0);       // text results
 
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_COMMAND_OK) {
+		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
 		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
-					 ", " ^ key ^ ") Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
-					 var(PQerrorMessage(pgconn));
+				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
+				var(PQerrorMessage(pgconn));
 		throw MVDBException(errmsg);
 	}
 
@@ -1683,18 +1813,24 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	MVresult mvresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
-											2,	   // two params (key and data)
-											nullptr,  // let the backend deduce param type
+											2,       // two params (key and data)
+											nullptr, // let the backend deduce param type
 											paramValues, paramLengths,
-											0,	 // text arguments
-											0);	 // text results
+											0,       // text arguments
+											0);      // text results
 
-	// Handle serious errors
+	// Handle serious errors or ordinary duplicate key failure (which will mess us transactionsa)
 	if (PQresultStatus(mvresult) != PGRES_COMMAND_OK) {
+
+		// "duplicate key value violates unique constraint"
+		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
+		if (sqlstate == 23505)
+			return false;
+
 		var errmsg = "ERROR: mvdbpostgres insertrecord(" ^
-					 filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
-					 var(PQntuples(mvresult)) ^ " " ^
-					 var(PQerrorMessage(pgconn));
+				filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
+				var(PQntuples(mvresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
+				var(PQerrorMessage(pgconn));
 		throw MVDBException(errmsg);
 	}
 
@@ -1741,16 +1877,17 @@ bool var::deleterecord(CVR key) const {
 
 	DEBUG_LOG_SQL1
 	MVresult mvresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
-											nullptr,								   /* let the backend deduce param type */
+											nullptr,							/* let the backend deduce param type */
 											paramValues, paramLengths,
-											0,	 // text arguments
-											0);	 // text results
+											0,  // text arguments
+											0); // text results
 
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_COMMAND_OK) {
+		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
 		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
-					 ", " ^ key ^ ") Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
-					 var(PQerrorMessage(pgconn));
+				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
+				var(PQerrorMessage(pgconn));
 		throw MVDBException(errmsg);
 	}
 
@@ -1788,106 +1925,6 @@ void var::clearcache() const {
 
 	return;
 }
-
-/* How do transactions work in EXODUS?
-
-1. Visibilty of updates you make in a transaction
-
-Before you commit, any and all updates you make will not be read by any other connection.
-
-After you commit, any and all updates that you made will be immediately readable by all other connections regardless of whether they are in a transaction or not.
-
-Other connections can choose to be in a transaction mode where they CANNOT read any updates made after the commencement of their transaction. This allows reports to be consistent. NO IMPLEMENTED YET
-
-2. Visibility of other transactions while in a transaction.
-
-During your transaction on a connection by default you can will read any and all committed updates from other connections immediately they occur.
-
-Optionally you can be in a transaction mode where you will NOT read any updates made by other transactions after the commencement of your transaction.
-
-3. Lock visibility
-
-Locks are essentially independent of transactions and can be seen by other connections in real time.
-
-However, locks placed during a transaction cannot be unlocked and are automatically released after you commit. Unlock commands are therefore ignored.
-
-Within transactions, lock requests for locks that have already been obtained SUCCEED. This is the opposite of repeated locks outside of transactions which FAIL.
-
-4. How to coordinate updates between asynchronous processes using locks.
-
-	This process allows multiple asynchronous processes to update the database concurrently/in parallel as long as they are updating different data.
-
-	a. Start a transaction
-
-	b. Acquire an agreed lock appropriate for the data in c. and d.,
-	   OR wait for a limited period of time,
-	   OR or cancel the whole process i.e. rollback to to the state at a.
-
-	c. Read the data
-	d. Write the data
-
-	e. Repeat from b. as required for multiple updates
-
-	e. Commit the transaction (will also release all locks)
-
-	Generally *LOCK BEFORE READ* and *WRITE BEFORE UNLOCK* so that all READ and WRITE operations are "protected" by locks.
-
-	Locks form a barrier between changed state.
-
-	In the above, WRITE encompasses INSERT, UPDATE and DELETE.
-
-5. Postgres facilities used
-
-	Transaction isolation level used is the default:
-
-		READ COMMITTED (default)
-
-		SERIALIZABLE or REPEATABLE READ - pending implementation to facilite consistent reports based on snapshots
-
-		See https://www.postgresql.org/docs/12/sql-set-transaction.html
-
-	Locks are obtained and released:
-
-		Outside a transaction using pg_try_advisory_lock() and pg_try_advisory_unlock()
-
-		Inside a transaction  using pg_try_advisory_xact_lock() and commit or rollback.
-
-		See https://www.postgresql.org/docs/12/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS
-
-6. How Postgres handles versioning
-
-	Summary explanation: https://vladmihalcea.com/how-does-mvcc-multi-version-concurrency-control-work/
-
-	Detailed explanation: https://www.interdb.jp/pg/pgsql05.html
-
-	PostgreSQL stores all row versions in the table data structure.
-
-	This is called MVCC and postgres uses a version of it called "Snapshot Isolation".
-
-	It never updates existing rows, only adds new rows and marks the old rows as "deleted".
-
-	Automatic and manual VACUUM processes remove stale deleted rows at convenient times.
-
-	Every row has two additional columns:
-
-		t_xmin - the transaction id that inserted the record
-		t_xmax - the transaction id that deleted the row, if deleted.
-
-	Transaction id is an ever increasing 32 bit integer so it is possible to determine the
-	state of the database "as at" any transaction id. Every query eg SELECT gets its
-	own transaction id. Wrap around to zero after approx. 4.2 billion transactions is inevitable
-	and the concept of before and after is not absolute.
-
-	See SELECT txid_current();
-
-	Every row also has the following control info.
-
-		t_cid - holds the command id (cid), which means how many SQL commands were executed
-		        before this command was executed within the current transaction beginning from 0.
-
-		t_ctid - holds the tuple identifier (tid) that points to itself or a new tuple replacing it.
-
-*/
 
 // If this is opened SQL connection, pass connection ID to sqlexec
 bool var::begintrans() const {
@@ -2235,8 +2272,8 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 					} else {
 						if (fieldname == "@ID" || fieldname == "ID")
 							dictrec = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^
-									  FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
-									  15;
+								FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
+								15;
 						else {
 							throw MVDBException(
 								"get_dictexpression() cannot read " ^
@@ -2468,7 +2505,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				sqlexpression =
 					"exodus_extract_text(" ^
 					get_fileexpression(mainfilename, xlatetargetfilename,
-								   "data") ^
+							"data") ^
 					", " ^ xlatetargetfieldname ^ ", 0, 0)";
 
 			} else if (stage2_calculated) {
@@ -2801,42 +2838,42 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	return word1;
 }
 
-bool var::saveselect(CVR filename) {
-
-	THISIS("bool var::saveselect(CVR filename) const")
-	//?allow undefined usage like var xyz=xyz.select();
-	// assertDefined(function_sig);
-	ISSTRING(filename)
-
-	if (DBTRACE)
-		filename.logputl("DBTR var::saveselect() ");
-
-	int recn = 0;
-	var key;
-	var mv;
-
-	// save preselected keys into a file to be used with INNERJOIN on select()
-
-	// this should not throw if the select does not exist
-	this->deletefile(filename);
-
-	// clear or create any existing saveselect file with the same name
-	if (!this->createfile(filename))
-		throw MVDBException("saveselect cannot create file " ^ filename);
-
-	var file;
-	if (!file.open(filename, (*this)))
-		throw MVDBException("saveselect cannot open file " ^ filename);
-
-	while (this->readnext(key, mv)) {
-		recn++;
-
-		// save a key
-		(mv ^ FM ^ recn).write(file, key);
-	}
-
-	return recn > 0;
-}
+//bool var::saveselect(CVR filename) {
+//
+//	THISIS("bool var::saveselect(CVR filename) const")
+//	//?allow undefined usage like var xyz=xyz.select();
+//	assertDefined(function_sig);
+//	ISSTRING(filename)
+//
+//	if (DBTRACE)
+//		filename.logputl("DBTR var::saveselect() ");
+//
+//	int recn = 0;
+//	var key;
+//	var mv;
+//
+//	// save preselected keys into a file to be used with INNERJOIN on select()
+//
+//	// this should not throw if the select does not exist
+//	this->deletefile(filename);
+//
+//	// clear or create any existing saveselect file with the same name
+//	if (!this->createfile(filename))
+//		throw MVDBException("saveselect cannot create file " ^ filename);
+//
+//	var file;
+//	if (!file.open(filename, (*this)))
+//		throw MVDBException("saveselect cannot open file " ^ filename);
+//
+//	while (this->readnext(key, mv)) {
+//		recn++;
+//
+//		// save a key
+//		(mv ^ FM ^ recn).write(file, key);
+//	}
+//
+//	return recn > 0;
+//}
 
 void to_extract_text(VARREF dictexpression) {
 				dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
@@ -2904,7 +2941,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var ismv = false;
 
 	var maxnrecs = "";
-	var xx;	 // throwaway return value
+	var xx; // throwaway return value
 
 	//prepare to save calculated fields that cannot be calculated by postgresql for secondary processing
 	var calc_fields = "";
@@ -2986,7 +3023,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// options - last word enclosed in () or {}
 		if (!remaining.length() &&
 			((word1[1] == "(" && word1[-1] == ")") ||
-			 (word1[1] == "{" && word1[-1] == "}"))) {
+			(word1[1] == "{" && word1[-1] == "}"))) {
 			// word1.logputl("skipping last word in () options ");
 			continue;
 		}
@@ -3036,8 +3073,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				// this produces the right results in the right order
 				// BUT DOES IS USE INDEXES AND ACT VERY FAST??
 				distinctfieldnames = "DISTINCT ON (" ^
-									 naturalsort_distinctexpression ^ ") " ^
-									 distinctexpression;
+								naturalsort_distinctexpression ^ ") " ^
+								distinctexpression;
 				orderclause ^= ", " ^ naturalsort_distinctexpression;
 			}
 			continue;
@@ -3049,7 +3086,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			var dictid = getword(remaining, xx);
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
-								  dictfile, dictid, joins, unnests, selects, ismv, true);
+							dictfile, dictid, joins, unnests, selects, ismv, true);
 
 			// dictexpression.logputl("dictexpression=");
 			// orderclause.logputl("orderclause=");
@@ -3125,9 +3162,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			//////////////////////////////////////////////////////////
 
 			// skip AUTHORISED for now since too complicated to calculate in database
-			// ATM if (word1.ucase()=="AUTHORISED") { 	if
+			// ATM if (word1.ucase()=="AUTHORISED") { if
 			//(whereclause.substr(-4,4).ucase() == " AND")
-			//whereclause.splicer(-4,4,""); 	continue;
+			//whereclause.splicer(-4,4,""); continue;
 			//}
 
 			// process the dictionary id
@@ -3135,7 +3172,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				false;	// because indexes are NOT created sortable (exodus_sort()
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
-								  dictfile, word1, joins, unnests, selects, ismv, forsort);
+							dictfile, word1, joins, unnests, selects, ismv, forsort);
 			var usingnaturalorder = dictexpression.index("exodus_extract_sort") or dictexpression.index("exodus_natural");
 			var dictid = word1;
 
@@ -3371,11 +3408,11 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			}
 
 			/*implement using posix regular string matching
-				~ 	Matches regular expression, case sensitive
+				~ Matches regular expression, case sensitive
 					'thomas' ~ '.*thomas.*'
-				~* 	Matches regular expression, case insensitive
+				~* Matches regular expression, case insensitive
 					'thomas' ~* '.*Thomas.*'
-				!~ 	Does not match regular expression, case sensitive
+				!~ Does not match regular expression, case sensitive
 					'thomas' !~ '.*Thomas.*'
 				!~* Does not match regular expression, case insensitive
 					'thomas' !~* '.*vadim.*'
@@ -3579,23 +3616,23 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				// value is a FM separated list here so "subvalue" is a field
 				for (var subvalue : value) {
 					/* ordinary UTF8 collation strangely doesnt sort single punctuation characters along with phrases starting with the same
-					   so we will use C collation which does. All so that we can use BETWEEN instead of LIKE to support STARTING WITH syntax
+					so we will use C collation which does. All so that we can use BETWEEN instead of LIKE to support STARTING WITH syntax
 
 					Example WITHOUT collation showing % sorted in different places
 
 					test_test=# select * from test1 order by key;
-					    key    |   data    
-					-----------+---------==--
-					 %         | %
-					 +         | +
-					 1         | 1
-					 10        | 10
-					 2         | 2
-					 20        | 20
-					 A         | A
-					 B         | B
-					 %RECORDS% | RECORDS
-					 +RECORDS+ | +RECORDS+
+					key        |   data
+					-----------+-----------
+					%         | %
+					+         | +
+					1         | 1
+					10        | 10
+					2         | 2
+					20        | 20
+					A         | A
+					B         | B
+					%RECORDS% | RECORDS
+					+RECORDS+ | +RECORDS+
 					*/
 					dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
 					expression ^= dictexpression ^ " COLLATE \"C\"";
@@ -3761,8 +3798,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				/* creating a "none" stop list?
 				printf "" > /usr/share/postgresql/10/tsearch_data/none.stop
 				CREATE TEXT SEARCH DICTIONARY public.simple_dict (
-				    TEMPLATE = pg_catalog.simple,
-				    STOPWORDS = none
+					TEMPLATE = pg_catalog.simple,
+					STOPWORDS = none
 				);
 				in psql default_text_search_config(pgcatalog.simple_dict)
 				*/
@@ -4276,7 +4313,7 @@ bool var::deletelist(CVR listname) const {
 
 	THISIS("bool var::deletelist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
-	// assertDefined(function_sig);
+	assertDefined(function_sig);
 	ISSTRING(listname)
 
 	if (DBTRACE)
@@ -4305,10 +4342,9 @@ bool var::deletelist(CVR listname) const {
 
 bool var::savelist(CVR listname) {
 
-
 	THISIS("bool var::savelist(CVR listname)")
 	//?allow undefined usage like var xyz=xyz.select();
-	// assertDefined(function_sig);
+	assertDefined(function_sig);
 	ISSTRING(listname)
 
 	if (DBTRACE)
@@ -4319,57 +4355,75 @@ bool var::savelist(CVR listname) {
 	if (!lists.open("LISTS"))
 		throw MVDBException("savelist() LISTS file cannot be opened");
 
-	// this should not throw if the list does not exist
-	this->deletelist(listname);
-
 	var listno = 1;
 	var listkey = listname;
-	var block = "";
-	static int maxblocksize = 1024 * 1024;
+	var list = "";
+	static int maxlistsize = 1024 * 1024;
+
+	// Function to write list of keys.
+	// Called in readnext loop if list gets too large
+	// and after the loop to save any unsaved keys
+	auto write_list = [&] () {
+
+		if (!list.var_str.size())
+			return;
+
+		// Delete any prior list with the same name
+		if (listno == 1) {
+			// this should not throw if the list does not exist
+			this->deletelist(listname);
+		}
+
+		// Remove trailing FM
+		list.var_str.pop_back();
+
+		// save the block
+		list.write(lists, listkey);
+
+		// prepare the next block
+		// first list block is listno 1 but has no suffix
+		// 2nd list block is listno 2 and has suffice *2
+		listno++;
+		listkey = listname ^ "*" ^ listno;
+		list = "";
+	};
 
 	var key;
 	var mv;
 	while (this->readnext(key, mv)) {
 
-		// append the key
-		block.var_str.append(key.var_str);
+		// append the key to the list
+		list.var_str.append(key.var_str);
 
 		// append SM + mvno if mvno present
 		if (mv) {
-			block.var_str.push_back(VM_);
-			block.var_str.append(mv.var_str);
+			list.var_str.push_back(VM_);
+			list.var_str.append(mv.var_str);
 		}
 
-		// save a block of keys if more than a certain size (1MB)
-		if (block.length() > maxblocksize) {
-			// save the block
-			block.write(lists, listkey);
+		// save one list of keys if more than a certain size (1MB)
+		if (list.length() > maxlistsize) {
 
-			// prepare the next block
-			listno++;
-			listkey = listname ^ "*" ^ listno;
-			block = "";
+			write_list();
+
 			continue;
 		}
 
 		// append a FM separator since lists use FM
-		block.var_str.push_back(FM_);
+		list.var_str.push_back(FM_);
 	}
 
-	// write the block
-	if (block.length() > 1) {
-		block.write(lists, listkey);
-		listno++;
-	}
+	// write any pending list
+	write_list();
 
-	return listno > 0;
+	return listno > 1;
 }
 
 bool var::getlist(CVR listname) {
 
 	THISIS("bool var::getlist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
-	// assertDefined(function_sig);
+	assertDefined(function_sig);
 	ISSTRING(listname)
 
 	if (DBTRACE)
@@ -4750,13 +4804,13 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	// create index ads__brand_code on ads (exodus_extract_text(data,3,0,0));
 
 	// throws if cannot find dict file or record
-	var joins = "";	   // throw away - cant index on joined fields at the moment
-	var unnests = "";  // unnests are only created for ORDER BY, not indexing or selecting
+	var joins = "";   // throw away - cant index on joined fields at the moment
+	var unnests = ""; // unnests are only created for ORDER BY, not indexing or selecting
 	var selects = "";
 	var ismv;
 	var forsort = false;
 	var dictexpression = get_dictexpression(*this, filename, filename, actualdictfile, actualdictfile,
-										   fieldname, joins, unnests, selects, ismv, forsort);
+									fieldname, joins, unnests, selects, ismv, forsort);
 	// dictexpression.logputl("dictexp=");stop();
 
 	//mv fields return in unnests, not dictexpression
@@ -4920,9 +4974,10 @@ var var::dblist() const {
 
 //TODO avoid round trip to server to check this somehow or avoid calling it all the time
 bool var::cursorexists() {
-	// THISIS("var var::cursorexists() const")
+
+	THISIS("bool var::cursorexists()")
 	// could allow undefined usage since *this isnt used?
-	// assertString(function_sig);
+	assertDefined(function_sig);
 
     // Avoid generating sql errors since they abort transations
 
@@ -5095,7 +5150,7 @@ static bool get_mvresult(CVR sql, MVresult& mvresult, PGconn* pgconn) {
 	DEBUG_LOG_SQL
 
 	/* dont use PQexec because is cannot be told to return binary results
-	 and use PQexecParams with zero parameters instead
+	and use PQexecParams with zero parameters instead
 	//execute the command
 	mvresult = get_mvresult(pgconn, sql.var_str.c_str());
 	mvresult = mvresult;
@@ -5107,10 +5162,10 @@ static bool get_mvresult(CVR sql, MVresult& mvresult, PGconn* pgconn) {
 
 	// will contain any mvresult IF successful
 	mvresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
-							nullptr,									  /* let the backend deduce param type */
+							nullptr,								/* let the backend deduce param type */
 							paramValues, paramLengths,
-							0,	 // text arguments
-							0);	 // text results
+							0,  // text arguments
+							0);	// text results
 
 	// Handle serious error. Why not throw?
 	if (!mvresult) {

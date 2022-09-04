@@ -125,9 +125,9 @@ function main() {
 					//printl(rec2);
 					var nfs = dcount(RECORD, FM);
 					var nfs2 = dcount(rec2, FM);
-					if (nfs2 gt nfs)
-						nfs = nfs2;
-					for (var fn = 1; fn <= nfs; ++fn) {
+					//if (nfs2 gt nfs)
+					//	nfs = nfs2;
+					for (let fn : range(1, std::max(nfs,nfs2))) {
 						var f1 = RECORD.a(fn);
 						var f2 = rec2.a(fn);
 						if (f1 ne f2) {

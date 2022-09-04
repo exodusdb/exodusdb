@@ -32,6 +32,13 @@ function main()
 		return 0;
 	}
 
+	//Skip if fast testing required
+	if (osgetenv("EXO_FAST_TEST")) {
+		printl("EXO_FAST_TEST - skipping test.");
+		printl("Test passed");
+		return 0;
+	}
+
 	var response;
 	assert(var().sqlexec("select exodus_extract_date_array(''||chr(29)||'1',0,0,0);",response));
 	TRACE(response.field(RM,2))
@@ -55,6 +62,61 @@ function main()
 	var trec;
 	deletefile(filename);
 	assert(createfile(filename));
+
+	printl("Test rename, and rename back");
+	assert(renamefile(filename, filename ^ "_renamed"));
+	assert(renamefile(filename ^ "_renamed", filename));
+
+	printl("Test reccount");
+	for (var recn : range(1,10))
+		write(recn on filename, recn);
+	assert(filename.reccount() eq 10);
+
+	printl("Select 3 records");
+	assert(select(filename ^ " 1 2 3"));
+	assert(LISTACTIVE);
+
+	printl("savelist");
+	var listid = rnd(999999);
+	assert(savelist(listid));
+	assert(not LISTACTIVE);
+
+	printl("Check lists record");
+	var lists = "lists";
+	var list;
+	assert(read(list from lists, listid));
+	assert(list eq "1^2^3"_var);
+
+	printl("Cannot savelist without active list");
+	assert(not savelist(listid));
+
+	printl("getlist");
+	assert(getlist(listid));
+	assert(LISTACTIVE);
+
+	printl("deletelist");
+	assert(deletelist(listid));
+
+	printl("select list should still be active despite the above");
+	assert(LISTACTIVE);
+
+	printl("deletelist if doesnt exist is not an error");
+	assert(deletelist(listid));
+
+	printl("select list should still be active despite the above");
+	assert(LISTACTIVE);
+
+	printl("Test clearfile");
+	clearfile(filename);
+	assert(filename.reccount() eq 0);
+
+	printl("select list should still be active despite the above");
+	assert(LISTACTIVE);
+
+	printl("clearselect should deactivate any active list");
+	//assert(clearselect());
+	clearselect();
+	assert(not LISTACTIVE);
 
     //check writeo creates a cached record readable by reado but not read
 	{
@@ -121,6 +183,11 @@ function main()
 			write(i on tempfile, i);
 		tempfile.reccount().outputl("nrecs");
 
+		// Check reading magic key %RECORDS% returns all keys in natural order
+		assert(read(RECORD from tempfile, "%RECORDS%"));
+		TRACE(RECORD)
+		assert(RECORD eq "1^2^3^4^5^6^7^8^9^10"_var);
+
 		printl("Check deleterecord works on a select list");
 //		select(tempfile ^ " with ID ge 5");
 		select(tempfilename ^ " with ID ge '5'");
@@ -134,6 +201,75 @@ function main()
 		printl("Check deleterecord one key using 2nd parameter works");
 		deleterecord(tempfilename, "10");
 		assert(tempfile.reccount() == 1);
+
+		printl("Prepare a test record");
+		assert(write("aa^bb^cc"_var on tempfile, "X"));
+
+		{
+			printl("Update single field");
+			assert(writev("22" on tempfile, "X", 2));
+			var rec;
+			assert(read(rec from tempfile, "X"));
+			assert(rec eq "aa^22^cc"_var);
+
+			printl("Check single field updated");
+			assert(readv(rec from tempfile, "X", 2));
+			assert(rec eq "22"_var);
+
+			printl("Writev on empty record");
+			assert(writev("22" on tempfile, "Y", 2));
+			assert(read(rec from tempfile, "Y"));
+			assert(rec eq "^22"_var);
+
+			printl("Check that insertrecord works only if record DOESNT exist");
+			assert(insertrecord("11^22^33"_var on tempfile, "ZZZ"));
+			assert(read(rec from tempfile, "ZZZ"));
+			assert(rec eq "11^22^33"_var);
+			//
+			assert(not insertrecord("aa^bb^cc" on tempfile, "ZZZ"));
+			assert(read(rec from tempfile, "ZZZ"));
+			assert(rec eq "11^22^33"_var);
+
+			printl("Check that updaterecord works only if record DOES exist");
+			assert(not updaterecord("aa^bb^cc"_var on tempfile, "QQQ"));
+			assert(not read(rec from tempfile, "QQQ"));
+			//
+			assert(updaterecord("aa^bb^cc"_var on tempfile, "ZZZ"));
+			assert(read(rec from tempfile, "ZZZ"));
+			assert(rec eq "aa^bb^cc"_var);
+
+			printl("Make an active list from a record");
+			assert(formlist(tempfile, "ZZZ"));
+			assert(LISTACTIVE);
+
+			assert(readnext(ID));
+			assert(ID eq "aa");
+
+			assert(readnext(ID));
+			assert(ID eq "bb");
+
+			assert(readnext(ID));
+			assert(ID eq "cc");
+
+			assert(not readnext(ID));
+
+			printl("Make an active list from a multivalued record field");
+			assert(write("aa^bb^c1]c2]c3^dd"_var on tempfile, "ZZZ"));
+			assert(formlist(tempfile, "ZZZ", 3));
+			assert(LISTACTIVE);
+
+			assert(readnext(ID));
+			assert(ID eq "c1");
+
+			assert(readnext(ID));
+			assert(ID eq "c2");
+
+			assert(readnext(ID));
+			assert(ID eq "c3");
+
+			assert(not readnext(ID));
+
+		}
 	}
 
     //NFD - Decomposed Normal Form                                                                     │
@@ -164,8 +300,42 @@ function main()
         printl("OK failure to read a record makes the record variable unassigned. For programming safety");
     }
 
-#define MULTIPLE_CONNECTION_CODE_EXCLUDED
-#ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
+	{
+		printl("Check can write a whole dim array to one record");
+		dim d1 = {11,22,33};
+		assert(d1.write(filename,"D1"));
+		var rec;
+
+		printl("Verify record back into a var");
+		assert(read(rec from filename, "D1"));
+		assert(rec eq "11^22^33"_var);
+
+		printl("Verify record back into a dim");
+		dim d2;
+		assert(d2.read(filename, "D1"));
+		assert(d2.join() eq d1.join());
+
+	}
+
+	{
+		// free functions
+
+		printl("Check can write a whole dim array to one record");
+		dim d1 = {11,22,33};
+		assert(dimwrite(d1 on filename,"D1"));
+		var rec;
+
+		printl("Verify record back into a var");
+		assert(read(rec from filename, "D1"));
+		assert(rec eq "11^22^33"_var);
+
+		printl("Verify record back into a dim");
+		dim d2;
+		assert(dimread(d2 from filename, "D1"));
+		assert(d2.join() eq d1.join());
+
+	}
+
 	{
 		var conn1;
 		//connect normally doesnt touch default connection
@@ -185,7 +355,7 @@ function main()
 	var dbname4="exodus4b";
 	{
 		var conn1;
-		conn1.connect( "");			// creates new connection with default parameters (connection string)
+		assert(conn1.connect(""));			// creates new connection with default parameters (connection string)
 
 		//remove any existing test databases
 		for (var dbname : dbname2 ^ FM ^ dbname3 ^ FM ^ dbname4) {
@@ -198,6 +368,9 @@ function main()
 					outputl(conn1.lasterror());
 			}
 		}
+
+		TRACE(lasterror());
+		assert(lasterror() eq var().lasterror());
 
 		printl("verify CANNOT connect to non-existent deleted database2");
 		printl("=======================================================");
@@ -295,15 +468,108 @@ function main()
 		disconnect();		// global connection
 	}
 
+	{
+		printl("dbcreate using free function");
+
+		assert(dbcreate(dbname2));
+		printl("dblist using free function");
+
+		assert(dblist().convert(FM,VM).locate(dbname2));
+		printl("dbcopy using free function");
+
+		assert(dbcopy(dbname2, dbname3));
+		printl("dbdelete using free function");
+
+		assert(dbdelete(dbname2));
+		printl("dbdelete using free function");
+
+		var tempfilename = "xo_temp_" ^ ospid();
+		printl("createfile using free function");
+		assert(createfile(tempfilename));
+
+		assert(write("11^22^33"_var on tempfilename, "key1"));
+
+		assert(read(RECORD from tempfilename, "key1"));
+		assert(RECORD eq "11^22^33"_var);
+
+		assert(write("11.^22.^33."_var on tempfilename, "key2"));
+		assert(reccount(tempfilename) eq 2);
+
+		assert(reado(RECORD from tempfilename, "key2"));
+		assert(RECORD eq "11.^22.^33."_var);
+		assert(reccount(tempfilename) eq 2);
+
+		// Test write to cache but not file
+		assert(writeo("111^222^333"_var on tempfilename, "key9"));
+		assert(not read(RECORD from tempfilename, "key9"));
+		// Read from cache should succeed
+		assert(reado(RECORD from tempfilename, "key9"));
+		assert(RECORD eq "111^222^333"_var);
+
+		assert(lock(tempfilename, "k1"));
+		assert(not lock(tempfilename, "k1"));
+		assert(lock(tempfilename, "k2"));
+		assert(lock(tempfilename, "k3"));
+		unlock(tempfilename, "k1");
+		assert(lock(tempfilename, "k1"));
+		unlockall();
+		assert(lock(tempfilename, "k1"));
+		assert(lock(tempfilename, "k2"));
+		assert(lock(tempfilename, "k3"));
+		unlockall();
+
+		printl("clearfile using free function");
+		assert(clearfile(tempfilename));
+
+		assert(reccount(tempfilename) eq 0);
+
+		var tempfilename2 = tempfilename ^ "_2";
+		assert(renamefile(tempfilename, tempfilename2));
+
+		{
+			assert(begintrans());
+			assert(write("xyz" on tempfilename2, "key1"));
+			assert(read(RECORD from tempfilename2, "key1"));
+			assert(statustrans());
+			assert(rollbacktrans());
+			assert(not statustrans());
+			assert(not read(RECORD from tempfilename2, "key1"));
+		}
+
+		{
+			assert(begintrans());
+			assert(write("xyz" on tempfilename2, "key1"));
+			assert(read(RECORD from tempfilename2, "key1"));
+			assert(statustrans());
+			assert(committrans());
+			assert(not statustrans());
+			assert(read(RECORD from tempfilename2, "key1"));
+		}
+
+		printl("deletefile using free function");
+		assert(deletefile(tempfilename2));
+
+		printl("dbdelete using free function");
+		assert(dbdelete(dbname3));
+
+		printl("done");
+	}
+
 	var table2name = "TABLE2";
 	var table3name = "TABLE2";
 
 	{
+
 		printl("create dbs exodus2 and exodus3");
 		var conn1;
 		assert(conn1.connect(""));
 		assert(conn1.dbcreate(dbname2));
 		assert(conn1.dbcreate(dbname3));
+
+		// Check dblist
+		var dbnames = dblist().convert(FM,VM);
+		assert(dbnames.locate(dbname2));
+		assert(dbnames.locate(dbname3));
 
 		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
 		var conndb2,conndb3;
@@ -481,14 +747,74 @@ function main()
 			//assert(open(uniquefilename, conn1));
 			assert(conn1.open(uniquefilename, conn1));
 
+			//"detach" the file so that it is not in cache
+			conn1.detach(uniquefilename);
+
 			//file is not available without specifying connection
-			//due to file handle caching it WILL find it
-			//assert(not open(uniquefilename));
+			//without detach above, file handle caching it WOULD find it
+			assert(not open(uniquefilename));
 
 			//test "attach"
 
-			//"attach" the file via the connection
+			//cannot "attach" files that do not exist on the connection
+			assert(not conn1.attach("test_db_97876_" ^ uniquefilename));
+
+			// Check "attach" the file via the connection
 			assert(conn1.attach(uniquefilename));
+
+			//file can now be opened without specifying the connection
+			assert(open(uniquefilename));
+
+			//"detach" the file
+			conn1.detach(uniquefilename);
+
+			//the file is no longer available without specifying connection
+			assert(not open(uniquefilename));
+
+			conn1.disconnect();
+
+		}
+
+		///test attach "all" dict files
+		{
+
+			var uniquefilename = "dict.test_attach";
+			var otherdbname = dbname4;
+
+			//delete the file first in case already exists
+			deletefile(uniquefilename);
+
+			//the file is not available in the default connection
+			assert(not open(uniquefilename));
+
+			//open a connection
+			var conn1;
+			assert(conn1.connect(otherdbname));
+
+			//delete the file first in case already exists
+			conn1.deletefile(uniquefilename);
+
+			//create the file
+			assert(conn1.createfile(uniquefilename));
+
+			//file exists in connection's listfiles
+			assert(conn1.listfiles().index(uniquefilename.lcase()));
+
+			//file can be opened via the connection
+			//assert(open(uniquefilename, conn1));
+			assert(conn1.open(uniquefilename, conn1));
+
+			//"detach" the file - so it will be removed from the cache
+			conn1.detach(uniquefilename);
+
+			//file is not available without specifying connection
+			//without detach above, file handle caching WOULD find it
+			assert(not open(uniquefilename));
+
+			//test "attach"
+
+			//"attach" all "dict" file via the connection using "dict"
+			assert(conn1.attach("dict"));
 
 			//file can now be opened without specifying the connection
 			assert(open(uniquefilename));
@@ -514,365 +840,8 @@ function main()
 
 		conn1.disconnect();
 	}
-#endif
 
-//#if 0
-
-	deletefile("XO_USERS");
-	deletefile("dict.XO_USERS");
-
-	createfile("XO_USERS");
-	createfile("dict.XO_USERS");
-
-	//create some dictionary records (field descriptions)
-	//PERSON_NO    Type "F", Key Field (0)
-	//BIRTHDAY     Type "F", Data Field 1
-	//AGE IN DAYS  Type "S", Source Code needs a dictionary subroutine library called dict_XO_USERS
-	//AGE IN YEARS Type "S", Source Code ditto
-	assert(write(convert( "F|0|Person No||||||R|10"   ,"|",FM),"dict.XO_USERS", "PERSON_NO"   ));
-	assert(write(convert( "F|1|Birthday||||D||R|12"   ,"|",FM),"dict.XO_USERS", "BIRTHDAY"    ));
-	assert(write(convert( "S||Age in Days||||||R|10"  ,"|",FM),"dict.XO_USERS", "AGE_IN_DAYS" ));
-	assert(write(convert( "S||Age in Years||||||R|10" ,"|",FM),"dict.XO_USERS", "AGE_IN_YEARS"));
-
-	//create some users and their birthdays 11000=11 FEB 1998 .... 14000=30 APR 2006
-	assert(write("11000","XO_USERS","1"));
-	assert(write("12000","XO_USERS","2"));
-	assert(write("13000","XO_USERS","3"));
-	assert(write("14000","XO_USERS","4"));
-
-//DBTRACE=true;
-	//check can create and delete indexes
-	//errmsg = {var_mvstr="ERROR:  function exodus_extract_date(bytea, integer, integer, integer) does not exist
-	//use DBTRACE to see the error
-	printl("CHECKING IF PGEXODUS POSTGRES PLUGIN IS INSTALLED");
-	var pluginok=true;
-	if (not createindex("XO_USERS","BIRTHDAY")) {
-		pluginok=false;
-		printl("Error: pgexodus, Exodus's plugin to PostgreSQL is not working. Run configexodus.");
-	}
-
-	if (pluginok) {
-		assert(listindexes("XO_USERS") eq ("xo_users" _VM_ "birthday"));
-		assert(listindexes() ne "");
-//ALN: do not delete to make subsequent select work::	assert(deleteindex("XO_USERS","BIRTHDAY"));
-//		assert(listindexes("XO_USERS") eq "");
-	}
-	//check can select and readnext through the records
-	printl("Beginning transaction");
-	assert(begintrans());
-	printl("Begun transaction");
-	if (pluginok) {
-		assert(select("select XO_USERS with BIRTHDAY between '1 JAN 2000' and '31 DEC 2003'"));
-		assert(readnext(ID));
-		assert(ID eq 2);
-		assert(readnext(ID));
-		assert(ID eq 3);
-		assert(not readnext(ID));//check no more
-	}
-//test function dictionaries
-//	if (not select("SELECT XO_USERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
-//	if (not select("SELECT XO_USERS"))
-	if (not select("SELECT XO_USERS (R)"))
-		assert(false and var("Failed to Select XO_USERS!"));
-
-	DICT="dict.XO_USERS";
-	while (readnext(RECORD,ID,MV))
-//	while (readnext(ID))
-	{
-		printl("ID=" ^ ID ^ " RECORD=" ^ RECORD);
-
-//		continue;
-//following requires dict_XO_USERS to be a dictionary library something like
-//edic dict_XO_USERS
-/*
-#include <exodus/dict.h>
-
-dict(AGE_IN_DAYS) {
-	ANS=date()-RECORD(1);
-}
-
-dict(AGE_IN_YEARS) {
-	ANS=calculate("AGE_IN_DAYS")/365.25;
-}
-*/
-			//		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
-			//		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
-	}
-
-//#endif
-
-	committrans();
-
-	var filenames=listfiles();
-	var indexnames=listindexes("test_people");
-
-	/*
-	var().begin();
-	var testfile;
-	if (!testfile.open("TESTFILE"))
-		testfile.createfile("TESTFILE");
-	var record1=var("x").str(300);
-	var started=var().ostime();
-	int nn=10000;
-	if (0)
-	{
-		for (int ii=1;ii<nn;++ii)
-		{
-			if (!(ii%10000)) cout<<"Written "<<ii<<endl;
-			record1.insertrecord(testfile,ii);
-		}
-	}
-	var stopped=var().ostime();
-	wcout<<(stopped-started)/nn;
-
-	started=var().ostime();
-	for (int ii=1;ii<nn;++ii)
-	{
-		if (!(ii%10000)) cout<<"Read "<<ii<<endl;
-		record1.read(testfile,ii);
-	}
-
-	var().end();
-
-	stopped=var().ostime();
-	printl((stopped-started)/nn*1000000);
-
-	wcin>>nn;
-
-	//	testfile.deletefile();
-
-	*/
-
-//	var().connectlocal("");
-
-	var filenames2="XO_JOBS";
-	filenames2^=FM^"XO_PRODUCTION_ORDERS";
-	filenames2^=FM^"XO_PRODUCTION_INVOICES";
-	filenames2^=FM^"XO_COMPANIES";
-	filenames2^=FM^"XO_BRANDS";
-	filenames2^=FM^"XO_CLIENTS";
-	filenames2^=FM^"XO_VEHICLES";
-	filenames2^=FM^"XO_SUPPLIERS";
-	filenames2^=FM^"XO_CURRENCIES";
-	filenames2^=FM^"XO_MARKETS";
-	filenames2^=FM^"XO_ADS";
-
-	var tempfile;
-	printl();
-	var nfiles=dcount(filenames2,FM);
-	for (int ii=1;ii<=nfiles;++ii) {
-		var filename=filenames2.a(ii);
-
-		printl(filename);
-
-		if (not open(filename, tempfile)) {
-			printl("creating "^filename);
-			assert(createfile(filename));
-		}
-
-		if (not open("dict."^filename.lcase(), tempfile)) {
-			printl("creating dict_"^filename);
-			assert(createfile("dict."^filename));
-		}
-
-	}
-//	var("x:y:z:").dcount(":").outputl();
-//	var().stop();
-
-	var ads;
-	if (!ads.open("XO_ADS"))
-	{
-		var().createfile("XO_ADS");
-		if (!ads.open("XO_ADS"))
-			printl("Cannot create XO_ADS");
-			//abort("Cannot create XO_ADS");
-	}
-
-	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","dict.XO_CURRENCIES","CURRENCY_CODE");
-	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","dict.XO_CURRENCIES","CURRENCY_NAME");
-	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","dict.XO_MARKETS","CODE");
-	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","dict.XO_MARKETS","NAME");
-
-	var dictrec="";
-	dictrec(1) = "F";
-	dictrec(2) = "3";
-	dictrec(3) = "Brand Code";
-	if (not dictrec.write("dict.XO_ADS","BRAND_CODE"))
-		printl("cannot write dict_ads, BRAND_CODE");
-	//oo style
-	assert(ads.createindex("BRAND_CODE"));
-	assert(ads.deleteindex("BRAND_CODE"));
-	//procedural
-	assert(createindex("XO_ADS BRAND_CODE"));
-	assert(deleteindex("XO_ADS BRAND_CODE"));
-
-//	var("").select("MARKETS","WITH CURRENCY_NAME = '' AND WITH AUTHORISED");
-//	var("").select("MARKETS","WITH AUTHORISED");
-//	var("").select("XO_ADS","WITH AUTHORISED");
-//	ads.select("XO_ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
-//	ads.select("XO_ADS","BY MARKET_CODE");
-//	var().select("XO_ADS");
-//	var("").select("SCHEDULES","WITH AUTHORISED");
-//	var("").select("SCHEDULES","");
-	//MvLibs mvlibs;
-	var key;
-	int ii=0;
-//	cin>>ii;
-	var record;
-	begintrans();
-	if (ads.select("SELECT XO_ADS")) {
-		while (ii<3&&ads.readnext(record,key,MV))
-		{
-			++ii;
-			if (!(ii%10000))
-				printl(" " ^ key);
-			if (record.lcase().index("QWEQWE"))
-				print("?");
-
-		}
-	}
-	clearselect();
-	committrans();
-#ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
-	{	// test to reproduce cached_handles error
-		var file1( "t_FILE1.txt");
-		oswrite( "", file1);
-		var off1 = 0;
-		osbwrite( "This text is written to the file 't_FILE1.txt'", file1, off1);
-
-		var file2( "t_FILE2.txt");
-		oswrite( "", file2);
-		var off2 = 0;
-		osbwrite( "This text is written to the file 't_FILE2.txt'", file2, off2);
-
-		var file1x = file1;		// wicked copy of file handle
-		file1x.osclose();		// we could even do: var( file1).osclose();
-
-		var file3( "t_FILE3.txt");
-		oswrite( "", file3);
-		var off3 = 0;
-		osbwrite( "This text is written to the file 't_FILE3.txt'", file3, off3);
-
-		osbwrite( "THIS TEXT INTENDED FOR FILE 't_FILE1.txt' BUT IT GOES TO 't_FILE3.txt'", file1, off1);
-	}
-#endif
-
-    var myclients;
-	var clients_filename = "xo_clients";
-    if (myclients.open(clients_filename)) {
-
-	    printl();
-    	printl("The following section requires data created by testsort.cpp");
-
-        var key;
-
-        //begintrans();
-
-        if (var().open(clients_filename))
-                printl("Could open " ^ clients_filename);
-        else
-                printl("Could NOT open " ^ clients_filename);
-
-        printl();
-        printl("1. test full output with no selection clause or preselect");
-        myclients.select();
-        while(myclients.readnext(key)) {
-                key.outputl("t1 key=");
-        }
-
-	printl();
-        printl("2. test with default cursor (unassigned var) - select clause needs filename");
-        myclients.select("select " ^ clients_filename ^ " with type 'B'");
-        while(myclients.readnext(key)) {
-                key.outputl("t2 key=");
-        }
-
-        printl();
-        printl("3. tests with named cursor (assigned var) - if is file name then select clause can omit filename");
-        myclients=clients_filename;
-        printl("test preselect affects following select");
-        myclients.select("with type 'B'");
-        printl("Normally the following select would output all records but it only shows the preselected ones (2)");
-        myclients.select();
-        while(myclients.readnext(key)) {
-                key.outputl("t3 key=");
-        }
-
-        printl();
-        printl("4. Normally the following select would output all records but it only shows 3 keys from makelist");
-        var keys="SB1" _FM_ "JB2" _FM_ "SB001";
-        myclients.makelist("",keys);
-        myclients.outputl();
-//      myclients.select();
-	//while(myclients.readnext(key)) {
-	//	key.outputl("t4 key=");
-	//}
-		myclients.readnext(key);
-		assert(key=="SB1");
-		myclients.readnext(key);
-		assert(key=="JB2");
-		myclients.readnext(key);
-		assert(key=="SB001");
-		myclients.readnext(key);
-		assert(key=="SB001");
-		//committrans();
-		//rollbacktrans();
-
-		assert(write("Client XB1" on myclients, "XB1"));
-		assert(write("Client XB2" on myclients, "XB2"));
-
-		// Check mvprogram's xlate using X and C mode9
-		assert(xlate(clients_filename, "XB1", 1, "C") eq "Client XB1");
-		assert(xlate(clients_filename, "XB1x", 1, "X") eq "");
-		assert(xlate(clients_filename, "XB1x", 1, "C") eq "XB1x");
-
-		// var::xlate multivalues using VM
-		keys = "XB1]XB2"_var;
-		assert(keys.xlate(clients_filename, 1, "X").outputl() eq "Client XB1]Client XB2"_var);
-
-		assert(deleterecord(myclients, "XB1"));
-		assert(deleterecord(myclients, "XB2"));
-
-    }
-
-	{
-	    // Create a temporary file (ending _temp)
-	    var filename = "xo_test_trans_temp";
-	    var file;
-	    assert(not open(filename to file));
-
-	    //deletefile(filename); //should never exist since temporary
-	    assert(createfile(filename));
-
-	    // Check open/read/write
-	    assert(open(filename to file));
-	    assert(write(1 on file,1));
-	    assert(read(RECORD from file,1));
-	    assert(RECORD eq 1);
-
-	    // Start transaction
-	    assert(begintrans());
-
-	    // Check write within transaction can be seen within transaction
-	    assert(write(11 on file,1));
-	    assert(read(RECORD from file,1));
-	    assert(RECORD eq 11);
-
-	    // Rollback
-	    assert(rollbacktrans());
-
-	    // Check rollback reverts write
-	    assert(read(RECORD from file,1));
-	    assert(RECORD eq 1);
-
-	    // Check temporary files are deleted on closing connection
-	    disconnect();
-	    //disconnectall();
-	    connect();
-	    assert(not open(filename to file));
-	}
-
-	printl("Test passed");
+printl("Test passed");
 
 	return 0;
 }

@@ -34,6 +34,44 @@ programinit()
 function main()
 {
 
+//EXODUS syntax directions
+//
+//
+//	x[]
+//
+//	.substr(2,2) ... for char
+//
+//	xxx[1] ... for single chars or could be used to extract
+//
+//	in c++23 [] becomes multidimensional
+//
+//	??? extract in c++23 multidim []
+//
+//	FM (AREV) or AM (Pick)
+//
+//	AREV                          EXODUS
+//
+//	                              xxx.r(2,vn,yyy.f(2,vn)); OLD
+//
+//	xxx<2,vn,sn> = yyy<2,vn>      xxx(2,vn) = yyy.f(2,vn); CURRENT
+//
+//	                              xxx(2,vn) = yyy(2,vn);   POSSIBLE NOW WITH PROBLEMS
+//
+//
+//	// wont work unless var() proxy is equipped with .write member function
+//	yyy(2,vn).write(file,key);
+//
+//	AREV                              EXODUS?
+//	xxx<2,vn,sn> = yyy<2,vn>          xxx(2,vn) = yyy[2,vn]
+//
+//
+//	field(fromstr,sep,start,n=1)
+//	fromstr.field(sep,start,n=1)
+//
+	{
+		assert("1a^2b^3c"_var.a(2).str(3) == "2b2b2b");
+	}
+
 	/* UBUNTU locale-gen
 	locale-gen de_DE.UTF-8
 	locale-gen en_GB.UTF-8
@@ -104,7 +142,11 @@ function main()
 	//test normalize (to NFC)
 	assert(decomp_a != compact_a);
 	assert(decomp_a.normalize() == compact_a);
+	assert(normalize(decomp_a) == compact_a);//func
 	assert(decomp_a.normalize().oconv("HEX")=="C3A1");
+	var b = decomp_a;
+	normalizer(b);
+	assert(b eq compact_a);
 
 	//test read/write/delete normalization
 	//exodus will normalize everything being written to the database because otherwise kind of duplicate keys can exist because
@@ -148,10 +190,30 @@ function main()
 	var greek5x2="αβγδεαβγδε";
 	assert(greek5x2.index("β")==3);
 	assert(greek5x2.index("β",2)==13);
+	// alternative starting from byte no
+	assert(greek5x2.index2("β")==3);
+	assert(greek5x2.index2("β",3)==3);//start is optional and works the same as index if missing
+	assert(greek5x2.index2("β",4)==13);// start on the 2nd byte of two byte utf-8 char skips it
+
+	//empty target string always returns "" instead of 0
+	assert(greek5x2.index("")=="");
+	assert(greek5x2.index2("",4)=="");
+
+	//target string not found returns zero
+	assert(greek5x2.index("xyz")==0);
+	assert(greek5x2.index2("xyz",4)==0);
+
+	// free function version of above
+	assert(index(greek5x2,"β")==3);
+	assert(index(greek5x2,"β",2)==13);
+	assert(index2(greek5x2,"β")==3);
+	assert(index2(greek5x2,"β",3)==3);
+	assert(index2(greek5x2,"β",4)==13);
 
 	//multibyte sep field
 	var greek5x2f2=field(greek5x2,"β",2);
 	assert(greek5x2f2=="γδεα");
+	// alternative starting from byte no so doesnt work well with utf8 other than ASCII
 	assert(greek5x2f2.length()==8);
 	assert(greek5x2f2.oconv("HEX")=="CEB3CEB4CEB5CEB1");
 
@@ -303,6 +365,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 00000008
 */
 
+	assert(seq("")=="");
 	assert(seq(chr(-513))==255);
 	assert(seq(chr(-512))==0);
 	assert(seq(chr(-256))==0);
@@ -542,7 +605,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//test windows codepages
 	if (SLASH_IS_BACKSLASH) {
 		//show where we are working
-		printl(oscwd("OSCWD="));
+		TRACE(oscwd());
 		var greektestfilename="t_greeksas.txt";
 		//check CANNOT write greek unicode characters using French codepage
 		assert(not Greek_sas.oswrite(greektestfilename,"French"));//CANNOT write
@@ -652,8 +715,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//We expect the question mark to remain as it is,
 	// and the greek gammas and ABC to be replaced with latin question marks.
 	expect=unicode;
-	expect.splicer(2,2,"??");
-	expect.splicer(4,3,"???");
+	splicer(expect,2,2,"??");
+	splicer(expect,4,3,"???");
 	//expect.outputl();
 	//expect.oconv("HEX4").outputl();
 	//swap(unicode,"\\p{L}","?","ri").outputl();
@@ -763,6 +826,9 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 			printl(ii);
 	}
 
+    assert(invert("ÏÎÍÌËÊÉÈÇÆ¾½¼»º¹¸·¶µ´³²±°¯®­¬«ª©¨§¦¥") eq "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    assert(invert("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") eq "ÏÎÍÌËÊÉÈÇÆ¾½¼»º¹¸·¶µ´³²±°¯®­¬«ª©¨§¦¥");
+
 	//check unicode is invalid from 0xD800-0xDFF (UTF16 encoding) and 0x110000 onwards
 	assert(textchr(0xD7FF)!="");
 	assert(textchr(0xD800)=="");
@@ -770,6 +836,11 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(textchr(0xE000)!="");
 	assert(textchr(0x10FFFF)!="");
 	assert(textchr(0x110000)=="");
+
+	var cmd = "c:\\windowspath\\to\\xyz.exe arg1 arg2";
+	//assert(var(to_oscmd_string(cmd) == cmd.convert("\\",OSSLASH));
+	// No conversion at the moment
+	assert(to_oscmd_string(cmd) == cmd);
 
 	printl("Test passed");
 

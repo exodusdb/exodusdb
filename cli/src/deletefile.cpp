@@ -5,22 +5,26 @@ function main() {
 
 	var filenames = COMMAND.field(FM, 2, 999999);
 
+	if (not filenames)
+		abort("Syntax is deletefile filename ...");
+
 	var result = 0;
 
-	//if (not filenames)
-	//	stop("Syntax is deletefile filename filename ...\ndict files are named dict.filename");
+	for (let filename : filenames) {
 
-	var nfiles = dcount(filenames, FM);
-	for (var filen = 1; filen <= nfiles; ++filen) {
-
-		var filename = filenames.a(filen);
-		if (deletefile(filename)) {
-			print("Deleted ");
-		} else {
-			errput("Cannot delete ");
+		if (not open(filename)) {
+			errputl(fsmsg());
 			result = 1;
+			continue;
 		}
-		printl(filename);
+
+		if (not deletefile(filename)) {
+			errputl("Cannot delete", filename);
+			result = 1;
+			continue;
+		}
+
+		printl("Deleted", filename);
 	}
 	return result;
 }

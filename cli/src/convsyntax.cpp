@@ -1,7 +1,8 @@
 #include <exodus/program.h>
 programinit()
 
-/*
+var syntax = R"(
+NAME
 
  convsyntax  Convert various EXODUS cpp syntax
 
@@ -11,24 +12,43 @@ SYNTAX
 
 EXAMPLE
 
-	conv_syntax ~/neosys/src/ASTERISK/ASTERISK.cpp {U}
+	conv_syntax ~/neosys/src/ASTERISK/ASTERISK.cpp {RF}
 
 OPTIONS
 
-	U Update the source file
+	R - Change replacer syntax
 
-	R Convert x.r(a,b,c,y) -> x(a,b,c) = y
+		   x.r(a,b,c,y)
+		-> x(a,b,c) = y
 
-		x.r(fn, replacement);         -> x(fn)         = replacement;
-		x.r(fn, vn, replacement);     -> x(fn, vn)     = replacement;
-		x.r(fn, vn, sn, replacement); -> x(fn, vn, sn) = replacement;
+		Examples:
 
-	F Convert for (const var x = ... -> for (var x : range(...
+		   x.r(fn, replacement);
+		-> x(fn) = replacement;
 
-		for (const var x = a; x <= b; ++x) -> for (var x : range(a to b))
-*/
+		   x.r(fn, vn, replacement);
+		-> x(fn, vn) = replacement;
+
+		   x.r(fn, vn, sn, replacement);
+		-> x(fn, vn, sn) = replacement;
+
+	F - Change for loop syntax to use range()
+
+		   for (const var x = ...
+		-> for (var x : range(...
+
+		Example:
+
+		for (const var x = a; x <= b; ++x)
+		-> for (var x : range(a to b))
+
+	U - Actually update the source file
+)";
 
 function main() {
+
+	if (not OPTIONS)
+		abort(syntax);
 
 	COMMAND.remover(1);
 
@@ -127,7 +147,7 @@ function main() {
 				var line2 = line;
 				bool fail = false;
 
-				//for (var dictidn = 1; dictidn <= ndictids; ++dictidn) {
+				//for (const var dictidn : range(1, ndictids)) {
 
 				// for (var dictidn = 1
 				var part1 = line2.substr(pos).field(";", 1).trim();

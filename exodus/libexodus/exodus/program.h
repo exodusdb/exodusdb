@@ -40,9 +40,9 @@
 		int result = 0;                                                                                         \
 		PROGRAMNAME##ExodusProgram exodusprogram1(mv);                                                          \
 		if (osgetenv("EXO_DEBUG")) {                                                                            \
-			errputl("Debug Init Thread:", PROCESSNO, #PROGRAMNAME, SENTENCE);                                   \
+			errputl("Debug Init Thread:", THREADNO, #PROGRAMNAME, SENTENCE);                                    \
 			result = exodusprogram1.main().toInt();                                                             \
-			errputl("Debug Exit Thread:", PROCESSNO, #PROGRAMNAME, SENTENCE);                                   \
+			errputl("Debug Exit Thread:", THREADNO, #PROGRAMNAME, SENTENCE);                                    \
 		} else {                                                                                                \
 			try {                                                                                               \
 				result = exodusprogram1.main().toInt();                                                         \
@@ -61,7 +61,7 @@
 			} catch (const MVAbortAll& exceptionx) {                                                            \
 				if (exceptionx.description.length())                                                            \
 					exceptionx.description.errputl();                                                           \
-				if (exceptionx.description.isnum())                                                             \
+				if (exceptionx.description.isnum() && exceptionx.description)                                   \
 					result = exceptionx.description.toInt();                                                    \
 				else                                                                                            \
 					result = 2;                                                                                 \
@@ -71,12 +71,12 @@
 				if (exceptionx.description.isnum())                                                             \
 					result = exceptionx.description.toInt();                                                    \
 			}                                                                                                   \
-			/*catch (const MVError& exceptionx)                                                                 \
+			catch (const MVError& exceptionx)                                                                   \
 			{                                                                                                   \
 				errputl(exceptionx.description, " - Aborting.");                                                \
-				errputl(exceptionx.stack.convert(FM, "\n"));                                                    \
+				errputl(mv_backtrace().convert(FM, "\n"));                                                      \
 				result = OPTIONS.index("I") ? 0 : 999;                                                          \
-			}*/                                                                                                 \
+			}                                                                                                   \
 		}                                                                                                       \
 		/*disconnect ALL connections of this thread*/                                                           \
 		disconnectall();                                                                                        \

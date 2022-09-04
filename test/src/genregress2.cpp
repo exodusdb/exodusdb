@@ -11,7 +11,7 @@ function main() {
 	// The existing regression test files in exodus/test/data were generated in AREV not in exodus
 	// in order to verify that exodus has some degree of Pick OS compatibility
 
-	// SPLICER1 and SPLICER2 - var.splicer(pos,str) and var.splicer(pos,len,str)
+	// SPLICER1 and SPLICER2 - splicer(var,pos,str) and splicer(var,pos,len,str)
 	////////////////////////
 
 	var n1 = 3;
@@ -28,7 +28,7 @@ function main() {
 				//TRACE(expression);
 				//var value      = splice(source,ii,insert));
 				var value = source;
-				value.splicer(ii,insert);
+				splicer(value,ii,insert);
 				//TRACE(value);
 				printt(value, "SPLICER1", source, ii, "", insert);
 				printl();

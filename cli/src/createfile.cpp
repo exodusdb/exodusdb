@@ -5,27 +5,30 @@ function main() {
 
 	var filenames = COMMAND.field(FM, 2, 999999);
 
-	if (not filenames) {
-		stop("Syntax is createfile filename filename ...\ndict files are named dict.filename");
-	}
+	if (not filenames)
+		abort("Syntax is createfile filename ...");
 
 	var result = 0;
-	var nfiles = dcount(filenames, FM);
-	for (var filen = 1; filen <= nfiles; ++filen) {
 
-		var filename = filenames.a(filen);
+	for (let filename : filenames) {
 
-		if (createfile(filename)) {
-			print("Created ");
-		} else {
+		if (open(filename)) {
+			errputl("Cannot create", filename, " - it already exists");
 			result = 1;
-			print("Cannot create ");
+			continue;
 		}
-		printl(filename);
+
+		if (not createfile(filename)) {
+			result = 1;
+			errputl("Cannot create", filename);
+			continue;
+		}
+
+		printl("Created", filename);
+
 	}
 
-	//why 1??
-	return 1;
+	return result;
 }
 
 programexit()

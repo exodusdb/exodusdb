@@ -498,16 +498,18 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		chars ^= "\\x1C";  //SVM
 		chars ^= "\\x1F";  //RM
 
-		sourcecode.r(1, -1,
-					 "/"
-					 "*pgsql");
+//		sourcecode.r(1, -1,
+//					 "/"
+//					 "*pgsql");
+		sourcecode(1, -1) = "/" "*pgsql";
 		//note postgres string prefix E'...'
 		// E is required to enable \xFF hex decoding
 		//LIMIT TO 1000 characters since postgres index limit is around 2700 BYTES
 		sourcecode(1, -1) = "ans:=upper(translate(substring(" ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid.lcase() ^ "(key,data),0,1000)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));";
-		sourcecode.r(1, -1,
-					 "*"
-					 "/");
+//		sourcecode.r(1, -1,
+//					 "*"
+//					 "/");
+		sourcecode(1, -1) = "*" "/";
 		dictrec(8) = sourcecode;
 
 		//write the sql to the dictionary record so the availablily of pgsql is visible to var::selectx

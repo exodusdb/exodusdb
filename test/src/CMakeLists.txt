@@ -23,9 +23,16 @@ link_directories(../../exodus/libexodus/exodus)
 #TODO look at breaking test_main main function into many smaller functions
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
-#file(GLOB files "test_*.cpp")
+##file(GLOB files "test_*.cpp")
 file(GLOB_RECURSE files CONFIGURE_DEPENDS "test_*.cpp")
 list(SORT files)
+#set("files" "test_main2.cpp" "test_db.cpp" "test_main3.cpp" "test_multilang.cpp" "test_dim.cpp"
+# "test_perf.cpp" "test_mvfuncs.cpp" "test_dict.cpp" "test_int.cpp" "test_sort.cpp" "test_zzzclean.cpp"
+# "test_precision.cpp" "test_mvmv2.cpp" "test_isnum.cpp" "test_more.cpp" "test_comp.cpp"
+# "test_precision2.cpp" "test_select.cpp" "test_numfmt.cpp" "test_math.cpp" "test_sortarray.cpp"
+# "test_main1.cpp" "test_more2.cpp" "test_mvmv.cpp" "test_regress.cpp" "test_regex.cpp"
+# "test_MD.cpp" "test_round.cpp" "test_except.cpp" "test_asyncupd.cpp" "test_osopen.cpp")
+
 #file(GLOB files "test_mvmv.cpp")
 foreach(file ${files})
 	string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})

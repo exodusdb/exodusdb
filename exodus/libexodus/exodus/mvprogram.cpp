@@ -14,7 +14,10 @@ namespace exodus {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
 
-// constructor with an mvenvironment
+// constructor with an mvenvironment mv 
+// mv is a reference to allow mv.xxxxxx syntax instead of mv->xxxxxx
+// but this means that mv must be provided at program construction
+// and cannot be changed thereafter
 ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 	: mv(inmv)
 {
@@ -652,15 +655,14 @@ void ExodusProgramBase::mssg(CVR msg, CVR options) const {
 // mssg 4
 void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) const {
 
-	//skip if just "downing" a previous "upped" message
-	if (options.index("D")) {
-		std::cout << std::endl;
-		return;
-	}
-
 	var interactive = !SYSTEM.a(33);
 	if (interactive)
 		std::cout << var("----------------------------------------") << std::endl;
+
+	//skip if just "downing" a previous "upped" message
+	if (options.index("D")) {
+		return;
+	}
 
 	//we must pass the message unmodified into USER4 below
 	//e.g. to pass ACCOUNTLIST back to client with FM/VM etc
@@ -1516,17 +1518,17 @@ baddict:
 	return "";
 }
 
-// debug
-void ExodusProgramBase::debug() const {
-
-	var reply;
-	std::clog << "debug():";
-	if (OSSLASH == "/")
-		asm("int $3");	//use gdb n commands to resume
-	else
-		var().debug();
-	return;
-}
+//// debug
+//void ExodusProgramBase::debug() const {
+//
+//	var reply;
+//	std::clog << "debug():";
+//	if (OSSLASH == "/")
+//		asm("int $3");	//use gdb n commands to resume
+//	else
+//		var().debug();
+//	return;
+//}
 
 // fsmg
 bool ExodusProgramBase::fsmsg(CVR msg) const {
@@ -2733,5 +2735,14 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 	return s.substr(0, pos + 1);
 
 }
+
+// in cursor.cpp
+//var ExodusProgramBase::getcursor() const {
+//	return var().getcursor);
+//}
+//
+//void ExodusProgramBase::setcursor(CVR cursor) const {;
+//	var().setcursor(cursor);
+//}
 
 }  // namespace exodus

@@ -27,6 +27,14 @@ function main() {
 	var csvline=R"(123,2.99,AMO024,Title,"Description, more info",,123987564)";
 	var csvre=R"tag((?:^|,)(?=[^"]|(")?)"?((?(1)[^"]*|[^,"]*))"?(?=,|$))tag";
 
+	var notposix_extended = R"(\(XYZ\))"; //escaped () will indicate groups to be captured
+	var posix_extended = R"((XYZ))";      //unescaped () will match () in the source string
+
+	assert("raw(XYZ)raw"_var.match(posix_extended, "i").dump() eq "XYZ]XYZ"_var);
+	assert("raw(XYZ)raw"_var.match(notposix_extended, "i").dump() eq "(XYZ)"_var);
+
+	// no need to backslash many letters
+
 #define BOOST_REGEX 1
 	{
 

@@ -32,13 +32,135 @@ THE SOFTWARE.
 
 namespace exodus {
 
+//C/C++                Int  Float	Definition
+//
+//%, div               Yes  No   Truncated[c]
+//
+//fmod (C)
+//std::fmod (C++)      No   Yes  Truncated[11]
+//
+//remainder (C)
+//std::remainder (C++) No   Yes  Rounded
+
+//PICKOS modulo limits the value instead of doing a kind of remainder as per c++ % operator
+// [0 , limit) if limit is positive
+// (limit, 0] if limit is positive
+// unlike c++ which is acts more like a divisor/remainder function
+// Note that PICKOS definition is symmetrical about 0 the limit of 0
+//i.e. mod(x,y) == -(mod(-x,-y))
+inline double exodusmodulo_dbl(const double dividend, const double limit) {
+
+	if (!limit)
+		throw MVDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
+
+	double result;
+	if (limit > 0) {
+		[[likely]]
+		result = fmod(dividend, limit);
+		if (result < 0)
+			[[unlikely]]
+			result += limit;
+	} else {
+		result = -fmod(-dividend, -limit);
+		if (result > 0)
+			result += limit;
+	}
+	return result;
+}
+
+inline int exodusmodulo_int(const int dividend, const int limit) {
+
+	if (!limit)
+		throw MVDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
+
+	int result;
+	if (limit > 0) {
+		[[likely]]
+		result = dividend % limit;
+		if (result < 0)
+			[[unlikely]]
+			result += limit;
+	} else {
+		result = -(-dividend % -limit);
+		if (result > 0)
+			result += limit;
+	}
+	return result;
+}
+
+var var::mod(CVR limit) const {
+
+	THISIS("var var::mod(CVR limit) const")
+	assertNumeric(function_sig);
+	ISNUMERIC(limit)
+
+	// prefer double dividend
+	if (this->var_typ & VARTYP_DBL) {
+
+		// use limit's double if available otherwise create it from limit's int/long
+		if (!(limit.var_typ & VARTYP_DBL)) {
+			limit.var_dbl = double(limit.var_int);
+			// Dont register that the limit has a double
+			//limit.var_typ = limit.var_typ & VARTYP_DBL;
+		}
+
+mod_doubles:
+		return exodusmodulo_dbl(var_dbl, limit.var_dbl);
+	}
+
+	// if limit has a double then prefer it and convert this to double
+	if (limit.var_typ & VARTYP_DBL) {
+		var_dbl = double(this->var_int);
+		// Dont register that this has a double
+		//var_typ = var_typ & VARTYP_DBL;
+		goto mod_doubles;
+	}
+
+	//otherwise both ints/longs
+	return exodusmodulo_int(this->var_int, limit.var_int);
+}
+
+var var::mod(double limit) const {
+
+	THISIS("var var::mod(double limit) const")
+	assertNumeric(function_sig);
+
+	// ensure double dividend
+	if (not (this->var_typ & VARTYP_DBL)) {
+		this->var_dbl = double(this->var_int);
+		// Dont register that this has a double
+		//this->var_typ = this->var_typ & VARTYP_DBL;
+	}
+
+	return exodusmodulo_dbl(this->var_dbl, limit);
+}
+
+var var::mod(const int limit) const {
+
+	THISIS("var var::mod(const int limit) const")
+	assertNumeric(function_sig);
+
+	// prefer double dividend
+	if (this->var_typ & VARTYP_DBL) {
+		return exodusmodulo_dbl(this->var_dbl, double(limit));
+	}
+
+	// otherwise both ints
+	return exodusmodulo_int(var_int, limit);
+}
+
+/*
+	var sqrt() const;
+	var loge() const;
+*/
+
 var var::abs() const {
 
 	THISIS("var var::abs() const")
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL) {
+	if (this->var_typ & VARTYP_DBL) {
 		if (var_dbl < 0)
 			return -var_dbl;
 		return (*this);
@@ -51,115 +173,13 @@ var var::abs() const {
 	throw MVError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::mod(CVR divisor) const {
-
-	THISIS("var var::mod(CVR divisor) const")
-	assertNumeric(function_sig);
-	ISNUMERIC(divisor)
-
-	// NB NOT using c++ % operator which until c++11 had undefined behaviour if divisor was negative
-	// from c++11 % the sign of the result after a negative divisor is always the same as the
-	// dividend
-
-    //following is what c++ fmod does (a mathematical concept)
-    //assert(mod(-2.3,var(1.499)).round(3).outputl() eq -0.801);
-    //assert(mod(2.3,var(-1.499)).round(3).outputl() eq 0.801);
-    //BUT arev and qm ensure that the result is somewhere from 0 up to or down to
-    //(but not including) the divisor
-
-	// prefer double dividend
-	if (var_typ & VARTYP_DBL) {
-
-		// use divisor's double if available otherwise create it from divisor's int/long
-		if (!(divisor.var_typ & VARTYP_DBL)) {
-			divisor.var_dbl = double(divisor.var_int);
-			//divisor.var_typ = divisor.var_typ & VARTYP_DBL;
-		}
-
-mod_doubles:
-	    //method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
-		//if ((var_dbl < 0 && divisor.var_dbl >= 0) ||
-		//	(divisor.var_dbl < 0 && var_dbl >= 0)) {
-		//	return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
-		//}
-		//else {
-		//	return fmod(var_dbl, divisor.var_dbl);
-		//}
-
-		return var_dbl - std::floor(var_dbl / divisor.var_dbl) * divisor.var_dbl;
-	}
-
-	// prefer double divisor
-	if (divisor.var_typ & VARTYP_DBL) {
-		var_dbl = double(var_int);
-		//var_typ = var_typ & VARTYP_DBL;
-		goto mod_doubles;
-	}
-
-	//both ints/longs
-
-	//if ((var_int < 0 && divisor.var_int >= 0) ||
-	//	(divisor.var_int < 0 && var_int >= 0))
-	//	return (var_int % divisor.var_int) + divisor.var_int;
-	//else
-	//	return var_int % divisor.var_int;
-
-	double double1 = double(var_int);
-	return double1 - std::floor(double1 / divisor.var_int) * divisor.var_int;
-}
-
-var var::mod(const int divisor) const {
-
-	THISIS("var var::mod(const int divisor) const")
-	assertNumeric(function_sig);
-
-	// see ::mod(CVR divisor) for comments about c++11 % operator
-
-	// prefer double dividend
-	if (var_typ & VARTYP_DBL) {
-		//if ((var_dbl < 0 && divisor >= 0) || (divisor < 0 && var_dbl >= 0)) {
-		//	// multivalue version of mod
-		//	double divisor2 = double(divisor);
-		//	return fmod(var_dbl, divisor2) + divisor2;
-		//} else
-		//	return fmod(var_dbl, double(divisor));
-
-		//double divisor2 = double(divisor);
-		//double result = fmod(var_dbl, divisor2);
-		//if (result < 0 && divisor2 > 0)
-		//	result += divisor2;
-		//return result;
-
-		return var_dbl - std::floor(var_dbl / divisor) * divisor;
-	}
-
-	//if ((var_int < 0 && divisor >= 0) || (divisor < 0 && var_int >= 0))
-	//	// multivalue version of mod
-	//	return (var_int % divisor) + divisor;
-	//else
-	//	return var_int % divisor;
-
-	//mvint_t result = var_int % divisor;
-	//if (result < 0 && divisor > 0)
-	//	result += divisor;
-	//return result;
-
-	auto double1 = double(var_int);
-	return double1 - std::floor(double1 / divisor) * divisor;
-}
-
-/*
-	var sqrt() const;
-	var loge() const;
-*/
-
 var var::sin() const {
 
 	THISIS("var var::sin() const")
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::sin(var_dbl * M_PI / 180);
 	else
 		return std::sin(double(var_int) * M_PI / 180);
@@ -174,7 +194,7 @@ var var::cos() const {
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::cos(var_dbl * M_PI / 180);
 	else
 		return std::cos(double(var_int) * M_PI / 180);
@@ -189,7 +209,7 @@ var var::tan() const {
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::tan(var_dbl * M_PI / 180);
 	else
 		return std::tan(double(var_int) * M_PI / 180);
@@ -204,7 +224,7 @@ var var::atan() const {
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::atan(var_dbl) / M_PI * 180;
 	else
 		return std::atan(double(var_int)) / M_PI * 180;
@@ -219,7 +239,7 @@ var var::loge() const {
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::log(var_dbl);
 	else
 		return std::log(double(var_int));
@@ -234,10 +254,10 @@ var var::sqrt() const {
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::sqrt(var_dbl);
 
-	//	if (var_typ & VARTYP_INT)
+	//	if (this->var_typ & VARTYP_INT)
 	return std::sqrt(double(var_int));
 
 	throw MVError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -250,7 +270,7 @@ var var::pwr(CVR exponent) const {
 	ISNUMERIC(exponent)
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::pow(var_dbl, exponent.toDouble());
 	else
 		return std::pow(double(var_int), exponent.toDouble());
@@ -265,7 +285,7 @@ var var::exp() const {
 	assertNumeric(function_sig);
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (this->var_typ & VARTYP_DBL)
 		return std::exp(var_dbl);
 	else
 		return std::exp(double(var_int));

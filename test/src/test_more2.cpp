@@ -462,6 +462,11 @@ function main() {
 		assert(x == "xya");
 	}
 
+
+
+
+
+
 	//==
 	{
 		assert(var(1) == var(1));
@@ -512,6 +517,77 @@ function main() {
 		assert("1.1x" != var("01.1x"));
 		assert(var("1x") != "01x");
 		assert(var("1.1x") != "01.1x");
+
+	}
+
+	{
+		assert(oconv('\x00',"HEX") == "00");
+		assert(oconv('\x01',"HEX") == "01");
+		assert(oconv('\x02',"HEX") == "02");
+		assert(oconv('\x03',"HEX") == "03");
+		assert(oconv('\x04',"HEX") == "04");
+		assert(oconv('\x05',"HEX") == "05");
+		assert(oconv('\x06',"HEX") == "06");
+		assert(oconv('\x07',"HEX") == "07");
+		assert(oconv('\x08',"HEX") == "08");
+		assert(oconv('\x09',"HEX") == "09");
+		assert(oconv('\x0a',"HEX") == "0A");
+		assert(oconv('\x0b',"HEX") == "0B");
+		assert(oconv('\x0c',"HEX") == "0C");
+		assert(oconv('\x0d',"HEX") == "0D");
+		assert(oconv('\x0e',"HEX") == "0E");
+		assert(oconv('\x0f',"HEX") == "0F");
+
+		assert(oconv('\x10',"HEX") == "10");
+		assert(oconv('\x11',"HEX") == "11");
+		assert(oconv('\x12',"HEX") == "12");
+		assert(oconv('\x13',"HEX") == "13");
+		assert(oconv('\x14',"HEX") == "14");
+		assert(oconv('\x15',"HEX") == "15");
+		assert(oconv('\x16',"HEX") == "16");
+		assert(oconv('\x17',"HEX") == "17");
+		assert(oconv('\x18',"HEX") == "18");
+		assert(oconv('\x19',"HEX") == "19");
+		assert(oconv('\x1a',"HEX") == "1A");
+		assert(oconv('\x1b',"HEX") == "1B");
+		assert(oconv('\x1c',"HEX") == "1C");
+		assert(oconv('\x1d',"HEX") == "1D");
+		assert(oconv('\x1e',"HEX") == "1E");
+		assert(oconv('\x1f',"HEX") == "1F");
+
+		assert(oconv('\x20',"HEX") == "20");
+		assert(oconv('\x21',"HEX") == "21");
+		assert(oconv('\x22',"HEX") == "22");
+		assert(oconv('\x23',"HEX") == "23");
+		assert(oconv('\x24',"HEX") == "24");
+		assert(oconv('\x25',"HEX") == "25");
+		assert(oconv('\x26',"HEX") == "26");
+		assert(oconv('\x27',"HEX") == "27");
+		assert(oconv('\x28',"HEX") == "28");
+		assert(oconv('\x29',"HEX") == "29");
+		assert(oconv('\x2a',"HEX") == "2A");
+		assert(oconv('\x2b',"HEX") == "2B");
+		assert(oconv('\x2c',"HEX") == "2C");
+		assert(oconv('\x2d',"HEX") == "2D");
+		assert(oconv('\x2e',"HEX") == "2E");
+		assert(oconv('\x2f',"HEX") == "2F");
+
+		assert(oconv('\xf0',"HEX") == "F0");
+		assert(oconv('\xf1',"HEX") == "F1");
+		assert(oconv('\xf2',"HEX") == "F2");
+		assert(oconv('\xf3',"HEX") == "F3");
+		assert(oconv('\xf4',"HEX") == "F4");
+		assert(oconv('\xf5',"HEX") == "F5");
+		assert(oconv('\xf6',"HEX") == "F6");
+		assert(oconv('\xf7',"HEX") == "F7");
+		assert(oconv('\xf8',"HEX") == "F8");
+		assert(oconv('\xf9',"HEX") == "F9");
+		assert(oconv('\xfa',"HEX") == "FA");
+		assert(oconv('\xfb',"HEX") == "FB");
+		assert(oconv('\xfc',"HEX") == "FC");
+		assert(oconv('\xfd',"HEX") == "FD");
+		assert(oconv('\xfe',"HEX") == "FE");
+		assert(oconv('\xff',"HEX") == "FF");
 
 	}
 
@@ -690,6 +766,11 @@ function main() {
 	assert((1 >= v2));
 	assert((1.0 >= v2));
 	assert((true >= v2));
+
+
+
+
+
 
 	{
 		var v1 = 10;

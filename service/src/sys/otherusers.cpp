@@ -36,7 +36,7 @@ function main(in databasecode0="", in usercode0="") {
 	var processes = "";
 
 	//curruserlockid.sys134=sysvar('GET',109,134)
-	var curruserlockid = PROCESSNO;
+	var curruserlockid = THREADNO;
 
 	var returndata = 0;
 	var otherusercodes = "";

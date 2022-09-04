@@ -30,6 +30,47 @@ function main() {
 	//dim array
 
 	{
+		// Empty array is allowed
+		dim d0(0,0);
+		assert(d0.join() eq "");
+
+		d0.redim(2,2);
+		d0 = "x";
+		assert(d0.join() eq "x^x^x^x"_var);
+
+		// Redim to empty array is allowed
+		d0.redim(0,0);
+		assert(d0.join() eq "");
+
+	}
+	{
+		// wll not compile since assignment function returns void
+		//dim d0 = dim() = "";
+	}
+
+	{
+		// Try to constuct dim from a temporary but
+		// Doesnt work due to excellent RVO
+
+		dim d1 = dim(2,3);
+		dim d2(dim(2,3));
+
+		// var::split returns a dim but RVO results in it being constructed in place
+		dim d3 = var("aaaa").split();
+		dim d4(var("asdasd").split());
+
+		dim d5 = split("11^22"_var);
+		assert(d5.join() eq "11" _FM_ "22");
+
+		dim d6(split("aa^bb"_var));
+		assert(d6.join() eq "aa" _FM_ "bb");
+
+		std::vector<dim> vofdims {dim(0), dim(0)};
+
+	}
+
+	{
+		//dim_iter
 		dim d1;
 		d1.split("aa" _FM_ "bb");
 		var count = 0;
@@ -42,9 +83,49 @@ function main() {
 				v1 = "cc"; //will have no effect on d1
 		}
 		TRACE(d1.join());
-		assert(d1.join() eq "aa" _FM_ "bb");//d1 not updated
+
+		assert(d1.join().dump() eq "aa" _FM_ "bb");//default separator is FM
+		assert(d1.join("").dump() eq "aa" "bb");//sep can be ""
+		assert(d1.join("Δ").dump() eq "aaΔbb");//sep can be multibyte UTF8
+		assert(d1.join("XYZ").dump() eq "aaXYZbb");//sep can be multichar
 	}
 
+	{
+		printl("Create a dim from a split var");
+		dim d1 = "aa^bb^cc"_var.split();
+	}
+
+	{
+		dim d1(3,2);
+		d1 = "x";
+		assert(d1(1,1) eq "x");
+		assert(d1(2,1) eq "x");
+		assert(d1(3,1) eq "x");
+		assert(d1(1,2) eq "x");
+		assert(d1(2,2) eq "x");
+		assert(d1(3,2) eq "x");
+
+		const dim d2 = {1,2,3,4,5,6};
+		assert(d2(6,1) eq 6);
+
+		const dim d3 = {1,2,3,4,5,6};
+		assert(d2(6,1) eq 6);
+
+		d1(0, 0) = "qwe";
+		assert(d1(0,0) eq "qwe");
+
+		//const dim d4 = {{1,2},{3,4},{5,6}};
+		//assert(d2(6,1) eq 6);
+
+	}
+	{
+		// Cannot dim(0,0)
+		dim d1(1,1);
+		// But can redim(0,0) to clear all data
+		d1.redim(0,0);
+		//empty dim() join returns ""
+		assert(d1.join() eq "");
+	}
 	{
 		dim d1;
 		d1.split("aa" _FM_ "bb");
@@ -61,10 +142,39 @@ function main() {
 		assert(d1.join() eq "aa" _FM_ "cc");//d1 updated
 	}
 
+	{
+
+		// Construct from list
+		dim d1 = {1,2,3};
+		assert(d1.join() eq "1^2^3"_var);
+
+		// Copy construction (from lvalue)
+		dim d2 = d1;
+		assert(d2.join() eq "1^2^3"_var);
+
+		// Move construction (from rvalue)
+		dim d3 = "1^2^3^4"_var.split();
+		assert(d3.join() eq "1^2^3^4"_var);
+
+		// Move assign (from rvalue)
+		d3 = "1^2^3^4^5"_var.split();
+		assert(d3.join() eq "1^2^3^4^5"_var);
+
+		// Copy assign (from lvalue)
+		d3 = d2;
+		assert(d1.join() eq "1^2^3"_var);
+
+//		assert(d1 eq d2);
+//		assert(d1 ne d3);
+
+	}
+
 	dim a9;
 	var a10;
 	//check global split returns number of elements and an array out
-	assert(split("xx"^FM^"bb",a9) eq 2);
+	a9 = split("xx"^FM^"bb");
+	TRACE(a9.rows());
+	assert(a9.rows() eq 2);
 	//check join returns correct string
 	assert(join(a9) eq ("xx" ^FM^ "bb"));
 
@@ -217,7 +327,7 @@ function main() {
 	printl("-------------------");
 	array.convert(VM^FM ,"]\n").outputl();
 
-	array.converter(VM,"]");
+	converter(array,VM,"]");
 	assert(array.a(3)=="20]10]2]1");
 	assert(array.a(6)=="620]610]62]61");
 	assert(array.a(7)=="720]710]72]71");
@@ -243,6 +353,44 @@ function main() {
 		TRACE(d1.join("\n"));
 		//assert((d1.join("\n") ^ "\n") eq txt);
 		assert(d1.join("\n") eq txt);
+
+		printl("Make a wintext file");
+		var temposfilename = ostempfilename().dump();
+		var wintext = "aaa\r\n" "bbb\r\n" "ccc\r\n" "ddd\r\n" "eee" "\r\n";
+		assert(oswrite(wintext on temposfilename));
+
+		printl("read wintext into dim array");
+		dim d2;
+		assert(d2.osread(temposfilename));
+		TRACE(d2.join());
+
+		printl("verify dimmary array element (5) is eee");
+		assert(d2(5) eq "eee");
+
+		printl("Verify line ending \r\n has been remembered in array element 0");
+		TRACE(d2(0).oconv("HEX"))
+		assert(d2(0) eq "\r\n");
+
+		printl("Check round trip");
+		assert((d2.join("\r\n") ^ "\r\n") eq wintext);
+
+		printl("Check writing dim array to wintext file");
+		var temposfilename2 = ostempfilename().dump();
+		assert(d2.oswrite(temposfilename2));
+
+		printl("Check round trip");
+		var wintext2;
+		assert(osread(wintext2 from temposfilename2));
+		TRACE(wintext)
+		TRACE(wintext2)
+		TRACE(wintext.oconv("HEX"))
+		TRACE(wintext2.oconv("HEX"))
+		assert(wintext2 eq wintext);
+
+		// Check cannot read a non-existent osfile
+		assert(osremove(temposfilename));
+		assert(osremove(temposfilename2));
+		assert(not d1.osread(temposfilename));
 
 		//assert(osremove(osfilename));
 	}

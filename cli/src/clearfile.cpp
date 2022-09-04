@@ -1,26 +1,28 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	var filenames = COMMAND.field(FM, 2, 999999);
 
 	if (not filenames)
-		stop("Syntax is clearfile filename...");
+		abort("Syntax is clearfile filename ...");
 
-	var nfiles = dcount(filenames, FM);
-	for (var filen = 1; filen <= nfiles; ++filen) {
+	var result = 0;
 
-		var filename = filenames.a(filen);
-		if (clearfile(filename)) {
-			print("Cleared ");
-		} else {
-			print("Cannot clear ");
+	for (let filename : filenames) {
+
+		if (not open(filename) or not clearfile(filename)) {
+			errputl("Cannot clear", filename);
+			result = 1;
+			continue;
 		}
-		printl(filename);
+
+		printl("Cleared", filename);
+
 	}
 
-	return 0;
+	return result;
 }
 
 programexit()

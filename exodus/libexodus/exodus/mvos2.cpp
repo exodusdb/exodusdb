@@ -80,6 +80,7 @@ using RNG_typ = std::mt19937;
 thread_local std::unique_ptr<RNG_typ> thread_RNG;
 
 // PickOS returns pseudo random integers in the range of 0-4 for rnd(5)
+// Exodus is symmetrical for negative numbers
 var var::rnd() const {
 
 	THISIS("var var::rnd() const")
@@ -87,14 +88,24 @@ var var::rnd() const {
 
 	// Create a base generator per thread on the heap. Will be destroyed on thread termination.
 	if (not thread_RNG.get())
-		var().initrnd();
+		var(0).initrnd();
 
-	int max = (*this).toInt() - 1;
-	if (max < 0)
-		return var(*this);
+	int top = (*this).round().toInt();
 
-	// Define a integer range (0 to n-1)
-	std::uniform_int_distribution<int> uniform_dist(0, max);
+	// rnd(-1 ... 1) will always return 0 which is not random
+	if (std::abs(top) <= 1)
+		throw MVDivideByZero("rnd(" ^ *this ^ ") will always return 0 which is not random");
+
+	// Define a integer range (0 to n-1) or (n+1 to 0)
+	int min,max;
+	if (top >= 0) {
+		min = 0;
+		max = top - 1;
+	} else {
+		min = top + 1;
+		max = 0;
+	}
+	std::uniform_int_distribution<int> uniform_dist(min, max);
 
 	// Generate a pseudo random number from the distribution using the seeded RNG
 	return uniform_dist(*thread_RNG);
@@ -106,7 +117,7 @@ var var::rnd() const {
 void var::initrnd() const {
 
 	THISIS("void var::initrnd() const")
-	assertDefined(function_sig);
+	assertAssigned(__PRETTY_FUNCTION__);
 
 	// Get a seed for the RNG
 	uint64_t seed;
@@ -117,6 +128,15 @@ void var::initrnd() const {
 		//seed = this->toLong();
 		seed = this->toInt();
 
+		if (not seed) {
+
+			// Seed from low resolution clock per second
+			//seed.var_int = static_cast<unsigned int>(std::time(0) + 2'075'472'354);
+
+			// Seed from high resolution clock
+			seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		}
+
 	} else if (var_typ & VARTYP_STR) {
 
 		// Seed from string
@@ -125,13 +145,6 @@ void var::initrnd() const {
 			seed *= var_str[ii];
 		// seed=MurmurHash64((char*)var_str.data(),int(var_str.size()*sizeof(char)),0);
 
-	} else {
-
-		// Seed from low resolution clock per second
-		//seed.var_int = static_cast<unsigned int>(std::time(0) + 2'075'472'354);
-
-		// Seed from high resolution clock
-		seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	}
 
 	// Set the new seed
@@ -155,8 +168,8 @@ bool var::osgetenv(const char* envvarname) {
 		int i = 1;
 		char* s = *environ;
 		for (; s; i++) {
-			// printf("%s\n", s);
-			// var_str.append(boost::locale::conv::utf_to_utf<wchar_t>(s));
+			//printf("%s\n", s);
+			//var_str.append(boost::locale::conv::utf_to_utf<wchar_t>(s));
 			var_str.append(s);
 			var_str.append("\n");
 			s = *(environ + i);

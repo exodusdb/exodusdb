@@ -91,7 +91,6 @@ class PUBLIC MvEnvironment {
 
 	// per process - set in init()
 	var ROLLOUTFILE = "";
-	var THREADNO = "";
 
 	// per db access
 	var DICT = "";
@@ -186,7 +185,7 @@ class PUBLIC MvEnvironment {
 	var VOLUMES = "";
 
 	// set in init()
-	var PROCESSNO = "";
+	var THREADNO = "";
 
 	var CURSOR = "1";
 
