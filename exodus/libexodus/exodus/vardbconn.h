@@ -29,6 +29,8 @@
 #include <map>
 #include <unordered_map>
 
+#include <exodus/var.h>
+
 using ConnectionLocks = std::map<uint64_t, int>;
 
 namespace exodus {

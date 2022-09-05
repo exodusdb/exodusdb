@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include <exodus/cargs.h>
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 //similar code in haskey.cpp and mvwait.cpp
 

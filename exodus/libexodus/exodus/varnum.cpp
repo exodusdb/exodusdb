@@ -89,7 +89,7 @@ THE SOFTWARE.
 // 2643383279502884197169399375105820974944592307816406286208998f;
 #endif
 
-#include <exodus/mv.h>
+#include <exodus/varimpl.h>
 
 namespace exodus {
 

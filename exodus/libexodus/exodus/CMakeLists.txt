@@ -99,15 +99,17 @@ add_library(exodus SHARED
 # mvlocale.cpp
 
 # big ones first for efficient parallel compilation
- mvdbpostgres.cpp mvregex.cpp mvos.cpp mvos2.cpp mvprogram.cpp mvmv.cpp
- mv.cpp mvnumeric.cpp mvmath.cpp mvdim.cpp mvdatetime.cpp mvdebug.cpp mviter.cpp
- mvfuncs.cpp mvioconv.cpp
+ mvprogram.cpp
+ vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
+ var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
+ varchrono.cpp
+ varfuncs.cpp varioconv.cpp
  mvenvironment.cpp exodusfuncs.cpp
- mvwait.cpp mvunicode.cpp mvposix.cpp mvfunctor.cpp mvbrackets.cpp
+ varwait.cpp varunicode.cpp varposix.cpp mvfunctor.cpp #mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
  MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp
- mvhandles.cpp mvdbconns.cpp mvprocessno.cpp
-
+ varoshandle.cpp vardbconn.cpp mvprocessno.cpp
+ variter.cpp
 # little ones last for quick parallel finishing
  term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 )
@@ -141,8 +143,13 @@ install(TARGETS exodus DESTINATION lib)
 ### install some of exodus' include files so programs can be written in exodus c++ ###
 
 install(FILES
- mv.h
+ var.h
+ vartyp.h
+ varerr.h
+ dim.h
  exodus.h
+ range.h
+ exoimpl.h
  exodusmacros.h
  mvenvironment.h
  exodusfuncs.h

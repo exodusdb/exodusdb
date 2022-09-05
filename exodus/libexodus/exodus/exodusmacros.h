@@ -31,7 +31,7 @@ THE SOFTWARE.
 // you can program without exodus macros cause conflict then you can
 // include m.h directly
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 #include <exodus/mvfunctor.h>
 
 // please include <exodus> AFTER <iostream> etc. For example:

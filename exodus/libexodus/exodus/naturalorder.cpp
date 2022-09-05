@@ -1,10 +1,9 @@
 // copied in pgexodus and exodus - please keep in sync 1
 #include <cstring>
 #include <sstream>
-
 #include <cassert>
 
-#include <mv.h>
+#include <exodus/var.h>
 
 namespace exodus {
 

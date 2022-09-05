@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 namespace exodus {
 

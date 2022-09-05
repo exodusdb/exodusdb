@@ -1,14 +1,11 @@
-#include <exodus/mvconfig.h>
-#ifdef EXODUS_IPC_POSIX
+#include <unistd.h> // for getpid
 
-#include <unistd.h>
-
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 namespace exodus {
 
 var getprocessn() {
-	return var((int)getpid());
+	return var(getpid());
 }
 
 var getexecpath() {
@@ -18,5 +15,3 @@ var getexecpath() {
 }
 
 }  // namespace exodus
-
-#endif

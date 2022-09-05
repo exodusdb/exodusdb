@@ -5,7 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 namespace exodus {
 

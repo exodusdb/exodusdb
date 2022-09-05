@@ -1,4 +1,5 @@
-#include <mv.h>
+#include <exodus/var.h>
+#include <exodus/dim.h>
 
 //mv_iter class enables c++ range based programming over a dynamic array
 //
@@ -94,57 +95,6 @@ PUBLIC var_iter end([[maybe_unused]] CVR var1) {
 	// No need to use var1 since the end is always string::npos
 	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos;
 	return var_iter();
-}
-
-///////////
-// dim_iter
-///////////
-
-//CONSTRUCTOR from a dim (ie begin())
-dim_iter::dim_iter(const dim& d1)
-	: pdim_(&d1){}
-
-//check iter != iter (i.e. iter != end()
-bool dim_iter::operator!=(const dim_iter& dim_iter1) {
-	return this->index_ != dim_iter1.index_;
-}
-
-//CONVERSION - conversion to var
-//dim_iter::operator var*() {
-var& dim_iter::operator*() {
-	return pdim_->data_[index_];
-}
-
-//INCREMENT
-dim_iter dim_iter::operator++() {
-
-	index_++;
-
-	return *this;
-}
-
-//DECREMENT
-dim_iter dim_iter::operator--() {
-
-	index_--;
-
-	return *this;
-}
-
-void dim_iter::end() {
-	index_ = pdim_->nrows_ * pdim_->ncols_ + 1;
-}
-
-//BEGIN - free function to create an iterator -> begin
-PUBLIC dim_iter begin(const dim& d1) {
-	return dim_iter(d1);
-}
-
-//END - free function to create an interator -> end
-PUBLIC dim_iter end(const dim& d1) {
-	dim_iter diter1(d1);
-	diter1.end();
-	return diter1;
 }
 
 }  //namespace exodus

@@ -75,7 +75,7 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 #ifndef MVFUNCTOR_H
 #define MVFUNCTOR_H
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 // MvEnvironment and ExodusProgramBase are forward declared classes (see below)
 // because they only exist as pointers or references in mvfunctor.

@@ -36,7 +36,8 @@ THE SOFTWARE.
 #include <vector>
 #define eq ==
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
+#include <exodus/dim.h>
 #include <exodus/mvfunctor.h>
 
 namespace exodus {

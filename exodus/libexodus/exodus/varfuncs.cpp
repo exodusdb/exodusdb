@@ -84,9 +84,9 @@ Binary    Hex          Comments
 //#include <iostream> //cin and cout
 //#include <memory>   //for unique_ptr
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 //#include <exodus/mvutf.h>
-#include <exodus/mvlocale.h>
+#include "varlocale.h"
 
 // Keep doxygen happy
 #undef DEFAULT_SPACE

@@ -45,8 +45,8 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #define std_boost std
 #endif
 
-#include <exodus/mv.h>
-#include "mvhandles.h"
+#include <exodus/varimpl.h>
+#include "varoshandle.h"
 
 namespace exodus {
 

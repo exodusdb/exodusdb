@@ -1,3 +1,6 @@
+#ifndef MVDATETIME_H
+#define MVDATETIME_H
+
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -20,8 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef MVDATETIME_H
-#define MVDATETIME_H
+#include <iostream> //ony for for cerr
 
 // ostime, osdate, osfile, osdir should return dates and times in UTC
 
@@ -64,7 +66,7 @@ const char* longdayofweeks =
 #include <sys/time.h>
 #endif
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 namespace exodus {
 
@@ -295,7 +297,8 @@ var var::iconv_D(const char* conversion) const {
 	if (year <= 99) {
 		if (year >= year_50) {
 			year += year_2000 - 100;
-			std::cerr << "WARNING: 2 digit year >= " << year_50 << " being converted to " << year << std::endl;
+			//std::cerr << "WARNING: 2 digit year >= " << year_50 << " being converted to " << year << std::endl;
+			errputl("WARNING: 2 digit year >= " ^ var(year_50) ^ " being converted to " ^ year);
 		} else
 			year += year_2000;
 	}

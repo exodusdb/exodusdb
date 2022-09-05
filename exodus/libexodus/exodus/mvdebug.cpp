@@ -28,27 +28,17 @@ THE SOFTWARE.
 //#define TRACING
 
 #ifdef _POSIX_SOURCE
-#include "config.h"
-
 #include <stdio.h>
 #include <cstdlib>
 #include <iostream>
 #include <string>
-// defined in config.h but config.h created by ./configure (automake tools not cmake)
-//#ifdef HAVE_BACKTRACE
-#include <execinfo.h>
-//#endif
-// for getpid
-#include <unistd.h>
-#endif
-// for signal
+#include <execinfo.h> // for backtrace
+#include <unistd.h> // for getpid
 #include <signal.h>
-
-#include <exodus/mv.h>
-
-#ifndef HAVE_BACKTRACE
-#define NOBACKTRACE
 #endif
+
+#include <exodus/var.h>
+#include <exodus/exoimpl.h>
 
 namespace exodus {
 
@@ -118,11 +108,6 @@ var mv_backtrace() {
 
 	var returnlines = "";
 	//var("backtrace()").errputl();
-
-//#if !defined(HAVE_BACKTRACE)
-//	fprintf(stderr, "backtrace() not available\n");
-//	return "";
-//#else
 
 	var internaladdresses = "";
 
@@ -243,193 +228,6 @@ var mv_backtrace() {
 }
 
 //service managers like systemd will send a polite SIGTERM signal
-//// http://www.delorie.com/gnu/docs/glibc/libc_665.html
-//var backtrace() {
-//
-//	var returnlines = "";
-//	//var("backtrace()").errputl();
-//
-//#if !defined(HAVE_BACKTRACE)
-//	fprintf(stderr, "backtrace() not available\n");
-//	return "";
-//#else
-//
-//	var internaladdresses = "";
-//
-//#define BACKTRACE_MAXADDRESSES 500
-//	void* addresses[BACKTRACE_MAXADDRESSES];
-//
-//	/* example of TRACE from osx 64
-//	Stack frames: 8
-//	Backtrace 0: 0x10000c313
-//	0   libexodus-11.5.0.dylib              0x000000010000c313 _ZN6exodus9backtraceEv + 99
-//	Backtrace 1: 0x10001ec51
-//	1   libexodus-11.5.0.dylib              0x000000010001ec51
-//	_ZN6exodus11MVErrorC2ERKNS_3varE + 129 Backtrace 2: 0x10001f314 2 libexodus-11.5.0.dylib
-//	0x000000010001f314 _ZN6exodus12MVUnassignedC2ERKNS_3varE + 52 Backtrace 3: 0x10000e193 3
-//	libexodus-11.5.0.dylib              0x000000010000e193 _ZNK6exodus3var3putERSo + 243
-//	Backtrace 4: 0x10000e322
-//	4   libexodus-11.5.0.dylib              0x000000010000e322 _ZNK6exodus3var7outputlEv + 34
-//	Backtrace 5: 0x10000143f
-//	5   steve                               0x000000010000143f _ZN13ExodusProgram4mainEv + 77
-//	Backtrace 6: 0x1000010e6
-//	6   steve                               0x00000001000010e6 main + 99
-//	Backtrace 7: 0x100000f64
-//	7   steve                               0x0000000100000f64 start + 52
-//	*/
-//
-//	// TODO autodetect if addr2line or dwalfdump/dSYM is available
-//
-//#ifdef __APPLE__
-//	int size = ::backtrace(addresses, BACKTRACE_MAXADDRESSES);
-//	char** strings = backtrace_symbols(addresses, size);
-//	// fprintf(stderr,"Stack frames: %d\n", size);
-//
-//	for (int i = 0; i < size; i++) {
-//
-//#ifdef TRACING
-//		// each string is like:
-//		// 6   steve                               0x00000001000010e6 main + 99
-//		//////////////////////////////////////////////////////////////////////
-//		fprintf(stderr, "%s\n", strings[i]);
-//#endif
-//		// parse one string for object filename and offset
-//		var onestring = var(strings[i]).trim();
-//		var objectfilename = onestring.field(" ", 2);
-//		var objectoffset = onestring.field(" ", 3);
-//
-//		// looking for a dwarfdump line like this:
-//		// Line table file: 'steve.cpp' line 14, column 0 with start address
-//		// 0x000000010000109e
-//		//////////////////////////////////////////////////////////////////////////////////////
-//
-//		// get a dwarfdump line containing source filename and line number
-//		var debugfilename = objectfilename ^ ".dSYM";
-//		var cmd = "dwarfdump " ^ debugfilename ^ " --lookup " ^ objectoffset ^
-//				  " |grep \"Line table file: \" 2> /dev/null";
-//		//var result = cmd.osshellread();
-//		result.osshellread(cmd);
-//#ifdef TRACING
-//		cmd.errputl("CMD=");
-//		result.errputl("RESULT=");
-//#endif
-//		if (not result)
-//			continue;
-//
-//		// parse the dwarfdump line for source filename and line number
-//		var sourcefilename = result.field("'", 2);
-//		var lineno = result.field("'", 3).trim().field(" ", 2).field(",", 1);
-//
-//		addbacktraceline(i, sourcefilename, lineno, returnlines);
-//	}
-//
-//	free(strings);
-//
-//	return returnlines.substr(2);
-//
-//// not __APPLE_ probably LINUX
-//#else
-//
-//	int size = ::backtrace(addresses, BACKTRACE_MAXADDRESSES);
-//	char** strings = backtrace_symbols(addresses, size);
-//
-//	for (int ii = 0; ii < size; ii++) {
-//
-//#ifdef TRACING
-//		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", ii, addresses[ii], strings[ii]);
-//		// Backtrace 0: 0x7f9d247cf9fd
-//		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
-//		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
-//#endif
-//
-//		// objdump --stop-address=0xa3f6 -l --disassemble ~/lib/libl1.so |grep cpp|tail -n1
-//
-//		var objfilename = var(strings[ii]).field("(", 1).field(" ", 1).field("[", 1);
-//		var objaddress = var(strings[ii]).field("[", 2).field("]", 1);
-//		if (objaddress.length() > 9)
-//			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
-//
-//		if (objfilename.index("libc.so") or objfilename.index("libexodus.so"))
-//			continue;
-//
-//#ifdef TRACING
-//		objfilename.errput("objfilename=");
-//		objaddress.errputl(" objaddress=");
-//#endif
-//
-//		// if (objfilename == objfilename.convert("/\\:",""))
-//		if (not objfilename.osfile()) {
-//			// loadable program
-//			var temp;
-//			temp.osshellread("which " ^ objfilename.field2(OSSLASH, -1));
-//			temp = temp.field("\n", 1).field("\r", 1);
-//			if (temp)
-//				objfilename = temp;
-//			else
-//				// things like what?
-//				continue;
-//		}
-//
-//		if (objaddress[1] != "0" || objaddress[2] != "x")
-//			continue;
-//
-//		var startaddress = objaddress.splice(-3, 3, "000");
-//		// var temp="objdump -S --start-address=" ^ startaddress ^ " --stop-address=" ^
-//		// objaddress ^ " --disassemble -l " ^ objfilename;
-//		//var temp = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-//		//	   objaddress ^ " --disassemble -l " ^ objfilename;
-//#ifdef TRACING
-//		temp.errputl("");
-//#endif
-//
-//		////////////////////////
-//		//temp = temp.osshellread();
-//		var temp;
-//		var cmd = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-//						 objaddress ^ " --disassemble -l " ^ objfilename;
-//		//cmd.errputl();
-//		temp.osshellread(cmd);
-//		////////////////////////
-//
-//		temp.converter("\r\n", _FM_ _FM_);
-//
-//		// find the last line containing .cpp
-//		/// root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)
-//		var nn2 = temp.dcount(FM);
-//		var line = "";
-//		var linesource = "";
-//		for (var ii2 = 1; ii2 < nn2; ++ii2) {
-//			if (temp.f(ii2).index(".cpp")) {
-//				line = temp.f(ii2);
-//				linesource = temp.f(ii2 + 1);
-//			}
-//		}
-//
-//#ifdef TRACING
-//		if (line)
-//			line.errputl("line=");
-//#endif
-//
-//		// append the source line text and number to the output
-//		if (line) {
-//			var sourcefilename = line.field(":", 1);
-//			var lineno = line.field(":", 2).field(" ", 1);
-//			addbacktraceline(ii, sourcefilename, lineno, returnlines);
-//			// returnlines^=FM^sourcefilename.field2(OSSLASH,-1) ^ ":" ^ lineno ^ " " ^
-//			// linesource;
-//		}
-//
-//	}
-//
-//	free(strings);
-//	return returnlines.substr(2);
-//
-//#endif
-//
-//#endif
-//}
-
-//service managers like systemd will send a polite SIGTERM signal
 //and wait for say 90 seconds before sending a kill signal
 void SIGTERM_handler(int) {
 	fprintf(stderr, "=== SIGTERM received ===\n");
@@ -442,6 +240,14 @@ void SIGHUP_handler(int) {
 	RELOAD_req = true;
 }
 
+//void var::breakoff() const {
+PUBLIC void breakoff() {
+	// ignore more of this signal
+	signal(SIGINT, SIG_IGN);
+}
+
+PUBLIC void breakon();
+
 //signals are received by one thread at random
 //void SIGINT_handler(int sig) {
 void SIGINT_handler(int sig [[maybe_unused]]) {
@@ -449,7 +255,7 @@ void SIGINT_handler(int sig [[maybe_unused]]) {
 	mv_savestack();
 
 	// Ignore more of this signal - restore on exit
-	var().breakoff();
+	breakoff();
 	// Faster/safer?
 	//signal(sig, SIG_IGN);
 
@@ -538,19 +344,15 @@ void SIGINT_handler(int sig [[maybe_unused]]) {
 	//var().echo(true);
 
 	// Stop ignoring this signal
-	var().breakon();
+	breakon();
 	// faster/safer?
 	//signal(SIGINT, SIGINT_handler);
 
 }
 
-void var::breakoff() const {
-	// ignore more of this signal
-	signal(SIGINT, SIG_IGN);
-}
-
 //called in exodus_main to initialise signals
-void var::breakon() const {
+//void var::breakon() const {
+PUBLIC void breakon()  {
 	signal(SIGINT, SIGINT_handler);	   // Ctrl+C from termio
 	signal(SIGTERM, SIGTERM_handler);  // a polite request to TERMINATE
 									   // probably followed by SIGABORT after some delay
@@ -562,15 +364,17 @@ void var::breakon() const {
 	signal(SIGTTOU, SIG_IGN);
 }
 
-var var::backtrace() const {
+//var var::backtrace() const {
+PUBLIC ND var backtrace() {
 	mv_savestack();
 	return mv_backtrace().convert(FM, "\n");
 }
 
-void var::debug(CVR var1) const {
+//void var::debug(CVR var1) const {
+PUBLIC void debug(CVR var1) {
 	// THISIS("var var::debug() const")
 
-	std::clog << "var::debug(" << var1 << ")" << std::endl;
+	std::clog << "debug(" << var1 << ")" << std::endl;
 	std::cout << std::flush;
 
 	//use gdb "n" command(s) to single step
@@ -586,7 +390,7 @@ void var::debug(CVR var1) const {
 
 #elif defined(_MSC_VER)
 	// this will terminate the program rather than invoke the debugger but is catchable
-	throw MVDebug(var1);
+	//throw MVDebug(var1);
 
 // another way to break into the debugger by causing a seg fault
 #elif 0

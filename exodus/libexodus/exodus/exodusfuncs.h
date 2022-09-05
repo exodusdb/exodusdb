@@ -23,7 +23,7 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 #ifndef PUBLIC
 #	define PUBLIC
@@ -114,7 +114,7 @@ PUBLIC var logoff();
 PUBLIC var execute(CVR command);
 // PUBLIC var chain(CVR command);
 
-PUBLIC void debug();
+//PUBLIC void debug(CVR DEFAULT_EMPTY);
 PUBLIC ND var backtrace();
 
 PUBLIC bool setxlocale(const char* locale);

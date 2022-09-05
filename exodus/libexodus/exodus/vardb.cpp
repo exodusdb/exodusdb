@@ -183,7 +183,7 @@ Within transactions, lock requests for locks that have already been obtained SUC
 #if defined (USE_WYHASH)
 #	include "wyhash.h"
 #elif defined(USE_MURMURHASH)
-#	include "MurmurHash2_64.h" // it has included in mvdbconns.h (uint64_t defined)
+#	include "MurmurHash2_64.h" // it has included in vardbconn.h (uint64_t defined)
 #else
 	// c++ std Hash functions are only required to produce the same result for the same input within a single execution of a program;
 	// therefore different processes would not be able to perform coordinated record locking
@@ -191,8 +191,8 @@ Within transactions, lock requests for locks that have already been obtained SUC
 	// C++ std hash functions are designed for use in c++ containers, nothing else.
 #endif
 
-#include <exodus/mv.h>
-#include <exodus/mvdbconns.h>  // placed as last include, causes boost header compiler errors
+#include <exodus/varimpl.h>
+#include <exodus/vardbconn.h>  // placed as last include, causes boost header compiler errors
 //#include <exodus/mvenvironment.h>
 //#include <exodus/mvutf.h>
 
@@ -3971,7 +3971,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		}
 
 		if (this->f(3))
-			debug();
+			throw MVDBException("Internal Error. this->f(3) must be empty");
+
 		//must be empty!
 
 		joins.inserter(1, 1, "\n RIGHT JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");

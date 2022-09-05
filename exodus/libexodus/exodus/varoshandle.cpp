@@ -3,8 +3,9 @@
 //
 #include <algorithm>
 #include <cassert>
-#define INSIDE_MVHANDLES_CPP  // global obj in "mvhandles.h"
-#include "mvhandles.h"
+
+#define INSIDE_VAR_OSHANDLE_CPP  // global obj in "varoshandle.h"
+#include "varoshandle.h"
 
 #include <mutex>
 std::mutex mvhandles_mutex;
@@ -13,13 +14,13 @@ std::mutex mvhandles_mutex;
 
 namespace exodus {
 
-MvHandleEntry::MvHandleEntry()
+VarOSHandleEntry::VarOSHandleEntry()
 	: deleter((DELETER_AND_DESTROYER)0), handle(0) {}
 
-MvHandlesCache::MvHandlesCache()
+VarOSHandlesCache::VarOSHandlesCache()
 	: conntbl(HANDLES_CACHE_SIZE) {}
 
-int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
+int VarOSHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
 	assert(del);
 	// No longer need locking since mv_handlescache is thread_local
 	//std::lock_guard lock(mvhandles_mutex);
@@ -38,14 +39,14 @@ int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTRO
 	return ix;
 }
 
-CACHED_HANDLE MvHandlesCache::get_handle(int index, std::string name) {
+CACHED_HANDLE VarOSHandlesCache::get_handle(int index, std::string name) {
 	//std::lock_guard lock(mvhandles_mutex);
 	return (conntbl[index].deleter == nullptr) || (conntbl[index].extra != name)
 			   ? nullptr
 			   : conntbl[index].handle;
 }
 
-void MvHandlesCache::del_handle(int index) {
+void VarOSHandlesCache::del_handle(int index) {
 	//std::lock_guard lock(mvhandles_mutex);
 	assert(conntbl[index].deleter);
 	if (conntbl[index].deleter) {
@@ -55,7 +56,7 @@ void MvHandlesCache::del_handle(int index) {
 	conntbl[index].deleter = 0;	 //	nullptr
 }
 
-MvHandlesCache::~MvHandlesCache() {
+VarOSHandlesCache::~VarOSHandlesCache() {
 
 	// crashes on linux and multithreaded destructor cant exist so  dont lock
 	// std::lock_guard lock(mvhandles_mutex);

@@ -23,7 +23,7 @@ THE SOFTWARE.
 #include <string.h>
 #include <sstream>
 
-#include <exodus/mv.h>
+#include <exodus/varimpl.h>
 
 static const int HEX_PER_CHAR = sizeof(char) * 2;
 // using namespace std;

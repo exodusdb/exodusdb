@@ -1,4 +1,3 @@
-#include <iostream>
 #ifndef MV_H
 #define MV_H 1
 /*
@@ -23,10 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#define VARREF var&
-#define CVR const var&
-#define TVR var&&
-#define SV std::string_view
+//#include <iostream>
+#include <string>
+#include <cmath>  //for floor
 
 #define EXODUS_RELEASE "21.03"
 #define EXODUS_PATCH "21.03.0"
@@ -72,15 +70,19 @@ THE SOFTWARE.
 
 #endif
 
-#include <string>
-#include <cmath>  //for floor
-
 // ND macro [[no_discard]]
 #if __clang_major__ != 10
 #define ND [[nodiscard]]
 #else
 #define ND
 #endif
+
+#include <exodus/vartyp.h>
+
+#define VARREF var&
+#define CVR const var&
+#define TVR var&&
+#define SV std::string_view
 
 // Decided to use ASCII characters 0x1A-0x1F for PickOS separator chars
 // instead of PickOS 0xFA-0xFF which are illegal utf-8 bytes
@@ -151,147 +153,31 @@ class dim;
 class var_iter;
 class var__extractreplace;
 
-// most help from Thinking in C++ Volume 1 Chapter 12
+// original help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
 
 // could also use http://www.informit.com/articles/article.asp?p=25264&seqNum=1
 // which is effectively about makeing objects behave like ordinary variable syntactically
 // implementing smartpointers
 
-// explanation 1.
-// we need a thread specific environment number so that functions written in C++
-// and used in database calculations (via a callback to a different thread).
-// Database calculation functions written in c++ should use this environment number
-// as an index into arrays or vectors of global data and not use simple thread specific storage
-// explanation 2.
-// the SELECT statement often needs to sort/select on calculated fields and we provide a way for the
-// database to call procedures in the main program using pipes and a separate thread to serve the
-// pipe. to enhance programmability the procedures can have the environment of the thread that
-// issued the SELECT statement so we have two threads essentially using the same environment but
-// because one is waiting for the database to complete the select statement, the other thread can
-// have free access to the same environment each main thread gets a supporting thread the first time
-// it does a SELECT explanation 3.
-
-/*TODO check if the following guidance is followed in class var
-Conversion never applies to this for member functions, and this extends to operators. If the
-operator was instead example operator+ (example, example) in the global namespace, it would compile
-(or if pass-by-const-ref was used).
-
-As a result, symmetric operators like + and - are generally implemented as non-members, whereas the
-compound assignment operators like += and -= are implemented as members (they also change data,
-meaning they should be members). And, since you want to avoid code duplication, the symmetric
-operators can be implemented in terms of the compound assignment ones (as in your code example,
-although convention recommends making the temporary inside the function).
-*/
-
 // the destructor is public non-virtual (supposedly to save space)
 // since this class has no virtual functions
 // IT SHOULD BE ABLE TO DERIVE FROM IT AND DO DELETE()
 // http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
 
-// on linux, size is 56 bytes
+// on linux, size of var is 56 bytes (8 bytes "free" to round up to 64 bytes
+//
 // string:    32
 // int:        8
-// double:    8
-// char:        4
-// var:        56
+// double:     8
+// char:       4
+//           ---
+// var:       56
 
 class var_proxy1;
 class var_proxy2;
 class var_proxy3;
 //class var_brackets_proxy;
-
-class VARTYP {
-
-   private:
-
-	unsigned int flags_ = 0;
-
-   public:
-
-	// constructor from unsigned int
-	VARTYP(unsigned int rhs)
-		: flags_(rhs){};
-
-	// default constructor
-	VARTYP() = default;
-	//VARTYP() : flags(0) {
-	//    std::cout<<"def ctor2"
-	//    << std::endl;
-	//};
-
-	// copy constructor
-	VARTYP(const VARTYP& rhs) = default;
-	//VARTYP(const VARTYP& rhs) : flags(rhs.flags) {
-	//    std::cout<<"copy ctor "<< rhs.flags
-	//    << std::endl;
-	//};
-
-	// assign
-	VARTYP& operator=(const unsigned int newflags) {
-		flags_ = newflags;
-		return *this;
-	};
-
-	// bitwise mutators: xor, or, and
-	VARTYP& operator^=(const unsigned int rhs) {flags_ ^= rhs; return *this; }
-	VARTYP& operator|=(const unsigned int rhs) {flags_ |= rhs; return *this; }
-	VARTYP& operator&=(const unsigned int rhs) {flags_ &= rhs; return *this; }
-
-	// logical comparison with int and self
-	ND bool operator==(const unsigned int rhs) const { return flags_ == rhs; };
-	ND bool operator!=(const unsigned int rhs) const { return flags_ != rhs; };
-	ND bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; };
-	ND bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; };
-
-	// bitwise accessors
-	VARTYP operator&(const unsigned int rhs) const { return flags_ & rhs; }
-	VARTYP operator|(const unsigned int rhs) const { return flags_ | rhs; }
-	VARTYP operator~() const { return VARTYP(~flags_); }
-
-	// int - not explicit so we can do "if (var_typ)"
-	operator int() const { return flags_; }
-
-}; // class VARTYP
-
-// WARNING these VARTYP constants must be initialised before any var variables are
-// NOT they are declared inline which presumably makes them the same in all compilation units
-// but it also seems to ensure that they are initialised BEFORE any var variables
-// theoretically they should be because C++ says
-// this is mandatory because initialising var variables REQUIRES these constants to be available
-// with their correct values otherwise any such var, when used later on, will throw Unassigned
-// Variable Used since its var_typ will be zero
-
-// throw an exception if used an unassigned variable
-constexpr unsigned int VARTYP_UNA {0x0};
-
-// assigned string - unknown if numeric or not
-constexpr unsigned int VARTYP_STR {0x1};
-
-// following indicate that the var is numeric
-constexpr unsigned int VARTYP_INT {0x2};
-constexpr unsigned int VARTYP_DBL {0x4};
-
-// indicates known non-numeric string
-constexpr unsigned int VARTYP_NAN {0x8};
-
-// following indicates that the int is an os file handle
-constexpr unsigned int VARTYP_OSFILE {0x10};
-//constexpr unsigned int VARTYP_DBCONN {0x20};
-
-// various useful flag combinations
-constexpr unsigned int VARTYP_INTDBL {VARTYP_INT | VARTYP_DBL};
-constexpr unsigned int VARTYP_INTSTR {VARTYP_INT | VARTYP_STR};
-constexpr unsigned int VARTYP_DBLSTR {VARTYP_DBL | VARTYP_STR};
-constexpr unsigned int VARTYP_NANSTR {VARTYP_NAN | VARTYP_STR};
-constexpr unsigned int VARTYP_NOTNUMFLAGS {~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN)};
-
-constexpr unsigned int VARTYP_NANSTR_OSFILE {VARTYP_NANSTR | VARTYP_OSFILE};
-//constexpr unsigned int VARTYP_NANSTR_DBCONN {VARTYP_NANSTR | VARTYP_DBCONN};
-
-//constexpr unsigned int VARTYP_DESTRUCTED {0xFFFFF0};
-
-constexpr unsigned int VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE)};
 
 #define DEFAULT_UNASSIGNED = var()
 #define DEFAULT_EMPTY = ""
@@ -1970,8 +1856,8 @@ class PUBLIC var final {
 
 	var logoff() const;
 
-	void debug(CVR DEFAULT_EMPTY) const;
-	ND var backtrace() const;
+//	void debug(CVR DEFAULT_EMPTY) const;
+//	ND var backtrace() const;
 
 	CVR dump(SV text DEFAULT_EMPTY) const;
 	VARREF dump(SV text DEFAULT_EMPTY);
@@ -2247,271 +2133,6 @@ class PUBLIC var_proxy3 {
 
 }; // class var_proxy3
 
-class dim_iter;
-
-//class dim final
-class PUBLIC dim final {
-
-   private:
-	unsigned int nrows_, ncols_;
-	// NOTE: trying to implement data_ as boost smart array pointer (boost::scoped_array<var>
-	// data_;) raises warning: as dim is PUBLIC, boost library should have DLL interface.
-	// Choices: 1) leave memory allocation as is (refuse from scoped_array, or
-	// 2) use pimpl metaphor with slight decrease in performance.
-	// Constructors of dim are very simple, no exception expected between 'new' and return from
-	// constructor As such, choice (1).
-
-	// all redimensioning of this array (eg when copying arrays)
-	// seem to be using ::redim() to accomplish redimensioning
-	// so only the redim code is dangerous (danger in one place is manageable)
-	// we choose NOT to implement 2) above (pimpl) in order
-	// to provide exodus programmer greater/easier visibility into dimensiorned arrays when
-	// debugging (cannot use boost scoped pointer here because mv.h is required by exodus
-	// programmer who should not need boost)
-	var* data_ = nullptr;
-	bool initialised_ = false;
-
-   public:
-
-	// TODO define in class for inline/optimisation
-
-	///////////////////////////
-	// SPECIAL MEMBER FUNCTIONS
-	///////////////////////////
-
-	/////////////////////////
-	// 1. Default constructor
-	/////////////////////////
-	//
-	// allow syntax "dim d;" to create an "unassigned" dim
-	// allow default construction for class variables later resized in class methods
-	dim();
-
-	////////////////
-	// 2. Destructor
-	////////////////
-
-	// destructor to (NOT VIRTUAL to save space since not expected to be a base class)
-	// protected to prevent deriving from var since wish to save space and not provide virtual
-	// destructor http://www.gotw.ca/publications/mill18.htm
-	~dim();
-
-	//////////////////////
-	// 3. Copy constructor - from lvalue
-	//////////////////////
-	//
-	dim(const dim& sourcedim);
-
-	//////////////////////
-	// 4. move constructor - from rvalue
-	//////////////////////
-	//
-	dim(dim&& sourcedim);
-
-	/////////////////////
-	// 5. copy assignment - from lvalue
-	/////////////////////
-
-	// Not using copy assignment by value (copy-and-swap idiom)
-	// because Howard Hinnant recommends against in our case
-
-	// Prevent assigning to temporaries
-	VOID_OR_DIMREF operator=(const dim& rhs) && = delete;
-
-	// var& operator=(CVR rhs) & = default;
-	// Cannot use default copy assignment because
-	// a) it returns a value allowing accidental use of "=" instead of == in if statements
-	// b) doesnt check if rhs is assigned
-	VOID_OR_DIMREF operator=(const dim& rhs) &;
-
-	/////////////////////
-	// 6. move assignment - from rvalue
-	/////////////////////
-
-	// Prevent assigning to temporaries
-	VOID_OR_DIMREF operator=(dim&& rhs) && noexcept = delete;
-
-	// Cannot use default move assignment because
-	// a) it returns a value allowing accidental use of "=" in if statements instead of ==
-	// b) doesnt check if rhs is assigned (less important for temporaries which are rarely unassigned)
-	//var& operator=(TVR rhs) & noexcept = default;
-	VOID_OR_DIMREF operator=(dim&& rhs) &;
-
-
-	// Constructor with number of rows and optional number of columns
-	/////////////////////////////////////////////////////////////////
-	dim(const unsigned int nrows, const unsigned int ncols = 1);
-
-	bool redim(const unsigned int nrows, const unsigned int ncols = 1);
-
-    // Constructor from initializer_list for (int, double, cstr etc.)
-	/////////////////////////////////////////////////////////////////
-	template<class T>
-	dim(std::initializer_list<T> list) {
-		//std::clog << "iizer " << list.size() << std::endl;
-		redim(list.size(), 1);
-		int itemno = 1;
-		for (auto item : list) {
-			this->data_[itemno++] = item;
-		}
-	}
-
-	ND var join(SV sepchar = _FM_) const;
-
-	// parenthesis operators often come in pairs
-	// returns a reference to one var of the array
-	// and so allows lhs assignment like d1(1,2) = "x";
-	// or if on the rhs then use as a normal expression
-	ND VARREF operator()(unsigned int rowno, unsigned int colno = 1);
-
-	//following const version is called if we do () on a dim which was defined as const xx
-	ND CVR operator()(unsigned int rowno, unsigned int colno = 1) const;
-
-	ND var rows() const;
-	ND var cols() const;
-
-	// Q: why is this commented out?
-	// A: we dont want to COPY vars out of an array when using it in rhs expression
-	// var operator() (int row, int col=1) const;
-
-	//=var
-	// The assignment operator should always return a reference to *this.
-	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
-	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
-	// contruction see also ^= etc
-	VOID_OR_DIMREF operator=(CVR sourcevar);
-	VOID_OR_DIMREF operator=(const int sourceint);
-	VOID_OR_DIMREF operator=(const double sourcedbl);
-
-	// see also var::split
-	// return the number of fields
-	var split(CVR var1, SV sepchar = _FM_);
-	dim& sort(bool reverse = false);
-
-	bool read(CVR filehandle, CVR key);
-	bool write(CVR filehandle, CVR key) const;
-
-	bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
-	bool oswrite(CVR osfilename,const char* codepage DEFAULT_EMPTY) const;
-
-	// following is implemented on the dim class now
-	// dim dimarray2();
-	//
-
-	friend class dim_iter;
-
-	//BEGIN - free function to create an iterator -> begin
-	PUBLIC ND friend dim_iter begin(const dim& d);
-
-	//END - free function to create an interator -> end
-	PUBLIC ND friend dim_iter end(const dim& d);
-
-   private:
-
-	dim& init(CVR var1);
-
-}; // class dim
-
-// Note that "for (var& var1: dim1)" with & allows direct access and update into the elements of the array dim1 via varx
-// whereaS "for (var var1 : dim1)" gives a copy of each element which is slower allows updating var1 without updating dim1
-// Both cases are useful
-
-//class dim_iter
-// defined in header to be inlined for performance which is critical
-class PUBLIC dim_iter {
-
-   private:
-
-	const dim* pdim_;
-
-	// Start from 1 ignoring element 0
-	unsigned int index_ = 1;
-
-   public:
-
-	// Default constructor
-	dim_iter() = default;
-
-	// Construct from dim
-	dim_iter(const dim& d1);
-
-	// Check iter != iter (i.e. iter != string::npos)
-	bool operator!=(const dim_iter& dim_iter1);
-
-	// Dereference iter to a var&
-	// return a reference to the actual dim element so it can be updated
-	// iif use var& instead of var in "for (var& : dim1)"
-	//operator var*();
-	var& operator*();
-
-	//iter++
-	dim_iter operator++();
-
-	//iter--
-	dim_iter operator--();
-
-	void end();
-
-}; // class dim_iter
-
-
-// class range
-// provides "for (const var i : range(1,10))"
-// Represents an interable range of ints (int_iter)
-// Lower case class name so we can use in syntax like
-// "for (int i : range(1 to 10))"
-// https://www.internalpointers.com/post/writing-custom-iterators-modern-cpp
-// defined in header to be inlined for performance which is critical
-#define INT_T int
-class PUBLIC range
-{
-	using int_t = INT_T;
-
-	int first_;
-	int last_;
-
-public:
-
-	// Represent an incrementable and comparable int
-	class Iterator
-	{
-		int int_;
-
-	public:
-
-		// Construct from an int
-		Iterator(int_t int1) : int_(int1) {};
-
-		// Return our int
-		int_t operator*() const { return int_; }
-
-		// Increment our int
-		Iterator& operator++() { int_++; return *this; }
-
-		//Iterator operator++(int_t) { Iterator tmp = *this; ++(*this); return tmp; }
-
-		// Allow checking if an iterator is AT OR BEYOND the end of the range
-		// WARNING declare "operator!=" but actually use the "<" operator to compare!
-		friend bool operator!= (const Iterator& a, const Iterator& b) {
-			//var (a.int_).errputl("A ");
-			//var (b.int_).errputl("B ");
-			// Once the moving int is equal to OR GREATER THAN the target then the result is TRUE ie NOT EQUAL
-			// This caters for the situation "for (var x : (10, 8)" which would otherwise loop incorrectly
-			return a.int_ < b.int_; };
-
-	};
-
-	// Construct a range from two ints
-	range( int_t first, int_t last) : first_(first), last_(last + 1) {};
-
-	// Return our first int
-	Iterator begin() { return Iterator(first_); }
-
-	// Return our last int
-	Iterator end()   { return Iterator(last_); }
-
-};
-
 // var versions of separator characters. Must be after class declaration
 inline const var FM = FM_;
 inline const var VM = VM_;
@@ -2553,13 +2174,6 @@ inline const var PLATFORM_ = "x86";
 
 // This is left a global copy for backtrace to get at it
 PUBLIC inline exodus::var EXECPATH2 = "";
-
-PUBLIC void mv_savestack();
-PUBLIC ND var mv_backtrace();
-
-// Set by signals for threads to poll
-PUBLIC inline bool TERMINATE_req = false;
-PUBLIC inline bool RELOAD_req = false;
 
 #ifndef SWIG
 PUBLIC ND std::string naturalorder(const std::string& string1);
@@ -2616,26 +2230,6 @@ class PUBLIC MVError {
 	var description;
 };
 
-// clang-format off
-
-//individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
-class PUBLIC MVDivideByZero         : public MVError {public: explicit MVDivideByZero         (CVR var1    );};
-class PUBLIC MVNonNumeric           : public MVError {public: explicit MVNonNumeric           (CVR var1    );};
-class PUBLIC MVIntOverflow          : public MVError {public: explicit MVIntOverflow          (CVR var1    );};
-class PUBLIC MVIntUnderflow         : public MVError {public: explicit MVIntUnderflow         (CVR var1    );};
-class PUBLIC MVOutOfMemory          : public MVError {public: explicit MVOutOfMemory          (CVR var1    );};
-class PUBLIC MVUnassigned           : public MVError {public: explicit MVUnassigned           (CVR var1    );};
-class PUBLIC MVUndefined            : public MVError {public: explicit MVUndefined            (CVR var1    );};
-class PUBLIC MVInvalidPointer       : public MVError {public: explicit MVInvalidPointer       (CVR var1    );};
-class PUBLIC MVDBException          : public MVError {public: explicit MVDBException          (CVR var1    );};
-class PUBLIC MVNotImplemented       : public MVError {public: explicit MVNotImplemented       (CVR var1    );};
-class PUBLIC MVDebug                : public MVError {public: explicit MVDebug                (CVR var1 DEFAULT_EMPTY);};
-class PUBLIC MVArrayDimensionedZero : public MVError {public: explicit MVArrayDimensionedZero (            );};
-class PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(CVR var1    );};
-class PUBLIC MVArrayNotDimensioned  : public MVError {public: explicit MVArrayNotDimensioned  (            );};
-
-// clang-format on
-
 //inline avoids hitting ODR rule
 ND inline var operator""_var(const char* cstr, std::size_t size) {
 	return var(cstr, size).convert(VISIBLE_FMS, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
@@ -2649,6 +2243,25 @@ ND inline var operator""_var(long double d) {
 	return var(static_cast<double>(d));
 }
 
+//mv_iter class enables c++ range based programming over a dynamic array uses FM as field separator at the moment Example: for (CVR v : dynstr) 
+//{...} Warning: updating the string probably invalidates the iterator! It is a byte pointer into the string. TODO add option a) to specify field 
+//separator eg VM, SM and/or b) acquire field number as well as provided by SRP precompiler 
+//https://wiki.srpcs.com/display/SRPUtilities/SRP_PreCompiler#SRP_PreCompiler-ForEachLoops For Each Value in MyValues using @STM setting Pos 
+//NewValues<Pos> = Value Next Value / var_iter / CONSTRUCTOR from a var (ie begin()) var_iter::var_iter(CVR var1) pvar_(&var1){ if 
+//(!var1.length()) startpos_ = std::string::npos; std::cerr << __PRETTY_FUNCTION__ << std::endl; check iter != iter (i.e. iter != end() bool 
+//var_iter::operator!=([[maybe_unused]] var_iter& var_iter1) { std::cerr << __PRETTY_FUNCTION__ << std::endl; no need to use var_iter1 since the 
+//end is always string::npos; return this->startpos_ != std::string::npos; CONVERSION - conversion to var var var_iter::operator*() const { 
+//std::cerr << __PRETTY_FUNCTION__ << std::endl; find the end of the field if not already known if (endpos_ == std::string::npos) { endpos_ = 
+//pvar_->var_str.find(FM_, startpos_); extract the field if (endpos_ == std::string::npos) return pvar_->var_str.substr(startpos_); else return 
+//pvar_->var_str.substr(startpos_, endpos_ - startpos_); INCREMENT var_iter var_iter::operator++() { std::cerr << __PRETTY_FUNCTION__ << 
+//std::endl; find the end of the field if not already found from a call to above CONVERSION if (endpos_ == std::string::npos) endpos_ = 
+//pvar_->var_str.find(FM_, startpos_); move up to the next field startpos_ = endpos_; skip over any FM character if (startpos_ != 
+//std::string::npos) { max str size = 9223372036854775807 string npos = 18446744073709551615 we will ignore the fact that we could be processing a 
+//string of maximum size with a terminating FM and incrementing would take us past maximum string size but not beyond "no position" npos. 
+//startpos_++; indicate that the end of the next field is not yet known endpos_ = std::string::npos; return *this; BEGIN - free function to create 
+//an iterator -> begin PUBLIC var_iter begin(CVR var1) { std::cerr << __PRETTY_FUNCTION__ << std::endl; return var_iter(var1); END - free function 
+//to create an interator -> end PUBLIC var_iter end([[maybe_unused]] CVR var1) { std::cerr << __PRETTY_FUNCTION__ << std::endl; No need to use 
+//var1 since the end is always string::npos so var_iter!=var_iter is implemented in terms of startpos_ != string::npos; return var_iter();
 
 }  // namespace exodus
 

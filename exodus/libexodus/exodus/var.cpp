@@ -28,7 +28,8 @@ THE SOFTWARE.
 #include <vector>
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
-#include <exodus/mv.h>
+#include <exodus/varimpl.h>
+#include <exodus/exoimpl.h>
 
 namespace exodus {
 
@@ -1593,7 +1594,7 @@ std::istream& operator>>(std::istream& istream1, VARREF into_str1) {
 
 // Forward declaration of free functions defined in mvdebug.cpp
 void save_stack_addresses();
-var backtrace();
+//var backtrace();
 
 MVError::MVError(CVR description_)
 	: description(description_) {
@@ -1620,7 +1621,7 @@ MVError::MVError(CVR description_)
 	var exo_debug;
 	exo_debug.osgetenv("EXO_DEBUG");
 	if (exo_debug) {
-		var().debug();
+		debug();
 	}
 }
 
@@ -1672,5 +1673,6 @@ MVArrayNotDimensioned ::MVArrayNotDimensioned()
 //var operator""_var(long double d) {
 //	return var(static_cast<double>(d));
 //}
+
 
 }  // namespace exodus

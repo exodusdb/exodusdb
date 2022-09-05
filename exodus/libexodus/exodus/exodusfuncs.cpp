@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 //#include <cstdlib> //for atexit()
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 #include <exodus/mvenvironment.h>
 #include <exodusfuncs.h>
 
@@ -74,13 +74,6 @@ PUBLIC var oswait(const int milliseconds, CVR dirpath) {
 
 PUBLIC var ostime() {
 	return var().ostime();
-}
-
-PUBLIC void breakon() {
-	return var().breakon();
-}
-PUBLIC void breakoff() {
-	return var().breakoff();
 }
 
 // osopen x to y else
@@ -279,13 +272,20 @@ PUBLIC var logoff() {
 	return var().logoff();
 }
 
-PUBLIC void debug() {
-	var().debug();
-}
-
-PUBLIC var backtrace() {
-	return var().backtrace();
-}
+//PUBLIC void breakon() {
+//	return var().breakon();
+//}
+//PUBLIC void breakoff() {
+//	return var().breakoff();
+//}
+//
+//PUBLIC void debug() {
+//	var().debug();
+//}
+//
+//PUBLIC var backtrace() {
+//	return var().backtrace();
+//}
 
 PUBLIC var input() {
 	var v;
@@ -1086,7 +1086,8 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 
 	// signal/interrupt handlers
 	// install_signals();
-	var().breakon();
+	//var().breakon();
+	breakon();
 
 	//	tss_environmentns.reset(new int(0));
 	//	global_environments.resize(6);

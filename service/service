@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -euxo pipefail
 
 : =================================================================================
 : Service commands start, stop, restart, reload, status, is-active, enable, disable
@@ -17,19 +17,19 @@ set -eu
 	CMD=${2:?Action [start|stop|etc.] argument is required}
 	LIVE_OR_TEST=${3:-}
 
-:
-: LIVE
-: ====
-:
 	if [ "$LIVE_OR_TEST" != "test" ]; then
+:
+:		LIVE
+:		====
+:
 		sudo systemctl $CMD ${APP_CODE}_live@$DB_CODE
 	fi
 
-:
-: TEST
-: ====
-:
 	if [ "$LIVE_OR_TEST" != "live" ]; then
+:
+:		TEST
+:		====
+:
 		sudo systemctl $CMD ${APP_CODE}_test@$DB_CODE
 	fi
 

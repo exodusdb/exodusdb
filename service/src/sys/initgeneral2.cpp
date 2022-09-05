@@ -161,7 +161,10 @@ function main(in mode, io logtime, in menu) {
 		for (let enventry : osenv) {
 			if (not enventry)
 				continue;
-			printl(THREADNO ^ ":", enventry);
+			// osenv being global is probably the same for all threads
+			// unless they start after the process global env is changed
+			if (THREADNO eq 1)
+				printl(THREADNO ^ ":", enventry);
 			var envkey = enventry.field("=", 1);
 			var envval = enventry.field("=", 2, 999999);
 			if (not(SYSTEM.f(12).locate(envkey, vn))) {

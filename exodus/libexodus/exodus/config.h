@@ -1,1 +1,0 @@
-#define HAVE_BACKTRACE 1

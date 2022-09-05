@@ -1,5 +1,7 @@
 #include <exodus/mvprogram.h>
 
+#include <exodus/exoimpl.h>
+
 //allows and *requires* coding style like exodus application programming
 // e.g. must use USERNAME not mv.USERNAME
 #include <exodus/exodusmacros.h>
@@ -107,7 +109,8 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	if (!DICT.open(dictfilename)) {
 		dictfilename = "dict.voc";
 		if (!DICT.open(dictfilename)) {
-			throw MVDBException(dictfilename.quote() ^ " cannot be opened");
+			//throw MVDBException(dictfilename.quote() ^ " cannot be opened");
+			throw MVError(dictfilename.quote() ^ " cannot be opened");
 		}
 	}
 
@@ -512,7 +515,8 @@ bool ExodusProgramBase::readnext(VARREF record, VARREF key, VARREF valueno) {
 bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key) {
 
 	if (not filename_or_handle_or_command.assigned() || not key.assigned())
-		throw MVUnassigned("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
+		//throw MVUnassigned("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
+		throw MVError("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
 
 	// Simple deleterecord
 	//if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
@@ -1220,9 +1224,12 @@ var ExodusProgramBase::perform(CVR sentence) {
 		// call the shared library exodus object's main function
 		try {
 			ANS = perform_exodusfunctorbase_.callsmf();
-		} catch (const MVUndefined&) {
-			// if return "" is missing then default ANS to ""
-			ANS = "";
+
+		// TODO reimplement this
+//		} catch (const MVUndefined&) {
+//			// if return "" is missing then default ANS to ""
+//			ANS = "";
+
 		} catch (const MVStop&) {
 			// stop is normal way of stopping a perform
 			// functions can call it to terminate the whole "program"

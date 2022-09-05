@@ -5,14 +5,13 @@
 //		variable (that is linked to SQL TABLE name - in mvint field)
 //
 // NOTE_OSX: Changing order of member construction could cause warning under MacOSX, like:
-//	mvdbconns.h: In constructor 'exodus::MVConnections::MVConnections(void
-//(*)(PGconn*))': mvdbconns.h:57: warning: 'exodus::MVConnections::connection_id' will be
-// initialized after mvdbconns.h:56: warning:   'void (*
+//	vardbconn.h: In constructor 'exodus::MVConnections::MVConnections(void
+//(*)(PGconn*))': vardbconn.h:57: warning: 'exodus::MVConnections::connection_id' will be
+// initialized after vardbconn.h:56: warning:   'void (*
 // exodus::MVConnections::del)(PGconn*)' mvdbconns.cpp:15: warning:   when initialized here
 //
-#include "mv.h"
 //#define INSIDE_MVDBCONNS_CPP
-#include "mvdbconns.h"
+#include "vardbconn.h"
 
 namespace exodus {
 

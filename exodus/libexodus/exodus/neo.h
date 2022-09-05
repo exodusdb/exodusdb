@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #ifndef EXODUS_POSIX
 #define WIN32_LEAN_AND_MEAN
-#include <exodus/mv.h>
+#include <exodus/var.h>
 #include <exodus/mvenvironment.h>
 #include <windows.h>
 

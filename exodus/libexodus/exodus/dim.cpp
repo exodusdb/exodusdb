@@ -22,7 +22,8 @@ THE SOFTWARE.
 
 #include <algorithm>
 
-#include <exodus/mv.h>
+#include <exodus/varimpl.h>
+#include <exodus/dim.h>
 
 // based on http://geneura.ugr.es/~jmerelo/c++-faq/operator-overloading.html#faq-13.8
 
@@ -160,13 +161,15 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 		throw MVArrayDimensionedZero();
 	}
 
-	std::clog << "new dim data var x " << nvars << std::endl;
+	//std::clog << "new dim data var x " << nvars << std::endl;
+	var("new dim data var x " ^ var(nvars)).logputl();
 
 	// Allocate a new array of vars on the heap
 	try {
 		//data_ = new var[rows * cols + 1];
 		data_ = new var[nvars];
-		std::clog << "new dim data_ at " << data_ << std::endl;
+		//std::clog << "new dim data_ at " << data_ << std::endl;
+		//this->logputl("new dim data_ at " ^ var(data_);
 	}
 //	catch (const std::bad_alloc& e) {
 //		var(e.what()).errputl();
@@ -562,6 +565,57 @@ var var::sort(SV sepchar) const{
 
 	return this->split(sepchar).sort().join(sepchar);
 
+}
+
+///////////
+// dim_iter
+///////////
+
+//CONSTRUCTOR from a dim (ie begin())
+dim_iter::dim_iter(const dim& d1)
+	: pdim_(&d1){}
+
+//check iter != iter (i.e. iter != end()
+bool dim_iter::operator!=(const dim_iter& dim_iter1) {
+	return this->index_ != dim_iter1.index_;
+}
+
+//CONVERSION - conversion to var
+//dim_iter::operator var*() {
+var& dim_iter::operator*() {
+	return pdim_->data_[index_];
+}
+
+//INCREMENT
+dim_iter dim_iter::operator++() {
+
+	index_++;
+
+	return *this;
+}
+
+//DECREMENT
+dim_iter dim_iter::operator--() {
+
+	index_--;
+
+	return *this;
+}
+
+void dim_iter::end() {
+	index_ = pdim_->nrows_ * pdim_->ncols_ + 1;
+}
+
+//BEGIN - free function to create an iterator -> begin
+PUBLIC dim_iter begin(const dim& d1) {
+	return dim_iter(d1);
+}
+
+//END - free function to create an interator -> end
+PUBLIC dim_iter end(const dim& d1) {
+	dim_iter diter1(d1);
+	diter1.end();
+	return diter1;
 }
 
 }  // namespace exodus

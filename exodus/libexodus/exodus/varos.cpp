@@ -38,8 +38,8 @@ THE SOFTWARE.
 
 //#include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <exodus/mv.h>
-#include "mvhandles.h"
+#include <exodus/varimpl.h>
+#include <exodus/varoshandle.h>
 
 std::once_flag locale_once_flag;
 void locale_once_func() {
@@ -68,14 +68,14 @@ static LocaleOnce locale_once_static;
 namespace exodus {
 
 // this object caches fstream * pointers, to avoid multiple reopening files
-// extern MvHandlesCache mv_handles_cache;
+// extern VarOSHandlesCache mv_handles_cache;
 // Lifecircle of fstream object:
 //	- created (by new) and opened in osbread()/osbwrite();
 //	- pointer to created object stored in h_cache;
 //  - when user calls osclose(), the stream is closed and the object is deleted, and removed from
 //  h_cache;
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
-//		~MvHandlesCache for h_cache closes/deletes all registered objects.
+//		~VarOSHandlesCache for h_cache closes/deletes all registered objects.
 
 std::locale get_locale(const char* locale_name)	// throw (MVError)
 {
