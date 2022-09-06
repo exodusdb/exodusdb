@@ -580,7 +580,7 @@ nextsearch0:
 		return false;
 	}
 
-	var().clearcache();
+	var().cleardbcache();
 
 	//restore the program stack
 	//call programstackstack);
@@ -731,13 +731,13 @@ subroutine wait() {
 
 	//quit if connection no longer active. postgres restarted/stopped.
 	if (not var().sqlexec("SELECT NOW()"))
-		var().logoff();
+		logoff();
 
 	//place a lock to indicate processing
 	//should really retry in case blocked by other processes checking it
 	//call rtp57(syslock, '', '', trim(@station):THREADNO, '', '', '')
 	if (not lockrecord("PROCESSES", processes, THREADNO, "", 999999))
-		var().logoff();
+		logoff();
 
 	//pause forever while any quiet time process (eg hourly backup) is working
 	//maybe not necessary on test data
@@ -823,7 +823,7 @@ function loop_exit() {
 				execute(cmd);
 				USERNAME=username;
 
-			} catch (MVError e) {errputl(e.description);}
+			} catch (VarError e) {errputl(e.description);}
 		}
 
 		osflush();
@@ -936,12 +936,12 @@ function loop_exit() {
 		} else if (bakpars.f(11)) {
 			call log2("backup is suppressed. Quitting.", logtime);
 			perform("OFF");
-			var().logoff();
+			logoff();
 
 		} else if (not(bakpars.f(5).index(dow))) {
 			call log2("Not right day of week " ^ bakpars.f(5) ^ " Logging off", logtime);
 			perform("OFF");
-			var().logoff();
+			logoff();
 
 		} else {
 			//call log2('Preventing further automatic backups today',logtime)
@@ -1013,7 +1013,7 @@ subroutine main_exit() {
 	if ((origsysmode or request1 eq "STOPDB") or halt) {
 		//break off
 		perform("OFF");
-		var().logoff();
+		logoff();
 	}
 
 	//msg is @user4
@@ -1615,10 +1615,10 @@ subroutine process() {
 		if (not committrans())
 			USER3 = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ USER3;
 	}
-	catch (MVError mverror) {
+	catch (VarError varerror) {
 		rollbacktrans();
 		// Similar code in net.cpp and listen.cpp
-		USER3 = mverror.description ^ FM ^ backtrace();
+		USER3 = varerror.description ^ FM ^ backtrace();
 	}
 
 	return;

@@ -53,7 +53,7 @@ var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
 
 	if (separatorx.var_str == "") {
 		//return "";
-		throw MVError("separator cannot be blank in field()");
+		throw VarError("separator cannot be blank in field()");
 	}
 
 	int fieldno = fieldnx > 0 ? fieldnx : 1;
@@ -125,7 +125,7 @@ VARREF var::fieldstorer(CVR separator0, const int fieldnx, const int nfieldsx, C
 		//var_str.clear();
 		//var_typ = VARTYP_STR;
 		//return *this;
-		throw MVError("separator cannot be blank in fieldstorer()");
+		throw VarError("separator cannot be blank in fieldstorer()");
 	}
 
 	// handle multibyte/non-ASCII separators
@@ -349,7 +349,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					//break;
 
 				default:
-					throw MVError("locateat() invalid mode " ^ var(order));
+					throw VarError("locateat() invalid mode " ^ var(order));
 			}
 		}
 
@@ -454,7 +454,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 				break;
 
 			default:
-				throw MVError("locateat() invalid order" ^ var(order));
+				throw VarError("locateat() invalid order" ^ var(order));
 		}
 		// skip over any sep character
 		start_pos = nextstart_pos + usingchar_len;
@@ -479,7 +479,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		const char* ordercodes = "ALARDLDR";
 		const char* orderindex = strstr(ordercodes, ordercode);
 		if (orderindex == nullptr)
-			throw MVError("locateby('" ^ var(ordercode) ^ "') is invalid");
+			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
 
 		// convert the memory address to the char position within the codes
 		ordermode = int(orderindex - ordercodes);
@@ -2012,7 +2012,7 @@ var var::sumall() const {
 			//for clarity of error message,
 			//throw any error here instead of leaving it up to the +=
 			if (!subfield.isnum())
-				throw MVNonNumeric("sumall() " ^ subfield.substr(1, 128).quote());
+				throw VarNonNumeric("sumall() " ^ subfield.substr(1, 128).quote());
 
 			result += subfield;
 			size_t n = subfield.var_str.find('.');
@@ -2053,7 +2053,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!this->isnum())
-			throw MVNonNumeric("sum() " ^ this->substr(1, 128).quote());
+			throw VarNonNumeric("sum() " ^ this->substr(1, 128).quote());
 
 		return (*this) + 0;
 	}
@@ -2073,7 +2073,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!part.isnum())
-			throw MVNonNumeric("sum() " ^ part.substr(1, 128).quote());
+			throw VarNonNumeric("sum() " ^ part.substr(1, 128).quote());
 
 		if (flag) {
 

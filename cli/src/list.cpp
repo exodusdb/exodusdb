@@ -70,26 +70,26 @@ Example command line:
 
 #define EXO_NOHTML
 #ifdef EXO_NOHTML
-#define xselect select
-#define timedate2 timedate
+#	define xselect select
+#	define timedate2 timedate
 
 #else
-#include <addunits.h>
-#include <colrowspan.h>
-#include <convcss.h>
-#include <docmods.h>
-#include <elapsedtimetext.h>
-#include <getcss.h>
-#include <gethtml.h>
-#include <getmark.h>
-#include <getsortjs.h>
-#include <htmllib2.h>
-#include <sendmail.h>
-#include <timedate2.h>
-#include <xselect.h>
+#	include <addunits.h>
+#	include <colrowspan.h>
+#	include <convcss.h>
+#	include <docmods.h>
+#	include <elapsedtimetext.h>
+#	include <getcss.h>
+#	include <gethtml.h>
+#	include <getmark.h>
+#	include <getsortjs.h>
+#	include <htmllib2.h>
+#	include <sendmail.h>
+#	include <timedate2.h>
+#	include <xselect.h>
 #endif
 
-#include "printtx.hpp"
+#include <exodus/printtx.hpp>
 
 //#include <gen_common.h>
 

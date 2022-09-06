@@ -273,7 +273,7 @@ function main() {
 						gosub failsys();
 					}
 					perform("OFF");
-					var().logoff();
+					logoff();
 				}
 			}
 		}
@@ -536,7 +536,7 @@ nextreport:
 			//var().chr(7).output().str(3);
 			call note(msg);
 			perform("OFF");
-			var().logoff();
+			logoff();
 
 		}
 
@@ -549,7 +549,7 @@ nextreport:
 				gosub failsys();
 			}
 			perform("OFF");
-			var().logoff();
+			logoff();
 		}
 
 	}
@@ -1980,7 +1980,7 @@ subroutine failsys() {
 
 	//and quit
 	perform("OFF");
-	var().logoff();
+	logoff();
 
 	return;
 }

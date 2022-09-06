@@ -43,13 +43,13 @@ function main() {
 		printl(fieldstore(greekstr2,"",2,1,"xxx"));
 		assert(false && "empty separator character in fieldstore() should generate an error");
 	}
-	catch (MVError e) {
+	catch (VarError e) {
 	}
 	try {
 		printl(field(greekstr2,"",1));
 		assert(false && "empty separator character in field() should generate an error");
 	}
-	catch (MVError e) {
+	catch (VarError e) {
 	}
 	//fieldstore after end of string
 	greekstr2=greek5x2;
@@ -169,7 +169,7 @@ function main() {
 	var vn;
 
 	// BY cannot be XX
-	try {var x = "xyz"_var.locateby("XX", "xyz", MV);assert(false);} catch(MVError e){};
+	try {var x = "xyz"_var.locateby("XX", "xyz", MV);assert(false);} catch(VarError e){};
 
 	assert(var("f100" _FM_ "f210" _VM_ "" _VM_ "f230").locateby("AL", "", vn, 2));
 	assert(vn == 2);

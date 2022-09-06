@@ -59,7 +59,7 @@ void var::ossleep(const int milliseconds) const {
 //		tss_random_base_generators.reset(new RNG_typ);
 //		threads_random_base_generator = tss_random_base_generators.get();
 //		if (!threads_random_base_generator)
-//			throw MVError("Could not create random number generator");
+//			throw VarError("Could not create random number generator");
 //
 //		// seed to the os clock (secs since unix epoch)
 //		// Caveat: std::time(0) is not a very good truly-random seed.
@@ -94,7 +94,7 @@ var var::rnd() const {
 
 	// rnd(-1 ... 1) will always return 0 which is not random
 	if (std::abs(top) <= 1)
-		throw MVDivideByZero("rnd(" ^ *this ^ ") will always return 0 which is not random");
+		throw VarDivideByZero("rnd(" ^ *this ^ ") will always return 0 which is not random");
 
 	// Define a integer range (0 to n-1) or (n+1 to 0)
 	int min,max;

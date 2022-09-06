@@ -923,7 +923,7 @@ gotip:
 //		//close all other processes, upgrade, close and restart
 //		call upgrade("R");
 //		perform("OFF");
-//		var().logoff();
+//		logoff();
 //	}
 //
 	/////

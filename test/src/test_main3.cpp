@@ -126,7 +126,7 @@ function main()
 
 	{
 		printl("Prevent rnd always returning 0");
-		try { var x = rnd(0); assert(false); } catch (MVDivideByZero e) {};
+		try { var x = rnd(0); assert(false); } catch (VarDivideByZero e) {};
 	}
 
 	{
@@ -292,7 +292,7 @@ function main()
 	            var x3=x1;//unassigned var
 	            assert(false && "var x3 = x1 should throw unassigned error)");
 	        }
-	        catch (MVUnassigned e) {
+	        catch (VarUnassigned e) {
 	            assert(true || "var v3 = v1) does give unassigned error)");
 	        }
 	    }
@@ -304,7 +304,7 @@ function main()
 	            var x2(x1);//unassigned dim element
 	            assert(false && "var x2(x1) should throw unassigned error)");
 	        }
-	        catch (MVUnassigned e) {
+	        catch (VarUnassigned e) {
 	            assert(true || "x2(x1) does give unassigned error)");
 	        }
 	    }

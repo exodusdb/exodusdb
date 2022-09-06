@@ -204,10 +204,10 @@ static var defaultconninfo =
 	"password=somesillysecret connect_timeout=10";
 
 // Deleter function to close connection and connection cache object
-// this is also called in the destructor of MVConnectionsCache
+// this is also called in the destructor of DBConnectorCache
 // MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
 // TODO so make sure that we dont use exit(n) anywhere in the programs!
-static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
+static void PGconn_DELETER(PGconn* pgconn) {
 	auto pgconn2 = pgconn;
     // at this point we have good new connection to database
     if (DBTRACE) {
@@ -240,11 +240,11 @@ static void connection_DELETER_AND_DESTROYER(PGconn* pgconn) {
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
 // THREAD_LOCAL data
-thread_local int thread_default_data_mvconn_no = 0;
-thread_local int thread_default_dict_mvconn_no = 0;
+thread_local int thread_default_data_dbconn_no = 0;
+thread_local int thread_default_dict_dbconn_no = 0;
 //thread_local var thread_connparams = "";
 thread_local var thread_dblasterror = "";
-thread_local MVConnections thread_connections(connection_DELETER_AND_DESTROYER);
+thread_local DBConnector thread_dbconnector(PGconn_DELETER);
 thread_local std::map<std::string, std::string> thread_file_handles;
 
 //very few entries so map will be much faster than unordered_map
@@ -415,34 +415,34 @@ class MVresult {
 	}
 };
 
-int get_mvconn_no(CVR dbhandle) {
+int get_dbconn_no(CVR dbhandle) {
 
 	if (!dbhandle.assigned()) {
-		// var("get_mvconn_no() returning 0 - unassigned").logputl();
+		// var("get_dbconn_no() returning 0 - unassigned").logputl();
 		return 0;
 	}
-	var mvconn_no = dbhandle.f(2);
-	if (mvconn_no.isnum()) {
-		/// var("get_mvconn_no() returning " ^ mvconn_no).logputl();
-		return mvconn_no;
+	var dbconn_no = dbhandle.f(2);
+	if (dbconn_no.isnum()) {
+		/// var("get_dbconn_no() returning " ^ dbconn_no).logputl();
+		return dbconn_no;
 	}
 
-	// var("get_mvconn_no() returning 0 - not numeric").logputl();
+	// var("get_dbconn_no() returning 0 - not numeric").logputl();
 
 	return 0;
 }
 
-int get_mvconn_no_or_default(CVR dbhandle) {
+int get_dbconn_no_or_default(CVR dbhandle) {
 
-	int mvconn_no = get_mvconn_no(dbhandle);
-	if (mvconn_no)
-		return mvconn_no;
+	int dbconn_no = get_dbconn_no(dbhandle);
+	if (dbconn_no)
+		return dbconn_no;
 
 	// otherwise get the default connection
-	if (!mvconn_no) {
+	if (!dbconn_no) {
 
 		//if (DBTRACE and dbhandle.assigned()) {
-		//	dbhandle.logputl("DBTR get_mvconn_no_or_default=");
+		//	dbhandle.logputl("DBTR get_dbconn_no_or_default=");
 		//}
 
 		//dbhandle MUST always arrive in lower case to detect if "dict."
@@ -451,14 +451,14 @@ int get_mvconn_no_or_default(CVR dbhandle) {
 		//bool isdict = false;
 
 		if (isdict)
-			mvconn_no = thread_default_dict_mvconn_no;
+			dbconn_no = thread_default_dict_dbconn_no;
 		else
-			mvconn_no = thread_default_data_mvconn_no;
+			dbconn_no = thread_default_data_dbconn_no;
 
-		// var(mvconn_no).logputl("mvconn_no2=");
+		// var(dbconn_no).logputl("dbconn_no2=");
 
 		// otherwise try the default connection
-		if (!mvconn_no) {
+		if (!dbconn_no) {
 
 			var defaultdb;
 
@@ -478,47 +478,47 @@ int get_mvconn_no_or_default(CVR dbhandle) {
 
 			//try to connect
 			if (defaultdb.connect())
-				mvconn_no = get_mvconn_no(defaultdb);
+				dbconn_no = get_dbconn_no(defaultdb);
 
 			//if cannot connect then for dictionaries look on default connection
 			else if (isdict) {
 
 				//attempt a default connection if not already done
-				if (!thread_default_data_mvconn_no) {
+				if (!thread_default_data_dbconn_no) {
 					defaultdb = "";
 					defaultdb.connect();
 				}
 
-				mvconn_no = thread_default_data_mvconn_no;
+				dbconn_no = thread_default_data_dbconn_no;
 			}
 
 			//save default dict/data connections
 			if (isdict) {
-				thread_default_dict_mvconn_no = mvconn_no;
+				thread_default_dict_dbconn_no = dbconn_no;
 				if (DBTRACE) {
-					var(mvconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
+					var(dbconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
 				}
 			}
 			else {
-				thread_default_data_mvconn_no = mvconn_no;
+				thread_default_data_dbconn_no = dbconn_no;
 				if (DBTRACE) {
-					var(mvconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
+					var(dbconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
 				}
 			}
 		}
 
 		//save the connection number in the dbhandle
-		//if (mvconn_no) {
+		//if (dbconn_no) {
 		//	dbhandle.unassigned("");
-		//	dbhandle.r(2, mvconn_no);
+		//	dbhandle.r(2, dbconn_no);
 		//}
 
 	}
 
-	return mvconn_no;
+	return dbconn_no;
 }
 
-// var::get_pgconnection()
+// var::get_pgconn()
 // 1. return the associated db connection
 // this could be a previously opened filevar, a previous connected connectionvar
 // or any variable previously used for a default connection
@@ -530,37 +530,37 @@ int get_mvconn_no_or_default(CVR dbhandle) {
 // NB in case 2 and 3 the connection id is recorded in the var
 // use void pointer to avoid need for including postgres headers in mv.h or any fancy class
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-PGconn* get_pgconnection(CVR dbhandle) {
+PGconn* get_pgconn(CVR dbhandle) {
 
 	// var("--- connection ---").logputl();
 	// get the connection associated with *this
-	int mvconn_no = get_mvconn_no_or_default(dbhandle);
-	// var(mvconn_no).logputl("mvconn_no1=");
+	int dbconn_no = get_dbconn_no_or_default(dbhandle);
+	// var(dbconn_no).logputl("dbconn_no1=");
 
 	// otherwise error
-	if (!mvconn_no)
-		throw MVDBException("pgconnection() requested when not connected.");
+	if (!dbconn_no)
+		throw VarDBException("pgconnection() requested when not connected.");
 
 	if (DBTRACE) {
 		std::cout << std::endl;
-		PGconn* pgconn=thread_connections.get_pgconnection(mvconn_no);
-		std::clog << "CONN " << mvconn_no << " " << pgconn << std::endl;
+		PGconn* pgconn=thread_dbconnector.get_pgconn(dbconn_no);
+		std::clog << "CONN " << dbconn_no << " " << pgconn << std::endl;
 	}
 
 	// return the relevent pg_connection structure
-	auto pgconn = thread_connections.get_pgconnection(mvconn_no);
+	auto pgconn = thread_dbconnector.get_pgconn(dbconn_no);
 	//TODO error abort if zero
 	return pgconn;
 
 }
 
 // gets lock_table, associated with connection, associated with this object
-MVConnection* get_mvconnection(CVR dbhandle) {
-	int mvconn_no = get_mvconn_no_or_default(dbhandle);
-	if (!mvconn_no)
-		throw MVDBException("get_mvconnection() attempted when not connected");
+DBConn* get_dbconn(CVR dbhandle) {
+	int dbconn_no = get_dbconn_no_or_default(dbhandle);
+	if (!dbconn_no)
+		throw VarDBException("get_dbconn() attempted when not connected");
 
-	return thread_connections.get_mvconnection(mvconn_no);
+	return thread_dbconnector.get_dbconn(dbconn_no);
 }
 
 void var::lasterror(CVR msg) const {
@@ -773,7 +773,7 @@ bool var::connect(CVR conninfo) {
 #ifdef PQisthreadsafe
 	if (!PQisthreadsafe()) {
 		// TODO only abort if environmentn>0
-		throw MVDBException("connect(): Postgres PQ library is not threadsafe");
+		throw VarDBException("connect(): Postgres PQ library is not threadsafe");
 
 	}
 #endif
@@ -781,15 +781,15 @@ bool var::connect(CVR conninfo) {
 	// at this point we have good new connection to database
 
 	// cache the new connection handle
-	int mvconn_no = thread_connections.add_connection(pgconn, fullconninfo.var_str);
+	int dbconn_no = thread_dbconnector.add_dbconn(pgconn, fullconninfo.var_str);
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
 	if (not this->f(1))
 		//this->r(1,fullconninfo.field(" ",1));
 		this->r(1,fullconninfo.field2("dbname=",-1).field(" ",1));
-	this->r(2, mvconn_no);
-	this->r(3, mvconn_no);
+	this->r(2, dbconn_no);
+	this->r(3, dbconn_no);
 
 	if (DBTRACE) {
 		fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect() OK ");
@@ -800,10 +800,10 @@ bool var::connect(CVR conninfo) {
 	// this->outputl("new connection=");
 
 	// set default connection - ONLY IF THERE ISNT ONE ALREADY
-	if (isdefault && !thread_default_data_mvconn_no) {
-		thread_default_data_mvconn_no = mvconn_no;
+	if (isdefault && !thread_default_data_dbconn_no) {
+		thread_default_data_dbconn_no = dbconn_no;
 		if (DBTRACE) {
-			this->logputl("DBTR NEW DEFAULT DATA CONN " ^ var(mvconn_no) ^ " on ");
+			this->logputl("DBTR NEW DEFAULT DATA CONN " ^ var(dbconn_no) ^ " on ");
 		}
 
 	}
@@ -896,33 +896,34 @@ void var::disconnect() {
 	if (DBTRACE)
 		(this->assigned() ? *this : var("")).logputl("DBTR var::disconnect() ");
 
-	var mvconn_no = get_mvconn_no(*this);
-	if (!mvconn_no)
-		mvconn_no = thread_default_data_mvconn_no;
+	var dbconn_no = get_dbconn_no(*this);
+	if (!dbconn_no)
+		dbconn_no = thread_default_data_dbconn_no;
 
-	if (mvconn_no) {
+	if (dbconn_no) {
 
 		//disconnect
-		thread_connections.del_connection((int)mvconn_no);
+		// note singular form of dbconn
+		thread_dbconnector.del_dbconn((int)dbconn_no);
 		var_typ = VARTYP_UNA;
 
 		// if we happen to be disconnecting the same connection as the default connection
 		// then reset the default connection so that it will be reconnected to the next
 		// connect this is rather too smart but will probably do what people expect
-		if (mvconn_no == thread_default_data_mvconn_no) {
-			thread_default_data_mvconn_no = 0;
+		if (dbconn_no == thread_default_data_dbconn_no) {
+			thread_default_data_dbconn_no = 0;
 			if (DBTRACE) {
-				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
+				var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
 			}
 		}
 
 		// if we happen to be disconnecting the same connection as the default connection FOR DICT
 		// then reset the default connection so that it will be reconnected to the next
 		// connect this is rather too smart but will probably do what people expect
-		if (mvconn_no == thread_default_dict_mvconn_no) {
-			thread_default_dict_mvconn_no = 0;
+		if (dbconn_no == thread_default_dict_dbconn_no) {
+			thread_default_dict_dbconn_no = 0;
 			if (DBTRACE) {
-				var(mvconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
+				var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
 			}
 		}
 	}
@@ -934,26 +935,27 @@ void var::disconnectall() {
 	THISIS("bool var::disconnectall()")
 	assertDefined(function_sig);
 
-	var mvconn_no = get_mvconn_no(*this);
-	if (!mvconn_no)
-		mvconn_no = 2;
+	var dbconn_no = get_dbconn_no(*this);
+	if (!dbconn_no)
+		dbconn_no = 2;
 
 	if (DBTRACE)
-		mvconn_no.logputl("DBTR var::disconnectall() >= ");
+		dbconn_no.logputl("DBTR var::disconnectall() >= ");
 
-	thread_connections.del_connections(mvconn_no);
+	//note the plural for of dbconns
+	thread_dbconnector.del_dbconns(dbconn_no);
 
-	if (thread_default_data_mvconn_no >= mvconn_no) {
-		thread_default_data_mvconn_no = 0;
+	if (thread_default_data_dbconn_no >= dbconn_no) {
+		thread_default_data_dbconn_no = 0;
 		if (DBTRACE) {
-			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
+			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
 		}
 	}
 
-	if (thread_default_dict_mvconn_no >= mvconn_no) {
-		thread_default_dict_mvconn_no = 0;
+	if (thread_default_dict_dbconn_no >= dbconn_no) {
+		thread_default_dict_dbconn_no = 0;
 		if (DBTRACE) {
-			var(mvconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
+			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
 		}
 	}
 
@@ -999,7 +1001,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 			auto cached_file_handle = entry->second;
 
 			// Make sure the connection is still valid otherwise redo the open
-			auto pgconn = get_pgconnection(cached_file_handle);
+			auto pgconn = get_pgconn(cached_file_handle);
 			if (! pgconn) {
 				thread_file_handles.erase(normal_filename);
 				//var(cached_file_handle).errputl("==== Connection cache INVALID = ");
@@ -1083,9 +1085,9 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	//this->lasterror();
 
 	// var becomes a filehandle containing the filename and connection no
-	(*this) = normal_filename ^ FM ^ get_mvconn_no_or_default(connection2);
+	(*this) = normal_filename ^ FM ^ get_dbconn_no_or_default(connection2);
 	normal_filename.var_str.push_back(FM_);
-	normal_filename.var_str.append(std::to_string(get_mvconn_no_or_default(connection2)));
+	normal_filename.var_str.append(std::to_string(get_dbconn_no_or_default(connection2)));
 	var_str = normal_filename.var_str;
 	var_typ = VARTYP_NANSTR;
 
@@ -1133,15 +1135,15 @@ bool var::reado(CVR filehandle, CVR key) {
 	ISSTRING(key)
 
 	// check cache first, and return any cached record
-	int mvconn_no = get_mvconn_no_or_default(filehandle);
-	if (!mvconn_no)
-		throw MVDBException("get_mvconn_no() failed");
+	int dbconn_no = get_dbconn_no_or_default(filehandle);
+	if (!dbconn_no)
+		throw VarDBException("get_dbconn_no() failed");
 
 	// Attempt to get record from the cache
 	// TODO cache non-existent records as empty
 	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
 	std::string cachedrecord =
-		thread_connections.getrecord(mvconn_no, hash64);
+		thread_dbconnector.getrecord(dbconn_no, hash64);
 	if (!cachedrecord.empty()) {
 
 		//(*this) = cachedrecord;
@@ -1173,12 +1175,12 @@ bool var::writeo(CVR filehandle, CVR key) const {
 
 	// update cache
 	// virtually identical code in read and write/update/insert/delete
-	int mvconn_no = get_mvconn_no_or_default(filehandle);
-	if (!mvconn_no)
-		throw MVDBException("get_mvconn_no() failed");
+	int dbconn_no = get_dbconn_no_or_default(filehandle);
+	if (!dbconn_no)
+		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
-	thread_connections.putrecord(mvconn_no, hash64, var_str);
+	thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 
 	return true;
 }
@@ -1191,12 +1193,12 @@ bool var::deleteo(CVR key) const {
 
 	// update cache
 	// virtually identical code in read and write/update/insert/delete
-	int mvconn_no = get_mvconn_no_or_default(*this);
-	if (!mvconn_no)
-		throw MVDBException("get_mvconn_no() failed");
+	int dbconn_no = get_dbconn_no_or_default(*this);
+	if (!dbconn_no)
+		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
-	thread_connections.delrecord(mvconn_no, hash64);
+	thread_dbconnector.delrecord(dbconn_no, hash64);
 
 	return true;
 }
@@ -1242,14 +1244,14 @@ bool var::read(CVR filehandle, CVR key) {
 	if (filehandle == "") {
 		var errmsg = "read(...) filename not specified, probably not opened.";
 		this->lasterror(errmsg);
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	// reading a magic special key returns all keys in the file in natural order
 	if (key == "%RECORDS%") {
 		var sql = "SELECT key from " ^ get_normal_filename(filehandle) ^ ";";
 
-		auto pgconn = get_pgconnection(filehandle);
+		auto pgconn = get_pgconn(filehandle);
 		if (! pgconn)
 			return false;
 
@@ -1289,7 +1291,7 @@ bool var::read(CVR filehandle, CVR key) {
 	}
 
 	// get filehandle specific connection or fail
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1319,7 +1321,7 @@ bool var::read(CVR filehandle, CVR key) {
 			errmsg ^= var(PQerrorMessage(pgconn)) ^ " SQLERROR:" ^ sqlstate;
 		;
 		this->lasterror(errmsg);
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	if (PQntuples(mvresult) < 1) {
@@ -1334,7 +1336,7 @@ bool var::read(CVR filehandle, CVR key) {
 	// A serious error
 	if (PQntuples(mvresult) > 1) {
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	*this = getpgresultcell(mvresult, 0, 0);
@@ -1390,11 +1392,11 @@ var var::lock(CVR key) const {
 	assertDefined(function_sig);
 	ISSTRING(key)
 
-	PGconn* pgconn = get_pgconnection(*this);
+	PGconn* pgconn = get_pgconn(*this);
 	if (!pgconn)
 		return false;
 
-	auto mvconnection = get_mvconnection(*this);
+	auto dbconn = get_dbconn(*this);
 
 	// TODO consider preventing begintrans if lock cache not empty
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
@@ -1406,8 +1408,8 @@ var var::lock(CVR key) const {
 	// then INSIDE transaction then SUCCEED with 2 to indicate already locked
 	//
 	// postgres allows and stacks up multiple locks whereas multivalue databases dont
-	if (mvconnection->connection_locks.contains(hash64)) {
-		if (mvconnection->in_transaction)
+	if (dbconn->locks_.contains(hash64)) {
+		if (dbconn->in_transaction_)
 			return 2; //SUCCESS TYPE ALREADY CACHED
 		else
 			return ""; //FAILURE TYPE ALREADY CACHED
@@ -1420,7 +1422,7 @@ var var::lock(CVR key) const {
 
 	// Locks outside transactions remain for the duration of the connection and can be unlocked/relocked or unlockall'd
 	// Locks inside transactions are unlockable and automatically unlocked on commit/rollback
-	const char* sql = (mvconnection->in_transaction) ? "SELECT PG_TRY_ADVISORY_XACT_LOCK($1)" : "SELECT PG_TRY_ADVISORY_LOCK($1)";
+	const char* sql = (dbconn->in_transaction_) ? "SELECT PG_TRY_ADVISORY_XACT_LOCK($1)" : "SELECT PG_TRY_ADVISORY_LOCK($1)";
 
 	// Debugging
 	if (DBTRACE)
@@ -1440,13 +1442,13 @@ var var::lock(CVR key) const {
 			var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 			var(PQresultStatus(mvresult)) ^ ", PQntuples=" ^
 			var(PQntuples(mvresult));
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	// Add to lock cache if successful
 	if (*PQgetvalue(mvresult, 0, 0) != 0) {
 		std::pair<const uint64_t, int> lock(hash64, 0);
-		mvconnection->connection_locks.insert(lock);
+		dbconn->locks_.insert(lock);
 		return 1;
 	}
 
@@ -1464,22 +1466,22 @@ bool var::unlock(CVR key) const {
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (!pgconn)
 		return false;
 
-	auto mvconnection = get_mvconnection(*this);
+	auto dbconn = get_dbconn(*this);
 
 	// Unlock inside transaction has no effect
-	if (mvconnection->in_transaction)
+	if (dbconn->in_transaction_)
 		return false;
 
 	// If not in lock cache then return false
-	if (!mvconnection->connection_locks.contains(hash64))
+	if (!dbconn->locks_.contains(hash64))
 		return false;
 
 	// Remove from lock cache
-	mvconnection->connection_locks.erase(hash64);
+	dbconn->locks_.erase(hash64);
 
 	// Parameter array
 	const char* paramValues[] = {(char*)&hash64};
@@ -1506,7 +1508,7 @@ bool var::unlock(CVR key) const {
 				var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 				var(PQresultStatus(mvresult)) ^ ", PQntuples=" ^
 				var(PQntuples(mvresult));
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	// Should return true
@@ -1518,22 +1520,22 @@ bool var::unlockall() const {
 	THISIS("void var::unlockall() const")
 	assertDefined(function_sig);
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (!pgconn)
 		return false;
 
-	auto mvconnection = get_mvconnection(*this);
+	auto dbconn = get_dbconn(*this);
 
 	// Locks in transactions cannot be cleared
-	if (mvconnection->in_transaction)
+	if (dbconn->in_transaction_)
 		return false;
 
 	// If lock cache is empty already then return true
-	if (mvconnection->connection_locks.empty())
+	if (dbconn->locks_.empty())
 		return true;
 
 	// Clear the lock cache
-	mvconnection->connection_locks.clear();
+	dbconn->locks_.clear();
 
 	// Should return true
 	return this->sqlexec("SELECT PG_ADVISORY_UNLOCK_ALL()");
@@ -1562,7 +1564,7 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	THISIS("bool var::sqlexec(CVR sqlcmd, VARREF response) const")
 	ISSTRING(sqlcmd)
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (!pgconn) {
 		response = "Error: sqlexec cannot find thread database connection";
 		return false;
@@ -1689,7 +1691,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	sql ^= " ON CONFLICT (key)";
 	sql ^= " DO UPDATE SET data = $2";
 
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1714,7 +1716,7 @@ bool var::write(CVR filehandle, CVR key) const {
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 					var(PQresultStatus(mvresult)) ^ " " ^
 					var(PQerrorMessage(pgconn));
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	// if not updated 1 then fail
@@ -1745,7 +1747,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 
 	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1765,7 +1767,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	// if not updated 1 then fail
@@ -1805,7 +1807,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	var sql =
 		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 
-	auto pgconn = get_pgconnection(filehandle);
+	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
 		return false;
 
@@ -1831,7 +1833,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 				filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(mvresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
 				var(PQerrorMessage(pgconn));
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	// if not updated 1 then fail
@@ -1871,7 +1873,7 @@ bool var::deleterecord(CVR key) const {
 
 	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (!pgconn)
 		return false;
 
@@ -1888,7 +1890,7 @@ bool var::deleterecord(CVR key) const {
 		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 	}
 
 	// if not updated 1 then fail
@@ -1905,16 +1907,16 @@ bool var::deleterecord(CVR key) const {
 	return result;
 }
 
-void var::clearcache() const {
+void var::cleardbcache() const {
 
-	THISIS("bool var::clearcache() const")
+	THISIS("bool var::cleardbcache() const")
 	assertDefined(function_sig);
 
-	int mvconn_no = get_mvconn_no_or_default(*this);
-	if (!mvconn_no)
-		throw MVDBException("get_mvconn_no() failed in clearcache");
+	int dbconn_no = get_dbconn_no_or_default(*this);
+	if (!dbconn_no)
+		throw VarDBException("get_dbconn_no() failed in cleardbcache");
 
-	thread_connections.clearrecordcache(mvconn_no);
+	thread_dbconnector.cleardbcache(dbconn_no);
 
 	// Warning if any cursors have not been closed/cleaned up.
 	for (auto& entry : thread_mvresults)
@@ -1926,26 +1928,25 @@ void var::clearcache() const {
 	return;
 }
 
-// If this is opened SQL connection, pass connection ID to sqlexec
 bool var::begintrans() const {
 
 	THISIS("bool var::begintrans() const")
 	assertDefined(function_sig);
 
 	// Clear the record cache
-	this->clearcache();
+	this->cleardbcache();
 
 	// begin a transaction
 	//if (!this->sqlexec("BEGIN"))
 	if (!this->sqlexec("BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED"))
 		return false;
 
-	auto mvconnection = get_mvconnection(*this);
+	auto dbconn = get_dbconn(*this);
 
 	// Change status
 	// ESSENTIAL Used to change locking type to PER TRANSACTION
 	// so all locks persist until after commit i.e. cannot be specifically unlocked
-	mvconnection->in_transaction = true;
+	dbconn->in_transaction_ = true;
 
 	return true;
 
@@ -1957,19 +1958,19 @@ bool var::rollbacktrans() const {
 	assertDefined(function_sig);
 
 	// Clear the record cache
-	this->clearcache();
+	this->cleardbcache();
 
 	// Rollback a transaction
 	if (!this->sqlexec("ROLLBACK"))
 		return false;
 
-	auto mvconnection = get_mvconnection(*this);
+	auto dbconn = get_dbconn(*this);
 
 	// Change status
-	mvconnection->in_transaction = false;
+	dbconn->in_transaction_ = false;
 
     // Clear the lock cache
-    mvconnection->connection_locks.clear();
+    dbconn->locks_.clear();
 
 	return true;
 }
@@ -1980,19 +1981,19 @@ bool var::committrans() const {
 	assertDefined(function_sig);
 
 	// Clear the record cache
-	this->clearcache();
+	this->cleardbcache();
 
 	// end (commit) a transaction
 	if (!this->sqlexec("END"))
 		return false;
 
-	auto mvconnection = get_mvconnection(*this);
+	auto dbconn = get_dbconn(*this);
 
 	// Change status
-	mvconnection->in_transaction = false;
+	dbconn->in_transaction_ = false;
 
     // Clear the lock cache
-    mvconnection->connection_locks.clear();
+    dbconn->locks_.clear();
 
 	return true;
 
@@ -2003,9 +2004,9 @@ bool var::statustrans() const {
 	THISIS("bool var::statustrans() const")
 	assertDefined(function_sig);
 //
-//	auto pgconn = get_pgconnection(*this);
+//	auto pgconn = get_pgconn(*this);
 //	if (!pgconn) {
-//		this->lasterror("db connection " ^ var(get_mvconn_no(*this)) ^ "not opened");
+//		this->lasterror("db connection " ^ var(get_dbconn_no(*this)) ^ "not opened");
 //		return false;
 //	}
 //
@@ -2014,8 +2015,8 @@ bool var::statustrans() const {
 //	// only idle is considered to be not in a transaction
 //	return (PQtransactionStatus(pgconn) != PQTRANS_IDLE);
 
-	auto mvconnection = get_mvconnection(*this);
-	return mvconnection->in_transaction;
+	auto dbconn = get_dbconn(*this);
+	return dbconn->in_transaction_;
 
 }
 
@@ -2126,7 +2127,7 @@ bool var::deletefile(CVR filename) const {
 	ISSTRING(filename)
 
 	// False if file does not exist
-	// Avoid generating sql errors since they abort transations
+	// Avoid generating sql errors since they abort transactions
 	if (!var().open(filename, *this)) {
 		//this->errputl(filename ^ " cannot be deleted because it does not exist. ");
 		return false;
@@ -2230,7 +2231,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			dictfilename = "dict.voc";
 			if (!actualdictfile.open(dictfilename)) {
 
-				throw MVDBException("get_dictexpression() cannot open " ^
+				throw VarDBException("get_dictexpression() cannot open " ^
 									dictfilename.quote());
 			}
 		}
@@ -2275,7 +2276,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 								FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
 								15;
 						else {
-							throw MVDBException(
+							throw VarDBException(
 								"get_dictexpression() cannot read " ^
 								fieldname.quote() ^ " from " ^
 								actualdictfile.convert(FM, "^")
@@ -2514,13 +2515,13 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			} else {
 				// var dictxlatetofile=xlatetargetfilename;
 				// if (!dictxlatetofile.open("DICT",xlatetargetfilename))
-				//	throw MVDBException("get_dictexpression() DICT" ^
+				//	throw VarDBException("get_dictexpression() DICT" ^
 				// xlatetargetfilename ^ " file cannot be opened"); var
 				// ismv;
 				var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
 				var xlatetargetdictfile;
 				if (!xlatetargetdictfile.open(xlatetargetdictfilename))
-					throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ function_src);
+					throw VarDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ function_src);
 
 				sqlexpression = get_dictexpression(cursor,
 					filename, xlatetargetfilename, xlatetargetdictfilename,
@@ -2557,7 +2558,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				xlatekeyexpression = filename ^ ".key";
 
 			} else {
-				// throw  MVDBException("get_dictexpression() " ^
+				// throw  VarDBException("get_dictexpression() " ^
 				// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
 				// DICTIONARY EXPRESSION - " ^ dictrec.f(8).quote());
 				var("ERROR: mvdbpostgres get_dictexpression() " ^
@@ -2604,20 +2605,20 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 		} //of dict type S
 
-		// FOLLOWING IS CURRENTLY DISABLED
-		// if we get here then we were unable to work out any sql expression or function
-		// so originally we instructed postgres to CALL EXODUS VIA IPC to run exodus
-		// subroutines in the context of the calling program. exodus mvdbpostgres.cpp setup
-		// a separate listening thread with a separate pgconnection before calling postgres.
-		// BUT exodus subroutines cannot make request to the db while it is handling a
-		// request FROM the db - unless it were to setup ANOTHER threada and pgconnection to
-		// handle it. this is also perhaps SLOW since it has to copy the whole RECORD and ID
-		// etc to exodus via IPC for every call!
 		else {
 exodus_call:
+			// FOLLOWING IS CURRENTLY DISABLED since postgres has no way to call exodus
+			// if we get here then we were unable to work out any sql expression or function
+			// so originally we instructed postgres to CALL EXODUS VIA IPC to run exodus
+			// subroutines in the context of the calling program. exodus mvdbpostgres.cpp setup
+			// a separate listening thread with a separate pgconnection before calling postgres.
+			// BUT exodus subroutines cannot make request to the db while it is handling a
+			// request FROM the db - unless it were to setup ANOTHER threada and pgconnection to
+			// handle it. this is also perhaps SLOW since it has to copy the whole RECORD and ID
+			// etc to exodus via IPC for every call!
 			sqlexpression = "'" ^ fieldname ^ "'";
 			int environmentn = 1;  // getenvironmentn()
-			sqlexpression = "exodus_call('exodusservice-" ^ getprocessn() ^ "." ^
+			sqlexpression = "exodus_call('exodusservice-" ^ var().ospid() ^ "." ^
 							environmentn ^ "', '" ^ dictfilename.lcase() ^ "', '" ^
 							fieldname.lcase() ^ "', " ^ filename ^ ".key, " ^ filename ^
 							".data,0,0)";
@@ -2629,7 +2630,7 @@ exodus_call:
 		}
 	} else {
 		// throw  filename ^ " " ^ fieldname ^ " - INVALID DICTIONARY ITEM";
-		// throw  MVDBException("get_dictexpression(" ^ filename.quote() ^ ", " ^
+		// throw  VarDBException("get_dictexpression(" ^ filename.quote() ^ ", " ^
 		// fieldname.quote() ^ ") invalid dictionary type " ^ dicttype.quote());
 		var("ERROR: mvdbpostgres get_dictexpression(" ^ filename.quote() ^ ", " ^
 			fieldname.quote() ^ ") invalid dictionary type " ^
@@ -2859,11 +2860,11 @@ var getword(VARREF remainingwords, VARREF ucword) {
 //
 //	// clear or create any existing saveselect file with the same name
 //	if (!this->createfile(filename))
-//		throw MVDBException("saveselect cannot create file " ^ filename);
+//		throw VarDBException("saveselect cannot create file " ^ filename);
 //
 //	var file;
 //	if (!file.open(filename, (*this)))
-//		throw MVDBException("saveselect cannot open file " ^ filename);
+//		throw VarDBException("saveselect cannot open file " ^ filename);
 //
 //	while (this->readnext(key, mv)) {
 //		recn++;
@@ -2902,7 +2903,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// private - and arguments are left unchecked for speed
 	//?allow undefined usage like var xyz=xyz.select();
 	if (var_typ & VARTYP_MASK) {
-		// throw MVUndefined("selectx()");
+		// throw VarUndefined("selectx()");
 		var_str.clear();
 		var_typ = VARTYP_STR;
 	}
@@ -2950,7 +2951,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 	//catch bad FM character
 	if (sortselectclause.var_str.find(FM_) != std::string::npos)
-		throw MVDBException("Illegal FM character in " ^ sortselectclause);
+		throw VarDBException("Illegal FM character in " ^ sortselectclause);
 
 	// sortselect clause can be a filehandle in which case we extract the filename from field1
 	// omitted if filename.select() or filehandle.select()
@@ -3006,7 +3007,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// actualfilename.logputl("actualfilename=");
 	if (!actualfilename) {
 		// this->outputl("this=");
-		throw MVDBException("filename missing from select statement:" ^ sortselectclause);
+		throw VarDBException("filename missing from select statement:" ^ sortselectclause);
 	}
 
 	while (remaining.length()) {
@@ -3045,7 +3046,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		else if (ucword == "USING" && remaining) {
 			dictfilename = getword(remaining, xx);
 			if (!dictfile.open("dict." ^ dictfilename)) {
-				throw MVDBException("select() dict_" ^ dictfilename ^
+				throw VarDBException("select() dict_" ^ dictfilename ^
 									" file cannot be opened");
 
 			}
@@ -3216,7 +3217,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				//prevent BETWEEN being used on fields
 				if (dictexpression_isvector) {
-					throw MVDBException(
+					throw VarDBException(
 						sortselectclause ^
 						" 'BETWEEN x AND y' and 'FROM x TO y' ... are not currently supported for mv or xref columns");
 				}
@@ -3234,7 +3235,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				// check we have two values (in word1 and word2)
 				if (!valuechars.index(word1[1]) || !valuechars.index(word2[1])) {
-					throw MVDBException(
+					throw VarDBException(
 						sortselectclause ^
 						"BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)");
 				}
@@ -3259,7 +3260,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					//prevent WITH XXX appearing twice in the same sort/select clause
 					//unless and until implementeda
 					if (calc_fields.f(2, calc_fieldn))
-						throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
+						throw VarDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 
 					calc_fields.r(2, calc_fieldn, opid);
 					calc_fields.r(3, calc_fieldn, word1.lowerer());
@@ -3445,7 +3446,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				if (op == "<>")
 					negative = !negative;
 				else if (op != "=" and op != "")
-					throw MVDBException("SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote());
+					throw VarDBException("SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote());
 
 				// use regular expression operator
 				op = "~";
@@ -3524,7 +3525,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					calc_fields.r(1, calc_fieldn, dictid);
 				}
 				if (calc_fields.f(2, calc_fieldn))
-					throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
+					throw VarDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 
 				//save the op
 				calc_fields.r(2, calc_fieldn, op);
@@ -3874,7 +3875,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	}  // getword loop
 
 	if (calc_fields && orwith) {
-		//		throw MVDBException("OR not allowed with sort/select calculated fields");
+		//		throw VarDBException("OR not allowed with sort/select calculated fields");
 	}
 
 	// prefix specified keys into where clause
@@ -3914,7 +3915,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var listname = "";
 	// see also listname below
 	//	if (this->hasnext()) {
-	//		listname=this->f(1) ^ "_" ^ getprocessn() ^ "_tempx";
+	//		listname=this->f(1) ^ "_" ^ ospid() ^ "_tempx";
 	//		this->savelist(listname);
 	//		var savelistfilename="savelist_" ^ listname;
 	//		joins ^= " \nINNER JOIN\n " ^ savelistfilename ^ " ON " ^ actualfilename ^
@@ -3960,7 +3961,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		createtablesql ^= ";DELETE FROM " ^ temptablename ^ "\n";
 		var errmsg;
 		if (!this->sqlexec(createtablesql, errmsg)) {
-			throw MVDBException(errmsg);
+			throw VarDBException(errmsg);
 		}
 
 		//readnext the keys into a temporary table
@@ -3971,7 +3972,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		}
 
 		if (this->f(3))
-			throw MVDBException("Internal Error. this->f(3) must be empty");
+			throw VarDBException("Internal Error. this->f(3) must be empty");
 
 		//must be empty!
 
@@ -4041,7 +4042,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	//	exodus::logputl(sql);
 
 	// first close any existing cursor with the same name, otherwise cannot create  new cursor
-    // Avoid generating sql errors since they abort transations
+    // Avoid generating sql errors since they abort transactions
 	if (this->cursorexists()) {
 		var sql = "";
 		sql ^= "CLOSE cursor1_";
@@ -4071,7 +4072,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// TODO handle duplicate_cursor sqlstate 42P03
 		sql.logputl("sql=");
 
-		throw MVDBException(errmsg);
+		throw VarDBException(errmsg);
 
 		// if (autotrans)
 		//	rollbacktrans();
@@ -4108,13 +4109,13 @@ void var::clearselect() {
 		//		return;
 	}
 
-	var listname = (*this) ^ "_" ^ getprocessn() ^ "_tempx";
+	var listname = (*this) ^ "_" ^ ospid() ^ "_tempx";
 
 	// if (DBTRACE)
 	//	exodus::logputl("DBTRACE: ::clearselect() for " ^ listname);
 
 	// Dont close cursor unless it exists otherwise sql error aborts any transaction
-    // Avoid generating sql errors since they abort transations
+    // Avoid generating sql errors since they abort transactions
 	// if (not this->cursorexists())
 	if (not this->cursorexists())
 		return;
@@ -4253,7 +4254,7 @@ bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, 
 			/**
 			//if the standard select list file is available then select it, i.e. create
 			a CURSOR, so FETCH has something to work on var listfilename="savelist_" ^
-			cursor ^ "_" ^ getprocessn() ^ "_tempx"; if (not var().open(listfilename))
+			cursor ^ "_" ^ ospid() ^ "_tempx"; if (not var().open(listfilename))
 				return false;
 			//TODO should add BY LISTITEMNO
 			if (not cursor.select("select " ^ listfilename))
@@ -4268,7 +4269,7 @@ bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, 
 
 		// any other error
 		if (errmsg)
-			throw MVDBException(errmsg ^ " sqlstate= " ^ sqlstate.quote() ^ " in SQL " ^
+			throw VarDBException(errmsg ^ " sqlstate= " ^ sqlstate.quote() ^ " in SQL " ^
 								sql);
 
 		return false;
@@ -4325,7 +4326,7 @@ bool var::deletelist(CVR listname) const {
 	if (!lists.open("LISTS"))
 		//skip this error for now because maybe no LISTS on some databases
 		return false;
-		//throw MVDBException("deletelist() LISTS file cannot be opened");
+		//throw VarDBException("deletelist() LISTS file cannot be opened");
 
 	// initial block of keys are stored with no suffix (i.e. no *1)
 	lists.deleterecord(listname);
@@ -4354,7 +4355,7 @@ bool var::savelist(CVR listname) {
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS"))
-		throw MVDBException("savelist() LISTS file cannot be opened");
+		throw VarDBException("savelist() LISTS file cannot be opened");
 
 	var listno = 1;
 	var listkey = listname;
@@ -4440,11 +4441,11 @@ bool var::getlist(CVR listname) {
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS"))
-		throw MVDBException("getlist() LISTS file cannot be opened");
+		throw VarDBException("getlist() LISTS file cannot be opened");
 
 	var keys;
 	if (!keys.read(lists, listname))
-		// throw MVDBException(listname.quote() ^ " list does not exist.");
+		// throw VarDBException(listname.quote() ^ " list does not exist.");
 		return false;
 
 	// provide first block of keys for readnext
@@ -4514,7 +4515,7 @@ bool var::makelist(CVR listname, CVR keys) {
 		// open the lists file on the same connection
 		var lists = *this;
 		if (!lists.open("LISTS"))
-			throw MVDBException("makelist() LISTS file cannot be opened");
+			throw VarDBException("makelist() LISTS file cannot be opened");
 
 		keys.write(lists, listname);
 		return true;
@@ -4572,7 +4573,7 @@ bool var::hasnext() {
 		// otherwise try and get another block
 		var lists = *this;
 		if (!lists.open("LISTS"))
-			throw MVDBException("hasnext() LISTS file cannot be opened");
+			throw VarDBException("hasnext() LISTS file cannot be opened");
 
 		var listno = this->f(4);
 		listno++;
@@ -4597,11 +4598,11 @@ bool var::hasnext() {
 	}
 
 	//TODO avoid this trip to the database somehow?
-    // Avoid generating sql errors since they abort transations
+    // Avoid generating sql errors since they abort transactions
 	if (!this->cursorexists())
 		return false;
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (!pgconn) {
 		// this->clearselect();
 		return false;
@@ -4631,7 +4632,7 @@ bool var::readnext(VARREF key, VARREF valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK) {
-		// throw MVUndefined("readnext()");
+		// throw VarUndefined("readnext()");
 		var_str.clear();
 		var_typ = VARTYP_STR;
 	}
@@ -4651,7 +4652,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
-		// throw MVUndefined("readnext()");
+		// throw VarUndefined("readnext()");
 		var_str.clear();
 		var_typ = VARTYP_STR;
 	}
@@ -4694,7 +4695,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 
 				var lists = *this;
 				if (!lists.open("LISTS"))
-					throw MVDBException("readnext() LISTS file cannot be opened");
+					throw VarDBException("readnext() LISTS file cannot be opened");
 
 				var listno = this->f(4);
 				listno++;
@@ -4725,12 +4726,12 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 		}
 	}
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
 		return "";
 
 	//TODO avoid this trip to the database somehow?
-    // Avoid generating sql errors since they abort transations
+    // Avoid generating sql errors since they abort transactions
 	if (!this->cursorexists())
 		return false;
 
@@ -4772,7 +4773,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 	if (PQnfields(pgresult) < 3) {
 		//var errmsg = "readnext() must follow a select() clause with option (R)";
 		//this->lasterror(errmsg);
-		//throw MVDBException(errmsg);
+		//throw VarDBException(errmsg);
 		// return false;
 
 		// Dont throw an error, just return empty record. why?
@@ -4916,7 +4917,7 @@ var var::listfiles() const {
 	sql ^= " UNION SELECT matviewname as table_name, schemaname as table_schema from pg_matviews";
 	sql ^= " WHERE schemaname " ^ schemafilter;
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
 		return "";
 
@@ -4949,7 +4950,7 @@ var var::dblist() const {
 
 	var sql = "SELECT datname FROM pg_database";
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
 		return "";
 
@@ -4980,7 +4981,7 @@ bool var::cursorexists() {
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 
-    // Avoid generating sql errors since they abort transations
+    // Avoid generating sql errors since they abort transactions
 
 	// default cursor is ""
 	this->unassigned("");
@@ -4992,7 +4993,7 @@ bool var::cursorexists() {
 	if (thread_mvresults.find(cursorid) != thread_mvresults.end())
 		return true;
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
 		return "";
 
@@ -5036,7 +5037,7 @@ var var::listindexes(CVR filename0, CVR fieldname0) const {
 		" AND indisprimary != 't'"
 		");";
 
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
 		return "";
 
@@ -5090,7 +5091,7 @@ var var::reccount(CVR filename0) const {
 	sql ^= filename.f(1).lcase();
 	sql ^= "';";
 
-	auto pgconn = get_pgconnection(filename);
+	auto pgconn = get_pgconn(filename);
 	if (! pgconn)
 		return "";
 
@@ -5126,7 +5127,7 @@ var var::flushindex(CVR filename) const {
 	// sql.logputl("sql=");
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
-	auto pgconn = get_pgconnection(*this);
+	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
 		return "";
 

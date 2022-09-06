@@ -24,7 +24,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 
 	} else {
 		call mssg(DQ ^ (alerttype ^ DQ) ^ " unrecognised alert type in systemalerts");
-		var().stop();
+		stop();
 	}
 //L150:
 	return 0;

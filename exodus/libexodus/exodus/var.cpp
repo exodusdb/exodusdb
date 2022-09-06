@@ -54,15 +54,15 @@ namespace exodus {
 // assigned in most var constructions
 
 void var::throwUndefined(CVR message) const {
-	throw MVUndefined(message);
+	throw VarUndefined(message);
 }
 
 void var::throwUnassigned(CVR message) const {
-	throw MVUnassigned(message);
+	throw VarUnassigned(message);
 }
 
 void var::throwNonNumeric(CVR message) const {
-	throw MVNonNumeric(message);
+	throw VarNonNumeric(message);
 }
 
 CVR var::dump(SV text) const {
@@ -313,7 +313,7 @@ tryagain:
 	// prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			throw MVIntOverflow("operator++");
+			throw VarIntOverflow("operator++");
 		priorvalue = var(var_int);
 		var_int++;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -328,11 +328,11 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		//trigger MVNonNumeric
+		//trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger MVUnassigned
+		//trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
@@ -353,7 +353,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			throw MVIntUnderflow("operator--");
+			throw VarIntUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -368,11 +368,11 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		//trigger MVNonNumeric
+		//trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger MVUnassigned
+		//trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
@@ -390,7 +390,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			throw MVIntOverflow("operator++");
+			throw VarIntOverflow("operator++");
 		var_int++;
 		var_typ = VARTYP_INT;  // reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
@@ -401,11 +401,11 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		//trigger MVNonNumeric
+		//trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger MVUnassigned
+		//trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
@@ -424,7 +424,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			throw MVIntUnderflow("operator--");
+			throw VarIntUnderflow("operator--");
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
 
@@ -437,11 +437,11 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		//trigger MVNonNumeric
+		//trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger MVUnassigned
+		//trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
@@ -499,7 +499,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 // MULTIPLY VAR
@@ -544,7 +544,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 // SUBTRACT VAR
@@ -589,7 +589,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 
@@ -610,7 +610,7 @@ tryagain:
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 									 "')");
 			var_dbl /= rhs.var_dbl;
 		}
@@ -618,7 +618,7 @@ tryagain:
 		// rhs double
 		else {
 			if (!rhs.var_int)
-				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 									 "')");
 			var_dbl /= rhs.var_int;
 		}
@@ -631,7 +631,7 @@ tryagain:
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 								 "')");
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_dbl;
 		}
@@ -639,7 +639,7 @@ tryagain:
 		// both are ints - must return a double
 		else {
 			if (!rhs.var_int)
-				throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
 				"')");
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_int;
 		}
@@ -692,7 +692,7 @@ tryagain:
 	else {
 		assertNumeric(__PRETTY_FUNCTION__);
 		// Cant get here
-		throw MVNonNumeric(substr(1, 128) ^ "+= ");
+		throw VarNonNumeric(substr(1, 128) ^ "+= ");
 	}
 
 	// reset to one unique type
@@ -761,7 +761,7 @@ tryagain:
 VARREF var::operator/=(const double dbl1) &{
 
 	if (!dbl1)
-		throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ dbl1 ^
+		throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ dbl1 ^
 		"')");
 
 tryagain:
@@ -828,7 +828,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 // MULTIPLY INT
@@ -860,7 +860,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 //SUBTRACT INT
@@ -892,7 +892,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw MVNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(substr(1, 128) ^ "+= ");
 }
 
 
@@ -903,7 +903,7 @@ VARREF var::operator/=(const int int1) &{
 	// Always return double
 
 	if (!int1)
-		throw MVDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ int1 ^
+		throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ int1 ^
 		"')");
 
 tryagain:
@@ -1015,7 +1015,7 @@ inline bool almost_equal(double x, double y, int) {
 	return (std::abs(x - y) < SMALLEST_NUMBER);
 }
 
-PUBLIC bool MVlt_bool(const bool lhs, const bool rhs) {
+PUBLIC bool var_lt_bool(const bool lhs, const bool rhs) {
 
 	//return true if lhs is "less true" than rhs
 
@@ -1034,9 +1034,9 @@ PUBLIC bool MVlt_bool(const bool lhs, const bool rhs) {
 
 }
 
-// almost identical code in MVeq and MVlt except where noted
+// almost identical code in var_eq and var_lt except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVeq(CVR lhs, CVR rhs) {
+PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -1049,15 +1049,15 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 			// we have two strings
 			// if they are both the same (including both empty) then eq is true
 			if (lhs.var_str == rhs.var_str)
-				// different from MVlt
+				// different from var_lt
 				return true;
 			// otherwise if either is empty then return eq false
 			//(since empty string is ONLY eq to another empty string)
 			if (lhs.var_str.empty())
-				// different from MVlt
+				// different from var_lt
 				return false;
 			if (rhs.var_str.empty())
-				// SAME as MVlt
+				// SAME as var_lt
 				return false;
 			// otherwise go on to test numerically then literally
 		} else {
@@ -1065,10 +1065,10 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 			//(after checking that rhs is actually assigned)
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
-					// throw MVUnassigned("eq(rhs)");
+					// throw VarUnassigned("eq(rhs)");
 					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
-				// different from MVlt
+				// different from var_lt
 				return false;
 			}
 		}
@@ -1077,10 +1077,10 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 		//(after checking that lhs is actually assigned)
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
-				// throw MVUnassigned("eq(lhs)");
+				// throw VarUnassigned("eq(lhs)");
 				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
-			// SAME as MVlt
+			// SAME as var_lt
 			return false;
 		}
 	}
@@ -1096,7 +1096,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 			//DOUBLE v DOUBLE
 			//if (rhs.var_typ & VARTYP_INT)
 			if (rhs.var_typ & VARTYP_DBL) {
-				// different from MVlt
+				// different from var_lt
 
 				//return (lhs.var_intd == rhs.var_intd);
 
@@ -1107,7 +1107,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 
 			//DOUBLE V INT
 			else {
-				// different from MVlt (uses absolute)
+				// different from var_lt (uses absolute)
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 				//return (lhs.var_int == rhs.var_dbl);
@@ -1119,7 +1119,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 		//INT v DOUBLE
 		//if (rhs.var_typ & VARTYP_INTd)
 		if (rhs.var_typ & VARTYP_DBL) {
-			// different from MVlt (uses absolute)
+			// different from var_lt (uses absolute)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
@@ -1131,7 +1131,7 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 
 		//INT v INT
 		else {
-			// different from MVlt (uses absolute)
+			// different from var_lt (uses absolute)
 
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl == rhs.var_dbl);
@@ -1146,14 +1146,14 @@ PUBLIC bool MVeq(CVR lhs, CVR rhs) {
 		lhs.createString();
 	if (!(rhs.var_typ & VARTYP_STR))
 		rhs.createString();
-	// different from MVlt
+	// different from var_lt
 	//return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) == 0;
 	return lhs.var_str == rhs.var_str;
 }
 
-// almost identical between MVeq and MVlt except where noted
+// almost identical between var_eq and var_lt except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVlt(CVR lhs, CVR rhs) {
+PUBLIC bool var_lt(CVR lhs, CVR rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -1166,15 +1166,15 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 			// we have two strings
 			// if they are both the same (including both empty) then eq is true
 			if (lhs.var_str == rhs.var_str)
-				// different from MVeq
+				// different from var_eq
 				return false;
 			// otherwise if either is empty then return eq false
 			//(since empty string is ONLY eq to another empty string)
 			if (lhs.var_str.empty())
-				// different from MVeq
+				// different from var_eq
 				return true;
 			if (rhs.var_str.empty())
-				// SAME as MVeq
+				// SAME as var_eq
 				return false;
 			// otherwise go on to test numerically then literally
 		} else {
@@ -1182,10 +1182,10 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 			// after checking that rhs is actually assigned
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
-					// throw MVUnassigned("eq(rhs)");
+					// throw VarUnassigned("eq(rhs)");
 					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
-				// different from MVeq
+				// different from var_eq
 				return true;
 			}
 		}
@@ -1194,10 +1194,10 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 		// after checking that lhs is actually assigned
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
-				// throw MVUnassigned("eq(lhs)");
+				// throw VarUnassigned("eq(lhs)");
 				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
-			// SAME as MVeq
+			// SAME as var_eq
 			return false;
 		}
 	}
@@ -1206,22 +1206,22 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 	if (lhs.isnum() && rhs.isnum()) {
 		if (lhs.var_typ & VARTYP_INT) {
 			if (rhs.var_typ & VARTYP_INT)
-				// different from MVeq
+				// different from var_eq
 				return (lhs.var_int < rhs.var_int);
 			else
-				// different from MVeq
+				// different from var_eq
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 				//return (static_cast<double>(lhs.var_int) < rhs.var_dbl);
 				return (rhs.var_dbl - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
 			//return ((rhs.var_dbl - static_cast<double>(lhs.var_int) >= SMALLEST_NUMBER);
 		}
 		if (rhs.var_typ & VARTYP_INT)
-			// different from MVeq
+			// different from var_eq
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl < static_cast<double>(rhs.var_int));
 			return (static_cast<double>(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
 		else
-			// different from MVeq
+			// different from var_eq
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl < rhs.var_dbl);
 			return (rhs.var_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
@@ -1232,14 +1232,14 @@ PUBLIC bool MVlt(CVR lhs, CVR rhs) {
 		lhs.createString();
 	if (!(rhs.var_typ & VARTYP_STR))
 		rhs.createString();
-	// different from MVeq
+	// different from var_eq
 	// return lhs.var_str<rhs.var_str;
 	return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) < 0;
 }
 
-// similar to MVeq and MVlt - this is the var<int version for speed
+// similar to var_eq and var_lt - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVlt_int(CVR lhs, const int int2) {
+PUBLIC bool var_lt_int(CVR lhs, const int int2) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -1270,7 +1270,7 @@ PUBLIC bool MVlt_int(CVR lhs, const int int2) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVlt_int(const int int1, CVR rhs) {
+PUBLIC bool var_lt_int(const int int1, CVR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -1300,7 +1300,7 @@ PUBLIC bool MVlt_int(const int int1, CVR rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVlt_dbl(CVR lhs, const double dbl2) {
+PUBLIC bool var_lt_dbl(CVR lhs, const double dbl2) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -1332,7 +1332,7 @@ PUBLIC bool MVlt_dbl(CVR lhs, const double dbl2) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVlt_dbl(const double dbl1, CVR rhs) {
+PUBLIC bool var_lt_dbl(const double dbl1, CVR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -1363,7 +1363,7 @@ PUBLIC bool MVlt_dbl(const double dbl1, CVR rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVeq_dbl(CVR lhs, const double dbl1) {
+PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -1371,7 +1371,7 @@ PUBLIC bool MVeq_dbl(CVR lhs, const double dbl1) {
 
 	// 1. EMPTY STRING always false
 	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
-		//std::clog << "MVeq_dbl 1. Empty string can never equal any number" << std::endl;
+		//std::clog << "var_eq_dbl 1. Empty string can never equal any number" << std::endl;
 		return false;
 	}
 
@@ -1382,7 +1382,7 @@ PUBLIC bool MVeq_dbl(CVR lhs, const double dbl1) {
 
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
-			//std::clog << "MVeq_dbl 2. lhs double " << lhs.var_dbl << " compare to double " << dbl1 << std::endl;
+			//std::clog << "var_eq_dbl 2. lhs double " << lhs.var_dbl << " compare to double " << dbl1 << std::endl;
 			return almost_equal(lhs.var_dbl, dbl1, 2);
 
 		}
@@ -1391,14 +1391,14 @@ PUBLIC bool MVeq_dbl(CVR lhs, const double dbl1) {
 		else if (lhs.var_typ & VARTYP_INT) {
 
 			// LHS INT
-			// different from MVlt (uses absolute)
+			// different from var_lt (uses absolute)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
 			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
-			//std::clog << "MVeq_dbl 3. lhs int " << lhs.var_int << " compare to double " << dbl1 << std::endl;
+			//std::clog << "var_eq_dbl 3. lhs int " << lhs.var_int << " compare to double " << dbl1 << std::endl;
 			return almost_equal(dbl1, lhs.var_int, 2);
 
 		}
@@ -1407,19 +1407,19 @@ PUBLIC bool MVeq_dbl(CVR lhs, const double dbl1) {
 	while (lhs.isnum());
 
 	// 4. NON-NUMERIC STRING - always false
-	//std::clog << "MVeq_dbl 4. Non-numeric string can never equal any number" << std::endl;;
+	//std::clog << "var_eq_dbl 4. Non-numeric string can never equal any number" << std::endl;;
 	return false;
 
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool MVeq_int(CVR lhs, const int int1) {
+PUBLIC bool var_eq_int(CVR lhs, const int int1) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
 	// 1. EMPTY STRING always false
 	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
-		//std::clog << "MVeq_int 1. Empty string can never equal any number" << std::endl;
+		//std::clog << "var_eq_int 1. Empty string can never equal any number" << std::endl;
 		return false;
 	}
 
@@ -1430,14 +1430,14 @@ PUBLIC bool MVeq_int(CVR lhs, const int int1) {
 
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
-			//std::clog << "MVeq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
+			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
 			return almost_equal(lhs.var_dbl, int1, 2);
 
 		}
 
 		// 3. LHS INT
 		else if (lhs.var_typ & VARTYP_INT) {
-			//std::clog << "MVeq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
+			//std::clog << "var_eq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
 			return lhs.var_int == int1;
 
 		}
@@ -1446,7 +1446,7 @@ PUBLIC bool MVeq_int(CVR lhs, const int int1) {
 	while (lhs.isnum());
 
 	// 4. NON-NUMERIC STRING - always false
-	//std::clog << "MVeq_int 4. Non-numeric string can never equal any number" << std::endl;;
+	//std::clog << "var_eq_int 4. Non-numeric string can never equal any number" << std::endl;;
 	return false;
 
 }
@@ -1482,40 +1482,61 @@ var var::operator-() const{
 	this->assertNumeric(__PRETTY_FUNCTION__);
 
 	// will never get here
-	throw MVNonNumeric("+(" ^ this->substr(1, 128) ^ ")");
+	throw VarNonNumeric("+(" ^ this->substr(1, 128) ^ ")");
 }
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
 // slightly wrong precedence but at least we have a reliable concat operator to replace the + which
 // is now reserved for forced ADDITION both according to fundamental PickOS principle
-var MVcat_var_var(CVR lhs, CVR rhs) {
+var var_cat_var(CVR lhs, CVR rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
 
-	return lhs.var_str + rhs.var_str;
+	// return lhs.var_str + rhs.var_str;
+
+	var result(lhs.var_str);
+	result.var_str.append(rhs.var_str);
+
+	return result;
 }
 
-var MVcat_var_cstr(CVR lhs, const char* cstr) {
+var var_cat_cstr(CVR lhs, const char* rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
 
-	return lhs.var_str + cstr;
+	//return lhs.var_str + cstr;
+
+	var result(lhs.var_str);
+	result.var_str.append(rhs);
+
+	return result;
 }
 
-var MVcat_cstr_var(const char* cstr, CVR rhs) {
+var var_cat_char(CVR lhs, const char rhs) {
+
+	lhs.assertString(__PRETTY_FUNCTION__);
+
+	//return lhs.var_str + char2;
+
+	var result(lhs.var_str);
+	result.var_str.push_back(rhs);
+
+	return result;
+}
+
+var cstr_cat_var(const char* lhs, CVR rhs) {
 
 	rhs.assertString(__PRETTY_FUNCTION__);
 
-	return cstr + rhs.var_str;
+	//return cstr + rhs.var_str;
+
+	var result(lhs);
+	result.var_str.append(rhs.var_str);
+
+	return result;
 }
 
-var MVcat_var_char(CVR lhs, const char char2) {
-
-	lhs.assertString(__PRETTY_FUNCTION__);
-
-	return lhs.var_str + char2;
-}
 /*
 
 VARREF var::operator^(CVR vstr) {
@@ -1596,10 +1617,34 @@ std::istream& operator>>(std::istream& istream1, VARREF into_str1) {
 void save_stack_addresses();
 //var backtrace();
 
-MVError::MVError(CVR description_)
+// Exception constructors
+/////////////////////////
+
+// clang-format off
+
+VarUnassigned     ::VarUnassigned(    CVR errmsg) : VarError("VarUnassigned:"     ^ errmsg) {}
+VarDivideByZero   ::VarDivideByZero(  CVR errmsg) : VarError("VarDivideByZero:"   ^ errmsg) {}
+VarNonNumeric     ::VarNonNumeric(    CVR errmsg) : VarError("VarNonNumeric:"     ^ errmsg) {}
+VarIntOverflow    ::VarIntOverflow(   CVR errmsg) : VarError("VarIntOverflow:"    ^ errmsg) {}
+VarIntUnderflow   ::VarIntUnderflow(  CVR errmsg) : VarError("VarIntUnderflow:"   ^ errmsg) {}
+VarUndefined      ::VarUndefined(     CVR errmsg) : VarError("VarUndefined:"      ^ errmsg) {}
+VarOutOfMemory    ::VarOutOfMemory(   CVR errmsg) : VarError("VarOutOfMemory:"    ^ errmsg) {}
+VarInvalidPointer ::VarInvalidPointer(CVR errmsg) : VarError("VarInvalidPointer:" ^ errmsg) {}
+VarDBException    ::VarDBException(   CVR errmsg) : VarError("VarDBException:"    ^ errmsg) {}
+VarNotImplemented ::VarNotImplemented(CVR errmsg) : VarError("VarNotImplemented:" ^ errmsg) {}
+VarDebug          ::VarDebug(         CVR errmsg) : VarError("VarDebug"           ^ errmsg) {}
+
+DimNotDimensioned   ::DimNotDimensioned(  CVR errmsg) : VarError("DimNotDimensioned"    ^ errmsg) {}
+DimDimensionedZero  ::DimDimensionedZero( CVR errmsg) : VarError("DimDimensionedZero:"  ^ errmsg) {}
+DimIndexOutOfBounds ::DimIndexOutOfBounds(CVR errmsg) : VarError("DimIndexOutOfBounds:" ^ errmsg) {}
+
+// clang-format on
+
+VarError::VarError(CVR description_)
 	: description(description_) {
 
-	// WARNING any errors in this constructor
+	// *** WARNING ***
+	// any errors in this constructor
 	// will cause recursion and hang/segfault
 
 //	if (description.assigned())
@@ -1616,63 +1661,13 @@ MVError::MVError(CVR description_)
 //	stack.convert(FM, "\n").put(std::cerr);
 //	var("\n").put(std::cerr);
 
-	//break into debugger if EXO_DEBUG is set to non-zero
-	//otherwise allow catch at a higher level or terminate
+	// Break into debugger if EXO_DEBUG is set to non-zero
+	// otherwise allow catch at a higher level or terminate
 	var exo_debug;
 	exo_debug.osgetenv("EXO_DEBUG");
 	if (exo_debug) {
 		debug();
 	}
 }
-
-MVUnassigned ::MVUnassigned(CVR var1)
-	: MVError("MVUnassigned:" ^ var1) {}
-MVDivideByZero ::MVDivideByZero(CVR var1)
-	: MVError("MVDivideByZero:" ^ var1) {}
-MVNonNumeric ::MVNonNumeric(CVR var1)
-	: MVError("MVNonNumeric:" ^ var1) {}
-MVIntOverflow ::MVIntOverflow(CVR var1)
-	: MVError("MVIntOverflow:" ^ var1) {}
-MVIntUnderflow ::MVIntUnderflow(CVR var1)
-	: MVError("MVIntUnderflow:" ^ var1) {}
-MVUndefined ::MVUndefined(CVR var1)
-	: MVError("MVUndefined:" ^ var1) {}
-MVOutOfMemory ::MVOutOfMemory(CVR var1)
-	: MVError("MVOutOfMemory:" ^ var1) {}
-MVInvalidPointer ::MVInvalidPointer(CVR var1)
-	: MVError("MVInvalidPointer:" ^ var1) {}
-MVDBException ::MVDBException(CVR var1)
-	: MVError("MVDBException:" ^ var1) {}
-MVNotImplemented ::MVNotImplemented(CVR var1)
-	: MVError("MVNotImplemented:" ^ var1) {}
-MVDebug ::MVDebug(CVR var1)
-	: MVError("MVDebug" ^ var1) {}
-MVStop ::MVStop(CVR var1)
-	: description(var1) {}
-MVAbort ::MVAbort(CVR var1)
-	: description(var1) {}
-MVAbortAll ::MVAbortAll(CVR var1)
-	: description(var1) {}
-MVLogoff ::MVLogoff(CVR var1)
-	: description(var1) {}
-MVArrayDimensionedZero ::MVArrayDimensionedZero()
-	: MVError("MVArrayDimensionedZero:") {}
-MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(CVR var1)
-	: MVError("MVArrayIndexOutOfBounds:" ^ var1) {}
-MVArrayNotDimensioned ::MVArrayNotDimensioned()
-	: MVError("MVArrayNotDimensioned") {}
-
-//var operator""_var(const char* cstr, std::size_t size) {
-//	return var(cstr, size).convert(VISIBLE_FMS, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
-//}
-//
-//var operator""_var(unsigned long long int i) {
-//	return var(int(i));
-//}
-//
-//var operator""_var(long double d) {
-//	return var(static_cast<double>(d));
-//}
-
 
 }  // namespace exodus

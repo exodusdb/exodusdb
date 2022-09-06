@@ -26,7 +26,7 @@
 #include <exodus/mvenvironment.h>
 
 // avoid this unless absolutely necessary then possible to move this file out of exodus var library
-//(stick to throwing MVError with a suitable error message)
+//(stick to throwing VarError with a suitable error message)
 
 namespace exodus {
 

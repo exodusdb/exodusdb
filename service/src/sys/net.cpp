@@ -52,9 +52,9 @@ listen:
 	execute(cmd);
 
 	}
-	catch (MVError mverror) {
+	catch (VarError varerror) {
 		// Similar code in net.cpp and listen.cpp
-	    USER4 = mverror.description ^ FM ^ backtrace();
+	    USER4 = varerror.description ^ FM ^ backtrace();
 	}
 
 	//unlock all
@@ -93,7 +93,7 @@ listen:
 	//stop if cant backup because another process is backing up or hung processes
 	if (USER4.index("FILEMAN-SHUTDOWN")) {
 		perform("OFF");
-		var().logoff();
+		logoff();
 	}
 
 	//check lists and indexing files are not corrupted and zero them if they are
@@ -271,7 +271,7 @@ listen:
 
 			if (SYSTEM.f(125)) {
 				perform("OFF");
-				var().logoff();
+				logoff();
 			}
 		}
 
@@ -301,7 +301,7 @@ listen:
 
 	if (halt) {
 		perform("OFF");
-		var().logoff();
+		logoff();
 	}
 
 	if (cmd.field(" ",1) eq "LISTEN") {

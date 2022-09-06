@@ -36,7 +36,7 @@ function main() {
 				i64_min--;
 				assert(false and var("i64_min--"));
 				i64_min.dump();
-			} catch(MVIntUnderflow e) {
+			} catch(VarIntUnderflow e) {
 				printl("Successfully caught deliberate error", e.description);
 			}
 
@@ -57,7 +57,7 @@ function main() {
 				i64_max++;
 				assert(false and var("i64_max++"));
 				i64_max.dump();
-			} catch(MVIntOverflow e) {
+			} catch(VarIntOverflow e) {
 				printl("Successfully caught deliberate error", e.description);
 			}
 
@@ -137,7 +137,7 @@ function main() {
 		try {
 			assert(x.toInt());
 			assert(false);//should not get here
-		} catch (MVNonNumeric e) {
+		} catch (VarNonNumeric e) {
 			printl("OK", e.description);
 		}
 		x.dump();
@@ -151,7 +151,7 @@ function main() {
 		try {
 			assert(x.toInt());
 			assert(false);//should not get here
-		} catch (MVNonNumeric e) {
+		} catch (VarNonNumeric e) {
 			printl("OK", e.description);
 		}
 		x.dump();

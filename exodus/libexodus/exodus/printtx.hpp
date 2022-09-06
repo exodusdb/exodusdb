@@ -62,7 +62,7 @@ subroutine printtx() {
 			call oswrite("", printfilename);
 			if (not(printfile.osopen(printfilename))) {
 				call mssg("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
-				var().stop();
+				stop();
 			}
 		}
 
@@ -262,8 +262,8 @@ subroutine convoptions(io ptx_temp) {
 				var spaceoptionsize = "";
 				while (true) {
 					///BREAK;
-					if (not((optionchars.at(i_ + 1)).match("^\\d$"))) break;
-					spaceoptionsize ^= optionchars.at(i_ + 1);
+					if (not((optionchars[i_ + 1]).match("^\\d$"))) break;
+					spaceoptionsize ^= optionchars[i_ + 1];
 					i_ += 1;
 				}//loop;
 				newoptions ^= spaceoptionsize.space();

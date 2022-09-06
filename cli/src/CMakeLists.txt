@@ -71,7 +71,7 @@ endif()
 
 #largest first
 add_executable(compile compile.cpp)
-add_executable(list list.cpp printtx.hpp)
+add_executable(list list.cpp)
 add_executable(dict2sql dict2sql.cpp)
 add_executable(edic edic.cpp)
 add_executable(configexodus configexodus.cpp)

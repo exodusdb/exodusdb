@@ -64,7 +64,7 @@ function main()
 
 	var xyz;
 	//xyz=xyz;
-	printl("\nTest catching MVError");
+	printl("\nTest catching VarError");
 	try {
 		//runtime errors instead of compiler error sadly
 
@@ -75,7 +75,7 @@ function main()
 		var xx=xx.operator++(); //sadly c++ compiler allows this
 		//var xx=xx++;			//doesnt compile
 	}
-	catch (MVError error) {
+	catch (VarError error) {
 		print(error.description);
 	}
 
@@ -86,15 +86,15 @@ function main()
 		printl("should never get here because above should cause a runtime undefined error");
 		assert(false);
 	}
-	catch (MVUndefined mve) {
+	catch (VarUndefined mve) {
 		//g++ sees the above as undefined
 		mve.description.outputl();
 	}
-	catch(MVUnassigned mve) {
+	catch(VarUnassigned mve) {
 		//clang sees the above as unassigned
 		mve.description.outputl();
 	}
-	//catch(MVNonNumeric mve) {
+	//catch(VarNonNumeric mve) {
 	//	mve.description.outputl();
 	//}
 	catch (...) {
@@ -662,7 +662,7 @@ function main()
 	//var temp2=temp2="xxx";
 
 	//undefined behaviour but decided to allow it in order not to slow down all copy construction
-	//show cause MVUndefined and not simply crash do to assigning an uninitialised string
+	//show cause VarUndefined and not simply crash do to assigning an uninitialised string
 	//var undefinedassign=undefinedassign="xxx";
 
 	//undefined behaviour but decided to allow it in order not to slow down all copy construction
@@ -685,7 +685,7 @@ function main()
 	try {
 		printl(filehandle);
 	}
-	catch (MVError error) {
+	catch (VarError error) {
 		error.description.outputl();
 	}
 */

@@ -299,7 +299,7 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 		std::cout << "mvfunctor:checkload: ko:" << newlibraryname << std::endl;
 #endif
 
-		throw MVError("Unable to load " ^ var(libraryfilename_));
+		throw VarError("Unable to load " ^ var(libraryfilename_));
 		return false;
 	}
 
@@ -310,7 +310,7 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 				  << std::endl;
 #endif
 
-		throw MVError("Unable to find function " ^ var(newfunctionname) ^ " in " ^
+		throw VarError("Unable to find function " ^ var(newfunctionname) ^ " in " ^
 					  var(libraryfilename_));
 		return false;
 	}
@@ -410,11 +410,11 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname) {
 		// std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
 		var libraryfilename = libraryfilename_;
 		if (libraryfilename.osfile())
-			throw MVError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
+			throw VarError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
 			^ libraryfilename ^ "' to check its sublibs are available. Also run 'nm -C " ^ libraryfilename ^ "' to check its content.)"
 			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exodus::var::var()");
 		else
-			throw MVError(libraryfilename ^ " does not exist or cannot be found.");
+			throw VarError(libraryfilename ^ " does not exist or cannot be found.");
 		return false;
 	}
 
@@ -471,7 +471,7 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname) {
 
 		// std::cerr<<functionname_<<" function cannot be found in
 		// "<<libraryfilename_<<std::endl;
-		throw MVError(var(newfunctionname).quote() ^ " function cannot be found in lib " ^
+		throw VarError(var(newfunctionname).quote() ^ " function cannot be found in lib " ^
 					  var(libraryfilename_).quote());
 		return false;
 	}

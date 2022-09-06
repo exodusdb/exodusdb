@@ -77,7 +77,7 @@ namespace exodus {
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
 //		~VarOSHandlesCache for h_cache closes/deletes all registered objects.
 
-std::locale get_locale(const char* locale_name)	// throw (MVError)
+std::locale get_locale(const char* locale_name)	// throw (VarError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
 	// THISIS("std::locale get_locale(const char* locale_name)")
@@ -104,7 +104,7 @@ std::locale get_locale(const char* locale_name)	// throw (MVError)
 				return mylocale;
 			}
 		} catch (std::runtime_error& re) {
-			throw MVError("get_locale cannot create locale for " ^ var(locale_name));
+			throw VarError("get_locale cannot create locale for " ^ var(locale_name));
 		}
 	}
 }
@@ -263,7 +263,7 @@ var var::ostempfilename() const {
 	// Linux only function to create a temporary file
 	int fd_or_error;
 	if ((fd_or_error = mkstemp(&buffer[0])) == -1)
-		throw MVError(var(__PRETTY_FUNCTION__) ^ " - Cannot create tempfilename " ^ rvo_tempfilename.quote());
+		throw VarError(var(__PRETTY_FUNCTION__) ^ " - Cannot create tempfilename " ^ rvo_tempfilename.quote());
 
 	// Must close or we will leak file handles because this badly designed function returns a name not a handle
 	::close(fd_or_error);
@@ -526,7 +526,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 		// resize the string to receive the whole file
 		var_str.resize(bytesize);
 	} catch (std::bad_alloc& ex) {
-		throw MVOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
+		throw VarOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
 							" bytes of memory to read " ^ var(osfilename));
 		// myfile.close();
 		// return false;
@@ -828,7 +828,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	//std::unique_ptr memblock(new char[bytesize]);
 	if (memblock == 0)
-		throw MVOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
+		throw VarOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
 							" bytes of memory to read " ^ osfilevar);
 	// return *this;
 

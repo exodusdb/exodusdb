@@ -3,13 +3,14 @@ libraryinit()
 
 #include <authorised.h>
 #include <crosstab.h>
-#include <printtx.hpp>
 #include <htmllib2.h>
 #include <gethtml.h>
 #include <getmark.h>
 #include <getcss.h>
 #include <docmods.h>
 #include <timedate2.h>
+
+#include <exodus/printtx.hpp>
 
 #include <sys_common.h>
 

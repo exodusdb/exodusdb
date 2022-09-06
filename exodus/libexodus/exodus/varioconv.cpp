@@ -118,7 +118,7 @@ var var::iconv(const char* convstr) const {
 						case 'D':
 						case 'C':
 
-							throw MVError(
+							throw VarError(
 								"iconv MD and MC are not implemented yet");
 							//							output
 							//^= part.iconv_MD(convstr);
@@ -137,7 +137,7 @@ var var::iconv(const char* convstr) const {
 
 						// "MX" number to hex (not string to hex)
 						case 'X':
-							throw MVNotImplemented("iconv('MX')");
+							throw VarNotImplemented("iconv('MX')");
 							// std::ostringstream ss;
 							// ss << std::hex << std::uppercase << part.round().toInt();
 							// output ^= ss.str();
@@ -210,7 +210,7 @@ var var::iconv(const char* convstr) const {
 		// access to mv environment required to call external subroutines
 		case '[':
 
-			throw MVError("Custom conversions like (" ^ var(convstr) ^
+			throw VarError("Custom conversions like (" ^ var(convstr) ^
 						  ") must be called like a function iconv(input,conversion) not "
 						  "like a method, input.iconv(conversion)");
 			break;
@@ -221,7 +221,7 @@ var var::iconv(const char* convstr) const {
 	}
 
 	// TODO implement
-	throw MVNotImplemented("iconv '" ^ var(convstr) ^ "' not implemented yet ");
+	throw VarNotImplemented("iconv '" ^ var(convstr) ^ "' not implemented yet ");
 
 	return *this;
 }
@@ -872,7 +872,7 @@ var var::oconv(const char* conversion) const {
 		// custom conversion should not be called via ::oconv
 		case '[':
 
-			throw MVError("Custom conversions like (" ^ var(conversion) ^
+			throw VarError("Custom conversions like (" ^ var(conversion) ^
 						  ") must be called like a function oconv(input,conversion) not "
 						  "like a method, input.oconv(conversion)");
 			break;
@@ -886,7 +886,7 @@ var var::oconv(const char* conversion) const {
 	}
 
 	// TODO implement
-	throw MVNotImplemented("oconv '" ^ var(conversion).substr(1, 6) ^ "' not implemented yet ");
+	throw VarNotImplemented("oconv '" ^ var(conversion).substr(1, 6) ^ "' not implemented yet ");
 
 	// unknown conversions are simply ignored in pickos
 	return *this;

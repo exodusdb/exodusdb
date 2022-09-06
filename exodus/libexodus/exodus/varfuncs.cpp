@@ -288,40 +288,6 @@ VARREF var::inputn(const int nchars) {
 	return *this;
 }
 
-void var::stop(CVR text) const {
-
-	THISIS("void var::stop(CVR text) const")
-	ISSTRING(text)
-
-	// exit(0);
-	throw MVStop(text);
-}
-
-/*
-//swig for perl wants it on windows!void var::win32_abort(CVR text) const
-{
-	abort(text);
-}
-*/
-
-void var::abort(CVR text) const {
-
-	THISIS("void var::abort(CVR text) const")
-	ISSTRING(text)
-
-	// exit(1);
-	throw MVAbort(text);
-}
-
-void var::abortall(CVR text) const {
-
-	THISIS("void var::abortall(CVR text) const")
-	ISSTRING(text)
-
-	// exit(2);
-	throw MVAbortAll(text);
-}
-
 bool var::assigned() const {
 	// THISIS("bool var::assigned() const")
 
@@ -360,7 +326,7 @@ VARREF var::unassigned(CVR defaultvalue) {
 	// if (var_typ & VARTYP_MASK)
 
 	if (this->unassigned()) {
-		// throw MVUndefined("unassigned( ^ defaultvalue ^")");
+		// throw VarUndefined("unassigned( ^ defaultvalue ^")");
 		// var_str="";
 		// var_typ=VARTYP_STR;
 		*this = defaultvalue;
@@ -1847,16 +1813,6 @@ var var::index(CVR substrx, const int occurrenceno) const {
 
 	// should never get here
 	return 0;
-}
-
-var var::logoff() const {
-	// THISIS("var var::logoff() const")
-	// THIS"var.logoff()".assertString(function_sig);
-
-	//LOCKIOSTREAM
-	//std::cout << "var::logoff not implemented yet " << std::endl;
-	//return "";
-	throw MVLogoff();
 }
 
 // fieldno can be "" to return the whole record (0 returns the key)

@@ -69,7 +69,7 @@ nexttest:
 		stop();
 
 	if (esctoexit()) {
-		var().stop();
+		stop();
 	}
 
 	//PERFORM 'MAKEFILE ':TEMPFILENAME:' ':recsize:' ':N:' (S)'
@@ -85,7 +85,7 @@ nexttest:
 
 	if (not(tempfile.open(tempfilename, ""))) {
 		call fsmsg();
-		var().stop();
+		stop();
 	}
 
 	starttime = ostime();

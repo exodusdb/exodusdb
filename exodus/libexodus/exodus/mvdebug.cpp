@@ -117,8 +117,8 @@ var mv_backtrace() {
 	0   libexodus-11.5.0.dylib              0x000000010000c313 _ZN6exodus9backtraceEv + 99
 	Backtrace 1: 0x10001ec51
 	1   libexodus-11.5.0.dylib              0x000000010001ec51
-	_ZN6exodus11MVErrorC2ERKNS_3varE + 129 Backtrace 2: 0x10001f314 2 libexodus-11.5.0.dylib
-	0x000000010001f314 _ZN6exodus12MVUnassignedC2ERKNS_3varE + 52 Backtrace 3: 0x10000e193 3
+	_ZN6exodus11VarErrorC2ERKNS_3varE + 129 Backtrace 2: 0x10001f314 2 libexodus-11.5.0.dylib
+	0x000000010001f314 _ZN6exodus12VarUnassignedC2ERKNS_3varE + 52 Backtrace 3: 0x10000e193 3
 	libexodus-11.5.0.dylib              0x000000010000e193 _ZNK6exodus3var3putERSo + 243
 	Backtrace 4: 0x10000e322
 	4   libexodus-11.5.0.dylib              0x000000010000e322 _ZNK6exodus3var7outputlEv + 34
@@ -390,7 +390,7 @@ PUBLIC void debug(CVR var1) {
 
 #elif defined(_MSC_VER)
 	// this will terminate the program rather than invoke the debugger but is catchable
-	//throw MVDebug(var1);
+	//throw VarDebug(var1);
 
 // another way to break into the debugger by causing a seg fault
 #elif 0

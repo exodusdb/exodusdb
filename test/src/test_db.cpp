@@ -296,7 +296,7 @@ function main()
     {
         printl(rec.quote());
     }
-    catch (MVError e) {
+    catch (VarError e) {
         printl("OK failure to read a record makes the record variable unassigned. For programming safety");
     }
 

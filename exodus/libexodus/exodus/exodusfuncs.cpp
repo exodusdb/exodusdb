@@ -242,16 +242,20 @@ PUBLIC bool osshellwrite(CVR writestr, CVR command) {
 	return writestr.osshellwrite(command);
 }
 
-PUBLIC void stop(CVR text) {
-	text.stop(text);
-}
-
-PUBLIC void abort(CVR text) {
-	var().abort(text);
-}
-PUBLIC void abortall(CVR text) {
-	var().abortall(text);
-}
+//PUBLIC void stop(CVR text) {
+//	text.stop(text);
+//}
+//
+//PUBLIC void abort(CVR text) {
+//	var().abort(text);
+//}
+//PUBLIC void abortall(CVR text) {
+//	var().abortall(text);
+//}
+//
+//PUBLIC var logoff() {
+//	return var().logoff();
+//}
 
 // PUBLIC var perform(CVR command)
 //{
@@ -267,10 +271,6 @@ PUBLIC void abortall(CVR text) {
 //{
 //	return command.chain();
 //}
-
-PUBLIC var logoff() {
-	return var().logoff();
-}
 
 //PUBLIC void breakon() {
 //	return var().breakon();
@@ -871,6 +871,11 @@ PUBLIC bool rollbacktrans() {
 PUBLIC bool committrans() {
 	return var().committrans();
 }
+
+PUBLIC void cleardbcache() {
+	var().cleardbcache();
+}
+
 
 PUBLIC bool lock(CVR filehandle, CVR key) {
 	return (bool)filehandle.lock(key);

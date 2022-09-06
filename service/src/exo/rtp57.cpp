@@ -150,7 +150,7 @@ INSTALL      | 22 | Passed         | Unused         | Unused         | Unused   
 		break;
 
 	default:
-		throw MVError(code ^ " invalid code in rtp57");
+		throw VarError(code ^ " invalid code in rtp57");
 		break;
 
 	}

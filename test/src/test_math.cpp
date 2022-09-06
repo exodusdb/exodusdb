@@ -264,7 +264,7 @@ subroutine test2(in as, in bs) {
 			var x = 100.0;
 			x /= zero;
 			assert(false);
-		} catch(MVDivideByZero){}
+		} catch(VarDivideByZero){}
 	}
 	{
 		//check cannot divide var decimal by var int 0
@@ -273,7 +273,7 @@ subroutine test2(in as, in bs) {
 			var x = 100.0;
 			x /= zero;
 			assert(false);
-		} catch(MVDivideByZero){}
+		} catch(VarDivideByZero){}
 	}
 
 	{
@@ -283,7 +283,7 @@ subroutine test2(in as, in bs) {
 			var x = 100;
 			x /= zero;
 			assert(false);
-		} catch(MVDivideByZero){}
+		} catch(VarDivideByZero){}
 	}
 	{
 		//check cannot divide var int by var int 0
@@ -292,7 +292,7 @@ subroutine test2(in as, in bs) {
 			var x = 100;
 			x /= zero;
 			assert(false);
-		} catch(MVDivideByZero){}
+		} catch(VarDivideByZero){}
 	}
 	{
 		//Check rhs conversion from string;

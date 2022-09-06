@@ -109,8 +109,8 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	if (!DICT.open(dictfilename)) {
 		dictfilename = "dict.voc";
 		if (!DICT.open(dictfilename)) {
-			//throw MVDBException(dictfilename.quote() ^ " cannot be opened");
-			throw MVError(dictfilename.quote() ^ " cannot be opened");
+			//throw VarDBException(dictfilename.quote() ^ " cannot be opened");
+			throw VarError(dictfilename.quote() ^ " cannot be opened");
 		}
 	}
 
@@ -183,7 +183,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		if (!op)
 			opno = 0;
 		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! ! ] [ []").locateusing(" ", op.convert(" ", "_"), opno))
-			throw MVError(op.quote() ^ " unknown op in sql select");
+			throw VarError(op.quote() ^ " unknown op in sql select");
 		opnos(fieldn) = opno;
 
 		//reqivalues
@@ -471,7 +471,7 @@ bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, cons
 	//open the file
 	clearselect();
 	if (not CURSOR.open(filename2))
-		throw MVError(filename2.quote() ^ " file cannot be opened in formlist(" ^ keys ^ ")");
+		throw VarError(filename2.quote() ^ " file cannot be opened in formlist(" ^ keys ^ ")");
 
 	return CURSOR.formlist(keys2, fieldno);
 }
@@ -515,8 +515,8 @@ bool ExodusProgramBase::readnext(VARREF record, VARREF key, VARREF valueno) {
 bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key) {
 
 	if (not filename_or_handle_or_command.assigned() || not key.assigned())
-		//throw MVUnassigned("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
-		throw MVError("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
+		//throw VarUnassigned("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
+		throw VarError("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
 
 	// Simple deleterecord
 	//if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
@@ -1123,7 +1123,7 @@ var ExodusProgramBase::execute(CVR sentence) {
 // chain
 void ExodusProgramBase::chain(CVR libraryname) {
 	CHAIN = libraryname;
-	var().stop();
+	this->stop();
 }
 
 // perform
@@ -1216,7 +1216,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 												)) {
 			USER4 ^= "perform() Cannot find shared library \"" + libname +
 					 "\", or \"libraryexit()\" is not present in it.";
-			// throw MVError(USER4);
+			// throw VarError(USER4);
 			// return "";
 			break;
 		}
@@ -1226,7 +1226,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			ANS = perform_exodusfunctorbase_.callsmf();
 
 		// TODO reimplement this
-//		} catch (const MVUndefined&) {
+//		} catch (const VarUndefined&) {
 //			// if return "" is missing then default ANS to ""
 //			ANS = "";
 
@@ -1247,11 +1247,11 @@ var ExodusProgramBase::perform(CVR sentence) {
 			ANS = "";
 		}
 		//TODO create a second version of this whole try/catch block
-		//that omits catch (MVError) if EXO_DEBUG is set
+		//that omits catch (VarError) if EXO_DEBUG is set
 		//so that gdb will catch the original error and allow backtracing there
 		//Until then, use gdb "catch throw" as mentioned below.
-		catch (const MVError&) {
-			//restore environment in case MVError is caught
+		catch (const VarError&) {
+			//restore environment in case VarError is caught
 			//in caller and the program resumes processing
 			restore_environment();
 
@@ -1294,7 +1294,7 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 	var dictfile;
 	if (not is_fieldno) {
 		if (not dictfile.open("dict." ^ filename.f(1))) {
-			throw MVError("ExodusProgramBase::xlate(filename:" ^ filename ^ ", key:" ^ key ^ ",field:" ^ fieldno_or_name ^ ") - dict." ^ filename ^ " does not exist.");
+			throw VarError("ExodusProgramBase::xlate(filename:" ^ filename ^ ", key:" ^ key ^ ",field:" ^ fieldno_or_name ^ ") - dict." ^ filename ^ " does not exist.");
 		}
 	}
 
@@ -1389,7 +1389,7 @@ var ExodusProgramBase::calculate(CVR dictid) {
 		newlibfunc = true;
 
 		if (not DICT)
-			throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
+			throw VarError("ExodusProgramBase::calculate(" ^ dictid ^
 						  ") DICT file variable has not been set");
 
 		if (not cached_dictrec_.reado(DICT, dictid)) {
@@ -1401,7 +1401,7 @@ var ExodusProgramBase::calculate(CVR dictid) {
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
 				if (not dictvoc.open("dict.voc")) {
 baddict:
-					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
+					throw VarError("ExodusProgramBase::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
 								  DICT.f(1).quote() ^ " nor in dict.voc");
 				}
@@ -1486,7 +1486,7 @@ baddict:
 					("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 				if (!cached_dictexodusfunctorbase_->initsmf(libname.c_str(),
 													  str_funcname.c_str()))
-					throw MVError("ExodusProgramBase::calculate() Cannot find Library " +
+					throw VarError("ExodusProgramBase::calculate() Cannot find Library " +
 								  libname + ", or function " +
 								  dictid.lcase() + " is not present");
 			}
@@ -1520,7 +1520,7 @@ baddict:
 		return ANS;
 	}
 
-	throw MVError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
+	throw VarError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 				  dicttype.quote());
 	return "";
 }
@@ -1544,7 +1544,7 @@ bool ExodusProgramBase::fsmsg(CVR msg) const {
 }
 
 // sysvar
-var ExodusProgramBase::sysvar(CVR var1, CVR var2, CVR var3, CVR var4) {
+var ExodusProgramBase::sysvar(CVR errmsg, CVR var2, CVR var3, CVR var4) {
 
 	std::cout << "sysvar() do nothing:";
 	//	var reply;
@@ -1552,15 +1552,15 @@ var ExodusProgramBase::sysvar(CVR var1, CVR var2, CVR var3, CVR var4) {
 	return "";
 
 	// evade warning: unused parameter
-	if (var1 || var2 || var3 || var4) {
+	if (errmsg || var2 || var3 || var4) {
 	}
 }
 
 // setprivilege
-void ExodusProgramBase::setprivilege(CVR var1) {
+void ExodusProgramBase::setprivilege(CVR errmsg) {
 
-	PRIVILEGE = var1;
-	std::cout << "setprivilege(" << var1 << ") do nothing" << std::endl;
+	PRIVILEGE = errmsg;
+	std::cout << "setprivilege(" << errmsg << ") do nothing" << std::endl;
 	//	var reply;
 	//	cin>>reply;
 	return;
@@ -1638,7 +1638,7 @@ inp:
 	if (reply < 0 || reply > noptions) {
 		if (interactive)
 			goto inp;
-		throw MVError(questionx ^ " Default reply must be 0-" ^ noptions);
+		throw VarError(questionx ^ " Default reply must be 0-" ^ noptions);
 	}
 
 	return options.f(reply);
@@ -1722,7 +1722,7 @@ bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx, CVR reco
 	if (file.unassigned()) {
 		if (not file.open(filename)) {
 			call mssg(filename.quote() ^ " cannot be opened in LOCKRECORD " ^ keyx);
-			var().abort();
+			this->abort();
 		}
 	}
 
@@ -2061,7 +2061,7 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 // c/c++/linux/terminal standards. hopefully not too inconvenient
 
 var ExodusProgramBase::AT(const int columnno, const int rowno) const {
-	// THISIS("var var::at(const int columnno,const int rowno) const")
+	// THISIS("var ExodusProgramBase::at(const int columnno,const int rowno) const")
 
 	std::string tempstr = "\x1B[";
 	tempstr += std::to_string(rowno);
@@ -2072,7 +2072,7 @@ var ExodusProgramBase::AT(const int columnno, const int rowno) const {
 }
 
 var ExodusProgramBase::AT(const int columnno) const {
-	// THISIS("var var::at(const int columnno) const")
+	// THISIS("var ExodusProgramBase::at(const int columnno) const")
 
 	// hard coded for xterm at the moment
 	// http://www.xfree86.org/current/ctlseqs.html
@@ -2743,13 +2743,18 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 
 }
 
-// in cursor.cpp
-//var ExodusProgramBase::getcursor() const {
-//	return var().getcursor);
-//}
-//
-//void ExodusProgramBase::setcursor(CVR cursor) const {;
-//	var().setcursor(cursor);
-//}
+// clang-format off
+
+MVStop     ::MVStop(CVR errmsg)     : description(errmsg) {}
+MVAbort    ::MVAbort(CVR errmsg)    : description(errmsg) {}
+MVAbortAll ::MVAbortAll(CVR errmsg) : description(errmsg) {}
+MVLogoff   ::MVLogoff(CVR errmsg)   : description(errmsg) {}
+
+void ExodusProgramBase::stop(CVR errmsg)     const {throw MVStop(errmsg);}
+void ExodusProgramBase::abort(CVR errmsg)    const {throw MVAbort(errmsg);}
+void ExodusProgramBase::abortall(CVR errmsg) const {throw MVAbortAll(errmsg);}
+void ExodusProgramBase::logoff(CVR errmsg)   const {throw MVLogoff(errmsg);}
+
+// clang-format on
 
 }  // namespace exodus

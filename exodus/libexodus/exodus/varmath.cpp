@@ -51,7 +51,7 @@ namespace exodus {
 inline double exodusmodulo_dbl(const double dividend, const double limit) {
 
 	if (!limit)
-		throw MVDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
+		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
 
 	double result;
 	if (limit > 0) {
@@ -71,7 +71,7 @@ inline double exodusmodulo_dbl(const double dividend, const double limit) {
 inline int exodusmodulo_int(const int dividend, const int limit) {
 
 	if (!limit)
-		throw MVDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
+		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
 
 	int result;
 	if (limit > 0) {
@@ -170,7 +170,7 @@ var var::abs() const {
 		return var_int;
 	}
 	// cannot get here
-	throw MVError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::sin() const {
@@ -185,7 +185,7 @@ var var::sin() const {
 		return std::sin(double(var_int) * M_PI / 180);
 
 	// cannot get here
-	throw MVError("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::cos() const {
@@ -200,7 +200,7 @@ var var::cos() const {
 		return std::cos(double(var_int) * M_PI / 180);
 
 	// cannot get here
-	throw MVError("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::tan() const {
@@ -215,7 +215,7 @@ var var::tan() const {
 		return std::tan(double(var_int) * M_PI / 180);
 
 	// cannot get here
-	throw MVError("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::atan() const {
@@ -230,7 +230,7 @@ var var::atan() const {
 		return std::atan(double(var_int)) / M_PI * 180;
 
 	// cannot get here
-	throw MVError("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::loge() const {
@@ -245,7 +245,7 @@ var var::loge() const {
 		return std::log(double(var_int));
 
 	// cannot get here
-	throw MVError("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::sqrt() const {
@@ -260,7 +260,7 @@ var var::sqrt() const {
 	//	if (this->var_typ & VARTYP_INT)
 	return std::sqrt(double(var_int));
 
-	throw MVError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::pwr(CVR exponent) const {
@@ -276,7 +276,7 @@ var var::pwr(CVR exponent) const {
 		return std::pow(double(var_int), exponent.toDouble());
 
 	// cannot get here
-	throw MVError("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::exp() const {
@@ -291,7 +291,7 @@ var var::exp() const {
 		return std::exp(double(var_int));
 
 	// cannot get here
-	throw MVError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw VarError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 } // namespace exodus

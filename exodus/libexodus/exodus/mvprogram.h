@@ -187,7 +187,25 @@ class PUBLIC ExodusProgramBase {
 	ND var amountunit(in input0);
 	var amountunit(in input0, out unitx);
 
+	// Program flow control
+	///////////////////////
+
+	// Return to parent mvprogram
+	// or quit to OS WITHOUT an error
+	void stop(CVR description DEFAULT_EMPTY) const;
+
+	// Return to parent mvprogram
+	// or quit to OS WITH an error 1
+	void abort(CVR description DEFAULT_EMPTY) const;
+
+	// Quit to OS WITH an error 2
+	void abortall(CVR description DEFAULT_EMPTY) const;
+
+	// Quit to OS WITHOUT an error
+	void logoff(CVR description DEFAULT_EMPTY) const;
+
    private:
+
 	var number(CVR type, CVR input0, CVR ndecs0, VARREF output);
 
 	// used by calculate to call dict libraries
@@ -200,6 +218,15 @@ class PUBLIC ExodusProgramBase {
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;
 	//mutable var cached_perform_libid_;
 };
+
+// clang-format off
+
+class PUBLIC MVStop     {public:explicit MVStop(    CVR var1 DEFAULT_EMPTY);var description;};
+class PUBLIC MVAbort    {public:explicit MVAbort(   CVR var1 DEFAULT_EMPTY);var description;};
+class PUBLIC MVAbortAll {public:explicit MVAbortAll(CVR var1 DEFAULT_EMPTY);var description;};
+class PUBLIC MVLogoff   {public:explicit MVLogoff(  CVR var1 DEFAULT_EMPTY);var description;};
+
+// clang-format on
 
 }  // namespace exodus
 #endif	// MVPROGRAM_H

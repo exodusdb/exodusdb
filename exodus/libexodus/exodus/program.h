@@ -71,7 +71,7 @@
 				if (exceptionx.description.isnum())                                                             \
 					result = exceptionx.description.toInt();                                                    \
 			}                                                                                                   \
-			catch (const MVError& exceptionx)                                                                   \
+			catch (const VarError& exceptionx)                                                                   \
 			{                                                                                                   \
 				errputl(exceptionx.description, " - Aborting.");                                                \
 				errputl(mv_backtrace().convert(FM, "\n"));                                                      \

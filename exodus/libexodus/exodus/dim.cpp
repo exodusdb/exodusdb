@@ -50,7 +50,7 @@ dim::dim()
 	}
 	catch (const std::bad_alloc& e) {
 		//TRACE("dim()")
-		throw MVOutOfMemory("dim::dim() "_var ^ e.what());
+		throw VarOutOfMemory("dim::dim() "_var ^ e.what());
 	}
 
 	//std::cout<< "created[] " << data_ << std::endl;
@@ -89,7 +89,7 @@ dim::dim(dim&& sourcedim) {
 
 //	// cannot copy an undimensioned array
 //	if (!sourcedim.initialised_)
-//		throw MVArrayNotDimensioned();
+//		throw DimNotDimensioned("");
 //
 //	nrows_ = sourcedim.nrows_;
 //	ncols_ = sourcedim.ncols_;
@@ -105,7 +105,7 @@ VOID_OR_DIMREF dim::operator=(const dim& sourcedim) &{
 //TRACE("CP ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
-		throw MVArrayNotDimensioned();
+		throw DimNotDimensioned("");
 
 	this->redim(sourcedim.nrows_, sourcedim.ncols_);
 
@@ -125,7 +125,7 @@ VOID_OR_DIMREF dim::operator=(dim&& sourcedim) & {
 //TRACE("MV ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
-		throw MVArrayNotDimensioned();
+		throw DimNotDimensioned("");
 
 	nrows_ = sourcedim.nrows_;
 	ncols_ = sourcedim.ncols_;
@@ -150,7 +150,7 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 
 	// Prevent 0 dimensions
 //	if (rows == 0 || cols == 0)
-//		throw MVArrayDimensionedZero();
+//		throw DimDimensionedZero();
 
 	// Prevent zero elements
 	// Especially because int*int can overflow to -1
@@ -158,7 +158,7 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 	std::size_t nvars = rows * cols + 1;
 	if (!nvars) {
 		("dim("_var ^ var(rows) ^ ", " ^ var(cols) ^ ")").errputl();
-		throw MVArrayDimensionedZero();
+		throw DimDimensionedZero("");
 	}
 
 	//std::clog << "new dim data var x " << nvars << std::endl;
@@ -182,7 +182,7 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 
 	if (!data_) {
 		//TRACE("dim::dim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ")")
-		throw MVOutOfMemory("dim::dim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ")");
+		throw VarOutOfMemory("dim::dim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ")");
 	}
 
 	//var(rows * cols + 1).errputl("created dim[] ");
@@ -190,7 +190,7 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 
 VOID_OR_DIMREF dim::operator=(CVR sourcevar) {
 	//if (!initialised_)
-	//	throw MVArrayNotDimensioned();
+	//	throw DimNotDimensioned("");
 	this->init(sourcevar);
 	return VOID_OR_THIS	;
 }
@@ -207,13 +207,13 @@ VOID_OR_DIMREF dim::operator=(const double sourcedbl) {
 
 var dim::rows() const {
 	if (!this->initialised_)
-		throw MVArrayNotDimensioned();
+		throw DimNotDimensioned("");
 	return nrows_;
 }
 
 var dim::cols() const {
 	if (!this->initialised_)
-		throw MVArrayNotDimensioned();
+		throw DimNotDimensioned("");
 	return ncols_;
 }
 
@@ -221,7 +221,7 @@ bool dim::redim(unsigned int rows, unsigned int cols) {
 
 	// Allow redim(0, 0) to clear all date
 //	if (rows == 0 || cols == 0)
-//		throw MVArrayDimensionedZero();
+//		throw DimDimensionedZero();
 
 //	// do nothing if no change
 //	if (this->initialised_ && rows == nrows_ && cols == ncols_)
@@ -248,7 +248,7 @@ bool dim::redim(unsigned int rows, unsigned int cols) {
 		//std::cout<< "created[] " << newdata << std::endl;
 	}
 	catch (const std::bad_alloc& e) {
-		throw MVOutOfMemory("redim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ") " ^ e.what());
+		throw VarOutOfMemory("redim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ") " ^ e.what());
 	}
 
 //	// 2. only then delete the old data
@@ -271,9 +271,9 @@ VARREF dim::operator()(unsigned int rowno, unsigned int colno) {
 
 	// check bounds
 	if (rowno > nrows_)
-		throw MVArrayIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
+		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
 	if (colno > ncols_)
-		throw MVArrayIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
+		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
 
 	if (rowno == 0 || colno == 0)
 		return data_[0];
@@ -286,11 +286,11 @@ CVR dim::operator()(unsigned int rowno, unsigned int colno) const {
 	// check bounds
 	//if (rowno > nrows_ || rowno < 0)
 	if (rowno > nrows_)
-		throw MVArrayIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
+		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
 
 	//if (colno > ncols_ || colno < 0)
 	if (colno > ncols_)
-		throw MVArrayIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
+		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
 
 	if (rowno == 0 || colno == 0) {
 		return (data_)[0];
@@ -301,7 +301,7 @@ CVR dim::operator()(unsigned int rowno, unsigned int colno) const {
 
 dim& dim::init(CVR sourcevar) {
 	if (!initialised_)
-		throw MVArrayNotDimensioned();
+		throw DimNotDimensioned("");
 	size_t arraysize = nrows_ * ncols_ + 1;
 	//for (int ii = 0; ii < arraysize; ii++)
 	for (size_t ii = 1; ii < arraysize; ii++)
@@ -312,7 +312,7 @@ dim& dim::init(CVR sourcevar) {
 var dim::join(SV sepchar) const {
 
 	if (!initialised_)
-		throw MVArrayNotDimensioned();
+		throw DimNotDimensioned("");
 
 	size_t arraysize = nrows_ * ncols_;
 	if (!arraysize)

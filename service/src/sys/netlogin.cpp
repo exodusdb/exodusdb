@@ -119,7 +119,7 @@ inpname:
 fail:
 	//  if @username='EXODUS' then stop
 		perform("OFF");
-		var().logoff();
+		logoff();
 	}
 
 	userx = xdata;
@@ -245,7 +245,7 @@ okfail:
 			call oswrite(msg, SYSTEM.f(33, 10) ^ ".$2");
 			//print char(12):char(7):msg
 			printl(msg);
-			var().logoff();
+			logoff();
 		}
 
 		nfailures += 1;

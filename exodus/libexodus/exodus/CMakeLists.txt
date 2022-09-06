@@ -23,6 +23,13 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 #
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 
+execute_process(
+        COMMAND rm /root/inc/printtx.hpp
+        OUTPUT_VARIABLE OUTVAR
+        ERROR_VARIABLE  ERRVAR
+        RESULT_VARIABLE RESVAR
+)
+
 #######################################
 # c++ version 17 or 20 if on Ubuntu 20+
 #######################################
@@ -161,6 +168,7 @@ install(FILES
  common.h
  mvprogram.h
  ioconv_custom.h
+ printtx.hpp
 DESTINATION include/exodus)
 
 message("--LIBEXODUS CMAKE EXIT --")

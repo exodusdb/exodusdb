@@ -81,7 +81,7 @@ functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 	var myfunction;
 	if (!myfunction.load("mydll"))
 	{
-	throw MVError("cannot load mydll");
+	throw VarError("cannot load mydll");
 	}
 	
 
@@ -90,7 +90,7 @@ functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 	var myfunction;
 	if (!myfunction.link("myfunction"))
 	{
-	throw MVError("cannot link  myfunction");
+	throw VarError("cannot link  myfunction");
 	}
 	
 
@@ -99,7 +99,7 @@ functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 	var myfunction;
 	if (!myfunction.link("mydll","myfunction"))
 	{
-	throw MVError("cannot link mydll, myfunction");
+	throw VarError("cannot link mydll, myfunction");
 	}
 	
 

@@ -99,7 +99,7 @@ function main(in mode, in status0="") {
 	parentdir.converter("/", OSSLASH);
 	if ((((SYSTEM.f(17).lcase() ^ ".end").osfile()) or var("global.end").osfile()) or ((parentdir ^ SYSTEM.f(123).lcase() ^ ".end").osfile())) {
 		perform("OFF");
-		var().logoff();
+		logoff();
 	}
 
 	return 0;

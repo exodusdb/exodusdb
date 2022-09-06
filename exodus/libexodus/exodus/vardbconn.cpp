@@ -2,137 +2,131 @@
 // Exodus -
 //
 // mvdbconn.cpp - keep table of connections in the way, that connection is linked to 'filename'
-//		variable (that is linked to SQL TABLE name - in mvint field)
-//
-// NOTE_OSX: Changing order of member construction could cause warning under MacOSX, like:
-//	vardbconn.h: In constructor 'exodus::MVConnections::MVConnections(void
-//(*)(PGconn*))': vardbconn.h:57: warning: 'exodus::MVConnections::connection_id' will be
-// initialized after vardbconn.h:56: warning:   'void (*
-// exodus::MVConnections::del)(PGconn*)' mvdbconns.cpp:15: warning:   when initialized here
+//variable (that is linked to SQL TABLE name - in field 2 of file handle)
 //
 //#define INSIDE_MVDBCONNS_CPP
 #include "vardbconn.h"
 
 namespace exodus {
 
-MVConnections::MVConnections(DELETER_AND_DESTROYER del_)
+DBConnector::DBConnector(PGCONN_DELETER del)
 	// see important NOTE_OSX in header
-	: del(del_), connection_id(0), conntbl() {
+	: del_(del), dbconn_no_(0), dbconns_() {
 }
 
-int MVConnections::add_connection(PGconn* conn_to_cache, const std::string conninfo) {
-	// no longer need locking since mvconnections is thread_local
-	//std::lock_guard lock(mvconnections_mutex);
+int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
+	// no longer need locking since dbconns_ is thread_local
+	//std::lock_guard lock(dbconns_mutex);
 
-	connection_id++;
-	conntbl[connection_id] = MVConnection(conn_to_cache, conninfo);
-	return connection_id;
+	dbconn_no_++;
+	dbconns_[dbconn_no_] = DBConn(conn_to_cache, conninfo);
+	return dbconn_no_;
 }
 
-PGconn* MVConnections::get_pgconnection(int index) const {
+PGconn* DBConnector::get_pgconn(int index) const {
 
-	//std::lock_guard lock(mvconnections_mutex); 
+	//std::lock_guard lock(dbconns_mutex); 
 
-	//for (auto pair : conntbl) {
-	//	std::clog << pair.first << ". " << (pair.second.connection) <<std::endl;
+	//for (auto pair : dbconns) {
+	//	std::clog << pair.first << ". " << (pair.second.pgconn_) <<std::endl;
 	//}
 
-	//std::lock_guard lock(mvconnections_mutex);
-	CONN_MAP::const_iterator iter = conntbl.find(index);
-	return (PGconn*)(iter == conntbl.end() ? 0 : iter->second.connection);
+	//std::lock_guard lock(dbconns_mutex);
+	const auto iter = dbconns_.find(index);
+	return (PGconn*)(iter == dbconns_.end() ? 0 : iter->second.pgconn_);
 }
 
-MVConnection* MVConnections::get_mvconnection(int index) const {
-	//std::lock_guard lock(mvconnections_mutex);
-	CONN_MAP::const_iterator iter = conntbl.find(index);
-	return (MVConnection*)(iter == conntbl.end() ? 0 : &iter->second);
+DBConn* DBConnector::get_dbconn(int index) const {
+	//std::lock_guard lock(dbconns_mutex);
+	const auto iter = dbconns_.find(index);
+	return (DBConn*)(iter == dbconns_.end() ? 0 : &iter->second);
 }
 
-//ConnectionLocks* MVConnections::get_lock_table(int index) const {
-//	//std::lock_guard lock(mvconnections_mutex);
-//	CONN_MAP::const_iterator iter = conntbl.find(index);
-//	return (ConnectionLocks*)(iter == conntbl.end() ? 0 : iter->second.connection_locks);
+//ConnectionLocks* DBConnector::get_lock_table(int index) const {
+//	//std::lock_guard lock(dbconns_mutex);
+//	const auto iter = dbconns_.find(index);
+//	return (ConnectionLocks*)(iter == dbconns_.end() ? 0 : iter->second.locks__);
 //}
 
-ConnectionRecordCache* MVConnections::get_recordcache(int index) const {
-	//std::lock_guard lock(mvconnections_mutex);
-	CONN_MAP::const_iterator iter = conntbl.find(index);
-	return (ConnectionRecordCache*)(iter == conntbl.end() ? 0 : &iter->second.connection_readcache);
+DBCache* DBConnector::get_dbcache(int index) const {
+	//std::lock_guard lock(dbconns_mutex);
+	const auto iter = dbconns_.find(index);
+	return (DBCache*)(iter == dbconns_.end() ? 0 : &iter->second.dbcache_);
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-std::string MVConnections::getrecord(const int connid, uint64_t file_and_key) const {
-	auto connection_readcache = get_recordcache(connid);
-	auto cacheentry = connection_readcache->find(file_and_key);
-	if (cacheentry == connection_readcache->end())
+std::string DBConnector::getrecord(const int connid, uint64_t file_and_key) const {
+	auto dbcache = get_dbcache(connid);
+	auto cacheentry = dbcache->find(file_and_key);
+	if (cacheentry == dbcache->end())
 		return "";
 
-	return connection_readcache->at(file_and_key);
+	return dbcache->at(file_and_key);
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-void MVConnections::putrecord(const int connid, uint64_t file_and_key, const std::string& record) {
-	auto connection_readcache = get_recordcache(connid);
-	connection_readcache->insert_or_assign(file_and_key, record);
+void DBConnector::putrecord(const int connid, uint64_t file_and_key, const std::string& record) {
+	auto dbcache = get_dbcache(connid);
+	dbcache->insert_or_assign(file_and_key, record);
 	return;
 }
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
-void MVConnections::delrecord(const int connid, uint64_t file_and_key) {
-	auto connection_readcache = get_recordcache(connid);
-	//(*connection_readcache)[filenameandkey] = "";
-	//connection_readcache->erase(filenameandkey);
-	connection_readcache->insert_or_assign(file_and_key, "");
+void DBConnector::delrecord(const int connid, uint64_t file_and_key) {
+	auto dbcache = get_dbcache(connid);
+	//(*dbcache)[filenameandkey] = "";
+	//dbcache->erase(filenameandkey);
+	dbcache->insert_or_assign(file_and_key, "");
 	return;
 }
 
-void MVConnections::clearrecordcache(const int connid) {
-	auto connection_readcache = get_recordcache(connid);
-	connection_readcache->clear();
+void DBConnector::cleardbcache(const int connid) {
+	auto dbcache = get_dbcache(connid);
+	dbcache->clear();
 	return;
 }
 
-void MVConnections::del_connection(int index) {
-	//std::lock_guard lock(mvconnections_mutex);
-	CONN_MAP::iterator iter = conntbl.find(index);
-	if (iter != conntbl.end()) {
+void DBConnector::del_dbconn(int index) {
+	//std::lock_guard lock(dbconns_mutex);
+
+	auto iter = dbconns_.find(index);
+	if (iter != dbconns_.end()) {
 		//	PGconn* p /*std::pair<int, void*> p*/ = ;
-		del((PGconn*)iter /*conntbl.find(index)*/->second.connection);
-		//delete /*conntbl.find(index)*/ iter->second.connection_locks;
-		//delete /*conntbl.find(index)*/ iter->second.connection_readcache;
-		conntbl.erase(index);
+		del_((PGconn*)iter /*dbconns_.find(index)*/->second.pgconn_);
+		//delete /*dbconns_.find(index)*/ iter->second.locks__;
+		//delete /*dbconns_.find(index)*/ iter->second.dbcache;
+		dbconns_.erase(index);
 	}
 }
 
-void MVConnections::del_connections(int from_index) {
-	//std::lock_guard lock(mvconnections_mutex);
-	CONN_MAP::iterator ix;
-	ix = conntbl.begin();
-	while (ix != conntbl.end()) {
+void DBConnector::del_dbconns(int from_index) {
+	//std::lock_guard lock(dbconns_mutex);
+
+	auto ix = dbconns_.begin();
+	while (ix != dbconns_.end()) {
 		if (ix->first >= from_index) {
 			//TRACE(ix->first)
-			del((PGconn*)ix->second.connection);
-			//delete ix->second.connection_locks;
-			//delete ix->second.connection_readcache;
-			ix = conntbl.erase(ix);
+			del_((PGconn*)ix->second.pgconn_);
+			//delete ix->second.locks__;
+			//delete ix->second.dbcache;
+			ix = dbconns_.erase(ix);
 		}
 		else {
 			ix++;
 		}
 	}
-	connection_id = from_index -= 1;
+	dbconn_no_ = from_index -= 1;
 }
 
-MVConnections::~MVConnections() {
-	// no need
-	// std::lock_guard lock(mvconnections_mutex);
+DBConnector::~DBConnector() {
+	// std::lock_guard lock(dbconns_mutex);
 
-	CONN_MAP::iterator ix;
-	for (ix = conntbl.begin(); ix != conntbl.end(); ix++) {
-		del((PGconn*)ix->second.connection);
-		//delete ix->second.connection_locks;
-		//delete ix->second.connection_readcache;
+	auto ix = dbconns_.begin();
+	for (;ix != dbconns_.end(); ix++) {
+		del_((PGconn*)ix->second.pgconn_);
+		//delete ix->second.locks__;
+		//delete ix->second.dbcache;
 	}
 
 	// not sure what this comment means .. scoped lock is designed to autounlock

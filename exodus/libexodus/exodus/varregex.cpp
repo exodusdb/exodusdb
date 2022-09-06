@@ -372,7 +372,7 @@ var var::match(CVR matchstr, SV options) const {
 		regex=std::regex(matchstr.var_str, get_regex_syntax_flags(options));
 #endif
 	} catch (std_boost::regex_error& e) {
-		throw MVError("Error: Invalid regex " ^ matchstr.quote() ^ " " ^ var(e.what()).quote());
+		throw VarError("Error: Invalid regex " ^ matchstr.quote() ^ " " ^ var(e.what()).quote());
 	}
 
 	/*
@@ -510,7 +510,7 @@ VARREF var::regex_replacer(CVR regexstr, CVR replacementstr, SV options) {
 		regex1=std::regex(regexstr.var_str, get_regex_syntax_flags(options));
 #endif
 	} catch (std_boost::regex_error& e) {
-		throw MVError("Error: Invalid regex " ^ regexstr.quote() ^ " " ^ var(e.what()));
+		throw VarError("Error: Invalid regex " ^ regexstr.quote() ^ " " ^ var(e.what()));
 	}
 
 	// return regex_match(var_str, expression);

@@ -106,10 +106,11 @@ PUBLIC var osshellread(CVR command);
 PUBLIC bool osshellread(VARREF readstr, CVR command);
 PUBLIC bool osshellwrite(CVR writestr, CVR command);
 
-PUBLIC void stop(CVR text DEFAULT_EMPTY);
-PUBLIC void abort(CVR text DEFAULT_EMPTY);	 // dont confuse with abort() which is standard c/c++
-PUBLIC void abortall(CVR text DEFAULT_EMPTY);
-PUBLIC var logoff();
+// Moved to mvprogram
+//PUBLIC void stop(CVR text DEFAULT_EMPTY);
+//PUBLIC void abort(CVR text DEFAULT_EMPTY);	 // dont confuse with abort() which is standard c/c++
+//PUBLIC void abortall(CVR text DEFAULT_EMPTY);
+//PUBLIC var logoff();
 
 PUBLIC var execute(CVR command);
 // PUBLIC var chain(CVR command);
@@ -332,6 +333,7 @@ PUBLIC bool begintrans();
 PUBLIC bool statustrans();
 PUBLIC bool rollbacktrans();
 PUBLIC bool committrans();
+PUBLIC void cleardbcache();
 
 PUBLIC bool lock(CVR filehandle, CVR key);
 PUBLIC void unlock(CVR filehandle, CVR key);

@@ -45,7 +45,7 @@ function main() {
 		var msg = "OUTPUT FILE FOR PRINTOUT CANNOT BE CREATED.";
 		msg(-1) = "|" ^ (DQ ^ (oscwd() ^ prnfile ^ DQ)) ^ "|";
 		call mssg(msg);
-		var().stop();
+		stop();
 	}
 
 	//equ getflag to system<3>;*1=printing program has reset setptr to prn and done its own printing
@@ -77,7 +77,7 @@ function main() {
 	if (filelen < 2) {
 nooutput:
 		dfs.osremove();
-		var().stop();
+		stop();
 	}
 
 	//fail if only spaces output
@@ -104,7 +104,7 @@ nooutput:
 	// dfs=dfs2
 	// end
 
-	var().stop();
+	stop();
 	//for c++
 	return 0;
 

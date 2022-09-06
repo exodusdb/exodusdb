@@ -120,7 +120,7 @@ std::string mvd2s(double double1) {
 
 	// Throw if non-numeric
 	if (ec != std::errc())
-		throw MVNonNumeric("mvd2s: Cannot convert double to 24 characters");
+		throw VarNonNumeric("mvd2s: Cannot convert double to 24 characters");
 
 	// Convert to a string. Hopefully using small string optimisation (SSO)
 	std::string s = std::string(chars.data(), ptr - chars.data());
@@ -422,7 +422,7 @@ void var::createString() const {
 
 	// treat any other case as unassigned
 	//(usually var_typ & VARTYP_UNA)
-	throw MVUnassigned("createString()");
+	throw VarUnassigned("createString()");
 }
 
 var var::round(const int ndecimals) const {
@@ -563,7 +563,7 @@ var var::round(const int ndecimals) const {
 
 	// Throw if non-numeric
 	if (ec != std::errc())
-		throw MVNonNumeric("var::round: Cannot convert double to 24 characters");
+		throw VarNonNumeric("var::round: Cannot convert double to 24 characters");
 
 	// Convert to a string. Hopefully using small string optimisation (SSO)
 	result.var_str = std::string(chars.data(), ptr - chars.data());
@@ -648,7 +648,7 @@ bool var::toBool() const {
 
 		if (!(var_typ)) {
 			this->assertAssigned(__PRETTY_FUNCTION__);
-			throw MVUnassigned("toBool()");
+			throw VarUnassigned("toBool()");
 		}
 
 		// must be string - try to convert to numeric and do all tests again
@@ -717,7 +717,7 @@ bool var::isnum(void) const {
 
 	// Not assigned error
 	if (!var_typ)
-		throw MVUnassigned("isnum()");
+		throw VarUnassigned("isnum()");
 
 	// Empty string is zero. Leave the string as "".
 	int strlen = var_str.size();
