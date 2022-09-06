@@ -74,26 +74,26 @@ class PUBLIC dim final {
 	// because Howard Hinnant recommends against in our case
 
 	// Prevent assigning to temporaries
-	VOID_OR_DIMREF operator=(const dim& rhs) && = delete;
+	void operator=(const dim& rhs) && = delete;
 
 	// var& operator=(CVR rhs) & = default;
 	// Cannot use default copy assignment because
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
-	VOID_OR_DIMREF operator=(const dim& rhs) &;
+	void operator=(const dim& rhs) &;
 
 	/////////////////////
 	// 6. move assignment - from rvalue
 	/////////////////////
 
 	// Prevent assigning to temporaries
-	VOID_OR_DIMREF operator=(dim&& rhs) && noexcept = delete;
+	void operator=(dim&& rhs) && noexcept = delete;
 
 	// Cannot use default move assignment because
 	// a) it returns a value allowing accidental use of "=" in if statements instead of ==
 	// b) doesnt check if rhs is assigned (less important for temporaries which are rarely unassigned)
 	//var& operator=(TVR rhs) & noexcept = default;
-	VOID_OR_DIMREF operator=(dim&& rhs) &;
+	void operator=(dim&& rhs) &;
 
 
 	// Constructor with number of rows and optional number of columns
@@ -137,9 +137,9 @@ class PUBLIC dim final {
 	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
 	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
 	// contruction see also ^= etc
-	VOID_OR_DIMREF operator=(CVR sourcevar);
-	VOID_OR_DIMREF operator=(const int sourceint);
-	VOID_OR_DIMREF operator=(const double sourcedbl);
+	void operator=(CVR sourcevar);
+	void operator=(const int sourceint);
+	void operator=(const double sourcedbl);
 
 	// see also var::split
 	// return the number of fields

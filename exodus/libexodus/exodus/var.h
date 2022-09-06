@@ -1,5 +1,5 @@
-#ifndef MV_H
-#define MV_H 1
+#ifndef EXODUS_VAR_H
+#define EXODUS_VAR_H
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -24,10 +24,11 @@ THE SOFTWARE.
 
 //#include <iostream>
 #include <string>
-#include <cmath>  //for floor
+#include <string_view>
+#include <cmath>  //for std::floor
 
-#define EXODUS_RELEASE "21.03"
-#define EXODUS_PATCH "21.03.0"
+#define EXODUS_RELEASE "22.09"
+#define EXODUS_PATCH "22.09.0"
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
@@ -78,11 +79,6 @@ THE SOFTWARE.
 #endif
 
 #include <exodus/vartyp.h>
-
-#define VARREF var&
-#define CVR const var&
-#define TVR var&&
-#define SV std::string_view
 
 // Decided to use ASCII characters 0x1A-0x1F for PickOS separator chars
 // instead of PickOS 0xFA-0xFF which are illegal utf-8 bytes
@@ -141,6 +137,20 @@ THE SOFTWARE.
 #define TRACE(EXPRESSION) \
 	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
 
+#define DEFAULT_UNASSIGNED = var()
+#define DEFAULT_EMPTY = ""
+#define DEFAULT_DOT = "."
+#define DEFAULT_SPACE = " "
+#define DEFAULT_VM = VM_
+#define DEFAULT_NULL = nullptr
+
+#define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
+
+#define ISDEFINED(VARNAME) VARNAME.assertDefined(function_sig, #VARNAME);
+#define ISASSIGNED(VARNAME) VARNAME.assertAssigned(function_sig, #VARNAME);
+#define ISSTRING(VARNAME) VARNAME.assertString(function_sig, #VARNAME);
+#define ISNUMERIC(VARNAME) VARNAME.assertNumeric(function_sig, #VARNAME);
+
 namespace exodus {
 
 //#define SMALLEST_NUMBER 1e-13
@@ -149,9 +159,20 @@ namespace exodus {
 //#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
 constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 
+class var;
 class dim;
 class var_iter;
 class var__extractreplace;
+
+class var_proxy1;
+class var_proxy2;
+class var_proxy3;
+//class var_brackets_proxy;
+
+using VARREF = var&;
+using CVR = const var&;
+using TVR = var&&;
+using SV = std::string_view;
 
 // original help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
@@ -173,42 +194,6 @@ class var__extractreplace;
 // char:       4
 //           ---
 // var:       56
-
-class var_proxy1;
-class var_proxy2;
-class var_proxy3;
-//class var_brackets_proxy;
-
-#define DEFAULT_UNASSIGNED = var()
-#define DEFAULT_EMPTY = ""
-#define DEFAULT_DOT = "."
-#define DEFAULT_SPACE = " "
-#define DEFAULT_VM = VM_
-#define DEFAULT_NULL = nullptr
-
-//prevent or allow assignment to var to return a reference to the var
-//preventing will stop accidental usage of = instead of == in if() clauses
-//if you really want to assign in an if clause then use something like  if (x=123;x)
-#define PREVENT_ASSIGN_IN_IF
-#ifdef PREVENT_ASSIGN_IN_IF
-#define VOID_OR_VARREF void
-#define VOID_OR_DIMREF void
-#define VOID_OR_THIS
-#else
-#define VOID_OR_VARREF "VARREF"
-#define VOID_OR_DIMREF "dim&"
-#define VOID_OR_THIS "*this"
-#endif
-
-#define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
-
-#define ISDEFINED(VARNAME) VARNAME.assertDefined(function_sig, #VARNAME);
-#define ISASSIGNED(VARNAME) VARNAME.assertAssigned(function_sig, #VARNAME);
-#define ISSTRING(VARNAME) VARNAME.assertString(function_sig, #VARNAME);
-#define ISNUMERIC(VARNAME) VARNAME.assertNumeric(function_sig, #VARNAME);
-
-#define INLINE inline //this is the default anyway
-//#define INLINE __attribute__ ((noinline)) //use this to reduce compllation speed and object size
 
 // class var final
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
@@ -244,6 +229,7 @@ class PUBLIC var final {
 	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
 	//
 	var() = default;
+
 //	var()
 //		: var_typ(VARTYP_UNA) {
 //		//std::cout << "ctor()" << std::endl;
@@ -311,6 +297,7 @@ class PUBLIC var final {
 	//////////////////////
 	//
 	var(TVR fromvar) noexcept = default;
+
 	//	// var(TVR fromvar) noexcept;  // = default;
 	//	// defined in class for inline/optimisation
 	//	// move constructor
@@ -335,13 +322,13 @@ class PUBLIC var final {
 	// because Howard Hinnant recommends against in our case
 
 	// Prevent assigning to temporaries
-	INLINE VOID_OR_VARREF operator=(CVR rhs) && = delete;
+	void operator=(CVR rhs) && = delete;
 
 	// var& operator=(CVR rhs) & = default;
 	// Cannot use default copy assignment because
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
-	INLINE VOID_OR_VARREF operator=(CVR rhs) & {
+	void operator=(CVR rhs) & {
 
 		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
@@ -351,7 +338,7 @@ class PUBLIC var final {
 		// Prevent self assign
 		// Removed for speed since we assume std::string handles it ok
 		//if (this == &rhs)
-		//	return VOID_OR_THIS;
+		//	return;
 
 		// copy everything across
 		var_str = rhs.var_str;
@@ -359,7 +346,7 @@ class PUBLIC var final {
 		var_int = rhs.var_int;
 		var_typ = rhs.var_typ;
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 	/////////////////////
@@ -369,13 +356,13 @@ class PUBLIC var final {
 	// defined in class for inline/optimisation
 
 	// Prevent assigning to temporaries
-	INLINE VOID_OR_VARREF operator=(TVR rhs) && noexcept = delete;
+	void operator=(TVR rhs) && noexcept = delete;
 
 	// Cannot use default move assignment because
 	// a) it returns a value allowing accidental use of "=" in if statements instead of ==
 	// b) doesnt check if rhs is assigned (less important for temporaries which are rarely unassigned)
 	//var& operator=(TVR rhs) & noexcept = default;
-	INLINE VOID_OR_VARREF operator=(TVR rhs) & {
+	void operator=(TVR rhs) & {
 
 		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
 
@@ -387,7 +374,7 @@ class PUBLIC var final {
 		// Prevent self assign
 		// Removed for speed since we assume std::string handles it ok
 		//if (this == &rhs)
-		//	return VOID_OR_THIS;
+		//	return;
 
 		// move everything over
 		var_str = std::move(rhs.var_str);
@@ -395,7 +382,7 @@ class PUBLIC var final {
 		var_int = rhs.var_int;
 		var_typ = rhs.var_typ;
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 
@@ -423,7 +410,7 @@ class PUBLIC var final {
 	*/
 	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	INLINE var(I rhs)
+	var(I rhs)
 		:
 		var_int(rhs),
 		var_typ(VARTYP_INT) {
@@ -442,7 +429,7 @@ class PUBLIC var final {
 	*/
 	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	INLINE var(F rhs)
+	var(F rhs)
 		:
 		var_dbl(rhs),
 		var_typ(VARTYP_DBL){
@@ -462,7 +449,7 @@ class PUBLIC var final {
 	*/
 	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	INLINE var(S&& fromstr)
+	var(S&& fromstr)
 	    :
 		var_str(std::forward<S>(fromstr)),
 		var_typ(VARTYP_STR) {
@@ -471,7 +458,7 @@ class PUBLIC var final {
 
 	// memory block
 	///////////////
-	INLINE var(const char* charstart, const size_t nchars)
+	var(const char* charstart, const size_t nchars)
 		:
 		var_str(charstart, nchars),
 		var_typ(VARTYP_STR) {
@@ -481,7 +468,7 @@ class PUBLIC var final {
 	// char
 	///////
 	//must be separate from unsigned int contructor to get a string/char not an int/ character number
-	INLINE var(const char char1) noexcept
+	var(const char char1) noexcept
 		:
 		var_str(1, char1),
 		var_typ(VARTYP_STR) {
@@ -503,7 +490,7 @@ class PUBLIC var final {
 
 	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	INLINE var(W&& fromstr)
+	var(W&& fromstr)
 	    :
 		var_typ(VARTYP_STR) {
 		//std::cerr << "TEMPLATE " << __PRETTY_FUNCTION__ << std::endl;
@@ -516,7 +503,7 @@ class PUBLIC var final {
 
 	// wchar*
 	/////////
-	INLINE var(const wchar_t* wcstr1)
+	var(const wchar_t* wcstr1)
 		: var_typ(VARTYP_STR) {
 
 		// protect against null pointer
@@ -530,7 +517,7 @@ class PUBLIC var final {
 //
 //	// wchar
 //  ////////
-//	INLINE explicit var(wchar_t wchar1)
+//	explicit var(wchar_t wchar1)
 //		: var_typ(VARTYP_STR) {
 //
 //		(*this) = var(std::wstring(1, wchar1));
@@ -538,7 +525,7 @@ class PUBLIC var final {
 //
 //	// char32_t char
 //  ////////////////
-//	INLINE var(char32_t u32char)
+//	var(char32_t u32char)
 //		: var_typ(VARTYP_STR) {
 //
 //		this->from_u32string(std::u32string(1, u32char));
@@ -546,7 +533,7 @@ class PUBLIC var final {
 //
 //	// char8_t char
 //  ///////////////
-//	INLINE var(char8_t u8char)
+//	var(char8_t u8char)
 //		: var_typ(VARTYP_STR) {
 //
 //		this->var_str = std::string(1, u8char);
@@ -800,7 +787,7 @@ class PUBLIC var final {
 
 	// int assignment
 	// The assignment operator should always return a reference to *this.
-	INLINE VOID_OR_VARREF operator=(const int int1) & {
+	void operator=(const int int1) & {
 		// THISIS("VARREF operator= (const int int1)")
 		// protect against unlikely syntax as follows:
 		// var undefinedassign=undefinedassign=123';
@@ -810,12 +797,12 @@ class PUBLIC var final {
 		var_int = int1;
 		var_typ = VARTYP_INT;  // reset to one unique type
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 	// double assignment
 	// The assignment operator should always return a reference to *this.
-	INLINE VOID_OR_VARREF operator=(const double dbl1) & {
+	void operator=(const double dbl1) & {
 		// THISIS("VARREF operator= (const double dbl1)")
 		// protect against unlikely syntax as follows:
 		// var undefinedassign=undefinedassign=9.9';
@@ -825,12 +812,12 @@ class PUBLIC var final {
 		var_dbl = dbl1;
 		var_typ = VARTYP_DBL;  // reset to one unique type
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 	// char assignment
 	// The assignment operator should always return a reference to *this.
-	INLINE VOID_OR_VARREF operator=(const char char2) & {
+	void operator=(const char char2) & {
 
 		//THISIS("VARREF operator= (const char char2) &")
 		// protect against unlikely syntax as follows:
@@ -844,12 +831,12 @@ class PUBLIC var final {
 		var_str = char2;
 		var_typ = VARTYP_STR;  // reset to one unique type
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 	// char* assignment
 	// The assignment operator should always return a reference to *this.
-	INLINE VOID_OR_VARREF operator=(const char* cstr) & {
+	void operator=(const char* cstr) & {
 		//THISIS("VARREF operator= (const char* cstr2) &")
 		// protect against unlikely syntax as follows:
 		// var undefinedassign=undefinedassign="xxx";
@@ -860,12 +847,12 @@ class PUBLIC var final {
 		var_str = cstr;
 		var_typ = VARTYP_STR;  // reset to one unique type
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 	// std::string assignment from variable (lvalue)
 	// The assignment operator should always return a reference to *this.
-	INLINE VOID_OR_VARREF operator=(const std::string& string2) & {
+	void operator=(const std::string& string2) & {
 
 		//THISIS("VARREF operator= (const std::string& string2) &")
 		// protect against unlikely syntax as follows:
@@ -876,12 +863,12 @@ class PUBLIC var final {
 		var_str = string2;
 		var_typ = VARTYP_STR;  // reset to one unique type
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 	// std::string assignment from temporary (rvalue)
 	// The assignment operator should always return a reference to *this.
-	INLINE VOID_OR_VARREF operator=(const std::string&& string2) & {
+	void operator=(const std::string&& string2) & {
 
 		//THISIS("VARREF operator= (const std::string&& string2) &")
 		// protect against unlikely syntax as follows:
@@ -893,7 +880,7 @@ class PUBLIC var final {
 		var_str = std::move(string2);
 		var_typ = VARTYP_STR;  // reset to one unique type
 
-		return VOID_OR_THIS;
+		return;
 	}
 
 
@@ -1874,23 +1861,23 @@ class PUBLIC var final {
 
 	// WARNING: MUST not use any var when checking Undefined
 	// otherwise will get recursion/segfault
-	INLINE void assertDefined(const char* message, const char* varname = "") const {
+	void assertDefined(const char* message, const char* varname = "") const {
 		if (var_typ & VARTYP_MASK)
 			throwUndefined(var(varname) ^ " in " ^ message);
 	}
 
-	INLINE void assertAssigned(const char* message, const char* varname = "") const {
+	void assertAssigned(const char* message, const char* varname = "") const {
 		assertDefined(message, varname);
 		if (!var_typ)
 			throwUnassigned(var(varname) ^ " in " ^ message);
 	}
 
-	INLINE void assertNumeric(const char* message, const char* varname = "") const {
+	void assertNumeric(const char* message, const char* varname = "") const {
 		if (!this->isnum())
 			throwNonNumeric(var(varname) ^ " in " ^ var(message) ^ " data: " ^ this->substr(1, 128).quote());
 	}
 
-	INLINE void assertDecimal(const char* message, const char* varname = "") const {
+	void assertDecimal(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_DBL)) {
 			var_dbl = double(var_int);
@@ -1899,7 +1886,7 @@ class PUBLIC var final {
 		}
 	}
 
-	INLINE void assertInteger(const char* message, const char* varname = "") const {
+	void assertInteger(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {
 			var_int = std::floor(var_dbl);
@@ -1908,7 +1895,7 @@ class PUBLIC var final {
 		}
 	}
 
-	INLINE void assertString(const char* message, const char* varname = "") const {
+	void assertString(const char* message, const char* varname = "") const {
 		assertDefined(message, varname);
 		if (!(var_typ & VARTYP_STR)) {
 			if (!var_typ)
@@ -1917,7 +1904,7 @@ class PUBLIC var final {
 		};
 	}
 
-	INLINE void assertStringMutator(const char* message, const char* varname = "") const {
+	void assertStringMutator(const char* message, const char* varname = "") const {
 		assertString(message, varname);
 		// Very important:
 		// Reset all flags to ensure they are evaluated again
@@ -2209,4 +2196,4 @@ ND inline var operator""_var(long double d) {
 
 }  // namespace exodus
 
-#endif    // MV_H
+#endif    // EXODUS_VAR_H

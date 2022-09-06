@@ -101,7 +101,7 @@ dim::dim(dim&& sourcedim) {
 // 5. COPY ASSIGNMENT
 /////////////////////
 
-VOID_OR_DIMREF dim::operator=(const dim& sourcedim) &{
+void dim::operator=(const dim& sourcedim) &{
 //TRACE("CP ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
@@ -114,14 +114,14 @@ VOID_OR_DIMREF dim::operator=(const dim& sourcedim) &{
 	for (size_t celln = 1; celln < ncells; ++celln)
 		//data_[celln] = sourcedim.data_[celln].clone();
 		data_[celln] = sourcedim.data_[celln];
-	return VOID_OR_THIS;
+	return;
 }
 
 /////////////////////
 // 6. MOVE ASSIGNMENT
 /////////////////////
 
-VOID_OR_DIMREF dim::operator=(dim&& sourcedim) & {
+void dim::operator=(dim&& sourcedim) & {
 //TRACE("MV ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
@@ -132,7 +132,7 @@ VOID_OR_DIMREF dim::operator=(dim&& sourcedim) & {
 	initialised_ = sourcedim.ncols_;
 	std::swap(data_, sourcedim.data_);
 
-	return VOID_OR_THIS;
+	return;
 }
 
 // constructor - rows only
@@ -188,21 +188,21 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 	//var(rows * cols + 1).errputl("created dim[] ");
 }
 
-VOID_OR_DIMREF dim::operator=(CVR sourcevar) {
+void dim::operator=(CVR sourcevar) {
 	//if (!initialised_)
 	//	throw DimNotDimensioned("");
 	this->init(sourcevar);
-	return VOID_OR_THIS	;
+	return;
 }
 
-VOID_OR_DIMREF dim::operator=(const int sourceint) {
+void dim::operator=(const int sourceint) {
 	this->init(sourceint);
-	return VOID_OR_THIS;
+	return;
 }
 
-VOID_OR_DIMREF dim::operator=(const double sourcedbl) {
+void dim::operator=(const double sourcedbl) {
 	this->init(sourcedbl);
-	return VOID_OR_THIS;
+	return;
 }
 
 var dim::rows() const {

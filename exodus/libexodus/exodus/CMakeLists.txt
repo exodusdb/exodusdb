@@ -121,9 +121,6 @@ add_library(exodus SHARED
  term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 )
 
-#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
-set_target_properties(exodus PROPERTIES SOVERSION "21.03")
-
 ### specify what libraries are to be linked in when building libexodus ###
 
 message("Boost_LIBRARIES=${Boost_LIBRARIES}")
@@ -146,6 +143,9 @@ endif()
 ### CMAKE_INSTALL_PREFIX defaults to /usr/local/
 install(TARGETS exodus DESTINATION lib)
 ##install(TARGETS exodus DESTINATION /usr/lib)
+
+#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
+set_target_properties(exodus PROPERTIES SOVERSION "22.09")
 
 ### install some of exodus' include files so programs can be written in exodus c++ ###
 
@@ -170,5 +170,21 @@ install(FILES
  ioconv_custom.h
  printtx.hpp
 DESTINATION include/exodus)
+
+install(
+    CODE "
+        execute_process(
+            COMMAND 
+                ldconfig
+                OUTPUT_VARIABLE OUTVAR
+                ERROR_VARIABLE ERRVAR
+                RESULT_VARIABLE RESVAR
+        )
+        message(ldconfig <\${OUTVAR}>\n
+            <\${ERRVAR}>\n
+            <\${RESVAR}>\n
+        )
+    "
+)
 
 message("--LIBEXODUS CMAKE EXIT --")

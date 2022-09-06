@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.1)
 #
 #update version in mv.h and libexodus/exodus/CMakeLists.txt
 set(CPACK_PACKAGE_CONTACT neo)
-set(CPACK_PACKAGE_VERSION 21.03.1)
+set(CPACK_PACKAGE_VERSION 22.09.1)
 INCLUDE(CPack)
 
 #
