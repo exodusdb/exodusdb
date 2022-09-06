@@ -121,8 +121,7 @@ void var::initrnd() const {
 
 	// Get a seed for the RNG
 	uint64_t seed;
-	if (this->unassigned()) {
-	} else if (this->isnum()) {
+	if (this->isnum()) {
 
 		// Seed from number
 		//seed = this->toLong();
@@ -145,6 +144,11 @@ void var::initrnd() const {
 			seed *= var_str[ii];
 		// seed=MurmurHash64((char*)var_str.data(),int(var_str.size()*sizeof(char)),0);
 
+	} else {
+		// Cant get here because already checked but need to evade a warning
+		// warning: ‘seed’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+		seed = 0;
+		throw VarUnassigned(__PRETTY_FUNCTION__);
 	}
 
 	// Set the new seed

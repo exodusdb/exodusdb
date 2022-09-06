@@ -1,7 +1,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include <exodus/mv.h>
+#include <exodus/var.h>
 
 namespace exodus {
 
