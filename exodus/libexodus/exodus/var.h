@@ -88,19 +88,13 @@ THE SOFTWARE.
 // the var versions of the following (without leading or trailing _)
 // are defined AFTER the class declaration of "var"
 
-// leading and trailing _ char* versions of classic pick delimiters
-// also in ADECOM
+// leading _ char* versions of classic pick delimiters
 #define _RM "\x1F"      // Record Mark
 #define _FM "\x1E"      // Field Mark
 #define _VM "\x1D"      // Value Mark
 #define _SM "\x1C"      // Subvalue Mark
 #define _TM "\x1B"      // Text Mark
 #define _ST "\x1A"  // Subtext Mark
-
-//// aliases for different implementations of multivalue
-//#define _IM_ _RM
-//#define _AM_ _FM
-//#define _SVM_ _SM
 
 #define _BS_ "\\"
 #define _DQ_ "\""
@@ -113,11 +107,6 @@ THE SOFTWARE.
 #define SM_ '\x1C'     // Subvalue Mark
 #define TM_ '\x1B'     // Text Mark
 #define ST_ '\x1A'     // Subtext Mark
-
-//// aliases for different implementations of multivalue
-//#define IM_ RM_
-//#define AM_ FM_
-//#define SVM_ SM_
 
 #define BS_ '\\'
 #define DQ_ '\"'
@@ -1926,9 +1915,10 @@ class PUBLIC var final {
 
 	void assertStringMutator(const char* message, const char* varname = "") const {
 		assertString(message, varname);
-		// Very important:
-		// Reset all flags to ensure they are evaluated again
-		// after string mutation
+		// VERY IMPORTANT:
+		// If var_str is mutated then we MUST
+		// reset all flags to ensure that the int/dbl are lazily
+		// derived from the new string if and when required.
 		var_typ = VARTYP_STR;
 	}
 

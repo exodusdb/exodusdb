@@ -841,7 +841,7 @@ function main()
 		conn1.disconnect();
 	}
 
-printl("Test passed");
+	printl("Test passed");
 
 	return 0;
 }
