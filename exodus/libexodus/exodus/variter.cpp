@@ -1,3 +1,5 @@
+#include <string>
+
 #include <exodus/var.h>
 #include <exodus/dim.h>
 
@@ -33,7 +35,7 @@ var_iter::var_iter(CVR var1)
 }
 
 //check iter != iter (i.e. iter != end()
-bool var_iter::operator!=([[maybe_unused]] var_iter& var_iter1) {
+bool var_iter::operator!=([[maybe_unused]] const var_iter& var_iter1) {
 	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	//no need to use var_iter1 since the end is always string::npos;
 	return this->startpos_ != std::string::npos;

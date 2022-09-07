@@ -29,7 +29,9 @@ Binary    Hex          Comments
 11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
 */
 
-#include <mutex> //for lock_guard
+#include <utility> //for move
+//#include <mutex> //for lock_guard
+#include <string>
 
 #if __has_include(<signal.h>)
 #include <signal.h>	 //for raise(SIGTRAP)
@@ -86,7 +88,7 @@ Binary    Hex          Comments
 
 #include <exodus/var.h>
 //#include <exodus/mvutf.h>
-#include "varlocale.h"
+#include <exodus/varlocale.h>
 
 // Keep doxygen happy
 #undef DEFAULT_SPACE
@@ -277,7 +279,7 @@ VARREF var::inputn(const int nchars) {
 
 			// quit if got the desired number of characters
 			//nchars cannot be negative at this point
-			if (var_str.size() >= uint(nchars))
+			if (var_str.size() >= static_cast<unsigned int>(nchars))
 				break;
 		}
 
@@ -368,7 +370,7 @@ var var::length() const {
 	THISIS("var var::length() const")
 	assertString(function_sig);
 
-	return int(var_str.size());
+	return var_str.size();
 }
 
 // synonym for length for compatibility with pick's len()
@@ -377,7 +379,7 @@ var var::len() const {
 	THISIS("var var::len() const")
 	assertString(function_sig);
 
-	return int(var_str.size());
+	return var_str.size();
 }
 
 //const char* var::data() const {
@@ -889,7 +891,7 @@ var var::unique() const {
 
 		// if (!founddelimiter && delimiter)
 		if (delimiter)
-			// sepchar=RM_-int(delimiter)+1;
+			// sepchar=RM_-static_cast<int>(delimiter)+1;
 			sepchar = var().chr(RMseq_plus1 - delimiter);
 
 		if (bit.length()) {
@@ -937,13 +939,13 @@ var var::textseq() const {
 	// bytes
 	std::u32string str1 = boost::locale::conv::utf_to_utf<char32_t>(var_str.substr(0, 4));
 
-	return int(uint32_t(str1[0]));
+	return uint32_t(str1[0]);
 }
 
 // only returns BINARY bytes 0-255 (128-255) cannot be stored in the database unless with other
 // bytes making up UTF8
 var var::chr(const int charno) const {
-	return char(charno % 256);
+	return static_cast<char>(charno % 256);
 }
 
 // returns unicode 1-4 byte sequences (in utf8)
@@ -1114,7 +1116,7 @@ VARREF var::splicer(const int start1, const int length, SV insertstr) {
 	} else
 		lengthb = length;
 
-	if (uint(start0) >= var_str.size()) {
+	if (static_cast<unsigned int>(start0) >= var_str.size()) {
 		//if (newstr.var_str.size())
 			var_str += insertstr;
 	} else {
@@ -1139,13 +1141,13 @@ VARREF var::splicer(const int start1, SV insertstr) {
 	if (start1 > 0)
 		start1b = start1;
 	else if (start1 < 0) {
-		start1b = int(var_str.size()) + start1 + 1;
+		start1b = static_cast<int>(var_str.size()) + start1 + 1;
 		if (start1b < 1)
 			start1b = 1;
 	} else
 		start1b = 1;
 
-	if (uint(start1b) > var_str.size())
+	if (static_cast<unsigned int>(start1b) > var_str.size())
 		var_str += insertstr;
 	else
 		var_str.replace(start1b - 1, var_str.size(), insertstr);
@@ -1280,14 +1282,14 @@ var var::str(const int num) const {
 	if (num < 0)
 		return newstr;
 
-	int basestrlen = int(var_str.size());
+	int basestrlen = static_cast<int>(var_str.size());
 	if (basestrlen == 1) {
 		newstr.var_str.resize(num, var_str.at(0));
 	}
-	else if (basestrlen)
+	else if (basestrlen) {
 		for (int ii = num; ii > 0; --ii)
 			newstr.var_str.append(var_str);
-
+	}
 	return newstr;
 }
 
@@ -1439,7 +1441,7 @@ void string_converter(T1& var_str, const T2 oldchars, const T3 newchars) {
 			break;
 
 		// find which from character we have found
-		int fromcharn = int(oldchars.find(var_str[pos]));
+		int fromcharn = static_cast<int>(oldchars.find(var_str[pos]));
 
 		if (fromcharn < newchars_size)
 			var_str.replace(pos, 1, newchars.substr(fromcharn, 1));
@@ -1770,7 +1772,7 @@ var var::index2(CVR substrx, const int startchar1) const {
 	if (start_pos == std::string::npos)
 		return 0;
 
-	return var((int)start_pos + 1);
+	return var(static_cast<int>(start_pos) + 1);
 }
 
 // 1 based starting byte no of an occurrence or 0 if not present
@@ -1805,7 +1807,7 @@ var var::index(CVR substrx, const int occurrenceno) const {
 
 		// found the right occurrence
 		if (countdown == 0)
-			return ((int)start_pos + 1);
+			return (static_cast<int>(start_pos) + 1);
 
 		// skip to character after substr (not just next character)
 		// start_pos++;

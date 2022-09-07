@@ -20,11 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// for sleep
-#include <thread>
+#include <unistd.h> //for getpid
+
+#include <thread> //for sleep
 #include <chrono>
 #include <random>
-#include <unistd.h> //for getpid
+#include <memory> //for make_unique
 
 #include <exodus/varimpl.h>
 
@@ -229,9 +230,12 @@ bool var::ossetenv(const char* envvarname) const {
 	//std::cout<<getenv("EXO_DATA");
 
 	//char winenv[1024];
-	char* env = (char*)malloc(1024);
+	size_t maxenv = 1024;
+	char* env = reinterpret_cast<char*>(malloc(maxenv));
 	//snprintf(env, 1024, "%s=%s", envvarname.var_str.c_str(), var_str.c_str());
-	snprintf(env, 1024, "%s=%s", envvarname, var_str.c_str());
+	//snprintf(env, 1024, "%s=%s", envvarname, var_str.c_str());
+	//snprintf(env, sizeof(env), "%s=%s", envvarname, var_str.c_str());
+	snprintf(env, maxenv, "%s=%s", envvarname, var_str.c_str());
 	//std::cout << winenv;
 	int result = putenv(env);
 
@@ -242,7 +246,7 @@ bool var::ossetenv(const char* envvarname) const {
 
 #else
 	var("setenv " ^ envvarname ^ "=" ^ (*this)).outputl();
-	return setenv((char*)(envvarname.toString().c_str()), (char*)(toString().c_str()), 1);
+	return setenv(reinterpret_cast<char*>(envvarname.toString().c_str()), reinterpret_cast<char*>(toString().c_str()), 1);
 #endif
 }
 

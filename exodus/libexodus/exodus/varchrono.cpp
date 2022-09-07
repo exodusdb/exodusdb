@@ -23,7 +23,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <iostream> //ony for for cerr
+#include <cstring>
+
+#include <exodus/gregorian.h>
+
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+//   #include <time.h>
+#include <exodus/gettimeofday.h>
+#else
+#include <sys/time.h>
+#endif
+
+#include <string>
+#include <iostream> //for cerr
+#include <chrono>
+#include <sstream>
 
 // ostime, osdate, osfile, osdir should return dates and times in UTC
 
@@ -43,6 +57,7 @@ const char* longmths =
 	"\0OCTOBER\0  "
 	"\0NOVEMBER\0 "
 	"\0DECEMBER\0 ";
+
 const char* longdayofweeks =
 	"MONDAY\0   "
 	"TUESDAY\0  "
@@ -51,20 +66,6 @@ const char* longdayofweeks =
 	"FRIDAY\0   "
 	"SATURDAY\0 "
 	"SUNDAY\0   ";
-
-#include <chrono>
-
-#include <cstring>
-#include <sstream>
-
-#include <exodus/gregorian.h>
-
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-//   #include <time.h>
-#include <exodus/gettimeofday.h>
-#else
-#include <sys/time.h>
-#endif
 
 #include <exodus/var.h>
 
@@ -228,7 +229,7 @@ var var::iconv_D(const char* conversion) const {
 
 			// determine the month or return "" to indicate failure
 			for (int ii = 0; ii < 12 * 4; ii += 4) {
-				if (strcmp((char*)(shortmths + ii), word.c_str()) == 0) {
+				if (strcmp(static_cast<const char*>(shortmths + ii), word.c_str()) == 0) {
 					month = ii / 4 + 1;
 					break;
 				}
@@ -383,7 +384,7 @@ var var::oconv_D(const char* conversion) const {
 				++conversionchar;
 				if (*conversionchar == 'A')
 					return &longmths[civil_month * 11 - 10];
-				return var(int(civil_month));
+				return var(static_cast<int>(civil_month));
 
 			// Not AREV
 			// DW returns day of week number number 1-7 Mon-Sun
@@ -412,17 +413,17 @@ var var::oconv_D(const char* conversion) const {
 			// Not AREV
 			// DD day of month
 			case 'D':
-				return var(int(civil_day));
+				return var(static_cast<int>(civil_day));
 
 			// Not AREV
 			// DQ returns quarter number
 			case 'Q':
-				return var(int((civil_month - 1) / 3) + 1);
+				return var(static_cast<int>((civil_month - 1) / 3) + 1);
 
 			// Not AREV
 			// DJ returns day of year
 			case 'J':
-				//return int(desired_date.day_of_year());
+				//return static_cast<int>(desired_date.day_of_year());
 				return unixdayno - hinnant::gregorian::days_from_civil(civil_year, 1, 1) + 1;
 
 			// iso year format - at the beginning
@@ -433,8 +434,8 @@ var var::oconv_D(const char* conversion) const {
 
 			// DL LAST day of month
 			case 'L':
-				//return var(int(desired_date.end_of_month().day()));
-				return var(int(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
+				//return var(static_cast<int>(desired_date.end_of_month().day()));
+				return var(static_cast<int>(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
 
 			default:
 				sepchar = *conversionchar;
@@ -453,7 +454,7 @@ var var::oconv_D(const char* conversion) const {
 	std::stringstream yearstream;
 	yearstream << civil_year;
 	std::string yearstring = yearstream.str();
-	int yearstringerase = int(yearstring.length() - yeardigits);
+	int yearstringerase = static_cast<int>(yearstring.length() - yeardigits);
 	if (yearstringerase > 0)
 		yearstring.erase(0, yearstringerase);
 
@@ -485,7 +486,7 @@ var var::oconv_D(const char* conversion) const {
 		ss << &shortmths[civil_month * 4 - 4];
 	} else {
 		ss.width(2);
-		ss << int(civil_month);
+		ss << static_cast<int>(civil_month);
 	}
 
 	// day last

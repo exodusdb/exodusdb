@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 
+project(libexodus)
+
 message("")
 message("--LIBEXODUS CMAKE INIT --")
-
-project(libexodus)
 
 #use CMakeList.txt options in parent directory
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")

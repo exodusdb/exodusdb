@@ -32,6 +32,8 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 */
 
 #include <iostream>
+#include <utility> //for swap
+#include <string>
 
 #define USE_BOOST
 #ifdef USE_BOOST
@@ -46,7 +48,7 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #endif
 
 #include <exodus/varimpl.h>
-#include "varoshandle.h"
+#include <exodus/varoshandle.h>
 
 namespace exodus {
 

@@ -1,0 +1,4 @@
+comp:
+	./compall
+test:
+install:

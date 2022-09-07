@@ -22,6 +22,8 @@ THE SOFTWARE.
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h> //for close()
+#include <fnmatch.h> //for fnmatch() globbing
 
 //#include <algorithm>  //for count in osrename
 #include <fstream>
@@ -29,9 +31,11 @@ THE SOFTWARE.
 #include <locale>
 #include <mutex>
 #include <filesystem>
-#include <fnmatch.h> //for fnmatch() globbing
 #include <chrono>
-#include <unistd.h> //for close()
+#include <memory>
+#include <string>
+#include <algorithm>
+#include <vector>
 
 //used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>
@@ -42,6 +46,7 @@ THE SOFTWARE.
 #include <exodus/varoshandle.h>
 
 std::once_flag locale_once_flag;
+
 void locale_once_func() {
 	// so wcscoll() sorts a<B etc instead of character number wise where B<a
 	// wcscoll currently only used on non-pc/non-mac ... see var::localeAwareCompare
@@ -56,13 +61,15 @@ void locale_once_func() {
 	if (!setlocale(LC_ALL, "en_US.utf8")) {
 		if (!setlocale(LC_ALL, "C.UTF-8"))
 			std::cout << "Cannot setlocale LC_COLLATE to en_US.utf8" << std::endl;
-	};
+	}
 	//std::cout << std::cout.getloc().name() << std::endl;
 }
+
 class LocaleOnce {
    public:
 	LocaleOnce() { std::call_once(locale_once_flag, locale_once_func); }
 };
+
 static LocaleOnce locale_once_static;
 
 namespace exodus {
@@ -526,7 +533,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 		// resize the string to receive the whole file
 		var_str.resize(bytesize);
 	} catch (std::bad_alloc& ex) {
-		throw VarOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
+		throw VarOutOfMemory("Could not obtain " ^ var(bytesize * sizeof(char)) ^
 							" bytes of memory to read " ^ var(osfilename));
 		// myfile.close();
 		// return false;
@@ -695,7 +702,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 	}
 
 	// pass back the file pointer offset
-	offset = (int)pmyfile->tellp();
+	offset = static_cast<int>(pmyfile->tellp());
 
 	// although slow, ensure immediate visibility of osbwrites
 	pmyfile->flush();
@@ -718,7 +725,7 @@ bool var::osbread(CVR osfilevar, CVR offset, const int bytesize) {
 }
 #endif
 
-ssize_t count_excess_UTF8_bytes(std::string& str) {
+ssize_t count_excess_UTF8_bytes(const std::string& str) {
 
 	// Scans backward from the end of string.
 	const char* cptr = &str.back();
@@ -806,7 +813,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 		// Position get pointer at the end of file, as expected it to be if we open file
 	anew pmyfile->seekg(0, std::ios::end); unsigned int maxsize = pmyfile->tellg();
 
-	var(int(maxsize)).outputl("maxsize=");
+	var(maxsize).outputl("maxsize=");
 		//return "" if start reading past end of file
 		if ((unsigned long)(int)offset>=maxsize)	// past EOF
 			return *this;
@@ -820,7 +827,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 		// pmyfile->seekg (static_cast<long> (offset.var_int), std::ios::beg);	//
 		// 'std::streampos' usually 'long' seekg always seems to result in tellg being -1 in
 		// linux (Ubunut 10.04 64bit)
-		pmyfile->rdbuf()->pubseekpos(static_cast<long>(offset.var_int));
+		pmyfile->rdbuf()->pubseekpos(static_cast<uint64_t>(offset.var_int));
 	}
 	// var((int) pmyfile->tellg()).outputl("2 tellg=");
 
@@ -828,7 +835,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	//std::unique_ptr memblock(new char[bytesize]);
 	if (memblock == 0)
-		throw VarOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
+		throw VarOutOfMemory("Could not obtain " ^ var(bytesize * sizeof(char)) ^
 							" bytes of memory to read " ^ osfilevar);
 	// return *this;
 
@@ -843,7 +850,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 
 	// update the offset function argument
 	// if (readsize > 0)
-	offset = (int)pmyfile->tellg();
+	offset = static_cast<int>(pmyfile->tellg());
 
 	// transfer the memory block to this variable's string
 	//(is is possible to read directly into string data() avoiding a memory copy?
@@ -870,7 +877,7 @@ void var::osclose() const {
 	// THISIS("void var::osclose() const")
 	// assertString(function_sig);
 	if (THIS_IS_OSFILE()) {
-		mv_handles_cache.del_handle((int)var_int);
+		mv_handles_cache.del_handle(var_int);
 		var_int = 0L;
 		var_typ ^= VARTYP_OSFILE | VARTYP_INT;	// only STR bit should remains
 	}
@@ -1055,7 +1062,7 @@ var var::osfile() const {
 
 	} catch (...) {
 		return "";
-	};
+	}
 }
 
 //convert some clock to time_t (for osfile() and osdir()
@@ -1104,7 +1111,7 @@ var var::osfile() const {
 //		return int(std::filesystem::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
 //	} catch (...) {
 //		return "";
-//	};
+//	}
 //}
 
 bool var::osmkdir() const {
@@ -1204,11 +1211,11 @@ var var::osdir() const {
 		time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
 
 		//file_size() is only available for files not directories
-		return int(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
+		return static_cast<int>(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
 
 	} catch (...) {
 		return "";
-	};
+	}
 }
 
 // old slower implementation using std::filesystem
@@ -1252,7 +1259,7 @@ var var::osdir() const {
 //
 //	} catch (...) {
 //		return "";
-//	};
+//	}
 //}
 
 var var::oslistf(CVR path, CVR globpattern) const {
@@ -1344,7 +1351,7 @@ var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
 			// evade warning: unused variable
 			if (false)
 				if (ex.what()) {
-				};
+				}
 
 			//++err_count;
 			// std::cout << dir_itr->path().leaf() << " " << ex.what() << std::endl;

@@ -1,5 +1,5 @@
-#ifndef EXODUS_VAR_H
-#define EXODUS_VAR_H
+#ifndef EXODUS_LIBEXODUS_EXODUS_VAR_H_
+#define EXODUS_LIBEXODUS_EXODUS_VAR_H_
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -23,9 +23,9 @@ THE SOFTWARE.
 */
 
 //#include <iostream>
+#include <cmath>  //for std::floor
 #include <string>
 #include <string_view>
-#include <cmath>  //for std::floor
 
 #define EXODUS_RELEASE "22.09"
 #define EXODUS_PATCH "22.09.0"
@@ -613,7 +613,7 @@ class PUBLIC var final {
 //#define HASINTREFOP
 #ifdef HASINTREFOP
 	operator int&() const;
-	explicit operator long long&() const;
+	//explicit operator uint64_t&() const;
 	operator double&() const;
 #else
 
@@ -652,7 +652,7 @@ class PUBLIC var final {
 		// conversion when does c++ use automatic conversion to void* note that exodus operator !
 		// uses (void*) trial elimination of operator void* seems to cause no problems but without
 		// full regression testing
-		return (void*)this->toBool();
+		return reinterpret_cast<void*>(this->toBool());
 	}
 
 	// this stops using var as indexes of arrays on msvc since msvc converts bool and int
@@ -1486,10 +1486,10 @@ class PUBLIC var final {
 	ND VARREF fcase() &&;     // utf8
 	ND VARREF normalize() &&; // utf8
 	ND VARREF invert() &&;    // utf8
-	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return this->trimmer(trimchars);};
-	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return this->trimmerf(trimchars);};
-	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return this->trimmerb(trimchars);};
-	ND VARREF trim(SV trimchars, SV options) && {return this->trimmer(trimchars, options);};
+	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return this->trimmer(trimchars);}
+	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return this->trimmerf(trimchars);}
+	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return this->trimmerb(trimchars);}
+	ND VARREF trim(SV trimchars, SV options) && {return this->trimmer(trimchars, options);}
 	ND VARREF fieldstore(CVR sepchar, const int fieldno, const int nfields, CVR replacement) &&;
 	ND VARREF substr(const int startindex) &&;
 	ND VARREF substr(const int startindex, const int length) &&;
@@ -1889,7 +1889,7 @@ class PUBLIC var final {
 	void assertDecimal(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_DBL)) {
-			var_dbl = double(var_int);
+			var_dbl = static_cast<double>(var_int);
 			// Add double flag
 			var_typ |= VARTYP_DBL;
 		}
@@ -1910,7 +1910,7 @@ class PUBLIC var final {
 			if (!var_typ)
 				throwUnassigned(var(varname) ^ " in " ^ message);
 			this->createString();
-		};
+		}
 	}
 
 	void assertStringMutator(const char* message, const char* varname = "") const {
@@ -2038,7 +2038,7 @@ class PUBLIC var_iter {
 	var_iter(CVR v);
 
 	//check iter != iter (i.e. iter != string::npos)
-	bool operator!=(var_iter& vi);
+	bool operator!=(const var_iter& vi);
 
 	//convert to var
 	var operator*() const;
@@ -2061,7 +2061,7 @@ class PUBLIC var_proxy1 {
    public:
 
 	//constructor
-	var_proxy1(var* var1, int fn) : var_(var1), fn_(fn) {};
+	var_proxy1(var* var1, int fn) : var_(var1), fn_(fn) {}
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
@@ -2094,7 +2094,7 @@ class PUBLIC var_proxy2 {
    public:
 
 	//constructor
-	var_proxy2(var* var1, int fn, int vn) : var_(var1), fn_(fn), vn_(vn) {};
+	var_proxy2(var* var1, int fn, int vn) : var_(var1), fn_(fn), vn_(vn) {}
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
@@ -2128,7 +2128,7 @@ class PUBLIC var_proxy3 {
    public:
 
 	//constructor
-	var_proxy3(var* var1, int fn, int vn = 0, int sn = 0) : var_(var1), fn_(fn), vn_(vn), sn_(sn) {};
+	var_proxy3(var* var1, int fn, int vn = 0, int sn = 0) : var_(var1), fn_(fn), vn_(vn), sn_(sn) {}
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
@@ -2218,4 +2218,4 @@ ND inline var operator""_var(long double d) {
 
 }  // namespace exodus
 
-#endif    // EXODUS_VAR_H
+#endif //EXODUS_LIBEXODUS_EXODUS_VAR_H_

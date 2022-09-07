@@ -5,7 +5,7 @@
 //variable (that is linked to SQL TABLE name - in field 2 of file handle)
 //
 //#define INSIDE_MVDBCONNS_CPP
-#include "vardbconn.h"
+#include <exodus/vardbconn.h>
 
 namespace exodus {
 
@@ -33,13 +33,14 @@ PGconn* DBConnector::get_pgconn(int index) const {
 
 	//std::lock_guard lock(dbconns_mutex);
 	const auto iter = dbconns_.find(index);
-	return (PGconn*)(iter == dbconns_.end() ? 0 : iter->second.pgconn_);
+	return reinterpret_cast<PGconn*>(iter == dbconns_.end() ? 0 : iter->second.pgconn_);
 }
 
 DBConn* DBConnector::get_dbconn(int index) const {
 	//std::lock_guard lock(dbconns_mutex);
 	const auto iter = dbconns_.find(index);
 	return (DBConn*)(iter == dbconns_.end() ? 0 : &iter->second);
+	//return reinterpret_cast<DBConn*>(iter == dbconns_.end() ? 0 : &iter->second);
 }
 
 //ConnectionLocks* DBConnector::get_lock_table(int index) const {
@@ -52,6 +53,7 @@ DBCache* DBConnector::get_dbcache(int index) const {
 	//std::lock_guard lock(dbconns_mutex);
 	const auto iter = dbconns_.find(index);
 	return (DBCache*)(iter == dbconns_.end() ? 0 : &iter->second.dbcache_);
+	//return reinterpret_cast<DBCache*>(iter == dbconns_.end() ? 0 : &iter->second.dbcache_);
 }
 
 // pass filename and key by value relying on short string optimisation for performance
@@ -93,7 +95,7 @@ void DBConnector::del_dbconn(int index) {
 	auto iter = dbconns_.find(index);
 	if (iter != dbconns_.end()) {
 		//	PGconn* p /*std::pair<int, void*> p*/ = ;
-		del_((PGconn*)iter /*dbconns_.find(index)*/->second.pgconn_);
+		del_(reinterpret_cast<PGconn*>(iter /*dbconns_.find(index)*/->second.pgconn_));
 		//delete /*dbconns_.find(index)*/ iter->second.locks__;
 		//delete /*dbconns_.find(index)*/ iter->second.dbcache;
 		dbconns_.erase(index);
@@ -107,7 +109,7 @@ void DBConnector::del_dbconns(int from_index) {
 	while (ix != dbconns_.end()) {
 		if (ix->first >= from_index) {
 			//TRACE(ix->first)
-			del_((PGconn*)ix->second.pgconn_);
+			del_(reinterpret_cast<PGconn*>(ix->second.pgconn_));
 			//delete ix->second.locks__;
 			//delete ix->second.dbcache;
 			ix = dbconns_.erase(ix);
@@ -124,7 +126,7 @@ DBConnector::~DBConnector() {
 
 	auto ix = dbconns_.begin();
 	for (;ix != dbconns_.end(); ix++) {
-		del_((PGconn*)ix->second.pgconn_);
+		del_(reinterpret_cast<PGconn*>(ix->second.pgconn_));
 		//delete ix->second.locks__;
 		//delete ix->second.dbcache;
 	}

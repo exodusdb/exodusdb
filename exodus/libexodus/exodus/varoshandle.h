@@ -9,8 +9,8 @@
 // but the non-numeric bit will also be set to prevent the int being used
 // for ordinary numerical functions
 
-#ifndef VAROSHANDLE_H
-#define VAROSHANDLE_H
+#ifndef EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
+#define EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
 
 #include <string>
 #include <vector>
@@ -50,4 +50,5 @@ extern
 	thread_local VarOSHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
 
 }  // namespace exodus
-#endif	// VAROSHANDLE_H
+
+#endif  // EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_

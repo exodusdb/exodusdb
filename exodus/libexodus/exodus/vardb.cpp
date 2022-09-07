@@ -154,12 +154,17 @@ Within transactions, lock requests for locks that have already been obtained SUC
 
 */
 
+#include <cstring>	//for strcmp strlen
+
+#include <string>
+
 // Using map for caches instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
 // and perhaps even more since it doesnt require hashing time.
 // Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
 //#include <unordered_map>
 #include <map>
+#include <utility> //for pair
 
 #if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
 #define WIN32_LEAN_AND_MEAN
@@ -168,7 +173,6 @@ Within transactions, lock requests for locks that have already been obtained SUC
 #else
 #endif
 
-#include <cstring>	//for strcmp strlen
 #include <iostream>
 
 // see exports.txt for all PQ functions
@@ -339,6 +343,7 @@ class MVresult {
 
 	// Allow construction from a PGresult*
 	MVresult(PGresult* pgresult)
+	//explicit MVresult(PGresult* pgresult)
 	:
 	pgresult_(pgresult) {
 
@@ -738,7 +743,7 @@ bool var::connect(CVR conninfo) {
 				". Verify configuration PATH contains postgres's \\bin.";
 			this->lasterror(errmsg);
 			return false;
-		};
+		}
 #else
 		//connect
 		pgconn = PQconnectdb(fullconninfo.var_str.c_str());
@@ -904,7 +909,7 @@ void var::disconnect() {
 
 		//disconnect
 		// note singular form of dbconn
-		thread_dbconnector.del_dbconn((int)dbconn_no);
+		thread_dbconnector.del_dbconn(dbconn_no);
 		var_typ = VARTYP_UNA;
 
 		// if we happen to be disconnecting the same connection as the default connection
@@ -1297,7 +1302,7 @@ bool var::read(CVR filehandle, CVR key) {
 
 	// Parameter array
 	const char* paramValues[] = {key2.data()};
-	int paramLengths[] = {int(key2.size())};
+	int paramLengths[] = {static_cast<int>(key2.size())};
 
 	var sql = "SELECT data FROM " ^ get_normal_filename(filehandle) ^ " WHERE key = $1";
 
@@ -1357,7 +1362,7 @@ var var::hash(const uint64_t modulus) const {
 	// std::string tempstr=this->normalize();
 
 	// uint64_t
-	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.size()*sizeof(wchar_t)),0);
+	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),static_cast<int>(fileandkey.size()*sizeof(wchar_t)),0);
 
 #if defined(USE_WYHASH)
 	uint64_t hash64 = wyhash(var_str.data(), var_str.size(), 0, _wyp);
@@ -1416,7 +1421,7 @@ var var::lock(CVR key) const {
 	}
 
 	// Parameter array
-	const char* paramValues[] = {(char*)&hash64};
+	const char* paramValues[] = {reinterpret_cast<char*>(&hash64)};
 	int paramLengths[] = {sizeof(uint64_t)};
 	int paramFormats[] = {1};  // binary
 
@@ -1484,7 +1489,7 @@ bool var::unlock(CVR key) const {
 	dbconn->locks_.erase(hash64);
 
 	// Parameter array
-	const char* paramValues[] = {(char*)&hash64};
+	const char* paramValues[] = {reinterpret_cast<char*>(&hash64)};
 	int paramLengths[] = {sizeof(uint64_t)};
 	int paramFormats[] = {1};//binary
 
@@ -1697,7 +1702,7 @@ bool var::write(CVR filehandle, CVR key) const {
 
 	// Parameter array
 	const char* paramValues[] = {key2.data(), data2.data()};
-	int paramLengths[] = {int(key2.size()), int(data2.size())};
+	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
 	DEBUG_LOG_SQL1
 	MVresult mvresult = PQexecParams(pgconn,
@@ -1743,7 +1748,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 
 	// Parameter array
 	const char* paramValues[] = {key2.data(), data2.data()};
-	int paramLengths[] = {int(key2.size()), int(data2.size())};
+	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
 	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
@@ -1802,7 +1807,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 
 	// Parameter array
 	const char* paramValues[] = {key2.data(), data2.data()};
-	int paramLengths[] = {int(key2.size()), int(data2.size())};
+	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
 	var sql =
 		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
@@ -1869,7 +1874,7 @@ bool var::deleterecord(CVR key) const {
 
 	// Parameter array
 	const char* paramValues[] = {key2.data()};
-	int paramLengths[] = {int(key2.size())};
+	int paramLengths[] = {static_cast<int>(key2.size())};
 
 	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 

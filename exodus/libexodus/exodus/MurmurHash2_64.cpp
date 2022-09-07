@@ -56,7 +56,7 @@ uint64_t MurmurHash64A(const void* key, int len, unsigned int seed) {
 		case 1:
 			h ^= uint64_t(data2[0]);
 			h *= m;
-	};
+	}
 
 	h ^= h >> r;
 	h *= m;
@@ -114,7 +114,7 @@ uint64_t MurmurHash64B(const void* key, int len, unsigned int seed) {
 		case 1:
 			h2 ^= ((unsigned char*)data)[0];
 			h2 *= m;
-	};
+	}
 
 	h1 ^= h2 >> 18;
 	h1 *= m;

@@ -1,11 +1,11 @@
+cmake_minimum_required(VERSION 3.1)
+
 project(exodus)
-
-cmake_minimum_required(VERSION 2.8)
-
-#use CMakeList.txt options in parent directory
 
 message("")
 message("--EXODUS CLI CMAKE INIT --")
+
+#use CMakeList.txt options in parent directory
 
 #allow relative link directories
 cmake_policy(SET CMP0015 NEW)

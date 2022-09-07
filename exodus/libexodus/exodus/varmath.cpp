@@ -99,7 +99,7 @@ var var::mod(CVR limit) const {
 
 		// use limit's double if available otherwise create it from limit's int/long
 		if (!(limit.var_typ & VARTYP_DBL)) {
-			limit.var_dbl = double(limit.var_int);
+			limit.var_dbl = static_cast<double>(limit.var_int);
 			// Dont register that the limit has a double
 			//limit.var_typ = limit.var_typ & VARTYP_DBL;
 		}
@@ -110,7 +110,7 @@ mod_doubles:
 
 	// if limit has a double then prefer it and convert this to double
 	if (limit.var_typ & VARTYP_DBL) {
-		var_dbl = double(this->var_int);
+		var_dbl = static_cast<double>(this->var_int);
 		// Dont register that this has a double
 		//var_typ = var_typ & VARTYP_DBL;
 		goto mod_doubles;
@@ -127,7 +127,7 @@ var var::mod(double limit) const {
 
 	// ensure double dividend
 	if (not (this->var_typ & VARTYP_DBL)) {
-		this->var_dbl = double(this->var_int);
+		this->var_dbl = static_cast<double>(this->var_int);
 		// Dont register that this has a double
 		//this->var_typ = this->var_typ & VARTYP_DBL;
 	}
@@ -142,7 +142,7 @@ var var::mod(const int limit) const {
 
 	// prefer double dividend
 	if (this->var_typ & VARTYP_DBL) {
-		return exodusmodulo_dbl(this->var_dbl, double(limit));
+		return exodusmodulo_dbl(this->var_dbl, static_cast<double>(limit));
 	}
 
 	// otherwise both ints
@@ -182,7 +182,7 @@ var var::sin() const {
 	if (this->var_typ & VARTYP_DBL)
 		return std::sin(var_dbl * M_PI / 180);
 	else
-		return std::sin(double(var_int) * M_PI / 180);
+		return std::sin(static_cast<double>(var_int) * M_PI / 180);
 
 	// cannot get here
 	throw VarError("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -197,7 +197,7 @@ var var::cos() const {
 	if (this->var_typ & VARTYP_DBL)
 		return std::cos(var_dbl * M_PI / 180);
 	else
-		return std::cos(double(var_int) * M_PI / 180);
+		return std::cos(static_cast<double>(var_int) * M_PI / 180);
 
 	// cannot get here
 	throw VarError("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -212,7 +212,7 @@ var var::tan() const {
 	if (this->var_typ & VARTYP_DBL)
 		return std::tan(var_dbl * M_PI / 180);
 	else
-		return std::tan(double(var_int) * M_PI / 180);
+		return std::tan(static_cast<double>(var_int) * M_PI / 180);
 
 	// cannot get here
 	throw VarError("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -227,7 +227,7 @@ var var::atan() const {
 	if (this->var_typ & VARTYP_DBL)
 		return std::atan(var_dbl) / M_PI * 180;
 	else
-		return std::atan(double(var_int)) / M_PI * 180;
+		return std::atan(static_cast<double>(var_int)) / M_PI * 180;
 
 	// cannot get here
 	throw VarError("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -242,7 +242,7 @@ var var::loge() const {
 	if (this->var_typ & VARTYP_DBL)
 		return std::log(var_dbl);
 	else
-		return std::log(double(var_int));
+		return std::log(static_cast<double>(var_int));
 
 	// cannot get here
 	throw VarError("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -258,7 +258,7 @@ var var::sqrt() const {
 		return std::sqrt(var_dbl);
 
 	//	if (this->var_typ & VARTYP_INT)
-	return std::sqrt(double(var_int));
+	return std::sqrt(static_cast<double>(var_int));
 
 	throw VarError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
@@ -273,7 +273,7 @@ var var::pwr(CVR exponent) const {
 	if (this->var_typ & VARTYP_DBL)
 		return std::pow(var_dbl, exponent.toDouble());
 	else
-		return std::pow(double(var_int), exponent.toDouble());
+		return std::pow(static_cast<double>(var_int), exponent.toDouble());
 
 	// cannot get here
 	throw VarError("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -288,7 +288,7 @@ var var::exp() const {
 	if (this->var_typ & VARTYP_DBL)
 		return std::exp(var_dbl);
 	else
-		return std::exp(double(var_int));
+		return std::exp(static_cast<double>(var_int));
 
 	// cannot get here
 	throw VarError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");

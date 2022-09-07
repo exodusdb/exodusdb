@@ -20,7 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <string.h>
+#include <cstring>//for strlen
+
+#include <string>
 #include <sstream>
 
 #include <exodus/varimpl.h>
@@ -304,7 +306,7 @@ var var::oconv_T(CVR format) const {
 					if (ii > 1)
 						output ^= TM;
 					output ^= word.substr(ii, width);
-				};	// ii;
+				}	// ii;
 
 				int remaining = width - (wordlen % width);
 
@@ -337,7 +339,7 @@ var var::oconv_T(CVR format) const {
 					}
 				}
 
-			};	// wordn;
+			}	// wordn;
 		}
 
 		if (!terminator)
@@ -713,7 +715,7 @@ var var::oconv(const char* conversion) const {
 				if (!terminator)
 					break;
 				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
-			};
+			}
 
 			return output;
 			break;

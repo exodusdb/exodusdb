@@ -1,5 +1,5 @@
-#ifndef VARDBCONNS_H
-#define VARDBCONNS_H
+#ifndef EXODUS_LIBEXODUS_EXODUS_VARDBCONN_H_
+#define EXODUS_LIBEXODUS_EXODUS_VARDBCONN_H_
 
 //
 // Exodus -
@@ -32,6 +32,8 @@
 
 //for postgresql's PGconn connection handle type
 #include <libpq-fe.h>
+
+#include <string>
 
 // Using map generally instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
@@ -114,7 +116,7 @@ class DBConnector final {
 	// ctors/dtors
 	//////////////
 
-	DBConnector(PGCONN_DELETER del_);
+	explicit DBConnector(PGCONN_DELETER del_);
 
 	//class marked as final so no need for virtual
 	//virtual ~DBConnector();
@@ -144,4 +146,4 @@ class DBConnector final {
 };
 
 }  // namespace exodus
-#endif	// VARDBCONNS_H
+#endif	//EXODUS_LIBEXODUS_EXODUS_VARDBCONN_H_

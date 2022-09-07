@@ -52,6 +52,7 @@ THE SOFTWARE.
 
 #include <limits> //for std::numeric_limits<double>::digits10
 
+#include <string>
 #include <sstream>
 
 //fastfloat  "1234.5678" -> 1234.5678  56ns (but does it round trip?)
@@ -628,7 +629,7 @@ bool var::toBool() const {
 	while (true) {
 		// ints are true except for zero
 		if (var_typ & VARTYP_INT)
-			return (bool)(var_int != 0);
+			return static_cast<bool>(var_int != 0);
 
 		// non-numeric strings are true unless zero length
 		if (var_typ & VARTYP_NAN)
@@ -653,7 +654,7 @@ bool var::toBool() const {
 
 		// must be string - try to convert to numeric and do all tests again
 		this->isnum();
-	};
+	}
 }
 
 int64_t var::toInt() const {

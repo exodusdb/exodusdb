@@ -1,5 +1,5 @@
-#ifndef VARERR_H
-#define VARERR_H
+#ifndef EXODUS_LIBEXODUS_EXODUS_VARERR_H_
+#define EXODUS_LIBEXODUS_EXODUS_VARERR_H_
 
 namespace exodus {
 
@@ -25,5 +25,5 @@ class PUBLIC DimNotDimensioned  : public VarError {public: explicit DimNotDimens
 
 } //namespace exodus
 
-#endif //VARERR_H
+#endif //EXODUS_LIBEXODUS_EXODUS_VARERR_H_
 

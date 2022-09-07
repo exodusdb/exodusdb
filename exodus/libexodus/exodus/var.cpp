@@ -21,6 +21,8 @@ THE SOFTWARE.
 */
 
 #include <iostream>
+#include <string>
+#include <utility> // for std::move
 
 //#include <cassert>
 #include <limits>
@@ -28,7 +30,9 @@ THE SOFTWARE.
 #include <vector>
 
 #define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
-#include <exodus/varimpl.h>
+#include <var.h>
+#include <varerr.h>
+//#include <exodus/varimpl.h>
 #include <exodus/exoimpl.h>
 
 namespace exodus {

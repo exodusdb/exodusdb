@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include <string>
+
 #include <algorithm>  //for dim::sort
 #include <cstring>	  //for strlen strstr
 
@@ -84,7 +86,8 @@ var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
 		end_pos = var_str.find(separatorx.var_str, end_pos);
 		// past of of string?
 		if (end_pos == std::string::npos) {
-			return var_str.substr(start_pos, var_str.size() - start_pos);
+			//return var_str.substr(start_pos, var_str.size() - start_pos);
+			return var_str.substr(start_pos);
 		}
 		// end_pos++;
 		end_pos += len_separator;
@@ -255,7 +258,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 	// find the starting position of the value or return ""
 	// using start_pos and end_pos of
-	int targetlen = (int)target.length();
+	int targetlen = static_cast<int>((target.length()));
 	int valuen2 = 1;
 	do {
 
@@ -358,12 +361,12 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 		// but pickos (by accidental error?) at least checks for the whole target
 		// even if the target contains the sep character
 		// if (var_str.substr(start_pos,nextstart_pos-start_pos)==target)
-		//(int) is to avoid warning of unsigned integer
+		//static_cast<int> is to avoid warning of unsigned integer
 		switch (order) {
 			// No order
 			case '\x00':
 				if (var_str.substr(start_pos, targetlen) == target) {
-					bool x = (int)(nextstart_pos - start_pos) <= targetlen;
+					bool x = static_cast<int>(nextstart_pos - start_pos) <= targetlen;
 					if (x) {
 						setting = valuen2;
 						return true;
@@ -482,7 +485,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
 
 		// convert the memory address to the char position within the codes
-		ordermode = int(orderindex - ordercodes);
+		ordermode = static_cast<int>(orderindex - ordercodes);
 		// add two and divide by two to get the order no AL=1 AR=2 DL=3 DR=4
 		ordermode = (ordermode + 2) >> 1;
 	}
@@ -1542,7 +1545,7 @@ VARREF var::substr(const int startindex1, const int length) && {
 VARREF var::substrer(const int startindex1) {
 	// TODO look at using erase to speed up
 	this->toString();
-	return this->substrer(startindex1, (int)var_str.size());
+	return this->substrer(startindex1, static_cast<int>(var_str.size()));
 }
 
 //[x,y]
@@ -1553,7 +1556,7 @@ VARREF var::substrer(const int startindex1, const int length) {
 	assertStringMutator(function_sig);
 
 	// return "" for ""
-	int max = (int)var_str.size();
+	int max = static_cast<int>(var_str.size());
 	if (max == 0) {
 		var_str.clear();
 		return *this;
@@ -1629,7 +1632,7 @@ var var::at(const int charno) const {
 	THISIS("var var::at(const int charno) const")
 	assertString(function_sig);
 
-	int nchars = int(var_str.size());
+	int nchars = static_cast<int>(var_str.size());
 
 	// beyond end of string return ""
 	// get this test out of the way first since it only has to be done later on anyway
@@ -1802,20 +1805,22 @@ var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const 
 	assertString(function_sig);
 	ISSTRING(delimiterchars)
 
-	std::string::size_type start_pos = startindex1 - 1;
+	std::string::size_type start_pos;
 
 	// domain check min startindex1
 	// handle before start of string
 	// startindex1 arg is 1 based per mv/pick standard
 	// remove treats anything below 1 as 1
 	// start_pos variable is zero based standard c++ logic
-	if (long(start_pos) < 0)
+	if (startindex1 > 0)
+		start_pos = startindex1 - 1;
+	else
 		start_pos = 0;
 
 	// domain check max startindex1
 	// handle after end of string
 	if (start_pos >= var_str.size()) {
-		endindex = int(var_str.size() + 1);
+		endindex = static_cast<int>(var_str.size() + 1);
 		return "";
 	}
 
@@ -1825,13 +1830,14 @@ var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const 
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
-		endindex = int(var_str.size() + 1);
-		return var_str.substr(start_pos, var_str.size() - start_pos);
+		endindex = static_cast<int>(var_str.size() + 1);
+		//return var_str.substr(start_pos, var_str.size() - start_pos);
+		return var_str.substr(start_pos);
 	}
 
 	// return the index of the dicovered delimiter
 	// unlike remove which returns the index of one AFTER the discovered delimiter
-	endindex = int(end_pos + 1);
+	endindex = static_cast<int>(end_pos + 1);
 
 	// extract and return the substr as well
 	return var_str.substr(start_pos, end_pos - start_pos);
@@ -1861,8 +1867,9 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 	// startindex1 arg is 1 based per mv/pick standard
 	// treats anything below 1 as 1
 	// start_pos variable is zero based standard c++ logic
-	if (long(start_pos) < 0)
-		start_pos = 0;
+	// start_pos cannot be < 0
+//	if (static_cast<long>(start_pos) < 0)
+//		start_pos = 0;
 
 	// domain check
 	// handle after end of string
@@ -1879,7 +1886,7 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 	// past of of string?
 	if (end_pos == std::string::npos) {
 		// wont work if string is the maximum string length but that cant occur
-		startindex1 = (int)(var_str.size() + 2);
+		startindex1 = static_cast<int>(var_str.size() + 2);
 		delimiterno = 0;
 		return var_str.substr(start_pos, var_str.size() - start_pos);
 		//returnable = (var_str.substr(start_pos, var_str.size() - start_pos));
@@ -1888,12 +1895,12 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 
 	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6
 	// delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_str[end_pos]);
-	delimiterno = int(*_RM) - int(var_str[end_pos]) + 1;
+	delimiterno = static_cast<int>(*_RM) - static_cast<int>(var_str[end_pos]) + 1;
 
 	// point AFTER the found separator or TWO after the length of the string (TODO shouldnt this
 	// be one??/bug in pickos) wont work if string is the maximum string length but that cant
 	// occur
-	startindex1 = int(end_pos + 2);
+	startindex1 = static_cast<int>(end_pos + 2);
 
 	// extract and return the substr as well
 	return var_str.substr(start_pos, end_pos - start_pos);
@@ -1911,7 +1918,7 @@ class PUBLIC var_brackets_proxy {
 
 	// Constructor from a var and an index
 	var_brackets_proxy(VARREF var1, int index) : var_(var1), index_(index) {
-	};
+	}
 
 	// Implicit conversion to var
 	operator var() const {
@@ -1946,7 +1953,7 @@ class PUBLIC var_brackets_proxy {
 		return var_.at(index_) ^ appendage;
 	}
 
-};
+}
 
 // could be used if var_brackets_proxy holds a string perhaps for performance
 
@@ -1960,7 +1967,7 @@ var_brackets_proxy::operator var() const {
 			index_ = 1;
 	}
 	//off end - return ""
-	else if (uint(index_) > str_.length())
+	else if (static_cast<unsigned int>(index_) > str_.length())
 		return "";
 
 	//within range
@@ -1977,7 +1984,7 @@ void var_brackets_proxy::operator=(char char1) {
 			index_ = 1;
 	}
 	//off end - return ""
-	else if (uint(index_) > str_.length()) {
+	else if (static_cast<unsigned int>(index_) > str_.length()) {
 		str_.push_back(char1);
 	} else {
 		str_[index_ - 1] = char1;
@@ -2047,7 +2054,7 @@ var var::sum() const {
 	for (min_sep_present = min_sep; min_sep_present <= max_sep; ++min_sep_present) {
 		if (this->index(var().chr(min_sep_present)))
 			break;
-	};
+	}
 	if (min_sep_present > max_sep) {
 
 		//for clarity of error message,

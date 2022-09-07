@@ -152,7 +152,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
 
 	//Allocate memory for watch descriptors
 	// or crash
-	wd = (int*)calloc(argc, sizeof(int));
+	wd = reinterpret_cast<int*>(calloc(argc, sizeof(int)));
 	if (wd == nullptr) {
 		perror("mvwait: calloc");
 		exit(EXIT_FAILURE);

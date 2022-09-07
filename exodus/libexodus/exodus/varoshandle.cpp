@@ -5,7 +5,7 @@
 #include <cassert>
 
 #define INSIDE_VAR_OSHANDLE_CPP  // global obj in "varoshandle.h"
-#include "varoshandle.h"
+#include <exodus/varoshandle.h>
 
 #include <mutex>
 std::mutex mvhandles_mutex;
@@ -26,11 +26,11 @@ int VarOSHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DES
 	//std::lock_guard lock(mvhandles_mutex);
 
 	int ix;
-	for (ix = 0; ix < (int)conntbl.size(); ix++)
+	for (ix = 0; ix < static_cast<int>(conntbl.size()); ix++)
 		if (conntbl[ix].deleter == nullptr)
 			break;
 
-	if (ix == (int)conntbl.size())
+	if (ix == static_cast<int>(conntbl.size()))
 		conntbl.resize(ix * 2);	 // double the table size
 
 	conntbl[ix].deleter = del;
@@ -62,7 +62,7 @@ VarOSHandlesCache::~VarOSHandlesCache() {
 	// std::lock_guard lock(mvhandles_mutex);
 
 	int ix;
-	for (ix = 0; ix < (int)conntbl.size(); ix++)
+	for (ix = 0; ix < static_cast<int>(conntbl.size()); ix++)
 		if (conntbl[ix].deleter != nullptr) {
 			// do not call 'del_handle(ix)' here because of deadlock
 			conntbl[ix].deleter(conntbl[ix].handle);
