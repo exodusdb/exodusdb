@@ -158,7 +158,7 @@ function main() {
 		assert(unique("x]y]x]z"_var) eq convert("x]y]z","]",VM));
 		assert(unique("x}y}x}z"_var) eq convert("x}y}z","}",SM));
 		assert(unique("x|y|x|z"_var) eq convert("x|y|z","|",TM));
-		assert(unique("x~y~x~z"_var) eq convert("x~y~z","~",STM));
+		assert(unique("x~y~x~z"_var) eq convert("x~y~z","~",ST));
 	}
 
 	{
@@ -168,7 +168,7 @@ function main() {
 		x="x]y]x]z"_var;uniquer(x); assert(x eq convert("x]y]z","]",VM));
 		x="x}y}x}z"_var;uniquer(x); assert(x eq convert("x}y}z","}",SM));
 		x="x|y|x|z"_var;uniquer(x); assert(x eq convert("x|y|z","|",TM));
-		x="x~y~x~z"_var;uniquer(x); assert(x eq convert("x~y~z","~",STM));
+		x="x~y~x~z"_var;uniquer(x); assert(x eq convert("x~y~z","~",ST));
 	}
 
 	{

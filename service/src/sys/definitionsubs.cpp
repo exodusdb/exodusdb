@@ -650,7 +650,7 @@ subroutine reorderdbs() {
 	//dbdir=field(dbdir,char(26),1)
 	dbdir.converter("\r\n", FM ^ FM);
 	dbdir.swapper(FM ^ FM, FM);
-	dbdir.converter(",*", SVM ^ VM);
+	dbdir.converter(",*", SM ^ VM);
 
 	//extract substitution and dblist from dbdir line 1
 	var substitution = dbdir.f(1).field(" ", 1);
@@ -677,7 +677,7 @@ subroutine reorderdbs() {
 	if (newdbdir[-1] ne FM) {
 		newdbdir ^= FM;
 	}
-	newdbdir.converter(SVM ^ VM, ",*");
+	newdbdir.converter(SM ^ VM, ",*");
 	newdbdir.swapper(FM, "\r\n");
 
 	if (newdbdir ne olddbdir) {

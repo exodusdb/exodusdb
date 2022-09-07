@@ -27,7 +27,7 @@ function main() {
 	assert(var("60" _VM_ "120").oconv("MT")=="00:01" _VM_ "00:02");
 	assert(var("60" _SM_ "120").oconv("MT")=="00:01" _SM_ "00:02");
 	assert(var("60" _TM_ "120").oconv("MT")=="00:01" _TM_ "00:02");
-	assert(var("60" _STM_ "120").oconv("MT")=="00:01" _STM_ "00:02");
+	assert(var("60" _ST_ "120").oconv("MT")=="00:01" _ST_ "00:02");
 
 	//test that some random times iconv/oconv roundtrip ok
 	initrnd(1000);

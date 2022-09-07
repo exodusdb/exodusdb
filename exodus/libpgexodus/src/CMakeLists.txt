@@ -52,7 +52,8 @@ add_library(pgexodus SHARED
 
  mvconfig.h
  #callexodus.cpp callexodus_ms.cpp callexodus_posix.cpp
- naturalorder.cpp pgnaturalorder.cpp extract.c pgexodus.c
+ #naturalorder.cpp pgnaturalorder.cpp
+ extract.c pgexodus.c
 
 )
 

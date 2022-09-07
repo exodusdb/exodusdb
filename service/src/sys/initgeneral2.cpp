@@ -90,10 +90,10 @@ function main(in mode, io logtime, in menu) {
 		//remove blank lines and convert fm to sm
 		hosts.converter(FM, " ");
 		hosts.trimmer();
-		hosts.converter(" ", SVM);
+		hosts.converter(" ", SM);
 
 		//remove any trailing . from 10. etc which is valid syntax for hosts.allow
-		hosts.swapper("." ^ SVM, SVM);
+		hosts.swapper("." ^ SM, SM);
 		if (hosts[-1] eq ".") {
 			hosts.popper();
 		}
@@ -118,9 +118,9 @@ function main(in mode, io logtime, in menu) {
 		if (configips eq "") {
 			configips = "192.168 10 172";
 		}
-		configips.converter(" ", SVM);
+		configips.converter(" ", SM);
 		configips.swapper(".*", "");
-		nn = configips.count(SVM) + (configips ne "");
+		nn = configips.count(SM) + (configips ne "");
 		for (const var ii : range(nn, 1)) {
 			var ipno = configips.f(1, 1, ii);
 			if (ipno.field(".", 1) eq "10") {
@@ -129,7 +129,7 @@ function main(in mode, io logtime, in menu) {
 			} else if (ipno.field(".", 1, 2) eq "192.168") {
 			} else {
 				//delete all WAN (non-LAN) ranges and allow only fully specced WAN ips
-				if (ipno.count(SVM) ne 3) {
+				if (ipno.count(SM) ne 3) {
 					configips.remover(1, 1, ii);
 				}
 			}
@@ -144,7 +144,7 @@ function main(in mode, io logtime, in menu) {
 		hosts.inserter(1, 1, 4, "172");
 		hosts.inserter(1, 1, 5, configips);
 
-		hosts.converter(SVM, " ");
+		hosts.converter(SM, " ");
 		hosts.trimmer();
 
 		hosts.write(DEFINITIONS, "IPNOS*EXODUS");

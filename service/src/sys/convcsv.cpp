@@ -74,8 +74,8 @@ function main(in sentence0, in select0="", in filters0="") {
 	if (nfilters) {
 		filters.redim(3, nfilters);
 		for (const var filtern : range(1, nfilters)) {
-			filters(1, filtern) = filterfields.f(1, filtern).convert(SVM, VM);
-			filters(3, filtern) = filtervalues.f(1, filtern).convert(SVM, VM);
+			filters(1, filtern) = filterfields.f(1, filtern).convert(SM, VM);
+			filters(3, filtern) = filtervalues.f(1, filtern).convert(SM, VM);
 		} //filtern;
 	}
 

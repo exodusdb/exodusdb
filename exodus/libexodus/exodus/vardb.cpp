@@ -3174,7 +3174,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 							dictfile, word1, joins, unnests, selects, ismv, forsort);
-			var usingnaturalorder = dictexpression.index("exodus_extract_sort") or dictexpression.index("exodus_natural");
+			//var usingnaturalorder = dictexpression.index("exodus_extract_sort") or dictexpression.index("exodus_natural");
 			var dictid = word1;
 
 			//var dictexpression_isarray=dictexpression.index("string_to_array(");
@@ -3240,10 +3240,11 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 						"BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)");
 				}
 
-				if (usingnaturalorder) {
-					word1 = naturalorder(word1.var_str);
-					word2 = naturalorder(word2.var_str);
-				}
+				// Replaced by COLLATE
+				//if (usingnaturalorder) {
+				//	word1 = naturalorder(word1.var_str);
+				//	word2 = naturalorder(word2.var_str);
+				//}
 
 				// no filtering in database on calculated items
 				//save then for secondary filtering
@@ -3591,9 +3592,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// op and value(s) are now set
 
+			// Replaced by COLLATE
 			// natural order value(s)
-			if (usingnaturalorder)
-				value = naturalorder(value.var_str);
+			//if (usingnaturalorder)
+			//	value = naturalorder(value.var_str);
 
 			// without xxx = "abc"
 			// with xxx not = "abc"

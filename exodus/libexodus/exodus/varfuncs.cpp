@@ -1331,7 +1331,7 @@ VARREF var::cropper() {
 		++iter;
 
 		// simply append ordinary characters
-		if (charx < STM_ || charx > RM_) {
+		if (charx < ST_ || charx > RM_) {
 			newstr.push_back(charx);
 			continue;
 		}
@@ -1341,7 +1341,7 @@ VARREF var::cropper() {
 		// remove any lower separators from the end of the string
 		while (!newstr.empty()) {
 			char lastchar = newstr.back();
-			if (lastchar >= STM_ && lastchar < charx)
+			if (lastchar >= ST_ && lastchar < charx)
 				newstr.pop_back();
 			else
 				break;
@@ -1352,7 +1352,7 @@ VARREF var::cropper() {
 	}
 
 	// remove any trailing separators
-	while (!newstr.empty() && newstr.back() >= STM_ && newstr.back() <= RM_) {
+	while (!newstr.empty() && newstr.back() >= ST_ && newstr.back() <= RM_) {
 		newstr.pop_back();
 	}
 
@@ -1380,11 +1380,11 @@ VARREF var::lowerer() {
 	//assertString(function_sig);
 
 	// note: rotate lowest sep to highest
-	//this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _FM_ _VM_ _SM_ _TM_ _STM_ _RM_);
+	//this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, _FM_ _VM_ _SM_ _TM_ _ST_ _RM_);
 
-	//bottom marks get crushed together but STM is infrequently used
-	// reversible by raiser only if no STM chars are present - which are not common
-	this->converter(_RM_ _FM_ _VM_ _SM_ _TM_, _FM_ _VM_ _SM_ _TM_ _STM_);
+	//bottom marks get crushed together but ST is infrequently used
+	// reversible by raiser only if no ST chars are present - which are not common
+	this->converter(_RM_ _FM_ _VM_ _SM_ _TM_, _FM_ _VM_ _SM_ _TM_ _ST_);
 
 	return *this;
 }
@@ -1408,11 +1408,11 @@ VARREF var::raiser() {
 
 	// note: rotate highest sep to lowest
 	// advantage is it is reversible by lowerer but the problem is that the smallest delimiter becomes the largest
-	//this->converter(_FM_ _VM_ _SM_ _TM_ _STM_ _RM_, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+	//this->converter(_FM_ _VM_ _SM_ _TM_ _ST_ _RM_, _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
 
 	// top two marks get crushed together but RM is rarely used
 	// reversible by lowerer only if no RM are present - which are rare
-	this->converter(_FM_ _VM_ _SM_ _TM_ _STM_, _RM_ _FM_ _VM_ _SM_ _TM_);
+	this->converter(_FM_ _VM_ _SM_ _TM_ _ST_, _RM_ _FM_ _VM_ _SM_ _TM_);
 
 	return *this;
 }
@@ -1428,6 +1428,7 @@ void string_converter(T1& var_str, const T2 oldchars, const T3 newchars) {
 	//	std::replace(var_str.begin(), var_str.end(), oldchars[0], newchars[0]);
 	//}
 
+	int newchars_size = newchars.length();
 	while (true) {
 		// locate (backwards) any of the from characters
 		// because we might be removing characters
@@ -1440,7 +1441,7 @@ void string_converter(T1& var_str, const T2 oldchars, const T3 newchars) {
 		// find which from character we have found
 		int fromcharn = int(oldchars.find(var_str[pos]));
 
-		if (fromcharn < int(newchars.length()))
+		if (fromcharn < newchars_size)
 			var_str.replace(pos, 1, newchars.substr(fromcharn, 1));
 			//var_str.replace(pos, 1, newchars[fromcharn]);
 		else

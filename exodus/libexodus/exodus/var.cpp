@@ -68,7 +68,7 @@ void var::throwNonNumeric(CVR message) const {
 CVR var::dump(SV text) const {
 //	std::clog << "DUMP: " << text << " ";
 //	if (var_typ & VARTYP_STR)
-//		std::clog << "str: " _DQ_ << var(var_str).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS) << _DQ_ " ";
+//		std::clog << "str: " _DQ_ << var(var_str).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, VISIBLE_FMS) << _DQ_ " ";
 //	if (var_typ & VARTYP_INT)
 //		std::clog << "int:" << var_int << " ";
 //	if (var_typ & VARTYP_DBL)
@@ -82,7 +82,7 @@ VARREF var::dump(SV text) {
 	std::clog << "DUMP: " << text << " ";
 	if (var_typ & VARTYP_STR)
 		//std::clog << "str: \"" << var_str << "\" ";
-		std::clog << "str: " _DQ_ << var(var_str).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS) << _DQ_ " ";
+		std::clog << "str: " _DQ_ << var(var_str).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, VISIBLE_FMS) << _DQ_ " ";
 	if (var_typ & VARTYP_INT)
 		std::clog << "int:" << var(var_int) << " ";
 	if (var_typ & VARTYP_DBL)

@@ -26,9 +26,9 @@ function main(in a0, io bb, in sep) {
 	var aa = a0;
 
 	//work as if vms
-	if (sep eq SVM) {
-		aa.converter(SVM, VM);
-		bb.converter(SVM, VM);
+	if (sep eq SM) {
+		aa.converter(SM, VM);
+		bb.converter(SM, VM);
 	}
 
 	var na = aa.count(VM) + (aa ne "");
@@ -80,8 +80,8 @@ function main(in a0, io bb, in sep) {
 	} //an;
 
 	//work as if vms
-	if (sep eq SVM) {
-		bb.converter(VM, SVM);
+	if (sep eq SM) {
+		bb.converter(VM, SM);
 	}
 
 	return 0;

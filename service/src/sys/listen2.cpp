@@ -636,7 +636,7 @@ passwordexpired:
 			//from GBP, $HOSTS.ALLOW at process startup
 			if (validips.read(DEFINITIONS, "IPNOS*" ^ username)) {
 				//should be removed after medialine is upgraded
-				validips.converter(SVM, " ");
+				validips.converter(SM, " ");
 			} else {
 				validips = "127 192.168 10 172";
 			}

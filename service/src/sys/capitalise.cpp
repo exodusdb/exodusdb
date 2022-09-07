@@ -51,13 +51,13 @@ subroutine process(in str0, in mode, io wordseps) {
 
 	if (wordseps.unassigned()) {
 		wordseps = " .()&_";
-		wordseps ^= _RM_ _FM_ _VM_ _SM_ _TM_ _STM_;
+		wordseps ^= _RM_ _FM_ _VM_ _SM_ _TM_ _ST_;
 	}
 
 	if (mode eq "QUOTE") {
 		string2 = str0;
 		if (string2 ne "") {
-			string2.converter(FM ^ VM ^ SVM ^ TM, "    ");
+			string2.converter(FM ^ VM ^ SM ^ TM, "    ");
 			string2.swapper(" ", "\" \"");
 			string2 = string2.quote();
 		}

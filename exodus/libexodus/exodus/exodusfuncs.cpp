@@ -1117,7 +1117,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	//		EXECPATH.converter("/","\\");
 	//}
 	// leave a global copy where backtrace can get at it
-	EXECPATH2 = mv.EXECPATH;
+	//EXECPATH2 = mv.EXECPATH;
 
 	mv.SENTENCE = "";  // ALN:TODO: hm, again, char->var-> op=(var)
 

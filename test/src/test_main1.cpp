@@ -837,10 +837,11 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(textchr(0x10FFFF)!="");
 	assert(textchr(0x110000)=="");
 
-	var cmd = "c:\\windowspath\\to\\xyz.exe arg1 arg2";
+	var cmd = "c:\\xwindowspath_test_main1_\\to\\xyz.exe arg1 arg2";
 	//assert(var(to_oscmd_string(cmd) == cmd.convert("\\",OSSLASH));
 	// No conversion at the moment
-	assert(to_oscmd_string(cmd) == cmd);
+	//assert(to_oscmd_string(cmd) == cmd);
+	assert(not osshell(cmd));
 
 	printl("Test passed");
 

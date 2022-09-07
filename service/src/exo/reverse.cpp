@@ -27,12 +27,12 @@ function main(in input0) {
 		sep = FM;
 	} else if (input0.index(VM, 1)) {
 		sep = VM;
-	} else if (input0.index(SVM, 1)) {
-		sep = SVM;
+	} else if (input0.index(SM, 1)) {
+		sep = SM;
 	} else if (input0.index(TM, 1)) {
 		sep = TM;
-	} else if (input0.index(STM, 1)) {
-		sep = STM;
+	} else if (input0.index(ST, 1)) {
+		sep = ST;
 	} else {
 		return input0;
 	}

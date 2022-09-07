@@ -5,7 +5,7 @@ libraryinit(keywords)
 function main() {
 	ANS = RECORD.f(2);
 	ANS.swapper(VM, ", ");
-	ANS.swapper(SVM, ", ");
+	ANS.swapper(SM, ", ");
 	return ANS;
 }
 /*pgsql
@@ -21,7 +21,7 @@ libraryinit(text2)
 function main() {
 	ANS = RECORD.f(3);
 	var distrib = RECORD.f(5);
-	distrib.converter(SVM, ":");
+	distrib.converter(SM, ":");
 	if (distrib and not(distrib.index("User"))) {
 		ANS.splicer(1, 0, distrib.field(":", 1) ^ ": ");
 	}

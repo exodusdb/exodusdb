@@ -103,7 +103,7 @@ function main() {
 	var usercodename = ",USER_CODE";
 
 	var filename = "STATISTICS";
-	rowfields.converter(SVM, VM);
+	rowfields.converter(SM, VM);
 
 	//remove col field from row fields because not logical or useful
 	if (rowfields.locate(colfield, vn)) {

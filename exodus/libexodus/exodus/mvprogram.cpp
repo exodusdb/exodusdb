@@ -1009,7 +1009,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		var inquotes = 0;
 		// wordseps=' /-.()&'
 		if (wordseps0.unassigned())
-			wordseps = " .()&_" _RM_ _FM_ _VM_ _SM_ _TM_ _STM_;
+			wordseps = " .()&_" _RM_ _FM_ _VM_ _SM_ _TM_ _ST_;
 		else
 			wordseps = wordseps0;
 		for (int ii = 1; ii <= nn; ii++) {
@@ -1049,7 +1049,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 	} else if (mode0 == "QUOTE") {
 		string2 = str0;
 		if (string2 != "") {
-			string2.converter(FM ^ VM ^ SVM ^ TM, "    ");
+			string2.converter(FM ^ VM ^ SM ^ TM, "    ");
 			string2.swapper(" ", "\" \"");
 			string2 = string2.quote();
 		}
@@ -1580,7 +1580,7 @@ var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const i
 
 	// question can be multiline
 	var question = questionx;
-	question.converter(STM ^ TM ^ SM ^ VM ^ "|" ^ FM, "\n\n\n\n\n\n");
+	question.converter(ST ^ TM ^ SM ^ VM ^ "|" ^ FM, "\n\n\n\n\n\n");
 
 	var interactive = !SYSTEM.f(33);
 	if (interactive)
@@ -2225,7 +2225,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 				// and call it
 				//call ioconv_custom("OCONV", result, mode, output);
 
-				//call it once per field (any field mark RM-STM are preserved)
+				//call it once per field (any field mark RM-ST are preserved)
 				var posn = 1;
 				var ifield, ofield, delim;
 				output = "";

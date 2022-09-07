@@ -43,7 +43,7 @@ function main(io listitems) {
 		}
 	} //ii;
 
-	listitems.converter(SVM, "-");
+	listitems.converter(SM, "-");
 
 	return 0;
 }

@@ -87,8 +87,8 @@ function main() {
 
 	var r1 = _FM_ "0.123";
 	assert(r1.regex_replace("([\x1A-\x1F]-?)0.","$1.") == _FM_ ".123");
-	var r2 = _STM_ "-0.123";
-    assert(r2.regex_replace("([\x1A-\x1F]-?)0.","$1.") == _STM_ "-.123");
+	var r2 = _ST_ "-0.123";
+    assert(r2.regex_replace("([\x1A-\x1F]-?)0.","$1.") == _ST_ "-.123");
 
 	//replacing unicode style numbers characters using javascript style regex
 	//assert(var("Ⅻ").regex_replace(R"(\p{Number})","yes")=="yes");

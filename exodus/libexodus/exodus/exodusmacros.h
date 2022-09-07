@@ -149,27 +149,11 @@ using out = var&;      // VARREF;
 
 //perhaps a little crazy but included last so should not interfer with other heads
 //allow syntax like "read(rec from file)" and "convert(a to b)"
+//sadly "in" cannot be used since it is already used for "cnst var&"
 #define on ,
 #define from ,
 #define with ,
 #define to ,
-
-// narrow char* versions of classic pick delimiters
-//_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
-//#define _RM "\u01FF"
-//#define _FM "\u01FE"
-//#define _VM "\u01FD"
-//#define _SM "\u01FC"
-//#define _TM "\u01FB"
-//#define _STM "\u01FA"
-
-// aliases for different multivalue implementations
-//#define _IM _RM
-//#define _AM _FM
-//#define _SVM _SM
-
-//#define _DQ "\""
-//#define _SQ "\'"
 
 #define ID mv.ID
 #define RECORD mv.RECORD
@@ -178,7 +162,6 @@ using out = var&;      // VARREF;
 #define MV mv.MV
 #define PSEUDO mv.PSEUDO
 #define DATA mv.DATA
-//#define LISTACTIVE mv.LISTACTIVE
 #define LISTACTIVE hasnext()
 
 #define USERNAME mv.USERNAME

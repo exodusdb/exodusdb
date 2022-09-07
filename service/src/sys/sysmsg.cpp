@@ -221,7 +221,7 @@ function main(in msg0, in subject0="", in username0="") {
 
 		if (USER0) {
 			temp = USER0;
-			temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, "`^]}\\~");
+			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ ST, "`^]}\\~");
 			body(-1) = oconv("Request:", l9) ^ temp;
 		}
 
@@ -240,7 +240,7 @@ function main(in msg0, in subject0="", in username0="") {
 			temp.swapper("}", "%7D");
 			temp.swapper("\\", "%5C");
 			temp.swapper("~", "%7E");
-			temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, "`^]}\\~");
+			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ ST, "`^]}\\~");
 			body(-1) = oconv("Data:", l9) ^ temp;
 		}
 
@@ -249,7 +249,7 @@ function main(in msg0, in subject0="", in username0="") {
 			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(var().date(), requeststarttime);
 		}
 
-		body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
+		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
 		body.swapper("\r", "\r\n");
 
 	}

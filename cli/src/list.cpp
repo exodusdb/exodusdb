@@ -535,19 +535,19 @@ function main() {
 	}
 
 	if (not(tt.read(dictvoc, "@ID"))) {
-		var("F|0|TABLE_NAME|S|1||||L|20||VARCHAR").converter("|", FM).write(dictvoc, "TABLE_NAME");
-		var("F|0|COLUMN_NAME|S|2||||L|20").converter("|", FM).write(dictvoc, "COLUMN_NAME");
-		var("G||TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG|||||||||||||||||||||||||0").converter("|", FM).write(dictvoc, "@CRT");
-		var("F|0|Ref.|S|0||||T|20").converter("|", FM).write(dictvoc, "@ID");
-		var("F|1|TYPE|S|0||||L|4").converter("|", FM).write(dictvoc, "TYPE");
-		var("F|2|FMC|S|0||||R|3").converter("|", FM).write(dictvoc, "FMC");
-		var("F|5|PART|S|0||||R|2").converter("|", FM).write(dictvoc, "PART");
-		var("F|3|HEADING|S|0||||T|20").converter("|", FM).write(dictvoc, "HEADING");
-		var("F|4|SM|S|0||||L|4").converter("|", FM).write(dictvoc, "SM");
-		var("F|7|CONV|S|0||||L|9").converter("|", FM).write(dictvoc, "CONV");
-		var("F|9|JST|S|0||||L|3").converter("|", FM).write(dictvoc, "JUST");
-		var("F|10|LEN|S|0||||R|3||LENGTH").converter("|", FM).write(dictvoc, "LEN");
-		var("F|28|MST|S|||BYes,||L|4").converter("|", FM).write(dictvoc, "MASTER_FLAG");
+		write("F^0^TABLE_NAME^S^1^^^^L^20^^VARCHAR"_var on dictvoc, "TABLE_NAME");
+		write("F^0^COLUMN_NAME^S^2^^^^L^20"_var on dictvoc, "COLUMN_NAME");
+		write("G^^TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG^^^^^^^^^^^^^^^^^^^^^^^^^0"_var on dictvoc, "@CRT");
+		write("F^0^Ref.^S^0^^^^T^20"_var on dictvoc, "@ID");
+		write("F^1^TYPE^S^0^^^^L^4"_var on dictvoc, "TYPE");
+		write("F^2^FMC^S^0^^^^R^3"_var on dictvoc, "FMC");
+		write("F^5^PART^S^0^^^^R^2"_var on dictvoc, "PART");
+		write("F^3^HEADING^S^0^^^^T^20"_var on dictvoc, "HEADING");
+		write("F^4^SM^S^0^^^^L^4"_var on dictvoc, "SM");
+		write("F^7^CONV^S^0^^^^L^9"_var on dictvoc, "CONV");
+		write("F^9^JST^S^0^^^^L^3"_var on dictvoc, "JUST");
+		write("F^10^LEN^S^0^^^^R^3^^LENGTH"_var on dictvoc, "LEN");
+		write("F^28^MST^S^^^BYes,^^L^4"_var on dictvoc, "MASTER_FLAG");
 	}
 
 	colname.redim(maxncols);
@@ -1541,7 +1541,7 @@ nextdict:
 				if (dictrec.f(4).field(".", 1) eq limits.f(4, limitn)) {
 					tt = dictrec.f(2);
 					if (tt) {
-						if (not(limits.f(5, limitn).locateusing(SVM, tt, xx))) {
+						if (not(limits.f(5, limitn).locateusing(SM, tt, xx))) {
 							limits(5, limitn, -1) = dictrec.f(2);
 						}
 					}
@@ -1678,7 +1678,7 @@ nextrec:
 
 			//find maximum mv number for the associated group of fns
 			fns = limits.f(5, limitn);
-			nfns = fns.count(SVM) + (SVM ne "");
+			nfns = fns.count(SM) + (SM ne "");
 			nmvs = 0;
 			for (fnn = 1; fnn <= nfns; ++fnn) {
 				fn = fns.f(1, 1, fnn);
@@ -1698,7 +1698,7 @@ nextrec:
 					tt = "\"\"";
 				}
 				//locate tt in (limits<3,limitn>)<1,1> using sm setting xx else
-				if (not(limits.f(3, limitn).locateusing(SVM, tt, xx))) {
+				if (not(limits.f(3, limitn).locateusing(SM, tt, xx))) {
 					for (fnn = 1; fnn <= nfns; ++fnn) {
 						RECORD.remover(fns.f(1, 1, fnn), mvx);
 					};	//fnn;

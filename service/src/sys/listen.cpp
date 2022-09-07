@@ -2889,7 +2889,7 @@ subroutine properlock() {
 	srcfile2 = win.srcfile;
 	/*
 	if (not(win.srcfile.unassigned())) {
-		srcfile2.swapper("SHADOW.MFS" ^ SVM, "");
+		srcfile2.swapper("SHADOW.MFS" ^ SM, "");
 	}
 	*/
 
@@ -2916,7 +2916,7 @@ subroutine properunlock() {
 	//will be removed as well
 	srcfile2 = win.srcfile;
 	/*
-	srcfile2.swapper("SHADOW.MFS" ^ SVM, "");
+	srcfile2.swapper("SHADOW.MFS" ^ SM, "");
 	*/
 
 	srcfile2.unlock( keyx);

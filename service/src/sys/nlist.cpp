@@ -1423,7 +1423,7 @@ nextdict:
 				if (dictrec.f(4).field(".", 1) eq limits.f(4, limitn)) {
 					tt = dictrec.f(2);
 					if (tt) {
-						if (not(limits.f(5, limitn).locateusing(SVM, tt, xx))) {
+						if (not(limits.f(5, limitn).locateusing(SM, tt, xx))) {
 							limits(5, limitn, -1) = dictrec.f(2);
 						}
 					}
@@ -1581,7 +1581,7 @@ nextrec:
 
 			//find maximum mv number for the associated group of fns
 			fns = limits.f(5, limitn);
-			nfns = fns.count(SVM) + (SVM ne "");
+			nfns = fns.count(SM) + (SM ne "");
 			nmvs = 0;
 			for (fnn = 1; fnn <= nfns; ++fnn) {
 				fn = fns.f(1, 1, fnn);
@@ -1601,7 +1601,7 @@ nextrec:
 					tt = "\"\"";
 				}
 				//locate tt in (limits<3,limitn>)<1,1> using sm setting xx else
-				if (not(limits.f(3, limitn).locateusing(SVM, tt, xx))) {
+				if (not(limits.f(3, limitn).locateusing(SM, tt, xx))) {
 					for (fnn = 1; fnn <= nfns; ++fnn) {
 						RECORD.remover(fns.f(1, 1, fnn), mvx);
 					} //fnn;

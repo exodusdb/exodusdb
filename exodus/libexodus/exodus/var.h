@@ -95,12 +95,12 @@ THE SOFTWARE.
 #define _VM_ "\x1D"      // Value Mark
 #define _SM_ "\x1C"      // Subvalue Mark
 #define _TM_ "\x1B"      // Text Mark
-#define _STM_ "\x1A"  // Subtext Mark
+#define _ST_ "\x1A"  // Subtext Mark
 
-// aliases for different implementations of multivalue
-#define _IM_ _RM_
-#define _AM_ _FM_
-#define _SVM_ _SM_
+//// aliases for different implementations of multivalue
+//#define _IM_ _RM_
+//#define _AM_ _FM_
+//#define _SVM_ _SM_
 
 #define _BS_ "\\"
 #define _DQ_ "\""
@@ -112,12 +112,12 @@ THE SOFTWARE.
 #define VM_ '\x1D'     // Value Mark
 #define SM_ '\x1C'     // Subvalue Mark
 #define TM_ '\x1B'     // Text Mark
-#define STM_ '\x1A'     // Subtext Mark
+#define ST_ '\x1A'     // Subtext Mark
 
-// aliases for different implementations of multivalue
-#define IM_ RM_
-#define AM_ FM_
-#define SVM_ SM_
+//// aliases for different implementations of multivalue
+//#define IM_ RM_
+//#define AM_ FM_
+//#define SVM_ SM_
 
 #define BS_ '\\'
 #define DQ_ '\"'
@@ -128,14 +128,16 @@ THE SOFTWARE.
 // Used in var::remove()
 #define LASTDELIMITERCHARNOPLUS1 0x20
 
+// print() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
 //#define VISIBLE_FMS "_]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
 //#define VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
 #define VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
+#define ALL_FMS _RM_ _FM_ _VM_ _SM_ _TM_ _ST_
 
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
+	var(EXPRESSION).convert(ALL_FMS, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
 
 #define DEFAULT_UNASSIGNED = var()
 #define DEFAULT_EMPTY = ""
@@ -1004,7 +1006,6 @@ class PUBLIC var final {
 	PUBLIC ND friend var_iter begin(CVR v);
 	PUBLIC ND friend var_iter end(CVR v);
 
-
 	friend class dim;
 	//friend class var_brackets_proxy;
 
@@ -1040,6 +1041,8 @@ class PUBLIC var final {
 	PUBLIC ND friend var var_cat_cstr(CVR         lhs,  const char* cstr);
 	PUBLIC ND friend var var_cat_char(CVR         lhs,  const char  char2);
 	PUBLIC ND friend var cstr_cat_var(const char* cstr, CVR         rhs);
+
+	ND friend var operator""_var(const char* cstr, std::size_t size);
 
 	//////////////////////////////
 	// OPERATOR FRIENDS - pure var
@@ -1343,8 +1346,25 @@ class PUBLIC var final {
 		var clone;
 		clone.var_typ = var_typ;
 		clone.var_str = var_str;
-		clone.var_int = var_int;
-		clone.var_dbl = var_dbl;
+
+		// Avoid copying int and dbl in case cloning an unassigned var
+		// since default ctor var() = default and int/dbl are not initialised to zero.
+		//
+		// Strategy is as follows:
+		//
+		// Cloning uninitialised data should leave the target uninitialised as well
+		//
+		// If var implementation ever changes so that int/dbl must be cloned
+		// even if vartype is unassigned then int/dbl will have to be default initialised
+		// to something, probably zero.
+		//
+		// Avoid triggering a compiler warning
+		// warning: ‘<anonymous>.exodus::var::var_dbl’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+		if (var_typ) {
+			clone.var_int = var_int;
+			clone.var_dbl = var_dbl;
+		}
+
 		return clone;
 	}
 
@@ -1557,7 +1577,7 @@ class PUBLIC var final {
 	// correctly lined up mv to mv, sv to sv, tm to tm even when particular columns were missing
 	// some vm/sm/tm
 	// it is like substr(startindex,delimiterbytes,endindex) except that the delimiter bytes are
-	// hard coded as the usual RM/FM/VM/SM/TM/STM
+	// hard coded as the usual RM/FM/VM/SM/TM/ST
 	// except that it updates the startstopindex to point one after found delimiter byte and
 	// returns the delimiter no (1-6)
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
@@ -1976,6 +1996,23 @@ class PUBLIC var final {
 	// bool THIS_IS_DBCONN() const    { return var_typ & VARTYP_DBCONN; }
 	// bool THIS_IS_OSFILE() const    { return var_typ & VARTYP_OSFILE; }
 
+	// Convert VISIBLE_FMS to ALL_FMS
+	var& fmiconverter() {
+		// clang-format off
+		for (char& c : this->var_str) {
+			switch (c) {
+				case '^': c = FM_; break;
+				case ']': c = VM_; break;
+				case '}': c = SM_; break;
+				case '|': c = TM_; break;
+				case '~': c = ST_; break;
+				case '_': c = RM_; break;
+			}
+		}
+		// clang-format on
+		return *this;
+	}
+
 };    // class "var"
 
 // NB we should probably NEVER add operator^(VARREF var1, bool)
@@ -2121,16 +2158,16 @@ class PUBLIC var_proxy3 {
 }; // class var_proxy3
 
 // var versions of separator characters. Must be after class declaration
+inline const var RM = RM_;
 inline const var FM = FM_;
 inline const var VM = VM_;
 inline const var SM = SM_;
-inline const var SVM = SVM_;
 inline const var TM = TM_;
-inline const var STM = STM_;
+inline const var ST = ST_;
 
-inline const var IM = IM_;
-inline const var RM = RM_;
-inline const var AM = AM_;
+//inline const var IM = IM_;
+//inline const var AM = AM_;
+//inline const var SVM = SVM_;
 
 inline const var BS = BS_;
 inline const var DQ = DQ_;
@@ -2159,15 +2196,6 @@ inline const var PLATFORM_ = "x86";
 // A global flag used in mvdbpostgres
 [[maybe_unused]] static inline int DBTRACE=var().osgetenv("EXO_DBTRACE");
 
-// This is left a global copy for backtrace to get at it
-PUBLIC inline exodus::var EXECPATH2 = "";
-
-#ifndef SWIG
-PUBLIC ND std::string naturalorder(const std::string& string1);
-PUBLIC ND const std::string to_oscmd_string(CVR cmd);
-
-#endif
-
 // provide a public base exception for all other exceptions so exodus programmers can catch mv
 // exceptions generally
 class PUBLIC VarError {
@@ -2180,8 +2208,12 @@ class PUBLIC VarError {
 ///////////////////
 
 //inline avoids hitting ODR rule
+
 ND inline var operator""_var(const char* cstr, std::size_t size) {
-	return var(cstr, size).convert(VISIBLE_FMS, _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+	//return var(cstr, size).convert(VISIBLE_FMS, _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
+	var result = var(cstr, size);
+	result.fmiconverter();
+	return result;
 }
 
 ND inline var operator""_var(unsigned long long int i) {

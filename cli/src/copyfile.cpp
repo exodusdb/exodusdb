@@ -71,7 +71,7 @@ function main() {
 
 	// Raw option
 	var txt5fmt = "TX";
-	// Raw option only converts FM to NL and leaves VM SM TM STM as are
+	// Raw option only converts FM to NL and leaves VM SM TM ST as are
 	if (OPTIONS.index("R"))
 		txt5fmt ^= "1";
 

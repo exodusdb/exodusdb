@@ -1705,7 +1705,7 @@ var var::mv(const char* opcode, CVR var2) const {
 		// find the end of a value in var1 (this)
 		if (separator1 <= separator2) {
 getnextp1:
-			p1b = var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, p1a);
+			p1b = var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, p1a);
 			if (p1b == std::string::npos) {
 				separator1 = RM_ + 1;
 			} else {
@@ -1718,7 +1718,7 @@ getnextp1:
 		// find the end of a value in var1 (this)
 		if (separator2 <= separator1_prior) {
 getnextp2:
-			p2b = var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, p2a);
+			p2b = var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, p2a);
 			if (p2b == std::string::npos) {
 				separator2 = RM_ + 1;
 			} else {
@@ -1842,7 +1842,7 @@ var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const 
 ////////
 
 // returns the characters up to the next delimiter
-// delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6 or 0 if not found
+// delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6 or 0 if not found
 // NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
 var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 
@@ -1874,7 +1874,7 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 
 	// find the end of the field (or string)
 	std::string::size_type end_pos;
-	end_pos = var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, start_pos);
+	end_pos = var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, start_pos);
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
@@ -1886,7 +1886,7 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 		//return returnable;
 	}
 
-	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6
+	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6
 	// delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_str[end_pos]);
 	delimiterno = int(*_RM_) - int(var_str[end_pos]) + 1;
 
@@ -2004,7 +2004,7 @@ var var::sumall() const {
 	var subfield, term;
 	size_t maxdecimals = 0;
 	while (true) {
-		//this extracts a substring up to any separator charactor STM-RM
+		//this extracts a substring up to any separator charactor ST-RM
 		subfield = (*this).substr2(start, term);
 
 		size_t subfieldsize = subfield.var_str.size();
@@ -2040,7 +2040,7 @@ var var::sum() const {
 	var nextsep;  //num
 	var accum;	  //num
 
-	var min_sep = STM.seq();  //26
+	var min_sep = ST.seq();  //26
 	var max_sep = RM.seq();	  //31
 
 	var min_sep_present;
@@ -2150,7 +2150,7 @@ var var::sum(SV separator) const {
 	var result = 0;
 	int nn = this->dcount(separator);
 
-	// static var allseparators=_STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
+	// static var allseparators=_ST_ _TM_ _SM_ _VM_ _FM_ _RM_;
 	// var separatorn=allseparators.index(separator);
 	// if (!separatorn) return var1*var2;
 

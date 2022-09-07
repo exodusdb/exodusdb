@@ -186,7 +186,7 @@ function main() {
 		assert(    123.456_var           eq "123.456");
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM_ "bb" _FM_ _FM_ "ccc");
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM_ "bb" _FM_ _FM_ "ccc");
-		assert(   "_^]}|~"_var.errputl() eq _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+		assert(   "_^]}|~"_var.errputl() eq _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
 	}
 
 

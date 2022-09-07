@@ -604,7 +604,7 @@ PUBLIC void printt() {
 }
 
 /*#define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "==");
+	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "==");
 */
 
 }  // namespace exodus

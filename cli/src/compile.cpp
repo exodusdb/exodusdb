@@ -1769,9 +1769,10 @@ function set_environment() {
 //			ossetenv(
 //				field(vars(varn), '=', 1), field(vars(varn), '=', 2, 999999));
 //		}
-		for (let line : vars)
+		for (in line : vars) {
 			ossetenv(
 				field(line, '=', 1), field(line, '=', 2, 999999));
+		}
 		/*
 		var value;
 		if (getparam(result,"PATH",value))

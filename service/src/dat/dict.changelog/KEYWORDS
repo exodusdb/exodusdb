@@ -7,7 +7,7 @@ S
 
 	ANS = RECORD.f(2);\
 	ANS.swapper(VM, ", ");\
-	ANS.swapper(SVM, ", ");\
+	ANS.swapper(SM, ", ");\
 	return ANS;\
 \
 /*pgsql\

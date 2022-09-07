@@ -33,6 +33,11 @@ function main()
 {
 
 	{
+		// Check conversion of visible to internal field marks in user literals
+		assert("_^]}|~"_var == _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
+	}
+
+	{
 		outputt("xxx","yyy");
 		outputl();
 		outputl("===\t===");
@@ -222,10 +227,10 @@ function main()
 		assert(test_ioconv_TX("TX", "X\\nY\nZ" _SM_ "ABC", "X\\\\nY\\nZ\\\\\nABC"));
 		//TM
 		assert(test_ioconv_TX("TX", "X\\nY\nZ" _TM_ "ABC", "X\\\\nY\\nZ\\\\\\\nABC"));
-		//STM
-		assert(test_ioconv_TX("TX", "X" "\\n" "Y" "\n" "Z" _STM_ "ABC", "X" "\\\\n" "Y" "\\n" "Z" "\\\\\\\\\n" "ABC"));
+		//ST
+		assert(test_ioconv_TX("TX", "X" "\\n" "Y" "\n" "Z" _ST_ "ABC", "X" "\\\\n" "Y" "\\n" "Z" "\\\\\\\\\n" "ABC"));
 
-		assert(test_ioconv_TX("TX", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _RM_ "\n" "\\\n" "\\\\\n" "\\\\\\\n" "\\\\\\\\\n"));
+		assert(test_ioconv_TX("TX", _RM_ _FM_ _VM_ _SM_ _TM_ _ST_, _RM_ "\n" "\\\n" "\\\\\n" "\\\\\\\n" "\\\\\\\\\n"));
 
 		// \n, literal "\n" and literal "\\n"
 		assert(test_ioconv_TX("TX", "\n", "\\n"));
@@ -246,10 +251,10 @@ function main()
 		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _SM_ "ABC", "X\\\\nY\\nZ" _SM_ "ABC"));
 		//TM
 		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _TM_ "ABC", "X\\\\nY\\nZ" _TM_ "ABC"));
-		//STM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _STM_ "ABC", "X\\\\nY\\nZ" _STM_ "ABC"));
+		//ST
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _ST_ "ABC", "X\\\\nY\\nZ" _ST_ "ABC"));
 
-		assert(test_ioconv_TX("TXR", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_, _RM_ "\n" _VM_ _SM_ _TM_ _STM_));
+		assert(test_ioconv_TX("TXR", _RM_ _FM_ _VM_ _SM_ _TM_ _ST_, _RM_ "\n" _VM_ _SM_ _TM_ _ST_));
 
 	}
 
@@ -508,7 +513,7 @@ function main()
 	    //check conversion of unprintable field marks to unusual ASCII characters
 	    //except TM which is ESC
 	    std::ostringstream stringstr;
-	    stringstr << var(_RM_ _FM_ _VM_ _SM_ _TM_  _STM_);
+	    stringstr << var(_RM_ _FM_ _VM_ _SM_ _TM_  _ST_);
 	    std::cout << stringstr.str() << std::endl;
 	    //assert(var(stringstr.str()) == "~^]\\[|");
 	    assert(var(stringstr.str()) == "~^]}" "\x1B" "|");
@@ -605,8 +610,8 @@ function main()
 		printt<'-'>("0", "1", "2", "t");
 		printl<'-'>("0", "1", "2", "l");
 
-		print(RM, FM, VM, SM, TM, STM);
-		printl(RM, FM, VM, SM, TM, STM);
+		print(RM, FM, VM, SM, TM, ST);
+		printl(RM, FM, VM, SM, TM, ST);
 
 		{
 			static char const sep[] = ", ";
@@ -622,12 +627,12 @@ function main()
 		output(0);
 		output("0", "1", "2", "p");
 		output("0", "1", "2", "pl");
-		output(RM, FM, VM, SM, TM, STM);
+		output(RM, FM, VM, SM, TM, ST);
 		outputl();
 		outputl(0);
 		outputl("0", "1", "2", "l");
 		outputl("0", "1", "2", "l");
-		outputl(RM, FM, VM, SM, TM, STM);
+		outputl(RM, FM, VM, SM, TM, ST);
 
 		printl();
 		printl("=== errput ===");

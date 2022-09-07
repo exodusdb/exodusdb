@@ -6,7 +6,7 @@ S
 
 
 	ANS = RECORD;\
-	ANS.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ "\u07f9\u07f8", "");\
+	ANS.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_ "\u07f9\u07f8", "");\
 	return ANS;
 L
 10

@@ -148,7 +148,7 @@ libraryinit(data)
 //---------------
 function main() {
 	ANS = RECORD;
-	ANS.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ "\u07f9\u07f8", "");
+	ANS.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_ "\u07f9\u07f8", "");
 	return ANS;
 }
 libraryexit(data)
@@ -395,7 +395,7 @@ function main() {
 	var brand = brandcode.xlate("BRANDS", "", "X");
 	var ans = brand.f(2);
 	var brandcode1 = brand.f(8);
-	brandcode1.converter(SVM, VM);
+	brandcode1.converter(SM, VM);
 	brandcode1 = brandcode1.f(1, 1);
 	if (brandcode1 and brandcode1 ne brandcode) {
 		ans.splicer(1, 0, brandcode1.xlate("BRANDS", 2, "X") ^ " ");

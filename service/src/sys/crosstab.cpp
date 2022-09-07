@@ -449,7 +449,7 @@ exit:
 	} //rowfn;
 
 	//convert sm row keys into columns
-	output.converter(SVM, VM);
+	output.converter(SM, VM);
 
 	return 0;
 	/*;

@@ -72,11 +72,11 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	var dow = (idate - 1).mod(7) + 1;
 
 	//from user
-	var weekenddows = trim(userx.f(24), SVM);
+	var weekenddows = trim(userx.f(24), SM);
 	if (not weekenddows) {
 
 		//else from market
-		weekenddows = trim(market.f(9), SVM);
+		weekenddows = trim(market.f(9), SM);
 		if (not weekenddows) {
 
 			weekenddows = agp.f(95);
@@ -85,7 +85,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 			if (not weekenddows) {
 				//weekenddows=agp<13>:sm:mod(agp<13>-1-1,7)+1
 				var tt = (agp.f(13) - 1 - 1).mod(7) + 1;
-				weekenddows = agp.f(13) ^ SVM ^ tt;
+				weekenddows = agp.f(13) ^ SM ^ tt;
 			}
 		}
 	}

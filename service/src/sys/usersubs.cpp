@@ -147,7 +147,7 @@ function main(in mode) {
 			//check emails
 			//emails=lcase(@record<7>)
 			var emails = win.is.lcase();
-			emails.converter(FM ^ VM ^ SVM ^ ", ", ";;;;;");
+			emails.converter(FM ^ VM ^ SM ^ ", ", ";;;;;");
 			var nn = emails.count(";") + 1;
 			for (const var ii : range(1, nn)) {
 				var email = emails.field(";", ii);
@@ -316,7 +316,7 @@ function main(in mode) {
 			//update security if managed to lock it
 			if (resetpassword lt 2) {
 				ans.converter(FM, TM);
-				var tt = "<hidden>" ^ SVM ^ ans;
+				var tt = "<hidden>" ^ SM ^ ans;
 				SECURITY(4, usern) = tt;
 			}
 

@@ -141,7 +141,7 @@ next:
 		if (cleared) {
 			while (true) {
 				///BREAK;
-				if (not(RECORD and ((FM ^ VM ^ SVM).index(RECORD[-1])))) break;
+				if (not(RECORD and ((FM ^ VM ^ SM).index(RECORD[-1])))) break;
 				RECORD.popper();
 			}//loop;
 			if (RECORD eq "") {

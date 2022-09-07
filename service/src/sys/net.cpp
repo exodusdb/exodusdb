@@ -226,7 +226,7 @@ listen:
 				//if servername then body:=fm:'ServerName=':servername
 
 				body ^= FM ^ FM ^ USER4;
-				body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
+				body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
 				body.swapper("\r", "\r\n");
 
 				//sendmail - if it fails, there will be an entry in the log

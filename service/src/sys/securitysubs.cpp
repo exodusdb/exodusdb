@@ -674,9 +674,9 @@ function main(in mode) {
 			var sysrec2;
 			if (sysrec2.read(systemfile(), userx)) {
 				//convert \FE\:\FD\:\FC\ TO \FB\:\FA\:\F9\ in SYSREC2
-				sysrec2.converter(FM ^ VM ^ SVM, TM ^ STM ^ var().chr(249));
+				sysrec2.converter(FM ^ VM ^ SM, TM ^ ST ^ var().chr(249));
 				if (sysrec2 ne sysrec) {
-					RECORD(4, usern) = "<hidden>" ^ SVM ^ sysrec2;
+					RECORD(4, usern) = "<hidden>" ^ SM ^ sysrec2;
 				}
 			}
 		} //usern;
@@ -1467,7 +1467,7 @@ subroutine changepassx() {
 	var datax = RECORD.f(4, win.mvx);
 	sysrec = datax.f(1, 1, 2);
 	//convert \FB\:\FA\:\F9\ to \FE\:\FD\:\FC\ in SYSREC
-	sysrec.converter(TM ^ STM ^ var().chr(249), FM ^ VM ^ SVM);
+	sysrec.converter(TM ^ ST ^ var().chr(249), FM ^ VM ^ SM);
 	if (not sysrec) {
 		if (not(sysrec.read(systemfile(), userx))) {
 			sysrec = "USER";
@@ -1484,7 +1484,7 @@ subroutine changepassx() {
 
 		//store the new password and system record
 		var temp = sysrec;
-		temp.converter(FM ^ VM ^ SVM, TM ^ STM ^ var().chr(249));
+		temp.converter(FM ^ VM ^ SM, TM ^ ST ^ var().chr(249));
 		win.is(1, 1, 2) = temp;
 		RECORD(4, win.mvx) = win.is;
 

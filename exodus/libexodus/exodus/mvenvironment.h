@@ -148,7 +148,7 @@ class PUBLIC MvEnvironment {
 	var LOWERCASE = LOWERCASE_;
 	var UPPERCASE = UPPERCASE_;
 	// var INTERNALCHARS = "\x1A\x1B\x1C\x1D\x1E\x1F";
-	// var EXTERNALCHARS = _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
+	// var EXTERNALCHARS = _ST_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
 	var TCLSTACK = "";
 	// INTCONST=keyboard constants 1:ESC 2:f5 7:f10

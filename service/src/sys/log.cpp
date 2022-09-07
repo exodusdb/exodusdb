@@ -104,7 +104,7 @@ getlogkey:
 
 		body ^= FM ^ FM ^ text2;
 
-		body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
+		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
 		body.converter("\n", "");
 		body = trim(body, "\r");
 		body.swapper("\r", "\r\n");

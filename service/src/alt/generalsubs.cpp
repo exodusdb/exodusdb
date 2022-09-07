@@ -187,7 +187,7 @@ subroutine getdatasets() {
 		//STOP
 	}
 
-	datasetparams.converter(",*", SVM ^ VM);
+	datasetparams.converter(",*", SM ^ VM);
 	var subst = datasetparams.field(" ", 1);
 	datasetparams = datasetparams.field(" ", 2, 9999);
 	var ndatasets = datasetparams.count(VM) + 1;

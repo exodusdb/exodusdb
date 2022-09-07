@@ -286,7 +286,7 @@ subroutine list() {
 
 	if (data_.f(1)) {
 		headingx ^= "'L'" ^ USER1.f(1);
-		headingx.swapper(SVM, ", ");
+		headingx.swapper(SM, ", ");
 		headingx.swapper(VM, ", ");
 	}
 

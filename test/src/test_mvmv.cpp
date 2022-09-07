@@ -535,7 +535,7 @@ function main() {
 //function to conveniently test sum function
 function test_sum(in instr)
 {
-	return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"~^]}>|");
+	return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _ST_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_,"~^]}>|");
 }
 
 programexit()

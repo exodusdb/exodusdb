@@ -14,7 +14,7 @@
 //TODO add option a) to specify field separator eg VM, SM and/or b) acquire field number as well
 //as provided by SRP precompiler
 //https://wiki.srpcs.com/display/SRPUtilities/SRP_PreCompiler#SRP_PreCompiler-ForEachLoops
-//For Each Value in MyValues using @STM setting Pos
+//For Each Value in MyValues using @ST setting Pos
 //    NewValues<Pos> = Value
 //Next Value
 

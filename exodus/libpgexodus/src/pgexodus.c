@@ -905,34 +905,34 @@ exodus_extract_number(PG_FUNCTION_ARGS)
 	PG_RETURN_FLOAT8(doublenum);
 }
 
-//defined in naturalorder.cpp
-Datum
-exodus_natural_order(char * instring, int inlength);
-
-PG_FUNCTION_INFO_V1(exodus_extract_sort);
-
-//avoid warning "Unused declaration of .." in above macro
-int no_such_variable;
-
-Datum
-exodus_extract_sort(PG_FUNCTION_ARGS)
-{
-	GETINPUTSTARTLENGTH
-
-
-/*
-	if (!outlen)
-		elog(WARNING, "outlen0");
-	if (!outstart)
-		elog(WARNING, "outstart0");
-	PG_RETURN_NULL();
-
-	//return NULL for zero length string
-	if (outstart==0||outlen==0)
-		PG_RETURN_NULL();
-*/
-	return exodus_natural_order(VARDATA(input)+outstart,outlen);
-}
+////defined in naturalorder.cpp
+//Datum
+//exodus_natural_order(char * instring, int inlength);
+//
+//PG_FUNCTION_INFO_V1(exodus_extract_sort);
+//
+////avoid warning "Unused declaration of .." in above macro
+//int no_such_variable;
+//
+//Datum
+//exodus_extract_sort(PG_FUNCTION_ARGS)
+//{
+//	GETINPUTSTARTLENGTH
+//
+//
+///*
+//	if (!outlen)
+//		elog(WARNING, "outlen0");
+//	if (!outstart)
+//		elog(WARNING, "outstart0");
+//	PG_RETURN_NULL();
+//
+//	//return NULL for zero length string
+//	if (outstart==0||outlen==0)
+//		PG_RETURN_NULL();
+//*/
+//	return exodus_natural_order(VARDATA(input)+outstart,outlen);
+//}
 
 /*
 

@@ -467,7 +467,7 @@ nextpatch:;
 		logx.converter(_FM_ _VM_ _SM_ _TM_, "^]\\[");
 		//fefdfcfb=char(254):char(253):char(252):char(251)
 		//convert fefdfcfb to '^]\[' in logx;*backslash
-		logx.swapper(STM, "%FA");
+		logx.swapper(ST, "%FA");
 
 		logx.swapper("%20", " ");
 		//does not seem to format in XML

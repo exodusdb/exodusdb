@@ -319,9 +319,8 @@ subroutine replace_FM_etc(io sql) {
 	sql.regex_replacer(R"(\bFM\b)", R"(E'\\x1E')");
 	sql.regex_replacer(R"(\bVM\b)", R"(E'\\x1D')");
 	sql.regex_replacer(R"(\bSM\b)", R"(E'\\x1C')");
-	sql.regex_replacer(R"(\bSVM\b)", R"(E'\\x1C')");
 	sql.regex_replacer(R"(\bTM\b)", R"(E'\\x1B')");
-	sql.regex_replacer(R"(\bSTM\b)", R"(E'\\x1A')");
+	sql.regex_replacer(R"(\bST\b)", R"(E'\\x1A')");
 }
 
 subroutine create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
@@ -493,9 +492,9 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		chars.swapper("FA", "");
 		chars = "\\x1D\\x1E" ^ iconv(chars, "HEX");
 		chars.swapper("'", "''");
-		chars ^= "\\x1A";  //STM
+		chars ^= "\\x1A";  //ST
 		chars ^= "\\x1B";  //TM
-		chars ^= "\\x1C";  //SVM
+		chars ^= "\\x1C";  //SM
 		chars ^= "\\x1F";  //RM
 
 //		sourcecode.r(1, -1,
@@ -644,7 +643,7 @@ $RETVAR := array_to_string
 			// e.g. split_part($1,'*',2) to use part of the key ($1)
 			// e.g. exodus_extract_text($2,3,2,1) to use part of the data record ($2)
 			// e.g. jobinvno||'**'||companycode using concatentated pgsql variables
-			// e.g. split_part(split_part(split_part($2,FM,2),VM,1),SVM,2) another way to use
+			// e.g. split_part(split_part(split_part($2,FM,2),VM,1),SM,2) another way to use
 			var source_key_expr = line.field(" ", 5);
 
 			// Arg 3 - Target field number, name or expression

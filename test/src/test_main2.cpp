@@ -202,20 +202,20 @@ function main()
 
 	{
 		var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
-		assert(lower(seps) eq _FM_ _VM_ _SM_ _TM_ _STM_);
+		assert(lower(seps) eq _FM_ _VM_ _SM_ _TM_ _ST_);
 		assert(lower(seps).raise() eq seps);
 
-		seps = _FM_ _VM_ _SM_ _TM_ _STM_;
+		seps = _FM_ _VM_ _SM_ _TM_ _ST_;
 		assert(raise(seps) eq _RM_ _FM_ _VM_ _SM_ _TM_);
 		assert(raise(seps).lower() eq seps);
 	}
 
 	{
 		var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
-		var x = seps; lowerer(x); assert(x eq _FM_ _VM_ _SM_ _TM_ _STM_);
+		var x = seps; lowerer(x); assert(x eq _FM_ _VM_ _SM_ _TM_ _ST_);
 		assert(raiser(x) eq seps);
 
-		seps = _FM_ _VM_ _SM_ _TM_ _STM_;
+		seps = _FM_ _VM_ _SM_ _TM_ _ST_;
 		x=seps; raiser(x); assert(x eq _RM_ _FM_ _VM_ _SM_ _TM_);
 		lowerer(x); assert(x eq seps);
 
@@ -483,63 +483,150 @@ function main()
 	}
 
 	{
+
+		var filename = "xo_naturals";
+		createfile(filename);
+		var naturals;
+		assert(open(filename, naturals));
+
+		var key = 0;
+
 		var alphanum1="Flat 10a";
 		var alphanum2="Flat 2b";
 		//Flat 2b is before Flat 10a
-		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
 		alphanum1="Part A-10";
 		alphanum2="Part A-2";
 		//Part A-2 is before Part A-10
-		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
-		alphanum1="Part -10";
-		alphanum2="Part -2";
+		alphanum1="Xart -10";
+		alphanum2="Xart -2";
 		//Part -10 is before Part -2
-		assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
 		alphanum1="-10";
 		alphanum2="-2";
 		//-10 is before -2
-		assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
 		alphanum1="-1.11";
 		alphanum2="-1.2";
 		//-1.2 is before -1.11
-		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
 		alphanum1="01.10";
 		alphanum2="1.1";
 		//01.10 is equal to 1.1
-		assert(naturalorder(alphanum1.toString()) == naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) == naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
 		alphanum1="A B C..C+";
 		alphanum2="A B C.C";
 		//A B C..C+ is before A B C.C
-		assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
-	}
+		//assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
-	{
 		//numbers in quotes?
-		var alphanum1="'2'";
-		var alphanum2="'10bbb22";
-		printl(naturalorder(alphanum1));
-		printl(naturalorder(alphanum2));
-		printl(oconv(naturalorder(alphanum1), "HEX"));
-		printl(oconv(naturalorder(alphanum2), "HEX"));
-//		assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
-	}
+		alphanum1="'2'";
+		alphanum2="'10bbb22";
+		//printl(naturalorder(alphanum1));
+		//printl(naturalorder(alphanum2));
+		//printl(oconv(naturalorder(alphanum1), "HEX"));
+		//printl(oconv(naturalorder(alphanum2), "HEX"));
+		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
-	{
-		assert(naturalorder("10a") > naturalorder("2b"));
+		alphanum1 = "10a";
+		alphanum2 = "2b";
+		//assert(naturalorder(alphanum1) > naturalorder(alphanum2));
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
 
-		var sortable = naturalorder("-2 +2 -2.0 +2.0 -10 +10 -10.0 +10.0");
-		TRACE(sortable)
-		assert(sortable == "4000000000000009c000000000000004000000000000009c000000000000003fdc000000000009c024000000000003fdc000000000009c02400000000000");
+		//var sortable = naturalorder("-2 +2 -2.0 +2.0 -10 +10 -10.0 +10.0");
+		//TRACE(sortable)
+		//assert(sortable == "4000000000000009c000000000000004000000000000009c000000000000003fdc000000000009c024000000000003fdc000000000009c02400000000000");
 
-		assert(naturalorder("") eq "");
-		assert(var(naturalorder(" ")).dump() eq " ");
-		assert(var(naturalorder(" abc ")).dump() eq " abc ");
+		//assert(naturalorder("") eq "");
+		//assert(var(naturalorder(" ")).dump() eq " ");
+		//assert(var(naturalorder(" abc ")).dump() eq " abc ");
+
+		alphanum1 = " .";
+		alphanum2 = "   .";
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
+
+		alphanum1 = " abc ";
+		alphanum2 = "abc";
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
+
+		alphanum1 = " abc";
+		alphanum2 = "abc ";
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
+
+		alphanum1 = "a";
+		alphanum2 = "aa";
+		assert(write(++key on naturals, alphanum1));
+		assert(write(++key on naturals, alphanum2));
+
+		assert(select("select " ^ filename ^ " by id"));
+
+		// postgres COLLATE exodus_natural does not do a good job of sorting negative numbers but does sort 2 before 10.
+		var keys = "";
+		while(readnext(ID)) {
+			printl(ID.quote());
+			keys ^= ID ^ FM;
+		}
+		keys.popper();
+		TRACE(keys)
+		keys.converter(FM, "^");
+		assert(keys == "   .^ .^ abc^ abc ^-1.2^-1.11^-2^-10^'2'^'10bbb22^1.1^01.10^2b^10a^a^A B C..C+^A B C.C^aa^abc^abc ^Flat 2b^Flat 10a^Part A-2^Part A-10^Xart -2^Xart -10");
+
+		/*
+		"   ."
+		" ."
+		" abc"
+		" abc "
+		"-1.2"
+		"-1.11"
+		"-2"
+		"-10"
+		"'2'"
+		"'10bbb22"
+		"1.1"
+		"01.10"
+		"2b"
+		"10a"
+		"a"
+		"A B C..C+"
+		"A B C.C"
+		"aa"
+		"abc"
+		"abc "
+		"Flat 2b"
+		"Flat 10a"
+		"Part A-2"
+		"Part A-10"
+		"Xart -2"
+		"Xart -10"
+		*/
+		//deletefile(filename);
 
 	}
 
