@@ -5,7 +5,7 @@ S
 
 
 
-	RECORD.converter(_FM_ " ", " " _FM_);\
+	RECORD.converter(_FM " ", " " _FM);\
 	return RECORD.trim().count(" ") + 1;
 L
 10

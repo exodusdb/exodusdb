@@ -224,7 +224,7 @@ forcedemail:
 		//cut off after end of file character
 		//params2=field(params2,char(26),1)
 		params2.swapper("\r\n", "\r");
-		params2.converter("\r\n", _FM_ _FM_);
+		params2.converter("\r\n", _FM _FM);
 		for (const var ii : range(1, 9)) {
 			if (params2.f(ii)) {
 				params1(ii) = params2.f(ii);

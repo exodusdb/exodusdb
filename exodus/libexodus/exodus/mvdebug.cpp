@@ -192,7 +192,7 @@ var mv_backtrace() {
 		temp.osshellread(cmd);
 		////////////////////////
 
-		temp.converter("\r\n", _FM_ _FM_);
+		temp.converter("\r\n", _FM _FM);
 
 		// find the last line containing .cpp
 		/// root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)

@@ -171,10 +171,10 @@ function main() {
 	// BY cannot be XX
 	try {var x = "xyz"_var.locateby("XX", "xyz", MV);assert(false);} catch(VarError e){};
 
-	assert(var("f100" _FM_ "f210" _VM_ "" _VM_ "f230").locateby("AL", "", vn, 2));
+	assert(var("f100" _FM "f210" _VM "" _VM "f230").locateby("AL", "", vn, 2));
 	assert(vn == 2);
 
-	assert(var("f100" _FM_ "f210" _VM_ "" _VM_ "f230").locateby("AL", "", vn, 2, 2));
+	assert(var("f100" _FM "f210" _VM "" _VM "f230").locateby("AL", "", vn, 2, 2));
 	assert(vn == 1);
 
 	assert(var("").locateby("AL", "", vn));
@@ -182,123 +182,123 @@ function main() {
 
 	//no orderby
 	assert(var("XXX").locate("XXX"));
-	assert(var("AAA" _VM_ "XXX").locate("XXX"));
-	assert(var("AA" _VM_ "BB" _FM_ "22").locate("BB",vn,1));
-	assert(!var("AA" _FM_ "BB").locate("BB",vn,1));
-	assert(var("AA" _FM_ "BB1" _VM_ "BB2").locate("BB2",vn,2));
+	assert(var("AAA" _VM "XXX").locate("XXX"));
+	assert(var("AA" _VM "BB" _FM "22").locate("BB",vn,1));
+	assert(!var("AA" _FM "BB").locate("BB",vn,1));
+	assert(var("AA" _FM "BB1" _VM "BB2").locate("BB2",vn,2));
 	assert (vn==2);
 	//
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2").locate("f2v2",vn,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2").locate("f2v2",vn,2));
 	assert (vn==2);
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2" _SM_ "X").locate("f2v2",vn,2));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2" _SM "X").locate("f2v2",vn,2));
 	//assert (vn=2);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2" _VM_ "X").locate("f2v2",vn,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2" _VM "X").locate("f2v2",vn,2));
 	assert (vn==2);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2" _FM_).locate("f2v2",vn,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2" _FM).locate("f2v2",vn,2));
 	assert (vn==2);
 	// search for a subvalue
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2v2s2").locate("f2v2s2",vn,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2v2s2").locate("f2v2s2",vn,2,2));
 	assert (vn==2);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2v2s2" _SM_ "X").locate("f2v2s2",vn,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2v2s2" _SM "X").locate("f2v2s2",vn,2,2));
 	assert (vn==2);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2v2s2" _VM_ "X").locate("f2v2s2",vn,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2v2s2" _VM "X").locate("f2v2s2",vn,2,2));
 	assert (vn==2);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2v2s2" _FM_ "X").locate("f2v2s2",vn,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2v2s2" _FM "X").locate("f2v2s2",vn,2,2));
 	assert (vn==2);
 	//search in a subvalue using ","
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2").locateusing(",","s2",vn,2,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2").locateusing(",","s2",vn,2,2,2));
 	// free function
-	assert(locateusing(",", "s2", var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2"),vn,2,2,2));
+	assert(locateusing(",", "s2", var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2"),vn,2,2,2));
 	assert (vn==3);
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2").locateusing(",","s2",vn,2,2,-2));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2").locateusing(",","s2",vn,2,2,-2));
 	assert (vn==1);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _SM_ "X").locateusing(",","s2",vn,2,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _SM "X").locateusing(",","s2",vn,2,2,2));
 	assert (vn==3);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _VM_ "X").locateusing(",","s2",vn,2,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _VM "X").locateusing(",","s2",vn,2,2,2));
 	assert (vn==3);
-	assert(var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _FM_ "X").locateusing(",","s2",vn,2,2,2));
+	assert(var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _FM "X").locateusing(",","s2",vn,2,2,2));
 	assert (vn==3);
 	//search in a subvalue using "," where subvalue doesnt exist
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2").locateusing(",","s2",vn,2,2,3));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2").locateusing(",","s2",vn,2,2,3));
 	assert (vn==1);
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2").locateusing(",","s2",vn,2,2,-3));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2").locateusing(",","s2",vn,2,2,-3));
 	assert (vn==1);
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _SM_ "X").locateusing(",","s2",vn,2,2,3));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _SM "X").locateusing(",","s2",vn,2,2,3));
 	assert (vn==2);
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _VM_ "X").locateusing(",","s2",vn,2,2,3));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _VM "X").locateusing(",","s2",vn,2,2,3));
 	assert (vn==1);
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _FM_ "X").locateusing(",","s2",vn,2,2,3));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _FM "X").locateusing(",","s2",vn,2,2,3));
 	assert (vn==1);
 	//check SV search doesnt cross into next multivalue or field
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _VM_ _SM_ "X").locateusing(",","s2",vn,2,2,3));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _VM _SM "X").locateusing(",","s2",vn,2,2,3));
 	assert (vn==1);
-	assert(!var("AA" _FM_ "f2v1" _VM_ "f2v2s1" _SM_ "f2,v2,s2" _FM_ _SM_ "X").locateusing(",","s2",vn,2,2,3));
+	assert(!var("AA" _FM "f2v1" _VM "f2v2s1" _SM "f2,v2,s2" _FM _SM "X").locateusing(",","s2",vn,2,2,3));
 	assert (vn==1);
 
 	//check field number zero means search using FM
 	var fn;
-	assert(var("aa" _FM_ "bb" _FM_ "cc").locate("bb", fn, 0));
+	assert(var("aa" _FM "bb" _FM "cc").locate("bb", fn, 0));
 	assert(fn == 2);
 
 	var lbvn;
 	//no fieldno/value given means using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn)||lbvn==4);
+	assert(var("1" _VM "10" _VM "2" _VM "B").locateby("AL","A",lbvn)||lbvn==4);
 	//fieldno given means search in that field using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn,1)||lbvn==4);
+	assert(var("1" _VM "10" _VM "2" _VM "B").locateby("AL","A",lbvn,1)||lbvn==4);
 	//fieldno given and =0 means search whole string using character FM
-	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("AL","A",lbvn,0)||lbvn==4);
+	assert(var("1" _FM "10" _FM "2" _FM "B").locateby("AL","A",lbvn,0)||lbvn==4);
 	// free function
-	assert(locateby("AL","A",var("1" _FM_ "10" _FM_ "2" _FM_ "B"),lbvn,0)||lbvn==4);
+	assert(locateby("AL","A",var("1" _FM "10" _FM "2" _FM "B"),lbvn,0)||lbvn==4);
 	var order2 = "AL";
-	assert(locateby(order2,"A",var("1" _FM_ "10" _FM_ "2" _FM_ "B"),lbvn,0)||lbvn==4);
+	assert(locateby(order2,"A",var("1" _FM "10" _FM "2" _FM "B"),lbvn,0)||lbvn==4);
 
 	//search values within a field
 
 	assert(!var("").locate("X",MV,2));
-	assert(!var(_FM_).locate("X",MV,2));
-	assert(!var(_FM_ _FM_).locate("X",MV,2));
-	assert(var(_FM_ _FM_).locate("",MV,2));
-	assert(!var(_FM_ "f2v1" _VM_ "f2v2"  _FM_).locate("X",MV,2));
-	assert(!var(_FM_ "f2v1" _VM_ "f2v2").locate("X",MV,2));
+	assert(!var(_FM).locate("X",MV,2));
+	assert(!var(_FM _FM).locate("X",MV,2));
+	assert(var(_FM _FM).locate("",MV,2));
+	assert(!var(_FM "f2v1" _VM "f2v2"  _FM).locate("X",MV,2));
+	assert(!var(_FM "f2v1" _VM "f2v2").locate("X",MV,2));
 
 	//search subvalues within a value within a field
 
 	assert(!var("").locate("X",MV,2,2));
-	assert(!var(_FM_).locate("X",MV,2,2));
-	assert(!var(_FM_ _VM_).locate("X",MV,2,2));
-	assert(!var(_FM_ _VM_ _VM_).locate("X",MV,2,2));
-	assert(var(_FM_ _VM_ _VM_).locate("",MV,2,2));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2"  _VM_).locate("X",MV,2,2));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2").locate("X",MV,2,2));
+	assert(!var(_FM).locate("X",MV,2,2));
+	assert(!var(_FM _VM).locate("X",MV,2,2));
+	assert(!var(_FM _VM _VM).locate("X",MV,2,2));
+	assert(var(_FM _VM _VM).locate("",MV,2,2));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2"  _VM).locate("X",MV,2,2));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2").locate("X",MV,2,2));
 
 	assert(!var("").locate("X",MV,2,3));
-	assert(!var(_FM_ _FM_).locate("X",MV,2,3));
-	assert(!var(_FM_ _VM_ _FM_).locate("X",MV,2,3));
-	assert(!var(_FM_ _VM_ _VM_ _FM_).locate("X",MV,2,3));
-	assert(var(_FM_ _VM_ _VM_ _FM_).locate("",MV,2,3));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2"  _VM_ _FM_).locate("X",MV,2,3));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2" _FM_).locate("X",MV,2,3));
+	assert(!var(_FM _FM).locate("X",MV,2,3));
+	assert(!var(_FM _VM _FM).locate("X",MV,2,3));
+	assert(!var(_FM _VM _VM _FM).locate("X",MV,2,3));
+	assert(var(_FM _VM _VM _FM).locate("",MV,2,3));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2"  _VM _FM).locate("X",MV,2,3));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2" _FM).locate("X",MV,2,3));
 
 	//check searching for VMs does not stray over into the next field
 	assert(!var("").locate("X",MV,2,3));
-	assert(!var(_FM_ _FM_ _VM_).locate("X",MV,2,3));
-	assert(!var(_FM_ _VM_ _FM_ _VM_).locate("X",MV,2,3));
-	assert(!var(_FM_ _VM_ _VM_ _FM_ _VM_).locate("X",MV,2,3));
-	assert(var(_FM_ _VM_ _VM_ _FM_ _VM_).locate("",MV,2,3));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2"  _VM_ _FM_ _VM_).locate("X",MV,2,3));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2" _FM_ _VM_).locate("X",MV,2,3));
+	assert(!var(_FM _FM _VM).locate("X",MV,2,3));
+	assert(!var(_FM _VM _FM _VM).locate("X",MV,2,3));
+	assert(!var(_FM _VM _VM _FM _VM).locate("X",MV,2,3));
+	assert(var(_FM _VM _VM _FM _VM).locate("",MV,2,3));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2"  _VM _FM _VM).locate("X",MV,2,3));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2" _FM _VM).locate("X",MV,2,3));
 
 	//search subvalues within a value within a field (using a specfic separator)
 
 	//check searching for SMs does not stray over into the next value
 	assert(!var("").locateusing(",","X",MV,2,3,-3));
 	assert(!var("").locateusing(",","X",MV,2,3,3));
-	assert(!var(_FM_ _FM_ _VM_).locateusing(",","X",MV,2,2,2));
-	assert(!var(_FM_ _VM_ _FM_ _VM_).locateusing(",","X",MV,2,2,2));
-	assert(!var(_FM_ _VM_ _VM_ _FM_ _VM_).locateusing(",","X",MV,2,2,2));
-	assert(var(_FM_ _VM_ _VM_ _FM_ _VM_).locateusing(",","",MV,2,2,2));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2"  _VM_ _FM_ _VM_).locateusing(",","X",MV,2,2,2));
-	assert(!var(_FM_ _VM_ "f2v2s1" _SM_ "f2v2s2" _FM_ _VM_).locateusing(",","X",MV,2,2,2));
+	assert(!var(_FM _FM _VM).locateusing(",","X",MV,2,2,2));
+	assert(!var(_FM _VM _FM _VM).locateusing(",","X",MV,2,2,2));
+	assert(!var(_FM _VM _VM _FM _VM).locateusing(",","X",MV,2,2,2));
+	assert(var(_FM _VM _VM _FM _VM).locateusing(",","",MV,2,2,2));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2"  _VM _FM _VM).locateusing(",","X",MV,2,2,2));
+	assert(!var(_FM _VM "f2v2s1" _SM "f2v2s2" _FM _VM).locateusing(",","X",MV,2,2,2));
 
     //locate using multibyte unicode char separator and target
 	//var greek5x4="αβγδεαβγδεαβγδεαβγδε";
@@ -306,7 +306,7 @@ function main() {
     assert(greek5x4.locateusing("β","γδεα",setting));
     assert(setting==2);
 
-	var sort="aa" _FM_ "bb" _FM_ "dd";
+	var sort="aa" _FM "bb" _FM "dd";
 	var sortn;
 	assert(!sort.locatebyusing(var("AL"),FM,"a",sortn));
 	assert(sortn==1);
@@ -321,7 +321,7 @@ function main() {
 	assert(!sort.locatebyusing("AL",FM,"ee",sortn));
 	assert(sortn==4);
 	//usingchar is cstr
-	assert(sort.locatebyusing("AL", _FM_, "bb", sortn));
+	assert(sort.locatebyusing("AL", _FM, "bb", sortn));
 	assert(sortn==2);
 
 	assert(sort.locateusing(FM,"aa",sortn));
@@ -535,7 +535,7 @@ function main() {
 //function to conveniently test sum function
 function test_sum(in instr)
 {
-	return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _ST_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_,"~^]}>|");
+	return sum(instr.convert("~^]}>|", _RM _FM _VM _SM _TM _ST)).convert(_RM _FM _VM _SM _TM _ST,"~^]}>|");
 }
 
 programexit()

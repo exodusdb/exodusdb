@@ -33,7 +33,7 @@ function main() {
 	if (not filenames) {
 		filenames = db1.listfiles();
 		//TODO get from command line somehow to avoid hardcoding
-		exclude_filenames ^= _VM_ "processes" _VM_ "locks" _VM_ "statistics" _VM_ "requestlog";
+		exclude_filenames ^= _VM "processes" _VM "locks" _VM "statistics" _VM "requestlog";
 	}
 	for (var filename : filenames) {
 

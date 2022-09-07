@@ -173,9 +173,9 @@ function main() {
 
 	// Construct from initializer list of int double and const char*
 	{
-		assert(var({1, 22, -0, 333}) eq "1" _FM_ "22" _FM_ "0" _FM_ "333");
-		assert(var({1.1, 1.2, 1000.0}) eq "1.1" _FM_ "1.2" _FM_ "1000");
-		assert(var({"a", "bb", "", "ccc"}) eq "a" _FM_ "bb" _FM_ _FM_ "ccc");
+		assert(var({1, 22, -0, 333}) eq "1" _FM "22" _FM "0" _FM "333");
+		assert(var({1.1, 1.2, 1000.0}) eq "1.1" _FM "1.2" _FM "1000");
+		assert(var({"a", "bb", "", "ccc"}) eq "a" _FM "bb" _FM _FM "ccc");
 	}
 
 	// Construct from literal int, double and const char*
@@ -184,9 +184,9 @@ function main() {
 //		assert(    123.456_var.errputl() eq "123.456");
 		assert(     123456_var           eq "123456");
 		assert(    123.456_var           eq "123.456");
-		assert("a^bb^^ccc"_var.errputl() eq "a" _FM_ "bb" _FM_ _FM_ "ccc");
-		assert("a^bb^^ccc"_var.errputl() eq "a" _FM_ "bb" _FM_ _FM_ "ccc");
-		assert(   "_^]}|~"_var.errputl() eq _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
+		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
+		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
+		assert(   "_^]}|~"_var.errputl() eq _RM _FM _VM _SM _TM _ST);
 	}
 
 

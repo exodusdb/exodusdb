@@ -31,15 +31,15 @@ function main() {
 		abort("cannot open "^tempfilename);
 
 	if (not write(
-	"F" _FM_
-	"0" _FM_
-	"ID" _FM_
-	_FM_
-	_FM_
-	_FM_
-	_FM_
-	_FM_
-	"R" _FM_
+	"F" _FM
+	"0" _FM
+	"ID" _FM
+	_FM
+	_FM
+	_FM
+	_FM
+	_FM
+	"R" _FM
 	"20", dicttempfilename, "ID"))
 		abort("cannot write "^dicttempfilename^" ID");
 

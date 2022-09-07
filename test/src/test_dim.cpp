@@ -60,10 +60,10 @@ function main() {
 		dim d4(var("asdasd").split());
 
 		dim d5 = split("11^22"_var);
-		assert(d5.join() eq "11" _FM_ "22");
+		assert(d5.join() eq "11" _FM "22");
 
 		dim d6(split("aa^bb"_var));
-		assert(d6.join() eq "aa" _FM_ "bb");
+		assert(d6.join() eq "aa" _FM "bb");
 
 		std::vector<dim> vofdims {dim(0), dim(0)};
 
@@ -72,7 +72,7 @@ function main() {
 	{
 		//dim_iter
 		dim d1;
-		d1.split("aa" _FM_ "bb");
+		d1.split("aa" _FM "bb");
 		var count = 0;
 		for (var v1 : d1) {
 		//for (var& v1 : d1) {
@@ -84,7 +84,7 @@ function main() {
 		}
 		TRACE(d1.join());
 
-		assert(d1.join().dump() eq "aa" _FM_ "bb");//default separator is FM
+		assert(d1.join().dump() eq "aa" _FM "bb");//default separator is FM
 		assert(d1.join("").dump() eq "aa" "bb");//sep can be ""
 		assert(d1.join("Δ").dump() eq "aaΔbb");//sep can be multibyte UTF8
 		assert(d1.join("XYZ").dump() eq "aaXYZbb");//sep can be multichar
@@ -128,7 +128,7 @@ function main() {
 	}
 	{
 		dim d1;
-		d1.split("aa" _FM_ "bb");
+		d1.split("aa" _FM "bb");
 		var count = 0;
 		//for (var v1 : d1) {
 		for (var& v1 : d1) {
@@ -139,7 +139,7 @@ function main() {
 				v1 = "cc"; //will update d1
 		}
 		TRACE(d1.join());
-		assert(d1.join() eq "aa" _FM_ "cc");//d1 updated
+		assert(d1.join() eq "aa" _FM "cc");//d1 updated
 	}
 
 	{
@@ -185,24 +185,24 @@ function main() {
 	assert(dx.join().outputl()==(1^FM^1^FM^1));
 
 	//test dim=var.split()
-	dim a=var("abc" _FM_ "def").split();
+	dim a=var("abc" _FM "def").split();
 	assert(a(2) == "def");
 
 	//dim.split(stringvar)
 	dim a12(4);
 	//test not enough fields - initialises rest of array elements to ""
-	assert(a12.split("a" _FM_ "b"));
+	assert(a12.split("a" _FM "b"));
 	assert(a12(2) == "b");
 	assert(a12(3) == "");
 	assert(a12(4) == "");
 	//test extra fields are forced into last element
-	assert(a12.split("a" _FM_ "b" _FM_ "c" _FM_ "d" _FM_ "e"));
+	assert(a12.split("a" _FM "b" _FM "c" _FM "d" _FM "e"));
 	assert(a12(2) == "b");
 	assert(a12(3) == "c");
-	assert(a12(4) == "d" _FM_ "e");
+	assert(a12(4) == "d" _FM "e");
 
 	//test sort and reverse sort
-	dim a13 = var("10" _FM_ "2" _FM_ "1" _FM_ "20" _FM_ "-2").split();
+	dim a13 = var("10" _FM "2" _FM "1" _FM "20" _FM "-2").split();
 	//printl(a13.join());
 	assert(a13.join("^") == "10^2^1^20^-2");
 	a13.sort();

@@ -330,7 +330,7 @@ dict(AGE_IN_YEARS) {
 
         printl();
         printl("4. Normally the following select would output all records but it only shows 3 keys from makelist");
-        var keys="SB1" _FM_ "JB2" _FM_ "SB001";
+        var keys="SB1" _FM "JB2" _FM "SB001";
         myclients.makelist("",keys);
         myclients.outputl();
 //      myclients.select();

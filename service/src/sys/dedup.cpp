@@ -15,8 +15,8 @@ function main(in mode, io list1, io list2, in seps) {
 		return 0;
 	}
 
-	list1.converter(seps, _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_);
-	list2.converter(seps, _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_ _FM_);
+	list1.converter(seps, _FM _FM _FM _FM _FM _FM _FM _FM _FM _FM);
+	list2.converter(seps, _FM _FM _FM _FM _FM _FM _FM _FM _FM _FM);
 	var alllist2 = list2;
 
 	//remove matches from both

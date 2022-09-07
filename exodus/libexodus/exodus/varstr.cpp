@@ -638,7 +638,7 @@ bool var::locate(CVR target, VARREF setting) const {
 	ISSTRING(target)
 	ISDEFINED(setting)
 
-	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
+	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 }
 
 bool var::locate(CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
@@ -652,11 +652,11 @@ bool var::locate(CVR target, VARREF setting, const int fieldno, const int valuen
 
 	std::string usingchar;
 	if (valueno != 0)
-		usingchar = _SM_;
+		usingchar = _SM;
 	else if (fieldno != 0)
-		usingchar = _VM_;
+		usingchar = _VM;
 	else
-		usingchar = _FM_;
+		usingchar = _FM;
 	// if (fieldno<=0) *usingchar=FM_;
 	// else if (valueno<=0) *usingchar=VM_;
 	// else *usingchar=SM_;
@@ -672,7 +672,7 @@ bool var::locate(CVR target) const {
 	ISSTRING(target)
 
 	var setting;
-	return locatex(var_str, target.var_str, "", _VM_, setting, 0, 0, 0);
+	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 }
 
 ////////////
@@ -709,7 +709,7 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
 	// if field number is given then locate in values of that field
 	// otherwise locate in fields of the string
 
-	return locatex(var_str, target.var_str, ordercode, _VM_, setting, 0, 0, 0);
+	return locatex(var_str, target.var_str, ordercode, _VM, setting, 0, 0, 0);
 }
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
@@ -1159,7 +1159,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 	// zero means all, negative means append one mv ... regardless of subvalueno
 	if (valueno < 0) {
 		if (field_end_pos - start_pos > 0) {
-			var_str.insert(field_end_pos, _VM_);
+			var_str.insert(field_end_pos, _VM);
 			field_end_pos++;
 		}
 		start_pos = field_end_pos;
@@ -1198,7 +1198,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 	// zero means all, negative means append one sv ... regardless of subvalueno
 	if (subvalueno < 0) {
 		if (value_end_pos - start_pos > 0) {
-			var_str.insert(value_end_pos, _SM_);
+			var_str.insert(value_end_pos, _SM);
 			value_end_pos++;
 		}
 		start_pos = value_end_pos;
@@ -1347,7 +1347,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 	// zero means all, negative means append one mv ... regardless of subvalueno
 	if (valueno < 0) {
 		if (field_end_pos - start_pos > 0) {
-			var_str.insert(field_end_pos, _VM_);
+			var_str.insert(field_end_pos, _VM);
 			field_end_pos++;
 		}
 		start_pos = field_end_pos;
@@ -1355,7 +1355,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 		pad = true;
 	} else if (valueno == 0 && subvalueno == 0) {
 		if (!pad && !var_str.empty())
-			var_str.insert(start_pos, _FM_);
+			var_str.insert(start_pos, _FM);
 		var_str.insert(start_pos, insertion.var_str);
 		return *this;
 	} else {
@@ -1390,7 +1390,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 	// zero means all, negative means append one sv ... regardless of subvalueno
 	if (subvalueno < 0) {
 		if (value_end_pos - start_pos > 0) {
-			var_str.insert(value_end_pos, _SM_);
+			var_str.insert(value_end_pos, _SM);
 			value_end_pos++;
 		}
 		start_pos = value_end_pos;
@@ -1399,7 +1399,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 		pad = true;
 	} else if (subvalueno == 0) {
 		if (!pad && (start_pos < field_end_pos || valueno > 1))
-			var_str.insert(start_pos, _VM_);
+			var_str.insert(start_pos, _VM);
 		var_str.insert(start_pos, insertion.var_str);
 		return *this;
 	} else {
@@ -1429,7 +1429,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 	}
 
 	if (!pad && (start_pos < value_end_pos || subvalueno > 1))
-		var_str.insert(start_pos, _SM_);
+		var_str.insert(start_pos, _SM);
 	var_str.insert(start_pos, insertion.var_str);
 
 	return *this;
@@ -1705,7 +1705,7 @@ var var::mv(const char* opcode, CVR var2) const {
 		// find the end of a value in var1 (this)
 		if (separator1 <= separator2) {
 getnextp1:
-			p1b = var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, p1a);
+			p1b = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p1a);
 			if (p1b == std::string::npos) {
 				separator1 = RM_ + 1;
 			} else {
@@ -1718,7 +1718,7 @@ getnextp1:
 		// find the end of a value in var1 (this)
 		if (separator2 <= separator1_prior) {
 getnextp2:
-			p2b = var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, p2a);
+			p2b = var2.var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p2a);
 			if (p2b == std::string::npos) {
 				separator2 = RM_ + 1;
 			} else {
@@ -1767,19 +1767,19 @@ getnextp2:
 				break;
 
 			outstr ^= separator1;
-			// outstr.convert(_VM_ _FM_, "]^").outputl("= outstr=");
+			// outstr.convert(_VM _FM, "]^").outputl("= outstr=");
 			p1a++;
 			p2a++;
 		} else if (separator1 < separator2) {
 			outstr ^= separator1;
-			// outstr.convert(_VM_ _FM_, "]^").outputl("< outstr=");
+			// outstr.convert(_VM _FM, "]^").outputl("< outstr=");
 			mv2 = "";
 			p1a++;
 			separator1_prior = separator1;
 			goto getnextp1;
 		} else {
 			outstr ^= separator2;
-			// outstr.convert(_VM_ _FM_, "]^").outputl("> outstr=");
+			// outstr.convert(_VM _FM, "]^").outputl("> outstr=");
 			mv1 = "";
 			p2a++;
 			goto getnextp2;
@@ -1874,7 +1874,7 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 
 	// find the end of the field (or string)
 	std::string::size_type end_pos;
-	end_pos = var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, start_pos);
+	end_pos = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, start_pos);
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
@@ -1888,7 +1888,7 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 
 	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6
 	// delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_str[end_pos]);
-	delimiterno = int(*_RM_) - int(var_str[end_pos]) + 1;
+	delimiterno = int(*_RM) - int(var_str[end_pos]) + 1;
 
 	// point AFTER the found separator or TWO after the length of the string (TODO shouldnt this
 	// be one??/bug in pickos) wont work if string is the maximum string length but that cant
@@ -1997,7 +1997,7 @@ var var::sumall() const {
 
 	// Add up all numbers regardless of separators or levels (multilevel)
 	// Limit the number of decimal places in returned value to the max found in the input
-	// assert(sum("2245000900.76" _FM_ "102768099.9" _VM_ "-2347769000.66") == 0);
+	// assert(sum("2245000900.76" _FM "102768099.9" _VM "-2347769000.66") == 0);
 
 	var result = 0;
 	var start = 0;
@@ -2034,7 +2034,7 @@ var var::sum() const {
 	assertString(function_sig);
 
 	// Limit the number of decimal places in returned value to the max found in the input
-	// assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66") == 0);
+	// assert(sum("2245000900.76" _VM "102768099.9" _VM "-2347769000.66") == 0);
 
 	var part;	  //num
 	var nextsep;  //num
@@ -2150,7 +2150,7 @@ var var::sum(SV separator) const {
 	var result = 0;
 	int nn = this->dcount(separator);
 
-	// static var allseparators=_ST_ _TM_ _SM_ _VM_ _FM_ _RM_;
+	// static var allseparators=_ST _TM _SM _VM _FM _RM;
 	// var separatorn=allseparators.index(separator);
 	// if (!separatorn) return var1*var2;
 

@@ -220,7 +220,7 @@ function main() {
 // Restore the hidden commas|semicolons etc
 function restore_subsyntax(in line2, in hidden_char) {
 	//var line = line2.convert(FM_, hidden_char);
-	var line = line2.convert(_FM_, hidden_char);
+	var line = line2.convert(_FM, hidden_char);
 	return line;
 }
 // Hide commas|semicolons inside brackets and quotes
@@ -251,7 +251,7 @@ function hide_subsyntax(in line, io pos, in hidden_char) {
 
 		//else if (c == ',' and (inquotes or depth))
 		else if (c == hidden_char and (inquotes or depth))
-			line2.splicer(pos, 1, _FM_);
+			line2.splicer(pos, 1, _FM);
 	}
 	return line2;
 }

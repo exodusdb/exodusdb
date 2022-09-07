@@ -843,7 +843,7 @@ nextreport:
 				}
 			}
 			if (datacfg) {
-				datacfg.converter("\r\n", _FM_ _FM_);
+				datacfg.converter("\r\n", _FM _FM);
 				codepage = datacfg.f(1).trim();
 			} else {
 				var output = shell2("mode CON:", xx);
@@ -953,7 +953,7 @@ nextreport:
 	} else {
 		if (VOLUMES) {
 			cpu = shell2("wmic CPU GET NAME", xx);
-			if (cpu.substr(1, 2) eq _RM_ _FM_) {
+			if (cpu.substr(1, 2) eq _RM _FM) {
 				cpu.splicer(1, 2, "");
 				cpu.converter(var().chr(0), "");
 			}

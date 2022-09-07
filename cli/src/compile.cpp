@@ -652,7 +652,7 @@ function main() {
 	srcfilenames.converter(FM, VM);
 	srcfilenames ^= FM ^ filesizes;
 	//sort by field 2 which is file sizes and drag field 1 into the same order
-	call sortarray(srcfilenames, "2" _VM_ "1", "DR");
+	call sortarray(srcfilenames, "2" _VM "1", "DR");
 	srcfilenames = srcfilenames.f(1).convert(VM, FM);
 
 	// This loop consists of a single function call
@@ -716,7 +716,7 @@ function main() {
 
 			// Try reading the source text is various locales
 			var text;
-			var alllocales = "utf8" _FM_ "en_US.iso88591" _FM_ "en_GB.iso88591";
+			var alllocales = "utf8" _FM "en_US.iso88591" _FM "en_GB.iso88591";
 			var locales = "";
 			//var nlocales = dcount(alllocales, " ");
 			var locale;

@@ -72,7 +72,7 @@ function main() {
 		//unordered files and directories
 		var dir1 = oslist("*").sort();
 
-		var dir2 = osshellread("ls . -AU1").convert("\n\r", _FM_).trim(_FM_).sort();
+		var dir2 = osshellread("ls . -AU1").convert("\n\r", _FM).trim(_FM).sort();
 		//TRACE(dir1)
 		//TRACE(dir2)
 		assert(dir1 eq dir2);
@@ -86,7 +86,7 @@ function main() {
 
 			var result;
 			assert(osshellread(result from "ls . -AU1"));
-			var dir2 = result.convert("\n\r", _FM_).trim(_FM_).sort();
+			var dir2 = result.convert("\n\r", _FM).trim(_FM).sort();
 
 			//TRACE(dir1)
 			//TRACE(dir2)
@@ -115,7 +115,7 @@ function main() {
 
 		// ls xxx*.yyy returns a sorted list regardless of the -U unordered option
 		dir1 = oslist("test_*.cpp").sort();
-		dir2 = osshellread("ls test_*.cpp -AU1").convert("\n\r", _FM_ ).trim(_FM_).sort();
+		dir2 = osshellread("ls test_*.cpp -AU1").convert("\n\r", _FM ).trim(_FM).sort();
 		//TRACE(dir1)
 		//TRACE(dir2)
 		assert(dir1 eq dir2);
@@ -131,7 +131,7 @@ function main() {
 	osrmdir("test_main.2");
 
 	printl();
-	assert(osdir(OSSLASH).match(_FM_ "\\d{5}" _FM_ "\\d{1,5}"));
+	assert(osdir(OSSLASH).match(_FM "\\d{5}" _FM "\\d{1,5}"));
 
 	//root directories
 

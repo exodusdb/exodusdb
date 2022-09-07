@@ -90,17 +90,17 @@ THE SOFTWARE.
 
 // leading and trailing _ char* versions of classic pick delimiters
 // also in ADECOM
-#define _RM_ "\x1F"      // Record Mark
-#define _FM_ "\x1E"      // Field Mark
-#define _VM_ "\x1D"      // Value Mark
-#define _SM_ "\x1C"      // Subvalue Mark
-#define _TM_ "\x1B"      // Text Mark
-#define _ST_ "\x1A"  // Subtext Mark
+#define _RM "\x1F"      // Record Mark
+#define _FM "\x1E"      // Field Mark
+#define _VM "\x1D"      // Value Mark
+#define _SM "\x1C"      // Subvalue Mark
+#define _TM "\x1B"      // Text Mark
+#define _ST "\x1A"  // Subtext Mark
 
 //// aliases for different implementations of multivalue
-//#define _IM_ _RM_
-//#define _AM_ _FM_
-//#define _SVM_ _SM_
+//#define _IM_ _RM
+//#define _AM_ _FM
+//#define _SVM_ _SM
 
 #define _BS_ "\\"
 #define _DQ_ "\""
@@ -133,7 +133,7 @@ THE SOFTWARE.
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
 //#define VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
 #define VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
-#define ALL_FMS _RM_ _FM_ _VM_ _SM_ _TM_ _ST_
+#define ALL_FMS _RM _FM _VM _SM _TM _ST
 
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
@@ -1471,7 +1471,7 @@ class PUBLIC var final {
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
 
-	VARREF sorter(SV sepchar = _FM_);
+	VARREF sorter(SV sepchar = _FM);
 
 	VARREF lowerer();
 	VARREF raiser();
@@ -1548,9 +1548,9 @@ class PUBLIC var final {
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
-	ND dim split(SV sepchar = _FM_) const;
+	ND dim split(SV sepchar = _FM) const;
 
-	ND var sort(SV sepchar = _FM_) const;
+	ND var sort(SV sepchar = _FM) const;
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -2210,7 +2210,7 @@ class PUBLIC VarError {
 //inline avoids hitting ODR rule
 
 ND inline var operator""_var(const char* cstr, std::size_t size) {
-	//return var(cstr, size).convert(VISIBLE_FMS, _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
+	//return var(cstr, size).convert(VISIBLE_FMS, _RM _FM _VM _SM _TM _ST);
 	var result = var(cstr, size);
 	result.fmiconverter();
 	return result;

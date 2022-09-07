@@ -34,7 +34,7 @@ function main()
 
 	{
 		// Check conversion of visible to internal field marks in user literals
-		assert("_^]}|~"_var == _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
+		assert("_^]}|~"_var == _RM _FM _VM _SM _TM _ST);
 	}
 
 	{
@@ -220,17 +220,17 @@ function main()
 		//TX
 
 		//FM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _FM_ "ABC", "X\\\\nY\\nZ\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _FM "ABC", "X\\\\nY\\nZ\nABC"));
 		//VM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _VM_ "ABC", "X\\\\nY\\nZ\\\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _VM "ABC", "X\\\\nY\\nZ\\\nABC"));
 		//SM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _SM_ "ABC", "X\\\\nY\\nZ\\\\\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _SM "ABC", "X\\\\nY\\nZ\\\\\nABC"));
 		//TM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _TM_ "ABC", "X\\\\nY\\nZ\\\\\\\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ" _TM "ABC", "X\\\\nY\\nZ\\\\\\\nABC"));
 		//ST
-		assert(test_ioconv_TX("TX", "X" "\\n" "Y" "\n" "Z" _ST_ "ABC", "X" "\\\\n" "Y" "\\n" "Z" "\\\\\\\\\n" "ABC"));
+		assert(test_ioconv_TX("TX", "X" "\\n" "Y" "\n" "Z" _ST "ABC", "X" "\\\\n" "Y" "\\n" "Z" "\\\\\\\\\n" "ABC"));
 
-		assert(test_ioconv_TX("TX", _RM_ _FM_ _VM_ _SM_ _TM_ _ST_, _RM_ "\n" "\\\n" "\\\\\n" "\\\\\\\n" "\\\\\\\\\n"));
+		assert(test_ioconv_TX("TX", _RM _FM _VM _SM _TM _ST, _RM "\n" "\\\n" "\\\\\n" "\\\\\\\n" "\\\\\\\\\n"));
 
 		// \n, literal "\n" and literal "\\n"
 		assert(test_ioconv_TX("TX", "\n", "\\n"));
@@ -239,22 +239,22 @@ function main()
 		assert(test_ioconv_TX("TX", "\n\\n\\\\n\\\\n", "\\n\\\\n\\\\\\n\\\\\\n"));
 
 		// trailing backslashes need escaping too
-		assert(test_ioconv_TX("TX", "ABC\\" _FM_ "DEF", "ABC{Back_Slash}\nDEF"));
+		assert(test_ioconv_TX("TX", "ABC\\" _FM "DEF", "ABC{Back_Slash}\nDEF"));
 
 		//TX1 (raw = FM only)
 
 		//FM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _FM_ "ABC", "X\\\\nY\\nZ\nABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _FM "ABC", "X\\\\nY\\nZ\nABC"));
 		//VM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _VM_ "ABC", "X\\\\nY\\nZ" _VM_ "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _VM "ABC", "X\\\\nY\\nZ" _VM "ABC"));
 		//SM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _SM_ "ABC", "X\\\\nY\\nZ" _SM_ "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _SM "ABC", "X\\\\nY\\nZ" _SM "ABC"));
 		//TM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _TM_ "ABC", "X\\\\nY\\nZ" _TM_ "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _TM "ABC", "X\\\\nY\\nZ" _TM "ABC"));
 		//ST
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _ST_ "ABC", "X\\\\nY\\nZ" _ST_ "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _ST "ABC", "X\\\\nY\\nZ" _ST "ABC"));
 
-		assert(test_ioconv_TX("TXR", _RM_ _FM_ _VM_ _SM_ _TM_ _ST_, _RM_ "\n" _VM_ _SM_ _TM_ _ST_));
+		assert(test_ioconv_TX("TXR", _RM _FM _VM _SM _TM _ST, _RM "\n" _VM _SM _TM _ST));
 
 	}
 
@@ -365,7 +365,7 @@ function main()
 
 	    //test accessing var as a range of fields separated by FM
 	    {
-	        var fields = "a1" _FM_ "b2" _FM_ "c3";
+	        var fields = "a1" _FM "b2" _FM "c3";
 	        var fieldn=0;
 	        for (var field : fields) {
 	            fieldn++;
@@ -513,7 +513,7 @@ function main()
 	    //check conversion of unprintable field marks to unusual ASCII characters
 	    //except TM which is ESC
 	    std::ostringstream stringstr;
-	    stringstr << var(_RM_ _FM_ _VM_ _SM_ _TM_  _ST_);
+	    stringstr << var(_RM _FM _VM _SM _TM  _ST);
 	    std::cout << stringstr.str() << std::endl;
 	    //assert(var(stringstr.str()) == "~^]\\[|");
 	    assert(var(stringstr.str()) == "~^]}" "\x1B" "|");
@@ -696,19 +696,19 @@ function main()
 		"xxxx"_var.logputl();
 	}
 	{
-		assert(crop(_VM_ _FM_) eq "");
-		assert(crop("xxx" _VM_ _FM_) eq "xxx");
-		assert(crop("aaa" _VM_ _FM_ "bbb") eq ("aaa" _FM_ "bbb"));
-		assert(crop("aaa" _FM_ "bbb" _FM_ _VM_ _SM_ _FM_ "ddd") eq ("aaa" _FM_ "bbb" _FM_ _FM_ "ddd"));
-		assert(crop("aaa" _FM_ "bbb" _FM_ _VM_ _SM_ _FM_ _RM_ "ddd") eq ("aaa" _FM_ "bbb" _RM_ "ddd"));
+		assert(crop(_VM _FM) eq "");
+		assert(crop("xxx" _VM _FM) eq "xxx");
+		assert(crop("aaa" _VM _FM "bbb") eq ("aaa" _FM "bbb"));
+		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM "ddd") eq ("aaa" _FM "bbb" _FM _FM "ddd"));
+		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM _RM "ddd") eq ("aaa" _FM "bbb" _RM "ddd"));
 
-		assert(crop("aa" _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
-		assert(crop("aa" _SM_ _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
-		assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_)==_FM_ "aa" _FM_ "bb");
-		assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ "bb");
-		assert(crop(_FM_ "aa" _VM_ _FM_ _VM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ _VM_ "bb");
-		assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_FM_ "aa" _FM_ "bb");
-		assert(crop(_FM_ _RM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_RM_ "aa" _FM_ "bb");
+		assert(crop("aa" _VM _FM "bb" _FM)=="aa" _FM "bb");
+		assert(crop("aa" _SM _VM _FM "bb" _FM)=="aa" _FM "bb");
+		assert(crop(_FM "aa" _VM _FM "bb" _FM)==_FM "aa" _FM "bb");
+		assert(crop(_FM "aa" _VM _FM "bb" _FM _VM)==_FM "aa" _FM "bb");
+		assert(crop(_FM "aa" _VM _FM _VM "bb" _FM _VM)==_FM "aa" _FM _VM "bb");
+		assert(crop(_FM "aa" _VM _FM "bb" _FM _RM)==_FM "aa" _FM "bb");
+		assert(crop(_FM _RM "aa" _VM _FM "bb" _FM _RM)==_RM "aa" _FM "bb");
 
 		// crop temporaries
 		assert("^]^]^}^|^~^"_var.crop().outputl() eq "");

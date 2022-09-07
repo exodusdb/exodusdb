@@ -46,9 +46,9 @@ function main() {
 	printl("\nPrepare some dictionary records");
 
 	var dictrecs =
-		"CODE         |F|0|Code         ||||          ||L|8" _FM_ "NAME         |F|1|Name         ||||          ||T|15" _FM_ "TYPE         |F|2|Type         ||||          ||L|5" _FM_ "DATE_CREATED |F|3|Date Created ||||D4        ||L|12" _FM_ "TIME_CREATED |F|4|Time Created ||||MTH       ||L|12" _FM_ "BALANCE      |F|5|Balance      ||||MD20P     ||R|10"
-		//_FM_ "TIMESTAMP    |F|6|Timestamp    ||||[DATETIME]||L|12"
-		_FM_ "TIMESTAMP    |F|6|Timestamp    ||||          ||R|12" _FM_ "NAME_AND_TYPE|S| |Name and Type||||          ||L|20" _FM_ "NAME_AND_CODE|S| |Name and Code||||          ||L|20" _FM_ "@CRT         |G| |CODE NAME TYPE NAME_AND_TYPE BALANCE DATE_CREATED TIME_CREATED TIMESTAMP";
+		"CODE         |F|0|Code         ||||          ||L|8" _FM "NAME         |F|1|Name         ||||          ||T|15" _FM "TYPE         |F|2|Type         ||||          ||L|5" _FM "DATE_CREATED |F|3|Date Created ||||D4        ||L|12" _FM "TIME_CREATED |F|4|Time Created ||||MTH       ||L|12" _FM "BALANCE      |F|5|Balance      ||||MD20P     ||R|10"
+		//_FM "TIMESTAMP    |F|6|Timestamp    ||||[DATETIME]||L|12"
+		_FM "TIMESTAMP    |F|6|Timestamp    ||||          ||R|12" _FM "NAME_AND_TYPE|S| |Name and Type||||          ||L|20" _FM "NAME_AND_CODE|S| |Name and Code||||          ||L|20" _FM "@CRT         |G| |CODE NAME TYPE NAME_AND_TYPE BALANCE DATE_CREATED TIME_CREATED TIMESTAMP";
 
 	printl("\nWrite the dictionary records to the dictionary");
 

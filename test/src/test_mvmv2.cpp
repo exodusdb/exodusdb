@@ -14,7 +14,7 @@ function main() {
 	// but we use pickreplace which returns a temporary for convenience in testing
 	// note that replace() function in exodus is regular expression replace a with b
 
-	var rec = "1" _FM_ "21" _VM_ "22" _FM_ "311" _SM_ "312" _VM_ "32" _FM_ "4";
+	var rec = "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4";
 
 	{
 		printl("Check that () extraction on a constant var produces an ordinary var that can use .oconv(...) etc");
@@ -31,39 +31,39 @@ function main() {
 	}
 
 	{
-		assert(pickreplace(rec,1,"1r") == "1r" _FM_ "21" _VM_ "22" _FM_ "311" _SM_ "312" _VM_ "32" _FM_ "4");
+		assert(pickreplace(rec,1,"1r") == "1r" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4");
 		printl(pickreplace(rec,2,"2r"));//1^2r^311}312]32^4
-		assert(pickreplace(rec,2,"2r") == "1" _FM_ "2r" _FM_ "311" _SM_ "312" _VM_ "32" _FM_ "4");
+		assert(pickreplace(rec,2,"2r") == "1" _FM "2r" _FM "311" _SM "312" _VM "32" _FM "4");
 
-		assert(pickreplace(rec,-1,"5-1r") == "1" _FM_ "21" _VM_ "22" _FM_ "311" _SM_ "312" _VM_ "32" _FM_ "4" _FM_ "5-1r");
-		assert(pickreplace(rec,2,-1,"2-1r") == "1" _FM_ "21" _VM_ "22" _VM_ "2-1r" _FM_ "311" _SM_ "312" _VM_ "32" _FM_ "4");
-		assert(pickreplace(rec,3,2,-1,"32-1r") == "1" _FM_ "21" _VM_ "22" _FM_ "311" _SM_ "312" _VM_ "32" _SM_ "32-1r" _FM_ "4");
+		assert(pickreplace(rec,-1,"5-1r") == "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4" _FM "5-1r");
+		assert(pickreplace(rec,2,-1,"2-1r") == "1" _FM "21" _VM "22" _VM "2-1r" _FM "311" _SM "312" _VM "32" _FM "4");
+		assert(pickreplace(rec,3,2,-1,"32-1r") == "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _SM "32-1r" _FM "4");
 
-		assert(pickreplace(rec,2,1,"21r") == "1" _FM_ "21r" _VM_ "22" _FM_ "311" _SM_ "312" _VM_ "32" _FM_ "4");
-		assert(pickreplace(rec,2,4,"24r") == "1" _FM_ "21" _VM_ "22" _VM_ _VM_ "24r" _FM_ "311" _SM_ "312" _VM_ "32" _FM_ "4");
+		assert(pickreplace(rec,2,1,"21r") == "1" _FM "21r" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4");
+		assert(pickreplace(rec,2,4,"24r") == "1" _FM "21" _VM "22" _VM _VM "24r" _FM "311" _SM "312" _VM "32" _FM "4");
 	}
 
 	//.r()
 
 	//plain replace subvalue in the middle of subvalues
-	var v123 = "f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_;
-	assert(v123.r(2, 2, 2, "n222") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
+	var v123 = "f100" _FM "f210" _VM "f221" _SM "f222" _SM;
+	assert(v123.r(2, 2, 2, "n222") == "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
 	v123(2, 2, 2) = "n222";
-	assert(v123 == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "n222") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "n222" _SM_);
+	assert(v123 == "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "n222") == "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
 	//plain replace subvalue in the middle of subvalues with null, smaller and larger
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "" _SM_);
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "x") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "x" _SM_);
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, 2, 2, "xyz123") == "f100" _FM_ "f210" _VM_ "f221" _SM_ "xyz123" _SM_);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "") == "f100" _FM "f210" _VM "f221" _SM "" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "x") == "f100" _FM "f210" _VM "f221" _SM "x" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "xyz123") == "f100" _FM "f210" _VM "f221" _SM "xyz123" _SM);
 
-	assert(var("f100" _FM_ "f210" _VM_ "f221" _SM_ "f222" _SM_).r(2, "xyz123") == "f100" _FM_ "xyz123");
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, "xyz123") == "f100" _FM "xyz123");
 
 	//replace field zero
 	assert(pickreplace(rec,0,"f000") == "f000");
 	assert(pickreplace(rec,0,0,"f000") == "f000");
 	assert(pickreplace(rec,0,0,0,"f000") == "f000");
 
-	var da2="aa" _FM_ "b1" _VM_ "b2" _SM_ "b22" _FM_ "cc";
+	var da2="aa" _FM "b1" _VM "b2" _SM "b22" _FM "cc";
 
 	//this shouldnt compile without a warning since it has no effect
 	//pickreplace(da2,3,"x");//or this
@@ -73,44 +73,44 @@ function main() {
 	//replacement
 	//da2(2)="x";//this will not compile because da2(2) is a temporary;
 
-	da2="f1" _FM_ "f2" _FM_ "f3";
+	da2="f1" _FM "f2" _FM "f3";
 
 	//replace field 2 with "R2"
 	da2="";
-	assert(pickreplacer(da2, 2, "R2") eq ( _FM_ "R2"));
+	assert(pickreplacer(da2, 2, "R2") eq ( _FM "R2"));
 
 	//replace field 2, value 3 with "R22"
 	da2="";
-	assert(pickreplacer(da2, 2, 3, "R23") eq ( _FM_ _VM_ _VM_ "R23"));
+	assert(pickreplacer(da2, 2, 3, "R23") eq ( _FM _VM _VM "R23"));
 
 	//replace field 2, value 3, subvalue 4 with "R234"
 	da2="";
-	assert(pickreplacer(da2, 2, 3, 4, "R234") eq ( _FM_ _VM_ _VM_ _SM_ _SM_ _SM_ "R234"));
+	assert(pickreplacer(da2, 2, 3, 4, "R234") eq ( _FM _VM _VM _SM _SM _SM "R234"));
 
 	/////////
 	//extract
 	/////////
 
 	//extraction
-	var da1="aa" _FM_ "b1" _VM_ "b2" _SM_ "b22" _FM_ "cc";
+	var da1="aa" _FM "b1" _VM "b2" _SM "b22" _FM "cc";
 	assert(da1.f(2) eq extract(da1,2));//this extracts field 2
 	assert(da1.f(2,2) eq extract(da1,2,2));//this extracts field 2, value 2
 	assert(da1.f(2,2,2) eq extract(da1,2,2,2));//this extracts field 2, value 2, subvalue 2
 
 	//extract or a() or plain ()
-	var xx = "11" _SM_ "111" _VM_ "12" _FM_ "22" _FM_ "31" _VM_ "321" _SM_ "322" _FM_;
+	var xx = "11" _SM "111" _VM "12" _FM "22" _FM "31" _VM "321" _SM "322" _FM;
 	assert(extract(xx,3,2,2) == "322");
 	assert(xx.extract(3,2,2) == "322");
 	//extract beyond end of string
-	assert(extract(var("f100" _FM_ "f200"),3) == "");
-	assert(extract(var("f100" _FM_ "f210" _VM_),2,3) == "");
-	assert(extract(var("f100" _FM_ "f210" _VM_ "f221" _SM_),2,2,2) == "");
-	assert(extract(var("f100" _FM_ "f200"),3) == "");
-	assert(extract(var("f100" _FM_ "f210" _VM_),2,3) == "");
-	assert(extract(var("f100" _FM_ "f211" _SM_),2,2,2) == "");
+	assert(extract(var("f100" _FM "f200"),3) == "");
+	assert(extract(var("f100" _FM "f210" _VM),2,3) == "");
+	assert(extract(var("f100" _FM "f210" _VM "f221" _SM),2,2,2) == "");
+	assert(extract(var("f100" _FM "f200"),3) == "");
+	assert(extract(var("f100" _FM "f210" _VM),2,3) == "");
+	assert(extract(var("f100" _FM "f211" _SM),2,2,2) == "");
 
 	//plain extract subvalue from middle of subvalues
-	assert(extract(var("100" _FM_ "210" _VM_ "221" _SM_ "222" _SM_),2,2,2) == "222");
+	assert(extract(var("100" _FM "210" _VM "221" _SM "222" _SM),2,2,2) == "222");
 
 	//another way
 	assert(xx.f(3,2,2) == "322");
@@ -344,104 +344,104 @@ function main() {
 
 	var t1="aa";
 
-	assert(insert(t1,-2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^xyz");//-2 is the same as -1 i.e append
-	assert(insert(t1,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^xyz");
-	assert(insert(t1,0,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="xyz^aa");
-	assert(insert(t1,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^xyz");
-	assert(insert(t1,3,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^^xyz");
-	assert(insert(t1,1,1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="xyz]aa");
-	assert(insert(t1,2,1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^xyz");
-	assert(insert(t1,2,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]xyz");
+	assert(insert(t1,-2,"xyz").convert(_FM _VM _SM,"^]}")=="aa^xyz");//-2 is the same as -1 i.e append
+	assert(insert(t1,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa^xyz");
+	assert(insert(t1,0,"xyz").convert(_FM _VM _SM,"^]}")=="xyz^aa");
+	assert(insert(t1,2,"xyz").convert(_FM _VM _SM,"^]}")=="aa^xyz");
+	assert(insert(t1,3,"xyz").convert(_FM _VM _SM,"^]}")=="aa^^xyz");
+	assert(insert(t1,1,1,"xyz").convert(_FM _VM _SM,"^]}")=="xyz]aa");
+	assert(insert(t1,2,1,"xyz").convert(_FM _VM _SM,"^]}")=="aa^xyz");
+	assert(insert(t1,2,2,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]xyz");
 
-	assert(var("f110" _VM_ "f120" _VM_ "f130" _VM_ "f140" _FM_ "f211" _VM_ "f212").inserter(1,3,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="f110]f120]xyz]f130]f140^f211]f212");
-	assert(var(t1).inserter(1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="xyz^aa");
+	assert(var("f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212").inserter(1,3,"xyz").convert(_FM _VM _SM,"^]}")=="f110]f120]xyz]f130]f140^f211]f212");
+	assert(var(t1).inserter(1,"xyz").convert(_FM _VM _SM,"^]}")=="xyz^aa");
 
 	// free function
 	{
-		var x = "f110" _VM_ "f120" _VM_ "f130" _VM_ "f140" _FM_ "f211" _VM_ "f212";
+		var x = "f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212";
 		inserter(x,2,"xyz");
-		assert(x.convert(_FM_ _VM_ _SM_,"^]}") eq "f110]f120]f130]f140^xyz^f211]f212");
+		assert(x.convert(_FM _VM _SM,"^]}") eq "f110]f120]f130]f140^xyz^f211]f212");
 	}
 	{
-		var x = "f110" _VM_ "f120" _VM_ "f130" _VM_ "f140" _FM_ "f211" _VM_ "f212";
+		var x = "f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212";
 		inserter(x,1,3,"xyz");
-		assert(x.convert(_FM_ _VM_ _SM_,"^]}") eq "f110]f120]xyz]f130]f140^f211]f212");
+		assert(x.convert(_FM _VM _SM,"^]}") eq "f110]f120]xyz]f130]f140^f211]f212");
 	}
 	{
-		var x = "f110" _VM_ "f120" _VM_ "f130" _VM_ "f140" _FM_ "f211" _VM_ "f212";
+		var x = "f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212";
 		inserter(x,1,3,1,"xyz").dump();
-		assert(x.convert(_FM_ _VM_ _SM_,"^]}") eq "f110]f120]xyz}f130]f140^f211]f212");
+		assert(x.convert(_FM _VM _SM,"^]}") eq "f110]f120]xyz}f130]f140^f211]f212");
 	}
 
-	assert(insert(t1,2,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^xyz");
-	assert(var("aa" _FM_ _VM_).insert(1,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa]xyz^]");
-	assert(var("aa" _FM_ _SM_).insert(1,1,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa}xyz^}");
-	assert(var("aa" _FM_ _SM_).insert(1,2,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa]xyz^}");
-	assert(var("aa" _FM_ _SM_).insert(1,3,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa]]xyz^}");
-	assert(var("aa" _FM_ _SM_).insert(1,3,4,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa]]}}}xyz^}");
-	assert(var("f111" _SM_ "f112" _SM_ "f113" _FM_ "f211" _SM_ "f212").insert(1,1,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="f111}xyz}f112}f113^f211}f212");
+	assert(insert(t1,2,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa^xyz");
+	assert(var("aa" _FM _VM).insert(1,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa]xyz^]");
+	assert(var("aa" _FM _SM).insert(1,1,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa}xyz^}");
+	assert(var("aa" _FM _SM).insert(1,2,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa]xyz^}");
+	assert(var("aa" _FM _SM).insert(1,3,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa]]xyz^}");
+	assert(var("aa" _FM _SM).insert(1,3,4,"xyz").convert(_FM _VM _SM,"^]}")=="aa]]}}}xyz^}");
+	assert(var("f111" _SM "f112" _SM "f113" _FM "f211" _SM "f212").insert(1,1,2,"xyz").convert(_FM _VM _SM,"^]}")=="f111}xyz}f112}f113^f211}f212");
 
-	assert(insert(t1,2,2,-2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]xyz");//-2 same as -1
-	assert(insert(t1,2,2,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]xyz");
-	assert(insert(t1,2,2,0,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]xyz");
-	assert(insert(t1,2,2,1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]xyz");
-	assert(insert(t1,2,2,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]}xyz");
+	assert(insert(t1,2,2,-2,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]xyz");//-2 same as -1
+	assert(insert(t1,2,2,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]xyz");
+	assert(insert(t1,2,2,0,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]xyz");
+	assert(insert(t1,2,2,1,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]xyz");
+	assert(insert(t1,2,2,2,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]}xyz");
 
-	assert(insert(t1,1,2,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa]xyz");
-	assert(insert(t1,1,2,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa]xyz");
+	assert(insert(t1,1,2,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa]xyz");
+	assert(insert(t1,1,2,-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa]xyz");
 
 	//on a temporary
-	assert(var(t1).insert(-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^xyz");
-	assert(var(t1).insert(2,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]xyz");
-	assert(var(t1).insert(2,2,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="aa^]}xyz");
+	assert(var(t1).insert(-1,"xyz").convert(_FM _VM _SM,"^]}")=="aa^xyz");
+	assert(var(t1).insert(2,2,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]xyz");
+	assert(var(t1).insert(2,2,2,"xyz").convert(_FM _VM _SM,"^]}")=="aa^]}xyz");
 
 	t1="";
-	assert(insert(t1,-1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="xyz");
-	assert(insert(t1,0,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="xyz");
-	assert(insert(t1,1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="xyz");
-	assert(insert(t1,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="^xyz");
-	assert(insert(t1,3,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="^^xyz");
-	assert(insert(t1,1,1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="xyz");
-	assert(insert(t1,2,1,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="^xyz");
-	assert(insert(t1,2,2,"xyz").convert(_FM_ _VM_ _SM_,"^]}")=="^]xyz");
+	assert(insert(t1,-1,"xyz").convert(_FM _VM _SM,"^]}")=="xyz");
+	assert(insert(t1,0,"xyz").convert(_FM _VM _SM,"^]}")=="xyz");
+	assert(insert(t1,1,"xyz").convert(_FM _VM _SM,"^]}")=="xyz");
+	assert(insert(t1,2,"xyz").convert(_FM _VM _SM,"^]}")=="^xyz");
+	assert(insert(t1,3,"xyz").convert(_FM _VM _SM,"^]}")=="^^xyz");
+	assert(insert(t1,1,1,"xyz").convert(_FM _VM _SM,"^]}")=="xyz");
+	assert(insert(t1,2,1,"xyz").convert(_FM _VM _SM,"^]}")=="^xyz");
+	assert(insert(t1,2,2,"xyz").convert(_FM _VM _SM,"^]}")=="^]xyz");
 
 	//insert "I2" at field 2
-	da1="f1" _FM_ "f2";
-	assert(insert(da1, 2, "I2") eq ( "f1" _FM_ "I2" _FM_ "f2"));
-	assert(insert(da1, 2, 1, "I21") eq ( "f1" _FM_ "I21" _VM_ "f2"));
-	assert(insert(da1, 2, 1, 1, "I211") eq ( "f1" _FM_ "I211" _SM_ "f2"));
+	da1="f1" _FM "f2";
+	assert(insert(da1, 2, "I2") eq ( "f1" _FM "I2" _FM "f2"));
+	assert(insert(da1, 2, 1, "I21") eq ( "f1" _FM "I21" _VM "f2"));
+	assert(insert(da1, 2, 1, 1, "I211") eq ( "f1" _FM "I211" _SM "f2"));
 
 	////////////////////////
 	//remove (pickos delete)
 	////////////////////////
 
 	//remove field 1
-	da1="f1" _FM_ "f2";
+	da1="f1" _FM "f2";
 	assert(remove(da1, 1) eq ( "f2"));
 	assert(remover(da1, 1) eq ( "f2"));
 	assert(da1 == "f2");
 
 	//remove field 1, value 2
-	da1="f1" _VM_ "f1v2" _VM_ "f1v3" _FM_ "f2";
-	assert(remove(da1, 1, 2) eq ("f1" _VM_ "f1v3" _FM_ "f2"));
+	da1="f1" _VM "f1v2" _VM "f1v3" _FM "f2";
+	assert(remove(da1, 1, 2) eq ("f1" _VM "f1v3" _FM "f2"));
 
 	//remove field 1, value 2, subvalue 2
-	da1="f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3" _FM_ "f2";
-	assert(remove(da1, 1, 2, 2) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s3" _VM_ "f1v3" _FM_ "f2"));
+	da1="f1" _VM "f1v2s1" _SM "f1v2s2" _SM "f1v2s3" _VM "f1v3" _FM "f2";
+	assert(remove(da1, 1, 2, 2) eq ("f1" _VM "f1v2s1" _SM "f1v2s3" _VM "f1v3" _FM "f2"));
 
 	//remove field 2, value 1, subvalue 1
-	assert(remove(da1, 2, 1, 1) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3" _FM_));
-	assert(remove(da1, 2, 0, 0) eq ("f1" _VM_ "f1v2s1" _SM_ "f1v2s2" _SM_ "f1v2s3" _VM_ "f1v3"));
+	assert(remove(da1, 2, 1, 1) eq ("f1" _VM "f1v2s1" _SM "f1v2s2" _SM "f1v2s3" _VM "f1v3" _FM));
+	assert(remove(da1, 2, 0, 0) eq ("f1" _VM "f1v2s1" _SM "f1v2s2" _SM "f1v2s3" _VM "f1v3"));
 	assert(remove(da1, 3, 0, 0) eq da1);
 
 	da1="1^2^31]32]331|332|333]34^4";
-	assert(convert(da1,"^]|",_FM_ _VM_ _SM_).remove(3,3,0) == var("1^2^31]32]34^4").convert("^]|",_FM_ _VM_ _SM_));
+	assert(convert(da1,"^]|",_FM _VM _SM).remove(3,3,0) == var("1^2^31]32]34^4").convert("^]|",_FM _VM _SM));
 
 	da1="1^2^311|312]32]331|332|333]34^4";
-	assert(convert(da1,"^]|",_FM_ _VM_ _SM_).remove(3,1,0) == var("1^2^32]331|332|333]34^4").convert("^]|",_FM_ _VM_ _SM_));
+	assert(convert(da1,"^]|",_FM _VM _SM).remove(3,1,0) == var("1^2^32]331|332|333]34^4").convert("^]|",_FM _VM _SM));
 
 	da1="1^2^311|312]32]331|332|333]34^4";
-	assert(convert(da1,"^]|",_FM_ _VM_ _SM_).remove(3,1,1) == var("1^2^312]32]331|332|333]34^4").convert("^]|",_FM_ _VM_ _SM_));
+	assert(convert(da1,"^]|",_FM _VM _SM).remove(3,1,1) == var("1^2^312]32]331|332|333]34^4").convert("^]|",_FM _VM _SM));
 
 	//remove 0, 0, 0
 	assert(remove(da1,0 ,0 ,0) eq "");
@@ -451,19 +451,19 @@ function main() {
 	/////
 
 	//sum with defined separator
-	assert(var("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ).sum(VM) == 0);
+	assert(var("2245000900.76" _VM "102768099.9" _VM "-2347769000.66" _VM ).sum(VM) == 0);
 	//using free function
-	assert(sum(var("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_), VM) == 0);
+	assert(sum(var("2245000900.76" _VM "102768099.9" _VM "-2347769000.66" _VM), VM) == 0);
 	//multilevel
-	assert(var("2245000900.76" _VM_ "102760000" _SM_ "8099.9" _VM_ "-2347769000.66" _VM_ ).sum(VM) == 0);
+	assert(var("2245000900.76" _VM "102760000" _SM "8099.9" _VM "-2347769000.66" _VM ).sum(VM) == 0);
 	assert(var("2245000900.76").sum(VM) == 2245000900.76);
 	assert(var("").sum(VM) == 0);
 	//sumall
-	assert(var("2245000900.76" _VM_ "102760000" _SM_ "8099.9" _VM_ "-2347769000.66" _VM_ ).sumall() == 0);
+	assert(var("2245000900.76" _VM "102760000" _SM "8099.9" _VM "-2347769000.66" _VM ).sumall() == 0);
 
 	//test sum rounds result to no more than the input decimals input
-	printl(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ));
-	assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ) == 0);
+	printl(sum("2245000900.76" _VM "102768099.9" _VM "-2347769000.66" _VM ));
+	assert(sum("2245000900.76" _VM "102768099.9" _VM "-2347769000.66" _VM ) == 0);
 	assert(sum("2245000900.76") == 2245000900.76);
 	assert(sum("") == 0);
 
@@ -505,32 +505,32 @@ function main() {
 	/////////////////////////
 
 
-	assert((1 ^ FM ^ 2).mv("*",10 ^ FM ^ 20) == "10" _FM_ "40");
+	assert((1 ^ FM ^ 2).mv("*",10 ^ FM ^ 20) == "10" _FM "40");
 
 	var aaa="11"^VM^VM^"13"^VM^FM^"21";
 	var bbb="1011"^VM^VM^"1013";
 
-	assert(convert(aaa.mv(":",bbb), _VM_ _FM_, "]^")=="111011]]131013]^21");
-	assert(convert(aaa.mv("+",bbb), _VM_ _FM_, "]^")=="1022]0]1026]0^21");
-	assert(convert(aaa.mv("-",bbb), _VM_ _FM_, "]^")=="-1000]0]-1000]0^21");
-	assert(convert(aaa.mv("*",bbb), _VM_ _FM_, "]^")=="11121]0]13169]0^0");
+	assert(convert(aaa.mv(":",bbb), _VM _FM, "]^")=="111011]]131013]^21");
+	assert(convert(aaa.mv("+",bbb), _VM _FM, "]^")=="1022]0]1026]0^21");
+	assert(convert(aaa.mv("-",bbb), _VM _FM, "]^")=="-1000]0]-1000]0^21");
+	assert(convert(aaa.mv("*",bbb), _VM _FM, "]^")=="11121]0]13169]0^0");
 
-	assert(convert(bbb.mv(":",aaa), _VM_ _FM_, "]^")=="101111]]101313]^21");
-	assert(convert(bbb.mv("+",aaa), _VM_ _FM_, "]^")=="1022]0]1026]0^21");
-	assert(convert(bbb.mv("-",aaa), _VM_ _FM_, "]^")=="1000]0]1000]0^-21");
-	assert(convert(bbb.mv("*",aaa), _VM_ _FM_, "]^")=="11121]0]13169]0^0");
+	assert(convert(bbb.mv(":",aaa), _VM _FM, "]^")=="101111]]101313]^21");
+	assert(convert(bbb.mv("+",aaa), _VM _FM, "]^")=="1022]0]1026]0^21");
+	assert(convert(bbb.mv("-",aaa), _VM _FM, "]^")=="1000]0]1000]0^-21");
+	assert(convert(bbb.mv("*",aaa), _VM _FM, "]^")=="11121]0]13169]0^0");
 
 	aaa="11"  ^VM^VM^"13"  ^VM^FM^"21";
 	bbb="1011"^VM^"0"^VM^"1013"^VM^FM^"2011";
-	assert(oconv(aaa.mv("/",bbb), "MD90P").convert(_VM_ _FM_, "]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
+	assert(oconv(aaa.mv("/",bbb), "MD90P").convert(_VM _FM, "]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
 
 	aaa=""^VM^"" ^VM^"0"^VM^"0"^VM;
 	bbb=""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0";
-	assert(aaa.mv("/",bbb).convert(_VM_ _FM_, "]^")=="0]0]0]0]0]0]0]0");
+	assert(aaa.mv("/",bbb).convert(_VM _FM, "]^")=="0]0]0]0]0]0]0]0");
 
 	//testing .mv(+ - * / :)
-	var m1="1" _VM_ "2" _VM_ _VM_ "4";
-	var m2="100" _VM_ "200" _VM_ "300"; 
+	var m1="1" _VM "2" _VM _VM "4";
+	var m2="100" _VM "200" _VM "300"; 
 
 	m1.convert(VM,"]").outputl("m1=");
 	m2.convert(VM,"]").outputl("m2=");
@@ -646,7 +646,7 @@ function main() {
 //function to conveniently test sum function
 function test_sum(in instr)
 {
-	return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _ST_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_,"~^]}>|");
+	return sum(instr.convert("~^]}>|", _RM _FM _VM _SM _TM _ST)).convert(_RM _FM _VM _SM _TM _ST,"~^]}>|");
 }
 
 programexit()

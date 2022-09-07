@@ -148,12 +148,12 @@ class PUBLIC MvEnvironment {
 	var LOWERCASE = LOWERCASE_;
 	var UPPERCASE = UPPERCASE_;
 	// var INTERNALCHARS = "\x1A\x1B\x1C\x1D\x1E\x1F";
-	// var EXTERNALCHARS = _ST_ _TM_ _SM_ _VM_ _FM_ _RM_;
+	// var EXTERNALCHARS = _ST _TM _SM _VM _FM _RM;
 
 	var TCLSTACK = "";
 	// INTCONST=keyboard constants 1:ESC 2:f5 7:f10
-	//var INTCONST = "\x1B" _FM_ "{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
-	var INTCONST = "q" _FM_ "x" _FM_ _FM_ _FM_ _FM_ _FM_ "m";
+	//var INTCONST = "\x1B" _FM "{f5?}" _FM _FM _FM _FM _FM "{f10?}";
+	var INTCONST = "q" _FM "x" _FM _FM _FM _FM _FM "m";
 	var PRIORITYINT = "";
 	int COL1 = 0;
 	int COL2 = 0;

@@ -677,7 +677,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 	for (var ii = 1; ii <= 9; ++ii)
 		msg1.swapper("%" ^ ii, params.f(ii));
 
-	msg1.converter(_FM_ _VM_ "|", "\n\n\n").trimmer("\n");
+	msg1.converter(_FM _VM "|", "\n\n\n").trimmer("\n");
 
 	std::cout << msg1 << std::endl;
 
@@ -953,7 +953,7 @@ notallowed:
 	}
 	// convert ',' to vm in keys
 	// convert ',' to vm in locks
-	keys.converter("," _VM_ "", "  ");
+	keys.converter("," _VM "", "  ");
 	locks.converter(",", " ");
 	// NLOCKS=COUNT(LOCKS,vm)+1
 	var nlocks = locks.count(" ") + 1;
@@ -1009,7 +1009,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		var inquotes = 0;
 		// wordseps=' /-.()&'
 		if (wordseps0.unassigned())
-			wordseps = " .()&_" _RM_ _FM_ _VM_ _SM_ _TM_ _ST_;
+			wordseps = " .()&_" _RM _FM _VM _SM _TM _ST;
 		else
 			wordseps = wordseps0;
 		for (int ii = 1; ii <= nn; ii++) {
@@ -1096,9 +1096,9 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		};	// ii;
 
 		if (mode0.index("TRIM", 1)) {
-			string2.converter(" " _FM_, _FM_ " ");
+			string2.converter(" " _FM, _FM " ");
 			string2 = string2.trim();
-			string2.converter(" " _FM_, _FM_ " ");
+			string2.converter(" " _FM, _FM " ");
 		}
 	}
 
@@ -1205,7 +1205,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
 		if (OPTIONS)
 			COMMAND.splicer(-(OPTIONS.length()), OPTIONS.length(), "");
-		COMMAND.trimmerb(_FM_);
+		COMMAND.trimmerb(_FM);
 
 		// load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();
@@ -1338,9 +1338,9 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 	}
 
 	if (nkeys > 1)
-		results.converter(_FM_, _VM_);
+		results.converter(_FM, _VM);
 	//else
-	//    sep = _RM_;
+	//    sep = _RM;
 
 	return results;
 }
@@ -1383,7 +1383,7 @@ var ExodusProgramBase::calculate(CVR dictid) {
 	// or call the right library
 	bool indictvoc = false;
 	bool newlibfunc = false;
-	std::string curr_dictid = std::string(dictid) + _RM_ + DICT.f(1).toString();
+	std::string curr_dictid = std::string(dictid) + _RM + DICT.f(1).toString();
 	if (cached_dictid_ != curr_dictid) {
 		cached_dictid_ = "";
 		newlibfunc = true;
@@ -1591,7 +1591,7 @@ var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const i
 	//	var noptions = options.count(FM) + (options != "");
 	var options = optionsx;
 	if (not options)
-		options = "Yes" _VM_ "No";
+		options = "Yes" _VM "No";
 	options.converter(VM ^ "|", FM ^ FM);
 	var noptions = options.dcount(FM);
 	for (int optionn = 1; optionn <= noptions; optionn++) {

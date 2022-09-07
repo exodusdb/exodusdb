@@ -114,7 +114,7 @@ class PUBLIC dim final {
 		}
 	}
 
-	ND var join(SV sepchar = _FM_) const;
+	ND var join(SV sepchar = _FM) const;
 
 	// parenthesis operators often come in pairs
 	// returns a reference to one var of the array
@@ -143,7 +143,7 @@ class PUBLIC dim final {
 
 	// see also var::split
 	// return the number of fields
-	var split(CVR var1, SV sepchar = _FM_);
+	var split(CVR var1, SV sepchar = _FM);
 	dim& sort(bool reverse = false);
 
 	bool read(CVR filehandle, CVR key);

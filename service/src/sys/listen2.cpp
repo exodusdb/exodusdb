@@ -685,7 +685,7 @@ validateexit2:
 
 			}
 
-			text.converter(_RM_ _FM_ _VM_, _SM_ _SM_ _SM_);
+			text.converter(_RM _FM _VM, _SM _SM _SM);
 
 			//open 'USERS' to users then
 			if (users) {

@@ -900,7 +900,7 @@ var var::oconv_TX(const int raw) const {
 	// so we have to escape them somehow first
 	// for usual case skip if no backslashes are present
 	if (txt.var_str.find('\\') != std::string::npos)
-		txt.regex_replacer("\\\\([" _FM_ _VM_ _SM_ _TM_ _ST_ "])", "{Back_Slash}\\1");
+		txt.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
 
 	// "\n" -> "\\n"
 	txt.swapper("\\n", "\\\\n");
@@ -909,17 +909,17 @@ var var::oconv_TX(const int raw) const {
 	txt.swapper("\n", "\\n");
 
 	// FM -> LF
-	txt.converter(_FM_, "\n");
+	txt.converter(_FM, "\n");
 
 	// VM -> \ + LF
 	// SM -> \\ + LF
 	// TM -> \\\ + LF
 	// ST -> \\\\ + LF
 	if (not raw) {
-		txt.swapper(_VM_, "\\\n");
-		txt.swapper(_SM_, "\\\\\n");
-		txt.swapper(_TM_, "\\\\\\\n");
-		txt.swapper(_ST_, "\\\\\\\\\n");
+		txt.swapper(_VM, "\\\n");
+		txt.swapper(_SM, "\\\\\n");
+		txt.swapper(_TM, "\\\\\\\n");
+		txt.swapper(_ST, "\\\\\\\\\n");
 	}
 
 	return txt;
@@ -933,14 +933,14 @@ var var::iconv_TX(const int raw) const {
 	// \\ + LF -> TM
 	// \\\ + LF -> ST
 	if (not raw) {
-		record.swapper("\\\\\\\\\n", _ST_);
-		record.swapper("\\\\\\\n", _TM_);
-		record.swapper("\\\\\n", _SM_);
-		record.swapper("\\\n", _VM_);
+		record.swapper("\\\\\\\\\n", _ST);
+		record.swapper("\\\\\\\n", _TM);
+		record.swapper("\\\\\n", _SM);
+		record.swapper("\\\n", _VM);
 	}
 
 	// LF -> FM
-	record.converter("\n", _FM_);
+	record.converter("\n", _FM);
 
 	// "\n" -> LF
 	record.swapper("\\n", "\n");
@@ -952,7 +952,7 @@ var var::iconv_TX(const int raw) const {
 	// so we have to escape them somehow first
 	// for usual case skip if no { is present
 	if (record.var_str.find('{') != std::string::npos)
-		record.regex_replacer("{Back_Slash}([" _FM_ _VM_ _SM_ _TM_ _ST_ "])", "\\\\" "\\1");
+		record.regex_replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])", "\\\\" "\\1");
 
 	return record;
 }

@@ -51,7 +51,7 @@ subroutine process(in str0, in mode, io wordseps) {
 
 	if (wordseps.unassigned()) {
 		wordseps = " .()&_";
-		wordseps ^= _RM_ _FM_ _VM_ _SM_ _TM_ _ST_;
+		wordseps ^= _RM _FM _VM _SM _TM _ST;
 	}
 
 	if (mode eq "QUOTE") {
@@ -150,9 +150,9 @@ capitalise:
 		} //ii;
 
 		if (mode.index("TRIM")) {
-			string2.converter(" " _FM_, _FM_ " ");
+			string2.converter(" " _FM, _FM " ");
 			string2.trimmer();
-			string2.converter(" " _FM_, _FM_ " ");
+			string2.converter(" " _FM, _FM " ");
 		}
 
 	} else {

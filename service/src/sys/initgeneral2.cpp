@@ -154,7 +154,7 @@ function main(in mode, io logtime, in menu) {
 		call log2("*get osenv", logtime);
 
 		//nb will NOT overwrite any manual entries in SYSTEM.CFG
-		let osenv = osgetenv().converter("\r\n", _FM_ _FM_ _FM_);
+		let osenv = osgetenv().converter("\r\n", _FM _FM _FM);
 //		var nenv = osenv.count(FM) + 1;
 //		for (const var ii : range(1, nenv)) {
 //			var enventry = osenv.f(ii);

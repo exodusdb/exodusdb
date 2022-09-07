@@ -88,10 +88,10 @@ function main()
 
 //assert(var(L"123456").outputl() eq "123456");
 
-		TRACE(_VM_ "0" _VM_ _VM_)
+		TRACE(_VM "0" _VM _VM)
 		TRACE("MD20PZ")
-		TRACE(oconv(_VM_ "0" _VM_ _VM_,"MD20PZ"));
-		assert(oconv(_VM_ "0" _VM_ _VM_,"MD20PZ")== _VM_ _VM_ _VM_);
+		TRACE(oconv(_VM "0" _VM _VM,"MD20PZ"));
+		assert(oconv(_VM "0" _VM _VM,"MD20PZ")== _VM _VM _VM);
 
 		assert(oconv(1234.567,"MC20PZ")=="1234,57");
 

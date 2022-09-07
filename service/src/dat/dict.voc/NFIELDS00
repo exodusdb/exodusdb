@@ -31,7 +31,7 @@ S
 	//@record=matunparse(x)\
 	//             call msg('y')\
 	//remove blank lines\
-	RECORD.converter(_FM_ " ", " " _FM_);\
+	RECORD.converter(_FM " ", " " _FM);\
 \
 	nfields = RECORD.trim().count(" ") + 1;\
 	return nfields;

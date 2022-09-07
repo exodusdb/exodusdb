@@ -1380,11 +1380,11 @@ VARREF var::lowerer() {
 	//assertString(function_sig);
 
 	// note: rotate lowest sep to highest
-	//this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_, _FM_ _VM_ _SM_ _TM_ _ST_ _RM_);
+	//this->converter(_RM _FM _VM _SM _TM _ST, _FM _VM _SM _TM _ST _RM);
 
 	//bottom marks get crushed together but ST is infrequently used
 	// reversible by raiser only if no ST chars are present - which are not common
-	this->converter(_RM_ _FM_ _VM_ _SM_ _TM_, _FM_ _VM_ _SM_ _TM_ _ST_);
+	this->converter(_RM _FM _VM _SM _TM, _FM _VM _SM _TM _ST);
 
 	return *this;
 }
@@ -1408,11 +1408,11 @@ VARREF var::raiser() {
 
 	// note: rotate highest sep to lowest
 	// advantage is it is reversible by lowerer but the problem is that the smallest delimiter becomes the largest
-	//this->converter(_FM_ _VM_ _SM_ _TM_ _ST_ _RM_, _RM_ _FM_ _VM_ _SM_ _TM_ _ST_);
+	//this->converter(_FM _VM _SM _TM _ST _RM, _RM _FM _VM _SM _TM _ST);
 
 	// top two marks get crushed together but RM is rarely used
 	// reversible by lowerer only if no RM are present - which are rare
-	this->converter(_FM_ _VM_ _SM_ _TM_ _ST_, _RM_ _FM_ _VM_ _SM_ _TM_);
+	this->converter(_FM _VM _SM _TM _ST, _RM _FM _VM _SM _TM);
 
 	return *this;
 }
@@ -1844,7 +1844,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 	char sep = fieldno.length() ? VM_ : RM_;
 
 	var response = "";
-	int nmv = this->dcount(_VM_);
+	int nmv = this->dcount(_VM);
 	for (int vn = 1; vn <= nmv; ++vn) {
 
 		//test every time instead of always appending and removing at the end
@@ -1902,17 +1902,17 @@ var var::numberinwords(CVR langname_or_locale_id) {
 	langname_or_locale_id.assertString(function_sig);
 
 	var exo_languages =
-		"english" _VM_
-		"arabic" _VM_
-		"greek" _VM_
-		"spanish" _VM_
+		"english" _VM
+		"arabic" _VM
+		"greek" _VM
+		"spanish" _VM
 		"french";
 
 	var iso_languages =
-		"en_GB" _VM_
-		"ar_AE" _VM_
-		"el_CY" _VM_
-		"es_US" _VM_
+		"en_GB" _VM
+		"ar_AE" _VM
+		"el_CY" _VM
+		"es_US" _VM
 		"fr_FR";
 
 	// Determine locale_id

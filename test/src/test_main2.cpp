@@ -45,7 +45,7 @@ function main()
 
 	// range based field iteration
 	{
-	    var fields = _FM_ "aaa" _FM_ _FM_ "bb" _FM_ ;
+	    var fields = _FM "aaa" _FM _FM "bb" _FM ;
 	    var count = 0;
 	    for (var field : fields) {
 	        count++;
@@ -201,22 +201,22 @@ function main()
 	}
 
 	{
-		var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
-		assert(lower(seps) eq _FM_ _VM_ _SM_ _TM_ _ST_);
+		var seps = _RM _FM _VM _SM _TM;
+		assert(lower(seps) eq _FM _VM _SM _TM _ST);
 		assert(lower(seps).raise() eq seps);
 
-		seps = _FM_ _VM_ _SM_ _TM_ _ST_;
-		assert(raise(seps) eq _RM_ _FM_ _VM_ _SM_ _TM_);
+		seps = _FM _VM _SM _TM _ST;
+		assert(raise(seps) eq _RM _FM _VM _SM _TM);
 		assert(raise(seps).lower() eq seps);
 	}
 
 	{
-		var seps = _RM_ _FM_ _VM_ _SM_ _TM_;
-		var x = seps; lowerer(x); assert(x eq _FM_ _VM_ _SM_ _TM_ _ST_);
+		var seps = _RM _FM _VM _SM _TM;
+		var x = seps; lowerer(x); assert(x eq _FM _VM _SM _TM _ST);
 		assert(raiser(x) eq seps);
 
-		seps = _FM_ _VM_ _SM_ _TM_ _ST_;
-		x=seps; raiser(x); assert(x eq _RM_ _FM_ _VM_ _SM_ _TM_);
+		seps = _FM _VM _SM _TM _ST;
+		x=seps; raiser(x); assert(x eq _RM _FM _VM _SM _TM);
 		lowerer(x); assert(x eq seps);
 
 	}
@@ -248,7 +248,7 @@ function main()
 	assert(a eq "axxe");
 
 	//test single character extraction
-	var expected="a" _FM_ "a" _FM_ "b" _FM_ "a" _FM_ "a" _FM_ "b" _FM_ "";
+	var expected="a" _FM "a" _FM "b" _FM "a" _FM "a" _FM "b" _FM "";
 	var tempstr2="ab";
 	for (const var ii : range(-3, 3)) {
 		assert(tempstr2[ii] eq expected.f(ii+4));
@@ -388,7 +388,7 @@ function main()
 
 	//gosub is a throwaway word to indicate calling a local member function
 	//call is similar but conventionally used for external function (shared lib functions)
-	gosub internal_subroutine_xyzz("aa" _FM_ "b1" _VM_ "b2" _SM_ "b22" _FM_ "cc");
+	gosub internal_subroutine_xyzz("aa" _FM "b1" _VM "b2" _SM "b22" _FM "cc");
 
 	//osopen fail
 	var nonexistentfile=OSSLASH^"129834192784";
@@ -788,7 +788,7 @@ function main()
 	assert(oconv("-1.5","MX") eq "FFFFFFFFFFFFFFFE");
 	assert(oconv("-1","MX") eq "FFFFFFFFFFFFFFFF");
 	assert(oconv("1.5","MX") eq "2");
-	assert(oconv("20" _FM_ "255","MX") eq ("14" _FM_ "FF"));
+	assert(oconv("20" _FM "255","MX") eq ("14" _FM "FF"));
 
 
 
@@ -804,10 +804,10 @@ function main()
 	var ss;
 
 	var tconv=FM.oconv("T#20");
-	assert(tconv eq ("                    " _FM_ "                    "));
-	tconv="xxxxx/xxxxx xxx" _FM_ "xx";
+	assert(tconv eq ("                    " _FM "                    "));
+	tconv="xxxxx/xxxxx xxx" _FM "xx";
 	tconv=tconv.oconv("T#8");
-	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " _FM_ "xx      "));
+	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " _FM "xx      "));
 
 	var sentence=sentence();
 

@@ -274,8 +274,8 @@ PUBLIC ND var trimb(CVR instring, const char* trimchars DEFAULT_SPACE);
 PUBLIC VARREF cropper(VARREF iostring);
 PUBLIC ND var crop(CVR instring);
 
-PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM_);
-PUBLIC ND var sort(CVR instring, SV sepchar = _FM_);
+PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM);
+PUBLIC ND var sort(CVR instring, SV sepchar = _FM);
 
 PUBLIC ND var chr(CVR integer);
 PUBLIC ND var chr(const int integer);
@@ -368,8 +368,8 @@ PUBLIC ND var xlate(CVR filename, CVR key, CVR fieldno, const char* mode);
 PUBLIC ND var xlate(CVR filename, CVR key, CVR fieldno, CVR mode);
 PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno);
 
-PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM_);
-PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM_);
+PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM);
+PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM);
 
 PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
 PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement);
@@ -604,7 +604,7 @@ PUBLIC void printt() {
 }
 
 /*#define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "==");
+	var(EXPRESSION).convert(_RM _FM _VM _SM _TM _ST,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "==");
 */
 
 }  // namespace exodus

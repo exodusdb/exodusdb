@@ -196,7 +196,7 @@ function main()
 	assert(oconv("X","D") eq "X");
 	assert(oconv("-1.5","D") eq "29 DEC 1967");
 	assert(oconv("1.5","D") eq "01 JAN 1968");
-	assert(oconv("1.5" _FM_ "-1.5","D") eq ("01 JAN 1968" _FM_ "29 DEC 1967"));
+	assert(oconv("1.5" _FM "-1.5","D") eq ("01 JAN 1968" _FM "29 DEC 1967"));
 
 	assert(oconv(14276,"D").outputl() eq "31 JAN 2007");
 	assert(oconv(14276,"D2").outputl() eq "31 JAN 07");
@@ -226,8 +226,8 @@ function main()
 	assert(oconv(feb29_2004,"DL") eq "29");
 
 	//check does multivalues
-	assert(oconv("14591" _VM_ _VM_ "14592", "D") eq "12 DEC 2007" _VM_ _VM_ "13 DEC 2007");
-	assert(oconv("14591" _FM_ _VM_ "14592", "D") eq "12 DEC 2007" _FM_ _VM_ "13 DEC 2007");
+	assert(oconv("14591" _VM _VM "14592", "D") eq "12 DEC 2007" _VM _VM "13 DEC 2007");
+	assert(oconv("14591" _FM _VM "14592", "D") eq "12 DEC 2007" _FM _VM "13 DEC 2007");
 
 	assert(oconv(14591,"D") eq "12 DEC 2007");
 	assert(oconv(14591,"D2/") eq "12/12/07");

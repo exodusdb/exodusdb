@@ -148,7 +148,7 @@ libraryinit(data)
 //---------------
 function main() {
 	ANS = RECORD;
-	ANS.converter(_RM_ _FM_ _VM_ _SM_ _TM_ _ST_ "\u07f9\u07f8", "");
+	ANS.converter(_RM _FM _VM _SM _TM _ST "\u07f9\u07f8", "");
 	return ANS;
 }
 libraryexit(data)
@@ -540,7 +540,7 @@ libraryexit(nfields)
 libraryinit(nfields0)
 //-------------------
 function main() {
-	RECORD.converter(_FM_ " ", " " _FM_);
+	RECORD.converter(_FM " ", " " _FM);
 	return RECORD.trim().count(" ") + 1;
 }
 libraryexit(nfields0)
@@ -575,7 +575,7 @@ function main() {
 	//@record=matunparse(x)
 	//             call msg('y')
 	//remove blank lines
-	RECORD.converter(_FM_ " ", " " _FM_);
+	RECORD.converter(_FM " ", " " _FM);
 
 	nfields = RECORD.trim().count(" ") + 1;
 	return nfields;

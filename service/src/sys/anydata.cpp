@@ -18,7 +18,7 @@ function main(in filenames0, out result) {
 	if (filenames0) {
 		filenamesx = filenames0;
 	} else {
-		filenamesx = "PLANS" _VM_ "SCHEDULES" _VM_ "JOBS" _VM_ "BALANCES";
+		filenamesx = "PLANS" _VM "SCHEDULES" _VM "JOBS" _VM "BALANCES";
 	}
 
 	var nfiles = filenamesx.count(VM) + 1;

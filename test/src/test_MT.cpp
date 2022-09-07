@@ -22,12 +22,12 @@ function main() {
 	}
 
 	//check oconv does multivalues
-	assert(var("60" _RM_ "120").oconv("MT")=="00:01" _RM_ "00:02");
-	assert(var("60" _FM_ "120").oconv("MT")=="00:01" _FM_ "00:02");
-	assert(var("60" _VM_ "120").oconv("MT")=="00:01" _VM_ "00:02");
-	assert(var("60" _SM_ "120").oconv("MT")=="00:01" _SM_ "00:02");
-	assert(var("60" _TM_ "120").oconv("MT")=="00:01" _TM_ "00:02");
-	assert(var("60" _ST_ "120").oconv("MT")=="00:01" _ST_ "00:02");
+	assert(var("60" _RM "120").oconv("MT")=="00:01" _RM "00:02");
+	assert(var("60" _FM "120").oconv("MT")=="00:01" _FM "00:02");
+	assert(var("60" _VM "120").oconv("MT")=="00:01" _VM "00:02");
+	assert(var("60" _SM "120").oconv("MT")=="00:01" _SM "00:02");
+	assert(var("60" _TM "120").oconv("MT")=="00:01" _TM "00:02");
+	assert(var("60" _ST "120").oconv("MT")=="00:01" _ST "00:02");
 
 	//test that some random times iconv/oconv roundtrip ok
 	initrnd(1000);
@@ -143,8 +143,8 @@ function main() {
 	assert(var(9).oconv("MT2US").outputl() eq "09:00:00");
 	assert(var(-9).oconv("MT2US").outputl() eq "-09:00:00");
 
-//	assert(oconv(_FM_ "\x0035","HEX4") eq "00FE0035");
-	//assert(oconv(_FM_ "\x0035","HEX4") eq "07FE0035");
+//	assert(oconv(_FM "\x0035","HEX4") eq "00FE0035");
+	//assert(oconv(_FM "\x0035","HEX4") eq "07FE0035");
 	//assert(oconv(FM,"HEX4") eq "07FE");
 
 	assert(oconv(43260,"MT")    == "12:01");

@@ -13,12 +13,12 @@ function main() {
 	//groups
 	var csvline1="abcdef abcdef";
 	var csvre1="(bc).(ef)";
-	assert(match(csvline1,csvre1).convert(_FM_ _VM_,"^]")=="bcdef]bc]ef^bcdef]bc]ef");
+	assert(match(csvline1,csvre1).convert(_FM _VM,"^]")=="bcdef]bc]ef^bcdef]bc]ef");
 
 	//no groups
 	var csvline2="abcdef abcdef";
 	var csvre2="bc.ef";
-	assert(match(csvline2,csvre2).convert(_FM_ _VM_,"^]")=="bcdef^bcdef");
+	assert(match(csvline2,csvre2).convert(_FM _VM,"^]")=="bcdef^bcdef");
 
 	//Gives the following error when using std::regex. No such error with boost:regex
 	//Error: Invalid regex "(?:^|,)(?=[^"]|(")?)"?((?(1)[^"]*|[^,"]*))"?(?=,|$)" "Invalid special open parenthesis."
@@ -76,19 +76,19 @@ function main() {
 	}
 
 	if (BOOST_REGEX) {
-		assert(match(csvline,csvre).convert(_FM_ _VM_,"^]")==R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
+		assert(match(csvline,csvre).convert(_FM _VM,"^]")==R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
 
 		//unicode case insensitive finding
-		assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","i").convert(_FM_ _VM_,"^]")=="αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");
+		assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","i").convert(_FM _VM,"^]")=="αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");
 
 		//unicode case sensitive NOT finding
-		assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(_FM_ _VM_,"^]")=="");
+		assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(_FM _VM,"^]")=="");
 	}
 
-	var r1 = _FM_ "0.123";
-	assert(r1.regex_replace("([\x1A-\x1F]-?)0.","$1.") == _FM_ ".123");
-	var r2 = _ST_ "-0.123";
-    assert(r2.regex_replace("([\x1A-\x1F]-?)0.","$1.") == _ST_ "-.123");
+	var r1 = _FM "0.123";
+	assert(r1.regex_replace("([\x1A-\x1F]-?)0.","$1.") == _FM ".123");
+	var r2 = _ST "-0.123";
+    assert(r2.regex_replace("([\x1A-\x1F]-?)0.","$1.") == _ST "-.123");
 
 	//replacing unicode style numbers characters using javascript style regex
 	//assert(var("Ⅻ").regex_replace(R"(\p{Number})","yes")=="yes");
@@ -122,7 +122,7 @@ function main() {
 	//test regular expression
 	//four digits followed by dash or space) three times ... followed by four digits
 	var regex1="(\\d{4}[- ]){3}\\d{4}";
-	assert(var("1247-1234-1234-1234").match(regex1,"r").convert(_FM_ _VM_,"^]")=="1247-1234-1234-1234]1234-");
+	assert(var("1247-1234-1234-1234").match(regex1,"r").convert(_FM _VM,"^]")=="1247-1234-1234-1234]1234-");
 	assert(var("1247.1234-1234-1234").match(regex1,"r")=="");
 
 	printl(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match("文字.*漢字\\(UTF"));

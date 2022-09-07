@@ -464,7 +464,7 @@ nextpatch:;
 		//swap vm with ']' in logx
 		//swap sm with '\' in logx;*backslash
 		//swap tm with "[" in logx
-		logx.converter(_FM_ _VM_ _SM_ _TM_, "^]\\[");
+		logx.converter(_FM _VM _SM _TM, "^]\\[");
 		//fefdfcfb=char(254):char(253):char(252):char(251)
 		//convert fefdfcfb to '^]\[' in logx;*backslash
 		logx.swapper(ST, "%FA");

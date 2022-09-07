@@ -1271,7 +1271,7 @@ bool var::read(CVR filehandle, CVR key) {
 				//skip metadata keys starting and ending in % eg "%RECORDS%"
 				if (key[1] != "%" && key[-1] != "%") {
 					if (this->length() <= 65535) {
-						if (!this->locatebyusing("AR", _FM_, key, keyn))
+						if (!this->locatebyusing("AR", _FM, key, keyn))
 							this->inserter(keyn, key);
 					} else {
 						var_str.append(key.var_str);
@@ -1314,7 +1314,7 @@ bool var::read(CVR filehandle, CVR key) {
 	if (PQresultStatus(mvresult) != PGRES_TUPLES_OK) {
 		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
 		var errmsg =
-			"read(" ^ filehandle.convert("." _FM_, "_^").swap("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
+			"read(" ^ filehandle.convert("." _FM, "_^").swap("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
 		if (sqlstate == "42P01")
 			errmsg ^= " File doesnt exist";
 		else
@@ -1504,7 +1504,7 @@ bool var::unlock(CVR key) const {
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_TUPLES_OK) {
 		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
-		var errmsg = "unlock(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^ ")\n" ^
+		var errmsg = "unlock(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")\n" ^
 				var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 				var(PQresultStatus(mvresult)) ^ ", PQntuples=" ^
 				var(PQntuples(mvresult));
@@ -1712,7 +1712,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_COMMAND_OK) {
 		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
+		var errmsg = "ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM, "^") ^
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 					var(PQresultStatus(mvresult)) ^ " " ^
 					var(PQerrorMessage(pgconn));
@@ -1764,7 +1764,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_COMMAND_OK) {
 		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
+		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
 		throw VarDBException(errmsg);
@@ -1772,7 +1772,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 
 	// if not updated 1 then fail
 	if (strcmp(PQcmdTuples(mvresult), "1") != 0) {
-		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
+		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
 			.errputl();
@@ -1830,7 +1830,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 			return false;
 
 		var errmsg = "ERROR: mvdbpostgres insertrecord(" ^
-				filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
+				filehandle.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(mvresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
 				var(PQerrorMessage(pgconn));
 		throw VarDBException(errmsg);
@@ -1838,7 +1838,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 
 	// if not updated 1 then fail
 	if (strcmp(PQcmdTuples(mvresult), "1") != 0) {
-		var("ERROR: mvdbpostgres insertrecord(" ^ filehandle.convert(_FM_, "^") ^
+		var("ERROR: mvdbpostgres insertrecord(" ^ filehandle.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
 			.errputl();
@@ -1887,7 +1887,7 @@ bool var::deleterecord(CVR key) const {
 	// Handle serious errors
 	if (PQresultStatus(mvresult) != PGRES_COMMAND_OK) {
 		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
+		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(mvresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
 		throw VarDBException(errmsg);
@@ -1897,7 +1897,7 @@ bool var::deleterecord(CVR key) const {
 	bool result;
 	if (strcmp(PQcmdTuples(mvresult), "1") != 0) {
 		if (DBTRACE)
-			var("var::deleterecord(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^
+			var("var::deleterecord(" ^ this->convert(_FM, "^") ^ ", " ^ key ^
 				") failed. Record does not exist")
 				.errputl();
 		result = false;
@@ -2438,7 +2438,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			// the 2nd defaults to FILENAME.data
 			// e.g.
 			// / *pgsql BRAND_CODE
-			args.converter(" ", _FM_);
+			args.converter(" ", _FM);
 			for (const var& arg : args) {
 				if (arg == "key" or arg == "data") {
 					sqlexpression ^= get_fileexpression(mainfilename, filename, arg);
@@ -3439,7 +3439,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					if (special.index(word1[ii]))
 						word1.splicer(ii, 0, "\\");
 				}
-				word1.swapper("'" _FM_ "'", postfix ^ "'" _FM_ "'" ^ prefix);
+				word1.swapper("'" _FM "'", postfix ^ "'" _FM "'" ^ prefix);
 				word1.splicer(-1, 0, postfix);
 				word1.splicer(2, 0, prefix);
 
@@ -3532,7 +3532,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				calc_fields.r(2, calc_fieldn, op);
 
 				//save the value(s) after removing quotes and using SM to separate values instead of FM
-				calc_fields.r(3, calc_fieldn, value.unquote().swap("'" _FM_ "'", FM).convert(FM, SM));
+				calc_fields.r(3, calc_fieldn, value.unquote().swap("'" _FM "'", FM).convert(FM, SM));
 
 				//place holder to be removed before issuing actual sql command
 				whereclause ^= " true";
@@ -3655,7 +3655,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				//WARNING ", " is swapped in mvprogram.cpp ::select()
 				//so change there if changed here
-				value.swapper(_FM_, ", ");
+				value.swapper(_FM, ", ");
 
 				// no processing for arrays (why?)
 				if (dictexpression_isarray) {
@@ -3716,7 +3716,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					value.squoter();
 
 					//multiple with options become alternatives using to_tsquery | divider
-					value.swapper(_FM_, "|");
+					value.swapper(_FM, "|");
 
 				}
 
