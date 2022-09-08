@@ -22,13 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#define EXODUS_RELEASE "22.09"
+#define EXODUS_PATCH "22.09.0"
+
 //#include <iostream>
-#include <cmath>  //for std::floor
 #include <string>
 #include <string_view>
 
-#define EXODUS_RELEASE "22.09"
-#define EXODUS_PATCH "22.09.0"
+//#define INT_IS_FLOOR
+//#include <math.h>  //for std::floor
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
@@ -142,6 +144,8 @@ THE SOFTWARE.
 #define ISSTRING(VARNAME) VARNAME.assertString(function_sig, #VARNAME);
 #define ISNUMERIC(VARNAME) VARNAME.assertNumeric(function_sig, #VARNAME);
 
+#define BACKTRACE_MAXADDRESSES 100
+
 namespace exodus {
 
 //#define SMALLEST_NUMBER 1e-13
@@ -177,14 +181,14 @@ using SV = std::string_view;
 // IT SHOULD BE ABLE TO DERIVE FROM IT AND DO DELETE()
 // http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
 
-// on linux, size of var is 56 bytes (8 bytes "free" to round up to 64 bytes
+// on gcc, size of var is 48 bytes
 //
 // string:    32
 // int:        8
 // double:     8
-// char:       4
+// type:       4
 //           ---
-// var:       56
+// var:       48
 
 // class var final
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
@@ -717,6 +721,32 @@ class PUBLIC var final {
 		assertString(__PRETTY_FUNCTION__);
 		return var_str.c_str();
 	}
+
+	// In case using a pointer to a var
+	//
+	// e.g. when passing io or out vars to functions as pointers instead of const ref
+	//
+	// var funcxyz(var* outvar)
+	//
+	// Prevent compilation of expressions containing
+	//
+    //  *outvar[4]
+	//  *outvar.substr(99)
+	//
+	// but allow
+	//
+	//  (*outvar)[4]
+	//  outvar->substr(99)
+	//
+	// Unfortunately there is no way to prevent
+	//
+	//  outvar[4] //compiles with undefined behaviour at runtime since there is only one var!
+	//
+	// Since c++ always allows treating any pointer as an array of pointers!
+	//
+	// but var objects use [] for substr access and super easy to get false array access instead
+	//
+	auto operator*() = delete;
 
 	// allow conversion to char (takes first char or char 0 if zero length string)
 	// would allow the usage of any char function but may result
@@ -1374,12 +1404,8 @@ class PUBLIC var final {
 	ND var tan() const;
 	ND var atan() const;
 	ND var loge() const;
-	// integer() represents pick int() because int() is reserved word in c/c++
-	// Note that integer like pick int() is the same as floor()
-	// whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any
-	// fractional decimal places) to get the usual c/c++ effect use toInt() (although toInt()
-	// returns an int instead of a var like normal exodus functions)
-	ND var integer() const;
+	//ND var int() const;//reserved word
+	ND var integer() const;//returns a var in case you need a var and not an int  which the c++ built-in int(varx) produces
 	ND var floor() const;
 	ND var round(const int ndecimals = 0) const;
 
@@ -1898,7 +1924,13 @@ class PUBLIC var final {
 	void assertInteger(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {
+
+#ifdef INT_IS_FLOOR
 			var_int = std::floor(var_dbl);
+#else
+			//var_int = std::trunc(var_dbl);
+			var_int = var_dbl;
+#endif
 			// Add int flag
 			var_typ |= VARTYP_INT;
 		}
@@ -2190,8 +2222,19 @@ inline const var PLATFORM_ = "x86";
 // exceptions generally
 class PUBLIC VarError {
    public:
+
 	explicit VarError(CVR description);
+
 	var description;
+
+	// Convert stack addresses to source code if available
+	var stack() const;
+
+  private:
+
+	mutable void* stack_addresses_[BACKTRACE_MAXADDRESSES];
+	mutable size_t stack_size_ = 0;
+
 };
 
 //user literal _var

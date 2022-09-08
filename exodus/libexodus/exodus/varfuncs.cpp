@@ -29,6 +29,9 @@ Binary    Hex          Comments
 11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
 */
 
+//#include <math.h>    //for abs(double) and stod
+//#include <cstdlib>  //for exit
+
 #include <utility> //for move
 //#include <mutex> //for lock_guard
 #include <string>
@@ -77,12 +80,9 @@ Binary    Hex          Comments
 //gcc 10 doesnt include conv from and to floating point
 #include <charconv>	 // for from_chars and to_chars
 
-//#include <cmath>      //for stod()
 //#include <sstream>
 //#include <iomanip>    //for setprecision
 
-//#include <cmath>    //for abs(double)
-//#include <cstdlib>  //for exit
 //#include <iostream> //cin and cout
 //#include <memory>   //for unique_ptr
 

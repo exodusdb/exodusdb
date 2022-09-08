@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 
 #include <cstring>//for strlen
+#include <math.h> //for pow
 
 #include <string>
 #include <sstream>

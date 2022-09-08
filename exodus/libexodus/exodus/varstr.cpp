@@ -809,7 +809,7 @@ bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const i
 // const var(fn,vn,sn) extract var
 //
 //var var::operator()(int fieldno, int valueno/*=0*/, int subvalueno/*=0*/) const {
-//	return a(fieldno, valueno, subvalueno);
+//	return f(fieldno, valueno, subvalueno);
 //}
 
 // non-const xxxx(fn,vn,sn) returns a proxy that can be aasigned to or implicitly converted to a var
@@ -838,7 +838,7 @@ var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsu
 var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 
 	THISIS(
-		"var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) "
+		"var var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) "
 		"const")
 	assertString(function_sig);
 
@@ -1621,6 +1621,7 @@ VARREF var::substrer(const int startindex1, const int length) {
 }
 
 var var::operator[](int charno) const {
+	//errputl(__PRETTY_FUNCTION__);
 	return this->at(charno);
 }
 

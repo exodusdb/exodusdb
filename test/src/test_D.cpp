@@ -8,23 +8,6 @@ programinit()
 function main()
 {
 
-		// C++ double to int is symmetrical about 0
-		assert(int(2.9) == 2);
-		assert(int(-2.9) == -2);
-
-		// BUT exodus and pickos int()
-		// is the floor function which is *not* symmetrical
-		// float -> nearest integer towards negative infinity
-		// 1.999 -> 1 and -1.001 -> -2
-		assert(var(1.9999).toInt() == 1);
-		assert(var(-1.9999).toInt() == -2);
-
-		// exodus round function is symmetrical
-		// and rounds 0.5 up and -0.5 down
-		// which is 
-		assert(var(1.5).toInt() == 1);
-		assert(var(-1.5).toInt() == -2);
-
 		// pickos day zero is "1968/12/31"
 		// "1968/12/31" <-> 0
 		// Fractional days eg 1.5 are handled by floor() function

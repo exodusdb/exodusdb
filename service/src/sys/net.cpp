@@ -54,7 +54,7 @@ listen:
 	}
 	catch (VarError varerror) {
 		// Similar code in net.cpp and listen.cpp
-	    USER4 = varerror.description ^ FM ^ backtrace();
+	    USER4 = varerror.description.unassigned("No error message") ^ FM ^ backtrace();
 	}
 
 	//unlock all

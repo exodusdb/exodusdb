@@ -360,7 +360,7 @@ function main()
 	    assert(var(d)=="1234.567");
 	    assert(var(-d)=="-1234.567");
 	    assert(int(var(d))==1234);
-	    assert(int(var(-d))==-1235);
+	    assert(int(var(-d))==-1234);
 
 
 	    //test accessing var as a range of fields separated by FM

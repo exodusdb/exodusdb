@@ -70,6 +70,34 @@ function main() {
 	}
 
 	{
+		dim d1(0);
+		dim d2(0,0);
+		dim d3(0,1);
+		dim d4(0,2);
+		d1 = "x";
+		d2 = "x";
+		d3 = "x";
+		d4 = "x";
+		assert(join(d1) == "");
+		assert(join(d2) == "");
+		assert(join(d3) == "");
+		assert(join(d4) == "");
+	}
+	{
+		dim d1(0);
+		dim d2(0,0);
+		dim d3(1,0);
+		dim d4(2,0);
+		d1 = "x";
+		d2 = "x";
+		d3 = "x";
+		d4 = "x";
+		assert(join(d1) == "");
+		assert(join(d2) == "");
+		assert(join(d3) == "");
+		assert(join(d4) == "");
+	}
+	{
 		//dim_iter
 		dim d1;
 		d1.split("aa" _FM "bb");

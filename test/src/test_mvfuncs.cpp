@@ -68,41 +68,6 @@ function main() {
 
 	//toInt and oconv "MX"
 
-    //floor() (=== arev int())
-  
-    assert(floor(var(-3.5)) == -4);
-    assert(floor(var(-3)) == -3);
-    assert(floor(var(-2.5)) == -3);
-    assert(floor(var(-2)) == -2);
-    assert(floor(var(-1.5)) == -2);
-    assert(floor(var(-1)) == -1);
-    assert(floor(var(-.5)) == -1);
-    assert(floor(var(0)) == 0);
-    assert(floor(var(.5)) == 0);
-    assert(floor(var(1)) == 1);
-    assert(floor(var(1.5)) == 1);
-    assert(floor(var(2)) == 2);
-    assert(floor(var(2.5)) == 2);
-    assert(floor(var(3)) == 3);
-    assert(floor(var(3.5)) == 3);
-
-    //toInt acts like floor
-    assert((var(-3.5)).toInt() == -4);
-    assert((var(-3)).toInt() == -3);
-    assert((var(-2.5)).toInt() == -3);
-    assert((var(-2)).toInt() == -2);
-    assert((var(-1.5)).toInt() == -2);
-    assert((var(-1)).toInt() == -1);
-    assert((var(-.5)).toInt() == -1);
-    assert((var(0)).toInt() == 0);
-    assert((var(.5)).toInt() == 0);
-    assert((var(1)).toInt() == 1);
-    assert((var(1.5)).toInt() == 1);
-    assert((var(2)).toInt() == 2);
-    assert((var(2.5)).toInt() == 2);
-    assert((var(3)).toInt() == 3);
-    assert((var(3.5)).toInt() == 3);
-
     TRACE(oconv(-3.5,"MX"));
     TRACE(oconv(-3,"MX"));
     TRACE(oconv(-2.5,"MX"));

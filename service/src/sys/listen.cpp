@@ -1618,7 +1618,7 @@ subroutine process() {
 	catch (VarError varerror) {
 		rollbacktrans();
 		// Similar code in net.cpp and listen.cpp
-		USER3 = varerror.description ^ FM ^ backtrace();
+		USER3 = varerror.description.unassigned("No error message") ^ FM ^ varerror.stack();
 	}
 
 	return;

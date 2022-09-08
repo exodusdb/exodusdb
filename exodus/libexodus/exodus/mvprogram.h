@@ -26,6 +26,19 @@ class PUBLIC ExodusProgramBase {
 	// Constant var
 	using let = const var ; // same as CV
 
+	// Not passing io/out parameters by pointer as per several style guides because
+	// it is far too easy to type
+	//
+	//  outvar[4]
+	//
+	// thinking to get a substr when you meant
+	//
+	//  (*outvar)[4]
+	//
+	// and c++ happily compiles outvar[4] thinking that outvar is an array of pointers
+	//
+	// and gives random memory access as run time as you access the non-existent element [4].
+
 #include <exodus/ioconv_custom.h>
 
 	ExodusProgramBase(MvEnvironment& inmv);

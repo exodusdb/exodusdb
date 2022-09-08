@@ -85,26 +85,26 @@ void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF return
 	return;
 }
 
-//////////////////////////////////////////////////////////////////
-// Reserve space for snapshot of stack taken on every mv exception
-//////////////////////////////////////////////////////////////////
-// in case the exception is caught then it is wasted time
-namespace {
-	#define BACKTRACE_MAXADDRESSES 100
-	thread_local void* thread_stack_addresses[BACKTRACE_MAXADDRESSES];
-	thread_local size_t thread_stack_size = 0;
-}
+////////////////////////////////////////////////////////////////////
+//// Reserve space for snapshot of stack taken on every mv exception
+////////////////////////////////////////////////////////////////////
+//// in case the exception is caught then it is wasted time
+//namespace {
+//	#define BACKTRACE_MAXADDRESSES 100
+//	thread_local void* thread_stack_addresses[BACKTRACE_MAXADDRESSES];
+//	thread_local size_t thread_stack_size = 0;
+//}
 
 // Capture the current stack addresses for later decoding
-void mv_savestack() {
-	thread_stack_size = ::backtrace(thread_stack_addresses, BACKTRACE_MAXADDRESSES);
+void mv_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_size) {
+	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
 }
 
 ////////////////////////////////////////////////////////////////////
 // Convert the stack addresses to source file, line no and line text
 ////////////////////////////////////////////////////////////////////
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
-var mv_backtrace() {
+var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size) {
 
 	var returnlines = "";
 	//var("backtrace()").errputl();
@@ -132,9 +132,9 @@ var mv_backtrace() {
 
 	// TODO autodetect if addr2line or dwalfdump/dSYM is available
 
-	char** strings = backtrace_symbols(thread_stack_addresses, thread_stack_size);
+	char** strings = backtrace_symbols(stack_addresses, stack_size);
 
-	for (size_t ii = 0; ii < thread_stack_size; ii++) {
+	for (size_t ii = 0; ii < stack_size; ii++) {
 
 #ifdef TRACING
 		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", ii, thread_stack_addresses[ii], strings[ii]);
@@ -252,8 +252,6 @@ PUBLIC void breakon();
 //void SIGINT_handler(int sig) {
 void SIGINT_handler(int sig [[maybe_unused]]) {
 
-	mv_savestack();
-
 	// Ignore more of this signal - restore on exit
 	breakoff();
 	// Faster/safer?
@@ -264,6 +262,8 @@ void SIGINT_handler(int sig [[maybe_unused]]) {
 
 	// duplicated in init and B
 	// backtrace().convert(FM,"\n").errputl();
+
+	VarError err("backtrace()");
 
 	// interact on a new line
 	fprintf(stderr, "\n");
@@ -308,7 +308,7 @@ void SIGINT_handler(int sig [[maybe_unused]]) {
 			fflush(stderr);			// duplicated in init and B
 
 			// Backtrace
-			mv_backtrace().convert(FM, "\n").errputl();
+			err.stack().convert(FM, "\n").errputl();
 
 		} else if (cmd1 == "D") {
 
@@ -364,10 +364,10 @@ PUBLIC void breakon()  {
 	signal(SIGTTOU, SIG_IGN);
 }
 
-//var var::backtrace() const {
+// Get a stack list on demand
 PUBLIC ND var backtrace() {
-	mv_savestack();
-	return mv_backtrace().convert(FM, "\n");
+	VarError e("backtrace()");
+	return e.stack();
 }
 
 //void var::debug(CVR var1) const {

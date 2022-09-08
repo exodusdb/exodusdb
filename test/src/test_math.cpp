@@ -451,18 +451,87 @@ subroutine test2(in as, in bs) {
 
 	}
 
-	// pickos in is actually the floor function
+	{
 
-	assert(integer(-1.9) eq -2);
-	assert(integer(-1.5) eq -2);
-	assert(integer(-1.1) eq -2);
+		// C++ double to int is symmetrical about 0
+		// exodus is the same
 
-	assert(integer(0) eq 0);
+		// c++ double to int
+		assert(int(2.9) == 2);
+		assert(int(-2.9) == -2);
 
-	assert(integer(1.9) eq 1);
-	assert(integer(1.5) eq 1);
-	assert(integer(1.1) eq 1);
+		// Using exodus' var::toInt
+		assert(var(2.9).toInt() == 2);
+		assert(var(-2.9).toInt() == -2);
 
+		// Using c++ int()
+		assert(int(var(2.9)) == 2);
+		assert(int(var(-2.9)) == -2);
+
+		// Using exodus' integer()
+		assert(integer(var(2.9)) == 2);
+		assert(integer(var(-2.9)) == -2);
+
+//		// BUT exodus and pickos int()
+//		// is the floor function which is *not* symmetrical
+//		// float -> nearest integer towards negative infinity
+//		// 1.999 -> 1 and -1.001 -> -2
+//		assert(var(1.9999).toInt() == 1);
+//		assert(var(-1.9999).toInt() == -2);
+//
+//		// exodus round function is symmetrical
+//		// and rounds 0.5 up and -0.5 down
+//		// which is 
+//		assert(var(1.5).toInt() == 1);
+//		assert(var(-1.5).toInt() == -2);
+
+		// floor is not symmetrical
+		assert(var(1.9999).floor() == 1);
+		assert(var(-1.9999).floor() == -2);
+
+		// round function is symmetrical
+		assert(var(1.5).round() == 2);
+		assert(var(-1.5).round() == -2);
+
+	}
+
+	{
+		//floor() (=== arev int())
+
+		assert(floor(var(-3.5)) == -4);
+		assert(floor(var(-3)) == -3);
+		assert(floor(var(-2.5)) == -3);
+		assert(floor(var(-2)) == -2);
+		assert(floor(var(-1.5)) == -2);
+		assert(floor(var(-1)) == -1);
+		assert(floor(var(-.5)) == -1);
+		assert(floor(var(0)) == 0);
+		assert(floor(var(.5)) == 0);
+		assert(floor(var(1)) == 1);
+		assert(floor(var(1.5)) == 1);
+		assert(floor(var(2)) == 2);
+		assert(floor(var(2.5)) == 2);
+		assert(floor(var(3)) == 3);
+		assert(floor(var(3.5)) == 3);
+
+		//toInt truncates like c++ int(double)
+		assert((var(-3.5)).toInt() == -3);
+		assert((var(-3)).toInt() == -3);
+		assert((var(-2.5)).toInt() == -2);
+		assert((var(-2)).toInt() == -2);
+		assert((var(-1.5)).toInt() == -1);
+		assert((var(-1)).toInt() == -1);
+		assert((var(-.5)).toInt() == -0);
+		assert((var(0)).toInt() == 0);
+		assert((var(.5)).toInt() == 0);
+		assert((var(1)).toInt() == 1);
+		assert((var(1.5)).toInt() == 1);
+		assert((var(2)).toInt() == 2);
+		assert((var(2.5)).toInt() == 2);
+		assert((var(3)).toInt() == 3);
+		assert((var(3.5)).toInt() == 3);
+
+	}
 	return;
 }
 

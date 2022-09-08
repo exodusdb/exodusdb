@@ -1536,7 +1536,7 @@ VarError::VarError(CVR description_)
 //	var("\n").put(std::cerr);
 
 	// capture the stack at point of creation i.e. when thrown
-	mv_savestack();
+	mv_savestack(stack_addresses_, &stack_size_);
 
 //	this->stack = mv_backtrace();
 //	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
@@ -1550,8 +1550,17 @@ VarError::VarError(CVR description_)
 	var exo_debug;
 	exo_debug.osgetenv("EXO_DEBUG");
 	if (exo_debug) {
+		description.errputl("\n");
+		stack().convert(FM, "\n").errputl();
 		debug();
 	}
+}
+
+var VarError::stack() const {
+
+	// Convert the stack addresses into source code lines
+	return mv_backtrace(stack_addresses_, stack_size_);
+
 }
 
 }  // namespace exodus

@@ -483,8 +483,8 @@ var var::round(const int ndecimals) const {
 
 	var result;
 
-	// Note that we cannot use var_int even if available since
-	// var_int may have been created from var_dbl using floor()
+	// Sadly we cannot use var_int even if available since
+	// var_int may have been created from var_dbl using trunc()
 
 	// prefer double
 	double fromdouble;
@@ -583,39 +583,46 @@ var var::round(const int ndecimals) const {
 	return result;
 }
 
-// pick int() is actually the same as floor. using integer() instead of int() because int is a
-// reserved word in c/c++ for int datatype
+// function name is "integer" instead of "int" because int is a reserved word in c/c++ for int datatype
+// using the system int() function on a var e.g. int(varx) returns an int whereas this function returns a var
 var var::integer() const {
 
+    //-1.0=-1
+    //-0.9=0
+    //-0.5=0
+    //-0.1=0
+    // 0  =0
+    // 0.1=0
+    // 0.5=0
+    // 0.9=0
+    // 1.0=1
+
 	this->assertInteger(__PRETTY_FUNCTION__);
-
-	/*
-	//pick integer means floor()
-	//-1.0=-1
-	//-0.9=-1
-	//-0.5=-1
-	//-0.1=-1
-	// 0  =0
-	// 0.1=0
-	// 0.5=0
-	// 0.9=0
-	// 1.0=1
-
-
-	// floor
-	var_int = std::floor(var_dbl);
-	var_typ |= VARTYP_INT;
-*/
 	return var_int;
 }
 
-// integer and floor are the same
 var var::floor() const {
 
-	this->assertInteger(__PRETTY_FUNCTION__);
+    //-1.0=-1
+    //-0.9=-1
+    //-0.5=-1
+    //-0.1=-1
+    // 0  =0
+    // 0.1=0
+    // 0.5=0
+    // 0.9=0
+    // 1.0=1
 
-	// 123.999 -> 123
-	// -123.999 -> -124
+	this->assertNumeric(__PRETTY_FUNCTION__);
+
+	if (!(var_typ & VARTYP_INT)) {
+
+		var_int = std::floor(var_dbl);
+
+		// Add int flag
+		var_typ |= VARTYP_INT;
+	}
+
 	return var_int;
 }
 

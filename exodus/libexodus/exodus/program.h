@@ -71,10 +71,10 @@
 				if (exceptionx.description.isnum())                                                             \
 					result = exceptionx.description.toInt();                                                    \
 			}                                                                                                   \
-			catch (const VarError& exceptionx)                                                                   \
+			catch (const VarError& exceptionx)                                                                  \
 			{                                                                                                   \
 				errputl(exceptionx.description, " - Aborting.");                                                \
-				errputl(mv_backtrace().convert(FM, "\n"));                                                      \
+				errputl(exceptionx.stack().convert(FM, "\n"));                                                  \
 				result = OPTIONS.index("I") ? 0 : 999;                                                          \
 			}                                                                                                   \
 		}                                                                                                       \

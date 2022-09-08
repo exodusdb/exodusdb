@@ -109,9 +109,15 @@ void dim::operator=(const dim& sourcedim) &{
 
 	this->redim(sourcedim.nrows_, sourcedim.ncols_);
 
+	// Copy element 0 as well to allow a degree
+	// zero-based indexing although split/join/sort/read/write
+	// ignore the zeroth element
+	if (sourcedim.data_[0].assigned())
+		data_[0] = sourcedim.data_[0];
+
 	size_t ncells = nrows_ * ncols_ + 1;
-	//for (int celln = 0; celln < ncells; ++celln)
-	for (size_t celln = 1; celln < ncells; ++celln)
+	//for (unsigned int celln = 0; celln < ncells; ++celln)
+	for (unsigned int celln = 1; celln < ncells; ++celln)
 		//data_[celln] = sourcedim.data_[celln].clone();
 		data_[celln] = sourcedim.data_[celln];
 	return;
@@ -148,11 +154,14 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
 
+	// Allow 0 dimensions
+	// This partially allows a zero based indexing scheme to work for
+	// Unidimensional arrays except that split/join/sort omit [0]th element
 	// Prevent 0 dimensions
-//	if (rows == 0 || cols == 0)
-//		throw DimDimensionedZero();
+	//if (rows == 0 || cols == 0)
+	// throw DimDimensionedZero();
 
-	// Prevent zero elements
+	// Prevent zero elements. We always create a least one element.
 	// Especially because int*int can overflow to -1
 	// and +1 makes it zero
 	std::size_t nvars = rows * cols + 1;
@@ -303,8 +312,11 @@ dim& dim::init(CVR sourcevar) {
 	if (!initialised_)
 		throw DimNotDimensioned("");
 	size_t arraysize = nrows_ * ncols_ + 1;
-	//for (int ii = 0; ii < arraysize; ii++)
-	for (size_t ii = 1; ii < arraysize; ii++)
+
+	// init starts from element[0]
+
+	for (unsigned int ii = 0; ii < arraysize; ii++)
+	//for (size_t ii = 1; ii < arraysize; ii++)
 		data_[ii] = sourcevar;
 	return *this;
 }
@@ -324,6 +336,8 @@ var dim::join(SV sepchar) const {
 		if (data_[nn].assigned() && data_[nn].length())
 			break;
 	}
+
+	// join always starts from element[1] and ignores element[0]
 
 	// get the first element at least to ensure
 	// at least first element is assigned - even if it is an empty string
@@ -393,6 +407,8 @@ var dim::split(CVR str1, SV sepchar) {
 		(*this) = "";
 		return this->nrows_;
 	}
+
+	// split always fills starting from element[1] and ignores element[0]
 
 	// start at the beginning and look for FM delimiters
 	std::string::size_type start_pos = 0;
