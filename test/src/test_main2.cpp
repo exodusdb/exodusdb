@@ -400,62 +400,62 @@ function main()
 
 	var eof1 = var().eof();
 
-	//skip input testing without terminal for now until we can redirect input
-	// since it messing up tmux too many std inputs
-	if (true || isterminal()) {
-
-		printl("We have a terminal. CANNOT check that input fails");
-
-		// Can change echo if is terminal
-		assert(echo(false));
-		assert(echo(true));
-
-		assert(getcursor() eq AT(0,0));
-		setcursor("");
-
-	}
-	else {
-		printl("We dont have a terminal. CAN check that input fails");
-
-		// 1. No prompt - free function
-		var inpz=input();
-		//assert(not inpz);
-
-		// 2. Prompt -  member function
-		var inpx;
-		assert(not inpx.input("prompt1"));
-		printl();
-
-		// 3. Prompt - free function
-		var inpy;
-		assert(not input("prompt2"));
-		printl();
-
-		// 4. nchars - free function
-		var inpq;
-		assert(not inputn(5));
-		printl();
-
-		// 5. std::cin
-		var cin_v1;
-		//assert(not std::cin >> cin_v1);
-		//var ok = std::cin >> cin_v1;
-		//assert(not ok);
-		//bool ok = std::cin >> cin_v1;
-		//assert(not ok);
-		printl("testing std::cin >> cin_v1; - press enter if hung");
-		osflush();
-		std::cin >> cin_v1;
-
-		// get some coverage but not really testing
-		assert(not inputn(-1));
-		assert(not hasinput());
-
-		// Cannot change echo if no terminal
-		assert(not echo(true));
-
-	}
-
+//	//skip input testing without terminal for now until we can redirect input
+//	// since it messing up tmux too many std inputs
+//	if (isterminal()) {
+//
+//		printl("We have a terminal. CANNOT check that input fails");
+//
+//		// Can change echo if is terminal
+//		assert(echo(false));
+//		assert(echo(true));
+//
+//		assert(getcursor() eq AT(0,0));
+//		setcursor("");
+//
+//	}
+//	else {
+//		printl("We dont have a terminal. CAN check that input fails");
+//
+//		// 1. No prompt - free function
+//		var inpz=input();
+//		//assert(not inpz);
+//
+//		// 2. Prompt -  member function
+//		var inpx;
+//		assert(not inpx.input("prompt1"));
+//		printl();
+//
+//		// 3. Prompt - free function
+//		var inpy;
+//		assert(not input("prompt2"));
+//		printl();
+//
+//		// 4. nchars - free function
+//		var inpq;
+//		assert(not inputn(5));
+//		printl();
+//
+//		// 5. std::cin
+//		var cin_v1;
+//		//assert(not std::cin >> cin_v1);
+//		//var ok = std::cin >> cin_v1;
+//		//assert(not ok);
+//		//bool ok = std::cin >> cin_v1;
+//		//assert(not ok);
+//		printl("testing std::cin >> cin_v1; - press enter if hung");
+//		osflush();
+//		std::cin >> cin_v1;
+//
+//		// get some coverage but not really testing
+//		assert(not inputn(-1));
+//		assert(not hasinput());
+//
+//		// Cannot change echo if no terminal
+//		assert(not echo(true));
+//
+//	}
+//
 	ossetenv("XYZ","abc");
 	assert(osgetenv("XYZ") == "abc");
 
