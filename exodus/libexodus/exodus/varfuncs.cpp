@@ -86,9 +86,11 @@ Binary    Hex          Comments
 //#include <iostream> //cin and cout
 //#include <memory>   //for unique_ptr
 
-#include <exodus/var.h>
+#include <boost/locale.hpp>
+
+#include <exodus/varimpl.h>
 //#include <exodus/mvutf.h>
-#include <exodus/varlocale.h>
+//#include <exodus/varlocale.h>
 
 // Keep doxygen happy
 #undef DEFAULT_SPACE
@@ -105,6 +107,17 @@ namespace exodus {
 //inline std::mutex global_mutex_threadstream;
 //#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
 #define LOCKIOSTREAM
+
+
+// exodus uses one locale per thread
+inline thread_local std::locale thread_boost_locale1;
+
+inline void init_boost_locale1() {
+	if (thread_boost_locale1.name() != "*") {
+		boost::locale::generator generator1;
+		thread_boost_locale1 = generator1("");
+	}
+}
 
 int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
@@ -128,7 +141,7 @@ int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 //	boost::string_view str1b(str1.data(), str1.size());
 //	boost::string_view str2b(str2.data(), str2.size());
 
-	int result = std::use_facet<boost::locale::collator<char>>(tls_boost_locale1)
+	int result = std::use_facet<boost::locale::collator<char>>(thread_boost_locale1)
 					 .compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
 
 	//var(str1).outputl("str1=");
@@ -686,7 +699,7 @@ VARREF var::ucaser() {
 
 	init_boost_locale1();
 
-	var_str = boost::locale::to_upper(var_str, tls_boost_locale1);
+	var_str = boost::locale::to_upper(var_str, thread_boost_locale1);
 
 	return *this;
 
@@ -737,7 +750,7 @@ VARREF var::lcaser() {
 
 	init_boost_locale1();
 
-	var_str = boost::locale::to_lower(var_str, tls_boost_locale1);
+	var_str = boost::locale::to_lower(var_str, thread_boost_locale1);
 
 	return *this;
 }
@@ -769,7 +782,7 @@ VARREF var::tcaser() {
 	// from in into like mid of on onto out over per pro qua sans than thru to until unto up
 	// upon via vice with the and nor or yet so
 
-	var_str = boost::locale::to_title(var_str, tls_boost_locale1);
+	var_str = boost::locale::to_title(var_str, thread_boost_locale1);
 
 	return *this;
 }
@@ -803,7 +816,7 @@ VARREF var::fcaser() {
 
 	init_boost_locale1();
 
-	var_str = boost::locale::fold_case(var_str, tls_boost_locale1);
+	var_str = boost::locale::fold_case(var_str, thread_boost_locale1);
 
 	return *this;
 }
@@ -860,7 +873,7 @@ VARREF var::normalizer() {
 	// because checking for being in normal form is very fast according to unicode docs
 
 	// norm_nfc
-	var_str = boost::locale::normalize(var_str, boost::locale::norm_nfc, tls_boost_locale1);
+	var_str = boost::locale::normalize(var_str, boost::locale::norm_nfc, thread_boost_locale1);
 
 	return *this;
 }

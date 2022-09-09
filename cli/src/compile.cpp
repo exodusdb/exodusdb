@@ -1550,7 +1550,7 @@ function static compile2(
 			//http://msdn.microsoft.com/en-us/library/ms235591%28VS.80%29.aspx
 			//mt.exe manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
 			//mt.exe manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
-			if (SLASH_IS_BACKSLASH and PLATFORM_ ne "x64") {
+			if (OSSLASH == "\\" and PLATFORM_ ne "x64") {
 				var cmd = "mt.exe";
 				if (not verbose) {
 					cmd ^= " -nologo";

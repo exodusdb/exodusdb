@@ -123,14 +123,18 @@ class PUBLIC MvEnvironment {
 	var DATA = "";
 	var ANS = "";
 
-	// temporary application globals
+	// thread globals available to the application
+	// remain the same across perform/execute levels
+	// initialised to "" in thread init
 	var USER0 = "";
 	var USER1 = "";
 	var USER2 = "";	 // was base currency format
 	var USER3 = "";
 	var USER4 = "";
 
-	// per execute level temporary application global
+	// thread globals available to the application
+	// separate per execute/perform level
+	// initialised to "" in execute/perform init
 	var RECUR0 = "";
 	var RECUR1 = "";
 	var RECUR2 = "";
@@ -140,19 +144,20 @@ class PUBLIC MvEnvironment {
 	// i18n/l10n - basic internationalisation/localisation
 	var DATEFMT = "D/E";	 // international date format
 	var BASEFMT = "MD20P,";	 // base currency format
-	var SW = "";
+	var SW = "";             // TZ offsets
 
-	// encoding globals
-	// MUST be the same length
-	// TODO Should not be global otherwise cannot multithread MvEnvironment
-	var LOWERCASE = LOWERCASE_;
-	var UPPERCASE = UPPERCASE_;
-	// var INTERNALCHARS = "\x1A\x1B\x1C\x1D\x1E\x1F";
-	// var EXTERNALCHARS = _ST _TM _SM _VM _FM _RM;
+	// Backward compatible - deprecated
+	// Not used in exodus built-in functions like lcase/ucase
+	// Should be the same length otherwise character loss
+	var LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+	var UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	var TCLSTACK = "";
-	// INTCONST=keyboard constants 1:ESC 2:f5 7:f10
-	//var INTCONST = "\x1B" _FM "{f5?}" _FM _FM _FM _FM _FM "{f10?}";
+
+	// INTCONST=hot keys in some places
+	// q = quit    (wasEsc)
+	// x = execute (was F5)
+	// m = menu    (was F10)
 	var INTCONST = "q" _FM "x" _FM _FM _FM _FM _FM "m";
 	var PRIORITYINT = "";
 	int COL1 = 0;

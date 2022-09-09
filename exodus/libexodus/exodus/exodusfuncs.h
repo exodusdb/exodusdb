@@ -32,6 +32,22 @@ THE SOFTWARE.
 // add global function type syntax to the exodus users
 namespace exodus {
 
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+	inline const var OSSLASH = "\\";
+	constexpr char OSSLASH_ = '\\';
+	constexpr bool SLASH_IS_BACKSLASH = true;
+#else
+	inline const var OSSLASH = "/";
+	constexpr char OSSLASH_ = '/';
+	constexpr bool SLASH_IS_BACKSLASH = false;
+#endif
+
+#if defined(_WIN64) or defined(_LP64)
+	inline const var PLATFORM_ = "x64";
+#else
+	inline const var PLATFORM_ = "x86";
+#endif
+
 // Removed to reduce compile time of exodus programs.
 // Use .output() .errput() and .logput() for threadsafe output.
 // print() errput() logput() to output all arguments together in a thread-safe manner

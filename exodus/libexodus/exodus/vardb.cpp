@@ -637,7 +637,8 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 
 #endif
 
-var var::build_conn_info(CVR conninfo) const {
+//var var::build_conn_info(CVR conninfo) const {
+var build_conn_info(CVR conninfo) {
 	// priority is
 	// 1) given parameters //or last connection parameters
 	// 2) individual environment parameters
@@ -660,9 +661,9 @@ var var::build_conn_info(CVR conninfo) const {
 		var configfilename = "";
 		var home = "";
 		if (home.osgetenv("HOME"))
-			configfilename = home ^ OSSLASH ^ ".config/exodus/exodus.cfg";
+			configfilename = home ^ "/.config/exodus/exodus.cfg";
 		else if (home.osgetenv("USERPROFILE"))
-			configfilename ^= home ^ OSSLASH ^ "Exodus\\.exodus";
+			configfilename ^= home ^ "\\Exodus\\.exodus";
 		var configconn = "";
 		if (!configconn.osread(configfilename))
 			configconn.osread("exodus.cfg");

@@ -21,20 +21,21 @@ THE SOFTWARE.
 */
 
 #ifndef _MSC_VER
-#define _POSIX_SOURCE
+#	define _POSIX_SOURCE
+#	define _POSIX_OSSLASH "/"
 #endif
 
 // for debugging
 //#define TRACING
 
 #ifdef _POSIX_SOURCE
-#include <stdio.h>
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <execinfo.h> // for backtrace
-#include <unistd.h> // for getpid
-#include <signal.h>
+#	include <stdio.h>
+#	include <cstdlib>
+#	include <iostream>
+#	include <string>
+#	include <execinfo.h> // for backtrace
+#	include <unistd.h> // for getpid
+#	include <signal.h>
 #endif
 
 #include <exodus/var.h>
@@ -52,7 +53,7 @@ void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF return
 	if (not lineno || not lineno.isnum())
 		return;
 
-	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(OSSLASH, -1) ^ ":" ^ lineno;
+	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(_POSIX_OSSLASH, -1) ^ ":" ^ lineno;
 
 	// get the source file text
 	var filetext;
@@ -162,7 +163,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		if (not objfilename.osfile()) {
 			// loadable program
 			var temp;
-			temp.osshellread("which " ^ objfilename.field2(OSSLASH, -1));
+			temp.osshellread("which " ^ objfilename.field2(_POSIX_OSSLASH, -1));
 			temp = temp.field("\n", 1).field("\r", 1);
 			if (temp)
 				objfilename = temp;

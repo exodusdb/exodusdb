@@ -125,7 +125,7 @@ bool checknotabsoluterootfolder(std::string dirname) {
 	//	return true;
 	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
 		 //std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
-		 var(dirname).count(OSSLASH) < 3) ||
+		 var(dirname).count(_OSSLASH) < 3) ||
 		(SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_))) {
 
 		std::cerr
@@ -1295,7 +1295,7 @@ var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
 	// file globbing can and must be passed as tail end of path
 	// perhaps could use <glob.h> in linux instead of regex
 	else {
-		globpattern = path.field2(OSSLASH, -1);
+		globpattern = path.field2(_OSSLASH, -1);
 		path = path.substr(1, path.length() - globpattern.length());
 	}
 
@@ -1396,7 +1396,7 @@ var var::oscwd() const {
 
 	std::string currentpath = std::filesystem::current_path().string();
 
-	return var(currentpath).convert("/", OSSLASH);
+	return var(currentpath).convert("/", _OSSLASH);
 }
 
 }  // namespace exodus

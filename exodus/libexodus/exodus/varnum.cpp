@@ -636,7 +636,8 @@ bool var::toBool() const {
 	while (true) {
 		// ints are true except for zero
 		if (var_typ & VARTYP_INT)
-			return static_cast<bool>(var_int != 0);
+			//return static_cast<bool>(var_int != 0);
+			return var_int != 0;
 
 		// non-numeric strings are true unless zero length
 		if (var_typ & VARTYP_NAN)

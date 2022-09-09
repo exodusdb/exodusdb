@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include <string_view>
 
 //#define INT_IS_FLOOR
-//#include <math.h>  //for std::floor
+//#include <math.h>  //for std::trunc
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
@@ -566,13 +566,19 @@ class PUBLIC var final {
 
 	char toChar() const;
 
-	// standard c/c++ int() in other words simply take the number to the left of the point. -1.5
-	// becomes -1 and 1.5 becomes 1
+	// standard c/c++ int() in other words simply take the number to the left of the point.
+	// -1.9 -> -1
+	// +1.9 -> 1
 	int64_t toInt() const;
 
 	//long long toLong() const;
 
 	double toDouble() const;
+
+	const char* c_str() const {
+		assertString(__PRETTY_FUNCTION__);
+		return var_str.c_str();
+	}
 
 	std::u32string to_u32string() const;
 
@@ -582,9 +588,6 @@ class PUBLIC var final {
 
 	//Be careful not to retain the reference beyond the scope of the var
 	const std::string& toString() const&;  //for non-temporaries.
-
-	// weird version for perl that outputs "" if undefined
-	std::string toString2() const;
 
 
 	///////////////////////////
@@ -611,15 +614,6 @@ class PUBLIC var final {
 	// and C++ uses bool and int conversion in certain cases to convert to int and bool
 	// therefore have chosen to make both bool and int "const" since they dont make
 	// and changes to the base object.
-	// provide a reference to the (long long) int inside a var
-	// This allows passing by reference to the guts of var for speed
-	// it is safe because changing the int has no side effects
-//#define HASINTREFOP
-#ifdef HASINTREFOP
-	operator int&() const;
-	//explicit operator uint64_t&() const;
-	operator double&() const;
-#else
 
 	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
@@ -636,11 +630,6 @@ class PUBLIC var final {
 		assertDecimal(__PRETTY_FUNCTION__);
 		return static_cast<F>(var_dbl);
 	}
-
-#endif
-
-	// remove because causes "ambiguous" with -short_wchar on linux
-	// operator unsigned int() const;
 
 	// recommended to provide automatic conversion to VOID POINTER instead of direct to bool
 	// since void* is auto converted to bool nicely for natural "if (xyz)" syntax
@@ -675,13 +664,9 @@ class PUBLIC var final {
 		return this->toBool();
 	}
 
-	//#endif
-
 	// NB && and || operators are NOT overloaded because var is set to convert to boolean
 	// automatically this is fortunate because "shortcircuiting" of && and || doesnt happen when
 	// overloaded
-
-	// operator size_t() const;
 
 	// Perhaps should NOT allow automatic convertion to char* since it assumes a conversion to
 	// utf8 and cannot hold char(0) perhaps and force people to use something like .utf8() or
@@ -1927,12 +1912,14 @@ class PUBLIC var final {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {
 
-#ifdef INT_IS_FLOOR
-			var_int = std::floor(var_dbl);
-#else
+			//var_int = std::floor(var_dbl);
+
+			// Truncate double to int
+			// -2.9 -> -2
+			// +2.9 -> +2
 			//var_int = std::trunc(var_dbl);
 			var_int = var_dbl;
-#endif
+
 			// Add int flag
 			var_typ |= VARTYP_INT;
 		}
@@ -1964,25 +1951,7 @@ class PUBLIC var final {
 	ND bool cursorexists();//database, not terminal
 	bool selectx(CVR fieldnames, CVR sortselectclause);
 
-	// retrieves cid from *this, or uses default connection, or autoconnect with default
-	// connection string On return *this contains connection ID and type VARTYP_NANSTR_DBCONN
-	//int getconnectionid_ordefault() const;
-	//int getconnectionid() const;
-
-	// finds connection of this variable:
-	// if this is not filename SQLOPENED variable, returns thread default connection or attempts
-	// a default connect()
-	// returning a void pointer in order to not have to include postgres headers in mv.h
-	// will have to be cast to (PGconn *)
-	//void* connection() const;
-
-	// gets lock_table, associated with connection, associated with this object
-	//void* get_lock_table() const;
-	//void* get_mvconnection() const;
-
-	ND var build_conn_info(CVR conninfo) const;
-
-	//var getdictexpression(CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname, VARREF joins, VARREF froms, VARREF selects, VARREF ismv, bool forsort_or_select_or_index = false) const;
+	//ND var build_conn_info(CVR conninfo) const;
 
 	// TODO check if can speed up by returning reference to converted self like MC
 	// left/right justification
@@ -1999,6 +1968,7 @@ class PUBLIC var final {
 	ND VARREF oconv_MR(const char* conversion);
 	// hex
 	ND var oconv_HEX(const int ioratio) const;
+	// text fm <-> \+nl
 	ND var oconv_TX(const int raw = 0) const;
 
 	// faster primitive arguments
@@ -2189,39 +2159,15 @@ inline const var SM = SM_;
 inline const var TM = TM_;
 inline const var ST = ST_;
 
-//inline const var IM = IM_;
-//inline const var AM = AM_;
-//inline const var SVM = SVM_;
-
 inline const var BS = BS_;
 inline const var DQ = DQ_;
 inline const var SQ = SQ_;
 
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-inline const var OSSLASH = "\\";
-constexpr char OSSLASH_ = '\\';
-constexpr bool SLASH_IS_BACKSLASH = true;
-#else
-inline const var OSSLASH = "/";
-constexpr char OSSLASH_ = '/';
-constexpr bool SLASH_IS_BACKSLASH = false;
-#endif
-
-// ASCII definition. Not used in ucase()/lcase() which handle unicode.
-inline const var LOWERCASE_ = "abcdefghijklmnopqrstuvwxyz";
-inline const var UPPERCASE_ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-#if defined(_WIN64) or defined(_LP64)
-inline const var PLATFORM_ = "x64";
-#else
-inline const var PLATFORM_ = "x86";
-#endif
-
 // A global flag used in mvdbpostgres
 [[maybe_unused]] static inline int DBTRACE=var().osgetenv("EXO_DBTRACE");
 
-// provide a public base exception for all other exceptions so exodus programmers can catch mv
-// exceptions generally
+// A public base exception for all other exceptions so exodus programmers can catch
+// var exceptions generally
 class PUBLIC VarError {
    public:
 
