@@ -841,6 +841,7 @@ function main()
 		conn1.disconnect();
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

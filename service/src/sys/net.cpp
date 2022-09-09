@@ -78,7 +78,7 @@ listen:
 		}
 
 		RELOAD_req = true;
-		printl("Reloading PROCESS ", SYSTEM.f(24));
+		printl(THREADNO ^ ":", USER4);
 
 		stop();
 		////

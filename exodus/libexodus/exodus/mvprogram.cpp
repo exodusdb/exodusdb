@@ -2304,6 +2304,12 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 	return result;
 }
 
+// elapsedtimetext 1 - from program start/TIMESTAMP
+var ExodusProgramBase::elapsedtimetext() {
+	var uptodate, uptotime;
+	return elapsedtimetext(int(TIMESTAMP), TIMESTAMP.mod(1) * 86400, uptodate, uptotime);
+}
+
 // elapsedtimetext 2 - automatic upto date/time
 var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime) {
 	var uptodate, uptotime;

@@ -62,6 +62,8 @@ MvEnvironment::~MvEnvironment() {
 // keep in sync both 1) declaration in class and 2) contruction initialisation
 bool MvEnvironment::init(const int threadno) {
 
+	this->TIMESTAMP = var().timestamp();
+
 	// std::wcout<<"MvEnvironment::init("<<threadno<<")"<<std::endl;
 
 	// per process

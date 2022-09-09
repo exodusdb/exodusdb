@@ -11,9 +11,6 @@ function main()
 
 	var begin, end;
 
-	print( "Start of isnum() benchmark: ");
-	begin = begin.timedate();
-	printl( begin.oconv( "MTS"));
 	for( int i=0; i<LOOPS; i++)
 		// mixture of strings in the following proporsion: ([14:58:30] neosys: )
 		//	15% 11111
@@ -622,11 +619,7 @@ function main()
 		assert(!var("-123+").isnum());
 	}
 
-	printl("OK");
-
-	end = end.timedate();
-	print( "End of  isnum()  benchmark: ");
-	printl( end.oconv( "MTS"));
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

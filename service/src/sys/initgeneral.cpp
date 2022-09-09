@@ -285,16 +285,16 @@ function main() {
 	if (not(SYSTEM.f(54))) {
 		SYSTEM(54) = SYSTEM.f(33);
 	}
-	if (VOLUMES) {
-		pidfilename = SYSTEM.f(54, 5) ^ ".pid";
-	} else {
+//	if (VOLUMES) {
+//		pidfilename = SYSTEM.f(54, 5) ^ ".pid";
+//	} else {
 		pidfilename = "/run/neo/neo@" ^ SYSTEM.f(17);
 		if (SYSTEM.f(17).substr(-5) eq "_test") {
 			pidfilename.swapper("neo@", "tst@");
 			pidfilename.swapper("_test", "");
 			pidfilename ^= ".pid";
 		}
-	}
+//	}
 	call osread(pidrec, pidfilename);
 	//osremove pidfilename
 	if (pidrec) {
@@ -409,22 +409,22 @@ updateversion:
 	call log2("*force replication system to reinitialise", logtime);
 	call shadowmfs("EXODUSINIT", "");
 
-	call log2("*reattach data", logtime);
-	var volumesx = VOLUMES;
-	var nvolumes = VOLUMES.count(FM) + 1;
-	for (const var volumen : range(1, nvolumes)) {
-		var volume = volumesx.f(volumen);
-		var tpath = "../" "DATA" "/";
-		tpath.converter("/", OSSLASH);
-		if (volume.substr(1, 8) eq tpath) {
-			execute("ATTACH " ^ volume ^ " (S)");
-		}
-	} //volumen;
-
-	if (VOLUMES) {
-		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
-		perform("RUN GBP LOGON.OLD UPGRADEVOC");
-	}
+//	call log2("*reattach data", logtime);
+//	var volumesx = VOLUMES;
+//	var nvolumes = VOLUMES.count(FM) + 1;
+//	for (const var volumen : range(1, nvolumes)) {
+//		var volume = volumesx.f(volumen);
+//		var tpath = "../" "DATA" "/";
+//		tpath.converter("/", OSSLASH);
+//		if (volume.substr(1, 8) eq tpath) {
+//			execute("ATTACH " ^ volume ^ " (S)");
+//		}
+//	} //volumen;
+//
+//	if (VOLUMES) {
+//		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
+//		perform("RUN GBP LOGON.OLD UPGRADEVOC");
+//	}
 
 	//call log2('*set workstation time to server time',logtime)
 	//call settime('')
@@ -826,34 +826,34 @@ nextreport:
 	SYSTEM(47) = SYSTEM.f(46);
 
 	//why is this called again?
-	call initgeneral2("GETENV", logtime);
+	//call initgeneral2("GETENV", logtime);
 
 	call log2("*get codepage as an environment variable", logtime);
 	//will not override entries in SYSTEM.CFG
 	if (not(SYSTEM.f(12).locate("CODEPAGE", vn))) {
 
-		if (VOLUMES) {
-			tt = "../data/" ^ SYSTEM.f(17) ^ "/data.cfg";
-			tt.swapper("/", OSSLASH);
-			if (not(datacfg.osread(tt))) {
-				tt = "../data/data.cfg";
-				tt.swapper("/", OSSLASH);
-				if (not(datacfg.osread(tt))) {
-					datacfg = "";
-				}
-			}
-			if (datacfg) {
-				datacfg.converter("\r\n", _FM _FM);
-				codepage = datacfg.f(1).trim();
-			} else {
-				var output = shell2("mode CON:", xx);
-				output = trim(output.convert("\r\n", FM ^ FM), FM);
-				codepage = field2(output, " ", -1);
-			}
-		} else {
+//		if (VOLUMES) {
+//			tt = "../data/" ^ SYSTEM.f(17) ^ "/data.cfg";
+//			tt.swapper("/", OSSLASH);
+//			if (not(datacfg.osread(tt))) {
+//				tt = "../data/data.cfg";
+//				tt.swapper("/", OSSLASH);
+//				if (not(datacfg.osread(tt))) {
+//					datacfg = "";
+//				}
+//			}
+//			if (datacfg) {
+//				datacfg.converter("\r\n", _FM _FM);
+//				codepage = datacfg.f(1).trim();
+//			} else {
+//				var output = shell2("mode CON:", xx);
+//				output = trim(output.convert("\r\n", FM ^ FM), FM);
+//				codepage = field2(output, " ", -1);
+//			}
+//		} else {
 			//en_US.UTF-8
 			call osgetenv("LANG", codepage);
-		}
+//		}
 
 		SYSTEM(12, vn) = "CODEPAGE";
 		SYSTEM(13, vn) = codepage;
@@ -884,44 +884,44 @@ nextreport:
 	SYSTEM(9) = 1;
 
 	call log2("*first uses of getenv", logtime);
-	if (VOLUMES) {
-		if (not(osgetenv("OS", os))) {
-			os = "";
-		}
-		if (not(osgetenv("VER", ver))) {
-			ver = "";
-		}
-		if (not(osgetenv("NUMBER_OF_PROCESSORS", tt))) {
-			tt = 1;
-		}
-		SYSTEM(9) = tt;
-
-		call log2("*get windows version", logtime);
-		ver = shell2("ver", xx);
-		ver.converter(FM ^ VM, "  ");
-		ver.converter("\r\n", "  ");
-		//if index(ver,'Windows 9',1) or index(ver,'NT',1) or index(os,'NT',1) then
-		ver = ver.trim().ucase();
-		if ((ver.index("WINDOWS") or ver.index("NT")) or os.index("NT")) {
-			SYSTEM(12, -1) = "WORDSIZE";
-			SYSTEM(13, -1) = "32";
-		}
-		ver = ver.field(" ", 4).field("]", 1);
-		//Windows Server 2003         5.2.3790 (24.04.2003)
-		//Windows Server 2003, SP1    5.2.3790.1180
-		//Windows Server 2003         5.2.3790.1218
-		//Windows Server 2008         6.0.6001 (27.02.2008)
-		var ver2 = ver.field(".", 1, 2);
-		if (var("5.0,5.1,5.2,6.0,6.1,6.2,6.3").locateusing(",", ver2, vern)) {
-			ver2 = var("2000,XP,2003,2008,2008R2,2012,2012R2").field(",", vern);
-			ver = ver.fieldstore(".", 1, -2, "Win" ^ ver2);
-			ver.swapper(".6001", "");
-			ver.swapper(".6002", " SP2");
-			ver.swapper(".3790", "");
-		}
-
-	//not Windows
-	} else {
+//	if (VOLUMES) {
+//		if (not(osgetenv("OS", os))) {
+//			os = "";
+//		}
+//		if (not(osgetenv("VER", ver))) {
+//			ver = "";
+//		}
+//		if (not(osgetenv("NUMBER_OF_PROCESSORS", tt))) {
+//			tt = 1;
+//		}
+//		SYSTEM(9) = tt;
+//
+//		call log2("*get windows version", logtime);
+//		ver = shell2("ver", xx);
+//		ver.converter(FM ^ VM, "  ");
+//		ver.converter("\r\n", "  ");
+//		//if index(ver,'Windows 9',1) or index(ver,'NT',1) or index(os,'NT',1) then
+//		ver = ver.trim().ucase();
+//		if ((ver.index("WINDOWS") or ver.index("NT")) or os.index("NT")) {
+//			SYSTEM(12, -1) = "WORDSIZE";
+//			SYSTEM(13, -1) = "32";
+//		}
+//		ver = ver.field(" ", 4).field("]", 1);
+//		//Windows Server 2003         5.2.3790 (24.04.2003)
+//		//Windows Server 2003, SP1    5.2.3790.1180
+//		//Windows Server 2003         5.2.3790.1218
+//		//Windows Server 2008         6.0.6001 (27.02.2008)
+//		var ver2 = ver.field(".", 1, 2);
+//		if (var("5.0,5.1,5.2,6.0,6.1,6.2,6.3").locateusing(",", ver2, vern)) {
+//			ver2 = var("2000,XP,2003,2008,2008R2,2012,2012R2").field(",", vern);
+//			ver = ver.fieldstore(".", 1, -2, "Win" ^ ver2);
+//			ver.swapper(".6001", "");
+//			ver.swapper(".6002", " SP2");
+//			ver.swapper(".3790", "");
+//		}
+//
+//	//not Windows
+//	} else {
 		//Description:\tUbuntu 18.04.3 LTS\n
 		ver = shell2("lsb_release -d").field(var().chr(9), 2).trim();
 		ver.popper();
@@ -937,7 +937,7 @@ nextreport:
 		if (not ncpus or not ncpus.isnum())
 			ncpus = 1;
 		SYSTEM(9) = ncpus;
-	}
+//	}
 
 	//save VER
 	if (not(SYSTEM.f(12).locate("VER", tt))) {
@@ -951,20 +951,20 @@ nextreport:
 		//grep "model name" /proc/cpuinfo
 		cpu = "Unknown";
 	} else {
-		if (VOLUMES) {
-			cpu = shell2("wmic CPU GET NAME", xx);
-			if (cpu.substr(1, 2) eq _RM _FM) {
-				cpu.splicer(1, 2, "");
-				cpu.converter(var().chr(0), "");
-			}
-			cpu.swapper("\r\n", FM);
-			cpu.remover(1);
-		} else {
+//		if (VOLUMES) {
+//			cpu = shell2("wmic CPU GET NAME", xx);
+//			if (cpu.substr(1, 2) eq _RM _FM) {
+//				cpu.splicer(1, 2, "");
+//				cpu.converter(var().chr(0), "");
+//			}
+//			cpu.swapper("\r\n", FM);
+//			cpu.remover(1);
+//		} else {
 			cpu = ((shell2("cat /proc/cpuinfo|grep -i \"model name\"")).field(var().chr(9), 2)).trim();
 			cpu.converter(var().chr(10), FM);
 			cpu.converter(":", "");
 			cpu.trimmer();
-		}
+//		}
 		if (cpu[-1] eq FM) {
 			cpu.popper();
 		}
@@ -1043,47 +1043,47 @@ nextreport:
 		//if freemb then perform 'OFF'
 	}
 
-	if (VOLUMES) {
-		call log2("*try to update upload.dll", logtime);
-		//for extn=1 to 3
-		// ext=field('net,w3c,www',',',extn)
-		var ext = "NET";
-		var path = "../exodus." ^ ext ^ "/exodus/dll/";
-		path.converter("/", OSSLASH);
-		tt = (path ^ "upload.dl_").osfile();
-		if (tt) {
-			if (tt ne (path ^ "upload.dll").osfile()) {
-				call osremove(path ^ "upload.dll");
-				if (not((path ^ "upload.dll").osfile())) {
-					//call shell('ren ':path:'upload.dl_ upload.dll')
-					osshell("copy " ^ path ^ "upload.dl_ " ^ path ^ "upload.dll");
-				}
-			}
-		}
-		// next extn
-	}
+//	if (VOLUMES) {
+//		call log2("*try to update upload.dll", logtime);
+//		//for extn=1 to 3
+//		// ext=field('net,w3c,www',',',extn)
+//		var ext = "NET";
+//		var path = "../exodus." ^ ext ^ "/exodus/dll/";
+//		path.converter("/", OSSLASH);
+//		tt = (path ^ "upload.dl_").osfile();
+//		if (tt) {
+//			if (tt ne (path ^ "upload.dll").osfile()) {
+//				call osremove(path ^ "upload.dll");
+//				if (not((path ^ "upload.dll").osfile())) {
+//					//call shell('ren ':path:'upload.dl_ upload.dll')
+//					osshell("copy " ^ path ^ "upload.dl_ " ^ path ^ "upload.dll");
+//				}
+//			}
+//		}
+//		// next extn
+//	}
 
-	//Windows Cygwin
-	if (VOLUMES) {
-		call log2("*find cygwin", logtime);
-		var locations = SYSTEM.f(50);
-		locations(1, -1) = "C:\\CYGWIN\\BIN\\,\\CYGWIN\\BIN\\,..\\..\\CYGWIN\\BIN\\";
-		var nn = locations.count(",") + 1;
-		for (const var ii : range(1, nn)) {
-			var location = locations.field(",", ii);
-			if (location[-1] ne "\\") {
-				location ^= "\\";
-			}
-			//initdir location:'*.*'
-			//tt=dirlist()
-			tt = oslistf(location ^ "*.*");
-			if (tt) {
-				SYSTEM(50) = location;
-			}
-			///BREAK;
-			if (not(tt eq "")) break;
-		} //ii;
-	}
+//	//Windows Cygwin
+//	if (VOLUMES) {
+//		call log2("*find cygwin", logtime);
+//		var locations = SYSTEM.f(50);
+//		locations(1, -1) = "C:\\CYGWIN\\BIN\\,\\CYGWIN\\BIN\\,..\\..\\CYGWIN\\BIN\\";
+//		var nn = locations.count(",") + 1;
+//		for (const var ii : range(1, nn)) {
+//			var location = locations.field(",", ii);
+//			if (location[-1] ne "\\") {
+//				location ^= "\\";
+//			}
+//			//initdir location:'*.*'
+//			//tt=dirlist()
+//			tt = oslistf(location ^ "*.*");
+//			if (tt) {
+//				SYSTEM(50) = location;
+//			}
+//			///BREAK;
+//			if (not(tt eq "")) break;
+//		} //ii;
+//	}
 
 	/* using proxycfg;
 	The following example specifies that HTTP servers are accessed through;
@@ -1096,31 +1096,31 @@ nextreport:
 		HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections\WinHttpSettings;
 	Deleting the WinHttpSettings value removes all proxy configurations.;
 	*/
-	if (VOLUMES) {
-		call log2("*find http proxy", logtime);
-		if (SYSTEM.f(56) eq "") {
-			var cmd = "proxycfg";
-getproxy:
-			var result = shell2(cmd, errors).lcase();
-			tt = result.index("proxy server(s)");
-			if (tt) {
-				//tt=result[tt,';'][1,char(13)]
-				tt = result.substr(tt, 9999);
-				tt = tt.field(";", 1).field(var().chr(13), 1);
-				tt = tt.field(":", 2, 99).trim();
-				tt.swapper("http=", "");
-			} else if (cmd eq "proxycfg") {
-				cmd = "netsh winhttp import proxy ie";
-				goto getproxy;
-				{}
-			} else {
-				tt = "";
-			}
-			{}
-			//todo get proxybypasslist
-			SYSTEM(56) = tt;
-		}
-	}
+//	if (VOLUMES) {
+//		call log2("*find http proxy", logtime);
+//		if (SYSTEM.f(56) eq "") {
+//			var cmd = "proxycfg";
+//getproxy:
+//			var result = shell2(cmd, errors).lcase();
+//			tt = result.index("proxy server(s)");
+//			if (tt) {
+//				//tt=result[tt,';'][1,char(13)]
+//				tt = result.substr(tt, 9999);
+//				tt = tt.field(";", 1).field(var().chr(13), 1);
+//				tt = tt.field(":", 2, 99).trim();
+//				tt.swapper("http=", "");
+//			} else if (cmd eq "proxycfg") {
+//				cmd = "netsh winhttp import proxy ie";
+//				goto getproxy;
+//				{}
+//			} else {
+//				tt = "";
+//			}
+//			{}
+//			//todo get proxybypasslist
+//			SYSTEM(56) = tt;
+//		}
+//	}
 
 	/*;
 		call log2('*put up the backup reminder',logtime);
@@ -1141,9 +1141,9 @@ getproxy:
 			}
 		}
 	}
-	if (VOLUMES) {
-		SECURITY = SECURITY.invert();
-	}
+//	if (VOLUMES) {
+//		SECURITY = SECURITY.invert();
+//	}
 
 	//must be before init.acc, init.agency or any task adding
 	//call security.subs2('FIXUSERPRIVS')
@@ -1317,9 +1317,9 @@ getproxy:
 	// *@priority.int<2>=''
 	// end
 
-	if (VOLUMES) {
-		perform("ADDMFS SHADOW.MFS FILEORDER.COMMON");
-	}
+//	if (VOLUMES) {
+//		perform("ADDMFS SHADOW.MFS FILEORDER.COMMON");
+//	}
 
 	call log2("*open general files", logtime);
 	var valid = 1;
@@ -1367,46 +1367,46 @@ getproxy:
 		}
 	}
 
-	if (VOLUMES) {
-
-		call log2("*open processes own lists file", logtime);
-
-		var workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
-		var workpath = "DATAVOL/" ^ workdir ^ "/";
-		workpath.converter("/", OSSLASH);
-
-		//check/create folder
-		//initdir workpath:'REVMEDIA.*'
-		//tt=dirlist()
-		tt = oslistf(workpath ^ "REVMEDIA.*");
-		if (not tt) {
-			osshell("mkdir " ^ workpath);
-			perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
-		}
-
-		//attach folder
-		perform("ATTACH " ^ workpath ^ " (S)");
-
-		//check/make LISTS file
-		if (not(lists.open("LISTS", ""))) {
-			lists = "";
-		}
-		if (not(lists.index(workpath))) {
-			createfile("" ^ workpath ^ " LISTS (S)");
-			if (not(lists.open("LISTS", ""))) {
-				lists = "";
-			}
-			if (not(lists.index(workpath))) {
-				//call note('FAILED TO MAKE LISTS FILE ON ':workpath
-			}
-		}
-
-		call log2("*check lists file exists", logtime);
-		if (not(lists.open("LISTS", ""))) {
-			clearfile(lists);
-		}
-
-	}
+//	if (VOLUMES) {
+//
+//		call log2("*open processes own lists file", logtime);
+//
+//		var workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
+//		var workpath = "DATAVOL/" ^ workdir ^ "/";
+//		workpath.converter("/", OSSLASH);
+//
+//		//check/create folder
+//		//initdir workpath:'REVMEDIA.*'
+//		//tt=dirlist()
+//		tt = oslistf(workpath ^ "REVMEDIA.*");
+//		if (not tt) {
+//			osshell("mkdir " ^ workpath);
+//			perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
+//		}
+//
+//		//attach folder
+//		perform("ATTACH " ^ workpath ^ " (S)");
+//
+//		//check/make LISTS file
+//		if (not(lists.open("LISTS", ""))) {
+//			lists = "";
+//		}
+//		if (not(lists.index(workpath))) {
+//			createfile("" ^ workpath ^ " LISTS (S)");
+//			if (not(lists.open("LISTS", ""))) {
+//				lists = "";
+//			}
+//			if (not(lists.index(workpath))) {
+//				//call note('FAILED TO MAKE LISTS FILE ON ':workpath
+//			}
+//		}
+//
+//		call log2("*check lists file exists", logtime);
+//		if (not(lists.open("LISTS", ""))) {
+//			clearfile(lists);
+//		}
+//
+//	}
 
 	if (not(openfile("LISTS", lists, "DEFINITIONS"))) {
 		{}
@@ -1464,12 +1464,12 @@ getproxy:
 		var file;
 		if (not(file.open(filename, ""))) {
 			createfile("REVBOOT " ^ filename ^ " (S)");
-			if (VOLUMES) {
-				perform("CONVGLOBAL REVBOOT GLOBAL " ^ filename ^ " (S)");
-				perform("DELETEFILE DICT." ^ filename ^ " (S)");
-				perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
-				perform("ATTACH REVBOOT " ^ filename ^ " (S)");
-			}
+//			if (VOLUMES) {
+//				perform("CONVGLOBAL REVBOOT GLOBAL " ^ filename ^ " (S)");
+//				perform("DELETEFILE DICT." ^ filename ^ " (S)");
+//				perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
+//				perform("ATTACH REVBOOT " ^ filename ^ " (S)");
+//			}
 			if (not(file.open(filename, ""))) {
 				call sysmsg(filename.quote() ^ " could not be created by INIT.GENERAL");
 			}
@@ -1533,9 +1533,9 @@ fixnextcompany:
 			goto fixnextcompany;
 		}
 
-		if (VOLUMES) {
-			sys.company(27) = sys.company.f(27).invert();
-		}
+//		if (VOLUMES) {
+//			sys.company(27) = sys.company.f(27).invert();
+//		}
 
 		//initialise with a recent company
 		tt = sys.company.f(2).field("/", 2);
@@ -1582,9 +1582,9 @@ fixcompany:
 		systemsubs = "initacc";
 		call systemsubs(menu);
 	}
-	if (VOLUMES) {
-		perform("MACRO ACCOUNTS");
-	}
+//	if (VOLUMES) {
+//		perform("MACRO ACCOUNTS");
+//	}
 
 	call log2("*open advertising system files INIT.AGENCY", logtime);
 	if (APPLICATION eq "ADAGENCY") {
@@ -1751,46 +1751,46 @@ nextdoc:
 		perform("FINDDEADALL");
 	}
 
-	if (VOLUMES) {
-		if (not(VOLUMES.locateusing(FM, "DATAVOL", xx))) {
-			//pcperform 'MD DATAVOL'
-			//call mkdir('DATAVOL':char(0),xx)
-			call osmkdir("DATAVOL");
-			perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
-			perform("ATTACH DATAVOL (S)");
-		}
-	}
-
-	//windows stuff
-	if (VOLUMES) {
-
-		call log2("*convert codepage", logtime);
-		if (codepaging.osread("CODEPAGE.CFG")) {
-			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
-				codepage = "0" ^ FM ^ codepaging.f(2);
-			}
-			if ((codepage.f(2) eq "737" and not(codepage.f(1))) and codepaging.f(3) eq "1253") {
-				perform("CONVGREEK (U)");
-			}
-		}
-
-		call log2("*installing authorised keys", logtime);
-		perform("INSTALLAUTHKEYS (S)");
-
-		call log2("*installing authorised hosts", logtime);
-		perform("INSTALLALLOWHOSTS (S)");
-
-		voc.deleterecord("$FILEMAN");
-
-		call log2("*put the admenus program as the system menu file", logtime);
-		//as there is no way to have multiple menus files
-		if (APPLICATION eq "ADAGENCY") {
-			var setfilecmd = "SETFILE ./ADAGENCY GLOBAL ADMENUS SYS.MENUS";
-			setfilecmd.converter("/", OSSLASH);
-			perform(setfilecmd);
-		}
-
-	}
+//	if (VOLUMES) {
+//		if (not(VOLUMES.locateusing(FM, "DATAVOL", xx))) {
+//			//pcperform 'MD DATAVOL'
+//			//call mkdir('DATAVOL':char(0),xx)
+//			call osmkdir("DATAVOL");
+//			perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
+//			perform("ATTACH DATAVOL (S)");
+//		}
+//	}
+//
+//	//windows stuff
+//	if (VOLUMES) {
+//
+//		call log2("*convert codepage", logtime);
+//		if (codepaging.osread("CODEPAGE.CFG")) {
+//			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
+//				codepage = "0" ^ FM ^ codepaging.f(2);
+//			}
+//			if ((codepage.f(2) eq "737" and not(codepage.f(1))) and codepaging.f(3) eq "1253") {
+//				perform("CONVGREEK (U)");
+//			}
+//		}
+//
+//		call log2("*installing authorised keys", logtime);
+//		perform("INSTALLAUTHKEYS (S)");
+//
+//		call log2("*installing authorised hosts", logtime);
+//		perform("INSTALLALLOWHOSTS (S)");
+//
+//		voc.deleterecord("$FILEMAN");
+//
+//		call log2("*put the admenus program as the system menu file", logtime);
+//		//as there is no way to have multiple menus files
+//		if (APPLICATION eq "ADAGENCY") {
+//			var setfilecmd = "SETFILE ./ADAGENCY GLOBAL ADMENUS SYS.MENUS";
+//			setfilecmd.converter("/", OSSLASH);
+//			perform(setfilecmd);
+//		}
+//
+//	}
 
 	//call log2('*create user name index',logtime)
 	//convkey='CONVERTED*USERNAMEINDEX'

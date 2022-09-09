@@ -71,8 +71,8 @@ Example command line:
 #define EXO_NOHTML
 #ifdef EXO_NOHTML
 #	define xselect select
-#	define timedate2 timedate
-
+//#	define timedate2 timedate
+//#	define timedate2 (oconv(time(), "MTS") ^ " " ^ oconv(date(), "D"))
 #else
 #	include <addunits.h>
 #	include <colrowspan.h>

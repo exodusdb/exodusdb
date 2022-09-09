@@ -247,7 +247,11 @@ subroutine convoptions(io ptx_temp) {
 		for (var i_ = 1; i_ <= optionchars.length(); ++i_) {
 			var optionchar = optionchars[i_];
 			if (optionchar == "T") {
+#ifdef EXO_NOHTML
+				newoptions ^= oconv(time(), "MTS") ^ " " ^ oconv(date(), "D");
+#else
 				newoptions ^= timedate2();
+#endif
 			} else if (optionchar == "D") {
 				newoptions ^= oconv(var().date(), "[DATE,*]");
 			} else if (optionchar == "P") {

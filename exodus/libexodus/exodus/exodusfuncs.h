@@ -56,12 +56,12 @@ PUBLIC void exchange(VARREF var1, VARREF var2);
 
 PUBLIC ND var date();
 PUBLIC ND var time();
-PUBLIC ND var timedate();
+PUBLIC ND var ostime();
+PUBLIC ND var timestamp();
+//PUBLIC ND var timedate();
 
 PUBLIC void ossleep(const int milliseconds);
 PUBLIC var oswait(const int milliseconds, CVR dirpath);
-
-PUBLIC ND var ostime();
 
 PUBLIC void breakon();
 PUBLIC void breakoff();

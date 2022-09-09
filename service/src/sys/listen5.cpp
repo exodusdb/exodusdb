@@ -194,16 +194,16 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	} else if (request1 eq "CHECKRESTART") {
 
-		//check for corruption in system record
-		//if index(system,char(0),1) then
-		if (SYSTEM.index(var().chr(0))) {
-			var(SYSTEM).oswrite("system.bad");
-			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
-			ANS = "CORRUPTSYSTEM";
-			SYSTEM.converter(var().chr(0), "");
-			ANS = "RESTART " ^ ANS;
-			return 0;
-		}
+//		//check for corruption in system record
+//		//if index(system,char(0),1) then
+//		if (SYSTEM.index(var().chr(0))) {
+//			var(SYSTEM).oswrite("system.bad");
+//			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
+//			ANS = "CORRUPTSYSTEM";
+//			SYSTEM.converter(var().chr(0), "");
+//			ANS = "RESTART " ^ ANS;
+//			return 0;
+//		}
 
 		//detect system parameter changes and restart
 		//this has the effect of detecting corruption in system which inserts lines
@@ -228,24 +228,24 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 		} //ii;
 
-		//check for upgrade to LISTEN
-		var gbp;
-		if (gbp.open("GBP", "")) {
-			var listen;
-			if (listen.read(gbp, "$LISTEN")) {
-				listen = field2(listen, FM, -1);
-				if (s100.f(1, 3)) {
-					if (s100.f(1, 3) ne listen) {
-						//this will only restart listen, not the whole process/thread
-						ANS = "RESTART $LISTEN";
-						return 0;
-					}
-						//comment to solve c++ decomp problem
-				} else {
-					SYSTEM(100, 3) = listen;
-				}
-			}
-		}
+//		//check for upgrade to LISTEN
+//		var gbp;
+//		if (gbp.open("GBP", "")) {
+//			var listen;
+//			if (listen.read(gbp, "$LISTEN")) {
+//				listen = field2(listen, FM, -1);
+//				if (s100.f(1, 3)) {
+//					if (s100.f(1, 3) ne listen) {
+//						//this will only restart listen, not the whole process/thread
+//						ANS = "RESTART $LISTEN";
+//						return 0;
+//					}
+//						//comment to solve c++ decomp problem
+//				} else {
+//					SYSTEM(100, 3) = listen;
+//				}
+//			}
+//		}
 
 		ANS = "";
 		return 0;

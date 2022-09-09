@@ -129,6 +129,7 @@ function main() {
 		assert(("x" ^ var(uint(255)).oconv("MX")).outputl() eq "xFF");
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

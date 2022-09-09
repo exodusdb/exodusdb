@@ -207,6 +207,7 @@ function main()
 		assert(var(1.2345678901).numberinwords("spanish").outputl() eq "uno punto dos tres cuatro cinco seis siete ocho nueve cero uno");
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

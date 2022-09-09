@@ -131,7 +131,8 @@ function main() {
 
 	gosub cleanup();
 
-	printl("\n   --- Test passed ---\n");
+	printl(elapsedtimetext());
+	printl("\nTest passed");
 
 	return 0;
 }

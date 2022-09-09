@@ -229,6 +229,7 @@ function main() {
 	printl(the_truth_hurts, some_dbl, some_char);
 
     printl();
+	printl(elapsedtimetext());
 	printl("Test passed");
 
     return 0;

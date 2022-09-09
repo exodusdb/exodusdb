@@ -310,7 +310,8 @@ subroutine convoptions() {
 		//for (const var ii : range(1, optionchars.length())) {
 			var optionchar = optionchars[ii];
 			if (optionchar == "T") {
-				newoptions ^= timedate();
+//				newoptions ^= timedate();
+				newoptions ^= oconv(time(), "MTS") ^ " " ^ oconv(date(), "D");
 			} else if (optionchar == "D") {
 				newoptions ^= oconv(date(),"[DATE,*]");
 			} else if (optionchar == "P") {

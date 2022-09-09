@@ -1,3 +1,7 @@
+// dont use guard since may required multiple times eg in dict_xxxxx.cpp files
+//#ifndef SERVICE_SRC_SYS_SYS_COMMON_H_
+//#define SERVICE_SRC_SYS_SYS_COMMON_H_
+
 #include <exodus/common.h>
 
 #define sys_common_no 0
@@ -23,3 +27,5 @@ commoninit(sys,sys_common_no)
 	var accounting;
 
 commonexit(sys,sys_common_no)
+
+//#endif // SERVICE_SRC_SYS_SYS_COMMON_H_

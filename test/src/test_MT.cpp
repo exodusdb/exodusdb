@@ -172,6 +172,7 @@ function main() {
 	var stopped=ostime();
 	errputl(stopped-started," seconds");
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

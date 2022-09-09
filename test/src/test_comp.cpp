@@ -381,6 +381,7 @@ function main() {
 		assert(not (var(negative_smaller) < var(0.0)));
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

@@ -183,6 +183,7 @@ function main() {
 	test("999.",	"999");
 	test("9999");
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

@@ -197,6 +197,8 @@ class PUBLIC MvEnvironment {
 
 	var CURSOR = "1";
 
+	var TIMESTAMP = "";
+
 	// define a type of object that holds many LabelledCommons
 	LabelledCommon* labelledcommon[99] = {0};
 

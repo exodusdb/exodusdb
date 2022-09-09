@@ -843,6 +843,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//assert(to_oscmd_string(cmd) == cmd);
 	assert(not osshell(cmd));
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

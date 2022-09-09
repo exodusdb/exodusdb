@@ -20,7 +20,7 @@ programinit()
 
 // Function to generate code to be asserted
 function print_assert(double d1, in /*v2*/) {
-	
+
 	printl("assert(var(", d1, ").squote().outputl() eq ", var(d1).squote().quote(), ");");
 	return true;
 }
@@ -152,6 +152,7 @@ function main() {
 		std::cout << "jump       " << std::fixed << std::setprecision(100) << std::nextafter(0.1, 0.0) - 0.1 << std::endl;
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

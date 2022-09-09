@@ -24,6 +24,7 @@ function main() {
 	assert(osremove(filename));
 	assert(not osfile(filename));
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

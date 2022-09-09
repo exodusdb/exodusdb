@@ -11,6 +11,7 @@ function main() {
 	gosub test_basic_ops();
 	gosub test_mod();
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

@@ -159,6 +159,7 @@ function main() {
 		assert(bt.match(R"__(\d+:\s+test_except.cpp:\d+: var bt = backtrace\(\);)__", ""));
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

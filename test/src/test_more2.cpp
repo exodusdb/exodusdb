@@ -1290,6 +1290,7 @@ function main() {
 
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

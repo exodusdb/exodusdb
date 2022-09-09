@@ -23,7 +23,10 @@ function main() {
 			deletefile(filename);
 		}
 	}
+
+	printl(elapsedtimetext());
 	printl("Test passed");
+
 	return 0;
 }
 

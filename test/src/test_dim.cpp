@@ -551,6 +551,7 @@ function main() {
 		assert(x.cols() eq 1);
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

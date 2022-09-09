@@ -242,4 +242,6 @@ using out = var&;      // VARREF;
 #define THREADNO mv.THREADNO
 #define CURSOR mv.CURSOR
 
+#define TIMESTAMP mv.TIMESTAMP
+
 #endif	// EXODUSMACROS_H

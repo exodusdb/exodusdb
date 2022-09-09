@@ -156,6 +156,7 @@ function main() {
 		assert(regex_replace("abababab","a.","xy").outputl() eq "xyxyxyxy");//regex
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

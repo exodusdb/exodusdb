@@ -752,6 +752,7 @@ programexit()
 
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

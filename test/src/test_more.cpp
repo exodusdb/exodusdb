@@ -366,6 +366,7 @@ function main() {
 		v1_01=1.01; assert(cropper(v1_01).outputl().toString() eq "1.01");
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

@@ -1282,12 +1282,14 @@ class PUBLIC var final {
 	// OS TIME/DATE
 	///////////////
 
-	ND var date() const;
-	ND var time() const;
-	ND var timedate() const;
+	ND var date() const;//int days since pick epoch 1967-12-31
+	ND var time() const;//int seconds since last midnight
+	ND var ostime() const;
+	ND var timestamp() const; // floating point fractional days since pick epoch 1967-12-31 00:00:00
+	//ND var timedate() const;// current date and time string eg 09:28:43 09 SEP 2022
+
 	void ossleep(const int milliseconds) const;
 	var oswait(const int milliseconds, CVR directory) const;
-	ND var ostime() const;
 
 	void breakon() const;
 	void breakoff() const;

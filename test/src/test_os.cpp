@@ -401,7 +401,7 @@ function main() {
 		assert(not osfile(filename));
 	}
 
-	TRACE("exit");
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

@@ -637,6 +637,7 @@ function main() {
 		assert(x(2, 3, 3) and not x(2, 3, 2));
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

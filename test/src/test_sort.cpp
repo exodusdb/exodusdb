@@ -38,6 +38,7 @@ function main() {
 
 	assert(var("bb^10^aa^2^a10^a2").split(sep).sort().join(sep) == "2^10^a10^a2^aa^bb");
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

@@ -109,6 +109,8 @@ function main() {
 		assert(round(var(6000.50f)/20,2).outputl()==300.03);
 		assert(round(var(-6000.50f)/20,2).outputl()==-300.03);
 	}
+
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

@@ -157,6 +157,7 @@ function main() {
 		x.dump();
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

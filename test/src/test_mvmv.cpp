@@ -526,6 +526,7 @@ function main() {
 	locateusing(locsep,30,ascints,locii);
 	assert(locii==6);
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

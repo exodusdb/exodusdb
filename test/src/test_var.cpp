@@ -15,6 +15,9 @@ int main() {
 	//  g++ test_var.cpp -std=c++17 -lexodus
 	//  g++ test_var.cpp -std=c++20 -lexodus
 
+	// Exodus programming environment is not available
+	//printl(elapsedtimetext());
+
     "Test passed"_var.outputl();
 
     return 0;

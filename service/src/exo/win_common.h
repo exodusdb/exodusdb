@@ -1,3 +1,7 @@
+// dont use guard since may required multiple times eg in dict_xxxxx.cpp files
+//#ifndef SERVICE_SRC_EXO_WIN_COMMON_H_
+//#define SERVICE_SRC_EXO_WIN_COMMON_H_
+
 #include <exodus/common.h>
 
 #define win_common_no 1
@@ -60,3 +64,4 @@ commoninit(win,win_common_no)
 
 commonexit(win,win_common_no)
 
+//#endif // SERVICE_SRC_EXO_WIN_COMMON_H_

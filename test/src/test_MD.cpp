@@ -143,6 +143,7 @@ function main()
 		assert(var(1E11).oconv("MD60P").squote().outputl() eq "'100000000000.000000'");
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

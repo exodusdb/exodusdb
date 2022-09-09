@@ -26,6 +26,7 @@ function main() {
 	assert(array.f(6)=="620]610]62]61");
 	assert(array.f(7)=="720]710]72]71");
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

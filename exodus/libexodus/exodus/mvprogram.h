@@ -194,6 +194,7 @@ class PUBLIC ExodusProgramBase {
 	ND var invertarray(CVR input, CVR force0 = (0));
 	void sortarray(VARREF array, CVR fns = 0, CVR orderby0 = "");
 
+	ND var elapsedtimetext();
 	ND var elapsedtimetext(CVR fromdate, CVR fromtime);
 	ND var elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime);
 

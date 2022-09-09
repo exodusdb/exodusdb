@@ -88,6 +88,7 @@ Lines: 190125 differences: 2 Max differences: 2
 		}
 	}
 
+	printl(elapsedtimetext());
 	if (totndifferences < 1)
 		printl("Test passed");
 	else

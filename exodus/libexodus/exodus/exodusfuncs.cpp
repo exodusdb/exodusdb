@@ -52,6 +52,7 @@ PUBLIC void exchange(VARREF var1, VARREF var2) {
 	var1.exchange(var2);
 }
 
+
 PUBLIC var date() {
 	return var().date();
 }
@@ -60,9 +61,17 @@ PUBLIC var time() {
 	return var().time();
 }
 
-PUBLIC var timedate() {
-	return var().timedate();
+PUBLIC var ostime() {
+	return var().ostime();
 }
+
+PUBLIC var timestamp() {
+	return var().timestamp();
+}
+//PUBLIC var timedate() {
+//	return var().timedate();
+//}
+
 
 PUBLIC void ossleep(const int milliseconds) {
 	var().ossleep(milliseconds);
@@ -72,9 +81,6 @@ PUBLIC var oswait(const int milliseconds, CVR dirpath) {
 	return var().oswait(milliseconds, dirpath);
 }
 
-PUBLIC var ostime() {
-	return var().ostime();
-}
 
 // osopen x to y else
 PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, const char* locale) {

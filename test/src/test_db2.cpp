@@ -15,6 +15,8 @@ function main()
 		return 0;
 	}
 
+	begintrans();
+
 //  //Skip if fast testing required
 //	if (osgetenv("EXO_FAST_TEST")) {
 //		printl("EXO_FAST_TEST - skipping test.");
@@ -556,6 +558,7 @@ dict(AGE_IN_YEARS) {
 
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;

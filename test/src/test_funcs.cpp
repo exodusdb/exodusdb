@@ -56,14 +56,6 @@ function main() {
 			assert(ostime() - started > 0.1);
 	}
 	{
-		// Block Ctrl+C etc
-		breakoff();
-		//input(ID);
-
-		breakon();
-		//input(ID);
-	}
-	{
 		assert(ospid().dump("ospid=").match("\\d+"));
 	}
 	{
@@ -73,15 +65,6 @@ function main() {
 		} catch(MVAbort v) {
 			printl("Caught MVAbort");
 		}
-	}
-	{
-		echo(false);
-		printl("echo(false) suppresses terminal input visibility");
-		///input(ID);
-
-		echo(true);
-		printl("echo(true) enables terminal input visibility");
-		//input(ID);
 	}
 	{
 		var x="asd";
@@ -270,6 +253,7 @@ function main() {
 		x = "abc"; assert(splicer(x,-4,"XYZ").outputl() eq "XYZ");
 	}
 
+	printl(elapsedtimetext());
 	printl("Test passed");
 	return 0;
 }

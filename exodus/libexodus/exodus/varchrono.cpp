@@ -105,6 +105,8 @@ var var::date() const {
 
 	using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>>;
 	const auto duration_in_days = std::chrono::duration_cast<days>(duration_since_epoch);
+
+	// timestamp() assumes that the var returned is an int
 	return duration_in_days.count() - PICK_UNIX_DAY_OFFSET;
 
 }
@@ -123,14 +125,6 @@ var var::time() const {
 
 }
 
-var var::timedate() const {
-	// output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
-
-	// TODO make this rely on a single timestamp instead of time and date
-	// to avoid the slight chance of time and date being called different sides of midnight
-	return time().oconv_MT("S") ^ " " ^ date().oconv_D("D");
-}
-
 var var::ostime() const {
 	// return decimal seconds since midnight up to micro or nano second accuracy
 
@@ -143,6 +137,31 @@ var var::ostime() const {
 	return now % 86400000000000 / 1000000000.0;
 
 }
+
+// return decimal fractional days since pick epoch 1967-12-31 00:00:00
+var var::timestamp() const {
+
+	var datenow = this->date();
+	var timenow = this->ostime();
+
+	// If the date flipped while we got the time then get the time again
+	// If someone is messing with the system clock then we will
+	// fall for the bait only once
+	// Assuming that date() is returned as an int for speed
+	if (this->date().var_int != datenow.var_int)
+		timenow = this->ostime();
+
+	return datenow + timenow / 86400;
+
+}
+
+//var var::timedate() const {
+//	// output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
+//
+//	// TODO make this rely on a single timestamp instead of time and date
+//	// to avoid the slight chance of time and date being called different sides of midnight
+//	return time().oconv_MT("S") ^ " " ^ date().oconv_D("D");
+//}
 
 var var::iconv_D(const char* conversion) const {
 
