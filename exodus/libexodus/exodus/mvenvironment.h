@@ -23,7 +23,7 @@ THE SOFTWARE.
 #ifndef MVENVIRONMENT_H
 #define MVENVIRONMENT_H 1
 
-#undef eq
+//#undef eq
 #include <iostream>
 
 // Using map for dllib cache instead of unordered_map since it is faster
@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include <map>
 
 #include <vector>
-#define eq ==
+//#define eq ==
 
 #include <exodus/var.h>
 #include <exodus/dim.h>

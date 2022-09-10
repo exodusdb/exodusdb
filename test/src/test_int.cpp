@@ -13,13 +13,30 @@ function main() {
 		//TRACE(65536L*65536L*65536L*65536L) //overflow = 0
 		TRACE(65536L*65536L*65536L)
 
-		TRACE(0xffffffffffffffff); // minus 1
-		TRACE(0x7fffffffffffffff); // max int64
-		TRACE(0x8000000000000000); // min int64
+		try {
+			TRACE(0xffffffffffffffff); // minus 1
+			assert(false);
+		} catch (VarIntOverflow e) {
+			printl(e.description);
+		}
 
-		var i64 = 0xefffffffffffffff;
-		i64.dump();
-		TRACE(i64);
+		TRACE(0x7fffffffffffffff); // max int64
+
+		try {
+			TRACE(0x8000000000000000); // min int64
+			assert(false);
+		} catch (VarIntOverflow e) {
+			printl(e.description);
+		}
+
+		try {
+			var i64 = 0xefffffffffffffff;
+			i64.dump();
+			TRACE(i64);
+			assert(false);
+		} catch (VarIntOverflow e) {
+			printl(e.description);
+		}
 
 		{ //min int
 

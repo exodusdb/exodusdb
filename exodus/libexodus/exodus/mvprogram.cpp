@@ -457,7 +457,7 @@ bool ExodusProgramBase::getlist(CVR listname) {
 bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, const var fieldno /*=0*/) {
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
-	if (filename2[-1] eq ")") {
+	if (filename2[-1] == ")") {
 		var options = filename2.field2(" ", -1);
 		filename2.splicer(-options.length(), 999999999, "").trimmerb();
 	}
@@ -750,7 +750,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	var usern;
 
 	var task = task0;
-	if (username0.unassigned() or username0 eq "") {
+	if (username0.unassigned() or username0 == "") {
 		// allow for username like FINANCE(STEVE)
 		// so security is done like FINANCE but record is kept of actual user
 		// this allows for example billing module users to post as finance module users
@@ -1020,7 +1020,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 			} else {
 				//if (tt == DQ && (string2.count(DQ) > 1 || tt == "\'") &&
 				//	string2.count("\'") > 1) {
-				if ((tt eq DQ and string2.count(DQ) gt 1) or ((tt eq "'" and string2.count("'") gt 1))) {
+				if ((tt == DQ and string2.count(DQ) gt 1) or ((tt == "'" and string2.count("'") gt 1))) {
 					inquotes = tt;
 				} else {
 					if (wordseps.index(tt, 1)) {
@@ -1735,7 +1735,7 @@ lock:
 	}
 
 	var locked = file.lock(keyx);
-	if (locked || (allowduplicate && locked eq "")) {
+	if (locked || (allowduplicate && locked == "")) {
 
 		// fail if unexpired persistent lock exists in LOCKS file
 		// on the same connection as file
@@ -2442,13 +2442,13 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 		zz = "Z";
 	}
 
-	if (type eq "ICONV") {
+	if (type == "ICONV") {
 		var reciprocal = 0;
-		if (input[1] eq "/") {
+		if (input[1] == "/") {
 			reciprocal = 1;
 			input.splicer(1, 1, "");
 		} else {
-			if (input.substr(1, 2) eq "1/") {
+			if (input.substr(1, 2) == "1/") {
 				reciprocal = 1;
 				input.splicer(1, 2, "");
 			}
@@ -2457,7 +2457,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 		output = input.trim();
 
 		//first get into a pickos number with dots not commas
-		if (BASEFMT.substr(1, 2) eq "MC") {
+		if (BASEFMT.substr(1, 2) == "MC") {
 			output.converter(",", ".");
 		} else {
 			output.converter(",", "");
@@ -2465,13 +2465,13 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 		//nb [NUMBER,X] means no decimal place conversion to be done
 		//if ndecs is given then convert to that number of decimals
 		// if ndecs starts with a digit then use {NDECS} (use 2 if {NDECS}=null)
-		if (ndecs eq "") {
+		if (ndecs == "") {
 			if (DICT) {
 				ndecs = calculate("NDECS");
 			} else {
 				ndecs = BASEFMT[3];
 			}
-			if (ndecs eq "") {
+			if (ndecs == "") {
 				ndecs = 2;
 			}
 			if (not(ndecs.match("^\\d$"))) {
@@ -2479,10 +2479,10 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 			//FMTX='MD':NDECS:'0P'
 			//OUTPUT=OUTPUT FMTX
 		}
-		if (ndecs eq "*" or ndecs eq "X") {
+		if (ndecs == "*" or ndecs == "X") {
 			ndecs = output.field(".", 2).length();
 		}
-		if (ndecs eq "BASE") {
+		if (ndecs == "BASE") {
 			//fmtx = "MD" ^ BASEFMT[3] ^ "0P";
 			fmtx = "MD" ^ BASEFMT.at(3) ^ "0P";
 		} else {
@@ -2514,13 +2514,13 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 		input1 = input.substr2(posn, delim);
 
 		var perc = input1[-1];
-		if (perc eq "%") {
+		if (perc == "%") {
 			input1.popper();
 		} else {
 			perc = "";
 		}
 		var plus = input1[1];
-		if (plus eq "+") {
+		if (plus == "+") {
 			input1.splicer(1, 1, "");
 		} else {
 			plus = "";
@@ -2544,13 +2544,13 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 			var unitx = input1.substr(numlen + 1, 99);
 			var numx = input1.substr(1, numlen);
 
-			if (ndecs eq "BASE") {
+			if (ndecs == "BASE") {
 				output1 = oconv(numx, BASEFMT ^ zz) ^ unitx;
 			} else {
 				//if ndecs='' then ndecs=len(field(numx,'.',2))
 				//!ndecs could be X to mean no conversion at all!
 				//FMTX=@USER2[1,2]:ndecs:'0P,':z
-				if (ndecs eq "") {
+				if (ndecs == "") {
 					fmtx = BASEFMT.substr(1, 2) ^ numx.field(".", 2).length() ^ "0P," ^ zz;
 				} else {
 					fmtx = BASEFMT.substr(1, 2) ^ ndecs ^ "0P," ^ zz;

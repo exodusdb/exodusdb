@@ -69,6 +69,18 @@ void var::throwNonNumeric(CVR message) const {
 	throw VarNonNumeric(message);
 }
 
+void var::throwNonPositive(CVR message) const {
+	throw VarNonPositive(message);
+}
+
+void var::throwIntOverflow(CVR message) const {
+	throw VarIntOverflow(message);
+}
+
+void var::throwIntUnderflow(CVR message) const {
+	throw VarIntUnderflow(message);
+}
+
 CVR var::dump(SV text) const {
 //	std::clog << "DUMP: " << text << " ";
 //	if (var_typ & VARTYP_STR)
@@ -1509,6 +1521,7 @@ void save_stack_addresses();
 VarUnassigned     ::VarUnassigned(    CVR errmsg) : VarError("VarUnassigned:"     ^ errmsg) {}
 VarDivideByZero   ::VarDivideByZero(  CVR errmsg) : VarError("VarDivideByZero:"   ^ errmsg) {}
 VarNonNumeric     ::VarNonNumeric(    CVR errmsg) : VarError("VarNonNumeric:"     ^ errmsg) {}
+VarNonPositive    ::VarNonPositive(   CVR errmsg) : VarError("VarNonPositive:"    ^ errmsg) {}
 VarIntOverflow    ::VarIntOverflow(   CVR errmsg) : VarError("VarIntOverflow:"    ^ errmsg) {}
 VarIntUnderflow   ::VarIntUnderflow(  CVR errmsg) : VarError("VarIntUnderflow:"   ^ errmsg) {}
 VarUndefined      ::VarUndefined(     CVR errmsg) : VarError("VarUndefined:"      ^ errmsg) {}

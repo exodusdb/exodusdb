@@ -8,6 +8,7 @@ namespace exodus {
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
 class PUBLIC VarDivideByZero    : public VarError {public: explicit VarDivideByZero(    CVR var1);};
 class PUBLIC VarNonNumeric      : public VarError {public: explicit VarNonNumeric(      CVR var1);};
+class PUBLIC VarNonPositive     : public VarError {public: explicit VarNonPositive(     CVR var1);};
 class PUBLIC VarIntOverflow     : public VarError {public: explicit VarIntOverflow(     CVR var1);};
 class PUBLIC VarIntUnderflow    : public VarError {public: explicit VarIntUnderflow(    CVR var1);};
 class PUBLIC VarOutOfMemory     : public VarError {public: explicit VarOutOfMemory(     CVR var1);};

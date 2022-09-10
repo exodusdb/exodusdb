@@ -25,9 +25,9 @@ THE SOFTWARE.
 #define EXODUS_RELEASE "22.09"
 #define EXODUS_PATCH "22.09.0"
 
-//#include <iostream>
 #include <string>
 #include <string_view>
+//#include <iostream> // only for debugging
 
 //#define INT_IS_FLOOR
 //#include <math.h>  //for std::trunc
@@ -75,9 +75,9 @@ THE SOFTWARE.
 
 // ND macro [[no_discard]]
 #if __clang_major__ != 10
-#define ND [[nodiscard]]
+#	define ND [[nodiscard]]
 #else
-#define ND
+#	define ND
 #endif
 
 #include <exodus/vartyp.h>
@@ -129,6 +129,8 @@ THE SOFTWARE.
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
 	var(EXPRESSION).convert(ALL_FMS, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
+#define TRACE2(EXPRESSION) \
+	std::cerr << (EXPRESSION) << std::endl;
 
 #define DEFAULT_UNASSIGNED = var()
 #define DEFAULT_EMPTY = ""
@@ -190,6 +192,8 @@ using SV = std::string_view;
 //           ---
 // var:       48
 
+using varint_t = int64_t;
+
 // class var final
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
 class PUBLIC var final {
@@ -198,14 +202,14 @@ class PUBLIC var final {
 	// PRIVATE DATA MEMBERS
 	///////////////////////
 
-   private:
+ private:
 
 	// Understanding size of bytes, characters, integers and floating point
 	// See https://en.cppreference.com/w/cpp/language/types
 
 	// All mutable because asking for a string can create it from an integer and vice versa
 	mutable std::string var_str; // 32 bytes on g++. is default constructed to empty string
-	mutable int64_t     var_int; // 8 bytes/64 bits - currently defined as a long long
+	mutable varint_t    var_int; // 8 bytes/64 bits - currently defined as a long long
 	mutable double      var_dbl; // 8 bytes/64 buts - double
 	mutable VARTYP      var_typ; // Default initialised to VARTYP_UNA
 	                             // Actually a unsigned int which will be 4 bytes
@@ -215,7 +219,7 @@ class PUBLIC var final {
 	// SPECIAL MEMBER FUNCTIONS
 	///////////////////////////
 
-   public:
+ public:
 
 	/////////////////////////
 	// 1. Default constructor - Can default as string and var_typ have constructors
@@ -284,7 +288,6 @@ class PUBLIC var final {
 		// use initializers for speed? and only check afterwards if rhs was assigned
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
 
-		//std::clog << "copy ctor CVR " << rhs.var_str << std::endl;
 	}
 
 	//////////////////////
@@ -293,30 +296,18 @@ class PUBLIC var final {
 	//
 	var(TVR fromvar) noexcept = default;
 
-	//	// var(TVR fromvar) noexcept;  // = default;
-	//	// defined in class for inline/optimisation
-	//	// move constructor
-	//	var(TVR rhs) noexcept
-	//		: var_str(std::move(rhs.var_str)),
-	//		var_int(rhs.var_int),
-	//		var_dbl(rhs.var_dbl),
-	//		var_typ(rhs.var_typ) {
-	//
-	//		//std::clog << "move ctor TVR noexcept " << rhs.var_str << std::endl;
-	//
-	//		// skip this for speed since temporararies are unlikely to be unassigned
-	//		// THISIS("var::var(TVR rhs) noexcept")
-	//		// ISASSIGNED(rhs)
-	//	}
-
 	/////////////////////
 	// 5. copy assignment - from lvalue
 	/////////////////////
 
-	// Not using copy assignment by value (copy-and-swap idiom)
-	// because Howard Hinnant recommends against in our case
+	//var = var
 
-	// Prevent assigning to temporaries
+	// Not using copy and swap idiom (copy assignment by value)
+	// because Howard Hinnant recommends against in our case
+	// We avoids a copy and make sure that we do the
+
+	// Prevent assigning to temporaries with a clearer error message
+	// e.g. printl(date() = 12345);
 	void operator=(CVR rhs) && = delete;
 
 	// var& operator=(CVR rhs) & = default;
@@ -348,9 +339,9 @@ class PUBLIC var final {
 	// 6. move assignment - from rvalue/temporary
 	/////////////////////
 
-	// defined in class for inline/optimisation
+	// var = temp var
 
-	// Prevent assigning to temporaries
+	// Prevent assigning to temporaries (is this required?)
 	void operator=(TVR rhs) && noexcept = delete;
 
 	// Cannot use default move assignment because
@@ -385,6 +376,10 @@ class PUBLIC var final {
 	// INT CONSTRUCTORS
 	///////////////////
 
+	// var(integer)
+
+	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		bool
 		char
@@ -402,32 +397,38 @@ class PUBLIC var final {
 		unsigned long
 		long long (C++11)
 		unsigned long long (C++11)
+		etc.
 	*/
-	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	var(I rhs)
 		:
 		var_int(rhs),
 		var_typ(VARTYP_INT) {
-		//std::cerr << "var(int)" << std::endl;
+
+		// Prevent overlarge unsigned ints resulting in negative ints
+		if (std::is_unsigned<I>::value) {
+			if (this->var_int < 0)
+				throwIntOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
+		}
 	}
 
 
-	//////////////////////
-	// DOUBLE CONSTRUCTORS
-	//////////////////////
+	//////////////////////////////
+	// FLOATING POINT CONSTRUCTORS
+	//////////////////////////////
 
+	// var = floating point
+
+	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		float,
 		double,
 		long double
 	*/
-	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	var(F rhs)
 		:
 		var_dbl(rhs),
-		var_typ(VARTYP_DBL){
+		var_typ(VARTYP_DBL) {
 			//std::cerr << "var(dbl)" << std::endl;
 	}
 
@@ -436,14 +437,16 @@ class PUBLIC var final {
 	// STRING CONSTRUCTORS
 	//////////////////////
 
+	// var = string-like
+
+	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		// Accepts l and r values efficiently hopefully
 		std::string,
 		std::string_view,
 		char*,
 	*/
-	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	var(S&& fromstr)
 	    :
 		var_str(std::forward<S>(fromstr)),
@@ -453,11 +456,10 @@ class PUBLIC var final {
 
 	// memory block
 	///////////////
-	var(const char* charstart, const size_t nchars)
-		:
-		var_str(charstart, nchars),
+	var(const char* charstart, const size_t nchars) :
 		var_typ(VARTYP_STR) {
-		//std::cerr << "var(mem)" << std::endl;
+		if (charstart)
+			var_str = std::string_view(charstart, nchars);
 	}
 
 	// char
@@ -475,6 +477,10 @@ class PUBLIC var final {
 	// STRING CONSTRUCTORS FROM WIDE
 	////////////////////////////////
 
+	// var(wide-string-like)
+
+	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		// Accepts l and r values efficiently hopefully
 		std::u32string,
@@ -482,9 +488,6 @@ class PUBLIC var final {
 		u32char*,
 		u32char
 	*/
-
-	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	var(W&& fromstr)
 	    :
 		var_typ(VARTYP_STR) {
@@ -500,12 +503,9 @@ class PUBLIC var final {
 	/////////
 	var(const wchar_t* wcstr1)
 		: var_typ(VARTYP_STR) {
-
-		// protect against null pointer
-		if (wcstr1 == 0)
-			throw ("Null pointer in var::var(const wchar_t*)");
-
-		(*this) = var(std::wstring(wcstr1));
+		if (wcstr1)
+			//var_str = std::move(std::wstring(wcstr1));
+			(*this) = var(std::wstring(wcstr1));
 	}
 
 // Cant provide these and support L'x' since it they are ambiguous with char when creating var from ints
@@ -544,9 +544,11 @@ class PUBLIC var final {
 	// GENERAL CONSTRUCTOR FROM INITIALIZER LIST
 	////////////////////////////////////////////
 
+	// var{...}
+
+	template <class T>
 	// int, double, cstr etc.
 	/////////////////////////
-	template <class T>
 	var(std::initializer_list<T> list)
 		: var_typ(VARTYP_STR) {
 		for (auto item : list) {
@@ -615,21 +617,69 @@ class PUBLIC var final {
 	// therefore have chosen to make both bool and int "const" since they dont make
 	// and changes to the base object.
 
-	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
+	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = false>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	/*
+		bool
+		char
+		signed char
+		unsigned char
+		wchar_t
+		char8_t (C++20)
+		char16_t (C++11)
+		char32_t (C++11)
+		short
+		unsigned short
+		int
+		unsigned int
+		long
+		unsigned long
+		long long (C++11)
+		unsigned long long (C++11)
+		etc.
+	*/
 	operator I() const {
-		//converts string or double to int using pickos int() which is floor()
-		//unlike c/c++ int() function which rounds to nearest even number (negtive or positive)
 		assertInteger(__PRETTY_FUNCTION__);
+
+		// Prevent conversion of negative numbers to unsigned integers
+		if (std::is_unsigned<I>::value) {
+			if (this->var_int < 0)
+				throwNonPositive(__PRETTY_FUNCTION__);
+		}
+//		// Similar code in constructor(int) operator=(int) and int()
+//TRACE2(__PRETTY_FUNCTION__)
+//TRACE2(var_int)
+//TRACE2(std::numeric_limits<I>::min())
+//TRACE2(std::numeric_limits<I>::max())
+//		if (!std::is_same<I, varint_t>::value) {
+//			//if (!std::is_same<I, bool>::value) {
+//				if (var_int > std::numeric_limits<I>::max()) {
+//					throwIntOverflow(__PRETTY_FUNCTION__);
+//				}
+//				if (var_int < std::numeric_limits<I>::min()) {
+//					throwIntUnderflow(__PRETTY_FUNCTION__);
+//				}
+//			//}
+//		}
+
 		return static_cast<I>(var_int);
 	}
 
+	// floating point <- var
+
 	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	/*
+		float,
+		double,
+		long double
+	*/
 	operator F() const {
 		assertDecimal(__PRETTY_FUNCTION__);
 		return static_cast<F>(var_dbl);
 	}
+
+	// void* <- var
 
 	// recommended to provide automatic conversion to VOID POINTER instead of direct to bool
 	// since void* is auto converted to bool nicely for natural "if (xyz)" syntax
@@ -647,6 +697,8 @@ class PUBLIC var final {
 		// full regression testing
 		return reinterpret_cast<void*>(this->toBool());
 	}
+
+	// bool <- var
 
 	// this stops using var as indexes of arrays on msvc since msvc converts bool and int
 	// ambiguous to index number g++ seems happy to make int higher and unambigous with bool but
@@ -688,6 +740,23 @@ class PUBLIC var final {
 	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
 	// for now prevent this to ensure efficient programming
 	//explicit
+
+	// string-like <- var
+
+//	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
+//	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+//	/*
+//	// Accepts l and r values efficiently hopefully
+//	std::string,
+//	std::string_view,
+//	char*,
+//	*/
+//	operator S() {
+//		assertString(__PRETTY_FUNCTION__);
+//		return std::string_view(var_str);
+//		//std::cerr << "var(str)" << std::endl;
+//	}
+
 	operator std::string() const {
 		assertString(__PRETTY_FUNCTION__);
 		return var_str;
@@ -698,14 +767,15 @@ class PUBLIC var final {
 		return std::string_view(var_str);
 	}
 
-	operator std::u32string() const {
-		return this->to_u32string();
-	}
-
 	operator const char*() const {
 		assertString(__PRETTY_FUNCTION__);
 		return var_str.c_str();
 	}
+
+	operator std::u32string() const {
+		return this->to_u32string();
+	}
+
 
 	// In case using a pointer to a var
 	//
@@ -789,40 +859,78 @@ class PUBLIC var final {
 	// ASSIGNMENT
 	/////////////
 
-	// The assignment operator should always return a reference to *this.
+	// The assignment operators return void to prevent accidental misuse where == was intended.
 
-	// int assignment
-	// The assignment operator should always return a reference to *this.
-	void operator=(const int int1) & {
-		// THISIS("VARREF operator= (const int int1)")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=123';
-		// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
-		// THISISDEFINED()
+	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
+	/*
+		bool
+		char
+		signed char
+		unsigned char
+		wchar_t
+		char8_t (C++20)
+		char16_t (C++11)
+		char32_t (C++11)
+		short
+		unsigned short
+		int
+		unsigned int
+		long
+		unsigned long
+		long long (C++11)
+		unsigned long long (C++11)
+		etc.
+	*/
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	void operator=(I rhs) & {
 
-		var_int = int1;
-		var_typ = VARTYP_INT;  // reset to one unique type
+//		// Similar code in constructor(int) operator=(int) and int()
+//TRACE2(__PRETTY_FUNCTION__)
+//TRACE2(rhs)
+//		if (!std::is_same<I, varint_t>::value) {
+//			if (!std::is_same<I, bool>::value) { // Why does this not seem to exclude bools
+//				if (rhs > std::numeric_limits<varint_t>::max()) {
+//					throwIntOverflow(__PRETTY_FUNCTION__);
+//				}
+//				if (rhs < std::numeric_limits<varint_t>::min()) {
+//					throwIntUnderflow(__PRETTY_FUNCTION__);
+//				}
+//			}
+//		}
 
-		return;
+		var_int = rhs;
+		var_typ = VARTYP_INT;
+
+		// Prevent overlarge unsigned ints resulting in negative ints
+		if (std::is_unsigned<I>::value) {
+			if (this->var_int < 0)
+				throwIntOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
+		}
+
 	}
 
-	// double assignment
-	// The assignment operator should always return a reference to *this.
-	void operator=(const double dbl1) & {
-		// THISIS("VARREF operator= (const double dbl1)")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=9.9';
-		// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
-		// THISISDEFINED()
+//	// Specialisation for bool to avoid a compiler warning
+//	void operator=(bool rhs) & {
+//TRACE2(__PRETTY_FUNCTION__)
+//TRACE2(rhs)
+//		var_int = rhs;
+//		var_typ = VARTYP_INT;
+//	}
 
-		var_dbl = dbl1;
-		var_typ = VARTYP_DBL;  // reset to one unique type
-
-		return;
+	// var = floating point
+	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	/*
+		float,
+		double,
+		long double
+	*/
+	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+	void operator=(F rhs) & {
+		var_dbl = rhs;
+		var_typ = VARTYP_DBL;
 	}
 
-	// char assignment
-	// The assignment operator should always return a reference to *this.
+	// var = char
 	void operator=(const char char2) & {
 
 		//THISIS("VARREF operator= (const char char2) &")
@@ -926,37 +1034,37 @@ class PUBLIC var final {
 	// Add
 	VARREF operator+=(const int) &;
 	VARREF operator+=(const double) &;
-	VARREF operator+=(const char  char1) &{(*this) += var(char1);return *this;}
-	VARREF operator+=(const char* chars) &{(*this) += var(chars);return *this;}
+	VARREF operator+=(const char  char1) & {(*this) += var(char1); return *this;}
+	VARREF operator+=(const char* chars) & {(*this) += var(chars); return *this;}
 	VARREF operator+=(const bool) &;
 
 	// Multiply
 	VARREF operator*=(const int) &;
 	VARREF operator*=(const double) &;
-	VARREF operator*=(const char  char1) &{(*this) *= var(char1);return *this;}
-	VARREF operator*=(const char* chars) &{(*this) *= var(chars);return *this;}
+	VARREF operator*=(const char  char1) & {(*this) *= var(char1); return *this;}
+	VARREF operator*=(const char* chars) & {(*this) *= var(chars); return *this;}
 	VARREF operator*=(const bool) &;
 
 	// Subtract
 	VARREF operator-=(const int) &;
 	VARREF operator-=(const double) &;
-	VARREF operator-=(const char  char1) &{(*this) -= var(char1);return *this;}
-	VARREF operator-=(const char* chars) &{(*this) -= var(chars);return *this;}
+	VARREF operator-=(const char  char1) & {(*this) -= var(char1); return *this;}
+	VARREF operator-=(const char* chars) & {(*this) -= var(chars); return *this;}
 	VARREF operator-=(const bool) &;
 
 	// Divide
 	VARREF operator/=(const int) &;
 	VARREF operator/=(const double) &;
-	VARREF operator/=(const char  char1) &{(*this) /= var(char1);return *this;}
-	VARREF operator/=(const char* chars) &{(*this) /= var(chars);return *this;}
+	VARREF operator/=(const char  char1) & {(*this) /= var(char1); return *this;}
+	VARREF operator/=(const char* chars) & {(*this) /= var(chars); return *this;}
 	VARREF operator/=(const bool) &;
 
 	// Modulo
 	VARREF operator%=(const int) &;
 	VARREF operator%=(const double dbl1) &;
-	VARREF operator%=(const char  char1) &{(*this) %= var(char1);return *this;}
-	VARREF operator%=(const char* chars) &{(*this) %= var(chars);return *this;}
-	VARREF operator%=(const bool  bool1) &{(*this) %= var(bool1);return *this;}
+	VARREF operator%=(const char  char1) & {(*this) %= var(char1); return *this;}
+	VARREF operator%=(const char* chars) & {(*this) %= var(chars); return *this;}
+	VARREF operator%=(const bool  bool1) & {(*this) %= var(bool1); return *this;}
 
 	// Concat
 	VARREF operator^=(const int) &;
@@ -1025,14 +1133,14 @@ class PUBLIC var final {
 
 	// Specialisations for speed
 
-	PUBLIC ND friend bool var_eq_dbl( CVR          lhs,  const double dbl1 );
-	PUBLIC ND friend bool var_eq_int( CVR          lhs,  const int    int1 );
+	PUBLIC ND friend bool var_eq_dbl(CVR           lhs,  const double dbl1 );
+	PUBLIC ND friend bool var_eq_int(CVR           lhs,  const int    int1 );
 
-	PUBLIC ND friend bool var_lt_int( CVR          lhs,  const int    int1 );
-	PUBLIC ND friend bool var_lt_int( const int    int1, CVR          rhs  );
+	PUBLIC ND friend bool var_lt_int(CVR           lhs,  const int    int1 );
+	PUBLIC ND friend bool var_lt_int(const int     int1, CVR          rhs  );
 
-	PUBLIC ND friend bool var_lt_dbl( CVR          lhs,  const double dbl1 );
-	PUBLIC ND friend bool var_lt_dbl( const double dbl1, CVR          rhs  );
+	PUBLIC ND friend bool var_lt_dbl(CVR           lhs,  const double dbl1 );
+	PUBLIC ND friend bool var_lt_dbl(const double  dbl1, CVR          rhs  );
 
 	PUBLIC ND friend bool var_lt_bool(const bool   lhs,  const bool   int1 );
 
@@ -1054,25 +1162,25 @@ class PUBLIC var final {
 
 	// Logical friends for var and var
 
-	PUBLIC ND friend bool operator==(CVR lhs, CVR rhs){ return  var_eq(lhs, rhs); }
-	PUBLIC ND friend bool operator!=(CVR lhs, CVR rhs){ return !var_eq(lhs, rhs); }
-	PUBLIC ND friend bool operator< (CVR lhs, CVR rhs){ return  var_lt(lhs, rhs); }
-	PUBLIC ND friend bool operator>=(CVR lhs, CVR rhs){ return !var_lt(lhs, rhs); }
-	PUBLIC ND friend bool operator> (CVR lhs, CVR rhs){ return  var_lt(rhs, lhs); }
-	PUBLIC ND friend bool operator<=(CVR lhs, CVR rhs){ return !var_lt(rhs, lhs); }
+	PUBLIC ND friend bool operator==(CVR lhs, CVR rhs) {return  var_eq(lhs, rhs );}
+	PUBLIC ND friend bool operator!=(CVR lhs, CVR rhs) {return !var_eq(lhs, rhs );}
+	PUBLIC ND friend bool operator< (CVR lhs, CVR rhs) {return  var_lt(lhs, rhs );}
+	PUBLIC ND friend bool operator>=(CVR lhs, CVR rhs) {return !var_lt(lhs, rhs );}
+	PUBLIC ND friend bool operator> (CVR lhs, CVR rhs) {return  var_lt(rhs, lhs );}
+	PUBLIC ND friend bool operator<=(CVR lhs, CVR rhs) {return !var_lt(rhs, lhs );}
 
 	// Arithmetic friends for var and var
 
-	PUBLIC ND friend var  operator+(CVR  lhs, CVR rhs){ var rvo = lhs.clone(); rvo += rhs; return rvo;}
-	PUBLIC ND friend var  operator*(CVR  lhs, CVR rhs){ var rvo = lhs.clone(); rvo *= rhs; return rvo;}
-	PUBLIC ND friend var  operator-(CVR  lhs, CVR rhs){ var rvo = lhs.clone(); rvo -= rhs; return rvo;}
-	PUBLIC ND friend var  operator/(CVR  lhs, CVR rhs){ var rvo = lhs.clone(); rvo /= rhs; return rvo;}
-	PUBLIC ND friend var  operator%(CVR  lhs, CVR rhs){ var rvo = lhs.clone(); rvo %= rhs; return rvo;}
+	PUBLIC ND friend var  operator+(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo += rhs; return rvo;}
+	PUBLIC ND friend var  operator*(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo *= rhs; return rvo;}
+	PUBLIC ND friend var  operator-(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo -= rhs; return rvo;}
+	PUBLIC ND friend var  operator/(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo /= rhs; return rvo;}
+	PUBLIC ND friend var  operator%(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo %= rhs; return rvo;}
 
 	// Concatenation friends for var and var
 
-	PUBLIC ND friend var operator^(CVR lhs, CVR rhs){ return var_cat_var(lhs, rhs ); }
-	PUBLIC ND friend var operator^(TVR lhs, CVR rhs){ return lhs ^= rhs ; }
+	PUBLIC ND friend var operator^(CVR lhs, CVR rhs) {return var_cat_var(lhs, rhs ); }
+	PUBLIC ND friend var operator^(TVR lhs, CVR rhs) {return lhs ^= rhs ; }
 
 
 	/////////////////////////////////
@@ -1087,180 +1195,180 @@ class PUBLIC var final {
 
 	// == EQ friends v. main types
 
-	PUBLIC ND friend bool operator==(CVR          lhs,   const char*  cstr2 ){ return  var_eq(      lhs, cstr2  ); }
-	PUBLIC ND friend bool operator==(CVR          lhs,   const char   char2 ){ return  var_eq(      lhs, char2  ); }
-	PUBLIC ND friend bool operator==(CVR          lhs,   const int    int2  ){ return  var_eq_int(  lhs, int2   ); }
-	PUBLIC ND friend bool operator==(CVR          lhs,   const double dbl2  ){ return  var_eq_dbl(  lhs, dbl2   ); }
-	PUBLIC ND friend bool operator==(CVR          lhs,   const bool   bool2 ){ return  lhs.toBool() == bool2   ; }
+	PUBLIC ND friend bool operator==(CVR          lhs,   const char*  cstr2 ) {return  var_eq(      lhs, cstr2  ); }
+	PUBLIC ND friend bool operator==(CVR          lhs,   const char   char2 ) {return  var_eq(      lhs, char2  ); }
+	PUBLIC ND friend bool operator==(CVR          lhs,   const int    int2  ) {return  var_eq_int(  lhs, int2   ); }
+	PUBLIC ND friend bool operator==(CVR          lhs,   const double dbl2  ) {return  var_eq_dbl(  lhs, dbl2   ); }
+	PUBLIC ND friend bool operator==(CVR          lhs,   const bool   bool2 ) {return  lhs.toBool() == bool2   ; }
 
-	PUBLIC ND friend bool operator==(const char*  cstr1, CVR          rhs   ){ return  var_eq(      rhs, cstr1  ); }
-	PUBLIC ND friend bool operator==(const char   char1, CVR          rhs   ){ return  var_eq(      rhs, char1  ); }
-	PUBLIC ND friend bool operator==(const int    int1,  CVR          rhs   ){ return  var_eq_int(  rhs, int1   ); }
-	PUBLIC ND friend bool operator==(const double dbl1,  CVR          rhs   ){ return  var_eq_dbl(  rhs, dbl1   ); }
-	PUBLIC ND friend bool operator==(const bool   bool1, CVR          rhs   ){ return  rhs.toBool() == bool1   ; }
+	PUBLIC ND friend bool operator==(const char*  cstr1, CVR          rhs   ) {return  var_eq(      rhs, cstr1  ); }
+	PUBLIC ND friend bool operator==(const char   char1, CVR          rhs   ) {return  var_eq(      rhs, char1  ); }
+	PUBLIC ND friend bool operator==(const int    int1,  CVR          rhs   ) {return  var_eq_int(  rhs, int1   ); }
+	PUBLIC ND friend bool operator==(const double dbl1,  CVR          rhs   ) {return  var_eq_dbl(  rhs, dbl1   ); }
+	PUBLIC ND friend bool operator==(const bool   bool1, CVR          rhs   ) {return  rhs.toBool() == bool1   ; }
 
 	// != NE friends v. main types
 
-	PUBLIC ND friend bool operator!=(CVR          lhs,   const char*  cstr2 ){ return !var_eq(      lhs, cstr2  ); }
-	PUBLIC ND friend bool operator!=(CVR          lhs,   const char   char2 ){ return !var_eq(      lhs, char2  ); }
-	PUBLIC ND friend bool operator!=(CVR          lhs,   const int    int2  ){ return !var_eq_int(  lhs, int2   ); }
-	PUBLIC ND friend bool operator!=(CVR          lhs,   const double dbl2  ){ return !var_eq_dbl(  lhs, dbl2   ); }
-	PUBLIC ND friend bool operator!=(CVR          lhs,   const bool   bool2 ){ return lhs.toBool() != bool2    ; }
+	PUBLIC ND friend bool operator!=(CVR          lhs,   const char*  cstr2 ) {return !var_eq(      lhs, cstr2  ); }
+	PUBLIC ND friend bool operator!=(CVR          lhs,   const char   char2 ) {return !var_eq(      lhs, char2  ); }
+	PUBLIC ND friend bool operator!=(CVR          lhs,   const int    int2  ) {return !var_eq_int(  lhs, int2   ); }
+	PUBLIC ND friend bool operator!=(CVR          lhs,   const double dbl2  ) {return !var_eq_dbl(  lhs, dbl2   ); }
+	PUBLIC ND friend bool operator!=(CVR          lhs,   const bool   bool2 ) {return lhs.toBool() != bool2    ; }
 
-	PUBLIC ND friend bool operator!=(const char*  cstr1, CVR          rhs   ){ return !var_eq(      rhs, cstr1  ); }
-	PUBLIC ND friend bool operator!=(const char   char1, CVR          rhs   ){ return !var_eq(      rhs, char1  ); }
-	PUBLIC ND friend bool operator!=(const int    int1,  CVR          rhs   ){ return !var_eq_int(  rhs, int1   ); }
-	PUBLIC ND friend bool operator!=(const double dbl1,  CVR          rhs   ){ return !var_eq_dbl(  rhs, dbl1   ); }
-	PUBLIC ND friend bool operator!=(const bool   bool1, CVR          rhs   ){ return rhs.toBool() !=  bool1   ; }
+	PUBLIC ND friend bool operator!=(const char*  cstr1, CVR          rhs   ) {return !var_eq(      rhs, cstr1  ); }
+	PUBLIC ND friend bool operator!=(const char   char1, CVR          rhs   ) {return !var_eq(      rhs, char1  ); }
+	PUBLIC ND friend bool operator!=(const int    int1,  CVR          rhs   ) {return !var_eq_int(  rhs, int1   ); }
+	PUBLIC ND friend bool operator!=(const double dbl1,  CVR          rhs   ) {return !var_eq_dbl(  rhs, dbl1   ); }
+	PUBLIC ND friend bool operator!=(const bool   bool1, CVR          rhs   ) {return rhs.toBool() !=  bool1   ; }
 
 	// < LT friends v. main types
 
-	PUBLIC ND friend bool operator<(CVR           lhs,   const char*  cstr2 ){ return  var_lt(      lhs,   cstr2 ); }
-	PUBLIC ND friend bool operator<(CVR           lhs,   const char   char2 ){ return  var_lt(      lhs,   char2 ); }
-	PUBLIC ND friend bool operator<(CVR           lhs,   const int    int2  ){ return  var_lt_int(  lhs,   int2  ); }
-	PUBLIC ND friend bool operator<(CVR           lhs,   const double dbl2  ){ return  var_lt_dbl(  lhs,   dbl2  ); }
-	PUBLIC ND friend bool operator<(CVR           lhs,   const bool   bool1 ){ return  var_lt_bool( lhs,   bool1 ); }
+	PUBLIC ND friend bool operator<(CVR           lhs,   const char*  cstr2 ) {return  var_lt(      lhs,   cstr2 ); }
+	PUBLIC ND friend bool operator<(CVR           lhs,   const char   char2 ) {return  var_lt(      lhs,   char2 ); }
+	PUBLIC ND friend bool operator<(CVR           lhs,   const int    int2  ) {return  var_lt_int(  lhs,   int2  ); }
+	PUBLIC ND friend bool operator<(CVR           lhs,   const double dbl2  ) {return  var_lt_dbl(  lhs,   dbl2  ); }
+	PUBLIC ND friend bool operator<(CVR           lhs,   const bool   bool1 ) {return  var_lt_bool( lhs,   bool1 ); }
 
-	PUBLIC ND friend bool operator<(const char*   cstr1, CVR          rhs   ){ return  var_lt(      cstr1, rhs   ); }
-	PUBLIC ND friend bool operator<(const char    char1, CVR          rhs   ){ return  var_lt(      char1, rhs   ); }
-	PUBLIC ND friend bool operator<(const int     int1,  CVR          rhs   ){ return  var_lt_int(  int1,  rhs   ); }
-	PUBLIC ND friend bool operator<(const double  dbl1,  CVR          rhs   ){ return  var_lt_dbl(  dbl1,  rhs   ); }
-	PUBLIC ND friend bool operator<(const bool    bool1, CVR          rhs   ){ return  var_lt_bool( bool1, rhs   ); }
+	PUBLIC ND friend bool operator<(const char*   cstr1, CVR          rhs   ) {return  var_lt(      cstr1, rhs   ); }
+	PUBLIC ND friend bool operator<(const char    char1, CVR          rhs   ) {return  var_lt(      char1, rhs   ); }
+	PUBLIC ND friend bool operator<(const int     int1,  CVR          rhs   ) {return  var_lt_int(  int1,  rhs   ); }
+	PUBLIC ND friend bool operator<(const double  dbl1,  CVR          rhs   ) {return  var_lt_dbl(  dbl1,  rhs   ); }
+	PUBLIC ND friend bool operator<(const bool    bool1, CVR          rhs   ) {return  var_lt_bool( bool1, rhs   ); }
 
 	// >= GE friends v. main types
 
-	PUBLIC ND friend bool operator>=(CVR          lhs,   const char*  cstr2 ){ return !var_lt(      lhs,   cstr2 ); }
-	PUBLIC ND friend bool operator>=(CVR          lhs,   const char   char2 ){ return !var_lt(      lhs,   char2 ); }
-	PUBLIC ND friend bool operator>=(CVR          lhs,   const int    int2  ){ return !var_lt_int(  lhs,   int2  ); }
-	PUBLIC ND friend bool operator>=(CVR          lhs,   const double dbl2  ){ return !var_lt_dbl(  lhs,   dbl2  ); }
-	PUBLIC ND friend bool operator>=(CVR          lhs,   const bool   bool2 ){ return !var_lt_bool( lhs,   bool2 ); }
+	PUBLIC ND friend bool operator>=(CVR          lhs,   const char*  cstr2 ) {return !var_lt(      lhs,   cstr2 ); }
+	PUBLIC ND friend bool operator>=(CVR          lhs,   const char   char2 ) {return !var_lt(      lhs,   char2 ); }
+	PUBLIC ND friend bool operator>=(CVR          lhs,   const int    int2  ) {return !var_lt_int(  lhs,   int2  ); }
+	PUBLIC ND friend bool operator>=(CVR          lhs,   const double dbl2  ) {return !var_lt_dbl(  lhs,   dbl2  ); }
+	PUBLIC ND friend bool operator>=(CVR          lhs,   const bool   bool2 ) {return !var_lt_bool( lhs,   bool2 ); }
 
-	PUBLIC ND friend bool operator>=(const char*  cstr1, CVR          rhs   ){ return !var_lt(      cstr1, rhs   ); }
-	PUBLIC ND friend bool operator>=(const char   char1, CVR          rhs   ){ return !var_lt(      char1, rhs   ); }
-	PUBLIC ND friend bool operator>=(const int    int1,  CVR          rhs   ){ return !var_lt_int(  int1,  rhs   ); }
-	PUBLIC ND friend bool operator>=(const double dbl1,  CVR          rhs   ){ return !var_lt_dbl(  dbl1,  rhs   ); }
-	PUBLIC ND friend bool operator>=(const bool   bool1, CVR          rhs   ){ return !var_lt_bool( bool1, rhs   ); }
+	PUBLIC ND friend bool operator>=(const char*  cstr1, CVR          rhs   ) {return !var_lt(      cstr1, rhs   ); }
+	PUBLIC ND friend bool operator>=(const char   char1, CVR          rhs   ) {return !var_lt(      char1, rhs   ); }
+	PUBLIC ND friend bool operator>=(const int    int1,  CVR          rhs   ) {return !var_lt_int(  int1,  rhs   ); }
+	PUBLIC ND friend bool operator>=(const double dbl1,  CVR          rhs   ) {return !var_lt_dbl(  dbl1,  rhs   ); }
+	PUBLIC ND friend bool operator>=(const bool   bool1, CVR          rhs   ) {return !var_lt_bool( bool1, rhs   ); }
 
 	// > GT friends v. main types
 
-	PUBLIC ND friend bool operator>(CVR           lhs,   const char*  cstr2 ){ return  var_lt(      cstr2, lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const char   char2 ){ return  var_lt(      char2, lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const int    int2  ){ return  var_lt_int(  int2,  lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const double dbl2  ){ return  var_lt_dbl(  dbl2,  lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const bool   bool2 ){ return  var_lt_bool( bool2, lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const char*  cstr2 ) {return  var_lt(      cstr2, lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const char   char2 ) {return  var_lt(      char2, lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const int    int2  ) {return  var_lt_int(  int2,  lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const double dbl2  ) {return  var_lt_dbl(  dbl2,  lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const bool   bool2 ) {return  var_lt_bool( bool2, lhs   ); }
 
-	PUBLIC ND friend bool operator>(const char*   cstr1, CVR          rhs   ){ return  var_lt(      rhs,   cstr1 ); }
-	PUBLIC ND friend bool operator>(const char    char1, CVR          rhs   ){ return  var_lt(      rhs,   char1 ); }
-	PUBLIC ND friend bool operator>(const int     int1,  CVR          rhs   ){ return  var_lt_int(  rhs,   int1  ); }
-	PUBLIC ND friend bool operator>(const double  dbl1,  CVR          rhs   ){ return  var_lt_dbl(  rhs,   dbl1  ); }
-	PUBLIC ND friend bool operator>(const bool    bool1, CVR          rhs   ){ return  var_lt_bool( rhs,   bool1 ); }
+	PUBLIC ND friend bool operator>(const char*   cstr1, CVR          rhs   ) {return  var_lt(      rhs,   cstr1 ); }
+	PUBLIC ND friend bool operator>(const char    char1, CVR          rhs   ) {return  var_lt(      rhs,   char1 ); }
+	PUBLIC ND friend bool operator>(const int     int1,  CVR          rhs   ) {return  var_lt_int(  rhs,   int1  ); }
+	PUBLIC ND friend bool operator>(const double  dbl1,  CVR          rhs   ) {return  var_lt_dbl(  rhs,   dbl1  ); }
+	PUBLIC ND friend bool operator>(const bool    bool1, CVR          rhs   ) {return  var_lt_bool( rhs,   bool1 ); }
 
 	// <= LE friends v. main types
 
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const char*  cstr2 ){ return !var_lt(      cstr2, lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const char   char2 ){ return !var_lt(      char2, lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const int    int2  ){ return !var_lt_int(  int2,  lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const double dbl2  ){ return !var_lt_dbl(  dbl2,  lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const bool   bool2 ){ return !var_lt_bool( bool2, lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const char*  cstr2 ) {return !var_lt(      cstr2, lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const char   char2 ) {return !var_lt(      char2, lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const int    int2  ) {return !var_lt_int(  int2,  lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const double dbl2  ) {return !var_lt_dbl(  dbl2,  lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const bool   bool2 ) {return !var_lt_bool( bool2, lhs   ); }
 
-	PUBLIC ND friend bool operator<=(const char*  cstr1, CVR          rhs   ){ return !var_lt(      rhs,   cstr1 ); }
-	PUBLIC ND friend bool operator<=(const char   char1, CVR          rhs   ){ return !var_lt(      rhs,   char1 ); }
-	PUBLIC ND friend bool operator<=(const int    int1,  CVR          rhs   ){ return !var_lt_int(  rhs,   int1  ); }
-	PUBLIC ND friend bool operator<=(const double dbl1,  CVR          rhs   ){ return !var_lt_dbl(  rhs,   dbl1  ); }
-	PUBLIC ND friend bool operator<=(const bool   bool1, CVR          rhs   ){ return !var_lt_bool( rhs,   bool1 ); }
+	PUBLIC ND friend bool operator<=(const char*  cstr1, CVR          rhs   ) {return !var_lt(      rhs,   cstr1 ); }
+	PUBLIC ND friend bool operator<=(const char   char1, CVR          rhs   ) {return !var_lt(      rhs,   char1 ); }
+	PUBLIC ND friend bool operator<=(const int    int1,  CVR          rhs   ) {return !var_lt_int(  rhs,   int1  ); }
+	PUBLIC ND friend bool operator<=(const double dbl1,  CVR          rhs   ) {return !var_lt_dbl(  rhs,   dbl1  ); }
+	PUBLIC ND friend bool operator<=(const bool   bool1, CVR          rhs   ) {return !var_lt_bool( rhs,   bool1 ); } 
 
 	// ARITHMETIC friends v. main types
 
 	// PLUS  friends v. main types
 
-	PUBLIC ND friend var operator+(CVR            lhs,   const char*  cstr2 ){ var rvo = lhs.clone(); rvo    += cstr2; return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const char   char2 ){ var rvo = lhs.clone(); rvo    += char2; return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const int    int2  ){ var rvo = lhs.clone(); rvo    += int2;  return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const double dbl2  ){ var rvo = lhs.clone(); rvo    += dbl2;  return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const bool   bool2 ){ var rvo = lhs.clone(); rvo    += bool2; return rvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone(); rvo    += cstr2; return rvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone(); rvo    += char2; return rvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone(); rvo    += int2;  return rvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone(); rvo    += dbl2;  return rvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone(); rvo    += bool2; return rvo;}
 
-	PUBLIC ND friend var operator+(const char*    cstr1, CVR          rhs   ){ var rvo = rhs.clone(); rvo    += cstr1; return rvo;}
-	PUBLIC ND friend var operator+(const char     char1, CVR          rhs   ){ var rvo = rhs.clone(); rvo    += char1; return rvo;}
-	PUBLIC ND friend var operator+(const int      int1,  CVR          rhs   ){ var rvo = rhs.clone(); rvo    += int1;  return rvo;}
-	PUBLIC ND friend var operator+(const double   dbl1,  CVR          rhs   ){ var rvo = rhs.clone(); rvo    += dbl1;  return rvo;}
-	PUBLIC ND friend var operator+(const bool     bool1, CVR          rhs   ){ var rvo = rhs.clone(); rvo    += bool1; return rvo;}
+	PUBLIC ND friend var operator+(const char*    cstr1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    += cstr1; return rvo;}
+	PUBLIC ND friend var operator+(const char     char1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    += char1; return rvo;}
+	PUBLIC ND friend var operator+(const int      int1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    += int1;  return rvo;}
+	PUBLIC ND friend var operator+(const double   dbl1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    += dbl1;  return rvo;}
+	PUBLIC ND friend var operator+(const bool     bool1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    += bool1; return rvo;}
 
 	// MULTIPLY  friends v. main types
 
-	PUBLIC ND friend var operator*(CVR            lhs,   const char*  cstr2 ){ var rvo = lhs.clone(); rvo    *= cstr2; return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const char   char2 ){ var rvo = lhs.clone(); rvo    *= char2; return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const int    int2  ){ var rvo = lhs.clone(); rvo    *= int2;  return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const double dbl2  ){ var rvo = lhs.clone(); rvo    *= dbl2;  return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const bool   bool2 ){ var rvo = lhs.clone(); rvo    *= bool2; return rvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone(); rvo    *= cstr2; return rvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone(); rvo    *= char2; return rvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone(); rvo    *= int2;  return rvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone(); rvo    *= dbl2;  return rvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone(); rvo    *= bool2; return rvo;}
 
-	PUBLIC ND friend var operator*(const char*    cstr1, CVR          rhs   ){ var rvo = rhs.clone(); rvo    *= cstr1; return rvo;}
-	PUBLIC ND friend var operator*(const char     char1, CVR          rhs   ){ var rvo = rhs.clone(); rvo    *= char1; return rvo;}
-	PUBLIC ND friend var operator*(const int      int1,  CVR          rhs   ){ var rvo = rhs.clone(); rvo    *= int1;  return rvo;}
-	PUBLIC ND friend var operator*(const double   dbl1,  CVR          rhs   ){ var rvo = rhs.clone(); rvo    *= dbl1;  return rvo;}
-	PUBLIC ND friend var operator*(const bool     bool1, CVR          rhs   ){ var rvo = rhs.clone(); rvo    *= bool1; return rvo;}
+	PUBLIC ND friend var operator*(const char*    cstr1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= cstr1; return rvo;}
+	PUBLIC ND friend var operator*(const char     char1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= char1; return rvo;}
+	PUBLIC ND friend var operator*(const int      int1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= int1;  return rvo;}
+	PUBLIC ND friend var operator*(const double   dbl1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= dbl1;  return rvo;}
+	PUBLIC ND friend var operator*(const bool     bool1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= bool1; return rvo;}
 
 	// MINUS  friends v. main types
 
-	PUBLIC ND friend var operator-(CVR            lhs,   const char*  cstr2 ){ var rvo = lhs.clone();   rvo  -= cstr2; return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const char   char2 ){ var rvo = lhs.clone();   rvo  -= char2; return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const int    int2  ){ var rvo = lhs.clone();   rvo  -= int2;  return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const double dbl2  ){ var rvo = lhs.clone();   rvo  -= dbl2;  return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const bool   bool2 ){ var rvo = lhs.clone();   rvo  -= bool2; return rvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone();   rvo  -= cstr2; return rvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone();   rvo  -= char2; return rvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone();   rvo  -= int2;  return rvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone();   rvo  -= dbl2;  return rvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone();   rvo  -= bool2; return rvo;}
 
-	PUBLIC ND friend var operator-(const char*    cstr1, CVR          rhs   ){ var rvo = cstr1; rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const char     char1, CVR          rhs   ){ var rvo = char1; rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const int      int1,  CVR          rhs   ){ var rvo = int1;  rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const double   dbl1,  CVR          rhs   ){ var rvo = dbl1;  rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const bool     bool1, CVR          rhs   ){ var rvo = bool1; rvo  -= rhs;   return rvo;}
+	PUBLIC ND friend var operator-(const char*    cstr1, CVR          rhs   ) {var rvo = cstr1; rvo  -= rhs;   return rvo;}
+	PUBLIC ND friend var operator-(const char     char1, CVR          rhs   ) {var rvo = char1; rvo  -= rhs;   return rvo;}
+	PUBLIC ND friend var operator-(const int      int1,  CVR          rhs   ) {var rvo = int1;  rvo  -= rhs;   return rvo;}
+	PUBLIC ND friend var operator-(const double   dbl1,  CVR          rhs   ) {var rvo = dbl1;  rvo  -= rhs;   return rvo;}
+	PUBLIC ND friend var operator-(const bool     bool1, CVR          rhs   ) {var rvo = bool1; rvo  -= rhs;   return rvo;}
 
 	// DIVIDE  friends v. main types
 
-	PUBLIC ND friend var operator/(CVR            lhs,   const char*  cstr2 ){ var rvo = lhs.clone();   rvo  /= cstr2; return rvo;}
-	PUBLIC ND friend var operator/(CVR            lhs,   const char   char2 ){ var rvo = lhs.clone();   rvo  /= char2; return rvo;}
-	PUBLIC ND friend var operator/(CVR            lhs,   const int    int2  ){ var rvo = lhs.clone();   rvo  /= int2;  return rvo;}
-	PUBLIC ND friend var operator/(CVR            lhs,   const double dbl2  ){ var rvo = lhs.clone();   rvo  /= dbl2;  return rvo;}
-//	PUBLIC ND friend var operator/(CVR            lhs,   const bool   bool2 ){ var rvo = lhs.clone();   rvo  /= bool2; return rvo;} // Either does nothing or throws divide by zero
+	PUBLIC ND friend var operator/(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone();   rvo  /= cstr2; return rvo;}
+	PUBLIC ND friend var operator/(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone();   rvo  /= char2; return rvo;}
+	PUBLIC ND friend var operator/(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone();   rvo  /= int2;  return rvo;}
+	PUBLIC ND friend var operator/(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone();   rvo  /= dbl2;  return rvo;}
+//	PUBLIC ND friend var operator/(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone();   rvo  /= bool2; return rvo;} // Either does nothing or throws divide by zero
 
-	PUBLIC ND friend var operator/(const char*    cstr1, CVR          rhs   ){ var rvo = cstr1; rvo  /= rhs;   return rvo;}
-	PUBLIC ND friend var operator/(const char     char1, CVR          rhs   ){ var rvo = char1; rvo  /= rhs;   return rvo;}
-	PUBLIC ND friend var operator/(const int      int1,  CVR          rhs   ){ var rvo = int1;  rvo  /= rhs;   return rvo;}
-	PUBLIC ND friend var operator/(const double   dbl1,  CVR          rhs   ){ var rvo = dbl1;  rvo  /= rhs;   return rvo;}
-//	PUBLIC ND friend var operator/(const bool     bool1, CVR          rhs   ){ var rvo = bool1 ;rvo /= rhs;   return rvo;} // Almost meaningless
+	PUBLIC ND friend var operator/(const char*    cstr1, CVR          rhs   ) {var rvo = cstr1; rvo  /= rhs;   return rvo;}
+	PUBLIC ND friend var operator/(const char     char1, CVR          rhs   ) {var rvo = char1; rvo  /= rhs;   return rvo;}
+	PUBLIC ND friend var operator/(const int      int1,  CVR          rhs   ) {var rvo = int1;  rvo  /= rhs;   return rvo;}
+	PUBLIC ND friend var operator/(const double   dbl1,  CVR          rhs   ) {var rvo = dbl1;  rvo  /= rhs;   return rvo;}
+//	PUBLIC ND friend var operator/(const bool     bool1, CVR          rhs   ) {var rvo = bool1 ;rvo /= rhs;   return rvo;} // Almost meaningless
 
 	// MODULO  friends v. main types
 
-	PUBLIC ND friend var operator%(CVR            lhs,   const char*  cstr2 ){ var rvo = lhs.clone();   rvo  %= cstr2; return rvo;}
-	PUBLIC ND friend var operator%(CVR            lhs,   const char   char2 ){ var rvo = lhs.clone();   rvo  %= char2; return rvo;}
-	PUBLIC ND friend var operator%(CVR            lhs,   const int    int2  ){ var rvo = lhs.clone();   rvo  %= int2;  return rvo;}
-	PUBLIC ND friend var operator%(CVR            lhs,   const double dbl2  ){ var rvo = lhs.clone();   rvo  %= dbl2;  return rvo;}
-//	PUBLIC ND friend var operator%(CVR            lhs,   const bool   bool2 ){ var rvo = lhs.clone();   rvo  %= bool2; return rvo;} // Rather useless or throws divide by zero
+	PUBLIC ND friend var operator%(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone();   rvo  %= cstr2; return rvo;}
+	PUBLIC ND friend var operator%(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone();   rvo  %= char2; return rvo;}
+	PUBLIC ND friend var operator%(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone();   rvo  %= int2;  return rvo;}
+	PUBLIC ND friend var operator%(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone();   rvo  %= dbl2;  return rvo;}
+//	PUBLIC ND friend var operator%(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone();   rvo  %= bool2; return rvo;} // Rather useless or throws divide by zero
 
-	PUBLIC ND friend var operator%(const char*    cstr1, CVR          rhs   ){ var rvo = cstr1; rvo  %= rhs;   return rvo;}
-	PUBLIC ND friend var operator%(const char     char1, CVR          rhs   ){ var rvo = char1; rvo  %= rhs;   return rvo;}
-	PUBLIC ND friend var operator%(const int      int1,  CVR          rhs   ){ var rvo = int1;  rvo  %= rhs;   return rvo;}
-	PUBLIC ND friend var operator%(const double   dbl1,  CVR          rhs   ){ var rvo = dbl1;  rvo  %= rhs;   return rvo;}
-	//PUBLIC ND friend var operator%(const bool   bool1, CVR          rhs   ){ var rvo = bool1 ;rvo  %= rhs;   return rvo;} // Almost meaningless
+	PUBLIC ND friend var operator%(const char*    cstr1, CVR          rhs   ) {var rvo = cstr1; rvo  %= rhs;   return rvo;}
+	PUBLIC ND friend var operator%(const char     char1, CVR          rhs   ) {var rvo = char1; rvo  %= rhs;   return rvo;}
+	PUBLIC ND friend var operator%(const int      int1,  CVR          rhs   ) {var rvo = int1;  rvo  %= rhs;   return rvo;}
+	PUBLIC ND friend var operator%(const double   dbl1,  CVR          rhs   ) {var rvo = dbl1;  rvo  %= rhs;   return rvo;}
+	//PUBLIC ND friend var operator%(const bool   bool1, CVR          rhs   ) {var rvo = bool1 ;rvo  %= rhs;   return rvo;} // Almost meaningless
 
 	// STRING CONCATENATE  friends v. main types
 
 	// NB do *NOT* support concatenate with bool or vice versa!
 	// to avoid compiler doing wrong precendence issue between ^ and logical operators
-	//remove this to avoid some gcc ambiguous warnings although it means concat std:string will create a temp var
-	//PUBLIC ND friend var operator^(CVR          lhs,   const std::string str2 ){ return var_cat_var(lhs,    var(str2) ); }
-	PUBLIC ND friend var operator^(CVR            lhs,   const char*  cstr  ){ return var_cat_cstr( lhs,        cstr  ); }
-	PUBLIC ND friend var operator^(CVR            lhs,   const char   char2 ){ return var_cat_char( lhs,        char2 ); }
-	PUBLIC ND friend var operator^(CVR            lhs,   const int    int2  ){ return var_cat_var(  lhs,        int2  ); }
-	PUBLIC ND friend var operator^(CVR            lhs,   const double dbl2  ){ return var_cat_var(  lhs,        dbl2  ); }
-	PUBLIC ND friend var operator^(const char*    cstr,  CVR          rhs   ){ return cstr_cat_var( cstr,       rhs   ); }
-	PUBLIC ND friend var operator^(const char     char1, CVR          rhs   ){ return var_cat_var(  char1,      rhs   ); }
-	PUBLIC ND friend var operator^(const int      int1,  CVR          rhs   ){ return var_cat_var(  int1,       rhs   ); }
-	PUBLIC ND friend var operator^(const double   dbl1,  CVR          rhs   ){ return var_cat_var(  dbl1,       rhs   ); }
+	//remove this to avoid some gcc ambiguous warnings although it means concat std::string will create a temp var
+	//PUBLIC ND friend var operator^(CVR          lhs,   const std::string str2 ) {return var_cat_var(lhs,    var(str2) ); }
+	PUBLIC ND friend var operator^(CVR            lhs,   const char*  cstr  ) {return var_cat_cstr( lhs,        cstr  ); }
+	PUBLIC ND friend var operator^(CVR            lhs,   const char   char2 ) {return var_cat_char( lhs,        char2 ); }
+	PUBLIC ND friend var operator^(CVR            lhs,   const int    int2  ) {return var_cat_var(  lhs,        int2  ); }
+	PUBLIC ND friend var operator^(CVR            lhs,   const double dbl2  ) {return var_cat_var(  lhs,        dbl2  ); }
+	PUBLIC ND friend var operator^(const char*    cstr,  CVR          rhs   ) {return cstr_cat_var( cstr,       rhs   ); }
+	PUBLIC ND friend var operator^(const char     char1, CVR          rhs   ) {return var_cat_var(  char1,      rhs   ); }
+	PUBLIC ND friend var operator^(const int      int1,  CVR          rhs   ) {return var_cat_var(  int1,       rhs   ); }
+	PUBLIC ND friend var operator^(const double   dbl1,  CVR          rhs   ) {return var_cat_var(  dbl1,       rhs   ); }
 
 	//temporaries (rvalues) - mutate the temporary string to save a copy
-	PUBLIC ND friend var operator^(TVR            lhs,   const char*  cstr2 ){ return lhs ^= cstr2 ; }
-	PUBLIC ND friend var operator^(TVR            lhs,   const char   char2 ){ return lhs ^= char2 ; }
-	PUBLIC ND friend var operator^(TVR            lhs,   const int    int2  ){ return lhs ^= int2  ; }
-	PUBLIC ND friend var operator^(TVR            lhs,   const double dbl2  ){ return lhs ^= dbl2  ; }
+	PUBLIC ND friend var operator^(TVR            lhs,   const char*  cstr2 ) {return lhs ^= cstr2 ; }
+	PUBLIC ND friend var operator^(TVR            lhs,   const char   char2 ) {return lhs ^= char2 ; }
+	PUBLIC ND friend var operator^(TVR            lhs,   const int    int2  ) {return lhs ^= int2  ; }
+	PUBLIC ND friend var operator^(TVR            lhs,   const double dbl2  ) {return lhs ^= dbl2  ; }
 
 	// clang-format on
 
@@ -1374,6 +1482,9 @@ class PUBLIC var final {
 		return clone;
 	}
 
+	CVR dump(SV text DEFAULT_EMPTY) const;
+	VARREF dump(SV text DEFAULT_EMPTY);
+
 	// MATH/BOOLEAN
 	///////////////
 
@@ -1409,11 +1520,13 @@ class PUBLIC var final {
 	// version 1 chr - only char 0 - 255 returned in a single byte
 	// bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
 	ND var chr(const int num) const;  // ASCII
+
 	// version 2 textchr - returns utf8 byte sequences for all unicode code points
 	// not unsigned int so to get utf codepoints > 2^63 must provide negative ints
 	// not providing implicit constructor from var to unsigned int due to getting ambigious conversions
 	// since int and unsigned int are parallel priority in c++ implicit conversions
 	ND var textchr(const int num) const;  // UTF8
+
 	ND var str(const int num) const;
 	ND var space() const;
 
@@ -1422,16 +1535,13 @@ class PUBLIC var final {
 	// STRING INFO
 	//////////////
 
-	// bool match(CVR matchstr,CVR options DEFAULT_EMPTY) const;
 	ND var match(CVR matchstr, SV options DEFAULT_EMPTY) const;
-	ND var seq() const;     // ASCII
-	ND var textseq() const; // TEXT
+	ND var seq() const;          // ASCII
+	ND var textseq() const;      // TEXT
 	ND var dcount(SV str) const;
 	ND var count(SV str) const;
-	//ND var count(const char charx) const;
 	ND var length() const;
 	ND var len() const;
-	//const char* data() const;
 	bool isnum() const;
 
 	ND bool starts(SV str) const;
@@ -1447,9 +1557,7 @@ class PUBLIC var final {
 
 	// all return VARREF and are not const)
 
-	//var& converter(std::string_view oldchars, std::string_view newchars);
 	VARREF converter(SV oldchars, SV newchars);
-	//VARREF converter(const char* oldchars, const char* newchars);
 	VARREF textconverter(SV oldchars, SV newchars);
 	VARREF swapper(SV whatstr, SV withstr);
 	VARREF regex_replacer(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY);
@@ -1459,11 +1567,11 @@ class PUBLIC var final {
 	VARREF quoter();
 	VARREF squoter();
 	VARREF unquoter();
-	VARREF ucaser();        // utf8
-	VARREF lcaser();        // utf8
-	VARREF tcaser();        // utf8
-	VARREF fcaser();        // utf8
-	VARREF normalizer();    // utf8
+	VARREF ucaser();      // utf8
+	VARREF lcaser();      // utf8
+	VARREF tcaser();      // utf8
+	VARREF fcaser();      // utf8
+	VARREF normalizer();  // utf8
 	VARREF inverter();    // utf8
 	VARREF trimmer(SV trimchars DEFAULT_SPACE);
 	VARREF trimmerf(SV trimchars DEFAULT_SPACE);
@@ -1473,12 +1581,11 @@ class PUBLIC var final {
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
 
-	VARREF sorter(SV sepchar = _FM);
-
 	VARREF lowerer();
 	VARREF raiser();
 	VARREF cropper();
 	VARREF uniquer();
+	VARREF sorter(SV sepchar = _FM);
 
 	// SAME ON TEMPORARIES
 	//////////////////////
@@ -1541,18 +1648,17 @@ class PUBLIC var final {
 	ND var lower() const&;
 	ND var raise() const&;
 	ND var crop() const&;
+	ND var unique() const;
+	ND var sort(SV sepchar = _FM) const;
 
 	// OTHER STRING ACCESS
 	//////////////////////
 
 	ND var hash(const uint64_t modulus = 0) const;
-	ND var unique() const;
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
 	ND dim split(SV sepchar = _FM) const;
-
-	ND var sort(SV sepchar = _FM) const;
 
 	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
 
@@ -1605,7 +1711,7 @@ class PUBLIC var final {
 	ND var to_codepage(const char* codepage) const;
 
 	// CLASSIC MV STRING FUNCTIONS
-	/////////////////////////////
+	//////////////////////////////
 
 	// this function hardly occurs anywhere in exodus code and should probably be renamed to
 	// something better it was called replace() in pickos but we are now using "replace()" to
@@ -1652,7 +1758,7 @@ class PUBLIC var final {
 	ND var mv(const char* opcode, CVR var2) const;
 
 	// MV STRING MUTATORS
-	////////////////////
+	/////////////////////
 
 	// mutable versions update and return source
 	// r stands for "replacer" abbreviated due to high incidience in code
@@ -1676,7 +1782,7 @@ class PUBLIC var final {
 	// VARREF extracter(int fieldno,int valueno=0,int subvalueno=0) const;
 
 	// MV STRING LOCATORS
-	////////////////////
+	/////////////////////
 
 	// should these be like extract, replace, insert, delete
 	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY)
@@ -1696,8 +1802,31 @@ class PUBLIC var final {
 	// locatebyusing
 	bool locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
+	// DATABASE ACCESS
+	//////////////////
+
+	bool connect(CVR conninfo DEFAULT_EMPTY);
+	void disconnect();
+	void disconnectall();
+
+	bool attach(CVR filenames);
+	void detach(CVR filenames);
+
+	// var() is a db connection or default connection
+	bool begintrans() const;
+	bool rollbacktrans() const;
+	bool committrans() const;
+	bool statustrans() const;
+	void cleardbcache() const;
+
+	bool sqlexec(CVR sqlcmd) const;
+	bool sqlexec(CVR sqlcmd, VARREF response) const;
+
+	ND var lasterror() const;
+	void lasterror(CVR msg) const;
+
 	// DATABASE MANAGEMENT
-	/////////////////////
+	//////////////////////
 
 	bool dbcreate(CVR dbname) const;
 	ND var dblist() const;
@@ -1714,32 +1843,8 @@ class PUBLIC var final {
 	bool deleteindex(CVR fieldname) const;
 	ND var listindexes(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
 
-	bool sqlexec(CVR sqlcmd) const;
-	bool sqlexec(CVR sqlcmd, VARREF response) const;
-
 	// bool selftest() const;
 	ND var version() const;
-
-	ND var lasterror() const;
-	void lasterror(CVR msg) const;
-
-
-	// DATABASE ACCESS
-	/////////////////
-
-	bool connect(CVR conninfo DEFAULT_EMPTY);
-	void disconnect();
-	void disconnectall();
-
-	bool attach(CVR filenames);
-	void detach(CVR filenames);
-
-	// var() is a db connection or default connection
-	bool begintrans() const;
-	bool rollbacktrans() const;
-	bool committrans() const;
-	bool statustrans() const;
-	void cleardbcache() const;
 
 	ND var reccount(CVR filename DEFAULT_EMPTY) const;
 	var flushindex(CVR filename DEFAULT_EMPTY) const;
@@ -1777,7 +1882,7 @@ class PUBLIC var final {
 	ND var xlate(CVR filename, CVR fieldno, const char* mode) const;
 
 	// DATABASE SORT/SELECT
-	//////////////////////
+	///////////////////////
 
 	bool select(CVR sortselectclause DEFAULT_EMPTY);
 	void clearselect();
@@ -1868,18 +1973,18 @@ class PUBLIC var final {
 //	void debug(CVR DEFAULT_EMPTY) const;
 //	ND var backtrace() const;
 
-	CVR dump(SV text DEFAULT_EMPTY) const;
-	VARREF dump(SV text DEFAULT_EMPTY);
-
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
 	///////////////////////////
 
-   private:
+ private:
 
 	void throwUndefined(CVR message) const;
 	void throwUnassigned(CVR message) const;
 	void throwNonNumeric(CVR message) const;
+	void throwNonPositive(CVR message) const;
+	void throwIntOverflow(CVR message) const;
+	void throwIntUnderflow(CVR message) const;
 
 	// WARNING: MUST not use any var when checking Undefined
 	// otherwise will get recursion/segfault
@@ -2034,7 +2139,7 @@ class PUBLIC var_iter {
 	mutable std::string::size_type startpos_ = 0;
 	mutable std::string::size_type endpos_ = std::string::npos;
 
-   public:
+ public:
 	//default constructor
 	var_iter() = default;
 
@@ -2055,14 +2160,14 @@ class PUBLIC var_iter {
 //class var_proxy1 - replace or extract fn
 class PUBLIC var_proxy1 {
 
-   private:
+ private:
 
 	var* var_;
 	mutable int fn_;
 
 	var_proxy1() = delete;
 
-   public:
+ public:
 
 	//constructor
 	var_proxy1(var* var1, int fn) : var_(var1), fn_(fn) {}
@@ -2087,7 +2192,7 @@ class PUBLIC var_proxy1 {
 //class var_proxy2 - replace or extract fn, sn
 class PUBLIC var_proxy2 {
 
-   private:
+ private:
 
 	var* var_;
 	mutable int fn_;
@@ -2095,7 +2200,7 @@ class PUBLIC var_proxy2 {
 
 	var_proxy2() = delete;
 
-   public:
+ public:
 
 	//constructor
 	var_proxy2(var* var1, int fn, int vn) : var_(var1), fn_(fn), vn_(vn) {}
@@ -2120,7 +2225,7 @@ class PUBLIC var_proxy2 {
 //class var_proxy3 - replace or extract fn, vn, sn
 class PUBLIC var_proxy3 {
 
-   private:
+ private:
 
 	var* var_;
 	mutable int fn_;
@@ -2129,7 +2234,7 @@ class PUBLIC var_proxy3 {
 
 	var_proxy3() = delete;
 
-   public:
+ public:
 
 	//constructor
 	var_proxy3(var* var1, int fn, int vn = 0, int sn = 0) : var_(var1), fn_(fn), vn_(vn), sn_(sn) {}
@@ -2164,12 +2269,12 @@ inline const var DQ = DQ_;
 inline const var SQ = SQ_;
 
 // A global flag used in mvdbpostgres
-[[maybe_unused]] static inline int DBTRACE=var().osgetenv("EXO_DBTRACE");
+[[maybe_unused]] static inline int DBTRACE = var().osgetenv("EXO_DBTRACE");
 
 // A public base exception for all other exceptions so exodus programmers can catch
 // var exceptions generally
 class PUBLIC VarError {
-   public:
+ public:
 
 	explicit VarError(CVR description);
 
@@ -2178,7 +2283,7 @@ class PUBLIC VarError {
 	// Convert stack addresses to source code if available
 	var stack() const;
 
-  private:
+ private:
 
 	mutable void* stack_addresses_[BACKTRACE_MAXADDRESSES];
 	mutable size_t stack_size_ = 0;
