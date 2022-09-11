@@ -48,9 +48,12 @@ function main()
 	var cyrillic_cp = VOLUMES ? "Ukrainian_Ukraine.1251" : "CP1251";
 	//osshell("locale ru_RU.CP1251 || locale-gen ru_RU.CP1251");
 	//[<D0><F3><F1><F1><EA><E8><E9> <FF><E7><FB><EA>][<D3><EA><F0><E0><BF><ED><F1><FC><EA><E0> <EC><EE><E2><E0>]
-	var EN_RU_UA_cp1251 = "[English language][Русский язык][Українська мова]";
+    //                       [English language][Р СѓСЃСЃРєРёР№ СЏР·С‹Рє][РЈРєСЂР°С—РЅСЃСЊРєР° РјРѕРІР°]
+	var EN_RU_UA_cp1251 = "[English language]" ^ iconv("5BD0f3f1f1eae8e920ffe7fbea5d5bd3eaf0e0bfedf1fceae020eceee2e05d","HEX");
+	printl(EN_RU_UA_cp1251.from_codepage("cp1251"));
+	assert(EN_RU_UA_cp1251.len().outputl() == 49);
 	var EN_RU_UA_utf8 =   "[English language][Р СѓСЃСЃРєРёР№ СЏР·С‹Рє][РЈРєСЂР°С—РЅСЃСЊРєР° РјРѕРІР°]";
-	assert(EN_RU_UA_cp1251.len() == 49);
+	//                     [English language][Р СѓСЃСЃРєРёР№ СЏР·С‹Рє][РЈРєСЂР°С—РЅСЃСЊРєР° РјРѕРІР°]
 	assert(EN_RU_UA_utf8.len() == 74);
 	assert(EN_RU_UA_cp1251.from_codepage(cyrillic_cp) == EN_RU_UA_utf8);
 	assert(EN_RU_UA_cp1251 == EN_RU_UA_utf8.to_codepage(cyrillic_cp));
@@ -84,7 +87,7 @@ function main()
 //	oswrite( EN_GREEK_utf8, EN_GREEK_file, "some_bad_locale");
 
 //  this code fragment tests locale specific characters IO with UTF8 files
-	var MIXTURE_txt1 = "[English][Русский][Українська][Greek Char:\\u03A3][\u03A3]\n";
+	var MIXTURE_txt1 = "[English]" ^ "5bd0f3f1f1eae8e95d5bd3eaf0e0bfedf1fceae05d"_var.iconv("HEX") ^ "[Greek Char:\\u03A3][\u03A3]\n";
 	var MIXTURE_txt2;
 	var MIXTURE_file = "t_test_MIXTURE.txt";
 	oswrite( MIXTURE_txt1, MIXTURE_file, "utf8");
@@ -138,6 +141,7 @@ function main()
 		assert(osread(tfilename) eq x);
 	}
 
+	var cpdata = "d4f0e0e7e020b3e720323220f1e8ece2eeebb3e2"_var.iconv("HEX");
 	var OUTPUT_file = "t_test_OUTPUT_UTF8.txt";
 	oswrite( "", OUTPUT_file, "utf8");
 	position = 5;
@@ -145,7 +149,7 @@ function main()
 	assert(position eq 15);
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
 	assert(position eq 26);
-	assert( osbwrite( "Фраза із 22 символів", OUTPUT_file, position));
+	assert( osbwrite( cpdata, OUTPUT_file, position));
 	assert(position eq 46);
 	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
 	assert(position eq 57);
@@ -163,9 +167,10 @@ function main()
 	assert(position eq 15);
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
 	assert(position eq 26);
-	assert( osbwrite( "Фраза із 22 символів", OUTPUT_file, position));
+
+	assert( osbwrite(cpdata, OUTPUT_file, position));
 	assert(position eq 46);
-	assert( osbwrite( "Фраза из 22 символов", OUTPUT_file, position));
+	assert( osbwrite( cpdata, OUTPUT_file, position));
 	assert(position eq 66);
 	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
 	assert(position eq 77);

@@ -1137,12 +1137,12 @@ class PUBLIC var final {
 	PUBLIC ND friend bool var_eq_int(CVR           lhs,  const int    int1 );
 
 	PUBLIC ND friend bool var_lt_int(CVR           lhs,  const int    int1 );
-	PUBLIC ND friend bool var_lt_int(const int     int1, CVR          rhs  );
+	PUBLIC ND friend bool int_lt_var(const int     int1, CVR          rhs  );
 
 	PUBLIC ND friend bool var_lt_dbl(CVR           lhs,  const double dbl1 );
-	PUBLIC ND friend bool var_lt_dbl(const double  dbl1, CVR          rhs  );
+	PUBLIC ND friend bool dbl_lt_var(const double  dbl1, CVR          rhs  );
 
-	PUBLIC ND friend bool var_lt_bool(const bool   lhs,  const bool   int1 );
+	PUBLIC ND friend bool bool_lt_bool(const bool   lhs,  const bool   int1 );
 
 	// Concatenation
 
@@ -1199,13 +1199,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator==(CVR          lhs,   const char   char2 ) {return  var_eq(      lhs, char2  ); }
 	PUBLIC ND friend bool operator==(CVR          lhs,   const int    int2  ) {return  var_eq_int(  lhs, int2   ); }
 	PUBLIC ND friend bool operator==(CVR          lhs,   const double dbl2  ) {return  var_eq_dbl(  lhs, dbl2   ); }
-	PUBLIC ND friend bool operator==(CVR          lhs,   const bool   bool2 ) {return  lhs.toBool() == bool2   ; }
+	PUBLIC ND friend bool operator==(CVR          lhs,   const bool   bool2 ) {return  lhs.toBool() ==   bool2   ; }
 
 	PUBLIC ND friend bool operator==(const char*  cstr1, CVR          rhs   ) {return  var_eq(      rhs, cstr1  ); }
 	PUBLIC ND friend bool operator==(const char   char1, CVR          rhs   ) {return  var_eq(      rhs, char1  ); }
 	PUBLIC ND friend bool operator==(const int    int1,  CVR          rhs   ) {return  var_eq_int(  rhs, int1   ); }
 	PUBLIC ND friend bool operator==(const double dbl1,  CVR          rhs   ) {return  var_eq_dbl(  rhs, dbl1   ); }
-	PUBLIC ND friend bool operator==(const bool   bool1, CVR          rhs   ) {return  rhs.toBool() == bool1   ; }
+	PUBLIC ND friend bool operator==(const bool   bool1, CVR          rhs   ) {return  rhs.toBool() ==   bool1   ; }
 
 	// != NE friends v. main types
 
@@ -1213,13 +1213,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator!=(CVR          lhs,   const char   char2 ) {return !var_eq(      lhs, char2  ); }
 	PUBLIC ND friend bool operator!=(CVR          lhs,   const int    int2  ) {return !var_eq_int(  lhs, int2   ); }
 	PUBLIC ND friend bool operator!=(CVR          lhs,   const double dbl2  ) {return !var_eq_dbl(  lhs, dbl2   ); }
-	PUBLIC ND friend bool operator!=(CVR          lhs,   const bool   bool2 ) {return lhs.toBool() != bool2    ; }
+	PUBLIC ND friend bool operator!=(CVR          lhs,   const bool   bool2 ) {return lhs.toBool()  !=   bool2   ; }
 
 	PUBLIC ND friend bool operator!=(const char*  cstr1, CVR          rhs   ) {return !var_eq(      rhs, cstr1  ); }
 	PUBLIC ND friend bool operator!=(const char   char1, CVR          rhs   ) {return !var_eq(      rhs, char1  ); }
 	PUBLIC ND friend bool operator!=(const int    int1,  CVR          rhs   ) {return !var_eq_int(  rhs, int1   ); }
 	PUBLIC ND friend bool operator!=(const double dbl1,  CVR          rhs   ) {return !var_eq_dbl(  rhs, dbl1   ); }
-	PUBLIC ND friend bool operator!=(const bool   bool1, CVR          rhs   ) {return rhs.toBool() !=  bool1   ; }
+	PUBLIC ND friend bool operator!=(const bool   bool1, CVR          rhs   ) {return rhs.toBool()  !=   bool1   ; }
 
 	// < LT friends v. main types
 
@@ -1227,13 +1227,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator<(CVR           lhs,   const char   char2 ) {return  var_lt(      lhs,   char2 ); }
 	PUBLIC ND friend bool operator<(CVR           lhs,   const int    int2  ) {return  var_lt_int(  lhs,   int2  ); }
 	PUBLIC ND friend bool operator<(CVR           lhs,   const double dbl2  ) {return  var_lt_dbl(  lhs,   dbl2  ); }
-	PUBLIC ND friend bool operator<(CVR           lhs,   const bool   bool1 ) {return  var_lt_bool( lhs,   bool1 ); }
+	PUBLIC ND friend bool operator<(CVR           lhs,   const bool   bool1 ) {return  bool_lt_bool(lhs,   bool1 ); }
 
 	PUBLIC ND friend bool operator<(const char*   cstr1, CVR          rhs   ) {return  var_lt(      cstr1, rhs   ); }
 	PUBLIC ND friend bool operator<(const char    char1, CVR          rhs   ) {return  var_lt(      char1, rhs   ); }
-	PUBLIC ND friend bool operator<(const int     int1,  CVR          rhs   ) {return  var_lt_int(  int1,  rhs   ); }
-	PUBLIC ND friend bool operator<(const double  dbl1,  CVR          rhs   ) {return  var_lt_dbl(  dbl1,  rhs   ); }
-	PUBLIC ND friend bool operator<(const bool    bool1, CVR          rhs   ) {return  var_lt_bool( bool1, rhs   ); }
+	PUBLIC ND friend bool operator<(const int     int1,  CVR          rhs   ) {return  int_lt_var(  int1,  rhs   ); }
+	PUBLIC ND friend bool operator<(const double  dbl1,  CVR          rhs   ) {return  dbl_lt_var(  dbl1,  rhs   ); }
+	PUBLIC ND friend bool operator<(const bool    bool1, CVR          rhs   ) {return  bool_lt_bool(bool1, rhs   ); }
 
 	// >= GE friends v. main types
 
@@ -1241,41 +1241,41 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator>=(CVR          lhs,   const char   char2 ) {return !var_lt(      lhs,   char2 ); }
 	PUBLIC ND friend bool operator>=(CVR          lhs,   const int    int2  ) {return !var_lt_int(  lhs,   int2  ); }
 	PUBLIC ND friend bool operator>=(CVR          lhs,   const double dbl2  ) {return !var_lt_dbl(  lhs,   dbl2  ); }
-	PUBLIC ND friend bool operator>=(CVR          lhs,   const bool   bool2 ) {return !var_lt_bool( lhs,   bool2 ); }
+	PUBLIC ND friend bool operator>=(CVR          lhs,   const bool   bool2 ) {return !bool_lt_bool(lhs,   bool2 ); }
 
 	PUBLIC ND friend bool operator>=(const char*  cstr1, CVR          rhs   ) {return !var_lt(      cstr1, rhs   ); }
 	PUBLIC ND friend bool operator>=(const char   char1, CVR          rhs   ) {return !var_lt(      char1, rhs   ); }
-	PUBLIC ND friend bool operator>=(const int    int1,  CVR          rhs   ) {return !var_lt_int(  int1,  rhs   ); }
-	PUBLIC ND friend bool operator>=(const double dbl1,  CVR          rhs   ) {return !var_lt_dbl(  dbl1,  rhs   ); }
-	PUBLIC ND friend bool operator>=(const bool   bool1, CVR          rhs   ) {return !var_lt_bool( bool1, rhs   ); }
+	PUBLIC ND friend bool operator>=(const int    int1,  CVR          rhs   ) {return !int_lt_var(  int1,  rhs   ); }
+	PUBLIC ND friend bool operator>=(const double dbl1,  CVR          rhs   ) {return !dbl_lt_var(  dbl1,  rhs   ); }
+	PUBLIC ND friend bool operator>=(const bool   bool1, CVR          rhs   ) {return !bool_lt_bool(bool1, rhs   ); }
 
 	// > GT friends v. main types
 
 	PUBLIC ND friend bool operator>(CVR           lhs,   const char*  cstr2 ) {return  var_lt(      cstr2, lhs   ); }
 	PUBLIC ND friend bool operator>(CVR           lhs,   const char   char2 ) {return  var_lt(      char2, lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const int    int2  ) {return  var_lt_int(  int2,  lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const double dbl2  ) {return  var_lt_dbl(  dbl2,  lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const bool   bool2 ) {return  var_lt_bool( bool2, lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const int    int2  ) {return  int_lt_var(  int2,  lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const double dbl2  ) {return  dbl_lt_var(  dbl2,  lhs   ); }
+	PUBLIC ND friend bool operator>(CVR           lhs,   const bool   bool2 ) {return  bool_lt_bool(bool2, lhs   ); }
 
 	PUBLIC ND friend bool operator>(const char*   cstr1, CVR          rhs   ) {return  var_lt(      rhs,   cstr1 ); }
 	PUBLIC ND friend bool operator>(const char    char1, CVR          rhs   ) {return  var_lt(      rhs,   char1 ); }
 	PUBLIC ND friend bool operator>(const int     int1,  CVR          rhs   ) {return  var_lt_int(  rhs,   int1  ); }
 	PUBLIC ND friend bool operator>(const double  dbl1,  CVR          rhs   ) {return  var_lt_dbl(  rhs,   dbl1  ); }
-	PUBLIC ND friend bool operator>(const bool    bool1, CVR          rhs   ) {return  var_lt_bool( rhs,   bool1 ); }
+	PUBLIC ND friend bool operator>(const bool    bool1, CVR          rhs   ) {return  bool_lt_bool(rhs,   bool1 ); }
 
 	// <= LE friends v. main types
 
 	PUBLIC ND friend bool operator<=(CVR          lhs,   const char*  cstr2 ) {return !var_lt(      cstr2, lhs   ); }
 	PUBLIC ND friend bool operator<=(CVR          lhs,   const char   char2 ) {return !var_lt(      char2, lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const int    int2  ) {return !var_lt_int(  int2,  lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const double dbl2  ) {return !var_lt_dbl(  dbl2,  lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const bool   bool2 ) {return !var_lt_bool( bool2, lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const int    int2  ) {return !int_lt_var(  int2,  lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const double dbl2  ) {return !dbl_lt_var(  dbl2,  lhs   ); }
+	PUBLIC ND friend bool operator<=(CVR          lhs,   const bool   bool2 ) {return !bool_lt_bool(bool2, lhs   ); }
 
 	PUBLIC ND friend bool operator<=(const char*  cstr1, CVR          rhs   ) {return !var_lt(      rhs,   cstr1 ); }
 	PUBLIC ND friend bool operator<=(const char   char1, CVR          rhs   ) {return !var_lt(      rhs,   char1 ); }
 	PUBLIC ND friend bool operator<=(const int    int1,  CVR          rhs   ) {return !var_lt_int(  rhs,   int1  ); }
 	PUBLIC ND friend bool operator<=(const double dbl1,  CVR          rhs   ) {return !var_lt_dbl(  rhs,   dbl1  ); }
-	PUBLIC ND friend bool operator<=(const bool   bool1, CVR          rhs   ) {return !var_lt_bool( rhs,   bool1 ); } 
+	PUBLIC ND friend bool operator<=(const bool   bool1, CVR          rhs   ) {return !bool_lt_bool(rhs,   bool1 ); } 
 
 	// ARITHMETIC friends v. main types
 

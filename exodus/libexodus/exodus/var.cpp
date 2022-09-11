@@ -911,7 +911,7 @@ inline bool almost_equal(double x, double y, int) {
 	return (std::abs(x - y) < SMALLEST_NUMBER);
 }
 
-PUBLIC bool var_lt_bool(const bool lhs, const bool rhs) {
+PUBLIC bool bool_lt_bool(const bool lhs, const bool rhs) {
 
 	//return true if lhs is "less true" than rhs
 
@@ -1166,7 +1166,7 @@ PUBLIC bool var_lt_int(CVR lhs, const int int2) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt_int(const int int1, CVR rhs) {
+PUBLIC bool int_lt_var(const int int1, CVR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -1228,7 +1228,7 @@ PUBLIC bool var_lt_dbl(CVR lhs, const double dbl2) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt_dbl(const double dbl1, CVR rhs) {
+PUBLIC bool dbl_lt_var(const double dbl1, CVR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
