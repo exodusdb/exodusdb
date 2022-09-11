@@ -69,7 +69,7 @@ nextrec1:
 		goto nextrec1;
 	}
 
-	periodsize += RECORD.length() + ID.length();
+	periodsize += RECORD.len() + ID.len();
 
 	goto nextrec1;
 
@@ -165,7 +165,7 @@ nextrec2:
 
 		printl(" deleted");
 		ndeleted += 1;
-		sizedeleted += ID.length() + RECORD.length();
+		sizedeleted += ID.len() + RECORD.len();
 	} else {
 		printl(" deletable");
 	}

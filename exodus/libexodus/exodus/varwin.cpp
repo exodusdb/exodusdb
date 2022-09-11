@@ -34,7 +34,7 @@ var getexecpath() {
 		tstring tempstr(filename, bytes);
 		// transfer the TCHARS into a wstring
 		std::wstring wtempstr;
-		for (unsigned int ii = 0; ii < tempstr.length(); ++ii)
+		for (unsigned int ii = 0; ii < tempstr.size(); ++ii)
 			wtempstr.push_back((unsigned int)(tempstr[ii]));
 
 		// which we can return to the

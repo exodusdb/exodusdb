@@ -47,7 +47,7 @@ function main(in msg0, io time0) {
 		//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
 			call osbread(datax, logfile, ptr, 1024);
 			//if any data then break out of loop
-			if (datax.length()) {
+			if (datax.len()) {
 				ptr = logfilelength;
 			}
 		} //ptr;

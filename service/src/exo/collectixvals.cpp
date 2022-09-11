@@ -4,7 +4,7 @@ libraryinit()
 function main(in filename0, in dictid, in prefix="", in orderby="") {
 	//c xxx in,in,"",""
 
-	var lenprefix = prefix.length();
+	var lenprefix = prefix.len();
 
 	var filename = filename0.convert(".","_");
 

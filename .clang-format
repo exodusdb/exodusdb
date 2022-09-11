@@ -9,3 +9,9 @@ UseTab:                           Always
 PointerAlignment:                 Left
 IndentGotoLabels:                 false
 KeepEmptyLinesAtTheStartOfBlocks: true
+
+BreakStringLiterals:              false
+
+AlignConsecutiveMacros:           true
+AlignConsecutiveAssignments:      true
+AlignConsecutiveDeclarations:     true

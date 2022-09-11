@@ -476,7 +476,7 @@ nextrec:
 	//skip multivalues
 	for (const var filtern : range(1, nfilters)) {
 		var value = calculate(filters(1, filtern));
-		if (filters(3, filtern).length()) {
+		if (filters(3, filtern).len()) {
 
 			//if reqvalue then skip if not matching
 			if (not(filters(3, filtern).locate(value, xx))) {
@@ -595,7 +595,7 @@ nextvn:
 				if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
 					cell.swapper(DQ, "''");
 				}
-				if (cell.length() gt 255) {
+				if (cell.len() gt 255) {
 					cell = cell.substr(1, 200) ^ " ...";
 				}
 				if (fmtxs(coln) ne "R" or not(cell.isnum())) {

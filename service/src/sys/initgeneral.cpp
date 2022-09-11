@@ -643,8 +643,8 @@ nextreport:
 	//SYSTEM(58) = oslistd("../data/").convert(FM,VM);
 	//SYSTEM.fieldstorer(FM, 59, 5, "");
     //update dbcodes with dir dbcodes if dbcodes in sys cfg file contain lcase
-    var ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx","").length();
-    if(ttdbcodes eq SYSTEM.f(58).length()){
+    var ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx","").len();
+    if(ttdbcodes eq SYSTEM.f(58).len()){
         //c++ only
         SYSTEM(58) = oslistd("../data/").convert(FM,VM);
         SYSTEM.fieldstorer(FM, 59, 5, "");
@@ -773,7 +773,7 @@ nextreport:
 	} else {
 		SW(1) = SYSTEM.f(118);
 		//if display time is not server/gmt/utc then adjust offset to server/gmt/utc
-		if (SW.f(1).length()) {
+		if (SW.f(1).len()) {
 			//system time offset is currently automatically determined by CID()
 			//CID will tell you the current server tz
 			//but should this be recorded in the dataset in case it is moved
@@ -1265,7 +1265,7 @@ nextreport:
 	call logprocess(sessionid, "LOGIN", "", "", "", "");
 	SYSTEM(4) = sessionid;
 
-	if (not(SYSTEM.f(22).length())) {
+	if (not(SYSTEM.f(22).len())) {
 		SYSTEM(22) = 300;
 	}
 
@@ -1948,7 +1948,7 @@ subroutine getsystem() {
 	//ie global installation parameters override dataset parameters
 	var ni = systemx.count(FM) + 1;
 	for (const var ii : range(1, ni)) {
-		if (systemx.f(ii).length()) {
+		if (systemx.f(ii).len()) {
 			SYSTEM(ii) = systemx.f(ii);
 		}
 	} //ii;

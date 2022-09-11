@@ -1390,32 +1390,33 @@ class PUBLIC var final {
 	// OUTPUT
 	/////////
 
-	//to stdout/cout
-	CVR output() const;      //output without line ending, without flush
-	CVR outputl() const;     //output without a line ending and flush
-	CVR outputt() const;     //output with a tab and flush
+	// To stdout/cout buffered
+	CVR output() const;      // stdout no new line, buffered
+	CVR outputl() const;     // stdout starts a new line, flushed
+	CVR outputt() const;     // stdout adds a tab, buffered
 
-	//as above but with var1 prefixed
-	CVR output(CVR var1) const;
-	CVR outputl(CVR var1) const;
-	CVR outputt(CVR var1) const;
+	// As above but with a prefix
+	CVR output(CVR var1) const;  // stdout with a prefix, no new line, buffered
+	CVR outputl(CVR var1) const; // stdout with a prefix, starts a new line, flushed
+	CVR outputt(CVR var1) const; // stdout with a prefix, adds a tab, buffered
 
-	//to stdlog/clog
-	CVR logput() const;
-	CVR logputl() const;
+	// To stdlog/clog buffered
+	CVR logput() const;  // stdlog no new line, buffered
+	CVR logputl() const; // stdlog starts a new line, flushed
 
-	//as above but with var1 prefixed
-	CVR logput(CVR var1) const;
-	CVR logputl(CVR var1) const;
+	// As above but with a prefix
+	CVR logput(CVR var1) const;  // stdlog with a prefix, no new line, buffered
+	CVR logputl(CVR var1) const; // stdlog with a prefix, starts a new line, flushed
 
-	//to stderr/cerr
-	CVR errput() const;
-	CVR errputl() const;
+	// To stderr/cerr usually unbuffered
+	CVR errput() const;  // stderr no new line, flushed
+	CVR errputl() const; // stderr starts a new line, flushed
 
-	//as above but with var1 prefixed
-	CVR errput(CVR var1) const;
-	CVR errputl(CVR var1) const;
+	// As above but with a prefix
+	CVR errput(CVR var1) const;  // stderr with a prefix, no new line, flushed
+	CVR errputl(CVR var1) const; // stderr with a prefix, starts a new line, flushed
 
+	// Output to a given stream
 	CVR put(std::ostream& ostream1) const;
 
 	// STANDARD INPUT
@@ -1540,8 +1541,8 @@ class PUBLIC var final {
 	ND var textseq() const;      // TEXT
 	ND var dcount(SV str) const;
 	ND var count(SV str) const;
-	ND var length() const;
-	ND var len() const;
+	ND var len() const; // BYTES
+	ND var textlen() const; // TEXT
 	bool isnum() const;
 
 	ND bool starts(SV str) const;

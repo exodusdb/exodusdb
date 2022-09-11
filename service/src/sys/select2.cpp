@@ -314,7 +314,7 @@ nocommon:
 			//only look in selected files otherwise c++ takes too long on some files
 			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex, xx)) {
 				if (records.read(file, "%RECORDS%")) {
-					if (records.length() lt 200) {
+					if (records.len() lt 200) {
 						records.swapper(FM, "\" \"");
 						sortselect.splicer(1, 0, records.quote() ^ " ");
 					}
@@ -365,7 +365,7 @@ nextrec:
 		givenkeyn += 1;
 		ID = sortselect.f(givenkeyn);
 		MV = ID.f(1, 2);
-		if (MV.length()) {
+		if (MV.len()) {
 			ID = ID.f(1, 1);
 		}
 
@@ -547,13 +547,13 @@ nextrec:
 
 	} else {
 		datax ^= row;
-		dataptr += row.length();
+		dataptr += row.len();
 	}
 
 	//get next if output to file or space for more data
 	//goto nextrec
 	//if xml or len(DATAX)<64000 then goto nextrec
-	if (xml or (datax.length() lt maxstrsize_ - 1530)) {
+	if (xml or (datax.len() lt maxstrsize_ - 1530)) {
 		goto nextrec;
 	}
 

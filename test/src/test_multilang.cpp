@@ -50,8 +50,8 @@ function main()
 	//[<D0><F3><F1><F1><EA><E8><E9> <FF><E7><FB><EA>][<D3><EA><F0><E0><BF><ED><F1><FC><EA><E0> <EC><EE><E2><E0>]
 	var EN_RU_UA_cp1251 = "[English language][������� ����][��������� ����]";
 	var EN_RU_UA_utf8 =   "[English language][Русский язык][Українська мова]";
-	assert(EN_RU_UA_cp1251.length() == 49);
-	assert(EN_RU_UA_utf8.length() == 74);
+	assert(EN_RU_UA_cp1251.len() == 49);
+	assert(EN_RU_UA_utf8.len() == 74);
 	assert(EN_RU_UA_cp1251.from_codepage(cyrillic_cp) == EN_RU_UA_utf8);
 	assert(EN_RU_UA_cp1251 == EN_RU_UA_utf8.to_codepage(cyrillic_cp));
 
@@ -205,6 +205,17 @@ function main()
 		assert(var(1.2345678901).numberinwords("arabic").outputl() eq "واحد فاصل إثنان ثلاثة أربعة خمسة ستة سبعة ثمانية تسعة صفر واحد");
 		assert(var(1.2345678901).numberinwords("french").outputl() eq "un virgule deux trois quatre cinq six sept huit neuf zéro un");
 		assert(var(1.2345678901).numberinwords("spanish").outputl() eq "uno punto dos tres cuatro cinco seis siete ocho nueve cero uno");
+	}
+
+	{
+		// Count unicode points (not the same as graphemes since unicode points may combine into one visible character)
+		var en="one point two three four five six seven eight nine zero one xx";
+		var gr="ένα κόμμα δύο τρία τέσσερα πέντε έξι επτά οκτώ εννέα μηδέν ένα";
+		var ar="واحد فاصل إثنان ثلاثة أربعة خمسة ستة سبعة ثمانية تسعة صفر واحد";
+
+		assert(en.textlen() eq 62);
+		assert(gr.textlen() eq 62);
+		assert(ar.textlen() eq 62);
 	}
 
 	printl(elapsedtimetext());

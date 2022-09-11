@@ -142,7 +142,7 @@ bool checknotabsoluterootfolder(std::string dirname) {
 
 //const std::string var::to_path_string() const {
 //	var part2 = this->field(" ", 2, 999999);
-//	if (part2.length()) {
+//	if (part2.len()) {
 //
 //#if defined WIN32 || defined _WIN32
 //		var part = this->field(" ", 1).convert("/", OSSLASH);
@@ -632,7 +632,7 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 	// write out the full string or fail
 	if (*codepage) {
 		std::string tempstr = boost::locale::conv::from_utf<char>(var_str, codepage);
-		myfile.write(tempstr.data(), tempstr.length());
+		myfile.write(tempstr.data(), tempstr.size());
 	} else {
 		myfile.write(var_str.data(), var_str.size());
 	}
@@ -1289,14 +1289,14 @@ var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
 
 	var path = to_path_string(path0);
 	var globpattern;
-	if (globpattern0.length()) {
+	if (globpattern0.len()) {
 		globpattern = globpattern0;
 	}
 	// file globbing can and must be passed as tail end of path
 	// perhaps could use <glob.h> in linux instead of regex
 	else {
 		globpattern = path.field2(_OSSLASH, -1);
-		path = path.substr(1, path.length() - globpattern.length());
+		path = path.substr(1, path.len() - globpattern.len());
 	}
 
 	bool getfiles = true;
@@ -1308,7 +1308,7 @@ var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
 
 	var filelist = "";
 	std::filesystem::path full_path(std::filesystem::current_path());
-	if (path.length()) {
+	if (path.len()) {
 		//full_path = std::filesystem::absolute(std::filesystem::path(path.to_path_string().c_str()));
 		std::error_code error_code;
 		std::filesystem::path pathx = std::filesystem::path(to_path_string(path).c_str());

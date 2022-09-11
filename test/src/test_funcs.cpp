@@ -68,11 +68,12 @@ function main() {
 	}
 	{
 		var x="asd";
-		assert(length(x) eq 3);
 		assert(len(x) eq 3);
+		assert(textlen(x) eq 3);
 
 		x="Γιάννης";
 		assert(len(x) eq 14);
+		assert(textlen(x) eq 7);
 	}
 
 	{

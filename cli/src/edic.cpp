@@ -169,7 +169,7 @@ function main() {
 		filen += 1;
 		var filename = filenames.f(filen).unquote();
 
-		if (not filename.length())
+		if (not filename.len())
 			continue;
 
 		//split out trailing line number after :

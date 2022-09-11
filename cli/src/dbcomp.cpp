@@ -73,7 +73,7 @@ function main() {
 			recn++;
 			if (not silent) {
 				output(AT(-40), recn, "/", reccount, " ", ID);
-				//printl("",RECORD.length());
+				//printl("",RECORD.len());
 				if ((recn % 1000) eq 1)
 					osflush();
 			}

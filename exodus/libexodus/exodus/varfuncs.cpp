@@ -207,7 +207,7 @@ VARREF var::input(CVR prompt) {
 	var_typ = VARTYP_STR;
 
 	//output any prompt and flush
-	if (prompt.length())
+	if (prompt.len())
 		prompt.output().osflush();
 
 	//windows currently doesnt allow line editing
@@ -378,14 +378,6 @@ const std::string& var::toString() const& {
 	return var_str;
 }
 
-var var::length() const {
-
-	THISIS("var var::length() const")
-	assertString(function_sig);
-
-	return var_str.size();
-}
-
 // synonym for length for compatibility with pick's len()
 var var::len() const {
 
@@ -402,6 +394,19 @@ var var::len() const {
 //
 //	return var_str.data();
 //}
+
+var var::textlen() const {
+
+	THISIS("var var::textsize()")
+	assertString(function_sig);
+
+	var result = 0;
+	for (char& c : var_str) {
+		result.var_int += (c & 0b1100'0000) != 0b1000'0000;
+		//std::cout << c << " " << std::bitset<8>(c) << " " << result.var_int << std::endl;
+	}
+	return result;
+}
 
 std::u32string var::to_u32string() const {
 
@@ -907,7 +912,7 @@ var var::unique() const {
 			// sepchar=RM_-static_cast<int>(delimiter)+1;
 			sepchar = var().chr(RMseq_plus1 - delimiter);
 
-		if (bit.length()) {
+		if (bit.len()) {
 			if (not(result.locateusing(sepchar, bit))) {
 				//if (delimiter)
 				result ^= bit ^ sepchar;
@@ -1439,11 +1444,11 @@ void string_converter(T1& var_str, const T2 oldchars, const T3 newchars) {
 
 	// Optimise for single character replacement
 	// No observable speedup
-	//if (oldchars.length() == 1 and newchars.length() == 1) {
+	//if (oldchars.len() == 1 and newchars.len() == 1) {
 	//	std::replace(var_str.begin(), var_str.end(), oldchars[0], newchars[0]);
 	//}
 
-	int newchars_size = newchars.length();
+	int newchars_size = newchars.size();
 	while (true) {
 		// locate (backwards) any of the from characters
 		// because we might be removing characters
@@ -1856,7 +1861,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 	//file MUST be lower case in order to detect "dict."
 	file = filename.lcase();
 
-	char sep = fieldno.length() ? VM_ : RM_;
+	char sep = fieldno.len() ? VM_ : RM_;
 
 	var response = "";
 	int nmv = this->dcount(_VM);
@@ -1898,7 +1903,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 		}
 
 		// fieldno "" returns whole record
-		if (!fieldno.length()) {
+		if (!fieldno.len()) {
 			response ^= record;
 			continue;
 		}

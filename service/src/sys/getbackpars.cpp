@@ -58,7 +58,7 @@ function main(out bakpars, in process0=var()) {
 	}
 	if (tt.osread("backup.cfg")) {
 		for (const var ii : range(1, 99)) {
-			if (tt.f(ii).length()) {
+			if (tt.f(ii).len()) {
 				bakpars(ii) = tt.f(ii);
 			}
 		} //ii;
@@ -68,7 +68,7 @@ function main(out bakpars, in process0=var()) {
 	configfilename.converter("/", OSSLASH);
 	if (tt.osread(configfilename)) {
 		for (const var ii : range(1, 99)) {
-			if (tt.f(ii).length()) {
+			if (tt.f(ii).len()) {
 				bakpars(ii) = tt.f(ii);
 			}
 		} //ii;

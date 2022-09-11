@@ -1276,7 +1276,7 @@ bool var::read(CVR filehandle, CVR key) {
 				var key = getpgresultcell(mvresult, tuplen, 0);
 				//skip metadata keys starting and ending in % eg "%RECORDS%"
 				if (key[1] != "%" && key[-1] != "%") {
-					if (this->length() <= 65535) {
+					if (this->len() <= 65535) {
 						if (!this->locatebyusing("AR", _FM, key, keyn))
 							this->inserter(keyn, key);
 					} else {
@@ -2174,7 +2174,7 @@ inline void unquoter_inline(VARREF string) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
 	if (quotecharacters.index(string[1]))
-		string = string.substr(2, string.length() - 2);
+		string = string.substr(2, string.len() - 2);
 }
 
 inline void tosqlstring(VARREF string1) {
@@ -2434,7 +2434,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 //			sqlexpression ^= get_fileexpression(mainfilename, filename, "data");
 
 			var args = pgsql_line1.field(" ",2,99);
-			if (not args.length())
+			if (not args.len())
 				args = "key data";
 			else if (not args.index(' '))
 				args ^= " data";
@@ -2755,7 +2755,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	remainingwords = remainingwords.field(" ", 2, 99999);
 
 	//separate out leading or trailing parens () but not both
-	if (word1.length() > 1) {
+	if (word1.len() > 1) {
 		if (word1[1] == "(" && word1[-1] != ")") {
 			//put remaining word back on the pending words
 			remainingwords.splicer(1, 0, word1.substr(2) ^ " ");
@@ -2772,8 +2772,8 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	// join words within quote marks into one quoted phrase
 	var char1 = word1[1];
 	if ((char1 == DQ || char1 == SQ)) {
-		while (word1[-1] != char1 || word1.length() <= 1) {
-			if (remainingwords.length()) {
+		while (word1[-1] != char1 || word1.len() <= 1) {
+			if (remainingwords.len()) {
 				word1 ^= " " ^ remainingwords.field(" ", 1);
 				remainingwords = remainingwords.field(" ", 2, 99999);
 			} else {
@@ -2975,7 +2975,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var lastword = remaining.field2(" ", -1);
 	if ((lastword[1] == "(" && lastword[-1] == ")") ||
 		(lastword[1] == "{" && lastword[-1] == "}")) {
-		remaining.splicer(-lastword.length() - 1, 999, "");
+		remaining.splicer(-lastword.len() - 1, 999, "");
 	}
 
 	var firstucword = remaining.field(" ", 1).ucase();
@@ -2992,7 +2992,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	}
 
 	// the second word can be a number to limit the number of records selected
-	if (firstucword.length() and firstucword.isnum()) {
+	if (firstucword.len() and firstucword.isnum()) {
 		maxnrecs = firstucword;
 
 		// remove it
@@ -3016,7 +3016,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		throw VarDBException("filename missing from select statement:" ^ sortselectclause);
 	}
 
-	while (remaining.length()) {
+	while (remaining.len()) {
 
 		// remaining.logputl("remaining=");
 		// whereclause.logputl("whereclause=");
@@ -3028,7 +3028,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// skip options (last word and surrounded by brackets)
 		// (S) etc
 		// options - last word enclosed in () or {}
-		if (!remaining.length() &&
+		if (!remaining.len() &&
 			((word1[1] == "(" && word1[-1] == ")") ||
 			(word1[1] == "{" && word1[-1] == "}"))) {
 			// word1.logputl("skipping last word in () options ");
@@ -3441,7 +3441,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				// TWO backslashes.
 				word1.swapper("\\", "\\\\");
 				var special = "[^$.|?*+()";
-				for (int ii = special.length(); ii > 0; --ii) {
+				for (int ii = special.len(); ii > 0; --ii) {
 					if (special.index(word1[ii]))
 						word1.splicer(ii, 0, "\\");
 				}
@@ -3462,7 +3462,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// word1 at this point may be empty, contain a value or be the first word of an unrelated clause
 			// if non-value word1 unrelated to current phrase
-			if (ucword.length() && !valuechars.index(ucword[1])) {
+			if (ucword.len() && !valuechars.index(ucword[1])) {
 
 				// push back and treat as missing value
 				// remaining[1,0]=ucword:' '
@@ -4412,7 +4412,7 @@ bool var::savelist(CVR listname) {
 		}
 
 		// save one list of keys if more than a certain size (1MB)
-		if (list.length() > maxlistsize) {
+		if (list.len() > maxlistsize) {
 
 			write_list();
 
@@ -4572,7 +4572,7 @@ bool var::hasnext() {
 		var key_and_mv = this->f(6, keyno);
 
 		// true if we have another key
-		if (key_and_mv.length())
+		if (key_and_mv.len())
 			return true;
 
 		if (DBTRACE)
@@ -4690,7 +4690,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 			var key_and_mv = this->f(6, keyno);
 
 			// if no more keys, try to get next block of keys, otherwise return false
-			if (key_and_mv.length() == 0) {
+			if (key_and_mv.len() == 0) {
 
 				// makelist provides one block of keys and nothing in the lists file
 				if (listid == "%MAKELIST%") {

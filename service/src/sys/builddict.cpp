@@ -280,7 +280,7 @@ addline:
 							} else {
 								lineparam = "";
 							}
-							if (lineparam.length()) {
+							if (lineparam.len()) {
 								if (mword1 eq "#ifndef") {
 deletemline:
 									macrotext.remover(mln);

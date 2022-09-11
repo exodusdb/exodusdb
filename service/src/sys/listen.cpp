@@ -701,7 +701,7 @@ subroutine wait() {
 			linkfilename1 = var(99999999).rnd() ^ ".0";
 		}
 	}
-	linkfilename0 = linkfilename1.substr(inpath.length() + 1, 9999);
+	linkfilename0 = linkfilename1.substr(inpath.len() + 1, 9999);
 	cmd ^= " " ^ linkfilename0 ^ " " ^ inpath ^ " " ^ portno;
 	cmd.lcaser();
 	cmd.converter("/", OSSLASH);
@@ -1301,7 +1301,7 @@ function request_init() {
 		}
 		req6up = logx.field(FM, 6, 9999);
 		req6up.converter(FM, "^");
-		if (req6up.length()) {
+		if (req6up.len()) {
 			tt ^= " Req6up=" ^ (req6up.quote());
 		}
 
@@ -1361,7 +1361,7 @@ function request_init() {
 				call osbread(datx(blockn), linkfile2, inptr, inblocksize);
 
 				///BREAK;
-				if (not(datx(blockn).length())) break;
+				if (not(datx(blockn).len())) break;
 
 				//avoid hexcode spanning block end by moving one or two bytes backwards
 				if (blockn gt 1) {
@@ -1378,7 +1378,7 @@ function request_init() {
 			lendata = 0;
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
 
-				if (datx(blockn).length()) {
+				if (datx(blockn).len()) {
 
 					//output to log before unescaping since log is xml
 					if (logfilename) {
@@ -1412,7 +1412,7 @@ function request_init() {
 						call hexcode(2, datx(blockn));
 					}
 
-					lendata += datx(blockn).length();
+					lendata += datx(blockn).len();
 
 				}
 
@@ -2051,7 +2051,7 @@ noupdate:
 				//remove session id
 				tt = USER3.index("SESSIONID");
 				if (tt) {
-					response_.splicer(tt, ("SESSIONID " ^ sessionid).length(), "");
+					response_.splicer(tt, ("SESSIONID " ^ sessionid).len(), "");
 					USER3.trimmerb();
 					if (response_ eq "") {
 						USER3 = "OK";
@@ -2680,7 +2680,7 @@ function request_exit() {
 		gosub writelogx();
 
 		logx = "</Response>";
-		iodatlen = iodat_.length();
+		iodatlen = iodat_.len();
 		if (iodatlen) {
 			logx ^= "\r\n" "<DataOut>";
 		}
@@ -2707,7 +2707,7 @@ function request_exit() {
 				blk = USER1.substr(1, outblocksize);
 				iodat_.splicer(1, outblocksize, "");
 				///BREAK;
-				if (not(blk.length())) break;
+				if (not(blk.len())) break;
 
 				//in LISTEN and SELECT2 for direct output
 

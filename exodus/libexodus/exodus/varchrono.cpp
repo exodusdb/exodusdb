@@ -473,7 +473,7 @@ var var::oconv_D(const char* conversion) const {
 	std::stringstream yearstream;
 	yearstream << civil_year;
 	std::string yearstring = yearstream.str();
-	int yearstringerase = static_cast<int>(yearstring.length() - yeardigits);
+	int yearstringerase = static_cast<int>(yearstring.size() - yeardigits);
 	if (yearstringerase > 0)
 		yearstring.erase(0, yearstringerase);
 
@@ -591,8 +591,14 @@ after_analyse_conversion:
 		// if input is integer or decimal hours then convert by *3600 to integer seconds
 		timesecs = ((*this) * 3600).round();
 	} else {
-		// otherwise round any decimal seconds to integer
-		timesecs = round();
+		// otherwise floor any decimal seconds to an integer
+		//
+		// Fractional seconds using floor function where
+		// A time is considered to be reached when you arrive at it exactly now before
+		// So a fractional second before midnight is still 23:59:59
+		// +0.9999 -> +0 -> 00:00:00
+		// -0.0001 -> -1 -> 23:59:59
+		timesecs = floor();
 	}
 
 	// standardise times <0 and >=86400 to one day ie 0-85399 seconds

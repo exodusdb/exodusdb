@@ -16,11 +16,11 @@ function main() {
 	var greek5x2="αβγδεαβγδε";
 	var greekstr2=fieldstore(greek5x2,"β",2,1,"xxx");
 	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
+	assert(greekstr2.len()==15);
 	//on a temporary
 	greekstr2=var(greek5x2).fieldstore("β",2,1,"xxx");
 	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
+	assert(greekstr2.len()==15);
 
 	// First *byte* of a var may not be valid utf8
 	assert(var(greek5x4.toChar()).oconv("HEX").outputl() == "CE");
@@ -32,12 +32,12 @@ function main() {
 	greekstr2=greek5x2;
 	greekstr2.fieldstorer("β",2,1,"xxx");
 	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
+	assert(greekstr2.len()==15);
 	//in place - procedural
 	greekstr2=greek5x2;
 	fieldstorer(greekstr2,"β",2,1,"xxx");
 	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
+	assert(greekstr2.len()==15);
 	//empty separator character
 	try {
 		printl(fieldstore(greekstr2,"",2,1,"xxx"));
@@ -59,22 +59,22 @@ function main() {
 	greekstr2=greek5x2;
 	greekstr2.fieldstorer("β",-2,1,"xxx");
 	assert(greekstr2=="αβxxxβγδε");
-	assert(greekstr2.length()==15);
+	assert(greekstr2.len()==15);
 	//positive number of fields indicates to replace fieldwise with the fields in the insertion. empty fields if the number of fields in the insertion value is insufficient
 	greekstr2=greek5x2;
 	greekstr2.fieldstorer("β",2,2,"xxx");
 	assert(greekstr2=="αβxxxβ");
-	assert(greekstr2.length()==9);
+	assert(greekstr2.len()==9);
 	//positive number of fields indicates to replace fieldwise with the fields in the insertion.
 	greekstr2=greek5x2;
 	greekstr2.fieldstorer("β",2,2,"xxxβyyy");
 	assert(greekstr2=="αβxxxβyyy");
-	assert(greekstr2.length()==12);
+	assert(greekstr2.len()==12);
 	//negative number of fields indicates to replace that positive number of fields with whatever is the insertion.
 	greekstr2=greek5x2;
 	greekstr2.fieldstorer("β",2,-2,"xxx");
 	assert(greekstr2=="αβxxx");
-	assert(greekstr2.length()==7);
+	assert(greekstr2.len()==7);
 	//replacing an empty field with something
 	greekstr2="αββγδε";
 	greekstr2.fieldstorer("β",2,1,"xxx");

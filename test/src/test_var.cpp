@@ -1,8 +1,10 @@
 #include <exodus/var.h>
 
-using namespace exodus;
+//using namespace exodus;
+using exodus::var;
 
 int main() {
+
 
 	// Test we can use var.h on its own without the exodus program environment
 
@@ -18,7 +20,8 @@ int main() {
 	// Exodus programming environment is not available
 	//printl(elapsedtimetext());
 
-    "Test passed"_var.outputl();
+	var s = "Test passed";
+	s.outputl();
 
-    return 0;
+	return 0;
 }

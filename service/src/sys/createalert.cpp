@@ -92,7 +92,7 @@ syntax:
 	}
 
 	var tt = runhours;
-	if (not(tt.length())) {
+	if (not(tt.len())) {
 		goto syntax;
 	}
 	tt.converter(":0123456789," ^ VM, "");

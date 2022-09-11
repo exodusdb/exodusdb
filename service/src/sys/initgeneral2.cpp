@@ -193,7 +193,7 @@ function main(in mode, io logtime, in menu) {
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).lcase();
 				if (tt2.substr(1, 4).index(".htm")) {
-					tt.splicer(-tt2.length(), tt2.length(), "");
+					tt.splicer(-tt2.len(), tt2.len(), "");
 				}
 				if (not(var("\\/").index(tt[-1]))) {
 					tt ^= "/";

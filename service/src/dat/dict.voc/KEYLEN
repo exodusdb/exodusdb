@@ -5,7 +5,7 @@ S
 
 
 
-	return ID.length();
+	return ID.len();
 R
 10
 

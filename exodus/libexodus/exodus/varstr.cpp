@@ -222,8 +222,8 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	// private - assume everything is defined/assigned correctly
 
 	//
-	// if (target.length()==0&&start_pos==end_pos)
-	// if (target.length()==0)
+	// if (target.size()==0&&start_pos==end_pos)
+	// if (target.size()==0)
 	//{
 	//	setting=1;
 	//	return true;
@@ -246,10 +246,10 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	// find null in a null field
 	if (start_pos >= end_pos) {
 		setting = 1;
-		return !target.length();
+		return !target.size();
 	}
 
-	size_t usingchar_len = usingchar.length();
+	size_t usingchar_len = usingchar.size();
 
 	// for use in AR/DR;
 	var value;
@@ -258,7 +258,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 	// find the starting position of the value or return ""
 	// using start_pos and end_pos of
-	int targetlen = static_cast<int>((target.length()));
+	int targetlen = static_cast<int>((target.size()));
 	int valuen2 = 1;
 	do {
 
@@ -312,7 +312,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 					if (value >= target2) {
 						if (value == target2) {
 							setting = valuen2;
-							//setting = valuen2 + (value.length() < target2.length());
+							//setting = valuen2 + (value.size() < target2.size());
 							return true;
 						} else {
 							setting = valuen2;
@@ -429,7 +429,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 				if (value <= target2) {
 					if (value == target2) {
 						//setting = valuen2;
-						setting = valuen2;//(value.length() < target2.length());
+						setting = valuen2;//(value.size() < target2.size());
 						return true;
 					}
 					else {
@@ -496,7 +496,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		// locate negative field number always returns false and setting 1
 		if (fieldno < 0) {
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 
 		if (valueno || subvalueno)
@@ -517,7 +517,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 			// if (valueno||subvalueno) setting=1;
 			// else setting=fieldn2+1;
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 		start_pos++;
 		fieldn2++;
@@ -533,14 +533,14 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 
 	if (start_pos >= field_end_pos) {
 		setting = 1;
-		return !target.length();
+		return !target.size();
 	}
 
 	// zero means all, negative return ""
 	if (valueno <= 0) {
 		if (valueno < 0) {
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 		if (subvalueno)
 			valueno = 1;
@@ -559,14 +559,14 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 			// if (subvalueno) setting=1;
 			// else setting=valuen2+1;
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 		start_pos++;
 		// past end of field?
 		if (start_pos > field_end_pos) {
 			// setting=valuen2+1;
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 		valuen2++;
 	}
@@ -581,7 +581,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 
 	if (start_pos >= value_end_pos) {
 		setting = 1;
-		return !target.length();
+		return !target.size();
 	}
 
 	if (subvalueno <= 0) {
@@ -594,7 +594,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		// negative means ""
 		else {
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 	}
 
@@ -607,14 +607,14 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		if (start_pos == std::string::npos) {
 			// setting=subvaluen2+1;
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 		start_pos++;
 		// past end of value?
 		if (start_pos > value_end_pos) {
 			// setting=subvaluen2+1;
 			setting = 1;
-			return !target.length();
+			return !target.size();
 		}
 		subvaluen2++;
 	}
@@ -1962,13 +1962,13 @@ class PUBLIC var_brackets_proxy {
 var_brackets_proxy::operator var() const {
 	//before first character?
 	if (index_ < 1) {
-		index_ += str_.length();
+		index_ += str_.size();
 		//overly negative - return ""
 		if (index_ < 1)
 			index_ = 1;
 	}
 	//off end - return ""
-	else if (static_cast<unsigned int>(index_) > str_.length())
+	else if (static_cast<unsigned int>(index_) > str_.size())
 		return "";
 
 	//within range
@@ -1979,13 +1979,13 @@ var_brackets_proxy::operator var() const {
 void var_brackets_proxy::operator=(char char1) {
 	//before first character?
 	if (index_ < 1) {
-		index_ += str_.length();
+		index_ += str_.size();
 		//overly negative - return ""
 		if (index_ < 1)
 			index_ = 1;
 	}
 	//off end - return ""
-	else if (static_cast<unsigned int>(index_) > str_.length()) {
+	else if (static_cast<unsigned int>(index_) > str_.size()) {
 		str_.push_back(char1);
 	} else {
 		str_[index_ - 1] = char1;

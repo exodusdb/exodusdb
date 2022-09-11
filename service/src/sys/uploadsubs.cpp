@@ -400,7 +400,7 @@ postuploadfail:
 		}
 		if (importcode.index(".")) {
 			var tt = field2(uploadpath, ".", -1);
-			importcode.splicer(-tt.length() - 1, 999, "");
+			importcode.splicer(-tt.len() - 1, 999, "");
 		}
 		importcode.converter(" .", "--");
 		RECORD(11) = importcode;
@@ -574,7 +574,7 @@ nextline:
 				} else {
 					cell = line.substr(col.f(1, 2), col.f(1, 3)).trimb();
 				}
-				if (cell.length()) {
+				if (cell.len()) {
 					if (col.f(1, 4)) {
 						var cell0 = cell;
 						var CONV = col.f(1, 4);
@@ -586,7 +586,7 @@ nextline:
 						} else {
 							cell = iconv(cell, CONV);
 						}
-						if (not(cell.length())) {
+						if (not(cell.len())) {
 							call mssg(cell0.quote() ^ " cannot be converted in line " ^ linenox ^ " col " ^ coln);
 						//indicate strange but leave workable date/time
 							cell = "00";
@@ -639,7 +639,7 @@ subroutine cleanup() {
 
 subroutine getline() {
 
-	if (buff.length() lt lengthx) {
+	if (buff.len() lt lengthx) {
 
 addbuff:
 ////////
@@ -648,11 +648,11 @@ addbuff:
 		buff ^= temp;
 
 		//get more if no line ending
-		if (temp.length() and not(buff.index("\r"))) {
+		if (temp.len() and not(buff.index("\r"))) {
 			goto addbuff;
 		}
 
-		if (not(buff.length())) {
+		if (not(buff.len())) {
 			eof = 1;
 			line = "";
 			return;
@@ -666,20 +666,20 @@ addbuff:
 		if (not(buff[1] eq "\r")) break;
 		buff.splicer(1, 1, "");
 	}//loop;
-	if (not(buff.length())) {
+	if (not(buff.len())) {
 		goto addbuff;
 	}
 
 	line = buff.field("\r", 1);
-	buff.splicer(1, line.length() + 1, "");
+	buff.splicer(1, line.len() + 1, "");
 
 	nquotes = line.count(DQ);
 	while (true) {
 		///BREAK;
-		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.length())) break;
+		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.len())) break;
 		var line2 = buff.field("\r", 1);
 		nquotes += line2.count(DQ);
-		buff.splicer(1, line2.length() + 1, "");
+		buff.splicer(1, line2.len() + 1, "");
 		line ^= "\n";
 		line ^= line2;
 	}//loop;

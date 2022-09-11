@@ -19,7 +19,7 @@ function security2(in mode, in op0)
 	if (op[-1] == DQ) {
 //		op2 = (op.substr(-2, "B\"")).quote();
 		op2=op.field2(DQ,-2);
-		op.splicer(-op2.length(), op2.length(), "");
+		op.splicer(-op2.len(), op2.len(), "");
 		op2.splicer(1, 0, " ");
 	}
 	if (mode.index("INIT", 1)) {
@@ -126,7 +126,7 @@ function badchars(io msg) {
 	}
 	var tt = win.is;
 	var bad = "\'" "~!@#$%^&*()_+|\\{}[]:\";,?";
-	tt.converter(bad, RM.str(bad.length()));
+	tt.converter(bad, RM.str(bad.len()));
 	if (tt ne win.is) {
 		var t2 = win.is;
 		t2.converter(tt, "");

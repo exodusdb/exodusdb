@@ -12,7 +12,7 @@ S
 		if (not pos1) break;\
 		var pos2 = RECORD.index("*/");\
 		if (not pos2) {\
-			pos2 = RECORD.length() + 1;\
+			pos2 = RECORD.len() + 1;\
 		}\
 		RECORD.splicer(pos1, pos2 - pos1 + 2, "");\
 	}//loop;\

@@ -3,7 +3,7 @@ libraryinit()
 
 function main(in string0) {
 	//c sys
-	if (not(string0.length())) {
+	if (not(string0.len())) {
 		return string0;
 	}
 

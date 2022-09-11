@@ -100,8 +100,8 @@ function main() {
 	xx.converter(LOWERCASE, "");
 	var yy = RECORD;
 	yy.converter(UPPERCASE, "");
-	var uu = RECORD.length() - yy.length();
-	var ll = RECORD.length() - xx.length();
+	var uu = RECORD.len() - yy.len();
+	var ll = RECORD.len() - xx.len();
 	if (uu gt ll) {
 		ANS = uu / (ll + 1);
 	} else {
@@ -465,7 +465,7 @@ libraryexit(key4)
 libraryinit(keylen)
 //-----------------
 function main() {
-	return ID.length();
+	return ID.len();
 }
 libraryexit(keylen)
 
@@ -473,7 +473,7 @@ libraryexit(keylen)
 libraryinit(keysize)
 //------------------
 function main() {
-	return ID.length();
+	return ID.len();
 }
 libraryexit(keysize)
 
@@ -556,7 +556,7 @@ function main() {
 		if (not pos1) break;
 		var pos2 = RECORD.index("*/");
 		if (not pos2) {
-			pos2 = RECORD.length() + 1;
+			pos2 = RECORD.len() + 1;
 		}
 		RECORD.splicer(pos1, pos2 - pos1 + 2, "");
 	}//loop;
@@ -644,7 +644,7 @@ libraryexit(record)
 libraryinit(size)
 //---------------
 function main() {
-	return RECORD.length() + ID.length() + 5;
+	return RECORD.len() + ID.len() + 5;
 }
 libraryexit(size)
 

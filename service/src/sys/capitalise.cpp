@@ -78,7 +78,7 @@ capitalise:
 		}
 
 		//convert @upper.case to @lower.case in string2
-		nn = string2.length();
+		nn = string2.len();
 		numx = var("1234567890").index(string2[1]);
 		cap = 1;
 		inquotes = 0;

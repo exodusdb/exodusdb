@@ -4,7 +4,7 @@ libraryinit(secs)
 //---------------
 function main() {
 	var responsetime = RECORD.f(5);
-	if (responsetime.length()) {
+	if (responsetime.len()) {
 		ANS = RECORD.f(5) - ID.field("*", 3);
 		if (ANS lt 0) {
 			ANS += 86400;

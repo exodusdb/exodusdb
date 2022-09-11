@@ -126,13 +126,13 @@ function main(io ranges0, in basekey0="", in listid0="") {
 				if (listid) {
 					keys ^= FM ^ key;
 					//assumes key is not too long
-					if (keys.length() gt maxlistpartsize) {
+					if (keys.len() gt maxlistpartsize) {
 						gosub writelist();
 					}
 
 				} else {
 					//if (len(range)+len(ranges))>65000 then
-					if (range2.length() + ranges.length() gt maxstrsize_ - 530) {
+					if (range2.len() + ranges.len() gt maxstrsize_ - 530) {
 						//call msg('Range exceeds maximum of 65,000 characters|Please enter a smaller range')
 						call mssg("Range exceeds maximum|Please enter a smaller range");
 						ranges = "";
@@ -197,7 +197,7 @@ exit:
 }
 
 subroutine writelist() {
-	if (not(keys.length())) {
+	if (not(keys.len())) {
 		return;
 	}
 	keys.splicer(1, 1, "");

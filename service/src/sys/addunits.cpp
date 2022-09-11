@@ -51,9 +51,9 @@ function main(in a0, io bb, in sep) {
 
 			if (bcode eq acode) {
 				//garbagecollect;
-				if (bnum.length() or anum.length()) {
-					var ndecs = anum.field(".", 2).length();
-					var bndecs = bnum.field(".", 2).length();
+				if (bnum.len() or anum.len()) {
+					var ndecs = anum.field(".", 2).len();
+					var bndecs = bnum.field(".", 2).len();
 					if (bndecs gt ndecs) {
 						ndecs = bndecs;
 					}

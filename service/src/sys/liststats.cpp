@@ -174,7 +174,7 @@ function main() {
 		tx ^= tr;
 		for (const var coln : range(1, ncols)) {
 			var cell = output.f(1, coln);
-			if (not(cell.length())) {
+			if (not(cell.len())) {
 				cell = nbsp;
 			}
 			tx ^= th ^ cell ^ thx;
@@ -207,7 +207,7 @@ function main() {
 						}
 						celltd ^= ">";
 
-						if (not(cell.length())) {
+						if (not(cell.len())) {
 							cell = nbsp;
 						}
 
@@ -235,7 +235,7 @@ function main() {
 
 					}
 				} else {
-					if (not(cell.length())) {
+					if (not(cell.len())) {
 						cell = nbsp;
 					}
 					rowtx ^= td ^ cell ^ tdx;
@@ -245,7 +245,7 @@ function main() {
 				}
 			} //coln;
 			tx ^= tr ^ rowtx ^ trx;
-			if (tx.length() gt 64000) {
+			if (tx.len() gt 64000) {
 				gosub printtx();
 			}
 		} //rown;

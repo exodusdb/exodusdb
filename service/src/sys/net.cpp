@@ -306,7 +306,7 @@ listen:
 
 	if (cmd.field(" ",1) eq "LISTEN") {
 		//if NET LISTEN LISTEN LISTEN - then terminate if too many errors
-		if (cmd.length() gt 100) {
+		if (cmd.len() gt 100) {
 			printl(USER4);
 			perform("OFF");
 		}

@@ -5,7 +5,7 @@ S
 
 
 
-	return RECORD.length() + ID.length() + 5;
+	return RECORD.len() + ID.len() + 5;
 R
 8
 

@@ -333,8 +333,8 @@ PUBLIC var len(CVR var1) {
 	return var1.len();
 }
 
-PUBLIC var length(CVR var1) {
-	return var1.length();
+PUBLIC var textlen(CVR var1) {
+	return var1.textlen();
 }
 
 
@@ -1169,7 +1169,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	} else if (lastchar == "}")
 		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
 	if (mv.OPTIONS)
-		mv.COMMAND.splicer(-(mv.OPTIONS.length()), mv.OPTIONS.length(), "");
+		mv.COMMAND.splicer(-(mv.OPTIONS.len()), mv.OPTIONS.len(), "");
 	mv.COMMAND.trimmerb(_FM);
 
 	var temp;

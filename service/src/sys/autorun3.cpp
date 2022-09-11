@@ -760,14 +760,14 @@ subroutine exec2() {
 	printfilename = linkfilename2;
 	tt = oscwd();
 	tt.splicer(-7, 7, "");
-	if (printfilename.substr(1, tt.length()) eq tt) {
-		printfilename.splicer(1, tt.length(), "../");
+	if (printfilename.substr(1, tt.len()) eq tt) {
+		printfilename.splicer(1, tt.len(), "../");
 	}
 	printfilename.converter("/", OSSLASH);
 
 	//tt=printfilename[-1,'B.']
 	tt = field2(printfilename, ".", -1);
-	printfilename.splicer(-tt.length(), tt.length(), "htm");
+	printfilename.splicer(-tt.len(), tt.len(), "htm");
 	SYSTEM(2) = printfilename;
 	//if tracing then
 	// print datasetcode:' Waiting for output:':

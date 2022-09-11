@@ -121,7 +121,7 @@ function main(in nextcompanycode) {
 		LOWERCASE.swapper("%FD", VM);
 		UPPERCASE.swapper("%25", "%");
 		LOWERCASE.swapper("%25", "%");
-		if (UPPERCASE.length() ne LOWERCASE.length()) {
+		if (UPPERCASE.len() ne LOWERCASE.len()) {
 			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
 			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		}

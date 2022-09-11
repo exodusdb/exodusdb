@@ -101,7 +101,7 @@ readmenu:
 			}
 
 			//specifically locked or no legacy menus - only allow if authorised
-			if (oldmenus eq "" or ((menun and SECURITY.f(11, taskn).length()))) {
+			if (oldmenus eq "" or ((menun and SECURITY.f(11, taskn).len()))) {
 				if (not(authorised(menutask, xx))) {
 deleteit:
 					if (menus.locate(menu, menun2)) {

@@ -42,7 +42,7 @@ function main(in type, in in0, in mode0, out output, in glang) {
 		//dont oconv 1 or 2 digits as they are probably day of month being converted
 		// to proper dates
 		//IF len(inx) gt 2 and inx MATCHES '0N' OR inx MATCHES '"-"0N' OR inx MATCHES '0N.0N' THEN
-		if (inx.length() gt 2 and inx.match("^\\d*$")) {
+		if (inx.len() gt 2 and inx.match("^\\d*$")) {
 			goto ok;
 		}
 

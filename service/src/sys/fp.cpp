@@ -8,7 +8,7 @@ function main(in type, in inx, in mode, out outx) {
 	if (type eq "OCONV") {
 		outx = "" ^ inx;
 		var exp = outx.field("E", 2);
-		if (exp.length()) {
+		if (exp.len()) {
 			outx = outx.field("E",1);
 
 			if (exp lt 0) {
@@ -16,18 +16,18 @@ function main(in type, in inx, in mode, out outx) {
 				outx = ("." ^ var("0").str(-(exp + 1)) ^ outx).substr(1, 15);
 				while (true) {
 					///BREAK;
-					if (not(outx.length() gt 2 and (outx[-1] eq "0"))) break;
+					if (not(outx.len() gt 2 and (outx[-1] eq "0"))) break;
 					outx.popper();
 				}//loop;
 
 			} else if (exp gt 0) {
 				outx.splicer(2, 1, "");
 
-				if (outx.length() eq 1 + exp) {
-				} else if (outx.length() gt 1 + exp) {
+				if (outx.len() eq 1 + exp) {
+				} else if (outx.len() gt 1 + exp) {
 					outx.splicer(2 + exp, 1, ".");
 				} else {
-					outx ^= var("0").str(exp - outx.length());
+					outx ^= var("0").str(exp - outx.len());
 				}
 
 			}

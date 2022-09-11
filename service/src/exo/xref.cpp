@@ -4,7 +4,7 @@ libraryinit()
 function main(in instr, in sepchars, in stoplist, in mode) {
 
 	//split into words by separators
-	var outstr=instr.convert(sepchars,str(VM,sepchars.length()));
+	var outstr=instr.convert(sepchars,str(VM,sepchars.len()));
 
 	//remove stop words
 	if (mode) {

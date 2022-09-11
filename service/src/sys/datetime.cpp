@@ -43,7 +43,7 @@ function main(in type, in inx, in mode, out outx) {
 			in2 = 86400 * ("." ^ in2);
 
 		//fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0
-		} else if (in2.length() ne 5) {
+		} else if (in2.len() ne 5) {
 			in2 = (in2 ^ "00000").substr(1, 5);
 		}
 

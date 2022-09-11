@@ -975,7 +975,7 @@ nextfiles:
 
 		//get the file time
 		var filename0 = filenamesx.field(FM, 1);
-		filenamesx.splicer(1, filenamesx.field(FM, 1).length() + 1, "");
+		filenamesx.splicer(1, filenamesx.field(FM, 1).len() + 1, "");
 
 		var filename = inpath ^ filename0;
 

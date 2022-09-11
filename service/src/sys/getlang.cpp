@@ -124,7 +124,7 @@ exit:
 		nn = custlang.count(FM) + 1;
 		for (const var fn : range(1, nn)) {
 			var tt = custlang.f(fn);
-			if (tt.length()) {
+			if (tt.len()) {
 				if (tt eq "\"\"") {
 					tt = "";
 				}

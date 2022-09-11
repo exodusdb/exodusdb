@@ -47,26 +47,26 @@
 			try {                                                                                               \
 				result = exodusprogram1.main().toInt();                                                         \
 			} catch (const MVStop& exceptionx) {                                                                \
-				if (exceptionx.description.length())                                                            \
+				if (exceptionx.description.len())                                                               \
 					exceptionx.description.outputl();                                                           \
 				if (exceptionx.description.isnum())                                                             \
 					result = exceptionx.description.toInt();                                                    \
 			} catch (const MVAbort& exceptionx) {                                                               \
-				if (exceptionx.description.length())                                                            \
+				if (exceptionx.description.len())                                                               \
 					exceptionx.description.errputl();                                                           \
 				if (exceptionx.description.isnum() && exceptionx.description)                                   \
 					result = exceptionx.description;                                                            \
 				else                                                                                            \
 					result = 1;                                                                                 \
 			} catch (const MVAbortAll& exceptionx) {                                                            \
-				if (exceptionx.description.length())                                                            \
+				if (exceptionx.description.len())                                                               \
 					exceptionx.description.errputl();                                                           \
 				if (exceptionx.description.isnum() && exceptionx.description)                                   \
 					result = exceptionx.description.toInt();                                                    \
 				else                                                                                            \
 					result = 2;                                                                                 \
 			} catch (const MVLogoff& exceptionx) {                                                              \
-				if (exceptionx.description.length())                                                            \
+				if (exceptionx.description.len())                                                               \
 					exceptionx.description.outputl();                                                           \
 				if (exceptionx.description.isnum())                                                             \
 					result = exceptionx.description.toInt();                                                    \

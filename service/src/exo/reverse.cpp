@@ -19,7 +19,7 @@ function main(in input0) {
 /*
 	//c sys
 	//linemark
-	if (input0.length() == 0) {
+	if (input0.len() == 0) {
 		return input0;
 	}
 

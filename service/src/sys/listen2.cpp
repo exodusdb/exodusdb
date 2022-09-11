@@ -743,7 +743,7 @@ validateexit2:
 					text.swapper("username and/or ", "");
 
 					var tt = text.field("|", 1);
-					if (tt.length() gt 80) {
+					if (tt.len() gt 80) {
 						tt.splicer(81, 999999, "...");
 					}
 
@@ -777,7 +777,7 @@ validateexit2:
 				}
 
 				//trim long user records
-				if (RECORD.length() gt 5000) {
+				if (RECORD.len() gt 5000) {
 					var nitems = RECORD.f(15).count(VM) + 1;
 					RECORD(15) = RECORD.f(15).field(VM, 1, nitems - 5);
 					RECORD(16) = RECORD.f(16).field(VM, 1, nitems - 5);
@@ -1127,7 +1127,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				}
 
 				//departmental default
-				if (not(tt2.length())) {
+				if (not(tt2.len())) {
 					tt2 = styles2.f(1, vn);
 				}
 

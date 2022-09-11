@@ -13,7 +13,7 @@ function main(in yymm) {
 	//linemark
 
 	//only convert 4 digit YYMM to YYYYMM
-	if (yymm.length() ne 4) {
+	if (yymm.len() ne 4) {
 		return yymm;
 	}
 

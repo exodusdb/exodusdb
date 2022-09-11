@@ -976,7 +976,7 @@ var var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 	// 4. convert as 1. or 3 depending on platform (word length 4 or 2 chars)
 
 	/*	std::ostringstream ss;
-		int nchars=length();
+		int nchars=size();
 		ss.flags (std::ios::right | std::ios::hex | std::ios::uppercase);
 		//ss.setbase(16) useful to set numerically instead of ios::hex
 		ss.fill('0');

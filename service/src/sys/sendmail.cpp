@@ -281,7 +281,7 @@ forcedemail:
 
 	}
 
-	msgsize += body.length();
+	msgsize += body.len();
 
 	//convert to links if attachfile is too big to email
 	//assumes attachfilename is in data dir accessible by web

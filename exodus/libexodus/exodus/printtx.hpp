@@ -50,7 +50,7 @@ subroutine printtx() {
 			printfilename.osremove();
 
 			//create a new filename
-			var ptx_filenamelen = (field2(printfilename, "\\", -1)).length();
+			var ptx_filenamelen = (field2(printfilename, "\\", -1)).len();
 			var ptx_random = var(10).pwr(15).rnd().substr(1,8);
 			printfilename.splicer(-ptx_filenamelen, ptx_filenamelen, ptx_random ^ ".htm");
 
@@ -213,7 +213,7 @@ subroutine printtx2() {
 		call osbwrite(tx, printfile,  printptr);
 	else {
 		tx.output();
-		printptr+=tx.length();
+		printptr+=tx.len();
 	}
 
 	tx = "";
@@ -244,7 +244,7 @@ subroutine convoptions(io ptx_temp) {
 			optionchars ^= optionchar;
 		}//loop;
 		var newoptions = "";
-		for (var i_ = 1; i_ <= optionchars.length(); ++i_) {
+		for (var i_ = 1; i_ <= optionchars.len(); ++i_) {
 			var optionchar = optionchars[i_];
 			if (optionchar == "T") {
 #ifdef EXO_NOHTML
@@ -274,7 +274,7 @@ subroutine convoptions(io ptx_temp) {
 			}
 		};//i_;
 		//ptx_temp[optioncharn,-len(optionchars)-2]=newoptions
-		ptx_temp.splicer(optioncharn - optionchars.length() - 1, optionchars.length() + 2, newoptions);
+		ptx_temp.splicer(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
 	}//loop;
 
 	ptx_temp.swapper("^%^", "\'");

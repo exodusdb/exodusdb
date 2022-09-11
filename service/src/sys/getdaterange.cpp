@@ -63,9 +63,9 @@ inpfromdate:
 		} else if (iuptodate eq "TOMORROW") {
 			iuptodate = var().date() + 1;
 		} else if (iuptodate.match("^\\d*D$")) {
-			iuptodate = ifromdate2 + iuptodate.substr(1, iuptodate.length() - 1);
+			iuptodate = ifromdate2 + iuptodate.substr(1, iuptodate.len() - 1);
 		} else if (iuptodate.match("^\\d*W$")) {
-			iuptodate = ifromdate2 + iuptodate.substr(1, iuptodate.length() - 1) * 7;
+			iuptodate = ifromdate2 + iuptodate.substr(1, iuptodate.len() - 1) * 7;
 		}
 	}
 

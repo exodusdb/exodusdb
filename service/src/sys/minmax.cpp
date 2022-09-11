@@ -15,7 +15,7 @@ function main(in list0, out min, out max) {
 	var result = "";
 	var start = 0;
 	bit=list0.substr2(start, term);
-	if (bit.length()) {
+	if (bit.len()) {
 		min = bit;
 		max = bit;
 	}
@@ -24,7 +24,7 @@ function main(in list0, out min, out max) {
 		///BREAK;
 		if (not term) break;
 		bit=list0.substr2(start, term);
-		if (bit.length()) {
+		if (bit.len()) {
 			if (bit lt min) {
 				min = bit;
 			}

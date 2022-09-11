@@ -129,6 +129,21 @@ function main()
 	var decomp_a="\x61\xCC\x81";//"á";
 	var compact_a="\xC3\xA1";//"á";
 
+	assert(len(decomp_a) eq 3);
+	assert(len(compact_a) eq 2);
+
+	TRACE(decomp_a)
+	TRACE(decomp_a[1])          //ASCII A
+	//TRACE(decomp_a[2])
+	//TRACE(decomp_a[3])
+	TRACE(decomp_a.substr(2,2)) //ACCENT_ON_PRIOR
+	TRACE(len(decomp_a))        // 3 bytes
+	TRACE(textlen(decomp_a))    // two unicode points. ASCII A, ACCENT_ON_PRIOR
+
+	assert(textlen(decomp_a) eq 2);
+
+	assert(textlen(compact_a) eq 1);
+
 	//should NOT compile since it has no effect
 	// and convert defined as NODISCARD
 	//decomp_a.convert("v","y");
@@ -214,7 +229,7 @@ function main()
 	var greek5x2f2=field(greek5x2,"β",2);
 	assert(greek5x2f2=="γδεα");
 	// alternative starting from byte no so doesnt work well with utf8 other than ASCII
-	assert(greek5x2f2.length()==8);
+	assert(greek5x2f2.len()==8);
 	assert(greek5x2f2.oconv("HEX")=="CEB3CEB4CEB5CEB1");
 
     var greek5x4="αβγδεαβγδεαβγδεαβγδε";
@@ -269,7 +284,7 @@ function main()
 	TRACE(offsetx);
 	//assert(testdata.osbread(testfilex,offsetx=0,1));
 	assert(testdata.osbread(testfilex,offsetx,1));
-	assert(testdata.length()==0);
+	assert(testdata.len()==0);
 	assert(testdata.oconv("HEX2")=="");
 	assert(offsetx==0);
 
@@ -277,7 +292,7 @@ function main()
 	offsetx=0;
 	testdata.osbread(testfilex,offsetx,2);
 	assert(testdata==charout);
-	assert(testdata.length()==2);
+	assert(testdata.len()==2);
 	assert(testdata.oconv("HEX2")=="CEB3");
 	assert(offsetx==2);
 
@@ -285,7 +300,7 @@ function main()
 	offsetx=0;
 	testdata.osbread(testfilex,offsetx,3);
 	assert(testdata==charout);
-	assert(testdata.length()==2);
+	assert(testdata.len()==2);
 	assert(testdata.oconv("HEX2")=="CEB3");
 	printl(offsetx);
 	assert(offsetx==2);
@@ -294,7 +309,7 @@ function main()
 	offsetx=0;
 	testdata.osbread(testfilex,offsetx,4);
 	assert(testdata==(charout^charout));
-	assert(testdata.length()==4);
+	assert(testdata.len()==4);
 	assert(testdata.oconv("HEX2")=="CEB3CEB3");
 	assert(offsetx==4);
 
@@ -302,7 +317,7 @@ function main()
 	offsetx=0;
 	testdata.osbread(testfilex,offsetx,5);
 	assert(testdata==(charout^charout));
-	assert(testdata.length()==4);
+	assert(testdata.len()==4);
 	assert(testdata.oconv("HEX2")=="CEB3CEB3");
 	assert(offsetx==4);
 
@@ -343,7 +358,7 @@ function main()
 	//read in from binary cyrillic codepage text converting to utf8
 	var utf8_allo3;
 	assert(utf8_allo3.osread("t_cp_allo.txt","ISO-8859-5"));
-	assert(utf8_allo3.length()==8);
+	assert(utf8_allo3.len()==8);
 	assert(utf8_allo3.oconv("HEX")=="D090D0BBD0BBD0BE");
 	assert(utf8_allo3=="Алло");
 
@@ -860,12 +875,12 @@ function test_codepage(in codepage, in lang) {
 	//convert to utf8
 	var as_utf8a=v256.from_codepage(codepage);
 	assert(as_utf8a != v256);
-	assert(as_utf8a.length() > v256.length());
+	assert(as_utf8a.len() > v256.len());
 
 	//convert back to codepage
 	var as_cp=as_utf8a.to_codepage(codepage);
-	printl(as_cp.length());
-	//assert(as_cp.length()==256);
+	printl(as_cp.len());
+	//assert(as_cp.len()==256);
 
 	//convert to utf8 again
 	var as_utf8b=as_cp.from_codepage(codepage);
@@ -878,7 +893,7 @@ function test_codepage(in codepage, in lang) {
 	//(only if loop back does produced 256 bytes)
 	printl(as_utf8a.substr(32));
 	printl("round trip " ^ var(as_cp == v256));
-	if (as_cp.length()==256)
+	if (as_cp.len()==256)
 		assert(as_cp == v256);
 
 	//check double trip

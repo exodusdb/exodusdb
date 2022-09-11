@@ -22,7 +22,7 @@ function main(in args1, in args2, in sep) {
 	//deal with the common elements first for speed
 	for (int ii = 1; ii <= min_nn; ++ii) {
 		//subtract arg2, if not null, from arg1
-		if (array2(ii).length())
+		if (array2(ii).len())
 			output(ii)=array1(ii)-array2(ii);
 		else
 			output(ii)=array1(ii);
@@ -32,7 +32,7 @@ function main(in args1, in args2, in sep) {
 	for (int ii = min_nn+1; ii <= max_nn; ++ii) {
 		if (ii>nn1) {
 			//array2 is longer than array1
-			if (array2(ii).length())
+			if (array2(ii).len())
 				output(ii)=-array2(ii);
 			else
 				output(ii)="";

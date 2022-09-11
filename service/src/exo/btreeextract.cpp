@@ -60,7 +60,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 nextrec:
 		var key;
 		if (readnext(key)) {
-			if (hits.length() + key.length() < maxstrsize - 30) {
+			if (hits.len() + key.len() < maxstrsize - 30) {
 				hits ^= key ^ VM;
 				goto nextrec;
 			}

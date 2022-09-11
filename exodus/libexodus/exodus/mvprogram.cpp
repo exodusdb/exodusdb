@@ -360,10 +360,10 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 							ok = !ivalue;
 							break;
 						case 17:  // STARTING ]
-							ok = reqivalues(fieldn).substr(0, ivalue.length()) == ivalue;
+							ok = reqivalues(fieldn).substr(0, ivalue.len()) == ivalue;
 							break;
 						case 18:  // ENDING [
-							ok = reqivalues(fieldn).substr(-ivalue.length()) == ivalue;
+							ok = reqivalues(fieldn).substr(-ivalue.len()) == ivalue;
 							ok = !ivalue;
 							break;
 						case 19:  //  CONTAINING []
@@ -459,7 +459,7 @@ bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, cons
 	var filename2 = filename_or_command;
 	if (filename2[-1] == ")") {
 		var options = filename2.field2(" ", -1);
-		filename2.splicer(-options.length(), 999999999, "").trimmerb();
+		filename2.splicer(-options.len(), 999999999, "").trimmerb();
 	}
 
 	//optionally get keys from filename or command
@@ -519,8 +519,8 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 		throw VarError("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
 
 	// Simple deleterecord
-	//if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
-	if (not filename_or_handle_or_command.index(" ") and key.length() != 0)
+	//if (filename_or_handle_or_command.index(" ") || key.len() == 0) {
+	if (not filename_or_handle_or_command.index(" ") and key.len() != 0)
 		return filename_or_handle_or_command.deleterecord(key);
 
 	// Complex deleterecord command
@@ -720,7 +720,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 	}
 
 	if (!options.index("U")) {
-		if (USER4.length() > 8000) {
+		if (USER4.len() > 8000) {
 			var msg2 = "Aborted MSG()>8000";
 			if (not USER4.index(msg2)) {
 				std::cout << msg2 << std::endl;
@@ -794,7 +794,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	}
 	// if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
 	if (not noadd) {
-		var lenuserprivs = SECURITY.length();
+		var lenuserprivs = SECURITY.len();
 		noadd = task[-1] == DQ or lenuserprivs > 48000;
 	}
 	var positive = task[1];
@@ -870,7 +870,7 @@ updateprivs:
 		}
 		if (not noadd) {
 			gosub readuserprivs();
-			// if (SECURITY.length() < 65000) {
+			// if (SECURITY.len() < 65000) {
 			if (true) {
 				var x = var();
 				if (not(SECURITY.f(10).locateby("A", task, taskn))) {
@@ -927,7 +927,7 @@ notallowed:
 		if (username != "EXODUS" and username != APPLICATION) {
 			gosub readuserprivs();
 			usern = (SECURITY.f(1)).count(VM) + (SECURITY.f(1) != "") + 1;
-			if (SECURITY.length() < 65000) {
+			if (SECURITY.len() < 65000) {
 				var users;
 				if (not(users.open("USERS"))) {
 					goto notallowed;
@@ -1002,7 +1002,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 	if (mode0.unassigned() || mode0 == "CAPITALISE") {
 		string2 = str0;
 		// convert @upper.case to @lower.case in string2
-		int nn = string2.length();
+		int nn = string2.len();
 		var numx = var("1234567890").index(string2[1], 1);
 		var cap = 1;
 		var wordseps;
@@ -1204,7 +1204,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 		} else if (lastchar == "}")
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
 		if (OPTIONS)
-			COMMAND.splicer(-(OPTIONS.length()), OPTIONS.length(), "");
+			COMMAND.splicer(-(OPTIONS.len()), OPTIONS.len(), "");
 		COMMAND.trimmerb(_FM);
 
 		// load the shared library file
@@ -1322,7 +1322,7 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 			}
 
 			// handle record not found and mode X
-			if (not record.length()) {
+			if (not record.len()) {
 				results.r(keyn, "");
 				continue;
 			}
@@ -2166,7 +2166,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 
 	//nothing in, nothing out
 	//unfortutely conversions like L# do convert ""
-	//if (result.length() == 0)
+	//if (result.len() == 0)
 	//	return result;
 
 	var ptr = 1;
@@ -2193,7 +2193,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 			//for speed dont call custom conversions on empty strings
 			//nothing in, nothing out
 			//Unfortunately [taghtml,td] produces output from nothing
-			//if (result.length() == 0)
+			//if (result.len() == 0)
 			//	continue;
 
 			//remove brackets
@@ -2205,7 +2205,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 			var functionname = subconversion.field(",").lcase();
 
 			// extract any params
-			var mode = subconversion.substr(functionname.length() + 2);
+			var mode = subconversion.substr(functionname.len() + 2);
 
 			var output;
 
@@ -2480,7 +2480,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 			//OUTPUT=OUTPUT FMTX
 		}
 		if (ndecs == "*" or ndecs == "X") {
-			ndecs = output.field(".", 2).length();
+			ndecs = output.field(".", 2).len();
 		}
 		if (ndecs == "BASE") {
 			//fmtx = "MD" ^ BASEFMT[3] ^ "0P";
@@ -2505,7 +2505,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 	//////
 
 	var divx = ndecs.field(",", 2);
-	if (divx.length()) {
+	if (divx.len()) {
 		ndecs = ndecs.field(",", 1);
 	}
 
@@ -2526,7 +2526,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 			plus = "";
 		}
 
-		if (input.length()) {
+		if (input.len()) {
 
 			if (divx) {
 				input1 = input1 / var(10).pwr(divx);
@@ -2540,7 +2540,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 
 			var temp = input1;
 			temp.converter("0123456789-.", "            ");
-			var numlen = input1.length() - temp.trimf().length();
+			var numlen = input1.len() - temp.trimf().len();
 			var unitx = input1.substr(numlen + 1, 99);
 			var numx = input1.substr(1, numlen);
 
@@ -2551,7 +2551,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 				//!ndecs could be X to mean no conversion at all!
 				//FMTX=@USER2[1,2]:ndecs:'0P,':z
 				if (ndecs == "") {
-					fmtx = BASEFMT.substr(1, 2) ^ numx.field(".", 2).length() ^ "0P," ^ zz;
+					fmtx = BASEFMT.substr(1, 2) ^ numx.field(".", 2).len() ^ "0P," ^ zz;
 				} else {
 					fmtx = BASEFMT.substr(1, 2) ^ ndecs ^ "0P," ^ zz;
 				}
@@ -2562,7 +2562,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 
 			}
 
-			if (output1.length()) {
+			if (output1.len()) {
 				if (var(".,").count(output1[1])) {
 					output1.splicer(1, 0, "0");
 				}
@@ -2657,7 +2657,7 @@ var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 	var maxnvs = 0;
 	for (var fn = 1; fn <= nfs; ++fn) {
 		var fieldx = input.field(FM, fn);
-		if (fieldx.length() or force) {
+		if (fieldx.len() or force) {
 			var nvs = fieldx.count(VM) + 1;
 			if (force) {
 				if (nvs > maxnvs) {
@@ -2668,7 +2668,7 @@ var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 			}
 			for (var vn = 1; vn <= maxnvs; ++vn) {
 				var cell = fieldx.field(VM, vn);
-				if (cell.length() or force) {
+				if (cell.len() or force) {
 					output.r(vn, fn, cell);
 				}
 			};	//vn;

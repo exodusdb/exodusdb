@@ -333,7 +333,7 @@ var dim::join(SV sepchar) const {
 	// find last element with any data
 	size_t nn;
 	for (nn = arraysize; nn > 0; --nn) {
-		if (data_[nn].assigned() && data_[nn].length())
+		if (data_[nn].assigned() && data_[nn].len())
 			break;
 	}
 
@@ -403,7 +403,7 @@ var dim::split(CVR str1, SV sepchar) {
 		this->redim(str1.count(sepchar) + 1);
 
 	// empty string just fills array with empty string
-	if (str1.length() == 0) {
+	if (str1.len() == 0) {
 		(*this) = "";
 		return this->nrows_;
 	}

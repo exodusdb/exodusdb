@@ -23,7 +23,7 @@ function main(in multipliers1, in multipliers2, in sep) {
 	for (int ii = 1; ii <= min_nn; ++ii) {
 		//return nulls where both nulls
 		//otherwise multiply, treating nulls as zeros
-		if (array1(ii).length() and array2(ii).length()) {
+		if (array1(ii).len() and array2(ii).len()) {
 			output(ii)=array1(ii)*array2(ii);
 		} else {
 			output(ii)="";
@@ -36,13 +36,13 @@ function main(in multipliers1, in multipliers2, in sep) {
 		//return zeros otherwise
 		if (ii>nn1) {
 			//array2 is longer than array1
-			if (array2(ii).length())
+			if (array2(ii).len())
 				output(ii)=0;
 			else
 				output(ii)="";
 		} else {
 			//array1 is longer than array2
-			if (array1(ii).length())
+			if (array1(ii).len())
 				output(ii)=0;
 			else
 				output(ii)="";

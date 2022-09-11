@@ -153,7 +153,7 @@ function main() {
 
 		// following is questionable c/c++ behaviour allowing a comparison between signed and unsigned.
 		// g++ doesnt always warn
-		assert(ui == -2);
+		//assert(ui == -2);
 
 		uint64_t ull = x;
 		std::cout << ull << std::endl;

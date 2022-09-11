@@ -784,7 +784,7 @@ function main(in mode) {
 					userx = RECORD.f(1, usern);
 
 					newpassword = RECORD.f(4, usern);
-					if (newpassword and newpassword.length() lt 4) {
+					if (newpassword and newpassword.len() lt 4) {
 						msg = userx.quote() ^ " user password cannot be less than " ^ minpasswordchars_;
 						return invalid(msg);
 					}
@@ -1498,8 +1498,8 @@ subroutine generatepassword() {
 	consonants.converter(vowels ^ "QX", "");
 	newpassword = "";
 	for (const var ii : range(1, minpasswordchars_ / 2)) {
-		newpassword ^= consonants[consonants.length().rnd() + 1];
-		newpassword ^= vowels[vowels.length().rnd() + 1];
+		newpassword ^= consonants[consonants.len().rnd() + 1];
+		newpassword ^= vowels[vowels.len().rnd() + 1];
 	} //ii;
 	return;
 }
@@ -1639,12 +1639,12 @@ subroutine getemailtx() {
 				if (old) {
 					old = "removed " ^ old;
 				}
-				if (not(newx.length())) {
+				if (not(newx.len())) {
 					old.transfer(newx);
 				}
 				was = "";
 			}
-			if ((newx ^ old).length()) {
+			if ((newx ^ old).len()) {
 				tx(-1) = (fieldx.f(1, 1) ^ ":").oconv("L#10");
 				tx ^= newx;
 				if (old or ((newx and not(isnew)))) {

@@ -121,7 +121,7 @@ function main(io tx, in mode="", in modevalue="") {
 			printfilename.osremove();
 
 			//create a new filename
-			var tt = (field2(printfilename, "\\", -1)).length();
+			var tt = (field2(printfilename, "\\", -1)).len();
 			var t2 = (var(10).pwr(15)).rnd().substr(1,8);
 			printfilename.splicer(-tt, tt, t2 ^ ".htm");
 
@@ -272,7 +272,7 @@ printtx2:
 		}
 	} else {
 		tx.outputl();
-		printptr+=tx.length();
+		printptr+=tx.len();
 	}
 
 	tx = "";
@@ -306,8 +306,8 @@ subroutine convoptions() {
 			optionchars ^= optionchar;
 		}
 		var newoptions = "";
-		for (var ii = 1; ii <= optionchars.length(); ii++) {
-		//for (const var ii : range(1, optionchars.length())) {
+		for (var ii = 1; ii <= optionchars.len(); ii++) {
+		//for (const var ii : range(1, optionchars.len())) {
 			var optionchar = optionchars[ii];
 			if (optionchar == "T") {
 //				newoptions ^= timedate();
@@ -332,7 +332,7 @@ subroutine convoptions() {
 			}
 		}//ii;
 		//temp[optioncharn,-len(optionchars)-2]=newoptions
-		temp.splicer(optioncharn - optionchars.length() - 1, optionchars.length() + 2, newoptions);
+		temp.splicer(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
 	}
 
 	temp.swapper("^%^", "\'");

@@ -647,7 +647,7 @@ nextrep:
 	//print repn,data<1>
 			}
 			//if len(data)<65000 then goto nextrep
-			if (data_.length() lt maxstrsize_ - 530) {
+			if (data_.len() lt maxstrsize_ - 530) {
 				goto nextrep;
 			}
 		}

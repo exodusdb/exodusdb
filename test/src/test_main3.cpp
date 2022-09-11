@@ -407,7 +407,7 @@ function main()
 		//2. full precision using VERY FAST ryu algorithm (450ns)
 		//full accuracy of ryu shows why calculations always must be rounded after every calculation because every calculation introduces more inaccuracies.
 		TRACE(var(10.0/3.0))
-		printl(var(10.0/3.0).length());
+		printl(var(10.0/3.0).len());
 
 		//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
 		//assert(var(10.0/3.0).toString() == "3.3333333333333335");

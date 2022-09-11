@@ -194,7 +194,7 @@ PUBLIC ND bool eof();
 PUBLIC bool echo(const int on_off);
 
 PUBLIC ND var len(CVR var2);
-PUBLIC ND var length(CVR var2);
+PUBLIC ND var textlen(CVR var2);
 
 PUBLIC VARREF converter(VARREF iostring, CVR oldchars, CVR newchars);
 PUBLIC ND var convert(CVR instring, CVR oldchars, CVR newchars);

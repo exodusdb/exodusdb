@@ -218,7 +218,7 @@ bool var::ossetenv(const char* envvarname) const {
 	//tempstr += "=";
 	//tempstr += toString();
 	// var(tempstr).outputl("temp std:string");
-	// std::cout<<tempstr<<" "<<tempstr.length()<<std::endl;
+	// std::cout<<tempstr<<" "<<tempstr.size()<<std::endl;
 
 	// this will NOT work reliably since putenv will NOT COPY the local (i.e. temporary)
 	// variable string

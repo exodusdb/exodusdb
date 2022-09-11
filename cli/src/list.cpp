@@ -678,7 +678,7 @@ nextkey:
 			keylist = 1;
 			ss ^= " " ^ nextword;
 			gosub getword();
-			if (nextword.length()) {
+			if (nextword.len()) {
 				goto nextkey;
 			}
 		}
@@ -782,7 +782,7 @@ nextkey:
 				if (limitx) {
 					if ((DQ ^ "'").index(word[1])) {
 						if (word[1] eq word[-1]) {
-							word = word.substr(2, word.length() - 2);
+							word = word.substr(2, word.len() - 2);
 						}
 					}
 					if (word eq "") {
@@ -890,7 +890,7 @@ nextkey:
 
 		//automatic labelling with dictionary title
 		if (word[1] eq "{") {
-			tt = word.substr(2, word.length() - 2);
+			tt = word.substr(2, word.len() - 2);
 			replacements(-1) = tt;
 			nreplacements += 1;
 			if (not(tt.reado(DICT, tt))) {
@@ -996,7 +996,7 @@ nextkey:
 	} else if (word eq "EMAIL_CC") {
 		gosub getword();
 		if ((DQ ^ "'").index(word[1])) {
-			emailcc = word.substr(2, word.length() - 2);
+			emailcc = word.substr(2, word.len() - 2);
 			nextemailcc = emailcc;
 		} else {
 			emailccid = word;
@@ -1005,7 +1005,7 @@ nextkey:
 	} else if (word eq "EMAIL_SUBJECT") {
 		gosub getword();
 		if ((DQ ^ "'").index(word[1])) {
-			emailsubject = word.substr(2, word.length() - 2);
+			emailsubject = word.substr(2, word.len() - 2);
 			nextemailsubject = emailsubject;
 		} else {
 			emailsubjectid = word;
@@ -1040,8 +1040,8 @@ nextkey:
 			if (dictrec.f(10)) {
 				let titles = dictrec.f(3).convert(VM, FM);
 				for (let part : titles) {
-					if (part.length() gt dictrec.f(10)) {
-						dictrec(10) = part.length();
+					if (part.len() gt dictrec.f(10)) {
+						dictrec(10) = part.len();
 					}
 				};	//ii;
 			}
@@ -1113,7 +1113,7 @@ nextkey:
 						for (tt += 1; tt <= 9999; ++tt) {
 							charx = word[tt];
 							///BREAK;
-							if (not(charx.length() and var("0123456789,").index(charx)))
+							if (not(charx.len() and var("0123456789,").index(charx)))
 								break;
 							tt2 ^= charx;
 						};	//tt;
@@ -1189,7 +1189,7 @@ x1exit:
 			crtx = 1;
 			sentencex ^= " " ^ word;
 			//charn-=2
-			charn = sentencex.length() - word.length();
+			charn = sentencex.len() - word.len();
 			goto nextphrase;
 		}
 	}
@@ -1265,7 +1265,7 @@ x1exit:
 				colul ^= ulchar.str(coldict(coln).f(10)) ^ " ";
 			}
 		};	//coln;
-		bar = ulchar.str(colul.length() - 1);
+		bar = ulchar.str(colul.len() - 1);
 	}
 
 	//////
@@ -1654,7 +1654,7 @@ nextrec:
 	if (not(MV)) {
 		//watch out that 200 is equal to 200.0 etc and would be skipped!!!
 		if (ID eq lastid) {
-			if (ID.length() eq lastid.length()) {
+			if (ID.len() eq lastid.len()) {
 				goto nextrec;
 			}
 		}
@@ -1665,7 +1665,7 @@ nextrec:
 	//	goto nextrec;
 	//}
 	//RECORD.errputl("RECORD=");
-	if (not(RECORD.length()) and not(RECORD.read(srcfile, ID))) {
+	if (not(RECORD.len()) and not(RECORD.read(srcfile, ID))) {
 		goto nextrec;
 	}
 
@@ -1683,7 +1683,7 @@ nextrec:
 			for (fnn = 1; fnn <= nfns; ++fnn) {
 				fn = fns.f(1, 1, fnn);
 				tt = RECORD.f(fn);
-				if (tt.length()) {
+				if (tt.len()) {
 					tt = tt.count(VM) + 1;
 					if (tt gt nmvs) {
 						nmvs = tt;
@@ -1909,7 +1909,7 @@ recexit:
 					if (tt.substr(1, 2) eq("\x1B"
 										   "\x1B")) {
 						tt = tt.field(" ", 2, 999999);
-						if (tt.length()) {
+						if (tt.len()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
 						} else {
 							//tx1:=td:nbsp:tdx
@@ -1920,7 +1920,7 @@ recexit:
 						//TODO do with class? to save document space?
 						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).substr(2, 9999) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
-						if (tt.length()) {
+						if (tt.len()) {
 							tx1 ^= tt ^ tdx;
 						} else {
 							//tx1:=nbsp:tdx
@@ -1929,7 +1929,7 @@ recexit:
 					}
 
 				} else {
-					if (tt.length()) {
+					if (tt.len()) {
 						tx1 ^= tdz ^ tt ^ tdx;
 					} else {
 						//tx1:=tdz:nbsp:tdx
@@ -2083,7 +2083,7 @@ getnextword:
 	////////////
 	gosub getword2();
 
-	if (word.length()) {
+	if (word.len()) {
 		if (ignorewords.f(1).locate(word, xx)) {
 			goto getnextword;
 		}
@@ -2133,7 +2133,7 @@ getword2b:
 		if (not(sentencex[charn] eq " "))
 			break;
 		charn += 1;
-		if (charn gt sentencex.length()) {
+		if (charn gt sentencex.len()) {
 			return;
 		}
 	}  //loop;
@@ -2214,7 +2214,7 @@ maindict:
 		if (dictrec.f(1) eq "G") {
 			tt = dictrec.f(3);
 			tt.converter(VM, " ");
-			sentencex.splicer(startcharn, word.length(), tt);
+			sentencex.splicer(startcharn, word.len(), tt);
 			charn = startcharn - 1;
 			wordn -= 1;
 			wordexpanded = 1;
@@ -2468,7 +2468,7 @@ subroutine printbreaks() {
 
 				tx ^= cell ^ thx;
 				//if len(cell) then if cell<>nbsp then anycell=1
-				if (cell.length()) {
+				if (cell.len()) {
 					anycell = 1;
 				}
 			}
@@ -2562,10 +2562,10 @@ subroutine printbreaks() {
 subroutine addstr() {
 
 	str3 = str2;
-	if (str3.length() lt str1.length()) {
-		str3 ^= (str1.length() - str2.length()).space();
+	if (str3.len() lt str1.len()) {
+		str3 ^= (str1.len() - str2.len()).space();
 	}
-	for (ii = 1; ii <= str1.length(); ++ii) {
+	for (ii = 1; ii <= str1.len(); ++ii) {
 		char1 = str1.at(ii).trim();
 		if (char1 ne "") {
 			char2 = str3[ii];
@@ -2609,7 +2609,7 @@ subroutine emailing() {
 	}
 
 	if ((DQ ^ "'").index(emailtoid[1])) {
-		nextemailto = emailtoid.substr(2, emailtoid.length() - 2);
+		nextemailto = emailtoid.substr(2, emailtoid.len() - 2);
 	} else {
 		nextemailto = calculate(emailtoid);
 	}

@@ -16,7 +16,7 @@ function main() {
 
 	if (SENTENCE.index("(")) {
 		options = field2(SENTENCE, "(", -1);
-		SENTENCE.splicer(-options.length() - 1, 9999, "");
+		SENTENCE.splicer(-options.len() - 1, 9999, "");
 		SENTENCE.trimmerb();
 	} else {
 		options = "";
@@ -126,7 +126,7 @@ next:
 		var cleartovalue2 = cleartovalue;
 		if (cleartovalue[1] eq "{") {
 			if (cleartovalue[-1] eq "}") {
-				cleartovalue2 = calculate(cleartovalue.substr(2, cleartovalue.length() - 2));
+				cleartovalue2 = calculate(cleartovalue.substr(2, cleartovalue.len() - 2));
 			}
 		}
 

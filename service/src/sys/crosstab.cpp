@@ -280,7 +280,7 @@ nextmv:
 		}
 	}
 
-	if (datafield.length() eq 0) {
+	if (datafield.len() eq 0) {
 		datavals = 1;
 	} else if (datafield.match("^\\d*$")) {
 		datavals = RECORD.f(datafield);
@@ -338,7 +338,7 @@ nextmv:
 
 		//determine which row to add into
 		if (not(allrowvals.f(1).locateby("AL", rowval, rown))) {
-			if (allrowvals.length() + rowval.length() gt 65000) {
+			if (allrowvals.len() + rowval.len() gt 65000) {
 toobig:
 				clearselect();
 				msg = "Crosstab too complex. Please simplify your request.";
@@ -359,12 +359,12 @@ toobig:
 			colval = colvals.f(1, colvaln);
 			if (not(allcolvals.f(1).locateby(colorder, colval, coln))) {
 				ncols += 1;
-				if (allcolvals.length() + colval.length() gt 65000) {
+				if (allcolvals.len() + colval.len() gt 65000) {
 					goto toobig;
 				}
 				allcolvals.inserter(1, coln, colval);
 
-				if (output.length() + nrows * 2 gt 65000) {
+				if (output.len() + nrows * 2 gt 65000) {
 					goto toobig;
 				}
 
@@ -374,7 +374,7 @@ toobig:
 				} //rownx;
 			}
 
-			if (output.length() + datavals.length() gt 6500) {
+			if (output.len() + datavals.len() gt 6500) {
 				goto toobig;
 			}
 
@@ -426,7 +426,7 @@ exit:
 	}
 
 	for (rown = 1; rown <= nrows; ++rown) {
-		if (output.length() + allrowvals.length() gt 65000) {
+		if (output.len() + allrowvals.len() gt 65000) {
 			goto toobig;
 		}
 		output(rown + 1, 1) = allrowvals.f(1, rown);
