@@ -1,9 +1,8 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
 #include <exodus/program.h>
 programinit()
-
 
 	// Sadly "Non-static data members can only be initialized with member initializer list or with a default member initializer."
 	// dim ww(100);
@@ -11,19 +10,19 @@ programinit()
 	//
 	// Compiles but initializes to 0
 	//
-	dim ww{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	dim registerx{0,0,0,0,0,0,0,0,0,0};
-	//
-	// Solution is to use default constructor and dimension in a default constructor of this common array
-	//
-	//dim ww;
-	//dim registerx;
-	//
-	// Default constructor to properly dimension the dim arrays
-	//ExodusProgram() {
-	//	ww.redim(100);
-	//	registerx.redim(10);
-	//}
+	dim ww{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+dim registerx{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//
+// Solution is to use default constructor and dimension in a default constructor of this common array
+//
+//dim ww;
+//dim registerx;
+//
+// Default constructor to properly dimension the dim arrays
+//ExodusProgram() {
+//	ww.redim(100);
+//	registerx.redim(10);
+//}
 
 function main() {
 
@@ -31,17 +30,16 @@ function main() {
 
 	{
 		// Empty array is allowed
-		dim d0(0,0);
+		dim d0(0, 0);
 		assert(d0.join() eq "");
 
-		d0.redim(2,2);
+		d0.redim(2, 2);
 		d0 = "x";
 		assert(d0.join() eq "x^x^x^x"_var);
 
 		// Redim to empty array is allowed
-		d0.redim(0,0);
+		d0.redim(0, 0);
 		assert(d0.join() eq "");
-
 	}
 	{
 		// wll not compile since assignment function returns void
@@ -52,8 +50,8 @@ function main() {
 		// Try to constuct dim from a temporary but
 		// Doesnt work due to excellent RVO
 
-		dim d1 = dim(2,3);
-		dim d2(dim(2,3));
+		dim d1 = dim(2, 3);
+		dim d2(dim(2, 3));
 
 		// var::split returns a dim but RVO results in it being constructed in place
 		dim d3 = var("aaaa").split();
@@ -65,37 +63,36 @@ function main() {
 		dim d6(split("aa^bb"_var));
 		assert(d6.join() eq "aa" _FM "bb");
 
-		std::vector<dim> vofdims {dim(0), dim(0)};
-
+		std::vector<dim> vofdims{dim(0), dim(0)};
 	}
 
 	{
 		dim d1(0);
-		dim d2(0,0);
-		dim d3(0,1);
-		dim d4(0,2);
+		dim d2(0, 0);
+		dim d3(0, 1);
+		dim d4(0, 2);
 		d1 = "x";
 		d2 = "x";
 		d3 = "x";
 		d4 = "x";
-		assert(join(d1) == "");
-		assert(join(d2) == "");
-		assert(join(d3) == "");
-		assert(join(d4) == "");
+		assert(join(d1)          eq "");
+		assert(join(d2)          eq "");
+		assert(join(d3)          eq "");
+		assert(join(d4)          eq "");
 	}
 	{
 		dim d1(0);
-		dim d2(0,0);
-		dim d3(1,0);
-		dim d4(2,0);
+		dim d2(0, 0);
+		dim d3(1, 0);
+		dim d4(2, 0);
 		d1 = "x";
 		d2 = "x";
 		d3 = "x";
 		d4 = "x";
-		assert(join(d1) == "");
-		assert(join(d2) == "");
-		assert(join(d3) == "");
-		assert(join(d4) == "");
+		assert(join(d1)          eq "");
+		assert(join(d2)          eq "");
+		assert(join(d3)          eq "");
+		assert(join(d4)          eq "");
 	}
 	{
 		//dim_iter
@@ -103,19 +100,21 @@ function main() {
 		d1.split("aa" _FM "bb");
 		var count = 0;
 		for (var v1 : d1) {
-		//for (var& v1 : d1) {
+			//for (var& v1 : d1) {
 			count++;
 			assert(count ne 1 or v1 eq "aa");
 			assert(count ne 2 or v1 eq "bb");
 			if (count eq 2)
-				v1 = "cc"; //will have no effect on d1
+				v1 = "cc";	//will have no effect on d1
 		}
 		TRACE(d1.join());
 
-		assert(d1.join().dump() eq "aa" _FM "bb");//default separator is FM
-		assert(d1.join("").dump() eq "aa" "bb");//sep can be ""
-		assert(d1.join("Δ").dump() eq "aaΔbb");//sep can be multibyte UTF8
-		assert(d1.join("XYZ").dump() eq "aaXYZbb");//sep can be multichar
+		assert(d1.join().dump() eq "aa" _FM "bb");	//default separator is FM
+		assert(d1.join("").dump() eq
+			   "aa"
+			   "bb");								 //sep can be ""
+		assert(d1.join("Δ").dump() eq "aaΔbb");		 //sep can be multibyte UTF8
+		assert(d1.join("XYZ").dump() eq "aaXYZbb");	 //sep can be multichar
 	}
 
 	{
@@ -124,35 +123,34 @@ function main() {
 	}
 
 	{
-		dim d1(3,2);
+		dim d1(3, 2);
 		d1 = "x";
-		assert(d1(1,1) eq "x");
-		assert(d1(2,1) eq "x");
-		assert(d1(3,1) eq "x");
-		assert(d1(1,2) eq "x");
-		assert(d1(2,2) eq "x");
-		assert(d1(3,2) eq "x");
+		assert(d1(1, 1) eq "x");
+		assert(d1(2, 1) eq "x");
+		assert(d1(3, 1) eq "x");
+		assert(d1(1, 2) eq "x");
+		assert(d1(2, 2) eq "x");
+		assert(d1(3, 2) eq "x");
 
-		const dim d2 = {1,2,3,4,5,6};
-		assert(d2(6,1) eq 6);
+		const dim d2 = {1, 2, 3, 4, 5, 6};
+		assert(d2(6, 1) eq 6);
 
-		const dim d3 = {1,2,3,4,5,6};
-		assert(d2(6,1) eq 6);
+		const dim d3 = {1, 2, 3, 4, 5, 6};
+		assert(d2(6, 1) eq 6);
 
 		d1(0, 0) = "qwe";
-		assert(d1(0,0) eq "qwe");
+		assert(d1(0, 0) eq "qwe");
 
 		//const dim d4 = {{1,2},{3,4},{5,6}};
 		//assert(d2(6,1) eq 6);
-
 	}
 	{
 		// Cannot dim(0,0)
-		dim d1(1,1);
+		dim d1(1, 1);
 		// But can redim(0,0) to clear all data
-		d1.redim(0,0);
+		d1.redim(0, 0);
 		//empty dim() join returns ""
-		assert(d1.join() eq "");
+		assert(d1.join()         eq "");
 	}
 	{
 		dim d1;
@@ -164,16 +162,16 @@ function main() {
 			assert(count ne 1 or v1 eq "aa");
 			assert(count ne 2 or v1 eq "bb");
 			if (count eq 2)
-				v1 = "cc"; //will update d1
+				v1 = "cc";	//will update d1
 		}
 		TRACE(d1.join());
-		assert(d1.join() eq "aa" _FM "cc");//d1 updated
+		assert(d1.join() eq "aa" _FM "cc");	 //d1 updated
 	}
 
 	{
 
 		// Construct from list
-		dim d1 = {1,2,3};
+		dim d1 = {1, 2, 3};
 		assert(d1.join() eq "1^2^3"_var);
 
 		// Copy construction (from lvalue)
@@ -192,65 +190,64 @@ function main() {
 		d3 = d2;
 		assert(d1.join() eq "1^2^3"_var);
 
-//		assert(d1 eq d2);
-//		assert(d1 ne d3);
-
+		//		assert(d1 eq d2);
+		//		assert(d1 ne d3);
 	}
 
 	dim a9;
 	var a10;
 	//check global split returns number of elements and an array out
-	a9 = split("xx"^FM^"bb");
+	a9 = split("xx" ^ FM ^ "bb");
 	TRACE(a9.rows());
 	assert(a9.rows() eq 2);
 	//check join returns correct string
-	assert(join(a9) eq ("xx" ^FM^ "bb"));
+	assert(join(a9) eq("xx" ^ FM ^ "bb"));
 
 	dim dx(3);
 	//assign all elements to one value
-	dx=1;
+	dx = 1;
 	//check join
-	assert(dx.join().outputl()==(1^FM^1^FM^1));
+	assert(dx.join().outputl() eq (1 ^ FM ^ 1 ^ FM ^ 1));
 
 	//test dim=var.split()
-	dim a=var("abc" _FM "def").split();
-	assert(a(2) == "def");
+	dim a = var("abc" _FM "def").split();
+	assert(a(2) eq "def");
 
 	//dim.split(stringvar)
 	dim a12(4);
 	//test not enough fields - initialises rest of array elements to ""
 	assert(a12.split("a" _FM "b"));
-	assert(a12(2) == "b");
-	assert(a12(3) == "");
-	assert(a12(4) == "");
+	assert(a12(2) eq "b");
+	assert(a12(3) eq "");
+	assert(a12(4) eq "");
 	//test extra fields are forced into last element
 	assert(a12.split("a" _FM "b" _FM "c" _FM "d" _FM "e"));
-	assert(a12(2) == "b");
-	assert(a12(3) == "c");
-	assert(a12(4) == "d" _FM "e");
+	assert(a12(2) eq "b");
+	assert(a12(3) eq "c");
+	assert(a12(4) eq "d" _FM "e");
 
 	//test sort and reverse sort
 	dim a13 = var("10" _FM "2" _FM "1" _FM "20" _FM "-2").split();
 	//printl(a13.join());
-	assert(a13.join("^") == "10^2^1^20^-2");
+	assert(a13.join("^") eq "10^2^1^20^-2");
 	a13.sort();
 	//printl(a13.join());
-	assert(a13.join("^") == "-2^1^2^10^20");
+	assert(a13.join("^") eq "-2^1^2^10^20");
 	a13.sort(true);
 	//printl(a13.join());
-	assert(a13.join("^") == "20^10^2^1^-2");
+	assert(a13.join("^") eq "20^10^2^1^-2");
 
 	dim a11(10);
-	a11 = "1";//fill all with 1
-	assert(a11(1) == 1);
-	assert(a11(10) == 1);
-	a11.split("");//fill all with "" TODO should this not just make an array of 1 element?
-	assert(a11(1) == "");
-	assert(a11(10) == "");
+	a11 = "1";	//fill all with 1
+	assert(a11(1)  eq 1);
+	assert(a11(10) eq 1);
+	a11.split("");	//fill all with "" TODO should this not just make an array of 1 element?
+	assert(a11(1)  eq "");
+	assert(a11(10) eq "");
 
 	//test redimensioning
 	dim aaaa(10);
-	aaaa.redim(20,30);
+	aaaa.redim(20, 30);
 
 	//c array
 	var r[2];
@@ -258,76 +255,76 @@ function main() {
 	//dim array
 	assert(unassigned(r[0]));
 
-	dim a7(2,3);
+	dim a7(2, 3);
 
 	for (int ii = 1; ii <= 2; ++ii) {
 		for (int jj = 1; jj <= 3; ++jj) {
-			a7(ii,jj)=ii^var(".")^jj;
+			a7(ii, jj) = ii ^ var(".") ^ jj;
 		}
 	}
 
-	dim a8(4,5);
+	dim a8(4, 5);
 	for (int ii = 1; ii <= 4; ++ii) {
 		for (int jj = 1; jj <= 5; ++jj) {
-			a8(ii,jj)=ii^var(".")^jj;
+			a8(ii, jj) = ii ^ var(".") ^ jj;
 		}
 	}
-	a8=2.2;
+	a8 = 2.2;
 
 	for (int ii = 1; ii <= 4; ++ii) {
 		for (int jj = 1; jj <= 5; ++jj) {
-			a8(ii,jj).outputt("=");
+			a8(ii, jj).outputt("=");
 		}
-//		printl();
+		//		printl();
 	}
 
-	a8=a7;
+	a8 = a7;
 
-	for (int ii =1 ; ii <= 2; ++ii) {
+	for (int ii = 1; ii <= 2; ++ii) {
 		for (int jj = 1; jj <= 3; ++jj) {
-			a8(ii,jj).outputt("=");
-			assert(a8(ii,jj)==a7(ii,jj));
-//		printl();
+			a8(ii, jj).outputt("=");
+			assert(a8(ii, jj) eq a7(ii, jj));
+			//		printl();
 		}
 	}
 	printl();
 
-	assert(a7.split("xx"^FM^"bb") eq 2);
-	assert(a7(1) eq "xx");
-	assert(a7(2) eq "bb");
-	assert(a7.join() eq ("xx"^FM^"bb"));
+	assert(a7.split("xx" ^ FM ^ "bb") eq 2);
+	assert(a7(1)                      eq "xx");
+	assert(a7(2)                      eq "bb");
+	assert(a7.join() eq("xx" ^ FM ^ "bb"));
 
-	dim arrx(2,2),arry;
-	arrx = "";
-	arrx(1,1)="11";
-	assert(arrx(1,1) eq "11");
-	arrx(1,2)=arrx(1,1);
-	assert(arrx(1,2) eq "11");
-	arry=arrx;
-	assert(arry(1,2) eq "11");
+	dim arrx(2, 2), arry;
+	arrx	   = "";
+	arrx(1, 1) = "11";
+	assert(arrx(1, 1) eq "11");
+	arrx(1, 2) = arrx(1, 1);
+	assert(arrx(1, 2) eq "11");
+	arry = arrx;
+	assert(arry(1, 2) eq "11");
 
 	//using mv dimensioned arrays
 	//mv dimensioned arrays have a zero element that is
 	//used in case either or both of the indexes are zero
-	dim arr1(3), arr2(3,3);
-	arr1(0)=0;
-	arr1(0,0)=0;
+	dim arr1(3), arr2(3, 3);
+	arr1(0)	   = 0;
+	arr1(0, 0) = 0;
 	for (int ii = 1; ii <= 3; ++ii) {
-		arr1(ii)=ii;
+		arr1(ii) = ii;
 		for (int jj = 1; jj <= 3; ++jj) {
-			arr2(ii,jj)=ii*3+jj;
+			arr2(ii, jj) = ii * 3 + jj;
 		}
 	}
-	assert(arr1(0) eq "0");
-	assert(arr1(0,0) eq "0");
+	assert(arr1(0)        eq "0");
+	assert(arr1(0, 0)     eq "0");
 	for (int ii = 1; ii <= 3; ++ii) {
-		assert(arr1(ii) eq ii);
+		assert(arr1(ii)      eq ii);
 		for (int jj = 1; jj <= 3; ++jj) {
-			assert(arr2(ii,jj) eq ii*3+jj);
+			assert(arr2(ii, jj) eq ii * 3 + jj);
 		}
 	}
 
-/* 
+	/* 
 	//using c arrays UNSAFE! USE exodus dim INSTEAD;
 	var arrxxx[10];
 
@@ -342,28 +339,28 @@ function main() {
 
 	//another sort test
 
-	var array="";
+	var array = "";
 
-	array(3) =  1  ^VM ^2  ^VM ^20  ^VM ^10;
-	array(6) =  61 ^VM ^62 ^VM ^620 ^VM ^610;
-	array(7) =  71 ^VM ^72 ^VM ^720 ^VM ^710;
+	array(3) = 1 ^ VM ^ 2 ^ VM ^ 20 ^ VM ^ 10;
+	array(6) = 61 ^ VM ^ 62 ^ VM ^ 620 ^ VM ^ 610;
+	array(7) = 71 ^ VM ^ 72 ^ VM ^ 720 ^ VM ^ 710;
 
-	array.convert(VM^FM,"]\n").outputl();
+	array.convert(VM ^ FM, "]\n").outputl();
 
-	call sortarray(array,3 ^ VM ^ 7 ^ VM ^ 6,"DR");
+	call sortarray(array, 3 ^ VM ^ 7 ^ VM ^ 6, "DR");
 
 	printl("-------------------");
-	array.convert(VM^FM ,"]\n").outputl();
+	array.convert(VM ^ FM, "]\n").outputl();
 
-	converter(array,VM,"]");
-	assert(array.f(3)=="20]10]2]1");
-	assert(array.f(6)=="620]610]62]61");
-	assert(array.f(7)=="720]710]72]71");
+	converter(array, VM, "]");
+	assert(array.f(3) eq "20]10]2]1");
+	assert(array.f(6) eq "620]610]62]61");
+	assert(array.f(7) eq "720]710]72]71");
 
 	//test reading and writing text files into and from dim arrays
 	{
-		var osfilename="t_dim_rw.txt";
-		var txt = "a\nb\n\nc";
+		var osfilename = "t_dim_rw.txt";
+		var txt		   = "a\nb\n\nc";
 		assert(oswrite(txt on osfilename));
 
 		// test reading a test file into a dim array
@@ -384,7 +381,13 @@ function main() {
 
 		printl("Make a wintext file");
 		var temposfilename = ostempfilename().dump();
-		var wintext = "aaa\r\n" "bbb\r\n" "ccc\r\n" "ddd\r\n" "eee" "\r\n";
+		var wintext =
+			"aaa\r\n"
+			"bbb\r\n"
+			"ccc\r\n"
+			"ddd\r\n"
+			"eee"
+			"\r\n";
 		assert(oswrite(wintext on temposfilename));
 
 		printl("read wintext into dim array");
@@ -443,12 +446,11 @@ function main() {
 
 		//check join trims trailing FM
 		assert(x.join() eq "");
-
 	}
 
 	//constr nrows, ncols
 	{
-		dim x(2,3);
+		dim x(2, 3);
 		TRACE(x.rows())
 		TRACE(x.cols())
 		assert(x.rows() eq 2);
@@ -466,7 +468,6 @@ function main() {
 
 		//check join trims trailing FM
 		assert(x.join() eq "");
-
 	}
 
 	// CONSTRUCT ASSIGN = {}
@@ -486,7 +487,7 @@ function main() {
 
 	// 2
 	{
-		dim x = {3,4};
+		dim x = {3, 4};
 		TRACE(x.rows())
 		TRACE(x.cols())
 		TRACE(x.join())
@@ -499,7 +500,7 @@ function main() {
 
 	// 3
 	{
-		dim x = {3,4,5};
+		dim x = {3, 4, 5};
 		TRACE(x.rows())
 		TRACE(x.cols())
 		TRACE(x.join())
@@ -527,7 +528,7 @@ function main() {
 
 	// 2
 	{
-		dim x{3,4};
+		dim x{3, 4};
 		TRACE(x.rows())
 		TRACE(x.cols())
 		TRACE(x.join())
@@ -540,7 +541,7 @@ function main() {
 
 	// 3
 	{
-		dim x{3,4,5};
+		dim x{3, 4, 5};
 		TRACE(x.rows())
 		TRACE(x.cols())
 		TRACE(x.join())
@@ -555,6 +556,6 @@ function main() {
 	printl("Test passed");
 
 	return 0;
-	}
+}
 
 programexit()

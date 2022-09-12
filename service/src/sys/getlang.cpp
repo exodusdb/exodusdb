@@ -62,7 +62,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 				//lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
 				var lang1line = lang1.f(fn);
 				var lang2line = lang2.f(fn);
-				var nparts = dcount(lang1line, "|");
+				var nparts = fcount(lang1line, "|");
 				if (nparts eq 1) {
 					//eg English Arabic
 					lang(fn) = (lang1line ^ " " ^ lang2line).trim();

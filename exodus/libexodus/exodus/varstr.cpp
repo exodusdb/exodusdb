@@ -2156,7 +2156,7 @@ var var::sum(SV separator) const {
 	assertString(function_sig);
 
 	var result = 0;
-	int nn = this->dcount(separator);
+	int nn = this->fcount(separator);
 
 	// static var allseparators=_ST _TM _SM _VM _FM _RM;
 	// var separatorn=allseparators.index(separator);

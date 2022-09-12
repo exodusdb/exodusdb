@@ -1726,12 +1726,12 @@ CVR var::logputl(CVR str) const {
 }
 
 ////////
-// DCOUNT
+// FCOUNT
 ////////
 // TODO make a char and char version for speed
-var var::dcount(SV substrx) const {
+var var::fcount(SV substrx) const {
 
-	THISIS("var var::dcount(SV substrx) const")
+	THISIS("var var::fcount(SV substrx) const")
 	assertString(function_sig);
 	//ISSTRING(substrx)
 
@@ -1744,13 +1744,13 @@ var var::dcount(SV substrx) const {
 	return this->count(substrx) + 1;
 }
 
-///////
+////////
 // COUNT
-///////
+////////
 
 var var::count(SV substrx) const {
 
-	THISIS("var var::count(CVR substrx) const")
+	THISIS("var var::count(SV substrx) const")
 	assertString(function_sig);
 
 	if (substrx.empty())
@@ -1772,21 +1772,71 @@ var var::count(SV substrx) const {
 	}
 }
 
+////////
+// INDEX
+////////
+
+//// 1 based starting byte no of an occurrence or 0 if not present
+//var var::index(SV substrx) const {
+//	return this->index2(substrx, 1);
+//}
+
 // 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
-var var::index2(CVR substrx, const int startchar1) const {
+var var::index(SV substrx, const int startindex) const {
 
-	THISIS("var var::index2(CVR substrx,const int startchar1) const")
+	THISIS("var var::index(SV substrx,const int startindex) const")
 	assertString(function_sig);
-	ISSTRING(substrx)
 
-	if (substrx.var_str.empty())
+	if (substrx.empty())
 		return "";
 
 	// find the starting position of the field or return ""
-	std::string::size_type start_pos = startchar1 - 1;
-	start_pos = var_str.find(substrx.var_str, start_pos);
+	std::string::size_type start_pos = startindex - 1;
+	start_pos = var_str.find(substrx, start_pos);
 
-	// past of of string?
+	// not found, return 0
+	if (start_pos == std::string::npos)
+		return 0;
+
+	return var(static_cast<int>(start_pos) + 1);
+}
+
+// reverse search
+// 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
+var var::indexr(SV substrx, const int startindex) const {
+
+	THISIS("var var::indexr(SV substrx,const int startindex) const")
+	assertString(function_sig);
+
+	if (substrx.empty())
+		return "";
+
+	std::string::size_type start_pos;
+
+	if (startindex == 0) {
+		start_pos = std::string::npos;
+	}
+	else if (startindex > 0) {
+		//if (static_cast<std::size_t>(startindex) > var_str.size())
+	      //  start_pos = std::string::npos;
+    	//else
+			start_pos = startindex - 1;
+	}
+	else if (startindex < 1) {
+
+		// prevent negative index starting before beginning of string
+		// e.g. -startindex(-2) > strsize(1) is true
+		if (static_cast<std::size_t>(-startindex) > var_str.size())
+			return 0;
+
+		// e.g. startpos(0) = strsize(1) + startindex(-1)
+		start_pos = var_str.size() + startindex;
+	}
+
+	// find the starting position of the target
+	start_pos = var_str.rfind(substrx, start_pos);
+
+	// not found, return 0
 	if (start_pos == std::string::npos)
 		return 0;
 
@@ -1794,20 +1844,20 @@ var var::index2(CVR substrx, const int startchar1) const {
 }
 
 // 1 based starting byte no of an occurrence or 0 if not present
-var var::index(CVR substrx, const int occurrenceno) const {
+var var::indexn(SV substrx, const int occurrenceno) const {
 
-	THISIS("var var::index(CVR substrx,const int occurrenceno) const")
+	//THISIS("var var::index(SV substrx,const int occurrenceno) const")
+	THISIS("var var::index(SV substrx) const")
 	assertString(function_sig);
-	ISSTRING(substrx)
 
 	//TODO implement negative occurenceno as meaning backwards from the end
 	//eg -1 means the last occurrence
 
-	if (substrx.var_str.empty())
+	if (substrx.empty())
 		return "";
 
 	std::string::size_type start_pos = 0;
-	std::string::size_type substr_len = substrx.var_str.size();
+	std::string::size_type substr_len = substrx.size();
 
 	// negative and 0th occurrence mean the first
 	int countdown = occurrenceno >= 1 ? occurrenceno : 1;
@@ -1815,7 +1865,7 @@ var var::index(CVR substrx, const int occurrenceno) const {
 	for (;;) {
 
 		// find the starting position of the field or return ""
-		start_pos = var_str.find(substrx.var_str, start_pos);
+		start_pos = var_str.find(substrx, start_pos);
 
 		// past of of string?
 		if (start_pos == std::string::npos)
@@ -1864,7 +1914,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 	char sep = fieldno.len() ? VM_ : RM_;
 
 	var response = "";
-	int nmv = this->dcount(_VM);
+	int nmv = this->fcount(_VM);
 	for (int vn = 1; vn <= nmv; ++vn) {
 
 		//test every time instead of always appending and removing at the end

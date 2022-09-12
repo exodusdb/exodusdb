@@ -5,7 +5,6 @@ using exodus::var;
 
 int main() {
 
-
 	// Test we can use var.h on its own without the exodus program environment
 
 	// Only needs various include files in /usr/local/include/exodus

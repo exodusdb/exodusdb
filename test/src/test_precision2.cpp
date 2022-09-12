@@ -1,7 +1,7 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <iomanip> // for setprecision
-#include <cmath> // for nextafter
+#include <cmath>	// for nextafter
+#include <iomanip>	// for setprecision
 
 // 1. TO_CHARS from Ubuntu 22.04
 #if __GNUC__ >= 11
@@ -18,8 +18,8 @@
 #include <exodus/program.h>
 programinit()
 
-// Function to generate code to be asserted
-function print_assert(double d1, in /*v2*/) {
+	// Function to generate code to be asserted
+	function print_assert(double d1, in /*v2*/) {
 
 	printl("assert(var(", d1, ").squote().outputl() eq ", var(d1).squote().quote(), ");");
 	return true;
@@ -62,80 +62,79 @@ function main() {
 		print_assert(1.0E200, var(1E200));
 	}
 
-	{	// generated code pasted back in
+	{  // generated code pasted back in
 
-		assert(var( 1e-200 ).squote().outputl() eq  "'1e-200'" );
-		assert(var( 1e-101 ).squote().outputl() eq  "'1e-101'" );
-		assert(var( 1e-100 ).squote().outputl() eq  "'1e-100'" );
-		assert(var( 1e-99 ).squote().outputl() eq  "'1e-99'" );
-		assert(var( 1e-10 ).squote().outputl() eq  "'0.0000000001'" );
-		assert(var( 1e-09 ).squote().outputl() eq  "'0.000000001'" );
-		assert(var( 1e-08 ).squote().outputl() eq  "'0.00000001'" );
-		assert(var( 1e-07 ).squote().outputl() eq  "'0.0000001'" );
-		assert(var( 1e-06 ).squote().outputl() eq  "'0.000001'" );
-		assert(var( 1e-05 ).squote().outputl() eq  "'0.00001'" );
-		assert(var( 0.0001 ).squote().outputl() eq  "'0.0001'" );
+		assert(var(1e-200).squote().outputl() eq "'1e-200'");
+		assert(var(1e-101).squote().outputl() eq "'1e-101'");
+		assert(var(1e-100).squote().outputl() eq "'1e-100'");
+		assert(var(1e-99).squote().outputl()  eq "'1e-99'");
+		assert(var(1e-10).squote().outputl()  eq "'0.0000000001'");
+		assert(var(1e-09).squote().outputl()  eq "'0.000000001'");
+		assert(var(1e-08).squote().outputl()  eq "'0.00000001'");
+		assert(var(1e-07).squote().outputl()  eq "'0.0000001'");
+		assert(var(1e-06).squote().outputl()  eq "'0.000001'");
+		assert(var(1e-05).squote().outputl()  eq "'0.00001'");
+		assert(var(0.0001).squote().outputl() eq "'0.0001'");
 
-		assert(var( 0.001 ).squote().outputl() eq  "'0.001'" );
-		assert(var( 0.01 ).squote().outputl() eq  "'0.01'" );
-		assert(var( 0.1 ).squote().outputl() eq  "'0.1'" );
+		assert(var(0.001).squote().outputl() eq "'0.001'");
+		assert(var(0.01).squote().outputl()  eq "'0.01'");
+		assert(var(0.1).squote().outputl()   eq "'0.1'");
 
-		assert(var( 1.0 ).squote().outputl() eq  "'1'" );
-		assert(var( 10.0 ).squote().outputl() eq  "'10'" );
-		assert(var( 100.0 ).squote().outputl() eq  "'100'" );
-		assert(var( 1000.0 ).squote().outputl() eq  "'1000'" );
-		assert(var( 10000.0 ).squote().outputl() eq  "'10000'" );
-		assert(var( 100000.0 ).squote().outputl() eq  "'100000'" );
+		assert(var(1.0).squote().outputl()      eq "'1'");
+		assert(var(10.0).squote().outputl()     eq "'10'");
+		assert(var(100.0).squote().outputl()    eq "'100'");
+		assert(var(1000.0).squote().outputl()   eq "'1000'");
+		assert(var(10000.0).squote().outputl()  eq "'10000'");
+		assert(var(100000.0).squote().outputl() eq "'100000'");
 
-		assert(var( 1 ).squote().outputl() eq  "'1'" );
-		assert(var( 10 ).squote().outputl() eq  "'10'" );
-		assert(var( 100 ).squote().outputl() eq  "'100'" );
-		assert(var( 1000 ).squote().outputl() eq  "'1000'" );
-		assert(var( 10000 ).squote().outputl() eq  "'10000'" );
+		assert(var(1).squote().outputl()     eq "'1'");
+		assert(var(10).squote().outputl()    eq "'10'");
+		assert(var(100).squote().outputl()   eq "'100'");
+		assert(var(1000).squote().outputl()  eq "'1000'");
+		assert(var(10000).squote().outputl() eq "'10000'");
 
 #ifdef USE_TO_CHARS_G
 		printl();
 		//printl("DIFFERENT FORMATTING FOR INT AND DOUBLE?! to_chars(in) to_chars(double)");
 		//assert(var( 100000.0 ).squote().outputl() eq  "'1e+05'" );
-		assert(var( 100000.0 ).squote().outputl() eq  "'100000'" );
-		assert(var( 100000 ).squote().outputl() eq  "'100000'" );
+		assert(var(100000.0).squote().outputl() eq "'100000'");
+		assert(var(100000).squote().outputl()   eq "'100000'");
 
 		printl();
 #else
-		assert(var( 100000 ).squote().outputl() eq  "'100000'" );
+		assert(var(100000).squote().outputl() eq "'100000'");
 #endif
 
-		assert(var( 1e+06 ).squote().outputl() eq  "'1000000'" );
-		assert(var( 1e+07 ).squote().outputl() eq  "'10000000'" );
-		assert(var( 1e+08 ).squote().outputl() eq  "'100000000'" );
-		assert(var( 1e+09 ).squote().outputl() eq  "'1000000000'" );
-		assert(var( 1e+10 ).squote().outputl() eq  "'10000000000'" );
-		assert(var( 1e+99 ).squote().outputl() eq  "'1e+99'" );
-		assert(var( 1e+100 ).squote().outputl() eq  "'1e+100'" );
-		assert(var( 1e+101 ).squote().outputl() eq  "'1e+101'" );
-		assert(var( 1e+200 ).squote().outputl() eq  "'1e+200'" );
-
+		assert(var(1e+06).squote().outputl()  eq "'1000000'");
+		assert(var(1e+07).squote().outputl()  eq "'10000000'");
+		assert(var(1e+08).squote().outputl()  eq "'100000000'");
+		assert(var(1e+09).squote().outputl()  eq "'1000000000'");
+		assert(var(1e+10).squote().outputl()  eq "'10000000000'");
+		assert(var(1e+99).squote().outputl()  eq "'1e+99'");
+		assert(var(1e+100).squote().outputl() eq "'1e+100'");
+		assert(var(1e+101).squote().outputl() eq "'1e+101'");
+		assert(var(1e+200).squote().outputl() eq "'1e+200'");
 	}
 
 	{
 		// other tests
-		assert(var( "1000000000000000" ).isnum());
-		assert(var( "10000000000000000" ).isnum());
-		assert(var( "100000000000000000" ).isnum());
-		assert(var( "1000000000000000000" ).isnum()); //1e18 is ok for input
+		assert(var("1000000000000000").isnum());
+		assert(var("10000000000000000").isnum());
+		assert(var("100000000000000000").isnum());
+		assert(var("1000000000000000000").isnum());	 //1e18 is ok for input
 
-		printl(var( "1000000000000000000" ).toDouble()); //1e18
+		printl(var("1000000000000000000").toDouble());	//1e18
 		//printl(var( "10000000000000000000" ).toDouble()); //1e19 non-numeric
 
-		assert(!var( "10000000000000000000" ).isnum());
-		assert(!var( "100000000000000000000000000000" ).isnum());
-		assert(!var( "1000000000000000000000000000000000000000" ).isnum());
-		assert(!var( "10000000000000000000000000000000000000000000000000" ).isnum());
+		assert(!var("10000000000000000000").isnum());
+		assert(!var("100000000000000000000000000000").isnum());
+		assert(!var("1000000000000000000000000000000000000000").isnum());
+		assert(!var("10000000000000000000000000000000000000000000000000").isnum());
 
-		assert(!var( "1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ).isnum());
-		assert(!var( "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ).isnum());
-		assert(!var( "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ).isnum());
-		assert(!var( "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" ).isnum());
+		assert(!var("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").isnum());
+		assert(!var("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").isnum());
+		assert(!var("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").isnum());
+		assert(!var("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").isnum());
 	}
 
 	{

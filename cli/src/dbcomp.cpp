@@ -123,8 +123,8 @@ function main() {
 					//errputl(" ", ID, " different.");
 					//printl(RECORD);
 					//printl(rec2);
-					var nfs = dcount(RECORD, FM);
-					var nfs2 = dcount(rec2, FM);
+					var nfs = fcount(RECORD, FM);
+					var nfs2 = fcount(rec2, FM);
 					//if (nfs2 gt nfs)
 					//	nfs = nfs2;
 					for (let fn : range(1, std::max(nfs,nfs2))) {

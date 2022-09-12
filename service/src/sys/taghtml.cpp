@@ -31,18 +31,29 @@ function main(in type, in in0, in mode, out output) {
 		}
 	}
 
-	//convert "&" to &amp;
-	for (const var ii : range(1, 99999)) {
-		var charn = output.index("&", ii);
-
-		///BREAK;
-		if (not charn) break;
-
-		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",", (output.substr(charn + 1, 99999)).field(";", 1), xx))) {
-			output.splicer(charn, 1, "&amp;");
+	//convert "&" to &amp; except if already &amp; &nbsp; etc.
+//	for (const var ii : range(1, 99999)) {
+//		var charn = output.index("&", ii);
+//
+//		///BREAK;
+//		if (not charn) break;
+//
+//		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",", (output.substr(charn + 1, 10)).field(";", 1), xx))) {
+//			output.splicer(charn, 1, "&amp;");
+//		}
+//
+//	} //ii;
+	var precoded = _VM "nbsp" _VM "amp" _VM "lt" _VM "gt" _VM "infin" _VM;
+	for (var pos = 1; ; pos++) {
+		pos = output.index("&", pos);
+		if (not pos)
+			break;
+		var ss = _VM ^ output.substr(pos + 1, 10).field(";", 1) ^ _VM;
+		if (not precoded.index(ss)) {
+			output.splicer(pos + 1, 0, "amp;");
+			pos += 4;
 		}
-
-	} //ii;
+	}
 
 	//swap '<' with '&lt;' in output
 	//swap '>' with '&gt;' in output
@@ -53,5 +64,14 @@ function main(in type, in in0, in mode, out output) {
 
 	return 0;
 }
+
+//subroutine test() {
+//	// test oconv [TAGHTML]
+//	var text = "&nbsp" _VM "&amp" _VM "&lt" _VM "&gt" _VM "&infin" _VM;
+//	assert(oconv(text,"[TAGHTML,XYZ]").convert(VM,"]") eq "<XYZ>&nbsp</XYZ>]<XYZ>&amp</XYZ>]<XYZ>&lt</XYZ>]<XYZ>&gt</XYZ>]<XYZ>&infin</XYZ>]");
+//
+//	var text2 =  "&&___&amp;___&lt;___&gt&gt___&&";
+//	assert(oconv(text2,"[TAGHTML,XYZ]").convert(VM,"]").outputl() eq "<XYZ>&amp;&amp;___&amp;___&lt;___&amp;gt&amp;gt___&amp;&amp;</XYZ>");
+//}
 
 libraryexit()

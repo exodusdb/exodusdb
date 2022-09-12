@@ -34,7 +34,7 @@ function main() {
 	if (verbose)
 		EXECPATH.outputl("Executable:");
 
-	var exodusbinpath = field(EXECPATH, OSSLASH, 1, dcount(EXECPATH, OSSLASH) - 1);
+	var exodusbinpath = field(EXECPATH, OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
 
 	if (verbose)
 		exodusbinpath.outputl("Path:");
@@ -99,7 +99,7 @@ function main() {
 		//set EXO_PATH used by compile to find LIB and INCLUDE paths
 		var exoduspath = exodusbinpath;
 		if (exoduspath.field2(OSSLASH, -1) eq "bin")
-			exoduspath = field(exoduspath, OSSLASH, 1, dcount(exoduspath, OSSLASH) - 1);
+			exoduspath = field(exoduspath, OSSLASH, 1, fcount(exoduspath, OSSLASH) - 1);
 		if (exoduspath and not ossetenv("EXO_PATH", exoduspath))
 			errput("Couldnt set EXO_PATH environment variable");
 

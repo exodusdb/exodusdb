@@ -1,8 +1,8 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <exodus/program.h>
 programinit()
 
-function main() {
+	function main() {
 
 	//Pass if no default database connection
 	if (not connect()) {
@@ -13,9 +13,9 @@ function main() {
 
 	var filenames = listfiles();
 
-//	var dictconn;
-//	if (dictconn.connect("exodus")) {
-//		 ^ FM ^ connect("exodus").listfiles();
+	//	var dictconn;
+	//	if (dictconn.connect("exodus")) {
+	//		 ^ FM ^ connect("exodus").listfiles();
 
 	for (var filename : filenames.unique()) {
 		if (filename.index("xo_")) {
@@ -31,4 +31,3 @@ function main() {
 }
 
 programexit()
-

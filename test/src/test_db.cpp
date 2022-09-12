@@ -1,4 +1,4 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 //#include <sstream>
 
@@ -22,8 +22,7 @@
 
 programinit()
 
-function main()
-{
+	function main() {
 
 	//Pass if no default database connection
 	if (not connect()) {
@@ -40,24 +39,24 @@ function main()
 	}
 
 	var response;
-	assert(var().sqlexec("select exodus_extract_date_array(''||chr(29)||'1',0,0,0);",response));
-	TRACE(response.field(RM,2))
-	assert(response.field(RM,2)=="{NULL,1968-01-01}");
-	var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);",response);
+	assert(var().sqlexec("select exodus_extract_date_array(''||chr(29)||'1',0,0,0);", response));
+	TRACE(response.field(RM, 2))
+	assert(response.field(RM, 2) eq "{NULL,1968-01-01}");
+	var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);", response);
 	printl(response);
-	assert(response.field(RM,2)=="{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
+	assert(response.field(RM, 2) eq "{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
 
-	var filename="xo_test_db_temp1";
+	var filename = "xo_test_db_temp1";
 
 	printl("test open/read/write/delete on file 'DOS'");
 	var dosfile;
-	assert(open("DOS",dosfile));
-	assert(open("dos",dosfile));
-	assert(write("xyz",dosfile,"t_xyz.txt"));
-	assert(read(RECORD,dosfile,"t_xyz.txt"));
-	assert(RECORD == "xyz");
-	assert(deleterecord(dosfile,"t_xyz.txt"));
-	assert(not read(RECORD,dosfile,"t_xyz.txt"));
+	assert(open("DOS", dosfile));
+	assert(open("dos", dosfile));
+	assert(write("xyz", dosfile, "t_xyz.txt"));
+	assert(read(RECORD, dosfile, "t_xyz.txt"));
+	assert(RECORD eq "xyz");
+	assert(deleterecord(dosfile, "t_xyz.txt"));
+	assert(not read(RECORD, dosfile, "t_xyz.txt"));
 
 	var trec;
 	deletefile(filename);
@@ -68,7 +67,7 @@ function main()
 	assert(renamefile(filename ^ "_renamed", filename));
 
 	printl("Test reccount");
-	for (var recn : range(1,10))
+	for (var recn : range(1, 10))
 		write(recn on filename, recn);
 	assert(filename.reccount() eq 10);
 
@@ -118,68 +117,68 @@ function main()
 	clearselect();
 	assert(not LISTACTIVE);
 
-    //check writeo creates a cached record readable by reado but not read
+	//check writeo creates a cached record readable by reado but not read
 	{
-		var k1="tempkey";
+		var k1 = "tempkey";
 
 		//write to cache
-		var xyz="xyz";
-		assert(xyz.writeo(filename,k1));
+		var xyz = "xyz";
+		assert(xyz.writeo(filename, k1));
 
 		//ensure wasnt written to real file
-		assert(not xyz.read(filename,k1));
+		assert(not xyz.read(filename, k1));
 		//and ensure failure to read results in unassigned variable
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
 		//TRACE(xyz)
-		assert(xyz == "xyz");
+		assert(xyz eq "xyz");
 
 		//read from cache ok
-		assert(xyz.reado(filename,k1));
+		assert(xyz.reado(filename, k1));
 
 		//writing empty record to cache is like a deletion
-		xyz="";
-		assert(xyz.writeo(filename,k1));
-		assert(not xyz.reado(filename,k1));
+		xyz = "";
+		assert(xyz.writeo(filename, k1));
+		assert(not xyz.reado(filename, k1));
 		//and ensure failure to reado results in unassigned variable
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
 		//TRACE(xyz)
-		assert(xyz == "");
+		assert(xyz eq "");
 
 		//writing to real file also clears cache forcing a real reread
-		xyz="abc";
-		assert(xyz.writeo(filename,k1));
-		assert(xyz.reado(filename,k1));
-		xyz="123";
-		assert(xyz.write(filename,k1));
-		assert(xyz.reado(filename,k1));
-		assert(xyz == "123");
+		xyz = "abc";
+		assert(xyz.writeo(filename, k1));
+		assert(xyz.reado(filename, k1));
+		xyz = "123";
+		assert(xyz.write(filename, k1));
+		assert(xyz.reado(filename, k1));
+		assert(xyz eq "123");
 
 		//not testing deleteo because write and delete always call it?
 
 		//deleting a record deletes it from both real and cache file
-		assert(deleterecord(filename,k1));
-		assert(not xyz.read(filename,k1));
-		assert(not xyz.reado(filename,k1));
+		assert(deleterecord(filename, k1));
+		assert(not xyz.read(filename, k1));
+		assert(not xyz.reado(filename, k1));
 
 		//writing empty record to cache is like a deletion
-		xyz="";
-		assert(xyz.writeo(filename,k1));
+		xyz = "";
+		assert(xyz.writeo(filename, k1));
 		//deletion from cache
-		assert(not xyz.reado(filename,k1));
+		assert(not xyz.reado(filename, k1));
 
-		assert(not xyz.read(filename,k1));
+		assert(not xyz.read(filename, k1));
 	}
 
 	{
 		printl("Create a temp file");
-		var tempfilename="xo_test_db_deleterecord";
-		var tempfile=tempfilename;
+		var tempfilename = "xo_test_db_deleterecord";
+		var tempfile	 = tempfilename;
 		deletefile(tempfile);
 		if (createfile(tempfile))
 			outputl(tempfile);
-		for (int i=1;i<=10;++i)
+		for (int i = 1; i <= 10; ++i)
 			write(i on tempfile, i);
 		tempfile.reccount().outputl("nrecs");
 
@@ -189,18 +188,18 @@ function main()
 		assert(RECORD eq "1^2^3^4^5^6^7^8^9^10"_var);
 
 		printl("Check deleterecord works on a select list");
-//		select(tempfile ^ " with ID ge 5");
+		//		select(tempfile ^ " with ID ge 5");
 		select(tempfilename ^ " with ID ge '5'");
 		deleterecord(tempfile);
-		assert(tempfile.reccount() == 5);
+		assert(tempfile.reccount() eq 5);
 
 		printl("Check deleterecord works command style list of keys");
 		deleterecord(tempfilename ^ " '1' 2 \"3\"");
-		assert(tempfile.reccount() == 2);
+		assert(tempfile.reccount() eq 2);
 
 		printl("Check deleterecord one key using 2nd parameter works");
 		deleterecord(tempfilename, "10");
-		assert(tempfile.reccount() == 1);
+		assert(tempfile.reccount() eq 1);
 
 		printl("Prepare a test record");
 		assert(write("aa^bb^cc"_var on tempfile, "X"));
@@ -268,42 +267,39 @@ function main()
 			assert(ID eq "c3");
 
 			assert(not readnext(ID));
-
 		}
 	}
 
-    //NFD - Decomposed Normal Form                                                                     │
-    //NFC - Compact Normal Form                                                                        │
-    var decomp_a="\x61\xCC\x81";//"á";                                                                 │
-    var compact_a="\xC3\xA1";//"á";
+	//NFD - Decomposed Normal Form                                                                     │
+	//NFC - Compact Normal Form                                                                        │
+	var decomp_a  = "\x61\xCC\x81";	 //"á";                                                                 │
+	var compact_a = "\xC3\xA1";		 //"á";
 
-    //test write decomp can be read by compact and deleted by compact
-	write("temp",filename,decomp_a);
-	assert(read(trec,filename,compact_a));
-	assert(trec=="temp");
-	deleterecord(filename,compact_a);
-	assert(not read(trec,filename,compact_a));
+	//test write decomp can be read by compact and deleted by compact
+	write("temp", filename, decomp_a);
+	assert(read(trec, filename, compact_a));
+	assert(trec eq "temp");
+	deleterecord(filename, compact_a);
+	assert(not read(trec, filename, compact_a));
 
 	//test write compact can be read by decomp and deleted by decomp
-	write("temp",filename,compact_a);
-	trec="";
-	assert(read(trec,filename,decomp_a));
+	write("temp", filename, compact_a);
+	trec = "";
+	assert(read(trec, filename, decomp_a));
 
-    //check failure to read a record turns the record variable into unassigned and unusable
-    var rec="abc";
-    assert( not rec.read("dict.voc","LJLKJLKJLKJLKJLKJw"));
-    try
-    {
-        printl(rec.quote());
-    }
-    catch (VarError e) {
-        printl("OK failure to read a record makes the record variable unassigned. For programming safety");
-    }
+	//check failure to read a record turns the record variable into unassigned and unusable
+	var rec = "abc";
+	assert(not rec.read("dict.voc", "LJLKJLKJLKJLKJLKJw"));
+	try {
+		printl(rec.quote());
+	} catch (VarError e) {
+		printl("OK failure to read a record makes the record variable unassigned. For programming safety");
+	}
 
 	{
 		printl("Check can write a whole dim array to one record");
-		dim d1 = {11,22,33};
-		assert(d1.write(filename,"D1"));
+		dim d1 = {11, 22, 33};
+		assert(d1.write(filename, "D1"));
 		var rec;
 
 		printl("Verify record back into a var");
@@ -314,15 +310,14 @@ function main()
 		dim d2;
 		assert(d2.read(filename, "D1"));
 		assert(d2.join() eq d1.join());
-
 	}
 
 	{
 		// free functions
 
 		printl("Check can write a whole dim array to one record");
-		dim d1 = {11,22,33};
-		assert(dimwrite(d1 on filename,"D1"));
+		dim d1 = {11, 22, 33};
+		assert(dimwrite(d1 on filename, "D1"));
 		var rec;
 
 		printl("Verify record back into a var");
@@ -333,7 +328,6 @@ function main()
 		dim d2;
 		assert(dimread(d2 from filename, "D1"));
 		assert(d2.join() eq d1.join());
-
 	}
 
 	{
@@ -342,20 +336,20 @@ function main()
 		//!!! EXCEPT if default connection is empty then it sets it
 		//default connection is empty to start with
 		//OR if you disconnect a connection with the same number (ie the same connection)
-		assert(conn1.connect( ""));
-	}		// one connection is lost here (hangs)
+		assert(conn1.connect(""));
+	}  // one connection is lost here (hangs)
 
 	{
 		var conn1;
-		conn1.connect( "");
+		conn1.connect("");
 		conn1.disconnect();
 	}
-	var dbname2="exodus2b";
-	var dbname3="exodus3b";
-	var dbname4="exodus4b";
+	var dbname2 = "exodus2b";
+	var dbname3 = "exodus3b";
+	var dbname4 = "exodus4b";
 	{
 		var conn1;
-		assert(conn1.connect(""));			// creates new connection with default parameters (connection string)
+		assert(conn1.connect(""));	// creates new connection with default parameters (connection string)
 
 		//remove any existing test databases
 		for (var dbname : dbname2 ^ FM ^ dbname3 ^ FM ^ dbname4) {
@@ -381,91 +375,90 @@ function main()
 		assert(not conn1.connect(dbname3));
 
 		conn1.disconnect();
-
 	}
 
-	{	// Lets test" WITHOUT transaction
+	{  // Lets test" WITHOUT transaction
 		//	global connect/disconnect
 		//	locks/unlocks
 		//	createfile/deletefile
-		connect();			// global connection
+		connect();	// global connection
 		var file = "NANOTABLE";
 		deletefile(file);
-		assert( createfile( file));
+		assert(createfile(file));
 
 		//check 1 can be locked and not relocked
-		assert(file.lock( "1"));
-		assert(not file.lock( "1"));
+		assert(file.lock("1"));
+		assert(not file.lock("1"));
 
 		//check 2 can be locked and not relocked
-		assert(file.lock( "2"));
-		assert(not file.lock( "2"));
+		assert(file.lock("2"));
+		assert(not file.lock("2"));
 
 		//check 1 is still locked and can be unlocked and relocked
-		assert(not file.lock( "1"));
+		assert(not file.lock("1"));
 		assert(not file.statustrans());
-		assert(file.unlock( "1"));
-		assert(file.lock( "1"));
+		assert(file.unlock("1"));
+		assert(file.lock("1"));
 
 		//check 2 is still locked and can be unlocked and relocked
-		assert(not file.lock( "2"));
-		assert(file.unlock( "2"));
-		assert(file.lock( "2"));
+		assert(not file.lock("2"));
+		assert(file.unlock("2"));
+		assert(file.lock("2"));
 
 		//check unlockall
 		//Note: this unlocks locks on ALL FILES locks on the same connection
 		//NOT just the locks on the file in question
 		//TODO make it work per file and per connection?
 		assert(file.unlockall());
-		assert(file.lock( "1"));
-		assert(file.lock( "2"));
+		assert(file.lock("1"));
+		assert(file.lock("2"));
 
-		assert( deletefile( file));
+		assert(deletefile(file));
 
-		disconnect();		// global connection
+		disconnect();  // global connection
 	}
 
-	{	// Lets test" WITH trsnsaction
+	{  // Lets test" WITH trsnsaction
 		//	global connect/disconnect
 		//	locks/unlocks
 		//	createfile/deletefile
-		connect();			// global connection
+		connect();	// global connection
 		begintrans();
 		var file = "NANOTABLE";
 		deletefile(file);
-		assert( createfile( file));
+		assert(createfile(file));
 
 		//check 1 can be locked and CAN BE relocked since in a transaction
-		assert(file.lock( "1") == 1);
-		assert(file.lock( "1") == 2);
+		assert(file.lock("1") eq 1);
+		assert(file.lock("1") eq 2);
 
 		//check 2 can be locked and CAN BE relocked since in a transaction
-		assert(file.lock( "2") == 1);
-		assert(file.lock( "2") == 2);
+		assert(file.lock("2") eq 1);
+		assert(file.lock("2") eq 2);
 
 		//check 1 is still locked
-		assert(file.lock( "1"));
+		assert(file.lock("1"));
 		assert(file.statustrans());
-		assert(not file.unlock( "1")); // check CANNOT unlock inside transactions
-		assert(file.lock( "1"));
+		assert(not file.unlock("1"));  // check CANNOT unlock inside transactions
+		assert(file.lock("1"));
 
 		//check 2 is still locked and CANNOT be unlocked inside transactions
-		assert(file.lock( "2"));
-		assert(not file.unlock( "2")); //CANNOT unlock unside trsnsactions
-		assert(file.lock( "2"));
+		assert(file.lock("2"));
+		assert(not file.unlock("2"));  //CANNOT unlock unside trsnsactions
+		assert(file.lock("2"));
 
 		//check unlockall
 		//Note: this unlocks locks on ALL FILES locks on the same connection
 		//NOT just the locks on the file in question
 		//TODO make it work per file and per connection?
-		assert(not file.unlockall()); //should do nothing inside transactions
-		assert(file.lock( "1"));
-		assert(file.lock( "2"));
+		assert(not file.unlockall());  //should do nothing inside transactions
+		assert(file.lock("1"));
+		assert(file.lock("2"));
 
-		assert( deletefile( file));
+		assert(deletefile(file));
 		committrans();
 
-		disconnect();		// global connection
+		disconnect();  // global connection
 	}
 
 	{
@@ -474,7 +467,7 @@ function main()
 		assert(dbcreate(dbname2));
 		printl("dblist using free function");
 
-		assert(dblist().convert(FM,VM).locate(dbname2));
+		assert(dblist().convert(FM, VM).locate(dbname2));
 		printl("dbcopy using free function");
 
 		assert(dbcopy(dbname2, dbname3));
@@ -496,7 +489,7 @@ function main()
 		assert(reccount(tempfilename) eq 2);
 
 		assert(reado(RECORD from tempfilename, "key2"));
-		assert(RECORD eq "11.^22.^33."_var);
+		assert(RECORD                 eq "11.^22.^33."_var);
 		assert(reccount(tempfilename) eq 2);
 
 		// Test write to cache but not file
@@ -567,28 +560,28 @@ function main()
 		assert(conn1.dbcreate(dbname3));
 
 		// Check dblist
-		var dbnames = dblist().convert(FM,VM);
+		var dbnames = dblist().convert(FM, VM);
 		assert(dbnames.locate(dbname2));
 		assert(dbnames.locate(dbname3));
 
 		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
-		var conndb2,conndb3;
+		var conndb2, conndb3;
 		//var table2="TABLE2";
 		//var table3="TABLE3";
-		var table2=table2name;
-		var table3=table3name;
+		var table2 = table2name;
+		var table3 = table3name;
 		assert(conndb2.connect(dbname2));
 		assert(conndb3.connect(dbname3));
-		assert(not table2.open(table2name,conndb2));
-		assert(not table3.open(table3name,conndb3));
+		assert(not table2.open(table2name, conndb2));
+		assert(not table3.open(table3name, conndb3));
 		printl(table2);
 		printl(table3);
 		assert(conndb2.createfile(table2));
 		assert(conndb3.createfile(table3));
 
 		if (table2name ne table3name) {
-			assert(not table2.open(table2,conndb3));
-			assert(not table3.open(table3,conndb2));
+			assert(not table2.open(table2, conndb3));
+			assert(not table3.open(table3, conndb2));
 		}
 
 		//check created on the right db
@@ -596,29 +589,29 @@ function main()
 		assert(conndb3.createfile(table3 ^ "_db3"));
 		var table2x;
 		var table3x;
-		assert(not table2x.open(table2 ^ "_db2",conndb3));
-		assert(not table3x.open(table3 ^ "_db3",conndb2));
+		assert(not table2x.open(table2 ^ "_db2", conndb3));
+		assert(not table3x.open(table3 ^ "_db3", conndb2));
 
-		assert(table2.open(table2,conndb2));
-		assert(table3.open(table3,conndb3));
-		assert(write( "2.1111", table2, "2.111"));
-		assert(write( "3.1111", table3, "3.111"));
-		assert(write( "2.2222", table2, "2.222"));
-		assert(write( "3.2222", table3, "3.222"));
-		assert(write( "2.3333", table2, "2.333"));
-		assert(write( "3.3333", table3, "3.333"));
+		assert(table2.open(table2, conndb2));
+		assert(table3.open(table3, conndb3));
+		assert(write("2.1111", table2, "2.111"));
+		assert(write("3.1111", table3, "3.111"));
+		assert(write("2.2222", table2, "2.222"));
+		assert(write("3.2222", table3, "3.222"));
+		assert(write("2.3333", table2, "2.333"));
+		assert(write("3.3333", table3, "3.333"));
 
 		var tt;
-		assert(! read( tt, table3, "2.111"));
-		assert(! read( tt, table2, "3.111"));
+		assert(!read(tt, table3, "2.111"));
+		assert(!read(tt, table2, "3.111"));
 
 		//test locks are per connection
 		assert(conndb2.createfile("TESTLOCKS"));
 		assert(conndb3.createfile("TESTLOCKS"));
 		var testlocks2;
 		var testlocks3;
-		assert(testlocks2.open("TESTLOCKS",conndb2));
-		assert(testlocks3.open("TESTLOCKS",conndb3));
+		assert(testlocks2.open("TESTLOCKS", conndb2));
+		assert(testlocks3.open("TESTLOCKS", conndb3));
 		assert(testlocks2.lock("123"));
 		assert(testlocks3.lock("123"));
 		assert(not testlocks2.lock("123"));
@@ -636,9 +629,9 @@ function main()
 		var conndb2a, conndb2b;
 		assert(conndb2a.connect(dbname2));
 		assert(conndb2b.connect(dbname2));
-		var table2a,table2b;
-		assert(table2a.open(table2name,conndb2a));
-		assert(table2b.open(table3name,conndb2b));
+		var table2a, table2b;
+		assert(table2a.open(table2name, conndb2a));
+		assert(table2b.open(table3name, conndb2b));
 
 		//lock on TABLE2 on db2
 		assert(table2a.lock("123X"));
@@ -668,9 +661,9 @@ function main()
 		var conndb2, conndb3;
 		assert(conndb2.connect(dbname2));
 		assert(conndb3.connect(dbname3));
-		var table2,table3;
-		assert( table2.open(table2name,conndb2));
-		assert( table3.open(table3name,conndb3));
+		var table2, table3;
+		assert(table2.open(table2name, conndb2));
+		assert(table3.open(table3name, conndb3));
 
 		conndb2.begintrans();
 		printl("select db2 " ^ table2name);
@@ -686,18 +679,18 @@ function main()
 		//if (!table3.readnext( record3, id3,MV))
 		//	printl("couldnt readnext table23");
 
-		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
+		assert(table2.readnext(record2, id2, MV) and table3.readnext(record3, id3, MV));
 		assert(record2.outputl() eq "2.1111" and id2.outputl() eq "2.111" and record3.outputl() eq "3.1111" and id3.outputl() eq "3.111");
 
-		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
+		assert(table2.readnext(record2, id2, MV) and table3.readnext(record3, id3, MV));
 		assert(record2.outputl() eq "2.2222" and id2.outputl() eq "2.222" and record3.outputl() eq "3.2222" and id3.outputl() eq "3.222");
 
-		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
+		assert(table2.readnext(record2, id2, MV) and table3.readnext(record3, id3, MV));
 		assert(record2 eq "2.3333" and id2 eq "2.333" and record3 eq "3.3333" and id3 eq "3.333");
 
-		assert(not table2.readnext( record2, id2, MV) and not table3.readnext( record3, id3, MV));
+		assert(not table2.readnext(record2, id2, MV) and not table3.readnext(record3, id3, MV));
 
-/* rather slow to check so skip
+		/* rather slow to check so skip
 		printl("check CANNOT delete databases while a connection is open");
 		//NB try to delete db2 from conndb3 and vice versa
 		assert(not conndb3.dbdelete(dbname2));
@@ -711,18 +704,18 @@ function main()
 
 		printl("check copy db exodus2b to exodus4b");
 		var conn4;
-		assert(conn4.dbcopy(dbname2,dbname4));
+		assert(conn4.dbcopy(dbname2, dbname4));
 		//printl(conn4.getlasterror());
-		assert(conn4.connect( dbname4));
+		assert(conn4.connect(dbname4));
 		printl("check can open table2 on copied database exodus4");
-		var table2b,table3b;
-		assert( table2b.open( table2name,conn4));
+		var table2b, table3b;
+		assert(table2b.open(table2name, conn4));
 
 		///test attach
 		{
 
 			var uniquefilename = "TEMP_test_attach";
-			var otherdbname = dbname4;
+			var otherdbname	   = dbname4;
 
 			//delete the file first in case already exists
 			deletefile(uniquefilename);
@@ -772,14 +765,13 @@ function main()
 			assert(not open(uniquefilename));
 
 			conn1.disconnect();
-
 		}
 
 		///test attach "all" dict files
 		{
 
 			var uniquefilename = "dict.test_attach";
-			var otherdbname = dbname4;
+			var otherdbname	   = dbname4;
 
 			//delete the file first in case already exists
 			deletefile(uniquefilename);
@@ -826,7 +818,6 @@ function main()
 			assert(not open(uniquefilename));
 
 			conn1.disconnect();
-
 		}
 
 		printl("remove any test databases");

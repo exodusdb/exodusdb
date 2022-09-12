@@ -1,26 +1,26 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
 #include <exodus/program.h>
 programinit()
 
-	var xo_dict = "xo_dict";
-	var dict_xo_test = "dict.xo_test";
-	var default_conn;
-	var xo_dict_conn;
+	var xo_dict	 = "xo_dict";
+var dict_xo_test = "dict.xo_test";
+var default_conn;
+var xo_dict_conn;
 
 function main() {
 
 	printl("\n   --- clear any existing EXO_DATA/DICT env ---\n");
-	assert(ossetenv("EXO_DATA",""));
-	assert(ossetenv("EXO_DICT",""));
+	assert(ossetenv("EXO_DATA", ""));
+	assert(ossetenv("EXO_DICT", ""));
 
 	printl("\n   --- default connection first thing before anything else to ensure clean ---\n");
-    printl("\n   --- quit (pass test) if no default database connection ---\n");
-    if (not default_conn.connect()) {
-        printl("\n   --- No default db connection to perform db testing. Test passed ---\n");
-        return 0;
-    }
+	printl("\n   --- quit (pass test) if no default database connection ---\n");
+	if (not default_conn.connect()) {
+		printl("\n   --- No default db connection to perform db testing. Test passed ---\n");
+		return 0;
+	}
 	TRACE(default_conn)
 
 	//Skip if fast testing required
@@ -42,8 +42,8 @@ function main() {
 		assert(xo_dict_conn.connect(xo_dict));
 
 		printl("\n   --- say that dicts are on the specific database " ^ xo_dict ^ " ---\n");
-		assert(ossetenv("EXO_DICT",xo_dict));
-		assert(var(getenv("EXO_DICT")) == xo_dict);
+		assert(ossetenv("EXO_DICT", xo_dict));
+		assert(var(getenv("EXO_DICT")) eq xo_dict);
 
 		printl("\n   --- create a dict on the specific database implicitly ---\n");
 		assert(createfile(dict_xo_test));
@@ -72,7 +72,6 @@ function main() {
 
 		printl("\n   --- disconnect specific connection ---\n");
 		xo_dict_conn.disconnect();
-
 	}
 
 	printl("\n   --- test without EXO_DICT ---\n");
@@ -81,8 +80,8 @@ function main() {
 		printl("\n   --- connect to the specific database (although not used for dict here) ---\n");
 
 		printl("\n   --- say that dicts are on the default database ---\n");
-		assert(ossetenv("EXO_DICT",""));
-		assert(var(getenv("EXO_DICT")) == "");
+		assert(ossetenv("EXO_DICT", ""));
+		assert(var(getenv("EXO_DICT")) eq "");
 
 		printl("\n   --- needed to remove default dict connection ---\n");
 		disconnectall();
@@ -92,7 +91,6 @@ function main() {
 
 		printl("\n   --- create a dict on the default database implicitly ---\n");
 		assert(createfile(dict_xo_test));
-
 
 		printl("\n   --- ensure new dict IS on the right database implicitly ---\n");
 		var dicttest;
@@ -106,10 +104,8 @@ function main() {
 		var dicttest3;
 		assert(not dicttest3.open(dict_xo_test, xo_dict_conn));
 
-
 		printl("\n   --- delete the dict on the default database implicitly ---\n");
 		assert(deletefile(dict_xo_test));
-
 
 		printl("\n   --- ensure new dict IS NO LONGER on the default database implicitly ---\n");
 		var dicttest4;
@@ -123,10 +119,8 @@ function main() {
 		var dicttest6;
 		assert(not dicttest6.open(dict_xo_test, xo_dict_conn));
 
-
 		printl("\n   --- disconnect specific connection ---\n");
 		xo_dict_conn.disconnect();
-
 	}
 
 	gosub cleanup();
@@ -143,7 +137,5 @@ subroutine cleanup() {
 
 	printl("\n   --- delete the dict file from the default connection just in case, to be clean ---\n");
 	default_conn.deletefile(dict_xo_test);
-
 }
 programexit()
-

@@ -1,4 +1,4 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 #include <sstream>
 //#include <cmath>
@@ -29,35 +29,34 @@
 
 programinit()
 
-function main()
-{
+	function main() {
 
 	{
 		// Check conversion of visible to internal field marks in user literals
-		assert("_^]}|~"_var == _RM _FM _VM _SM _TM _ST);
+		assert("_^]}|~"_var eq _RM _FM _VM _SM _TM _ST);
 	}
 
 	{
-		outputt("xxx","yyy");
+		outputt("xxx", "yyy");
 		outputl();
 		outputl("===\t===");
 
-		errput("aaa","bbb");
+		errput("aaa", "bbb");
 		errputl();
-		errputl("---","---");
+		errputl("---", "---");
 
-		logput("111","222");
+		logput("111", "222");
 		logputl();
-		logputl("...","...");
+		logputl("...", "...");
 	}
 
 	{
 		printl("Check randomness of rnd(10)");
 
 		var ntests = 1'000'000;
-		var n = 10;
+		var n	   = 10;
 		dim d1(n);
-		d1 = 0;
+		d1	  = 0;
 		d1(0) = 0;
 
 		for (auto i [[maybe_unused]] : range(1, ntests)) {
@@ -68,21 +67,20 @@ function main()
 		printl();
 
 		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
-		for (auto i : range(0, n-1)) {
+		for (auto i : range(0, n - 1)) {
 			printt(i, d1(i), "\n");
-			assert(d1(i) > ntests/n*0.99);
-			assert(d1(i) < ntests/n*1.01);
+			assert(d1(i) > ntests / n * 0.99);
+			assert(d1(i) < ntests / n * 1.01);
 		}
-
 	}
 
 	{
 		printl("Check randomness of rnd(-10)");
 
 		var ntests = 1'000'000;
-		var n = 10;
+		var n	   = 10;
 		dim d1(n);
-		d1 = 0;
+		d1	  = 0;
 		d1(0) = 0;
 
 		for (auto i [[maybe_unused]] : range(1, ntests)) {
@@ -94,12 +92,11 @@ function main()
 		printl();
 
 		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
-		for (auto i : range(0, n-1)) {
+		for (auto i : range(0, n - 1)) {
 			printt(i, d1(i), "\n");
-			assert(d1(i) > ntests/n*0.99);
-			assert(d1(i) < ntests/n*1.01);
+			assert(d1(i) > ntests / n * 0.99);
+			assert(d1(i) < ntests / n * 1.01);
 		}
-
 	}
 
 	{
@@ -131,7 +128,11 @@ function main()
 
 	{
 		printl("Prevent rnd always returning 0");
-		try { var x = rnd(0); assert(false); } catch (VarDivideByZero e) {};
+		try {
+			var x = rnd(0);
+			assert(false);
+		} catch (VarDivideByZero e) {
+		};
 	}
 
 	{
@@ -140,7 +141,7 @@ function main()
 
 		//string seed
 		initrnd("cccc");
-		var r1 =rnd(1'000'000'000);
+		var r1 = rnd(1'000'000'000);
 		//test reseed
 		initrnd("cccc");
 		assert(rnd(1'000'000'000) eq r1);
@@ -152,29 +153,28 @@ function main()
 		//slightly different max int
 		initrnd("cccd");
 		assert(rnd(1'000'000'001) ne r1);
-
 	}
 
 	{
 		//int seed
 		initrnd(123456);
-		var r1 =rnd(1'000'000'000);
+		var r1 = rnd(1'000'000'000);
 
 		//test reseed is the same
 		initrnd(123456);
-		assert(rnd(1'000'000'000)==r1);
+		assert(rnd(1'000'000'000) eq r1);
 
 		//test reseed with string of int is the same
 		initrnd("123456");
-		assert(rnd(1'000'000'000)==r1);
+		assert(rnd(1'000'000'000) eq r1);
 
 		//test reseed with double of int is the same
 		initrnd(123456.4);
-		assert(rnd(1'000'000'000)==r1);
+		assert(rnd(1'000'000'000) eq r1);
 
 		//test reseed with double of int is the same
 		initrnd(123456.6);
-		assert(rnd(1'000'000'000)==r1);
+		assert(rnd(1'000'000'000) eq r1);
 
 		//slightly different seed
 		initrnd(123457);
@@ -188,7 +188,7 @@ function main()
 	{
 		var unitx;
 		//printl("x", amountunit("USD",ID), "y", ID.quote());
-		var amount = amountunit("USD",unitx);
+		var amount = amountunit("USD", unitx);
 		printl("amount:", amount.quote(), "unit:", unitx.quote());
 
 		assert(test_amountunit("1.23456E-6USD", 1.23456E-6, "USD"));
@@ -206,15 +206,14 @@ function main()
 		assert(test_amountunit(" 123.456XYZZZZ", " 123.456", "XYZZZZ"));
 		assert(test_amountunit("123.456 XYZZZZ", 123.456, " XYZZZZ"));
 		assert(test_amountunit("123.456XYZZZZ ", 123.456, "XYZZZZ "));
-
 	}
 
 	{
 
-		assert(oconv("12345","L#6")				 eq "12345 ");
-		assert(oconv("12345","R(*)#8")			  eq "***12345");
-		assert(oconv("ABCDEFG","R#4")			   eq "DEFG");
-		assert(oconv("ABCD","C#6")				  eq " ABCD ");
+		assert(oconv("12345", "L#6")    eq "12345 ");
+		assert(oconv("12345", "R(*)#8") eq "***12345");
+		assert(oconv("ABCDEFG", "R#4")  eq "DEFG");
+		assert(oconv("ABCD", "C#6")     eq " ABCD ");
 		//assert(oconv("1234567890","L(###)###-####") eq "(123)456-7890");
 
 		//TX
@@ -228,9 +227,25 @@ function main()
 		//TM
 		assert(test_ioconv_TX("TX", "X\\nY\nZ" _TM "ABC", "X\\\\nY\\nZ\\\\\\\nABC"));
 		//ST
-		assert(test_ioconv_TX("TX", "X" "\\n" "Y" "\n" "Z" _ST "ABC", "X" "\\\\n" "Y" "\\n" "Z" "\\\\\\\\\n" "ABC"));
+		assert(test_ioconv_TX("TX",
+							  "X"
+							  "\\n"
+							  "Y"
+							  "\n"
+							  "Z" _ST "ABC",
+							  "X"
+							  "\\\\n"
+							  "Y"
+							  "\\n"
+							  "Z"
+							  "\\\\\\\\\n"
+							  "ABC"));
 
-		assert(test_ioconv_TX("TX", _RM _FM _VM _SM _TM _ST, _RM "\n" "\\\n" "\\\\\n" "\\\\\\\n" "\\\\\\\\\n"));
+		assert(test_ioconv_TX("TX", _RM _FM _VM _SM _TM _ST, _RM "\n"
+																 "\\\n"
+																 "\\\\\n"
+																 "\\\\\\\n"
+																 "\\\\\\\\\n"));
 
 		// \n, literal "\n" and literal "\\n"
 		assert(test_ioconv_TX("TX", "\n", "\\n"));
@@ -255,7 +270,6 @@ function main()
 		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _ST "ABC", "X\\\\nY\\nZ" _ST "ABC"));
 
 		assert(test_ioconv_TX("TXR", _RM _FM _VM _SM _TM _ST, _RM "\n" _VM _SM _TM _ST));
-
 	}
 
 	{
@@ -265,10 +279,9 @@ function main()
 		{
 			var x1;
 			try {
-				var x3=x1;//unassigned var
+				var x3 = x1;  //unassigned var
 				assert(false && "var x3 = x1 should throw unassigned error)");
-			}
-			catch (VarUnassigned e) {
+			} catch (VarUnassigned e) {
 				assert(true || "var v3 = v1) does give unassigned error)");
 			}
 		}
@@ -277,10 +290,9 @@ function main()
 		{
 			var x1;
 			try {
-				var x2(x1);//unassigned dim element
+				var x2(x1);	 //unassigned dim element
 				assert(false && "var x2(x1) should throw unassigned error)");
-			}
-			catch (VarUnassigned e) {
+			} catch (VarUnassigned e) {
 				assert(true || "x2(x1) does give unassigned error)");
 			}
 		}
@@ -296,85 +308,82 @@ function main()
 
 		printl("----------------------------------------------");
 
+		assert("abc"_var    eq "abc");
+		assert(12345_var    eq 12345);
+		assert(1234.567_var eq 1234.567);
 
-		assert("abc"_var == "abc");
-		assert(12345_var == 12345);
-		assert(1234.567_var == 1234.567);
-
-		var v=123.456;
+		var v = 123.456;
 		assert(int(v) != v);
-		assert(int(v) == 123);
-		assert(double(v) == v);
-		assert(double(v) == 123.456);
+		assert(int(v)    eq 123);
+		assert(double(v) eq v);
+		assert(double(v) eq 123.456);
 		assert(floor(v) != v);
-		assert(floor(v) == int(v));
+		assert(floor(v)  eq int(v));
 
-		v="123.456";
+		v = "123.456";
 		assert(int(v) != v);
-		assert(int(v) == 123);
-		assert(double(v) == v);
-		assert(double(v) == 123.456);
+		assert(int(v)    eq 123);
+		assert(double(v) eq v);
+		assert(double(v) eq 123.456);
 		assert(floor(v) != v);
-		assert(floor(v) == int(v));
+		assert(floor(v)  eq int(v));
 
-		v=123456;
-		v=v/1000;
+		v = 123456;
+		v = v / 1000;
 		TRACE(v)
 		assert(int(v) != v);
-		assert(int(v) == 123);
-		assert(double(v) == v);
-		assert(double(v) == 123.456);
+		assert(int(v)    eq 123);
+		assert(double(v) eq v);
+		assert(double(v) eq 123.456);
 		assert(floor(v) != v);
-		assert(floor(v) == int(v));
+		assert(floor(v)  eq int(v));
 
-		double d=1234.567;
+		double d = 1234.567;
 		//false && d;
-		assert(var(d)=="1234.567");
-		assert(var(-d)=="-1234.567");
-		assert(int(var(d))==1234);
-		assert(int(var(-d))==-1234);
-
+		assert(var(d)       eq "1234.567");
+		assert(var(-d)      eq "-1234.567");
+		assert(int(var(d))  eq 1234);
+		assert(int(var(-d)) eq -1234);
 
 		//test accessing var as a range of fields separated by FM
 		{
 			var fields = "a1" _FM "b2" _FM "c3";
-			var fieldn=0;
+			var fieldn = 0;
 			for (var field : fields) {
 				fieldn++;
-				if (fieldn==1)
-					assert(field=="a1");
-				else if (fieldn==2)
-					assert(field=="b2");
-				if (fieldn==3)
-					assert(field=="c3");
+				if (fieldn eq 1)
+					assert(field   eq "a1");
+				else if (fieldn eq 2)
+					assert(field   eq "b2");
+				if (fieldn eq 3)
+					assert(field   eq "c3");
 			}
 		}
-
 	}
 
 	{
 
 		printl("sizeof");
-		printl("int:	  ",(int)sizeof(int));
-		printl("long:	 ",(int)sizeof(long));
-		printl("long int: ",(int)sizeof(long int));
-		printl("long long:",(int)sizeof(long long));
-		printl("float:	",(int)sizeof(float));
-		printl("double:   ",(int)sizeof(double));
+		printl("int:	  ", (int)sizeof(int));
+		printl("long:	 ", (int)sizeof(long));
+		printl("long int: ", (int)sizeof(long int));
+		printl("long long:", (int)sizeof(long long));
+		printl("float:	", (int)sizeof(float));
+		printl("double:   ", (int)sizeof(double));
 		printl();
-		printl("string:   ",(int)sizeof(std::string));
-		printl("long long:",(int)sizeof(long long));
-		printl("double:   ",(int)sizeof(double));
-		printl("uint:	 ",(int)sizeof(uint));
-		printl("uint:	 ",(int)sizeof(uint),	  " padding1");
-		printl("long long:",(int)sizeof(long long), " padding2");
+		printl("string:   ", (int)sizeof(std::string));
+		printl("long long:", (int)sizeof(long long));
+		printl("double:   ", (int)sizeof(double));
+		printl("uint:	 ", (int)sizeof(uint));
+		printl("uint:	 ", (int)sizeof(uint), " padding1");
+		printl("long long:", (int)sizeof(long long), " padding2");
 		printl("		   ==");
-		printl("var:	  ",(int)sizeof(var));
+		printl("var:	  ", (int)sizeof(var));
 
-		auto size = sizeof(std::string);
+		auto size	  = sizeof(std::string);
 		auto capacity = std::string().capacity();
-		auto small = std::string(capacity, '*');
-		auto big = std::string(capacity + 1, '*');
+		auto small	  = std::string(capacity, '*');
+		auto big	  = std::string(capacity + 1, '*');
 
 		std::cout << "\nstd:string implementation\n";
 		std::cout << "sizeof  : " << size << std::endl;
@@ -386,111 +395,111 @@ function main()
 		printl(var("top of the world").tcase().fcase());
 
 		var g = "Grüßen";
-		assert(g.fcase() eq "grüssen");
+		assert(g.fcase()             eq "grüssen");
 		assert(var("Grüßen").fcase() eq "grüssen");
-		assert(g.fcaser() eq "grüssen");
+		assert(g.fcaser()            eq "grüssen");
 
-		var v="top of the world";
-		assert(v.tcase()=="Top Of The World");
-		assert(var("top of the world").tcase()=="Top Of The World");
-		assert(v.tcaser()=="Top Of The World");
+		var v = "top of the world";
+		assert(v.tcase()                       eq "Top Of The World");
+		assert(var("top of the world").tcase() eq "Top Of The World");
+		assert(v.tcaser()                      eq "Top Of The World");
 
-		printl(round(var("6000.50")/20,2));
-		assert(round(var("6000.50")/20,2)==300.03);
-
+		printl(round(var("6000.50") / 20, 2));
+		assert(round(var("6000.50") / 20, 2) eq 300.03);
 	}
-
 
 	{
 		//exodus currently configured to use 2. for very great speed (see mv.cpp USE_RYU) BUT it will include over accurate figures without any rounding
 		//1. precision 16 using sstring. SLOW (1850ns)
 		//2. full precision using VERY FAST ryu algorithm (450ns)
 		//full accuracy of ryu shows why calculations always must be rounded after every calculation because every calculation introduces more inaccuracies.
-		TRACE(var(10.0/3.0))
-		printl(var(10.0/3.0).len());
+		TRACE(var(10.0 / 3.0))
+		printl(var(10.0 / 3.0).len());
 
 		//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
-		//assert(var(10.0/3.0).toString() == "3.3333333333333335");
+		//assert(var(10.0/3.0).toString() eq "3.3333333333333335");
 
 		//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
-		//assert(var(10.0/3.0).toString() == "3.333333333333333");
+		//assert(var(10.0/3.0).toString() eq "3.333333333333333");
 
 		assert(
-			var(10.0/3.0).toString()
-			//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
-			==  "3.333333333333333"
+			var(10.0 / 3.0).toString()
+				//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
+				== "3.333333333333333"
 
 			||
-			var(10.0/3.0).toString()
-			//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
-			==  "3.3333333333333335"
+			var(10.0 / 3.0).toString()
+				//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
+				== "3.3333333333333335"
 
-//		  ||
-//		  var(10.0/3.0).toString()
-//		  //g++11 to_chars implementation full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
-//		  ==  "3.333333333333335"
+			//		  ||
+			//		  var(10.0/3.0).toString()
+			//		  //g++11 to_chars implementation full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
+			//		  eq  "3.333333333333335"
 		);
 
-		assert(var(10.0/3.0*2.0).toString() == "6.666666666666667");
-		assert(var(10.0/3.0*3.0).toString() == "10");
+		assert(var(10.0 / 3.0 * 2.0).toString() eq "6.666666666666667");
+		assert(var(10.0 / 3.0 * 3.0).toString() eq "10");
 
-		var x=10;
-		var y=3;
-		var z=3;
-		assert(x/y*z==x);
-		assert(x/y*z==10);
-		assert(x/y*z==10.0);
-		assert(x/y*z=="10");
-		assert(x/y*z=="10.0");
+		var x = 10;
+		var y = 3;
+		var z = 3;
+		assert(x / y * z eq x);
+		assert(x / y * z eq 10);
+		assert(x / y * z eq 10.0);
+		assert(x / y * z eq "10");
+		assert(x / y * z eq "10.0");
 
-		x=10.0;
-		y=3.0;
-		z=3.0;
-		assert(x/y*z==x);
-		assert(x/y*z==10);
-		assert(x/y*z==10.0);
-		assert(x/y*z=="10");
-		assert(x/y*z=="10.0");
+		x = 10.0;
+		y = 3.0;
+		z = 3.0;
+		assert(x / y * z eq x);
+		assert(x / y * z eq 10);
+		assert(x / y * z eq 10.0);
+		assert(x / y * z eq "10");
+		assert(x / y * z eq "10.0");
 
-		x="10.0";
-		y="3.0";
-		z="3.0";
-		assert(x/y*z==x);
-		assert(x/y*z==10);
-		assert(x/y*z==10.0);
-		assert(x/y*z=="10");
-		assert(x/y*z=="10.0");
+		x = "10.0";
+		y = "3.0";
+		z = "3.0";
+		assert(x / y * z eq x);
+		assert(x / y * z eq 10);
+		assert(x / y * z eq 10.0);
+		assert(x / y * z eq "10");
+		assert(x / y * z eq "10.0");
 
-		x="10";
-		y="3";
-		z="3";
-		assert(x/y*z==x);
-		assert(x/y*z==10);
-		assert(x/y*z==10.0);
-		assert(x/y*z=="10");
-		assert(x/y*z=="10.0");
+		x = "10";
+		y = "3";
+		z = "3";
+		assert(x / y * z eq x);
+		assert(x / y * z eq 10);
+		assert(x / y * z eq 10.0);
+		assert(x / y * z eq "10");
+		assert(x / y * z eq "10.0");
 	}
 
 	{
-		assert(capitalise("aa \"AAA\"") == "Aa \"AAA\"");
-		assert(capitalise("aa \"aAa\"") == "Aa \"aAa\"");
-		assert(capitalise("aa 'AAA'") == "Aa 'AAA'");
-		assert(capitalise("aa 'aAa'") == "Aa 'aAa'");
-		assert(capitalise("1aA 2AA 3Aa 4aa") == "1AA 2AA 3AA 4AA");
+		assert(capitalise("aa \"AAA\"")      eq "Aa \"AAA\"");
+		assert(capitalise("aa \"aAa\"")      eq "Aa \"aAa\"");
+		assert(capitalise("aa 'AAA'")        eq "Aa 'AAA'");
+		assert(capitalise("aa 'aAa'")        eq "Aa 'aAa'");
+		assert(capitalise("1aA 2AA 3Aa 4aa") eq "1AA 2AA 3AA 4AA");
 
 		//raw strings
-		var value=R"('1')";
-		assert(value.swap("'",R"(\')")=="\\'1\\'");
+		var value = R"('1')";
+		assert(value.swap("'", R"(\')") eq "\\'1\\'");
 
 		//check conversion of unprintable field marks to unusual ASCII characters
 		//except TM which is ESC
 		std::ostringstream stringstr;
-		stringstr << var(_RM _FM _VM _SM _TM  _ST);
+		stringstr << var(_RM _FM _VM _SM _TM _ST);
 		std::cout << stringstr.str() << std::endl;
-		//assert(var(stringstr.str()) == "~^]\\[|");
-		assert(var(stringstr.str()) == "~^]}" "\x1B" "|");
+		//assert(var(stringstr.str()) eq "~^]\\[|");
+		assert(var(stringstr.str()) ==
+			   "~^]}"
+			   "\x1B"
+			   "|");
 	}
-
 
 	{
 		/* now using epsilon to judge small numbers and differences see MVeq()
@@ -507,26 +516,26 @@ function main()
 		assert(!toosmallno);
 		assert(toosmallno==0);
 		assert(!(toosmallno>0));
-		assert(smallestno == SMALLEST_NUMBER);
+		assert(smallestno eq SMALLEST_NUMBER);
 		*/
 
-		var d1=1.2;
+		var d1 = 1.2;
 		d1++;
-		assert(d1==2.2);
+		assert(d1 eq 2.2);
 		++d1;
-		assert(d1==3.2);
+		assert(d1 eq 3.2);
 
-		var i1=1;
+		var i1 = 1;
 		i1++;
-		assert(i1==2.0);
+		assert(i1 eq 2.0);
 		++i1;
-		assert(i1==3.0);
+		assert(i1 eq 3.0);
 
-		d1=1.2;
-		d1+=1;
-		assert(d1==2.2);
-		d1+=1.1;
-		assert(d1==3.3);
+		d1 = 1.2;
+		d1 += 1;
+		assert(d1 eq 2.2);
+		d1 += 1.1;
+		assert(d1 eq 3.3);
 
 		//exodus accidentally equipped std:string with most of the attributes of a var (this could be viewed as a good thing)
 		// the feature was removed by using "hidden friends" ie placing all global friend operator functions inside the body of the var class
@@ -534,11 +543,11 @@ function main()
 		//assert(d1.toString()==3.3);//strange that this compiles and works (no longer after switching to "hidden friends" in exodus mv.h
 		//printl(std::string("1.1")+3.3);//strange this compiles! we have equipped std:string with the ability to convert to numeric for addition with a double!
 
-		i1=1;
-		i1+=1;
-		assert(i1==2.0);
-		i1+=1.1;
-		assert(i1==3.1);
+		i1 = 1;
+		i1 += 1;
+		assert(i1 eq 2.0);
+		i1 += 1.1;
+		assert(i1 eq 3.1);
 
 		printl(1e-14);
 		printl(var(0));
@@ -668,22 +677,22 @@ function main()
 		"xxxx"_var.logputl();
 	}
 	{
-		assert(crop(_VM _FM) eq "");
+		assert(crop(_VM _FM)       eq "");
 		assert(crop("xxx" _VM _FM) eq "xxx");
-		assert(crop("aaa" _VM _FM "bbb") eq ("aaa" _FM "bbb"));
-		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM "ddd") eq ("aaa" _FM "bbb" _FM _FM "ddd"));
-		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM _RM "ddd") eq ("aaa" _FM "bbb" _RM "ddd"));
+		assert(crop("aaa" _VM _FM "bbb") eq("aaa" _FM "bbb"));
+		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM "ddd") eq("aaa" _FM "bbb" _FM _FM "ddd"));
+		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM _RM "ddd") eq("aaa" _FM "bbb" _RM "ddd"));
 
-		assert(crop("aa" _VM _FM "bb" _FM)=="aa" _FM "bb");
-		assert(crop("aa" _SM _VM _FM "bb" _FM)=="aa" _FM "bb");
-		assert(crop(_FM "aa" _VM _FM "bb" _FM)==_FM "aa" _FM "bb");
-		assert(crop(_FM "aa" _VM _FM "bb" _FM _VM)==_FM "aa" _FM "bb");
-		assert(crop(_FM "aa" _VM _FM _VM "bb" _FM _VM)==_FM "aa" _FM _VM "bb");
-		assert(crop(_FM "aa" _VM _FM "bb" _FM _RM)==_FM "aa" _FM "bb");
-		assert(crop(_FM _RM "aa" _VM _FM "bb" _FM _RM)==_RM "aa" _FM "bb");
+		assert(crop("aa" _VM _FM "bb" _FM)             eq "aa" _FM "bb");
+		assert(crop("aa" _SM _VM _FM "bb" _FM)         eq "aa" _FM "bb");
+		assert(crop(_FM "aa" _VM _FM "bb" _FM)         eq _FM "aa" _FM "bb");
+		assert(crop(_FM "aa" _VM _FM "bb" _FM _VM)     eq _FM "aa" _FM "bb");
+		assert(crop(_FM "aa" _VM _FM _VM "bb" _FM _VM) eq _FM "aa" _FM _VM "bb");
+		assert(crop(_FM "aa" _VM _FM "bb" _FM _RM)     eq _FM "aa" _FM "bb");
+		assert(crop(_FM _RM "aa" _VM _FM "bb" _FM _RM) eq _RM "aa" _FM "bb");
 
 		// crop temporaries
-		assert("^]^]^}^|^~^"_var.crop().outputl() eq "");
+		assert("^]^]^}^|^~^"_var.crop().outputl()        eq "");
 		assert("a^b]^c]^d}^e|^f~^g"_var.crop().outputl() eq "a^b^c^d^e^f^g"_var);
 
 		var errmsg;
@@ -696,31 +705,31 @@ function main()
 	{
 
 		COMMAND.outputl("COMMAND-");
-		assert(COMMAND eq "service" or COMMAND.substr(1,9) eq "test_main");
+		assert(COMMAND eq "service" or COMMAND.substr(1, 9) eq "test_main");
 
 		//test int/string changes after inc/dec (should really check MANY other ops)
-		var nn=0;
-		assert(nn.toString() eq "0");//nn now has string available internally
-		++nn;//this should destroy the internal string
-		assert(nn.toString() eq "1");//the string should be recalculated after the ++
+		var nn = 0;
+		assert(nn.toString() eq "0");  //nn now has string available internally
+		++nn;						   //this should destroy the internal string
+		assert(nn.toString() eq "1");  //the string should be recalculated after the ++
 		nn++;
 		assert(nn.toString() eq "2");
 		--nn;
 		assert(nn.toString() eq "1");
 		nn--;
 		assert(nn.toString() eq "0");
-		nn+=1;
+		nn += 1;
 		assert(nn.toString() eq "1");
-		nn-=1;
+		nn -= 1;
 		assert(nn.toString() eq "0");
 
 		//same for float/string
-		nn=0.1;
+		nn = 0.1;
 		printl(nn);
-		assert(nn.toString() eq "0.1");//nn now has string available internally
-		++nn;//this should destroy the internal string
+		assert(nn.toString() eq "0.1");	 //nn now has string available internally
+		++nn;							 //this should destroy the internal string
 		printl(nn);
-		assert(nn.toString() eq "1.1");//the string should be recalculated after the ++
+		assert(nn.toString() eq "1.1");	 //the string should be recalculated after the ++
 		nn++;
 		printl(nn);
 		assert(nn.toString() eq "2.1");
@@ -730,14 +739,14 @@ function main()
 		nn--;
 		printl(nn);
 		//assert(nn.toString() eq "0.1"); //fails at precision 15 = 0.1000000000000001
-		assert(nn eq "0.1"); //succeeds numerically
-		nn+=1.0;
+		assert(nn eq "0.1");  //succeeds numerically
+		nn += 1.0;
 		printl(nn);
 		assert(nn.toString() eq "1.1");
-		nn-=1.0;
+		nn -= 1.0;
 		printl(nn);
 		//assert(nn.toString() eq "0.1"); //fails at precision 15 = 0.1000000000000001
-		assert(nn eq "0.1"); //succeeds numerically
+		assert(nn eq "0.1");  //succeeds numerically
 
 		//test remove
 
@@ -751,66 +760,65 @@ function main()
 		{
 			// member functions
 
-			var rem="abc"^FM^"xyz";
-			var ptr=2;
+			var rem = "abc" ^ FM ^ "xyz";
+			var ptr = 2;
 			var sep;
 
-			var result=rem.substr2(ptr,sep);
+			var result = rem.substr2(ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
 
-			result=rem.substr2(ptr,sep);
+			result = rem.substr2(ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
-			ptr=0;
+			ptr = 0;
 
-			result=rem.substr2(ptr,sep);
+			result = rem.substr2(ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
 
-			result=rem.substr2(ptr,sep);
+			result = rem.substr2(ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
-			ptr=999;
+			ptr = 999;
 
-			result=rem.substr2(ptr,sep);
+			result = rem.substr2(ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
 
-			result=rem.substr2(ptr,sep);
+			result = rem.substr2(ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
 		}
 
 		{
 			// free functions
 
-			var rem="abc"^FM^"xyz";
-			var ptr=2;
+			var rem = "abc" ^ FM ^ "xyz";
+			var ptr = 2;
 			var sep;
 
-			var result=substr2(rem, ptr,sep);
+			var result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
 
-			result=substr2(rem, ptr,sep);
+			result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
-			ptr=0;
+			ptr = 0;
 
-			result=substr2(rem, ptr,sep);
+			result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
 
-			result=substr2(rem, ptr,sep);
+			result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
-			ptr=999;
+			ptr = 999;
 
-			result=substr2(rem, ptr,sep);
+			result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
 
-			result=substr2(rem, ptr,sep);
+			result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
 		}
 
 		//test unquote
 		assert(unquote("\"This is quoted?\"") eq "This is quoted?");
-
 	}
 
 	printl(elapsedtimetext());
@@ -830,7 +838,6 @@ bool test_amountunit(in inputx, in amount, in unitcode) {
 
 	// Check unit
 	return unitcode2 eq unitcode;
-
 }
 
 function test_ioconv_TX(in fmt, in rec, in txt) {

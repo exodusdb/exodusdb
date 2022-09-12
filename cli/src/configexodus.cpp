@@ -261,7 +261,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		//locate pgexodus dll to install
 		var pgexodusdll = "pgexodus.dll";
 		if (not osfile(pgexodusdll)) {
-			var exodusbinpath = field(EXECPATH, OSSLASH, 1, dcount(EXECPATH, OSSLASH) - 1);
+			var exodusbinpath = field(EXECPATH, OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
 			pgexodusdll = exodusbinpath ^ OSSLASH ^ "pgexodus.dll";
 			if (not osfile(pgexodusdll)) {
 				printl("Cant find pgexodus.dll or " ^ pgexodusdll);

@@ -338,10 +338,10 @@ PUBLIC var textlen(CVR var1) {
 }
 
 
-PUBLIC VARREF converter(VARREF iostring, CVR oldchars, CVR newchars) {
+PUBLIC VARREF converter(VARREF iostring, SV oldchars, SV newchars) {
 	return iostring.converter(oldchars, newchars);
 }
-PUBLIC var convert(CVR instring, CVR oldchars, CVR newchars) {
+PUBLIC var convert(CVR instring, SV oldchars, SV newchars) {
 	return instring.convert(oldchars, newchars);
 }
 
@@ -354,10 +354,10 @@ PUBLIC var textconvert(CVR instring, CVR oldchars, CVR newchars) {
 }
 
 
-PUBLIC VARREF swapper(VARREF iostring, CVR from, CVR to) {
+PUBLIC VARREF swapper(VARREF iostring, SV from, SV to) {
 	return iostring.swapper(from, to);
 }
-PUBLIC var swap(CVR instring, CVR from, CVR to) {
+PUBLIC var swap(CVR instring, SV from, SV to) {
 	var newstring = instring;
 	return newstring.swap(from, to);
 }
@@ -702,13 +702,15 @@ PUBLIC var space(const int number) {
 	return var(number).space();
 }
 
-PUBLIC var dcount(CVR instring, CVR substrx) {
-	return instring.dcount(substrx);
+
+PUBLIC var fcount(CVR instring, SV substrx) {
+	return instring.fcount(substrx);
 }
 
-PUBLIC var count(CVR instring, CVR substrx) {
+PUBLIC var count(CVR instring, SV substrx) {
 	return instring.count(substrx);
 }
+
 
 PUBLIC var substr(CVR instring, const int startx) {
 	return instring.substr(startx);
@@ -726,13 +728,23 @@ PUBLIC VARREF substrer(VARREF iostring, const int startx, const int length) {
 	return iostring.substrer(startx, length);
 }
 
-PUBLIC var index(CVR instring, CVR substr, const int occurrenceno) {
-	return instring.index(substr, occurrenceno);
+
+//PUBLIC var index(CVR instring, SV substr) {
+//	return instring.index(substr);
+//}
+
+PUBLIC var index(CVR instring, SV substr, const int startcharno) {
+	return instring.index(substr, startcharno);
 }
 
-PUBLIC var index2(CVR instring, CVR substr, const int startcharno) {
-	return instring.index2(substr, startcharno);
+PUBLIC var indexn(CVR instring, SV substr, const int occurrenceno) {
+	return instring.indexn(substr, occurrenceno);
 }
+
+PUBLIC var indexr(CVR instring, SV substr, const int startcharno) {
+	return instring.indexr(substr, startcharno);
+}
+
 
 PUBLIC var field(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx) {
 	return instring.field(substrx, fieldnx, nfieldsx);

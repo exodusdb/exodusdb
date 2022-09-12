@@ -8,7 +8,7 @@ function main() {
 	var editor = "nano";
 
 	//quit if arguments
-	if (dcount(COMMAND, FM) < 2)
+	if (fcount(COMMAND, FM) < 2)
 		abort(
 			"Syntax is:\n"
 			"edir DBFILENAME KEY [FIELDNO]\n"

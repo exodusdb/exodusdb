@@ -24,7 +24,7 @@ function main(io css, in version="") {
 	//css.converter(FM, "\r\n");
 
 	//remove trailing EOL characters
-	//while (var("\r\n").index(css[-1], 1))
+	//while (var("\r\n").index(css[-1]))
 	//	css.popper();
 
 	var thcolor = SYSTEM.f(46, 1);
@@ -62,7 +62,7 @@ function main(io css, in version="") {
 	css.swapper("exodussize", fontsize);
 
 	var agent = SYSTEM.f(40);
-	if (agent.index("MSIE 7", 1)) {
+	if (agent.index("MSIE 7")) {
 		css.swapper("xborder-collapse", "border-collapse");
 	}
 

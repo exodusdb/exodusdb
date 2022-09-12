@@ -2436,7 +2436,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			var args = pgsql_line1.field(" ",2,99);
 			if (not args.len())
 				args = "key data";
-			else if (not args.index(' '))
+			else if (not args.index(" "))
 				args ^= " data";
 
 			// The first and 2nd arguments can be SOME_DICTID otherwise

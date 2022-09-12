@@ -234,7 +234,7 @@ function main(io tx, in mode="", in modevalue="") {
 		}
 		// end
 		// end
-		if (html and not bottomline.index("</tbody></table>", 1)) {
+		if (html and not bottomline.index("</tbody></table>")) {
 			tx.splicer(1, 0, "</tbody></table>");
 		}
 		bodyln = ntxlns;
@@ -292,7 +292,7 @@ subroutine convoptions() {
 	//swap "'T'" with timedate2() in temp
 	//swap "''" with "" in temp
 	while (true) {
-		var optioncharn = temp.index("\'", 1);
+		var optioncharn = temp.index("\'");
 		if (not optioncharn) {
 			break;
 		}
@@ -343,14 +343,14 @@ subroutine convoptions() {
 
 subroutine getheadfoot() {
 	headx = head;
-	if (headx.index("\'", 1)) {
+	if (headx.index("\'")) {
 		temp = headx;
 		gosub convoptions();
 		headx = temp;
 		headx.converter("`", "`");
 	}
 	var footx = foot;
-	if (footx.index("\'", 1)) {
+	if (footx.index("\'")) {
 		temp = footx;
 		gosub convoptions();
 		footx = temp;

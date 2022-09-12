@@ -1,42 +1,42 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 #include <functional>
 #include <limits>
 
-#include <string> //for ""_s suffix
+#include <string>  //for ""_s suffix
 using namespace std::string_literals;
 
 #include <exodus/program.h>
 
 template <class A, class B>
-bool less(A a,B b) {
+bool less(A a, B b) {
 	return a < b and a <= b and b > a and b >= a;
 }
 
 template <class A, class B>
-bool equal(A a,B b) {
+bool equal(A a, B b) {
 
 	{
 		errputl("equal:", a, b);
 
-		assert((var(a) ==     b  and var(b) ==     a  and var(a) <=     b  and var(a) >=     b  and var(b) <=     a  and var(b) >=     a)) ;//return false;
-		assert((    a  == var(b) and     b  == var(a) and     a  <= var(b) and     a  >= var(b) and     b  <= var(a) and     b  >= var(a)));//return false;
-		assert((var(a) == var(b) and var(b) == var(a) and var(a) <= var(b) and var(a) >= var(b) and var(b) <= var(a) and var(b) >= var(a)));//return false;
+		assert((var(a) eq b and var(b) eq a and var(a) <= b and var(a) >= b and var(b) <= a and var(b) >= a));								  //return false;
+		assert((a      eq var(b) and b eq var(a) and a <= var(b) and a >= var(b) and b <= var(a) and b >= var(a)));								  //return false;
+		assert((var(a) eq var(b) and var(b) eq var(a) and var(a) <= var(b) and var(a) >= var(b) and var(b) <= var(a) and var(b) >= var(a)));  //return false;
 
-		assert ((a == a && b == b))                    ;//return false;
-		assert ((var(a) == a && var(b) == b))          ;//return false;
-		assert ((a == var(a) && b == var(b)))          ;//return false;
-		assert ((var(a) == var(a) && var(b) == var(b)));//return false;
+		assert((a      eq a && b eq b));						 //return false;
+		assert((var(a) eq a && var(b) eq b));			 //return false;
+		assert((a      eq var(a) && b eq var(b)));			 //return false;
+		assert((var(a) eq var(a) && var(b) eq var(b)));	 //return false;
 
-		assert ((a >= a && b >= b))                    ;//return false;
-		assert ((var(a) >= a && var(b) >= b))          ;//return false;
-		assert ((a >= var(a) && b >= var(b)))          ;//return false;
-		assert ((var(a) >= var(a) && var(b) >= var(b)));//return false;
+		assert((a >= a && b >= b));						 //return false;
+		assert((var(a) >= a && var(b) >= b));			 //return false;
+		assert((a >= var(a) && b >= var(b)));			 //return false;
+		assert((var(a) >= var(a) && var(b) >= var(b)));	 //return false;
 
-		assert ((a <= a && b <= b))                    ;//return false;
-		assert ((var(a) <= a && var(b) <= b))          ;//return false;
-		assert ((a <= var(a) && b <= var(b)))          ;//return false;
-		assert ((var(a) <= var(a) && var(b) <= var(b)));//return false;
+		assert((a <= a && b <= b));						 //return false;
+		assert((var(a) <= a && var(b) <= b));			 //return false;
+		assert((a <= var(a) && b <= var(b)));			 //return false;
+		assert((var(a) <= var(a) && var(b) <= var(b)));	 //return false;
 	}
 
 	return true;
@@ -53,142 +53,140 @@ bool numtest(A a, B b, in c, in d) {
 
 	errputl("numtest: a,b,c,d", a, b, c, d);
 
-	var no = 1;
+	var no	= 1;
 	var no2 = 1;
-	var add = c+d;
+	var add = c + d;
 	add.dump("add = c+d");
 
-	assert(var(    a  +     b).errput(no++ ^ ". ")  == (add).errputl(" should be "));//return false;
-	assert(var(var(a) +     b).errput(no++ ^ ". ")  == (add).errputl(" should be "));//return false;
-	assert(var(    a  + var(b)).errput(no++ ^ ". ") == (add).errputl(" should be "));//return false;
-	assert(var(var(a) + var(b)).errput(no++ ^ ". ") == (add).errputl(" should be "));//return false;
-	assert(var(    b  +     a ).errput(no++ ^ ". ") == (add).errputl(" should be "));//return false;
-	assert(var(    b  + var(a)).dump("222") == (add).errputl(" should be ").dump("1"));//return false;
-
+	assert(var(a + b).errput(no++ ^ ". ")           eq (add).errputl(" should be "));			   //return false;
+	assert(var(var(a) + b).errput(no++ ^ ". ")      eq (add).errputl(" should be "));	   //return false;
+	assert(var(a + var(b)).errput(no++ ^ ". ")      eq (add).errputl(" should be "));	   //return false;
+	assert(var(var(a) + var(b)).errput(no++ ^ ". ") eq (add).errputl(" should be "));  //return false;
+	assert(var(b + a).errput(no++ ^ ". ")           eq (add).errputl(" should be "));			   //return false;
+	assert(var(b + var(a)).dump("222")              eq (add).errputl(" should be ").dump("1"));	   //return false;
 
 	//assert((    b  + var(a)).dump("1") != add.dump("2"));//return false;
-	assert(var(var(b) + var(a)).errput(no++ ^ ". ").dump("1B") == (add).errputl(" should be ").dump("2B"));//return false;
+	assert(var(var(b) + var(a)).errput(no++ ^ ". ").dump("1B") eq (add).errputl(" should be ").dump("2B"));	 //return false;
 
-	var sub = c-d;
-	assert(var(    a  -     b).errput(no++ ^ ". ")  == (sub).errputl(" should be "));//return false;
-	assert(var(var(a) -     b).errput(no++ ^ ". ")  == (sub).errputl(" should be "));//return false;
-	assert(var(    a  - var(b)).errput(no++ ^ ". ") == (sub).errputl(" should be "));//return false;
-	assert(var(var(a) - var(b)).errput(no++ ^ ". ") == (sub).errputl(" should be "));//return false;
+	var sub = c - d;
+	assert(var(a - b).errput(no++ ^ ". ")           eq (sub).errputl(" should be "));			   //return false;
+	assert(var(var(a) - b).errput(no++ ^ ". ")      eq (sub).errputl(" should be "));	   //return false;
+	assert(var(a - var(b)).errput(no++ ^ ". ")      eq (sub).errputl(" should be "));	   //return false;
+	assert(var(var(a) - var(b)).errput(no++ ^ ". ") eq (sub).errputl(" should be "));  //return false;
 
-	var mul = c*d;
-	assert(var(    a  *     b).errput(no++ ^ ". ")  == (mul).errputl(" should be "));//return false;
-	assert(var(var(a) *     b).errput(no++ ^ ". ")  == (mul).errputl(" should be "));//return false;
-	assert(var(    a  * var(b)).errput(no++ ^ ". ") == (mul).errputl(" should be "));//return false;
-	assert(var(var(a) * var(b)).errput(no++ ^ ". ") == (mul).errputl(" should be "));//return false;
+	var mul = c * d;
+	assert(var(a * b).errput(no++ ^ ". ")           eq (mul).errputl(" should be "));			   //return false;
+	assert(var(var(a) * b).errput(no++ ^ ". ")      eq (mul).errputl(" should be "));	   //return false;
+	assert(var(a * var(b)).errput(no++ ^ ". ")      eq (mul).errputl(" should be "));	   //return false;
+	assert(var(var(a) * var(b)).errput(no++ ^ ". ") eq (mul).errputl(" should be "));  //return false;
 
-	assert(var(    b  *     a).errput(no++ ^ ". ")  == (mul).errputl(" should be "));//return false;
-	assert(var(var(b) *     a).errput(no++ ^ ". ")  == (mul).errputl(" should be "));//return false;
-	assert(var(    b  * var(a)).errput(no++ ^ ". ") == (mul).errputl(" should be "));//return false;
-	assert(var(var(b) * var(a)).errput(no++ ^ ". ") == (mul).errputl(" should be "));//return false;
+	assert(var(b * a).errput(no++ ^ ". ")           eq (mul).errputl(" should be "));			   //return false;
+	assert(var(var(b) * a).errput(no++ ^ ". ")      eq (mul).errputl(" should be "));	   //return false;
+	assert(var(b * var(a)).errput(no++ ^ ". ")      eq (mul).errputl(" should be "));	   //return false;
+	assert(var(var(b) * var(a)).errput(no++ ^ ". ") eq (mul).errputl(" should be "));  //return false;
 
-	var div = var(c)/var(d);
-	assert(var(    a  /     b).errput(no++ ^ ". ")  == div.errputl(" should be "));//return false;
-	assert(var(var(a) /     b).errput(no++ ^ ". ")  == div.errputl(" should be "));//return false;
-	assert(var(    a  / var(b)).errput(no++ ^ ". ") == div.errputl(" should be "));//return false;
-	assert(var(var(a) / var(b)).errput(no++ ^ ". ") == div.errputl(" should be "));//return false;
-	assert(var(1/(    b  /     a)).errput(no++ ^ ". ")  == div.errputl(" should be "));//return false;
-	assert(var(1/(var(b) /     a)).errput(no++ ^ ". ")  == div.errputl(" should be "));//return false;
-	assert(var(1/(    b  / var(a))).errput(no++ ^ ". ") == div.errputl(" should be "));//return false;
-	assert(var(1/(var(b) / var(a))).errput(no++ ^ ". ") == div.errputl(" should be "));//return false;
+	var div = var(c) / var(d);
+	assert(var(a / b).errput(no++ ^ ". ")                 eq div.errputl(" should be "));				   //return false;
+	assert(var(var(a) / b).errput(no++ ^ ". ")            eq div.errputl(" should be "));			   //return false;
+	assert(var(a / var(b)).errput(no++ ^ ". ")            eq div.errputl(" should be "));			   //return false;
+	assert(var(var(a) / var(b)).errput(no++ ^ ". ")       eq div.errputl(" should be "));		   //return false;
+	assert(var(1 / (b / a)).errput(no++ ^ ". ")           eq div.errputl(" should be "));			   //return false;
+	assert(var(1 / (var(b) / a)).errput(no++ ^ ". ")      eq div.errputl(" should be "));	   //return false;
+	assert(var(1 / (b / var(a))).errput(no++ ^ ". ")      eq div.errputl(" should be "));	   //return false;
+	assert(var(1 / (var(b) / var(a))).errput(no++ ^ ". ") eq div.errputl(" should be "));  //return false;
 
-	var mod = var(c)%var(d);
+	var mod = var(c) % var(d);
 	//assert((    a  %     b)  != mod);//return false;
-	assert((var(a) %     b).errput(no++ ^ ". ")  == mod.errputl(" should be "));//return false;
-	assert((    a  % var(b)).errput(no++ ^ ". ") == mod.errputl(" should be "));//return false;
-	assert((var(a) % var(b)).errput(no++ ^ ". ") == mod.errputl(" should be "));//return false;
+	assert((var(a) % b).errput(no++ ^ ". ")      eq mod.errputl(" should be "));		  //return false;
+	assert((a % var(b)).errput(no++ ^ ". ")      eq mod.errputl(" should be "));		  //return false;
+	assert((var(a) % var(b)).errput(no++ ^ ". ") eq mod.errputl(" should be "));  //return false;
 
 	return true;
 }
 
 auto func_c(const char* xyz) {
-    std::cout << xyz << std::endl;
-    return xyz;
+	std::cout << xyz << std::endl;
+	return xyz;
 }
 
 auto func_s(std::string xyz) {
-    std::cout << xyz << std::endl;
-    return xyz;
+	std::cout << xyz << std::endl;
+	return xyz;
 }
 
 auto func_i(const int xyz) {
-    std::cout << xyz << std::endl;
-    return xyz;
+	std::cout << xyz << std::endl;
+	return xyz;
 }
 
 auto func_li(const long long xyz) {
-    std::cout << xyz << std::endl;
-    return xyz;
+	std::cout << xyz << std::endl;
+	return xyz;
 }
 
 auto func_d(const double xyz) {
-    std::cout << xyz << std::endl;
-    return xyz;
+	std::cout << xyz << std::endl;
+	return xyz;
 }
 
 auto func_ld(const long double xyz) {
-    std::cout << xyz << std::endl;
-    return xyz;
+	std::cout << xyz << std::endl;
+	return xyz;
 }
 
 programinit()
 
-function main() {
+	function main() {
 	printl("test_more says 'Hello World!'");
 
 	{
-		equal('a','a'  );
-		equal('a',"a"  );
+		equal('a', 'a');
+		equal('a', "a");
 
-		equal('3' , '3');
-		equal('3' , "3");
-		equal('3' , 3.0);
+		equal('3', '3');
+		equal('3', "3");
+		equal('3', 3.0);
 
-		equal("3" , '3');
-		equal("3" , 3  );
-		equal("3" , 3.0);
+		equal("3", '3');
+		equal("3", 3);
+		equal("3", 3.0);
 
 		equal("03", '3');
-		equal("03", 3  );
+		equal("03", 3);
 		equal("03", 3.0);
 	}
 
 	//note
-	assert(numtest(var(223),        123,   223,   123   ));
-	assert(numtest(    223,     var(123),  223,   123   ));
-	assert(numtest(    223,         123.1, 223,   123.1 ));
-	assert(numtest(    223.1,       123,   223.1, 123   ));
-	assert(numtest(    223.1,       123.1, 223.1, 123.1 ));
+	assert(numtest(var(223), 123, 223, 123));
+	assert(numtest(223, var(123), 223, 123));
+	assert(numtest(223, 123.1, 223, 123.1));
+	assert(numtest(223.1, 123, 223.1, 123));
+	assert(numtest(223.1, 123.1, 223.1, 123.1));
 
-	assert(numtest("223"  , var(123),     223,   123   ));
-	assert(numtest("223"  , var(123.1),   223,   123.1 ));
-	assert(numtest("223.1", var(123),     223.1, 123   ));
-	assert(numtest("223.1", var(123.1),   223.1, 123.1 ));
-	assert(numtest("223.1", var("123"),   223.1, 123   ));
-	assert(numtest("223.1", var("123.1"), 223.1, 123.1 ));
+	assert(numtest("223", var(123), 223, 123));
+	assert(numtest("223", var(123.1), 223, 123.1));
+	assert(numtest("223.1", var(123), 223.1, 123));
+	assert(numtest("223.1", var(123.1), 223.1, 123.1));
+	assert(numtest("223.1", var("123"), 223.1, 123));
+	assert(numtest("223.1", var("123.1"), 223.1, 123.1));
 
 	// Construct from initializer list of int double and const char*
 	{
-		assert(var({1, 22, -0, 333}) eq "1" _FM "22" _FM "0" _FM "333");
-		assert(var({1.1, 1.2, 1000.0}) eq "1.1" _FM "1.2" _FM "1000");
+		assert(var({1, 22, -0, 333})       eq "1" _FM "22" _FM "0" _FM "333");
+		assert(var({1.1, 1.2, 1000.0})     eq "1.1" _FM "1.2" _FM "1000");
 		assert(var({"a", "bb", "", "ccc"}) eq "a" _FM "bb" _FM _FM "ccc");
 	}
 
 	// Construct from literal int, double and const char*
 	{
-//		assert(     123456_var.errputl() eq "123456");
-//		assert(    123.456_var.errputl() eq "123.456");
-		assert(     123456_var           eq "123456");
-		assert(    123.456_var           eq "123.456");
+		//		assert(     123456_var.errputl() eq "123456");
+		//		assert(    123.456_var.errputl() eq "123.456");
+		assert(123456_var                eq "123456");
+		assert(123.456_var               eq "123.456");
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
-		assert(   "_^]}|~"_var.errputl() eq _RM _FM _VM _SM _TM _ST);
+		assert("_^]}|~"_var.errputl()    eq _RM _FM _VM _SM _TM _ST);
 	}
-
 
 	//Construct fixed dim array from initializer list
 	{
@@ -216,23 +214,22 @@ function main() {
 		d.oswrite(tfilename);
 
 		//check roundtrip agrees
-		assert(osread(tfilename) eq (d.join("\n") ^ '\n'));
-
+		assert(osread(tfilename) eq(d.join("\n") ^ '\n'));
 	}
 
 	{
 		// bool -> int
-		assert((var(true) ^ "x").errputl() eq "1x");
+		assert((var(true) ^ "x").errputl()  eq "1x");
 		assert((var(false) ^ "x").errputl() eq "0x");
 
 		// char -> str
 		assert((var(char('A')) ^ "x").errputl() eq "Ax");
 
 		// signed char -> int
-		assert((var((signed char)('A')) ^ "x").errputl() eq "65x"); //numeric character -> int
+		assert((var((signed char)('A')) ^ "x").errputl() eq "65x");	 //numeric character -> int
 
 		// unsigned char -> int
-		assert((var((unsigned char)('A')) ^ "x").errputl() eq "65x"); //numeric character -> int
+		assert((var((unsigned char)('A')) ^ "x").errputl() eq "65x");  //numeric character -> int
 
 		// std string suffix -> str
 		assert((var("AB"s) ^ "x").errputl() eq "ABx");
@@ -251,9 +248,9 @@ function main() {
 
 		// Cannot provide var constructor for wide character -> string so they come in as ints at the moment
 		assert(var(u8'A').errputl("u8=") eq "65");
-		assert(var(L'A').errputl("L=") eq "65");
-		assert(var(u'A').errputl("u=") eq "65");
-		assert(var(U'A').errputl("U=") eq "65");
+		assert(var(L'A').errputl("L=")   eq "65");
+		assert(var(u'A').errputl("u=")   eq "65");
+		assert(var(U'A').errputl("U=")   eq "65");
 		//  assert((var(u8'A') ^ "x").errputl() eq "Ax"); //char8_t is integer but not string convertible so we need a specific converter
 		//  assert((var(L'A') ^ "x").errputl() eq "Ax"); //wchar_t is integer but not string convertible so we need a specific converter
 		//  assert((var(u'A') ^ "x").errputl() eq "Ax"); //wchar_t is integer but not string convertible so we need a specific converter
@@ -264,106 +261,136 @@ function main() {
 
 		// unsigned short -> int
 		assert((var((unsigned short)(65)) ^ "x").errputl() eq "65x");
-		assert((var(65) ^ "x").errputl() eq "65x");
+		assert((var(65) ^ "x").errputl()                   eq "65x");
 
 		// unsigned int -> int
-		assert((var(int(65)) ^ "x").errputl() eq "65x");
+		assert((var(int(65)) ^ "x").errputl()            eq "65x");
 		assert((var((unsigned int)(65)) ^ "x").errputl() eq "65x");
 
 		// unsigned long -> int
-		assert((var(65L) ^ "x").errputl() eq "65x");
+		assert((var(65L) ^ "x").errputl()                  eq "65x");
 		assert((var((unsigned long)(65L)) ^ "x").errputl() eq "65x");
 
 		// unsigned long long -> int
-		assert((var(65LL) ^ "x").errputl() eq "65x");
+		assert((var(65LL) ^ "x").errputl()                      eq "65x");
 		assert((var((unsigned long long)(65L)) ^ "x").errputl() eq "65x");
 
 		// float -> dbl
 		assert((var(123.456f).round(3) ^ "x").errputl() eq "123.456x");
-		assert((var(123.0f) ^ "x").errputl() eq "123x");
+		assert((var(123.0f) ^ "x").errputl()            eq "123x");
 
 		// double -> dbl
 		assert((var(123.456).round(3) ^ "x").errputl() eq "123.456x");
-		assert((var(123.0) ^ "x").errputl() eq "123x");
+		assert((var(123.0) ^ "x").errputl()            eq "123x");
 
 		// long double -> dbl
 		assert((var(123.456L).round(3) ^ "x").errputl() eq "123.456x");
-		assert((var(123.0L) ^ "x").errputl() eq "123x");
+		assert((var(123.0L) ^ "x").errputl()            eq "123x");
 	}
 
 	{
-	    std::string s = "abc";
-	    assert(std::string(var(s)) == s);
-	    assert(func_s(var(s)) == s);
+		std::string s = "abc";
+		assert(std::string(var(s)) eq s);
+		assert(func_s(var(s))      eq s);
 
-	    const char* c = "abc";
-	    assert(*(const char*)(var(c)) == *c);
-	    assert(*func_c(var(c)) == *c);
+		const char* c = "abc";
+		assert(*(const char*)(var(c)) eq *c);
+		assert(*func_c(var(c))        eq *c);
 
-	    int i = 42;
-	    assert(int(var(i)) == i);
-	    assert(func_i(var(i)) == i);
+		int i = 42;
+		assert(int(var(i))    eq i);
+		assert(func_i(var(i)) eq i);
 
-	    var v = "123";
+		var v = "123";
 
-	    assert(func_c(var(v)) == v);
-	    assert(func_s(var(v)) == v);
+		assert(func_c(var(v)) eq v);
+		assert(func_s(var(v)) eq v);
 
-	    assert(func_i(var(v)) == v);
-	    assert(func_li(var(v).toInt()) == v.toInt());
+		assert(func_i(var(v))          eq v);
+		assert(func_li(var(v).toInt()) eq v.toInt());
 
-	    assert(func_d(var(v)) == v);
-	    assert(func_ld(var(v)) == v.toDouble());
-
+		assert(func_d(var(v))  eq v);
+		assert(func_ld(var(v)) eq v.toDouble());
 	}
 
 	{
 		printl("Check BYes,No");
-		assert(oconv(var(true),"BYes,No").outputl() eq "Yes");
-		assert(oconv(var(false),"BYes,No").outputl() eq "No");
+		assert(oconv(var(true), "BYes,No").outputl()  eq "Yes");
+		assert(oconv(var(false), "BYes,No").outputl() eq "No");
 	}
 
 	//check convert from double to string
 	{
 		var x = var(123.456).convert(".", "_");
-		assert(x eq "123_456");
-
+		assert(x                                                        eq "123_456");
 	}
 	{
 		//check various xxxxxxxx-er functions
 		var v1_01;
-		v1_01=1.01; assert(converter(v1_01,".", "_").outputl().toString() eq "1_01");
-		v1_01=1.01; assert(textconverter(v1_01,".", "_").outputl().toString() eq "1_01");
-		v1_01=1.01; assert(swapper(v1_01,".", "_").outputl().toString() eq "1_01");
-		v1_01=1.01; assert(regex_replacer(v1_01,".", "_").outputl().toString() eq "____");
-		v1_01=1.01; assert(regex_replacer(v1_01,".", "_" , "").outputl().toString() eq "____");
-		v1_01=1.01; assert(splicer(v1_01,2, 1, "_").outputl().toString() eq "1_01");
-		v1_01=1.01; assert(splicer(v1_01,-1, "_").outputl().toString() eq "1.0_");
-		v1_01=1.01; assert(popper(v1_01).outputl().toString() eq "1.0");
-		v1_01=1.01; assert(quoter(v1_01).outputl().toString() eq "\"1.01\"");
-		v1_01=1.01; assert(squoter(v1_01).outputl().toString() eq "'1.01'");
-		v1_01=1.01; assert(unquoter(v1_01).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(ucaser(v1_01).outputl().toString() eq "1.01");        // utf8
-		v1_01=1.01; assert(lcaser(v1_01).outputl().toString() eq "1.01");        // utf8
-		v1_01=1.01; assert(tcaser(v1_01).outputl().toString() eq "1.01");        // utf8
-		v1_01=1.01; assert(fcaser(v1_01).outputl().toString() eq "1.01");        // utf8
-		v1_01=1.01; assert(normalizer(v1_01).outputl().toString() eq "1.01");    // utf8
-		v1_01=1.01; assert(inverter(v1_01).outputl().toString() eq "ÎÑÏÎ");    // utf8
-		v1_01=1.01; assert(trimmer(v1_01).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(trimmerf(v1_01).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(trimmerb(v1_01).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(trimmer(v1_01,var(" ")).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(trimmer(v1_01,var(" "), "FB").outputl().toString() eq "1.01");
-		v1_01=1.01; assert(trimmerf(v1_01,var(" ")).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(trimmerb(v1_01,var(" ")).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(fieldstorer(v1_01,".", 1, 1, "_").outputl().toString() eq "_.01");
-		v1_01=1.01; assert(substrer(v1_01,2,2).outputl().toString() eq ".0");
-		v1_01=1.01; assert(substrer(v1_01,3).outputl().toString() eq "01");
-		v1_01=1.01; assert(substrer(v1_01,1).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(sorter(v1_01).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(lowerer(v1_01).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(raiser(v1_01).outputl().toString() eq "1.01");
-		v1_01=1.01; assert(cropper(v1_01).outputl().toString() eq "1.01");
+		v1_01 = 1.01;
+		assert(converter(v1_01, ".", "_").outputl().toString()          eq "1_01");
+		v1_01 = 1.01;
+		assert(textconverter(v1_01, ".", "_").outputl().toString()      eq "1_01");
+		v1_01 = 1.01;
+		assert(swapper(v1_01, ".", "_").outputl().toString()            eq "1_01");
+		v1_01 = 1.01;
+		assert(regex_replacer(v1_01, ".", "_").outputl().toString()     eq "____");
+		v1_01 = 1.01;
+		assert(regex_replacer(v1_01, ".", "_", "").outputl().toString() eq "____");
+		v1_01 = 1.01;
+		assert(splicer(v1_01, 2, 1, "_").outputl().toString()           eq "1_01");
+		v1_01 = 1.01;
+		assert(splicer(v1_01, -1, "_").outputl().toString()             eq "1.0_");
+		v1_01 = 1.01;
+		assert(popper(v1_01).outputl().toString()                       eq "1.0");
+		v1_01 = 1.01;
+		assert(quoter(v1_01).outputl().toString()                       eq "\"1.01\"");
+		v1_01 = 1.01;
+		assert(squoter(v1_01).outputl().toString()                      eq "'1.01'");
+		v1_01 = 1.01;
+		assert(unquoter(v1_01).outputl().toString()                     eq "1.01");
+		v1_01 = 1.01;
+		assert(ucaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		v1_01 = 1.01;
+		assert(lcaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		v1_01 = 1.01;
+		assert(tcaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		v1_01 = 1.01;
+		assert(fcaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		v1_01 = 1.01;
+		assert(normalizer(v1_01).outputl().toString() eq "1.01");  // utf8
+		v1_01 = 1.01;
+		assert(inverter(v1_01).outputl().toString() eq "ÎÑÏÎ");	 // utf8
+		v1_01 = 1.01;
+		assert(trimmer(v1_01).outputl().toString()                      eq "1.01");
+		v1_01 = 1.01;
+		assert(trimmerf(v1_01).outputl().toString()                     eq "1.01");
+		v1_01 = 1.01;
+		assert(trimmerb(v1_01).outputl().toString()                     eq "1.01");
+		v1_01 = 1.01;
+		assert(trimmer(v1_01, var(" ")).outputl().toString()            eq "1.01");
+		v1_01 = 1.01;
+		assert(trimmer(v1_01, var(" "), "FB").outputl().toString()      eq "1.01");
+		v1_01 = 1.01;
+		assert(trimmerf(v1_01, var(" ")).outputl().toString()           eq "1.01");
+		v1_01 = 1.01;
+		assert(trimmerb(v1_01, var(" ")).outputl().toString()           eq "1.01");
+		v1_01 = 1.01;
+		assert(fieldstorer(v1_01, ".", 1, 1, "_").outputl().toString()  eq "_.01");
+		v1_01 = 1.01;
+		assert(substrer(v1_01, 2, 2).outputl().toString()               eq ".0");
+		v1_01 = 1.01;
+		assert(substrer(v1_01, 3).outputl().toString()                  eq "01");
+		v1_01 = 1.01;
+		assert(substrer(v1_01, 1).outputl().toString()                  eq "1.01");
+		v1_01 = 1.01;
+		assert(sorter(v1_01).outputl().toString()                       eq "1.01");
+		v1_01 = 1.01;
+		assert(lowerer(v1_01).outputl().toString()                      eq "1.01");
+		v1_01 = 1.01;
+		assert(raiser(v1_01).outputl().toString()                       eq "1.01");
+		v1_01 = 1.01;
+		assert(cropper(v1_01).outputl().toString()                      eq "1.01");
 	}
 
 	printl(elapsedtimetext());
@@ -373,4 +400,3 @@ function main() {
 }
 
 programexit()
-

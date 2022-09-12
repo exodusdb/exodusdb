@@ -1,25 +1,25 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
 #include <exodus/program.h>
 
 programinit()
 
-function main() {
+	function main() {
 
-	var filename="t_hello.txt";
+	var filename = "t_hello.txt";
 	assert(oswrite("xyz", filename));
-	assert(osfile(filename).f(1) == 3);
+	assert(osfile(filename).f(1) eq 3);
 
 	var filex;
-	assert(osopen(filename,filex));
+	assert(osopen(filename, filex));
 
 	var data;
-	var offset=0;
-	var length=4;
-	assert(osbread(data,filex,offset,length));
+	var offset = 0;
+	var length = 4;
+	assert(osbread(data, filex, offset, length));
 
-	assert(data.outputl() == "xyz");
+	assert(data.outputl() eq "xyz");
 
 	assert(osremove(filename));
 	assert(not osfile(filename));
@@ -31,4 +31,3 @@ function main() {
 }
 
 programexit()
-

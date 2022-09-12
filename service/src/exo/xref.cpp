@@ -9,7 +9,7 @@ function main(in instr, in sepchars, in stoplist, in mode) {
 	//remove stop words
 	if (mode) {
 		var xx;
-		for (var ii = outstr.dcount(VM); ii>0; --ii) {
+		for (var ii = outstr.fcount(VM); ii>0; --ii) {
 			if (stoplist.locate(outstr.f(1,ii),xx)) {
 				outstr.remover(1,ii);
 			}

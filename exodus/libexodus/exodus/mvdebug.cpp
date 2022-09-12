@@ -197,7 +197,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 
 		// find the last line containing .cpp
 		/// root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)
-		var nn2 = temp.dcount(FM);
+		var nn2 = temp.fcount(FM);
 		var line = "";
 		var linesource = "";
 		for (var ii2 = 1; ii2 < nn2; ++ii2) {

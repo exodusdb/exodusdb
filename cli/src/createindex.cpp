@@ -21,7 +21,7 @@ function main() {
 		printl(indexnames);
 	}
 
-	var nindexes = dcount(indexnames, FM);
+	var nindexes = fcount(indexnames, FM);
 
 	var result = 0;
 

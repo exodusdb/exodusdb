@@ -196,14 +196,14 @@ PUBLIC bool echo(const int on_off);
 PUBLIC ND var len(CVR var2);
 PUBLIC ND var textlen(CVR var2);
 
-PUBLIC VARREF converter(VARREF iostring, CVR oldchars, CVR newchars);
-PUBLIC ND var convert(CVR instring, CVR oldchars, CVR newchars);
+PUBLIC VARREF converter(VARREF iostring, SV oldchars, SV newchars);
+PUBLIC ND var convert(CVR instring, SV oldchars, SV newchars);
 
 PUBLIC VARREF textconverter(VARREF iostring, CVR oldchars, CVR newchars);
 PUBLIC ND var textconvert(CVR instring, CVR oldchars, CVR newchars);
 
-PUBLIC VARREF swapper(VARREF iostring, CVR oldstr, CVR newstr);
-PUBLIC ND var swap(CVR instring, CVR oldstr, CVR newstr);
+PUBLIC VARREF swapper(VARREF iostring, SV oldstr, SV newstr);
+PUBLIC ND var swap(CVR instring, SV oldstr, SV newstr);
 
 PUBLIC VARREF regex_replacer(VARREF iostring, CVR oldstr, CVR newstr, CVR options DEFAULT_EMPTY);
 PUBLIC ND var regex_replace(CVR instring, CVR oldstr, CVR newstr, CVR options DEFAULT_EMPTY);
@@ -302,16 +302,19 @@ PUBLIC ND var seq(CVR char1);
 PUBLIC ND var textseq(CVR char1);
 PUBLIC ND var str(CVR instring, const int number);
 PUBLIC ND var space(const int number);
-PUBLIC ND var dcount(CVR instring, CVR substrx);
-PUBLIC ND var count(CVR instring, CVR substrx);
+PUBLIC ND var fcount(CVR instring, SV substrx);
+PUBLIC ND var count(CVR instring, SV substrx);
 
 PUBLIC ND var substr(CVR instring, const int startx);
 PUBLIC ND var substr(CVR instring, const int startx, const int length);
 PUBLIC VARREF substrer(VARREF iostring, const int startx);
 PUBLIC VARREF substrer(VARREF iostring, const int startx, const int length);
 
-PUBLIC ND var index(CVR instring, CVR substr, const int occurrenceno = 1);
-PUBLIC ND var index2(CVR instring, CVR substr, const int startcharno = 1);
+//PUBLIC ND var index(CVR instring, CVR substr, const int occurrenceno = 1);
+//PUBLIC ND var index(CVR instring, SV substr);
+PUBLIC ND var index(CVR instring, SV substr, const int startcharno = 1);
+PUBLIC ND var indexn(CVR instring, SV substr);
+PUBLIC ND var indexr(CVR instring, SV substr, const int startcharno = -1);
 
 PUBLIC ND var field(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx = 1);
 PUBLIC ND var field2(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx = 1);

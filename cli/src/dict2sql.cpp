@@ -100,7 +100,7 @@ function main() {
 
 	var filenames = COMMAND.f(2).lcase();
 	var dictid = COMMAND.f(3);
-	verbose = index(OPTIONS, 'V');
+	verbose = index(OPTIONS, "V");
 	var doall = true;
 
 	// Option to install standard exodus functions
@@ -544,17 +544,19 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//so pgsql comments like /* */ are respected ??
 	//remove anything after sql code
 	//find the LAST * /  pair and remove everything after it
-	var lastpos = 0;
-	for (int ii = 1;; ++ii) {
-		//find the ii'th * / terminator
-		pos = index(sql,
-					"*"
-					"/",
-					ii);
-		if (!pos)
-			break;
-		lastpos = pos;
-	}
+//	var lastpos = 0;
+//	for (int ii = 1;; ++ii) {
+//		//find the ii'th * / terminator
+//		//pos = index2(sql,
+//		pos = index(sql,
+//					"*"
+//					"/",
+//					lastpos + 1);
+//		if (!pos)
+//			break;
+//		lastpos = pos;
+//	}
+	var lastpos = sql.indexr("*" "/");
 	if (lastpos)
 		sql.splicer(lastpos - 1, "");
 
@@ -617,7 +619,7 @@ $RETVAR := array_to_string
 	// mode can be X, C or omitted
 	// X returns '' if target record is missing
 	// C returns the target key unconvered is target record is missing
-	int nlines = dcount(sql, VM);
+	int nlines = fcount(sql, VM);
 	for (int ln = 1; ln <= nlines; ++ln) {
 		var line = sql.f(1, ln).trim();
 		//if (line.substr(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {

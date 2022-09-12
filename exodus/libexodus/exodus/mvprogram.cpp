@@ -136,7 +136,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//UPLOADS=''
 	//AUTHORISED<>''
 	//DEADLINE<='10/6/2019'
-	int nfields = calc_fields.f(1).dcount(VM);
+	int nfields = calc_fields.f(1).fcount(VM);
 	dim dictids(nfields);
 	dim opnos(nfields);
 	dim reqivalues(nfields);
@@ -530,7 +530,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 	var filename = command.field(" ", 1);
 
 	//if any keys provided (remove quotes if present)
-	int nwords = command.dcount(" ");
+	int nwords = command.fcount(" ");
 
 	//find and skip final options like (S)
 	bool silent = false;
@@ -574,30 +574,6 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_u
 	CURSOR.transfer(v2);
 	CURSOR = var().date() ^ "_" ^ (var().ostime().convert(".", "_"));
 	return true;
-
-	/*
-	SUBROUTINE PUSH.SELECT(V1, V2, V3, V4)
-	11 nullptr
-	12 *STOPLINECOUNT
-	13 *STARTLINECOUNT
-	14 *STOPLINECOUNT
-	15 *STARTLINECOUNT
-	16 TRANSFER SYS109_27 TO V2
-	20 V3 = SYS109_63
-	24 V3 := @RM : SYS109_99
-	33 V3 := @RM : SYS109_140
-	42 V3 := @RM : SYS109_64
-	51 V3 := @RM : SYS109_61_FILEHANDLE
-	60 V3 := @RM : SYS109_87
-	69 V3 := @RM : SYS109_65
-	78 V3 := @RM : SYS109_66
-	87 V3 := @RM : SYS109_135_MAPNAME
-	96 V3 := @RM : SYS109_79
-	105 V4 = SYS109_58
-	109 SYS109_63 = 0
-	113 SYS109_100 += 1
-	119 RETURN
-	*/
 }
 
 // popselect
@@ -606,37 +582,6 @@ bool ExodusProgramBase::popselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_un
 	// CURSOR--;
 	v2.transfer(CURSOR);
 	return true;
-	/*
-	SUBROUTINE POP.SELECT(V1, V2, V3, V4)
-	11 nullptr
-	12 *STOPLINECOUNT
-	13 *STARTLINECOUNT
-	14 *STOPLINECOUNT
-	15 *STARTLINECOUNT
-	16 TRANSFER V2 TO SYS109_27
-	20 SYS109_63 = V3[1, @RM]
-	28 V3[1, COL2()]=''
-	35 SYS109_99 = V3[1, @RM]
-	43 V3[1, COL2()]=''
-	50 SYS109_140 = V3[1, @RM]
-	58 V3[1, COL2()]=''
-	65 SYS109_64 = V3[1, @RM]
-	73 V3[1, COL2()]=''
-	80 SYS109_61_FILEHANDLE = V3[1, @RM]
-	88 V3[1, COL2()]=''
-	95 SYS109_87 = V3[1, @RM]
-	103 V3[1, COL2()]=''
-	110 SYS109_65 = V3[1, @RM]
-	118 V3[1, COL2()]=''
-	125 SYS109_66 = V3[1, @RM]
-	133 V3[1, COL2()]=''
-	140 SYS109_135_MAPNAME = V3[1, @RM]
-	148 V3[1, COL2()]=''
-	155 SYS109_79 = V3[1, @RM]
-	163 SYS109_58 = V4
-	167 SYS109_100 -= 1
-	173 RETURN
-	*/
 }
 
 // note 2
@@ -947,7 +892,7 @@ notallowed:
 	// user must have all the keys for all the locks on this task
 	// following users up to first blank line also have the same keys
 	var keys = SECURITY.f(2).field(VM, usern, 999);
-	var temp = keys.index("---", 1);
+	var temp = keys.index("---");
 	if (temp) {
 		keys.splicer(temp - 1, 999, "");
 	}
@@ -1003,7 +948,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		string2 = str0;
 		// convert @upper.case to @lower.case in string2
 		int nn = string2.len();
-		var numx = var("1234567890").index(string2[1], 1);
+		var numx = var("1234567890").index(string2[1]);
 		var cap = 1;
 		var wordseps;
 		var inquotes = 0;
@@ -1023,11 +968,11 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 				if ((tt == DQ and string2.count(DQ) gt 1) or ((tt == "'" and string2.count("'") gt 1))) {
 					inquotes = tt;
 				} else {
-					if (wordseps.index(tt, 1)) {
+					if (wordseps.index(tt)) {
 						cap = 1;
 						if (tt == " ")
 							//numx = var("1234567890").index(string2.substr(ii + 1, 1), 1);
-							numx = var("1234567890").index(string2[ii + 1], 1);
+							numx = var("1234567890").index(string2[ii + 1]);
 					} else {
 						if (cap || numx) {
 							tt.converter(LOWERCASE, UPPERCASE);
@@ -1061,7 +1006,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		string2.converter(UPPERCASE, LOWERCASE);
 	} else if (mode0.substr(1, 5) == "PARSE") {
 
-		var uppercase = mode0.index("UPPERCASE", 1);
+		var uppercase = mode0.index("UPPERCASE");
 
 		string2 = str0;
 
@@ -1078,7 +1023,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 				quoted = "";
 			} else {
 				if (!quoted) {
-					if ((DQ ^ "\'").index(tt, 1)) {
+					if ((DQ ^ "\'").index(tt)) {
 						quoted = tt;
 					} else {
 						if (tt == " ") {
@@ -1095,7 +1040,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 			}
 		};	// ii;
 
-		if (mode0.index("TRIM", 1)) {
+		if (mode0.index("TRIM")) {
 			string2.converter(" " _FM, _FM " ");
 			string2 = string2.trim();
 			string2.converter(" " _FM, _FM " ");
@@ -1287,7 +1232,7 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 
 	// key can be multivalued and multivalued result will be returned
 	var results = "";
-	var nkeys = key.dcount(VM);
+	var nkeys = key.fcount(VM);
 
 	var is_fieldno = fieldno_or_name.isnum();
 
@@ -1593,7 +1538,7 @@ var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const i
 	if (not options)
 		options = "Yes" _VM "No";
 	options.converter(VM ^ "|", FM ^ FM);
-	var noptions = options.dcount(FM);
+	var noptions = options.fcount(FM);
 	for (int optionn = 1; optionn <= noptions; optionn++) {
 		if (optionn == defaultreply)
 			std::cout << "*";

@@ -16,9 +16,9 @@ function main(io tx) {
 
         tx.swapper(FM, "\r\n");
 
-        if (DATEFMT.index("E", 1)) {
+        if (DATEFMT.index("E")) {
                 t2 = "d/M/yyyy";
-        } else if (DATEFMT.index("J", 1)) {
+        } else if (DATEFMT.index("J")) {
                 t2 = "yyyy/M/d";
         } else {
                 t2 = "M/d/yyyy";

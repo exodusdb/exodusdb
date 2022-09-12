@@ -7,7 +7,7 @@ function main() {
 	//check command syntax
 	var edic_hist_dir = osgetenv("HOME") ^ "/.config/exodus/";
 	var edic_hist = edic_hist_dir ^ "edic_hist.txt";
-	if (dcount(COMMAND, FM) < 2) {
+	if (fcount(COMMAND, FM) < 2) {
 		if (osread(COMMAND, edic_hist)) {
 			OPTIONS = COMMAND.f(2);
 			COMMAND = raise(COMMAND.f(1));
@@ -117,7 +117,7 @@ function main() {
 		//C:\Documents and Settings\USERNAME\.nanorc  ($HOMEDRIVE$HOMEPATH)
 		var nanorcfilename;
 		if (cygwinpath) {
-			nanorcfilename = cygwinpath.field(OSSLASH, 1, dcount(cygwinpath, OSSLASH) - 2) ^ OSSLASH ^ "etc" ^ OSSLASH ^ "nanorc";
+			nanorcfilename = cygwinpath.field(OSSLASH, 1, fcount(cygwinpath, OSSLASH) - 2) ^ OSSLASH ^ "etc" ^ OSSLASH ^ "nanorc";
 		} else {
 			nanorcfilename = osgetenv("HOME");
 			if (not nanorcfilename)
@@ -127,8 +127,8 @@ function main() {
 			nanorcfilename ^= ".nanorc";
 		}
 		if (not osfile(nanorcfilename)) {
-			//var nanorctemplatefilename=EXECPATH.field(OSSLASH,1,dcount(EXECPATH,OSSLASH)-1) ^ OSSLASH ^ "nanorc";
-			var nanorctemplatefilename = nanopath.field(OSSLASH, 1, dcount(nanopath, OSSLASH) - 1) ^ OSSLASH ^ "nanorc";
+			//var nanorctemplatefilename=EXECPATH.field(OSSLASH,1,fcount(EXECPATH,OSSLASH)-1) ^ OSSLASH ^ "nanorc";
+			var nanorctemplatefilename = nanopath.field(OSSLASH, 1, fcount(nanopath, OSSLASH) - 1) ^ OSSLASH ^ "nanorc";
 			if (not osfile(nanorctemplatefilename))
 				nanorctemplatefilename.swapper("release", "..\\release");
 			//if (not osfile(nanorctemplatefilename))
@@ -163,7 +163,7 @@ function main() {
 
 	//configure nano syntax highlighting
 	var filenames = field(COMMAND, FM, 2, 99999);
-	var nfiles = dcount(filenames, FM);
+	var nfiles = fcount(filenames, FM);
 	var filen = 0;
 	while (filen < nfiles) {
 		filen += 1;
@@ -193,7 +193,7 @@ function main() {
 			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
 			if (verbose)
 				paths.outputl("paths=");
-//			let npaths = dcount(paths, ":");
+//			let npaths = fcount(paths, ":");
 //			for (const var pathn : range(1, npaths - 1)) {
 //				var filename2 = paths.field(":", pathn) ^ "/" ^ filename;
 			for (let path : paths.convert(":", FM)) {
@@ -242,7 +242,7 @@ function main() {
 		if (iscompilable and not osfile(filename)) {
 
 			var basefilename = field2(filename, OSSLASH, -1);
-			basefilename = basefilename.field(".", dcount(basefilename, ".") - 1);
+			basefilename = basefilename.field(".", fcount(basefilename, ".") - 1);
 
 			var progtype;
 			var question = "1=Normal Program, 2=External Subroutine or Function";

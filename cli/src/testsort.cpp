@@ -52,7 +52,7 @@ function main() {
 
 	printl("\nWrite the dictionary records to the dictionary");
 
-	let nrecs = dcount(dictrecs, FM);
+	let nrecs = fcount(dictrecs, FM);
 	for (const var recn : range(1, nrecs)) {
 
 		var dictrec = extract(dictrecs, recn);
@@ -101,7 +101,7 @@ function main() {
 
 	printl("\nWrite the data records to the data file");
 
-	let nrecs2 = dcount(recs, FM);
+	let nrecs2 = fcount(recs, FM);
 	for (const var recn : range(1, nrecs2)) {
 		var rec = extract(recs, recn);
 		var key = field(rec, "|", 1);

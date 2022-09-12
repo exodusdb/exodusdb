@@ -22,12 +22,12 @@ function security2(in mode, in op0)
 		op.splicer(-op2.len(), op2.len(), "");
 		op2.splicer(1, 0, " ");
 	}
-	if (mode.index("INIT", 1)) {
+	if (mode.index("INIT")) {
 		var msg;
 		if (!(authorised(op ^ " ACCESS" ^ op2, msg, "")))
 			return invalid(msg);
 
-	}else if (mode.index("READ", 1) || mode.index("WRITE", 1)) {
+	}else if (mode.index("READ") || mode.index("WRITE")) {
 		if (!win.wlocked) {
 			op ^= " ACCESS";
 		}else{
@@ -49,7 +49,7 @@ function security2(in mode, in op0)
 			}
 		}
 
-	}else if (mode.index("DELETE", 1)) {
+	}else if (mode.index("DELETE")) {
 		var msg;
 		if (!(authorised(op ^ " DELETE" ^ op2, msg, "")))
 			return invalid(msg);

@@ -1,20 +1,20 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
-#include <thread>
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
+#include <thread>
 
 #include <exodus/program.h>
 programinit()
 
-	var key = 1;
-	var max = 5;
-	var nprocesses = 50;
+	var key	   = 1;
+var max		   = 5;
+var nprocesses = 50;
 
-	// Create a temporary file (ending _temp)
-	var filename = "xo_test";
+// Create a temporary file (ending _temp)
+var filename = "xo_test";
 
-	var file;
+var file;
 
-	var silent = OPTIONS.count("S");
+var silent = OPTIONS.count("S");
 
 function main() {
 
@@ -95,7 +95,7 @@ function main() {
 			write(RECORD on file, key);
 
 			if (use_locking)
-				unlock(file,key);
+				unlock(file, key);
 
 			if (not silent)
 				printl(THREADNO, RECORD);
@@ -111,7 +111,6 @@ function main() {
 			//errputl(THREADNO, "Sleeping");
 			ossleep(100);
 		}
-
 	}
 
 	if (silent < 2)
@@ -122,40 +121,39 @@ function main() {
 
 function test(in option) {
 
-		deleterecord(file, key);
+	deleterecord(file, key);
 
-		var cmd = "";
-		var options = OPTIONS.convert("{}", "") ^ option;
-		for (const var processn : range(1, nprocesses)) {
-			// Hard code path so make test can find it without any installation
-			cmd ^= "./test_asyncupd " ^ processn ^ " {" ^ options ^ "} & ";
-		}
+	var cmd		= "";
+	var options = OPTIONS.convert("{}", "") ^ option;
+	for (const var processn : range(1, nprocesses)) {
+		// Hard code path so make test can find it without any installation
+		cmd ^= "./test_asyncupd " ^ processn ^ " {" ^ options ^ "} & ";
+	}
 
-		//osshell("test_asyncupd 1 & test_asyncupd 2 & test_asyncupd 3 & test_asyncupd 4 & test_asyncupd 5 &");
-		osshell(cmd);
-		while (osshellread("pgrep test_asyncupd").count("\n") gt 1) {
-
-			if (not silent)
-				printl("Waiting for test_asyncupd processes to complete");
-
-			ossleep(1000);
-		}
-
-		if (not read(RECORD from file, key))
-			RECORD = "";
-
-		var target = str(max ^ FM, nprocesses).pop();
-
-		if (RECORD ne target) {
-			errputl("ERROR: " ^ RECORD.quote() ^ " not equal to target " ^ target.quote());
-			return false;
-		}
+	//osshell("test_asyncupd 1 & test_asyncupd 2 & test_asyncupd 3 & test_asyncupd 4 & test_asyncupd 5 &");
+	osshell(cmd);
+	while (osshellread("pgrep test_asyncupd").count("\n") gt 1) {
 
 		if (not silent)
-			printl("OK: " ^ RECORD.quote() ^ " equal to target");
+			printl("Waiting for test_asyncupd processes to complete");
 
-		return true;
+		ossleep(1000);
+	}
 
+	if (not read(RECORD from file, key))
+		RECORD = "";
+
+	var target = str(max ^ FM, nprocesses).pop();
+
+	if (RECORD ne target) {
+		errputl("ERROR: " ^ RECORD.quote() ^ " not equal to target " ^ target.quote());
+		return false;
+	}
+
+	if (not silent)
+		printl("OK: " ^ RECORD.quote() ^ " equal to target");
+
+	return true;
 }
 
 programexit()

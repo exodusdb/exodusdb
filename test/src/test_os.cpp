@@ -1,13 +1,13 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
-#include <cassert>
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <exodus/program.h>
+#include <cassert>
 
 programinit()
 
-function main() {
+	function main() {
 
-	var tempdir="t_exotemp746.dir";
-	var tempfilename=tempdir^OSSLASH^"temp1";
+	var tempdir		 = "t_exotemp746.dir";
+	var tempfilename = tempdir ^ OSSLASH ^ "temp1";
 
 	{
 		printl("Waiting for 500ms for any event on the log dir");
@@ -28,21 +28,21 @@ function main() {
 
 	//test copying files forced overwrite)
 	assert(osmkdir("d1/d1"));
-	assert(oswrite("f1","d1/f1"));
-	assert(oswrite("f2","d1/f2"));
-	assert(oscopy("d1/f1","d1/f2"));
+	assert(oswrite("f1", "d1/f1"));
+	assert(oswrite("f2", "d1/f2"));
+	assert(oscopy("d1/f1", "d1/f2"));
 	var data;
-	assert(osread(data,"d1/f2"));
-	printl(data=="f1");
+	assert(osread(data, "d1/f2"));
+	printl(data eq "f1");
 
 	//test copying directories (recursive)
-	assert(oswrite("f1","d1/d1/f1"));
-	assert(oscopy("d1","d2"));
-	assert(osread(data,"d2/d1/f1"));
-	assert(data=="f1");
+	assert(oswrite("f1", "d1/d1/f1"));
+	assert(oscopy("d1", "d2"));
+	assert(osread(data, "d2/d1/f1"));
+	assert(data eq "f1");
 
 	//cannot copy a directory to a file
-	assert(oscopy("d1","d2/d1/f1")==0);
+	assert(oscopy("d1", "d2/d1/f1") eq 0);
 
 	// Cannot oswrite on a dir path
 	assert(not oswrite("xxx" on "d2"));
@@ -51,8 +51,8 @@ function main() {
 	assert(not osrmdir("d1"));
 
 	// Check can rm dir with contents by setting recursive true
-	assert(osrmdir("d1",true));
-	assert(osrmdir("d2",true));
+	assert(osrmdir("d1", true));
+	assert(osrmdir("d2", true));
 
 	// Cannot oswrite to a file in a non-existent dir
 	assert(not oswrite("xxx" on "d2/abc"));
@@ -82,7 +82,7 @@ function main() {
 			var dir1 = oslist("*").sort();
 
 			//separate dir and glob
-			assert(oslist(".","*").sort() eq dir1);
+			assert(oslist(".", "*").sort() eq dir1);
 
 			var result;
 			assert(osshellread(result from "ls . -AU1"));
@@ -99,7 +99,7 @@ function main() {
 		assert(dir1 ne dirs);
 
 		//separate dir and glob
-		assert(oslistd(".","*").sort() eq dirs);
+		assert(oslistd(".", "*").sort() eq dirs);
 
 		//unordered files
 		var files = oslistf("*").sort();
@@ -107,7 +107,7 @@ function main() {
 		assert(dir1 ne files);
 
 		//separate dir and glob
-		assert(oslistf(".","*").sort() eq files);
+		assert(oslistf(".", "*").sort() eq files);
 
 		//check oslist = oslistd ^ oslistf (both sorted)
 		dir2 = (dirs ^ FM ^ files).sort();
@@ -115,16 +115,16 @@ function main() {
 
 		// ls xxx*.yyy returns a sorted list regardless of the -U unordered option
 		dir1 = oslist("test_*.cpp").sort();
-		dir2 = osshellread("ls test_*.cpp -AU1").convert("\n\r", _FM ).trim(_FM).sort();
+		dir2 = osshellread("ls test_*.cpp -AU1").convert("\n\r", _FM).trim(_FM).sort();
 		//TRACE(dir1)
 		//TRACE(dir2)
 		assert(dir1 eq dir2);
 
 		//files (not directories)
-		assert(oslistf("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . ! -type d -printf '%f\n'").convert("\n\r",""));
+		assert(oslistf("*").convert(FM, "") eq osshellread("find . -maxdepth 1 ! -path . ! -type d -printf '%f\n'").convert("\n\r", ""));
 
 		//directories (not files)
-		assert(oslistd("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . -type d -printf '%f\n\'").convert("\n\r",""));
+		assert(oslistd("*").convert(FM, "") eq osshellread("find . -maxdepth 1 ! -path . -type d -printf '%f\n\'").convert("\n\r", ""));
 	}
 
 	osrmdir("test_main.1");
@@ -136,17 +136,17 @@ function main() {
 	//root directories
 
 	//check one step multilevel subfolder creation (requires boost version > ?)
-	var topdir1=OSSLASH^"exodus544";
-	var topdir1b=topdir1^"b";
-	var subdir2=topdir1^OSSLASH^"abcd";
-	var subdir2b=topdir1b^OSSLASH^"abcd";
+	var topdir1	 = OSSLASH ^ "exodus544";
+	var topdir1b = topdir1 ^ "b";
+	var subdir2	 = topdir1 ^ OSSLASH ^ "abcd";
+	var subdir2b = topdir1b ^ OSSLASH ^ "abcd";
 
-	osrmdir(tempdir,true);
+	osrmdir(tempdir, true);
 
 	//try to remove any old versions (subdir first to avoid problems)
-	osrmdir(topdir1b,true);
+	osrmdir(topdir1b, true);
 	osrmdir(topdir1);
-	osrmdir(subdir2b,true);
+	osrmdir(subdir2b, true);
 	osrmdir(subdir2);
 
 	//need oermission to test root directory access
@@ -155,10 +155,10 @@ function main() {
 		//assert(osmkdir(subdir2));
 
 		printl("\nCheck CANNOT rename multilevel root folders");
-		assert(not osrename(topdir1,topdir1b));
+		assert(not osrename(topdir1, topdir1b));
 
 		printl("\nCheck CANNOT force delete root folders");
-		assert(not osrmdir(topdir1,true));
+		assert(not osrmdir(topdir1, true));
 		printl();
 
 		//check can remove root folders one by one without force
@@ -169,7 +169,7 @@ function main() {
 
 		//relative directories ie not-root
 		if (osdir(tempdir))
-			assert(osrmdir(tempdir,true));
+			assert(osrmdir(tempdir, true));
 
 		//check mkdir
 		assert(osmkdir(tempdir));
@@ -188,7 +188,7 @@ function main() {
 		assert(not osmove("t_move1.txt", "t_move2.txt"));
 
 		// Verify cannot rename to an existing file
-		assert(not osrename("t_move1.txt","t_move2.txt"));
+		assert(not osrename("t_move1.txt", "t_move2.txt"));
 
 		// Verify can move a file
 		assert(osremove("t_move2.txt"));
@@ -196,7 +196,7 @@ function main() {
 
 		// Verify cannot rename non-existent file
 		osremove("t_move3.txt");
-		assert(not osrename("t_move1.txt","t_move3.txt"));
+		assert(not osrename("t_move1.txt", "t_move3.txt"));
 
 		// Verify cannot remove non-existent file
 		assert(not osremove("t_move1.txt"));
@@ -206,7 +206,6 @@ function main() {
 
 		// Verify can remove a file
 		assert(osremove("t_move2.txt"));
-
 	}
 
 	{
@@ -223,7 +222,7 @@ function main() {
 
 		// Verify cannot move non-existent dir
 		osrmdir("t_move3.dir");
-		assert(not osmove("t_move1.dir","t_move3.dir"));
+		assert(not osmove("t_move1.dir", "t_move3.dir"));
 
 		// Verify cannot remove non-existent dir
 		assert(not osrmdir("t_move1.dir"));
@@ -233,7 +232,6 @@ function main() {
 
 		// Verify can remove a dir
 		assert(osrmdir("t_move2.dir"));
-
 	}
 
 	{
@@ -241,48 +239,48 @@ function main() {
 		//restrict to ascii characters so size on disk=number of characters in string
 		//also restrict to size 1 2 4 8 16 etc
 		//var str1="1234ABC\x0160";//Note: you have to prefix strings with L if you want to put multibyte hex chars
-		var str1="1234ABCD";
-		var filesize=1024*1024/8;
+		var str1	 = "1234ABCD";
+		var filesize = 1024 * 1024 / 8;
 		printl(tempdir);
 		assert(osmkdir(tempdir));
 		assert(osrmdir(tempdir));
 		assert(osmkdir(tempdir));
 		printl(tempfilename);
 		//printl(str(str1,filesize/len(str1)));
-		assert(oswrite(str(str1,filesize/len(str1)),tempfilename));
-		var filedate=date();
+		assert(oswrite(str(str1, filesize / len(str1)), tempfilename));
+		var filedate = date();
 		assert(osfile(tempfilename));
 
-		var info=osfile(tempfilename);
+		var info = osfile(tempfilename);
 		assert(info.f(1) eq filesize);
 		assert(info.f(2) eq filedate);
 
 		//check copying to a new file
-		var tempfilename2=tempfilename^2;
+		var tempfilename2 = tempfilename ^ 2;
 		if (osfile(tempfilename2))
 			assert(osremove(tempfilename2));
-		assert(oscopy(tempfilename,tempfilename2));
+		assert(oscopy(tempfilename, tempfilename2));
 		assert(osfile(tempfilename2) eq info);
 
 		//check renaming
-		var tempfilename3=tempfilename^3;
-		assert(osrename(tempfilename2,tempfilename3));
+		var tempfilename3 = tempfilename ^ 3;
+		assert(osrename(tempfilename2, tempfilename3));
 		assert(osfile(tempfilename3) eq info);
 
 		//check force delete of subdirectory
-		assert(osrmdir(tempdir,true));
+		assert(osrmdir(tempdir, true));
 	}
 
 	{
-		var env=osgetenv("");
+		var env = osgetenv("");
 		printl(env);
 		assert(osgetenv("PATH"));
 		assert(osgetenv("HOME"));
-		env="Steve";
+		env = "Steve";
 		env.ossetenv("XYZ");
 		assert(osgetenv("XYZ"));
 
-		assert(osgetenv("HOME",RECORD));
+		assert(osgetenv("HOME", RECORD));
 		assert(RECORD eq osgetenv("HOME"));
 
 		assert(not osgetenv("test_os" ^ rnd(999999), RECORD));
@@ -290,7 +288,7 @@ function main() {
 
 	{
 		var temprecord;
-		var tempfilename0="tempfile";
+		var tempfilename0 = "tempfile";
 		assert(oswrite("123" on tempfilename0));
 		assert(osfile(tempfilename0));
 		assert(osread(temprecord from tempfilename0));
@@ -303,7 +301,7 @@ function main() {
 
 		// Get current working dir
 		var cwd1;
-		cwd1=oscwd();
+		cwd1 = oscwd();
 		TRACE(cwd1)
 		assert(cwd1);
 
@@ -327,7 +325,6 @@ function main() {
 		// Cannot change to deleted dir
 		assert(not oscwd(cwd2));
 		assert(oscwd() eq cwd1);
-
 	}
 
 	{
@@ -360,36 +357,36 @@ function main() {
 	osflush();
 
 	{
-		var filename="t_hello.txt";
+		var filename = "t_hello.txt";
 		assert(oswrite("1234567890abc", filename));
-		assert(osfile(filename).f(1) == 13);
+		assert(osfile(filename).f(1) eq 13);
 
 		var filex;
-		assert(osopen(filename,filex));
+		assert(osopen(filename, filex));
 
 		var data;
-		var offset=3;// zero based offset
-		var length=3;
-		assert(osbread(data,filex,offset,length));
-		assert(data.outputl() == "456");
+		var offset = 3;	 // zero based offset
+		var length = 3;
+		assert(osbread(data, filex, offset, length));
+		assert(data.outputl() eq "456");
 
 		length = 2;
-		assert(osbread(data,filex,offset,length));
-		assert(data.outputl() == "78");
+		assert(osbread(data, filex, offset, length));
+		assert(data.outputl() eq "78");
 		//offset is automatically updated according to length of previous osbread
-		assert(offset == 8);
+		assert(offset         eq 8);
 
 		//offset -1 appends on write
 		offset = -1;
-		assert(osbwrite("qwe",filex,offset));
-		assert(offset == 16);
-		assert(osread(filename).outputl() == "1234567890abcqwe");
+		assert(osbwrite("qwe", filex, offset));
+		assert(offset                     eq 16);
+		assert(osread(filename).outputl() eq "1234567890abcqwe");
 
 		//offset -2 offset starts on the last byte of the file
 		offset = -2;
-		assert(osbwrite("XYZ",filex,offset));
-		assert(offset == 18);
-		assert(osread(filename).outputl() == "1234567890abcqwXYZ");
+		assert(osbwrite("XYZ", filex, offset));
+		assert(offset                     eq 18);
+		assert(osread(filename).outputl() eq "1234567890abcqwXYZ");
 
 		// files must be closed manually
 		// TODO add a way to autoclose all files/all files opened after a certain point

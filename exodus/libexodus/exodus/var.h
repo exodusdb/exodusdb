@@ -1536,18 +1536,29 @@ class PUBLIC var final {
 	// STRING INFO
 	//////////////
 
-	ND var match(CVR matchstr, SV options DEFAULT_EMPTY) const;
-	ND var seq() const;          // ASCII
-	ND var textseq() const;      // TEXT
-	ND var dcount(SV str) const;
-	ND var count(SV str) const;
-	ND var len() const; // BYTES
-	ND var textlen() const; // TEXT
-	bool isnum() const;
+	ND var seq() const;     // int of first byte
+	ND var textseq() const; // int of UTF8 code point
+	ND var len() const;     // int of total bytes
+	bool isnum() const;     // integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
 
-	ND bool starts(SV str) const;
-	ND bool ends(SV str) const;
-	ND bool contains(SV str) const;
+	// STRING SCANNING
+	//////////////////
+
+	ND var textlen() const; // UTF8 code points
+	ND var fcount(SV str) const; //field count
+	ND var count(SV str) const;
+	ND var match(CVR matchstr, SV options DEFAULT_EMPTY) const;
+
+	//                                 Javascript   PHP             Python       Go          Rust          C++
+	ND bool starts(SV str) const;   // startsWith() str_starts_with startswith() HasPrefix() starts_with() starts_with
+	ND bool ends(SV str) const;     // endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
+	ND bool contains(SV str) const; // includes()   str_contains    contains()   Contains()  contains()    contains
+
+	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
+	//ND var index(SV substr) const;
+	ND var index(SV substr, const int startchar1 = 1) const;
+	ND var indexn(SV substr, const int occurrence) const;
+	ND var indexr(SV substr, const int startchar1 = -1) const;
 
 	//static member for speed on std strings
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
@@ -1695,8 +1706,6 @@ class PUBLIC var final {
 	// delimiterno) const;
 	var substr2(VARREF startstopindex, VARREF delimiterno) const;
 
-	ND var index(CVR substr, const int occurrenceno = 1) const;
-	ND var index2(CVR substr, const int startchar1 = 1) const;
 	ND var field(CVR substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
 	// version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO
 	// should probably make field() do this

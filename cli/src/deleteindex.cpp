@@ -5,7 +5,7 @@ function main() {
 
 	var force = OPTIONS.index("F");
 	var indexnames = COMMAND.field(FM, 2, 999999);
-	var nindexes = dcount(indexnames, FM);
+	var nindexes = fcount(indexnames, FM);
 
 	if (not nindexes)
 		abort("Syntax is 'deleteindex filename__fieldname ...'");

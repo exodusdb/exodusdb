@@ -27,10 +27,10 @@ function main() {
 		var rr = "F";
 		for (const var ii : range(1, 12)) {
 
-			ID = "F" ^ ii;
-			rr(2) = ii;
-			rr(3) = ID;
-			rr(9) = "L";
+			ID	   = "F" ^ ii;
+			rr(2)  = ii;
+			rr(3)  = ID;
+			rr(9)  = "L";
 			rr(10) = "10";
 
 			printl(ID);
@@ -76,59 +76,59 @@ function test() {
 
 	assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
 	assert(readnext(RECORD, ID, MV));
-	assert(ID.outputl("E] FF 1=") == "B");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("E] FF 2=") == "C");
+	assert(ID.outputl("E] FF 1=")                             eq "B");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("E] FF 2=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'AA' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("AA 1=") == "A");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("AA 1=") eq "A");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'BB' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("BB 1=") == "A");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("BB 2=") == "B");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("BB 1=") eq "A");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("BB 2=") eq "B");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'CC' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("CC 1=") == "A");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("CC 2=") == "B");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("CC 3=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("CC 1=") eq "A");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("CC 2=") eq "B");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("CC 3=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'DD' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("DD 1=") == "A");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("DD 2=") == "B");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("DD 3=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("DD 1=") eq "A");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("DD 2=") eq "B");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("DD 3=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'EE' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("EE 1=") == "B");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("EE 2=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("EE 1=") eq "B");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("EE 2=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'FF' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("EE 1=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("EE 1=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'AA' 'FF' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("AA FF 1=") == "A");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("AA FF 2=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("AA FF 1=") eq "A");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("AA FF 2=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'BB' 'EE' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("BB EE 1=") == "A");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("BB EE 2=") == "B");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("BB EE 3=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("BB EE 1=") eq "A");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("BB EE 2=") eq "B");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("BB EE 3=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	assert(select(testfilename ^ " with f1m 'EE' 'FF' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("EE FF 1=") == "B");
-	assert(readnext(RECORD, ID, MV) && ID.outputl("EE FF 2=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("EE FF 1=") eq "B");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("EE FF 2=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	//E doesnt exist
 	assert(select(testfilename ^ " with f1m 'E' 'FF' (SR)"));
-	assert(readnext(RECORD, ID, MV) && ID.outputl("E FF 1=") == "C");
+	assert(readnext(RECORD, ID, MV) && ID.outputl("E FF 1=") eq "C");
 	assert(!readnext(RECORD, ID, MV));
 
 	//E and F dont exist
@@ -140,19 +140,19 @@ function test() {
 
 		//E] and XX finds EE
 		assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
-		assert(readnext(RECORD, ID, MV) && ID.outputl("E] XX 1=") == "B");
-		assert(readnext(RECORD, ID, MV) && ID.outputl("E] XX 2=") == "C");
+		assert(readnext(RECORD, ID, MV) && ID.outputl("E] XX 1=") eq "B");
+		assert(readnext(RECORD, ID, MV) && ID.outputl("E] XX 2=") eq "C");
 		assert(!readnext(RECORD, ID, MV));
 
 		//A] and F] finds AA FF
 		assert(select(testfilename ^ " with f1m 'A]' 'F]' (SR)"));
-		assert(readnext(RECORD, ID, MV) && ID.outputl("A] F] 1=") == "A");
-		assert(readnext(RECORD, ID, MV) && ID.outputl("A] F] 2=") == "C");
+		assert(readnext(RECORD, ID, MV) && ID.outputl("A] F] 1=") eq "A");
+		assert(readnext(RECORD, ID, MV) && ID.outputl("A] F] 2=") eq "C");
 		assert(!readnext(RECORD, ID, MV));
 
 		//without A] and F] finds B only
 		assert(select(testfilename ^ " without f1m 'A]' 'F]' (SR)"));
-		assert(readnext(RECORD, ID, MV) && ID.outputl("without A] F] 1=") == "B");
+		assert(readnext(RECORD, ID, MV) && ID.outputl("without A] F] 1=") eq "B");
 		assert(!readnext(RECORD, ID, MV));
 	}
 

@@ -188,7 +188,7 @@ function main() {
 				if (not line2.index(" : range(")) {
 
 					// Failed to convert
-					if (line2.index(';'))
+					if (line2.index(";"))
 						errputl('?', line2.swap("\t", "    "));
 
 				} else {

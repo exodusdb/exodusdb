@@ -1,4 +1,4 @@
-#undef NDEBUG //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
 #include <exodus/program.h>
@@ -6,82 +6,81 @@
 #define LOOPS 1
 programinit()
 
-function main()
-{
+	function main() {
 
 	var begin, end;
 
-	for( int i=0; i<LOOPS; i++)
-		// mixture of strings in the following proporsion: ([14:58:30] neosys: )
-		//	15% 11111
-		//	 5% -11111
-		//	15% 11111.11
-		//	 5% -11111.11
-		//	50% xxxxxx
-		{
+	for (int i = 0; i < LOOPS; i++)
+	// mixture of strings in the following proporsion: ([14:58:30] neosys: )
+	//	15% 11111
+	//	 5% -11111
+	//	15% 11111.11
+	//	 5% -11111.11
+	//	50% xxxxxx
+	{
 		//0
-		assert( var("").isnum());
-		assert( var("11111").isnum());
-		assert( var("2").isnum());
-		assert( var("00000876229").isnum());
-		assert( var("+999").isnum());
-		assert( var("12222").isnum());
-		assert( var("22222222").isnum());
-		assert( var("+2").isnum());
-		assert( var("222").isnum());
-		assert( var("222").isnum());
-		assert( var("222").isnum());
-		assert( var("222").isnum());
-		assert( var("222").isnum());
-		assert( var("222").isnum());
+		assert(var("").isnum());
+		assert(var("11111").isnum());
+		assert(var("2").isnum());
+		assert(var("00000876229").isnum());
+		assert(var("+999").isnum());
+		assert(var("12222").isnum());
+		assert(var("22222222").isnum());
+		assert(var("+2").isnum());
+		assert(var("222").isnum());
+		assert(var("222").isnum());
+		assert(var("222").isnum());
+		assert(var("222").isnum());
+		assert(var("222").isnum());
+		assert(var("222").isnum());
 
-		assert( var("0").isnum());
-		assert( var("00").isnum());
-		assert( var("0000000000").isnum());
-		assert( var("-0000000000").isnum());
-		assert( var("-0").isnum());
-		assert( var("-00").isnum());
-		assert( var("+0").isnum());
-		assert( var("+00").isnum());
+		assert(var("0").isnum());
+		assert(var("00").isnum());
+		assert(var("0000000000").isnum());
+		assert(var("-0000000000").isnum());
+		assert(var("-0").isnum());
+		assert(var("-00").isnum());
+		assert(var("+0").isnum());
+		assert(var("+00").isnum());
 
-		assert( var("0.0").isnum());
-		assert( var("-0.0").isnum());
-		assert( var("0.00").isnum());
-		assert( var("-0.00").isnum());
-		assert( var("00.0").isnum());
-		assert( var("-00.0").isnum());
-		assert( var("00.00").isnum());
-		assert( var("-00.00").isnum());
-		assert( var("0.").isnum());
-		assert( var("-0.").isnum());
-		assert( var(".0").isnum());
-		assert( var("-.0").isnum());
+		assert(var("0.0").isnum());
+		assert(var("-0.0").isnum());
+		assert(var("0.00").isnum());
+		assert(var("-0.00").isnum());
+		assert(var("00.0").isnum());
+		assert(var("-00.0").isnum());
+		assert(var("00.00").isnum());
+		assert(var("-00.00").isnum());
+		assert(var("0.").isnum());
+		assert(var("-0.").isnum());
+		assert(var(".0").isnum());
+		assert(var("-.0").isnum());
 
-		assert( var("-2").isnum());
-		assert( var("-222").isnum());
-		assert( var("-222").isnum());
+		assert(var("-2").isnum());
+		assert(var("-222").isnum());
+		assert(var("-222").isnum());
 
-		assert( var("11111.11").isnum());
-		assert( var("8.76").isnum());
-		assert( var("8.76").isnum());
-		assert( var("8.76").isnum());
-		assert( var("8.76").isnum());
-		assert( var(".9").isnum());
-		assert( var("+.9").isnum());
-		assert( var("000008.76229").isnum());
-		assert( var("2208.76229").isnum());
-		assert( var(".9000000000").isnum());
-		assert( var("+.1239").isnum());
-		assert( var("000008.76229").isnum());
-		assert( var("2208.76229").isnum());
-		assert( var("8.76229").isnum());
-		assert( var("8.76").isnum());
+		assert(var("11111.11").isnum());
+		assert(var("8.76").isnum());
+		assert(var("8.76").isnum());
+		assert(var("8.76").isnum());
+		assert(var("8.76").isnum());
+		assert(var(".9").isnum());
+		assert(var("+.9").isnum());
+		assert(var("000008.76229").isnum());
+		assert(var("2208.76229").isnum());
+		assert(var(".9000000000").isnum());
+		assert(var("+.1239").isnum());
+		assert(var("000008.76229").isnum());
+		assert(var("2208.76229").isnum());
+		assert(var("8.76229").isnum());
+		assert(var("8.76").isnum());
 
-		assert( var("-11111.11").isnum());
-		assert( var("-0.").isnum());
-		assert( var("-2.27770").isnum());
-		assert( var("-.222").isnum());
-		assert( var("-2.22").isnum());
+		assert(var("-11111.11").isnum());
+		assert(var("-0.").isnum());
+		assert(var("-2.27770").isnum());
+		assert(var("-.222").isnum());
+		assert(var("-2.22").isnum());
 
 		assert(!var("missing 10%").isnum());
 		assert(!var("missing 10%").isnum());
@@ -155,10 +154,6 @@ function main()
 		assert(!var("Address: 221b BAKER STREET").isnum());
 		assert(!var("\n").isnum());
 
-
-
-
-
 		//0
 		assert(var("").isnum());
 
@@ -166,28 +161,28 @@ function main()
 		assert(!var("+").isnum());
 		assert(!var("-").isnum());
 		assert(!var(".").isnum());
-		assert( var("9").isnum());
+		assert(var("9").isnum());
 
 		//2
 		assert(!var("++").isnum());
 		assert(!var("+-").isnum());
 		assert(!var("+.").isnum());
-		assert( var("+9").isnum());
+		assert(var("+9").isnum());
 
 		assert(!var("-+").isnum());
 		assert(!var("--").isnum());
 		assert(!var("-.").isnum());
-		assert( var("-9").isnum());
+		assert(var("-9").isnum());
 
 		assert(!var(".+").isnum());
 		assert(!var(".-").isnum());
 		assert(!var("..").isnum());
-		assert( var(".9").isnum());
+		assert(var(".9").isnum());
 
 		assert(!var("9+").isnum());
 		assert(!var("9-").isnum());
-		assert( var("9.").isnum());
-		assert( var("99").isnum());
+		assert(var("9.").isnum());
+		assert(var("99").isnum());
 
 		//3
 		assert(!var("+++").isnum());
@@ -201,11 +196,11 @@ function main()
 		assert(!var("+.+").isnum());
 		assert(!var("+.-").isnum());
 		assert(!var("+..").isnum());
-		assert( var("+.9").isnum());
+		assert(var("+.9").isnum());
 		assert(!var("+9+").isnum());
 		assert(!var("+9-").isnum());
-		assert( var("+9.").isnum());
-		assert( var("+99").isnum());
+		assert(var("+9.").isnum());
+		assert(var("+99").isnum());
 
 		assert(!var("-++").isnum());
 		assert(!var("-+-").isnum());
@@ -218,11 +213,11 @@ function main()
 		assert(!var("-.+").isnum());
 		assert(!var("-.-").isnum());
 		assert(!var("-..").isnum());
-		assert( var("-.9").isnum());
+		assert(var("-.9").isnum());
 		assert(!var("-9+").isnum());
 		assert(!var("-9-").isnum());
-		assert( var("-9.").isnum());
-		assert( var("-99").isnum());
+		assert(var("-9.").isnum());
+		assert(var("-99").isnum());
 
 		assert(!var(".++").isnum());
 		assert(!var(".+-").isnum());
@@ -239,7 +234,7 @@ function main()
 		assert(!var(".9+").isnum());
 		assert(!var(".9-").isnum());
 		assert(!var(".9.").isnum());
-		assert( var(".99").isnum());
+		assert(var(".99").isnum());
 
 		assert(!var("9++").isnum());
 		assert(!var("9+-").isnum());
@@ -252,12 +247,11 @@ function main()
 		assert(!var("9.+").isnum());
 		assert(!var("9.-").isnum());
 		assert(!var("9..").isnum());
-		assert( var("9.9").isnum());
+		assert(var("9.9").isnum());
 		assert(!var("99+").isnum());
 		assert(!var("99-").isnum());
-		assert( var("99.").isnum());
-		assert( var("999").isnum());
-
+		assert(var("99.").isnum());
+		assert(var("999").isnum());
 
 		//4
 		assert(!var("++++").isnum());
@@ -307,7 +301,7 @@ function main()
 		assert(!var("+.9+").isnum());
 		assert(!var("+.9-").isnum());
 		assert(!var("+.9.").isnum());
-		assert( var("+.99").isnum());
+		assert(var("+.99").isnum());
 		assert(!var("+9++").isnum());
 		assert(!var("+9+-").isnum());
 		assert(!var("+9+.").isnum());
@@ -319,11 +313,11 @@ function main()
 		assert(!var("+9.+").isnum());
 		assert(!var("+9.-").isnum());
 		assert(!var("+9..").isnum());
-		assert( var("+9.9").isnum());
+		assert(var("+9.9").isnum());
 		assert(!var("+99+").isnum());
 		assert(!var("+99-").isnum());
-		assert( var("+99.").isnum());
-		assert( var("+999").isnum());
+		assert(var("+99.").isnum());
+		assert(var("+999").isnum());
 
 		assert(!var("-+++").isnum());
 		assert(!var("-++-").isnum());
@@ -372,7 +366,7 @@ function main()
 		assert(!var("-.9+").isnum());
 		assert(!var("-.9-").isnum());
 		assert(!var("-.9.").isnum());
-		assert( var("-.99").isnum());
+		assert(var("-.99").isnum());
 		assert(!var("-9++").isnum());
 		assert(!var("-9+-").isnum());
 		assert(!var("-9+.").isnum());
@@ -384,11 +378,11 @@ function main()
 		assert(!var("-9.+").isnum());
 		assert(!var("-9.-").isnum());
 		assert(!var("-9..").isnum());
-		assert( var("-9.9").isnum());
+		assert(var("-9.9").isnum());
 		assert(!var("-99+").isnum());
 		assert(!var("-99-").isnum());
-		assert( var("-99.").isnum());
-		assert( var("-999").isnum());
+		assert(var("-99.").isnum());
+		assert(var("-999").isnum());
 
 		assert(!var(".+++").isnum());
 		assert(!var(".++-").isnum());
@@ -453,7 +447,7 @@ function main()
 		assert(!var(".99+").isnum());
 		assert(!var(".99-").isnum());
 		assert(!var(".99.").isnum());
-		assert( var(".999").isnum());
+		assert(var(".999").isnum());
 
 		assert(!var("9+++").isnum());
 		assert(!var("9++-").isnum());
@@ -502,7 +496,7 @@ function main()
 		assert(!var("9.9+").isnum());
 		assert(!var("9.9-").isnum());
 		assert(!var("9.9.").isnum());
-		assert( var("9.99").isnum());
+		assert(var("9.99").isnum());
 		assert(!var("99++").isnum());
 		assert(!var("99+-").isnum());
 		assert(!var("99+.").isnum());
@@ -514,11 +508,11 @@ function main()
 		assert(!var("99.+").isnum());
 		assert(!var("99.-").isnum());
 		assert(!var("99..").isnum());
-		assert( var("99.9").isnum());
+		assert(var("99.9").isnum());
 		assert(!var("999+").isnum());
 		assert(!var("999-").isnum());
-		assert( var("999.").isnum());
-		assert( var("9999").isnum());
+		assert(var("999.").isnum());
+		assert(var("9999").isnum());
 
 		//various hand coded negatives
 
@@ -579,7 +573,6 @@ function main()
 		assert(!var("9e").isnum());
 		assert(!var("e9").isnum());
 
-
 		assert(!var("9e9.").isnum());
 		assert(!var("-9e9.").isnum());
 		assert(!var("-9e-9.").isnum());
@@ -596,7 +589,6 @@ function main()
 		assert(!var("e.").isnum());
 		assert(!var("9e.").isnum());
 		assert(!var("e9.").isnum());
-
 
 		assert(!var("++123").isnum());
 		assert(!var("+-123").isnum());

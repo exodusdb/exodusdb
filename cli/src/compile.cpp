@@ -48,7 +48,7 @@ function main() {
 
 	//default to previous edit/compile - similar code in edic and compile
 	//check command syntax
-	if (dcount(COMMAND, FM) < 2) {
+	if (fcount(COMMAND, FM) < 2) {
 		var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
 		if (osread(COMMAND, edic_hist)) {
 			//OPTIONS = COMMAND.f(2);
@@ -92,7 +92,7 @@ function main() {
 
 	//extract filenames
 	var filenames = field(command, FM, 2, 999999999);
-	var nfiles = dcount(filenames, FM);
+	var nfiles = fcount(filenames, FM);
 	if (not filenames)
 		abort("Syntax is compile filename ... {options}\nOptions are R=Release (No symbols), O/OO/OOO=Optimise (Poor back trace/debugging), V=Verbose, S=Silent, H=Generate headers only");
 
@@ -278,7 +278,7 @@ function main() {
 		//EXO_PATH is the parent directory of bin and include etc.
 		//compile needs to locate the include and lib directories
 
-		var ndeep = dcount(EXECPATH, OSSLASH);
+		var ndeep = fcount(EXECPATH, OSSLASH);
 		var exoduspath = "";
 		//first guess is the parent directory of the executing command
 		//on the grounds that compile.exe is in EXO_PATH/bin
@@ -583,7 +583,7 @@ function main() {
 				filenames.inserter(fileno + 1, subfiles);
 			}
 
-			nfiles = dcount(filenames, FM);
+			nfiles = fcount(filenames, FM);
 			continue;
 		}
 
@@ -601,7 +601,7 @@ function main() {
 		//SIMILAR CODE IN EDIC and COMPILE
 		if (not(osfile(srcfilename)) and not(srcfilename.index(OSSLASH))) {
 			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
-			let npaths = dcount(paths, ":");
+			let npaths = fcount(paths, ":");
 			for (const var pathn : range(1, npaths -1)) {
 				var srcfilename2 = paths.field(":", pathn) ^ "/" ^ srcfilename;
 				if (osfile(srcfilename2)) {
@@ -718,7 +718,7 @@ function main() {
 			var text;
 			var alllocales = "utf8" _FM "en_US.iso88591" _FM "en_GB.iso88591";
 			var locales = "";
-			//var nlocales = dcount(alllocales, " ");
+			//var nlocales = fcount(alllocales, " ");
 			var locale;
 			var origlocale = getxlocale();
 			//for (const var localen : range(1, nlocales)) {
@@ -772,9 +772,9 @@ function main() {
 				if (libfileprefix) {
 					//binfilename=libfileprefix^binfilename;
 					//objfilename=libfileprefix^objfilename;
-					var nfields = binfilename.dcount(OSSLASH);
+					var nfields = binfilename.fcount(OSSLASH);
 					binfilename = fieldstore(binfilename, OSSLASH, nfields, 1, libfileprefix ^ field(binfilename, OSSLASH, nfields));
-					nfields = objfilename.dcount(OSSLASH);
+					nfields = objfilename.fcount(OSSLASH);
 					objfilename = fieldstore(objfilename, OSSLASH, nfields, 1, libfileprefix ^ field(objfilename, OSSLASH, nfields));
 				}
 				outputdir = libdir;
@@ -861,7 +861,7 @@ function main() {
 						if (useclassmemberfunctions)
 							funcargstype = "";
 
-						int nargs = dcount(funcargsdecl, ",");
+						int nargs = fcount(funcargsdecl, ",");
 
 						/* no longer generate default arguments using a dumb process since some pedantic compilers eg g++ 4.2.1 on osx 10.6 refuse to default non-constant parameters (io/out)
 	for now, programmers can still manually define defaults eg "func1(in arg1=var(), in arg2=var())"
@@ -898,7 +898,7 @@ function main() {
 							//assume everything except the last word (by spaces) is the variable type
 							//wrap it in brackets otherwise when filling in missing parameters
 							//the syntax could be wrong/fail to compile eg "const var&()" v. "(const var&)()"
-							var argtype = field(funcarg, " ", 1, dcount(funcarg, " ") - 1);
+							var argtype = field(funcarg, " ", 1, fcount(funcarg, " ") - 1);
 							fieldstorer(funcargstype, ',', argn, 1, argtype);
 						}
 

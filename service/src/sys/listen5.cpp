@@ -212,7 +212,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		var ospaths = "../../system.cfg,system.cfg";
 		ospaths ^= "," ^ exohome ^ "/dat/";
 		ospaths.converter("/", OSSLASH);
-		var npaths = dcount(ospaths, ",");
+		var npaths = fcount(ospaths, ",");
 		for (const var ii : range(1, npaths)) {
 			var ospath = ospaths.field(",",ii);
 			//order is significant
