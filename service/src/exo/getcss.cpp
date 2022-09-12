@@ -62,7 +62,7 @@ function main(io css, in version="") {
 	css.swapper("exodussize", fontsize);
 
 	var agent = SYSTEM.f(40);
-	if (agent.index("MSIE 7")) {
+	if (agent.contains("MSIE 7")) {
 		css.swapper("xborder-collapse", "border-collapse");
 	}
 

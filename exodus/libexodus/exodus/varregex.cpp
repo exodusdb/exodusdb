@@ -248,23 +248,23 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 	syntax_flags_typ regex_syntax_flags = std_boost::regex_constants::collate;
 
 	// i = icase
-	//if (options.index("i"))
+	//if (options.contains("i"))
 	if (options.find('i') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::icase;
 
 	// m = multiline (TODO should be present c++17 onwards)
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
-	// if the ECMAScript engine is selected. if (options.index("m"))
+	// if the ECMAScript engine is selected. if (options.contains("m"))
 	//	regex_syntax_flags|=std_boost::regex_constants::multiline;
 
 	// b = basic (withdrawn after c++17?)
 	// Use the basic POSIX regular expression grammar
-	// if (options.index("b"))
+	// if (options.contains("b"))
 	//	regex_syntax_flags|=std_boost::regex_constants::basic;
 
 	// e = extended
 	// Use the extended POSIX regular expression grammar
-	//if (options.index("e"))
+	//if (options.contains("e"))
 	if (options.find('e') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::extended;
 
@@ -272,7 +272,7 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 	// ignore all usual regex special characters
 	// BOOST only option
 #ifdef USE_BOOST
-	//if (options.index("l"))
+	//if (options.contains("l"))
 	if (options.find('l') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::literal;
 #endif
@@ -294,7 +294,7 @@ var var::match(CVR matchstr, SV options) const {
 	// *.* or *.???
 	// *abcde
 	// abcde*
-	//if (options.index("w")) {
+	//if (options.contains("w")) {
 	if (options.find("w") != std::string::npos) {
 
 		// rules of glob - converting glob to regex

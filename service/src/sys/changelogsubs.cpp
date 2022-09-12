@@ -135,19 +135,19 @@ function main(in mode0) {
 			//tt=capitalise(menucodes)
 			//swap 'Support' with 'Technical' in tt
 			//mode<2>=tt
-			if (menucodes.index("FINANCE")) {
+			if (menucodes.contains("FINANCE")) {
 				mode(2, -1) = "Finance";
 			}
-			if (menucodes.index("MEDIA")) {
+			if (menucodes.contains("MEDIA")) {
 				mode(2, -1) = "Media";
 			}
-			if (menucodes.index("JOBS")) {
+			if (menucodes.contains("JOBS")) {
 				mode(2, -1) = "Jobs";
 			}
-			if (menucodes.index("TIMESHEETS")) {
+			if (menucodes.contains("TIMESHEETS")) {
 				mode(2, -1) = "Timesheets";
 			}
-			if (menucodes.index("SUPPORT")) {
+			if (menucodes.contains("SUPPORT")) {
 				mode(2, -1) = "Technical";
 			}
 

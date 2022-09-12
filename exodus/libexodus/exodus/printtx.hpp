@@ -285,14 +285,14 @@ subroutine convoptions(io ptx_temp) {
 
 subroutine getheadfoot() {
 	headx = head;
-	if (headx.index("\'")) {
+	if (headx.contains("\'")) {
 		var ptx_temp = headx;
 		gosub convoptions(ptx_temp);
 		headx = ptx_temp;
 		//convert "`" to "`" in headx
 	}
 	var footx = foot;
-	if (footx.index("\'")) {
+	if (footx.contains("\'")) {
 		var ptx_temp = footx;
 		gosub convoptions(ptx_temp);
 		footx = ptx_temp;

@@ -31,7 +31,7 @@ function main() {
 
 	for (var filename : filenames) {
 
-		if (filename.index("preselect") or filename.index("select_stage2"))
+		if (filename.contains("preselect") or filename.index("select_stage2"))
 			continue;
 
 		// filter by reqfilename. "-" means all files

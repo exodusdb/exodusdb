@@ -131,7 +131,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	html.swapper("%DATABASE%", SYSTEM.f(17, 1));
 
 	// QR code (requires apt install qrencode)
-	if (html.index("%QR%")) {
+	if (html.contains("%QR%")) {
 
 		var svg = "";
 		if (qr_text) {

@@ -2173,7 +2173,7 @@ bool var::clearfile(CVR filename) const {
 inline void unquoter_inline(VARREF string) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
-	if (quotecharacters.index(string[1]))
+	if (quotecharacters.contains(string[1]))
 		string = string.substr(2, string.len() - 2);
 }
 
@@ -2578,7 +2578,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			//if the xlate key expression is stage2_calculated then
 			//indicate that the whole dictid expression is stage2_calculated
 			//and do not do any join
-			if (xlatekeyexpression.index("exodus_call")) {
+			if (xlatekeyexpression.contains("exodus_call")) {
 				sqlexpression = "exodus_call(";
 				return sqlexpression;
 			}
@@ -2797,7 +2797,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 		// duplicated above/below
 		if (nextword == "and") {
 			var nextword2 = remainingwords;
-			if (valuechars.index(nextword2[1])) {
+			if (valuechars.contains(nextword2[1])) {
 				nextword = nextword2;
 				remainingwords = remainingwords.field(" ", 2, 99999);
 			}
@@ -2818,7 +2818,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 			// duplicated above/below
 			if (nextword == "and") {
 				var nextword2 = remainingwords;
-				if (valuechars.index(nextword2[1])) {
+				if (valuechars.contains(nextword2[1])) {
 					nextword = nextword2;
 					remainingwords = remainingwords.field(" ", 2, 99999);
 				}
@@ -3039,7 +3039,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// 2. value chars are " ' 0-9 . + -
 		// 3. values are ignored after any with/by statements to skip the following
 		//    e.g. JUSTLEN "T#20" or HEADING "..."
-		else if (valuechars.index(word1[1])) {
+		else if (valuechars.contains(word1[1])) {
 			if (!whereclause && !orderclause) {
 				if (keycodes)
 					keycodes ^= FM;
@@ -3100,7 +3100,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// no filtering in database on calculated items
 			//save then for secondary filtering
-			if (dictexpression.index("exodus_call"))
+			if (dictexpression.contains("exodus_call"))
 			//if (dictexpression == "true")
 			{
 				if (!calc_fields.f(1).locate(dictid)) {
@@ -3190,7 +3190,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			var dictexpression_isfulltext = dictid.substr(-4).ucase() == "XREF";
 
 			// add the dictid expression
-			//if (dictexpression.index("exodus_call"))
+			//if (dictexpression.contains("exodus_call"))
 			//	dictexpression = "true";
 
 			//whereclause ^= " " ^ dictexpression;
@@ -3254,7 +3254,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				// no filtering in database on calculated items
 				//save then for secondary filtering
-				if (dictexpression.index("exodus_call")) {
+				if (dictexpression.contains("exodus_call")) {
 					var opid = negative ? ">!<" : "><";
 
 					//almost identical code for exodus_call above/below
@@ -3279,10 +3279,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//select numrange(100,150,'[]')  @> any(string_to_array('1,2,150',',','')::numeric[]);
 				if (dictexpression_isarray) {
 					var date_time_numeric;
-					if (dictexpression.index("date_array(")) {
+					if (dictexpression.contains("date_array(")) {
 						whereclause ^= " daterange(";
 						date_time_numeric = "date";
-					} else if (dictexpression.index("time_array(")) {
+					} else if (dictexpression.contains("time_array(")) {
 						whereclause ^= " tsrange(";
 						//date_time_numeric = "time";
 						date_time_numeric = "interval";
@@ -3442,7 +3442,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				word1.swapper("\\", "\\\\");
 				var special = "[^$.|?*+()";
 				for (int ii = special.len(); ii > 0; --ii) {
-					if (special.index(word1[ii]))
+					if (special.contains(word1[ii]))
 						word1.splicer(ii, 0, "\\");
 				}
 				word1.swapper("'" _FM "'", postfix ^ "'" _FM "'" ^ prefix);
@@ -3479,7 +3479,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (value == "''") {
 
 				//remove multivalue handling - duplicate code elsewhere
-				if (dictexpression.index("to_tsvector(")) {
+				if (dictexpression.contains("to_tsvector(")) {
 					//dont create exodus_tobool(to_tsvector(...
 					dictexpression.swapper("to_tsvector('simple',","");
 					dictexpression.popper();
@@ -3497,7 +3497,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// no filtering in database on calculated items
 			//save then for secondary filtering
-			if (dictexpression.index("exodus_call"))
+			if (dictexpression.contains("exodus_call"))
 			//if (dictexpression == "true")
 			{
 				//no op or value means test for Pick/AREV true (zero and '' are false)
@@ -3567,7 +3567,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				}
 
 				//remove multivalue handling - duplicate code elsewhere
-				if (dictexpression.index("to_tsvector(")) {
+				if (dictexpression.contains("to_tsvector(")) {
 					//dont create exodus_tobool(to_tsvector(...
 					dictexpression.swapper("to_tsvector('simple',","");
 					dictexpression.popper();
@@ -3580,7 +3580,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//doesnt work on multivalued fields - results in:
 				//exodus_tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				//TODO work out better way of determining DATE/TIME that must be tested versus null
-				if (dictexpression.index("FULLY_") || (!dictexpression.index("exodus_extract") && dictexpression.index("_DATE")))
+				if (dictexpression.contains("FULLY_") || (!dictexpression.index("exodus_extract") && dictexpression.index("_DATE")))
 					dictexpression ^= " is not null";
 				else
 					dictexpression = "exodus_tobool(" ^ dictexpression ^ ")";
@@ -3657,7 +3657,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			}
 
 			// single value data with multiple values filter
-			else if (value.index(FM) && !dictexpression_isvector) {
+			else if (value.contains(FM) && !dictexpression_isvector) {
 
 				//WARNING ", " is swapped in mvprogram.cpp ::select()
 				//so change there if changed here
@@ -3817,7 +3817,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// testing for "" may become testing for null
 			// for date and time which are returned as null for empty string
 			else if (value == "''") {
-				if (dictexpression.index("extract_date") ||
+				if (dictexpression.contains("extract_date") ||
 					dictexpression.index("extract_datetime") ||
 					dictexpression.index("extract_time")) {
 					//if (op == "=")
@@ -3831,13 +3831,13 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				}
 				// currently number returns 0 for empty string
 				//|| dictexpression.index("extract_number")
-				else if (dictexpression.index("extract_number")) {
+				else if (dictexpression.contains("extract_number")) {
 					//value = "'0'";
 					dictexpression.swapper("extract_number(","extract_text(");
 				}
 				//horrible hack to allow filtering calculated date fields versus ""
 				//TODO detect FULLY_BOOKED and FULLY_APPROVED as dates automatically
-				else if (dictexpression.index("FULLY_")) {
+				else if (dictexpression.contains("FULLY_")) {
 					if (op == "=")
 						op = "is";
 					else
@@ -3911,7 +3911,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	//remove mv::integer if no unnesting (sort on mv fields)
 	if (!unnests) {
 		// sql ^= ", 0 as mv";
-		if (actualfieldnames.index("mv::integer, data")) {
+		if (actualfieldnames.contains("mv::integer, data")) {
 			// replace the mv column with zero if selecting record
 			actualfieldnames.swapper("mv::integer, data", "0::integer, data");
 		} else
@@ -4833,7 +4833,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	var sql;
 
 	// index on calculated columns causes an additional column to be created
-	if (dictexpression.index("exodus_call")) {
+	if (dictexpression.contains("exodus_call")) {
 		("ERROR: Cannot create index on " ^ filename ^ " for calculated field " ^ fieldname).errputl();
 		return false;
 
@@ -4864,7 +4864,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	// create postgres index
 	sql = "CREATE INDEX index__" ^ filename ^ "__" ^ fieldname ^ " ON " ^ filename;
 	//if (ismv || fieldname.substr(-5).lcase() == "_xref")
-	if (dictexpression.index("to_tsvector("))
+	if (dictexpression.contains("to_tsvector("))
 		sql ^= " USING GIN";
 	sql ^= " (";
 	// unaccent requires "CREATE EXTENSION unaccent" in postgres

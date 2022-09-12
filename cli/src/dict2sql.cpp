@@ -293,7 +293,7 @@ COST 10;
 		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW IF EXISTS dict.all"))
 			rawsqlexec("DROP VIEW IF EXISTS dict.all");
 
-		if (filenames.index(FM)) {
+		if (filenames.contains(FM)) {
 			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
 			var errmsg;
 			if (verbose)
@@ -358,7 +358,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	rawsqlexec(functionsql, errmsg);
 
 	//do drop function first if suggested
-	if (errmsg.index("DROP FUNCTION")) {
+	if (errmsg.contains("DROP FUNCTION")) {
 
 		var dropsql = "drop function " ^ functionname_and_args;
 		if (verbose)

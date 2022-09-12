@@ -110,7 +110,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 
 	//read fromuser from users,@username else fromuser=''
 	replyto = "";
-	if (options.index("R")) {
+	if (options.contains("R")) {
 		if ((USERNAME eq "EXODUS" or USERNAME eq "ADAGENCY") or USERNAME eq "ACCOUNTS") {
 			replyto = "support@neosys.com";
 		} else {

@@ -663,7 +663,7 @@ nextsign:
 			//if ucase(printfilename[-4,4])='.XLS' then
 			//locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
 			tt = (field2(printfilename, ".", -1)).lcase();
-			if (tt.index("htm") and sys.document.f(33) ne "2") {
+			if (tt.contains("htm") and sys.document.f(33) ne "2") {
 				//insert body from file
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;

@@ -38,7 +38,7 @@ function main() {
 	var silent = options.index("S");
 	var overwrite = options.index("O");
 
-	if (options.index("R")) {
+	if (options.contains("R")) {
 
 		if (not alertid) {
 			goto syntax;

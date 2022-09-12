@@ -865,7 +865,7 @@ nextreport:
 			//if codepage=720 then tt='windows-1256'
 			//if codepage=737 then tt='windows-1253'
 			//if codepage='UTF-8' then tt='UTF-8'
-			if (codepage.index("UTF-8")) {
+			if (codepage.contains("UTF-8")) {
 				codepage = "UTF-8";
 			}
 			if (var("UTF-8,720,737").locateusing(",", codepage, tt)) {

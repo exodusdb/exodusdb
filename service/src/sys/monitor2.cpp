@@ -697,10 +697,10 @@ nextdbasen:;
 
 	} //backupdriven;
 	//oswrite descriptions on 'DESCRIPS'
-	if (descriptions.index("!!") and status0123 lt 2) {
+	if (descriptions.contains("!!") and status0123 lt 2) {
 		status0123 = 2;
 	}
-	if (descriptions.index("!") and status0123 lt 1) {
+	if (descriptions.contains("!") and status0123 lt 1) {
 		status0123 = 1;
 	}
 

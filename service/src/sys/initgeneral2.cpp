@@ -336,7 +336,7 @@ nextuser:
 			return 0;
 		}
 
-		if (lastlog.index("UPGRADEVOC")) {
+		if (lastlog.contains("UPGRADEVOC")) {
 			return 0;
 		}
 

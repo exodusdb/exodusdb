@@ -91,7 +91,7 @@ capitalise:
 				if ((tt eq DQ and string2.count(DQ) gt 1) or ((tt eq "'" and string2.count("'") gt 1))) {
 					inquotes = tt;
 				} else {
-					if (wordseps.index(tt)) {
+					if (wordseps.contains(tt)) {
 						cap = 1;
 						if (tt eq " ") {
 							numx = var("1234567890").index(string2[ii + 1]);
@@ -149,7 +149,7 @@ capitalise:
 			}
 		} //ii;
 
-		if (mode.index("TRIM")) {
+		if (mode.contains("TRIM")) {
 			string2.converter(" " _FM, _FM " ");
 			string2.trimmer();
 			string2.converter(" " _FM, _FM " ");

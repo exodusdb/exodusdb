@@ -83,7 +83,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		var nlines = dataio.count(FM) + 1;
 		var lastline = dataio.f(nlines);
 	//Total
-		if (lastline.index("<td>" ^ sys.glang.f(28))) {
+		if (lastline.contains("<td>" ^ sys.glang.f(28))) {
 			lastline.swapper("TD>", "th>");
 			lastline.swapper("td>", "th>");
 			dataio(nlines) = lastline;
@@ -120,7 +120,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 					if (line[1] eq "#") {
 						line.splicer(1, 1, "");
 						//if colon : present then before colon is the tag name
-						if (line.index(":")) {
+						if (line.contains(":")) {
 							tagsep = ":";
 						} else {
 							tagsep = " ";
@@ -183,31 +183,31 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		//similar code in INIT.GENERAL and HTMLLIB
 		//name can be CLIENT OS or SERVER OS
 		var osname = "";
-		if (dataio.index("NT 10.0")) {
+		if (dataio.contains("NT 10.0")) {
 			osname = "10";
-		} else if (dataio.index("NT 6.3")) {
+		} else if (dataio.contains("NT 6.3")) {
 			osname = "8.1";
-		} else if (dataio.index("NT 6.2")) {
+		} else if (dataio.contains("NT 6.2")) {
 			osname = "8";
-		} else if (dataio.index("NT 6.1")) {
+		} else if (dataio.contains("NT 6.1")) {
 			osname = "7";
-		} else if (dataio.index("NT 6.0")) {
+		} else if (dataio.contains("NT 6.0")) {
 			osname = "Vista/2008";
-		} else if (dataio.index("NT 5.2")) {
+		} else if (dataio.contains("NT 5.2")) {
 			osname = "XP-64";
-		} else if (dataio.index("NT 5.1")) {
+		} else if (dataio.contains("NT 5.1")) {
 			osname = "XP";
-		} else if (dataio.index("Windows NT ")) {
+		} else if (dataio.contains("Windows NT ")) {
 			var tt = dataio.index("Windows NT ");
 			osname = ((dataio.substr(tt + 11, 9999)).field(";", 1)).field(")", 1);
 		}
-		if (dataio.index("WOW64")) {
+		if (dataio.contains("WOW64")) {
 			osname ^= "-64";
 		}
 		if (osname) {
 			osname = "Win" ^ osname;
 			//add touch if Windows but not Windows Phone
-			if (dataio.index("Touch")) {
+			if (dataio.contains("Touch")) {
 				osname ^= " Touch";
 			}
 		}
@@ -261,13 +261,13 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		//Trident tells you the actual browser software for MS
 		var browser = "";
-		if (dataio.index("Trident/7.0")) {
+		if (dataio.contains("Trident/7.0")) {
 			browser = "11";
-		} else if (dataio.index("Trident/6.0")) {
+		} else if (dataio.contains("Trident/6.0")) {
 			browser = "10";
-		} else if (dataio.index("Trident/5.0")) {
+		} else if (dataio.contains("Trident/5.0")) {
 			browser = "9";
-		} else if (dataio.index("Trident/4.0")) {
+		} else if (dataio.contains("Trident/4.0")) {
 			browser = "8";
 		}
 
@@ -278,15 +278,15 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		//MSIE 7.0  Windows Internet Explorer 7 or IE7 Compatibility View/Browser Mode
 		//MSIE 6.0  Microsoft Internet Explorer 6
 		var iemode = "";
-		if (dataio.index("MSIE 10.0")) {
+		if (dataio.contains("MSIE 10.0")) {
 			iemode = "10";
-		} else if (dataio.index("MSIE 9.0")) {
+		} else if (dataio.contains("MSIE 9.0")) {
 			iemode = "9";
-		} else if (dataio.index("MSIE 8.0")) {
+		} else if (dataio.contains("MSIE 8.0")) {
 			iemode = "8";
-		} else if (dataio.index("MSIE 7.0")) {
+		} else if (dataio.contains("MSIE 7.0")) {
 			iemode = "7";
-		} else if (dataio.index("MSIE 6.0")) {
+		} else if (dataio.contains("MSIE 6.0")) {
 			iemode = "6";
 		}
 

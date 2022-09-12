@@ -197,7 +197,7 @@ const std::string to_oscmd_string(CVR cmd) {
 
 	// warning if any backslashes unless at least one of them is followed by $ which indicates
 	// valid usage as an escape character aiming to recode all old windows-only code
-	if (cmd.index("\\") && !cmd.index("\\$"))
+	if (cmd.contains("\\") && !cmd.index("\\$"))
 		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
 
 	return to_path_string(cmd.field(" ", 1)) + " " + cmd.field(" ", 2, 999999).toString();

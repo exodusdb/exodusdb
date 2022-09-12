@@ -191,7 +191,7 @@ function main() {
 			// If the server is not already attached then attach it
 			// ERROR:  server "adlinek_test" does not exist
 			//  sqlstate:42704^IMPORT FOREIGN SCHEMA public LIMIT TO (markets) FROM SERVER adlinek_test INTO public
-			if (lasterror.index("sqlstate:42704")) {
+			if (lasterror.contains("sqlstate:42704")) {
 				if (not osshell(SENTENCE.field(" ", 1, 2)))
 					abort("");
 			}

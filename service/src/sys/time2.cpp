@@ -24,7 +24,7 @@ function main(in type, in input0, in mode0, out output) {
 
 	if (type eq "OCONV") {
 
-		if (mode.index("48")) {
+		if (mode.contains("48")) {
 			var modex = mode;
 			modex.swapper("48", "");
 			if (modex eq "") {

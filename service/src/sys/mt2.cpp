@@ -16,7 +16,7 @@ function main(in type, in in0, in mode, out out0) {
 	//call msg(in2:'')
 
 	//Z option suppresses zeros, returns ''
-	if (mode.index("Z")) {
+	if (mode.contains("Z")) {
 		if (not in0) {
 			out0 = "";
 			return 0;

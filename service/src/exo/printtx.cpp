@@ -343,14 +343,14 @@ subroutine convoptions() {
 
 subroutine getheadfoot() {
 	headx = head;
-	if (headx.index("\'")) {
+	if (headx.contains("\'")) {
 		temp = headx;
 		gosub convoptions();
 		headx = temp;
 		headx.converter("`", "`");
 	}
 	var footx = foot;
-	if (footx.index("\'")) {
+	if (footx.contains("\'")) {
 		temp = footx;
 		gosub convoptions();
 		footx = temp;

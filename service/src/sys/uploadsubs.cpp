@@ -238,7 +238,7 @@ postuploadfail:
 		//convert '\/:*?<>|' to '--------' in virtualfilebase
 		//convert '"' to "'" in virtualfilebase
 
-		if (virtualfilebase.index(OSSLASH)) {
+		if (virtualfilebase.contains(OSSLASH)) {
 			//uploadpath=field(virtualfilebase,OSSLASH,1,count(virtualfilebase,OSSLASH))
 		} else {
 			//uploadpath='*'
@@ -398,7 +398,7 @@ postuploadfail:
 		if (not importcode) {
 			importcode = (field2(uploadpath, OSSLASH, -1)).ucase();
 		}
-		if (importcode.index(".")) {
+		if (importcode.contains(".")) {
 			var tt = field2(uploadpath, ".", -1);
 			importcode.splicer(-tt.len() - 1, 999, "");
 		}
@@ -580,7 +580,7 @@ nextline:
 						var CONV = col.f(1, 4);
 						if (CONV.index("TIME")) {
 						//if no : in time then assume is already seconds
-							if (cell.index(":")) {
+							if (cell.contains(":")) {
 								cell = iconv(cell, CONV);
 							}
 						} else {
@@ -727,7 +727,7 @@ subroutine parseline(io line) {
 	nquotes = line.count(DQ);
 	for (var quoten = 2; quoten <= nquotes; quoten+=2) {
 		var tt = line.field(DQ, quoten);
-		if (tt.index(",")) {
+		if (tt.contains(",")) {
 			tt.swapper(",", "&comma;");
 			line = line.fieldstore(DQ, quoten, 1, tt);
 		}

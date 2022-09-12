@@ -22,13 +22,13 @@ function main(in mode, in tableid, in in0, out outx) {
 	for (const var coln : range(1, ncols)) {
 		var tt = inp.f(1, coln);
 
-		if (tt.index("left")) {
+		if (tt.contains("left")) {
 			align = "left";
 		}
-		if (tt.index("right")) {
+		if (tt.contains("right")) {
 			align = "right";
 		}
-		if (tt.index("center")) {
+		if (tt.contains("center")) {
 			align = "center";
 		}
 

@@ -38,7 +38,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		}
 	}
 
-	if (origlanguagecode.index("*")) {
+	if (origlanguagecode.contains("*")) {
 
 		var langcode1 = origlanguagecode.field("*", 1);
 		call getlang(origprogname, langcode1, origdatatype, languagefile, lang);
@@ -202,7 +202,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 		lang = raise(lang.f(1));
 
 		//strip out English pretext
-		if (lang.index(var().chr(170))) {
+		if (lang.contains(var().chr(170))) {
 			nn = lang.count(FM) + 1;
 			for (const var ii : range(1, nn)) {
 				var tt = lang.f(ii).field(var().chr(170), 2);

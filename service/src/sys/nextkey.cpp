@@ -95,7 +95,7 @@ checkrec:
 		keyx = result;
 		if (prefix) {
 			keyx = prefix;
-			if (prefix.index("%")) {
+			if (prefix.contains("%")) {
 				keyx.swapper("%", result);
 			} else {
 				keyx ^= result;

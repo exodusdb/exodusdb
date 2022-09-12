@@ -50,7 +50,7 @@ function main(io osfilename, in printopts0, out errors) {
 	} else {
 		printopts = printopts0;
 	}
-	if (printopts.index("X")) {
+	if (printopts.contains("X")) {
 		return 0;
 	}
 
@@ -88,7 +88,7 @@ function main(io osfilename, in printopts0, out errors) {
 	pdfcmd ^= " --footer-left [page]/[topage]";
 	// end
 
-	if (printopts.index("L")) {
+	if (printopts.contains("L")) {
 		pdfcmd ^= " -O landscape";
 	}
 

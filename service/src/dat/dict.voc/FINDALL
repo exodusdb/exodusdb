@@ -21,7 +21,7 @@ function main() {\
 	for (const var fn : range(1, nn)) {\
 		var tx = datax.f(fn).trim();\
 \
-		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {\
+		if (tx.contains("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {\
 		//gosub change2\
 			ANS(1, -1) = tx;\
 		}\

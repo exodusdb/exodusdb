@@ -171,7 +171,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		var op = calc_fields.f(2, fieldn);
 
 		//multivalued selections are not well supported from mvdbpostgresql. handle the obvious cases"
-		if (ovalue.index(VM)) {
+		if (ovalue.contains(VM)) {
 			if (op == "=")
 				op = "in";
 			else if (op == "<>")
@@ -215,17 +215,17 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//sqltype
 		var sqltype;
-		if (ioconv.index("[NUMBER")) {
+		if (ioconv.contains("[NUMBER")) {
 			sqltype = "NUMERIC";
 		}
-		else if (ioconv.index("[DATE")) {
+		else if (ioconv.contains("[DATE")) {
 			sqltype = "DATE";
             ioconvs(fieldn) = "D";
 		}
-		else if (ioconv.index("[TIME")) {
+		else if (ioconv.contains("[TIME")) {
 			sqltype = "TIME";//TODO check if works
 		}
-		else if (ioconv.index("[DATETIME")) {
+		else if (ioconv.contains("[DATETIME")) {
 			sqltype = "DATE";//TODO
 		}
 		else {
@@ -609,7 +609,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 		std::cout << var("----------------------------------------") << std::endl;
 
 	//skip if just "downing" a previous "upped" message
-	if (options.index("D")) {
+	if (options.contains("D")) {
 		return;
 	}
 
@@ -629,7 +629,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 	var origbuffer = buffer.assigned() ? buffer : "";
 
 	//R=Reply required in buffer
-	if (options.index("R")) {
+	if (options.contains("R")) {
 		if (interactive) {
 
 			//one space after the prompt
@@ -647,7 +647,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 
 			//escape anywhere in the input returned as a single ESC character
 			//or empty input with ESC option means ESC
-			if (options.index("E") and (buffer == "" or buffer.index("\x1B")))
+			if (options.contains("E") and (buffer == "" or buffer.index("\x1B")))
 				buffer = "\x1B";  //esc
 
 			std::cout << std::endl;
@@ -658,7 +658,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 		}
 
 		//force upper case
-		if (options.index("C"))
+		if (options.contains("C"))
 			buffer.ucaser();
 
 		return;
@@ -968,7 +968,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 				if ((tt == DQ and string2.count(DQ) gt 1) or ((tt == "'" and string2.count("'") gt 1))) {
 					inquotes = tt;
 				} else {
-					if (wordseps.index(tt)) {
+					if (wordseps.contains(tt)) {
 						cap = 1;
 						if (tt == " ")
 							//numx = var("1234567890").index(string2.substr(ii + 1, 1), 1);
@@ -1560,7 +1560,7 @@ inp:
 		reply.input("? ");
 
 		//entering ESC anywhere in the input causes "no response"
-		if (reply.index("\x1B"))
+		if (reply.contains("\x1B"))
 			reply = 0;
 
 		//reply must be numeric in range
@@ -2382,7 +2382,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 	output = "";
 
 	var zz = "";
-	if (ndecs.index("Z")) {
+	if (ndecs.contains("Z")) {
 		ndecs.converter("Z", "");
 		zz = "Z";
 	}

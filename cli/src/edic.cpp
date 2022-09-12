@@ -72,7 +72,7 @@ function main() {
 		}
 	}
 
-	if (editor.index("nano"))
+	if (editor.contains("nano"))
 		linenopattern = "+$LINENO ";
 
 	//otherwise on windows try to locate CYGWIN nano or vi
@@ -158,7 +158,7 @@ function main() {
 	editor.regex_replacer("^[^ ]*\\bnano\\b", "nano --positionlog --const --suspend +$LINENO");
 	//editor.swapper("nano ", "nano --positionlog --const --nowrap --autoindent --suspend --speller=compile +$LINENO ");
 
-	if (editor.index("nano"))
+	if (editor.contains("nano"))
 		printl("http://www.nano-editor.org/dist/v2.1/nano.html");
 
 	//configure nano syntax highlighting
@@ -180,7 +180,7 @@ function main() {
 			startatlineno = "";
 
 		filename.trimmerb(".");
-		if (not index(field2(filename, OSSLASH, -1), "."))
+		if (not field2(filename, OSSLASH, -1).contains("."))
 			filename ^= ".cpp";
 
 		//allow compiler to copy .h files to ~/inc dir
@@ -232,7 +232,7 @@ function main() {
 
 		//make absolute in case EDITOR changes current working directory
 		var editcmd = editor;
-		if (editcmd.index("$ABSOLUTEFILENAME")) {
+		if (editcmd.contains("$ABSOLUTEFILENAME")) {
 			editcmd.swapper("$ABSOLUTEFILENAME", "$FILENAME");
 
 			filename = oscwd() ^ OSSLASH ^ filename;
@@ -344,7 +344,7 @@ function main() {
 			var fileinfo = osfile(filename);
 
 			//build the edit command
-			if (editcmd.index("$LINENO")) {
+			if (editcmd.contains("$LINENO")) {
 				if (not startatlineno)
 					linenopattern = "";
 				else
@@ -352,7 +352,7 @@ function main() {
 				editcmd.swapper("+$LINENO", linenopattern);
 			}
 
-			if (editcmd.index("$FILENAME"))
+			if (editcmd.contains("$FILENAME"))
 				editcmd.swapper("$FILENAME", filename);
 			else
 				editcmd ^= " " ^ filename;

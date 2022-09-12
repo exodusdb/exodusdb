@@ -84,7 +84,7 @@ function main() {
 	}
 
 	// / present in source without : treated as if : appended
-	if (sourcefilenames.index("/") and not sourcename) {
+	if (sourcefilenames.contains("/") and not sourcename) {
 		sourcename = sourcefilenames;
 		sourcefilenames = "";
 	}
@@ -98,7 +98,7 @@ function main() {
 	}
 
 	// / present in target without : treated as if : was appended
-	if (targetfilenames.index("/") and not targetname) {
+	if (targetfilenames.contains("/") and not targetname) {
 		targetname = targetfilenames;
 		targetfilenames = "";
 	}
@@ -108,7 +108,7 @@ function main() {
 	if (not sourcename.index("/") and not sourcename.ends(".sql") and not sourcedb.connect(sourcename))
 		abort(sourcename.quote() ^ " Cannot connect to source");
 
-	if (targetname.index("/")) {
+	if (targetname.contains("/")) {
 
 		//flag target is not a db
 		targetdb = "";

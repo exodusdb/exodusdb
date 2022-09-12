@@ -64,8 +64,8 @@ function main() {
 	if (containing) {
 
 		var tt = containing.ucase();
-		if (tt.index(DQ)) {
-			if (tt.index("'")) {
+		if (tt.contains(DQ)) {
+			if (tt.contains("'")) {
 				call mssg("Cannot find text containing single AND double quotes");
 				stop();
 			} else {

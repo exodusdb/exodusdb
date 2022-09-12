@@ -1158,7 +1158,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 
 		//dont do this because easier to understand bash expansion without it
 		// put back quotes if any spaces
-		//if (word.index(" "))
+		//if (word.contains(" "))
 		//	word.quoter();
 
 		mv.SENTENCE ^= word;

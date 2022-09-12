@@ -657,7 +657,7 @@ subroutine addlinks2osfilename() {
     //attachment path must start with '/data/'
     //Apache will replace the alias /data/ to absolute path from /
     //eg /root/hosts/test/work/../data/test/xxxxxx.xls
-    if (tt.index("../")){
+    if (tt.contains("../")){
         //becomes: /data/test/xxxxxx.xls
         tt.splicer(1,tt.index("../")+2,"");
     }

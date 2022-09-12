@@ -248,7 +248,7 @@ function main() {
 	executivecode.ucaser();
 
 	//@ in executive name assume is an email email
-	if (executivecode.index("@")) {
+	if (executivecode.contains("@")) {
 		ANS = executivecode;
 		ANS.converter(" ,", ";;");
 	} else {
@@ -348,7 +348,7 @@ function main() {
 	for (const var fn : range(1, nn)) {
 		var tx = datax.f(fn).trim();
 
-		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {
+		if (tx.contains("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {
 		//gosub change2
 			ANS(1, -1) = tx;
 		}

@@ -1140,7 +1140,7 @@ function main() {
 						swapper(inclusion, "callorreturn", callorreturn);
 						swapper(inclusion, "{additional_funcs}", add_funcs);
 
-						if (text.index("-Wcast-function-type")) {
+						if (text.contains("-Wcast-function-type")) {
 							swapper(inclusion, "{before_call}",
 									"#pragma GCC diagnostic push"
 									"\r\n #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
@@ -1169,11 +1169,11 @@ function main() {
 
 							//dont include more than once in the header file
 							//function might appear more than once if declared and defined separately
-							if (not index(headertext, funcdecl)) {
+							if (not headertext.contains(funcdecl)) {
 								headertext ^= crlf;
 								headertext ^= crlf;
 								var includefunctor = "#include <exodus/xfunctor" ^ functype ^ nargs ^ ".h>" ^ crlf;
-								if (not index(headertext, includefunctor))
+								if (not headertext.contains(includefunctor))
 									headertext ^= includefunctor;
 								headertext ^= funcdecl;
 							}

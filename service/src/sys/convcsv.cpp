@@ -356,7 +356,7 @@ nextdict:
 					var oconvx = dict.f(7);
 
 					//force long date format
-					if (oconvx.index("DATE") or (oconvx[1] eq "D")) {
+					if (oconvx.contains("DATE") or (oconvx[1] eq "D")) {
 						//if raw then
 						// oconvx='D4/J'
 						//end else
@@ -609,7 +609,7 @@ nextvn:
 						}
 					}
 
-					if (cell.index(DQ)) {
+					if (cell.contains(DQ)) {
 						if (fmtxs(coln) eq "T") {
 							if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
 								cell.swapper(DQ, "''");

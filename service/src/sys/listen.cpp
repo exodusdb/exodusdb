@@ -2803,7 +2803,7 @@ function request_exit() {
 		tt = " " ^ oconv((responsetime - requesttime).mod(86400), "[NUMBER,2]") ^ "s ";
 		//seconds
 		tt ^= rawresponse.f(1, 1).field("|", 1).f(1, 1);
-		if (tt.index("<")) {
+		if (tt.contains("<")) {
 			call htmllib2("STRIPTAGS", tt);
 		}
 		tt.swapper("SESSIONID ", "");
@@ -3265,7 +3265,7 @@ subroutine writelogx2() {
 subroutine filesecurity() {
 
 	ok = 1;
-	if (keyx.index("*")) {
+	if (keyx.contains("*")) {
 		return;
 	}
 	if (authorised(filetitle2 ^ " " ^ secmode, msg0, "")) {

@@ -77,7 +77,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	//exit:
 	//////
 
-	if (mode.index("READ")) {
+	if (mode.contains("READ")) {
 		//1/2
 		if (preread) {
 			triggers(1) = preread ^ FM ^ prereadmode;
@@ -90,7 +90,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 		if (replaceread) {
 			triggers(5) = replaceread ^ FM ^ "READ";
 		}
-	} else if (mode.index("WRITE")) {
+	} else if (mode.contains("WRITE")) {
 		if (updatesubs) {
 			triggers(1) = updatesubs ^ FM ^ "PREWRITE";
 			triggers(3) = updatesubs ^ FM ^ "POSTWRITE";
@@ -98,7 +98,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 				triggers(5) = updatesubs ^ FM ^ "WRITE";
 			}
 		}
-	} else if (mode.index("DELETE")) {
+	} else if (mode.contains("DELETE")) {
 		if (updatesubs) {
 			triggers(1) = updatesubs ^ FM ^ "PREDELETE";
 			triggers(3) = updatesubs ^ FM ^ "POSTDELETE";

@@ -264,7 +264,7 @@ passfail:
 				validips = SECURITY.f(6, usern);
 
 				//+ in user ipnos means add to group user ip ranges
-				if (validips.index("+")) {
+				if (validips.contains("+")) {
 					validips.transfer(addvalidips);
 				} else {
 					addvalidips = "";
@@ -283,7 +283,7 @@ passfail:
 					validips = SECURITY.f(6, ii);
 
 					//+ in group ipnos means add to system config ip ranges
-					if (validips.index("+")) {
+					if (validips.contains("+")) {
 						addvalidips ^= " " ^ validips;
 						validips = "";
 					}
@@ -293,7 +293,7 @@ passfail:
 						validips = SYSTEM.f(39);
 
 						//+ in system config ipnos means add traditional private LAN ip ranges
-						if (validips.index("+")) {
+						if (validips.contains("+")) {
 							addvalidips ^= " " ^ validips;
 							validips = "";
 						}

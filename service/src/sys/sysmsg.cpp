@@ -109,7 +109,7 @@ function main(in msg0, in subject0="", in username0="") {
 
 	//prevent a weird error going to users
 	var addhw = 0;
-	if (msg.index("The process cannot access the file because it is being")) {
+	if (msg.contains("The process cannot access the file because it is being")) {
 		addhw = 1;
 		emailaddrs = "";
 		subjectin ^= " V2";

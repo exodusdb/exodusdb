@@ -514,10 +514,10 @@ function main() {
 	idsupp = "";
 	dblspc = "";
 	detsupp = 0;
-	if (sentencex.index(" DET-SUPP")) {
+	if (sentencex.contains(" DET-SUPP")) {
 		detsupp = 1;
 	}
-	if (sentencex.index(" DET-SUPP2")) {
+	if (sentencex.contains(" DET-SUPP2")) {
 		detsupp = 2;
 	}
 	gtotsupp = "";
@@ -2175,17 +2175,17 @@ getword2b:
 	if (((word[1] eq "(") and (word[-1] eq ")")) or (((word[1] eq "{") and (word[-1] eq "}")))) {
 		tt = word;
 		//option (N) no letterhead
-		if (tt.index("N")) {
+		if (tt.contains("N")) {
 			letterhead = "";
 		}
-		if (tt.index("NN")) {
+		if (tt.contains("NN")) {
 			rawtable = 1;
 			bottomline = "";
 		}
-		if (tt.index("S")) {
+		if (tt.contains("S")) {
 			silent = 1;
 		}
-		if (tt.index("T")) {
+		if (tt.contains("T")) {
 			html = 0;
 		}
 		goto getword2b;

@@ -323,13 +323,13 @@ class printtext {
 	void getheadfoot(io head, io foot, io nbodylns) {
 
 		headx = head;
-		if (headx.index("\'", 1)) {
+		if (headx.contains("\'", 1)) {
 			convoptions(headx);
 			headx.converter("`", "`");
 		}
 
 		footx = foot;
-		if (footx.index("\'", 1)) {
+		if (footx.contains("\'", 1)) {
 			convoptions(footx);
 			footx.converter("`", "`");
 		}

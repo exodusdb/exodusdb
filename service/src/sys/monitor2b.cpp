@@ -235,7 +235,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		if (post) {
 
 			if (params) {
-				if (cmd.index(" -N ")) {
+				if (cmd.contains(" -N ")) {
 					params = "?data=" ^ params;
 				} else {
 					var datafilename = tempfilename ^ ".XDA";

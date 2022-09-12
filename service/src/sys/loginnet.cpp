@@ -121,7 +121,7 @@ deleteit:
 	} //menun;
 
 	//if they have MENU then ANALYSIS=MEDIAANALYSIS
-	if (menus.index("MEDIA")) {
+	if (menus.contains("MEDIA")) {
 		menus.swapper("ANALYSIS", "MEDIAANALYSIS");
 	}
 

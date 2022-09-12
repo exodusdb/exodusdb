@@ -40,7 +40,7 @@ function main() {
 		cleartovalue.splicer(1, 1, "");
 		cleartovalue.popper();
 	}
-	if (options.index("I")) {
+	if (options.contains("I")) {
 		cleartovalue = cleartovalue.invert();
 	}
 	var file;

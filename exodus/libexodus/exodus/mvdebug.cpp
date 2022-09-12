@@ -151,7 +151,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		if (objaddress.len() > 9)
 			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
 
-		if (objfilename.index("libc.so") or objfilename.index("libexodus.so"))
+		if (objfilename.contains("libc.so") or objfilename.index("libexodus.so"))
 			continue;
 
 #ifdef TRACING
