@@ -1589,7 +1589,7 @@ class PUBLIC var final {
 	VARREF trimmerf(SV trimchars DEFAULT_SPACE);
 	VARREF trimmerb(SV trimchars DEFAULT_SPACE);
 	VARREF trimmer(SV trimchars, SV options);
-	VARREF fieldstorer(CVR sepchar, const int fieldno, const int nfields, CVR replacement);
+	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
 
@@ -1622,7 +1622,7 @@ class PUBLIC var final {
 	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return this->trimmerf(trimchars);}
 	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return this->trimmerb(trimchars);}
 	ND VARREF trim(SV trimchars, SV options) && {return this->trimmer(trimchars, options);}
-	ND VARREF fieldstore(CVR sepchar, const int fieldno, const int nfields, CVR replacement) &&;
+	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) &&;
 	ND VARREF substr(const int startindex) &&;
 	ND VARREF substr(const int startindex, const int length) &&;
 
@@ -1655,7 +1655,7 @@ class PUBLIC var final {
 	ND var trimf(SV trimchars DEFAULT_SPACE) const&;
 	ND var trimb(SV trimchars DEFAULT_SPACE) const&;
 	ND var trim(SV trimchars, SV options) const&;
-	ND var fieldstore(CVR sepchar, const int fieldno, const int nfields, CVR replacement) const&;
+	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
 
 	ND var lower() const&;
 	ND var raise() const&;
@@ -1706,10 +1706,10 @@ class PUBLIC var final {
 	// delimiterno) const;
 	var substr2(VARREF startstopindex, VARREF delimiterno) const;
 
-	ND var field(CVR substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
+	ND var field(SV substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
 	// version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO
 	// should probably make field() do this
-	ND var field2(CVR substrx, const int fieldnx, const int nfieldsx = 1) const;
+	ND var field2(SV substrx, const int fieldnx, const int nfieldsx = 1) const;
 
 	// I/O CONVERSION
 	/////////////////

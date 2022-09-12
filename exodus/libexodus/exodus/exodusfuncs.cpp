@@ -496,10 +496,10 @@ PUBLIC var unquote(CVR instring) {
 }
 
 
-PUBLIC VARREF fieldstorer(VARREF iostring, CVR sepchar, const int fieldno, const int nfields, CVR replacement) {
+PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement) {
 	return iostring.fieldstorer(sepchar, fieldno, nfields, replacement);
 }
-PUBLIC var fieldstore(CVR instring, CVR sepchar, const int fieldno, const int nfields, CVR replacement) {
+PUBLIC var fieldstore(CVR instring, SV sepchar, const int fieldno, const int nfields, CVR replacement) {
 	return instring.fieldstore(sepchar, fieldno, nfields, replacement);
 }
 
@@ -746,11 +746,11 @@ PUBLIC var indexr(CVR instring, SV substr, const int startcharno) {
 }
 
 
-PUBLIC var field(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx) {
+PUBLIC var field(CVR instring, SV substrx, const int fieldnx, const int nfieldsx) {
 	return instring.field(substrx, fieldnx, nfieldsx);
 }
 
-PUBLIC var field2(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx) {
+PUBLIC var field2(CVR instring, SV substrx, const int fieldnx, const int nfieldsx) {
 	return instring.field2(substrx, fieldnx, nfieldsx);
 }
 

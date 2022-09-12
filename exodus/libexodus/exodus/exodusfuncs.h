@@ -259,8 +259,8 @@ PUBLIC ND var squote(CVR instring);
 PUBLIC VARREF unquoter(VARREF iostring);
 PUBLIC ND var unquote(CVR instring);
 
-PUBLIC VARREF fieldstorer(VARREF iostring, CVR sepchar, const int fieldno, const int nfields, CVR replacement);
-PUBLIC ND var fieldstore(CVR instring, CVR sepchar, const int fieldno, const int nfields, CVR replacement);
+PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
+PUBLIC ND var fieldstore(CVR instring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
 
 
 PUBLIC VARREF trimmer(VARREF iostring, CVR trimchars, CVR options);
@@ -316,8 +316,8 @@ PUBLIC ND var index(CVR instring, SV substr, const int startcharno = 1);
 PUBLIC ND var indexn(CVR instring, SV substr);
 PUBLIC ND var indexr(CVR instring, SV substr, const int startcharno = -1);
 
-PUBLIC ND var field(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx = 1);
-PUBLIC ND var field2(CVR instring, CVR substrx, const int fieldnx, const int nfieldsx = 1);
+PUBLIC ND var field(CVR instring, SV substrx, const int fieldnx, const int nfieldsx = 1);
+PUBLIC ND var field2(CVR instring, SV substrx, const int fieldnx, const int nfieldsx = 1);
 
 // moved to mvprogram to allow custom conversions like "[DATE]"
 // PUBLIC var oconv(CVR instring, const char* conversion);

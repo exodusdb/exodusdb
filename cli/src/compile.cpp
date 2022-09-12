@@ -876,7 +876,7 @@ function main() {
 	*/
 						nodefaults = 0;
 						for (int argn = 1; argn <= nargs; ++argn) {
-							var funcarg = field(funcargsdecl, ',', argn).trim();
+							var funcarg = field(funcargsdecl, ",", argn).trim();
 
 							//remove any default arguments (after =)
 							//TODO verify this is ok with <exodus/mvlink.h> method below
@@ -893,13 +893,13 @@ function main() {
 							}
 
 							//assume the last word (by spaces) is the variable name
-							fieldstorer(funcargs, ',', argn, 1, funcarg.field2(" ", -1));
+							fieldstorer(funcargs, ",", argn, 1, funcarg.field2(" ", -1));
 
 							//assume everything except the last word (by spaces) is the variable type
 							//wrap it in brackets otherwise when filling in missing parameters
 							//the syntax could be wrong/fail to compile eg "const var&()" v. "(const var&)()"
 							var argtype = field(funcarg, " ", 1, fcount(funcarg, " ") - 1);
-							fieldstorer(funcargstype, ',', argn, 1, argtype);
+							fieldstorer(funcargstype, ",", argn, 1, argtype);
 						}
 
 						//develop additional function calls to allow constants to be provided for io/out arguments
@@ -1771,7 +1771,7 @@ function set_environment() {
 //		}
 		for (in line : vars) {
 			ossetenv(
-				field(line, '=', 1), field(line, '=', 2, 999999));
+				field(line, "=", 1), field(line, "=", 2, 999999));
 		}
 		/*
 		var value;

@@ -38,7 +38,7 @@ namespace exodus {
 ///////////////
 
 // FIELD2()
-var var::field2(CVR separator, const int fieldno, const int nfields) const {
+var var::field2(SV separator, const int fieldno, const int nfields) const {
 	if (fieldno >= 0)
 		return field(separator, fieldno, nfields);
 
@@ -47,13 +47,12 @@ var var::field2(CVR separator, const int fieldno, const int nfields) const {
 
 // FIELD()
 // var.field(separator,fieldno,nfields)
-var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
+var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 
-	THISIS("var var::field(CVR separatorx,const int fieldnx,const int nfieldsx) const")
+	THISIS("var var::field(SV separatorx,const int fieldnx,const int nfieldsx) const")
 	assertString(function_sig);
-	ISSTRING(separatorx)
 
-	if (separatorx.var_str == "") {
+	if (separatorx.empty()) {
 		//return "";
 		throw VarError("separator cannot be blank in field()");
 	}
@@ -62,7 +61,7 @@ var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
 	int nfields = nfieldsx > 0 ? nfieldsx : 1;
 
 	// separator might be multi-byte ... esp. for non-ASCII
-	std::string::size_type len_separator = separatorx.var_str.size();
+	std::string::size_type len_separator = separatorx.size();
 
 	// FIND FIELD
 
@@ -70,7 +69,7 @@ var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
 	std::string::size_type start_pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
-		start_pos = var_str.find(separatorx.var_str, start_pos);
+		start_pos = var_str.find(separatorx, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return "";
@@ -83,7 +82,7 @@ var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
 	std::string::size_type end_pos = start_pos;
 	int pastfieldn = fieldno + nfields;
 	while (fieldn2 < pastfieldn) {
-		end_pos = var_str.find(separatorx.var_str, end_pos);
+		end_pos = var_str.find(separatorx, end_pos);
 		// past of of string?
 		if (end_pos == std::string::npos) {
 			//return var_str.substr(start_pos, var_str.size() - start_pos);
@@ -104,26 +103,24 @@ var var::field(CVR separatorx, const int fieldnx, const int nfieldsx) const {
 /////////////
 
 // var.fieldstore(separator,fieldno,nfields,replacement)
-var var::fieldstore(CVR separator, const int fieldnx, const int nfieldsx, CVR replacementx) const& {
+var var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) const& {
 	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 }
 
 // on temporary
-VARREF var::fieldstore(CVR separator, const int fieldnx, const int nfieldsx, CVR replacementx) && {
+VARREF var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) && {
 	return this->fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 }
 
 // in-place
-VARREF var::fieldstorer(CVR separator0, const int fieldnx, const int nfieldsx, CVR replacementx) {
+VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) {
 
 	THISIS(
-		"VARREF var::fieldstorer(CVR separator0,const int fieldnx,const int nfieldsx, "
+		"VARREF var::fieldstorer(SV separator0,const int fieldnx,const int nfieldsx, "
 		"CVR replacementx)")
 	assertStringMutator(function_sig);
-	ISSTRING(separator0)
 
-	std::string separator = separator0.var_str;
-	if (separator == "") {
+	if (separator.empty()) {
 		//// *this = "";
 		//var_str.clear();
 		//var_typ = VARTYP_STR;
@@ -132,13 +129,13 @@ VARREF var::fieldstorer(CVR separator0, const int fieldnx, const int nfieldsx, C
 	}
 
 	// handle multibyte/non-ASCII separators
-	std::string::size_type separator_len = separator0.var_str.size();
+	std::string::size_type separator_len = separator.size();
 
 	int fieldno;
 	if (fieldnx > 0)
 		fieldno = fieldnx;
 	else if (fieldnx < 0)
-		fieldno = this->count(separator0) + 1 + fieldnx + 1;
+		fieldno = this->count(separator) + 1 + fieldnx + 1;
 	else
 		fieldno = 1;
 
@@ -147,7 +144,7 @@ VARREF var::fieldstorer(CVR separator0, const int fieldnx, const int nfieldsx, C
 	// pad replacement if required
 	var replacement;
 	if (nfieldsx >= 0) {
-		int nreplacementfields = replacementx.count(separator0) + 1;
+		int nreplacementfields = replacementx.count(separator) + 1;
 		// pad to correct number of fields
 		if (nreplacementfields < nfields) {
 			replacement = replacementx;
