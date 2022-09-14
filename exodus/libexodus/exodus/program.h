@@ -75,13 +75,13 @@
 			{                                                                                                   \
 				errputl(exceptionx.description, " - Aborting.");                                                \
 				errputl(exceptionx.stack().convert(FM, "\n"));                                                  \
-				result = OPTIONS.index("I") ? 0 : 999;                                                          \
+				result = OPTIONS.contains("I") ? 0 : 999;                                                       \
 			}                                                                                                   \
 		}                                                                                                       \
 		/*disconnect ALL connections of this thread*/                                                           \
 		disconnectall();                                                                                        \
 		disconnect();                                                                                           \
-		if (OPTIONS.index("I"))                                                                                 \
+		if (OPTIONS.contains("I"))                                                                              \
 			result = 0;                                                                                         \
 		return result;                                                                                          \
 	}                                                                                                           \

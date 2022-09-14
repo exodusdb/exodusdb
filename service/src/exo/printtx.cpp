@@ -104,7 +104,7 @@ function main(io tx, in mode="", in modevalue="") {
 		//if no printfile assume command mode and make an output file name
 		printfilename = SYSTEM.f(2);
 		if (html.unassigned()) {
-			html = printfilename.lcase().index(".htm");
+			html = printfilename.lcase().contains(".htm");
 		}
 		var ownprintfile = 0;
 		//if (printfilename == "") {
@@ -234,7 +234,7 @@ function main(io tx, in mode="", in modevalue="") {
 		}
 		// end
 		// end
-		if (html and not bottomline.index("</tbody></table>")) {
+		if (html and not bottomline.contains("</tbody></table>")) {
 			tx.splicer(1, 0, "</tbody></table>");
 		}
 		bodyln = ntxlns;

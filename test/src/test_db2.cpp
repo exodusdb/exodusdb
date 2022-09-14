@@ -14,6 +14,7 @@ programinit()
 		return 0;
 	}
 
+	// Comment this out if you want to see anything in the database after an assert failure
 	begintrans();
 
 	//  //Skip if fast testing required
@@ -62,16 +63,31 @@ programinit()
 	//errmsg = {var_mvstr="ERROR:  function exodus_extract_date(bytea, integer, integer, integer) does not exist
 	//use DBTRACE to see the error
 	printl("CHECKING IF PGEXODUS POSTGRES PLUGIN IS INSTALLED");
-	var pluginok = true;
-	if (not createindex(FILE, "BIRTHDAY")) {
-		pluginok = false;
+	var pluginok = createindex(FILE, "BIRTHDAY");
+	if (not pluginok) {
 		printl("Error: pgexodus, Exodus's plugin to PostgreSQL is not working. Run configexodus.");
-	}
+	} else {
+		var tt = listindexes();
+		tt.dump();
+		TRACE(tt)
+		TRACE(tt.oconv("HEX"))
+		var tt2 = "xo_users]birthday"_var;
+		tt2.dump();
+		TRACE(tt2.oconv("HEX"))
+		TRACE(tt2)
+		assert(tt eq tt2);
+		assert(listindexes()                 eq "xo_users]birthday"_var);
+		assert(listindexes(FILE)             eq "xo_users]birthday"_var);
+		assert(listindexes(FILE, "birthday") eq "xo_users]birthday"_var);
 
-	if (pluginok) {
-		assert(listindexes().oswrite("x")                 eq "xo_users]birthday"_var);
-		assert(listindexes(FILE).oswrite("y")             eq "xo_users]birthday"_var);
-		assert(listindexes(FILE, "birthday").oswrite("z") eq "xo_users]birthday"_var);
+//		TRACE(listindexes(FILE, "birthday"))
+//		TRACE(listindexes(FILE, "birthday").oswrite("z2"))
+//		TRACE("xo_users]birthday"_var)
+//
+//		var x = listindexes(FILE, "birthday").oswrite("z2");
+//		var y = "xo_users]birthday"_var;
+//		assert(x eq y);
+
 		assert(listindexes() ne "");
 		//ALN: do not delete to make subsequent select work::	assert(deleteindex(FILE,"BIRTHDAY"));
 		//		assert(listindexes(FILE) eq "");
@@ -253,7 +269,7 @@ dict(AGE_IN_YEARS) {
 			++ii;
 			if (!(ii % 10000))
 				printl(" " ^ key);
-			if (record.lcase().index("QWEQWE"))
+			if (record.lcase().contains("QWEQWE"))
 				print("?");
 		}
 	}

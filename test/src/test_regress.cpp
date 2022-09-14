@@ -325,11 +325,11 @@ function onefile(in filename, in maxndifferences) {
 				//skip some case where Pick/AREV are strange ie compare FM:'A' < 'A' in order by
 				//i.e. skip lines where PICK/AREV thinks that "A"> FM:A (something that we can say is "undefined behaviour" for locate by
 				if (LOCATE_FN eq 0 and LOCATE_VN == 0 and LOCATE_SN == 0) {
-					if (subrec.index("\xFE")) {
+					if (subrec.contains("\xFE")) {
 						if (sep eq VM or sep == SM or sep > RM)
 							continue;
 					}
-					else if (subrec.index("\xFD") and ( sep eq SM or sep > RM))
+					else if (subrec.contains("\xFD") and ( sep eq SM or sep > RM))
 						continue;
 				}
 				*/

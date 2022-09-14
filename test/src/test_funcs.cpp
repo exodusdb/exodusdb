@@ -134,7 +134,7 @@ programinit()
 	}
 
 	{
-		assert(unique("x_y_x_z"_var) eq convert("x_y_z", "_", RM));
+		assert(unique("x`y`x`z"_var) eq convert("x`y`z", "`", RM));
 		assert(unique("x^y^x^z"_var) eq convert("x^y^z", "^", FM));
 		assert(unique("x]y]x]z"_var) eq convert("x]y]z", "]", VM));
 		assert(unique("x}y}x}z"_var) eq convert("x}y}z", "}", SM));
@@ -144,9 +144,9 @@ programinit()
 
 	{
 		var x;
-		x = "x_y_x_z"_var;
+		x = "x`y`x`z"_var;
 		uniquer(x);
-		assert(x eq convert("x_y_z", "_", RM));
+		assert(x eq convert("x`y`z", "`", RM));
 		x = "x^y^x^z"_var;
 		uniquer(x);
 		assert(x eq convert("x^y^z", "^", FM));

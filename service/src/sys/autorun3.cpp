@@ -81,7 +81,7 @@ function main(in docids0="", in options0="") {
 	//logging=@username='EXODUS'
 	var logging = 0;
 
-	var suppressemail = options.index("S");
+	var suppressemail = options.contains("S");
 
 	var users;
 	if (not(users.open("USERS", ""))) {
@@ -570,12 +570,12 @@ nextuser:;
 	USER1.swapper("{90DAYSAGO}", var().date() - 90);
 	iodat_.swapper("{YESTERDAY}", var().date() - 1);
 	USER1.swapper("{TOMORROW}", var().date() + 1);
-	if (iodat_.index("{2WORKINGDAYSAGO}")) {
+	if (iodat_.contains("{2WORKINGDAYSAGO}")) {
 		daysago = 2;
 		gosub getdaysago();
 		USER1.swapper("{2WORKINGDAYSAGO}", xdate);
 	}
-	if (iodat_.index("{3WORKINGDAYSAGO}")) {
+	if (iodat_.contains("{3WORKINGDAYSAGO}")) {
 		daysago = 3;
 		gosub getdaysago();
 		USER1.swapper("{3WORKINGDAYSAGO}", xdate);
@@ -634,7 +634,7 @@ nextsign:
 			if (USER3.substr(1, 6) eq "Error:") {
 				response_.splicer(1, 6, "Result:");
 			}
-			if (USER3.index("Error")) {
+			if (USER3.contains("Error")) {
 				subject ^= " ERROR";
 				var(response_).oswrite("xyz.xyz");
 			}
@@ -798,14 +798,14 @@ subroutine exec2() {
 
 	//detect memory corruption?
 	//@user4='R18.6'
-	if (msg_.index("R18.6")) {
+	if (msg_.contains("R18.6")) {
 		var halt = 1;
 		USER4(-1) = "Corrupt temporary file. Restart Needed.";
 		msg_(-1) = "EXODUS.NET TERMINATED";
 	}
 
 	//convert error message
-	if (USER4.index(" IN INDEX.REDUCER AT ") or msg_.index(" IN RTP21 AT ")) {
+	if (USER4.contains(" IN INDEX.REDUCER AT ") or msg_.index(" IN RTP21 AT ")) {
 		//@user4='Please select fewer records and/or simplify your request'
 		call listen4(17, USER4);
 	}
@@ -817,7 +817,7 @@ subroutine exec2() {
 	}
 
 	//send errors to exodus
-	if (USER4.index("An internal error") or msg_.index("Error:")) {
+	if (USER4.contains("An internal error") or msg_.contains("Error:")) {
 		USER4.transfer(response_);
 		goto sysmsgit;
 	}
@@ -886,7 +886,7 @@ subroutine exit(in lockfilename,io lockfile,in lockkey) {
 subroutine fmtresp() {
 
 	//trim everything after <ESC> (why?)
-	tt = USER3.index("<ESC>");
+	tt = USER3.contains("<ESC>");
 	if (tt) {
 		response_ = USER3.substr(1, tt - 1);
 	}
@@ -915,7 +915,7 @@ subroutine getdaysago() {
 	xdate = var().date();
 	while (true) {
 		xdate -= 1;
-		if (not(weekend.index((xdate - 1).mod(7) + 1))) {
+		if (not(weekend.contains((xdate - 1).mod(7) + 1))) {
 			daysago -= 1;
 		}
 		///BREAK;

@@ -190,7 +190,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	html.swapper(FM, "\r\n");
 	while (true) {
 		///BREAK;
-		if (not(html and (var("\r\n").index(html[-1])))) break;
+		if (not(html and (var("\r\n").contains(html[-1])))) break;
 		html.popper();
 	}//loop;
 

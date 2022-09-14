@@ -21,7 +21,7 @@ function main() {
 	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS, edic_hist))
 		printl("Cannot write to ", edic_hist);
 
-	var verbose = OPTIONS.ucase().index("V");
+	var verbose = OPTIONS.ucase().contains("V");
 
 	var exo_HOME = osgetenv("EXO_HOME");
 	if (not exo_HOME)
@@ -36,7 +36,7 @@ function main() {
 	//TODO simplify this editor finding code
 
 	//enable edit at first error for crimson editor (no quotes around filename for cedt)
-	if (editor.lcase().index("cedt") and not editor.index("$"))
+	if (editor.lcase().contains("cedt") and not editor.contains("$"))
 		editor ^= " /L:$LINENO $FILENAME";
 
 	//look for installed nano
@@ -189,7 +189,7 @@ function main() {
 
 		//search paths and convert to absolute filename
 		//SIMILAR CODE IN EDIC and COMPILE
-		if (not(osfile(filename)) and not(filename.index(OSSLASH))) {
+		if (not(osfile(filename)) and not(filename.contains(OSSLASH))) {
 			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
 			if (verbose)
 				paths.outputl("paths=");
@@ -209,7 +209,7 @@ function main() {
 
 		//also look in ~/inc for backlinks to source
 		//SIMILAR CODE IN EDIC and COMPILE
-		if (not(osfile(filename)) and not(filename.index(OSSLASH))) {
+		if (not(osfile(filename)) and not(filename.contains(OSSLASH))) {
 			var headerfilename = exo_HOME ^ OSSLASH ^ "inc" ^ OSSLASH ^ filename;
 			// Try .h files for library subroutines first
 			headerfilename.fieldstorer(".", -1, 1, "h");
@@ -449,11 +449,14 @@ function main() {
 					var reply = "";
 					for (;;) {
 						reply = "";
-						reply.input("Re-edit at line " ^ startatlineno ^ "? (Y/n)");
-						if (reply.convert("YyNn","") eq "")
+						output("Re-edit at line " ^ startatlineno ^ "? (Y/n)");
+						osflush();
+						reply.inputn(1);
+						printl();
+						if (reply.convert("YyNn\n","") eq "")
 							break;
 					}
-					if (reply.convert("Yy","") eq "")
+					if (reply.convert("Yy\n","") eq "")
 						continue;
 
 					abort("");

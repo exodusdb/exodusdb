@@ -192,10 +192,10 @@ function main(in mode, io logtime, in menu) {
 			tt = baselinks.f(1, linkn);
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).lcase();
-				if (tt2.substr(1, 4).index(".htm")) {
+				if (tt2.substr(1, 4).contains(".htm")) {
 					tt.splicer(-tt2.len(), tt2.len(), "");
 				}
-				if (not(var("\\/").index(tt[-1]))) {
+				if (not(var("\\/").contains(tt[-1]))) {
 					tt ^= "/";
 				}
 				baselinks(1, linkn) = tt;
@@ -214,7 +214,7 @@ function main(in mode, io logtime, in menu) {
 			if (not(conf.osread("..\\LOGS\\exodus.ini"))) {
 				conf = "";
 			}
-			if (not(conf.index("NOTREQ"))) {
+			if (not(conf.contains("NOTREQ"))) {
 
 				var cmd = "compact /C /S /F ..\\LOGS ..\\LOGS\\*.*";
 				var(cmd ^ " DONE,NOTREQ").oswrite("..\\LOGS\\exodus.ini");
@@ -341,8 +341,8 @@ nextuser:
 		}
 
 		//email anything unexpected
-		if (not(lastlog.index("Quitting."))) {
-			if (not(lastlog.index("*chain to NET AUTO"))) {
+		if (not(lastlog.contains("Quitting."))) {
+			if (not(lastlog.contains("*chain to NET AUTO"))) {
 				call sysmsg("Unexpected last log entry||" ^ lastlog, "Unexpected Log", "EXODUS");
 			}
 		}

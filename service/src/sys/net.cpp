@@ -91,7 +91,7 @@ listen:
 	}
 
 	//stop if cant backup because another process is backing up or hung processes
-	if (USER4.index("FILEMAN-SHUTDOWN")) {
+	if (USER4.contains("FILEMAN-SHUTDOWN")) {
 		perform("OFF");
 		logoff();
 	}
@@ -107,21 +107,21 @@ listen:
 
 	//detect memory corruption?
 	var halt = 0;
-	if (USER4.index("R18.6")) {
+	if (USER4.contains("R18.6")) {
 		halt = 1;
 		USER4(-1) = "Corrupt temporary file. Restart Needed.";
 		USER4(-1) = "exodus.net TERMINATED";
 	}
-	if (USER4.ucase().index("NOT ENOUGH MEMORY")) {
+	if (USER4.ucase().contains("NOT ENOUGH MEMORY")) {
 		halt = 1;
 	}
-	if (USER4.ucase().index("OUT OF MEMORY")) {
+	if (USER4.ucase().contains("OUT OF MEMORY")) {
 		halt = 1;
 	}
 
 	//convert error messages
 	var normal = 0;
-	if (USER4.index("INDEX.REDUCER")) {
+	if (USER4.contains("INDEX.REDUCER")) {
 		normal = 1;
 		USER4 = "Error: Please select fewer records";
 	}
@@ -146,7 +146,7 @@ listen:
 			}
 
 			//note new or changed media
-			tt = USER4.index("Media: ");
+			tt = USER4.contains("Media: ");
 			if (tt) {
 				subject ^= " " ^ (USER4.substr(tt + 7, 9999)).f(1);
 			}
@@ -154,10 +154,10 @@ listen:
 			//add success, WARNING or FAILURE
 			tt = "";
 			tt2 = USER4.ucase();
-			if (not(tt2.index("SUCCESS")) or tt2.index("FAIL")) {
+			if (not(tt2.contains("SUCCESS")) or tt2.contains("FAIL")) {
 				tt = "FAILURE";
 			} else {
-				if (tt2.index("WARNING")) {
+				if (tt2.contains("WARNING")) {
 					tt = "WARNING";
 				}
 				attachfilename = SYSTEM.f(42);

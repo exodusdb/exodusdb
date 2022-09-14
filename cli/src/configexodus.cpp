@@ -91,7 +91,7 @@ function main() {
 	while (true) {
 
 		getinput("Save user configuration in .exodus", saveconfig);
-		if (not var(saveconfig[1]).ucase().index("Y"))
+		if (not var(saveconfig[1]).ucase().contains("Y"))
 			break;
 
 		oconv("Saving user configuration in .exodus", "L#40").output();

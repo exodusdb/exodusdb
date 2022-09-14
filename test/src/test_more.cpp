@@ -185,7 +185,7 @@ programinit()
 		assert(123.456_var               eq "123.456");
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
-		assert("_^]}|~"_var.errputl()    eq _RM _FM _VM _SM _TM _ST);
+		assert("`^]}|~"_var.errputl()    eq _RM _FM _VM _SM _TM _ST);
 	}
 
 	//Construct fixed dim array from initializer list

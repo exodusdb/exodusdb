@@ -54,7 +54,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 			}
 
 			//t2='<th style="background-color:':thcolor:'"'
-			if (thproperties.index(FM)) {
+			if (thproperties.contains(FM)) {
 				thprop = thproperties.f(coln);
 			}
 			t2 = "\r\n" " <th " ^ thprop;

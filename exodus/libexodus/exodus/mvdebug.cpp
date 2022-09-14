@@ -151,7 +151,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		if (objaddress.len() > 9)
 			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
 
-		if (objfilename.contains("libc.so") or objfilename.index("libexodus.so"))
+		if (objfilename.contains("libc.so") or objfilename.contains("libexodus.so"))
 			continue;
 
 #ifdef TRACING
@@ -201,7 +201,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		var line = "";
 		var linesource = "";
 		for (var ii2 = 1; ii2 < nn2; ++ii2) {
-			if (temp.f(ii2).index(".cpp")) {
+			if (temp.f(ii2).contains(".cpp")) {
 				line = temp.f(ii2);
 				linesource = temp.f(ii2 + 1);
 			}

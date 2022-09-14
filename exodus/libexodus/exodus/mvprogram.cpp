@@ -41,7 +41,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//TRACE(sortselectclause_or_filehandle)
 
 	//simple select on filehandle
-	if (sortselectclause_or_filehandle.index(FM)) {
+	if (sortselectclause_or_filehandle.contains(FM)) {
 		CURSOR = sortselectclause_or_filehandle;
 		return CURSOR.select();
 	}
@@ -91,7 +91,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	calc_fields.raiser();
 
 	//ONLY TEST MATERIALS FOR NOW
-	//if (!calc_fields.ucase().index("MATERIALS"))
+	//if (!calc_fields.ucase().contains("MATERIALS"))
 	//	return true;
 
 	//debug
@@ -367,7 +367,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 							ok = !ivalue;
 							break;
 						case 19:  //  CONTAINING []
-							ok = reqivalues(fieldn).index(ivalue);
+							ok = reqivalues(fieldn).contains(ivalue);
 							break;
 					}//switch
 
@@ -422,7 +422,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		if (not CURSOR.sqlexec(insertsql)) {
 			//tolerate failure to write in case multiple records returned (due to mv selection?)
-			if (not CURSOR.lasterror().index("duplicate key"))
+			if (not CURSOR.lasterror().contains("duplicate key"))
 				CURSOR.lasterror().errputl("Error inserting pass2 record:");
 		}
 
@@ -519,8 +519,8 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 		throw VarError("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
 
 	// Simple deleterecord
-	//if (filename_or_handle_or_command.index(" ") || key.len() == 0) {
-	if (not filename_or_handle_or_command.index(" ") and key.len() != 0)
+	//if (filename_or_handle_or_command.contains(" ") || key.len() == 0) {
+	if (not filename_or_handle_or_command.contains(" ") and key.len() != 0)
 		return filename_or_handle_or_command.deleterecord(key);
 
 	// Complex deleterecord command
@@ -535,7 +535,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 	//find and skip final options like (S)
 	bool silent = false;
 	if (command[-1] == ")" || command[-1] == "}") {
-		silent = command.field2(" ", -1).index("S");
+		silent = command.field2(" ", -1).contains("S");
 		nwords--;
 	}
 
@@ -647,7 +647,7 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 
 			//escape anywhere in the input returned as a single ESC character
 			//or empty input with ESC option means ESC
-			if (options.contains("E") and (buffer == "" or buffer.index("\x1B")))
+			if (options.contains("E") and (buffer == "" or buffer.contains("\x1B")))
 				buffer = "\x1B";  //esc
 
 			std::cout << std::endl;
@@ -664,10 +664,10 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 		return;
 	}
 
-	if (!options.index("U")) {
+	if (!options.contains("U")) {
 		if (USER4.len() > 8000) {
 			var msg2 = "Aborted MSG()>8000";
-			if (not USER4.index(msg2)) {
+			if (not USER4.contains(msg2)) {
 				std::cout << msg2 << std::endl;
 				//std::cout << USER4 << std::endl;
 				USER4 ^= FM ^ msg2;
@@ -948,7 +948,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		string2 = str0;
 		// convert @upper.case to @lower.case in string2
 		int nn = string2.len();
-		var numx = var("1234567890").index(string2[1]);
+		var numx = var("1234567890").contains(string2[1]);
 		var cap = 1;
 		var wordseps;
 		var inquotes = 0;
@@ -971,8 +971,8 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 					if (wordseps.contains(tt)) {
 						cap = 1;
 						if (tt == " ")
-							//numx = var("1234567890").index(string2.substr(ii + 1, 1), 1);
-							numx = var("1234567890").index(string2[ii + 1]);
+							//numx = var("1234567890").contains(string2.substr(ii + 1, 1), 1);
+							numx = var("1234567890").contains(string2[ii + 1]);
 					} else {
 						if (cap || numx) {
 							tt.converter(LOWERCASE, UPPERCASE);
@@ -1006,7 +1006,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		string2.converter(UPPERCASE, LOWERCASE);
 	} else if (mode0.substr(1, 5) == "PARSE") {
 
-		var uppercase = mode0.index("UPPERCASE");
+		var uppercase = mode0.contains("UPPERCASE");
 
 		string2 = str0;
 
@@ -1023,7 +1023,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 				quoted = "";
 			} else {
 				if (!quoted) {
-					if ((DQ ^ "\'").index(tt)) {
+					if ((DQ ^ "\'").contains(tt)) {
 						quoted = tt;
 					} else {
 						if (tt == " ") {
@@ -1040,7 +1040,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 			}
 		};	// ii;
 
-		if (mode0.index("TRIM")) {
+		if (mode0.contains("TRIM")) {
 			string2.converter(" " _FM, _FM " ");
 			string2 = string2.trim();
 			string2.converter(" " _FM, _FM " ");
@@ -2477,7 +2477,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 				input1 = input1 / var(10).pwr(divx);
 			}
 
-			if (input1.index("E-")) {
+			if (input1.contains("E-")) {
 				if (input1.isnum()) {
 					input1 = input1.oconv("MD90P");
 				}

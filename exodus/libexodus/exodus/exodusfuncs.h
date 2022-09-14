@@ -57,9 +57,9 @@ namespace exodus {
 
 PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int threadno);
 
-PUBLIC ND var osgetenv(CVR name = "");
-PUBLIC bool osgetenv(CVR name, VARREF value);
-PUBLIC bool ossetenv(CVR name, CVR value);
+PUBLIC ND var osgetenv(CVR code = "");
+PUBLIC bool osgetenv(CVR code, VARREF value);
+PUBLIC bool ossetenv(CVR code, CVR value);
 
 PUBLIC ND var ostempdirpath();
 PUBLIC ND var ostempfilename();
@@ -83,7 +83,7 @@ PUBLIC void breakon();
 PUBLIC void breakoff();
 
 // Read/write osfile at specified offset. Must open/close.
-PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
+PUBLIC bool osopen(CVR osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
 PUBLIC void osclose(CVR osfilevar);
 PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length);
 PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
@@ -91,28 +91,29 @@ PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
 PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset);
 
 // Read/Write whole osfile
-PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage DEFAULT_EMPTY);
-PUBLIC bool osread(VARREF data, CVR osfilename, const char* codepage DEFAULT_EMPTY);
+PUBLIC bool oswrite(CVR data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
+PUBLIC bool osread(VARREF data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
 // Simple version without codepage returns the contents or "" if file cannot be read
-PUBLIC ND var osread(CVR osfilename);
+PUBLIC ND var osread(CVR osfilepath);
 
-PUBLIC bool osremove(CVR osfilename);
-PUBLIC bool osrename(CVR oldosdir_or_filename, CVR newosdir_or_filename);
-PUBLIC bool oscopy(CVR fromosdir_or_filename, CVR newosdir_or_filename);
-PUBLIC bool osmove(CVR fromosdir_or_filename, CVR newosdir_or_filename);
+PUBLIC bool osremove(CVR ospath);
+PUBLIC bool osrename(CVR old_ospath, CVR new_ospath);
+PUBLIC bool oscopy(CVR from_ospath, CVR to_ospath);
+PUBLIC bool osmove(CVR from_ospath, CVR to_ospath);
 
 PUBLIC ND var oslist(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY, const int mode = 0);
-PUBLIC ND var oslistf(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY);
-PUBLIC ND var oslistd(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY);
+PUBLIC ND var oslistf(CVR filepath DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY);
+PUBLIC ND var oslistd(CVR dirpath DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY);
 
-PUBLIC ND var osfile(CVR filename);
-PUBLIC ND var osdir(CVR filename);
+PUBLIC ND var osinfo(CVR path, const int mode = 0);
+PUBLIC ND var osfile(CVR filepath);
+PUBLIC ND var osdir(CVR dirpath);
 
-PUBLIC bool osmkdir(CVR dirname);
-PUBLIC bool osrmdir(CVR dirname, const bool evenifnotempty = false);
+PUBLIC bool osmkdir(CVR dirpath);
+PUBLIC bool osrmdir(CVR dirpath, const bool evenifnotempty = false);
 
 PUBLIC ND var oscwd();
-PUBLIC var oscwd(CVR dirname);
+PUBLIC var oscwd(CVR dirpath);
 
 PUBLIC void osflush();
 PUBLIC ND var ospid();
@@ -310,6 +311,10 @@ PUBLIC ND var substr(CVR instring, const int startx, const int length);
 PUBLIC VARREF substrer(VARREF iostring, const int startx);
 PUBLIC VARREF substrer(VARREF iostring, const int startx, const int length);
 
+PUBLIC bool starts(CVR instring, SV substr);
+PUBLIC bool end(CVR instring, SV substr);
+PUBLIC bool contains(CVR instring, SV substr);
+
 //PUBLIC ND var index(CVR instring, CVR substr, const int occurrenceno = 1);
 //PUBLIC ND var index(CVR instring, SV substr);
 PUBLIC ND var index(CVR instring, SV substr, const int startcharno = 1);
@@ -336,17 +341,17 @@ PUBLIC ND var dblist();
 PUBLIC bool dbcopy(CVR from_dbname, CVR to_dbname);
 PUBLIC bool dbdelete(CVR dbname);
 
-PUBLIC bool createfile(CVR filename);
-PUBLIC bool deletefile(CVR filename_or_handle);
-PUBLIC bool clearfile(CVR filename_or_handle);
-PUBLIC bool renamefile(CVR filename, CVR newfilename);
+PUBLIC bool createfile(CVR dbfilename);
+PUBLIC bool deletefile(CVR dbfilename_or_var);
+PUBLIC bool clearfile(CVR dbfilename_or_var);
+PUBLIC bool renamefile(CVR old_dbfilename, CVR new_dbfilename);
 PUBLIC ND var listfiles();
 
-PUBLIC ND var reccount(CVR filename_or_handle);
+PUBLIC ND var reccount(CVR dbfilename_or_var);
 
-PUBLIC bool createindex(CVR filename_or_handle, CVR fieldname DEFAULT_EMPTY, CVR dictfilename DEFAULT_EMPTY);
-PUBLIC bool deleteindex(CVR filename_or_handle, CVR fieldname DEFAULT_EMPTY);
-PUBLIC ND var listindexes(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
+PUBLIC bool createindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY, CVR dictfilename DEFAULT_EMPTY);
+PUBLIC bool deleteindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY);
+PUBLIC ND var listindexes(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
 
 PUBLIC bool begintrans();
 PUBLIC bool statustrans();
@@ -354,26 +359,26 @@ PUBLIC bool rollbacktrans();
 PUBLIC bool committrans();
 PUBLIC void cleardbcache();
 
-PUBLIC bool lock(CVR filehandle, CVR key);
-PUBLIC void unlock(CVR filehandle, CVR key);
+PUBLIC bool lock(CVR dbfilevar, CVR key);
+PUBLIC void unlock(CVR dbfilevar, CVR key);
 PUBLIC void unlockall();
 
-PUBLIC bool open(CVR filename, VARREF filehandle);
-PUBLIC bool open(CVR filename);
-// PUBLIC bool open(CVR dictdata, CVR filename, VARREF filehandle);
+PUBLIC bool open(CVR dbfilename, VARREF dbfilevar);
+PUBLIC bool open(CVR dbfilename);
+// PUBLIC bool open(CVR dictdata, CVR dbfilename, VARREF dbfilevar);
 
-PUBLIC bool read(VARREF record, CVR filehandle, CVR key);
-PUBLIC bool reado(VARREF record, CVR filehandle, CVR key);
-PUBLIC bool readv(VARREF record, CVR filehandle, CVR key, CVR fieldnumber);
+PUBLIC bool read(VARREF record, CVR dbfilevar, CVR key);
+PUBLIC bool reado(VARREF record, CVR dbfilevar, CVR key);
+PUBLIC bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber);
 
-PUBLIC bool write(CVR record, CVR filehandle, CVR key);
-PUBLIC bool writeo(CVR record, CVR filehandle, CVR key);
-PUBLIC bool writev(CVR record, CVR filehandle, CVR key, const int fieldno);
-PUBLIC bool updaterecord(CVR record, CVR filehandle, CVR key);
-PUBLIC bool insertrecord(CVR record, CVR filehandle, CVR key);
+PUBLIC bool write(CVR record, CVR dbfilevar, CVR key);
+PUBLIC bool writeo(CVR record, CVR dbfilevar, CVR key);
+PUBLIC bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno);
+PUBLIC bool updaterecord(CVR record, CVR dbfilevar, CVR key);
+PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key);
 
-PUBLIC bool dimread(dim& dimrecord, CVR filehandle, CVR key);
-PUBLIC bool dimwrite(const dim& dimrecord, CVR filehandle, CVR key);
+PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key);
+PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
 
 // moved to mvprogram so they have access to default cursor in mv.CURSOR
 // PUBLIC bool select(CVR sortselectclause DEFAULT_EMPTY);
@@ -381,10 +386,10 @@ PUBLIC bool dimwrite(const dim& dimrecord, CVR filehandle, CVR key);
 // PUBLIC bool readnext(VARREF key);
 // PUBLIC bool readnext(VARREF key, VARREF valueno);
 // PUBLIC bool readnext(VARREF record, VARREF key, VARREF value);
-// PUBLIC bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULT_EMPTY);
+// PUBLIC bool deleterecord(CVR dbfilename_or_var_or_command, CVR key DEFAULT_EMPTY);
 
-PUBLIC ND var xlate(CVR filename, CVR key, CVR fieldno, const char* mode);
-PUBLIC ND var xlate(CVR filename, CVR key, CVR fieldno, CVR mode);
+PUBLIC ND var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode);
+PUBLIC ND var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode);
 PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno);
 
 PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM);

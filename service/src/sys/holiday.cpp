@@ -89,7 +89,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 			}
 		}
 	}
-	if (weekenddows.index(dow)) {
+	if (weekenddows.contains(dow)) {
 		holidaytype = 1;
 		return;
 	}

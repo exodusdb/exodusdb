@@ -120,10 +120,17 @@ THE SOFTWARE.
 #define LASTDELIMITERCHARNOPLUS1 0x20
 
 // print() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
-//#define VISIBLE_FMS "_]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
+//#define VISIBLE_FMS "_^]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
 //#define VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
-#define VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
+//#define VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
+#define VISIBLE_FMS "`^]}|~"   //all uncommon in natural language. ^] are identical to pickos. Using ` for RM since _ common in IT
+#define VISIBLE_RM_ '`'
+#define VISIBLE_FM_ '^'
+#define VISIBLE_VM_ ']'
+#define VISIBLE_SM_ '}'
+#define VISIBLE_TM_ '|'
+#define VISIBLE_ST_ '~'
 #define ALL_FMS _RM _FM _VM _SM _TM _ST
 
 // Useful TRACE() function for debugging
@@ -193,6 +200,12 @@ using SV = std::string_view;
 // var:       48
 
 using varint_t = int64_t;
+
+// Hard coding to avoid including <limits>
+// #define VAR_MAX_DOUBLE std::numeric_limits<varint_t>::max()
+// #define VAR_LOW_DOUBLE std::numeric_limits<varint_t>::lowest()
+#define VAR_MAX_DOUBLE 1.797693134862315708145274237317043567981e+308
+#define VAR_LOW_DOUBLE -1.797693134862315708145274237317043567981e+308
 
 // class var final
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
@@ -407,7 +420,7 @@ class PUBLIC var final {
 		// Prevent overlarge unsigned ints resulting in negative ints
 		if (std::is_unsigned<I>::value) {
 			if (this->var_int < 0)
-				throwIntOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
+				throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 		}
 	}
 
@@ -429,7 +442,14 @@ class PUBLIC var final {
 		:
 		var_dbl(rhs),
 		var_typ(VARTYP_DBL) {
-			//std::cerr << "var(dbl)" << std::endl;
+
+		// Prevent overlarge or overnegative long doubles entering var's double
+		if (std::is_same<F, long double>::value) {
+			if (rhs > VAR_MAX_DOUBLE)
+			    throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
+			if (rhs < VAR_LOW_DOUBLE)
+			    throwNumUnderflow(var(__PRETTY_FUNCTION__).field(";", 1));
+		}
 	}
 
 
@@ -654,10 +674,10 @@ class PUBLIC var final {
 //		if (!std::is_same<I, varint_t>::value) {
 //			//if (!std::is_same<I, bool>::value) {
 //				if (var_int > std::numeric_limits<I>::max()) {
-//					throwIntOverflow(__PRETTY_FUNCTION__);
+//					throwNumOverflow(__PRETTY_FUNCTION__);
 //				}
 //				if (var_int < std::numeric_limits<I>::min()) {
-//					throwIntUnderflow(__PRETTY_FUNCTION__);
+//					throwNumUnderflow(__PRETTY_FUNCTION__);
 //				}
 //			//}
 //		}
@@ -890,10 +910,10 @@ class PUBLIC var final {
 //		if (!std::is_same<I, varint_t>::value) {
 //			if (!std::is_same<I, bool>::value) { // Why does this not seem to exclude bools
 //				if (rhs > std::numeric_limits<varint_t>::max()) {
-//					throwIntOverflow(__PRETTY_FUNCTION__);
+//					throwNumOverflow(__PRETTY_FUNCTION__);
 //				}
 //				if (rhs < std::numeric_limits<varint_t>::min()) {
-//					throwIntUnderflow(__PRETTY_FUNCTION__);
+//					throwNumUnderflow(__PRETTY_FUNCTION__);
 //				}
 //			}
 //		}
@@ -904,7 +924,7 @@ class PUBLIC var final {
 		// Prevent overlarge unsigned ints resulting in negative ints
 		if (std::is_unsigned<I>::value) {
 			if (this->var_int < 0)
-				throwIntOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
+				throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 		}
 
 	}
@@ -1133,16 +1153,18 @@ class PUBLIC var final {
 
 	// Specialisations for speed
 
-	PUBLIC ND friend bool var_eq_dbl(CVR           lhs,  const double dbl1 );
-	PUBLIC ND friend bool var_eq_int(CVR           lhs,  const int    int1 );
+	PUBLIC ND friend bool var_eq_dbl(CVR           lhs,   const double dbl1 );
+	PUBLIC ND friend bool var_eq_int(CVR           lhs,   const int    int1 );
+	PUBLIC ND friend bool var_eq_bool(CVR          lhs,   const bool   bool1);
 
-	PUBLIC ND friend bool var_lt_int(CVR           lhs,  const int    int1 );
-	PUBLIC ND friend bool int_lt_var(const int     int1, CVR          rhs  );
+	PUBLIC ND friend bool var_lt_int(CVR           lhs,   const int    int1 );
+	PUBLIC ND friend bool int_lt_var(const int     int1,  CVR          rhs  );
 
-	PUBLIC ND friend bool var_lt_dbl(CVR           lhs,  const double dbl1 );
-	PUBLIC ND friend bool dbl_lt_var(const double  dbl1, CVR          rhs  );
+	PUBLIC ND friend bool var_lt_dbl(CVR           lhs,   const double dbl1 );
+	PUBLIC ND friend bool dbl_lt_var(const double  dbl1,  CVR          rhs  );
 
-	PUBLIC ND friend bool bool_lt_bool(const bool   lhs,  const bool   int1 );
+	PUBLIC ND friend bool var_lt_bool(CVR          lhs,   const bool   bool1) = delete;
+	PUBLIC ND friend bool bool_lt_var(const bool   bool1, CVR          rhs  ) = delete;
 
 	// Concatenation
 
@@ -1199,13 +1221,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator==(CVR          lhs,   const char   char2 ) {return  var_eq(      lhs, char2  ); }
 	PUBLIC ND friend bool operator==(CVR          lhs,   const int    int2  ) {return  var_eq_int(  lhs, int2   ); }
 	PUBLIC ND friend bool operator==(CVR          lhs,   const double dbl2  ) {return  var_eq_dbl(  lhs, dbl2   ); }
-	PUBLIC ND friend bool operator==(CVR          lhs,   const bool   bool2 ) {return  lhs.toBool() ==   bool2   ; }
+	PUBLIC ND friend bool operator==(CVR          lhs,   const bool   bool2 ) {return  var_eq_bool( lhs, bool2  ); }
 
 	PUBLIC ND friend bool operator==(const char*  cstr1, CVR          rhs   ) {return  var_eq(      rhs, cstr1  ); }
 	PUBLIC ND friend bool operator==(const char   char1, CVR          rhs   ) {return  var_eq(      rhs, char1  ); }
 	PUBLIC ND friend bool operator==(const int    int1,  CVR          rhs   ) {return  var_eq_int(  rhs, int1   ); }
 	PUBLIC ND friend bool operator==(const double dbl1,  CVR          rhs   ) {return  var_eq_dbl(  rhs, dbl1   ); }
-	PUBLIC ND friend bool operator==(const bool   bool1, CVR          rhs   ) {return  rhs.toBool() ==   bool1   ; }
+	PUBLIC ND friend bool operator==(const bool   bool1, CVR          rhs   ) {return  var_eq_bool( rhs, bool1  ); }
 
 	// != NE friends v. main types
 
@@ -1213,13 +1235,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator!=(CVR          lhs,   const char   char2 ) {return !var_eq(      lhs, char2  ); }
 	PUBLIC ND friend bool operator!=(CVR          lhs,   const int    int2  ) {return !var_eq_int(  lhs, int2   ); }
 	PUBLIC ND friend bool operator!=(CVR          lhs,   const double dbl2  ) {return !var_eq_dbl(  lhs, dbl2   ); }
-	PUBLIC ND friend bool operator!=(CVR          lhs,   const bool   bool2 ) {return lhs.toBool()  !=   bool2   ; }
+	PUBLIC ND friend bool operator!=(CVR          lhs,   const bool   bool2 ) {return !var_eq_bool( lhs, bool2  ); }
 
 	PUBLIC ND friend bool operator!=(const char*  cstr1, CVR          rhs   ) {return !var_eq(      rhs, cstr1  ); }
 	PUBLIC ND friend bool operator!=(const char   char1, CVR          rhs   ) {return !var_eq(      rhs, char1  ); }
 	PUBLIC ND friend bool operator!=(const int    int1,  CVR          rhs   ) {return !var_eq_int(  rhs, int1   ); }
 	PUBLIC ND friend bool operator!=(const double dbl1,  CVR          rhs   ) {return !var_eq_dbl(  rhs, dbl1   ); }
-	PUBLIC ND friend bool operator!=(const bool   bool1, CVR          rhs   ) {return rhs.toBool()  !=   bool1   ; }
+	PUBLIC ND friend bool operator!=(const bool   bool1, CVR          rhs   ) {return !var_eq_bool( rhs, bool1  ); }
 
 	// < LT friends v. main types
 
@@ -1227,13 +1249,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator<(CVR           lhs,   const char   char2 ) {return  var_lt(      lhs,   char2 ); }
 	PUBLIC ND friend bool operator<(CVR           lhs,   const int    int2  ) {return  var_lt_int(  lhs,   int2  ); }
 	PUBLIC ND friend bool operator<(CVR           lhs,   const double dbl2  ) {return  var_lt_dbl(  lhs,   dbl2  ); }
-	PUBLIC ND friend bool operator<(CVR           lhs,   const bool   bool1 ) {return  bool_lt_bool(lhs,   bool1 ); }
+	//PUBLIC ND friend bool operator<(CVR           lhs,   const bool   bool1 ) {return  bool_lt_bool(lhs,   bool1 ); }
 
 	PUBLIC ND friend bool operator<(const char*   cstr1, CVR          rhs   ) {return  var_lt(      cstr1, rhs   ); }
 	PUBLIC ND friend bool operator<(const char    char1, CVR          rhs   ) {return  var_lt(      char1, rhs   ); }
 	PUBLIC ND friend bool operator<(const int     int1,  CVR          rhs   ) {return  int_lt_var(  int1,  rhs   ); }
 	PUBLIC ND friend bool operator<(const double  dbl1,  CVR          rhs   ) {return  dbl_lt_var(  dbl1,  rhs   ); }
-	PUBLIC ND friend bool operator<(const bool    bool1, CVR          rhs   ) {return  bool_lt_bool(bool1, rhs   ); }
+	//PUBLIC ND friend bool operator<(const bool    bool1, CVR          rhs   ) {return  bool_lt_bool(bool1, rhs   ); }
 
 	// >= GE friends v. main types
 
@@ -1241,13 +1263,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator>=(CVR          lhs,   const char   char2 ) {return !var_lt(      lhs,   char2 ); }
 	PUBLIC ND friend bool operator>=(CVR          lhs,   const int    int2  ) {return !var_lt_int(  lhs,   int2  ); }
 	PUBLIC ND friend bool operator>=(CVR          lhs,   const double dbl2  ) {return !var_lt_dbl(  lhs,   dbl2  ); }
-	PUBLIC ND friend bool operator>=(CVR          lhs,   const bool   bool2 ) {return !bool_lt_bool(lhs,   bool2 ); }
+	//PUBLIC ND friend bool operator>=(CVR          lhs,   const bool   bool2 ) {return !bool_lt_bool(lhs,   bool2 ); }
 
 	PUBLIC ND friend bool operator>=(const char*  cstr1, CVR          rhs   ) {return !var_lt(      cstr1, rhs   ); }
 	PUBLIC ND friend bool operator>=(const char   char1, CVR          rhs   ) {return !var_lt(      char1, rhs   ); }
 	PUBLIC ND friend bool operator>=(const int    int1,  CVR          rhs   ) {return !int_lt_var(  int1,  rhs   ); }
 	PUBLIC ND friend bool operator>=(const double dbl1,  CVR          rhs   ) {return !dbl_lt_var(  dbl1,  rhs   ); }
-	PUBLIC ND friend bool operator>=(const bool   bool1, CVR          rhs   ) {return !bool_lt_bool(bool1, rhs   ); }
+	//PUBLIC ND friend bool operator>=(const bool   bool1, CVR          rhs   ) {return !bool_lt_bool(bool1, rhs   ); }
 
 	// > GT friends v. main types
 
@@ -1255,13 +1277,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator>(CVR           lhs,   const char   char2 ) {return  var_lt(      char2, lhs   ); }
 	PUBLIC ND friend bool operator>(CVR           lhs,   const int    int2  ) {return  int_lt_var(  int2,  lhs   ); }
 	PUBLIC ND friend bool operator>(CVR           lhs,   const double dbl2  ) {return  dbl_lt_var(  dbl2,  lhs   ); }
-	PUBLIC ND friend bool operator>(CVR           lhs,   const bool   bool2 ) {return  bool_lt_bool(bool2, lhs   ); }
+	//PUBLIC ND friend bool operator>(CVR           lhs,   const bool   bool2 ) {return  bool_lt_bool(bool2, lhs   ); }
 
 	PUBLIC ND friend bool operator>(const char*   cstr1, CVR          rhs   ) {return  var_lt(      rhs,   cstr1 ); }
 	PUBLIC ND friend bool operator>(const char    char1, CVR          rhs   ) {return  var_lt(      rhs,   char1 ); }
 	PUBLIC ND friend bool operator>(const int     int1,  CVR          rhs   ) {return  var_lt_int(  rhs,   int1  ); }
 	PUBLIC ND friend bool operator>(const double  dbl1,  CVR          rhs   ) {return  var_lt_dbl(  rhs,   dbl1  ); }
-	PUBLIC ND friend bool operator>(const bool    bool1, CVR          rhs   ) {return  bool_lt_bool(rhs,   bool1 ); }
+	//PUBLIC ND friend bool operator>(const bool    bool1, CVR          rhs   ) {return  bool_lt_bool(rhs,   bool1 ); }
 
 	// <= LE friends v. main types
 
@@ -1269,13 +1291,13 @@ class PUBLIC var final {
 	PUBLIC ND friend bool operator<=(CVR          lhs,   const char   char2 ) {return !var_lt(      char2, lhs   ); }
 	PUBLIC ND friend bool operator<=(CVR          lhs,   const int    int2  ) {return !int_lt_var(  int2,  lhs   ); }
 	PUBLIC ND friend bool operator<=(CVR          lhs,   const double dbl2  ) {return !dbl_lt_var(  dbl2,  lhs   ); }
-	PUBLIC ND friend bool operator<=(CVR          lhs,   const bool   bool2 ) {return !bool_lt_bool(bool2, lhs   ); }
+	//PUBLIC ND friend bool operator<=(CVR          lhs,   const bool   bool2 ) {return !bool_lt_bool(bool2, lhs   ); }
 
 	PUBLIC ND friend bool operator<=(const char*  cstr1, CVR          rhs   ) {return !var_lt(      rhs,   cstr1 ); }
 	PUBLIC ND friend bool operator<=(const char   char1, CVR          rhs   ) {return !var_lt(      rhs,   char1 ); }
 	PUBLIC ND friend bool operator<=(const int    int1,  CVR          rhs   ) {return !var_lt_int(  rhs,   int1  ); }
 	PUBLIC ND friend bool operator<=(const double dbl1,  CVR          rhs   ) {return !var_lt_dbl(  rhs,   dbl1  ); }
-	PUBLIC ND friend bool operator<=(const bool   bool1, CVR          rhs   ) {return !bool_lt_bool(rhs,   bool1 ); } 
+	//PUBLIC ND friend bool operator<=(const bool   bool1, CVR          rhs   ) {return !bool_lt_bool(rhs,   bool1 ); } 
 
 	// ARITHMETIC friends v. main types
 
@@ -1552,7 +1574,7 @@ class PUBLIC var final {
 	//                                 Javascript   PHP             Python       Go          Rust          C++
 	ND bool starts(SV str) const;   // startsWith() str_starts_with startswith() HasPrefix() starts_with() starts_with
 	ND bool ends(SV str) const;     // endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
-	ND bool contains(SV str) const; // includes()   str_contains    contains()   Contains()  contains()    contains
+	ND bool contains(SV str) const;  // includes()   str_contains    contains()   Contains()  contains()    contains
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 	//ND var index(SV substr) const;
@@ -1928,15 +1950,17 @@ class PUBLIC var final {
 	bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
 	bool osremove() const;
 	bool osremove(CVR osfilename) const;
-	bool osrename(CVR newosdir_or_filename) const;
+	bool osrename(CVR new_dirpath_or_filepath) const;
 	bool oscopy(CVR to_osfilename) const;
 	bool osmove(CVR to_osfilename) const;
 
-	ND var oslist(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY, const int mode = 0) const;
-	ND var oslistf(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY) const;
-	ND var oslistd(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY) const;
+	ND var oslist(CVR globpattern DEFAULT_EMPTY, const int mode = 0) const;
+	ND var oslistf(CVR globpattern DEFAULT_EMPTY) const;
+	ND var oslistd(CVR globpattern DEFAULT_EMPTY) const;
+	ND var osinfo(const int mode) const;
 	ND var osfile() const;
 	ND var osdir() const;
+	ND var osinfo() const;
 	bool osmkdir() const;
 	bool osrmdir(bool evenifnotempty = false) const;
 
@@ -1962,8 +1986,8 @@ class PUBLIC var final {
 	ND var ostempdirpath() const;
 	ND var ostempfilename() const;
 
-	bool osgetenv(const char* name);
-	bool ossetenv(const char* name) const;
+	bool osgetenv(const char* code);
+	bool ossetenv(const char* code) const;
 
 	// EXECUTE/PERFORM CONTROL
 	/////////////////////////
@@ -1993,8 +2017,8 @@ class PUBLIC var final {
 	void throwUnassigned(CVR message) const;
 	void throwNonNumeric(CVR message) const;
 	void throwNonPositive(CVR message) const;
-	void throwIntOverflow(CVR message) const;
-	void throwIntUnderflow(CVR message) const;
+	void throwNumOverflow(CVR message) const;
+	void throwNumUnderflow(CVR message) const;
 
 	// WARNING: MUST not use any var when checking Undefined
 	// otherwise will get recursion/segfault
@@ -2106,19 +2130,38 @@ class PUBLIC var final {
 	// bool THIS_IS_OSFILE() const    { return var_typ & VARTYP_OSFILE; }
 
 	// Convert VISIBLE_FMS to ALL_FMS
+	// In header to perhaps aid runtime string literal conversion for operator""_var
+	// since currently it cannot be constexpr due to var containing a std::string
 	var& fmiconverter() {
-		// clang-format off
 		for (char& c : this->var_str) {
 			switch (c) {
-				case '^': c = FM_; break;
-				case ']': c = VM_; break;
-				case '}': c = SM_; break;
-				case '|': c = TM_; break;
-				case '~': c = ST_; break;
-				case '_': c = RM_; break;
+				// Most common first to perhaps aid optimisation
+				case VISIBLE_FM_: c = FM_; break;
+				case VISIBLE_VM_: c = VM_; break;
+				case VISIBLE_SM_: c = SM_; break;
+				case VISIBLE_TM_: c = TM_; break;
+				case VISIBLE_ST_: c = ST_; break;
+				case VISIBLE_RM_: c = RM_; break;
 			}
 		}
-		// clang-format on
+		return *this;
+	}
+
+	// Convert ALL_FMS to VISIBLE_FMS
+	var& fmoconverter() {
+		for (char& c : this->var_str) {
+			if (c > RM_ || c > RM_) {
+				switch (c) {
+					// In order to perhaps aid optimisation
+					case RM_: c = VISIBLE_RM_; break;
+					case FM_: c = VISIBLE_FM_; break;
+					case VM_: c = VISIBLE_VM_; break;
+					case SM_: c = VISIBLE_SM_; break;
+					case TM_: c = VISIBLE_TM_; break;
+					case ST_: c = VISIBLE_ST_; break;
+				}
+			}
+		}
 		return *this;
 	}
 

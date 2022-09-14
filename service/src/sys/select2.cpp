@@ -86,8 +86,8 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		nlimitfields = limitfields.count(VM) + (limitfields ne "");
 	}
 
-	var xml = options.index("XML");
-	var rawread = options.index("RAW");
+	var xml = options.contains("XML");
+	var rawread = options.contains("RAW");
 
 	datax = "";
 
@@ -101,7 +101,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 
 	#define msg_ USER4
 
-	useactivelist = sortselect.index("%SELECTLIST%");
+	useactivelist = sortselect.contains("%SELECTLIST%");
 	sortselect.swapper("%SELECTLIST%", "");
 	if (not(LISTACTIVE)) {
 		useactivelist = 0;
@@ -184,7 +184,7 @@ nocommon:
 	//if trim(@station)='SBCP1800' then cmd='SELECT 10 ':filename
 
 	//check no @ in xml dict ids because cannot return xml tag with @
-	if (xml and dictids.index("@")) {
+	if (xml and dictids.contains("@")) {
 		response = "Error: select2: XML dictids cannot contain @ characters";
 
 		//abort
@@ -310,7 +310,7 @@ nocommon:
 		//if not sorted then try use %RECORDS% if present and <200 chars
 		var records = "";
 		//if @list.active or index(' ':sortselect,' BY ',1) or index(sortselect,'WITH AUTHORISED',1) else
-		if (not(LISTACTIVE or ((" " ^ sortselect).index(" BY ")))) {
+		if (not(LISTACTIVE or ((" " ^ sortselect).contains(" BY ")))) {
 			//only look in selected files otherwise c++ takes too long on some files
 			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex, xx)) {
 				if (records.read(file, "%RECORDS%")) {
@@ -329,7 +329,7 @@ nocommon:
 
 		//handle invalid cmd
 		//R18.1 is normal 'No records found' message
-		if (USER4 and not(msg_.index("R18.1"))) {
+		if (USER4 and not(msg_.contains("R18.1"))) {
 			if (USER4.field(" ", 1) eq "W156") {
 				msg_ = USER4.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
 			}

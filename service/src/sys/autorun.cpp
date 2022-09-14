@@ -21,7 +21,7 @@ function main() {
 
 	//if not called with X option then reexecute with X option
 	//so that after crash the original user and station can be restored
-	if (not(options.index("X"))) {
+	if (not(options.contains("X"))) {
 		var origuser = USERNAME;
 		var origstation = STATION;
 		var origsysmode = SYSTEM.f(33);

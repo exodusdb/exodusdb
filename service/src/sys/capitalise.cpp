@@ -79,7 +79,7 @@ capitalise:
 
 		//convert @upper.case to @lower.case in string2
 		nn = string2.len();
-		numx = var("1234567890").index(string2[1]);
+		numx = var("1234567890").contains(string2[1]);
 		cap = 1;
 		inquotes = 0;
 		for (ii = 1; ii <= nn; ++ii) {
@@ -94,7 +94,7 @@ capitalise:
 					if (wordseps.contains(tt)) {
 						cap = 1;
 						if (tt eq " ") {
-							numx = var("1234567890").index(string2[ii + 1]);
+							numx = var("1234567890").contains(string2[ii + 1]);
 						}
 					} else {
 						if (cap or numx) {
@@ -118,7 +118,7 @@ capitalise:
 
 	} else if (mode.substr(1, 5) eq "PARSE") {
 
-		toupper = mode.index("UPPERCASE");
+		toupper = mode.contains("UPPERCASE");
 
 		string2 = str0;
 
@@ -132,7 +132,7 @@ capitalise:
 				quoted = "";
 			} else {
 				if (not quoted) {
-					if ((DQ ^ "'").index(tt)) {
+					if ((DQ ^ "'").contains(tt)) {
 						quoted = tt;
 					} else {
 						if (tt eq " ") {

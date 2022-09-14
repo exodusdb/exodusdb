@@ -53,7 +53,7 @@ function main() {
 	SYSTEM(3) = "";
 
 	//put up a message
-	if (not OPTIONS.index("S"))
+	if (not OPTIONS.contains("S"))
 		printl("Making a new document/report " ^ SYSTEM.f(2) ^ ":");
 
 	var timestarted = var().time();

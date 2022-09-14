@@ -23,15 +23,15 @@ function main(in input0) {
 		return input0;
 	}
 
-	if (input0.index(FM, 1)) {
+	if (input0.contains(FM, 1)) {
 		sep = FM;
-	} else if (input0.index(VM, 1)) {
+	} else if (input0.contains(VM, 1)) {
 		sep = VM;
-	} else if (input0.index(SM, 1)) {
+	} else if (input0.contains(SM, 1)) {
 		sep = SM;
-	} else if (input0.index(TM, 1)) {
+	} else if (input0.contains(TM, 1)) {
 		sep = TM;
-	} else if (input0.index(ST, 1)) {
+	} else if (input0.contains(ST, 1)) {
 		sep = ST;
 	} else {
 		return input0;

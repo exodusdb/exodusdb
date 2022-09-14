@@ -11,10 +11,10 @@ function main() {
 	COMMAND.remover(1);
 	for (var dbname : COMMAND) {
 		if (!dbname.dbdelete(dbname)) {
-			if (not OPTIONS.index("S"))
+			if (not OPTIONS.contains("S"))
 				errputl(var().lasterror());
 			errorno = 1;
-		} else if (not OPTIONS.index("S"))
+		} else if (not OPTIONS.contains("S"))
 			printl(dbname.quote(), "database deleted.");
 	}
 

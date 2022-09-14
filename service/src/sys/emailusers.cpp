@@ -102,7 +102,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	/////
 	//if target and options='' or index(options,'U',1) then
 	// end
-	var groupword = options.index("W");
+	bool groupword = options.contains("W");
 	nsent = 0;
 
 	subject = subject0;
@@ -205,7 +205,7 @@ nextuser:
 		if (groupword) {
 			//eq search for MEDIA in user department like MEDIA BUYER
 			for (const var groupn : range(1, ngroups)) {
-				ok = userx.f(5).index(groupids.f(1, groupn));
+				ok = userx.f(5).contains(groupids.f(1, groupn));
 				///BREAK;
 				if (not(not(ok))) break;
 			} //groupn;
@@ -273,7 +273,7 @@ exit:
 
 	while (true) {
 		///BREAK;
-		if (not(("." ^ VM ^ FM).index(emaillog[-1]))) break;
+		if (not(("." ^ VM ^ FM).contains(emaillog[-1]))) break;
 		emaillog.popper();
 	}//loop;
 
@@ -293,7 +293,7 @@ exit:
 
 	while (true) {
 		///BREAK;
-		if (not(("." ^ VM ^ FM).index(emaillog[-1]))) break;
+		if (not(("." ^ VM ^ FM).contains(emaillog[-1]))) break;
 		emaillog.popper();
 	}//loop;
 

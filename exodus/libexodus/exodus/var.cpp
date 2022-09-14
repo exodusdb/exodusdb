@@ -73,12 +73,12 @@ void var::throwNonPositive(CVR message) const {
 	throw VarNonPositive(message);
 }
 
-void var::throwIntOverflow(CVR message) const {
-	throw VarIntOverflow(message);
+void var::throwNumOverflow(CVR message) const {
+	throw VarNumOverflow(message);
 }
 
-void var::throwIntUnderflow(CVR message) const {
-	throw VarIntUnderflow(message);
+void var::throwNumUnderflow(CVR message) const {
+	throw VarNumUnderflow(message);
 }
 
 CVR var::dump(SV text) const {
@@ -209,7 +209,7 @@ tryagain:
 	// prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			throw VarIntOverflow("operator++");
+			throw VarNumOverflow("operator++");
 		priorvalue = var(var_int);
 		var_int++;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -249,7 +249,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			throw VarIntUnderflow("operator--");
+			throw VarNumUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -286,7 +286,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			throw VarIntOverflow("operator++");
+			throw VarNumOverflow("operator++");
 		var_int++;
 		var_typ = VARTYP_INT;  // reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
@@ -320,7 +320,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			throw VarIntUnderflow("operator--");
+			throw VarNumUnderflow("operator--");
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
 
@@ -906,7 +906,7 @@ inline bool almost_equal(double x, double y, int ulp)
 }
 */
 
-inline bool almost_equal(double x, double y, int) {
+inline bool almost_equal(double x, double y) {
 	//crude pickos method
 	return (std::abs(x - y) < SMALLEST_NUMBER);
 }
@@ -998,7 +998,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 				//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
-				return almost_equal(lhs.var_dbl, rhs.var_dbl, 2);
+				return almost_equal(lhs.var_dbl, rhs.var_dbl);
 			}
 
 			//DOUBLE V INT
@@ -1008,7 +1008,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 
 				//return (lhs.var_int == rhs.var_dbl);
 				//return (std::abs(lhs.var_dbl - static_cast<double>(rhs.var_int)) < SMALLEST_NUMBER);
-				return almost_equal(lhs.var_dbl, rhs.var_int, 2);
+				return almost_equal(lhs.var_dbl, rhs.var_int);
 			}
 		}
 
@@ -1022,7 +1022,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
-			return almost_equal(rhs.var_dbl, lhs.var_int, 2);
+			return almost_equal(rhs.var_dbl, lhs.var_int);
 		}
 
 		//INT v INT
@@ -1279,7 +1279,7 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
 			//std::clog << "var_eq_dbl 2. lhs double " << lhs.var_dbl << " compare to double " << dbl1 << std::endl;
-			return almost_equal(lhs.var_dbl, dbl1, 2);
+			return almost_equal(lhs.var_dbl, dbl1);
 
 		}
 
@@ -1295,7 +1295,7 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
 			//std::clog << "var_eq_dbl 3. lhs int " << lhs.var_int << " compare to double " << dbl1 << std::endl;
-			return almost_equal(dbl1, lhs.var_int, 2);
+			return almost_equal(dbl1, lhs.var_int);
 
 		}
 	}
@@ -1308,6 +1308,60 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 
 }
 
+// NOTE doubles compare only to 0.0001 accuracy)
+PUBLIC bool var_eq_bool(CVR lhs, const bool bool1) {
+
+	lhs.assertDefined(__PRETTY_FUNCTION__);
+
+	bool result;
+
+	// 1. EMPTY STRING equates to false
+	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
+		result = bool1 == false;
+		return result;
+	}
+
+	do {
+
+		// 2. LHS DBL
+		//
+		// 1.0 equates to true within precision limit
+		// 0.0 equates to true within precision limit
+		// All other floating point numbers equate to false
+		//
+		if (lhs.var_typ & VARTYP_DBL) {
+
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
+			result = almost_equal(lhs.var_dbl, (bool1 ? 1 : 0));
+
+			return result;
+
+		}
+
+		// 3. LHS INT
+		//
+		// 0 equates to false
+		// All other ints equate to 
+		//
+		else if (lhs.var_typ & VARTYP_INT) {
+			//std::clog << "var_eq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
+			result = lhs.var_int == (bool1 ? 1 : 0);
+			return result;
+
+		}
+	}
+	// try to convert to numeric string and try again if successful
+	while (lhs.isnum());
+
+	// 4. NON-NUMERIC STRING dont equate to false or true
+	//
+	result = false;
+
+	return result;
+
+}
 // NOTE doubles compare only to 0.0001 accuracy)
 PUBLIC bool var_eq_int(CVR lhs, const int int1) {
 
@@ -1327,7 +1381,7 @@ PUBLIC bool var_eq_int(CVR lhs, const int int1) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
 			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
-			return almost_equal(lhs.var_dbl, int1, 2);
+			return almost_equal(lhs.var_dbl, int1);
 
 		}
 
@@ -1522,8 +1576,8 @@ VarUnassigned     ::VarUnassigned(    CVR errmsg) : VarError("VarUnassigned:"   
 VarDivideByZero   ::VarDivideByZero(  CVR errmsg) : VarError("VarDivideByZero:"   ^ errmsg) {}
 VarNonNumeric     ::VarNonNumeric(    CVR errmsg) : VarError("VarNonNumeric:"     ^ errmsg) {}
 VarNonPositive    ::VarNonPositive(   CVR errmsg) : VarError("VarNonPositive:"    ^ errmsg) {}
-VarIntOverflow    ::VarIntOverflow(   CVR errmsg) : VarError("VarIntOverflow:"    ^ errmsg) {}
-VarIntUnderflow   ::VarIntUnderflow(  CVR errmsg) : VarError("VarIntUnderflow:"   ^ errmsg) {}
+VarNumOverflow    ::VarNumOverflow(   CVR errmsg) : VarError("VarNumOverflow:"    ^ errmsg) {}
+VarNumUnderflow   ::VarNumUnderflow(  CVR errmsg) : VarError("VarNumUnderflow:"   ^ errmsg) {}
 VarUndefined      ::VarUndefined(     CVR errmsg) : VarError("VarUndefined:"      ^ errmsg) {}
 VarOutOfMemory    ::VarOutOfMemory(   CVR errmsg) : VarError("VarOutOfMemory:"    ^ errmsg) {}
 VarInvalidPointer ::VarInvalidPointer(CVR errmsg) : VarError("VarInvalidPointer:" ^ errmsg) {}

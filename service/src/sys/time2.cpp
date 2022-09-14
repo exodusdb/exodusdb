@@ -53,7 +53,7 @@ function main(in type, in input0, in mode0, out output) {
 	} else if (type eq "ICONV") {
 
 		//handle multivalues
-		if (input0.index(VM)) {
+		if (input0.contains(VM)) {
 			output = "";
 			var nn = input0.count(VM) + 1;
 			for (const var ii : range(1, nn)) {

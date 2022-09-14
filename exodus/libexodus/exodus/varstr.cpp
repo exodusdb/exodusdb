@@ -2156,7 +2156,7 @@ var var::sum(SV separator) const {
 	int nn = this->fcount(separator);
 
 	// static var allseparators=_ST _TM _SM _VM _FM _RM;
-	// var separatorn=allseparators.index(separator);
+	// var separatorn=allseparators.contains(separator);
 	// if (!separatorn) return var1*var2;
 
 	// TODO make this faster using remove or index?

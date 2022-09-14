@@ -36,13 +36,13 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		var tt = " " ^ VM;
 		while (true) {
 			///BREAK;
-			if (not(dataio.index(tt))) break;
+			if (not(dataio.contains(tt))) break;
 			dataio.swapper(tt, VM);
 		}//loop;
 		tt = " " ^ FM;
 		while (true) {
 			///BREAK;
-			if (not(dataio.index(tt))) break;
+			if (not(dataio.contains(tt))) break;
 			dataio.swapper(tt, FM);
 		}//loop;
 
@@ -61,7 +61,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			line1.swapper("</td>", "</th>");
 			line1.swapper("<td>", "<th>");
 			line1.swapper("</td>", "</th>");
-			if (not(line1.index("<thead"))) {
+			if (not(line1.contains("<thead"))) {
 				line1 = FM ^ "<thead>" ^ FM ^ line1;
 			}
 			dataio(1) = line1;

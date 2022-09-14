@@ -14,8 +14,8 @@ function main() {
 
 	command.swapper(" dict."," dict ");
 	command.swapper(" dict_"," dict ");
-	var dataonly=command.index(" data ");
-	var dictonly=command.index(" dict ");
+	var dataonly=command.contains(" data ");
+	var dictonly=command.contains(" dict ");
 	command.swapper(" data "," ");
 	command.swapper(" dict "," ");
 

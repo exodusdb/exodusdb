@@ -28,13 +28,6 @@ THE SOFTWARE.
 
 namespace exodus {
 
-PUBLIC bool setxlocale(const char* locale) {
-	return var(locale).setxlocale();
-}
-
-PUBLIC var getxlocale() {
-	return var().getxlocale();
-}
 
 PUBLIC bool assigned(CVR var1) {
 	return var1.assigned();
@@ -52,201 +45,6 @@ PUBLIC void exchange(VARREF var1, VARREF var2) {
 	var1.exchange(var2);
 }
 
-
-PUBLIC var date() {
-	return var().date();
-}
-
-PUBLIC var time() {
-	return var().time();
-}
-
-PUBLIC var ostime() {
-	return var().ostime();
-}
-
-PUBLIC var timestamp() {
-	return var().timestamp();
-}
-//PUBLIC var timedate() {
-//	return var().timedate();
-//}
-
-
-PUBLIC void ossleep(const int milliseconds) {
-	var().ossleep(milliseconds);
-}
-
-PUBLIC var oswait(const int milliseconds, CVR dirpath) {
-	return var().oswait(milliseconds, dirpath);
-}
-
-
-// osopen x to y else
-PUBLIC bool osopen(CVR osfilename, VARREF osfilevar, const char* locale) {
-	return osfilevar.osopen(osfilename, locale);
-}
-
-// osclose x
-PUBLIC void osclose(CVR osfilevar) {
-	osfilevar.osclose();
-}
-
-// 4 argument version for statement format
-// osbread(data from x at y length z)
-// PUBLIC VARREF osbread(VARREF data, CVR filehandle, const int offset, const int
-// length)
-//VARREF osbread(VARREF data, CVR filehandle, VARREF offset, const int length,
-//	     const bool adjust)
-PUBLIC bool osbread(VARREF data, CVR filehandle, VARREF offset, const int length) {
-	return data.osbread(filehandle, offset, length);
-}
-
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-// 4 argument version for statement format BUT ALLOWING offset TO BE A CONSTANT ie output
-// ignored osbread(data from x at y length z) PUBLIC VARREF osbread(VARREF data, CVR
-// filehandle, const int offset, const int length)
-//VARREF osbread(VARREF data, CVR filehandle, CVR offset, const int length,
-//	     const bool adjust)
-PUBLIC bool osbread(VARREF data, CVR filehandle, CVR offset, const int length) {
-	return data.osbread(filehandle, const_cast<VARREF>(offset), length);
-}
-#endif
-
-//PUBLIC bool osbwrite(CVR data, CVR filehandle, VARREF offset,
-//			 const bool adjust = true)
-PUBLIC bool osbwrite(CVR data, CVR filehandle, VARREF offset) {
-	return data.osbwrite(filehandle, offset);
-}
-
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-//PUBLIC bool osbwrite(CVR data, CVR filehandle, CVR offset,
-//			 const bool adjust)
-PUBLIC bool osbwrite(CVR data, CVR filehandle, CVR offset) {
-	return data.osbwrite(filehandle, const_cast<VARREF>(offset));
-}
-#endif
-
-// two argument version returns success/failure to be used in if statement
-// target variable first to be like "osread x from y else" and "read x from y else"
-// unfortunately different from osgetenv which is the reverse
-PUBLIC bool osread(VARREF data, CVR osfilename, const char* codepage) {
-	return data.osread(osfilename, codepage);
-}
-
-// one argument returns the contents directly to be used in assignments
-PUBLIC var osread(CVR osfilename) {
-	var data;
-	if (data.osread(osfilename))
-		return data;
-	else
-		return "";
-}
-
-// oswrite x on y else
-PUBLIC bool oswrite(CVR data, CVR osfilename, const char* codepage) {
-	return data.oswrite(osfilename, codepage);
-}
-
-// if osremove x else
-PUBLIC bool osremove(CVR osfilename) {
-	return osfilename.osremove();
-}
-
-// if osrename x to y else
-PUBLIC bool osrename(CVR oldosdir_or_filename, CVR newosdir_or_filename) {
-	return oldosdir_or_filename.osrename(newosdir_or_filename);
-}
-
-// oscopy x to y
-PUBLIC bool oscopy(CVR fromosfilename, CVR to_osfilename) {
-	return fromosfilename.oscopy(to_osfilename);
-}
-
-// osmove x to y
-PUBLIC bool osmove(CVR fromosfilename, CVR to_osfilename) {
-	return fromosfilename.osmove(to_osfilename);
-}
-
-PUBLIC var oslist(CVR path, CVR globpattern, const int mode) {
-	return var().oslist(path, globpattern, mode);
-}
-
-PUBLIC var oslistf(CVR path, CVR globpattern) {
-	return var().oslistf(path, globpattern);
-}
-
-PUBLIC var oslistd(CVR path, CVR globpattern) {
-	return var().oslistd(path, globpattern);
-}
-
-PUBLIC var osfile(CVR filename) {
-	return filename.osfile();
-}
-
-PUBLIC var osdir(CVR dirname) {
-	return dirname.osdir();
-}
-
-PUBLIC bool osmkdir(CVR dirname) {
-	return dirname.osmkdir();
-}
-
-PUBLIC bool osrmdir(CVR dirname, const bool evenifnotempty) {
-	return dirname.osrmdir(evenifnotempty);
-}
-
-PUBLIC var ospid() {
-	return var().ospid();
-}
-
-PUBLIC var oscwd() {
-	return var().oscwd();
-}
-
-PUBLIC var oscwd(CVR dirname) {
-	return dirname.oscwd(dirname);
-}
-
-PUBLIC void osflush() {
-	return var().osflush();
-}
-
-// version to get return int (conventionally 0 means success, otherwise error)
-// example: if (osshell(somecommand)) { ...
-PUBLIC bool osshell(CVR command) {
-	return command.osshell();
-}
-
-// simple version to write one liner read (declare and assign in one line)
-// example: var xx=osshellread("somecommand");
-PUBLIC var osshellread(CVR command) {
-	var result;
-	result.osshellread(command);
-	return result;
-}
-
-// versions to be written like a command
-
-// example: osshellread(command,outputresult);
-// for now returns nothing since popen cannot write and tell success
-PUBLIC bool osshellread(VARREF readstr, CVR command) {
-	return readstr.osshellread(command);
-}
-
-PUBLIC var ostempfilename() {
-	return var().ostempfilename();
-}
-
-PUBLIC var ostempdirpath() {
-	return var().ostempdirpath();
-}
-
-// example: osshellwrite(command,inputforcommand);
-// for now returns nothing since popen cannot write and tell success
-PUBLIC bool osshellwrite(CVR writestr, CVR command) {
-	return writestr.osshellwrite(command);
-}
 
 //PUBLIC void stop(CVR text) {
 //	text.stop(text);
@@ -574,12 +372,12 @@ PUBLIC ND var sort(CVR instring, SV sepchar) {
 }
 
 
-PUBLIC bool dimread(dim& dimrecord, CVR filehandle, CVR key) {
-	return dimrecord.read(filehandle, key);
+PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key) {
+	return dimrecord.read(dbfilevar, key);
 }
 
-PUBLIC bool dimwrite(const dim& dimrecord, CVR filehandle, CVR key) {
-	return dimrecord.write(filehandle, key);
+PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key) {
+	return dimrecord.write(dbfilevar, key);
 }
 
 
@@ -729,6 +527,19 @@ PUBLIC VARREF substrer(VARREF iostring, const int startx, const int length) {
 }
 
 
+PUBLIC bool starts(CVR instring, SV substr) {
+	return instring.starts(substr);
+}
+
+PUBLIC bool ends(CVR instring, SV substr) {
+	return instring.ends(substr);
+}
+
+PUBLIC bool contains(CVR instring, SV substr) {
+	return instring.contains(substr);
+}
+
+
 //PUBLIC var index(CVR instring, SV substr) {
 //	return instring.index(substr);
 //}
@@ -809,69 +620,69 @@ PUBLIC bool dbdelete(CVR dbname) {
 	return var().dbdelete(dbname);
 }
 
-PUBLIC bool createfile(CVR filename) {
+PUBLIC bool createfile(CVR dbfilename) {
 	//exodus doesnt automatically create dict files
 
 	//remove options like (S)
-	var filename2 = filename.field("(", 1).trim();
+	var dbfilename2 = dbfilename.field("(", 1).trim();
 
 	//remove pickos volume locations
-	filename2.swapper("DATA ", "").swapper("REVBOOT ", "").swapper("DATAVOL ", "").trimmer();
+	dbfilename2.swapper("DATA ", "").swapper("REVBOOT ", "").swapper("DATAVOL ", "").trimmer();
 
-	return filename2.createfile(filename2);
+	return dbfilename2.createfile(dbfilename2);
 }
 
-PUBLIC bool deletefile(CVR filename_or_handle) {
+PUBLIC bool deletefile(CVR dbfilename_or_var) {
 	//remove options like (S)
-	var filename2 = filename_or_handle.field(" ", 1).trim();
+	var dbfilename2 = dbfilename_or_var.field(" ", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	filename2.swapper("DATA ", "").trimmer();
+	dbfilename2.swapper("DATA ", "").trimmer();
 
-	return filename_or_handle.deletefile(filename2);
+	return dbfilename_or_var.deletefile(dbfilename2);
 }
 
-PUBLIC bool clearfile(CVR filename_or_handle) {
+PUBLIC bool clearfile(CVR dbfilename_or_var) {
 	//remove options like (S)
-	var filename2 = filename_or_handle.field("(", 1).trim();
+	var dbfilename2 = dbfilename_or_var.field("(", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	filename2.swapper("DATA ", "").trimmer();
+	dbfilename2.swapper("DATA ", "").trimmer();
 
-	return filename_or_handle.clearfile(filename2);
+	return dbfilename_or_var.clearfile(dbfilename2);
 }
 
-PUBLIC bool renamefile(CVR filename_or_handle, CVR newfilename) {
-	return filename_or_handle.renamefile(filename_or_handle.f(1), newfilename);
+PUBLIC bool renamefile(CVR dbfilename_or_var, CVR newdbfilename) {
+	return dbfilename_or_var.renamefile(dbfilename_or_var.f(1), newdbfilename);
 }
 
-PUBLIC bool createindex(CVR filename_or_handle, CVR fieldname, CVR dictfilename) {
+PUBLIC bool createindex(CVR dbfilename_or_var, CVR fieldname, CVR dictdbfilename) {
 
 	//virtually identical code in createindex and deleteindex
-	if (filename_or_handle.index(" ")) {
-		var filename2 = filename_or_handle.field(" ", 1);
-		var fieldname2 = filename_or_handle.field(" ", 2);
-		var indextype2 = filename_or_handle.field(" ", 3);
+	if (dbfilename_or_var.contains(" ")) {
+		var dbfilename2 = dbfilename_or_var.field(" ", 1);
+		var fieldname2 = dbfilename_or_var.field(" ", 2);
+		var indextype2 = dbfilename_or_var.field(" ", 3);
 		if (indextype2 && indextype2 != "BTREE")
 			fieldname2 ^= "_" ^ indextype2;
-		return filename2.createindex(fieldname2, dictfilename);
+		return dbfilename2.createindex(fieldname2, dictdbfilename);
 	}
 
-	return filename_or_handle.createindex(fieldname, dictfilename);
+	return dbfilename_or_var.createindex(fieldname, dictdbfilename);
 }
 
-PUBLIC bool deleteindex(CVR filename_or_handle, CVR fieldname) {
+PUBLIC bool deleteindex(CVR dbfilename_or_var, CVR fieldname) {
 	//virtually identical code in createindex and deleteindex
-	if (filename_or_handle.index(" ")) {
-		var filename2 = filename_or_handle.field(" ", 1);
-		var fieldname2 = filename_or_handle.field(" ", 2);
-		var indextype2 = filename_or_handle.field(" ", 3);
+	if (dbfilename_or_var.contains(" ")) {
+		var dbfilename2 = dbfilename_or_var.field(" ", 1);
+		var fieldname2 = dbfilename_or_var.field(" ", 2);
+		var indextype2 = dbfilename_or_var.field(" ", 3);
 		if (indextype2 && indextype2 != "BTREE")
 			fieldname2 ^= "_" ^ indextype2;
-		return filename2.deleteindex(fieldname2);
+		return dbfilename2.deleteindex(fieldname2);
 	}
 
-	return filename_or_handle.deleteindex(fieldname);
+	return dbfilename_or_var.deleteindex(fieldname);
 }
 
 PUBLIC bool begintrans() {
@@ -895,68 +706,68 @@ PUBLIC void cleardbcache() {
 }
 
 
-PUBLIC bool lock(CVR filehandle, CVR key) {
-	return (bool)filehandle.lock(key);
+PUBLIC bool lock(CVR dbfilevar, CVR key) {
+	return (bool)dbfilevar.lock(key);
 }
 
-PUBLIC void unlock(CVR filehandle, CVR key) {
-	filehandle.unlock(key);
+PUBLIC void unlock(CVR dbfilevar, CVR key) {
+	dbfilevar.unlock(key);
 }
 
 PUBLIC void unlockall() {
 	var().unlockall();
 }
 
-PUBLIC bool open(CVR filename, VARREF filehandle) {
-	return filehandle.open(filename);
+PUBLIC bool open(CVR dbfilename, VARREF dbfilevar) {
+	return dbfilevar.open(dbfilename);
 }
 
-PUBLIC bool open(CVR filename) {
-	var filehandle;
-	return filehandle.open(filename);
+PUBLIC bool open(CVR dbfilename) {
+	var dbfilevar;
+	return dbfilevar.open(dbfilename);
 }
 
-PUBLIC bool read(VARREF record, CVR filehandle, CVR key) {
-	return record.read(filehandle, key);
+PUBLIC bool read(VARREF record, CVR dbfilevar, CVR key) {
+	return record.read(dbfilevar, key);
 }
 
-PUBLIC bool reado(VARREF record, CVR filehandle, CVR key) {
-	return record.reado(filehandle, key);
+PUBLIC bool reado(VARREF record, CVR dbfilevar, CVR key) {
+	return record.reado(dbfilevar, key);
 }
 
-PUBLIC bool readv(VARREF record, CVR filehandle, CVR key, CVR fieldnumber) {
-	return record.readv(filehandle, key, fieldnumber);
+PUBLIC bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber) {
+	return record.readv(dbfilevar, key, fieldnumber);
 }
 
-PUBLIC bool write(CVR record, CVR filehandle, CVR key) {
-	return record.write(filehandle, key);
+PUBLIC bool write(CVR record, CVR dbfilevar, CVR key) {
+	return record.write(dbfilevar, key);
 }
 
-PUBLIC bool writeo(CVR record, CVR filehandle, CVR key) {
-	return record.writeo(filehandle, key);
+PUBLIC bool writeo(CVR record, CVR dbfilevar, CVR key) {
+	return record.writeo(dbfilevar, key);
 }
 
-PUBLIC bool writev(CVR record, CVR filehandle, CVR key, const int fieldno) {
-	return record.writev(filehandle, key, fieldno);
+PUBLIC bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno) {
+	return record.writev(dbfilevar, key, fieldno);
 }
 
-PUBLIC bool updaterecord(CVR record, CVR filehandle, CVR key) {
-	return record.updaterecord(filehandle, key);
+PUBLIC bool updaterecord(CVR record, CVR dbfilevar, CVR key) {
+	return record.updaterecord(dbfilevar, key);
 }
 
-PUBLIC bool insertrecord(CVR record, CVR filehandle, CVR key) {
-	return record.insertrecord(filehandle, key);
+PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key) {
+	return record.insertrecord(dbfilevar, key);
 }
 
 /*
-PUBLIC var xlate(CVR filename, CVR key, CVR fieldno, const char* mode)
+PUBLIC var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode)
 {
-	return key.xlate(filename, fieldno, mode);
+	return key.xlate(dbfilename, fieldno, mode);
 }
 
-PUBLIC var xlate(CVR filename, CVR key, CVR fieldno, CVR mode)
+PUBLIC var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode)
 {
-	return key.xlate(filename, fieldno, mode);
+	return key.xlate(dbfilename, fieldno, mode);
 }
 */
 
@@ -1077,31 +888,12 @@ PUBLIC var listfiles() {
 	return var().listfiles();
 }
 
-PUBLIC var reccount(CVR filename_or_handle) {
-	return filename_or_handle.reccount();
+PUBLIC var reccount(CVR dbfilename_or_var) {
+	return dbfilename_or_var.reccount();
 }
 
-PUBLIC var listindexes(CVR filename, CVR fieldname) {
-	return var().listindexes(filename, fieldname);
-}
-
-// one argument returns the contents of an envvar (empty name returns the whole environment)
-PUBLIC var osgetenv(CVR name) {
-	var temp = "";
-	temp.osgetenv(name);
-	return temp;
-}
-
-// two argument returns the success/failure to be used in an if statement
-// target variable last to be like ossetenv and traditional getenv name, value
-// unfortunately different from osread which is the reverse
-PUBLIC bool osgetenv(CVR name, VARREF value) {
-	return value.osgetenv(name);
-}
-
-// like "if set xxx=yyy"
-PUBLIC bool ossetenv(CVR name, CVR value) {
-	return value.ossetenv(name);
+PUBLIC var listindexes(CVR dbfilename, CVR fieldname) {
+	return var().listindexes(dbfilename, fieldname);
 }
 
 PUBLIC
@@ -1123,12 +915,12 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	if (not mv.EXECPATH) {
 		if (exodus__argc)
 			mv.EXECPATH = var(exodus__argv[0]);
-		if (not mv.EXECPATH.index(OSSLASH))
+		if (not mv.EXECPATH.contains(OSSLASH))
 			mv.EXECPATH.splicer(1, 0, oscwd() ^ OSSLASH);
 	}
 	//"see getting path to current executable" above
 	// or use "which EXECPATH somehow like in mvdebug.cpp
-	// if (not EXECPATH.index(OSSLASH) && not EXECPATH.index(":"))
+	// if (not EXECPATH.contains(OSSLASH) && not EXECPATH.contains(":"))
 	//{
 	//	EXECPATH.splicer(0,0,oscwd()^OSSLASH);
 	//	if (OSSLASH=="\\")

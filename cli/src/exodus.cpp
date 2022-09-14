@@ -29,7 +29,7 @@ function main() {
 	printl("http://www.opensource.org/licenses/mit-license.php");
 	printl("Using Library Version: ", var().version(), " ", PLATFORM_);
 
-	var verbose = OPTIONS.index("V");
+	var verbose = OPTIONS.contains("V");
 
 	if (verbose)
 		EXECPATH.outputl("Executable:");

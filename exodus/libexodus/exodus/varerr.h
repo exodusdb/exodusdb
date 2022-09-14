@@ -9,8 +9,8 @@ namespace exodus {
 class PUBLIC VarDivideByZero    : public VarError {public: explicit VarDivideByZero(    CVR var1);};
 class PUBLIC VarNonNumeric      : public VarError {public: explicit VarNonNumeric(      CVR var1);};
 class PUBLIC VarNonPositive     : public VarError {public: explicit VarNonPositive(     CVR var1);};
-class PUBLIC VarIntOverflow     : public VarError {public: explicit VarIntOverflow(     CVR var1);};
-class PUBLIC VarIntUnderflow    : public VarError {public: explicit VarIntUnderflow(    CVR var1);};
+class PUBLIC VarNumOverflow     : public VarError {public: explicit VarNumOverflow(     CVR var1);};
+class PUBLIC VarNumUnderflow    : public VarError {public: explicit VarNumUnderflow(    CVR var1);};
 class PUBLIC VarOutOfMemory     : public VarError {public: explicit VarOutOfMemory(     CVR var1);};
 class PUBLIC VarUnassigned      : public VarError {public: explicit VarUnassigned(      CVR var1);};
 class PUBLIC VarUndefined       : public VarError {public: explicit VarUndefined(       CVR var1);};

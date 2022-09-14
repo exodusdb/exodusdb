@@ -73,7 +73,7 @@ function main() {
 
 	var sql;
 
-	if (OPTIONS.index("L")) {
+	if (OPTIONS.contains("L")) {
 
 		sql = "select foreign_server_name, foreign_table_name from information_schema.foreign_tables;";
 		var result;
@@ -97,7 +97,7 @@ function main() {
 	////////////////////////////////////////////////////////////////////////////
 
 	// If no filenames are provided then just setup the interdb connection
-	if (not filenames or OPTIONS.index("R")) {
+	if (not filenames or OPTIONS.contains("R")) {
 
 		/////////////////////////////////////////////////////////////////////////
 		// Must be done as a superuser eg postgres or exodus with superuser power
@@ -109,7 +109,7 @@ function main() {
 			abort(conn1.lasterror());
 
 		// Reset all interdb connections
-		if (OPTIONS.index("RRR")) {
+		if (OPTIONS.contains("RRR")) {
 			if (not conn1.sqlexec("DROP EXTENSION IF EXISTS postgres_fdw CASCADE"))
 				abort(conn1.lasterror());
 			stop();
@@ -126,7 +126,7 @@ function main() {
 			abort(conn1.lasterror());
 
 		// Create an interdb connection to the target server
-		if (OPTIONS.index("RR"))
+		if (OPTIONS.contains("RR"))
 			exit(0);
 
 		if (not conn1.sqlexec("CREATE SERVER IF NOT EXISTS " ^ dbname2 ^ " FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname '" ^ dbname2 ^ "', port '5432')"))
@@ -140,7 +140,7 @@ function main() {
 		if (not conn1.sqlexec("DROP USER MAPPING IF EXISTS FOR " ^ dbuser1 ^ " SERVER " ^ dbname2))
 			abort(conn1.lasterror());
 
-		if (OPTIONS.index("R"))
+		if (OPTIONS.contains("R"))
 			exit(0);
 
 		// Configure user/connection parameters. Target dbuser and dbpass.
@@ -170,7 +170,7 @@ function main() {
 		if (conn1.open(filename)) {
 
 			// Option to forcibly delete any existing files in the default database
-			if (OPTIONS.index("F")) {
+			if (OPTIONS.contains("F")) {
 
 				//logputl("Remove any existing table " ^ filename);
 				//if (not conn1.sqlexec("DROP TABLE IF EXISTS " ^ filenames.swap(","," ")))

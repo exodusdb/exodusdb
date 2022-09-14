@@ -2,6 +2,7 @@ t_*.txt
 t_*.bin
 t_*.html
 t_*.dir
+t_*.cpp
 
 test_*
 !test_*.cpp

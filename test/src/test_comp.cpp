@@ -374,6 +374,353 @@ programinit()
 		assert(not(var(negative_smaller) < var(0.0)));
 	}
 
+	{
+		// compare eq bool true/false
+
+		// Differences from PickOS?
+		// Leading spaces are not acceptable on otherwise numeric strings
+
+		// Differences from Javascript
+		// 0.999999999999 != 1 and  != true
+
+		assert((var("") == true) == false); //same as javascript
+		assert((var("") != true) == true); //same as javascript
+
+		assert((var("") == false) == true); //javascript
+		assert((var("") != false) == false); //javascript
+
+//		assert(var("") == false);
+		assert(var("") != true);
+
+//		assert(var(" ") == false);//javascript
+		assert(var(" ") != false);//exodus
+		assert(var(" ") != true);
+
+
+		assert(var("1") != false);
+		assert(var("1") == true);
+
+		assert(var("2") != false);
+		assert(var("2") != true);
+
+		assert(var("x") != false);
+		assert(var("x") != true);
+
+		assert(var("1.01") != false); // only zero and empty string are false
+		assert(var("1.01") != true);  // not quite = 1
+
+		assert(var("1.001") != false); // only zero and empty string are false
+		assert(var("1.001") != true);  // not quite = 1
+
+		assert(var("1.0001") != false); // only zero and empty string are false
+
+//		assert(var("1.0001") != true);  // not quite = 1
+//		assert(var("1.0001") != true);  // not quite = 1
+		assert(var("1.00001") == true); //too small a difference from 1
+		assert(var("1.00001") != false); //too small a difference from 1
+
+		assert(var("1.0001") != false);//close enough to 1 to be true?
+		assert(var("1.0001") == true);
+
+		assert(var("2.0") != false);//neither true nor false
+		assert(var("2.0") != true);
+
+		assert(var("x") != false);//neither true nor false
+		assert(var("x") != true);
+
+		assert(0.9999 != true);// not close enough to 1
+		assert(0.9999 != false);
+
+		assert(0.99999 != true);// close enough to 1
+		assert(0.99999 != false);
+
+		assert(var(1.01) != false); // only number 1 is true
+		assert(var(1.01) != true);  // not quite = 1
+
+		assert(var(1.001) != false); // only zero and empty string are false
+		assert(var(1.001) != true);  // not quite = 1
+
+		assert(var(1.0001) != false); // Only zero and empty string are false
+//		assert(var(1.0001) != true);  // not quite = 1
+		assert(var(1.00001) == true); //too small a difference from 1
+		assert(var(1.00001) != false); //too small a difference from 1
+
+		assert(var(1.0001) != false);
+		assert(var(1.0001) == true);
+
+		assert(var(1) != false);
+		assert(var(1) == true);
+
+		assert(var(2) != false);//neither true nor false
+		assert(var(2) != true);
+
+		assert(var(1.0) != false);
+		assert(var(1.0) == true);
+
+		assert(var(2.0) != false);//neither true nor false
+		assert(var(2.0) != true);
+
+	}
+	{
+		assert( var("xxx") != true);
+		assert( true != var("xxx"));
+
+		assert(true eq var(1));
+		assert(true eq var(1.0));
+
+		assert(true eq var("1"));
+		assert(true eq var("01"));
+		assert(true eq var("+1"));
+		assert(true eq var("+01"));
+		assert(true eq var("1.0"));
+		assert(true eq var("+1.0"));
+
+		assert(true eq 1);
+		assert(true eq 1);
+
+		assert(true ne var(0));
+		assert(true ne var(0.0));
+
+		assert(var("") < true);
+	}
+	{
+		assert(not(var("1x")   lt true));
+		assert(not(var("x")    lt true));
+		assert(    var(" ")    lt true);// javascript because leading spaces can be converted to number 0
+//		assert(not(var(" ")    lt true));
+		assert(not(var("1 ")   lt true));
+		assert(not var(") 1")  lt true);
+		assert(not(var(1)      lt true));
+		assert(    var("")     lt true);
+		assert(    var(0)      lt true);
+		assert(    var("0")    lt true);
+		assert(    var("0.1")  lt true);
+		assert(    var("-0.1") lt true);
+
+	}
+
+	{
+		assert(var(-0.1) lt false);
+		assert(var(0.1) gt false);
+
+		assert(var(0.9) lt true);
+		assert(var(1.1) gt true);
+
+
+		assert(var(-0.1) le false);
+		assert(var(0.1) ge false);
+
+		assert(var(0.9) le true);
+		assert(var(1.1) ge true);
+
+
+		assert(false gt var(-0.1));
+		assert(false lt var(0.1));
+
+		assert(true gt var(0.9));
+		assert(true lt var(1.1));
+
+
+		assert(false ge var(-0.1));
+		assert(false le var(0.1));
+
+		assert(true ge var(0.9));
+		assert(true le var(1.1));
+
+	}
+
+	{
+		assert(  var(true) eq var(true));
+		assert(!(var(true) ne var(true)));
+		assert(!(var(true) lt var(true)));
+		assert(!(var(true) gt var(true)));
+		assert(  var(true) le var(true));
+		assert(  var(true) ge var(true));
+	}
+
+	{
+		assert(!(var(true) eq var(false)));
+		assert( (var(true) ne var(false)));
+		assert(!(var(true) lt var(false)));
+		assert( (var(true) gt var(false)));
+		assert(!(var(true) le var(false)));
+		assert( (var(true) ge var(false)));
+	}
+
+	{
+		assert(!(var(false) eq var(true)));
+		assert( (var(false) ne var(true)));
+		assert( (var(false) lt var(true)));
+		assert(!(var(false) gt var(true)));
+		assert(  var(false) le var(true));
+		assert(!(var(false) ge var(true)));
+	}
+
+	{
+		assert( (var(false) eq var(false)));
+		assert(!(var(false) ne var(false)));
+		assert(!(var(false) lt var(false)));
+		assert(!(var(false) gt var(false)));
+		assert( (var(false) le var(false)));
+		assert( (var(false) ge var(false)));
+	}
+
+	{
+		assert((var("x") == true) == false);
+		assert((var("x") == false) == false);
+
+		assert((var("x") != true) == true);
+		assert((var("x") != false) == true);
+
+		assert((var("x") < true) == false);
+		assert((var("x") < false) == false);
+
+		assert((var("x") <= true) == false);
+		assert((var("x") <= false) == false);
+
+		assert((var("x") > true) == true);
+		assert((var("x") > false) == true);
+
+		assert((var("x") >= true) == true);
+		assert((var("x") >= false) == true);
+	}
+
+	{
+		assert((true == var("x")) == false);
+		assert((false == var("x")) == false);
+
+		assert((true != var("x")) == true);
+		assert((false != var("x")) == true);
+
+		assert((true < var("x")) == true);
+		assert((false < var("x")) == true);
+
+		assert((true <= var("x")) == true);
+		assert((false <= var("x")) == true);
+
+		assert((true > var("x")) == false);
+		assert((false > var("x")) == false);
+
+		assert((true >= var("x")) == false);
+		assert((false >= var("x")) == false);
+	}
+
+
+	for (var j = -1; j <= 1; j++) {
+		for (var i = -6; i <= 1; i++) {
+			var d = pwr(10, i);
+			var d2 = d + j;
+	//		TRACE(d)
+	//		TRACE(d == true)
+	//		TRACE(d == false)
+			var line;
+			printl();
+			line = var("assert((var(") ^ d2 ^ ") == true)  == " ^ ((d2 == true)  ? "true " : "false") ^ ");";
+			printl(line);
+			line = var("assert((var(") ^ d2 ^ ") == false) == " ^ ((d2 == false) ? "true " : "false") ^ ");";
+			printl(line);
+		}
+	}
+
+	assert((var(0.000001) == true)  == false);
+	assert((var(0.000001) == false) == true );
+	assert((var(0.00001) == true)  == false);
+	assert((var(0.00001) == false) == true );
+	assert((var(0.0001) == true)  == false);
+	assert((var(0.0001) == false) == false);
+	assert((var(0.001) == true)  == false);
+	assert((var(0.001) == false) == false);
+	assert((var(0.01) == true)  == false);
+	assert((var(0.01) == false) == false);
+	assert((var(0.1) == true)  == false);
+	assert((var(0.1) == false) == false);
+	assert((var(1) == true)  == true );
+	assert((var(1) == false) == false);
+	assert((var(10) == true)  == false);
+	assert((var(10) == false) == false);
+	assert((var(100) == true)  == false);
+	assert((var(100) == false) == false);
+	assert((var(1000) == true)  == false);
+	assert((var(1000) == false) == false);
+	assert((var(10000) == true)  == false);
+	assert((var(10000) == false) == false);
+	assert((var(100000) == true)  == false);
+	assert((var(100000) == false) == false);
+	assert((var(1000000) == true)  == false);
+	assert((var(1000000) == false) == false);
+
+	assert((var(-0.999999) == true)  == false);
+	assert((var(-0.999999) == false) == false);
+
+	assert((var(-0.99999) == true)  == false);
+	assert((var(-0.99999) == false) == false);
+
+	assert((var(-0.9999) == true)  == false);
+	assert((var(-0.9999) == false) == false);
+
+	assert((var(-0.999) == true)  == false);
+	assert((var(-0.999) == false) == false);
+
+	assert((var(-0.99) == true)  == false);
+	assert((var(-0.99) == false) == false);
+
+	assert((var(-0.9) == true)  == false);
+	assert((var(-0.9) == false) == false);
+
+	assert((var(0) == true)  == false);
+	assert((var(0) == false) == true );
+
+	assert((var(9) == true)  == false);
+	assert((var(9) == false) == false);
+
+	assert((var(0.000001) == true)  == false);
+	assert((var(0.000001) == false) == true );
+
+	assert((var(0.00001) == true)  == false);
+	assert((var(0.00001) == false) == true );
+
+	assert((var(0.0001) == true)  == false);
+	assert((var(0.0001) == false) == false);
+
+	assert((var(0.001) == true)  == false);
+	assert((var(0.001) == false) == false);
+
+	assert((var(0.01) == true)  == false);
+	assert((var(0.01) == false) == false);
+
+	assert((var(0.1) == true)  == false);
+	assert((var(0.1) == false) == false);
+
+	assert((var(1) == true)  == true );
+	assert((var(1) == false) == false);
+
+	assert((var(10) == true)  == false);
+	assert((var(10) == false) == false);
+
+	assert((var(1.000001) == true)  == true );
+	assert((var(1.000001) == false) == false);
+
+	assert((var(1.00001) == true)  == true );
+	assert((var(1.00001) == false) == false);
+
+	assert((var(1.0001) == true)  == true );
+	assert((var(1.0001) == false) == false);
+
+	assert((var(1.001) == true)  == false);
+	assert((var(1.001) == false) == false);
+
+	assert((var(1.01) == true)  == false);
+	assert((var(1.01) == false) == false);
+
+	assert((var(1.1) == true)  == false);
+	assert((var(1.1) == false) == false);
+
+	assert((var(2) == true)  == false);
+	assert((var(2) == false) == false);
+
+	assert((var(11) == true)  == false);
+	assert((var(11) == false) == false);
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

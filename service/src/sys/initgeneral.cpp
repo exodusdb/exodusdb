@@ -602,7 +602,7 @@ nextreport:
 	}
 
 	call log2("*check for invalid characters in workstation name", logtime);
-	if (STATION.index("'") or STATION.index(DQ)) {
+	if (STATION.contains("'") or STATION.contains(DQ)) {
 		msg = "WARNING: EXODUS WILL NOT WORK PROPERLY BECAUSE";
 		msg ^= FM ^ "YOUR WORKSTATION NAME (" ^ STATION.trim() ^ ")";
 		msg ^= FM ^ "CONTAINS QUOTATION MARKS. PLEASE ASK YOUR ";
@@ -902,7 +902,7 @@ nextreport:
 //		ver.converter("\r\n", "  ");
 //		//if index(ver,'Windows 9',1) or index(ver,'NT',1) or index(os,'NT',1) then
 //		ver = ver.trim().ucase();
-//		if ((ver.index("WINDOWS") or ver.index("NT")) or os.index("NT")) {
+//		if ((ver.contains("WINDOWS") or ver.contains("NT")) or os.contains("NT")) {
 //			SYSTEM(12, -1) = "WORDSIZE";
 //			SYSTEM(13, -1) = "32";
 //		}
@@ -1000,7 +1000,7 @@ nextreport:
 		if @volumes then;
 			call log2('*warning if too little or too much EMS memory',logtime);
 			ems.allocated=get.ems('');
-			if interactive and not(index(os,'NT',1)) and not(index(ver,'Millennium',1)) then;
+			if interactive and not.contains(os,'NT',1)) and not.contains(ver,'Millennium',1)) then;
 				//if ems.allocated>1024000 or ems.allocated<512000 then
 				if ems.allocated>1100000 or ems.allocated<512000 then;
 					msg='WARNING: EXODUS may not work reliably because it|has ';
@@ -1236,7 +1236,7 @@ nextreport:
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (const var usern : range(1, nusers)) {
 			var userx = usercodes.f(1, usern);
-			if (not(userx.index("---"))) {
+			if (not(userx.contains("---"))) {
 				userx.writev(users, userx, 1);
 
 			}
@@ -1391,12 +1391,12 @@ nextreport:
 //		if (not(lists.open("LISTS", ""))) {
 //			lists = "";
 //		}
-//		if (not(lists.index(workpath))) {
+//		if (not(lists.contains(workpath))) {
 //			createfile("" ^ workpath ^ " LISTS (S)");
 //			if (not(lists.open("LISTS", ""))) {
 //				lists = "";
 //			}
-//			if (not(lists.index(workpath))) {
+//			if (not(lists.contains(workpath))) {
 //				//call note('FAILED TO MAKE LISTS FILE ON ':workpath
 //			}
 //		}
@@ -1558,7 +1558,7 @@ fixnextcompany:
 		}
 
 		call log2("*remove obsolete period 13 from deloitte data", logtime);
-		if (sys.company.index("13X4WEEK,1/7,5")) {
+		if (sys.company.contains("13X4WEEK,1/7,5")) {
 			tt = sys.company.f(16);
 			tt.swapper("13/", "12/");
 			sys.company(16) = tt;

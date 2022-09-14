@@ -58,11 +58,11 @@ function main() {
 	// Fortunately most dat files are dictionaries which tend to be more limited
 	//  by sql column name restrictions.
 
-	var allow_overwrite  = OPTIONS.index("O");
-	var allow_new        = OPTIONS.index("N");
-	//var move_option    = OPTIONS.index("M");
-	//var delete_option  = OPTIONS.index("D");
-	var allow_createfile = OPTIONS.index("C");
+	var allow_overwrite  = OPTIONS.contains("O");
+	var allow_new        = OPTIONS.contains("N");
+	//var move_option    = OPTIONS.contains("M");
+	//var delete_option  = OPTIONS.contains("D");
+	var allow_createfile = OPTIONS.contains("C");
 
 	if (allow_createfile) {
 		allow_overwrite = 1;
@@ -72,7 +72,7 @@ function main() {
 	// Raw option
 	var txt5fmt = "TX";
 	// Raw option only converts FM to NL and leaves VM SM TM ST as are
-	if (OPTIONS.index("R"))
+	if (OPTIONS.contains("R"))
 		txt5fmt ^= "1";
 
 	//parse source
@@ -105,7 +105,7 @@ function main() {
 
 	//connect to source db if source not a path or .sql file
 	sourcedb = "";
-	if (not sourcename.index("/") and not sourcename.ends(".sql") and not sourcedb.connect(sourcename))
+	if (not sourcename.contains("/") and not sourcename.ends(".sql") and not sourcedb.connect(sourcename))
 		abort(sourcename.quote() ^ " Cannot connect to source");
 
 	if (targetname.contains("/")) {
@@ -405,7 +405,7 @@ function getrec() {
 
 subroutine unescape_sql(io arg1) {
 
-	if (not arg1.index("\\"))
+	if (not arg1.contains("\\"))
 		return;
 
 	arg1.swapper("\\n","\n");

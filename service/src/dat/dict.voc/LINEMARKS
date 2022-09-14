@@ -5,12 +5,12 @@ S
 
 
 
-	if (var("$*").index(ID[1])) {\
+	if (var("$*").contains(ID[1])) {\
 		return "";\
-	} else if (RECORD.index("linemark")) {\
+	} else if (RECORD.contains("linemark")) {\
 		var tt = RECORD;\
 		tt.converter(" ", FM);\
-		return tt.index(FM ^ "linemark");\
+		return tt.contains(FM ^ "linemark");\
 	} else {\
 		ANS = 0;\
 	}\

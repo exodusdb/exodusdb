@@ -92,6 +92,7 @@ set -eux
 : Restarting all live processes
 : =============================
 :
+#	touch ~/live/{bin,lib,dat,dat/*,dat/*/*}
 	touch ~/live/{bin,lib,dat}
 	fi
-
+:

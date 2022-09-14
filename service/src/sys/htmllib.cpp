@@ -41,13 +41,13 @@ function main(in mode, io datax, in params0="", in params20="") {
 		var tt = " " ^ VM;
 		while (true) {
 			///BREAK;
-			if (not(datax.index(tt))) break;
+			if (not(datax.contains(tt))) break;
 			datax.swapper(tt, VM);
 		}//loop;
 		tt = " " ^ FM;
 		while (true) {
 			///BREAK;
-			if (not(datax.index(tt))) break;
+			if (not(datax.contains(tt))) break;
 			datax.swapper(tt, FM);
 		}//loop;
 		filler = "&nbsp;";

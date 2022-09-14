@@ -19,7 +19,7 @@ function main() {
 		);
 
 	// Allow for first argument to be an os file path
-	if (COMMAND.f(2).index(OSSLASH))
+	if (COMMAND.f(2).contains(OSSLASH))
 		COMMAND.inserter(2,"DOS");
 
 	//var filename = COMMAND.f(2).convert(".", "_");
@@ -30,7 +30,7 @@ function main() {
 	// Raw
 	var txtfmt = "TX";
 	// Raw option only converts FM to NL and leaves VM SM TM ST as are
-	if (OPTIONS.index("R"))
+	if (OPTIONS.contains("R"))
 		txtfmt ^= "1";
 
 	if (not fieldno.isnum())
@@ -140,7 +140,7 @@ function main() {
 					printl(filename ^ " " ^ ID ^ " > db");
 
 					//generate/update database functions if saved a symbolic dictionary record
-					if (filename.substr(1, 5) == "dict." and newrecord.f(1) eq "S" and newrecord.f(8).index("/"
+					if (filename.substr(1, 5) == "dict." and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
 																											"*pgsql")) {
 						var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
 						osshell(oscmd);

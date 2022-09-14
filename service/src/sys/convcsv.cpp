@@ -106,28 +106,28 @@ function main(in sentence0, in select0="", in filters0="") {
 		return 0;
 	}
 
-	var normalise = sentencex.index(" NORMALISE");
+	var normalise = sentencex.contains(" NORMALISE");
 	if (normalise) {
 		sentencex.swapper(" NORMALISE", "");
 	}
 
-	var firstmvonly = sentencex.index(" FIRSTMVONLY");
+	var firstmvonly = sentencex.contains(" FIRSTMVONLY");
 	if (firstmvonly) {
 		sentencex.swapper(" FIRSTMVONLY", "");
 	}
 
-	var mv1only = sentencex.index(" MV1ONLY");
+	var mv1only = sentencex.contains(" MV1ONLY");
 	if (mv1only) {
 		sentencex.swapper(" MV1ONLY", "");
 	}
 
-	var raw = sentencex.index(" RAW");
+	var raw = sentencex.contains(" RAW");
 	if (raw) {
 		sentencex.swapper(" RAW", "");
 	}
 	var mvgroupno = "";
 
-	var colheaderrow = not(sentencex.index(" NOCOLHEADER"));
+	var colheaderrow = not(sentencex.contains(" NOCOLHEADER"));
 	if (not colheaderrow) {
 		sentencex.swapper(" NOCOLHEADER", "");
 	}
@@ -602,7 +602,7 @@ nextvn:
 
 					//make sure "1-12" is not interpreted as a formula
 					if (var(1) or excel) {
-						if (var(".-+0123456789").index(cell[1])) {
+						if (var(".-+0123456789").contains(cell[1])) {
 							if (not(cell.isnum())) {
 								cell.splicer(1, 0, " ");
 							}

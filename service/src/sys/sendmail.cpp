@@ -149,8 +149,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//development systems ALWAYS email hardcoded in next line
 		//1. exodus.id always indicates a test system (dos or exodus)
 		//2. on exodus lack of live.txt file indicates a test system
-		//if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile()))) or subject.index("mvdbpostgres")) {
-		if (var("exodus.id").osfile() or subject.index("mvdbpostgres")) {
+		//if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile()))) or subject.contains("mvdbpostgres")) {
+		if (var("exodus.id").osfile() or subject.contains("mvdbpostgres")) {
 			forcedemailx = "dev@neosys.com";
 			//toaddress=xlate('USERS','EXODUS',7,'X')
 			//if toaddress else toaddress='dev@neosys.com'
@@ -185,7 +185,7 @@ forcedemail:
 	}
 
 	//limit development system to steve
-	if (SYSTEM.index("1EEC633B")) {
+	if (SYSTEM.contains("1EEC633B")) {
 		toaddress = "steve.bush@neosys.com";
 		ccaddress = "";
 	}
@@ -412,7 +412,7 @@ forcedemail:
 			tt = body.substr(1, 20);
 		}
 		tt.ucaser();
-		if ((not(attachfilename) and tt.index("<!DOCTYPE")) or tt.index("<HTML")) {
+		if ((not(attachfilename) and tt.contains("<!DOCTYPE")) or tt.contains("<HTML")) {
 			cmd ^= VM ^ "-a \"Content-Type: text/html\"";
 			cmd ^= VM ^ "-a \"MIME-Version: 1.0\"";
 		}

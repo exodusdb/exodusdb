@@ -178,7 +178,7 @@ class printtext {
 					tx.splicer(1, 0, bottomline);
 				}
 			}
-			if (html and not bottomline.index("</tbody></table>", 1))
+			if (html and not bottomline.contains("</tbody></table>", 1))
 				tx.splicer(1, 0, "</tbody></table>");
 			bodyln = ntxlns;
 		}
@@ -273,7 +273,7 @@ class printtext {
 		//swap "'T'" with timedate2() in temp
 		//swap "''" with "" in temp
 		var optioncharn;
-		while ((optioncharn = temp.index("\'", 1))) {
+		while ((optioncharn = temp.contains("\'", 1))) {
 
 			var optionchars = "";
 			while (true) {

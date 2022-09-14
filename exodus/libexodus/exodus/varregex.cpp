@@ -82,9 +82,9 @@ var var::iconv_MT() const {
 		return "";
 
 	// PM
-	if (inttime < 43200 && (*this).index("P"))
+	if (inttime < 43200 && (*this).contains("P"))
 		inttime += 43200;
-	else if (inttime >= 43200 && (*this).index("A"))
+	else if (inttime >= 43200 && (*this).contains("A"))
 		inttime -= 43200;
 
 	return inttime;

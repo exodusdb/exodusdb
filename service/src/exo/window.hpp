@@ -27,7 +27,7 @@ function security2(in mode, in op0)
 		if (!(authorised(op ^ " ACCESS" ^ op2, msg, "")))
 			return invalid(msg);
 
-	}else if (mode.contains("READ") || mode.index("WRITE")) {
+	}else if (mode.contains("READ") || mode.contains("WRITE")) {
 		if (!win.wlocked) {
 			op ^= " ACCESS";
 		}else{

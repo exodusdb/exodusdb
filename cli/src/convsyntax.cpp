@@ -52,8 +52,8 @@ function main() {
 
 	COMMAND.remover(1);
 
-	var r2a = OPTIONS.index("R");
-	var forrange = OPTIONS.index("F");
+	var r2a = OPTIONS.contains("R");
+	var forrange = OPTIONS.contains("F");
 
 	for (var filename : COMMAND) {
 
@@ -118,7 +118,7 @@ function main() {
 				, R"(\1(\2, \3, \4) = \5;)");
 
 
-				if (line2.index(".r(")) {
+				if (line2.contains(".r(")) {
 
 					// Failed to convert
 					errputl('?', line2);
@@ -185,10 +185,10 @@ function main() {
 					line2.splicer(pos, 99999, "for (const var " ^ varname ^ " : range(" ^ starting ^ ", " ^ ending ^ ")) {");
 				}
 
-				if (not line2.index(" : range(")) {
+				if (not line2.contains(" : range(")) {
 
 					// Failed to convert
-					if (line2.index(";"))
+					if (line2.contains(";"))
 						errputl('?', line2.swap("\t", "    "));
 
 				} else {
@@ -210,7 +210,7 @@ function main() {
 		}
 
 		// Update the source file
-		if (replaced && OPTIONS.index("U"))
+		if (replaced && OPTIONS.contains("U"))
 			txt.oswrite(filename);
 	}
 

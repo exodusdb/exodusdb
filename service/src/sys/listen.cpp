@@ -773,7 +773,7 @@ function loop_exit() {
 
 	//esc or "q" on linux
 	tt = INTCONST.f(1, 1);
-	if (charx.lcase().index(tt)) {
+	if (charx.lcase().contains(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.swapper(var().chr(27), "Esc");
 		call mssg("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
@@ -914,7 +914,7 @@ function loop_exit() {
 	}
 
 	//backup
-	if (var("Bb").index(charx)) {
+	if (var("Bb").contains(charx)) {
 		goto backup;
 	}
 	if (var().time() ge bakpars.f(3) and var().time() le bakpars.f(4)) {
@@ -938,7 +938,7 @@ function loop_exit() {
 			perform("OFF");
 			logoff();
 
-		} else if (not(bakpars.f(5).index(dow))) {
+		} else if (not(bakpars.f(5).contains(dow))) {
 			call log2("Not right day of week " ^ bakpars.f(5) ^ " Logging off", logtime);
 			perform("OFF");
 			logoff();
@@ -1775,7 +1775,7 @@ subroutine process2() {
 		}
 
 		autokey = 0;
-		if (((keyx eq "" or (keyx[1] eq "*")) or (keyx[-1] eq "*")) or keyx.index("**")) {
+		if (((keyx eq "" or (keyx[1] eq "*")) or (keyx[-1] eq "*")) or keyx.contains("**")) {
 
 			//must provide a key unless locking
 			if (not withlock) {
@@ -1883,7 +1883,7 @@ noupdate:
 
 				//no spaces in new keys
 				//allow in multipart keys on the assumption that they are old keys with spaces
-				if ((withlock and keyx.index(" ")) and not(keyx.index("*"))) {
+				if ((withlock and keyx.contains(" ")) and not(keyx.contains("*"))) {
 					//if sessionid then gosub leaseunlock
 					gosub leaseunlock();
 					//msg='Error: ':quote(params<1>):' must not contain a space character'
@@ -2026,7 +2026,7 @@ noupdate:
 					}
 
 					//in case postread has changed the key
-					if (keyx ne keyx0 and not(USER3.index("RECORDKEY"))) {
+					if (keyx ne keyx0 and not(USER3.contains("RECORDKEY"))) {
 						tt = keyx;
 						tt.swapper(" ", "%20");
 						response_ = (USER3 ^ " RECORDKEY " ^ tt).trim();
@@ -2520,13 +2520,13 @@ badwrite:
 			user4x = msg_.ucase();
 
 			//convert error message (could also be a system error eg dict says indexed but isnt
-			if ((user4x.index("IN INDEX.REDUCER") or user4x.index("IN RTP21")) or user4x.index("IN RTP20")) {
+			if ((user4x.contains("IN INDEX.REDUCER") or user4x.contains("IN RTP21")) or user4x.contains("IN RTP20")) {
 				//@user4='Please select fewer records and/or simplify your request'
 				call listen4(17, USER4);
 			}
 
 			//send errors to exodus
-			if (((msg_ ^ user4x).index("INTERNAL ERROR")) or user4x.index("DAMAGED FILE")) {
+			if (((msg_ ^ user4x).contains("INTERNAL ERROR")) or user4x.contains("DAMAGED FILE")) {
 				call sysmsg(USER4);
 			}
 
@@ -2623,7 +2623,7 @@ function request_exit() {
 		call listen4(1, USER3);
 	}
 
-	if (response_.index("ERROR NO:")) {
+	if (response_.contains("ERROR NO:")) {
 		call log("LISTEN", USER3);
 	}
 
@@ -2642,7 +2642,7 @@ function request_exit() {
 	}
 
 	tt = response_.ucase();
-	if ((tt.index("R18.6") or tt.index("RTP20 MISSING")) or tt.index("TOO MANY LEVELS OF TCL")) {
+	if ((tt.contains("R18.6") or tt.contains("RTP20 MISSING")) or tt.contains("TOO MANY LEVELS OF TCL")) {
 		halt = 1;
 		//response<-1>='INTERNAL ERROR Closing current EXODUS server process'
 		call listen4(1, USER3);
@@ -3311,7 +3311,7 @@ subroutine checkcompany() {
 		return;
 	}
 
-	if (request1.index("READ")) {
+	if (request1.contains("READ")) {
 		compcode = calculate("COMPANY_CODE", dictfile, keyx, iodat_, 0);
 	} else {
 		//compcode={COMPANY_CODE}

@@ -5,7 +5,7 @@ function main() {
 
 	var token = " eq ";
 
-	var update_inplace = OPTIONS.index("U");
+	var update_inplace = OPTIONS.contains("U");
 
 	var comment_regex = "^\\s*/";
 

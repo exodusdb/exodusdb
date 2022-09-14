@@ -116,7 +116,7 @@ nextdoc:
 			}
 
 			//always prevent users from editing documents designed by EXODUS
-			if (RECORD.f(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
+			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
 				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				win.wlocked = 0;
@@ -189,7 +189,7 @@ nextdoc:
 			}
 
 			//always prevent users from deleting documents designed by EXODUS
-			if (RECORD.f(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
+			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
 				msg = "You cannot delete report designs created by EXODUS";
 				return invalid(msg);
 			}

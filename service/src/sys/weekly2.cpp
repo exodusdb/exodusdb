@@ -60,7 +60,7 @@ function main(in type, in input0, in mode, out output) {
 	//if iconv then convert period (MM/YY or YYMM) to internal last date of month
 	////////////////////////////////////////////////////////////////////////////
 	//return the last day of the period (internal format)
-	if (input0.index("/")) {
+	if (input0.contains("/")) {
 		period = input0.field("/",1);
 		year = input0.field("/", 2);
 	} else {

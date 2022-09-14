@@ -749,7 +749,7 @@ nextdbasen:;
 //				tt = upgradefilename;
 //				tt.splicer(-3, 3, "$wg");
 //				call osread(wgetoutput, tt);
-//				if (wgetoutput.ucase().index(" NO NEWER ") or wgetoutput.index("100%")) {
+//				if (wgetoutput.ucase().contains(" NO NEWER ") or wgetoutput.contains("100%")) {
 //					upgradefiledir = upgradefilename83.osfile();
 //					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
 //					//tt=upgradefiledir<2> 'D2/J'
@@ -757,8 +757,8 @@ nextdbasen:;
 //					tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
 //					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.f(3).oconv("MT");
 //					upgradeready = 1;
-//				} else if (wgetoutput.ucase().index(" ERROR 404")) {
-//				} else if (wgetoutput.ucase().index(" failed: Unknown host.")) {
+//				} else if (wgetoutput.ucase().contains(" ERROR 404")) {
+//				} else if (wgetoutput.ucase().contains(" failed: Unknown host.")) {
 //					printl("DNS cant resolve upgrade host name");
 //				} else if (2) {
 //					if (not(var("exodus.id").osfile())) {

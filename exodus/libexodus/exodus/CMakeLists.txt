@@ -111,7 +111,7 @@ add_library(exodus SHARED
  var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
  varchrono.cpp
  varfuncs.cpp varioconv.cpp
- mvenvironment.cpp exodusfuncs.cpp
+ mvenvironment.cpp exodusfuncs.cpp exoos.cpp
  varwait.cpp varunicode.cpp varposix.cpp mvfunctor.cpp #mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
  MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp

@@ -88,7 +88,7 @@ function main(in mode) {
 	win.valid = 1;
 
 	//no validation for EXODUS
-	if (curruser_.index("EXODUS")) {
+	if (curruser_.contains("EXODUS")) {
 		if (mode.substr(1, 4) eq "VAL." and mode ne "VAL.USER") {
 			return 0;
 		}
@@ -225,7 +225,7 @@ function main(in mode) {
 				return invalid(msg);
 				end;
 
-			if index(is,'EXODUS',1) and not(index(curruser,'EXODUS',1)) then goto baduser;
+			if index(is,'EXODUS',1) and not.contains(curruser,'EXODUS',1)) then goto baduser;
 			//prevent use of reserved user names
 			read temp from system.file(),is then;
 				if index(curruser,'EXODUS',1) else;
@@ -260,7 +260,7 @@ function main(in mode) {
 				convert ',' to @vm in is.orig2;
 				locate KEYX in is.orig2<1> setting temp else;
 
-					if KEYX='EXODUS' and not(index(@username,'EXODUS',1)) then;
+					if KEYX='EXODUS' and not.contains(@username,'EXODUS',1)) then;
 						msg=quote(KEYX):' - YOU CANNOT USE THIS KEY BECAUSE IT|IS "OWNED" BY EXODUS';
 						return invalid(msg);
 						end;
@@ -494,7 +494,7 @@ function main(in mode) {
 		}
 
 		//if logged in as account then same as logged in as EXODUS
-		if (var("012").index(PRIVILEGE)) {
+		if (var("012").contains(PRIVILEGE)) {
 			curruser_ = "EXODUS";
 		} else {
 			curruser_ = USERNAME;
@@ -570,7 +570,7 @@ function main(in mode) {
 		}
 
 		//hide higher/lower users
-		if (not(curruser_.index("EXODUS"))) {
+		if (not(curruser_.contains("EXODUS"))) {
 
 			var usercodes = RECORD.f(1);
 			var nusers = usercodes.count(VM) + (usercodes ne "");
@@ -833,7 +833,7 @@ function main(in mode) {
 						username = "---";
 						RECORD(4, usern) = username;
 					}
-					if (not(username.index("---") or username eq "BACKUP")) {
+					if (not(username.contains("---") or username eq "BACKUP")) {
 						if (not(RECORD.f(7, usern))) {
 							//msg=quote(username):'|You must first give a password to this user'
 							msg = username.quote() ^ "|You must give an email or password for this user";
@@ -855,7 +855,7 @@ function main(in mode) {
 			nusers = RECORD.f(1).count(VM) + (RECORD.f(1) ne "");
 			for (usern = 1; usern <= nusers; ++usern) {
 				var temp = RECORD.f(1, usern);
-				if (temp eq "" or temp.index("---")) {
+				if (temp eq "" or temp.contains("---")) {
 					RECORD(1, usern) = "---";
 					RECORD(2, usern) = "---";
 				}
@@ -973,7 +973,7 @@ function main(in mode) {
 		for (usern = 1; usern <= nusers; ++usern) {
 			userx = usercodes.f(1, usern);
 
-			if (not(userx.index("---"))) {
+			if (not(userx.contains("---"))) {
 
 				//get the original and current system records
 				sysrec = RECORD.f(4, usern, 2);
@@ -1097,8 +1097,8 @@ function main(in mode) {
 		nusers = usercodes.count(VM) + (usercodes ne "");
 		for (usern = 1; usern <= nusers; ++usern) {
 			userx = usercodes.f(1, usern);
-			if (not(userx.index("---"))) {
-				if (userx and not(userx.index("EXODUS"))) {
+			if (not(userx.contains("---"))) {
+				if (userx and not(userx.contains("EXODUS"))) {
 					if (not(RECORD.f(1).locate(userx, temp))) {
 						if (userrec.read(users, userx)) {
 							if (users) {
@@ -1151,7 +1151,7 @@ function main(in mode) {
 					var ccaddress = replyto;
 
 					//also inform accounts although cancelled users are not emailed to accounts
-					if (not((toaddress ^ ccaddress).index("accounts@neosys.com"))) {
+					if (not((toaddress ^ ccaddress).contains("accounts@neosys.com"))) {
 						if (ccaddress) {
 							ccaddress ^= ";";
 						}
@@ -1612,7 +1612,7 @@ subroutine cleartemp() {
 
 subroutine getemailtx() {
 	//dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
-	if ((userrec.f(7).ucase().index("@EXODUS.COM") and (SYSTEM.f(17, 1).substr(-5) ne "_test")) and not(var("exodus.id").osfile())) {
+	if ((userrec.f(7).ucase().contains("@EXODUS.COM") and (SYSTEM.f(17, 1).substr(-5) ne "_test")) and not(var("exodus.id").osfile())) {
 		return;
 	}
 

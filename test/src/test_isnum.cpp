@@ -3,6 +3,8 @@
 
 #include <exodus/program.h>
 
+// clang-format off
+
 #define LOOPS 1
 programinit()
 
@@ -161,28 +163,28 @@ programinit()
 		assert(!var("+").isnum());
 		assert(!var("-").isnum());
 		assert(!var(".").isnum());
-		assert(var("9").isnum());
+		assert( var("9").isnum());//
 
 		//2
 		assert(!var("++").isnum());
 		assert(!var("+-").isnum());
 		assert(!var("+.").isnum());
-		assert(var("+9").isnum());
+		assert( var("+9").isnum());//
 
 		assert(!var("-+").isnum());
 		assert(!var("--").isnum());
 		assert(!var("-.").isnum());
-		assert(var("-9").isnum());
+		assert( var("-9").isnum());//
 
 		assert(!var(".+").isnum());
 		assert(!var(".-").isnum());
 		assert(!var("..").isnum());
-		assert(var(".9").isnum());
+		assert( var(".9").isnum());//
 
 		assert(!var("9+").isnum());
 		assert(!var("9-").isnum());
-		assert(var("9.").isnum());
-		assert(var("99").isnum());
+		assert( var("9.").isnum());//
+		assert( var("99").isnum());//
 
 		//3
 		assert(!var("+++").isnum());
@@ -196,11 +198,11 @@ programinit()
 		assert(!var("+.+").isnum());
 		assert(!var("+.-").isnum());
 		assert(!var("+..").isnum());
-		assert(var("+.9").isnum());
+		assert( var("+.9").isnum());//
 		assert(!var("+9+").isnum());
 		assert(!var("+9-").isnum());
-		assert(var("+9.").isnum());
-		assert(var("+99").isnum());
+		assert( var("+9.").isnum());//
+		assert( var("+99").isnum());//
 
 		assert(!var("-++").isnum());
 		assert(!var("-+-").isnum());
@@ -213,11 +215,11 @@ programinit()
 		assert(!var("-.+").isnum());
 		assert(!var("-.-").isnum());
 		assert(!var("-..").isnum());
-		assert(var("-.9").isnum());
+		assert( var("-.9").isnum());//
 		assert(!var("-9+").isnum());
 		assert(!var("-9-").isnum());
-		assert(var("-9.").isnum());
-		assert(var("-99").isnum());
+		assert( var("-9.").isnum());//
+		assert( var("-99").isnum());//
 
 		assert(!var(".++").isnum());
 		assert(!var(".+-").isnum());
@@ -234,7 +236,7 @@ programinit()
 		assert(!var(".9+").isnum());
 		assert(!var(".9-").isnum());
 		assert(!var(".9.").isnum());
-		assert(var(".99").isnum());
+		assert( var(".99").isnum());//
 
 		assert(!var("9++").isnum());
 		assert(!var("9+-").isnum());
@@ -247,11 +249,11 @@ programinit()
 		assert(!var("9.+").isnum());
 		assert(!var("9.-").isnum());
 		assert(!var("9..").isnum());
-		assert(var("9.9").isnum());
+		assert( var("9.9").isnum());//
 		assert(!var("99+").isnum());
 		assert(!var("99-").isnum());
-		assert(var("99.").isnum());
-		assert(var("999").isnum());
+		assert( var("99.").isnum());//
+		assert( var("999").isnum());//
 
 		//4
 		assert(!var("++++").isnum());
@@ -301,7 +303,7 @@ programinit()
 		assert(!var("+.9+").isnum());
 		assert(!var("+.9-").isnum());
 		assert(!var("+.9.").isnum());
-		assert(var("+.99").isnum());
+		assert( var("+.99").isnum());//
 		assert(!var("+9++").isnum());
 		assert(!var("+9+-").isnum());
 		assert(!var("+9+.").isnum());
@@ -313,11 +315,11 @@ programinit()
 		assert(!var("+9.+").isnum());
 		assert(!var("+9.-").isnum());
 		assert(!var("+9..").isnum());
-		assert(var("+9.9").isnum());
+		assert( var("+9.9").isnum());//
 		assert(!var("+99+").isnum());
 		assert(!var("+99-").isnum());
-		assert(var("+99.").isnum());
-		assert(var("+999").isnum());
+		assert( var("+99.").isnum());//
+		assert( var("+999").isnum());//
 
 		assert(!var("-+++").isnum());
 		assert(!var("-++-").isnum());
@@ -366,7 +368,7 @@ programinit()
 		assert(!var("-.9+").isnum());
 		assert(!var("-.9-").isnum());
 		assert(!var("-.9.").isnum());
-		assert(var("-.99").isnum());
+		assert( var("-.99").isnum());//
 		assert(!var("-9++").isnum());
 		assert(!var("-9+-").isnum());
 		assert(!var("-9+.").isnum());
@@ -378,11 +380,11 @@ programinit()
 		assert(!var("-9.+").isnum());
 		assert(!var("-9.-").isnum());
 		assert(!var("-9..").isnum());
-		assert(var("-9.9").isnum());
+		assert( var("-9.9").isnum());//
 		assert(!var("-99+").isnum());
 		assert(!var("-99-").isnum());
-		assert(var("-99.").isnum());
-		assert(var("-999").isnum());
+		assert( var("-99.").isnum());//
+		assert( var("-999").isnum());//
 
 		assert(!var(".+++").isnum());
 		assert(!var(".++-").isnum());
@@ -447,7 +449,7 @@ programinit()
 		assert(!var(".99+").isnum());
 		assert(!var(".99-").isnum());
 		assert(!var(".99.").isnum());
-		assert(var(".999").isnum());
+		assert( var(".999").isnum());//
 
 		assert(!var("9+++").isnum());
 		assert(!var("9++-").isnum());
@@ -496,7 +498,7 @@ programinit()
 		assert(!var("9.9+").isnum());
 		assert(!var("9.9-").isnum());
 		assert(!var("9.9.").isnum());
-		assert(var("9.99").isnum());
+		assert( var("9.99").isnum());//
 		assert(!var("99++").isnum());
 		assert(!var("99+-").isnum());
 		assert(!var("99+.").isnum());
@@ -508,11 +510,11 @@ programinit()
 		assert(!var("99.+").isnum());
 		assert(!var("99.-").isnum());
 		assert(!var("99..").isnum());
-		assert(var("99.9").isnum());
+		assert( var("99.9").isnum());//
 		assert(!var("999+").isnum());
 		assert(!var("999-").isnum());
-		assert(var("999.").isnum());
-		assert(var("9999").isnum());
+		assert( var("999.").isnum());//
+		assert( var("9999").isnum());//
 
 		//various hand coded negatives
 

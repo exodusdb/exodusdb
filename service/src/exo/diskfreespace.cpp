@@ -4,7 +4,7 @@ libraryinit()
 function main(in path0) {
 
 	var path;
-	if (path0.unassigned() or path0.index(":") or not(path0))
+	if (path0.unassigned() or path0.contains(":") or not(path0))
 		// case we are presented with a DOS path
 		path=".";
 	else

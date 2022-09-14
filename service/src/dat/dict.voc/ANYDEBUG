@@ -5,7 +5,7 @@ S
 
 
 
-	if (var("*$").index(ID[1])) {\
+	if (var("*$").contains(ID[1])) {\
 		return 0;\
 	}\
 	if (ID eq "DEBUG") {\
@@ -27,13 +27,13 @@ S
 	//upper=@record\
 	//convert @lower.case to @upper.case in upper\
 \
-	if (RECORD.index("debug")) {\
+	if (RECORD.contains("debug")) {\
 		return 1;\
 	}\
 	if (ID eq "SENDMAIL") {\
 		RECORD.converter("'EXODUS.ID'", "");\
 	}\
-	if (RECORD.index("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {\
+	if (RECORD.contains("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {\
 		return 1;\
 	}\
 	return 0;

@@ -15,7 +15,7 @@ function main() {
 		//stop();
 	}
 
-	bool caseinsensitive = OPTIONS.index("I");
+	bool caseinsensitive = OPTIONS.contains("I");
 	if (caseinsensitive)
 		reqtext.lcaser();
 
@@ -31,7 +31,7 @@ function main() {
 
 	for (var filename : filenames) {
 
-		if (filename.contains("preselect") or filename.index("select_stage2"))
+		if (filename.contains("preselect") or filename.contains("select_stage2"))
 			continue;
 
 		// filter by reqfilename. "-" means all files
@@ -65,7 +65,7 @@ function main() {
 				ID.lcaser();
 			}
 
-			if (not RECORD.index(reqtext) and not ID.index(reqtext)) {
+			if (not RECORD.contains(reqtext) and not ID.contains(reqtext)) {
 				continue;
 			}
 

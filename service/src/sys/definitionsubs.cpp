@@ -251,7 +251,7 @@ unlockdefinitions:
 			}
 
 			//prevent update or delete of EXODUS definitions
-			if ((win.wlocked and RECORD.f(8).index("EXODUS")) and not(USERNAME.index("EXODUS"))) {
+			if ((win.wlocked and RECORD.f(8).contains("EXODUS")) and not(USERNAME.contains("EXODUS"))) {
 preventupdate:
 				win.wlocked = 0;
 				xx = unlockrecord("DEFINITIONS", win.srcfile, ID);

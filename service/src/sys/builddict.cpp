@@ -105,7 +105,7 @@ subroutine writedict() {
 
 	block.lowerer().trimmerb(VM);
 
-	if (not block.index("function main()"))
+	if (not block.contains("function main()"))
 		block ^= VM ^ "\treturn ANS;";
 
 	// blockid may be followed by |1|7 for example
@@ -185,7 +185,7 @@ subroutine writedict() {
 	//			print("press any key:");
 	//			osflush();
 	//			xx.inputn(1);
-	//			if (var("Qq").index(xx)) {
+	//			if (var("Qq").contains(xx)) {
 	//				stop();
 	//			}
 				printl("---------- NEW ", dictid, " ----------");
@@ -193,11 +193,11 @@ subroutine writedict() {
 				print("Update (y=yes, q=quit, a=all, n=no)");
 				osflush();
 				ans.inputn(1);
-				if (var("Qq").index(ans)) {
+				if (var("Qq").contains(ans)) {
 					printl();
 					stop();
 				}
-				if (var("Aa").index(ans)) {
+				if (var("Aa").contains(ans)) {
 					ans = "Y";
 					doall = "Y";
 				}

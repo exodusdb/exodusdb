@@ -18,7 +18,7 @@ programinit()
 	//		 ^ FM ^ connect("exodus").listfiles();
 
 	for (var filename : filenames.unique()) {
-		if (filename.index("xo_")) {
+		if (filename.contains("xo_")) {
 			printl("Deleting", filename);
 			deletefile(filename);
 		}

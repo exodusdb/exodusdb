@@ -196,7 +196,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 //		//check for corruption in system record
 //		//if index(system,char(0),1) then
-//		if (SYSTEM.index(var().chr(0))) {
+//		if (SYSTEM.contains(var().chr(0))) {
 //			var(SYSTEM).oswrite("system.bad");
 //			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
 //			ANS = "CORRUPTSYSTEM";
@@ -500,7 +500,7 @@ nextpatch:;
 				if (s23.locate("TRAINING", xx)) {
 					username ^= "*";
 				} else {
-					if (s17.index("test")) {
+					if (s17.contains("test")) {
 						username ^= "*";
 					}
 				}
@@ -619,16 +619,16 @@ getvalues:
 
 		}
 
-		if (request_.index("RECORD")) {
+		if (request_.contains("RECORD")) {
 			iodat_ = invertarray(USER1, 1);
 
-		} else if (USER0.index("XML")) {
+		} else if (USER0.contains("XML")) {
 			if (iodat_) {
 				call htmllib2("STRIPTAGS", USER1);
 				iodat_.swapper(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
 				USER1.splicer(1, 0, "<record><" ^ fieldname ^ ">");
 				iodat_ ^= "</" ^ fieldname ^ ">" "</record>";
-				if (USER1.index(VM)) {
+				if (USER1.contains(VM)) {
 					iodat_.swapper("</" ^ fieldname ^ ">", "</STOPPED>");
 					USER1.swapper(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
@@ -653,7 +653,7 @@ getvalues:
 		var options = request5;
 		var maxnrecs = request6;
 
-		if (not(sortselect.index("%SELECTLIST%"))) {
+		if (not(sortselect.contains("%SELECTLIST%"))) {
 			clearselect();
 		}
 
@@ -825,7 +825,7 @@ nextlock:
 			call oswrite("", request3);
 
 			//stop server
-			if (request2.index("ALL")) {
+			if (request2.contains("ALL")) {
 				call oswrite("", request4);
 			}
 
@@ -855,7 +855,7 @@ nextlock:
 				USER3 = "OK";
 			}
 
-			if (request2.index("ALL")) {
+			if (request2.contains("ALL")) {
 				request4.osremove();
 			}
 		}
@@ -886,7 +886,7 @@ nextlock:
 
 		call sysmsg(response_, "EXODUS Backup");
 
-		if (USER3.ucase().index("SUCCESS")) {
+		if (USER3.ucase().contains("SUCCESS")) {
 			response_.splicer(1, 0, "OK ");
 		}
 
@@ -930,7 +930,7 @@ subroutine fileaccesscheck(in filename) {
 			//specifically allowed
 			if (not(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msg2, ""))) {
 				//if there is an authorised dictionary item then leave it up to that
-				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).index("ALLOWPARTIALACCESS"))) {
+				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).contains("ALLOWPARTIALACCESS"))) {
 					response_ = msg_;
 					return;
 				}
@@ -962,7 +962,7 @@ subroutine deleteoldfiles() {
 	if (filespec.substr(-2, 2) eq ".*") {
 		var tdir = "/data/";
 		tdir.converter("/", OSSLASH);
-		if (not(filespec.index(tdir))) {
+		if (not(filespec.contains(tdir))) {
 			return;
 		}
 	}
@@ -1000,7 +1000,7 @@ nextfiles:
 				//and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
-				if (((filename.substr(-4, 4)).index(".")) and filetime le deletetime) {
+				if (((filename.substr(-4, 4)).contains(".")) and filetime le deletetime) {
 deleteit:
 					filename.osremove();
 				} else {

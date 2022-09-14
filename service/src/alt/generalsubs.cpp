@@ -175,14 +175,14 @@ subroutine getdatasets() {
 	//convert dos text to revelation format and standardise
 	directory.ucaser();
 	//DIRECTORY=TRIM(DIRECTORY[1,\1A\]);*DOS TEXT EOF IS CONTROL-Z
-	var dosformat = directory.index(var().chr(13));
+	var dosformat = directory.contains(var().chr(13));
 	directory.converter(" " ^ FM ^ "\r\n", FM ^ " " " " " ");
 	directory.trimmer();
 	directory.converter(" " ^ FM, FM ^ " ");
 	var nvols = directory.count(FM) + 1;
 
 	datasetparams = directory.f(1);
-	if (not(datasetparams.index(","))) {
+	if (not(datasetparams.contains(","))) {
 		//CALL MSG('LINE 1 OF THE DOS FILE ':DOS.FILENAME:' IS INVALID')
 		//STOP
 	}

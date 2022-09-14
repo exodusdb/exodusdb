@@ -156,16 +156,16 @@ void var::initrnd() const {
 	thread_RNG = std::make_unique<RNG_typ>(seed);
 }
 
-bool var::osgetenv(const char* envvarname) {
+bool var::osgetenv(const char* envcode) {
 
-	THISIS("bool var::osgetenv(const char* envvarname)")
+	THISIS("bool var::osgetenv(const char* envcode)")
 	assertDefined(function_sig);
 	//assertStringMutator(function_sig);
-	//ISSTRING(envvarname)
+	//ISSTRING(envcode)
 
-	// return whole environment if blank envvarname
-	//if (envvarname.var_str.empty()) {
-	if (*envvarname == 0) {
+	// return whole environment if blank envcode
+	//if (envcode.var_str.empty()) {
+	if (*envcode == 0) {
 
 		var_str.clear();
 		//var_typ = VARTYP_STR;
@@ -184,8 +184,8 @@ bool var::osgetenv(const char* envvarname) {
 
 	//TIP if you cant seem to osgetenv vars set in bash, then ensure you set them in bash with "export"
 
-	//const char* cvalue = std::getenv(envvarname.var_str.c_str());
-	const char* cvalue = std::getenv(envvarname);
+	//const char* cvalue = std::getenv(envcode.var_str.c_str());
+	const char* cvalue = std::getenv(envcode);
 	if (cvalue == 0) {
 		var_str.clear();
 		var_typ = VARTYP_STR;
@@ -199,11 +199,11 @@ bool var::osgetenv(const char* envvarname) {
 	return true;
 }
 
-bool var::ossetenv(const char* envvarname) const {
+bool var::ossetenv(const char* envcode) const {
 
-	THISIS("bool var::ossetenv(const char* envvarname) const")
+	THISIS("bool var::ossetenv(const char* envcode) const")
 	assertString(function_sig);
-	//ISSTRING(envvarname)
+	//ISSTRING(envcode)
 
 //#ifdef _MSC_VER
 #ifndef setenv
@@ -214,7 +214,7 @@ bool var::ossetenv(const char* envvarname) const {
 	// var("USING PUTENV").outputl();
 	// is this safe on windows??
 	// https://www.securecoding.cert.org/confluence/display/seccode/POS34-C.+Do+not+call+putenv()+with+a+pointer+to+an+automatic+variable+as+the+argument
-	//std::string tempstr = envvarname.toString();
+	//std::string tempstr = envcode.toString();
 	//tempstr += "=";
 	//tempstr += toString();
 	// var(tempstr).outputl("temp std:string");
@@ -232,10 +232,10 @@ bool var::ossetenv(const char* envvarname) const {
 	//char winenv[1024];
 	size_t maxenv = 1024;
 	char* env = reinterpret_cast<char*>(malloc(maxenv));
-	//snprintf(env, 1024, "%s=%s", envvarname.var_str.c_str(), var_str.c_str());
-	//snprintf(env, 1024, "%s=%s", envvarname, var_str.c_str());
-	//snprintf(env, sizeof(env), "%s=%s", envvarname, var_str.c_str());
-	snprintf(env, maxenv, "%s=%s", envvarname, var_str.c_str());
+	//snprintf(env, 1024, "%s=%s", envcode.var_str.c_str(), var_str.c_str());
+	//snprintf(env, 1024, "%s=%s", envcode, var_str.c_str());
+	//snprintf(env, sizeof(env), "%s=%s", envcode, var_str.c_str());
+	snprintf(env, maxenv, "%s=%s", envcode, var_str.c_str());
 	//std::cout << winenv;
 	int result = putenv(env);
 
@@ -245,8 +245,8 @@ bool var::ossetenv(const char* envvarname) const {
 		return false;
 
 #else
-	var("setenv " ^ envvarname ^ "=" ^ (*this)).outputl();
-	return setenv(reinterpret_cast<char*>(envvarname.toString().c_str()), reinterpret_cast<char*>(toString().c_str()), 1);
+	var("setenv " ^ envcode ^ "=" ^ (*this)).outputl();
+	return setenv(reinterpret_cast<char*>(envcode.toString().c_str()), reinterpret_cast<char*>(toString().c_str()), 1);
 #endif
 }
 

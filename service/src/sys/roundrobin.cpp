@@ -83,7 +83,7 @@ function main(in mode, in params, io result, io msg) {
 		if (not(roundrobin.read(roundrobinfile, roundrobinkey_))) {
 			roundrobin = "";
 		}
-		if (roundrobin.index(var().chr(0))) {
+		if (roundrobin.contains(var().chr(0))) {
 			roundrobin.converter(var().chr(0), "");
 			var(var().date() ^ FM ^ var().time()).oswrite("rrobin");
 		}
@@ -123,7 +123,7 @@ function main(in mode, in params, io result, io msg) {
 
 		//garbagecollect;
 
-		if (roundrobin.index(var().chr(0))) {
+		if (roundrobin.contains(var().chr(0))) {
 			roundrobin.converter(var().chr(0), "");
 			var(var().date() ^ FM ^ var().time()).oswrite("RRW");
 		}

@@ -346,7 +346,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	var functionname = field(functionname_and_args, "(", 1).lcase();
 	var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
 	oldfunction.substrer(oldfunction.index("\n") + 1);
-	if (oldfunction and not functionsql.index(oldfunction)) {
+	if (oldfunction and not functionsql.contains(oldfunction)) {
 		reindexrequired = true;
 		//TRACE(functionsql)
 		//TRACE(oldfunction)
@@ -750,7 +750,7 @@ $RETVAR := array_to_string
 							}
 						}
 					}
-					if (not dictrec.f(8).index("/" "*pgsql")) {
+					if (not dictrec.f(8).contains("/" "*pgsql")) {
 						errmsg ^= target_dictfilename ^ " " ^ target_expr.quote() ^ " item does not have a pgsql section.";
 						errmsg.errputl();
 						errors ^= "\n" ^ errmsg;
@@ -839,7 +839,7 @@ COST 10;
 
 	// Remove unnecessary declaration of temp_xlate_key
 	// from the above standard sql template if not needed
-	if (not sql.index("temp_xlate_key") ) {
+	if (not sql.contains("temp_xlate_key") ) {
 		sqltemplate.swapper("\n temp_xlate_key text;","");
 	}
 

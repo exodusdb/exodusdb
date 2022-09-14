@@ -734,7 +734,7 @@ programinit()
 			assert(conn1.createfile(uniquefilename));
 
 			//file exists in connection's listfiles
-			assert(conn1.listfiles().index(uniquefilename.lcase()));
+			assert(conn1.listfiles().contains(uniquefilename.lcase()));
 
 			//file can be opened via the connection
 			//assert(open(uniquefilename, conn1));
@@ -790,7 +790,7 @@ programinit()
 			assert(conn1.createfile(uniquefilename));
 
 			//file exists in connection's listfiles
-			assert(conn1.listfiles().index(uniquefilename.lcase()));
+			assert(conn1.listfiles().contains(uniquefilename.lcase()));
 
 			//file can be opened via the connection
 			//assert(open(uniquefilename, conn1));

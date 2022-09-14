@@ -54,14 +54,14 @@ function main() {
 	var dirnames = COMMAND.field(FM, 3, 999999);
 
 	var force = index(OPTIONS, "F");
-	var generate_dict_cpp = index(OPTIONS, "G");
+	var generate = index(OPTIONS, "G");
 	var verbose = index(OPTIONS, "V");
 
 	var txtfmt = "TX";
 
 	// Skip if no definitions file
 	var definitions;
-	if (not open("DEFINITIONS",definitions)) {
+	if (generate or not open("DEFINITIONS", definitions)) {
 		//abort("Error: sync_dat - No DEFINITIONS file");
 		definitions = "";
 	}
@@ -69,7 +69,7 @@ function main() {
 	// Get the date and time of last sync
 	var last_sync;
 	var definitions_key = "LAST_SYNC_DATE_TIME*DAT";
-	if (not definitions or not read(last_sync,definitions, definitions_key))
+	if (not definitions or not read(last_sync, definitions, definitions_key))
 		last_sync = "";
 	last_sync_date = last_sync.f(1);
 	last_sync_time = last_sync.f(2);
@@ -85,23 +85,26 @@ function main() {
 			printl(dirtext, "No change.");
 		return 0;
 	}
-	printl(dirtext,"Scanning ...");
+	printl(THREADNO ^ ":", "Scanning", dirtext);
 
 	begintrans();
 
 	// Process each subdir in turn. each one represents a db file.
 	if (not dirnames) {
-		dirnames = oslistd(datpath ^ "/*").sort();
+		dirnames = oslistd(datpath ^ "/" "*").sort();
 	}
+	//printl(THREADNO ^ ":", "Scanning", dirnames.convert(FM, "^"));
+
 	for (var dirname : dirnames) {
 
 		var dirpath = datpath ^ "/" ^ dirname ^ "/";
 
+// Dont skip old dirs, since we skip old files below , and it doesnt take much time to scan dirs
 //		// Skip dirs which are not newer i.e. have no newer records
-//		if (not force) {
+//		if (not force and not generate) {
 //			var dirinfo = osdir(dirpath);
 //			if (not is_newer(dirinfo)) {
-//				if (verbose)
+//				//if (verbose)
 //					printl("Nothing new in", dirpath, dirinfo.f(2).oconv("D-Y"), dirinfo.f(3).oconv("MTS"));
 //				continue;
 //			}
@@ -118,10 +121,11 @@ function main() {
 			}
 		}
 
-		var add2cpp = generate_dict_cpp and dbfilename.starts("dict.");
+		var isdict = dbfilename.starts("dict.");
 		var newcpptext = "#include <exodus/library.h>\n";
 
 		// Process each dat file/record in the subdir
+		//printl(THREADNO ^ ":", dirpath);
 		var osfilenames = oslistf(dirpath ^ "*").sort();
 		for (var osfilename : osfilenames) {
 
@@ -143,8 +147,11 @@ function main() {
 			// unescape to convert from txt to pickos format.
 			RECORD = RECORD.iconv(txtfmt);
 
+			// RECORD may be empty indicating that it should be deleted
+			// if present in the target dbfile
+
 			// Add it to newcpptext
-			if (add2cpp and RECORD.f(1) eq "S") {
+			if (generate and isdict and RECORD.f(1) eq "S") {
 
 				// dict intro
 				var line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
@@ -155,7 +162,7 @@ function main() {
 				dictsrc.converter(VM, "\n");
 
 				// Add dict function intro
-				var addfunctionmain = not dictsrc.index("function main()");
+				var addfunctionmain = not dictsrc.contains("function main()");
 				if (addfunctionmain) {
 					newcpptext ^= "function main() {\n";
 
@@ -182,50 +189,71 @@ function main() {
 				// dict outro
 				newcpptext ^= "libraryexit(" ^ ID.lcase() ^ ")\n\n";
 
-			}
+			} // generate and isdict and S item
 
-			// Skip files/records which are not newer
-			if (not force and not is_newer(osfile(filepath))) {
-				if (verbose)
-					printl("Not newer", dbfilename, ID);
-				continue;
-			}
+			if (not generate) {
 
-			// Moved up so we can generate complete dict_xxxxxxxx.cpp source
-			//if (not osread(RECORD from filepath)) {
-			//	errputl("Error: sync_dat cannot read " ^ ID ^ " from " ^ filepath);
-			//	continue;
-			//}
-			//gosub unescape_text(RECORD);
+				// Skip on dir date time above
 
-			//get any existing record
-			var oldrecord;
-			if (not read(oldrecord from dbfile, ID)) {
-				oldrecord = "";
-			}
+				// Skip files/records which are not newer
+				// because reloading pg functions in slow
+				// to force updates, perhaps touch dat dat/* and dat/*/*
+				if (not force and not is_newer(osfile(filepath))) {
+					if (verbose)
+						printl("Not newer", dbfilename, ID);
+					continue;
+				}
 
-			if (RECORD eq oldrecord) {
-				if (verbose)
-					printl("Not changed", dbfilename, ID);
-			} else {
-				// Write the RECORD
-				write(RECORD on dbfile, ID);
-				printl("sync_dat:", dbfilename, ID, "WRITTEN");
-			}
+				// Moved up so we can generate complete dict_xxxxxxxx.cpp source
+				//if (not osread(RECORD from filepath)) {
+				//	errputl("Error: sync_dat cannot read " ^ ID ^ " from " ^ filepath);
+				//	continue;
+				//}
+				//gosub unescape_text(RECORD);
 
-			// Create pgsql using dict2sql
-			// DONT SKIP SINCE PGSQL FUNCTIONS MUST BE IN EVERY DATABASE
-			if (dbfilename.starts("dict.") and RECORD.index("/" "*pgsql")) {
-				var cmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
-				//cmd ^= " {V}";
-				if (not osshell(cmd))
-					errputl("Error: sync_dat: In dict2sql for " ^ ID ^ " in " ^ dbfilename);
-			}
+				//get any existing record
+				var oldrecord;
+				if (not read(oldrecord from dbfile, ID)) {
+					oldrecord = "";
+				}
 
+				if (RECORD eq oldrecord) {
+					if (RECORD.len() eq 0) {
+						// Delete the RECORD again
+						deleterecord(dbfile, ID);
+						printl("sync_dat:", dbfilename, ID, "DELETED");
+					} else {
+						if (verbose)
+							printl("Not changed", dbfilename, ID);
+					}
+				} else {
+					if (RECORD.len() eq 0) {
+						// Write the RECORD
+						write(RECORD on dbfile, ID);
+						printl("sync_dat:", dbfilename, ID, "WRITTEN");
+					} else {
+						// Delete the RECORD
+						deleterecord(dbfile, ID);
+						printl("sync_dat:", dbfilename, ID, "DELETED");
+					}
+				}
+
+				// Create pgsql using dict2sql
+				// DONT SKIP SINCE PGSQL FUNCTIONS MUST BE IN EVERY DATABASE
+				if (dbfilename.starts("dict.") and RECORD.contains("/" "*pgsql")) {
+					var cmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
+					//cmd ^= " {V}";
+					if (not osshell(cmd))
+						errputl("Error: sync_dat: In dict2sql for " ^ ID ^ " in " ^ dbfilename);
+				}
+
+			} // of not generate
 
 		} // next dat file
 
-		if (add2cpp) {
+		// Store and compile the generated dict_xxxxxxx.cpp text
+		if (generate and isdict) {
+
 			var dictcppfilename = "dict_" ^ dirname;
 
 			var incfilename = homedir ^ "/inc/" ^ dbfilename.convert(".", "_") ^ ".h";
@@ -243,7 +271,9 @@ function main() {
 				oldcpptext = "";
 
 			// Update
-			if (newcpptext ne oldcpptext) {
+			if (newcpptext eq oldcpptext) {
+				printl("Already up to date", dictcppfilename);
+			} else {
 				//if (not oswrite(newcpptext on dbfilename))
 				if (not oswrite(newcpptext on dictcppfilename))
 					abort("sync_dat cannot write " ^ dictcppfilename);
@@ -257,12 +287,13 @@ function main() {
 				if (not osshell(cmd))
 					abort("sync_dat could not compile " ^ dictcppfilename);
 			}
-		}
+
+		} // of store and compile generated cpp file
 
 	} // next dat dir
 
 	// Record the current sync date and time
-	if (definitions)
+	if (not generate and definitions)
 		write(date() ^ FM ^ time() on definitions, definitions_key);
 
 	committrans();

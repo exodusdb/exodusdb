@@ -303,7 +303,7 @@ function main() {
 	//TRACE(SENTENCE)
 	//TRACE(COMMAND)
 
-	if (TERMINAL and not OPTIONS.index("N")) {
+	if (TERMINAL and not OPTIONS.contains("N")) {
 		// Switch off TERMINAL
 		var oscmd = "TERM=";
 
@@ -780,7 +780,7 @@ nextkey:
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limitx) {
-					if ((DQ ^ "'").index(word[1])) {
+					if ((DQ ^ "'").contains(word[1])) {
 						if (word[1] eq word[-1]) {
 							word = word.substr(2, word.len() - 2);
 						}
@@ -876,7 +876,7 @@ nextkey:
 
 		gosub getquotedword2();
 
-		if ((DQ ^ "'").index(nextword[1])) {
+		if ((DQ ^ "'").contains(nextword[1])) {
 			title = word;
 			gosub getquotedword2();
 			value = word;
@@ -995,7 +995,7 @@ nextkey:
 
 	} else if (word eq "EMAIL_CC") {
 		gosub getword();
-		if ((DQ ^ "'").index(word[1])) {
+		if ((DQ ^ "'").contains(word[1])) {
 			emailcc = word.substr(2, word.len() - 2);
 			nextemailcc = emailcc;
 		} else {
@@ -1004,7 +1004,7 @@ nextkey:
 
 	} else if (word eq "EMAIL_SUBJECT") {
 		gosub getword();
-		if ((DQ ^ "'").index(word[1])) {
+		if ((DQ ^ "'").contains(word[1])) {
 			emailsubject = word.substr(2, word.len() - 2);
 			nextemailsubject = emailsubject;
 		} else {
@@ -1013,7 +1013,7 @@ nextkey:
 
 	} else if (dictrec) {
 
-		if (var("FSDIA").index(dictrec.f(1))) {
+		if (var("FSDIA").contains(dictrec.f(1))) {
 
 			//pick format dictionary
 			//if index('DI',dictrec<1>,1) then
@@ -1113,7 +1113,7 @@ nextkey:
 						for (tt += 1; tt <= 9999; ++tt) {
 							charx = word[tt];
 							///BREAK;
-							if (not(charx.len() and var("0123456789,").index(charx)))
+							if (not(charx.len() and var("0123456789,").contains(charx)))
 								break;
 							tt2 ^= charx;
 						};	//tt;
@@ -1434,7 +1434,7 @@ x1exit:
 	} else {
 		while (true) {
 			///BREAK;
-			if (not(colhdg and ((" " ^ FM).index(colhdg[-1]))))
+			if (not(colhdg and ((" " ^ FM).contains(colhdg[-1]))))
 				break;
 			colhdg.splicer(-1, 1, "");
 		}  //loop;
@@ -2068,7 +2068,7 @@ subroutine getquotedword() {
 
 subroutine getquotedword2() {
 	gosub getword();
-	if (((DQ ^ "'").index(word[1])) and (word[1] eq word[-1])) {
+	if (((DQ ^ "'").contains(word[1])) and (word[1] eq word[-1])) {
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
 	} else {
@@ -2142,7 +2142,7 @@ getword2b:
 	//otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-	if (("'" ^ DQ).index(charx)) {
+	if (("'" ^ DQ).contains(charx)) {
 		searchchar = charx;
 	} else {
 		searchchar = " ";
@@ -2319,7 +2319,7 @@ subroutine printbreaks() {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 				//WARNING TODO: check ternary op following;
 				underline2 = leveln eq 1 ? underline : bar;
-				if (not((tx.substr(-2, 2)).index(ulchar))) {
+				if (not((tx.substr(-2, 2)).contains(ulchar))) {
 					if (tx[-1] ne FM) {
 						tx ^= FM;
 					}
@@ -2490,7 +2490,7 @@ subroutine printbreaks() {
 
 		//option to suppress the current level
 		//or if this is the first record cannot be any totals before it.
-		if ((not(anycell) or breakopts.f(leveln).index("X")) or recn eq 1) {
+		if ((not(anycell) or breakopts.f(leveln).contains("X")) or recn eq 1) {
 			tx = storetx;
 		}
 
@@ -2608,7 +2608,7 @@ subroutine emailing() {
 		return;
 	}
 
-	if ((DQ ^ "'").index(emailtoid[1])) {
+	if ((DQ ^ "'").contains(emailtoid[1])) {
 		nextemailto = emailtoid.substr(2, emailtoid.len() - 2);
 	} else {
 		nextemailto = calculate(emailtoid);
@@ -2646,7 +2646,7 @@ subroutine emailing() {
 		} else {
 			//tt3='EXODUS: ':field(head<1,1,1>,"'",1)
 			tt3 = head.f(1, 1, 1).field("'", 1);
-			if (tt3.index(">")) {
+			if (tt3.contains(">")) {
 				tt3 = field2(tt3, ">", -1);
 			}
 			tt3 = "EXODUS: " ^ tt3;

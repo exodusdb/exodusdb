@@ -369,23 +369,23 @@ programinit()
 
 		try {
 			--minint;
-			uncaught = "VarIntUnderflow";
-		} catch (VarIntUnderflow e) {
+			uncaught = "VarNumUnderflow";
+		} catch (VarNumUnderflow e) {
 		};
 		try {
 			++maxint;
-			uncaught = "VarIntUnderflow";
-		} catch (VarIntOverflow e) {
+			uncaught = "VarNumUnderflow";
+		} catch (VarNumOverflow e) {
 		};
 		try {
 			minint--;
-			uncaught = "VarIntUnderflow";
-		} catch (VarIntUnderflow e) {
+			uncaught = "VarNumUnderflow";
+		} catch (VarNumUnderflow e) {
 		};
 		try {
 			maxint++;
-			uncaught = "VarIntUnderflow";
-		} catch (VarIntOverflow e) {
+			uncaught = "VarNumUnderflow";
+		} catch (VarNumOverflow e) {
 		};
 
 		try {

@@ -25,7 +25,7 @@ function main(in type, in in0, in mode, out output) {
 
 	if (output[1] eq "-") {
 		if (mode eq "TD") {
-			if (var("1234567890").index(output[2])) {
+			if (var("1234567890").contains(output[2])) {
 				output = "<NOBR>" ^ output ^ "</NOBR>";
 			}
 		}
@@ -33,7 +33,7 @@ function main(in type, in in0, in mode, out output) {
 
 	//convert "&" to &amp; except if already &amp; &nbsp; etc.
 //	for (const var ii : range(1, 99999)) {
-//		var charn = output.index("&", ii);
+//		var charn = output.contains("&", ii);
 //
 //		///BREAK;
 //		if (not charn) break;
@@ -49,7 +49,7 @@ function main(in type, in in0, in mode, out output) {
 		if (not pos)
 			break;
 		var ss = _VM ^ output.substr(pos + 1, 10).field(";", 1) ^ _VM;
-		if (not precoded.index(ss)) {
+		if (not precoded.contains(ss)) {
 			output.splicer(pos + 1, 0, "amp;");
 			pos += 4;
 		}

@@ -398,6 +398,76 @@ programinit()
 		assert(not osfile(filename));
 	}
 
+	{
+
+		assert(oswrite("" on "t_qwe1.txt"));
+		assert(oswrite("" on "t_qwe2.txt"));
+
+		assert(oswrite("" on "t_qwe1.cpp"));
+		assert(oswrite("" on "t_qwe2.cpp"));
+
+		osrmdir("t_qwe1", true);
+		osrmdir("t_qwe2", true);
+		//assert(osmkdir("t_qwe1"));
+		//assert(osmkdir("t_qwe2"));
+		assert(osmkdir("t_qwe1/t_qwe1a"));
+		assert(osmkdir("t_qwe2/t_qwe2b"));
+
+		assert(oswrite("" on "t_qwe1/t_qwe3.cpp"));
+		assert(oswrite("" on "t_qwe1/t_qwe4.cpp"));
+
+		assert(oswrite("" on "t_qwe1/t_qwe1a/t_qwe5.cpp"));
+		assert(oswrite("" on "t_qwe1/t_qwe1a/t_qwe6.cpp"));
+
+		printl();
+		assert(oslistf("", "t_qwe*.cpp").sort() eq "t_qwe1.cpp^t_qwe2.cpp"_var);
+		assert(oslistf(".", "t_qwe*.cpp").sort() eq "t_qwe1.cpp^t_qwe2.cpp"_var);
+		assert(oslistf("./t_qwe*.cpp").sort() eq "t_qwe1.cpp^t_qwe2.cpp"_var);
+		assert(oslistf("t_qwe*.cpp").sort() eq "t_qwe1.cpp^t_qwe2.cpp"_var);
+		//assert(oslistf("t_qwe2.cpp").sort().outputl() eq "t_qwe2.cpp"_var);
+		assert(oslistf("").lower().locate("t_qwe1.cpp"));
+		assert(oslistf(".").lower().locate("t_qwe2.cpp"));
+
+		printl();
+		assert(oslistd("", "t_qwe*").sort() eq "t_qwe1^t_qwe2"_var);
+		assert(oslistd(".", "t_qwe*").sort() eq "t_qwe1^t_qwe2"_var);
+		assert(oslistd("./t_qwe*").sort() eq "t_qwe1^t_qwe2"_var);
+		assert(oslistd("t_qwe*").sort() eq "t_qwe1^t_qwe2"_var);
+		assert(oslistd("t_qwe1").sort() eq "t_qwe1a"_var);
+		assert(oslistd("t_qwe2").sort() eq "t_qwe2b"_var);
+		assert(oslistd("").lower().locate("t_qwe1"));
+		assert(oslistd(".").lower().locate("t_qwe2"));
+
+		assert(oslistf("t_qwe1/t_qwe1a/*.cpp").sort() eq "t_qwe5.cpp^t_qwe6.cpp"_var);
+		assert(oslistf("t_qwe1/t_qwe1a/").sort() eq "t_qwe5.cpp^t_qwe6.cpp"_var);
+		assert(oslistf("t_qwe1/t_qwe1a").sort() eq "t_qwe5.cpp^t_qwe6.cpp"_var);
+
+		assert(oslist("t_qwe1/t_qwe1a/*.cpp").sort() eq "t_qwe5.cpp^t_qwe6.cpp"_var);
+		assert(oslist("t_qwe1/t_qwe1a/").sort() eq "t_qwe5.cpp^t_qwe6.cpp"_var);
+		assert(oslist("t_qwe1/t_qwe1a").sort() eq "t_qwe5.cpp^t_qwe6.cpp"_var);
+
+		printl();
+		assert(oslist(".", "t_qwe*").sort() eq "t_qwe1^t_qwe1.cpp^t_qwe1.txt^t_qwe2^t_qwe2.cpp^t_qwe2.txt"_var);
+		assert(oslist("./t_qwe*").sort() eq "t_qwe1^t_qwe1.cpp^t_qwe1.txt^t_qwe2^t_qwe2.cpp^t_qwe2.txt"_var);
+		assert(oslist("t_qwe*").sort() eq "t_qwe1^t_qwe1.cpp^t_qwe1.txt^t_qwe2^t_qwe2.cpp^t_qwe2.txt"_var);
+
+		printl();
+		assert(oslistf("*.cpp") ne "");
+		assert(oslistd("*") ne "");
+		assert(oslist("*") ne "");
+
+		assert((oslistf() ^ FM ^ oslistd()).sort() eq oslist().outputl("oslist()==oslistf()^oslistd() = ").sort());
+
+		assert(oslistf() and oslistf() eq oslistf(""));
+		assert(oslistd() and oslistd() eq oslistd(""));
+		assert(oslist() and oslist() eq oslist(""));
+
+		assert(oslistf() eq oslistf("."));
+		assert(oslistd() eq oslistd("."));
+		assert(oslist() eq oslist("."));
+
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

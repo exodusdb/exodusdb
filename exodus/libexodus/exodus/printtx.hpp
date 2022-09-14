@@ -28,7 +28,7 @@ subroutine printtx() {
 		//if no printfile assume command mode and make an output file name
 		printfilename = SYSTEM.f(2);
 		if (html.unassigned()) {
-			html = printfilename.lcase().index(".htm");
+			html = printfilename.lcase().contains(".htm");
 		}
 		var ownprintfile = 0;
 		//if (printfilename == "") {

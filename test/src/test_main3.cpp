@@ -33,7 +33,7 @@ programinit()
 
 	{
 		// Check conversion of visible to internal field marks in user literals
-		assert("_^]}|~"_var eq _RM _FM _VM _SM _TM _ST);
+		assert("`^]}|~"_var eq _RM _FM _VM _SM _TM _ST);
 	}
 
 	{

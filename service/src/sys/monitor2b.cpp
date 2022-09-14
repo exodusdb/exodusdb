@@ -49,7 +49,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		wgetrc = "";
 		//look for local or cygwin wget.exe otherwise quit
 		//WARNING TODO: check ternary op following;
-		var exe = oscwd().index(":") ? ".exe" : "";
+		var exe = oscwd().contains(":") ? ".exe" : "";
 		cmd = SYSTEM.f(50) ^ "wget" ^ exe;
 		if (not(cmd.osfile())) {
 			httpsbug = 1;

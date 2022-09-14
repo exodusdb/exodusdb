@@ -35,8 +35,8 @@ function main() {
 	var testemail = sentencex.f(8);
 
 	var options = SENTENCE.field("(", 2);
-	var silent = options.index("S");
-	var overwrite = options.index("O");
+	var silent = options.contains("S");
+	var overwrite = options.contains("O");
 
 	if (options.contains("R")) {
 

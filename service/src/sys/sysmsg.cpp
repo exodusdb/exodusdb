@@ -188,7 +188,7 @@ function main(in msg0, in subject0="", in username0="") {
 		}
 		if (useremail) {
 			//if user email is not in the list of people being sent to then
-			if (emailaddrs.lcase().index(useremail)) {
+			if (emailaddrs.lcase().contains(useremail)) {
 				//body<-1>='Email:' l9:useremail
 			} else {
 				ccaddrs = useremail;

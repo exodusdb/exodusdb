@@ -599,7 +599,7 @@ function main() {
 		}
 		//search paths and convert to absolute filename
 		//SIMILAR CODE IN EDIC and COMPILE
-		if (not(osfile(srcfilename)) and not(srcfilename.index(OSSLASH))) {
+		if (not(osfile(srcfilename)) and not(srcfilename.contains(OSSLASH))) {
 			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
 			let npaths = fcount(paths, ":");
 			for (const var pathn : range(1, npaths -1)) {
@@ -615,7 +615,7 @@ function main() {
 
 		//also look in inc dir backlinks to source
 		//SIMILAR CODE IN EDIC and COMPILE
-		if (not(osfile(srcfilename)) and not(srcfilename.index(OSSLASH))) {
+		if (not(osfile(srcfilename)) and not(srcfilename.contains(OSSLASH))) {
 			var headerfilename = osgetenv("HOME") ^ OSSLASH ^ "inc" ^ OSSLASH ^ srcfilename;
 			// Try .h files for library subroutines first
 			headerfilename.fieldstorer(".", -1, 1, "h");
@@ -1287,7 +1287,7 @@ function main() {
 				for (var line : text) {
 
 					// Skip lines unlike "#include <printplans7.h>"
-					if (! line.index("#include"))
+					if (! line.contains("#include"))
 						continue;
 
 					// Acquire include file date/time

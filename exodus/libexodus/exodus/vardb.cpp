@@ -653,8 +653,8 @@ var build_conn_info(CVR conninfo) {
 
 	// otherwise search for details from exodus config file
 	// if incomplete connection parameters provided
-	if (not result.index("host=") or not result.index("port=") or not result.index("dbname=") or
-		not result.index("user=") or not result.index("password=")) {
+	if (not result.contains("host=") or not result.contains("port=") or not result.contains("dbname=") or
+		not result.contains("user=") or not result.contains("password=")) {
 
 		// discover any configuration file parameters
 		// TODO parse config properly instead of just changing \n\r to spaces!
@@ -723,7 +723,7 @@ bool var::connect(CVR conninfo) {
 	}
 
 	//add dbname= if missing
-	if (fullconninfo && !fullconninfo.index("="))
+	if (fullconninfo && !fullconninfo.contains("="))
 		fullconninfo = "dbname=" ^ fullconninfo.lcase();
 
 	fullconninfo = build_conn_info(fullconninfo);
@@ -1034,7 +1034,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	var tablename;
 	var schema;
 	var and_schema_clause;
-	if (normal_filename.index(".")) {
+	if (normal_filename.contains(".")) {
 		schema = normal_filename.field(".",1);
 		tablename = normal_filename.field(".",2,999);
 		and_schema_clause = " AND table_schema = " ^ schema.squote();
@@ -1554,7 +1554,7 @@ bool var::sqlexec(CVR sql) const {
 	if (!this->sqlexec(sql, response)) {
 		this->lasterror(response);
 		//skip table does not exist because it is very normal to check if table exists
-		//if ((true && !response.index("sqlstate:42P01")) || response.index("syntax") || DBTRACE)
+		//if ((true && !response.contains("sqlstate:42P01")) || response.contains("syntax") || DBTRACE)
 		//	response.logputl();
 
 		// For now, all sqlexec calls that do not accept a response have any error response sent to cerr
@@ -2313,7 +2313,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	var isinteger = conversion == "[NUMBER,0]" || dictrec.f(11) == "0N" ||
 					dictrec.f(11).substr(1, 3) == "0N_";
 	var isdecimal = conversion.substr(1, 2) == "MD" || conversion.substr(1, 7) == "[NUMBER" ||
-					dictrec.f(12) == "FLOAT" || dictrec.f(11).index("0N");
+					dictrec.f(12) == "FLOAT" || dictrec.f(11).contains("0N");
 	//dont assume things that are R are numeric
 	//eg period 1/19 is right justified but not numeric and sql select will crash if ::float8 is used
 	//||dictrec.f(9) == "R";
@@ -2436,7 +2436,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			var args = pgsql_line1.field(" ",2,99);
 			if (not args.len())
 				args = "key data";
-			else if (not args.index(" "))
+			else if (not args.contains(" "))
 				args ^= " data";
 
 			// The first and 2nd arguments can be SOME_DICTID otherwise
@@ -2604,7 +2604,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				xlatetargetfilename ^ ".key = " ^ xlatekeyexpression;
 			// only allow one join per file for now.
 			// TODO allow multiple joins to the same file via different keys
-			if (!joins.f(joinsectionn).index(join_part1))
+			if (!joins.f(joinsectionn).contains(join_part1))
 				joins.r(joinsectionn, -1, join_part1 ^ join_part2);
 
 			return sqlexpression;
@@ -2666,8 +2666,8 @@ exodus_call:
 		if (fieldname0[-1] == ":") {
 			var joinsectionn = 1;
 			var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
-			//if (!joins.f(joinsectionn).index(join))
-			if (!joins.index(join))
+			//if (!joins.f(joinsectionn).contains(join))
+			if (!joins.contains(join))
 				joins.r(joinsectionn, -1, join);
 		}
 
@@ -2714,7 +2714,7 @@ exodus_call:
 
 				// dont include more than once, in case order by and filter on the same
 				// field
-				if (!selects.f(1).index(sqlexpression))
+				if (!selects.f(1).contains(sqlexpression))
 					selects ^= ", " ^ sqlexpression;
 			} else {
 
@@ -2722,8 +2722,8 @@ exodus_call:
 				if (fieldname0[-1] == ":") {
 					var joinsectionn = 1;
 					var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
-					//if (!joins.f(joinsectionn).index(join))
-					if (!joins.index(join))
+					//if (!joins.f(joinsectionn).contains(join))
+					if (!joins.contains(join))
 						joins.r(joinsectionn, -1, join);
 				}
 
@@ -2787,7 +2787,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 
 	// grab multiple values (numbers or quoted words) into one list, separated by FM
 	//value chars are " ' 0-9 . + -
-	if (remainingwords && joinvalues && valuechars.index(word1[1])) {
+	if (remainingwords && joinvalues && valuechars.contains(word1[1])) {
 		word1 = SQ ^ word1.unquote().swap("'", "''") ^ SQ;
 
 		var nextword = remainingwords.field(" ", 1);
@@ -2804,7 +2804,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 		}
 
 		/*
-		while (nextword && valuechars.index(nextword[1])) {
+		while (nextword && valuechars.contains(nextword[1])) {
 			tosqlstring(nextword);
 			if (word1 != "")
 				word1 ^= FM_;
@@ -2826,7 +2826,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 		}
 		*/
 		nextword = getword(remainingwords, ucword);
-		if (nextword && valuechars.index(nextword[1])) {
+		if (nextword && valuechars.contains(nextword[1])) {
 			tosqlstring(nextword);
 			if (word1 != "")
 				word1 ^= FM_;
@@ -3180,12 +3180,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 							dictfile, word1, joins, unnests, selects, ismv, forsort);
-			//var usingnaturalorder = dictexpression.index("exodus_extract_sort") or dictexpression.index("exodus_natural");
+			//var usingnaturalorder = dictexpression.contains("exodus_extract_sort") or dictexpression.contains("exodus_natural");
 			var dictid = word1;
 
-			//var dictexpression_isarray=dictexpression.index("string_to_array(");
-			var dictexpression_isarray = dictexpression.index("_array(");
-			var dictexpression_isvector = dictexpression.index("to_tsvector(");
+			//var dictexpression_isarray=dictexpression.contains("string_to_array(");
+			var dictexpression_isarray = dictexpression.contains("_array(");
+			var dictexpression_isvector = dictexpression.contains("to_tsvector(");
 			//var dictexpression_isfulltext = dictid.substr(-5).ucase() == "_XREF";
 			var dictexpression_isfulltext = dictid.substr(-4).ucase() == "XREF";
 
@@ -3240,7 +3240,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				}
 
 				// check we have two values (in word1 and word2)
-				if (!valuechars.index(word1[1]) || !valuechars.index(word2[1])) {
+				if (!valuechars.contains(word1[1]) || !valuechars.contains(word2[1])) {
 					throw VarDBException(
 						sortselectclause ^
 						"BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)");
@@ -3462,7 +3462,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// word1 at this point may be empty, contain a value or be the first word of an unrelated clause
 			// if non-value word1 unrelated to current phrase
-			if (ucword.len() && !valuechars.index(ucword[1])) {
+			if (ucword.len() && !valuechars.contains(ucword[1])) {
 
 				// push back and treat as missing value
 				// remaining[1,0]=ucword:' '
@@ -3580,7 +3580,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//doesnt work on multivalued fields - results in:
 				//exodus_tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				//TODO work out better way of determining DATE/TIME that must be tested versus null
-				if (dictexpression.contains("FULLY_") || (!dictexpression.index("exodus_extract") && dictexpression.index("_DATE")))
+				if (dictexpression.contains("FULLY_") || (!dictexpression.contains("exodus_extract") && dictexpression.contains("_DATE")))
 					dictexpression ^= " is not null";
 				else
 					dictexpression = "exodus_tobool(" ^ dictexpression ^ ")";
@@ -3818,8 +3818,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// for date and time which are returned as null for empty string
 			else if (value == "''") {
 				if (dictexpression.contains("extract_date") ||
-					dictexpression.index("extract_datetime") ||
-					dictexpression.index("extract_time")) {
+					dictexpression.contains("extract_datetime") ||
+					dictexpression.contains("extract_time")) {
 					//if (op == "=")
 					//	op = "is";
 					//else
@@ -3830,7 +3830,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					dictexpression.swapper("extract_time(","extract_text(");
 				}
 				// currently number returns 0 for empty string
-				//|| dictexpression.index("extract_number")
+				//|| dictexpression.contains("extract_number")
 				else if (dictexpression.contains("extract_number")) {
 					//value = "'0'";
 					dictexpression.swapper("extract_number(","extract_text(");
@@ -4875,7 +4875,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	if (!this->sqlexec(sql, response)) {
 		//ERROR:  cannot create index on foreign table "clients"
 		//sqlstate:42809 CREATE INDEX index__suppliers__SEQUENCE_XREF ON suppliers USING GIN (to_tsvector('simple',dict_suppliers_SEQUENCE_XREF(suppliers.key, suppliers.data)))
-		if (!response.index("sqlstate:42809"))
+		if (!response.contains("sqlstate:42809"))
 			response.errputl();
 		return false;
 	}
@@ -5054,32 +5054,32 @@ var var::listindexes(CVR filename0, CVR fieldname0) const {
 	if (!get_mvresult(sql, mvresult, pgconn))
 		return "";
 
-	var tt;
-	var indexname;
-	var indexnames = "";
+	std::string indexnames = "";
 	int nindexes = PQntuples(mvresult);
 	var lc_fieldname = fieldname.lcase();
 	for (int indexn = 0; indexn < nindexes; indexn++) {
 		if (!PQgetisnull(mvresult, indexn, 0)) {
-			indexname = getpgresultcell(mvresult, indexn, 0);
-			if (indexname.substr(1, 6) == "index_") {
-				tt = indexname.index("__");
-				if (tt) {
+			var indexname = getpgresultcell(mvresult, indexn, 0);
+			if (indexname.starts("index_")) {
+				if (indexname.contains("__")) {
 					indexname.substrer(8, 999999).swapper("__", VM);
 					if (fieldname && indexname.f(1, 2) != lc_fieldname)
 						continue;
 
-					// indexnames^=FM^indexname;
-					var fn;
-					if (not indexnames.locateby("A", indexname, fn, 0))
-						indexnames.inserter(fn, indexname);
+					indexnames += indexname.var_str;
+					indexnames.push_back(FM_);
 				}
 			}
 		}
 	}
-	// indexnames.splicer(1,1,"");
 
-	return indexnames;
+	var result = "";
+	if (!indexnames.empty()) {
+		indexnames.pop_back();
+		result = std::move(indexnames);
+		result.sorter();
+	}
+	return result;
 }
 
 var var::reccount(CVR filename0) const {

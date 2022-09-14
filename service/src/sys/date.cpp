@@ -14,7 +14,7 @@ function main(in type, in in0, in mode0, out output, in glang) {
 		return 0;
 	}
 
-	var nospaces = mode.index("*");
+	var nospaces = mode.contains("*");
 	if (nospaces) {
 		mode.converter("*", "");
 	}

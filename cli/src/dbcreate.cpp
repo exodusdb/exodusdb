@@ -8,12 +8,12 @@ function main() {
 		abort("Syntax is dbcreate [dbname] {S}");
 
 	if (!dbname.dbcreate(dbname)) {
-		if (not OPTIONS.index("S"))
+		if (not OPTIONS.contains("S"))
 			errputl(var().lasterror());
 		abort("");
 	}
 
-	if (not OPTIONS.index("S"))
+	if (not OPTIONS.contains("S"))
 		printl(dbname.quote(), "database created");
 
 	return 0;

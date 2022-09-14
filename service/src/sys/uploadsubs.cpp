@@ -139,7 +139,7 @@ postuploadfail:
 		var tt = "\\";
 		uploadpath.converter(tt, OSSLASH);
 
-		if (uploadpath.substr(3, 99999).index("..")) {
+		if (uploadpath.substr(3, 99999).contains("..")) {
 			msg = uploadpath.quote() ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -216,7 +216,7 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
-		if (tt eq "" or tt.index("FILE NOT FOUND")) {
+		if (tt eq "" or tt.contains("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
@@ -256,7 +256,7 @@ postuploadfail:
 		//if dirpatt[-1,1]<>'.' then dirpatt:='.'
 		dirpatt ^= "*";
 
-		if (dirpatt.substr(3, 99999).index("..")) {
+		if (dirpatt.substr(3, 99999).contains("..")) {
 			msg = dirpatt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -332,13 +332,13 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
-		if (tt eq "" or tt.index("FILE NOT FOUND")) {
+		if (tt eq "" or tt.contains("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
 
 		tt = uploadroot ^ uploadpath;
-		if (tt.substr(3, 99999).index("..")) {
+		if (tt.substr(3, 99999).contains("..")) {
 			msg = tt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -372,7 +372,7 @@ postuploadfail:
 		var validating = RECORD.f(17);
 		osfile = "";
 
-		if (uploadpath.substr(3, 99999).index("..")) {
+		if (uploadpath.substr(3, 99999).contains("..")) {
 			msg = uploadpath.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -578,7 +578,7 @@ nextline:
 					if (col.f(1, 4)) {
 						var cell0 = cell;
 						var CONV = col.f(1, 4);
-						if (CONV.index("TIME")) {
+						if (CONV.contains("TIME")) {
 						//if no : in time then assume is already seconds
 							if (cell.contains(":")) {
 								cell = iconv(cell, CONV);
@@ -648,7 +648,7 @@ addbuff:
 		buff ^= temp;
 
 		//get more if no line ending
-		if (temp.len() and not(buff.index("\r"))) {
+		if (temp.len() and not(buff.contains("\r"))) {
 			goto addbuff;
 		}
 

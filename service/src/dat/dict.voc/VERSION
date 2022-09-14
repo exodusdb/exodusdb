@@ -6,7 +6,7 @@ S
 
 
 function main() {\
-	if (DICT.index("VOC")) {\
+	if (DICT.contains("VOC")) {\
 		ANS = xlate(RECORD.f(3), "$" ^ RECORD.f(4), "VERSION", "X");\
 	} else {\
 		ANS = field2(RECORD, FM, -1);\

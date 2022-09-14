@@ -9,12 +9,12 @@ function main() {
 		abort("Syntax is dbcopy [from_dbname] [to_dbname] {S}");
 
 	if (!dbname1.dbcopy(dbname1, dbname2)) {
-		if (not OPTIONS.index("S"))
+		if (not OPTIONS.contains("S"))
 			errputl(var().lasterror());
 		abort("");
 	}
 
-	if (not OPTIONS.index("S"))
+	if (not OPTIONS.contains("S"))
 		printl(dbname1.quote(), "database copied to", dbname2.quote());
 
 	return 0;

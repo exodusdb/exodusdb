@@ -884,12 +884,19 @@ programinit()
 	assert(v1      eq '2');
 	assert(v1      eq 2);
 	assert(v1      eq 2.0);
-	assert((v1 eq true));  //v1.toBool()
+
+	//assert((v1 eq true));  //v1.toBool()
+	assert((v1 ne false));
+	assert((v1 ne true));
+
 	assert(!("2.0" eq v2));
 	assert(!('2'   eq v2));
 	assert(!(2     eq v2));
 	assert(!(2.0   eq v2));
-	assert(!(true != v2));	//v1.toBool()
+
+	//assert(!(true != v2));	//v1.toBool()
+	assert( (true != v2));
+	assert( (false != v2));
 
 	// != ne
 	assert(v1 != v2);
@@ -897,13 +904,19 @@ programinit()
 	assert(v1 != '3');
 	assert(v1 != 3);
 	assert(v1 != 3.0);
-	assert(v1   eq true);
+	assert(!(v1   eq true));
+	assert(  v1   ne true);
+	assert(!(v1   eq false));
+	assert(  v1   ne true);
 	;  //v1.toBool()
 	assert("2.0" != v2);
 	assert('2' != v2);
 	assert(2 != v2);
 	assert(2.0 != v2);
-	assert(true eq v2);
+	assert(!(true eq v2));
+	assert(  true ne v2);
+	assert(!(false eq v2));
+	assert(  false ne v2);
 	;
 
 	// < lt
@@ -917,7 +930,7 @@ programinit()
 	assert(('2' < v2));
 	assert((2 < v2));
 	assert((2.0 < v2));
-	assert(!(true < v2));
+	assert(true < v2);
 
 	// <= le
 	assert((v1 <= v2));
@@ -925,7 +938,7 @@ programinit()
 	assert((v1 <= '3'));
 	assert((v1 <= 3));
 	assert((v1 <= 3.0));
-	assert((v1 <= true));
+	assert(!(v1 <= true));
 	assert(("2.0" <= v2));
 	assert(('2' <= v2));
 	assert((2 <= v2));
@@ -938,7 +951,7 @@ programinit()
 	assert(!(v1 > '3'));
 	assert(!(v1 > 3));
 	assert(!(v1 > 3.0));
-	assert(!(v1 > true));
+	assert( (v1 > true));
 	assert(!("2.0" > v2));
 	assert(!('2' > v2));
 	assert(!(2 > v2));
@@ -956,7 +969,7 @@ programinit()
 	assert(!('2' >= v2));
 	assert(!(2 >= v2));
 	assert(!(2.0 >= v2));
-	assert((true >= v2));
+	assert(!(true >= v2));
 
 	// + add
 	assert((v1 + v2)    eq 5);
@@ -1157,10 +1170,27 @@ programinit()
 		assert(var("0.")  eq false);
 		assert(var("0.0") eq false);
 
-		assert(var("x")    eq true);
-		assert(var("10")   eq true);
-		assert(var("10.")  eq true);
-		assert(var("10.0") eq true);
+		assert(!var("x")    eq false);
+		assert(!var("x")    eq false);
+		assert(var("x")     ne false);
+		assert(var("x")     ne false);
+
+		assert(!(var("x")    eq true));
+		assert(!(var("x")    eq true));
+		assert(var("x")     ne true);
+		assert(var("x")     ne true);
+
+		assert(var("10")   ne false);
+		assert(var("10.")  ne false);
+		assert(var("10.0") ne false);
+
+		assert(var("10")   ne true);
+		assert(var("10.")  ne true);
+		assert(var("10.0") ne true);
+
+		assert(var("1")    eq true);
+		assert(var("1.")   eq true);
+		assert(var("1.")   eq true);
 	}
 	{
 		assert(false       eq var(""));
@@ -1168,10 +1198,23 @@ programinit()
 		assert(false       eq var("0."));
 		assert(false       eq var("0.0"));
 
-		assert(true eq var("x"));
-		assert(true eq var("10"));
-		assert(true eq var("10."));
-		assert(true eq var("10.0"));
+		assert(!(true eq var("x")));
+		assert(!(true eq var("10")));
+		assert(!(true eq var("10.")));
+		assert(!(true eq var("10.0")));
+		assert(true ne var("x"));
+		assert(true ne var("10"));
+		assert(true ne var("10."));
+		assert(true ne var("10.0"));
+
+		assert(!(false eq var("x")));
+		assert(!(false eq var("10")));
+		assert(!(false eq var("10.")));
+		assert(!(false eq var("10.0")));
+		assert(false ne var("x"));
+		assert(false ne var("10"));
+		assert(false ne var("10."));
+		assert(false ne var("10.0"));
 	}
 	{
 		assert(var("") != true);

@@ -103,7 +103,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		//2. email addresses are not secret and usernames are guessable
 		//3. magic character in password on logins causes password reset if email
 		//as the password. Therefore NO @ characters in passwords
-		var passwordreset = origrequest1 eq "LOGIN" and password.index("@");
+		var passwordreset = origrequest1 eq "LOGIN" and password.contains("@");
 
 		//determine username from emailaddress
 		//only for users with single, unique emails
@@ -381,7 +381,7 @@ invalidip:
 					//prevent EXODUS from using CONFIGURED fully formed LAN ips
 					//which are deemed to be NAT routers possibly providing WAN access
 					//but EXODUS should not have unrestricted access from WAN
-					if (username eq "EXODUS" and not(SYSTEM.f(17).index("DEMO"))) {
+					if (username eq "EXODUS" and not(SYSTEM.f(17).contains("DEMO"))) {
 						if (ip2 eq "192.168") {
 exoduslocalip:
 							if (validips.locateusing(" ", ipno, xx)) {

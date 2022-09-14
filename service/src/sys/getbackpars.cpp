@@ -139,8 +139,8 @@ function main(out bakpars, in process0=var()) {
 		if (baktestdata_ eq "") {
 			var testdata = 1;
 			if ((process.f(17).substr(-5)) eq "_test") {
-			} else if (process.f(23).ucase().index("TRAINING")) {
-			} else if (process.f(23).ucase().index("TESTING")) {
+			} else if (process.f(23).ucase().contains("TRAINING")) {
+			} else if (process.f(23).ucase().contains("TESTING")) {
 			} else if (osfile("~/hosts/disabled.cfg")) {
 			} else {
 				//not otherwise specified then exclude database if in list of non-live data

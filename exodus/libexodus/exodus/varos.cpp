@@ -116,24 +116,24 @@ std::locale get_locale(const char* locale_name)	// throw (VarError)
 	}
 }
 
-bool checknotabsoluterootfolder(std::string dirname) {
+bool checknotabsoluterootfolder(std::string dirpath) {
 	// safety - will not rename/remove top level folders
 	// cwd to top level and delete relative
 	// top level folder has only one slash either at the beginning or, on windows, like x:\ .
 	// NB copy/same code in osrmdir and osrename
-	//if (!dirname.ends_with(OSSLASH_))
+	//if (!dirpath.ends_with(OSSLASH_))
 	//	return true;
-	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
-		 //std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
-		 var(dirname).count(_OSSLASH) < 3) ||
-		(SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_))) {
+	if ((!SLASH_IS_BACKSLASH && dirpath[0] == OSSLASH_ &&
+		 //std::count(dirpath.begin(), dirpath.end(), OSSLASH_) < 3) ||
+		 var(dirpath).count(_OSSLASH) < 3) ||
+		(SLASH_IS_BACKSLASH && (dirpath[1] == ':') && (dirpath[2] == OSSLASH_))) {
 
 		std::cerr
 			<< "Forced removal/renaming of top two level directories by absolute path is "
 			   "not supported for safety but you can use cwd() and relative path."
-			<< dirname << std::endl;
+			<< dirpath << std::endl;
 
-		var().lasterror(var(dirname).quote() ^ " Cannot be deleted or moved (absolute) because it is a top level dir");
+		var().lasterror(var(dirpath).quote() ^ " Cannot be deleted or moved (absolute) because it is a top level dir");
 
 		return false;
 	}
@@ -156,7 +156,7 @@ bool checknotabsoluterootfolder(std::string dirname) {
 //		// old source code
 //		/*
 //		var lcpart = part.lcase();
-//		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG" && !part.index("./data/"))
+//		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG" && !part.contains("./data/"))
 //		{
 //			part.errputl("WARNING - UPPERCASE OS=");
 ////			part = lcpart;
@@ -197,7 +197,7 @@ const std::string to_oscmd_string(CVR cmd) {
 
 	// warning if any backslashes unless at least one of them is followed by $ which indicates
 	// valid usage as an escape character aiming to recode all old windows-only code
-	if (cmd.contains("\\") && !cmd.index("\\$"))
+	if (cmd.contains("\\") && !cmd.contains("\\$"))
 		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
 
 	return to_path_string(cmd.field(" ", 1)) + " " + cmd.field(" ", 2, 999999).toString();
@@ -207,10 +207,10 @@ const std::string to_oscmd_string(CVR cmd) {
 var var::ostempdirpath() const {
 	std::error_code error_code;
 	//TODO handle error code specifically
-	std::string dirname = std::string(std::filesystem::temp_directory_path(error_code));
-	if (dirname.back() != OSSLASH_)
-		dirname.push_back(OSSLASH_);
-	return dirname;
+	std::string dirpath = std::string(std::filesystem::temp_directory_path(error_code));
+	if (dirpath.back() != OSSLASH_)
+		dirpath.push_back(OSSLASH_);
+	return dirpath;
 }
 
 // This function in Ubuntu/g++ returns *sequential* temporary file names which is perhaps not good
@@ -884,14 +884,14 @@ void var::osclose() const {
 	// in all other cases, the files should be closed.
 }
 
-bool var::osrename(CVR newosdir_or_filename) const {
+bool var::osrename(CVR new_dirpath_or_filepath) const {
 
-	THISIS("bool var::osrename(CVR newosdir_or_filename) const")
+	THISIS("bool var::osrename(CVR new_dirpath_or_filepath) const")
 	assertString(function_sig);
-	ISSTRING(newosdir_or_filename)
+	ISSTRING(new_dirpath_or_filepath)
 
 	std::string path1 = to_path_string(*this);
-	std::string path2 = to_path_string(newosdir_or_filename);
+	std::string path2 = to_path_string(new_dirpath_or_filepath);
 
 	// prevent overwrite of existing file
     // ACQUIRE
@@ -900,7 +900,7 @@ bool var::osrename(CVR newosdir_or_filename) const {
 	if (myfile) {
 		// RELEASE
 		myfile.close();
-		this->lasterror(newosdir_or_filename.quote() ^ " already exists. Cannot osrename " ^ this->quote());
+		this->lasterror(new_dirpath_or_filepath.quote() ^ " already exists. Cannot osrename " ^ this->quote());
 		return false;
 	}
 
@@ -913,14 +913,14 @@ bool var::osrename(CVR newosdir_or_filename) const {
 	return !std::rename(path1.c_str(), path2.c_str());
 }
 
-bool var::oscopy(CVR newosdir_or_filename) const {
+bool var::oscopy(CVR new_dirpath_or_filepath) const {
 
-	THISIS("bool var::oscopy(CVR newosdir_or_filename) const")
+	THISIS("bool var::oscopy(CVR new_dirpath_or_filepath) const")
 	assertString(function_sig);
-	ISSTRING(newosdir_or_filename)
+	ISSTRING(new_dirpath_or_filepath)
 
 	std::string path1 = to_path_string(*this);
-	std::string path2 = to_path_string(newosdir_or_filename);
+	std::string path2 = to_path_string(new_dirpath_or_filepath);
 
     // copy recursively, overwriting
 	std::filesystem::path frompathx(path1.c_str());
@@ -933,21 +933,21 @@ bool var::oscopy(CVR newosdir_or_filename) const {
 
     // Handle error
     if (error_code) {
-		this->lasterror("oscopy failed. " ^ this->quote() ^ " to " ^ newosdir_or_filename.quote());
+		this->lasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote());
 		return false;
     }
 
 	return true;
 }
 
-bool var::osmove(CVR newosdir_or_filename) const {
+bool var::osmove(CVR new_dirpath_or_filepath) const {
 
-	THISIS("bool var::osmove(CVR newosdir_or_filename) const")
+	THISIS("bool var::osmove(CVR new_dirpath_or_filepath) const")
 	assertString(function_sig);
-	ISSTRING(newosdir_or_filename)
+	ISSTRING(new_dirpath_or_filepath)
 
 	std::string path1 = to_path_string(*this);
-	std::string path2 = to_path_string(newosdir_or_filename);
+	std::string path2 = to_path_string(new_dirpath_or_filepath);
 
 	// prevent overwrite of existing file or dir
 	// ACQUIRE
@@ -957,7 +957,7 @@ bool var::osmove(CVR newosdir_or_filename) const {
 	if (myfile) {
 		// RELEASE
 		myfile.close();
-		this->lasterror(newosdir_or_filename.quote() ^ " already exists. Cannot osmove " ^ this->quote());
+		this->lasterror(new_dirpath_or_filepath.quote() ^ " already exists. Cannot osmove " ^ this->quote());
 		return false;
 	}
 
@@ -969,13 +969,13 @@ bool var::osmove(CVR newosdir_or_filename) const {
 
 	// Try to rename but will fail to move across file systems
 	//////////////////////////////////////////////////////////
-	if (this->osrename(newosdir_or_filename))
+	if (this->osrename(new_dirpath_or_filepath))
 		return true;
 
 	// To copy and delete instead of move
 	////////////////////////////////////////
-	if (!this->oscopy(newosdir_or_filename)) {
-		this->lasterror(this->quote() ^ " failed to osmove to " ^ newosdir_or_filename.quote());
+	if (!this->oscopy(new_dirpath_or_filepath)) {
+		this->lasterror(this->quote() ^ " failed to osmove to " ^ new_dirpath_or_filepath.quote());
 		return false;
 	}
 
@@ -985,9 +985,9 @@ bool var::osmove(CVR newosdir_or_filename) const {
 
     // Too dangerous to remove target in case of failure to delete source
 	//otherwise delete the target too
-	//newosdir_or_filename.osremove();
+	//new_dirpath_or_filepath.osremove();
 
-	this->lasterror(this->quote() ^ " osmove failed to remove source after copying to " ^ newosdir_or_filename.quote());
+	this->lasterror(this->quote() ^ " osmove failed to remove source after copying to " ^ new_dirpath_or_filepath.quote());
 	return false;
 }
 
@@ -1015,124 +1015,33 @@ bool var::osremove(CVR osfilename) const {
 	return true;
 }
 
-// utility defined in mvdatetime.cpp
-//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
-//WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
-//void ptime2mvdatetime(const std::filesystem::file_time_type& ptimex, int& mvdate, int& mvtime);
-void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
-
-var var::osfile() const {
-
-	// SIMILAR CODE IN OSFILE AND OSDIR
-
-	assertString(__PRETTY_FUNCTION__);
-
-	// get a handle and return "" if doesnt exist or isnt a regular file
-	try {
-
-		// Why use stat instead of std::filesystem?
-		// https://eklitzke.org/std-filesystem-last-write-time
-
-		// Using low level interface instead of std::filesystem to avoid multiple call to stat
-		// 7,430 ns/op instead of  18,500 ns/op
-
-		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
-
-		struct stat statinfo;
-
-		// Get stat info or quit
-		if (stat(to_path_string(*this).c_str(), &statinfo) != 0)
-			return "";
-
-		// Quit if is dir
-		if ((statinfo.st_mode & S_IFMT) == S_IFDIR)
-			return "";
-
-		// Identical code in osfile and osdir
-
-		// convert c style time_t to pickos integer date and time
-		int pick_date, pick_time;
-		//boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(statinfo.st_mtime);
-		//ptime2mvdatetime(ptimex, pick_date, pick_time);
-		time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
-
-		//file_size() is only available for files not directories
-		//return static_cast<int>(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
-		return var(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
-
-	} catch (...) {
-		return "";
-	}
-}
-
-//convert some clock to time_t (for osfile() and osdir()
-//template <typename TP>
-//std::time_t to_time_t(TP tp) {
-//	using namespace std::chrono;
-//	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
-//	return system_clock::to_time_t(sctp);
-//}
-
-// Old slower implementation using std:filesystem that requires multiple calls to stat
-//var var::osfile() const {
-//
-//	THISIS("var var::osfile() const")
-//	assertString(function_sig);
-//
-//	// get a handle and return "" if doesnt exist or isnt a regular file
-//	try {
-//		std::filesystem::path pathx(to_path_string(*this).c_str());
-//
-//		if (!std::filesystem::exists(pathx))
-//			return "";
-//		// if (! std::filesystem::is_regular(pathx)) return "";
-//		if (std::filesystem::is_directory(pathx))
-//			return "";
-//
-//		//not using low level interface
-//		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
-//
-//		// SIMILAR CODE IN OSFILE AND OSDIR
-//
-//		// get last write datetime
-//		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(std::filesystem::last_write_time(pathx));
-//		std::filesystem::file_time_type file_time = std::filesystem::last_write_time(pathx);
-//		std::time_t last_write_time = to_time_t(file_time);
-//
-//		// convert to posix time
-//		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-//		//std::filesystem::file_time_type ptimex = std::filesystem::last_write_time(pathx);
-//
-//		// convert posix time to mv date and time
-//		int mvdate, mvtime;
-//		ptime2mvdatetime(ptimex, mvdate, mvtime);
-//
-//		//file_size() is only available for files not directories
-//		return int(std::filesystem::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
-//	} catch (...) {
-//		return "";
-//	}
-//}
-
 bool var::osmkdir() const {
 
 	THISIS("bool var::osmkdir() const")
 	assertString(function_sig);
 
-	try {
+	std::filesystem::path pathx(to_path_string(*this).c_str());
 
-		std::filesystem::path pathx(to_path_string(*this).c_str());
+//	if (std::filesystem::exists(pathx))	{
+//		this->lasterror(this->quote() ^ " osmkdir failed. Target already exists.");
+//		return false;
+//	}
+//
+	std::error_code ec;
 
-		if (std::filesystem::exists(pathx))	{
-			this->lasterror(this->quote() ^ " osmkdir failed. Target already exists.");
-			return false;
-		}
-
-		std::filesystem::create_directories(pathx);
-	} catch (...) {
-		this->lasterror(this->quote() ^ " osmkdir failed.");
+	// Creates parent directories automatically
+	// https://en.cppreference.com/w/cpp/filesystem/create_directory
+	bool created = std::filesystem::create_directories(pathx, ec);
+	if (ec or ! created) {
+		this->lasterror(this->quote() ^ " osmkdir failed. " ^ ec.message());
 		return false;
 	}
+
+	if (!std::filesystem::exists(pathx)) {
+		this->lasterror(this->quote() ^ " osmkdir failed. Target could not be created.");
+		return false;
+	}
+
 	return true;
 }
 
@@ -1174,9 +1083,21 @@ bool var::osrmdir(bool evenifnotempty) const {
 	return true;
 }
 
-var var::osdir() const {
+// utility defined in mvdatetime.cpp
+//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
+//WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
+//void ptime2mvdatetime(const std::filesystem::file_time_type& ptimex, int& mvdate, int& mvtime);
+void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
 
-	// SIMILAR CODE IN OSFILE AND OSDIR
+//convert some clock to time_t (for osfile() and osdir()
+//template <typename TP>
+//std::time_t to_time_t(TP tp) {
+//	using namespace std::chrono;
+//	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
+//	return system_clock::to_time_t(sctp);
+//}
+
+var var::osinfo(const int mode) const {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -1198,11 +1119,33 @@ var var::osdir() const {
 		if (stat(to_path_string(*this).c_str(), &statinfo) != 0)
 			return "";
 
-		// Quit if is not dir
-		if ((statinfo.st_mode & S_IFMT) != S_IFDIR)
-			return "";
+		var size;
 
-		// Identical code in osfile and osdir
+		// Quit if is not a required file/dir type
+		switch (mode) {
+
+			case 2:
+				// Reject non-dirs. Links to dirs are ok.
+				if ((statinfo.st_mode & S_IFMT) != S_IFDIR)
+					return "";
+				// Assume std::string ""
+				size.var_typ = VARTYP_STR;
+				break;
+
+			case 1:
+				// Reject non-files. Links to files are ok.
+	 			if ((statinfo.st_mode & S_IFMT) != S_IFREG)
+					return "";
+				size = static_cast<varint_t>(statinfo.st_size);
+				break;
+
+			default:
+	 			if ((statinfo.st_mode & S_IFMT) == S_IFREG)
+					size = static_cast<varint_t>(statinfo.st_size);
+				else
+					size = "";
+				break;
+			}
 
 		// convert c style time_t to pickos integer date and time
 		int pick_date, pick_time;
@@ -1211,11 +1154,19 @@ var var::osdir() const {
 		time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
 
 		//file_size() is only available for files not directories
-		return static_cast<int>(statinfo.st_size) ^ FM ^ pick_date ^ FM ^ pick_time;
+		return size ^ FM ^ pick_date ^ FM ^ pick_time;
 
 	} catch (...) {
 		return "";
 	}
+}
+
+var var::osfile() const {
+	return this->osinfo(1);
+}
+
+var var::osdir() const {
+	return this->osinfo(2);
 }
 
 // old slower implementation using std::filesystem
@@ -1262,12 +1213,12 @@ var var::osdir() const {
 //	}
 //}
 
-var var::oslistf(CVR path, CVR globpattern) const {
-	return this->oslist(path, globpattern, 1);
+var var::oslistf(CVR globpattern) const {
+	return this->oslist(globpattern, 1);
 }
 
-var var::oslistd(CVR path, CVR globpattern) const {
-	return this->oslist(path, globpattern, 2);
+var var::oslistd(CVR globpattern) const {
+	return this->oslist(globpattern, 2);
 }
 
 /*
@@ -1276,27 +1227,35 @@ var var::oslistd(CVR path, CVR globpattern) const {
 *@param	mode	1=files only, 2=directories only, otherwise both.
 *@returns		List of directory and/or filenames depending on mode. fm separator
 */
-var var::oslist(CVR path0, CVR globpattern0, const int mode) const {
+var var::oslist(CVR globpattern0, const int mode) const {
 
-	THISIS("var var::oslist(CVR path, CVR globpattern, const int mode) const")
+	THISIS("var var::oslist(CVR globpattern, const int mode) const")
 	assertDefined(function_sig);
-	ISSTRING(path0)
+	//ISSTRING(path0)
 	ISSTRING(globpattern0)
 
 	// returns an fm separated list of files and/or folders
 
 	// http://www.boost.org/libs/filesystem/example/simple_ls.cpp
 
-	var path = to_path_string(path0);
+	var path = to_path_string(*this);
 	var globpattern;
 	if (globpattern0.len()) {
 		globpattern = globpattern0;
 	}
 	// file globbing can and must be passed as tail end of path
 	// perhaps could use <glob.h> in linux instead of regex
+	// TODO bash-like globbing using something like
+	// https://github.com/MrGriefs/glob-cpp/blob/main/README.md
 	else {
+
+		// If the last part of path looks like a glob
+		// (has * or ?) use it.
 		globpattern = path.field2(_OSSLASH, -1);
-		path = path.substr(1, path.len() - globpattern.len());
+		if (globpattern.convert("*?", "") != globpattern)
+			path = path.substr(1, path.len() - globpattern.len());
+		else
+			globpattern = "";
 	}
 
 	bool getfiles = true;

@@ -61,7 +61,7 @@ function main(io osfilename, in printopts0, out errors) {
 
 	if (VOLUMES) {
 		//WARNING TODO: check ternary op following;
-		var exe = oscwd().index(":") ? ".exe" : "";
+		var exe = oscwd().contains(":") ? ".exe" : "";
 		pdfcmd = "html2pdf";
 		if (exe) {
 			pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;

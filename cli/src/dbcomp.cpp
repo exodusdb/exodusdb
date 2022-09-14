@@ -8,7 +8,7 @@ function main() {
 	var db1 = COMMAND.f(2);
 	var db2 = COMMAND.f(3);
 
-	var silent = OPTIONS.index("S");
+	var silent = OPTIONS.contains("S");
 
 	if (not silent)
 		db1.logputl("dbcomp connecting to ");

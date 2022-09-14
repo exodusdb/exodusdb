@@ -14,7 +14,7 @@ function main() {
 	//c sys
 	//global nindexed
 
-	if (SENTENCE.index("(")) {
+	if (SENTENCE.contains("(")) {
 		options = field2(SENTENCE, "(", -1);
 		SENTENCE.splicer(-options.len() - 1, 9999, "");
 		SENTENCE.trimmerb();
@@ -104,7 +104,7 @@ tryagain:
 		nrecs = "/" ^ nrecs;
 	}
 
-	var isindexed = file.index("SI.MFS") ne 0;
+	var isindexed = file.contains("SI.MFS") ne 0;
 
 next:
 /////
@@ -141,7 +141,7 @@ next:
 		if (cleared) {
 			while (true) {
 				///BREAK;
-				if (not(RECORD and ((FM ^ VM ^ SM).index(RECORD[-1])))) break;
+				if (not(RECORD and ((FM ^ VM ^ SM).contains(RECORD[-1])))) break;
 				RECORD.popper();
 			}//loop;
 			if (RECORD eq "") {

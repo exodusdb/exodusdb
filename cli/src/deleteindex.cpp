@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var force = OPTIONS.index("F");
+	var force = OPTIONS.contains("F");
 	var indexnames = COMMAND.field(FM, 2, 999999);
 	var nindexes = fcount(indexnames, FM);
 

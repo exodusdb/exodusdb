@@ -45,7 +45,7 @@ libraryexit(alpha)
 libraryinit(anydebug)
 //-------------------
 function main() {
-	if (var("*$").index(ID[1])) {
+	if (var("*$").contains(ID[1])) {
 		return 0;
 	}
 	if (ID eq "DEBUG") {
@@ -67,13 +67,13 @@ function main() {
 	//upper=@record
 	//convert @lower.case to @upper.case in upper
 
-	if (RECORD.index("debug")) {
+	if (RECORD.contains("debug")) {
 		return 1;
 	}
 	if (ID eq "SENDMAIL") {
 		RECORD.converter("'EXODUS.ID'", "");
 	}
-	if (RECORD.index("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {
+	if (RECORD.contains("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {
 		return 1;
 	}
 	return 0;
@@ -348,7 +348,7 @@ function main() {
 	for (const var fn : range(1, nn)) {
 		var tx = datax.f(fn).trim();
 
-		if (tx.contains("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {
+		if (tx.contains("xlate(") and ((tx.contains("','C')") or tx.contains("','X')")))) {
 		//gosub change2
 			ANS(1, -1) = tx;
 		}
@@ -481,12 +481,12 @@ libraryexit(keysize)
 libraryinit(linemarks)
 //--------------------
 function main() {
-	if (var("$*").index(ID[1])) {
+	if (var("$*").contains(ID[1])) {
 		return "";
-	} else if (RECORD.index("linemark")) {
+	} else if (RECORD.contains("linemark")) {
 		var tt = RECORD;
 		tt.converter(" ", FM);
-		return tt.index(FM ^ "linemark");
+		return tt.contains(FM ^ "linemark");
 	} else {
 		ANS = 0;
 	}
@@ -712,7 +712,7 @@ libraryexit(username_created)
 libraryinit(version)
 //------------------
 function main() {
-	if (DICT.index("VOC")) {
+	if (DICT.contains("VOC")) {
 		ANS = xlate(RECORD.f(3), "$" ^ RECORD.f(4), "VERSION", "X");
 	} else {
 		ANS = field2(RECORD, FM, -1);
