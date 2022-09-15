@@ -23,8 +23,8 @@ THE SOFTWARE.
 //#include <cstdlib> //for atexit()
 
 #include <exodus/var.h>
-#include <exodus/mvenvironment.h>
-//#include <exodusfuncs.h>
+#include <exodus/exoenv.h>
+//#include <exofuncs.h>
 
 namespace exodus {
 
@@ -60,7 +60,7 @@ PUBLIC void ossleep(const int milliseconds) {
 	var().ossleep(milliseconds);
 }
 
-PUBLIC var oswait(const int milliseconds, CVR dirpath) {
+PUBLIC var oswait(const int milliseconds, SV dirpath) {
 	return var().oswait(milliseconds, dirpath);
 }
 
@@ -152,15 +152,15 @@ PUBLIC bool osmove(CVR from_path, CVR to_path) {
 }
 
 
-PUBLIC var oslist(CVR path, CVR globpattern, const int mode) {
+PUBLIC var oslist(CVR path, SV globpattern, const int mode) {
 	return path.oslist(globpattern, mode);
 }
 
-PUBLIC var oslistf(CVR path, CVR globpattern) {
+PUBLIC var oslistf(CVR path, SV globpattern) {
 	return path.oslistf(globpattern);
 }
 
-PUBLIC var oslistd(CVR path, CVR globpattern) {
+PUBLIC var oslistd(CVR path, SV globpattern) {
 	return path.oslistd(globpattern);
 }
 

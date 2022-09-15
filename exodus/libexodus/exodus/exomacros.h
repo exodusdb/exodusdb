@@ -32,7 +32,7 @@ THE SOFTWARE.
 // include m.h directly
 
 #include <exodus/var.h>
-#include <exodus/mvfunctor.h>
+#include <exodus/exofunctor.h>
 
 // please include <exodus> AFTER <iostream> etc. For example:
 // #include <iostream>
@@ -111,11 +111,11 @@ THE SOFTWARE.
 	class CLASSNAME##ExodusProgram : public ExodusProgramBase {
 
 // class exit
-// insert a constructor function accepting an mvenvironment just before the class exit
+// insert a constructor function accepting an exoenv just before the class exit
 // and then insert the class termination "};"
 #define classexit(CLASSNAME)                                               \
    public:                                                                 \
-	CLASSNAME##ExodusProgram(MvEnvironment& mv) : ExodusProgramBase(mv) {} \
+	CLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {} \
 	}                                                                      \
 	;
 

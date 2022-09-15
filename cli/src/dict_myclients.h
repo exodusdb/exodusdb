@@ -6,7 +6,7 @@
 //ExodusFunctorBase Functordict_myclients;
 class Functordict_myclients : public ExodusFunctorBase {
    public:
-	Functordict_myclients(MvEnvironment& mv)
+	Functordict_myclients(ExoEnv& mv)
 		: ExodusFunctorBase("dict_myclients", "exodusprogrambasecreatedelete_", mv) {}
 
 	Functordict_myclients& operator=(const var& newlibraryname) {
@@ -47,7 +47,7 @@ Functordict_myclients dict_myclients{mv};
 //ExodusFunctorBase Functordict_myclients;
 class Functordict_myclients : public ExodusFunctorBase {
    public:
-	Functordict_myclients(MvEnvironment& mv)
+	Functordict_myclients(ExoEnv& mv)
 		: ExodusFunctorBase("dict_myclients", "exodusprogrambasecreatedelete_", mv) {}
 
 	Functordict_myclients& operator=(const var& newlibraryname) {

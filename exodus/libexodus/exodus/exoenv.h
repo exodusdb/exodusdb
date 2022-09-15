@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef MVENVIRONMENT_H
-#define MVENVIRONMENT_H 1
+#ifndef EXOENV_H
+#define EXOENV_H 1
 
 //#undef eq
 #include <iostream>
@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 #include <exodus/var.h>
 #include <exodus/dim.h>
-#include <exodus/mvfunctor.h>
+#include <exodus/exofunctor.h>
 
 namespace exodus {
 
@@ -51,18 +51,18 @@ PUBLIC ND var getexecpath();
 
 // to avoid gcc 4 "warning: type attributes are honored only at type definition"
 // dont declare PUBLIC on forward declarations
-// class PUBLIC MvEnvironment;
-class MvEnvironment;
+// class PUBLIC ExoEnv;
+class ExoEnv;
 
 /*
 const static int NTHREADS = 1;
 
-#ifdef EXO_MVENVIRONMENT_CPP
+#ifdef EXOENV_CPP
 // plus 1 to allow for main thread to have its own
 PUBLIC
-std::vector<MvEnvironment*> global_environments(NTHREADS + 1);
+std::vector<ExoEnv*> global_environments(NTHREADS + 1);
 #else
-extern PUBLIC std::vector<MvEnvironment*> global_environments;
+extern PUBLIC std::vector<ExoEnv*> global_environments;
 #endif
 */
 
@@ -71,9 +71,9 @@ class LabelledCommon {
 	virtual ~LabelledCommon(){};
 };
 
-class PUBLIC MvEnvironment {
+class PUBLIC ExoEnv {
    public:
-	virtual ~MvEnvironment();
+	virtual ~ExoEnv();
 
 	bool init(const int threadno);
 
@@ -217,4 +217,4 @@ class PUBLIC MvEnvironment {
 
 }  // namespace exodus
 
-#endif /*MVENVIRONMENT_H*/
+#endif //EXOENV_H

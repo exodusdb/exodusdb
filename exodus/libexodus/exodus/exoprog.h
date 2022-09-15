@@ -1,5 +1,5 @@
-#ifndef MVPROGRAM_H
-#define MVPROGRAM_H
+#ifndef EXOPROG_H
+#define EXOPROG_H
 
 // Using map for dict function cache instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
@@ -8,8 +8,8 @@
 //#include <unordered_map>
 #include <map>
 
-#include <exodus/mvenvironment.h>
-//#include <exodus/mvfunctor.h>
+#include <exodus/exoenv.h>
+//#include <exodus/exofunctor.h>
 
 namespace exodus {
 
@@ -41,8 +41,8 @@ class PUBLIC ExodusProgramBase {
 
 #include <exodus/ioconv_custom.h>
 
-	ExodusProgramBase(MvEnvironment& inmv);
-	ExodusProgramBase(MvEnvironment&& inmv) = delete;
+	ExodusProgramBase(ExoEnv& inmv);
+	ExodusProgramBase(ExoEnv&& inmv) = delete;
 
 	// doing virtual isnt much use because external functions (which are based on
 	// ExodusProgramBase) need to have complete freedom of arguments to main(...) virtual var
@@ -72,7 +72,7 @@ class PUBLIC ExodusProgramBase {
 	//#define ID mv->ID
 	// so that ID RECORD etc. continue to appear to the application programmer to be "threadsafe
 	// global" variables
-	MvEnvironment& mv;
+	ExoEnv& mv;
 
 	// work on CURSOR
 	bool select(CVR sortselectclause_or_filehandle DEFAULT_EMPTY);
@@ -126,7 +126,7 @@ class PUBLIC ExodusProgramBase {
 	ND var otherusers(CVR param);
 	ND var otherdatasetusers(CVR param);
 
-	// moved to mvprogram
+	// moved to exoprog
 	// var capitalise(CVR str0, CVR mode=var(), CVR wordseps=var()) const;
 	////var capitalise(CVR str0, CVR mode="", CVR wordseps="") const;
 
@@ -204,11 +204,11 @@ class PUBLIC ExodusProgramBase {
 	// Program flow control
 	///////////////////////
 
-	// Return to parent mvprogram
+	// Return to parent exoprog
 	// or quit to OS WITHOUT an error
 	void stop(CVR description DEFAULT_EMPTY) const;
 
-	// Return to parent mvprogram
+	// Return to parent exoprog
 	// or quit to OS WITH an error 1
 	void abort(CVR description DEFAULT_EMPTY) const;
 
@@ -243,4 +243,4 @@ class PUBLIC MVLogoff   {public:explicit MVLogoff(  CVR var1 DEFAULT_EMPTY);var 
 // clang-format on
 
 }  // namespace exodus
-#endif	// MVPROGRAM_H
+#endif	// EXOPROG_H

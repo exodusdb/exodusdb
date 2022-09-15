@@ -156,98 +156,146 @@ void var::initrnd() const {
 	thread_RNG = std::make_unique<RNG_typ>(seed);
 }
 
+thread_local std::string thread_environ;
+
 bool var::osgetenv(const char* envcode) {
+
+	// TIP if you cant seem to set osgetenv vars in bash/sh
+	// then ensure you set them with "export"
+	// otherwise child processes don't see them.
 
 	THISIS("bool var::osgetenv(const char* envcode)")
 	assertDefined(function_sig);
 	//assertStringMutator(function_sig);
 	//ISSTRING(envcode)
 
-	// return whole environment if blank envcode
-	//if (envcode.var_str.empty()) {
-	if (*envcode == 0) {
+	// Initialise the thread local cache if not already done
+	if (thread_environ.empty()) {
 
-		var_str.clear();
-		//var_typ = VARTYP_STR;
+		// The cache should already be empty actually.
+		thread_environ.clear();
 
+		// The cache will start with a FM to speed up
+		// later location of specific codes
+		thread_environ.push_back(FM_);
+
+		// Read the global environ into a list
+		// of CODE=VALUE pairs separated by FM
 		int i = 1;
 		char* s = *environ;
 		for (; s; i++) {
 			//printf("%s\n", s);
-			//var_str.append(boost::locale::conv::utf_to_utf<wchar_t>(s));
-			var_str.append(s);
-			var_str.append("\n");
+			thread_environ.append(s);
+			thread_environ.push_back(FM_);
 			s = *(environ + i);
 		}
+
+		// Remove the last (or only) trailing FM_
+		thread_environ.pop_back();
+	}
+
+	// return whole environment if blank envcode
+	if (*envcode == 0) {
+
+		// Return a copy of the cached list of pairs
+		// excluding the initial FM
+		if (thread_environ.size() >= 2)
+			var_str = thread_environ.substr(1);
+		else
+			var_str.clear();
+		var_typ = VARTYP_STR;
+
+		return true;
+
+	}
+
+	// Example:
+	// target "^a="
+	// environ "^a=1^b=2^c=3"
+
+	// Create the target like "^a="
+	std::string target(_FM);
+	target.append(envcode);
+	target.push_back('=');
+
+	// *this defaults to empty string
+	var_str.clear();
+	var_typ = VARTYP_STR;
+
+	// Search for "^a="
+	// Example: pos -> 0
+	auto pos = thread_environ.find(target);
+
+	// If not found then fail
+	// If environ was "^x=1^y=2" then pos->npos
+	if (pos == std::string::npos)
+		return false;
+
+	// Move the pointer to one after the target
+	// Assume not > max str size
+	// Example: pos -> 3
+	pos += target.size();
+
+	// If nothing after the target then success
+	// If environ was just "^a=" then 3 >= 3 true
+	if (pos >= thread_environ.size())
+		return true;
+
+	// Search for the next FM after the target
+	// Example: pos = 3. pos2 -> 4
+	auto pos2 = thread_environ.find(FM_, pos);
+
+	// If not found then extract everything
+	// after the "=" and succeed
+	// If environ was "^a=1" then extract from pos 3
+	if (pos2 == std::string::npos) {
+		var_str = thread_environ.substr(pos);
 		return true;
 	}
 
-	//TIP if you cant seem to osgetenv vars set in bash, then ensure you set them in bash with "export"
-
-	//const char* cvalue = std::getenv(envcode.var_str.c_str());
-	const char* cvalue = std::getenv(envcode);
-	if (cvalue == 0) {
-		var_str.clear();
-		var_typ = VARTYP_STR;
-		return false;
-	}
-
-	// *this = var(cvalue);
-	var_str = cvalue;
-	var_typ = VARTYP_STR;
-
+	// Extract everything after the target
+	// up to the next FM and succeed
+	// Example: pos = 3, length = 4 - 3 = 1
+	var_str = thread_environ.substr(pos, pos2 - pos);
 	return true;
+
 }
 
 bool var::ossetenv(const char* envcode) const {
 
 	THISIS("bool var::ossetenv(const char* envcode) const")
 	assertString(function_sig);
-	//ISSTRING(envcode)
 
-//#ifdef _MSC_VER
-#ifndef setenv
+	// Create the new pair like "^a=c"
+	std::string new_pair(_FM);
+	new_pair.append(envcode);
+	new_pair.push_back('=');
+	new_pair.append(this->var_str);
 
-	/* on windows this should be used
-	BOOL WINAPI SetEnvironmentVariable(LPCTSTR lpName, LPCTSTR lpValue);
-	*/
-	// var("USING PUTENV").outputl();
-	// is this safe on windows??
-	// https://www.securecoding.cert.org/confluence/display/seccode/POS34-C.+Do+not+call+putenv()+with+a+pointer+to+an+automatic+variable+as+the+argument
-	//std::string tempstr = envcode.toString();
-	//tempstr += "=";
-	//tempstr += toString();
-	// var(tempstr).outputl("temp std:string");
-	// std::cout<<tempstr<<" "<<tempstr.size()<<std::endl;
+	// Start to create the old pair like "^a="
+	std::string old_pair(_FM);
+	old_pair.append(envcode);
+	old_pair.push_back('=');
 
-	// this will NOT work reliably since putenv will NOT COPY the local (i.e. temporary)
-	// variable string
+	// Try to get the old value from environ
+	// The old value may be ""
+	if (var oldvalue; oldvalue.osgetenv(envcode)) {
 
-	//var("putenv " ^ var(tempstr) ).outputl();
-	//#pragma warning (disable : 4996)
-	//const int result = putenv((char*)(tempstr.c_str()));
-	//putenv("EXO_DATA=C:\\");
-	//std::cout<<getenv("EXO_DATA");
+		// Finish creating the old pair "^a=b"
+		old_pair.append(oldvalue.var_str);
+TRACE(old_pair)
+		// Replace in thread_environ, old pair with new pair
+		auto pos = thread_environ.find(old_pair.data(), 0, old_pair.length());
+		if (pos != old_pair.npos)
+			thread_environ.replace(pos, old_pair.length(), new_pair.data(), new_pair.length());
 
-	//char winenv[1024];
-	size_t maxenv = 1024;
-	char* env = reinterpret_cast<char*>(malloc(maxenv));
-	//snprintf(env, 1024, "%s=%s", envcode.var_str.c_str(), var_str.c_str());
-	//snprintf(env, 1024, "%s=%s", envcode, var_str.c_str());
-	//snprintf(env, sizeof(env), "%s=%s", envcode, var_str.c_str());
-	snprintf(env, maxenv, "%s=%s", envcode, var_str.c_str());
-	//std::cout << winenv;
-	int result = putenv(env);
+	} else {
+TRACE(new_pair)
+		// Append new pair
+		thread_environ.append(new_pair);
+	}
 
-	if (result == 0)
-		return true;
-	else
-		return false;
-
-#else
-	var("setenv " ^ envcode ^ "=" ^ (*this)).outputl();
-	return setenv(reinterpret_cast<char*>(envcode.toString().c_str()), reinterpret_cast<char*>(toString().c_str()), 1);
-#endif
+	return true;
 }
 
 var var::ospid() const {

@@ -23,8 +23,8 @@ THE SOFTWARE.
 //#include <cstdlib> //for atexit()
 
 #include <exodus/var.h>
-#include <exodus/mvenvironment.h>
-#include <exodusfuncs.h>
+#include <exodus/exoenv.h>
+#include <exodus/exofuncs.h>
 
 namespace exodus {
 
@@ -136,37 +136,37 @@ PUBLIC var textlen(CVR var1) {
 }
 
 
-PUBLIC VARREF converter(VARREF iostring, SV oldchars, SV newchars) {
-	return iostring.converter(oldchars, newchars);
+PUBLIC VARREF converter(VARREF iostring, SV fromchars, SV tochars) {
+	return iostring.converter(fromchars, tochars);
 }
-PUBLIC var convert(CVR instring, SV oldchars, SV newchars) {
-	return instring.convert(oldchars, newchars);
-}
-
-
-PUBLIC VARREF textconverter(VARREF iostring, CVR oldchars, CVR newchars) {
-	return iostring.textconverter(oldchars, newchars);
-}
-PUBLIC var textconvert(CVR instring, CVR oldchars, CVR newchars) {
-	return instring.textconvert(oldchars, newchars);
+PUBLIC var convert(CVR instring, SV fromchars, SV tochars) {
+	return instring.convert(fromchars, tochars);
 }
 
 
-PUBLIC VARREF replacer(VARREF iostring, SV from, SV to) {
-	return iostring.replacer(from, to);
+PUBLIC VARREF textconverter(VARREF iostring, SV fromchars, SV tochars) {
+	return iostring.textconverter(fromchars, tochars);
 }
-PUBLIC var replace(CVR instring, SV from, SV to) {
+PUBLIC var textconvert(CVR instring, SV fromchars, SV tochars) {
+	return instring.textconvert(fromchars, tochars);
+}
+
+
+PUBLIC VARREF replacer(VARREF iostring, SV fromstr, SV tostr) {
+	return iostring.replacer(fromstr, tostr);
+}
+PUBLIC var replace(CVR instring, SV fromstr, SV tostr) {
 	var newstring = instring;
-	return newstring.replace(from, to);
+	return newstring.replace(fromstr, tostr);
 }
 
 
-PUBLIC VARREF regex_replacer(VARREF iostring, CVR regexstr, CVR replacementstr, CVR options) {
-	return iostring.regex_replacer(regexstr, replacementstr, options);
+PUBLIC VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options) {
+	return iostring.regex_replacer(regex, replacement, options);
 }
-PUBLIC var regex_replace(CVR instring, CVR regexstr, CVR replacementstr, CVR options) {
+PUBLIC var regex_replace(CVR instring, SV regex, SV replacement, SV options) {
 	var newstring = instring;
-	return newstring.regex_replacer(regexstr, replacementstr, options);
+	return newstring.regex_replacer(regex, replacement, options);
 }
 
 
@@ -310,59 +310,35 @@ PUBLIC var crop(CVR instring) {
 }
 
 
-PUBLIC VARREF trimmer(VARREF iostring, CVR trimchars, CVR options) {
+PUBLIC VARREF trimmer(VARREF iostring, SV trimchars, SV options) {
 	return iostring.trimmer(trimchars, options);
 }
-PUBLIC var trim(CVR instring, CVR trimchars, CVR options) {
+PUBLIC var trim(CVR instring, SV trimchars, SV options) {
 
 	return instring.trim(trimchars, options);
 }
 
-
-
-PUBLIC VARREF trimmer(VARREF iostring, const char* trimchars) {
+PUBLIC VARREF trimmer(VARREF iostring, SV trimchars) {
 	return iostring.trimmer(trimchars);
 }
-PUBLIC var trim(CVR instring, const char* trimchars) {
+PUBLIC var trim(CVR instring, SV trimchars) {
 	return instring.trim(trimchars);
 }
 
-PUBLIC VARREF trimmerf(VARREF iostring, const char* trimchars) {
+PUBLIC VARREF trimmerf(VARREF iostring, SV trimchars) {
 	return iostring.trimmerf(trimchars);
 }
-PUBLIC var trimf(CVR instring, const char* trimchars) {
+PUBLIC var trimf(CVR instring, SV trimchars) {
 	return instring.trimf(trimchars);
 }
 
-PUBLIC VARREF trimmerb(VARREF iostring, const char* trimchars) {
+PUBLIC VARREF trimmerb(VARREF iostring, SV trimchars) {
 	return iostring.trimmerb(trimchars);
 }
-PUBLIC var trimb(CVR instring, const char* trimchars) {
+PUBLIC var trimb(CVR instring, SV trimchars) {
 	return instring.trimb(trimchars);
 }
 
-
-//PUBLIC VARREF trimmer(VARREF iostring, CVR trimchars) {
-//	return iostring.trimmer(trimchars);
-//}
-//PUBLIC var trim(CVR instring, CVR trimchars) {
-//	return instring.trim(trimchars);
-//}
-//
-//PUBLIC VARREF trimmerf(VARREF iostring, CVR trimchars) {
-//	return iostring.trimmerf(trimchars);
-//}
-//PUBLIC var trimf(CVR instring, CVR trimchars) {
-//	return instring.trimf(trimchars);
-//}
-//
-//PUBLIC VARREF trimmerb(VARREF iostring, CVR trimchars) {
-//	return iostring.trimmerb(trimchars);
-//}
-//PUBLIC var trimb(CVR instring, CVR trimchars) {
-//	return instring.trimb(trimchars);
-//}
-//
 
 PUBLIC VARREF sorter(VARREF iostring, SV sepchar) {
 	return iostring.sorter(sepchar);
@@ -390,16 +366,8 @@ PUBLIC var join(const dim& sourcedim, SV sepchar) {
 }
 
 
-PUBLIC var chr(CVR integer) {
-	return var().chr(integer);
-}
-
 PUBLIC var chr(const int integer) {
 	return var().chr(integer);
-}
-
-PUBLIC var textchr(CVR integer) {
-	return var().textchr(integer);
 }
 
 PUBLIC var textchr(const int integer) {
@@ -565,7 +533,7 @@ PUBLIC var field2(CVR instring, SV substrx, const int fieldnx, const int nfields
 	return instring.field2(substrx, fieldnx, nfieldsx);
 }
 
-/* moved to mvprogram to allow custom conversions like "[DATE]"
+/* moved to exoprog to allow custom conversions like "[DATE]"
 PUBLIC var oconv(CVR instring, const char* conversion)
 {
 	return instring.oconv(conversion);
@@ -897,7 +865,7 @@ PUBLIC var listindexes(CVR dbfilename, CVR fieldname) {
 }
 
 PUBLIC
-int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int threadno) {
+int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno) {
 
 	// signal/interrupt handlers
 	// install_signals();
@@ -959,7 +927,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	mv.COMMAND.splicer(1, 1, "");
 
 	// options are in either (XXX) or {XXX} at the end of the command.
-	// similar code in exodus_main() and mvprogram.cpp:perform()
+	// similar code in exodus_main() and exoprog.cpp:perform()
 	var lastchar = mv.COMMAND[-1];
 	// if (lastchar==")")
 	//	mv.OPTIONS=mv.COMMAND.field2("(",-1);

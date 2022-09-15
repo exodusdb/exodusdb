@@ -1092,7 +1092,7 @@ function main() {
 							"\r\n// 1. the name of the shared library to open,"
 							"\r\n// 2. the name of the function within the shared library that will create an exodus program object,"
 							"\r\n// 3. and the current program's mv environment to share with it."
-							"\r\nFunctor_funcx(MvEnvironment& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+							"\r\nFunctor_funcx(ExoEnv& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
 							"\r\n"
 							"\r\n// Allow assignment of library name to override the default constructed"
 							"\r\nFunctor_funcx& operator=(const var& newlibraryname) {"

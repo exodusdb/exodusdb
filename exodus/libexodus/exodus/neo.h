@@ -27,7 +27,7 @@ THE SOFTWARE.
 #ifndef EXODUS_POSIX
 #define WIN32_LEAN_AND_MEAN
 #include <exodus/var.h>
-#include <exodus/mvenvironment.h>
+#include <exodus/exoenv.h>
 #include <windows.h>
 
 // http://msdn2.microsoft.com/en-us/library/28d6s79h(VS.80).aspx
@@ -114,7 +114,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) {
 extern "C" {
 
 #define function(funcname) \
-	exodus::var __declspec(dllexport) funcname(exodus::MvEnvironment& env) {
+	exodus::var __declspec(dllexport) funcname(exodus::ExoEnv& env) {
 
 #define functionexit }
 

@@ -44,6 +44,10 @@ programinit()
 		swap(s1, s2);
 		assert(s1         eq "2");
 		assert(s2         eq "1");
+
+		std::swap(s1, s2);
+		assert(s1         eq "1");
+		assert(s2         eq "2");
 	}
 	{
 		var started = ostime().dump("ostime=");

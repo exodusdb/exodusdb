@@ -44,7 +44,7 @@ class printtext {
 		printfilename.osclose();
 	}
 
-	void printtx(MvEnvironment& mv, io tx) {
+	void printtx(ExoEnv& mv, io tx) {
 		//print(tx);
 		if (printptr.unassigned())
 			printptr = 0;

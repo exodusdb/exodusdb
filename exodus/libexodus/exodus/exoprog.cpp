@@ -1,10 +1,10 @@
-#include <exodus/mvprogram.h>
+#include <exodus/exoprog.h>
 
 #include <exodus/exoimpl.h>
 
 //allows and *requires* coding style like exodus application programming
 // e.g. must use USERNAME not mv.USERNAME
-#include <exodus/exodusmacros.h>
+#include <exodus/exomacros.h>
 
 // putting various member functions into all exodus programs allows access to the mv environment
 // variable which is also available in all exodus programs.
@@ -16,11 +16,11 @@ namespace exodus {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
 
-// constructor with an mvenvironment mv 
+// constructor with an exoenv mv 
 // mv is a reference to allow mv.xxxxxx syntax instead of mv->xxxxxx
 // but this means that mv must be provided at program construction
 // and cannot be changed thereafter
-ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
+ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
 	: mv(inmv)
 {
 	cached_dictid_ = "";
@@ -1078,7 +1078,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 	// return ID^"*"^dictid;
 
-	// wire up the the library linker to have the current mvenvironment
+	// wire up the the library linker to have the current exoenv
 	// if (!perform_exodusfunctorbase_.mv_)
 	//	perform_exodusfunctorbase_.mv_=this;
 
@@ -1142,7 +1142,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 		// set new perform environment
 		COMMAND = SENTENCE;
 		OPTIONS = "";
-		// similar code in exodus_main() and mvprogram.cpp:perform()
+		// similar code in exodus_main() and exoprog.cpp:perform()
 		var lastchar = COMMAND[-1];
 		if (lastchar == ")") {
 			OPTIONS = "(" ^ COMMAND.field2("(", -1);
@@ -1204,7 +1204,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			throw;
 		}
 
-		//dont catch MVLogoff in perform/execute. leave it for mvprogram top level exit
+		//dont catch MVLogoff in perform/execute. leave it for exoprog top level exit
 		//catch (const MVLogoff& e)
 		//{
 		//	// similar to stop for the time being
@@ -1423,7 +1423,7 @@ baddict:
 				cached_dictexodusfunctorbase_ = new ExodusFunctorBase;
 				cached_dict_functions[functorcachekey] = cached_dictexodusfunctorbase_;
 
-				// wire up the the library linker to have the current mvenvironment
+				// wire up the the library linker to have the current exoenv
 				// if (!dict_exodusfunctorbase_.mv_)
 				cached_dictexodusfunctorbase_->mv_ = (&mv);
 

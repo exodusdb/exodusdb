@@ -35,7 +35,7 @@
 //OPTION D=Debug. Suppress try/catch exception handling so debuggers can catch errors
 #define programexit(PROGRAMNAME)                                                                                \
 	classexit(PROGRAMNAME) int PROGRAMNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno) { \
-		MvEnvironment mv;                                                                                       \
+		ExoEnv mv;                                                                                              \
 		exodus_main(exodus__argc, exodus__argv, mv, threadno);                                                  \
 		int result = 0;                                                                                         \
 		PROGRAMNAME##ExodusProgram exodusprogram1(mv);                                                          \

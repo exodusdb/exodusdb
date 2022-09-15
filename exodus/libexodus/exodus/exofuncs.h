@@ -55,7 +55,7 @@ namespace exodus {
 //#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
 #define LOCKIOSTREAM
 
-PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int threadno);
+PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno);
 
 PUBLIC ND var osgetenv(CVR code = "");
 PUBLIC bool osgetenv(CVR code, VARREF value);
@@ -70,6 +70,8 @@ PUBLIC ND bool unassigned(CVR var2);
 PUBLIC void move(VARREF fromvar, VARREF tovar);
 PUBLIC void swap(VARREF var1, VARREF var2);
 
+// OS
+
 PUBLIC ND var date();
 PUBLIC ND var time();
 PUBLIC ND var ostime();
@@ -77,16 +79,15 @@ PUBLIC ND var timestamp();
 //PUBLIC ND var timedate();
 
 PUBLIC void ossleep(const int milliseconds);
-PUBLIC var oswait(const int milliseconds, CVR dirpath);
-
-PUBLIC void breakon();
-PUBLIC void breakoff();
+PUBLIC var oswait(const int milliseconds, SV dirpath);
 
 // Read/write osfile at specified offset. Must open/close.
 PUBLIC bool osopen(CVR osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
 PUBLIC void osclose(CVR osfilevar);
+// Versions where offset is input and output
 PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length);
 PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
+// Allow calling with const offset e.g. numeric ints
 PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
 PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset);
 
@@ -101,9 +102,9 @@ PUBLIC bool osrename(CVR old_ospath, CVR new_ospath);
 PUBLIC bool oscopy(CVR from_ospath, CVR to_ospath);
 PUBLIC bool osmove(CVR from_ospath, CVR to_ospath);
 
-PUBLIC ND var oslist(CVR path DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY, const int mode = 0);
-PUBLIC ND var oslistf(CVR filepath DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY);
-PUBLIC ND var oslistd(CVR dirpath DEFAULT_DOT, CVR globpattern DEFAULT_EMPTY);
+PUBLIC ND var oslist(CVR path DEFAULT_DOT, SV globpattern DEFAULT_EMPTY, const int mode = 0);
+PUBLIC ND var oslistf(CVR filepath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
+PUBLIC ND var oslistd(CVR dirpath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
 
 PUBLIC ND var osinfo(CVR path, const int mode = 0);
 PUBLIC ND var osfile(CVR filepath);
@@ -123,7 +124,7 @@ PUBLIC var osshellread(CVR command);
 PUBLIC bool osshellread(VARREF readstr, CVR command);
 PUBLIC bool osshellwrite(CVR writestr, CVR command);
 
-// Moved to mvprogram
+// Moved to exoprog
 //PUBLIC void stop(CVR text DEFAULT_EMPTY);
 //PUBLIC void abort(CVR text DEFAULT_EMPTY);	 // dont confuse with abort() which is standard c/c++
 //PUBLIC void abortall(CVR text DEFAULT_EMPTY);
@@ -143,7 +144,8 @@ PUBLIC ND var getxlocale();
 //void printl(CVR var2 DEFAULT_EMPTY);
 //void printt(CVR var2 DEFAULT_EMPTY);
 
-// MATH/BOOLEAN
+// MATH
+
 PUBLIC ND var abs(CVR num1);
 PUBLIC ND var pwr(CVR base, CVR exponent);
 PUBLIC ND var exp(CVR power);
@@ -153,6 +155,10 @@ PUBLIC ND var cos(CVR degrees);
 PUBLIC ND var tan(CVR degrees);
 PUBLIC ND var atan(CVR degrees);
 PUBLIC ND var loge(CVR num1);
+PUBLIC ND var mod(CVR dividend, CVR divisor);
+PUBLIC ND var mod(CVR dividend, const double divisor);
+PUBLIC ND var mod(CVR dividend, const int divisor);
+
 // integer() represents pick int() because int() is reserved word in c/c++
 // Note that integer like pick int() is the same as floor()
 // whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any fractional
@@ -165,26 +171,11 @@ PUBLIC ND var round(CVR num1, const int ndecimals = 0);
 PUBLIC ND var rnd(const int number);
 PUBLIC void initrnd(CVR seed = 0);
 
-PUBLIC ND var mod(CVR dividend, CVR divisor);
-PUBLIC ND var mod(CVR dividend, const double divisor);
-PUBLIC ND var mod(CVR dividend, const int divisor);
-
-PUBLIC ND var at(const int columnorcode);
-PUBLIC ND var at(CVR column, CVR row);
-
-// Moved to mvprogram
-//PUBLIC ND var getcursor();
-//PUBLIC void setcursor(CVR cursor);
+// INPUT
 
 PUBLIC ND var getprompt();
 PUBLIC void setprompt(CVR prompt);
 
-PUBLIC bool echo(const int on_off);
-
-//PUBLIC VARREF input();
-//PUBLIC VARREF input(VARREF intostr);
-//PUBLIC VARREF input(CVR prompt, VARREF intostr);
-//PUBLIC VARREF inputn(VARREF intostr, const int nchars);
 PUBLIC var input();
 PUBLIC var input(CVR prompt);
 PUBLIC var inputn(const int nchars);
@@ -194,20 +185,25 @@ PUBLIC ND bool hasinput(const int millisecs = 0);
 PUBLIC ND bool eof();
 PUBLIC bool echo(const int on_off);
 
+PUBLIC void breakon();
+PUBLIC void breakoff();
+
+// SIMPLE STRINGS
+
 PUBLIC ND var len(CVR var2);
 PUBLIC ND var textlen(CVR var2);
 
-PUBLIC VARREF converter(VARREF iostring, SV oldchars, SV newchars);
-PUBLIC ND var convert(CVR instring, SV oldchars, SV newchars);
+PUBLIC VARREF converter(VARREF iostring, SV fromchars, SV tochars);
+PUBLIC ND var convert(CVR instring, SV fromchars, SV tochars);
 
-PUBLIC VARREF textconverter(VARREF iostring, CVR oldchars, CVR newchars);
-PUBLIC ND var textconvert(CVR instring, CVR oldchars, CVR newchars);
+PUBLIC VARREF textconverter(VARREF iostring, SV fromchars, SV tochars);
+PUBLIC ND var textconvert(CVR instring, SV fromchars, SV tochars);
 
-PUBLIC VARREF replacer(VARREF iostring, SV oldstr, SV newstr);
-PUBLIC ND var replace(CVR instring, SV oldstr, SV newstr);
+PUBLIC VARREF replacer(VARREF iostring, SV fromstr, SV tostr);
+PUBLIC ND var replace(CVR instring, SV fromstr, SV tostr);
 
-PUBLIC VARREF regex_replacer(VARREF iostring, CVR oldstr, CVR newstr, CVR options DEFAULT_EMPTY);
-PUBLIC ND var regex_replace(CVR instring, CVR oldstr, CVR newstr, CVR options DEFAULT_EMPTY);
+PUBLIC VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
+PUBLIC ND var regex_replace(CVR instring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
 
 PUBLIC VARREF ucaser(VARREF iostring);
 PUBLIC ND var ucase(CVR instring);
@@ -264,39 +260,20 @@ PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const 
 PUBLIC ND var fieldstore(CVR instring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
 
 
-PUBLIC VARREF trimmer(VARREF iostring, CVR trimchars, CVR options);
-PUBLIC ND var trim(CVR instring, CVR trimchars, CVR options);
+PUBLIC VARREF trimmer(VARREF iostring, SV trimchars, SV options);
+PUBLIC ND var trim(CVR instring, SV trimchars, SV options);
 
 
-PUBLIC VARREF trimmer(VARREF iostring, const char* trimchars DEFAULT_SPACE);
-PUBLIC ND var trim(CVR instring, const char* trimchars DEFAULT_SPACE);
+PUBLIC VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE);
+PUBLIC ND var trim(CVR instring, SV trimchars DEFAULT_SPACE);
 
-PUBLIC VARREF trimmerf(VARREF iostring, const char* trimchars DEFAULT_SPACE);
-PUBLIC ND var trimf(CVR instring, const char* trimchars DEFAULT_SPACE);
+PUBLIC VARREF trimmerf(VARREF iostring, SV trimchars DEFAULT_SPACE);
+PUBLIC ND var trimf(CVR instring, SV trimchars DEFAULT_SPACE);
 
-PUBLIC VARREF trimmerb(VARREF iostring, const char* trimchars DEFAULT_SPACE);
-PUBLIC ND var trimb(CVR instring, const char* trimchars DEFAULT_SPACE);
+PUBLIC VARREF trimmerb(VARREF iostring, SV trimchars DEFAULT_SPACE);
+PUBLIC ND var trimb(CVR instring, SV trimchars DEFAULT_SPACE);
 
-
-//PUBLIC VARREF trimmer(VARREF iostring, CVR trimchars);
-//PUBLIC ND var trim(CVR instring, CVR trimchars);
-//
-//PUBLIC VARREF trimmerf(VARREF iostring, CVR trimchars);
-//PUBLIC ND var trimf(CVR instring, CVR trimchars);
-//
-//PUBLIC VARREF trimmerb(VARREF iostring, CVR trimchars);
-//PUBLIC ND var trimb(CVR instring, CVR trimchars);
-
-
-PUBLIC VARREF cropper(VARREF iostring);
-PUBLIC ND var crop(CVR instring);
-
-PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM);
-PUBLIC ND var sort(CVR instring, SV sepchar = _FM);
-
-PUBLIC ND var chr(CVR integer);
 PUBLIC ND var chr(const int integer);
-PUBLIC ND var textchr(CVR integer);
 PUBLIC ND var textchr(const int integer);
 PUBLIC ND var match(CVR instring, CVR matchstr, CVR options DEFAULT_EMPTY);
 PUBLIC ND var seq(CVR char1);
@@ -315,8 +292,6 @@ PUBLIC bool starts(CVR instring, SV substr);
 PUBLIC bool end(CVR instring, SV substr);
 PUBLIC bool contains(CVR instring, SV substr);
 
-//PUBLIC ND var index(CVR instring, CVR substr, const int occurrenceno = 1);
-//PUBLIC ND var index(CVR instring, SV substr);
 PUBLIC ND var index(CVR instring, SV substr, const int startcharno = 1);
 PUBLIC ND var indexn(CVR instring, SV substr);
 PUBLIC ND var indexr(CVR instring, SV substr, const int startcharno = -1);
@@ -324,11 +299,63 @@ PUBLIC ND var indexr(CVR instring, SV substr, const int startcharno = -1);
 PUBLIC ND var field(CVR instring, SV substrx, const int fieldnx, const int nfieldsx = 1);
 PUBLIC ND var field2(CVR instring, SV substrx, const int fieldnx, const int nfieldsx = 1);
 
-// moved to mvprogram to allow custom conversions like "[DATE]"
-// PUBLIC var oconv(CVR instring, const char* conversion);
-// PUBLIC var oconv(CVR instring, CVR conversion);
-// PUBLIC var iconv(CVR instring, const char* conversion);
-// PUBLIC var iconv(CVR instring, CVR conversion);
+// STRINGS WITH FIELD MARKS
+
+PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno);
+
+PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM);
+PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM);
+
+PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
+PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement);
+PUBLIC ND var pickreplace(CVR instring, const int fieldno, CVR replacement);
+
+PUBLIC ND var extract(CVR instring, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0);
+
+PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
+PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, CVR insertion);
+PUBLIC ND var insert(CVR instring, const int fieldno, CVR insertion);
+
+// PUBLIC var erase(CVR instring, const int fieldno, const int valueno=0, const int
+// subvalueno=0);
+PUBLIC ND var remove(CVR instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
+
+PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
+PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, CVR replacement);
+PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, CVR replacement);
+
+PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
+PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, CVR insertion);
+PUBLIC VARREF inserter(VARREF iostring, const int fieldno, CVR insertion);
+
+// PUBLIC VARREF eraser(VARREF iostring, const int fieldno, const int valueno=0, const int
+// subvalueno=0);
+PUBLIC VARREF remover(VARREF iostring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
+
+PUBLIC ND bool locate(CVR target, CVR instring);
+PUBLIC bool locate(CVR target, CVR instring, VARREF setting);
+PUBLIC bool locate(CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
+
+PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting);
+PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
+
+PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting);
+PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
+
+PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring);
+PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting);
+PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0, const int subvalueno = 0);
+
+PUBLIC ND var sum(CVR instring, SV sepchar);
+PUBLIC ND var sum(CVR instring);
+
+PUBLIC VARREF cropper(VARREF iostring);
+PUBLIC ND var crop(CVR instring);
+
+PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM);
+PUBLIC ND var sort(CVR instring, SV sepchar = _FM);
+
+// DATABASE
 
 PUBLIC bool connect(CVR connectionstring DEFAULT_EMPTY);
 PUBLIC void disconnect();
@@ -380,7 +407,7 @@ PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key);
 PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key);
 PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
 
-// moved to mvprogram so they have access to default cursor in mv.CURSOR
+// moved to exoprog so they have access to default cursor in mv.CURSOR
 // PUBLIC bool select(CVR sortselectclause DEFAULT_EMPTY);
 // PUBLIC void clearselect();
 // PUBLIC bool readnext(VARREF key);
@@ -390,59 +417,6 @@ PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
 
 PUBLIC ND var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode);
 PUBLIC ND var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode);
-PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno);
-
-PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM);
-PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM);
-
-PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
-PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement);
-PUBLIC ND var pickreplace(CVR instring, const int fieldno, CVR replacement);
-
-PUBLIC ND var extract(CVR instring, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0);
-
-PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
-PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, CVR insertion);
-PUBLIC ND var insert(CVR instring, const int fieldno, CVR insertion);
-
-// PUBLIC var erase(CVR instring, const int fieldno, const int valueno=0, const int
-// subvalueno=0);
-PUBLIC ND var remove(CVR instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
-
-PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
-PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, CVR replacement);
-PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, CVR replacement);
-
-PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
-PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, CVR insertion);
-PUBLIC VARREF inserter(VARREF iostring, const int fieldno, CVR insertion);
-
-// PUBLIC VARREF eraser(VARREF iostring, const int fieldno, const int valueno=0, const int
-// subvalueno=0);
-PUBLIC VARREF remover(VARREF iostring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
-
-// locate & locateby without fieldno or valueno arguments uses character VM as separator character
-// locate & locateby with fieldno=0 uses character FM
-// locate & locateby with fieldno>0 uses character VM
-// locate & locateby with valueno>0 uses character SM
-
-PUBLIC ND bool locate(CVR target, CVR instring);
-PUBLIC bool locate(CVR target, CVR instring, VARREF setting);
-PUBLIC bool locate(CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
-
-PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting);
-PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
-
-PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting);
-PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0);
-
-PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring);
-PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting);
-PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0, const int subvalueno = 0);
-
-PUBLIC ND var sum(CVR instring, SV sepchar);
-PUBLIC ND var sum(CVR instring);
-
 
 ////////////////////////////////////////////
 //output(args), outputl(args), outputt(args)

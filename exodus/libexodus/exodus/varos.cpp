@@ -1213,11 +1213,11 @@ var var::osdir() const {
 //	}
 //}
 
-var var::oslistf(CVR globpattern) const {
+var var::oslistf(SV globpattern) const {
 	return this->oslist(globpattern, 1);
 }
 
-var var::oslistd(CVR globpattern) const {
+var var::oslistd(SV globpattern) const {
 	return this->oslist(globpattern, 2);
 }
 
@@ -1227,12 +1227,12 @@ var var::oslistd(CVR globpattern) const {
 *@param	mode	1=files only, 2=directories only, otherwise both.
 *@returns		List of directory and/or filenames depending on mode. fm separator
 */
-var var::oslist(CVR globpattern0, const int mode) const {
+var var::oslist(SV globpattern0, const int mode) const {
 
 	THISIS("var var::oslist(CVR globpattern, const int mode) const")
 	assertDefined(function_sig);
 	//ISSTRING(path0)
-	ISSTRING(globpattern0)
+	//ISSTRING(globpattern0)
 
 	// returns an fm separated list of files and/or folders
 
@@ -1240,7 +1240,7 @@ var var::oslist(CVR globpattern0, const int mode) const {
 
 	var path = to_path_string(*this);
 	var globpattern;
-	if (globpattern0.len()) {
+	if (globpattern0.size()) {
 		globpattern = globpattern0;
 	}
 	// file globbing can and must be passed as tail end of path

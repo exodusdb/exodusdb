@@ -287,6 +287,26 @@ programinit()
 	}
 
 	{
+		printl("Check getting whole env is the same as getting all one by one");
+
+		var env;
+		env.osgetenv("");
+		printl(env);
+		printl();
+		TRACE(env.len())
+
+		var env2 = "";
+		for (var code : env) {
+			env2 ^= code.field("=",1) ^ "=" ^ osgetenv(code.field("=",1));
+			env2 ^= FM_;
+		}
+		env2.popper();
+		printl(env2);
+		TRACE(env2.len())
+
+		assert(env2 eq env);
+	}
+	{
 		var temprecord;
 		var tempfilename0 = "tempfile";
 		assert(oswrite("123" on tempfilename0));

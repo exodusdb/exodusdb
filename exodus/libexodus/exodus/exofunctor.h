@@ -72,16 +72,16 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 
 */
 
-#ifndef MVFUNCTOR_H
-#define MVFUNCTOR_H
+#ifndef EXOFUNCTOR_H
+#define EXOFUNCTOR_H
 
 #include <exodus/var.h>
 
-// MvEnvironment and ExodusProgramBase are forward declared classes (see below)
-// because they only exist as pointers or references in mvfunctor.
-// and MvEnvironment contains an actual ExodusFunctorBase
-//#include <exodus/mvenvironment.h>
-//#include <exodus/mvprogram.h>
+// ExoEnv and ExodusProgramBase are forward declared classes (see below)
+// because they only exist as pointers or references in exofunctor.
+// and ExoEnv contains an actual ExodusFunctorBase
+//#include <exodus/exoenv.h>
+//#include <exodus/exoprog.h>
 
 // good programming practice to prevent many white hairs
 // http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
@@ -91,7 +91,7 @@ namespace exodus {
 // using namespace exodus;
 
 class ExodusProgramBase;
-class MvEnvironment;
+class ExoEnv;
 
 // pExodusProgramBase - "pointer to exodus program" type
 using pExodusProgramBase = ExodusProgramBase*;
@@ -101,7 +101,7 @@ using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
 
 // ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus
 // programs
-using ExodusProgramBaseCreateDeleteFunction = auto (*)(pExodusProgramBase&, MvEnvironment&, pExodusProgramBaseMemberFunction&) -> void;
+using ExodusProgramBaseCreateDeleteFunction = auto (*)(pExodusProgramBase&, ExoEnv&, pExodusProgramBaseMemberFunction&) -> void;
 
 class PUBLIC ExodusFunctorBase {
 
@@ -109,13 +109,13 @@ class PUBLIC ExodusFunctorBase {
 	ExodusFunctorBase();
 
 	// constructor to provide everything immediately
-	ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv);
+	ExodusFunctorBase(const std::string libname, const std::string funcname, ExoEnv& mv);
 
 	// constructor to provide library and function names immediately
 	ExodusFunctorBase(const std::string libname, const std::string funcname);
 
 	// constructor to provide environment immediately
-	ExodusFunctorBase(MvEnvironment& mv);
+	ExodusFunctorBase(ExoEnv& mv);
 
 	// to allow function name to be assigned a name and this name is the name of the library
 	// called pickos call @
@@ -150,7 +150,7 @@ class PUBLIC ExodusFunctorBase {
 
    public:
 	// for call or die (smf)
-	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
+	bool init(const char* libraryname, const char* functionname, ExoEnv& mv);
 
 	// assumes name and mv setup on initialisation then opens library on first call
 	bool init();
@@ -176,7 +176,7 @@ class PUBLIC ExodusFunctorBase {
 
    public:
 	// only public for rather hacked mvipc getResponseToRequest()
-	mutable MvEnvironment* mv_;
+	mutable ExoEnv* mv_;
 
 	// TODO move to private
 	// records the library opened so we can close and reopen new libraries automatically
@@ -209,4 +209,4 @@ class PUBLIC ExodusFunctorBase {
 
 }  // namespace exodus
 
-#endif	// MVFUNCTOR_H
+#endif	// EXOFUNCTOR_H

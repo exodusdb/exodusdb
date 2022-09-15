@@ -1212,26 +1212,28 @@ VARREF splicerx(const int start1, const int length, const char* c) {
 };
 */
 
-VARREF var::move(VARREF destinationvar) {
+VARREF var::move(VARREF tovar) {
 
-	THISIS("VARREF var::move(VARREF destinationvar)")
-	// move even unassigned vars (but not uninitialised ones)
-	//assertDefined(function_sig);
+	THISIS("VARREF var::move(VARREF tovar)")
 	assertAssigned(function_sig);
-	ISDEFINED(destinationvar)
+	ISDEFINED(tovar)
 
-	destinationvar.var_str.swap(var_str);
-	destinationvar.var_typ = var_typ;
-	destinationvar.var_int = var_int;
-	destinationvar.var_dbl = var_dbl;
+	// move the string
+	tovar.var_str = std::move(var_str);
 
+	// set source var to empty string
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
-	return destinationvar;
+	// copy the rest over
+	tovar.var_typ = var_typ;
+	tovar.var_int = var_int;
+	tovar.var_dbl = var_dbl;
+
+	return tovar;
 }
 
-// kind of const needed in calculatex
+// const version needed in calculatex
 CVR var::swap(CVR var2) const {
 
 	THISIS(__PRETTY_FUNCTION__)
@@ -1239,20 +1241,20 @@ CVR var::swap(CVR var2) const {
 	assertDefined(function_sig);
 	ISDEFINED(var2)
 
-	// intermediary copies of var2
+	// copy var2 to temp
 	auto mvtypex = var2.var_typ;
 	auto mvintx = var2.var_int;
 	auto mvdblx = var2.var_dbl;
 
-	// do string first since it is the largest and most likely to fail
+	// swap strings
 	var_str.swap(var2.var_str);
 
-	// copy mv to var2
+	// copy var1 to var2
 	var2.var_typ = var_typ;
 	var2.var_int = var_int;
 	var2.var_dbl = var_dbl;
 
-	// copy intermediaries to mv
+	// copy temp to var1
 	var_typ = mvtypex;
 	var_int = mvintx;
 	var_dbl = mvdblx;
@@ -1260,7 +1262,7 @@ CVR var::swap(CVR var2) const {
 	return *this;
 }
 
-// version without const
+// non-const version
 VARREF var::swap(VARREF var2) {
 
 	THISIS(__PRETTY_FUNCTION__)
@@ -1268,20 +1270,20 @@ VARREF var::swap(VARREF var2) {
 	assertDefined(function_sig);
 	ISDEFINED(var2)
 
-	// intermediary copies of var2
+	// copy var2 to temp
 	auto mvtypex = var2.var_typ;
 	auto mvintx = var2.var_int;
 	auto mvdblx = var2.var_dbl;
 
-	// do string first since it is the largest and most likely to fail
+	// swap strings
 	var_str.swap(var2.var_str);
 
-	// copy mv to var2
+	// copy var1 to var2
 	var2.var_typ = var_typ;
 	var2.var_int = var_int;
 	var2.var_dbl = var_dbl;
 
-	// copy intermediaries to mv
+	// copy temp to var1
 	var_typ = mvtypex;
 	var_int = mvintx;
 	var_dbl = mvdblx;
@@ -1439,31 +1441,31 @@ VARREF var::raiser() {
 
 //generic helper to handle char and u32_char wise conversion (mapping)
 template <class T1, class T2, class T3>
-void string_converter(T1& var_str, const T2 oldchars, const T3 newchars) {
+void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 	typename T1::size_type pos = T1::npos;
 
 	// Optimise for single character replacement
 	// No observable speedup
-	//if (oldchars.len() == 1 and newchars.len() == 1) {
-	//	std::replace(var_str.begin(), var_str.end(), oldchars[0], newchars[0]);
+	//if (fromchars.len() == 1 and tochars.len() == 1) {
+	//	std::replace(var_str.begin(), var_str.end(), fromchars[0], tochars[0]);
 	//}
 
-	int newchars_size = newchars.size();
+	int tochars_size = tochars.size();
 	while (true) {
 		// locate (backwards) any of the from characters
 		// because we might be removing characters
 		// and it is faster to remove last character first
-		pos = var_str.find_last_of(oldchars, pos);
+		pos = var_str.find_last_of(fromchars, pos);
 
 		if (pos == T1::npos)
 			break;
 
 		// find which from character we have found
-		int fromcharn = static_cast<int>(oldchars.find(var_str[pos]));
+		int fromcharn = static_cast<int>(fromchars.find(var_str[pos]));
 
-		if (fromcharn < newchars_size)
-			var_str.replace(pos, 1, newchars.substr(fromcharn, 1));
-			//var_str.replace(pos, 1, newchars[fromcharn]);
+		if (fromcharn < tochars_size)
+			var_str.replace(pos, 1, tochars.substr(fromcharn, 1));
+			//var_str.replace(pos, 1, tochars[fromcharn]);
 		else
 			var_str.erase(pos, 1);
 
@@ -1477,69 +1479,69 @@ void string_converter(T1& var_str, const T2 oldchars, const T3 newchars) {
 
 // convert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
-//var var::convert(CVR oldchars, CVR newchars) const& {
-var var::convert(SV oldchars, SV newchars) const& {
+//var var::convert(CVR fromchars, CVR tochars) const& {
+var var::convert(SV fromchars, SV tochars) const& {
 
-//	THISIS("var var::convert(SV oldchars,SV newchars) const")
+//	THISIS("var var::convert(SV fromchars,SV tochars) const")
 //	assertString(function_sig);
 
-	// return var(*this).converter(oldchars,newchars);
-	var temp = var(*this).converter(oldchars, newchars);
+	// return var(*this).converter(fromchars,tochars);
+	var temp = var(*this).converter(fromchars, tochars);
 	return temp;
 }
 
 // on temporary
-//VARREF var::convert(CVR oldchars, CVR newchars) && {
-VARREF var::convert(SV oldchars, SV newchars) && {
+//VARREF var::convert(CVR fromchars, CVR tochars) && {
+VARREF var::convert(SV fromchars, SV tochars) && {
 	//dont check if defined/assigned since temporaries very unlikely to be so
 
-	return this->converter(oldchars, newchars);
+	return this->converter(fromchars, tochars);
 }
 
 // in-place
-//VARREF var::converter(CVR oldchars, CVR newchars) {
-VARREF var::converter(SV oldchars, SV newchars) {
+//VARREF var::converter(CVR fromchars, CVR tochars) {
+VARREF var::converter(SV fromchars, SV tochars) {
 
-	THISIS("VARREF var::converter(SV oldchars,SV newchars)")
+	THISIS("VARREF var::converter(SV fromchars,SV tochars)")
 	assertStringMutator(function_sig);
 
-	//string_converter(var_str, oldchars.var_str, newchars.var_str);
-	string_converter(var_str, oldchars, newchars);
+	//string_converter(var_str, fromchars.var_str, tochars.var_str);
+	string_converter(var_str, fromchars, tochars);
 
 	return *this;
 }
 
 //// in-place for const char*
-//VARREF var::converter(const char* oldchars, const char* newchars) {
+//VARREF var::converter(const char* fromchars, const char* tochars) {
 //
-//	THISIS("VARREF var::converter(const char* oldchars, const char* newchars)")
+//	THISIS("VARREF var::converter(const char* fromchars, const char* tochars)")
 //	assertStringMutator(function_sig);
 //
-//	string_converter(var_str, std::string(oldchars), std::string(newchars));
+//	string_converter(var_str, std::string(fromchars), std::string(tochars));
 //
 //	return *this;
 //}
 
 // textconvert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
-var var::textconvert(SV oldchars, SV newchars) const& {
-	return var(*this).textconverter(oldchars, newchars);
+var var::textconvert(SV fromchars, SV tochars) const& {
+	return var(*this).textconverter(fromchars, tochars);
 }
 
 // on temporary
-VARREF var::textconvert(SV oldchars, SV newchars) && {
-	return this->textconverter(oldchars, newchars);
+VARREF var::textconvert(SV fromchars, SV tochars) && {
+	return this->textconverter(fromchars, tochars);
 }
 
 // in-place
-VARREF var::textconverter(SV oldchars, SV newchars) {
+VARREF var::textconverter(SV fromchars, SV tochars) {
 
-	THISIS("VARREF var::converter(CVR oldchars,CVR newchars)")
+	THISIS("VARREF var::converter(CVR fromchars,CVR tochars)")
 	assertStringMutator(function_sig);
 
 	// all ASCII -> bytewise conversion for speed
-	if (is_ascii(oldchars) && is_ascii(newchars)) {
-		string_converter(var_str, oldchars, newchars);
+	if (is_ascii(fromchars) && is_ascii(tochars)) {
+		string_converter(var_str, fromchars, tochars);
 	}
 
 	// any non-ASCI -> convert to wide before conversion, then back again
@@ -1547,15 +1549,15 @@ VARREF var::textconverter(SV oldchars, SV newchars) {
 
 		// convert everything to from UTF8 to wide string
 		std::u32string u32_str1 = this->to_u32string();
-		//std::u32string u32_oldchars = var(oldchars).to_u32string();
-		//std::u32string u32_newchars = var(newchars).to_u32string();
-		//std::u32string u32_oldchars = boost::locale::conv::utf_to_utf<char32_t>(oldchars);
-		//std::u32string u32_newchars = boost::locale::conv::utf_to_utf<char32_t>(newchars);
-		std::u32string u32_oldchars = boost::locale::conv::utf_to_utf<char32_t>(std::string(oldchars));
-		std::u32string u32_newchars = boost::locale::conv::utf_to_utf<char32_t>(std::string(newchars));
+		//std::u32string u32_fromchars = var(fromchars).to_u32string();
+		//std::u32string u32_tochars = var(tochars).to_u32string();
+		//std::u32string u32_fromchars = boost::locale::conv::utf_to_utf<char32_t>(fromchars);
+		//std::u32string u32_tochars = boost::locale::conv::utf_to_utf<char32_t>(tochars);
+		std::u32string u32_fromchars = boost::locale::conv::utf_to_utf<char32_t>(std::string(fromchars));
+		std::u32string u32_tochars = boost::locale::conv::utf_to_utf<char32_t>(std::string(tochars));
 
 		// convert the wide characters
-		string_converter(u32_str1, u32_oldchars, u32_newchars);
+		string_converter(u32_str1, u32_fromchars, u32_tochars);
 
 		// convert the string back to UTF8 from wide string
 		//this->from_u32string(u32_str1);
@@ -1895,7 +1897,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 	THISIS("var var::xlate(CVR filename,CVR fieldno, const char* mode) const")
 	assertString(function_sig);
 	ISSTRING(filename)
-	// fieldnames are supported as mvprogram::xlate
+	// fieldnames are supported as exoprog::xlate
 	// but not here in var::xlate which only supports field numbers since it has no
 	// access to dictionaries
 	ISNUMERIC(fieldno)

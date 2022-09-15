@@ -22,8 +22,8 @@
 
 #include <string>
 #include <thread>
-#define EXO_MVENVIRONMENT_CPP
-#include <exodus/mvenvironment.h>
+#define EXOENV_CPP
+#include <exodus/exoenv.h>
 
 // avoid this unless absolutely necessary then possible to move this file out of exodus var library
 //(stick to throwing VarError with a suitable error message)
@@ -40,15 +40,15 @@ std::string mvgethostname();
 // derived classes to implement them since they are defined in the class header
 
 // destructor
-MvEnvironment::~MvEnvironment() {
+ExoEnv::~ExoEnv() {
 
-	// std::wcout<<"MvEnvironment: Closing Definitions ... "<<std::flush;
+	// std::wcout<<"ExoEnv: Closing Definitions ... "<<std::flush;
 	if (this->DEFINITIONS.assigned() && this->DEFINITIONS) {
 		this->DEFINITIONS.close();
 	}
 	// std::wcout<<"OK"<<std::endl;
 
-	// std::wcout<<"MvEnvironment: Disconnecting DB ... "<<std::flush;
+	// std::wcout<<"ExoEnv: Disconnecting DB ... "<<std::flush;
 	if (this->SESSION.assigned() && this->SESSION) {
 		this->SESSION.close();
 	}
@@ -60,11 +60,11 @@ MvEnvironment::~MvEnvironment() {
 }
 
 // keep in sync both 1) declaration in class and 2) contruction initialisation
-bool MvEnvironment::init(const int threadno) {
+bool ExoEnv::init(const int threadno) {
 
 	this->TIMESTAMP = var().timestamp();
 
-	// std::wcout<<"MvEnvironment::init("<<threadno<<")"<<std::endl;
+	// std::wcout<<"ExoEnv::init("<<threadno<<")"<<std::endl;
 
 	// per process
 	this->ROLLOUTFILE = "~" ^ var(threadno) ^ ".$$$";
@@ -98,7 +98,7 @@ bool MvEnvironment::init(const int threadno) {
 	return true;
 }
 
-//bool MvEnvironment::processno_islocked(int processno)
+//bool ExoEnv::processno_islocked(int processno)
 //{
 //	return processno_islocked2(processno, &processnolockfd);
 //}

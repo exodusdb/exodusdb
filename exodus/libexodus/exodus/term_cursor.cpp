@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include <exodus/var.h>
-#include <mvprogram.h>
+#include <exoprog.h>
 
 namespace exodus {
 

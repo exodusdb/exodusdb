@@ -29,13 +29,13 @@ THE SOFTWARE.
 
 // must be before exodus macros and functions otherwise lots of errors
 // from standard libararies which are included here
-#include <exodus/mvenvironment.h>
-#include <exodus/mvfunctor.h>
-#include <exodus/mvprogram.h>
+#include <exodus/exoenv.h>
+#include <exodus/exofunctor.h>
+#include <exodus/exoprog.h>
 
 // always last to avoid conflicting definitions
-#include <exodus/exodusfuncs.h>
-#include <exodus/exodusmacros.h>
+#include <exodus/exofuncs.h>
+#include <exodus/exomacros.h>
 #include <exodus/exoimpl.h>
 #include <exodus/varerr.h>
 #include <exodus/range.h>

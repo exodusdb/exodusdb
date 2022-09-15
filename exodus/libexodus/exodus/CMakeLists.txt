@@ -106,13 +106,13 @@ add_library(exodus SHARED
 # mvlocale.cpp
 
 # big ones first for efficient parallel compilation
- mvprogram.cpp
+ exoprog.cpp
  vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
  var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
  varchrono.cpp
  varfuncs.cpp varioconv.cpp
- mvenvironment.cpp exodusfuncs.cpp exoos.cpp
- varwait.cpp varunicode.cpp varposix.cpp mvfunctor.cpp #mvbrackets.cpp
+ exoenv.cpp exofuncs.cpp exoos.cpp
+ varwait.cpp varunicode.cpp varposix.cpp exofunctor.cpp #mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
  MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp
  varoshandle.cpp vardbconn.cpp mvprocessno.cpp
@@ -157,16 +157,16 @@ install(FILES
  exodus.h
  range.h
  exoimpl.h
- exodusmacros.h
- mvenvironment.h
- exodusfuncs.h
+ exomacros.h
+ exoenv.h
+ exofuncs.h
  #mvimpl.h mvipc.h mvconfig.h mvlink.h
- mvfunctor.h
+ exofunctor.h
  program.h
  library.h
  dict.h
  common.h
- mvprogram.h
+ exoprog.h
  ioconv_custom.h
  printtx.hpp
 DESTINATION include/exodus)

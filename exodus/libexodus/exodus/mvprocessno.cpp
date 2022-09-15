@@ -108,7 +108,7 @@ int getprocessno(const char* filename, int* fd) {
 	return 0;
 }
 
-// should be called in mvenvironment destructor
+// should be called in exoenv destructor
 void releaseprocess(int* fd) {
 	close(*fd);
 	*fd = 0;

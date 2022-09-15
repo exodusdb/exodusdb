@@ -6,7 +6,7 @@
 // ExodusFunctorBase Functor_ioconv_custom;
 class Functor_ioconv_custom : public ExodusFunctorBase {
    public:
-	Functor_ioconv_custom(MvEnvironment& mv)
+	Functor_ioconv_custom(ExoEnv& mv)
 		: ExodusFunctorBase("ioconv_custom", "exodusprogrambasecreatedelete_", mv) {
 	}
 

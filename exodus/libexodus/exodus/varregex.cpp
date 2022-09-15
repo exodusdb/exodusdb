@@ -281,14 +281,14 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 }
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::match(CVR matchstr, SV options) const {
+var var::match(SV matchstr, SV options) const {
 
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
 	// https:www.debuggex.com
 
-	THISIS("bool var::match(CVR matchstr, SV options) const")
+	THISIS("bool var::match(SV matchstr, SV options) const")
 	assertString(function_sig);
-	ISSTRING(matchstr)
+	//ISSTRING(matchstr)
 
 	// wild cards like
 	// *.* or *.???
@@ -313,7 +313,8 @@ var var::match(CVR matchstr, SV options) const {
 		const std::string replacement_for_regex_special = R"raw(\$&)raw";
 #endif
 
-		std::string matchstr2 = std_boost::regex_replace(matchstr.var_str, regex_special_chars,
+		//std::string matchstr2 = std_boost::regex_replace(matchstr.var_str, regex_special_chars,
+		std::string matchstr2 = std_boost::regex_replace(std::string(matchstr), regex_special_chars,
 											  replacement_for_regex_special);
 
 		// 1. force to match whole string
@@ -369,12 +370,14 @@ var var::match(CVR matchstr, SV options) const {
 	REGEX regex;
 	try {
 #ifdef USE_BOOST
-        regex = boost::make_u32regex(matchstr.var_str, get_regex_syntax_flags(options));
+		//regex = boost::make_u32regex(matchstr.var_str, get_regex_syntax_flags(options));
+		regex = boost::make_u32regex(std::string(matchstr), get_regex_syntax_flags(options));
 #else
-		regex=std::regex(matchstr.var_str, get_regex_syntax_flags(options));
+		//regex=std::regex(matchstr.var_str, get_regex_syntax_flags(options));
+		regex=std::regex(matchstr, get_regex_syntax_flags(options));
 #endif
 	} catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex " ^ matchstr.quote() ^ " " ^ var(e.what()).quote());
+		throw VarError("Error: Invalid regex " ^ var(matchstr).quote() ^ " " ^ var(e.what()).quote());
 	}
 
 	/*
@@ -481,24 +484,24 @@ VARREF var::replacer(SV what, SV with) {
 
 //regex based string replacement
 // only here really because boost regex is included here for file matching
-var var::regex_replace(CVR regexstr, CVR replacementstr, SV options) const& {
+var var::regex_replace(SV regexstr, SV replacementstr, SV options) const& {
 	var newmv = *this;
 	return newmv.regex_replacer(regexstr, replacementstr, options);
 }
 
 // on temporary
-VARREF var::regex_replace(CVR regexstr, CVR replacementstr, SV options) && {
+VARREF var::regex_replace(SV regexstr, SV replacementstr, SV options) && {
 	return this->regex_replacer(regexstr, replacementstr, options);
 }
 
 // in-place
-VARREF var::regex_replacer(CVR regexstr, CVR replacementstr, SV options) {
+VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 
 	THISIS(
-		"VARREF var::regex_replacer(CVR regexstr, CVR replacementstr, SV options)")
+		"VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options)")
 	assertStringMutator(function_sig);
-	ISSTRING(regexstr)
-	ISSTRING(replacementstr)
+	//ISSTRING(regexstr)
+	//ISSTRING(replacementstr)
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
@@ -507,12 +510,14 @@ VARREF var::regex_replacer(CVR regexstr, CVR replacementstr, SV options) {
 	try {
 		//regex = std_boost::regex(regexstr.var_str, get_regex_syntax_flags(options));
 #ifdef USE_BOOST
-        regex1 = boost::make_u32regex(regexstr.var_str, get_regex_syntax_flags(options));
+		//regex1 = boost::make_u32regex(regexstr.var_str, get_regex_syntax_flags(options));
+		regex1 = boost::make_u32regex(std::string(regexstr), get_regex_syntax_flags(options));
 #else
-		regex1=std::regex(regexstr.var_str, get_regex_syntax_flags(options));
+		//regex1=std::regex(regexstr.var_str, get_regex_syntax_flags(options));
+		regex1=std::regex(regexstr, get_regex_syntax_flags(options));
 #endif
 	} catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex " ^ regexstr.quote() ^ " " ^ var(e.what()));
+		throw VarError("Error: Invalid regex " ^ var(regexstr).quote() ^ " " ^ var(e.what()));
 	}
 
 	// return regex_match(var_str, expression);
@@ -521,7 +526,7 @@ VARREF var::regex_replacer(CVR regexstr, CVR replacementstr, SV options) {
 	// std::ostream_iterator<char, char> oiter(outputstring);
 	// std_boost::regex_replace(oiter, var_str.begin(), var_str.end(),regex_regex, with,
 	// boost::match_default | boost::format_all);
-	var_str = REGEX_REPLACE(var_str, regex1, replacementstr.var_str);
+	var_str = REGEX_REPLACE(var_str, regex1, std::string(replacementstr));
 	return *this;
 }
 

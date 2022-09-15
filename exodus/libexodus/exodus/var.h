@@ -1415,7 +1415,7 @@ class PUBLIC var final {
 	//ND var timedate() const;// current date and time string eg 09:28:43 09 SEP 2022
 
 	void ossleep(const int milliseconds) const;
-	var oswait(const int milliseconds, CVR directory) const;
+	var oswait(const int milliseconds, SV directory) const;
 
 	void breakon() const;
 	void breakoff() const;
@@ -1485,7 +1485,7 @@ class PUBLIC var final {
 
 	VARREF move(VARREF destinationvar);
 	// swap is marked as const despite it replaceping the var with var2
-	// Currently this is required in rare cases where functions like mvprogram::calculate
+	// Currently this is required in rare cases where functions like exoprog::calculate
 	// temporarily require member variables to be something else but switch back before exiting
 	// if such function throws then it would leave the member variables in a changed state.
 	CVR swap(CVR var2) const;//version that works on const vars
@@ -1580,7 +1580,7 @@ class PUBLIC var final {
 	ND var textlen() const; // UTF8 code points
 	ND var fcount(SV str) const; //field count
 	ND var count(SV str) const;
-	ND var match(CVR matchstr, SV options DEFAULT_EMPTY) const;
+	ND var match(SV str, SV options DEFAULT_EMPTY) const;
 
 	//                                 Javascript   PHP             Python       Go          Rust          C++
 	ND bool starts(SV str) const;   // startsWith() str_starts_with startswith() HasPrefix() starts_with() starts_with
@@ -1602,10 +1602,10 @@ class PUBLIC var final {
 
 	// all return VARREF and are not const)
 
-	VARREF converter(SV oldchars, SV newchars);
-	VARREF textconverter(SV oldchars, SV newchars);
-	VARREF replacer(SV whatstr, SV withstr);
-	VARREF regex_replacer(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY);
+	VARREF converter(SV fromchars, SV tochars);
+	VARREF textconverter(SV fromchars, SV tochars);
+	VARREF replacer(SV fromstr, SV tostr);
+	VARREF regex_replacer(SV regex, SV replacement, SV options DEFAULT_EMPTY);
 	VARREF splicer(const int start1, const int length, SV insertstr);
 	VARREF splicer(const int start1, SV insertstr);
 	VARREF popper();
@@ -1635,10 +1635,10 @@ class PUBLIC var final {
 	// SAME ON TEMPORARIES
 	//////////////////////
 
-	ND VARREF convert(SV oldchars, SV newchars) &&;
-	ND VARREF textconvert(SV oldchars, SV newchars) &&;
-	ND VARREF replace(SV whatstr, SV withstr) &&;
-	ND VARREF regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY) &&;
+	ND VARREF convert(SV fromchars, SV tochars) &&;
+	ND VARREF textconvert(SV fromchars, SV tochars) &&;
+	ND VARREF replace(SV fromstr, SV tostr) &&;
+	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) &&;
 	ND VARREF splice(const int start1, const int length, SV insertstr) &&;
 	ND VARREF splice(const int start1, SV insertstr) &&;
 	ND VARREF pop() &&;
@@ -1668,10 +1668,10 @@ class PUBLIC var final {
 
 	// all are const
 
-	ND var convert(SV oldchars, SV newchars) const&;
-	ND var textconvert(SV oldchars, SV newchars) const&;
-	ND var replace(SV whatstr, SV withstr) const&;
-	ND var regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY) const&;
+	ND var convert(SV fromchars, SV tochars) const&;
+	ND var textconvert(SV fromchars, SV tochars) const&;
+	ND var replace(SV fromstr, SV tostr) const&;
+	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
 	ND var splice(const int start1, const int length, SV insertstr) const&;
 	ND var splice(const int start1, SV insertstr) const&;
 	ND var pop() const&;
@@ -1918,7 +1918,7 @@ class PUBLIC var final {
 	bool writeo(CVR filehandle, CVR key) const;
 	bool deleteo(CVR key) const;
 
-	// MvEnvironment function now to allow access to RECORD ID DICT etc. and call external
+	// ExoEnv function now to allow access to RECORD ID DICT etc. and call external
 	// functions
 	// var calculate() const;
 
@@ -1965,9 +1965,9 @@ class PUBLIC var final {
 	bool oscopy(CVR to_osfilename) const;
 	bool osmove(CVR to_osfilename) const;
 
-	ND var oslist(CVR globpattern DEFAULT_EMPTY, const int mode = 0) const;
-	ND var oslistf(CVR globpattern DEFAULT_EMPTY) const;
-	ND var oslistd(CVR globpattern DEFAULT_EMPTY) const;
+	ND var oslist(SV globpattern DEFAULT_EMPTY, const int mode = 0) const;
+	ND var oslistf(SV globpattern DEFAULT_EMPTY) const;
+	ND var oslistd(SV globpattern DEFAULT_EMPTY) const;
 	ND var osinfo(const int mode) const;
 	ND var osfile() const;
 	ND var osdir() const;
@@ -2003,13 +2003,13 @@ class PUBLIC var final {
 	// EXECUTE/PERFORM CONTROL
 	/////////////////////////
 
-	// done in mvprogram now since they need to pass mvenvironment
+	// done in exoprog now since they need to pass exoenv
 	// var perform() const;
 	// var execute() const;
 	// chain should be similar to one of the above?
 	// var chain() const;
 
-	// done in mvprogram since no need to include in var
+	// done in exoprog since no need to include in var
 	// void stop(CVR text DEFAULT_EMPTY) const;
 	// void abort(CVR text DEFAULT_EMPTY) const;
 	// void abortall(CVR text DEFAULT_EMPTY) const;
