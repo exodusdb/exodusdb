@@ -148,7 +148,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		//invalidlogin:='||If you know and have access to the email address of this account'
 		//invalidlogin:='|<b>you can click Password Reset to get a new password.<b>'
 		//NB make sure "Password Reset" does not appear exactly in message
-		invalidlogin.swapper("Password Reset", "Password&nbsp;Reset");
+		invalidlogin.replacer("Password Reset", "Password&nbsp;Reset");
 
 		var realreason = "";
 
@@ -265,7 +265,7 @@ passfail:
 
 				//+ in user ipnos means add to group user ip ranges
 				if (validips.contains("+")) {
-					validips.transfer(addvalidips);
+					validips.move(addvalidips);
 				} else {
 					addvalidips = "";
 				}
@@ -324,7 +324,7 @@ passfail:
 
 					//gosub convvalidips
 					validips.converter(",;/ " ^ FM, "     ");
-					validips.swapper(".*", "");
+					validips.replacer(".*", "");
 					validips.trimmer();
 
 					//1. allow connection from anywhere if * is present
@@ -724,7 +724,7 @@ validateexit2:
 
 				//username does not exist
 				} else {
-					text.swapper(" and/or password", "");
+					text.replacer(" and/or password", "");
 					usersordefinitions = DEFINITIONS;
 					userkey = "BADUSER*" ^ username;
 					realreason = "Invalid usercode";
@@ -740,7 +740,7 @@ validateexit2:
 					var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 					RECORD.inserter(15, 1, datetime);
 					RECORD.inserter(16, 1, connection.f(1, 2));
-					text.swapper("username and/or ", "");
+					text.replacer("username and/or ", "");
 
 					var tt = text.field("|", 1);
 					if (tt.len() gt 80) {
@@ -770,7 +770,7 @@ validateexit2:
 					win.orec = RECORD;
 					call usersubs("PREWRITE.RESETPASSWORD");
 					if (not(win.valid)) {
-						msg_.transfer(request5);
+						msg_.move(request5);
 						return 0;
 					}
 
@@ -789,7 +789,7 @@ validateexit2:
 
 				if (passwordreset eq 1) {
 					invalidlogin = text;
-					text.transfer(request5);
+					text.move(request5);
 
 				} else if (passwordreset eq 2) {
 
@@ -811,7 +811,7 @@ validateexit2:
 					body(-1) = "Database: " ^ SYSTEM.f(23) ^ " (" ^ SYSTEM.f(17) ^ ")";
 					body(-1) = "System: " ^ SYSTEM.f(44);
 
-					body.swapper(FM, "\r\n");
+					body.replacer(FM, "\r\n");
 					call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
 					//"Password Reset" is hardcoded in index.htm
@@ -841,7 +841,7 @@ validateexit2:
 					}
 				}
 				if (failn gt 1) {
-					emailsubject.swapper("Failure", "Failure (" ^ failn ^ ")");
+					emailsubject.replacer("Failure", "Failure (" ^ failn ^ ")");
 				}
 
 				var fromipno = connection.f(1, 2);
@@ -1036,7 +1036,7 @@ validateexit2:
 		//detach the calling process
 		response_ = request2;
 		USER3.converter(VM ^ "|", FM ^ FM);
-		response_.swapper(FM, "\r\n");
+		response_.replacer(FM, "\r\n");
 
 		call oswrite(USER3, responsefilename);
 		//osclose responsefilename
@@ -1090,7 +1090,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 			gosub switchcompany();
 
 			var styles = userrec.f(19);
-			styles.swapper("Default", "");
+			styles.replacer("Default", "");
 			if (not(styles2.readv(users, userrec.f(21), 19))) {
 				styles2 = "";
 			}

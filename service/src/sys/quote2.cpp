@@ -10,9 +10,9 @@ function main(in string0) {
 	var string1 = string0;
 
 	string1.converter(DQ, "'");
-	string1.swapper(SM, "\" \"");
-	string1.swapper(VM, "\" \"");
-	string1.swapper(FM, "\" \"");
+	string1.replacer(SM, "\" \"");
+	string1.replacer(VM, "\" \"");
+	string1.replacer(FM, "\" \"");
 
 	return string1.quote();
 }

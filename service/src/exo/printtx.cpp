@@ -251,7 +251,7 @@ printtx2:
 				style = "";
 			}
 			if (style) {
-				css.swapper("</style>", style ^ "</style>");
+				css.replacer("</style>", style ^ "</style>");
 			}
 			//htmltitle=field(headx<1>,"'",1)
 			var htmltitle = headx.f(1);
@@ -263,7 +263,7 @@ printtx2:
 			css = "";
 		}
 	}
-	tx.swapper(FM, "\r\n");
+	tx.replacer(FM, "\r\n");
 	var result=1;
 	if (printfilename) {
 		if (not osbwrite(tx, printfile, printptr)) {
@@ -284,7 +284,7 @@ printtx2:
 
 subroutine convoptions() {
 
-	temp.swapper("\'\'", "^%^");
+	temp.replacer("\'\'", "^%^");
 
 	//convert options
 	//loop while index(temp,"L'",1) do swap "L'" with "'":fm in temp repeat
@@ -335,7 +335,7 @@ subroutine convoptions() {
 		temp.splicer(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
 	}
 
-	temp.swapper("^%^", "\'");
+	temp.replacer("^%^", "\'");
 
 	return;
 
@@ -359,7 +359,7 @@ subroutine getheadfoot() {
 
 	if (html) {
 		var head1 = headx.f(1);
-		head1.swapper(" ", "&nbsp;");
+		head1.replacer(" ", "&nbsp;");
 		head1.converter("~", " ");
 		while (true) {
 		///BREAK;

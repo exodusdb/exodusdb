@@ -19,7 +19,9 @@ var silent = OPTIONS.count("S");
 function main() {
 
 	//Pass if no default database connection
-	if (true or not connect()) {
+	if (not connect()) {
+	//if (true or not connect()) {
+		////
 		printl("No default db connection to perform test_asyncupd");
 		printl("Test passed");
 		return 0;

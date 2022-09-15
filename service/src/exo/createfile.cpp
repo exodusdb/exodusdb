@@ -12,12 +12,12 @@ function main() {
 
 	var command=COMMAND.convert(FM," ").lcase();
 
-	command.swapper(" dict."," dict ");
-	command.swapper(" dict_"," dict ");
+	command.replacer(" dict."," dict ");
+	command.replacer(" dict_"," dict ");
 	var dataonly=command.contains(" data ");
 	var dictonly=command.contains(" dict ");
-	command.swapper(" data "," ");
-	command.swapper(" dict "," ");
+	command.replacer(" data "," ");
+	command.replacer(" dict "," ");
 
 	//printl(command);
 

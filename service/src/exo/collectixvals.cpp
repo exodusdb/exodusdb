@@ -57,7 +57,7 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 		indexvalues.popper();
 
 	//return value in PSEUDO
-	transfer(indexvalues, PSEUDO);
+	move(indexvalues, PSEUDO);
 
         clearselect();
         call popselect(0, v69, v70, v71);

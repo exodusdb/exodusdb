@@ -332,7 +332,7 @@ programinit()
 		v1_01 = 1.01;
 		assert(textconverter(v1_01, ".", "_").outputl().toString()      eq "1_01");
 		v1_01 = 1.01;
-		assert(swapper(v1_01, ".", "_").outputl().toString()            eq "1_01");
+		assert(replacer(v1_01, ".", "_").outputl().toString()            eq "1_01");
 		v1_01 = 1.01;
 		assert(regex_replacer(v1_01, ".", "_").outputl().toString()     eq "____");
 		v1_01 = 1.01;

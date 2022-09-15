@@ -58,7 +58,7 @@ subroutine process(in str0, in mode, io wordseps) {
 		string2 = str0;
 		if (string2 ne "") {
 			string2.converter(FM ^ VM ^ SM ^ TM, "    ");
-			string2.swapper(" ", "\" \"");
+			string2.replacer(" ", "\" \"");
 			string2 = string2.quote();
 		}
 
@@ -111,7 +111,7 @@ capitalise:
 
 		} //ii;
 
-		string2.swapper("'S ", "'s ");
+		string2.replacer("'S ", "'s ");
 		if (string2.substr(-2, 2) eq "'S") {
 			string2.splicer(-2, 2, "'s");
 		}

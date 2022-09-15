@@ -166,7 +166,7 @@ nextdoc:
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
-				key.swapper("*", "%2A");
+				key.replacer("*", "%2A");
 				RECORD.write(reports, "DOCUMENTS*" ^ key);
 			}
 		}
@@ -203,7 +203,7 @@ nextdoc:
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
-				key.swapper("*", "%2A");
+				key.replacer("*", "%2A");
 				key = "DOCUMENTS*" ^ key;
 				if (xx.read(reports, key)) {
 					var("%DELETED%").write(reports, key);

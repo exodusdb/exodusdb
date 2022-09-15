@@ -158,7 +158,7 @@ getupperlower:
 	}
 
 	//swap '(Base)' with '(':base.currency:')' in lang
-	lang.swapper("(Base)", "(" ^ SYSTEM.f(134) ^ ")");
+	lang.replacer("(Base)", "(" ^ SYSTEM.f(134) ^ ")");
 
 	lang(100) = languagecode;
 	return 0;

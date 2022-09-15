@@ -113,14 +113,14 @@ function main(in nextcompanycode) {
 		if (sys.glang.f(10)) {
 			LOWERCASE = sys.glang.f(10);
 		}
-		UPPERCASE.swapper("%FF", RM);
-		LOWERCASE.swapper("%FF", RM);
-		UPPERCASE.swapper("%FE", FM);
-		LOWERCASE.swapper("%FE", FM);
-		UPPERCASE.swapper("%FD", VM);
-		LOWERCASE.swapper("%FD", VM);
-		UPPERCASE.swapper("%25", "%");
-		LOWERCASE.swapper("%25", "%");
+		UPPERCASE.replacer("%FF", RM);
+		LOWERCASE.replacer("%FF", RM);
+		UPPERCASE.replacer("%FE", FM);
+		LOWERCASE.replacer("%FE", FM);
+		UPPERCASE.replacer("%FD", VM);
+		LOWERCASE.replacer("%FD", VM);
+		UPPERCASE.replacer("%25", "%");
+		LOWERCASE.replacer("%25", "%");
 		if (UPPERCASE.len() ne LOWERCASE.len()) {
 			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
 			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

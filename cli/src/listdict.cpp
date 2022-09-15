@@ -26,7 +26,7 @@ function main() {
 			if (filename.starts("dict."))
 				dictfilenames ^= filename ^ FM;
 		}
-		dictfilenames.swapper(FM, "\n");
+		dictfilenames.replacer(FM, "\n");
 		print(dictfilenames);
 
 		stop();

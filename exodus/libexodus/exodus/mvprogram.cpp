@@ -189,7 +189,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		//reqivalues
 		if (op == "in" and ovalue[1] == "(" and ovalue[-1] == ")") {
 			ovalue.splicer(1, 1, "").popper();
-			ovalue.swapper("', '", VM);
+			ovalue.replacer("', '", VM);
 			ovalue.trimmerb().trimmerf().unquoter();
 			//ovalue.convert(VM,"]").outputl("ovalue=");
 		}
@@ -280,7 +280,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		bool allok = true;
 
 		//var id2 = MV ? (ID ^ "*" ^ MV) : ID;
-		var insertsql = baseinsertsql ^ ID.swapper("'", "''").squote() ^ ",";
+		var insertsql = baseinsertsql ^ ID.replacer("'", "''").squote() ^ ",";
 
 		//some or all fields may have filters on them
 		//some or all fields may not have filters, if 'order by' calculated fields
@@ -398,7 +398,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 			}
 			else {
 				//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
-				ovalues = ivalues.swap("'", "''").squoter();
+				ovalues = ivalues.replace("'", "''").squoter();
 			}
 
 			insertsql ^= " " ^ ovalues ^ ",";
@@ -571,7 +571,7 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_u
 	// CURSOR++;
 	// CURSOR has connection number hidden in it, so it cannot be used as an ordinary variable
 	// ATM
-	CURSOR.transfer(v2);
+	CURSOR.move(v2);
 	CURSOR = var().date() ^ "_" ^ (var().ostime().convert(".", "_"));
 	return true;
 }
@@ -580,7 +580,7 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_u
 bool ExodusProgramBase::popselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_unused]] VARREF v3, [[maybe_unused]] VARREF v4) {
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR--;
-	v2.transfer(CURSOR);
+	v2.move(CURSOR);
 	return true;
 }
 
@@ -618,9 +618,9 @@ void ExodusProgramBase::mssg(CVR msg, CVR options, VARREF buffer, CVR params) co
 	//var msg1 = msg.convert("|" ^ FM ^ VM ^ SM, "\n\n\n\n").trim("\n");
 	var msg1 = msg;
 
-	//swap %1, %2 etc with params
+	//replace %1, %2 etc with params
 	for (var ii = 1; ii <= 9; ++ii)
-		msg1.swapper("%" ^ ii, params.f(ii));
+		msg1.replacer("%" ^ ii, params.f(ii));
 
 	msg1.converter(_FM _VM "|", "\n\n\n").trimmer("\n");
 
@@ -720,8 +720,8 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 
 	task.ucaser();
 	task.converter(RM ^ FM ^ VM ^ SM, "\\\\\\");
-	task.swapper(" FILE ", " ");
-	task.swapper(" - ", " ");
+	task.replacer(" FILE ", " ");
+	task.replacer(" - ", " ");
 	task.converter(".", " ");
 	task.trimmer();
 
@@ -988,14 +988,14 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 
 		};	// ii;
 
-		string2.swapper("\'S ", "\'s ");
+		string2.replacer("\'S ", "\'s ");
 		if (string2.substr(-2, 2) == "\'S")
 			string2.splicer(-2, 2, "\'s");
 	} else if (mode0 == "QUOTE") {
 		string2 = str0;
 		if (string2 != "") {
 			string2.converter(FM ^ VM ^ SM ^ TM, "    ");
-			string2.swapper(" ", "\" \"");
+			string2.replacer(" ", "\" \"");
 			string2 = string2.quote();
 		}
 	} else if (mode0 == "UPPERCASE") {
@@ -1102,38 +1102,38 @@ var ExodusProgramBase::perform(CVR sentence) {
 	var savemv;
 	var savedict;
 
-	SENTENCE.transfer(savesentence);
-	COMMAND.transfer(savecommand);
-	OPTIONS.transfer(saveoptions);
-	RECUR0.transfer(saverecur0);
-	RECUR1.transfer(saverecur1);
-	RECUR2.transfer(saverecur2);
-	RECUR3.transfer(saverecur3);
-	RECUR4.transfer(saverecur4);
+	SENTENCE.move(savesentence);
+	COMMAND.move(savecommand);
+	OPTIONS.move(saveoptions);
+	RECUR0.move(saverecur0);
+	RECUR1.move(saverecur1);
+	RECUR2.move(saverecur2);
+	RECUR3.move(saverecur3);
+	RECUR4.move(saverecur4);
 	LEVEL++;
 	//
-	ID.transfer(saveid);
-	RECORD.transfer(saverecord);
-	MV.transfer(savemv);
-	DICT.transfer(savedict);
+	ID.move(saveid);
+	RECORD.move(saverecord);
+	MV.move(savemv);
+	DICT.move(savedict);
 
 	//a lambda function to restore the environment
 	auto restore_environment = [&]() {
 		// restore some environment
-		savesentence.transfer(SENTENCE);
-		savecommand.transfer(COMMAND);
-		saveoptions.transfer(OPTIONS);
-		saverecur0.transfer(RECUR0);
-		saverecur1.transfer(RECUR1);
-		saverecur2.transfer(RECUR2);
-		saverecur3.transfer(RECUR3);
-		saverecur4.transfer(RECUR4);
+		savesentence.move(SENTENCE);
+		savecommand.move(COMMAND);
+		saveoptions.move(OPTIONS);
+		saverecur0.move(RECUR0);
+		saverecur1.move(RECUR1);
+		saverecur2.move(RECUR2);
+		saverecur3.move(RECUR3);
+		saverecur4.move(RECUR4);
 		LEVEL--;
 		//
-		saveid.transfer(ID);
-		saverecord.transfer(RECORD);
-		savemv.transfer(MV);
-		savedict.transfer(DICT);
+		saveid.move(ID);
+		saverecord.move(RECORD);
+		savemv.move(MV);
+		savedict.move(DICT);
 	};
 
 	SENTENCE = sentence;
@@ -1216,7 +1216,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 		// chain is a kind of optional follow controlled by the library function
 		// to perform another function after the first
 		// go round again if anything in CHAIN
-		CHAIN.transfer(SENTENCE);
+		CHAIN.move(SENTENCE);
 	}
 
 	// restore some environment
@@ -1300,19 +1300,19 @@ var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, C
 	//if (dictid == "@ID" || dictid == "@id")
 	//	return ID;
 
-	// TODO how is it possible to exchange when the variable is const?
+	// TODO how is it possible to swap when the variable is const?
 
-	DICT.exchange(dictfile);
-	ID.exchange(id);
-	RECORD.exchange(record);
-	MV.exchange(mvno);
+	DICT.swap(dictfile);
+	ID.swap(id);
+	RECORD.swap(record);
+	MV.swap(mvno);
 
 	var result = calculate(dictid);
 
-	DICT.exchange(dictfile);
-	ID.exchange(id);
-	RECORD.exchange(record);
-	MV.exchange(mvno);
+	DICT.swap(dictfile);
+	ID.swap(id);
+	RECORD.swap(record);
+	MV.swap(mvno);
 
 	return result;
 }
@@ -1854,14 +1854,14 @@ var ExodusProgramBase::xmlquote(CVR string0) const {
 		string1 = string0;
 	}
 
-	string1.swapper("&", "&amp;");
-	string1.swapper(DQ, "&quot;");
-	string1.swapper("<", "&lt;");
-	string1.swapper(">", "&gt;");
+	string1.replacer("&", "&amp;");
+	string1.replacer(DQ, "&quot;");
+	string1.replacer("<", "&lt;");
+	string1.replacer(">", "&gt;");
 
 	string1.converter(DQ, "\'");
-	string1.swapper(VM, "\" \"");
-	string1.swapper(FM, "\" \"");
+	string1.replacer(VM, "\" \"");
+	string1.replacer(FM, "\" \"");
 	return string1.quote();
 }
 
@@ -1990,7 +1990,7 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 	 cookie ^= "&mk=" ^ defmarketcode;
 	 cookie ^= "&mc=" ^ maincurrcode;
 	 temp = SYSTEM.f(23);
-	 temp.swap("&", " and ");
+	 temp.replace("&", " and ");
 	 cookie ^= "&db=" ^ temp;
 
 	 backupreminder(dataset, msg);
@@ -2355,9 +2355,9 @@ zero:
 		}
 	}
 
-	text.swapper(FM ^ FM ^ FM, FM);
-	text.swapper(FM ^ FM, FM);
-	text.swapper(FM, ", ");
+	text.replacer(FM ^ FM ^ FM, FM);
+	text.replacer(FM ^ FM, FM);
+	text.replacer(FM, ", ");
 
 	return text;
 }

@@ -27,7 +27,11 @@ THE SOFTWARE.
 
 #include <string>
 #include <string_view>
-//#include <iostream> // only for debugging
+
+//#define EXO_SNITCH
+#ifdef EXO_SNITCH
+#	include <iostream> // only for debugging
+#endif
 
 //#define INT_IS_FLOOR
 //#include <math.h>  //for std::trunc
@@ -282,6 +286,9 @@ class PUBLIC var final {
 		// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
 		// variables var_typ=(char)0xFFFFFFF0;
 		var_typ = VARTYP_MASK;
+#ifdef EXO_SNITCH
+		std::clog << this << " var dtor" <<std::endl;
+#endif
 	}
 #else
 	~var() = default;
@@ -301,6 +308,9 @@ class PUBLIC var final {
 		// use initializers for speed? and only check afterwards if rhs was assigned
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
 
+#ifdef EXO_SNITCH
+		std::clog << this << " var copy ctor" <<std::endl;
+#endif
 	}
 
 	//////////////////////
@@ -315,7 +325,7 @@ class PUBLIC var final {
 
 	//var = var
 
-	// Not using copy and swap idiom (copy assignment by value)
+	// Not using copy and replace idiom (copy assignment by value)
 	// because Howard Hinnant recommends against in our case
 	// We avoids a copy and make sure that we do the
 
@@ -332,8 +342,9 @@ class PUBLIC var final {
 		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
 
-		//std::clog << "copy assignment by reference" <<std::endl;
-
+#ifdef EXO_SNITCH
+		std::clog << this << " var copy assign" <<std::endl;
+#endif
 		// Prevent self assign
 		// Removed for speed since we assume std::string handles it ok
 		//if (this == &rhs)
@@ -1472,13 +1483,13 @@ class PUBLIC var final {
 	ND bool unassigned() const;
 	VARREF unassigned(CVR defaultvalue);
 
-	VARREF transfer(VARREF destinationvar);
-	// exchange is marked as const despite it swapping the var with var2
+	VARREF move(VARREF destinationvar);
+	// swap is marked as const despite it replaceping the var with var2
 	// Currently this is required in rare cases where functions like mvprogram::calculate
 	// temporarily require member variables to be something else but switch back before exiting
 	// if such function throws then it would leave the member variables in a changed state.
-	CVR exchange(CVR var2) const;//version that works on const vars
-	VARREF exchange(VARREF var2);//version that works on non-const vars
+	CVR swap(CVR var2) const;//version that works on const vars
+	VARREF swap(VARREF var2);//version that works on non-const vars
 	var clone() const {
 		var clone;
 		clone.var_typ = var_typ;
@@ -1593,7 +1604,7 @@ class PUBLIC var final {
 
 	VARREF converter(SV oldchars, SV newchars);
 	VARREF textconverter(SV oldchars, SV newchars);
-	VARREF swapper(SV whatstr, SV withstr);
+	VARREF replacer(SV whatstr, SV withstr);
 	VARREF regex_replacer(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY);
 	VARREF splicer(const int start1, const int length, SV insertstr);
 	VARREF splicer(const int start1, SV insertstr);
@@ -1626,7 +1637,7 @@ class PUBLIC var final {
 
 	ND VARREF convert(SV oldchars, SV newchars) &&;
 	ND VARREF textconvert(SV oldchars, SV newchars) &&;
-	ND VARREF swap(SV whatstr, SV withstr) &&;
+	ND VARREF replace(SV whatstr, SV withstr) &&;
 	ND VARREF regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY) &&;
 	ND VARREF splice(const int start1, const int length, SV insertstr) &&;
 	ND VARREF splice(const int start1, SV insertstr) &&;
@@ -1659,7 +1670,7 @@ class PUBLIC var final {
 
 	ND var convert(SV oldchars, SV newchars) const&;
 	ND var textconvert(SV oldchars, SV newchars) const&;
-	ND var swap(SV whatstr, SV withstr) const&;
+	ND var replace(SV whatstr, SV withstr) const&;
 	ND var regex_replace(CVR regexstr, CVR replacementstr, SV options DEFAULT_EMPTY) const&;
 	ND var splice(const int start1, const int length, SV insertstr) const&;
 	ND var splice(const int start1, SV insertstr) const&;
@@ -1747,7 +1758,7 @@ class PUBLIC var final {
 
 	// this function hardly occurs anywhere in exodus code and should probably be renamed to
 	// something better it was called replace() in pickos but we are now using "replace()" to
-	// change substrings using regex (similar to the old pickos swap function) its mutator function
+	// change substrings using regex (similar to the old pickos replace function) its mutator function
 	// is .r()
 	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const;
 	ND var pickreplace(const int fieldno, const int valueno, CVR replacement) const;

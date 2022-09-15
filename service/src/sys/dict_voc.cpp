@@ -299,7 +299,7 @@ function main() {
 	var ans2 = ans;
 	ans2.ucaser();
 	if (ans2 ne ans) {
-		ans.transfer(ANS);
+		ans.move(ANS);
 	} else {
 	//@ans=xlate('USERS','%':ans2:'%',1,'X')
 		ANS = ans2.xlate("USERS", 1, "X");
@@ -310,7 +310,7 @@ function main() {
 				ANS = capitalise(ANS);
 				}
 			} else {
-			ans.transfer(ANS);
+			ans.move(ANS);
 			ANS = capitalise(ANS);
 		}
 	}

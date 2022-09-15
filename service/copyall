@@ -92,6 +92,7 @@ set -eux
 : Restarting all live processes
 : =============================
 :
+#	Only needed if sync_dat failed and need to force all
 #	touch ~/live/{bin,lib,dat,dat/*,dat/*/*}
 	touch ~/live/{bin,lib,dat}
 	fi

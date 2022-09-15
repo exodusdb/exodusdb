@@ -114,7 +114,7 @@ function main(in amountfmlanguage, in currcode0) {
 
 	//if base.currency='MYR' and currcode='MYR' then
 	if (currcode eq "MYR") {
-		words.swapper(" and ", " ");
+		words.replacer(" and ", " ");
 		cents = ((amount - amount.floor()) * 100).oconv("MD00P");
 		if (cents) {
 			words ^= " and Cents " ^ amountinwords(cents);

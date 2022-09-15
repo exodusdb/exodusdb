@@ -70,7 +70,7 @@ class PUBLIC dim final {
 	// 5. copy assignment - from lvalue
 	/////////////////////
 
-	// Not using copy assignment by value (copy-and-swap idiom)
+	// Not using copy assignment by value (copy-and-replace idiom)
 	// because Howard Hinnant recommends against in our case
 
 	// Prevent assigning to temporaries

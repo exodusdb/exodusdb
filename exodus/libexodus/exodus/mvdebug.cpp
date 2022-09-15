@@ -61,7 +61,7 @@ void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF return
 	}
 
 	// change DOS/WIN and MAC line ends to lf only
-	filetext.swapper("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
+	filetext.replacer("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
 
 	// extract the source line
 	var line = filetext.field("\x0A", lineno).trimf(" \t");

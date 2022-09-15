@@ -116,9 +116,9 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		if (not toaddress) {
 			toaddress = "support@neosys.com";
 		}
-		SENTENCE.transfer(savesentence);
+		SENTENCE.move(savesentence);
 		call sendmail(toaddress, "", "test email test subject", "test body line 1" "\r" "test body line2", v5, v6, errormsg, v8, params);
-		savesentence.transfer(SENTENCE);
+		savesentence.move(SENTENCE);
 		//if errormsg then call msg(toaddress:' ':@fm:errormsg)
 		//call msg(toaddress:' ':@fm:errormsg)
 		//if errormsg then call msg(toaddress:' ':@fm:errormsg)
@@ -226,7 +226,7 @@ forcedemail:
 		call osread(params2, filenamesx.f(1, filen));
 		//cut off after end of file character
 		//params2=field(params2,char(26),1)
-		params2.swapper("\r\n", "\r");
+		params2.replacer("\r\n", "\r");
 		params2.converter("\r\n", _FM _FM);
 		for (const var ii : range(1, 9)) {
 			if (params2.f(ii)) {
@@ -299,7 +299,7 @@ forcedemail:
 	//for CDO attachfilename must be full path
 	if (attachfilename) {
 
-		attachfilename.swapper("\\\\", "\\");
+		attachfilename.replacer("\\\\", "\\");
 		var cwd = oscwd();
 		if (not(VOLUMES)) {
 			cwd ^= OSSLASH;
@@ -311,18 +311,18 @@ forcedemail:
 		}
 		msgsize += attachfilename.osfile().f(1);
 
-		attachfilename.swapper("\\", "\\\\");
+		attachfilename.replacer("\\", "\\\\");
 	}
 
 	//body=body0
-	body.swapper(FM, "\r\n");
+	body.replacer(FM, "\r\n");
 
 	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
 	if (body and (body[1] ne "@")) {
 		bodyfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line
-		body.swapper("\r", "\t\r");
+		body.replacer("\r", "\t\r");
 		call oswrite(body, bodyfilename);
 		bodyfilename.osclose();
 		body = "@" ^ bodyfilename;
@@ -363,7 +363,7 @@ forcedemail:
 	//DOS uses EXODUS sendmail.js script which uses windows CDO object
 	if (VOLUMES) {
 
-		params.swapper(FM, "\r\n");
+		params.replacer(FM, "\r\n");
 		paramfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
 		call oswrite(params, paramfilename);
 
@@ -481,7 +481,7 @@ forcedemail:
 			headers.splicer(1, 1, "");
 			headers ^= VM;
 			headers.converter("'", "");
-			headers.swapper(VM, "\r\n");
+			headers.replacer(VM, "\r\n");
 
 			//cmd = "neomail " ^ (toaddress.quote()) ^ " " ^ (attachfilename.quote()) ^ " " "'" ^ headers ^ "'";
 
@@ -555,7 +555,7 @@ TRACE(offset)
 		//and pipe the body file into the program as standard input
 		tt = "\\";
 		bodyfilename.converter(tt, OSSLASH);
-		bodyfilename.swapper("$", "\\$");
+		bodyfilename.replacer("$", "\\$");
 		cmd ^= " < " ^ (bodyfilename.quote());
 
 	}

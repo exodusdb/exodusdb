@@ -42,31 +42,31 @@ function main(in mode, io datax, in params0="", in params20="") {
 		while (true) {
 			///BREAK;
 			if (not(datax.contains(tt))) break;
-			datax.swapper(tt, VM);
+			datax.replacer(tt, VM);
 		}//loop;
 		tt = " " ^ FM;
 		while (true) {
 			///BREAK;
 			if (not(datax.contains(tt))) break;
-			datax.swapper(tt, FM);
+			datax.replacer(tt, FM);
 		}//loop;
 		filler = "&nbsp;";
 		gosub fill(datax);
 
-		datax.swapper(FM, "</TD></TR>" ^ FM ^ "<TR><TD>");
-		datax.swapper(VM, "</TD>" ^ VM ^ "<TD>");
+		datax.replacer(FM, "</TD></TR>" ^ FM ^ "<TR><TD>");
+		datax.replacer(VM, "</TD>" ^ VM ^ "<TD>");
 		datax = "<TR><TD>" ^ datax ^ "</TD></TR>";
 
 		//trth='<TR><TD>'
 		if (params2) {
 			//trth='<TH>'
 			var line1 = datax.f(1);
-			line1.swapper("</TR>", "</tr>");
-			line1.swapper("</tr>", "</TR></THEAD><TBODY>");
-			line1.swapper("<TD>", "<th>");
-			line1.swapper("</TD>", "</th>");
-			line1.swapper("<td>", "<th>");
-			line1.swapper("</td>", "</th>");
+			line1.replacer("</TR>", "</tr>");
+			line1.replacer("</tr>", "</TR></THEAD><TBODY>");
+			line1.replacer("<TD>", "<th>");
+			line1.replacer("</TD>", "</th>");
+			line1.replacer("<td>", "<th>");
+			line1.replacer("</td>", "</th>");
 			datax(1) = line1;
 		}
 
@@ -74,7 +74,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		//tableid='T':rnd(999999999)[-7,7]
 		params2 = params;
 		//if params2 else params2='<TABLE><THEAD>'
-		params2.swapper("<TABLE", "<table");
+		params2.replacer("<TABLE", "<table");
 		//swap '<table' with '<table id=':tableid in params2
 		datax.splicer(1, 0, params2 ^ "<TBODY>");
 
@@ -91,8 +91,8 @@ function main(in mode, io datax, in params0="", in params20="") {
 		var lastline = datax.f(nlines);
 	//Total
 		if (lastline.contains("<TD>" ^ sys.glang.f(28))) {
-			lastline.swapper("TD>", "TH>");
-			lastline.swapper("td>", "th>");
+			lastline.replacer("TD>", "TH>");
+			lastline.replacer("td>", "th>");
 			datax(nlines) = lastline;
 		}
 
@@ -110,10 +110,10 @@ function main(in mode, io datax, in params0="", in params20="") {
 			var data2 = datax.f(1, vn);
 
 			//insert a break before all space+#
-			data2.swapper(" #", FM ^ "#");
+			data2.replacer(" #", FM ^ "#");
 
 			//restore #+space to be NOT broken
-			data2.swapper(FM ^ "# ", " # ");
+			data2.replacer(FM ^ "# ", " # ");
 
 			data2.converter(TM, FM);
 
@@ -142,7 +142,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 					}
 				} //ln;
 
-				data2.swapper(FM, trx ^ tr);
+				data2.replacer(FM, trx ^ tr);
 				data2.splicer(1, 0, "<table class=\"hashtable\">" ^ tr);
 				data2 ^= trx ^ "</table>";
 
@@ -162,10 +162,10 @@ function main(in mode, io datax, in params0="", in params20="") {
 		}//loop;
 
 	} else if (mode eq "DECODEHTML") {
-		datax.swapper("&nbsp;", " ");
-		datax.swapper("&lt;", "<");
-		datax.swapper("&gt;", ">");
-		datax.swapper("&amp;", "&");
+		datax.replacer("&nbsp;", " ");
+		datax.replacer("&lt;", "<");
+		datax.replacer("&gt;", ">");
+		datax.replacer("&amp;", "&");
 
 	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
 
@@ -257,7 +257,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				}
 				osname = osname.field(";", 1);
 				osname = osname.field(")", 1);
-				osname.swapper(" x86_64", "-64");
+				osname.replacer(" x86_64", "-64");
 			}
 		}
 		if (osname.substr(-2, 2) eq ".0") {

@@ -22,10 +22,10 @@ function main(in filename, in indexid, in texts0, io msg) {
 	texts.converter(allpunctuation, var(50).space());
 	var temp = texts.trim();
 
-	temp.swapper(" ", "&");
+	temp.replacer(" ", "&");
 	//if 1 then
-	temp.swapper("&", "]&");
-	temp.swapper(VM, "]" ^ VM);
+	temp.replacer("&", "]&");
+	temp.replacer(VM, "]" ^ VM);
 	temp ^= "]";
 	// end
 

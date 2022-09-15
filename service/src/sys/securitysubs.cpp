@@ -695,7 +695,7 @@ function main(in mode) {
 			//group separators act as data in intranet client forcing menu and passwords
 			for (const var fn : range(1, 2)) {
 				var temp = RECORD.f(fn);
-				temp.swapper("---", "");
+				temp.replacer("---", "");
 				RECORD(fn) = temp;
 			} //fn;
 
@@ -1180,7 +1180,7 @@ function main(in mode) {
 							body(1, -1) = baselinkdescs.f(1, linkn) ^ " " ^ baselinks.f(1, linkn);
 							//if @account='ACCOUNTS' then body:='?ACCOUNTS'
 						} //linkn;
-						body.swapper("Internet Explorer", "MS Edge");
+						body.replacer("Internet Explorer", "MS Edge");
 					} else {
 						body(1, -1) = "Please contact your IT support or colleagues";
 					}
@@ -1201,12 +1201,12 @@ function main(in mode) {
 						body(1, -1) = replyto;
 					}
 
-					body.swapper("%USERCODE%", newusers.f(ii, 1));
-					body.swapper("%USERNAME%", newusers.f(ii, 2));
-					body.swapper("%EMAIL%", toaddress);
-					body.swapper("%GROUP%", newusers.f(ii, 4));
-					body.swapper("%DATABASE%", SYSTEM.f(14, 1) ^ " (" ^ SYSTEM.f(17, 1) ^ ")");
-					body.swapper(VM, var().chr(13));
+					body.replacer("%USERCODE%", newusers.f(ii, 1));
+					body.replacer("%USERNAME%", newusers.f(ii, 2));
+					body.replacer("%EMAIL%", toaddress);
+					body.replacer("%GROUP%", newusers.f(ii, 4));
+					body.replacer("%DATABASE%", SYSTEM.f(14, 1) ^ " (" ^ SYSTEM.f(17, 1) ^ ")");
+					body.replacer(VM, var().chr(13));
 
 					call sendmail(toaddress, ccaddress, subject, body, attachfilename, deletex, errormsg, replyto);
 
@@ -1282,7 +1282,7 @@ function main(in mode) {
 		} //ii;
 
 		//add group marks
-		temprec(1) = temprec.f(1).swap(VM ^ VM, VM ^ "<hr/>" ^ VM);
+		temprec(1) = temprec.f(1).replace(VM ^ VM, VM ^ "<hr/>" ^ VM);
 
 		//reverse users so department shows at the top (and higher users at bottom sadly)
 		if (mode.field(".", 2) eq "USERS") {
@@ -1375,7 +1375,7 @@ function main(in mode) {
 					if (not temp) break;
 				} //ii;
 				task ^= "   ";
-				task.swapper("%SAME% ", "+");
+				task.replacer("%SAME% ", "+");
 				task.trimmerb();
 				lasttask = task2;
 
@@ -1640,7 +1640,7 @@ subroutine getemailtx() {
 					old = "removed " ^ old;
 				}
 				if (not(newx.len())) {
-					old.transfer(newx);
+					old.move(newx);
 				}
 				was = "";
 			}

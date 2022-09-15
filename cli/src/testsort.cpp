@@ -62,10 +62,15 @@ function main() {
 
 		printl(key, " : ", rec);
 
-		rec = trim(rec);
-		rec = swap(rec, " |", "|");
+//		rec = trim(rec);
+//		rec = replace(rec, " |", "|");
+//
+//		rec = convert(rec, "|", FM);
 
-		rec = convert(rec, "|", FM);
+		rec.trimmer();
+		rec.replacer(" |", "|");
+
+		rec.converter("|", FM);
 
 		write(rec, dictfile, key);
 
@@ -108,7 +113,7 @@ function main() {
 		rec = field(rec, "|", 2, 9999);
 		printl(key, ": ", rec);
 		while (index(rec, " |"))
-			swapper(rec, " |", "|");
+			replacer(rec, " |", "|");
 		write(trimb(convert(rec, "|", FM)), file, trim(key));
 	}
 

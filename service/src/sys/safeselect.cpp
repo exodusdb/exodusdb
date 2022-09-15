@@ -10,16 +10,16 @@ var dict;
 function main(in selectx) {
 	//c sys
 
-	RECORD.transfer(rr);
-	ID.transfer(id);
-	DICT.transfer(dict);
+	RECORD.move(rr);
+	ID.move(id);
+	DICT.move(dict);
 	//if @username='EXODUS' then oswrite selectx on 'SAFESELE'
 	//CALL PERF(selectX)
 	call xselect(selectx);
 
-	rr.transfer(RECORD);
-	id.transfer(ID);
-	dict.transfer(DICT);
+	rr.move(RECORD);
+	id.move(ID);
+	dict.move(DICT);
 
 	return 0;
 }

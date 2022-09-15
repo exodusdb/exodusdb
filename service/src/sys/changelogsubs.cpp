@@ -286,8 +286,8 @@ subroutine list() {
 
 	if (data_.f(1)) {
 		headingx ^= "'L'" ^ USER1.f(1);
-		headingx.swapper(SM, ", ");
-		headingx.swapper(VM, ", ");
+		headingx.replacer(SM, ", ");
+		headingx.replacer(VM, ", ");
 	}
 
 	cmd ^= " HEADING " ^ (headingx.quote());

@@ -613,7 +613,7 @@ nextprocess:
 									//sendmail - if it fails, there will be an entry in the log
 									toaddresses = bakpars.f(6);
 									//never send reminders to exodus since we will get nagios warnings at 12:00
-									toaddresses.swapper("backups@neosys.com", "");
+									toaddresses.replacer("backups@neosys.com", "");
 									toaddresses = trim(toaddresses, ";");
 									if (toaddresses) {
 										remindern = (localtime - 21600).mod(3600 * reminderhours) + 1;
@@ -628,7 +628,7 @@ nextprocess:
 											body(-1) = FM ^ "Please change it " "before 00:00 midnight tonight.";
 										}
 										printl(body);
-										body.swapper(FM, var().chr(13));
+										body.replacer(FM, var().chr(13));
 										call sendmail(toaddresses, "", subject, body, "", "", xx);
 									}
 
@@ -826,7 +826,7 @@ nextdbasen:;
 		ips = "";
 		for (ii = 1; ii <= nn; ++ii) {
 			line = result.f(ii).trim();
-			line.swapper("IPV4 ADDRESS", "IP ADDRESS");
+			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
 			if (line.substr(1, 10) eq "IP ADDRESS") {
 				ips(-1) = line.field(":", 2).trim().field("(", 1);
 			//only display the first

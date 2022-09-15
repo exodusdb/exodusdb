@@ -259,8 +259,8 @@ function main() {
 		var sys2 = SYSTEM.f(2);
 		sys2.splicer(-3, 3, "xls");
 		SYSTEM(2) = sys2;
-		output.swapper(FM, "\r\n");
-		output.swapper(VM, "\t");
+		output.replacer(FM, "\r\n");
+		output.replacer(VM, "\t");
 		call oswrite(output, SYSTEM.f(2));
 
 	}

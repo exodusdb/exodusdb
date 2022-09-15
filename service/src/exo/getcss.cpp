@@ -46,24 +46,24 @@ function main(io css, in version="") {
 		fontsize ^= "%";
 	}
 	if (thcolor) {
-		css.swapper("#ffff80", "%thcol%");
+		css.replacer("#ffff80", "%thcol%");
 	}
 	if (tdcolor) {
-		css.swapper("#ffffc0", "%tdcol%");
+		css.replacer("#ffffc0", "%tdcol%");
 	}
 	if (thcolor) {
-		css.swapper("%thcol%", thcolor);
+		css.replacer("%thcol%", thcolor);
 	}
 	if (tdcolor) {
-		css.swapper("%tdcol%", tdcolor);
+		css.replacer("%tdcol%", tdcolor);
 	}
 
-	css.swapper("exodusfont,", font);
-	css.swapper("exodussize", fontsize);
+	css.replacer("exodusfont,", font);
+	css.replacer("exodussize", fontsize);
 
 	var agent = SYSTEM.f(40);
 	if (agent.contains("MSIE 7")) {
-		css.swapper("xborder-collapse", "border-collapse");
+		css.replacer("xborder-collapse", "border-collapse");
 	}
 
 	return 0;

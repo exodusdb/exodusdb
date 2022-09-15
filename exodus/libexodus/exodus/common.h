@@ -38,7 +38,7 @@
 //      mv.labelledcommon[gen_common_no]=new gen_common;
 
 //works nicely but only if common already created otherwise points to nothing
-//and if you try to reset it later, it tried to swap out nothing, causing segfault
+//and if you try to reset it later, it tried to replace out nothing, causing segfault
 gen_common&& gen=reinterpret_cast<gen_common&&> (*mv.labelledcommon[gen_common_no]);
 
 //could use pointers but syntax is ugly gen->companies (and adecom must not recognise -> as an

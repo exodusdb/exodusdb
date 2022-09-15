@@ -82,7 +82,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	//convert command line to subroutine call
 	if (SENTENCE.field(" ", 1) eq "CONVCSV" and sentence0.unassigned()) {
 
-		SENTENCE.transfer(sentencex);
+		SENTENCE.move(sentencex);
 
 		//locate and remove SELECT statement from end of command
 		if (sentencex.locateusing(" ", "SELECT", temp)) {
@@ -108,28 +108,28 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	var normalise = sentencex.contains(" NORMALISE");
 	if (normalise) {
-		sentencex.swapper(" NORMALISE", "");
+		sentencex.replacer(" NORMALISE", "");
 	}
 
 	var firstmvonly = sentencex.contains(" FIRSTMVONLY");
 	if (firstmvonly) {
-		sentencex.swapper(" FIRSTMVONLY", "");
+		sentencex.replacer(" FIRSTMVONLY", "");
 	}
 
 	var mv1only = sentencex.contains(" MV1ONLY");
 	if (mv1only) {
-		sentencex.swapper(" MV1ONLY", "");
+		sentencex.replacer(" MV1ONLY", "");
 	}
 
 	var raw = sentencex.contains(" RAW");
 	if (raw) {
-		sentencex.swapper(" RAW", "");
+		sentencex.replacer(" RAW", "");
 	}
 	var mvgroupno = "";
 
 	var colheaderrow = not(sentencex.contains(" NOCOLHEADER"));
 	if (not colheaderrow) {
-		sentencex.swapper(" NOCOLHEADER", "");
+		sentencex.replacer(" NOCOLHEADER", "");
 	}
 
 	if (filename.substr(1, 4) eq "DICT") {
@@ -319,8 +319,8 @@ nextdict:
 
 					//extract title
 					var title = dict.f(3).trim();
-					title.swapper("<WBR/>", "");
-					title.swapper("<wbr/>", " ");
+					title.replacer("<WBR/>", "");
+					title.replacer("<wbr/>", " ");
 					title.converter(UPPERCASE ^ "|_" ^ VM, LOWERCASE ^ "   ");
 
 					//t=title[1,1]
@@ -328,7 +328,7 @@ nextdict:
 					//title[1,1]=t
 					title = capitalise(title);
 
-					title.swapper("(Base)", "(" ^ sys.company.f(3) ^ ")");
+					title.replacer("(Base)", "(" ^ sys.company.f(3) ^ ")");
 
 					//swap ' code' with '' in title
 
@@ -593,7 +593,7 @@ nextvn:
 					cell = "''";
 				}
 				if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
-					cell.swapper(DQ, "''");
+					cell.replacer(DQ, "''");
 				}
 				if (cell.len() gt 255) {
 					cell = cell.substr(1, 200) ^ " ...";
@@ -612,7 +612,7 @@ nextvn:
 					if (cell.contains(DQ)) {
 						if (fmtxs(coln) eq "T") {
 							if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
-								cell.swapper(DQ, "''");
+								cell.replacer(DQ, "''");
 								cell = cell.quote();
 							}
 						}
@@ -649,7 +649,7 @@ nextvn:
 		//if filename='TIMESHEETS' then if @record<2,vn> else line=''
 
 		//remove leading equal signs in order not to confuse Excel
-		line.swapper(FM ^ "=", FM);
+		line.replacer(FM ^ "=", FM);
 
 		//output one line
 		if (line ne "") {
@@ -679,7 +679,7 @@ nextvn:
 			if (hasconverter) {
 				call convertercsv("LINE", line, converterparams, filename);
 			} else {
-				line.swapper(FM, var().chr(9));
+				line.replacer(FM, var().chr(9));
 				line ^= "\r\n";
 			}
 

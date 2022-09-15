@@ -126,7 +126,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not filename) break;
 			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
 				if (tt.osread(filename)) {
-					tt.swapper("\r\n", FM);
+					tt.replacer("\r\n", FM);
 					tt.converter("\r\n", FM ^ FM);
 					//dont start if there is a database stop command
 					if (not((tt.f(1).lcase() ^ ".end").osfile())) {
@@ -451,15 +451,15 @@ nextpatch:;
 		//assumes at least 0-31 and 128-255 encoded like $hh
 
 		//reserve/use special characters for field separators
-		logx.swapper("^", "%5E");
-		logx.swapper("]", "%5D");
-		logx.swapper("\\", "%5C");
-		logx.swapper("[", "%5B");
-		logx.swapper("%FE", "^");
-		logx.swapper("%FD", "]");
-		logx.swapper("%FC", "\\");
-		logx.swapper("%FB", "[");
-		logx.swapper(RM, "%FF");
+		logx.replacer("^", "%5E");
+		logx.replacer("]", "%5D");
+		logx.replacer("\\", "%5C");
+		logx.replacer("[", "%5B");
+		logx.replacer("%FE", "^");
+		logx.replacer("%FD", "]");
+		logx.replacer("%FC", "\\");
+		logx.replacer("%FB", "[");
+		logx.replacer(RM, "%FF");
 		//swap fm with '^' in logx
 		//swap vm with ']' in logx
 		//swap sm with '\' in logx;*backslash
@@ -467,20 +467,20 @@ nextpatch:;
 		logx.converter(_FM _VM _SM _TM, "^]\\[");
 		//fefdfcfb=char(254):char(253):char(252):char(251)
 		//convert fefdfcfb to '^]\[' in logx;*backslash
-		logx.swapper(ST, "%FA");
+		logx.replacer(ST, "%FA");
 
-		logx.swapper("%20", " ");
+		logx.replacer("%20", " ");
 		//does not seem to format in XML
 		//swap '%20' with '&nbsp;' in logx
 
-		logx.swapper("&", "&amp;");
-		logx.swapper(DQ, "&quot;");
-		logx.swapper("<", "&lt;");
-		logx.swapper(">", "&gt;");
-		logx.swapper("%26", "&amp;");
-		logx.swapper("%22", "&quot;");
-		logx.swapper("%3C", "&lt;");
-		logx.swapper("%3E", "&gt;");
+		logx.replacer("&", "&amp;");
+		logx.replacer(DQ, "&quot;");
+		logx.replacer("<", "&lt;");
+		logx.replacer(">", "&gt;");
+		logx.replacer("%26", "&amp;");
+		logx.replacer("%22", "&quot;");
+		logx.replacer("%3C", "&lt;");
+		logx.replacer("%3E", "&gt;");
 
 /* obsolete
 	} else if (request1 eq "PROCESSINIT") {
@@ -561,7 +561,7 @@ nextpatch:;
 
 getvalues:
 		call collectixvals(filename, fieldname, prefix);
-		PSEUDO.transfer(USER1);
+		PSEUDO.move(USER1);
 		if (iodat_[1] eq FM) {
 			USER1.splicer(1, 1, "");
 		}
@@ -625,12 +625,12 @@ getvalues:
 		} else if (USER0.contains("XML")) {
 			if (iodat_) {
 				call htmllib2("STRIPTAGS", USER1);
-				iodat_.swapper(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
+				iodat_.replacer(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
 				USER1.splicer(1, 0, "<record><" ^ fieldname ^ ">");
 				iodat_ ^= "</" ^ fieldname ^ ">" "</record>";
 				if (USER1.contains(VM)) {
-					iodat_.swapper("</" ^ fieldname ^ ">", "</STOPPED>");
-					USER1.swapper(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
+					iodat_.replacer("</" ^ fieldname ^ ">", "</STOPPED>");
+					USER1.replacer(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
 			}
 			iodat_.splicer(1, 0, "<records>");
@@ -645,7 +645,7 @@ getvalues:
 		var filename0 = request2;
 		if (not(VOLUMES)) {
 			filename0.converter(".", "_");
-			filename0.swapper("MEDIA_TYPE", "JOB_TYPE");
+			filename0.replacer("MEDIA_TYPE", "JOB_TYPE");
 		}
 		var filename = filename0.field(" ", 1);
 		var sortselect = request3;

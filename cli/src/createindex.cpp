@@ -17,7 +17,7 @@ function main() {
 				indexnames2 ^= index ^ FM;
 		}
 		indexnames = indexnames2.pop();
-		indexnames.swapper(VM, "__");
+		indexnames.replacer(VM, "__");
 		printl(indexnames);
 	}
 

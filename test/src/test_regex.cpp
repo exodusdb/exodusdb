@@ -143,13 +143,13 @@ programinit()
 			assert(regex_replace("abc", "b.", "xyz", "l").outputl() eq "abc");	//literal wont convert
 
 		//simple test of case sensitive/insensitive swap
-		assert(swap("abc", "b", "xyz").outputl() eq "axyzc");				 //will convert right case
-		assert(swap("abc", "B", "xyz").outputl() eq "abc");					 //wont convert wrong case
+		assert(replace("abc", "b", "xyz").outputl() eq "axyzc");				 //will convert right case
+		assert(replace("abc", "B", "xyz").outputl() eq "abc");					 //wont convert wrong case
 		assert(regex_replace("abc", "B", "xyz", "i").outputl() eq "axyzc");	 //will convert case insensitive
 		if (BOOST_REGEX)
 			assert(regex_replace("ab*c", "B*", "xyz", "il").outputl() eq "axyzc");	//will convert case insensitive but not regex
 
-		assert(swap("abababab", "ab", "x").outputl()           eq "xxxx");
+		assert(replace("abababab", "ab", "x").outputl()           eq "xxxx");
 		assert(regex_replace("abababab", "ab", "x").outputl() eq "xxxx");		//regex
 		assert(regex_replace("abababab", "a.", "xy").outputl() eq "xyxyxyxy");	//regex
 	}

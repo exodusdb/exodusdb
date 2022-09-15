@@ -173,7 +173,7 @@ function main() {
 			if (OPTIONS.contains("F")) {
 
 				//logputl("Remove any existing table " ^ filename);
-				//if (not conn1.sqlexec("DROP TABLE IF EXISTS " ^ filenames.swap(","," ")))
+				//if (not conn1.sqlexec("DROP TABLE IF EXISTS " ^ filenames.replace(","," ")))
 				//      abort(conn1.lasterror());
 				if (not conn1.deletefile(filename))
 					{};//logputl(conn1.lasterror());

@@ -188,7 +188,7 @@ DEFINER
 COST 10;
 )V0G0N";
 
-		var sqltemplate = sqltemplate_strict.swap(" STRICT", "");
+		var sqltemplate = sqltemplate_strict.replace(" STRICT", "");
 
 		create_function("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
 		create_function("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
@@ -329,11 +329,11 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 
 	var functionsql = sqltemplate;
 
-	functionsql.swapper("$functionname_and_args", functionname_and_args);
-	functionsql.swapper("$functionname", functionname_and_args.field("(", 1));
-	functionsql.swapper("$return_type", return_sqltype);
+	functionsql.replacer("$functionname_and_args", functionname_and_args);
+	functionsql.replacer("$functionname", functionname_and_args.field("(", 1));
+	functionsql.replacer("$return_type", return_sqltype);
 
-	functionsql.swapper("$sqlcode", sql);
+	functionsql.replacer("$sqlcode", sql);
 
 	replace_FM_etc(functionsql);
 
@@ -484,14 +484,14 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 
 		//replace all punctuation and delimiters with spaces
 		var chars = field(sourcecode.trim("\\"), "\\", 2);
-		chars.swapper("FF", "");
-		chars.swapper("FE", "");
-		chars.swapper("FD", "");
-		chars.swapper("FC", "");
-		chars.swapper("FB", "");
-		chars.swapper("FA", "");
+		chars.replacer("FF", "");
+		chars.replacer("FE", "");
+		chars.replacer("FD", "");
+		chars.replacer("FC", "");
+		chars.replacer("FB", "");
+		chars.replacer("FA", "");
 		chars = "\\x1D\\x1E" ^ iconv(chars, "HEX");
-		chars.swapper("'", "''");
+		chars.replacer("'", "''");
 		chars ^= "\\x1A";  //ST
 		chars ^= "\\x1B";  //TM
 		chars ^= "\\x1C";  //SM
@@ -594,7 +594,7 @@ $RETVAR := array_to_string
  $RETVAR := coalesce($RETVAR,$COALESCE_TO);
 )V0G0N";
 
-	sql.swapper("\t", " ");
+	sql.replacer("\t", " ");
 	// expand lines like the following to sql
 	// (inner single spaces are MANDATORY)
 	//  varx := xlate filename fromfield tofield mode
@@ -799,12 +799,12 @@ $RETVAR := array_to_string
 				//line^="\n WHERE "^target_filename^".key="^source_key_expression^";";
 				var origline = line;
 				line = xlatetemplate;
-				line.swapper("$COMMENT", origline);
-				line.swapper("$RETVAR", targetvariablename);
-				line.swapper("$TARGETFILE", target_filename);
-				line.swapper("$SOURCEKEY_EXPR", source_key_expr);
-				line.swapper("$TARGET_EXPR", target_expr);
-				line.swapper("$COALESCE_TO", coalesce_to);
+				line.replacer("$COMMENT", origline);
+				line.replacer("$RETVAR", targetvariablename);
+				line.replacer("$TARGETFILE", target_filename);
+				line.replacer("$SOURCEKEY_EXPR", source_key_expr);
+				line.replacer("$TARGET_EXPR", target_expr);
+				line.replacer("$COALESCE_TO", coalesce_to);
 				//line.outputl("sql=");
 
 			}
@@ -840,7 +840,7 @@ COST 10;
 	// Remove unnecessary declaration of temp_xlate_key
 	// from the above standard sql template if not needed
 	if (not sql.contains("temp_xlate_key") ) {
-		sqltemplate.swapper("\n temp_xlate_key text;","");
+		sqltemplate.replacer("\n temp_xlate_key text;","");
 	}
 
 	//upload pgsql function to postgres

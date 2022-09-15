@@ -32,7 +32,7 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 */
 
 #include <iostream>
-#include <utility> //for swap
+#include <utility> //for replace
 #include <string>
 
 #define USE_BOOST
@@ -62,7 +62,7 @@ var var::iconv_MT() const {
 	// remove leading and trailing non-digits and replace internal strings of non-digits with
 	// single space
 
-	// var time=(*this).swap("^\\D+|\\D+$", "", "r").swap("\\D+", " ", "r");
+	// var time=(*this).replace("^\\D+|\\D+$", "", "r").replace("\\D+", " ", "r");
 
 	static std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",
 														std_boost::regex_constants::icase);
@@ -320,10 +320,10 @@ var var::match(CVR matchstr, SV options) const {
 		var matchstr3 = "^" + matchstr2 + "$";
 
 		// 2. * matches zero or more characters like .* in regex
-		matchstr3.swapper("*", ".*");
+		matchstr3.replacer("*", ".*");
 
 		// 3. ? matches any one character
-		matchstr3.swapper("?", ".");
+		matchstr3.replacer("?", ".");
 		//TRACE(matchstr3)
 
 		// having created a suitable regex str, recursively call match with it
@@ -436,20 +436,20 @@ var var::match(CVR matchstr, SV options) const {
 }
 
 // simple case sensitive substr replacement
-var var::swap(SV what, SV with) const& {
+var var::replace(SV what, SV with) const& {
 	var newmv = *this;
-	return newmv.swapper(what, with);
+	return newmv.replacer(what, with);
 }
 
 // on temporaries
-VARREF var::swap(SV what, SV with) && {
-	return this->swapper(what, with);
+VARREF var::replace(SV what, SV with) && {
+	return this->replacer(what, with);
 }
 
 // in-place
-VARREF var::swapper(SV what, SV with) {
+VARREF var::replacer(SV what, SV with) {
 
-	THISIS("VARREF var::swapper(SV what, SV with)")
+	THISIS("VARREF var::replacer(SV what, SV with)")
 	assertStringMutator(function_sig);
 	//ISSTRING(what)
 	//ISSTRING(with)

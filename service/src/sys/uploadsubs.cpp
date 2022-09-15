@@ -170,7 +170,7 @@ postuploadfail:
 			//if result else
 			var fullsubfolder = (uploadroot ^ subfolder).lcase();
 			//remove doubled up separators - \\ on winddows or // on linux
-			fullsubfolder.swapper(OSSLASH_ OSSLASH_, OSSLASH);
+			fullsubfolder.replacer(OSSLASH_ OSSLASH_, OSSLASH);
 			//osopen fullsubfolder to xx else if status() ne 2 then
 			//cannot use dos 8 characters since keys can be > 8 characters
 			call shell2("dir " ^ fullsubfolder, errors);
@@ -262,7 +262,7 @@ postuploadfail:
 		}
 
 		//why does % come encoded as %25?
-		dirpatt.swapper("%25", "%");
+		dirpatt.replacer("%25", "%");
 
 		if (USER0.f(3) eq "NEW") {
 			if (oslistf(dirpatt)) {
@@ -721,23 +721,23 @@ subroutine unlockfile() {
 subroutine parseline(io line) {
 
 	//preserve escaped quotes
-	line.swapper(_BS_ _DQ_, "&quote;");
+	line.replacer(_BS_ _DQ_, "&quote;");
 
 	//preserve commas inside quotes
 	nquotes = line.count(DQ);
 	for (var quoten = 2; quoten <= nquotes; quoten+=2) {
 		var tt = line.field(DQ, quoten);
 		if (tt.contains(",")) {
-			tt.swapper(",", "&comma;");
+			tt.replacer(",", "&comma;");
 			line = line.fieldstore(DQ, quoten, 1, tt);
 		}
 	} //quoten;
 
 	line.converter(",", VM);
 
-	line.swapper(DQ, "");
-	line.swapper("&quote;", DQ);
-	line.swapper("&comma;", ",");
+	line.replacer(DQ, "");
+	line.replacer("&quote;", DQ);
+	line.replacer("&comma;", ",");
 
 	return;
 }

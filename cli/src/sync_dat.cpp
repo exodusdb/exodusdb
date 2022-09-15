@@ -170,7 +170,7 @@ function main() {
 					var t = dictsrc.index("\n/*pgsql");
 					if (t) {
 						dictsrc.splicer(t, 1, "\n}\n");
-						dictsrc.swapper("\n\n}", "\n}");
+						dictsrc.replacer("\n\n}", "\n}");
 						addfunctionmain = false;
 					}
 				}
@@ -213,13 +213,15 @@ function main() {
 
 				//get any existing record
 				var oldrecord;
+				var exists = true;
 				if (not read(oldrecord from dbfile, ID)) {
 					oldrecord = "";
+					exists = false;
 				}
 
 				if (RECORD eq oldrecord) {
-					if (RECORD.len() eq 0) {
-						// Delete the RECORD again
+					if (exists and RECORD.len() eq 0) {
+						// Delete the RECORD
 						deleterecord(dbfile, ID);
 						printl("sync_dat:", dbfilename, ID, "DELETED");
 					} else {
@@ -228,13 +230,13 @@ function main() {
 					}
 				} else {
 					if (RECORD.len() eq 0) {
-						// Write the RECORD
-						write(RECORD on dbfile, ID);
-						printl("sync_dat:", dbfilename, ID, "WRITTEN");
-					} else {
 						// Delete the RECORD
 						deleterecord(dbfile, ID);
 						printl("sync_dat:", dbfilename, ID, "DELETED");
+					} else {
+						// Write the RECORD
+						write(RECORD on dbfile, ID);
+						printl("sync_dat:", dbfilename, ID, "WRITTEN");
 					}
 				}
 

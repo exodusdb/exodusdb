@@ -12,14 +12,14 @@ function main(in string0) {
 		string1 = string0;
 	}
 
-	string1.swapper("&", "&amp;");
-	string1.swapper(DQ, "&quot;");
-	string1.swapper("<", "&lt;");
-	string1.swapper(">", "&gt;");
+	string1.replacer("&", "&amp;");
+	string1.replacer(DQ, "&quot;");
+	string1.replacer("<", "&lt;");
+	string1.replacer(">", "&gt;");
 
 	string1.converter(DQ, "'");
-	string1.swapper(VM, "\" \"");
-	string1.swapper(FM, "\" \"");
+	string1.replacer(VM, "\" \"");
+	string1.replacer(FM, "\" \"");
 	return string1.quote();
 }
 

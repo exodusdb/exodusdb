@@ -487,7 +487,7 @@ programinit()
 
 		//raw strings
 		var value = R"('1')";
-		assert(value.swap("'", R"(\')") eq "\\'1\\'");
+		assert(value.replace("'", R"(\')") eq "\\'1\\'");
 
 		//check conversion of unprintable field marks to unusual ASCII characters
 		//except TM which is ESC

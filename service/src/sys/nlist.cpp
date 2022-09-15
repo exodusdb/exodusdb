@@ -373,7 +373,7 @@ function main() {
 		tr = "<tr>";
 		trx = "</tr>";
 		tt = SYSTEM.f(2);
-		tt.swapper(".txt", ".htm");
+		tt.replacer(".txt", ".htm");
 		SYSTEM(2) = tt;
 	} else {
 		td0 = "";
@@ -488,7 +488,7 @@ function main() {
 	tt = " AND WITH AUTHORISED AND ";
 	onlyauthorised = sentencex.contains(tt);
 	if (onlyauthorised) {
-		sentencex.swapper(tt, " AND ");
+		sentencex.replacer(tt, " AND ");
 	}
 
 ///////////
@@ -832,9 +832,9 @@ nextkey:
 		}
 
 		//any existing doubled single quotes are removed to avoid double doublimg
-		title.swapper("''", "'");
+		title.replacer("''", "'");
 		//double any single quotes to avoid them being understood as options
-		title.swapper("'", "''");
+		title.replacer("'", "''");
 
 		headtab(hrown, tcoln) = title.convert(FM ^ VM, "  ");
 		headtab(hrown, tcoln + 1) = value;
@@ -847,8 +847,8 @@ nextkey:
 
 		//remove page numbering options from headings
 		if (html) {
-			head.swapper("Page 'P'", "");
-			head.swapper("Page 'P", "'");
+			head.replacer("Page 'P'", "");
+			head.replacer("Page 'P", "'");
 		}
 
 	} else if (word eq "FOOTING") {
@@ -891,7 +891,7 @@ nextkey:
 		//skip if detsupp2 and column is being skipped
 		if (not(coldict(coln).unassigned())) {
 			if (html) {
-				word.swapper("[DATE]", "[DATE,*]");
+				word.replacer("[DATE]", "[DATE,*]");
 			}
 			coldict(coln)(7) = word;
 		}
@@ -981,7 +981,7 @@ nextkey:
 
 			if (html) {
 				tt = dictrec.f(7);
-				tt.swapper("[DATE]", "[DATE,*]");
+				tt.replacer("[DATE]", "[DATE,*]");
 				if (tt eq "[DATE,4]") {
 					tt = "[DATE,4*]";
 				}
@@ -1227,9 +1227,9 @@ x1exit:
 				//vm indicates folding, \\ indicates rows in column headings
 				tt = coldict(coln).f(3);
 				if (not multirowcolhdg) {
-					tt.swapper(VM, "<br />");
+					tt.replacer(VM, "<br />");
 				}
-				tt.swapper("\\\\", VM);
+				tt.replacer("\\\\", VM);
 
 				colhdg(coln2) = tt;
 				if (tt.count(VM) gt vmcount) {
@@ -1320,10 +1320,10 @@ x1exit:
 
 		tt ^= colhdg ^ FM ^ "</thead>";
 		tt ^= FM ^ "<tbody>";
-		tt.transfer(colhdg);
+		tt.move(colhdg);
 
 		//allow for single quotes
-		colhdg.swapper("'", "''");
+		colhdg.replacer("'", "''");
 
 	} else {
 		while (true) {
@@ -1341,7 +1341,7 @@ x1exit:
 	}
 
 	if (html) {
-		head.swapper(FM, "<br />");
+		head.replacer(FM, "<br />");
 		//div to make header as wide as body
 		//the report title
 		if (head) {
@@ -1368,23 +1368,23 @@ x1exit:
 		headtabcols = (headtabcols ^ VM).str(8);
 		headtabcols.popper();
 
-		tt ^= "<colgroup>" "\r\n" ^ headtabcols.swap(VM, "\r\n") ^ "</colgroup>";
+		tt ^= "<colgroup>" "\r\n" ^ headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
 
 		//style columns where '<col>' not supported.
 		call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		style ^= "\r\n" ^ headtabstyle;
 		//tt[1,0]=headtabstyle:crlf
 
-		tt ^= "<colgroup>" "\r\n" ^ headtabcols.swap(VM, "\r\n") ^ "</colgroup>";
+		tt ^= "<colgroup>" "\r\n" ^ headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
 
 		//tt:=crlf:'</THEAD>':crlf:'<TBODY>'
 		tt ^= "\r\n" "<TBODY>";
 		call htmllib2("TABLE.MAKE", headtab, tt, "");
-		headtab.swapper("</TR>", "</TR>" "\r\n");
+		headtab.replacer("</TR>", "</TR>" "\r\n");
 		if (headtabperpage) {
-			colhdg.swapper(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:white\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
+			colhdg.replacer(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:white\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
 		} else {
-			headtab.swapper(posttheadmark, "");
+			headtab.replacer(posttheadmark, "");
 			head ^= FM ^ headtab ^ FM;
 		}
 	}
@@ -1619,9 +1619,9 @@ nextrec:
 	////////
 
 	if (recn eq 1) {
-		head.transfer(newhead);
+		head.move(newhead);
 		gosub newheadreplacements();
-		newhead.transfer(head);
+		newhead.move(head);
 	}
 
 	//if interactive then print @AW<30>:@(36,@CRTHIGH/2):
@@ -1658,7 +1658,7 @@ nextrec:
 			//swap '<' with '&lt;' in m.col(coln)
 			//swap '>' with '&gt;' in m.col(coln)
 			if (html) {
-				mcol(coln).swapper(TM, "<br />");
+				mcol(coln).replacer(TM, "<br />");
 			}
 		}
 
@@ -1804,7 +1804,7 @@ recexit:
 				if (tt eq "") {
 					//tt=nbsp
 				} else {
-					tt.swapper("\r\n", "<br />");
+					tt.replacer("\r\n", "<br />");
 				}
 
 				//colored cells starting with colorprefix
@@ -2182,8 +2182,8 @@ gotdictvoc:
 		word = "]";
 	}
 
-	word.swapper("%DQUOTE%", DQ);
-	word.swapper("%SQUOTE%", "'");
+	word.replacer("%DQUOTE%", DQ);
+	word.replacer("%SQUOTE%", "'");
 
 	return;
 }
@@ -2286,7 +2286,7 @@ subroutine printbreaks() {
 				}
 
 				if (html) {
-					cell.swapper(VM, "<br />");
+					cell.replacer(VM, "<br />");
 				}
 
 				//if html and cell='' then cell=nbsp
@@ -2323,12 +2323,12 @@ subroutine printbreaks() {
 						tt = oconv(tt, oconvx);
 					}
 					//ensure single quotes in data dont screw up the html
-					tt.swapper("'", "''");
+					tt.replacer("'", "''");
 					//if tt='' and html then tt=nbsp
 
 					//insert the page break data
 					//swap "'B'" with tt in newhead
-					newhead.swapper(pagebreaks.f(coln), tt);
+					newhead.replacer(pagebreaks.f(coln), tt);
 
 				}
 
@@ -2440,7 +2440,7 @@ subroutine printbreaks() {
 			if (bottomline.unassigned()) {
 				bottomline = "";
 			}
-			bottomline.transfer(bottomline2);
+			bottomline.move(bottomline2);
 
 			tx(-1) = bottomline2;
 
@@ -2513,8 +2513,8 @@ subroutine newheadreplacements() {
 		dictid = replacements.f(ii);
 		tt = "{" ^ dictid ^ "}";
 		tt2 = calculate(dictid);
-		tt2.swapper("'", "''");
-		newhead.swapper(tt, tt2);
+		tt2.replacer("'", "''");
+		newhead.replacer(tt, tt2);
 	} //ii;
 	return;
 }
@@ -2554,7 +2554,7 @@ subroutine emailing() {
 		tt = emailto;
 		tt2 = emailcc;
 		if (not tt) {
-			tt2.transfer(tt);
+			tt2.move(tt);
 		}
 
 		if (emailsubject) {

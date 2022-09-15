@@ -60,12 +60,12 @@ function main(in mode, io logtime, in menu) {
 
 			//run once on first installation
 			tt = cmd;
-			tt.swapper("{}", "7:::::1");
+			tt.replacer("{}", "7:::::1");
 			perform(tt);
 
 			//run every 1st of the month
 			tt = cmd;
-			tt.swapper("{}", "7:1");
+			tt.replacer("{}", "7:1");
 			perform(tt);
 
 			var().date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
@@ -80,7 +80,7 @@ function main(in mode, io logtime, in menu) {
 		call readhostsallow(hosts);
 
 		//convert hosts.allow format to sv list of valid ip numbers or partial ip nos
-		hosts.swapper("sshd:", "");
+		hosts.replacer("sshd:", "");
 		hosts.converter(" ", "");
 		var nn = hosts.count(FM) + 1;
 		for (var ln = nn; ln >= 1; --ln) {
@@ -93,7 +93,7 @@ function main(in mode, io logtime, in menu) {
 		hosts.converter(" ", SM);
 
 		//remove any trailing . from 10. etc which is valid syntax for hosts.allow
-		hosts.swapper("." ^ SM, SM);
+		hosts.replacer("." ^ SM, SM);
 		if (hosts[-1] eq ".") {
 			hosts.popper();
 		}
@@ -119,7 +119,7 @@ function main(in mode, io logtime, in menu) {
 			configips = "192.168 10 172";
 		}
 		configips.converter(" ", SM);
-		configips.swapper(".*", "");
+		configips.replacer(".*", "");
 		nn = configips.count(SM) + (configips ne "");
 		for (const var ii : range(nn, 1)) {
 			var ipno = configips.f(1, 1, ii);
@@ -478,7 +478,7 @@ nextuser:
 
 		call menusubs("EXITMENUS", menutx);
 
-		menutx.swapper(FM, "\r\n");
+		menutx.replacer(FM, "\r\n");
 
 		var menuosfilename = "../data/menu.htm";
 		if (not(oldmenu.osread(menuosfilename))) {

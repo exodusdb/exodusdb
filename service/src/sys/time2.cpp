@@ -26,7 +26,7 @@ function main(in type, in input0, in mode0, out output) {
 
 		if (mode.contains("48")) {
 			var modex = mode;
-			modex.swapper("48", "");
+			modex.replacer("48", "");
 			if (modex eq "") {
 				modex = "MTS";
 			}

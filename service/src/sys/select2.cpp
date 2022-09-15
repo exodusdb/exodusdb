@@ -102,7 +102,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	#define msg_ USER4
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
-	sortselect.swapper("%SELECTLIST%", "");
+	sortselect.replacer("%SELECTLIST%", "");
 	if (not(LISTACTIVE)) {
 		useactivelist = 0;
 	}
@@ -115,10 +115,10 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		call pushselect(0, v69, v70, v71);
 	}
 
-	RECORD.transfer(storer);
-	ID.transfer(storeid);
-	DICT.transfer(storedict);
-	MV.transfer(storemv);
+	RECORD.move(storer);
+	ID.move(storeid);
+	DICT.move(storedict);
+	MV.move(storemv);
 
 	//detect if called without common
 	//NB cant run without common in caller since perform gives some RTP20 error
@@ -130,12 +130,12 @@ nocommon:
 		commonsaved = 0;
 	} else {
 		commonsaved = 1;
-		win.srcfile.transfer(savesrcfile);
-		win.datafile.transfer(savedatafile);
-		win.wlocked.transfer(savewlocked);
-		msg_.transfer(savemsg);
-		win.reset.transfer(savereset);
-		win.valid.transfer(savevalid);
+		win.srcfile.move(savesrcfile);
+		win.datafile.move(savedatafile);
+		win.wlocked.move(savewlocked);
+		msg_.move(savemsg);
+		win.reset.move(savereset);
+		win.valid.move(savevalid);
 	}
 
 	//if unassigned(limitfields) then limitfields=''
@@ -315,7 +315,7 @@ nocommon:
 			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex, xx)) {
 				if (records.read(file, "%RECORDS%")) {
 					if (records.len() lt 200) {
-						records.swapper(FM, "\" \"");
+						records.replacer(FM, "\" \"");
 						sortselect.splicer(1, 0, records.quote() ^ " ");
 					}
 				}
@@ -468,7 +468,7 @@ nextrec:
 
 		///
 
-		RECORD.transfer(row);
+		RECORD.move(row);
 
 		var prefix = ID ^ FM;
 
@@ -492,10 +492,10 @@ nextrec:
 			if (xml) {
 				//cell='X'
 				//convert "'":'".+/,()&%:-1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz' to '' in cell
-				cell.swapper("%", "%25");
-				cell.swapper("&", "&amp;");
-				cell.swapper("<", "&lt;");
-				cell.swapper(">", "&gt;");
+				cell.replacer("%", "%25");
+				cell.replacer("&", "&amp;");
+				cell.replacer("<", "&lt;");
+				cell.replacer(">", "&gt;");
 				//if cell then deb ug
 				//cell=quote(str(cell,10))
 				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^ ">" "\r\n";
@@ -533,10 +533,10 @@ nextrec:
 			///BREAK;
 			if (not rowpart) break;
 
-			rowpart.swapper("%", "%25");
+			rowpart.replacer("%", "%25");
 			//changed to allow language characters to pass through x80-xF9
 			for (const var ii : range(249, 255)) {
-				rowpart.swapper(var().chr(ii), hexx(ii - 249));
+				rowpart.replacer(var().chr(ii), hexx(ii - 249));
 			} //ii;
 
 			//output converted row part
@@ -563,18 +563,18 @@ nextrec:
 
 subroutine exit() {
 	if (commonsaved) {
-		savesrcfile.transfer(win.srcfile);
-		savedatafile.transfer(win.datafile);
-		savewlocked.transfer(win.wlocked);
-		savemsg.transfer(USER4);
-		savereset.transfer(win.reset);
-		savevalid.transfer(win.valid);
+		savesrcfile.move(win.srcfile);
+		savedatafile.move(win.datafile);
+		savewlocked.move(win.wlocked);
+		savemsg.move(USER4);
+		savereset.move(win.reset);
+		savevalid.move(win.valid);
 	}
 
-	storer.transfer(RECORD);
-	storeid.transfer(ID);
-	storedict.transfer(DICT);
-	storemv.transfer(MV);
+	storer.move(RECORD);
+	storeid.move(ID);
+	storedict.move(DICT);
+	storemv.move(MV);
 
 	if (not useactivelist) {
 		call popselect(0, v69, v70, v71);

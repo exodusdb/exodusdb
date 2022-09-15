@@ -211,8 +211,8 @@ function create_dbuser(in dbusername, in dbuserpass) {
 		//"  CREATEROLE"
 		";";
 
-	swapper(sql, "$dbusername$", dbusername);
-	swapper(sql, "$dbuserpass$", dbuserpass);
+	replacer(sql, "$dbusername$", dbusername);
+	replacer(sql, "$dbuserpass$", dbuserpass);
 
 	return runsomesql(sql);
 }
@@ -225,8 +225,8 @@ function create_db(in dbname, in dbusername) {
 		" OWNER=$dbusername$"
 		";";
 
-	swapper(sql, "$dbname$", dbname);
-	swapper(sql, "$dbusername$", dbusername);
+	replacer(sql, "$dbname$", dbname);
+	replacer(sql, "$dbusername$", dbusername);
 
 	return runsomesql(sql);
 }
@@ -286,9 +286,9 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		}
 		pglibdir.converter("/", OSSLASH);
 		//exodus oscopy cannot handle old 8.3 file names (boost library issue)
-		pglibdir.swapper("PROGRA~1", "Program Files");
-		pglibdir.swapper("PROGRA~2", "Program Files (x86)");
-		pglibdir.swapper("POSTGR~1", "PostgreSQL");
+		pglibdir.replacer("PROGRA~1", "Program Files");
+		pglibdir.replacer("PROGRA~2", "Program Files (x86)");
+		pglibdir.replacer("POSTGR~1", "PostgreSQL");
 		var targetfilename = pglibdir ^ OSSLASH ^ "pgexodus.dll";
 		while (not osdir(pglibdir)) {
 			printl(pglibdir ^ " does not exist");

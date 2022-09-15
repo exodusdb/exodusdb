@@ -227,7 +227,7 @@ listen:
 
 				body ^= FM ^ FM ^ USER4;
 				body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
-				body.swapper("\r", "\r\n");
+				body.replacer("\r", "\r\n");
 
 				//sendmail - if it fails, there will be an entry in the log
 				var address1 = sys.address.field("/", 1);
@@ -281,9 +281,9 @@ listen:
 	var linkfilename3 = PRIORITYINT.f(100);
 	if (linkfilename3) {
 		//cannot remove these since they may be codepage letters now
-		USER4.swapper("|", "\r\n");
-		USER4.swapper(FM, "\r\n");
-		USER4.swapper(VM, "\r\n");
+		USER4.replacer("|", "\r\n");
+		USER4.replacer(FM, "\r\n");
+		USER4.replacer(VM, "\r\n");
 		call oswrite("Error: " ^ USER4, linkfilename3);
 		//osclose linkfilename3
 	}
@@ -310,7 +310,7 @@ listen:
 			printl(USER4);
 			perform("OFF");
 		}
-		cmd.swapper(" INTRANET", "");
+		cmd.replacer(" INTRANET", "");
 		chain("NET " ^ cmd);
 	}
 

@@ -4,8 +4,8 @@ libraryinit(keywords)
 //-------------------
 function main() {
 	ANS = RECORD.f(2);
-	ANS.swapper(VM, ", ");
-	ANS.swapper(SM, ", ");
+	ANS.replacer(VM, ", ");
+	ANS.replacer(SM, ", ");
 	return ANS;
 }
 /*pgsql

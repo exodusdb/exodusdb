@@ -9,7 +9,7 @@ S
 	ANS = usercode.xlate("USERS", 1, "X");\
 	if (ANS eq "") {\
 		ANS = usercode;\
-		ANS.swapper(" ", "_");\
+		ANS.replacer(" ", "_");\
 	} else if (ANS ne usercode) {\
 		ANS ^= " (" ^ usercode ^ ")";\
 	}\

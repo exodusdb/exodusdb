@@ -95,9 +95,9 @@ zero:
 		}
 	}
 
-	text.swapper(FM ^ FM ^ FM, FM);
-	text.swapper(FM ^ FM, FM);
-	text.swapper(FM, ", ");
+	text.replacer(FM ^ FM ^ FM, FM);
+	text.replacer(FM ^ FM, FM);
+	text.replacer(FM, ", ");
 
 	return text;
 }

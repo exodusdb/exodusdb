@@ -408,13 +408,13 @@ subroutine unescape_sql(io arg1) {
 	if (not arg1.contains("\\"))
 		return;
 
-	arg1.swapper("\\n","\n");
-	arg1.swapper("\\b","\b");
-	arg1.swapper("\\t","\t");
-	arg1.swapper("\\v","\v");
-	arg1.swapper("\\f","\f");
-	arg1.swapper("\\r","\r");
-	arg1.swapper("\\\\","\\");
+	arg1.replacer("\\n","\n");
+	arg1.replacer("\\b","\b");
+	arg1.replacer("\\t","\t");
+	arg1.replacer("\\v","\v");
+	arg1.replacer("\\f","\f");
+	arg1.replacer("\\r","\r");
+	arg1.replacer("\\\\","\\");
 
 	return;
 

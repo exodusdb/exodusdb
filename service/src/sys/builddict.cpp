@@ -167,7 +167,7 @@ subroutine writedict() {
 		// Update the source code
 		dictrec(8) = block;
 		if (suffixno)
-			dictrec.swapper("{||}", suffixno);
+			dictrec.replacer("{||}", suffixno);
 
 		// Get the relevent column title
 		if (suffixno)
@@ -177,7 +177,7 @@ subroutine writedict() {
 			printl(var().chr(12), dictid);
 			printl();
 			printl("---------- OLD ", dictid, " ----------");
-			printl(origdictrec.f(8).swap(VM, "\n"));
+			printl(origdictrec.f(8).replace(VM, "\n"));
 			printl();
 			if (doall) {
 				ans = "Y";
@@ -189,7 +189,7 @@ subroutine writedict() {
 	//				stop();
 	//			}
 				printl("---------- NEW ", dictid, " ----------");
-				printl(dictrec.f(8).swap(VM, "\n"));
+				printl(dictrec.f(8).replace(VM, "\n"));
 				print("Update (y=yes, q=quit, a=all, n=no)");
 				osflush();
 				ans.inputn(1);
@@ -316,7 +316,7 @@ nextmln:;
 					for (paramn = 1; paramn <= nparams; ++paramn) {
 						var old = macroline.f(1, paramn);
 						var newx = lineparams.f(1, paramn);
-						macrotext.swapper(old, newx);
+						macrotext.replacer(old, newx);
 					} //paramn;
 
 					//speed up fieldwise {} for F fields. avoid calling a dict subroutine
@@ -360,14 +360,14 @@ nextmln:;
 						var nfields = fields.f(1).count(VM) + 1;
 						for (fieldn = 1; fieldn <= nfields; ++fieldn) {
 							var fieldname = fields.f(1, fieldn);
-							macrotext.swapper("{" ^ fieldname ^ "}", fieldname);
+							macrotext.replacer("{" ^ fieldname ^ "}", fieldname);
 							//swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext
 							equates(-1) = "\t#define " ^ fieldname ^ "\tRECORD.f(" ^ fields.f(2, fieldn) ^ ")";
 						} //fieldn;
 						macrotext.splicer(1, 0, equates ^ FM);
 					}
 
-					macrotext.transfer(line);
+					macrotext.move(line);
 
 				} else {
 					//call mssg(macroid.quote() ^ " macro is undefined in line " ^ ln ^ FM ^ doc.f(ln));

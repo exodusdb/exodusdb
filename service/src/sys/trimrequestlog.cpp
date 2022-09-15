@@ -106,7 +106,7 @@ stage2:
 	if (mindate ge datekept) {
 		tx(-1) = "";
 		tx(-1) = "No need to delete anything";
-		tx.swapper(FM, "\r\n");
+		tx.replacer(FM, "\r\n");
 		printl();
 		printl(tx);
 		stop();
@@ -139,7 +139,7 @@ nextrec2:
 		//call sysmsg(tx)
 		call log("TRIMREQUESTLOG", tx);
 
-		tx.swapper(FM, "\r\n");
+		tx.replacer(FM, "\r\n");
 		printl();
 		printl(tx);
 

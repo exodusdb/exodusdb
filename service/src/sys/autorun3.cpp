@@ -128,7 +128,7 @@ function main(in docids0="", in options0="") {
 	//initdoc:
 	////////
 	if (docids) {
-		docids.swapper(",", FM);
+		docids.replacer(",", FM);
 		docn = 0;
 	} else {
 		select(sys.documents);
@@ -559,26 +559,26 @@ nextuser:;
 	//to avoid "year is not open" type messages
 	//TODO
 
-	USER1.swapper("{RUNTIME_PERIOD}", runtimeperiod);
-	iodat_.swapper("{TODAY}", var().date());
-	USER1.swapper("{7DAYSAGO}", var().date() - 7);
-	iodat_.swapper("{14DAYSAGO}", var().date() - 14);
-	USER1.swapper("{21DAYSAGO}", var().date() - 21);
-	iodat_.swapper("{28DAYSAGO}", var().date() - 28);
-	USER1.swapper("{30DAYSAGO}", var().date() - 30);
-	iodat_.swapper("{60DAYSAGO}", var().date() - 60);
-	USER1.swapper("{90DAYSAGO}", var().date() - 90);
-	iodat_.swapper("{YESTERDAY}", var().date() - 1);
-	USER1.swapper("{TOMORROW}", var().date() + 1);
+	USER1.replacer("{RUNTIME_PERIOD}", runtimeperiod);
+	iodat_.replacer("{TODAY}", var().date());
+	USER1.replacer("{7DAYSAGO}", var().date() - 7);
+	iodat_.replacer("{14DAYSAGO}", var().date() - 14);
+	USER1.replacer("{21DAYSAGO}", var().date() - 21);
+	iodat_.replacer("{28DAYSAGO}", var().date() - 28);
+	USER1.replacer("{30DAYSAGO}", var().date() - 30);
+	iodat_.replacer("{60DAYSAGO}", var().date() - 60);
+	USER1.replacer("{90DAYSAGO}", var().date() - 90);
+	iodat_.replacer("{YESTERDAY}", var().date() - 1);
+	USER1.replacer("{TOMORROW}", var().date() + 1);
 	if (iodat_.contains("{2WORKINGDAYSAGO}")) {
 		daysago = 2;
 		gosub getdaysago();
-		USER1.swapper("{2WORKINGDAYSAGO}", xdate);
+		USER1.replacer("{2WORKINGDAYSAGO}", xdate);
 	}
 	if (iodat_.contains("{3WORKINGDAYSAGO}")) {
 		daysago = 3;
 		gosub getdaysago();
-		USER1.swapper("{3WORKINGDAYSAGO}", xdate);
+		USER1.replacer("{3WORKINGDAYSAGO}", xdate);
 	}
 	var closedperiod = sys.company.f(37);
 	if (closedperiod) {
@@ -586,7 +586,7 @@ nextuser:;
 	} else {
 		opendate = 11689;
 	}
-	iodat_.swapper("{OPERATIONS_OPEN_DATE}", opendate);
+	iodat_.replacer("{OPERATIONS_OPEN_DATE}", opendate);
 
 	//convert {TODAY-99} to today minus 99
 	//and {TODAY+999} to today+999
@@ -595,7 +595,7 @@ nextsign:
 	tt = USER1.index("{TODAY" ^ sign);
 	if (tt) {
 		var t2 = (iodat_.substr(tt + 1, 999999)).field("}", 1);
-		USER1.swapper("{" ^ t2 ^ "}", var().date() + t2.substr(6, 999999));
+		USER1.replacer("{" ^ t2 ^ "}", var().date() + t2.substr(6, 999999));
 	}
 	if (sign eq "-") {
 		sign = "+";
@@ -642,7 +642,7 @@ nextsign:
 			body(-1) = ("Document: " ^ sys.document.f(2) ^ " (" ^ docid ^ ")").trim();
 			body(-1) = "Database: " ^ SYSTEM.f(23) ^ " (" ^ SYSTEM.f(17) ^ ")";
 			//swap '%RESULT%' with '* ' in subject
-			subject.swapper("%RESULT%", "");
+			subject.replacer("%RESULT%", "");
 
 			//treat all errors as system errors for now
 			//since autorun doesnt really know a user to send them to
@@ -676,9 +676,9 @@ nextsign:
 				body = timetext;
 			}
 
-			subject.swapper("%RESULT%", "");
+			subject.replacer("%RESULT%", "");
 		}
-		body.swapper(FM, var().chr(13));
+		body.replacer(FM, var().chr(13));
 
 		// Option to force the actual email recipient
 		var system117 = SYSTEM.f(117);
@@ -818,7 +818,7 @@ subroutine exec2() {
 
 	//send errors to exodus
 	if (USER4.contains("An internal error") or msg_.contains("Error:")) {
-		USER4.transfer(response_);
+		USER4.move(response_);
 		goto sysmsgit;
 	}
 
@@ -897,7 +897,7 @@ subroutine fmtresp() {
 	if (response_[1] eq FM) {
 		USER3.splicer(1, 1, "");
 	}
-	response_.swapper(FM, "\r\n");
+	response_.replacer(FM, "\r\n");
 
 	return;
 }

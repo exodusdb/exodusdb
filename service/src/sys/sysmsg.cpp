@@ -51,8 +51,8 @@ function main(in msg0, in subject0="", in username0="") {
 		username = username0;
 	}
 
-	msg.swapper(var().chr(0), "%00");
-	subjectin.swapper(var().chr(0), "%00");
+	msg.replacer(var().chr(0), "%00");
+	subjectin.replacer(var().chr(0), "%00");
 
 	if (not interactive) {
 		//print msg:', ':subjectin:', ':username
@@ -99,11 +99,11 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 	emailaddrs = emailaddrs.field("/", 1);
 	//if emailaddrs='' then readv emailaddrs from definitions,'REPLICATION',12 else emailaddrs=''
-	emailaddrs.swapper("backups@neosys.com", "sysmsg@neosys.com");
+	emailaddrs.replacer("backups@neosys.com", "sysmsg@neosys.com");
 
 	//suppress login failure messages
 	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and subjectin.substr(1, 13) eq "Login Failure") {
-		emailaddrs.swapper("sysmsg@neosys.com", "");
+		emailaddrs.replacer("sysmsg@neosys.com", "");
 		emailaddrs = trim(emailaddrs, ";");
 	}
 
@@ -232,14 +232,14 @@ function main(in msg0, in subject0="", in username0="") {
 
 		if (USER1) {
 			temp = USER1;
-			temp.swapper("%", "%25");
-			temp.swapper("'", "%27");
-			temp.swapper("`", "%60");
-			temp.swapper("^", "%5E");
-			temp.swapper("]", "%5D");
-			temp.swapper("}", "%7D");
-			temp.swapper("\\", "%5C");
-			temp.swapper("~", "%7E");
+			temp.replacer("%", "%25");
+			temp.replacer("'", "%27");
+			temp.replacer("`", "%60");
+			temp.replacer("^", "%5E");
+			temp.replacer("]", "%5D");
+			temp.replacer("}", "%7D");
+			temp.replacer("\\", "%5C");
+			temp.replacer("~", "%7E");
 			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ ST, "`^]}\\~");
 			body(-1) = oconv("Data:", l9) ^ temp;
 		}
@@ -250,7 +250,7 @@ function main(in msg0, in subject0="", in username0="") {
 		}
 
 		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
-		body.swapper("\r", "\r\n");
+		body.replacer("\r", "\r\n");
 
 	}
 

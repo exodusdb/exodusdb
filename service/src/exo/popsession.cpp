@@ -4,20 +4,20 @@ libraryinit()
 function main(io v1, io v2, io v3, io v4, io v5, io v6) {
 /* pushsession
         v1=var().getcursor();
-        SENTENCE.transfer(v2);
-        RECORD.transfer(v3);
-        ID.transfer(v4);
-        DICT.transfer(v5);
-        MV.transfer(v6);
+        SENTENCE.move(v2);
+        RECORD.move(v3);
+        ID.move(v4);
+        DICT.move(v5);
+        MV.move(v6);
         //v6 ^= RM ^ INSERT ^ RM ^ CURATR();
 */
 	setcursor(v1);
 	v1 = "";
-	v2.transfer(SENTENCE);
-	v3.transfer(RECORD);
-	v4.transfer(ID);
-	v5.transfer(DICT);
-	v6.transfer(MV);
+	v2.move(SENTENCE);
+	v3.move(RECORD);
+	v4.move(ID);
+	v5.move(DICT);
+	v6.move(MV);
 	MV=v6.field(RM,1);
 	//INSERT=v6.field(RM,2);
 	//print(v6.field(RM,3));

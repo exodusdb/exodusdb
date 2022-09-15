@@ -37,12 +37,12 @@ PUBLIC bool unassigned(CVR var1) {
 	return !var1.assigned();
 }
 
-PUBLIC void transfer(VARREF fromvar, VARREF tovar) {
-	fromvar.transfer(tovar);
+PUBLIC void move(VARREF fromvar, VARREF tovar) {
+	fromvar.move(tovar);
 }
 
-PUBLIC void exchange(VARREF var1, VARREF var2) {
-	var1.exchange(var2);
+PUBLIC void swap(VARREF var1, VARREF var2) {
+	var1.swap(var2);
 }
 
 
@@ -152,12 +152,12 @@ PUBLIC var textconvert(CVR instring, CVR oldchars, CVR newchars) {
 }
 
 
-PUBLIC VARREF swapper(VARREF iostring, SV from, SV to) {
-	return iostring.swapper(from, to);
+PUBLIC VARREF replacer(VARREF iostring, SV from, SV to) {
+	return iostring.replacer(from, to);
 }
-PUBLIC var swap(CVR instring, SV from, SV to) {
+PUBLIC var replace(CVR instring, SV from, SV to) {
 	var newstring = instring;
-	return newstring.swap(from, to);
+	return newstring.replace(from, to);
 }
 
 
@@ -627,7 +627,7 @@ PUBLIC bool createfile(CVR dbfilename) {
 	var dbfilename2 = dbfilename.field("(", 1).trim();
 
 	//remove pickos volume locations
-	dbfilename2.swapper("DATA ", "").swapper("REVBOOT ", "").swapper("DATAVOL ", "").trimmer();
+	dbfilename2.replacer("DATA ", "").replacer("REVBOOT ", "").replacer("DATAVOL ", "").trimmer();
 
 	return dbfilename2.createfile(dbfilename2);
 }
@@ -637,7 +637,7 @@ PUBLIC bool deletefile(CVR dbfilename_or_var) {
 	var dbfilename2 = dbfilename_or_var.field(" ", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	dbfilename2.swapper("DATA ", "").trimmer();
+	dbfilename2.replacer("DATA ", "").trimmer();
 
 	return dbfilename_or_var.deletefile(dbfilename2);
 }
@@ -647,7 +647,7 @@ PUBLIC bool clearfile(CVR dbfilename_or_var) {
 	var dbfilename2 = dbfilename_or_var.field("(", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	dbfilename2.swapper("DATA ", "").trimmer();
+	dbfilename2.replacer("DATA ", "").trimmer();
 
 	return dbfilename_or_var.clearfile(dbfilename2);
 }

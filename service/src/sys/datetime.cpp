@@ -29,7 +29,7 @@ function main(in type, in inx, in mode, out outx) {
 		//find all DOS in accessible columns
 		//find all DOS related code by searching GBP for /86400
 		if (datemode.contains("DOS")) {
-			datemode.swapper("DOS", "");
+			datemode.replacer("DOS", "");
 			//in1-=24873
 			in1 -= 24837;
 		}
@@ -39,7 +39,7 @@ function main(in type, in inx, in mode, out outx) {
 		var dostime = 0;
 		if (timemode.contains("DOS")) {
 			dostime = 1;
-			timemode.swapper("DOS", "");
+			timemode.replacer("DOS", "");
 			in2 = 86400 * ("." ^ in2);
 
 		//fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0

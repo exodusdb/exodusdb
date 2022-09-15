@@ -290,8 +290,8 @@ function main() {
 //	} else {
 		pidfilename = "/run/neo/neo@" ^ SYSTEM.f(17);
 		if (SYSTEM.f(17).substr(-5) eq "_test") {
-			pidfilename.swapper("neo@", "tst@");
-			pidfilename.swapper("_test", "");
+			pidfilename.replacer("neo@", "tst@");
+			pidfilename.replacer("_test", "");
 			pidfilename ^= ".pid";
 		}
 //	}
@@ -481,7 +481,7 @@ nextreport:
 					var file;
 					if (file.open(filename, "")) {
 						var keyx = reportkey.field("*", 2);
-						keyx.swapper("%2A", "*");
+						keyx.replacer("%2A", "*");
 						if (recordx.f(1) eq "%DELETED%") {
 							var rec;
 							if (rec.read(file, keyx)) {
@@ -834,10 +834,10 @@ nextreport:
 
 //		if (VOLUMES) {
 //			tt = "../data/" ^ SYSTEM.f(17) ^ "/data.cfg";
-//			tt.swapper("/", OSSLASH);
+//			tt.replacer("/", OSSLASH);
 //			if (not(datacfg.osread(tt))) {
 //				tt = "../data/data.cfg";
-//				tt.swapper("/", OSSLASH);
+//				tt.replacer("/", OSSLASH);
 //				if (not(datacfg.osread(tt))) {
 //					datacfg = "";
 //				}
@@ -915,9 +915,9 @@ nextreport:
 //		if (var("5.0,5.1,5.2,6.0,6.1,6.2,6.3").locateusing(",", ver2, vern)) {
 //			ver2 = var("2000,XP,2003,2008,2008R2,2012,2012R2").field(",", vern);
 //			ver = ver.fieldstore(".", 1, -2, "Win" ^ ver2);
-//			ver.swapper(".6001", "");
-//			ver.swapper(".6002", " SP2");
-//			ver.swapper(".3790", "");
+//			ver.replacer(".6001", "");
+//			ver.replacer(".6002", " SP2");
+//			ver.replacer(".3790", "");
 //		}
 //
 //	//not Windows
@@ -957,7 +957,7 @@ nextreport:
 //				cpu.splicer(1, 2, "");
 //				cpu.converter(var().chr(0), "");
 //			}
-//			cpu.swapper("\r\n", FM);
+//			cpu.replacer("\r\n", FM);
 //			cpu.remover(1);
 //		} else {
 			cpu = ((shell2("cat /proc/cpuinfo|grep -i \"model name\"")).field(var().chr(9), 2)).trim();
@@ -975,10 +975,10 @@ nextreport:
 		//Name
 		//Intel(R) Xeon(TM) CPU 3.40GHz
 		//Intel(R) Xeon(TM) CPU 3.40GHz
-		cpu.swapper("(R)", "");
-		cpu.swapper("(TM)", "");
-		cpu.swapper("Intel", "");
-		cpu.swapper("CPU", "");
+		cpu.replacer("(R)", "");
+		cpu.replacer("(TM)", "");
+		cpu.replacer("Intel", "");
+		cpu.replacer("CPU", "");
 		cpu.converter("-", " ");
 		var nsockets = cpu.count(FM) + 1;
 		var nlogical = SYSTEM.f(9);
@@ -1108,7 +1108,7 @@ nextreport:
 //				tt = result.substr(tt, 9999);
 //				tt = tt.field(";", 1).field(var().chr(13), 1);
 //				tt = tt.field(":", 2, 99).trim();
-//				tt.swapper("http=", "");
+//				tt.replacer("http=", "");
 //			} else if (cmd eq "proxycfg") {
 //				cmd = "netsh winhttp import proxy ie";
 //				goto getproxy;
@@ -1560,7 +1560,7 @@ fixnextcompany:
 		call log2("*remove obsolete period 13 from deloitte data", logtime);
 		if (sys.company.contains("13X4WEEK,1/7,5")) {
 			tt = sys.company.f(16);
-			tt.swapper("13/", "12/");
+			tt.replacer("13/", "12/");
 			sys.company(16) = tt;
 fixcompany:
 			sys.company.write(sys.companies, companycode);
@@ -1939,7 +1939,7 @@ subroutine getsystem() {
 	//ensure default style is null
 	var tt3 = systemx.f(46);
 	tt3.converter(VM, "");
-	tt3.swapper("Default", "");
+	tt3.replacer("Default", "");
 	if (tt3 eq "") {
 		systemx(46) = "";
 	}
@@ -1973,7 +1973,7 @@ subroutine failsys() {
 	SYSTEM(33) = s33;
 
 	//respond to user
-	msg.swapper(FM ^ FM, FM);
+	msg.replacer(FM ^ FM, FM);
 	msg.converter(FM, "|");
 	//call oswrite(msg,system<33,10>:'.$2')
 	var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2");

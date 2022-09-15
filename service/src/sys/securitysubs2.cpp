@@ -102,27 +102,27 @@ function main(in mode) {
 		t10.converter(".", " ");
 
 		call log2("*rename some keys", logtime);
-		t10.swapper(" - ", " ");
-		t10.swapper("MEDIA INVOICE - INVOICE WITHOUT ACCOUNT", "MEDIA INVOICE CREATE WITHOUT ACCOUNT");
-		t10.swapper("JOB FILE UPDATE OWN JOB", "JOB FILE UPDATE OTHERS JOBS");
-		t10.swapper("JOB QUOTE", "JOB ESTIMATE");
-		t10.swapper(" FILE ", " ");
-		t10.swapper("RECURRING ENTRIES", "RECURRING");
-		t10.swapper("JOB ESTIMATE CREATE OWN ORDER NO", "JOB ESTIMATE CREATE OWN NO");
-		t10.swapper("VEHICLE RATE ", "RATECARDS ");
-		t10.swapper("MEDIA COSTS ", "MEDIA COST ");
+		t10.replacer(" - ", " ");
+		t10.replacer("MEDIA INVOICE - INVOICE WITHOUT ACCOUNT", "MEDIA INVOICE CREATE WITHOUT ACCOUNT");
+		t10.replacer("JOB FILE UPDATE OWN JOB", "JOB FILE UPDATE OTHERS JOBS");
+		t10.replacer("JOB QUOTE", "JOB ESTIMATE");
+		t10.replacer(" FILE ", " ");
+		t10.replacer("RECURRING ENTRIES", "RECURRING");
+		t10.replacer("JOB ESTIMATE CREATE OWN ORDER NO", "JOB ESTIMATE CREATE OWN NO");
+		t10.replacer("VEHICLE RATE ", "RATECARDS ");
+		t10.replacer("MEDIA COSTS ", "MEDIA COST ");
 
-		t10.swapper("BALANCE ACCESS", "FINANCIAL REPORT ACCESS");
-		t10.swapper("GENERAL REPORT ", "FINANCIAL STATEMENT ");
-		t10.swapper("FINANCIAL STATEMENT DESIGN CREATE", "FINANCIAL REPORT CREATE");
-		t10.swapper("FINANCIAL STATEMENT DESIGN MODIFY", "FINANCIAL REPORT UPDATE");
-		t10.swapper("FINANCIAL STATEMENT ", "FINANCIAL REPORT ");
+		t10.replacer("BALANCE ACCESS", "FINANCIAL REPORT ACCESS");
+		t10.replacer("GENERAL REPORT ", "FINANCIAL STATEMENT ");
+		t10.replacer("FINANCIAL STATEMENT DESIGN CREATE", "FINANCIAL REPORT CREATE");
+		t10.replacer("FINANCIAL STATEMENT DESIGN MODIFY", "FINANCIAL REPORT UPDATE");
+		t10.replacer("FINANCIAL STATEMENT ", "FINANCIAL REPORT ");
 
-		t10.swapper("ANALYSIS REPORT DESIGN CREATE", "BILLING REPORT CREATE");
-		t10.swapper("ANALYSIS REPORT DESIGN MODIFY", "BILLING REPORT UPDATE");
-		t10.swapper("ADS EXPORT", "MEDIA DIARY EXPORT");
-		t10.swapper(VM ^ "ANALYSIS ACCESS", VM ^ "BILLING REPORT ACCESS");
-		t10.swapper("LEDGER RE-OPEN", "LEDGER REOPEN");
+		t10.replacer("ANALYSIS REPORT DESIGN CREATE", "BILLING REPORT CREATE");
+		t10.replacer("ANALYSIS REPORT DESIGN MODIFY", "BILLING REPORT UPDATE");
+		t10.replacer("ADS EXPORT", "MEDIA DIARY EXPORT");
+		t10.replacer(VM ^ "ANALYSIS ACCESS", VM ^ "BILLING REPORT ACCESS");
+		t10.replacer("LEDGER RE-OPEN", "LEDGER REOPEN");
 
 		if (t10.f(1).locate("POSTING", tn)) {
 			if (newuserprivs.f(11, tn) eq "") {
@@ -131,31 +131,31 @@ function main(in mode) {
 			t10(1, tn) = "JOURNAL POST";
 		}
 		//swap vm:'POSTING' with vm:'JOURNAL POST' in t10
-		t10.swapper(VM ^ "REPOSTING", VM ^ "JOURNAL REPOST");
-		t10.swapper(VM ^ "UNPOSTING", VM ^ "JOURNAL UNPOST");
-		t10.swapper(VM ^ "POST ", VM ^ "JOURNAL POST ");
-		t10.swapper("DAYBOOK", "JOURNAL");
-		t10.swapper("JOURNAL JOURNAL", "JOURNAL");
-		t10.swapper("RATECARDS ", "RATECARD ");
-		t10.swapper("UNITS ", "UNIT ");
+		t10.replacer(VM ^ "REPOSTING", VM ^ "JOURNAL REPOST");
+		t10.replacer(VM ^ "UNPOSTING", VM ^ "JOURNAL UNPOST");
+		t10.replacer(VM ^ "POST ", VM ^ "JOURNAL POST ");
+		t10.replacer("DAYBOOK", "JOURNAL");
+		t10.replacer("JOURNAL JOURNAL", "JOURNAL");
+		t10.replacer("RATECARDS ", "RATECARD ");
+		t10.replacer("UNITS ", "UNIT ");
 		//swap 'SUPPLIER INVOICE ACCESS' with 'MEDIA ':'SUPPLIER INVOICE ACCESS' in t10
 		//swap 'SUPPLIER INVOICE CREATE' with 'MEDIA ':'SUPPLIER INVOICE CREATE' in t10
 		//swap 'SUPPLIER INVOICE UPDATE' with 'JOB ':'SUPPLIER INVOICE UPDATE' in t10
 
-		t10.swapper("OWN ORDER NO", "OWN NO");
-		t10.swapper("OWN ESTIMATE NO", "OWN NO");
-		t10.swapper("OWN JOB NO", "OWN NO");
+		t10.replacer("OWN ORDER NO", "OWN NO");
+		t10.replacer("OWN ESTIMATE NO", "OWN NO");
+		t10.replacer("OWN JOB NO", "OWN NO");
 
 		call log2("*fix an error", logtime);
 		while (true) {
 			///BREAK;
 			if (not(t10.contains("MEDIA MEDIA "))) break;
-			t10.swapper("MEDIA MEDIA ", "MEDIA ");
+			t10.replacer("MEDIA MEDIA ", "MEDIA ");
 		}//loop;
 		while (true) {
 			///BREAK;
 			if (not(t10.contains("JOB JOB "))) break;
-			t10.swapper("JOB JOB ", "JOB ");
+			t10.replacer("JOB JOB ", "JOB ");
 		}//loop;
 
 		t10.trimmer();

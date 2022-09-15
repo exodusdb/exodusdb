@@ -52,8 +52,8 @@ nousername0:
 
 	task.ucaser();
 	task.converter(RM ^ FM ^ VM ^ SM, "\\\\\\");
-	task.swapper(" FILE ", " ");
-	task.swapper(" - ", " ");
+	task.replacer(" FILE ", " ");
+	task.replacer(" - ", " ");
 	task.converter(".", " ");
 	task.trimmer();
 

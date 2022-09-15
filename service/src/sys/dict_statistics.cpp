@@ -42,7 +42,7 @@ libraryinit(user_code)
 //--------------------
 function main() {
 	ANS = ID.field("*", 3);
-	ANS.swapper(" ", "_");
+	ANS.replacer(" ", "_");
 	return ANS;
 }
 libraryexit(user_code)
@@ -55,7 +55,7 @@ function main() {
 	ANS = usercode.xlate("USERS", 1, "X");
 	if (ANS eq "") {
 		ANS = usercode;
-		ANS.swapper(" ", "_");
+		ANS.replacer(" ", "_");
 	} else if (ANS ne usercode) {
 		ANS ^= " (" ^ usercode ^ ")";
 	}

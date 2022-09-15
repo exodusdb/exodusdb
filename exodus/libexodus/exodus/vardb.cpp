@@ -225,7 +225,7 @@ static void PGconn_DELETER(PGconn* pgconn) {
 
 #define DEBUG_LOG_SQL if (DBTRACE) sql.squote().logputl("SQL0 ");
 
-#define DEBUG_LOG_SQL1 if (DBTRACE) {((this->assigned() ? (this->substr(1,50)) : "") ^ " | " ^ sql.swap("$1", var(paramValues[0]).substr(1,50).squote())).logputl("SQL1 ");}
+#define DEBUG_LOG_SQL1 if (DBTRACE) {((this->assigned() ? (this->substr(1,50)) : "") ^ " | " ^ sql.replace("$1", var(paramValues[0]).substr(1,50).squote())).logputl("SQL1 ");}
 
 // this front end C interface is based on postgres
 // http://www.postgresql.org/docs/8.2/static/libpq-exec.html
@@ -290,7 +290,7 @@ var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 // Normalise all alternative utf8 encodings of the same unicode points so they are identical
 var get_normal_filename(CVR filename_or_handle) {
-	//return filename_or_handle.f(1).normalize().lcase().convert(".", "_").swap("dict_","dict.");
+	//return filename_or_handle.f(1).normalize().lcase().convert(".", "_").replace("dict_","dict.");
 	// No longer convert . in filenames to _
 	return filename_or_handle.f(1).normalize().lcase();
 }
@@ -356,7 +356,7 @@ class MVresult {
 	// Prevent copy
 	MVresult(const MVresult&) = delete;
 
-	// Move contructor transfers ownership of the PGresult
+	// Move constructor transfers ownership of the PGresult
 	MVresult(MVresult&& mvresult)
 	:
 	rown_(mvresult.rown_) {
@@ -1320,7 +1320,7 @@ bool var::read(CVR filehandle, CVR key) {
 	if (PQresultStatus(mvresult) != PGRES_TUPLES_OK) {
 		var sqlstate = var(PQresultErrorField(mvresult, PG_DIAG_SQLSTATE));
 		var errmsg =
-			"read(" ^ filehandle.convert("." _FM, "_^").swap("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
+			"read(" ^ filehandle.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
 		if (sqlstate == "42P01")
 			errmsg ^= " File doesnt exist";
 		else
@@ -1432,7 +1432,7 @@ var var::lock(CVR key) const {
 
 	// Debugging
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	MVresult mvresult = PQexecParams(pgconn,
@@ -1498,7 +1498,7 @@ bool var::unlock(CVR key) const {
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).swap("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	MVresult mvresult = PQexecParams(pgconn,
@@ -2183,7 +2183,7 @@ inline void tosqlstring(VARREF string1) {
 	// double up any internal single quotes
 	if (string1[1] == "\"") {
 	//if (string1.var_str.front() == '"') {
-		string1.swapper("'", "''");
+		string1.replacer("'", "''");
 		string1.splicer(1, 1, "'");
 		string1.splicer(-1, 1, "'");
 		//string1.var_str.front() = "'";
@@ -2410,7 +2410,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		else if (pgsql_pos) {
 
 			// plsql function name assumed to be like "dictfilename_FIELDNAME()"
-			sqlexpression = get_normal_filename(actualdictfile).swap("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
+			sqlexpression = get_normal_filename(actualdictfile).replace("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
 
 			// function arguments are (key,data) by default
 
@@ -2481,10 +2481,10 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			function_src.splicer(1, 13, "");
 
 			// Hide comma in arg3 like <1,@mv>
-			function_src.swapper(",@mv", "|@mv");
+			function_src.replacer(",@mv", "|@mv");
 
 			// Hide commas in arg2 like field(@id,'*',x)
-			function_src.swapper(",'*',", "|'*'|");
+			function_src.replacer(",'*',", "|'*'|");
 
 			// arg1 = filename
 			var xlatetargetfilename = function_src.field(",", 1).trim().convert(".", "_");
@@ -2788,7 +2788,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	// grab multiple values (numbers or quoted words) into one list, separated by FM
 	//value chars are " ' 0-9 . + -
 	if (remainingwords && joinvalues && valuechars.contains(word1[1])) {
-		word1 = SQ ^ word1.unquote().swap("'", "''") ^ SQ;
+		word1 = SQ ^ word1.unquote().replace("'", "''") ^ SQ;
 
 		var nextword = remainingwords.field(" ", 1);
 
@@ -3112,7 +3112,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			//use postgres collation instead of exodus_extract_sort
 			if (dictexpression.contains("exodus_extract_sort")) {
-				dictexpression.swapper("exodus_extract_sort", "exodus_extract_text");
+				dictexpression.replacer("exodus_extract_sort", "exodus_extract_text");
 				dictexpression ^= " COLLATE exodus_natural";
 			}
 
@@ -3439,13 +3439,13 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				// [\^$.|?*+()
 				// if present in the search criteria, they need to be escaped with
 				// TWO backslashes.
-				word1.swapper("\\", "\\\\");
+				word1.replacer("\\", "\\\\");
 				var special = "[^$.|?*+()";
 				for (int ii = special.len(); ii > 0; --ii) {
 					if (special.contains(word1[ii]))
 						word1.splicer(ii, 0, "\\");
 				}
-				word1.swapper("'" _FM "'", postfix ^ "'" _FM "'" ^ prefix);
+				word1.replacer("'" _FM "'", postfix ^ "'" _FM "'" ^ prefix);
 				word1.splicer(-1, 0, postfix);
 				word1.splicer(2, 0, prefix);
 
@@ -3481,7 +3481,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//remove multivalue handling - duplicate code elsewhere
 				if (dictexpression.contains("to_tsvector(")) {
 					//dont create exodus_tobool(to_tsvector(...
-					dictexpression.swapper("to_tsvector('simple',","");
+					dictexpression.replacer("to_tsvector('simple',","");
 					dictexpression.popper();
 					dictexpression_isvector = false;
 				}
@@ -3538,7 +3538,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				calc_fields.r(2, calc_fieldn, op);
 
 				//save the value(s) after removing quotes and using SM to separate values instead of FM
-				calc_fields.r(3, calc_fieldn, value.unquote().swap("'" _FM "'", FM).convert(FM, SM));
+				calc_fields.r(3, calc_fieldn, value.unquote().replace("'" _FM "'", FM).convert(FM, SM));
 
 				//place holder to be removed before issuing actual sql command
 				whereclause ^= " true";
@@ -3569,7 +3569,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//remove multivalue handling - duplicate code elsewhere
 				if (dictexpression.contains("to_tsvector(")) {
 					//dont create exodus_tobool(to_tsvector(...
-					dictexpression.swapper("to_tsvector('simple',","");
+					dictexpression.replacer("to_tsvector('simple',","");
 					dictexpression.popper();
 					//TRACE(dictexpression)
 					dictexpression_isvector = false;
@@ -3612,7 +3612,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			//allow searching for text with * characters embedded
 			//otherwise interpreted as glob character?
 			if (dictexpression_isvector) {
-				value.swapper("*", "\\*");
+				value.replacer("*", "\\*");
 			}
 
 			// STARTING
@@ -3648,7 +3648,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.popper();
-				expression.swapper(FM, " OR ");
+				expression.replacer(FM, " OR ");
 				value = expression;
 
 				// indicate that the dictexpression is included in the value(s)
@@ -3659,9 +3659,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// single value data with multiple values filter
 			else if (value.contains(FM) && !dictexpression_isvector) {
 
-				//WARNING ", " is swapped in mvprogram.cpp ::select()
+				//WARNING ", " is replaceped in mvprogram.cpp ::select()
 				//so change there if changed here
-				value.swapper(_FM, ", ");
+				value.replacer(_FM, ", ");
 
 				// no processing for arrays (why?)
 				if (dictexpression_isarray) {
@@ -3716,13 +3716,13 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 					//double the single quotes so the whole thing can be wrapped in single quotes
 					//and because to_tsquery generates a syntax error in case of spaces inside values unless quotedd
-					value.swapper("'","''");
+					value.replacer("'","''");
 
 					//wrap everything in single quotes for sql
 					value.squoter();
 
 					//multiple with options become alternatives using to_tsquery | divider
-					value.swapper(_FM, "|");
+					value.replacer(_FM, "|");
 
 				}
 
@@ -3749,25 +3749,25 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 						//remove all single quotes
 						//partvalue.converter("'","");
 
-						//swap all single quotes in search term for pairs of single quotes as per postgres syntax
-						partvalue.swapper("'","''");
+						//replace all single quotes in search term for pairs of single quotes as per postgres syntax
+						partvalue.replacer("'","''");
 
 						//append postfix :* to every search word
 						//so STEV:* also finds STEVE and STEVEN
 
 						//spaces should have been converted to & before selection
 						//spaces imply &
-						//partvalue.swapper(" ", "&");
+						//partvalue.replacer(" ", "&");
 						//partvalue.splicer(-1, 0, ":*");
 
 						//treat entered colons as &
-						partvalue.swapper(":", "&");
+						partvalue.replacer(":", "&");
 
 						//respect any user entered AND or OR operators
 						//search for all words STARTING with user defined words
-						partvalue.swapper("&", ":*&");
-						partvalue.swapper("|", ":*|");
-						partvalue.swapper("!", ":*!");
+						partvalue.replacer("&", ":*&");
+						partvalue.replacer("|", ":*|");
+						partvalue.replacer("!", ":*!");
 
 						partvalue ^= ":*";
 
@@ -3775,19 +3775,19 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 						values ^= FM;
 					}
 					values.popper();
-					values.swapper(FM, "|");
+					values.replacer(FM, "|");
 					value = values.squote();
 				}
 				//select multivalues starting "XYZ" by selecting "XYZ]"
 				else if (postfix) {
-					value.swapper("]''", "'':*");
-					value.swapper("]", ":*");
-					//value.swapper("|", ":*|");
+					value.replacer("]''", "'':*");
+					value.replacer("]", ":*");
+					//value.replacer("|", ":*|");
 					value.splicer(-1, 0, ":*");
 				}
 
-				value.swapper("]''", "'':*");
-				value.swapper("]", ":*");
+				value.replacer("]''", "'':*");
+				value.replacer("]", ":*");
 				//value.splicer(-1, 0, ":*");
 
 				//use "simple" dictionary (ie none) to allow searching for words starting with 'a'
@@ -3825,15 +3825,15 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					//else
 					//	op = "is not";
 					//value = "null";
-					dictexpression.swapper("extract_date(","extract_text(");
-					dictexpression.swapper("extract_datetime(","extract_text(");
-					dictexpression.swapper("extract_time(","extract_text(");
+					dictexpression.replacer("extract_date(","extract_text(");
+					dictexpression.replacer("extract_datetime(","extract_text(");
+					dictexpression.replacer("extract_time(","extract_text(");
 				}
 				// currently number returns 0 for empty string
 				//|| dictexpression.contains("extract_number")
 				else if (dictexpression.contains("extract_number")) {
 					//value = "'0'";
-					dictexpression.swapper("extract_number(","extract_text(");
+					dictexpression.replacer("extract_number(","extract_text(");
 				}
 				//horrible hack to allow filtering calculated date fields versus ""
 				//TODO detect FULLY_BOOKED and FULLY_APPROVED as dates automatically
@@ -3858,7 +3858,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					value = "'{}'";
 				} else {
 					op = "&&";	//postgres array overlap operator
-					value.swapper("'", "\"");
+					value.replacer("'", "\"");
 					//convert to postrgesql array syntax
 					value = "'{" ^ value ^ "}'";
 				}
@@ -3890,7 +3890,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	if (keycodes) {
 		//if (keycodes.count(FM))
 		{
-			keycodes = actualfilename ^ ".key IN ( " ^ keycodes.swap(FM, ", ") ^ " )";
+			keycodes = actualfilename ^ ".key IN ( " ^ keycodes.replace(FM, ", ") ^ " )";
 
 			if (whereclause)
 				//whereclause ^= "\n AND ( " ^ keycodes ^ " ) ";
@@ -3913,9 +3913,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// sql ^= ", 0 as mv";
 		if (actualfieldnames.contains("mv::integer, data")) {
 			// replace the mv column with zero if selecting record
-			actualfieldnames.swapper("mv::integer, data", "0::integer, data");
+			actualfieldnames.replacer("mv::integer, data", "0::integer, data");
 		} else
-			actualfieldnames.swapper(", mv::integer", "");
+			actualfieldnames.replacer(", mv::integer", "");
 	}
 
 	// if any active select, convert to a file and use as an additional filter on key
@@ -3932,8 +3932,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 	// disambiguate from any INNER JOIN key
 	//actualfieldnames.logputl("actualfieldnames=");
-	//actualfieldnames.swapper("key", actualfilename ^ ".key");
-	//actualfieldnames.swapper("data", actualfilename ^ ".data");
+	//actualfieldnames.replacer("key", actualfilename ^ ".key");
+	//actualfieldnames.replacer("data", actualfilename ^ ".data");
 	actualfieldnames.regex_replacer("\\bkey\\b", actualfilename ^ ".key");
 	actualfieldnames.regex_replacer("\\bdata\\b", actualfilename ^ ".data");
 
@@ -3942,8 +3942,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		actualfieldnames = distinctfieldnames;
 
 	// remove redundant clauses
-	whereclause.swapper("\n AND true", "");
-	whereclause.swapper("true\n AND ", "");
+	whereclause.replacer("\n AND true", "");
+	whereclause.replacer("true\n AND ", "");
 
 	//determine the connection from the filename
 	//could be an attached on a non-default connection
@@ -3976,7 +3976,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		var key;
 		while (this->readnext(key)) {
 			//std::cout<<key<<std::endl;
-			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.swap("'", "''") ^ "')");
+			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')");
 		}
 
 		if (this->f(3))
@@ -4013,13 +4013,13 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	//should only be one unnest (parallel mvs if more than one) since it is not clear how sselect by mv by mv2 should work if they are not in parallel
 	if (unnests) {
 		// unnest
-		sql ^= ",\n unnest(\n  " ^ unnests.f(3).swap(VM, ",\n  ") ^ "\n )";
+		sql ^= ",\n unnest(\n  " ^ unnests.f(3).replace(VM, ",\n  ") ^ "\n )";
 		// as fake tablename
 		sql ^= " with ordinality as mvtable1";
 		// brackets allow providing column names for use elsewhere
 		// and renaming of automatic column "ORDINAL" to "mv" for use in SELECT key,mv ...
 		// sql statement
-		sql ^= "( " ^ unnests.f(2).swap(VM, ", ") ^ ", mv)";
+		sql ^= "( " ^ unnests.f(2).replace(VM, ", ") ^ ", mv)";
 	}
 
 	//JOIN - related files
@@ -5062,7 +5062,7 @@ var var::listindexes(CVR filename0, CVR fieldname0) const {
 			var indexname = getpgresultcell(mvresult, indexn, 0);
 			if (indexname.starts("index_")) {
 				if (indexname.contains("__")) {
-					indexname.substrer(8, 999999).swapper("__", VM);
+					indexname.substrer(8, 999999).replacer("__", VM);
 					if (fieldname && indexname.f(1, 2) != lc_fieldname)
 						continue;
 

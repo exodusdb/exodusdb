@@ -29,7 +29,7 @@ function main(in mode, in ipno, out text) {
 	}
 
 	if (SENTENCE.field(" ", 1) eq "WHOIS") {
-		SENTENCE.transfer(sentencex);
+		SENTENCE.move(sentencex);
 		call whois("", sentencex.field(" ", 2), text);
 		call mssg(text);
 		stop();
@@ -104,8 +104,8 @@ returnzero:
 			text ^= errors;
 		}
 
-		text.swapper("\r\n", FM);
-		text.swapper("\n", FM);
+		text.replacer("\r\n", FM);
+		text.replacer("\n", FM);
 	}
 
 	return 0;

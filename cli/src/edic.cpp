@@ -46,7 +46,7 @@ function main() {
 
 		//look for nano.exe next to edic.exe
 		if (not editor)
-			nanopath = EXECPATH.swap("edic", "nano");
+			nanopath = EXECPATH.replace("edic", "nano");
 		if (nanopath.osfile())
 			editor = "nano $LINENO'$FILENAME'";
 	}
@@ -130,9 +130,9 @@ function main() {
 			//var nanorctemplatefilename=EXECPATH.field(OSSLASH,1,fcount(EXECPATH,OSSLASH)-1) ^ OSSLASH ^ "nanorc";
 			var nanorctemplatefilename = nanopath.field(OSSLASH, 1, fcount(nanopath, OSSLASH) - 1) ^ OSSLASH ^ "nanorc";
 			if (not osfile(nanorctemplatefilename))
-				nanorctemplatefilename.swapper("release", "..\\release");
+				nanorctemplatefilename.replacer("release", "..\\release");
 			//if (not osfile(nanorctemplatefilename))
-			//	nanorctemplatefilename.swapper("release","..\\"^PLATFORM_^"\\release");
+			//	nanorctemplatefilename.replacer("release","..\\"^PLATFORM_^"\\release");
 			if (oscopy(nanorctemplatefilename, nanorcfilename)) {
 				printl("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
 				var().input("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");
@@ -156,7 +156,7 @@ function main() {
 
 	//editor="vi";
 	editor.regex_replacer("^[^ ]*\\bnano\\b", "nano --positionlog --const --suspend +$LINENO");
-	//editor.swapper("nano ", "nano --positionlog --const --nowrap --autoindent --suspend --speller=compile +$LINENO ");
+	//editor.replacer("nano ", "nano --positionlog --const --nowrap --autoindent --suspend --speller=compile +$LINENO ");
 
 	if (editor.contains("nano"))
 		printl("http://www.nano-editor.org/dist/v2.1/nano.html");
@@ -233,7 +233,7 @@ function main() {
 		//make absolute in case EDITOR changes current working directory
 		var editcmd = editor;
 		if (editcmd.contains("$ABSOLUTEFILENAME")) {
-			editcmd.swapper("$ABSOLUTEFILENAME", "$FILENAME");
+			editcmd.replacer("$ABSOLUTEFILENAME", "$FILENAME");
 
 			filename = oscwd() ^ OSSLASH ^ filename;
 		}
@@ -282,7 +282,7 @@ function main() {
 					blankfile ^= "\treturn 0;\n";
 				blankfile ^= "}\n";
 				if (progtype eq "mainlib")
-					blankfile.swapper("program()", "function " ^ basefilename ^ "()");
+					blankfile.replacer("program()", "function " ^ basefilename ^ "()");
 			} else if (progtype eq "class" or progtype eq "classlib") {
 				startatlineno = "6,9";
 				blankfile ^= "#include <exodus/program.h>\n";
@@ -302,7 +302,7 @@ function main() {
 				blankfile ^= "\n";
 
 				if (progtype eq "classlib")
-					blankfile.swapper("program", "library");
+					blankfile.replacer("program", "library");
 			} else if (progtype eq "dict") {
 				startatlineno = "6,9";
 				blankfile ^= "#include <exodus/dict.h>\n\n";
@@ -323,7 +323,7 @@ function main() {
 
 			//convert to DOS format on Windows
 			if (OSSLASH eq "\\")
-				blankfile.swapper("\n", "\r\n");
+				blankfile.replacer("\n", "\r\n");
 
 			if (not oswrite(blankfile, filename))
 				stop("Cannot create " ^ filename ^ ". Invalid file name, or no rights here.");
@@ -349,11 +349,11 @@ function main() {
 					linenopattern = "";
 				else
 					linenopattern = "+" ^ startatlineno;
-				editcmd.swapper("+$LINENO", linenopattern);
+				editcmd.replacer("+$LINENO", linenopattern);
 			}
 
 			if (editcmd.contains("$FILENAME"))
-				editcmd.swapper("$FILENAME", filename);
+				editcmd.replacer("$FILENAME", filename);
 			else
 				editcmd ^= " " ^ filename;
 

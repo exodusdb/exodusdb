@@ -141,7 +141,7 @@ subroutine printtx() {
 			}
 		}
 
-		//swap '<h2>' with '<h2~style="page-break-before:auto">' in head
+		//replace '<h2>' with '<h2~style="page-break-before:auto">' in head
 
 		tx.splicer(1, 0, ptx_temp ^ FM);
 		if (printptr and not(html)) {
@@ -208,7 +208,7 @@ subroutine printtx2() {
 		}
 	}
 #endif
-	tx.swapper(FM, "\r\n");
+	tx.replacer(FM, "\r\n");
 	if (printfilename)
 		call osbwrite(tx, printfile,  printptr);
 	else {
@@ -224,13 +224,13 @@ subroutine printtx2() {
 }
 
 subroutine convoptions(io ptx_temp) {
-	ptx_temp.swapper("\'\'", "^%^");
+	ptx_temp.replacer("\'\'", "^%^");
 
 	//convert options
-	//loop while index(ptx_temp,"L'",1) do swap "L'" with "'":fm in ptx_temp repeat
-	//swap "'P'" with pagen in ptx_temp
-	//swap "'T'" with timedate2() in ptx_temp
-	//swap "''" with "" in ptx_temp
+	//loop while index(ptx_temp,"L'",1) do replace "L'" with "'":fm in ptx_temp repeat
+	//replace "'P'" with pagen in ptx_temp
+	//replace "'T'" with timedate2() in ptx_temp
+	//replace "''" with "" in ptx_temp
 	while (true) {
 		var optioncharn = ptx_temp.index("\'");
 		///BREAK;
@@ -277,7 +277,7 @@ subroutine convoptions(io ptx_temp) {
 		ptx_temp.splicer(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
 	}//loop;
 
-	ptx_temp.swapper("^%^", "\'");
+	ptx_temp.replacer("^%^", "\'");
 
 	return;
 
@@ -301,7 +301,7 @@ subroutine getheadfoot() {
 
 	if (html) {
 		var head1 = headx.f(1);
-		head1.swapper(" ", "&nbsp;");
+		head1.replacer(" ", "&nbsp;");
 		head1.converter("~", " ");
 		while (true) {
 			///BREAK;
@@ -310,7 +310,7 @@ subroutine getheadfoot() {
 		}//loop;
 		headx.r(1, head1);
 		head1 = "";
-		headx.swapper("{%20}", " ");
+		headx.replacer("{%20}", " ");
 	}
 
 	//nheadlns=topmargin+count(headx,fm)+(headx<>'')

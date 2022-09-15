@@ -88,8 +88,8 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		}
 
 		//normalise handcoded html so later conversions will work
-		html.swapper("<image", "<img");
-		html.swapper("<IMAGE", "<img");
+		html.replacer("<image", "<img");
+		html.replacer("<IMAGE", "<img");
 
 		//image should not have closing tag but dont bother removing it
 		//swap '</image>' with '' in html
@@ -106,14 +106,14 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 			clientmark = SYSTEM.f(14);
 		}
 	}
-	html.swapper("%AGENCY%", clientmark);
+	html.replacer("%AGENCY%", clientmark);
 
 	//similar code in GETHTML and GENERALMACROS TODO: use GENERALMACROS instead
 
-	html.swapper("%COMPANY_NAME%", letterheadcompany.f(1));
-	html.swapper("%TAX_REGISTRATION_NO%", letterheadcompany.f(21));
-	html.swapper("%TAX_REG_NO%", letterheadcompany.f(21));
-	html.swapper("%COMPANY_REG_NO%", letterheadcompany.f(59));
+	html.replacer("%COMPANY_NAME%", letterheadcompany.f(1));
+	html.replacer("%TAX_REGISTRATION_NO%", letterheadcompany.f(21));
+	html.replacer("%TAX_REG_NO%", letterheadcompany.f(21));
+	html.replacer("%COMPANY_REG_NO%", letterheadcompany.f(59));
 
 	var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 	tt = "L";
@@ -122,13 +122,13 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	} else {
 		call date("OCONV", datetime, tt, tdate, "");
 	}
-	html.swapper("%DATE%", tdate);
-	html.swapper("%TIME%", oconv(datetime.field(".", 2), "[TIME2]"));
-	html.swapper("%STATION%", STATION);
+	html.replacer("%DATE%", tdate);
+	html.replacer("%TIME%", oconv(datetime.field(".", 2), "[TIME2]"));
+	html.replacer("%STATION%", STATION);
 
-	html.swapper("%DATAURL%", "%URL%/data/%DATABASE%");
-	html.swapper("%URL%", SYSTEM.f(114, 1));
-	html.swapper("%DATABASE%", SYSTEM.f(17, 1));
+	html.replacer("%DATAURL%", "%URL%/data/%DATABASE%");
+	html.replacer("%URL%", SYSTEM.f(114, 1));
+	html.replacer("%DATABASE%", SYSTEM.f(17, 1));
 
 	// QR code (requires apt install qrencode)
 	if (html.contains("%QR%")) {
@@ -155,10 +155,10 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 			"#tooltip1 a span { display: none; color: #FFFFFF; }\n"
 			"#tooltip1 a:hover span { display: block; position: absolute; white-space: nowrap; background-color: #222; left: 20px; top: 20px; color: #FFFFFF; padding: 0 5px; font-size:170%}\n"
 			"</style>\n"
-			"<p id='tooltip1'><a>" ^ svg ^ "<span> " ^ qr_tip.swap("\n","<br />") ^ "</span></a></p>";
+			"<p id='tooltip1'><a>" ^ svg ^ "<span> " ^ qr_tip.replace("\n","<br />") ^ "</span></a></p>";
 		}
 
-		html.swapper("%QR%", svg);
+		html.replacer("%QR%", svg);
 	}
 
 	//check valid html .. html from company file is prechecked anyway
@@ -187,7 +187,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 
 	}
 
-	html.swapper(FM, "\r\n");
+	html.replacer(FM, "\r\n");
 	while (true) {
 		///BREAK;
 		if (not(html and (var("\r\n").contains(html[-1])))) break;
@@ -216,8 +216,8 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 
 		//click logos to switch on/off editing
 		onclick = "javascript:edithtml.click()";
-		html.swapper("<IMG", "<img");
-		html.swapper("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
+		html.replacer("<IMG", "<img");
+		html.replacer("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
 
 	}
 
@@ -376,7 +376,7 @@ subroutine getcompanyconfig(io html, io mode) {
 
 		//add text div
 		if (text) {
-			text.swapper(TM, "<br />" "\r\n");
+			text.replacer(TM, "<br />" "\r\n");
 			tab ^= div;
 			tab(-1) = text;
 			tab ^= divx;

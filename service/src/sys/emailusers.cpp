@@ -92,7 +92,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 			emaillog = "(nobody)";
 		}
 		emaillog = "Upgrade Notification emailed to:" ^ VM ^ emaillog;
-		emaillog.swapper(VM, var().chr(13));
+		emaillog.replacer(VM, var().chr(13));
 		call sysmsg(emaillog, "Upgrade to version " ^ version);
 
 		stop();
@@ -281,7 +281,7 @@ exit:
 	if (nsent and replyto) {
 		toemails = replyto;
 		body ^= VM ^ VM ^ "-- Sent to --" ^ emaillog;
-		body.swapper(VM, var().chr(13));
+		body.replacer(VM, var().chr(13));
 		gosub sendemails(emaillog);
 	}
 

@@ -564,7 +564,7 @@ function main() {
 				t1.split(subdirs);
 				subdirs = t1.sort().join();
 				subdirs = srcfilename ^ "/" ^ subdirs;
-				subdirs.swapper(FM, FM ^ srcfilename ^ "/");
+				subdirs.replacer(FM, FM ^ srcfilename ^ "/");
 				//subdirs.printl("subdirs=");
 				filenames.inserter(fileno + 1, subdirs);
 			}
@@ -578,7 +578,7 @@ function main() {
 				t2.split(subfiles);
 				subfiles = t2.sort().join();
 				subfiles = srcfilename ^ "/" ^ subfiles;
-				subfiles.swapper(FM, FM ^ srcfilename ^ "/");
+				subfiles.replacer(FM, FM ^ srcfilename ^ "/");
 				//subfiles.outputl("subfiles2=");
 				filenames.inserter(fileno + 1, subfiles);
 			}
@@ -1131,24 +1131,24 @@ function main() {
 							"\r\n// A functor object of the above type that allows function call syntax to access"
 							"\r\n// an Exodus program/function initialized with the current mv environment."
 							"\r\nFunctor_funcx funcx{mv};";
-						swapper(inclusion, "funcx", field2(libname, OSSLASH, -1));
-						//swapper(example,"exodusprogrambasecreatedelete_",funcname);
-						swapper(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
-						swapper(inclusion, "IN,OUT,OUT", funcargstype);
-						swapper(inclusion, "ARG1,ARG2,ARG3", funcargs);
-						swapper(inclusion, "VARORVOID", returnsvarorvoid);
-						swapper(inclusion, "callorreturn", callorreturn);
-						swapper(inclusion, "{additional_funcs}", add_funcs);
+						replacer(inclusion, "funcx", field2(libname, OSSLASH, -1));
+						//replacer(example,"exodusprogrambasecreatedelete_",funcname);
+						replacer(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
+						replacer(inclusion, "IN,OUT,OUT", funcargstype);
+						replacer(inclusion, "ARG1,ARG2,ARG3", funcargs);
+						replacer(inclusion, "VARORVOID", returnsvarorvoid);
+						replacer(inclusion, "callorreturn", callorreturn);
+						replacer(inclusion, "{additional_funcs}", add_funcs);
 
 						if (text.contains("-Wcast-function-type")) {
-							swapper(inclusion, "{before_call}",
+							replacer(inclusion, "{before_call}",
 									"#pragma GCC diagnostic push"
 									"\r\n #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
-							swapper(inclusion, "{after_call}",
+							replacer(inclusion, "{after_call}",
 									"#pragma GCC diagnostic pop");
 						} else {
-							swapper(inclusion, "\r\n {before_call}", "");
-							swapper(inclusion, "\r\n {after_call}", "");
+							replacer(inclusion, "\r\n {before_call}", "");
+							replacer(inclusion, "\r\n {after_call}", "");
 						}
 						var usepredefinedfunctor = nargs <= EXODUS_FUNCTOR_MAXNARGS;
 						if (useclassmemberfunctions) {

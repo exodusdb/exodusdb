@@ -105,8 +105,8 @@ function main() {
 				//temp suppress ads field 56
 				if (filename eq "ads") {
 					RECORD(56) = rec2.f(56);
-					RECORD.swapper(".000", "");
-					rec2.swapper(".000", "");
+					RECORD.replacer(".000", "");
+					rec2.replacer(".000", "");
 					RECORD.replacer("\\.00([\x1A-\x1F])", "$1");
 					rec2.replacer("\\.00([\x1A-\x1F])", "$1");
 				} else if (filename eq "brands") {

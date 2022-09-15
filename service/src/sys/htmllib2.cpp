@@ -37,30 +37,30 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		while (true) {
 			///BREAK;
 			if (not(dataio.contains(tt))) break;
-			dataio.swapper(tt, VM);
+			dataio.replacer(tt, VM);
 		}//loop;
 		tt = " " ^ FM;
 		while (true) {
 			///BREAK;
 			if (not(dataio.contains(tt))) break;
-			dataio.swapper(tt, FM);
+			dataio.replacer(tt, FM);
 		}//loop;
 
 		//filler='&nbsp;'
 		//gosub fill
 
-		dataio.swapper(FM, "</td></tr>" ^ FM ^ "<tr><td>");
-		dataio.swapper(VM, "</td>" ^ VM ^ "<td>");
+		dataio.replacer(FM, "</td></tr>" ^ FM ^ "<tr><td>");
+		dataio.replacer(VM, "</td>" ^ VM ^ "<td>");
 		dataio = "<tr><td>" ^ dataio ^ "</td></tr>";
 
 		if (params2) {
 			var line1 = dataio.f(1);
-			line1.swapper("</TR>", "</tr>");
-			line1.swapper("</tr>", "</tr>" ^ FM ^ "</thead>" ^ FM ^ "<tbody>");
-			line1.swapper("<td>", "<th>");
-			line1.swapper("</td>", "</th>");
-			line1.swapper("<td>", "<th>");
-			line1.swapper("</td>", "</th>");
+			line1.replacer("</TR>", "</tr>");
+			line1.replacer("</tr>", "</tr>" ^ FM ^ "</thead>" ^ FM ^ "<tbody>");
+			line1.replacer("<td>", "<th>");
+			line1.replacer("</td>", "</th>");
+			line1.replacer("<td>", "<th>");
+			line1.replacer("</td>", "</th>");
 			if (not(line1.contains("<thead"))) {
 				line1 = FM ^ "<thead>" ^ FM ^ line1;
 			}
@@ -84,8 +84,8 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		var lastline = dataio.f(nlines);
 	//Total
 		if (lastline.contains("<td>" ^ sys.glang.f(28))) {
-			lastline.swapper("TD>", "th>");
-			lastline.swapper("td>", "th>");
+			lastline.replacer("TD>", "th>");
+			lastline.replacer("td>", "th>");
 			dataio(nlines) = lastline;
 		}
 
@@ -105,10 +105,10 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			var datax = dataio.f(1, vn);
 
 			//insert a break before all space+#
-			datax.swapper(" #", FM ^ "#");
+			datax.replacer(" #", FM ^ "#");
 
 			//restore #+space to be NOT broken
-			datax.swapper(FM ^ "# ", " # ");
+			datax.replacer(FM ^ "# ", " # ");
 
 			datax.converter(TM, FM);
 
@@ -137,7 +137,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 					}
 				} //ln;
 
-				datax.swapper(FM, trx ^ tr);
+				datax.replacer(FM, trx ^ tr);
 				datax.splicer(1, 0, "<table class=\"hashtable\">" ^ tr);
 				datax ^= trx ^ "</table>";
 
@@ -157,10 +157,10 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		}//loop;
 
 	} else if (mode eq "DECODEHTML") {
-		dataio.swapper("&nbsp;", " ");
-		dataio.swapper("&lt;", "<");
-		dataio.swapper("&gt;", ">");
-		dataio.swapper("&amp;", "&");
+		dataio.replacer("&nbsp;", " ");
+		dataio.replacer("&lt;", "<");
+		dataio.replacer("&gt;", ">");
+		dataio.replacer("&amp;", "&");
 
 	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
 
@@ -252,7 +252,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				}
 				osname = osname.field(";", 1);
 				osname = osname.field(")", 1);
-				osname.swapper(" x86_64", "-64");
+				osname.replacer(" x86_64", "-64");
 			}
 		}
 		if (osname.substr(-2, 2) eq ".0") {

@@ -30,18 +30,18 @@ programinit()
 		assert(unassigned(y));
 	}
 	{
-		// Transfer
+		// move
 		var s1 = "1";
 		var s2 = "2";
-		transfer(s1, s2);
+		move(s1, s2);
 		assert(s1         eq "");
 		assert(s2         eq "1");
 	}
 	{
-		// Exchange
+		// swap
 		var s1 = "1";
 		var s2 = "2";
-		exchange(s1, s2);
+		swap(s1, s2);
 		assert(s1         eq "2");
 		assert(s2         eq "1");
 	}
@@ -86,9 +86,9 @@ programinit()
 	{
 		//swap byte strings with byte strings
 		var yiannis = "Γιάννης";
-		assert(swapper(yiannis, "Γιά", "ννης") eq "ννηςννης");
+		assert(replacer(yiannis, "Γιά", "ννης") eq "ννηςννης");
 		var str1 = "go to heaven";
-		assert(swapper(str1, "o ", "___")      eq "g___t___heaven");
+		assert(replacer(str1, "o ", "___")      eq "g___t___heaven");
 	}
 	{
 		// \d \D and [:number:]

@@ -6,7 +6,7 @@ S
 
 
 	ANS = ID.field("*", 3);\
-	ANS.swapper(" ", "_");\
+	ANS.replacer(" ", "_");\
 	return ANS;
 L
 10

@@ -156,7 +156,7 @@ function main() {
 
 		} //compn;
 		allhtml(-1) = "Press F5 to refresh any images just uploaded.";
-		allhtml.swapper(FM, "\r\n");
+		allhtml.replacer(FM, "\r\n");
 		var(allhtml).oswrite(SYSTEM.f(2));
 		gosub postproc();
 
@@ -451,9 +451,9 @@ setcodepagecase:
 				}
 			}
 			var temp = data_;
-			temp.swapper(RM, "%FF");
-			temp.swapper(FM, "%FE");
-			temp.swapper(VM, "%FD");
+			temp.replacer(RM, "%FF");
+			temp.replacer(FM, "%FE");
+			temp.replacer(VM, "%FD");
 			recordx(1, fn) = temp;
 
 			recordx.write(sys.alanguage, "GENERAL*" ^ codepage);
@@ -523,7 +523,7 @@ badsetcodepage:
 
 		call changelogsubs("SELECTANDLIST" ^ FM ^ data_);
 		if (msg_) {
-			USER4.transfer(USER3);
+			USER4.move(USER3);
 			stop();
 		}
 
@@ -552,7 +552,7 @@ badsetcodepage:
 		perform("ABOUT");
 		//transfer @user4 to data
 		//response='OK'
-		msg_.transfer(USER3);
+		msg_.move(USER3);
 		response_.splicer(1, 0, "OK ");
 
 	} else if (mode eq "UTIL") {
@@ -607,7 +607,7 @@ badsetcodepage:
 		var select = "SELECT DOCUMENTS BY-DSND EXODUS_STANDARD BY DESCRIPTION";
 
 		var instructions = USER0.f(2);
-		instructions.swapper(VM, "%FD");
+		instructions.replacer(VM, "%FD");
 		select ^= " WITH INSTRUCTIONS2 " ^ (instructions.quote());
 
 		if (not(authorised("DOCUMENTS: ACCESS OTHER PEOPLES DOCUMENTS", xx, ""))) {
@@ -627,9 +627,9 @@ nextrep:
 				repn += 1;
 
 				var temp = report.f(2);
-				temp.swapper("&", "&amp;");
-				temp.swapper("<", "&lt;");
-				temp.swapper(">", "&gt;");
+				temp.replacer("&", "&amp;");
+				temp.replacer("<", "&lt;");
+				temp.replacer(">", "&gt;");
 				report(2) = temp;
 
 				//!dont send instructions since takes up space and not needed
@@ -791,7 +791,7 @@ nextrep:
 			if (runtimeperiod[1] eq "0") {
 				runtimeperiod.splicer(1, 1, "");
 			}
-			data_.swapper("{RUNTIME_PERIOD}", runtimeperiod);
+			data_.replacer("{RUNTIME_PERIOD}", runtimeperiod);
 			goto performreport;
 
 		} else {
@@ -841,7 +841,7 @@ performreport:
 		if (temp) {
 			cmd.splicer(temp, 5, "");
 		}
-		cmd.swapper("xAND", "AND");
+		cmd.replacer("xAND", "AND");
 		perform(cmd);
 
 		//printopts='L'

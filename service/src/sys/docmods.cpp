@@ -15,10 +15,10 @@ function main(in letterheadopts, io tx) {
 		//swap '</thead>' with '' in tx
 		//swap '</tbody>' with '' in tx
 
-		tx.swapper("<THEAD", "<tbody");
-		tx.swapper("</THEAD", "</tbody");
-		tx.swapper("<thead", "<tbody");
-		tx.swapper("</thead", "</tbody");
+		tx.replacer("<THEAD", "<tbody");
+		tx.replacer("</THEAD", "</tbody");
+		tx.replacer("<thead", "<tbody");
+		tx.replacer("</thead", "</tbody");
 
 	}
 

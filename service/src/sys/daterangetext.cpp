@@ -72,7 +72,7 @@ function main(in d1, in d2, out result, io lang) {
 
 	tt.converter(FM, " ");
 	result = tt.trim();
-	result.swapper(" ^ ", "-");
+	result.replacer(" ^ ", "-");
 
 	return 0;
 

@@ -58,8 +58,8 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	ranges.converter(",", " ");
 	ranges.trimmer();
 	ranges.converter(" ", FM);
-	ranges.swapper(" -", "-");
-	ranges.swapper("- ", "-");
+	ranges.replacer(" -", "-");
+	ranges.replacer("- ", "-");
 
 	var nn = ranges.count(FM) + (ranges ne "");
 
@@ -118,7 +118,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 				if (basekey and not(prefix)) {
 					key = basekey;
-					key.swapper("%", i2);
+					key.replacer("%", i2);
 				} else {
 					key = prefix ^ i2;
 				}
@@ -155,7 +155,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 				if (basekey and not(prefix)) {
 makekey:
 					key = basekey;
-					key.swapper("%", temp);
+					key.replacer("%", temp);
 
 				} else if (basekey) {
 					temp = rangex;

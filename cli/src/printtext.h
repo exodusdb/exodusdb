@@ -156,7 +156,7 @@ class printtext {
 				}
 			}
 
-			//swap '<h2>' with '<h2~style="page-break-before:auto">' in head
+			//replace '<h2>' with '<h2~style="page-break-before:auto">' in head
 
 			//insert page heading
 			tx.splicer(1, 0, temp ^ FM);
@@ -197,7 +197,7 @@ class printtext {
 				if (style.unassigned())
 					style = "";
 				if (style)
-					css.swapper("</style>", style ^ "</style>");
+					css.replacer("</style>", style ^ "</style>");
 				var htmltitle = (headx.f(1)).field("\'", 1, 1);
 				if (htmltitle[1] == "<")
 					htmltitle = (htmltitle.field(">", 2, 1)).field("<", 1, 1);
@@ -208,7 +208,7 @@ class printtext {
 			//cannot remove these since they may be nonibm codepage letters
 			//convert 'Í' to '=-' in tx
 		}
-		tx.swapper(FM, "\n");
+		tx.replacer(FM, "\n");
 		//osbwritex(tx, printfilename, printfilename, printptr);
 		//tx.osbwrite(printfilename,printptr);
 		printptr = 99;
@@ -265,13 +265,13 @@ class printtext {
 	}
 
 	void convoptions(io temp) {
-		temp.swapper(SQ ^ SQ, "^%^");
+		temp.replacer(SQ ^ SQ, "^%^");
 
 		//convert options
-		//loop while index(temp,"L'",1) do swap "L'" with "'":fm in temp repeat
-		//swap "'P'" with pagen in temp
-		//swap "'T'" with timedate2() in temp
-		//swap "''" with "" in temp
+		//loop while index(temp,"L'",1) do replace "L'" with "'":fm in temp repeat
+		//replace "'P'" with pagen in temp
+		//replace "'T'" with timedate2() in temp
+		//replace "''" with "" in temp
 		var optioncharn;
 		while ((optioncharn = temp.contains("\'", 1))) {
 
@@ -315,7 +315,7 @@ class printtext {
 			temp.splicer(optioncharn - optionchars.length() - 1, optionchars.length() + 2, newoptions);
 		}
 
-		temp.swapper("^%^", "\'");
+		temp.replacer("^%^", "\'");
 
 		return;
 	}
@@ -336,7 +336,7 @@ class printtext {
 
 		if (html) {
 			var head1 = headx.f(1);
-			head1.swapper(" ", "&nbsp;");
+			head1.replacer(" ", "&nbsp;");
 			head1.converter("~", " ");
 			while (head1.substr(-6, 6) == "&nbsp;") {
 				head1.splicer(-6, 6, "");

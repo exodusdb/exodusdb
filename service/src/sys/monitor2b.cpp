@@ -241,10 +241,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 					var datafilename = tempfilename ^ ".XDA";
 
 					//encodeuri
-					params.swapper("%", "%25");
-					params.swapper("&", "%26");
-					params.swapper("`", "%60");
-					params.swapper("+", "%2B");
+					params.replacer("%", "%25");
+					params.replacer("&", "%26");
+					params.replacer("`", "%60");
+					params.replacer("+", "%2B");
 
 					var(params).oswrite(datafilename);
 					cmd ^= " --post-file=" ^ datafilename;
@@ -254,10 +254,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 
 			//encodeuri
-			cmd.swapper("%", "%25");
-			cmd.swapper("&", "%26");
-			cmd.swapper("`", "%60");
-			cmd.swapper("+", "%2B");
+			cmd.replacer("%", "%25");
+			cmd.replacer("&", "%26");
+			cmd.replacer("`", "%60");
+			cmd.replacer("+", "%2B");
 
 			//add url
 			cmd ^= " " ^ ((authurl ^ params).quote());
@@ -288,7 +288,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			//finally add location to get
 			cmd ^= " " ^ ((authurl ^ "?" ^ params).quote());
 
-			wgetrc.swapper(FM, "\r\n");
+			wgetrc.replacer(FM, "\r\n");
 			var wgetrcfilename = oscwd() ^ tempfilename ^ ".XRC";
 			var(wgetrc).oswrite(wgetrcfilename);
 
@@ -375,7 +375,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		if (not(datax.field(",", 1) eq hashcode)) {
 			msg = "wrong response";
 badresponse:
-			datax.swapper("<br />", FM);
+			datax.replacer("<br />", FM);
 			gosub getlog(logfilename, cleanup, log);
 			msg ^= FM ^ FM ^ datax ^ log;
 			msg = msg.oconv("T#60");
@@ -406,7 +406,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 			logfilename.osremove();
 		}
 		log.converter("\r\n", FM ^ FM);
-		log.swapper("<br />", FM);
+		log.replacer("<br />", FM);
 		log = trim(log, FM);
 		log = field2(log, FM, -1);
 		if (log) {

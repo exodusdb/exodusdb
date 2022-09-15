@@ -90,12 +90,12 @@ function main() {
 	if (tt) {
 		cmd.splicer(tt, 6, "");
 	}
-	cmd.swapper("%AND% ", "AND ");
+	cmd.replacer("%AND% ", "AND ");
 
 	//cmd:=' HEADING ':quote(title)
 	title = cmd.oconv("T#60");
-	title.swapper(TM, " 'L' ");
-	title.swapper(DQ, "''");
+	title.replacer(TM, " 'L' ");
+	title.replacer(DQ, "''");
 	cmd ^= " HEADING " ^ (title.quote());
 
 	perform(cmd);

@@ -100,9 +100,9 @@ function main(in mode) {
 			}
 
 			var backupkey = ID;
-			backupkey.swapper("SYSTEM", "BACKUP");
+			backupkey.replacer("SYSTEM", "BACKUP");
 			var smtpkey = ID;
-			smtpkey.swapper("SYSTEM", "SMTP");
+			smtpkey.replacer("SYSTEM", "SMTP");
 
 			// backup rec on definitions
 			if (ID eq "SYSTEM") {
@@ -339,7 +339,7 @@ preventupdate:
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
-				key.swapper("*", "%2A");
+				key.replacer("*", "%2A");
 				key = "DEFINITIONS*" ^ key;
 				RECORD.write(reports, key);
 			}
@@ -436,17 +436,17 @@ preventupdate:
 			//if valid else return
 
 			var backupkey = ID;
-			backupkey.swapper("SYSTEM", "BACKUP");
+			backupkey.replacer("SYSTEM", "BACKUP");
 			backuprec = RECORD.field(FM, 71, 29);
 
 			var smtpkey = ID;
-			smtpkey.swapper("SYSTEM", "SMTP");
+			smtpkey.replacer("SYSTEM", "SMTP");
 			smtprec = RECORD.field(FM, 101, 9);
 
 			//ensure default style is null
 			tt = RECORD.f(46);
 			tt.converter(VM, "");
-			tt.swapper("Default", "");
+			tt.replacer("Default", "");
 			if (tt eq "") {
 				RECORD(46) = "";
 			}
@@ -611,7 +611,7 @@ preventupdate:
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
-				key.swapper("*", "%2A");
+				key.replacer("*", "%2A");
 				key = "DEFINITIONS*" ^ key;
 				if (xx.read(reports, key)) {
 					var("%DELETED%").write(reports, key);
@@ -649,7 +649,7 @@ subroutine reorderdbs() {
 	//convert from DOS
 	//dbdir=field(dbdir,char(26),1)
 	dbdir.converter("\r\n", FM ^ FM);
-	dbdir.swapper(FM ^ FM, FM);
+	dbdir.replacer(FM ^ FM, FM);
 	dbdir.converter(",*", SM ^ VM);
 
 	//extract substitution and dblist from dbdir line 1
@@ -678,7 +678,7 @@ subroutine reorderdbs() {
 		newdbdir ^= FM;
 	}
 	newdbdir.converter(SM ^ VM, ",*");
-	newdbdir.swapper(FM, "\r\n");
+	newdbdir.replacer(FM, "\r\n");
 
 	if (newdbdir ne olddbdir) {
 		call oswrite(newdbdir, dbdirfilename);

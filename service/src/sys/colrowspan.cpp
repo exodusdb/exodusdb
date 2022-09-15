@@ -105,11 +105,11 @@ nextcoln:;
 		} //coln;
 
 	} //rown;
-	colhdg.swapper(nocell, "");
+	colhdg.replacer(nocell, "");
 
 	colhdg = invertarray(colhdg);
-	colhdg.swapper(FM, "</tr><tr>");
-	colhdg.swapper(VM, "");
+	colhdg.replacer(FM, "</tr><tr>");
+	colhdg.replacer(VM, "");
 	colhdg = "<tr>" ^ colhdg ^ "</tr>";
 
 	//change all "(Base)" in dictionary column headings to the base currency
@@ -122,8 +122,8 @@ nextcoln:;
 		} else {
 			t2 = "(" ^ t2 ^ ")";
 		}
-		colhdg.swapper("(Base)", t2);
-		colhdg.swapper("%BASE%", sys.company.f(3));
+		colhdg.replacer("(Base)", t2);
+		colhdg.replacer("%BASE%", sys.company.f(3));
 	}
 
 	return 0;

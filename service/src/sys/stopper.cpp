@@ -31,7 +31,7 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 
 	var result = "";
 	if (mode) {
-		text.swapper(", ", FM);
+		text.replacer(", ", FM);
 	} else {
 		//SWAP @FM WITH ', ' IN TEXT
 		var msgx = msg;

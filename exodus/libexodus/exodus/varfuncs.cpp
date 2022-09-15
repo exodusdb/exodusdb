@@ -217,8 +217,8 @@ VARREF var::input(CVR prompt) {
 
 	//linux terminal input line editing
 	else {
-		//swap double quotes with \"
-		default_input.swapper("\"", "\\\"");
+		//replace double quotes with \"
+		default_input.replacer("\"", "\\\"");
 		var cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
 		//cmd.outputl("cmd=");
 		this->osshellread(cmd);
@@ -1212,10 +1212,10 @@ VARREF splicerx(const int start1, const int length, const char* c) {
 };
 */
 
-VARREF var::transfer(VARREF destinationvar) {
+VARREF var::move(VARREF destinationvar) {
 
-	THISIS("VARREF var::transfer(VARREF destinationvar)")
-	// transfer even unassigned vars (but not uninitialised ones)
+	THISIS("VARREF var::move(VARREF destinationvar)")
+	// move even unassigned vars (but not uninitialised ones)
 	//assertDefined(function_sig);
 	assertAssigned(function_sig);
 	ISDEFINED(destinationvar)
@@ -1232,7 +1232,7 @@ VARREF var::transfer(VARREF destinationvar) {
 }
 
 // kind of const needed in calculatex
-CVR var::exchange(CVR var2) const {
+CVR var::swap(CVR var2) const {
 
 	THISIS(__PRETTY_FUNCTION__)
 	// Works on unassigned vars
@@ -1261,7 +1261,7 @@ CVR var::exchange(CVR var2) const {
 }
 
 // version without const
-VARREF var::exchange(VARREF var2) {
+VARREF var::swap(VARREF var2) {
 
 	THISIS(__PRETTY_FUNCTION__)
 	// Works on unassigned vars
@@ -1377,7 +1377,7 @@ VARREF var::cropper() {
 	}
 
 	var_str = newstr;
-	// swap(var_str,newstr);
+	// replace(var_str,newstr);
 
 	return *this;
 }

@@ -144,7 +144,7 @@ function main() {
 			searched(-1) = exodusincludepath;
 			if (!osfile(exodusincludepath ^ "\\exodus.h")) {
 				errputl("Couldnt find exodus include path (exodus.h)");
-				errputl(searched.swap(FM, "\n"));
+				errputl(searched.replace(FM, "\n"));
 				exodusincludepath = "";
 			}
 		}

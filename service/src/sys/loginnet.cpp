@@ -55,11 +55,11 @@ readmenu:
 		}
 	}
 	//convert to new menu codes
-	oldmenus.swapper("ACCS", "FINANCE");
-	oldmenus.swapper("ANALMENU", "ANALYSIS");
-	oldmenus.swapper("ANALYSIS.INVOICES", "ANALYSIS");
-	oldmenus.swapper("ADJOB", "JOBS");
-	oldmenus.swapper("GENERAL", "SUPPORT");
+	oldmenus.replacer("ACCS", "FINANCE");
+	oldmenus.replacer("ANALMENU", "ANALYSIS");
+	oldmenus.replacer("ANALYSIS.INVOICES", "ANALYSIS");
+	oldmenus.replacer("ADJOB", "JOBS");
+	oldmenus.replacer("GENERAL", "SUPPORT");
 	//convert '.' to '_' in oldmenus
 
 	//all menus - not in order
@@ -122,7 +122,7 @@ deleteit:
 
 	//if they have MENU then ANALYSIS=MEDIAANALYSIS
 	if (menus.contains("MEDIA")) {
-		menus.swapper("ANALYSIS", "MEDIAANALYSIS");
+		menus.replacer("ANALYSIS", "MEDIAANALYSIS");
 	}
 
 	//check there is at least one menu
@@ -252,7 +252,7 @@ nextcomp:
 	if (not temp) {
 		temp = SYSTEM.f(17);
 	}
-	temp.swapper("&", " and ");
+	temp.replacer("&", " and ");
 	cookie ^= "&db=" ^ temp;
 
 	//split extras (does gui use this? it must always be 1)
@@ -302,7 +302,7 @@ nextcomp:
 		var ndays = var().date() - lastbackupdate;
 		msg ^= ndays ^ " day" ^ var("s").substr(1, ndays ne 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
-		msg.swapper("(0", "(");
+		msg.replacer("(0", "(");
 		msg(-1) = "EXODUS recommends that you \"BACKUP\" your data ";
 		msg(-1) = "regularly to prevent total loss of data due to";
 		msg(-1) = "power failure, disk damage or other accidents.";

@@ -745,13 +745,13 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	splicer(expect, 4, 3, "???");
 	//expect.outputl();
 	//expect.oconv("HEX4").outputl();
-	//swap(unicode,"\\p{L}","?","ri").outputl();
-	//swap(unicode,"\\p{L}","?","ri").oconv("HEX4").outputl();
+	//replace(unicode,"\\p{L}","?","ri").outputl();
+	//replace(unicode,"\\p{L}","?","ri").oconv("HEX4").outputl();
 	//p(L} is regular expression for Unicode Letter
 	if (SLASH_IS_BACKSLASH)
 		assert(regex_replace(unicode, "\\pL", "?", "ri") eq expect);
 	//but what is its inverse?
-	//assert(swap(unicode,"\\PL","?","ri") eq expect);
+	//assert(replace(unicode,"\\PL","?","ri") eq expect);
 
 	//setxlocale(greek_gr);
 	var punctuation = GreekQuestionMark;  //(Punctuation)

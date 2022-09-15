@@ -94,7 +94,7 @@ dim::dim(dim&& sourcedim) {
 //	nrows_ = sourcedim.nrows_;
 //	ncols_ = sourcedim.ncols_;
 //	initialised_ = sourcedim.ncols_;
-//	std::swap(data_, sourcedim.data_);
+//	std::replace(data_, sourcedim.data_);
 }
 
 /////////////////////

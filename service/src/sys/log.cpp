@@ -107,7 +107,7 @@ getlogkey:
 		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
 		body.converter("\n", "");
 		body = trim(body, "\r");
-		body.swapper("\r", "\r\n");
+		body.replacer("\r", "\r\n");
 
 		//sendmail - if it fails, there will be an entry in the log
 		call sendmail(emailaddrs, "", subject, body, "", "", xx);

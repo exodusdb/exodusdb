@@ -775,7 +775,7 @@ function loop_exit() {
 	tt = INTCONST.f(1, 1);
 	if (charx.lcase().contains(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
-		tt.swapper(var().chr(27), "Esc");
+		tt.replacer(var().chr(27), "Esc");
 		call mssg("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
 		//loop
 		// input reply,-1:
@@ -1087,8 +1087,8 @@ readlink1:
 		//cleanup the input file
 		//convert '&' to fm in request
 		request_.converter("\r\n", FM);
-		USER0.swapper("\\\\", "\\");
-		request_.swapper("\\r", FM);
+		USER0.replacer("\\\\", "\\");
+		request_.replacer("\\r", FM);
 		//convert @lower.case to @upper.case in request
 		while (true) {
 			///BREAK;
@@ -1224,7 +1224,7 @@ function request_init() {
 
 	//REMOTE_ADDR, REMOTE_HOST, HTTPS, SESSIONID
 	//if connection<1>='::1' then connection<1>='127.0.0.1'
-	connection.swapper(FM ^ "::1", FM ^ "127.0.0.1");
+	connection.replacer(FM ^ "::1", FM ^ "127.0.0.1");
 	connection.converter(FM, VM);
 	connection(1, 10) = username;
 	SYSTEM(40) = connection;
@@ -1306,7 +1306,7 @@ function request_init() {
 		}
 
 		tt ^= "/>";
-		tt.transfer(logx);
+		tt.move(logx);
 		gosub writelogx2();
 
 	}
@@ -1698,7 +1698,7 @@ subroutine process2() {
 		}
 		leaselocks = "";
 		gosub leaselock();
-		sessionid.transfer(USER1);
+		sessionid.move(USER1);
 
 	} else if (request1 eq "UNLOCK") {
 
@@ -1765,13 +1765,13 @@ subroutine process2() {
 		keyx0 = keyx;
 		preread = triggers.f(1);
 		if (preread) {
-			keyx.transfer(ID);
+			keyx.move(ID);
 			win.srcfile = file;
 			win.datafile = filename;
 			systemsubs = preread;
 			call systemsubs(triggers.f(2));
 			DATA = "";
-			ID.transfer(keyx);
+			ID.move(keyx);
 		}
 
 		autokey = 0;
@@ -1945,7 +1945,7 @@ noupdate:
 			//response:=' RECORDKEY ':keyx
 			tt = keyx;
 			//ugly cludge to allow space in recordkey to be understood in client.htm
-			tt.swapper(" ", "{20}");
+			tt.replacer(" ", "{20}");
 			response_ ^= " RECORDKEY " ^ tt;
 		}
 
@@ -1964,8 +1964,8 @@ noupdate:
 				gosub fmtresp();
 				return;
 			}
-			keyx.transfer(ID);
-			USER1.transfer(RECORD);
+			keyx.move(ID);
+			USER1.move(RECORD);
 			win.orec = RECORD;
 			win.wlocked = sessionid;
 			origresponse = response_;
@@ -1978,8 +1978,8 @@ noupdate:
 			DATA = "";
 
 	//restore this programs environment
-			RECORD.transfer(iodat_);
-			ID.transfer(keyx);
+			RECORD.move(iodat_);
+			ID.move(keyx);
 
 			call cropper(USER1);
 
@@ -2017,7 +2017,7 @@ noupdate:
 						keyx = keyx2;
 					}
 
-					USER3.swapper("Error: NO RECORD", "");
+					USER3.replacer("Error: NO RECORD", "");
 
 					//swap 'RECORDKEY ' with '' in response
 					response_.trimmerb();
@@ -2028,7 +2028,7 @@ noupdate:
 					//in case postread has changed the key
 					if (keyx ne keyx0 and not(USER3.contains("RECORDKEY"))) {
 						tt = keyx;
-						tt.swapper(" ", "%20");
+						tt.replacer(" ", "%20");
 						response_ = (USER3 ^ " RECORDKEY " ^ tt).trim();
 					}
 
@@ -2120,7 +2120,7 @@ noupdate:
 		ID = keyx;
 		MV = 0;
 		//@record=iodat
-		iodat_.transfer(RECORD);
+		iodat_.move(RECORD);
 		win.datafile = filename;
 		//not really needed because pre/post code should assume that it is wlocked
 		//but some code does not know that (eg postread called from postwrite)
@@ -2415,7 +2415,7 @@ badwrite:
 			tt = ID;
 			//response:=' RECORDKEY ':@id
 			//horrible cludge to allow space in recordkey to be understood in client.htm
-			tt.swapper(" ", "{20}");
+			tt.replacer(" ", "{20}");
 			response_ ^= " RECORDKEY " ^ tt;
 			if (sessionid) {
 				USER3 ^= " SESSIONID " ^ sessionid;
@@ -2550,7 +2550,7 @@ badwrite:
 		//speed up next autorun if new one has been added
 		tt = response_.index("%NEWAUTORUN%");
 		if (tt) {
-			USER3.swapper("%NEWAUTORUN%", "");
+			USER3.replacer("%NEWAUTORUN%", "");
 			lastautorun = "";
 		}
 
@@ -2692,7 +2692,7 @@ function request_exit() {
 
 		logx = iodat_;
 		//convert '%' to '%25' in logx
-		logx.swapper("%", "%25");
+		logx.replacer("%", "%25");
 		gosub writelogx();
 
 	} else {
@@ -2751,7 +2751,7 @@ function request_exit() {
 				call osbwrite(blk, linkfile2, ptr);
 
 				if (logfilename) {
-					blk.transfer(logx);
+					blk.move(logx);
 					gosub writelogx();
 				}
 
@@ -2806,7 +2806,7 @@ function request_exit() {
 		if (tt.contains("<")) {
 			call htmllib2("STRIPTAGS", tt);
 		}
-		tt.swapper("SESSIONID ", "");
+		tt.replacer("SESSIONID ", "");
 		printl(tt);
 		//print linkfilename1
 	}
@@ -2835,8 +2835,8 @@ function request_exit() {
 subroutine geterrorresponse() {
 //	fileerrorx = FILEERROR;
 //	USER3 = "Error: " ^ ("FS" ^ fileerrorx.f(1, 1)).xlate("SYS.MESSAGES", 11, "X");
-//	response_.swapper("%1%", handlefilename(fileerrorx.f(2, 1)));
-//	USER3.swapper("%2%", fileerrorx.f(2, 2));
+//	response_.replacer("%1%", handlefilename(fileerrorx.f(2, 1)));
+//	USER3.replacer("%2%", fileerrorx.f(2, 2));
 	USER3 = "Error: " ^ FILEERROR;
 	gosub fmtresp();
 	return;
@@ -2856,7 +2856,7 @@ subroutine fmtresp() {
 	if (USER3[1] eq FM) {
 		response_.splicer(1, 1, "");
 	}
-	USER3.swapper(FM, "\r\n");
+	USER3.replacer(FM, "\r\n");
 
 	return;
 }
@@ -2889,7 +2889,7 @@ subroutine properlock() {
 	srcfile2 = win.srcfile;
 	/*
 	if (not(win.srcfile.unassigned())) {
-		srcfile2.swapper("SHADOW.MFS" ^ SM, "");
+		srcfile2.replacer("SHADOW.MFS" ^ SM, "");
 	}
 	*/
 
@@ -2916,7 +2916,7 @@ subroutine properunlock() {
 	//will be removed as well
 	srcfile2 = win.srcfile;
 	/*
-	srcfile2.swapper("SHADOW.MFS" ^ SM, "");
+	srcfile2.replacer("SHADOW.MFS" ^ SM, "");
 	*/
 
 	srcfile2.unlock( keyx);
@@ -3277,9 +3277,9 @@ subroutine filesecurity() {
 		//!*use the FILENAME ACCESS/DELETE "ID" message because gives clue
 		//!*that they may be allowed to access other records
 		if (positive) {
-			msg0.transfer(response_);
+			msg0.move(response_);
 		} else {
-			posmsg.transfer(USER3);
+			posmsg.move(USER3);
 		}
 		ok = 0;
 		gosub fmtresp();

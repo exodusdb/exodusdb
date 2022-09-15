@@ -70,7 +70,7 @@ function main() {
 	if (interactive) {
 		text ^= FM;
 	} else {
-		text.swapper(FM, "\r\n");
+		text.replacer(FM, "\r\n");
 	}
 
 	call note(text);

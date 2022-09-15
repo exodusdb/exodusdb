@@ -67,8 +67,8 @@ PUBLIC ND var ostempfilename();
 PUBLIC ND bool assigned(CVR var2);
 PUBLIC ND bool unassigned(CVR var2);
 
-PUBLIC void transfer(VARREF fromvar, VARREF tovar);
-PUBLIC void exchange(VARREF var1, VARREF var2);
+PUBLIC void move(VARREF fromvar, VARREF tovar);
+PUBLIC void swap(VARREF var1, VARREF var2);
 
 PUBLIC ND var date();
 PUBLIC ND var time();
@@ -203,8 +203,8 @@ PUBLIC ND var convert(CVR instring, SV oldchars, SV newchars);
 PUBLIC VARREF textconverter(VARREF iostring, CVR oldchars, CVR newchars);
 PUBLIC ND var textconvert(CVR instring, CVR oldchars, CVR newchars);
 
-PUBLIC VARREF swapper(VARREF iostring, SV oldstr, SV newstr);
-PUBLIC ND var swap(CVR instring, SV oldstr, SV newstr);
+PUBLIC VARREF replacer(VARREF iostring, SV oldstr, SV newstr);
+PUBLIC ND var replace(CVR instring, SV oldstr, SV newstr);
 
 PUBLIC VARREF regex_replacer(VARREF iostring, CVR oldstr, CVR newstr, CVR options DEFAULT_EMPTY);
 PUBLIC ND var regex_replace(CVR instring, CVR oldstr, CVR newstr, CVR options DEFAULT_EMPTY);

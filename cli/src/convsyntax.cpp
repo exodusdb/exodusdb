@@ -189,7 +189,7 @@ function main() {
 
 					// Failed to convert
 					if (line2.contains(";"))
-						errputl('?', line2.swap("\t", "    "));
+						errputl('?', line2.replace("\t", "    "));
 
 				} else {
 
@@ -199,7 +199,7 @@ function main() {
 					if (line2 ne line) {
 						line = line2;
 						replaced = true;
-						printl('+', line.swap("\t", "    "));
+						printl('+', line.replace("\t", "    "));
 					}
 				}
 

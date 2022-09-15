@@ -906,10 +906,10 @@ var var::oconv_TX(const int raw) const {
 		txt.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
 
 	// "\n" -> "\\n"
-	txt.swapper("\\n", "\\\\n");
+	txt.replacer("\\n", "\\\\n");
 
 	// LF -> literal "\n"
-	txt.swapper("\n", "\\n");
+	txt.replacer("\n", "\\n");
 
 	// FM -> LF
 	txt.converter(_FM, "\n");
@@ -919,10 +919,10 @@ var var::oconv_TX(const int raw) const {
 	// TM -> \\\ + LF
 	// ST -> \\\\ + LF
 	if (not raw) {
-		txt.swapper(_VM, "\\\n");
-		txt.swapper(_SM, "\\\\\n");
-		txt.swapper(_TM, "\\\\\\\n");
-		txt.swapper(_ST, "\\\\\\\\\n");
+		txt.replacer(_VM, "\\\n");
+		txt.replacer(_SM, "\\\\\n");
+		txt.replacer(_TM, "\\\\\\\n");
+		txt.replacer(_ST, "\\\\\\\\\n");
 	}
 
 	return txt;
@@ -936,20 +936,20 @@ var var::iconv_TX(const int raw) const {
 	// \\ + LF -> TM
 	// \\\ + LF -> ST
 	if (not raw) {
-		record.swapper("\\\\\\\\\n", _ST);
-		record.swapper("\\\\\\\n", _TM);
-		record.swapper("\\\\\n", _SM);
-		record.swapper("\\\n", _VM);
+		record.replacer("\\\\\\\\\n", _ST);
+		record.replacer("\\\\\\\n", _TM);
+		record.replacer("\\\\\n", _SM);
+		record.replacer("\\\n", _VM);
 	}
 
 	// LF -> FM
 	record.converter("\n", _FM);
 
 	// "\n" -> LF
-	record.swapper("\\n", "\n");
+	record.replacer("\\n", "\n");
 
 	// "\\n" -> "\n"
-	record.swapper("\\\n", "\\n");
+	record.replacer("\\\n", "\\n");
 
 	// unescape backslash before FM
 	// so we have to escape them somehow first
