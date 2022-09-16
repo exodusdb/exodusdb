@@ -114,7 +114,7 @@ add_library(exodus SHARED
  exoenv.cpp exofuncs.cpp exoos.cpp
  varwait.cpp varunicode.cpp varposix.cpp exofunctor.cpp #mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
- MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp
+ murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
  varoshandle.cpp vardbconn.cpp mvprocessno.cpp
  variter.cpp
 # little ones last for quick parallel finishing

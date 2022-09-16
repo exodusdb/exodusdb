@@ -802,7 +802,7 @@ function main() {
 
 				//for external subroutines (dll/so libraries), build up .h
 				// and maybe .def file text
-				if (not isprogram and word1.substr(1, 11) eq "libraryinit")
+				if (not isprogram and word1.b(1, 11) eq "libraryinit")
 					useclassmemberfunctions = true;
 
 				if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine")) {
@@ -829,7 +829,7 @@ function main() {
 						int level = 0;
 						int charn;
 						for (charn = 1; charn <= len(funcargsdecl); ++charn) {
-							var ch = funcargsdecl.substr(charn, 1);
+							var ch = funcargsdecl.b(charn, 1);
 							if (ch eq ")") {
 								if (level eq 0)
 									break;
@@ -1200,7 +1200,7 @@ function main() {
 				if (loadtimelinking and word1 eq "#include") {
 					var word2 = line.field(" ", 2);
 					if (word2[1] == DQ) {
-						word2 = word2.substr(2, word2.len() - 2);
+						word2 = word2.b(2, word2.len() - 2);
 						if (word2.substr(-2, 2) eq ".h")
 							word2.splicer(-2, 2, "");
 						//libnames^=" "^word2;
@@ -1510,7 +1510,7 @@ function static compile2(
 		//osremove(compileoutputfilename);
 		var charn = index(compileroutput, ": error:");
 		if (charn) {
-			startatlineno = compileroutput.substr(charn - 9, 9);
+			startatlineno = compileroutput.b(charn - 9, 9);
 			startatlineno = startatlineno.field2(":", -1);
 			//				print("ERROR(S) FOUND IN " ^ srcfilename ^ " STARTING IN LINE "^startatlineno^" ... ");
 			//				var().input(1);
@@ -1808,7 +1808,7 @@ function getparam(in result, in paramname, out paramvalue) {
 	var posn = index(result.ucase(), "\n" ^ paramname.ucase() ^ "=");
 	if (not posn)
 		return false;
-	paramvalue = result.substr(posn + len(paramname) + 2).field("\n", 1);
+	paramvalue = result.b(posn + len(paramname) + 2).field("\n", 1);
 	return true;
 }
 

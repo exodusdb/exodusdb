@@ -150,7 +150,7 @@ function main() {
 				//for (const var dictidn : range(1, ndictids)) {
 
 				// for (var dictidn = 1
-				var part1 = line2.substr(pos).field(";", 1).trim();
+				var part1 = line2.b(pos).field(";", 1).trim();
 				var varname = part1.field(" ", 3);
 				var starting = part1.field("=", 2, 999).trim();
 

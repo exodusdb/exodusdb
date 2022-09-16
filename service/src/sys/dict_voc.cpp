@@ -85,7 +85,7 @@ libraryinit(c_args)
 //-----------------
 function main() {
 	ANS = RECORD.f(2);
-	if (ANS.substr(1, 3) ne "*c ") {
+	if (ANS.b(1, 3) ne "*c ") {
 		ANS = "";
 	}
 	return ANS;
@@ -619,7 +619,7 @@ libraryinit(program_date)
 //-----------------------
 function main() {
 	var ans = calculate("TIMEDATE");
-	return ans.substr(11, 99).iconv("D");
+	return ans.b(11, 99).iconv("D");
 }
 libraryexit(program_date)
 
@@ -683,7 +683,7 @@ function main() {
 	if (ans[1] eq "V") {
 		ans = field2(RECORD, FM, -2);
 	}
-	if (not(ans.substr(1, 2).match("^\\d{2}$"))) {
+	if (not(ans.b(1, 2).match("^\\d{2}$"))) {
 		ANS = "";
 	} else {
 		ANS = ans;

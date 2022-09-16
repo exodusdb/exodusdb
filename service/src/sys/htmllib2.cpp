@@ -199,7 +199,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			osname = "XP";
 		} else if (dataio.contains("Windows NT ")) {
 			var tt = dataio.index("Windows NT ");
-			osname = ((dataio.substr(tt + 11, 9999)).field(";", 1)).field(")", 1);
+			osname = ((dataio.b(tt + 11, 9999)).field(";", 1)).field(")", 1);
 		}
 		if (dataio.contains("WOW64")) {
 			osname ^= "-64";
@@ -242,8 +242,8 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				tt = dataio.index("CrOS");
 			}
 			if (tt) {
-				osname = dataio.substr(tt, 9999);
-				if (osname.substr(1, 4) eq "CPU ") {
+				osname = dataio.b(tt, 9999);
+				if (osname.b(1, 4) eq "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
@@ -320,7 +320,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				tt = dataio.index("Netscape");
 			}
 			if (tt) {
-				browser = dataio.substr(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
+				browser = dataio.b(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
 			}
 
 			//browsernames='Edge,Chrome,Firefox,Safari,Opera,Netscape'

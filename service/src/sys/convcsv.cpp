@@ -132,7 +132,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		sentencex.replacer(" NOCOLHEADER", "");
 	}
 
-	if (filename.substr(1, 4) eq "DICT") {
+	if (filename.b(1, 4) eq "DICT") {
 		tt = "VOC";
 	} else {
 		tt = filename;
@@ -198,7 +198,7 @@ function main(in sentence0, in select0="", in filters0="") {
 				exportable = exportable.f(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
-			keyx = exportable.substr(1, exportable.index(FM ^ FM) - 1);
+			keyx = exportable.b(1, exportable.index(FM ^ FM) - 1);
 			nkeys = keyx.count(FM) + 1;
 			if (nkeys gt 2) {
 				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
@@ -263,7 +263,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		//delete lists,listkey
 
 	} else {
-		if (filename.substr(1, 4) eq "DICT") {
+		if (filename.b(1, 4) eq "DICT") {
 			dict = "";
 		} else {
 			dict = "DICT ";
@@ -369,7 +369,7 @@ nextdict:
 						//end
 
 					//no commas to be added to numbers
-					} else if (oconvx.substr(1, 7) eq "[NUMBER") {
+					} else if (oconvx.b(1, 7) eq "[NUMBER") {
 						oconvx = "";
 					}
 
@@ -585,7 +585,7 @@ nextvn:
 				}
 
 				if (cell[1] eq "+") {
-					if (cell.substr(2, 9999).isnum()) {
+					if (cell.b(2, 9999).isnum()) {
 						cell.splicer(1, 1, "");
 					}
 				}
@@ -596,7 +596,7 @@ nextvn:
 					cell.replacer(DQ, "''");
 				}
 				if (cell.len() gt 255) {
-					cell = cell.substr(1, 200) ^ " ...";
+					cell = cell.b(1, 200) ^ " ...";
 				}
 				if (fmtxs(coln) ne "R" or not(cell.isnum())) {
 

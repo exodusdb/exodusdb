@@ -8,7 +8,7 @@
 // The same caveats as 32-bit MurmurHash2 apply here - beware of alignment
 // and endian-ness issues if used across multiple platforms.
 
-#include "MurmurHash2_64.h"
+#include "murmurhash2_64.h"
 
 #ifdef MURMUR64_64
 

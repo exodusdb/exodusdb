@@ -40,7 +40,7 @@ function main() {
 		if (not silent)
 			outputl("\n", filename);
 
-		if (filename.substr(1,10) eq "preselect_" or filename.substr(1,14) eq "select_stage2_" or locate(filename,exclude_filenames))
+		if (filename.b(1,10) eq "preselect_" or filename.b(1,14) eq "select_stage2_" or locate(filename,exclude_filenames))
 			continue;
 
 		var file1;

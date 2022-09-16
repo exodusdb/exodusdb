@@ -89,7 +89,7 @@ function main(in mode) {
 
 	//no validation for EXODUS
 	if (curruser_.contains("EXODUS")) {
-		if (mode.substr(1, 4) eq "VAL." and mode ne "VAL.USER") {
+		if (mode.b(1, 4) eq "VAL." and mode ne "VAL.USER") {
 			return 0;
 		}
 	}
@@ -561,7 +561,7 @@ function main(in mode) {
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
 				var task = tasks.f(1, taskn);
 				//WARNING TODO: check ternary op following;
-				var temp = task.substr(1, 10) eq "DOCUMENT: " ? "#" : "";
+				var temp = task.b(1, 10) eq "DOCUMENT: " ? "#" : "";
 				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
 					RECORD.remover(10, taskn);
 					RECORD.remover(11, taskn);
@@ -1493,7 +1493,7 @@ subroutine changepassx() {
 }
 
 subroutine generatepassword() {
-	var consonants = UPPERCASE.substr(1, 26);
+	var consonants = UPPERCASE.b(1, 26);
 	var vowels = "AEIOUY";
 	consonants.converter(vowels ^ "QX", "");
 	newpassword = "";

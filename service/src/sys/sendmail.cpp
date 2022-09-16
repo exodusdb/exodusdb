@@ -196,8 +196,8 @@ forcedemail:
 		if (ccaddress) {
 			ccaddress ^= ";";
 		}
-		ccaddress ^= toaddress.substr(tt + 2, 9999);
-		toaddress = toaddress.substr(1, tt - 1);
+		ccaddress ^= toaddress.b(tt + 2, 9999);
+		toaddress = toaddress.b(1, tt - 1);
 	}
 
 	//send mail requires confirmation if user is EXODUS
@@ -268,7 +268,7 @@ forcedemail:
 
 	if (body[1] eq "@") {
 
-		osfilename = body.substr(2, 99999);
+		osfilename = body.b(2, 99999);
 		osfilesize = osfilename.osfile().f(1);
 
 		//convert to link if file is too big to email
@@ -304,9 +304,9 @@ forcedemail:
 		if (not(VOLUMES)) {
 			cwd ^= OSSLASH;
 		}
-		if (attachfilename.substr(1, 2) eq "..") {
+		if (attachfilename.b(1, 2) eq "..") {
 			attachfilename.splicer(1, 2, cwd.field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
-		} else if (attachfilename.substr(1, 2) eq ".") {
+		} else if (attachfilename.b(1, 2) eq ".") {
 			attachfilename.splicer(1, 1, cwd);
 		}
 		msgsize += attachfilename.osfile().f(1);
@@ -335,12 +335,12 @@ forcedemail:
 	//if delete then params:=' /d ':delete
 
 	//condition subject start standard with 'EXODUS: '
-	if (subject.substr(1, 8) ne "EXODUS: ") {
-		if (subject.substr(1, 6) eq "EXODUS") {
-			subject = subject.substr(7, 9999).trimf();
+	if (subject.b(1, 8) ne "EXODUS: ") {
+		if (subject.b(1, 6) eq "EXODUS") {
+			subject = subject.b(7, 9999).trimf();
 		}
-		if (subject.substr(1, 7) eq "System:") {
-			subject = subject.substr(8, 9999).trimf();
+		if (subject.b(1, 7) eq "System:") {
+			subject = subject.b(8, 9999).trimf();
 		}
 		subject.splicer(1, 0, "EXODUS: ");
 	}
@@ -403,13 +403,13 @@ forcedemail:
 		//mark html formatted messages as such
 		if (body[1] eq "@") {
 			tt = "";
-			if (bodyfile.osopen(body.substr(2, 999))) {
+			if (bodyfile.osopen(body.b(2, 999))) {
 				//osbread tt from bodyfile at 0 length 100
 				var offset = 0;
 				call osbread(tt, bodyfile, offset, 100);
 			}
 		} else {
-			tt = body.substr(1, 20);
+			tt = body.b(1, 20);
 		}
 		tt.ucaser();
 		if ((not(attachfilename) and tt.contains("<!DOCTYPE")) or tt.contains("<HTML")) {
@@ -436,7 +436,7 @@ forcedemail:
 
 			//body may already be in a file
 			if (body[1] eq "@") {
-				bodyfilename = body.substr(2, 99999);
+				bodyfilename = body.b(2, 99999);
 
 			//otherwise generate a random filename and write it
 			} else {
@@ -650,7 +650,7 @@ TRACE(offset)
 subroutine addlinks2osfilename() {
     tt = osfilename;
     //tt.converter("\\", "/");
-    //if (tt.substr(1, 3) eq "../") {
+    //if (tt.b(1, 3) eq "../") {
     //  tt.splicer(1, 3, "");
     //}
 

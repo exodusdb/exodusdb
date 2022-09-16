@@ -193,7 +193,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				for (failn = 1; failn <= 999999; failn++) {
 					var tt = userx.f(18, failn);
 					///BREAK;
-					if (not(tt ne "" and tt.substr(1, 2) ne "OK")) break;
+					if (not(tt ne "" and tt.b(1, 2) ne "OK")) break;
 				} //failn;
 				//do normal authorisation to show type of failure - but fail even if ok
 				//if failn>=maxnfails then

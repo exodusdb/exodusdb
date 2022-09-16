@@ -34,8 +34,8 @@ function main() {
 		var fieldname;
 		var tt = filename.index("__");
 		if (tt) {
-			fieldname = filename.substr(tt + 2);
-			filename = filename.substr(1, tt - 1);
+			fieldname = filename.b(tt + 2);
+			filename = filename.b(1, tt - 1);
 		} else {
 			fieldname = indexnames.f(indexn + 1);
 			indexn += 1;

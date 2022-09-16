@@ -28,10 +28,15 @@ THE SOFTWARE.
 
 #include <exodus/varimpl.h>
 
-static const int HEX_PER_CHAR = sizeof(char) * 2;
-// using namespace std;
-
 namespace exodus {
+
+// Would be 256 if RM was character number 255.
+// Last delimiter character is 0x1F (RM)
+// Used in var::remove()
+// #define LASTDELIMITERCHARNOPLUS1 0x20
+static constexpr int LASTDELIMITERCHARNOPLUS1 = FM_ + 2;
+
+static constexpr int HEX_PER_CHAR = sizeof(char) * 2;
 
 //var var::iconv(CVR convstr) const {
 //

@@ -1,5 +1,5 @@
-#ifndef EXO_RANGE_H
-#define EXO_RANGE_H
+#ifndef EXODUS_LIBEXODUS_EXODUS_RANGE_H_
+#define EXODUS_LIBEXODUS_EXODUS_RANGE_H_
 
 namespace exodus {
 
@@ -11,24 +11,22 @@ namespace exodus {
 // https://www.internalpointers.com/post/writing-custom-iterators-modern-cpp
 // defined in header to be inlined for performance which is critical
 #define INT_T int
-class PUBLIC range
-{
+class PUBLIC range {
 	using int_t = INT_T;
 
 	int first_;
 	int last_;
 
-public:
+ public:
 
 	// Represent an incrementable and comparable int
-	class Iterator
-	{
+	class Iterator {
 		int int_;
 
 	public:
 
 		// Construct from an int
-		Iterator(int_t int1) : int_(int1) {};
+		Iterator(int_t int1) : int_(int1) {}
 
 		// Return our int
 		int_t operator*() const { return int_; }
@@ -45,12 +43,12 @@ public:
 			//var (b.int_).errputl("B ");
 			// Once the moving int is equal to OR GREATER THAN the target then the result is TRUE ie NOT EQUAL
 			// This caters for the situation "for (var x : (10, 8)" which would otherwise loop incorrectly
-			return a.int_ < b.int_; };
+			return a.int_ < b.int_; }
 
 	};
 
 	// Construct a range from two ints
-	range( int_t first, int_t last) : first_(first), last_(last + 1) {};
+	range(int_t first, int_t last) : first_(first), last_(last + 1) {}
 
 	// Return our first int
 	Iterator begin() { return Iterator(first_); }
@@ -62,4 +60,4 @@ public:
 
 } // namespace exodus
 
-#endif //EXO_RANGE_H
+#endif // EXODUS_LIBEXODUS_EXODUS_RANGE_H_

@@ -371,7 +371,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		//verify response or abort
 		text = datax.field(",", 2, 999999);
 		gosub hash(salt, max, hashcode);
-		hashcode = hashcode.substr(9999, -9999);
+		hashcode = hashcode.b(9999, -9999);
 		if (not(datax.field(",", 1) eq hashcode)) {
 			msg = "wrong response";
 badresponse:

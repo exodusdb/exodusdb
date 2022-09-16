@@ -68,7 +68,7 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 
 	//remove html tags from message and decode things like &nbsp;
-	if (msg.substr(1, 2) ne "@@") {
+	if (msg.b(1, 2) ne "@@") {
 		call htmllib2("STRIPTAGS", msg);
 		call htmllib2("DECODEHTML", msg);
 	}
@@ -102,7 +102,7 @@ function main(in msg0, in subject0="", in username0="") {
 	emailaddrs.replacer("backups@neosys.com", "sysmsg@neosys.com");
 
 	//suppress login failure messages
-	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and subjectin.substr(1, 13) eq "Login Failure") {
+	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and subjectin.b(1, 13) eq "Login Failure") {
 		emailaddrs.replacer("sysmsg@neosys.com", "");
 		emailaddrs = trim(emailaddrs, ";");
 	}
@@ -152,14 +152,14 @@ function main(in msg0, in subject0="", in username0="") {
 	var subject = "EXODUS System: " ^ datasetcode;
 	var tt = msg.index("ERROR NO:");
 	if (tt) {
-		subject ^= " " ^ msg.substr(tt, 9999).f(1, 1, 1);
+		subject ^= " " ^ msg.b(tt, 9999).f(1, 1, 1);
 	}
 	if (subjectin) {
 		subject ^= " " ^ subjectin;
 	}
 
-	if (msg.substr(1, 2) eq "@@") {
-		body = msg.substr(2, 999999);
+	if (msg.b(1, 2) eq "@@") {
+		body = msg.b(2, 999999);
 
 	} else {
 		var l9 = "L#9";

@@ -139,7 +139,7 @@ postuploadfail:
 		var tt = "\\";
 		uploadpath.converter(tt, OSSLASH);
 
-		if (uploadpath.substr(3, 99999).contains("..")) {
+		if (uploadpath.b(3, 99999).contains("..")) {
 			msg = uploadpath.quote() ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -256,7 +256,7 @@ postuploadfail:
 		//if dirpatt[-1,1]<>'.' then dirpatt:='.'
 		dirpatt ^= "*";
 
-		if (dirpatt.substr(3, 99999).contains("..")) {
+		if (dirpatt.b(3, 99999).contains("..")) {
 			msg = dirpatt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -338,7 +338,7 @@ postuploadfail:
 		}
 
 		tt = uploadroot ^ uploadpath;
-		if (tt.substr(3, 99999).contains("..")) {
+		if (tt.b(3, 99999).contains("..")) {
 			msg = tt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -372,7 +372,7 @@ postuploadfail:
 		var validating = RECORD.f(17);
 		osfile = "";
 
-		if (uploadpath.substr(3, 99999).contains("..")) {
+		if (uploadpath.b(3, 99999).contains("..")) {
 			msg = uploadpath.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -383,7 +383,7 @@ postuploadfail:
 		if (not dictfilename) {
 			dictfilename = filename;
 		}
-		if (dictfilename.substr(1, 4) ne "DICT") {
+		if (dictfilename.b(1, 4) ne "DICT") {
 			dictfilename.splicer(1, 0, "DICT.");
 		}
 		//if keydictid else keydictid='@ID'
@@ -470,7 +470,7 @@ nextline:
 						var tt = line.index("  ");
 						///BREAK;
 						if (not tt) break;
-						cols(-1) = line.substr(1, tt - 1) ^ VM ^ offset;
+						cols(-1) = line.b(1, tt - 1) ^ VM ^ offset;
 						for (ptr = tt; ptr <= 999999; ++ptr) {
 							///BREAK;
 							if (line[ptr + 1] ne " ") break;
@@ -572,7 +572,7 @@ nextline:
 				if (csv) {
 					cell = line.f(1, coln);
 				} else {
-					cell = line.substr(col.f(1, 2), col.f(1, 3)).trimb();
+					cell = line.b(col.f(1, 2), col.f(1, 3)).trimb();
 				}
 				if (cell.len()) {
 					if (col.f(1, 4)) {

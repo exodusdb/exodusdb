@@ -250,7 +250,7 @@ function main() {
 			question ^= "\n" ^ basefilename.quote() ^ " does not exist. Create what? (1-2) ";
 			while (true) {
 
-				if (basefilename.substr(1, 5).lcase() eq "dict.")
+				if (basefilename.b(1, 5).lcase() eq "dict.")
 					progtype = 5;
 				else
 					progtype.input(question);
@@ -441,7 +441,7 @@ function main() {
 					//msvc style error lines
 					//test.cpp(6) : error C2143: syntax error : missing ';' before '}'
 //				} else if (charn = index(errors, ") : error ");charn) {
-//					startatlineno = errors.substr(charn - 10, 10).field2("(", 2);
+//					startatlineno = errors.b(charn - 10, 10).field2("(", 2);
 
 				}
 				if (startatlineno) {

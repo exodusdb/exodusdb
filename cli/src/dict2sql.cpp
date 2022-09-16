@@ -112,7 +112,7 @@ function main() {
 
 	if (filenames) {
 		doall = false;
-		if (filenames.substr(1, 5) ne "dict.")
+		if (filenames.b(1, 5) ne "dict.")
 			filenames.splicer(1, 0, "dict.");
 
 	} else if (doall) {
@@ -409,7 +409,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 
 subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
-	if (dictfilename.substr(1, 5) ne "dict." or dictfilename == "dict.all")
+	if (dictfilename.b(1, 5) ne "dict." or dictfilename == "dict.all")
 		return;
 
 	if (!open(dictfilename, dictfile)) {
@@ -429,7 +429,7 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
 	//add one file for the dict_all sql using sql UNION
 	if (viewsql) {
-		viewsql ^= "SELECT '" ^ dictfilename.substr(6).ucase() ^ "'||'*'||key as key, data\n";
+		viewsql ^= "SELECT '" ^ dictfilename.b(6).ucase() ^ "'||'*'||key as key, data\n";
 		viewsql ^= "FROM " ^ dictfilename ^ "\n";
 		viewsql ^= "UNION\n";
 	}
@@ -452,14 +452,14 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
 	var conversion = dictrec.f(7);
-	if (conversion.substr(1, 6) == "[DATE]" || conversion.substr(1, 6) == "[DATE," || conversion.substr(1, 6) == "[DATE2")
+	if (conversion.b(1, 6) == "[DATE]" || conversion.b(1, 6) == "[DATE," || conversion.b(1, 6) == "[DATE2")
 		dict_returns = "date";
-	else if (conversion.substr(1, 9) == "[DATETIME")
+	else if (conversion.b(1, 9) == "[DATETIME")
 		dict_returns = "timestamp";
-	if (conversion.substr(1, 5) == "[TIME")
+	if (conversion.b(1, 5) == "[TIME")
 		//dict_returns = "time";
 		dict_returns = "interval";
-	else if (conversion.substr(1, 7) == "[NUMBER") {
+	else if (conversion.b(1, 7) == "[NUMBER") {
 		if (conversion[9] == "0")
 			//[NUMBER,0]
 			dict_returns = "integer";
@@ -470,14 +470,14 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	var function_name_and_args = dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)";
 
 	//auto generate pgsql code for ..._XREF dict records (full text)
-	if (sourcecode.substr(1, 11) == "CALL XREF({") {
+	if (sourcecode.b(1, 11) == "CALL XREF({") {
 
 		//remove any existing pgsql
 		var pos = index(sourcecode,
 						"/"
 						"*pgsql");
 		if (pos) {
-			sourcecode = sourcecode.substr(1, pos - 1).trimb(VM);
+			sourcecode = sourcecode.b(1, pos - 1).trimb(VM);
 		}
 
 		var fulltext_dictid = field(field(sourcecode, "{", 2), "}", 1);
@@ -530,13 +530,13 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		return;
 	}
 	var delim;
-	//var sql = sourcecode.substr(pos + 8);
+	//var sql = sourcecode.b(pos + 8);
 	// Move pos to point to the start of the first line AFTER the / *pgsql line
 	// thereby ignoring any "arguments" on the first line
 	var temp = sourcecode.substr2(pos, delim);
 
 	// Extract the pgsql function source code
-	var sql = sourcecode.substr(pos);
+	var sql = sourcecode.b(pos);
 
 	//printl(dictfilename, " ",dictid, " > sql");
 
@@ -622,8 +622,8 @@ $RETVAR := array_to_string
 	int nlines = fcount(sql, VM);
 	for (int ln = 1; ln <= nlines; ++ln) {
 		var line = sql.f(1, ln).trim();
-		//if (line.substr(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {
-		if (line.substr(1, 2) != "--" && field(line, " ", 2, 2).match(":?= xlate")) {
+		//if (line.b(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {
+		if (line.b(1, 2) != "--" && field(line, " ", 2, 2).match(":?= xlate")) {
 
 			//line.printl("xlate=");
 
@@ -851,7 +851,7 @@ COST 10;
 
 	var calc_fields;
 	if (calc_fields.open("calc_fields")) {
-		var key = ucase(dictfilename.substr(6) ^ "*" ^ dictid);
+		var key = ucase(dictfilename.b(6) ^ "*" ^ dictid);
 		if (calc_fields.deleterecord(key)) {
 			key.outputl("deleted calc_fields = ");
 		}
@@ -884,9 +884,9 @@ BEGIN
  nchars := length(data);
  for charn in 1..nchars loop
 
-  continue when substr(data,charn,1) <> sep;
+  continue when.b(data,charn,1) <> sep;
 
-  --if substr(data,charn,1) = sep then
+  --if.b(data,charn,1) = sep then
 
    currfieldn=currfieldn+1;
 
@@ -946,8 +946,8 @@ BEGIN
  nchars := length(data);
  for charn in 1..nchars loop
 
-  continue when substr(data,charn,1) <> sep;
-  --if substr(data,charn,1) = sep then
+  continue when.b(data,charn,1) <> sep;
+  --if.b(data,charn,1) = sep then
 
   currfieldn=currfieldn+1;
 

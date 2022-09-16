@@ -135,7 +135,7 @@ programinit()
 	TRACE(decomp_a[1])	//ASCII A
 	//TRACE(decomp_a[2])
 	//TRACE(decomp_a[3])
-	TRACE(decomp_a.substr(2, 2))  //ACCENT_ON_PRIOR
+	TRACE(decomp_a.b(2, 2))  //ACCENT_ON_PRIOR
 	TRACE(len(decomp_a))		  // 3 bytes
 	TRACE(textlen(decomp_a))	  // two unicode points. ASCII A, ACCENT_ON_PRIOR
 
@@ -901,14 +901,14 @@ function test_codepage(in codepage, in lang) {
 
 	//check loop back
 	//(only if loop back does produced 256 bytes)
-	printl(as_utf8a.substr(32));
+	printl(as_utf8a.b(32));
 	printl("round trip " ^ var(as_cp eq v256));
 	if (as_cp.len() eq 256)
 		assert(as_cp                    eq v256);
 
 	//check double trip
 	printl("double trip " ^ var(as_utf8a eq as_utf8b));
-	printl(as_utf8b.substr(32));
+	printl(as_utf8b.b(32));
 	assert(as_utf8a                      eq as_utf8b);
 
 	return 0;

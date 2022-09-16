@@ -60,7 +60,7 @@ nousername0:
 	msg = "";
 	//!*CALL note(' ':TASK)
 
-	if (task.substr(1, 2) eq "..") {
+	if (task.b(1, 2) eq "..") {
 	// call note(task:'')
 		return 1;
 	}
@@ -86,15 +86,15 @@ nousername0:
 		isexodus = username eq "EXODUS";
 	}
 
-	var deleting = task.substr(1, 8) eq "%DELETE%";
+	var deleting = task.b(1, 8) eq "%DELETE%";
 	if (deleting) {
 		task.splicer(1, 8, "");
 	}
-	var updating = task.substr(1, 8) eq "%UPDATE%";
+	var updating = task.b(1, 8) eq "%UPDATE%";
 	if (updating) {
 		task.splicer(1, 8, "");
 	}
-	var renaming = task.substr(1, 8) eq "%RENAME%";
+	var renaming = task.b(1, 8) eq "%RENAME%";
 	if (renaming) {
 		task.splicer(1, 8, "");
 	}

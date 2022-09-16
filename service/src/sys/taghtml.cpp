@@ -13,7 +13,7 @@ function main(in type, in in0, in mode, out output) {
 
 	output = in0;
 	if (output eq "") {
-		var temp = mode.substr(1, 2);
+		var temp = mode.b(1, 2);
 		temp.ucaser();
 		if (temp eq "TD" or mode eq "TH") {
 			output = "&nbsp;";
@@ -38,7 +38,7 @@ function main(in type, in in0, in mode, out output) {
 //		///BREAK;
 //		if (not charn) break;
 //
-//		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",", (output.substr(charn + 1, 10)).field(";", 1), xx))) {
+//		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",", (output.b(charn + 1, 10)).field(";", 1), xx))) {
 //			output.splicer(charn, 1, "&amp;");
 //		}
 //
@@ -48,7 +48,7 @@ function main(in type, in in0, in mode, out output) {
 		pos = output.index("&", pos);
 		if (not pos)
 			break;
-		var ss = _VM ^ output.substr(pos + 1, 10).field(";", 1) ^ _VM;
+		var ss = _VM ^ output.b(pos + 1, 10).field(";", 1) ^ _VM;
 		if (not precoded.contains(ss)) {
 			output.splicer(pos + 1, 0, "amp;");
 			pos += 4;

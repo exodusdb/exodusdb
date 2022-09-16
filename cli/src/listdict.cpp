@@ -4,7 +4,7 @@ programinit()
 function main() {
 
 	var filename = COMMAND.f(2);//field(SENTENCE, " ", 2).lcase();
-	if (filename && filename.substr(1, 5) != "dict.")
+	if (filename && filename.b(1, 5) != "dict.")
 		filename = "dict." ^ filename;
 	//perform("list " ^ dictfilename ^ " by type \"F\" by FMC by PART");
 

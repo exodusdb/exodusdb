@@ -229,7 +229,7 @@ subroutine getblock() {
 				while (true) {
 					///BREAK;
 					if (not(block[-1] eq FM)) break;
-					block.splicer(-1, 1, "");
+					block.popper();
 				}//loop;
 				return;
 			}
@@ -333,7 +333,7 @@ nextmln:;
 						if (not findpos)
 							break;
 
-						var fieldname = macrotext.substr(findpos + 1, "}", COL2);
+						var fieldname = macrotext.b(findpos + 1, "}", COL2);
 
 						// skip c++ brackets { } and only convert old calculated fields like {XXXXXXXXX}
 						if (not fieldname.match("^[A-Za-z_]\\w*$"))

@@ -416,7 +416,7 @@ updateversion:
 //		var volume = volumesx.f(volumen);
 //		var tpath = "../" "DATA" "/";
 //		tpath.converter("/", OSSLASH);
-//		if (volume.substr(1, 8) eq tpath) {
+//		if (volume.b(1, 8) eq tpath) {
 //			execute("ATTACH " ^ volume ^ " (S)");
 //		}
 //	} //volumen;
@@ -953,7 +953,7 @@ nextreport:
 	} else {
 //		if (VOLUMES) {
 //			cpu = shell2("wmic CPU GET NAME", xx);
-//			if (cpu.substr(1, 2) eq _RM _FM) {
+//			if (cpu.b(1, 2) eq _RM _FM) {
 //				cpu.splicer(1, 2, "");
 //				cpu.converter(var().chr(0), "");
 //			}
@@ -1105,7 +1105,7 @@ nextreport:
 //			tt = result.index("proxy server(s)");
 //			if (tt) {
 //				//tt=result[tt,';'][1,char(13)]
-//				tt = result.substr(tt, 9999);
+//				tt = result.b(tt, 9999);
 //				tt = tt.field(";", 1).field(var().chr(13), 1);
 //				tt = tt.field(":", 2, 99).trim();
 //				tt.replacer("http=", "");
@@ -1873,7 +1873,7 @@ nextdoc:
 					var itime = version.field(" ", 1).iconv("MT");
 					//tt=idate 'D/J':' ':itime 'MT'
 					tt = idate.oconv("D/E");
-					tt = idate.substr(-4, 4) ^ "/" ^ tt.substr(1, 5) ^ " " ^ itime.oconv("MT");
+					tt = idate.substr(-4, 4) ^ "/" ^ tt.b(1, 5) ^ " " ^ itime.oconv("MT");
 					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
 					if (reply eq 1) {
 						perform("EMAILUSERS UPGRADE " ^ tt);

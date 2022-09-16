@@ -168,7 +168,7 @@ fail:
 	//long distance override
 	if (xdata eq "?") {
 
-		if (not(userx eq lockx.substr(1, userx.len()))) {
+		if (not(userx eq lockx.b(1, userx.len()))) {
 			lockx = userx ^ " " ^ var(1000000).rnd();
 			if (SECURITY.f(1).locate(userx, usern)) {
 				lockx ^= " " ^ SECURITY.f(4, usern, 2).field(TM, 7).oconv("HEX2");

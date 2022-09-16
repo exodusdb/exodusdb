@@ -118,11 +118,6 @@ THE SOFTWARE.
 #define DQ_ '\"'
 #define SQ_ '\''
 
-// Would be 256 if RM was character number 255.
-// Last delimiter character is 0x1F (RM)
-// Used in var::remove()
-#define LASTDELIMITERCHARNOPLUS1 0x20
-
 // print() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
 //#define VISIBLE_FMS "_^]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
 //#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
@@ -162,8 +157,9 @@ THE SOFTWARE.
 namespace exodus {
 
 //#define SMALLEST_NUMBER 1e-13
-//0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
+//sum(1287.89,-1226.54,-61.35,1226.54,-1226.54) -> 0.000'000'000'000'23
 //#define SMALLEST_NUMBER 1e-10
+//#define SMALLEST_NUMBER 2.91E-11 (2^-35) or 0.000'000'000'029'1
 //#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
 constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 
@@ -1714,16 +1710,19 @@ class PUBLIC var final {
 	// v1 - returns bytes from some char number up to the end of the string
 	// equivalent to substr(x) from javascript except it is 1 based
 	ND var substr(const int startindex) const&;
+	ND var b(const int startindex) const& {return substr(startindex);}
 
 	// v2 - returns a given number of bytes starting from some byte
 	// both start and length can be negative
 	// negative length extracts characters up to the starting byte IN REVERSE
 	// 'abcde'.substr(4,-3) -> 'dcb'
 	ND var substr(const int startindex, const int length) const&;
+	ND var b(const int startindex, const int length) const& {return substr(startindex, length);}
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
 	var substr(const int startindex, CVR delimiterchars, int& endindex) const;
+	var b(const int startindex, CVR delimiterchars, int& endindex) const {return substr(startindex, delimiterchars, endindex);}
 
 	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
 	// of mixed combinations of multivalues/subvalues and text marks
@@ -1738,6 +1737,7 @@ class PUBLIC var final {
 	// does NOT remove anything from the source string var remove(VARREF startindex, VARREF
 	// delimiterno) const;
 	var substr2(VARREF startstopindex, VARREF delimiterno) const;
+	var b2(VARREF startstopindex, VARREF delimiterno) const {return substr2(startstopindex, delimiterno);}
 
 	ND var field(SV substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
 	// version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO

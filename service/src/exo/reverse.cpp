@@ -41,7 +41,7 @@ function main(in input0) {
 	while (true) {
 	///BREAK;
 	if (not COL1) break;;
-		output ^= sep ^ input0.substr(COL1 - 1,"B" ^ sep);
+		output ^= sep ^ input0.b(COL1 - 1,"B" ^ sep);
 		//print col1():',':col2()
 	}//loop;
 

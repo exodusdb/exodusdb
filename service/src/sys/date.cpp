@@ -73,7 +73,7 @@ ok:
 					output.splicer(4, 1, " ");
 				}
 
-				if (output.substr(4, 3).match("^[A-Za-z]{3}$")) {
+				if (output.b(4, 3).match("^[A-Za-z]{3}$")) {
 					output.splicer(7, 1, "");
 					output.splicer(3, 1, "");
 				}

@@ -53,7 +53,7 @@ function main(in module, in mode, in stationery) {
 		var t2 = OSSLASH;
 		var tt = outfile.index(t2 ^ "data" ^ t2);
 		if (tt) {
-			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.substr(tt, 999999);
+			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.b(tt, 999999);
 		} else {
 			data_(1, filen) = outfile;
 		}
@@ -112,7 +112,7 @@ fileok:
 		}
 
 		//force error
-		if (response_.substr(1, 6) ne "Error:") {
+		if (response_.b(1, 6) ne "Error:") {
 			USER3.splicer(1, 0, "Error:");
 		}
 

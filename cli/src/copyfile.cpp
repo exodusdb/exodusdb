@@ -150,7 +150,7 @@ function main() {
 			continue;
 
 		//option to skip all but dict files
-		if (sourcedb and dictonly and sourcefilename.substr(1,5) ne "dict.")
+		if (sourcedb and dictonly and sourcefilename.b(1,5) ne "dict.")
 			continue;
 
 		// source is a db
@@ -336,7 +336,7 @@ function getrec() {
 
 			// Remove public. from start of filename but not dict.
 			if (targetfilename.starts("public."))
-				targetfilename = targetfilename.substr(8);
+				targetfilename = targetfilename.b(8);
 
 			// Skip unwanted files
 			if (not dictonly and sourcefilename and not sourcefilename.locateusing(targetfilename, ","))

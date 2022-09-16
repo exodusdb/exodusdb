@@ -466,7 +466,7 @@ function main_init() {
 		}
 	}
 
-	logfilename = logpath ^ "/" ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ ("00" ^ THREADNO).substr(-2, 2);
+	logfilename = logpath ^ "/" ^ datex.substr(-2, 2) ^ datex.b(1, 2) ^ datex.b(4, 2) ^ ("00" ^ THREADNO).substr(-2, 2);
 	logfilename ^= ".xml";
 	logfilename.converter("/", OSSLASH);
 
@@ -701,7 +701,7 @@ subroutine wait() {
 			linkfilename1 = var(99999999).rnd() ^ ".0";
 		}
 	}
-	linkfilename0 = linkfilename1.substr(inpath.len() + 1, 9999);
+	linkfilename0 = linkfilename1.b(inpath.len() + 1, 9999);
 	cmd ^= " " ^ linkfilename0 ^ " " ^ inpath ^ " " ^ portno;
 	cmd.lcaser();
 	cmd.converter("/", OSSLASH);
@@ -999,7 +999,7 @@ subroutine main_exit() {
 	//system<33>=origsysmode
 	SYSTEM(33) = "";
 	//call setprivilegeorigprivilege);
-	if (request1.substr(1, 7) eq "RESTART") {
+	if (request1.b(1, 7) eq "RESTART") {
 		USER4 = request1;
 		//return to net which will restart LISTEN
 		//stop();
@@ -1131,7 +1131,7 @@ readlink1:
 			if (tt) {
 				//eg drive() = D:\EXODUS\EXODUS\ ...
 				//replyfilename='..\':replyfilename[tt+1,9999]
-				replyfilename = ".." OSSLASH_ ^ replyfilename.substr(tt + 1, 9999);
+				replyfilename = ".." OSSLASH_ ^ replyfilename.b(tt + 1, 9999);
 			}
 		}
 
@@ -1659,7 +1659,7 @@ subroutine process2() {
 
 	//find index values
 	//case request1[1,14]='GETINDEXVALUES'
-	} else if (request1.substr(1, 8) eq "GETINDEX") {
+	} else if (request1.b(1, 8) eq "GETINDEX") {
 
 		//call listen3(request2,'GETINDEXVALUES')
 		call listen5(request1, request2, request3, request4, request5, request6);
@@ -2704,7 +2704,7 @@ function request_exit() {
 			datx = "";//dim
 			ptr = 0;
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
-				blk = USER1.substr(1, outblocksize);
+				blk = USER1.b(1, outblocksize);
 				iodat_.splicer(1, outblocksize, "");
 				///BREAK;
 				if (not(blk.len())) break;
@@ -2822,7 +2822,7 @@ function request_exit() {
 	}
 
 	if (response_ eq "OK") {
-		if (request1 eq "STOPDB" or request1.substr(1, 7) eq "RESTART") {
+		if (request1 eq "STOPDB" or request1.b(1, 7) eq "RESTART") {
 			//gosub main_exit();
 			return false;
 		}
@@ -2847,7 +2847,7 @@ subroutine fmtresp() {
 	//trim everything after <ESC> (why?)
 	tt = response_.index("<ESC>");
 	if (tt) {
-		USER3 = response_.substr(1, tt - 1);
+		USER3 = response_.b(1, tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters

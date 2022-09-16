@@ -204,7 +204,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			osname = "XP";
 		} else if (datax.contains("Windows NT ")) {
 			var tt = datax.index("Windows NT ");
-			osname = ((datax.substr(tt + 11, 9999)).field(";", 1)).field(")", 1);
+			osname = ((datax.b(tt + 11, 9999)).field(";", 1)).field(")", 1);
 		}
 		if (datax.contains("WOW64")) {
 			osname ^= "-64";
@@ -247,8 +247,8 @@ function main(in mode, io datax, in params0="", in params20="") {
 				tt = datax.index("CrOS");
 			}
 			if (tt) {
-				osname = datax.substr(tt, 9999);
-				if (osname.substr(1, 4) eq "CPU ") {
+				osname = datax.b(tt, 9999);
+				if (osname.b(1, 4) eq "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
@@ -321,7 +321,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				tt = datax.index("Netscape");
 			}
 			if (tt) {
-				browser = datax.substr(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
+				browser = datax.b(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
 			}
 		}
 		if (browser.substr(-2, 2) eq ".0") {

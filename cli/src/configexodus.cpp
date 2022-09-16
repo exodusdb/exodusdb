@@ -113,7 +113,7 @@ subroutine getorigparam(in config, in name, out value) {
 	var pos = index(config, name);
 	if (!pos)
 		return;
-	value = config.substr(pos).field(" ", 1).field("=", 2, 999999999);
+	value = config.b(pos).field(" ", 1).field("=", 2, 999999999);
 	return;
 }
 

@@ -187,7 +187,7 @@ Within transactions, lock requests for locks that have already been obtained SUC
 #if defined (USE_WYHASH)
 #	include "wyhash.h"
 #elif defined(USE_MURMURHASH)
-#	include "MurmurHash2_64.h" // it has included in vardbconn.h (uint64_t defined)
+#	include "murmurhash2_64.h" // it has included in vardbconn.h (uint64_t defined)
 #else
 	// c++ std Hash functions are only required to produce the same result for the same input within a single execution of a program;
 	// therefore different processes would not be able to perform coordinated record locking

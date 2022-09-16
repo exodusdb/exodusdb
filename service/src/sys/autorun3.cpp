@@ -594,8 +594,8 @@ nextuser:;
 nextsign:
 	tt = USER1.index("{TODAY" ^ sign);
 	if (tt) {
-		var t2 = (iodat_.substr(tt + 1, 999999)).field("}", 1);
-		USER1.replacer("{" ^ t2 ^ "}", var().date() + t2.substr(6, 999999));
+		var t2 = (iodat_.b(tt + 1, 999999)).field("}", 1);
+		USER1.replacer("{" ^ t2 ^ "}", var().date() + t2.b(6, 999999));
 	}
 	if (sign eq "-") {
 		sign = "+";
@@ -622,7 +622,7 @@ nextsign:
 		subject ^= ": %RESULT%" ^ sys.document.f(2);
 
 		//email it
-		if (response_.substr(1, 2) ne "OK" or printfilename.osfile().f(1) lt 10) {
+		if (response_.b(1, 2) ne "OK" or printfilename.osfile().f(1) lt 10) {
 
 			//plain "OK" with no file means nothing to email
 			if (USER3 eq "OK") {
@@ -631,7 +631,7 @@ nextsign:
 
 			body = "";
 			body(-1) = response_;
-			if (USER3.substr(1, 6) eq "Error:") {
+			if (USER3.b(1, 6) eq "Error:") {
 				response_.splicer(1, 6, "Result:");
 			}
 			if (USER3.contains("Error")) {
@@ -647,8 +647,8 @@ nextsign:
 			//treat all errors as system errors for now
 			//since autorun doesnt really know a user to send them to
 			//NB programs should return OK+message if no report is required (eg "OK no ads found")
-			if (USER3.substr(1, 2) eq "OK") {
-				response_ = USER3.substr(3, 999999).trimf();
+			if (USER3.b(1, 2) eq "OK") {
+				response_ = USER3.b(3, 999999).trimf();
 			} else {
 				call sysmsg(subject ^ FM ^ body);
 				goto nextdoc;
@@ -760,7 +760,7 @@ subroutine exec2() {
 	printfilename = linkfilename2;
 	tt = oscwd();
 	tt.splicer(-7, 7, "");
-	if (printfilename.substr(1, tt.len()) eq tt) {
+	if (printfilename.b(1, tt.len()) eq tt) {
 		printfilename.splicer(1, tt.len(), "../");
 	}
 	printfilename.converter("/", OSSLASH);
@@ -811,7 +811,7 @@ subroutine exec2() {
 	}
 
 	//no records are not system errors
-	if (USER3.substr(1, 9) eq "No record" or response_.substr(1, 7) eq "No item") {
+	if (USER3.b(1, 9) eq "No record" or response_.b(1, 7) eq "No item") {
 		USER3.splicer(1, 0, "OK ");
 		msg_ = "";
 	}
@@ -823,7 +823,7 @@ subroutine exec2() {
 	}
 
 	//send errors to exodus
-	if (USER3 eq "" or response_.substr(1, 2) ne "OK") {
+	if (USER3 eq "" or response_.b(1, 2) ne "OK") {
 		if (not USER3) {
 			response_ = "No response from " ^ voccmd;
 		}
@@ -888,7 +888,7 @@ subroutine fmtresp() {
 	//trim everything after <ESC> (why?)
 	tt = USER3.contains("<ESC>");
 	if (tt) {
-		response_ = USER3.substr(1, tt - 1);
+		response_ = USER3.b(1, tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters

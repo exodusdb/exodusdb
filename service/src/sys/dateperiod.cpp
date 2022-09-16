@@ -19,7 +19,7 @@ function main(in type, in input0, in mode, out output) {
 			period = input0.field("/", 1) + 1;
 			year = input0.field("/", 2);
 		} else {
-			year = input0.substr(1, 2);
+			year = input0.b(1, 2);
 			period = input0.substr(-2, 2) + 1;
 		}
 		if (firstmonth and firstmonth.isnum()) {
@@ -46,7 +46,7 @@ function main(in type, in input0, in mode, out output) {
 	//if oconv then convert internal date to year:period
 	var temp = input0.oconv("D2-E");
 	year = temp.substr(-2, 2);
-	period = temp.substr(4, 2);
+	period = temp.b(4, 2);
 	if (firstmonth and firstmonth.isnum()) {
 		period -= firstmonth - 1;
 		if (period lt 1) {

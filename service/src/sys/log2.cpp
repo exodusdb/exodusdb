@@ -68,7 +68,7 @@ function main(in msg0, io time0) {
 	if (TERMINAL) {
 		//entry:=oconv(date(),'D2-J')
 		entry = var().date().oconv("D2-E");
-		entry = entry.substr(-2, 2) ^ "-" ^ entry.substr(1, 5);
+		entry = entry.substr(-2, 2) ^ "-" ^ entry.b(1, 5);
 		entry ^= sep_ ^ time2.oconv("MTS") ^ sep_;
 		//entry:=field(time2,'.',2) 'MD20P'
 	}

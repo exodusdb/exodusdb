@@ -529,7 +529,7 @@ nextrec:
 
 		var blockn = 0;
 		while (true) {
-			var rowpart = row.substr(blockn * 16384 + 1, 16384);
+			var rowpart = row.b(blockn * 16384 + 1, 16384);
 			///BREAK;
 			if (not rowpart) break;
 

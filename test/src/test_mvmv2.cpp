@@ -190,7 +190,7 @@ programinit()
 	//negative length reverses the characters
 
 	var ss = "abcd";
-	assert(ss.substr(2, 2) eq "bc");
+	assert(ss.b(2, 2) eq "bc");
 
 	assert(substr(var(""), 0)    eq "");
 	assert(substr(var(""), 0, 0) eq "");
@@ -327,7 +327,7 @@ programinit()
 
 	//note multibyte delimiters and indexing dont work properly due to both being bytewise currently
 	//var greek5x4b="αβγδεαβγδεαβγδεαβγδε";
-	//assert(greek5x4b.substr(3,"β",pos) eq "γδεα");
+	//assert(greek5x4b.b(3,"β",pos) eq "γδεα");
 
 	//var var::insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) const&
 	// given only field and value numbers

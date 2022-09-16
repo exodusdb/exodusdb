@@ -609,7 +609,7 @@ nextphrase:
 
 phraseinit:
 	///////////
-	if (word.substr(1, 4) eq "SORT" or word.substr(1, 5) eq "NSORT") {
+	if (word.b(1, 4) eq "SORT" or word.b(1, 5) eq "NSORT") {
 		ss ^= "SSELECT";
 
 filename:
@@ -632,7 +632,7 @@ filename:
 			gosub getword();
 			filename = "DICT." ^ word;
 		}
-		if (filename.substr(1, 5) eq "DICT.") {
+		if (filename.b(1, 5) eq "DICT.") {
 			dictfilename = "VOC";
 		} else {
 			dictfilename = filename;
@@ -683,7 +683,7 @@ nextkey:
 			}
 		}
 
-	} else if ((word.substr(1, 4) eq "LIST" or word.substr(1, 5) eq "NLIST") or word eq "XLIST") {
+	} else if ((word.b(1, 4) eq "LIST" or word.b(1, 5) eq "NLIST") or word eq "XLIST") {
 		ss ^= "SELECT";
 		goto filename;
 
@@ -782,7 +782,7 @@ nextkey:
 				if (limitx) {
 					if ((DQ ^ "'").contains(word[1])) {
 						if (word[1] eq word[-1]) {
-							word = word.substr(2, word.len() - 2);
+							word = word.b(2, word.len() - 2);
 						}
 					}
 					if (word eq "") {
@@ -890,7 +890,7 @@ nextkey:
 
 		//automatic labelling with dictionary title
 		if (word[1] eq "{") {
-			tt = word.substr(2, word.len() - 2);
+			tt = word.b(2, word.len() - 2);
 			replacements(-1) = tt;
 			nreplacements += 1;
 			if (not(tt.reado(DICT, tt))) {
@@ -952,7 +952,7 @@ nextkey:
 		if (not(coldict(coln).unassigned())) {
 			gosub getquotedword();
 			coldict(coln)(9) = word[1];
-			coldict(coln)(10) = word.substr(3, 9999);
+			coldict(coln)(10) = word.b(3, 9999);
 			coldict(coln)(11) = word;
 		}
 
@@ -996,7 +996,7 @@ nextkey:
 	} else if (word eq "EMAIL_CC") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
-			emailcc = word.substr(2, word.len() - 2);
+			emailcc = word.b(2, word.len() - 2);
 			nextemailcc = emailcc;
 		} else {
 			emailccid = word;
@@ -1005,7 +1005,7 @@ nextkey:
 	} else if (word eq "EMAIL_SUBJECT") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
-			emailsubject = word.substr(2, word.len() - 2);
+			emailsubject = word.b(2, word.len() - 2);
 			nextemailsubject = emailsubject;
 		} else {
 			emailsubjectid = word;
@@ -1244,10 +1244,10 @@ x1exit:
 	}
 
 	if (breakcolns[-1] eq FM) {
-		breakcolns.splicer(-1, 1, "");
+		breakcolns.popper();
 	}
 	if (breakopts[-1] eq FM) {
-		breakopts.splicer(-1, 1, "");
+		breakopts.popper();
 	}
 
 	//make underline and column title underline
@@ -1436,7 +1436,7 @@ x1exit:
 			///BREAK;
 			if (not(colhdg and ((" " ^ FM).contains(colhdg[-1]))))
 				break;
-			colhdg.splicer(-1, 1, "");
+			colhdg.popper();
 		}  //loop;
 	}
 
@@ -1473,7 +1473,7 @@ x1exit:
 		headtabcols = " <col style=\"text-align:left\"/>" ^ VM ^ "<col style=\"text-align: left;font-weight:bold\"/>";
 		//allow 8 max pair of headtab columns
 		headtabcols = (headtabcols ^ VM).str(8);
-		headtabcols.splicer(-1, 1, "");
+		headtabcols.popper();
 
 		tt ^=
 			"<colgroup>"
@@ -1888,7 +1888,7 @@ recexit:
 				tt = oconv(tt, oconvx);
 				if (html) {
 					if (tt[1] eq "-") {
-						if (oconvx.substr(1, 7) eq "[NUMBER") {
+						if (oconvx.b(1, 7) eq "[NUMBER") {
 							tt = "<nobr>" ^ tt ^ "</nobr>";
 						}
 					}
@@ -1906,7 +1906,7 @@ recexit:
 
 				//colored cells starting with ESC
 				if (tt[1] eq "\x1B") {
-					if (tt.substr(1, 2) eq("\x1B"
+					if (tt.b(1, 2) eq("\x1B"
 										   "\x1B")) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
@@ -2070,7 +2070,7 @@ subroutine getquotedword2() {
 	gosub getword();
 	if (((DQ ^ "'").contains(word[1])) and (word[1] eq word[-1])) {
 		word.splicer(1, 1, "");
-		word.splicer(-1, 1, "");
+		word.popper();
 	} else {
 		call mssg(lastword ^ " must be followed by a quoted phrase");
 	}
@@ -2453,7 +2453,7 @@ subroutine printbreaks() {
 
 			if (coldict(coln).f(10)) {
 				if (not(html)) {
-					cell = cell.substr(1, coldict(coln).f(10));
+					cell = cell.b(1, coldict(coln).f(10));
 					cell = oconv(cell, coldict(coln).f(11));
 				} else {
 					tx ^= td0 ^ "<th";
@@ -2609,7 +2609,7 @@ subroutine emailing() {
 	}
 
 	if ((DQ ^ "'").contains(emailtoid[1])) {
-		nextemailto = emailtoid.substr(2, emailtoid.len() - 2);
+		nextemailto = emailtoid.b(2, emailtoid.len() - 2);
 	} else {
 		nextemailto = calculate(emailtoid);
 	}

@@ -278,7 +278,7 @@ class printtext {
 			var optionchars = "";
 			while (true) {
 				optioncharn += 1;
-				var optionchar = temp.substr(optioncharn, 1);
+				var optionchar = temp.b(optioncharn, 1);
 				//BREAK
 				if (!(optionchar not_eq "" and optionchar not_eq "\'"))
 					break;
@@ -287,7 +287,7 @@ class printtext {
 
 			var newoptions = "";
 			for (var ii = 1; ii <= optionchars.length(); ii++) {
-				var optionchar = optionchars.substr(ii, 1);
+				var optionchar = optionchars.b(ii, 1);
 				if (optionchar == "T") {
 					newoptions ^= timedate();
 
@@ -304,8 +304,8 @@ class printtext {
 						newoptions ^= "<br />";
 				} else if (optionchar == "S") {
 					var spaceoptionsize = "";
-					while (optionchars.substr(ii + 1, 1).match("\\d", "r")) {
-						spaceoptionsize ^= optionchars.substr(ii + 1, 1);
+					while (optionchars.b(ii + 1, 1).match("\\d", "r")) {
+						spaceoptionsize ^= optionchars.b(ii + 1, 1);
 						ii += 1;
 					}
 					newoptions ^= spaceoptionsize.space();

@@ -15,7 +15,7 @@ function main() {
 		stop("cant open "^osfilename);
 
 	data.converter("\r\n",RM^RM);
-	var bit=data.substr(1,100);
+	var bit=data.b(1,100);
 	var ix=0;
 	var delimiter;
 	int ln=0;

@@ -126,7 +126,7 @@ next:
 		var cleartovalue2 = cleartovalue;
 		if (cleartovalue[1] eq "{") {
 			if (cleartovalue[-1] eq "}") {
-				cleartovalue2 = calculate(cleartovalue.substr(2, cleartovalue.len() - 2));
+				cleartovalue2 = calculate(cleartovalue.b(2, cleartovalue.len() - 2));
 			}
 		}
 

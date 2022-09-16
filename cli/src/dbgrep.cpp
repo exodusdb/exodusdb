@@ -76,9 +76,9 @@ function main() {
 				padding += startpos2;
 				startpos = 1;
 			}
-			//var leftcontext = RECORD.substr(startpos - padding, padding).field2(FM, -1);
-			var leftcontext = RECORD.substr(startpos2, padding).field2(FM, -1);
-			var rightcontext = RECORD.substr(startpos + len(reqtext), padding).f(1);
+			//var leftcontext = RECORD.b(startpos - padding, padding).field2(FM, -1);
+			var leftcontext = RECORD.b(startpos2, padding).field2(FM, -1);
+			var rightcontext = RECORD.b(startpos + len(reqtext), padding).f(1);
 
 			printl(filename, ID, leftcontext ^ colored_reqtext ^ rightcontext);
 			//var(filename ^ " : " ^ ID ^ " :: " ^ context).outputl();

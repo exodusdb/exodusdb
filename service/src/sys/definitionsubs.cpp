@@ -483,7 +483,7 @@ preventupdate:
 				//TODO replace with checkwritable()
 				drive ^= ":";
 				call osmkdir(drive ^ OSSLASH_ "data.bak");
-				call shell2("dir " ^ drive.substr(1, 2), errors);
+				call shell2("dir " ^ drive.b(1, 2), errors);
 				if (errors) {
 					call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
 				} else {

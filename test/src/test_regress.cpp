@@ -347,7 +347,7 @@ function onefile(in filename, in maxndifferences) {
 				break;
 
 			case 19:
-				result = ARG0.substr(ARG1, ARG2);
+				result = ARG0.b(ARG1, ARG2);
 				break;
 
 			//SPLICER1 x[y]=a

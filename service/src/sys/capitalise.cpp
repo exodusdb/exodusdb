@@ -116,7 +116,7 @@ capitalise:
 			string2.splicer(-2, 2, "'s");
 		}
 
-	} else if (mode.substr(1, 5) eq "PARSE") {
+	} else if (mode.b(1, 5) eq "PARSE") {
 
 		toupper = mode.contains("UPPERCASE");
 

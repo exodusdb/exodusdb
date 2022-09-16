@@ -59,8 +59,8 @@ function main(in mode, in status0="") {
 		//but all functions sharing the same mvenvironment will have the same no
 		//determine process number
 
-		if (userlockid.substr(1, 5) eq "U7906") {
-			processno = userlockid.substr(6, 9999);
+		if (userlockid.b(1, 5) eq "U7906") {
+			processno = userlockid.b(6, 9999);
 			processno -= (processno / 10).floor();
 
 		} else if (userlockid.isnum()) {

@@ -712,7 +712,7 @@ nextdbasen:;
 	call osread(versionnote, tt);
 	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
 	tt = versiondate.oconv("D2/");
-	tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
+	tt = tt.substr(-2, 2) ^ "/" ^ tt.b(1, 5);
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 //	//dont allow upgrades by test databases
@@ -754,7 +754,7 @@ nextdbasen:;
 //					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
 //					//tt=upgradefiledir<2> 'D2/J'
 //					tt = upgradefiledir.f(2).oconv("D2/E");
-//					tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
+//					tt = tt.substr(-2, 2) ^ "/" ^ tt.b(1, 5);
 //					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.f(3).oconv("MT");
 //					upgradeready = 1;
 //				} else if (wgetoutput.ucase().contains(" ERROR 404")) {
@@ -827,7 +827,7 @@ nextdbasen:;
 		for (ii = 1; ii <= nn; ++ii) {
 			line = result.f(ii).trim();
 			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
-			if (line.substr(1, 10) eq "IP ADDRESS") {
+			if (line.b(1, 10) eq "IP ADDRESS") {
 				ips(-1) = line.field(":", 2).trim().field("(", 1);
 			//only display the first
 				goto gotip;

@@ -305,7 +305,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			offset_zero = 0;
 			call osbread(firstblock, patchfile, offset_zero, 65000);
 			patchid = firstblock.f(2).substr(6, 9999);
-			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.substr(1, 8) ne "INSTALL*") {
+			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.b(1, 8) ne "INSTALL*") {
 				goto nextpatch;
 			}
 
@@ -319,7 +319,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//remove 00000DEFINITIONS^
 			firstblock.remover(1);
 			//remove 5 byte length field and cut out key+rec
-			keyandrec = firstblock.substr(6, firstblock.substr(1, 5));
+			keyandrec = firstblock.b(6, firstblock.b(1, 5));
 			//remove key
 			rec = keyandrec.remove(1, 0, 0);
 
@@ -422,7 +422,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//if the runonce record appears in the definitions then
 			//run it, save it and delete it
 			if (runonce.read(DEFINITIONS, runoncekey)) {
-				perform("RUN DEFINITIONS " ^ runoncekey.substr(2, 9999));
+				perform("RUN DEFINITIONS " ^ runoncekey.b(2, 9999));
 				//leave it for inspection
 				//delete definitions,runoncekey
 			}
@@ -514,7 +514,7 @@ nextpatch:;
 		bottomline = var(80).space();
 		gosub printbottomline();
 */
-	} else if (request1.substr(1, 8) eq "GETINDEX") {
+	} else if (request1.b(1, 8) eq "GETINDEX") {
 
 		iodat_ = "";
 		var filename = request2;
@@ -847,7 +847,7 @@ nextlock:
 			} else {
 				osshell("NET STOP EXODUSSERVICE");
 
-				if (request2.substr(1, 7) eq "RESTART") {
+				if (request2.b(1, 7) eq "RESTART") {
 					request3.osremove();
 					osshell("NET START EXODUSSERVICE");
 				}
@@ -948,7 +948,7 @@ subroutine printbottomline() {
 	} else {
 		yy = CRTHIGH;
 	}
-	call scrnio(0, yy, bottomline.substr(1, 80), esctoattr(ENVIRONSET.f(21)));
+	call scrnio(0, yy, bottomline.b(1, 80), esctoattr(ENVIRONSET.f(21)));
 	return;
 }
 

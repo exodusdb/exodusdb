@@ -33,7 +33,7 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 		//remove prefix if specified
 		if (prefix) {
 			//failsafe - skip indexes with wrong prefix
-			if (indexvalue.substr(1,lenprefix) ne prefix) {
+			if (indexvalue.b(1,lenprefix) ne prefix) {
 				continue;
 			}
 			//remove prefix

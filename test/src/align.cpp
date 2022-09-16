@@ -52,7 +52,7 @@ function main() {
 			var coln = line.index(token);
 			// Skip lines starting with white space and a slash
 			if (coln and not line.match(comment_regex)) {
-				var printcoln = textlen(line.substr(1, coln - 1)) + 1;
+				var printcoln = textlen(line.b(1, coln - 1)) + 1;
 				if (printcoln > maxprintcoln)
 					maxprintcoln = printcoln;
 				if (not block_startln)

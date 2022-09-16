@@ -192,7 +192,7 @@ function main(in mode, io logtime, in menu) {
 			tt = baselinks.f(1, linkn);
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).lcase();
-				if (tt2.substr(1, 4).contains(".htm")) {
+				if (tt2.b(1, 4).contains(".htm")) {
 					tt.splicer(-tt2.len(), tt2.len(), "");
 				}
 				if (not(var("\\/").contains(tt[-1]))) {

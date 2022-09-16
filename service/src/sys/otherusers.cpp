@@ -148,7 +148,7 @@ nextlock:;
 		usercode = returndata.f(2, ii);
 		///BREAK;
 		if (not usercode) break;
-		usercode = usercode.substr(6, 9999);
+		usercode = usercode.b(6, 9999);
 		if (not(curruserlockid.isnum())) {
 			usercode -= (usercode / 10).floor();
 		}
