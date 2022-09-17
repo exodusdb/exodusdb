@@ -68,9 +68,9 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 		//allow for keys to be passed as vm
 		keys.converter(VM, FM);
 
-		var nfields = fieldnameornos.count(FM) + (fieldnameornos ne "");
+		let nfields = fieldnameornos.count(FM) + (fieldnameornos ne "");
 
-		var nkeys = keys.count(FM) + (keys ne "");
+		let nkeys = keys.count(FM) + (keys ne "");
 		for (const var keyn : range(1, nkeys)) {
 			var keyx = keys.f(keyn);
 

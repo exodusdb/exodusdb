@@ -40,7 +40,7 @@ function main() {
 		if (not silent)
 			outputl("\n", filename);
 
-		if (filename.b(1,10) eq "preselect_" or filename.b(1,14) eq "select_stage2_" or locate(filename,exclude_filenames))
+		if (filename.starts("preselect_") or filename.starts("select_stage2_") or locate(filename,exclude_filenames))
 			continue;
 
 		var file1;
@@ -93,7 +93,7 @@ function main() {
 				continue;
 			}
 
-			if (rec2 ne RECORD and ID.substr(-5,5) != "_XREF") {
+			if (rec2 ne RECORD and not ID.ends("_XREF")) {
 
 				/*
 				//revert both records to leading zero 0.1, -0.1 instead of old pickos .1 and -.1;

@@ -705,7 +705,7 @@ programinit()
 	{
 
 		COMMAND.outputl("COMMAND-");
-		assert(COMMAND eq "service" or COMMAND.b(1, 9) eq "test_main");
+		assert(COMMAND eq "service" or COMMAND.starts("test_main"));
 
 		//test int/string changes after inc/dec (should really check MANY other ops)
 		var nn = 0;

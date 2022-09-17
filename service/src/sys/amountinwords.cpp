@@ -126,7 +126,7 @@ function main(in amountfmlanguage, in currcode0) {
 		//subunits
 		if (amount.floor() ne amount) {
 			words ^= " and ";
-			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.f(3) ^ "0PZ")).substr(2, 9999);
+			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.f(3) ^ "0PZ")).b(2);
 			words ^= " " ^ amountcurrency.f(2);
 		}
 

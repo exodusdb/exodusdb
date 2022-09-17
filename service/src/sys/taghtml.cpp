@@ -13,7 +13,7 @@ function main(in type, in in0, in mode, out output) {
 
 	output = in0;
 	if (output eq "") {
-		var temp = mode.b(1, 2);
+		var temp = mode.first(2);
 		temp.ucaser();
 		if (temp eq "TD" or mode eq "TH") {
 			output = "&nbsp;";

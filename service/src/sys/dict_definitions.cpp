@@ -34,7 +34,7 @@ libraryinit(full_name)
 //--------------------
 function main() {
 	ANS = RECORD.f(1).xlate("USERS", 1, "X");
-	var nn = ANS.count(VM) + 1;
+	let nn = ANS.count(VM) + 1;
 	for (const var ii : range(1, nn)) {
 		if (ANS.f(1, ii) eq RECORD.f(1, ii)) {
 			ANS(1, ii) = "";
@@ -73,11 +73,11 @@ libraryinit(last_login_age)
 //-------------------------
 function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");
-	var nn = ANS.count(VM) + 1;
+	let nn = ANS.count(VM) + 1;
 	for (const var ii : range(1, nn)) {
 		var logindate = ANS.f(1, ii).floor();
 		if (logindate) {
-			ANS(1, ii) = (var().date() - logindate).oconv("MD00P");
+			ANS(1, ii) = (date() - logindate).oconv("MD00P");
 		}
 	} //ii;
 	return ANS;
@@ -113,11 +113,11 @@ libraryinit(password_age)
 //-----------------------
 function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 36, "X");
-	var nn = ANS.count(VM) + 1;
+	let nn = ANS.count(VM) + 1;
 	for (const var ii : range(1, nn)) {
 		var passworddate = ANS.f(1, ii);
 		if (passworddate) {
-			ANS(1, ii) = (var().date() - passworddate).oconv("MD00P");
+			ANS(1, ii) = (date() - passworddate).oconv("MD00P");
 		}
 	} //ii;
 	return ANS;
@@ -160,10 +160,10 @@ function main() {
 	var uptodate = RECORD.f(11);
 	var uptotime = RECORD.f(12);
 	if (uptodate eq "") {
-		uptodate = var().date();
+		uptodate = date();
 	}
 	if (uptotime eq "") {
-		uptotime = var().time();
+		uptotime = time();
 	}
 	var daysecs = (uptodate - RECORD.f(1)) * secsperday;
 	var timesecs = uptotime - RECORD.f(2);
@@ -201,7 +201,7 @@ libraryinit(user_code_html)
 function main() {
 	var usercodes = calculate("USERS");
 	var emails = usercodes.xlate("USERS", 7, "X");
-	var nusers = usercodes.count(VM) + 1;
+	let nusers = usercodes.count(VM) + 1;
 	for (const var usern : range(1, nusers)) {
 		var usercode = usercodes.f(1, usern);
 		if (usercode) {
@@ -221,7 +221,7 @@ function main() {
 	var usercodes = RECORD.f(1, MV);
 	var emails = RECORD.f(7, MV);
 
-	var nusers = usercodes.count(VM) + 1;
+	let nusers = usercodes.count(VM) + 1;
 	for (const var usern : range(1, nusers)) {
 		if (emails.f(1, usern) eq "") {
 			usercodes(1, usern) = "";
@@ -230,4 +230,3 @@ function main() {
 	return usercodes;
 }
 libraryexit(user_code_with_email)
-

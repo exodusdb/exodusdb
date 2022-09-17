@@ -312,17 +312,17 @@ programinit()
 
 	int pos;
 	//from beginning of string (char 1) or zero or negative the same
-	assert(var("abc/:cde").substr(-1, ":/", pos) eq "abc");
-	assert(var("abc/:cde").substr(0, ":/", pos)  eq "abc");
-	assert(var("abc/:cde").substr(1, ":/", pos)  eq "abc");
+	assert(var("abc/:cde").b(-1, ":/", pos) eq "abc");
+	assert(var("abc/:cde").b(0, ":/", pos)  eq "abc");
+	assert(var("abc/:cde").b(1, ":/", pos)  eq "abc");
 
 	//starting after end of string
-	assert(var("abc/:cde").substr(10, ":/", pos) eq "");
+	assert(var("abc/:cde").b(10, ":/", pos) eq "");
 	assert(pos                                   eq 9);
 
 	//no delimiter found
 	//start from middle
-	assert(var("abc/:cde").substr(3, "xyz", pos) eq "c/:cde");
+	assert(var("abc/:cde").b(3, "xyz", pos) eq "c/:cde");
 	assert(pos                                   eq 9);
 
 	//note multibyte delimiters and indexing dont work properly due to both being bytewise currently

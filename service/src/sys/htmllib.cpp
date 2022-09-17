@@ -105,7 +105,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 	} else if (mode eq "HASHTABLE") {
 
-		var nv = datax.count(VM) + 1;
+		let nv = datax.count(VM) + 1;
 		for (const var vn : range(1, nv)) {
 			var data2 = datax.f(1, vn);
 
@@ -117,7 +117,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 			data2.converter(TM, FM);
 
-			var nlines = data2.count(FM) + 1;
+			let nlines = data2.count(FM) + 1;
 			if (nlines gt 1) {
 
 				for (const var ln : range(1, nlines)) {
@@ -247,8 +247,8 @@ function main(in mode, io datax, in params0="", in params20="") {
 				tt = datax.index("CrOS");
 			}
 			if (tt) {
-				osname = datax.b(tt, 9999);
-				if (osname.b(1, 4) eq "CPU ") {
+				osname = datax.b(tt);
+				if (osname.starts("CPU ")) {
 					osname.splicer(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
@@ -260,7 +260,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				osname.replacer(" x86_64", "-64");
 			}
 		}
-		if (osname.substr(-2, 2) eq ".0") {
+		if (osname.ends(".0")) {
 			osname.splicer(-2, 2, "");
 		}
 
@@ -321,10 +321,10 @@ function main(in mode, io datax, in params0="", in params20="") {
 				tt = datax.index("Netscape");
 			}
 			if (tt) {
-				browser = datax.b(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
+				browser = datax.b(tt).field(";", 1).field(" ", 1).field(")", 1);
 			}
 		}
-		if (browser.substr(-2, 2) eq ".0") {
+		if (browser.ends(".0")) {
 			browser.splicer(-2, 2, "");
 		}
 
@@ -361,7 +361,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 subroutine fill(io datax) {
 
-	var nn = datax.count(FM) + (datax ne "");
+	let nn = datax.count(FM) + (datax ne "");
 
 		//find max number of columns
 	var n2 = 0;

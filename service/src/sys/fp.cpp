@@ -13,7 +13,7 @@ function main(in type, in inx, in mode, out outx) {
 
 			if (exp lt 0) {
 				outx.splicer(2, 1, "");
-				outx = ("." ^ var("0").str(-(exp + 1)) ^ outx).substr(1, 15);
+				outx = ("." ^ var("0").str(-(exp + 1)) ^ outx).first(15);
 				while (true) {
 					///BREAK;
 					if (not(outx.len() gt 2 and (outx[-1] eq "0"))) break;

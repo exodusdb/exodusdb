@@ -37,7 +37,7 @@ function main(in input0) {
 		return input0;
 	}
 //L127:
-	var output = input0.substr(-1,"B" ^ sep);
+	var output = input0.b(-1,"B" ^ sep);
 	while (true) {
 	///BREAK;
 	if (not COL1) break;;

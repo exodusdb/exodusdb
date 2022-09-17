@@ -17,8 +17,8 @@ function security2(in mode, in op0)
 	var op=op0.convert("_.", "  ");
 	var op2 = "";
 	if (op[-1] == DQ) {
-//		op2 = (op.substr(-2, "B\"")).quote();
-		op2=op.field2(DQ,-2);
+//		op2 = (op.b(-2, "B\"")).quote();
+		op2=op.field2(DQ, -2);
 		op.splicer(-op2.len(), op2.len(), "");
 		op2.splicer(1, 0, " ");
 	}
@@ -135,4 +135,3 @@ function badchars(io msg) {
 	}
 	return 0;
 }
-

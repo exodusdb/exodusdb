@@ -126,7 +126,7 @@ function main(in mode) {
 			if (sysemails) {
 
 				//strip out the domain names
-				var nn = sysemails.count(" ") + 1;
+				let nn = sysemails.count(" ") + 1;
 				for (const var ii : range(1, nn)) {
 					var word = sysemails.field(" ", ii);
 					word = field2(word, "@", -1);
@@ -336,7 +336,7 @@ function main(in mode) {
 		//similar in security.subs and user.subs
 		if (resetpassword or newuser) {
 			//datetime=(date():'.':time() 'R(0)#5')+0
-			var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+			var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 			RECORD.inserter(15, 1, datetime);
 			RECORD.inserter(16, 1, SYSTEM.f(40, 2));
 

@@ -85,7 +85,7 @@ libraryinit(c_args)
 //-----------------
 function main() {
 	ANS = RECORD.f(2);
-	if (ANS.b(1, 3) ne "*c ") {
+	if (ANS.first(3) ne "*c ") {
 		ANS = "";
 	}
 	return ANS;
@@ -235,7 +235,7 @@ libraryexit(display2)
 libraryinit(dt)
 //-------------
 function main() {
-	return var().date();
+	return date();
 }
 libraryexit(dt)
 
@@ -267,7 +267,7 @@ function main() {
 			userx = xlate("USERS", executivecode.field(" ", 1), "", "X");
 		}
 
-		if (userx.f(35) and var().date() ge userx.f(35)) {
+		if (userx.f(35) and date() ge userx.f(35)) {
 		//expired
 			ANS = "";
 		} else {
@@ -341,7 +341,7 @@ function main() {
 	} else {
 		datax = RECORD;
 	}
-	var nn = datax.count(FM) + 1;
+	let nn = datax.count(FM) + 1;
 	datax.ucaser();
 	datax.converter(DQ, "'");
 	ANS = "";
@@ -425,7 +425,7 @@ libraryexit(full_brand_name)
 libraryinit(iscpp)
 //----------------
 function main() {
-	return RECORD.f(2).substr(1, 3) eq "*c ";
+	return RECORD.f(2).starts("*c ");
 }
 libraryexit(iscpp)
 
@@ -562,7 +562,7 @@ function main() {
 	}//loop;
 	//call msg('x')
 	//remove comment lines
-	var nfields = RECORD.count(FM) + 1;
+	let nfields = RECORD.count(FM) + 1;
 
 	//dim x(nfields)
 	//matparse @record into x
@@ -577,8 +577,8 @@ function main() {
 	//remove blank lines
 	RECORD.converter(_FM " ", " " _FM);
 
-	nfields = RECORD.trim().count(" ") + 1;
-	return nfields;
+	var nfields2 = RECORD.trim().count(" ") + 1;
+	return nfields2;
 }
 libraryexit(nfields00)
 
@@ -619,7 +619,7 @@ libraryinit(program_date)
 //-----------------------
 function main() {
 	var ans = calculate("TIMEDATE");
-	return ans.b(11, 99).iconv("D");
+	return ans.b(11).iconv("D");
 }
 libraryexit(program_date)
 
@@ -683,7 +683,7 @@ function main() {
 	if (ans[1] eq "V") {
 		ans = field2(RECORD, FM, -2);
 	}
-	if (not(ans.b(1, 2).match("^\\d{2}$"))) {
+	if (not(ans.first(2).match("^\\d{2}$"))) {
 		ANS = "";
 	} else {
 		ANS = ans;
@@ -732,4 +732,3 @@ function main() {
 	return calculate("VERSION").trim().field(" ", 2, 3).iconv("D");
 }
 libraryexit(version_date)
-

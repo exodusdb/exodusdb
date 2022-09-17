@@ -18,7 +18,7 @@ function main(in mode, in tableid, in in0, out outx) {
 	outx = "\n<style type=\"text/css\">\n";
 	var align = "left";
 
-	var ncols = inp.count(VM) + 1;
+	let ncols = inp.count(VM) + 1;
 	for (const var coln : range(1, ncols)) {
 		var tt = inp.f(1, coln);
 

@@ -25,7 +25,7 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 		temp = "";
 	}
 
-	startdate = var().date();
+	startdate = date();
 	starttime = ostime();
 
 	//autostart in system mode

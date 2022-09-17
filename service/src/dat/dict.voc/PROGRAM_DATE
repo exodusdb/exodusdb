@@ -6,7 +6,7 @@ S
 
 [DATE,4]
 	var ans = calculate("TIMEDATE");\
-	return ans.b(11, 99).iconv("D");
+	return ans.b(11).iconv("D");
 R
 12
 

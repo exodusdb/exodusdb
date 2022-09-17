@@ -7,18 +7,18 @@ function main(in pluralnoun) {
 	var temp2 = pluralnoun;
 	temp2.ucaser();
 
-	if (temp2.substr(-2,2) == "ES") {
+	if (temp2.ends("ES")) {
 
 		//COMPANIES=COMPANY
-		if (temp2.substr(-3,3) == "IES") {
+		if (temp2.ends("IES")) {
 			temp.splicer(-3, 3, "Y");
 
 		//ADDRESSES=ADDRESS
-		} else if (temp2.substr(-4,4) == "SSES") {
+		} else if (temp2.ends("SSES")) {
 			temp.splicer(-2, 2, "");
-		} else if (temp2.substr(-4,4) == "SHES") {
+		} else if (temp2.ends("SHES")) {
 			temp.splicer(-2, 2, "");
-		} else if (temp2.substr(-4,4) == "CHES") {
+		} else if (temp2.ends("CHES")) {
 			temp.splicer(-2, 2, "");
 		} else {
 			temp.popper();
@@ -29,7 +29,7 @@ function main(in pluralnoun) {
 
 		if (temp2[-1] == "S") {
 			//ANALYSIS, DOS
-			if ((temp2.substr(-2,2) ne "IS") and (temp2.substr(-2,2) ne "OS")) {
+			if ((temp2.last(2) ne "IS") and (temp2.last(2) ne "OS")) {
 				temp.popper();
 			}
 		}

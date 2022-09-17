@@ -12,7 +12,7 @@ libraryinit()
 var dictids;
 var options;
 var maxnrecs;
-var nlimitfields;//num
+//var nlimitfields;//num
 dim hexx;
 var useactivelist;//num
 var v69;
@@ -80,11 +80,12 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	} else {
 		maxnrecs = maxnrecs0;
 	}
-	if (limitfields.unassigned()) {
-		nlimitfields = 0;
-	} else {
-		nlimitfields = limitfields.count(VM) + (limitfields ne "");
-	}
+//	if (limitfields.unassigned()) {
+//		nlimitfields = 0;
+//	} else {
+//		nlimitfields = limitfields.count(VM) + (limitfields ne "");
+//	}
+	let nlimitfields = limitfields.unassigned("").fcount(VM);
 
 	var xml = options.contains("XML");
 	var rawread = options.contains("RAW");
@@ -238,7 +239,7 @@ nocommon:
 		if (dictids eq "") {
 			dictids = "ID";
 		}
-		ndictids = dictids.count(FM) + 1;
+		let ndictids = dictids.count(FM) + 1;
 		for (const var dictidn : range(1, ndictids)) {
 			var dictid = dictids.f(dictidn);
 			var dictrec;
@@ -536,7 +537,7 @@ nextrec:
 			rowpart.replacer("%", "%25");
 			//changed to allow language characters to pass through x80-xF9
 			for (const var ii : range(249, 255)) {
-				rowpart.replacer(var().chr(ii), hexx(ii - 249));
+				rowpart.replacer(chr(ii), hexx(ii - 249));
 			} //ii;
 
 			//output converted row part

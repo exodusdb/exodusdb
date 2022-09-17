@@ -62,7 +62,8 @@ function main() {
 	var nfields = fns.count(FM) + 1;
 
 	//check numeric
-	for (const var ii : range(1, nfields)) {
+	// space to defeat convsyntax
+	for ( var ii = 1; ii <= nfields; ii++) {
 tryagain:
 		var fn = fns.f(ii);
 		//prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0

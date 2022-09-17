@@ -91,7 +91,7 @@ function main() {
 		return ANS;
 	}
 
-	var dostimenow = var().date() + 24873 + var().time() / 86400;
+	var dostimenow = date() + 24873 + time() / 86400;
 	//10 mins
 	var hungtime = 10 * 60 / 86400.0;
 	var r33 = RECORD.f(33);
@@ -114,4 +114,3 @@ function main() {
 	return ANS;
 }
 libraryexit(status)
-

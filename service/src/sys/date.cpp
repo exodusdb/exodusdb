@@ -91,7 +91,7 @@ ok:
 	} else if (type eq "ICONV") {
 
 		if (inx.match("^\\d*$") and inx le 31) {
-			inx ^= var().date().oconv("D").substr(4, 9);
+			inx ^= date().oconv("D").b(4, 9);
 		}
 
 		output = iconv(inx, mode);

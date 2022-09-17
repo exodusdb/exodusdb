@@ -115,7 +115,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	html.replacer("%TAX_REG_NO%", letterheadcompany.f(21));
 	html.replacer("%COMPANY_REG_NO%", letterheadcompany.f(59));
 
-	var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+	var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 	tt = "L";
 	if (hascompanies) {
 		call date("OCONV", datetime, tt, tdate, sys.glang);
@@ -174,7 +174,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		//check various tags exist in equal numbers
 		//this doesnt check if they are in a correct sequence or hierarchy etc
 		var tags = "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
-		var ntags = tags.count(",") + 1;
+		let ntags = tags.count(",") + 1;
 		var html2 = html.lcase();
 		for (const var tagn : range(1, ntags)) {
 			var tag = tags.field(",", tagn);

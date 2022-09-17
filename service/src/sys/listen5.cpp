@@ -136,7 +136,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							//TRACE: tt="tamra2^EXODUS^^^ADAGENCY^/root/hosts/tamra/data/tamra2/~4025798^"
 							//TRACE: osgetenv("EXO_SERVICE_CODE")="agy_live@tamra"
 
-							//var application = tt.f(5).substr(1,3).lcase();
+							//var application = tt.f(5).first(3).lcase();
 							var app_code = osgetenv("EXO_SERVICE_CODE").field("_",1);
 							if (not app_code)
 								app_code = osgetenv("APP_CODE");
@@ -149,10 +149,10 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							}
 
 							var cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
-							//printl(AT(-40), var().time().oconv("MTS"), " ", tt);
+							//printl(AT(-40), time().oconv("MTS"), " ", tt);
 							if (TERMINAL)
 								print(AT(-40));
-							printl(var().time().oconv("MTS"), " ", cmd);
+							printl(time().oconv("MTS"), " ", cmd);
 
 							cmd.osshell();
 						}
@@ -196,11 +196,11 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 //		//check for corruption in system record
 //		//if index(system,char(0),1) then
-//		if (SYSTEM.contains(var().chr(0))) {
+//		if (SYSTEM.contains(chr(0))) {
 //			var(SYSTEM).oswrite("system.bad");
 //			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
 //			ANS = "CORRUPTSYSTEM";
-//			SYSTEM.converter(var().chr(0), "");
+//			SYSTEM.converter(chr(0), "");
 //			ANS = "RESTART " ^ ANS;
 //			return 0;
 //		}
@@ -212,7 +212,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		var ospaths = "../../system.cfg,system.cfg";
 		ospaths ^= "," ^ exohome ^ "/dat/";
 		ospaths.converter("/", OSSLASH);
-		var npaths = fcount(ospaths, ",");
+		let npaths = fcount(ospaths, ",");
 		for (const var ii : range(1, npaths)) {
 			var ospath = ospaths.field(",",ii);
 			//order is significant
@@ -254,7 +254,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 		//never patch and run on development systems (therefore can only test elsewhere)
 		//OFF while developing this feature
-		isdevsys = isdevsys and var().date() gt 19034;
+		isdevsys = isdevsys and date() gt 19034;
 		//if system<61> or isdevsys then
 		if (isdevsys or not(VOLUMES)) {
 			ANS = "";
@@ -285,7 +285,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//skip if no patch file or not dated today
 			var patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
 			var patchfileinfo = patchfilename.osfile();
-			if (patchfileinfo.f(2) lt var().date()) {
+			if (patchfileinfo.f(2) lt date()) {
 				goto nextpatch;
 			}
 
@@ -304,8 +304,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//verify correct file heading and determine patchid from the file
 			offset_zero = 0;
 			call osbread(firstblock, patchfile, offset_zero, 65000);
-			patchid = firstblock.f(2).substr(6, 9999);
-			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.b(1, 8) ne "INSTALL*") {
+			patchid = firstblock.f(2).b(6);
+			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.first(8) ne "INSTALL*") {
 				goto nextpatch;
 			}
 
@@ -319,7 +319,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//remove 00000DEFINITIONS^
 			firstblock.remover(1);
 			//remove 5 byte length field and cut out key+rec
-			keyandrec = firstblock.b(6, firstblock.b(1, 5));
+			keyandrec = firstblock.b(6, firstblock.first(5));
 			//remove key
 			rec = keyandrec.remove(1, 0, 0);
 
@@ -384,7 +384,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				if (skipreason) {
 					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
 				}
-				var nfiles = rec.f(3).count(VM) + 1;
+				let nfiles = rec.f(3).count(VM) + 1;
 				for (const var filen : range(1, nfiles)) {
 					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
 				} //filen;
@@ -397,14 +397,14 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not skipreason) {
 
 				//perform the installation
-				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().substr(1, 2) ^ " (IO)";
+				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().first(2) ^ " (IO)";
 				printl(cmd);
 				perform(cmd);
 
 			}
 
 			//record success/failure before any autorun
-			(var().date() ^ "." ^ var().time().oconv("R(0)#5")).writev(DEFINITIONS, patchid, 6);
+			(date() ^ "." ^ time().oconv("R(0)#5")).writev(DEFINITIONS, patchid, 6);
 
 			skipreason.writev(DEFINITIONS, patchid, 7);
 
@@ -422,7 +422,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//if the runonce record appears in the definitions then
 			//run it, save it and delete it
 			if (runonce.read(DEFINITIONS, runoncekey)) {
-				perform("RUN DEFINITIONS " ^ runoncekey.b(2, 9999));
+				perform("RUN DEFINITIONS " ^ runoncekey.b(2));
 				//leave it for inspection
 				//delete definitions,runoncekey
 			}
@@ -514,7 +514,7 @@ nextpatch:;
 		bottomline = var(80).space();
 		gosub printbottomline();
 */
-	} else if (request1.b(1, 8) eq "GETINDEX") {
+	} else if (request1.starts("GETINDEX")) {
 
 		iodat_ = "";
 		var filename = request2;
@@ -830,10 +830,10 @@ nextlock:
 			}
 
 			//wait up to 30 seconds for other users to quit
-			var timex = var().time();
+			var timex = time();
 			while (true) {
 				///BREAK;
-				if (not(otherusers().f(1) and ((var().time() - timex).abs() lt 30))) break;
+				if (not(otherusers().f(1) and ((time() - timex).abs() lt 30))) break;
 				call ossleep(1000*1);
 			}//loop;
 
@@ -847,7 +847,7 @@ nextlock:
 			} else {
 				osshell("NET STOP EXODUSSERVICE");
 
-				if (request2.b(1, 7) eq "RESTART") {
+				if (request2.starts("RESTART")) {
 					request3.osremove();
 					osshell("NET START EXODUSSERVICE");
 				}
@@ -905,7 +905,7 @@ subroutine getdostime() {
 	dostime = ostime();
 	//convert to Windows based date/time (ndays since 1/1/1900)
 	//31/12/67 in rev date() format equals 24837 in windows date format
-	dostime = 24837 + var().date() + dostime / 24 / 3600;
+	dostime = 24837 + date() + dostime / 24 / 3600;
 	return;
 }
 
@@ -948,18 +948,18 @@ subroutine printbottomline() {
 	} else {
 		yy = CRTHIGH;
 	}
-	call scrnio(0, yy, bottomline.b(1, 80), esctoattr(ENVIRONSET.f(21)));
+	call scrnio(0, yy, bottomline.first(80), esctoattr(ENVIRONSET.f(21)));
 	return;
 }
 
 subroutine deleteoldfiles() {
 
-	var deletetime = var().date() * 24 * 60 * 60 + var().time() - ageinsecs;
+	var deletetime = date() * 24 * 60 * 60 + time() - ageinsecs;
 
 	var filespec = (inpath ^ pattern).lcase();
 
 	//failsafe - only allow delete .* in data folder
-	if (filespec.substr(-2, 2) eq ".*") {
+	if (filespec.ends(".*")) {
 		var tdir = "/data/";
 		tdir.converter("/", OSSLASH);
 		if (not(filespec.contains(tdir))) {
@@ -982,10 +982,10 @@ nextfiles:
 		//replaced by databasecode.SVR
 		//if filename0='GLOBAL.SVR' then goto deleteit
 
-		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.substr(-4, 4)).lcase(), xx))) {
+		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.last(4)).lcase(), xx))) {
 
 			//a file ending .4 is a request to delete the .2 and .3 files
-			if (filename.substr(-2, 2) eq ".4") {
+			if (filename.ends(".4")) {
 				filename.osremove();
 				filename.splicer(-1, 1, "2");
 				filename.osremove();
@@ -993,14 +993,14 @@ nextfiles:
 				filename.osremove();
 
 			} else {
-				if (filename.substr(-4, 4) eq ".TMP") {
+				if (filename.ends(".TMP")) {
 					goto deleteit;
 				}
 				//and delete it if older than the cut off time
 				//and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
-				if (((filename.substr(-4, 4)).contains(".")) and filetime le deletetime) {
+				if (((filename.last(4)).contains(".")) and filetime le deletetime) {
 deleteit:
 					filename.osremove();
 				} else {

@@ -6,7 +6,7 @@ M1
 
 
 	ANS = RECORD.f(1).xlate("USERS", 1, "X");\
-	var nn = ANS.count(VM) + 1;\
+	let nn = ANS.count(VM) + 1;\
 	for (const var ii : range(1, nn)) {\
 		if (ANS.f(1, ii) eq RECORD.f(1, ii)) {\
 			ANS(1, ii) = "";\

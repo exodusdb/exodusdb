@@ -302,7 +302,7 @@ function main() {
 				}
 			}
 		}
-		if (exoduspath.substr(-1, 1) ne OSSLASH)
+		if (exoduspath.last(1) ne OSSLASH)
 			exoduspath ^= OSSLASH;
 		var exodusbin = exoduspath;
 		if (not osfile(exodusbin ^ "exodus.dll")) {
@@ -496,7 +496,7 @@ function main() {
 
 	// nfiles may increase during the loop as directories may be included
 	//for (const var fileno : range(1, nfiles)) {
-	for (var fileno = 1; fileno <= nfiles; fileno++) {
+	for ( var fileno = 1; fileno <= nfiles; fileno++) {
 
 		//var text = "";
 		var filebase;
@@ -543,7 +543,7 @@ function main() {
 		}
 
 		//skip backup files
-		else if (fileext.substr(-1, 1) == "~") {
+		else if (fileext.ends("~")) {
 			continue;
 		}
 
@@ -802,7 +802,7 @@ function main() {
 
 				//for external subroutines (dll/so libraries), build up .h
 				// and maybe .def file text
-				if (not isprogram and word1.b(1, 11) eq "libraryinit")
+				if (not isprogram and word1.starts("libraryinit"))
 					useclassmemberfunctions = true;
 
 				if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine")) {
@@ -1201,7 +1201,7 @@ function main() {
 					var word2 = line.field(" ", 2);
 					if (word2[1] == DQ) {
 						word2 = word2.b(2, word2.len() - 2);
-						if (word2.substr(-2, 2) eq ".h")
+						if (word2.ends(".h"))
 							word2.splicer(-2, 2, "");
 						//libnames^=" "^word2;
 						if (compiler == "cl")

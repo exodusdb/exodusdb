@@ -475,12 +475,12 @@ programinit()
 	assert(fcount(log1, "x") eq 3);
 
 	printl(SENTENCE);
-	assert(var("xyz").substr(4, 1) eq "");
+	assert(var("xyz").b(4, 1) eq "");
 
 	//TODO ensure isnum converts ints larger that the maximum int to FLOATS
 
 	var subs = "xyz";
-	assert(subs.substr(-1) eq "z");
+	assert(subs.b(-1) eq "z");
 	assert(subs[-1]        eq "z");
 
 	printl(oconv("a", "L#3").quote());

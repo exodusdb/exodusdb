@@ -29,8 +29,8 @@ function main() {
 				// Dont update lines not ending in ;
 				// Dont update lines if the token is in double quotes
 				// (there are an odd number of double quotes before the token
-				if (not text(ln).match(comment_regex) and text(ln)[-1] == ";" and text(ln).substr(1,coln).count(DQ).mod(2) == 0) {
-					var printcoln = textlen(text(ln).substr(1, coln - 1)) + 1;
+				if (not text(ln).match(comment_regex) and text(ln)[-1] == ";" and text(ln).b(1,coln).count(DQ).mod(2) == 0) {
+					var printcoln = textlen(text(ln).b(1, coln - 1)) + 1;
 					if (coln and printcoln < maxprintcoln) {
 						text(ln).splicer(coln, 0, space(maxprintcoln-printcoln));
 						updated = true;
@@ -79,4 +79,3 @@ function main() {
 }
 
 programexit()
-

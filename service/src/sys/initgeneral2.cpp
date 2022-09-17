@@ -68,7 +68,7 @@ function main(in mode, io logtime, in menu) {
 			tt.replacer("{}", "7:1");
 			perform(tt);
 
-			var().date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
+			date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
 		}
 
 	} else if (mode eq "UPDATEIPNOS4EXODUS") {
@@ -155,7 +155,7 @@ function main(in mode, io logtime, in menu) {
 
 		//nb will NOT overwrite any manual entries in SYSTEM.CFG
 		let osenv = osgetenv().converter("\r\n", _FM _FM _FM);
-//		var nenv = osenv.count(FM) + 1;
+//		let nenv = osenv.count(FM) + 1;
 //		for (const var ii : range(1, nenv)) {
 //			var enventry = osenv.f(ii);
 		for (let enventry : osenv) {
@@ -187,12 +187,12 @@ function main(in mode, io logtime, in menu) {
 		if (not baselinkdescs) {
 			baselinkdescs = "Pending Configuration";
 		}
-		var nlinks = baselinks.count(VM) + (baselinks ne "");
+		let nlinks = baselinks.count(VM) + (baselinks ne "");
 		for (const var linkn : range(1, nlinks)) {
 			tt = baselinks.f(1, linkn);
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).lcase();
-				if (tt2.b(1, 4).contains(".htm")) {
+				if (tt2.first(4).contains(".htm")) {
 					tt.splicer(-tt2.len(), tt2.len(), "");
 				}
 				if (not(var("\\/").contains(tt[-1]))) {
@@ -229,7 +229,7 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*compress logs with gzip", logtime);
 		var dbcode = SYSTEM.f(17);
-		var curryear = var().date().oconv("D").substr(-4, 4);
+		var curryear = date().oconv("D").last(4);
 		var minyear = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
 
@@ -293,7 +293,7 @@ nextuser:
 		call log2("*trim requestlog", logtime);
 
 		//only run on saturdays and only run once per day per installation
-		if ((var().date() - 1).mod(7) + 1 ne 6) {
+		if ((date() - 1).mod(7) + 1 ne 6) {
 			return 0;
 		}
 
@@ -304,11 +304,11 @@ nextuser:
 		if (not(lastdate.osread("reqlog.cfg"))) {
 			lastdate = "";
 		}
-		var(var().date()).oswrite("reqlog.cfg");
+		var(date()).oswrite("reqlog.cfg");
 		DEFINITIONS.unlock( "TRIMREQUESTLOG");
 
 		//dont run twice on same day
-		if (lastdate eq var().date()) {
+		if (lastdate eq date()) {
 			return 0;
 		}
 
@@ -322,7 +322,7 @@ nextuser:
 		if (tt.osread("reorder.cfg")) {
 			return 0;
 		}
-		var(var().date()).oswrite("reorder.cfg");
+		var(date()).oswrite("reorder.cfg");
 
 		perform("WINDOWSTUB DEFINITION.SUBS REORDERDBS");
 
@@ -352,7 +352,7 @@ nextuser:
 		//temps=dirlist()
 		if (VOLUMES) {
 			var temps = oslistf("..\\vdm*.tmp");
-			var ntemps = temps.count(FM) + (temps ne "");
+			let ntemps = temps.count(FM) + (temps ne "");
 			for (const var tempn : range(1, ntemps)) {
 				("..\\" ^ temps.f(tempn)).osremove();
 			} //tempn;
@@ -410,14 +410,14 @@ nextuser:
 			item = "List of Database _Processes";
 			var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
 				//backslash
-			onclick.converter("|", var().chr(92));
+			onclick.converter("|", chr(92));
 			call menusubs("ADDITEM", menutx, item, href, onclick);
 		}
 
 		item = "_List of Documents in Use";
 		var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTLOCKS');return false";
 			//backslash
-		onclick.converter("|", var().chr(92));
+		onclick.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
 		if (VOLUMES) {
@@ -436,7 +436,7 @@ nextuser:
 		item = "_What's new in EXODUS";
 		href = "javascript:window.location.assign((typeof gusername!='undefined'&&gusername=='EXODUS'&&confirm('EXODUS only option|n|nChange Log File=OK|nWhats New Report=Cancel'))?'../exodus/changelog.htm':'../exodus/whatsnew.htm')";
 			//backslash
-		href.converter("|", var().chr(92));
+		href.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href);
 
 		item = "_User Details";
@@ -466,7 +466,7 @@ nextuser:
 		item = "_About";
 		onclick = "javascript:displayresponsedata_sync('EXECUTE|rGENERAL|rABOUT');return false";
 			//backslash
-		onclick.converter("|", var().chr(92));
+		onclick.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
 			//this element at the end determines when the menu is fully loaded

@@ -171,7 +171,7 @@ function main() {
 	}
 
 	//work out the current and nextchecktime
-	currenttime = (var().date() + var().time() / 86400).oconv("MD50P");
+	currenttime = (date() + time() / 86400).oconv("MD50P");
 	//nextchecktime=monitordata<1>+checkinterval/86400
 
 	//only process if current time is > last checktime plus check interval
@@ -229,7 +229,7 @@ function main() {
 	minusagetime = currenttime - 1;
 	//minusagetime=int(currenttime)
 	//31 days ago
-	delusagetime = var().date() - 31;
+	delusagetime = date() - 31;
 
 	if (statistics.open("STATISTICS", "")) {
 		select(statistics);
@@ -362,7 +362,7 @@ nextprocess:
 		nok = processcount.f(1, dbasen);
 		if (not(nok) and not(VOLUMES)) {
 			temp = ("../data/" ^ dbasecode ^ "/" ^ dbasecode ^ ".svr").osfile();
-			secs = var().date() * 86400 + var().time() - (temp.f(2) * 86400 + temp.f(3));
+			secs = date() * 86400 + time() - (temp.f(2) * 86400 + temp.f(3));
 			nok = secs lt 600;
 			//otherwise flag hung
 			if (not nok) {
@@ -397,7 +397,7 @@ nextprocess:
 		//not if this is a test database (only those with codes ending in TEST')
 		//unless configured to all it
 		first = 1;
-		if ((((SYSTEM.f(17, 1).substr(-5) ne "_test") or SYSTEM.f(126)) and nok lt minreq) and nhung lt 5) {
+		if ((( not SYSTEM.f(17, 1).ends("_test") or SYSTEM.f(126)) and nok lt minreq) and nhung lt 5) {
 			//if locksystem('LOCK',dbasecode) then
 				//unlock immediately to enable startup - which will fail if anyone locks
 				//call locksystem('UNLOCK',dbasecode)
@@ -484,7 +484,7 @@ nextprocess:
 		//Critical for more
 		backupdrive = backuprequired.f(1, dbasen, 1).ucase();
 		if (not(VOLUMES)) {
-			backupdrive = dbasecode.substr(-5, 5) ne "_test";
+			backupdrive = not dbasecode.ends("_test");
 		}
 		if (backupdrive) {
 
@@ -520,7 +520,7 @@ nextprocess:
 			//if integer datetime then old format missing time so add 2 hours
 			//if lastbackupdatetime and int(lastbackupdatetime)=lastbackupdatetime then lastbackupdatetime+=2/24
 			//assume backup on same day (ie after last midnight)
-			currentdatetime = (var().date() + var().time() / 86400).oconv("MD50P");
+			currentdatetime = (date() + time() / 86400).oconv("MD50P");
 			tt = currentdatetime - lastbackupdatetime;
 			//allow one day and one hour
 			if (lastbackupdatetime and (tt gt 1 + 1 / 24.0)) {
@@ -548,7 +548,7 @@ nextprocess:
 				backupdrives(2, backupdriven) = freespace;
 
 				/*
-				testdata = var().date() ^ FM ^ var().time();
+				testdata = date() ^ FM ^ time();
 				if (freespace) {
 					testfile = backupdrive.f(1, 1, 1) ^ "/MONITOR.$$$";
 					testfile.converter("/", OSSLASH);
@@ -576,12 +576,12 @@ nextprocess:
 
 					//determine next backup filename
 					//similar in MONITOR2 and FILEMAN
-					nextbackupdate = var().date();
+					nextbackupdate = date();
 					//add 1 if next backup is tomorrow
-					if (var().time() gt backuprequired.f(1, dbasen, 3)) {
+					if (time() gt backuprequired.f(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
-					dow = ((sys.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).substr(1, 8)).ucase();
+					dow = ((sys.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).first(8)).ucase();
 					// eg 1/data.bak/adlined/wednesda/backup.zip
 					//nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
 					nextbackupfilename = "../../backup." ^ ((nextbackupdate - 1).mod(7) + 1) ^ ".txt";
@@ -628,7 +628,7 @@ nextprocess:
 											body(-1) = FM ^ "Please change it " "before 00:00 midnight tonight.";
 										}
 										printl(body);
-										body.replacer(FM, var().chr(13));
+										body.replacer(FM, chr(13));
 										call sendmail(toaddresses, "", subject, body, "", "", xx);
 									}
 
@@ -712,11 +712,11 @@ nextdbasen:;
 	call osread(versionnote, tt);
 	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
 	tt = versiondate.oconv("D2/");
-	tt = tt.substr(-2, 2) ^ "/" ^ tt.b(1, 5);
+	tt = tt.last(2) ^ "/" ^ tt.first(5);
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 //	//dont allow upgrades by test databases
-//	if (false and SYSTEM.f(124)) and (SYSTEM.f(17).substr(-5) ne "_test")) {
+//	if (false and SYSTEM.f(124) and not SYSTEM.f(17).ends"_test") {
 //
 //		//get upgrade file details
 //		upgradefilename83 = SYSTEM.f(112);
@@ -729,7 +729,7 @@ nextdbasen:;
 //			upgradefilename83 = shell2("dir " ^ (longupgradefilename.quote()) ^ " /x /l", errors);
 //			if (not errors) {
 //				upgradefilename83.converter("\r\n", FM);
-//				upgradefilename83 = upgradefilename83.f(6).substr(22, 999).trim().field(" ", 2);
+//				upgradefilename83 = upgradefilename83.f(6).b(22).trim().field(" ", 2);
 //				upgradefiledir = upgradefilename83.osfile();
 //				if (upgradefiledir) {
 //					SYSTEM(112) = upgradefilename83;
@@ -754,7 +754,7 @@ nextdbasen:;
 //					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
 //					//tt=upgradefiledir<2> 'D2/J'
 //					tt = upgradefiledir.f(2).oconv("D2/E");
-//					tt = tt.substr(-2, 2) ^ "/" ^ tt.b(1, 5);
+//					tt = tt.last(2) ^ "/" ^ tt.first(5);
 //					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.f(3).oconv("MT");
 //					upgradeready = 1;
 //				} else if (wgetoutput.ucase().contains(" ERROR 404")) {
@@ -772,7 +772,7 @@ nextdbasen:;
 //	}
 
 	//show local time
-	hostdescriptions ^= " - At:" ^ var().time().oconv("MT");
+	hostdescriptions ^= " - At:" ^ time().oconv("MT");
 
 	//find max nusersperhour by type
 	for (ii = 1; ii <= 24; ++ii) {
@@ -827,7 +827,7 @@ nextdbasen:;
 		for (ii = 1; ii <= nn; ++ii) {
 			line = result.f(ii).trim();
 			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
-			if (line.b(1, 10) eq "IP ADDRESS") {
+			if (line.starts("IP ADDRESS")) {
 				ips(-1) = line.field(":", 2).trim().field("(", 1);
 			//only display the first
 				goto gotip;
@@ -860,13 +860,13 @@ gotip:
 	//host passive check line
 	//currently any exodus update indicates that the host is ok
 	if (datax) {
-		datax ^= var().chr(10);
+		datax ^= chr(10);
 	}
 	datax ^= "PROCESS_HOST_CHECK_RESULT;" ^ installid ^ ";0;" ^ hostdescriptions;
 
 	//service passive check line
 	if (datax) {
-		datax ^= var().chr(10);
+		datax ^= chr(10);
 	}
 	datax ^= "PROCESS_SERVICE_CHECK_RESULT;" ^ installid ^ ";exodus;" ^ status0123 ^ ";" ^ descriptions;
 
@@ -878,20 +878,6 @@ gotip:
 	if (cidx) {
 		call monitor2b("WRITE", request, tempfilename, datax, msg);
 	}
-
-//	//also look to get any upgrade file
-//	//TODO put this on a less frequent check since it will only be
-//	//updated after the nightly backup usually *unless last hour users are 0/0/0
-//	//dont allow upgrades by test databases
-//	if (false and SYSTEM.f(124)) and SYSTEM.f(17).substr(-5) ne "_test")) {
-//		if (msg) {
-//		} else {
-//			msg = "";
-//			if (cidx) {
-//				call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
-//			}
-//		}
-//	}
 
 	//any error is going to be up front like error in parameters or missing wget
 	//errors in hostnames and connectivity must be obtained
@@ -918,7 +904,7 @@ gotip:
 //	//parallel means installations next to each other in the same folder
 //	upgflagfile = "../../UPGRADE.$$$";
 //	upgflagfile.converter("/", OSSLASH);
-//	if ((upgradeready and not(anyusers)) and ((var().time() - upgflagfile.osfile().f(3)).abs() gt 60)) {
+//	if ((upgradeready and not(anyusers)) and ((time() - upgflagfile.osfile().f(3)).abs() gt 60)) {
 //		call oswrite("", upgflagfile);
 //		//close all other processes, upgrade, close and restart
 //		call upgrade("R");

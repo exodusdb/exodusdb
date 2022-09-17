@@ -68,7 +68,7 @@ noconv:
 
 		//three digits - use right most two digits
 		} else {
-			inx = inx.substr(-2, 2);
+			inx = inx.last(2);
 		}
 
 		//00-49 -> 2000 ... 2049
@@ -101,9 +101,9 @@ noconv:
 	//return right hand two chars (presumably digits)
 	//pad to at least two zeros
 	if (in0.len() lt 2) {
-		outx = ("00" ^ in0).substr(-2, 2);
+		outx = ("00" ^ in0).last(2);
 	} else {
-		outx = in0.substr(-2, 2);
+		outx = in0.last(2);
 	}
 
 	return outx;

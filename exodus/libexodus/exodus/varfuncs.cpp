@@ -349,6 +349,17 @@ VARREF var::unassigned(CVR defaultvalue) {
 	return *this;
 }
 
+var var::unassigned(CVR defaultvalue) const {
+
+	THISIS("VARREF var::unassigned(CVR defaultvalue)")
+	ISASSIGNED(defaultvalue)
+
+	if (this->unassigned())
+		return defaultvalue;
+	else
+		return *this;
+}
+
 char var::toChar() const {
 
 	THISIS("char var::toChar() const")
@@ -1731,40 +1742,40 @@ CVR var::logputl(CVR str) const {
 // FCOUNT
 ////////
 // TODO make a char and char version for speed
-var var::fcount(SV substrx) const {
+var var::fcount(SV sep) const {
 
-	THISIS("var var::fcount(SV substrx) const")
+	THISIS("var var::fcount(SV sep) const")
 	assertString(function_sig);
-	//ISSTRING(substrx)
+	//ISSTRING(sep)
 
 	if (var_str.empty())
 		return 0;
 
-	if (substrx.empty())
+	if (sep.empty())
 		return "";
 
-	return this->count(substrx) + 1;
+	return this->count(sep) + 1;
 }
 
 ////////
 // COUNT
 ////////
 
-var var::count(SV substrx) const {
+var var::count(SV str) const {
 
-	THISIS("var var::count(SV substrx) const")
+	THISIS("var var::count(SV str) const")
 	assertString(function_sig);
 
-	if (substrx.empty())
+	if (str.empty())
 		return "";
 
-	std::string::size_type substr_len = substrx.size();
+	std::string::size_type substr_len = str.size();
 
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = 0;
 	int fieldno = 0;
 	while (true) {
-		start_pos = var_str.find(substrx, start_pos);
+		start_pos = var_str.find(str, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return fieldno;
@@ -1779,22 +1790,22 @@ var var::count(SV substrx) const {
 ////////
 
 //// 1 based starting byte no of an occurrence or 0 if not present
-//var var::index(SV substrx) const {
-//	return this->index2(substrx, 1);
+//var var::index(SV substr) const {
+//	return this->index2(substr, 1);
 //}
 
 // 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
-var var::index(SV substrx, const int startindex) const {
+var var::index(SV substr, const int startindex) const {
 
-	THISIS("var var::index(SV substrx,const int startindex) const")
+	THISIS("var var::index(SV substr,const int startindex) const")
 	assertString(function_sig);
 
-	if (substrx.empty())
+	if (substr.empty())
 		return "";
 
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = startindex - 1;
-	start_pos = var_str.find(substrx, start_pos);
+	start_pos = var_str.find(substr, start_pos);
 
 	// not found, return 0
 	if (start_pos == std::string::npos)
@@ -1805,12 +1816,12 @@ var var::index(SV substrx, const int startindex) const {
 
 // reverse search
 // 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
-var var::indexr(SV substrx, const int startindex) const {
+var var::indexr(SV substr, const int startindex) const {
 
-	THISIS("var var::indexr(SV substrx,const int startindex) const")
+	THISIS("var var::indexr(SV substr,const int startindex) const")
 	assertString(function_sig);
 
-	if (substrx.empty())
+	if (substr.empty())
 		return "";
 
 	std::string::size_type start_pos;
@@ -1836,7 +1847,7 @@ var var::indexr(SV substrx, const int startindex) const {
 	}
 
 	// find the starting position of the target
-	start_pos = var_str.rfind(substrx, start_pos);
+	start_pos = var_str.rfind(substr, start_pos);
 
 	// not found, return 0
 	if (start_pos == std::string::npos)
@@ -1846,20 +1857,20 @@ var var::indexr(SV substrx, const int startindex) const {
 }
 
 // 1 based starting byte no of an occurrence or 0 if not present
-var var::indexn(SV substrx, const int occurrenceno) const {
+var var::indexn(SV substr, const int occurrenceno) const {
 
-	//THISIS("var var::index(SV substrx,const int occurrenceno) const")
-	THISIS("var var::index(SV substrx) const")
+	//THISIS("var var::index(SV substr,const int occurrenceno) const")
+	THISIS("var var::index(SV substr) const")
 	assertString(function_sig);
 
 	//TODO implement negative occurenceno as meaning backwards from the end
 	//eg -1 means the last occurrence
 
-	if (substrx.empty())
+	if (substr.empty())
 		return "";
 
 	std::string::size_type start_pos = 0;
-	std::string::size_type substr_len = substrx.size();
+	std::string::size_type substr_len = substr.size();
 
 	// negative and 0th occurrence mean the first
 	int countdown = occurrenceno >= 1 ? occurrenceno : 1;
@@ -1867,7 +1878,7 @@ var var::indexn(SV substrx, const int occurrenceno) const {
 	for (;;) {
 
 		// find the starting position of the field or return ""
-		start_pos = var_str.find(substrx, start_pos);
+		start_pos = var_str.find(substr, start_pos);
 
 		// past of of string?
 		if (start_pos == std::string::npos)

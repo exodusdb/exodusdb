@@ -63,8 +63,8 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 			processrec = "";
 		}
 		if (not(FILEERROR)) {
-			processrec(11) = var().date();
-			processrec(12) = var().time();
+			processrec(11) = date();
+			processrec(12) = time();
 
 			processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
 
@@ -87,8 +87,8 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 				gosub newprocessid( processid);
 			}
 
-			processrec(11) = var().date();
-			processrec(12) = var().time();
+			processrec(11) = date();
+			processrec(12) = time();
 
 		}
 
@@ -119,7 +119,7 @@ subroutine newprocessid(io processid) {
 	timex = ostime();
 
 	while (true) {
-		processid = var(999999999).rnd().substr(-8,8);
+		processid = var(999999999).rnd().last(8);
 		var xx;
 		if (not(xx.read(DEFINITIONS, "PROCESS*" ^ processid))) {
 			xx = "";
@@ -128,7 +128,7 @@ subroutine newprocessid(io processid) {
 	if (not xx) break;
 	}//loop;
 
-	processrec(1) = var().date();
+	processrec(1) = date();
 	processrec(2) = timex;
 	processrec(3) = STATION.trim();
 	processrec(4) = SYSTEM.f(17);

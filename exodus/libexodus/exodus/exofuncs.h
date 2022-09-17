@@ -280,28 +280,28 @@ PUBLIC ND var seq(CVR char1);
 PUBLIC ND var textseq(CVR char1);
 PUBLIC ND var str(CVR instring, const int number);
 PUBLIC ND var space(const int number);
-PUBLIC ND var fcount(CVR instring, SV substrx);
-PUBLIC ND var count(CVR instring, SV substrx);
+PUBLIC ND var fcount(CVR instring, SV substr);
+PUBLIC ND var count(CVR instring, SV substr);
 
-PUBLIC ND var substr(CVR instring, const int startx);
-PUBLIC ND var substr(CVR instring, const int startx, const int length);
-PUBLIC VARREF substrer(VARREF iostring, const int startx);
-PUBLIC VARREF substrer(VARREF iostring, const int startx, const int length);
+PUBLIC ND var substr(CVR instring, const int startindex);
+PUBLIC ND var substr(CVR instring, const int startindex, const int length);
+PUBLIC VARREF substrer(VARREF iostring, const int startindex);
+PUBLIC VARREF substrer(VARREF iostring, const int startindex, const int length);
 
 PUBLIC bool starts(CVR instring, SV substr);
 PUBLIC bool end(CVR instring, SV substr);
 PUBLIC bool contains(CVR instring, SV substr);
 
-PUBLIC ND var index(CVR instring, SV substr, const int startcharno = 1);
+PUBLIC ND var index(CVR instring, SV substr, const int startindex = 1);
 PUBLIC ND var indexn(CVR instring, SV substr);
-PUBLIC ND var indexr(CVR instring, SV substr, const int startcharno = -1);
+PUBLIC ND var indexr(CVR instring, SV substr, const int startindex = -1);
 
-PUBLIC ND var field(CVR instring, SV substrx, const int fieldnx, const int nfieldsx = 1);
-PUBLIC ND var field2(CVR instring, SV substrx, const int fieldnx, const int nfieldsx = 1);
+PUBLIC ND var field(CVR instring, SV substr, const int fieldno, const int nfields = 1);
+PUBLIC ND var field2(CVR instring, SV substr, const int fieldno, const int nfields = 1);
 
 // STRINGS WITH FIELD MARKS
 
-PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno);
+PUBLIC var substr2(CVR fromstr, VARREF startindex, VARREF delimiterno);
 
 PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM);
 PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM);

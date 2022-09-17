@@ -83,14 +83,14 @@ function main(in mode, in params, io result, io msg) {
 		if (not(roundrobin.read(roundrobinfile, roundrobinkey_))) {
 			roundrobin = "";
 		}
-		if (roundrobin.contains(var().chr(0))) {
-			roundrobin.converter(var().chr(0), "");
-			var(var().date() ^ FM ^ var().time()).oswrite("rrobin");
+		if (roundrobin.contains(chr(0))) {
+			roundrobin.converter(chr(0), "");
+			var(date() ^ FM ^ time()).oswrite("rrobin");
 		}
 
 		//determine current and last timeperiod
 		//currentperiodn=date()*24*secsperperiod+mod(time(),secsperperiod)
-		var currentperiodn = ((var().date() * 24 * 60 * 60 + var().time()) / secsperperiod_).floor();
+		let currentperiodn = ((date() * 24 * 60 * 60 + time()) / secsperperiod_).floor();
 		var lastperiodn = roundrobin.f(1);
 
 		//prevent catch up longer than periodsperwindow (add 2 for safety)
@@ -123,9 +123,9 @@ function main(in mode, in params, io result, io msg) {
 
 		//garbagecollect;
 
-		if (roundrobin.contains(var().chr(0))) {
-			roundrobin.converter(var().chr(0), "");
-			var(var().date() ^ FM ^ var().time()).oswrite("RRW");
+		if (roundrobin.contains(chr(0))) {
+			roundrobin.converter(chr(0), "");
+			var(date() ^ FM ^ time()).oswrite("RRW");
 		}
 		roundrobin.write(roundrobinfile, roundrobinkey_);
 

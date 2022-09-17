@@ -1442,73 +1442,149 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 //starting is equivalent to x::index(y) == 1
 //contains is equivalent to x::index(y) != 0
 
-bool var::starts(SV sv) const {
+bool var::starts(SV str) const {
 
-	THISIS("bool var::starts(SV sv) const")
+	THISIS("bool var::starts(SV str) const")
 	//THISIS(__PRETTY_FUNCTION__)
 	//      bool exodus::var::starts(const exodus::VARREF) const
 	assertString(function_sig);
-	return var_str.starts_with(sv);
+
+	// Differ from c++
+	if (str.empty()) {
+		VarError e(__PRETTY_FUNCTION__);
+		e.description.errput();
+		e.stack(1).f(1).errputl();
+		return false;
+	}
+
+	return var_str.starts_with(str);
 }
 
-bool var::ends(SV sv) const {
+bool var::ends(SV str) const {
 
-	THISIS("bool var::ends(SV sv) const")
+	THISIS("bool var::ends(SV str) const")
 	assertString(function_sig);
-	return var_str.ends_with(sv);
+
+	// Differ from c++
+	if (str.empty()) {
+		VarError e(__PRETTY_FUNCTION__);
+		e.description.errput();
+		e.stack(1).f(1).errputl();
+		return false;
+	}
+
+	return var_str.ends_with(str);
 }
 
-bool var::contains(SV sv) const {
+bool var::contains(SV str) const {
 
-	THISIS("bool var::contains(SV sv) const")
+	THISIS("bool var::contains(SV str) const")
 	assertString(function_sig);
-	return var_str.find(sv) != std::string::npos;
+
+	// Differ from c++
+	if (str.empty()) {
+		VarError e(__PRETTY_FUNCTION__);
+		e.description.errput();
+		e.stack(1).f(1).errputl();
+		return false;
+	}
+
+	return var_str.find(str) != std::string::npos;
 	//C++23 return var_str.contains(vstr.var_str);
 }
 
-//bool var::starts(const char* cstr) const {
-//
-//	THISIS("bool var::starts(const char* cstr) const")
-//	assertString(function_sig);
-//	return var_str.starts_with(cstr);
-//}
-//
-//bool var::ends(const char* cstr) const {
-//
-//	THISIS("bool var::ends(const char* cstr) const")
-//	assertString(function_sig);
-//	return var_str.ends_with(cstr);
-//}
-//
-//bool var::contains(const char* cstr) const {
-//
-//	THISIS("bool var::contains(const char* cstr) const")
-//	assertString(function_sig);
-//	return var_str.find(cstr) != std::string::npos;
-//	//C++23 return var_str.contains(cstr);
-//}
-//
-//bool var::starts(const char c) const {
-//
-//	THISIS("bool var::starts(const char c) const")
-//	assertString(function_sig);
-//	return var_str.starts_with(c);
-//}
-//
-//bool var::ends(const char c) const {
-//
-//	THISIS("bool var::ends(const char c) const")
-//	assertString(function_sig);
-//	return var_str.ends_with(c);
-//}
-//
-//bool var::contains(const char c) const {
-//
-//	THISIS("bool var::contains(const char c) const")
-//	assertString(function_sig);
-//	return var_str.find(c) != std::string::npos;
-//	//C++23 return var_str.contains(c);
-//}
+////////
+// FIRST
+////////
+
+var var::first(const size_t  length) const& {
+
+	THISIS("VARREF var::first(const size_t length)")
+	assertString(function_sig);
+
+	// Assume high half of size_t is c++ unblockable conversion
+	// of negative ints to size_t. Runtime error
+	if (length > std::string::npos >> 1)
+		throwNonPositive(__PRETTY_FUNCTION__);
+
+	// Construct a new var with the required number of chars from this or all
+	var rvo(this->var_str.data(), std::min(length, this->var_str.size()));
+
+	return rvo;
+}
+//__cpp_lib_string_contains
+
+
+//[1,y]
+// var.s(1,length) substring
+VARREF var::firster(const size_t length) {
+
+	THISIS("VARREF var::firster(const size_t length)")
+	assertStringMutator(function_sig);
+
+	// Assume high half of size_t is c++ unblockable conversion
+	// of negative ints to size_t. Runtime error
+	if (length > std::string::npos >> 1)
+		throwNonPositive(__PRETTY_FUNCTION__);
+
+	// Reduce the size of this string if necessary
+	if (length < this->var_str.size()) {
+		this->var_str.resize(length);
+	}
+
+	return *this;
+}
+
+///////
+// LAST
+///////
+
+var var::last(const size_t  length) const& {
+
+	THISIS("VARREF var::last(const size_t length)")
+	assertString(function_sig);
+
+	// Assume high half of size_t is c++ unblockable conversion
+	// of negative ints to size_t. Runtime error
+	if (length > std::string::npos >> 1)
+		throwNonPositive(__PRETTY_FUNCTION__);
+
+	// Example "abc".last(2)
+	// min of 2, 3 -> 2 for copylen
+	// copy start = data() +3 -2 = data+1, copylen 2
+
+	size_t copylen = std::min(length, this->var_str.size());
+
+	// Construct a new var with the required number of chars from this
+	var rvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
+
+	return rvo;
+}
+//__cpp_lib_string_contains
+
+//[-y]
+// var.s(-length) substring
+VARREF var::laster(const size_t length) {
+
+	THISIS("VARREF var::laster(const size_t length)")
+	assertStringMutator(function_sig);
+
+	// Assume high half of size_t is c++ unblockable conversion
+	// of negative ints to size_t. Runtime error
+	if (length > std::string::npos >> 1)
+		throwNonPositive(__PRETTY_FUNCTION__);
+
+	// Example "abc".last(2)
+	// 2 < 3
+	// erase 0, 3 - 2 = 1
+
+	// Erase the first part of this string if necessary
+	if (length < this->var_str.size()) {
+		this->var_str.erase(0, this->var_str.size() - length);
+	}
+
+	return *this;
+}
 
 /////////
 // SUBSTR
@@ -1516,12 +1592,9 @@ bool var::contains(SV sv) const {
 
 var var::substr(const int startindex1) const& {
 	return var(*this).substrer(startindex1);
-	//var temp = *this;
-	//temp.substrer(startindex1);
-	//return temp;
 }
 
-// on temporary
+//// on temporary
 VARREF var::substr(const int startindex1) && {
 	return this->substrer(startindex1);
 }
@@ -1529,7 +1602,6 @@ VARREF var::substr(const int startindex1) && {
 //[x,y]
 // var.s(start,length) substring
 var var::substr(const int startindex1, const int length) const& {
-	//return var(*this).substrer(startindex1, length);
 	return var(*this).substrer(startindex1, length);
 }
 

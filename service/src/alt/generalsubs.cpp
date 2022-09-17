@@ -150,7 +150,7 @@ next:
 		}
 
 	} else {
-		var().chr(7).output();
+		chr(7).output();
 		call mssg(mode.quote() ^ " - invalid mode ignored");
 		//valid=0
 	}
@@ -159,7 +159,7 @@ next:
 }
 
 subroutine getdatasets() {
-	var dospath = oscwd().substr(1,2) ^ "../data/";
+	var dospath = oscwd().first(2) ^ "../data/";
 	dospath.converter("/", OSSLASH);
 
 	var dosfilename = APPLICATION ^ ".vol";
@@ -175,7 +175,7 @@ subroutine getdatasets() {
 	//convert dos text to revelation format and standardise
 	directory.ucaser();
 	//DIRECTORY=TRIM(DIRECTORY[1,\1A\]);*DOS TEXT EOF IS CONTROL-Z
-	var dosformat = directory.contains(var().chr(13));
+	var dosformat = directory.contains(chr(13));
 	directory.converter(" " ^ FM ^ "\r\n", FM ^ " " " " " ");
 	directory.trimmer();
 	directory.converter(" " ^ FM, FM ^ " ");
@@ -190,7 +190,7 @@ subroutine getdatasets() {
 	datasetparams.converter(",*", SM ^ VM);
 	var subst = datasetparams.field(" ", 1);
 	datasetparams = datasetparams.field(" ", 2, 9999);
-	var ndatasets = datasetparams.count(VM) + 1;
+	let ndatasets = datasetparams.count(VM) + 1;
 
 	datasetcodes = "";
 	var datasetnames = "";

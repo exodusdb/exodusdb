@@ -138,7 +138,7 @@ function main(out bakpars, in process0=var()) {
 		//autodetermine if it is "test" data
 		if (baktestdata_ eq "") {
 			var testdata = 1;
-			if ((process.f(17).substr(-5)) eq "_test") {
+			if (process.f(17).ends("_test")) {
 			} else if (process.f(23).ucase().contains("TRAINING")) {
 			} else if (process.f(23).ucase().contains("TESTING")) {
 			} else if (osfile("~/hosts/disabled.cfg")) {

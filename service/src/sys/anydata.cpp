@@ -21,7 +21,7 @@ function main(in filenames0, out result) {
 		filenamesx = "PLANS" _VM "SCHEDULES" _VM "JOBS" _VM "BALANCES";
 	}
 
-	var nfiles = filenamesx.count(VM) + 1;
+	let nfiles = filenamesx.count(VM) + 1;
 
 	for (const var filen : range(1, nfiles)) {
 

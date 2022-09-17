@@ -15,7 +15,7 @@ function main() {
 			"DESCRIPTION\n"
 			"\n"
 			"    Copies dat files into database files.\n"
-			"    Generates and compiles dict_*.cpp files.\n"
+			"    or generates and compiles dict_*.cpp files.\n"
 			"\n"
 			"SYNTAX\n"
 			"\n"
@@ -28,7 +28,9 @@ function main() {
 			"    F = Force. Dont skip dirs/files older than\n"
 			"               last sync_dat recorded in DEFINITIONS file\n"
 			"\n"
-			"    G = Also generate and compile dict_*.cpp\n"
+			"    G = Generate and compile dict_*.cpp\n"
+			"\n"
+			"    V = Verbose\n"
 			"\n"
 			"EXAMPLES\n"
 			"\n"
@@ -59,10 +61,13 @@ function main() {
 
 	var txtfmt = "TX";
 
+	var prefix = THREADNO ^ ": sync_dat:";
+
 	// Skip if no definitions file
 	var definitions;
 	if (generate or not open("DEFINITIONS", definitions)) {
-		//abort("Error: sync_dat - No DEFINITIONS file");
+		//abort(prefix ^ " Warning: No DEFINITIONS file");
+		logputl(prefix, "Warning: No DEFINITIONS file");
 		definitions = "";
 	}
 
@@ -77,15 +82,14 @@ function main() {
 	// Skip if nothing new
 	var datinfo = osdir(datpath);
 	if (not datinfo) {
-		abort("Error: syncdat: " ^ datpath.quote() ^ " dat dir missing");
+		abort(prefix ^ " Error: " ^ datpath.quote() ^ " dat dir missing");
 	}
-	var dirtext = "sync_dat: " ^ datpath ^ " " ^ datinfo.f(2).oconv("D-Y") ^ " " ^ datinfo.f(3).oconv("MTS");
+	printl(prefix, "Scanning", datpath, datinfo.f(2).oconv("D-Y"), datinfo.f(3).oconv("MTS"));
 	if (not force and not is_newer(datinfo)) {
 		if (verbose)
-			printl(dirtext, "No change.");
+			printl("No change since", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
 		return 0;
 	}
-	printl(THREADNO ^ ":", "Scanning", dirtext);
 
 	begintrans();
 
@@ -93,7 +97,7 @@ function main() {
 	if (not dirnames) {
 		dirnames = oslistd(datpath ^ "/" "*").sort();
 	}
-	//printl(THREADNO ^ ":", "Scanning", dirnames.convert(FM, "^"));
+	//printl(prefix, "Scanning", dirnames.convert(FM, "^"));
 
 	for (var dirname : dirnames) {
 
@@ -116,7 +120,7 @@ function main() {
 		if (not open(dbfilename, dbfile)) {
 			createfile(dbfilename);
 			if (not open(dbfilename, dbfile)) {
-				errputl("Error: sync_dat cannot create " ^ dbfilename);
+				errputl(prefix, "Error: Cannot create " ^ dbfilename);
 				continue;
 			}
 		}
@@ -125,7 +129,7 @@ function main() {
 		var newcpptext = "#include <exodus/library.h>\n";
 
 		// Process each dat file/record in the subdir
-		//printl(THREADNO ^ ":", dirpath);
+		//printl(prefix, dirpath);
 		var osfilenames = oslistf(dirpath ^ "*").sort();
 		for (var osfilename : osfilenames) {
 
@@ -140,7 +144,7 @@ function main() {
 			// Get the dat record
 			var filepath = dirpath ^ ID;
 			if (not osread(RECORD from filepath)) {
-				errputl("Error: sync_dat cannot read " ^ ID ^ " from " ^ filepath);
+				errputl(prefix, "Error: Cannot read " ^ ID ^ " from " ^ filepath);
 				continue;
 			}
 
@@ -206,7 +210,7 @@ function main() {
 
 				// Moved up so we can generate complete dict_xxxxxxxx.cpp source
 				//if (not osread(RECORD from filepath)) {
-				//	errputl("Error: sync_dat cannot read " ^ ID ^ " from " ^ filepath);
+				//	errputl(prefix, "Error: Cannot read " ^ ID ^ " from " ^ filepath);
 				//	continue;
 				//}
 				//gosub unescape_text(RECORD);
@@ -223,7 +227,7 @@ function main() {
 					if (exists and RECORD.len() eq 0) {
 						// Delete the RECORD
 						deleterecord(dbfile, ID);
-						printl("sync_dat:", dbfilename, ID, "DELETED");
+						printl(prefix, dbfilename, ID, "DELETED");
 					} else {
 						if (verbose)
 							printl("Not changed", dbfilename, ID);
@@ -246,7 +250,7 @@ function main() {
 					var cmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
 					//cmd ^= " {V}";
 					if (not osshell(cmd))
-						errputl("Error: sync_dat: In dict2sql for " ^ ID ^ " in " ^ dbfilename);
+						errputl(prefix, "Error: In dict2sql for " ^ ID ^ " in " ^ dbfilename);
 				}
 
 			} // of not generate
@@ -263,7 +267,7 @@ function main() {
 			var incfiletext;
 			if (not osread(incfiletext from incfilename)) {
 				//abort("sync_dat cannot read " ^ incfilename);
-				errputl("sync_dat cannot read " ^ incfilename);
+				errputl(prefix, "Warning: Cannot read " ^ incfilename);
 				continue;
 			}
 
@@ -272,9 +276,13 @@ function main() {
 			if (not osread(oldcpptext from dictcppfilename))
 				oldcpptext = "";
 
+			// Remove one of the /n/n appended after every libraryexit()
+			newcpptext.popper();
+
 			// Update
 			if (newcpptext eq oldcpptext) {
-				printl("Already up to date", dictcppfilename);
+				if (verbose)
+					printl("Already up to date", dictcppfilename);
 			} else {
 				//if (not oswrite(newcpptext on dbfilename))
 				if (not oswrite(newcpptext on dictcppfilename))

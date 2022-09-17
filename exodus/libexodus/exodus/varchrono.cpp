@@ -349,14 +349,13 @@ var var::iconv_D(const char* conversion) const {
 
 var var::oconv_D(const char* conversion) const {
 
-	// by this time it is known to be a number and not an empty string
+	// by this time *this is known to be numeric and not an empty string
 
-	// pick date uses floor()ie 1.9=1 and -1.9=-2
-
-	// get a ymd object for the desired date
+	// pick date uses floor() i.e. day 0.9 = day 0 and day -0.9 -> -1
 	int pickdayno = this->floor();
-	int unixdayno = pickdayno + PICK_UNIX_DAY_OFFSET;
 
+	// convert to day, month and year
+	int unixdayno = pickdayno + PICK_UNIX_DAY_OFFSET;
 	int civil_year;
 	unsigned civil_month;
 	unsigned civil_day;
@@ -372,8 +371,8 @@ var var::oconv_D(const char* conversion) const {
 
 	// this function is only called when the 1st character is "D"
 	const char* conversionchar = conversion;
-//	if (*conversionchar != 'D')
-//		return *this;
+
+    // bump to the next char
 	++conversionchar;
 
 	// DY means year only unless followed by a separator character

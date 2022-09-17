@@ -268,7 +268,7 @@ forcedemail:
 
 	if (body[1] eq "@") {
 
-		osfilename = body.b(2, 99999);
+		osfilename = body.b(2);
 		osfilesize = osfilename.osfile().f(1);
 
 		//convert to link if file is too big to email
@@ -304,9 +304,9 @@ forcedemail:
 		if (not(VOLUMES)) {
 			cwd ^= OSSLASH;
 		}
-		if (attachfilename.b(1, 2) eq "..") {
+		if (attachfilename.starts("..")) {
 			attachfilename.splicer(1, 2, cwd.field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
-		} else if (attachfilename.b(1, 2) eq ".") {
+		} else if (attachfilename.starts(".")) {
 			attachfilename.splicer(1, 1, cwd);
 		}
 		msgsize += attachfilename.osfile().f(1);
@@ -319,7 +319,7 @@ forcedemail:
 
 	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
 	if (body and (body[1] ne "@")) {
-		bodyfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
+		bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line
 		body.replacer("\r", "\t\r");
@@ -335,12 +335,12 @@ forcedemail:
 	//if delete then params:=' /d ':delete
 
 	//condition subject start standard with 'EXODUS: '
-	if (subject.b(1, 8) ne "EXODUS: ") {
-		if (subject.b(1, 6) eq "EXODUS") {
-			subject = subject.b(7, 9999).trimf();
+	if (subject.first(8) ne "EXODUS: ") {
+		if (subject.starts("EXODUS")) {
+			subject = subject.b(7).trimf();
 		}
-		if (subject.b(1, 7) eq "System:") {
-			subject = subject.b(8, 9999).trimf();
+		if (subject.starts("System:")) {
+			subject = subject.b(8).trimf();
 		}
 		subject.splicer(1, 0, "EXODUS: ");
 	}
@@ -364,10 +364,10 @@ forcedemail:
 	if (VOLUMES) {
 
 		params.replacer(FM, "\r\n");
-		paramfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
+		paramfilename = var(999999999).rnd().first(7) ^ ".tmp";
 		call oswrite(params, paramfilename);
 
-		errorfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
+		errorfilename = var(999999999).rnd().first(7) ^ ".tmp";
 
 		//cmd='START /w'
 		//using CSCRIPT because of difficulty reading errorfilename contents
@@ -403,13 +403,13 @@ forcedemail:
 		//mark html formatted messages as such
 		if (body[1] eq "@") {
 			tt = "";
-			if (bodyfile.osopen(body.b(2, 999))) {
+			if (bodyfile.osopen(body.b(2))) {
 				//osbread tt from bodyfile at 0 length 100
 				var offset = 0;
 				call osbread(tt, bodyfile, offset, 100);
 			}
 		} else {
-			tt = body.b(1, 20);
+			tt = body.first(20);
 		}
 		tt.ucaser();
 		if ((not(attachfilename) and tt.contains("<!DOCTYPE")) or tt.contains("<HTML")) {
@@ -436,11 +436,11 @@ forcedemail:
 
 			//body may already be in a file
 			if (body[1] eq "@") {
-				bodyfilename = body.b(2, 99999);
+				bodyfilename = body.b(2);
 
 			//otherwise generate a random filename and write it
 			} else {
-				bodyfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
+				bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
 				var(body).oswrite(bodyfilename);
 				bodyfilename.osclose();
 			}
@@ -451,7 +451,7 @@ forcedemail:
 		//because strangely ubuntu mail doesnt support the -A option
 		if (attachfilename) {
 			var headers = "";
-			var nn = cmd.count(VM) + 1;
+			let nn = cmd.count(VM) + 1;
 			for (const var ii : range(2, nn)) {
 				var line = cmd.f(1, ii);
 				var opt = line.field(" ", 1);
@@ -650,7 +650,7 @@ TRACE(offset)
 subroutine addlinks2osfilename() {
     tt = osfilename;
     //tt.converter("\\", "/");
-    //if (tt.b(1, 3) eq "../") {
+    //if (tt.starts("../")) {
     //  tt.splicer(1, 3, "");
     //}
 
@@ -670,7 +670,7 @@ subroutine addlinks2osfilename() {
 	body(-1) = "Your report is too large to email. (" ^ oconv(osfilesize, "[XBYTES]") ^ ", max " ^ oconv(maxemailsize, "[XBYTES]") ^ ")";
 	body(-1) = "but you can download it by clicking the following link.";
 	body(-1) = FM ^ "*Link is only available for ONE HOUR from creation*";
-	var nlinks = SYSTEM.f(114).count(VM) + 1;
+	let nlinks = SYSTEM.f(114).count(VM) + 1;
 	for (const var linkn : range(1, nlinks)) {
 		body ^= FM;
 		var linkdesc = SYSTEM.f(115, linkn);

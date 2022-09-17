@@ -83,7 +83,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	var salt = 3923517;
 	var max = 4752137;
 
-	var sessionid = (var().date().pwr(3) * 7 + 5).substr(9999, -9999);
+	var sessionid = (date().pwr(3) * 7 + 5).b(9999, -9999);
 	var cidx = cid();
 
 	if (mode eq "WRITE") {
@@ -435,7 +435,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 subroutine hash(in salt, in max, out hashcode) {
 
 	hashcode = salt;
-	for (const var ii : range(1, text.len())) {
+	for (const int ii : range(1, text.len())) {
 		hashcode = (hashcode * (text[ii]).seq()).mod(max);
 	} //ii;
 	return;

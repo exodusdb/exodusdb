@@ -38,7 +38,7 @@ programinit()
 	//
 	//	x[]
 	//
-	//	.substr(2,2) ... for char
+	//	.b(2,2) ... for char
 	//
 	//	xxx[1] ... for single chars or could be used to extract
 	//
@@ -429,10 +429,19 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//assert(var("xyz").hash(1000)==894);//wchar/wstring vars
 	assert(var("xyz").hash(1000) eq 274);
 
-	{  //null characters cannot be embedded in string constants in c/c++
-
+	{
+		//null characters cannot be embedded in string constants in c/c++
 		var data = "\xFF\x30\x00\x32";
 		assert(len(data) eq 2);
+
+		// but we can get them in via _var user literal
+		data = "\xFF\x30\x00\x32"_var;
+		assert(len(data) eq 4);
+
+		// but we can get them in via chars
+		data = '\x00';
+		assert(len(data) eq 1);
+
 		//wont compile
 		//data="\u0032";
 		//cant put unicode in narrow character strings

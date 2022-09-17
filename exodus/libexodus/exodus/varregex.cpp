@@ -371,13 +371,17 @@ var var::match(SV matchstr, SV options) const {
 	try {
 #ifdef USE_BOOST
 		//regex = boost::make_u32regex(matchstr.var_str, get_regex_syntax_flags(options));
-		regex = boost::make_u32regex(std::string(matchstr), get_regex_syntax_flags(options));
+		try {
+			regex = boost::make_u32regex(std::string(matchstr), get_regex_syntax_flags(options));
+		} catch (boost::wrapexcept<std::out_of_range>& e) {
+			throw VarError("Error: (1) Invalid data during match of " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
+		}
 #else
 		//regex=std::regex(matchstr.var_str, get_regex_syntax_flags(options));
 		regex=std::regex(matchstr, get_regex_syntax_flags(options));
 #endif
 	} catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex " ^ var(matchstr).quote() ^ " " ^ var(e.what()).quote());
+		throw VarError("Error: Invalid regex string " ^ var(matchstr).quote() ^ ". " ^ var(e.what()).quote());
 	}
 
 	/*
@@ -411,7 +415,12 @@ var var::match(SV matchstr, SV options) const {
 
 	// construct our iterators:
 #ifdef USE_BOOST
-	boost::u32regex_iterator<std::string::const_iterator> iter{boost::make_u32regex_iterator(var_str, regex)};
+	boost::u32regex_iterator<std::string::const_iterator> iter;
+	try {
+		iter = boost::make_u32regex_iterator(var_str, regex);
+	} catch (boost::wrapexcept<std::out_of_range>& e) {
+		throw VarError("Error: (2) Invalid match string " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
+	}
 #else
 	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex);
 #endif
@@ -511,22 +520,50 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 		//regex = std_boost::regex(regexstr.var_str, get_regex_syntax_flags(options));
 #ifdef USE_BOOST
 		//regex1 = boost::make_u32regex(regexstr.var_str, get_regex_syntax_flags(options));
-		regex1 = boost::make_u32regex(std::string(regexstr), get_regex_syntax_flags(options));
+		try {
+			regex1 = boost::make_u32regex(std::string(regexstr), get_regex_syntax_flags(options));
+		} catch (boost::wrapexcept<std::out_of_range>& e) {
+			throw VarError("Error: (4) Invalid regexstr during replacement of " ^ var(regexstr).quote() ^ ". " ^ var(e.what()));
+		}
+
 #else
 		//regex1=std::regex(regexstr.var_str, get_regex_syntax_flags(options));
 		regex1=std::regex(regexstr, get_regex_syntax_flags(options));
 #endif
 	} catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex " ^ var(regexstr).quote() ^ " " ^ var(e.what()));
+		throw VarError("Error: Invalid regex replace " ^ var(regexstr).quote() ^ ". " ^ var(e.what()));
 	}
 
 	// return regex_match(var_str, expression);
 
-	// std::ostringstream outputstring(std::ios::out | std::ios::binary);
-	// std::ostream_iterator<char, char> oiter(outputstring);
-	// std_boost::regex_replace(oiter, var_str.begin(), var_str.end(),regex_regex, with,
-	// boost::match_default | boost::format_all);
-	var_str = REGEX_REPLACE(var_str, regex1, std::string(replacementstr));
+	// One liner to replace the first occurrence only
+	//var_str = REGEX_REPLACE(var_str, regex1, std::string(replacementstr));
+
+	// Get an ostringstream object and an iterator on it
+	std::ostringstream oss1(std::ios::out | std::ios::binary);
+	std::ostream_iterator<char, char> oiter(oss1);
+
+	// Generate output
+	try {
+		std_boost::u32regex_replace(
+			oiter,
+			var_str.begin(),
+			var_str.end(),
+			regex1,
+			std::string(replacementstr),
+			boost::match_default | boost::format_all
+		);
+	} catch (boost::wrapexcept<std::out_of_range>& e) {
+		var errmsg = "Error: (3) Invalid data or replacement during regex replace of " ^ var(regexstr).quote() ^ " with " ^ var(replacementstr).quote() ^ ". " ^ var(e.what());
+		//TODO Show some of the invalid UTF8 bytes maybe.
+		//Cannot show actual data because it could be a security breach.
+		//errmsg ^= ". Data[1,128] = " ^ this->first(128).quote();
+		throw VarError(errmsg);
+	}
+
+	// Acquire the output
+	var_str = std::move(oss1).str();
+
 	return *this;
 }
 

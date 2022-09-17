@@ -7,7 +7,7 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 	var text = "";
 
 	if (uptodate.unassigned()) {
-		uptodate = var().date();
+		uptodate = date();
 	}
 	if (uptotime.unassigned()) {
 		uptotime = ostime();

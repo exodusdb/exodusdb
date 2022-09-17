@@ -152,8 +152,8 @@ nextdoc:
 		if (RECORD.f(1) eq "") {
 			RECORD(1) = USERNAME;
 		}
-		RECORD(3) = var().date();
-		RECORD(4) = var().time();
+		RECORD(3) = date();
+		RECORD(4) = time();
 		RECORD(7) = APPLICATION;
 
 		//update exodus standard (in case doing this on the programming system)

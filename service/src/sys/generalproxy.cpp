@@ -106,7 +106,7 @@ function main() {
 		//}
 
 		ID = "1";
-		var ntrans = 100;
+		let ntrans = 100;
 		//printl();
 		//printl("TRANTEST 1.", THREADNO);
 		for (const var recn : range(1, ntrans)) {
@@ -139,7 +139,7 @@ function main() {
 			allhtml(-1) = "</style>";
 		}
 
-		var ncomps = compcodes.count(",") + 1;
+		let ncomps = compcodes.count(",") + 1;
 		for (const var compn : range(1, ncomps)) {
 
 			mode = "HEAD";
@@ -197,7 +197,7 @@ function main() {
 			stop();
 		}
 
-		var started = var().time().oconv("MTS");
+		var started = time().oconv("MTS");
 		var otherusersx = otherusers(copydb);
 		var log = started ^ " Started copy database " ^ copydb ^ " to " ^ todb;
 		log ^= "|" ^ started ^ " Other processes online:" ^ otherusersx.f(1);
@@ -206,7 +206,7 @@ function main() {
 
 		USER3 = USER4;
 		if (not response_) {
-			log ^= "|" ^ var().time().oconv("MTS") ^ " Finished";
+			log ^= "|" ^ time().oconv("MTS") ^ " Finished";
 			call sysmsg(log);
 			USER3 = "OK " ^ log;
 		}
@@ -361,7 +361,7 @@ function main() {
 
 		//record historical resets/attempts
 		//datetime=(date():'.':time() 'R(0)#5')+0
-		var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+		var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 		userrec.inserter(15, 1, datetime);
 		userrec.inserter(16, 1, SYSTEM.f(40, 2));
 		userrec.inserter(18, 1, ("Password Reset " ^ baduseroremail).trim());
@@ -415,7 +415,7 @@ function main() {
 		//have to skip char zero it seems to be treated as string terminator
 		//somewhere on the way to the browser (not in revelation)
 		for (const var ii : range(1, 255)) {
-			USER1 ^= var().chr(ii);
+			USER1 ^= chr(ii);
 		} //ii;
 		//data='xxx'
 		USER3 = "OK";
@@ -637,7 +637,7 @@ nextrep:
 				//report<5>=''
 
 				report.converter(VM, RM);
-				var nn = report.count(FM) + 1;
+				let nn = report.count(FM) + 1;
 				for (const var ii : range(1, nn)) {
 					data_(ii, repn) = report.f(ii);
 				} //ii;
@@ -659,7 +659,7 @@ nextrep:
 
 		var docnos = request_.f(2);
 
-		var ndocs = docnos.count(VM) + 1;
+		let ndocs = docnos.count(VM) + 1;
 		for (const var docn : range(1, ndocs)) {
 			ID = docnos.f(1, docn);
 			if (ID) {
@@ -778,7 +778,7 @@ nextrep:
 		USER1 = PSEUDO;
 
 		//in case we are calling another proxy
-		if (sys.document.f(5, 1).substr(-5, 5) eq "PROXY") {
+		if (sys.document.f(5, 1).ends("PROXY")) {
 
 			//run but suppress email
 			//perform 'TEST ':request<2>:' (S)'
@@ -787,7 +787,7 @@ nextrep:
 			//moved up so parameters show in any emailed error messages
 			//data=@pseudo
 			//override the saved period with a current period
-			var runtimeperiod = var().date().oconv("D2/E").substr(4, 5);
+			var runtimeperiod = date().oconv("D2/E").b(4, 5);
 			if (runtimeperiod[1] eq "0") {
 				runtimeperiod.splicer(1, 1, "");
 			}
@@ -976,7 +976,7 @@ subroutine initlog() {
 	logsearch = USER1.f(7);
 
 	if (logoptions eq "TODAY") {
-		logfromdate = var().date();
+		logfromdate = date();
 		loguptodate = logfromdate;
 	}
 
@@ -984,13 +984,13 @@ subroutine initlog() {
 		var tt = logfromdate;
 		var tt2 = loguptodate;
 		if (not tt) {
-			tt = var().date();
+			tt = date();
 		}
 		if (not tt2) {
 			tt2 = tt;
 		}
-		logyear = tt.oconv("D").substr(-4, 4);
-		var logtoyear = tt2.oconv("D").substr(-4, 4);
+		logyear = tt.oconv("D").last(4);
+		var logtoyear = tt2.oconv("D").last(4);
 		if (logyear ne logtoyear) {
 			response_ = "Dates must be within one calendar year";
 			stop();

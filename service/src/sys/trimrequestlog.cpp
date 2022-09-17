@@ -37,7 +37,7 @@ function main() {
 
 	//calculate the size of the last month of requestlog entries
 
-	var periodago = var().date() - perioddays;
+	var periodago = date() - perioddays;
 	select(requestlog);
 	var periodsize = 0;
 	var recn = 0;
@@ -89,9 +89,9 @@ stage2:
 	var ndayskept = (nperiodskept * perioddays).floor();
 	if (ndayskept gt 9999) {
 		var datekept = var("1/1/2000").iconv("D");
-		ndayskept = var().date() - datekept + 1;
+		ndayskept = date() - datekept + 1;
 	}
-	var datekept = var().date() - ndayskept;
+	var datekept = date() - ndayskept;
 
 	var tx = "TRIM REQUESTLOG";
 	tx(-1) = "";

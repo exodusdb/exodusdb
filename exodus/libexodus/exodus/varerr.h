@@ -18,6 +18,7 @@ class PUBLIC VarInvalidPointer  : public VarError {public: explicit VarInvalidPo
 class PUBLIC VarDBException     : public VarError {public: explicit VarDBException(     CVR var1);};
 class PUBLIC VarNotImplemented  : public VarError {public: explicit VarNotImplemented(  CVR var1);};
 class PUBLIC VarDebug           : public VarError {public: explicit VarDebug(           CVR var1);};
+
 class PUBLIC DimDimensionedZero : public VarError {public: explicit DimDimensionedZero( CVR var1);};
 class PUBLIC DimIndexOutOfBounds: public VarError {public: explicit DimIndexOutOfBounds(CVR var1);};
 class PUBLIC DimNotDimensioned  : public VarError {public: explicit DimNotDimensioned(  CVR var1);};

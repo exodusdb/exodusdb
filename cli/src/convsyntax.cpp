@@ -3,46 +3,50 @@ programinit()
 
 var syntax = R"(
 NAME
-
  convsyntax  Convert various EXODUS cpp syntax
-
 SYNTAX
-
 	convsyntax SOURCEFILENAME ... {OPTION}
-
 EXAMPLE
-
 	conv_syntax ~/neosys/src/ASTERISK/ASTERISK.cpp {RF}
-
 OPTIONS
-
 	R - Change replacer syntax
-
 		   x.r(a,b,c,y)
 		-> x(a,b,c) = y
-
 		Examples:
-
 		   x.r(fn, replacement);
 		-> x(fn) = replacement;
-
 		   x.r(fn, vn, replacement);
 		-> x(fn, vn) = replacement;
-
 		   x.r(fn, vn, sn, replacement);
 		-> x(fn, vn, sn) = replacement;
-
 	F - Change for loop syntax to use range()
-
 		   for (const var x = ...
 		-> for (var x : range(...
-
 		Example:
-
 		for (const var x = a; x <= b; ++x)
 		-> for (var x : range(a to b))
+	B - Change substr to b
+		   .substr(
+		-> .b(
+	S - Change .b(1, n) eq/== to .starts(
+	    and    '.b(n, n)' to .first(n)
+		   .b(1, n) eq "XXX"
+		-> .starts("XXX")
+		   .b(3, 3)
+		-> .first(3)
+	L - Change '.b(-n, n) eq' to .ends(n)
+	    and    '.b(-n, n)' to .last(n)
+		   .b(1, n) eq "XXX"
+		-> .starts("XXX")
+		   .b(-3, 3)
+		-> .last(3)
+	G - General
+	v - Remove empty var().
+
+	A - All conversions except R and F
 
 	U - Actually update the source file
+	V - Verbose
 )";
 
 function main() {
@@ -52,13 +56,25 @@ function main() {
 
 	COMMAND.remover(1);
 
-	var r2a = OPTIONS.contains("R");
+	if (OPTIONS.contains("A"))
+		OPTIONS ^= "BSLGv";
+	var r2a = OPTIONS.contains("R") ;
 	var forrange = OPTIONS.contains("F");
+	var substr2b = OPTIONS.contains("B");
+	var b1eq2starts = OPTIONS.contains("S");
+	var b2last = OPTIONS.contains("L");
+	var general = OPTIONS.contains("G");
+	var emptyvar = OPTIONS.contains("v");
+
+	var verbose = OPTIONS.contains("V");
 
 	for (var filename : COMMAND) {
 
-		if (not filename)
+		if (not filename or filename.contains("convsyntax") or filename.ends(".so") or osdir(filename))
 			continue;
+
+		if (verbose)
+			logputl(filename);
 
 		// Read a source file into a dimensioned array of vars
 		dim txt;
@@ -206,6 +222,80 @@ function main() {
 				continue;
 
 			}// forrange
+
+			// the following conversions are applied progressively
+
+			var line2 = line;
+
+			// B - substr() to b()
+			if (substr2b) {
+				line2.regex_replacer("\\.substr\\(", ".b\\(");
+			}
+
+			// S - .b(1, ..) eq -> .starts(..
+			//var newrec = RECORD.regex_replace(R"(\.b\(1, \d+\) eq (".*"))", R"(.starts(\1)");
+			if (b1eq2starts) {
+				line2.regex_replacer(
+					R"__(\.b\(1, ?\d+\) ?(eq|==) ?(".*?"))__",
+					R"__(.starts\(\2\))__", "g"
+				);
+
+				// first
+				line.regex_replacer(
+					R"__(\.b\(1, ?(\d+)\))__",
+					R"__(.first\(\1\))__", "g"
+				);
+			}
+
+			// L - last()/ends()
+			if (b2last) {
+
+				// ends
+				line2.regex_replacer(
+					R"__(\.b\(-(\d+), ?\1\) ?(eq|==) ?(".*?"))__",
+					R"__(.ends\(\3\))__", "g"
+				);
+
+				// last
+				line2.regex_replacer(
+					R"__(\.b\(-(\d+), ?\1\))__",
+					R"__(.last\(\1\))__", "g"
+				);
+			}
+
+			// G - General
+			if (general) {
+
+				line2.regex_replacer(
+					R"__(\.oconv\("D2/E"\)\.first\(2\))__",
+					R"__(\.oconv\("DD"\))__"
+				);
+
+				// .b(9, 99) -> .b(9)
+				line2.regex_replacer(
+					R"__(\.b\(([a-zA-Z_0-9"]+), 99+\))__",
+					//R"__(\.b\((\d), 99+\))__",
+					R"__(.b\(\1\))__"
+				);
+
+			}
+			// var().xxx -> xxx
+			if (emptyvar) {
+
+				// var().date/time/chr( -> date/time/chr(
+				line2.regex_replacer(
+					R"__(var\(\)\.(chr|date|time)\()__",
+					R"__(\1\()__"
+				);
+
+			}
+
+			//line = restore_subsyntax(line2, ',');
+			if (line2 ne line) {
+				line = line2;
+				replaced = true;
+				printl('+', line.replace("\t", "    "));
+			}
 
 		}
 

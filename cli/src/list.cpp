@@ -460,7 +460,7 @@ function main() {
 
 		//if not DOS then dont force html or force output to file
 	} else {
-		html = SYSTEM.f(2).lcase().substr(-3, 3) eq "htm";
+		html = SYSTEM.f(2).lcase().ends("htm");
 	}
 
 	if (html) {
@@ -609,7 +609,7 @@ nextphrase:
 
 phraseinit:
 	///////////
-	if (word.b(1, 4) eq "SORT" or word.b(1, 5) eq "NSORT") {
+	if (word.starts("SORT") or word.starts("NSORT")) {
 		ss ^= "SSELECT";
 
 filename:
@@ -632,7 +632,7 @@ filename:
 			gosub getword();
 			filename = "DICT." ^ word;
 		}
-		if (filename.b(1, 5) eq "DICT.") {
+		if (filename.starts("DICT.")) {
 			dictfilename = "VOC";
 		} else {
 			dictfilename = filename;
@@ -683,7 +683,7 @@ nextkey:
 			}
 		}
 
-	} else if ((word.b(1, 4) eq "LIST" or word.b(1, 5) eq "NLIST") or word eq "XLIST") {
+	} else if ((word.starts("LIST") or word.starts("NLIST")) or word eq "XLIST") {
 		ss ^= "SELECT";
 		goto filename;
 
@@ -914,7 +914,7 @@ nextkey:
 		}  //loop;
 
 		//prevent trailing colon folding onto following line
-		if (title.substr(-2, 2) eq " :") {
+		if (title.ends(" :")) {
 			title.splicer(-2, 2, "&nbsp;:");
 		}
 
@@ -1888,7 +1888,7 @@ recexit:
 				tt = oconv(tt, oconvx);
 				if (html) {
 					if (tt[1] eq "-") {
-						if (oconvx.b(1, 7) eq "[NUMBER") {
+						if (oconvx.starts("[NUMBER")) {
 							tt = "<nobr>" ^ tt ^ "</nobr>";
 						}
 					}
@@ -1918,7 +1918,7 @@ recexit:
 					} else {
 						//tx1:=td0:'<td bgcolor=':field(tt,' ',1)[2,9999]:'>'
 						//TODO do with class? to save document space?
-						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).substr(2, 9999) ^ "\">";
+						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).b(2, 9999) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= tt ^ tdx;
@@ -2207,7 +2207,7 @@ subroutine getwordexit() {
 	if (DICT eq "") {
 		goto dictvoc;
 	}
-	if (not(html) and word.substr(-5, 5) == "_LINK")
+	if (not(html) and word.ends("_LINK"))
 		word.splicer(-5, 5, "");
 	if (dictrec.reado(DICT, word)) {
 maindict:
@@ -2319,7 +2319,7 @@ subroutine printbreaks() {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 				//WARNING TODO: check ternary op following;
 				underline2 = leveln eq 1 ? underline : bar;
-				if (not((tx.substr(-2, 2)).contains(ulchar))) {
+				if (not((tx.last(2)).contains(ulchar))) {
 					if (tx[-1] ne FM) {
 						tx ^= FM;
 					}

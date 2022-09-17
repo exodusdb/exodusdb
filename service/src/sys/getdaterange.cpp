@@ -29,7 +29,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 		uptoquestion = "Up to date ?";
 	}
 	if (ifromdate eq "") {
-		var fromdate = var().date();
+		var fromdate = date();
 	}
 	if (defaultperiod.unassigned()) {
 		defaultperiod = "";
@@ -38,7 +38,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 	var fromdate = oconv(ifromdate, "[DATE,*4]");
 inpfromdate:
 	call note(fromquestion, "RCE", fromdate, "");
-	if (fromdate eq "" or fromdate eq var().chr(27)) {
+	if (fromdate eq "" or fromdate eq chr(27)) {
 	//cancel:
 		ifromdate = "";
 		iuptodate = "";
@@ -57,11 +57,11 @@ inpfromdate:
 	}
 	if (iuptodate eq "" or not(iuptodate.isnum())) {
 		if (iuptodate eq "TODAY") {
-			iuptodate = var().date();
+			iuptodate = date();
 		} else if (iuptodate eq "YESTERDAY") {
-			iuptodate = var().date() - 1;
+			iuptodate = date() - 1;
 		} else if (iuptodate eq "TOMORROW") {
-			iuptodate = var().date() + 1;
+			iuptodate = date() + 1;
 		} else if (iuptodate.match("^\\d*D$")) {
 			iuptodate = ifromdate2 + iuptodate.b(1, iuptodate.len() - 1);
 		} else if (iuptodate.match("^\\d*W$")) {
@@ -77,7 +77,7 @@ inpfromdate:
 	var uptodate = oconv(iuptodate, "[DATE,*4]");
 inpuptodate:
 	call note(uptoquestion, "RCE", uptodate, "");
-	if (uptodate eq "" or uptodate eq var().chr(27)) {
+	if (uptodate eq "" or uptodate eq chr(27)) {
 		goto inpfromdate;
 	}
 

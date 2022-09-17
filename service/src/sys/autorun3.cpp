@@ -196,10 +196,10 @@ readdoc:
 	//determine current datetime
 currdatetime:
 /////////////
-	var itime = var().time();
-	var idate = var().date();
+	var itime = time();
+	var idate = date();
 	//handle rare case where passes midnight between time() and date()
-	if (var().time() lt itime) {
+	if (time() lt itime) {
 		goto currdatetime;
 	}
 	var currdatetime = idate + itime / 86400;
@@ -248,7 +248,7 @@ currdatetime:
 		//hour of day restrictions
 		var hours = restrictions.f(2);
 		if (hours ne "") {
-			var hournow = itime.oconv("MT").substr(1, 2) + 0;
+			var hournow = itime.oconv("MT").first(2) + 0;
 
 			//if one hour then treat it as a minimum hour
 			if (hours.isnum()) {
@@ -446,7 +446,7 @@ preventsameday:
 						}
 					}
 
-					idate = var().date();
+					idate = date();
 					agp = "";
 					call holiday("GETTYPE", idate, usercode, userx, marketcode, market, agp, holidaytype, workdate);
 
@@ -512,7 +512,7 @@ nextuser:;
 
 	//check if runasuser is authorised to run the task
 	if (authtasks) {
-		var ntasks = authtasks.count(VM) + 1;
+		let ntasks = authtasks.count(VM) + 1;
 		for (const var taskn : range(1, ntasks)) {
 			var task = authtasks.f(1, taskn);
 			if (not(authorised(task, msg_, "", runasusercode))) {
@@ -529,7 +529,7 @@ nextuser:;
 		printl("running as ", runasusercode);
 	}
 
-	var fromdate = var().date();
+	var fromdate = date();
 	fromtime = ostime();
 
 	ndocsprocessed += 1;
@@ -551,7 +551,7 @@ nextuser:;
 	//override the saved period with a current period
 
 	//get today's period
-	var runtimeperiod = var().date().oconv("D2/E").substr(4, 5);
+	var runtimeperiod = date().oconv("D2/E").b(4, 5);
 	if (runtimeperiod[1] eq "0") {
 		runtimeperiod.splicer(1, 1, "");
 	}
@@ -560,16 +560,16 @@ nextuser:;
 	//TODO
 
 	USER1.replacer("{RUNTIME_PERIOD}", runtimeperiod);
-	iodat_.replacer("{TODAY}", var().date());
-	USER1.replacer("{7DAYSAGO}", var().date() - 7);
-	iodat_.replacer("{14DAYSAGO}", var().date() - 14);
-	USER1.replacer("{21DAYSAGO}", var().date() - 21);
-	iodat_.replacer("{28DAYSAGO}", var().date() - 28);
-	USER1.replacer("{30DAYSAGO}", var().date() - 30);
-	iodat_.replacer("{60DAYSAGO}", var().date() - 60);
-	USER1.replacer("{90DAYSAGO}", var().date() - 90);
-	iodat_.replacer("{YESTERDAY}", var().date() - 1);
-	USER1.replacer("{TOMORROW}", var().date() + 1);
+	iodat_.replacer("{TODAY}", date());
+	USER1.replacer("{7DAYSAGO}", date() - 7);
+	iodat_.replacer("{14DAYSAGO}", date() - 14);
+	USER1.replacer("{21DAYSAGO}", date() - 21);
+	iodat_.replacer("{28DAYSAGO}", date() - 28);
+	USER1.replacer("{30DAYSAGO}", date() - 30);
+	iodat_.replacer("{60DAYSAGO}", date() - 60);
+	USER1.replacer("{90DAYSAGO}", date() - 90);
+	iodat_.replacer("{YESTERDAY}", date() - 1);
+	USER1.replacer("{TOMORROW}", date() + 1);
 	if (iodat_.contains("{2WORKINGDAYSAGO}")) {
 		daysago = 2;
 		gosub getdaysago();
@@ -595,7 +595,7 @@ nextsign:
 	tt = USER1.index("{TODAY" ^ sign);
 	if (tt) {
 		var t2 = (iodat_.b(tt + 1, 999999)).field("}", 1);
-		USER1.replacer("{" ^ t2 ^ "}", var().date() + t2.b(6, 999999));
+		USER1.replacer("{" ^ t2 ^ "}", date() + t2.b(6));
 	}
 	if (sign eq "-") {
 		sign = "+";
@@ -622,7 +622,7 @@ nextsign:
 		subject ^= ": %RESULT%" ^ sys.document.f(2);
 
 		//email it
-		if (response_.b(1, 2) ne "OK" or printfilename.osfile().f(1) lt 10) {
+		if (response_.first(2) ne "OK" or printfilename.osfile().f(1) lt 10) {
 
 			//plain "OK" with no file means nothing to email
 			if (USER3 eq "OK") {
@@ -631,7 +631,7 @@ nextsign:
 
 			body = "";
 			body(-1) = response_;
-			if (USER3.b(1, 6) eq "Error:") {
+			if (USER3.starts("Error:")) {
 				response_.splicer(1, 6, "Result:");
 			}
 			if (USER3.contains("Error")) {
@@ -647,8 +647,8 @@ nextsign:
 			//treat all errors as system errors for now
 			//since autorun doesnt really know a user to send them to
 			//NB programs should return OK+message if no report is required (eg "OK no ads found")
-			if (USER3.b(1, 2) eq "OK") {
-				response_ = USER3.b(3, 999999).trimf();
+			if (USER3.starts("OK")) {
+				response_ = USER3.b(3).trimf();
 			} else {
 				call sysmsg(subject ^ FM ^ body);
 				goto nextdoc;
@@ -678,7 +678,7 @@ nextsign:
 
 			subject.replacer("%RESULT%", "");
 		}
-		body.replacer(FM, var().chr(13));
+		body.replacer(FM, chr(13));
 
 		// Option to force the actual email recipient
 		var system117 = SYSTEM.f(117);
@@ -713,7 +713,7 @@ subroutine exec() {
 	//generate a unique random output file
 	while (true) {
 		//linkfilename2=inpath:str(rnd(10^15),8)[1,8]
-		linkfilename2 = inpath ^ ("00000000" ^ var(99999999).rnd()).substr(-8, 8);
+		linkfilename2 = inpath ^ ("00000000" ^ var(99999999).rnd()).last(8);
 		///BREAK;
 		if (not(oslistf(linkfilename2 ^ ".*"))) break;
 	}//loop;
@@ -745,7 +745,7 @@ subroutine exec2() {
 	//print @(0):@(-4):localtime 'MTS':' AUTORUN ':docid:
 	//similar in LISTEN and AUTORUN
 	printl();
-	print(var().time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(FM, " "), " ", sys.document.f(2), ":");
+	print(time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(FM, " "), " ", sys.document.f(2), ":");
 
 	//print 'link',linkfilename2
 	//print 'request',request
@@ -811,7 +811,7 @@ subroutine exec2() {
 	}
 
 	//no records are not system errors
-	if (USER3.b(1, 9) eq "No record" or response_.b(1, 7) eq "No item") {
+	if (USER3.starts("No record") or response_.starts("No item")) {
 		USER3.splicer(1, 0, "OK ");
 		msg_ = "";
 	}
@@ -823,7 +823,7 @@ subroutine exec2() {
 	}
 
 	//send errors to exodus
-	if (USER3 eq "" or response_.b(1, 2) ne "OK") {
+	if (USER3 eq "" or response_.first(2) ne "OK") {
 		if (not USER3) {
 			response_ = "No response from " ^ voccmd;
 		}
@@ -912,7 +912,7 @@ subroutine getdaysago() {
 		}
 	}
 
-	xdate = var().date();
+	xdate = date();
 	while (true) {
 		xdate -= 1;
 		if (not(weekend.contains((xdate - 1).mod(7) + 1))) {

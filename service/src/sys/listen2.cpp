@@ -193,7 +193,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				for (failn = 1; failn <= 999999; failn++) {
 					var tt = userx.f(18, failn);
 					///BREAK;
-					if (not(tt ne "" and tt.b(1, 2) ne "OK")) break;
+					if (not(tt ne "" and tt.first(2) ne "OK")) break;
 				} //failn;
 				//do normal authorisation to show type of failure - but fail even if ok
 				//if failn>=maxnfails then
@@ -204,7 +204,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
                    goto validateexit;
                 }
 				//check account expiry
-				if (userx.f(35) and var().date() ge userx.f(35)) {
+				if (userx.f(35) and date() ge userx.f(35)) {
 
 					realreason = "Login user account expired";
 
@@ -443,7 +443,7 @@ exoduslocalip:
 
 						//int() to ignore time of day so expiring in one day means they can
 						//login on the day that the password was changed
-						if (var().date() ge passworddate.floor() + passwordexpirydays) {
+						if (date() ge passworddate.floor() + passwordexpirydays) {
 							goto passwordexpired;
 						}
 
@@ -466,7 +466,7 @@ exoduslocalip:
 						}
 
 						//int() to remove time part of date
-						if (var().date() ge lastlogindate.floor() + maxnologindays) {
+						if (date() ge lastlogindate.floor() + maxnologindays) {
 
 passwordexpired:
 
@@ -703,7 +703,7 @@ validateexit2:
 						//ONLY if user has an email address
 						//and account is not expired
 						var expirydate = RECORD.f(35);
-						if (RECORD.f(7) and ((expirydate eq "" or expirydate gt var().date()))) {
+						if (RECORD.f(7) and ((expirydate eq "" or expirydate gt date()))) {
 
 							//signify ok
 							passwordreset = 2;
@@ -737,7 +737,7 @@ validateexit2:
 				if (passwordreset ne 2) {
 
 					//datetime=(date():'.':time() 'R(0)#5')+0
-					var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+					var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 					RECORD.inserter(15, 1, datetime);
 					RECORD.inserter(16, 1, connection.f(1, 2));
 					text.replacer("username and/or ", "");
@@ -897,8 +897,8 @@ validateexit2:
 				key ^= "*" ^ connection.f(1, 5);
 				key ^= "*" ^ username;
 				key ^= "*" ^ connection.f(1, 3);
-				key ^= "*" ^ var().date();
-				var tt = (var().time() / 3600).floor() + 1;
+				key ^= "*" ^ date();
+				var tt = (time() / 3600).floor() + 1;
 				key ^= "*" ^ tt;
 				var statistic;
 				if (not(statistic.read(statistics, key))) {
@@ -907,7 +907,7 @@ validateexit2:
 				//to avoid garbagecollect delay required to avoid MD conversion bug
 				//by not doing 'MD50P'
 				//statistic<1>=(date()+time()/86400) 'MD50P'
-				statistic(1) = (var().date() + var().time() / 86400).substr(1, 12);
+				statistic(1) = (date() + time() / 86400).first(12);
 				if (origrequest1 ne "RELOCK") {
 					statistic(2) = statistic.f(2) + 1;
 				}
@@ -977,7 +977,7 @@ validateexit2:
 
 			//save current login
 			//datetime=(date():'.':time() 'R(0)#5')+0
-			var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+			var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 			userrec(13) = datetime;
 			userrec(14) = SYSTEM.f(40, 2);
 

@@ -46,7 +46,7 @@ function main(in nextcompanycode) {
 		}
 	} else {
 		sys.company = "";
-		sys.company(2) = var().date().oconv("D2/E").field("/", 2, 2);
+		sys.company(2) = date().oconv("D2/E").field("/", 2, 2);
 	}
 
 	//in LISTEN2 and INIT.COMPANY
@@ -78,17 +78,17 @@ function main(in nextcompanycode) {
 	var dateformat = sys.company.f(10);
 	if (dateformat eq "") {
 		DATEFMT = "D2/E";
-	} else if (dateformat.b(1, 6) eq "31/01/") {
+	} else if (dateformat.starts("31/01/")) {
 		DATEFMT = "D2/E";
-	} else if (dateformat.b(1, 6) eq "31-01-") {
+	} else if (dateformat.starts("31-01-")) {
 		DATEFMT = "D2-E";
 	} else if (dateformat eq "31 JAN 90") {
 		DATEFMT = "D2E";
 	} else if (dateformat eq "31 JAN 90.") {
 		DATEFMT = "D2";
-	} else if (dateformat.b(1, 6) eq "01/31/") {
+	} else if (dateformat.starts("01/31/")) {
 		DATEFMT = "D2/";
-	} else if (dateformat.b(1, 6) eq "01-31-") {
+	} else if (dateformat.starts("01-31-")) {
 		DATEFMT = "D2-";
 	//CASE DATE.FORMAT[-6,6]='90/01/31';@DATE.FORMAT='D2J'
 

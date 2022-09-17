@@ -42,8 +42,10 @@ function main(in msg0, io time0) {
 			return "";
 		}
 
-		//try multiple start points in case hit middle of multibyte character
-		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
+		// Try multiple start points in case hit middle of multibyte character
+		// space to defeat convsyntax
+		for ( var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
+		//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
 		//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
 			call osbread(datax, logfile, ptr, 1024);
 			//if any data then break out of loop
@@ -67,8 +69,8 @@ function main(in msg0, io time0) {
 	var entry = "";
 	if (TERMINAL) {
 		//entry:=oconv(date(),'D2-J')
-		entry = var().date().oconv("D2-E");
-		entry = entry.substr(-2, 2) ^ "-" ^ entry.b(1, 5);
+		entry = date().oconv("D2-E");
+		entry = entry.last(2) ^ "-" ^ entry.first(5);
 		entry ^= sep_ ^ time2.oconv("MTS") ^ sep_;
 		//entry:=field(time2,'.',2) 'MD20P'
 	}

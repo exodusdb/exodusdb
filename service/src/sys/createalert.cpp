@@ -125,7 +125,7 @@ syntax:
 	call generalalerts(alerttype, runasuser, authtasks, title, request, datax);
 
 	if (authtasks) {
-		var ntasks = authtasks.count(VM) + 1;
+		let ntasks = authtasks.count(VM) + 1;
 		for (const var taskn : range(1, ntasks)) {
 			var task = authtasks.f(1, taskn);
 			if (not(authorised(task, msg, "", runasusercode))) {

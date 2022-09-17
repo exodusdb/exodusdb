@@ -412,7 +412,7 @@ subroutine getversiondates() {
 	call osread(versionlog, "upgrade.cfg");
 	//versionlog=trim(field(versionlog,\1A\,1))
 	versionlog.converter("\r\n", FM);
-	var nn = versionlog.count(FM) + (versionlog ne "");
+	let nn = versionlog.count(FM) + (versionlog ne "");
 	var versiondata = "";
 	for (const var ii : range(1, nn)) {
 		idate = versionlog.f(ii, 1).field(" ", 2, 3).iconv("D");

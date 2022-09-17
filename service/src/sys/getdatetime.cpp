@@ -16,9 +16,9 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 	//by ensuring time is not less than time1
 	//which could happen over midnight
 	while (true) {
-		var systime1 = var().time();
-		sysdate = var().date();
-		systime = var().time();
+		var systime1 = time();
+		sysdate = date();
+		systime = time();
 		///BREAK;
 		if (systime ge systime1) break;
 	}//loop;

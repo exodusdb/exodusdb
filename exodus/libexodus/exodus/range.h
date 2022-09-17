@@ -10,12 +10,12 @@ namespace exodus {
 // "for (int i : range(1 to 10))"
 // https://www.internalpointers.com/post/writing-custom-iterators-modern-cpp
 // defined in header to be inlined for performance which is critical
-#define INT_T int
 class PUBLIC range {
-	using int_t = INT_T;
+	using int_t = int;
 
 	int first_;
 	int last_;
+	int inc_;
 
  public:
 
@@ -48,7 +48,7 @@ class PUBLIC range {
 	};
 
 	// Construct a range from two ints
-	range(int_t first, int_t last) : first_(first), last_(last + 1) {}
+	range(int_t first, int_t last, int_t inc = 0) : first_(first), last_(last + 1), inc_(inc) {}
 
 	// Return our first int
 	Iterator begin() { return Iterator(first_); }

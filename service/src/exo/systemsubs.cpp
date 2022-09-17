@@ -45,7 +45,7 @@ function main(in mode0) {
 	else if (mode.field(",", 1) == "PREDELETE") ;
 	else if (mode.field(",", 1) == "POSTDELETE") {
 	} else {
-		var().chr(7).output();
+		chr(7).output();
 		call mssg(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored");
 		//valid=0
 	}

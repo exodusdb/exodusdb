@@ -85,9 +85,9 @@ function main() {
 	if (datemode gt 1) {
 		var selectcmd = "SELECT STATISTICS WITH DATE ";
 		if (datemode eq 2) {
-			reqdate = var().date();
+			reqdate = date();
 		} else {
-			reqdate = var().date() - 1;
+			reqdate = date() - 1;
 		}
 
 		selectcmd ^= reqdate.oconv("D4").quote();
@@ -111,7 +111,7 @@ function main() {
 	}
 
 	var datafield = "REQUESTS";
-	var nrowfields = rowfields.count(VM) + 1;
+	let nrowfields = rowfields.count(VM) + 1;
 	call crosstab(filename, rowfields, colfield, datafield, output);
 
 	var nrows = output.count(FM) + 1;

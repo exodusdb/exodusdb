@@ -65,7 +65,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 	var allchars = "";
 	for (const var ii : range(32, 255)) {
-		allchars ^= var().chr(ii);
+		allchars ^= chr(ii);
 	} //ii;
 	allchars.converter("0123456789-", "");
 

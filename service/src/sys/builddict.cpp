@@ -113,7 +113,7 @@ subroutine writedict() {
 	// The various dict titles will be multivalues
 	// found in the base dict record which has no suffix.
 	var suffix_from = blockid.field("|", 2);
-	var suffix_upto = blockid.field("|", 3);
+	let suffix_upto = blockid.field("|", 3);
 
 	var basedictrec;
 	for (var suffixno : range(suffix_from, suffix_upto)) {
@@ -174,7 +174,7 @@ subroutine writedict() {
 			dictrec(3) = basedictrec.f(3, suffixno);
 
 		if (dictrec ne origdictrec) {
-			printl(var().chr(12), dictid);
+			printl(chr(12), dictid);
 			printl();
 			printl("---------- OLD ", dictid, " ----------");
 			printl(origdictrec.f(8).replace(VM, "\n"));
@@ -265,7 +265,8 @@ addline:
 					var macrotext = raise(raise(macros.f(3, macron)));
 
 					var nmlns = macrotext.count(FM) + 1;
-					for (var mln = 1; mln <= nmlns; ++mln) {
+					// Additional space to defeat convsyntax until clang-format
+					for ( var mln = 1; mln <= nmlns; mln++) {
 						var mline0 = macrotext.f(mln).convert("\t"," ");
 						var mline = mline0.trim(" ");
 						var mword1 = mline.field(" ", 1);

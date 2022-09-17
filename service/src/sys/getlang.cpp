@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var nn;
+//var nn;
 var progname;
 var languagecode;
 var langkey;
@@ -53,11 +53,12 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 			lang = "";
 			var n1 = lang1.count(FM) + 1;
 			var n2 = lang2.count(FM) + 1;
-			if (n1 lt n2) {
-				nn = n2;
-			} else {
-				nn = n1;
-			}
+//			if (n1 lt n2) {
+//				nn = n2;
+//			} else {
+//				nn = n1;
+//			}
+			let nn = (n1 < n2) ? n2 : n1;
 			for (const var fn : range(1, nn)) {
 				//lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
 				var lang1line = lang1.f(fn);
@@ -121,7 +122,7 @@ exit:
 
 	var custlang;
 	if (custlang.read(DEFINITIONS, "LANGUAGE*" ^ langkey)) {
-		nn = custlang.count(FM) + 1;
+		let nn = custlang.count(FM) + 1;
 		for (const var fn : range(1, nn)) {
 			var tt = custlang.f(fn);
 			if (tt.len()) {
@@ -202,10 +203,10 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 		lang = raise(lang.f(1));
 
 		//strip out English pretext
-		if (lang.contains(var().chr(170))) {
-			nn = lang.count(FM) + 1;
+		if (lang.contains(chr(170))) {
+			let nn = lang.count(FM) + 1;
 			for (const var ii : range(1, nn)) {
-				var tt = lang.f(ii).field(var().chr(170), 2);
+				var tt = lang.f(ii).field(chr(170), 2);
 				if (tt) {
 					lang(ii) = tt;
 				}

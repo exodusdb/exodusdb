@@ -9,7 +9,7 @@ function main(io tx) {
         //TODO consider merging with readcss() perhaps with mode
 
 	//in revelation get from GBP file
-        //tx = var("$SORT.JS").xlate("GBP", "", "X").substr(1,0x1A) ^ "\r\n";
+        //tx = var("$SORT.JS").xlate("GBP", "", "X").b(1,0x1A) ^ "\r\n";
 
 	//in c++ get from raw text string below
 	tx=getvogonpoetry();
@@ -168,4 +168,3 @@ if (!document.swapNode) {
 }
 
 libraryexit()
-

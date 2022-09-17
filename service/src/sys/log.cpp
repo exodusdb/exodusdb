@@ -35,7 +35,7 @@ function main(in programname0, in text0) {
 	//update the log
 	///////////////
 
-	var year = var().date().oconv("D").substr(-4, 4);
+	var year = date().oconv("D").last(4);
 	if (s33) {
 		xstation = SYSTEM.f(40, 2);
 		} else {
@@ -60,7 +60,7 @@ function main(in programname0, in text0) {
 
 getlogkey:
 		time = ostime();
-		var logkey = xstation.trim() ^ "*" ^ USERNAME ^ "*" ^ var().date() ^ "*" ^ time;
+		var logkey = xstation.trim() ^ "*" ^ USERNAME ^ "*" ^ date() ^ "*" ^ time;
 		if (xx.read(log, logkey)) {
 			goto getlogkey;
 		}
@@ -84,7 +84,7 @@ getlogkey:
 		var subject = "EXODUS Log: " ^ SYSTEM.f(17) ^ " " ^ programname;
 
 		var body = "";
-		body ^= FM ^ "Date=" ^ var().date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local";
+		body ^= FM ^ "Date=" ^ date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local";
 		body ^= FM ^ "Server=" ^ SYSTEM.f(44).trim();
 		body ^= FM ^ "Install=" ^ oscwd();
 		//osread ver from 'general\version.dat' then

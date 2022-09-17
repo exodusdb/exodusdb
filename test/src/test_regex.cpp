@@ -154,6 +154,46 @@ programinit()
 		assert(regex_replace("abababab", "a.", "xy").outputl() eq "xyxyxyxy");	//regex
 	}
 
+	{
+		var utf8 = "αβγδεΑΒΓΔΕ";
+		var notutf8 = "       \xff"_var;
+		TRACE(notutf8.oconv("HEX"))
+
+		// MATCHING
+
+		// bad data
+		try {
+			notutf8.match("X").errputl();
+			assert(false);
+		} catch (VarError e) {errputl(e.description);}
+
+		// bad target
+		try {
+			utf8.match(notutf8).errputl();
+			assert(false);
+		} catch (VarError e) {errputl(e.description);}
+
+		// REPLACING
+
+		// bad data
+		try {
+			notutf8.regex_replace("X", "Y").errputl();
+			assert(false);
+		} catch (VarError e) {errputl(e.description);}
+
+		// bad target
+		try {
+			utf8.regex_replace(notutf8, "Y").errputl();
+			assert(false);
+		} catch (VarError e) {errputl(e.description);}
+
+		// bad replacement
+		try {
+			utf8.regex_replace("X", notutf8).errputl();
+			assert(false);
+		} catch (VarError e) {errputl(e.description);}
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

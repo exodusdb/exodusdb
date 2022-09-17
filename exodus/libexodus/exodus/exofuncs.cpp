@@ -469,29 +469,29 @@ PUBLIC var space(const int number) {
 }
 
 
-PUBLIC var fcount(CVR instring, SV substrx) {
-	return instring.fcount(substrx);
+PUBLIC var fcount(CVR instring, SV substr) {
+	return instring.fcount(substr);
 }
 
-PUBLIC var count(CVR instring, SV substrx) {
-	return instring.count(substrx);
+PUBLIC var count(CVR instring, SV substr) {
+	return instring.count(substr);
 }
 
 
-PUBLIC var substr(CVR instring, const int startx) {
-	return instring.substr(startx);
+PUBLIC var substr(CVR instring, const int startindex) {
+	return instring.substr(startindex);
 }
 
-PUBLIC var substr(CVR instring, const int startx, const int length) {
-	return instring.substr(startx, length);
+PUBLIC var substr(CVR instring, const int startindex, const int length) {
+	return instring.substr(startindex, length);
 }
 
-PUBLIC VARREF substrer(VARREF iostring, const int startx) {
-	return iostring.substrer(startx);
+PUBLIC VARREF substrer(VARREF iostring, const int startindex) {
+	return iostring.substrer(startindex);
 }
 
-PUBLIC VARREF substrer(VARREF iostring, const int startx, const int length) {
-	return iostring.substrer(startx, length);
+PUBLIC VARREF substrer(VARREF iostring, const int startindex, const int length) {
+	return iostring.substrer(startindex, length);
 }
 
 
@@ -512,25 +512,25 @@ PUBLIC bool contains(CVR instring, SV substr) {
 //	return instring.index(substr);
 //}
 
-PUBLIC var index(CVR instring, SV substr, const int startcharno) {
-	return instring.index(substr, startcharno);
+PUBLIC var index(CVR instring, SV substr, const int startindex) {
+	return instring.index(substr, startindex);
 }
 
 PUBLIC var indexn(CVR instring, SV substr, const int occurrenceno) {
 	return instring.indexn(substr, occurrenceno);
 }
 
-PUBLIC var indexr(CVR instring, SV substr, const int startcharno) {
-	return instring.indexr(substr, startcharno);
+PUBLIC var indexr(CVR instring, SV substr, const int startindex) {
+	return instring.indexr(substr, startindex);
 }
 
 
-PUBLIC var field(CVR instring, SV substrx, const int fieldnx, const int nfieldsx) {
-	return instring.field(substrx, fieldnx, nfieldsx);
+PUBLIC var field(CVR instring, SV substr, const int fieldno, const int nfields) {
+	return instring.field(substr, fieldno, nfields);
 }
 
-PUBLIC var field2(CVR instring, SV substrx, const int fieldnx, const int nfieldsx) {
-	return instring.field2(substrx, fieldnx, nfieldsx);
+PUBLIC var field2(CVR instring, SV substr, const int fieldno, const int nfields) {
+	return instring.field2(substr, fieldno, nfields);
 }
 
 /* moved to exoprog to allow custom conversions like "[DATE]"
@@ -739,10 +739,10 @@ PUBLIC var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode)
 }
 */
 
-// PUBLIC var remove(CVR fromstr, VARREF startx, VARREF delimiterno)
-PUBLIC var substr2(CVR fromstr, VARREF startx, VARREF delimiterno) {
-	// return fromstr.remove(startx,delimiterno);
-	return fromstr.substr2(startx, delimiterno);
+// PUBLIC var remove(CVR fromstr, VARREF startindex, VARREF delimiterno)
+PUBLIC var substr2(CVR fromstr, VARREF startindex, VARREF delimiterno) {
+	// return fromstr.remove(startindex,delimiterno);
+	return fromstr.substr2(startindex, delimiterno);
 }
 
 PUBLIC var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement) {

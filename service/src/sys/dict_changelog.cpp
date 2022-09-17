@@ -28,4 +28,3 @@ function main() {
 	return ANS;
 }
 libraryexit(text2)
-

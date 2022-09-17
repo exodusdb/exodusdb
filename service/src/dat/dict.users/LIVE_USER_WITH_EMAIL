@@ -7,7 +7,7 @@ S
 
 	if (RECORD.f(7)) {\
 		var expired = RECORD.f(35);\
-		if (expired and expired le var().date()) {\
+		if (expired and expired le date()) {\
 			ANS = 0;\
 		} else {\
 			ANS = 1;\

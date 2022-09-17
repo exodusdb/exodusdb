@@ -42,9 +42,11 @@ function main(io colhdg, in thproperties, in nobase0) {
 
 	var thprop = thproperties;
 	var nocell = "%~%";
-	for (const var rown : range(1, nrows)) {
+	// Additional space to defeat convsyntax until clanf-format
+	for ( var rown = 1; rown <= nrows; rown++) {
 
-		for (var coln = 1; coln <= ncols2; coln++) {
+		// Additional space to defeat convsyntax until clang-format
+		for ( var coln = 1; coln <= ncols2; coln++) {
 		// Reverted because we do need to skip coln's
 		//for (const var coln : range(1, ncols2)) {
 

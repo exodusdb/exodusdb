@@ -289,7 +289,7 @@ function main() {
 //		pidfilename = SYSTEM.f(54, 5) ^ ".pid";
 //	} else {
 		pidfilename = "/run/neo/neo@" ^ SYSTEM.f(17);
-		if (SYSTEM.f(17).substr(-5) eq "_test") {
+		if (SYSTEM.f(17).ends("_test")) {
 			pidfilename.replacer("neo@", "tst@");
 			pidfilename.replacer("_test", "");
 			pidfilename ^= ".pid";
@@ -411,12 +411,12 @@ updateversion:
 
 //	call log2("*reattach data", logtime);
 //	var volumesx = VOLUMES;
-//	var nvolumes = VOLUMES.count(FM) + 1;
+//	let nvolumes = VOLUMES.count(FM) + 1;
 //	for (const var volumen : range(1, nvolumes)) {
 //		var volume = volumesx.f(volumen);
 //		var tpath = "../" "DATA" "/";
 //		tpath.converter("/", OSSLASH);
-//		if (volume.b(1, 8) eq tpath) {
+//		if (volume.first(8) eq tpath) {
 //			execute("ATTACH " ^ volume ^ " (S)");
 //		}
 //	} //volumen;
@@ -511,7 +511,7 @@ nextreport:
 	}
 
 	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
-		var().chr(7).output();
+		chr(7).output();
 		msg = "The DEFINITIONS file is missing";
 		msg(-1) = "Did you startup using the right command file/datasettype?";
 		call note(msg);
@@ -533,7 +533,7 @@ nextreport:
 			call log2("*inform user and close", logtime);
 			msg = var("594F552043414E4E4F5420555345204E454F53595320534F465457415245204F4E205448495320434F4D50555445527C554E54494C20594F5520484156452054484520415554484F5249534154494F4E204E554D4245522E").iconv("HEX2");
 
-			//var().chr(7).output().str(3);
+			//chr(7).output().str(3);
 			call note(msg);
 			perform("OFF");
 			logoff();
@@ -558,7 +558,7 @@ nextreport:
 	if (((initmode ne "LOGIN" and LEVEL ne 1) and interactive) and not(resetting)) {
 		msg = "You cannot quit from within another program via F10.";
 		msg(-1) = "Please quit all programs first and then try again.";
-		var().chr(7).output();
+		chr(7).output();
 		call note(msg);
 		stop();
 	}
@@ -595,8 +595,8 @@ nextreport:
 			END;
 	*/
 	call log2("*update \"last used date\"", logtime);
-	if (var().date() ne lastdate) {
-		config(1) = var().date();
+	if (date() ne lastdate) {
+		config(1) = date();
 		//call OSWRITE(CONFIG,'exodus.cfg')
 		var(config).oswrite("exodus.cfg");
 	}
@@ -607,7 +607,7 @@ nextreport:
 		msg ^= FM ^ "YOUR WORKSTATION NAME (" ^ STATION.trim() ^ ")";
 		msg ^= FM ^ "CONTAINS QUOTATION MARKS. PLEASE ASK YOUR ";
 		msg ^= FM ^ "TECHNICIAN TO CHANGE THE WORKSTATION NAME.";
-		var().chr(7).output();
+		chr(7).output();
 		call note("!" ^ msg ^ "|");
 	}
 
@@ -923,14 +923,14 @@ nextreport:
 //	//not Windows
 //	} else {
 		//Description:\tUbuntu 18.04.3 LTS\n
-		ver = shell2("lsb_release -d").field(var().chr(9), 2).trim();
+		ver = shell2("lsb_release -d").field(chr(9), 2).trim();
 		ver.popper();
 
 		//CPU(s):              2
 		//Thread(s) per core:  1
 		//Core(s) per socket:  2
-		//var nthreads_percpu = (((shell2("lscpu|grep \"Thread(s) per core\"")).field(":", 2)).field(var().chr(10), 1)).trim();
-		//var ncpus = (((shell2("lscpu|grep \"CPU(s)\"")).field(":", 2)).field(var().chr(10), 1)).trim();
+		//var nthreads_percpu = (((shell2("lscpu|grep \"Thread(s) per core\"")).field(":", 2)).field(chr(10), 1)).trim();
+		//var ncpus = (((shell2("lscpu|grep \"CPU(s)\"")).field(":", 2)).field(chr(10), 1)).trim();
 		//if (nthreads_percpu.isnum() and ncpus.isnum()) {
 		//	SYSTEM(9) = nthreads_percpu * ncpus;
 		var ncpus = shell2("nproc").field("\n").trim();
@@ -953,15 +953,15 @@ nextreport:
 	} else {
 //		if (VOLUMES) {
 //			cpu = shell2("wmic CPU GET NAME", xx);
-//			if (cpu.b(1, 2) eq _RM _FM) {
+//			if (cpu.first(2) eq _RM _FM) {
 //				cpu.splicer(1, 2, "");
-//				cpu.converter(var().chr(0), "");
+//				cpu.converter(chr(0), "");
 //			}
 //			cpu.replacer("\r\n", FM);
 //			cpu.remover(1);
 //		} else {
-			cpu = ((shell2("cat /proc/cpuinfo|grep -i \"model name\"")).field(var().chr(9), 2)).trim();
-			cpu.converter(var().chr(10), FM);
+			cpu = ((shell2("cat /proc/cpuinfo|grep -i \"model name\"")).field(chr(9), 2)).trim();
+			cpu.converter(chr(10), FM);
 			cpu.converter(":", "");
 			cpu.trimmer();
 //		}
@@ -1032,12 +1032,12 @@ nextreport:
 	if (freemb lt reqfreemb * notherusers) {
 	//if 1 then
 		msg = "THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE";
-		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().substr(1, 2) ^ " but";
+		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().first(2) ^ " but";
 		msg ^= "|there is only " ^ freemb ^ "Mb available.";
 		if (notherusers) {
 			msg ^= "||There is/are " ^ notherusers ^ " other users online.";
 		}
-		var().chr(7).output();
+		chr(7).output();
 		call note(msg ^ "|");
 		//stop
 		//if freemb then perform 'OFF'
@@ -1068,7 +1068,7 @@ nextreport:
 //		call log2("*find cygwin", logtime);
 //		var locations = SYSTEM.f(50);
 //		locations(1, -1) = "C:\\CYGWIN\\BIN\\,\\CYGWIN\\BIN\\,..\\..\\CYGWIN\\BIN\\";
-//		var nn = locations.count(",") + 1;
+//		let nn = locations.count(",") + 1;
 //		for (const var ii : range(1, nn)) {
 //			var location = locations.field(",", ii);
 //			if (location[-1] ne "\\") {
@@ -1105,8 +1105,8 @@ nextreport:
 //			tt = result.index("proxy server(s)");
 //			if (tt) {
 //				//tt=result[tt,';'][1,char(13)]
-//				tt = result.b(tt, 9999);
-//				tt = tt.field(";", 1).field(var().chr(13), 1);
+//				tt = result.b(tt);
+//				tt = tt.field(";", 1).field(chr(13), 1);
 //				tt = tt.field(":", 2, 99).trim();
 //				tt.replacer("http=", "");
 //			} else if (cmd eq "proxycfg") {
@@ -1233,7 +1233,7 @@ nextreport:
 
 		call log2("*zzz should create full user record not just the name", logtime);
 		var usercodes = SECURITY.f(1);
-		var nusers = usercodes.count(VM) + (usercodes ne "");
+		let nusers = usercodes.count(VM) + (usercodes ne "");
 		for (const var usern : range(1, nusers)) {
 			var userx = usercodes.f(1, usern);
 			if (not(userx.contains("---"))) {
@@ -1288,12 +1288,12 @@ nextreport:
 	ENVIRONSET(37) = temp;
 
 	call log2("*force the F1 key to be general help (Ctrl+F1) instead of context help", logtime);
-	PRIORITYINT(1) = var().chr(0) ^ ";";
+	PRIORITYINT(1) = chr(0) ^ ";";
 
 	//if security('USE SPECIAL KEYS',MSG,'') then
-	INTCONST(4) = var().chr(0) ^ var("41").iconv("HEX2");
-	INTCONST(18) = var().chr(0) ^ var("1F").iconv("HEX2");
-	INTCONST(26) = var().chr(0) ^ var("19").iconv("HEX2");
+	INTCONST(4) = chr(0) ^ var("41").iconv("HEX2");
+	INTCONST(18) = chr(0) ^ var("1F").iconv("HEX2");
+	INTCONST(26) = chr(0) ^ var("19").iconv("HEX2");
 	PRIORITYINT(7) = var("1F").iconv("HEX2");
 	MOVEKEYS(27) = var("14").iconv("HEX2");
 	MOVEKEYS(25) = var("05").iconv("HEX2");
@@ -1361,7 +1361,7 @@ nextreport:
 	}
 
 	if (not valid) {
-		var().chr(7).output();
+		chr(7).output();
 		if (interactive) {
 			call note("DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING");
 		}
@@ -1646,10 +1646,10 @@ convcompany:
 	if (not(datasetid.read(DEFINITIONS, "GLOBALDATASETID"))) {
 newdatasetid:
 		dostime = ostime();
-		datasetid = var().date() ^ "." ^ dostime;
+		datasetid = date() ^ "." ^ dostime;
 		datasetid.converter(".", "");
 		datasetid = datasetid.oconv("MX");
-		datasetid = (datasetid ^ datasetid ^ datasetid ^ datasetid).substr(1, 8);
+		datasetid = (datasetid ^ datasetid ^ datasetid ^ datasetid).first(8);
 adddatasetcodename:
 		datasetid(2) = SYSTEM.f(23);
 		datasetid(3) = SYSTEM.f(17);
@@ -1718,8 +1718,8 @@ adddatasetcodename:
 		userx.write(DEFINITIONS, "USER*" ^ USERNAME ^ "*LAST");
 
 		call log2("*update the last login time", logtime);
-		userx(4) = var().date();
-		userx(5) = var().time();
+		userx(4) = date();
+		userx(5) = time();
 		userx(6) = STATION;
 		userx.write(DEFINITIONS, "USER*" ^ USERNAME);
 
@@ -1834,7 +1834,7 @@ nextdoc:
 
 		//get version last run
 		call osread(upgradelog, "UPGRADE.CFG");
-		var versionlastrun = field2(upgradelog, var().chr(10), -1);
+		var versionlastrun = field2(upgradelog, chr(10), -1);
 
 		//if changed then log and email users
 		if (versioninstalled ne versionlastrun) {
@@ -1873,7 +1873,7 @@ nextdoc:
 					var itime = version.field(" ", 1).iconv("MT");
 					//tt=idate 'D/J':' ':itime 'MT'
 					tt = idate.oconv("D/E");
-					tt = idate.substr(-4, 4) ^ "/" ^ tt.b(1, 5) ^ " " ^ itime.oconv("MT");
+					tt = idate.last(4) ^ "/" ^ tt.first(5) ^ " " ^ itime.oconv("MT");
 					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
 					if (reply eq 1) {
 						perform("EMAILUSERS UPGRADE " ^ tt);
@@ -1902,8 +1902,8 @@ nextdoc:
 		if (interactive and USERNAME ne "EXODUS.NET") {
 			call log2("*do a few escapes then F10 HOME to initialise the menu system", logtime);
 			//do home enter home to open the first menu at the first option
-			DATA ^= var().chr(27) ^ var().chr(27) ^ var().chr(27) ^ INTCONST.f(7);
-			DATA ^= MOVEKEYS.f(15) ^ var().chr(13) ^ MOVEKEYS.f(15);
+			DATA ^= chr(27) ^ chr(27) ^ chr(27) ^ INTCONST.f(7);
+			DATA ^= MOVEKEYS.f(15) ^ chr(13) ^ MOVEKEYS.f(15);
 
 			call log2("*if not interactive then start the required process", logtime);
 			//by pressing F5
@@ -1946,7 +1946,7 @@ subroutine getsystem() {
 
 	//parameters in the exodus\system file override params from definitions
 	//ie global installation parameters override dataset parameters
-	var ni = systemx.count(FM) + 1;
+	let ni = systemx.count(FM) + 1;
 	for (const var ii : range(1, ni)) {
 		if (systemx.f(ii).len()) {
 			SYSTEM(ii) = systemx.f(ii);

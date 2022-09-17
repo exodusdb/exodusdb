@@ -10,10 +10,10 @@ S
 	var uptodate = RECORD.f(11);\
 	var uptotime = RECORD.f(12);\
 	if (uptodate eq "") {\
-		uptodate = var().date();\
+		uptodate = date();\
 	}\
 	if (uptotime eq "") {\
-		uptotime = var().time();\
+		uptotime = time();\
 	}\
 	var daysecs = (uptodate - RECORD.f(1)) * secsperday;\
 	var timesecs = uptotime - RECORD.f(2);\

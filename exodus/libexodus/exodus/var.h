@@ -813,7 +813,7 @@ class PUBLIC var final {
 	// Prevent compilation of expressions containing
 	//
     //  *outvar[4]
-	//  *outvar.substr(99)
+	//  *outvar.b(99)
 	//
 	// but allow
 	//
@@ -1478,6 +1478,7 @@ class PUBLIC var final {
 	ND bool assigned() const;
 	ND bool unassigned() const;
 	VARREF unassigned(CVR defaultvalue);
+	var unassigned(CVR defaultvalue) const;
 
 	VARREF move(VARREF destinationvar);
 	// swap is marked as const despite it replaceping the var with var2
@@ -1584,10 +1585,10 @@ class PUBLIC var final {
 	ND bool contains(SV str) const;  // includes()   str_contains    contains()   Contains()  contains()    contains
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
-	//ND var index(SV substr) const;
-	ND var index(SV substr, const int startchar1 = 1) const;
-	ND var indexn(SV substr, const int occurrence) const;
-	ND var indexr(SV substr, const int startchar1 = -1) const;
+	//ND var index(SV str) const;
+	ND var index(SV str, const int startchar1 = 1) const;
+	ND var indexn(SV str, const int occurrence) const;
+	ND var indexr(SV str, const int startchar1 = -1) const;
 
 	//static member for speed on std strings
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
@@ -1619,6 +1620,8 @@ class PUBLIC var final {
 	VARREF trimmerb(SV trimchars DEFAULT_SPACE);
 	VARREF trimmer(SV trimchars, SV options);
 	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
+	VARREF firster(const size_t length);
+	VARREF laster(const size_t length);
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
 
@@ -1652,6 +1655,8 @@ class PUBLIC var final {
 	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return this->trimmerb(trimchars);}
 	ND VARREF trim(SV trimchars, SV options) && {return this->trimmer(trimchars, options);}
 	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) &&;
+	ND VARREF first(const size_t length) && {return this->firster(length);}
+	ND VARREF last(const size_t length) && {return this->laster(length);}
 	ND VARREF substr(const int startindex) &&;
 	ND VARREF substr(const int startindex, const int length) &&;
 
@@ -1701,7 +1706,10 @@ class PUBLIC var final {
 	// see also dim.split()
 	ND dim split(SV sepchar = _FM) const;
 
-	// STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
+	// STRING EXTRACTION varx[x,y] -> varx.b(start,length)
+
+	ND var first(const size_t length) const&;
+	ND var last(const size_t length) const&;
 
 	// NOTE char=byte ... NOT utf-8 code point
 	// NOTE 1 based indexing. byte 1 = first byte as per mv conventions for all indexing (except
@@ -1715,9 +1723,9 @@ class PUBLIC var final {
 	// v2 - returns a given number of bytes starting from some byte
 	// both start and length can be negative
 	// negative length extracts characters up to the starting byte IN REVERSE
-	// 'abcde'.substr(4,-3) -> 'dcb'
+	// 'abcde'.b(4,-3) -> 'dcb'
 	ND var substr(const int startindex, const int length) const&;
-	ND var b(const int startindex, const int length) const& {return substr(startindex, length);}
+	ND var b(const int startindex, const int length) const& {return substr(startindex, length);};
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
@@ -1739,10 +1747,10 @@ class PUBLIC var final {
 	var substr2(VARREF startstopindex, VARREF delimiterno) const;
 	var b2(VARREF startstopindex, VARREF delimiterno) const {return substr2(startstopindex, delimiterno);}
 
-	ND var field(SV substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
+	ND var field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
 	// version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO
 	// should probably make field() do this
-	ND var field2(SV substrx, const int fieldnx, const int nfieldsx = 1) const;
+	ND var field2(SV strx, const int fieldnx, const int nfieldsx = 1) const;
 
 	// I/O CONVERSION
 	/////////////////
@@ -2345,7 +2353,7 @@ class PUBLIC VarError {
 	var description;
 
 	// Convert stack addresses to source code if available
-	var stack() const;
+	var stack(const size_t limit = 0) const;
 
  private:
 

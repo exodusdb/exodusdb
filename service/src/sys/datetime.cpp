@@ -44,7 +44,7 @@ function main(in type, in inx, in mode, out outx) {
 
 		//fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0
 		} else if (in2.len() ne 5) {
-			in2 = (in2 ^ "00000").substr(1, 5);
+			in2 = (in2 ^ "00000").first(5);
 		}
 
 		//move time and date into the local date time

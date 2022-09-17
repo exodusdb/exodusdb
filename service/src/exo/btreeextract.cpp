@@ -28,7 +28,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	//XREF should be able to do it all in one go
 	var fieldname = cmd.f(1, 1);
 	var parts = cmd.f(1, 2);
-	if (fieldname.substr(-4)=="XREF") {
+	if (fieldname.ends("XREF")) {
 
 		parts = cmd.f(1).remove(1,1);
 
@@ -40,7 +40,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 
 	//otherwise do successive selects each one reducing the list
 	} else {
-		var nparts = parts.count("&") + 1;
+		let nparts = parts.count("&") + 1;
 		//parts.outputl("parts=");
 		for (const var partn : range(1, nparts)) {
 			var part = parts.field("&", partn);
@@ -65,7 +65,7 @@ nextrec:
 				goto nextrec;
 			}
 		}
-		hits.splicer(-1,1,"");
+		hits.popper();
 	}
 
 	clearselect();

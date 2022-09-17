@@ -11,7 +11,7 @@ var nn = 1000;
 
 function main() {
 	//call savescreenss1, ss2);
-	printl(var().chr(12));
+	printl(chr(12));
 	var ntries = 0;
 	var tot = 0;
 	var ntots = 0;
@@ -43,7 +43,7 @@ function main() {
 
 			avgspeed = (tot / ntots / 1000000).oconv("MD20P");
 
-			printl(speed, " x=i ", secs.oconv("MD10P"), " ", nn, " ", var().time());
+			printl(speed, " x=i ", secs.oconv("MD10P"), " ", nn, " ", time());
 		}
 	}//loop;
 

@@ -51,7 +51,7 @@ function main() {
 	var mintime = 999999;
 	var maxtime = "";
 	var avgtime = "";
-	printl(var().chr(12), "writing then deleting ", nreps, " x ", recsize, " byte records ", ntests, " times");
+	printl(chr(12), "writing then deleting ", nreps, " x ", recsize, " byte records ", ntests, " times");
 	printl("     Test" , "\t" , "Time" , "\t" , "Min." , "\t" , "Avg." , "\t" , "Max.");
 	var minspeed = 0;
 	var maxspeed = 0;

@@ -334,7 +334,7 @@ function main() {
 	nblocks = 0;
 	blockn = 0;
 
-	fromdate = var().date();
+	fromdate = date();
 	if (LISTACTIVE) {
 		fromtime = SYSTEM.f(25);
 	} else {
@@ -359,7 +359,7 @@ function main() {
 
 	//if not DOS then dont force html or force output to file
 	} else {
-		html = SYSTEM.f(2).lcase().substr(-3, 3) eq "htm";
+		html = SYSTEM.f(2).lcase().ends("htm");
 	}
 
 	if (html) {
@@ -502,7 +502,7 @@ nextphrase:
 
 phraseinit:
 ///////////
-	if (word.b(1, 4) eq "SORT" or word.b(1, 5) eq "NSORT") {
+	if (word.starts("SORT") or word.starts("NSORT")) {
 		ss ^= "SSELECT";
 
 filename:
@@ -525,7 +525,7 @@ filename:
 			gosub getword();
 			filename = "DICT." ^ word;
 		}
-		if (filename.b(1, 5) eq "DICT.") {
+		if (filename.starts("DICT.")) {
 			dictfilename = "VOC";
 		} else {
 			dictfilename = filename;
@@ -581,7 +581,7 @@ nextkey:
 			}
 		}
 
-	} else if ((word.b(1, 4) eq "LIST" or word.b(1, 5) eq "NLIST") or word eq "XLIST") {
+	} else if ((word.starts("LIST") or word.starts("NLIST")) or word eq "XLIST") {
 		ss ^= "SELECT";
 		goto filename;
 		{}
@@ -613,7 +613,7 @@ nextkey:
 		if (nextword eq "AUTHORISED") {
 			onlyauthorised = 1;
 			gosub getword();
-			if (ss.substr(-4, 4) eq " AND") {
+			if (ss.ends(" AND")) {
 				ss.splicer(-4, 4, "");
 			}
 			if (nextword eq "AND") {
@@ -827,7 +827,7 @@ nextkey:
 		}//loop;
 
 		//prevent trailing colon folding onto following line
-		if (title.substr(-2, 2) eq " :") {
+		if (title.ends(" :")) {
 			title.splicer(-2, 2, "&nbsp;:");
 		}
 
@@ -865,7 +865,7 @@ nextkey:
 		if (not(coldict(coln).unassigned())) {
 			gosub getquotedword();
 			coldict(coln)(9) = word[1];
-			coldict(coln)(10) = word.b(3, 9999);
+			coldict(coln)(10) = word.b(3);
 			coldict(coln)(11) = word;
 		}
 
@@ -1791,7 +1791,7 @@ recexit:
 				tt = oconv(tt, oconvx);
 				if (html) {
 					if (tt[1] eq "-") {
-						if (oconvx.b(1, 7) eq "[NUMBER") {
+						if (oconvx.starts("[NUMBER")) {
 							tt = "<nobr>" ^ tt ^ "</nobr>";
 						}
 					}
@@ -1820,7 +1820,7 @@ recexit:
 					} else {
 						//tx1:=td0:'<td bgcolor=':field(tt,' ',1)[2,9999]:'>'
 						//TODO do with class? to save document space?
-						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).substr(2, 9999) ^ "\">";
+						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).b(2) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= tt ^ tdx;
@@ -2053,7 +2053,7 @@ getword2b:
 	//otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-	if (("'" ^ DQ).contains(charx)) {
+	if (charx and ("'" ^ DQ).contains(charx)) {
 		searchchar = charx;
 	} else {
 		searchchar = " ";
@@ -2227,7 +2227,7 @@ subroutine printbreaks() {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 				//WARNING TODO: check ternary op following;
 				underline2 = leveln eq 1 ? underline : bar;
-				if (not((tx.substr(-2, 2)).contains(ulchar))) {
+				if (not((tx.last(2)).contains(ulchar))) {
 					if (tx[-1] ne FM) {
 						tx ^= FM;
 					}

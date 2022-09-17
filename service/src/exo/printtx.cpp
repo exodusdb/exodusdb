@@ -108,21 +108,21 @@ function main(io tx, in mode="", in modevalue="") {
 		}
 		var ownprintfile = 0;
 		//if (printfilename == "") {
-		//	printfilename = var("9999999999").rnd().substr(-8,8);
+		//	printfilename = var("9999999999").rnd().last(8);
 		//	printfilename = printfilename ^ (html ? ".htm" : ".5~txt");
 		//	SYSTEM(2) = printfilename;
 		//	ownprintfile = 1;
 		//}
 
 		//change the file extension to HTM
-		if (html and printfilename and printfilename.substr(-4,4).lcase() ne ".htm") {
+		if (html and printfilename and printfilename.last(4).lcase() ne ".htm") {
 
 			printfilename.osclose();
 			printfilename.osremove();
 
 			//create a new filename
 			var tt = (field2(printfilename, "\\", -1)).len();
-			var t2 = (var(10).pwr(15)).rnd().substr(1,8);
+			var t2 = (var(10).pwr(15)).rnd().first(8);
 			printfilename.splicer(-tt, tt, t2 ^ ".htm");
 
 			SYSTEM(2) = printfilename;
@@ -210,7 +210,7 @@ function main(io tx, in mode="", in modevalue="") {
 
 		tx.splicer(1, 0, temp ^ FM);
 		if (printptr and not html) {
-			tx.splicer(1, 0, FM ^ var().chr(12));
+			tx.splicer(1, 0, FM ^ chr(12));
 		}
 	}
 
@@ -306,8 +306,10 @@ subroutine convoptions() {
 			optionchars ^= optionchar;
 		}
 		var newoptions = "";
-		for (var ii = 1; ii <= optionchars.len(); ii++) {
+		//space to defeat convsyntax
+		for ( var ii = 1; ii <= optionchars.len(); ii++) {
 		//for (const var ii : range(1, optionchars.len())) {
+		//while (var ii = 0; ++ii <= optionchars.len()) {
 			var optionchar = optionchars[ii];
 			if (optionchar == "T") {
 //				newoptions ^= timedate();
@@ -363,7 +365,7 @@ subroutine getheadfoot() {
 		head1.converter("~", " ");
 		while (true) {
 		///BREAK;
-		if (not(head1.substr(-6,6) == "&nbsp;")) break;
+		if (not(head1.ends("&nbsp;"))) break;
 			head1.splicer(-6, 6, "");
 		}//loop;
 		headx(1) = head1;

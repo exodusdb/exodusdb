@@ -5,7 +5,7 @@ S
 0
 
 D2-
-	return var().date();
+	return date();
 L
 10
 (D)

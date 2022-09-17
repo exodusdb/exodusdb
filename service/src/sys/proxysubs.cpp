@@ -38,7 +38,7 @@ function main(in module, in mode, in stationery) {
 	var outfiles = SYSTEM.f(2);
 	outfiles.converter(";", VM);
 	data_ = outfiles;
-	var nfiles = outfiles.count(VM) + (outfiles ne "");
+	let nfiles = outfiles.count(VM) + (outfiles ne "");
 	for (const var filen : range(1, nfiles)) {
 
 		outfile = outfiles.f(1, filen);
@@ -53,7 +53,7 @@ function main(in module, in mode, in stationery) {
 		var t2 = OSSLASH;
 		var tt = outfile.index(t2 ^ "data" ^ t2);
 		if (tt) {
-			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.b(tt, 999999);
+			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.b(tt);
 		} else {
 			data_(1, filen) = outfile;
 		}
@@ -112,7 +112,7 @@ fileok:
 		}
 
 		//force error
-		if (response_.b(1, 6) ne "Error:") {
+		if (response_.first(6) ne "Error:") {
 			USER3.splicer(1, 0, "Error:");
 		}
 

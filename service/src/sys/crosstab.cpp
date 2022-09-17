@@ -295,7 +295,7 @@ nextmv:
 			fieldname = rowfields.f(1, rowfn);
 			tt = calculate(fieldname);
 			if (fieldname eq "HOUR") {
-				tt = ("00" ^ tt).substr(-2, 2);
+				tt = ("00" ^ tt).last(2);
 			}
 			nn = tt.count(VM) + (tt ne "");
 			if (nn gt nrowvals) {
@@ -314,7 +314,7 @@ nextmv:
 	} else {
 		colvals = calculate(colfield);
 		if (colfield eq "HOUR") {
-			colvals = ("00" ^ colvals).substr(-2, 2);
+			colvals = ("00" ^ colvals).last(2);
 		}
 	}
 	ncolvals = colvals.count(VM) + (colvals ne "");

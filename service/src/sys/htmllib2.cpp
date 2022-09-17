@@ -100,7 +100,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 	} else if (mode eq "HASHTABLE") {
 
-		var nv = dataio.count(VM) + 1;
+		let nv = dataio.count(VM) + 1;
 		for (const var vn : range(1, nv)) {
 			var datax = dataio.f(1, vn);
 
@@ -112,7 +112,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 			datax.converter(TM, FM);
 
-			var nlines = datax.count(FM) + 1;
+			let nlines = datax.count(FM) + 1;
 			if (nlines gt 1) {
 
 				for (const var ln : range(1, nlines)) {
@@ -242,8 +242,8 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				tt = dataio.index("CrOS");
 			}
 			if (tt) {
-				osname = dataio.b(tt, 9999);
-				if (osname.b(1, 4) eq "CPU ") {
+				osname = dataio.b(tt);
+				if (osname.starts("CPU ")) {
 					osname.splicer(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
@@ -255,7 +255,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				osname.replacer(" x86_64", "-64");
 			}
 		}
-		if (osname.substr(-2, 2) eq ".0") {
+		if (osname.ends(".0")) {
 			osname.splicer(-2, 2, "");
 		}
 
@@ -320,7 +320,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				tt = dataio.index("Netscape");
 			}
 			if (tt) {
-				browser = dataio.b(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
+				browser = dataio.b(tt).field(";", 1).field(" ", 1).field(")", 1);
 			}
 
 			//browsernames='Edge,Chrome,Firefox,Safari,Opera,Netscape'
@@ -332,7 +332,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			//browser=trimf(browser)
 
 		}
-		if (browser.substr(-2, 2) eq ".0") {
+		if (browser.ends(".0")) {
 			browser.splicer(-2, 2, "");
 		}
 

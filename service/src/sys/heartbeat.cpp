@@ -59,8 +59,8 @@ function main(in mode, in status0="") {
 		//but all functions sharing the same mvenvironment will have the same no
 		//determine process number
 
-		if (userlockid.b(1, 5) eq "U7906") {
-			processno = userlockid.b(6, 9999);
+		if (userlockid.starts("U7906")) {
+			processno = userlockid.b(6);
 			processno -= (processno / 10).floor();
 
 		} else if (userlockid.isnum()) {
@@ -83,7 +83,7 @@ function main(in mode, in status0="") {
 		process(12) = "";
 		process(13) = "";
 		//garbagecollect;
-		process(27) = (var().date() + 24873 + var().time() / 86400).oconv("MD50P");
+		process(27) = (date() + 24873 + time() / 86400).oconv("MD50P");
 		process(51) = APPLICATION;
 		//can never be closed while this is running
 		process(52) = "";

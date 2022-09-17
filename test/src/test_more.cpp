@@ -186,6 +186,11 @@ programinit()
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
 		assert("a^bb^^ccc"_var.errputl() eq "a" _FM "bb" _FM _FM "ccc");
 		assert("`^]}|~"_var.errputl()    eq _RM _FM _VM _SM _TM _ST);
+
+		// Check can acquire \0 characters via _var literal
+		assert("abc\x00 def"_var.len() eq 8);
+		assert(" \x00 "_var.oconv("HEX") eq "200020");
+
 	}
 
 	//Construct fixed dim array from initializer list

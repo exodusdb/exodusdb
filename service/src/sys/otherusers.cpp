@@ -55,7 +55,7 @@ function main(in databasecode0="", in usercode0="") {
 	if (curruserlockid.isnum()) {
 		lockprefix = "";
 	} else {
-		lockprefix = "U" ^ var("99999").substr(-4, 4);
+		lockprefix = "U" ^ var("99999").last(4);
 	}
 
 	//FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
@@ -148,7 +148,7 @@ nextlock:;
 		usercode = returndata.f(2, ii);
 		///BREAK;
 		if (not usercode) break;
-		usercode = usercode.b(6, 9999);
+		usercode = usercode.b(6);
 		if (not(curruserlockid.isnum())) {
 			usercode -= (usercode / 10).floor();
 		}

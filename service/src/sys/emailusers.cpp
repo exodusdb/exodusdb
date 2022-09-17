@@ -77,7 +77,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 		body ^= VM ^ "Please email SUPPORT@EXODUS.COM for any assistance.";
 		//body:=vm
 		//body:=vm:'This is an automated email. You cannot reply to it.'
-		body.converter(VM, var().chr(13));
+		body.converter(VM, chr(13));
 
 		//call emailusers(mode,subject,body,'','','','R',emaillog)
 		//no more replyto support@neosys.com because no longer needed
@@ -92,7 +92,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 			emaillog = "(nobody)";
 		}
 		emaillog = "Upgrade Notification emailed to:" ^ VM ^ emaillog;
-		emaillog.replacer(VM, var().chr(13));
+		emaillog.replacer(VM, chr(13));
 		call sysmsg(emaillog, "Upgrade to version " ^ version);
 
 		stop();
@@ -129,11 +129,11 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	var usern = 0;
 	emaillog = "";
 	var alreadyemailed = "";
-	body.converter(FM ^ VM, var().chr(13) ^ var().chr(13));
+	body.converter(FM ^ VM, chr(13) ^ chr(13));
 
 	var groupids = groupids0;
 	groupids.converter(",", VM);
-	var ngroups = groupids.count(VM) + 1;
+	let ngroups = groupids.count(VM) + 1;
 
 	var userids = userids0;
 	userids.converter(",", VM);
@@ -173,7 +173,7 @@ nextuser:
 
 	//not expired users
 	expirydate = userx.f(35);
-	if (expirydate and expirydate le var().date()) {
+	if (expirydate and expirydate le date()) {
 		goto nextuser;
 	}
 
@@ -281,7 +281,7 @@ exit:
 	if (nsent and replyto) {
 		toemails = replyto;
 		body ^= VM ^ VM ^ "-- Sent to --" ^ emaillog;
-		body.replacer(VM, var().chr(13));
+		body.replacer(VM, chr(13));
 		gosub sendemails(emaillog);
 	}
 

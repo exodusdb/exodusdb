@@ -105,9 +105,11 @@ void mv_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_s
 // Convert the stack addresses to source file, line no and line text
 ////////////////////////////////////////////////////////////////////
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
-var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size) {
+var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size, size_t limit) {
 
 	var returnlines = "";
+	size_t nlines = 0;
+
 	//var("backtrace()").errputl();
 
 	var internaladdresses = "";
@@ -220,6 +222,10 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 			// returnlines^=FM^sourcefilename.field2(OSSLASH,-1) ^ ":" ^ lineno ^ " " ^
 			// linesource;
 		}
+
+		// Quit if reached limit of desired backtrace
+		if (limit && nlines++ >= limit)
+			break;
 
 	}
 

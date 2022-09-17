@@ -268,12 +268,12 @@ function main_init() {
 	//lastmonitortime=0
 	//dont call monitor for approx 60 seconds after startup
 	//to allow pressing B for backup and quit without other processes starting up
-	lastmonitortime = var().time();
+	lastmonitortime = time();
 	//dont do autoruns until 1 or 2 mins after starting (to let other processes start)
-	lastautorun = var().time() + var(60).rnd();
+	lastautorun = time() + var(60).rnd();
 	//do autorun immediately on dev system
 	if (var("exodus.id").osfile()) {
-		lastautorun = var().time() - 60;
+		lastautorun = time() - 60;
 	}
 
 	//delete any old (5min) login response pid name based files
@@ -301,7 +301,7 @@ function main_init() {
 	defaultlockmins = 5;
 
 	datasetcode = SYSTEM.f(17);
-	live = datasetcode.ucase().substr(-5) ne "_test";
+	live = not datasetcode.ucase().ends("_test");
 	//processno = SYSTEM.f(24);
 
 	neopath = "../exodus/";
@@ -398,7 +398,7 @@ function main_init() {
 
 	//ensure unique sorttempfile
 	//if sysvar('SET',192,102,'R':('0000':THREADNO)[-5,5]:'.SFX') else null
-	//call sysvar_192_102"SET", "R" ^ ("0000" ^ THREADNO).substr(-5, 5) ^ ".SFX");
+	//call sysvar_192_102"SET", "R" ^ ("0000" ^ THREADNO).last(5) ^ ".SFX");
 
 	nrequests = SYSTEM.f(35) + 0;
 
@@ -441,9 +441,9 @@ function main_init() {
 	call getbackpars(bakpars);
 
 	//open an XML log file
-	datex = var().date().oconv("D.");
+	datex = date().oconv("D.");
 	//if 1 then
-	logpath = ("../logs/" ^ datasetcode ^ "/" ^ datex.substr(-4, 4)).lcase();
+	logpath = ("../logs/" ^ datasetcode ^ "/" ^ datex.last(4)).lcase();
 	logpath.converter("/", OSSLASH);
 
 	//check/make the dataset folder
@@ -466,7 +466,7 @@ function main_init() {
 		}
 	}
 
-	logfilename = logpath ^ "/" ^ datex.substr(-2, 2) ^ datex.b(1, 2) ^ datex.b(4, 2) ^ ("00" ^ THREADNO).substr(-2, 2);
+	logfilename = logpath ^ "/" ^ datex.last(2) ^ datex.first(2) ^ datex.b(4, 2) ^ ("00" ^ THREADNO).last(2);
 	logfilename ^= ".xml";
 	logfilename.converter("/", OSSLASH);
 
@@ -527,8 +527,8 @@ function loop_init() {
 	//disconnect any connections added while processing requests
 	nextconnection.disconnectall();
 
-	lastrequestdate = var().date();
-	lastrequesttime = var().time();
+	lastrequestdate = date();
+	lastrequesttime = time();
 	win.registerx = "";//dim
 
 	//forcedemail
@@ -620,8 +620,8 @@ nextsearch0:
 
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
-	//tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
-	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
+	//tt = time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
+	tt = time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
 		output(AT(-40), tt, " : ");
 	} else {
@@ -658,8 +658,8 @@ nextsearch0:
 	gosub flagserveractive();
 
 	//run autorun, syncdata and clear old files once a minute
-	if ((var().time() - lastautorun gt 60) or (var().time() lt lastautorun - 600)) {
-		lastautorun = var().time();
+	if ((time() - lastautorun gt 60) or (time() lt lastautorun - 600)) {
+		lastautorun = time();
 
 		//call autorun instead of perform to allow output to remain on screen
 		//(BUT errors cause listen to crash and restart)
@@ -755,7 +755,7 @@ function loop_exit() {
 
 	//timeout if no activity
 	dostime = ostime();
-	now = (var().date() ^ "." ^ dostime.floor().oconv("R(0)#5")) + 0;
+	now = (date() ^ "." ^ dostime.floor().oconv("R(0)#5")) + 0;
 	//if timeouttime and now>timeouttime then gosub exit
 
 	gosub flagserveractive();
@@ -775,7 +775,7 @@ function loop_exit() {
 	tt = INTCONST.f(1, 1);
 	if (charx.lcase().contains(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
-		tt.replacer(var().chr(27), "Esc");
+		tt.replacer(chr(27), "Esc");
 		call mssg("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
 		//loop
 		// input reply,-1:
@@ -872,12 +872,12 @@ function loop_exit() {
 	call getbackpars(bakpars);
 
 	//call monitor approx every minute +/- 10 seconds to avoid checking all the time
-	if ((var().time() - lastmonitortime).abs() gt 60 + var(20).rnd() - 10) {
+	if ((time() - lastmonitortime).abs() gt 60 + var(20).rnd() - 10) {
 	//if abs(time()-lastmonitortime)>(0+rnd(20)-10) then
 
 		//monitor updates nagios and optionally checks for upgrades
 		call monitor2();
-		lastmonitortime = var().time();
+		lastmonitortime = time();
 
 		//install and run patches
 		//patched=0
@@ -914,23 +914,23 @@ function loop_exit() {
 	}
 
 	//backup
-	if (var("Bb").contains(charx)) {
+	if (charx and var("Bb").contains(charx)) {
 		goto backup;
 	}
-	if (var().time() ge bakpars.f(3) and var().time() le bakpars.f(4)) {
+	if (time() ge bakpars.f(3) and time() le bakpars.f(4)) {
 
 		//call log2('LISTEN: Backup time for ':datasetcode,logtime)
 
 		//delay closedown randomly to avoid conflict with identically configured processes
 		call ossleep(1000*var(10).rnd());
 
-		dow = (var().date() - 1).mod(7) + 1;
+		dow = (date() - 1).mod(7) + 1;
 
 		//optionally perform backup and/or shutdown and not backed up today
 		if (bakpars.f(9)) {
 			//call log2('Backup is disabled',logtime)
 
-		} else if (var().date() eq bakpars.f(1)) {
+		} else if (date() eq bakpars.f(1)) {
 			//call log2('Backup already done today',logtime)
 
 		} else if (bakpars.f(11)) {
@@ -945,7 +945,7 @@ function loop_exit() {
 
 		} else {
 			//call log2('Preventing further automatic backups today',logtime)
-			((var().date() + var().time() / 86400).oconv("MD50P")).writev(DEFINITIONS, "BACKUP", 1);
+			((date() + time() / 86400).oconv("MD50P")).writev(DEFINITIONS, "BACKUP", 1);
 
 backup:
 			//similar code in LISTEN and LISTEN2
@@ -999,7 +999,7 @@ subroutine main_exit() {
 	//system<33>=origsysmode
 	SYSTEM(33) = "";
 	//call setprivilegeorigprivilege);
-	if (request1.b(1, 7) eq "RESTART") {
+	if (request1.starts("RESTART")) {
 		USER4 = request1;
 		//return to net which will restart LISTEN
 		//stop();
@@ -1032,7 +1032,7 @@ function got_link() {
 	linkfilenames = linkfilename0;
 
 	//get the earliest time possible for the log
-	requestdate = var().date();
+	requestdate = date();
 	requesttime = ostime();
 	SYSTEM(25) = requesttime;
 
@@ -1066,7 +1066,7 @@ function got_link() {
 		}
 
 		//get the .1 file which contains the request
-		timex = var().time();
+		timex = time();
 readlink1:
 		USER0 = "";
 		//osbread request from linkfile1 at 0 length 256*256-4
@@ -1074,7 +1074,7 @@ readlink1:
 		call osbread(request_, linkfile1, tt, 256 * 256 - 4);
 
 		//if cannot read it then try again
-		if (USER0 eq "" and var().time() eq timex) {
+		if (USER0 eq "" and time() eq timex) {
 			var().osflush();
 			call ossleep(1000*1 / 10.0);
 			linkfile1.osclose();
@@ -1183,7 +1183,7 @@ function request_init() {
 	nrequests += 1;
 
 	if (VOLUMES) {
-		output(AT(-40), var().time().oconv("MTS"), " ");
+		output(AT(-40), time().oconv("MTS"), " ");
 	} else {
 		//similar in listen and log2
 		print(THREADNO ^ ": ");
@@ -1260,7 +1260,7 @@ function request_init() {
 
 	if (logfilename) {
 
-		datex = var().date();
+		datex = date();
 		timex = requesttime;
 
 		tt = "<Message ";
@@ -1365,9 +1365,9 @@ function request_init() {
 
 				//avoid hexcode spanning block end by moving one or two bytes backwards
 				if (blockn gt 1) {
-					tt = ((datx(blockn - 1)).substr(-2, 2)).index("%");
+					tt = ((datx(blockn - 1)).last(2)).index("%");
 					if (tt) {
-						datx(blockn - 1) ^= datx(blockn).substr(1, tt);
+						datx(blockn - 1) ^= datx(blockn).b(1, tt);
 						datx(blockn).splicer(1, tt, "");
 					}
 				}
@@ -1659,7 +1659,7 @@ subroutine process2() {
 
 	//find index values
 	//case request1[1,14]='GETINDEXVALUES'
-	} else if (request1.b(1, 8) eq "GETINDEX") {
+	} else if (request1.starts("GETINDEX")) {
 
 		//call listen3(request2,'GETINDEXVALUES')
 		call listen5(request1, request2, request3, request4, request5, request6);
@@ -2500,7 +2500,7 @@ badwrite:
 		if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.f(1), xx)) {
 			iodat_ = linkfilename2;
 		}
-		if (request_.f(1).substr(1, 4) eq "VAL.") {
+		if (request_.f(1).starts("VAL.")) {
 			USER1 = linkfilename2;
 		}
 
@@ -2822,7 +2822,7 @@ function request_exit() {
 	}
 
 	if (response_ eq "OK") {
-		if (request1 eq "STOPDB" or request1.b(1, 7) eq "RESTART") {
+		if (request1 eq "STOPDB" or request1.starts("RESTART")) {
 			//gosub main_exit();
 			return false;
 		}
@@ -2867,7 +2867,7 @@ subroutine gettimeouttime() {
 		return;
 	}
 
-	timeoutdate = var().date();
+	timeoutdate = date();
 	timeouttime = ostime();
 	timeouttime += timeoutsecs;
 	if (timeouttime gt 24 * 60 * 60) {
@@ -3228,7 +3228,7 @@ subroutine getdostime() {
 	dostime = ostime();
 	//convert to Windows based date/time (ndays since 1/1/1900)
 	//31/12/67 in rev date() format equals 24837 in windows date format
-	dostime = 24837 + var().date() + dostime / 24 / 3600;
+	dostime = 24837 + date() + dostime / 24 / 3600;
 	return;
 }
 

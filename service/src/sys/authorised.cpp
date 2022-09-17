@@ -60,7 +60,7 @@ nousername0:
 	msg = "";
 	//!*CALL note(' ':TASK)
 
-	if (task.b(1, 2) eq "..") {
+	if (task.starts("..")) {
 	// call note(task:'')
 		return 1;
 	}
@@ -86,15 +86,15 @@ nousername0:
 		isexodus = username eq "EXODUS";
 	}
 
-	var deleting = task.b(1, 8) eq "%DELETE%";
+	var deleting = task.starts("%DELETE%");
 	if (deleting) {
 		task.splicer(1, 8, "");
 	}
-	var updating = task.b(1, 8) eq "%UPDATE%";
+	var updating = task.starts("%UPDATE%");
 	if (updating) {
 		task.splicer(1, 8, "");
 	}
-	var renaming = task.b(1, 8) eq "%RENAME%";
+	var renaming = task.starts("%RENAME%");
 	if (renaming) {
 		task.splicer(1, 8, "");
 	}
@@ -247,7 +247,7 @@ notallowed:
 	keys.converter("," ^ VM, "  ");
 	locks.converter(",", " ");
 	locks.trimmer();
-	var nlocks = locks.count(" ") + 1;
+	let nlocks = locks.count(" ") + 1;
 
 	for (const var lockn : range(1, nlocks)) {
 		var lockx = locks.field(" ", lockn);

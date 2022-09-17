@@ -8,7 +8,7 @@ M
 	var usercodes = RECORD.f(1, MV);\
 	var emails = RECORD.f(7, MV);\
 \
-	var nusers = usercodes.count(VM) + 1;\
+	let nusers = usercodes.count(VM) + 1;\
 	for (const var usern : range(1, nusers)) {\
 		if (emails.f(1, usern) eq "") {\
 			usercodes(1, usern) = "";\

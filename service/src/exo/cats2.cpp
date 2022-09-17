@@ -18,7 +18,7 @@ function main(in list1, in infix, in list2) {
 	for (const var ii : range(1, nn)) {
 		output^=list1.f(1,ii) ^ infix ^ list2.f(1,ii) ^ VM;
 	}
-	output.splicer(-1,1,"");
+	output.popper();
 	return output;
 }
 

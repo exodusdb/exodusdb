@@ -173,8 +173,8 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	sys.document(14) = targetusercodes;
 
 	sys.document(7) = APPLICATION;
-	sys.document(3) = var().date();
-	sys.document(4) = var().time();
+	sys.document(3) = date();
+	sys.document(4) = time();
 	if (sys.document.f(12) eq "") {
 		sys.document(12) = 1;
 	}

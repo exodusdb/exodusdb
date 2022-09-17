@@ -216,7 +216,7 @@ nochequeformat:
 			var filename = ID.field("*", 2);
 			var fieldname = ID.field("*", 3);
 			call collectixvals(filename, fieldname);
-			var nn = PSEUDO.count(FM) + 1;
+			let nn = PSEUDO.count(FM) + 1;
 			for (const var ii : range(1, nn)) {
 				var val = PSEUDO.f(ii);
 				if (val) {
@@ -483,7 +483,7 @@ preventupdate:
 				//TODO replace with checkwritable()
 				drive ^= ":";
 				call osmkdir(drive ^ OSSLASH_ "data.bak");
-				call shell2("dir " ^ drive.b(1, 2), errors);
+				call shell2("dir " ^ drive.first(2), errors);
 				if (errors) {
 					call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
 				} else {
@@ -495,7 +495,7 @@ preventupdate:
 						tempfilename ^= "./$";
 					}
 					tempfilename.converter("/", OSSLASH);
-					var(var().date()).oswrite(tempfilename);
+					var(date()).oswrite(tempfilename);
 					if (tt.osread(tempfilename)) {
 						tempfilename.osremove();
 					} else {
@@ -658,7 +658,7 @@ subroutine reorderdbs() {
 
 	//create newdblist in order of given newdbcodes
 	//if not found in new order then append in order found
-	var ndbs = dblist.count(VM) + 1;
+	let ndbs = dblist.count(VM) + 1;
 	var newdblist = "";
 	for (const var dbn : range(1, ndbs)) {
 		var db = dblist.f(1, dbn);

@@ -31,7 +31,7 @@ function main(in a0, io bb, in sep) {
 		bb.converter(SM, VM);
 	}
 
-	var na = aa.count(VM) + (aa ne "");
+	let na = aa.count(VM) + (aa ne "");
 	for (const var an : range(1, na)) {
 
 		var anum = amountunit(aa.f(1, an), acode);

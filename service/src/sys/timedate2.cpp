@@ -34,10 +34,10 @@ function main(in localdate0, in localtime0) {
 	if (temp[1] eq "0") {
 		temp.splicer(1, 1, "");
 	}
-	if (temp.substr(-2, 2) eq "AM") {
+	if (temp.ends("AM")) {
 		temp.splicer(-2, 2, sys.glang.f(16));
 	}
-	if (temp.substr(-2, 2) eq "PM") {
+	if (temp.ends("PM")) {
 		temp.splicer(-2, 2, sys.glang.f(17));
 	}
 

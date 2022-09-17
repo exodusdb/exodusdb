@@ -28,7 +28,7 @@ function main() {
 	/////
 
 	//make up a dos print file name
-	var dfs = where ^ var(99999999).rnd().str(8).substr(1,8);
+	var dfs = where ^ var(99999999).rnd().str(8).first(8);
 	if (html) {
 		dfs ^= ".htm";
 	}else{
@@ -56,7 +56,7 @@ function main() {
 	if (not OPTIONS.contains("S"))
 		printl("Making a new document/report " ^ SYSTEM.f(2) ^ ":");
 
-	var timestarted = var().time();
+	var timestarted = time();
 
 	//execute the cmd to produce the report
 	perform(cmd);

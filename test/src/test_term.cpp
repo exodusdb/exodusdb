@@ -87,7 +87,7 @@ programinit()
 		//should show 1;1 in top left
 		for (const var ii : range(0, 12)) {
 			print(AT(ii, ii));
-			print(getcursor().substr(2));
+			print(getcursor().b(2));
 		}
 
 		print(AT(7, 24));

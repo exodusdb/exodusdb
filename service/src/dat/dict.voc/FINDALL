@@ -14,7 +14,7 @@ function main() {\
 	} else {\
 		datax = RECORD;\
 	}\
-	var nn = datax.count(FM) + 1;\
+	let nn = datax.count(FM) + 1;\
 	datax.ucaser();\
 	datax.converter(DQ, "'");\
 	ANS = "";\

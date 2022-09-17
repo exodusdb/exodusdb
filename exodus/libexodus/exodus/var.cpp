@@ -1623,10 +1623,10 @@ VarError::VarError(CVR description_)
 	}
 }
 
-var VarError::stack() const {
+var VarError::stack(const size_t limit) const {
 
 	// Convert the stack addresses into source code lines
-	return mv_backtrace(stack_addresses_, stack_size_);
+	return mv_backtrace(stack_addresses_, stack_size_, limit);
 
 }
 

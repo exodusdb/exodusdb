@@ -64,14 +64,17 @@ function main(in sentence0, in select0="", in filters0="") {
 		selectx = select0;
 		}
 
-	if (nfilters0.unassigned()) {
-		nfilters = 0;
-	} else {
+//	if (nfilters0.unassigned()) {
+//		nfilters = 0;
+//	} else {
+//		filterfields = filters0.f(1);
+//		filtervalues = filters0.f(3);
+//		nfilters = filterfields.count(FM) + (filterfields ne 0);
+//	}
+	let nfilters = nfilters0.unassigned("").fcount(FM);
+	if (nfilters) {
 		filterfields = filters0.f(1);
 		filtervalues = filters0.f(3);
-		nfilters = filterfields.count(FM) + (filterfields ne 0);
-	}
-	if (nfilters) {
 		filters.redim(3, nfilters);
 		for (const var filtern : range(1, nfilters)) {
 			filters(1, filtern) = filterfields.f(1, filtern).convert(SM, VM);
@@ -132,7 +135,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		sentencex.replacer(" NOCOLHEADER", "");
 	}
 
-	if (filename.b(1, 4) eq "DICT") {
+	if (filename.starts("DICT")) {
 		tt = "VOC";
 	} else {
 		tt = filename;
@@ -227,11 +230,11 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	var outfilename = SYSTEM.f(2);
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
-	if ((outfilename.substr(-4, 4)).lcase() eq ".htm") {
+	if ((outfilename.last(4)).lcase() eq ".htm") {
 		outfilename.splicer(-3, 3, "xls");
 		SYSTEM(2) = outfilename;
 	}
-	var excel = (outfilename.substr(-3, 3)).lcase() eq "xls";
+	var excel = (outfilename.last(3)).lcase() eq "xls";
 
 	outfilename.osremove();
 	if (outfilename.osfile()) {
@@ -263,7 +266,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		//delete lists,listkey
 
 	} else {
-		if (filename.b(1, 4) eq "DICT") {
+		if (filename.starts("DICT")) {
 			dict = "";
 		} else {
 			dict = "DICT ";
@@ -337,7 +340,7 @@ nextdict:
 
 				//extract file
 				if (dict.f(11)[1] eq "<") {
-					temp = dict.f(11).substr(2, 9999).field(">", 1);
+					temp = dict.f(11).b(2).field(">", 1);
 					xfilenames(coln) = temp;
 					if (not(xfiles(coln).open(temp, ""))) {
 						call mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
@@ -345,7 +348,7 @@ nextdict:
 						return 0;
 					}
 					var title = headingx.f(coln);
-					if (title.ucase().substr(-5, 5) eq " CODE") {
+					if (title.ucase().ends(" CODE")) {
 						title.splicer(-5, 5, "");
 						headingx(coln) = title;
 					}
@@ -369,7 +372,7 @@ nextdict:
 						//end
 
 					//no commas to be added to numbers
-					} else if (oconvx.b(1, 7) eq "[NUMBER") {
+					} else if (oconvx.starts("[NUMBER")) {
 						oconvx = "";
 					}
 
@@ -385,7 +388,7 @@ nextdict:
 		}
 		goto nextdict;
 	}
-	var ncols = coln;
+	let ncols = coln;
 
 	//if @username='EXODUS' then oswrite matunparse(dictids) on 'csv'
 
@@ -585,7 +588,7 @@ nextvn:
 				}
 
 				if (cell[1] eq "+") {
-					if (cell.b(2, 9999).isnum()) {
+					if (cell.b(2).isnum()) {
 						cell.splicer(1, 1, "");
 					}
 				}
@@ -596,7 +599,7 @@ nextvn:
 					cell.replacer(DQ, "''");
 				}
 				if (cell.len() gt 255) {
-					cell = cell.b(1, 200) ^ " ...";
+					cell = cell.first(200) ^ " ...";
 				}
 				if (fmtxs(coln) ne "R" or not(cell.isnum())) {
 
@@ -665,7 +668,7 @@ nextvn:
 					converterparams = line;
 					call convertercsv("HEAD", headingx, converterparams, filename);
 				} else {
-					headingx.converter(FM, var().chr(9));
+					headingx.converter(FM, chr(9));
 					headingx ^= "\r\n";
 				}
 
@@ -679,7 +682,7 @@ nextvn:
 			if (hasconverter) {
 				call convertercsv("LINE", line, converterparams, filename);
 			} else {
-				line.replacer(FM, var().chr(9));
+				line.replacer(FM, chr(9));
 				line ^= "\r\n";
 			}
 

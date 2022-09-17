@@ -69,7 +69,7 @@ listen:
 	// @user4[tt,99999]=''
 	// end
 
-	if (USER4.b(1, 7) eq "RESTART") {
+	if (USER4.starts("RESTART")) {
 
 		if (USER4 eq "RESTART $LISTEN") {
 			SYSTEM(100, 3) = "";
@@ -133,13 +133,13 @@ listen:
 		var attachfilename = "";
 
 		//either BACKUP or BACKUP2 followed by space and drive letter
-		if (PSEUDO.b(1, 6) eq "BACKUP") {
+		if (PSEUDO.starts("BACKUP")) {
 
 			subject = "EXODUS Backup " ^ dbcode;
 
 			//add drive letter(s)
-			tt = PSEUDO.field(" ", 2).substr(1, 2);
-			var tt2 = PSEUDO.field(" ", 3).substr(1, 2);
+			tt = PSEUDO.field(" ", 2).first(2);
+			var tt2 = PSEUDO.field(" ", 3).first(2);
 			subject ^= " -> " ^ tt;
 			if (tt2 and tt2 ne tt) {
 				subject ^= "/" ^ tt2;
@@ -182,7 +182,7 @@ listen:
 			if (VOLUMES) {
 				printl(USER4);
 			}
-			var techmsg = USER4.f(1).substr(1, 256);
+			var techmsg = USER4.f(1).first(256);
 			call sysmsg(USER4, techmsg);
 
 		}
@@ -237,7 +237,7 @@ listen:
 				}
 
 				//optionally email backup.zip
-				if ((errormsg eq "" or errormsg.b(1, 2) eq "OK") and attachfilename) {
+				if ((errormsg eq "" or errormsg.starts("OK")) and attachfilename) {
 					var address2 = sys.address.field("/", 2);
 					//remove exodus from the backup.zip recipients
 					if (address2.locateusing(";", "backups@neosys.com", xx)) {

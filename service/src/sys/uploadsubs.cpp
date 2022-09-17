@@ -27,7 +27,7 @@ var eof;//num
 var line;
 var csv;
 var ptr;//num
-var ncols;
+//var ncols;
 var dictfile;
 var xx;
 var cell;
@@ -102,7 +102,7 @@ postuploadfail:
 		rec(fns.f(1), ii2) = targetfilename;
 		rec(fns.f(2), ii2) = newstatus;
 		rec(fns.f(3), ii2) = USERNAME;
-		rec(fns.f(4), ii2) = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+		rec(fns.f(4), ii2) = date() ^ "." ^ time().oconv("R(0)#5");
 		rec(fns.f(5), ii2) = STATION;
 
 		rec.write(file, key);
@@ -139,7 +139,7 @@ postuploadfail:
 		var tt = "\\";
 		uploadpath.converter(tt, OSSLASH);
 
-		if (uploadpath.b(3, 99999).contains("..")) {
+		if (uploadpath.b(3).contains("..")) {
 			msg = uploadpath.quote() ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -163,7 +163,7 @@ postuploadfail:
 		}
 
 		//otherwise make the folders in parent order
-		var nsubfolders = uploadpath.count(OSSLASH);
+		let nsubfolders = uploadpath.count(OSSLASH);
 		for (const var subfoldern : range(1, nsubfolders)) {
 			var subfolder = uploadpath.field(OSSLASH, 1, subfoldern);
 			//call subdirs(uploadroot:subfolder:char(0),result)
@@ -256,7 +256,7 @@ postuploadfail:
 		//if dirpatt[-1,1]<>'.' then dirpatt:='.'
 		dirpatt ^= "*";
 
-		if (dirpatt.b(3, 99999).contains("..")) {
+		if (dirpatt.b(3).contains("..")) {
 			msg = dirpatt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -283,8 +283,8 @@ postuploadfail:
 		//select extensions if many .jpg .gif .mpg etc.
 		//insert the missing virtual path
 		if (uploadfilenames) {
-			var nuploads = uploadfilenames.count(FM) + 1;
 
+			let nuploads = uploadfilenames.count(FM) + 1;
 			var ndeep = virtualfilebase.count(OSSLASH) + 1;
 			for (const var uploadn : range(1, nuploads)) {
 				var uploadfilename = uploadfilenames.f(uploadn);
@@ -338,7 +338,7 @@ postuploadfail:
 		}
 
 		tt = uploadroot ^ uploadpath;
-		if (tt.b(3, 99999).contains("..")) {
+		if (tt.b(3).contains("..")) {
 			msg = tt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -372,7 +372,7 @@ postuploadfail:
 		var validating = RECORD.f(17);
 		osfile = "";
 
-		if (uploadpath.b(3, 99999).contains("..")) {
+		if (uploadpath.b(3).contains("..")) {
 			msg = uploadpath.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -383,7 +383,7 @@ postuploadfail:
 		if (not dictfilename) {
 			dictfilename = filename;
 		}
-		if (dictfilename.b(1, 4) ne "DICT") {
+		if (dictfilename.first(4) ne "DICT") {
 			dictfilename.splicer(1, 0, "DICT.");
 		}
 		//if keydictid else keydictid='@ID'
@@ -410,7 +410,7 @@ postuploadfail:
 		// goto invalid
 		// end
 
-		temposfilename83 = (SYSTEM.f(24) ^ var(1000000).rnd()).substr(1, 8) ^ "._IM";
+		temposfilename83 = (SYSTEM.f(24) ^ var(1000000).rnd()).first(8) ^ "._IM";
 
 		msg = (uploadroot ^ uploadpath).quote() ^ "\r\n";
 		msg = "Uploaded file cannot be found/copied" "\r\n";
@@ -480,13 +480,14 @@ nextline:
 						line.splicer(1, ptr, "");
 					}//loop;
 				}
-				ncols = cols.count(FM) + 1;
+				//ncols = cols.count(FM) + 1;
 	//oswrite cols on 'cols'
 
 				goto nextline;
 
 			}
 
+			let ncols = cols.count(FM) + 1;
 			//first record, open files and create dictionary
 			if (file eq "") {
 

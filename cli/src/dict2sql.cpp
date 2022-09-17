@@ -452,14 +452,14 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
 	var conversion = dictrec.f(7);
-	if (conversion.b(1, 6) == "[DATE]" || conversion.b(1, 6) == "[DATE," || conversion.b(1, 6) == "[DATE2")
+	if (conversion.starts("[DATE]") || conversion.starts("[DATE,") || conversion.starts("[DATE2"))
 		dict_returns = "date";
-	else if (conversion.b(1, 9) == "[DATETIME")
+	else if (conversion.starts("[DATETIME"))
 		dict_returns = "timestamp";
-	if (conversion.b(1, 5) == "[TIME")
+	if (conversion.starts("[TIME"))
 		//dict_returns = "time";
 		dict_returns = "interval";
-	else if (conversion.b(1, 7) == "[NUMBER") {
+	else if (conversion.starts("[NUMBER")) {
 		if (conversion[9] == "0")
 			//[NUMBER,0]
 			dict_returns = "integer";
@@ -470,7 +470,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	var function_name_and_args = dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)";
 
 	//auto generate pgsql code for ..._XREF dict records (full text)
-	if (sourcecode.b(1, 11) == "CALL XREF({") {
+	if (sourcecode.starts("CALL XREF({")) {
 
 		//remove any existing pgsql
 		var pos = index(sourcecode,

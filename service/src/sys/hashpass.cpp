@@ -18,7 +18,7 @@ function main(in password) {
 
 	//pass2
 	while (true) {
-		hashedpassword ^= var().chr(65 + (encryptkey.mod(50)));
+		hashedpassword ^= chr(65 + (encryptkey.mod(50)));
 		encryptkey = (encryptkey / 50).floor();
 		///BREAK;
 		if (not encryptkey) break;
