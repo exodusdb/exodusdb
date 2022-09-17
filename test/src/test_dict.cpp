@@ -43,7 +43,7 @@ function main() {
 
 		printl("\n   --- say that dicts are on the specific database " ^ xo_dict ^ " ---\n");
 		assert(ossetenv("EXO_DICT", xo_dict));
-		assert(var(getenv("EXO_DICT")) eq xo_dict);
+		assert(var(osgetenv("EXO_DICT")) eq xo_dict);
 
 		printl("\n   --- create a dict on the specific database implicitly ---\n");
 		assert(createfile(dict_xo_test));
@@ -81,7 +81,7 @@ function main() {
 
 		printl("\n   --- say that dicts are on the default database ---\n");
 		assert(ossetenv("EXO_DICT", ""));
-		assert(var(getenv("EXO_DICT")) eq "");
+		assert(var(osgetenv("EXO_DICT")) eq "");
 
 		printl("\n   --- needed to remove default dict connection ---\n");
 		disconnectall();
