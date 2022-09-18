@@ -68,17 +68,22 @@ function main() {
 
 	var verbose = OPTIONS.contains("V");
 
-	for (var filename : COMMAND) {
+	for (var osfilename : COMMAND) {
 
-		if (not filename or filename.contains("convsyntax") or filename.ends(".so") or osdir(filename))
+		if (not osfilename
+			or osfilename.contains("convsyntax")
+			or osfilename.ends(".so")
+			or osdir(osfilename)
+			or osfilename.starts(".")
+		)
 			continue;
 
 		if (verbose)
-			logputl(filename);
+			logputl(osfilename);
 
 		// Read a source file into a dimensioned array of vars
 		dim txt;
-		if (not txt.osread(filename))
+		if (not txt.osread(osfilename))
 			abort(lasterror());
 
 		bool replaced = false;
@@ -278,6 +283,12 @@ function main() {
 					R"__(.b\(\1\))__"
 				);
 
+				// .b(1, -> .starts(
+				line2.regex_replacer(
+					R"__(\.b\(1,\s*)__",
+					R"__(.first\()__"
+				);
+
 			}
 			// var().xxx -> xxx
 			if (emptyvar) {
@@ -292,16 +303,17 @@ function main() {
 
 			//line = restore_subsyntax(line2, ',');
 			if (line2 ne line) {
+				printl('-', osfilename, line.replace("\t", "    "));
+				printl('+', osfilename, line2.replace("\t", "    "));
 				line = line2;
 				replaced = true;
-				printl('+', line.replace("\t", "    "));
 			}
 
 		}
 
 		// Update the source file
 		if (replaced && OPTIONS.contains("U"))
-			txt.oswrite(filename);
+			txt.oswrite(osfilename);
 	}
 
 	return 0;

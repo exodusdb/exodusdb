@@ -5,8 +5,7 @@ function main() {
 
 	var filename = COMMAND.f(2);
 
-	var itemids = remove(COMMAND, 1, 0, 0);
-	remover(itemids, 1, 0, 0);
+	var itemids = COMMAND.remove(1).remove(1);
 
 	if (not filename or not itemids)
 		abort("Syntax is 'delete filename itemid ... (S=Silent)'");
@@ -15,11 +14,9 @@ function main() {
 	if (not open(filename, file))
 		abort(filename.quote() ^ " file does not exist.");
 
-	var sep = 0;
-	var posn = 1;
 	var ndeleted = 0;
-	do {
-		var itemid = substr2(itemids, posn, sep);
+
+	for (var itemid : itemids) {
 
 		if (itemid == "*") {
 			clearfile(file);
@@ -31,7 +28,7 @@ function main() {
 			++ndeleted;
 		else
 			printl(quote(itemid) ^ " does not exist.");
-	} while (sep);
+	}
 
 	printl(ndeleted ^ " record(s) deleted.");
 

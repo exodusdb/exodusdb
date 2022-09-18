@@ -63,12 +63,12 @@ class printtext {
 			//if no printfilename assume command mode and make an output file name
 			printfilename = SYSTEM.f(2);
 			if (html.unassigned()) {
-				html = printfilename.substr(-4, 4) eq ".htm";
+				html = printfilename.ends(".htm");
 			}
 
 			var ownprintfile = 0;
 			if (printfilename == "") {
-				printfilename = (var(999999999).rnd()).substr(-8, 8);
+				printfilename = (var(999999999).rnd()).last(8);
 				if (html)
 					printfilename ^= ".htm";
 				else
@@ -78,15 +78,14 @@ class printtext {
 			}
 
 			//change the file extension to htm
-			if (html and printfilename.substr(-4, 4) not_eq ".htm") {
+			if (html and not printfilename.ends(".htm")) {
 
 				printfilename.osclose();
 				printfilename.osremove();
 
 				//create a new filename
 				var tt = (field2(printfilename, "\\", -1)).length();
-				var t2 = ((var(10).pwr(15)).rnd()).substr(1, 8);
-				//var t2 = ((var(pow(10,15)).rnd()).substr(1, 8);
+				var t2 = ((var(10).pwr(15)).rnd()).last(8);
 				printfilename.splicer(-tt, tt, t2 ^ ".htm");
 
 				SYSTEM.r(2, printfilename);
@@ -338,7 +337,7 @@ class printtext {
 			var head1 = headx.f(1);
 			head1.replacer(" ", "&nbsp;");
 			head1.converter("~", " ");
-			while (head1.substr(-6, 6) == "&nbsp;") {
+			while (head1.ends( "&nbsp;")) {
 				head1.splicer(-6, 6, "");
 			}
 			headx.r(1, head1);

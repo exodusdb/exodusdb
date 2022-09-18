@@ -1906,8 +1906,7 @@ recexit:
 
 				//colored cells starting with ESC
 				if (tt[1] eq "\x1B") {
-					if (tt.b(1, 2) eq("\x1B"
-										   "\x1B")) {
+					if (tt.starts("\x1B\x1B")) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
@@ -2142,7 +2141,7 @@ getword2b:
 	//otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-	if (("'" ^ DQ).contains(charx)) {
+	if (charx and ("'" ^ DQ).contains(charx)) {
 		searchchar = charx;
 	} else {
 		searchchar = " ";

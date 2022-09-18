@@ -225,7 +225,7 @@ static void PGconn_DELETER(PGconn* pgconn) {
 
 #define DEBUG_LOG_SQL if (DBTRACE) sql.squote().logputl("SQL0 ");
 
-#define DEBUG_LOG_SQL1 if (DBTRACE) {((this->assigned() ? (this->substr(1,50)) : "") ^ " | " ^ sql.replace("$1", var(paramValues[0]).substr(1,50).squote())).logputl("SQL1 ");}
+#define DEBUG_LOG_SQL1 if (DBTRACE) {((this->assigned() ? (this->first(50)) : "") ^ " | " ^ sql.replace("$1", var(paramValues[0]).first(50).squote())).logputl("SQL1 ");}
 
 // this front end C interface is based on postgres
 // http://www.postgresql.org/docs/8.2/static/libpq-exec.html
@@ -842,7 +842,7 @@ bool var::attach(CVR filenames) {
 		filenames2 = "";
 		var allfilenames = this->listfiles();
 		for (var filename : allfilenames) {
-			if (filename.substr(1, 5) == "dict.") {
+			if (filename.starts("dict.")) {
 				filenames2 ^= filename ^ FM;
 			}
 		}
@@ -1233,7 +1233,7 @@ bool var::read(CVR filehandle, CVR key) {
 
 	// lower case key if reading from dictionary
 	// std::string key2;
-	// if (filehandle.substr(1,5).lcase()=="dict.")
+	// if (filehandle.lcase().starts("dict.)")
 	//	key2=key.lcase().var_str;
 	// else
 	//	key2=key.var_str;
@@ -2100,7 +2100,7 @@ bool var::createfile(CVR filename) const {
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
 	var sql = "CREATE";
-	if (filename.substr(-5, 5) == "_temp")
+	if (filename.ends("_temp"))
 		sql ^= " TEMPORARY ";
 	sql ^= " TABLE " ^ get_normal_filename(filename);
 	sql ^= " (key text primary key, data text)";
@@ -2170,11 +2170,13 @@ bool var::clearfile(CVR filename) const {
 		return filename.sqlexec(sql);
 }
 
-inline void unquoter_inline(VARREF string) {
+inline void unquoter_inline(VARREF iovar) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
-	if (quotecharacters.contains(string[1]))
-		string = string.substr(2, string.len() - 2);
+	if (quotecharacters.contains(iovar[1]))
+		//string = string.substr(2, string.len() - 2);
+		//iovar = iovar.substr(2).popper();
+		iovar.substrer(2).popper();
 }
 
 inline void tosqlstring(VARREF string1) {
@@ -2227,7 +2229,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 		// The dictionary of all dict. files is dict.voc. Used when selecting any dict. file.
 		var dictfilename;
-		if (mainfilename.substr(1, 5).lcase() == "dict.")
+		if (mainfilename.lcase().starts("dict."))
 			dictfilename = "dict.voc";
 		else
 			dictfilename = "dict." ^ mainfilename;
@@ -2311,8 +2313,8 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	var conversion = dictrec.f(7);
 
 	var isinteger = conversion == "[NUMBER,0]" || dictrec.f(11) == "0N" ||
-					dictrec.f(11).substr(1, 3) == "0N_";
-	var isdecimal = conversion.substr(1, 2) == "MD" || conversion.substr(1, 7) == "[NUMBER" ||
+					dictrec.f(11).starts("0N_");
+	var isdecimal = conversion.starts("MD") || conversion.starts("[NUMBER") ||
 					dictrec.f(12) == "FLOAT" || dictrec.f(11).contains("0N");
 	//dont assume things that are R are numeric
 	//eg period 1/19 is right justified but not numeric and sql select will crash if ::float8 is used
@@ -2321,8 +2323,8 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	var ismv1 = dictrec.f(4)[1] == "M";
 	var fromjoin = false;
 
-	var isdate = conversion[1] == "D" || conversion.substr(1, 5) == "[DATE";
-	var istime = !isdate && (conversion.substr(1,2) == "MT" || conversion.substr(1, 5) == "[TIME");
+	var isdate = conversion.starts("D") || conversion.starts("[DATE");
+	var istime = !isdate && (conversion.starts("MT") || conversion.starts("[TIME"));
 
 	var sqlexpression;
 	if (dicttype == "F") {
@@ -2367,7 +2369,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		var extractargs =
 			get_fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
 
-		if (conversion.substr(1, 9) == "[DATETIME")
+		if (conversion.starts("[DATETIME"))
 			sqlexpression = "exodus_extract_datetime(" ^ extractargs;
 
 		else if (isdate)
@@ -2475,7 +2477,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		//@ans=xlate('ADDRESSES',@id,2,'X')
 		//@ans=xlate('SCHEDULES',field(@id,'.',1),'YEAR_PERIOD','C')
 		//@ans=xlate('CURRENCIES',{CURRENCY_CODE},1,'X')
-		else if ((!ismv1 || stage2_calculated) && function_src.trimf("\t ").substr(1, 13).lcase() == "/" "/@ans=xlate(") {
+		else if ((!ismv1 || stage2_calculated) && function_src.trimf("\t ").lcase().starts("/" "/@ans=xlate(")) {
 
 			function_src = function_src.f(1, 1).trimf("\t ");
 			function_src.splicer(1, 13, "");
@@ -2538,21 +2540,21 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			// determine the join details
 			var xlatekeyexpression = "";
 			//xlatefromfieldname.logputl("xlatefromfieldname=");
-			if (xlatefromfieldname.trim().substr(1, 8).lcase() == "@record<") {
+			if (xlatefromfieldname.trim().lcase().starts("@record<")) {
 				xlatekeyexpression = "exodus_extract_text(";
 				xlatekeyexpression ^= filename ^ ".data";
 				xlatekeyexpression ^= ", " ^ xlatefromfieldname.substr(9);
 				xlatekeyexpression.popper();
 				xlatekeyexpression ^=
 					var(", 0").str(3 - xlatekeyexpression.count(",")) ^ ")";
-			} else if (xlatefromfieldname.trim().substr(1, 10).lcase() == "field(@id|") {
+			} else if (xlatefromfieldname.trim().lcase().starts("field(@id|")) {
 				xlatekeyexpression = "split_part(";
 				xlatekeyexpression ^= filename ^ ".key,'*',";
 				xlatekeyexpression ^= xlatefromfieldname.field("|", 3).field(")", 1) ^ ")";
 			}
 
 			// TODO				if
-			// (xlatefromfieldname.substr(1,8)=="FIELD(@ID)
+			// (xlatefromfieldname.starts(FIELD(@ID))
 			else if (xlatefromfieldname[1] == "{") {
 				xlatefromfieldname =
 					xlatefromfieldname.substr(2).popper();
@@ -2651,11 +2653,11 @@ exodus_call:
 	ismv = ismv1;
 
 	// vector (for GIN or indexing/filtering multivalue fields)
-	//if ((ismv1 and !forsort) || fieldname.substr(-5).ucase() == "_XREF") {
-	if ((ismv1 and !forsort) || fieldname.substr(-4).ucase() == "XREF") {
+	//if ((ismv1 and !forsort) || fieldname.ucase().ends("_XREF")) {
+	if ((ismv1 and !forsort) || fieldname.ucase().ends("XREF")) {
 		//this is the sole creation of to_tsvector in mvdbpostgres.cpp
 		//it will be used like to_tsvector(...) @@ to_tsquery(...)
-		if (fieldname.substr(-4).ucase() == "XREF")
+		if (fieldname.ucase().ends("XREF"))
 			sqlexpression = "immutable_unaccent(" ^ sqlexpression ^ ")";
 		sqlexpression = "to_tsvector('simple', " ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('simple', " ^ sqlexpression ^ ")";
@@ -2679,7 +2681,7 @@ exodus_call:
 		//ismv = true;
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
-		if (sqlexpression.substr(1, 20) == "exodus_extract_date(" || sqlexpression.substr(1, 20) == "exodus_extract_time(")
+		if (sqlexpression.starts("exodus_extract_date(") || sqlexpression.starts("exodus_extract_time("))
 			sqlexpression.splicer(20, 0, "_array");
 		else {
 			sqlexpression.regex_replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
@@ -2897,7 +2899,7 @@ bool var::select(CVR sortselectclause) {
 	assertDefined(function_sig);
 	ISSTRING(sortselectclause)
 
-	if (!sortselectclause || sortselectclause.substr(-2, 2) == "R)")
+	if (!sortselectclause || sortselectclause.ends("R)"))
 		return this->selectx("key, mv::integer, data", sortselectclause);
 	else
 		return this->selectx("key, mv::integer", sortselectclause);
@@ -3170,7 +3172,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// skip AUTHORISED for now since too complicated to calculate in database
 			// ATM if (word1.ucase()=="AUTHORISED") { if
-			//(whereclause.substr(-4,4).ucase() == " AND")
+			//(whereclause.ends(" AND"))
 			//whereclause.splicer(-4,4,""); continue;
 			//}
 
@@ -3186,8 +3188,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			//var dictexpression_isarray=dictexpression.contains("string_to_array(");
 			var dictexpression_isarray = dictexpression.contains("_array(");
 			var dictexpression_isvector = dictexpression.contains("to_tsvector(");
-			//var dictexpression_isfulltext = dictid.substr(-5).ucase() == "_XREF";
-			var dictexpression_isfulltext = dictid.substr(-4).ucase() == "XREF";
+			//var dictexpression_isfulltext = dictid.ucase(),ends("_XREF");
+			var dictexpression_isfulltext = dictid.ucase().ends("XREF");
 
 			// add the dictid expression
 			//if (dictexpression.contains("exodus_call"))
@@ -3561,7 +3563,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				//remove conversion to array
 				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
-				if (dictexpression.substr(1, 16) == "string_to_array(") {
+				if (dictexpression.starts("string_to_array(")) {
 					dictexpression.splicer(1, 16, "");
 					dictexpression.splicer(-13, "");
 				}
@@ -3727,7 +3729,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				}
 
 				// if full text search
-				//if (dictid.substr(-5).ucase() == "_XREF") {
+				//if (dictid.last(5).ucase() == "_XREF") {
 				if (dictexpression_isfulltext) {
 
 					//https://www.postgresql.org/docs/current/textsearch-controls.html
@@ -3905,7 +3907,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		orderclause ^= ", " ^ actualfilename ^ ".key";
 
 	//if calculated fields then secondary sort/select is going to use data column, so add the data column if missing
-	if (calc_fields && actualfieldnames.substr(-6) != ", data")
+	if (calc_fields && not actualfieldnames.ends(", data"))
 		actualfieldnames ^= ", data";
 
 	//remove mv::integer if no unnesting (sort on mv fields)
@@ -4863,7 +4865,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 
 	// create postgres index
 	sql = "CREATE INDEX index__" ^ filename ^ "__" ^ fieldname ^ " ON " ^ filename;
-	//if (ismv || fieldname.substr(-5).lcase() == "_xref")
+	//if (ismv || fieldname.lcase().ends("_xref"))
 	if (dictexpression.contains("to_tsvector("))
 		sql ^= " USING GIN";
 	sql ^= " (";

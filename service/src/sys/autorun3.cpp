@@ -760,7 +760,7 @@ subroutine exec2() {
 	printfilename = linkfilename2;
 	tt = oscwd();
 	tt.splicer(-7, 7, "");
-	if (printfilename.b(1, tt.len()) eq tt) {
+	if (printfilename.starts(tt)) {
 		printfilename.splicer(1, tt.len(), "../");
 	}
 	printfilename.converter("/", OSSLASH);
@@ -888,7 +888,7 @@ subroutine fmtresp() {
 	//trim everything after <ESC> (why?)
 	tt = USER3.contains("<ESC>");
 	if (tt) {
-		response_ = USER3.b(1, tt - 1);
+		response_ = USER3.first(tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters

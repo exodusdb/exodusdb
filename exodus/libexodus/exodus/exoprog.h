@@ -220,7 +220,8 @@ class PUBLIC ExodusProgramBase {
 
    private:
 
-	var number(CVR type, CVR input0, CVR ndecs0, VARREF output);
+	var exoprog_date(CVR type, CVR input0, CVR ndecs0, VARREF output);
+	var exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF output);
 
 	// used by calculate to call dict libraries
 	mutable std::string cached_dictid_;

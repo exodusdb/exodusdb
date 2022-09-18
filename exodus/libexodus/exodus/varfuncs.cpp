@@ -464,18 +464,17 @@ inline void trimmerf_helper(std::string& instr, SV trimchars) {
 	return;
 }
 
-inline void trimmerb_helper(std::string& instr, SV trimchars) {
+inline void trimmerb_helper(std::string& iostr, SV trimchars) {
 
-	std::size_t end_pos = instr.find_last_not_of(trimchars);
+	std::size_t end_pos = iostr.find_last_not_of(trimchars);
 
 	// Early exit
 	if (end_pos == std::string::npos) {
-		instr.clear();
+		iostr.clear();
 		return;
 	}
 
-	// return var(var_str.substr(0,end_pos+1));
-	instr.erase(end_pos + 1);
+	iostr.erase(end_pos + 1);
 
 	return;
 }

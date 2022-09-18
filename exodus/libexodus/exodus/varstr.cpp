@@ -1485,7 +1485,8 @@ bool var::contains(SV str) const {
 	if (str.empty()) {
 		VarError e(__PRETTY_FUNCTION__);
 		e.description.errput();
-		e.stack(1).f(1).errputl();
+		//e.stack().f(1).errputl(", ");
+		e.stack(1).f(1).errputl(", ");
 		return false;
 	}
 
@@ -2089,7 +2090,7 @@ var var::sumall() const {
 			//for clarity of error message,
 			//throw any error here instead of leaving it up to the +=
 			if (!subfield.isnum())
-				throw VarNonNumeric("sumall() " ^ subfield.substr(1, 128).quote());
+				throw VarNonNumeric("sumall() " ^ subfield.first(128).quote());
 
 			result += subfield;
 			size_t n = subfield.var_str.find('.');
@@ -2130,7 +2131,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!this->isnum())
-			throw VarNonNumeric("sum() " ^ this->substr(1, 128).quote());
+			throw VarNonNumeric("sum() " ^ this->first(128).quote());
 
 		return (*this) + 0;
 	}
@@ -2150,7 +2151,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!part.isnum())
-			throw VarNonNumeric("sum() " ^ part.substr(1, 128).quote());
+			throw VarNonNumeric("sum() " ^ part.first(128).quote());
 
 		if (flag) {
 

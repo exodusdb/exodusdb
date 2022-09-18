@@ -250,7 +250,7 @@ function main() {
 			question ^= "\n" ^ basefilename.quote() ^ " does not exist. Create what? (1-2) ";
 			while (true) {
 
-				if (basefilename.b(1, 5).lcase() eq "dict.")
+				if (basefilename.lcase().starts("dict."))
 					progtype = 5;
 				else
 					progtype.input(question);

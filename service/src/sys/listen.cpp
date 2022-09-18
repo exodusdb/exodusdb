@@ -1367,7 +1367,7 @@ function request_init() {
 				if (blockn gt 1) {
 					tt = ((datx(blockn - 1)).last(2)).index("%");
 					if (tt) {
-						datx(blockn - 1) ^= datx(blockn).b(1, tt);
+						datx(blockn - 1) ^= datx(blockn).first(tt);
 						datx(blockn).splicer(1, tt, "");
 					}
 				}
@@ -2704,7 +2704,7 @@ function request_exit() {
 			datx = "";//dim
 			ptr = 0;
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
-				blk = USER1.b(1, outblocksize);
+				blk = USER1.first(outblocksize);
 				iodat_.splicer(1, outblocksize, "");
 				///BREAK;
 				if (not(blk.len())) break;
@@ -2847,7 +2847,7 @@ subroutine fmtresp() {
 	//trim everything after <ESC> (why?)
 	tt = response_.index("<ESC>");
 	if (tt) {
-		USER3 = response_.b(1, tt - 1);
+		USER3 = response_.first(tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters

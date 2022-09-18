@@ -395,7 +395,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(this->first(128) ^ "+= ");
 }
 
 // MULTIPLY VAR
@@ -440,7 +440,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(this->first(128) ^ "+= ");
 }
 
 // SUBTRACT VAR
@@ -485,7 +485,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(this->first(128) ^ "+= ");
 }
 
 
@@ -506,7 +506,7 @@ tryagain:
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 									 "')");
 			var_dbl /= rhs.var_dbl;
 		}
@@ -514,7 +514,7 @@ tryagain:
 		// rhs double
 		else {
 			if (!rhs.var_int)
-				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 									 "')");
 			var_dbl /= rhs.var_int;
 		}
@@ -527,7 +527,7 @@ tryagain:
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 								 "')");
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_dbl;
 		}
@@ -535,7 +535,7 @@ tryagain:
 		// both are ints - must return a double
 		else {
 			if (!rhs.var_int)
-				throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ rhs.substr(1, 128) ^
+				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 				"')");
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_int;
 		}
@@ -588,7 +588,7 @@ tryagain:
 	else {
 		assertNumeric(__PRETTY_FUNCTION__);
 		// Cant get here
-		throw VarNonNumeric(substr(1, 128) ^ "+= ");
+		throw VarNonNumeric(this->first(128) ^ "+= ");
 	}
 
 	// reset to one unique type
@@ -657,7 +657,7 @@ tryagain:
 VARREF var::operator/=(const double dbl1) &{
 
 	if (!dbl1)
-		throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ dbl1 ^
+		throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ dbl1 ^
 		"')");
 
 tryagain:
@@ -724,7 +724,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(this->first(128) ^ "+= ");
 }
 
 // MULTIPLY INT
@@ -756,7 +756,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(this->first(128) ^ "+= ");
 }
 
 //SUBTRACT INT
@@ -788,7 +788,7 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(substr(1, 128) ^ "+= ");
+	throw VarNonNumeric(this->first(128) ^ "+= ");
 }
 
 
@@ -799,7 +799,7 @@ VARREF var::operator/=(const int int1) &{
 	// Always return double
 
 	if (!int1)
-		throw VarDivideByZero("div('" ^ this->substr(1, 128) ^ "', '" ^ int1 ^
+		throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ int1 ^
 		"')");
 
 tryagain:
@@ -1432,7 +1432,7 @@ var var::operator-() const{
 	this->assertNumeric(__PRETTY_FUNCTION__);
 
 	// will never get here
-	throw VarNonNumeric("+(" ^ this->substr(1, 128) ^ ")");
+	throw VarNonNumeric("+(" ^ this->first(128) ^ ")");
 }
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!

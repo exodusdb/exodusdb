@@ -67,7 +67,7 @@ void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF return
 	var line = filetext.field("\x0A", lineno).trimf(" \t");
 
 	// suppress confusing and unhelpful exodus macros
-	//if ((line.substr(1,12) == "programexit(" || line.substr(1,12) == "libraryexit(" || line.substr(1,10) == "classexit(") or
+	//if ((line.first(12) == "programexit(" || line.first(12) == "libraryexit(" || line.first(10) == "classexit(") or
 	//if (line.match("^(program|library|class)(init|exit)\\(") or
 	//	(line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
 	//	return;
@@ -153,7 +153,12 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		if (objaddress.len() > 9)
 			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
 
-		if (objfilename.contains("libc.so") or objfilename.contains("libexodus.so"))
+		// Skip libc
+		if (objfilename.contains("libc.so"))
+			continue;
+
+		// Skip libexodus
+		if (objfilename.contains("libexodus.so"))
 			continue;
 
 #ifdef TRACING

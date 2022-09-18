@@ -140,52 +140,6 @@ bool checknotabsoluterootfolder(std::string dirpath) {
 	return true;
 }
 
-//const std::string var::to_path_string() const {
-//	var part2 = this->field(" ", 2, 999999);
-//	if (part2.len()) {
-//
-//#if defined WIN32 || defined _WIN32
-//		var part = this->field(" ", 1).convert("/", OSSLASH);
-//#else
-//		// printf("path=%s\n",this->convert("\\",OSSLASH).toString().c_str());
-//		var part = this->field(" ", 1).convert("\\", OSSLASH);
-//
-//		// very similar code below
-//		// standardise on ALL AND ONLY lower case os file and path names
-//		// in order to allow uppercase, will have to find and remove all uppercase in the
-//		// old source code
-//		/*
-//		var lcpart = part.lcase();
-//		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG" && !part.contains("./data/"))
-//		{
-//			part.errputl("WARNING - UPPERCASE OS=");
-////			part = lcpart;
-//		}
-//		*/
-//#endif
-//		return part.toString() + " " + part2.toString();
-//	} else {
-//
-//#if defined WIN32 || defined _WIN32
-//		return this->convert("/", OSSLASH).toString();
-//#else
-//		// very similar code above
-//		// standardise on ALL AND ONLY lower case os file and path names
-//		// in order to allow uppercase, will have to find and remove all uppercase in the
-//		// old source code
-//		/*
-//		var lcthis = this->lcase();
-//		if (lcthis != (*this) && this->substr(-3,3) != ".LK" && this->substr(-3,3) != ".OV" && this->substr(-9) != "/DATA.CFG")
-//		{
-//			(*this).errputl("WARNING - UPPERCASE OS=");
-////			return lcthis.convert("\\", OSSLASH).toString();
-//		}
-//		*/
-//		return this->convert("\\", OSSLASH).toString();
-//#endif
-//	}
-//}
-
 const std::string to_path_string(CVR str1) {
 	return str1.toString();
 }
@@ -1253,7 +1207,7 @@ var var::oslist(SV globpattern0, const int mode) const {
 		// (has * or ?) use it.
 		globpattern = path.field2(_OSSLASH, -1);
 		if (globpattern.convert("*?", "") != globpattern)
-			path = path.substr(1, path.len() - globpattern.len());
+			path.firster(path.len() - globpattern.len());
 		else
 			globpattern = "";
 	}

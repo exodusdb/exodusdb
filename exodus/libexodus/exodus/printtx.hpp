@@ -32,7 +32,7 @@ subroutine printtx() {
 		}
 		var ownprintfile = 0;
 		//if (printfilename == "") {
-		//	printfilename = var(999999999).rnd().substr(-8,8);
+		//	printfilename = var(999999999).rnd().last(8);
 		//	//printfilename:=if html then '.htm' else '.txt'
 		//	if (html) {
 		//		printfilename ^= ".htm";
@@ -44,14 +44,14 @@ subroutine printtx() {
 		//}
 
 		//change the file extension to HTM
-		if (html and ((printfilename.substr(-4,4)).lcase() ne ".htm")) {
+		if (html and not printfilename.lcase().ends(".htm")) {
 
 			printfilename.osclose();
 			printfilename.osremove();
 
 			//create a new filename
 			var ptx_filenamelen = (field2(printfilename, "\\", -1)).len();
-			var ptx_random = var(10).pwr(15).rnd().substr(1,8);
+			var ptx_random = var(10).pwr(15).rnd().first(8);
 			printfilename.splicer(-ptx_filenamelen, ptx_filenamelen, ptx_random ^ ".htm");
 
 			SYSTEM.r(2, printfilename);
@@ -305,7 +305,7 @@ subroutine getheadfoot() {
 		head1.converter("~", " ");
 		while (true) {
 			///BREAK;
-			if (not(head1.substr(-6,6) == "&nbsp;")) break;
+			if (not head1.ends("&nbsp;")) break;
 			head1.splicer(-6, 6, "");
 		}//loop;
 		headx.r(1, head1);

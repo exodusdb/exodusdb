@@ -439,7 +439,7 @@ var var::oconv_D(const char* conversion) const {
 				return var(static_cast<int>((civil_month - 1) / 3) + 1);
 
 			// Not AREV
-			// DJ returns day of year
+			// DyJ returns day of year
 			case 'J':
 				//return static_cast<int>(desired_date.day_of_year());
 				return unixdayno - hinnant::gregorian::days_from_civil(civil_year, 1, 1) + 1;
@@ -643,7 +643,7 @@ after_analyse_conversion:
 		newmv ^= hours;
 	} else {
 		// two digit hours
-		//newmv = ("00" ^ var(hours)).substr(-2);
+		//newmv = ("00" ^ var(hours)).last(2);
 		newmv.var_str.push_back('0' + hours / 10);
 		newmv.var_str.push_back('0' + hours % 10);
 	}
@@ -652,7 +652,7 @@ after_analyse_conversion:
 	newmv.var_str.push_back(sepchar);
 
 	// two digit minutes
-	//newmv ^= ("00" ^ var(mins)).substr(-2);
+	//newmv ^= ("00" ^ var(mins)).last(2);
 	newmv.var_str.push_back('0' + mins / 10);
 	newmv.var_str.push_back('0' + mins % 10);
 
@@ -662,7 +662,7 @@ after_analyse_conversion:
 		newmv.var_str.push_back(sepchar);
 
 		// two digit seconds
-		//newmv ^= ("00" ^ var(secs)).substr(-2);
+		//newmv ^= ("00" ^ var(secs)).last(2);
 		newmv.var_str.push_back('0' + secs / 10);
 		newmv.var_str.push_back('0' + secs % 10);
 	}

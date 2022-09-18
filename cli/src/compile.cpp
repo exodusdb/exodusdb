@@ -837,7 +837,7 @@ function main() {
 							} else if (ch eq "(")
 								++level;
 						}
-						funcargsdecl.substrer(1, charn - 1);
+						funcargsdecl.firster(charn - 1);
 
 						//replace comment outs like /*arg1*/ with arg1
 						funcargsdecl.regex_replacer(

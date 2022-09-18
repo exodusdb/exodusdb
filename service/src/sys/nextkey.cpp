@@ -24,7 +24,7 @@ function main(in mode, in previous0="") {
 	if (actfilename eq "") {
 		var temp = seqkey.index(".SK");
 		if (temp) {
-			actfilename = seqkey.b(1, temp - 1);
+			actfilename = seqkey.first(temp - 1);
 		} else {
 			actfilename = keyfilename;
 		}

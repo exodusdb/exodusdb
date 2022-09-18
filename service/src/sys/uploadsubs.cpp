@@ -470,7 +470,7 @@ nextline:
 						var tt = line.index("  ");
 						///BREAK;
 						if (not tt) break;
-						cols(-1) = line.b(1, tt - 1) ^ VM ^ offset;
+						cols(-1) = line.first(tt - 1) ^ VM ^ offset;
 						for (ptr = tt; ptr <= 999999; ++ptr) {
 							///BREAK;
 							if (line[ptr + 1] ne " ") break;

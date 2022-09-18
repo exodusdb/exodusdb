@@ -150,7 +150,7 @@ function main() {
 			continue;
 
 		//option to skip all but dict files
-		if (sourcedb and dictonly and sourcefilename.b(1,5) ne "dict.")
+		if (sourcedb and dictonly and not sourcefilename.starts("dict."))
 			continue;
 
 		// source is a db

@@ -300,7 +300,7 @@ nextcomp:
 	if (lastbackupdate and lastbackupdate lt date()) {
 		msg = "The last backup was ";
 		var ndays = date() - lastbackupdate;
-		msg ^= ndays ^ " day" ^ var("s").b(1, ndays ne 1) ^ " ago.";
+		msg ^= ndays ^ " day" ^ var("s").first(ndays ne 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
 		msg.replacer("(0", "(");
 		msg(-1) = "EXODUS recommends that you \"BACKUP\" your data ";

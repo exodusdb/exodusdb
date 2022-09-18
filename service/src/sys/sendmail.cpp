@@ -197,7 +197,7 @@ forcedemail:
 			ccaddress ^= ";";
 		}
 		ccaddress ^= toaddress.b(tt + 2, 9999);
-		toaddress = toaddress.b(1, tt - 1);
+		toaddress = toaddress.first(tt - 1);
 	}
 
 	//send mail requires confirmation if user is EXODUS

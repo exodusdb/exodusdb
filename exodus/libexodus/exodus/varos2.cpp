@@ -198,8 +198,8 @@ bool var::osgetenv(const char* envcode) {
 	if (*envcode == 0) {
 
 		// Return a copy of the cached list of pairs
-		// excluding the initial FM
 		if (thread_environ.size() >= 2)
+			// excluding the initial FM
 			var_str = thread_environ.substr(1);
 		else
 			var_str.clear();

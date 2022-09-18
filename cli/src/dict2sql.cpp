@@ -112,7 +112,7 @@ function main() {
 
 	if (filenames) {
 		doall = false;
-		if (filenames.b(1, 5) ne "dict.")
+		if (not filenames.starts("dict."))
 			filenames.splicer(1, 0, "dict.");
 
 	} else if (doall) {
@@ -409,7 +409,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 
 subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
-	if (dictfilename.b(1, 5) ne "dict." or dictfilename == "dict.all")
+	if (not dictfilename.starts("dict.") or dictfilename == "dict.all")
 		return;
 
 	if (!open(dictfilename, dictfile)) {
@@ -622,8 +622,7 @@ $RETVAR := array_to_string
 	int nlines = fcount(sql, VM);
 	for (int ln = 1; ln <= nlines; ++ln) {
 		var line = sql.f(1, ln).trim();
-		//if (line.b(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {
-		if (line.b(1, 2) != "--" && field(line, " ", 2, 2).match(":?= xlate")) {
+		if (not line.starts("--") && field(line, " ", 2, 2).match(":?= xlate")) {
 
 			//line.printl("xlate=");
 

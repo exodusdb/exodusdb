@@ -104,7 +104,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	calc_fields_file.open("calc_fields");
 
 	//open the dictionary
-	if (dictfilename.substr(1, 5).lcase() != "dict.")
+	if (not dictfilename.lcase().starts("dict."))
 		dictfilename = "dict." ^ dictfilename;
 	if (!DICT.open(dictfilename)) {
 		dictfilename = "dict.voc";
@@ -360,10 +360,10 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 							ok = !ivalue;
 							break;
 						case 17:  // STARTING ]
-							ok = reqivalues(fieldn).substr(0, ivalue.len()) == ivalue;
+							ok = reqivalues(fieldn).starts(ivalue);
 							break;
 						case 18:  // ENDING [
-							ok = reqivalues(fieldn).substr(-ivalue.len()) == ivalue;
+							ok = reqivalues(fieldn).ends(ivalue);
 							ok = !ivalue;
 							break;
 						case 19:  //  CONTAINING []
@@ -728,7 +728,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	msg = "";
 	// **CALL note(' ':TASK)
 
-	if (task.substr(1, 2) == "..") {
+	if (task.starts("..")) {
 		// call note(task:'')
 		return 1;
 	}
@@ -757,15 +757,15 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	} else
 		isadmin = username == "EXODUS";
 
-	var deleting = task.substr(1, 8) == "%DELETE%";
+	var deleting = task.starts("%DELETE%");
 	if (deleting) {
 		task.splicer(1, 8, "");
 	}
-	var updating = task.substr(1, 8) == "%UPDATE%";
+	var updating = task.starts("%UPDATE%");
 	if (updating) {
 		task.splicer(1, 8, "");
 	}
-	var renaming = task.substr(1, 8) == "%RENAME%";
+	var renaming = task.starts("%RENAME%");
 	if (renaming) {
 		task.splicer(1, 8, "");
 	}
@@ -944,6 +944,11 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 
 	var string2;
 
+	if (not str0) {
+		string2 = "";
+		return string2;
+	}
+
 	if (mode0.unassigned() || mode0 == "CAPITALISE") {
 		string2 = str0;
 		// convert @upper.case to @lower.case in string2
@@ -989,7 +994,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		};	// ii;
 
 		string2.replacer("\'S ", "\'s ");
-		if (string2.substr(-2, 2) == "\'S")
+		if (string2.ends("\'S"))
 			string2.splicer(-2, 2, "\'s");
 	} else if (mode0 == "QUOTE") {
 		string2 = str0;
@@ -1004,7 +1009,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 	} else if (mode0 == "LOWERCASE") {
 		string2 = str0;
 		string2.converter(UPPERCASE, LOWERCASE);
-	} else if (mode0.substr(1, 5) == "PARSE") {
+	} else if (mode0.starts("PARSE")) {
 
 		var uppercase = mode0.contains("UPPERCASE");
 
@@ -1778,18 +1783,18 @@ var ExodusProgramBase::singular(CVR pluralnoun) {
 
 	var temp = pluralnoun;
 
-	if (temp.substr(-2, 2) == "ES") {
+	if (temp.ends("ES")) {
 
 		// companies=company
-		if (temp.substr(-3, 3) == "IES") {
+		if (temp.ends("IES")) {
 			temp.splicer(-3, 3, "Y");
 
 			// addresses=address
-		} else if (temp.substr(-4, 4) == "SSES") {
+		} else if (temp.ends("SSES")) {
 			temp.splicer(-2, 2, "");
-		} else if (temp.substr(-4, 4) == "SHES") {
+		} else if (temp.ends("SHES")) {
 			temp.splicer(-2, 2, "");
-		} else if (temp.substr(-4, 4) == "CHES") {
+		} else if (temp.ends("CHES")) {
 			temp.splicer(-2, 2, "");
 		} else if (1) {
 			temp.popper();
@@ -1798,7 +1803,7 @@ var ExodusProgramBase::singular(CVR pluralnoun) {
 
 		if (temp[-1] == "S") {
 			// analysis, dos
-			if (temp.substr(-2, 2) != "IS" && temp.substr(-2, 2) != "OS")
+			if (not temp.ends("IS") && not temp.ends("OS"))
 				temp.popper();
 		}
 	}
@@ -2156,10 +2161,13 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 
 			//custom function "[NUMBER]" actually has a built in function
 			if (functionname == "number") {
+				gosub exoprog_number("OCONV", result, mode, output);
+			}
 
-				gosub number("OCONV", result, mode, output);
-
-			} else {
+			//custom function "[DATE]" will use the standard exodus var oconv
+			else if (functionname == "date") {
+				gosub exoprog_date("OCONV", result, mode, output);
+			}  else {
 
 				// set the function name
 				ioconv_custom = functionname;
@@ -2228,7 +2236,12 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 
 			//custom function "[NUMBER]" actually has a built in function
             if (functionname == "number") {
-                gosub number("ICONV", result, mode, output);
+                gosub exoprog_number("ICONV", result, mode, output);
+			}
+
+			//custom function "[DATE]" actually has a built in function
+            else if (functionname == "date") {
+                gosub exoprog_date("ICONV", result, mode, output);
 
             } else {
 
@@ -2363,14 +2376,115 @@ zero:
 }
 
 // number
-var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 	//function main(in type, in input0, in ndecs0, out output) {
 	//c xxx in,in,in,out
 
-	//WARNING IF YOU CHANGE THIS THEN ADECOM GOES TO MODULE xxx and libexodus
-	////////////////////////////////////////////////////////////////////////
-	//where exodus/service/src/getpickos will copy
-	//~/pickos/xxx/number.cpp to ~/exodus/cli/src
+var ExodusProgramBase::exoprog_date(CVR type, CVR in0, CVR mode0, VARREF output) {
+//var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
+	//c sys in,in,in,out,in
+
+	//should really be sensitive to timezone in @SW
+
+	var inx = in0;
+	var mode = mode0;
+
+	if (inx eq "") {
+		output = "";
+		return 0;
+	}
+
+	var nospaces = mode.contains("*");
+	if (nospaces) {
+		mode.converter("*", "");
+	}
+
+	if (mode) {
+
+		if (mode eq "4") {
+			mode = DATEFMT;
+			mode.splicer(2, 1, "4");
+		}
+
+	} else {
+
+		if (DATEFMT) {
+			mode = DATEFMT;
+		} else {
+			mode = "D2/E";
+		}
+
+	}
+
+	//status=0
+	if (type eq "OCONV") {
+
+		//dont oconv 1 or 2 digits as they are probably day of month being converted
+		// to proper dates
+		//IF len(inx) gt 2 and inx MATCHES '0N' OR inx MATCHES '"-"0N' OR inx MATCHES '0N.0N' THEN
+		if (inx.len() gt 2 and inx.match("^\\d*$")) {
+			goto ok;
+		}
+
+		if (inx.match("^-\\d*$") or inx.match("^\\d*\\.\\d*$")) {
+ok:
+			//language specific (date format could be a pattern in lang?)
+			if (mode eq "L") {
+
+//				var tt = inx.oconv("D4/E");
+//				var mth = glang.f(2).field("|", tt.field("/", 2));
+//				var day = tt.field("/", 1);
+//				var year = tt.field("/", 3);
+//				//if 1 then
+//				output = day ^ " " ^ mth ^ " " ^ year;
+//				//end else
+//				// output=mth:' ':day:' ':year
+//				// end
+				output = inx.oconv("D");
+
+			} else {
+
+				output = oconv(inx, mode);
+
+				if (output[1] eq "0") {
+					output.splicer(1, 1, " ");
+				}
+
+				if (output[4] eq "0") {
+					output.splicer(4, 1, " ");
+				}
+
+				if (output.b(4, 3).match("^[A-Za-z]{3}$")) {
+					output.splicer(7, 1, "");
+					output.splicer(3, 1, "");
+				}
+
+				if (nospaces) {
+					output.converter(" ", "");
+				}
+
+			}
+
+		} else {
+			output = inx;
+		}
+
+	} else if (type eq "ICONV") {
+
+		if (inx.match("^\\d*$") and inx le 31) {
+			inx ^= var().date().oconv("D").b(4, 9);
+		}
+
+		output = iconv(inx, mode);
+
+	}
+
+	return 0;
+}
+
+// number
+var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
+	//function main(in type, in input0, in ndecs0, out output) {
+	//c xxx in,in,in,out
 
 	var fmtx;
 	var input1;	 //num
@@ -2393,7 +2507,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 			reciprocal = 1;
 			input.splicer(1, 1, "");
 		} else {
-			if (input.substr(1, 2) == "1/") {
+			if (input.starts("1/")) {
 				reciprocal = 1;
 				input.splicer(1, 2, "");
 			}
@@ -2402,7 +2516,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 		output = input.trim();
 
 		//first get into a pickos number with dots not commas
-		if (BASEFMT.substr(1, 2) == "MC") {
+		if (BASEFMT.starts("MC")) {
 			output.converter(",", ".");
 		} else {
 			output.converter(",", "");
@@ -2487,7 +2601,7 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 			temp.converter("0123456789-.", "            ");
 			var numlen = input1.len() - temp.trimf().len();
 			var unitx = input1.substr(numlen + 1, 99);
-			var numx = input1.substr(1, numlen);
+			var numx = input1.first(numlen);
 
 			if (ndecs == "BASE") {
 				output1 = oconv(numx, BASEFMT ^ zz) ^ unitx;
@@ -2496,9 +2610,9 @@ var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
 				//!ndecs could be X to mean no conversion at all!
 				//FMTX=@USER2[1,2]:ndecs:'0P,':z
 				if (ndecs == "") {
-					fmtx = BASEFMT.substr(1, 2) ^ numx.field(".", 2).len() ^ "0P," ^ zz;
+					fmtx = BASEFMT.first(2) ^ numx.field(".", 2).len() ^ "0P," ^ zz;
 				} else {
-					fmtx = BASEFMT.substr(1, 2) ^ ndecs ^ "0P," ^ zz;
+					fmtx = BASEFMT.first(2) ^ ndecs ^ "0P," ^ zz;
 				}
 				if (numx.isnum()) {
 					numx += 0;

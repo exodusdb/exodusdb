@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <date.h>
+#include <langdate.h>
 #include <authorised.h>
 
 #include <sys_common.h>
@@ -118,9 +118,9 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 	tt = "L";
 	if (hascompanies) {
-		call date("OCONV", datetime, tt, tdate, sys.glang);
+		call langdate("OCONV", datetime, tt, tdate, sys.glang);
 	} else {
-		call date("OCONV", datetime, tt, tdate, "");
+		call langdate("OCONV", datetime, tt, tdate, "");
 	}
 	html.replacer("%DATE%", tdate);
 	html.replacer("%TIME%", oconv(datetime.field(".", 2), "[TIME2]"));

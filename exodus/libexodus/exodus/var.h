@@ -818,7 +818,7 @@ class PUBLIC var final {
 	// but allow
 	//
 	//  (*outvar)[4]
-	//  outvar->substr(99)
+	//  outvar->f(99)
 	//
 	// Unfortunately there is no way to prevent
 	//
@@ -2054,7 +2054,7 @@ class PUBLIC var final {
 
 	void assertNumeric(const char* message, const char* varname = "") const {
 		if (!this->isnum())
-			throwNonNumeric(var(varname) ^ " in " ^ var(message) ^ " data: " ^ this->substr(1, 128).quote());
+			throwNonNumeric(var(varname) ^ " in " ^ var(message) ^ " data: " ^ this->first(128).quote());
 	}
 
 	void assertDecimal(const char* message, const char* varname = "") const {

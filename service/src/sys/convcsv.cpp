@@ -201,7 +201,7 @@ function main(in sentence0, in select0="", in filters0="") {
 				exportable = exportable.f(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
-			keyx = exportable.b(1, exportable.index(FM ^ FM) - 1);
+			keyx = exportable.first(exportable.index(FM ^ FM) - 1);
 			nkeys = keyx.count(FM) + 1;
 			if (nkeys gt 2) {
 				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')

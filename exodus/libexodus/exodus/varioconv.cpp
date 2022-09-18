@@ -534,7 +534,6 @@ convert:
 			part1.append(part2).append(std::string(ndecimals - part2len, '0'));
 
 		else /*if (ndecimals < part2len)*/
-			//part1 ^= part2.substr(1, ndecimals);
 			part1.append(part2.substr(0, ndecimals));
 
 	}
@@ -890,11 +889,11 @@ var var::oconv(const char* conversion) const {
 			return (*this);
 
 			//default:
-			//	throw MVNotImplmented("oconv " ^ var(*conversionchar).oconv("HEX").substr(1,6) ^ " not implemented yet ");
+			//	throw MVNotImplmented("oconv " ^ var(*conversionchar).oconv("HEX").first(6) ^ " not implemented yet ");
 	}
 
 	// TODO implement
-	throw VarNotImplemented("oconv '" ^ var(conversion).substr(1, 6) ^ "' not implemented yet ");
+	throw VarNotImplemented("oconv '" ^ var(conversion).first(16) ^ "' not implemented yet ");
 
 	// unknown conversions are simply ignored in pickos
 	return *this;

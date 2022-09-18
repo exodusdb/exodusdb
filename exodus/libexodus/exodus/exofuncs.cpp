@@ -911,7 +911,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 		if (ii == 0) {
 			word = word.field2(OSSLASH, -1);
 			// remove trailing ".exe"
-			if (word.lcase().substr(-4) == ".exe")
+			if (word.lcase().ends(".exe"))
 				word.splicer(-4, 4, "");
 		} else
 			mv.SENTENCE ^= " ";

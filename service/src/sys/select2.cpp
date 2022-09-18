@@ -230,6 +230,7 @@ nocommon:
 
 	//check/get dict recs
 
+	let ndictids = dictids.count(FM) + 1;
 	if (dictids ne "RECORD") {
 		while (true) {
 			///BREAK;
@@ -239,7 +240,6 @@ nocommon:
 		if (dictids eq "") {
 			dictids = "ID";
 		}
-		let ndictids = dictids.count(FM) + 1;
 		for (const var dictidn : range(1, ndictids)) {
 			var dictid = dictids.f(dictidn);
 			var dictrec;
