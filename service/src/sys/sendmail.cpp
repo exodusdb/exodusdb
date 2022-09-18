@@ -196,7 +196,7 @@ forcedemail:
 		if (ccaddress) {
 			ccaddress ^= ";";
 		}
-		ccaddress ^= toaddress.b(tt + 2, 9999);
+		ccaddress ^= toaddress.cut(tt + 1);
 		toaddress = toaddress.first(tt - 1);
 	}
 
@@ -268,7 +268,7 @@ forcedemail:
 
 	if (body[1] eq "@") {
 
-		osfilename = body.b(2);
+		osfilename = body.cut(1);
 		osfilesize = osfilename.osfile().f(1);
 
 		//convert to link if file is too big to email
@@ -337,10 +337,10 @@ forcedemail:
 	//condition subject start standard with 'EXODUS: '
 	if (subject.first(8) ne "EXODUS: ") {
 		if (subject.starts("EXODUS")) {
-			subject = subject.b(7).trimf();
+			subject = subject.cut(6).trimf();
 		}
 		if (subject.starts("System:")) {
-			subject = subject.b(8).trimf();
+			subject = subject.cut(7).trimf();
 		}
 		subject.splicer(1, 0, "EXODUS: ");
 	}
@@ -403,7 +403,7 @@ forcedemail:
 		//mark html formatted messages as such
 		if (body[1] eq "@") {
 			tt = "";
-			if (bodyfile.osopen(body.b(2))) {
+			if (bodyfile.osopen(body.cut(1))) {
 				//osbread tt from bodyfile at 0 length 100
 				var offset = 0;
 				call osbread(tt, bodyfile, offset, 100);
@@ -436,7 +436,7 @@ forcedemail:
 
 			//body may already be in a file
 			if (body[1] eq "@") {
-				bodyfilename = body.b(2);
+				bodyfilename = body.cut(1);
 
 			//otherwise generate a random filename and write it
 			} else {

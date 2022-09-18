@@ -171,7 +171,7 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 	}
 
 	//std::clog << "new dim data var x " << nvars << std::endl;
-	var("new dim data var x " ^ var(nvars)).logputl();
+	//var("new dim data var x " ^ var(nvars)).logputl();
 
 	// Allocate a new array of vars on the heap
 	try {

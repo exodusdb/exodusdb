@@ -204,7 +204,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			osname = "XP";
 		} else if (datax.contains("Windows NT ")) {
 			var tt = datax.index("Windows NT ");
-			osname = ((datax.b(tt + 11, 9999)).field(";", 1)).field(")", 1);
+			osname = ((datax.cut(tt + 10)).field(";", 1)).field(")", 1);
 		}
 		if (datax.contains("WOW64")) {
 			osname ^= "-64";

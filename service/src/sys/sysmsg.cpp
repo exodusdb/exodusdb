@@ -152,14 +152,14 @@ function main(in msg0, in subject0="", in username0="") {
 	var subject = "EXODUS System: " ^ datasetcode;
 	var tt = msg.index("ERROR NO:");
 	if (tt) {
-		subject ^= " " ^ msg.b(tt).f(1, 1, 1);
+		subject ^= " " ^ msg.cut(tt - 1).f(1, 1, 1);
 	}
 	if (subjectin) {
 		subject ^= " " ^ subjectin;
 	}
 
 	if (msg.starts("@@")) {
-		body = msg.b(2);
+		body = msg.cut(1);
 
 	} else {
 		var l9 = "L#9";

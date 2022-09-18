@@ -832,28 +832,8 @@ nextreport:
 	//will not override entries in SYSTEM.CFG
 	if (not(SYSTEM.f(12).locate("CODEPAGE", vn))) {
 
-//		if (VOLUMES) {
-//			tt = "../data/" ^ SYSTEM.f(17) ^ "/data.cfg";
-//			tt.replacer("/", OSSLASH);
-//			if (not(datacfg.osread(tt))) {
-//				tt = "../data/data.cfg";
-//				tt.replacer("/", OSSLASH);
-//				if (not(datacfg.osread(tt))) {
-//					datacfg = "";
-//				}
-//			}
-//			if (datacfg) {
-//				datacfg.converter("\r\n", _FM _FM);
-//				codepage = datacfg.f(1).trim();
-//			} else {
-//				var output = shell2("mode CON:", xx);
-//				output = trim(output.convert("\r\n", FM ^ FM), FM);
-//				codepage = field2(output, " ", -1);
-//			}
-//		} else {
-			//en_US.UTF-8
-			call osgetenv("LANG", codepage);
-//		}
+		//en_US.UTF-8
+		call osgetenv("LANG", codepage);
 
 		SYSTEM(12, vn) = "CODEPAGE";
 		SYSTEM(13, vn) = codepage;
@@ -884,60 +864,21 @@ nextreport:
 	SYSTEM(9) = 1;
 
 	call log2("*first uses of getenv", logtime);
-//	if (VOLUMES) {
-//		if (not(osgetenv("OS", os))) {
-//			os = "";
-//		}
-//		if (not(osgetenv("VER", ver))) {
-//			ver = "";
-//		}
-//		if (not(osgetenv("NUMBER_OF_PROCESSORS", tt))) {
-//			tt = 1;
-//		}
-//		SYSTEM(9) = tt;
-//
-//		call log2("*get windows version", logtime);
-//		ver = shell2("ver", xx);
-//		ver.converter(FM ^ VM, "  ");
-//		ver.converter("\r\n", "  ");
-//		//if index(ver,'Windows 9',1) or index(ver,'NT',1) or index(os,'NT',1) then
-//		ver = ver.trim().ucase();
-//		if ((ver.contains("WINDOWS") or ver.contains("NT")) or os.contains("NT")) {
-//			SYSTEM(12, -1) = "WORDSIZE";
-//			SYSTEM(13, -1) = "32";
-//		}
-//		ver = ver.field(" ", 4).field("]", 1);
-//		//Windows Server 2003         5.2.3790 (24.04.2003)
-//		//Windows Server 2003, SP1    5.2.3790.1180
-//		//Windows Server 2003         5.2.3790.1218
-//		//Windows Server 2008         6.0.6001 (27.02.2008)
-//		var ver2 = ver.field(".", 1, 2);
-//		if (var("5.0,5.1,5.2,6.0,6.1,6.2,6.3").locateusing(",", ver2, vern)) {
-//			ver2 = var("2000,XP,2003,2008,2008R2,2012,2012R2").field(",", vern);
-//			ver = ver.fieldstore(".", 1, -2, "Win" ^ ver2);
-//			ver.replacer(".6001", "");
-//			ver.replacer(".6002", " SP2");
-//			ver.replacer(".3790", "");
-//		}
-//
-//	//not Windows
-//	} else {
-		//Description:\tUbuntu 18.04.3 LTS\n
-		ver = shell2("lsb_release -d").field(chr(9), 2).trim();
-		ver.popper();
+	//Description:\tUbuntu 18.04.3 LTS\n
+	ver = shell2("lsb_release -d").field(chr(9), 2).trim();
+	ver.popper();
 
-		//CPU(s):              2
-		//Thread(s) per core:  1
-		//Core(s) per socket:  2
-		//var nthreads_percpu = (((shell2("lscpu|grep \"Thread(s) per core\"")).field(":", 2)).field(chr(10), 1)).trim();
-		//var ncpus = (((shell2("lscpu|grep \"CPU(s)\"")).field(":", 2)).field(chr(10), 1)).trim();
-		//if (nthreads_percpu.isnum() and ncpus.isnum()) {
-		//	SYSTEM(9) = nthreads_percpu * ncpus;
-		var ncpus = shell2("nproc").field("\n").trim();
-		if (not ncpus or not ncpus.isnum())
-			ncpus = 1;
-		SYSTEM(9) = ncpus;
-//	}
+	//CPU(s):              2
+	//Thread(s) per core:  1
+	//Core(s) per socket:  2
+	//var nthreads_percpu = (((shell2("lscpu|grep \"Thread(s) per core\"")).field(":", 2)).field(chr(10), 1)).trim();
+	//var ncpus = (((shell2("lscpu|grep \"CPU(s)\"")).field(":", 2)).field(chr(10), 1)).trim();
+	//if (nthreads_percpu.isnum() and ncpus.isnum()) {
+	//	SYSTEM(9) = nthreads_percpu * ncpus;
+	var ncpus = shell2("nproc").field("\n").trim();
+	if (not ncpus or not ncpus.isnum())
+		ncpus = 1;
+	SYSTEM(9) = ncpus;
 
 	//save VER
 	if (not(SYSTEM.f(12).locate("VER", tt))) {
@@ -951,20 +892,10 @@ nextreport:
 		//grep "model name" /proc/cpuinfo
 		cpu = "Unknown";
 	} else {
-//		if (VOLUMES) {
-//			cpu = shell2("wmic CPU GET NAME", xx);
-//			if (cpu.first(2) eq _RM _FM) {
-//				cpu.splicer(1, 2, "");
-//				cpu.converter(chr(0), "");
-//			}
-//			cpu.replacer("\r\n", FM);
-//			cpu.remover(1);
-//		} else {
-			cpu = ((shell2("cat /proc/cpuinfo|grep -i \"model name\"")).field(chr(9), 2)).trim();
-			cpu.converter(chr(10), FM);
-			cpu.converter(":", "");
-			cpu.trimmer();
-//		}
+		cpu = ((shell2("cat /proc/cpuinfo|grep -i \"model name\"")).field(chr(9), 2)).trim();
+		cpu.converter(chr(10), FM);
+		cpu.converter(":", "");
+		cpu.trimmer();
 		if (cpu[-1] eq FM) {
 			cpu.popper();
 		}
@@ -996,33 +927,6 @@ nextreport:
 
 	var currdataset = SYSTEM.f(17);
 
-	/*;
-		if @volumes then;
-			call log2('*warning if too little or too much EMS memory',logtime);
-			ems.allocated=get.ems('');
-			if interactive and not.contains(os,'NT',1)) and not.contains(ver,'Millennium',1)) then;
-				//if ems.allocated>1024000 or ems.allocated<512000 then
-				if ems.allocated>1100000 or ems.allocated<512000 then;
-					msg='WARNING: EXODUS may not work reliably because it|has ';
-					if ems.allocated>1024000 then;
-						msg:='been given more than';
-					end else;
-						msg:='not been given';
-						end;
-					msg:=' 1024Kb of "EMS" memory|';
-					msg:='|1. Close EXODUS' 'L#35';
-					msg:='|2. Right click the EXODUS icon' 'L#35';
-					msg:='|3. Choose "Properties"' 'L#35';
-					msg:='|4. click "Memory"' 'L#35';
-					msg:='|5. Set "EMS" memory to 1024' 'L#35';
-					msg:='|6. Click "OK" and restart EXODUS' 'L#35';
-					print char(7):
-					call note('!':msg:'|');
-					end;
-				end;
-			end;
-	*/
-
 	call log2("*get diskfreespace", logtime);
 	var reqfreemb = 10;
 	var freemb = (diskfreespace(oscwd()) / 1024 / 1024).oconv("MD00");
@@ -1043,85 +947,6 @@ nextreport:
 		//if freemb then perform 'OFF'
 	}
 
-//	if (VOLUMES) {
-//		call log2("*try to update upload.dll", logtime);
-//		//for extn=1 to 3
-//		// ext=field('net,w3c,www',',',extn)
-//		var ext = "NET";
-//		var path = "../exodus." ^ ext ^ "/exodus/dll/";
-//		path.converter("/", OSSLASH);
-//		tt = (path ^ "upload.dl_").osfile();
-//		if (tt) {
-//			if (tt ne (path ^ "upload.dll").osfile()) {
-//				call osremove(path ^ "upload.dll");
-//				if (not((path ^ "upload.dll").osfile())) {
-//					//call shell('ren ':path:'upload.dl_ upload.dll')
-//					osshell("copy " ^ path ^ "upload.dl_ " ^ path ^ "upload.dll");
-//				}
-//			}
-//		}
-//		// next extn
-//	}
-
-//	//Windows Cygwin
-//	if (VOLUMES) {
-//		call log2("*find cygwin", logtime);
-//		var locations = SYSTEM.f(50);
-//		locations(1, -1) = "C:\\CYGWIN\\BIN\\,\\CYGWIN\\BIN\\,..\\..\\CYGWIN\\BIN\\";
-//		let nn = locations.count(",") + 1;
-//		for (const var ii : range(1, nn)) {
-//			var location = locations.field(",", ii);
-//			if (location[-1] ne "\\") {
-//				location ^= "\\";
-//			}
-//			//initdir location:'*.*'
-//			//tt=dirlist()
-//			tt = oslistf(location ^ "*.*");
-//			if (tt) {
-//				SYSTEM(50) = location;
-//			}
-//			///BREAK;
-//			if (not(tt eq "")) break;
-//		} //ii;
-//	}
-
-	/* using proxycfg;
-	The following example specifies that HTTP servers are accessed through;
-	the http_proxy proxy and HTTPS servers are accessed through https_proxy.;
-	Local intranet sites and any site in the *.microsoft.com domain bypass the proxy.;
-		proxycfg -p "http=http_proxy https=https_proxy" "<local>;*.microsoft.com";
-	Removing ProxyCfg.exe;
-	To remove the registry entries that ProxyCfg.exe creates,;
-	you must delete the WinHttpSettings value from the following registry key.;
-		HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections\WinHttpSettings;
-	Deleting the WinHttpSettings value removes all proxy configurations.;
-	*/
-//	if (VOLUMES) {
-//		call log2("*find http proxy", logtime);
-//		if (SYSTEM.f(56) eq "") {
-//			var cmd = "proxycfg";
-//getproxy:
-//			var result = shell2(cmd, errors).lcase();
-//			tt = result.index("proxy server(s)");
-//			if (tt) {
-//				//tt=result[tt,';'][1,char(13)]
-//				tt = result.b(tt);
-//				tt = tt.field(";", 1).field(chr(13), 1);
-//				tt = tt.field(":", 2, 99).trim();
-//				tt.replacer("http=", "");
-//			} else if (cmd eq "proxycfg") {
-//				cmd = "netsh winhttp import proxy ie";
-//				goto getproxy;
-//				{}
-//			} else {
-//				tt = "";
-//			}
-//			{}
-//			//todo get proxybypasslist
-//			SYSTEM(56) = tt;
-//		}
-//	}
-
 	/*;
 		call log2('*put up the backup reminder',logtime);
 		reminder='';
@@ -1141,9 +966,6 @@ nextreport:
 			}
 		}
 	}
-//	if (VOLUMES) {
-//		SECURITY = SECURITY.invert();
-//	}
 
 	//must be before init.acc, init.agency or any task adding
 	//call security.subs2('FIXUSERPRIVS')

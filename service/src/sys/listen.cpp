@@ -620,7 +620,6 @@ nextsearch0:
 
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
-	//tt = time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	tt = time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
 		output(AT(-40), tt, " : ");
@@ -697,11 +696,10 @@ subroutine wait() {
 	if (linkfilename1.osfile()) {
 		if (tracing) {
 			printl("CANNOT DELETE ", linkfilename1, " GENERATING ANOTHER");
-			//linkfilename1=inpath:rnd(99999999):'.0'
 			linkfilename1 = var(99999999).rnd() ^ ".0";
 		}
 	}
-	linkfilename0 = linkfilename1.b(inpath.len() + 1, 9999);
+	linkfilename0 = linkfilename1.cut(inpath.len());
 	cmd ^= " " ^ linkfilename0 ^ " " ^ inpath ^ " " ^ portno;
 	cmd.lcaser();
 	cmd.converter("/", OSSLASH);
@@ -1131,7 +1129,7 @@ readlink1:
 			if (tt) {
 				//eg drive() = D:\EXODUS\EXODUS\ ...
 				//replyfilename='..\':replyfilename[tt+1,9999]
-				replyfilename = ".." OSSLASH_ ^ replyfilename.b(tt + 1, 9999);
+				replyfilename = ".." OSSLASH_ ^ replyfilename.cut(tt);
 			}
 		}
 

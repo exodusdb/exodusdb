@@ -60,7 +60,7 @@ function main(in mode, in status0="") {
 		//determine process number
 
 		if (userlockid.starts("U7906")) {
-			processno = userlockid.b(6);
+			processno = userlockid.cut(5);
 			processno -= (processno / 10).floor();
 
 		} else if (userlockid.isnum()) {

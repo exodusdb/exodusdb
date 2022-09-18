@@ -729,7 +729,7 @@ nextdbasen:;
 //			upgradefilename83 = shell2("dir " ^ (longupgradefilename.quote()) ^ " /x /l", errors);
 //			if (not errors) {
 //				upgradefilename83.converter("\r\n", FM);
-//				upgradefilename83 = upgradefilename83.f(6).b(22).trim().field(" ", 2);
+//				upgradefilename83 = upgradefilename83.f(6).cut(21).trim().field(" ", 2);
 //				upgradefiledir = upgradefilename83.osfile();
 //				if (upgradefiledir) {
 //					SYSTEM(112) = upgradefilename83;

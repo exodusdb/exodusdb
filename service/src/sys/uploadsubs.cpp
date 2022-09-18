@@ -139,7 +139,7 @@ postuploadfail:
 		var tt = "\\";
 		uploadpath.converter(tt, OSSLASH);
 
-		if (uploadpath.b(3).contains("..")) {
+		if (uploadpath.cut(2).contains("..")) {
 			msg = uploadpath.quote() ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -256,7 +256,7 @@ postuploadfail:
 		//if dirpatt[-1,1]<>'.' then dirpatt:='.'
 		dirpatt ^= "*";
 
-		if (dirpatt.b(3).contains("..")) {
+		if (dirpatt.cut(2).contains("..")) {
 			msg = dirpatt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -338,7 +338,7 @@ postuploadfail:
 		}
 
 		tt = uploadroot ^ uploadpath;
-		if (tt.b(3).contains("..")) {
+		if (tt.cut(2).contains("..")) {
 			msg = tt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -372,7 +372,7 @@ postuploadfail:
 		var validating = RECORD.f(17);
 		osfile = "";
 
-		if (uploadpath.b(3).contains("..")) {
+		if (uploadpath.cut(2).contains("..")) {
 			msg = uploadpath.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}

@@ -1622,6 +1622,7 @@ class PUBLIC var final {
 	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
 	VARREF firster(const size_t length);
 	VARREF laster(const size_t length);
+	VARREF cutter(const int length);
 	VARREF substrer(const int startindex);
 	VARREF substrer(const int startindex, const int length);
 
@@ -1657,6 +1658,7 @@ class PUBLIC var final {
 	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) &&;
 	ND VARREF first(const size_t length) && {return this->firster(length);}
 	ND VARREF last(const size_t length) && {return this->laster(length);}
+	ND VARREF cut(const int length) && {return this->cutter(length);}
 	ND VARREF substr(const int startindex) &&;
 	ND VARREF substr(const int startindex, const int length) &&;
 
@@ -1710,6 +1712,7 @@ class PUBLIC var final {
 
 	ND var first(const size_t length) const&;
 	ND var last(const size_t length) const&;
+	ND var cut(const int length) const&;
 
 	// NOTE char=byte ... NOT utf-8 code point
 	// NOTE 1 based indexing. byte 1 = first byte as per mv conventions for all indexing (except

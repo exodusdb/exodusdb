@@ -53,7 +53,7 @@ function main(in module, in mode, in stationery) {
 		var t2 = OSSLASH;
 		var tt = outfile.index(t2 ^ "data" ^ t2);
 		if (tt) {
-			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.b(tt);
+			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.cut(tt - 1);
 		} else {
 			data_(1, filen) = outfile;
 		}

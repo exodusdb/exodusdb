@@ -40,6 +40,12 @@ OPTIONS
 		-> .starts("XXX")
 		   .b(-3, 3)
 		-> .last(3)
+	C - Cut
+		   .b(2)
+		-> .cut(1)
+		...
+		   .b(10)
+		-> .cut(9)
 	G - General
 	v - Remove empty var().
 
@@ -65,6 +71,7 @@ function main() {
 	var b2last = OPTIONS.contains("L");
 	var general = OPTIONS.contains("G");
 	var emptyvar = OPTIONS.contains("v");
+	var cut = OPTIONS.contains("C");
 
 	var verbose = OPTIONS.contains("V");
 
@@ -265,6 +272,46 @@ function main() {
 				line2.regex_replacer(
 					R"__(\.b\(-(\d+), ?\1\))__",
 					R"__(.last\(\1\))__", "g"
+				);
+			}
+
+			// C - Cut
+			if (cut) {
+				line2.regex_replacer(
+					R"__(\.b\(2\))__",
+					R"__(\.cut\(1\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(3\))__",
+					R"__(\.cut\(2\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(4\))__",
+					R"__(\.cut\(3\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(5\))__",
+					R"__(\.cut\(4\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(6\))__",
+					R"__(\.cut\(5\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(7\))__",
+					R"__(\.cut\(6\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(8\))__",
+					R"__(\.cut\(7\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(9\))__",
+					R"__(\.cut\(8\))__"
+				);
+				line2.regex_replacer(
+					R"__(\.b\(10\))__",
+					R"__(\.cut\(9\))__"
 				);
 			}
 

@@ -148,7 +148,7 @@ listen:
 			//note new or changed media
 			tt = USER4.contains("Media: ");
 			if (tt) {
-				subject ^= " " ^ (USER4.b(tt + 7, 9999)).f(1);
+				subject ^= " " ^ (USER4.cut(tt + 6)).f(1);
 			}
 
 			//add success, WARNING or FAILURE

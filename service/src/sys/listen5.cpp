@@ -304,7 +304,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//verify correct file heading and determine patchid from the file
 			offset_zero = 0;
 			call osbread(firstblock, patchfile, offset_zero, 65000);
-			patchid = firstblock.f(2).b(6);
+			patchid = firstblock.f(2).cut(5);
 			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.first(8) ne "INSTALL*") {
 				goto nextpatch;
 			}
@@ -422,7 +422,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//if the runonce record appears in the definitions then
 			//run it, save it and delete it
 			if (runonce.read(DEFINITIONS, runoncekey)) {
-				perform("RUN DEFINITIONS " ^ runoncekey.b(2));
+				perform("RUN DEFINITIONS " ^ runoncekey.cut(1));
 				//leave it for inspection
 				//delete definitions,runoncekey
 			}

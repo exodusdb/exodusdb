@@ -340,7 +340,7 @@ nextdict:
 
 				//extract file
 				if (dict.f(11)[1] eq "<") {
-					temp = dict.f(11).b(2).field(">", 1);
+					temp = dict.f(11).cut(1).field(">", 1);
 					xfilenames(coln) = temp;
 					if (not(xfiles(coln).open(temp, ""))) {
 						call mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
@@ -588,7 +588,7 @@ nextvn:
 				}
 
 				if (cell[1] eq "+") {
-					if (cell.b(2).isnum()) {
+					if (cell.cut(1).isnum()) {
 						cell.splicer(1, 1, "");
 					}
 				}

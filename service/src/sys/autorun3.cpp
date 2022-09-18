@@ -594,8 +594,8 @@ nextuser:;
 nextsign:
 	tt = USER1.index("{TODAY" ^ sign);
 	if (tt) {
-		var t2 = (iodat_.b(tt + 1, 999999)).field("}", 1);
-		USER1.replacer("{" ^ t2 ^ "}", date() + t2.b(6));
+		var t2 = (iodat_.cut(tt)).field("}", 1);
+		USER1.replacer("{" ^ t2 ^ "}", date() + t2.cut(5));
 	}
 	if (sign eq "-") {
 		sign = "+";
@@ -648,7 +648,7 @@ nextsign:
 			//since autorun doesnt really know a user to send them to
 			//NB programs should return OK+message if no report is required (eg "OK no ads found")
 			if (USER3.starts("OK")) {
-				response_ = USER3.b(3).trimf();
+				response_ = USER3.cut(2).trimf();
 			} else {
 				call sysmsg(subject ^ FM ^ body);
 				goto nextdoc;

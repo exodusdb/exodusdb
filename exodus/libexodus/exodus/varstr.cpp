@@ -1500,7 +1500,7 @@ bool var::contains(SV str) const {
 
 var var::first(const size_t  length) const& {
 
-	THISIS("VARREF var::first(const size_t length)")
+	THISIS("var var::first(const size_t length)")
 	assertString(function_sig);
 
 	// Assume high half of size_t is c++ unblockable conversion
@@ -1542,7 +1542,7 @@ VARREF var::firster(const size_t length) {
 
 var var::last(const size_t  length) const& {
 
-	THISIS("VARREF var::last(const size_t length)")
+	THISIS("var var::last(const size_t length)")
 	assertString(function_sig);
 
 	// Assume high half of size_t is c++ unblockable conversion
@@ -1586,6 +1586,80 @@ VARREF var::laster(const size_t length) {
 
 	return *this;
 }
+
+
+//////
+// CUT
+//////
+
+// var[1,length] = "" 
+var var::cut(const int length) const& {
+
+	THISIS("var var::cut(const int length)")
+	assertString(function_sig);
+
+	var rvo;
+	rvo.var_typ = VARTYP_STR;
+
+	// Assume var_str size is <= max int
+
+	if (length >= static_cast<int>(var_str.size())) {
+		// Example "ab".cut(2) return ""
+		// Example "ab".cut(3) return ""
+		// return empty string
+	}
+
+	else if (length >= 0) {
+		// Positive - Copy from middle to end
+		// Example "ab".cut(0) , append from pos 0, return "ab"
+		// Example "ab".cut(1) , append from pos 1, return "b"
+		rvo.var_str.append(var_str, length, std::string::npos);
+
+	} else {
+		// Negative = Copy first n chars
+		// Example "ab".cut(-1) copyn = -1 + 2 = 1, return "a"
+		// Example "ab".cut(-2) copyn = -2 + 2 = 0, return ""
+		// Example "ab".cut(-3) copyn = -3 + 2 = -1, return ""
+		auto copyn = length + static_cast<int>(var_str.size());
+		if (copyn > 0)
+			rvo.var_str.append(var_str, 0, copyn);
+	}
+
+	return rvo;
+}
+
+// x[1, length] = ""
+// x[-length, length] = ""
+VARREF var::cutter(const int length) {
+
+	THISIS("VARREF var::cutter(const int length)")
+	assertStringMutator(function_sig);
+
+	if (length >= 0 ) {
+
+		// Positive - cut first n chars. Erase from first char.
+		// Example "ab".cutter(0) , erase 0, return "ab"
+		// Example "ab".cutter(1) , erase 1, return "b"
+		// Example "ab".cutter(2) , erase 2, return ""
+		// Example "ab".cutter(3) , erase 3, return ""
+		var_str.erase(0, length);
+
+	} else {
+
+		// Negative = cut last n chars. Erase from middle to end.
+		// Example "ab".cutter(-1) start_pos = -1 + 2 = erase_pos 1, return "a"
+		// Example "ab".cutter(-2) start_pos = -2 + 2 = erase_pos 0, return ""
+		// Example "ab".cutter(-3) start_pos = -3 + 2 = erase_pos -1, return ""
+		int erase_pos = length + var_str.size();
+		if (erase_pos < 1)
+			var_str.clear();
+		else
+			var_str.erase(erase_pos, std::string::npos);
+	}
+
+	return *this;
+}
+
 
 /////////
 // SUBSTR

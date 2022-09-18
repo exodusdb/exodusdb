@@ -865,7 +865,7 @@ nextkey:
 		if (not(coldict(coln).unassigned())) {
 			gosub getquotedword();
 			coldict(coln)(9) = word[1];
-			coldict(coln)(10) = word.b(3);
+			coldict(coln)(10) = word.cut(2);
 			coldict(coln)(11) = word;
 		}
 
@@ -1820,7 +1820,7 @@ recexit:
 					} else {
 						//tx1:=td0:'<td bgcolor=':field(tt,' ',1)[2,9999]:'>'
 						//TODO do with class? to save document space?
-						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).b(2) ^ "\">";
+						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).cut(1) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= tt ^ tdx;
