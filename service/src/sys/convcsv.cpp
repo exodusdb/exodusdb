@@ -293,7 +293,7 @@ nextdict:
 			goto nextdict;
 		}
 
-		if (dictid[1] eq "%") {
+		if (dictid.starts("%")) {
 			goto nextdict;
 		}
 
@@ -339,7 +339,7 @@ nextdict:
 				}
 
 				//extract file
-				if (dict.f(11)[1] eq "<") {
+				if (dict.f(11).starts("<")) {
 					temp = dict.f(11).cut(1).field(">", 1);
 					xfilenames(coln) = temp;
 					if (not(xfiles(coln).open(temp, ""))) {
@@ -359,7 +359,7 @@ nextdict:
 					var oconvx = dict.f(7);
 
 					//force long date format
-					if (oconvx.contains("DATE") or (oconvx[1] eq "D")) {
+					if (oconvx.contains("DATE") or (oconvx.starts("D"))) {
 						//if raw then
 						// oconvx='D4/J'
 						//end else
@@ -379,7 +379,7 @@ nextdict:
 					oconvxs(coln) = oconvx;
 				}
 
-				colgroups(coln) = dict.f(4)[1] eq "M";
+				colgroups(coln) = dict.f(4).starts("M");
 				dictids(coln) = dictid;
 				dictrecs(coln) = dict;
 
@@ -587,7 +587,7 @@ nextvn:
 
 				}
 
-				if (cell[1] eq "+") {
+				if (cell.starts("+")) {
 					if (cell.cut(1).isnum()) {
 						cell.splicer(1, 1, "");
 					}
@@ -595,7 +595,7 @@ nextvn:
 				if (cell eq DQ) {
 					cell = "''";
 				}
-				if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
+				if (not cell.starts(DQ) or not cell.ends(DQ)) {
 					cell.replacer(DQ, "''");
 				}
 				if (cell.len() gt 255) {
@@ -614,7 +614,7 @@ nextvn:
 
 					if (cell.contains(DQ)) {
 						if (fmtxs(coln) eq "T") {
-							if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
+							if (not cell.starts(DQ) or not cell.ends(DQ)) {
 								cell.replacer(DQ, "''");
 								cell = cell.quote();
 							}
@@ -636,7 +636,7 @@ nextvn:
 		//remove trailing or all tab chars
 		while (true) {
 			///BREAK;
-			if (not(line[-1] eq FM)) break;
+			if (not(line.ends(FM))) break;
 			line.popper();
 		}//loop;
 

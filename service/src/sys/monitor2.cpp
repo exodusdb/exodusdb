@@ -283,7 +283,7 @@ nextprocess:
 		}
 
 		//handle special records in processes
-		if (ID[1] eq "%") {
+		if (ID.starts("%")) {
 			goto nextprocess;
 		}
 
@@ -462,7 +462,7 @@ nextprocess:
 		if (nmaint) {
 			if ((description[-1]).isnum()) {
 				description ^= "+";
-			} else if (description[-1] ne " ") {
+			} else if (not description.ends(" ")) {
 				description ^= " ";
 			}
 			description ^= nmaint ^ "M";

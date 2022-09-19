@@ -16,7 +16,7 @@ function main(in type, in inx, in mode, out outx) {
 				outx = ("." ^ var("0").str(-(exp + 1)) ^ outx).first(15);
 				while (true) {
 					///BREAK;
-					if (not(outx.len() gt 2 and (outx[-1] eq "0"))) break;
+					if (not(outx.len() gt 2 and (outx.ends("0")))) break;
 					outx.popper();
 				}//loop;
 

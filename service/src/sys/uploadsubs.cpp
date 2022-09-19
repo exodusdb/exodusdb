@@ -151,7 +151,7 @@ postuploadfail:
 		//convert '"' to "'" in uploadpath
 
 		//if doesnt terminate with a \ then assume that the last bit is filename
-		if (uploadpath[-1] ne OSSLASH) {
+		if (not uploadpath.ends(OSSLASH)) {
 			uploadpath = uploadpath.field(OSSLASH, 1, uploadpath.count(OSSLASH)) ^ OSSLASH;
 		}
 
@@ -664,7 +664,7 @@ addbuff:
 	//skip empty lines
 	while (true) {
 		///BREAK;
-		if (not(buff[1] eq "\r")) break;
+		if (not(buff.starts("\r"))) break;
 		buff.splicer(1, 1, "");
 	}//loop;
 	if (not(buff.len())) {

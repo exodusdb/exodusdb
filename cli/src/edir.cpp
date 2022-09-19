@@ -134,7 +134,7 @@ function main() {
 
 			//keep trying to update - perhaps futilely
 			//at least temp file will be left in the directory
-			while (ucase(reply)[1] eq "Y" and true) {
+			while (ucase(reply).starts("Y") and true) {
 
 				if (write(newrecord, file, ID)) {
 					printl(filename ^ " " ^ ID ^ " > db");

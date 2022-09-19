@@ -31,7 +31,7 @@ function main(in localdate0, in localtime0) {
 		temp = "MTH";
 	}
 	temp = oconv(localtime, temp);
-	if (temp[1] eq "0") {
+	if (temp.starts("0")) {
 		temp.splicer(1, 1, "");
 	}
 	if (temp.ends("AM")) {

@@ -674,7 +674,7 @@ filename:
 
 		//get any specfic keys
 nextkey:
-		if ((nextword.isnum() or (nextword[1] eq "'")) or (nextword[1] eq DQ)) {
+		if ((nextword.isnum() or (nextword.starts("'"))) or (nextword.starts(DQ))) {
 			keylist = 1;
 			ss ^= " " ^ nextword;
 			gosub getword();
@@ -705,7 +705,7 @@ nextkey:
 		//determine if limited nrecs sorted by mv field (which needs preselect)
 		if ((maxnrecs and not(preselect)) and DICT) {
 			if (dictrec.reado(DICT, word)) {
-				preselect = dictrec.f(4)[1] eq "M";
+				preselect = dictrec.f(4).starts("M");
 			}
 		}
 
@@ -775,13 +775,13 @@ nextkey:
 			//parameters
 			while (true) {
 				///BREAK;
-				if (not(nextword ne "" and (((nextword.isnum() or (nextword[1] eq DQ)) or (nextword[1] eq "'")))))
+				if (not(nextword ne "" and (((nextword.isnum() or (nextword.starts(DQ))) or (nextword.starts("'"))))))
 					break;
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limitx) {
 					if ((DQ ^ "'").contains(word[1])) {
-						if (word[1] eq word[-1]) {
+						if (word.starts(word)[-1]) {
 							word = word.b(2, word.len() - 2);
 						}
 					}
@@ -880,7 +880,7 @@ nextkey:
 			title = word;
 			gosub getquotedword2();
 			value = word;
-		} else if (word[1] eq "{") {
+		} else if (word.starts("{")) {
 			title = "";
 			value = word;
 		} else {
@@ -889,7 +889,7 @@ nextkey:
 		}
 
 		//automatic labelling with dictionary title
-		if (word[1] eq "{") {
+		if (word.starts("{")) {
 			tt = word.b(2, word.len() - 2);
 			replacements(-1) = tt;
 			nreplacements += 1;
@@ -1096,7 +1096,7 @@ nextkey:
 				coldict(coln)(13) = 1;
 				breakonflag = 0;
 
-				if (nextword[1] eq DQ) {
+				if (nextword.starts(DQ)) {
 					gosub getword();
 
 					//zzz break  options
@@ -1243,10 +1243,10 @@ x1exit:
 		}
 	}
 
-	if (breakcolns[-1] eq FM) {
+	if (breakcolns.ends(FM)) {
 		breakcolns.popper();
 	}
-	if (breakopts[-1] eq FM) {
+	if (breakopts.ends(FM)) {
 		breakopts.popper();
 	}
 
@@ -1646,7 +1646,7 @@ nextrec:
 		goto x2exit;
 	}
 
-	if (ID[1] eq "%") {
+	if (ID.starts("%")) {
 		goto nextrec;
 	}
 
@@ -1887,7 +1887,7 @@ recexit:
 			if (oconvx) {
 				tt = oconv(tt, oconvx);
 				if (html) {
-					if (tt[1] eq "-") {
+					if (tt.starts("-")) {
 						if (oconvx.starts("[NUMBER")) {
 							tt = "<nobr>" ^ tt ^ "</nobr>";
 						}
@@ -2067,7 +2067,7 @@ subroutine getquotedword() {
 
 subroutine getquotedword2() {
 	gosub getword();
-	if (((DQ ^ "'").contains(word[1])) and (word[1] eq word[-1])) {
+	if (((DQ ^ "'").contains(word[1])) and (word.starts(word)[-1])) {
 		word.splicer(1, 1, "");
 		word.popper();
 	} else {
@@ -2171,7 +2171,7 @@ getword2b:
 	}
 
 	//get options and skip to next word
-	if (((word[1] eq "(") and (word[-1] eq ")")) or (((word[1] eq "{") and (word[-1] eq "}")))) {
+	if (((word.starts("(")) and (word.ends(")"))) or (((word.starts("{")) and (word.ends("}"))))) {
 		tt = word;
 		//option (N) no letterhead
 		if (tt.contains("N")) {

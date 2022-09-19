@@ -674,7 +674,7 @@ subroutine reorderdbs() {
 	newdbdir(1) = substitution ^ " " ^ newdblist;
 
 	//convert to DOS
-	if (newdbdir[-1] ne FM) {
+	if (not newdbdir.ends(FM)) {
 		newdbdir ^= FM;
 	}
 	newdbdir.converter(SM ^ VM, ",*");

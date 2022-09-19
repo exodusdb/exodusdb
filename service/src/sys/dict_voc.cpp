@@ -191,7 +191,7 @@ function main() {
 		if (RECORD eq rec) {
 			ANS = "";
 		} else {
-			if (ID[1] eq "$") {
+			if (ID.starts("$")) {
 				var recdatetime = field2(RECORD, FM, -1);
 				recdatetime = recdatetime.field(" ", 2, 9).trim() ^ " " ^ recdatetime.field(" ", 1);
 				recdatetime = recdatetime.iconv("DT");
@@ -568,7 +568,7 @@ function main() {
 	//matparse @record into x
 	for (const var ii : range(1, nfields)) {
 	//if trim(x(i))[1,1]='*' then x(i)=''
-		if (RECORD.f(ii).trim()[1] eq "*") {
+		if (RECORD.f(ii).trim().starts("*")) {
 			RECORD(ii) = "";
 		}
 	} //ii;
@@ -619,7 +619,7 @@ libraryinit(program_date)
 //-----------------------
 function main() {
 	var ans = calculate("TIMEDATE");
-	return ans.b(11).iconv("D");
+	return ans.cut(10).iconv("D");
 }
 libraryexit(program_date)
 
@@ -680,7 +680,7 @@ libraryinit(timedate)
 function main() {
 	#include <system_common.h>
 	var ans = field2(RECORD, FM, -1);
-	if (ans[1] eq "V") {
+	if (ans.starts("V")) {
 		ans = field2(RECORD, FM, -2);
 	}
 	if (not(ans.first(2).match("^\\d{2}$"))) {

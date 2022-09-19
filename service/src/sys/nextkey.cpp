@@ -47,7 +47,7 @@ function main(in mode, in previous0="") {
 lockit:
 	if (not(lockrecord(keyfilename, keyfile, seqkey))) {
 		var temp = keyfilename;
-		if (temp[-1] eq "S") {
+		if (temp.ends("S")) {
 			temp.splicer(1, 1, "");
 		}
 		if (not buffer) {

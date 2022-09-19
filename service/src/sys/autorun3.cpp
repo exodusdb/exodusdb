@@ -120,7 +120,7 @@ function main(in docids0="", in options0="") {
 		webpath = "../" "data/";
 	}
 	webpath.converter("/", OSSLASH);
-	if (webpath[-1] ne OSSLASH) {
+	if (not webpath.ends(OSSLASH)) {
 		webpath ^= OSSLASH;
 	}
 	inpath = webpath ^ datasetcode ^ OSSLASH;
@@ -552,7 +552,7 @@ nextuser:;
 
 	//get today's period
 	var runtimeperiod = date().oconv("D2/E").b(4, 5);
-	if (runtimeperiod[1] eq "0") {
+	if (runtimeperiod.starts("0")) {
 		runtimeperiod.splicer(1, 1, "");
 	}
 	//should backdate period to maximum open period for all selected companies
@@ -894,7 +894,7 @@ subroutine fmtresp() {
 	//cannot remove since these may be proper codepage letters
 	response_.converter("|", FM);
 	USER3.converter(VM, FM);
-	if (response_[1] eq FM) {
+	if (response_.starts(FM)) {
 		USER3.splicer(1, 1, "");
 	}
 	response_.replacer(FM, "\r\n");

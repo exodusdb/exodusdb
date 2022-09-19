@@ -117,7 +117,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 				for (const var ln : range(1, nlines)) {
 					var line = datax.f(ln).trim();
-					if (line[1] eq "#") {
+					if (line.starts("#")) {
 						line.splicer(1, 1, "");
 						//if colon : present then before colon is the tag name
 						if (line.contains(":")) {
@@ -128,7 +128,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 						var tt1 = line.field(tagsep, 1);
 						tt1.converter("_", " ");
 						var tt2 = line.field(tagsep, 2, 9999);
-						if (tt2[1] eq "=") {
+						if (tt2.starts("=")) {
 							tt2.splicer(1, 1, "");
 						}
 						datax(ln) = td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx;

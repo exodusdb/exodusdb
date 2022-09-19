@@ -32,7 +32,7 @@ function main() {\
 		if (RECORD eq rec) {\
 			ANS = "";\
 		} else {\
-			if (ID[1] eq "$") {\
+			if (ID.starts("$")) {\
 				var recdatetime = field2(RECORD, FM, -1);\
 				recdatetime = recdatetime.field(" ", 2, 9).trim() ^ " " ^ recdatetime.field(" ", 1);\
 				recdatetime = recdatetime.iconv("DT");\

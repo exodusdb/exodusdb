@@ -335,7 +335,7 @@ subroutine getcompanyconfig(io html, io mode) {
 
 			//FULL http path to images so EMAIL/OFFICE programs can get images
 			var url = SYSTEM.f(114, 1);
-			if (url[-1] eq "/") {
+			if (url.ends("/")) {
 				url.popper();
 			}
 

@@ -228,7 +228,7 @@ subroutine getblock() {
 				block.splicer(1, 1, "");
 				while (true) {
 					///BREAK;
-					if (not(block[-1] eq FM)) break;
+					if (not(block.ends(FM))) break;
 					block.popper();
 				}//loop;
 				return;

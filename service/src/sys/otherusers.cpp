@@ -71,7 +71,7 @@ function main(in databasecode0="", in usercode0="") {
 
 		//skip 10,20,100 etc because they appear to be equivalent to
 		// their equivalents without trailing zeroes
-		if ((lockno[-1] eq "0") and lockprefix) {
+		if ((lockno.ends("0")) and lockprefix) {
 			goto nextlock;
 		}
 

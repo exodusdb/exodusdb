@@ -65,7 +65,7 @@ ok:
 
 				output = oconv(inx, mode);
 
-				if (output[1] eq "0") {
+				if (output.starts("0")) {
 					output.splicer(1, 1, " ");
 				}
 

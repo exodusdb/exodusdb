@@ -266,7 +266,7 @@ forcedemail:
 
 	var msgsize = 0;
 
-	if (body[1] eq "@") {
+	if (body.starts("@")) {
 
 		osfilename = body.cut(1);
 		osfilesize = osfilename.osfile().f(1);
@@ -318,7 +318,7 @@ forcedemail:
 	body.replacer(FM, "\r\n");
 
 	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
-	if (body and (body[1] ne "@")) {
+	if (body and not body.starts("@")) {
 		bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line
@@ -401,7 +401,7 @@ forcedemail:
 		}
 
 		//mark html formatted messages as such
-		if (body[1] eq "@") {
+		if (body.starts("@")) {
 			tt = "";
 			if (bodyfile.osopen(body.cut(1))) {
 				//osbread tt from bodyfile at 0 length 100
@@ -435,7 +435,7 @@ forcedemail:
 		if (bodyfilename eq "") {
 
 			//body may already be in a file
-			if (body[1] eq "@") {
+			if (body.starts("@")) {
 				bodyfilename = body.cut(1);
 
 			//otherwise generate a random filename and write it
@@ -456,7 +456,7 @@ forcedemail:
 				var line = cmd.f(1, ii);
 				var opt = line.field(" ", 1);
 				var arg = line.field(" ", 2, 9999);
-				if (arg[1] eq DQ) {
+				if (arg.starts(DQ)) {
 					arg.splicer(1, 1, "");
 					arg.popper();
 				}

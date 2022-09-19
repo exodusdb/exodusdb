@@ -788,7 +788,7 @@ nextrep:
 			//data=@pseudo
 			//override the saved period with a current period
 			var runtimeperiod = date().oconv("D2/E").b(4, 5);
-			if (runtimeperiod[1] eq "0") {
+			if (runtimeperiod.starts("0")) {
 				runtimeperiod.splicer(1, 1, "");
 			}
 			data_.replacer("{RUNTIME_PERIOD}", runtimeperiod);

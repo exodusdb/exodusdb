@@ -429,7 +429,7 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
 	//add one file for the dict_all sql using sql UNION
 	if (viewsql) {
-		viewsql ^= "SELECT '" ^ dictfilename.b(6).ucase() ^ "'||'*'||key as key, data\n";
+		viewsql ^= "SELECT '" ^ dictfilename.cut(5).ucase() ^ "'||'*'||key as key, data\n";
 		viewsql ^= "FROM " ^ dictfilename ^ "\n";
 		viewsql ^= "UNION\n";
 	}
@@ -850,7 +850,7 @@ COST 10;
 
 	var calc_fields;
 	if (calc_fields.open("calc_fields")) {
-		var key = ucase(dictfilename.b(6) ^ "*" ^ dictid);
+		var key = ucase(dictfilename.cut(5) ^ "*" ^ dictid);
 		if (calc_fields.deleterecord(key)) {
 			key.outputl("deleted calc_fields = ");
 		}

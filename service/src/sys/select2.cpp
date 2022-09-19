@@ -109,7 +109,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	}
 
 	//fm termination indicates list of keys and optionally mvnos
-	var givenkeys = sortselect[-1] eq FM;
+	var givenkeys = sortselect.ends(FM);
 	var givenkeyn = 0;
 
 	if (not useactivelist) {
@@ -234,7 +234,7 @@ nocommon:
 	if (dictids ne "RECORD") {
 		while (true) {
 			///BREAK;
-			if (not(dictids[-1] eq FM)) break;
+			if (not(dictids.ends(FM))) break;
 			dictids.popper();
 		}//loop;
 		if (dictids eq "") {
@@ -394,7 +394,7 @@ nextrec:
 		return 0;
 	}
 
-	if (ID[1] eq "%") {
+	if (ID.starts("%")) {
 		goto nextrec;
 	}
 	if (not(RECORD.read(file, ID))) {

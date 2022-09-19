@@ -99,10 +99,10 @@ function main(out bakpars, in process0=var()) {
 	}
 
 	//fix bug in data entry that allows : and :: to be entered
-	if (bakdisk_[1] eq ":") {
+	if (bakdisk_.starts(":")) {
 		bakpars(7) = "";
 	}
-	if (bakdisk2_[1] eq ":") {
+	if (bakdisk2_.starts(":")) {
 		bakpars(12) = "";
 	}
 

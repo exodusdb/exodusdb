@@ -27,7 +27,7 @@ function main(in pluralnoun) {
 	//comment to help c++ decompiler
 	}else{
 
-		if (temp2[-1] == "S") {
+		if (temp2.ends("S")) {
 			//ANALYSIS, DOS
 			if ((temp2.last(2) ne "IS") and (temp2.last(2) ne "OS")) {
 				temp.popper();

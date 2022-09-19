@@ -46,6 +46,8 @@ OPTIONS
 		...
 		   .b(10)
 		-> .cut(9)
+	[] - 
+
 	G - General
 	v - Remove empty var().
 
@@ -63,7 +65,7 @@ function main() {
 	COMMAND.remover(1);
 
 	if (OPTIONS.contains("A"))
-		OPTIONS ^= "BSLGv";
+		OPTIONS ^= "BSLCGv[]";
 	var r2a = OPTIONS.contains("R") ;
 	var forrange = OPTIONS.contains("F");
 	var substr2b = OPTIONS.contains("B");
@@ -72,6 +74,7 @@ function main() {
 	var general = OPTIONS.contains("G");
 	var emptyvar = OPTIONS.contains("v");
 	var cut = OPTIONS.contains("C");
+	var onechar = OPTIONS.contains("[]");
 
 	var verbose = OPTIONS.contains("V");
 
@@ -344,6 +347,21 @@ function main() {
 				line2.regex_replacer(
 					R"__(var\(\)\.(chr|date|time)\()__",
 					R"__(\1\()__"
+				);
+
+			}
+
+			// [1/-1] eq/ne "x"/XX -> .starts/ends(xx)
+			if (onechar) {
+
+				line2.regex_replacer(
+					R"__(\[1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__",
+					R"__(.starts\(\1\))__"
+				);
+
+				line2.regex_replacer(
+					R"__(\[-1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__",
+					R"__(.ends\(\1\))__"
 				);
 
 			}

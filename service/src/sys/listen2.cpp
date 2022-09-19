@@ -314,7 +314,7 @@ passfail:
 
 				//convert wildcards to matches and cache the result
 				//converted cache is indicate by a trailing ' '
-				if (validips[-1] ne " ") {
+				if (not validips.ends(" ")) {
 
 					//prefix any additional validips - guessing is faster on average
 					if (addvalidips) {
@@ -754,7 +754,7 @@ validateexit2:
 					//trim leading html tags
 					while (true) {
 						///BREAK;
-						if (not(tt[1] eq "<")) break;
+						if (not(tt.starts("<"))) break;
 						tt = tt.field(">", 2, 99999);
 					}//loop;
 

@@ -255,7 +255,7 @@ printtx2:
 			}
 			//htmltitle=field(headx<1>,"'",1)
 			var htmltitle = headx.f(1);
-			if (htmltitle[1] == "<") {
+			if (htmltitle.starts("<")) {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
 			tx.splicer(1, 0, "<html><head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\" style=\"text-align:center\">\n");

@@ -366,7 +366,7 @@ function main_init() {
 	if (not webpath) {
 		webpath = "../" "data/";
 	}
-	if (webpath[-1] ne "/") {
+	if (not webpath.ends("/")) {
 		webpath ^= "/";
 	}
 	webpath.converter("/", OSSLASH);
@@ -1090,7 +1090,7 @@ readlink1:
 		//convert @lower.case to @upper.case in request
 		while (true) {
 			///BREAK;
-			if (not(USER0[-1] eq FM)) break;
+			if (not(USER0.ends(FM))) break;
 			request_.popper();
 		}//loop;
 		//swap '%FF' with rm  in request
@@ -1313,7 +1313,7 @@ function request_init() {
 
 	if (request2 eq "JOURNALS") {
 		request2 = "JOURNALS";
-		if (request3.count("*") eq 3 and (request3[-1] eq "*")) {
+		if (request3.count("*") eq 3 and (request3.ends("*"))) {
 			request3.popper();
 		}
 	}
@@ -1773,7 +1773,7 @@ subroutine process2() {
 		}
 
 		autokey = 0;
-		if (((keyx eq "" or (keyx[1] eq "*")) or (keyx[-1] eq "*")) or keyx.contains("**")) {
+		if (((keyx eq "" or (keyx.starts("*"))) or (keyx.ends("*"))) or keyx.contains("**")) {
 
 			//must provide a key unless locking
 			if (not withlock) {
@@ -2851,7 +2851,7 @@ subroutine fmtresp() {
 	//cannot remove since these may be proper codepage letters
 	USER3.converter("|", FM);
 	response_.converter(VM, FM);
-	if (USER3[1] eq FM) {
+	if (USER3.starts(FM)) {
 		response_.splicer(1, 1, "");
 	}
 	USER3.replacer(FM, "\r\n");

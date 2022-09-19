@@ -199,7 +199,7 @@ function main(in mode) {
 		for (taskn = ntasks; taskn >= 1; --taskn) {
 			var lockx = locks.f(1, taskn);
 			var task = tasks.f(1, taskn);
-			if (lockx eq "" and (task[-1] eq DQ)) {
+			if (lockx eq "" and (task.ends(DQ))) {
 deletetask:
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);

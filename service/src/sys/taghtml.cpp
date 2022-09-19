@@ -23,7 +23,7 @@ function main(in type, in in0, in mode, out output) {
 		return 0;
 	}
 
-	if (output[1] eq "-") {
+	if (output.starts("-")) {
 		if (mode eq "TD") {
 			if (var("1234567890").contains(output[2])) {
 				output = "<NOBR>" ^ output ^ "</NOBR>";

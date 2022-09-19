@@ -306,7 +306,7 @@ subroutine sendemails(io emaillog) {
 		return;
 	}
 
-	if (ccemails[1] eq ";") {
+	if (ccemails.starts(";")) {
 		ccemails.splicer(1, 1, "");
 	}
 

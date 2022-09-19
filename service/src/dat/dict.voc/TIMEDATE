@@ -10,7 +10,7 @@ S
 function main() {\
 	#include <system_common.h>\
 	var ans = field2(RECORD, FM, -1);\
-	if (ans[1] eq "V") {\
+	if (ans.starts("V")) {\
 		ans = field2(RECORD, FM, -2);\
 	}\
 	if (not(ans.first(2).match("^\\d{2}$"))) {\

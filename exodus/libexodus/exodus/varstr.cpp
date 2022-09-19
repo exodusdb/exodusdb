@@ -2197,7 +2197,7 @@ var var::sum() const {
 
 	var min_sep_present;
 	for (min_sep_present = min_sep; min_sep_present <= max_sep; ++min_sep_present) {
-		if (this->index(var().chr(min_sep_present)))
+		if (this->index(this->chr(min_sep_present)))
 			break;
 	}
 	if (min_sep_present > max_sep) {
@@ -2283,7 +2283,7 @@ var var::sum() const {
 			}
 
 			if (nextsep) {
-				outstr ^= var().chr(1 + max_sep - nextsep);
+				outstr ^= this->chr(1 + max_sep - nextsep);
 			}
 
 			flag = 0;

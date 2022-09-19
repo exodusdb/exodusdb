@@ -216,7 +216,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		for (const var ii : range(1, npaths)) {
 			var ospath = ospaths.field(",",ii);
 			//order is significant
-			var newtime = (ospath[-1] eq OSSLASH) ? ospath.osdir().f(3) : ospath.osfile().f(3);
+			var newtime = (ospath.ends(OSSLASH)) ? ospath.osdir().f(3) : ospath.osfile().f(3);
 			var oldtime = s100.f(1, ii);
 			if (newtime ne oldtime) {
 				if (oldtime) {
@@ -562,7 +562,7 @@ nextpatch:;
 getvalues:
 		call collectixvals(filename, fieldname, prefix);
 		PSEUDO.move(USER1);
-		if (iodat_[1] eq FM) {
+		if (iodat_.starts(FM)) {
 			USER1.splicer(1, 1, "");
 		}
 		USER3 = "OK";

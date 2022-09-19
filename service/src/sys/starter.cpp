@@ -54,7 +54,7 @@ inpreply:
 		reply = "Y";
 		//IF DECIDE(TEMP:'OK to start ?|','',REPLY) ELSE REPLY=2
 		call note(temp ^ "OK to start ? (Y/n)", "RC", reply);
-		reply = reply[1] eq "Y";
+		reply = reply.starts("Y");
 		if (not reply) {
 			printl("Cancelled");
 		}

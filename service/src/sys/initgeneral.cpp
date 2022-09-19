@@ -809,7 +809,7 @@ nextreport:
 		var imagesdir = "../images/";
 		imagesdir.converter("/", OSSLASH);
 		SYSTEM(49) = imagesdir;
-	} else if (tt[-1] ne OSSLASH) {
+	} else if (not tt.ends(OSSLASH)) {
 		//system<49>=tt:'\'
 		SYSTEM(49) = tt ^ OSSLASH;
 	}
@@ -896,7 +896,7 @@ nextreport:
 		cpu.converter(chr(10), FM);
 		cpu.converter(":", "");
 		cpu.trimmer();
-		if (cpu[-1] eq FM) {
+		if (cpu.ends(FM)) {
 			cpu.popper();
 		}
 

@@ -35,10 +35,10 @@ function main(in mode, in tableid, in in0, out outx) {
 		var otherstyle = tt.field(DQ, 2);
 		otherstyle.converter("{}", "");
 		otherstyle.trimmer();
-		if (otherstyle[1] ne ";") {
+		if (not otherstyle.starts(";")) {
 			otherstyle.splicer(1, 0, ";");
 		}
-		if (otherstyle[-1] ne ";") {
+		if (not otherstyle.ends(";")) {
 			otherstyle ^= ";";
 		}
 

@@ -133,7 +133,7 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 				indexingrecord = "0";
 			}
 
-			if (not(indexinglist[-1] eq FM)) {
+			if (not(indexinglist.ends(FM))) {
 				indexinglist ^= FM;
 			}
 			indexingrecord ^= indexinglist;

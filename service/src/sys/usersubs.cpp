@@ -371,7 +371,7 @@ function main(in mode) {
 			}
 			///BREAK;
 			if (not(ID ne "*!%")) break;
-			if (not(ID[1] eq "%")) {
+			if (not(ID.starts("%"))) {
 				if (RECORD.read(users, ID)) {
 					gosub updatemirror();
 				}

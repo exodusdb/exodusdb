@@ -336,7 +336,7 @@ function getrec() {
 
 			// Remove public. from start of filename but not dict.
 			if (targetfilename.starts("public."))
-				targetfilename = targetfilename.b(8);
+				targetfilename = targetfilename.cut(7);
 
 			// Skip unwanted files
 			if (not dictonly and sourcefilename and not sourcefilename.locateusing(targetfilename, ","))

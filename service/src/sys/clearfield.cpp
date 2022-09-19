@@ -33,10 +33,10 @@ function main() {
 
 	var fns = SENTENCE.field(" ", 3, 9999).field("/",1).trim();
 	var cleartovalue = SENTENCE.field("/", 2, 9999);
-	if ((cleartovalue[1] eq DQ) and (cleartovalue[-1] eq DQ)) {
+	if ((cleartovalue.starts(DQ)) and (cleartovalue.ends(DQ))) {
 		cleartovalue.splicer(1, 1, "");
 		cleartovalue.popper();
-	} else if ((cleartovalue[1] eq "'") and (cleartovalue[-1] eq "'")) {
+	} else if ((cleartovalue.starts("'")) and (cleartovalue.ends("'"))) {
 		cleartovalue.splicer(1, 1, "");
 		cleartovalue.popper();
 	}
@@ -115,7 +115,7 @@ next:
 		goto exit;
 	}
 
-	if (ID[1] eq "%") {
+	if (ID.starts("%")) {
 		goto next;
 	}
 	count += 1;
@@ -125,8 +125,8 @@ next:
 	if (RECORD.read(file, ID)) {
 
 		var cleartovalue2 = cleartovalue;
-		if (cleartovalue[1] eq "{") {
-			if (cleartovalue[-1] eq "}") {
+		if (cleartovalue.starts("{")) {
+			if (cleartovalue.ends("}")) {
 				cleartovalue2 = calculate(cleartovalue.b(2, cleartovalue.len() - 2));
 			}
 		}

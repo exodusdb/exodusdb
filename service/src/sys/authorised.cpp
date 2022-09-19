@@ -40,7 +40,7 @@ nousername0:
 
 	//if username='EXODUS' or username='STEVE' then call msg(task:'')
 
-	if (task[1] eq " ") {
+	if (task.starts(" ")) {
 		call mssg(task.quote());
 	}
 	//Each task may have many "locks", each users may have many "keys"
@@ -65,7 +65,7 @@ nousername0:
 		return 1;
 	}
 
-	var noadd = task[1] eq "!";
+	var noadd = task.starts("!");
 	if (noadd) {
 		task.splicer(1, 1, "");
 	}
@@ -79,7 +79,7 @@ nousername0:
 
 	//? as first character of task (after positive) means
 	//security is being used as a configuration and user exodus has no special privs
-	if (task[1] eq "?") {
+	if (task.starts("?")) {
 		isexodus = 0;
 		task.splicer(1, 1, "");
 	} else {
@@ -148,7 +148,7 @@ updateprivs:
 		}
 		if (not(noadd)) {
 			//NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
-			noadd = (task[-1] eq DQ) or (SECURITY.len() gt maxstrsize_ * 2 / 3);
+			noadd = (task.ends(DQ)) or (SECURITY.len() gt maxstrsize_ * 2 / 3);
 			//if passed a default lock then add even tasks ending like "XXXXX"
 			if (not(defaultlock.unassigned())) {
 				if (defaultlock) {

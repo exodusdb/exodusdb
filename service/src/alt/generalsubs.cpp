@@ -170,7 +170,7 @@ subroutine getdatasets() {
 		}
 	}
 
-	var nodata = directory.field("\r", 1)[-1] == " ";
+	var nodata = directory.field("\r", 1).ends(" ");
 	//call msg(nodata:' ')
 	//convert dos text to revelation format and standardise
 	directory.ucaser();

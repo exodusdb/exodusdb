@@ -94,7 +94,7 @@ function main(in mode, io logtime, in menu) {
 
 		//remove any trailing . from 10. etc which is valid syntax for hosts.allow
 		hosts.replacer("." ^ SM, SM);
-		if (hosts[-1] eq ".") {
+		if (hosts.ends(".")) {
 			hosts.popper();
 		}
 
@@ -265,7 +265,7 @@ function main(in mode, io logtime, in menu) {
 		select(users);
 nextuser:
 		if (readnext(userid)) {
-			if (userid[1] eq "%") {
+			if (userid.starts("%")) {
 				goto nextuser;
 			}
 			var userx;

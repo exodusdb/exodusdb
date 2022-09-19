@@ -106,7 +106,7 @@ function main(in amountfmlanguage, in currcode0) {
 		// WORDS:=TEXT<1,UNITSx+1>
 		//end else
 			words ^= text.f(1, 19 + unitsx[-2]);
-			if (unitsx[-1] ne "0") {
+			if (not unitsx.ends("0")) {
 				words ^= "-" ^ text.f(1, unitsx[-1] + 1);
 			}
 		}
