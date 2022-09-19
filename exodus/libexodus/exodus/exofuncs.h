@@ -237,12 +237,12 @@ PUBLIC ND var lower(CVR instring);
 PUBLIC VARREF raiser(VARREF iostring);
 PUBLIC ND var raise(CVR instring);
 
-PUBLIC VARREF splicer(VARREF iostring, const int start1, const int length, CVR str);
-PUBLIC ND var splice(CVR instring, const int start1, const int length, CVR str);
+PUBLIC VARREF paster(VARREF iostring, const int start1, const int length, CVR str);
+PUBLIC ND var paste(CVR instring, const int start1, const int length, CVR str);
 
 //length omitted
-PUBLIC VARREF splicer(VARREF iostring, const int start1, CVR str);
-PUBLIC ND var splice(CVR instring, const int start1, CVR str);
+PUBLIC VARREF paster(VARREF iostring, const int start1, CVR str);
+PUBLIC ND var paste(CVR instring, const int start1, CVR str);
 
 PUBLIC VARREF popper(VARREF iostring);
 PUBLIC ND var pop(CVR instring);

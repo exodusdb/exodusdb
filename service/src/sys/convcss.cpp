@@ -36,7 +36,7 @@ function main(in mode, in tableid, in in0, out outx) {
 		otherstyle.converter("{}", "");
 		otherstyle.trimmer();
 		if (not otherstyle.starts(";")) {
-			otherstyle.splicer(1, 0, ";");
+			otherstyle.paster(1, 0, ";");
 		}
 		if (not otherstyle.ends(";")) {
 			otherstyle ^= ";";

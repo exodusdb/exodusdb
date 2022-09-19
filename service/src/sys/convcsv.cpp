@@ -231,7 +231,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	var outfilename = SYSTEM.f(2);
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
 	if ((outfilename.last(4)).lcase() eq ".htm") {
-		outfilename.splicer(-3, 3, "xls");
+		outfilename.paster(-3, 3, "xls");
 		SYSTEM(2) = outfilename;
 	}
 	var excel = (outfilename.last(3)).lcase() eq "xls";
@@ -349,7 +349,7 @@ nextdict:
 					}
 					var title = headingx.f(coln);
 					if (title.ucase().ends(" CODE")) {
-						title.splicer(-5, 5, "");
+						title.paster(-5, 5, "");
 						headingx(coln) = title;
 					}
 				}
@@ -607,7 +607,7 @@ nextvn:
 					if (var(1) or excel) {
 						if (var(".-+0123456789").contains(cell[1])) {
 							if (not(cell.isnum())) {
-								cell.splicer(1, 0, " ");
+								cell.paster(1, 0, " ");
 							}
 						}
 					}

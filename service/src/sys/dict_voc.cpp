@@ -398,7 +398,7 @@ function main() {
 	brandcode1.converter(SM, VM);
 	brandcode1 = brandcode1.f(1, 1);
 	if (brandcode1 and brandcode1 ne brandcode) {
-		ans.splicer(1, 0, brandcode1.xlate("BRANDS", 2, "X") ^ " ");
+		ans.paster(1, 0, brandcode1.xlate("BRANDS", 2, "X") ^ " ");
 	}
 	return ans;
 }
@@ -558,7 +558,7 @@ function main() {
 		if (not pos2) {
 			pos2 = RECORD.len() + 1;
 		}
-		RECORD.splicer(pos1, pos2 - pos1 + 2, "");
+		RECORD.paster(pos1, pos2 - pos1 + 2, "");
 	}//loop;
 	//call msg('x')
 	//remove comment lines

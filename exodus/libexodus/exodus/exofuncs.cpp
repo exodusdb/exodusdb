@@ -245,21 +245,21 @@ PUBLIC var raise(CVR instring) {
 }
 
 
-PUBLIC VARREF splicer(VARREF iostring, const int start1, const int length, CVR str) {
-	return iostring.splicer(start1, length, str);
+PUBLIC VARREF paster(VARREF iostring, const int start1, const int length, CVR str) {
+	return iostring.paster(start1, length, str);
 }
-PUBLIC var splice(CVR instring, const int start1, const int length, CVR str) {
-	return instring.splice(start1, length, str);
+PUBLIC var paste(CVR instring, const int start1, const int length, CVR str) {
+	return instring.paste(start1, length, str);
 }
 
 
 // length omitted
-PUBLIC VARREF splicer(VARREF iostring, const int start1, CVR str) {
-	return iostring.splicer(start1, str);
+PUBLIC VARREF paster(VARREF iostring, const int start1, CVR str) {
+	return iostring.paster(start1, str);
 }
 // length omitted
-PUBLIC var splice(CVR instring, const int start1, CVR str) {
-	return instring.splice(start1, str);
+PUBLIC var paste(CVR instring, const int start1, CVR str) {
+	return instring.paste(start1, str);
 }
 
 
@@ -884,13 +884,13 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 		if (exodus__argc)
 			mv.EXECPATH = var(exodus__argv[0]);
 		if (not mv.EXECPATH.contains(OSSLASH))
-			mv.EXECPATH.splicer(1, 0, oscwd() ^ OSSLASH);
+			mv.EXECPATH.paster(1, 0, oscwd() ^ OSSLASH);
 	}
 	//"see getting path to current executable" above
 	// or use "which EXECPATH somehow like in mvdebug.cpp
 	// if (not EXECPATH.contains(OSSLASH) && not EXECPATH.contains(":"))
 	//{
-	//	EXECPATH.splicer(0,0,oscwd()^OSSLASH);
+	//	EXECPATH.paster(0,0,oscwd()^OSSLASH);
 	//	if (OSSLASH=="\\")
 	//		EXECPATH.converter("/","\\");
 	//}
@@ -912,7 +912,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 			word = word.field2(OSSLASH, -1);
 			// remove trailing ".exe"
 			if (word.lcase().ends(".exe"))
-				word.splicer(-4, 4, "");
+				word.paster(-4, 4, "");
 		} else
 			mv.SENTENCE ^= " ";
 
@@ -934,14 +934,14 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	// else if (lastchar=="}")
 	//	mv.OPTIONS=mv.COMMAND.field2("{",-1);
 	// if (mv.OPTIONS)
-	//	mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, "");
+	//	mv.COMMAND.paster(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, "");
 	// var lastchar=mv.COMMAND[-1];
 	if (lastchar == ")") {
 		mv.OPTIONS = "(" ^ mv.COMMAND.field2("(", -1);
 	} else if (lastchar == "}")
 		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
 	if (mv.OPTIONS)
-		mv.COMMAND.splicer(-(mv.OPTIONS.len()), mv.OPTIONS.len(), "");
+		mv.COMMAND.paster(-(mv.OPTIONS.len()), mv.OPTIONS.len(), "");
 	mv.COMMAND.trimmerb(_FM);
 
 	var temp;

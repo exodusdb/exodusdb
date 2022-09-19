@@ -97,13 +97,13 @@ function main() {
 		if (osfile(cygwinpath ^ "nano.exe") or osfile("nano.exe")) {
 			editor = "nano $LINENO'$FILENAME'";
 			if (osfile(cygwinpath ^ "nano.exe"))
-				editor.splicer(1, 0, cygwinpath);
+				editor.paster(1, 0, cygwinpath);
 			//editor^="\"";
 			linenopattern = "+$LINENO ";
 		} else if (osfile(cygwinpath ^ "vi.exe") or osfile("vi.exe")) {
 			editor = "vi -c \":$LINENO\" $FILENAME";
 			if (osfile(cygwinpath ^ "vi.exe"))
-				editor.splicer(1, 0, cygwinpath);
+				editor.paster(1, 0, cygwinpath);
 			//editor^="\"";
 		} else
 			editor = "";

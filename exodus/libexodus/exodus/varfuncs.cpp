@@ -642,16 +642,12 @@ VARREF var::trimmer(SV trimchars DEFAULT_SPACE) {
 	return *this;
 }
 
+
 // invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
 var var::invert() const& {
 	var tt = *this;
 	tt.inverter();
 	return tt;
-}
-
-// on temporary
-VARREF var::invert() && {
-	return this->inverter();
 }
 
 // in-place
@@ -681,14 +677,10 @@ VARREF var::inverter() {
 	return *this;
 }
 
+
 // ucase() - upper case
 var var::ucase() const& {
 	return var(*this).ucaser();
-}
-
-// on temporary
-VARREF var::ucase() && {
-	return this->ucaser();
 }
 
 // in-place
@@ -730,14 +722,10 @@ VARREF var::ucaser() {
 	*/
 }
 
+
 // lcase() - lower case
 var var::lcase() const& {
 	return var(*this).lcaser();
-}
-
-// on temporary
-VARREF var::lcase() && {
-	return this->lcaser();
 }
 
 // in-place
@@ -770,14 +758,10 @@ VARREF var::lcaser() {
 	return *this;
 }
 
+
 // tcase() - title case
 var var::tcase() const& {
 	return var(*this).tcaser();
-}
-
-// on temporary
-VARREF var::tcase() && {
-	return this->tcaser();
 }
 
 // in-place
@@ -802,6 +786,7 @@ VARREF var::tcaser() {
 	return *this;
 }
 
+
 // fcase()
 // fold case - standardise text for indexing/searching
 // https://www.w3.org/International/wiki/Case_folding
@@ -815,11 +800,6 @@ VARREF var::tcaser() {
 // where the letter "ß" is represented in case independent way as "ss".
 var var::fcase() const& {
 	return var(*this).fcaser();
-}
-
-// on temporary
-VARREF var::fcase() && {
-	return this->fcaser();
 }
 
 // in-place
@@ -849,6 +829,7 @@ inline bool is_ascii(std::string_view str1) {
 	return true;
 }
 
+
 // *** USED TO NORMALISE ALL KEYS BEFORE READING OR WRITING ***
 // *** otherwise can have two record with similar keys á and á
 // postgres gives FALSE for the following:
@@ -863,11 +844,6 @@ inline bool is_ascii(std::string_view str1) {
 // it must remain normalized under all future versions of Unicode."
 var var::normalize() const& {
 	return var(*this).normalizer();
-}
-
-// on temporary
-VARREF var::normalize() && {
-	return this->normalizer();
 }
 
 // in-place
@@ -893,13 +869,14 @@ VARREF var::normalizer() {
 	return *this;
 }
 
+
 // There is no memory or performance advantage for mutable call, only a consistent syntax for user
 VARREF var::uniquer() {
 	*this = this->unique();
 	return *this;
 }
 
-var var::unique() const {
+var var::unique() const& {
 
 	THISIS("var var::unique()")
 	assertString(function_sig);
@@ -992,14 +969,10 @@ var var::textchr(const int utf_codepoint) const {
 	return boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
+
 // quote() - wrap with double quotes
 var var::quote() const& {
 	return var(*this).quoter();
-}
-
-// on temporary
-VARREF var::quote() && {
-	return this->quoter();
 }
 
 // in-place
@@ -1014,14 +987,10 @@ VARREF var::quoter() {
 	return *this;
 }
 
+
 // squoter() - wrap with single quotes
 var var::squote() const& {
 	return var(*this).squoter();
-}
-
-// on temporary
-VARREF var::squote() && {
-	return this->squoter();
 }
 
 // in-place
@@ -1036,14 +1005,10 @@ VARREF var::squoter() {
 	return *this;
 }
 
+
 //unquote() - remove outer double or single quotes
 var var::unquote() const& {
 	return var(*this).unquoter();
-}
-
-// on temporary
-VARREF var::unquote() && {
-	return this->unquoter();
 }
 
 // in-place
@@ -1079,30 +1044,16 @@ VARREF var::unquoter() {
 	return *this;
 }
 
-//splice() remove/replace/insert part of a string with another string
-var var::splice(const int start1, const int length, SV insertstr) const& {
-	return var(*this).splicer(start1, length, insertstr);
-}
 
-// on temporary
-VARREF var::splice(const int start1, const int length, SV insertstr) && {
-	return this->splicer(start1, length, insertstr);
-}
-
-// splice() remove/replace/insert part of a string (up to the end) with another string
-var var::splice(const int start1, SV insertstr) const& {
-	return var(*this).splicer(start1, insertstr);
-}
-
-// on temporary
-VARREF var::splice(const int start1, SV insertstr) && {
-	return this->splicer(start1, insertstr);
+//paste() remove/replace/insert part of a string with another string
+var var::paste(const int start1, const int length, SV insertstr) const& {
+	return var(*this).paster(start1, length, insertstr);
 }
 
 // in-place
-VARREF var::splicer(const int start1, const int length, SV insertstr) {
+VARREF var::paster(const int start1, const int length, SV insertstr) {
 
-	THISIS("VARREF var::splicer(const int start1,const int length, SV insertstr)")
+	THISIS("VARREF var::paster(const int start1, const int length, SV insertstr)")
 	assertStringMutator(function_sig);
 	//ISSTRING(insertstr)
 
@@ -1157,10 +1108,16 @@ VARREF var::splicer(const int start1, const int length, SV insertstr) {
 	return *this;
 }
 
-// in-place
-VARREF var::splicer(const int start1, SV insertstr) {
 
-	THISIS("VARREF var::splicer(const int start1, SV insertstr)")
+// paste() insert a string at
+var var::paste(const int start1, SV insertstr) const& {
+	return var(*this).paster(start1, insertstr);
+}
+
+// in-place
+VARREF var::paster(const int start1, SV insertstr) {
+
+	THISIS("VARREF var::paster(const int start1, SV insertstr)")
 	assertStringMutator(function_sig);
 	//ISSTRING(insertstr)
 
@@ -1183,14 +1140,26 @@ VARREF var::splicer(const int start1, SV insertstr) {
 	return *this;
 }
 
+
+// insert a string a the beginning
+var var::paste(SV insertstr) const& {
+	return var(*this).paster(insertstr);
+}
+
+// in-place
+VARREF var::paster(SV insertstr) {
+
+	THISIS("VARREF var::paster(SV insertstr)")
+	assertStringMutator(function_sig);
+
+	var_str.insert(0, insertstr);
+
+	return *this;
+}
+
 // pop() remove last byte of string
 var var::pop() const& {
 	return var(*this).popper();
-}
-
-// on temporary do in place
-VARREF var::pop() && {
-	return this->popper();
 }
 
 // in-place
@@ -1209,14 +1178,14 @@ VARREF var::popper() {
 /* Failed attempt to get compiler to call different functions depending on specific arguments
 
 template<class T1, class T2, class T3>
-VARREF splicerx(T1 start1, T2 length, const T3 str) {
-	return this->splice(start1, length, var(str));
+VARREF pasterx(T1 start1, T2 length, const T3 str) {
+	return this->paste(start1, length, var(str));
 };
 
-// Specialise splicer(-1, 1, "") to call popper()
+// Specialise paster(-1, 1, "") to call popper()
 // Sadly compiler never chooses this one over the main template
 template<const int = -1, const int = 1, const char* = "">
-VARREF splicerx(const int start1, const int length, const char* c) {
+VARREF pasterx(const int start1, const int length, const char* c) {
        this->outputl("testing");
        return this->popper();
 };
@@ -1336,14 +1305,10 @@ var var::space() const {
 	return newstr;
 }
 
+
 //crop() - remove superfluous FM, VM etc.
 var var::crop() const& {
 	return var(*this).cropper();
-}
-
-// on temporary
-VARREF var::crop() && {
-	return this->cropper();
 }
 
 // in-place
@@ -1394,14 +1359,10 @@ VARREF var::cropper() {
 	return *this;
 }
 
+
 // lower() drops FM to VM, VM to SM etc.
 var var::lower() const& {
 	return var(*this).lowerer();
-}
-
-// on temporary
-VARREF var::lower() && {
-	return this->lowerer();
 }
 
 // in-place
@@ -1421,14 +1382,10 @@ VARREF var::lowerer() {
 	return *this;
 }
 
+
 // raise() lifts VM to FM, SM to VM etc.
 var var::raise() const& {
 	return var(*this).raiser();
-}
-
-// on temporary
-VARREF var::raise() && {
-	return this->raiser();
 }
 
 // in-place
@@ -1487,6 +1444,7 @@ void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 	return;
 }
 
+
 // convert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
 //var var::convert(CVR fromchars, CVR tochars) const& {
@@ -1498,14 +1456,6 @@ var var::convert(SV fromchars, SV tochars) const& {
 	// return var(*this).converter(fromchars,tochars);
 	var temp = var(*this).converter(fromchars, tochars);
 	return temp;
-}
-
-// on temporary
-//VARREF var::convert(CVR fromchars, CVR tochars) && {
-VARREF var::convert(SV fromchars, SV tochars) && {
-	//dont check if defined/assigned since temporaries very unlikely to be so
-
-	return this->converter(fromchars, tochars);
 }
 
 // in-place
@@ -1520,6 +1470,7 @@ VARREF var::converter(SV fromchars, SV tochars) {
 
 	return *this;
 }
+
 
 //// in-place for const char*
 //VARREF var::converter(const char* fromchars, const char* tochars) {
@@ -1536,11 +1487,6 @@ VARREF var::converter(SV fromchars, SV tochars) {
 // if the target list is shorter than the source list of characters then characters are deleted
 var var::textconvert(SV fromchars, SV tochars) const& {
 	return var(*this).textconverter(fromchars, tochars);
-}
-
-// on temporary
-VARREF var::textconvert(SV fromchars, SV tochars) && {
-	return this->textconverter(fromchars, tochars);
 }
 
 // in-place

@@ -35,16 +35,16 @@ function main(in localdate0, in localtime0) {
 		temp.cutter(1);
 	}
 	if (temp.ends("AM")) {
-		temp.splicer(-2, 2, sys.glang.f(16));
+		temp.paster(-2, 2, sys.glang.f(16));
 	}
 	if (temp.ends("PM")) {
-		temp.splicer(-2, 2, sys.glang.f(17));
+		temp.paster(-2, 2, sys.glang.f(17));
 	}
 
 	if (DATEFMT eq "") {
 		DATEFMT = "D/E";
 	}
-	temp.splicer(1, 0, oconv(localdate, "[DATE,*4]") ^ " ");
+	temp.paster(1, 0, oconv(localdate, "[DATE,*4]") ^ " ");
 
 	return temp;
 }

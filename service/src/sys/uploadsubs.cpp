@@ -247,7 +247,7 @@ postuploadfail:
 
 		//lcase upload path (not filenames which must retain case)
 		var filename = virtualfilebase.field2(OSSLASH, -1 , 1 );
-		virtualfilebase.lcaser().splicer(-len(filename), filename);
+		virtualfilebase.lcaser().paster(-len(filename), filename);
 
 		//search for extensions
 		//may be only one extension now
@@ -384,7 +384,7 @@ postuploadfail:
 			dictfilename = filename;
 		}
 		if (dictfilename.first(4) ne "DICT") {
-			dictfilename.splicer(1, 0, "DICT.");
+			dictfilename.paster(1, 0, "DICT.");
 		}
 		//if keydictid else keydictid='@ID'
 		if (not lengthx) {
@@ -400,7 +400,7 @@ postuploadfail:
 		}
 		if (importcode.contains(".")) {
 			var tt = field2(uploadpath, ".", -1);
-			importcode.splicer(-tt.len() - 1, 999, "");
+			importcode.paster(-tt.len() - 1, 999, "");
 		}
 		importcode.converter(" .", "--");
 		RECORD(11) = importcode;

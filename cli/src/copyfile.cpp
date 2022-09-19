@@ -392,7 +392,7 @@ function getrec() {
 
 	ID = RECORD.field("\t",1);
 	//RECORD[1,len(ID)+1] = ""
-	RECORD.splicer(1,ID.len()+1,"");
+	RECORD.paster(1,ID.len()+1,"");
 
 	gosub unescape_sql(ID);
 	gosub unescape_sql(RECORD);

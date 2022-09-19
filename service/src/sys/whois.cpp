@@ -94,7 +94,7 @@ returnzero:
 
 		//dont wait for a long time - in case internet access is blocked
 		if ((cmd ^ "timeout.exe").osfile()) {
-			cmd.splicer(1, 0, SYSTEM.f(50) ^ "timeout 5 ");
+			cmd.paster(1, 0, SYSTEM.f(50) ^ "timeout 5 ");
 		}
 
 		//capture the output of the whois command

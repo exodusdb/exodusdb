@@ -242,7 +242,7 @@ notallowed:
 	var keys = SECURITY.f(2).field(VM, usern, 65535);
 	var temp = keys.index("---");
 	if (temp) {
-		keys.splicer(temp - 1, 65535, "");
+		keys.paster(temp - 1, 65535, "");
 	}
 	keys.converter("," ^ VM, "  ");
 	locks.converter(",", " ");

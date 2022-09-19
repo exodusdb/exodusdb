@@ -52,7 +52,7 @@ subroutine printtx() {
 			//create a new filename
 			var ptx_filenamelen = (field2(printfilename, "\\", -1)).len();
 			var ptx_random = var(10).pwr(15).rnd().first(8);
-			printfilename.splicer(-ptx_filenamelen, ptx_filenamelen, ptx_random ^ ".htm");
+			printfilename.paster(-ptx_filenamelen, ptx_filenamelen, ptx_random ^ ".htm");
 
 			SYSTEM.r(2, printfilename);
 		}
@@ -137,15 +137,15 @@ subroutine printtx() {
 				if (newpagetag.unassigned()) {
 					newpagetag = "<div style=\"page-break-before:always\">";
 				}
-				ptx_temp.splicer(1, 0, newpagetag ^ "&nbsp;</div>");
+				ptx_temp.paster(1, 0, newpagetag ^ "&nbsp;</div>");
 			}
 		}
 
 		//replace '<h2>' with '<h2~style="page-break-before:auto">' in head
 
-		tx.splicer(1, 0, ptx_temp ^ FM);
+		tx.paster(1, 0, ptx_temp ^ FM);
 		if (printptr and not(html)) {
-			tx.splicer(1, 0, FM ^ var().chr(12));
+			tx.paster(1, 0, FM ^ var().chr(12));
 		}
 	}
 
@@ -157,12 +157,12 @@ subroutine printtx() {
 
 			//commented so foot always follows bottom line (printtxmark)
 			//if foot then
-		tx.splicer(1, 0, foot);
+		tx.paster(1, 0, foot);
 			//end else
 		if (bottomline) {
 					//if html then t_:='<p style="text-align:center">'
 					//tx[1,0]=bottomline:fm:t_:'continues' rfmt
-			tx.splicer(1, 0, bottomline);
+			tx.paster(1, 0, bottomline);
 		}
 			// end
 		// end
@@ -189,7 +189,7 @@ subroutine printtx2() {
 			}
 			if (style) {
 				var stylennx = ptx_css.index("</style>");
-				ptx_css.splicer(stylennx + 8, 0, FM ^ style);
+				ptx_css.paster(stylennx + 8, 0, FM ^ style);
 			}
 
 			//htmltitle=field(headx<1>,"'",1)
@@ -200,7 +200,7 @@ subroutine printtx2() {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
 
-			tx.splicer(1, 0, "<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
+			tx.paster(1, 0, "<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
 
 			call docmods("", tx);
 
@@ -274,7 +274,7 @@ subroutine convoptions(io ptx_temp) {
 			}
 		};//i_;
 		//ptx_temp[optioncharn,-len(optionchars)-2]=newoptions
-		ptx_temp.splicer(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
+		ptx_temp.paster(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
 	}//loop;
 
 	ptx_temp.replacer("^%^", "\'");
@@ -306,7 +306,7 @@ subroutine getheadfoot() {
 		while (true) {
 			///BREAK;
 			if (not head1.ends("&nbsp;")) break;
-			head1.splicer(-6, 6, "");
+			head1.paster(-6, 6, "");
 		}//loop;
 		headx.r(1, head1);
 		head1 = "";

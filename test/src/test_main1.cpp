@@ -750,8 +750,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//We expect the question mark to remain as it is,
 	// and the greek gammas and ABC to be replaced with latin question marks.
 	expect = unicode;
-	splicer(expect, 2, 2, "??");
-	splicer(expect, 4, 3, "???");
+	paster(expect, 2, 2, "??");
+	paster(expect, 4, 3, "???");
 	//expect.outputl();
 	//expect.oconv("HEX4").outputl();
 	//replace(unicode,"\\p{L}","?","ri").outputl();

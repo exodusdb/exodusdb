@@ -212,7 +212,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		tt ^= " style=\"position:fixed;top:2px;left:2px;font-size:60%;display:none\"";
 		tt ^= " onclick=" ^ (onclick.quote());
 		tt ^= "></button>";
-		html.splicer(1, 0, tt);
+		html.paster(1, 0, tt);
 
 		//click logos to switch on/off editing
 		onclick = "javascript:edithtml.click()";

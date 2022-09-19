@@ -46,8 +46,8 @@ OPTIONS
 		...
 		   .b(10)
 		-> .cut(9)
-	P - Splicer
-		   .splicer(1, n, ""))
+	P - paster
+		   .paster(1, n, ""))
 		-> .cutter(n)
 	[] - 
 
@@ -217,7 +217,7 @@ function main() {
 				//printl("part3 :", part3.quote());
 				//printl("varname :", varname.quote(), ",", varname2.quote(), "starting :", starting.quote(), "compare :" ^ compare.quote(), "ending :", ending.quote());
 				if (not fail) {
-					line2.splicer(pos, 99999, "for (const var " ^ varname ^ " : range(" ^ starting ^ ", " ^ ending ^ ")) {");
+					line2.paster(pos, 99999, "for (const var " ^ varname ^ " : range(" ^ starting ^ ", " ^ ending ^ ")) {");
 				}
 
 				if (not line2.contains(" : range(")) {
@@ -322,12 +322,12 @@ function main() {
 				);
 			}
 
-			// splicer -> cutter
+			// paster "" -> cutter
 			if (splicing) {
 
 				line2.regex_replacer(
-					//R"__(.splicer\(1,\s*([A-Z0-9a-z_. + -]+),\s*""\))__",
-					R"__(.splicer\(1,\s*([^,]+),\s*""\))__",
+					//R"__(.paster\(1,\s*([A-Z0-9a-z_. + -]+),\s*""\))__",
+					R"__(.paster\(1,\s*([^,]+),\s*""\))__",
 					R"__(.cutter\(\1\))__"
 				);
 
@@ -435,7 +435,7 @@ function hide_subsyntax(in line, io pos, in hidden_char) {
 
 		//else if (c == ',' and (inquotes or depth))
 		else if (c == hidden_char and (inquotes or depth))
-			line2.splicer(pos, 1, _FM);
+			line2.paster(pos, 1, _FM);
 	}
 	return line2;
 }

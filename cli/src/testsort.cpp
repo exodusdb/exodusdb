@@ -112,7 +112,7 @@ function main() {
 	recs ^= FM ^ "SB1  |Client SB1 |1 |     |     |       |           ";
 	recs ^= FM ^ "JB2  |Client JB2 |2 |14000|10539|0      |14000.10539";
 	recs ^= FM ^ "JB10 |Client JB10|10|14010|10539|2000.00|14010.10539";
-	splicer(recs, 1, 1, "");
+	paster(recs, 1, 1, "");
 
 	printl("\nWrite the data records to the data file");
 

@@ -465,6 +465,16 @@ dim& dim::sort(bool reverse) {
 	return *this;
 }
 
+dim& dim::reverse() {
+
+	//note that _data[0] may be empty
+	//std::cout<<nfields<<std::endl;
+	//std::cout<<data_[0]<<std::endl;
+	std::reverse(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1);
+
+	return *this;
+}
+
 bool dim::read(CVR filehandle, CVR key) {
 
 	THISIS("bool dim::read(CVR filehandle, CVR key)")
@@ -569,7 +579,7 @@ VARREF var::sorter(SV sepchar) {
 }
 
 //sorting var - using temporary dim
-var var::sort(SV sepchar) const{
+var var::sort(SV sepchar) const& {
 
 	THISIS("var var::sort(SV sepchar = FM)")
 	assertString(function_sig);

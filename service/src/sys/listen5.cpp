@@ -145,7 +145,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							var mode="live";
 							if (database.ends("_test")) {
 								mode = "test";
-								database.splicer(-5, "");
+								database.paster(-5, "");
 							}
 
 							var cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
@@ -626,14 +626,14 @@ getvalues:
 			if (iodat_) {
 				call htmllib2("STRIPTAGS", USER1);
 				iodat_.replacer(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
-				USER1.splicer(1, 0, "<record><" ^ fieldname ^ ">");
+				USER1.paster(1, 0, "<record><" ^ fieldname ^ ">");
 				iodat_ ^= "</" ^ fieldname ^ ">" "</record>";
 				if (USER1.contains(VM)) {
 					iodat_.replacer("</" ^ fieldname ^ ">", "</STOPPED>");
 					USER1.replacer(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
 			}
-			iodat_.splicer(1, 0, "<records>");
+			iodat_.paster(1, 0, "<records>");
 			USER1 ^= "</records>";
 		} else {
 			//convert fm to vm in iodat
@@ -887,7 +887,7 @@ nextlock:
 		call sysmsg(response_, "EXODUS Backup");
 
 		if (USER3.ucase().contains("SUCCESS")) {
-			response_.splicer(1, 0, "OK ");
+			response_.paster(1, 0, "OK ");
 		}
 
 		//note: if backup did not respond already then the requestexit will
@@ -975,7 +975,7 @@ nextfiles:
 
 		//get the file time
 		var filename0 = filenamesx.field(FM, 1);
-		filenamesx.splicer(1, filenamesx.field(FM, 1).len() + 1, "");
+		filenamesx.paster(1, filenamesx.field(FM, 1).len() + 1, "");
 
 		var filename = inpath ^ filename0;
 
@@ -987,9 +987,9 @@ nextfiles:
 			//a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.ends(".4")) {
 				filename.osremove();
-				filename.splicer(-1, 1, "2");
+				filename.paster(-1, 1, "2");
 				filename.osremove();
-				filename.splicer(-1, 1, "3");
+				filename.paster(-1, 1, "3");
 				filename.osremove();
 
 			} else {

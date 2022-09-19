@@ -83,7 +83,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 			var lastchar = prefix[-1];
 			///BREAK;
 			if (not(var("0123456789").contains(lastchar))) break;
-			startx.splicer(1, 0, lastchar);
+			startx.paster(1, 0, lastchar);
 			prefix.popper();
 		}//loop;
 
@@ -101,7 +101,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 				var lastchar = tt[-1];
 				///BREAK;
 				if (not(var("0123456789").contains(lastchar))) break;
-				finish.splicer(1, 0, lastchar);
+				finish.paster(1, 0, lastchar);
 				tt.popper();
 			}//loop;
 

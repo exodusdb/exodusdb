@@ -747,7 +747,7 @@ nextdbasen:;
 //			if (upgradex.f(2) ne upgradefiledatetime) {
 //				//check wget output file to see if is fully downloaded (100%) or "NO NEWER"
 //				tt = upgradefilename;
-//				tt.splicer(-3, 3, "$wg");
+//				tt.paster(-3, 3, "$wg");
 //				call osread(wgetoutput, tt);
 //				if (wgetoutput.ucase().contains(" NO NEWER ") or wgetoutput.contains("100%")) {
 //					upgradefiledir = upgradefilename83.osfile();

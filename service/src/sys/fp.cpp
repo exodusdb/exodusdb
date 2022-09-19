@@ -12,7 +12,7 @@ function main(in type, in inx, in mode, out outx) {
 			outx = outx.field("E",1);
 
 			if (exp lt 0) {
-				outx.splicer(2, 1, "");
+				outx.paster(2, 1, "");
 				outx = ("." ^ var("0").str(-(exp + 1)) ^ outx).first(15);
 				while (true) {
 					///BREAK;
@@ -21,11 +21,11 @@ function main(in type, in inx, in mode, out outx) {
 				}//loop;
 
 			} else if (exp gt 0) {
-				outx.splicer(2, 1, "");
+				outx.paster(2, 1, "");
 
 				if (outx.len() eq 1 + exp) {
 				} else if (outx.len() gt 1 + exp) {
-					outx.splicer(2 + exp, 1, ".");
+					outx.paster(2 + exp, 1, ".");
 				} else {
 					outx ^= var("0").str(exp - outx.len());
 				}

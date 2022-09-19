@@ -553,7 +553,7 @@ badsetcodepage:
 		//transfer @user4 to data
 		//response='OK'
 		msg_.move(USER3);
-		response_.splicer(1, 0, "OK ");
+		response_.paster(1, 0, "OK ");
 
 	} else if (mode eq "UTIL") {
 		perform("UTIL");
@@ -839,7 +839,7 @@ performreport:
 		cmd ^= " ID-SUPP";
 		var temp = cmd.index("xAND");
 		if (temp) {
-			cmd.splicer(temp, 5, "");
+			cmd.paster(temp, 5, "");
 		}
 		cmd.replacer("xAND", "AND");
 		perform(cmd);

@@ -40,7 +40,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		//convert _x to <u>x</u> to indicate keyboard shortcut
 		var tt = mainmenu.index("_");
 		if (tt) {
-			mainmenu.splicer(tt, 2, "<u>" ^ mainmenu[tt + 1] ^ "</u>");
+			mainmenu.paster(tt, 2, "<u>" ^ mainmenu[tt + 1] ^ "</u>");
 		}
 
 		tx ^= FM ^ "<a id=\"menu_" ^ id ^ "\">" ^ mainmenu ^ "</a>";
@@ -58,7 +58,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		//convert _x to <u>x</u> to indicate keyboard shortcut
 		var tt = submenu.index("_");
 		if (tt) {
-			submenu.splicer(tt, 2, "<u>" ^ submenu[tt + 1] ^ "</u>");
+			submenu.paster(tt, 2, "<u>" ^ submenu[tt + 1] ^ "</u>");
 		}
 
 		tx ^= FM ^ "<a>" ^ submenu ^ "</a>";
@@ -82,7 +82,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		//convert _x to <u>x</u> to indicate keyboard shortcut
 		var tt = item.index("_");
 		if (tt) {
-			item.splicer(tt, 2, "<u>" ^ item[tt + 1] ^ "</u>");
+			item.paster(tt, 2, "<u>" ^ item[tt + 1] ^ "</u>");
 		}
 
 		tx ^= FM ^ " <a" ^ props ^ " href=\"" ^ arg4 ^ "\">" ^ item ^ "</a><br />";

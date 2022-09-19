@@ -86,7 +86,7 @@ class printtext {
 				//create a new filename
 				var tt = (field2(printfilename, "\\", -1)).length();
 				var t2 = ((var(10).pwr(15)).rnd()).last(8);
-				printfilename.splicer(-tt, tt, t2 ^ ".htm");
+				printfilename.paster(-tt, tt, t2 ^ ".htm");
 
 				SYSTEM.r(2, printfilename);
 			}
@@ -151,34 +151,34 @@ class printtext {
 				if (printptr not_eq 0) {
 					if (newpagetag.unassigned())
 						newpagetag = "<div style=\"page-break-before:always\">";
-					temp.splicer(1, 0, newpagetag ^ "&nbsp;</div>");
+					temp.paster(1, 0, newpagetag ^ "&nbsp;</div>");
 				}
 			}
 
 			//replace '<h2>' with '<h2~style="page-break-before:auto">' in head
 
 			//insert page heading
-			tx.splicer(1, 0, temp ^ FM);
+			tx.paster(1, 0, temp ^ FM);
 
 			//insert text style page break
 			if (printptr and not html)
-				tx.splicer(1, 0, FM ^ var().chr(12));
+				tx.paster(1, 0, FM ^ var().chr(12));
 		}
 
 		if (bodyln > nbodylns or newpage) {
 			var tt = html ? "<p>" : "";
 			if (bodyln < 999) {
 				if (foot) {
-					tx.splicer(1, 0, foot);
+					tx.paster(1, 0, foot);
 				} else {
 					if (html)
 						tt ^= "<p style=\"text-align:center\">";
 					//tx[1,0]=bottomline:fm:t:'continues ...' rfmt
-					tx.splicer(1, 0, bottomline);
+					tx.paster(1, 0, bottomline);
 				}
 			}
 			if (html and not bottomline.contains("</tbody></table>", 1))
-				tx.splicer(1, 0, "</tbody></table>");
+				tx.paster(1, 0, "</tbody></table>");
 			bodyln = ntxlns;
 		}
 		printtx2(tx);
@@ -200,8 +200,8 @@ class printtext {
 				var htmltitle = (headx.f(1)).field("\'", 1, 1);
 				if (htmltitle[1] == "<")
 					htmltitle = (htmltitle.field(">", 2, 1)).field("<", 1, 1);
-				tx.splicer(1, 0, "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head>\n<body style=\"background-color:#ffffff\">\n<div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
-				tx.splicer(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+				tx.paster(1, 0, "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head>\n<body style=\"background-color:#ffffff\">\n<div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
+				tx.paster(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 				css = "";
 			}
 			//cannot remove these since they may be nonibm codepage letters
@@ -311,7 +311,7 @@ class printtext {
 				}
 			};	//ii;
 			//temp[optioncharn,-len(optionchars)-2]=newoptions
-			temp.splicer(optioncharn - optionchars.length() - 1, optionchars.length() + 2, newoptions);
+			temp.paster(optioncharn - optionchars.length() - 1, optionchars.length() + 2, newoptions);
 		}
 
 		temp.replacer("^%^", "\'");
@@ -338,7 +338,7 @@ class printtext {
 			head1.replacer(" ", "&nbsp;");
 			head1.converter("~", " ");
 			while (head1.ends( "&nbsp;")) {
-				head1.splicer(-6, 6, "");
+				head1.paster(-6, 6, "");
 			}
 			headx.r(1, head1);
 			head1 = "";

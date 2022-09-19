@@ -1594,18 +1594,93 @@ class PUBLIC var final {
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
 	//int localeAwareCompare(const std::string& str2) const;
 
+	// STRING ACCESSORS
+	///////////////////
+
+	// all are const
+
+	ND var convert(SV fromchars, SV tochars) const&;
+	ND var textconvert(SV fromchars, SV tochars) const&;
+	ND var replace(SV fromstr, SV tostr) const&;
+	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
+	ND var quote() const&;
+	ND var squote() const&;
+	ND var unquote() const&;
+	ND var ucase() const&;        // utf8
+	ND var lcase() const&;        // utf8
+	ND var tcase() const&;        // utf8
+	ND var fcase() const&;        // utf8
+	ND var normalize() const&;    // utf8
+	ND var invert() const&;        // utf8
+	ND var trim(SV trimchars DEFAULT_SPACE) const&;
+	ND var trimf(SV trimchars DEFAULT_SPACE) const&;
+	ND var trimb(SV trimchars DEFAULT_SPACE) const&;
+	ND var trim(SV trimchars, SV options) const&;
+	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
+	ND var first(const size_t length) const&;
+	ND var last(const size_t length) const&;
+	ND var cut(const int length) const&;
+	ND var paste(const int start1, const int length, SV insertstr) const&;
+	ND var paste(const int start1, SV insertstr) const&;
+	ND var paste(SV insertstr) const&;
+	ND var pop() const&;
+
+	ND var substr(const int startindex, const int length) const&;
+	ND var b(const int startindex, const int length) const& {return substr(startindex, length);};
+	ND var substr(const int startindex) const&;
+	ND var b(const int startindex) const& {return substr(startindex);}
+
+	ND var lower() const&;
+	ND var raise() const&;
+	ND var crop() const&;
+	ND var unique() const&;
+	ND var sort(SV sepchar = _FM) const&;
+
+	// SAME ON TEMPORARIES - MUTATE FOR SPEED
+	/////////////////////////////////////////
+
+	ND VARREF convert(SV fromchars, SV tochars) && {return converter(fromchars, tochars);}
+	ND VARREF textconvert(SV fromchars, SV tochars) && {return textconverter(fromchars, tochars);}
+	ND VARREF replace(SV fromstr, SV tostr) && {return replacer(fromstr, tostr);}
+	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) && {return regex_replacer(regex, replacement, options);}
+	ND VARREF quote() && {return quoter();}
+	ND VARREF squote() && {return squoter();}
+	ND VARREF unquote() && {return unquoter();}
+	ND VARREF ucase() && {return ucaser();}     // utf8
+	ND VARREF lcase() && {return lcaser();}     // utf8
+	ND VARREF tcase() && {return tcaser();}     // utf8
+	ND VARREF fcase() && {return fcaser();}     // utf8
+	ND VARREF normalize() && {return normalizer();} // utf8
+	ND VARREF invert() && {return inverter();}    // utf8
+	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
+	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return trimmerf(trimchars);}
+	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return trimmerb(trimchars);}
+	ND VARREF trim(SV trimchars, SV options) && {return trimmer(trimchars, options);}
+	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
+	ND VARREF first(const size_t length) && {return firster(length);}
+	ND VARREF last(const size_t length) && {return laster(length);}
+	ND VARREF cut(const int length) && {return cutter(length);}
+	ND VARREF paste(const int start1, const int length, SV insertstr) && {return paster(start1, length, insertstr);};
+	ND VARREF paste(const int start1, SV insertstr) && {return paster(start1, insertstr);}
+	ND VARREF paste(SV insertstr) && {return paster(insertstr);}
+	ND VARREF pop() && {return popper();}
+
+	ND VARREF substr(const int startindex, const int length) && {return substrer(startindex, length);};
+	ND VARREF substr(const int startindex) && {return substrer(startindex);}
+
+	ND VARREF lower() && {return lowerer();}
+	ND VARREF raise() && {return raiser();}
+	ND VARREF crop() && {return cropper();}
+	ND VARREF unique() && {return uniquer();}
+	ND VARREF sort() && {return sorter();}
+
 	// STRING MUTATORS
 	//////////////////
-
-	// all return VARREF and are not const)
 
 	VARREF converter(SV fromchars, SV tochars);
 	VARREF textconverter(SV fromchars, SV tochars);
 	VARREF replacer(SV fromstr, SV tostr);
 	VARREF regex_replacer(SV regex, SV replacement, SV options DEFAULT_EMPTY);
-	VARREF splicer(const int start1, const int length, SV insertstr);
-	VARREF splicer(const int start1, SV insertstr);
-	VARREF popper();
 	VARREF quoter();
 	VARREF squoter();
 	VARREF unquoter();
@@ -1623,81 +1698,19 @@ class PUBLIC var final {
 	VARREF firster(const size_t length);
 	VARREF laster(const size_t length);
 	VARREF cutter(const int length);
-	VARREF substrer(const int startindex);
+	VARREF paster(const int start1, const int length, SV insertstr);
+	VARREF paster(const int start1, SV insertstr);
+	VARREF paster(SV insertstr);
+	VARREF popper();
+
 	VARREF substrer(const int startindex, const int length);
+	VARREF substrer(const int startindex);
 
 	VARREF lowerer();
 	VARREF raiser();
 	VARREF cropper();
 	VARREF uniquer();
 	VARREF sorter(SV sepchar = _FM);
-
-	// SAME ON TEMPORARIES
-	//////////////////////
-
-	ND VARREF convert(SV fromchars, SV tochars) &&;
-	ND VARREF textconvert(SV fromchars, SV tochars) &&;
-	ND VARREF replace(SV fromstr, SV tostr) &&;
-	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) &&;
-	ND VARREF splice(const int start1, const int length, SV insertstr) &&;
-	ND VARREF splice(const int start1, SV insertstr) &&;
-	ND VARREF pop() &&;
-	ND VARREF quote() &&;
-	ND VARREF squote() &&;
-	ND VARREF unquote() &&;
-	ND VARREF ucase() &&;     // utf8
-	ND VARREF lcase() &&;     // utf8
-	ND VARREF tcase() &&;     // utf8
-	ND VARREF fcase() &&;     // utf8
-	ND VARREF normalize() &&; // utf8
-	ND VARREF invert() &&;    // utf8
-	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return this->trimmer(trimchars);}
-	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return this->trimmerf(trimchars);}
-	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return this->trimmerb(trimchars);}
-	ND VARREF trim(SV trimchars, SV options) && {return this->trimmer(trimchars, options);}
-	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) &&;
-	ND VARREF first(const size_t length) && {return this->firster(length);}
-	ND VARREF last(const size_t length) && {return this->laster(length);}
-	ND VARREF cut(const int length) && {return this->cutter(length);}
-	ND VARREF substr(const int startindex) &&;
-	ND VARREF substr(const int startindex, const int length) &&;
-
-	ND VARREF lower() &&;
-	ND VARREF raise() &&;
-	ND VARREF crop() &&;
-
-	// SAME BUT NON-MUTATING
-	////////////////////////
-
-	// all are const
-
-	ND var convert(SV fromchars, SV tochars) const&;
-	ND var textconvert(SV fromchars, SV tochars) const&;
-	ND var replace(SV fromstr, SV tostr) const&;
-	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
-	ND var splice(const int start1, const int length, SV insertstr) const&;
-	ND var splice(const int start1, SV insertstr) const&;
-	ND var pop() const&;
-	ND var quote() const&;
-	ND var squote() const&;
-	ND var unquote() const&;
-	ND var ucase() const&;        // utf8
-	ND var lcase() const&;        // utf8
-	ND var tcase() const&;        // utf8
-	ND var fcase() const&;        // utf8
-	ND var normalize() const&;    // utf8
-	ND var invert() const&;        // utf8
-	ND var trim(SV trimchars DEFAULT_SPACE) const&;
-	ND var trimf(SV trimchars DEFAULT_SPACE) const&;
-	ND var trimb(SV trimchars DEFAULT_SPACE) const&;
-	ND var trim(SV trimchars, SV options) const&;
-	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
-
-	ND var lower() const&;
-	ND var raise() const&;
-	ND var crop() const&;
-	ND var unique() const;
-	ND var sort(SV sepchar = _FM) const;
 
 	// OTHER STRING ACCESS
 	//////////////////////
@@ -1707,28 +1720,6 @@ class PUBLIC var final {
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
 	ND dim split(SV sepchar = _FM) const;
-
-	// STRING EXTRACTION varx[x,y] -> varx.b(start,length)
-
-	ND var first(const size_t length) const&;
-	ND var last(const size_t length) const&;
-	ND var cut(const int length) const&;
-
-	// NOTE char=byte ... NOT utf-8 code point
-	// NOTE 1 based indexing. byte 1 = first byte as per mv conventions for all indexing (except
-	// offset in osbread) NOTE start byte may be negative to count backwards -1=last byte
-
-	// v1 - returns bytes from some char number up to the end of the string
-	// equivalent to substr(x) from javascript except it is 1 based
-	ND var substr(const int startindex) const&;
-	ND var b(const int startindex) const& {return substr(startindex);}
-
-	// v2 - returns a given number of bytes starting from some byte
-	// both start and length can be negative
-	// negative length extracts characters up to the starting byte IN REVERSE
-	// 'abcde'.b(4,-3) -> 'dcb'
-	ND var substr(const int startindex, const int length) const&;
-	ND var b(const int startindex, const int length) const& {return substr(startindex, length);};
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found

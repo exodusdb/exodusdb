@@ -2186,8 +2186,8 @@ inline void tosqlstring(VARREF string1) {
 	if (string1[1] == "\"") {
 	//if (string1.var_str.front() == '"') {
 		string1.replacer("'", "''");
-		string1.splicer(1, 1, "'");
-		string1.splicer(-1, 1, "'");
+		string1.paster(1, 1, "'");
+		string1.paster(-1, 1, "'");
 		//string1.var_str.front() = "'";
 		//string1.var_str.back() = "'";
 	}
@@ -2459,7 +2459,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				sqlexpression ^= ", ";
 			}
 
-			sqlexpression.splicer(-2, 2, ")");
+			sqlexpression.paster(-2, 2, ")");
 
 		}
 
@@ -2682,7 +2682,7 @@ exodus_call:
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
 		if (sqlexpression.starts("exodus_extract_date(") || sqlexpression.starts("exodus_extract_time("))
-			sqlexpression.splicer(20, 0, "_array");
+			sqlexpression.paster(20, 0, "_array");
 		else {
 			sqlexpression.regex_replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
@@ -2760,12 +2760,12 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	if (word1.len() > 1) {
 		if (word1[1] == "(" && word1[-1] != ")") {
 			//put remaining word back on the pending words
-			remainingwords.splicer(1, 0, word1.substr(2) ^ " ");
+			remainingwords.paster(1, 0, word1.substr(2) ^ " ");
 			//return single leading paren (
 			word1 = "(";
 		} else if (word1[-1] == ")") {
 			//put single closing paren back on the pending words
-			remainingwords.splicer(1, 0, ") ");
+			remainingwords.paster(1, 0, ") ");
 			//return word without trailing paren )
 			word1.popper();
 		}
@@ -2977,7 +2977,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var lastword = remaining.field2(" ", -1);
 	if ((lastword[1] == "(" && lastword[-1] == ")") ||
 		(lastword[1] == "{" && lastword[-1] == "}")) {
-		remaining.splicer(-lastword.len() - 1, 999, "");
+		remaining.paster(-lastword.len() - 1, 999, "");
 	}
 
 	var firstucword = remaining.field(" ", 1).ucase();
@@ -3173,7 +3173,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// skip AUTHORISED for now since too complicated to calculate in database
 			// ATM if (word1.ucase()=="AUTHORISED") { if
 			//(whereclause.ends(" AND"))
-			//whereclause.splicer(-4,4,""); continue;
+			//whereclause.paster(-4,4,""); continue;
 			//}
 
 			// process the dictionary id
@@ -3377,12 +3377,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (word1[1] == "'") {
 
 				if (word1[2] == "[") {
-					word1.splicer(2, 1, "");
+					word1.paster(2, 1, "");
 					prefix = ".*";
 
 					//CONTAINING
 					if (word1[-2] == "]") {
-						word1.splicer(-2, 1, "");
+						word1.paster(-2, 1, "");
 						postfix = ".*";
 					}
 					//ENDING
@@ -3392,7 +3392,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 					//STARTING
 				} else if (word1[-2] == "]") {
-					word1.splicer(-2, 1, "");
+					word1.paster(-2, 1, "");
 
 					//identical code above/below
 					if (dictexpression_isvector) {
@@ -3445,11 +3445,11 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				var special = "[^$.|?*+()";
 				for (int ii = special.len(); ii > 0; --ii) {
 					if (special.contains(word1[ii]))
-						word1.splicer(ii, 0, "\\");
+						word1.paster(ii, 0, "\\");
 				}
 				word1.replacer("'" _FM "'", postfix ^ "'" _FM "'" ^ prefix);
-				word1.splicer(-1, 0, postfix);
-				word1.splicer(2, 0, prefix);
+				word1.paster(-1, 0, postfix);
+				word1.paster(2, 0, prefix);
 
 				//only ops <> and != are supported when using the regular expression operator (starting/ending/containing)
 				if (op == "<>")
@@ -3468,7 +3468,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				// push back and treat as missing value
 				// remaining[1,0]=ucword:' '
-				remaining.splicer(1, 0, ucword ^ " ");
+				remaining.paster(1, 0, ucword ^ " ");
 
 				// simulate no given value .. so a boolean filter like "WITH APPROVED"
 				word1 = "";
@@ -3565,7 +3565,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
 				if (dictexpression.starts("string_to_array(")) {
 					dictexpression.cutter(16);
-					dictexpression.splicer(-13, "");
+					dictexpression.paster(-13, "");
 				}
 
 				//remove multivalue handling - duplicate code elsewhere
@@ -3647,7 +3647,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					*/
 					dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
 					expression ^= dictexpression ^ " COLLATE \"C\"";
-					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.splice(-1, 0, "ZZZZZZ") ^ FM;
+					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.paste(-1, 0, "ZZZZZZ") ^ FM;
 				}
 				expression.popper();
 				expression.replacer(FM, " OR ");
@@ -3760,7 +3760,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 						//spaces should have been converted to & before selection
 						//spaces imply &
 						//partvalue.replacer(" ", "&");
-						//partvalue.splicer(-1, 0, ":*");
+						//partvalue.paster(-1, 0, ":*");
 
 						//treat entered colons as &
 						partvalue.replacer(":", "&");
@@ -3785,12 +3785,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					value.replacer("]''", "'':*");
 					value.replacer("]", ":*");
 					//value.replacer("|", ":*|");
-					value.splicer(-1, 0, ":*");
+					value.paster(-1, 0, ":*");
 				}
 
 				value.replacer("]''", "'':*");
 				value.replacer("]", ":*");
-				//value.splicer(-1, 0, ":*");
+				//value.paster(-1, 0, ":*");
 
 				//use "simple" dictionary (ie none) to allow searching for words starting with 'a'
 				//use "english" dictionary for stemming (or "simple" dictionary for none)

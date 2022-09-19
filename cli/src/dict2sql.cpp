@@ -113,7 +113,7 @@ function main() {
 	if (filenames) {
 		doall = false;
 		if (not filenames.starts("dict."))
-			filenames.splicer(1, 0, "dict.");
+			filenames.paster(1, 0, "dict.");
 
 	} else if (doall) {
 		var dictdbname = "";
@@ -294,7 +294,7 @@ COST 10;
 			rawsqlexec("DROP VIEW IF EXISTS dict.all");
 
 		if (filenames.contains(FM)) {
-			viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
+			viewsql.paster(-6, 6, "");	 //remove trailing "UNION" word
 			var errmsg;
 			if (verbose)
 				viewsql.output("SQL:");
@@ -558,7 +558,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 //	}
 	var lastpos = sql.indexr("*" "/");
 	if (lastpos)
-		sql.splicer(lastpos - 1, "");
+		sql.paster(lastpos - 1, "");
 
 	var xlatetemplate;
 	if (ismv)

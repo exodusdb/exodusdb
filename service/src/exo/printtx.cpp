@@ -123,7 +123,7 @@ function main(io tx, in mode="", in modevalue="") {
 			//create a new filename
 			var tt = (field2(printfilename, "\\", -1)).len();
 			var t2 = (var(10).pwr(15)).rnd().first(8);
-			printfilename.splicer(-tt, tt, t2 ^ ".htm");
+			printfilename.paster(-tt, tt, t2 ^ ".htm");
 
 			SYSTEM(2) = printfilename;
 		}
@@ -202,15 +202,15 @@ function main(io tx, in mode="", in modevalue="") {
 				if (newpagetag.unassigned()) {
 					newpagetag = "<div style=\"page-break-before:always\">";
 				}
-				temp.splicer(1, 0, newpagetag ^ "&nbsp;</div>");
+				temp.paster(1, 0, newpagetag ^ "&nbsp;</div>");
 			}
 		}
 
 		//swap '<h2>' with '<h2~style="page-break-before:auto">' in head
 
-		tx.splicer(1, 0, temp ^ FM);
+		tx.paster(1, 0, temp ^ FM);
 		if (printptr and not html) {
-			tx.splicer(1, 0, FM ^ chr(12));
+			tx.paster(1, 0, FM ^ chr(12));
 		}
 	}
 
@@ -223,19 +223,19 @@ function main(io tx, in mode="", in modevalue="") {
 
 		//commented so foot always follows bottom line (printtxmark)
 		//if foot then
-		tx.splicer(1, 0, foot);
+		tx.paster(1, 0, foot);
 		//end else
 		if (bottomline) {
 			if (html) {
 				tt ^= "<p style=\"text-align:center\">";
 			}
 			//tx[1,0]=bottomline:fm:t:'continues ...' rfmt
-			tx.splicer(1, 0, bottomline);
+			tx.paster(1, 0, bottomline);
 		}
 		// end
 		// end
 		if (html and not bottomline.contains("</tbody></table>")) {
-			tx.splicer(1, 0, "</tbody></table>");
+			tx.paster(1, 0, "</tbody></table>");
 		}
 		bodyln = ntxlns;
 	}
@@ -258,8 +258,8 @@ printtx2:
 			if (htmltitle.starts("<")) {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
-			tx.splicer(1, 0, "<html><head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\" style=\"text-align:center\">\n");
-			tx.splicer(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+			tx.paster(1, 0, "<html><head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\" style=\"text-align:center\">\n");
+			tx.paster(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 			css = "";
 		}
 	}
@@ -334,7 +334,7 @@ subroutine convoptions() {
 			}
 		}//ii;
 		//temp[optioncharn,-len(optionchars)-2]=newoptions
-		temp.splicer(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
+		temp.paster(optioncharn - optionchars.len() - 1, optionchars.len() + 2, newoptions);
 	}
 
 	temp.replacer("^%^", "\'");
@@ -366,7 +366,7 @@ subroutine getheadfoot() {
 		while (true) {
 		///BREAK;
 		if (not(head1.ends("&nbsp;"))) break;
-			head1.splicer(-6, 6, "");
+			head1.paster(-6, 6, "");
 		}//loop;
 		headx(1) = head1;
 		head1 = "";

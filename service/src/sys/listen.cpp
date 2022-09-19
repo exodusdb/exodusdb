@@ -1336,9 +1336,9 @@ function request_init() {
 	}
 
 	linkfilename2 = replyfilename;
-	linkfilename2.splicer(-1, 1, "2");
+	linkfilename2.paster(-1, 1, "2");
 	linkfilename3 = replyfilename;
-	linkfilename3.splicer(-1, 1, "3");
+	linkfilename3.paster(-1, 1, "3");
 
 	//save the response file name
 	//so that if listen fails then NET the calling program can still respond
@@ -2049,7 +2049,7 @@ noupdate:
 				//remove session id
 				tt = USER3.index("SESSIONID");
 				if (tt) {
-					response_.splicer(tt, ("SESSIONID " ^ sessionid).len(), "");
+					response_.paster(tt, ("SESSIONID " ^ sessionid).len(), "");
 					USER3.trimmerb();
 					if (response_ eq "") {
 						USER3 = "OK";
@@ -2471,14 +2471,14 @@ badwrite:
 		//tt=printfilename[-1,'B.']
 		//tt=field2(printfilename,'.',-1)
 		//printfilename[-len(tt),len(tt)]='htm'
-		printfilename.splicer(-1, 1, "htm");
+		printfilename.paster(-1, 1, "htm");
 		SYSTEM(2) = printfilename;
 
 		//provide interruptfilename
 		//esc.to.exit will return 1 if it finds this file
 		//clear it if running non-interruptable processes and giveway maybe called
 		tt = linkfilename2;
-		tt.splicer(-1, 1, "5");
+		tt.paster(-1, 1, "5");
 		SYSTEM(6) = tt;
 
 		//execute the program
@@ -2507,7 +2507,7 @@ badwrite:
 		execute(voccmd);
 
 		//reformat for reqlog
-		voccmd.splicer(-5, 5, "");
+		voccmd.paster(-5, 5, "");
 		USER0(1) = voccmd ^ "_" ^ request_.f(1);
 
 		//discard any stored input

@@ -23,7 +23,7 @@ function main(in msg0, io time0) {
 	if (VOLUMES) {
 		//logfilename=field(FIELD2(@rollout.file,'\',-1),'.',1):'.LOG'
 		logfilename = ROLLOUTFILE;
-		logfilename.splicer(-3, 3, "log");
+		logfilename.paster(-3, 3, "log");
 		logfilelength = logfilename.osfile().f(1);
 		if (not logfilelength) {
 			call oswrite("", logfilename);

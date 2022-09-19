@@ -82,7 +82,7 @@ function main(io osfilename, in printopts0, out errors) {
 
 	//generate an output filename
 	var pdffilename = osfilename;
-	pdffilename.splicer(-3, 3, "pdf");
+	pdffilename.paster(-3, 3, "pdf");
 
 	//if index(printopts,'F',1) then
 	pdfcmd ^= " --footer-left [page]/[topage]";

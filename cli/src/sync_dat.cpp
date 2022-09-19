@@ -173,7 +173,7 @@ function main() {
 					// Add closing brace before pgsql , if present
 					var t = dictsrc.index("\n/*pgsql");
 					if (t) {
-						dictsrc.splicer(t, 1, "\n}\n");
+						dictsrc.paster(t, 1, "\n}\n");
 						dictsrc.replacer("\n\n}", "\n}");
 						addfunctionmain = false;
 					}

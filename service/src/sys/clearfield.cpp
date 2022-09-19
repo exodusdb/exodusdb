@@ -16,7 +16,7 @@ function main() {
 
 	if (SENTENCE.contains("(")) {
 		options = field2(SENTENCE, "(", -1);
-		SENTENCE.splicer(-options.len() - 1, 9999, "");
+		SENTENCE.paster(-options.len() - 1, 9999, "");
 		SENTENCE.trimmerb();
 	} else {
 		options = "";

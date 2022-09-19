@@ -76,7 +76,7 @@ function main(in msg0, in subject0="", in username0="") {
 	//log the system message first in case sendmail fails
 	var logmsg = msg;
 	if (subjectin) {
-		logmsg.splicer(1, 0, subjectin ^ FM);
+		logmsg.paster(1, 0, subjectin ^ FM);
 	}
 	call log("SYSMSG", logmsg);
 

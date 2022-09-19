@@ -19,8 +19,8 @@ function security2(in mode, in op0)
 	if (op.ends(DQ)) {
 //		op2 = (op.b(-2, "B\"")).quote();
 		op2=op.field2(DQ, -2);
-		op.splicer(-op2.len(), op2.len(), "");
-		op2.splicer(1, 0, " ");
+		op.paster(-op2.len(), op2.len(), "");
+		op2.paster(1, 0, " ");
 	}
 	if (mode.contains("INIT")) {
 		var msg;
@@ -72,7 +72,7 @@ function security3(in op, in op2)
 
 function invalidq(in msg)
 {
-	return invalid(msg.splice(1, 0, (win.is.f(1, 1, 1)).quote() ^ " "));
+	return invalid(msg.paste(1, 0, (win.is.f(1, 1, 1)).quote() ^ " "));
 }
 
 function invalid()

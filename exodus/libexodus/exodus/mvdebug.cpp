@@ -182,7 +182,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		if (objaddress[1] != "0" || objaddress[2] != "x")
 			continue;
 
-		var startaddress = objaddress.splice(-3, 3, "000");
+		var startaddress = objaddress.paste(-3, 3, "000");
 		// var temp="objdump -S --start-address=" ^ startaddress ^ " --stop-address=" ^
 		// objaddress ^ " --disassemble -l " ^ objfilename;
 		//var temp = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^

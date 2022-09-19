@@ -11,15 +11,15 @@ function main(in pluralnoun) {
 
 		//COMPANIES=COMPANY
 		if (temp2.ends("IES")) {
-			temp.splicer(-3, 3, "Y");
+			temp.paster(-3, 3, "Y");
 
 		//ADDRESSES=ADDRESS
 		} else if (temp2.ends("SSES")) {
-			temp.splicer(-2, 2, "");
+			temp.paster(-2, 2, "");
 		} else if (temp2.ends("SHES")) {
-			temp.splicer(-2, 2, "");
+			temp.paster(-2, 2, "");
 		} else if (temp2.ends("CHES")) {
-			temp.splicer(-2, 2, "");
+			temp.paster(-2, 2, "");
 		} else {
 			temp.popper();
 		}

@@ -88,7 +88,7 @@ function main() {
 
 	var tt = cmd.index("%AND% ");
 	if (tt) {
-		cmd.splicer(tt, 6, "");
+		cmd.paster(tt, 6, "");
 	}
 	cmd.replacer("%AND% ", "AND ");
 

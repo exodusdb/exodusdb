@@ -305,9 +305,9 @@ forcedemail:
 			cwd ^= OSSLASH;
 		}
 		if (attachfilename.starts("..")) {
-			attachfilename.splicer(1, 2, cwd.field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
+			attachfilename.paster(1, 2, cwd.field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
 		} else if (attachfilename.starts(".")) {
-			attachfilename.splicer(1, 1, cwd);
+			attachfilename.paster(1, 1, cwd);
 		}
 		msgsize += attachfilename.osfile().f(1);
 
@@ -342,7 +342,7 @@ forcedemail:
 		if (subject.starts("System:")) {
 			subject = subject.cut(7).trimf();
 		}
-		subject.splicer(1, 0, "EXODUS: ");
+		subject.paster(1, 0, "EXODUS: ");
 	}
 
 	params(-1) = "toaddress=" ^ (toaddress.quote());

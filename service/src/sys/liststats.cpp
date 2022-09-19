@@ -257,7 +257,7 @@ function main() {
 
 		SYSTEM(3) = 1;
 		var sys2 = SYSTEM.f(2);
-		sys2.splicer(-3, 3, "xls");
+		sys2.paster(-3, 3, "xls");
 		SYSTEM(2) = sys2;
 		output.replacer(FM, "\r\n");
 		output.replacer(VM, "\t");

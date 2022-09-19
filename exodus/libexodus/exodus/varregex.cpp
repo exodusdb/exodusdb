@@ -453,11 +453,6 @@ var var::replace(SV what, SV with) const& {
 	return newmv.replacer(what, with);
 }
 
-// on temporaries
-VARREF var::replace(SV what, SV with) && {
-	return this->replacer(what, with);
-}
-
 // in-place
 VARREF var::replacer(SV what, SV with) {
 
@@ -496,11 +491,6 @@ VARREF var::replacer(SV what, SV with) {
 var var::regex_replace(SV regexstr, SV replacementstr, SV options) const& {
 	var newmv = *this;
 	return newmv.regex_replacer(regexstr, replacementstr, options);
-}
-
-// on temporary
-VARREF var::regex_replace(SV regexstr, SV replacementstr, SV options) && {
-	return this->regex_replacer(regexstr, replacementstr, options);
 }
 
 // in-place

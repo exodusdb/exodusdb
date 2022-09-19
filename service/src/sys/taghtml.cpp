@@ -39,7 +39,7 @@ function main(in type, in in0, in mode, out output) {
 //		if (not charn) break;
 //
 //		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",", (output.b(charn + 1, 10)).field(";", 1), xx))) {
-//			output.splicer(charn, 1, "&amp;");
+//			output.paster(charn, 1, "&amp;");
 //		}
 //
 //	} //ii;
@@ -50,7 +50,7 @@ function main(in type, in in0, in mode, out output) {
 			break;
 		var ss = _VM ^ output.b(pos + 1, 10).field(";", 1) ^ _VM;
 		if (not precoded.contains(ss)) {
-			output.splicer(pos + 1, 0, "amp;");
+			output.paster(pos + 1, 0, "amp;");
 			pos += 4;
 		}
 	}

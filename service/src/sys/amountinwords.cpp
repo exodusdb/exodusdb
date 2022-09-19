@@ -150,7 +150,7 @@ french:
 ///////
 	//millions
 	millions = amount.field(".", 1);
-	millions.splicer(-6, 6, "");
+	millions.paster(-6, 6, "");
 	if (millions) {
 		words = amountinwords(millions ^ FM ^ language) ^ " million";
 		if (millions gt 1) {

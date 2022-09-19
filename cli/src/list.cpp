@@ -795,8 +795,8 @@ nextkey:
 
 	} else if (word eq "BREAK-ON") {
 		tt = coln + 1;
-		breakcolns.splicer(1, 0, tt ^ FM);
-		breakopts.splicer(1, 0, FM);
+		breakcolns.paster(1, 0, tt ^ FM);
+		breakopts.paster(1, 0, FM);
 		nbreaks += 1;
 		breakonflag = 1;
 
@@ -915,7 +915,7 @@ nextkey:
 
 		//prevent trailing colon folding onto following line
 		if (title.ends(" :")) {
-			title.splicer(-2, 2, "&nbsp;:");
+			title.paster(-2, 2, "&nbsp;:");
 		}
 
 		//any existing doubled single quotes are removed to avoid double doublimg
@@ -1521,7 +1521,7 @@ x1exit:
 		head ^= FM;
 	}
 
-	head.splicer(1, 0, FM);
+	head.paster(1, 0, FM);
 
 	orighead = head;
 
@@ -2207,13 +2207,13 @@ subroutine getwordexit() {
 		goto dictvoc;
 	}
 	if (not(html) and word.ends("_LINK"))
-		word.splicer(-5, 5, "");
+		word.paster(-5, 5, "");
 	if (dictrec.reado(DICT, word)) {
 maindict:
 		if (dictrec.f(1) eq "G") {
 			tt = dictrec.f(3);
 			tt.converter(VM, " ");
-			sentencex.splicer(startcharn, word.len(), tt);
+			sentencex.paster(startcharn, word.len(), tt);
 			charn = startcharn - 1;
 			wordn -= 1;
 			wordexpanded = 1;
@@ -2569,7 +2569,7 @@ subroutine addstr() {
 		if (char1 ne "") {
 			char2 = str3[ii];
 			if (char2 eq " ") {
-				str3.splicer(ii, 1, char1);
+				str3.paster(ii, 1, char1);
 			} else {
 				//if num(char1) else char1=1
 				//if num(char2) else char2=1
@@ -2581,7 +2581,7 @@ subroutine addstr() {
 				} else {
 					char3 = char1;
 				}
-				str3.splicer(ii, 1, char3);
+				str3.paster(ii, 1, char3);
 			}
 		}
 	};	//ii;

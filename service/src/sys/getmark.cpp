@@ -27,7 +27,7 @@ function main(in mode, in html, io mark) {
 		//S o f t  w a r e   b y
 		mark ^= var("7962206572617774666F53").iconv("HEX2").b(-1, -999);
 		if (html) {
-			mark.splicer(1, 0, "<div style=\"font-size:60%;margin:0px;text-align:left;page-break-before:avoid;page-break-after:avoid\">");
+			mark.paster(1, 0, "<div style=\"font-size:60%;margin:0px;text-align:left;page-break-before:avoid;page-break-after:avoid\">");
 		}
 
 		mark ^= " ";

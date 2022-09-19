@@ -145,6 +145,7 @@ class PUBLIC dim final {
 	// return the number of fields
 	var split(CVR var1, SV sepchar = _FM);
 	dim& sort(bool reverse = false);
+	dim& reverse();
 
 	bool read(CVR filehandle, CVR key);
 	bool write(CVR filehandle, CVR key) const;

@@ -318,8 +318,8 @@ function main() {
     var t6 = str("0000000000",12);
 
     for (var i : range(1,90)) {
-        var t7 = t6.splice(i,30,t3);
-        t7.splicer(61,0,".");
+        var t7 = t6.paste(i,30,t3);
+        t7.paster(61,0,".");
         t7.trimmerf("0").trimmerb("0");
         //printl(t7+0);
 

@@ -23,7 +23,7 @@ function main(in type, in in0, in mode0, out output, in glang) {
 
 		if (mode eq "4") {
 			mode = DATEFMT;
-			mode.splicer(2, 1, "4");
+			mode.paster(2, 1, "4");
 		}
 
 	} else {
@@ -66,16 +66,16 @@ ok:
 				output = oconv(inx, mode);
 
 				if (output.starts("0")) {
-					output.splicer(1, 1, " ");
+					output.paster(1, 1, " ");
 				}
 
 				if (output[4] eq "0") {
-					output.splicer(4, 1, " ");
+					output.paster(4, 1, " ");
 				}
 
 				if (output.b(4, 3).match("^[A-Za-z]{3}$")) {
-					output.splicer(7, 1, "");
-					output.splicer(3, 1, "");
+					output.paster(7, 1, "");
+					output.paster(3, 1, "");
 				}
 
 				if (nospaces) {

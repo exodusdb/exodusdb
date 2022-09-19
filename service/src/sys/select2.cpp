@@ -317,7 +317,7 @@ nocommon:
 				if (records.read(file, "%RECORDS%")) {
 					if (records.len() lt 200) {
 						records.replacer(FM, "\" \"");
-						sortselect.splicer(1, 0, records.quote() ^ " ");
+						sortselect.paster(1, 0, records.quote() ^ " ");
 					}
 				}
 			}
@@ -474,9 +474,9 @@ nextrec:
 		var prefix = ID ^ FM;
 
 		if (dataptr) {
-			prefix.splicer(1, 0, RM);
+			prefix.paster(1, 0, RM);
 		}
-		row.splicer(1, 0, prefix);
+		row.paster(1, 0, prefix);
 
 	//dictids ne RECORD
 	} else {
@@ -513,11 +513,11 @@ nextrec:
 		}
 		if (dataptr) {
 			if (not xml) {
-				row.splicer(1, 0, FM);
+				row.paster(1, 0, FM);
 			}
 		} else {
 			if (xml) {
-				row.splicer(1, 0, "<records>" "\r\n");
+				row.paster(1, 0, "<records>" "\r\n");
 				//row[1,0]='<XML id=':quote(lcase(filename)):'>':crlf
 			}
 		}

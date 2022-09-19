@@ -22,7 +22,7 @@ function main() {
 		sql^=filesql;
 	}
 	var viewname="dicts";
-	sql.splicer(1,0,"create or replace view " ^ viewname ^ " as \n");
+	sql.paster(1,0,"create or replace view " ^ viewname ^ " as \n");
 	sql ^= " order by key";
 
 	var().sqlexec("drop view " ^ viewname);

@@ -31,7 +31,7 @@ namespace exodus {
 
 // includes dim::split
 
-// and var::field,field2,locate,extract,remove,pickreplace,insert,substr,splice,remove
+// and var::field,field2,locate,extract,remove,pickreplace,insert,substr,paste,remove
 
 ///////////////
 // FIELD/FIELD2
@@ -105,11 +105,6 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 // var.fieldstore(separator,fieldno,nfields,replacement)
 var var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) const& {
 	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
-}
-
-// on temporary
-VARREF var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) && {
-	return this->fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 }
 
 // in-place
@@ -1669,20 +1664,10 @@ var var::substr(const int startindex1) const& {
 	return var(*this).substrer(startindex1);
 }
 
-//// on temporary
-VARREF var::substr(const int startindex1) && {
-	return this->substrer(startindex1);
-}
-
 //[x,y]
 // var.s(start,length) substring
 var var::substr(const int startindex1, const int length) const& {
 	return var(*this).substrer(startindex1, length);
-}
-
-// on temporary
-VARREF var::substr(const int startindex1, const int length) && {
-	return this->substrer(startindex1, length);
 }
 
 // in-place
@@ -2077,7 +2062,7 @@ class PUBLIC var_brackets_proxy {
 
 	// Operator assign
 	void operator=(const char char1) {
-		var_.splicer(index_, 1, char1);
+		var_.paster(index_, 1, char1);
 	}
 
 	// Operator ==

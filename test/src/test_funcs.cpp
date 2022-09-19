@@ -228,50 +228,50 @@ programinit()
 	}
 
 	// Splice on temporaries
-	assert(var("abc").splice(-1, "XY")    eq "abXY");
-	assert(var("abc").splice(-2, 1, "XY") eq "aXYc");
+	assert(var("abc").paste(-1, "XY")    eq "abXY");
+	assert(var("abc").paste(-2, 1, "XY") eq "aXYc");
 
 	{
 		var x = "abc";
 
-		assert(splice(x, 5, "XYZ").outputl() eq "abcXYZ");
-		assert(splice(x, 4, "XYZ").outputl() eq "abcXYZ");
-		assert(splice(x, 3, "XYZ").outputl() eq "abXYZ");
-		assert(splice(x, 2, "XYZ").outputl() eq "aXYZ");
-		assert(splice(x, 1, "XYZ").outputl() eq "XYZ");
+		assert(paste(x, 5, "XYZ").outputl() eq "abcXYZ");
+		assert(paste(x, 4, "XYZ").outputl() eq "abcXYZ");
+		assert(paste(x, 3, "XYZ").outputl() eq "abXYZ");
+		assert(paste(x, 2, "XYZ").outputl() eq "aXYZ");
+		assert(paste(x, 1, "XYZ").outputl() eq "XYZ");
 
-		assert(splice(x, 0, "XYZ").outputl() eq "XYZ");
+		assert(paste(x, 0, "XYZ").outputl() eq "XYZ");
 
-		assert(splice(x, -1, "XYZ").outputl() eq "abXYZ");
-		assert(splice(x, -2, "XYZ").outputl() eq "aXYZ");
-		assert(splice(x, -3, "XYZ").outputl() eq "XYZ");
-		assert(splice(x, -4, "XYZ").outputl() eq "XYZ");
+		assert(paste(x, -1, "XYZ").outputl() eq "abXYZ");
+		assert(paste(x, -2, "XYZ").outputl() eq "aXYZ");
+		assert(paste(x, -3, "XYZ").outputl() eq "XYZ");
+		assert(paste(x, -4, "XYZ").outputl() eq "XYZ");
 	}
 
 	{
 		var x;
 		x = "abc";
-		assert(splicer(x, 5, "XYZ").outputl() eq "abcXYZ");
+		assert(paster(x, 5, "XYZ").outputl() eq "abcXYZ");
 		x = "abc";
-		assert(splicer(x, 4, "XYZ").outputl() eq "abcXYZ");
+		assert(paster(x, 4, "XYZ").outputl() eq "abcXYZ");
 		x = "abc";
-		assert(splicer(x, 3, "XYZ").outputl() eq "abXYZ");
+		assert(paster(x, 3, "XYZ").outputl() eq "abXYZ");
 		x = "abc";
-		assert(splicer(x, 2, "XYZ").outputl() eq "aXYZ");
+		assert(paster(x, 2, "XYZ").outputl() eq "aXYZ");
 		x = "abc";
-		assert(splicer(x, 1, "XYZ").outputl() eq "XYZ");
+		assert(paster(x, 1, "XYZ").outputl() eq "XYZ");
 
 		x = "abc";
-		assert(splicer(x, 0, "XYZ").outputl() eq "XYZ");
+		assert(paster(x, 0, "XYZ").outputl() eq "XYZ");
 
 		x = "abc";
-		assert(splicer(x, -1, "XYZ").outputl() eq "abXYZ");
+		assert(paster(x, -1, "XYZ").outputl() eq "abXYZ");
 		x = "abc";
-		assert(splicer(x, -2, "XYZ").outputl() eq "aXYZ");
+		assert(paster(x, -2, "XYZ").outputl() eq "aXYZ");
 		x = "abc";
-		assert(splicer(x, -3, "XYZ").outputl() eq "XYZ");
+		assert(paster(x, -3, "XYZ").outputl() eq "XYZ");
 		x = "abc";
-		assert(splicer(x, -4, "XYZ").outputl() eq "XYZ");
+		assert(paster(x, -4, "XYZ").outputl() eq "XYZ");
 	}
 
 	printl(elapsedtimetext());

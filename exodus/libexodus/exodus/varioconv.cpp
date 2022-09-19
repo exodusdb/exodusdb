@@ -513,7 +513,7 @@ convert:
 			char thousandsep = (conversion[1] == 'C') ? '.' : ',';
 			int minii = part1.front() == '-' ? 2 : 1;
 			for (int ii = part1len - 2; ii > minii; ii -= 3) {
-				//part1.splicer(ii, 0, thousandsep);
+				//part1.paster(ii, 0, thousandsep);
 				part1.insert(ii - 1, 1, thousandsep);
 			}
 		}

@@ -74,7 +74,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		if (not params2) {
 			tt ^= FM ^ "<tbody>";
 		}
-		dataio.splicer(1, 0, tt ^ FM);
+		dataio.paster(1, 0, tt ^ FM);
 
 		//postfix
 		dataio = dataio ^ FM ^ "</tbody>" ^ FM ^ "</table>";
@@ -138,7 +138,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				} //ln;
 
 				datax.replacer(FM, trx ^ tr);
-				datax.splicer(1, 0, "<table class=\"hashtable\">" ^ tr);
+				datax.paster(1, 0, "<table class=\"hashtable\">" ^ tr);
 				datax ^= trx ^ "</table>";
 
 				dataio(1, vn) = datax;
@@ -153,7 +153,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			var tag2 = dataio.index(">");
 			///BREAK;
 			if (not(tag1 and tag1 lt tag2)) break;
-			dataio.splicer(tag1, tag2 - tag1 + 1, "");
+			dataio.paster(tag1, tag2 - tag1 + 1, "");
 		}//loop;
 
 	} else if (mode eq "DECODEHTML") {
@@ -232,7 +232,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			if (not tt) {
 				tt = dataio.index("Windows Phone ");
 				if (tt) {
-					dataio.splicer(tt, 13, "WinPhone");
+					dataio.paster(tt, 13, "WinPhone");
 				}
 			}
 			if (not tt) {
@@ -244,11 +244,11 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			if (tt) {
 				osname = dataio.cut(tt - 1);
 				if (osname.starts("CPU ")) {
-					osname.splicer(1, 3, "iPad");
+					osname.paster(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
 				if (tt) {
-					osname.splicer(tt, 9999, "");
+					osname.paster(tt, 9999, "");
 				}
 				osname = osname.field(";", 1);
 				osname = osname.field(")", 1);
@@ -256,7 +256,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			}
 		}
 		if (osname.ends(".0")) {
-			osname.splicer(-2, 2, "");
+			osname.paster(-2, 2, "");
 		}
 
 		//Trident tells you the actual browser software for MS
@@ -333,7 +333,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		}
 		if (browser.ends(".0")) {
-			browser.splicer(-2, 2, "");
+			browser.paster(-2, 2, "");
 		}
 
 		var submode = mode.field(".", 3);

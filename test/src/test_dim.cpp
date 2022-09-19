@@ -1,5 +1,7 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
+//#include <range>
+#include <algorithm>
 
 #include <exodus/program.h>
 programinit()
@@ -244,6 +246,20 @@ function main() {
 	a11.split("");	//fill all with "" TODO should this not just make an array of 1 element?
 	assert(a11(1)  eq "");
 	assert(a11(10) eq "");
+
+	{
+		// Reverse - odd
+		dim d1 = {1,2,3,4,5};
+		assert(d1.reverse().join(",") eq "5,4,3,2,1");
+
+		// Reverse - even
+		dim d2 = {1,2,3,4};
+		assert(d2.reverse().join(",") eq "4,3,2,1");
+
+		//? std::range::reverse(d1);
+		//? std::reverse(begin(d1), end(d1));
+
+	}
 
 	//test redimensioning
 	dim aaaa(10);

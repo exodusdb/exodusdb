@@ -229,22 +229,22 @@ programinit()
 
 	//replacing a section of a string - method 1
 	var a = "abcde";
-	splicer(a, 3, 2, "xx");
+	paster(a, 3, 2, "xx");
 	assert(a eq "abxxe");
 
 	//replacing a section of a string - method 2
 	a = "abcde";
-	splicer(a, -2, -3, "xx");
+	paster(a, -2, -3, "xx");
 	assert(a eq "axxe");
 
 	//replacing a section of a string - method 3 - but may be slower
 	a = "abcde";
-	a = splice(a, -2, -3, "xx");
+	a = paste(a, -2, -3, "xx");
 	assert(a eq "axxe");
 
 	//replacing a section of a string - method 4 - but may be slower
 	a = "abcde";
-	a = a.splice(-2, -3, "xx");
+	a = a.paste(-2, -3, "xx");
 	assert(a eq "axxe");
 
 	//test single character extraction

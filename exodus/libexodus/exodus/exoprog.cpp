@@ -257,10 +257,10 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 	if (baseinsertsql[-1] == ",") {
 
-		baseinsertsql.splicer(-1, 1, ")");
+		baseinsertsql.paster(-1, 1, ")");
 		baseinsertsql ^= " VALUES (";
 
-		createtablesql.splicer(-1, 1, ")");
+		createtablesql.paster(-1, 1, ")");
 		//createtablesql.outputl();
 
 		//clear the table in case we are reusing it
@@ -416,7 +416,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		// Replace final comma with a closing bracket and additional SQL
 		// Ignore any duplicates due to multivalues
 		// TODO insert stage2 records with MV as par of the key?
-		insertsql.splicer(-1, 1, ") ON CONFLICT (key) DO NOTHING");
+		insertsql.paster(-1, 1, ") ON CONFLICT (key) DO NOTHING");
 
 		//insertsql.outputl();
 
@@ -459,7 +459,7 @@ bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, cons
 	var filename2 = filename_or_command;
 	if (filename2[-1] == ")") {
 		var options = filename2.field2(" ", -1);
-		filename2.splicer(-options.len(), 999999999, "").trimmerb();
+		filename2.paster(-options.len(), 999999999, "").trimmerb();
 	}
 
 	//optionally get keys from filename or command
@@ -894,7 +894,7 @@ notallowed:
 	var keys = SECURITY.f(2).field(VM, usern, 999);
 	var temp = keys.index("---");
 	if (temp) {
-		keys.splicer(temp - 1, 999, "");
+		keys.paster(temp - 1, 999, "");
 	}
 	// convert ',' to vm in keys
 	// convert ',' to vm in locks
@@ -981,11 +981,11 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 					} else {
 						if (cap || numx) {
 							tt.converter(LOWERCASE, UPPERCASE);
-							string2.splicer(ii, 1, tt);
+							string2.paster(ii, 1, tt);
 							cap = 0;
 						} else {
 							tt.converter(UPPERCASE, LOWERCASE);
-							string2.splicer(ii, 1, tt);
+							string2.paster(ii, 1, tt);
 						}
 					}
 				}
@@ -995,7 +995,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 
 		string2.replacer("\'S ", "\'s ");
 		if (string2.ends("\'S"))
-			string2.splicer(-2, 2, "\'s");
+			string2.paster(-2, 2, "\'s");
 	} else if (mode0 == "QUOTE") {
 		string2 = str0;
 		if (string2 != "") {
@@ -1033,11 +1033,11 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 					} else {
 						if (tt == " ") {
 							tt = FM;
-							string2.splicer(ii, 1, tt);
+							string2.paster(ii, 1, tt);
 						} else {
 							if (uppercase) {
 								tt.converter(LOWERCASE, UPPERCASE);
-								string2.splicer(ii, 1, tt);
+								string2.paster(ii, 1, tt);
 							}
 						}
 					}
@@ -1154,7 +1154,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 		} else if (lastchar == "}")
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
 		if (OPTIONS)
-			COMMAND.splicer(-(OPTIONS.len()), OPTIONS.len(), "");
+			COMMAND.paster(-(OPTIONS.len()), OPTIONS.len(), "");
 		COMMAND.trimmerb(_FM);
 
 		// load the shared library file
@@ -1787,15 +1787,15 @@ var ExodusProgramBase::singular(CVR pluralnoun) {
 
 		// companies=company
 		if (temp.ends("IES")) {
-			temp.splicer(-3, 3, "Y");
+			temp.paster(-3, 3, "Y");
 
 			// addresses=address
 		} else if (temp.ends("SSES")) {
-			temp.splicer(-2, 2, "");
+			temp.paster(-2, 2, "");
 		} else if (temp.ends("SHES")) {
-			temp.splicer(-2, 2, "");
+			temp.paster(-2, 2, "");
 		} else if (temp.ends("CHES")) {
-			temp.splicer(-2, 2, "");
+			temp.paster(-2, 2, "");
 		} else if (1) {
 			temp.popper();
 		}
@@ -2346,7 +2346,7 @@ var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptoda
 			} else {
 				nsecs = (nsecs.oconv("MD40P")) + 0;
 				if (nsecs[1] == ".") {
-					nsecs.splicer(1, 0, "0");
+					nsecs.paster(1, 0, "0");
 				}
 			}
 			if (nsecs) {
@@ -2402,7 +2402,7 @@ var ExodusProgramBase::exoprog_date(CVR type, CVR in0, CVR mode0, VARREF output)
 
 		if (mode eq "4") {
 			mode = DATEFMT;
-			mode.splicer(2, 1, "4");
+			mode.paster(2, 1, "4");
 		}
 
 	} else {
@@ -2446,16 +2446,16 @@ ok:
 				output = oconv(inx, mode);
 
 				if (output.starts("0")) {
-					output.splicer(1, 1, " ");
+					output.paster(1, 1, " ");
 				}
 
 				if (output[4] eq "0") {
-					output.splicer(4, 1, " ");
+					output.paster(4, 1, " ");
 				}
 
 				if (output.b(4, 3).match("^[A-Za-z]{3}$")) {
-					output.splicer(7, 1, "");
-					output.splicer(3, 1, "");
+					output.paster(7, 1, "");
+					output.paster(3, 1, "");
 				}
 
 				if (nospaces) {
@@ -2623,7 +2623,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 
 			if (output1.len()) {
 				if (var(".,").count(output1[1])) {
-					output1.splicer(1, 0, "0");
+					output1.paster(1, 0, "0");
 				}
 			}
 

@@ -178,7 +178,7 @@ function main(in mode0) {
 
 		//make a suitable output filename based on the responsefilename
 		var temp = PRIORITYINT.f(100);
-		temp.splicer(-1, 1, "htm");
+		temp.paster(-1, 1, "htm");
 		SYSTEM(2) = temp;
 
 		//get new items in new filename and return the filename in @ans

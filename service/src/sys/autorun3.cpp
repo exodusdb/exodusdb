@@ -632,7 +632,7 @@ nextsign:
 			body = "";
 			body(-1) = response_;
 			if (USER3.starts("Error:")) {
-				response_.splicer(1, 6, "Result:");
+				response_.paster(1, 6, "Result:");
 			}
 			if (USER3.contains("Error")) {
 				subject ^= " ERROR";
@@ -759,15 +759,15 @@ subroutine exec2() {
 	//this could be improved to work
 	printfilename = linkfilename2;
 	tt = oscwd();
-	tt.splicer(-7, 7, "");
+	tt.paster(-7, 7, "");
 	if (printfilename.starts(tt)) {
-		printfilename.splicer(1, tt.len(), "../");
+		printfilename.paster(1, tt.len(), "../");
 	}
 	printfilename.converter("/", OSSLASH);
 
 	//tt=printfilename[-1,'B.']
 	tt = field2(printfilename, ".", -1);
-	printfilename.splicer(-tt.len(), tt.len(), "htm");
+	printfilename.paster(-tt.len(), tt.len(), "htm");
 	SYSTEM(2) = printfilename;
 	//if tracing then
 	// print datasetcode:' Waiting for output:':
@@ -812,7 +812,7 @@ subroutine exec2() {
 
 	//no records are not system errors
 	if (USER3.starts("No record") or response_.starts("No item")) {
-		USER3.splicer(1, 0, "OK ");
+		USER3.paster(1, 0, "OK ");
 		msg_ = "";
 	}
 

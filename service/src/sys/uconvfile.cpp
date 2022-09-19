@@ -43,7 +43,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	}
 	var cmd = "uconv" ^ exe;
 	if (not(cmd.osfile())) {
-		cmd.splicer(1, 0, SYSTEM.f(50));
+		cmd.paster(1, 0, SYSTEM.f(50));
 	}
 	if (not(cmd.osfile())) {
 		msg = "UCONVFILE: Cannot find " ^ cmd;
@@ -86,7 +86,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 		//invent a temporary filename
 		var tempfilename = inputfilename;
-		tempfilename.splicer(-3, 3, "$CP");
+		tempfilename.paster(-3, 3, "$CP");
 
 		cmd ^= " -f windows=" ^ encoding1 ^ " -t " ^ encoding2;
 
