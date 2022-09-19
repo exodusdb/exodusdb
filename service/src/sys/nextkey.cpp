@@ -48,7 +48,7 @@ lockit:
 	if (not(lockrecord(keyfilename, keyfile, seqkey))) {
 		var temp = keyfilename;
 		if (temp.ends("S")) {
-			temp.splicer(1, 1, "");
+			temp.cutter(1);
 		}
 		if (not buffer) {
 			call mssg("WAITING TO GET THE NEXT " ^ temp ^ " NUMBER|PRESS ESCAPE TO EXIT.", "UB", buffer, "");

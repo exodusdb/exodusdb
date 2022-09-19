@@ -924,7 +924,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 		mv.SENTENCE ^= word;
 		mv.COMMAND ^= FM ^ word;
 	}
-	mv.COMMAND.splicer(1, 1, "");
+	mv.COMMAND.cutter(1);
 
 	// options are in either (XXX) or {XXX} at the end of the command.
 	// similar code in exodus_main() and exoprog.cpp:perform()

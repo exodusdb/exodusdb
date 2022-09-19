@@ -589,7 +589,7 @@ nextvn:
 
 				if (cell.starts("+")) {
 					if (cell.cut(1).isnum()) {
-						cell.splicer(1, 1, "");
+						cell.cutter(1);
 					}
 				}
 				if (cell eq DQ) {

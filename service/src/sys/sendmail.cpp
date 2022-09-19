@@ -457,7 +457,7 @@ forcedemail:
 				var opt = line.field(" ", 1);
 				var arg = line.field(" ", 2, 9999);
 				if (arg.starts(DQ)) {
-					arg.splicer(1, 1, "");
+					arg.cutter(1);
 					arg.popper();
 				}
 
@@ -478,7 +478,7 @@ forcedemail:
 				}
 			} //ii;
 
-			headers.splicer(1, 1, "");
+			headers.cutter(1);
 			headers ^= VM;
 			headers.converter("'", "");
 			headers.replacer(VM, "\r\n");
@@ -651,7 +651,7 @@ subroutine addlinks2osfilename() {
     tt = osfilename;
     //tt.converter("\\", "/");
     //if (tt.starts("../")) {
-    //  tt.splicer(1, 3, "");
+    //  tt.cutter(3);
     //}
 
     //attachment path must start with '/data/'
@@ -659,7 +659,7 @@ subroutine addlinks2osfilename() {
     //eg /root/hosts/test/work/../data/test/xxxxxx.xls
     if (tt.contains("../")){
         //becomes: /data/test/xxxxxx.xls
-        tt.splicer(1,tt.index("../")+2,"");
+        tt.cutter(tt.index("../")+2);
     }
     if (body) {
         body ^= FM;

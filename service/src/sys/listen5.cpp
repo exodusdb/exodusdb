@@ -563,7 +563,7 @@ getvalues:
 		call collectixvals(filename, fieldname, prefix);
 		PSEUDO.move(USER1);
 		if (iodat_.starts(FM)) {
-			USER1.splicer(1, 1, "");
+			USER1.cutter(1);
 		}
 		USER3 = "OK";
 

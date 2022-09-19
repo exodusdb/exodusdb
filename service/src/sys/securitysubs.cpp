@@ -641,7 +641,7 @@ function main(in mode) {
 								}
 							}
 						} //keyn;
-						otherkeys.splicer(1, 1, "");
+						otherkeys.cutter(1);
 						otherkeys.converter(VM, ",");
 					}
 					RECORD(24) = otherkeys;
@@ -1394,8 +1394,8 @@ function main(in mode) {
 				locks2 ^= VM ^ locks.f(1, taskn);
 			}
 		} //taskn;
-		tasks2.splicer(1, 1, "");
-		locks2.splicer(1, 1, "");
+		tasks2.cutter(1);
+		locks2.cutter(1);
 		//transfer tasks2 to @ans
 
 		ANS = tasks2;

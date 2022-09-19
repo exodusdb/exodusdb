@@ -102,7 +102,7 @@ function main(in mode0) {
 		}
 
 		ANS = groupusers;
-		ANS.splicer(1, 1, "");
+		ANS.cutter(1);
 
 	} else if ((mode.field(".", 1, 2) == "DEF.SK") or (mode.field(".", 1, 2) == "DEF.SK2")) {
 

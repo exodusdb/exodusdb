@@ -46,6 +46,9 @@ OPTIONS
 		...
 		   .b(10)
 		-> .cut(9)
+	P - Splicer
+		   .splicer(1, n, ""))
+		-> .cutter(n)
 	[] - 
 
 	G - General
@@ -65,7 +68,7 @@ function main() {
 	COMMAND.remover(1);
 
 	if (OPTIONS.contains("A"))
-		OPTIONS ^= "BSLCGv[]";
+		OPTIONS ^= "BSLCPGv[]";
 	var r2a = OPTIONS.contains("R") ;
 	var forrange = OPTIONS.contains("F");
 	var substr2b = OPTIONS.contains("B");
@@ -73,7 +76,8 @@ function main() {
 	var b2last = OPTIONS.contains("L");
 	var general = OPTIONS.contains("G");
 	var emptyvar = OPTIONS.contains("v");
-	var cut = OPTIONS.contains("C");
+	var cutting = OPTIONS.contains("C");
+	var splicing = OPTIONS.contains("P");
 	var onechar = OPTIONS.contains("[]");
 
 	var verbose = OPTIONS.contains("V");
@@ -279,7 +283,7 @@ function main() {
 			}
 
 			// C - Cut
-			if (cut) {
+			if (cutting) {
 				line2.regex_replacer(
 					R"__(\.b\(2\))__",
 					R"__(\.cut\(1\))__"
@@ -316,6 +320,17 @@ function main() {
 					R"__(\.b\(10\))__",
 					R"__(\.cut\(9\))__"
 				);
+			}
+
+			// splicer -> cutter
+			if (splicing) {
+
+				line2.regex_replacer(
+					//R"__(.splicer\(1,\s*([A-Z0-9a-z_. + -]+),\s*""\))__",
+					R"__(.splicer\(1,\s*([^,]+),\s*""\))__",
+					R"__(.cutter\(\1\))__"
+				);
+
 			}
 
 			// G - General
@@ -365,6 +380,8 @@ function main() {
 				);
 
 			}
+
+			// Finally
 
 			//line = restore_subsyntax(line2, ',');
 			if (line2 ne line) {

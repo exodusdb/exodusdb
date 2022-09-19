@@ -1366,7 +1366,7 @@ function request_init() {
 					tt = ((datx(blockn - 1)).last(2)).index("%");
 					if (tt) {
 						datx(blockn - 1) ^= datx(blockn).first(tt);
-						datx(blockn).splicer(1, tt, "");
+						datx(blockn).cutter(tt);
 					}
 				}
 
@@ -2703,7 +2703,7 @@ function request_exit() {
 			ptr = 0;
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
 				blk = USER1.first(outblocksize);
-				iodat_.splicer(1, outblocksize, "");
+				iodat_.cutter(outblocksize);
 				///BREAK;
 				if (not(blk.len())) break;
 
@@ -2852,7 +2852,7 @@ subroutine fmtresp() {
 	USER3.converter("|", FM);
 	response_.converter(VM, FM);
 	if (USER3.starts(FM)) {
-		response_.splicer(1, 1, "");
+		response_.cutter(1);
 	}
 	USER3.replacer(FM, "\r\n");
 

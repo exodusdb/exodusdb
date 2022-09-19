@@ -144,7 +144,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 			} //i2;
 
 			if (not listid) {
-				range2.splicer(1, 1, "");
+				range2.cutter(1);
 				ranges(ii) = range2;
 			}
 
@@ -200,7 +200,7 @@ subroutine writelist() {
 	if (not(keys.len())) {
 		return;
 	}
-	keys.splicer(1, 1, "");
+	keys.cutter(1);
 	keys.write(lists, listid ^ listn);
 	keys = "";
 	listn += 1;

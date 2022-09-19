@@ -67,12 +67,12 @@ nousername0:
 
 	var noadd = task.starts("!");
 	if (noadd) {
-		task.splicer(1, 1, "");
+		task.cutter(1);
 	}
 
 	var positive = task[1];
 	if (positive eq "#") {
-		task.splicer(1, 1, "");
+		task.cutter(1);
 	} else {
 		positive = "";
 	}
@@ -81,22 +81,22 @@ nousername0:
 	//security is being used as a configuration and user exodus has no special privs
 	if (task.starts("?")) {
 		isexodus = 0;
-		task.splicer(1, 1, "");
+		task.cutter(1);
 	} else {
 		isexodus = username eq "EXODUS";
 	}
 
 	var deleting = task.starts("%DELETE%");
 	if (deleting) {
-		task.splicer(1, 8, "");
+		task.cutter(8);
 	}
 	var updating = task.starts("%UPDATE%");
 	if (updating) {
-		task.splicer(1, 8, "");
+		task.cutter(8);
 	}
 	var renaming = task.starts("%RENAME%");
 	if (renaming) {
-		task.splicer(1, 8, "");
+		task.cutter(8);
 	}
 
 	//find the task

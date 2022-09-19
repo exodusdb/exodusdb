@@ -781,8 +781,8 @@ nextkey:
 				ss ^= " " ^ word;
 				if (limitx) {
 					if ((DQ ^ "'").contains(word[1])) {
-						if (word.starts(word)[-1]) {
-							word = word.b(2, word.len() - 2);
+						if (word.starts(word[-1])) {
+							word.cutter(1).popper();
 						}
 					}
 					if (word eq "") {
@@ -2067,8 +2067,8 @@ subroutine getquotedword() {
 
 subroutine getquotedword2() {
 	gosub getword();
-	if (((DQ ^ "'").contains(word[1])) and (word.starts(word)[-1])) {
-		word.splicer(1, 1, "");
+	if (((DQ ^ "'").contains(word[1])) and word.starts(word[-1])) {
+		word.cutter(1);
 		word.popper();
 	} else {
 		call mssg(lastword ^ " must be followed by a quoted phrase");

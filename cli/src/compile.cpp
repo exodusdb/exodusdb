@@ -1676,7 +1676,7 @@ function set_environment() {
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio\\Common\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("VS60COMNTOOLS");
 
-	searchdirs.splicer(1, 1, "").trimmer(FM);
+	searchdirs.cutter(1).trimmer(FM);
 	var searched = "";
 	var batfilename = "";
 

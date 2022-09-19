@@ -32,7 +32,7 @@ function main(in localdate0, in localtime0) {
 	}
 	temp = oconv(localtime, temp);
 	if (temp.starts("0")) {
-		temp.splicer(1, 1, "");
+		temp.cutter(1);
 	}
 	if (temp.ends("AM")) {
 		temp.splicer(-2, 2, sys.glang.f(16));

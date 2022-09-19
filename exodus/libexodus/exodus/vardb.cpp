@@ -2480,7 +2480,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		else if ((!ismv1 || stage2_calculated) && function_src.trimf("\t ").lcase().starts("/" "/@ans=xlate(")) {
 
 			function_src = function_src.f(1, 1).trimf("\t ");
-			function_src.splicer(1, 13, "");
+			function_src.cutter(13);
 
 			// Hide comma in arg3 like <1,@mv>
 			function_src.replacer(",@mv", "|@mv");
@@ -3564,7 +3564,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//remove conversion to array
 				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
 				if (dictexpression.starts("string_to_array(")) {
-					dictexpression.splicer(1, 16, "");
+					dictexpression.cutter(16);
 					dictexpression.splicer(-13, "");
 				}
 

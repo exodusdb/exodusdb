@@ -477,7 +477,7 @@ nextline:
 						} //ptr;
 						cols ^= VM ^ ptr;
 						offset += ptr;
-						line.splicer(1, ptr, "");
+						line.cutter(ptr);
 					}//loop;
 				}
 				//ncols = cols.count(FM) + 1;
@@ -665,14 +665,14 @@ addbuff:
 	while (true) {
 		///BREAK;
 		if (not(buff.starts("\r"))) break;
-		buff.splicer(1, 1, "");
+		buff.cutter(1);
 	}//loop;
 	if (not(buff.len())) {
 		goto addbuff;
 	}
 
 	line = buff.field("\r", 1);
-	buff.splicer(1, line.len() + 1, "");
+	buff.cutter(line.len() + 1);
 
 	nquotes = line.count(DQ);
 	while (true) {
@@ -680,7 +680,7 @@ addbuff:
 		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.len())) break;
 		var line2 = buff.field("\r", 1);
 		nquotes += line2.count(DQ);
-		buff.splicer(1, line2.len() + 1, "");
+		buff.cutter(line2.len() + 1);
 		line ^= "\n";
 		line ^= line2;
 	}//loop;

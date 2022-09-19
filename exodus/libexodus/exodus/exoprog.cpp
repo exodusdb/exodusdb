@@ -188,7 +188,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//reqivalues
 		if (op == "in" and ovalue[1] == "(" and ovalue[-1] == ")") {
-			ovalue.splicer(1, 1, "").popper();
+			ovalue.cutter(1).popper();
 			ovalue.replacer("', '", VM);
 			ovalue.trimmerb().trimmerf().unquoter();
 			//ovalue.convert(VM,"]").outputl("ovalue=");
@@ -735,7 +735,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 
 	var noadd = task[1] == "!";
 	if (noadd) {
-		task.splicer(1, 1, "");
+		task.cutter(1);
 	}
 	// if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
 	if (not noadd) {
@@ -744,7 +744,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	}
 	var positive = task[1];
 	if (positive == "#")
-		task.splicer(1, 1, "");
+		task.cutter(1);
 	else
 		positive = "";
 
@@ -753,21 +753,21 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	var isadmin;
 	if (task[1] == "?") {
 		isadmin = 0;
-		task.splicer(1, 1, "");
+		task.cutter(1);
 	} else
 		isadmin = username == "EXODUS";
 
 	var deleting = task.starts("%DELETE%");
 	if (deleting) {
-		task.splicer(1, 8, "");
+		task.cutter(8);
 	}
 	var updating = task.starts("%UPDATE%");
 	if (updating) {
-		task.splicer(1, 8, "");
+		task.cutter(8);
 	}
 	var renaming = task.starts("%RENAME%");
 	if (renaming) {
-		task.splicer(1, 8, "");
+		task.cutter(8);
 	}
 
 	// find the task
@@ -1831,7 +1831,7 @@ var ExodusProgramBase::encrypt2(CVR encrypt0) const {
 			break;
 		;
 		encryptkey = (encryptkey % 390001) * (var(encrypt[1])).seq() + 1;
-		encrypt.splicer(1, 1, "");
+		encrypt.cutter(1);
 	}  // loop;
 
 	// pass2
@@ -2505,11 +2505,11 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 		var reciprocal = 0;
 		if (input[1] == "/") {
 			reciprocal = 1;
-			input.splicer(1, 1, "");
+			input.cutter(1);
 		} else {
 			if (input.starts("1/")) {
 				reciprocal = 1;
-				input.splicer(1, 2, "");
+				input.cutter(2);
 			}
 		}
 
@@ -2580,7 +2580,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 		}
 		var plus = input1[1];
 		if (plus == "+") {
-			input1.splicer(1, 1, "");
+			input1.cutter(1);
 		} else {
 			plus = "";
 		}

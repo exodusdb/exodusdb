@@ -13,7 +13,7 @@ function main(in password) {
 		///BREAK;
 		if (not(hashedpassword ne "")) break;
 		encryptkey = (encryptkey.mod(390001)) * (hashedpassword[1]).seq() + 1;
-		hashedpassword.splicer(1, 1, "");
+		hashedpassword.cutter(1);
 	}//loop;
 
 	//pass2

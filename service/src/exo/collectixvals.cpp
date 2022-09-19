@@ -37,7 +37,7 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 				continue;
 			}
 			//remove prefix
-			indexvalue.splicer(1, lenprefix, "");
+			indexvalue.cutter(lenprefix);
 		}
 //indexvalue.outputl("index value=");
 		//accumulate the index values

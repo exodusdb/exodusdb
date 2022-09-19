@@ -307,7 +307,7 @@ subroutine sendemails(io emaillog) {
 	}
 
 	if (ccemails.starts(";")) {
-		ccemails.splicer(1, 1, "");
+		ccemails.cutter(1);
 	}
 
 	call sendmail(toemails, ccemails, subject, body, "", "", errormsg, replyto);

@@ -225,7 +225,7 @@ subroutine getblock() {
 		if (word1 eq "#define" or word1 eq "#comment") {
 
 			if (blocktype) {
-				block.splicer(1, 1, "");
+				block.cutter(1);
 				while (true) {
 					///BREAK;
 					if (not(block.ends(FM))) break;

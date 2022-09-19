@@ -142,7 +142,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 			svg = osshellread(cmd);
 
 			//remove everything like xml and comments before the opening <svg tag
-			svg.splicer(1, svg.index("<svg") - 1, "");
+			svg.cutter(svg.index("<svg") - 1);
 
 //			#tooltip1 { position: relative; }
 //			#tooltip1 a span { display: none; color: #FFFFFF; }

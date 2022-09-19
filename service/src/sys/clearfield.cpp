@@ -34,10 +34,10 @@ function main() {
 	var fns = SENTENCE.field(" ", 3, 9999).field("/",1).trim();
 	var cleartovalue = SENTENCE.field("/", 2, 9999);
 	if ((cleartovalue.starts(DQ)) and (cleartovalue.ends(DQ))) {
-		cleartovalue.splicer(1, 1, "");
+		cleartovalue.cutter(1);
 		cleartovalue.popper();
 	} else if ((cleartovalue.starts("'")) and (cleartovalue.ends("'"))) {
-		cleartovalue.splicer(1, 1, "");
+		cleartovalue.cutter(1);
 		cleartovalue.popper();
 	}
 	if (options.contains("I")) {

@@ -553,7 +553,7 @@ nextuser:;
 	//get today's period
 	var runtimeperiod = date().oconv("D2/E").b(4, 5);
 	if (runtimeperiod.starts("0")) {
-		runtimeperiod.splicer(1, 1, "");
+		runtimeperiod.cutter(1);
 	}
 	//should backdate period to maximum open period for all selected companies
 	//to avoid "year is not open" type messages
@@ -895,7 +895,7 @@ subroutine fmtresp() {
 	response_.converter("|", FM);
 	USER3.converter(VM, FM);
 	if (response_.starts(FM)) {
-		USER3.splicer(1, 1, "");
+		USER3.cutter(1);
 	}
 	response_.replacer(FM, "\r\n");
 
