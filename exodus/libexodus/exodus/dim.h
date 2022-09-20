@@ -1,37 +1,30 @@
 #ifndef VARDIM_H
 #define VARDIM_H
 
+#include <vector>
+
 #include <exodus/var.h>
 
 namespace exodus {
 
-class dim_iter;
+// Note that "for (var& var1: dim1)" with & allows direct access and update into the elements of the array dim1 via varx
+// whereas "for (var var1 : dim1)" gives a copy of each element which is slower allows updating var1 without updating dim1
+// Both cases are useful
 
 //class dim final
 class PUBLIC dim final {
 
-   private:
-	unsigned int nrows_, ncols_;
-	// NOTE: trying to implement data_ as boost smart array pointer (boost::scoped_array<var>
-	// data_;) raises warning: as dim is PUBLIC, boost library should have DLL interface.
-	// Choices: 1) leave memory allocation as is (refuse from scoped_array, or
-	// 2) use pimpl metaphor with slight decrease in performance.
-	// Constructors of dim are very simple, no exception expected between 'new' and return from
-	// constructor As such, choice (1).
+friend class var;
 
-	// all redimensioning of this array (eg when copying arrays)
-	// seem to be using ::redim() to accomplish redimensioning
-	// so only the redim code is dangerous (danger in one place is manageable)
-	// we choose NOT to implement 2) above (pimpl) in order
-	// to provide exodus programmer greater/easier visibility into dimensiorned arrays when
-	// debugging (cannot use boost scoped pointer here because mv.h is required by exodus
-	// programmer who should not need boost)
-	var* data_ = nullptr;
+ private:
+
+	unsigned int nrows_, ncols_;
+	std::vector<var> data_;
 	bool initialised_ = false;
 
-   public:
+ public:
 
-	// TODO define in class for inline/optimisation
+	// TODO define in class for inline/optimisation?
 
 	///////////////////////////
 	// SPECIAL MEMBER FUNCTIONS
@@ -43,7 +36,7 @@ class PUBLIC dim final {
 	//
 	// allow syntax "dim d;" to create an "unassigned" dim
 	// allow default construction for class variables later resized in class methods
-	dim();
+	dim() = default;
 
 	////////////////
 	// 2. Destructor
@@ -52,19 +45,25 @@ class PUBLIC dim final {
 	// destructor to (NOT VIRTUAL to save space since not expected to be a base class)
 	// protected to prevent deriving from var since wish to save space and not provide virtual
 	// destructor http://www.gotw.ca/publications/mill18.htm
-	~dim();
+	~dim() = default;
 
 	//////////////////////
 	// 3. Copy constructor - from lvalue
 	//////////////////////
 	//
-	dim(const dim& sourcedim);
+	dim(const dim& sourcedim) {
+		// use copy assign
+		*this = sourcedim;
+	}
 
 	//////////////////////
 	// 4. move constructor - from rvalue
 	//////////////////////
 	//
-	dim(dim&& sourcedim);
+	dim(dim&& sourcedim) {
+		// use move assign
+		*this = std::move(sourcedim);
+	}
 
 	/////////////////////
 	// 5. copy assignment - from lvalue
@@ -95,6 +94,9 @@ class PUBLIC dim final {
 	//var& operator=(TVR rhs) & noexcept = default;
 	void operator=(dim&& rhs) &;
 
+	/////////////////////
+	// Other constructors
+	/////////////////////
 
 	// Constructor with number of rows and optional number of columns
 	/////////////////////////////////////////////////////////////////
@@ -106,13 +108,39 @@ class PUBLIC dim final {
 	/////////////////////////////////////////////////////////////////
 	template<class T>
 	dim(std::initializer_list<T> list) {
-		//std::clog << "iizer " << list.size() << std::endl;
+
+		// Will not be called with zero elements
+		//dim d {};
+
+		//TRACE(var("dim constructor from initializer_list ") ^ int(list.size()));
+		// list rows, ncols = 1
 		redim(list.size(), 1);
+
+		// Allow arbitrary copying of element zero without throwing variable not assigned
+		//data_[0].var_typ = VARTYP_STR;
+
 		int itemno = 1;
 		for (auto item : list) {
-			this->data_[itemno++] = item;
+			data_[itemno++] = item;
 		}
 	}
+
+	///////////////////
+	// OTHER ASSIGNMENT
+	///////////////////
+
+	//=var
+	// The assignment operator should always return a reference to *this.
+	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
+	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
+	// contruction see also ^= etc
+	void operator=(CVR sourcevar);
+	void operator=(const int sourceint);
+	void operator=(const double sourcedbl);
+
+	////////////
+	// ACCESSORS
+	////////////
 
 	ND var join(SV sepchar = _FM) const;
 
@@ -132,86 +160,46 @@ class PUBLIC dim final {
 	// A: we dont want to COPY vars out of an array when using it in rhs expression
 	// var operator() (int row, int col=1) const;
 
-	//=var
-	// The assignment operator should always return a reference to *this.
-	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
-	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
-	// contruction see also ^= etc
-	void operator=(CVR sourcevar);
-	void operator=(const int sourceint);
-	void operator=(const double sourcedbl);
+	ND dim sort(bool reverseorder = false) const& {return dim(*this).sorter(reverseorder);}
+	ND dim& sort(bool reverseorder = false) && {return this->sorter(reverseorder);}
 
-	// see also var::split
-	// return the number of fields
-	var split(CVR var1, SV sepchar = _FM);
-	dim& sort(bool reverse = false);
-	dim& reverse();
+	ND dim reverse() const& {return dim(*this).reverser();}
+	ND dim& reverse() && {return this->reverser();}
 
-	bool read(CVR filehandle, CVR key);
-	bool write(CVR filehandle, CVR key) const;
+	///////////
+	// MUTATORS
+	///////////
 
+	dim& sorter(bool reverse = false);
+	dim& reverser();
+
+	/////////////
+	// READ/WRITE
+	/////////////
+
+	// db
+	bool read(CVR filevar, CVR key);
+	bool write(CVR filevar, CVR key) const;
+
+	// os
 	bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
 	bool oswrite(CVR osfilename,const char* codepage DEFAULT_EMPTY) const;
 
-	// following is implemented on the dim class now
-	// dim dimarray2();
-	//
+	////////////
+	// ITERATORS
+	////////////
 
-	friend class dim_iter;
+	// begin needs to skip the first vector element 0,0
+	// because dim uses 1 based indexing
+	// but we still allow use of vestigial dim(0)/dim(0, 0)
+	PUBLIC auto begin() {return ++data_.begin();}
+	PUBLIC auto end()   {return data_.end();}
 
-	//BEGIN - free function to create an iterator -> begin
-	PUBLIC ND friend dim_iter begin(const dim& d);
-
-	//END - free function to create an interator -> end
-	PUBLIC ND friend dim_iter end(const dim& d);
-
-   private:
+ private:
 
 	dim& init(CVR var1);
 
 }; // class dim
-
-// Note that "for (var& var1: dim1)" with & allows direct access and update into the elements of the array dim1 via varx
-// whereaS "for (var var1 : dim1)" gives a copy of each element which is slower allows updating var1 without updating dim1
-// Both cases are useful
-
-//class dim_iter
-// defined in header to be inlined for performance which is critical
-class PUBLIC dim_iter {
-
-   private:
-
-	const dim* pdim_;
-
-	// Start from 1 ignoring element 0
-	unsigned int index_ = 1;
-
-   public:
-
-	// Default constructor
-	dim_iter() = default;
-
-	// Construct from dim
-	dim_iter(const dim& d1);
-
-	// Check iter != iter (i.e. iter != string::npos)
-	bool operator!=(const dim_iter& dim_iter1);
-
-	// Dereference iter to a var&
-	// return a reference to the actual dim element so it can be updated
-	// iif use var& instead of var in "for (var& : dim1)"
-	//operator var*();
-	var& operator*();
-
-	//iter++
-	dim_iter operator++();
-
-	//iter--
-	dim_iter operator--();
-
-	void end();
-
-}; // class dim_iter
 
 } // namespace exodus
 

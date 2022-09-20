@@ -176,7 +176,8 @@ function main() {
 				abort(sourcename.quote() ^ " does not exist or cannot be accessed");
 
 			//split the sql text into an fixed array
-			nlines = sql_text_in.split(txt,"\n");
+			sql_text_in = txt.split("\n");
+			nlines = sql_text_in.rows();
 			ln = 0;
 
 		}

@@ -561,7 +561,7 @@ function main() {
 								  "*");
 			dim t1;
 			if (subdirs) {
-				t1.split(subdirs);
+				t1 = subdirs.split();
 				subdirs = t1.sort().join();
 				subdirs = srcfilename ^ "/" ^ subdirs;
 				subdirs.replacer(FM, FM ^ srcfilename ^ "/");
@@ -575,7 +575,7 @@ function main() {
 			dim t2;
 			if (subfiles) {
 				//subfiles.outputl("subfiles1=");
-				t2.split(subfiles);
+				t2 = subfiles.split();
 				subfiles = t2.sort().join();
 				subfiles = srcfilename ^ "/" ^ subfiles;
 				subfiles.replacer(FM, FM ^ srcfilename ^ "/");

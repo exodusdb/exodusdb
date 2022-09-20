@@ -114,6 +114,9 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 
 	var internaladdresses = "";
 
+//    var exo_debug;
+//    exo_debug.osgetenv("EXO_DEBUG");
+
 	/* example of TRACE from osx 64
 	Stack frames: 8
 	Backtrace 0: 0x10000c313
@@ -140,7 +143,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 	for (size_t ii = 0; ii < stack_size; ii++) {
 
 #ifdef TRACING
-		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", ii, thread_stack_addresses[ii], strings[ii]);
+		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", ii, stack_addresses[ii], strings[ii]);
 		// Backtrace 0: 0x7f9d247cf9fd
 		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
 		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
@@ -158,6 +161,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 			continue;
 
 		// Skip libexodus
+		//if (not exo_debug and objfilename.contains("libexodus.so"))
 		if (objfilename.contains("libexodus.so"))
 			continue;
 
@@ -183,13 +187,6 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 			continue;
 
 		var startaddress = objaddress.paste(-3, 3, "000");
-		// var temp="objdump -S --start-address=" ^ startaddress ^ " --stop-address=" ^
-		// objaddress ^ " --disassemble -l " ^ objfilename;
-		//var temp = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-		//	   objaddress ^ " --disassemble -l " ^ objfilename;
-#ifdef TRACING
-		temp.errputl("");
-#endif
 
 		////////////////////////
 		//temp = temp.osshellread();

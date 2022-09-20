@@ -7,7 +7,7 @@ libraryinit()
 #include <securitysubs2.h>
 #include <sysmsg.h>
 #include <sendmail.h>
-#include <reverse.h>
+//#include <reverse.h>
 #include <hashpass.h>
 #include <dedup.h>
 #include <singular.h>
@@ -1303,6 +1303,7 @@ function main(in mode) {
 			for (const var fn : range(1, nfs)) {
 				temprec(fn) = temprec.f(fn).field(VM, 1, nusers);
 			} //fn;
+			//temprec = invertarray(reverse(invertarray(temprec)));
 			temprec = invertarray(reverse(invertarray(temprec)));
 		}
 

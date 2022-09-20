@@ -355,6 +355,9 @@ PUBLIC ND var crop(CVR instring);
 PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM);
 PUBLIC ND var sort(CVR instring, SV sepchar = _FM);
 
+PUBLIC VARREF reverser(VARREF iostring, SV sepchar = _FM);
+PUBLIC ND var reverse(CVR instring, SV sepchar = _FM);
+
 // DATABASE
 
 PUBLIC bool connect(CVR connectionstring DEFAULT_EMPTY);

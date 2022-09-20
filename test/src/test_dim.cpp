@@ -65,7 +65,8 @@ function main() {
 		dim d6(split("aa^bb"_var));
 		assert(d6.join() eq "aa" _FM "bb");
 
-		std::vector<dim> vofdims{dim(0), dim(0)};
+//		std::vector<dim> vofdims{dim(0), dim(0)};
+//		std::vector<dim> vofdims{dim(1), dim(1)};
 	}
 
 	{
@@ -99,7 +100,7 @@ function main() {
 	{
 		//dim_iter
 		dim d1;
-		d1.split("aa" _FM "bb");
+		d1 = split("aa" _FM "bb");
 		var count = 0;
 		for (var v1 : d1) {
 			//for (var& v1 : d1) {
@@ -156,7 +157,7 @@ function main() {
 	}
 	{
 		dim d1;
-		d1.split("aa" _FM "bb");
+		d1 = split("aa" _FM "bb");
 		var count = 0;
 		//for (var v1 : d1) {
 		for (var& v1 : d1) {
@@ -174,6 +175,8 @@ function main() {
 
 		// Construct from list
 		dim d1 = {1, 2, 3};
+		TRACE(d1.join());
+		TRACE(d1.join().dump());
 		assert(d1.join() eq "1^2^3"_var);
 
 		// Copy construction (from lvalue)
@@ -215,49 +218,115 @@ function main() {
 	dim a = var("abc" _FM "def").split();
 	assert(a(2) eq "def");
 
-	//dim.split(stringvar)
-	dim a12(4);
-	//test not enough fields - initialises rest of array elements to ""
-	assert(a12.split("a" _FM "b"));
-	assert(a12(2) eq "b");
-	assert(a12(3) eq "");
-	assert(a12(4) eq "");
-	//test extra fields are forced into last element
-	assert(a12.split("a" _FM "b" _FM "c" _FM "d" _FM "e"));
-	assert(a12(2) eq "b");
-	assert(a12(3) eq "c");
-	assert(a12(4) eq "d" _FM "e");
+//	{// No way to limit number of fields at the moment
+//		//dim.split(stringvar)
+//		dim a12(4);
+//		//test not enough fields - initialises rest of array elements to ""
+//		assert(a12.split("a" _FM "b").rows());
+//		assert(a12(2) eq "b");
+//		assert(a12(3) eq "");
+//		assert(a12(4) eq "");
+//		//test extra fields are forced into last element
+//		assert(a12.split("a" _FM "b" _FM "c" _FM "d" _FM "e").rows());
+//		assert(a12(2) eq "b");
+//		assert(a12(3) eq "c");
+//		assert(a12(4) eq "d" _FM "e");
+//	}
 
 	//test sort and reverse sort
 	dim a13 = var("10" _FM "2" _FM "1" _FM "20" _FM "-2").split();
-	//printl(a13.join());
+	printl(a13.join());
 	assert(a13.join("^") eq "10^2^1^20^-2");
-	a13.sort();
-	//printl(a13.join());
+
+	a13.sorter();
+	printl(a13.join());
 	assert(a13.join("^") eq "-2^1^2^10^20");
-	a13.sort(true);
-	//printl(a13.join());
+
+	a13.sorter(true);
+	printl(a13.join());
 	assert(a13.join("^") eq "20^10^2^1^-2");
 
 	dim a11(10);
 	a11 = "1";	//fill all with 1
 	assert(a11(1)  eq 1);
 	assert(a11(10) eq 1);
-	a11.split("");	//fill all with "" TODO should this not just make an array of 1 element?
-	assert(a11(1)  eq "");
-	assert(a11(10) eq "");
+	a11 = split("");	//fill all with "" TODO should this not just make an array of 1 element?
+	assert(a11.rows() eq 1);
+//	assert(a11(1)  eq "");
+//	assert(a11(10) eq "");
 
+	{
+		dim d = {1,2,3};
+		d.redim(0, 0);
+		assert(d.join() eq "");
+	}
 	{
 		// Reverse - odd
 		dim d1 = {1,2,3,4,5};
+		d1.reverser();
+		assert(d1.join(",") eq "5,4,3,2,1");
+		d1.reverser();
 		assert(d1.reverse().join(",") eq "5,4,3,2,1");
 
 		// Reverse - even
 		dim d2 = {1,2,3,4};
+		d2.reverser();
+		assert(d2.join(",") eq "4,3,2,1");
+		d2.reverser();
 		assert(d2.reverse().join(",") eq "4,3,2,1");
 
-		//? std::range::reverse(d1);
-		//? std::reverse(begin(d1), end(d1));
+		// Reverse - empty will not work since it is undimensioned
+		dim d3 = {};
+		try {
+			assert(d3.reverse().join(",") eq "");
+			assert(false);
+		} catch (DimNotDimensioned e) { e.description.errputl();}
+
+		// Reverse - unassigned should be error
+		dim d4;
+		try {
+			assert(d4.reverse().join(",") eq "");
+			assert(false);
+		} catch (DimNotDimensioned e) { e.description.errputl();}
+
+	}
+
+	{
+		// std algorithmns should work too!
+		//std::range::reverse(d1);
+		var v1 = "10^2^1^20"_var;
+		var v2 = "20^1^2^10"_var;
+
+		dim d1 = v1.split();
+		std::reverse(std::begin(d1), std::end(d1));
+		assert(d1.join() eq v2);
+
+		d1 = v1.split();
+		std::reverse(d1.begin(), d1.end());
+		assert(d1.join() eq v2);
+
+//		// remove_if
+//		d1 = "10^2^1^20"_var.split();
+//		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
+//		TRACE(d1.join("^"));
+//		assert(d1.join() eq "10^1^20"_var);
+//
+//		// remove_if
+//		d1 = v1.split();
+//		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
+//		assert(d1.join() eq "10^1^20"_var);
+//
+//		// unique?
+//		d1 = "b^a^a^b^c"_var.split();
+//		std::unique(d1.begin(), d1.end());
+//		assert(d1.join().outputl() eq "b^a^b^c"_var);
+
+		// std::find
+		d1 = "b^a^a^b^c"_var.split();
+		auto x = std::find(d1.begin(), d1.end(), "c");
+		const auto pos = std::distance(d1.begin(), x);
+		assert(pos == 4);
+		//assert(d1.join().outputl() eq "b^a^b^c"_var);
 
 	}
 
@@ -305,7 +374,7 @@ function main() {
 	}
 	printl();
 
-	assert(a7.split("xx" ^ FM ^ "bb") eq 2);
+	a7 = split("xx" ^ FM ^ "bb");
 	assert(a7(1)                      eq "xx");
 	assert(a7(2)                      eq "bb");
 	assert(a7.join() eq("xx" ^ FM ^ "bb"));
@@ -373,40 +442,73 @@ function main() {
 	assert(array.f(6) eq "620]610]62]61");
 	assert(array.f(7) eq "720]710]72]71");
 
+	{
+		// Check extra seps get split and joined too
+		var x = ",,a,,b,,";
+		assert(x.split(",").rows() eq 7);
+		assert(x.split(",").join(",") eq ",,a,,b,,");
+	}
+
+	{
+		// Check dim.oswrite preserves line endings
+		var tfilename = ostempfilename();
+		var tx = "\n\nA\n\nB\n\n";
+		tx.split("\n").oswrite(tfilename);
+		assert(osfile(tfilename).f(1) eq 8);
+
+		// Check dim.osread preserves line endings
+		dim d;
+		assert(d.osread(tfilename));
+		assert(d.rows().outputl() eq 7);
+		assert(d.join("\n") eq tx);
+	}
+
 	//test reading and writing text files into and from dim arrays
 	{
 		var osfilename = "t_dim_rw.txt";
 		var txt		   = "a\nb\n\nc";
 		assert(oswrite(txt on osfilename));
 
-		// test reading a test file into a dim array
+		printl("test reading a test file into a dim array");
 		dim d1;
 		assert(d1.osread(osfilename));
 		assert(d1.join("\n") eq txt);
 
-		// Test writing a dim array to a text file
+		printl("Test writing a dim array to a text file");
 		d1(3) = "bb";
 		TRACE(d1.join());
+
 		txt = "a\nb\nbb\nc\n";
+		d1 = split(txt);
 		TRACE(txt);
+		TRACE(txt.oconv("HEX"));
+		TRACE(txt.replace("\n","|"));
+		TRACE(txt.replace("\n","|"));
+
+		TRACE(d1.rows());
 		assert(d1.oswrite(osfilename));
+		assert(osfile(osfilename).f(1) eq 9);
+		printl();
 		assert(d1.osread(osfilename));
-		TRACE(d1.join("\n"));
+		TRACE(d1.join("\n").replace("\n","|"));
+		TRACE(d1.rows());
+		TRACE(txt);
+		TRACE(txt.replace("\n","|"));
 		//assert((d1.join("\n") ^ "\n") eq txt);
 		assert(d1.join("\n") eq txt);
 
 		printl("Make a wintext file");
 		var temposfilename = ostempfilename().dump();
-		var wintext =
+		var wintext1 =
 			"aaa\r\n"
 			"bbb\r\n"
 			"ccc\r\n"
 			"ddd\r\n"
 			"eee"
 			"\r\n";
-		assert(oswrite(wintext on temposfilename));
+		assert(oswrite(wintext1 on temposfilename));
 
-		printl("read wintext into dim array");
+		printl("read wintext1 into dim array");
 		dim d2;
 		assert(d2.osread(temposfilename));
 		TRACE(d2.join());
@@ -419,7 +521,7 @@ function main() {
 		assert(d2(0) eq "\r\n");
 
 		printl("Check round trip");
-		assert((d2.join("\r\n") ^ "\r\n") eq wintext);
+		assert(d2.join("\r\n") eq wintext1);
 
 		printl("Check writing dim array to wintext file");
 		var temposfilename2 = ostempfilename().dump();
@@ -428,11 +530,11 @@ function main() {
 		printl("Check round trip");
 		var wintext2;
 		assert(osread(wintext2 from temposfilename2));
-		TRACE(wintext)
+		TRACE(wintext1)
 		TRACE(wintext2)
-		TRACE(wintext.oconv("HEX"))
+		TRACE(wintext1.oconv("HEX"))
 		TRACE(wintext2.oconv("HEX"))
-		assert(wintext2 eq wintext);
+		assert(wintext2 eq wintext1);
 
 		// Check cannot read a non-existent osfile
 		assert(osremove(temposfilename));
@@ -460,8 +562,8 @@ function main() {
 		//set each element to ""
 		x = "";
 
-		//check join trims trailing FM
-		assert(x.join() eq "");
+		//check join doesnt trims trailing FM
+		assert(x.join() eq "^^^"_var);
 	}
 
 	//constr nrows, ncols
@@ -482,8 +584,8 @@ function main() {
 		//set each element to ""
 		x = "";
 
-		//check join trims trailing FM
-		assert(x.join() eq "");
+		//check join doesnt trim trailing FM
+		assert(x.join() eq "^^^^^"_var);
 	}
 
 	// CONSTRUCT ASSIGN = {}
@@ -556,6 +658,7 @@ function main() {
 	}
 
 	// 3
+
 	{
 		dim x{3, 4, 5};
 		TRACE(x.rows())

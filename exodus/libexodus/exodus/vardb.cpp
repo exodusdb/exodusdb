@@ -243,7 +243,7 @@ static void PGconn_DELETER(PGconn* pgconn) {
 // explain select * from testview where field1  > 'aaaaaaaaa';
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
-// THREAD_LOCAL data
+// THREAD_LOCAL data - shared by all dynamically loaded shared libraries
 thread_local int thread_default_data_dbconn_no = 0;
 thread_local int thread_default_dict_dbconn_no = 0;
 //thread_local var thread_connparams = "";
@@ -583,6 +583,7 @@ void var::lasterror(CVR msg) const {
 }
 
 var var::lasterror() const {
+	//TRACE(thread_file_handles.size());
 	return thread_dblasterror ?: "";
 }
 

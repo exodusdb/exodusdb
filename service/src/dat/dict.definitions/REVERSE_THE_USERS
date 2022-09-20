@@ -5,7 +5,7 @@ S
 
 
 
-#include <reverse.h>\
+//#include <reverse.h>\
 \
 function main() {\
 	RECORD = invertarray(reverse(invertarray(RECORD)));\

@@ -219,7 +219,7 @@ programinit()
 		d.oswrite(tfilename);
 
 		//check roundtrip agrees
-		assert(osread(tfilename) eq(d.join("\n") ^ '\n'));
+		assert(osread(tfilename) eq(d.join("\n")));
 	}
 
 	{

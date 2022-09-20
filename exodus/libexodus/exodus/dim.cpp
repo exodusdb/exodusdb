@@ -34,75 +34,12 @@ namespace exodus {
 
 // SPECIAL MEMBER FUNCTIONS
 
-/////////////////////////
-// 1. DEFAULT CONSTRUCTOR
-/////////////////////////
-
-// was declared private to prevent it being called but somehow still "dim xyz();" still compiles
-// although with a warning now public to allow usage in class variables
-dim::dim()
-	: nrows_(0), ncols_(0), initialised_(false)
-{
-//TRACE("DF CON")
-	try {
-		//data_ = new var[nrows_ * ncols_ + 1];
-		data_ = new var[1];
-	}
-	catch (const std::bad_alloc& e) {
-		//TRACE("dim()")
-		throw VarOutOfMemory("dim::dim() "_var ^ e.what());
-	}
-
-	//std::cout<< "created[] " << data_ << std::endl;
-}
-
-////////////////
-// 2. DESTRUCTOR
-////////////////
-
-dim::~dim() {
-//TRACE("DF DES")
-	//std::cout<< "deleted[] " << data_ << std::endl;
-	delete[] data_;
-}
-
-//////////////////////
-// 3. COPY CONSTRUCTOR
-//////////////////////
-
-dim::dim(const dim& sourcedim) {
-//TRACE("CP CON")
-
-	// same as copy assign
-	*this = sourcedim;
-}
-
-//////////////////////
-// 4. MOVE CONSTRUCTOR
-//////////////////////
-
-dim::dim(dim&& sourcedim) {
-//TRACE("MV CON")
-
-	// same as copy assign
-	*this = sourcedim;
-
-//	// cannot copy an undimensioned array
-//	if (!sourcedim.initialised_)
-//		throw DimNotDimensioned("");
-//
-//	nrows_ = sourcedim.nrows_;
-//	ncols_ = sourcedim.ncols_;
-//	initialised_ = sourcedim.ncols_;
-//	std::replace(data_, sourcedim.data_);
-}
-
 /////////////////////
 // 5. COPY ASSIGNMENT
 /////////////////////
 
 void dim::operator=(const dim& sourcedim) &{
-//TRACE("CP ASS")
+	//TRACE("CP ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
 		throw DimNotDimensioned("");
@@ -112,14 +49,18 @@ void dim::operator=(const dim& sourcedim) &{
 	// Copy element 0 as well to allow a degree
 	// zero-based indexing although split/join/sort/read/write
 	// ignore the zeroth element
-	if (sourcedim.data_[0].assigned())
-		data_[0] = sourcedim.data_[0];
+//	if (sourcedim.data_[0].assigned())
+//		data_[0] = sourcedim.data_[0];
+		data_[0] = sourcedim.data_[0].clone();
 
-	size_t ncells = nrows_ * ncols_ + 1;
+	// Use vector size in case some algorithm has adjusted it
+	//size_t ncells = nrows_ * ncols_ + 1;
+	size_t ncells = data_.size();
+
 	//for (unsigned int celln = 0; celln < ncells; ++celln)
 	for (unsigned int celln = 1; celln < ncells; ++celln)
-		//data_[celln] = sourcedim.data_[celln].clone();
-		data_[celln] = sourcedim.data_[celln];
+		data_[celln] = sourcedim.data_[celln].clone();
+		//data_[celln] = sourcedim.data_[celln];
 	return;
 }
 
@@ -128,7 +69,7 @@ void dim::operator=(const dim& sourcedim) &{
 /////////////////////
 
 void dim::operator=(dim&& sourcedim) & {
-//TRACE("MV ASS")
+	//TRACE("MV ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
 		throw DimNotDimensioned("");
@@ -153,53 +94,17 @@ dim::dim(const unsigned int rows, const unsigned int cols)
 	: nrows_(rows), ncols_(cols), initialised_(true)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
-
-	// Allow 0 dimensions
-	// This partially allows a zero based indexing scheme to work for
+	// Partially allow a kind of zero based indexing scheme to work for
 	// Unidimensional arrays except that split/join/sort omit [0]th element
-	// Prevent 0 dimensions
+
+	// Prevent 0 elements
 	//if (rows == 0 || cols == 0)
 	// throw DimDimensionedZero();
 
-	// Prevent zero elements. We always create a least one element.
-	// Especially because int*int can overflow to -1
-	// and +1 makes it zero
-	std::size_t nvars = rows * cols + 1;
-	if (!nvars) {
-		("dim("_var ^ var(rows) ^ ", " ^ var(cols) ^ ")").errputl();
-		throw DimDimensionedZero("");
-	}
-
-	//std::clog << "new dim data var x " << nvars << std::endl;
-	//var("new dim data var x " ^ var(nvars)).logputl();
-
-	// Allocate a new array of vars on the heap
-	try {
-		//data_ = new var[rows * cols + 1];
-		data_ = new var[nvars];
-		//std::clog << "new dim data_ at " << data_ << std::endl;
-		//this->logputl("new dim data_ at " ^ var(data_);
-	}
-//	catch (const std::bad_alloc& e) {
-//		var(e.what()).errputl();
-//	}
-	catch (...) {
-		var("dim error").errputl();
-		delete[] data_;
-		data_ = nullptr;
-	}
-
-	if (!data_) {
-		//TRACE("dim::dim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ")")
-		throw VarOutOfMemory("dim::dim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ")");
-	}
-
-	//var(rows * cols + 1).errputl("created dim[] ");
+	this->redim(rows, cols);
 }
 
 void dim::operator=(CVR sourcevar) {
-	//if (!initialised_)
-	//	throw DimNotDimensioned("");
 	this->init(sourcevar);
 	return;
 }
@@ -242,30 +147,18 @@ bool dim::redim(unsigned int rows, unsigned int cols) {
 	//(var(initialised_)^" "^var(nrows_)^" "^var(ncols_)^" -> "^var(rows)^"
 	//"^var(cols)).outputl("redim=");
 
+//	if (initialised_ and data_[0].unassigned())
+//		// Ensure element zero will not throw unassigned during resizing/copying etc.
+//		data_[0] = "";
+
 	// how exception safe is this?
-
-	// 0. delete the old data for space
-	//std::cout<< "deleted[] " << data_ << std::endl;
-	if (data_) {
-		delete[] data_;
-		data_ = nullptr;
-	}
-
-	// 1. create new data
 	try {
-		data_ = new var[rows * cols + 1];
+		data_.resize(rows * cols + 1);
 		//std::cout<< "created[] " << newdata << std::endl;
 	}
 	catch (const std::bad_alloc& e) {
 		throw VarOutOfMemory("redim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ") " ^ e.what());
 	}
-
-//	// 2. only then delete the old data
-//	//std::cout<< "deleted[] " << data_ << std::endl;
-//	delete[] data_;
-//
-//	// 3. and point to the new data
-//	data_ = newdata;
 
 	initialised_ = true;
 	nrows_ = rows;
@@ -311,13 +204,16 @@ CVR dim::operator()(unsigned int rowno, unsigned int colno) const {
 dim& dim::init(CVR sourcevar) {
 	if (!initialised_)
 		throw DimNotDimensioned("");
-	size_t arraysize = nrows_ * ncols_ + 1;
+
+	// Use vector size in case some algorithm has adjusted it
+	//size_t arraysize = nrows_ * ncols_ + 1;
+	size_t arraysize = data_.size();
 
 	// init starts from element[0]
-
 	for (unsigned int ii = 0; ii < arraysize; ii++)
 	//for (size_t ii = 1; ii < arraysize; ii++)
 		data_[ii] = sourcevar;
+
 	return *this;
 }
 
@@ -326,28 +222,38 @@ var dim::join(SV sepchar) const {
 	if (!initialised_)
 		throw DimNotDimensioned("");
 
-	size_t arraysize = nrows_ * ncols_;
-	if (!arraysize)
+	// Use vector size in case some algorithm has adjusted it
+	//size_t arraysize = nrows_ * ncols_;
+	size_t arraysize = data_.size();
+
+	if (arraysize < 2)
 		return "";
 
-	// find last element with any data
+	// We are not interest in element 0
+	arraysize -= 1;
+	//TRACE(arraysize)
+
+	// find the last assigned element
 	size_t nn;
 	for (nn = arraysize; nn > 0; --nn) {
-		if (data_[nn].assigned() && data_[nn].len())
+		//if (data_[nn].assigned() && data_[nn].len())
+		if (data_[nn].assigned())
 			break;
 	}
+	//TRACE(nn)
 
 	// join always starts from element[1] and ignores element[0]
 
 	// get the first element at least to ensure
 	// at least first element is assigned - even if it is an empty string
 	var output = "";
-	// ensuring converted to a string
-	output ^= data_[1];
 
 	// if no elements
 	if (!nn)
 		return output;
+
+	// ensuring converted to a string
+	output ^= data_[1];
 
 	//when sepchar is one byte (usual case), use push_back for speed
 	if (sepchar.size() == 1) {
@@ -378,111 +284,104 @@ var dim::join(SV sepchar) const {
 dim var::split(SV sepchar) const {
 
 	//TODO provide a version that can split on any utf8 character
-	// should use dim's move constructor to place the array directly in place avoiding a slow
-	// deep copy and perhaps even copy/move elision to not even copy the base dim object (which
-	// contains a pointer to an array of vars)
-	dim tempdim2;
-	tempdim2.split(*this, sepchar);
-	return tempdim2;  //NRVO hopefully since single named return
-					  //return dim().split(*this);//doesnt work because split returns a var, the number of fields
-}
+	// Perhaps if sepchar is ""
 
-// number=dim.split(varstr)
-// returns number of elements
-var dim::split(CVR str1, SV sepchar) {
-
-	THISIS("var dim::split(CVR var1, SV separator = FM)")
-	ISSTRING(str1)
-
-	size_t sepsize = sepchar.size();
+	THISIS("dim var::split(SV sepchar = FM)")
+	assertString(function_sig);
 
 	// maybe dimension to the size of the string
 	// do NOT redimension always since pick matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
-	if (!this->initialised_ || this->ncols_ != 1)
-		this->redim(str1.count(sepchar) + 1);
+	dim rvo(this->count(sepchar) + 1);
+
+	// Ensure element zero will not throw unassigned during resizing/copying etc.
+	//data_[0] = "";
 
 	// empty string just fills array with empty string
-	if (str1.len() == 0) {
-		(*this) = "";
-		return this->nrows_;
+	if (this->var_str.empty()) {
+		rvo.data_[1] = "";
+		return rvo;
 	}
 
 	// split always fills starting from element[1] and ignores element[0]
 
-	// start at the beginning and look for FM delimiters
+	// start at the beginning and look for sepchar delimiters
 	std::string::size_type start_pos = 0;
 	std::string::size_type next_pos = 0;
+	size_t sepsize = sepchar.size();
 	size_t fieldno;
-	for (fieldno = 1; fieldno <= this->nrows_;/*no limit*/) {
+	for (fieldno = 1; fieldno <= rvo.nrows_; fieldno++) {
 
-		// find the next FM delimiter
-		//next_pos = str1.var_str.find(FM_, start_pos);
-		next_pos = str1.var_str.find(sepchar, start_pos);
+		// find the next sepchar delimiter
+		next_pos = this->var_str.find(sepchar, start_pos);
 
 		// not found - past end of string?
 		if (next_pos == std::string::npos) {
-			this->data_[fieldno] = str1.var_str.substr(start_pos);
+			rvo.data_[fieldno] = this->var_str.substr(start_pos);
 			break;
 		}
 
 		// fill an element with a field
-		this->data_[fieldno] = str1.var_str.substr(start_pos, next_pos - start_pos);
+		rvo.data_[fieldno] = this->var_str.substr(start_pos, next_pos - start_pos);
 
+		// shift to start of next field
 		start_pos = next_pos + sepsize;
-		fieldno++;
 
 	}
 
-	size_t nfields = fieldno;
+	//size_t nfields = fieldno;
 
-	// stuff any excess fields into the last element
-	if (next_pos != std::string::npos) {
-		//this->data_[this->nrows_] ^= sepchar;
-		this->data_[this->nrows_].var_str.append(sepchar);
-		this->data_[this->nrows_].var_str.append(str1.var_str.substr(start_pos));
-	} else {
-		++fieldno;
-		// fill any remaining array elements with empty string
-		for (; fieldno <= (this->nrows_); ++fieldno)
-			this->data_[fieldno] = "";
-	}
+//TODO provide versions that limit or force size of output dim
+//
+//	// stuff any excess fields into the last element
+//	if (next_pos != std::string::npos) {
+//		//rvo.data_[rvo.nrows_] ^= sepchar;
+//		rvo.data_[rvo.nrows_].var_str.append(sepchar);
+//		rvo.data_[rvo.nrows_].var_str.append(this->var_str.substr(start_pos));
+//	} else {
+//		++fieldno;
+//		// fill any remaining array elements with empty string
+//		for (; fieldno <= (rvo.nrows_); ++fieldno)
+//			rvo.data_[fieldno] = "";
+//	}
 
-	return nfields;	 //NRVO hopefully since single named return and/or requires a conversion from int to var
+	return rvo;
 }
 
-dim& dim::sort(bool reverse) {
-	//THISIS("var dim::sort(bool reverse = false)")
+dim& dim::sorter(bool reverseorder) {
+	//THISIS("var dim::sorter(bool reverseorder = false)")
 
+	// We must use dim's custom begin to skip element zero
 	//note that _data[0] may be empty
 	//std::cout<<nfields<<std::endl;
 	//std::cout<<data_[0]<<std::endl;
-	if (!reverse)
-		std::sort(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1);
+	//std::sort(std::begin(data_), std::end(data_), reverseorder ? std::greater<var>{} : std::less<var>{});
+	if (!reverseorder)
+		//std::sort(std::begin(data_), std::end(data_));
+		std::sort(this->begin(), this->end());
 	else
-		std::sort(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1, std::greater<var>());
+		std::sort(this->begin(), this->end(), std::greater<var>());
 
 	return *this;
 }
 
-dim& dim::reverse() {
+dim& dim::reverser() {
 
-	//note that _data[0] may be empty
-	//std::cout<<nfields<<std::endl;
-	//std::cout<<data_[0]<<std::endl;
-	std::reverse(data_ + 1, data_ + this->nrows_ * this->ncols_ + 1);
+	// We must use dim's custom begin to skip element zero
+	//std::reverser(std::begin(data_), std::end(data_));
+	std::reverse(this->begin(), this->end());
 
 	return *this;
 }
 
-bool dim::read(CVR filehandle, CVR key) {
+bool dim::read(CVR filevar, CVR key) {
 
-	THISIS("bool dim::read(CVR filehandle, CVR key)")
-	ISSTRING(filehandle)
+	THISIS("bool dim::read(CVR filevar, CVR key)")
+	ISSTRING(filevar)
 	ISSTRING(key)
 
 	var temprecord;
-	if (!temprecord.read(filehandle, key))
+	if (!temprecord.read(filevar, key))
 		return false;
 
 	// dont use following because it redimensions the array to the actual number of fields found
@@ -490,7 +389,7 @@ bool dim::read(CVR filehandle, CVR key) {
 	// repetitively in subroutines
 	//(*this)=temprecord.split();
 
-	this->split(temprecord);
+	*this = temprecord.split();
 
 	// var(nrows_).outputl("nrows now=");
 
@@ -498,21 +397,20 @@ bool dim::read(CVR filehandle, CVR key) {
 	return true;
 }
 
-bool dim::write(CVR filehandle, CVR key) const {
+bool dim::write(CVR filevar, CVR key) const {
 
-	THISIS("bool dim::write(CVR filehandle, CVR key) const")
-	ISSTRING(filehandle)
+	THISIS("bool dim::write(CVR filevar, CVR key) const")
+	ISSTRING(filevar)
 	ISSTRING(key)
 
 	var temprecord = this->join();
-	return temprecord.write(filehandle, key);
+	return temprecord.write(filevar, key);
 }
 
 bool dim::osread(CVR osfilename, const char* codepage) {\
 
 	THISIS("bool dim::osread(CVR osfilename, const char* codepage DEFAULT_EMPTY)")
 	ISSTRING(osfilename)
-//	ISSTRING(codepage)
 
 	var txt;
 	if (not txt.osread(osfilename, codepage)) {
@@ -520,27 +418,20 @@ bool dim::osread(CVR osfilename, const char* codepage) {\
 		return false;
 	}
 
-	// Detect \r\n text
-	var linesep = "\n";
-	int first_nl = txt.index("\n");
-	if (first_nl > 1 && txt[first_nl - 1] == "\r")
+	std::string linesep = "\n";
+
+	// Detect \r\n
+	auto first_nl = txt.var_str.find('\n');
+	if (first_nl != std::string::npos && first_nl > 0 && txt.var_str[first_nl - 1] == '\r')
 		linesep = "\r\n";
 
-	//int n =
-	this->split(txt, linesep);
+	//TRACE(txt.replace("\n", "|"))
+	*this = txt.split(linesep);
+	//TRACE(nrows_)
 
 	// Save the linesep in the unused element[0]
 	// Will be used for oswrite
 	data_[0] = linesep;
-
-//	// If the first line ended with \r\n then we need to remove trailing \r from every element
-//	if (!this->data_[1].var_str.empty() && this->data_[1].var_str.back() == '\r') {
-//		for (size_t i = 1; i <= n; i++) {
-//			if (!this->data_[i].var_str.empty())
-//				//Assume all \n were preceeded by \r. No standalone \n chars.
-//				this->data_[i].var_str.pop_back();
-//		}
-//	}
 
 	return true;
 }
@@ -562,19 +453,19 @@ bool dim::oswrite(CVR osfilename, const char* codepage) const {
 
 	// Join suppresses trailing empty elements
 	// So append a trailing linesep since text files should end with one
-	txt.var_str.append(linesep);
+	//txt.var_str.append(linesep);
 
 	return txt.oswrite(osfilename, codepage);
 }
 
-//////////////
-// var sorting
-//////////////
+///////////
+// var sort
+///////////
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of sort()
 VARREF var::sorter(SV sepchar) {
-	(*this) = this->sort(sepchar);
+	(*this) = this->split(sepchar).sort().join(sepchar);
 	return *this;
 }
 
@@ -588,60 +479,34 @@ var var::sort(SV sepchar) const& {
 
 	//split into a temporary dim array for sorting
 	//then join it back up into a single string
+	var rvo = this->split(sepchar).sort().join(sepchar);
+	return rvo;
 
-	return this->split(sepchar).sort().join(sepchar);
 
 }
 
-///////////
-// dim_iter
-///////////
+//////////////
+// var reverse
+//////////////
 
-//CONSTRUCTOR from a dim (ie begin())
-dim_iter::dim_iter(const dim& d1)
-	: pdim_(&d1){}
-
-//check iter != iter (i.e. iter != end()
-bool dim_iter::operator!=(const dim_iter& dim_iter1) {
-	return this->index_ != dim_iter1.index_;
-}
-
-//CONVERSION - conversion to var
-//dim_iter::operator var*() {
-var& dim_iter::operator*() {
-	return pdim_->data_[index_];
-}
-
-//INCREMENT
-dim_iter dim_iter::operator++() {
-
-	index_++;
-
+// no speed or memory advantage since not sorting in place
+// but provided for syntactical convenience avoiding need to assign output of reverse()
+VARREF var::reverser(SV sepchar) {
+	(*this) = this->split(sepchar).reverse().join(sepchar);
 	return *this;
 }
 
-//DECREMENT
-dim_iter dim_iter::operator--() {
+//reverseing var - using temporary dim
+var var::reverse(SV sepchar) const& {
 
-	index_--;
+	THISIS("var var::reverse(SV sepchar = FM)")
+	assertString(function_sig);
 
-	return *this;
-}
+	//split into a temporary dim array for reverseing
+	//then join it back up into a single string
+	var rvo = this->split(sepchar).reverse().join(sepchar);
+	return rvo;
 
-void dim_iter::end() {
-	index_ = pdim_->nrows_ * pdim_->ncols_ + 1;
-}
-
-//BEGIN - free function to create an iterator -> begin
-PUBLIC dim_iter begin(const dim& d1) {
-	return dim_iter(d1);
-}
-
-//END - free function to create an interator -> end
-PUBLIC dim_iter end(const dim& d1) {
-	dim_iter diter1(d1);
-	diter1.end();
-	return diter1;
 }
 
 }  // namespace exodus

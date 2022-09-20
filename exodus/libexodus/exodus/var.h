@@ -1635,6 +1635,7 @@ class PUBLIC var final {
 	ND var crop() const&;
 	ND var unique() const&;
 	ND var sort(SV sepchar = _FM) const&;
+	ND var reverse(SV sepchar = _FM) const&;
 
 	// SAME ON TEMPORARIES - MUTATE FOR SPEED
 	/////////////////////////////////////////
@@ -1672,7 +1673,8 @@ class PUBLIC var final {
 	ND VARREF raise() && {return raiser();}
 	ND VARREF crop() && {return cropper();}
 	ND VARREF unique() && {return uniquer();}
-	ND VARREF sort() && {return sorter();}
+	ND VARREF sort(SV sepchar = _FM) && {return sorter(sepchar);}
+	ND VARREF reverse(SV sepchar = _FM) && {return reverser(sepchar);}
 
 	// STRING MUTATORS
 	//////////////////
@@ -1711,14 +1713,13 @@ class PUBLIC var final {
 	VARREF cropper();
 	VARREF uniquer();
 	VARREF sorter(SV sepchar = _FM);
+	VARREF reverser(SV sepchar = _FM);
 
 	// OTHER STRING ACCESS
 	//////////////////////
 
 	ND var hash(const uint64_t modulus = 0) const;
 
-	// CONVERT TO DIM (returns a dim)
-	// see also dim.split()
 	ND dim split(SV sepchar = _FM) const;
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
@@ -2323,16 +2324,16 @@ class PUBLIC var_proxy3 {
 }; // class var_proxy3
 
 // var versions of separator characters. Must be after class declaration
-inline const var RM = RM_;
-inline const var FM = FM_;
-inline const var VM = VM_;
-inline const var SM = SM_;
-inline const var TM = TM_;
-inline const var ST = ST_;
+thread_local inline const var RM = RM_;
+thread_local inline const var FM = FM_;
+thread_local inline const var VM = VM_;
+thread_local inline const var SM = SM_;
+thread_local inline const var TM = TM_;
+thread_local inline const var ST = ST_;
 
-inline const var BS = BS_;
-inline const var DQ = DQ_;
-inline const var SQ = SQ_;
+thread_local inline const var BS = BS_;
+thread_local inline const var DQ = DQ_;
+thread_local inline const var SQ = SQ_;
 
 // A global flag used in mvdbpostgres
 [[maybe_unused]] static inline int DBTRACE = var().osgetenv("EXO_DBTRACE");
