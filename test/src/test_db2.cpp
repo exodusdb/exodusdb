@@ -67,6 +67,8 @@ programinit()
 	if (not pluginok) {
 		printl("Error: pgexodus, Exodus's plugin to PostgreSQL is not working. Run configexodus.");
 	} else {
+
+		// Check our index is present in the list
 		var tt = listindexes();
 		tt.dump();
 		TRACE(tt)
@@ -75,9 +77,13 @@ programinit()
 		tt2.dump();
 		TRACE(tt2.oconv("HEX"))
 		TRACE(tt2)
-		assert(tt eq tt2);
-		assert(listindexes()                 eq "xo_users]birthday"_var);
+		var fn;
+		assert(tt.locate(tt2, fn, 0));
+
+		// Check our index is present in the list for our file
 		assert(listindexes(FILE)             eq "xo_users]birthday"_var);
+
+		// Check our index is present specifically
 		assert(listindexes(FILE, "birthday") eq "xo_users]birthday"_var);
 
 //		TRACE(listindexes(FILE, "birthday"))

@@ -5,16 +5,16 @@
 #include <exodus/program.h>
 programinit()
 
-	var key	   = 1;
-var max		   = 5;
-var nprocesses = 50;
+	var key        = 1;
+	var max        = 5;
+	var nprocesses = 10;//50;
 
-// Create a temporary file (ending _temp)
-var filename = "xo_test";
+	// Create a temporary file (ending _temp)
+	var filename = "xo_test";
 
-var file;
+	var file;
 
-var silent = OPTIONS.count("S");
+	var silent = OPTIONS.count("S");
 
 function main() {
 
@@ -133,6 +133,7 @@ function test(in option) {
 	}
 
 	//osshell("test_asyncupd 1 & test_asyncupd 2 & test_asyncupd 3 & test_asyncupd 4 & test_asyncupd 5 &");
+	printl(cmd);
 	osshell(cmd);
 	while (osshellread("pgrep test_asyncupd").count("\n") gt 1) {
 
