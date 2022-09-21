@@ -3565,7 +3565,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
 				if (dictexpression.starts("string_to_array(")) {
 					dictexpression.cutter(16);
-					dictexpression.paster(-13, "");
+					dictexpression.cutter(-13);
 				}
 
 				//remove multivalue handling - duplicate code elsewhere

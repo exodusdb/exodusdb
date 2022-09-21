@@ -558,7 +558,8 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 //	}
 	var lastpos = sql.indexr("*" "/");
 	if (lastpos)
-		sql.paster(lastpos - 1, "");
+		//sql.pasterall(lastpos - 1, "");
+		sql.cutter(lastpos - 2);
 
 	var xlatetemplate;
 	if (ismv)

@@ -253,7 +253,8 @@ function main(in mode, io datax, in params0="", in params20="") {
 				}
 				tt = osname.index(" like ");
 				if (tt) {
-					osname.paster(tt, 9999, "");
+					//osname.paster(tt, 9999, "");
+					osname.firster(tt - 1);
 				}
 				osname = osname.field(";", 1);
 				osname = osname.field(")", 1);

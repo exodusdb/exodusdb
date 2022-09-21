@@ -247,7 +247,12 @@ postuploadfail:
 
 		//lcase upload path (not filenames which must retain case)
 		var filename = virtualfilebase.field2(OSSLASH, -1 , 1 );
-		virtualfilebase.lcaser().paster(-len(filename), filename);
+		//virtualfilebase.lcaser().paster(-len(filename), filename);
+		//virtualfilebase.lcaser().pasterall(-len(filename), filename);
+		virtualfilebase.lcaser();
+		//virtualfilebase.cutter(-len(filename)) ^= filename;
+		virtualfilebase.cutter(-len(filename));
+		virtualfilebase ^= filename;
 
 		//search for extensions
 		//may be only one extension now
@@ -400,7 +405,8 @@ postuploadfail:
 		}
 		if (importcode.contains(".")) {
 			var tt = field2(uploadpath, ".", -1);
-			importcode.paster(-tt.len() - 1, 999, "");
+			//importcode.paster(-tt.len() - 1, 999, "");
+			importcode.cutter(-tt.len() - 1);
 		}
 		importcode.converter(" .", "--");
 		RECORD(11) = importcode;
@@ -722,7 +728,7 @@ subroutine unlockfile() {
 subroutine parseline(io line) {
 
 	//preserve escaped quotes
-	line.replacer(_BS_ _DQ_, "&quote;");
+	line.replacer(_BS _DQ, "&quote;");
 
 	//preserve commas inside quotes
 	nquotes = line.count(DQ);

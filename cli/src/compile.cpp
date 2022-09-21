@@ -512,7 +512,7 @@ function main() {
 		srcfilename.trimmerb(".");
 		var fileext = srcfilename.field2(".", -1).lcase();
 		if (src_extensions.locateusing(" ", fileext)) {
-			filebase = srcfilename.paste(-len(fileext) - 1, "");
+			filebase = srcfilename.cut(-len(fileext) - 1);
 		}
 
 		//install/copy header files to inc directory
@@ -610,7 +610,7 @@ function main() {
 				}
 			}
 			var fileext = srcfilename.field2(".", -1).lcase();
-			filebase = srcfilename.paste(-len(fileext) - 1, "");
+			filebase = srcfilename.cut(-len(fileext) - 1);
 		}
 
 		//also look in inc dir backlinks to source
@@ -704,7 +704,7 @@ function main() {
 			}
 
 			var fileext = srcfilename.field2(".", -1).lcase();
-			var filebase = srcfilename.paste(-len(fileext) - 1, "");
+			var filebase = srcfilename.cut(-len(fileext) - 1);
 
 			var srcfileinfo = osfile(srcfilename);
 			if (!srcfileinfo) {
@@ -1202,7 +1202,7 @@ function main() {
 					if (word2[1] == DQ) {
 						word2 = word2.cut(1).pop();
 						if (word2.ends(".h"))
-							word2.paster(-2, 2, "");
+							word2.cutter(-2);
 						//libnames^=" "^word2;
 						if (compiler == "cl")
 							linkoptions ^= " " ^ word2 ^ ".lib";

@@ -744,7 +744,12 @@ validateexit2:
 
 					var tt = text.field("|", 1);
 					if (tt.len() gt 80) {
-						tt.paster(81, 999999, "...");
+						//tt[81, 999999] = '...'
+						//tt.paster(81, 999999, "...");
+						//tt.pasterall(81, "...");
+						//tt.firster(80) ^= "...";
+						tt.firster(80);
+						tt ^= "...";
 					}
 
 					if (realreason) {

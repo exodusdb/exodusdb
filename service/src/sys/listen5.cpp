@@ -145,7 +145,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							var mode="live";
 							if (database.ends("_test")) {
 								mode = "test";
-								database.paster(-5, "");
+								database.cutter(-5);
 							}
 
 							var cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;

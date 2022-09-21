@@ -288,24 +288,32 @@ programinit()
 	}
 
 	// Splice on temporaries
-	assert(var("abc").paste(-1, "XY")    eq "abXY");
+	assert(var("abc").pasteall(-1, "XY")    eq "abXY");
 	assert(var("abc").paste(-2, 1, "XY") eq "aXYc");
 
 	{
+		var x = "abcdef";
+		x.cutter(-3) ^= "Q";
+		assert(x eq "abcQ");
+
+		x.cutter(-1) ^= "XYZ";
+		assert(x eq "abcXYZ");
+	}
+	{
 		var x = "abc";
 
-		assert(paste(x, 5, "XYZ").outputl() eq "abcXYZ");
-		assert(paste(x, 4, "XYZ").outputl() eq "abcXYZ");
-		assert(paste(x, 3, "XYZ").outputl() eq "abXYZ");
-		assert(paste(x, 2, "XYZ").outputl() eq "aXYZ");
-		assert(paste(x, 1, "XYZ").outputl() eq "XYZ");
+		assert(pasteall(x, 5, "XYZ").outputl() eq "abcXYZ");
+		assert(pasteall(x, 4, "XYZ").outputl() eq "abcXYZ");
+		assert(pasteall(x, 3, "XYZ").outputl() eq "abXYZ");
+		assert(pasteall(x, 2, "XYZ").outputl() eq "aXYZ");
+		assert(pasteall(x, 1, "XYZ").outputl() eq "XYZ");
 
-		assert(paste(x, 0, "XYZ").outputl() eq "XYZ");
+		assert(pasteall(x, 0, "XYZ").outputl() eq "XYZ");
 
-		assert(paste(x, -1, "XYZ").outputl() eq "abXYZ");
-		assert(paste(x, -2, "XYZ").outputl() eq "aXYZ");
-		assert(paste(x, -3, "XYZ").outputl() eq "XYZ");
-		assert(paste(x, -4, "XYZ").outputl() eq "XYZ");
+		assert(pasteall(x, -1, "XYZ").outputl() eq "abXYZ");
+		assert(pasteall(x, -2, "XYZ").outputl() eq "aXYZ");
+		assert(pasteall(x, -3, "XYZ").outputl() eq "XYZ");
+		assert(pasteall(x, -4, "XYZ").outputl() eq "XYZ");
 	}
 
 	{
@@ -323,32 +331,32 @@ programinit()
 		assert(x eq "abcxyz");
 	}
 
-	{
-		var x;
-		x = "abc";
-		assert(paster(x, 5, "XYZ").outputl() eq "abcXYZ");
-		x = "abc";
-		assert(paster(x, 4, "XYZ").outputl() eq "abcXYZ");
-		x = "abc";
-		assert(paster(x, 3, "XYZ").outputl() eq "abXYZ");
-		x = "abc";
-		assert(paster(x, 2, "XYZ").outputl() eq "aXYZ");
-		x = "abc";
-		assert(paster(x, 1, "XYZ").outputl() eq "XYZ");
-
-		x = "abc";
-		assert(paster(x, 0, "XYZ").outputl() eq "XYZ");
-
-		x = "abc";
-		assert(paster(x, -1, "XYZ").outputl() eq "abXYZ");
-		x = "abc";
-		assert(paster(x, -2, "XYZ").outputl() eq "aXYZ");
-		x = "abc";
-		assert(paster(x, -3, "XYZ").outputl() eq "XYZ");
-		x = "abc";
-		assert(paster(x, -4, "XYZ").outputl() eq "XYZ");
-	}
-
+//	{ try to do without this function since scarely used
+//		var x;
+//		x = "abc";
+//		assert(pasterall(x, 5, "XYZ").outputl() eq "abcXYZ");
+//		x = "abc";
+//		assert(pasterall(x, 4, "XYZ").outputl() eq "abcXYZ");
+//		x = "abc";
+//		assert(pasterall(x, 3, "XYZ").outputl() eq "abXYZ");
+//		x = "abc";
+//		assert(pasterall(x, 2, "XYZ").outputl() eq "aXYZ");
+//		x = "abc";
+//		assert(pasterall(x, 1, "XYZ").outputl() eq "XYZ");
+//
+//		x = "abc";
+//		assert(pasterall(x, 0, "XYZ").outputl() eq "XYZ");
+//
+//		x = "abc";
+//		assert(pasterall(x, -1, "XYZ").outputl() eq "abXYZ");
+//		x = "abc";
+//		assert(pasterall(x, -2, "XYZ").outputl() eq "aXYZ");
+//		x = "abc";
+//		assert(pasterall(x, -3, "XYZ").outputl() eq "XYZ");
+//		x = "abc";
+//		assert(pasterall(x, -4, "XYZ").outputl() eq "XYZ");
+//	}
+//
 	printl(elapsedtimetext());
 	printl("Test passed");
 	return 0;

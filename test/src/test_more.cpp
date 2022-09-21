@@ -345,7 +345,7 @@ programinit()
 		v1_01 = 1.01;
 		assert(paster(v1_01, 2, 1, "_").outputl().toString()           eq "1_01");
 		v1_01 = 1.01;
-		assert(paster(v1_01, -1, "_").outputl().toString()             eq "1.0_");
+		assert(pasterall(v1_01, -1, "_").outputl().toString()             eq "1.0_");
 		v1_01 = 1.01;
 		assert(popper(v1_01).outputl().toString()                       eq "1.0");
 		v1_01 = 1.01;

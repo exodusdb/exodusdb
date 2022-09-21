@@ -237,17 +237,21 @@ PUBLIC ND var lower(CVR instring);
 PUBLIC VARREF raiser(VARREF iostring);
 PUBLIC ND var raise(CVR instring);
 
+// 1. paste over
+PUBLIC VARREF paster(VARREF iostring, const int pos1, const int length, CVR str);
+PUBLIC ND var paste(CVR instring, const int pos1, const int length, CVR str);
 
-PUBLIC VARREF paster(VARREF iostring, const int start1, const int length, CVR str);
-PUBLIC ND var paste(CVR instring, const int start1, const int length, CVR str);
-
-//length omitted
-PUBLIC VARREF paster(VARREF iostring, const int start1, CVR str);
-PUBLIC ND var paste(CVR instring, const int start1, CVR str);
-
-//start and length omitted
-PUBLIC VARREF paster(VARREF iostring, CVR str);
-PUBLIC ND var paste(CVR instring, CVR str);
+//// 2. paste over to end
+//PUBLIC VARREF pasterall(VARREF iostring, const int pos1, CVR str);
+//PUBLIC ND var pasteall(CVR instring, const int pos1, CVR str);
+//
+// 3. paste insert at pos1
+//PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str);
+//PUBLIC ND var paste(CVR instring, const int pos1, CVR str);
+//
+//// 4. paste insert at start
+//PUBLIC VARREF paster(VARREF iostring, CVR str);
+//PUBLIC ND var paste(CVR instring, CVR str);
 
 
 PUBLIC VARREF popper(VARREF iostring);

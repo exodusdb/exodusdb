@@ -353,7 +353,7 @@ function onefile(in filename, in maxndifferences) {
 			//SPLICER1 x[y]=a
 			case 20:
 				result = ARG0;
-				paster(result, ARG1, ARG3);
+				pasterall(result, ARG1, ARG3);
 				break;
 
 			//SPLICER2 x[y,z]=a

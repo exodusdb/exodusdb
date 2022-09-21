@@ -247,37 +247,52 @@ PUBLIC var raise(CVR instring) {
 
 // PASTE
 
+// 1. paste over
+
 // copy
-PUBLIC var paste(CVR instring, const int start1, const int length, CVR str) {
-	return instring.paste(start1, length, str);
+PUBLIC var paste(CVR instring, const int pos1, const int length, CVR str) {
+	return instring.paste(pos1, length, str);
 }
 // mutate
-PUBLIC VARREF paster(VARREF iostring, const int start1, const int length, CVR str) {
-	return iostring.paster(start1, length, str);
+PUBLIC VARREF paster(VARREF iostring, const int pos1, const int length, CVR str) {
+	return iostring.paster(pos1, length, str);
 }
 
-// length omitted
+//// 2. paste over to end
+//
+//// copy
+//PUBLIC var pasteall(CVR instring, const int pos1, CVR str) {
+//	return instring.pasteall(pos1, str);
+//}
+//// mutate
+//PUBLIC VARREF pasterall(VARREF iostring, const int pos1, CVR str) {
+//	return iostring.pasterall(pos1, str);
+//}
+//
+////// 3. paste insert at
+//
+//// copy
+//PUBLIC var paste(CVR instring, const int pos1, CVR str) {
+//	return instring.paste(pos1, str);
+//}
+//// mutate
+//PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str) {
+//	return iostring.paster(pos1, str);
+//}
+//
+//// 4. paste insert at beginning
+//
+//// copy
+//PUBLIC var paste(CVR instring, CVR str) {
+//	return instring.paste(str);
+//}
+////mutate
+//PUBLIC VARREF paster(VARREF iostring, CVR str) {
+//	return iostring.paster(str);
+//}
 
-// copy
-PUBLIC var paste(CVR instring, const int start1, CVR str) {
-	return instring.paste(start1, str);
-}
-// mutate
-PUBLIC VARREF paster(VARREF iostring, const int start1, CVR str) {
-	return iostring.paster(start1, str);
-}
 
-// length and start omitted
-
-// copy
-PUBLIC var paste(CVR instring, CVR str) {
-	return instring.paste(str);
-}
-//mutate
-PUBLIC VARREF paster(VARREF iostring, CVR str) {
-	return iostring.paster(str);
-}
-
+// POP
 
 PUBLIC VARREF popper(VARREF iostring) {
 	return iostring.popper();
@@ -936,7 +951,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 			word = word.field2(OSSLASH, -1);
 			// remove trailing ".exe"
 			if (word.lcase().ends(".exe"))
-				word.paster(-4, 4, "");
+				word.cutter(-4);
 		} else
 			mv.SENTENCE ^= " ";
 
@@ -965,7 +980,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	} else if (lastchar == "}")
 		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
 	if (mv.OPTIONS)
-		mv.COMMAND.paster(-(mv.OPTIONS.len()), mv.OPTIONS.len(), "");
+		mv.COMMAND.cutter(-mv.OPTIONS.len());
 	mv.COMMAND.trimmerb(_FM);
 
 	var temp;

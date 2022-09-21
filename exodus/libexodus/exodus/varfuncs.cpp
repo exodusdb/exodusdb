@@ -1099,18 +1099,18 @@ VARREF var::unquoter() {
 // PASTE
 ////////
 
-// 1. paste(start, len, insertion) remove/replace/insert part of a string with another string
+// 1. paste over
 
 // copy
-var var::paste(const int start1, const int length, SV insertstr) const& {
+var var::paste(const int pos1, const int length, SV insertstr) const& {
 	// TODO avoid copy
-	return var(*this).paster(start1, length, insertstr);
+	return var(*this).paster(pos1, length, insertstr);
 }
 
 // mutate
-VARREF var::paster(const int start1, const int length, SV insertstr) {
+VARREF var::paster(const int pos1, const int length, SV insertstr) {
 
-	THISIS("VARREF var::paster(const int start1, const int length, SV insertstr)")
+	THISIS("VARREF var::paster(const int pos1, const int length, SV insertstr)")
 	assertStringMutator(function_sig);
 	//ISSTRING(insertstr)
 
@@ -1119,11 +1119,11 @@ VARREF var::paster(const int start1, const int length, SV insertstr) {
 
 	// First work out start index from start position
 	// Depends on length of string, if position is negative
-	if (start1 < 0)
+	if (pos1 < 0)
 		// abcdef[-3,2] -> abcdef[4,2] ie de
-		start0 = var_str.size() + start1;
+		start0 = var_str.size() + pos1;
 	else
-		start0 = start1 - 1;
+		start0 = pos1 - 1;
 
 	// Negative start index means 0
 	// abcdef[-8,2] -> abcdef[1,2] ie ab
@@ -1164,65 +1164,68 @@ VARREF var::paster(const int start1, const int length, SV insertstr) {
 
 	return *this;
 }
+//
+//// 2. paste over to end
+//
+//// copy
+//var var::pasteall(const int pos1, SV insertstr) const& {
+//	// TODO avoid copy
+//	return var(*this).pasterall(pos1, insertstr);
+//}
+//
+//// mutate
+//VARREF var::pasterall(const int pos1, SV insertstr) {
+//
+//	THISIS("VARREF var::pasterall(const int pos1, SV insertstr)")
+//	assertStringMutator(function_sig);
+//	//ISSTRING(insertstr)
+//
+//	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
+//	int pos1b;
+//	if (pos1 > 0)
+//		pos1b = pos1;
+//	else if (pos1 < 0) {
+//		pos1b = static_cast<int>(var_str.size()) + pos1 + 1;
+//		if (pos1b < 1)
+//			pos1b = 1;
+//	} else
+//		pos1b = 1;
+//
+//	if (static_cast<unsigned int>(pos1b) > var_str.size())
+//		var_str += insertstr;
+//	else
+//		var_str.replace(pos1b - 1, var_str.size(), insertstr);
+//
+//	return *this;
+//}
+//
+// 3. paste insert at
+//
+//// 4. paste insert at start
+//
+//// copy
+//var var::paste(SV insertstr) const& {
+//
+//	THISIS("var var::paste(SV insertstr)")
+//	assertString(function_sig);
+//
+//	var rvo(insertstr);
+//	rvo.var_str.append(this->var_str);
+//
+//	return rvo;
+//}
+//
+//// mutate
+//VARREF var::paster(SV insertstr) {
+//
+//	THISIS("VARREF var::paster(SV insertstr)")
+//	assertStringMutator(function_sig);
+//
+//	var_str.insert(0, insertstr);
+//
+//	return *this;
+//}
 
-// 2. paste(index, insertion) insert a string at
-
-// copy
-var var::paste(const int start1, SV insertstr) const& {
-	// TODO avoid copy
-	return var(*this).paster(start1, insertstr);
-}
-
-// mutate
-VARREF var::paster(const int start1, SV insertstr) {
-
-	THISIS("VARREF var::paster(const int start1, SV insertstr)")
-	assertStringMutator(function_sig);
-	//ISSTRING(insertstr)
-
-	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
-	int start1b;
-	if (start1 > 0)
-		start1b = start1;
-	else if (start1 < 0) {
-		start1b = static_cast<int>(var_str.size()) + start1 + 1;
-		if (start1b < 1)
-			start1b = 1;
-	} else
-		start1b = 1;
-
-	if (static_cast<unsigned int>(start1b) > var_str.size())
-		var_str += insertstr;
-	else
-		var_str.replace(start1b - 1, var_str.size(), insertstr);
-
-	return *this;
-}
-
-// 3. paste(insertion) - insert a string at the beginning
-
-// copy
-var var::paste(SV insertstr) const& {
-
-	THISIS("var var::paste(SV insertstr)")
-	assertString(function_sig);
-
-	var rvo(insertstr);
-	rvo.var_str.append(this->var_str);
-
-	return rvo;
-}
-
-// mutate
-VARREF var::paster(SV insertstr) {
-
-	THISIS("VARREF var::paster(SV insertstr)")
-	assertStringMutator(function_sig);
-
-	var_str.insert(0, insertstr);
-
-	return *this;
-}
 
 //////
 // POP -remove last byte of string

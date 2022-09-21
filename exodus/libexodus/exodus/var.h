@@ -1622,14 +1622,15 @@ class PUBLIC var final {
 	ND var last(const size_t length) const&;
 	ND var cut(const int length) const&;
 	ND var paste(const int start1, const int length, SV insertstr) const&;
-	ND var paste(const int start1, SV insertstr) const&;
+	//ND var paste(const int start1, SV insertstr) const&;
+	//ND var pasteall(const int start1, SV insertstr) const&;
 	ND var paste(SV insertstr) const&;
 	ND var pop() const&;
 
-	ND var substr(const int startindex, const int length) const&;
-	ND var b(const int startindex, const int length) const& {return substr(startindex, length);};
-	ND var substr(const int startindex) const&;
-	ND var b(const int startindex) const& {return substr(startindex);}
+	ND var substr(const int pos1, const int length) const&;
+	ND var b(const int pos1, const int length) const& {return substr(pos1, length);};
+	ND var substr(const int pos1) const&;
+	ND var b(const int pos1) const& {return substr(pos1);}
 
 	ND var lower() const&;
 	ND var raise() const&;
@@ -1664,12 +1665,13 @@ class PUBLIC var final {
 	ND VARREF last(const size_t length) && {return laster(length);}
 	ND VARREF cut(const int length) && {return cutter(length);}
 	ND VARREF paste(const int start1, const int length, SV insertstr) && {return paster(start1, length, insertstr);};
-	ND VARREF paste(const int start1, SV insertstr) && {return paster(start1, insertstr);}
-	ND VARREF paste(SV insertstr) && {return paster(insertstr);}
+	//ND VARREF paste(const int start1, SV insertstr) && {return paster(start1, insertstr);}
+	//ND VARREF pasteall(const int start1, SV insertstr) && {return pasterall(start1, insertstr);}
+	//ND VARREF paste(SV insertstr) && {return paster(insertstr);}
 	ND VARREF pop() && {return popper();}
 
-	ND VARREF substr(const int startindex, const int length) && {return substrer(startindex, length);};
-	ND VARREF substr(const int startindex) && {return substrer(startindex);}
+	ND VARREF substr(const int pos1, const int length) && {return substrer(pos1, length);};
+	ND VARREF substr(const int pos1) && {return substrer(pos1);}
 
 	ND VARREF lower() && {return lowerer();}
 	ND VARREF raise() && {return raiser();}
@@ -1704,12 +1706,13 @@ class PUBLIC var final {
 	VARREF laster(const size_t length);
 	VARREF cutter(const int length);
 	VARREF paster(const int start1, const int length, SV insertstr);
-	VARREF paster(const int start1, SV insertstr);
-	VARREF paster(SV insertstr);
+	//VARREF paster(const int start1, SV insertstr);
+	//VARREF pasterall(const int start1, SV insertstr);
+	//VARREF paster(SV insertstr);
 	VARREF popper();
 
-	VARREF substrer(const int startindex, const int length);
-	VARREF substrer(const int startindex);
+	VARREF substrer(const int pos1, const int length);
+	VARREF substrer(const int pos1);
 
 	VARREF lowerer();
 	VARREF raiser();
@@ -1727,20 +1730,20 @@ class PUBLIC var final {
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
-	var substr(const int startindex, CVR delimiterchars, int& endindex) const;
-	var b(const int startindex, CVR delimiterchars, int& endindex) const {return substr(startindex, delimiterchars, endindex);}
+	var substr(const int pos1, CVR delimiterchars, int& endindex) const;
+	var b(const int pos1, CVR delimiterchars, int& endindex) const {return substr(pos1, delimiterchars, endindex);}
 
 	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
 	// of mixed combinations of multivalues/subvalues and text marks
 	// correctly lined up mv to mv, sv to sv, tm to tm even when particular columns were missing
 	// some vm/sm/tm
-	// it is like substr(startindex,delimiterbytes,endindex) except that the delimiter bytes are
+	// it is like substr(pos1,delimiterbytes,endindex) except that the delimiter bytes are
 	// hard coded as the usual RM/FM/VM/SM/TM/ST
 	// except that it updates the startstopindex to point one after found delimiter byte and
 	// returns the delimiter no (1-6)
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
 	// startstopindex to after tne end of the string and returns delimiter no 0 NOTE that it
-	// does NOT remove anything from the source string var remove(VARREF startindex, VARREF
+	// does NOT remove anything from the source string var remove(VARREF pos1, VARREF
 	// delimiterno) const;
 	var substr2(VARREF startstopindex, VARREF delimiterno) const;
 	var b2(VARREF startstopindex, VARREF delimiterno) const {return substr2(startstopindex, delimiterno);}

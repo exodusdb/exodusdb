@@ -248,7 +248,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				}
 				tt = osname.index(" like ");
 				if (tt) {
-					osname.paster(tt, 9999, "");
+					osname.firster(tt - 1);
 				}
 				osname = osname.field(";", 1);
 				osname = osname.field(")", 1);
@@ -256,7 +256,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			}
 		}
 		if (osname.ends(".0")) {
-			osname.paster(-2, 2, "");
+			osname.cutter(-2);
 		}
 
 		//Trident tells you the actual browser software for MS
