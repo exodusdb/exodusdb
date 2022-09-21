@@ -127,7 +127,7 @@ next:
 		var cleartovalue2 = cleartovalue;
 		if (cleartovalue.starts("{")) {
 			if (cleartovalue.ends("}")) {
-				cleartovalue2 = calculate(cleartovalue.b(2, cleartovalue.len() - 2));
+				cleartovalue2 = calculate(cleartovalue.cut(1).pop());
 			}
 		}
 

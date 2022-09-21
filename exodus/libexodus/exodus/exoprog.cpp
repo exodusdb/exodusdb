@@ -963,7 +963,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		else
 			wordseps = wordseps0;
 		for (int ii = 1; ii <= nn; ii++) {
-			var tt = string2.substr(ii, 1);
+			var tt = string2.b(ii, 1);
 
 			if (inquotes) {
 				inquotes = tt != inquotes;
@@ -976,7 +976,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 					if (wordseps.contains(tt)) {
 						cap = 1;
 						if (tt == " ")
-							//numx = var("1234567890").contains(string2.substr(ii + 1, 1), 1);
+							//numx = var("1234567890").contains(string2.b(ii + 1, 1), 1);
 							numx = var("1234567890").contains(string2[ii + 1]);
 					} else {
 						if (cap || numx) {
@@ -1018,7 +1018,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		// convert to uppercase
 		var quoted = "";
 		for (int ii = 1; ii <= 99999; ii++) {
-			//var tt = string2.substr(ii, 1);
+			//var tt = string2.b(ii, 1);
 			var tt = string2[ii];
 			// BREAK;
 			if (!(tt != ""))
@@ -2155,7 +2155,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 			var functionname = subconversion.field(",").lcase();
 
 			// extract any params
-			var mode = subconversion.substr(functionname.len() + 2);
+			var mode = subconversion.b(functionname.len() + 2);
 
 			var output;
 
@@ -2227,7 +2227,7 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 		} else {
 
 			//determine the function name
-			var functionname = subconversion.substr(2).field(",", 1).field("]", 1).lcase();;
+			var functionname = subconversion.cut(1).field(",", 1).field("]", 1).lcase();;
 
 			// extract any params
 			var mode = subconversion.field(",", 2, 9999).field("]", 1);
@@ -2600,7 +2600,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 			var temp = input1;
 			temp.converter("0123456789-.", "            ");
 			var numlen = input1.len() - temp.trimf().len();
-			var unitx = input1.substr(numlen + 1, 99);
+			var unitx = input1.b(numlen + 1, 99);
 			var numx = input1.first(numlen);
 
 			if (ndecs == "BASE") {

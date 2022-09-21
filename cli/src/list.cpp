@@ -890,7 +890,7 @@ nextkey:
 
 		//automatic labelling with dictionary title
 		if (word.starts("{")) {
-			tt = word.b(2, word.len() - 2);
+			tt = word.cut(1).pop();
 			replacements(-1) = tt;
 			nreplacements += 1;
 			if (not(tt.reado(DICT, tt))) {
@@ -952,7 +952,7 @@ nextkey:
 		if (not(coldict(coln).unassigned())) {
 			gosub getquotedword();
 			coldict(coln)(9) = word[1];
-			coldict(coln)(10) = word.b(3, 9999);
+			coldict(coln)(10) = word.b(3);
 			coldict(coln)(11) = word;
 		}
 
@@ -996,7 +996,7 @@ nextkey:
 	} else if (word eq "EMAIL_CC") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
-			emailcc = word.b(2, word.len() - 2);
+			emailcc = word.cut(1).pop();
 			nextemailcc = emailcc;
 		} else {
 			emailccid = word;
@@ -1005,7 +1005,7 @@ nextkey:
 	} else if (word eq "EMAIL_SUBJECT") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
-			emailsubject = word.b(2, word.len() - 2);
+			emailsubject = word.cut(1).pop();
 			nextemailsubject = emailsubject;
 		} else {
 			emailsubjectid = word;
@@ -1917,7 +1917,7 @@ recexit:
 					} else {
 						//tx1:=td0:'<td bgcolor=':field(tt,' ',1)[2,9999]:'>'
 						//TODO do with class? to save document space?
-						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).b(2, 9999) ^ "\">";
+						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).cut(1) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= tt ^ tdx;
@@ -2452,7 +2452,7 @@ subroutine printbreaks() {
 
 			if (coldict(coln).f(10)) {
 				if (not(html)) {
-					cell = cell.b(1, coldict(coln).f(10));
+					cell = cell.first(coldict(coln).f(10));
 					cell = oconv(cell, coldict(coln).f(11));
 				} else {
 					tx ^= td0 ^ "<th";
@@ -2608,7 +2608,7 @@ subroutine emailing() {
 	}
 
 	if ((DQ ^ "'").contains(emailtoid[1])) {
-		nextemailto = emailtoid.b(2, emailtoid.len() - 2);
+		nextemailto = emailtoid.cut(1).pop();
 	} else {
 		nextemailto = calculate(emailtoid);
 	}

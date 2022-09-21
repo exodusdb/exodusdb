@@ -88,7 +88,7 @@ var ExodusProgramBase::getcursor() const {
 
 	//response could be ESC[54;10R for x=54, y=10
 	var response(buf, sizeof(buf));
-	var y = response.field(";", 1).substr(3);
+	var y = response.field(";", 1).cut(2);
 	var x = response.field(";", 2).field("R");
 
 	//x.outputl("x=");

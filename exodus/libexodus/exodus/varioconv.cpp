@@ -311,7 +311,7 @@ var var::oconv_T(CVR format) const {
 				for (int ii = 1; ii <= wordlen; ii += width) {
 					if (ii > 1)
 						output ^= TM;
-					output ^= word.substr(ii, width);
+					output ^= word.b(ii, width);
 				}	// ii;
 
 				int remaining = width - (wordlen % width);
@@ -871,9 +871,9 @@ var var::oconv(const char* conversion) const {
 			if (var_typ & VARTYP_STR && var_str.empty())
 				return "";
 			if (this->toBool())
-				return var(conversion).substr(2).field(",", 1);
+				return var(conversion).cut(1).field(",", 1);
 			else
-				return var(conversion).substr(2).field(",", 2);
+				return var(conversion).cut(1).field(",", 2);
 			break;
 
 		// custom conversion should not be called via ::oconv

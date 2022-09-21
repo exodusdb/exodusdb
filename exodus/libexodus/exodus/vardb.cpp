@@ -2175,9 +2175,9 @@ inline void unquoter_inline(VARREF iovar) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
 	if (quotecharacters.contains(iovar[1]))
-		//string = string.substr(2, string.len() - 2);
-		//iovar = iovar.substr(2).popper();
-		iovar.substrer(2).popper();
+		//string = string.b(2, string.len() - 2);
+		//iovar = iovar.cut(1).popper();
+		iovar.cutter(1).popper();
 }
 
 inline void tosqlstring(VARREF string1) {
@@ -2212,7 +2212,7 @@ inline var get_fileexpression(CVR mainfilename, CVR filename, CVR keyordata) {
 	// use COALESCE function in case this is a joined but missing record (and therefore null)
 	// in MYSQL this is the ISNULL expression?
 	// xlatekeyexpression="exodus_extract_text(coalesce(" ^ filename ^ ".data,''::text), " ^
-	// xlatefromfieldname.substr(9); if (filename==mainfilename) return expression; return
+	// xlatefromfieldname.cut(8); if (filename==mainfilename) return expression; return
 	// "coalesce(" ^ expression ^", ''::text)";
 }
 
@@ -2544,7 +2544,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			if (xlatefromfieldname.trim().lcase().starts("@record<")) {
 				xlatekeyexpression = "exodus_extract_text(";
 				xlatekeyexpression ^= filename ^ ".data";
-				xlatekeyexpression ^= ", " ^ xlatefromfieldname.substr(9);
+				xlatekeyexpression ^= ", " ^ xlatefromfieldname.cut(8);
 				xlatekeyexpression.popper();
 				xlatekeyexpression ^=
 					var(", 0").str(3 - xlatekeyexpression.count(",")) ^ ")";
@@ -2557,8 +2557,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			// TODO				if
 			// (xlatefromfieldname.starts(FIELD(@ID))
 			else if (xlatefromfieldname[1] == "{") {
-				xlatefromfieldname =
-					xlatefromfieldname.substr(2).popper();
+				xlatefromfieldname.cutter(1).popper();
 				xlatekeyexpression = get_dictexpression(cursor,
 					filename, filename, dictfilename, dictfile,
 					xlatefromfieldname, joins, unnests, selects, ismv, forsort);
@@ -2761,7 +2760,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	if (word1.len() > 1) {
 		if (word1[1] == "(" && word1[-1] != ")") {
 			//put remaining word back on the pending words
-			remainingwords.paster(1, 0, word1.substr(2) ^ " ");
+			remainingwords.paster(1, 0, word1.cut(1) ^ " ");
 			//return single leading paren (
 			word1 = "(";
 		} else if (word1[-1] == ")") {
@@ -4036,7 +4035,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 	//ORDER - suppressed if doing stage 1 of a two stage sort/select
 	if (orderclause && !calc_fields)
-		sql ^= " \nORDER BY \n" ^ orderclause.substr(3);
+		sql ^= " \nORDER BY \n" ^ orderclause.cut(2);
 
 	//LIMIT - number of records returned
 	// no limit initially if any calculated items - limit will be done in secondary sort/select

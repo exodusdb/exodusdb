@@ -477,7 +477,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 						"/"
 						"*pgsql");
 		if (pos) {
-			sourcecode = sourcecode.b(1, pos - 1).trimb(VM);
+			sourcecode = sourcecode.first(pos - 1).trimb(VM);
 		}
 
 		var fulltext_dictid = field(field(sourcecode, "{", 2), "}", 1);

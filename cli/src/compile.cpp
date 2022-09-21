@@ -1200,7 +1200,7 @@ function main() {
 				if (loadtimelinking and word1 eq "#include") {
 					var word2 = line.field(" ", 2);
 					if (word2[1] == DQ) {
-						word2 = word2.b(2, word2.len() - 2);
+						word2 = word2.cut(1).pop();
 						if (word2.ends(".h"))
 							word2.paster(-2, 2, "");
 						//libnames^=" "^word2;

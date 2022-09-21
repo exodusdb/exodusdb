@@ -487,11 +487,11 @@ PUBLIC var count(CVR instring, SV substr) {
 
 
 PUBLIC var substr(CVR instring, const int startindex) {
-	return instring.substr(startindex);
+	return instring.b(startindex);
 }
 
 PUBLIC var substr(CVR instring, const int startindex, const int length) {
-	return instring.substr(startindex, length);
+	return instring.b(startindex, length);
 }
 
 PUBLIC VARREF substrer(VARREF iostring, const int startindex) {

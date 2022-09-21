@@ -693,7 +693,7 @@ nextkey:
 				if (limitx) {
 					if ((DQ ^ "'").contains(word[1])) {
 						if (word.starts(word[-1])) {
-							word = word.b(2, word.len() - 2);
+							word = word.cut(1).pop();
 						}
 					}
 					if (word eq "") {
@@ -804,7 +804,7 @@ nextkey:
 
 		//automatic labelling with dictionary title
 		if (word.starts("{")) {
-			tt = word.b(2, word.len() - 2);
+			tt = word.cut(1).pop();
 			replacements(-1) = tt;
 			nreplacements += 1;
 			if (not(rec.reado(DICT, tt))) {
@@ -909,7 +909,7 @@ nextkey:
 	} else if (word eq "EMAIL_CC") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
-			emailcc = word.b(2, word.len() - 2);
+			emailcc = word.cut(1).pop();
 			nextemailcc = emailcc;
 		} else {
 			emailccid = word;
@@ -918,7 +918,7 @@ nextkey:
 	} else if (word eq "EMAIL_SUBJECT") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
-			emailsubject = word.b(2, word.len() - 2);
+			emailsubject = word.cut(1).pop();
 			nextemailsubject = emailsubject;
 		} else {
 			emailsubjectid = word;
@@ -2525,7 +2525,7 @@ subroutine emailing() {
 	}
 
 	if ((DQ ^ "'").contains(emailtoid[1])) {
-		nextemailto = emailtoid.b(2, emailtoid.len() - 2);
+		nextemailto = emailtoid.cut(1).pop();
 	} else {
 		nextemailto = calculate(emailtoid);
 	}

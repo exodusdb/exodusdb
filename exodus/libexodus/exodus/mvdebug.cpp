@@ -69,7 +69,7 @@ void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF return
 	// suppress confusing and unhelpful exodus macros
 	//if ((line.first(12) == "programexit(" || line.first(12) == "libraryexit(" || line.first(10) == "classexit(") or
 	//if (line.match("^(program|library|class)(init|exit)\\(") or
-	//	(line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
+	//	(line == "}" && sourcefilename.ends(".h")) or (line == ""))
 	//	return;
 	if (line.match("^(program|library|class)(init|exit)\\("))
 		return;
@@ -232,7 +232,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 	}
 
 	free(strings);
-	return returnlines.substr(2);
+	return returnlines.cut(1);
 
 }
 

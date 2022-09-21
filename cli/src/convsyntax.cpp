@@ -248,7 +248,7 @@ function main() {
 
 			// B - substr() to b()
 			if (substr2b) {
-				line2.regex_replacer("\\.substr\\(", ".b\\(");
+				line2.regex_replacer(R"__(\.substr\()__", R"__(.b\()__");
 			}
 
 			// S - .b(1, ..) eq -> .starts(..
