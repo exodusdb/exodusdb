@@ -2184,7 +2184,7 @@ inline void tosqlstring(VARREF string1) {
 
 	// if double quoted then convert to sql style single quoted strings
 	// double up any internal single quotes
-	if (string1[1] == "\"") {
+	if (string1.starts("\"")) {
 	//if (string1.var_str.front() == '"') {
 		string1.replacer("'", "''");
 		string1.paster(1, 1, "'");
@@ -2248,7 +2248,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
 	//and their column names appended with a colon (:)
-	var stage2_calculated = fieldname[-1] == ":";
+	var stage2_calculated = fieldname.ends(":");
 	var stage2_filename = "SELECT_CURSOR_STAGE2_" ^ cursor.f(1);
 
 	if (stage2_calculated) {
@@ -2321,7 +2321,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	//eg period 1/19 is right justified but not numeric and sql select will crash if ::float8 is used
 	//||dictrec.f(9) == "R";
 	var isnumeric = isinteger || isdecimal || dictrec.f(9) == "R";
-	var ismv1 = dictrec.f(4)[1] == "M";
+	var ismv1 = dictrec.f(4).starts("M");
 	var fromjoin = false;
 
 	var isdate = conversion.starts("D") || conversion.starts("[DATE");
@@ -2556,7 +2556,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 			// TODO				if
 			// (xlatefromfieldname.starts(FIELD(@ID))
-			else if (xlatefromfieldname[1] == "{") {
+			else if (xlatefromfieldname.starts("{")) {
 				xlatefromfieldname.cutter(1).popper();
 				xlatekeyexpression = get_dictexpression(cursor,
 					filename, filename, dictfilename, dictfile,
@@ -2665,7 +2665,7 @@ exodus_call:
 		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
 
 		//multivalued prestage2_calculated field DUPLICATE CODE
-		if (fieldname0[-1] == ":") {
+		if (fieldname0.ends(":")) {
 			var joinsectionn = 1;
 			var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 			//if (!joins.f(joinsectionn).contains(join))
@@ -2721,7 +2721,7 @@ exodus_call:
 			} else {
 
 				//multivalued prestage2_calculated field DUPLICATE CODE
-				if (fieldname0[-1] == ":") {
+				if (fieldname0.ends(":")) {
 					var joinsectionn = 1;
 					var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 					//if (!joins.f(joinsectionn).contains(join))
@@ -2758,12 +2758,12 @@ var getword(VARREF remainingwords, VARREF ucword) {
 
 	//separate out leading or trailing parens () but not both
 	if (word1.len() > 1) {
-		if (word1[1] == "(" && word1[-1] != ")") {
+		if (word1.starts("(") && word1[-1] != ")") {
 			//put remaining word back on the pending words
 			remainingwords.paster(1, 0, word1.cut(1) ^ " ");
 			//return single leading paren (
 			word1 = "(";
-		} else if (word1[-1] == ")") {
+		} else if (word1.ends(")")) {
 			//put single closing paren back on the pending words
 			remainingwords.paster(1, 0, ") ");
 			//return word without trailing paren )
@@ -2975,8 +2975,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 	// remove trailing options eg (S) or {S}
 	var lastword = remaining.field2(" ", -1);
-	if ((lastword[1] == "(" && lastword[-1] == ")") ||
-		(lastword[1] == "{" && lastword[-1] == "}")) {
+	if ((lastword.starts("(") && lastword.ends(")")) ||
+		(lastword.starts("{") && lastword.ends("}"))) {
 		remaining.paster(-lastword.len() - 1, 999, "");
 	}
 
@@ -3031,8 +3031,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// (S) etc
 		// options - last word enclosed in () or {}
 		if (!remaining.len() &&
-			((word1[1] == "(" && word1[-1] == ")") ||
-			(word1[1] == "{" && word1[-1] == "}"))) {
+			((word1.starts("(") && word1.ends(")")) ||
+			(word1.starts("{") && word1.ends("}")))) {
 			// word1.logputl("skipping last word in () options ");
 			continue;
 		}
@@ -3374,7 +3374,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// determine Pick/AREV values like "[xxx" "xxx]" and "[xxx]"
 			// TODO
-			if (word1[1] == "'") {
+			if (word1.starts("'")) {
 
 				if (word1[2] == "[") {
 					word1.paster(2, 1, "");
@@ -4765,7 +4765,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 	//recursive call to skip any meta data with keys starting and ending %
 	//eg keys like "%RECORDS%" (without the quotes)
 	//similar code in readnext()
-	if (key[1] == "%" && key[-1] == "%") {
+	if (key.starts("%") && key.ends("%")) {
 		return readnext(record, key, valueno);
 	}
 

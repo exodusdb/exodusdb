@@ -196,7 +196,7 @@ subroutine printtx2() {
 			if (htmltitle.unassigned()) {
 				htmltitle = headx.f(1);
 				}
-			if (htmltitle[1] == "<") {
+			if (htmltitle.starts("<")) {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
 

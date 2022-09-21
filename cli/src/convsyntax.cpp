@@ -366,17 +366,17 @@ function main() {
 
 			}
 
-			// [1/-1] eq/ne "x"/XX -> .starts/ends(xx)
+			// [1/-1] eq/ne "x"/XX -> .starts/ends(xx) []
 			if (onechar) {
 
 				line2.regex_replacer(
 					R"__(\[1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__",
-					R"__(.starts\(\1\))__"
+					R"__(.starts\(\2\))__"
 				);
 
 				line2.regex_replacer(
 					R"__(\[-1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__",
-					R"__(.ends\(\1\))__"
+					R"__(.ends\(\2\))__"
 				);
 
 			}

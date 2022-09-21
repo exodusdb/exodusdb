@@ -187,7 +187,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		opnos(fieldn) = opno;
 
 		//reqivalues
-		if (op == "in" and ovalue[1] == "(" and ovalue[-1] == ")") {
+		if (op == "in" and ovalue.starts("(") and ovalue.ends(")")) {
 			ovalue.cutter(1).popper();
 			ovalue.replacer("', '", VM);
 			ovalue.trimmerb().trimmerf().unquoter();
@@ -255,7 +255,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		}
 	}
 
-	if (baseinsertsql[-1] == ",") {
+	if (baseinsertsql.ends(",")) {
 
 		baseinsertsql.paster(-1, 1, ")");
 		baseinsertsql ^= " VALUES (";
@@ -457,7 +457,7 @@ bool ExodusProgramBase::getlist(CVR listname) {
 bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, const var fieldno /*=0*/) {
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
-	if (filename2[-1] == ")") {
+	if (filename2.ends(")")) {
 		var options = filename2.field2(" ", -1);
 		filename2.paster(-options.len(), 999999999, "").trimmerb();
 	}
@@ -534,7 +534,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 
 	//find and skip final options like (S)
 	bool silent = false;
-	if (command[-1] == ")" || command[-1] == "}") {
+	if (command.ends(")") || command.ends("}")) {
 		silent = command.field2(" ", -1).contains("S");
 		nwords--;
 	}
@@ -708,7 +708,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 
 	// if username='EXODUS' or username='STEVE' then call msg(task:'');
 
-	if (task[1] == " ") {
+	if (task.starts(" ")) {
 		call mssg(DQ ^ (task0 ^ DQ));
 	}
 	// Each task may have many "locks", each users may have many "keys"
@@ -733,14 +733,14 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 		return 1;
 	}
 
-	var noadd = task[1] == "!";
+	var noadd = task.starts("!");
 	if (noadd) {
 		task.cutter(1);
 	}
 	// if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
 	if (not noadd) {
 		var lenuserprivs = SECURITY.len();
-		noadd = task[-1] == DQ or lenuserprivs > 48000;
+		noadd = task.ends(DQ) or lenuserprivs > 48000;
 	}
 	var positive = task[1];
 	if (positive == "#")
@@ -751,7 +751,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 	//? as first character of task (after positive) means
 	// security is being used as a configuration and user EXODUS has no special privs
 	var isadmin;
-	if (task[1] == "?") {
+	if (task.starts("?")) {
 		isadmin = 0;
 		task.cutter(1);
 	} else
@@ -1379,7 +1379,7 @@ baddict:
 	}
 
 	var dicttype = cached_dictrec_.f(1);
-	bool ismv = cached_dictrec_.f(4)[1] == "M";
+	bool ismv = cached_dictrec_.f(4).starts("M");
 
 	// F type dictionaries
 	if (dicttype == "F") {
@@ -1801,7 +1801,7 @@ var ExodusProgramBase::singular(CVR pluralnoun) {
 		}
 	} else {
 
-		if (temp[-1] == "S") {
+		if (temp.ends("S")) {
 			// analysis, dos
 			if (not temp.ends("IS") && not temp.ends("OS"))
 				temp.popper();
@@ -2148,7 +2148,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 
 			//remove brackets
 			subconversion.substrer(2);
-			if (subconversion[-1] == "]")
+			if (subconversion.ends("]"))
 				subconversion.popper();
 
 			//determine the function name
@@ -2345,7 +2345,7 @@ var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptoda
 				nsecs = nsecs.oconv("MD00P");
 			} else {
 				nsecs = (nsecs.oconv("MD40P")) + 0;
-				if (nsecs[1] == ".") {
+				if (nsecs.starts(".")) {
 					nsecs.paster(1, 0, "0");
 				}
 			}
@@ -2503,7 +2503,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 
 	if (type == "ICONV") {
 		var reciprocal = 0;
-		if (input[1] == "/") {
+		if (input.starts("/")) {
 			reciprocal = 1;
 			input.cutter(1);
 		} else {
