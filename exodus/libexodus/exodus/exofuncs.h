@@ -237,6 +237,7 @@ PUBLIC ND var lower(CVR instring);
 PUBLIC VARREF raiser(VARREF iostring);
 PUBLIC ND var raise(CVR instring);
 
+
 PUBLIC VARREF paster(VARREF iostring, const int start1, const int length, CVR str);
 PUBLIC ND var paste(CVR instring, const int start1, const int length, CVR str);
 
@@ -244,8 +245,14 @@ PUBLIC ND var paste(CVR instring, const int start1, const int length, CVR str);
 PUBLIC VARREF paster(VARREF iostring, const int start1, CVR str);
 PUBLIC ND var paste(CVR instring, const int start1, CVR str);
 
+//start and length omitted
+PUBLIC VARREF paster(VARREF iostring, CVR str);
+PUBLIC ND var paste(CVR instring, CVR str);
+
+
 PUBLIC VARREF popper(VARREF iostring);
 PUBLIC ND var pop(CVR instring);
+
 
 PUBLIC VARREF quoter(VARREF iostring);
 PUBLIC ND var quote(CVR instring);
@@ -255,6 +262,7 @@ PUBLIC ND var squote(CVR instring);
 
 PUBLIC VARREF unquoter(VARREF iostring);
 PUBLIC ND var unquote(CVR instring);
+
 
 PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
 PUBLIC ND var fieldstore(CVR instring, SV sepchar, const int fieldno, const int nfields, CVR replacement);

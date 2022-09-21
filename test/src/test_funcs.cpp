@@ -198,6 +198,66 @@ programinit()
 		assert(unquote(quote(""))  eq "");
 		assert(unquote(squote("")) eq "");
 	}
+	{
+		// on rvalues
+		assert(unquote("") eq "");
+
+		assert(unquote(_DQ) eq _DQ);
+		assert(unquote(_SQ) eq _SQ);
+
+		assert(unquote(_DQ _SQ) eq _DQ _SQ);
+		assert(unquote(_SQ _DQ) eq _SQ _DQ);
+
+		assert(unquote(_DQ _DQ) eq "");
+		assert(unquote(_SQ _SQ) eq "");
+
+		assert(unquote(_DQ _DQ _DQ) eq _DQ);
+		assert(unquote(_SQ _SQ _SQ) eq _SQ);
+
+		assert(unquote(_DQ "x" _DQ) eq "x");
+		assert(unquote(_SQ "x" _SQ) eq "x");
+	}
+	{
+		// on accessor on lvalues
+		var x;
+		x = ""; assert(unquote(x) eq "");
+
+		x = _DQ; assert(unquote(x) eq _DQ);
+		x = _SQ; assert(unquote(x) eq _SQ);
+
+		x = _DQ _SQ; assert(unquote(x) eq _DQ _SQ);
+		x = _SQ _DQ; assert(unquote(x) eq _SQ _DQ);
+
+		x = _DQ _DQ; assert(unquote(x) eq "");
+		x = _SQ _SQ; assert(unquote(x) eq "");
+
+		x = _DQ _DQ _DQ; assert(unquote(x) eq _DQ);
+		x = _SQ _SQ _SQ; assert(unquote(x) eq _SQ);
+
+		x = _DQ "x" _DQ; assert(unquote(x) eq "x");
+		x = _SQ "x" _SQ; assert(unquote(x) eq "x");
+	}
+
+	{
+		// on mutator on lvalues
+		var x;
+		x = ""; x.unquoter(); assert(x eq "");
+
+		x = _DQ; x.unquoter(); assert(x eq _DQ);
+		x = _SQ; x.unquoter(); assert(x eq _SQ);
+
+		x = _DQ _SQ; x.unquoter(); assert(x eq _DQ _SQ);
+		x = _SQ _DQ; x.unquoter(); assert(x eq _SQ _DQ);
+
+		x = _DQ _DQ; x.unquoter(); assert(x eq "");
+		x = _SQ _SQ; x.unquoter(); assert(x eq "");
+
+		x = _DQ _DQ _DQ; x.unquoter(); assert(x eq _DQ);
+		x = _SQ _SQ _SQ; x.unquoter(); assert(x eq _SQ);
+
+		x = _DQ "x" _DQ; x.unquoter(); assert(x eq "x");
+		x = _SQ "x" _SQ; x.unquoter(); assert(x eq "x");
+	}
 
 	{
 		assert(space(-2) eq "");
@@ -246,6 +306,21 @@ programinit()
 		assert(paste(x, -2, "XYZ").outputl() eq "aXYZ");
 		assert(paste(x, -3, "XYZ").outputl() eq "XYZ");
 		assert(paste(x, -4, "XYZ").outputl() eq "XYZ");
+	}
+
+	{
+		// test paste at beginning
+
+		var x = "";
+		assert(paste(x,"xyz") eq "xyz");
+
+		x.paster("xyz");
+		assert(x eq "xyz");
+
+		assert(paste(x,"abc") eq "abcxyz");
+
+		x.paster("abc");
+		assert(x eq "abcxyz");
 	}
 
 	{

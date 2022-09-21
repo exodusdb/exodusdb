@@ -570,7 +570,7 @@ var var::trimf(SV trimchars DEFAULT_SPACE) const& {
 	return rvo;
 }
 
-// in-place
+// mutate
 VARREF var::trimmerf(SV trimchars DEFAULT_SPACE) {
 
 	THISIS("VARREF var::trimmerf(SV trimchars)")
@@ -594,7 +594,7 @@ var var::trimb(SV trimchars DEFAULT_SPACE) const& {
 	return rvo;
 }
 
-// in-place
+// mutate
 VARREF var::trimmerb(SV trimchars DEFAULT_SPACE) {
 
 	THISIS("VARREF var::trimmerb(SV trimchars)")
@@ -623,7 +623,7 @@ var var::trim(SV trimchars DEFAULT_SPACE) const& {
 	return rvo;
 }
 
-// in-place
+// mutate
 VARREF var::trimmer(SV trimchars DEFAULT_SPACE) {
 
 	// reimplement with boost string trim_if algorithm
@@ -650,7 +650,7 @@ var var::invert() const& {
 	return tt;
 }
 
-// in-place
+// mutate
 VARREF var::inverter() {
 
 	THISIS("VARREF var::inverter()")
@@ -683,7 +683,7 @@ var var::ucase() const& {
 	return var(*this).ucaser();
 }
 
-// in-place
+// mutate
 VARREF var::ucaser() {
 
 	THISIS("VARREF var::ucaser()")
@@ -728,7 +728,7 @@ var var::lcase() const& {
 	return var(*this).lcaser();
 }
 
-// in-place
+// mutate
 VARREF var::lcaser() {
 
 	THISIS("VARREF var::lcaser()")
@@ -764,7 +764,7 @@ var var::tcase() const& {
 	return var(*this).tcaser();
 }
 
-// in-place
+// mutate
 VARREF var::tcaser() {
 
 	THISIS("VARREF var::tcaser()")
@@ -802,7 +802,7 @@ var var::fcase() const& {
 	return var(*this).fcaser();
 }
 
-// in-place
+// mutate
 VARREF var::fcaser() {
 
 	THISIS("VARREF var::fcaser()")
@@ -846,7 +846,7 @@ var var::normalize() const& {
 	return var(*this).normalizer();
 }
 
-// in-place
+// mutate
 VARREF var::normalizer() {
 
 	THISIS("VARREF var::normalizer()")
@@ -970,51 +970,101 @@ var var::textchr(const int utf_codepoint) const {
 }
 
 
-// quote() - wrap with double quotes
+////////
+// QUOTE - wrap with double quotes
+////////
+
+// copy
 var var::quote() const& {
-	return var(*this).quoter();
+
+	THISIS(__PRETTY_FUNCTION__)
+	assertString(function_sig);
+
+	var rvo = DQ_;
+	rvo.var_str.append(this->var_str);
+	rvo.var_str.push_back(DQ_);
+
+	return rvo;
 }
 
-// in-place
+// mutate
 VARREF var::quoter() {
 
-	THISIS("VARREF var::quoter()")
+	THISIS(__PRETTY_FUNCTION__)
 	assertStringMutator(function_sig);
 
 	// NB this is std::string "replace" not var field replace
-	var_str.replace(0, 0, "\"");
-	var_str.push_back('"');
+	var_str.replace(0, 0, _DQ);
+	var_str.push_back(DQ_);
 	return *this;
 }
 
 
-// squoter() - wrap with single quotes
+/////////
+// SQUOTE - wrap with single quotes
+/////////
+
+// copy
 var var::squote() const& {
-	return var(*this).squoter();
+
+	THISIS(__PRETTY_FUNCTION__)
+	assertString(function_sig);
+
+	var rvo = SQ_;
+	rvo.var_str.append(this->var_str);
+	rvo.var_str.push_back(SQ_);
+
+	return rvo;
 }
 
-// in-place
+// mutate
 VARREF var::squoter() {
 
-	THISIS("VARREF var::squoter()")
+	THISIS(__PRETTY_FUNCTION__)
 	assertStringMutator(function_sig);
 
 	// NB this is std::string "replace" not var field replace
-	var_str.replace(0, 0, "'");
+	var_str.replace(0, 0, _SQ);
 	var_str.push_back('\'');
+
 	return *this;
 }
 
 
-//unquote() - remove outer double or single quotes
+//////////
+// UNQUOTE - remove outer double or single quotes
+//////////
+
+// copy
 var var::unquote() const& {
-	return var(*this).unquoter();
+
+	THISIS(__PRETTY_FUNCTION__)
+	assertString(function_sig);
+
+	var rvo;
+	rvo.var_typ = VARTYP_STR;
+
+	if (
+		this->var_str.size() > 1 and (
+			(this->var_str.starts_with(DQ_) and this->var_str.ends_with(DQ_))
+			or
+			(this->var_str.starts_with(SQ_) and this->var_str.ends_with(SQ_))
+		)
+	) {
+		// Skip first and last char
+		rvo.var_str.append(++this->var_str.begin(), this->var_str.end());
+		rvo.var_str.pop_back();
+	} else {
+		rvo.var_str = this->var_str;
+	}
+
+	return rvo;
 }
 
-// in-place
+// mutate
 VARREF var::unquoter() {
 
-	THISIS("VARREF var::unquoter()")
+	THISIS(__PRETTY_FUNCTION__)
 	assertStringMutator(function_sig);
 
 	// removes MATCHING beginning and terminating " or ' characters
@@ -1045,12 +1095,19 @@ VARREF var::unquoter() {
 }
 
 
-//paste() remove/replace/insert part of a string with another string
+////////
+// PASTE
+////////
+
+// 1. paste(start, len, insertion) remove/replace/insert part of a string with another string
+
+// copy
 var var::paste(const int start1, const int length, SV insertstr) const& {
+	// TODO avoid copy
 	return var(*this).paster(start1, length, insertstr);
 }
 
-// in-place
+// mutate
 VARREF var::paster(const int start1, const int length, SV insertstr) {
 
 	THISIS("VARREF var::paster(const int start1, const int length, SV insertstr)")
@@ -1108,13 +1165,15 @@ VARREF var::paster(const int start1, const int length, SV insertstr) {
 	return *this;
 }
 
+// 2. paste(index, insertion) insert a string at
 
-// paste() insert a string at
+// copy
 var var::paste(const int start1, SV insertstr) const& {
+	// TODO avoid copy
 	return var(*this).paster(start1, insertstr);
 }
 
-// in-place
+// mutate
 VARREF var::paster(const int start1, SV insertstr) {
 
 	THISIS("VARREF var::paster(const int start1, SV insertstr)")
@@ -1140,13 +1199,21 @@ VARREF var::paster(const int start1, SV insertstr) {
 	return *this;
 }
 
+// 3. paste(insertion) - insert a string at the beginning
 
-// insert a string a the beginning
+// copy
 var var::paste(SV insertstr) const& {
-	return var(*this).paster(insertstr);
+
+	THISIS("var var::paste(SV insertstr)")
+	assertString(function_sig);
+
+	var rvo(insertstr);
+	rvo.var_str.append(this->var_str);
+
+	return rvo;
 }
 
-// in-place
+// mutate
 VARREF var::paster(SV insertstr) {
 
 	THISIS("VARREF var::paster(SV insertstr)")
@@ -1157,12 +1224,16 @@ VARREF var::paster(SV insertstr) {
 	return *this;
 }
 
-// pop() remove last byte of string
+//////
+// POP -remove last byte of string
+//////
+
+// copy
 var var::pop() const& {
 	return var(*this).popper();
 }
 
-// in-place
+// mutate
 VARREF var::popper() {
 
 	THISIS("VARREF var::popper()")
@@ -1311,7 +1382,7 @@ var var::crop() const& {
 	return var(*this).cropper();
 }
 
-// in-place
+// mutate
 VARREF var::cropper() {
 
 	THISIS("VARREF var::cropper()")
@@ -1365,7 +1436,7 @@ var var::lower() const& {
 	return var(*this).lowerer();
 }
 
-// in-place
+// mutate
 VARREF var::lowerer() {
 
 	THISIS("VARREF var::lowerer()")
@@ -1388,7 +1459,7 @@ var var::raise() const& {
 	return var(*this).raiser();
 }
 
-// in-place
+// mutate
 VARREF var::raiser() {
 
 	THISIS("VARREF var::raiser()")
@@ -1458,7 +1529,7 @@ var var::convert(SV fromchars, SV tochars) const& {
 	return temp;
 }
 
-// in-place
+// mutate
 //VARREF var::converter(CVR fromchars, CVR tochars) {
 VARREF var::converter(SV fromchars, SV tochars) {
 
@@ -1472,7 +1543,7 @@ VARREF var::converter(SV fromchars, SV tochars) {
 }
 
 
-//// in-place for const char*
+//// mutate for const char*
 //VARREF var::converter(const char* fromchars, const char* tochars) {
 //
 //	THISIS("VARREF var::converter(const char* fromchars, const char* tochars)")
@@ -1489,7 +1560,7 @@ var var::textconvert(SV fromchars, SV tochars) const& {
 	return var(*this).textconverter(fromchars, tochars);
 }
 
-// in-place
+// mutate
 VARREF var::textconverter(SV fromchars, SV tochars) {
 
 	THISIS("VARREF var::converter(CVR fromchars,CVR tochars)")

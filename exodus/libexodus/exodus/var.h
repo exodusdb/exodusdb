@@ -102,9 +102,9 @@ THE SOFTWARE.
 #define _TM "\x1B"      // Text Mark
 #define _ST "\x1A"  // Subtext Mark
 
-#define _BS_ "\\"
-#define _DQ_ "\""
-#define _SQ_ "\'"
+#define _BS "\\"
+#define _DQ "\""
+#define _SQ "\'"
 
 // trailing _ char versions of classic pick delimiters
 #define RM_ '\x1F'     // Record Mark
@@ -1603,15 +1603,16 @@ class PUBLIC var final {
 	ND var textconvert(SV fromchars, SV tochars) const&;
 	ND var replace(SV fromstr, SV tostr) const&;
 	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
-	ND var quote() const&;
-	ND var squote() const&;
-	ND var unquote() const&;
 	ND var ucase() const&;        // utf8
 	ND var lcase() const&;        // utf8
 	ND var tcase() const&;        // utf8
 	ND var fcase() const&;        // utf8
 	ND var normalize() const&;    // utf8
 	ND var invert() const&;        // utf8
+
+	ND var quote() const&;
+	ND var squote() const&;
+	ND var unquote() const&;
 	ND var trim(SV trimchars DEFAULT_SPACE) const&;
 	ND var trimf(SV trimchars DEFAULT_SPACE) const&;
 	ND var trimb(SV trimchars DEFAULT_SPACE) const&;
@@ -1644,15 +1645,16 @@ class PUBLIC var final {
 	ND VARREF textconvert(SV fromchars, SV tochars) && {return textconverter(fromchars, tochars);}
 	ND VARREF replace(SV fromstr, SV tostr) && {return replacer(fromstr, tostr);}
 	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) && {return regex_replacer(regex, replacement, options);}
-	ND VARREF quote() && {return quoter();}
-	ND VARREF squote() && {return squoter();}
-	ND VARREF unquote() && {return unquoter();}
 	ND VARREF ucase() && {return ucaser();}     // utf8
 	ND VARREF lcase() && {return lcaser();}     // utf8
 	ND VARREF tcase() && {return tcaser();}     // utf8
 	ND VARREF fcase() && {return fcaser();}     // utf8
 	ND VARREF normalize() && {return normalizer();} // utf8
 	ND VARREF invert() && {return inverter();}    // utf8
+
+	ND VARREF quote() && {return quoter();}
+	ND VARREF squote() && {return squoter();}
+	ND VARREF unquote() && {return unquoter();}
 	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
 	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return trimmerf(trimchars);}
 	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return trimmerb(trimchars);}
@@ -1683,15 +1685,16 @@ class PUBLIC var final {
 	VARREF textconverter(SV fromchars, SV tochars);
 	VARREF replacer(SV fromstr, SV tostr);
 	VARREF regex_replacer(SV regex, SV replacement, SV options DEFAULT_EMPTY);
-	VARREF quoter();
-	VARREF squoter();
-	VARREF unquoter();
 	VARREF ucaser();      // utf8
 	VARREF lcaser();      // utf8
 	VARREF tcaser();      // utf8
 	VARREF fcaser();      // utf8
 	VARREF normalizer();  // utf8
 	VARREF inverter();    // utf8
+	VARREF quoter();
+	VARREF squoter();
+	VARREF unquoter();
+
 	VARREF trimmer(SV trimchars DEFAULT_SPACE);
 	VARREF trimmerf(SV trimchars DEFAULT_SPACE);
 	VARREF trimmerb(SV trimchars DEFAULT_SPACE);

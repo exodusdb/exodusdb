@@ -245,21 +245,37 @@ PUBLIC var raise(CVR instring) {
 }
 
 
-PUBLIC VARREF paster(VARREF iostring, const int start1, const int length, CVR str) {
-	return iostring.paster(start1, length, str);
-}
+// PASTE
+
+// copy
 PUBLIC var paste(CVR instring, const int start1, const int length, CVR str) {
 	return instring.paste(start1, length, str);
 }
-
+// mutate
+PUBLIC VARREF paster(VARREF iostring, const int start1, const int length, CVR str) {
+	return iostring.paster(start1, length, str);
+}
 
 // length omitted
+
+// copy
+PUBLIC var paste(CVR instring, const int start1, CVR str) {
+	return instring.paste(start1, str);
+}
+// mutate
 PUBLIC VARREF paster(VARREF iostring, const int start1, CVR str) {
 	return iostring.paster(start1, str);
 }
-// length omitted
-PUBLIC var paste(CVR instring, const int start1, CVR str) {
-	return instring.paste(start1, str);
+
+// length and start omitted
+
+// copy
+PUBLIC var paste(CVR instring, CVR str) {
+	return instring.paste(str);
+}
+//mutate
+PUBLIC VARREF paster(VARREF iostring, CVR str) {
+	return iostring.paster(str);
 }
 
 
