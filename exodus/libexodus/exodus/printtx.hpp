@@ -306,7 +306,7 @@ subroutine getheadfoot() {
 		while (true) {
 			///BREAK;
 			if (not head1.ends("&nbsp;")) break;
-			head1.paster(-6, 6, "");
+			head1.cutter(-6);
 		}//loop;
 		headx.r(1, head1);
 		head1 = "";

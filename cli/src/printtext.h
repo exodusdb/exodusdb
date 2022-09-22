@@ -338,7 +338,7 @@ class printtext {
 			head1.replacer(" ", "&nbsp;");
 			head1.converter("~", " ");
 			while (head1.ends( "&nbsp;")) {
-				head1.paster(-6, 6, "");
+				head1.cutter(-6);
 			}
 			headx.r(1, head1);
 			head1 = "";

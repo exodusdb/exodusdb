@@ -2977,7 +2977,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var lastword = remaining.field2(" ", -1);
 	if ((lastword.starts("(") && lastword.ends(")")) ||
 		(lastword.starts("{") && lastword.ends("}"))) {
-		remaining.paster(-lastword.len() - 1, 999, "");
+		remaining.cutter(-lastword.len() - 1);
 	}
 
 	var firstucword = remaining.field(" ", 1).ucase();

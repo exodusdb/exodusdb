@@ -333,7 +333,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		}
 		if (browser.ends(".0")) {
-			browser.paster(-2, 2, "");
+			browser.cutter(-2);
 		}
 
 		var submode = mode.field(".", 3);

@@ -759,7 +759,7 @@ subroutine exec2() {
 	//this could be improved to work
 	printfilename = linkfilename2;
 	tt = oscwd();
-	tt.paster(-7, 7, "");
+	tt.cutter(-7);
 	if (printfilename.starts(tt)) {
 		printfilename.paster(1, tt.len(), "../");
 	}

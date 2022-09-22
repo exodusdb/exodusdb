@@ -257,10 +257,10 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 	if (baseinsertsql.ends(",")) {
 
-		baseinsertsql.paster(-1, 1, ")");
+		baseinsertsql.popper() ^= ")";
 		baseinsertsql ^= " VALUES (";
 
-		createtablesql.paster(-1, 1, ")");
+		createtablesql.popper() ^= ")";
 		//createtablesql.outputl();
 
 		//clear the table in case we are reusing it
@@ -416,7 +416,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		// Replace final comma with a closing bracket and additional SQL
 		// Ignore any duplicates due to multivalues
 		// TODO insert stage2 records with MV as par of the key?
-		insertsql.paster(-1, 1, ") ON CONFLICT (key) DO NOTHING");
+		insertsql.popper() ^= ") ON CONFLICT (key) DO NOTHING";
 
 		//insertsql.outputl();
 
@@ -459,7 +459,7 @@ bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, cons
 	var filename2 = filename_or_command;
 	if (filename2.ends(")")) {
 		var options = filename2.field2(" ", -1);
-		filename2.paster(-options.len(), 999999999, "").trimmerb();
+		filename2.cutter(-options.len()).trimmerb();
 	}
 
 	//optionally get keys from filename or command
@@ -1154,7 +1154,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 		} else if (lastchar == "}")
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
 		if (OPTIONS)
-			COMMAND.paster(-(OPTIONS.len()), OPTIONS.len(), "");
+			COMMAND.cutter(-OPTIONS.len());
 		COMMAND.trimmerb(_FM);
 
 		// load the shared library file
@@ -1791,11 +1791,11 @@ var ExodusProgramBase::singular(CVR pluralnoun) {
 
 			// addresses=address
 		} else if (temp.ends("SSES")) {
-			temp.paster(-2, 2, "");
+			temp.cutter(-2);
 		} else if (temp.ends("SHES")) {
-			temp.paster(-2, 2, "");
+			temp.cutter(-2);
 		} else if (temp.ends("CHES")) {
-			temp.paster(-2, 2, "");
+			temp.cutter(-2);
 		} else if (1) {
 			temp.popper();
 		}

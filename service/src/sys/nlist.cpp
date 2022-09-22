@@ -614,7 +614,7 @@ nextkey:
 			onlyauthorised = 1;
 			gosub getword();
 			if (ss.ends(" AND")) {
-				ss.paster(-4, 4, "");
+				ss.cutter(-4);
 			}
 			if (nextword eq "AND") {
 				gosub getword();

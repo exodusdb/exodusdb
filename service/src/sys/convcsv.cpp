@@ -351,7 +351,7 @@ nextdict:
 					}
 					var title = headingx.f(coln);
 					if (title.ucase().ends(" CODE")) {
-						title.paster(-5, 5, "");
+						title.cutter(-5);
 						headingx(coln) = title;
 					}
 				}

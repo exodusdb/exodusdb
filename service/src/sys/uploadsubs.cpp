@@ -405,7 +405,6 @@ postuploadfail:
 		}
 		if (importcode.contains(".")) {
 			var tt = field2(uploadpath, ".", -1);
-			//importcode.paster(-tt.len() - 1, 999, "");
 			importcode.cutter(-tt.len() - 1);
 		}
 		importcode.converter(" .", "--");

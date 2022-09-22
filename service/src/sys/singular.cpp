@@ -15,11 +15,11 @@ function main(in pluralnoun) {
 
 		//ADDRESSES=ADDRESS
 		} else if (temp2.ends("SSES")) {
-			temp.paster(-2, 2, "");
+			temp.cutter(-2);
 		} else if (temp2.ends("SHES")) {
-			temp.paster(-2, 2, "");
+			temp.cutter(-2);
 		} else if (temp2.ends("CHES")) {
-			temp.paster(-2, 2, "");
+			temp.cutter(-2);
 		} else {
 			temp.popper();
 		}

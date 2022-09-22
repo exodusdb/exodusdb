@@ -2508,7 +2508,7 @@ badwrite:
 		execute(voccmd);
 
 		//reformat for reqlog
-		voccmd.paster(-5, 5, "");
+		voccmd.cutter(-5);
 		USER0(1) = voccmd ^ "_" ^ request_.f(1);
 
 		//discard any stored input

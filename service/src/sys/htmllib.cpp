@@ -262,7 +262,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			}
 		}
 		if (osname.ends(".0")) {
-			osname.paster(-2, 2, "");
+			osname.cutter(-2);
 		}
 
 		//Trident tells you the actual browser software for MS
@@ -326,7 +326,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			}
 		}
 		if (browser.ends(".0")) {
-			browser.paster(-2, 2, "");
+			browser.cutter(-2);
 		}
 
 		var submode = mode.field(".", 3);

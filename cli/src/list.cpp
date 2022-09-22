@@ -2207,7 +2207,7 @@ subroutine getwordexit() {
 		goto dictvoc;
 	}
 	if (not(html) and word.ends("_LINK"))
-		word.paster(-5, 5, "");
+		word.cutter(-5);
 	if (dictrec.reado(DICT, word)) {
 maindict:
 		if (dictrec.f(1) eq "G") {

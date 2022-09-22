@@ -294,7 +294,8 @@ COST 10;
 			rawsqlexec("DROP VIEW IF EXISTS dict.all");
 
 		if (filenames.contains(FM)) {
-			viewsql.paster(-6, 6, "");	 //remove trailing "UNION" word
+			//remove trailing "UNION" word
+			viewsql.cutter(-6);
 			var errmsg;
 			if (verbose)
 				viewsql.output("SQL:");
