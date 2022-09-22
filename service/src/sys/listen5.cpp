@@ -482,38 +482,6 @@ nextpatch:;
 		logx.replacer("%3C", "&lt;");
 		logx.replacer("%3E", "&gt;");
 
-/* obsolete
-	} else if (request1 eq "PROCESSINIT") {
-		//put username and database on the bottom line of the screen
-		var username = USERNAME.trim();
-	//username=rnd(1000000)
-		var s23 = SYSTEM.f(23);
-		var s17 = SYSTEM.f(17);
-		s23.converter(" ", FM);
-		//locate 'TEST' in s23 setting xx then username:='*' else
-		if (s23.locate("TESTDATA", xx)) {
-			username ^= "*";
-		} else {
-			if (s23.locate("TESTING", xx)) {
-				username ^= "*";
-			} else {
-				if (s23.locate("TRAINING", xx)) {
-					username ^= "*";
-				} else {
-					if (s17.contains("test")) {
-						username ^= "*";
-					}
-				}
-			}
-		}
-		// end
-		bottomline = (s17 ^ " " ^ SYSTEM.f(24)).oconv("L#40") ^ username.oconv("R#40");
-		gosub printbottomline();
-
-	} else if (request1 eq "PROCESSEXIT") {
-		bottomline = var(80).space();
-		gosub printbottomline();
-*/
 	} else if (request1.starts("GETINDEX")) {
 
 		iodat_ = "";
@@ -939,16 +907,6 @@ subroutine fileaccesscheck(in filename) {
 		USER4 = "";
 	}
 
-	return;
-}
-
-subroutine printbottomline() {
-	if (CRTHIGH gt 24) {
-		yy = CRTHIGH - 1;
-	} else {
-		yy = CRTHIGH;
-	}
-	call scrnio(0, yy, bottomline.first(80), esctoattr(ENVIRONSET.f(21)));
 	return;
 }
 

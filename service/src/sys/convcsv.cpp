@@ -324,7 +324,9 @@ nextdict:
 					var title = dict.f(3).trim();
 					title.replacer("<WBR/>", "");
 					title.replacer("<wbr/>", " ");
-					title.converter(UPPERCASE ^ "|_" ^ VM, LOWERCASE ^ "   ");
+					//title.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ" "|_" _VM, "abcdefghijklmnopqrstuvwxyz" "   ");
+					title.lcaser();
+					title.converter("|_" _VM, "   ");
 
 					//t=title[1,1]
 					//convert @lower.case to @upper.case in t

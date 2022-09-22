@@ -28,14 +28,6 @@ THE SOFTWARE.
 #include <string>
 #include <string_view>
 
-//#define EXO_SNITCH
-#ifdef EXO_SNITCH
-#	include <iostream> // only for debugging
-#endif
-
-//#define INT_IS_FLOOR
-//#include <math.h>  //for std::trunc
-
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
 // http://msdn.microsoft.com/en-us/library/81h27t8c(VS.80).aspx
@@ -44,37 +36,28 @@ THE SOFTWARE.
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 
-#ifdef BUILDING_LIBRARY
+	// BUILDING_LIBRARY is defined set in exodus/library.h and exodus/common.h
+#	ifdef BUILDING_LIBRARY
+#		define PUBLIC __declspec(dllexport)
+#	else
+#		define PUBLIC __declspec(dllimport)
+#	endif
 
-#ifdef __GNUC__
-#define PUBLIC __attribute__((dllexport))
-#else
-#define PUBLIC __declspec(dllexport)  // Note: actually gcc seems to also support this syntax.
-#endif
-
-#else //not BUILDING LIBRARY
-
-#ifdef __GNUC__
-#define PUBLIC __attribute__((dllimport))
-#else
-#define PUBLIC __declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
-#endif
-
-#endif
-
-#define DLL_LOCAL
+#	define DLL_LOCAL
 
 #else
 
-#if __GNUC__ >= 4
-// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
+	// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
+	// see nm -D libexodus.so --demangle |grep T -w
+
 #	define PUBLIC __attribute__((visibility("default")))
 #	define DLL_LOCAL __attribute__((visibility("hidden")))
-#else
-#	define PUBLIC
-#	define DLL_LOCAL
-#endif
 
+#endif // not windows
+
+// #define EXO_SNITCH
+#ifdef EXO_SNITCH
+#	include <iostream> // only for debugging
 #endif
 
 // ND macro [[no_discard]]
@@ -86,8 +69,8 @@ THE SOFTWARE.
 
 #include <exodus/vartyp.h>
 
-// Decided to use ASCII characters 0x1A-0x1F for PickOS separator chars
-// instead of PickOS 0xFA-0xFF which are illegal utf-8 bytes
+// Use ASCII 0x1A-0x1F for PickOS separator chars instead
+// of PickOS 0xFA-0xFF which are illegal utf-8 bytes
 
 // also defined in extract.c and exodusmacros.h
 
@@ -1563,78 +1546,82 @@ class PUBLIC var final {
 
 	ND var numberinwords(CVR languagename_or_locale_id DEFAULT_EMPTY);
 
+	////////////
+	// STRING // All utf8 unless mentioned
+	////////////
+
 	// STRING INFO
 	//////////////
 
-	ND var seq() const;     // int of first byte
-	ND var textseq() const; // int of UTF8 code point
-	ND var len() const;     // int of total bytes
+	ND var seq() const;     // byte
+	ND var textseq() const;
+	ND var len() const;     // bytes
 	bool isnum() const;     // integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
 
 	// STRING SCANNING
 	//////////////////
 
-	ND var textlen() const; // UTF8 code points
-	ND var fcount(SV str) const; //field count
+	ND var textlen() const;
+	ND var fcount(SV str) const;
 	ND var count(SV str) const;
 	ND var match(SV str, SV options DEFAULT_EMPTY) const;
 
-	//                                 Javascript   PHP             Python       Go          Rust          C++
-	ND bool starts(SV str) const;   // startsWith() str_starts_with startswith() HasPrefix() starts_with() starts_with
-	ND bool ends(SV str) const;     // endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
+	//                                  Javascript   PHP             Python       Go          Rust          C++
+	ND bool starts(SV str) const;    // startsWith() str_starts_with startswith() HasPrefix() starts_with() starts_with
+	ND bool ends(SV str) const;      // endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
 	ND bool contains(SV str) const;  // includes()   str_contains    contains()   Contains()  contains()    contains
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 	//ND var index(SV str) const;
-	ND var index(SV str, const int startchar1 = 1) const;
-	ND var indexn(SV str, const int occurrence) const;
-	ND var indexr(SV str, const int startchar1 = -1) const;
+	ND var index(SV str, const int startchar1 = 1) const;   // byte returned and startchar1
+	ND var indexn(SV str, const int occurrence) const;      // byte returned
+	ND var indexr(SV str, const int startchar1 = -1) const; // byte returned
 
 	//static member for speed on std strings
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
 	//int localeAwareCompare(const std::string& str2) const;
 
-	// STRING ACCESSORS
+	// STRING ACCESSORS - All const
 	///////////////////
 
-	// all are const
-
-	ND var convert(SV fromchars, SV tochars) const&;
-	ND var textconvert(SV fromchars, SV tochars) const&;
-	ND var replace(SV fromstr, SV tostr) const&;
-	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
-	ND var ucase() const&;        // utf8
-	ND var lcase() const&;        // utf8
-	ND var tcase() const&;        // utf8
-	ND var fcase() const&;        // utf8
-	ND var normalize() const&;    // utf8
-	ND var invert() const&;        // utf8
-
-	ND var quote() const&;
-	ND var squote() const&;
-	ND var unquote() const&;
-	ND var trim(SV trimchars DEFAULT_SPACE) const&;
-	ND var trimf(SV trimchars DEFAULT_SPACE) const&;
-	ND var trimb(SV trimchars DEFAULT_SPACE) const&;
-	ND var trim(SV trimchars, SV options) const&;
-	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
-	ND var first(const size_t length) const&;
-	ND var last(const size_t length) const&;
-	ND var cut(const int length) const&;
-	ND var paste(const int start1, const int length, SV insertstr) const&;
-	//ND var paste(const int start1, SV insertstr) const&;
-	//ND var pasteall(const int start1, SV insertstr) const&;
-	ND var paste(SV insertstr) const&;
-	ND var pop() const&;
-
-	ND var substr(const int pos1, const int length) const&;
-	ND var b(const int pos1, const int length) const& {return substr(pos1, length);};
-	ND var substr(const int pos1) const&;
-	ND var b(const int pos1) const& {return substr(pos1);}
+	ND var ucase() const&;
+	ND var lcase() const&;
+	ND var tcase() const&;
+	ND var fcase() const&;
+	ND var normalize() const&;
+	ND var invert() const&;
 
 	ND var lower() const&;
 	ND var raise() const&;
 	ND var crop() const&;
+
+	ND var quote() const&;
+	ND var squote() const&;
+	ND var unquote() const&;
+
+	ND var trim(SV trimchars  DEFAULT_SPACE) const&; // byte arg
+	ND var trimf(SV trimchars DEFAULT_SPACE) const&; // byte arg
+	ND var trimb(SV trimchars DEFAULT_SPACE) const&; // byte arg
+	ND var trim(SV trimchars, SV options) const&;    // byte arg
+
+	ND var first(const size_t length) const&; // byte arg
+	ND var last(const size_t length) const&;  // byte arg
+	ND var cut(const int length) const&;      // byte arg
+	ND var paste(const int pos1, const int length, SV insertstr) const&; // byte args
+	ND var pop() const&;                      // byte data
+
+	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
+	ND var substr(const int pos1, const int length) const&; // byte args
+	ND var b(const int pos1, const int length) const& {return substr(pos1, length);}; // byte args
+	ND var substr(const int pos1) const&;                   // byte arg
+	ND var b(const int pos1) const& {return substr(pos1);}  // byte arg
+
+	ND var convert(SV fromchars, SV tochars) const&;     // byte
+	ND var textconvert(SV fromchars, SV tochars) const&; // utf8
+
+	ND var replace(SV fromstr, SV tostr) const&;
+	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
+
 	ND var unique() const&;
 	ND var sort(SV sepchar = _FM) const&;
 	ND var reverse(SV sepchar = _FM) const&;
@@ -1642,40 +1629,43 @@ class PUBLIC var final {
 	// SAME ON TEMPORARIES - MUTATE FOR SPEED
 	/////////////////////////////////////////
 
-	ND VARREF convert(SV fromchars, SV tochars) && {return converter(fromchars, tochars);}
-	ND VARREF textconvert(SV fromchars, SV tochars) && {return textconverter(fromchars, tochars);}
-	ND VARREF replace(SV fromstr, SV tostr) && {return replacer(fromstr, tostr);}
-	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) && {return regex_replacer(regex, replacement, options);}
-	ND VARREF ucase() && {return ucaser();}     // utf8
-	ND VARREF lcase() && {return lcaser();}     // utf8
-	ND VARREF tcase() && {return tcaser();}     // utf8
-	ND VARREF fcase() && {return fcaser();}     // utf8
-	ND VARREF normalize() && {return normalizer();} // utf8
-	ND VARREF invert() && {return inverter();}    // utf8
+	// utf8/byte as for accessors
 
-	ND VARREF quote() && {return quoter();}
-	ND VARREF squote() && {return squoter();}
-	ND VARREF unquote() && {return unquoter();}
-	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
-	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return trimmerf(trimchars);}
-	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return trimmerb(trimchars);}
-	ND VARREF trim(SV trimchars, SV options) && {return trimmer(trimchars, options);}
-	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
-	ND VARREF first(const size_t length) && {return firster(length);}
-	ND VARREF last(const size_t length) && {return laster(length);}
-	ND VARREF cut(const int length) && {return cutter(length);}
-	ND VARREF paste(const int start1, const int length, SV insertstr) && {return paster(start1, length, insertstr);};
-	//ND VARREF paste(const int start1, SV insertstr) && {return paster(start1, insertstr);}
-	//ND VARREF pasteall(const int start1, SV insertstr) && {return pasterall(start1, insertstr);}
-	//ND VARREF paste(SV insertstr) && {return paster(insertstr);}
-	ND VARREF pop() && {return popper();}
-
-	ND VARREF substr(const int pos1, const int length) && {return substrer(pos1, length);};
-	ND VARREF substr(const int pos1) && {return substrer(pos1);}
+	ND VARREF ucase() && {return ucaser();}
+	ND VARREF lcase() && {return lcaser();}
+	ND VARREF tcase() && {return tcaser();}
+	ND VARREF fcase() && {return fcaser();}
+	ND VARREF normalize() && {return normalizer();}
+	ND VARREF invert() && {return inverter();}
 
 	ND VARREF lower() && {return lowerer();}
 	ND VARREF raise() && {return raiser();}
 	ND VARREF crop() && {return cropper();}
+
+	ND VARREF quote() && {return quoter();}
+	ND VARREF squote() && {return squoter();}
+	ND VARREF unquote() && {return unquoter();}
+
+	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
+	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return trimmerf(trimchars);}
+	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return trimmerb(trimchars);}
+	ND VARREF trim(SV trimchars, SV options) && {return trimmer(trimchars, options);}
+
+	ND VARREF first(const size_t length) && {return firster(length);}
+	ND VARREF last(const size_t length) && {return laster(length);}
+	ND VARREF cut(const int length) && {return cutter(length);}
+	ND VARREF paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
+	ND VARREF pop() && {return popper();}
+
+	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
+	ND VARREF substr(const int pos1, const int length) && {return substrer(pos1, length);}
+	ND VARREF substr(const int pos1) && {return substrer(pos1);}
+
+	ND VARREF convert(SV fromchars, SV tochars) && {return converter(fromchars, tochars);}
+	ND VARREF textconvert(SV fromchars, SV tochars) && {return textconverter(fromchars, tochars);}
+	ND VARREF replace(SV fromstr, SV tostr) && {return replacer(fromstr, tostr);}
+	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) && {return regex_replacer(regex, replacement, options);}
+
 	ND VARREF unique() && {return uniquer();}
 	ND VARREF sort(SV sepchar = _FM) && {return sorter(sepchar);}
 	ND VARREF reverse(SV sepchar = _FM) && {return reverser(sepchar);}
@@ -1683,40 +1673,43 @@ class PUBLIC var final {
 	// STRING MUTATORS
 	//////////////////
 
-	VARREF converter(SV fromchars, SV tochars);
-	VARREF textconverter(SV fromchars, SV tochars);
-	VARREF replacer(SV fromstr, SV tostr);
-	VARREF regex_replacer(SV regex, SV replacement, SV options DEFAULT_EMPTY);
-	VARREF ucaser();      // utf8
-	VARREF lcaser();      // utf8
-	VARREF tcaser();      // utf8
-	VARREF fcaser();      // utf8
-	VARREF normalizer();  // utf8
-	VARREF inverter();    // utf8
+	// utf8/byte as for accessors
+
+	VARREF ucaser();
+	VARREF lcaser();
+	VARREF tcaser();
+	VARREF fcaser();
+	VARREF normalizer();
+	VARREF inverter();
+
 	VARREF quoter();
 	VARREF squoter();
 	VARREF unquoter();
+
+	VARREF lowerer();
+	VARREF raiser();
+	VARREF cropper();
 
 	VARREF trimmer(SV trimchars DEFAULT_SPACE);
 	VARREF trimmerf(SV trimchars DEFAULT_SPACE);
 	VARREF trimmerb(SV trimchars DEFAULT_SPACE);
 	VARREF trimmer(SV trimchars, SV options);
-	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
+
 	VARREF firster(const size_t length);
 	VARREF laster(const size_t length);
 	VARREF cutter(const int length);
-	VARREF paster(const int start1, const int length, SV insertstr);
-	//VARREF paster(const int start1, SV insertstr);
-	//VARREF pasterall(const int start1, SV insertstr);
-	//VARREF paster(SV insertstr);
+	VARREF paster(const int pos1, const int length, SV insertstr);
 	VARREF popper();
 
+	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
 	VARREF substrer(const int pos1, const int length);
 	VARREF substrer(const int pos1);
 
-	VARREF lowerer();
-	VARREF raiser();
-	VARREF cropper();
+	VARREF converter(SV fromchars, SV tochars);
+	VARREF textconverter(SV fromchars, SV tochars);
+	VARREF replacer(SV fromstr, SV tostr);
+	VARREF regex_replacer(SV regex, SV replacement, SV options DEFAULT_EMPTY);
+
 	VARREF uniquer();
 	VARREF sorter(SV sepchar = _FM);
 	VARREF reverser(SV sepchar = _FM);

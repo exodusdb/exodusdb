@@ -394,8 +394,10 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		//var filename=functionname_and_args.field("_",2);
 		//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
 		var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
-		var fieldname = filename.convert(LOWERCASE, "").trim("_");
-		filename = filename.convert(UPPERCASE, "").trim("_");
+		//var fieldname = filename.convert(LOWERCASE, "").trim("_");
+		var fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
+		//filename = filename.convert(UPPERCASE, "").trim("_");
+		filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "").trimmer("_");
 		if (filename.listindexes(filename, fieldname)) {
 			logputl("Deleting index " ^ filename ^ " " ^ fieldname);
 			filename.deleteindex(fieldname);
@@ -473,9 +475,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	if (sourcecode.starts("CALL XREF({")) {
 
 		//remove any existing pgsql
-		var pos = index(sourcecode,
-						"/"
-						"*pgsql");
+		var pos = index(sourcecode, "/" "*pgsql");
 		if (pos) {
 			sourcecode = sourcecode.first(pos - 1).trimb(VM);
 		}
@@ -511,18 +511,14 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		sourcecode(1, -1) = "*" "/";
 		dictrec(8) = sourcecode;
 
-		//write the sql to the dictionary record so the availablily of pgsql is visible to var::selectx
+		//write the sql to the dictionary record so the availabilily of pgsql is visible to var::selectx
 		dictrec.write(dictfile, dictid);
 	}
 
 	//remove anything before sql code
-	var pos = index(sourcecode,
-					"/"
-					"*pgsql");
+	var pos = index(sourcecode, "/" "*pgsql");
 	if (!pos) {
-		if (index(sourcecode,
-				  "/"
-				  "*psql"))
+		if (index(sourcecode, "/" "*psql"))
 			abort(quote(dictfilename) ^ " " ^ quote(dictid) ^ " 'psql' must be 'pgsql'");
 		if (reqdictid)
 			abort(quote(dictfilename) ^ " " ^ quote(dictid) ^ " does not have any pgsql section");
@@ -559,7 +555,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	var lastpos = sql.indexr("*" "/");
 	if (lastpos)
 		//sql.pasterall(lastpos - 1, "");
-		sql.cutter(lastpos - 2);
+		sql.firster(lastpos - 2);
 
 	var xlatetemplate;
 	if (ismv)

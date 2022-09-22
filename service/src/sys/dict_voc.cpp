@@ -97,9 +97,9 @@ libraryinit(caseratio)
 //--------------------
 function main() {
 	var xx = RECORD;
-	xx.converter(LOWERCASE, "");
+	xx.converter("abcdefghijklmnopqrstuvwxyz", "");
 	var yy = RECORD;
-	yy.converter(UPPERCASE, "");
+	yy.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
 	var uu = RECORD.len() - yy.len();
 	var ll = RECORD.len() - xx.len();
 	if (uu gt ll) {

@@ -20,16 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef EXODUSMACROS_H
-#define EXODUSMACROS_H 1
+#ifndef EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_
+#define EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_
 
-// this file provides a few macros to make exodus application programming
+// This file provides a few macros to make exodus application programming
 // look simpler. sadly, in c++, macros cannot be declared within namespaces
 // and pollute the global namespace. However it is considered so useful to
 // hide c++ syntax from the application programmer that we put them in this
 // header file.
-// you can program without exodus macros cause conflict then you can
-// include m.h directly
+// You can program without exodus macros by including var.h directly
 
 #include <exodus/var.h>
 #include <exodus/exofunctor.h>
@@ -47,19 +46,16 @@ THE SOFTWARE.
 // #define eq ==
 //(regrettably eq is defined in global namespace in some libraries)
 
-// allow pseudo pick syntax
-#define sentence() SENTENCE
-
 // for dll/so determine how functions are to be exported without name mangling
 #ifndef EXODUS_LINK_MAPORDEF
-#define EXODUS_LINK_MAPORDEF 0
+#	define EXODUS_LINK_MAPORDEF 0
 #endif
 
 #if EXODUS_LINK_MAPORDEF == 0
-#define EXODUS_EXTERN_C extern "C"
-// disable the following warning because seems it can be ignored at least in MSVC 2005 32bit
-// warning C4190: 'xyz' has C-linkage specified, but returns UDT 'exodus::var' which is incompatible
-// with C
+	#define EXODUS_EXTERN_C extern "C"
+	// disable the following warning because seems it can be ignored at least in MSVC 2005 32bit
+	// warning C4190: 'xyz' has C-linkage specified, but returns UDT 'exodus::var' which is incompatible
+	// with C
 #endif
 
 // work out if any functions are being exported or imported
@@ -67,31 +63,31 @@ THE SOFTWARE.
 // also perhaps need to avoid "gnu export all" performance issue
 // http://gcc.gnu.org/wiki/Visibility
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-#if defined _DLL || defined _SO
-#ifdef __GNUC__
-#define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((dllexport))
-#else
-#define EXODUSMACRO_IMPORTEXPORT \
+#	if defined _DLL || defined _SO
+#		ifdef __GNUC__
+#			define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((dllexport))
+#		else
+#			define EXODUSMACRO_IMPORTEXPORT \
 	EXODUS_EXTERN_C __declspec(  \
 		dllexport)	// Note: actually gcc seems to also support this syntax.
-#endif
-#else
-#ifdef __GNUC__
-#define EXODUSMACRO_IMPORTEXPORT __attribute__((dllimport))
-#else
-#define EXODUSMACRO_IMPORTEXPORT \
+#		endif
+#	else
+#		ifdef __GNUC__
+#			define EXODUSMACRO_IMPORTEXPORT __attribute__((dllimport))
+#		else
+#			define EXODUSMACRO_IMPORTEXPORT \
 	__declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
-#endif
-#endif
+#		endif
+#	endif
 #else
-#if __GNUC__ >= 4
+#	if __GNUC__ >= 4
 // use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
-#define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((visibility("default")))
-#define DLL_LOCAL __attribute__((visibility("hidden")))
-#else
-#define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C
-#define DLL_LOCAL
-#endif
+#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((visibility("default")))
+#		define DLL_LOCAL __attribute__((visibility("hidden")))
+#	else
+#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C
+#		define DLL_LOCAL
+#	endif
 #endif
 
 // allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
@@ -103,6 +99,9 @@ THE SOFTWARE.
 // gosub xyz() ... is just xyz() (local function)
 #define call
 #define gosub
+
+// allow pseudo pick syntax
+#define sentence() SENTENCE
 
 // class init
 // allow multiple named "exodus classes" useful for dictionary item programs where each dict item
@@ -130,12 +129,12 @@ THE SOFTWARE.
 // Can be declared in exodus namespace which is useful since "in" and "out" could easily
 // occur in other libraries.
 namespace exodus {
-using in = const var&; // CVR;
-using io = var&;       // VARREF;
-using out = var&;      // VARREF;
-}  // namespace exodus
+	using in = const var&; // CVR;
+	using io = var&;       // VARREF;
+	using out = var&;      // VARREF;
+}
 
-// forcibly redefine "eq" even if already previously defined in some other library like iostream
+// Forcibly redefine "eq" even if already previously defined in some other library like iostream
 // to generate a compilation error so that the issue can be corrected (see heading) and the "eq"
 // keyword remain available
 #define eq ==
@@ -147,7 +146,7 @@ using out = var&;      // VARREF;
 #define le <=
 #define ge >=
 
-//perhaps a little crazy but included last so should not interfer with other heads
+//Perhaps a little crazy but included last so should not interfer with other heads
 //allow syntax like "read(rec from file)" and "convert(a to b)"
 //sadly "in" cannot be used since it is already used for "cnst var&"
 #define on ,
@@ -155,6 +154,11 @@ using out = var&;      // VARREF;
 #define with ,
 #define to ,
 
+// The following short cuts are provided because they are used continually.
+// but the common environment mv has to be shared by shared libraries.
+// They could all be referenced individually but that would slow creation
+// of exodus callable "programs".
+// When debugging you will have to remember to inspect mv.ID instead of ID.
 #define ID mv.ID
 #define RECORD mv.RECORD
 #define DICT mv.DICT
@@ -189,13 +193,10 @@ using out = var&;      // VARREF;
 #define SECURITY mv.SECURITY
 #define SYSTEM mv.SYSTEM
 #define SESSION mv.SESSION
-#define ROLLOUTFILE mv.ROLLOUTFILE
 #define THREADNO mv.THREADNO
 
-#define INTERNALCHARS mv.INTERNALCHARS
-#define EXTERNALCHARS mv.EXTERNALCHARS
-#define LOWERCASE mv.LOWERCASE
-#define UPPERCASE mv.UPPERCASE
+//#define LOWERCASE mv.LOWERCASE
+//#define UPPERCASE mv.UPPERCASE
 
 #define STATION mv.STATION
 #define DATEFMT mv.DATEFMT
@@ -208,6 +209,8 @@ using out = var&;      // VARREF;
 #define COL1 mv.COL1
 #define COL2 mv.COL2
 #define PRIORITYINT mv.PRIORITYINT
+
+// To be replace by try/catch
 #define FILEERRORMODE mv.FILEERRORMODE
 #define FILEERROR mv.FILEERROR
 
@@ -227,14 +230,6 @@ using out = var&;      // VARREF;
 #define LPTRHIGH mv.LPTRHIGH
 #define LPTRWIDE mv.LPTRWIDE
 
-// obsolete
-#define ENVIRONKEYS mv.ENVIRONKEYS
-#define ENVIRONSET mv.ENVIRONSET
-#define DEFAULTSTOPS mv.DEFAULTSTOPS
-#define MOVEKEYS mv.MOVEKEYS
-
-#define INDEXTIME mv.INDEXTIME
-
 #define TERMINAL mv.TERMINAL
 #define LEVEL mv.LEVEL
 #define VOLUMES mv.VOLUMES
@@ -244,4 +239,4 @@ using out = var&;      // VARREF;
 
 #define TIMESTAMP mv.TIMESTAMP
 
-#endif	// EXODUSMACROS_H
+#endif	// EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_

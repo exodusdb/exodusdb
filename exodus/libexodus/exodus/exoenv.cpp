@@ -67,7 +67,6 @@ bool ExoEnv::init(const int threadno) {
 	// std::wcout<<"ExoEnv::init("<<threadno<<")"<<std::endl;
 
 	// per process
-	this->ROLLOUTFILE = "~" ^ var(threadno) ^ ".$$$";
 	this->THREADNO = threadno;
 
 	// pretty obsolete nowadays

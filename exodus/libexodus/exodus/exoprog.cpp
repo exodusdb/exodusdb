@@ -980,11 +980,11 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 							numx = var("1234567890").contains(string2[ii + 1]);
 					} else {
 						if (cap || numx) {
-							tt.converter(LOWERCASE, UPPERCASE);
+							tt.ucaser();
 							string2.paster(ii, 1, tt);
 							cap = 0;
 						} else {
-							tt.converter(UPPERCASE, LOWERCASE);
+							tt.lcaser();
 							string2.paster(ii, 1, tt);
 						}
 					}
@@ -1005,10 +1005,10 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		}
 	} else if (mode0 == "UPPERCASE") {
 		string2 = str0;
-		string2.converter(LOWERCASE, UPPERCASE);
+		string2.ucaser();
 	} else if (mode0 == "LOWERCASE") {
 		string2 = str0;
-		string2.converter(UPPERCASE, LOWERCASE);
+		string2.lcaser();
 	} else if (mode0.starts("PARSE")) {
 
 		var uppercase = mode0.contains("UPPERCASE");
@@ -1036,7 +1036,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 							string2.paster(ii, 1, tt);
 						} else {
 							if (uppercase) {
-								tt.converter(LOWERCASE, UPPERCASE);
+								tt.ucaser();
 								string2.paster(ii, 1, tt);
 							}
 						}

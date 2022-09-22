@@ -171,7 +171,7 @@ function main() {
 					newcpptext ^= "function main() {\n";
 
 					// Add closing brace before pgsql , if present
-					var t = dictsrc.index("\n/*pgsql");
+					var t = dictsrc.index("\n/" "*pgsql");
 					if (t) {
 						dictsrc.paster(t, 1, "\n}\n");
 						dictsrc.replacer("\n\n}", "\n}");

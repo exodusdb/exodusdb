@@ -75,7 +75,7 @@ function main(in mode) {
 		//prevent new users with punctuation characters etc
 		if (win.orec eq "" and win.wlocked) {
 			var temp = ID;
-			temp.converter(UPPERCASE ^ "0123456789", "");
+			temp.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789", "");
 			if (temp) {
 				msg = ID.quote() ^ " user doesnt exist and new usercodes";
 				msg(-1) = "must be alphanumeric characters only";

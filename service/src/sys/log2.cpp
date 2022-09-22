@@ -20,21 +20,7 @@ function main(in msg0, io time0) {
 
 	#define sep_ " "
 
-	if (VOLUMES) {
-		//logfilename=field(FIELD2(@rollout.file,'\',-1),'.',1):'.LOG'
-		logfilename = ROLLOUTFILE;
-		logfilename.paster(-3, 3, "log");
-		logfilelength = logfilename.osfile().f(1);
-		if (not logfilelength) {
-			call oswrite("", logfilename);
-		}
-		temposfilename83 = logfilename;
-		if (not(logfile.osopen(logfilename))) {
-			return 0;
-		}
-	} else {
-		logfile = "";
-	}
+	logfile = "";
 
 	if (msg0 eq "GETLASTLOG") {
 

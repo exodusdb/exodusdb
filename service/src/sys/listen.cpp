@@ -835,7 +835,8 @@ function loop_exit() {
 
 	//f10 or "x" on linux
 	if (charx eq INTCONST.f(7)) {
-		execute("RUNMENU " ^ ENVIRONSET.f(37));
+		//execute("RUNMENU " ^ ENVIRONSET.f(37));
+		execute("RUNMENU");
 		return true;
 	}
 

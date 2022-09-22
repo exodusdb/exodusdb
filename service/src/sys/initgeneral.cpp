@@ -444,29 +444,29 @@ updateversion:
 		perform("DELETEFILE MERGES (S)");
 	}
 
-	call log2("*get user video table if any", logtime);
-	var temp = ENVIRONKEYS.f(2);
-	temp.converter(".", "");
-	if (colors.osread(temp ^ ".vid")) {
-		var color2;
-		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
-			color2 = "";
-		}
-		if (colors ne color2) {
-			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
-			//call colortoescold);
-		}
-	}
-
-	call log2("*setup escape sequence for standard color and background", logtime);
-	temp = HW.f(3)[4] ^ HW.f(8)[4];
-	if (temp eq "00") {
-		temp = "70";
-	}
-	tt = "\x1B";
-	tt ^= "C";
-	tt ^= temp;
-	AW(30) = tt;
+//	call log2("*get user video table if any", logtime);
+//	var temp = ENVIRONKEYS.f(2);
+//	temp.converter(".", "");
+//	if (colors.osread(temp ^ ".vid")) {
+//		var color2;
+//		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
+//			color2 = "";
+//		}
+//		if (colors ne color2) {
+//			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
+//			//call colortoescold);
+//		}
+//	}
+//
+//	call log2("*setup escape sequence for standard color and background", logtime);
+//	temp = HW.f(3)[4] ^ HW.f(8)[4];
+//	if (temp eq "00") {
+//		temp = "70";
+//	}
+//	tt = "\x1B";
+//	tt ^= "C";
+//	tt ^= temp;
+//	AW(30) = tt;
 
 	call log2("*convert reports file", logtime);
 	if (SYSTEM.f(17) ne "DEVDTEST") {
@@ -960,6 +960,7 @@ nextreport:
 
 	call log2("*get security - also in LISTEN", logtime);
 	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+		var temp;
 		if (temp.open("DICT.DEFINITIONS")) {
 			if (SECURITY.read(temp, "SECURITY")) {
 				SECURITY.write(DEFINITIONS, "SECURITY");
@@ -1075,7 +1076,7 @@ nextreport:
 	call log2("*get user name", logtime);
 	//prevent F5
 	if (not resetting) {
-		ENVIRONSET(38) = "";
+		//ENVIRONSET(38) = "";
 		call netlogin("INIT");
 	}
 
@@ -1096,18 +1097,18 @@ nextreport:
 	//	INDEXTIME = 0;
 	//}
 
-	call log2("*suppress words not to be indexed", logtime);
-	//see ED SYSTEM * ... ENVIRONMENT words like LTD
-	DEFAULTSTOPS = "";
+//	call log2("*suppress words not to be indexed", logtime);
+//	//see ED SYSTEM * ... ENVIRONMENT words like LTD
+//	DEFAULTSTOPS = "";
 
-	//this may not be necessary now that menus are determined by authorisation
-	call log2("*get maintenance user menu if any", logtime);
-	if (xx.open("SCHEDULES", "")) {
-		temp = "ADAGENCY";
-	} else {
-		temp = "EXODUS2";
-	}
-	ENVIRONSET(37) = temp;
+//	//this may not be necessary now that menus are determined by authorisation
+//	call log2("*get maintenance user menu if any", logtime);
+//	if (xx.open("SCHEDULES", "")) {
+//		temp = "ADAGENCY";
+//	} else {
+//		temp = "EXODUS2";
+//	}
+//	//ENVIRONSET(37) = temp;
 
 	call log2("*force the F1 key to be general help (Ctrl+F1) instead of context help", logtime);
 	PRIORITYINT(1) = chr(0) ^ ";";
@@ -1117,8 +1118,8 @@ nextreport:
 	INTCONST(18) = chr(0) ^ var("1F").iconv("HEX2");
 	INTCONST(26) = chr(0) ^ var("19").iconv("HEX2");
 	PRIORITYINT(7) = var("1F").iconv("HEX2");
-	MOVEKEYS(27) = var("14").iconv("HEX2");
-	MOVEKEYS(25) = var("05").iconv("HEX2");
+//	MOVEKEYS(27) = var("14").iconv("HEX2");
+//	MOVEKEYS(25) = var("05").iconv("HEX2");
 		//break key on
 	//end else
 	// @int.const<4>=''
@@ -1132,7 +1133,7 @@ nextreport:
 
 	//call log2('*allow/disallow F5',logtime)
 	//if security('USE TCL COMMAND KEY F5',MSG,'') then
-	ENVIRONSET(38) = 1;
+	//ENVIRONSET(38) = 1;
 	// *@priority.int<2>=char(0):iconv('3F','HEX')
 	//end else
 	// @environ.set<38>=''
@@ -1300,6 +1301,7 @@ nextreport:
 
 	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
 	if (not exodusid) {
+		var temp;
 		if (temp.read(DEFINITIONS, "AUTOEXEC")) {
 			perform("TASK AUTOEXEC");
 		}
@@ -1724,8 +1726,8 @@ nextdoc:
 		if (interactive and USERNAME ne "EXODUS.NET") {
 			call log2("*do a few escapes then F10 HOME to initialise the menu system", logtime);
 			//do home enter home to open the first menu at the first option
-			DATA ^= chr(27) ^ chr(27) ^ chr(27) ^ INTCONST.f(7);
-			DATA ^= MOVEKEYS.f(15) ^ chr(13) ^ MOVEKEYS.f(15);
+			//DATA ^= chr(27) ^ chr(27) ^ chr(27) ^ INTCONST.f(7);
+			//DATA ^= MOVEKEYS.f(15) ^ chr(13) ^ MOVEKEYS.f(15);
 
 			call log2("*if not interactive then start the required process", logtime);
 			//by pressing F5

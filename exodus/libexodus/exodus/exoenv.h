@@ -97,9 +97,6 @@ class PUBLIC ExoEnv {
 	var EXECPATH = "";
 	var CHAIN = "";
 
-	// per process - set in init()
-	var ROLLOUTFILE = "";
-
 	// per db access
 	var DICT = "";
 	var ID = "";
@@ -175,6 +172,8 @@ class PUBLIC ExoEnv {
 
 	var RECCOUNT = "";
 
+	var TERMINAL = "";
+
 	// pretty obsolete nowadays
 	// environment variables may not be available until exported
 	// do set -p to find out exported variables instead of all
@@ -182,16 +181,6 @@ class PUBLIC ExoEnv {
 	var CRTHIGH = 25;
 	var LPTRWIDE = 132;
 	var LPTRHIGH = 66;
-
-	// obsolete
-	var ENVIRONKEYS = "";
-	var ENVIRONSET = "";
-	var DEFAULTSTOPS = "";
-	var MOVEKEYS = "";
-
-	// replaced
-	//var INDEXTIME = "";
-	var TERMINAL = "";
 
 	// other
 	var LEVEL = 1;

@@ -605,8 +605,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//check ASCII upper/lower casing
 	//	setxlocale(english_usuk);
 	assert(setxlocale(english_usuk));
-	assert(ucase(LOWERCASE) eq UPPERCASE);
-	assert(lcase(UPPERCASE) eq LOWERCASE);
+	assert(ucase("abcdefghijklmnopqrstuvwxyz") eq "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	assert(lcase("ABCDEFGHIJKLMNOPQRSTUVWXYZ") eq "abcdefghijklmnopqrstuvwxyz");
 
 	//in German/Standard Locale
 	//check Eszet (like a Beta) uppercases to SS

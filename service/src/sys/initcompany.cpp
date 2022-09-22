@@ -107,24 +107,24 @@ function main(in nextcompanycode) {
 
 	if (sys.glang eq "" or sys.company.f(14) ne oldcompany.f(14)) {
 		call getlang("GENERAL", "", "", sys.alanguage, sys.glang);
-		if (sys.glang.f(9)) {
-			UPPERCASE = sys.glang.f(9);
-		}
-		if (sys.glang.f(10)) {
-			LOWERCASE = sys.glang.f(10);
-		}
-		UPPERCASE.replacer("%FF", RM);
-		LOWERCASE.replacer("%FF", RM);
-		UPPERCASE.replacer("%FE", FM);
-		LOWERCASE.replacer("%FE", FM);
-		UPPERCASE.replacer("%FD", VM);
-		LOWERCASE.replacer("%FD", VM);
-		UPPERCASE.replacer("%25", "%");
-		LOWERCASE.replacer("%25", "%");
-		if (UPPERCASE.len() ne LOWERCASE.len()) {
-			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
-			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		}
+//		if (sys.glang.f(9)) {
+//			UPPERCASE = sys.glang.f(9);
+//		}
+//		if (sys.glang.f(10)) {
+//			LOWERCASE = sys.glang.f(10);
+//		}
+//		UPPERCASE.replacer("%FF", RM);
+//		LOWERCASE.replacer("%FF", RM);
+//		UPPERCASE.replacer("%FE", FM);
+//		LOWERCASE.replacer("%FE", FM);
+//		UPPERCASE.replacer("%FD", VM);
+//		LOWERCASE.replacer("%FD", VM);
+//		UPPERCASE.replacer("%25", "%");
+//		LOWERCASE.replacer("%25", "%");
+//		if (UPPERCASE.len() ne LOWERCASE.len()) {
+//			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+//			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//		}
 
 		//sort.order
 		//read sortorder from alanguage,'SORTORDER*':company<14> else
