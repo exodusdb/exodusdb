@@ -76,7 +76,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		//if params2 else params2='<TABLE><THEAD>'
 		params2.replacer("<TABLE", "<table");
 		//swap '<table' with '<table id=':tableid in params2
-		datax.paster(1, 0, params2 ^ "<TBODY>");
+		datax.prefixer(params2 ^ "<TBODY>");
 
 		//postfix
 		datax ^= "</TBODY></TABLE>";
@@ -143,7 +143,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				} //ln;
 
 				data2.replacer(FM, trx ^ tr);
-				data2.paster(1, 0, "<table class=\"hashtable\">" ^ tr);
+				data2.prefixer("<table class=\"hashtable\">" ^ tr);
 				data2 ^= trx ^ "</table>";
 
 				datax(1, vn) = data2;

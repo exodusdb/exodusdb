@@ -812,7 +812,7 @@ subroutine exec2() {
 
 	//no records are not system errors
 	if (USER3.starts("No record") or response_.starts("No item")) {
-		USER3.paster(1, 0, "OK ");
+		USER3.prefixer("OK ");
 		msg_ = "";
 	}
 

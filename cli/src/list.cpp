@@ -795,8 +795,8 @@ nextkey:
 
 	} else if (word eq "BREAK-ON") {
 		tt = coln + 1;
-		breakcolns.paster(1, 0, tt ^ FM);
-		breakopts.paster(1, 0, FM);
+		breakcolns.prefixer(tt ^ FM);
+		breakopts.prefixer(FM);
 		nbreaks += 1;
 		breakonflag = 1;
 
@@ -1521,7 +1521,7 @@ x1exit:
 		head ^= FM;
 	}
 
-	head.paster(1, 0, FM);
+	head.prefixer(FM);
 
 	orighead = head;
 

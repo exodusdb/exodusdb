@@ -792,7 +792,7 @@ function main(in mode) {
 		} // deletion of old
 
 		if (emailtx) {
-			emailtx.paster(1, 0, "User File Amendments:" ^ FM);
+			emailtx.prefixer("User File Amendments:" ^ FM);
 		}
 
 		call securitysubs2("GETCHANGEDTASKS");
@@ -992,7 +992,7 @@ function main(in mode) {
 
 		cmd ^= " ID-SUPP DBL-SPC";
 		if (interactive) {
-			cmd.paster(1, 0, "GET ");
+			cmd.prefixer("GET ");
 		}
 		execute(cmd);
 

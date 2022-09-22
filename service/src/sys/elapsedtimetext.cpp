@@ -73,7 +73,7 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 				//nsecs=(nsecs 'MD40P')+0
 				nsecs = (nsecs.oconv("MD30P")) + 0;
 				if (nsecs.starts(".")) {
-					nsecs.paster(1, 0, "0");
+					nsecs.prefixer("0");
 				}
 			}
 			if (nsecs) {

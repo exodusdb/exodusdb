@@ -52,7 +52,7 @@ function main(in type, in in0, in mode, out out0) {
 		out0 = (in2.field(".", 1) + 0) ^ ":";
 		var temp = in2.field(".", 2);
 		if (temp) {
-			temp.paster(1, 0, ".");
+			temp.prefixer(".");
 		}
 		temp = (temp * 60).oconv("MD00P");
 		out0 ^= temp.oconv("R(0)#2");

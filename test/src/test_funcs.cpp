@@ -317,22 +317,33 @@ programinit()
 //		assert(pasteall(x, -3, "XYZ").outputl() eq "XYZ");
 //		assert(pasteall(x, -4, "XYZ").outputl() eq "XYZ");
 //	}
-//
-//	{
-//		// test paste at beginning
-//
-//		var x = "";
-//		assert(paste(x,"xyz") eq "xyz");
-//
-//		x.paster("xyz");
-//		assert(x eq "xyz");
-//
-//		assert(paste(x,"abc") eq "abcxyz");
-//
-//		x.paster("abc");
-//		assert(x eq "abcxyz");
-//	}
-//
+
+	{
+		// test adding prefix
+
+		var x = "";
+		assert(prefix(x,"xyz") eq "xyz");
+
+		x.prefixer("xyz");
+		assert(x eq "xyz");
+
+		assert(prefix(x,"abc") eq "abcxyz");
+
+		x.prefixer("abc");
+		assert(x eq "abcxyz");
+
+		var y = "abc";
+		assert(y.prefix("") eq y);
+		assert(y.prefixer("") eq "abc");
+		assert(y eq "abc");
+
+		var z = "";
+		assert(z.prefix("") eq z);
+		assert(z.prefixer("") eq "");
+		assert(z eq "");
+
+	}
+
 //	{ try to do without this function since scarely used
 //		var x;
 //		x = "abc";

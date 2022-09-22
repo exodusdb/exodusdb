@@ -1200,31 +1200,34 @@ VARREF var::paster(const int pos1, const int length, SV insertstr) {
 //}
 //
 // 3. paste insert at
-//
-//// 4. paste insert at start
-//
-//// copy
-//var var::paste(SV insertstr) const& {
-//
-//	THISIS("var var::paste(SV insertstr)")
-//	assertString(function_sig);
-//
-//	var rvo(insertstr);
-//	rvo.var_str.append(this->var_str);
-//
-//	return rvo;
-//}
-//
-//// mutate
-//VARREF var::paster(SV insertstr) {
-//
-//	THISIS("VARREF var::paster(SV insertstr)")
-//	assertStringMutator(function_sig);
-//
-//	var_str.insert(0, insertstr);
-//
-//	return *this;
-//}
+
+
+/////////
+// PREFIX - insert at beginning
+/////////
+
+// copy
+var var::prefix(SV insertstr) const& {
+
+	THISIS("var var::prefix(SV insertstr)")
+	assertString(function_sig);
+
+	var rvo(insertstr);
+	rvo.var_str.append(this->var_str);
+
+	return rvo;
+}
+
+// mutate
+VARREF var::prefixer(SV insertstr) {
+
+	THISIS("VARREF var::prefixer(SV insertstr)")
+	assertStringMutator(function_sig);
+
+	var_str.insert(0, insertstr);
+
+	return *this;
+}
 
 
 //////

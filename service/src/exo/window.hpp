@@ -20,7 +20,7 @@ function security2(in mode, in op0)
 //		op2 = (op.b(-2, "B\"")).quote();
 		op2=op.field2(DQ, -2);
 		op.cutter(-op2.len());
-		op2.paster(1, 0, " ");
+		op2.prefixer(" ");
 	}
 	if (mode.contains("INIT")) {
 		var msg;

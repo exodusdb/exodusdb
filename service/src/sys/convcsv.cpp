@@ -609,7 +609,7 @@ nextvn:
 					if (var(1) or excel) {
 						if (var(".-+0123456789").contains(cell[1])) {
 							if (not(cell.isnum())) {
-								cell.paster(1, 0, " ");
+								cell.prefixer(" ");
 							}
 						}
 					}

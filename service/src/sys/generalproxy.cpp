@@ -553,7 +553,7 @@ badsetcodepage:
 		//transfer @user4 to data
 		//response='OK'
 		msg_.move(USER3);
-		response_.paster(1, 0, "OK ");
+		response_.prefixer("OK ");
 
 	} else if (mode eq "UTIL") {
 		perform("UTIL");

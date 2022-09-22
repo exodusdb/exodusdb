@@ -1599,25 +1599,26 @@ class PUBLIC var final {
 	ND var squote() const&;
 	ND var unquote() const&;
 
-	ND var trim(SV trimchars  DEFAULT_SPACE) const&; // byte arg
-	ND var trimf(SV trimchars DEFAULT_SPACE) const&; // byte arg
-	ND var trimb(SV trimchars DEFAULT_SPACE) const&; // byte arg
-	ND var trim(SV trimchars, SV options) const&;    // byte arg
+	ND var trim(SV trimchars  DEFAULT_SPACE) const&; // byte trimchars
+	ND var trimf(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
+	ND var trimb(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
+	ND var trim(SV trimchars, SV options) const&;    // byte trimchars
 
-	ND var first(const size_t length) const&; // byte arg
-	ND var last(const size_t length) const&;  // byte arg
-	ND var cut(const int length) const&;      // byte arg
-	ND var paste(const int pos1, const int length, SV insertstr) const&; // byte args
-	ND var pop() const&;                      // byte data
+	ND var first(const size_t length) const&; // byte length
+	ND var last(const size_t length) const&;  // byte length
+	ND var cut(const int length) const&;      // byte length
+	ND var paste(const int pos1, const int length, SV insertstr) const&; // byte pos1, length
+	ND var prefix(SV insertstr) const&;
+	ND var pop() const&;                      // byte removed
 
 	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
-	ND var substr(const int pos1, const int length) const&; // byte args
-	ND var b(const int pos1, const int length) const& {return substr(pos1, length);}; // byte args
-	ND var substr(const int pos1) const&;                   // byte arg
-	ND var b(const int pos1) const& {return substr(pos1);}  // byte arg
+	ND var substr(const int pos1, const int length) const&; // byte pos1, length
+	ND var b(const int pos1, const int length) const& {return substr(pos1, length);}; // byte pos1, length
+	ND var substr(const int pos1) const&;                   // byte pos1
+	ND var b(const int pos1) const& {return substr(pos1);}  // byte pos1
 
-	ND var convert(SV fromchars, SV tochars) const&;     // byte
-	ND var textconvert(SV fromchars, SV tochars) const&; // utf8
+	ND var convert(SV fromchars, SV tochars) const&;        // byte fromchars, tochars
+	ND var textconvert(SV fromchars, SV tochars) const&;
 
 	ND var replace(SV fromstr, SV tostr) const&;
 	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
@@ -1655,6 +1656,7 @@ class PUBLIC var final {
 	ND VARREF last(const size_t length) && {return laster(length);}
 	ND VARREF cut(const int length) && {return cutter(length);}
 	ND VARREF paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
+	ND VARREF prefix(SV insertstr) && {return prefixer(insertstr);}
 	ND VARREF pop() && {return popper();}
 
 	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
@@ -1699,6 +1701,7 @@ class PUBLIC var final {
 	VARREF laster(const size_t length);
 	VARREF cutter(const int length);
 	VARREF paster(const int pos1, const int length, SV insertstr);
+	VARREF prefixer(SV insertstr);
 	VARREF popper();
 
 	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);

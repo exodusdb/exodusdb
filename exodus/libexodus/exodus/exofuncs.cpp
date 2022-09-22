@@ -279,16 +279,16 @@ PUBLIC VARREF paster(VARREF iostring, const int pos1, const int length, CVR str)
 //PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str) {
 //	return iostring.paster(pos1, str);
 //}
-//
-//// 4. paste insert at beginning
-//
-//// copy
-//PUBLIC var paste(CVR instring, CVR str) {
-//	return instring.paste(str);
+
+// PREFIX
+
+// copy
+//PUBLIC var prefix(CVR instring, CVR str) {
+//	return instring.prefix(str);
 //}
 ////mutate
-//PUBLIC VARREF paster(VARREF iostring, CVR str) {
-//	return iostring.paster(str);
+//PUBLIC VARREF prefixer(VARREF iostring, CVR str) {
+//	return iostring.prefixer(str);
 //}
 
 
@@ -923,7 +923,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 		if (exodus__argc)
 			mv.EXECPATH = var(exodus__argv[0]);
 		if (not mv.EXECPATH.contains(OSSLASH))
-			mv.EXECPATH.paster(1, 0, oscwd() ^ OSSLASH);
+			mv.EXECPATH.prefixer(oscwd() ^ OSSLASH);
 	}
 	//"see getting path to current executable" above
 	// or use "which EXECPATH somehow like in mvdebug.cpp

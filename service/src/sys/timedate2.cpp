@@ -44,7 +44,7 @@ function main(in localdate0, in localtime0) {
 	if (DATEFMT eq "") {
 		DATEFMT = "D/E";
 	}
-	temp.paster(1, 0, oconv(localdate, "[DATE,*4]") ^ " ");
+	temp.prefixer(oconv(localdate, "[DATE,*4]") ^ " ");
 
 	return temp;
 }

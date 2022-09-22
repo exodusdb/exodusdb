@@ -137,15 +137,15 @@ subroutine printtx() {
 				if (newpagetag.unassigned()) {
 					newpagetag = "<div style=\"page-break-before:always\">";
 				}
-				ptx_temp.paster(1, 0, newpagetag ^ "&nbsp;</div>");
+				ptx_temp.prefixer(newpagetag ^ "&nbsp;</div>");
 			}
 		}
 
 		//replace '<h2>' with '<h2~style="page-break-before:auto">' in head
 
-		tx.paster(1, 0, ptx_temp ^ FM);
+		tx.prefixer(ptx_temp ^ FM);
 		if (printptr and not(html)) {
-			tx.paster(1, 0, FM ^ var().chr(12));
+			tx.prefixer(FM ^ var().chr(12));
 		}
 	}
 
@@ -157,12 +157,12 @@ subroutine printtx() {
 
 			//commented so foot always follows bottom line (printtxmark)
 			//if foot then
-		tx.paster(1, 0, foot);
+		tx.prefixer(foot);
 			//end else
 		if (bottomline) {
 					//if html then t_:='<p style="text-align:center">'
 					//tx[1,0]=bottomline:fm:t_:'continues' rfmt
-			tx.paster(1, 0, bottomline);
+			tx.prefixer(bottomline);
 		}
 			// end
 		// end
@@ -200,7 +200,7 @@ subroutine printtx2() {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
 
-			tx.paster(1, 0, "<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
+			tx.prefixer("<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
 
 			call docmods("", tx);
 

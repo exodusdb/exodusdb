@@ -342,7 +342,7 @@ forcedemail:
 		if (subject.starts("System:")) {
 			subject = subject.cut(7).trimf();
 		}
-		subject.paster(1, 0, "EXODUS: ");
+		subject.prefixer("EXODUS: ");
 	}
 
 	params(-1) = "toaddress=" ^ (toaddress.quote());

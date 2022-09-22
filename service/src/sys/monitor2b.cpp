@@ -149,7 +149,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 			text = params;
 			gosub hash(salt, max, hashcode);
-			params.paster(1, 0, "hashcode=" ^ hashcode ^ "&");
+			params.prefixer("hashcode=" ^ hashcode ^ "&");
 
 		}
 
@@ -294,7 +294,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 			if (wgetrcfilename[2] eq ":") {
 				wgetrcfilename.paster(2, 1, "");
-				wgetrcfilename.paster(1, 0, "/cygdrive/");
+				wgetrcfilename.prefixer("/cygdrive/");
 			}
 			wgetrcfilename.converter(OSSLASH, "/");
 
@@ -410,7 +410,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 		log = trim(log, FM);
 		log = field2(log, FM, -1);
 		if (log) {
-			log.paster(1, 0, FM ^ FM);
+			log.prefixer(FM ^ FM);
 		}
 	} else {
 		log = "";

@@ -43,7 +43,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	}
 	var cmd = "uconv" ^ exe;
 	if (not(cmd.osfile())) {
-		cmd.paster(1, 0, SYSTEM.f(50));
+		cmd.prefixer(SYSTEM.f(50));
 	}
 	if (not(cmd.osfile())) {
 		msg = "UCONVFILE: Cannot find " ^ cmd;

@@ -2346,7 +2346,7 @@ var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptoda
 			} else {
 				nsecs = (nsecs.oconv("MD40P")) + 0;
 				if (nsecs.starts(".")) {
-					nsecs.paster(1, 0, "0");
+					nsecs.prefixer("0");
 				}
 			}
 			if (nsecs) {
@@ -2623,7 +2623,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 
 			if (output1.len()) {
 				if (var(".,").count(output1[1])) {
-					output1.paster(1, 0, "0");
+					output1.prefixer("0");
 				}
 			}
 

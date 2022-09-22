@@ -2760,12 +2760,12 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	if (word1.len() > 1) {
 		if (word1.starts("(") && word1[-1] != ")") {
 			//put remaining word back on the pending words
-			remainingwords.paster(1, 0, word1.cut(1) ^ " ");
+			remainingwords.prefixer(word1.cut(1) ^ " ");
 			//return single leading paren (
 			word1 = "(";
 		} else if (word1.ends(")")) {
 			//put single closing paren back on the pending words
-			remainingwords.paster(1, 0, ") ");
+			remainingwords.prefixer(") ");
 			//return word without trailing paren )
 			word1.popper();
 		}
@@ -3468,7 +3468,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				// push back and treat as missing value
 				// remaining[1,0]=ucword:' '
-				remaining.paster(1, 0, ucword ^ " ");
+				remaining.prefixer(ucword ^ " ");
 
 				// simulate no given value .. so a boolean filter like "WITH APPROVED"
 				word1 = "";

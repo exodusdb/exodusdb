@@ -389,7 +389,7 @@ postuploadfail:
 			dictfilename = filename;
 		}
 		if (dictfilename.first(4) ne "DICT") {
-			dictfilename.paster(1, 0, "DICT.");
+			dictfilename.prefixer("DICT.");
 		}
 		//if keydictid else keydictid='@ID'
 		if (not lengthx) {

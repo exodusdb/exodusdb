@@ -365,7 +365,7 @@ nextmln:;
 							//swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext
 							equates(-1) = "\t#define " ^ fieldname ^ "\tRECORD.f(" ^ fields.f(2, fieldn) ^ ")";
 						} //fieldn;
-						macrotext.paster(1, 0, equates ^ FM);
+						macrotext.prefixer(equates ^ FM);
 					}
 
 					macrotext.move(line);

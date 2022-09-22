@@ -23,7 +23,7 @@ function main() {
 	var distrib = RECORD.f(5);
 	distrib.converter(SM, ":");
 	if (distrib and not(distrib.contains("User"))) {
-		ANS.paster(1, 0, distrib.field(":", 1) ^ ": ");
+		ANS.prefixer(distrib.field(":", 1) ^ ": ");
 	}
 	return ANS;
 }

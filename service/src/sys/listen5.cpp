@@ -594,14 +594,14 @@ getvalues:
 			if (iodat_) {
 				call htmllib2("STRIPTAGS", USER1);
 				iodat_.replacer(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
-				USER1.paster(1, 0, "<record><" ^ fieldname ^ ">");
+				USER1.prefixer("<record><" ^ fieldname ^ ">");
 				iodat_ ^= "</" ^ fieldname ^ ">" "</record>";
 				if (USER1.contains(VM)) {
 					iodat_.replacer("</" ^ fieldname ^ ">", "</STOPPED>");
 					USER1.replacer(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
 			}
-			iodat_.paster(1, 0, "<records>");
+			iodat_.prefixer("<records>");
 			USER1 ^= "</records>";
 		} else {
 			//convert fm to vm in iodat
@@ -855,7 +855,7 @@ nextlock:
 		call sysmsg(response_, "EXODUS Backup");
 
 		if (USER3.ucase().contains("SUCCESS")) {
-			response_.paster(1, 0, "OK ");
+			response_.prefixer("OK ");
 		}
 
 		//note: if backup did not respond already then the requestexit will

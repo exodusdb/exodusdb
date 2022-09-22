@@ -113,7 +113,7 @@ function main() {
 	if (filenames) {
 		doall = false;
 		if (not filenames.starts("dict."))
-			filenames.paster(1, 0, "dict.");
+			filenames.prefixer("dict.");
 
 	} else if (doall) {
 		var dictdbname = "";

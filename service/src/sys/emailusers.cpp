@@ -120,7 +120,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 			if (USERNAME ne fromuser.f(1)) {
 				fromline ^= " (" ^ USERNAME ^ ")";
 			}
-			subject.paster(1, 0, fromline ^ " : ");
+			subject.prefixer(fromline ^ " : ");
 		}
 	}
 

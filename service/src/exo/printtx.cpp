@@ -202,15 +202,15 @@ function main(io tx, in mode="", in modevalue="") {
 				if (newpagetag.unassigned()) {
 					newpagetag = "<div style=\"page-break-before:always\">";
 				}
-				temp.paster(1, 0, newpagetag ^ "&nbsp;</div>");
+				temp.prefixer(newpagetag ^ "&nbsp;</div>");
 			}
 		}
 
 		//swap '<h2>' with '<h2~style="page-break-before:auto">' in head
 
-		tx.paster(1, 0, temp ^ FM);
+		tx.prefixer(temp ^ FM);
 		if (printptr and not html) {
-			tx.paster(1, 0, FM ^ chr(12));
+			tx.prefixer(FM ^ chr(12));
 		}
 	}
 
@@ -223,19 +223,19 @@ function main(io tx, in mode="", in modevalue="") {
 
 		//commented so foot always follows bottom line (printtxmark)
 		//if foot then
-		tx.paster(1, 0, foot);
+		tx.prefixer(foot);
 		//end else
 		if (bottomline) {
 			if (html) {
 				tt ^= "<p style=\"text-align:center\">";
 			}
 			//tx[1,0]=bottomline:fm:t:'continues ...' rfmt
-			tx.paster(1, 0, bottomline);
+			tx.prefixer(bottomline);
 		}
 		// end
 		// end
 		if (html and not bottomline.contains("</tbody></table>")) {
-			tx.paster(1, 0, "</tbody></table>");
+			tx.prefixer("</tbody></table>");
 		}
 		bodyln = ntxlns;
 	}
@@ -258,8 +258,8 @@ printtx2:
 			if (htmltitle.starts("<")) {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
-			tx.paster(1, 0, "<html><head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\" style=\"text-align:center\">\n");
-			tx.paster(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+			tx.prefixer("<html><head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\" style=\"text-align:center\">\n");
+			tx.prefixer("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 			css = "";
 		}
 	}

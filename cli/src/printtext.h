@@ -151,34 +151,34 @@ class printtext {
 				if (printptr not_eq 0) {
 					if (newpagetag.unassigned())
 						newpagetag = "<div style=\"page-break-before:always\">";
-					temp.paster(1, 0, newpagetag ^ "&nbsp;</div>");
+					temp.prefixer(newpagetag ^ "&nbsp;</div>");
 				}
 			}
 
 			//replace '<h2>' with '<h2~style="page-break-before:auto">' in head
 
 			//insert page heading
-			tx.paster(1, 0, temp ^ FM);
+			tx.prefixer(temp ^ FM);
 
 			//insert text style page break
 			if (printptr and not html)
-				tx.paster(1, 0, FM ^ var().chr(12));
+				tx.prefixer(FM ^ var().chr(12));
 		}
 
 		if (bodyln > nbodylns or newpage) {
 			var tt = html ? "<p>" : "";
 			if (bodyln < 999) {
 				if (foot) {
-					tx.paster(1, 0, foot);
+					tx.prefixer(foot);
 				} else {
 					if (html)
 						tt ^= "<p style=\"text-align:center\">";
 					//tx[1,0]=bottomline:fm:t:'continues ...' rfmt
-					tx.paster(1, 0, bottomline);
+					tx.prefixer(bottomline);
 				}
 			}
 			if (html and not bottomline.contains("</tbody></table>", 1))
-				tx.paster(1, 0, "</tbody></table>");
+				tx.prefixer("</tbody></table>");
 			bodyln = ntxlns;
 		}
 		printtx2(tx);
@@ -200,8 +200,8 @@ class printtext {
 				var htmltitle = (headx.f(1)).field("\'", 1, 1);
 				if (htmltitle[1] == "<")
 					htmltitle = (htmltitle.field(">", 2, 1)).field("<", 1, 1);
-				tx.paster(1, 0, "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head>\n<body style=\"background-color:#ffffff\">\n<div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
-				tx.paster(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+				tx.prefixer("\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head>\n<body style=\"background-color:#ffffff\">\n<div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
+				tx.prefixer("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 				css = "";
 			}
 			//cannot remove these since they may be nonibm codepage letters

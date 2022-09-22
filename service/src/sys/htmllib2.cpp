@@ -74,7 +74,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		if (not params2) {
 			tt ^= FM ^ "<tbody>";
 		}
-		dataio.paster(1, 0, tt ^ FM);
+		dataio.prefixer(tt ^ FM);
 
 		//postfix
 		dataio = dataio ^ FM ^ "</tbody>" ^ FM ^ "</table>";
@@ -138,7 +138,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				} //ln;
 
 				datax.replacer(FM, trx ^ tr);
-				datax.paster(1, 0, "<table class=\"hashtable\">" ^ tr);
+				datax.prefixer("<table class=\"hashtable\">" ^ tr);
 				datax ^= trx ^ "</table>";
 
 				dataio(1, vn) = datax;

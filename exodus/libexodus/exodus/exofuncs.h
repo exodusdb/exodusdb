@@ -248,11 +248,10 @@ PUBLIC ND var paste(CVR instring, const int pos1, const int length, CVR str);
 // 3. paste insert at pos1
 //PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str);
 //PUBLIC ND var paste(CVR instring, const int pos1, CVR str);
-//
-//// 4. paste insert at start
-//PUBLIC VARREF paster(VARREF iostring, CVR str);
-//PUBLIC ND var paste(CVR instring, CVR str);
 
+// PREFIX
+PUBLIC VARREF prefixer(VARREF iostring, CVR str) {return iostring.prefixer(str);}
+PUBLIC ND var prefix(CVR instring, CVR str) {return instring.prefix(str);}
 
 PUBLIC VARREF popper(VARREF iostring);
 PUBLIC ND var pop(CVR instring);

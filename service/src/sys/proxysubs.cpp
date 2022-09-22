@@ -113,7 +113,7 @@ fileok:
 
 		//force error
 		if (response_.first(6) ne "Error:") {
-			USER3.paster(1, 0, "Error:");
+			USER3.prefixer("Error:");
 		}
 
 	}
