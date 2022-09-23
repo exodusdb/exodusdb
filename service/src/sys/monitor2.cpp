@@ -434,7 +434,6 @@ nextprocess:
 			}
 
 			if (startit) {
-				//garbagecollect;
 				dbasesystem = dbasesystems.f(1, dbasen);
 				if (not dbasesystem) {
 					dbasesystem = APPLICATION;
@@ -515,7 +514,6 @@ nextprocess:
 			}
 	//uncomment to test insufficient backup space
 	//lastbackupsize=999999999
-			//garbagecollect;
 			lastbackupdatetime = (paramrec.f(2) + paramrec.f(1) / 86400).oconv("MD50P");
 			//if integer datetime then old format missing time so add 2 hours
 			//if lastbackupdatetime and int(lastbackupdatetime)=lastbackupdatetime then lastbackupdatetime+=2/24

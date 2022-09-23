@@ -9,7 +9,6 @@ function main() {
 		if (ANS lt 0) {
 			ANS += 86400;
 		}
-	//garbagecollect
 		ANS = (ANS.oconv("MD20P")) + 0;
 	} else {
 	//blank if no response time (crashed)

@@ -50,7 +50,6 @@ function main(in a0, io bb, in sep) {
 			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
 
 			if (bcode eq acode) {
-				//garbagecollect;
 				if (bnum.len() or anum.len()) {
 					var ndecs = anum.field(".", 2).len();
 					var bndecs = bnum.field(".", 2).len();

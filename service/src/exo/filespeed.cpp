@@ -76,7 +76,6 @@ nexttest:
 	createfile(tempfilename ^ " (S)");
 	//perform 'SELECT ':tempfilename
 
-	//garbagecollect;
 
 	if (esctoexit()) {
 		goto exit;

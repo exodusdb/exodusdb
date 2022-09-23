@@ -82,7 +82,6 @@ function main(in mode, in status0="") {
 		//remove environment variables because mostly the same and waste space
 		process(12) = "";
 		process(13) = "";
-		//garbagecollect;
 		process(27) = (date() + 24873 + time() / 86400).oconv("MD50P");
 		process(51) = APPLICATION;
 		//can never be closed while this is running

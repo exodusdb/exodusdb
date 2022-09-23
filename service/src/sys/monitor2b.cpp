@@ -267,7 +267,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			//run the wget command
 			//print @(0):@(-4):time() 'MTS':' CONTROL ':cmd[1,50]:'... ':
 
-			//garbagecollect;
 			var().osflush();
 			var result = shell2(cmd, errors);
 			var().osflush();
@@ -307,7 +306,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			//print
 			//print 'CONTROL cmd /c ':cmdfilename:' ... ':
 
-			//garbagecollect;
 			var().osflush();
 			("cmd /c " ^ cmdfilename).osshell();
 			var().osflush();

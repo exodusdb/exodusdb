@@ -549,7 +549,6 @@ function loop_init() {
 	iodat_ = "";
 	response_ = "";
 	msg_ = "";
-	//garbagecollect;
 	win.wlocked = "";
 
 	//linkfilename1=''
@@ -630,7 +629,6 @@ nextsearch0:
 	call unlockrecord("PROCESSES", processes, THREADNO);
 
 	//prevent sleep in esc.to.exit
-	//garbagecollect;
 	timenow = ostime();
 	SYSTEM(25) = timenow;
 	SYSTEM(26) = timenow;
@@ -684,7 +682,6 @@ nextsearch0:
 
 subroutine wait() {
 
-	//garbagecollect;
 	//if index(drive(),':',1) then exe='.exe' else exe=''
 	//cmd='WAITING.EXE'
 	cmd = "waiting";
@@ -708,7 +705,6 @@ subroutine wait() {
 	//gosub sysunlock
 	//print cmd
 	//break off
-	//garbagecollect;
 	//unfortunately cant use this because on SOME datasets?!?!?
 	//eg TESTMARK/BMTEST (MARKONE/BMDATA runs!!!!) both MASTERBR and MASTTEST dont
 	//on nl1 it will not run the waiting.exe command
@@ -1150,7 +1146,6 @@ deleterequest:
 		linkfilename1.osremove();
 		if (linkfilename1.osfile()) {
 			var().osflush();
-			//garbagecollect;
 			call ossleep(1000*1 / 10.0);
 			ntries += 1;
 			//if tracing then print 'COULD NOT DELETE ':linkfile1

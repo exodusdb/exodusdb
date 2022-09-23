@@ -82,7 +82,6 @@ function main() {
 			cout << " activems:";
 			var cmd = "WAITING.EXE Q$W$E$R$T$.Y$U 0 " ^ sleepms;
 			//print cmd
-			//garbagecollect;
 			cmd.osperform();
 			cout << endl;
 		}
@@ -91,7 +90,6 @@ function main() {
 */
 
 	//save the time last slept or return to avoid checking otherusers all the time
-	//garbagecollect;
 	nowtime=ostime().round(2);
 	SYSTEM(26) = nowtime;
 

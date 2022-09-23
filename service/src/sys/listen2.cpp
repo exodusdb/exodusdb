@@ -909,7 +909,6 @@ validateexit2:
 				if (not(statistic.read(statistics, key))) {
 					statistic = "";
 				}
-				//to avoid garbagecollect delay required to avoid MD conversion bug
 				//by not doing 'MD50P'
 				//statistic<1>=(date()+time()/86400) 'MD50P'
 				statistic(1) = (date() + time() / 86400).first(12);

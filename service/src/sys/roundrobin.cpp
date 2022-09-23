@@ -76,7 +76,6 @@ function main(in mode, in params, io result, io msg) {
 			return 0;
 		}
 
-		//garbagecollect;
 
 		//get the round robin data
 		var roundrobin;
@@ -121,7 +120,6 @@ function main(in mode, in params, io result, io msg) {
 			result = 0;
 		}
 
-		//garbagecollect;
 
 		if (roundrobin.contains(chr(0))) {
 			roundrobin.converter(chr(0), "");
