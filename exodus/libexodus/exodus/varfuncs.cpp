@@ -1099,7 +1099,7 @@ VARREF var::unquoter() {
 // PASTE
 ////////
 
-// 1. paste over
+// 1. paste replace
 
 // copy
 var var::paste(const int pos1, const int length, SV insertstr) const& {
@@ -1198,9 +1198,50 @@ VARREF var::paster(const int pos1, const int length, SV insertstr) {
 //
 //	return *this;
 //}
-//
+
 // 3. paste insert at
 
+// copy
+var var::paste(const int pos1, SV insertstr) const& {
+	// TODO avoid copy
+	return var(*this).paster(pos1, insertstr);
+}
+
+// mutate
+VARREF var::paster(const int pos1, SV insertstr) {
+
+	THISIS("VARREF var::paster(const int pos1, SV insertstr)")
+	assertStringMutator(function_sig);
+	//ISSTRING(insertstr)
+
+	if (pos1 > 0) {
+		if (static_cast<unsigned int>(pos1) > var_str.size())
+			// abc(4, x) -> abcx
+			// abc(5, x) -> abcx
+			var_str += insertstr;
+		else
+			// abc(1, x) -> xabc
+			// abc(2, x) -> axbc
+			// abc(3, x) -> abxc
+			var_str.insert(pos1 - 1, insertstr);
+	}
+
+	else if (pos1 < 0) {
+		if (static_cast<unsigned int>(-pos1) >= var_str.size())
+			// abc(-4, x) -> xabc
+			// abc(-3, x) -> xabc
+			var_str.insert(0, insertstr);
+		else
+			// abc(-2, x) -> axbc
+			// abc(-1, x) -> abxc
+			var_str.insert(var_str.size() + pos1, insertstr);
+	}
+	else
+		// abc(0, x) -> xabc
+		var_str.insert(0, insertstr);
+
+	return *this;
+}
 
 /////////
 // PREFIX - insert at beginning

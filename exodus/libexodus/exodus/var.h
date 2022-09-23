@@ -1581,8 +1581,8 @@ class PUBLIC var final {
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
 	//int localeAwareCompare(const std::string& str2) const;
 
-	// STRING ACCESSORS - All const
-	///////////////////
+	// STRING CONVERSION - Non-mutating
+	////////////////////
 
 	ND var ucase() const&;
 	ND var lcase() const&;
@@ -1608,6 +1608,7 @@ class PUBLIC var final {
 	ND var last(const size_t length) const&;  // byte length
 	ND var cut(const int length) const&;      // byte length
 	ND var paste(const int pos1, const int length, SV insertstr) const&; // byte pos1, length
+	ND var paste(const int pos1, SV insertstr) const&; // byte pos1
 	ND var prefix(SV insertstr) const&;
 	ND var pop() const&;                      // byte removed
 
@@ -1656,6 +1657,7 @@ class PUBLIC var final {
 	ND VARREF last(const size_t length) && {return laster(length);}
 	ND VARREF cut(const int length) && {return cutter(length);}
 	ND VARREF paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
+	ND VARREF paste(const int pos1, SV insertstr) && {return paster(pos1, insertstr);}
 	ND VARREF prefix(SV insertstr) && {return prefixer(insertstr);}
 	ND VARREF pop() && {return popper();}
 
@@ -1701,6 +1703,7 @@ class PUBLIC var final {
 	VARREF laster(const size_t length);
 	VARREF cutter(const int length);
 	VARREF paster(const int pos1, const int length, SV insertstr);
+	VARREF paster(const int pos1, SV insertstr);
 	VARREF prefixer(SV insertstr);
 	VARREF popper();
 

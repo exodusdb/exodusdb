@@ -3645,7 +3645,13 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					%RECORDS% | RECORDS
 					+RECORDS+ | +RECORDS+
 					*/
+
 					dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
+					if (not subvalue.starts("'"))
+						subvalue.squoter();
+
+					// .. with somefield starting 'abc'
+					// -> WHERE ( exodus_extract_text(somefile.data,999, 0, 0) COLLATE "C" BETWEEN 'abc' AND 'abcZZZZZZ' )
 					expression ^= dictexpression ^ " COLLATE \"C\"";
 					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.paste(-1, 0, "ZZZZZZ") ^ FM;
 				}

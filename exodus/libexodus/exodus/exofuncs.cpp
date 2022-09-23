@@ -245,53 +245,6 @@ PUBLIC var raise(CVR instring) {
 }
 
 
-// PASTE
-
-// 1. paste over
-
-// copy
-PUBLIC var paste(CVR instring, const int pos1, const int length, CVR str) {
-	return instring.paste(pos1, length, str);
-}
-// mutate
-PUBLIC VARREF paster(VARREF iostring, const int pos1, const int length, CVR str) {
-	return iostring.paster(pos1, length, str);
-}
-
-//// 2. paste over to end
-//
-//// copy
-//PUBLIC var pasteall(CVR instring, const int pos1, CVR str) {
-//	return instring.pasteall(pos1, str);
-//}
-//// mutate
-//PUBLIC VARREF pasterall(VARREF iostring, const int pos1, CVR str) {
-//	return iostring.pasterall(pos1, str);
-//}
-//
-////// 3. paste insert at
-//
-//// copy
-//PUBLIC var paste(CVR instring, const int pos1, CVR str) {
-//	return instring.paste(pos1, str);
-//}
-//// mutate
-//PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str) {
-//	return iostring.paster(pos1, str);
-//}
-
-// PREFIX
-
-// copy
-//PUBLIC var prefix(CVR instring, CVR str) {
-//	return instring.prefix(str);
-//}
-////mutate
-//PUBLIC VARREF prefixer(VARREF iostring, CVR str) {
-//	return iostring.prefixer(str);
-//}
-
-
 // POP
 
 PUBLIC VARREF popper(VARREF iostring) {

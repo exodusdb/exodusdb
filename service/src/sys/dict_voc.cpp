@@ -374,7 +374,7 @@ function main() {
 	brandcode1.converter(SM, VM);
 	brandcode1 = brandcode1.f(1, 1);
 	if (brandcode1 and brandcode1 ne brandcode) {
-		ans.paster(1, 0, brandcode1.xlate("BRANDS", 2, "X") ^ " ");
+		ans.prefixer(brandcode1.xlate("BRANDS", 2, "X") ^ " ");
 	}
 	return ans;
 }

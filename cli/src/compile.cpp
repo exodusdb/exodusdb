@@ -316,31 +316,11 @@ function main() {
 			}
 		}
 
-		/* now done by vcvarsall above
-		var msvc=msvs^"..\\..\\VC\\";
-
-		//add path to MSVC binaries
-		path.paster(0,0,";"^msvs^"..\\IDE;");
-		path.paster(0,0,";"^msvc^"bin;");
-
-		//add msvc include
-		include.paster(0,0,";"^msvc^"include;");
-
-		//add msvc lib
-		lib.paster(0,0,";"^msvc^"lib;");
-
-		//express doesnt have win32
-		if (not osfile(msvc^"lib\\kernel32.dll"))
-		{
-			//var libpath="\\Program Files\\Microsoft SDKs\\Windows\\v6.0A\\Lib"
-		}
-		*/
-
 		//add exodus path, include and lib
-		path.paster(0, 0, exodusbin ^ ";");
-		include.paster(0, 0, exoduspath ^ "include;");
-		include.paster(0, 0, exoduspath ^ "include\\exodus;");
-		lib.paster(0, 0, exoduspath ^ "lib;");
+		path.prefixer(exodusbin ^ ";");
+		include.prefixer(exoduspath ^ "include;");
+		include.prefixer(exoduspath ^ "include\\exodus;");
+		lib.prefixer(exoduspath ^ "lib;");
 
 		//set the new environment
 		if (not ossetenv("PATH", path))

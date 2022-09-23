@@ -304,18 +304,18 @@ programinit()
 //	{
 //		var x = "abc";
 //
-//		assert(pasteall(x, 5, "XYZ").outputl() eq "abcXYZ");
-//		assert(pasteall(x, 4, "XYZ").outputl() eq "abcXYZ");
-//		assert(pasteall(x, 3, "XYZ").outputl() eq "abXYZ");
-//		assert(pasteall(x, 2, "XYZ").outputl() eq "aXYZ");
-//		assert(pasteall(x, 1, "XYZ").outputl() eq "XYZ");
+//		assert(pasteall(x, 5, "XYZ") eq "abcXYZ");
+//		assert(pasteall(x, 4, "XYZ") eq "abcXYZ");
+//		assert(pasteall(x, 3, "XYZ") eq "abXYZ");
+//		assert(pasteall(x, 2, "XYZ") eq "aXYZ");
+//		assert(pasteall(x, 1, "XYZ") eq "XYZ");
 //
-//		assert(pasteall(x, 0, "XYZ").outputl() eq "XYZ");
+//		assert(pasteall(x, 0, "XYZ") eq "XYZ");
 //
-//		assert(pasteall(x, -1, "XYZ").outputl() eq "abXYZ");
-//		assert(pasteall(x, -2, "XYZ").outputl() eq "aXYZ");
-//		assert(pasteall(x, -3, "XYZ").outputl() eq "XYZ");
-//		assert(pasteall(x, -4, "XYZ").outputl() eq "XYZ");
+//		assert(pasteall(x, -1, "XYZ") eq "abXYZ");
+//		assert(pasteall(x, -2, "XYZ") eq "aXYZ");
+//		assert(pasteall(x, -3, "XYZ") eq "XYZ");
+//		assert(pasteall(x, -4, "XYZ") eq "XYZ");
 //	}
 
 	{
@@ -344,30 +344,88 @@ programinit()
 
 	}
 
-//	{ try to do without this function since scarely used
+	{
+		// test paster insert
+		var x;
+		x = "abc"; paster(x, -5, "x"); assert(x eq "xabc");
+		x = "abc"; paster(x, -4, "x"); assert(x eq "xabc");
+		x = "abc"; paster(x, -3, "x"); assert(x eq "xabc");
+		x = "abc"; paster(x, -2, "x"); assert(x eq "axbc");
+		x = "abc"; paster(x, -1, "x"); assert(x eq "abxc");
+		x = "abc"; paster(x,  0, "x"); assert(x eq "xabc");
+		x = "abc"; paster(x,  1, "x"); assert(x eq "xabc");
+		x = "abc"; paster(x,  2, "x"); assert(x eq "axbc");
+		x = "abc"; paster(x,  3, "x"); assert(x eq "abxc");
+		x = "abc"; paster(x,  4, "x"); assert(x eq "abcx");
+		x = "abc"; paster(x,  5, "x"); assert(x eq "abcx");
+	}
+
+	{
+		// test paste insert
+		var x = "abc";
+		assert(paste(x, -5, "x") eq "xabc");
+		assert(paste(x, -4, "x") eq "xabc");
+		assert(paste(x, -3, "x") eq "xabc");
+		assert(paste(x, -2, "x") eq "axbc");
+		assert(paste(x, -1, "x") eq "abxc");
+		assert(paste(x,  0, "x") eq "xabc");
+		assert(paste(x,  1, "x") eq "xabc");
+		assert(paste(x,  2, "x") eq "axbc");
+		assert(paste(x,  3, "x") eq "abxc");
+		assert(paste(x,  4, "x") eq "abcx");
+		assert(paste(x,  5, "x") eq "abcx");
+	}
+
+	{
+		// test paste insert empty
+		var x = "abc";
+		assert(paste(x, -5, "") eq "abc");
+		assert(paste(x, -4, "") eq "abc");
+		assert(paste(x, -3, "") eq "abc");
+		assert(paste(x, -2, "") eq "abc");
+		assert(paste(x, -1, "") eq "abc");
+		assert(paste(x,  0, "") eq "abc");
+		assert(paste(x,  1, "") eq "abc");
+		assert(paste(x,  2, "") eq "abc");
+		assert(paste(x,  3, "") eq "abc");
+		assert(paste(x,  4, "") eq "abc");
+		assert(paste(x,  5, "") eq "abc");
+	}
+
+	{
+		// test paste insert into empty
+		var x = "";
+		assert(paste(x, -2, "abc") eq "abc");
+		assert(paste(x, -1, "abc") eq "abc");
+		assert(paste(x,  0, "abc") eq "abc");
+		assert(paste(x,  1, "abc") eq "abc");
+		assert(paste(x,  2, "abc") eq "abc");
+	}
+
+//	{ try to do without this function since scarcely used
 //		var x;
 //		x = "abc";
-//		assert(pasterall(x, 5, "XYZ").outputl() eq "abcXYZ");
+//		assert(pasterall(x, 5, "XYZ") eq "abcXYZ");
 //		x = "abc";
-//		assert(pasterall(x, 4, "XYZ").outputl() eq "abcXYZ");
+//		assert(pasterall(x, 4, "XYZ") eq "abcXYZ");
 //		x = "abc";
-//		assert(pasterall(x, 3, "XYZ").outputl() eq "abXYZ");
+//		assert(pasterall(x, 3, "XYZ") eq "abXYZ");
 //		x = "abc";
-//		assert(pasterall(x, 2, "XYZ").outputl() eq "aXYZ");
+//		assert(pasterall(x, 2, "XYZ") eq "aXYZ");
 //		x = "abc";
-//		assert(pasterall(x, 1, "XYZ").outputl() eq "XYZ");
+//		assert(pasterall(x, 1, "XYZ") eq "XYZ");
 //
 //		x = "abc";
-//		assert(pasterall(x, 0, "XYZ").outputl() eq "XYZ");
+//		assert(pasterall(x, 0, "XYZ") eq "XYZ");
 //
 //		x = "abc";
-//		assert(pasterall(x, -1, "XYZ").outputl() eq "abXYZ");
+//		assert(pasterall(x, -1, "XYZ") eq "abXYZ");
 //		x = "abc";
-//		assert(pasterall(x, -2, "XYZ").outputl() eq "aXYZ");
+//		assert(pasterall(x, -2, "XYZ") eq "aXYZ");
 //		x = "abc";
-//		assert(pasterall(x, -3, "XYZ").outputl() eq "XYZ");
+//		assert(pasterall(x, -3, "XYZ") eq "XYZ");
 //		x = "abc";
-//		assert(pasterall(x, -4, "XYZ").outputl() eq "XYZ");
+//		assert(pasterall(x, -4, "XYZ") eq "XYZ");
 //	}
 //
 	printl(elapsedtimetext());
