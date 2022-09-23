@@ -324,21 +324,21 @@ PUBLIC var trimb(CVR instring, SV trimchars) {
 }
 
 
-PUBLIC VARREF sorter(VARREF iostring, SV sepchar) {
-	return iostring.sorter(sepchar);
-}
-PUBLIC ND var sort(CVR instring, SV sepchar) {
-	return instring.sort(sepchar);
-}
-
-
-PUBLIC VARREF reverser(VARREF iostring, SV sepchar) {
-	return iostring.reverser(sepchar);
-}
-PUBLIC ND var reverse(CVR instring, SV sepchar) {
-	return instring.reverse(sepchar);
-}
-
+//PUBLIC VARREF sorter(VARREF iostring, SV sepchar) {
+//	return iostring.sorter(sepchar);
+//}
+//PUBLIC ND var sort(CVR instring, SV sepchar) {
+//	return instring.sort(sepchar);
+//}
+//
+//
+//PUBLIC VARREF reverser(VARREF iostring, SV sepchar) {
+//	return iostring.reverser(sepchar);
+//}
+//PUBLIC ND var reverse(CVR instring, SV sepchar) {
+//	return instring.reverse(sepchar);
+//}
+//
 
 PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key) {
 	return dimrecord.read(dbfilevar, key);
@@ -349,13 +349,13 @@ PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key) {
 }
 
 
-PUBLIC dim split(CVR sourcevar, SV sepchar) {
-	return sourcevar.split(sepchar);
-}
-
-PUBLIC var join(const dim& sourcedim, SV sepchar) {
-	return sourcedim.join(sepchar);
-}
+//PUBLIC dim split(CVR sourcevar, SV sepchar) {
+//	return sourcevar.split(sepchar);
+//}
+//
+//PUBLIC var join(const dim& sourcedim, SV sepchar) {
+//	return sourcedim.join(sepchar);
+//}
 
 
 PUBLIC var chr(const int integer) {

@@ -172,6 +172,7 @@ friend class var;
 
 	dim& sorter(bool reverse = false);
 	dim& reverser();
+	dim& splitter(CVR str1, SV sepchar = _FM);
 
 	/////////////
 	// READ/WRITE

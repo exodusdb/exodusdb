@@ -290,7 +290,6 @@ function main() {
 		} catch (DimNotDimensioned e) { e.description.errputl();}
 
 	}
-
 	{
 		// std algorithmns should work too!
 		//std::range::reverse(d1);
@@ -669,6 +668,39 @@ function main() {
 		assert(x.join() eq "x^x^x"_var);
 		assert(x.rows() eq 3);
 		assert(x.cols() eq 1);
+	}
+
+	{
+		// Check dim.splitter(v)
+		dim d1;
+		var rec = "aa^bb^cc"_var;
+		d1.splitter(rec);
+		TRACE(d1.join());
+		assert(d1.join() eq rec);
+
+		// Check split into existing array is padded with ""
+		dim d2(5);
+		d2.splitter(rec);
+		TRACE(d2.join())
+		assert(d2.join() eq (rec ^ FM ^ FM));
+
+		// Check split into existing array overflows into final element
+		dim d3(2);
+		d3.splitter(rec);
+		TRACE(d3(1))
+		TRACE(d3(2))
+		TRACE(d3.join())
+		assert(d3.join() eq rec);
+		assert(d3(2) eq "bb^cc"_var);
+	}
+
+	{
+		// join unassigned should be error
+		dim d1;
+		try {
+			var x = d1.join(",");
+			assert(false);
+		} catch (DimNotDimensioned e) { e.description.errputl();}
 	}
 
 	printl(elapsedtimetext());

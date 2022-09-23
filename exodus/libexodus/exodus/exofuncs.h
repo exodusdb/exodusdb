@@ -193,98 +193,98 @@ PUBLIC void breakoff();
 PUBLIC ND var len(CVR var2);
 PUBLIC ND var textlen(CVR var2);
 
-PUBLIC VARREF converter(VARREF iostring, SV fromchars, SV tochars);
 PUBLIC ND var convert(CVR instring, SV fromchars, SV tochars);
+PUBLIC VARREF converter(VARREF iostring, SV fromchars, SV tochars);
 
-PUBLIC VARREF textconverter(VARREF iostring, SV fromchars, SV tochars);
 PUBLIC ND var textconvert(CVR instring, SV fromchars, SV tochars);
+PUBLIC VARREF textconverter(VARREF iostring, SV fromchars, SV tochars);
 
-PUBLIC VARREF replacer(VARREF iostring, SV fromstr, SV tostr);
 PUBLIC ND var replace(CVR instring, SV fromstr, SV tostr);
+PUBLIC VARREF replacer(VARREF iostring, SV fromstr, SV tostr);
 
-PUBLIC VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
 PUBLIC ND var regex_replace(CVR instring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
+PUBLIC VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
 
-PUBLIC VARREF ucaser(VARREF iostring);
 PUBLIC ND var ucase(CVR instring);
+PUBLIC VARREF ucaser(VARREF iostring);
 
-PUBLIC VARREF lcaser(VARREF iostring);
 PUBLIC ND var lcase(CVR instring);
+PUBLIC VARREF lcaser(VARREF iostring);
 
-PUBLIC VARREF tcaser(VARREF iostring);
 PUBLIC ND var tcase(CVR instring);
+PUBLIC VARREF tcaser(VARREF iostring);
 
-PUBLIC VARREF fcaser(VARREF iostring);
 PUBLIC ND var fcase(CVR instring);
+PUBLIC VARREF fcaser(VARREF iostring);
 
-PUBLIC VARREF normalizer(VARREF iostring);
 PUBLIC ND var normalize(CVR instring);
+PUBLIC VARREF normalizer(VARREF iostring);
 
 PUBLIC VARREF uniquer(VARREF iostring);
 PUBLIC ND var unique(CVR instring);
 
-PUBLIC VARREF inverter(VARREF iostring);
 PUBLIC ND var invert(CVR instring);
+PUBLIC VARREF inverter(VARREF iostring);
 PUBLIC ND var invert(var&& instring);
 //PUBLIC VARREF inverter(VARREF iostring) {return instring.inverter();};
 //PUBLIC ND var invert(CVR instring) {return var(instring).inverter();};
 //PUBLIC ND var invert(var&& instring) {return instring.inverter();};
 //template<typename T> PUBLIC T invert(var && instring) {return T (std::forward<var>(instring));}
 
-PUBLIC VARREF lowerer(VARREF iostring);
 PUBLIC ND var lower(CVR instring);
+PUBLIC VARREF lowerer(VARREF iostring);
 
-PUBLIC VARREF raiser(VARREF iostring);
 PUBLIC ND var raise(CVR instring);
+PUBLIC VARREF raiser(VARREF iostring);
 
 // PASTER
 
 // 1. paste replace
-PUBLIC VARREF paster(VARREF iostring, const int pos1, const int length, CVR str) {return iostring.paster(pos1, length, str);}
 PUBLIC ND var paste(CVR instring, const int pos1, const int length, CVR str) {return instring.paste(pos1, length, str);}
+PUBLIC VARREF paster(VARREF iostring, const int pos1, const int length, CVR str) {return iostring.paster(pos1, length, str);}
 
 //// 2. paste over to end
 //PUBLIC VARREF pasterall(VARREF iostring, const int pos1, CVR str);
 //PUBLIC ND var pasteall(CVR instring, const int pos1, CVR str);
 
 // 3. paste insert at pos1
-PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str) {return iostring.paster(pos1, str);}
 PUBLIC ND var paste(CVR instring, const int pos1, CVR str) {return instring.paste(pos1, str);}
+PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str) {return iostring.paster(pos1, str);}
 
 // PREFIX
-PUBLIC VARREF prefixer(VARREF iostring, CVR str) {return iostring.prefixer(str);}
 PUBLIC ND var prefix(CVR instring, CVR str) {return instring.prefix(str);}
+PUBLIC VARREF prefixer(VARREF iostring, CVR str) {return iostring.prefixer(str);}
 
-PUBLIC VARREF popper(VARREF iostring);
 PUBLIC ND var pop(CVR instring);
+PUBLIC VARREF popper(VARREF iostring);
 
 
-PUBLIC VARREF quoter(VARREF iostring);
 PUBLIC ND var quote(CVR instring);
+PUBLIC VARREF quoter(VARREF iostring);
 
-PUBLIC VARREF squoter(VARREF iostring);
 PUBLIC ND var squote(CVR instring);
+PUBLIC VARREF squoter(VARREF iostring);
 
-PUBLIC VARREF unquoter(VARREF iostring);
 PUBLIC ND var unquote(CVR instring);
+PUBLIC VARREF unquoter(VARREF iostring);
 
 
-PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
 PUBLIC ND var fieldstore(CVR instring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
+PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
 
 
-PUBLIC VARREF trimmer(VARREF iostring, SV trimchars, SV options);
 PUBLIC ND var trim(CVR instring, SV trimchars, SV options);
+PUBLIC VARREF trimmer(VARREF iostring, SV trimchars, SV options);
 
-
-PUBLIC VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE);
 PUBLIC ND var trim(CVR instring, SV trimchars DEFAULT_SPACE);
+PUBLIC VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE);
 
-PUBLIC VARREF trimmerf(VARREF iostring, SV trimchars DEFAULT_SPACE);
 PUBLIC ND var trimf(CVR instring, SV trimchars DEFAULT_SPACE);
+PUBLIC VARREF trimmerf(VARREF iostring, SV trimchars DEFAULT_SPACE);
 
-PUBLIC VARREF trimmerb(VARREF iostring, SV trimchars DEFAULT_SPACE);
 PUBLIC ND var trimb(CVR instring, SV trimchars DEFAULT_SPACE);
+PUBLIC VARREF trimmerb(VARREF iostring, SV trimchars DEFAULT_SPACE);
+
 
 PUBLIC ND var chr(const int integer);
 PUBLIC ND var textchr(const int integer);
@@ -316,8 +316,8 @@ PUBLIC ND var field2(CVR instring, SV substr, const int fieldno, const int nfiel
 
 PUBLIC var substr2(CVR fromstr, VARREF startindex, VARREF delimiterno);
 
-PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM);
-PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM);
+PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM) {return sourcevar.split(sepchar);}
+PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM) {return sourcedim.join(sepchar);}
 
 PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
 PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement);
@@ -362,14 +362,14 @@ PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting,
 PUBLIC ND var sum(CVR instring, SV sepchar);
 PUBLIC ND var sum(CVR instring);
 
-PUBLIC VARREF cropper(VARREF iostring);
 PUBLIC ND var crop(CVR instring);
+PUBLIC VARREF cropper(VARREF iostring);
 
-PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM);
-PUBLIC ND var sort(CVR instring, SV sepchar = _FM);
+PUBLIC ND var sort(CVR instring, SV sepchar = _FM) {return instring.sort(sepchar);}
+PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM) {return iostring.sorter(sepchar);}
 
-PUBLIC VARREF reverser(VARREF iostring, SV sepchar = _FM);
-PUBLIC ND var reverse(CVR instring, SV sepchar = _FM);
+PUBLIC ND var reverse(CVR instring, SV sepchar = _FM) {return instring.reverse(sepchar);}
+PUBLIC VARREF reverser(VARREF iostring, SV sepchar = _FM) {return iostring.reverser(sepchar);}
 
 // DATABASE
 

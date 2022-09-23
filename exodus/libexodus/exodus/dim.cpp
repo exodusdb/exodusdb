@@ -283,24 +283,34 @@ var dim::join(SV sepchar) const {
 // dim=var.split()
 dim var::split(SV sepchar) const {
 
-	//TODO provide a version that can split on any utf8 character
-	// Perhaps if sepchar is ""
+	//TODO provide a version that can split on any utf8 character - perhaps if sepchar is ""
 
 	THISIS("dim var::split(SV sepchar = FM)")
 	assertString(function_sig);
 
+	// an undimensioned dim will be dimensioned automatically
+	return dim().splitter(*this, sepchar);
+}
+
+// d.splitter(v, sep)
+dim& dim::splitter(CVR str1, SV sepchar) {
+
+	//TODO provide a version that can split on any utf8 character
+	// Perhaps if sepchar is ""
+
+	THISIS("var dim::split(CVR str1, SV sepchar = FM)")
+	ISSTRING(str1);
+
 	// maybe dimension to the size of the string
 	// do NOT redimension always since pick matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
-	dim rvo(this->count(sepchar) + 1);
-
-	// Ensure element zero will not throw unassigned during resizing/copying etc.
-	//data_[0] = "";
+	if (!this->initialised_ || this->ncols_ != 1)
+		this->redim(str1.count(sepchar) + 1);
 
 	// empty string just fills array with empty string
-	if (this->var_str.empty()) {
-		rvo.data_[1] = "";
-		return rvo;
+	if (str1.var_str.empty()) {
+		(*this) = "";
+		return *this;
 	}
 
 	// split always fills starting from element[1] and ignores element[0]
@@ -310,19 +320,19 @@ dim var::split(SV sepchar) const {
 	std::string::size_type next_pos = 0;
 	size_t sepsize = sepchar.size();
 	size_t fieldno;
-	for (fieldno = 1; fieldno <= rvo.nrows_; fieldno++) {
+	for (fieldno = 1; fieldno <= this->nrows_; fieldno++) {
 
 		// find the next sepchar delimiter
-		next_pos = this->var_str.find(sepchar, start_pos);
+		next_pos = str1.var_str.find(sepchar, start_pos);
 
 		// not found - past end of string?
 		if (next_pos == std::string::npos) {
-			rvo.data_[fieldno] = this->var_str.substr(start_pos);
+			this->data_[fieldno] = str1.var_str.substr(start_pos);
 			break;
 		}
 
 		// fill an element with a field
-		rvo.data_[fieldno] = this->var_str.substr(start_pos, next_pos - start_pos);
+		this->data_[fieldno] = str1.var_str.substr(start_pos, next_pos - start_pos);
 
 		// shift to start of next field
 		start_pos = next_pos + sepsize;
@@ -331,21 +341,21 @@ dim var::split(SV sepchar) const {
 
 	//size_t nfields = fieldno;
 
-//TODO provide versions that limit or force size of output dim
-//
-//	// stuff any excess fields into the last element
-//	if (next_pos != std::string::npos) {
-//		//rvo.data_[rvo.nrows_] ^= sepchar;
-//		rvo.data_[rvo.nrows_].var_str.append(sepchar);
-//		rvo.data_[rvo.nrows_].var_str.append(this->var_str.substr(start_pos));
-//	} else {
-//		++fieldno;
-//		// fill any remaining array elements with empty string
-//		for (; fieldno <= (rvo.nrows_); ++fieldno)
-//			rvo.data_[fieldno] = "";
-//	}
+	if (next_pos != std::string::npos) {
 
-	return rvo;
+		// stuff any excess fields into the last element
+		//this->data_[this->nrows_] ^= sepchar;
+		this->data_[this->nrows_].var_str.append(sepchar).append(str1.var_str.substr(start_pos));
+
+	} else {
+
+		// fill any remaining array elements with empty string
+		++fieldno;
+		for (; fieldno <= (this->nrows_); ++fieldno)
+			this->data_[fieldno] = "";
+	}
+
+	return *this;
 }
 
 dim& dim::sorter(bool reverseorder) {
@@ -384,16 +394,18 @@ bool dim::read(CVR filevar, CVR key) {
 	if (!temprecord.read(filevar, key))
 		return false;
 
-	// dont use following because it redimensions the array to the actual number of fields found
-	// and this causes redim to clear the array when redim is in common.h and called
-	// repetitively in subroutines
+	// Dont use following because it redimensions the array to the actual number of fields found
 	//(*this)=temprecord.split();
 
-	*this = temprecord.split();
+	// dim::splitter does not adjust the length of the array
+	// If the record has fewer fields than the size of the array then the rest of the array is set to ""
+	// If the record has more fields than the size of the array then they are crammed in the last element
+	// Allowing usage like record(30) even though there were not 30 fields in the specific record
+	this->splitter(temprecord);
 
 	// var(nrows_).outputl("nrows now=");
-
 	// this->join("|").outputl("read=");
+
 	return true;
 }
 
@@ -403,8 +415,10 @@ bool dim::write(CVR filevar, CVR key) const {
 	ISSTRING(filevar)
 	ISSTRING(key)
 
-	var temprecord = this->join();
+	var temprecord = this->join().trimb(_FM);
+
 	return temprecord.write(filevar, key);
+
 }
 
 bool dim::osread(CVR osfilename, const char* codepage) {\

@@ -1444,11 +1444,12 @@ bool var::starts(SV str) const {
 	//      bool exodus::var::starts(const exodus::VARREF) const
 	assertString(function_sig);
 
-	// Differ from c++
+	// Differ from c++, javascript, python3
 	if (str.empty()) {
-		VarError e(__PRETTY_FUNCTION__);
-		e.description.errput();
-		e.stack(1).f(1).errputl();
+		var(function_sig).errputl();
+//		VarError e(__PRETTY_FUNCTION__);
+//		e.description.errput();
+//		e.stack(1).f(1).errputl();
 		return false;
 	}
 
@@ -1460,11 +1461,12 @@ bool var::ends(SV str) const {
 	THISIS("bool var::ends(SV str) const")
 	assertString(function_sig);
 
-	// Differ from c++
+	// Differ from c++, javascript, python3
 	if (str.empty()) {
-		VarError e(__PRETTY_FUNCTION__);
-		e.description.errput();
-		e.stack(1).f(1).errputl();
+		var(function_sig).errputl();
+//		VarError e(__PRETTY_FUNCTION__);
+//		e.description.errput();
+//		e.stack(1).f(1).errputl();
 		return false;
 	}
 
@@ -1476,12 +1478,13 @@ bool var::contains(SV str) const {
 	THISIS("bool var::contains(SV str) const")
 	assertString(function_sig);
 
-	// Differ from c++
+	// Differ from c++, javascript, python3
 	if (str.empty()) {
-		VarError e(__PRETTY_FUNCTION__);
-		e.description.errput();
-		//e.stack().f(1).errputl(", ");
-		e.stack(1).f(1).errputl(", ");
+		var(function_sig).errputl();
+//		VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
+//		e.description.errput();
+//		//e.stack().f(1).errputl(", ");
+//		e.stack(1).f(1).errputl(", ");
 		return false;
 	}
 
