@@ -189,7 +189,7 @@ subroutine printtx2() {
 			}
 			if (style) {
 				var stylennx = ptx_css.index("</style>");
-				ptx_css.paster(stylennx + 8, 0, FM ^ style);
+				ptx_css.paster(stylennx + 8, FM ^ style);
 			}
 
 			//htmltitle=field(headx<1>,"'",1)

@@ -50,7 +50,7 @@ function main(in type, in in0, in mode, out output) {
 			break;
 		var ss = _VM ^ output.b(pos + 1, 10).field(";", 1) ^ _VM;
 		if (not precoded.contains(ss)) {
-			output.paster(pos + 1, 0, "amp;");
+			output.paster(pos + 1, "amp;");
 			pos += 4;
 		}
 	}

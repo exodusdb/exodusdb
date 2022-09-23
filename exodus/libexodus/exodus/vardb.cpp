@@ -2682,7 +2682,7 @@ exodus_call:
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
 		if (sqlexpression.starts("exodus_extract_date(") || sqlexpression.starts("exodus_extract_time("))
-			sqlexpression.paster(20, 0, "_array");
+			sqlexpression.paster(20, "_array");
 		else {
 			sqlexpression.regex_replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
@@ -3445,11 +3445,11 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				var special = "[^$.|?*+()";
 				for (int ii = special.len(); ii > 0; --ii) {
 					if (special.contains(word1[ii]))
-						word1.paster(ii, 0, "\\");
+						word1.paster(ii, "\\");
 				}
 				word1.replacer("'" _FM "'", postfix ^ "'" _FM "'" ^ prefix);
-				word1.paster(-1, 0, postfix);
-				word1.paster(2, 0, prefix);
+				word1.paster(-1, postfix);
+				word1.paster(2, prefix);
 
 				//only ops <> and != are supported when using the regular expression operator (starting/ending/containing)
 				if (op == "<>")
@@ -3766,7 +3766,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 						//spaces should have been converted to & before selection
 						//spaces imply &
 						//partvalue.replacer(" ", "&");
-						//partvalue.paster(-1, 0, ":*");
+						//partvalue.paster(-1, ":*");
 
 						//treat entered colons as &
 						partvalue.replacer(":", "&");
@@ -3791,12 +3791,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					value.replacer("]''", "'':*");
 					value.replacer("]", ":*");
 					//value.replacer("|", ":*|");
-					value.paster(-1, 0, ":*");
+					value.paster(-1, ":*");
 				}
 
 				value.replacer("]''", "'':*");
 				value.replacer("]", ":*");
-				//value.paster(-1, 0, ":*");
+				//value.paster(-1, ":*");
 
 				//use "simple" dictionary (ie none) to allow searching for words starting with 'a'
 				//use "english" dictionary for stemming (or "simple" dictionary for none)

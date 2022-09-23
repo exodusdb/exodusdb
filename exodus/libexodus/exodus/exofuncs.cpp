@@ -882,7 +882,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	// or use "which EXECPATH somehow like in mvdebug.cpp
 	// if (not EXECPATH.contains(OSSLASH) && not EXECPATH.contains(":"))
 	//{
-	//	EXECPATH.paster(0,0,oscwd()^OSSLASH);
+	//	EXECPATH.prefixer(oscwd()^OSSLASH);
 	//	if (OSSLASH=="\\")
 	//		EXECPATH.converter("/","\\");
 	//}

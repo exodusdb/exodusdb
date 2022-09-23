@@ -32,7 +32,7 @@ function main() {
 				if (not text(ln).match(comment_regex) and text(ln)[-1] == ";" and text(ln).first(coln).count(DQ).mod(2) == 0) {
 					var printcoln = textlen(text(ln).first(coln - 1)) + 1;
 					if (coln and printcoln < maxprintcoln) {
-						text(ln).paster(coln, 0, space(maxprintcoln-printcoln));
+						text(ln).paster(coln, space(maxprintcoln-printcoln));
 						updated = true;
 						//printl(text(ln));
 					}
