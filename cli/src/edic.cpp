@@ -21,7 +21,7 @@ function main() {
 	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS, edic_hist))
 		printl("Cannot write to ", edic_hist);
 
-	var verbose = OPTIONS.ucase().contains("V");
+	var verbose = OPTIONS.contains("V");
 
 	var exo_HOME = osgetenv("EXO_HOME");
 	if (not exo_HOME)

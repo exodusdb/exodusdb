@@ -195,9 +195,6 @@ namespace exodus {
 #define SESSION mv.SESSION
 #define THREADNO mv.THREADNO
 
-//#define LOWERCASE mv.LOWERCASE
-//#define UPPERCASE mv.UPPERCASE
-
 #define STATION mv.STATION
 #define DATEFMT mv.DATEFMT
 #define BASEFMT mv.BASEFMT

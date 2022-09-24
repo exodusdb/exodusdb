@@ -40,9 +40,12 @@ set -euxo pipefail
 : Compile EXODUS service
 : ======================
 :
-: O - Optimize level 1
-: S - Silent. Only stars
+: O - Increase optimisation level
+: o - Reduce optimisation level
 : F - Force
+: H - Headers only
+: X - Suppress compilation
+: S - Silent
 : V - Verbose
 :
 	compile alt exo sys {OS${COMPILER_OPTIONS}}

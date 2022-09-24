@@ -68,14 +68,13 @@ function main() {
 	var usedeffile = false;
 
 	//extract options
-	OPTIONS.ucaser();
 	if (index(OPTIONS,"X"))
 		return 0;
 	verbose = index(OPTIONS, "V");
 	silent = count(OPTIONS, "S");
 	debugging = not index(OPTIONS, "R");  //no symbols for backtrace
 	//the backtrace seems to work fine with release mode at least in vs2005
-	optimise = count(OPTIONS, "O") - count(OPTIONS, "-");				//prevents backtrace
+	optimise = count(OPTIONS, "O") - count(OPTIONS, "o");				//prevents backtrace
 	generateheadersonly = index(OPTIONS, "H");	//prevents backtrace
 	force = index(OPTIONS,"F");
 	var color_option = index(OPTIONS,"C");
