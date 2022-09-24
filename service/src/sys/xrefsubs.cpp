@@ -2,8 +2,8 @@
 libraryinit()
 
 #include <locking.h>
-#include <singular.h>
 #include <authorised.h>
+#include <singular.h>
 
 #include <sys_common.h>
 #include <win_common.h>

@@ -16,6 +16,7 @@ libraryinit()
 #include <getsubs.h>
 #include <proxysubs.h>
 #include <addcent4.h>
+#include <singular.h>
 
 #include <sys_common.h>
 #include <win_common.h>

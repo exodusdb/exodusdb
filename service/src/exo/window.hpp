@@ -1,3 +1,6 @@
+#ifndef EXO_WINDOW_HPP_
+#define EXO_WINDOW_HPP_
+
 //#include <authorised.h>
 
 function security(in mode)
@@ -135,3 +138,5 @@ function badchars(io msg) {
 	}
 	return 0;
 }
+
+#endif // EXO_WINDOW_HPP_

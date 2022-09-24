@@ -1778,39 +1778,6 @@ bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const 
 	return 1;
 }
 
-// singular
-var ExodusProgramBase::singular(CVR pluralnoun) {
-
-	var temp = pluralnoun;
-
-	if (temp.ends("ES")) {
-
-		// companies=company
-		if (temp.ends("IES")) {
-			temp.paster(-3, 3, "Y");
-
-			// addresses=address
-		} else if (temp.ends("SSES")) {
-			temp.cutter(-2);
-		} else if (temp.ends("SHES")) {
-			temp.cutter(-2);
-		} else if (temp.ends("CHES")) {
-			temp.cutter(-2);
-		} else if (1) {
-			temp.popper();
-		}
-	} else {
-
-		if (temp.ends("S")) {
-			// analysis, dos
-			if (not temp.ends("IS") && not temp.ends("OS"))
-				temp.popper();
-		}
-	}
-
-	return temp;
-}
-
 // flushindex
 void ExodusProgramBase::flushindex(CVR /*filename*/) {
 	//std::cout << "ExodusProgramBase::std::flushindex not implemented yet, " << filename

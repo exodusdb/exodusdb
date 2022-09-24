@@ -230,11 +230,11 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	var outfilename = SYSTEM.f(2);
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
-	if ((outfilename.last(4)).lcase() eq ".htm") {
+	if (outfilename.lcase().ends(".htm")) {
 		outfilename.paster(-3, 3, "xls");
 		SYSTEM(2) = outfilename;
 	}
-	var excel = (outfilename.last(3)).lcase() eq "xls";
+	var excel = outfilename.lcase().ends("xls");
 
 	outfilename.osremove();
 	if (outfilename.osfile()) {

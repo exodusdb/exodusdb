@@ -16,12 +16,12 @@ libraryinit()
 #include <sysmsg.h>
 #include <htmllib2.h>
 #include <listen3.h>
-#include <singular.h>
 #include <systemsubs.h>
 #include <generalsubs.h>
 #include <authorised.h>
 #include <flushindex.h>
 #include <rtp57.h>
+#include <singular.h>
 
 #include <sys_common.h>
 #include <win_common.h>

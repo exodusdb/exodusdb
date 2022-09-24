@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <singular.h>
+
 #include <win_common.h>
 
 #include <window.hpp>

@@ -3,7 +3,6 @@ libraryinit()
 
 #include <listen5.h>
 #include <sysmsg.h>
-#include <singular.h>
 #include <authorised.h>
 #include <collectixvals.h>
 #include <htmllib2.h>
@@ -15,6 +14,7 @@ libraryinit()
 #include <getbackpars.h>
 #include <esctoattr.h>
 #include <scrnio.h>
+#include <singular.h>
 
 #include <sys_common.h>
 #include <win_common.h>

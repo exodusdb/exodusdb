@@ -112,67 +112,34 @@ class PUBLIC ExodusProgramBase {
 	// called dict+DICT function dictid not const so we can mess with the library?
 	ND var calculate(CVR dictid);
 	ND var calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mv = 0);
-
 	ND var xlate(CVR filename, CVR key, CVR fieldno_or_name, const char* mode);
-	// moved to exodusprogrambase
-	// var perform(CVR sentence);
-
-	// ditto
-	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
-	// called dict+DICT function dictid not const so we can mess with the library? var
-	// calculate(CVR dictid); var calculate(CVR dictid, CVR dictfile, const
-	// VARREF id, CVR record, CVR mv=0);
 
 	ND var otherusers(CVR param);
 	ND var otherdatasetusers(CVR param);
 
-	// moved to exoprog
-	// var capitalise(CVR str0, CVR mode=var(), CVR wordseps=var()) const;
-	////var capitalise(CVR str0, CVR mode="", CVR wordseps="") const;
-
-	//void debug() const;
 	bool fsmsg(CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
 	ND var sysvar(CVR var1, CVR var2, CVR mv3, CVR mv4);
 	void setprivilege(CVR var1);
 
 	// NB does not return record yet
 	ND bool lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
-	// bool lockrecord(CVR xfilename, CVR xfile, CVR keyx, CVR
-	// recordx, CVR waitsecs, const bool allowduplicate=false) const;
 	ND bool lockrecord(CVR filename, VARREF file, CVR keyx) const;
 	bool unlockrecord(CVR filename, VARREF file, CVR key) const;
-	//unlock all
 	bool unlockrecord() const;
 
 	ND var decide(CVR question, CVR options) const;
 	var decide(CVR question, CVR options, VARREF reply, const int defaultreply = 1) const;
 
 	void savescreen(VARREF origscrn, VARREF origattr) const;
-	// void ostime(VARREF ostimenow) const;
 	var keypressed(int milliseconds = 0) const;
 	ND bool esctoexit() const;
 
-	//	bool oswritex(CVR str, CVR filename) const;
-	//	bool osbwritex(CVR str1, CVR filehandle, CVR filename, VARREF
-	// offset) const; 	bool osbreadx(VARREF str1, CVR filehandle, CVR filename,
-	// const int offset, const int length); 	bool osbreadx(VARREF str1, CVR
-	// filehandle, CVR filename, VARREF offset, const int length);
-
-	// moved to external function
-	// bool authorised(CVR task, VARREF msg, CVR defaultlock="");
-	// bool authorised(CVR task);
-	// void readuserprivs();
-	// void writeuserprivs();
-	// void sysmsg(CVR msg);
-	// var sendmail(CVR toaddress, CVR subject, CVR body0, CVR
-	// attachfilename, CVR deletex, VARREF errormsg);
-
-	ND var singular(CVR pluralnoun);
 	void flushindex(CVR filename);
 	ND var encrypt2(CVR encrypt0) const;
 	ND var xmlquote(CVR str) const;
 	ND bool loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg);
 
+	// TERMINAL specific terminal cursor control
 	ND var AT(const int code) const;
 	ND var AT(const int x, const int y) const;
 
@@ -183,11 +150,11 @@ class PUBLIC ExodusProgramBase {
 	void setprompt(CVR prompt) const;
 
 	ND var handlefilename(CVR handle);
-	//ND var memspace(CVR requiredmemspace);
 
-	// was MVDB
 	ND var getuserdept(CVR usercode);
 
+	// ioconv with access to all exoprog functionality and base ioconv
+	// Particularly the ability to call custom ioconv funcs like "[xxxxxxxx]"
 	ND var oconv(CVR input, CVR conversion);
 	ND var iconv(CVR input, CVR conversion);
 
@@ -220,6 +187,7 @@ class PUBLIC ExodusProgramBase {
 
    private:
 
+	// ioconv with a language specific month
 	var exoprog_date(CVR type, CVR input0, CVR ndecs0, VARREF output);
 	var exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF output);
 
@@ -231,7 +199,6 @@ class PUBLIC ExodusProgramBase {
 
 	// used by perform to call libraries WITH NO ARGUMENTS
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;
-	//mutable var cached_perform_libid_;
 };
 
 // clang-format off
