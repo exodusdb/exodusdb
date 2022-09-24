@@ -598,6 +598,9 @@ function main() {
 	ss = "";
 	wordn = 0;
 
+	//TRACE(sentencex)
+	//TRACE(OPTIONS)
+
 ///////////
 nextphrase:
 	///////////
@@ -780,11 +783,12 @@ nextkey:
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limitx) {
-					if ((DQ ^ "'").contains(word[1])) {
-						if (word.starts(word[-1])) {
-							word.cutter(1).popper();
-						}
-					}
+//					if ((DQ ^ "'").contains(word[1])) {
+//						if (word.starts(word[-1])) {
+//							word.cutter(1).popper();
+//						}
+//					}
+					word.unquoter();
 					if (word eq "") {
 						word = "\"\"";
 					}
@@ -2104,7 +2108,7 @@ getnextword:
 	}
 
 	//!** call note(quote(word):' ':quote(nextword))
-	//TRACE(word)
+	//TRACE(charn ^ " " ^ word)
 	//TRACE(nextword)
 	return;
 }
@@ -2127,15 +2131,20 @@ getword2b:
 	charn += 1;
 
 	//skip spaces
-	while (true) {
-		///BREAK;
-		if (not(sentencex[charn] eq " "))
-			break;
-		charn += 1;
-		if (charn gt sentencex.len()) {
-			return;
-		}
-	}  //loop;
+//	while (true) {
+//		///BREAK;
+//		if (not(sentencex[charn] eq " "))
+//			break;
+//		charn += 1;
+//		if (charn gt sentencex.len()) {
+//			return;
+//		}
+//	}  //loop;
+	while (sentencex[charn] eq " ") {
+		charn++;
+	}
+	if (charn gt sentencex.len())
+		return;
 
 	//if next word starts with " or ' then scan for the same closing
 	//otherwise scan up to the next space char

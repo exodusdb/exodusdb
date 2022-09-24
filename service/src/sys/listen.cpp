@@ -814,7 +814,27 @@ function loop_exit() {
 				// Execute the command as user EXODUS
 				var username=USERNAME;
 				USERNAME="EXODUS";
-				execute(cmd);
+
+				if (not cmd.starts("list")) {
+					printl("Begin transaction");
+					begintrans();
+				}
+
+				var ok = execute(cmd);
+
+				if (statustrans()) {
+					if (decide("Commit any database updates ?","Commit" _VM "Rollback") eq "Commit") {
+						print("Committing transaction ... ");
+						committrans();
+						printl("done.");
+					}
+					else {
+						print("*ROLLING BACK* transaction ... ");
+						rollbacktrans();
+						printl("done.");
+					}
+				}
+
 				USERNAME=username;
 
 			} catch (VarError e) {errputl(e.description);}
@@ -829,7 +849,7 @@ function loop_exit() {
 		return true;
 	}
 
-	//f10 or "x" on linux
+	//f10 or ? on linux
 	if (charx eq INTCONST.f(7)) {
 		//execute("RUNMENU " ^ ENVIRONSET.f(37));
 		execute("RUNMENU");

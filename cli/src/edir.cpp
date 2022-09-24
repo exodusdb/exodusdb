@@ -86,72 +86,109 @@ function main() {
 	if (not fileinfo)
 		abort("Could not write local copy for editing " ^ temposfilename);
 
-	//fire up the editor
 	var editcmd = editor ^ " " ^ temposfilename.quote();
-	printl(editcmd);
-	osshell(editor ^ " " ^ temposfilename);
+	while (true) {
 
-	//process after editor has been closed
+		//fire up the editor
+		printl(editcmd);
+		osshell(editor ^ " " ^ temposfilename);
 
-	var fileinfo2 = osfile(temposfilename);
+		//process after editor has been closed
 
-	//get edited file info or abort
-	if (not fileinfo2) {
-		abort("Could not read local copy after editing " ^ temposfilename);
-	}
+		var fileinfo2 = osfile(temposfilename);
 
-	//file has been edited
-	else if (fileinfo2 ne fileinfo) {
-
-		var text2;
-		osread(text2, temposfilename);
-
-		if (text2 == "") {
+		//get edited file info or abort
+		if (not fileinfo2) {
 			abort("Could not read local copy after editing " ^ temposfilename);
 		}
 
-		// Unescape text back to data format
-		if (filename ne "DOS") {
+		//file has been edited
+		else if (fileinfo2 ne fileinfo) {
 
-			trimmerb(text2, "\r\n");
+			var text2;
+			osread(text2, temposfilename);
 
-			//convert to original format
-			text2 = text2.iconv(txtfmt);
+			if (text2 == "") {
+				abort("Could not read local copy after editing " ^ temposfilename);
+			}
 
-		}
+			// Unescape text back to data format
+			if (filename ne "DOS") {
 
-		// Convert FMs back to VMs etc. if editing a specific field
-		if (fieldno)
-			text2.lowerer();
+				trimmerb(text2, "\r\n");
 
-		if (text2 ne text) {
+				//convert to original format
+				text2 = text2.iconv(txtfmt);
 
-			//print("Ok to update? ");
-			//var reply=inputl();
-			var reply = "Y";
+			}
 
-			var newrecord = fieldno ? RECORD.pickreplace(fieldno, text2) : text2;
+			// Convert FMs back to VMs etc. if editing a specific field
+			if (fieldno)
+				text2.lowerer();
 
-			//keep trying to update - perhaps futilely
-			//at least temp file will be left in the directory
-			while (ucase(reply).starts("Y") and true) {
+			// Validate dict recs
 
-				if (write(newrecord, file, ID)) {
-					printl(filename ^ " " ^ ID ^ " > db");
+			if (filename.starts("dict.")) {
+				var dictrec = text2;
 
-					//generate/update database functions if saved a symbolic dictionary record
-					if (filename.starts("dict.") and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
-																											"*pgsql")) {
-						var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
-						osshell(oscmd);
+				// Convert to FMs
+				if (filename eq "DOS") {
+
+					trimmerb(dictrec, "\r\n");
+
+					//convert to original format
+					dictrec = dictrec.iconv(txtfmt);
+
+				}
+				// Check F/S items
+				if (var("FS").contains(dictrec.f(1))) {
+
+					// Check justification
+					if (not var("LRTC").contains(dictrec.f(9))) {
+						if (decide("Field 9 of F/S dict items cannot be " ^ dictrec.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.\nFix it?") ne "Yes")
+							abort("");
+						continue;
 					}
 
-					break;
+					// Check width
+					if (not dictrec.f(10).isnum()) {
+						if (decide("Field 10 of F/S items cannot be " ^ dictrec.f(10).quote() ^ "\nField 10 of F/S items must be numeric\nFix it?") ne "Yes")
+							abort("");
+						continue;
+					}
 				}
-				var temp;
-				temp.input();
+			}
+
+			if (text2 ne text) {
+
+				//print("Ok to update? ");
+				//var reply=inputl();
+				var reply = "Y";
+
+				var newrecord = fieldno ? RECORD.pickreplace(fieldno, text2) : text2;
+
+				//keep trying to update - perhaps futilely
+				//at least temp file will be left in the directory
+				while (ucase(reply).starts("Y") and true) {
+
+					if (write(newrecord, file, ID)) {
+						printl(filename ^ " " ^ ID ^ " > db");
+
+						//generate/update database functions if saved a symbolic dictionary record
+						if (filename.starts("dict.") and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
+																												"*pgsql")) {
+							var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
+							osshell(oscmd);
+						}
+
+						break;
+					}
+					var temp;
+					temp.input();
+				}
 			}
 		}
+		break;
 	}
 
 	//clean up any temporary file

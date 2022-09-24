@@ -127,7 +127,7 @@ class PUBLIC ExodusProgramBase {
 	bool unlockrecord(CVR filename, VARREF file, CVR key) const;
 	bool unlockrecord() const;
 
-	ND var decide(CVR question, CVR options) const;
+	ND var decide(CVR question, CVR options = "") const;
 	var decide(CVR question, CVR options, VARREF reply, const int defaultreply = 1) const;
 
 	void savescreen(VARREF origscrn, VARREF origattr) const;

@@ -200,6 +200,8 @@ Within transactions, lock requests for locks that have already been obtained SUC
 //#include <exodus/exoenv.h>
 //#include <exodus/mvutf.h>
 
+#define DBTRACE2 DBTRACE
+
 namespace exodus {
 
 // the idea is for exodus to have access to one standard database without secret password
@@ -2774,7 +2776,7 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	// join words within quote marks into one quoted phrase
 	var char1 = word1[1];
 	if ((char1 == DQ || char1 == SQ)) {
-		while (word1[-1] != char1 || word1.len() <= 1) {
+		while (not word1.ends(char1) || word1.len() <= 1) {
 			if (remainingwords.len()) {
 				word1 ^= " " ^ remainingwords.field(" ", 1);
 				remainingwords = remainingwords.field(" ", 2, 99999);
@@ -2844,6 +2846,8 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	}
 
 	ucword = word1.ucase();
+	if (DBTRACE) TRACE(word1);
+	if (DBTRACE) TRACE(remainingwords);
 	return word1;
 }
 
@@ -2929,7 +2933,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	}
 
 	if (DBTRACE)
-		sortselectclause.logputl("sortselectclause=");
+		TRACE(sortselectclause);
 
 	var actualfilename = get_normal_filename(*this);
 	// actualfilename.logputl("actualfilename=");
@@ -3047,6 +3051,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					keycodes ^= FM;
 				keycodes ^= word1;
 			}
+			if (DBTRACE2) TRACE(keycodes);
 			continue;
 		}
 
@@ -3058,6 +3063,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 									" file cannot be opened");
 
 			}
+			if (DBTRACE2) TRACE(dictfilename);
 			continue;
 		}
 
@@ -3086,6 +3092,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 								distinctexpression;
 				orderclause ^= ", " ^ naturalsort_distinctexpression;
 			}
+			if (DBTRACE2) TRACE(orderclause);
 			continue;
 		}
 
@@ -3123,6 +3130,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (ucword == "BY-DSND")
 				orderclause ^= " DESC";
 
+			if (DBTRACE2) TRACE(orderclause);
 			continue;
 		}
 
@@ -3134,12 +3142,14 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (ucword == "OR") {
 				orwith = true;
 			}
+			if (DBTRACE2) TRACE(whereclause)
 			continue;
 		}
 
 		// subexpression grouping
 		else if (ucword == "(" || ucword == ")") {
 			whereclause ^= "\n " ^ ucword;
+			if (DBTRACE2) TRACE(whereclause);
 			continue;
 		}
 
@@ -3884,7 +3894,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				whereclause ^= " ( " ^ value ^ " )";
 			else
 				whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
-			// whereclause.logputl("whereclause=");
+
+			if (DBTRACE2) TRACE(whereclause);
 
 		}  //with/without
 

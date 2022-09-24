@@ -554,9 +554,10 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 //		lastpos = pos;
 //	}
 	var lastpos = sql.indexr("*" "/");
-	if (lastpos)
+	if (lastpos) {
 		//sql.pasterall(lastpos - 1, "");
-		sql.firster(lastpos - 2);
+		sql.firster(lastpos - 1);
+	}
 
 	var xlatetemplate;
 	if (ismv)
@@ -881,20 +882,20 @@ BEGIN
  nchars := length(data);
  for charn in 1..nchars loop
 
-  continue when.b(data,charn,1) <> sep;
+  continue when substring(data,charn,1) <> sep;
 
-  --if.b(data,charn,1) = sep then
+  --if substring(data,charn,1) = sep then
 
    currfieldn=currfieldn+1;
 
   if currfieldn=fieldno then
-   ans := substr(data,1,charn-1);
+   ans := substring(data,1,charn-1);
 
   elseif currfieldn>fieldno then
    if ans<>'' then
-    ans := ans || sep || substr(data,charn+1);
+    ans := ans || sep || substring(data,charn+1);
    else
-    ans := substr(data,charn+1);
+    ans := substring(data,charn+1);
    end if;
    return ans;
   end if;
@@ -943,19 +944,19 @@ BEGIN
  nchars := length(data);
  for charn in 1..nchars loop
 
-  continue when.b(data,charn,1) <> sep;
-  --if.b(data,charn,1) = sep then
+  continue when substring(data,charn,1) <> sep;
+  --if substring(data,charn,1) = sep then
 
   currfieldn=currfieldn+1;
 
   if currfieldn=fieldno then
-   ans := substr(data,1,charn-1);
+   ans := substring(data,1,charn-1);
 
   elseif currfieldn>fieldno then
    if ans<>'' then
-    ans := ans || sep || replacement || sep || substr(data,charn+1);
+    ans := ans || sep || replacement || sep || substring(data,charn+1);
    else
-    ans := replacement || sep || substr(data,charn+1);
+    ans := replacement || sep || substring(data,charn+1);
    end if;
    return ans;
   end if;

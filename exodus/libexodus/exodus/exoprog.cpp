@@ -1519,7 +1519,7 @@ void ExodusProgramBase::setprivilege(CVR errmsg) {
 // decide 2
 var ExodusProgramBase::decide(CVR question, CVR options) const {
 	var reply = "";
-	return decide(question, options, reply, 1);
+	return decide(question, options, reply, 0);
 }
 
 // decide 4
@@ -1556,7 +1556,7 @@ inp:
 	if (defaultreply)
 		std::cout << " Please enter 1 - " << noptions << " or Enter to default or 0 to cancel.";
 	else
-		std::cout << " Please enter 1 - " << noptions << " or Enter to cancel.";
+		std::cout << " Please enter 1 - " << noptions;
 	std::cout << std::endl;
 
 	reply = defaultreply;
