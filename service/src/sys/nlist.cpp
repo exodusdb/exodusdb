@@ -350,17 +350,7 @@ function main() {
 		decimalchar = ".";
 	}
 
-	if (VOLUMES) {
-		if (SYSTEM.f(2) eq "") {
-			perform("GET NEW " ^ SENTENCE);
-			stop();
-		}
-		html = 1;
-
-	//if not DOS then dont force html or force output to file
-	} else {
-		html = SYSTEM.f(2).lcase().ends("htm");
-	}
+	html = SYSTEM.f(2).lcase().ends("htm");
 
 	if (html) {
 		//td0=crlf:' '
@@ -404,11 +394,8 @@ function main() {
 
 	sentencex = SENTENCE;
 	DICT = "";
-	if (VOLUMES) {
-		maxncols = 100;
-	} else {
-		maxncols = 256;
-	}
+	maxncols = 256;
+
 	maxnrecs = "";
 	preselect = 0;
 	keylist = "";
@@ -1468,11 +1455,7 @@ nextdict:
 
 	} else {
 		if (not LISTACTIVE) {
-			if (VOLUMES) {
-				select(srcfile);
-			} else {
-				call xselect("SELECT " ^ filename ^ " (SR)");
-			}
+			call xselect("SELECT " ^ filename ^ " (SR)");
 		}
 	}
 	recn = "";
@@ -1511,13 +1494,7 @@ nextrec:
 
 	ok = 0;
 	RECORD = "";
-	if (VOLUMES) {
-		if (readnext(ID, MV)) {
-			ok = 1;
-		}
-	} else {
-		ok=readnext(RECORD,ID,MV);
-	}
+	ok=readnext(RECORD,ID,MV);
 	if (not ok) {
 		FILEERRORMODE = 0;
 		if (STATUS) {
@@ -1555,16 +1532,9 @@ nextrec:
 	lastid = ID;
 
 	//if c++ the select (R) option might have provided RECORD already
-	if (not RECORD) {
-		if (not(RECORD.reado(srcfile, ID))) {
-			goto nextrec;
-		}
+	if (not RECORD and not RECORD.reado(srcfile, ID)) {
+		goto nextrec;
 	}
-	//if @id='OX25637' then
-	//x=@record<50>
-	//oswrite @record on 'r'
-	//debug
-	//end
 
 	if (onlyauthorised) {
 		if (not(calculate("AUTHORISED"))) {

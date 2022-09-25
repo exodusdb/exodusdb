@@ -342,13 +342,13 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		functionsql.outputl();
 
 	//decide if reindex is required - only if function has changed
-	var reindexrequired = false;
+	var reindex_if_indexed = false;
 	var oldfunction;
 	var functionname = field(functionname_and_args, "(", 1).lcase();
 	var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
 	oldfunction.substrer(oldfunction.index("\n") + 1);
 	if (oldfunction and not functionsql.contains(oldfunction)) {
-		reindexrequired = true;
+		reindex_if_indexed = true;
 		//TRACE(functionsql)
 		//TRACE(oldfunction)
 	}
@@ -365,7 +365,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		if (verbose)
 			dropsql.outputl();
 
-		reindexrequired = true;
+		reindex_if_indexed = true;
 
 		rawsqlexec(dropsql, errmsg);
 		errmsg.outputl();
@@ -389,7 +389,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		//		}
 		errmsg.errputl();
 	}
-	if (reindexrequired) {
+	if (reindex_if_indexed) {
 		//drop any index using the previous function
 		//TODO identify file/fields like production_orders_date_time
 		//var filename=functionname_and_args.field("_",2);

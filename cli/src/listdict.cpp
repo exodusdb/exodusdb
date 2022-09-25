@@ -38,7 +38,8 @@ function main() {
 	if (filename eq "dict.all")
 		cmd ^= " ID-SUPP TABLE_NAME COLUMN_NAME @CRT BY TABLE_NAME";
 
-	cmd ^= " by TYPE by FMC by PART";
+	cmd ^= " by TYPE by FMC by PART by MASTER_FLAG";
+	//cmd ^= " by TYPE by-dsnd MASTER_FLAG by FMC by PART";
 
 	osshell(cmd);
 

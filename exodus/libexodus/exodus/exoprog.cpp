@@ -949,7 +949,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		return string2;
 	}
 
-	if (mode0.unassigned() || mode0 == "CAPITALISE") {
+	if (mode0.unassigned() || !mode0.len() || mode0 == "CAPITALISE") {
 		string2 = str0;
 		// convert @upper.case to @lower.case in string2
 		int nn = string2.len();
@@ -2130,11 +2130,14 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 			if (functionname == "number") {
 				gosub exoprog_number("OCONV", result, mode, output);
 			}
-
 			//custom function "[DATE]" will use the standard exodus var oconv
 			else if (functionname == "date") {
 				gosub exoprog_date("OCONV", result, mode, output);
-			}  else {
+			}
+			//custom function "[CAPITALISE]" will use the standard exodus var oconv
+			else if (functionname == "capitalise") {
+				output = capitalise(result, mode, "");
+			} else {
 
 				// set the function name
 				ioconv_custom = functionname;
@@ -2205,11 +2208,15 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
             if (functionname == "number") {
                 gosub exoprog_number("ICONV", result, mode, output);
 			}
-
 			//custom function "[DATE]" actually has a built in function
             else if (functionname == "date") {
                 gosub exoprog_date("ICONV", result, mode, output);
-
+			}
+			//custom function "[CAPITALISE]" actually has a built in function
+            else if (functionname == "capitalise") {
+                //gosub capitalise(result, mode, output);
+				//result = result;
+				output = result;
             } else {
 
 				// set the function name
