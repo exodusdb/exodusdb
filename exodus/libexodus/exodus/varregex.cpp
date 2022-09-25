@@ -280,6 +280,39 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 	return regex_syntax_flags;
 }
 
+thread_local std::map<std::string, REGEX> thread_regexes;
+
+// Caches regex giving very approx 10x speed up
+REGEX& getregex(SV matchstr, SV options) {
+
+	auto key = std::string(matchstr);
+	key.push_back(FM_);
+	key += options;
+
+	auto mapiter = thread_regexes.find(key);
+	if (mapiter != thread_regexes.end())
+		return mapiter->second;
+
+	try {
+		try {
+			REGEX re = boost::make_u32regex(
+						std::string(matchstr),
+						get_regex_syntax_flags(options)
+					);
+			[[maybe_unused]] auto [mapiter, success] = thread_regexes.insert({key, re});
+			return mapiter->second;
+			//return re;
+		} catch (boost::wrapexcept<std::out_of_range>& e) {
+			throw VarError("Error: (1) Invalid data during match of " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
+		}
+	} catch (std_boost::regex_error& e) {
+		throw VarError("Error: Invalid regex string " ^ var(matchstr).quote() ^ ". " ^ var(e.what()).quote());
+	}
+
+	// Cannot get here
+	throw VarError("getreg");
+}
+
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
 var var::match(SV matchstr, SV options) const {
 
@@ -294,7 +327,7 @@ var var::match(SV matchstr, SV options) const {
 	// *.* or *.???
 	// *abcde
 	// abcde*
-	//if (options.contains("w")) {
+	//if (options.contains("w")) { //c++20
 	if (options.find("w") != std::string::npos) {
 
 		// rules of glob - converting glob to regex
@@ -331,8 +364,6 @@ var var::match(SV matchstr, SV options) const {
 		return this->match(matchstr3);
 	}
 
-	// TODO automatic caching of regular expressions or new exodus datatype to handle them
-
 	/*
 	//using ECMAScript grammar. It's the default grammar and offers far more features that the
 	other grammars. Most C++ references talk as if C++11 implements regular expressions as
@@ -367,22 +398,7 @@ var var::match(SV matchstr, SV options) const {
 	// ICU in BOOST REGEX
 	// https://www.boost.org/doc/libs/1_34_1/libs/regex/doc/icu_strings.html
 
-	REGEX regex;
-	try {
-#ifdef USE_BOOST
-		//regex = boost::make_u32regex(matchstr.var_str, get_regex_syntax_flags(options));
-		try {
-			regex = boost::make_u32regex(std::string(matchstr), get_regex_syntax_flags(options));
-		} catch (boost::wrapexcept<std::out_of_range>& e) {
-			throw VarError("Error: (1) Invalid data during match of " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
-		}
-#else
-		//regex=std::regex(matchstr.var_str, get_regex_syntax_flags(options));
-		regex=std::regex(matchstr, get_regex_syntax_flags(options));
-#endif
-	} catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex string " ^ var(matchstr).quote() ^ ". " ^ var(e.what()).quote());
-	}
+	REGEX& regex = getregex(matchstr, options);
 
 	/*
 		//create iterators to matches
@@ -504,25 +520,7 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
-	// TODO automatic caching of regular expressions or new exodus datatype to handle them
-	REGEX regex1;
-	try {
-		//regex = std_boost::regex(regexstr.var_str, get_regex_syntax_flags(options));
-#ifdef USE_BOOST
-		//regex1 = boost::make_u32regex(regexstr.var_str, get_regex_syntax_flags(options));
-		try {
-			regex1 = boost::make_u32regex(std::string(regexstr), get_regex_syntax_flags(options));
-		} catch (boost::wrapexcept<std::out_of_range>& e) {
-			throw VarError("Error: (4) Invalid regexstr during replacement of " ^ var(regexstr).quote() ^ ". " ^ var(e.what()));
-		}
-
-#else
-		//regex1=std::regex(regexstr.var_str, get_regex_syntax_flags(options));
-		regex1=std::regex(regexstr, get_regex_syntax_flags(options));
-#endif
-	} catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex replace " ^ var(regexstr).quote() ^ ". " ^ var(e.what()));
-	}
+	REGEX& regex = getregex(regexstr, options);
 
 	// return regex_match(var_str, expression);
 
@@ -539,7 +537,7 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 			oiter,
 			var_str.begin(),
 			var_str.end(),
-			regex1,
+			regex,
 			std::string(replacementstr),
 			boost::match_default | boost::format_all
 		);
