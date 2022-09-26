@@ -293,8 +293,12 @@ function main() {
 			return invalid(targetdbname ^ targetdbcode.quote() ^ " not created");
 		}
 
-		//copy source data dir to new target data dir
-		oscopy(sourcedatadir, targetdatadir);
+		//create target data dir
+		//oscopy(sourcedatadir, targetdatadir);
+		//KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
+        osshell("mkdir -p " ^ targetdatadir);
+        osshell("chmod a+srw " ^ targetdatadir);
+        osshell("setfacl -d -m g::rw " ^ targetdatadir);
 		if (not osdir(targetdatadir)) {
 			return invalid("Error in creating target data directory");
 		}
