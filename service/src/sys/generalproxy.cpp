@@ -264,6 +264,13 @@ function main() {
 
 		var dbcodes = dblist();
 
+		//source database services will be stopped for source to target database copy
+        //reject source db if same as current database.
+        var currentdbcode = SYSTEM(17);
+        if (sourcedbcode eq currentdbcode) {
+            return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
+        }
+
 		//check source database exists
 		if (not locateusing(FM, sourcedbcode, dbcodes)) {
 			return invalid("Source database doesn't exists.");

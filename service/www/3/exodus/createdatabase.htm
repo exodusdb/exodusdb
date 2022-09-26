@@ -28,6 +28,7 @@
 
             di = dict[++din] = dictrec('OLD_DATABASE_CODE', 'F', 3)
 			yield* system_dict_datasetcode(di, false, false,'')
+			di.validation = 'yield* database_val_olddatabasecode()
 			exodus_dict_text(di,20)
             di.required = true
 
@@ -60,6 +61,12 @@
         }
         function* form_postwrite() {
 			yield* cleardoc()
+            return true
+        }
+        function* database_val_olddatabasecode(){
+            if (gvalue==gdataset) {
+                return yield* exodusinvalid('The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.');
+            }
             return true
         }
 		//allow lowercase alphanumeric only
