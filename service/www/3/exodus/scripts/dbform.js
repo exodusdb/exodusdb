@@ -8952,8 +8952,9 @@ function form_copypaste_getcols(event, pasting) {
     var cols = []
     for (var fn = 0; fn < tablefieldns.length; ++fn) {
         var element = gfields[tablefieldns[fn]]
-        if (pasting && element.getAttribute('exodusreadonly'))
-            continue
+	    //skip pasting values of non field type columns like symbolics
+        	if (pasting && Number(element.getAttribute('exodusfieldno')) == 0)
+            	continue
         var elementtitle = element.id.exodusconvert('_', ' ')
         var conversion = element.getAttribute('exodusconversion')
         var col = [element.id, elementtitle, conversion]
