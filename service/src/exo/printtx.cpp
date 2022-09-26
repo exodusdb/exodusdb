@@ -355,9 +355,10 @@ subroutine getheadfoot() {
 		var head1 = headx.f(1);
 		head1.replacer(" ", "&nbsp;");
 		head1.converter("~", " ");
-		while (true) {
-		///BREAK;
-		if (not(head1.ends("&nbsp;"))) break;
+//		while (true) {
+//		///BREAK;
+//		if (not(head1.ends("&nbsp;"))) break;
+		while (head1.ends("&nbsp;")) {
 			head1.cutter(-6);
 		}//loop;
 		headx(1) = head1;

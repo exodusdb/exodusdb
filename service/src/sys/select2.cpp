@@ -231,11 +231,12 @@ nocommon:
 
 	let ndictids = dictids.count(FM) + 1;
 	if (dictids ne "RECORD") {
-		while (true) {
-			///BREAK;
-			if (not(dictids.ends(FM))) break;
-			dictids.popper();
-		}//loop;
+//		while (true) {
+//			///BREAK;
+//			if (not(dictids.ends(FM))) break;
+//			dictids.popper();
+//		}//loop;
+		dictids.trimmerlast(FM);
 		if (dictids eq "") {
 			dictids = "ID";
 		}
@@ -530,8 +531,9 @@ nextrec:
 		var blockn = 0;
 		while (true) {
 			var rowpart = row.b(blockn * 16384 + 1, 16384);
-			///BREAK;
-			if (not rowpart) break;
+
+			if (not rowpart)
+				break;
 
 			rowpart.replacer("%", "%25");
 			//changed to allow language characters to pass through x80-xF9

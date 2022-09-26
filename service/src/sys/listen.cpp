@@ -552,8 +552,6 @@ function loop_init() {
 //nextsearch:
 ///////////
 
-	//BREAK ON;
-
 	//clear any file handles
 	var().osflush();
 
@@ -705,19 +703,7 @@ subroutine wait() {
 	//eg TESTMARK/BMTEST (MARKONE/BMDATA runs!!!!) both MASTERBR and MASTTEST dont
 	//on nl1 it will not run the waiting.exe command
 	//solved by removing path before WAITING.EXE above (unknown cause though)
-	if (not(VOLUMES)) {
-		perform(cmd);
-
-	} else if (SYSTEM.f(29)) {
-		osshell(cmd);
-
-	} else {
-		//print timedate():' ':cmd
-
-		cmd.osshell();
-
-	}
-	//break on
+	perform(cmd);
 
 	//quit if connection no longer active. postgres restarted/stopped.
 	if (not var().sqlexec("SELECT NOW()"))
@@ -1017,12 +1003,8 @@ subroutine main_exit() {
 		return;
 	}
 
-	//break off
-	//break on
-
 	//esc does this
 	if ((origsysmode or request1 eq "STOPDB") or halt) {
-		//break off
 		perform("OFF");
 		logoff();
 	}
@@ -1101,11 +1083,12 @@ readlink1:
 		request_.replacer("\\\\", "\\");
 		request_.replacer("\\r", FM);
 		//convert @lower.case to @upper.case in request
-		while (true) {
-			///BREAK;
-			if (not(request_.ends(FM))) break;
-			request_.popper();
-		}//loop;
+//		while (true) {
+//			///BREAK;
+//			if (not(request_.ends(FM))) break;
+//			request_.popper();
+//		}//loop;
+		request_.trimmerlast(FM);
 		//swap '%FF' with rm  in request
 		//swap '%FE' with fm in request
 		//swap '%FD' with vm in request
@@ -1370,8 +1353,8 @@ function request_init() {
 				//tt=(blockn-1)*inblocksize
 				call osbread(datx(blockn), linkfile2, inptr, inblocksize);
 
-				///BREAK;
-				if (not(datx(blockn).len())) break;
+				if (not(datx(blockn).len()))
+					break;
 
 				//avoid hexcode spanning block end by moving one or two bytes backwards
 				if (blockn gt 1) {
@@ -2713,8 +2696,9 @@ function request_exit() {
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
 				blk = data_.first(outblocksize);
 				data_.cutter(outblocksize);
-				///BREAK;
-				if (not(blk.len())) break;
+
+				if (not(blk.len()))
+					break;
 
 				//in LISTEN and SELECT2 for direct output
 

@@ -80,21 +80,24 @@ postuploadfail:
 			return invalid(msg);
 		}
 
-		var dictids = "VERSION*STATUS*USERNAME*DATETIME*STATION";
+		var dictids = "VERSION^STATUS^USERNAME^DATETIME^STATION"_var;
 		var fns = "";
 		var dictfilename = "DICT." ^ filename;
-		for (const var ii : range(1, 99)) {
-			var dictid = dictids.field("*", ii);
-
-			///BREAK;
-			if (not dictid) break;
+//		for (const var ii : range(1, 99)) {
+//			var dictid = dictids.field("*", ii);
+//
+//			///BREAK;
+//			if (not dictid)
+//				break;
+		for (var dictid : dictids) {
 			var fn = (dictid ^ "_ARCHIVED").xlate(dictfilename, 2, "X");
 			if (not(fn) or not(fn.isnum())) {
 				msg = (dictid ^ "_ARCHIVED").quote() ^ " is missing from " ^ dictfilename ^ " in upload.subs";
 				goto postuploadfail;
 			}
-			fns(ii) = fn;
+			fns ^= fn ^ FM;
 		} //ii;
+		fns.popper();
 
 		var ii2 = rec.f(fns.f(1)).fcount(VM);
 		rec(fns.f(1), ii2) = targetfilename;
@@ -451,8 +454,9 @@ nextline:
 /////////
 			gosub getline();
 
-			///BREAK;
-			if (not(not(eof))) break;
+			if (eof)
+				break;
+
 			if (not(line and linenox ge startatrown)) {
 				goto nextline;
 			}
@@ -471,12 +475,16 @@ nextline:
 					var offset = 1;
 					while (true) {
 						var tt = line.index("  ");
-						///BREAK;
-						if (not tt) break;
+
+						if (not tt)
+							break;
+
 						cols(-1) = line.first(tt - 1) ^ VM ^ offset;
 						for (ptr = tt; ptr <= 999999; ++ptr) {
-							///BREAK;
-							if (line[ptr + 1] ne " ") break;
+
+							if (line[ptr + 1] ne " ")
+								break;
+
 						} //ptr;
 						cols ^= VM ^ ptr;
 						offset += ptr;
@@ -665,11 +673,12 @@ addbuff:
 	}
 
 	//skip empty lines
-	while (true) {
-		///BREAK;
-		if (not(buff.starts("\r"))) break;
-		buff.cutter(1);
-	}//loop;
+//	while (true) {
+//		///BREAK;
+//		if (not(buff.starts("\r"))) break;
+//		buff.cutter(1);
+//	}//loop;
+	buff.trimmerfirst("\r");
 	if (not(buff.len())) {
 		goto addbuff;
 	}

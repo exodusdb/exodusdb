@@ -753,11 +753,9 @@ validateexit2:
 					}
 
 					//trim leading html tags
-					while (true) {
-						///BREAK;
-						if (not(tt.starts("<"))) break;
+					while (tt.starts("<")) {
 						tt = tt.field(">", 2, 99999);
-					}//loop;
+					}
 
 					RECORD.inserter(18, 1, tt);
 

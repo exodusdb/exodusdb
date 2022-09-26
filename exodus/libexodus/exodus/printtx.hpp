@@ -233,16 +233,22 @@ subroutine convoptions(io ptx_temp) {
 	//replace "''" with "" in ptx_temp
 	while (true) {
 		var optioncharn = ptx_temp.index("\'");
-		///BREAK;
-		if (not optioncharn) break;
+
+		if (not optioncharn)
+			break;
+
 		var optionchars = "";
 		while (true) {
+
 			optioncharn += 1;
 			var optionchar = ptx_temp[optioncharn];
-			///BREAK;
-			if (not(optionchar ne "" and optionchar ne "\'")) break;
+
+			//if (not(optionchar ne "" and optionchar ne "\'"))
+			if (optionchar eq _SQ or optionchar eq "")
+				break;
+
 			optionchars ^= optionchar;
-		}//loop;
+		}
 		var newoptions = "";
 		for (var i_ = 1; i_ <= optionchars.len(); ++i_) {
 			var optionchar = optionchars[i_];
@@ -265,11 +271,13 @@ subroutine convoptions(io ptx_temp) {
 			} else if (optionchar == "S") {
 				var spaceoptionsize = "";
 				while (true) {
-					///BREAK;
-					if (not((optionchars[i_ + 1]).match("^\\d$"))) break;
+
+					if (not optionchars[i_ + 1].match("^\\d$"))
+						break;
+
 					spaceoptionsize ^= optionchars[i_ + 1];
 					i_ += 1;
-				}//loop;
+				}
 				newoptions ^= spaceoptionsize.space();
 			}
 		};//i_;
@@ -303,11 +311,9 @@ subroutine getheadfoot() {
 		var head1 = headx.f(1);
 		head1.replacer(" ", "&nbsp;");
 		head1.converter("~", " ");
-		while (true) {
-			///BREAK;
-			if (not head1.ends("&nbsp;")) break;
+		while (head1.ends("&nbsp;")) {
 			head1.cutter(-6);
-		}//loop;
+		}
 		headx.r(1, head1);
 		head1 = "";
 		headx.replacer("{%20}", " ");

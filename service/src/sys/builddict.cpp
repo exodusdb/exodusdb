@@ -67,8 +67,9 @@ function main() {
 
 	while (true) {
 		gosub getblock();
-		///BREAK;
-		if (not blocktype) break;
+
+		if (not blocktype)
+			break;
 
 		if (blocktype eq "macro") {
 			gosub definemacro();
@@ -226,11 +227,11 @@ subroutine getblock() {
 
 			if (blocktype) {
 				block.cutter(1);
-				while (true) {
-					///BREAK;
-					if (not(block.ends(FM))) break;
-					block.popper();
-				}//loop;
+//				while (true) {
+//					if (not(block.ends(FM))) break;
+//					block.popper();
+//				}//loop;
+				block.trimmerlast(FM);
 				return;
 			}
 
@@ -330,7 +331,7 @@ nextmln:;
 //						findfieldn += 1;
 						//findpos = macrotext.index2("{", findpos);
 						findpos = macrotext.index("{", findpos);
-						///BREAK;
+
 						if (not findpos)
 							break;
 

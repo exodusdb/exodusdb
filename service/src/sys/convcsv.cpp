@@ -637,11 +637,12 @@ nextvn:
 		var line = rec.join();
 
 		//remove trailing or all tab chars
-		while (true) {
-			///BREAK;
-			if (not(line.ends(FM))) break;
-			line.popper();
-		}//loop;
+//		while (true) {
+//			///BREAK;
+//			if (not(line.ends(FM))) break;
+//			line.popper();
+//		}//loop;
+		line.trimmerlast(FM);
 
 		//suppress output of empty amv rows
 		if (mvgroupno and nkeys) {

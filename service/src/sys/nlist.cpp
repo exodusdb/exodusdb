@@ -215,9 +215,9 @@ var htmltitle;
 var head_or_foot;
 var footx;
 var head1;
-var optioncharn;//num
-var optionchars;
-var optionchar;
+//var optioncharn;//num
+//var optionchars;
+//var optionchar;
 var newoptions;
 var printtx_ii;//num
 var spaceoptionsize;
@@ -673,13 +673,13 @@ nextkey:
 		} else {
 
 			//parameters
-			while (true) {
-				///BREAK;
-				if (not(nextword ne "" and (((nextword.isnum() or (nextword.starts(DQ))) or (nextword.starts("'")))))) break;
+			while (nextword ne "" and (nextword.isnum() or nextword.starts(DQ) or nextword.starts(SQ))) {
+
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limitx) {
-					if ((DQ ^ "'").contains(word[1])) {
+//					if ((DQ ^ SQ).contains(word[1])) {
+					if (word.starts(DQ) or word.starts(SQ)) {
 						if (word.starts(word[-1])) {
 							word.cutter(1).popper();
 						}
@@ -689,7 +689,6 @@ nextkey:
 					}
 					limits(3, nlimits, -1) = word;
 				}
-				{}
 			}//loop;
 
 		}
@@ -808,9 +807,7 @@ nextkey:
 
 		tcoln = (hcoln - 1) * 2 + 1;
 		//find the next empty row
-		while (true) {
-			///BREAK;
-			if (not(headtab.f(hrown, tcoln) or (headtab.f(hrown, tcoln + 1)))) break;
+		while (headtab.f(hrown, tcoln) or headtab.f(hrown, tcoln + 1)) {
 			hrown += 1;
 		}//loop;
 
@@ -1007,10 +1004,13 @@ nextkey:
 
 						//determine B99.99 format for row and col
 						tt2 = "";
-						for (tt += 1; tt <= 9999; ++tt) {
+						var wordlen = word.len();
+						for (tt += 1; tt <= wordlen; ++tt) {
 							charx = word[tt];
-							///BREAK;
-							if (not(charx.len() and var("0123456789,").contains(charx))) break;
+
+							if (not var("0123456789,").contains(charx))
+								break;
+
 							tt2 ^= charx;
 						} //tt;
 
@@ -1314,11 +1314,12 @@ x1exit:
 		colhdg.replacer("'", "''");
 
 	} else {
-		while (true) {
-			///BREAK;
-			if (not(colhdg and ((" " ^ FM).contains(colhdg[-1])))) break;
-			colhdg.popper();
-		}//loop;
+//		while (true) {
+//			///BREAK;
+//			if (not(colhdg and ((" " ^ FM).contains(colhdg[-1])))) break;
+//			colhdg.popper();
+//		}//loop;
+		colhdg.trimmerlast(" " _FM);
 	}
 
 	//heading options
@@ -1650,8 +1651,10 @@ nextrec:
 	} else {
 		for (leveln = nbreaks; leveln >= 1; --leveln) {
 			coln = breakcolns.f(leveln);
-			///BREAK;
-			if (scol(coln) ne breakvalue(coln)) break;
+
+			if (scol(coln) ne breakvalue(coln))
+				break;
+
 		} //leveln;
 		breakleveln = leveln;
 	}
@@ -2011,20 +2014,19 @@ getword2b:
 	charn += 1;
 
 	//skip spaces
-	while (true) {
-		///BREAK;
-		if (not(sentencex[charn] eq " ")) break;
+	while (sentencex[charn] eq " ") {
 		charn += 1;
 		if (charn gt sentencex.len()) {
 			return;
 		}
-	}//loop;
+	}
 
 	//if next word starts with " or ' then scan for the same closing
 	//otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-	if (charx and ("'" ^ DQ).contains(charx)) {
+//	if (charx and ("'" ^ DQ).contains(charx)) {
+	if (charx eq _DQ or charx eq _SQ) {
 		searchchar = charx;
 	} else {
 		searchchar = " ";
@@ -2033,13 +2035,15 @@ getword2b:
 
 	//build up the word character by character until the closing char is found
 	//closing character (" ' or space)
-	while (true) {
+	while (charn < sentencex.len()) {
 		charn += 1;
 		charx = sentencex[charn];
-		///BREAK;
-		if (not(charx ne "" and charx ne searchchar)) break;
+
+		if (charx eq searchchar)
+			break;
+
 		word ^= charx;
-	}//loop;
+	}
 
 	//if scanned for " or ' then add it to the word
 	if (searchchar ne " ") {
