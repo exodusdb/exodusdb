@@ -77,7 +77,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		dataio.prefixer(tt ^ FM);
 
 		//postfix
-		dataio = dataio ^ FM ^ "</tbody>" ^ FM ^ "</table>";
+		dataio ^= FM ^ "</tbody>" ^ FM ^ "</table>";
 
 		//highlight last row if a total
 		var nlines = dataio.count(FM) + 1;
@@ -329,7 +329,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			// tt=index(dataio,browsername,1)
 			// if tt then browser:=' ':field(field(field(dataio[tt,9999],';',1),' ',1),')',1)
 			// next browsern
-			//browser=trimf(browser)
+			//browser=trimfirst(browser)
 
 		}
 		if (browser.ends(".0")) {

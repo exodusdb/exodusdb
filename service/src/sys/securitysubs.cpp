@@ -188,9 +188,6 @@ function main(in mode) {
 		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 			SECURITY = "";
 		}
-		if (VOLUMES) {
-			SECURITY = SECURITY.invert();
-		}
 		//in case not cleared in save/write
 		gosub cleartemp();
 
@@ -364,11 +361,7 @@ function main(in mode) {
 
 			//save orec (after removing stuff) for prewrite
 			if (win.wlocked) {
-				if (VOLUMES) {
-					RECORD.invert().write(DEFINITIONS, "SECURITY.OREC");
-				} else {
-					RECORD.write(DEFINITIONS, "SECURITY.OREC");
-				}
+				RECORD.write(DEFINITIONS, "SECURITY.OREC");
 			}
 
 		}
@@ -385,18 +378,12 @@ function main(in mode) {
 				msg = "SECURITY missing from DEFINITIONS";
 				return invalid(msg);
 			}
-			if (VOLUMES) {
-				origfullrec_ = origfullrec_.invert();
-			}
 
 			//simulate orec
 			if (win.orec.read(DEFINITIONS, "SECURITY.OREC")) {
 			} else {
 				msg = "SECURITY.OREC is missing from DEFINITIONS";
 				return invalid(msg);
-			}
-			if (VOLUMES) {
-				win.orec = win.orec.invert();
 			}
 
 			//safety check
@@ -592,11 +579,7 @@ function main(in mode) {
 		call cropper(RECORD);
 		//dont save record in noninteractive mode as we are in prewrite stage
 		if (interactive and RECORD) {
-			if (VOLUMES) {
-				RECORD.invert().write(DEFINITIONS, "SECURITY");
-			} else {
-				RECORD.write(DEFINITIONS, "SECURITY");
-			}
+			RECORD.write(DEFINITIONS, "SECURITY");
 		}
 		SECURITY = RECORD;
 
@@ -889,9 +872,6 @@ function main(in mode) {
 			}
 
 			//prepare to write the inverted record in noninteractive mode
-			if (VOLUMES) {
-				RECORD = RECORD.invert();
-			}
 
 			//remove the temp file
 			DEFINITIONS.deleterecord("SECURITY.OREC");
@@ -904,9 +884,6 @@ function main(in mode) {
 
 		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 			SECURITY = "";
-		}
-		if (VOLUMES) {
-			SECURITY = SECURITY.invert();
 		}
 		if (interactive) {
 			xx = unlockrecord("", DEFINITIONS, "SECURITY");
@@ -1050,7 +1027,7 @@ function main(in mode) {
 				} //ii;
 				task ^= "   ";
 				task.replacer("%SAME% ", "+");
-				task.trimmerb();
+				task.trimmerlast();
 				lasttask = task2;
 
 				tasks2 ^= VM ^ task;

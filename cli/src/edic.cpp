@@ -179,7 +179,7 @@ function main() {
 		else
 			startatlineno = "";
 
-		filename.trimmerb(".");
+		filename.trimmerlast(".");
 		if (not field2(filename, OSSLASH, -1).contains("."))
 			filename ^= ".cpp";
 

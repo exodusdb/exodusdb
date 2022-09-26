@@ -273,17 +273,15 @@ PUBLIC ND var fieldstore(CVR instring, SV sepchar, const int fieldno, const int 
 PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
 
 
-PUBLIC ND var trim(CVR instring, SV trimchars, SV options);
-PUBLIC VARREF trimmer(VARREF iostring, SV trimchars, SV options);
+PUBLIC ND var trim(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trim(trimchars);}
+PUBLIC ND var trimfirst(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trimfirst(trimchars);}
+PUBLIC ND var trimlast(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trimlast(trimchars);}
+PUBLIC ND var trimboth(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trimboth(trimchars);}
 
-PUBLIC ND var trim(CVR instring, SV trimchars DEFAULT_SPACE);
-PUBLIC VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE);
-
-PUBLIC ND var trimf(CVR instring, SV trimchars DEFAULT_SPACE);
-PUBLIC VARREF trimmerf(VARREF iostring, SV trimchars DEFAULT_SPACE);
-
-PUBLIC ND var trimb(CVR instring, SV trimchars DEFAULT_SPACE);
-PUBLIC VARREF trimmerb(VARREF iostring, SV trimchars DEFAULT_SPACE);
+PUBLIC VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmer(trimchars);}
+PUBLIC VARREF trimmerfirst(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerfirst(trimchars);}
+PUBLIC VARREF trimmerlast(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerlast(trimchars);}
+PUBLIC VARREF trimmerboth(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerboth(trimchars);}
 
 
 PUBLIC ND var chr(const int integer);

@@ -197,7 +197,7 @@ forcedemail:
 			ccaddress ^= ";";
 		}
 		ccaddress ^= toaddress.cut(tt + 1);
-		toaddress = toaddress.first(tt - 1);
+		toaddress.firster(tt - 1);
 	}
 
 	//send mail requires confirmation if user is EXODUS
@@ -337,10 +337,10 @@ forcedemail:
 	//condition subject start standard with 'EXODUS: '
 	if (subject.first(8) ne "EXODUS: ") {
 		if (subject.starts("EXODUS")) {
-			subject = subject.cut(6).trimf();
+			subject.cutter(6).trimmerfirst();
 		}
 		if (subject.starts("System:")) {
-			subject = subject.cut(7).trimf();
+			subject.cutter(7).trimmerfirst();
 		}
 		subject.prefixer("EXODUS: ");
 	}
@@ -622,7 +622,7 @@ TRACE(offset)
 		errormsg.remover(1);
 		call log("SENDMAIL", details);
 	} else {
-		errormsg.trimmerb(FM);
+		errormsg.trimmerlast(FM);
 		//errormsg<-1>=@fm:'Size:     ':msgsize '[XBYTES]'
 		//errormsg<-1>='From:     ':params1<1>
 		//errormsg<-1>='To:       ':toaddress

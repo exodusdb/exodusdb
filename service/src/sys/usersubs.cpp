@@ -169,9 +169,6 @@ function main(in mode) {
 		var resetpassword = mode.field(".", 2) eq "RESETPASSWORD";
 
 		if (SECURITY.read(DEFINITIONS, "SECURITY")) {
-			if (VOLUMES) {
-				SECURITY = SECURITY.invert();
-			}
 		}
 
 		if (SECURITY.f(1).locate(ID, usern)) {
@@ -199,9 +196,6 @@ function main(in mode) {
 			gosub unlocksec();
 			call sysmsg(msg);
 			return invalid(msg);
-		}
-		if (VOLUMES) {
-			SECURITY = SECURITY.invert();
 		}
 
 		var olduserprivs = SECURITY;
@@ -323,11 +317,7 @@ function main(in mode) {
 		}
 
 		if (resetpassword lt 2 and SECURITY ne olduserprivs) {
-			if (VOLUMES) {
-				SECURITY.invert().write(DEFINITIONS, "SECURITY");
-			} else {
-				SECURITY.write(DEFINITIONS, "SECURITY");
-			}
+			SECURITY.write(DEFINITIONS, "SECURITY");
 			//no need on user if on userprivs
 			RECORD(4) = "";
 		}

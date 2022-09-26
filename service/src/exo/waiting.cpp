@@ -42,7 +42,7 @@ function main() {
 		//reason is because events sometimes dont get reported
 		//so we need to check for actual files present
 		//at least in test where only one process is running
-		oswaitsecs = oswaitsecs + oswaitsecs;
+		oswaitsecs += oswaitsecs;
 		//but no more than remaining secs
 		if (oswaitsecs>remainingsecs)
 			oswaitsecs = remainingsecs;

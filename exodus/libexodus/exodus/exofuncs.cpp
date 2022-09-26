@@ -46,51 +46,6 @@ PUBLIC void swap(VARREF var1, VARREF var2) {
 }
 
 
-//PUBLIC void stop(CVR text) {
-//	text.stop(text);
-//}
-//
-//PUBLIC void abort(CVR text) {
-//	var().abort(text);
-//}
-//PUBLIC void abortall(CVR text) {
-//	var().abortall(text);
-//}
-//
-//PUBLIC var logoff() {
-//	return var().logoff();
-//}
-
-// PUBLIC var perform(CVR command)
-//{
-//	return command.perform();
-//}
-
-// PUBLIC var execute(CVR command)
-//{
-//	return command.execute();
-//}
-
-// PUBLIC var chain(CVR command)
-//{
-//	return command.chain();
-//}
-
-//PUBLIC void breakon() {
-//	return var().breakon();
-//}
-//PUBLIC void breakoff() {
-//	return var().breakoff();
-//}
-//
-//PUBLIC void debug() {
-//	var().debug();
-//}
-//
-//PUBLIC var backtrace() {
-//	return var().backtrace();
-//}
-
 PUBLIC var input() {
 	var v;
 	v.input();
@@ -293,53 +248,6 @@ PUBLIC var crop(CVR instring) {
 	return instring.crop();
 }
 
-
-PUBLIC VARREF trimmer(VARREF iostring, SV trimchars, SV options) {
-	return iostring.trimmer(trimchars, options);
-}
-PUBLIC var trim(CVR instring, SV trimchars, SV options) {
-
-	return instring.trim(trimchars, options);
-}
-
-PUBLIC VARREF trimmer(VARREF iostring, SV trimchars) {
-	return iostring.trimmer(trimchars);
-}
-PUBLIC var trim(CVR instring, SV trimchars) {
-	return instring.trim(trimchars);
-}
-
-PUBLIC VARREF trimmerf(VARREF iostring, SV trimchars) {
-	return iostring.trimmerf(trimchars);
-}
-PUBLIC var trimf(CVR instring, SV trimchars) {
-	return instring.trimf(trimchars);
-}
-
-PUBLIC VARREF trimmerb(VARREF iostring, SV trimchars) {
-	return iostring.trimmerb(trimchars);
-}
-PUBLIC var trimb(CVR instring, SV trimchars) {
-	return instring.trimb(trimchars);
-}
-
-
-//PUBLIC VARREF sorter(VARREF iostring, SV sepchar) {
-//	return iostring.sorter(sepchar);
-//}
-//PUBLIC ND var sort(CVR instring, SV sepchar) {
-//	return instring.sort(sepchar);
-//}
-//
-//
-//PUBLIC VARREF reverser(VARREF iostring, SV sepchar) {
-//	return iostring.reverser(sepchar);
-//}
-//PUBLIC ND var reverse(CVR instring, SV sepchar) {
-//	return instring.reverse(sepchar);
-//}
-//
-
 PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key) {
 	return dimrecord.read(dbfilevar, key);
 }
@@ -347,15 +255,6 @@ PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key) {
 PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key) {
 	return dimrecord.write(dbfilevar, key);
 }
-
-
-//PUBLIC dim split(CVR sourcevar, SV sepchar) {
-//	return sourcevar.split(sepchar);
-//}
-//
-//PUBLIC var join(const dim& sourcedim, SV sepchar) {
-//	return sourcedim.join(sepchar);
-//}
 
 
 PUBLIC var chr(const int integer) {
@@ -524,28 +423,6 @@ PUBLIC var field(CVR instring, SV substr, const int fieldno, const int nfields) 
 PUBLIC var field2(CVR instring, SV substr, const int fieldno, const int nfields) {
 	return instring.field2(substr, fieldno, nfields);
 }
-
-/* moved to exoprog to allow custom conversions like "[DATE]"
-PUBLIC var oconv(CVR instring, const char* conversion)
-{
-	return instring.oconv(conversion);
-}
-
-PUBLIC var oconv(CVR instring, CVR conversion)
-{
-	return instring.oconv(conversion);
-}
-
-PUBLIC var iconv(CVR instring, const char* conversion)
-{
-	return instring.iconv(conversion);
-}
-
-PUBLIC var iconv(CVR instring, CVR conversion)
-{
-	return instring.iconv(conversion);
-}
-*/
 
 PUBLIC bool connect(CVR connectioninfo) {
 	var conn1;
@@ -718,18 +595,6 @@ PUBLIC bool updaterecord(CVR record, CVR dbfilevar, CVR key) {
 PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key) {
 	return record.insertrecord(dbfilevar, key);
 }
-
-/*
-PUBLIC var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode)
-{
-	return key.xlate(dbfilename, fieldno, mode);
-}
-
-PUBLIC var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode)
-{
-	return key.xlate(dbfilename, fieldno, mode);
-}
-*/
 
 // PUBLIC var remove(CVR fromstr, VARREF startindex, VARREF delimiterno)
 PUBLIC var substr2(CVR fromstr, VARREF startindex, VARREF delimiterno) {
@@ -934,7 +799,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
 	if (mv.OPTIONS)
 		mv.COMMAND.cutter(-mv.OPTIONS.len());
-	mv.COMMAND.trimmerb(_FM);
+	mv.COMMAND.trimmerlast(_FM);
 
 	var temp;
 	// DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;

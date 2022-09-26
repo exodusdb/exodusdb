@@ -372,7 +372,7 @@ function onefile(in filename, in maxndifferences) {
 
 		if (result ne TARGET) {
 			ndifferences++;
-			printl(lineno ^ ".", line.trimb("\t"), "result differs:", result);
+			printl(lineno ^ ".", line.trimlast("\t"), "result differs:", result);
 			//			assert(result eq TARGET);
 		} else {
 			//printl(line,"OK");

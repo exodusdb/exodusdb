@@ -488,7 +488,7 @@ function main() {
 		//printl("--- ",srcfilename, " ---", osfile(srcfilename));
 
 		//OK if one of the compilable default file extension
-		srcfilename.trimmerb(".");
+		srcfilename.trimmerlast(".");
 		var fileext = srcfilename.field2(".", -1).lcase();
 		if (src_extensions.locateusing(" ", fileext)) {
 			filebase = srcfilename.cut(-len(fileext) - 1);
@@ -775,7 +775,7 @@ function main() {
 			var useclassmemberfunctions = false;
 
 //			for (int ln = 1; ln <= nlines; ++ln) {
-//				var line = trimf(text2(ln));
+//				var line = trimfirst(text2(ln));
 			for (const var& line : text2) {
 				var word1 = line.field(" ", 1);
 

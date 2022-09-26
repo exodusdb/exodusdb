@@ -2176,7 +2176,7 @@ getword2b:
 		//otherwise
 	} else {
 		word.ucaser();
-		word = word.trimb().trimf();
+		word = word.trimlast().trimfirst();
 	}
 
 	//get options and skip to next word

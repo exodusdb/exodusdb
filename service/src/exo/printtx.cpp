@@ -107,12 +107,6 @@ function main(io tx, in mode="", in modevalue="") {
 			html = printfilename.lcase().contains(".htm");
 		}
 		var ownprintfile = 0;
-		//if (printfilename == "") {
-		//	printfilename = var("9999999999").rnd().last(8);
-		//	printfilename = printfilename ^ (html ? ".htm" : ".5~txt");
-		//	SYSTEM(2) = printfilename;
-		//	ownprintfile = 1;
-		//}
 
 		//change the file extension to HTM
 		if (html and printfilename and printfilename.last(4).lcase() ne ".htm") {
@@ -205,8 +199,6 @@ function main(io tx, in mode="", in modevalue="") {
 				temp.prefixer(newpagetag ^ "&nbsp;</div>");
 			}
 		}
-
-		//swap '<h2>' with '<h2~style="page-break-before:auto">' in head
 
 		tx.prefixer(temp ^ FM);
 		if (printptr and not html) {

@@ -268,36 +268,36 @@ programinit()
 	str1 = str0;
 	assert(trim(str1)  eq "xxx xxx");
 	assert(str1        eq str0);
-	assert(trimf(str1) eq "xxx  xxx  ");
+	assert(trimfirst(str1) eq "xxx  xxx  ");
 	assert(str1        eq str0);
-	assert(trimb(str1) eq "  xxx  xxx");
+	assert(trimlast(str1) eq "  xxx  xxx");
 	assert(str1        eq str0);
 
-	assert(trim(str1, " ", "")   eq "xxx xxx");
+	assert(trim(str1, " ")   eq "xxx xxx");
 	assert(str1                  eq str0);
-	assert(trim(str1, " ", "F")  eq "xxx  xxx  ");
+	assert(trimfirst(str1, " ")  eq "xxx  xxx  ");
 	assert(str1                  eq str0);
-	assert(trim(str1, " ", "B")  eq "  xxx  xxx");
+	assert(trimlast(str1, " ")  eq "  xxx  xxx");
 	assert(str1                  eq str0);
-	assert(trim(str1, " ", "FB") eq "xxx  xxx");
+	assert(trimboth(str1, " ") eq "xxx  xxx");
 	assert(str1                  eq str0);
 
 	//member function trim/f/b
 
 	assert(str1.trim()  eq "xxx xxx");
 	assert(str1         eq str0);
-	assert(str1.trimf() eq "xxx  xxx  ");
+	assert(str1.trimfirst() eq "xxx  xxx  ");
 	assert(str1         eq str0);
-	assert(str1.trimb() eq "  xxx  xxx");
+	assert(str1.trimlast() eq "  xxx  xxx");
 	assert(str1         eq str0);
 
-	assert(str1.trim(" ", "")   eq "xxx xxx");
+	assert(str1.trim(" ")   eq "xxx xxx");
 	assert(str1                 eq str0);
-	assert(str1.trim(" ", "F")  eq "xxx  xxx  ");
+	assert(str1.trimfirst(" ")  eq "xxx  xxx  ");
 	assert(str1                 eq str0);
-	assert(str1.trim(" ", "B")  eq "  xxx  xxx");
+	assert(str1.trimlast(" ")  eq "  xxx  xxx");
 	assert(str1                 eq str0);
-	assert(str1.trim(" ", "FB") eq "xxx  xxx");
+	assert(str1.trimboth(" ") eq "xxx  xxx");
 	assert(str1                 eq str0);
 
 	//global function trimmer/f/b
@@ -306,23 +306,23 @@ programinit()
 	assert(trimmer(str1)  eq "xxx xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(trimmerf(str1) eq "xxx  xxx  ");
+	assert(trimmerfirst(str1) eq "xxx  xxx  ");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(trimmerb(str1) eq "  xxx  xxx");
+	assert(trimmerlast(str1) eq "  xxx  xxx");
 	assert(str1 ne str0);
 
 	str1 = str0;
-	assert(trimmer(str1, " ", "")   eq "xxx xxx");
+	assert(trimmer(str1, " ")   eq "xxx xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(trimmer(str1, " ", "F")  eq "xxx  xxx  ");
+	assert(trimmerfirst(str1, " ")  eq "xxx  xxx  ");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(trimmer(str1, " ", "B")  eq "  xxx  xxx");
+	assert(trimmerlast(str1, " ")  eq "  xxx  xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(trimmer(str1, " ", "FB") eq "xxx  xxx");
+	assert(trimmerboth(str1, " ") eq "xxx  xxx");
 	assert(str1 ne str0);
 
 	//member function trimmer/f/b
@@ -331,23 +331,23 @@ programinit()
 	assert(str1.trimmer()  eq "xxx xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmerf() eq "xxx  xxx  ");
+	assert(str1.trimmerfirst() eq "xxx  xxx  ");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmerb() eq "  xxx  xxx");
+	assert(str1.trimmerlast() eq "  xxx  xxx");
 	assert(str1 ne str0);
 
 	str1 = str0;
-	assert(str1.trimmer(" ", "")   eq "xxx xxx");
+	assert(str1.trimmer(" ")   eq "xxx xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmer(" ", "F")  eq "xxx  xxx  ");
+	assert(str1.trimmerfirst(" ")  eq "xxx  xxx  ");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmer(" ", "B")  eq "  xxx  xxx");
+	assert(str1.trimmerlast(" ")  eq "  xxx  xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmer(" ", "FB") eq "xxx  xxx");
+	assert(str1.trimmerboth(" ") eq "xxx  xxx");
 	assert(str1 ne str0);
 
 	{
@@ -358,16 +358,16 @@ programinit()
 	}
 
 	{
-		assert(trimf("XYZabcXYZdefXYZ", "XYZ").outputl() eq "abcXYZdefXYZ");
+		assert(trimfirst("XYZabcXYZdefXYZ", "XYZ").outputl() eq "abcXYZdefXYZ");
 		var x = "XYZabcXYZdefXYZ";
-		trimmerf(x, "XYZ");
+		trimmerfirst(x, "XYZ");
 		assert(x                                         eq "abcXYZdefXYZ");
 	}
 
 	{
-		assert(trimb("XYZabcXYZdefXYZ", "XYZ").outputl() eq "XYZabcXYZdef");
+		assert(trimlast("XYZabcXYZdefXYZ", "XYZ").outputl() eq "XYZabcXYZdef");
 		var x = "XYZabcXYZdefXYZ";
-		trimmerb(x, "XYZ");
+		trimmerlast(x, "XYZ");
 		assert(x                                         eq "XYZabcXYZdef");
 	}
 
@@ -541,7 +541,7 @@ programinit()
 	assert(var("XF").iconv("HEX").oconv("HEX")               eq "");
 
 	assert(var("abcabdef").trim("abef")                eq "cbd");
-	assert(var("abcabdef").trimf("abef").trimb("abef") eq "cabd");
+	assert(var("abcabdef").trimfirst("abef").trimlast("abef") eq "cabd");
 
 	var temp3 = "c";
 	var temp2("c");

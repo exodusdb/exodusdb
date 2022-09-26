@@ -274,7 +274,7 @@ var var::oconv_T(CVR format) const {
 
 			// more complex processing folding on spaces
 			// part.converter(TM," ");
-			part.trimmerf().trimmerb();
+			part.trimmerboth();
 
 			// simple processing if part is less than width
 			int partlen = part.var_str.size();

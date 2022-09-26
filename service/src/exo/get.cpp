@@ -18,7 +18,7 @@ function main() {
 	while (cmd) {
 		var word1=field(cmd," ",1);
 		if (word1 eq "GET" or word1 eq "NEW")
-			cmd = field(cmd," ",2,99999).trimb();
+			cmd = field(cmd," ",2,99999).trimlast();
 		else
 			break;
 	}

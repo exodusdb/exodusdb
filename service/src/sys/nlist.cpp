@@ -680,7 +680,7 @@ nextkey:
 				if (limitx) {
 					if ((DQ ^ "'").contains(word[1])) {
 						if (word.starts(word[-1])) {
-							word = word.cut(1).pop();
+							word.cutter(1).popper();
 						}
 					}
 					if (word eq "") {
@@ -2048,7 +2048,7 @@ getword2b:
 	//otherwise
 	} else {
 		word.ucaser();
-		word = word.trimb().trimf();
+		word.trimmerboth();
 	}
 
 	//get options and skip to next word

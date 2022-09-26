@@ -1533,9 +1533,6 @@ cannotopenlinkfile2:
 	//update security table every few secs and every login
 	//if request1='LOGIN' or index('036',time()[-1,1],1) then gosub getsecurity
 	if (SECURITY.read(DEFINITIONS, "SECURITY")) {
-		if (VOLUMES) {
-			SECURITY = SECURITY.invert();
-		}
 	}
 
 	//validate username and password ('LOGIN' gets special treatment)
@@ -2034,7 +2031,7 @@ noupdate:
 					USER3.replacer("Error: NO RECORD", "");
 
 					//swap 'RECORDKEY ' with '' in response
-					response_.trimmerb();
+					response_.trimmerlast();
 					if (USER3 eq "") {
 						response_ = "OK";
 					}
@@ -2066,7 +2063,7 @@ noupdate:
 				tt = USER3.index("SESSIONID");
 				if (tt) {
 					response_.paster(tt, ("SESSIONID " ^ sessionid).len(), "");
-					USER3.trimmerb();
+					USER3.trimmerlast();
 					if (response_ eq "") {
 						USER3 = "OK";
 					}

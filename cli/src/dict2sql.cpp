@@ -478,7 +478,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		//remove any existing pgsql
 		var pos = index(sourcecode, "/" "*pgsql");
 		if (pos) {
-			sourcecode = sourcecode.first(pos - 1).trimb(VM);
+			sourcecode = sourcecode.first(pos - 1).trimlast(VM);
 		}
 
 		var fulltext_dictid = field(field(sourcecode, "{", 2), "}", 1);
@@ -813,7 +813,7 @@ $RETVAR := array_to_string
 	replace_FM_etc(sql);
 
 	//convert to text
-	sql.trimmerf(VM).trimmerb(VM);
+	sql.trimmerfirst(VM).trimmerlast(VM);
 	sql.converter(VM, "\n");
 
 	var sqltemplate =

@@ -447,8 +447,9 @@ var::var(const std::wstring& wstr1) {
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
+
 // trim leading trimchars from a given string
-inline void trimmerf_helper(std::string& instr, SV trimchars) {
+inline void trimmerfirst_helper(std::string& instr, SV trimchars) {
 
 	auto start_pos = instr.find_first_not_of(trimchars);
 
@@ -464,7 +465,8 @@ inline void trimmerf_helper(std::string& instr, SV trimchars) {
 	return;
 }
 
-inline void trimmerb_helper(std::string& iostr, SV trimchars) {
+// trim trailing trimchars from a given string
+inline void trimmerlast_helper(std::string& iostr, SV trimchars) {
 
 	std::size_t end_pos = iostr.find_last_not_of(trimchars);
 
@@ -479,11 +481,12 @@ inline void trimmerb_helper(std::string& iostr, SV trimchars) {
 	return;
 }
 
-inline void trimmerm_helper(std::string& instr, SV trimchars) {
-
-	// ONLY works after trimming leading (F)ront and trailing (B)ack spaces
+// trim inner excess trimchars from a given string
+// ONLY works after trimming leading (F)ront and trailing (B)ack spaces
+inline void trimmerinner_helper(std::string& instr, SV trimchars) {
 
 	// find the starting position of any embedded trimchars
+	// working backwards
 	auto start_pos = std::string::npos;
 	while (true) {
 
@@ -512,100 +515,92 @@ inline void trimmerm_helper(std::string& instr, SV trimchars) {
 	return;
 }
 
-var var::trim(SV trimchars, SV options) const& {
+//trimfirst() - trim leading spaces/character
 
-	THISIS("var var::trim(SV trimchars, SV options) const&")
-	assertStringMutator(function_sig);
+// constant
+var var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
 
-	return var(*this).trimmer(trimchars, options);
-}
-
-VARREF var::trimmer(SV trimchars, SV options) {
-
-	THISIS("var var::trimmer(SV trimchars, SV options) const")
-	assertStringMutator(function_sig);
-
-	// Front only
-	if (options == "F") {
-		trimmerf_helper(var_str, trimchars);
-	}
-
-	// Back only
-	else if (options == "B") {
-		trimmerb_helper(var_str, trimchars);
-
-	}
-
-	// Front and Back, no Middle
-	else if (options == "FB") {
-		// back and front
-		trimmerb_helper(var_str, trimchars);
-		trimmerf_helper(var_str, trimchars);
-
-	}
-
-	// Front, Back and Middle
-	else {
-		// b, m, f for speed
-		trimmerb_helper(var_str, trimchars);
-		//trimmerm_helper(var_str, trimchars);
-		trimmerf_helper(var_str, trimchars);
-		// Sadly m must be last
-		trimmerm_helper(var_str, trimchars);
-	}
-
-	return *this;
-}
-
-//trimf() - trim leading spaces/character
-var var::trimf(SV trimchars DEFAULT_SPACE) const& {
-
-	THISIS("var var::trimf(SV trimchars) const&")
+	THISIS("var var::trimfirst(SV trimchars) const&")
 	assertStringMutator(function_sig);
 
 	var rvo = *this;
 
-	trimmerf_helper(rvo.var_str, trimchars);
+	trimmerfirst_helper(rvo.var_str, trimchars);
 
 	return rvo;
 }
 
 // mutate
-VARREF var::trimmerf(SV trimchars DEFAULT_SPACE) {
+VARREF var::trimmerfirst(SV trimchars DEFAULT_SPACE) {
 
-	THISIS("VARREF var::trimmerf(SV trimchars)")
+	THISIS("VARREF var::trimmerfirst(SV trimchars)")
 	assertStringMutator(function_sig);
 
-	trimmerf_helper(var_str, trimchars);
+	trimmerfirst_helper(var_str, trimchars);
 
 	return *this;
 }
 
-// trimb() - trim backward (trailing) spaces/character
-var var::trimb(SV trimchars DEFAULT_SPACE) const& {
+// trimlast() - trim backward (trailing) spaces/character
 
-	THISIS("var var::trimb(SV trimchars) const&")
+// constant
+var var::trimlast(SV trimchars DEFAULT_SPACE) const& {
+
+	THISIS("var var::trimlast(SV trimchars) const&")
 	assertStringMutator(function_sig);
 
 	var rvo = *this;
 
-	trimmerb_helper(rvo.var_str, trimchars);
+	trimmerlast_helper(rvo.var_str, trimchars);
 
 	return rvo;
 }
 
 // mutate
-VARREF var::trimmerb(SV trimchars DEFAULT_SPACE) {
+VARREF var::trimmerlast(SV trimchars DEFAULT_SPACE) {
 
-	THISIS("VARREF var::trimmerb(SV trimchars)")
+	THISIS("VARREF var::trimmerlast(SV trimchars)")
 	assertStringMutator(function_sig);
 
-	trimmerb_helper(var_str, trimchars);
+	trimmerlast_helper(var_str, trimchars);
+
+	return *this;
+}
+
+//trimboth() - remove leading and trailing spaces/characters
+
+// constant
+var var::trimboth(SV trimchars DEFAULT_SPACE) const& {
+
+	THISIS("var var::trimboth(SV trimchars) const&")
+	assertStringMutator(function_sig);
+
+	var rvo = *this;
+
+	trimmerlast_helper(rvo.var_str, trimchars);
+	trimmerfirst_helper(rvo.var_str, trimchars);
+
+	return rvo;
+}
+
+// mutate
+VARREF var::trimmerboth(SV trimchars DEFAULT_SPACE) {
+
+	// TODO reimplement with boost string trim_if algorithm
+	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
+
+	THISIS("VARREF var::trimmerboth(SV trimchars)")
+	assertStringMutator(function_sig);
+
+	trimmerlast_helper(var_str, trimchars);
+	trimmerfirst_helper(var_str, trimchars);
 
 	return *this;
 }
 
 //trim() - remove leading, trailing and excess internal spaces/character
+
+// constant
 var var::trim(SV trimchars DEFAULT_SPACE) const& {
 
 	THISIS("var var::trim(SV trimchars) const&")
@@ -613,12 +608,10 @@ var var::trim(SV trimchars DEFAULT_SPACE) const& {
 
 	var rvo = *this;
 
-	// Similar code in various places
-	trimmerb_helper(rvo.var_str, trimchars);
-	//trimmerm_helper(rvo.var_str, trimchars);
-	trimmerf_helper(rvo.var_str, trimchars);
-	//trimmerm only works after f and b trimchars are removed
-	trimmerm_helper(rvo.var_str, trimchars);
+	trimmerlast_helper(rvo.var_str, trimchars);
+	trimmerfirst_helper(rvo.var_str, trimchars);
+	//trimmerinner_helper only works after first and last trimchars are removed
+	trimmerinner_helper(rvo.var_str, trimchars);
 
 	return rvo;
 }
@@ -626,24 +619,24 @@ var var::trim(SV trimchars DEFAULT_SPACE) const& {
 // mutate
 VARREF var::trimmer(SV trimchars DEFAULT_SPACE) {
 
-	// reimplement with boost string trim_if algorithm
+	// TODO reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
 
 	THISIS("VARREF var::trimmer(SV trimchars)")
 	assertStringMutator(function_sig);
 
-	// Similar code in various places
-	trimmerb_helper(var_str, trimchars);
-	//trimmerm_helper(var_str, trimchars);
-	trimmerf_helper(var_str, trimchars);
-	//trimmerm only works after f and b trimchars are removed
-	trimmerm_helper(var_str, trimchars);
+	trimmerlast_helper(var_str, trimchars);
+	trimmerfirst_helper(var_str, trimchars);
+	//trimmerinner_helper only works after first and last trimchars are removed
+	trimmerinner_helper(var_str, trimchars);
 
 	return *this;
 }
 
 
 // invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
+
+// constant
 var var::invert() const& {
 	var tt = *this;
 	tt.inverter();
@@ -679,6 +672,8 @@ VARREF var::inverter() {
 
 
 // ucase() - upper case
+
+// constant
 var var::ucase() const& {
 	return var(*this).ucaser();
 }
@@ -724,6 +719,8 @@ VARREF var::ucaser() {
 
 
 // lcase() - lower case
+
+// constant
 var var::lcase() const& {
 	return var(*this).lcaser();
 }
@@ -760,6 +757,8 @@ VARREF var::lcaser() {
 
 
 // tcase() - title case
+
+// constant
 var var::tcase() const& {
 	return var(*this).tcaser();
 }
@@ -798,6 +797,8 @@ VARREF var::tcaser() {
 // Case Folding - is a process of converting a text to case independent representation.
 // For example case folding for a word "Grüßen" is "grüssen"
 // where the letter "ß" is represented in case independent way as "ss".
+
+// constant
 var var::fcase() const& {
 	return var(*this).fcaser();
 }
@@ -842,6 +843,8 @@ inline bool is_ascii(std::string_view str1) {
 // not
 // have any unassigned characters is normalized under one version of Unicode,
 // it must remain normalized under all future versions of Unicode."
+
+// constant
 var var::normalize() const& {
 	return var(*this).normalizer();
 }
@@ -871,11 +874,14 @@ VARREF var::normalizer() {
 
 
 // There is no memory or performance advantage for mutable call, only a consistent syntax for user
+
+// mutate
 VARREF var::uniquer() {
 	*this = this->unique();
 	return *this;
 }
 
+// constant
 var var::unique() const& {
 
 	THISIS("var var::unique()")
@@ -974,7 +980,7 @@ var var::textchr(const int utf_codepoint) const {
 // QUOTE - wrap with double quotes
 ////////
 
-// copy
+// constant
 var var::quote() const& {
 
 	THISIS(__PRETTY_FUNCTION__)
@@ -1004,7 +1010,7 @@ VARREF var::quoter() {
 // SQUOTE - wrap with single quotes
 /////////
 
-// copy
+// constant
 var var::squote() const& {
 
 	THISIS(__PRETTY_FUNCTION__)
@@ -1035,7 +1041,7 @@ VARREF var::squoter() {
 // UNQUOTE - remove outer double or single quotes
 //////////
 
-// copy
+// constant
 var var::unquote() const& {
 
 	THISIS(__PRETTY_FUNCTION__)
@@ -1101,7 +1107,7 @@ VARREF var::unquoter() {
 
 // 1. paste replace
 
-// copy
+// constant
 var var::paste(const int pos1, const int length, SV insertstr) const& {
 	// TODO avoid copy
 	return var(*this).paster(pos1, length, insertstr);
@@ -1167,7 +1173,7 @@ VARREF var::paster(const int pos1, const int length, SV insertstr) {
 //
 //// 2. paste over to end
 //
-//// copy
+//// constant
 //var var::pasteall(const int pos1, SV insertstr) const& {
 //	// TODO avoid copy
 //	return var(*this).pasterall(pos1, insertstr);
@@ -1201,7 +1207,7 @@ VARREF var::paster(const int pos1, const int length, SV insertstr) {
 
 // 3. paste insert at
 
-// copy
+// constant
 var var::paste(const int pos1, SV insertstr) const& {
 	// TODO avoid copy
 	return var(*this).paster(pos1, insertstr);
@@ -1247,7 +1253,7 @@ VARREF var::paster(const int pos1, SV insertstr) {
 // PREFIX - insert at beginning
 /////////
 
-// copy
+// constant
 var var::prefix(SV insertstr) const& {
 
 	THISIS("var var::prefix(SV insertstr)")
@@ -1275,7 +1281,7 @@ VARREF var::prefixer(SV insertstr) {
 // POP -remove last byte of string
 //////
 
-// copy
+// constant
 var var::pop() const& {
 	return var(*this).popper();
 }

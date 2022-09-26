@@ -99,6 +99,8 @@ function main() {
 	}
 	//printl(prefix, "Scanning", dirnames.convert(FM, "^"));
 
+	var dictcppfilenames = "";
+
 	for (var dirname : dirnames) {
 
 		var dirpath = datpath ^ "/" ^ dirname ^ "/";
@@ -290,17 +292,18 @@ function main() {
 				printl("Updated", dictcppfilename);
 			}
 
-			// Compile
-			if (force or newcpptext ne oldcpptext) {
-				var cmd = "compile " ^ dictcppfilename;
-				printl(cmd);
-				if (not osshell(cmd))
-					abort("sync_dat could not compile " ^ dictcppfilename);
-			}
+		dictcppfilenames ^= dictcppfilename ^ " ";
 
 		} // of store and compile generated cpp file
 
 	} // next dat dir
+
+	if (dictcppfilenames) {
+		var cmd = "compile " ^ dictcppfilenames ^ "{S}";
+		printl(cmd);
+		if (not osshell(cmd))
+			abort("sync_dat could not compile one or more dict_xxxx.cpp files");
+	}
 
 	// Record the current sync date and time
 	if (not generate and definitions)

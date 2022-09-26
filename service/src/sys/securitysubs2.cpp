@@ -91,9 +91,6 @@ function main(in mode) {
 		//which had blank passwords not allowed in the new system
 		if (SECURITY.f(1).locate("MICHAEL", xx)) {
 			if (newuserprivs.osread("PATSALID.CFG")) {
-				if (VOLUMES) {
-					newuserprivs = newuserprivs.invert();
-				}
 			}
 		}
 

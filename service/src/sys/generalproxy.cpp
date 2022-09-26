@@ -185,15 +185,15 @@ function main() {
 		//ensure authorised to login to one or the other database
 		//by ensuring the user is currently logged in to one or other database
 		if ((USERNAME ne "EXODUS" and copydb ne SYSTEM.f(17)) and todb ne SYSTEM.f(17)) {
-			USER4 = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
+			msg_ = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
 			msg_(-1) = "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote());
-			USER4(-1) = "but you are currently logged in to database " ^ (SYSTEM.f(17).quote());
+			msg_(-1) = "but you are currently logged in to database " ^ (SYSTEM.f(17).quote());
 			call mssg(msg_);
 			stop();
 		}
 
 		//should really have an option to close the live dataset and then copy
-		if (not(authorised("DATASET COPY", USER4, "LS"))) {
+		if (not(authorised("DATASET COPY", msg_, "LS"))) {
 			call mssg(msg_);
 			stop();
 		}
@@ -205,7 +205,7 @@ function main() {
 
 		perform("COPYDB " ^ copydb ^ " " ^ todb);
 
-		USER3 = USER4;
+		USER3 = msg_;
 		if (not response_) {
 			log ^= "|" ^ time().oconv("MTS") ^ " Finished";
 			call sysmsg(log);
@@ -332,7 +332,7 @@ function main() {
 	} else if (mode eq "PASSWORDRESET") {
 
 		if (not(authorised("PASSWORD RESET", msg_))) {
-			call mssg(USER4);
+			call mssg(msg_);
 			stop();
 		}
 
@@ -535,7 +535,7 @@ badsetcodepage:
 
 		call changelogsubs("SELECTANDLIST" ^ FM ^ data_);
 		if (msg_) {
-			USER4.move(USER3);
+			msg_.move(USER3);
 			stop();
 		}
 
@@ -610,7 +610,7 @@ badsetcodepage:
 		task = request_.f(2);
 		gosub gettaskprefix();
 		if (taskprefix) {
-			if (not(authorised(taskprefix ^ " ACCESS", USER4, ""))) {
+			if (not(authorised(taskprefix ^ " ACCESS", msg_, ""))) {
 				call mssg(msg_);
 				stop();
 			}
@@ -720,7 +720,7 @@ nextrep:
 		task = doc.f(5);
 		gosub gettaskprefix();
 		if (taskprefix) {
-			if (not(authorised(taskprefix ^ " CREATE", USER4, ""))) {
+			if (not(authorised(taskprefix ^ " CREATE", msg_, ""))) {
 				call mssg(msg_);
 				stop();
 			}
@@ -752,7 +752,7 @@ nextrep:
 		//get parameters from documents into @pseudo
 
 		if (not(sys.document.read(sys.documents, request_.f(2)))) {
-			USER4 = "Document " ^ (USER0.f(2).quote()) ^ " does not exist";
+			msg_ = "Document " ^ (USER0.f(2).quote()) ^ " does not exist";
 			call mssg(msg_);
 			stop();
 		}
@@ -760,7 +760,7 @@ nextrep:
 		task = sys.document.f(5);
 		gosub gettaskprefix();
 		if (taskprefix) {
-			if (not(authorised(taskprefix ^ " ACCESS", USER4, ""))) {
+			if (not(authorised(taskprefix ^ " ACCESS", msg_, ""))) {
 				call mssg(msg_);
 				stop();
 			}
@@ -895,80 +895,12 @@ exit:
 /////
 	stop();
 
-	/*;
-	//////////
-	errorexit:
-	//////////
-		response='Error: ':response;
-		stop;
-
-	//////////////
-	errorresponse:
-	//////////////
-		convert '|' to fm in msg;
-		msg=trim2(msg,fm,'F');
-		msg=trim2(msg,fm,'B');
-		//convert '||' to fm:fm in msg
-		swap fm:fm with crlf in msg;
-		swap fm with ' ' in msg;
-		response='Error: ':msg;
-		stop;
-
-	/////////////
-	opendatafile:
-	/////////////
-		open datafile to src.file else;
-			msg='The ':quote(datafile ):' file is not available';
-			goto errorresponse;
-			end;
-		open 'DICT',datafile to @dict else;
-			msg='The ':quote('DICT.':datafile ):' file is not available';
-			goto errorresponse;
-			end;
-		return 0;
-	*/
-
 	return "";
 }
 
 subroutine postproc() {
 	call proxysubs("GENERAL", mode, stationery);
 	return;
-
-	/*;
-	//////////////////////
-	checkoutputfileexists:
-	//////////////////////
-		if dir(system<2>)<1> gt 5 then;
-			data=system<2>;
-			response='OK';
-
-			//make pdf available as well
-			if stationery>2 then;
-				call convpdf(stationery,errors);
-				if errors then msg<-1>=errors;
-				end;
-
-			//convert to http path
-			data=system<2>;
-			tt=index(data,OSSLASH:'data':OSSLASH,1);
-			if tt then;
-				data='..':OSSLASH:'..':OSSLASH:data[tt,999999];
-				system<2>=data;
-				end;
-
-			if msg then response:=' ':msg;
-			msg='';
-		end else;
-			response=msg;
-			if response='' then;
-				response='Error: No output file in GENERALPROXY ':mode;
-				call sysmsg(response);
-				end;
-			end;
-		return;
-	*/
-
 }
 
 subroutine initlog() {
@@ -1009,12 +941,12 @@ subroutine initlog() {
 		}
 	}
 
-	if (not(authorised("LOG ACCESS", USER4, ""))) {
+	if (not(authorised("LOG ACCESS", msg_, ""))) {
 		USER3 = msg_;
 		stop();
 	}
 
-	if (not(authorised("LOG ACCESS " ^ (logkey.quote()), USER4, ""))) {
+	if (not(authorised("LOG ACCESS " ^ (logkey.quote()), msg_, ""))) {
 		response_ = msg_;
 		stop();
 	}

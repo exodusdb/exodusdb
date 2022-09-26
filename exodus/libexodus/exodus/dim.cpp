@@ -415,7 +415,7 @@ bool dim::write(CVR filevar, CVR key) const {
 	ISSTRING(filevar)
 	ISSTRING(key)
 
-	var temprecord = this->join().trimb(_FM);
+	var temprecord = this->join().trimlast(_FM);
 
 	return temprecord.write(filevar, key);
 

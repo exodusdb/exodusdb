@@ -138,9 +138,6 @@ function main(in mode) {
 		if (ID eq "SECURITY") {
 
 			if (win.templatex eq "USERS") {
-				if (VOLUMES) {
-					RECORD = RECORD.invert();
-				}
 				return 0;
 			}
 
@@ -419,11 +416,6 @@ preventupdate:
 				RECORD(128) = USERNAME;
 			}
 
-			//obfuscate the mark
-			if (VOLUMES) {
-				RECORD(1) = RECORD.f(1).invert();
-			}
-
 		}
 
 	} else if (mode eq "POSTWRITE") {
@@ -524,7 +516,7 @@ preventupdate:
 
 		}
 
-		//have to pass back the inverted, partial record
+		//have to pass back the partial record
 		if (ID eq "SECURITY") {
 
 			//could be HOURLYRATES which has different authorisation
@@ -689,10 +681,6 @@ subroutine reorderdbs() {
 
 subroutine postreadfix() {
 	if (ID eq "AGENCY.PARAMS") {
-
-		if (VOLUMES) {
-			RECORD(1) = RECORD.f(1).invert();
-		}
 
 		if (RECORD.f(55) eq "") {
 			RECORD(55) = "Budget";

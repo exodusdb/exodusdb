@@ -64,7 +64,7 @@ void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF return
 	filetext.replacer("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
 
 	// extract the source line
-	var line = filetext.field("\x0A", lineno).trimf(" \t");
+	var line = filetext.field("\x0A", lineno).trimfirst(" \t");
 
 	// suppress confusing and unhelpful exodus macros
 	//if ((line.first(12) == "programexit(" || line.first(12) == "libraryexit(" || line.first(10) == "classexit(") or

@@ -116,15 +116,21 @@ function main() {
 
 	printl("\nWrite the data records to the data file");
 
-	let nrecs2 = fcount(recs, FM);
-	for (const var recn : range(1, nrecs2)) {
-		var rec = extract(recs, recn);
+	let maxrec = 100;
+
+//	let nrecs2 = fcount(recs, FM);
+//	for (const var recn : range(1, nrecs2)) {
+//		var rec = extract(recs, recn);
+//  Using modern syntax
+	for (var rec : recs) {
 		var key = field(rec, "|", 1);
 		rec = field(rec, "|", 2, 9999);
 		printl(key, ": ", rec);
 		while (index(rec, " |"))
 			replacer(rec, " |", "|");
-		write(trimb(convert(rec, "|", FM)), file, trim(key));
+		// OO syntax seems more readable
+		//write(trimlast(convert(rec, "|", FM)), file, trim(key));
+		rec.convert("|", FM).trimlast().write(file, key.trim());
 	}
 
 	var prefix = "select " ^ filename;

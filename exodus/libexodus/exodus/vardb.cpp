@@ -715,7 +715,7 @@ bool var::connect(CVR conninfo) {
 	assertDefined(function_sig);
 	ISSTRING(conninfo)
 
-	var fullconninfo = conninfo.trimf().trimb();
+	var fullconninfo = conninfo.trimboth();
 
 	//use *this if conninfo not specified;
 	bool isdefault = false;
@@ -2480,9 +2480,9 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		//@ans=xlate('ADDRESSES',@id,2,'X')
 		//@ans=xlate('SCHEDULES',field(@id,'.',1),'YEAR_PERIOD','C')
 		//@ans=xlate('CURRENCIES',{CURRENCY_CODE},1,'X')
-		else if ((!ismv1 || stage2_calculated) && function_src.trimf("\t ").lcase().starts("/" "/@ans=xlate(")) {
+		else if ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t ").lcase().starts("/" "/@ans=xlate(")) {
 
-			function_src = function_src.f(1, 1).trimf("\t ");
+			function_src = function_src.f(1, 1).trimfirst("\t ");
 			function_src.cutter(13);
 
 			// Hide comma in arg3 like <1,@mv>

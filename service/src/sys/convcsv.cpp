@@ -601,7 +601,8 @@ nextvn:
 					cell.replacer(DQ, "''");
 				}
 				if (cell.len() gt 255) {
-					cell = cell.first(200) ^ " ...";
+					cell.firster(200);
+					cell ^= " ...";
 				}
 				if (fmtxs(coln) ne "R" or not(cell.isnum())) {
 
@@ -618,11 +619,11 @@ nextvn:
 						if (fmtxs(coln) eq "T") {
 							if (not cell.starts(DQ) or not cell.ends(DQ)) {
 								cell.replacer(DQ, "''");
-								cell = cell.quote();
+								cell.quoter();
 							}
 						}
 					} else {
-						cell = cell.quote();
+						cell.quoter();
 					}
 
 				}

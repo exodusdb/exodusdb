@@ -228,7 +228,7 @@ currdatetime:
 		//26 date
 		//27 max number of times
 
-		var restrictions = trimb(sys.document.field(FM, 21, 7), FM);
+		var restrictions = trimlast(sys.document.field(FM, 21, 7), FM);
 		restrictions.converter(",", VM);
 
 		//skip if no restrictions applied yet
@@ -648,7 +648,7 @@ nextsign:
 			//since autorun doesnt really know a user to send them to
 			//NB programs should return OK+message if no report is required (eg "OK no ads found")
 			if (USER3.starts("OK")) {
-				response_ = USER3.cut(2).trimf();
+				response_ = USER3.cut(2).trimfirst();
 			} else {
 				call sysmsg(subject ^ FM ^ body);
 				goto nextdoc;

@@ -370,17 +370,18 @@ programinit()
 		v1_01 = 1.01;
 		assert(trimmer(v1_01).outputl().toString()                      eq "1.01");
 		v1_01 = 1.01;
-		assert(trimmerf(v1_01).outputl().toString()                     eq "1.01");
+		assert(trimmerfirst(v1_01).outputl().toString()                     eq "1.01");
 		v1_01 = 1.01;
-		assert(trimmerb(v1_01).outputl().toString()                     eq "1.01");
+		assert(trimmerlast(v1_01).outputl().toString()                     eq "1.01");
 		v1_01 = 1.01;
 		assert(trimmer(v1_01, var(" ")).outputl().toString()            eq "1.01");
 		v1_01 = 1.01;
-		assert(trimmer(v1_01, var(" "), "FB").outputl().toString()      eq "1.01");
+//		assert(trimmer(v1_01, var(" "), "FB").outputl().toString()      eq "1.01");
+		assert(trimmerboth(v1_01, var(" ")).outputl().toString()      eq "1.01");
 		v1_01 = 1.01;
-		assert(trimmerf(v1_01, var(" ")).outputl().toString()           eq "1.01");
+		assert(trimmerfirst(v1_01, var(" ")).outputl().toString()           eq "1.01");
 		v1_01 = 1.01;
-		assert(trimmerb(v1_01, var(" ")).outputl().toString()           eq "1.01");
+		assert(trimmerlast(v1_01, var(" ")).outputl().toString()           eq "1.01");
 		v1_01 = 1.01;
 		assert(fieldstorer(v1_01, ".", 1, 1, "_").outputl().toString()  eq "_.01");
 		v1_01 = 1.01;
@@ -397,6 +398,32 @@ programinit()
 		assert(raiser(v1_01).outputl().toString()                       eq "1.01");
 		v1_01 = 1.01;
 		assert(cropper(v1_01).outputl().toString()                      eq "1.01");
+	}
+
+	{
+		var x = "  1  2  ";
+		assert(trim(x) eq "1 2");
+		assert(trimfirst(x) eq "1  2  ");
+		assert(trimlast(x) eq "  1  2");
+		assert(trimboth(x) eq "1  2");
+
+		x = "  1  2  ";trimmer(x)     ;assert(x eq "1 2");
+		x = "  1  2  ";trimmerfirst(x);assert(x eq "1  2  ");
+		x = "  1  2  ";trimmerlast(x) ;assert(x eq "  1  2");
+		x = "  1  2  ";trimmerboth(x) ;assert(x eq "1  2");
+	}
+
+	{
+		var x = ".,1,.2.,";
+		assert(trim(x      , ".,").outputl() eq "1.2");
+		assert(trimfirst(x , ".,").outputl() eq "1,.2.,");
+		assert(trimlast(x  , ".,").outputl() eq ".,1,.2");
+		assert(trimboth(x  , ".,").outputl() eq "1,.2");
+
+		x = ".,1,.2.,";trimmer(x     , ".,").outputl(); assert(x eq "1.2");
+		x = ".,1,.2.,";trimmerfirst(x, ".,").outputl(); assert(x eq "1,.2.,");
+		x = ".,1,.2.,";trimmerlast(x , ".,").outputl(); assert(x eq ".,1,.2");
+		x = ".,1,.2.,";trimmerboth(x , ".,").outputl(); assert(x eq "1,.2");
 	}
 
 	printl(elapsedtimetext());

@@ -578,7 +578,7 @@ nextline:
 				if (csv) {
 					cell = line.f(1, coln);
 				} else {
-					cell = line.b(col.f(1, 2), col.f(1, 3)).trimb();
+					cell = line.b(col.f(1, 2), col.f(1, 3)).trimlast();
 				}
 				if (cell.len()) {
 					if (col.f(1, 4)) {

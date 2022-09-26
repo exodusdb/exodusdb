@@ -72,7 +72,7 @@ function main() {
 				tt = "'" ^ tt ^ "'";
 			}
 		} else {
-			tt = tt.quote();
+			tt.quoter();
 		}
 
 		cmd ^= " %AND% WITH ALLUPPERCASE CONTAINING " ^ tt;

@@ -320,7 +320,7 @@ function main() {
     for (var i : range(1,90)) {
         var t7 = t6.paste(i,30,t3);
         t7.paster(61, ".");
-        t7.trimmerf("0").trimmerb("0");
+        t7.trimmerfirst("0").trimmerlast("0");
         //printl(t7+0);
 
         printl("assert(test2(" ^ t7.quote() ^ ", " ^ ((t7 + 0) ^ "x").quote() ^ "));");

@@ -190,7 +190,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		if (op == "in" and ovalue.starts("(") and ovalue.ends(")")) {
 			ovalue.cutter(1).popper();
 			ovalue.replacer("', '", VM);
-			ovalue.trimmerb().trimmerf().unquoter();
+			ovalue.trimmerboth().unquoter();
 			//ovalue.convert(VM,"]").outputl("ovalue=");
 		}
 
@@ -459,7 +459,7 @@ bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, cons
 	var filename2 = filename_or_command;
 	if (filename2.ends(")")) {
 		var options = filename2.field2(" ", -1);
-		filename2.cutter(-options.len()).trimmerb();
+		filename2.cutter(-options.len()).trimmerlast();
 	}
 
 	//optionally get keys from filename or command
@@ -1155,7 +1155,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
 		if (OPTIONS)
 			COMMAND.cutter(-OPTIONS.len());
-		COMMAND.trimmerb(_FM);
+		COMMAND.trimmerlast(_FM);
 
 		// load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();
@@ -2573,7 +2573,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 
 			var temp = input1;
 			temp.converter("0123456789-.", "            ");
-			var numlen = input1.len() - temp.trimf().len();
+			var numlen = input1.len() - temp.trimfirst().len();
 			var unitx = input1.b(numlen + 1, 99);
 			var numx = input1.first(numlen);
 

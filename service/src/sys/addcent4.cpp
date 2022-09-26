@@ -68,7 +68,7 @@ noconv:
 
 		//three digits - use right most two digits
 		} else {
-			inx = inx.last(2);
+			inx.laster(2);
 		}
 
 		//00-49 -> 2000 ... 2049

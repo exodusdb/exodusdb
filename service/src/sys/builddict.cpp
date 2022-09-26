@@ -103,7 +103,7 @@ subroutine definemacro() {
 
 subroutine writedict() {
 
-	block.lowerer().trimmerb(VM);
+	block.lowerer().trimmerlast(VM);
 
 	if (not block.contains("function main()"))
 		block ^= VM ^ "\treturn ANS;";
@@ -160,7 +160,7 @@ subroutine writedict() {
 		dictids ^= " " ^ dictid;
 		//var(dictids).oswrite("bdict");
 
-		var f8 = dictrec.f(8).trimb(VM);
+		var f8 = dictrec.f(8).trimlast(VM);
 		dictrec(8) = f8;
 		var origdictrec = dictrec;
 
@@ -298,7 +298,7 @@ insertmline:
 									mline0.remover(1, wordn);
 								}
 								mline0.converter(" " ^ VM, VM ^ " ");
-								mline0 = str("\t", len(mline0) - len(mline0.trimf())) ^ mline0.trimf();
+								mline0 = str("\t", len(mline0) - len(mline0.trimfirst())) ^ mline0.trimfirst();
 								macrotext(mln) = mline0;
 
 							} else {
@@ -377,9 +377,9 @@ nextmln:;
 
 			}
 
-			var indents = len(line)-len(trimf(line));
+			var indents = len(line)-len(trimfirst(line));
 
-			block ^= FM ^ str("\t",indents) ^ trimf(line);
+			block ^= FM ^ str("\t",indents) ^ trimfirst(line);
 
 		}
 

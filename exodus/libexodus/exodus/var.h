@@ -1600,9 +1600,9 @@ class PUBLIC var final {
 	ND var unquote() const&;
 
 	ND var trim(SV trimchars  DEFAULT_SPACE) const&; // byte trimchars
-	ND var trimf(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
-	ND var trimb(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
-	ND var trim(SV trimchars, SV options) const&;    // byte trimchars
+	ND var trimfirst(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
+	ND var trimlast(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
+	ND var trimboth(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
 
 	ND var first(const size_t length) const&; // byte length
 	ND var last(const size_t length) const&;  // byte length
@@ -1649,9 +1649,9 @@ class PUBLIC var final {
 	ND VARREF unquote() && {return unquoter();}
 
 	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
-	ND VARREF trimf(SV trimchars DEFAULT_SPACE) && {return trimmerf(trimchars);}
-	ND VARREF trimb(SV trimchars DEFAULT_SPACE) && {return trimmerb(trimchars);}
-	ND VARREF trim(SV trimchars, SV options) && {return trimmer(trimchars, options);}
+	ND VARREF trimfirst(SV trimchars DEFAULT_SPACE) && {return trimmerfirst(trimchars);}
+	ND VARREF trimlast(SV trimchars DEFAULT_SPACE) && {return trimmerlast(trimchars);}
+	ND VARREF trimboth(SV trimchars DEFAULT_SPACE) && {return trimmerboth(trimchars);}
 
 	ND VARREF first(const size_t length) && {return firster(length);}
 	ND VARREF last(const size_t length) && {return laster(length);}
@@ -1695,9 +1695,9 @@ class PUBLIC var final {
 	VARREF cropper();
 
 	VARREF trimmer(SV trimchars DEFAULT_SPACE);
-	VARREF trimmerf(SV trimchars DEFAULT_SPACE);
-	VARREF trimmerb(SV trimchars DEFAULT_SPACE);
-	VARREF trimmer(SV trimchars, SV options);
+	VARREF trimmerfirst(SV trimchars DEFAULT_SPACE);
+	VARREF trimmerlast(SV trimchars DEFAULT_SPACE);
+	VARREF trimmerboth(SV trimchars DEFAULT_SPACE);
 
 	VARREF firster(const size_t length);
 	VARREF laster(const size_t length);

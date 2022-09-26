@@ -194,7 +194,7 @@ function main() {
 	if (not hostid) {
 		hostid = SYSTEM.f(44);
 	}
-	hostid = hostid.trim().lcase();
+	hostid.trimmer().lcaser();
 
 	installid = SYSTEM.f(139) ^ hostid ^ "_" ^ cidx;
 
@@ -205,18 +205,6 @@ function main() {
 	msg = "";
 	if (cidx) {
 		call monitor2b("READ", request, tempfilename, datax, msg);
-	}
-
-	if (msg) {
-		//ignore errors which can include wget not being available
-		//print msg
-	} else {
-		//print data
-		//swap crlf with fm in data
-		//convert crlf to fm:fm in data
-		//if data<1>=system<17> then
-		// perform cmd
-		// end
 	}
 
 	//WRITE
@@ -713,62 +701,6 @@ nextdbasen:;
 	tt = tt.last(2) ^ "/" ^ tt.first(5);
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
-//	//dont allow upgrades by test databases
-//	if (false and SYSTEM.f(124) and not SYSTEM.f(17).ends"_test") {
-//
-//		//get upgrade file details
-//		upgradefilename83 = SYSTEM.f(112);
-//		upgradefiledir = upgradefilename83.osfile();
-//		//get and cache upgradefilename83
-//		//ie the dos 8.3 version of upgrade.php@data=xxxxxxxx_999999
-//		if (not upgradefiledir) {
-//			//get the 8.3 filename version
-//			longupgradefilename = upgradefilename ^ "@data=" ^ installid;
-//			upgradefilename83 = shell2("dir " ^ (longupgradefilename.quote()) ^ " /x /l", errors);
-//			if (not errors) {
-//				upgradefilename83.converter("\r\n", FM);
-//				upgradefilename83 = upgradefilename83.f(6).cut(21).trim().field(" ", 2);
-//				upgradefiledir = upgradefilename83.osfile();
-//				if (upgradefiledir) {
-//					SYSTEM(112) = upgradefilename83;
-//				}
-//			}
-//		}
-//
-//		//note if upgrade ready to be be installed (currently after nightly backup)
-//		if (upgradefiledir) {
-//			if (not(upgradex.read(processes, "%UPGRADE%"))) {
-//				upgradex = "";
-//			}
-//			upgradefiledatetime = (upgradefiledir.f(2) + upgradefiledir.f(3) / 86400).oconv("MD50P");
-//			//TODO make this only work for newer files? currently allows downgrading
-//			if (upgradex.f(2) ne upgradefiledatetime) {
-//				//check wget output file to see if is fully downloaded (100%) or "NO NEWER"
-//				tt = upgradefilename;
-//				tt.paster(-3, 3, "$wg");
-//				call osread(wgetoutput, tt);
-//				if (wgetoutput.ucase().contains(" NO NEWER ") or wgetoutput.contains("100%")) {
-//					upgradefiledir = upgradefilename83.osfile();
-//					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
-//					//tt=upgradefiledir<2> 'D2/J'
-//					tt = upgradefiledir.f(2).oconv("D2/E");
-//					tt = tt.last(2) ^ "/" ^ tt.first(5);
-//					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.f(3).oconv("MT");
-//					upgradeready = 1;
-//				} else if (wgetoutput.ucase().contains(" ERROR 404")) {
-//				} else if (wgetoutput.ucase().contains(" failed: Unknown host.")) {
-//					printl("DNS cant resolve upgrade host name");
-//				} else if (2) {
-//					if (not(var("exodus.id").osfile())) {
-//						print("upgrade downloading");
-//					}
-//				}
-//				{}
-//			}
-//		}
-//
-//	}
-
 	//show local time
 	hostdescriptions ^= " - At:" ^ time().oconv("MT");
 
@@ -897,19 +829,6 @@ gotip:
 	//update the monitor status
 	monitordata.write(processes, monitorkey);
 
-//	//optional upgrade immediate if no web users in the last hour
-//	//and no other parallel installation upgrades started in last 1 mins
-//	//parallel means installations next to each other in the same folder
-//	upgflagfile = "../../UPGRADE.$$$";
-//	upgflagfile.converter("/", OSSLASH);
-//	if ((upgradeready and not(anyusers)) and ((time() - upgflagfile.osfile().f(3)).abs() gt 60)) {
-//		call oswrite("", upgflagfile);
-//		//close all other processes, upgrade, close and restart
-//		call upgrade("R");
-//		perform("OFF");
-//		logoff();
-//	}
-//
 	/////
 	//exit:
 	/////

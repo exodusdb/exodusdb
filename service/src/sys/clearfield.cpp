@@ -17,7 +17,7 @@ function main() {
 	if (SENTENCE.contains("(")) {
 		options = field2(SENTENCE, "(", -1);
 		SENTENCE.cutter(-options.len() - 1);
-		SENTENCE.trimmerb();
+		SENTENCE.trimmerlast();
 	} else {
 		options = "";
 	}
@@ -41,7 +41,7 @@ function main() {
 		cleartovalue.popper();
 	}
 	if (options.contains("I")) {
-		cleartovalue = cleartovalue.invert();
+		cleartovalue.inverter();
 	}
 	var file;
 	if (not(file.open(filename, ""))) {
