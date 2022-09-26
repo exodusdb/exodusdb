@@ -31,7 +31,7 @@ function main() {
 	var dfs = where ^ var(99999999).rnd().str(8).first(8);
 	if (html) {
 		dfs ^= ".htm";
-	}else{
+	} else {
 		dfs ^= ".txt";
 		}
 	var prnfile = dfs;

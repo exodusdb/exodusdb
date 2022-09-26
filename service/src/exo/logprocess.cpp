@@ -23,7 +23,7 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 	}
 	if (processcategory0.unassigned()) {
 		processcategory = "";
-	}else{
+	} else {
 		processcategory = processcategory0;
 		}
 	if (processrec.unassigned()) {
@@ -31,17 +31,17 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 	}
 	if (processparameters0.unassigned()) {
 		processparameters = "";
-	}else{
+	} else {
 		processparameters = processparameters0;
 	}
 	if (processresult0.unassigned()) {
 		processresult = "";
-	}else{
+	} else {
 		processresult = processresult0;
 	}
 	if (processcomments0.unassigned()) {
 		processcomments = "";
-	}else{
+	} else {
 		processcomments = processcomments0;
 	}
 
@@ -81,7 +81,7 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 		if (processid == "") {
 			gosub newprocessid( processid);
 
-		}else{
+		} else {
 
 			if (not(processrec.read(DEFINITIONS, "PROCESS*" ^ processid))) {
 				gosub newprocessid( processid);

@@ -126,7 +126,7 @@ function main(in mode0) {
 				if (no.readv(win.srcfile, "%SK%", 1)) {
 					win.srcfile.deleterecord("%SK%");
 
-				}else{
+				} else {
 					no = 1;
 				}
 				no.writev(DEFINITIONS, win.datafile ^ ".SK", 1);
@@ -226,7 +226,7 @@ subroutine getuserdept2() {
 		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return;
-		}else{
+		} else {
 			ANS = "";
 			return;
 		}

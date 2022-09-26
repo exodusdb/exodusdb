@@ -622,7 +622,7 @@ TRACE(offset)
 		errormsg.remover(1);
 		call log("SENDMAIL", details);
 	} else {
-		errormsg = trim(errormsg, FM, "B");
+		errormsg.trimmerb(FM);
 		//errormsg<-1>=@fm:'Size:     ':msgsize '[XBYTES]'
 		//errormsg<-1>='From:     ':params1<1>
 		//errormsg<-1>='To:       ':toaddress

@@ -294,18 +294,19 @@ REGEX& getregex(SV matchstr, SV options) {
 		return mapiter->second;
 
 	try {
-		try {
-			REGEX re = boost::make_u32regex(
-						std::string(matchstr),
-						get_regex_syntax_flags(options)
-					);
-			[[maybe_unused]] auto [mapiter, success] = thread_regexes.insert({key, re});
-			return mapiter->second;
-			//return re;
-		} catch (boost::wrapexcept<std::out_of_range>& e) {
-			throw VarError("Error: (1) Invalid data during match of " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
-		}
-	} catch (std_boost::regex_error& e) {
+		[[maybe_unused]] auto [mapiter, success] = thread_regexes.emplace(
+			key,
+			boost::make_u32regex(
+				std::string(matchstr),
+				get_regex_syntax_flags(options)
+			)
+		);
+		return mapiter->second;
+	}
+	catch (boost::wrapexcept<std::out_of_range>& e) {
+		throw VarError("Error: (1) Invalid data during match of " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
+	}
+	catch (std_boost::regex_error& e) {
 		throw VarError("Error: Invalid regex string " ^ var(matchstr).quote() ^ ". " ^ var(e.what()).quote());
 	}
 

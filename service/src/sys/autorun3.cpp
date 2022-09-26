@@ -228,7 +228,7 @@ currdatetime:
 		//26 date
 		//27 max number of times
 
-		var restrictions = trim(sys.document.field(FM, 21, 7), FM, "B");
+		var restrictions = trimb(sys.document.field(FM, 21, 7), FM);
 		restrictions.converter(",", VM);
 
 		//skip if no restrictions applied yet

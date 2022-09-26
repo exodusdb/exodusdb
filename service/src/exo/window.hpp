@@ -33,10 +33,10 @@ function security2(in mode, in op0)
 	}else if (mode.contains("READ") || mode.contains("WRITE")) {
 		if (!win.wlocked) {
 			op ^= " ACCESS";
-		}else{
+		} else {
 			if (win.orec) {
 				op ^= " UPDATE";
-			}else{
+			} else {
 				op ^= " CREATE";
 			}
 		}

@@ -72,7 +72,7 @@ function main() {
 		if (nprocesslocks) {
 			longprocesslockno = otherusers2(nprocesslocks);
 			SYSTEM(48) = longprocesslockno;
-		}else{
+		} else {
 			longprocesslockno = 0;
 		}
 

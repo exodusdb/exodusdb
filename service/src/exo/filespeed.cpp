@@ -19,7 +19,7 @@ function main() {
 
 	if (deletefilex) {
 		tempfilename = "BENCHMARK" ^ SYSTEM.f(24);
-	}else{
+	} else {
 		tempfilename = "BENCHMARK.FILESPEED";
 	}
 

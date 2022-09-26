@@ -141,7 +141,7 @@ function main(io tx, in mode="", in modevalue="") {
 			if (html) {
 				var mode = "HEAD";
 				call gethtml(mode, letterhead, "");
-			}else{
+			} else {
 				letterhead = "";
 			}
 		}

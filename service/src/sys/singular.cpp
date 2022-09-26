@@ -25,7 +25,7 @@ function main(in pluralnoun) {
 		}
 
 	//comment to help c++ decompiler
-	}else{
+	} else {
 
 		if (temp2.ends("S")) {
 			//ANALYSIS, DOS
