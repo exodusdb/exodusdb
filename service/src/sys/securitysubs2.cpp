@@ -32,7 +32,7 @@ function main(in mode) {
 		var newlocks = RECORD.f(11);
 		var oldtasks = origfullrec_.f(10);
 		var oldlocks = origfullrec_.f(11);
-		var ntasks = newtasks.count(VM) + (newtasks ne "");
+		var ntasks = newtasks.fcount(VM);
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
 			var task = newtasks.f(1, taskn);
 			if (task) {
@@ -49,7 +49,7 @@ function main(in mode) {
 			}
 		} //taskn;
 
-		ntasks = oldtasks.count(VM) + (oldtasks ne "");
+		ntasks = oldtasks.fcount(VM);
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
 			var task = oldtasks.f(1, taskn);
 			if (task) {
@@ -192,7 +192,7 @@ function main(in mode) {
 		call log2("*delete any superfluous tasks", logtime);
 		var tasks = newuserprivs.f(10);
 		var locks = newuserprivs.f(11);
-		var ntasks = tasks.count(VM) + (tasks ne "");
+		var ntasks = tasks.fcount(VM);
 		for (taskn = ntasks; taskn >= 1; --taskn) {
 			var lockx = locks.f(1, taskn);
 			var task = tasks.f(1, taskn);

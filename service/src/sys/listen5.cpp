@@ -74,10 +74,6 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 
-	#define request_ USER0
-	#define iodat_ USER1
-	#define response_ USER3
-	#define msg_ USER4
 	var tracing = 1;
 	initdir = "";
 
@@ -484,7 +480,7 @@ nextpatch:;
 
 	} else if (request1.starts("GETINDEX")) {
 
-		iodat_ = "";
+		data_ = "";
 		var filename = request2;
 		var fieldname = request3;
 		var prefix = request4;
@@ -509,7 +505,7 @@ nextpatch:;
 		if (filename eq "JOURNALS" or filename eq "JOURNALS") {
 		} else {
 			gosub fileaccesscheck(filename);
-			if (USER3) {
+			if (response_) {
 				return 0;
 			}
 		}
@@ -523,28 +519,28 @@ nextpatch:;
 		}
 
 		if (not(authorised(singular(temp) ^ " LIST", msg_, ""))) {
-			response_ = USER4;
+			response_ = msg_;
 			return 0;
 		}
 
 getvalues:
 		call collectixvals(filename, fieldname, prefix);
-		PSEUDO.move(USER1);
-		if (iodat_.starts(FM)) {
-			USER1.cutter(1);
+		PSEUDO.move(data_);
+		if (data_.starts(FM)) {
+			data_.cutter(1);
 		}
-		USER3 = "OK";
+		response_ = "OK";
 
-		if (sortby and iodat_) {
+		if (sortby and data_) {
 			//convert fm to rm in iodat
 			//iodat:=rm
 			//call v119('S','',sortby[1,1],sortby[2,1],iodat,flag)
 			//convert rm to fm in iodat
 			//iodat[-1,1]=''
 			//v119 C/ASM sort routine cannot be easily converted/reimplemented in c++
-			USER1.converter(FM, VM);
-			call sortarray(iodat_, 1, sortby);
-			USER1.converter(VM, FM);
+			data_.converter(FM, VM);
+			call sortarray(data_, 1, sortby);
+			data_.converter(VM, FM);
 		}
 
 		var execstoplist;
@@ -553,21 +549,21 @@ getvalues:
 			//execs will be in field 1
 			//stopped reason will be in parallel in field 2
 			//stopped execs will be at the end
-			iodat_.converter(FM, VM);
+			data_.converter(FM, VM);
 
 			//remove or move any stopped execs to the end and add reason
-			var nn = USER1.count(VM) + 1;
+			var nn = data_.count(VM) + 1;
 			var nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
-				var execcode = iodat_.f(1, ii);
+				var execcode = data_.f(1, ii);
 				if (execstoplist.f(1).locate(execcode, stopn)) {
 					var reason = execstoplist.f(2, stopn);
 					if (reason) {
-						USER1.remover(1, ii);
-						iodat_.remover(2, ii);
+						data_.remover(1, ii);
+						data_.remover(2, ii);
 						if (not active) {
-							USER1(1, nn2) = execcode;
-							iodat_(2, nn2) = reason;
+							data_(1, nn2) = execcode;
+							data_(2, nn2) = reason;
 						}
 						ii -= 1;
 						nn -= 1;
@@ -576,33 +572,33 @@ getvalues:
 			} //ii;
 
 			//show inactive if none are active
-			if (USER1 eq "" and active) {
+			if (data_ eq "" and active) {
 				active = "";
 				goto getvalues;
 			}
 
 			//1=force vm to ensure xml has empty not missing tags
-			iodat_(2, 1) = USER1.f(2, 1);
-			iodat_ = invertarray(USER1, 1);
+			data_(2, 1) = data_.f(2, 1);
+			data_ = invertarray(data_, 1);
 
 		}
 
 		if (request_.contains("RECORD")) {
-			iodat_ = invertarray(USER1, 1);
+			data_ = invertarray(data_, 1);
 
-		} else if (USER0.contains("XML")) {
-			if (iodat_) {
-				call htmllib2("STRIPTAGS", USER1);
-				iodat_.replacer(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
-				USER1.prefixer("<record><" ^ fieldname ^ ">");
-				iodat_ ^= "</" ^ fieldname ^ ">" "</record>";
-				if (USER1.contains(VM)) {
-					iodat_.replacer("</" ^ fieldname ^ ">", "</STOPPED>");
-					USER1.replacer(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
+		} else if (request_.contains("XML")) {
+			if (data_) {
+				call htmllib2("STRIPTAGS", data_);
+				data_.replacer(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
+				data_.prefixer("<record><" ^ fieldname ^ ">");
+				data_ ^= "</" ^ fieldname ^ ">" "</record>";
+				if (data_.contains(VM)) {
+					data_.replacer("</" ^ fieldname ^ ">", "</STOPPED>");
+					data_.replacer(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
 			}
-			iodat_.prefixer("<records>");
-			USER1 ^= "</records>";
+			data_.prefixer("<records>");
+			data_ ^= "</records>";
 		} else {
 			//convert fm to vm in iodat
 		}
@@ -632,7 +628,7 @@ getvalues:
 		}
 
 		gosub fileaccesscheck(filename);
-		if (USER3) {
+		if (response_) {
 			return 0;
 		}
 
@@ -641,21 +637,21 @@ getvalues:
 
 		//and data passed to SELECT is assumed to be a selectlist
 
-		if (iodat_) {
-			makelist("", USER1);
+		if (data_) {
+			makelist("", data_);
 			sortselect ^= "%SELECTLIST%";
-			iodat_ = "";
+			data_ = "";
 		}
 
-		call select2(filename0, SYSTEM.f(2), sortselect, dictids, options, USER1, response_, "", "", "", maxnrecs);
+		call select2(filename0, SYSTEM.f(2), sortselect, dictids, options, data_, response_, "", "", "", maxnrecs);
 		//restore the program stack although this is done in LISTEN per request
 		//rev has a limit on 299 "programs" and dictionary entries count as 1 each!
 		//call program.stack(programstack)
 
 		if (msg_) {
-			USER3 = trim(USER4.f(1), FM);
+			response_ = trim(msg_.f(1), FM);
 		} else {
-			iodat_ = "%DIRECTOUTPUT%";
+			data_ = "%DIRECTOUTPUT%";
 			//response='OK'
 		}
 
@@ -780,13 +776,13 @@ nextlock:
 			tt = "STOP";
 		}
 		if (not(authorised("DATABASE " ^ tt, msg_, "LS"))) {
-			response_ = "Error: " ^ USER4;
+			response_ = "Error: " ^ msg_;
 			return 0;
 		}
 
 		if (request3.osfile() or serverend.osfile()) {
 			//response='Error: Database already stopped/stopping'
-			call listen4(19, USER3);
+			call listen4(19, response_);
 
 		} else {
 
@@ -805,7 +801,7 @@ nextlock:
 				call ossleep(1000*1);
 			}//loop;
 
-			USER1 = "";
+			data_ = "";
 
 			var otherusersx = otherusers();
 			if (otherusersx) {
@@ -820,7 +816,7 @@ nextlock:
 					osshell("NET START EXODUSSERVICE");
 				}
 
-				USER3 = "OK";
+				response_ = "OK";
 			}
 
 			if (request2.contains("ALL")) {
@@ -844,23 +840,23 @@ nextlock:
 		//user will be emailed
 		if (SYSTEM.f(2) eq "") {
 			PSEUDO = "BACKUP2 " ^ bakpars.f(7);
-			if (USER4) {
+			if (msg_) {
 				stop();
 			}
 		}
 
 		response_ = msg_;
-		USER3.converter(FM ^ VM, "\r\r");
+		response_.converter(FM ^ VM, "\r\r");
 
 		call sysmsg(response_, "EXODUS Backup");
 
-		if (USER3.ucase().contains("SUCCESS")) {
+		if (response_.ucase().contains("SUCCESS")) {
 			response_.prefixer("OK ");
 		}
 
 		//note: if backup did not respond already then the requestexit will
 		//respond as usual with the error message from backup
-		iodat_ = "";
+		data_ = "";
 
 	} else {
 		printl(request1.quote(), " invalid request in LISTEN5");
@@ -878,7 +874,7 @@ subroutine getdostime() {
 }
 
 subroutine fileaccesscheck(in filename) {
-	USER3 = "";
+	response_ = "";
 
 	var securityfilename = filename;
 	if (filename eq "JOURNALS") {
@@ -892,7 +888,7 @@ subroutine fileaccesscheck(in filename) {
 		var temp = securityfilename;
 		temp.converter(".", " ");
 		temp = singular(temp);
-		if (not(authorised(temp ^ " ACCESS", USER4, ""))) {
+		if (not(authorised(temp ^ " ACCESS", msg_, ""))) {
 			//we could use securityfilename LIST instead of securityfilename ACCESS PARTIAL clumsy
 			//ie list without general access means there are some records
 			//specifically allowed
@@ -904,7 +900,7 @@ subroutine fileaccesscheck(in filename) {
 				}
 			}
 		}
-		USER4 = "";
+		msg_ = "";
 	}
 
 	return;

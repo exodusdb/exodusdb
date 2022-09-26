@@ -120,7 +120,7 @@ function main(in mode, io logtime, in menu) {
 		}
 		configips.converter(" ", SM);
 		configips.replacer(".*", "");
-		nn = configips.count(SM) + (configips ne "");
+		nn = configips.fcount(SM);
 		for (const var ii : range(nn, 1)) {
 			var ipno = configips.f(1, 1, ii);
 			if (ipno.field(".", 1) eq "10") {
@@ -187,7 +187,7 @@ function main(in mode, io logtime, in menu) {
 		if (not baselinkdescs) {
 			baselinkdescs = "Pending Configuration";
 		}
-		let nlinks = baselinks.count(VM) + (baselinks ne "");
+		let nlinks = baselinks.fcount(VM);
 		for (const var linkn : range(1, nlinks)) {
 			tt = baselinks.f(1, linkn);
 			if (tt) {
@@ -352,7 +352,7 @@ nextuser:
 		//temps=dirlist()
 		if (VOLUMES) {
 			var temps = oslistf("..\\vdm*.tmp");
-			let ntemps = temps.count(FM) + (temps ne "");
+			let ntemps = temps.fcount(FM);
 			for (const var tempn : range(1, ntemps)) {
 				("..\\" ^ temps.f(tempn)).osremove();
 			} //tempn;

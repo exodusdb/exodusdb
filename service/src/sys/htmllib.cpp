@@ -362,7 +362,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 subroutine fill(io datax) {
 
-	let nn = datax.count(FM) + (datax ne "");
+	let nn = datax.fcount(FM);
 
 		//find max number of columns
 	var n2 = 0;

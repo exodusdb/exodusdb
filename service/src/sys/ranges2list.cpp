@@ -61,7 +61,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	ranges.replacer(" -", "-");
 	ranges.replacer("- ", "-");
 
-	var nn = ranges.count(FM) + (ranges ne "");
+	var nn = ranges.fcount(FM);
 
 	var allchars = "";
 	for (const var ii : range(32, 255)) {

@@ -219,8 +219,8 @@ function main(in msg0, in subject0="", in username0="") {
 		}
 		body(-1) = oconv("Stack:", l9) ^ temp;
 
-		if (USER0) {
-			temp = USER0;
+		if (request_) {
+			temp = request_;
 			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ ST, "`^]}\\~");
 			body(-1) = oconv("Request:", l9) ^ temp;
 		}
@@ -230,8 +230,8 @@ function main(in msg0, in subject0="", in username0="") {
 			body(-1) = oconv("@ID:", l9) ^ ID;
 		}
 
-		if (USER1) {
-			temp = USER1;
+		if (data_) {
+			temp = data_;
 			temp.replacer("%", "%25");
 			temp.replacer("'", "%27");
 			temp.replacer("`", "%60");

@@ -224,7 +224,7 @@ nextuser:
 	//remove any emails that have already been emailed before
 	emails.converter(" ", "");
 	emails.converter(";", VM);
-	nn = emails.count(VM) + (emails ne "");
+	nn = emails.fcount(VM);
 	for (var ii = nn; ii >= 1; --ii) {
 		var email = emails.f(1, ii);
 		if (alreadyemailed.locate(email, xx)) {

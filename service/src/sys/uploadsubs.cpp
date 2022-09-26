@@ -50,8 +50,6 @@ function main(in mode) {
 	#include <system_common.h>
 	//global ptr,iim,csv,nquotes
 
-	#define request_ USER0
-	#define data_ USER1
 
 	//determine upload directory
 	var uploadroot = SYSTEM.f(49);
@@ -63,9 +61,9 @@ function main(in mode) {
 	if (mode eq "POSTUPLOAD") {
 
 		filename = request_.f(3);
-		key = USER0.f(4);
+		key = request_.f(4);
 		var targetfilename = request_.f(5);
-		var newstatus = USER0.f(6);
+		var newstatus = request_.f(6);
 
 		//lock it
 		gosub lockfile();
@@ -98,7 +96,7 @@ postuploadfail:
 			fns(ii) = fn;
 		} //ii;
 
-		var ii2 = rec.f(fns.f(1)).count(VM) + (rec.f(fns.f(1)) ne "");
+		var ii2 = rec.f(fns.f(1)).fcount(VM);
 		rec(fns.f(1), ii2) = targetfilename;
 		rec(fns.f(2), ii2) = newstatus;
 		rec(fns.f(3), ii2) = USERNAME;
@@ -117,7 +115,7 @@ postuploadfail:
 
 		//additional option to check file and key is not locked
 		filename = request_.f(3);
-		key = USER0.f(4);
+		key = request_.f(4);
 		var ensurenotlocked = request_.f(5);
 		if (ensurenotlocked eq "undefined") {
 			ensurenotlocked = "";
@@ -269,7 +267,7 @@ postuploadfail:
 		//why does % come encoded as %25?
 		dirpatt.replacer("%25", "%");
 
-		if (USER0.f(3) eq "NEW") {
+		if (request_.f(3) eq "NEW") {
 			if (oslistf(dirpatt)) {
 				var cmd = "rm " ^ (dirpatt.quote());
 				osshell(cmd);
@@ -300,7 +298,7 @@ postuploadfail:
 
 		}
 
-		USER1(2) = uploadfilenames;
+		data_(2) = uploadfilenames;
 
 		//no longer required since updated in PLAN.SUBS POSTREAD
 		//since VIEW/OPENUPLOAD is no longer being called automatically after upload

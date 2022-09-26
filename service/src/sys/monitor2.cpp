@@ -339,7 +339,7 @@ nextprocess:
 	//checking minumum number of processes required
 	descriptions = "";
 	status0123 = 0;
-	ndbases = dbasecodes.count(VM) + (dbasecodes ne "");
+	ndbases = dbasecodes.fcount(VM);
 	for (dbasen = 1; dbasen <= ndbases; ++dbasen) {
 		dbasecode = dbasecodes.f(1, dbasen);
 		if (not dbasecode) {
@@ -651,7 +651,7 @@ nextdbasen:;
 	} //dbasen;
 
 	//check for free space on backup drive(s)
-	nbackupdrives = backupdrives.f(1).count(VM) + (backupdrives.f(1) ne "");
+	nbackupdrives = backupdrives.f(1).fcount(VM);
 	for (backupdriven = 1; backupdriven <= nbackupdrives; ++backupdriven) {
 
 		present = backupdrives.f(3, backupdriven);
@@ -707,7 +707,7 @@ nextdbasen:;
 	//find max nusersperhour by type
 	for (ii = 1; ii <= 24; ++ii) {
 		for (jj = 1; jj <= 3; ++jj) {
-			usertab(ii, jj) = usertab(ii, jj).count(VM) + (usertab(ii, jj) ne "");
+			usertab(ii, jj) = usertab(ii, jj).fcount(VM);
 			if (usertab(ii, jj) gt usertab(25, jj)) {
 				usertab(25, jj) = usertab(ii, jj);
 			}

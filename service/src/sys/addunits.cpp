@@ -31,13 +31,13 @@ function main(in a0, io bb, in sep) {
 		bb.converter(SM, VM);
 	}
 
-	let na = aa.count(VM) + (aa ne "");
+	let na = aa.fcount(VM);
 	for (const var an : range(1, na)) {
 
 		var anum = amountunit(aa.f(1, an), acode);
 		var bcode = "";
 
-		var nb = bb.count(VM) + (bb ne "");
+		var nb = bb.fcount(VM);
 		//assist ADECOM c++ decompiler to lift bn out of loop
 		//bn=1
 		//for bn=1 to nb

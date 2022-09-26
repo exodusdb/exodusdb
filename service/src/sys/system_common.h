@@ -4,11 +4,15 @@
 
 //
 
-//mc30p,
-	#define esc_ "\x1B"
-	#define crlf_ "\n"
-//equ sysat_listactive to system(11)
-	#define maxstrsize_ 1048576
-	#define OSSLASH_ "/"
+#define esc_ "\x1B"
+#define crlf_ "\n"
 
-//#endif // SERVICE_SRC_SYS_SYSTEM_COMMON_H_
+#define maxstrsize_ 1048576
+#define OSSLASH_ "/"
+
+#define interactive_ not(SYSTEM.f(33))
+
+#define request_ USER0
+#define data_ USER1
+#define response_ USER3
+#define msg_ USER4

@@ -243,11 +243,12 @@ function main() {
 	}
 
 	#include <system_common.h>
+
 	//global all
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	#define interactive_ false //not(SYSTEM.f(33))
+	//#define interactive_ false //not(SYSTEM.f(33))
 	ulchar = "-";
 
 	//NLIST keywords and aliases. blank keyword means throwaway word
@@ -1551,7 +1552,7 @@ nextrec:
 
 			//find maximum mv number for the associated group of fns
 			fns = limits.f(5, limitn);
-			nfns = fns.count(SM) + (SM ne "");
+			nfns = fns.fcount(SM);
 			nmvs = 0;
 			for (fnn = 1; fnn <= nfns; ++fnn) {
 				fn = fns.f(1, 1, fnn);

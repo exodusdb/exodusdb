@@ -871,7 +871,7 @@ notallowed:
 	if (not(SECURITY.f(1).locate(username, usern))) {
 		if (username != "EXODUS" and username != APPLICATION) {
 			gosub readuserprivs();
-			usern = (SECURITY.f(1)).count(VM) + (SECURITY.f(1) != "") + 1;
+			usern = (SECURITY.f(1)).fcount(VM) + 1;
 			if (SECURITY.len() < 65000) {
 				var users;
 				if (not(users.open("USERS"))) {
@@ -1538,7 +1538,7 @@ var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const i
 
 	std::cout << question << std::endl;
 
-	//	var noptions = options.count(FM) + (options != "");
+	//	var noptions = options.fcount(FM);
 	var options = optionsx;
 	if (not options)
 		options = "Yes" _VM "No";
@@ -2649,7 +2649,7 @@ void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 
 	//insert into a new array without other fields for speed
 	var newarray = "";
-	var nv = unsorted.count(VM) + (unsorted ne "");
+	var nv = unsorted.fcount(VM);
 	for (var vn = 1; vn <= nv; ++vn) {
 		var value = unsorted.f(1, vn);
 		if (not(sorted.locateby(orderby, value, newvn))) {
@@ -2685,7 +2685,7 @@ var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 	var force = force0.unassigned() ? var(0) : force0;
 
 	var output = "";
-	var nfs = input.count(FM) + (input ne "");
+	var nfs = input.fcount(FM);
 	//for force to work, the first field must have full number of vns
 	var maxnvs = 0;
 	for (var fn = 1; fn <= nfs; ++fn) {

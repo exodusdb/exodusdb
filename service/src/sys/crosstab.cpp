@@ -131,8 +131,8 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		prefixmvfn = "";
 	}
 
-	nrows = allrowvals.count(VM) + (allrowvals ne "");
-	ncols = allcolvals.count(VM) + (allcolvals ne "");
+	nrows = allrowvals.fcount(VM);
+	ncols = allcolvals.fcount(VM);
 
 	if (filterdictid.unassigned()) {
 		filterdictid = "";
@@ -165,7 +165,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	rowfields = rowfields0;
 	rowfields.converter(",", VM);
 	//nrowfields=count(rowfields,vm)+1
-	nrowfields = rowfields.count(VM) + (rowfields ne "");
+	nrowfields = rowfields.fcount(VM);
 	rowdict.redim(20);
 	rowfieldismv.redim(20);
 	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
@@ -249,7 +249,7 @@ nextrecord:
 
 	if (prefixmvfn) {
 		tt = RECORD.f(prefixmvfn);
-		nmvs = tt.count(VM) + (tt ne "");
+		nmvs = tt.fcount(VM);
 nextmv:
 ///////
 		//if prefixes else goto nextrecord
@@ -297,7 +297,7 @@ nextmv:
 			if (fieldname eq "HOUR") {
 				tt = ("00" ^ tt).last(2);
 			}
-			nn = tt.count(VM) + (tt ne "");
+			nn = tt.fcount(VM);
 			if (nn gt nrowvals) {
 				nrowvals = nn;
 			}
@@ -317,7 +317,7 @@ nextmv:
 			colvals = ("00" ^ colvals).last(2);
 		}
 	}
-	ncolvals = colvals.count(VM) + (colvals ne "");
+	ncolvals = colvals.fcount(VM);
 	for (rowvaln = 1; rowvaln <= nrowvals; ++rowvaln) {
 
 		//build row value (multiple fields sm separated)

@@ -24,7 +24,7 @@ function main() {
 	var cmd = "LISTEN " ^ SENTENCE.field(" ", 2, 9999);
 
 	PSEUDO = "";
-	USER4 = "";
+	msg_ = "";
 	PRIORITYINT(100) = "";
 	var dbcode = SYSTEM.f(17);
 	if (dbcode eq "") {
@@ -54,7 +54,7 @@ listen:
 	}
 	catch (VarError varerror) {
 		// Similar code in net.cpp and listen.cpp
-	    USER4 = varerror.description.unassigned("No error message") ^ FM ^ backtrace();
+	    msg_ = varerror.description.unassigned("No error message") ^ FM ^ backtrace();
 	}
 
 	//unlock all
@@ -69,29 +69,29 @@ listen:
 	// @user4[tt,99999]=''
 	// end
 
-	if (USER4.starts("RESTART")) {
+	if (msg_.starts("RESTART")) {
 
-		if (USER4 eq "RESTART $LISTEN") {
+		if (msg_ eq "RESTART $LISTEN") {
 			SYSTEM(100, 3) = "";
 			SYSTEM(33) = s33;
 			goto listen;
 		}
 
 		RELOAD_req = true;
-		printl(THREADNO ^ ":", USER4);
+		printl(THREADNO ^ ":", msg_);
 
 		stop();
 		////
 
 	}
 
-	if (USER4 eq "" or USER4 eq "TERMINATED OK") {
+	if (msg_ eq "" or msg_ eq "TERMINATED OK") {
 		stop();
 		////
 	}
 
 	//stop if cant backup because another process is backing up or hung processes
-	if (USER4.contains("FILEMAN-SHUTDOWN")) {
+	if (msg_.contains("FILEMAN-SHUTDOWN")) {
 		perform("OFF");
 		logoff();
 	}
@@ -107,23 +107,23 @@ listen:
 
 	//detect memory corruption?
 	var halt = 0;
-	if (USER4.contains("R18.6")) {
+	if (msg_.contains("R18.6")) {
 		halt = 1;
-		USER4(-1) = "Corrupt temporary file. Restart Needed.";
-		USER4(-1) = "exodus.net TERMINATED";
+		msg_(-1) = "Corrupt temporary file. Restart Needed.";
+		msg_(-1) = "exodus.net TERMINATED";
 	}
-	if (USER4.ucase().contains("NOT ENOUGH MEMORY")) {
+	if (msg_.ucase().contains("NOT ENOUGH MEMORY")) {
 		halt = 1;
 	}
-	if (USER4.ucase().contains("OUT OF MEMORY")) {
+	if (msg_.ucase().contains("OUT OF MEMORY")) {
 		halt = 1;
 	}
 
 	//convert error messages
 	var normal = 0;
-	if (USER4.contains("INDEX.REDUCER")) {
+	if (msg_.contains("INDEX.REDUCER")) {
 		normal = 1;
-		USER4 = "Error: Please select fewer records";
+		msg_ = "Error: Please select fewer records";
 	}
 
 	if (not normal) {
@@ -146,14 +146,14 @@ listen:
 			}
 
 			//note new or changed media
-			tt = USER4.contains("Media: ");
+			tt = msg_.contains("Media: ");
 			if (tt) {
-				subject ^= " " ^ (USER4.cut(tt + 6)).f(1);
+				subject ^= " " ^ (msg_.cut(tt + 6)).f(1);
 			}
 
 			//add success, WARNING or FAILURE
 			tt = "";
-			tt2 = USER4.ucase();
+			tt2 = msg_.ucase();
 			if (not(tt2.contains("SUCCESS")) or tt2.contains("FAIL")) {
 				tt = "FAILURE";
 			} else {
@@ -172,7 +172,7 @@ listen:
 			//subject:=' Ver: ':versiondate 'D4/J'
 
 			//log it
-			var errormsg = USER4;
+			var errormsg = msg_;
 			call log(cmd, errormsg ^ "");
 
 		} else {
@@ -180,10 +180,10 @@ listen:
 			//subject='EXODUS Technical Message :'
 			subject = "";
 			if (VOLUMES) {
-				printl(USER4);
+				printl(msg_);
 			}
-			var techmsg = USER4.f(1).first(256);
-			call sysmsg(USER4, techmsg);
+			var techmsg = msg_.f(1).first(256);
+			call sysmsg(msg_, techmsg);
 
 		}
 
@@ -225,7 +225,7 @@ listen:
 				//servername=getdrivepath(drive()[1,2])[3,'\']
 				//if servername then body:=fm:'ServerName=':servername
 
-				body ^= FM ^ FM ^ USER4;
+				body ^= FM ^ FM ^ msg_;
 				body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
 				body.replacer("\r", "\r\n");
 
@@ -281,10 +281,10 @@ listen:
 	var linkfilename3 = PRIORITYINT.f(100);
 	if (linkfilename3) {
 		//cannot remove these since they may be codepage letters now
-		USER4.replacer("|", "\r\n");
-		USER4.replacer(FM, "\r\n");
-		USER4.replacer(VM, "\r\n");
-		call oswrite("Error: " ^ USER4, linkfilename3);
+		msg_.replacer("|", "\r\n");
+		msg_.replacer(FM, "\r\n");
+		msg_.replacer(VM, "\r\n");
+		call oswrite("Error: " ^ msg_, linkfilename3);
 		//osclose linkfilename3
 	}
 
@@ -307,7 +307,7 @@ listen:
 	if (cmd.field(" ",1) eq "LISTEN") {
 		//if NET LISTEN LISTEN LISTEN - then terminate if too many errors
 		if (cmd.len() gt 100) {
-			printl(USER4);
+			printl(msg_);
 			perform("OFF");
 		}
 		cmd.replacer(" INTRANET", "");

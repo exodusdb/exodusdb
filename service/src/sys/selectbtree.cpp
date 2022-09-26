@@ -40,8 +40,8 @@ function main(in filename, in indexid, in texts0, io msg) {
 
 	//suppress maximum message
 	//similar code in LISTSCHED and AGENCY.SUBS
-	if (USER4.contains("maximum")) {
-		USER4 = "Too many records found. Some may have been excluded.";
+	if (msg_.contains("maximum")) {
+		msg_ = "Too many records found. Some may have been excluded.";
 	}
 
 	if (not foundkeys) {

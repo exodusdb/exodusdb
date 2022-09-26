@@ -48,10 +48,6 @@ function main() {
 	//c sys
 	//global mode,stationery,task
 
-	#define request_ USER0
-	#define data_ USER1
-	#define response_ USER3
-	#define msg_ USER4
 
 	#include <system_common.h>
 	//global fn,stationery,mode
@@ -69,12 +65,12 @@ function main() {
 
 	call cropper(request_);
 	call cropper(data_);
-	mode = USER0.f(1).ucase();
+	mode = request_.f(1).ucase();
 
 	//request 2 - can be anything actually
 
 	win.datafile = request_.f(2);
-	var keyx = USER0.f(3);
+	var keyx = request_.f(3);
 
 	response_ = "OK";
 
@@ -128,7 +124,7 @@ function main() {
 
 		//comma sep
 		var compcodes = request_.f(2);
-		var testing = USER0.f(3);
+		var testing = request_.f(3);
 
 		var allhtml = "";
 
@@ -164,7 +160,7 @@ function main() {
 	} else if (mode eq "PERIODTABLE") {
 
 		var year = request_.f(2).field("-", 1).field("/", 2);
-		var finyear = USER0.f(3);
+		var finyear = request_.f(3);
 
 		perform("PERIODTABLE " ^ year ^ " " ^ finyear ^ " (H)");
 
@@ -172,7 +168,7 @@ function main() {
 
 	} else if (mode eq "FILEMAN" and request_.f(2) eq "COPYDB") {
 
-		var copydb = USER0.f(3);
+		var copydb = request_.f(3);
 		if (not(SYSTEM.f(58).locate(copydb, dbn))) {
 			{}
 		}
@@ -205,16 +201,16 @@ function main() {
 
 		perform("COPYDB " ^ copydb ^ " " ^ todb);
 
-		USER3 = msg_;
+		response_ = msg_;
 		if (not response_) {
 			log ^= "|" ^ time().oconv("MTS") ^ " Finished";
 			call sysmsg(log);
-			USER3 = "OK " ^ log;
+			response_ = "OK " ^ log;
 		}
 
 	} else if (mode eq "EMAILUSERS") {
 
-		var groupids = USER1.f(1);
+		var groupids = data_.f(1);
 		var jobfunctionids = "";
 		var userids = data_.f(2);
 		if (not((groupids or jobfunctionids) or userids)) {
@@ -234,7 +230,7 @@ function main() {
 		//W=group is word to be found in user department
 		var options = "TR";
 
-		var subject = USER1.f(4);
+		var subject = data_.f(4);
 		var message = data_.f(5);
 
 		message.converter(TM, VM);
@@ -246,7 +242,7 @@ function main() {
 			} else {
 			call mssg("No users can be found to email,|or some problem with email server");
 		}
-		USER1 = "";
+		data_ = "";
 
 	} else if (mode eq "CREATEDATABASE") {
 		//For patsalides
@@ -255,9 +251,9 @@ function main() {
 		    stop();
 		}
 
-		var targetdbname = USER1.f(1);
-		var targetdbcode = USER1.f(2).lcase();
-		var sourcedbcode = USER1.f(3).lcase();
+		var targetdbname = data_.f(1);
+		var targetdbcode = data_.f(2).lcase();
+		var sourcedbcode = data_.f(3).lcase();
 
 		var sourcedatadir = "../data/" ^ sourcedbcode;
 		var targetdatadir = "../data/" ^ targetdbcode;
@@ -342,7 +338,7 @@ function main() {
 			stop();
 		}
 
-		ID = USER0.f(2);
+		ID = request_.f(2);
 		var emailaddress = request_.f(3);
 
 		var baduseroremail = "Either " ^ (ID.quote()) ^ " or " ^ (emailaddress.quote()) ^ " does not exist";
@@ -408,7 +404,7 @@ function main() {
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
 	} else if (mode eq "MAKEUPLOADPATH") {
-		call uploadsubs("MAKEUPLOADPATH." ^ USER0.f(2));
+		call uploadsubs("MAKEUPLOADPATH." ^ request_.f(2));
 
 	} else if (mode eq "POSTUPLOAD") {
 		call uploadsubs("POSTUPLOAD");
@@ -417,7 +413,7 @@ function main() {
 		call uploadsubs("VERIFYUPLOAD." ^ request_.f(2));
 
 	} else if (mode eq "OPENUPLOAD") {
-		call uploadsubs("OPENUPLOAD." ^ USER0.f(2));
+		call uploadsubs("OPENUPLOAD." ^ request_.f(2));
 
 	} else if (mode eq "DELETEUPLOAD") {
 		call uploadsubs("DELETEUPLOAD." ^ request_.f(2));
@@ -427,10 +423,10 @@ function main() {
 		//have to skip char zero it seems to be treated as string terminator
 		//somewhere on the way to the browser (not in revelation)
 		for (const var ii : range(1, 255)) {
-			USER1 ^= chr(ii);
+			data_ ^= chr(ii);
 		} //ii;
 		//data='xxx'
-		USER3 = "OK";
+		response_ = "OK";
 
 	} else if (mode eq "SETCODEPAGE") {
 		if (not(sys.alanguage.open("ALANGUAGE", ""))) {
@@ -438,7 +434,7 @@ function main() {
 			stop();
 		}
 
-		var codepage = USER0.f(3);
+		var codepage = request_.f(3);
 		if (not codepage) {
 			goto badsetcodepage;
 		}
@@ -453,7 +449,7 @@ function main() {
 				write char(0):data on alanguage,'SORTORDER*':codepage;
 			*/
 
-		} else if (USER0.f(2) eq "UPPERCASE") {
+		} else if (request_.f(2) eq "UPPERCASE") {
 			fn = 9;
 setcodepagecase:
 			var recordx;
@@ -500,9 +496,9 @@ badsetcodepage:
 	} else if (mode eq "GETDATASETS") {
 		ANS = "";
 		call generalsubs("GETDATASETS");
-		USER1 = ANS;
+		data_ = ANS;
 		if (data_) {
-			USER3 = "OK";
+			response_ = "OK";
 		} else {
 			response_ = "Error: No datasets found";
 		}
@@ -515,7 +511,7 @@ badsetcodepage:
 
 	} else if (mode eq "LISTREQUESTLOG") {
 
-		PSEUDO = USER1;
+		PSEUDO = data_;
 		perform("LISTREQUESTLOG");
 
 		//printopts='L'
@@ -535,7 +531,7 @@ badsetcodepage:
 
 		call changelogsubs("SELECTANDLIST" ^ FM ^ data_);
 		if (msg_) {
-			msg_.move(USER3);
+			msg_.move(response_);
 			stop();
 		}
 
@@ -551,12 +547,12 @@ badsetcodepage:
 
 	} else if (mode eq "GETDEPTS") {
 		call usersubs("GETDEPTS");
-		USER1 = ANS;
+		data_ = ANS;
 		response_ = "OK";
 
 	} else if (mode eq "LISTACTIVITIES") {
 
-		perform("LISTACTIVITIES " ^ USER0.f(2));
+		perform("LISTACTIVITIES " ^ request_.f(2));
 
 		gosub postproc();
 
@@ -564,12 +560,12 @@ badsetcodepage:
 		perform("ABOUT");
 		//transfer @user4 to data
 		//response='OK'
-		msg_.move(USER3);
+		msg_.move(response_);
 		response_.prefixer("OK ");
 
 	} else if (mode eq "UTIL") {
 		perform("UTIL");
-		USER3 = "OK";
+		response_ = "OK";
 
 	} else if (mode eq "PROG") {
 		perform("PROG");
@@ -603,7 +599,7 @@ badsetcodepage:
 		}
 
 		data_ = RECORD;
-		USER3 = "OK";
+		response_ = "OK";
 
 	} else if (mode eq "GETREPORTS") {
 
@@ -618,7 +614,7 @@ badsetcodepage:
 
 		var select = "SELECT DOCUMENTS BY-DSND EXODUS_STANDARD BY DESCRIPTION";
 
-		var instructions = USER0.f(2);
+		var instructions = request_.f(2);
 		instructions.replacer(VM, "%FD");
 		select ^= " WITH INSTRUCTIONS2 " ^ (instructions.quote());
 
@@ -630,7 +626,7 @@ badsetcodepage:
 
 		gosub opendocuments();
 
-		USER1 = "";
+		data_ = "";
 		var repn = 0;
 nextrep:
 		if (readnext(reportid)) {
@@ -654,7 +650,7 @@ nextrep:
 					data_(ii, repn) = report.f(ii);
 				} //ii;
 
-				USER1(9, repn) = reportid;
+				data_(9, repn) = reportid;
 
 	//print repn,data<1>
 			}
@@ -696,16 +692,16 @@ nextrep:
 		gosub opendocuments();
 
 		var doc;
-		if (not(doc.read(sys.documents, USER0.f(2)))) {
+		if (not(doc.read(sys.documents, request_.f(2)))) {
 			call mssg("Document " ^ (request_.f(2).quote()) ^ " is missing");
 			stop();
 		}
 
 		//TODO security
 
-		doc(6) = lower(USER1);
+		doc(6) = lower(data_);
 
-		doc.write(sys.documents, USER0.f(2));
+		doc.write(sys.documents, request_.f(2));
 
 	} else if (mode eq "COPYREPORT") {
 
@@ -713,7 +709,7 @@ nextrep:
 
 		var doc;
 		if (not(doc.read(sys.documents, request_.f(2)))) {
-			call mssg("Document " ^ (USER0.f(2).quote()) ^ " is missing");
+			call mssg("Document " ^ (request_.f(2).quote()) ^ " is missing");
 			stop();
 		}
 
@@ -742,7 +738,7 @@ nextrep:
 
 		data_ = ID ^ FM ^ doc;
 
-		USER3 = "OK";
+		response_ = "OK";
 
 	} else if (mode eq "GETREPORT") {
 
@@ -752,7 +748,7 @@ nextrep:
 		//get parameters from documents into @pseudo
 
 		if (not(sys.document.read(sys.documents, request_.f(2)))) {
-			msg_ = "Document " ^ (USER0.f(2).quote()) ^ " does not exist";
+			msg_ = "Document " ^ (request_.f(2).quote()) ^ " does not exist";
 			call mssg(msg_);
 			stop();
 		}
@@ -775,7 +771,7 @@ nextrep:
 
 		//merge any runtime parameters into the real parameters
 		for (fn = 1; fn <= 999; ++fn) {
-			var tt = USER1.f(fn);
+			var tt = data_.f(fn);
 			if (tt) {
 				PSEUDO(fn) = tt;
 			}
@@ -787,7 +783,7 @@ nextrep:
 
 		var sentencex = sys.document.f(5);
 		sentencex.converter(VM, " ");
-		USER1 = PSEUDO;
+		data_ = PSEUDO;
 
 		//in case we are calling another proxy
 		if (sys.document.f(5, 1).ends("PROXY")) {
@@ -795,7 +791,7 @@ nextrep:
 			//run but suppress email
 			//perform 'TEST ':request<2>:' (S)'
 
-			request_ = raise(sys.document.f(5)).field(FM, 2, 999999) ^ FM ^ USER0.f(2);
+			request_ = raise(sys.document.f(5)).field(FM, 2, 999999) ^ FM ^ request_.f(2);
 			//moved up so parameters show in any emailed error messages
 			//data=@pseudo
 			//override the saved period with a current period
@@ -812,7 +808,7 @@ performreport:
 			response_ = "";
 
 			perform(sentencex);
-			if (not USER3) {
+			if (not response_) {
 
 				gosub postproc();
 			}
@@ -821,7 +817,7 @@ performreport:
 
 	} else if (mode eq "USAGESTATISTICS") {
 
-		PSEUDO = USER1;
+		PSEUDO = data_;
 		perform("LISTSTATS");
 
 		//printopts='L'
@@ -882,7 +878,7 @@ performreport:
 
 	} else if (mode.field(".", 1) eq "GETTASKS") {
 
-		call securitysubs("GETTASKS." ^ USER0.f(2) ^ "." ^ request_.f(3));
+		call securitysubs("GETTASKS." ^ request_.f(2) ^ "." ^ request_.f(3));
 		data_ = ANS;
 
 	} else {
@@ -905,9 +901,9 @@ subroutine postproc() {
 
 subroutine initlog() {
 
-	logkey = USER0.f(2);
+	logkey = request_.f(2);
 	logyear = request_.f(3);
-	var logformat = USER0.f(4);
+	var logformat = request_.f(4);
 	var logoptions = request_.f(5);
 
 	if (logoptions.match("^\\d*/\\d{2}$")) {
@@ -915,9 +911,9 @@ subroutine initlog() {
 		logoptions = "";
 	}
 
-	logfromdate = USER1.f(5);
+	logfromdate = data_.f(5);
 	loguptodate = data_.f(6);
-	logsearch = USER1.f(7);
+	logsearch = data_.f(7);
 
 	if (logoptions eq "TODAY") {
 		logfromdate = date();
@@ -942,7 +938,7 @@ subroutine initlog() {
 	}
 
 	if (not(authorised("LOG ACCESS", msg_, ""))) {
-		USER3 = msg_;
+		response_ = msg_;
 		stop();
 	}
 

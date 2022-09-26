@@ -37,7 +37,6 @@ function main(in mode0) {
 	#include <system_common.h>
 	//global mode,text,ucline,rec,idate,date,line1,idates,errors,update,keywords,nkeywords,cmd,nlines
 
-	#define data_ USER1
 	keywords = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";
 	mode = mode0;
 	nkeywords = keywords.count(VM) + 1;
@@ -220,7 +219,7 @@ subroutine select0() {
 		tt.converter(FM, VM);
 		if (not(tt.locateby("AR", mode.f(3), versionn))) {
 			if (versionn gt 1) {
-				mode(3) = USER1.f(versionn - 1);
+				mode(3) = data_.f(versionn - 1);
 			}
 		}
 	}
@@ -237,11 +236,11 @@ subroutine select() {
 
 	cmd = "SELECT CHANGELOG";
 	var andx = "";
-	if (USER1.f(1)) {
+	if (data_.f(1)) {
 		cmd ^= " WITH KEYWORD " ^ quote2(data_.f(1));
 		andx = " AND";
 	}
-	if (USER1.f(2)) {
+	if (data_.f(2)) {
 		cmd ^= andx ^ " WITH DATE GE " ^ (data_.f(2).oconv("D4").quote());
 		andx = " AND";
 	}
@@ -263,7 +262,7 @@ subroutine list() {
 	//data<2>=date from which interested
 	//mode<2>
 
-	USER1 = mode.field(FM, 2, 9999);
+	data_ = mode.field(FM, 2, 9999);
 
 	cmd = "LIST CHANGELOG ID-SUPP";
 	//cmd:=' KEYWORD TEXT'
@@ -278,14 +277,14 @@ subroutine list() {
 	gosub getcurrentversiondatetime();
 	if (data_.f(2)) {
 		//heading:=' version ':data<2> '[DATE,4*]':' -'
-		call daterangetext(USER1.f(2), currentversiondatetime, tt, sys.glang);
+		call daterangetext(data_.f(2), currentversiondatetime, tt, sys.glang);
 		headingx ^= " : " ^ tt;
 	} else {
 		headingx ^= " Version : " ^ oconv(currentversiondatetime, "[DATE,4*]");
 	}
 
 	if (data_.f(1)) {
-		headingx ^= "'L'" ^ USER1.f(1);
+		headingx ^= "'L'" ^ data_.f(1);
 		headingx.replacer(SM, ", ");
 		headingx.replacer(VM, ", ");
 	}
@@ -321,7 +320,7 @@ subroutine getversiondates() {
 	call osread(versionlog, "upgrade.cfg");
 	//versionlog=trim(field(versionlog,\1A\,1))
 	versionlog.converter("\r\n", FM);
-	let nn = versionlog.count(FM) + (versionlog ne "");
+	let nn = versionlog.fcount(FM);
 	var versiondata = "";
 	for (const var ii : range(1, nn)) {
 		idate = versionlog.f(ii, 1).field(" ", 2, 3).iconv("D");

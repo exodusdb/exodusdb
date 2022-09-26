@@ -281,10 +281,6 @@ function main_init() {
 
 	halt = 0;
 
-	#define request_ USER0
-	#define iodat_ USER1
-	#define response_ USER3
-	#define msg_ USER4
 
 	origsentence = SENTENCE;
 
@@ -546,7 +542,7 @@ function loop_init() {
 	ID = "";
 	MV = 0;
 	request_ = "";
-	iodat_ = "";
+	data_ = "";
 	response_ = "";
 	msg_ = "";
 	win.wlocked = "";
@@ -964,7 +960,7 @@ function loop_exit() {
 
 backup:
 			//similar code in LISTEN and LISTEN2
-			USER4 = "";
+			msg_ = "";
 			cmd = "FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakpars.f(7) ^ " SYSTEM";
 			call log2("Attempting backup " ^ cmd, logtime);
 			perform(cmd);
@@ -1015,7 +1011,7 @@ subroutine main_exit() {
 	SYSTEM(33) = "";
 	//call setprivilegeorigprivilege);
 	if (request1.starts("RESTART")) {
-		USER4 = request1;
+		msg_ = request1;
 		//return to net which will restart LISTEN
 		//stop();
 		return;
@@ -1083,13 +1079,13 @@ function got_link() {
 		//get the .1 file which contains the request
 		timex = time();
 readlink1:
-		USER0 = "";
+		request_ = "";
 		//osbread request from linkfile1 at 0 length 256*256-4
 		tt = 0;
 		call osbread(request_, linkfile1, tt, 256 * 256 - 4);
 
 		//if cannot read it then try again
-		if (USER0 eq "" and time() eq timex) {
+		if (request_ eq "" and time() eq timex) {
 			var().osflush();
 			call ossleep(1000*1 / 10.0);
 			linkfile1.osclose();
@@ -1102,12 +1098,12 @@ readlink1:
 		//cleanup the input file
 		//convert '&' to fm in request
 		request_.converter("\r\n", FM);
-		USER0.replacer("\\\\", "\\");
+		request_.replacer("\\\\", "\\");
 		request_.replacer("\\r", FM);
 		//convert @lower.case to @upper.case in request
 		while (true) {
 			///BREAK;
-			if (not(USER0.ends(FM))) break;
+			if (not(request_.ends(FM))) break;
 			request_.popper();
 		}//loop;
 		//swap '%FF' with rm  in request
@@ -1123,7 +1119,7 @@ readlink1:
 			// swap hexx(ii) with char(ii) in request
 			// next ii
 			//decode %FA-%FF
-			call hexcode(3, USER0);
+			call hexcode(3, request_);
 		//end else
 			//swap 'MEDIA':'.TYPE' with 'JOB_TYPE' in request
 			//swap 'PRODUCT':'.CATEGORIES' with 'PRODUCT_CATEGORIES' in request
@@ -1133,7 +1129,7 @@ readlink1:
 		//eg D:\EXODUS\DATA\DEVDTEST\|3130570.1
 		//eg /var/www/html/exodus2/EXODUS//data/BASIC/~9979714.1
 		replyfilename = request_.f(1);
-		USER0.remover(1);
+		request_.remover(1);
 
 		//php requests that responses are to be written to linux file system files
 		//but if being served by dos/windows then need to reply to dos/win files
@@ -1205,11 +1201,11 @@ function request_init() {
 
 	//clear out buffers just to be sure
 	//request=''
-	USER1 = "";
+	data_ = "";
 	//response=''
 	//response='Error: Response not set in LISTEN'
-	call listen4(1, USER3);
-	USER4 = "";
+	call listen4(1, response_);
+	msg_ = "";
 
 	//only go on active if we actually get the request
 	//to avoid multiple processes going on active for only one request
@@ -1221,20 +1217,20 @@ function request_init() {
 	tt = request_.f(1);
 	if (tt eq "VERSION 3") {
 		//nconnectionfields
-		tt = USER0.f(2) - 1;
+		tt = request_.f(2) - 1;
 		request_.remover(2);
-	} else if (USER0.f(1) eq "VERSION 2") {
+	} else if (request_.f(1) eq "VERSION 2") {
 		tt = 4;
 	} else {
 		tt = 0;
 	}
 	connection = request_.field(FM, 1, tt);
 
-	USER0 = request_.field(FM, tt + 1, 999999);
+	request_ = request_.field(FM, tt + 1, 999999);
 
-	datasetx = USER0.f(1).ucase();
+	datasetx = request_.f(1).ucase();
 	username = request_.f(2).ucase();
-	password = USER0.f(3).ucase();
+	password = request_.f(3).ucase();
 
 	//REMOTE_ADDR, REMOTE_HOST, HTTPS, SESSIONID
 	//if connection<1>='::1' then connection<1>='127.0.0.1'
@@ -1250,23 +1246,23 @@ function request_init() {
 
 	//throw away initial request CACHE
 	if (request1 eq "CACHE") {
-		USER0.remover(firstrequestfieldn);
+		request_.remover(firstrequestfieldn);
 		request1 = request_.f(firstrequestfieldn);
 	}
 
 	request1.ucaser();
 	if (request1 eq "LOGIN") {
-		USER0(5) = request_.f(2);
+		request_(5) = request_.f(2);
 	}
 	//convert @lower.case to @upper.case in request
-	request2 = USER0.f(5);
+	request2 = request_.f(5);
 	request3 = request_.f(6);
-	request4 = USER0.f(7);
+	request4 = request_.f(7);
 	request5 = request_.f(8);
-	request6 = USER0.f(9);
+	request6 = request_.f(9);
 
 	//remove dataset and password
-	request_ = USER0.field(FM, firstrequestfieldn, 99999);
+	request_ = request_.field(FM, firstrequestfieldn, 99999);
 
 	responsetime = "";
 	rawresponse = "PENDING";
@@ -1336,7 +1332,7 @@ function request_init() {
 
 	//print the request
 	if (tracing) {
-		tt = username ^ " " ^ USER0;
+		tt = username ^ " " ^ request_;
 		//hide dataset and passord
 		//has been removed above now
 		//tt<firstrequestfieldn-1>=''
@@ -1434,16 +1430,16 @@ function request_init() {
 
 			//check max iodat size <= maxstrlen
 			if (lendata gt maxstrlen) {
-				iodat_ = "";
+				data_ = "";
 				//response='Error: Maximum record size of ':maxstrlen '[XBYTES]':' exceeded in LISTEN'
 				call listen4(2, response_, maxstrlen);
 				request_init_ok = false;
 
 			//otherwise join the blocks
 			} else {
-				USER1 = "";
+				data_ = "";
 				for (blockn = 1; blockn <= nblocks; ++blockn) {
-					iodat_ ^= datx(blockn);
+					data_ ^= datx(blockn);
 					datx(blockn) = "";
 				} //blockn;
 			}
@@ -1452,16 +1448,16 @@ function request_init() {
 		} else {
 cannotopenlinkfile2:
 			request_init_ok = false;
-			USER1 = "";
+			data_ = "";
 			//response='Error: LISTEN cannot open ':linkfilename2
-			call listen4(3, USER3, linkfilename2);
+			call listen4(3, response_, linkfilename2);
 		}
 
 	} else {
 
 		if (not(linkfile2size)) {
 
-			iodat_ = "";
+			data_ = "";
 
 		} else {
 
@@ -1471,7 +1467,7 @@ cannotopenlinkfile2:
 
 			//read whole file upto limit
 			var offset_zero = 0;
-			call osbread(USER1, linkfile2, offset_zero, maxstrlen);
+			call osbread(data_, linkfile2, offset_zero, maxstrlen);
 
 			//unescape
 			//for ii=0 to 255
@@ -1486,7 +1482,7 @@ cannotopenlinkfile2:
 					gosub writelogx();
 				}
 
-				logx = iodat_;
+				logx = data_;
 				gosub writelogx();
 			}
 
@@ -1502,7 +1498,7 @@ cannotopenlinkfile2:
 					swap HEXX(37) with char(37) in iodat;
 					*/
 				//decode all
-				call hexcode(2, USER1);
+				call hexcode(2, data_);
 			}
 
 			// next i
@@ -1614,7 +1610,7 @@ subroutine process() {
 		begintrans();
 		gosub process2();
 		if (not committrans())
-			USER3 = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ USER3;
+			response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
 	}
 
 	// With try/catch so errors can be dealt with properly
@@ -1624,12 +1620,12 @@ subroutine process() {
 		begintrans();
 		gosub process2();
 		if (not committrans())
-			USER3 = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ USER3;
+			response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
 	}
 	catch (VarError varerror) {
 		rollbacktrans();
 		// Similar code in net.cpp and listen.cpp
-		USER3 = varerror.description.unassigned("No error message") ^ FM ^ varerror.stack();
+		response_ = varerror.description.unassigned("No error message") ^ FM ^ varerror.stack();
 	}
 
 	return;
@@ -1648,19 +1644,19 @@ subroutine process2() {
 //	} else 
 
 	if (invaliduser) {
-		USER1 = "";
-		USER3 = invaliduser;
+		data_ = "";
+		response_ = invaliduser;
 
 	//if no request then possibly some failure in file sharing
 	} else if (request_ eq "") {
-		iodat_ = "";
+		data_ = "";
 		//response='Error: No request'
 		call listen4(4, response_);
 
 	//empty loopback to test connection (no username or password required)
 	} else if (request1 eq "TEST") {
 		//iodat='' if they pass iodat, pass it back
-		USER3 = "OK";
+		response_ = "OK";
 
 	//get cookies for company, market, menus etc (may fail if no allowed companies)
 	//username and password already validated above
@@ -1709,7 +1705,7 @@ subroutine process2() {
 		}
 		leaselocks = "";
 		gosub leaselock();
-		sessionid.move(USER1);
+		sessionid.move(data_);
 
 	} else if (request1 eq "UNLOCK") {
 
@@ -1731,7 +1727,7 @@ subroutine process2() {
 
 		withlock = request1 eq "READU";
 		//updatenotallowed=''
-		iodat_ = "";
+		data_ = "";
 		sessionid = "";
 
 		filename = request2;
@@ -1813,7 +1809,7 @@ getnextkey:
 
 			if (keyx eq "") {
 				//response='Error: Next number was not produced':fm:msg
-				call listen4(6, USER3, msg_);
+				call listen4(6, response_, msg_);
 				gosub fmtresp();
 				return;
 			}
@@ -1832,7 +1828,7 @@ getnextkey:
 			gosub leaselock();
 
 			//if cannot lock then get next key
-			if (USER3 eq "NOT OK" and autokey) {
+			if (response_ eq "NOT OK" and autokey) {
 				goto getnextkey;
 			}
 
@@ -1847,7 +1843,7 @@ getnextkey:
 		FILEERRORMODE = 1;
 		FILEERROR = "";
 
-		if (USER1.read(file, keyx)) {
+		if (data_.read(file, keyx)) {
 
 			//if record already on file somehow then get next key
 			if (autokey) {
@@ -1880,7 +1876,7 @@ noupdate:
 				call listen4(7, response_);
 				gosub addlockholder();
 			} else {
-				USER3 = "OK";
+				response_ = "OK";
 			}
 			if (sessionid) {
 				response_ ^= " SESSIONID " ^ sessionid;
@@ -1898,7 +1894,7 @@ noupdate:
 					//if sessionid then gosub leaseunlock
 					gosub leaseunlock();
 					//msg='Error: ':quote(params<1>):' must not contain a space character'
-					call listen4(28, USER3, keyx);
+					call listen4(28, response_, keyx);
 					gosub fmtresp();
 					return;
 				}
@@ -1921,9 +1917,9 @@ noupdate:
 				}
 
 				//response='Error: ':quote(keyx):' does not exist in the ':quote(filetitle):' file'
-				iodat_ = "";
+				data_ = "";
 				//response='Error: NO RECORD'
-				call listen4(8, USER3);
+				call listen4(8, response_);
 				if (sessionid) {
 					response_ ^= " SESSIONID " ^ sessionid;
 				} else {
@@ -1947,7 +1943,7 @@ noupdate:
 
 		if (withlock) {
 			if (not lockauthorised) {
-				USER3 ^= " LOCK NOT AUTHORISED";
+				response_ ^= " LOCK NOT AUTHORISED";
 			}
 		}
 
@@ -1971,17 +1967,17 @@ noupdate:
 					gosub leaseunlock();
 				}
 				//response=quote('DICT.':datafile):' CANNOT BE OPENED'
-				call listen4(9, USER3, "DICT." ^ win.datafile);
+				call listen4(9, response_, "DICT." ^ win.datafile);
 				gosub fmtresp();
 				return;
 			}
 			keyx.move(ID);
-			USER1.move(RECORD);
+			data_.move(RECORD);
 			win.orec = RECORD;
 			win.wlocked = sessionid;
 			origresponse = response_;
 			//response=''
-			USER4 = "";
+			msg_ = "";
 			win.reset = 0;
 
 			systemsubs = postread;
@@ -1989,10 +1985,10 @@ noupdate:
 			DATA = "";
 
 	//restore this programs environment
-			RECORD.move(iodat_);
+			RECORD.move(data_);
 			ID.move(keyx);
 
-			call cropper(USER1);
+			call cropper(data_);
 
 			//postread can request abort by setting msg or reset>=5
 			//msg with reset<0 results in comment to client
@@ -2003,11 +1999,11 @@ noupdate:
 					//wlocked=0
 				}
 				//if msg then msg='Error: ':msg
-				USER3 = USER4;
+				response_ = msg_;
 				if (response_ eq "") {
-					USER3 = "ACCESS REFUSED";
+					response_ = "ACCESS REFUSED";
 				}
-				iodat_ = "";
+				data_ = "";
 				gosub fmtresp();
 				//response='Error: ':response
 			} else {
@@ -2015,7 +2011,7 @@ noupdate:
 				//postread may have provided a record where non-was found
 				//ONLY if it unlocks it as well! otherwise
 				//removal of NO RECORD will cause failure in client
-				if (not(win.wlocked) and USER1) {
+				if (not(win.wlocked) and data_) {
 
 					if (withlock and sessionid) {
 
@@ -2028,23 +2024,23 @@ noupdate:
 						keyx = keyx2;
 					}
 
-					USER3.replacer("Error: NO RECORD", "");
+					response_.replacer("Error: NO RECORD", "");
 
 					//swap 'RECORDKEY ' with '' in response
 					response_.trimmerlast();
-					if (USER3 eq "") {
+					if (response_ eq "") {
 						response_ = "OK";
 					}
 
 					//in case postread has changed the key
-					if (keyx ne keyx0 and not(USER3.contains("RECORDKEY"))) {
+					if (keyx ne keyx0 and not(response_.contains("RECORDKEY"))) {
 						tt = keyx;
 						tt.replacer(" ", "%20");
-						response_ = (USER3 ^ " RECORDKEY " ^ tt).trim();
+						response_ = (response_ ^ " RECORDKEY " ^ tt).trim();
 					}
 
 					if (msg_) {
-						response_ ^= " " ^ USER4;
+						response_ ^= " " ^ msg_;
 					}
 				}
 
@@ -2055,17 +2051,17 @@ noupdate:
 			//but make sure
 			if (sessionid and not(win.wlocked)) {
 
-				storeresponse = USER3;
+				storeresponse = response_;
 				gosub leaseunlock();
 				response_ = storeresponse;
 
 				//remove session id
-				tt = USER3.index("SESSIONID");
+				tt = response_.index("SESSIONID");
 				if (tt) {
 					response_.paster(tt, ("SESSIONID " ^ sessionid).len(), "");
-					USER3.trimmerlast();
+					response_.trimmerlast();
 					if (response_ eq "") {
-						USER3 = "OK";
+						response_ = "OK";
 					}
 				}
 
@@ -2083,10 +2079,10 @@ noupdate:
 
 		//prevent reading passwords postread and postwrite
 		if (filename eq "DEFINITIONS" and keyx eq "SECURITY") {
-			iodat_(4) = "";
+			data_(4) = "";
 		}
 
-		call cropper(USER1);
+		call cropper(data_);
 
 	} else if ((request1 eq "WRITEU" or request1 eq "DELETE") or request1 eq "WRITE") {
 	//write:
@@ -2131,7 +2127,7 @@ noupdate:
 		ID = keyx;
 		MV = 0;
 		//@record=iodat
-		iodat_.move(RECORD);
+		data_.move(RECORD);
 		win.datafile = filename;
 		//not really needed because pre/post code should assume that it is wlocked
 		//but some code does not know that (eg postread called from postwrite)
@@ -2144,7 +2140,7 @@ noupdate:
 
 		if (not(win.srcfile.open(win.datafile, ""))) {
 			//response=quote(datafile):' CANNOT BE OPENED'
-			call listen4(9, USER3, win.datafile);
+			call listen4(9, response_, win.datafile);
 			return;
 		}
 
@@ -2168,7 +2164,7 @@ noupdate:
 		}
 		if (sessionid ne lockrec.f(5)) {
 			//response='Somebody has updated this record.|Your update cannot be applied.':'|The session id does not agree ':quote(lockrec<5>)
-			call listen4(12, USER3, lockrec.f(5));
+			call listen4(12, response_, lockrec.f(5));
 			gosub fmtresp();
 			return;
 		}
@@ -2230,7 +2226,7 @@ noupdate:
 			if (RECORD eq "") {
 emptyrecorderror:
 				//response='Write empty data record is disallowed.'
-				call listen4(14, USER3);
+				call listen4(14, response_);
 badwrite:
 				gosub properunlock();
 				gosub fmtresp();
@@ -2265,7 +2261,7 @@ badwrite:
 
 			if (not(win.valid)) {
 				gosub properunlock();
-				USER3 = msg_;
+				response_ = msg_;
 				gosub fmtresp();
 				return;
 			}
@@ -2335,15 +2331,15 @@ badwrite:
 
 			//send back revised data or nothing
 			//NB data is now '' to save space so always send back data unless @record is cleared
-			if (RECORD eq USER1) {
-				iodat_ = "";
+			if (RECORD eq data_) {
+				data_ = "";
 			} else {
-				USER1 = RECORD;
+				data_ = RECORD;
 			}
 
 			//prevent reading passwords postread and postwrite
 			if (filename eq "DEFINITIONS" and keyx eq "SECURITY") {
-				iodat_(4) = "";
+				data_(4) = "";
 			}
 
 		} else if (request1 eq "DELETE") {
@@ -2356,7 +2352,7 @@ badwrite:
 			//prevent deleting if record does not exist
 			if (RECORD eq "") {
 				//response='Cannot delete because ':quote(keyx):' does not exist in the ':quote(filetitle):' file'
-				call listen4(15, USER3, keyx ^ FM ^ filetitle);
+				call listen4(15, response_, keyx ^ FM ^ filetitle);
 				gosub fmtresp();
 				return;
 			}
@@ -2384,7 +2380,7 @@ badwrite:
 			}
 			if (not(win.valid)) {
 				gosub properunlock();
-				response_ = USER4;
+				response_ = msg_;
 				gosub fmtresp();
 				return;
 			}
@@ -2401,7 +2397,7 @@ badwrite:
 			}
 
 			//send back no iodat
-			USER1 = "";
+			data_ = "";
 
 		}
 
@@ -2420,7 +2416,7 @@ badwrite:
 		//even postwrite/postdelete can now set invalid (to indicate invalid mode etc)
 		//if valid then response='OK' else response='Error:'
 		//WARNING TODO: check ternary op following;
-		USER3 = win.valid ? "OK" : "Error:";
+		response_ = win.valid ? "OK" : "Error:";
 
 		if (request1 ne "DELETE") {
 			tt = ID;
@@ -2429,14 +2425,14 @@ badwrite:
 			tt.replacer(" ", "{20}");
 			response_ ^= " RECORDKEY " ^ tt;
 			if (sessionid) {
-				USER3 ^= " SESSIONID " ^ sessionid;
+				response_ ^= " SESSIONID " ^ sessionid;
 			}
 		}
 
 		//pre and post routines can return warnings/notes in msg
 
 		if (msg_) {
-			response_ ^= " " ^ USER4;
+			response_ ^= " " ^ msg_;
 		}
 
 		//if postroutine else call flush.index(filename)
@@ -2449,15 +2445,15 @@ badwrite:
 	} else if (request1 eq "EXECUTE") {
 
 		//if @username='EXODUS' then
-		// oswrite @user0 on 'USER0'
-		// oswrite @user1 on 'USER1'
+		// oswrite @user0 on 'request_'
+		// oswrite @user1 on 'data_'
 		// end
 
 		//build command from request and check is a valid program
 		voccmd = request2;
 		if (voccmd eq "") {
 			//response='LISTEN:EXECUTE: Module name is missing from request'
-			call listen4(32, USER3);
+			call listen4(32, response_);
 			return;
 		}
 		voccmd ^= "PROXY";
@@ -2495,7 +2491,7 @@ badwrite:
 		SYSTEM(6) = tt;
 
 		//execute the program
-		USER3 = "OK";
+		response_ = "OK";
 		win.valid = 1;
 		msg_ = "";
 
@@ -2504,15 +2500,15 @@ badwrite:
 		//execute instead of call prevents program crashes from crashing LISTEN
 		//changed now that dataset and password are removed in request()
 		//request=field(request,fm,firstrequestfieldn+2,99999)
-		USER0 = request_.field(FM, 3, 99999);
+		request_ = request_.field(FM, 3, 99999);
 
 		//pass the output file in linkfilename2
 		//not good method, pass in system?
-		if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.f(1), xx)) {
-			iodat_ = linkfilename2;
+		if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1), xx)) {
+			data_ = linkfilename2;
 		}
 		if (request_.f(1).starts("VAL.")) {
-			USER1 = linkfilename2;
+			data_ = linkfilename2;
 		}
 
 		//execute so that failures dont cause failures of LISTEN
@@ -2521,24 +2517,24 @@ badwrite:
 
 		//reformat for reqlog
 		voccmd.cutter(-5);
-		USER0(1) = voccmd ^ "_" ^ request_.f(1);
+		request_(1) = voccmd ^ "_" ^ request_.f(1);
 
 		//discard any stored input
 		DATA = "";
 
-		if (USER4) {
+		if (msg_) {
 
 			user4x = msg_.ucase();
 
 			//convert error message (could also be a system error eg dict says indexed but isnt
 			if ((user4x.contains("IN INDEX.REDUCER") or user4x.contains("IN RTP21")) or user4x.contains("IN RTP20")) {
 				//@user4='Please select fewer records and/or simplify your request'
-				call listen4(17, USER4);
+				call listen4(17, msg_);
 			}
 
 			//send errors to exodus
 			if (((msg_ ^ user4x).contains("INTERNAL ERROR")) or user4x.contains("DAMAGED FILE")) {
-				call sysmsg(USER4);
+				call sysmsg(msg_);
 			}
 
 		}
@@ -2546,22 +2542,22 @@ badwrite:
 		call cropper(msg_);
 		call cropper(response_);
 
-		if (USER4) {
-			iodat_ = "";
-			USER3 = "Error: " ^ msg_;
+		if (msg_) {
+			data_ = "";
+			response_ = "Error: " ^ msg_;
 			gosub fmtresp();
 		}
 
 		if (response_ eq "") {
 			//response='Error: No OK from ':voccmd:' ':request
-			call listen4(18, USER3, voccmd);
+			call listen4(18, response_, voccmd);
 			gosub fmtresp();
 		}
 
 		//speed up next autorun if new one has been added
 		tt = response_.index("%NEWAUTORUN%");
 		if (tt) {
-			USER3.replacer("%NEWAUTORUN%", "");
+			response_.replacer("%NEWAUTORUN%", "");
 			lastautorun = "";
 		}
 
@@ -2595,10 +2591,10 @@ badwrite:
 
 	//or give an error message
 	} else {
-		USER1 = "";
+		data_ = "";
 		//response='Error: ':quote(field(request,fm,4,9999)):' unknown request'
 		//response='Error: ':quote(request):' unknown request'
-		call listen4(21, response_, USER0);
+		call listen4(21, response_, request_);
 	}
 
 	//put no code here because some returns above will short cut it
@@ -2631,11 +2627,11 @@ function request_exit() {
 	clearselect();
 
 	if (response_ eq "") {
-		call listen4(1, USER3);
+		call listen4(1, response_);
 	}
 
 	if (response_.contains("ERROR NO:")) {
-		call log("LISTEN", USER3);
+		call log("LISTEN", response_);
 	}
 
 	USERNAME=(listenusername);
@@ -2656,11 +2652,11 @@ function request_exit() {
 	if ((tt.contains("R18.6") or tt.contains("RTP20 MISSING")) or tt.contains("TOO MANY LEVELS OF TCL")) {
 		halt = 1;
 		//response<-1>='INTERNAL ERROR Closing current EXODUS server process'
-		call listen4(1, USER3);
+		call listen4(1, response_);
 		call sysmsg(response_);
 	}
 
-	rawresponse = USER3;
+	rawresponse = response_;
 	rawresponse.converter("\r\n", "|");
 
 	gosub updreqlog();
@@ -2691,7 +2687,7 @@ function request_exit() {
 		gosub writelogx();
 
 		logx = "</Response>";
-		iodatlen = iodat_.len();
+		iodatlen = data_.len();
 		if (iodatlen) {
 			logx ^= "\r\n" "<DataOut>";
 		}
@@ -2699,9 +2695,9 @@ function request_exit() {
 
 	}
 
-	if (USER1 eq "%DIRECTOUTPUT%") {
+	if (data_ eq "%DIRECTOUTPUT%") {
 
-		logx = iodat_;
+		logx = data_;
 		//convert '%' to '%25' in logx
 		logx.replacer("%", "%25");
 		gosub writelogx();
@@ -2715,8 +2711,8 @@ function request_exit() {
 			datx = "";//dim
 			ptr = 0;
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
-				blk = USER1.first(outblocksize);
-				iodat_.cutter(outblocksize);
+				blk = data_.first(outblocksize);
+				data_.cutter(outblocksize);
 				///BREAK;
 				if (not(blk.len())) break;
 
@@ -2749,7 +2745,7 @@ function request_exit() {
 
 					//encode %->%25 %00-%0F %18-%1F %FA-%FF
 					call hexcode(1, blk);
-					call hexcode(1, USER3);
+					call hexcode(1, response_);
 
 				}
 
@@ -2803,7 +2799,7 @@ function request_exit() {
 	//swap fm with char(13) in response
 
 	//write the response
-	call oswrite(USER3, linkfilename3);
+	call oswrite(response_, linkfilename3);
 
 	//trace responded
 	responsetime = ostime();
@@ -2845,10 +2841,10 @@ function request_exit() {
 
 subroutine geterrorresponse() {
 //	fileerrorx = FILEERROR;
-//	USER3 = "Error: " ^ ("FS" ^ fileerrorx.f(1, 1)).xlate("SYS.MESSAGES", 11, "X");
+//	response_ = "Error: " ^ ("FS" ^ fileerrorx.f(1, 1)).xlate("SYS.MESSAGES", 11, "X");
 //	response_.replacer("%1%", handlefilename(fileerrorx.f(2, 1)));
-//	USER3.replacer("%2%", fileerrorx.f(2, 2));
-	USER3 = "Error: " ^ FILEERROR;
+//	response_.replacer("%2%", fileerrorx.f(2, 2));
+	response_ = "Error: " ^ FILEERROR;
 	gosub fmtresp();
 	return;
 }
@@ -2858,16 +2854,16 @@ subroutine fmtresp() {
 	//trim everything after <ESC> (why?)
 	tt = response_.index("<ESC>");
 	if (tt) {
-		USER3 = response_.first(tt - 1);
+		response_ = response_.first(tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters
-	USER3.converter("|", FM);
+	response_.converter("|", FM);
 	response_.converter(VM, FM);
-	if (USER3.starts(FM)) {
+	if (response_.starts(FM)) {
 		response_.cutter(1);
 	}
-	USER3.replacer(FM, "\r\n");
+	response_.replacer(FM, "\r\n");
 
 	return;
 }
@@ -2969,7 +2965,7 @@ subroutine leaselock() {
 	if (not openleaselocks(file))
 		return;
 
-	USER3 = "";
+	response_ = "";
 	if (request1 eq "RELOCK") {
 		gosub rawlock();
 	} else {
@@ -3022,7 +3018,7 @@ subroutine leaselock() {
 
 			//fail if other lock has not timed out
 			if (lockrec.f(1) gt dostime) {
-				USER3 = "NOT OK";
+				response_ = "NOT OK";
 				goto lockexit;
 			}
 
@@ -3061,7 +3057,7 @@ nolock:
 
 	}
 
-	USER3 = "OK";
+	response_ = "OK";
 
 	//convert minutes to fraction of one day (windows time format)
 	lockduration = lockmins / (24 * 60);
@@ -3144,7 +3140,7 @@ subroutine rawunlock() {
 
 subroutine badfile() {
 	//response='Error: ':quote(filename):' file does not exist'
-	call listen4(24, USER3, filename);
+	call listen4(24, response_, filename);
 	return;
 }
 
@@ -3153,7 +3149,7 @@ function openleaselocks(in file) {
 	// Open the leaselocks on the same connection as the data file
 	if (not(leaselocks.open("LOCKS", file))) {
 		response_="Error: LOCKS for " ^ file ^ " cannot be opened.";
-		//call listen4(9, USER3, win.datafile);
+		//call listen4(9, response_, win.datafile);
 		return false;
 	}
 
@@ -3193,7 +3189,7 @@ subroutine leaseunlock() {
 		if (FILEERROR.f(1) eq 100) {
 			//lock is missing but ignore it
 			//because we are unlocking anyway
-			USER3 = "OK";
+			response_ = "OK";
 		} else {
 			gosub geterrorresponse();
 		}
@@ -3220,7 +3216,7 @@ subroutine leaseunlock() {
 	//delete the lock
 	FILEERRORMODE = 1;
 	FILEERROR = "";
-	USER3 = "OK";
+	response_ = "OK";
 	leaselocks.deleterecord(lockkey);
 
 	if (FILEERROR) {
@@ -3290,7 +3286,7 @@ subroutine filesecurity() {
 		if (positive) {
 			msg0.move(response_);
 		} else {
-			posmsg.move(USER3);
+			posmsg.move(response_);
 		}
 		ok = 0;
 		gosub fmtresp();
@@ -3323,7 +3319,7 @@ subroutine checkcompany() {
 	}
 
 	if (request1.contains("READ")) {
-		compcode = calculate("COMPANY_CODE", dictfile, keyx, iodat_, 0);
+		compcode = calculate("COMPANY_CODE", dictfile, keyx, data_, 0);
 	} else {
 		//compcode={COMPANY_CODE}
 		//compcode=calculate('COMPANY_CODE')
@@ -3348,7 +3344,7 @@ subroutine updreqlog() {
 
 	tt = username ^ FM ^ ipno ^ FM ^ netid ^ FM ^ FM ^ responsetime ^ FM ^ rawresponse.f(1);
 	if (request_.f(1) eq "EXECUTE") {
-		tt(11) = USER0.f(2) ^ "_" ^ request_.f(3) ^ FM ^ USER0.field(FM, 4, 9999);
+		tt(11) = request_.f(2) ^ "_" ^ request_.f(3) ^ FM ^ request_.field(FM, 4, 9999);
 	} else {
 		tt(11) = request_;
 	}

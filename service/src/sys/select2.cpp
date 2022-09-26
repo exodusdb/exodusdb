@@ -83,7 +83,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 //	if (limitfields.unassigned()) {
 //		nlimitfields = 0;
 //	} else {
-//		nlimitfields = limitfields.count(VM) + (limitfields ne "");
+//		nlimitfields = limitfields.fcount(VM);
 //	}
 	let nlimitfields = limitfields.unassigned("").fcount(VM);
 
@@ -100,7 +100,6 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		} //ii;
 	}
 
-	#define msg_ USER4
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
 	sortselect.replacer("%SELECTLIST%", "");
@@ -330,9 +329,9 @@ nocommon:
 
 		//handle invalid cmd
 		//R18.1 is normal 'No records found' message
-		if (USER4 and not(msg_.contains("R18.1"))) {
-			if (USER4.field(" ", 1) eq "W156") {
-				msg_ = USER4.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
+		if (msg_ and not(msg_.contains("R18.1"))) {
+			if (msg_.field(" ", 1) eq "W156") {
+				msg_ = msg_.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
 			}
 			response = msg_;
 
@@ -447,7 +446,7 @@ nextrec:
 			//wlocked=1
 			//simulate unlocked read to avoid warning messages like job cannot be updated
 			win.wlocked = 0;
-			USER4 = "";
+			msg_ = "";
 			win.reset = 0;
 
 			call systemsubs(postreadmode);
@@ -567,7 +566,7 @@ subroutine exit() {
 		savesrcfile.move(win.srcfile);
 		savedatafile.move(win.datafile);
 		savewlocked.move(win.wlocked);
-		savemsg.move(USER4);
+		savemsg.move(msg_);
 		savereset.move(win.reset);
 		savevalid.move(win.valid);
 	}

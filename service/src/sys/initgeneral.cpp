@@ -325,7 +325,7 @@ function main() {
 				//abort since db is advanced
 				if (not(interactive)) {
 badversion:
-					USER4 = msg;
+					msg_ = msg;
 					gosub failsys();
 					stop();
 
@@ -1056,7 +1056,7 @@ nextreport:
 
 		call log2("*zzz should create full user record not just the name", logtime);
 		var usercodes = SECURITY.f(1);
-		let nusers = usercodes.count(VM) + (usercodes ne "");
+		let nusers = usercodes.fcount(VM);
 		for (const var usern : range(1, nusers)) {
 			var userx = usercodes.f(1, usern);
 			if (not(userx.contains("---"))) {
@@ -1488,7 +1488,7 @@ adddatasetcodename:
 	//lock even to EXODUS to prevent installation where EXODUS pass is known
 	if (datasetid.f(4)) {
 		if (not(datasetid.f(4).locate(cid(), xx))) {
-			USER4 = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
+			msg_ = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
 			gosub failsys();
 			stop();
 		}
@@ -1711,9 +1711,9 @@ nextdoc:
 	}
 
 	call log2("*emailing any notifications, warnings or errors", logtime);
-	if (USER4) {
-		call sysmsg(USER4, "Messages from INIT.GENERAL");
-		USER4 = "";
+	if (msg_) {
+		call sysmsg(msg_, "Messages from INIT.GENERAL");
+		msg_ = "";
 	}
 
 	call log2("*stop init.general - releasing exclusive access", logtime);
@@ -1784,7 +1784,7 @@ subroutine getsystem() {
 }
 
 subroutine failsys() {
-	msg = USER4;
+	msg = msg_;
 
 	tt = "*Authorisation Failure. " ^ msg;
 	tt.converter(FM, "|");

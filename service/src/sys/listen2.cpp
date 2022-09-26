@@ -71,10 +71,6 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 
-	#define request_ USER0
-	#define iodat_ USER1
-	#define response_ USER3
-	#define msg_ USER4
 	var tracing = 1;
 
 	//no output in arguments allowed since c++ doesnt allow
@@ -347,7 +343,7 @@ passfail:
 				//no longer has to be done after setting @username
 				if (origrequest1 eq "LOGIN") {
 					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.f(17).quote()), msg_, "", username))) {
-						invalidlogin = USER4;
+						invalidlogin = msg_;
 						goto validateexit;
 					}
 				}
@@ -850,7 +846,7 @@ validateexit2:
 				}
 
 				var fromipno = connection.f(1, 2);
-				USER4 = "User: " ^ username ^ FM ^ "From IP: " ^ fromipno;
+				msg_ = "User: " ^ username ^ FM ^ "From IP: " ^ fromipno;
 
 				var cmd = "SELECT USERS BY-DSND LAST_LOGIN_DATETIME WITH LAST_LOGIN_LOCATION " ^ (fromipno.quote()) ^ " AND WITH @ID NOT STARTING \"%\"";
 				call safeselect(cmd ^ " (S)");
@@ -860,12 +856,12 @@ validateexit2:
 						msg_ ^= " (last login was " ^ lastuser.f(1);
 						if (lastuser.f(1)) {
 							if (lastuserid ne lastuser.f(1)) {
-								USER4 ^= " (" ^ lastuserid ^ ")";
+								msg_ ^= " (" ^ lastuserid ^ ")";
 							}
 						} else {
 							msg_ ^= lastuserid;
 						}
-						USER4 ^= " on " ^ oconv(lastuser.f(13), "[DATETIME,4*,MTS]") ^ ")";
+						msg_ ^= " on " ^ oconv(lastuser.f(13), "[DATETIME,4*,MTS]") ^ ")";
 					}
 					clearselect();
 				}
@@ -934,8 +930,8 @@ validateexit2:
 		var dataset = request2.ucase();
 		var username = request3.ucase();
 
-		iodat_ = "";
-		USER4 = "";
+		data_ = "";
+		msg_ = "";
 		var authcompcodes = "";
 
 		//special login routine
@@ -946,19 +942,19 @@ validateexit2:
 		var loginmsg = "";
 				//dont pass system variables
 		call loginnet(dataset, username, cookie, loginmsg, authcompcodes);
-		USER1 = cookie;
+		data_ = cookie;
 		msg_ = loginmsg;
-		if (iodat_ eq "") {
-			response_ = USER4;
+		if (data_ eq "") {
+			response_ = msg_;
 			return 0;
 		}
 		//  end
 		// end
 
-		if (not USER1) {
-			iodat_ = "X=X";
+		if (not data_) {
+			data_ = "X=X";
 		}
-		USER3 = ("OK " ^ msg_).trim();
+		response_ = ("OK " ^ msg_).trim();
 
 		//record the last login per user
 		var users;
@@ -1039,10 +1035,10 @@ validateexit2:
 
 		//detach the calling process
 		response_ = request2;
-		USER3.converter(VM ^ "|", FM ^ FM);
+		response_.converter(VM ^ "|", FM ^ FM);
 		response_.replacer(FM, "\r\n");
 
-		call oswrite(USER3, responsefilename);
+		call oswrite(response_, responsefilename);
 		//osclose responsefilename
 
 		call ossleep(1000*2);

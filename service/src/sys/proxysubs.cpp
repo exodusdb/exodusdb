@@ -30,15 +30,11 @@ function main(in module, in mode, in stationery) {
 
 	#include <system_common.h>
 
-	#define request_ USER0
-	#define data_ USER1
-	#define response_ USER3
-	#define msg_ USER4
 
 	var outfiles = SYSTEM.f(2);
 	outfiles.converter(";", VM);
 	data_ = outfiles;
-	let nfiles = outfiles.count(VM) + (outfiles ne "");
+	let nfiles = outfiles.fcount(VM);
 	for (const var filen : range(1, nfiles)) {
 
 		outfile = outfiles.f(1, filen);
@@ -53,14 +49,14 @@ function main(in module, in mode, in stationery) {
 		var t2 = OSSLASH;
 		var tt = outfile.index(t2 ^ "data" ^ t2);
 		if (tt) {
-			USER1(1, filen) = ".." ^ t2 ^ ".." ^ outfile.cut(tt - 1);
+			data_(1, filen) = ".." ^ t2 ^ ".." ^ outfile.cut(tt - 1);
 		} else {
 			data_(1, filen) = outfile;
 		}
 
 	} //filen;
 
-	USER1.converter(VM, ";");
+	data_.converter(VM, ";");
 	//convert vm to ';' in outfiles
 	SYSTEM(2) = outfiles;
 
@@ -68,7 +64,7 @@ function main(in module, in mode, in stationery) {
 	if (nfiles gt 1) {
 		response_ = "OK";
 		if (msg_) {
-			USER3 ^= " " ^ USER4;
+			response_ ^= " " ^ msg_;
 		}
 		msg_ = "";
 	}
@@ -86,13 +82,13 @@ fileok:
 		if (stationery gt 2) {
 			call convpdf(outfile, stationery, errors);
 			if (errors) {
-				USER4(-1) = errors;
+				msg_(-1) = errors;
 			}
 		}
 
 		response_ = "OK";
 		if (msg_) {
-			USER3 ^= " " ^ USER4;
+			response_ ^= " " ^ msg_;
 		}
 		msg_ = "";
 
@@ -105,15 +101,15 @@ fileok:
 			}
 		}
 
-		response_ = USER4;
-		if (USER3 eq "") {
+		response_ = msg_;
+		if (response_ eq "") {
 			response_ = "Error: No output file in " ^ module ^ "PROXY " ^ mode;
-			call sysmsg(USER3);
+			call sysmsg(response_);
 		}
 
 		//force error
 		if (response_.first(6) ne "Error:") {
-			USER3.prefixer("Error:");
+			response_.prefixer("Error:");
 		}
 
 	}

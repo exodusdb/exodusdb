@@ -56,10 +56,6 @@ function main(in docids0="", in options0="") {
 	#include <system_common.h>
 	//global agp,market,marketcode,useraddress,inpath,tt,forceemail,voccmd,tracing
 
-	#define request_ USER0
-	#define iodat_ USER1
-	#define response_ USER3
-	#define msg_ USER4
 
 	if (docids0.unassigned()) {
 		docids = "";
@@ -498,7 +494,7 @@ nextuser:;
 		var origdocument = sys.document;
 
 		sys.document(2) = title;
-		sys.document(5) = lower(module ^ "PROXY" ^ FM ^ USER0);
+		sys.document(5) = lower(module ^ "PROXY" ^ FM ^ request_);
 		sys.document(6) = lower(datax);
 
 		call cropper(datax);
@@ -516,7 +512,7 @@ nextuser:;
 		for (const var taskn : range(1, ntasks)) {
 			var task = authtasks.f(1, taskn);
 			if (not(authorised(task, msg_, "", runasusercode))) {
-				USER4 = runasusercode.quote() ^ " is not authorised to do " ^ task;
+				msg_ = runasusercode.quote() ^ " is not authorised to do " ^ task;
 				printl(msg_);
 				goto nextdoc;
 			}
@@ -546,7 +542,7 @@ nextuser:;
 	//voccmd='GENERALPROXY'
 	request_ = raise("EXECUTE" ^ VM ^ sys.document.f(5));
 
-	iodat_ = raise(sys.document.f(6));
+	data_ = raise(sys.document.f(6));
 
 	//override the saved period with a current period
 
@@ -559,26 +555,26 @@ nextuser:;
 	//to avoid "year is not open" type messages
 	//TODO
 
-	USER1.replacer("{RUNTIME_PERIOD}", runtimeperiod);
-	iodat_.replacer("{TODAY}", date());
-	USER1.replacer("{7DAYSAGO}", date() - 7);
-	iodat_.replacer("{14DAYSAGO}", date() - 14);
-	USER1.replacer("{21DAYSAGO}", date() - 21);
-	iodat_.replacer("{28DAYSAGO}", date() - 28);
-	USER1.replacer("{30DAYSAGO}", date() - 30);
-	iodat_.replacer("{60DAYSAGO}", date() - 60);
-	USER1.replacer("{90DAYSAGO}", date() - 90);
-	iodat_.replacer("{YESTERDAY}", date() - 1);
-	USER1.replacer("{TOMORROW}", date() + 1);
-	if (iodat_.contains("{2WORKINGDAYSAGO}")) {
+	data_.replacer("{RUNTIME_PERIOD}", runtimeperiod);
+	data_.replacer("{TODAY}", date());
+	data_.replacer("{7DAYSAGO}", date() - 7);
+	data_.replacer("{14DAYSAGO}", date() - 14);
+	data_.replacer("{21DAYSAGO}", date() - 21);
+	data_.replacer("{28DAYSAGO}", date() - 28);
+	data_.replacer("{30DAYSAGO}", date() - 30);
+	data_.replacer("{60DAYSAGO}", date() - 60);
+	data_.replacer("{90DAYSAGO}", date() - 90);
+	data_.replacer("{YESTERDAY}", date() - 1);
+	data_.replacer("{TOMORROW}", date() + 1);
+	if (data_.contains("{2WORKINGDAYSAGO}")) {
 		daysago = 2;
 		gosub getdaysago();
-		USER1.replacer("{2WORKINGDAYSAGO}", xdate);
+		data_.replacer("{2WORKINGDAYSAGO}", xdate);
 	}
-	if (iodat_.contains("{3WORKINGDAYSAGO}")) {
+	if (data_.contains("{3WORKINGDAYSAGO}")) {
 		daysago = 3;
 		gosub getdaysago();
-		USER1.replacer("{3WORKINGDAYSAGO}", xdate);
+		data_.replacer("{3WORKINGDAYSAGO}", xdate);
 	}
 	var closedperiod = sys.company.f(37);
 	if (closedperiod) {
@@ -586,16 +582,16 @@ nextuser:;
 	} else {
 		opendate = 11689;
 	}
-	iodat_.replacer("{OPERATIONS_OPEN_DATE}", opendate);
+	data_.replacer("{OPERATIONS_OPEN_DATE}", opendate);
 
 	//convert {TODAY-99} to today minus 99
 	//and {TODAY+999} to today+999
 	var sign = "-";
 nextsign:
-	tt = USER1.index("{TODAY" ^ sign);
+	tt = data_.index("{TODAY" ^ sign);
 	if (tt) {
-		var t2 = (iodat_.cut(tt)).field("}", 1);
-		USER1.replacer("{" ^ t2 ^ "}", date() + t2.cut(5));
+		var t2 = (data_.cut(tt)).field("}", 1);
+		data_.replacer("{" ^ t2 ^ "}", date() + t2.cut(5));
 	}
 	if (sign eq "-") {
 		sign = "+";
@@ -625,16 +621,16 @@ nextsign:
 		if (response_.first(2) ne "OK" or printfilename.osfile().f(1) lt 10) {
 
 			//plain "OK" with no file means nothing to email
-			if (USER3 eq "OK") {
+			if (response_ eq "OK") {
 				goto nextdoc;
 			}
 
 			body = "";
 			body(-1) = response_;
-			if (USER3.starts("Error:")) {
+			if (response_.starts("Error:")) {
 				response_.paster(1, 6, "Result:");
 			}
-			if (USER3.contains("Error")) {
+			if (response_.contains("Error")) {
 				subject ^= " ERROR";
 				var(response_).oswrite("xyz.xyz");
 			}
@@ -647,8 +643,8 @@ nextsign:
 			//treat all errors as system errors for now
 			//since autorun doesnt really know a user to send them to
 			//NB programs should return OK+message if no report is required (eg "OK no ads found")
-			if (USER3.starts("OK")) {
-				response_ = USER3.cut(2).trimfirst();
+			if (response_.starts("OK")) {
+				response_ = response_.cut(2).trimfirst();
 			} else {
 				call sysmsg(subject ^ FM ^ body);
 				goto nextdoc;
@@ -706,7 +702,7 @@ nextsign:
 
 subroutine exec() {
 
-	voccmd = USER0.f(2);
+	voccmd = request_.f(2);
 
 	tracing = 1;
 
@@ -739,7 +735,7 @@ subroutine exec2() {
 	//system<25>=requeststarttime
 	//allow autorun processes to run for ever
 	SYSTEM(25) = "";
-	request_ = USER0.field(FM, 3, 99999);
+	request_ = request_.field(FM, 3, 99999);
 
 	//localtime=mod(time()+@sw<1>,86400)
 	//print @(0):@(-4):localtime 'MTS':' AUTORUN ':docid:
@@ -779,12 +775,12 @@ subroutine exec2() {
 	//execute instead of call prevents program crashes from crashing LISTEN
 	response_ = "OK";
 	win.valid = 1;
-	USER4 = "";
+	msg_ = "";
 
 	//pass the output file in linkfilename2
 	//not good method, pass in system?
-	if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.f(1), xx)) {
-		iodat_ = linkfilename2;
+	if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1), xx)) {
+		data_ = linkfilename2;
 	}
 
 	SYSTEM(117) = forceemail;
@@ -800,49 +796,49 @@ subroutine exec2() {
 	//@user4='R18.6'
 	if (msg_.contains("R18.6")) {
 		var halt = 1;
-		USER4(-1) = "Corrupt temporary file. Restart Needed.";
+		msg_(-1) = "Corrupt temporary file. Restart Needed.";
 		msg_(-1) = "EXODUS.NET TERMINATED";
 	}
 
 	//convert error message
-	if (USER4.contains(" IN INDEX.REDUCER AT ") or msg_.index(" IN RTP21 AT ")) {
+	if (msg_.contains(" IN INDEX.REDUCER AT ") or msg_.index(" IN RTP21 AT ")) {
 		//@user4='Please select fewer records and/or simplify your request'
-		call listen4(17, USER4);
+		call listen4(17, msg_);
 	}
 
 	//no records are not system errors
-	if (USER3.starts("No record") or response_.starts("No item")) {
-		USER3.prefixer("OK ");
+	if (response_.starts("No record") or response_.starts("No item")) {
+		response_.prefixer("OK ");
 		msg_ = "";
 	}
 
 	//send errors to exodus
-	if (USER4.contains("An internal error") or msg_.contains("Error:")) {
-		USER4.move(response_);
+	if (msg_.contains("An internal error") or msg_.contains("Error:")) {
+		msg_.move(response_);
 		goto sysmsgit;
 	}
 
 	//send errors to exodus
-	if (USER3 eq "" or response_.first(2) ne "OK") {
-		if (not USER3) {
+	if (response_ eq "" or response_.first(2) ne "OK") {
+		if (not response_) {
 			response_ = "No response from " ^ voccmd;
 		}
 sysmsgit:
-		call sysmsg("AUTORUN " ^ docid ^ " " ^ sys.document.f(2) ^ FM ^ USER3);
+		call sysmsg("AUTORUN " ^ docid ^ " " ^ sys.document.f(2) ^ FM ^ response_);
 	}
 
 	call cropper(msg_);
 	call cropper(response_);
 
-	if (USER4) {
-		USER1 = "";
-		USER3 = "Error: " ^ msg_;
+	if (msg_) {
+		data_ = "";
+		response_ = "Error: " ^ msg_;
 		gosub fmtresp();
 	}
 
 	if (response_ eq "") {
 		//response='Error: No OK from ':voccmd:' ':request
-		call listen4(18, USER3, voccmd);
+		call listen4(18, response_, voccmd);
 		gosub fmtresp();
 	}
 
@@ -886,16 +882,16 @@ subroutine exit(in lockfilename,io lockfile,in lockkey) {
 subroutine fmtresp() {
 
 	//trim everything after <ESC> (why?)
-	tt = USER3.contains("<ESC>");
+	tt = response_.contains("<ESC>");
 	if (tt) {
-		response_ = USER3.first(tt - 1);
+		response_ = response_.first(tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters
 	response_.converter("|", FM);
-	USER3.converter(VM, FM);
+	response_.converter(VM, FM);
 	if (response_.starts(FM)) {
-		USER3.cutter(1);
+		response_.cutter(1);
 	}
 	response_.replacer(FM, "\r\n");
 

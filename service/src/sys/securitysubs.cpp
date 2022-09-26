@@ -232,7 +232,7 @@ function main(in mode) {
 		if (not(curruser_.contains("EXODUS"))) {
 
 			var usercodes = RECORD.f(1);
-			var nusers = usercodes.count(VM) + (usercodes ne "");
+			var nusers = usercodes.fcount(VM);
 
 			if (not(usercodes.f(1).locate(USERNAME, usern))) {
 				msg = USERNAME ^ " user not in in authorisation file";
@@ -527,7 +527,7 @@ function main(in mode) {
 			//put back any hidden tasks
 			var tasks = origfullrec_.f(10);
 			var locks = origfullrec_.f(11);
-			let ntasks = tasks.count(VM) + (tasks ne "");
+			let ntasks = tasks.fcount(VM);
 			for (const var taskn : range(1, ntasks)) {
 				var task = tasks.f(1, taskn);
 				if (task) {
@@ -617,7 +617,7 @@ function main(in mode) {
 		var useremails = RECORD.f(7);
 		var usernames = RECORD.f(8);
 		var userpasswords = RECORD.f(4);
-		let nusers = usercodes.count(VM) + (usercodes ne "");
+		let nusers = usercodes.fcount(VM);
 		//for (usern = 1; usern <= nusers; ++usern) {
 		for (const var usern : range(1, nusers)) {
 			userx = usercodes.f(1, usern);
@@ -745,7 +745,7 @@ function main(in mode) {
 		{
 			//delete any deleted users from the system file for direct login
 			var usercodes = win.orec.f(1);
-			let nusers = usercodes.count(VM) + (usercodes ne "");
+			let nusers = usercodes.fcount(VM);
 			//for (usern = 1; usern <= nusers; ++usern) {
 			for (const var usern : range(1, nusers)) {
 				userx = usercodes.f(1, usern);
@@ -828,7 +828,7 @@ function main(in mode) {
 					body(1, -1) = "Login:";
 					var baselinks = SYSTEM.f(114);
 					var baselinkdescs = SYSTEM.f(115);
-					let nlinks = baselinks.count(VM) + (baselinks ne "");
+					let nlinks = baselinks.fcount(VM);
 					if (nlinks) {
 						for (const var linkn : range(1, nlinks)) {
 							body(1, -1) = baselinkdescs.f(1, linkn) ^ " " ^ baselinks.f(1, linkn);
