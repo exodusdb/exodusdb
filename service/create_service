@@ -154,7 +154,7 @@ V0G0N
 : Ensure directory permissions on data/$FULL_DB_CODE
 : ==============================================
 :
-: IDENTICAL code in create_site and create_service. KEEP IN SYNC
+: KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
 :
 	DB_DIR=~/hosts/$HOST_DIR/data/$FULL_DB_CODE
 	mkdir -p $DB_DIR
