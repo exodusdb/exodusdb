@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var params;
@@ -17,7 +19,6 @@ function main(in mode, io datax, in params0="", in params20="") {
 	//ABP neither used
 
 	//jbase
-	#include <system_common.h>
 	//global datax
 
 	var td = "<td>";

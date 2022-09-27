@@ -3,6 +3,8 @@ libraryinit()
 
 #include <getdatetime.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var localdate;
@@ -16,7 +18,6 @@ function main(in localdate0, in localtime0) {
 	//c sys
 
 	//caserevised*
-	#include <system_common.h>
 
 	//use parameters only if both are provided
 	if (localtime0.unassigned()) {

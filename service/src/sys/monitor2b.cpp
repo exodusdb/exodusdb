@@ -4,6 +4,8 @@ libraryinit()
 #include <cid.h>
 #include <shell2.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var wgetrc;
@@ -16,8 +18,6 @@ var log;
 
 function main(in mode, in request, in tempfilename, out datax, out msg) {
 	//c sys in,in,in,out,out
-
-	#include <system_common.h>
 
 	//mode is WRITE or READ
 	//request is required sent to the server and

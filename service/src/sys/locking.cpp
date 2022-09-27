@@ -1,25 +1,25 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var ntries;//num
 var lockdesc;
 var xx;
 var allowduplicate;//num
-var lockitem;
+//var lockitem;
 var lockn;//num
 var lockfile;
+
+#define lockitemsep_ "*"
 
 function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
 	//c sys ,,,,io,in,out
 
-	#define lockitemsep_ "*"
-
-	#include <system_common.h>
 	//global lockfile,lockitem
 
-	//declare function delay
 	if (locklist.unassigned()) {
 		locklist = "";
 	}
@@ -38,7 +38,8 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	}
 	msg = "";
 
-	var interactive = false; //not(SYSTEM.f(33));
+	//NOTE: not(SYSTEM.f(33));
+	var interactive = false;
 
 	if (var(0) and USERNAME eq "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
@@ -48,17 +49,19 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	if (mode eq "LOCK") {
 		allowduplicate = 0;
 		goto lockit;
-		{}
+
 	} else if (mode eq "RELOCK") {
 		allowduplicate = 1;
 		goto lockit;
-		{}
+
 	} else if (mode eq "UNLOCK") {
 		gosub unlockit(lockfilename, lockkey, locklist);
 		return 1;
+
 	} else if (mode eq "UNLOCKALL") {
 		gosub unlockall(locklist, msg);
 		return 1;
+
 	} else {
 		call note(mode.quote() ^ " is invalid in LOCKING");
 	}
@@ -69,14 +72,12 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 lockit:
 ///////
 
-	lockitem = lockfilename ^ lockitemsep_ ^ lockkey;
+	var lockitem = lockfilename ^ lockitemsep_ ^ lockkey;
 	if (locklist.locateusing(FM, lockitem, lockn)) {
-		//msg=quote(lockitem):' already locked'
 		return 1;
 	}
 
 	if (not(lockfile.open(lockfilename, ""))) {
-		//call fsmsg()
 		msg = lockfilename.quote() ^ " file cannot be opened in LOCKING";
 		return 0;
 	}
@@ -88,7 +89,6 @@ tryagain:
 		if (lockholder eq "") {
 			lockholder = "Someone, maybe you,";
 		}
-		//if lockdesc then
 		gosub getlockdesc(lockdesc, lockfilename, lockkey);
 		if (interactive) {
 			call note(lockholder ^ " is using the " ^ lockdesc, "T1", xx, "");
@@ -113,7 +113,6 @@ tryagain:
 				goto tryagain;
 			}
 		}
-		// end
 
 		return 0;
 
@@ -151,10 +150,11 @@ subroutine unlockall(io locklist, io msg) {
 
 	var filename2 = "";
 	var file = "";
-	for (lockn = 1; lockn <= 9999; ++lockn) {
-		lockitem = locklist.f(lockn);
-		///BREAK;
-		if (not lockitem) break;
+//	for (lockn = 1; lockn <= 9999; ++lockn) {
+//		lockitem = locklist.f(lockn);
+//		///BREAK;
+//		if (not lockitem) break;
+	for (in lockitem : locklist) {
 		var filename = lockitem.field(lockitemsep_, 1);
 		var lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
 		if (filename ne filename2) {
@@ -167,11 +167,9 @@ subroutine unlockall(io locklist, io msg) {
 		if (lockfile ne "") {
 			xx = unlockrecord("", lockfile, lockkeyx);
 		}
-	} //lockn;
+	} // lockitem
 
 	locklist = "";
-
-	//if msg then return 0
 
 	return;
 }

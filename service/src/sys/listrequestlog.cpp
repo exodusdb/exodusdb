@@ -4,14 +4,14 @@ libraryinit()
 #include <authorised.h>
 #include <quote2.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var msg;
 
 function main() {
 	//c sys
-
-	#include <system_common.h>
 
 	if (not(authorised("REQUESTLOG ACCESS", msg))) {
 		call mssg(msg);

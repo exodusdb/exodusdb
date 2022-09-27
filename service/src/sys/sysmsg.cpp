@@ -8,6 +8,8 @@ libraryinit()
 #include <roundrobin.h>
 #include <sendmail.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var subjectin;
@@ -31,7 +33,6 @@ function main(in msg0, in subject0="", in username0="") {
 	//if msg0 starts with @@something then sendmail sends file @something
 	//not tested or used currently
 
-	#include <system_common.h>
 	var interactive = false; //not(SYSTEM.f(33));
 	var datasetcode = SYSTEM.f(17);
 

@@ -4,6 +4,8 @@ libraryinit()
 #include <listen2.h>
 #include <autorun3.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -13,7 +15,6 @@ function main() {
 	//
 	//c sys
 
-	#include <system_common.h>
 	//clearcommon();
 
 	var options = SENTENCE.field("(", 2);

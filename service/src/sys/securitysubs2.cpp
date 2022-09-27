@@ -4,8 +4,12 @@ libraryinit()
 #include <authorised.h>
 #include <log2.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
+
+#define origfullrec_ win.registerx(7)
 
 var taskn;//num
 var oldtaskn;
@@ -19,9 +23,6 @@ var taskn2;
 function main(in mode) {
 	//c sys
 	//jbase
-	#include <system_common.h>
-
-	#define origfullrec_ win.registerx(7)
 
 	if (mode eq "GETCHANGEDTASKS") {
 
@@ -209,43 +210,6 @@ deletetask:
 				}
 			}
 		} //taskn;
-
-			/*;
-			//move menus to users - detect any non-numeric and move to users 37
-			//update users without locking since this will be done really only once
-			//at first startup with the new version of programs
-			//if definitions is cleared and it reconverts then nothing will be done
-			//if userprivs<3,*,1> remains numeric ie date or datetime
-			convkey='CONVERTED*MENUS';
-			read xx from definitions,convkey else;
-				open 'USERS' to users then;
-					menuorexpired=newuserprivs<3>;
-					tt=menuorexpired;
-					convert '0123456789.':vm to '' in tt;
-					if tt then;
-						//go through them one by one in case subvalued in future
-						nusers=count(menuorexpired,vm)+1;
-						for usern=1 to nusers;
-							menux=menuorexpired<1,usern,1>;
-							if num(menux) else;
-
-								usercode=newuserprivs<1,usern>;
-								read user from users,usercode then;
-									if user<34>='' then;
-										user<34>=menux;
-										write user on users,usercode;
-										end;
-									end;
-
-								newuserprivs<3,usern,1>='';
-
-								end;
-							next;
-						end;
-					write date() on definitions,convkey;
-					end;
-				end;
-			*/
 
 		if (newuserprivs ne SECURITY) {
 			call log2("*write userprivs back", logtime);

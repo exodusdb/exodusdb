@@ -5,6 +5,8 @@ libraryinit()
 #include <readhostsallow.h>
 #include <shell2.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var sentencex;
@@ -20,7 +22,6 @@ var errors;
 function main(in mode, in ipno, out text) {
 	//c sys in,in,out
 
-	#include <system_common.h>
 	//global allowedips,ip1,ip2
 
 	//prevent unused warning

@@ -16,6 +16,8 @@ libraryinit()
 #include <scrnio.h>
 #include <singular.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -65,7 +67,6 @@ var offset_zero;
 function main(in request1, in request2in, in request3in, in request4in, in request5in, in request6in) {
 	//c sys in,in,in,in,in,in
 
-	#include <system_common.h>
 	//$insert abp,common
 	//$insert bp,agency.common
 	//global ii,passwordexpired,lastlogindate,maxnologindays,validips

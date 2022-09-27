@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var params;
@@ -11,8 +13,6 @@ function main(in mode, io dataio, in params0="", in params20="") {
 	//c sys in,io,"",""
 
 	//REPLACING UPPERCASE VERSION HTMLLIB()
-
-	#include <system_common.h>
 
 	var td = "<td>";
 	var tdx = "</td>";

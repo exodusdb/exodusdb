@@ -16,13 +16,14 @@ libraryinit()
 
 #include <exodus/printtx.hpp>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var copyright;
 var showborder;//num
 var headtabperpage;//num
 var colorprefix;
-var ulchar;
 var nblocks;//num
 var blockn;//num
 var fromdate;
@@ -222,6 +223,8 @@ var newoptions;
 var printtx_ii;//num
 var spaceoptionsize;
 
+let ulchar = "-";
+
 function main() {
 	//
 	//c sys
@@ -242,14 +245,9 @@ function main() {
 		printl(SENTENCE);
 	}
 
-	#include <system_common.h>
-
 	//global all
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
-
-	//#define interactive_ false //not(SYSTEM.f(33))
-	ulchar = "-";
 
 	//NLIST keywords and aliases. blank keyword means throwaway word
 	/* LIST dict_voc WITH F1 'RLIST' BY F4 BY ID ID-SUPP F4 ID;

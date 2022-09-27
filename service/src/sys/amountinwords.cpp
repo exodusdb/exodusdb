@@ -3,6 +3,8 @@ libraryinit()
 
 #include <amountinwords.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var comma;
@@ -25,8 +27,6 @@ var temp;
 function main(in amountfmlanguage, in currcode0) {
 	//c sys
 	//global all
-
-	#include <system_common.h>
 
 	comma = "";
 

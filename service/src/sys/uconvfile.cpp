@@ -3,6 +3,8 @@ libraryinit()
 
 #include <shell2.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var encoding1;
@@ -20,7 +22,6 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	//uses the unicode uconv to convert file format
 	//
 	//http://www.microsoft.com/globaldev/reference/cphome.mspx
-	#include <system_common.h>
 
 	if (encoding1i.unassigned()) {
 		encoding1 = "";

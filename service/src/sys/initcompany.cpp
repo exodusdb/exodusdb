@@ -5,6 +5,8 @@ libraryinit()
 #include <getlang.h>
 #include <initcompany2.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var ndec;//num
@@ -13,15 +15,12 @@ var temp;
 function main(in nextcompanycode) {
 	//c sys
 
-	#include <system_common.h>
 	//global desc1,desc2
 
     //use app specific version of initcompany2
     if (APPLICATION ne "EXODUS") {
         initcompany2 = "initcompany2_app" ;
     }
-
-	#define interactive_ not(SYSTEM.f(33))
 
 	if (not(nextcompanycode.unassigned())) {
 

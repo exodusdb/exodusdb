@@ -4,6 +4,8 @@ libraryinit()
 #include <convpdf.h>
 #include <sysmsg.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var outfile;
@@ -27,8 +29,6 @@ function main(in module, in mode, in stationery) {
 	//1. filename(s) in system<2> may be converted from .htm to .pdf
 	//2. put converted filename(s) into DATA - to web ui with ../../data/
 	//3. error response set if file(s) do not exist or < 5 bytes
-
-	#include <system_common.h>
 
 
 	var outfiles = SYSTEM.f(2);

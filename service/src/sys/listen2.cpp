@@ -14,6 +14,8 @@ libraryinit()
 #include <openfile.h>
 #include <initcompany.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -63,7 +65,6 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 	//handles VALIDATE,BECOMEUSERANDCONNECTION,LOGIN and RESPOND
 
-	#include <system_common.h>
 	//$insert abp,common
 	//$insert bp,agency.common
 	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips

@@ -3,29 +3,31 @@ libraryinit()
 
 #include <roundrobin.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
+
+//eg 60 60 60 DOS EMAILS.DAT
+//means window of 60*60 seconds rolling every 60 seconds
+//max events 60 and store in DOS EMAILS.DAT file so per installation
+//could be DEFINITIONS EMAILS.ROUNDROBIN to be per database
+// clang-format off
+#define secsperperiod_      params.f(1)
+#define periodsperwindow_   params.f(2)
+#define maxeventsperwindow_ params.f(3)
+#define roundrobinfilename_ params.f(4)
+#define roundrobinkey_      params.f(5)
+// clang-format on
 
 var errormsg;
 
 function main(in mode, in params, io result, io msg) {
 	//c sys in,in,io,io
 
-	#include <system_common.h>
-
 	//output:
 	//empty = ok
 	//result
 	//msg if any error
-
-	//eg 60 60 60 DOS EMAILS.DAT
-	//means window of 60*60 seconds rolling every 60 seconds
-	//max events 60 and store in DOS EMAILS.DAT file so per installation
-	//could be DEFINITIONS EMAILS.ROUNDROBIN to be per database
-	#define secsperperiod_ params.f(1)
-	#define periodsperwindow_ params.f(2)
-	#define maxeventsperwindow_ params.f(3)
-	#define roundrobinfilename_ params.f(4)
-	#define roundrobinkey_ params.f(5)
 
 	result = "";
 	msg = "";
@@ -76,7 +78,6 @@ function main(in mode, in params, io result, io msg) {
 			return 0;
 		}
 
-
 		//get the round robin data
 		var roundrobin;
 		if (not(roundrobin.read(roundrobinfile, roundrobinkey_))) {
@@ -119,7 +120,6 @@ function main(in mode, in params, io result, io msg) {
 		} else {
 			result = 0;
 		}
-
 
 		if (roundrobin.contains(chr(0))) {
 			roundrobin.converter(chr(0), "");

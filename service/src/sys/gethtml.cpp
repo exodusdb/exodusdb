@@ -4,6 +4,8 @@ libraryinit()
 #include <langdate.h>
 #include <authorised.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var modex;
@@ -20,7 +22,6 @@ var divx;
 function main(in mode0, out html, in compcode0="", in qr_text="") {
 	//c sys in,out,""
 
-	#include <system_common.h>
 	//$insert bp,agency.common
 	//global letterheadcompany,modex,tt,hascompanies,compcode
 

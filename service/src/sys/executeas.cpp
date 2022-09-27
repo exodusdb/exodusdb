@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var xx;
@@ -8,8 +10,6 @@ var origusername;
 
 function main(in cmd, in username) {
 	//c sys
-
-	#include <system_common.h>
 
 	if (username) {
 		if (not(SECURITY.f(1).locate(username, xx))) {

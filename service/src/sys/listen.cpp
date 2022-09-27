@@ -23,6 +23,8 @@ libraryinit()
 #include <rtp57.h>
 #include <singular.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -206,8 +208,6 @@ var nextconnection;
 
 function main() {
 
-	#include <system_common.h>
-
 	if (main_init()) {
 
 		// Main loop
@@ -258,7 +258,6 @@ function main_init() {
         generalsubs = "generalsubs_app";
     }
 
-
     logfilename = "";
 
 	portno = 5700;
@@ -280,7 +279,6 @@ function main_init() {
 	call listen5("DELETEOLDFILES", "*.$2", "./", 300, "");
 
 	halt = 0;
-
 
 	origsentence = SENTENCE;
 

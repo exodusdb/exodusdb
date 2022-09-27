@@ -20,6 +20,8 @@ libraryinit()
 #include <systemsubs.h>
 #include <initcompany.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var lastlog;
@@ -65,7 +67,6 @@ function main() {
 	//NB @VOLUMES blank on C++ and used to run slightly differently on C++
 	//eg function called is generalalerts instead of general.alerts
 
-	#include <system_common.h>
 	//global tt,tt2,s33,lastlog
 
 	//!WARNING decide() returns REPLY number instead of VALUE when not interactive

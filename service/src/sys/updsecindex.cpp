@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var indexingfilename;
@@ -9,7 +11,6 @@ var recordx;
 
 function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in newvalues, io valid, io msg) {
 	//c sys in,in,io,in,in,in,io,io
-	#include <system_common.h>
 	//update symbolic indexed files
 	//this is designed to be called in prewrite
 	//to update the indexes of associated records

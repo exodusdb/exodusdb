@@ -1,4 +1,4 @@
-// dont use guard since may required multiple times eg in dict_xxxxx.cpp files
+// DONT use headerguard since may required multiple times eg in dict_xxxxx.cpp files
 //#ifndef SERVICE_SRC_SYS_SYS_COMMON_H_
 //#define SERVICE_SRC_SYS_SYS_COMMON_H_
 

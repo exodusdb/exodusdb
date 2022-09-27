@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var interactive;
@@ -19,8 +21,6 @@ var ver;
 function main() {
 	//c sys
 	//global all
-
-	#include <system_common.h>
 
 	interactive = false; //not(SYSTEM.f(33));
 

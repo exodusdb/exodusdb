@@ -3,6 +3,8 @@ libraryinit()
 
 #include <sysmsg.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var status;
@@ -20,7 +22,6 @@ function main(in mode, in status0="") {
 	//1. saves process info and status in processes file
 	//2. checks for .end flags and performs logoff/shutdown if present
 
-	#include <system_common.h>
 	if (status.unassigned()) {
 		status = "";
 	} else {

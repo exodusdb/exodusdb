@@ -3,6 +3,8 @@ libraryinit()
 
 #include <authorised.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var username;
@@ -20,7 +22,6 @@ function main(in task0, out msg, in defaultlock="", in username0="") {
 	//NB de bugging afer recompile requires restart since SECURITY is in PRELOAD
 	//call msg(task)
 
-	#include <system_common.h>
 	var task = task0;
 
 	if (username0.unassigned()) {

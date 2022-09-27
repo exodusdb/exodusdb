@@ -1,26 +1,17 @@
 #ifndef EXO_WINDOW_HPP_
 #define EXO_WINDOW_HPP_
 
-//#include <authorised.h>
-
 function security(in mode)
 {
-	/////////
-	//valid=1 move down
 	var op = singular(win.datafile);
-	//if op[-3,3]='ies' then op[-3,3]='y'
-	//if op-1,1]='s' then op[-1,1]=''
-	//op:=' file'
 	return security2(mode,op);
 }
 
 function security2(in mode, in op0)
 {
-//	win.valid = 1;
 	var op=op0.convert("_.", "  ");
 	var op2 = "";
 	if (op.ends(DQ)) {
-//		op2 = (op.b(-2, "B\"")).quote();
 		op2=op.field2(DQ, -2);
 		op.cutter(-op2.len());
 		op2.prefixer(" ");
@@ -86,7 +77,6 @@ function invalid()
 function invalid(in msg)
 {
 	win.valid = 0;
-	//if win.is.orig then win.is=win.is.orig
 	if (!win.isorig.unassigned()) {
 		win.is = win.isorig;
 		if (!win.reset)
@@ -106,7 +96,6 @@ function invalid2(in msg) {
 	}
 	win.valid = 0;
 	win.reset = 1;
-	//mode = msg;
 	return 0;
 }
 
@@ -122,7 +111,7 @@ function note3(in msg) {
 }
 
 function badchars(io msg) {
-	//var msg = "";
+
 	msg = "";
 	if (not win.is) {
 		return 0;

@@ -3,6 +3,8 @@ libraryinit()
 
 #include <log.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var reqdate;
@@ -11,8 +13,6 @@ var tt;
 function main() {
 	//c sys
 	//global reqdate
-
-	#include <system_common.h>
 
 	var update = 1;
 

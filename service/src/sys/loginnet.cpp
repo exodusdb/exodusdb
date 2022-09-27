@@ -6,6 +6,8 @@ libraryinit()
 #include <addcent4.h>
 #include <changelogsubs.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var menuid;
@@ -20,7 +22,6 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 
 	//this is a special login routine called from LISTEN2
 	//declare function validcode1
-	#include <system_common.h>
 	//$insert abp,common
 	//$insert bp,agency.common
 	cookie = "";

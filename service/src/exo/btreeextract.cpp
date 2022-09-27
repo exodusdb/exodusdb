@@ -1,10 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <pushselect.h>
-//#include <safeselect.h>
-//#include <popselect.h>
-#define maxstrsize 1048576
+#include <system_common.h>
 
 function main(in cmd, in filename, in dictfile, out hits) {
 
@@ -60,7 +57,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 nextrec:
 		var key;
 		if (readnext(key)) {
-			if (hits.len() + key.len() < maxstrsize - 30) {
+			if (hits.len() + key.len() < maxstrsize_ - 30) {
 				hits ^= key ^ VM;
 				goto nextrec;
 			}

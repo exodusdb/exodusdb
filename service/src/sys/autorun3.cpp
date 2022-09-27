@@ -9,6 +9,8 @@ libraryinit()
 #include <sendmail.h>
 #include <listen4.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -53,9 +55,7 @@ function main(in docids0="", in options0="") {
 
 	//clearcommon();
 
-	#include <system_common.h>
 	//global agp,market,marketcode,useraddress,inpath,tt,forceemail,voccmd,tracing
-
 
 	if (docids0.unassigned()) {
 		docids = "";

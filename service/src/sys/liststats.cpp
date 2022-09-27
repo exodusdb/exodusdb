@@ -12,6 +12,8 @@ libraryinit()
 
 #include <exodus/printtx.hpp>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var msg;
@@ -66,7 +68,6 @@ function main() {
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	#include <system_common.h>
 	var interactive = not(SYSTEM.f(33));
 
 	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {

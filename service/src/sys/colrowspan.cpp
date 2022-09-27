@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var nobase;//num
@@ -13,7 +15,6 @@ function main(io colhdg, in thproperties, in nobase0) {
 
 	//called from nlist, adxtab
 
-	#include <system_common.h>
 	//global rowspan,colspan,t2
 
 	//given fm list of column heading and vm per row of column heading

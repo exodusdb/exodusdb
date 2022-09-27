@@ -1,7 +1,44 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
+
+// clang-format off
+#define lastbakattemptdate_ bakpars.f(1)
+#define minbaktime_         bakpars.f(3)
+#define maxbaktime_         bakpars.f(4)
+#define bakdows_            bakpars.f(5)
+#define bakemails_          bakpars.f(6)
+#define bakdisk_            bakpars.f(7)
+#define bakexcludedatasets_ bakpars.f(8)
+#define bakdisable_         bakpars.f(9)
+#define bakdataemails_      bakpars.f(10)
+#define baktestdata_        bakpars.f(11)
+#define bakdisk2_           bakpars.f(12)
+#define bakmediarotation_   bakpars.f(13)
+#define logemail_           bakpars.f(14)
+
+//backup params
+//
+// 1  = date last attempted
+// 2  = not used - was workstation for backup (blank defaults to server)
+// 3  = min time of day for backup to start (defaults to 01:00)
+// 4  = max time of day for backup to start (defaults to 01:05)
+// 5  = days to do backup 1234567 1=sun NIGHT!!! EG 2AM
+// 2/3/4/5 could be multivalued in parallel (to be programmed)
+// 6  = tech support email addresse(s) separated by ';'
+// 7  = backup disk letter
+// 8  = mv list of datasets NOT to backup (ctrl+E to edit)  (Not used if any backups defined in Configuration File)
+// 9  = 1 disable both backup and shutdown
+// 10 = email addresses to send backup.zip to OR replacement for 6 if 6 missing
+//      backups@neosys.com is excluded in NET from backup.zip recipients
+// 11 = 1 = suppress backup but do shutdown (testdata)  (Doesnt suppress if any backups defined in Configuration File)
+// 12 = backup disk for uploads (images) folder if different from 7. Put 0 to suppress backup.
+// 13 = '' is default (weekly rotation) 1=wrong media doesnt fail the backup
+// max 30 since copied into system.cfg for editing
+// clang-format on
 
 var process;
 var tt;//num
@@ -10,8 +47,6 @@ var xx;
 
 function main(out bakpars, in process0=var()) {
 	//c sys out,=var()
-
-	#include <system_common.h>
 
 	//optonally get the backpars for a specific process if given
 	if (process0.unassigned()) {
@@ -22,37 +57,6 @@ function main(out bakpars, in process0=var()) {
 
 	//by test data means any non-live data that doesnt require backup
 
-	#define lastbakattemptdate_ bakpars.f(1)
-	#define minbaktime_ bakpars.f(3)
-	#define maxbaktime_ bakpars.f(4)
-	#define bakdows_ bakpars.f(5)
-	#define bakemails_ bakpars.f(6)
-	#define bakdisk_ bakpars.f(7)
-	#define bakexcludedatasets_ bakpars.f(8)
-	#define bakdisable_ bakpars.f(9)
-	#define bakdataemails_ bakpars.f(10)
-	#define baktestdata_ bakpars.f(11)
-	#define bakdisk2_ bakpars.f(12)
-	#define bakmediarotation_ bakpars.f(13)
-	#define logemail_ bakpars.f(14)
-
-	//backup params
-	//1=date last attempted
-	//!2= not used - was workstation for backup (blank defaults to server)
-	//3=min time of day for backup to start (defaults to 01:00)
-	//4=max time of day for backup to start (defaults to 01:05)
-	//5=days to do backup 1234567 1=sun NIGHT!!! EG 2AM
-	//2/3/4/5 could be multivalued in parallel (to be programmed)
-	//6=tech support email addresse(s) separated by ';'
-	//7=backup disk letter
-	//8=mv list of datasets NOT to backup (ctrl+E to edit)  (Not used if any backups defined in Configuration File)
-	//9=1 disable both backup and shutdown
-	//10=email addresses to send backup.zip to OR replacement for 6 if 6 missing
-	//backups@neosys.com is excluded in NET from backup.zip recipients
-	//11=1=suppress backup but do shutdown (testdata)  (Doesnt suppress if any backups defined in Configuration File)
-	//12=backup disk for uploads (images) folder if different from 7. Put 0 to suppress backup.
-	//13='' is default (weekly rotation) 1=wrong media doesnt fail the backup
-	//max 30 since copied into system.cfg for editing
 	if (not(bakpars.read(DEFINITIONS, "BACKUP"))) {
 		bakpars = "";
 	}

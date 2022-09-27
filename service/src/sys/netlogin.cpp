@@ -6,7 +6,11 @@ libraryinit()
 #include <systemfile.h>
 #include <inputbox.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
+
+let prikey_ = {1000, 100};
 
 var mode;
 var userx;
@@ -25,10 +29,7 @@ var allowablechars;
 
 function main(in mode0) {
 	//c sys
-	#include <system_common.h>
 	//global encryptx,password,maxlen,show,ok,msg,userx
-
-	#define prikey_ "1000" ^ "100"
 
 	if (mode0.unassigned()) {
 		mode = "";

@@ -7,6 +7,8 @@ libraryinit()
 #include <sendmail.h>
 #include <upgrade.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var tt;//num
@@ -15,8 +17,6 @@ var ver;
 
 function main() {
 	//c sys
-
-	#include <system_common.h>
 
 	//if @username='EXODUS' then break on
 	//BREAK ON;

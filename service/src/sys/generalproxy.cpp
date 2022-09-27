@@ -18,6 +18,8 @@ libraryinit()
 #include <addcent4.h>
 #include <singular.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -48,15 +50,12 @@ function main() {
 	//c sys
 	//global mode,stationery,task
 
-
-	#include <system_common.h>
 	//global fn,stationery,mode
 
     //use app specific version of generalsubs
     if (APPLICATION ne "EXODUS") {
         generalsubs = "generalsubs_app" ;
     }
-
 
 	//clearcommon();
 	win.valid = 1;

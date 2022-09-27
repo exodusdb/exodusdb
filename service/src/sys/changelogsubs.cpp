@@ -9,6 +9,8 @@ libraryinit()
 #include <authorised.h>
 #include <singular.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -34,7 +36,6 @@ var wsmsg;
 function main(in mode0) {
 	//c sys
 
-	#include <system_common.h>
 	//global mode,text,ucline,rec,idate,date,line1,idates,errors,update,keywords,nkeywords,cmd,nlines
 
 	keywords = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";

@@ -3,14 +3,14 @@ libraryinit()
 
 #include <btreeextract.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var foundkeys;
 
 function main(in filename, in indexid, in texts0, io msg) {
 	//c sys in,in,in,io
-
-	#include <system_common.h>
 
 	var texts = texts0;
 	msg = "";

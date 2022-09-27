@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var basekey;
@@ -23,8 +25,6 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	//listid if given will store the generated numbers/codes as a list in LISTS
 	//
 	//Returns: result in ranges0 unless listid given
-
-	#include <system_common.h>
 
 	//equ maxlistpartsize to 32000
 	var maxlistpartsize = maxstrsize_ / 2;

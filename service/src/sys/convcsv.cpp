@@ -6,6 +6,8 @@ libraryinit()
 #include <convertercsv.h>
 #include <uconvfile.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var sentencex;
@@ -50,7 +52,6 @@ function main(in sentence0, in select0="", in filters0="") {
 	//BP MEDIADIARY2 ditto
 	//ABP JOURNALS   ditto
 
-	#include <system_common.h>
 	//global ptr
 
 	if (sentence0.unassigned()) {

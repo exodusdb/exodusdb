@@ -1,16 +1,12 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 function main(in yymm) {
 	//c sys in,in,in,out
 
 	//only used in accounting to convert YYMM->YYYYMM
-
-	//keep "centuryyear" in sync in frontend exodus.js
-	//and backend ADDCENT ADDCENT2 ADDCENT4
-	#define centuryyear_ 50
-
-	//linemark
 
 	//only convert 4 digit YYMM to YYYYMM
 	if (yymm.len() ne 4) {

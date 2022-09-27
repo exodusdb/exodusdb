@@ -4,6 +4,8 @@ libraryinit()
 #include <authorised.h>
 #include <singular.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -23,7 +25,6 @@ function main(in mode) {
 	//c sys
 	//global task
 
-	#include <system_common.h>
 	//declare function lockposting
 
 	//"where" is not really functional in the intranet system

@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var direction;//num
@@ -14,8 +16,6 @@ function main(in mode, io idate, in usercode, in userx, in marketcode, in market
 
 	//holiday type is one of the following (priority in the same order)
 	//1=weekend, 2=public, 3=personal, 4=expired login, 0=not holiday
-
-	#include <system_common.h>
 
 	//prevent c++ warnings about unused variables
 	if (usercode.unassigned()) {

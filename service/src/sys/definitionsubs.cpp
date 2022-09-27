@@ -10,6 +10,8 @@ libraryinit()
 #include <definitionsubs.h>
 #include <singular.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -32,8 +34,6 @@ var wsmsg;
 
 function main(in mode) {
 	//c sys
-
-	#include <system_common.h>
 
 	//use agp<> instead of @record<> to assist source code searching for agp<?>
 

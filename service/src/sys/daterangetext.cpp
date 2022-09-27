@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 function main(in d1, in d2, out result, io lang) {
@@ -17,7 +19,6 @@ function main(in d1, in d2, out result, io lang) {
 	//Feb 2010 - Jan 2011
 	//10 Mar 2010 - 5 Feb 2010
 
-	#include <system_common.h>
 	if (lang.unassigned()) {
 		lang = sys.glang;
 	}

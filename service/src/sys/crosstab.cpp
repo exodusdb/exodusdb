@@ -7,6 +7,8 @@ libraryinit()
 #include <docmods.h>
 #include <timedate2.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var cmdline;//num
@@ -95,8 +97,6 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
-
-	#include <system_common.h>
 
 	//if prefixes then it will not select records but read sequentially
 	//prefix*1 prefix*2 etc

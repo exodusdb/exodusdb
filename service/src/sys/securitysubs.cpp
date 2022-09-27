@@ -7,15 +7,51 @@ libraryinit()
 #include <securitysubs2.h>
 #include <sysmsg.h>
 #include <sendmail.h>
-//#include <reverse.h>
 #include <hashpass.h>
 #include <dedup.h>
 #include <singular.h>
+
+#include <system_common.h>
 
 #include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
+
+// SEE AUTHORISATION_DICT in UI
+//
+// clang-format off
+//  @record/user grouped mvs
+//  1 = username
+//  2 = keys
+//  3 = expiry_date (was menu but menu moved to userx<34>)
+//  4 = password
+//  5 = was auto workstation DOS - now hourly rates
+//  6 = was sleeptime - now allowable ip addresses eg 1.1.1.1,1.1.1.*
+//  7 = emailaddress
+//  8 = fullname
+//  9 = buffered keys
+// 20 = startn
+// 21 = endn
+// 22 = possible menus - not used
+// 23 = hidden users
+// 24 = otherkeys
+// 25 = passwordautoexpirydays (also see system<128>)
+// 26 = emailnewusers
+
+#define minpasswordchars_ 4
+#define emailnewusers_ RECORD.f(26)
+
+#define tstore_             win.registerx(3)
+#define updatelowergroups_  win.registerx(4)
+#define updatehighergroups_ win.registerx(5)
+#define curruser_           win.registerx(6)
+#define origfullrec_        win.registerx(7)
+#define startn_             win.registerx(8)
+#define endn_               win.registerx(9)
+// clang-format on
+
+//NB (not any more) valid companies are buffered in userprivs<9>
 
 var newpassword;
 var userx;
@@ -49,41 +85,9 @@ var wsmsg;
 
 function main(in mode) {
 	//c sys
-	#include <system_common.h>
 	//global sysrec,lastfn,encryptx,newpassword
 
 	var interactive = false; //not(SYSTEM.f(33));
-
-	//SEE AUTHORISATION_DICT in UI
-	//@record/user grouped mvs
-	//1=username
-	//2=keys
-	//3=expiry_date (was menu but menu moved to userx<34>)
-	//4=password
-	//5=was auto workstation DOS - now hourly rates
-	//6=was sleeptime - now allowable ip addresses eg 1.1.1.1,1.1.1.*
-	//7=emailaddress
-	//8=fullname
-	//9=buffered keys
-	//20=startn
-	//21=endn
-	//22=possible menus - not used
-	//23=hidden users
-	//24=otherkeys
-	//25=passwordautoexpirydays (also see system<128>)
-	//26=emailnewusers
-	#define minpasswordchars_ 4
-	#define emailnewusers_ RECORD.f(26)
-
-	#define tstore_ win.registerx(3)
-	#define updatelowergroups_ win.registerx(4)
-	#define updatehighergroups_ win.registerx(5)
-	#define curruser_ win.registerx(6)
-	#define origfullrec_ win.registerx(7)
-	#define startn_ win.registerx(8)
-	#define endn_ win.registerx(9)
-
-	//NB (not any more) valid companies are buffered in userprivs<9>
 
 	win.valid = 1;
 
@@ -164,25 +168,10 @@ function main(in mode) {
 
 		//check security
 		if (authorised(filename ^ " UPDATE", msg, defaultlock)) {
-			//if interactive then
-			// if LOCKrecord('',DEFINITIONS,'SECURITY') ELSE
-			//  msg='Somebody else is updating ':lcase(filename):'|you may look at but not update the information'
-			//  GOSUB NOTE
-			//  GOTO PROTECT
-			//  END
-			//end else
-			// *wlocked=1 (done in LISTEN)
-			// end
 		} else {
-	//PROTECT:
-			//FOR I=1 TO W.CNT
-			// IF W(I)<18> NE 'P' THEN W(I)<18>='VP'
-			// NEXT I
-
 			if (not interactive) {
 				win.wlocked = 0;
 			}
-
 		}
 
 		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
@@ -397,19 +386,6 @@ function main(in mode) {
 				return invalid(msg);
 			}
 
-	/*;
-				//remove unauthorised users
-				orec=origfullrec;
-				if startn and endn then;
-					nn=endn-startn+1;
-					for fn=1 to 8;
-						orec<fn>=field(orec<fn>,vm,startn,nn);
-						next fn;
-					end;
-
-				//remove unauthorised tasks
-	*/
-
 		}
 
 		gosub cleartemp();
@@ -534,11 +510,6 @@ function main(in mode) {
 					if (not(win.orec.f(10).locate(task, newtaskn))) {
 						var lockx = locks.f(1, taskn);
 
-						//locate task in @record<10> by 'AL' setting newtaskn else null
-						//LOCKX=locks<1,taskn>
-						//@record=insert(@record,10,newtaskn,0,task)
-						//@record=insert(@record,11,newtaskn,0,LOCKX)
-
 						if (not(RECORD.f(10).locateby("AL", task, newtaskn))) {
 							RECORD.inserter(10, newtaskn, task);
 							RECORD.inserter(11, newtaskn, lockx);
@@ -549,23 +520,6 @@ function main(in mode) {
 			} //taskn;
 
 		}
-
-	/*;
-			//delete any superfluous tasks
-			tasks=@record<10>;
-			locks=@record<11>;
-			ntasks=count(tasks,vm)+(tasks ne '');
-			for taskn=ntasks to 1 step -1;
-				LOCKX=locks<1,taskn>;
-				if LOCKX='' then;
-					task=tasks<1,taskn>;
-					if task[-1,1]='"' then;
-						@record=delete(@record,10,taskn,0);
-						@record=delete(@record,11,taskn,0);
-						end;
-					end;
-				next taskn;
-	*/
 
 		//backup copy one per day
 		var temp;
@@ -701,13 +655,13 @@ function main(in mode) {
 					if (userrec ne origuserrec) {
 						userrec.write(users, userx);
 
-	//similar code in user.subs and security.subs
-	/////////////
-	//updatemirror:
-	/////////////
-	//save the user keyed as username too
-	//because we save the user name and executive code in many places
-	//and we still need to get the executive email if they are a user
+						//similar code in user.subs and security.subs
+						/////////////
+						//updatemirror:
+						/////////////
+						//save the user keyed as username too
+						//because we save the user name and executive code in many places
+						//and we still need to get the executive email if they are a user
 						var mirror = userrec.fieldstore(FM, 13, 5, "");
 						mirror = userrec.fieldstore(FM, 31, 3, "");
 						var mirrorkey = "%" ^ userrec.f(1).ucase() ^ "%";
@@ -720,23 +674,6 @@ function main(in mode) {
 
 					}
 				}
-
-				//make a new system record if this is a completely new user
-				//if SYSREC='' and oSYSREC='' then
-				// newpassword=''
-				// password.fn=7
-				// last.fn=9
-				// gosub makeSYSREC
-				// end
-
-				//update the central system file if user already exists there
-				//comment this out to prevent change the EXODUS password
-				//if SYSREC and SYSREC ne oSYSREC and user<>@account then
-				// convert \FB\:\FA\:\F9\ to \FE\:\FD\:\FC\ in SYSREC
-				// read temp from system.file(),user then
-				//  write SYSREC on system.file(),user
-				//  end
-				// end
 
 			}
 		} //usern;
@@ -975,14 +912,6 @@ function main(in mode) {
 
 		DEFINITIONS.deleterecord(tempkey);
 
-	/*;
-		case mode='XREFAUTH';
-			if @record ne orec then;
-				msg='Please save your changes first';
-				return invalid(msg);
-				end;
-			execute 'GET NEW NOHTML PRINTSECURITY';
-	*/
 	} else if (mode.field(".", 1) eq "GETTASKS") {
 
 		var disallowed = mode.field(".", 2) eq "NOT";
@@ -1047,64 +976,6 @@ function main(in mode) {
 		if (username) {
 			USERNAME=(origuser);
 		}
-	/*;
-		case mode='SHOWKEYSTASKS';
-			if si<4>=10 or si<4>=11 then;
-				KEYX=@record<11,mv>;
-			end else;
-				KEYX='';
-				end;
-	inpkey:
-			call note2('What key do you want ?','RC',KEYX);
-			if KEYX else return 0;
-			ntasks=count(@record<10>,vm)+1;
-			tasklist='';
-			for taskn=1 to ntasks;
-				tkeys=@record<11,taskn>;
-				convert ',' to @vm in tkeys;
-				locate KEYX in tkeys<1> setting xx then;
-					tasklist<-1>=@record<10,taskn>;
-					end;
-				next taskn;
-			if tasklist else;
-				call note(quote(KEYX):' No tasks are locked with this key');
-				goto inpkey;
-				end;
-			if decide('Key ':quote(KEYX):' locks these tasks.','':tasklist,reply) else return 0;
-			goto inpkey;
-			//locate tasklist<reply> in @record<10> setting taskn then
-			// tstore='NEXT.MV.WI':fm:taskn:fm:3
-			// @DATA=@MOVE.KEYS<4>:@MOVE.KEYS<5>
-			// return 0
-			// end
-
-		case mode='SETWORKSTATION' or mode='SETSLEEP';
-			if si<4>=1 else;
-				msg='YOU MUST BE ON THE USER NAME|TO SET THE WORKSTATION OR SLEEP TIME';
-				return invalid(msg);
-				end;
-
-			if mode='SETWORKSTATION' then;
-				if security('#AUTHORISATION SET USER WORKSTATION',msg,'') else return invalid(msg);
-				reply=@record<5,mv>;
-				call note2('What is the workstation|number for ':@record<1,mv>:' ?|(enter "CURRENT" for current station)|(blank for default)','RCE',reply,'');
-				if reply="\x0B" then return 0;
-				if reply='CURRENT' then reply=@station;
-				@record<5,mv>=reply;
-			end else;
-				if security('#AUTHORISATION SET USER SLEEP TIME',msg,'') else return invalid(msg);
-				reply=@record<6,mv>;
-	inp.sleep:
-				call note2('How many seconds before sleeping|for ':@record<1,mv>:' ?|(blank for default)','RCE',reply,'');
-				if reply="\x0B" then return 0;
-				if reply lt 60 or reply gt 1000000 then;
-					print char(7):
-					call note('Please enter a number|between 60 and 1000000');
-					goto inp.sleep;
-					end;
-				@record<6,mv>=reply;
-				end;
-	*/
 	} else {
 		msg = mode.quote() ^ " invalid mode in SECURITY.SUBS";
 		return invalid(msg);
@@ -1117,7 +988,6 @@ function main(in mode) {
 subroutine changepassx() {
 	var datax = RECORD.f(4, win.mvx);
 	sysrec = datax.f(1, 1, 2);
-	//convert \FB\:\FA\:\F9\ to \FE\:\FD\:\FC\ in SYSREC
 	sysrec.converter(TM ^ ST ^ chr(249), FM ^ VM ^ SM);
 	if (not sysrec) {
 		if (not(sysrec.read(systemfile(), userx))) {
@@ -1195,48 +1065,20 @@ subroutine makesysrec() {
 	}
 
 	//store the encrypted new password
-	//ENCRYPTX = newpassword
-	//gosub makepass
 	encryptx = hashpass(newpassword);
 	sysrec(passwordfn) = encryptx;
 
 	encryptx = userx ^ FM ^ sysrec.field(FM, 2, lastfn - 2);
-	//gosub makepass
 	encryptx = hashpass(encryptx);
 	sysrec(lastfn) = encryptx;
 
 	encryptx = userx ^ FM ^ sysrec.field(FM, 2, lastfn - 2);
-	//gosub makepass
 	encryptx = hashpass(encryptx);
 	sysrec(lastfn) = encryptx;
 
 	win.valid = 1;
 
 	return;
-	/*;
-	/////////
-	makepass:
-	/////////
-		//encryptx = encrypt2(encryptx)
-		//return
-
-		encryptkey = 1234567;
-
-		//pass1
-		loop;
-		while ENCRYPTX # '';
-			encryptkey = mod(encryptkey, 390001) * seq(ENCRYPTX[1, 1]) + 1;
-			ENCRYPTX[1, 1]='';
-			repeat;
-
-		//pass2
-		loop;
-			ENCRYPTX := char(65 + mod(encryptkey, 50));
-			encryptkey = int(encryptkey / 50);
-		while encryptkey repeat;
-
-		return;
-	*/
 }
 
 subroutine gueststatus() {
@@ -1249,12 +1091,12 @@ subroutine gueststatus() {
 
 subroutine cleartemp() {
 	//set in postread (setup) for exodus.net
-	//@record
-	//20 start
-	//21 end
-	//22 possible menus (no longer since menus moved to users field <34>
-	//23 other user codes
-	//24 other keys
+	// @record
+	// 20 start
+	// 21 end
+	// 22 possible menus (no longer since menus moved to users field <34>
+	// 23 other user codes
+	// 24 other keys
 	for (const var ii : range(20, 24)) {
 		RECORD(ii) = "";
 	} //ii;

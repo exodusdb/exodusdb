@@ -28,6 +28,8 @@ libraryinit()
 #include <shell2.h>
 #include <log.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var ccaddress;
@@ -63,8 +65,6 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	//uses sendmail.js
 
 	//global tt,maxemailsize,forcedemailx
-
-	#include <system_common.h>
 
 	if (ccaddress0.unassigned()) {
 		ccaddress = "";

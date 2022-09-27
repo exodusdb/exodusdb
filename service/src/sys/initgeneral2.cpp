@@ -7,6 +7,8 @@ libraryinit()
 #include <sysmsg.h>
 #include <menusubs.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var tt;
@@ -23,8 +25,6 @@ var oldmenu;
 
 function main(in mode, io logtime, in menu) {
 	//c sys in,io,in
-
-	#include <system_common.h>
 
 	call log2("*init.general2 " ^ mode.f(1), logtime);
 

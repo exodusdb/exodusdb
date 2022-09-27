@@ -6,6 +6,8 @@ libraryinit()
 #include <shell2.h>
 #include <singular.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -47,9 +49,7 @@ function main(in mode) {
 	//test wrote 1,000,000 files containing the filenumber 1,2,3 etc in about 5 mins
 	//and the files could be randomly read and written at excellent speed
 
-	#include <system_common.h>
 	//global ptr,iim,csv,nquotes
-
 
 	//determine upload directory
 	var uploadroot = SYSTEM.f(49);

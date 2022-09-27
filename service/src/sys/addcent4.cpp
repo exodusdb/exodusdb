@@ -1,20 +1,13 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <system_common.h>
+
 var inx;//num
 
-function main(in type, in in0, in mode, out outx) {
+function main(in type, in in0, in /*mode*/, out outx) {
 	//c sys in,in,in,out
 	//global inx
-
-	//keep "centuryyear" in sync in frontend exodus.js
-	//and backend ADDCENT ADDCENT2 ADDCENT4
-	#define centuryyear_ 50
-
-	//avoid c++ warning about unused variable
-	if (0) {
-		outx = mode;
-	}
 
 	//CALLED
 	///////

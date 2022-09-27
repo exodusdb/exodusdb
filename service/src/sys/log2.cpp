@@ -3,6 +3,8 @@ libraryinit()
 
 #include <sys_common.h>
 
+#define sep_ " "
+
 var logfilename;
 var logfilelength;//num
 var temposfilename83;
@@ -17,8 +19,6 @@ function main(in msg0, io time0) {
 	if (interactive) {
 		return 0;
 	}
-
-	#define sep_ " "
 
 	logfile = "";
 

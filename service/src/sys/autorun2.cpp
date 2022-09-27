@@ -3,6 +3,8 @@ libraryinit()
 
 #include <getsubs.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var mode;
@@ -20,8 +22,6 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//GBP GENERAL.SUBS2 mode ASAP
 	//BP MEDIADIARY mode WRITE/ASP for media diary
 	//ABP none
-
-	#include <system_common.h>
 
 	//default unassigned parameters
 	if (mode0.unassigned()) {

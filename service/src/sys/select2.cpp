@@ -6,6 +6,8 @@ libraryinit()
 #include <safeselect.h>
 #include <systemsubs.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 #include <win_common.h>
 
@@ -54,7 +56,6 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	//since it calls LISTEN3 and filename.subs('POSTREAD') to get accurate data
 	//clearcommon
 
-	#include <system_common.h>
 	//global maxnrecs,useactivelist
 
     //use app specific version of listen3
@@ -99,7 +100,6 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
 		} //ii;
 	}
-
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
 	sortselect.replacer("%SELECTLIST%", "");

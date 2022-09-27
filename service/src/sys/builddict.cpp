@@ -1,8 +1,6 @@
 #include <exodus/program.h>
 programinit()
 
-//#include <sys_common.h>
-
 var blocktype;
 var blockid;
 var blockline;
@@ -27,7 +25,6 @@ var splitline;
 var ln;
 
 function main() {
-	//#include <system_common.h>
 
 	filename = SENTENCE.field(" ", 2);
 	dictfilename = SENTENCE.field(" ", 3);

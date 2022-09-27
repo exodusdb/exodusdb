@@ -11,6 +11,8 @@ libraryinit()
 #include <sysmsg.h>
 //#include <upgrade.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var checkinterval;//num
@@ -116,7 +118,6 @@ var maxips;//num
 function main() {
 	//c sys
 
-	#include <system_common.h>
 	//global all
 
 	//NB the PROCESSES file is central to all databases in one installation
