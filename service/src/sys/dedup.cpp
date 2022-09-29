@@ -5,7 +5,6 @@ var list1n;
 var xx;
 
 function main(in mode, io list1, io list2, in seps) {
-	//c sys in,io,io,in
 
 	if (mode.unassigned()) {
 		{}

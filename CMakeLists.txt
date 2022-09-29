@@ -55,6 +55,11 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden") # Force g++ to hid
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 
 #
+# Profiling
+#
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+
+#
 # Output
 #
 message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")

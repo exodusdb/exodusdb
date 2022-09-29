@@ -1158,7 +1158,7 @@ bool var::reado(CVR filehandle, CVR key) {
 		//(*this) = cachedrecord;
 		var_str = std::move(cachedrecord);
 		var_typ = VARTYP_STR;
-
+		//var("*").output();
 		//this->lasterror();
 
 		return true;
@@ -2902,11 +2902,16 @@ bool var::select(CVR sortselectclause) {
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
 	ISSTRING(sortselectclause)
-
+	auto started = var().ostime();
+	bool result;
 	if (!sortselectclause || sortselectclause.ends("R)"))
-		return this->selectx("key, mv::integer, data", sortselectclause);
+		result = this->selectx("key, mv::integer, data", sortselectclause);
 	else
-		return this->selectx("key, mv::integer", sortselectclause);
+		result = this->selectx("key, mv::integer", sortselectclause);
+	auto elapsed = var().ostime() - started;
+	if (elapsed > 1)
+		elapsed.errputl(" select: secs:");
+	return result;
 }
 
 // currently only called from select, selectrecord and getlist
@@ -4913,16 +4918,16 @@ bool var::deleteindex(CVR fieldname0) const {
 
 	// delete the index field (actually only present on calculated field indexes so ignore
 	// result) deleting the index field automatically deletes the index
-	var index_fieldname = "index_" ^ fieldname;
-	if (var().sqlexec("alter table " ^ filename ^ " drop " ^ index_fieldname))
-		return true;
+	//var index_fieldname = "index_" ^ fieldname;
+	//if (var().sqlexec("alter table " ^ filename ^ " drop " ^ index_fieldname))
+	//	return true;
 
 	// delete the index.
 	// var filename=*this;
 	var sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
 	bool result = this->sqlexec(sql);
-	if (!result)
-		this->lasterror().errputl();
+	//if (!result)
+	//	this->lasterror().errputl();
 	return result;
 }
 
@@ -5034,9 +5039,9 @@ bool var::cursorexists() {
 	return PQntuples(dbresult) > 0;
 }
 
-var var::listindexes(CVR filename0, CVR fieldname0) const {
+var var::listindex(CVR filename0, CVR fieldname0) const {
 
-	THISIS("var var::listindexes(CVR filename) const")
+	THISIS("var var::listindex(CVR filename) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename0)

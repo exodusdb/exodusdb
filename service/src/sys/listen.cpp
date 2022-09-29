@@ -2396,7 +2396,6 @@ badwrite:
 
 		//even postwrite/postdelete can now set invalid (to indicate invalid mode etc)
 		//if valid then response='OK' else response='Error:'
-		//WARNING TODO: check ternary op following;
 		response_ = win.valid ? "OK" : "Error:";
 
 		if (request1 ne "DELETE") {

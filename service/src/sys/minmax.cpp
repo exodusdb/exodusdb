@@ -5,7 +5,6 @@ var bit;
 var term;
 
 function main(in list0, out min, out max) {
-	//c sys in,out,out
 
 	//find the min and max in a list
 

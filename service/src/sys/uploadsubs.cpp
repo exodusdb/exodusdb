@@ -43,13 +43,11 @@ var wspos;
 var wsmsg;
 
 function main(in mode) {
-	//c sys
 	//doesnt seem to be any limit on number of files per folder
 	//in ntfs filing system at least under win 2003 server
 	//test wrote 1,000,000 files containing the filenumber 1,2,3 etc in about 5 mins
 	//and the files could be randomly read and written at excellent speed
 
-	//global ptr,iim,csv,nquotes
 
 	//determine upload directory
 	var uploadroot = SYSTEM.f(49);

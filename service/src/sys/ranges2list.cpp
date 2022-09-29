@@ -13,7 +13,6 @@ var keys;
 var key;
 
 function main(io ranges0, in basekey0="", in listid0="") {
-	//c sys io,"",""
 
 	//generate individual numbers given a list of ranges
 	//eg 1000,1100-1200,2000-2100,3000

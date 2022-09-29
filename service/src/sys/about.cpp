@@ -19,8 +19,6 @@ var versiondata;
 var ver;
 
 function main() {
-	//c sys
-	//global all
 
 	interactive = false; //not(SYSTEM.f(33));
 

@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in mode, io line, in params, in filename) {
-	//c sys in,io,in,in
 
 	//mode=HEAD or LINE
 	//input line,params,filename

@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in mode, in tableid, in in0, out outx) {
-	//c sys in,in,in,out
 
 	//convert <COL ALIGN=RIGHT> to nth-child style
 

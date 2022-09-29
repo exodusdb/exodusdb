@@ -13,9 +13,7 @@ var xx;
 
 function main() {
 	//
-	//c sys
 
-	//clearcommon();
 
 	var options = SENTENCE.field("(", 2);
 	var sentencex = SENTENCE.field("(", 1);

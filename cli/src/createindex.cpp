@@ -10,7 +10,7 @@ function main() {
 		abort("Syntax is 'createindex [filename] [filename__]fieldname... {F=Force}'");
 
 	if (indexnames eq "xref") {
-		indexnames = var().listindexes();
+		indexnames = var().listindex();
 		var indexnames2 = "";
 		for (auto index : indexnames) {
 			if (index.ends("_xref")) 
@@ -42,7 +42,7 @@ function main() {
 		}
 
 		var indexname = filename ^ "__" ^ fieldname;
-		if (force && listindexes(filename, fieldname)) {
+		if (force && listindex(filename, fieldname)) {
 			printl("Deleting index", indexname);
 			if (not filename.deleteindex(fieldname)) {
 				errputl("Cannot delete index", indexname);

@@ -9,7 +9,6 @@ var xx;
 var origusername;
 
 function main(in cmd, in username) {
-	//c sys
 
 	if (username) {
 		if (not(SECURITY.f(1).locate(username, xx))) {

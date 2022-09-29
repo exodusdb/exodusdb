@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in password) {
-	//c sys
 
 	var encryptkey = 1234567;
 

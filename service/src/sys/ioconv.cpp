@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in type, in input0, in mode, io output) {
-	//c sys in,in,in,io
 
 	//just wraps the standard iconv oconv
 	//so that we can find "[IOCONV,MT" etc in the source code instead of "MT"

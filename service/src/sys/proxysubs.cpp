@@ -12,7 +12,6 @@ var outfile;
 var errors;
 
 function main(in module, in mode, in stationery) {
-	//c sys
 
 	//checks there is some output and converts htm to pdf if necessary
 

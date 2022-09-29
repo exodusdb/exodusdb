@@ -399,7 +399,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		var fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
 		//filename = filename.convert(UPPERCASE, "").trim("_");
 		filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "").trimmer("_");
-		if (filename.listindexes(filename, fieldname)) {
+		if (filename.listindex(filename, fieldname)) {
 			logputl("Deleting index " ^ filename ^ " " ^ fieldname);
 			filename.deleteindex(fieldname);
 			logputl("Creating index " ^ filename ^ " " ^ fieldname);

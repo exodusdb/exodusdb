@@ -6,7 +6,6 @@ libraryinit()
 var id;
 
 function main(in mode, io tx, in arg3, io arg4, in arg5) {
-	//c sys in,io,in,io,in
 
 	if (mode eq "INITMENUS") {
 

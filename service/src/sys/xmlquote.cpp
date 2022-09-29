@@ -4,7 +4,6 @@ libraryinit()
 var string1;
 
 function main(in string0) {
-	//c sys
 	if (string0.unassigned()) {
 		//de bug
 		string1 = "UNASSIGNED";

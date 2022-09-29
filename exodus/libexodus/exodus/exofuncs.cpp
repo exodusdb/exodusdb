@@ -717,8 +717,8 @@ PUBLIC var reccount(CVR dbfilename_or_var) {
 	return dbfilename_or_var.reccount();
 }
 
-PUBLIC var listindexes(CVR dbfilename, CVR fieldname) {
-	return var().listindexes(dbfilename, fieldname);
+PUBLIC var listindex(CVR dbfilename, CVR fieldname) {
+	return var().listindex(dbfilename, fieldname);
 }
 
 PUBLIC

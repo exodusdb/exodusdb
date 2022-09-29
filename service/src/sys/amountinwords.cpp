@@ -25,8 +25,6 @@ var ones;//num
 var temp;
 
 function main(in amountfmlanguage, in currcode0) {
-	//c sys
-	//global all
 
 	comma = "";
 

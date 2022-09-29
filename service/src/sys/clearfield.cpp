@@ -11,8 +11,6 @@ var nindexed;//num
 
 function main() {
 	//
-	//c sys
-	//global nindexed
 
 	if (SENTENCE.contains("(")) {
 		options = field2(SENTENCE, "(", -1);
@@ -51,7 +49,6 @@ function main() {
 	if (not(DICT.open("DICT." ^ filename))) {
 		DICT = "";
 	}
-	var interactive = not(SYSTEM.f(33));
 	nindexed = 0;
 
 	if (not fns) {

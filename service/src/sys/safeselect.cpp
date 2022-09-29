@@ -8,7 +8,6 @@ var id;
 var dict;
 
 function main(in selectx) {
-	//c sys
 
 	RECORD.move(rr);
 	ID.move(id);

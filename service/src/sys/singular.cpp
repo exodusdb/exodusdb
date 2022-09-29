@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in pluralnoun) {
-	//c gen
 	var temp = pluralnoun;
 	var temp2 = pluralnoun;
 	temp2.ucaser();

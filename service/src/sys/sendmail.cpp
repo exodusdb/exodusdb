@@ -60,11 +60,9 @@ var errorfile;
 var home = "";
 
 function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
-	//c sys in,in,in,in,in,in,out,=var(),=var()
 
 	//uses sendmail.js
 
-	//global tt,maxemailsize,forcedemailx
 
 	if (ccaddress0.unassigned()) {
 		ccaddress = "";
@@ -219,7 +217,6 @@ forcedemail:
 		}
 	}
 
-	//global override
 	var filenamesx = "smtp.cfg" ^ VM ^ "../../smtp.cfg";
 	filenamesx.converter("/", OSSLASH);
 	for (const var filen : range(1, 2)) {

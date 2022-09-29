@@ -1665,11 +1665,8 @@ nextrec:
 	}
 	lastid = ID;
 
-	//if (not(RECORD.reado(srcfile, ID))) {
-	//	goto nextrec;
-	//}
-	//RECORD.errputl("RECORD=");
-	if (not(RECORD.len()) and not(RECORD.read(srcfile, ID))) {
+	// The select (R) option should have provided RECORD already
+	if (not RECORD.len() and not RECORD.read(srcfile, ID)) {
 		goto nextrec;
 	}
 

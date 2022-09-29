@@ -14,9 +14,7 @@ var langkey;
 var codepage;
 
 function main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
-	//c sys in,in,in,io,io
 
-	//global question,temp,languagecode,progname
 
 	lang = "";
 	if (languagefile.unassigned()) {

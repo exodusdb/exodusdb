@@ -69,7 +69,7 @@ programinit()
 	} else {
 
 		// Check our index is present in the list
-		var tt = listindexes();
+		var tt = listindex();
 		tt.dump();
 		TRACE(tt)
 		TRACE(tt.oconv("HEX"))
@@ -81,22 +81,22 @@ programinit()
 		assert(tt.locate(tt2, fn, 0));
 
 		// Check our index is present in the list for our file
-		assert(listindexes(FILE)             eq "xo_users]birthday"_var);
+		assert(listindex(FILE)             eq "xo_users]birthday"_var);
 
 		// Check our index is present specifically
-		assert(listindexes(FILE, "birthday") eq "xo_users]birthday"_var);
+		assert(listindex(FILE, "birthday") eq "xo_users]birthday"_var);
 
-//		TRACE(listindexes(FILE, "birthday"))
-//		TRACE(listindexes(FILE, "birthday").oswrite("z2"))
+//		TRACE(listindex(FILE, "birthday"))
+//		TRACE(listindex(FILE, "birthday").oswrite("z2"))
 //		TRACE("xo_users]birthday"_var)
 //
-//		var x = listindexes(FILE, "birthday").oswrite("z2");
+//		var x = listindex(FILE, "birthday").oswrite("z2");
 //		var y = "xo_users]birthday"_var;
 //		assert(x eq y);
 
-		assert(listindexes() ne "");
+		assert(listindex() ne "");
 		//ALN: do not delete to make subsequent select work::	assert(deleteindex(FILE,"BIRTHDAY"));
-		//		assert(listindexes(FILE) eq "");
+		//		assert(listindex(FILE) eq "");
 	}
 
 	printl("check can select and readnext through the records");
@@ -150,7 +150,7 @@ dict(AGE_IN_YEARS) {
 	committrans();
 
 	var filenames  = listfiles();
-	var indexnames = listindexes("test_people");
+	var indexnames = listindex("test_people");
 
 	/*
 	var().begin();

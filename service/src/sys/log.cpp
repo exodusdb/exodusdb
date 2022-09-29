@@ -17,7 +17,6 @@ var bakpars;
 var ver;
 
 function main(in programname0, in text0) {
-	//c sys
 
 	var s33 = SYSTEM.f(33);
 

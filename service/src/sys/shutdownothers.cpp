@@ -4,7 +4,6 @@ libraryinit()
 #include <otherusers.h>
 
 function main(in mode, in datasetcode, out result) {
-	//c sys in,in,out
 
 	var shutdownfilename = datasetcode.lcase() ^ ".end";
 	if (shutdownfilename.osfile()) {

@@ -6,7 +6,6 @@ libraryinit()
 var link;
 
 function main(in mode, in html, io mark) {
-	//c sys in,in,io
 	//eg
 	//call getmark('CLIENT',1,clientmark)
 	//call getmark('OWN',1,ownmark)

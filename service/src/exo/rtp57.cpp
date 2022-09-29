@@ -139,12 +139,10 @@ INSTALL      | 22 | Passed         | Unused         | Unused         | Unused   
 		status=handle.open(keyorfilename);
 		break;
 
-	//global lock
 	case 23:
 		status=var("").lock(keyorfilename);
 		break;
 
-	//global unlock
 	case 24:
 		status=var("").unlock(keyorfilename);
 		break;

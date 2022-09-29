@@ -62,12 +62,10 @@ var yy;
 
 function main() {
 	//
-	//c sys
 
 	//NB @VOLUMES blank on C++ and used to run slightly differently on C++
 	//eg function called is generalalerts instead of general.alerts
 
-	//global tt,tt2,s33,lastlog
 
 	//!WARNING decide() returns REPLY number instead of VALUE when not interactive
 
@@ -678,7 +676,6 @@ nextreport:
 	SYSTEM(43) = oldsystem.f(43);
 	//original station id
 	SYSTEM(44) = oldsystem.f(44);
-	//globaldatasetid
 	SYSTEM(45) = oldsystem.f(45);
 	//processlock
 	SYSTEM(48) = oldsystem.f(48);

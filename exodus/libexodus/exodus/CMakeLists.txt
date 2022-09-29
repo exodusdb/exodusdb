@@ -30,31 +30,6 @@ execute_process(
         RESULT_VARIABLE RESVAR
 )
 
-#######################################
-# c++ version 17 or 20 if on Ubuntu 20+
-#######################################
-execute_process(
-        COMMAND         grep "Ubuntu 2" /etc/lsb-release
-        OUTPUT_VARIABLE OUTVAR
-        ERROR_VARIABLE  ERRVAR
-        RESULT_VARIABLE RESVAR
-)
-if(RESVAR EQUAL "0")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
-else()
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-endif()
-
-#2014/06/01 exodus doesnt require c++11 but can compile using it
-#NB exodus cli "compile" hard codes compilation as c++11 so exodus applications can be written in c++11
-#even if libexodus is compiled and linked to c++99 boost libraries etc
-#config is set to look in /usr/local/include and /usr/local/lib first for any source version of boost compiled for c++11
-#not using c++11 for now until solve problem linking to boost filesystem unless boost libs were compiled in c++11
-#perhaps using some BOOST_NO_CXX11_SCOPED_ENUMS macro
-#line #define BOOST_NO_CXX11_SCOPED_ENUMS before boost/filesystem is included
-#said to be not a good idea to link c++11 lib to pre c+11 libs (whether this applies to exodus annd boost is unknown)
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 ### POSTGRES ###
 ################
 ##set(PostgreSQL_ADDITIONAL_VERSIONS "9.3" "9.3.4")

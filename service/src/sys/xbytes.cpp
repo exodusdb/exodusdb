@@ -5,7 +5,6 @@ var output2;
 var ndecs;//num
 
 function main(in type, in input0, in mode, out output) {
-	//c sys in,in,in,out
 
 	if (mode) {
 		var sigfigs = mode;

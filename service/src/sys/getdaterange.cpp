@@ -6,7 +6,6 @@ var uptoquestion;
 var defaultperiod;
 
 function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
-	//c sys in,in,io,io
 
 	if (fromquestion0.unassigned()) {
 		fromquestion = "";

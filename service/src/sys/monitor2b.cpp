@@ -17,7 +17,6 @@ var errors;
 var log;
 
 function main(in mode, in request, in tempfilename, out datax, out msg) {
-	//c sys in,in,in,out,out
 
 	//mode is WRITE or READ
 	//request is required sent to the server and
@@ -48,7 +47,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	if (VOLUMES) {
 		wgetrc = "";
 		//look for local or cygwin wget.exe otherwise quit
-		//WARNING TODO: check ternary op following;
 		var exe = oscwd().contains(":") ? ".exe" : "";
 		cmd = SYSTEM.f(50) ^ "wget" ^ exe;
 		if (not(cmd.osfile())) {

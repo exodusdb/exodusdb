@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in fromdate, in fromtime, io uptodate, io uptotime) {
-	//c sys in,in,io,io
 
 	var text = "";
 

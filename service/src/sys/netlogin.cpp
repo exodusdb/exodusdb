@@ -28,8 +28,6 @@ var encryptx;
 var allowablechars;
 
 function main(in mode0) {
-	//c sys
-	//global encryptx,password,maxlen,show,ok,msg,userx
 
 	if (mode0.unassigned()) {
 		mode = "";

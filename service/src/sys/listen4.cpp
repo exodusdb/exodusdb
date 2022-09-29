@@ -4,7 +4,6 @@ libraryinit()
 var params;
 
 function main(in msgno, io msg, in params0="") {
-	//c sys in,io,""
 	if (params0.unassigned()) {
 		params = "";
 	} else {

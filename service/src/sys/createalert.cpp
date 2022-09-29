@@ -17,7 +17,6 @@ var request;
 var datax;
 
 function main() {
-	//c sys
 
 	var sentencex = SENTENCE.field("(", 1);
 	//cheap parser requires ~ for spaces

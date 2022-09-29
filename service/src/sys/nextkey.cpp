@@ -4,7 +4,6 @@ libraryinit()
 var previous;//num
 
 function main(in mode, in previous0="") {
-	//c sys in,""
 	//jbase linemark
 	if (previous0.unassigned()) {
 		previous = 0;

@@ -20,10 +20,8 @@ var div;
 var divx;
 
 function main(in mode0, out html, in compcode0="", in qr_text="") {
-	//c sys in,out,""
 
 	//$insert bp,agency.common
-	//global letterheadcompany,modex,tt,hascompanies,compcode
 
 	var mode = mode0;
 	modex = mode;

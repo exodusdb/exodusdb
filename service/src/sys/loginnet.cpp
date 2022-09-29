@@ -18,7 +18,6 @@ var compcodex;
 var paramrec;
 
 function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
-	//c sys in,in,io,io,io
 
 	//this is a special login routine called from LISTEN2
 	//declare function validcode1
@@ -198,7 +197,6 @@ nextcomp:
 
 	//market
 	//defmarketcode=if company<30> then company<30> else agp<37>;*market
-	//WARNING TODO: check ternary op following;
 	var defmarketcode = sys.company.f(30) ? sys.company.f(30) : SYSTEM.f(137);
 	//if unassigned(markets) then markets=''
 	//TODO maybe use the market on the user file?

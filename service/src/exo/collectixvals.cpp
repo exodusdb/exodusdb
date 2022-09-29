@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in filename0, in dictid, in prefix="", in orderby="") {
-	//c xxx in,in,"",""
 
 	var lenprefix = prefix.len();
 

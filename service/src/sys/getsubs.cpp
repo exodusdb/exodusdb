@@ -22,8 +22,6 @@ var wspos;
 var wsmsg;
 
 function main(in mode) {
-	//c sys
-	//global task
 
 	//declare function lockposting
 

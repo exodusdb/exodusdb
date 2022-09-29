@@ -71,6 +71,17 @@ programinit()
 		assert("1a^2b^3c"_var.f(2).str(3) eq "2b2b2b");
 	}
 
+	{
+		var x = "x";
+		//x.f(1) = "x";// Must not compile
+	}
+
+	{
+		// Check brackets work on var_proxy i.e. x(2)[n] instead of x.f(2)[n]
+		var x = "abc^xyz"_var;
+		assert(x(2)[-2] eq "y");
+	}
+
 	/* UBUNTU locale-gen
 	locale-gen de_DE.UTF-8
 	locale-gen en_GB.UTF-8

@@ -227,7 +227,6 @@ let ulchar = "-";
 
 function main() {
 	//
-	//c sys
 	copyright = "Copyright NEOSYS All Rights Reserved";
 	copyright = "";
 	showborder = 0;
@@ -237,7 +236,6 @@ function main() {
 	//compile nlist without linemarks. its inner loops benefit from efficiency
 
 	//for safety in case we are called with (PE) options, to avoid hanging
-	//PRINTER OFF;
 
 	if (USERNAME eq "EXODUS") {
 		var(SENTENCE).oswrite("nlist");
@@ -245,9 +243,7 @@ function main() {
 		printl(SENTENCE);
 	}
 
-	//global all
 	//for printtx
-	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
 	//NLIST keywords and aliases. blank keyword means throwaway word
 	/* LIST dict_voc WITH F1 'RLIST' BY F4 BY ID ID-SUPP F4 ID;
@@ -326,7 +322,6 @@ function main() {
 
 	*/
 
-	//PRINTER OFF;
 	//print @AW<30>
 	//get.cursor(cursor)
 
@@ -1494,7 +1489,7 @@ nextrec:
 
 	ok = 0;
 	RECORD = "";
-	ok=readnext(RECORD,ID,MV);
+	ok=readnext(RECORD, ID, MV);
 	if (not ok) {
 		FILEERRORMODE = 0;
 		if (STATUS) {
@@ -1531,8 +1526,8 @@ nextrec:
 	}
 	lastid = ID;
 
-	//if c++ the select (R) option might have provided RECORD already
-	if (not RECORD and not RECORD.reado(srcfile, ID)) {
+	// The select (R) option should have provided RECORD already
+	if (not RECORD.len() and not RECORD.reado(srcfile, ID)) {
 		goto nextrec;
 	}
 
@@ -2198,7 +2193,6 @@ subroutine printbreaks() {
 		} else {
 			if (not html) {
 				//underline2=if breakleveln>=nbreaks then bar else underline
-				//WARNING TODO: check ternary op following;
 				underline2 = leveln eq 1 ? underline : bar;
 				if (not((tx.last(2)).contains(ulchar))) {
 					if (not tx.ends(FM)) {

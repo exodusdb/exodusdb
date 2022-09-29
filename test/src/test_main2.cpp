@@ -61,6 +61,20 @@ programinit()
 		}
 	}
 
+	{
+		// We disallow self assign on temporaries
+		// because it is unusual programming and may indicate some misconception by the programmer
+		//var x = ostime() += 100;
+
+		// This works fine
+		var x = ostime() + 100;
+
+		// This is allowed because ^= (self append) is working on x, not a temporary
+		x = "xyz";
+		x.prefixer("abc") ^= "200";
+		assert(x eq "abcxyz200");
+	}
+
 	var xyz;
 	//xyz=xyz;
 	printl("\nTest catching VarError");

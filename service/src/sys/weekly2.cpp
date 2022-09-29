@@ -10,8 +10,6 @@ var period;//num
 var idate;//num
 
 function main(in type, in input0, in mode, out output) {
-	//c sys in,in,in,out
-	//global all
 
 	//eg mode is WEEKLY2,7,1,4
 	//ie year starts on the first monday of july

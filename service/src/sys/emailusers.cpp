@@ -26,10 +26,7 @@ var nn;
 var errormsg;
 
 function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in userids0, in options, io emaillog) {
-	//c sys ,,,,,,,io
 
-	//global nn,ok,emails,expirydate,userx,usercode,toemails,ccemails
-	//global subject,body,replyto,nsent
 
 	var interactive = false; //not(SYSTEM.f(33));
 

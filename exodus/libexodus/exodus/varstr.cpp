@@ -807,13 +807,13 @@ bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const i
 // non-const xxxx(fn,vn,sn) returns a proxy that can be aasigned to or implicitly converted to a var
 //
 var_proxy1 var::operator()(int fieldno) {
-	return var_proxy1(this, fieldno);
+	return var_proxy1(*this, fieldno);
 }
 var_proxy2 var::operator()(int fieldno, int valueno) {
-	return var_proxy2(this, fieldno, valueno);
+	return var_proxy2(*this, fieldno, valueno);
 }
 var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
-	return var_proxy3(this, fieldno, valueno, subvalueno);
+	return var_proxy3(*this, fieldno, valueno, subvalueno);
 }
 
 // Old "extract()" function in either procedural or OO style.

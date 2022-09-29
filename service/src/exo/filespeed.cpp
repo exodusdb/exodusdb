@@ -9,8 +9,6 @@ var endtime;//num
 var testtime;//num
 
 function main() {
-	//c test
-	//global testtime,tempfile,rec
 
 	//declare function esc.to.exit
 	var deletefilex = 1;
@@ -52,7 +50,7 @@ function main() {
 	var maxtime = "";
 	var avgtime = "";
 	printl(chr(12), "writing then deleting ", nreps, " x ", recsize, " byte records ", ntests, " times");
-	printl("     Test" , "\t" , "Time" , "\t" , "Min." , "\t" , "Avg." , "\t" , "Max.");
+	printl("Test" , "\t" , "Time" , "\t" , "Min." , "\t" , "Avg." , "\t" , "Max.");
 	var minspeed = 0;
 	var maxspeed = 0;
 	var avgspeed = 0;

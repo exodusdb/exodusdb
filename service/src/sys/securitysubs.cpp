@@ -84,8 +84,6 @@ var wspos;
 var wsmsg;
 
 function main(in mode) {
-	//c sys
-	//global sysrec,lastfn,encryptx,newpassword
 
 	var interactive = false; //not(SYSTEM.f(33));
 
@@ -208,7 +206,6 @@ function main(in mode) {
 			let ntasks = tasks.fcount(VM);
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
 				var task = tasks.f(1, taskn);
-				//WARNING TODO: check ternary op following;
 				var temp = task.starts("DOCUMENT: ") ? "#" : "";
 				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
 					RECORD.remover(10, taskn);

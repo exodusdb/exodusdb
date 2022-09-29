@@ -43,7 +43,6 @@ var styles2;
 var fields;
 
 function main(in request1, in request2, in request3, in request4, io request5, in request6="") {
-	//c sys in,in,in,in,io,""
 
 	/* LISTEN COMMANDS;
 
@@ -67,8 +66,6 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 	//$insert abp,common
 	//$insert bp,agency.common
-	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips
-	//global filetime,fileattributes
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 

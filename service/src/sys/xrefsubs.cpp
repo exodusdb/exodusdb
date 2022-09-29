@@ -24,7 +24,6 @@ var wsmsg;
 var xx;
 
 function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist) {
-	//c sys in,in,in,io,in,io
 
 	//also needs
 	//datafile,src.file

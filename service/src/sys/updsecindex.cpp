@@ -10,7 +10,6 @@ var indexingrecord;
 var recordx;
 
 function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in newvalues, io valid, io msg) {
-	//c sys in,in,io,in,in,in,io,io
 	//update symbolic indexed files
 	//this is designed to be called in prewrite
 	//to update the indexes of associated records

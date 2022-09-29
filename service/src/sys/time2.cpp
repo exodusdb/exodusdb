@@ -7,7 +7,6 @@ var mode;
 var outputx;
 
 function main(in type, in input0, in mode0, out output) {
-	//c sys in,in,in,out
 
 	//uses @sw to output to or input from "local time"
 	//NO LONGER since requires date to be effective (use [DATETIME])

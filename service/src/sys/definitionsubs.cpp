@@ -33,7 +33,6 @@ var wspos;
 var wsmsg;
 
 function main(in mode) {
-	//c sys
 
 	//use agp<> instead of @record<> to assist source code searching for agp<?>
 

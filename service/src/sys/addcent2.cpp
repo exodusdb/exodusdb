@@ -4,7 +4,6 @@ libraryinit()
 #include <system_common.h>
 
 function main(in yymm) {
-	//c sys in,in,in,out
 
 	//only used in accounting to convert YYMM->YYYYMM
 

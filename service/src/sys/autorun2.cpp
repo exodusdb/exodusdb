@@ -15,7 +15,6 @@ var title;
 var usern;//num
 
 function main(in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, io docid, out msg) {
-	//c sys in,in,in,in,in,in,in,io,io,out
 
 	//creates an autorun record in documents
 	//GBP CREATEALERT mode WRITE

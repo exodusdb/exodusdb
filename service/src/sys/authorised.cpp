@@ -17,7 +17,6 @@ var newlock;
 var usern;
 
 function main(in task0, out msg, in defaultlock="", in username0="") {
-	//c sys in,out,"",""
 
 	//NB de bugging afer recompile requires restart since SECURITY is in PRELOAD
 	//call msg(task)

@@ -4,7 +4,6 @@ libraryinit()
 var xx;
 
 function main(in type, in in0, in mode, out output) {
-	//c sys in,in,in,out
 
 	//prevent c++ var not used
 	if (var(0) or type) {

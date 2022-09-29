@@ -65,7 +65,7 @@ endif()
 #dbdelete.cpp
 #dbcopy.cpp
 #dbcreate.cpp
-#listindexes.cpp
+#listindex.cpp
 #listfiles.cpp
 #dblist.cpp
 
@@ -95,7 +95,7 @@ add_executable(clearfile clearfile.cpp)
 add_executable(deletefile deletefile.cpp)
 add_executable(deleteindex deleteindex.cpp)
 add_executable(edir edir.cpp)
-add_executable(listindexes listindexes.cpp)
+add_executable(listindex listindex.cpp)
 add_executable(testsort testsort.cpp)
 add_executable(sync_dat sync_dat.cpp)
 add_executable(convsyntax convsyntax.cpp)
@@ -141,7 +141,7 @@ target_link_libraries(edir exodus stdc++fs ${LIBS})
 target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 target_link_libraries(listfiles exodus stdc++fs ${LIBS})
 target_link_libraries(listdict exodus stdc++fs ${LIBS})
-target_link_libraries(listindexes exodus stdc++fs ${LIBS})
+target_link_libraries(listindex exodus stdc++fs ${LIBS})
 target_link_libraries(testsort exodus stdc++fs ${LIBS})
 target_link_libraries(sync_dat exodus stdc++fs ${LIBS})
 target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
@@ -173,7 +173,7 @@ exodus-cli
 list
 listfiles
 listdict
-listindexes
+listindex
 testsort
 configexodus
 sync_dat

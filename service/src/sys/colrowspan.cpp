@@ -11,11 +11,9 @@ var colspan;//num
 var rowspan;//num
 
 function main(io colhdg, in thproperties, in nobase0) {
-	//c sys io,in,in
 
 	//called from nlist, adxtab
 
-	//global rowspan,colspan,t2
 
 	//given fm list of column heading and vm per row of column heading
 	//return the same but converted to tagged something like <th>xx</th>

@@ -6,7 +6,6 @@ libraryinit()
 #include <sys_common.h>
 
 function main(in alerttype0, in runasuser, out tasks, out title, out request, out datax) {
-	//c sys in,in,out,out,out,out
 
 	//1) list of all active users
 	//at 7am on the 14th of each month (ie regularly but not everyday)

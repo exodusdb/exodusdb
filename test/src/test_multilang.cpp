@@ -30,7 +30,9 @@ programinit()
 	//	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
 	var utf8_html = "utf8.html";
 	var buf;
-	buf.osread(utf8_html);	//default external and internal format is utf8
+	if (not buf.osread(utf8_html) )	//default external and internal format is utf8
+	 abort("test_multilang needs access to test data file utf8.html");
+
 	buf.oswrite("t_utf8copy.html");
 	cmd = "diff " ^ utf8_html ^ " t_utf8copy.html";
 	printl(cmd);

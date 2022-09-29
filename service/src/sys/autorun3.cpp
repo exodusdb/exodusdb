@@ -48,14 +48,11 @@ var requeststoptime;//num
 var printfile;
 
 function main(in docids0="", in options0="") {
-	//c sys "",""
 
 	//LISTEN calls this every minute
 	//print 'autorun'
 
-	//clearcommon();
 
-	//global agp,market,marketcode,useraddress,inpath,tt,forceemail,voccmd,tracing
 
 	if (docids0.unassigned()) {
 		docids = "";

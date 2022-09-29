@@ -10,7 +10,6 @@ var params2;
 var tagsep;
 
 function main(in mode, io dataio, in params0="", in params20="") {
-	//c sys in,io,"",""
 
 	//REPLACING UPPERCASE VERSION HTMLLIB()
 

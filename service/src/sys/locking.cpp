@@ -16,9 +16,7 @@ var lockfile;
 #define lockitemsep_ "*"
 
 function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
-	//c sys ,,,,io,in,out
 
-	//global lockfile,lockitem
 
 	if (locklist.unassigned()) {
 		locklist = "";

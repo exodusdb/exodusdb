@@ -4,7 +4,6 @@ libraryinit()
 var acode;
 
 function main(in a0, io bb, in sep) {
-	//c sys in,io,in
 
 	//BP  ADXTAB  sm
 	//BP  ANALSCH vm

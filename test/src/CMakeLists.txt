@@ -42,13 +42,13 @@ foreach(file ${files})
 	target_link_libraries(${file_without_ext} ${PROJECT_LIBS} exodus)
 
 	#setup a classic test i.e. requiring output of "Test passed"
-	add_test(${file_without_ext} ${file_without_ext})
+	add_test(NAME ${file_without_ext} COMMAND ${file_without_ext} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 	set_tests_properties(${file_without_ext}
 		PROPERTIES
 		PASS_REGULAR_EXPRESSION "Test passed")
 	set_tests_properties(${file_without_ext}
 		PROPERTIES
-		FAIL_REGULAR_EXPRESSION "(Exception|Test failed)")
+		FAIL_REGULAR_EXPRESSION "(Test failed)")
 	set_tests_properties(${file_without_ext}
 		PROPERTIES
 		TIMEOUT 120)

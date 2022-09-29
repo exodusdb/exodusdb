@@ -9,7 +9,6 @@ var filename;
 var nrecs;//num
 
 function main(in filenames0, out result) {
-	//c sys in,out
 
 	//$insert bp,agency.common
 

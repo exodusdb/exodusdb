@@ -15,7 +15,6 @@ var encoding;
 var errors;
 
 function main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
-	//c sys in,in,in,out,out
 
 	//currently only used by convcsv
 

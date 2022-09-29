@@ -23,7 +23,6 @@ var errormsg;
 var exceededmsg;
 
 function main(in msg0, in subject0="", in username0="") {
-	//c sys in,"",""
 
 	//logs a message and sends it to all the technical support emails (backup)
 

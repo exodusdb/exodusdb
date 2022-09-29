@@ -29,7 +29,6 @@ var wspos;
 var wsmsg;
 
 function main(in mode) {
-	//c sys
 
 	//$insert abp,common
 

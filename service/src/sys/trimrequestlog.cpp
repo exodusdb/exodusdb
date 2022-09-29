@@ -11,8 +11,6 @@ var reqdate;
 var tt;
 
 function main() {
-	//c sys
-	//global reqdate
 
 	var update = 1;
 

@@ -24,7 +24,6 @@ var menutx;
 var oldmenu;
 
 function main(in mode, io logtime, in menu) {
-	//c sys in,io,in
 
 	call log2("*init.general2 " ^ mode.f(1), logtime);
 

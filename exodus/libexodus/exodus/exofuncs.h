@@ -392,7 +392,7 @@ PUBLIC ND var reccount(CVR dbfilename_or_var);
 
 PUBLIC bool createindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY, CVR dictfilename DEFAULT_EMPTY);
 PUBLIC bool deleteindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY);
-PUBLIC ND var listindexes(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
+PUBLIC ND var listindex(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
 
 PUBLIC bool begintrans();
 PUBLIC bool statustrans();

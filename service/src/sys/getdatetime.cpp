@@ -4,13 +4,11 @@ libraryinit()
 var tt;//num
 
 function main(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime) {
-	//c sys out,out,out,out,out,out
 
 	//see CHANGETZ which seems to go through all times (dates?) and changes them
 	//this should be done ONCE to standardise on gmt/utc really
 	//really need a DBTZ to determine datetime for storage in the database
 
-	//global tt
 
 	//ensure time and date are taken in the same day
 	//by ensuring time is not less than time1

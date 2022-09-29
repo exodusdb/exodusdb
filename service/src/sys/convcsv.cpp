@@ -43,7 +43,6 @@ var result;
 var errors;
 
 function main(in sentence0, in select0="", in filters0="") {
-	//c sys in,"",""
 
 	//called from
 	//BP ANALTIME    call with filters
@@ -52,7 +51,6 @@ function main(in sentence0, in select0="", in filters0="") {
 	//BP MEDIADIARY2 ditto
 	//ABP JOURNALS   ditto
 
-	//global ptr
 
 	if (sentence0.unassigned()) {
 		sentencex = "";

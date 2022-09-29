@@ -7,7 +7,6 @@ var temp;
 
 function main() {
 	//
-	//c xxx
 
 	// a much simpler non-interactive version of GET
 

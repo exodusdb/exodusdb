@@ -211,9 +211,9 @@ class PUBLIC var final {
 	                             // Actually a unsigned int which will be 4 bytes
 
 
-	///////////////////////////
-	// SPECIAL MEMBER FUNCTIONS
-	///////////////////////////
+	/////////////////////////////////
+	// SPECIAL MEMBER FUNCTIONS (SMF)
+	/////////////////////////////////
 
  public:
 
@@ -254,9 +254,6 @@ class PUBLIC var final {
 #ifdef VAR_SAFE_DESTRUCTOR
 	~var() {
 		//std::cout << "dtor:" << var_str << std::endl;
-
-		// not a pimpl style pointer anymore for speed
-		// delete priv;
 
 		// try to ensure any memory is not later recognises as initialised memory
 		//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
@@ -344,28 +341,31 @@ class PUBLIC var final {
 
 	// var = temp var
 
-	// Prevent assigning to temporaries (is this required?)
+	// Prevent assigning to temporaries
+	// xyz.f(2) = "abc"; // Must not compile
 	void operator=(TVR rhs) && noexcept = delete;
 
-	// Cannot use default move assignment because
-	// a) it returns a value allowing accidental use of "=" in if statements instead of ==
-	// b) doesnt check if rhs is assigned (less important for temporaries which are rarely unassigned)
+	// Cannot use the default move assignment because
+	// a) It returns a value allowing accidental use of "=" in if statements instead of ==
+	// b) It doesnt check if rhs is assigned although this is
+	//    is less important for temporaries which are rarely unassigned.
 	//var& operator=(TVR rhs) & noexcept = default;
 	void operator=(TVR rhs) & {
 
-		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
+		// Skipped for speed
+		//assertDefined(__PRETTY_FUNCTION__);
 
-		// Removed for speed like move constructor since temporaries are unlikely to be unassigned
+		// Skipped for speed since temporaries are unlikely to be unassigned
 		//rhs.assertAssigned(__PRETTY_FUNCTION__);
 
 		//std::clog << "move assignment" <<std::endl;
 
 		// Prevent self assign
-		// Removed for speed since we assume std::string handles it ok
+		// Skipped for speed since we assume std::string handles it
 		//if (this == &rhs)
 		//	return;
 
-		// move everything over
+		// *move* everything over
 		var_str = std::move(rhs.var_str);
 		var_dbl = rhs.var_dbl;
 		var_int = rhs.var_int;
@@ -385,6 +385,7 @@ class PUBLIC var final {
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		bool
+
 		char
 		signed char
 		unsigned char
@@ -392,6 +393,7 @@ class PUBLIC var final {
 		char8_t (C++20)
 		char16_t (C++11)
 		char32_t (C++11)
+
 		short
 		unsigned short
 		int
@@ -458,16 +460,19 @@ class PUBLIC var final {
 		char*,
 	*/
 	var(S&& fromstr)
-	    :
+		:
 		var_str(std::forward<S>(fromstr)),
 		var_typ(VARTYP_STR) {
+
 		//std::cerr << "var(str)" << std::endl;
 	}
 
 	// memory block
 	///////////////
-	var(const char* charstart, const size_t nchars) :
+	var(const char* charstart, const size_t nchars)
+		:
 		var_typ(VARTYP_STR) {
+
 		if (charstart)
 			var_str = std::string_view(charstart, nchars);
 	}
@@ -479,6 +484,7 @@ class PUBLIC var final {
 		:
 		var_str(1, char1),
 		var_typ(VARTYP_STR) {
+
 			//std::cerr << "var(char)" << std::endl;
 	}
 
@@ -492,17 +498,16 @@ class PUBLIC var final {
 	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
-		// Accepts l and r values efficiently hopefully
 		std::u32string,
 		std::u32string_view,
 		u32char*,
 		u32char
 	*/
-	var(W&& fromstr)
-	    :
-		var_typ(VARTYP_STR) {
-		//std::cerr << "TEMPLATE " << __PRETTY_FUNCTION__ << std::endl;
-		this->from_u32string(fromstr);
+	var(W& from_wstr)
+		:
+		var_typ(VARTYP_STR)	{
+
+		this->from_u32string(from_wstr);
 	}
 
 	// const std::wstring&
@@ -512,10 +517,9 @@ class PUBLIC var final {
 	// wchar*
 	/////////
 	var(const wchar_t* wcstr1)
-		: var_typ(VARTYP_STR) {
-		if (wcstr1)
-			//var_str = std::move(std::wstring(wcstr1));
-			(*this) = var(std::wstring(wcstr1));
+		:
+		var_str(var(std::wstring(wcstr1)).var_str),
+		var_typ(VARTYP_STR){
 	}
 
 // Cant provide these and support L'x' since it they are ambiguous with char when creating var from ints
@@ -560,7 +564,9 @@ class PUBLIC var final {
 	// int, double, cstr etc.
 	/////////////////////////
 	var(std::initializer_list<T> list)
-		: var_typ(VARTYP_STR) {
+		:
+		var_typ(VARTYP_STR) {
+
 		for (auto item : list) {
 			(*this) ^= item;
 			var_str.push_back(FM_);
@@ -602,30 +608,24 @@ class PUBLIC var final {
 	const std::string& toString() const&;  //for non-temporaries.
 
 
-	///////////////////////////
-	// AUTOMATIC CONVERSIONS TO
-	///////////////////////////
+	//////////////////////////
+	// IMPLICIT CONVERSIONS TO
+	//////////////////////////
 
 	// someone recommends not to create more than one automatic converter
 	// to avoid the compiler error "ambiguous conversion"
+
 	// explicit keyword only works on conversion TO var not conversion FROM var
 
-	// commented to allow conversion to int
-	// if you uncomment this then also uncomment the definition in var.cpp
-	// unfortunately int takes precedence over bool somehow (unless both const/not const?)
-	// so if x is not numeric "if (x)" gives a non-numeric error.
-	// automatic conversion to int would be nice to avoid large numbers of specialised function
-	// calls I think like var::extract(int, int, int);
-
-	// automatic conversion to int
-	// necessary to allow conversion to int in many functions like extract(x,y,z)
-
-	// if you uncomment this then also uncomment the definition in var.cpp
-	// uncommented to allow simpler functions
-	// NB const probably determines priority of choice between automatic conversion
+	// NB const possibly determines priority of choice between automatic conversion
 	// and C++ uses bool and int conversion in certain cases to convert to int and bool
 	// therefore have chosen to make both bool and int "const" since they dont make
-	// and changes to the base object.
+	// any changes to the base object.
+
+	// integer <- var
+	/////////////////
+
+	// necessary to allow conversion to int in many functions like extract(x,y,z)
 
 	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = false>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
@@ -676,6 +676,7 @@ class PUBLIC var final {
 	}
 
 	// floating point <- var
+	////////////////////////
 
 	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
@@ -690,8 +691,9 @@ class PUBLIC var final {
 	}
 
 	// void* <- var
+	///////////////
 
-	// recommended to provide automatic conversion to VOID POINTER instead of direct to bool
+	// Recommended to provide automatic conversion to VOID POINTER instead of direct to bool
 	// since void* is auto converted to bool nicely for natural "if (xyz)" syntax
 	// and doesnt suffer the "ambiguous bool promotion to int" issue that automatic conversion
 	// to bool has why this is working here now is probably because of non-portable compiler
@@ -709,19 +711,8 @@ class PUBLIC var final {
 	}
 
 	// bool <- var
+	//////////////
 
-	// this stops using var as indexes of arrays on msvc since msvc converts bool and int
-	// ambiguous to index number g++ seems happy to make int higher and unambigous with bool but
-	// probably non-standard c++ msvc (at least) cant do without this since it seems unwilling
-	// to convert void* as a bool therefore we include it and restrict indexing on ints and not
-	// var eg for (int ii=0 .... instead of for (var ii=0 ... #ifndef _MSVC explicit new in
-	// c++11 still allows implicit conversion in places where bool is definitely required ie in
-	// if (xx) or aa && bb but we do not use is because allowing implicit conversion to bool in
-	// argument lists is convenient explicit
-	//explicit operator bool() const;
-	// supposed to be replaced with automatic void() and made explicit but just seems to force int
-	// conversion during "if (var)" necessary to allow var to be used standalone in "if (xxx)" but see
-	// mv.h for discussion of using void* instead of bool #ifndef _MSC_VER
 	operator bool() const {
 		return this->toBool();
 	}
@@ -752,6 +743,7 @@ class PUBLIC var final {
 	//explicit
 
 	// string-like <- var
+	/////////////////////
 
 //	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
 //	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
@@ -819,8 +811,9 @@ class PUBLIC var final {
 	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
 	// operator char() const;
 
-	// ROUND BRACKETS ()
-	////////////////////
+	/////////////////
+	// PARENTHESIS ()
+	/////////////////
 
 	// extract using () int int int (alternative to .f() and extract())
 	// instead of xyz=abc.extract(1,2,3);
@@ -860,10 +853,6 @@ class PUBLIC var final {
 	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
 	// non-const xxxx(fn,vn,sn) returns a proxy that can be aasigned to or implicitly converted to a var
 	//
-//	ND var_proxy1 operator()(int fieldno)                              & {return var_proxy1(this, fieldno);}
-//	ND var_proxy2 operator()(int fieldno, int valueno)                 & {return var_proxy2(this, fieldno, valueno);}
-//	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno) & {return var_proxy3(this, fieldno, valueno, subvalueno);}
-
 
 	/////////////
 	// ASSIGNMENT
@@ -871,9 +860,13 @@ class PUBLIC var final {
 
 	// The assignment operators return void to prevent accidental misuse where == was intended.
 
+	// var = Integral
+	/////////////////
+
 	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
 	/*
 		bool
+
 		char
 		signed char
 		unsigned char
@@ -881,6 +874,7 @@ class PUBLIC var final {
 		char8_t (C++20)
 		char16_t (C++11)
 		char32_t (C++11)
+
 		short
 		unsigned short
 		int
@@ -927,7 +921,9 @@ class PUBLIC var final {
 //		var_typ = VARTYP_INT;
 //	}
 
-	// var = floating point
+	// var = Floating Point
+	///////////////////////
+
 	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
 	/*
 		float,
@@ -941,6 +937,8 @@ class PUBLIC var final {
 	}
 
 	// var = char
+	/////////////
+
 	void operator=(const char char2) & {
 
 		//THISIS("VARREF operator= (const char char2) &")
@@ -953,12 +951,16 @@ class PUBLIC var final {
 		// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
 
 		var_str = char2;
-		var_typ = VARTYP_STR;  // reset to one unique type
+
+		// reset to one unique type
+		var_typ = VARTYP_STR;
 
 		return;
 	}
 
-	// char* assignment
+	// var = char*
+	//////////////
+
 	// The assignment operator should always return a reference to *this.
 	void operator=(const char* cstr) & {
 		//THISIS("VARREF operator= (const char* cstr2) &")
@@ -969,30 +971,36 @@ class PUBLIC var final {
 		//THISISDEFINED()
 
 		var_str = cstr;
-		var_typ = VARTYP_STR;  // reset to one unique type
+
+		// reset to one unique type
+		var_typ = VARTYP_STR;
 
 		return;
 	}
 
-	// std::string assignment from variable (lvalue)
+//	// var = std::string& - lvalue
+//	//////////////////////////////
+//
+//	void operator=(const std::string& string2) & {
+//
+//		//THISIS("VARREF operator= (const std::string& string2) &")
+//		// protect against unlikely syntax as follows:
+//		// var undefinedassign=undefinedassign=std::string("xxx"";
+//		// this causes crash due to bad memory access due to setting string that doesnt exist
+//		// slows down all string settings so consider NOT CHECKING in production code
+//		//THISISDEFINED()
+//		var_str = string2;
+//		var_typ = VARTYP_STR;  // reset to one unique type
+//
+//		return;
+//	}
+
+	// var = std::string&& - lvalue/rvalue perfect forwarding
+	/////////////////////////////////////////////////////////
+
 	// The assignment operator should always return a reference to *this.
-	void operator=(const std::string& string2) & {
-
-		//THISIS("VARREF operator= (const std::string& string2) &")
-		// protect against unlikely syntax as follows:
-		// var undefinedassign=undefinedassign=std::string("xxx"";
-		// this causes crash due to bad memory access due to setting string that doesnt exist
-		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()
-		var_str = string2;
-		var_typ = VARTYP_STR;  // reset to one unique type
-
-		return;
-	}
-
-	// std::string assignment from temporary (rvalue)
-	// The assignment operator should always return a reference to *this.
-	void operator=(const std::string&& string2) & {
+	// but we do not in order to prevent misuse when == intended
+	void operator=(std::string&& string2) & {
 
 		//THISIS("VARREF operator= (const std::string&& string2) &")
 		// protect against unlikely syntax as follows:
@@ -1001,8 +1009,10 @@ class PUBLIC var final {
 		// slows down all string settings so consider NOT CHECKING in production code
 		//THISISDEFINED()
 
-		var_str = std::move(string2);
-		var_typ = VARTYP_STR;  // reset to one unique type
+		var_str = std::forward<std::string>(string2);
+
+		// reset to one unique type
+		var_typ = VARTYP_STR;
 
 		return;
 	}
@@ -1017,15 +1027,15 @@ class PUBLIC var final {
 
 	// Extract a character from a constant var
 	// first=1 last=-1 etc.
-	ND var operator[](const int charno) const;
+	ND var operator[](const int pos1) const;
 
 	// Named member function identical to operator[]
-	ND var at(const int charno) const;
+	ND var at(const int pos1) const;
 
 	// as of now, sadly the following all works EXCEPT that var[99].anymethod() doesnt work
 	// so would have to implement all var methods and free functions on the proxy object
-	//ND var_brackets_proxy operator[](int charno);
-	//ND var operator[](int charno) &&;
+	//ND var_brackets_proxy operator[](int pos1);
+	//ND var operator[](int pos1) &&;
 
 
 	////////////////////////
@@ -1082,6 +1092,62 @@ class PUBLIC var final {
 	VARREF operator^=(const char) &;
 	VARREF operator^=(const char*) &;
 	VARREF operator^=(const std::string&) &;
+
+
+	///////////////////////////////////////
+	// SELF ASSIGN OPERATORS ON TEMPORARIES - all deleted to prevent unusual and unnecessary coding
+	///////////////////////////////////////
+
+	VARREF operator+=(CVR) && = delete;
+	VARREF operator*=(CVR) && = delete;
+	VARREF operator-=(CVR) && = delete;
+	VARREF operator/=(CVR) && = delete;
+	VARREF operator%=(CVR) && = delete;
+	VARREF operator^=(CVR) && = delete;
+
+	// Specialisations
+
+	// Add
+	VARREF operator+=(const int) && = delete;
+	VARREF operator+=(const double) && = delete;
+	VARREF operator+=(const char  char1) && = delete;
+	VARREF operator+=(const char* chars) && = delete;
+	VARREF operator+=(const bool) && = delete;
+
+	// Multiply
+	VARREF operator*=(const int) && = delete;
+	VARREF operator*=(const double) && = delete;
+	VARREF operator*=(const char  char1) && = delete;
+	VARREF operator*=(const char* chars) && = delete;
+	VARREF operator*=(const bool) && = delete;
+
+	// Subtract
+	VARREF operator-=(const int) && = delete;
+	VARREF operator-=(const double) && = delete;
+	VARREF operator-=(const char  char1) && = delete;
+	VARREF operator-=(const char* chars) && = delete;
+	VARREF operator-=(const bool) && = delete;
+
+	// Divide
+	VARREF operator/=(const int) && = delete;
+	VARREF operator/=(const double) && = delete;
+	VARREF operator/=(const char  char1) && = delete;
+	VARREF operator/=(const char* chars) && = delete;
+	VARREF operator/=(const bool) && = delete;
+
+	// Modulo
+	VARREF operator%=(const int) && = delete;
+	VARREF operator%=(const double dbl1) && = delete;
+	VARREF operator%=(const char  char1) && = delete;
+	VARREF operator%=(const char* chars) && = delete;
+	VARREF operator%=(const bool  bool1) && = delete;
+
+	// Concat
+	VARREF operator^=(const int) && = delete;
+	VARREF operator^=(const double) && = delete;
+	VARREF operator^=(const char) && = delete;
+	VARREF operator^=(const char*) && = delete;
+	VARREF operator^=(const std::string&) && = delete;
 
 
 	//////////////////////
@@ -1610,6 +1676,7 @@ class PUBLIC var final {
 	ND var paste(const int pos1, const int length, SV insertstr) const&; // byte pos1, length
 	ND var paste(const int pos1, SV insertstr) const&; // byte pos1
 	ND var prefix(SV insertstr) const&;
+	//ND var append(SV appendstr) const&;
 	ND var pop() const&;                      // byte removed
 
 	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
@@ -1659,6 +1726,7 @@ class PUBLIC var final {
 	ND VARREF paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
 	ND VARREF paste(const int pos1, SV insertstr) && {return paster(pos1, insertstr);}
 	ND VARREF prefix(SV insertstr) && {return prefixer(insertstr);}
+	//ND VARREF append(SV appendstr) && {return appender(appendstr);}
 	ND VARREF pop() && {return popper();}
 
 	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
@@ -1705,6 +1773,7 @@ class PUBLIC var final {
 	VARREF paster(const int pos1, const int length, SV insertstr);
 	VARREF paster(const int pos1, SV insertstr);
 	VARREF prefixer(SV insertstr);
+	//VARREF appender(SV appendstr);
 	VARREF popper();
 
 	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
@@ -1892,7 +1961,7 @@ class PUBLIC var final {
 
 	bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY) const;
 	bool deleteindex(CVR fieldname) const;
-	ND var listindexes(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
+	ND var listindex(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
 
 	// bool selftest() const;
 	ND var version() const;
@@ -2234,7 +2303,7 @@ class PUBLIC var_proxy1 {
 
  private:
 
-	var* var_;
+	var& var_;
 	mutable int fn_;
 
 	var_proxy1() = delete;
@@ -2242,21 +2311,26 @@ class PUBLIC var_proxy1 {
  public:
 
 	//constructor
-	var_proxy1(var* var1, int fn) : var_(var1), fn_(fn) {}
+	var_proxy1(var& var1, int fn) : var_(var1), fn_(fn) {}
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
-		return var_->f(fn_);
+		return var_.f(fn_);
 	}
 
-	//operator assign = old pick replace but with round instead of angle brackets
+	//operator assign = old pickos "replace()" but with round instead of angle brackets
 	void operator=(CVR replacement) {
-		var_->r(fn_, replacement);
+		var_.r(fn_, replacement);
 	}
 
 	//operator bool
 	explicit operator bool() const {
-		return var_->f(fn_);
+		return var_.f(fn_);
+	}
+
+	//operator []
+	ND var operator[](const int pos1) const {
+		return var_.f(fn_)[pos1];
 	}
 
 }; // class var_proxy1
@@ -2266,7 +2340,7 @@ class PUBLIC var_proxy2 {
 
  private:
 
-	var* var_;
+	var& var_;
 	mutable int fn_;
 	mutable int vn_;
 
@@ -2275,21 +2349,26 @@ class PUBLIC var_proxy2 {
  public:
 
 	//constructor
-	var_proxy2(var* var1, int fn, int vn) : var_(var1), fn_(fn), vn_(vn) {}
+	var_proxy2(var& var1, int fn, int vn) : var_(var1), fn_(fn), vn_(vn) {}
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
-		return var_->f(fn_, vn_);
+		return var_.f(fn_, vn_);
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
 	void operator=(CVR replacement) {
-		var_->r(fn_, vn_, replacement);
+		var_.r(fn_, vn_, replacement);
 	}
 
 	//operator bool
 	explicit operator bool() const {
-		return var_->f(fn_, vn_);
+		return var_.f(fn_, vn_);
+	}
+
+	//operator []
+	ND var operator[](const int pos1) const {
+		return var_.f(fn_, vn_)[pos1];
 	}
 
 }; // class var_proxy2
@@ -2299,7 +2378,7 @@ class PUBLIC var_proxy3 {
 
  private:
 
-	var* var_;
+	var& var_;
 	mutable int fn_;
 	mutable int vn_;
 	mutable int sn_;
@@ -2309,21 +2388,26 @@ class PUBLIC var_proxy3 {
  public:
 
 	//constructor
-	var_proxy3(var* var1, int fn, int vn = 0, int sn = 0) : var_(var1), fn_(fn), vn_(vn), sn_(sn) {}
+	var_proxy3(var& var1, int fn, int vn = 0, int sn = 0) : var_(var1), fn_(fn), vn_(vn), sn_(sn) {}
 
 	//implicit conversion to var if on the right hand side
 	operator var() const {
-		return var_->f(fn_, vn_, sn_);
+		return var_.f(fn_, vn_, sn_);
 	}
 
 	//operator assign = old pick replace but with round instead of angle brackets
 	void operator=(CVR replacement) {
-		var_->r(fn_, vn_, sn_, replacement);
+		var_.r(fn_, vn_, sn_, replacement);
 	}
 
 	//operator bool
 	explicit operator bool() const {
-		return var_->f(fn_, vn_, sn_);
+		return var_.f(fn_, vn_, sn_);
+	}
+
+	//operator []
+	ND var operator[](const int pos1) const {
+		return var_.f(fn_, vn_, sn_)[pos1];
 	}
 
 }; // class var_proxy3

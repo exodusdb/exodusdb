@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in type, in in0, in mode0, out output, in glang) {
-	//c sys in,in,in,out,in
 
 	//should really be sensitive to timezone in @SW
 

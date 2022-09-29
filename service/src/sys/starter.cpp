@@ -3,6 +3,8 @@ libraryinit()
 
 #include <videorw.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var startmode;
@@ -10,9 +12,7 @@ var temp;
 var reply;//num
 
 function main(in startmode0, out starttime, out startdate, out startbuffer) {
-	//c sys in,out,out,out
 
-	var interactive = not(SYSTEM.f(33));
 
 	if (startmode0.unassigned()) {
 		startmode = "";
@@ -33,7 +33,7 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 
 	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
 
-	if (not interactive) {
+	if (not interactive_) {
 		return 1;
 	}
 

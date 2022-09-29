@@ -11,7 +11,6 @@ var status;
 var processno;//num
 
 function main(in mode, in status0="") {
-	//c sys in,""
 
 	//called from
 	//1. LISTEN every 10 seconds or per potential request

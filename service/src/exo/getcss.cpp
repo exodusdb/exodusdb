@@ -3,7 +3,6 @@ libraryinit()
 
 
 function main(io css, in version="") {
-	//c xxx io,""
 
 	//NB quirk in ie mimiced by mozilla table dont inherit size
 	//but work around is TABLE {FONT-SIZE:100%} in css

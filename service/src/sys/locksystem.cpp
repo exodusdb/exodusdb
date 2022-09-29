@@ -23,8 +23,6 @@ var msg;
 var datasetcode;
 
 function main(in mode0, in dataset0) {
-	//c sys
-	//global all
 
 	interactive = false; //not(SYSTEM.f(33));
 	if (mode0.unassigned()) {

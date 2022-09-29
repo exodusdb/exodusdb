@@ -9,7 +9,6 @@ var processcomments;
 var timex;
 
 function main(io processid, in processcategory0, in sparevar="", in processparameters0="", in processresult0="", in processcomments0="") {
-	//c sys io,in,"","","",""
 
 	//obsolete since moved to processes from definitions
 

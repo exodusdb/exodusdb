@@ -11,7 +11,6 @@ libraryinit()
 var msg;
 
 function main() {
-	//c sys
 
 	if (not(authorised("REQUESTLOG ACCESS", msg))) {
 		call mssg(msg);

@@ -20,9 +20,7 @@ var exe;
 var errors;
 
 function main(in mode, in ipno, out text) {
-	//c sys in,in,out
 
-	//global allowedips,ip1,ip2
 
 	//prevent unused warning
 	if (mode) {
@@ -83,7 +81,6 @@ returnzero:
 		cmd = SYSTEM.f(50);
 
 		//check cygwin whois present otherwise quit
-		//WARNING TODO: check ternary op following;
 		exe = oscwd().contains(":") ? ".exe" : "";
 		if (VOLUMES and (not((cmd ^ "whois" ^ exe).osfile()))) {
 			text = "whois command is not installed";

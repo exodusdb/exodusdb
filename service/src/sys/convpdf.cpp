@@ -8,7 +8,6 @@ var printopts;
 var pdfcmd;
 
 function main(io osfilename, in printopts0, out errors) {
-	//c sys io,in,out
 
 	//osfilename in  ../data/xxxxxxxx.htm
 	//osfilename out ../data/xxxxxxxx.pdf (if successful)
@@ -60,7 +59,6 @@ function main(io osfilename, in printopts0, out errors) {
 	}
 
 	if (VOLUMES) {
-		//WARNING TODO: check ternary op following;
 		var exe = oscwd().contains(":") ? ".exe" : "";
 		pdfcmd = "html2pdf";
 		if (exe) {

@@ -92,11 +92,8 @@ var printtx_ii;//num
 var spaceoptionsize;
 
 function main(in filename, in rowfields0, in colfield, in datafield, io output, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
-	//c sys in,in,in,in,io,io,io,io,io,io,io,io
-	//global all
 
 	//for printtx
-	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
 	//if prefixes then it will not select records but read sequentially
 	//prefix*1 prefix*2 etc

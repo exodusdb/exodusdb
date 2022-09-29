@@ -34,9 +34,7 @@ var wspos;
 var wsmsg;
 
 function main(in mode0) {
-	//c sys
 
-	//global mode,text,ucline,rec,idate,date,line1,idates,errors,update,keywords,nkeywords,cmd,nlines
 
 	keywords = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";
 	mode = mode0;

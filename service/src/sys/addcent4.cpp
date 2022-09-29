@@ -6,8 +6,6 @@ libraryinit()
 var inx;//num
 
 function main(in type, in in0, in /*mode*/, out outx) {
-	//c sys in,in,in,out
-	//global inx
 
 	//CALLED
 	///////

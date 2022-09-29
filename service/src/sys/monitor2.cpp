@@ -116,9 +116,7 @@ var maxips;//num
 //var upgflagfile;
 
 function main() {
-	//c sys
 
-	//global all
 
 	//NB the PROCESSES file is central to all databases in one installation
 	//so this update of the monitor covers all the installations running processes

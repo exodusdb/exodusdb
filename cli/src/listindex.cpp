@@ -10,7 +10,7 @@ function main() {
 	//if (not filename)
 	//	abort("Syntax is 'listindex {filename} {fieldname}'");
 
-	printl(listindexes(filename, fieldname).convert(FM, "\n").replace(VM, "__"));
+	printl(listindex(filename, fieldname).convert(FM, "\n").replace(VM, "__"));
 
 	return 0;
 }

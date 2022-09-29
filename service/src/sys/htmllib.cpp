@@ -11,7 +11,6 @@ var filler;
 var tagsep;
 
 function main(in mode, io datax, in params0="", in params20="") {
-	//c sys in,io,"",""
 
 	//BEING REPLACED BY LOWERCASE VERSION HTMLLIB2()
 	//GBP all HTMLLIB2
@@ -19,7 +18,6 @@ function main(in mode, io datax, in params0="", in params20="") {
 	//ABP neither used
 
 	//jbase
-	//global datax
 
 	var td = "<td>";
 	var tdx = "</td>";

@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in letterheadopts, io tx) {
-	//c sys in,io
 
 	//html2pdf.exe messes up repeating headers on continuation pages
 	//so turn thead into additional tbody

@@ -3,14 +3,14 @@ libraryinit()
 
 #include <videorw.h>
 
+#include <system_common.h>
+
 #include <sys_common.h>
 
 var mode;
 
 function main(in mode0, in time, in date, io buffer, out msg) {
-	//c sys in,in,in,io,out
 
-	var interactive = not(SYSTEM.f(33));
 	if (msg.unassigned()) {
 		msg = "";
 	}
@@ -39,7 +39,7 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 			msgx ^= "||";
 		}
 		result = msgx ^ "Finished in " ^ text;
-		if (interactive) {
+		if (interactive_) {
 			call note(result ^ "|What next boss ?");
 		}
 	}

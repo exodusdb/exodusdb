@@ -6,7 +6,6 @@ libraryinit()
 #include <sys_common.h>
 
 function main(in d1, in d2, out result, io lang) {
-	//c sys in,in,out,io
 
 	//returns minimal text representation of date range
 	// if @sentence='DATERANGETEXT' then goto testit

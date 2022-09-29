@@ -13,7 +13,6 @@ var datax;
 var time2;//num
 
 function main(in msg0, io time0) {
-	//c sys in,io
 
 	var interactive = false; //not(SYSTEM.f(33));
 	if (interactive) {

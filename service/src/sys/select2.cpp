@@ -43,20 +43,12 @@ var xx;
 var row;
 
 function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, io response, in limitfields="", in limitchecks="", in limitvalues="", in maxnrecs0=0) {
-	//c sys ,,,,,io,io,"","","",0
 
 	//NB add %SELECTLIST% to sortselect to use active select list
 	//or provide an FM terminated list of keys
 
 	//given a sort/select statement
 	//returns a dynamic array or file of xml data
-
-	//unless sortselect is prefixed with %RAW% then
-	//!!!needs something like the following in the calling program
-	//since it calls LISTEN3 and filename.subs('POSTREAD') to get accurate data
-	//clearcommon
-
-	//global maxnrecs,useactivelist
 
     //use app specific version of listen3
     if (APPLICATION ne "EXODUS") {

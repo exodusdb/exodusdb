@@ -34,10 +34,8 @@ var wspos;
 var wsmsg;
 
 function main(in mode0) {
-	//c gen
 	//#include <sys_common.h>
 
-	//global tt,nusers,usern,mode
 
 	//nb general.subs can only be called from programs with win_common.h
 	//because msg etc are common variables and must be defined in caller

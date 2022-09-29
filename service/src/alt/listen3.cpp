@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(io filename, in mode, out filetitle, out triggers) {
-	//c gen io,in,out,out
 
 	//purpose:
 	//1. given a filename and mode (READ/READO/READU/WRITE/WRITEU/DELETE)

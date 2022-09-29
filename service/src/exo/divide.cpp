@@ -3,7 +3,6 @@ libraryinit()
 
 function main(in numerators, in denominator, in sep) {
 	//*reimplemented because /// not in c++/exodus
-	//c sys
 	//linemark
 	if (numerators == "" or denominator == 1) {
 		return numerators;

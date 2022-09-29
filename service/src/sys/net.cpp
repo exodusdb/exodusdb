@@ -16,7 +16,6 @@ var bakpars;
 var ver;
 
 function main() {
-	//c sys
 
 	//if @username='EXODUS' then break on
 	//BREAK ON;

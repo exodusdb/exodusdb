@@ -7,7 +7,6 @@ var period;//num
 var year;//num
 
 function main(in type, in input0, in mode, out output) {
-	//c sys in,in,in,out
 
 	var firstmonth = mode.field(",", 1);
 	var maxperiod = mode.field(",", 2);

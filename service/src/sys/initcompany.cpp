@@ -13,9 +13,7 @@ var ndec;//num
 var temp;
 
 function main(in nextcompanycode) {
-	//c sys
 
-	//global desc1,desc2
 
     //use app specific version of initcompany2
     if (APPLICATION ne "EXODUS") {

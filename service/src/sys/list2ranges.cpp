@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(io listitems) {
-	//c sys io
 
 	//convert vm list of numbers to list of numbers and ranges
 	//eg 1,2,3,6,8,9,10 -> 1-3,6,8-10 where commas represent vms

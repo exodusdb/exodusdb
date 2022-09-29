@@ -63,12 +63,9 @@ var printtx_ii;//num
 var spaceoptionsize;
 
 function main() {
-	//c sys
 
 	//for printtx
-	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	var interactive = not(SYSTEM.f(33));
 
 	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {
 		call mssg(msg);

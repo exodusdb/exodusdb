@@ -21,7 +21,6 @@ var vn;
 var taskn2;
 
 function main(in mode) {
-	//c sys
 	//jbase
 
 	if (mode eq "GETCHANGEDTASKS") {

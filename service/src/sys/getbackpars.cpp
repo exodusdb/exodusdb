@@ -46,7 +46,6 @@ var dbn;
 var xx;
 
 function main(out bakpars, in process0=var()) {
-	//c sys out,=var()
 
 	//optonally get the backpars for a specific process if given
 	if (process0.unassigned()) {

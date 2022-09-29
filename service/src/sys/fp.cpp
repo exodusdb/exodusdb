@@ -2,7 +2,6 @@
 libraryinit()
 
 function main(in type, in inx, in mode, out outx) {
-	//c sys in,in,in,out
 
 	var status = 0;
 	if (type eq "OCONV") {

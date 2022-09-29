@@ -65,13 +65,9 @@ var filetime;
 var offset_zero;
 
 function main(in request1, in request2in, in request3in, in request4in, in request5in, in request6in) {
-	//c sys in,in,in,in,in,in
 
 	//$insert abp,common
 	//$insert bp,agency.common
-	//global ii,passwordexpired,lastlogindate,maxnologindays,validips
-	//global filetime,fileattributes,initdir
-	//global runonce,runoncekey,lastpatchid,skipemail,skipreason,patchdatetime,versionkey,versiondatetime,rec,keyandrec,patchid,offset
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 

@@ -4,7 +4,6 @@ libraryinit()
 #include <nlist.h>
 
 function main() {
-	//c sys
 
 	//only to enable perform('LIST ...') in c++
 	//appears as a loadable library liblist.so

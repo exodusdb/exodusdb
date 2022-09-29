@@ -3,7 +3,6 @@ libraryinit()
 
 function main(in multipliers, in multiplicand, in sep) {
 	//*reimplemented because *** operator not in c++/exodus
-	//c sys
 	//linemark
 	if (multipliers == "" or multiplicand == 1) {
 		return multipliers;
