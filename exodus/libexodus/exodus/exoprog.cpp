@@ -24,7 +24,7 @@ ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
 	: mv(inmv)
 {
 	cached_dictid_ = "";
-	cached_dictexodusfunctorbase_ = nullptr;
+	cached_dictcallablebase_ = nullptr;
 }
 #pragma GCC diagnostic pop
 
@@ -32,7 +32,7 @@ ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
 ExodusProgramBase::~ExodusProgramBase(){}
 
 var ExodusProgramBase::libinfo(CVR command) {
-	return var(perform_exodusfunctorbase_.libfilename(command.toString())).osfile();
+	return var(perform_callablebase_.libfilename(command.toString())).osfile();
 }
 
 // select
@@ -1084,13 +1084,13 @@ var ExodusProgramBase::perform(CVR sentence) {
 	// return ID^"*"^dictid;
 
 	// wire up the the library linker to have the current exoenv
-	// if (!perform_exodusfunctorbase_.mv_)
-	//	perform_exodusfunctorbase_.mv_=this;
+	// if (!perform_callablebase_.mv_)
+	//	perform_callablebase_.mv_=this;
 
 	// lowercase all library functions to aid in conversion from pickos
 	// TODO remove after conversion complete
 
-	perform_exodusfunctorbase_.mv_ = (&mv);
+	perform_callablebase_.mv_ = (&mv);
 
 	// save some environment
 	var savesentence;
@@ -1160,7 +1160,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 		// load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();
 		std::string libname = libid.toString();
-		if (!perform_exodusfunctorbase_.initsmf(libname.c_str(),
+		if (!perform_callablebase_.initsmf(libname.c_str(),
 												"exodusprogrambasecreatedelete_",
 												true  // forcenew each perform/execute
 												)) {
@@ -1173,7 +1173,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 		// call the shared library exodus object's main function
 		try {
-			ANS = perform_exodusfunctorbase_.callsmf();
+			ANS = perform_callablebase_.callsmf();
 
 		// TODO reimplement this
 //		} catch (const VarUndefined&) {
@@ -1414,27 +1414,27 @@ baddict:
 				libname = DICT.f(1).lcase().convert(".", "_").toString();
 
 			// get from cache
-			std::string functorcachekey = dictid.lcase().toString() + "_" + libname;
-			cached_dictexodusfunctorbase_ = cached_dict_functions[functorcachekey];
-			// if (dict_exodusfunctorbase_) {
-			//	delete dict_exodusfunctorbase_;
-			//	dict_exodusfunctorbase_=nullptr;
+			std::string callablecachekey = dictid.lcase().toString() + "_" + libname;
+			cached_dictcallablebase_ = cached_dict_functions[callablecachekey];
+			// if (dict_callablebase_) {
+			//	delete dict_callablebase_;
+			//	dict_callablebase_=nullptr;
 			//}
 
 			// if not in cache then create new one and save it in the cache
-			if (!cached_dictexodusfunctorbase_) {
+			if (!cached_dictcallablebase_) {
 				// var(cachekey).outputl("cachekey=");
 
-				cached_dictexodusfunctorbase_ = new ExodusFunctorBase;
-				cached_dict_functions[functorcachekey] = cached_dictexodusfunctorbase_;
+				cached_dictcallablebase_ = new CallableBase;
+				cached_dict_functions[callablecachekey] = cached_dictcallablebase_;
 
 				// wire up the the library linker to have the current exoenv
-				// if (!dict_exodusfunctorbase_.mv_)
-				cached_dictexodusfunctorbase_->mv_ = (&mv);
+				// if (!dict_callablebase_.mv_)
+				cached_dictcallablebase_->mv_ = (&mv);
 
 				std::string str_funcname =
 					("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
-				if (!cached_dictexodusfunctorbase_->initsmf(libname.c_str(),
+				if (!cached_dictcallablebase_->initsmf(libname.c_str(),
 													  str_funcname.c_str()))
 					throw VarError("ExodusProgramBase::calculate() Cannot find Library " +
 								  libname + ", or function " +
@@ -1453,14 +1453,14 @@ baddict:
 		//	MV = 0;
 		//}
 
-		// return dict_exodusfunctorbase_.calldict();
+		// return dict_callablebase_.calldict();
 		// return ANS;
 
 		// call the shared library object main function with the right args (none for
 		// dicts), returning a var std::cout<<"precal"<<std::endl;
-		ANS = CALLMEMBERFUNCTION(*(cached_dictexodusfunctorbase_->pobject_),
+		ANS = CALLMEMBERFUNCTION(*(cached_dictcallablebase_->pobject_),
 								 ((pExodusProgramBaseMemberFunction)(
-									 cached_dictexodusfunctorbase_->pmemberfunction_)))();
+									 cached_dictcallablebase_->pmemberfunction_)))();
 		// std::cout<<"postcal"<<std::endl;
 
 		// restore the MV if necessary

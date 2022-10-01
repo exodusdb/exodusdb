@@ -9,7 +9,7 @@ the only difference between functions and subroutines is that functions return a
 subroutines do not. Both functions and subroutines can be called with any number of arguments
 including none.
 
-exodus implements mv external functions and subroutines as C++ functors in shared libraries loaded
+exodus implements mv external functions and subroutines as C++ callables in shared libraries loaded
 on demand/just in time.
 
 === example ===
@@ -20,68 +20,60 @@ we decide that "subr3" will be in a library (ie a single compilable file/record)
 
 ==== library lib1.cpp ====
 
-#include <exodus/exodus.h>
-subroutine subr3(in var1) {
-	printl("lib1/subr3 says "^var1);
+#include <exodus/library.h>
+libraryinit()
+function main(in var1) {
+	printl("lib1 says " ^ var1);
 }
+libraryexit()
 
 ==== lib1.h ====
 
 This header file is generated AUTOMATICALLY by the command "compile lib1"
 
-==== client call1.cpp ====
+==== program call1.cpp ====
 
 To use the function all we have to do is include the lib1.h file. The library
 binary is automatically loaded the first time that the function is called.
 
-#include <exodus/exodus.h>
-#include "lib1.h"
-exodusprogram(){
- subr3("xyz");
+#include <exodus/program.h>
+programinit()
+#include <lib1.h>
+function main (){
+ call lib1("xyz");
 }
+programexit()
 
 ==== sample session ====
 
 compile lib1
 compile call1
 call1
-lib1/sub3 says xyz
+lib1 says xyz
 
 === Exodus Library Concept ===
 
 exodus allows multiple functions and subroutines in a particular file using the following syntax
 
-eg in a file lib1.cpp
+This is currently only used to provide c++ dictionary functions at the moment
+but the machinery would be similar for multi-function libraries.
 
-#include <exodus/exodus.h>
-function func1(args...) {
+e.g. in a file dict1.cpp
+
+#include <exodus/dict.h>
+dictinit(aaa)
 ...
-}
-subroutine sub1(args...) {
+dictexit(aaa)
+
+dictinit(bbb)
 ...
-}
-
-To use and call the above functions in a program or another library you just need to include the
-header file which is automatically generated when you do "compile lib1"
-
-#include "lib1.h"
-
-Alternatively, to keep it simple and just like traditional multivalue keep each function
-and subroutine in a separate file with the same name as the function or subroutine.
-That way you can forget the new exodus concept of "library" which is not a traditional mv concept
-
+dictexit(bbb)
 */
 
-#ifndef EXOFUNCTOR_H
-#define EXOFUNCTOR_H
+#ifndef EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
+#define EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
 
 #include <exodus/var.h>
-
-// ExoEnv and ExodusProgramBase are forward declared classes (see below)
-// because they only exist as pointers or references in exofunctor.
-// and ExoEnv contains an actual ExodusFunctorBase
-//#include <exodus/exoenv.h>
-//#include <exodus/exoprog.h>
 
 // good programming practice to prevent many white hairs
 // http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
@@ -103,23 +95,23 @@ using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
 // programs
 using ExodusProgramBaseCreateDeleteFunction = auto (*)(pExodusProgramBase&, ExoEnv&, pExodusProgramBaseMemberFunction&) -> void;
 
-class PUBLIC ExodusFunctorBase {
+class PUBLIC CallableBase {
 
    public:
-	ExodusFunctorBase();
+	CallableBase();
 
 	// constructor to provide everything immediately
-	ExodusFunctorBase(const std::string libname, const std::string funcname, ExoEnv& mv);
+	CallableBase(const std::string libname, const std::string funcname, ExoEnv& mv);
 
 	// constructor to provide library and function names immediately
-	ExodusFunctorBase(const std::string libname, const std::string funcname);
+	CallableBase(const std::string libname, const std::string funcname);
 
 	// constructor to provide environment immediately
-	ExodusFunctorBase(ExoEnv& mv);
+	CallableBase(ExoEnv& mv);
 
 	// to allow function name to be assigned a name and this name is the name of the library
 	// called pickos call @
-	ExodusFunctorBase& operator=(const char*);
+	CallableBase& operator=(const char*);
 
 	// call shared member function
 	var callsmf();
@@ -129,13 +121,13 @@ class PUBLIC ExodusFunctorBase {
 
 	/*
 	//constructor to provide library and function names immediately
-	ExodusFunctorBase(const std::string libname,const std::string funcname);
+	CallableBase(const std::string libname,const std::string funcname);
 	*/
 
 	// destructors of base classes must be virtual (if derived classes are going to be
 	// new/deleted?) otherwise the destructor of the derived class is not called when it should
 	// be
-	virtual ~ExodusFunctorBase();
+	virtual ~CallableBase();
 
 	// use void* to speed compilation of exodus applications on windows by avoiding
 	// inclusion of windows.h here BUT SEE ...
@@ -200,7 +192,7 @@ class PUBLIC ExodusFunctorBase {
 
    public:
 	// holds the
-	// not used if functor is calling global functions in the shared object
+	// not used if callable is calling global functions in the shared object
 	pExodusProgramBase pobject_;
 	pExodusProgramBaseMemberFunction pmemberfunction_;
 
@@ -209,4 +201,4 @@ class PUBLIC ExodusFunctorBase {
 
 }  // namespace exodus
 
-#endif	// EXOFUNCTOR_H
+#endif // EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_

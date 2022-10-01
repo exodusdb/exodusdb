@@ -87,7 +87,7 @@ add_library(exodus SHARED
  varchrono.cpp
  varfuncs.cpp varioconv.cpp
  exoenv.cpp exofuncs.cpp exoos.cpp
- varwait.cpp varunicode.cpp varposix.cpp exofunctor.cpp #mvbrackets.cpp
+ varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp #mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
  murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
  varoshandle.cpp vardbconn.cpp mvprocessno.cpp
@@ -136,7 +136,7 @@ install(FILES
  exoenv.h
  exofuncs.h
  #mvimpl.h mvipc.h mvconfig.h mvlink.h
- exofunctor.h
+ exocallable.h
  program.h
  library.h
  dict.h

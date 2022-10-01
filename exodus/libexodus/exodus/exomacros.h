@@ -31,7 +31,7 @@ THE SOFTWARE.
 // You can program without exodus macros by including var.h directly
 
 #include <exodus/var.h>
-#include <exodus/exofunctor.h>
+#include <exodus/exocallable.h>
 
 // please include <exodus> AFTER <iostream> etc. For example:
 // #include <iostream>

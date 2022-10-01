@@ -30,7 +30,7 @@ THE SOFTWARE.
 // must be before exodus macros and functions otherwise lots of errors
 // from standard libararies which are included here
 #include <exodus/exoenv.h>
-#include <exodus/exofunctor.h>
+#include <exodus/exocallable.h>
 #include <exodus/exoprog.h>
 
 // always last to avoid conflicting definitions

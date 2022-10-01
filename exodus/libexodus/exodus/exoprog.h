@@ -9,7 +9,8 @@
 #include <map>
 
 #include <exodus/exoenv.h>
-//#include <exodus/exofunctor.h>
+//#include <exodus/exocallable.h>
+//#include "timeaccount.h"
 
 namespace exodus {
 
@@ -194,11 +195,11 @@ class PUBLIC ExodusProgramBase {
 	// used by calculate to call dict libraries
 	mutable std::string cached_dictid_;
 	mutable var cached_dictrec_;
-	mutable ExodusFunctorBase* cached_dictexodusfunctorbase_;
-	std::map<std::string, ExodusFunctorBase*> cached_dict_functions;
+	mutable CallableBase* cached_dictcallablebase_;
+	std::map<std::string, CallableBase*> cached_dict_functions;
 
 	// used by perform to call libraries WITH NO ARGUMENTS
-	mutable ExodusFunctorBase perform_exodusfunctorbase_;
+	mutable CallableBase perform_callablebase_;
 };
 
 // clang-format off

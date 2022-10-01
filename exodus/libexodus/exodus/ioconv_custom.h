@@ -3,14 +3,14 @@
 #define EXODUSDLFUNC_IOCONV_CUSTOM_H
 
 // a member variable/object to cache a pointer/object for the shared library function
-// ExodusFunctorBase Functor_ioconv_custom;
-class Functor_ioconv_custom : public ExodusFunctorBase {
+// CallableBase Callable_ioconv_custom;
+class Callable_ioconv_custom : public CallableBase {
    public:
-	Functor_ioconv_custom(ExoEnv& mv)
-		: ExodusFunctorBase("ioconv_custom", "exodusprogrambasecreatedelete_", mv) {
+	Callable_ioconv_custom(ExoEnv& mv)
+		: CallableBase("ioconv_custom", "exodusprogrambasecreatedelete_", mv) {
 	}
 
-	Functor_ioconv_custom& operator=(CVR newlibraryname) {
+	Callable_ioconv_custom& operator=(CVR newlibraryname) {
 		closelib();
 		libraryname_ = newlibraryname.toString();
 		return (*this);
@@ -23,8 +23,8 @@ class Functor_ioconv_custom : public ExodusFunctorBase {
 		// passing current standard variables in mv
 		// first time link to the shared lib and create/cache an object from it
 		// passing current standard variables in mv
-		// if (Functor_getlang.pmemberfunction_==nullptr)
-		// Functor_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+		// if (Callable_getlang.pmemberfunction_==nullptr)
+		// Callable_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
 		if (this->pmemberfunction_ == nullptr)
 			this->init();
 
@@ -35,8 +35,8 @@ class Functor_ioconv_custom : public ExodusFunctorBase {
 
 		// call the shared library object main function with the right args,
 		// returning a var or void
-		// return CALLMEMBERFUNCTION(*(Functor_ioconv_custom.pobject_),
-		//((pExodusProgramBaseMemberFunction) (Functor_ioconv_custom.pmemberfunction_)))
+		// return CALLMEMBERFUNCTION(*(Callable_ioconv_custom.pobject_),
+		//((pExodusProgramBaseMemberFunction) (Callable_ioconv_custom.pmemberfunction_)))
 		// (mode);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-function-type"
@@ -72,5 +72,5 @@ class Functor_ioconv_custom : public ExodusFunctorBase {
 		return operator()(type, input, mode, output_out);
 	}
 };
-Functor_ioconv_custom ioconv_custom{mv};
+Callable_ioconv_custom ioconv_custom{mv};
 //#endif

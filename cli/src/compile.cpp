@@ -24,12 +24,12 @@ programinit()
 //more complicated so for now use extern "C" and not .def files
 #define EXODUS_EXPORT_USING_DEF 0
 
-#define EXODUS_FUNCTOR_MAXNARGS 20
+#define EXODUS_CALLABLE_MAXNARGS 20
 
 	//#include <exodus/exodus.h>
 
-	//#include <exodus/xfunctorf0.h>
-	//ExodusFunctorF0<int> xyz;
+	//#include <exodus/xcallablef0.h>
+	//ExodusCallableF0<int> xyz;
 
 	var verbose;
 	var silent;
@@ -831,7 +831,7 @@ function main() {
 						//work out the function arguments without declaratives
 						//to be inserted in the calling brackets.
 						var funcargs = "";
-						//default to one template argument for functors with zero arguments
+						//default to one template argument for callables with zero arguments
 
 						var nodefaults = index(funcargsdecl, "=") eq 0;
 						var funcargsdecl2 = funcargsdecl;
@@ -1031,7 +1031,7 @@ function main() {
 	var inclusion=
 	"\r\n"
 	"\r\n//a member variable/object to cache a pointer/object for the shared library function"
-	"\r\nExodusFunctorBase Functor_funcx;"
+	"\r\nCallableBase Callable_funcx;"
 	"\r\n"
 	"\r\n//a member function with the right arguments, returning a var or void"
 	"\r\nVARORVOID funcx(in arg1=var(), out arg2=var(), out arg3=var())"
@@ -1039,8 +1039,8 @@ function main() {
 	"\r\n"
 	"\r\n //first time link to the shared lib and create/cache an object from it"
 	"\r\n //passing current standard variables in mv"
-	"\r\n if (Functor_funcx.pmemberfunction_==NULL)"
-	"\r\n  Functor_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
+	"\r\n if (Callable_funcx.pmemberfunction_==NULL)"
+	"\r\n  Callable_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
 	"\r\n"
 	"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
 	"\r\n //that can call the shared library object member function"
@@ -1049,21 +1049,21 @@ function main() {
 	"\r\n"
 	"\r\n //call the shared library object main function with the right args,"
 	"\r\n // returning a var or void"
-	"\r\n callorreturn CALLMEMBERFUNCTION(*(Functor_funcx.pobject_),"
-	"\r\n ((pExodusProgramBaseMemberFunction) (Functor_funcx.pmemberfunction_)))"
+	"\r\n callorreturn CALLMEMBERFUNCTION(*(Callable_funcx.pobject_),"
+	"\r\n ((pExodusProgramBaseMemberFunction) (Callable_funcx.pmemberfunction_)))"
 	"\r\n  (ARG1,ARG2,ARG3);"
 	"\r\n"
 	"\r\n}";
 	*/
 
 						//new method using member functions to call external functions with mv environment
-						//using a functor class that allows library name changing
+						//using a callable class that allows library name changing
 						//public inheritance only so we can directly access mv in mvprogram.cpp for oconv/iconv. should perhaps be private inheritance and mv set using .init(mv)
 						var inclusion =
 							"\r\n"
-							"\r\n// A 'functor' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
+							"\r\n// A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
 							"\r\n"
-							"\r\nclass Functor_funcx : private ExodusFunctorBase"
+							"\r\nclass Callable_funcx : private CallableBase"
 							"\r\n{"
 							"\r\npublic:"
 							"\r\n"
@@ -1071,10 +1071,10 @@ function main() {
 							"\r\n// 1. the name of the shared library to open,"
 							"\r\n// 2. the name of the function within the shared library that will create an exodus program object,"
 							"\r\n// 3. and the current program's mv environment to share with it."
-							"\r\nFunctor_funcx(ExoEnv& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+							"\r\nCallable_funcx(ExoEnv& mv) : CallableBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
 							"\r\n"
 							"\r\n// Allow assignment of library name to override the default constructed"
-							"\r\nFunctor_funcx& operator=(const var& newlibraryname) {"
+							"\r\nCallable_funcx& operator=(const var& newlibraryname) {"
 							"\r\n        closelib();"
 							"\r\n        libraryname_=newlibraryname.toString();"
 							"\r\n        return (*this);"
@@ -1107,9 +1107,9 @@ function main() {
 							"{additional_funcs}"
 							"\r\n};"
 							"\r\n"
-							"\r\n// A functor object of the above type that allows function call syntax to access"
+							"\r\n// A callable object of the above type that allows function call syntax to access"
 							"\r\n// an Exodus program/function initialized with the current mv environment."
-							"\r\nFunctor_funcx funcx{mv};";
+							"\r\nCallable_funcx funcx{mv};";
 						replacer(inclusion, "funcx", field2(libname, OSSLASH, -1));
 						//replacer(example,"exodusprogrambasecreatedelete_",funcname);
 						replacer(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
@@ -1129,21 +1129,21 @@ function main() {
 							replacer(inclusion, "\r\n {before_call}", "");
 							replacer(inclusion, "\r\n {after_call}", "");
 						}
-						var usepredefinedfunctor = nargs <= EXODUS_FUNCTOR_MAXNARGS;
+						var usepredefinedcallable = nargs <= EXODUS_CALLABLE_MAXNARGS;
 						if (useclassmemberfunctions) {
 							if (funcname eq "main")
 								headertext ^= inclusion;
 						}
 
-						else if (usepredefinedfunctor) {
+						else if (usepredefinedcallable) {
 							//example output for a subroutine with 1 argument of "in" (const var&)
 							//ending of s1 and S1 indicates subroutine of one argument
-							//#include "xmvfunctors1.h"
-							//ExodusFunctorS1<in> func2("func2","func2");
+							//#include "xmvcallables1.h"
+							//ExodusCallableS1<in> func2("func2","func2");
 
 							var functype = funcreturnvoid ? "s" : "f";
 
-							var funcdecl = "ExodusFunctor" ^ functype.ucase() ^ nargs ^ "<" ^ funcargstype ^ "> ";
+							var funcdecl = "ExodusCallable" ^ functype.ucase() ^ nargs ^ "<" ^ funcargstype ^ "> ";
 							funcdecl ^= funcname ^ "(" ^ libname.quote() ^ "," ^ funcname.quote() ^ ");";
 
 							//dont include more than once in the header file
@@ -1151,9 +1151,9 @@ function main() {
 							if (not headertext.contains(funcdecl)) {
 								headertext ^= crlf;
 								headertext ^= crlf;
-								var includefunctor = "#include <exodus/xfunctor" ^ functype ^ nargs ^ ".h>" ^ crlf;
-								if (not headertext.contains(includefunctor))
-									headertext ^= includefunctor;
+								var includecallable = "#include <exodus/xcallable" ^ functype ^ nargs ^ ".h>" ^ crlf;
+								if (not headertext.contains(includecallable))
+									headertext ^= includecallable;
 								headertext ^= funcdecl;
 							}
 
@@ -1166,9 +1166,9 @@ function main() {
 							headertext ^= "#define EXODUSFUNCRETURNVOID " ^ funcreturnvoid ^ crlf;
 							headertext ^= "#define EXODUSfuncargsdecl " ^ funcargsdecl ^ crlf;
 							headertext ^= "#define EXODUSfuncargs " ^ funcargs ^ crlf;
-							headertext ^= "#define EXODUSFUNCTORCLASSNAME ExodusFunctor_" ^ funcname ^ crlf;
+							headertext ^= "#define EXODUSCALLABLECLASSNAME ExodusCallable_" ^ funcname ^ crlf;
 							headertext ^= "#define EXODUSFUNCTYPE ExodusDynamic_" ^ funcname ^ crlf;
-							//headertext^="#define EXODUSCLASSNAME Exodus_Functor_Class_"^funcname^crlf;
+							//headertext^="#define EXODUSCLASSNAME Exodus_Callable_Class_"^funcname^crlf;
 							headertext ^= "#include <exodus/mvlink.h>" ^ crlf;
 							//undefs are automatic at the end of mvlink.h to allow multiple inclusion
 						}

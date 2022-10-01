@@ -16,6 +16,12 @@ set -euxo pipefail
 	fi
 
 :
+: Generate all headers first
+: ==========================
+:
+	compile alt exo sys {HS$COMPILER_OPTIONS}
+
+:
 : Install dat files
 : =================
 :
@@ -29,12 +35,6 @@ set -euxo pipefail
 : ===============================================================
 :
 	sync_dat {G$COMPILER_OPTIONS}
-
-:
-: Generate all headers first
-: ==========================
-:
-	compile alt exo sys {HS$COMPILER_OPTIONS}
 
 :
 : Compile EXODUS service
@@ -51,10 +51,11 @@ set -euxo pipefail
 	compile alt exo sys {OS${COMPILER_OPTIONS}}
 
 :
-: Flag sync_dat to review all
-: ===========================
+: Flag sync_dat to review all and sync_dat to exodus
+: ==================================================
 :
 	touch ~/dat
+	sync_dat
 
 :
 : Finished compiling EXODUS service in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.

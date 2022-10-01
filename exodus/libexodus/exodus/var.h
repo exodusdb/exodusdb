@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 #include <string>
 #include <string_view>
+//#include "timeaccount.h"
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes

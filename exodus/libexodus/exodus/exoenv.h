@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 #include <exodus/var.h>
 #include <exodus/dim.h>
-#include <exodus/exofunctor.h>
+#include <exodus/exocallable.h>
 
 namespace exodus {
 
