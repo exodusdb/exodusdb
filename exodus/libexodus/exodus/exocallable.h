@@ -97,52 +97,45 @@ using ExodusProgramBaseCreateDeleteFunction = auto (*)(pExodusProgramBase&, ExoE
 
 class PUBLIC CallableBase {
 
-   public:
+	//TODO remove this
+	friend ExodusProgramBase;
+
+ public:
+    // only public for rather hacked mvipc getResponseToRequest()
+    mutable ExoEnv* mv_;
+
+ public:
+
+	// Default
 	CallableBase();
 
-	// constructor to provide everything immediately
-	CallableBase(const std::string libname, const std::string funcname, ExoEnv& mv);
-
-	// constructor to provide library and function names immediately
-	CallableBase(const std::string libname, const std::string funcname);
-
-	// constructor to provide environment immediately
-	CallableBase(ExoEnv& mv);
-
-	// to allow function name to be assigned a name and this name is the name of the library
-	// called pickos call @
-	CallableBase& operator=(const char*);
-
-	// call shared member function
-	var callsmf();
-
-	// call shared global function
-	var callsgf();
-
-	/*
-	//constructor to provide library and function names immediately
-	CallableBase(const std::string libname,const std::string funcname);
-	*/
-
+	// Destructor
 	// destructors of base classes must be virtual (if derived classes are going to be
 	// new/deleted?) otherwise the destructor of the derived class is not called when it should
 	// be
 	virtual ~CallableBase();
 
-	// use void* to speed compilation of exodus applications on windows by avoiding
-	// inclusion of windows.h here BUT SEE ...
-	// Can I convert a pointer-to-function to a void*? NO!
-	// http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.11
-	// In the implementation cast to HINSTANCE and
-	// conversion between function pointer and void* is not legal c++ and only works
-	// on architectures that have data and functions in the same address space
-	// since void* is pointer to data space and function is pointer to function space
-	//(having said that ... posix dlsym returns a void* for the address of the function!)
-	// void* pfunction_;
+	// Copy constructor
+	CallableBase(const CallableBase&) = delete;
 
-   public:
+	// Constructor to provide everything immediately
+	CallableBase(const std::string libname, const std::string funcname, ExoEnv& mv);
+
+	// Constructor to provide library and function names immediately
+	CallableBase(const std::string libname, const std::string funcname);
+
+	// constructor to provide environment immediately
+	CallableBase(ExoEnv& mv);
+
+	// Assignment
+	// to allow function name to be assigned a name and this name is the name of the library
+	// called pickos call @
+	virtual void operator=(const char* libname);
+
+ protected:
 	// for call or die (smf)
 	bool init(const char* libraryname, const char* functionname, ExoEnv& mv);
+	//bool init(const char* libraryname, const char* functionname);
 
 	// assumes name and mv setup on initialisation then opens library on first call
 	bool init();
@@ -158,23 +151,33 @@ class PUBLIC CallableBase {
 	// TODO move to private
 	void closelib();
 
-   private:
+ private:
 	bool openlib(std::string libraryname);
 	bool openfunc(std::string functionname);
 	void closefunc();
 
-   protected:
+ //protected:
 	bool checkload(std::string libraryname, std::string functionname);
 
-   public:
+	// call shared member function
+	var callsmf();
+
+	// call shared global function
+	var callsgf();
+
+	/*
+	//constructor to provide library and function names immediately
+	CallableBase(const std::string libname,const std::string funcname);
+	*/
+
 	// only public for rather hacked mvipc getResponseToRequest()
-	mutable ExoEnv* mv_;
+	//mutable ExoEnv* mv_;
 
 	// TODO move to private
 	// records the library opened so we can close and reopen new libraries automatically
 	std::string libraryname_;
 
-   private:
+ private:
 	// normally something like
 	// exodusprogrambasecreatedelete_
 	// or exodusprogrambasecreatedelete_{dictid}
@@ -186,11 +189,11 @@ class PUBLIC CallableBase {
 	// pointer to the shared library file
 	void* plibrary_;
 
-   protected:
+ protected:
 	// functioname_ is used to open a dl shared function to this point
 	ExodusProgramBaseCreateDeleteFunction pfunction_;
 
-   public:
+// public:
 	// holds the
 	// not used if callable is calling global functions in the shared object
 	pExodusProgramBase pobject_;

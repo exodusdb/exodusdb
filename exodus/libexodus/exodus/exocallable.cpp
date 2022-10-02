@@ -278,12 +278,12 @@ bool CallableBase::initsgf(const char* newlibraryname, const char* newfunctionna
 
 // assign (case sensitive)
 // pickos xxx="functionname"; call @xxx
-CallableBase& CallableBase::operator=(const char* newlibraryname) {
+void CallableBase::operator=(const char* newlibraryname) {
 	if (newlibraryname != libraryname_) {
 		closelib();
 		libraryname_ = newlibraryname;
 	}
-	return (*this);
+	return;
 }
 
 bool CallableBase::checkload(std::string newlibraryname, std::string newfunctionname) {

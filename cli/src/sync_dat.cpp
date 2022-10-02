@@ -47,10 +47,15 @@ function main() {
 	var homedir;
 	if (not homedir.osgetenv("EXO_HOME"))
 		homedir = osgetenv("HOME");
+	var homedatpath = homedir ^ "/dat";
 
+	// Get list of dirs from here
+	// NOTE we will always process items in the homedatpath
+	// so that any merged items from exodus and apps will
+	// be correctly added and cpp files fully generated
 	var datpath = COMMAND.f(2);
 	if (not datpath) {
-		datpath = homedir ^ "/dat";
+		datpath = homedatpath;
 	}
 
 	var dirnames = COMMAND.field(FM, 3, 999999);
@@ -103,7 +108,10 @@ function main() {
 
 	for (var dirname : dirnames) {
 
-		var dirpath = datpath ^ "/" ^ dirname ^ "/";
+		var dbfilename = dirname;
+		var isdict = dbfilename.starts("dict.");
+
+		var dirpath = homedatpath ^ "/" ^ dirname ^ "/";
 
 // Dont skip old dirs, since we skip old files below , and it doesnt take much time to scan dirs
 //		// Skip dirs which are not newer i.e. have no newer records
@@ -118,7 +126,6 @@ function main() {
 
 		// Open or create the target db file
 		var dbfile;
-		var dbfilename = dirname;
 		if (not open(dbfilename, dbfile)) {
 			createfile(dbfilename);
 			if (not open(dbfilename, dbfile)) {
@@ -127,7 +134,6 @@ function main() {
 			}
 		}
 
-		var isdict = dbfilename.starts("dict.");
 		var newcpptext = "#include <exodus/library.h>\n";
 
 		// Process each dat file/record in the subdir
@@ -229,7 +235,7 @@ function main() {
 					if (exists and RECORD.len() eq 0) {
 						// Delete the RECORD
 						deleterecord(dbfile, ID);
-						printl(prefix, dbfilename, ID, "DELETED");
+						printl(prefix, dbfilename, ID, "Deleted");
 					} else {
 						if (verbose)
 							printl("Not changed", dbfilename, ID);
@@ -238,11 +244,11 @@ function main() {
 					if (RECORD.len() eq 0) {
 						// Delete the RECORD
 						deleterecord(dbfile, ID);
-						printl("sync_dat:", dbfilename, ID, "DELETED");
+						printl("sync_dat:", dbfilename, ID, "Deleted");
 					} else {
 						// Write the RECORD
 						write(RECORD on dbfile, ID);
-						printl("sync_dat:", dbfilename, ID, "WRITTEN");
+						printl("sync_dat:", dbfilename, ID, "Written");
 					}
 				}
 

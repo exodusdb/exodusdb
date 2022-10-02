@@ -1305,7 +1305,11 @@ var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, C
 	//if (dictid == "@ID" || dictid == "@id")
 	//	return ID;
 
-	// TODO how is it possible to swap when the variable is const?
+	// How is it possible to swap when the argument variable is const?
+	// Because libexodus provides a const swap that isnt const just for calculate()
+	// to be able to work rapidly swapping globals in and out of place TEMPORARILY.
+	// and all it to work with const arguments.
+	// TODO replace with const_cast?
 
 	DICT.swap(dictfile);
 	ID.swap(id);
