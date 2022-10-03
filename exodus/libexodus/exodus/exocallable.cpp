@@ -471,7 +471,7 @@ bool CallableBase::openfunc(std::string newfunctionname) {
 
 		// std::cerr<<functionname_<<" function cannot be found in
 		// "<<libraryfilename_<<std::endl;
-		throw VarError(var(newfunctionname).quote() ^ " function cannot be found in lib " ^
+		throw VarError(var(newfunctionname).replace("exodusprogrambasecreatedelete_", "").quote() ^ " function cannot be found in lib " ^
 					  var(libraryfilename_).quote());
 		return false;
 	}

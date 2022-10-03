@@ -86,6 +86,8 @@ function main() {
 	if (not fileinfo)
 		abort("Could not write local copy for editing " ^ temposfilename);
 
+	var isdict = filename.starts("dict.") or (filename eq "DOS" and ID.contains("dat/dict."));
+
 	var editcmd = editor ^ " " ^ temposfilename.quote();
 	while (true) {
 
@@ -126,33 +128,31 @@ function main() {
 			if (fieldno)
 				text2.lowerer();
 
-			// Validate dict recs
-
-			if (filename.starts("dict.")) {
+			// Validate dict F/S items
+			if (isdict) {
 				var dictrec = text2;
 
-				// Convert to FMs
+				// Convert to FMs to check dict item format
 				if (filename eq "DOS") {
-
 					trimmerlast(dictrec, "\r\n");
-
-					//convert to original format
 					dictrec = dictrec.iconv(txtfmt);
-
 				}
-				// Check F/S items
+
 				if (var("FS").contains(dictrec.f(1))) {
+
+					var options = "";
+					var reply = "";
 
 					// Check justification
 					if (not var("LRTC").contains(dictrec.f(9))) {
-						if (decide("Field 9 of F/S dict items cannot be " ^ dictrec.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.\nFix it?") ne "Yes")
+						if (decide("Field 9 of F/S dict items cannot be " ^ dictrec.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.\nFix it?", options, reply, 1) ne "Yes")
 							abort("");
 						continue;
 					}
 
 					// Check width
 					if (not dictrec.f(10).isnum()) {
-						if (decide("Field 10 of F/S items cannot be " ^ dictrec.f(10).quote() ^ "\nField 10 of F/S items must be numeric\nFix it?") ne "Yes")
+						if (decide("Field 10 of F/S items cannot be " ^ dictrec.f(10).quote() ^ "\nField 10 of F/S items must be numeric\nFix it?", options, reply, 1) ne "Yes")
 							abort("");
 						continue;
 					}
@@ -175,7 +175,7 @@ function main() {
 						printl(filename ^ " " ^ ID ^ " > db");
 
 						//generate/update database functions if saved a symbolic dictionary record
-						if (filename.starts("dict.") and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
+						if (isdict and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
 																												"*pgsql")) {
 							var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
 							osshell(oscmd);

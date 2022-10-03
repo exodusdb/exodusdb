@@ -1033,7 +1033,7 @@ var var::iconv_HEX(const int ioratio) const {
 	if (!endposn)
 		return "";
 
-	std::string textstr = "";
+	std::string textstr;
 
 	size_t posn = 0;
 

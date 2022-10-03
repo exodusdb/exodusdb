@@ -144,10 +144,15 @@ install(FILES
  exoprog.h
  ioconv_custom.h
  printtx.hpp
+ timebank.h
 DESTINATION include/exodus)
 
-install(
-    CODE "
+install (FILES
+ timeaccs.txt
+DESTINATION share/exodus)
+
+install(CODE
+"
         execute_process(
             COMMAND 
                 ldconfig

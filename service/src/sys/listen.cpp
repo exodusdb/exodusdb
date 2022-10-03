@@ -747,7 +747,8 @@ function loop_exit() {
 
 	//esc or "q" on linux
 	tt = INTCONST.f(1, 1);
-	if (charx.lcase().contains(tt)) {
+	charx.lcaser();
+	if (charx.contains(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.replacer(chr(27), "Esc");
 		call mssg("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
@@ -758,6 +759,7 @@ function loop_exit() {
 		// repeat
 		echo(0);
 		reply.inputn(1);
+		reply.lcaser();
 		echo(1);
 		call mssg("", "DB", buffer, "");
 		if (reply eq INTCONST.f(1)) {

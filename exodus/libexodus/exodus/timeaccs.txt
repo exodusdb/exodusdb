@@ -1,0 +1,23 @@
+242 connect
+244 open
+245 open cache_miss
+246 reado
+247 reado cache_miss
+248 read
+250 sqlexec
+252 begintrans
+254 rollbacktrans
+256 committrans
+258 statustrans
+260 createfile
+262 get_dictexpression
+264 select
+266 readnextx not used
+226 deletelist
+228 savelist
+230 getlist
+232 formlist
+234 makelist
+236 hasnext
+238 readnext
+240 cursorexists
