@@ -2431,7 +2431,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 	else if (dicttype == "S") {
 		var function_src = dictrec.f(8).trim();
-		var pgsql_pos = function_src.index("\n/" "*pgsql");
+		var pgsql_pos = function_src.index(_VM "/" "*pgsql");
 		var x = (!ismv1 || stage2_calculated);
 		var y = function_src.trimfirst("\t /").lcase().starts("@ans=xlate(");
 		var is_ans_xlate = (!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(");
