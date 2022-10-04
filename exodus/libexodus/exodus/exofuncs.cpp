@@ -783,22 +783,23 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	}
 	mv.COMMAND.cutter(1);
 
-	// options are in either (XXX) or {XXX} at the end of the command.
-	// similar code in exodus_main() and exoprog.cpp:perform()
+	// OPTIONS are in either (XXX) or {XXX} at the end of the command.
+	// and do not contain spaces
+
+	// *** SIMILAR code in
+	// exofuncs.cpp exodus_main()
+	// exoprog.cpp  perform()
 	var lastchar = mv.COMMAND[-1];
-	// if (lastchar==")")
-	//	mv.OPTIONS=mv.COMMAND.field2("(",-1);
-	// else if (lastchar=="}")
-	//	mv.OPTIONS=mv.COMMAND.field2("{",-1);
-	// if (mv.OPTIONS)
-	//	mv.COMMAND.paster(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, "");
-	// var lastchar=mv.COMMAND[-1];
 	if (lastchar == ")") {
 		mv.OPTIONS = "(" ^ mv.COMMAND.field2("(", -1);
 	} else if (lastchar == "}")
 		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
-	if (mv.OPTIONS)
-		mv.COMMAND.cutter(-mv.OPTIONS.len());
+	if (mv.OPTIONS) {
+		if (mv.OPTIONS.contains(_FM))
+			mv.OPTIONS = "";
+		else
+			mv.COMMAND.cutter(-mv.OPTIONS.len());
+	}
 	mv.COMMAND.trimmerlast(_FM);
 
 	var temp;

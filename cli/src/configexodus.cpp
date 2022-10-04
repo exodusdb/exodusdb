@@ -62,7 +62,7 @@ function main() {
 	var serverconfig;
 	var adminconfig = input_adminconfig(origconfig, serverconfig);
 	if (not adminconfig)
-		stop("Stopping. Cannot continue without a working connection.");
+		abort("Stopping. Cannot continue without a working connection.");
 
 	var connecttimeout = "10";
 	getorigparam(origconfig, "connect_timeout", connecttimeout);
@@ -251,7 +251,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 
 	//^" user="^dbusername^" password="^dbuserpass;
 	if (not connect(connstr2))
-		stop("Stopping. Cannot connect to new database");
+		abort("Stopping. Cannot connect to new database");
 	printl("done!");
 
 	if (OSSLASH eq "\\") {
@@ -295,7 +295,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 			printl("Cannot locate PostgreSQL lib directory to install plugin");
 			pglibdir = input("PostgreSQL lib dir?");
 			if (not pglibdir)
-				stop();
+				abort("");
 		}
 
 		//delete any existing pgexodus.dll. restart service if cannot initially delete
@@ -343,7 +343,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 	print(oconv("Connecting to template1 database ... ", "L#40"));
 	var connstr3 = adminconfig ^ " dbname=template1";
 	if (not connect(connstr3))
-		stop("Stopping. Cannot connect to template1 database");
+		abort("Stopping. Cannot connect to template1 database");
 	printl("done!");
 
 	print(oconv("Add pgexodus postgres plugin ... ", "L#40"));

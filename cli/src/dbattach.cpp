@@ -89,7 +89,7 @@ function main() {
 		result.converter(VM, " ");
 
 		printl(result);
-		stop();
+		return 0;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -112,14 +112,14 @@ function main() {
 		if (OPTIONS.contains("RRR")) {
 			if (not conn1.sqlexec("DROP EXTENSION IF EXISTS postgres_fdw CASCADE"))
 				abort(conn1.lasterror());
-			stop();
+			return 0;
 		}
 		// Install extension required to establish interdb connections
 		if (not conn1.sqlexec("CREATE EXTENSION IF NOT EXISTS postgres_fdw WITH SCHEMA public"))
 			abort(conn1.lasterror());
 
 		if (not dbname2)
-			stop();
+			return 0;
 
 		// Reset the interdb connection to the target db. Remove all connected tables.
 		if (not conn1.sqlexec("DROP SERVER IF EXISTS " ^ dbname2 ^ " CASCADE"))
@@ -127,7 +127,7 @@ function main() {
 
 		// Create an interdb connection to the target server
 		if (OPTIONS.contains("RR"))
-			exit(0);
+			return 0;
 
 		if (not conn1.sqlexec("CREATE SERVER IF NOT EXISTS " ^ dbname2 ^ " FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname '" ^ dbname2 ^ "', port '5432')"))
 			abort(conn1.lasterror());
@@ -141,7 +141,7 @@ function main() {
 			abort(conn1.lasterror());
 
 		if (OPTIONS.contains("R"))
-			exit(0);
+			return 0;
 
 		// Configure user/connection parameters. Target dbuser and dbpass.
 		if (not conn1.sqlexec("CREATE USER MAPPING FOR " ^ dbuser1 ^ " SERVER " ^ dbname2 ^ " OPTIONS (user '" ^ dbuser2 ^ "', password '" ^dbpass2 ^ "')"))

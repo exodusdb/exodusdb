@@ -43,7 +43,7 @@ function main() {
 	//check the file exists
 	var file;
 	if (not open(filename, file))
-		stop("Cannot open file " ^ filename);
+		abort("Cannot open file " ^ filename);
 
 	//get the record from the database (or filesystem if "filename" is "DOS")
 	if (not read(RECORD, file, ID)) {

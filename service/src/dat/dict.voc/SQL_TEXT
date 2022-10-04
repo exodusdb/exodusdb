@@ -1,0 +1,11 @@
+S
+
+SQL_TEXT
+
+
+
+
+	return RECORD.f(8).field("/" "*pgsql", 2).field("*" "/", 1);
+T
+80
+

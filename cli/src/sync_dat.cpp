@@ -41,7 +41,7 @@ function main() {
 			"\n"
 			"    sync_dat '' voc dict.voc # Just the voc and dict.voc files\n"
 		);
-		stop();
+		return 0;
 	}
 
 	var homedir;

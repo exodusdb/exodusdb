@@ -177,7 +177,7 @@ function main() {
 
 		osshell((command ? command : shell));
 	} else
-		stop("Cannot find SHELL or ComSpec in environment");
+		abort("Cannot find SHELL or ComSpec in environment");
 
 	return 0;
 }

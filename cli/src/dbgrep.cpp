@@ -51,7 +51,7 @@ function main() {
 		while (file.readnext(RECORD, ID, MV)) {
 
 			if (esctoexit())
-				stop();
+				abort("");
 
 //			// get record or skip
 //			var RECORD;

@@ -29,7 +29,7 @@ function main() {
 		dictfilenames.replacer(FM, "\n");
 		print(dictfilenames);
 
-		stop();
+		return 0;
 
 	}
 

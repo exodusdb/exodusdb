@@ -15,7 +15,7 @@ function main() {
 
 	if (not(db1.connect())) {
 		call fsmsg();
-		stop(1);
+		abort(1);
 	}
 
 	if (not silent)
@@ -23,7 +23,7 @@ function main() {
 
 	if (not(db2.connect())) {
 		call fsmsg();
-		stop(1);
+		abort(1);
 	}
 
 	int nerrors = 0;
@@ -46,7 +46,7 @@ function main() {
 		var file1;
 		if (not file1.open(filename, db1)) {
 			call fsmsg();
-			stop(1);
+			abort(1);
 		}
 
 		var reccount = file1.reccount();
@@ -54,7 +54,7 @@ function main() {
 		var file2;
 		if (not file2.open(filename, db2)) {
 			call fsmsg();
-			stop(1);
+			abort(1);
 		}
 
 		//var keys;
@@ -68,7 +68,7 @@ function main() {
 		while (file1.readnext(RECORD, ID, MV)) {
 
 			if (esctoexit())
-				stop(1);
+				abort(1);
 
 			recn++;
 			if (not silent) {

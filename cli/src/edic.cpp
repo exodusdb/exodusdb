@@ -266,7 +266,7 @@ function main() {
 				else if (progtype eq 5)
 					progtype = "dict";
 				else
-					stop();
+					abort("");
 				break;
 			}
 
@@ -326,7 +326,7 @@ function main() {
 				blankfile.replacer("\n", "\r\n");
 
 			if (not oswrite(blankfile, filename))
-				stop("Cannot create " ^ filename ^ ". Invalid file name, or no rights here.");
+				abort("Cannot create " ^ filename ^ ". Invalid file name, or no rights here.");
 			//      startatlineno="4,9";
 			//startatlineno="";
 		}

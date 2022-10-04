@@ -74,11 +74,11 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		////////////
 	}
 
-	//stage 2
-	/////////
+	//stage 2 "2stage"
+	//////////////////
 
-	CURSOR.convert(FM^VM^SM,"^]}").outputl("2 Stage Select:");
-	sortselectclause.outputl();
+	CURSOR.convert(RM^FM^VM^SM,VISIBLE_FMS).logputl("2 Stage Select:");
+	sortselectclause.logputl();
 
 	//secondary sort/select on fields that could not be calculated by the database
 
@@ -95,7 +95,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//	return true;
 
 	//debug
-	//calc_fields.convert(FM^VM^SM,"   ").outputl("calc=");
+	//calc_fields.convert(FM^VM^SM,"   ").logputl("calc=");
 
 	var dictfilename = calc_fields.f(5, 1);
 
@@ -191,7 +191,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 			ovalue.cutter(1).popper();
 			ovalue.replacer("', '", VM);
 			ovalue.trimmerboth().unquoter();
-			//ovalue.convert(VM,"]").outputl("ovalue=");
+			//ovalue.convert(VM,"]").logputl("ovalue=");
 		}
 
 		var ovalue2 = calc_fields.f(4, fieldn).unquote();
@@ -244,14 +244,14 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		//dictid.outputt();
 		//op.outputt();
 		//ovalue.outputt();
-		//var("").outputl();
+		//var("").logputl();
 
 		//debug
 		if (calc_fields_file && dictid != "AUTHORISED") {
 			var key = dictfilename ^ "*" ^ dictid;
 			var rec = sortselectclause ^ FM ^ op ^ FM ^ ovalue ^ FM ^ ovalue2;
 			rec.write(calc_fields_file, key);
-			key.outputl("written to calc_fields ");
+			key.logput("written to calc_fields ");
 		}
 	}
 
@@ -261,7 +261,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		baseinsertsql ^= " VALUES (";
 
 		createtablesql.popper() ^= ")";
-		//createtablesql.outputl();
+		//createtablesql.logputl();
 
 		//clear the table in case we are reusing it
 		createtablesql ^= ";DELETE FROM " ^ temptablename ^ ";\n";
@@ -287,10 +287,13 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
 			var ivalues = calculate(dictids(fieldn));
-
+//			TRACE(ivalues)
+//			TRACE(opnos.join())
+//			TRACE(fieldn)
+//			TRACE(opnos(fieldn))
 			if (opnos(fieldn)) {
 				//debug
-				//ivalues.outputl(dictids(fieldn) ^ " ivalues=");
+				//ivalues.logputl(dictids(fieldn) ^ " ivalues=");
 
 				var nextsep;
 				var pos = 1;
@@ -299,6 +302,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 				while (true) {
 
 					var ivalue = ivalues.substr2(pos,nextsep);
+//					TRACE(ivalue)
 
 					switch (int(opnos(fieldn))) {
 						case 0://cannot occur - due to if statement above
@@ -355,6 +359,8 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 							break;
 						case 15:  // is true (not "" 0 "0" "00" "0.0" etc).
 							ok = ivalue;
+							//ok = !!ivalue;
+//							TRACE(!!ivalue)
 							break;
 						case 16:  // is false (isnt true)
 							ok = !ivalue;
@@ -372,6 +378,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 					}//switch
 
 					//quit searching data values if found or no more
+//					TRACE(ok)
 					if (ok || !nextsep)
 						break;
 
@@ -380,7 +387,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 				//if a field fails test then skip and remaining fields and readnext candidate record
 				if (!ok) {
 					//debug
-					//ivalue.outputl("FAILED=");
+					//ivalue.logputl("FAILED=");
 					allok = false;
 					break;// out of fields loop. assuming that all filters are AND. fail one = skip record
 				}
@@ -394,7 +401,8 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 					ovalues = oconv(ivalues,ioconvs(fieldn)).squoter();
 				}
 				else
-					ovalues = "nullptr";
+					//ovalues = "nullptr";
+					ovalues = "null";
 			}
 			else {
 				//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
@@ -407,18 +415,18 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//skip if failed to match
 		if (!allok) {
-			//ID.outputl("failed ");
+//			ID.logputl("stage 1/2 failed ");
 			continue;
 		}
 
-		//ID.outputl("stage1 ok ");
+//		ID.logputl("stage 1/2 ok ");
 
 		// Replace final comma with a closing bracket and additional SQL
 		// Ignore any duplicates due to multivalues
 		// TODO insert stage2 records with MV as par of the key?
 		insertsql.popper() ^= ") ON CONFLICT (key) DO NOTHING";
 
-		//insertsql.outputl();
+		//insertsql.logputl();
 
 		if (not CURSOR.sqlexec(insertsql)) {
 			//tolerate failure to write in case multiple records returned (due to mv selection?)
@@ -543,7 +551,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 		for (int wordn = 2; wordn <= nwords; ++wordn) {
 			var key = command.field(" ", wordn).unquote();
 			if (filename.deleterecord(key)) {
-				silent || key.quote().outputl("Deleted ");
+				silent || key.quote().logputl("Deleted ");
 			} else {
 				silent || key.quote().errputl("NOT deleted ");
 			}
@@ -554,7 +562,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 		var key;
 		while (CURSOR.readnext(key)) {
 			if (filename.deleterecord(key)) {
-				silent || key.quote().outputl("Deleted ");
+				silent || key.quote().logputl("Deleted ");
 			} else {
 				silent || key.quote().errputl("NOT deleted ");
 			}
@@ -567,7 +575,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 // pushselect
 bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_unused]] VARREF v3, [[maybe_unused]] VARREF v4) {
 
-	// CURSOR.quote().outputl("CURSOR=");
+	// CURSOR.quote().logputl("CURSOR=");
 	// CURSOR++;
 	// CURSOR has connection number hidden in it, so it cannot be used as an ordinary variable
 	// ATM
@@ -578,7 +586,7 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_u
 
 // popselect
 bool ExodusProgramBase::popselect([[maybe_unused]] CVR v1, VARREF v2, [[maybe_unused]] VARREF v3, [[maybe_unused]] VARREF v4) {
-	// CURSOR.quote().outputl("CURSOR=");
+	// CURSOR.quote().logputl("CURSOR=");
 	// CURSOR--;
 	v2.move(CURSOR);
 	return true;
@@ -1147,14 +1155,23 @@ var ExodusProgramBase::perform(CVR sentence) {
 		// set new perform environment
 		COMMAND = SENTENCE;
 		OPTIONS = "";
-		// similar code in exodus_main() and exoprog.cpp:perform()
+		// OPTIONS are in either (XXX) or {XXX} at the end of the command.
+		// and do not contain spaces
+
+		// *** SIMILAR code in
+		// exofuncs.cpp exodus_main()
+		// exoprog.cpp  perform()
 		var lastchar = COMMAND[-1];
 		if (lastchar == ")") {
 			OPTIONS = "(" ^ COMMAND.field2("(", -1);
 		} else if (lastchar == "}")
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
-		if (OPTIONS)
-			COMMAND.cutter(-OPTIONS.len());
+		if (OPTIONS) {
+			if (OPTIONS.contains(" "))
+				OPTIONS = "";
+			else
+				COMMAND.cutter(-OPTIONS.len());
+		}
 		COMMAND.trimmerlast(_FM);
 
 		// load the shared library file
@@ -1427,7 +1444,7 @@ baddict:
 
 			// if not in cache then create new one and save it in the cache
 			if (!cached_dictcallablebase_) {
-				// var(cachekey).outputl("cachekey=");
+				// var(cachekey).logputl("cachekey=");
 
 				cached_dictcallablebase_ = new CallableBase;
 				cached_dict_functions[callablecachekey] = cached_dictcallablebase_;
@@ -1625,8 +1642,8 @@ bool ExodusProgramBase::esctoexit() const {
 	var key;
 	key.input();
 
-	//key.outputl("key=");
-	//key.oconv("HEX").outputl("key=");
+	//key.logputl("key=");
+	//key.oconv("HEX").logputl("key=");
 
 	return key.at(-1).ucase() == "N";
 }
@@ -2128,19 +2145,19 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 			// extract any params
 			var mode = subconversion.b(functionname.len() + 2);
 
-			var output;
+			var outx;
 
 			//custom function "[NUMBER]" actually has a built in function
 			if (functionname == "number") {
-				gosub exoprog_number("OCONV", result, mode, output);
+				gosub exoprog_number("OCONV", result, mode, outx);
 			}
 			//custom function "[DATE]" will use the standard exodus var oconv
 			else if (functionname == "date") {
-				gosub exoprog_date("OCONV", result, mode, output);
+				gosub exoprog_date("OCONV", result, mode, outx);
 			}
 			//custom function "[CAPITALISE]" will use the standard exodus var oconv
 			else if (functionname == "capitalise") {
-				output = capitalise(result, mode, "");
+				outx = capitalise(result, mode, "");
 			} else {
 
 				// set the function name
@@ -2155,22 +2172,22 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 				//call it once per field (any field mark RM-ST are preserved)
 				var posn = 1;
 				var ifield, ofield, delim;
-				output = "";
+				outx = "";
 				while (true) {
 
 					ifield = result.substr2(posn, delim);
 
 					call ioconv_custom("OCONV", ifield, mode, ofield);
 
-					output ^= ofield;
+					outx ^= ofield;
 
 					if (not delim)
 						break;
 
-					output ^= var().chr(RM.seq() + 1 - delim);
+					outx ^= var().chr(RM.seq() + 1 - delim);
 				}
 			}
-			result = output;
+			result = outx;
 		}
 	} while (delimiter);
 
@@ -2206,21 +2223,21 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 			// extract any params
 			var mode = subconversion.field(",", 2, 9999).field("]", 1);
 
-			var output;
+			var outx;
 
 			//custom function "[NUMBER]" actually has a built in function
             if (functionname == "number") {
-                gosub exoprog_number("ICONV", result, mode, output);
+                gosub exoprog_number("ICONV", result, mode, outx);
 			}
 			//custom function "[DATE]" actually has a built in function
             else if (functionname == "date") {
-                gosub exoprog_date("ICONV", result, mode, output);
+                gosub exoprog_date("ICONV", result, mode, outx);
 			}
 			//custom function "[CAPITALISE]" actually has a built in function
             else if (functionname == "capitalise") {
-                //gosub capitalise(result, mode, output);
+                //gosub capitalise(result, mode, outx);
 				//result = result;
-				output = result;
+				outx = result;
             } else {
 
 				// set the function name
@@ -2230,10 +2247,10 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 				ioconv_custom.mv_ = (&mv);
 
 				// and call it
-				call ioconv_custom("ICONV", result, mode, output);
+				call ioconv_custom("ICONV", result, mode, outx);
 			}
 
-			result = output;
+			result = outx;
 		}
 	} while (delimiter);
 
@@ -2354,11 +2371,11 @@ zero:
 }
 
 // number
-	//function main(in type, in input0, in ndecs0, out output) {
+	//function main(in type, in input0, in ndecs0, out outx) {
 	//c xxx in,in,in,out
 
-var ExodusProgramBase::exoprog_date(CVR type, CVR in0, CVR mode0, VARREF output) {
-//var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
+var ExodusProgramBase::exoprog_date(CVR type, CVR in0, CVR mode0, VARREF outx) {
+//var ExodusProgramBase::number(CVR type, CVR input0, CVR ndecs0, VARREF outx) {
 	//c sys in,in,in,out,in
 
 	//should really be sensitive to timezone in @SW
@@ -2367,7 +2384,7 @@ var ExodusProgramBase::exoprog_date(CVR type, CVR in0, CVR mode0, VARREF output)
 	var mode = mode0;
 
 	if (inx eq "") {
-		output = "";
+		outx = "";
 		return 0;
 	}
 
@@ -2413,37 +2430,37 @@ ok:
 //				var day = tt.field("/", 1);
 //				var year = tt.field("/", 3);
 //				//if 1 then
-//				output = day ^ " " ^ mth ^ " " ^ year;
+//				outx = day ^ " " ^ mth ^ " " ^ year;
 //				//end else
-//				// output=mth:' ':day:' ':year
+//				// outx=mth:' ':day:' ':year
 //				// end
-				output = inx.oconv("D");
+				outx = inx.oconv("D");
 
 			} else {
 
-				output = oconv(inx, mode);
+				outx = oconv(inx, mode);
 
-				if (output.starts("0")) {
-					output.paster(1, 1, " ");
+				if (outx.starts("0")) {
+					outx.paster(1, 1, " ");
 				}
 
-				if (output[4] eq "0") {
-					output.paster(4, 1, " ");
+				if (outx[4] eq "0") {
+					outx.paster(4, 1, " ");
 				}
 
-				if (output.b(4, 3).match("^[A-Za-z]{3}$")) {
-					output.paster(7, 1, "");
-					output.paster(3, 1, "");
+				if (outx.b(4, 3).match("^[A-Za-z]{3}$")) {
+					outx.paster(7, 1, "");
+					outx.paster(3, 1, "");
 				}
 
 				if (nospaces) {
-					output.converter(" ", "");
+					outx.converter(" ", "");
 				}
 
 			}
 
 		} else {
-			output = inx;
+			outx = inx;
 		}
 
 	} else if (type eq "ICONV") {
@@ -2452,7 +2469,7 @@ ok:
 			inx ^= var().date().oconv("D").b(4, 9);
 		}
 
-		output = iconv(inx, mode);
+		outx = iconv(inx, mode);
 
 	}
 
@@ -2460,8 +2477,8 @@ ok:
 }
 
 // number
-var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF output) {
-	//function main(in type, in input0, in ndecs0, out output) {
+var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF outx) {
+	//function main(in type, in input0, in ndecs0, out outx) {
 	//c xxx in,in,in,out
 
 	var fmtx;
@@ -2471,7 +2488,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 
 	var ndecs = ndecs0;
 	var input = input0;
-	output = "";
+	outx = "";
 
 	var zz = "";
 	if (ndecs.contains("Z")) {
@@ -2491,13 +2508,13 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 			}
 		}
 
-		output = input.trim();
+		outx = input.trim();
 
 		//first get into a pickos number with dots not commas
 		if (BASEFMT.starts("MC")) {
-			output.converter(",", ".");
+			outx.converter(",", ".");
 		} else {
-			output.converter(",", "");
+			outx.converter(",", "");
 		}
 		//nb [NUMBER,X] means no decimal place conversion to be done
 		//if ndecs is given then convert to that number of decimals
@@ -2514,10 +2531,10 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 			if (not(ndecs.match("^\\d$"))) {
 			}
 			//FMTX='MD':NDECS:'0P'
-			//OUTPUT=OUTPUT FMTX
+			//outx=outx FMTX
 		}
 		if (ndecs == "*" or ndecs == "X") {
-			ndecs = output.field(".", 2).len();
+			ndecs = outx.field(".", 2).len();
 		}
 		if (ndecs == "BASE") {
 			//fmtx = "MD" ^ BASEFMT[3] ^ "0P";
@@ -2525,11 +2542,11 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 		} else {
 			fmtx = "MD" ^ ndecs ^ "0P";
 		}
-		output = oconv(output, fmtx);
+		outx = oconv(outx, fmtx);
 		STATUS = "";
-		if (output.isnum()) {
-			if (reciprocal and output) {
-				output = ((1 / output).oconv("MD90P")) + 0;
+		if (outx.isnum()) {
+			if (reciprocal and outx) {
+				outx = ((1 / outx).oconv("MD90P")) + 0;
 			}
 		} else {
 			STATUS = 2;
@@ -2605,14 +2622,14 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 				}
 			}
 
-			output ^= plus ^ output1 ^ perc;
+			outx ^= plus ^ output1 ^ perc;
 		}
 
 		///BREAK;
 		if (not delim)
 			break;
-		//output:=char(256-delim)
-		output ^= var().chr(RM.seq() + 1 - delim);
+		//outx:=char(256-delim)
+		outx ^= var().chr(RM.seq() + 1 - delim);
 	}  //loop;
 
 	return 0;
@@ -2688,7 +2705,7 @@ var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 
 	var force = force0.unassigned() ? var(0) : force0;
 
-	var output = "";
+	var outx = "";
 	var nfs = input.fcount(FM);
 	//for force to work, the first field must have full number of vns
 	var maxnvs = 0;
@@ -2706,13 +2723,13 @@ var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 			for (var vn = 1; vn <= maxnvs; ++vn) {
 				var cell = fieldx.field(VM, vn);
 				if (cell.len() or force) {
-					output.r(vn, fn, cell);
+					outx.r(vn, fn, cell);
 				}
 			};	//vn;
 		}
 	};	//fn;
 
-	return output;
+	return outx;
 }
 
 // amountunit 1

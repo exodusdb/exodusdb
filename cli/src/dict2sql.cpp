@@ -447,7 +447,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	if (not dictrec.read(dictfile, dictid)) {
 		dictid.ucaser();
 		if (!dictrec.read(dictfile, dictid))
-			stop(quote(dictid) ^ " cannot be read in " ^ quote(dictfilename));
+			abort(quote(dictid) ^ " cannot be read in " ^ quote(dictfilename));
 	}
 	var sourcecode = dictrec.f(8);
 	var ismv = dictrec.f(4)[1] == "M";

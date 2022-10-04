@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -euxo pipefail
 
 : ====================================================================
 : Stop a background test service and run it in the foreground with gdb

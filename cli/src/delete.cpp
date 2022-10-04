@@ -20,8 +20,10 @@ function main() {
 
 		if (itemid == "*") {
 			clearfile(file);
-			printl("All records deleted");
-			stop();
+			//printl("All records deleted");
+			//stop();
+			ndeleted = "ALL";
+			break;
 		}
 
 		if (deleterecord(file, itemid))

@@ -312,16 +312,28 @@ function main() {
 		// then escape any single quotes and wrap in single quotes
 		for (var word : COMMAND) {
 
-			var word2 = word.convert(R"( `~!@#$%^&*(){}[]:;'"|<>?\)" to "");
-			if (word2.len() < word.len()) {
-
-				// Single quotes inside single quotes can be represented as '"'"' for bash
-				// The leading and trailng aingle quotes in '"'"' terminate and resume the single quoted string
-				// so 'abc'"'"'def' is actually abc'def
-				word.replacer("'", R"('"'"')");
-
+			if (word[1] eq DQ and word[-1] eq DQ) {
 				word.squoter();
 			}
+			else if (word[1] eq SQ and word[-1] eq SQ) {
+				word.quoter();
+			}
+			else {
+				var word2 = word.convert(R"( `~!@#$%^&*(){}[]:;'"|<>?\)" to "");
+				if (word2.len() < word.len()) {
+
+					// Single quotes inside single quotes can be represented as '"'"' for bash
+					// The leading and trailng aingle quotes in '"'"' terminate and resume the single quoted string
+					// so 'abc'"'"'def' is actually abc'def
+					word.replacer("'", R"('"'"')");
+
+					word.squoter();
+				}
+			}
+
+			// Escape any ( )
+			if (var("()").index(word))
+				word = BS ^ word;
 
 			oscmd ^= " " ^ word;
 		}
@@ -454,7 +466,8 @@ function main() {
 	if (VOLUMES) {
 		if (SYSTEM.f(2) eq "") {
 			perform("GET NEW " ^ SENTENCE);
-			stop();
+			//stop();
+			return 0;
 		}
 		html = 1;
 
@@ -530,7 +543,7 @@ function main() {
 		createfile("dict.voc");
 		if (not(dictvoc.open("dict.voc", ""))) {
 			call fsmsg();
-			stop();
+			abort("");
 		}
 	}
 
@@ -619,7 +632,7 @@ filename:
 		gosub getword();
 		if (not word) {
 			call mssg("FILE NAME IS REQUIRED");
-			stop();
+			abort("");
 		}
 
 		//limit number of records
@@ -734,12 +747,12 @@ nextkey:
 			limits(1, nlimits) = word;
 			if (not(dictrec.reado(DICT, word))) {
 				call mssg(word ^ " is not a valid dictionary item");
-				stop();
+				abort("");
 			}
 			tt = dictrec.f(4).field(".", 1);
 			if (tt[1] ne "M") {
 				call mssg(word ^ " limit must be a multivalued dict item");
-				stop();
+				abort("");
 			}
 			limits(4, nlimits) = tt;
 		}
@@ -838,7 +851,7 @@ nextkey:
 		dictfilename = word;
 		if (not(DICT.open("dict." ^ dictfilename))) {
 			call fsmsg();
-			stop();
+			abort("");
 		}
 
 	} else if (word eq "HEADINGTABLE") {
@@ -900,7 +913,7 @@ nextkey:
 			if (not(tt.reado(DICT, tt))) {
 				if (not(tt.reado(dictvoc, tt))) {
 					call mssg(tt ^ " is not a valid dictionary item");
-					stop();
+					abort("");
 				}
 			}
 			if (title eq "") {
@@ -950,7 +963,7 @@ nextkey:
 	} else if (word eq "JL" or word eq "JUSTLEN") {
 		if (not coln) {
 			call mssg("JUSTLEN/JL must follow a column name");
-			stop();
+			abort("");
 		}
 		//skip if detsupp2 and column is being skipped
 		if (not(coldict(coln).unassigned())) {
@@ -964,7 +977,7 @@ nextkey:
 	} else if (word eq "CH" or word eq "COLHEAD") {
 		if (not coln) {
 			call mssg("COLHEAD/CH must follow a column name");
-			stop();
+			abort("");
 		}
 		gosub getquotedword();
 		//skip if detsupp2 and column is being skipped
@@ -976,7 +989,7 @@ nextkey:
 	} else if (word eq "OC" or word eq "OCONV") {
 		if (not coln) {
 			call mssg("OCONV/OC must follow a column name");
-			stop();
+			abort("");
 		}
 		gosub getquotedword();
 		//skip if detsupp2 and column is being skipped
@@ -1166,7 +1179,7 @@ dictrecexit:;
 		var oldword = word;
 		call mssg(tt, "RCE", word, "");
 		if (word eq oldword or word eq "\x1B") {
-			stop();
+			abort("");
 		}
 		gosub getwordexit();
 		goto phraseinit;
@@ -1280,7 +1293,7 @@ x1exit:
 
 	if (not(srcfile.open(filename, ""))) {
 		call fsmsg();
-		stop();
+		abort("");
 	}
 
 	breakcount.redim(nbreaks + 1);
@@ -1576,7 +1589,7 @@ nextdict:
 		if (not LISTACTIVE) {
 			//the words "No record" is hardcoded in autorun and maybe elsewhere
 			call mssg("No records found");
-			stop();
+			abort("");
 		}
 
 		if (not LISTACTIVE) {
@@ -1634,18 +1647,18 @@ nextrec:
 //		if (STATUS) {
 //			tx = "*** Fatal Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
 //			gosub printtx();
-//			stop();
+//			abort("");
 //		}
 //		if (FILEERROR.f(1) eq 421) {
 //			tx = "Operation aborted by user.";
 //			gosub printtx();
-//			stop();
+//			abort("");
 //		}
 //		if (FILEERROR and FILEERROR.f(1) ne 111) {
 //			tx = "*** Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
 //			gosub printtx();
 //			readerr += 1;
-//			stop();
+//			abort("");
 //		}
 		goto x2exit;
 	}
@@ -2055,7 +2068,7 @@ x2bexit:
 
 	printfile.osclose();
 
-	stop();
+	//stop();
 
 	return "";
 }

@@ -360,8 +360,9 @@ updateversion:
 
 	//install any dat files in the current database
 	//also load any new or amended pgsql functions found in dict files in dat
-	call log2("*install any new db dat data", logtime);
-	osshell("sync_dat");
+	call log2("*install any new db dat data if thread 0 or 1", logtime);
+	if (THREADNO le 1)
+		osshell("sync_dat");
 
 	call log2("*copy any new data records", logtime);
 	var bp;
@@ -1297,16 +1298,30 @@ nextreport:
 		}
 	} //ii;
 
-	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
+	call log2("*perform any autoexec task BEFORE initialising other systems", logtime);
 	if (not exodusid) {
 		var temp;
 		if (temp.read(DEFINITIONS, "AUTOEXEC")) {
+			call log2("*found definitions AUTOEXEC - " ^ temp, logtime);
 			perform("TASK AUTOEXEC");
 		}
 	}
 
-	// Attach foreign files BEFORE any database operations
-	var foreignfiles = osshellread("dbattach {L}").converter("\n ", FM ^ VM).trim(FM);
+	call log2("Attach foreign files BEFORE any database operations", logtime);
+	// Why is this necessary since foreign tables are mapped inside the database anyway
+	//
+	//var foreignfiles = osshellread("dbattach {L}").converter("\n ", FM ^ VM).trim(FM);
+	// Copy "attach" code from dbattach cli command ... UNTESTED
+	// TODO provide some support from libexodus to do all or part of this
+	var sql = "select foreign_server_name, foreign_table_name from information_schema.foreign_tables;";
+	var foreignfiles = "";
+	if (not var().sqlexec(sql, foreignfiles))
+	    errput(lasterror());
+	else {
+		// change RM to FM etc. and remove column headings
+		foreignfiles.lowerer();
+		foreignfiles.remover(1);
+	}
 	var attach = "";
 	var foreign_dbno;
 	//group filenames by foreign dbname
@@ -1319,7 +1334,7 @@ nextreport:
 			attach.inserter(1, foreign_dbno, foreign_dbname);
 		attach.inserter(2, foreign_dbno, -1, filename);
 	}
-	//attach filenames per foreign dbname
+	call log2("attach filenames per foreign dbname", logtime);
 	var foreign_dbnames = attach.f(1).convert(VM, FM);
 	foreign_dbno = 0;
 	for (var foreign_dbname : foreign_dbnames) {

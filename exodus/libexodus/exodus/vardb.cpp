@@ -711,7 +711,7 @@ var build_conn_info(CVR conninfo) {
 // connection.connect2("dbname=exodusbase");
 bool var::connect(CVR conninfo) {
 
-	TimeAcc t(242);//connect
+	Timer t(242);//connect
 
 	THISIS("bool var::connect(CVR conninfo")
 	// nb dont log/trace or otherwise output the full connection info without HIDING the
@@ -986,7 +986,7 @@ void var::disconnectall() {
 // connection is optional and default connection may be used instead
 bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
-	TimeAcc t(244);//open
+	Timer t(244);//open
 
 	THISIS("bool var::open(CVR filename, CVR connection)")
 	assertDefined(function_sig);
@@ -1037,7 +1037,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 	}
 
-	TimeAcc t2(245);//open cache_miss
+	Timer t2(245);//open cache_miss
 	//if (DBTRACE) {
 	//	connection2.logputl("DBTR var::open-1 ");
 	//}
@@ -1147,7 +1147,7 @@ bool var::readv(CVR filehandle, CVR key, const int fieldno) {
 
 bool var::reado(CVR filehandle, CVR key) {
 
-	TimeAcc t(246);//reado
+	Timer t(246);//reado
 
 	THISIS("bool var::reado(CVR filehandle,CVR key)")
 	assertDefined(function_sig);
@@ -1178,7 +1178,7 @@ bool var::reado(CVR filehandle, CVR key) {
 
 	}
 
-	TimeAcc t2(247);//reado cache_miss
+	Timer t2(247);//reado cache_miss
 
 	// ordinary read
 	bool result = this->read(filehandle, key);
@@ -1229,7 +1229,7 @@ bool var::deleteo(CVR key) const {
 
 bool var::read(CVR filehandle, CVR key) {
 
-	TimeAcc t(248);//read
+	Timer t(248);//read
 
 	THISIS("bool var::read(CVR filehandle,CVR key)")
 	assertDefined(function_sig);
@@ -1452,7 +1452,7 @@ var var::lock(CVR key) const {
 
 	// Debugging
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1518,7 +1518,7 @@ bool var::unlock(CVR key) const {
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", var(hash64) ^ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1587,7 +1587,7 @@ bool var::sqlexec(CVR sql) const {
 // returns success or failure, and response = data or errmsg (response can be preset to max number of tuples)
 bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 
-	TimeAcc t(250);//sqlexec
+	Timer t(250);//sqlexec
 
 	THISIS("bool var::sqlexec(CVR sqlcmd, VARREF response) const")
 	ISSTRING(sqlcmd)
@@ -1673,7 +1673,7 @@ bool var::writev(CVR filehandle, CVR key, const int fieldno) const {
 		record = "";
 
 	// replace the field
-	record.r(fieldno, var_str);
+	record(fieldno) = var_str;
 
 	// write it back
 	record.write(filehandle, key);
@@ -1958,7 +1958,7 @@ void var::cleardbcache() const {
 
 bool var::begintrans() const {
 
-	TimeAcc t(252);//begintrans
+	Timer t(252);//begintrans
 
 	THISIS("bool var::begintrans() const")
 	assertDefined(function_sig);
@@ -1984,7 +1984,7 @@ bool var::begintrans() const {
 
 bool var::rollbacktrans() const {
 
-	TimeAcc t(254);//rollbacktrans
+	Timer t(254);//rollbacktrans
 
 	THISIS("bool var::rollbacktrans() const")
 	assertDefined(function_sig);
@@ -2009,7 +2009,7 @@ bool var::rollbacktrans() const {
 
 bool var::committrans() const {
 
-	TimeAcc t(256);//committrane
+	Timer t(256);//committrane
 
 	THISIS("bool var::committrans() const")
 	assertDefined(function_sig);
@@ -2035,7 +2035,7 @@ bool var::committrans() const {
 
 bool var::statustrans() const {
 
-	TimeAcc t(258);//statustrans
+	Timer t(258);//statustrans
 
 	THISIS("bool var::statustrans() const")
 	assertDefined(function_sig);
@@ -2119,7 +2119,7 @@ bool var::dbdelete(CVR dbname) const {
 
 bool var::createfile(CVR filename) const {
 
-	TimeAcc t(260);//createfile
+	Timer t(260);//createfile
 
 	THISIS("bool var::createfile(CVR filename)")
 	assertDefined(function_sig);
@@ -2249,7 +2249,7 @@ inline var get_fileexpression(CVR mainfilename, CVR filename, CVR keyordata) {
 
 var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, VARREF ismv, bool forsort) {
 
-	TimeAcc t(262);//get_dictexpression
+	Timer t(262);//get_dictexpression
 
 	//cursor is required to join any calculated fields in any second pass
 
@@ -2286,15 +2286,16 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 	if (stage2_calculated) {
 		fieldname.popper();
-		//create a pseudo look up ... except that SELECT_CURSOR_STAGE2 has the fields stored in sql columns and not in the usual data column
-		stage2_calculated = "@ANS=XLATE(\"" ^ stage2_filename ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
+		// Create a pseudo look up to SELECT_CURSOR_STAGE2 temporary file created by stage 1/2 select
+		// which has the fields stored in sql columns and not in the usual data column
+		stage2_calculated = "/" "/@ANS=XLATE(\"" ^ stage2_filename ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 		stage2_calculated.logputl("stage2_calculated simulation --------------------->");
 	}
 
 	// given a file and dictionary id
-	// returns a postgres sql expression like (texta(filename.data,99,0,0))
-	// using one of the exodus backend functions installed in postgres like textextract,
-	// dateextract etc.
+	// returns a postgres sql expression like (exodus_extract_text(filename.data,99,0,0))
+	// using one of the exodus backend functions installed in postgres like exodus_extract_text,
+	// exodus_extract_date etc.
 	var dictrec;
 	if (!dictrec.read(actualdictfile, fieldname)) {
 		// try lowercase
@@ -2339,7 +2340,8 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	//create a pseudo look up. to trigger JOIN logic to the table that we stored
 	//Note that SELECT_TEMP has the fields stored in sql columns and not in the usual data column
 	if (stage2_calculated) {
-		dictrec.r(8, stage2_calculated);
+		//dictrec.r(8, stage2_calculated);
+		dictrec(8) = stage2_calculated;
 	}
 
 	var dicttype = dictrec.f(1);
@@ -2428,23 +2430,51 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	} // of dict type F
 
 	else if (dicttype == "S") {
-
 		var function_src = dictrec.f(8).trim();
+		var pgsql_pos = function_src.index("\n/" "*pgsql");
+		var x = (!ismv1 || stage2_calculated);
+		var y = function_src.trimfirst("\t /").lcase().starts("@ans=xlate(");
+		var is_ans_xlate = (!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(");
+//TRACE(is_ans_xlate);// 0 ??
+		is_ans_xlate = ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate("));
+//TRACE(is_ans_xlate);// 0 ??
+		is_ans_xlate = x and y;
 
-		var pgsql_pos = function_src.index("/" "*pgsql");
-
+//TRACE(ismv1)
+//TRACE(stage2_calculated)
+//TRACE(x)
+//TRACE(function_src)
+//TRACE(function_src.trimfirst("\t /"))
+//TRACE(function_src.trimfirst("\t /").lcase())
+//TRACE(y)
+//TRACE(pgsql_pos)
+/*
+TRACE: dicttype="S"
+TRACE: ismv1="0"
+TRACE: stage2_calculated="//@ANS=XLATE("SELECT_CURSOR_STAGE2_1",@ID,CPP_TEXT_calc,"X")"
+TRACE: x="1"
+TRACE: function_src="//@ANS=XLATE("SELECT_CURSOR_STAGE2_1",@ID,CPP_TEXT_calc,"X")"
+TRACE: function_src.trimfirst("\t /")="@ANS=XLATE("SELECT_CURSOR_STAGE2_1",@ID,CPP_TEXT_calc,"X")"
+TRACE: function_src.trimfirst("\t /").lcase()="@ans=xlate("select_cursor_stage2_1",@id,cpp_text_calc,"x")"
+TRACE: y="1"
+TRACE: is_ans_xlate="0"
+TRACE: pgsql_pos="0"
+TRACE: sqlexpression=""
+TRACE: "QQQ"="QQQ"
+*/
 		// sql expression available
 		///////////////////////////
 		sqlexpression = dictrec.f(17);
+		//TRACE(sqlexpression)
 		if (sqlexpression) {
+			//TRACE("has sqlexpression")
 			// return sqlexpression;
 		}
-
 		// sql function available
 		/////////////////////////
 		// eg dict_schedules_PROGRAM_POSITION(key text, data text)
 		else if (pgsql_pos) {
-
+			//TRACE("has pgsql_pos")
 			// plsql function name assumed to be like "dictfilename_FIELDNAME()"
 			sqlexpression = get_normal_filename(actualdictfile).replace("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
 
@@ -2499,6 +2529,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 		// Multivalued stage2 handled below
 		else if (stage2_calculated && ismv1) {
+			//TRACE("has stage2_calculated && ismv1")
 			sqlexpression = stage2_filename ^ "." ^ fieldname ^ "_calc";
 		}
 
@@ -2511,8 +2542,10 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		//@ans=xlate('ADDRESSES',@id,2,'X')
 		//@ans=xlate('SCHEDULES',field(@id,'.',1),'YEAR_PERIOD','C')
 		//@ans=xlate('CURRENCIES',{CURRENCY_CODE},1,'X')
-		else if ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t ").lcase().starts("/" "/@ans=xlate(")) {
-
+		//@ANS=XLATE("SELECT_CURSOR_STAGE2_1",@ID,CPP_TEXT_calc,"X")
+		//else if ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(")) {
+		else if (is_ans_xlate) {
+//			TRACE("function_src starts @ans=")
 			function_src = function_src.f(1, 1).trimfirst("\t ");
 			function_src.cutter(13);
 
@@ -2539,8 +2572,9 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			if (xlatemode != "X" && xlatemode != "C") {
 				// not xlate X or C
 				goto exodus_call;
+//				TRACE("goto exodus_call")
 			}
-
+//			TRACE("doing a join")
 			// Assume we have a good simple xlate function_src and can convert to a JOIN
 			// Determine the expression in the xlate target file
 			// VARREF todictexpression=sqlexpression;
@@ -2587,7 +2621,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				xlatekeyexpression ^= xlatefromfieldname.field("|", 3).field(")", 1) ^ ")";
 			}
 
-			// TODO				if
+			// TODO if
 			// (xlatefromfieldname.starts(FIELD(@ID))
 			else if (xlatefromfieldname.starts("{")) {
 				xlatefromfieldname.cutter(1).popper();
@@ -2640,14 +2674,16 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			// only allow one join per file for now.
 			// TODO allow multiple joins to the same file via different keys
 			if (!joins.f(joinsectionn).contains(join_part1))
-				joins.r(joinsectionn, -1, join_part1 ^ join_part2);
+				//joins.r(joinsectionn, -1, join_part1 ^ join_part2);
+				joins(joinsectionn, -1) = join_part1 ^ join_part2;
 
 			return sqlexpression;
 
-		} //of dict type S
+		}
 
 		else {
 exodus_call:
+//			TRACE("QQQ")
 			// FOLLOWING IS CURRENTLY DISABLED since postgres has no way to call exodus
 			// if we get here then we were unable to work out any sql expression or function
 			// so originally we instructed postgres to CALL EXODUS VIA IPC to run exodus
@@ -2669,7 +2705,9 @@ exodus_call:
 
 			return sqlexpression;
 		}
-	} else {
+	} // of dict type S
+
+	else {
 		// throw  filename ^ " " ^ fieldname ^ " - INVALID DICTIONARY ITEM";
 		// throw  VarDBException("get_dictexpression(" ^ filename.quote() ^ ", " ^
 		// fieldname.quote() ^ ") invalid dictionary type " ^ dicttype.quote());
@@ -2703,7 +2741,8 @@ exodus_call:
 			var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 			//if (!joins.f(joinsectionn).contains(join))
 			if (!joins.contains(join))
-				joins.r(joinsectionn, -1, join);
+				//joins.r(joinsectionn, -1, join);
+				joins(joinsectionn, -1) = join;
 		}
 
 	}
@@ -2759,13 +2798,16 @@ exodus_call:
 					var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 					//if (!joins.f(joinsectionn).contains(join))
 					if (!joins.contains(join))
-						joins.r(joinsectionn, -1, join);
+						//joins.r(joinsectionn, -1, join);
+						joins(joinsectionn, -1) = join;
 				}
 
 				// insert with SMs since expression can contain VMs
 				if (!unnests.f(2).locate(fieldname)) {
-					unnests.r(2, -1, fieldname);
-					unnests.r(3, -1, sqlexpression);
+					//unnests.r(2, -1, fieldname);
+					//unnests.r(3, -1, sqlexpression);
+					unnests(2, -1) = fieldname;
+					unnests(3, -1) = sqlexpression;
 				}
 			}
 
@@ -2929,7 +2971,7 @@ void to_extract_text(VARREF dictexpression) {
 
 bool var::select(CVR sortselectclause) {
 
-	TimeAcc t(264);//select
+	Timer t(264);//select
 
 	THISIS("bool var::select(CVR sortselectclause) const")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -3152,7 +3194,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			{
 				if (!calc_fields.f(1).locate(dictid)) {
 					//++ncalc_fields;
-					calc_fields.r(1, -1, dictid);
+					//calc_fields.r(1, -1, dictid);
+					calc_fields(1, -1) = dictid;
 				}
 				continue;
 			}
@@ -3186,6 +3229,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 		// subexpression grouping
 		else if (ucword == "(" || ucword == ")") {
+			//default to or between WITH clauses
+			if (whereclause[-1] == ")" and ucword == "(")
+				whereclause ^= "\nor";
 			whereclause ^= "\n " ^ ucword;
 			if (DBTRACE2) TRACE(whereclause);
 			continue;
@@ -3311,18 +3357,23 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					var calc_fieldn;
 					if (!calc_fields.locate(dictid, calc_fieldn, 1)) {
 						//++ncalc_fields;
-						calc_fields.r(1, calc_fieldn, dictid);
+						//calc_fields.r(1, calc_fieldn, dictid);
+						calc_fields(1, calc_fieldn) = dictid;
 					}
 
 					//prevent WITH XXX appearing twice in the same sort/select clause
-					//unless and until implementeda
+					//unless and until implemented
 					if (calc_fields.f(2, calc_fieldn))
 						throw VarDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 
-					calc_fields.r(2, calc_fieldn, opid);
-					calc_fields.r(3, calc_fieldn, word1.lowerer());
-					calc_fields.r(4, calc_fieldn, word2);
+					//calc_fields.r(2, calc_fieldn, opid);
+					//calc_fields.r(3, calc_fieldn, word1.lowerer());
+					//calc_fields.r(4, calc_fieldn, word2);
+					calc_fields(2, calc_fieldn) = opid;
+					calc_fields(3, calc_fieldn) = word1.lowerer();
+					calc_fields(4, calc_fieldn) = word2;
 
+					// Place holder for stage 1 of stage2 select
 					whereclause ^= " true";
 					continue;
 				}
@@ -3579,18 +3630,22 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				var calc_fieldn;
 				if (!calc_fields.locate(dictid, calc_fieldn, 1)) {
 					//++ncalc_fields;
-					calc_fields.r(1, calc_fieldn, dictid);
+					//calc_fields.r(1, calc_fieldn, dictid);
+					calc_fields(1, calc_fieldn) = dictid;
 				}
 				if (calc_fields.f(2, calc_fieldn))
 					throw VarDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 
 				//save the op
-				calc_fields.r(2, calc_fieldn, op);
+				//calc_fields.r(2, calc_fieldn, op);
+				calc_fields(2, calc_fieldn) = op;
 
 				//save the value(s) after removing quotes and using SM to separate values instead of FM
-				calc_fields.r(3, calc_fieldn, value.unquote().replace("'" _FM "'", FM).convert(FM, SM));
+				//calc_fields.r(3, calc_fieldn, value.unquote().replace("'" _FM "'", FM).convert(FM, SM));
+				calc_fields(3, calc_fieldn) = value.unquote().replace("'" _FM "'", FM).convert(FM, SM);
 
 				//place holder to be removed before issuing actual sql command
+	            if (DBTRACE2) TRACE(whereclause);
 				whereclause ^= " true";
 
 				continue;
@@ -3924,6 +3979,15 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// Filter Stage 10 - COMBINE INTO WHERE CLAUSE
 			//////////////////////////////////////////////
 
+			if (DBTRACE2) TRACE(whereclause);
+			// Default to OR between with clauses
+			if (whereclause) {
+				var lastpart = whereclause.field2(" ", -1);
+				if (not var("OR AND (").locateusing(" ", lastpart))
+					whereclause ^= " or ";
+				if (DBTRACE2) TRACE(whereclause);
+			}
+
 			//negate
 			if (negative)
 				whereclause ^= " not";
@@ -4147,9 +4211,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	//sort/select on calculated items may be done in exoprog::calculate
 	//which can call calculate() and has access to mv.RECORD, mv.ID etc
 	if (calc_fields) {
-		calc_fields.r(5, dictfilename.lower());
-		calc_fields.r(6, maxnrecs);
-		this->r(10, calc_fields.lower());
+		//calc_fields.r(5, dictfilename.lower());
+		//calc_fields.r(6, maxnrecs);
+		//this->r(10, calc_fields.lower());
+		calc_fields(5) = dictfilename.lower();
+		calc_fields(6) = maxnrecs;
+		(*this)(10) = calc_fields.lower();
 	}
 
 	return true;
@@ -4378,7 +4445,7 @@ bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, 
 
 bool var::deletelist(CVR listname) const {
 
-	TimeAcc t(226);//deletelist
+	Timer t(226);//deletelist
 
 	THISIS("bool var::deletelist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4411,7 +4478,7 @@ bool var::deletelist(CVR listname) const {
 
 bool var::savelist(CVR listname) {
 
-	TimeAcc t(228);//savelist
+	Timer t(228);//savelist
 
 	THISIS("bool var::savelist(CVR listname)")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4492,7 +4559,7 @@ bool var::savelist(CVR listname) {
 
 bool var::getlist(CVR listname) {
 
-	TimeAcc t(230);//getlist
+	Timer t(230);//getlist
 
 	THISIS("bool var::getlist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4538,7 +4605,7 @@ bool var::getlist(CVR listname) {
 //TODO make it work for multiple keys or select list
 bool var::formlist(CVR keys, CVR fieldno) {
 
-	TimeAcc t(232);//formlist
+	Timer t(232);//formlist
 
 	THISIS("bool var::formlist(CVR keys, CVR fieldno)")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4572,7 +4639,7 @@ bool var::formlist(CVR keys, CVR fieldno) {
 // using this function
 bool var::makelist(CVR listname, CVR keys) {
 
-	TimeAcc t(234);//makelist
+	Timer t(234);//makelist
 
 	THISIS("bool var::makelist(CVR listname)")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4620,7 +4687,7 @@ bool var::makelist(CVR listname, CVR keys) {
 //bool var::hasnext() const {
 bool var::hasnext() {
 
-	TimeAcc t(236);//hasnext
+	Timer t(236);//hasnext
 
 	// var xx;
 	// return this->readnext(xx);
@@ -4729,7 +4796,7 @@ bool var::readnext(VARREF key, VARREF valueno) {
 
 bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 
-	TimeAcc t(238);//readnext
+	Timer t(238);//readnext
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
@@ -5056,7 +5123,7 @@ var var::dblist() const {
 //TODO avoid round trip to server to check this somehow or avoid calling it all the time
 bool var::cursorexists() {
 
-	TimeAcc t(240);//cursorexists
+	Timer t(240);//cursorexists
 
 	THISIS("bool var::cursorexists()")
 	// could allow undefined usage since *this isnt used?

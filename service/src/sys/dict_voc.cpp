@@ -120,6 +120,14 @@ function main() {
 libraryexit(count)
 
 
+libraryinit(cpp_text)
+//-------------------
+function main() {
+	return RECORD.f(8).field("/" "*pgsql", 1);
+}
+libraryexit(cpp_text)
+
+
 libraryinit(data)
 //---------------
 function main() {
@@ -631,6 +639,14 @@ function main() {
 	return "";
 }
 libraryexit(spacer)
+
+
+libraryinit(sql_text)
+//-------------------
+function main() {
+	return RECORD.f(8).field("/" "*pgsql", 2).field("*" "/", 1);
+}
+libraryexit(sql_text)
 
 
 libraryinit(temp)
