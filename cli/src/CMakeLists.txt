@@ -45,6 +45,7 @@ endif()
 #edic.cpp
 #configexodus.cpp
 #copyfile.cpp
+#copyrec.cpp
 #exodus.cpp
 #dbattach.cpp
 #convsyntax.cpp
@@ -76,6 +77,7 @@ add_executable(dict2sql dict2sql.cpp)
 add_executable(edic edic.cpp)
 add_executable(configexodus configexodus.cpp)
 add_executable(copyfile copyfile.cpp)
+add_executable(copyrec copyrec.cpp)
 
 add_executable(listfiles listfiles.cpp)
 add_executable(listdict listdict.cpp)
@@ -120,6 +122,7 @@ target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
 target_link_libraries(edic exodus stdc++fs ${LIBS})
 target_link_libraries(configexodus exodus stdc++fs ${LIBS})
 target_link_libraries(copyfile exodus stdc++fs ${LIBS})
+target_link_libraries(copyrec exodus stdc++fs ${LIBS})
 
 target_link_libraries(createfile exodus stdc++fs ${LIBS})
 target_link_libraries(createindex exodus stdc++fs ${LIBS})
@@ -164,6 +167,7 @@ dbattach
 delete
 clearfile
 copyfile
+copyrec
 deletefile
 deleteindex
 edir
