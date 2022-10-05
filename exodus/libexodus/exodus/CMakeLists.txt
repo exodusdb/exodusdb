@@ -143,7 +143,6 @@ install(FILES
  common.h
  exoprog.h
  ioconv_custom.h
- printtx.hpp
  timebank.h
 DESTINATION include/exodus)
 

@@ -109,6 +109,7 @@ static std::mutex global_mutex_lockdlcache;
 //#define LOCKDLCACHE std::lock_guard<std::mutex> guard(global_mutex_lockdlcache);
 #define LOCKDLCACHE std::lock_guard guard(global_mutex_lockdlcache);
 
+#include <exodus/varimpl.h>
 #include <exodus/exoenv.h>
 #include <exodus/exocallable.h>
 namespace exodus {
@@ -388,7 +389,7 @@ bool CallableBase::openlib(std::string newlibraryname) {
 
 	// var(libraryfilename_).logputl();
 
-	// RTLD_NOW
+		// RTLD_NOW
 	// All necessary relocations shall be performed when the object is first loaded.
 	// This may waste some processing if relocations are performed for functions that are never
 	// referenced. This behavior may be useful for applications that need to know as soon as an
@@ -402,6 +403,16 @@ bool CallableBase::openlib(std::string newlibraryname) {
 	if (dlsym_error)
 		var(dlsym_error).errputl();
 #endif
+
+	// Try without path in case the library is system installed e.g. in /usr/local/lib
+	if (plibrary_ == nullptr) {
+		auto pos0 = libraryfilename_.rfind(OSSLASH_);
+		if (pos0 != std::string::npos && pos0 != libraryfilename_.size() - 1) {
+			auto purelibraryfilename = libraryfilename_.substr(pos0 + 1);
+			//TRACE(purelibraryfilename)
+			plibrary_ = (void*)dlopen(purelibraryfilename.c_str(), RTLD_NOW);
+		}
+	}
 
 	if (plibrary_ == nullptr) {
 		//#if TRACING >= 1

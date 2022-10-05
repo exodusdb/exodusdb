@@ -2,15 +2,15 @@
 libraryinit()
 
 #include <colrowspan.h>
-#include <getsortjs.h>
+//#include <getsortjs.h>
 #include <getmark.h>
 #include <convcss.h>
-#include <htmllib2.h>
+//#include <htmllib2.h>
 #include <xselect.h>
 #include <addunits.h>
 #include <sendmail.h>
 #include <gethtml.h>
-#include <getcss.h>
+//#include <getcss.h>
 #include <docmods.h>
 #include <timedate2.h>
 
@@ -1263,45 +1263,47 @@ x1exit:
 	//convert to html with colspan/rowspan where necessary and (Base) as currcode
 	//thproperties='style="background-color:':thcolor:'"'
 	if (html) {
-		call colrowspan(colhdg, thproperties, nobase);
+		call colrowspan(colhdg, thproperties, nobase, sys.company.f(3));
 	}
 
 	//trim off blank lines (due to the 9 above)
 	if (html) {
 
-		call getsortjs(tt);
+		var htmlcode;
+		//call getsortjs(htmlcode);
+		call htmllib2("GETSORTJS", htmlcode);
 
 		if (not rawtable) {
 			call getmark("CLIENT", html, clientmark);
-			tt ^= clientmark ^ "\r\n";
-			//tt:='<span style="font-size:66%"><small>':clientmark:'</small></span>':crlf
+			htmlcode ^= clientmark ^ "\r\n";
+			//htmlcode:='<span style="font-size:66%"><small>':clientmark:'</small></span>':crlf
 		}
 
-		//tt:='<table border="1" cellspacing="0" cellpadding="2"'
-		//tt:=' align="center" '
-		//tt:=' class="maintable"'
+		//htmlcode:='<table border="1" cellspacing="0" cellpadding="2"'
+		//htmlcode:=' align="center" '
+		//htmlcode:=' class="maintable"'
 
-		tt ^= "<table class=\"exodustable\"";
+		htmlcode ^= "<table class=\"exodustable\"";
 		//cellspacing is only required up to IE7 (or border-collapse)
-		tt ^= " cellspacing=\"0\"";
-		tt ^= " style=\"font-size:66%";
-		tt ^= ";page-break-after:avoid";
-		//tt:=';background-color:':tdcolor
-		tt ^= "\">";
-		tt ^= FM ^ "<colgroup>" ^ coltags ^ "</colgroup>";
+		htmlcode ^= " cellspacing=\"0\"";
+		htmlcode ^= " style=\"font-size:66%";
+		htmlcode ^= ";page-break-after:avoid";
+		//htmlcode:=';background-color:':tdcolor
+		htmlcode ^= "\">";
+		htmlcode ^= FM ^ "<colgroup>" ^ coltags ^ "</colgroup>";
 		//<thead> may be hardcoded elsewhere for page heading
 		//!!!if you change it here, search and change it there too
 
-		tt ^= FM ^ "<thead style=\"cursor:pointer\" onclick=\"sorttable(event)\">";
+		htmlcode ^= FM ^ "<thead style=\"cursor:pointer\" onclick=\"sorttable(event)\">";
 		posttheadmark = "<postthead/>";
 		if (headtab) {
-			tt ^= posttheadmark;
+			htmlcode ^= posttheadmark;
 		}
-		//tt:=fm:coltags
+		//htmlcode:=fm:coltags
 
-		tt ^= colhdg ^ FM ^ "</thead>";
-		tt ^= FM ^ "<tbody>";
-		tt.move(colhdg);
+		htmlcode ^= colhdg ^ FM ^ "</thead>";
+		htmlcode ^= FM ^ "<tbody>";
+		htmlcode.move(colhdg);
 
 		//allow for single quotes
 		colhdg.replacer("'", "''");

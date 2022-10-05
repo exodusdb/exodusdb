@@ -3,10 +3,10 @@ libraryinit()
 
 #include <authorised.h>
 #include <crosstab.h>
-#include <htmllib2.h>
+//#include <htmllib2.h>
 #include <gethtml.h>
 #include <getmark.h>
-#include <getcss.h>
+//#include <getcss.h>
 #include <docmods.h>
 #include <timedate2.h>
 

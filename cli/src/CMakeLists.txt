@@ -62,6 +62,7 @@ endif()
 #createfile.cpp
 #deletefile.cpp
 #dict_xo_clients.cpp
+#htmllib2.cpp
 #clearfile.cpp
 #dbdelete.cpp
 #dbcopy.cpp
@@ -108,6 +109,7 @@ set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 
 # lib #
 
+add_library(htmllib2 SHARED htmllib2.cpp)
 add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
 #add_library(number SHARED number.cpp)
 
@@ -191,5 +193,13 @@ convsyntax
 #push it into /usr/lib where it can be found by dlopen
 #install(TARGETS dict_xo_clients number DESTINATION /usr/lib)
 install(TARGETS dict_xo_clients DESTINATION /usr/lib)
+install(TARGETS htmllib2 DESTINATION /usr/lib)
+
+### 5. INSTALL INCLUDES ###
+
+install(FILES
+ printtx.hpp
+ htmllib2.h
+DESTINATION include/exodus)
 
 message("--EXODUS CLI CMAKE EXIT --")

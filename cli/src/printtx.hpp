@@ -1,8 +1,14 @@
+#include <exodus/htmllib2.h>
+
 subroutine printnext() {
 	bodyln = 999;
 	pagen = 0;
 	return;
 
+}
+subroutine getcss(io css, in version) {
+	call htmllib2("GETCSS", css, version);
+	return;
 }
 
 subroutine printtx() {

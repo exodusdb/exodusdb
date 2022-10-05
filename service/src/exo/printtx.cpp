@@ -2,8 +2,9 @@
 libraryinit()
 
 #include <gethtml.h>
+#include <htmllib2.h>
 #include <getmark.h>
-#include <getcss.h>
+//#include <getcss.h>
 #include <sysmsg.h>
 
 //settable by modes
@@ -237,7 +238,8 @@ printtx2:
 	if (html) {
 		if (not printptr) {
 
-			call getcss(css);
+//			call getcss(css);
+			gosub htmllib2("GETCSS", css);
 
 			if (style.unassigned()) {
 				style = "";
