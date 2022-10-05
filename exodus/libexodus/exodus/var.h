@@ -61,24 +61,20 @@ THE SOFTWARE.
 #	include <iostream> // only for debugging
 #endif
 
-// ND macro [[no_discard]]
-#if __clang_major__ != 10
-#	define ND [[nodiscard]]
-#else
-#	define ND
-#endif
+#define ND [[nodiscard]]
 
 #include <exodus/vartyp.h>
 
 // Use ASCII 0x1A-0x1F for PickOS separator chars instead
 // of PickOS 0xFA-0xFF which are illegal utf-8 bytes
 
-// also defined in extract.c and exodusmacros.h
+// also defined in pgexodus extract.c
 
 // the var versions of the following (without leading or trailing _)
 // are defined AFTER the class declaration of "var"
 
 // leading _ char* versions of classic pick delimiters
+// Using macros to allow use of space as compile time concatenation operator
 #define _RM "\x1F"      // Record Mark
 #define _FM "\x1E"      // Field Mark
 #define _VM "\x1D"      // Value Mark
@@ -91,16 +87,16 @@ THE SOFTWARE.
 #define _SQ "\'"
 
 // trailing _ char versions of classic pick delimiters
-#define RM_ '\x1F'     // Record Mark
-#define FM_ '\x1E'     // Field Mark
-#define VM_ '\x1D'     // Value Mark
-#define SM_ '\x1C'     // Subvalue Mark
-#define TM_ '\x1B'     // Text Mark
-#define ST_ '\x1A'     // Subtext Mark
+inline const char RM_ = '\x1F';     // Record Mark
+inline const char FM_ = '\x1E';     // Field Mark
+inline const char VM_ = '\x1D';     // Value Mark
+inline const char SM_ = '\x1C';     // Subvalue Mark
+inline const char TM_ = '\x1B';     // Text Mark
+inline const char ST_ = '\x1A';     // Subtext Mark
 
-#define BS_ '\\'
-#define DQ_ '\"'
-#define SQ_ '\''
+inline const char BS_ = '\\';
+inline const char DQ_ = '\"';
+inline const char SQ_ = '\'';
 
 // print() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
 //#define VISIBLE_FMS "_^]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
@@ -108,12 +104,12 @@ THE SOFTWARE.
 //#define VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
 //#define VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
 #define VISIBLE_FMS "`^]}|~"   //all uncommon in natural language. ^] are identical to pickos. Using ` for RM since _ common in IT
-#define VISIBLE_RM_ '`'
-#define VISIBLE_FM_ '^'
-#define VISIBLE_VM_ ']'
-#define VISIBLE_SM_ '}'
-#define VISIBLE_TM_ '|'
-#define VISIBLE_ST_ '~'
+inline const char VISIBLE_RM_ = '`';
+inline const char VISIBLE_FM_ = '^';
+inline const char VISIBLE_VM_ = ']';
+inline const char VISIBLE_SM_ = '}';
+inline const char VISIBLE_TM_ = '|';
+inline const char VISIBLE_ST_ = '~';
 #define ALL_FMS _RM _FM _VM _SM _TM _ST
 
 // Useful TRACE() function for debugging
@@ -181,7 +177,7 @@ using SV = std::string_view;
 // double:     8
 // type:       4
 //           ---
-// var:       48
+// var:       52
 
 using varint_t = int64_t;
 
@@ -657,21 +653,7 @@ class PUBLIC var final {
 			if (this->var_int < 0)
 				throwNonPositive(__PRETTY_FUNCTION__);
 		}
-//		// Similar code in constructor(int) operator=(int) and int()
-//TRACE2(__PRETTY_FUNCTION__)
-//TRACE2(var_int)
-//TRACE2(std::numeric_limits<I>::min())
-//TRACE2(std::numeric_limits<I>::max())
-//		if (!std::is_same<I, varint_t>::value) {
-//			//if (!std::is_same<I, bool>::value) {
-//				if (var_int > std::numeric_limits<I>::max()) {
-//					throwNumOverflow(__PRETTY_FUNCTION__);
-//				}
-//				if (var_int < std::numeric_limits<I>::min()) {
-//					throwNumUnderflow(__PRETTY_FUNCTION__);
-//				}
-//			//}
-//		}
+		// Similar code in constructor(int) operator=(int) and int()
 
 		return static_cast<I>(var_int);
 	}
@@ -889,19 +871,7 @@ class PUBLIC var final {
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	void operator=(I rhs) & {
 
-//		// Similar code in constructor(int) operator=(int) and int()
-//TRACE2(__PRETTY_FUNCTION__)
-//TRACE2(rhs)
-//		if (!std::is_same<I, varint_t>::value) {
-//			if (!std::is_same<I, bool>::value) { // Why does this not seem to exclude bools
-//				if (rhs > std::numeric_limits<varint_t>::max()) {
-//					throwNumOverflow(__PRETTY_FUNCTION__);
-//				}
-//				if (rhs < std::numeric_limits<varint_t>::min()) {
-//					throwNumUnderflow(__PRETTY_FUNCTION__);
-//				}
-//			}
-//		}
+		// Similar code in constructor(int) operator=(int) and int()
 
 		var_int = rhs;
 		var_typ = VARTYP_INT;
@@ -1451,21 +1421,6 @@ class PUBLIC var final {
 
 	// clang-format on
 
-	// OS TIME/DATE
-	///////////////
-
-	ND var date() const;//int days since pick epoch 1967-12-31
-	ND var time() const;//int seconds since last midnight
-	ND var ostime() const;
-	ND var timestamp() const; // floating point fractional days since pick epoch 1967-12-31 00:00:00
-	//ND var timedate() const;// current date and time string eg 09:28:43 09 SEP 2022
-
-	void ossleep(const int milliseconds) const;
-	var oswait(const int milliseconds, SV directory) const;
-
-	void breakon() const;
-	void breakoff() const;
-
 	// OUTPUT
 	/////////
 
@@ -1510,6 +1465,8 @@ class PUBLIC var final {
 	ND bool eof() const;
 	bool echo(const int on_off) const;
 
+	void breakon() const;
+	void breakoff() const;
 
 	// IO STREAM FRIENDS
 	////////////////////
@@ -2022,6 +1979,18 @@ class PUBLIC var final {
 
 	//bool saveselect(CVR filename);
 
+	// OS TIME/DATE
+	///////////////
+
+	ND var date() const;//int days since pick epoch 1967-12-31
+	ND var time() const;//int seconds since last midnight
+	ND var ostime() const;
+	ND var timestamp() const; // floating point fractional days since pick epoch 1967-12-31 00:00:00
+	//ND var timedate() const;// current date and time string eg 09:28:43 09 SEP 2022
+
+	void ossleep(const int milliseconds) const;
+	var oswait(const int milliseconds, SV directory) const;
+
 	// OS FILE SYSTEM
 	/////////////////
 
@@ -2078,23 +2047,6 @@ class PUBLIC var final {
 	bool osgetenv(const char* code);
 	bool ossetenv(const char* code) const;
 
-	// EXECUTE/PERFORM CONTROL
-	/////////////////////////
-
-	// done in exoprog now since they need to pass exoenv
-	// var perform() const;
-	// var execute() const;
-	// chain should be similar to one of the above?
-	// var chain() const;
-
-	// done in exoprog since no need to include in var
-	// void stop(CVR text DEFAULT_EMPTY) const;
-	// void abort(CVR text DEFAULT_EMPTY) const;
-	// void abortall(CVR text DEFAULT_EMPTY) const;
-	// var logoff() const;
-
-//	void debug(CVR DEFAULT_EMPTY) const;
-//	ND var backtrace() const;
 
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
