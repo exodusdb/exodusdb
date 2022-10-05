@@ -1120,21 +1120,22 @@ VARREF var::paster(const int pos1, const int length, SV insertstr) {
 	assertStringMutator(function_sig);
 	//ISSTRING(insertstr)
 
-	int start0;
-	int lengthb;
+	std::size_t start0;
+	std::size_t lengthb;
 
 	// First work out start index from start position
 	// Depends on length of string, if position is negative
-	if (pos1 < 0)
-		// abcdef[-3,2] -> abcdef[4,2] ie de
-		start0 = var_str.size() + pos1;
+	if (pos1 <= 0) {
+		if (pos1 == 0 || static_cast<std::size_t>(-pos1) > var_str.size())
+			// Negative start index means 0
+			// abcdef[-8,2] -> abcdef[1,2] ie ab will be replaced
+			start0 = 0;
+		else
+			// abcdef[-3,2] -> abcdef[4,2] ie de will be replaced
+			start0 = var_str.size() + pos1;
+	}
 	else
 		start0 = pos1 - 1;
-
-	// Negative start index means 0
-	// abcdef[-8,2] -> abcdef[1,2] ie ab
-	if (start0 < 0)
-		start0 = 0;
 
 	// Negative length simply moves the start char backwards
 	// and the length is up to and including the start char
@@ -1146,12 +1147,19 @@ VARREF var::paster(const int pos1, const int length, SV insertstr) {
 		//int start0_save = start0;
 		lengthb = start0 + 1;
 
-		start0 = start0 + length + 1;
-		if (start0 < 0) {
+		//start0 = start0 + length + 1;
+		if (static_cast<std::size_t>(-length) > start0) {
+			lengthb = start0 + 1;
 			start0 = 0;
-			//lengthb = start0_save + 1;
-		} else
+		} else {
+			start0 = start0 + length + 1;
 			lengthb = -length;
+		}
+//		if (start0 < 0) {
+//			start0 = 0;
+//			//lengthb = start0_save + 1;
+//		} else
+//			lengthb = -length;
 
 		//std::cerr << "start0  = " << start0  << std::endl;
 		//std::cerr << "lengthb = " << lengthb << std::endl;
