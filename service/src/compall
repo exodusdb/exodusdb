@@ -19,7 +19,7 @@ set -euxo pipefail
 : Generate all headers first
 : ==========================
 :
-	compile alt exo sys {HS$COMPILER_OPTIONS}
+	compile alt exo sys {hS$COMPILER_OPTIONS}
 
 :
 : Install dat files
@@ -43,7 +43,7 @@ set -euxo pipefail
 : O - Increase optimisation level
 : o - Reduce optimisation level
 : F - Force
-: H - Headers only
+: h - Headers only
 : X - Suppress compilation
 : S - Silent
 : V - Verbose

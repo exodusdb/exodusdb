@@ -16,94 +16,87 @@ std::atomic<int> atomic_ncompilation_failures;
 #include <exodus/program.h>
 programinit()
 
-//.def file is one way on msvc to force library function names to be "undecorated"
-// and therefore usable in on demand library loading
-//Declaring functions with extern "C" is the other way and seems less complicated
-//but msvc warns that functions defined with extern c cannot return var
-//nevertheless, returning vars seems to work in practice and .def files seem
-//more complicated so for now use extern "C" and not .def files
-#define EXODUS_EXPORT_USING_DEF 0
+	// CONSTANTS
 
-#define EXODUS_CALLABLE_MAXNARGS 20
+	// Options
+	let verbose = index(OPTIONS, "V");
+	let silent = count(OPTIONS, "S");
+	let debugging = not index(OPTIONS, "R");  //no symbols for backtrace
+	let optimise = count(OPTIONS, "O") - count(OPTIONS, "o");
+	let generateheadersonly = index(OPTIONS, "H");
+	let force = index(OPTIONS,"F");
+	let color_option = index(OPTIONS,"C");
 
-	//#include <exodus/exodus.h>
+	// Source extensions
+	let src_extensions = "cpp cxx cc";
+	let inc_extensions = "h hpp hxx";
+	let noncompilable_extensions = " out so o";
+	let default_extension = "cpp";
 
-	//#include <exodus/xcallablef0.h>
-	//ExodusCallableF0<int> xyz;
+	// Platform
+	let posix = OSSLASH eq "/";
+	let windows = not(posix);
 
-	var verbose;
-	var silent;
-	var debugging;
-	var optimise;
-	var generateheadersonly;
-	var force;
-	var posix;
-	var windows;
+	// Location of bin/lib/inc dirs
+	let exo_HOME = osgetenv("EXO_HOME") ?: osgetenv("HOME");
+
+	// Limits
+	let exodus_callable_maxnargs = 20;
+
+	// GLOBAL VARIABLES
+	// Do NOT update in multithreaded compile function
+
 	var exodus_include_dir_info = "";
 	var nasterisks = 0;
-//	var max_nthreads;
-//	std::list<std::thread> threadlist;
+
+	//.def file is one way on msvc to force library function names to be "undecorated"
+	// and therefore usable in on demand library loading
+	//Declaring functions with extern "C" is the other way and seems less complicated
+	//but msvc warns that functions defined with extern c cannot return var
+	//nevertheless, returning vars seems to work in practice and .def files seem
+	//more complicated so for now use extern "C" and not .def files
+	//#define EXODUS_EXPORT_USING_DEF
 
 function main() {
 
-	//default to previous edit/compile - similar code in edic and compile
-	//check command syntax
+	// Option X means skip compilation
+	if (OPTIONS.contains("X"))
+		return 0;
+
+	//if no file/dirnames then default to previous edic
+	//SIMILAR code in edic and compile
 	if (fcount(COMMAND, FM) < 2) {
 		var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
 		if (osread(COMMAND, edic_hist)) {
-			//OPTIONS = COMMAND.f(2);
 			COMMAND = raise(COMMAND.f(1));
-		//} else {
-		//	abort("Syntax is 'compile osfilename'");
 		}
 	}
-	//if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS, edic_hist))
-	//    printl("Cannot write to ", edic_hist);
 
-	var command = COMMAND;
+	//extract file/dirnames
+	var filenames = field(COMMAND, FM, 2, 999999999);
+	var nfiles = fcount(filenames, FM);
+	if (not filenames or OPTIONS.contains("H"))
+		abort(
+			"SYNTAX\n"
+			"	compile FILENAME|DIRNAME ... [{OPTION...}]\n"
+			"OPTIONS\n"
+			"	R = Release (No symbols)\n"
+			"	O/OO/OOO = Optimisation levels (Poorer debugging/backtrace)\n"
+			"	o/oo/ooo = Unoptimise (cancels 'O's)\n"
+			"	V = Verbose\n"
+			"	S = Silent (stars only)\n"
+			"	h = Generate headers only\n"
+			"	X = Skip compilation\n"
+		);
+
+
+	// DETERMINE COMPILER/LINKER OPTIONS AND FLAGS
+	//////////////////////////////////////////////
 
 	//we use on demand/jit linking using dlopen/dlsym
 	var loadtimelinking = false;
 
 	var usedeffile = false;
-
-	//extract options
-	if (index(OPTIONS,"X"))
-		return 0;
-	verbose = index(OPTIONS, "V");
-	silent = count(OPTIONS, "S");
-	debugging = not index(OPTIONS, "R");  //no symbols for backtrace
-	//the backtrace seems to work fine with release mode at least in vs2005
-	optimise = count(OPTIONS, "O") - count(OPTIONS, "o");				//prevents backtrace
-	generateheadersonly = index(OPTIONS, "H");	//prevents backtrace
-	force = index(OPTIONS,"F");
-	var color_option = index(OPTIONS,"C");
-
-	//var ncpus = osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ", 1);
-	//var ncpus = osshellread("grep -c ^processor /proc/cpuinfo").convert("\r\n","");
-	//if (ncpus)
-	//	max_nthreads = ncpus * 1.5;
-	//else
-	//	max_nthreads = 2;
-	//var max_nthreads = int(std::thread::hardware_concurrency());
-	//if (verbose)
-	//	printl("max threads = ", max_nthreads);
-
-	//extract filenames
-	var filenames = field(command, FM, 2, 999999999);
-	var nfiles = fcount(filenames, FM);
-	if (not filenames)
-		abort("Syntax is compile filename ... {options}\nOptions are R=Release (No symbols), O/OO/OOO=Optimise (Poor back trace/debugging), V=Verbose, S=Silent, H=Generate headers only");
-
-	//source extensions
-	var src_extensions = "cpp cxx cc";
-	var inc_extensions = "h hpp hxx";
-	var noncompilable_extensions = " out so o";
-	var default_extension = "cpp";
-
-	var exo_HOME = osgetenv("EXO_HOME");
-	if (not exo_HOME)
-		exo_HOME = osgetenv("HOME");
 
 	var compiler = "";
 	var basicoptions = osgetenv("CPP_OPTIONS");
@@ -117,7 +110,6 @@ function main() {
 	var bindir = "";
 	var libdir = "";
 	var incdir = "";
-	//var homedir=osgetenv("HOME");
 
 	var installcmd = "";
 	var outputoption = "";
@@ -135,9 +127,13 @@ function main() {
 
 	//hard coded compiler options at the moment
 	//assume msvc (cl) on windows and c++ (g++/clang) otherwise
-	posix = OSSLASH eq "/";
-	windows = not(posix);
 	if (posix) {
+
+
+		//////////////////////////
+		// POSIX - linux, bsd etc.
+		//////////////////////////
+
 		if (verbose)
 			printl("Posix environment detected.");
 
@@ -230,8 +226,9 @@ function main() {
 		//-Og means optimise but has compatible with gdb
 		if (optimise > 0) {
 			if (optimise eq 1)
-				optimise = "g";
-			basicoptions ^= " -O" ^ optimise;
+				basicoptions ^= " -Og";
+			else
+				basicoptions ^= " -O" ^ optimise;
 		}
 		//}
 
@@ -257,8 +254,13 @@ function main() {
 		//libexodusinfo = osfile("/usr/local/lib/libexodus.so");
 		exodus_include_dir_info = osdir("/usr/local/include/exodus");
 
-		//not posix
 	} else {
+
+
+		//////////////////////
+		// NOT POSIX - WINDOWS
+		//////////////////////
+
 		if (verbose)
 			printl("Windows environment detected. Finding C++ compiler.");
 
@@ -464,7 +466,8 @@ function main() {
 			libdir = "";
 			installcmd = "";
 		}
-	}
+
+	} // of not posix
 
 	if (bindir[-1] ne OSSLASH)
 		bindir ^= OSSLASH;
@@ -473,12 +476,20 @@ function main() {
 
 	var srcfilenames = "";
 
+///////////
+//initfile:
+///////////
+
+	///////////////////////////////
+	// find files, scan directories
+	///////////////////////////////
+
 	// nfiles may increase during the loop as directories may be included
 	//for (const var fileno : range(1, nfiles)) {
 	for ( var fileno = 1; fileno <= nfiles; fileno++) {
 
 		//var text = "";
-		var filebase;
+		//var filepath_without_ext;
 
 		//get the next file name
 		var srcfilename = filenames.f(fileno).unquote();
@@ -491,7 +502,7 @@ function main() {
 		srcfilename.trimmerlast(".");
 		var fileext = srcfilename.field2(".", -1).lcase();
 		if (src_extensions.locateusing(" ", fileext)) {
-			filebase = srcfilename.cut(-len(fileext) - 1);
+			//filepath_without_ext = srcfilename.cut(-len(fileext) - 1);
 		}
 
 		//install/copy header files to inc directory
@@ -528,7 +539,7 @@ function main() {
 
 		//pickup default file if it exists - even if base file also exists
 		else if (osfile(srcfilename ^ "." ^ default_extension)) {
-			filebase = srcfilename;
+			//filepath_without_ext = srcfilename;
 			srcfilename ^= "." ^ default_extension;
 		}
 
@@ -573,7 +584,7 @@ function main() {
 		}
 		//add the default extension
 		else {
-			filebase = srcfilename;
+			//filepath_without_ext = srcfilename;
 			srcfilename ^= "." ^ default_extension;
 		}
 		//search paths and convert to absolute filename
@@ -588,8 +599,8 @@ function main() {
 					break;
 				}
 			}
-			var fileext = srcfilename.field2(".", -1).lcase();
-			filebase = srcfilename.cut(-len(fileext) - 1);
+			//var fileext = srcfilename.field2(".", -1).lcase();
+			//filepath_without_ext = srcfilename.cut(-len(fileext) - 1);
 		}
 
 		//also look in inc dir backlinks to source
@@ -600,6 +611,7 @@ function main() {
 			headerfilename.fieldstorer(".", -1, 1, "h");
 			if (verbose)
 				headerfilename.outputl("headerfile=");
+
 			// Try .H header files for programs
 			if (!osfile(headerfilename)) {
 				headerfilename.fieldstorer(".", -1, 1, "H");
@@ -634,7 +646,11 @@ function main() {
 	call sortarray(srcfilenames, "2" _VM "1", "DR");
 	srcfilenames = srcfilenames.f(1).convert(VM, FM);
 
-	// This loop consists of a single function call
+///////////
+//nextfile:
+///////////
+
+	// This loop consists of a single function call handled by a thread
 	// with a very long lambda function argument
 	for (var srcfilename : srcfilenames) {
 
@@ -671,7 +687,7 @@ function main() {
 */
 			]() mutable -> void {
 
-			//get file text
+			// Ticker
 			if (verbose)
 				printl("thread: sourcefilename=", srcfilename);
 			else if (not silent)
@@ -682,13 +698,17 @@ function main() {
 				osflush();
 			}
 
+			// Get file text
+			////////////////
+
 			var fileext = srcfilename.field2(".", -1).lcase();
-			var filebase = srcfilename.cut(-len(fileext) - 1);
+			var filepath_without_ext = srcfilename.cut(-len(fileext) - 1);
+			var filename_without_ext = filepath_without_ext.field2(OSSLASH, -1);
 
 			var srcfileinfo = osfile(srcfilename);
 			if (!srcfileinfo) {
 				atomic_ncompilation_failures++;
-				srcfilename.errputl("srcfile doesnt exist: ");
+				srcfilename.quote().errputl("srcfile doesnt exist: ");
 				//continue;
 				return;
 			}
@@ -730,15 +750,16 @@ function main() {
 				return;
 			}
 
-			//determine if program or subroutine/function
+			// Determine if program or subroutine/function
+			// and decide compile/link options
 			var isprogram =
 				index(text, "<exodus/program.h>") or index(text, "int main(") or index(text, "program()");
 			if (verbose)
 				printl("Type=", isprogram ? "Program" : "Subroutine");
 			var outputdir;
 			var compileoptions;
-			var binfilename = filebase;
-			var objfilename = filebase;
+			var binfilename = filepath_without_ext;
+			var objfilename = filepath_without_ext;
 			if (isprogram) {
 				binfilename ^= binfileextension;
 				objfilename ^= objfileextension;
@@ -760,6 +781,9 @@ function main() {
 				compileoptions = liboptions;
 			}
 
+///////////
+//initline:
+///////////
 			//and, for subroutines and functions, create header file (even if compilation not successful)
 			var crlf = "\r\n";
 			var headertext = "";
@@ -767,13 +791,16 @@ function main() {
 			dim text2 = split(text);
 			var nlines = text2.rows();
 
-	#if EXODUS_EXPORT_USING_DEF
-			var deftext = "";
-			var defordinal = 0;
-	#endif
+//#if EXODUS_EXPORT_USING_DEF
+//			var deftext = "";
+//			var defordinal = 0;
+//#endif
 			//detect libraryinit
 			var useclassmemberfunctions = false;
 
+///////////
+//nextline:
+///////////
 //			for (int ln = 1; ln <= nlines; ++ln) {
 //				var line = trimfirst(text2(ln));
 			for (const var& line : text2) {
@@ -784,7 +811,11 @@ function main() {
 				if (not isprogram and word1.starts("libraryinit"))
 					useclassmemberfunctions = true;
 
-				if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine")) {
+				/////////////////////////
+				// GENERATE HEADER IF LIB
+				/////////////////////////
+
+				if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine") and not filename_without_ext.starts("dict_")) {
 
 					//extract out the function declaration in including arguments
 					//eg "function xyz(in arg1, out arg2)"
@@ -792,14 +823,14 @@ function main() {
 
 					var funcname = funcdecl.field(" ", 2).field("(", 1);
 
-	#if EXODUS_EXPORT_USING_DEF
-					++defordinal;
-					deftext ^= crlf ^ " " ^ funcname ^ " @" ^ defordinal;
-	#endif
+//#if EXODUS_EXPORT_USING_DEF
+//					++defordinal;
+//					deftext ^= crlf ^ " " ^ funcname ^ " @" ^ defordinal;
+//#endif
 					if (loadtimelinking) {
 						headertext ^= crlf ^ funcdecl ^ ";";
 					} else {
-						var libname = filebase;
+						var libname = filepath_without_ext;
 						var returnsvarorvoid = (word1 == "function") ? "var" : "void";
 						var callorreturn = (word1 == "function") ? "return" : "call";
 						var funcreturnvoid = (word1 == "function") ? 0 : 1;
@@ -842,7 +873,7 @@ function main() {
 
 						int nargs = fcount(funcargsdecl, ",");
 
-						/* no longer generate default arguments using a dumb process since some pedantic compilers eg g++ 4.2.1 on osx 10.6 refuse to default non-constant parameters (io/out)
+	/* no longer generate default arguments using a dumb process since some pedantic compilers eg g++ 4.2.1 on osx 10.6 refuse to default non-constant parameters (io/out)
 	for now, programmers can still manually define defaults eg "func1(in arg1=var(), in arg2=var())"
 
 	new possibility can default ALL arguments regardless of i/o status:
@@ -1132,13 +1163,14 @@ function main() {
 							replacer(inclusion, "\r\n {before_call}", "");
 							replacer(inclusion, "\r\n {after_call}", "");
 						}
-						var usepredefinedcallable = nargs <= EXODUS_CALLABLE_MAXNARGS;
+						var usepredefinedcallable = nargs <= exodus_callable_maxnargs;
 						if (useclassmemberfunctions) {
 							if (funcname eq "main")
 								headertext ^= inclusion;
 						}
 
 						else if (usepredefinedcallable) {
+
 							//example output for a subroutine with 1 argument of "in" (const var&)
 							//ending of s1 and S1 indicates subroutine of one argument
 							//#include "xmvcallables1.h"
@@ -1176,7 +1208,8 @@ function main() {
 							//undefs are automatic at the end of mvlink.h to allow multiple inclusion
 						}
 					}
-				}
+
+				} // generate header if lib
 
 				//build up list of loadtime libraries required by linker
 				if (loadtimelinking and word1 eq "#include") {
@@ -1190,13 +1223,17 @@ function main() {
 							linkoptions ^= " " ^ word2 ^ ".lib";
 					}
 				}
-			}
+
+			} // next line
 
 			// embedded linker options
 			if (var pos = text.index("/" "/gcc_link_options"); pos) {
 				pos += 18;
 				linkoptions ^= text.substr2(pos, pos);
 			}
+
+			// Update header in ~/inc dir
+			/////////////////////////////
 
 			// Generate headers even for executables that do not really need them
 			// so that we can find the path to the source code for executables
@@ -1208,14 +1245,13 @@ function main() {
 				var abs_srcfilename = srcfilename;
 				if (abs_srcfilename[1] != OSSLASH)
 					abs_srcfilename.prefixer(oscwd() ^ OSSLASH);
-				var filebaseend = filebase.field2(OSSLASH, -1);
-				var h_code = "EXODUS_CALLABLE_" ^ ucase(filebaseend) ^ "_H";
-				headertext.prefixer("#define " ^ h_code);
-				headertext.prefixer("/" "/#ifndef" ^ h_code ^ crlf);
+				var EXODUS_CALLABLE_XXXXX_H = "EXODUS_CALLABLE_" ^ ucase(filename_without_ext) ^ "_H";
+				headertext.prefixer("#define " ^ EXODUS_CALLABLE_XXXXX_H);
+				headertext.prefixer("/" "/#ifndef" ^ EXODUS_CALLABLE_XXXXX_H ^ crlf);
 				headertext.prefixer("/" "/generated by exodus \"compile " ^ abs_srcfilename ^ DQ ^ crlf);
-				headertext ^= crlf ^ "/" "/#endif " ^ crlf;
-				//var headerfilename=filebase^".h";
-				var headerfilename = incdir ^ OSSLASH ^ filebaseend ^ (isprogram ? ".H" : ".h");
+				headertext ^= crlf ^ "/" "/#endif" ^ crlf;
+				//var headerfilename=filepath_without_ext^".h";
+				var headerfilename = incdir ^ OSSLASH ^ filename_without_ext ^ (isprogram ? ".H" : ".h");
 
 				//create include directory if doesnt already exist
 				call make_include_dir(incdir);
@@ -1250,12 +1286,16 @@ function main() {
 					printl("already generated and is up to date.");
 			}
 
-			//skip compilation if generateheadersonly option
-			if (generateheadersonly)
-				//continue;
-				return;
+			// Skip compilation if generateheadersonly option
+			////////////////////////////////////////////////
 
-			//skip compilation if
+			if (generateheadersonly)
+				return;
+				///////
+
+			// Skip compilation if the output file is newer than source file and all include files
+			//////////////////////////////////////////////////////////////////////////////////////
+
 			var outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
 			//TRACE(outputdir ^ OSSLASH ^ field2(binfilename, OSSLASH, -1))
 			//TRACE(srcfileinfo)
@@ -1298,6 +1338,9 @@ function main() {
 
 			manifest = "";
 
+			// Call the actual compile function
+			///////////////////////////////////
+
 			// Compile separated out as a separate function in order to be passed to a thread
 			// Now the caller is itself a lambda expression that is passed to a thread
 			// and the call does not really need to be separated out.
@@ -1321,11 +1364,16 @@ function main() {
 				installcmd,
 				manifest
 			);
-		} // end of lambda
+
+		} // end of big lambda
 
 		); // end of boost::asio::post function
 
-	}  //fileno
+	}  //goto nextfile
+
+///////
+//exit:
+///////
 
 	//join any outstanding threads before terminating
 //	limit_threads(0);
@@ -1405,22 +1453,22 @@ function static compile2(
 	in installcmd,
 	in manifest) {
 
-#if EXODUS_EXPORT_USING_DEF
-	//add .def file to linker so that functions get exported without "c++ name decoration"
-	//then the runtime loader dlsym() can find the functions by their original (undecorated) name
-	//http://wyw.dcweb.cn/stdcall.htm
-	//CL can accept a DEF file on the command line, and it simply passes the file name to LINK
-	// cl /LD testdll.obj testdll.def
-	//will become
-	// link /out:testdll.dll /dll /implib:testdll.lib /def:testdll.def testdll.obj
-	if (deftext) {
-		deftext.prefixer("LIBRARY " ^ filebase ^ crlf ^ "EXPORTS");
-		var deffilename = filebase ^ ".def";
-		oswrite(deftext, deffilename);
-		if (compiler == "cl" and usedeffile)
-			linkoptions ^= " /def:" ^ filebase ^ ".def";
-	}
-#endif
+//#if EXODUS_EXPORT_USING_DEF
+//	//add .def file to linker so that functions get exported without "c++ name decoration"
+//	//then the runtime loader dlsym() can find the functions by their original (undecorated) name
+//	//http://wyw.dcweb.cn/stdcall.htm
+//	//CL can accept a DEF file on the command line, and it simply passes the file name to LINK
+//	// cl /LD testdll.obj testdll.def
+//	//will become
+//	// link /out:testdll.dll /dll /implib:testdll.lib /def:testdll.def testdll.obj
+//	if (deftext) {
+//		deftext.prefixer("LIBRARY " ^ filepath_without_ext ^ crlf ^ "EXPORTS");
+//		var deffilename = filepath_without_ext ^ ".def";
+//		oswrite(deftext, deffilename);
+//		if (compiler == "cl" and usedeffile)
+//			linkoptions ^= " /def:" ^ filepath_without_ext ^ ".def";
+//	}
+//#endif
 
 	var objfilename = objfilename0;
 
