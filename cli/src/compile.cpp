@@ -185,7 +185,7 @@ function main() {
 		//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
 		basicoptions ^= " -Wall";
 		basicoptions ^= " -Wextra";
-		basicoptions ^= " -Wpedantic";
+		//basicoptions ^= " -Wpedantic"; // allow "Elvis operator" ?:
 
 		// no-xxxxxxxx means switch off warning xxxxxxxx
 		basicoptions ^= " -Wno-unknown-pragmas";
