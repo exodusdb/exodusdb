@@ -47,7 +47,7 @@ var ExodusProgramBase::getcursor() const {
 	//output magic request
 	//char cmd[] = "echo -e '\033[6n'";
 	char cmd[] = "\x1b[6n";
-	int err = ::write(1, cmd, sizeof(cmd));
+	auto err = ::write(1, cmd, sizeof(cmd));
 
 	//failure to write
 	if (false && err) {

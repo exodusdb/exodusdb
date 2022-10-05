@@ -429,7 +429,7 @@ class PUBLIC var final {
 	*/
 	var(F rhs)
 		:
-		var_dbl(rhs),
+		var_dbl(static_cast<double>(rhs)),
 		var_typ(VARTYP_DBL) {
 
 		// Prevent overlarge or overnegative long doubles entering var's double
@@ -584,9 +584,11 @@ class PUBLIC var final {
 	// standard c/c++ int() in other words simply take the number to the left of the point.
 	// -1.9 -> -1
 	// +1.9 -> 1
-	int64_t toInt() const;
+	//int64_t toInt() const;
+	int toInt() const;
 
 	//long long toLong() const;
+	int64_t toInt64() const;
 
 	double toDouble() const;
 
@@ -2098,7 +2100,7 @@ class PUBLIC var final {
 			// -2.9 -> -2
 			// +2.9 -> +2
 			//var_int = std::trunc(var_dbl);
-			var_int = var_dbl;
+			var_int = static_cast<varint_t>(var_dbl);
 
 			// Add int flag
 			var_typ |= VARTYP_INT;

@@ -38,7 +38,7 @@ programinit()
 			printl(e.description);
 		}
 
-		{  //min int
+		{  //min int64
 
 			TRACE(std::numeric_limits<int64_t>::min())
 			//var i64 = -9223372036854775808L;
@@ -46,7 +46,9 @@ programinit()
 			TRACE(i64_min)
 			i64_min.dump();
 			//assert(i64_min.toInt() eq -9223372036854775808);
-			assert(i64_min.toInt()    eq std::numeric_limits<int64_t>::min());
+			printl("i64_min.toInt() =", i64_min.toInt());
+			//assert(i64_min.toInt()    eq std::numeric_limits<int64_t>::min());
+			assert(i64_min.toInt64()    eq std::numeric_limits<int64_t>::min());
 			assert(i64_min.toString() eq "-9223372036854775808");
 
 			try {
@@ -58,7 +60,35 @@ programinit()
 			}
 		}
 
-		{  //max int
+		{  //max int(32)
+
+			TRACE(std::numeric_limits<int32_t>::max())
+			//var i32 = -9223372036854775808L;
+			var i32_max = std::numeric_limits<int32_t>::max();
+			TRACE(i32_max)
+			i32_max.dump();
+			assert(i32_max.toInt() eq 2147483647);
+			assert(i32_max.toInt()    eq std::numeric_limits<int32_t>::max());
+			assert(i32_max.toString() eq "2147483647");
+
+			assert(static_cast<varint_t>(++i32_max) == 2147483648);
+		}
+		{  //min int(32)
+
+			TRACE(std::numeric_limits<int32_t>::min())
+			//var i32 = -9223372036854775808L;
+			var i32_min = std::numeric_limits<int32_t>::min();
+			TRACE(i32_min)
+			i32_min.dump();
+			assert(i32_min.toInt() eq -2147483648);
+			printl("i32_min.toInt() =", i32_min.toInt());
+			assert(i32_min.toInt()    eq std::numeric_limits<int32_t>::min());
+			assert(i32_min.toString() eq "-2147483648");
+
+			assert(static_cast<varint_t>(--i32_min) == -2147483649);
+		}
+
+		{  //max int64
 
 			TRACE(std::numeric_limits<int64_t>::max())
 			//var i64 = -9223372036854775808L;
@@ -66,7 +96,8 @@ programinit()
 			TRACE(i64_max)
 			i64_max.dump();
 			//assert(i64_max.toInt() eq -9223372036854775808);
-			assert(i64_max.toInt()    eq std::numeric_limits<int64_t>::max());
+			//assert(i64_max.toInt()    eq std::numeric_limits<int64_t>::max());
+			assert(i64_max.toInt64()    eq std::numeric_limits<int64_t>::max());
 			assert(i64_max.toString() eq "9223372036854775807");
 
 			try {
@@ -82,7 +113,8 @@ programinit()
 		var x = "21112000001";
 		TRACE(x)
 		x.dump();
-		assert(x.toInt()    eq 21112000001);
+		//assert(x.toInt()    eq 21'112'000'001);
+		assert(x.toInt64()    eq 21'112'000'001);
 		assert(x.toString() eq "21112000001");
 		x.dump();
 		TRACE(x.toInt());
@@ -94,7 +126,8 @@ programinit()
 		y *= 1000000;
 		y += 1;
 		y.dump();
-		assert(y.toInt()    eq 21112000001);
+		//assert(y.toInt()    eq 21'112'000'001);
+		assert(y.toInt64()    eq 21'112'000'001);
 		assert(y.toString() eq "21112000001");
 		y.dump();
 		TRACE(y);
@@ -107,10 +140,10 @@ programinit()
 		z.dump();
 
 		printl();
-		var maxint = 0x7fffffffffffffff;
-		TRACE(maxint.toInt())
+		var maxint = 0x7fff'ffff'ffff'ffff;
+		TRACE(maxint.toInt64())
 		maxint.dump();
-		assert(maxint.toInt()    eq 9223372036854775807);
+		assert(maxint.toInt64()    eq 9'223'372'036'854'775'807);
 		assert(maxint.toString() eq "9223372036854775807");
 
 		//throws
@@ -129,7 +162,7 @@ programinit()
 		printl("Check can convert string of largest int '9223372036854775807' to actual integer");
 		var x = "9223372036854775807";
 		x.dump();
-		assert(x.toInt() eq (9223372036854775000 + 807));
+		assert(x.toInt64() eq (9223372036854775000 + 807));
 		x.dump();
 	}
 
@@ -138,7 +171,7 @@ programinit()
 		printl("Check can convert string of minimum int '9223372036854775807' to actual integer");
 		var x = "-9223372036854775808";
 		x.dump();
-		assert(x.toInt() eq -9223372036854775000 - 808);
+		assert(x.toInt64() eq -9223372036854775000 - 808);
 		x.dump();
 	}
 
@@ -148,7 +181,7 @@ programinit()
 		var x = "-9223372036854775809";
 		x.dump();
 		try {
-			assert(x.toInt());
+			assert(x.toInt64());
 			assert(false);	//should not get here
 		} catch (VarNonNumeric e) {
 			printl("OK", e.description);
@@ -162,7 +195,7 @@ programinit()
 		var x = "9223372036854775808";
 		x.dump();
 		try {
-			assert(x.toInt());
+			assert(x.toInt64());
 			assert(false);	//should not get here
 		} catch (VarNonNumeric e) {
 			printl("OK", e.description);

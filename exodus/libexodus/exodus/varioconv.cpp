@@ -71,7 +71,7 @@ var var::iconv(const char* convstr) const {
 	var part;
 	var charn = 1;
 	var terminator;
-	var output = "";
+	var outx = "";
 
 	const char* conversionchar = convstr;
 
@@ -89,14 +89,14 @@ var var::iconv(const char* convstr) const {
 
 				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				} else
-					output ^= part.iconv_D(convstr);
+					outx ^= part.iconv_D(convstr);
 
 				if (!terminator)
 					break;
-				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			} while (true);
 
-			return output;
+			return outx;
 			break;
 
 		// "MD", "MC", "MT", "MX"
@@ -134,13 +134,13 @@ var var::iconv(const char* convstr) const {
 
 						// "MT"
 						case 'T':
-							// output ^= part.iconv_MT(convstr);
-							output ^= part.iconv_MT();
+							// outx ^= part.iconv_MT(convstr);
+							outx ^= part.iconv_MT();
 							break;
 
 						// "MR" - replace iconv is same as oconv!
 						case 'R':
-							output ^= part.oconv_MR(conversionchar);
+							outx ^= part.oconv_MR(conversionchar);
 							break;
 
 						// "MX" number to hex (not string to hex)
@@ -148,17 +148,17 @@ var var::iconv(const char* convstr) const {
 							throw VarNotImplemented("iconv('MX')");
 							// std::ostringstream ss;
 							// ss << std::hex << std::uppercase << part.round().toInt();
-							// output ^= ss.str();
+							// outx ^= ss.str();
 							// break;
 					}
 				}
 
 				if (!terminator)
 					break;
-				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			}
 
-			return output;
+			return outx;
 			break;
 
 		// iconv L#, R#, T#, C# do nothing. TX converts text to record format
@@ -256,7 +256,7 @@ var var::oconv_T(CVR format) const {
 	else
 		fillchar = ' ';
 
-	var output = "";
+	var outx = "";
 
 	var terminator;
 	int nwords;
@@ -280,15 +280,15 @@ var var::oconv_T(CVR format) const {
 			int partlen = part.var_str.size();
 			if (partlen <= width) {
 
-				// output ^= part;
-				// output ^= var(width-partlen).space();
+				// outx ^= part;
+				// outx ^= var(width-partlen).space();
 				part.var_str.resize(width, fillchar);
-				output ^= part.var_str;
+				outx ^= part.var_str;
 
 				if (!terminator)
 					break;
 
-				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 
 				continue;
 			}
@@ -304,14 +304,14 @@ var var::oconv_T(CVR format) const {
 				if (wordn > 1) {
 					if (!wordlen)
 						continue;
-					output ^= TM;
+					outx ^= TM;
 				}
 
 				// long words get tm inserted every width characters
 				for (int ii = 1; ii <= wordlen; ii += width) {
 					if (ii > 1)
-						output ^= TM;
-					output ^= word.b(ii, width);
+						outx ^= TM;
+					outx ^= word.b(ii, width);
 				}	// ii;
 
 				int remaining = width - (wordlen % width);
@@ -320,7 +320,7 @@ var var::oconv_T(CVR format) const {
 
 					if (remaining <= 1) {
 						if (remaining)
-							output ^= fillchar;
+							outx ^= fillchar;
 					} else {
 
 						// try to squeeze in following words into the
@@ -334,14 +334,14 @@ var var::oconv_T(CVR format) const {
 								break;
 
 							wordn += 1;
-							output ^= fillchar;
-							output ^= nextword;
+							outx ^= fillchar;
+							outx ^= nextword;
 							remaining -= nextwordlen + 1;
 						}  // loop;
 
-						// output ^= var(remaining).space();
+						// outx ^= var(remaining).space();
 						spacing.resize(remaining, fillchar);
-						output ^= spacing;
+						outx ^= spacing;
 					}
 				}
 
@@ -351,11 +351,11 @@ var var::oconv_T(CVR format) const {
 		if (!terminator)
 			break;
 
-		output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+		outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 
 	}  // loop parts
 
-	return output;
+	return outx;
 }
 
 var var::oconv_MD(const char* conversion) const {
@@ -611,7 +611,7 @@ var var::oconv_LRC(CVR format) const {
 	else
 		fillchar = ' ';
 
-	var output = "";
+	var outx = "";
 	var terminator;
 
 	var part;
@@ -631,30 +631,30 @@ var var::oconv_LRC(CVR format) const {
 			remaining = width - part.var_str.size();
 			if (remaining > 0) {
 				if (just == "L") {
-					// output ^= part;
-					// output ^= remaining.space();
+					// outx ^= part;
+					// outx ^= remaining.space();
 					part.var_str.resize(width, fillchar);
-					output ^= part;
+					outx ^= part;
 				} else if (just == "R") {
-					// output ^= remaining.space();
-					// output ^= part;
+					// outx ^= remaining.space();
+					// outx ^= part;
 					part.var_str.insert(0, remaining, fillchar);
-					output ^= part;
+					outx ^= part;
 				} else	//"C"
 				{
 					part.var_str.insert(0, remaining / 2, fillchar);
-					output ^= part;
-					output.var_str.resize(width, fillchar);
+					outx ^= part;
+					outx.var_str.resize(width, fillchar);
 				}
 			} else {
 				if (just == "R") {
 					// take the last n characters
-					output ^= part.var_str.substr(part.var_str.size() - width,
+					outx ^= part.var_str.substr(part.var_str.size() - width,
 												  width);
 				} else	// L or C
 				{
 					// take the first n characters
-					output ^= part.var_str.substr(0, width);
+					outx ^= part.var_str.substr(0, width);
 				}
 			}
 		}
@@ -664,10 +664,10 @@ var var::oconv_LRC(CVR format) const {
 			break;
 		;
 
-		output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+		outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 	}  // loop;
 
-	return output;
+	return outx;
 }
 
 //var var::oconv(CVR conversion) const {
@@ -695,7 +695,7 @@ var var::oconv(const char* conversion) const {
 	var part;
 	var charn = 1;
 	var terminator;
-	var output = "";
+	var outx = "";
 
 	const char* conversionchar = conversion;
 
@@ -713,16 +713,16 @@ var var::oconv(const char* conversion) const {
 
 				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				} else if (!part.isnum())
-					output ^= part;
+					outx ^= part;
 				else
-					output ^= part.oconv_D(conversion);
+					outx ^= part.oconv_D(conversion);
 
 				if (!terminator)
 					break;
-				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			}
 
-			return output;
+			return outx;
 			break;
 
 		// "MD", "MC", "MT", "MX", "ML", "MR"
@@ -747,12 +747,12 @@ var var::oconv(const char* conversion) const {
 				// MR ... character replacement
 				if (*conversionchar == 'R') {
 					if (notemptystring)
-						output ^= part.oconv_MR(++conversionchar);
+						outx ^= part.oconv_MR(++conversionchar);
 				}
 
 				// non-numeric are left unconverted for "MD", "MT", "MX"
 				else if (!part.isnum())
-					output ^= part;
+					outx ^= part;
 
 				// do conversion on a number
 				else {
@@ -763,14 +763,14 @@ var var::oconv(const char* conversion) const {
 						case 'D':
 						case 'C':
 							// may treat empty string as zero
-							output ^= part.oconv_MD(conversion);
+							outx ^= part.oconv_MD(conversion);
 							break;
 
 						// "MT" - time
 						case 'T':
 							// point to the remainder of the conversion after the "MT"
 							if (notemptystring) {
-								output ^= part.oconv_MT(conversionchar + 1);
+								outx ^= part.oconv_MT(conversionchar + 1);
 							}
 
 							break;
@@ -792,7 +792,7 @@ var var::oconv(const char* conversion) const {
 								   //   << part.round().toInt();
 								   << part.var_int;
 
-								output ^= ss.str();
+								outx ^= ss.str();
 							}
 
 							break;
@@ -801,10 +801,10 @@ var var::oconv(const char* conversion) const {
 
 				if (!terminator)
 					break;
-				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			}
 
-			return output;
+			return outx;
 			break;
 
 		//TODO implement masking eg.

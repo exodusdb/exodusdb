@@ -665,12 +665,30 @@ bool var::toBool() const {
 	}
 }
 
-int64_t var::toInt() const {
+//int64_t var::toInt64() const {
+//
+//	this->assertInteger(__PRETTY_FUNCTION__);
+//
+//	//return static_cast<int>(var_int);
+//	return var_int;
+//}
+
+int var::toInt() const {
 
 	this->assertInteger(__PRETTY_FUNCTION__);
 
 	//return static_cast<int>(var_int);
-	return var_int;
+	//return var_int;
+	return static_cast<int>(*this);
+}
+
+int64_t var::toInt64() const {
+
+	this->assertInteger(__PRETTY_FUNCTION__);
+
+	//return static_cast<int>(var_int);
+	//return var_int;
+	return static_cast<int64_t>(*this);
 }
 
 //long long int var::toLong() const {

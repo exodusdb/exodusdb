@@ -10,7 +10,7 @@ var t2;
 var colspan;//num
 var rowspan;//num
 
-function main(io colhdg, in thproperties, in nobase0) {
+function main(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 
 	//called from nlist, adxtab
 
@@ -116,7 +116,9 @@ nextcoln:;
 	//change all "(Base)" in dictionary column headings to the base currency
 	//unless the keyword NO-BASE is present in which case replace with blank
 	//this is useful if all the columns are base and no need to see the currency
-	t2 = sys.company.f(3);
+	//var basecurrcode = sys.company.f(3);
+	//t2 = sys.company.f(3);
+	t2 = basecurrcode;
 	if (t2) {
 		if (nobase) {
 			t2 = "";
@@ -124,7 +126,7 @@ nextcoln:;
 			t2 = "(" ^ t2 ^ ")";
 		}
 		colhdg.replacer("(Base)", t2);
-		colhdg.replacer("%BASE%", sys.company.f(3));
+		colhdg.replacer("%BASE%", basecurrcode);
 	}
 
 	return 0;

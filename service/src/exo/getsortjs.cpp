@@ -1,4 +1,3 @@
-
 #include <exodus/library.h>
 libraryinit()
 

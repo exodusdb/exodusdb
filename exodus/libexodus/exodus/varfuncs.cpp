@@ -242,25 +242,27 @@ VARREF var::inputn(const int nchars) {
 	var_typ = VARTYP_STR;
 
 	//declare function in getkey.cpp
-	int getkey(void);
+	char getkey(void);
 
 	//input whatever characters are available into this var a return true if more than none
 	// quit if error or EOF
 	if (nchars < 0) {
 
 		for (;;) {
-			int int1;
+			char char1;
 			{
 				//LOCKIOSTREAM
-				int1 = getkey();
+				char1 = getkey();
 			}
 
-			//quit if no (more) characters available
-			if (int1 < 0)
+			// Quit if no (more) characters available
+			// really should test for EOF which is usually -1
+			// Ctrl+D usually terminates input in posix
+			if (char1 < 0)
 				break;
 
-			//var_str += int1;
-			var_str.push_back(int1);
+			//var_str += char1;
+			var_str.push_back(char1);
 		}
 	}
 
@@ -269,26 +271,28 @@ VARREF var::inputn(const int nchars) {
 
 		while (!eof()) {
 
-			int int1;
+			char char1;
 			{
 				//LOCKIOSTREAM
-				int1 = getkey();
+				char1 = getkey();
 			}
 
 			// try again after a short delay if no key and not enough characters yet
 			// TODO implement as poll/epoll/select
-			if (int1 < 0) {
+			// Really should test for EOF which is usually -1
+			// Ctrl+D usually terminates input in posix
+			if (char1 < 0) {
 				this->ossleep(100);
 				continue;
 			}
 
 			// Enter/Return key always returns whatever has been entered so far
-			//if (int1 < 0 || int1 == 0x0d)
+			//if (char1 < 0 || char1 == 0x0d)
 			//	break;
 
 			// add the character to the output
-			//var_str += int1;
-			var_str.push_back(int1);
+			//var_str += char1;
+			var_str.push_back(char1);
 
 			// quit if got the desired number of characters
 			//nchars cannot be negative at this point
@@ -694,7 +698,9 @@ VARREF var::ucaser() {
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
-		c = std::toupper(c);
+		// toupper returns an int
+		// Presumably safe to cast back to char
+		c = static_cast<char>(std::toupper(c));
 	}
 	if (allASCII)
 		return *this;
@@ -738,12 +744,15 @@ VARREF var::lcaser() {
 	// try ASCII uppercase to start with for speed
 	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
 	// letters.
-	bool allASCII = false;
-	for (char& c : var_str) {
+	auto allASCII = false;
+	//for (char& c : var_str) {
+	for (auto& c : var_str) {
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
-		c = std::tolower(c);
+		// tolower returns an int
+		// Presumably safe to cast back to char
+		c = static_cast<char>(std::tolower(c));
 	}
 	if (allASCII)
 		return *this;
@@ -1549,7 +1558,7 @@ void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 	//	std::replace(var_str.begin(), var_str.end(), fromchars[0], tochars[0]);
 	//}
 
-	int tochars_size = tochars.size();
+	auto tochars_size = tochars.size();
 	while (true) {
 		// locate (backwards) any of the from characters
 		// because we might be removing characters
@@ -1560,7 +1569,8 @@ void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 			break;
 
 		// find which from character we have found
-		int fromcharn = static_cast<int>(fromchars.find(var_str[pos]));
+		//int fromcharn = static_cast<int>(fromchars.find(var_str[pos]));
+		auto fromcharn = fromchars.find(var_str[pos]);
 
 		if (fromcharn < tochars_size)
 			var_str.replace(pos, 1, tochars.substr(fromcharn, 1));

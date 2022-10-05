@@ -18,7 +18,7 @@
 
 namespace exodus {
 
-int getkey(void) {
+char getkey(void) {
 	char ch = 0;
 	int error;
 	struct termios oldAttr, newAttr;
