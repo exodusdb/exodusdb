@@ -9,7 +9,24 @@ var params;
 var params2;
 var tagsep;
 
+//Note that the argument names are not accurate for GETCSS, GETSORTJS, COLROWSPAN, CONVCSS, ADDUNITS, DOCMODS, GETMARK modes
 function main(in mode, io dataio, in params0="", in params20="", in glang="") {
+
+	// First for speed since calle for every column and row
+	if (mode eq "ADDUNITS") {
+
+		// Add/merge aa into bb
+
+		//wire up accurate names to the given parameters
+		var& bb = dataio;
+		let& aa = params0;
+		let& sep = params20;
+
+		// Note aa and bb are switched in order only
+		gosub addunits(aa, bb, sep);
+
+		return 0;
+	}
 
 	//REPLACING UPPERCASE VERSION HTMLLIB()
 
@@ -380,8 +397,42 @@ function main(in mode, io dataio, in params0="", in params20="", in glang="") {
 
 	} else if (mode eq "GETCSS") {
 
-		//version = params0
-		gosub getcss(dataio, params0);
+		//wire up accurate names to the given parameters
+		let& version = params0;
+
+		gosub getcss(dataio, version);
+
+	} else if (mode eq "COLROWSPAN") {
+
+		//wire up accurate names to the given parameters
+		var& colhdg = dataio;
+		let& thproperties = params0;
+		let& nobase0 = params20;
+		let& basecurrcode = glang;
+
+		gosub colrowspan(colhdg, thproperties, nobase0, basecurrcode);
+
+	} else if (mode eq "CONVCSS") {
+
+		//wire up accurate names to the given parameters
+		var& outx = dataio;
+		let& tableid = params0;
+		let& in0 = params20;
+
+		gosub convcss(outx, tableid, in0);
+
+	} else if (mode eq "DOCMODS") {
+
+		gosub docmods(dataio, params0);
+
+	} else if (mode eq "GETMARK") {
+
+		//wire up accurate names to the given parameters
+		var& mark = dataio;
+		let& getmarkmode = params0;
+		let& html = params20;
+
+		gosub getmark(getmarkmode, html, mark);
 
 	} else {
 		call mssg(mode.quote() ^ " unknown mode in HTMLLIB2");
@@ -824,6 +875,355 @@ function toggle(t,mode)
 )V0G0N";
 
 	}
+}
+
+subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
+
+	//called from nlist, adxtab
+
+
+	//given fm list of column heading and vm per row of column heading
+	//return the same but converted to tagged something like <th>xx</th>
+	//but with rowspan= and colspan= inserted to span any duplicates
+
+	//thproperties can be fm list otherwise one is used for all
+
+	var nobase;//num
+	if (nobase0.unassigned()) {
+		nobase = 0;
+	} else {
+		nobase = nobase0;
+	}
+
+	//determine ncols
+	var ncols2 = colhdg.count(FM) + 1;
+
+	//determine nrows
+	var nrows = 1;
+	for (const var coln : range(1, ncols2)) {
+		var tt = colhdg.f(coln).count(VM) + 1;
+		if (tt gt nrows) {
+			nrows = tt;
+		}
+	} //coln;
+
+	//var t2;
+	var colspan;//num
+	var rowspan;//num
+
+	var thprop = thproperties;
+	var nocell = "%~%";
+	// Additional space to defeat convsyntax until clanf-format
+	for ( var rown = 1; rown <= nrows; rown++) {
+
+		// Additional space to defeat convsyntax until clang-format
+		for ( var coln = 1; coln <= ncols2; coln++) {
+		// Reverted because we do need to skip coln's
+		//for (const var coln : range(1, ncols2)) {
+
+			var tt = colhdg.f(coln, rown);
+			if (tt eq nocell) {
+				continue;
+			}
+
+			//t2='<th style="background-color:':thcolor:'"'
+			if (thproperties.contains(FM)) {
+				thprop = thproperties.f(coln);
+			}
+			var t2 = "\r\n" " <th " ^ thprop;
+
+			colspan = 1;
+			rowspan = 1;
+
+			//determine any colspan (duplicate cells to the right)
+			while (true) {
+				var coln2 = coln + colspan;
+				var t3 = colhdg.f(coln2, rown);
+				///BREAK;
+				if (not((coln2 le ncols2 and t3 eq tt) and t3 ne nocell)) break;
+				colspan += 1;
+				//colhdg(coln2, rown) = nocell;
+				pickreplacer(colhdg, coln2, rown, nocell);
+			}//loop;
+
+			//if usecols else t:=coldict(coln)<14>
+			if (colspan gt 1) {
+				t2 ^= " colspan=" ^ colspan ^ " align=center";
+
+			} else {
+
+				//determine any rowspan (duplicate cells below)
+				while (true) {
+					var rown2 = rown + rowspan;
+					var t3 = colhdg.f(coln, rown2);
+					///BREAK;
+					if (not((rown2 le nrows and ((t3 eq tt or t3 eq ""))) and t3 ne nocell)) break;
+					rowspan += 1;
+					//colhdg(coln, rown2) = nocell;
+					pickreplacer(colhdg, coln, rown2, nocell);
+				}//loop;
+
+				if (rowspan gt 1) {
+					t2 ^= " rowspan=" ^ rowspan;
+				}
+			}
+
+			t2 ^= ">" ^ tt ^ "</th>";
+			//colhdg(coln, rown) = t2;
+			pickreplacer(colhdg, coln, rown, t2);
+
+			coln += colspan - 1;
+
+		} //coln;
+
+	} //rown;
+	colhdg.replacer(nocell, "");
+
+	colhdg = invertarray(colhdg);
+	colhdg.replacer(FM, "</tr><tr>");
+	colhdg.replacer(VM, "");
+	colhdg = "<tr>" ^ colhdg ^ "</tr>";
+
+	//change all "(Base)" in dictionary column headings to the base currency
+	//unless the keyword NO-BASE is present in which case replace with blank
+	//this is useful if all the columns are base and no need to see the currency
+	//var basecurrcode = sys.company.f(3);
+	//t2 = sys.company.f(3);
+	var t2 = basecurrcode;
+	if (t2) {
+		if (nobase) {
+			t2 = "";
+		} else {
+			t2 = "(" ^ t2 ^ ")";
+		}
+		colhdg.replacer("(Base)", t2);
+		colhdg.replacer("%BASE%", basecurrcode);
+	}
+	return;
+}
+
+subroutine convcss(out outx, in tableid, in in0) {
+
+	//convert <COL ALIGN=RIGHT> to nth-child style
+
+	var inp = in0.trim().lcase();
+
+	var crlf = "\r\n";
+
+	outx = "\n<style type=\"text/css\">\n";
+	var align = "left";
+
+	let ncols = inp.count(VM) + 1;
+	for (const var coln : range(1, ncols)) {
+		var tt = inp.f(1, coln);
+
+		if (tt.contains("left")) {
+			align = "left";
+		}
+		if (tt.contains("right")) {
+			align = "right";
+		}
+		if (tt.contains("center")) {
+			align = "center";
+		}
+
+		var otherstyle = tt.field(DQ, 2);
+		otherstyle.converter("{}", "");
+		otherstyle.trimmer();
+		if (not otherstyle.starts(";")) {
+			otherstyle.prefixer(";");
+		}
+		if (not otherstyle.ends(";")) {
+			otherstyle ^= ";";
+		}
+
+		//> means dont inherit to subtables
+		//td
+		outx ^= "table#" ^ tableid ^ " > tbody > tr > td:nth-child(" ^ coln ^ "){text-align:" ^ align ^ otherstyle ^ "}\n";
+		//th
+		outx ^= "table#" ^ tableid ^ " > tbody > tr > th:nth-child(" ^ coln ^ "){text-align:" ^ align ^ otherstyle ^ "}\n";
+	} //coln;
+
+	outx ^= "</style>\n";
+	return;
+}
+
+subroutine addunits(in a0, io bb, in sep) {
+
+	//BP  ADXTAB  sm
+	//BP  ANALSCH vm
+	//GBP NLIST   vm
+
+	if (a0 eq "") {
+		return;
+	}
+	//add a to b
+	//a and b can be a mv or sv list of amounts with unit codes eg 200STG]300YEN]100USD
+	//b must be ascii alphabetic order
+
+	//quick calc and exit if both are plain numeric
+	if (a0.isnum() and bb.isnum()) {
+		bb += a0;
+		return;
+	}
+
+	var aa = a0;
+
+	//work as if vms
+	if (sep eq SM) {
+		aa.converter(SM, VM);
+		bb.converter(SM, VM);
+	}
+
+	var acode;
+	let na = aa.fcount(VM);
+	for (const var an : range(1, na)) {
+
+		var anum = amountunit(aa.f(1, an), acode);
+		var bcode = "";
+
+		var nb = bb.fcount(VM);
+		//assist ADECOM c++ decompiler to lift bn out of loop
+		//bn=1
+		//for bn=1 to nb
+		var bn = 0;
+		while (true) {
+			bn += 1;
+			///BREAK;
+			if (not(bn le nb)) break;
+			var bnum = amountunit(bb.f(1, bn), bcode);
+			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
+
+			if (bcode eq acode) {
+				if (bnum.len() or anum.len()) {
+					var ndecs = anum.field(".", 2).len();
+					var bndecs = bnum.field(".", 2).len();
+					if (bndecs gt ndecs) {
+						ndecs = bndecs;
+					}
+					if (anum.isnum() and bnum.isnum()) {
+						pickreplacer(bb, 1, bn, (bnum + anum).oconv("MD" ^ ndecs ^ "0P") ^ acode);
+					}
+				} else {
+					pickreplacer(bb, 1, bn, acode);
+				}
+				break;
+			}
+
+			//could be faster if input was guaranteed to be in order
+			//until bcode>=acode
+
+			//next bn
+		}//loop;
+
+		//if bcode<>acode and len(anum) then
+		if (bcode ne acode) {
+			bb.inserter(1, bn, anum ^ acode);
+		}
+
+	} //an;
+
+	//work as if vms
+	if (sep eq SM) {
+		bb.converter(VM, SM);
+	}
+
+	return;
+}
+
+subroutine docmods(io tx, in letterheadopts) {
+
+	//html2pdf.exe messes up repeating headers on continuation pages
+	//so turn thead into additional tbody
+	if (not(letterheadopts.isnum())) {
+
+		//swap 'THEAD>' with 'thead>' in tx
+		//swap 'TBODY>' with 'body>' in tx
+		//swap '<thead>' with '' in tx
+		//swap '<tbody>' with '' in tx
+		//swap '</thead>' with '' in tx
+		//swap '</tbody>' with '' in tx
+
+		tx.replacer("<THEAD", "<tbody");
+		tx.replacer("</THEAD", "</tbody");
+		tx.replacer("<thead", "<tbody");
+		tx.replacer("</thead", "</tbody");
+
+	}
+
+	return;
+}
+
+function getmark(in mode, in html, io mark) {
+	//eg
+	//call getmark('CLIENT',1,clientmark)
+	//call getmark('OWN',1,ownmark)
+
+	//$insert gbp,general.common
+
+	if (mark.unassigned()) {
+		mark = "";
+	}
+
+var link;
+
+	//NB <small> tags seem to make no difference if they are removed
+	//at least in modern browsers. presumably style:font-size is preferential
+	if (mode eq "OWN") {
+
+		if (mark) {
+			mark ^= " ";
+		}
+		//S o f t  w a r e   b y
+		mark ^= var("7962206572617774666F53").iconv("HEX2").b(-1, -999);
+		if (html) {
+			mark.prefixer("<div style=\"font-size:60%;margin:0px;text-align:left;page-break-before:avoid;page-break-after:avoid\">");
+		}
+
+		mark ^= " ";
+
+		mark ^= var("4D4F432E5359534F454E").iconv("HEX2").b(-1, -99);
+
+		if (html) {
+			mark ^= "</div>";
+		}
+
+	} else {
+		mark = "";
+
+		if (html) {
+			//mark[1,0]='<small>'
+
+			//mark:=' '
+
+			//hyper link to client's email
+			link = SYSTEM.f(10, 2);
+			if (link) {
+				mark ^= "<a href=\"";
+				mark ^= "mailto:" ^ link;
+				mark ^= "\">";
+			}
+
+		}
+
+		//client mark
+		mark ^= SYSTEM.f(14);
+
+		if (html) {
+			if (link) {
+				mark ^= "</a>";
+			}
+			//mark:='</small>'
+			if (SYSTEM.f(17).ends("_test")) {
+				mark = "<span style=\"color:red\">" ^ mark ^ " - " ^ SYSTEM.f(17) ^ "</span>";
+			}
+		}
+
+		mark = "<div style=\"font-size:60%;margin:0px;text-align:left;page-break-before:avoid;page-break-after:avoid\">" ^ mark ^ "</div>";
+
+	}
+
+	return 0;
 }
 
 libraryexit()

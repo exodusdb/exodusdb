@@ -3,7 +3,7 @@ libraryinit()
 
 #include <gethtml.h>
 #include <htmllib2.h>
-#include <getmark.h>
+//#include <getmark.h>
 //#include <getcss.h>
 #include <sysmsg.h>
 
@@ -152,7 +152,7 @@ function main(io tx, in mode="", in modevalue="") {
 			if (html) {
 				bottomline ^= "</tbody></table>";
 			}
-			call getmark("OWN", html, printtxmark);
+			call htmllib2("GETMARK", printtxmark, "OWN", html);
 			bottomline ^= printtxmark;
 		}
 

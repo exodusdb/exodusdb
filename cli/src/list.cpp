@@ -74,18 +74,18 @@ Example command line:
 //#	define timedate2 timedate
 //#	define timedate2 (oconv(time(), "MTS") ^ " " ^ oconv(date(), "D"))
 #else
-#	include <addunits.h>
-#	include <colrowspan.h>
-#	include <convcss.h>
-#	include <docmods.h>
-#	include <elapsedtimetext.h>
-#	include <getcss.h>
+//#	include <addunits.h>
+//#	include <colrowspan.h>
+//#	include <convcss.h>
+//#	include <docmods.h>
+//#	include <elapsedtimetext.h>
+//#	include <getcss.h>
 #	include <gethtml.h>
-#	include <getmark.h>
-#	include <getsortjs.h>
+//#	include <getmark.h>
+//#	include <getsortjs.h>
 #	include <htmllib2.h>
 #	include <sendmail.h>
-#	include <timedate2.h>
+//#	include <timedate2.h>
 #	include <xselect.h>
 #endif
 
@@ -1405,13 +1405,15 @@ x1exit:
 	//thproperties='style="background-color:':thcolor:'"'
 #ifndef EXO_NOHTML
 	if (html) {
-		call colrowspan(colhdg, thproperties, nobase);
+		//call colrowspan(colhdg, thproperties, nobase);
+		call htmllib2("COLROWSPAN", colhdg, thproperties, nobase);
 	}
 #endif
 	//trim off blank lines (due to the 9 above)
 	if (html) {
 #ifndef EXO_NOHTML
-		call getsortjs(tt);
+		//call getsortjs(tt);
+		call htmllib2("GETSORTJS", tt);
 
 		if (not rawtable) {
 			call getmark("CLIENT", html, clientmark);
@@ -1498,7 +1500,8 @@ x1exit:
 			headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
 #ifndef EXO_NOHTML
 		//style columns where '<col>' not supported.
-		call convcss(mode, "headtab0", headtabcols, headtabstyle);
+		//call convcss(mode, "headtab0", headtabcols, headtabstyle);
+		call htmllib2("CONVCSS", headtabstyle, "headtab0", headtabcols);
 		style ^= "\r\n" ^ headtabstyle;
 		//tt[1,0]=headtabstyle:crlf
 
@@ -1818,7 +1821,9 @@ recexit:
 				if (html) {
 #ifndef EXO_NOHTML
 					//breaktotal(coln,1)+=i.col(coln)
-					call addunits(icol(coln), breaktotal(coln, 1), VM);
+					//call addunits(icol(coln), breaktotal(coln, 1), VM);
+					// breaktotal <- icol
+					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol(col), VM);
 #endif
 				} else {
 					if (breaktotal(coln, 1).isnum() and icol(coln).isnum()) {
@@ -2380,7 +2385,9 @@ subroutine printbreaks() {
 						if (html) {
 #ifndef EXO_NOHTML
 							//breaktotal(coln,leveln+1)+=cell
-							call addunits(cell, breaktotal(coln, leveln + 1), VM);
+							//call addunits(cell, breaktotal(coln, leveln + 1), VM);
+							// breaktotal <- cell
+							call htmllib2("ADDUNITS", breaktotal(coln, leveln + 1, cell, VM);
 #endif
 						} else {
 							if (((breaktotal(coln, leveln + 1)).isnum()) and cell.isnum()) {

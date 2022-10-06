@@ -6,9 +6,18 @@ subroutine printnext() {
 	return;
 
 }
-subroutine getcss(io css, in version) {
+subroutine getcss(io css, in version = "") {
 	call htmllib2("GETCSS", css, version);
 	return;
+}
+
+subroutine docmods(io tx, in params = "") {
+	call htmllib2("DOCMODS", tx, params);
+	return;
+}
+
+subroutine getmark(in mode, in html, io mark) {
+	call htmllib2("GETMARK", mark, mode, html);
 }
 
 subroutine printtx() {
@@ -208,7 +217,7 @@ subroutine printtx2() {
 
 			tx.prefixer("<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
 
-			call docmods("", tx);
+			call docmods(tx);
 
 			//ptx_css = "";
 		}

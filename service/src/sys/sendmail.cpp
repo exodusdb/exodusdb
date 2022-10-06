@@ -28,9 +28,9 @@ libraryinit()
 #include <shell2.h>
 #include <log.h>
 
-#include <system_common.h>
+//#include <system_common.h>
 
-#include <sys_common.h>
+//#include <sys_common.h>
 
 var ccaddress;
 var subject;
