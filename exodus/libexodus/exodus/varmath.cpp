@@ -68,12 +68,12 @@ inline double exodusmodulo_dbl(const double dividend, const double limit) {
 	return result;
 }
 
-inline int exodusmodulo_int(const int dividend, const int limit) {
+inline varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) {
 
 	if (!limit)
 		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
 
-	int result;
+	varint_t result;
 	if (limit > 0) {
 		[[likely]]
 		result = dividend % limit;
@@ -169,8 +169,6 @@ var var::abs() const {
 			return -var_int;
 		return var_int;
 	}
-	// cannot get here
-	throw VarError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::sin() const {
@@ -183,9 +181,6 @@ var var::sin() const {
 		return std::sin(var_dbl * M_PI / 180);
 	else
 		return std::sin(static_cast<double>(var_int) * M_PI / 180);
-
-	// cannot get here
-	throw VarError("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::cos() const {
@@ -198,9 +193,6 @@ var var::cos() const {
 		return std::cos(var_dbl * M_PI / 180);
 	else
 		return std::cos(static_cast<double>(var_int) * M_PI / 180);
-
-	// cannot get here
-	throw VarError("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::tan() const {
@@ -213,9 +205,6 @@ var var::tan() const {
 		return std::tan(var_dbl * M_PI / 180);
 	else
 		return std::tan(static_cast<double>(var_int) * M_PI / 180);
-
-	// cannot get here
-	throw VarError("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::atan() const {
@@ -228,9 +217,6 @@ var var::atan() const {
 		return std::atan(var_dbl) / M_PI * 180;
 	else
 		return std::atan(static_cast<double>(var_int)) / M_PI * 180;
-
-	// cannot get here
-	throw VarError("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::loge() const {
@@ -243,9 +229,6 @@ var var::loge() const {
 		return std::log(var_dbl);
 	else
 		return std::log(static_cast<double>(var_int));
-
-	// cannot get here
-	throw VarError("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::sqrt() const {
@@ -259,8 +242,6 @@ var var::sqrt() const {
 
 	//	if (this->var_typ & VARTYP_INT)
 	return std::sqrt(static_cast<double>(var_int));
-
-	throw VarError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::pwr(CVR exponent) const {
@@ -274,9 +255,6 @@ var var::pwr(CVR exponent) const {
 		return std::pow(var_dbl, exponent.toDouble());
 	else
 		return std::pow(static_cast<double>(var_int), exponent.toDouble());
-
-	// cannot get here
-	throw VarError("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::exp() const {
@@ -289,9 +267,6 @@ var var::exp() const {
 		return std::exp(var_dbl);
 	else
 		return std::exp(static_cast<double>(var_int));
-
-	// cannot get here
-	throw VarError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 } // namespace exodus

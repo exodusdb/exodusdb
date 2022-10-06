@@ -322,7 +322,7 @@ uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
 #if defined(USE_WYHASH)
 	return wyhash(fileandkey.data(), fileandkey.size(), 0, _wyp);
 #elif defined(USE_MURMURHASH)
-	return MurmurHash64(fileandkey.data(), fileandkey.size(), 0);
+	return MurmurHash64(fileandkey.data(), static_cast<int>(fileandkey.size()), 0);
 #else
 	return std::hash<std::string>{}(fileandkey);
 #endif
@@ -1388,7 +1388,7 @@ var var::hash(const uint64_t modulus) const {
 #if defined(USE_WYHASH)
 	uint64_t hash64 = wyhash(var_str.data(), var_str.size(), 0, _wyp);
 #elif defined(USE_MURMURHASH)
-	uint64_t hash64 = MurmurHash64(var_str.data(), var_str.size(), 0);
+	uint64_t hash64 = MurmurHash64(var_str.data(), static_cast<int>(var_str.size()), 0);
 #else
 	uint64_t hash64 = std::hash<std::string>{}(var_str);
 #endif
@@ -2431,6 +2431,8 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 	else if (dicttype == "S") {
 		var function_src = dictrec.f(8).trim();
+		while (function_src.f(1,1).contains("#include "))
+			function_src.remover(1,1);
 		var pgsql_pos = function_src.index(_VM "/" "*pgsql");
 		var x = (!ismv1 || stage2_calculated);
 		var y = function_src.trimfirst("\t /").lcase().starts("@ans=xlate(");

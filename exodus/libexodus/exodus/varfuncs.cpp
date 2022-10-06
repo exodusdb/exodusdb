@@ -527,11 +527,11 @@ var var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
 	THISIS("var var::trimfirst(SV trimchars) const&")
 	assertStringMutator(function_sig);
 
-	var rvo = *this;
+	var nrvo = *this;
 
-	trimmerfirst_helper(rvo.var_str, trimchars);
+	trimmerfirst_helper(nrvo.var_str, trimchars);
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate
@@ -553,11 +553,11 @@ var var::trimlast(SV trimchars DEFAULT_SPACE) const& {
 	THISIS("var var::trimlast(SV trimchars) const&")
 	assertStringMutator(function_sig);
 
-	var rvo = *this;
+	var nrvo = *this;
 
-	trimmerlast_helper(rvo.var_str, trimchars);
+	trimmerlast_helper(nrvo.var_str, trimchars);
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate
@@ -579,12 +579,12 @@ var var::trimboth(SV trimchars DEFAULT_SPACE) const& {
 	THISIS("var var::trimboth(SV trimchars) const&")
 	assertStringMutator(function_sig);
 
-	var rvo = *this;
+	var nrvo = *this;
 
-	trimmerlast_helper(rvo.var_str, trimchars);
-	trimmerfirst_helper(rvo.var_str, trimchars);
+	trimmerlast_helper(nrvo.var_str, trimchars);
+	trimmerfirst_helper(nrvo.var_str, trimchars);
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate
@@ -610,14 +610,14 @@ var var::trim(SV trimchars DEFAULT_SPACE) const& {
 	THISIS("var var::trim(SV trimchars) const&")
 	assertStringMutator(function_sig);
 
-	var rvo = *this;
+	var nrvo = *this;
 
-	trimmerlast_helper(rvo.var_str, trimchars);
-	trimmerfirst_helper(rvo.var_str, trimchars);
+	trimmerlast_helper(nrvo.var_str, trimchars);
+	trimmerfirst_helper(nrvo.var_str, trimchars);
 	//trimmerinner_helper only works after first and last trimchars are removed
-	trimmerinner_helper(rvo.var_str, trimchars);
+	trimmerinner_helper(nrvo.var_str, trimchars);
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate
@@ -698,7 +698,7 @@ VARREF var::ucaser() {
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
-		// toupper returns an int
+		// toupper returns an int despite being given a char
 		// Presumably safe to cast back to char
 		c = static_cast<char>(std::toupper(c));
 	}
@@ -750,7 +750,7 @@ VARREF var::lcaser() {
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
-		// tolower returns an int
+		// tolower returns an int despite being given a char
 		// Presumably safe to cast back to char
 		c = static_cast<char>(std::tolower(c));
 	}
@@ -995,11 +995,11 @@ var var::quote() const& {
 	THISIS(__PRETTY_FUNCTION__)
 	assertString(function_sig);
 
-	var rvo = DQ_;
-	rvo.var_str.append(this->var_str);
-	rvo.var_str.push_back(DQ_);
+	var nrvo = DQ_;
+	nrvo.var_str.append(this->var_str);
+	nrvo.var_str.push_back(DQ_);
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate
@@ -1025,11 +1025,11 @@ var var::squote() const& {
 	THISIS(__PRETTY_FUNCTION__)
 	assertString(function_sig);
 
-	var rvo = SQ_;
-	rvo.var_str.append(this->var_str);
-	rvo.var_str.push_back(SQ_);
+	var nrvo = SQ_;
+	nrvo.var_str.append(this->var_str);
+	nrvo.var_str.push_back(SQ_);
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate
@@ -1056,8 +1056,8 @@ var var::unquote() const& {
 	THISIS(__PRETTY_FUNCTION__)
 	assertString(function_sig);
 
-	var rvo;
-	rvo.var_typ = VARTYP_STR;
+	var nrvo;
+	nrvo.var_typ = VARTYP_STR;
 
 	if (
 		this->var_str.size() > 1 and (
@@ -1067,13 +1067,13 @@ var var::unquote() const& {
 		)
 	) {
 		// Skip first and last char
-		rvo.var_str.append(++this->var_str.begin(), this->var_str.end());
-		rvo.var_str.pop_back();
+		nrvo.var_str.append(++this->var_str.begin(), this->var_str.end());
+		nrvo.var_str.pop_back();
 	} else {
-		rvo.var_str = this->var_str;
+		nrvo.var_str = this->var_str;
 	}
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate
@@ -1276,10 +1276,10 @@ var var::prefix(SV insertstr) const& {
 	THISIS("var var::prefix(SV insertstr)")
 	assertString(function_sig);
 
-	var rvo(insertstr);
-	rvo.var_str.append(this->var_str);
+	var nrvo(insertstr);
+	nrvo.var_str.append(this->var_str);
 
-	return rvo;
+	return nrvo;
 }
 
 // mutate

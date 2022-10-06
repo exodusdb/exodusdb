@@ -8,7 +8,8 @@ programinit()
 	function main() {
 
 	{
-		assert(oconv(1234.56, "MD0") eq "1235");
+		TRACE(oconv(1234.56, "MD0"))
+		assert(oconv(1234.56, "MD0").output() eq "1235");
 		assert(oconv(1234, "MD0")    eq "1234");
 
 		assert(var(123.45).oconv("MD20P<") eq "123.45");
@@ -103,7 +104,7 @@ programinit()
 		assert(oconv(-1234, "MD2$D") eq "$12.34DB");
 		assert(oconv(-1234, "MD1-")  eq "123.4-");
 		//assert(oconv(1234,     "MD2,10*")       eq "*****12.34");
-		assert(oconv(500, "MD0#")    eq "#500");
+		assert(oconv(500, "MD0#").outputl()    eq "#500");
 		//assert(oconv(50,     "MD0[DM]")       eq "DM50");
 		//assert(oconv(50,     "MD0[DM ]")      eq "DM 50");
 		//assert(oconv(252525, "MC2.[<_>Bfr]S") eq "2.525,25 Bfr");
@@ -134,6 +135,15 @@ programinit()
 		assert(var(1E9).oconv("MD60P").squote()  eq "'1000000000.000000'");
 		assert(var(1E10).oconv("MD60P").squote() eq "'10000000000.000000'");
 		assert(var(1E11).oconv("MD60P").squote() eq "'100000000000.000000'");
+	}
+
+	{
+		// Invalid MD code or non-numeric data -> no conversion
+	    assert(oconv(500, "MD#") eq "500");
+	    assert(oconv(1234.56, "MD#") eq "1234.56");
+	    assert(oconv(500, "MD") eq "500");
+	    assert(oconv("5x00", "MD") eq "5x00");
+	    assert(oconv("5x00", "MD2") eq "5x00");
 	}
 
 	printl(elapsedtimetext());

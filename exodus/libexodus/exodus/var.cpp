@@ -364,7 +364,8 @@ tryagain:
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
 		// use rhs double if available otherwise use its int
-		var_dbl += (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : rhs.var_int;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl += (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
 		// reset lhs to one unique type
 		var_typ = VARTYP_DBL;
 		return *this;
@@ -375,7 +376,8 @@ tryagain:
 
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
-			var_dbl = var_int + rhs.var_dbl;
+			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			var_dbl = static_cast<double>(var_int) + rhs.var_dbl;
 			// reset lhs to one unique type
 			var_typ = VARTYP_DBL;
 			return *this;
@@ -409,7 +411,8 @@ tryagain:
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
 		// use rhs double if available otherwise use its int
-		var_dbl *= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : rhs.var_int;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl *= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
 		// reset lhs to one unique type
 		var_typ = VARTYP_DBL;
 		return *this;
@@ -420,7 +423,8 @@ tryagain:
 
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
-			var_dbl = var_int * rhs.var_dbl;
+			//warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			var_dbl = static_cast<double>(var_int) * rhs.var_dbl;
 			// reset lhs to one unique type
 			var_typ = VARTYP_DBL;
 			return *this;
@@ -454,7 +458,8 @@ tryagain:
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
 		// use rhs double if available otherwise use its int
-		var_dbl -= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : rhs.var_int;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl -= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
 		// reset lhs to one unique type
 		var_typ = VARTYP_DBL;
 		return *this;
@@ -465,7 +470,8 @@ tryagain:
 
 		// use rhs double if available
 		if (rhs.var_typ & VARTYP_DBL) {
-			var_dbl = var_int - rhs.var_dbl;
+			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			var_dbl = static_cast<double>(var_int) - rhs.var_dbl;
 			// reset lhs to one unique type
 			var_typ = VARTYP_DBL;
 			return *this;
@@ -516,7 +522,8 @@ tryagain:
 			if (!rhs.var_int)
 				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 									 "')");
-			var_dbl /= rhs.var_int;
+			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			var_dbl /= static_cast<double>(rhs.var_int);
 		}
 
 	}
@@ -529,6 +536,7 @@ tryagain:
 			if (!rhs.var_dbl)
 				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 								 "')");
+			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_dbl;
 		}
 
@@ -537,7 +545,8 @@ tryagain:
 			if (!rhs.var_int)
 				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 				"')");
-			var_dbl = static_cast<double>(this->var_int) / rhs.var_int;
+			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			var_dbl = static_cast<double>(this->var_int) / static_cast<double>(rhs.var_int);
 		}
 
 	}
@@ -579,6 +588,7 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) + dbl1;
 
 	// try to convert to numeric
@@ -609,7 +619,8 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
-		var_dbl = var_int * dbl1;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl = static_cast<double>(var_int) * dbl1;
 
 	// try to convert to numeric
 	else if (isnum())
@@ -636,7 +647,8 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
-		var_dbl = var_int - dbl1;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl = static_cast<double>(var_int) - dbl1;
 
 	// try to convert to numeric
 	else if (isnum())
@@ -668,6 +680,7 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) / dbl1;
 
 	// try to convert to numeric
@@ -703,7 +716,8 @@ tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
-		var_dbl += int1;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl += static_cast<double>(int1);
 		// reset to one unique type
 		var_typ = VARTYP_DBL;
 		return *this;
@@ -735,7 +749,8 @@ tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
-		var_dbl *= int1;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl *= static_cast<double>(int1);
 		// reset to one unique type
 		var_typ = VARTYP_DBL;
 		return *this;
@@ -767,7 +782,8 @@ tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
-		var_dbl -= int1;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl -= static_cast<double>(int1);
 		// reset to one unique type
 		var_typ = VARTYP_DBL;
 		return *this;
@@ -806,11 +822,13 @@ tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL)
-		var_dbl /= int1;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl /= static_cast<double>(int1);
 
 	// both int
 	else if (var_typ & VARTYP_INT)
-		var_dbl = static_cast<double>(var_int) / int1;
+		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl = static_cast<double>(var_int) / static_cast<double>(int1);
 
 	// try to convert to numeric
 	else if (isnum())
@@ -1008,7 +1026,8 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 
 				//return (lhs.var_int == rhs.var_dbl);
 				//return (std::abs(lhs.var_dbl - static_cast<double>(rhs.var_int)) < SMALLEST_NUMBER);
-				return almost_equal(lhs.var_dbl, rhs.var_int);
+				// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+				return almost_equal(lhs.var_dbl, static_cast<double>(rhs.var_int));
 			}
 		}
 
@@ -1022,7 +1041,8 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
-			return almost_equal(rhs.var_dbl, lhs.var_int);
+			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			return almost_equal(rhs.var_dbl, static_cast<double>(lhs.var_int));
 		}
 
 		//INT v INT
@@ -1295,7 +1315,8 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
 			//std::clog << "var_eq_dbl 3. lhs int " << lhs.var_int << " compare to double " << dbl1 << std::endl;
-			return almost_equal(dbl1, lhs.var_int);
+			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			return almost_equal(dbl1, static_cast<double>(lhs.var_int));
 
 		}
 	}

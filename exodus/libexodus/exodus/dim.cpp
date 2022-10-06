@@ -493,8 +493,8 @@ var var::sort(SV sepchar) const& {
 
 	//split into a temporary dim array for sorting
 	//then join it back up into a single string
-	var rvo = this->split(sepchar).sort().join(sepchar);
-	return rvo;
+	var nrvo = this->split(sepchar).sort().join(sepchar);
+	return nrvo;
 
 
 }
@@ -518,8 +518,8 @@ var var::reverse(SV sepchar) const& {
 
 	//split into a temporary dim array for reverseing
 	//then join it back up into a single string
-	var rvo = this->split(sepchar).reverse().join(sepchar);
-	return rvo;
+	var nrvo = this->split(sepchar).reverse().join(sepchar);
+	return nrvo;
 
 }
 

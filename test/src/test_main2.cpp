@@ -512,6 +512,9 @@ programinit()
 	assert(oconv("abc", "T#3") eq "abc");
 	assert(oconv("abcd", "T#3") eq("abc" ^ TM ^ "d  "));
 	assert(oconv("a" ^ FM ^ "abc" ^ FM ^ "abcd", "T#3") eq("a  " ^ FM ^ "abc" ^ FM ^ "abc" ^ TM ^ "d  "));
+	assert(var("x xx xxx xxxxx xxxxx xxxxxx").oconv("T#6") eq "x xx  |xxx   |xxxxx |xxxxx |xxxxxx"_var);
+	assert(var("x xx xxx xxxxx xxxxx xxxxxxx").oconv("T#6") eq "x xx  |xxx   |xxxxx |xxxxx |xxxxxx|x     "_var);
+	assert(var("").oconv("T#6") eq "      ");
 
 	assert(oconv("a", "L(0)#3") eq "a00");
 	assert(oconv("a", "R(0)#3") eq "00a");
@@ -609,7 +612,34 @@ programinit()
 	x = "0";
 	y = date();
 
-	assert(var(1000).oconv("MD20P,") eq "1,000.00");
+
+	{
+		// Test insertion of commas
+		assert(var(1000).oconv("MD20P,") eq "1,000.00");
+		assert(var(1000).oconv("MC20P,") eq "1.000,00");
+		assert(var(1).oconv("MD20P,") eq "1.00");
+		assert(var(12).oconv("MD20P,") eq "12.00");
+		assert(var(123).oconv("MD20P,") eq "123.00");
+		assert(var(1234).oconv("MD20P,") eq "1,234.00");
+		assert(var(12345).oconv("MD20P,") eq "12,345.00");
+		assert(var(123456).oconv("MD20P,") eq "123,456.00");
+		assert(var(1234567).oconv("MD20P,") eq "1,234,567.00");
+		assert(var(12345678).oconv("MD20P,") eq "12,345,678.00");
+	}
+
+	{
+		// Test insertion of commas with negative
+		assert(var(-1000).oconv("MD20P,") eq "-1,000.00");
+		assert(var(-1000).oconv("MC20P,") eq "-1.000,00");
+		assert(var(-1).oconv("MD20P,") eq "-1.00");
+		assert(var(-12).oconv("MD20P,") eq "-12.00");
+		assert(var(-123).oconv("MD20P,") eq "-123.00");
+		assert(var(-1234).oconv("MD20P,") eq "-1,234.00");
+		assert(var(-12345).oconv("MD20P,") eq "-12,345.00");
+		assert(var(-123456).oconv("MD20P,") eq "-123,456.00");
+		assert(var(-1234567).oconv("MD20P,") eq "-1,234,567.00");
+		assert(var(-12345678).oconv("MD20P,") eq "-12,345,678.00");
+	}
 
 	assert(var("0") < var(".5"));
 

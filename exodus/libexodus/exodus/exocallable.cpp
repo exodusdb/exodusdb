@@ -397,13 +397,6 @@ bool CallableBase::openlib(std::string newlibraryname) {
 	// RTLD_LAZY|RTLD_LOCAL may be a better option
 	plibrary_ = (void*)dlopen(libraryfilename_.c_str(), RTLD_NOW);
 
-#ifdef DLERROR
-	///root/lib/libdict_invoices.so: undefined symbol: _ZN6exodus14ostempfilenameEv
-	const char* dlsym_error = dlerror();
-	if (dlsym_error)
-		var(dlsym_error).errputl();
-#endif
-
 	// Try without path in case the library is system installed e.g. in /usr/local/lib
 	if (plibrary_ == nullptr) {
 		auto pos0 = libraryfilename_.rfind(OSSLASH_);
@@ -413,6 +406,14 @@ bool CallableBase::openlib(std::string newlibraryname) {
 			plibrary_ = (void*)dlopen(purelibraryfilename.c_str(), RTLD_NOW);
 		}
 	}
+
+#ifdef DLERROR
+	///root/lib/libdict_invoices.so: undefined symbol: _ZN6exodus14ostempfilenameEv
+	// /root/lib/libhtmllib2.so: cannot open shared object file: No such file or directory
+	const char* dlsym_error = dlerror();
+	if (dlsym_error)
+		var(dlsym_error).errputl();
+#endif
 
 	if (plibrary_ == nullptr) {
 		//#if TRACING >= 1

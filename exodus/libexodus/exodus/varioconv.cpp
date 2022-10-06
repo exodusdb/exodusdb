@@ -247,7 +247,7 @@ var var::oconv_T(CVR format) const {
 		return *this;
 
 	//
-	int width = width2;
+	std::size_t width = width2;
 
 	// get padding character from "L(?)" or space
 	char fillchar;
@@ -259,7 +259,7 @@ var var::oconv_T(CVR format) const {
 	var outx = "";
 
 	var terminator;
-	int nwords;
+	std::size_t nwords;
 	var charn = 1;
 	std::string spacing;
 
@@ -277,7 +277,7 @@ var var::oconv_T(CVR format) const {
 			part.trimmerboth();
 
 			// simple processing if part is less than width
-			int partlen = part.var_str.size();
+			auto partlen = part.var_str.size();
 			if (partlen <= width) {
 
 				// outx ^= part;
@@ -295,11 +295,11 @@ var var::oconv_T(CVR format) const {
 
 			nwords = part.count(" ") + 1;
 
-			for (int wordn = 1; wordn <= nwords; wordn++) {
+			for (std::size_t wordn = 1; wordn <= nwords; wordn++) {
 
-				var word = part.field(" ", wordn, 1);
+				var word = part.field(" ", static_cast<int>(wordn), 1);
 
-				int wordlen = word.var_str.size();
+				auto wordlen = word.var_str.size();
 
 				if (wordn > 1) {
 					if (!wordlen)
@@ -308,13 +308,14 @@ var var::oconv_T(CVR format) const {
 				}
 
 				// long words get tm inserted every width characters
-				for (int ii = 1; ii <= wordlen; ii += width) {
+				for (std::size_t ii = 1; ii <= wordlen; ii += width) {
 					if (ii > 1)
-						outx ^= TM;
-					outx ^= word.b(ii, width);
+						outx.var_str.push_back(TM_);
+					//outx ^= word.b(ii, width);
+					outx.var_str.append(word.var_str, ii - 1, width);
 				}	// ii;
 
-				int remaining = width - (wordlen % width);
+				auto remaining = width - (wordlen % width);
 
 				if (wordlen == 0 or remaining not_eq width) {
 
@@ -327,9 +328,9 @@ var var::oconv_T(CVR format) const {
 						// remaining space
 						while (remaining > 1 && wordn < nwords) {
 							var nextword =
-								part.field(" ", wordn + 1, 1);
+								part.field(" ", static_cast<int>(wordn) + 1, 1);
 
-							int nextwordlen = nextword.var_str.size();
+							auto nextwordlen = nextword.var_str.size();
 							if (nextwordlen + 1 > remaining)
 								break;
 
@@ -373,8 +374,8 @@ var var::oconv_MD(const char* conversion) const {
 		return *this;
 
 	// default conversion options
-	int ndecimals = -1;
-	int movedecs = -1;
+	auto ndecimals = std::string::npos;
+	auto movedecs = std::string::npos;
 	bool dontmovepoint = false;
 	bool septhousands = false;
 	bool z_flag = false;
@@ -382,10 +383,10 @@ var var::oconv_MD(const char* conversion) const {
 	char prefixchar = '\0';
 
 	// get pointer to the third character (after the MD/MC bit)
-	size_t charn = 2;
+	size_t pos = 2;
 
 	// get the first (next) character
-	char nextchar = conversion[charn];
+	char nextchar = conversion[pos];
 
 	// following up to two digits are ndecimals, or ndecimals and movedecimals
 	// look for a digit
@@ -397,23 +398,23 @@ var var::oconv_MD(const char* conversion) const {
 		movedecs = ndecimals;
 
 		// are we done
-		if (charn >= convlen)
+		if (pos >= convlen)
 			goto convert;
 
 		// look for a second digit
-		charn++;
-		nextchar = conversion[charn];
+		pos++;
+		nextchar = conversion[pos];
 		if (isdigit(nextchar)) {
 			// get movedecimals
 			movedecs = nextchar - '0';
 
 			// are we done
-			if (charn >= convlen)
+			if (pos >= convlen)
 				goto convert;
 
 			// move to the next character
-			charn++;
-			nextchar = conversion[charn];
+			pos++;
+			nextchar = conversion[pos];
 		}
 	}
 
@@ -466,24 +467,30 @@ var var::oconv_MD(const char* conversion) const {
 				break;
 		}
 		// move to next character if any otherwise break
-		if (charn >= convlen)
+		if (pos >= convlen)
 			break;
-		charn++;
-		nextchar = conversion[charn];
+		pos++;
+		nextchar = conversion[pos];
 	}
 
 convert:
 
+	// ndecimals is required for any conversion
+	if (ndecimals == std::string::npos)
+		return *this;
+
 	var newmv = (*this);
 
 	// move decimals
-	if (!dontmovepoint && movedecs)
+	if (!dontmovepoint && movedecs != std::string::npos)
 		newmv = newmv / pow(10.0, movedecs);
 
 	// rounding
-	newmv = newmv.round(ndecimals);
-	if (!(newmv.var_typ & VARTYP_STR))
-		newmv.createString();
+	//if (ndecimals != std::string::npos) {
+		newmv = newmv.round(static_cast<int>(ndecimals));
+		if (!(newmv.var_typ & VARTYP_STR))
+			newmv.createString();
+	//}
 
 	// Option to suppress zeros - if no digits 1-9
 	if (z_flag and newmv.var_str.find_first_of("123456789") == std::string::npos) {
@@ -504,23 +511,35 @@ convert:
 		part2 = newmv.var_str.substr(decpos + 1);
 	}
 
-	int part2len = part2.size();
+	auto part2len = part2.size();
 
 	// thousand separators
 	if (septhousands) {
-		int part1len = part1.size();
+		auto part1len = part1.size();
 		if (part1len > 3) {
 			char thousandsep = (conversion[1] == 'C') ? '.' : ',';
-			int minii = part1.front() == '-' ? 2 : 1;
-			for (int ii = part1len - 2; ii > minii; ii -= 3) {
-				//part1.paster(ii, 0, thousandsep);
-				part1.insert(ii - 1, 1, thousandsep);
+//			std::size_t minii = part1.front() == '-' ? 2 : 1;
+			std::size_t minpos = part1.front() == '-' ? 2 : 1;
+//			for (std::size_t ii = part1len - 2; ii > minii; ii -= 3) {
+//				//part1.paster(ii, 0, thousandsep);
+//				part1.insert(ii - 1, 1, thousandsep);
+//			}
+			{
+				auto pos = part1.size() - 2;
+				while (pos > minpos) {
+					part1.insert(pos - 1, 1, thousandsep);
+					// Be careful not to allow pos < 0 since it is unsigned
+					if (pos < 4)
+						break;
+					pos -= 3;
+				}
 			}
 		}
 	}
 
 	// fixed decimals
-	if (ndecimals > 0) {
+	//if (ndecimals > 0) {
+	if (ndecimals != 0) {
 		// append decimal point
 		//part1 ^= (conversion[1] == 'C') ? ',' : '.';
 		part1.push_back((conversion[1] == 'C') ? ',' : '.');
@@ -529,7 +548,7 @@ convert:
 			//part1 ^= part2;
 			part1.append(part2);
 
-		else if (ndecimals > part2len) 
+		else if (ndecimals > part2len)
 			//part1 ^= part2 ^ std::string(ndecimals - part2len, '0');
 			part1.append(part2).append(std::string(ndecimals - part2len, '0'));
 
@@ -600,9 +619,9 @@ var var::oconv_LRC(CVR format) const {
 	var varwidth = format.field("#", 2, 1);
 	var just = (format.field("#", 1, 1))[1];
 
-	if (!varwidth.isnum())
+	if (!varwidth.isnum() or varwidth < 0)
 		return *this;
-	int width = varwidth.toInt();
+	std::size_t width = varwidth.toInt();
 
 	// get padding character from "L(?)" or space
 	char fillchar;
@@ -615,7 +634,7 @@ var var::oconv_LRC(CVR format) const {
 	var terminator;
 
 	var part;
-	int remaining;
+	std::size_t remaining;
 	var charn = 1;
 	while (true) {
 
@@ -628,8 +647,9 @@ var var::oconv_LRC(CVR format) const {
 
 		if (width) {
 
-			remaining = width - part.var_str.size();
-			if (remaining > 0) {
+			//if (remaining > 0) {
+			if (width > part.var_str.size()) {
+				remaining = width - part.var_str.size();
 				if (just == "L") {
 					// outx ^= part;
 					// outx ^= remaining.space();
@@ -997,8 +1017,8 @@ var var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 								'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 	std::string result;
-	int nchars = var_str.size();
-	for (int charn = 0; charn < nchars; ++charn) {
+	auto nchars = var_str.size();
+	for (std::size_t charn = 0; charn < nchars; ++charn) {
 		char const byte = var_str[charn];
 		result += hex_chars[(byte & 0xF0) >> 4];
 		result += hex_chars[(byte & 0x0F) >> 0];
@@ -1008,18 +1028,18 @@ var var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 }
 
 // use macro to ensure inlined instead of using "inline" function
-#define ADD_NYBBLE_OR_FAIL                   \
-	nybble = var_str[posn++];                \
-	if (nybble < '0')                        \
-		return "";                           \
-	if (nybble <= '9')                       \
-		nybble -= '0';                       \
-	else if (nybble >= 'A' && nybble <= 'F') \
-		nybble -= '7';                       \
-	else if (nybble >= 'a' && nybble <= 'f') \
-		nybble -= 'W';                       \
-	else                                     \
-		return "";                           \
+#define ADD_NYBBLE_OR_FAIL                       \
+	nybble = var_str[posn++];                    \
+	if (nybble < '0')                            \
+		return "";                               \
+	if (nybble <= '9')                           \
+		nybble = static_cast<char>(nybble - '0');\
+	else if (nybble >= 'A' && nybble <= 'F')     \
+		nybble = static_cast<char>(nybble - '7');\
+	else if (nybble >= 'a' && nybble <= 'f')     \
+		nybble = static_cast<char>(nybble - 'W');\
+	else                                         \
+		return "";                               \
 	outchar += nybble;
 
 var var::iconv_HEX(const int ioratio) const {
@@ -1083,7 +1103,7 @@ var var::iconv_HEX(const int ioratio) const {
 				// bits outchar<<=4;
 		}
 
-		textstr += outchar;
+		textstr += static_cast<char>(outchar);
 
 		// only really needs to be done after the 1st outchar
 		ratio = ioratio;

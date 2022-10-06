@@ -1222,11 +1222,11 @@ class PUBLIC var final {
 
 	// Arithmetic friends for var and var
 
-	PUBLIC ND friend var  operator+(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo += rhs; return rvo;}
-	PUBLIC ND friend var  operator*(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo *= rhs; return rvo;}
-	PUBLIC ND friend var  operator-(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo -= rhs; return rvo;}
-	PUBLIC ND friend var  operator/(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo /= rhs; return rvo;}
-	PUBLIC ND friend var  operator%(CVR  lhs, CVR rhs) {var rvo = lhs.clone(); rvo %= rhs; return rvo;}
+	PUBLIC ND friend var  operator+(CVR  lhs, CVR rhs) {var nrvo = lhs.clone(); nrvo += rhs; return nrvo;}
+	PUBLIC ND friend var  operator*(CVR  lhs, CVR rhs) {var nrvo = lhs.clone(); nrvo *= rhs; return nrvo;}
+	PUBLIC ND friend var  operator-(CVR  lhs, CVR rhs) {var nrvo = lhs.clone(); nrvo -= rhs; return nrvo;}
+	PUBLIC ND friend var  operator/(CVR  lhs, CVR rhs) {var nrvo = lhs.clone(); nrvo /= rhs; return nrvo;}
+	PUBLIC ND friend var  operator%(CVR  lhs, CVR rhs) {var nrvo = lhs.clone(); nrvo %= rhs; return nrvo;}
 
 	// Concatenation friends for var and var
 
@@ -1332,73 +1332,73 @@ class PUBLIC var final {
 
 	// PLUS  friends v. main types
 
-	PUBLIC ND friend var operator+(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone(); rvo    += cstr2; return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone(); rvo    += char2; return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone(); rvo    += int2;  return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone(); rvo    += dbl2;  return rvo;}
-	PUBLIC ND friend var operator+(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone(); rvo    += bool2; return rvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const char*  cstr2 ) {var nrvo = lhs.clone(); nrvo    += cstr2; return nrvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const char   char2 ) {var nrvo = lhs.clone(); nrvo    += char2; return nrvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const int    int2  ) {var nrvo = lhs.clone(); nrvo    += int2;  return nrvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const double dbl2  ) {var nrvo = lhs.clone(); nrvo    += dbl2;  return nrvo;}
+	PUBLIC ND friend var operator+(CVR            lhs,   const bool   bool2 ) {var nrvo = lhs.clone(); nrvo    += bool2; return nrvo;}
 
-	PUBLIC ND friend var operator+(const char*    cstr1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    += cstr1; return rvo;}
-	PUBLIC ND friend var operator+(const char     char1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    += char1; return rvo;}
-	PUBLIC ND friend var operator+(const int      int1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    += int1;  return rvo;}
-	PUBLIC ND friend var operator+(const double   dbl1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    += dbl1;  return rvo;}
-	PUBLIC ND friend var operator+(const bool     bool1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    += bool1; return rvo;}
+	PUBLIC ND friend var operator+(const char*    cstr1, CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    += cstr1; return nrvo;}
+	PUBLIC ND friend var operator+(const char     char1, CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    += char1; return nrvo;}
+	PUBLIC ND friend var operator+(const int      int1,  CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    += int1;  return nrvo;}
+	PUBLIC ND friend var operator+(const double   dbl1,  CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    += dbl1;  return nrvo;}
+	PUBLIC ND friend var operator+(const bool     bool1, CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    += bool1; return nrvo;}
 
 	// MULTIPLY  friends v. main types
 
-	PUBLIC ND friend var operator*(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone(); rvo    *= cstr2; return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone(); rvo    *= char2; return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone(); rvo    *= int2;  return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone(); rvo    *= dbl2;  return rvo;}
-	PUBLIC ND friend var operator*(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone(); rvo    *= bool2; return rvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const char*  cstr2 ) {var nrvo = lhs.clone(); nrvo    *= cstr2; return nrvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const char   char2 ) {var nrvo = lhs.clone(); nrvo    *= char2; return nrvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const int    int2  ) {var nrvo = lhs.clone(); nrvo    *= int2;  return nrvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const double dbl2  ) {var nrvo = lhs.clone(); nrvo    *= dbl2;  return nrvo;}
+	PUBLIC ND friend var operator*(CVR            lhs,   const bool   bool2 ) {var nrvo = lhs.clone(); nrvo    *= bool2; return nrvo;}
 
-	PUBLIC ND friend var operator*(const char*    cstr1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= cstr1; return rvo;}
-	PUBLIC ND friend var operator*(const char     char1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= char1; return rvo;}
-	PUBLIC ND friend var operator*(const int      int1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= int1;  return rvo;}
-	PUBLIC ND friend var operator*(const double   dbl1,  CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= dbl1;  return rvo;}
-	PUBLIC ND friend var operator*(const bool     bool1, CVR          rhs   ) {var rvo = rhs.clone(); rvo    *= bool1; return rvo;}
+	PUBLIC ND friend var operator*(const char*    cstr1, CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    *= cstr1; return nrvo;}
+	PUBLIC ND friend var operator*(const char     char1, CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    *= char1; return nrvo;}
+	PUBLIC ND friend var operator*(const int      int1,  CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    *= int1;  return nrvo;}
+	PUBLIC ND friend var operator*(const double   dbl1,  CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    *= dbl1;  return nrvo;}
+	PUBLIC ND friend var operator*(const bool     bool1, CVR          rhs   ) {var nrvo = rhs.clone(); nrvo    *= bool1; return nrvo;}
 
 	// MINUS  friends v. main types
 
-	PUBLIC ND friend var operator-(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone();   rvo  -= cstr2; return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone();   rvo  -= char2; return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone();   rvo  -= int2;  return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone();   rvo  -= dbl2;  return rvo;}
-	PUBLIC ND friend var operator-(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone();   rvo  -= bool2; return rvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const char*  cstr2 ) {var nrvo = lhs.clone();   nrvo  -= cstr2; return nrvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const char   char2 ) {var nrvo = lhs.clone();   nrvo  -= char2; return nrvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const int    int2  ) {var nrvo = lhs.clone();   nrvo  -= int2;  return nrvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const double dbl2  ) {var nrvo = lhs.clone();   nrvo  -= dbl2;  return nrvo;}
+	PUBLIC ND friend var operator-(CVR            lhs,   const bool   bool2 ) {var nrvo = lhs.clone();   nrvo  -= bool2; return nrvo;}
 
-	PUBLIC ND friend var operator-(const char*    cstr1, CVR          rhs   ) {var rvo = cstr1; rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const char     char1, CVR          rhs   ) {var rvo = char1; rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const int      int1,  CVR          rhs   ) {var rvo = int1;  rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const double   dbl1,  CVR          rhs   ) {var rvo = dbl1;  rvo  -= rhs;   return rvo;}
-	PUBLIC ND friend var operator-(const bool     bool1, CVR          rhs   ) {var rvo = bool1; rvo  -= rhs;   return rvo;}
+	PUBLIC ND friend var operator-(const char*    cstr1, CVR          rhs   ) {var nrvo = cstr1; nrvo  -= rhs;   return nrvo;}
+	PUBLIC ND friend var operator-(const char     char1, CVR          rhs   ) {var nrvo = char1; nrvo  -= rhs;   return nrvo;}
+	PUBLIC ND friend var operator-(const int      int1,  CVR          rhs   ) {var nrvo = int1;  nrvo  -= rhs;   return nrvo;}
+	PUBLIC ND friend var operator-(const double   dbl1,  CVR          rhs   ) {var nrvo = dbl1;  nrvo  -= rhs;   return nrvo;}
+	PUBLIC ND friend var operator-(const bool     bool1, CVR          rhs   ) {var nrvo = bool1; nrvo  -= rhs;   return nrvo;}
 
 	// DIVIDE  friends v. main types
 
-	PUBLIC ND friend var operator/(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone();   rvo  /= cstr2; return rvo;}
-	PUBLIC ND friend var operator/(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone();   rvo  /= char2; return rvo;}
-	PUBLIC ND friend var operator/(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone();   rvo  /= int2;  return rvo;}
-	PUBLIC ND friend var operator/(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone();   rvo  /= dbl2;  return rvo;}
-//	PUBLIC ND friend var operator/(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone();   rvo  /= bool2; return rvo;} // Either does nothing or throws divide by zero
+	PUBLIC ND friend var operator/(CVR            lhs,   const char*  cstr2 ) {var nrvo = lhs.clone();   nrvo  /= cstr2; return nrvo;}
+	PUBLIC ND friend var operator/(CVR            lhs,   const char   char2 ) {var nrvo = lhs.clone();   nrvo  /= char2; return nrvo;}
+	PUBLIC ND friend var operator/(CVR            lhs,   const int    int2  ) {var nrvo = lhs.clone();   nrvo  /= int2;  return nrvo;}
+	PUBLIC ND friend var operator/(CVR            lhs,   const double dbl2  ) {var nrvo = lhs.clone();   nrvo  /= dbl2;  return nrvo;}
+//	PUBLIC ND friend var operator/(CVR            lhs,   const bool   bool2 ) {var nrvo = lhs.clone();   nrvo  /= bool2; return nrvo;} // Either does nothing or throws divide by zero
 
-	PUBLIC ND friend var operator/(const char*    cstr1, CVR          rhs   ) {var rvo = cstr1; rvo  /= rhs;   return rvo;}
-	PUBLIC ND friend var operator/(const char     char1, CVR          rhs   ) {var rvo = char1; rvo  /= rhs;   return rvo;}
-	PUBLIC ND friend var operator/(const int      int1,  CVR          rhs   ) {var rvo = int1;  rvo  /= rhs;   return rvo;}
-	PUBLIC ND friend var operator/(const double   dbl1,  CVR          rhs   ) {var rvo = dbl1;  rvo  /= rhs;   return rvo;}
-//	PUBLIC ND friend var operator/(const bool     bool1, CVR          rhs   ) {var rvo = bool1 ;rvo /= rhs;   return rvo;} // Almost meaningless
+	PUBLIC ND friend var operator/(const char*    cstr1, CVR          rhs   ) {var nrvo = cstr1; nrvo  /= rhs;   return nrvo;}
+	PUBLIC ND friend var operator/(const char     char1, CVR          rhs   ) {var nrvo = char1; nrvo  /= rhs;   return nrvo;}
+	PUBLIC ND friend var operator/(const int      int1,  CVR          rhs   ) {var nrvo = int1;  nrvo  /= rhs;   return nrvo;}
+	PUBLIC ND friend var operator/(const double   dbl1,  CVR          rhs   ) {var nrvo = dbl1;  nrvo  /= rhs;   return nrvo;}
+//	PUBLIC ND friend var operator/(const bool     bool1, CVR          rhs   ) {var nrvo = bool1 ;nrvo /= rhs;   return nrvo;} // Almost meaningless
 
 	// MODULO  friends v. main types
 
-	PUBLIC ND friend var operator%(CVR            lhs,   const char*  cstr2 ) {var rvo = lhs.clone();   rvo  %= cstr2; return rvo;}
-	PUBLIC ND friend var operator%(CVR            lhs,   const char   char2 ) {var rvo = lhs.clone();   rvo  %= char2; return rvo;}
-	PUBLIC ND friend var operator%(CVR            lhs,   const int    int2  ) {var rvo = lhs.clone();   rvo  %= int2;  return rvo;}
-	PUBLIC ND friend var operator%(CVR            lhs,   const double dbl2  ) {var rvo = lhs.clone();   rvo  %= dbl2;  return rvo;}
-//	PUBLIC ND friend var operator%(CVR            lhs,   const bool   bool2 ) {var rvo = lhs.clone();   rvo  %= bool2; return rvo;} // Rather useless or throws divide by zero
+	PUBLIC ND friend var operator%(CVR            lhs,   const char*  cstr2 ) {var nrvo = lhs.clone();   nrvo  %= cstr2; return nrvo;}
+	PUBLIC ND friend var operator%(CVR            lhs,   const char   char2 ) {var nrvo = lhs.clone();   nrvo  %= char2; return nrvo;}
+	PUBLIC ND friend var operator%(CVR            lhs,   const int    int2  ) {var nrvo = lhs.clone();   nrvo  %= int2;  return nrvo;}
+	PUBLIC ND friend var operator%(CVR            lhs,   const double dbl2  ) {var nrvo = lhs.clone();   nrvo  %= dbl2;  return nrvo;}
+//	PUBLIC ND friend var operator%(CVR            lhs,   const bool   bool2 ) {var nrvo = lhs.clone();   nrvo  %= bool2; return nrvo;} // Rather useless or throws divide by zero
 
-	PUBLIC ND friend var operator%(const char*    cstr1, CVR          rhs   ) {var rvo = cstr1; rvo  %= rhs;   return rvo;}
-	PUBLIC ND friend var operator%(const char     char1, CVR          rhs   ) {var rvo = char1; rvo  %= rhs;   return rvo;}
-	PUBLIC ND friend var operator%(const int      int1,  CVR          rhs   ) {var rvo = int1;  rvo  %= rhs;   return rvo;}
-	PUBLIC ND friend var operator%(const double   dbl1,  CVR          rhs   ) {var rvo = dbl1;  rvo  %= rhs;   return rvo;}
-	//PUBLIC ND friend var operator%(const bool   bool1, CVR          rhs   ) {var rvo = bool1 ;rvo  %= rhs;   return rvo;} // Almost meaningless
+	PUBLIC ND friend var operator%(const char*    cstr1, CVR          rhs   ) {var nrvo = cstr1; nrvo  %= rhs;   return nrvo;}
+	PUBLIC ND friend var operator%(const char     char1, CVR          rhs   ) {var nrvo = char1; nrvo  %= rhs;   return nrvo;}
+	PUBLIC ND friend var operator%(const int      int1,  CVR          rhs   ) {var nrvo = int1;  nrvo  %= rhs;   return nrvo;}
+	PUBLIC ND friend var operator%(const double   dbl1,  CVR          rhs   ) {var nrvo = dbl1;  nrvo  %= rhs;   return nrvo;}
+	//PUBLIC ND friend var operator%(const bool   bool1, CVR          rhs   ) {var nrvo = bool1 ;nrvo  %= rhs;   return nrvo;} // Almost meaningless
 
 	// STRING CONCATENATE  friends v. main types
 

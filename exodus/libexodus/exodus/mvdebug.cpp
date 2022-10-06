@@ -138,7 +138,8 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 
 	// TODO autodetect if addr2line or dwalfdump/dSYM is available
 
-	char** strings = backtrace_symbols(stack_addresses, stack_size);
+	//warning: conversion from ‘size_t’ {aka ‘long unsigned int’} to ‘int’ may change value [-Wconversion]
+	char** strings = backtrace_symbols(stack_addresses, static_cast<int>(stack_size));
 
 	for (size_t ii = 0; ii < stack_size; ii++) {
 
@@ -282,12 +283,15 @@ void SIGINT_handler(int sig [[maybe_unused]]) {
 		// printf ("\nInterrupted. (C)ontinue (E)nd (B)acktrace\n");
 
 		// errput("? ");
-		var cmd;
-		// if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
-		fprintf(stderr, "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ? ");
-		fflush(stderr);
-		if (!cmd.inputn(1))
-			continue;
+		var cmd = "A";
+
+		if (var().isterminal()) {
+			// if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
+			fprintf(stderr, "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ? ");
+			fflush(stderr);
+			if (!cmd.inputn(1))
+				continue;
+		}
 
 		// only look at first character in uppercase
 		var cmd1 = var(cmd[1]).ucase();

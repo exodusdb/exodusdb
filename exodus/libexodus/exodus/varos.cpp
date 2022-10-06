@@ -679,7 +679,7 @@ bool var::osbread(CVR osfilevar, CVR offset, const int bytesize) {
 }
 #endif
 
-ssize_t count_excess_UTF8_bytes(const std::string& str) {
+unsigned count_excess_UTF8_bytes(const std::string& str) {
 
 	// Scans backward from the end of string.
 	const char* cptr = &str.back();
@@ -817,9 +817,9 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// trim off any excess utf8 bytes if utf8
 	//	var(pmyfile->getloc().name()).outputl(L"loc name=");;
 	if (pmyfile->getloc().name() != "C") {
-		int nextrabytes = count_excess_UTF8_bytes(var_str);
+		auto nextrabytes = count_excess_UTF8_bytes(var_str);
 		if (nextrabytes) {
-			offset -= nextrabytes;
+			offset -= static_cast<int>(nextrabytes);
 			var_str.resize(var_str.size() - nextrabytes);
 		}
 	}
@@ -831,7 +831,7 @@ void var::osclose() const {
 	// THISIS("void var::osclose() const")
 	// assertString(function_sig);
 	if (THIS_IS_OSFILE()) {
-		mv_handles_cache.del_handle(var_int);
+		mv_handles_cache.del_handle(static_cast<int>(var_int));
 		var_int = 0L;
 		var_typ ^= VARTYP_OSFILE | VARTYP_INT;	// only STR bit should remains
 	}

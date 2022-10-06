@@ -71,87 +71,99 @@ const char* longdayofweeks =
 
 namespace exodus {
 
-/***********************
-time_t_to_pick_date_time
-************************/
-
-// Utility to convert a c time_t structure to pick integer date and time
-
+// time_t -> pick integer date, time
 void time_t_to_pick_date_time(const time_t time, int* pick_date, int* pick_time) noexcept {
+
+	// ASSUMPTION: td::chrono::system_clock() epoch is 1970/01/01 00:00:00
 
 	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
 
     const auto duration_since_epoch = std::chrono::system_clock::from_time_t(time).time_since_epoch();
-    //TRACE(duration_since_epoch.count())
 
-//    using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>>;
-//    const auto duration_in_days = std::chrono::duration_cast<days>(duration_since_epoch);
+//    const auto duration_in_days = std::chrono::duration_cast<std::chrono::days>(duration_since_epoch);
 //    idate = duration_in_days.count();
 
-    using secs = std::chrono::duration<int, std::ratio_multiply<std::chrono::seconds::period, std::ratio<1>>>;
-    const auto duration_in_secs = std::chrono::duration_cast<secs>(duration_since_epoch);
-    *pick_time = duration_in_secs.count() % 86400;
+    const auto duration_in_secs = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch);
 
-	*pick_date = (duration_in_secs.count() / 86400) - PICK_UNIX_DAY_OFFSET;
+	//Modulo 86'400 to seconds within day
+	// warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+    *pick_time = static_cast<int>(duration_in_secs.count()) % 86'400;
+
+	// Integer division by 86'400 to get whole days
+	//warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+	*pick_date = static_cast<int>(duration_in_secs.count()) / 86'400 - PICK_UNIX_DAY_OFFSET;
 
 }
 
+// -> number of days since the pick date epoch 31/12/1967
 var var::date() const {
-	// returns number of days since the pick date epoch 31/12/1967
+
+	// ASSUMPTION: td::chrono::system_clock() epoch is 1970/01/01 00:00:00
 
 	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
 
     const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
 
 	using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>>;
-	const auto duration_in_days = std::chrono::duration_cast<days>(duration_since_epoch);
+	const auto duration_in_days = std::chrono::duration_cast<days>(duration_since_epoch).count();
+	// Use std::chrono:days in new version of g++ c++20
+	//const auto duration_in_days = std::chrono::duration_cast<std::chrono::days>(duration_since_epoch).count();
 
 	// timestamp() assumes that the var returned is an int
-	return duration_in_days.count() - PICK_UNIX_DAY_OFFSET;
+	return duration_in_days - PICK_UNIX_DAY_OFFSET;
 
 }
 
+// -> number of whole seconds since midnight
 var var::time() const {
-	// returns number of whole seconds since midnight
 
+	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
 
 	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
 
     const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
 
-    using secs = std::chrono::duration<int, std::ratio_multiply<std::chrono::seconds::period, std::ratio<1>>>;
-    const auto duration_in_secs = std::chrono::duration_cast<secs>(duration_since_epoch);
-    return duration_in_secs.count() % 86400;
+    const auto secs_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch).count();
+
+	// Modulo 86'400 to get seconds since midnight
+    return secs_since_epoch % 86'400;
 
 }
 
+// -> decimal fractional seconds since midnight (up to micro or nano second accuracy)
 var var::ostime() const {
-	// return decimal seconds since midnight up to micro or nano second accuracy
+
+	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
+
+    const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
 
 	// ms accuracy
 	//uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	//return now % 86400000000 / 1000000.0;
 
 	// ns accuracy
-	uint64_t now = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	return now % 86400000000000 / 1000000000.0;
+	const auto ns_since_epoch = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_since_epoch).count();
+
+	// modulo 86'400E9 to get ns since midnight
+	// div 10E9 to get decimal fractional seconds (since midnight)
+	return static_cast<double>(ns_since_epoch % 86'400'000'000'000) / 1'000'000'000.0;
 
 }
 
-// return decimal fractional days since pick epoch 1967-12-31 00:00:00
+// -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
 var var::timestamp() const {
 
 	var datenow = this->date();
 	var timenow = this->ostime();
 
-	// If the date flipped while we got the time then get the time again
+	// 1. If the date flipped while we got the time then get the time again
 	// If someone is messing with the system clock then we will
-	// fall for the bait only once
-	// Assuming that date() is returned as an int for speed
+	// fall for the bait only once.
+	// 2. Assuming that date() is returned as an int for speed
 	if (this->date().var_int != datenow.var_int)
 		timenow = this->ostime();
 
-	return datenow + timenow / 86400;
+	return datenow + timenow / 86'400;
 
 }
 
@@ -243,7 +255,9 @@ var var::iconv_D(const char* conversion) const {
 
 			std::string word;
 			do {
-				word.push_back(toupper(*iter++));
+				// toupper returns an int despite being given a char
+				// Presumably safe to cast back to char
+				word.push_back(static_cast<char>(toupper(*iter++)));
 			} while (::isalpha(*iter));
 
 			// determine the month or return "" to indicate failure
@@ -644,8 +658,8 @@ after_analyse_conversion:
 	} else {
 		// two digit hours
 		//newmv = ("00" ^ var(hours)).last(2);
-		newmv.var_str.push_back('0' + hours / 10);
-		newmv.var_str.push_back('0' + hours % 10);
+		newmv.var_str.push_back(static_cast<char>('0' + hours / 10));
+		newmv.var_str.push_back(static_cast<char>('0' + hours % 10));
 	}
 
 	// separator
@@ -653,8 +667,8 @@ after_analyse_conversion:
 
 	// two digit minutes
 	//newmv ^= ("00" ^ var(mins)).last(2);
-	newmv.var_str.push_back('0' + mins / 10);
-	newmv.var_str.push_back('0' + mins % 10);
+	newmv.var_str.push_back(static_cast<char>('0' + mins / 10));
+	newmv.var_str.push_back(static_cast<char>('0' + mins % 10));
 
 	if (showsecs) {
 
@@ -663,8 +677,8 @@ after_analyse_conversion:
 
 		// two digit seconds
 		//newmv ^= ("00" ^ var(secs)).last(2);
-		newmv.var_str.push_back('0' + secs / 10);
-		newmv.var_str.push_back('0' + secs % 10);
+		newmv.var_str.push_back(static_cast<char>('0' + secs / 10));
+		newmv.var_str.push_back(static_cast<char>('0' + secs % 10));
 	}
 
 	// optional AM/PM suffix

@@ -347,7 +347,7 @@ std::string mvd2s(double double1) {
 		s.erase(1 + minus, 1);
 
 		//determine how many zeros need appending if any
-		int addzeros = exponent - s.size() + 1 + minus;
+		int addzeros = exponent - static_cast<int>(s.size()) + 1 + minus;
 
 		//debugging
 		//std::cout << ss.str() << " " << s << " " << exponent << " " << s.size() << " " << addzeros << std::endl;
@@ -617,7 +617,9 @@ var var::floor() const {
 
 	if (!(var_typ & VARTYP_INT)) {
 
-		var_int = std::floor(var_dbl);
+		//warning: conversion from ‘double’ to ‘long int’ may change value [-Wfloat-conversion]
+		var_int = static_cast<varint_t>(std::floor(var_dbl));
+		//var_int = std::floor<varint_t>(var_dbl);
 
 		// Add int flag
 		var_typ |= VARTYP_INT;
@@ -747,7 +749,7 @@ bool var::isnum(void) const {
 		throw VarUnassigned("isnum()");
 
 	// Empty string is zero. Leave the string as "".
-	int strlen = var_str.size();
+	auto strlen = var_str.size();
 	if (strlen == 0) {
 		var_int = 0;
 		var_typ = VARTYP_INTSTR;
@@ -760,7 +762,7 @@ bool var::isnum(void) const {
 	// on from_chars for the final parsing
 	bool floating = false;
 	bool has_sign = false;
-	for (int ii = 0; ii < strlen; ii++) {
+	for (std::size_t ii = 0; ii < strlen; ii++) {
 		char cc = var_str[ii];
 
 		// +   2B

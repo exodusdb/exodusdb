@@ -22,8 +22,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3") # 5% faster than -O2
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2") # little difference from -O1 running test_main
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O1") ##### remove -O1 for gdb to debug into libexodus #####
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og") # 5% slower than -01 but supposedly better debugging
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O1") ##### remove -O1 for gdb to debug into libexodus #####
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og") # 5% slower than -01 but supposedly better debugging
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 #
@@ -35,7 +35,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-cast-function-type -Wno-maybe-unini
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")           #switched off to avoid warning about elvis operator ?:
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie")
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g -march=native")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wconversion -Wextra -g -march=native")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden") # Force g++ to hide by default
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")               # Link time optimisation. very slow and no observed performance increase
 

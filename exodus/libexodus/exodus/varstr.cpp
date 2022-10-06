@@ -210,7 +210,7 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 /////////
 
 // hardcore string locate function given a section of a string and all parameters
-inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const char order, SV usingchar, VARREF setting) {
+inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const int order, SV usingchar, VARREF setting) {
 	// private - assume everything is defined/assigned correctly
 
 	//
@@ -465,7 +465,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 	// done inline since unusual
 	// if (fieldno<0||valueno<0||subvalueno<0) return ""
 
-	char ordermode;
+	int ordermode;
 	if (strlen(ordercode) == 0)
 		ordermode = 0;
 	else {
@@ -1507,9 +1507,9 @@ var var::first(const size_t  length) const& {
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Construct a new var with the required number of chars from this or all
-	var rvo(this->var_str.data(), std::min(length, this->var_str.size()));
+	var nrvo(this->var_str.data(), std::min(length, this->var_str.size()));
 
-	return rvo;
+	return nrvo;
 }
 //__cpp_lib_string_contains
 
@@ -1555,9 +1555,9 @@ var var::last(const size_t  length) const& {
 	size_t copylen = std::min(length, this->var_str.size());
 
 	// Construct a new var with the required number of chars from this
-	var rvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
+	var nrvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
 
-	return rvo;
+	return nrvo;
 }
 //__cpp_lib_string_contains
 
@@ -1590,14 +1590,15 @@ VARREF var::laster(const size_t length) {
 // CUT
 //////
 
-// var[1,length] = "" 
+// var[1,length] = ""         cut first n bytes
+// var[-length, length] = ""  cut last n bytes
 var var::cut(const int length) const& {
 
 	THISIS("var var::cut(const int length)")
 	assertString(function_sig);
 
-	var rvo;
-	rvo.var_typ = VARTYP_STR;
+	var nrvo;
+	nrvo.var_typ = VARTYP_STR;
 
 	// Assume var_str size is <= max int
 
@@ -1611,7 +1612,7 @@ var var::cut(const int length) const& {
 		// Positive - Copy from middle to end
 		// Example "ab".cut(0) , append from pos 0, return "ab"
 		// Example "ab".cut(1) , append from pos 1, return "b"
-		rvo.var_str.append(var_str, length, std::string::npos);
+		nrvo.var_str.append(var_str, length, std::string::npos);
 
 	} else {
 		// Negative = Copy first n chars
@@ -1620,10 +1621,10 @@ var var::cut(const int length) const& {
 		// Example "ab".cut(-3) copyn = -3 + 2 = -1, return ""
 		auto copyn = length + static_cast<int>(var_str.size());
 		if (copyn > 0)
-			rvo.var_str.append(var_str, 0, copyn);
+			nrvo.var_str.append(var_str, 0, copyn);
 	}
 
-	return rvo;
+	return nrvo;
 }
 
 // x[1, length] = ""
@@ -1642,17 +1643,21 @@ VARREF var::cutter(const int length) {
 		// Example "ab".cutter(3) , erase 3, return ""
 		var_str.erase(0, length);
 
+	}
+	// warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::__cxx11::basic_string<char>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+	else if (-length >= static_cast<int>(var_str.size())) {
+
+		// Negative = cut last n chars. Erase from middle to end.
+		// Example "ab".cutter(-2) start_pos = -2 + 2 = erase_pos 0, return ""
+		// Example "ab".cutter(-3) start_pos = -3 + 2 = erase_pos -1, return ""
+		var_str.clear();
+
 	} else {
 
 		// Negative = cut last n chars. Erase from middle to end.
 		// Example "ab".cutter(-1) start_pos = -1 + 2 = erase_pos 1, return "a"
-		// Example "ab".cutter(-2) start_pos = -2 + 2 = erase_pos 0, return ""
-		// Example "ab".cutter(-3) start_pos = -3 + 2 = erase_pos -1, return ""
-		int erase_pos = length + var_str.size();
-		if (erase_pos < 1)
-			var_str.clear();
-		else
-			var_str.erase(erase_pos, std::string::npos);
+		auto erase_pos = length + var_str.size();
+		var_str.erase(erase_pos, std::string::npos);
 	}
 
 	return *this;
@@ -2165,7 +2170,7 @@ var var::sumall() const {
 		if (not term)
 			break;
 	}
-	return result.round(maxdecimals);
+	return result.round(static_cast<int>(maxdecimals));
 }
 
 var var::sum() const {
@@ -2249,7 +2254,7 @@ var var::sum() const {
 			if (not accum.var_str.empty()) {
 
 				// Fix decimal places
-				accum = accum.round(maxndecimals);
+				accum = accum.round(static_cast<int>(maxndecimals));
 
 				// Check round returned a string
 				ISSTRING(accum)

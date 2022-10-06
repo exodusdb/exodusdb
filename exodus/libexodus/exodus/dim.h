@@ -114,7 +114,8 @@ friend class var;
 
 		//TRACE(var("dim constructor from initializer_list ") ^ int(list.size()));
 		// list rows, ncols = 1
-		redim(list.size(), 1);
+		// warning: conversion from ‘std::initializer_list<int>::size_type’ {aka ‘long unsigned int’} to ‘unsigned int’ may change value [-Wconversion]
+		redim(static_cast<unsigned int>(list.size()), 1);
 
 		// Allow arbitrary copying of element zero without throwing variable not assigned
 		//data_[0].var_typ = VARTYP_STR;

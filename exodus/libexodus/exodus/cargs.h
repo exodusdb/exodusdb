@@ -34,7 +34,8 @@ class Cargs {
 
 	//return argc as int
 	int argc() {
-		return argv_.size() - 1;
+		//warning: conversion from ‘std::vector<char*>::size_type’ {aka ‘long unsigned int’} to ‘int’ may change value [-Wconversion]
+		return static_cast<int>(argv_.size()) - 1;
 	}
 
 	//return argv_ as char*[]
