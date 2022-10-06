@@ -144,6 +144,8 @@ install(FILES
  exoprog.h
  ioconv_custom.h
  timebank.h
+ printtx.hpp
+ htmllib2.h
 DESTINATION include/exodus)
 
 install (FILES

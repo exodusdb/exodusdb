@@ -197,9 +197,10 @@ install(TARGETS htmllib2 DESTINATION /usr/lib)
 
 ### 5. INSTALL INCLUDES ###
 
-install(FILES
- printtx.hpp
- htmllib2.h
-DESTINATION include/exodus)
+# Moved to libexodus/exodus so that can be included when building cli
+#install(FILES
+# printtx.hpp
+# htmllib2.h
+#DESTINATION include/exodus)
 
 message("--EXODUS CLI CMAKE EXIT --")
