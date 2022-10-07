@@ -16,12 +16,6 @@ set -euxo pipefail
 	fi
 
 :
-: Generate all headers first
-: ==========================
-:
-	compile alt exo sys {hS$COMPILER_OPTIONS}
-
-:
 : Install dat files
 : =================
 :
@@ -29,6 +23,12 @@ set -euxo pipefail
 	# Empty files will be deleted in the end
 	#rsync -avz --delete ./dat/* ~/dat/
 	rsync -avz ./dat/* ~/dat/
+
+:
+: Generate all headers first
+: ==========================
+:
+	compile alt exo sys {hS$COMPILER_OPTIONS}
 
 :
 : Regenerate dict_xxxxxxxx.cpp files where dat have files changed

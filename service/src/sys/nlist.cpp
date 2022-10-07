@@ -8,11 +8,11 @@ libraryinit()
 //#include <htmllib2.h>
 #include <xselect.h>
 //#include <addunits.h>
-#include <sendmail.h>
-#include <gethtml.h>
+//#include <sendmail.h>
+//#include <gethtml.h>
 //#include <getcss.h>
 //#include <docmods.h>
-#include <timedate2.h>
+//#include <timedate2.h>
 
 #include <exodus/printtx.hpp>
 

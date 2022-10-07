@@ -19,13 +19,13 @@ programinit()
 	// CONSTANTS
 
 	// Options
-	let verbose = index(OPTIONS, "V");
+	let verbose = contains(OPTIONS, "V");
 	let silent = count(OPTIONS, "S");
-	let debugging = not index(OPTIONS, "R");  //no symbols for backtrace
+	let debugging = not contains(OPTIONS, "R");  //no symbols for backtrace
 	let optimise = count(OPTIONS, "O") - count(OPTIONS, "o");
-	let generateheadersonly = index(OPTIONS, "H");
-	let force = index(OPTIONS,"F");
-	let color_option = index(OPTIONS,"C");
+	let generateheadersonly = contains(OPTIONS, "h");
+	let force = contains(OPTIONS,"F");
+	let color_option = contains(OPTIONS,"C");
 
 	// Source extensions
 	let src_extensions = "cpp cxx cc";
@@ -753,7 +753,7 @@ function main() {
 			// Determine if program or subroutine/function
 			// and decide compile/link options
 			var isprogram =
-				index(text, "<exodus/program.h>") or index(text, "int main(") or index(text, "program()");
+				contains(text, "<exodus/program.h>") or contains(text, "int main(") or contains(text, "program()");
 			if (verbose)
 				printl("Type=", isprogram ? "Program" : "Subroutine");
 			var outputdir;
@@ -864,7 +864,7 @@ function main() {
 						var funcargs = "";
 						//default to one template argument for callables with zero arguments
 
-						var nodefaults = index(funcargsdecl, "=") eq 0;
+						var nodefaults = contains(funcargsdecl, "=") eq 0;
 						var funcargsdecl2 = funcargsdecl;
 
 						var funcargstype = "int";
@@ -1759,7 +1759,7 @@ function set_environment() {
 
 	//work out the options from the PLATFORM_ (and perhaps debug mode)
 	var options = PLATFORM_;
-	if (index(batfilename, "setenv.cmd")) {
+	if (contains(batfilename, "setenv.cmd")) {
 		//sdk71 wants x86 or x64
 		//if (options=="x86") options="Win32";
 		options = "/" ^ options;

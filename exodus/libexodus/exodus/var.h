@@ -304,6 +304,7 @@ class PUBLIC var final {
 
 	// Prevent assigning to temporaries with a clearer error message
 	// e.g. printl(date() = 12345);
+	//[[deprecated("Deprecated is a great way to highlight all uses of something which can otherwise be hard or slow to find!")]
 	void operator=(CVR rhs) && = delete;
 
 	// var& operator=(CVR rhs) & = default;
@@ -1068,60 +1069,67 @@ class PUBLIC var final {
 
 
 	///////////////////////////////////////
-	// SELF ASSIGN OPERATORS ON TEMPORARIES - all deleted to prevent unusual and unnecessary coding
+	// SELF ASSIGN OPERATORS ON TEMPORARIES - all deprecated or deleted to prevent unusual and unnecessary coding
 	///////////////////////////////////////
 
-	VARREF operator+=(CVR) && = delete;
-	VARREF operator*=(CVR) && = delete;
-	VARREF operator-=(CVR) && = delete;
-	VARREF operator/=(CVR) && = delete;
-	VARREF operator%=(CVR) && = delete;
-	VARREF operator^=(CVR) && = delete;
+	#define EXO_DEP	[[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign. ")]]
+
+	EXO_DEP VARREF operator+=(CVR rhs) && {(*this) += rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator*=(CVR rhs) && {(*this) *= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator-=(CVR rhs) && {(*this) -= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator/=(CVR rhs) && {(*this) /= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator%=(CVR rhs) && {(*this) %= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator^=(CVR rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	// Specialisations
 
+	// clang-format off
+
 	// Add
-	VARREF operator+=(const int) && = delete;
-	VARREF operator+=(const double) && = delete;
-	VARREF operator+=(const char  char1) && = delete;
-	VARREF operator+=(const char* chars) && = delete;
-	VARREF operator+=(const bool) && = delete;
+	EXO_DEP VARREF operator+=(const int    rhs) && {(*this) += rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator+=(const double rhs) && {(*this) += rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator+=(const char   rhs) && {(*this) += rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator+=(const char*  rhs) && {(*this) += rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator+=(const bool   rhs) && {(*this) += rhs; return *this;}// = delete;
 
 	// Multiply
-	VARREF operator*=(const int) && = delete;
-	VARREF operator*=(const double) && = delete;
-	VARREF operator*=(const char  char1) && = delete;
-	VARREF operator*=(const char* chars) && = delete;
-	VARREF operator*=(const bool) && = delete;
+	EXO_DEP VARREF operator*=(const int    rhs) && {(*this) *= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator*=(const double rhs) && {(*this) *= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator*=(const char   rhs) && {(*this) *= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator*=(const char*  rhs) && {(*this) *= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator*=(const bool   rhs) && {(*this) *= rhs; return *this;}// = delete;
 
 	// Subtract
-	VARREF operator-=(const int) && = delete;
-	VARREF operator-=(const double) && = delete;
-	VARREF operator-=(const char  char1) && = delete;
-	VARREF operator-=(const char* chars) && = delete;
-	VARREF operator-=(const bool) && = delete;
+	EXO_DEP VARREF operator-=(const int    rhs) && {(*this) -= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator-=(const double rhs) && {(*this) -= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator-=(const char   rhs) && {(*this) -= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator-=(const char*  rhs) && {(*this) -= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator-=(const bool   rhs) && {(*this) -= rhs; return *this;}// = delete;
 
 	// Divide
-	VARREF operator/=(const int) && = delete;
-	VARREF operator/=(const double) && = delete;
-	VARREF operator/=(const char  char1) && = delete;
-	VARREF operator/=(const char* chars) && = delete;
-	VARREF operator/=(const bool) && = delete;
+	EXO_DEP VARREF operator/=(const int    rhs) && {(*this) /= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator/=(const double rhs) && {(*this) /= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator/=(const char   rhs) && {(*this) /= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator/=(const char*  rhs) && {(*this) /= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator/=(const bool   rhs) && {(*this) /= rhs; return *this;}// = delete;
 
 	// Modulo
-	VARREF operator%=(const int) && = delete;
-	VARREF operator%=(const double dbl1) && = delete;
-	VARREF operator%=(const char  char1) && = delete;
-	VARREF operator%=(const char* chars) && = delete;
-	VARREF operator%=(const bool  bool1) && = delete;
+	EXO_DEP VARREF operator%=(const int    rhs) && {(*this) %= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator%=(const double rhs) && {(*this) %= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator%=(const char   rhs) && {(*this) %= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator%=(const char*  rhs) && {(*this) %= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator%=(const bool   rhs) && {(*this) %= rhs; return *this;}// = delete;
 
 	// Concat
-	VARREF operator^=(const int) && = delete;
-	VARREF operator^=(const double) && = delete;
-	VARREF operator^=(const char) && = delete;
-	VARREF operator^=(const char*) && = delete;
-	VARREF operator^=(const std::string&) && = delete;
+	EXO_DEP VARREF operator^=(const int          rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator^=(const double       rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	EXO_DEP VARREF operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
+	// clang-format on
+
+	#undef EXO_DEP
 
 	//////////////////////
 	// INCREMENT/DECREMENT

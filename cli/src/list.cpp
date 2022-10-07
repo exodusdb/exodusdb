@@ -68,28 +68,13 @@ Example command line:
 
 */
 
-#define EXO_NOHTML
-#ifdef EXO_NOHTML
-#	define xselect select
-//#	define timedate2 timedate
-//#	define timedate2 (oconv(time(), "MTS") ^ " " ^ oconv(date(), "D"))
-#else
-//#	include <addunits.h>
-//#	include <colrowspan.h>
-//#	include <convcss.h>
-//#	include <docmods.h>
-//#	include <elapsedtimetext.h>
-//#	include <getcss.h>
-#	include <gethtml.h>
-//#	include <getmark.h>
-//#	include <getsortjs.h>
-#	include <htmllib2.h>
-#	include <sendmail.h>
-//#	include <timedate2.h>
-#	include <xselect.h>
-#endif
-
 #include <exodus/printtx.hpp>
+
+#if __has_include(<xselect.h>)
+#	include <xselect.h>
+#else
+#	define xselect select
+#endif
 
 //#include <gen_common.h>
 
@@ -463,18 +448,7 @@ function main() {
 		decimalchar = ".";
 	}
 
-	if (VOLUMES) {
-		if (SYSTEM.f(2) eq "") {
-			perform("GET NEW " ^ SENTENCE);
-			//stop();
-			return 0;
-		}
-		html = 1;
-
-		//if not DOS then dont force html or force output to file
-	} else {
-		html = SYSTEM.f(2).lcase().ends("htm");
-	}
+	html = SYSTEM.f(2).lcase().ends("htm") or OPTIONS.contains("h");
 
 	if (html) {
 		//td0=crlf:' '
@@ -1403,15 +1377,15 @@ x1exit:
 
 	//convert to html with colspan/rowspan where necessary and (Base) as currcode
 	//thproperties='style="background-color:':thcolor:'"'
-#ifndef EXO_NOHTML
+//#ifndef EXO_NOHTML
 	if (html) {
 		//call colrowspan(colhdg, thproperties, nobase);
 		call htmllib2("COLROWSPAN", colhdg, thproperties, nobase);
 	}
-#endif
+//#endif
 	//trim off blank lines (due to the 9 above)
 	if (html) {
-#ifndef EXO_NOHTML
+//#ifndef EXO_NOHTML
 		//call getsortjs(tt);
 		call htmllib2("GETSORTJS", tt);
 
@@ -1449,7 +1423,7 @@ x1exit:
 
 		//allow for single quotes
 		colhdg.replacer("'", "''");
-#endif
+//#endif
 	} else {
 		while (true) {
 			///BREAK;
@@ -1498,7 +1472,7 @@ x1exit:
 			"<colgroup>"
 			"\r\n" ^
 			headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
-#ifndef EXO_NOHTML
+//#ifndef EXO_NOHTML
 		//style columns where '<col>' not supported.
 		//call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		call htmllib2("CONVCSS", headtabstyle, "headtab0", headtabcols);
@@ -1515,7 +1489,7 @@ x1exit:
 			"\r\n"
 			"<TBODY>";
 		call htmllib2("TABLE.MAKE", headtab, tt, "");
-#endif
+//#endif
 		headtab.replacer("</TR>",
 						"</TR>"
 						"\r\n");
@@ -1819,12 +1793,12 @@ recexit:
 		if (coldict(coln).f(12)) {
 			if (icol(coln)) {
 				if (html) {
-#ifndef EXO_NOHTML
+//#ifndef EXO_NOHTML
 					//breaktotal(coln,1)+=i.col(coln)
 					//call addunits(icol(coln), breaktotal(coln, 1), VM);
 					// breaktotal <- icol
-					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol(col), VM);
-#endif
+					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol(coln), VM);
+//#endif
 				} else {
 					if (breaktotal(coln, 1).isnum() and icol(coln).isnum()) {
 						breaktotal(coln, 1) += icol(coln);
@@ -2383,12 +2357,12 @@ subroutine printbreaks() {
 
 					if (cell) {
 						if (html) {
-#ifndef EXO_NOHTML
+//#ifndef EXO_NOHTML
 							//breaktotal(coln,leveln+1)+=cell
 							//call addunits(cell, breaktotal(coln, leveln + 1), VM);
 							// breaktotal <- cell
-							call htmllib2("ADDUNITS", breaktotal(coln, leveln + 1, cell, VM);
-#endif
+							call htmllib2("ADDUNITS", breaktotal(coln, leveln + 1), cell, VM);
+//#endif
 						} else {
 							if (((breaktotal(coln, leveln + 1)).isnum()) and cell.isnum()) {
 								breaktotal(coln, leveln + 1) += cell;
@@ -2680,9 +2654,7 @@ subroutine emailing() {
 		//osclose printfile
 		//dont email stuff which has no email address
 		if (tt) {
-#ifndef EXO_NOHTML
 			call sendmail(tt, tt2, tt3, body, "", "", xxerrmsg);
-#endif
 		}
 
 		printptr = 0;

@@ -14,7 +14,7 @@ libraryinit()
 #include <listen2.h>
 #include <log.h>
 #include <sysmsg.h>
-#include <htmllib2.h>
+#include <exodus/htmllib2.h>
 #include <listen3.h>
 #include <systemsubs.h>
 #include <generalsubs.h>

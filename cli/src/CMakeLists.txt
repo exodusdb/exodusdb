@@ -7,200 +7,216 @@ message("--EXODUS CLI CMAKE INIT --")
 
 #use CMakeList.txt options in parent directory
 
-#allow relative link directories
-cmake_policy(SET CMP0015 NEW)
-include_directories(../../exodus/libexodus)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
+#
+# Allow relative link directories
+# ###############################
+#
+	cmake_policy(SET CMP0015 NEW)
+	include_directories(../../exodus/libexodus)
+	link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
-#######################################
-# c++ version 17 or 20 if on Ubuntu 20+
-#######################################
-execute_process(
-        COMMAND         grep "Ubuntu 2" /etc/lsb-release
-        OUTPUT_VARIABLE OUTVAR
-        ERROR_VARIABLE  ERRVAR
-        RESULT_VARIABLE RESVAR
-)
-if(RESVAR EQUAL "0")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
-else()
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-endif()
+#
+# Determine C++ version - C++17/18 for Ubuntu 20+
+# ###############################################
+#
+	execute_process(
+	        COMMAND         grep "Ubuntu 2" /etc/lsb-release
+	        OUTPUT_VARIABLE OUTVAR
+	        ERROR_VARIABLE  ERRVAR
+	        RESULT_VARIABLE RESVAR
+	)
+	if(RESVAR EQUAL "0")
+	        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+	else()
+	        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+	endif()
 
+#
+# 1. COMPILE
+# ##########
+#
+	#NB add any NEW programs here and in TWO MORE sections further down
+	#target_link_libraries(
+	#install(
 
-### 1. COMPILE ###
+	#
+	# DONT FORGET TO ADD TO ALL STAGES (1, 2 AND 3)
+	#
+	# bin #
+	#compile.cpp
+	#list.cpp
+	#listo.cpp
+	#dict2sql.cpp
+	#edic.cpp
+	#configexodus.cpp
+	#copyfile.cpp
+	#copyrec.cpp
+	#exodus.cpp
+	#dbattach.cpp
+	#convsyntax.cpp
+	#testsort.cpp
+	#edir.cpp
+	#sync_dat.cpp
+	#dbcomp.cpp
+	#genfunctors.cpp
+	#dbgrep.cpp
+	#createindex.cpp
+	#listdict.cpp
+	#deleteindex.cpp
+	#delete.cpp
+	#createfile.cpp
+	#deletefile.cpp
+	#dict_xo_clients.cpp
+	#htmllib2.cpp
+	#clearfile.cpp
+	#dbdelete.cpp
+	#dbcopy.cpp
+	#dbcreate.cpp
+	#listindex.cpp
+	#listfiles.cpp
+	#dblist.cpp
 
-#NB add any NEW programs here and in TWO MORE sections further down
-#target_link_libraries(
-#install(
+	#largest first
+	add_executable(compile compile.cpp)
+	add_executable(list list.cpp)
+	add_executable(dict2sql dict2sql.cpp)
+	add_executable(edic edic.cpp)
+	add_executable(configexodus configexodus.cpp)
+	add_executable(copyfile copyfile.cpp)
+	add_executable(copyrec copyrec.cpp)
 
-### DONT FORGET TO ADD TO ALL STAGES (1, 2 AND 3) ###
+	add_executable(listfiles listfiles.cpp)
+	add_executable(listdict listdict.cpp)
+	add_executable(createfile createfile.cpp)
+	add_executable(createindex createindex.cpp)
 
-# bin #
-#compile.cpp
-#list.cpp
-#listo.cpp
-#dict2sql.cpp
-#edic.cpp
-#configexodus.cpp
-#copyfile.cpp
-#copyrec.cpp
-#exodus.cpp
-#dbattach.cpp
-#convsyntax.cpp
-#testsort.cpp
-#edir.cpp
-#sync_dat.cpp
-#dbcomp.cpp
-#genfunctors.cpp
-#dbgrep.cpp
-#createindex.cpp
-#listdict.cpp
-#deleteindex.cpp
-#delete.cpp
-#createfile.cpp
-#deletefile.cpp
-#dict_xo_clients.cpp
-#htmllib2.cpp
-#clearfile.cpp
-#dbdelete.cpp
-#dbcopy.cpp
-#dbcreate.cpp
-#listindex.cpp
-#listfiles.cpp
-#dblist.cpp
+	add_executable(dbcreate dbcreate.cpp)
+	add_executable(dbgrep dbgrep.cpp)
+	add_executable(dblist dblist.cpp)
+	add_executable(dbcopy dbcopy.cpp)
+	add_executable(dbcomp dbcomp.cpp)
+	add_executable(dbdelete dbdelete.cpp)
+	add_executable(dbattach dbattach.cpp)
 
-#largest first
-add_executable(compile compile.cpp)
-add_executable(list list.cpp)
-add_executable(dict2sql dict2sql.cpp)
-add_executable(edic edic.cpp)
-add_executable(configexodus configexodus.cpp)
-add_executable(copyfile copyfile.cpp)
-add_executable(copyrec copyrec.cpp)
+	add_executable(delete delete.cpp)
+	add_executable(clearfile clearfile.cpp)
+	add_executable(deletefile deletefile.cpp)
+	add_executable(deleteindex deleteindex.cpp)
+	add_executable(edir edir.cpp)
+	add_executable(listindex listindex.cpp)
+	add_executable(testsort testsort.cpp)
+	add_executable(sync_dat sync_dat.cpp)
+	add_executable(convsyntax convsyntax.cpp)
 
-add_executable(listfiles listfiles.cpp)
-add_executable(listdict listdict.cpp)
-add_executable(createfile createfile.cpp)
-add_executable(createindex createindex.cpp)
+	#name is name only ... input and output files are exodus
+	add_executable(exodus-cli exodus.cpp)
+	set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 
-add_executable(dbcreate dbcreate.cpp)
-add_executable(dbgrep dbgrep.cpp)
-add_executable(dblist dblist.cpp)
-add_executable(dbcopy dbcopy.cpp)
-add_executable(dbcomp dbcomp.cpp)
-add_executable(dbdelete dbdelete.cpp)
-add_executable(dbattach dbattach.cpp)
+	# lib #
+	add_library(htmllib2 SHARED htmllib2.cpp)
+	add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
+	#add_library(number SHARED number.cpp)
 
-add_executable(delete delete.cpp)
-add_executable(clearfile clearfile.cpp)
-add_executable(deletefile deletefile.cpp)
-add_executable(deleteindex deleteindex.cpp)
-add_executable(edir edir.cpp)
-add_executable(listindex listindex.cpp)
-add_executable(testsort testsort.cpp)
-add_executable(sync_dat sync_dat.cpp)
-add_executable(convsyntax convsyntax.cpp)
+#
+# 2. LINK
+# #######
+#
+	#dl is needed for dynamic link library code
 
-#name is name only ... input and output files are exodus
-add_executable(exodus-cli exodus.cpp)
-set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
+	# Largest first
+	target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
+	target_link_libraries(list exodus stdc++fs ${LIBS})
+	target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
+	target_link_libraries(edic exodus stdc++fs ${LIBS})
+	target_link_libraries(configexodus exodus stdc++fs ${LIBS})
+	target_link_libraries(copyfile exodus stdc++fs ${LIBS})
+	target_link_libraries(copyrec exodus stdc++fs ${LIBS})
 
-# lib #
+	target_link_libraries(createfile exodus stdc++fs ${LIBS})
+	target_link_libraries(createindex exodus stdc++fs ${LIBS})
 
-add_library(htmllib2 SHARED htmllib2.cpp)
-add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
-#add_library(number SHARED number.cpp)
+	target_link_libraries(dbcreate exodus stdc++fs ${LIBS})
+	target_link_libraries(dblist exodus stdc++fs ${LIBS})
+	target_link_libraries(dbgrep exodus stdc++fs ${LIBS})
+	target_link_libraries(dbcopy exodus stdc++fs ${LIBS})
+	target_link_libraries(dbcomp exodus stdc++fs ${LIBS})
+	target_link_libraries(dbdelete exodus stdc++fs ${LIBS})
+	target_link_libraries(dbattach exodus stdc++fs ${LIBS})
 
-### 2. LINK ###
+	target_link_libraries(delete exodus stdc++fs ${LIBS})
+	target_link_libraries(clearfile exodus stdc++fs ${LIBS})
+	target_link_libraries(deletefile exodus stdc++fs ${LIBS})
+	target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
+	target_link_libraries(edir exodus stdc++fs ${LIBS})
+	#target_link_libraries(number exodus stdc++fs ${LIBS})
+	target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
+	target_link_libraries(listfiles exodus stdc++fs ${LIBS})
+	target_link_libraries(listdict exodus stdc++fs ${LIBS})
+	target_link_libraries(listindex exodus stdc++fs ${LIBS})
+	target_link_libraries(testsort exodus stdc++fs ${LIBS})
+	target_link_libraries(sync_dat exodus stdc++fs ${LIBS})
+	target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
 
-#dl is needed for dynamic link library code
+#
+# 3. INSTALL BINs
+# ###############
+#
+	install(TARGETS compile
+	createfile
+	createindex
 
-# Largest first
-target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
-target_link_libraries(list exodus stdc++fs ${LIBS})
-target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
-target_link_libraries(edic exodus stdc++fs ${LIBS})
-target_link_libraries(configexodus exodus stdc++fs ${LIBS})
-target_link_libraries(copyfile exodus stdc++fs ${LIBS})
-target_link_libraries(copyrec exodus stdc++fs ${LIBS})
+	dbcreate
+	dblist
+	dbgrep
+	dbcopy
+	dbcomp
+	dbdelete
+	dbattach
 
-target_link_libraries(createfile exodus stdc++fs ${LIBS})
-target_link_libraries(createindex exodus stdc++fs ${LIBS})
+	delete
+	clearfile
+	copyfile
+	copyrec
+	deletefile
+	deleteindex
+	edir
+	edic
+	dict2sql
+	exodus-cli
+	list
+	listfiles
+	listdict
+	listindex
+	testsort
+	configexodus
+	sync_dat
+	convsyntax
+	 DESTINATION bin)
 
-target_link_libraries(dbcreate exodus stdc++fs ${LIBS})
-target_link_libraries(dblist exodus stdc++fs ${LIBS})
-target_link_libraries(dbgrep exodus stdc++fs ${LIBS})
-target_link_libraries(dbcopy exodus stdc++fs ${LIBS})
-target_link_libraries(dbcomp exodus stdc++fs ${LIBS})
-target_link_libraries(dbdelete exodus stdc++fs ${LIBS})
-target_link_libraries(dbattach exodus stdc++fs ${LIBS})
+#
+# 4. INSTALL LIBs
+# ###############
+#
+	## CMAKE_PREFIX=/usr/local/
+	#install(TARGETS dict_xo_clients DESTINATION lib)
+	#push it into /usr/lib where it can be found by dlopen
+	#install(TARGETS dict_xo_clients number DESTINATION /usr/lib)
+	install(TARGETS dict_xo_clients DESTINATION /usr/lib)
+	install(TARGETS htmllib2 DESTINATION /usr/lib)
 
-target_link_libraries(delete exodus stdc++fs ${LIBS})
-target_link_libraries(clearfile exodus stdc++fs ${LIBS})
-target_link_libraries(deletefile exodus stdc++fs ${LIBS})
-target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
-target_link_libraries(edir exodus stdc++fs ${LIBS})
-#target_link_libraries(number exodus stdc++fs ${LIBS})
-target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
-target_link_libraries(listfiles exodus stdc++fs ${LIBS})
-target_link_libraries(listdict exodus stdc++fs ${LIBS})
-target_link_libraries(listindex exodus stdc++fs ${LIBS})
-target_link_libraries(testsort exodus stdc++fs ${LIBS})
-target_link_libraries(sync_dat exodus stdc++fs ${LIBS})
-target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
+#
+# 5. INSTALL INCLUDES
+# ###################
+#
+	# Moved to libexodus/exodus so that can be included when building cli
+	#install(FILES
+	# printtx.hpp
+	# htmllib2.h
+	#DESTINATION include/exodus)
 
-
-### 3. INSTALL BINs ###
-
-install(TARGETS compile
-createfile
-createindex
-
-dbcreate
-dblist
-dbgrep
-dbcopy
-dbcomp
-dbdelete
-dbattach
-
-delete
-clearfile
-copyfile
-copyrec
-deletefile
-deleteindex
-edir
-edic
-dict2sql
-exodus-cli
-list
-listfiles
-listdict
-listindex
-testsort
-configexodus
-sync_dat
-convsyntax
- DESTINATION bin)
-
-### 4. INSTALL LIBs ###
-
-## CMAKE_PREFIX=/usr/local/
-#install(TARGETS dict_xo_clients DESTINATION lib)
-#push it into /usr/lib where it can be found by dlopen
-#install(TARGETS dict_xo_clients number DESTINATION /usr/lib)
-install(TARGETS dict_xo_clients DESTINATION /usr/lib)
-install(TARGETS htmllib2 DESTINATION /usr/lib)
-
-### 5. INSTALL INCLUDES ###
-
-# Moved to libexodus/exodus so that can be included when building cli
-#install(FILES
-# printtx.hpp
-# htmllib2.h
-#DESTINATION include/exodus)
-
-message("--EXODUS CLI CMAKE EXIT --")
+#
+# Exit
+# ####
+#
+	message("--EXODUS CLI CMAKE EXIT --")

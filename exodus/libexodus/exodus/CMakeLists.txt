@@ -5,167 +5,186 @@ project(libexodus)
 message("")
 message("--LIBEXODUS CMAKE INIT --")
 
-#use CMakeList.txt options in parent directory
+
+#Use CMakeList.txt options in parent directory
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
 #
 # Coverage testing
+# ################
 #
-# See https://gcc.gnu.org/onlinedocs/gcc/Gcov-Data-Files.html
-#
-# test-coverage = generate gcno files at compile time
-# profile-arcs = generate gcda files at runtime
-#
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage -fprofile-arcs")
+	# See https://gcc.gnu.org/onlinedocs/gcc/Gcov-Data-Files.html
+	#
+	# test-coverage = generate gcno files at compile time
+	# profile-arcs = generate gcda files at runtime
+	#
+	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage -fprofile-arcs")
+
+	#
+	# Sanitizer
+	#
+	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+	execute_process(
+	        COMMAND rm /root/inc/printtx.hpp
+	        OUTPUT_VARIABLE OUTVAR
+	        ERROR_VARIABLE  ERRVAR
+	        RESULT_VARIABLE RESVAR
+	)
 
 #
-# Sanitizer
+# POSTGRES
+# ########
 #
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+	##set(PostgreSQL_ADDITIONAL_VERSIONS "9.3" "9.3.4")
+	##find_package(PostgreSQL REQUIRED)
+	##find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+	#message(PostgreSQL_INCLUDE_DIRS=${PostgreSQL_INCLUDE_DIRS})
+	execute_process(
+	        COMMAND                 pg_config --includedir
+	        OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
+	        OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+	message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
+	include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR} ../../../fast_float/include)
 
-execute_process(
-        COMMAND rm /root/inc/printtx.hpp
-        OUTPUT_VARIABLE OUTVAR
-        ERROR_VARIABLE  ERRVAR
-        RESULT_VARIABLE RESVAR
+#
+# BOOST
+# #####
+#
+	#date_time appears to be header only in later boost versions eg 55
+	#find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
+	#find_package(Boost REQUIRED COMPONENTS filesystem system regex thread)
+	#find_package(Boost REQUIRED COMPONENTS system regex thread locale)
+	#find_package(Boost REQUIRED COMPONENTS filesystem system regex locale)
+	#find_package(Boost REQUIRED COMPONENTS filesystem regex locale)
+	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
+	message("BUT LOOKING IN /usr/local/lib and /usr/local/include FIRST!")
+
+	set(Boost_USE_STATIC_LIBS        ON)
+	set(Boost_USE_MULTITHREADED      ON)
+	set(Boost_USE_STATIC_RUNTIME     ON)
+
+#
+# ICU
+# ###
+#
+	#FindICU.cmake in cmake directory look in three levels of parent directories of source too
+	#set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};cmake;${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/../cmake/;${PROJECT_SOURCE_DIR}/../../cmake;${PROJECT_SOURCE_DIR}/../../../cmake")
+	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+	#note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
+	message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
+	#NOICU find_package(ICU 4.4 REQUIRED)
+
+#
+# RYU
+# ###
+#
+	find_library(RYU_LIBRARIES NAMES ryu)
+	message(${RYU_LIBRARIES})
+	#find_library(RYULIBRARIES NAMES ryu ryu_parse)
+
+	#define an output called exodus of type shared library and list all its source files
+	add_library(exodus SHARED
+	# mvutf.cpp
+	# ConvertUTF.c
+	# mvlocale.cpp
+	#big ones first for efficient parallel compilation
+	 exoprog.cpp
+	 vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
+	 var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
+	 varchrono.cpp
+	 varfuncs.cpp varioconv.cpp
+	 exoenv.cpp exofuncs.cpp exoos.cpp
+	 varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp #mvbrackets.cpp
+	# mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
+	 murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
+	 varoshandle.cpp vardbconn.cpp mvprocessno.cpp
+	 variter.cpp
+	# little ones last for quick parallel finishing
+	 term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 )
 
-### POSTGRES ###
-################
-##set(PostgreSQL_ADDITIONAL_VERSIONS "9.3" "9.3.4")
-##find_package(PostgreSQL REQUIRED)
-##find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
-#message(PostgreSQL_INCLUDE_DIRS=${PostgreSQL_INCLUDE_DIRS})
-execute_process(
-        COMMAND                 pg_config --includedir
-        OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
-include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR} ../../../fast_float/include)
+#
+# Specify what libraries are to be linked in when building libexodus
+# ##################################################################
+#
+	message("Boost_LIBRARIES=${Boost_LIBRARIES}")
+	#postgres libraries seem not to be set but we include -pq directly to solve
+	message("PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES}")
+	message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
+	#NOICU message("ICU_LIBRARIES=${ICU_LIBRARIES}")
+	#pq is needed for postgresql client library code
+	#dl is needed for dynamic link library code
+	#target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
+	#if (RYU_LIBRARIES STREQUAL "NOTFOUND")
+	if (RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-NOTFOUND")
+	target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
+	else()
+	target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ${RYU_LIBRARIES})
+	endif()
 
-### BOOST ###
-#############
-#date_time appears to be header only in later boost versions eg 55
-#find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
-#find_package(Boost REQUIRED COMPONENTS filesystem system regex thread)
-#find_package(Boost REQUIRED COMPONENTS system regex thread locale)
-#find_package(Boost REQUIRED COMPONENTS filesystem system regex locale)
-#find_package(Boost REQUIRED COMPONENTS filesystem regex locale)
-find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
-message("BUT LOOKING IN /usr/local/lib and /usr/local/include FIRST!")
+#
+# State that the output libexodus should be installed in the default system library
+# #################################################################################
+#
 
-set(Boost_USE_STATIC_LIBS        ON)
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME     ON)
+	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
+	install(TARGETS exodus DESTINATION lib)
+	##install(TARGETS exodus DESTINATION /usr/lib)
 
-### ICU ###
-###########
-#FindICU.cmake in cmake directory look in three levels of parent directories of source too
-#set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};cmake;${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/../cmake/;${PROJECT_SOURCE_DIR}/../../cmake;${PROJECT_SOURCE_DIR}/../../../cmake")
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-#note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
-message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
-#NOICU find_package(ICU 4.4 REQUIRED)
+	#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
+	set_target_properties(exodus PROPERTIES SOVERSION "22.09")
 
-### RYU ###
-###########
-find_library(RYU_LIBRARIES NAMES ryu)
-message(${RYU_LIBRARIES})
-#find_library(RYULIBRARIES NAMES ryu ryu_parse)
+#
+# Install some of exodus' include files so programs can be written in exodus c++
+# ##############################################################################
+#
+	install(FILES
+	 var.h
+	 vartyp.h
+	 varerr.h
+	 dim.h
+	 exodus.h
+	 range.h
+	 exoimpl.h
+	 exomacros.h
+	 exoenv.h
+	 exofuncs.h
+	 #mvimpl.h mvipc.h mvconfig.h mvlink.h
+	 exocallable.h
+	 program.h
+	 library.h
+	 dict.h
+	 common.h
+	 exoprog.h
+	 ioconv_custom.h
+	 timebank.h
+	 printtx.hpp
+	 htmllib2.h
+	DESTINATION include/exodus)
 
-### define an output called exodus of type shared library and list all its source files###
-add_library(exodus SHARED
-# mvutf.cpp
-# ConvertUTF.c
-# mvlocale.cpp
+	install (FILES
+	 timeaccs.txt
+	DESTINATION share/exodus)
 
-# big ones first for efficient parallel compilation
- exoprog.cpp
- vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
- var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
- varchrono.cpp
- varfuncs.cpp varioconv.cpp
- exoenv.cpp exofuncs.cpp exoos.cpp
- varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp #mvbrackets.cpp
-# mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
- murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
- varoshandle.cpp vardbconn.cpp mvprocessno.cpp
- variter.cpp
-# little ones last for quick parallel finishing
- term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
-)
+	install(CODE
+	"
+	        execute_process(
+	            COMMAND
+	                ldconfig
+	                OUTPUT_VARIABLE OUTVAR
+	                ERROR_VARIABLE ERRVAR
+	                RESULT_VARIABLE RESVAR
+	        )
+	        message(ldconfig <\${OUTVAR}>\n
+	            <\${ERRVAR}>\n
+	            <\${RESVAR}>\n
+	        )
+	    "
+	)
 
-### specify what libraries are to be linked in when building libexodus ###
-
-message("Boost_LIBRARIES=${Boost_LIBRARIES}")
-#postgres libraries seem not to be set but we include -pq directly to solve
-message("PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES}")
-message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
-#NOICU message("ICU_LIBRARIES=${ICU_LIBRARIES}")
-#pq is needed for postgresql client library code
-#dl is needed for dynamic link library code
-#target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
-#if (RYU_LIBRARIES STREQUAL "NOTFOUND")
-if (RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-NOTFOUND")
-target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
-else()
-target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ${RYU_LIBRARIES})
-endif()
-
-### state that the output libexodus should be installed in the default system library
-
-### CMAKE_INSTALL_PREFIX defaults to /usr/local/
-install(TARGETS exodus DESTINATION lib)
-##install(TARGETS exodus DESTINATION /usr/lib)
-
-#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
-set_target_properties(exodus PROPERTIES SOVERSION "22.09")
-
-### install some of exodus' include files so programs can be written in exodus c++ ###
-
-install(FILES
- var.h
- vartyp.h
- varerr.h
- dim.h
- exodus.h
- range.h
- exoimpl.h
- exomacros.h
- exoenv.h
- exofuncs.h
- #mvimpl.h mvipc.h mvconfig.h mvlink.h
- exocallable.h
- program.h
- library.h
- dict.h
- common.h
- exoprog.h
- ioconv_custom.h
- timebank.h
- printtx.hpp
- htmllib2.h
-DESTINATION include/exodus)
-
-install (FILES
- timeaccs.txt
-DESTINATION share/exodus)
-
-install(CODE
-"
-        execute_process(
-            COMMAND 
-                ldconfig
-                OUTPUT_VARIABLE OUTVAR
-                ERROR_VARIABLE ERRVAR
-                RESULT_VARIABLE RESVAR
-        )
-        message(ldconfig <\${OUTVAR}>\n
-            <\${ERRVAR}>\n
-            <\${RESVAR}>\n
-        )
-    "
-)
-
-message("--LIBEXODUS CMAKE EXIT --")
+#
+# EXIT
+# ####
+#
+	message("--LIBEXODUS CMAKE EXIT --")

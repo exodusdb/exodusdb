@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <htmllib2.h>
+#include <exodus/htmllib2.h>
 #include <log.h>
 #include <getbackpars.h>
 #include <htmllib.h>

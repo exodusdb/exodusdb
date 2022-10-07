@@ -1,3 +1,6 @@
+#ifndef EXO_PRINTTX_HPP
+#define EXO_PRINTTX_HPP
+
 #include <exodus/htmllib2.h>
 
 subroutine printnext() {
@@ -19,6 +22,29 @@ subroutine docmods(io tx, in params = "") {
 subroutine getmark(in mode, in html, io mark) {
 	call htmllib2("GETMARK", mark, mode, html);
 }
+
+#if __has_include(<gethtml.h>)
+#	include <gethtml.h>
+#	define EXO_HAS_GETHTML
+#else
+//subroutine gethtml(in mode0, out html_letterhead, in compcode0="", in qr_text="") {
+subroutine gethtml(in, out html_letterhead, in = "", in = "") {
+//	call htmllib2("GETHTML", html_letterhead, mode0, compcode0, qr_text);
+	html_letterhead = "";
+	return;
+}
+#endif
+
+#if __has_include(<sendmail.h>)
+#	include <sendmail.h>
+#	define EXO_HAS_SENDMAIL
+#else
+//subroutine sendmail(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
+subroutine sendmail(in, in, in, in, in, in, out errormsg, in = var(), in = var()) {
+	errormsg = "";
+	return;
+}
+#endif
 
 subroutine printtx() {
 
@@ -82,12 +108,9 @@ subroutine printtx() {
 		}
 
 		if (letterhead.unassigned()) {
+			letterhead = "";
 			if (html) {
-#ifndef EXO_NOHTML
 				call gethtml("HEAD", letterhead, "");
-#endif
-			}else{
-				letterhead = "";
 			}
 		}
 
@@ -99,7 +122,6 @@ subroutine printtx() {
 
 		if (bottomline.unassigned()) {
 			bottomline = "";
-#ifndef EXO_NOHTML
 			if (html) {
 				bottomline ^= "</tbody></table>";
 				call getmark("OWN", html, printtxmark);
@@ -107,7 +129,6 @@ subroutine printtx() {
 				//line below document on screen but not on print
 				//bottomline<-1>='<hr class="pagedivider noprint"/>'
 			}
-#endif
 		}
 
 		if (rfmt.unassigned()) {
@@ -191,7 +212,6 @@ subroutine printtx() {
 }
 
 subroutine printtx2() {
-#ifndef EXO_NOHTML
 	if (html) {
 		if (not(printptr)) {
 
@@ -222,7 +242,7 @@ subroutine printtx2() {
 			//ptx_css = "";
 		}
 	}
-#endif
+//#endif
 	tx.replacer(FM, "\r\n");
 	if (printfilename)
 		call osbwrite(tx, printfile,  printptr);
@@ -343,3 +363,5 @@ subroutine getheadfoot() {
 	return;
 
 }
+
+#endif // EXO_PRINTTX_HPP

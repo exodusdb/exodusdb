@@ -5,7 +5,7 @@ libraryinit()
 #include <sysmsg.h>
 #include <authorised.h>
 #include <collectixvals.h>
-#include <htmllib2.h>
+#include <exodus/htmllib2.h>
 #include <select2.h>
 #include <openfile.h>
 #include <rtp57.h>

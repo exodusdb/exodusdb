@@ -2,7 +2,7 @@
 libraryinit()
 
 #include <gethtml.h>
-#include <htmllib2.h>
+#include <exodus/htmllib2.h>
 //#include <getmark.h>
 //#include <getcss.h>
 #include <sysmsg.h>

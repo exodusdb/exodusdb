@@ -199,6 +199,10 @@ class PUBLIC ExodusProgramBase {
 	ND var invertarray(CVR input, CVR force0 = (0));
 	void sortarray(VARREF array, CVR fns = 0, CVR orderby0 = "");
 
+	ND var timedate2() {return timedate2(var(), var());}
+	ND var timedate2(in localdate0, in localtime0, in glang = "");
+	void getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
+
 	ND var elapsedtimetext();
 	ND var elapsedtimetext(CVR fromdate, CVR fromtime);
 	ND var elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime);
@@ -221,6 +225,7 @@ class PUBLIC ExodusProgramBase {
 	void abortall(CVR description DEFAULT_EMPTY) const;
 
 	// Quit to OS WITHOUT an error
+	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
 	void logoff(CVR description DEFAULT_EMPTY) const;
 
  private:
