@@ -460,9 +460,10 @@ function main() {
 		thx = "</th>";
 		tr = "<tr>";
 		trx = "</tr>";
-		tt = SYSTEM.f(2);
-		tt.replacer(".txt", ".htm");
-		SYSTEM(2) = tt;
+//		tt = SYSTEM.f(2);
+//		tt.replacer(".txt", ".htm");
+//		SYSTEM(2) = tt;
+		SYSTEM(2) = "-";
 	} else {
 		td0 = "";
 		td = "";

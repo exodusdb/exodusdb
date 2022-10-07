@@ -1,13 +1,19 @@
-cmake_minimum_required(VERSION 3.1)
+#
+# CONFIG
+# ######
+#
+	cmake_minimum_required(VERSION 3.1)
+	project(libexodus)
 
-project(libexodus)
+#
+# INIT
+# ####
+#
+	message("")
+	message("--LIBEXODUS CMAKE INIT --")
 
-message("")
-message("--LIBEXODUS CMAKE INIT --")
-
-
-#Use CMakeList.txt options in parent directory
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
+	#Use CMakeList.txt options in parent directory
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
 #
 # Coverage testing
@@ -83,26 +89,29 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 	message(${RYU_LIBRARIES})
 	#find_library(RYULIBRARIES NAMES ryu ryu_parse)
 
-	#define an output called exodus of type shared library and list all its source files
+#
+# Define an output called exodus of type shared library - list all its source files
+# ######################################################
+#
 	add_library(exodus SHARED
-	# mvutf.cpp
-	# ConvertUTF.c
-	# mvlocale.cpp
-	#big ones first for efficient parallel compilation
-	 exoprog.cpp
-	 vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
-	 var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
-	 varchrono.cpp
-	 varfuncs.cpp varioconv.cpp
-	 exoenv.cpp exofuncs.cpp exoos.cpp
-	 varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp #mvbrackets.cpp
-	# mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
-	 murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
-	 varoshandle.cpp vardbconn.cpp mvprocessno.cpp
-	 variter.cpp
-	# little ones last for quick parallel finishing
-	 term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
-)
+		# mvutf.cpp
+		# ConvertUTF.c
+		# mvlocale.cpp
+		#big ones first for efficient parallel compilation
+		exoprog.cpp
+		vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
+		var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
+		varchrono.cpp
+		varfuncs.cpp varioconv.cpp
+		exoenv.cpp exofuncs.cpp exoos.cpp
+		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp #mvbrackets.cpp
+		# mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
+		murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
+		varoshandle.cpp vardbconn.cpp mvprocessno.cpp
+		variter.cpp
+		# little ones last for quick parallel finishing
+		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
+	)
 
 #
 # Specify what libraries are to be linked in when building libexodus
@@ -118,9 +127,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 	#target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
 	#if (RYU_LIBRARIES STREQUAL "NOTFOUND")
 	if (RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-NOTFOUND")
-	target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
+		target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
 	else()
-	target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ${RYU_LIBRARIES})
+		target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ${RYU_LIBRARIES})
 	endif()
 
 #
@@ -129,8 +138,10 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 #
 
 	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
-	install(TARGETS exodus DESTINATION lib)
-	##install(TARGETS exodus DESTINATION /usr/lib)
+	install(
+		TARGETS exodus
+		DESTINATION lib
+	)
 
 	#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
 	set_target_properties(exodus PROPERTIES SOVERSION "22.09")
@@ -139,33 +150,37 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 # Install some of exodus' include files so programs can be written in exodus c++
 # ##############################################################################
 #
-	install(FILES
-	 var.h
-	 vartyp.h
-	 varerr.h
-	 dim.h
-	 exodus.h
-	 range.h
-	 exoimpl.h
-	 exomacros.h
-	 exoenv.h
-	 exofuncs.h
-	 #mvimpl.h mvipc.h mvconfig.h mvlink.h
-	 exocallable.h
-	 program.h
-	 library.h
-	 dict.h
-	 common.h
-	 exoprog.h
-	 ioconv_custom.h
-	 timebank.h
-	 printtx.hpp
-	 htmllib2.h
-	DESTINATION include/exodus)
+	install(
+		FILES
+			var.h
+			vartyp.h
+			varerr.h
+			dim.h
+			exodus.h
+			range.h
+			exoimpl.h
+			exomacros.h
+			exoenv.h
+			exofuncs.h
+			#mvimpl.h mvipc.h mvconfig.h mvlink.h
+			exocallable.h
+			program.h
+			library.h
+			dict.h
+			common.h
+			exoprog.h
+			ioconv_custom.h
+			timebank.h
+			printtx.hpp
+			htmllib2.h
+		DESTINATION include/exodus
+	)
 
-	install (FILES
-	 timeaccs.txt
-	DESTINATION share/exodus)
+	install (
+		FILES
+			timeaccs.txt
+		DESTINATION share/exodus
+	)
 
 	install(CODE
 	"

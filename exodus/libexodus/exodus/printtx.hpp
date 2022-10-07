@@ -9,6 +9,10 @@ subroutine printnext() {
 	return;
 
 }
+
+/////////////////////////////////////////////////////
+// STUBS to pass old function calls to htmllib2 modes
+/////////////////////////////////////////////////////
 subroutine getcss(io css, in version = "") {
 	call htmllib2("GETCSS", css, version);
 	return;
@@ -46,8 +50,15 @@ subroutine sendmail(in, in, in, in, in, in, out errormsg, in = var(), in = var()
 }
 #endif
 
+//////////////////////////
+// Main printtx() function
+//////////////////////////
+
 subroutine printtx() {
 
+
+	//Initialise on first call
+	//////////////////////////
 	if (printptr.unassigned()) {
 		printptr = 0;
 	}
@@ -64,7 +75,7 @@ subroutine printtx() {
 		}
 
 		//call setptr('prn':char(0),1)
-		SYSTEM.r(3, 1);
+		SYSTEM(3) = 1;
 
 		//if no printfile assume command mode and make an output file name
 		printfilename = SYSTEM.f(2);
@@ -80,12 +91,12 @@ subroutine printtx() {
 		//	}else{
 		//		printfilename ^= ".txt";
 		//	}
-		//	SYSTEM.r(2, printfilename);
+		//	SYSTEM(2) = printfilename;
 		//	ownprintfile = 1;
 		//}
 
 		//change the file extension to HTM
-		if (html and not printfilename.lcase().ends(".htm")) {
+		if (html and printfilename ne "-" and not printfilename.lcase().ends(".htm")) {
 
 			printfilename.osclose();
 			printfilename.osremove();
@@ -95,8 +106,12 @@ subroutine printtx() {
 			var ptx_random = var(10).pwr(15).rnd().first(8);
 			printfilename.paster(-ptx_filenamelen, ptx_filenamelen, ptx_random ^ ".htm");
 
-			SYSTEM.r(2, printfilename);
+			SYSTEM(2) = printfilename;
 		}
+
+		// printfilename "-" means stdout
+		if (printfilename == "-")
+			printfilename = "";
 
 		//open printout file
 		if (printfilename) {
@@ -125,7 +140,7 @@ subroutine printtx() {
 			if (html) {
 				bottomline ^= "</tbody></table>";
 				call getmark("OWN", html, printtxmark);
-				bottomline.r(-1, printtxmark);
+				bottomline(-1) = printtxmark;
 				//line below document on screen but not on print
 				//bottomline<-1>='<hr class="pagedivider noprint"/>'
 			}
@@ -143,7 +158,7 @@ subroutine printtx() {
 
 		gosub getheadfoot();
 
-	}
+	} // end of auto initialisation
 
 	//if tx[-1,1] ne char(12) then tx:=fm
 	tx ^= FM;
@@ -163,10 +178,6 @@ subroutine printtx() {
 		realpagen += 1;
 		pagen += 1;
 
-		//get.cursor(cursor)
-		//print @AW<30>:@(36,@CRTHIGH/2):'Page':' ':realpagen:'.':
-		//put.cursor(cursor)
-
 		var ptx_temp = FM.str(topmargin) ^ letterhead ^ headx;
 		if (html) {
 			if (printptr ne 0) {
@@ -185,31 +196,32 @@ subroutine printtx() {
 		}
 	}
 
+	///////////////////////////////////
+	// Page break if nlines > page size
+	///////////////////////////////////
 	if ((bodyln > nbodylns) or newpage) {
 		//if html then t_='<p>' else t_=''
 
 		//removed so always footing
 		//if bodyln<999 then
 
-			//commented so foot always follows bottom line (printtxmark)
-			//if foot then
+		// Footer always follows bottom line (printtxmark)
 		tx.prefixer(foot);
-			//end else
 		if (bottomline) {
-					//if html then t_:='<p style="text-align:center">'
-					//tx[1,0]=bottomline:fm:t_:'continues' rfmt
 			tx.prefixer(bottomline);
 		}
-			// end
-		// end
-		//removed because too automatic for PRINTJOB
-		//if html and not(index(bottomline,'</tbody></table>',1)) then tx[1,0]='</tbody></table>'
 		bodyln = ntxlns;
 	}
 
+	// Output a single line
 	gosub printtx2();
+
 	return;
 }
+
+///////////////////////
+// Output a single line
+///////////////////////
 
 subroutine printtx2() {
 	if (html) {
@@ -227,7 +239,6 @@ subroutine printtx2() {
 				ptx_css.paster(stylennx + 8, FM ^ style);
 			}
 
-			//htmltitle=field(headx<1>,"'",1)
 			if (htmltitle.unassigned()) {
 				htmltitle = headx.f(1);
 				}
@@ -242,8 +253,10 @@ subroutine printtx2() {
 			//ptx_css = "";
 		}
 	}
-//#endif
-	tx.replacer(FM, "\r\n");
+
+	// Convert fields to text lines
+	tx.replacer(FM, EOL);
+
 	if (printfilename)
 		call osbwrite(tx, printfile,  printptr);
 	else {
@@ -349,7 +362,7 @@ subroutine getheadfoot() {
 		while (head1.ends("&nbsp;")) {
 			head1.cutter(-6);
 		}
-		headx.r(1, head1);
+		headx(1) = head1;
 		head1 = "";
 		headx.replacer("{%20}", " ");
 	}

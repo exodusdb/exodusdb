@@ -1,6 +1,19 @@
-cmake_minimum_required(VERSION 3.1)
+#
+# CONFIG
+# ######
+#
+	cmake_minimum_required(VERSION 3.1)
+	project(exodus)
 
-#use make VERBOSE=1 to debug make
+	include(CTest)
+	enable_testing()
+
+	#use make VERBOSE=1 to debug make
+
+#
+# INIT
+# ####
+#
 
 #
 # CPack
@@ -73,11 +86,6 @@ cmake_minimum_required(VERSION 3.1)
 	message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
-
-	project(exodus)
-
-	include(CTest)
-	enable_testing()
 
 	add_subdirectory(exodus/libexodus/exodus)
 	add_subdirectory(exodus/libpgexodus/src)

@@ -24,6 +24,7 @@ var output;
 var usercoln;//num
 var tx;
 var userx;
+
 var printptr;//num
 var topmargin;//num
 var printfilename;

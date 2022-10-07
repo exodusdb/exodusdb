@@ -51,6 +51,7 @@ var rownx;//num
 var oldval;//num
 var colconv;
 var rowconv;
+
 var printptr;//num
 var topmargin;//num
 var tx;

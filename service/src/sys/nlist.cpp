@@ -199,6 +199,7 @@ var xxerrmsg;
 var ownprintfile;//num
 var ptx_filenamelen;
 var ptx_random;
+
 var pagelns;
 var realpagen;//num
 var pagen;//num

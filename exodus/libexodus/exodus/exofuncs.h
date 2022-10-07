@@ -30,16 +30,19 @@ THE SOFTWARE.
 #endif
 
 // add global function type syntax to the exodus users
+// SIMILAR code in exofuncs.h and varimpl.h
 namespace exodus {
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 	inline const var OSSLASH = "\\";
 	constexpr char OSSLASH_ = '\\';
 	constexpr bool SLASH_IS_BACKSLASH = true;
+	constexpr const char* EOL = "\r\n";
 #else
 	inline const var OSSLASH = "/";
 	constexpr char OSSLASH_ = '/';
 	constexpr bool SLASH_IS_BACKSLASH = false;
+	constexpr const char* EOL = "\n";
 #endif
 
 #if defined(_WIN64) or defined(_LP64)

@@ -1,12 +1,18 @@
-cmake_minimum_required(VERSION 3.1)
+#
+# CONFIG
+# ######
+#
+	cmake_minimum_required(VERSION 3.1)
+	project(exodus)
 
-project(exodus)
-
-message("")
-message("--EXODUS CLI CMAKE INIT --")
+#
+# INIT
+# ####
+#
+	message("")
+	message("--EXODUS CLI CMAKE INIT --")
 
 #use CMakeList.txt options in parent directory
-
 
 #
 # Allow relative link directories
@@ -36,46 +42,13 @@ message("--EXODUS CLI CMAKE INIT --")
 # 1. COMPILE
 # ##########
 #
-	#NB add any NEW programs here and in TWO MORE sections further down
-	#target_link_libraries(
-	#install(
-
 	#
 	# DONT FORGET TO ADD TO ALL STAGES (1, 2 AND 3)
 	#
-	# bin #
-	#compile.cpp
-	#list.cpp
-	#listo.cpp
-	#dict2sql.cpp
-	#edic.cpp
-	#configexodus.cpp
-	#copyfile.cpp
-	#copyrec.cpp
-	#exodus.cpp
-	#dbattach.cpp
-	#convsyntax.cpp
-	#testsort.cpp
-	#edir.cpp
-	#sync_dat.cpp
-	#dbcomp.cpp
-	#genfunctors.cpp
-	#dbgrep.cpp
-	#createindex.cpp
-	#listdict.cpp
-	#deleteindex.cpp
-	#delete.cpp
-	#createfile.cpp
-	#deletefile.cpp
-	#dict_xo_clients.cpp
-	#htmllib2.cpp
-	#clearfile.cpp
-	#dbdelete.cpp
-	#dbcopy.cpp
-	#dbcreate.cpp
-	#listindex.cpp
-	#listfiles.cpp
-	#dblist.cpp
+
+	#NB add any NEW programs here and in TWO MORE sections further down
+	#target_link_libraries(
+	#install(
 
 	#largest first
 	add_executable(compile compile.cpp)
@@ -163,35 +136,35 @@ message("--EXODUS CLI CMAKE INIT --")
 # ###############
 #
 	install(TARGETS compile
-	createfile
-	createindex
+		createfile
+		createindex
 
-	dbcreate
-	dblist
-	dbgrep
-	dbcopy
-	dbcomp
-	dbdelete
-	dbattach
+		dbcreate
+		dblist
+		dbgrep
+		dbcopy
+		dbcomp
+		dbdelete
+		dbattach
 
-	delete
-	clearfile
-	copyfile
-	copyrec
-	deletefile
-	deleteindex
-	edir
-	edic
-	dict2sql
-	exodus-cli
-	list
-	listfiles
-	listdict
-	listindex
-	testsort
-	configexodus
-	sync_dat
-	convsyntax
+		delete
+		clearfile
+		copyfile
+		copyrec
+		deletefile
+		deleteindex
+		edir
+		edic
+		dict2sql
+		exodus-cli
+		list
+		listfiles
+		listdict
+		listindex
+		testsort
+		configexodus
+		sync_dat
+		convsyntax
 	 DESTINATION bin)
 
 #
