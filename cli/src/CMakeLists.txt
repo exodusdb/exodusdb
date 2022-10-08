@@ -81,6 +81,7 @@
 	add_executable(testsort testsort.cpp)
 	add_executable(sync_dat sync_dat.cpp)
 	add_executable(convsyntax convsyntax.cpp)
+	add_executable(redefine redefine.cpp)
 
 	#name is name only ... input and output files are exodus
 	add_executable(exodus-cli exodus.cpp)
@@ -130,6 +131,7 @@
 	target_link_libraries(testsort exodus stdc++fs ${LIBS})
 	target_link_libraries(sync_dat exodus stdc++fs ${LIBS})
 	target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
+	target_link_libraries(redefine exodus stdc++fs ${LIBS})
 
 #
 # 3. INSTALL BINs
@@ -165,6 +167,7 @@
 		configexodus
 		sync_dat
 		convsyntax
+		redefine
 	 DESTINATION bin)
 
 #
