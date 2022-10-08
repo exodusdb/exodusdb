@@ -348,7 +348,6 @@ function main() {
 	html = SYSTEM.f(2).lcase().ends("htm");
 
 	if (html) {
-		//td0=crlf:' '
 		td0 = "";
 		nbsp = "&nbsp;";
 		td = td0 ^ "<td>";
@@ -1278,7 +1277,6 @@ x1exit:
 		if (not rawtable) {
 			call getmark("CLIENT", html, clientmark);
 			htmlcode ^= clientmark ^ "\r\n";
-			//htmlcode:='<span style="font-size:66%"><small>':clientmark:'</small></span>':crlf
 		}
 
 		//htmlcode:='<table border="1" cellspacing="0" cellpadding="2"'
@@ -1360,11 +1358,9 @@ x1exit:
 		//call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		call htmllib2("CONVCSS", headtabstyle, "headtab0", headtabcols);
 		style ^= "\r\n" ^ headtabstyle;
-		//tt[1,0]=headtabstyle:crlf
 
 		tt ^= "<colgroup>" "\r\n" ^ headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
 
-		//tt:=crlf:'</THEAD>':crlf:'<TBODY>'
 		tt ^= "\r\n" "<TBODY>";
 		call htmllib2("TABLE.MAKE", headtab, tt, "");
 		headtab.replacer("</TR>", "</TR>" "\r\n");

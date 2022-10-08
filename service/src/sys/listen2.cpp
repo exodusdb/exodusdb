@@ -656,8 +656,6 @@ validateexit2:
 				//"Password Reset Failed" is hardcoded in index.htm
 
 				text = "Password&nbsp;Reset Failed:" "\r\n";
-				//text:=crlf:'1. ':password:' not known'
-				//text:=crlf:'2. no email known for ':username
 				text ^= "\r\n" ^ password ^ " and " ^ username ^ " are unrecognised or expired";
 				text ^= "\r\n" " Database: " ^ SYSTEM.f(17);
 			} else {

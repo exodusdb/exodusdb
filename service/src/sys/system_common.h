@@ -3,7 +3,7 @@
 //#define SERVICE_SRC_SYS_SYSTEM_COMMON_H_
 
 #define esc_ "\x1B"
-#define crlf_ "\n"
+//#define crlf_ "\n"
 
 #define maxstrsize_ 1048576
 #define OSSLASH_ "/"

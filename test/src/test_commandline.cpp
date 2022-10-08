@@ -7,6 +7,9 @@ programinit()
 
 	function main() {
 
+	TRACE(osgetenv("PATH"))
+	TRACE(osgetenv())
+	TRACE(oslist())
     assert(osshellread("./testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
     assert(osshellread("./testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");
 

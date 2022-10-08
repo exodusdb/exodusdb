@@ -378,18 +378,19 @@ function main(in mode, io dataio, in params0="", in params20="", in glang="") {
 		//in c++ get from raw text string below
 		dataio=getvogonpoetry_sortjs();
 
-        dataio.replacer(FM, "\r\n");
+		dataio.replacer(FM, "\n");
+		dataio.replacer(FM, "\n");
 
 		var jsdatefmt;
-        if (DATEFMT.contains("E")) {
-                jsdatefmt = "d/M/yyyy";
-        } else if (DATEFMT.contains("J")) {
-                jsdatefmt = "yyyy/M/d";
-        } else {
-                jsdatefmt = "M/d/yyyy";
-        }
+		if (DATEFMT.contains("E")) {
+			jsdatefmt = "d/M/yyyy";
+		} else if (DATEFMT.contains("J")) {
+			jsdatefmt = "yyyy/M/d";
+		} else {
+			jsdatefmt = "M/d/yyyy";
+		}
 
-        dataio.replacer("gdateformat='d/M/yyyy'", "gdateformat='" ^ jsdatefmt ^ "'");
+		dataio.replacer("gdateformat='d/M/yyyy'", "gdateformat='" ^ jsdatefmt ^ "'");
 
 	} else if (mode eq "GETCSS") {
 
@@ -924,7 +925,8 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 			if (thproperties.contains(FM)) {
 				thprop = thproperties.f(coln);
 			}
-			var t2 = "\r\n" " <th " ^ thprop;
+			//var t2 = "\r\n" " <th " ^ thprop;
+			var t2 = "\n" " <th " ^ thprop;
 
 			colspan = 1;
 			rowspan = 1;
@@ -1001,8 +1003,6 @@ subroutine convcss(out outx, in tableid, in in0) {
 	//convert <COL ALIGN=RIGHT> to nth-child style
 
 	var inp = in0.trim().lcase();
-
-	var crlf = "\r\n";
 
 	outx = "\n<style type=\"text/css\">\n";
 	var align = "left";

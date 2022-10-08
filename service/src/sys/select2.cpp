@@ -267,8 +267,7 @@ nocommon:
 
 	var tx = "";
 	if (xml and linkfilename2) {
-		//tx:='<XML id=':quote(lcase(filename)):'>':crlf
-		tx ^= "<records>" "\r\n";
+		tx ^= "<records>" "\n";
 		call osbwrite(tx, linkfile2, dataptr);
 	}
 
@@ -491,14 +490,14 @@ nextrec:
 				cell.replacer(">", "&gt;");
 				//if cell then deb ug
 				//cell=quote(str(cell,10))
-				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^ ">" "\r\n";
+				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^ ">" "\n";
 			} else {
 				row(1, dictidn) = cell;
 			}
 		} //dictidn;
 
 		if (xml) {
-			row = "<RECORD>" "\r\n" ^ row ^ "</RECORD>" "\r\n";
+			row = "<RECORD>" "\n" ^ row ^ "</RECORD>" "\n";
 			//move up
 			//swap '&' with '&amp;' in row
 			//swap "'" with "" in row
@@ -509,8 +508,7 @@ nextrec:
 			}
 		} else {
 			if (xml) {
-				row.prefixer("<records>" "\r\n");
-				//row[1,0]='<XML id=':quote(lcase(filename)):'>':crlf
+				row.prefixer("<records>" "\n");
 			}
 		}
 

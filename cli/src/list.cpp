@@ -451,7 +451,6 @@ function main() {
 	html = SYSTEM.f(2).lcase().ends("htm") or OPTIONS.contains("h");
 
 	if (html) {
-		//td0=crlf:' '
 		td0 = "";
 		nbsp = "&nbsp;";
 		td = td0 ^ "<td>";
@@ -1393,7 +1392,6 @@ x1exit:
 		if (not rawtable) {
 			call getmark("CLIENT", html, clientmark);
 			tt ^= clientmark ^ "\r\n";
-			//tt:='<span style="font-size:66%"><small>':clientmark:'</small></span>':crlf
 		}
 
 		//tt:='<table border="1" cellspacing="0" cellpadding="2"'
@@ -1478,14 +1476,12 @@ x1exit:
 		//call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		call htmllib2("CONVCSS", headtabstyle, "headtab0", headtabcols);
 		style ^= "\r\n" ^ headtabstyle;
-		//tt[1,0]=headtabstyle:crlf
 
 		tt ^=
 			"<colgroup>"
 			"\r\n" ^
 			headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
 
-		//tt:=crlf:'</THEAD>':crlf:'<TBODY>'
 		tt ^=
 			"\r\n"
 			"<TBODY>";
@@ -2024,7 +2020,6 @@ x2exit:
 		tx ^=
 			"vhtm[vhtm.length-1]=url;"
 			"\r\n";
-		//tx:='alert(vhtm.join("/"));':crlf
 		tx ^=
 			"window.open(vhtm.join(\"/\"));"
 			"\r\n";
