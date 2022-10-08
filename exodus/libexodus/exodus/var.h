@@ -1662,6 +1662,7 @@ class PUBLIC var final {
 	ND var unique() const&;
 	ND var sort(SV sepchar = _FM) const&;
 	ND var reverse(SV sepchar = _FM) const&;
+    ND var parse(char sepchar = ' ') const&;
 
 	// SAME ON TEMPORARIES - MUTATE FOR SPEED
 	/////////////////////////////////////////
@@ -1709,6 +1710,7 @@ class PUBLIC var final {
 	ND VARREF unique() && {return uniquer();}
 	ND VARREF sort(SV sepchar = _FM) && {return sorter(sepchar);}
 	ND VARREF reverse(SV sepchar = _FM) && {return reverser(sepchar);}
+    ND VARREF parse(char sepchar = ' ') && {return parser(sepchar);}
 
 	// STRING MUTATORS
 	//////////////////
@@ -1756,6 +1758,7 @@ class PUBLIC var final {
 	VARREF uniquer();
 	VARREF sorter(SV sepchar = _FM);
 	VARREF reverser(SV sepchar = _FM);
+	VARREF parser(char sepchar = ' ');
 
 	// OTHER STRING ACCESS
 	//////////////////////

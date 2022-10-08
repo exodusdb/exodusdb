@@ -787,20 +787,17 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	// and do not contain spaces
 
 	// *** SIMILAR code in
-	// exofuncs.cpp exodus_main()
-	// exoprog.cpp  perform()
-	var lastchar = mv.COMMAND[-1];
-	if (lastchar == ")") {
-		mv.OPTIONS = "(" ^ mv.COMMAND.field2("(", -1);
-	} else if (lastchar == "}")
-		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
-	if (mv.OPTIONS) {
-		if (mv.OPTIONS.contains(_FM))
-			mv.OPTIONS = "";
-		else
-			mv.COMMAND.cutter(-mv.OPTIONS.len());
+	// 1. exofuncs.cpp exodus_main()
+	// 2. exoprog.cpp  perform()
+	mv.OPTIONS = mv.COMMAND.field2(_FM, -1);
+	if ((mv.OPTIONS.starts("{") and mv.OPTIONS.ends("}")) or (mv.OPTIONS.starts("(") and mv.OPTIONS.ends(")"))) {
+		// Remove last field of COMMAND TODO fpopper command?
+		mv.COMMAND.cutter(-mv.OPTIONS.len() - 1);
+		// Remove first { or ( and last ) } chars of OPTIONS
+		mv.OPTIONS.cutter(1).popper();
+	} else {
+		mv.OPTIONS = "";
 	}
-	mv.COMMAND.trimmerlast(_FM);
 
 	var temp;
 	// DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;

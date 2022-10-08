@@ -1159,20 +1159,19 @@ var ExodusProgramBase::perform(CVR sentence) {
 		// and do not contain spaces
 
 		// *** SIMILAR code in
-		// exofuncs.cpp exodus_main()
-		// exoprog.cpp  perform()
-		var lastchar = COMMAND[-1];
-		if (lastchar == ")") {
-			OPTIONS = "(" ^ COMMAND.field2("(", -1);
-		} else if (lastchar == "}")
-			OPTIONS = "{" ^ COMMAND.field2("{", -1);
-		if (OPTIONS) {
-			if (OPTIONS.contains(" "))
-				OPTIONS = "";
-			else
-				COMMAND.cutter(-OPTIONS.len());
+		// 1. exofuncs.cpp exodus_main()
+		// 2. exoprog.cpp  perform()
+		// TODO COMMAND should be parsed spaces into FM but spaces inside single or double quotes must be ignored
+		OPTIONS = COMMAND.field2(" ", -1);
+		if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
+			// Remove last field of COMMAND. TODO fpopper command?
+			COMMAND.cutter(-OPTIONS.len() - 1);
+			// Remove first { or ( and last ) } chars of OPTIONS
+			OPTIONS.cutter(1).popper();
+		} else {
+			OPTIONS = "";
 		}
-		COMMAND.trimmerlast(_FM);
+
 
 		// load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();

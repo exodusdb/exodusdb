@@ -1,15 +1,13 @@
-//#include <list>
-//#include <thread>
-//#include <atomic>
-//std::atomic<int> atomic_count;
-
-// Create a threadpool of suitable size
+// NOTE The rhs comment in the following line is in a special format
+// REQUIRED instruction to compile and link with pthread library
 #include <thread> //gcc_link_options -lpthread
 #include <boost/asio/thread_pool.hpp>
 #include <boost/asio/post.hpp>
+// Create a threadpool of suitable size to handle
+// ncpus/threads obtained from std::thread::hardware_concurrency()
 boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency());
 
-//allow threads to indicate failure
+// Use an atomic to allow threads to increment global failure count
 #include <atomic>
 std::atomic<int> atomic_ncompilation_failures;
 
@@ -59,12 +57,12 @@ programinit()
 
 function main() {
 
-	// Option X means skip compilation
-	if (OPTIONS.contains("X"))
+	// Skip compile for option X - allows disabling compilations unless generating headers
+	if (OPTIONS.contains("X") and not OPTIONS.contains("h"))
 		return 0;
 
-	//if no file/dirnames then default to previous edic
-	//SIMILAR code in edic and compile
+	// If no file/dirnames then default to previous edic
+	// SIMILAR code in edic and compile
 	if (fcount(COMMAND, FM) < 2) {
 		var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
 		if (osread(COMMAND, edic_hist)) {
@@ -72,7 +70,7 @@ function main() {
 		}
 	}
 
-	//extract file/dirnames
+	// Extract file/dirnames
 	var filenames = field(COMMAND, FM, 2, 999999999);
 	var nfiles = fcount(filenames, FM);
 	if (not filenames or OPTIONS.contains("H"))
@@ -93,7 +91,7 @@ function main() {
 	// DETERMINE COMPILER/LINKER OPTIONS AND FLAGS
 	//////////////////////////////////////////////
 
-	//we use on demand/jit linking using dlopen/dlsym
+	// Use on demand/jit linking using dlopen/dlsym
 	var loadtimelinking = false;
 
 	var usedeffile = false;
@@ -125,8 +123,8 @@ function main() {
 	//BFD: reopening /home/neo/exodus/service/service2/sys/server: No such file or directory
 	var updateinusebinposix = true;
 
-	//hard coded compiler options at the moment
-	//assume msvc (cl) on windows and c++ (g++/clang) otherwise
+	// Hard coded compiler options at the moment
+	// Assume msvc (cl) on windows and c++ (g++/clang) otherwise
 	if (posix) {
 
 
@@ -507,13 +505,20 @@ function main() {
 
 		//install/copy header files to inc directory
 		else if (inc_extensions.locateusing(" ", fileext)) {
+			var srctext = osread(srcfilename);
+
+			var abs_srcfilename = srcfilename;
+			if (not abs_srcfilename.starts(OSSLASH))
+				abs_srcfilename.prefixer(oscwd() ^ OSSLASH);
+			srctext.prefixer("/" "/copied by exodus \"compile " ^ abs_srcfilename ^ DQ ^ EOL);
 
 			//create include directory if doesnt already exist
 			call make_include_dir(incdir);
 
 			var targetfilename = incdir ^ OSSLASH ^ srcfilename.field2(OSSLASH, -1);
-			if (osread(targetfilename) != osread(srcfilename)) {
-				if (not srcfilename.oscopy(targetfilename)) {
+
+			if (osread(targetfilename) != srctext) {
+				if (not srctext.oswrite(targetfilename)) {
 					atomic_ncompilation_failures++;
 					errputl(" Error: Could not copy '" ^ srcfilename ^ "' to '" ^ targetfilename ^ "'");
 				} else if (not silent) {

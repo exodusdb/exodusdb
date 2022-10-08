@@ -16,7 +16,7 @@ libraryinit()
 
 #include <exodus/printtx.hpp>
 
-#include <system_common.h>
+//#include <system_common.h>
 
 #include <sys_common.h>
 
@@ -1044,7 +1044,7 @@ dictrecexit:;
 
 	} else {
 		tt = word.quote() ^ " is an unrecognized word.";
-		if (interactive_) {
+		if (isterminal()) {
 			tt ^= " Replace with? (Enter to cancel):";
 		}
 		var oldword = word;

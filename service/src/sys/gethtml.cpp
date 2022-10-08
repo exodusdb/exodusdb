@@ -4,8 +4,9 @@ libraryinit()
 #include <langdate.h>
 #include <authorised.h>
 
-#include <system_common.h>
+//#include <system_common.h>
 
+// For sys.gcurrcompany, sys.companies and sys.glang
 #include <sys_common.h>
 
 var modex;
@@ -15,9 +16,9 @@ var letterheadcompany;
 var keyx;
 var tt;
 var tdate;
-var xx;
-var div;
-var divx;
+//var xx;
+//var div;
+//var divx;
 
 function main(in mode0, out html, in compcode0="", in qr_text="") {
 
@@ -52,9 +53,6 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		if (not(sys.companies.unassigned() or sys.companies eq "")) {
 			if (not(letterheadcompany.read(sys.companies, compcode))) {
 				{}
-			}
-			if (VOLUMES) {
-				letterheadcompany(27) = letterheadcompany.f(27).invert();
 			}
 		}
 	}
@@ -193,7 +191,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		html.popper();
 	}//loop;
 
-	if (authorised("EDIT PRINTOUTS", xx)) {
+	if (authorised("EDIT PRINTOUTS")) {
 
 		//button
 		var onclick = "javascript:";
@@ -304,14 +302,15 @@ subroutine getcompanyconfig(io html, io mode) {
 		if (fontsize) {
 			divstyle ^= "font-size:" ^ fontsize ^ ";";
 		}
-		if (divstyle) {
-			div = FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">";
-			divx = FM ^ "   </div>";
-		} else {
-			div = "";
-			divx = "";
-		}
-
+//		if (divstyle) {
+//			div = FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">";
+//			divx = FM ^ "   </div>";
+//		} else {
+//			div = "";
+//			divx = "";
+//		}
+		var	div = divstyle ? FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">" : "";
+		var	divx = divstyle ? FM ^ "   </div>" : "";
 		//add image
 		if (imagetype or imagecompcode) {
 			tab ^= div;

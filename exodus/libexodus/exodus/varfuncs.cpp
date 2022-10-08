@@ -1573,7 +1573,8 @@ void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 		auto fromcharn = fromchars.find(var_str[pos]);
 
 		if (fromcharn < tochars_size)
-			var_str.replace(pos, 1, tochars.substr(fromcharn, 1));
+			//var_str.replace(pos, 1, tochars.substr(fromcharn, 1));
+			var_str[pos] = tochars[fromcharn];
 			//var_str.replace(pos, 1, tochars[fromcharn]);
 		else
 			var_str.erase(pos, 1);
@@ -1660,6 +1661,113 @@ VARREF var::textconverter(SV fromchars, SV tochars) {
 		// convert the string back to UTF8 from wide string
 		//this->from_u32string(u32_str1);
 		*this = var(u32_str1);
+	}
+	return *this;
+}
+
+// parse() - replaces seps with FMs except inside double and single quotes. Backslash escapes.
+
+// copy
+var var::parse(char sepchar) const& {
+	var temp = var(*this).parser(sepchar);
+	return temp;
+}
+
+// mutate
+VARREF var::parser(char sepchar) {
+
+	THISIS("VARREF var::parser(char sepchar)")
+	assertStringMutator(function_sig);
+
+//	//std::string s = "abc 'def gh'qwe";
+//	std::string s1 = R"___(abc 'def gh\' q'w "' e)___";
+//	//std::string s1 = R"___(a 'b c' d")___";
+//	std::string s2 = s1;
+
+	size_t len = var_str.size();
+	if (!len)
+		return *this;
+
+	// The following bytes can be escaped so spaces, double and single quotes are ignored
+	std::size_t pos = 0;
+	char ch;
+
+next_unquoted:
+	while (pos < len) {
+
+		// Replace separator with FM and skip to the next char
+		ch = var_str[pos];
+		if (ch == sepchar) {
+			var_str[pos] = FM_;
+			pos++;
+			continue;
+		}
+
+		switch (ch) {
+
+			// Switch into double quoted mode
+			case DQ_:
+
+				// Skip over all following characters up to the next double quote
+				// Ignore escaped double quote
+				pos++;
+				while (pos < len) {
+					switch (var_str[pos]) {
+
+						case DQ_:
+							// Skip over double quote and looping inside quote
+							pos++;
+							goto next_unquoted;
+
+						case BS_:
+							// Skip over the BS and the following character if any
+							pos++;
+							pos++;
+							break;
+
+						default:
+							pos++;
+					}
+				} // inside quotes
+
+				continue;
+
+			// Switch into single quoted mode
+			case SQ_:
+
+				// Skip over all following characters up to the next single quote
+				// Ignore escaped single quote
+				pos++;
+				while (pos < len) {
+					switch (var_str[pos]) {
+
+						case SQ_:
+							// Skip over single quote and looping inside quote
+							pos++;
+							goto next_unquoted;
+
+						case BS_:
+							// Skip over the BS and the following character if any
+							pos++;
+							pos++;
+							break;
+
+						default:
+							pos++;
+					}
+				} // inside quotes
+
+				continue;
+
+			case BS_:
+				pos++;
+				pos++;
+				continue;
+
+			default:
+				pos++;
+
+		} // switch
 	}
 	return *this;
 }

@@ -1,10 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <system_common.h>
-
-//#include <sys_common.h>
-
 var params;
 var params2;
 var tagsep;
@@ -12,7 +8,7 @@ var tagsep;
 //Note that the argument names are not accurate for GETCSS, GETSORTJS, COLROWSPAN, CONVCSS, ADDUNITS, DOCMODS, GETMARK modes
 function main(in mode, io dataio, in params0="", in params20="", in glang="") {
 
-	// First for speed since calle for every column and row
+	// First for speed since called for every column and row
 	if (mode eq "ADDUNITS") {
 
 		// Add/merge aa into bb
@@ -680,8 +676,6 @@ td.nx {border-top:none;border-bottom:none}
 .vbottom {vertical-align:bottom}
 .num {text-align:right;mso-number-format:General;white-space:nowrap;}
 
-/*collapse needed up to IE7 - cant do border-spacing:0
- also to avoid double borders internally*/
 table.exodustable {
  border-collapse:collapse;
  margin:0px;
@@ -1159,16 +1153,12 @@ function getmark(in mode, in html, io mark) {
 	//call getmark('CLIENT',1,clientmark)
 	//call getmark('OWN',1,ownmark)
 
-	//$insert gbp,general.common
-
 	if (mark.unassigned()) {
 		mark = "";
 	}
 
 var link;
 
-	//NB <small> tags seem to make no difference if they are removed
-	//at least in modern browsers. presumably style:font-size is preferential
 	if (mode eq "OWN") {
 
 		if (mark) {
@@ -1192,9 +1182,6 @@ var link;
 		mark = "";
 
 		if (html) {
-			//mark[1,0]='<small>'
-
-			//mark:=' '
 
 			//hyper link to client's email
 			link = SYSTEM.f(10, 2);

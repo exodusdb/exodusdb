@@ -106,6 +106,50 @@ programinit()
 		{var l = "abc";l.laster(4);assert(l eq "abc");}
 
 	}
+	{
+		assert(var("").parse().outputl() eq ""_var);
+		assert(var("a").parse().outputl() eq "a"_var);
+		assert(var("ab").parse().outputl() eq "ab"_var);
+
+		assert(var("a b").parse().outputl() eq "a^b"_var);
+		assert(var(" a b").parse().outputl() eq "^a^b"_var);
+		assert(var("a b ").parse().outputl() eq "a^b^"_var);
+		assert(var(" a b ").parse().outputl() eq "^a^b^"_var);
+
+		assert(var("a\\ b").parse().outputl() eq "a\\ b"_var);
+		assert(var("\\ a\\ b").parse().outputl() eq "\\ a\\ b"_var);
+		assert(var("a\\ b\\ ").parse().outputl() eq "a\\ b\\ "_var);
+		assert(var("\\ a\\ b\\ ").parse().outputl() eq "\\ a\\ b\\ "_var);
+
+		assert(var("a' 'b ").parse().outputl() eq "a' 'b^"_var);
+		assert(var("a\" \"b ").parse().outputl() eq "a\" \"b^"_var);
+		assert(var("a\"'\"b ").parse().outputl() eq "a\"'\"b^"_var);
+		assert(var("a'\"'b ").parse().outputl() eq "a'\"'b^"_var);
+
+		assert(var("a' 'b ").parse().outputl() eq "a' 'b^"_var);
+		assert(var("a\" \"b ").parse().outputl() eq "a\" \"b^"_var);
+		assert(var("a\"'\"b ").parse().outputl() eq "a\"'\"b^"_var);
+		assert(var("a'\"'b ").parse().outputl() eq "a'\"'b^"_var);
+
+		assert(var("\\a' 'b ").parse().outputl() eq "\\a' 'b^"_var);
+		assert(var("\\a\" \"b ").parse().outputl() eq "\\a\" \"b^"_var);
+		assert(var("\\a\"'\"b ").parse().outputl() eq "\\a\"'\"b^"_var);
+		assert(var("\\a'\"'b ").parse().outputl() eq "\\a'\"'b^"_var);
+
+		assert(var("\\\\' 'b ").parse().outputl() eq "\\\\' 'b^"_var);
+		assert(var("\\\\\" \"b ").parse().outputl() eq "\\\\\" \"b^"_var);
+		assert(var("\\\\\"'\"b ").parse().outputl() eq "\\\\\"'\"b^"_var);
+		assert(var("\\\\'\"'b ").parse().outputl() eq "\\\\'\"'b^"_var);
+
+		assert(var("\\' 'b ").parse().outputl() eq "\\'^'b "_var);
+		assert(var("\\' 'b ").parse().outputl() eq "\\'^'b "_var);
+
+		assert(var("\\\" \"b ").parse().outputl() eq "\\\"^\"b "_var);
+		assert(var("\\\" \"b ").parse().outputl() eq "\\\"^\"b "_var);
+
+		assert(var("abc 'def gh'qwe").parse().outputl() eq "abc^'def gh'qwe"_var);
+
+	}
 
 	printl(elapsedtimetext());
 	printl("Test passed");

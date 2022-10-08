@@ -37,6 +37,15 @@
 	# TODO look at breaking test_main main function into many smaller functions
 	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
+#
+# Build a specific test program
+# #############################
+#
+	add_executable(testcommandline testcommandline.cpp)
+	target_link_libraries(testcommandline ${PROJECT_LIBS} exodus)
+    # lib #
+    add_library(testcommandlib SHARED testcommandlib.cpp)
+
 # Trigger cmake update if any new test_*.cpp files appear
 # #######################################################
 #

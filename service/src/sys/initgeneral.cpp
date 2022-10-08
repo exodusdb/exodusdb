@@ -92,8 +92,8 @@ function main() {
 	//equ data to @user1
 	//equ response to @user3
 	//equ msg to @user4
-	//@user2 is used to hold the current base currency format
-	//@user4 is used to hold validation/error messages for non-interactive progs
+	//BASEFMT is used to hold the current base currency format
+	//msg/@user4 is used to hold validation/error messages for non-interactive progs
 
 	//equ dosenv to system<1> command line parameters set in logon.old
 	//following can be blanked to indicate that the proxy has already responded to the user

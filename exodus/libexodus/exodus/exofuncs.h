@@ -372,6 +372,9 @@ PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM) {return iostring.sorter(
 PUBLIC ND var reverse(CVR instring, SV sepchar = _FM) {return instring.reverse(sepchar);}
 PUBLIC VARREF reverser(VARREF iostring, SV sepchar = _FM) {return iostring.reverser(sepchar);}
 
+PUBLIC ND var parser(CVR instring, char sepchar = ' ') {return instring.parse(sepchar);}
+PUBLIC VARREF parser(VARREF iostring, char sepchar = ' ') {return iostring.parser(sepchar);}
+
 // DATABASE
 
 PUBLIC bool connect(CVR connectionstring DEFAULT_EMPTY);
