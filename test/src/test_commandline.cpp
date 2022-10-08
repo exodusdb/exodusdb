@@ -12,22 +12,23 @@ programinit()
 	TRACE(oslist())
 	TRACE(EXECPATH)
 	var execdir = EXECPATH.field(OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
-    assert(osshellread(execdir ^ "/testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
-    assert(osshellread(execdir ^ "/testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");
+	execdir = "";
+    assert(osshellread(execdir ^ "testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
+    assert(osshellread(execdir ^ "testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");
 
-    assert(osshellread(execdir ^ "/testcommandline a b c '(ab)'") eq "testcommandline a b c (ab)\ntestcommandline^a^b^c\nab\n");
-    assert(osshellread(execdir ^ "/testcommandline a b c '{ab}'") eq "testcommandline a b c {ab}\ntestcommandline^a^b^c\nab\n");
+    assert(osshellread(execdir ^ "testcommandline a b c '(ab)'") eq "testcommandline a b c (ab)\ntestcommandline^a^b^c\nab\n");
+    assert(osshellread(execdir ^ "testcommandline a b c '{ab}'") eq "testcommandline a b c {ab}\ntestcommandline^a^b^c\nab\n");
 
-    assert(osshellread(execdir ^ "/testcommandline a b c '(a b)'").outputl() eq "testcommandline a b c (a b)\ntestcommandline^a^b^c\na b\n");
-    assert(osshellread(execdir ^ "/testcommandline a b c '{a b}'").outputl() eq "testcommandline a b c {a b}\ntestcommandline^a^b^c\na b\n");
+    assert(osshellread(execdir ^ "testcommandline a b c '(a b)'").outputl() eq "testcommandline a b c (a b)\ntestcommandline^a^b^c\na b\n");
+    assert(osshellread(execdir ^ "testcommandline a b c '{a b}'").outputl() eq "testcommandline a b c {a b}\ntestcommandline^a^b^c\na b\n");
 
-    assert(osshellread(execdir ^ "/testcommandline a b c '(' a or b ')'").outputl() eq "testcommandline a b c ( a or b )\ntestcommandline^a^b^c^(^a^or^b^)\n\n");
+    assert(osshellread(execdir ^ "testcommandline a b c '(' a or b ')'").outputl() eq "testcommandline a b c ( a or b )\ntestcommandline^a^b^c^(^a^or^b^)\n\n");
 
 	// Syntax error
-//    assert(osshellread(execdir ^ "/testcommandline a b c (a b)").outputl() eq "testcommandline a b c (a b)\ntestcommandline^a^b^c^(a^b)\n\n");
-//    assert(osshellread(execdir ^ "/testcommandline a b c {a b}").outputl() eq "testcommandline a b c {a b}\ntestcommandline^a^b^c^{a^b}\n\n");
+//    assert(osshellread(execdir ^ "testcommandline a b c (a b)").outputl() eq "testcommandline a b c (a b)\ntestcommandline^a^b^c^(a^b)\n\n");
+//    assert(osshellread(execdir ^ "testcommandline a b c {a b}").outputl() eq "testcommandline a b c {a b}\ntestcommandline^a^b^c^{a^b}\n\n");
 
-    assert(osshellread(execdir ^ "/testcommandline '(' a b ')'") eq "testcommandline ( a b )\ntestcommandline^(^a^b^)\n\n");
+    assert(osshellread(execdir ^ "testcommandline '(' a b ')'") eq "testcommandline ( a b )\ntestcommandline^(^a^b^)\n\n");
 
 	if (libinfo("testcommandlib")) {
 		perform("testcommandlib a b c (xyz)");

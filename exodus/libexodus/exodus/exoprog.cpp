@@ -77,7 +77,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//stage 2 "2stage"
 	//////////////////
 
-	CURSOR.convert(RM^FM^VM^SM,VISIBLE_FMS).logputl("2 Stage Select:");
+	CURSOR.convert(ALL_FMS, VISIBLE_FMS).logputl("2 Stage Select:");
 	sortselectclause.logputl();
 
 	//secondary sort/select on fields that could not be calculated by the database
