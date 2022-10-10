@@ -32,7 +32,7 @@ programinit()
 	let default_extension = "cpp";
 
 	// Platform
-	let posix = OSSLASH eq "/";
+	let posix = not OSSLASH_IS_BACKSLASH;
 	let windows = not(posix);
 
 	// Location of bin/lib/inc dirs
@@ -160,7 +160,7 @@ function main() {
 		} else {
 			compiler = "c++";
 #ifdef __APPLE__
-			if (PLATFORM_ eq "x86")
+			if (PLATFORM eq "x86")
 				compiler = "g++-4.0";
 #endif
 			if (verbose)
@@ -371,7 +371,7 @@ function main() {
 		basicoptions ^= " /D \"WIN32\"";
 
 		//define common windows indicator
-		if (PLATFORM_ eq "x64")
+		if (PLATFORM eq "x64")
 			basicoptions ^= " /D \"WIN64\"";
 
 		//Uses the __cdecl calling convention (x86 only ie 32bit).
@@ -792,7 +792,7 @@ function main() {
 			//and, for subroutines and functions, create header file (even if compilation not successful)
 			var eol = EOL;
 			var headertext = "";
-			converter(text, "\r\n", FM ^ FM);
+			converter(text, "\r\n", _FM _FM);
 			dim text2 = split(text);
 			var nlines = text2.rows();
 
@@ -967,7 +967,7 @@ function main() {
 										//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
 										if (argdefault ne "" and argdefault ne "var()")
 											func_body ^= " = " ^ argdefault;
-										func_body ^= ";\r\n";
+										func_body ^= ";" _EOL;
 									}
 								} else {
 									//build a new non-constant dummy variable name to be used as unassigned argument to the real function
@@ -977,7 +977,7 @@ function main() {
 									//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
 									if (argdefault ne "" and argdefault ne "var()")
 										func_body ^= " = " ^ argdefault;
-									func_body ^= ";\r\n";
+									func_body ^= ";" _EOL;
 								}
 								outbound_args ^= ", " ^ argname2;
 							}
@@ -991,164 +991,69 @@ function main() {
 							outbound_args.substrer(3);
 
 							//build a function with all the new arguments and dummy variables
-							add_func ^= "\r\n";
-							add_func ^= "\r\n// Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn == 2 ? "" : "s");
-							add_func ^= "\r\nvar operator() (" ^ inbound_args ^ ") {";
-							add_func ^= "\r\n" ^ func_body;
+							add_func ^= _EOL;
+							add_func ^= _EOL "/" "/ Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn == 2 ? "" : "s");
+							add_func ^= _EOL "var operator() (" ^ inbound_args ^ ") {";
+							add_func ^= _EOL ^ func_body;
 							add_func ^= " return operator()(" ^ outbound_args ^ ");";
-							add_func ^= "\r\n}";
+							add_func ^= _EOL "}";
 						}
 
-						/*
-						//check arguments backwards, from right to left
-						for (int argn=nargs; argn > 0; --argn) {
-
-							//work out the variable name and default
-							var vname = funcargs.field(",", argn);
-
-							//io out cannot at the moment have defaults TODO
-							var vdefault = funcargsdecl2.field(",",argn).field("=", 2);
-
-							var vtype=funcargstype.field(",",argn);
-
-							//if (vtype ne "io" and vtype ne "out") {
-							//	//prevent next left argument from defaulting
-							//	can_default=vdefault ne "";
-							//
-							//only process io/out arguments
-							//} else
-							{
-
-								//can default const var&
-								if (!vdefault)
-									vdefault = "var()";
-
-								//change the type of the incoming argument to allow constants
-								var new_inargdecl = " in "^vname;
-								if (can_default and vdefault)
-									new_inargdecl ^= "=" ^ vdefault;
-								add_funcargsdecl.fieldstorer(",", argn, 1, new_inargdecl);
-
-								//build a new non-constant dummy variable name to be used as io/out argument of the real function
-								if (vtype eq "out" or vtype eq "io") {
-									var vname2 = vname ^ "_" ^ vtype;
-									//1. assign ie copy the incoming constant to it
-									add_vars ^= " var " ^ vname2 ^ ";\r\n";
-									add_vars ^= " if ("^vname ^ ".assigned()) " ^ vname2 ^ "=" ^ vname ^ ";\r\n";
-									//2. use it as an argument to the standard function
-									add_funcargs.fieldstorer(",", argn, 1, vname2);
-								}
-								//build a new function that calls the standard function
-
-								//if the argument is an io/out type, and is not the first argument, then output (append) any function built to date
-								//but do not build a new function with the modified argument (it will be built when arg=1 or an earlier arg is type io/out)
-								if (argn>1 and (vtype eq "out" or vtype eq "io")) {
-									add_funcs ^= add_func;
-									add_func="";//in case two io/out args next to each other? TODO check if two io/out next to each other works ok
-
-								//if the argument is an "in" type, or is argument 1, then build a function with all the modified arguments so far
-								//REPLACING and previously built function, but do not actually output it, since multiple earlier "in" args may be defaulted.
-								} else {
-									//build a function with all the new arguments and dummy variables
-									add_func = "\r\n\r\nvar operator() (" ^ add_funcargsdecl ^ ") {";
-									add_func ^= "\r\n" ^ add_vars;
-									add_func ^= " return operator()(" ^ add_funcargs ^ ");";
-									add_func ^= "\r\n}";
-								}
-							}
-						}
-						*/
 						add_funcs ^= add_func;
 						if (add_funcs)
-							add_funcs ^= "\r\n";
-
-						/*
-	//new method using member functions to call external functions with mv environment
-	var inclusion=
-	"\r\n"
-	"\r\n//a member variable/object to cache a pointer/object for the shared library function"
-	"\r\nCallableBase Callable_funcx;"
-	"\r\n"
-	"\r\n//a member function with the right arguments, returning a var or void"
-	"\r\nVARORVOID funcx(in arg1=var(), out arg2=var(), out arg3=var())"
-	"\r\n{"
-	"\r\n"
-	"\r\n //first time link to the shared lib and create/cache an object from it"
-	"\r\n //passing current standard variables in mv"
-	"\r\n if (Callable_funcx.pmemberfunction_==NULL)"
-	"\r\n  Callable_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
-	"\r\n"
-	"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
-	"\r\n //that can call the shared library object member function"
-	"\r\n //with the right arguments and returning a var or void"
-	"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
-	"\r\n"
-	"\r\n //call the shared library object main function with the right args,"
-	"\r\n // returning a var or void"
-	"\r\n callorreturn CALLMEMBERFUNCTION(*(Callable_funcx.pobject_),"
-	"\r\n ((pExodusProgramBaseMemberFunction) (Callable_funcx.pmemberfunction_)))"
-	"\r\n  (ARG1,ARG2,ARG3);"
-	"\r\n"
-	"\r\n}";
-	*/
+							add_funcs ^= _EOL;
 
 						//new method using member functions to call external functions with mv environment
 						//using a callable class that allows library name changing
 						//public inheritance only so we can directly access mv in mvprogram.cpp for oconv/iconv. should perhaps be private inheritance and mv set using .init(mv)
 						var inclusion =
-							"\r\n"
-							"\r\n// A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
-							"\r\n"
-							"\r\nclass Callable_funcx : public CallableBase"
-							"\r\n{"
-							"\r\npublic:"
-							"\r\n"
-							"\r\n// A constructor providing:"
-							"\r\n// 1. the name of the shared library to open,"
-							"\r\n// 2. the name of the function within the shared library that will create an exodus program object,"
-//							"\r\n// 3. and the current program's mv environment to share with it."
-							"\r\nCallable_funcx(ExoEnv& mv) : CallableBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
-//							"\r\nCallable_funcx() : CallableBase(\"funcx\", \"exodusprogrambasecreatedelete_\") {}"
-							"\r\n"
-							"\r\n// Allow assignment of library name to override the default constructed"
-							"\r\nusing CallableBase::operator=;"
-							"\r\n"
-//							"\r\nCallable_funcx& operator=(const var& newlibraryname) {"
-//							"\r\n        closelib();"
-//							"\r\n        libraryname_=newlibraryname.toString();"
-//							"\r\n        return (*this);"
-//							"\r\n}"
-//							"\r\n"
-							"\r\n// A callable member function with the right arguments, returning a var or void"
-							"\r\nvar operator() (in arg1=var(), out arg2=var(), out arg3=var())"
-							"\r\n{"
-							"\r\n"
-							"\r\n // The first call will link to the shared lib and create/cache an object from it."
-							"\r\n // passing current standard variables in mv"
-							"\r\n if (this->pmemberfunction_==NULL)"
-							"\r\n  this->init();"
-							"\r\n"
-							"\r\n // Define a function type (pExodusProgramBaseMemberFunction)"
-							"\r\n // that can call the shared library object member function"
-							"\r\n // with the right arguments and returning a var or void"
-							//"\r\n typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
-							"\r\n using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> VARORVOID;"
-							"\r\n"
-							"\r\n // Call the shared library object main function with the right args,"
-							"\r\n //  returning a var or void"
-							"\r\n {before_call}"
-							"\r\n return CALLMEMBERFUNCTION(*(this->pobject_),"
-							"\r\n ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
-							"\r\n  (ARG1,ARG2,ARG3);"
-							"\r\n {after_call}"
-							"\r\n"
-							"\r\n}"
+							_EOL
+							_EOL "/" "/ A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
+							_EOL
+							_EOL "class Callable_funcx : public CallableBase"
+							_EOL "{"
+							_EOL "public:"
+							_EOL
+							_EOL "/" "/ A constructor providing:"
+							_EOL "/" "/ 1. the name of the shared library to open,"
+							_EOL "/" "/ 2. the name of the function within the shared library that will create an exodus program object,"
+							_EOL "/" "/ 3. and the current program's mv environment to share with it."
+							_EOL "Callable_funcx(ExoEnv& mv) : CallableBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+							_EOL
+							_EOL "/" "/ Allow assignment of library name to override the default constructed"
+							_EOL "using CallableBase::operator=;"
+							_EOL
+							_EOL "/" "/ A callable member function with the right arguments, returning a var or void"
+							_EOL "var operator() (in arg1=var(), out arg2=var(), out arg3=var())"
+							_EOL "{"
+							_EOL
+							_EOL " /" "/ The first call will link to the shared lib and create/cache an object from it."
+							_EOL " /" "/ passing current standard variables in mv"
+							_EOL " if (this->pmemberfunction_==NULL)"
+							_EOL "  this->init();"
+							_EOL
+							_EOL " /" "/ Define a function type (pExodusProgramBaseMemberFunction)"
+							_EOL " /" "/ that can call the shared library object member function"
+							_EOL " /" "/ with the right arguments and returning a var or void"
+							//_EOL " typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
+							_EOL " using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> VARORVOID;"
+							_EOL
+							_EOL " /" "/ Call the shared library object main function with the right args,"
+							_EOL " /" "/  returning a var or void"
+							_EOL " {before_call}"
+							_EOL " return CALLMEMBERFUNCTION(*(this->pobject_),"
+							_EOL " ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
+							_EOL "  (ARG1,ARG2,ARG3);"
+							_EOL " {after_call}"
+							_EOL
+							_EOL "}"
 							"{additional_funcs}"
-							"\r\n};"
-							"\r\n"
-							"\r\n// A callable object of the above type that allows function call syntax to access"
-							"\r\n// an Exodus program/function initialized with the current mv environment."
-							"\r\nCallable_funcx funcx{mv};";
+							_EOL "};"
+							_EOL
+							_EOL "/" "/ A callable object of the above type that allows function call syntax to access"
+							_EOL "/" "/ an Exodus program/function initialized with the current mv environment."
+							_EOL "Callable_funcx funcx{mv};";
+
 						replacer(inclusion, "funcx", field2(libname, OSSLASH, -1));
 						//replacer(example,"exodusprogrambasecreatedelete_",funcname);
 						replacer(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
@@ -1161,12 +1066,12 @@ function main() {
 						if (text.contains("-Wcast-function-type")) {
 							replacer(inclusion, "{before_call}",
 									"#pragma GCC diagnostic push"
-									"\r\n #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
+									_EOL " #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
 							replacer(inclusion, "{after_call}",
 									"#pragma GCC diagnostic pop");
 						} else {
-							replacer(inclusion, "\r\n {before_call}", "");
-							replacer(inclusion, "\r\n {after_call}", "");
+							replacer(inclusion, _EOL " {before_call}", "");
+							replacer(inclusion, _EOL " {after_call}", "");
 						}
 						var usepredefinedcallable = nargs <= exodus_callable_maxnargs;
 						if (useclassmemberfunctions) {
@@ -1585,7 +1490,7 @@ function static compile2(
 			//http://msdn.microsoft.com/en-us/library/ms235591%28VS.80%29.aspx
 			//mt.exe manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
 			//mt.exe manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
-			if (OSSLASH == "\\" and PLATFORM_ ne "x64") {
+			if (OSSLASH_IS_BACKSLASH and PLATFORM ne "x64") {
 				var cmd = "mt.exe";
 				if (not verbose) {
 					cmd ^= " -nologo";
@@ -1656,7 +1561,7 @@ function static compile2(
 				//delete any manifest from early versions of compile which didnt have the
 				//MANIFEST:NO option
 				//was try to copy ms manifest so that the program can be run from anywhere?
-				if (SLASH_IS_BACKSLASH and PLATFORM_ ne "x64") {
+				if (OSSLASH_IS_BACKSLASH and PLATFORM ne "x64") {
 					if (true or (isprogram and manifest)) {
 						if (not oscopy(objfilename ^ ".manifest", outputpathandfile ^ ".manifest")) {
 							atomic_ncompilation_failures++;
@@ -1763,7 +1668,7 @@ function set_environment() {
 	var script = "call " ^ batfilename.quote();
 
 	//work out the options from the PLATFORM_ (and perhaps debug mode)
-	var options = PLATFORM_;
+	var options = PLATFORM;
 	if (contains(batfilename, "setenv.cmd")) {
 		//sdk71 wants x86 or x64
 		//if (options=="x86") options="Win32";
@@ -1798,7 +1703,7 @@ function set_environment() {
 		//	printl(result);
 		//printl(result);
 
-		dim vars = split(result.converter("\r\n", FM ^ FM));
+		dim vars = split(result.converter("\r\n", _FM _FM));
 //		let nvars = vars.rows();
 //		for (const var varn : range(1, nvars)) {
 //			ossetenv(

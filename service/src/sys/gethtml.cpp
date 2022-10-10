@@ -6,7 +6,7 @@ libraryinit()
 
 //#include <system_common.h>
 
-// For sys.gcurrcompany, sys.companies and sys.glang
+// For sys.gcurrcompany (for compcode), sys.companies (to read letterheadcompany and imagecompany) and sys.glang (months for langdate)
 #include <sys_common.h>
 
 var modex;
@@ -184,12 +184,8 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 
 	}
 
-	html.replacer(FM, "\r\n");
-	while (true) {
-		///BREAK;
-		if (not(html and (var("\r\n").contains(html[-1])))) break;
-		html.popper();
-	}//loop;
+	html.replacer(_FM, _EOL);
+	html.trimmer(_EOL);
 
 	if (authorised("EDIT PRINTOUTS")) {
 
@@ -374,7 +370,7 @@ subroutine getcompanyconfig(io html, io mode) {
 
 		//add text div
 		if (text) {
-			text.replacer(TM, "<br />" "\r\n");
+			text.replacer(_TM, "<br />" _EOL);
 			tab ^= div;
 			tab(-1) = text;
 			tab ^= divx;

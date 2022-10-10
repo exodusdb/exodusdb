@@ -597,12 +597,6 @@ function getcss(io css, in version="") {
 
 	css ^= getvogonpoetry_css(version);
 
-	//css.converter(FM, "\r\n");
-
-	//remove trailing EOL characters
-	//while (var("\r\n").contains(css[-1]))
-	//	css.popper();
-
 	var thcolor = SYSTEM.f(46, 1);
 	var tdcolor = SYSTEM.f(46, 2);
 
@@ -925,7 +919,6 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 			if (thproperties.contains(FM)) {
 				thprop = thproperties.f(coln);
 			}
-			//var t2 = "\r\n" " <th " ^ thprop;
 			var t2 = "\n" " <th " ^ thprop;
 
 			colspan = 1;

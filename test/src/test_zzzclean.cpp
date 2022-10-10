@@ -11,6 +11,13 @@ programinit()
 		return 0;
 	}
 
+	//Pass if parallel testing since we cannot clean up until afterwards
+	if (osgetenv("CTEST_PARALLEL_LEVEL")) {
+		printl("Cannot cleanup if parallel testing.");
+		printl("Test passed");
+		return 0;
+	}
+
 	var filenames = listfiles();
 
 	//	var dictconn;

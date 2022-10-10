@@ -248,13 +248,12 @@ function main() {
 
 function main_init() {
 
-    //use app specific version of listen3
     if (APPLICATION ne "EXODUS") {
-        listen3 = "listen3_app" ;
-    }
 
-    //use app specific version of generalsubs
-    if (APPLICATION ne "EXODUS") {
+	    //use app specific version of listen3
+        listen3 = "listen3_app";
+
+	    //use app specific version of generalsubs
         generalsubs = "generalsubs_app";
     }
 
@@ -310,26 +309,12 @@ function main_init() {
 	}
 
 	//prepare for sending and receiving escaped iodat > 64Kb
-	if (VOLUMES) {
-		maxstrlen = 65530;
-		nblocks = 4;
-		inblocksize = 65500;
-		//inblocksize=50000
-		outblocksize = (maxstrlen / 3).floor();
-		nblocks = 4;
-	} else {
-		inblocksize = 1048576;
-		maxstrlen = inblocksize * 4;
-		outblocksize = (maxstrlen / 3).floor();
-		nblocks = 1;
-	}
+	inblocksize = 1048576;
+	maxstrlen = inblocksize * 4;
+	outblocksize = (maxstrlen / 3).floor();
+	nblocks = 1;
+
 	datx.redim(nblocks);
-	hexx.redim(256);
-	if (VOLUMES) {
-		for (ii = 0; ii <= 255; ++ii) {
-			hexx(ii) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
-		} //ii;
-	}
 
 	/////
 	//init:
@@ -488,8 +473,8 @@ function main_init() {
 		call oswrite("", logfilename);
 		if (logfile.osopen(logfilename)) {
 			logptr = 0;
-			logx = "<?xml version=\"1.0\"?>" "\r\n";
-			logx ^= "<Log>" "\r\n";
+			logx = "<?xml version=\"1.0\"?>" _EOL;
+			logx ^= "<Log>" _EOL;
 			gosub writelogx2();
 
 			gosub writelogxclose();
@@ -555,8 +540,8 @@ function loop_init() {
 
 	//on win95 this runs at same speed in full screen or windowed
 
-	locks1.unlock( "REQUEST*" ^ linkfilename1);
-	locks1.unlock( "REQUEST*" ^ replyfilename);
+	locks1.unlock("REQUEST*" ^ linkfilename1);
+	locks1.unlock("REQUEST*" ^ replyfilename);
 	//print 'unlock locks,REQUEST*':linkfilename1
 	//print 'unlock locks,REQUEST*':replyfilename
 	call listen5("UNLOCKLONGPROCESS");
@@ -612,11 +597,7 @@ nextsearch0:
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
 	tt = time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
-	if (VOLUMES) {
-		output(AT(-40), tt, " : ");
-	} else {
-		var(tt).oswrite("process." ^ THREADNO);
-	}
+	var(tt).oswrite("process." ^ THREADNO);
 
 	call unlockrecord("PROCESSES", processes, THREADNO);
 
@@ -647,7 +628,7 @@ nextsearch0:
 	gosub flagserveractive();
 
 	//run autorun, syncdata and clear old files once a minute
-	if ((time() - lastautorun gt 60) or (time() lt lastautorun - 600)) {
+	if ((time() - lastautorun gt 60) or time() lt (lastautorun - 600)) {
 		lastautorun = time();
 
 		//call autorun instead of perform to allow output to remain on screen
@@ -717,7 +698,7 @@ subroutine wait() {
 	//maybe not necessary on test data
 	if (live) {
 		if (lockrecord("PROCESSES", processes, "ALL", "", 999999)) {
-			processes.unlock( "ALL");
+			processes.unlock("ALL");
 		}
 	}
 
@@ -794,8 +775,8 @@ function loop_exit() {
 			try {
 
 				// Execute the command as user EXODUS
-				var username=USERNAME;
-				USERNAME="EXODUS";
+				var username = USERNAME;
+				USERNAME = "EXODUS";
 
 				if (not cmd.starts("list")) {
 					printl("Begin transaction");
@@ -805,7 +786,7 @@ function loop_exit() {
 				var ok = execute(cmd);
 
 				if (statustrans()) {
-					if (decide("Commit any database updates ?","Commit" _VM "Rollback") eq "Commit") {
+					if (decide("Commit any database updates ?", "Commit" _VM "Rollback") eq "Commit") {
 						print("Committing transaction ... ");
 						committrans();
 						printl("done.");
@@ -817,7 +798,7 @@ function loop_exit() {
 					}
 				}
 
-				USERNAME=username;
+				USERNAME = username;
 
 			} catch (VarError e) {errputl(e.description);}
 		}
@@ -843,19 +824,8 @@ function loop_exit() {
 		//"U" = unlock all locks
 		if (charx eq "U") {
 			clearfile(locks1);
-			//unlock all
-			//if tracing then
 			printl(" ", "ALL LOCKS RELEASED");
-			//end else
-			// print @(25,@crthigh/2):
-			// print 'ALL LOCKS RELEASED' 'C#30':
-			// end
 		}
-
-		//"D" = De bug
-		//if charx='D' and @username='EXODUS' then
-		// DE BUG
-		// end
 
 		gosub gettimeouttime();
 		return true;
@@ -877,18 +847,8 @@ function loop_exit() {
 		lastmonitortime = time();
 
 		//install and run patches
-		//patched=0
-		//!system patches only on live data ... or only test data
-		//!to avoid loading programs into test where they are not available to users
-		//!PATCH.1 on live or PATCHT.1 on test
-		//if live then tt='path' else tt='patcht'
-		//call listen5('PATCHANDRUNONCE',tt,processes)
 		call listen5("PATCHANDRUNONCE", live, processes);
 		patched = ANS;
-
-		//database specific patches (can load into test)
-		//call listen5('PATCHANDRUNONCE',datasetcode,processes)
-		//if @ans then patched=1
 
 		if (patched) {
 			request1 = "RESTART PATCHED";
@@ -1079,34 +1039,10 @@ readlink1:
 
 		//cleanup the input file
 		//convert '&' to fm in request
-		request_.converter("\r\n", FM);
+		request_.converter("\r\n", _FM);
 		request_.replacer("\\\\", "\\");
-		request_.replacer("\\r", FM);
-		//convert @lower.case to @upper.case in request
-//		while (true) {
-//			///BREAK;
-//			if (not(request_.ends(FM))) break;
-//			request_.popper();
-//		}//loop;
-		request_.trimmerlast(FM);
-		//swap '%FF' with rm  in request
-		//swap '%FE' with fm in request
-		//swap '%FD' with vm in request
-		//swap '%FC' with sm in request
-		//swap '%FB' with tm in request
-		//swap '%FA' with stm in request
-		//swap '%F9' with \F9\ in request
-		if (VOLUMES) {
-			//HEXX1
-			//for ii=249 to 255
-			// swap hexx(ii) with char(ii) in request
-			// next ii
-			//decode %FA-%FF
-			call hexcode(3, request_);
-		//end else
-			//swap 'MEDIA':'.TYPE' with 'JOB_TYPE' in request
-			//swap 'PRODUCT':'.CATEGORIES' with 'PRODUCT_CATEGORIES' in request
-		}
+		request_.replacer("\\r", _FM);
+		request_.trimmerlast(_FM);
 
 		//replyfilename=ucase(request<1>)
 		//eg D:\EXODUS\DATA\DEVDTEST\|3130570.1
@@ -1114,27 +1050,12 @@ readlink1:
 		replyfilename = request_.f(1);
 		request_.remover(1);
 
-		//php requests that responses are to be written to linux file system files
-		//but if being served by dos/windows then need to reply to dos/win files
-		if (VOLUMES) {
-			//replyfilename could be D:\hosts\test\data\TEST/~7538977.1
-			//tt=index(replyfilename,'/data/',1)
-			replyfilename.converter("/", OSSLASH);
-			//tt=index(replyfilename,'\data\',1)
-			tt = replyfilename.index(OSSLASH_ "data" OSSLASH_);
-			if (tt) {
-				//eg drive() = D:\EXODUS\EXODUS\ ...
-				//replyfilename='..\':replyfilename[tt+1,9999]
-				replyfilename = ".." OSSLASH_ ^ replyfilename.cut(tt);
-			}
-		}
-
 		//lock the replyfilename to prevent other listeners from processing it
 		//unlock locks,'REQUEST*':replyfilename
 		if (not(lockrecord("", locks1, "REQUEST*" ^ replyfilename, xx))) {
 			//if tracing then print 'CANNOT LOCK LOCKS,':quote('REQUEST*':replyfilename)
 			continue;
-			}
+		}
 
 	//print 'lock locks,REQUEST*':replyfilename
 
@@ -1175,18 +1096,11 @@ function request_init() {
 
 	nrequests += 1;
 
-	if (VOLUMES) {
-		output(AT(-40), time().oconv("MTS"), " ");
-	} else {
-		//similar in listen and log2
-		print(THREADNO ^ ": ");
-	}
+	//similar in listen and log2
+	print(THREADNO ^ ": ");
 
 	//clear out buffers just to be sure
-	//request=''
 	data_ = "";
-	//response=''
-	//response='Error: Response not set in LISTEN'
 	call listen4(1, response_);
 	msg_ = "";
 
@@ -1267,7 +1181,7 @@ function request_init() {
 		tt ^= " Host=" ^ xmlquote(connection.f(1, 3));
 		tt ^= " HTTPS=" ^ xmlquote(connection.f(1, 4));
 		tt ^= " Session=" ^ xmlquote(netid);
-		tt ^= ">" "\r\n";
+		tt ^= ">" _EOL;
 
 		tt ^= "<Request ";
 
@@ -1318,8 +1232,6 @@ function request_init() {
 		tt = username ^ " " ^ request_;
 		//hide dataset and passord
 		//has been removed above now
-		//tt<firstrequestfieldn-1>=''
-		//tt<firstrequestfieldn-3>=''
 		tt.converter(FM, " ");
 
 		t2 = connection.f(1, 2);
@@ -1381,28 +1293,12 @@ function request_init() {
 						//log <DataIn>
 						if (not(anydata)) {
 							anydata = 1;
-							logx ^= "\r\n" "<DataIn>";
+							logx ^= _EOL "<DataIn>";
 						}
 
 						logx ^= datx(blockn);
 						gosub writelogx();
 
-					}
-
-					if (VOLUMES) {
-						//HEXX2
-							/*;
-							for ii=0 to 36;
-								swap HEXX(ii) with char(ii) in datx(blockn);
-								next ii;
-							for ii=38 to 255;
-								swap HEXX(ii) with char(ii) in datx(blockn);
-								next ii;
-							//convert %25 to % last
-							swap HEXX(37) with char(37) in datx(blockn);
-							*/
-						//decode all
-						call hexcode(2, datx(blockn));
 					}
 
 					lendata += datx(blockn).len();
@@ -1452,39 +1348,19 @@ cannotopenlinkfile2:
 			var offset_zero = 0;
 			call osbread(data_, linkfile2, offset_zero, maxstrlen);
 
-			//unescape
-			//for ii=0 to 255
-
 			//output to log
 			if (logfilename) {
 
 				//start after the last <DataIn>
 				if (not anydata) {
 					anydata = 1;
-					logx = "\r\n" "<DataIn>";
+					logx = _EOL "<DataIn>";
 					gosub writelogx();
 				}
 
 				logx = data_;
 				gosub writelogx();
 			}
-
-			if (VOLUMES) {
-				//HEXX3
-					/*;
-					for ii=0 to 36;
-						swap HEXX(ii) with char(ii) in iodat;
-						next ii;
-					for ii=38 to 255;
-						swap HEXX(ii) with char(ii) in iodat;
-						next ii;
-					swap HEXX(37) with char(37) in iodat;
-					*/
-				//decode all
-				call hexcode(2, data_);
-			}
-
-			// next i
 
 		}
 
@@ -1504,7 +1380,7 @@ cannotopenlinkfile2:
 		}
 
 		savelogptr = logptr;
-		logx = "\r\n" "</Message>" "\r\n" "</log>";
+		logx = _EOL "</Message>" _EOL "</log>";
 		gosub writelogx2();
 		logptr = savelogptr;
 	}
@@ -1910,14 +1786,6 @@ noupdate:
 						gosub addlockholder();
 					}
 				}
-				//response/@user3/RECORDKEY may be used in POSTREAD
-				//if autokey then
-				// *response:=' RECORDKEY ':keyx
-				// tt=keyx
-				// *horrible cludge to allow space in recordkey to be understood in client.htm
-				// swap ' ' with '{20}' in tt
-				// response:=' RECORDKEY ':tt
-				// end
 
 			} else {
 				gosub geterrorresponse();
@@ -1967,7 +1835,7 @@ noupdate:
 			call systemsubs(triggers.f(4));
 			DATA = "";
 
-	//restore this programs environment
+			//restore this programs environment
 			RECORD.move(data_);
 			ID.move(keyx);
 
@@ -2109,7 +1977,6 @@ noupdate:
 
 		ID = keyx;
 		MV = 0;
-		//@record=iodat
 		data_.move(RECORD);
 		win.datafile = filename;
 		//not really needed because pre/post code should assume that it is wlocked
@@ -2263,7 +2130,7 @@ badwrite:
 				keyx = ID;
 
 				//cannot place a lock file entry if the prewrite has locked the new key
-				file.unlock( keyx);
+				file.unlock(keyx);
 
 				masterlock = "";
 
@@ -2390,7 +2257,7 @@ badwrite:
 			leaselocks.deleterecord(lockkey);
 
 			//unlock local lock
-			win.srcfile.unlock( keyx);
+			win.srcfile.unlock(keyx);
 
 		} else {
 			gosub properunlock();
@@ -2439,29 +2306,19 @@ badwrite:
 			return;
 		}
 		voccmd ^= "PROXY";
-		if (VOLUMES) {
-			if (not(xx.read(voc, voccmd))) {
-				//response='Error: ':quote(voccmd):' module is not available'
-				call listen4(16, response_, voccmd);
-				return;
-			}
+		if (not libinfo(voccmd.lcase())) {
+			//response='Error: ':quote(voccmd):' module is not available'
+			call listen4(16, response_, voccmd);
+			return;
 		}
 
 		//provide an output file for the program to be executed
 		//NB response file name for detaching processes
 		//will be obtained from the output file name LISTEN2 RESPOND
 		//this could be improved to work
-		//..\data\DEVDTEST\|5916783.2
 		///root/exodus/service/data/exodus/~3810873.2
 		printfilename = linkfilename2;
 
-		//tt=drive()
-		//tt[-7,7]=''
-		//if printfilename[1,len(tt)]=tt then printfilename[1,len(tt)]='..':OSSLASH
-
-		//tt=printfilename[-1,'B.']
-		//tt=field2(printfilename,'.',-1)
-		//printfilename[-len(tt),len(tt)]='htm'
 		printfilename.paster(-1, 1, "htm");
 		SYSTEM(2) = printfilename;
 
@@ -2644,34 +2501,17 @@ function request_exit() {
 	gosub updreqlog();
 
 	if (logfilename) {
-		logx = "\r\n" "<Response ProcessingSecs=" ^ (secs.quote()) ^ ">";
+		logx = _EOL "<Response ProcessingSecs=" ^ (secs.quote()) ^ ">";
 		gosub writelogx2();
 
 		//convert non ascii to hexcode
 		logx = response_;
-		if (VOLUMES) {
-			//HEXX4
-				/*;
-				swap '%' with '%25' in logx;
-				for ii=128 to 255;
-					swap char(ii) with HEXX(ii) in logx;
-					next ii;
-				for ii=0 to 15;
-					swap char(ii) with HEXX(ii) in logx;
-					next ii;
-				for ii=24 to 31;
-					swap char(ii) with HEXX(ii) in logx;
-					next ii;
-				*/
-			//encode %->%25 %00-%0F %18-%1F %FA-%FF
-			call hexcode(1, logx);
-		}
 		gosub writelogx();
 
 		logx = "</Response>";
 		iodatlen = data_.len();
 		if (iodatlen) {
-			logx ^= "\r\n" "<DataOut>";
+			logx ^= _EOL "<DataOut>";
 		}
 		gosub writelogx2();
 
@@ -2700,44 +2540,6 @@ function request_exit() {
 					break;
 
 				//in LISTEN and SELECT2 for direct output
-
-				if (VOLUMES) {
-
-					//HEXX5
-						/*;
-						swap '%' with '%25' in blk;
-						//changed to allow language characters to pass through x80-xF9
-						for ii=249 to 255;
-							swap char(ii) with HEXX(ii) in blk;
-							//should not be done per block but is code economic
-							swap char(ii) with HEXX(ii) in response;
-							next ii;
-
-						//is the following really necessary?
-						for ii=0 to 15;
-							swap char(ii) with HEXX(ii) in blk;
-							//should not be done per block but is code economic
-							swap char(ii) with HEXX(ii) in response;
-							next ii;
-						for ii=24 to 31;
-							swap char(ii) with HEXX(ii) in blk;
-							//should not be done per block but is code economic
-							swap char(ii) with HEXX(ii) in response;
-							next ii;
-						*/
-
-					//encode %->%25 %00-%0F %18-%1F %FA-%FF
-					call hexcode(1, blk);
-					call hexcode(1, response_);
-
-				}
-
-				//convert some things for XML log
-				//swap '&' with '%26' in blk
-				//swap '"' with '%22' in blk
-				//swap '<' with '%3C' in blk
-				//swap '>' with '%3E' in blk
-
 				call osbwrite(blk, linkfile2, ptr);
 
 				if (logfilename) {
@@ -2771,7 +2573,7 @@ function request_exit() {
 		if (iodatlen) {
 			logx ^= "</DataOut>";
 		}
-		logx ^= "\r\n" "</Message>" "\r\n";
+		logx ^= _EOL "</Message>" _EOL;
 		gosub writelogx2();
 
 		gosub writelogxclose();
@@ -2841,12 +2643,12 @@ subroutine fmtresp() {
 	}
 
 	//cannot remove since these may be proper codepage letters
-	response_.converter("|", FM);
-	response_.converter(VM, FM);
-	if (response_.starts(FM)) {
+	response_.converter("|", _FM);
+	response_.converter(_VM, _FM);
+	if (response_.starts(_FM)) {
 		response_.cutter(1);
 	}
-	response_.replacer(FM, "\r\n");
+	response_.replacer(_FM, _EOL);
 
 	return;
 }
@@ -2909,7 +2711,7 @@ subroutine properunlock() {
 	srcfile2.replacer("SHADOW.MFS" ^ SM, "");
 	*/
 
-	srcfile2.unlock( keyx);
+	srcfile2.unlock(keyx);
 
 	return;
 }
@@ -3078,7 +2880,7 @@ lockexit:
 	if (request1 eq "RELOCK") {
 		gosub rawunlock();
 	} else {
-		file.unlock( keyx);
+		file.unlock(keyx);
 	}
 
 	return;

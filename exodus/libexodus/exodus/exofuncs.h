@@ -33,23 +33,39 @@ THE SOFTWARE.
 // SIMILAR code in exofuncs.h and varimpl.h
 namespace exodus {
 
+	// clang-format off
+
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-	inline const var OSSLASH = "\\";
-	constexpr char OSSLASH_ = '\\';
-	constexpr bool SLASH_IS_BACKSLASH = true;
-	constexpr const char* EOL = "\r\n";
+
+	inline const var       EOL      = "\r\n";
+#	define                _EOL        "\r\n"
+
+	inline const var       OSSLASH  = "\\";
+#	define                _OSSLASH    "\\"
+	constexpr char         OSSLASH_ = '\\';
+	constexpr bool         OSSLASH_IS_BACKSLASH = true;
+
 #else
-	inline const var OSSLASH = "/";
-	constexpr char OSSLASH_ = '/';
-	constexpr bool SLASH_IS_BACKSLASH = false;
-	constexpr const char* EOL = "\n";
+
+	inline const var       EOL      = "\n";
+#	define                _EOL        "\n"
+
+	inline const var       OSSLASH  = "/";
+#	define                _OSSLASH    "/"
+	constexpr char         OSSLASH_ = '/';
+	constexpr bool         OSSLASH_IS_BACKSLASH = false;
+
 #endif
 
 #if defined(_WIN64) or defined(_LP64)
-	inline const var PLATFORM_ = "x64";
+	inline const var       PLATFORM = "x64";
+#	define                _PLATFORM   "x84"
 #else
-	inline const var PLATFORM_ = "x86";
+	inline const var       PLATFORM = "x86";
+#	define                _PLATFORM   "x86"
 #endif
+
+	// clang-format on
 
 // Removed to reduce compile time of exodus programs.
 // Use .output() .errput() and .logput() for threadsafe output.
@@ -620,10 +636,6 @@ PUBLIC void printt() {
 	LOCKIOSTREAM
 	std::cout << sep;
 }
-
-/*#define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_RM _FM _VM _SM _TM _ST,VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "==");
-*/
 
 }  // namespace exodus
 

@@ -779,16 +779,15 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 		//	word.quoter();
 
 		mv.SENTENCE ^= word;
-		mv.COMMAND ^= FM ^ word;
+		mv.COMMAND ^= word ^ FM_;
 	}
-	mv.COMMAND.cutter(1);
+	mv.COMMAND.popper();
 
-	// OPTIONS are in either (XXX) or {XXX} at the end of the command.
-	// and do not contain spaces
-
+	// Cut off OPTIONS from end of COMMAND if present
 	// *** SIMILAR code in
 	// 1. exofuncs.cpp exodus_main()
 	// 2. exoprog.cpp  perform()
+	// OPTIONS are in either (AbC) or {AbC} in the last field of COMMAND
 	mv.OPTIONS = mv.COMMAND.field2(_FM, -1);
 	if ((mv.OPTIONS.starts("{") and mv.OPTIONS.ends("}")) or (mv.OPTIONS.starts("(") and mv.OPTIONS.ends(")"))) {
 		// Remove last field of COMMAND TODO fpopper command?

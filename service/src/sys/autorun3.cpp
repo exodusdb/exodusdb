@@ -121,7 +121,7 @@ function main(in docids0="", in options0="") {
 	//initdoc:
 	////////
 	if (docids) {
-		docids.replacer(",", FM);
+		docids.replacer(",", _FM);
 		docn = 0;
 	} else {
 		select(sys.documents);
@@ -221,8 +221,8 @@ currdatetime:
 		//26 date
 		//27 max number of times
 
-		var restrictions = trimlast(sys.document.field(FM, 21, 7), FM);
-		restrictions.converter(",", VM);
+		var restrictions = trimlast(sys.document.field(_FM, 21, 7), _FM);
+		restrictions.converter(",", _VM);
 
 		//skip if no restrictions applied yet
 		if (restrictions eq "") {
@@ -465,7 +465,7 @@ nextuser:;
 			goto nextdoc;
 		}
 
-		toaddress.converter(FM, ";");
+		toaddress.converter(_FM, ";");
 
 	}
 
@@ -491,7 +491,7 @@ nextuser:;
 		var origdocument = sys.document;
 
 		sys.document(2) = title;
-		sys.document(5) = lower(module ^ "PROXY" ^ FM ^ request_);
+		sys.document(5) = lower(module ^ "PROXY" _FM ^ request_);
 		sys.document(6) = lower(datax);
 
 		call cropper(datax);
@@ -537,7 +537,7 @@ nextuser:;
 
 	//request='EXECUTE':fm:'GENERAL':fm:'GETREPORT':fm:docid
 	//voccmd='GENERALPROXY'
-	request_ = raise("EXECUTE" ^ VM ^ sys.document.f(5));
+	request_ = raise("EXECUTE" _VM ^ sys.document.f(5));
 
 	data_ = raise(sys.document.f(6));
 
@@ -643,7 +643,7 @@ nextsign:
 			if (response_.starts("OK")) {
 				response_ = response_.cut(2).trimfirst();
 			} else {
-				call sysmsg(subject ^ FM ^ body);
+				call sysmsg(subject ^ _FM ^ body);
 				goto nextdoc;
 			}
 
@@ -671,7 +671,7 @@ nextsign:
 
 			subject.replacer("%RESULT%", "");
 		}
-		body.replacer(FM, chr(13));
+		body.replacer(_FM, chr(13));
 
 		// Option to force the actual email recipient
 		var system117 = SYSTEM.f(117);
@@ -732,13 +732,13 @@ subroutine exec2() {
 	//system<25>=requeststarttime
 	//allow autorun processes to run for ever
 	SYSTEM(25) = "";
-	request_ = request_.field(FM, 3, 99999);
+	request_ = request_.field(_FM, 3, 99999);
 
 	//localtime=mod(time()+@sw<1>,86400)
 	//print @(0):@(-4):localtime 'MTS':' AUTORUN ':docid:
 	//similar in LISTEN and AUTORUN
 	printl();
-	print(time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(FM, " "), " ", sys.document.f(2), ":");
+	print(time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(_FM, " "), " ", sys.document.f(2), ":");
 
 	//print 'link',linkfilename2
 	//print 'request',request
@@ -821,7 +821,7 @@ subroutine exec2() {
 			response_ = "No response from " ^ voccmd;
 		}
 sysmsgit:
-		call sysmsg("AUTORUN " ^ docid ^ " " ^ sys.document.f(2) ^ FM ^ response_);
+		call sysmsg("AUTORUN " ^ docid ^ " " ^ sys.document.f(2) ^ _FM ^ response_);
 	}
 
 	call cropper(msg_);
@@ -840,7 +840,8 @@ sysmsgit:
 	}
 
 	var rawresponse = response_;
-	rawresponse.converter("\r\n", "|");
+	rawresponse.replacer("\r\n", "|");
+	rawresponse.converter("\n", "|");
 
 	//get the printfilename in case the print program changed it
 	printfilename = SYSTEM.f(2);
@@ -885,12 +886,12 @@ subroutine fmtresp() {
 	}
 
 	//cannot remove since these may be proper codepage letters
-	response_.converter("|", FM);
-	response_.converter(VM, FM);
-	if (response_.starts(FM)) {
+	response_.converter("|", _FM);
+	response_.converter(_VM, _FM);
+	if (response_.starts(_FM)) {
 		response_.cutter(1);
 	}
-	response_.replacer(FM, "\r\n");
+	response_.replacer(_FM, _EOL);
 
 	return;
 }

@@ -10,7 +10,7 @@ function main(io tx) {
 	//in c++ get from raw text string below
 	tx=getvogonpoetry();
 
-        tx.replacer(FM, "\r\n");
+        tx.replacer(_FM, "\r\n");
 
         if (DATEFMT.contains("E")) {
                 t2 = "d/M/yyyy";

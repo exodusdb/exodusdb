@@ -671,8 +671,8 @@ nextvn:
 					converterparams = line;
 					call convertercsv("HEAD", headingx, converterparams, filename);
 				} else {
-					headingx.converter(FM, chr(9));
-					headingx ^= "\r\n";
+					headingx.converter(_FM, chr(9));
+					headingx ^= _EOL;
 				}
 
 				call osbwrite(headingx, outfile, ptr);
@@ -685,8 +685,8 @@ nextvn:
 			if (hasconverter) {
 				call convertercsv("LINE", line, converterparams, filename);
 			} else {
-				line.replacer(FM, chr(9));
-				line ^= "\r\n";
+				line.replacer(_FM, chr(9));
+				line ^= _EOL;
 			}
 
 			call osbwrite(line, outfile, ptr);

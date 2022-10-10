@@ -673,7 +673,7 @@ nextkey:
 			}
 		}
 
-	} else if ((word.starts("LIST") or word.starts("NLIST")) or word eq "XLIST") {
+	} else if ((word.starts("LIST") or word.starts("NLIST")) or word eq "OLIST") {
 		ss ^= "SELECT";
 		goto filename;
 
@@ -1355,7 +1355,7 @@ x1exit:
 					//works per table if the table is assigned a class (.maintable) here
 					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^
 							 "}"
-							 "\r\n";
+							_EOL;
 				}
 
 			} else {
@@ -1369,10 +1369,10 @@ x1exit:
 	if (style) {
 		style =
 			"<style type=\"text/css\">"
-			"\r\n" ^
+			_EOL ^
 			style ^
 			"</style>"
-			"\r\n";
+			_EOL;
 	}
 
 	//convert to html with colspan/rowspan where necessary and (Base) as currcode
@@ -1391,7 +1391,7 @@ x1exit:
 
 		if (not rawtable) {
 			call getmark("CLIENT", html, clientmark);
-			tt ^= clientmark ^ "\r\n";
+			tt ^= clientmark ^ _EOL;
 		}
 
 		//tt:='<table border="1" cellspacing="0" cellpadding="2"'
@@ -1469,27 +1469,27 @@ x1exit:
 
 		tt ^=
 			"<colgroup>"
-			"\r\n" ^
-			headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
+			_EOL ^
+			headtabcols.replace(VM, _EOL) ^ "</colgroup>";
 //#ifndef EXO_NOHTML
 		//style columns where '<col>' not supported.
 		//call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		call htmllib2("CONVCSS", headtabstyle, "headtab0", headtabcols);
-		style ^= "\r\n" ^ headtabstyle;
+		style ^= _EOL ^ headtabstyle;
 
 		tt ^=
 			"<colgroup>"
-			"\r\n" ^
-			headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
+			_EOL ^
+			headtabcols.replace(VM, _EOL) ^ "</colgroup>";
 
 		tt ^=
-			"\r\n"
+			_EOL
 			"<TBODY>";
 		call htmllib2("TABLE.MAKE", headtab, tt, "");
 //#endif
 		headtab.replacer("</TR>",
 						"</TR>"
-						"\r\n");
+						_EOL);
 		if (headtabperpage) {
 			colhdg.replacer(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:white\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
 		} else {
@@ -1891,7 +1891,7 @@ recexit:
 				if (tt eq "") {
 					//tt=nbsp
 				} else {
-					tt.replacer("\r\n", "<br />");
+					tt.replacer(_EOL, "<br />");
 				}
 
 				//colored cells starting with ESC
@@ -2019,10 +2019,10 @@ x2exit:
 		tx ^= "var vhtm=window.opener.location.toString().split(\"/\");";
 		tx ^=
 			"vhtm[vhtm.length-1]=url;"
-			"\r\n";
+			_EOL;
 		tx ^=
 			"window.open(vhtm.join(\"/\"));"
-			"\r\n";
+			_EOL;
 		tx ^= "}";
 		tx ^= FM ^ "</script>";
 	}

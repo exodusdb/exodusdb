@@ -285,7 +285,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			//finally add location to get
 			cmd ^= " " ^ ((authurl ^ "?" ^ params).quote());
 
-			wgetrc.replacer(FM, "\r\n");
+			wgetrc.replacer(_FM, _EOL);
 			var wgetrcfilename = oscwd() ^ tempfilename ^ ".XRC";
 			var(wgetrc).oswrite(wgetrcfilename);
 
@@ -298,7 +298,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			var cmdfilename = tempfilename ^ ".cmd";
 			var errorfilename = tempfilename ^ ".XER";
 			var cmdfile = "set WGETRC=" ^ wgetrcfilename;
-			cmdfile ^= "\r\n" ^ cmd ^ " 2>" ^ errorfilename;
+			cmdfile ^= _EOL ^ cmd ^ " 2>" ^ errorfilename;
 			var(cmdfile).oswrite(cmdfilename);
 
 			//print
@@ -324,8 +324,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		//catches option errors
 		if (errors) {
-			errors.converter("\r\n", FM ^ FM);
-			call note(trim(errors, FM));
+			errors.converter("\r\n", _FM _FM).trimmer(_FM);
+			call note(trim(errors, _FM));
 		}
 
 		msg = "";
@@ -371,11 +371,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		if (not(datax.field(",", 1) eq hashcode)) {
 			msg = "wrong response";
 badresponse:
-			datax.replacer("<br />", FM);
+			datax.replacer("<br />", _FM);
 			gosub getlog(logfilename, cleanup, log);
-			msg ^= FM ^ FM ^ datax ^ log;
+			msg ^=_FM _FM ^ datax ^ log;
 			msg = msg.oconv("T#60");
-			msg.converter(TM, FM);
+			msg.converter(_TM, _FM);
 			msg.trimmer();
 			return 0;
 		}
@@ -401,12 +401,12 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 		if (cleanup) {
 			logfilename.osremove();
 		}
-		log.converter("\r\n", FM ^ FM);
-		log.replacer("<br />", FM);
-		log = trim(log, FM);
-		log = field2(log, FM, -1);
+		log.converter("\r\n", _FM _FM).trimmer(_FM);
+		log.replacer("<br />", _FM);
+		log = trim(log, _FM);
+		log = field2(log, _FM, -1);
 		if (log) {
-			log.prefixer(FM ^ FM);
+			log.prefixer(_FM _FM);
 		}
 	} else {
 		log = "";

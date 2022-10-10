@@ -148,7 +148,7 @@ function main() {
 
 		} //compn;
 		allhtml(-1) = "Press F5 to refresh any images just uploaded.";
-		allhtml.replacer(FM, "\r\n");
+		allhtml.replacer(_FM, _EOL);
 		var(allhtml).oswrite(SYSTEM.f(2));
 		gosub postproc();
 
@@ -228,11 +228,11 @@ function main() {
 		var subject = data_.f(4);
 		var message = data_.f(5);
 
-		message.converter(TM, VM);
+		message.converter(_TM, _VM);
 		call emailusers("", subject, message, groupids, jobfunctionids, userids, options, emailresult);
 
 		if (emailresult) {
-			emailresult.converter(VM ^ FM, "\r\r");
+			emailresult.converter(_VM _FM, "\r\r");
 			response_ = "OK Email Sent to" "\r" ^ emailresult;
 			} else {
 			call mssg("No users can be found to email,|or some problem with email server");
@@ -263,12 +263,12 @@ function main() {
         }
 
 		//check source database exists
-		if (not locateusing(FM, sourcedbcode, dbcodes)) {
+		if (not locateusing(_FM, sourcedbcode, dbcodes)) {
 			return invalid("Source database doesn't exists.");
 		}
 
 		//check new database and data dir dont already exist
-		if (locateusing(FM, targetdbcode, dbcodes)) {
+		if (locateusing(_FM, targetdbcode, dbcodes)) {
 			return invalid("Sorry, " ^ targetdbcode.quote() ^ " already exists");
 		}
 
@@ -287,7 +287,7 @@ function main() {
 
 		//check target db created
 		var newdbcodes = dblist();
-		if (not locateusing(FM, targetdbcode, newdbcodes)) {
+		if (not locateusing(_FM, targetdbcode, newdbcodes)) {
 			return invalid(targetdbname ^ targetdbcode.quote() ^ " not created");
 		}
 
@@ -454,9 +454,9 @@ setcodepagecase:
 				}
 			}
 			var temp = data_;
-			temp.replacer(RM, "%FF");
-			temp.replacer(FM, "%FE");
-			temp.replacer(VM, "%FD");
+			temp.replacer(_RM, "%FF");
+			temp.replacer(_FM, "%FE");
+			temp.replacer(_VM, "%FD");
 			recordx(1, fn) = temp;
 
 			recordx.write(sys.alanguage, "GENERAL*" ^ codepage);
@@ -610,7 +610,7 @@ badsetcodepage:
 		var select = "SELECT DOCUMENTS BY-DSND EXODUS_STANDARD BY DESCRIPTION";
 
 		var instructions = request_.f(2);
-		instructions.replacer(VM, "%FD");
+		instructions.replacer(_VM, "%FD");
 		select ^= " WITH INSTRUCTIONS2 " ^ (instructions.quote());
 
 		if (not(authorised("DOCUMENTS: ACCESS OTHER PEOPLES DOCUMENTS", xx, ""))) {
@@ -639,8 +639,8 @@ nextrep:
 				//DO send now to have info in requestlog
 				//report<5>=''
 
-				report.converter(VM, RM);
-				let nn = report.count(FM) + 1;
+				report.converter(_VM, _RM);
+				let nn = report.fcount(_FM);
 				for (const var ii : range(1, nn)) {
 					data_(ii, repn) = report.f(ii);
 				} //ii;
@@ -662,7 +662,7 @@ nextrep:
 
 		var docnos = request_.f(2);
 
-		let ndocs = docnos.count(VM) + 1;
+		let ndocs = docnos.fcount(_VM);
 		for (const var docn : range(1, ndocs)) {
 			ID = docnos.f(1, docn);
 			if (ID) {
@@ -761,7 +761,7 @@ nextrep:
 		//if index(task,'MEDIADIARY',1) then printopts='X'
 
 		PSEUDO = sys.document.f(6);
-		PSEUDO.converter(RM, VM);
+		PSEUDO.converter(_RM, _VM);
 		PSEUDO = raise(PSEUDO);
 
 		//merge any runtime parameters into the real parameters
@@ -777,7 +777,7 @@ nextrep:
 		//document<11>=lower(data)
 
 		var sentencex = sys.document.f(5);
-		sentencex.converter(VM, " ");
+		sentencex.converter(_VM, " ");
 		data_ = PSEUDO;
 
 		//in case we are calling another proxy
@@ -786,7 +786,7 @@ nextrep:
 			//run but suppress email
 			//perform 'TEST ':request<2>:' (S)'
 
-			request_ = raise(sys.document.f(5)).field(FM, 2, 999999) ^ FM ^ request_.f(2);
+			request_ = raise(sys.document.f(5)).field(_FM, 2, 999999) ^ FM ^ request_.f(2);
 			//moved up so parameters show in any emailed error messages
 			//data=@pseudo
 			//override the saved period with a current period

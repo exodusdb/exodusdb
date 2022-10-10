@@ -387,24 +387,24 @@ function main(in mode) {
 		gosub getdepts();
 		ANS = depts;
 
-	} else if (mode eq "F2.DEPARTMENT") {
-		gosub getdepts();
-		if (not(decide("Which department do you want?", depts ^ "", reply))) {
-			return 0;
-		}
-		ANS = depts.f(reply);
-		DATA ^= ANS ^ "\r";
-
-	} else if (mode eq "VAL.DEPARTMENT") {
-		if (win.is eq "") {
-			return 0;
-		}
-		gosub getdepts();
-		if (not(depts.locateusing(FM, win.is, xx))) {
-			msg = win.is.quote() ^ " IS NOT A VALID DEPARTMENT";
-			return invalid(msg);
-		}
-
+//	} else if (mode eq "F2.DEPARTMENT") {
+//		gosub getdepts();
+//		if (not(decide("Which department do you want?", depts ^ "", reply))) {
+//			return 0;
+//		}
+//		ANS = depts.f(reply);
+//		DATA ^= ANS ^ "\r";
+//
+//	} else if (mode eq "VAL.DEPARTMENT") {
+//		if (win.is eq "") {
+//			return 0;
+//		}
+//		gosub getdepts();
+//		if (not(depts.locateusing(FM, win.is, xx))) {
+//			msg = win.is.quote() ^ " IS NOT A VALID DEPARTMENT";
+//			return invalid(msg);
+//		}
+//
 	} else {
 		msg = mode.quote() ^ " is invalid in USER.SUBS";
 		return invalid(msg);

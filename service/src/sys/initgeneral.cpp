@@ -1667,7 +1667,7 @@ nextdoc:
 	if (version.osread("GENERAL" OSSLASH_ "VERSION.DAT")) {
 
 		//get version installed
-		var versioninstalled = version.field("\r", 1).trim();
+		var versioninstalled = version.field("\r", 1).field("\n", 1).trim();
 
 		//get version last run
 		call osread(upgradelog, "UPGRADE.CFG");
@@ -1678,7 +1678,7 @@ nextdoc:
 
 			//log the upgraded version
 			if (upgradelog) {
-				upgradelog ^= "\r\n";
+				upgradelog ^= _EOL;
 			}
 			upgradelog ^= versioninstalled;
 			//call oswrite(upgradelog,'UPGRADE.CFG')

@@ -1,25 +1,25 @@
 #include <exodus/program.h>
 programinit()
 
-	//for the sake of multivalue gurus new to exodus programming this is written
-	//with multivalue-mimicking "everything is a global function" syntax
-	//instead of exodus's oo-style syntax "xxx.yyy().zzz()".
+	// For the sake of multivalue gurus new to exodus programming this is written
+	// with multivalue-mimicking "everything is a global function" syntax
+	// instead of exodus's oo-style syntax "xxx.yyy().zzz()".
 	//
 	var filename = "xo_clients";
 
 function main() {
 
-	//no real need for this especially because a) it does a default connection and b) we are not creating a connection for following db operations
-	//it is here just to remind that we can connect to specific servers and dataabases if desired
-//	if (not connect())
-//		abort("Cannot connect to database. Please check configuration or run configexodus.");
+	// No real need for this especially because a) it does a default connection and b) we are not creating a connection for following db operations
+	// it is here just to remind that we can connect to specific servers and dataabases if desired
+	//if (not connect())
+	//	abort("Cannot connect to database. Please check configuration or run configexodus.");
 
 	var dictfilename = "dict." ^ filename;
 
-	//leave the test data files around for playing with after the program finishes
+	// Leave the test data files around for playing with after the program finishes
 	var cleanup = false;
 
-	//always delete and start from scratch (ignore fact that files will not exist the first time)
+	// Always delete and start from scratch (ignore fact that files will not exist the first time)
 	//if (cleanup) {
 	deletefile(filename);
 	deletefile(dictfilename);
@@ -62,20 +62,13 @@ function main() {
 
 	printl("\nWrite the dictionary records to the dictionary");
 
-//	let nrecs = fcount(dictrecs, FM);
-//	for (const var recn : range(1, nrecs)) {
+	// Using modern c++ range based for loop
 	for (var dictrec : dictrecs) {
-//		var dictrec = extract(dictrecs, recn);
 
 		var key = trim(field(dictrec, "|", 1));
 		var rec = field(dictrec, "|", 2, 999999);
 
 		printl(key, " : ", rec);
-
-//		rec = trim(rec);
-//		rec = replace(rec, " |", "|");
-//
-//		rec = convert(rec, "|", FM);
 
 		rec.trimmer();
 		rec.replacer(" |", "|");
@@ -84,9 +77,8 @@ function main() {
 
 		write(rec, dictfile, key);
 
-		//check we can read the record back
+		// Check we can read the record back
 		var rec2;
-		//key.outputl("key");
 		if (read(rec2, dictfile, key)) {
 			if (rec2 ne rec)
 				printl("record differs?!");
@@ -118,30 +110,26 @@ function main() {
 
 	let maxrec = 100;
 
-//	let nrecs2 = fcount(recs, FM);
-//	for (const var recn : range(1, nrecs2)) {
-//		var rec = extract(recs, recn);
-//  Using modern syntax
 	for (var rec : recs) {
 		var key = field(rec, "|", 1);
 		rec = field(rec, "|", 2, 9999);
 		printl(key, ": ", rec);
 		while (index(rec, " |"))
 			replacer(rec, " |", "|");
-		// OO syntax seems more readable
+		// OO syntax seems more readable here, so use it.
 		//write(trimlast(convert(rec, "|", FM)), file, trim(key));
 		rec.convert("|", FM).trimlast().write(file, key.trim());
 	}
 
 	var prefix = "select " ^ filename;
 
-	gosub sortselect(file, prefix ^ " by code");
+	gosub sortselect(file, prefix ^ " by code (R)");
 
-	gosub sortselect(file, prefix ^ " by balance by code");
+	gosub sortselect(file, prefix ^ " by balance by code (R)");
 
-	gosub sortselect(file, prefix ^ " by timestamp");
+	gosub sortselect(file, prefix ^ " by timestamp (R)");
 
-	gosub sortselect(file, prefix ^ " with type 'B' by balance");
+	gosub sortselect(file, prefix ^ " with type 'B' by balance (R)");
 
 	var cmd = "list " ^ filename ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
@@ -160,7 +148,7 @@ function main() {
 	printl("\nJust type 'list' to see the syntax of list");
 	printl("or list dict." ^ filename ^ " to see the dictionary");
 	printl("or just listdict " ^ filename ^ " for the same");
-	printl("Type edic ~/exodus/cli/src/testsort to see or edit/recompile this program.");
+	printl("Type 'edic ~/exodus/cli/src/testsort' to view, edit and recompile this program.");
 
 	return 0;
 }
@@ -181,15 +169,17 @@ subroutine sortselect(in file, in sortselectcmd) {
 	var record;
 	var key;
 
-	//could also use the readnextrecord() function here
+	// Could also use the readnextrecord() function here
 	// if we had used the new selectrecord() function above
-	while (readnext(key)) {
+	while (readnext(RECORD, ID, MV)) {
 
-		if (not read(record, file, key)) {
-			printl(key, " missing from file");
+		// No need to read the record if is was obtained in readnext above
+		if (not RECORD and not read(RECORD, file, ID)) {
+			printl(quote(ID), " missing from file");
 			continue;
 		}
-		printl(key, ": ", convert(record, FM, "|"));
+
+		printl(ID, ": ", convert(RECORD, FM, "|"));
 	}
 
 	//	rollbacktrans();

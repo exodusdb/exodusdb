@@ -99,22 +99,22 @@ inline const char DQ_ = '\"';
 inline const char SQ_ = '\'';
 
 // print() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
-//#define VISIBLE_FMS "_^]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
-//#define VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
-//#define VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
-//#define VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
-#define VISIBLE_FMS "`^]}|~"   //all uncommon in natural language. ^] are identical to pickos. Using ` for RM since _ common in IT
+//#define _VISIBLE_FMS "_^]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
+//#define _VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
+//#define _VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
+//#define _VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
+#define _VISIBLE_FMS "`^]}|~"   //all uncommon in natural language. ^] are identical to pickos. Using ` for RM since _ common in IT
 inline const char VISIBLE_RM_ = '`';
 inline const char VISIBLE_FM_ = '^';
 inline const char VISIBLE_VM_ = ']';
 inline const char VISIBLE_SM_ = '}';
 inline const char VISIBLE_TM_ = '|';
 inline const char VISIBLE_ST_ = '~';
-#define ALL_FMS _RM _FM _VM _SM _TM _ST
+#define _ALL_FMS _RM _FM _VM _SM _TM _ST
 
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(ALL_FMS, VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
+	var(EXPRESSION).convert(_ALL_FMS, _VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
 #define TRACE2(EXPRESSION) \
 	std::cerr << (EXPRESSION) << std::endl;
 
@@ -2183,7 +2183,7 @@ class PUBLIC var final {
 	// bool THIS_IS_DBCONN() const    { return var_typ & VARTYP_DBCONN; }
 	// bool THIS_IS_OSFILE() const    { return var_typ & VARTYP_OSFILE; }
 
-	// Convert VISIBLE_FMS to ALL_FMS
+	// Convert _VISIBLE_FMS to _ALL_FMS
 	// In header to perhaps aid runtime string literal conversion for operator""_var
 	// since currently it cannot be constexpr due to var containing a std::string
 	var& fmiconverter() {
@@ -2201,7 +2201,7 @@ class PUBLIC var final {
 		return *this;
 	}
 
-	// Convert ALL_FMS to VISIBLE_FMS
+	// Convert _ALL_FMS to _VISIBLE_FMS
 	var& fmoconverter() {
 		for (char& c : this->var_str) {
 			if (c > RM_ || c > RM_) {
@@ -2418,7 +2418,7 @@ class PUBLIC VarError {
 //inline avoids hitting ODR rule
 
 ND inline var operator""_var(const char* cstr, std::size_t size) {
-	//return var(cstr, size).convert(VISIBLE_FMS, _RM _FM _VM _SM _TM _ST);
+	//return var(cstr, size).convert(_VISIBLE_FMS, _RM _FM _VM _SM _TM _ST);
 	var result = var(cstr, size);
 	result.fmiconverter();
 	return result;

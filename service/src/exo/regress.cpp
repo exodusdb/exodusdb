@@ -14,7 +14,7 @@ function main() {
 	if (not(osread(data,osfilename)))
 		stop("cant open "^osfilename);
 
-	data.converter("\r\n",RM^RM);
+	data.converter("\r\n", _RM _RM);
 	var bit=data.first(100);
 	var ix=0;
 	var delimiter;

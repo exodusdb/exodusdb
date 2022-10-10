@@ -50,6 +50,7 @@ namespace exodus {
 
 using ConnectionLocks = std::map<uint64_t, int>;
 using DBCache = std::unordered_map<uint64_t, std::string>;
+//using DBCache = std::map<uint64_t, std::string>;
 using PGCONN_DELETER = void (*)(PGconn*);
 
 class DBConn;
@@ -126,19 +127,19 @@ class DBConnector final {
 	///////////////
 
 	int add_dbconn(PGconn* connection_with_file, const std::string conninfo);
-	void del_dbconn(int dbconn_no);
-	void del_dbconns(int from_dbconn_no);
+	void del_dbconn(const int dbconn_no);
+	void del_dbconns(const int from_dbconn_no);
 
 	// observers
 	////////////
 
-	PGconn* get_pgconn(int dbconn_no) const;
-	DBConn* get_dbconn(int dbconn_no) const;
+	PGconn* get_pgconn(const int dbconn_no) const;
+	DBConn* get_dbconn(const int dbconn_no) const;
 
-	DBCache* get_dbcache(int dbconn_no) const;
-	std::string getrecord(const int dbconn_no, uint64_t file_and_key) const;
-	void putrecord(const int dbconn_no, uint64_t file_and_key, const std::string& record);
-	void delrecord(const int dbconn_no, uint64_t file_and_key);
+	DBCache* get_dbcache(const int dbconn_no) const;
+	bool getrecord(const int dbconn_no, const uint64_t hash64, std::string& record) const;
+	void putrecord(const int dbconn_no, const uint64_t hash64, const std::string& record);
+	void delrecord(const int dbconn_no, const uint64_t hash64);
 	void cleardbcache(const int dbconn_no);
 
    private:

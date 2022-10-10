@@ -153,7 +153,7 @@ function main(in mode, io logtime, in menu) {
 		call log2("*get osenv", logtime);
 
 		//nb will NOT overwrite any manual entries in SYSTEM.CFG
-		let osenv = osgetenv().converter("\r\n", _FM _FM _FM);
+		let osenv = osgetenv().converter("\r\n", _FM _FM);
 //		let nenv = osenv.count(FM) + 1;
 //		for (const var ii : range(1, nenv)) {
 //			var enventry = osenv.f(ii);
@@ -477,7 +477,7 @@ nextuser:
 
 		call menusubs("EXITMENUS", menutx);
 
-		menutx.replacer(FM, "\r\n");
+		menutx.replacer(FM, _EOL);
 
 		var menuosfilename = "../data/menu.htm";
 		if (not(oldmenu.osread(menuosfilename))) {

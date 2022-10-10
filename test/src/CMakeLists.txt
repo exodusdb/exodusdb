@@ -5,12 +5,23 @@
 	cmake_minimum_required(VERSION 3.1)
 	project(exodus_test)
 
+	#https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html
+
 #
 # Init
 # ####
 #
 	message("")
 	message("--EXODUS TEST CMAKE INIT --")
+
+#
+# Configure test options
+# ######################
+#
+	#CTEST_OUTPUT_ON_FAILURE=1
+	#CTEST_PARALLEL_LEVEL=16
+	#set(CMAKE_CTEST_ARGUMENTS "--parallel 32;--test-load 3;--output-on-failure")
+	set(CMAKE_CTEST_ARGUMENTS -output-on-failure --parallel=32 --test-load=3)
 
 #
 # Enable testing
@@ -65,16 +76,33 @@
 
 		#setup a classic test i.e. requiring output of "Test passed"
 		add_test(NAME ${file_without_ext} COMMAND ${file_without_ext} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-		set_tests_properties(${file_without_ext}
+		set_tests_properties(
+			${file_without_ext}
 			PROPERTIES
-			PASS_REGULAR_EXPRESSION "Test passed")
-		set_tests_properties(${file_without_ext}
+			PASS_REGULAR_EXPRESSION "Test passed"
+		)
+		set_tests_properties(
+			${file_without_ext}
 			PROPERTIES
-			FAIL_REGULAR_EXPRESSION "(Test failed)")
-		set_tests_properties(${file_without_ext}
+			FAIL_REGULAR_EXPRESSION "(Test failed)"
+		)
+		set_tests_properties(
+			${file_without_ext}
 			PROPERTIES
-			TIMEOUT 120)
-
+			TIMEOUT 120
+		)
+#		# NOT possible to easily customise tests until cmake 3.17 using CMAKE_CTEST_ARGUMENTS
+#		# https://stackoverflow.com/questions/16158091/cmake-setting-an-environmental-variable-for-ctest-or-otherwise-getting-failed
+#		set_tests_properties(
+#			${file_without_ext}
+#			PROPERTIES
+#			CTEST_OUTPUT_ON_FAILURE 1
+#		)
+#		#https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html#environment-variables-for-ctest
+#		set_tests_properties(
+#			${file_without_ext}
+#			PROPERTIES ENVIRONMENT CTEST_OUTPUT_ON_FAILURE CTEST_PARALLEL_LEVEL=32 CTEST_TEST_LOAD=2
+#		)
 	#add_custom_target(run_toto COMMAND echo bla bla bla)
 	#add_test(NAME test_toto COMMAND ${CMAKE_COMMAND} --build . --target run_toto)
 

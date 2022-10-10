@@ -404,6 +404,10 @@ bool CallableBase::openlib(std::string newlibraryname) {
 			auto purelibraryfilename = libraryfilename_.substr(pos0 + 1);
 			//TRACE(purelibraryfilename)
 			plibrary_ = (void*)dlopen(purelibraryfilename.c_str(), RTLD_NOW);
+
+//			// Try on the same path as the executable
+//			if (plibrary_ == nullptr) {
+//			}
 		}
 	}
 

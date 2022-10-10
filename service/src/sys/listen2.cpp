@@ -107,7 +107,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 			if (tt.locate(password.ucase(), usern)) {
 				//only if email address occurs more than once
 				tt(1, usern) = "";
-				tt.converter("; ", VM);
+				tt.converter("; ", _VM);
 				if (not(tt.locate(password.ucase(), xx))) {
 					username = SECURITY.f(1, usern);
 				}
@@ -267,7 +267,7 @@ passfail:
 				//default users valid ipnos if not defined (or cached)
 				if (not validips) {
 
-					var nn = SECURITY.f(6).count(VM) + 1;
+					var nn = SECURITY.f(6).fcount(_VM);
 
 					//get ipnos of group user
 					for (ii = usern + 1; ii <= nn; ++ii) {
@@ -317,7 +317,7 @@ passfail:
 					}
 
 					//gosub convvalidips
-					validips.converter(",;/ " ^ FM, "     ");
+					validips.converter(",;/ " _FM, "     ");
 					validips.replacer(".*", "");
 					validips.trimmer();
 
@@ -545,7 +545,7 @@ passwordexpired:
 								var isnewipnet = 1;
 								var ipno12 = ipno.field(".", 1, 2);
 								var uipnos = userx.f(16);
-								var nn = uipnos.count(VM);
+								var nn = uipnos.count(_VM);
 								for (ii = 1; ii <= nn; ++ii) {
 									if (ulogins.f(1, ii) eq "OK" and uipnos.f(1, ii).field(".", 1, 2) eq ipno12) {
 										isnewipnet = 0;
@@ -568,7 +568,7 @@ passwordexpired:
 										body ^= " recording a successful login from the ip number " ^ ipno;
 										body(-1) = "by " ^ userx.f(1) ^ " (" ^ username ^ ")";
 										//not in the last 100 login ips
-										body(-1) = FM ^ "You will not be notified of any further successful logins by " ^ username ^ " from this ip number for a while.";
+										body(-1) = _FM "You will not be notified of any further successful logins by " ^ username ^ " from this ip number for a while.";
 
 										if (whoistx) {
 											gosub addwhoistx();
@@ -588,7 +588,7 @@ passwordexpired:
 
 							body = "Welcome to EXODUS!";
 							//in security.subs and listen2
-							body(1, -1) = VM ^ "Browser configuration *REQUIRED*";
+							body(1, -1) = _VM "Browser configuration *REQUIRED*";
 							body(1, -1) = "http://userwiki.neosys.com/index.php/gettingstarted";
 
 							//add whoistx for non-lan ipnos
@@ -630,7 +630,7 @@ passwordexpired:
 			//from GBP, $HOSTS.ALLOW at process startup
 			if (validips.read(DEFINITIONS, "IPNOS*" ^ username)) {
 				//should be removed after medialine is upgraded
-				validips.converter(SM, " ");
+				validips.converter(_SM, " ");
 			} else {
 				validips = "127 192.168 10 172";
 			}
@@ -655,6 +655,7 @@ validateexit2:
 			if (passwordreset) {
 				//"Password Reset Failed" is hardcoded in index.htm
 
+				// Using \r\n for email text format *not* Windows
 				text = "Password&nbsp;Reset Failed:" "\r\n";
 				text ^= "\r\n" ^ password ^ " and " ^ username ^ " are unrecognised or expired";
 				text ^= "\r\n" " Database: " ^ SYSTEM.f(17);
@@ -773,10 +774,10 @@ validateexit2:
 
 				//trim long user records
 				if (RECORD.len() gt 5000) {
-					var nitems = RECORD.f(15).count(VM) + 1;
-					RECORD(15) = RECORD.f(15).field(VM, 1, nitems - 5);
-					RECORD(16) = RECORD.f(16).field(VM, 1, nitems - 5);
-					RECORD(18) = RECORD.f(18).field(VM, 1, nitems - 5);
+					var nitems = RECORD.f(15).fcount(_VM);
+					RECORD(15) = RECORD.f(15).field(_VM, 1, nitems - 5);
+					RECORD(16) = RECORD.f(16).field(_VM, 1, nitems - 5);
+					RECORD(18) = RECORD.f(18).field(_VM, 1, nitems - 5);
 				}
 
 				//update without locking if not resetting password ?!
@@ -801,12 +802,12 @@ validateexit2:
 					var subject = "EXODUS Password Reset";
 					body = "";
 					body(-1) = "Hi! Your new password is " ^ newpassword;
-					body(-1) = FM ^ "* Your usercode is " ^ ID;
-					body(-1) = FM ^ "This is for";
+					body(-1) = _FM "* Your usercode is " ^ ID;
+					body(-1) = _FM "This is for";
 					body(-1) = "Database: " ^ SYSTEM.f(23) ^ " (" ^ SYSTEM.f(17) ^ ")";
 					body(-1) = "System: " ^ SYSTEM.f(44);
 
-					body.replacer(FM, "\r\n");
+					body.replacer(_FM, "\r\n");
 					call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
 					//"Password Reset" is hardcoded in index.htm
@@ -840,7 +841,7 @@ validateexit2:
 				}
 
 				var fromipno = connection.f(1, 2);
-				msg_ = "User: " ^ username ^ FM ^ "From IP: " ^ fromipno;
+				msg_ = "User: " ^ username ^ _FM "From IP: " ^ fromipno;
 
 				var cmd = "SELECT USERS BY-DSND LAST_LOGIN_DATETIME WITH LAST_LOGIN_LOCATION " ^ (fromipno.quote()) ^ " AND WITH @ID NOT STARTING \"%\"";
 				call safeselect(cmd ^ " (S)");
@@ -981,9 +982,9 @@ validateexit2:
 			userrec.inserter(18, 1, "OK");
 
 			//only keep the last 100 logins
-			userrec(15) = userrec.f(15).field(VM, 1, 100);
-			userrec(16) = userrec.f(16).field(VM, 1, 100);
-			userrec(18) = userrec.f(18).field(VM, 1, 100);
+			userrec(15) = userrec.f(15).field(_VM, 1, 100);
+			userrec(16) = userrec.f(16).field(_VM, 1, 100);
+			userrec(18) = userrec.f(18).field(_VM, 1, 100);
 
 			if (authcompcodes) {
 				userrec(33) = authcompcodes;
@@ -1029,8 +1030,8 @@ validateexit2:
 
 		//detach the calling process
 		response_ = request2;
-		response_.converter(VM ^ "|", FM ^ FM);
-		response_.replacer(FM, "\r\n");
+		response_.converter(_VM "|", _FM _FM);
+		response_.replacer(_FM, _EOL);
 
 		call oswrite(response_, responsefilename);
 		//osclose responsefilename
@@ -1145,9 +1146,9 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 subroutine addwhoistx() {
 	if (whoistx) {
-		body(-1) = FM ^ "\"whois\" ip number " ^ ipno ^ " information:";
-		body(-1) = FM ^ whoistx;
-		body(-1) = FM ^ "end of " "\"whois\" ip number " ^ ipno ^ " information:";
+		body(-1) = _FM "\"whois\" ip number " ^ ipno ^ " information:";
+		body(-1) = _FM ^ whoistx;
+		body(-1) = _FM "end of " "\"whois\" ip number " ^ ipno ^ " information:";
 	}
 	return;
 }

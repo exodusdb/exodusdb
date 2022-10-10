@@ -121,18 +121,18 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//call msg(toaddress:' ':@fm:errormsg)
 		//if errormsg then call msg(toaddress:' ':@fm:errormsg)
 		if (errormsg) {
-			errormsg = (toaddress ^ " " ^ FM ^ errormsg).oconv("T#60");
-			errormsg.converter(TM, FM);
+			errormsg = (toaddress ^ " " _FM ^ errormsg).oconv("T#60");
+			errormsg.converter(_TM, _FM);
 			call mssg(errormsg);
 		} else {
 			var msg = "STEP 1 OK. Mail for " ^ toaddress ^ " accepted by mail server.";
-			params.converter("\r\n", FM);
-			msg(-1) = FM ^ "Sent using:" ^ FM ^ params;
+			params.converter("\r\n", _FM _FM).trimmer(_FM);
+			msg(-1) = _FM "Sent using:" _FM ^ params;
 			msg(-1) = "STEP 2. Now check if actually received by recipient to verify";
 			msg(-1) = " that the mail server can actually deliver email to " ^ toaddress;
-			msg(-1) = " and that " ^ toaddress ^ " can receive email from the server" ^ FM;
+			msg(-1) = " and that " ^ toaddress ^ " can receive email from the server" _FM;
 			msg = msg.oconv("T#75");
-			msg.converter(TM, FM);
+			msg.converter(_TM, _FM);
 			call note(msg);
 		}
 		stop();
@@ -218,13 +218,12 @@ forcedemail:
 	}
 
 	var filenamesx = "smtp.cfg" ^ VM ^ "../../smtp.cfg";
-	filenamesx.converter("/", OSSLASH);
+	filenamesx.converter("/", _OSSLASH);
 	for (const var filen : range(1, 2)) {
 		call osread(params2, filenamesx.f(1, filen));
 		//cut off after end of file character
 		//params2=field(params2,char(26),1)
-		params2.replacer("\r\n", "\r");
-		params2.converter("\r\n", _FM _FM);
+		params2.converter("\r\n", _FM _FM).trimmer(_FM);
 		for (const var ii : range(1, 9)) {
 			if (params2.f(ii)) {
 				params1(ii) = params2.f(ii);
@@ -299,10 +298,10 @@ forcedemail:
 		attachfilename.replacer("\\\\", "\\");
 		var cwd = oscwd();
 		if (not(VOLUMES)) {
-			cwd ^= OSSLASH;
+			cwd ^= _OSSLASH;
 		}
 		if (attachfilename.starts("..")) {
-			attachfilename.paster(1, 2, cwd.field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
+			attachfilename.paster(1, 2, cwd.field(_OSSLASH, 1, oscwd().count(_OSSLASH) - 1));
 		} else if (attachfilename.starts(".")) {
 			attachfilename.paster(1, 1, cwd);
 		}
@@ -311,10 +310,11 @@ forcedemail:
 		attachfilename.replacer("\\", "\\\\");
 	}
 
-	//body=body0
-	body.replacer(FM, "\r\n");
+	////////////
+	// IMPORTANT use \r\n to be compatible with EMAIL TEXT FORMAT
+	////////////
+	body.replacer(_FM, "\r\n");
 
-	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
 	if (body and not body.starts("@")) {
 		bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
 		//solve stupid outlook joining lines together if > 40 chars
@@ -355,24 +355,9 @@ forcedemail:
 	if (deletex) {
 		params(-1) = "deleteaftersend=" ^ (deletex.quote());
 	}
-	params ^= FM;
+	params ^= _FM;
 
-	//DOS uses EXODUS sendmail.js script which uses windows CDO object
-	if (VOLUMES) {
-
-		params.replacer(FM, "\r\n");
-		paramfilename = var(999999999).rnd().first(7) ^ ".tmp";
-		call oswrite(params, paramfilename);
-
-		errorfilename = var(999999999).rnd().first(7) ^ ".tmp";
-
-		//cmd='START /w'
-		//using CSCRIPT because of difficulty reading errorfilename contents
-		cmd = "cscript //Nologo";
-		cmd ^= " sendmail.js /e " ^ errorfilename ^ " /p " ^ paramfilename;
-
-	//otherwise use standard linux/posix mail program
-	} else {
+	{
 
 		cmd = "mail";
 
@@ -380,21 +365,21 @@ forcedemail:
 		errorfilename = "";
 
 		//subject
-		cmd ^= VM ^ "-s " ^ (subject.quote());
+		cmd ^= _VM "-s " ^ (subject.quote());
 
 		//from
 		var fromaddress = params1.f(1);
-		cmd ^= VM ^ "-r " ^ (fromaddress.quote());
+		cmd ^= _VM "-r " ^ (fromaddress.quote());
 
 		//optional cc address
 		if (ccaddress) {
 			//cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote()); 
-			cmd ^= VM ^ "-aCC: " ^ (ccaddress.convert(";", ",").quote());
+			cmd ^= _VM "-aCC: " ^ (ccaddress.convert(";", ",").quote());
 		}
 
 		//optional attach file
 		if (attachfilename) {
-			cmd ^= VM ^ "-A " ^ (attachfilename.quote());
+			cmd ^= _VM "-A " ^ (attachfilename.quote());
 		}
 
 		//mark html formatted messages as such
@@ -410,23 +395,23 @@ forcedemail:
 		}
 		tt.ucaser();
 		if ((not(attachfilename) and tt.contains("<!DOCTYPE")) or tt.contains("<HTML")) {
-			cmd ^= VM ^ "-a \"Content-Type: text/html\"";
-			cmd ^= VM ^ "-a \"MIME-Version: 1.0\"";
+			cmd ^= _VM "-a \"Content-Type: text/html\"";
+			cmd ^= _VM "-a \"MIME-Version: 1.0\"";
 		}
 
 		//if there is a specific reply email address then give it
 		if (replyto) {
-			cmd ^= VM ^ "-a \"Reply-To: " ^ replyto ^ DQ;
+			cmd ^= _VM "-a \"Reply-To: " ^ replyto ^ DQ;
 
 		//otherwise request suppression of replies, particularly automatic ones
 		} else {
-			cmd ^= VM ^ "-a \"X-Auto-Response-Suppress: RN, NRN, OOF\"";
+			cmd ^= _VM "-a \"X-Auto-Response-Suppress: RN, NRN, OOF\"";
 			//maybe Precedence: list would have better results
-			cmd ^= VM ^ "-a \"Precedence: bulk\"";
+			cmd ^= _VM "-a \"Precedence: bulk\"";
 		}
 
 		//to address(es) go last
-		cmd ^= VM ^ " " ^ toaddress.convert(";", " ");
+		cmd ^= _VM " " ^ toaddress.convert(";", " ");
 
 		//ensure the email body is in a file
 		if (bodyfilename eq "") {
@@ -448,37 +433,37 @@ forcedemail:
 		//because strangely ubuntu mail doesnt support the -A option
 		if (attachfilename) {
 			var headers = "";
-			let nn = cmd.count(VM) + 1;
+			let nn = cmd.fcount(_VM);
 			for (const var ii : range(2, nn)) {
 				var line = cmd.f(1, ii);
 				var opt = line.field(" ", 1);
 				var arg = line.field(" ", 2, 9999);
-				if (arg.starts(DQ)) {
+				if (arg.starts(_DQ)) {
 					arg.cutter(1);
 					arg.popper();
 				}
 
 				if (opt eq "-r") {
-					headers ^= VM ^ "From: " ^ arg;
-					headers ^= VM ^ "To: " ^ toaddress;
+					headers ^= _VM "From: " ^ arg;
+					headers ^= _VM "To: " ^ toaddress;
 
 				} else if (opt eq "-s") {
-					headers ^= VM ^ "Subject: " ^ arg;
+					headers ^= _VM "Subject: " ^ arg;
 
 				} else if (opt eq "-c") {
-					headers ^= VM ^ "cc: " ^ arg;
+					headers ^= _VM "cc: " ^ arg;
 
 				} else if (opt eq "-a") {
-					headers ^= VM ^ arg;
+					headers ^= _VM ^ arg;
 
 				//case opt='-A'
 				}
 			} //ii;
 
 			headers.cutter(1);
-			headers ^= VM;
+			headers ^= _VM;
 			headers.converter("'", "");
-			headers.replacer(VM, "\r\n");
+			headers.replacer(_VM, "\r\n");
 
 			//cmd = "neomail " ^ (toaddress.quote()) ^ " " ^ (attachfilename.quote()) ^ " " "'" ^ headers ^ "'";
 
@@ -491,7 +476,7 @@ forcedemail:
 			var mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n","");
 			//TRACE(mimetype)
 
-			var attachfilename_only = attachfilename.field2(OSSLASH, -1);
+			var attachfilename_only = attachfilename.field2(_OSSLASH, -1);
 			var mimetext =
                 "MIME-Version: 1.0\r\n"
                 "Content-Type: multipart/mixed;\r\n"
@@ -547,11 +532,11 @@ TRACE(offset)
 		}
 
 		//TRACE(cmd)
-		cmd.converter(VM, " ");
+		cmd.converter(_VM, " ");
 
 		//and pipe the body file into the program as standard input
 		tt = "\\";
-		bodyfilename.converter(tt, OSSLASH);
+		bodyfilename.converter(tt, _OSSLASH);
 		bodyfilename.replacer("$", "\\$");
 		cmd ^= " < " ^ (bodyfilename.quote());
 
@@ -600,7 +585,7 @@ TRACE(offset)
 			}
 		}
 	}
-	errormsg.converter(TM, FM);
+	errormsg.converter(_TM, _FM);
 
 	if (errorfilename) {
 		errorfilename.osremove();
@@ -619,15 +604,15 @@ TRACE(offset)
 		errormsg.remover(1);
 		call log("SENDMAIL", details);
 	} else {
-		errormsg.trimmerlast(FM);
+		errormsg.trimmerlast(_FM);
 		//errormsg<-1>=@fm:'Size:     ':msgsize '[XBYTES]'
 		//errormsg<-1>='From:     ':params1<1>
 		//errormsg<-1>='To:       ':toaddress
 		//if ccaddress then
 		// errormsg<-1>='cc:       ':ccaddress
 		// end
-		errormsg(-1) = FM ^ details;
-		errormsg(-1) = FM ^ "Server:   " ^ params1.f(2);
+		errormsg(-1) = _FM ^ details;
+		errormsg(-1) = _FM "Server:   " ^ params1.f(2);
 		errormsg(-1) = "Port:     " ^ params1.f(3);
 		errormsg(-1) = "UseSSL:   " ^ params1.f(5);
 		errormsg(-1) = "AuthType: " ^ params1.f(6);
@@ -659,17 +644,17 @@ subroutine addlinks2osfilename() {
         tt.cutter(tt.index("../")+2);
     }
     if (body) {
-        body ^= FM;
+        body ^= _FM;
     }
 	if (body) {
-		body ^= FM;
+		body ^= _FM;
 	}
 	body(-1) = "Your report is too large to email. (" ^ oconv(osfilesize, "[XBYTES]") ^ ", max " ^ oconv(maxemailsize, "[XBYTES]") ^ ")";
 	body(-1) = "but you can download it by clicking the following link.";
-	body(-1) = FM ^ "*Link is only available for ONE HOUR from creation*";
-	let nlinks = SYSTEM.f(114).count(VM) + 1;
+	body(-1) = _FM "*Link is only available for ONE HOUR from creation*";
+	let nlinks = SYSTEM.f(114).fcount(_VM);
 	for (const var linkn : range(1, nlinks)) {
-		body ^= FM;
+		body ^= _FM;
 		var linkdesc = SYSTEM.f(115, linkn);
 		if (linkdesc) {
 			body(-1) = linkdesc;

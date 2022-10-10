@@ -68,7 +68,7 @@ function main(in mode, in ipno, out text) {
 	//allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
 	call readhostsallow(allowedips);
 	allowedips(-1) = SYSTEM.f(39);
-	allowedips.converter(FM ^ VM ^ "," "\r\n", var(100).space());
+	allowedips.converter(_FM _VM "," "\r\n", var(100).space());
 	if (allowedips.locateusing(" ", ipno, xx)) {
 returnzero:
 		text = "0";
@@ -82,10 +82,6 @@ returnzero:
 
 		//check cygwin whois present otherwise quit
 		exe = oscwd().contains(":") ? ".exe" : "";
-		if (VOLUMES and (not((cmd ^ "whois" ^ exe).osfile()))) {
-			text = "whois command is not installed";
-			return 0;
-		}
 
 		//build the command
 		cmd ^= "whois " ^ ipno;
@@ -102,8 +98,7 @@ returnzero:
 			text ^= errors;
 		}
 
-		text.replacer("\r\n", FM);
-		text.replacer("\n", FM);
+		text.converter("\r\n", _FM _FM).trimmer(_FM);
 	}
 
 	return 0;

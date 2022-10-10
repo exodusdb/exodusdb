@@ -27,7 +27,7 @@ function main() {
 
 	printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");
 	printl("http://www.opensource.org/licenses/mit-license.php");
-	printl("Using Library Version: ", var().version(), " ", PLATFORM_);
+	printl("Using Library Version: ", var().version(), " ", _PLATFORM);
 
 	var verbose = OPTIONS.contains("V");
 

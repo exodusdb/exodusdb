@@ -77,7 +77,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	//stage 2 "2stage"
 	//////////////////
 
-	CURSOR.convert(ALL_FMS, VISIBLE_FMS).logputl("2 Stage Select:");
+	CURSOR.convert(_ALL_FMS, _VISIBLE_FMS).logputl("2 Stage Select:");
 	sortselectclause.logputl();
 
 	//secondary sort/select on fields that could not be calculated by the database
@@ -1115,7 +1115,11 @@ var ExodusProgramBase::perform(CVR sentence) {
 	var savemv;
 	var savedict;
 
-	SENTENCE.move(savesentence);
+	//SENTENCE.move(savesentence);
+	// Take a copy since they might be the same variable
+	// if called like 'perform(SENTENCE)'
+	savesentence = SENTENCE;
+
 	COMMAND.move(savecommand);
 	OPTIONS.move(saveoptions);
 	RECUR0.move(saverecur0);
@@ -1151,20 +1155,16 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 	SENTENCE = sentence;
 	while (SENTENCE) {
+		COMMAND = SENTENCE.parse(' ');
 
-		// set new perform environment
-		COMMAND = SENTENCE;
-		OPTIONS = "";
-		// OPTIONS are in either (XXX) or {XXX} at the end of the command.
-		// and do not contain spaces
-
+		// Cut off OPTIONS from end of COMMAND if present
 		// *** SIMILAR code in
 		// 1. exofuncs.cpp exodus_main()
 		// 2. exoprog.cpp  perform()
-		// TODO COMMAND should be parsed spaces into FM but spaces inside single or double quotes must be ignored
-		OPTIONS = COMMAND.field2(" ", -1);
+		// OPTIONS are in either (AbC) or {AbC} in the last field of COMMAND
+		OPTIONS = COMMAND.field2(FM, -1);
 		if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
-			// Remove last field of COMMAND. TODO fpopper command?
+			// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
 			COMMAND.cutter(-OPTIONS.len() - 1);
 			// Remove first { or ( and last ) } chars of OPTIONS
 			OPTIONS.cutter(1).popper();
@@ -1550,7 +1550,7 @@ var ExodusProgramBase::decide(CVR questionx, CVR optionsx, VARREF reply, const i
 
 	// question can be multiline
 	var question = questionx;
-	question.converter(ST ^ TM ^ SM ^ VM ^ "|" ^ FM, "\n\n\n\n\n\n");
+	question.converter(_ALL_FMS "|", "\n\n\n\n\n\n\n");
 
 	var interactive = !SYSTEM.f(33);
 	if (interactive)
@@ -2045,7 +2045,7 @@ var ExodusProgramBase::AT(const int columnno) const {
 	if (columnno == -4)
 		return "\x1B[0K";
 
-	// clear line and move cursor to columnno 0
+	// move cursor to columnno 0 and clear to end of line
 	if (columnno == -40)
 		return "\r\x1B[K";
 

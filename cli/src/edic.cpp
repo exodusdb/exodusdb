@@ -196,8 +196,8 @@ function main() {
 				blankfile ^= "\n";
 
 			//convert to DOS format on Windows
-			if (OSSLASH eq "\\")
-				blankfile.replacer("\n", "\r\n");
+			if (OSSLASH_IS_BACKSLASH)
+				blankfile.replacer("\n", _EOL);
 
 			if (not oswrite(blankfile, filename))
 				abort("Cannot create " ^ filename ^ ". Invalid file name, or no rights here.");
@@ -360,9 +360,8 @@ subroutine geteditor(out editor, out linenopattern) {
 	if (editor.lcase().contains("cedt") and not editor.contains("$"))
 		editor ^= " /L:$LINENO $FILENAME";
 
-	//if (OSSLASH eq "\\" and not index(PLATFORM_,"x64")) {
 	var nanopath = "";
-	if (OSSLASH eq "\\") {
+	if (OSSLASH_IS_BACKSLASH) {
 
 		//look for nano.exe next to edic.exe
 		if (not editor)
@@ -380,7 +379,7 @@ subroutine geteditor(out editor, out linenopattern) {
 
 	//look for nano in release directory during exodus development
 	//if (not editor) {
-	if (not editor and OSSLASH eq "\\") {
+	if (not editor and OSSLASH_IS_BACKSLASH) {
 		nanopath = "..\\..\\release\\cygwin\\bin\\nano.exe";
 		if (nanopath.osfile())
 			editor = "..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
@@ -451,8 +450,6 @@ subroutine geteditor(out editor, out linenopattern) {
 			var nanorctemplatefilename = nanopath.field(OSSLASH, 1, fcount(nanopath, OSSLASH) - 1) ^ OSSLASH ^ "nanorc";
 			if (not osfile(nanorctemplatefilename))
 				nanorctemplatefilename.replacer("release", "..\\release");
-			//if (not osfile(nanorctemplatefilename))
-			//	nanorctemplatefilename.replacer("release","..\\"^PLATFORM_^"\\release");
 			if (oscopy(nanorctemplatefilename, nanorcfilename)) {
 				printl("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
 				var().input("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");

@@ -582,7 +582,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	var english_usuk_locale;
 	var greek_gr_locale;
 	var turkish_tr_locale;
-	if (SLASH_IS_BACKSLASH) {
+	if (OSSLASH_IS_BACKSLASH) {
 		english_usuk	= 1033;
 		german_standard = 1031;
 		greek_gr		= 1032;
@@ -650,7 +650,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//NB a codepage is a 256 x one byte map of characters selected from all unicode characters depending on locale
 
 	//test windows codepages
-	if (SLASH_IS_BACKSLASH) {
+	if (OSSLASH_IS_BACKSLASH) {
 		//show where we are working
 		TRACE(oscwd());
 		var greektestfilename = "t_greeksas.txt";
@@ -717,7 +717,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(record5.oconv("HEX2") eq "00003738");
 	assert(osremove(tempfilename5));
 
-	if (SLASH_IS_BACKSLASH) {
+	if (OSSLASH_IS_BACKSLASH) {
 		//check cannot write non-codepage characters
 		assert(oswrite("", tempfilename5));
 		var offset = 2;
@@ -768,7 +768,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//replace(unicode,"\\p{L}","?","ri").outputl();
 	//replace(unicode,"\\p{L}","?","ri").oconv("HEX4").outputl();
 	//p(L} is regular expression for Unicode Letter
-	if (SLASH_IS_BACKSLASH)
+	if (OSSLASH_IS_BACKSLASH)
 		assert(regex_replace(unicode, "\\pL", "?", "ri") eq expect);
 	//but what is its inverse?
 	//assert(replace(unicode,"\\PL","?","ri") eq expect);

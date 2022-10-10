@@ -141,11 +141,11 @@ function main() {
 
 	if (html) {
 		var tr = "<TR valign=top>";
-		var trx = "</TR>" "\r\n";
+		var trx = "</TR>" _EOL;
 		var th = "<TH>";
-		var thx = "</TH>" "\r\n";
+		var thx = "</TH>" _EOL;
 		var td = "<TD>";
-		var tdx = "</TD>" "\r\n";
+		var tdx = "</TD>" _EOL;
 		var nbsp = "&nbsp;";
 
 		tx = "<H1 align=center>EXODUS USAGE STATISTICS</H1>";
@@ -248,7 +248,7 @@ function main() {
 				gosub printtx();
 			}
 		} //rown;
-		tx ^= "</table>" "\r\n";
+		tx ^= "</table>" _EOL;
 
 		gosub printtx();
 
@@ -258,7 +258,7 @@ function main() {
 		var sys2 = SYSTEM.f(2);
 		sys2.paster(-3, 3, "xls");
 		SYSTEM(2) = sys2;
-		output.replacer(FM, "\r\n");
+		output.replacer(FM, _EOL);
 		output.replacer(VM, "\t");
 		call oswrite(output, SYSTEM.f(2));
 

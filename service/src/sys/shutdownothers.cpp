@@ -14,7 +14,7 @@ function main(in mode, in datasetcode, out result) {
 		{}
 	}
 
-	call oswrite("\r\n" "BACKUP", shutdownfilename);
+	call oswrite(_EOL "BACKUP", shutdownfilename);
 
 	//wait for 120 secs for other database users to quit
 	//randomise randomising doesnt make any difference

@@ -51,6 +51,8 @@ programinit()
 	assert(write("14000", FILE, "4"));
 
 	printl("Check via dictionary giving a specific RECORD");
+	//DICT.cleardbcache();
+	TRACE("cleardbcache();")
 	assert(calculate("BIRTHDAY", "dict.xo_users", "1", "99000", 0).outputl() eq 99000);
 
 	printl("Same check using global");

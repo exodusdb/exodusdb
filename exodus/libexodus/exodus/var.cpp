@@ -84,7 +84,7 @@ void var::throwNumUnderflow(CVR message) const {
 CVR var::dump(SV text) const {
 //	std::clog << "DUMP: " << text << " ";
 //	if (var_typ & VARTYP_STR)
-//		std::clog << "str: " _DQ << var(var_str).convert(_RM _FM _VM _SM _TM _ST, VISIBLE_FMS) << _DQ " ";
+//		std::clog << "str: " _DQ << var(var_str).convert(_ALL_FMS, _VISIBLE_FMS) << _DQ " ";
 //	if (var_typ & VARTYP_INT)
 //		std::clog << "int:" << var_int << " ";
 //	if (var_typ & VARTYP_DBL)
@@ -98,7 +98,7 @@ VARREF var::dump(SV text) {
 	std::clog << "DUMP: " << text << " ";
 	if (var_typ & VARTYP_STR)
 		//std::clog << "str: \"" << var_str << "\" ";
-		std::clog << "str: " _DQ << var(var_str).convert(_RM _FM _VM _SM _TM _ST, VISIBLE_FMS) << _DQ " ";
+		std::clog << "str: " _DQ << var(var_str).convert(_ALL_FMS, _VISIBLE_FMS) << _DQ " ";
 	if (var_typ & VARTYP_INT)
 		std::clog << "int:" << var(var_int) << " ";
 	if (var_typ & VARTYP_DBL)

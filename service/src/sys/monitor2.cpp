@@ -750,8 +750,8 @@ nextdbasen:;
 	//list ipnos
 	if (VOLUMES) {
 		result = shell2("ipconfig /all", errors).ucase();
-		result.converter("\r\n", FM);
-		nn = result.count(FM) + 1;
+		result.converter("\r\n", _FM _FM).trimmer();
+		nn = result.fcount(FM);
 		ips = "";
 		for (ii = 1; ii <= nn; ++ii) {
 			line = result.f(ii).trim();

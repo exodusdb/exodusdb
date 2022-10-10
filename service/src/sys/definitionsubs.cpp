@@ -127,8 +127,8 @@ function main(in mode) {
 
 			}
 
-			RECORD = RECORD.fieldstore(FM, 71, 29, backuprec.field(FM, 1, 29));
-			RECORD = RECORD.fieldstore(FM, 101, 9, smtprec.field(FM, 1, 9));
+			RECORD = RECORD.fieldstore(_FM, 71, 29, backuprec.field(_FM, 1, 29));
+			RECORD = RECORD.fieldstore(_FM, 101, 9, smtprec.field(_FM, 1, 9));
 
 			return 0;
 
@@ -212,7 +212,7 @@ nochequeformat:
 			var filename = ID.field("*", 2);
 			var fieldname = ID.field("*", 3);
 			call collectixvals(filename, fieldname);
-			let nn = PSEUDO.count(FM) + 1;
+			let nn = PSEUDO.fcount(_FM);
 			for (const var ii : range(1, nn)) {
 				var val = PSEUDO.f(ii);
 				if (val) {
@@ -365,7 +365,7 @@ preventupdate:
 					if (usercode ne win.orec.f(fn)) {
 						//updater must themselves be authorised to post journals
 						if (not(authorised("JOURNAL POST", msg))) {
-							msg = "You are not authorised to change financial usercode" ^ FM ^ FM ^ msg;
+							msg = "You are not authorised to change financial usercode" _FM _FM ^ msg;
 							return invalid(msg);
 						}
 						//financial usercode must be authorised to post journals
@@ -377,9 +377,9 @@ preventupdate:
 				}
 			} //fn;
 
-			var t49 = field2(RECORD.f(49), VM, -1);
-			var t149 = field2(RECORD.f(149), VM, -1);
-			var t150 = field2(RECORD.f(150), VM, -1);
+			var t49 = field2(RECORD.f(49), _VM, -1);
+			var t149 = field2(RECORD.f(149), _VM, -1);
+			var t150 = field2(RECORD.f(150), _VM, -1);
 			if (t49 and t49 eq t149) {
 				msg = "Media adjustment no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);
@@ -428,15 +428,15 @@ preventupdate:
 
 			var backupkey = ID;
 			backupkey.replacer("SYSTEM", "BACKUP");
-			backuprec = RECORD.field(FM, 71, 29);
+			backuprec = RECORD.field(_FM, 71, 29);
 
 			var smtpkey = ID;
 			smtpkey.replacer("SYSTEM", "SMTP");
-			smtprec = RECORD.field(FM, 101, 9);
+			smtprec = RECORD.field(_FM, 101, 9);
 
 			//ensure default style is null
 			tt = RECORD.f(46);
-			tt.converter(VM, "");
+			tt.converter(_VM, "");
 			tt.replacer("Default", "");
 			if (tt eq "") {
 				RECORD(46) = "";
@@ -639,9 +639,9 @@ subroutine reorderdbs() {
 
 	//convert from DOS
 	//dbdir=field(dbdir,char(26),1)
-	dbdir.converter("\r\n", FM ^ FM);
-	dbdir.replacer(FM ^ FM, FM);
-	dbdir.converter(",*", SM ^ VM);
+	dbdir.converter("\r\n", _FM _FM);
+	dbdir.replacer(_FM _FM, _FM);
+	dbdir.converter(",*", _SM _VM);
 
 	//extract substitution and dblist from dbdir line 1
 	var substitution = dbdir.f(1).field(" ", 1);
@@ -649,7 +649,7 @@ subroutine reorderdbs() {
 
 	//create newdblist in order of given newdbcodes
 	//if not found in new order then append in order found
-	let ndbs = dblist.count(VM) + 1;
+	let ndbs = dblist.fcount(_VM);
 	var newdblist = "";
 	for (const var dbn : range(1, ndbs)) {
 		var db = dblist.f(1, dbn);
@@ -665,11 +665,11 @@ subroutine reorderdbs() {
 	newdbdir(1) = substitution ^ " " ^ newdblist;
 
 	//convert to DOS
-	if (not newdbdir.ends(FM)) {
-		newdbdir ^= FM;
+	if (not newdbdir.ends(_FM)) {
+		newdbdir ^= _FM;
 	}
-	newdbdir.converter(SM ^ VM, ",*");
-	newdbdir.replacer(FM, "\r\n");
+	newdbdir.converter(_SM _VM, ",*");
+	newdbdir.replacer(_FM, _EOL);
 
 	if (newdbdir ne olddbdir) {
 		call oswrite(newdbdir, dbdirfilename);

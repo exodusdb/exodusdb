@@ -318,11 +318,13 @@ subroutine getversiondates() {
 	//extract installed version dates from upgrade.cfg
 	call osread(versionlog, "upgrade.cfg");
 	//versionlog=trim(field(versionlog,\1A\,1))
-	versionlog.converter("\r\n", FM);
+	versionlog.converter("\r\n", _FM _FM);
 	let nn = versionlog.fcount(FM);
 	var versiondata = "";
 	for (const var ii : range(1, nn)) {
 		idate = versionlog.f(ii, 1).field(" ", 2, 3).iconv("D");
+		if (not idate)
+			continue;
 		//itime=iconv(field(versionlog,' ',1),'MT')
 		if (not(versiondata.locateusing(FM, idate, xx))) {
 			versiondata(-1) = idate;

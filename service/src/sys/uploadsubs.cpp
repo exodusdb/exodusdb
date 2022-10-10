@@ -93,11 +93,11 @@ postuploadfail:
 				msg = (dictid ^ "_ARCHIVED").quote() ^ " is missing from " ^ dictfilename ^ " in upload.subs";
 				goto postuploadfail;
 			}
-			fns ^= fn ^ FM;
+			fns ^= fn ^ _FM;
 		} //ii;
 		fns.popper();
 
-		var ii2 = rec.f(fns.f(1)).fcount(VM);
+		var ii2 = rec.f(fns.f(1)).fcount(_VM);
 		rec(fns.f(1), ii2) = targetfilename;
 		rec(fns.f(2), ii2) = newstatus;
 		rec(fns.f(3), ii2) = USERNAME;
@@ -288,14 +288,14 @@ postuploadfail:
 		//insert the missing virtual path
 		if (uploadfilenames) {
 
-			let nuploads = uploadfilenames.count(FM) + 1;
-			var ndeep = virtualfilebase.count(OSSLASH) + 1;
+			let nuploads = uploadfilenames.fcount(_FM);
+			var ndeep = virtualfilebase.fcount(OSSLASH);
 			for (const var uploadn : range(1, nuploads)) {
 				var uploadfilename = uploadfilenames.f(uploadn);
 				uploadfilename = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
 				uploadfilenames(uploadn) = uploadfilename;
 			} //uploadn;
-			uploadfilenames.converter(FM, VM);
+			uploadfilenames.converter(_FM, _VM);
 
 		}
 
@@ -466,7 +466,7 @@ nextline:
 				if (csv) {
 
 					gosub parseline(line);
-					line.converter(VM, FM);
+					line.converter(_VM, _FM);
 					cols = line;
 
 				} else {
@@ -489,14 +489,12 @@ nextline:
 						line.cutter(ptr);
 					}//loop;
 				}
-				//ncols = cols.count(FM) + 1;
-	//oswrite cols on 'cols'
 
 				goto nextline;
 
 			}
 
-			let ncols = cols.count(FM) + 1;
+			let ncols = cols.fcount(_FM);
 			//first record, open files and create dictionary
 			if (file eq "") {
 
@@ -521,7 +519,7 @@ nextline:
 
 				if (linenofn) {
 					grec ^= "LINE_NO ";
-					var dictrec = "F" ^ FM ^ linenofn ^ FM ^ "Line No." ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "R" ^ FM ^ "10";
+					var dictrec = "F" _FM ^ linenofn ^ _FM "Line No." ^ str(FM, 6) ^ "R" _FM ^ "10";
 					dictrec.write(dictfile, "LINE_NO");
 				}
 
@@ -555,14 +553,14 @@ nextline:
 					dictrec.write(dictfile, dictid);
 				} //coln;
 				grec.popper();
-				("G" ^ FM ^ FM ^ grec).write(dictfile, dictcolprefix);
-				("G" ^ FM ^ FM ^ grec).write(dictfile, "@CRT");
+				("G" _FM _FM ^ grec).write(dictfile, dictcolprefix);
+				("G" _FM _FM ^ grec).write(dictfile, "@CRT");
 
 				if (keyfunction) {
 					if (not keydictid) {
 						keydictid = dictcolprefix ^ "_TEMPKEY";
 					}
-					var tt = "S" ^ FM ^ FM ^ keydictid;
+					var tt = "S" _FM _FM ^ keydictid;
 					tt(8) = keyfunction;
 					tt(9) = "R";
 					tt(10) = 10;
@@ -744,7 +742,7 @@ subroutine parseline(io line) {
 		}
 	} //quoten;
 
-	line.converter(",", VM);
+	line.converter(",", _VM);
 
 	line.replacer(DQ, "");
 	line.replacer("&quote;", DQ);

@@ -50,9 +50,16 @@
 	#target_link_libraries(
 	#install(
 
+	# nlist -> bin/list
+	add_executable(nlist nlist.cpp)
+	# cmake - handling executable and library with same name
+	# https://gist.github.com/jlgerber/eafc4ee2b9954e27dd2bb009496b1b03
+	#set_target_properties(nlist PROPERTIES OUTPUT_NAME list)
+	set_target_properties(nlist PROPERTIES RUNTIME_OUTPUT_NAME list)
+
 	#largest first
 	add_executable(compile compile.cpp)
-	add_executable(list list.cpp)
+	add_executable(olist olist.cpp)
 	add_executable(dict2sql dict2sql.cpp)
 	add_executable(edic edic.cpp)
 	add_executable(configexodus configexodus.cpp)
@@ -89,6 +96,7 @@
 
 	# lib #
 	add_library(htmllib2 SHARED htmllib2.cpp)
+	add_library(list SHARED list.cpp)
 	add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
 	#add_library(number SHARED number.cpp)
 
@@ -100,7 +108,9 @@
 
 	# Largest first
 	target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
-	target_link_libraries(list exodus stdc++fs ${LIBS})
+
+	target_link_libraries(nlist exodus stdc++fs ${LIBS})
+	target_link_libraries(olist exodus stdc++fs ${LIBS})
 	target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
 	target_link_libraries(edic exodus stdc++fs ${LIBS})
 	target_link_libraries(configexodus exodus stdc++fs ${LIBS})
@@ -137,38 +147,44 @@
 # 3. INSTALL BINs
 # ###############
 #
-	install(TARGETS compile
-		createfile
-		createindex
+	install(
+		TARGETS
+			compile
+			createfile
+			createindex
 
-		dbcreate
-		dblist
-		dbgrep
-		dbcopy
-		dbcomp
-		dbdelete
-		dbattach
+			dbcreate
+			dblist
+			dbgrep
+			dbcopy
+			dbcomp
+			dbdelete
+			dbattach
 
-		delete
-		clearfile
-		copyfile
-		copyrec
-		deletefile
-		deleteindex
-		edir
-		edic
-		dict2sql
-		exodus-cli
-		list
-		listfiles
-		listdict
-		listindex
-		testsort
-		configexodus
-		sync_dat
-		convsyntax
-		redefine
-	 DESTINATION bin)
+			delete
+			clearfile
+			copyfile
+			copyrec
+			deletefile
+			deleteindex
+			edir
+			edic
+			dict2sql
+			exodus-cli
+			nlist
+			olist
+			listfiles
+			listdict
+			listindex
+			testsort
+			configexodus
+			sync_dat
+			convsyntax
+			redefine
+
+		DESTINATION
+			bin
+	)
 
 #
 # 4. INSTALL LIBs
@@ -178,8 +194,14 @@
 	#install(TARGETS dict_xo_clients DESTINATION lib)
 	#push it into /usr/lib where it can be found by dlopen
 	#install(TARGETS dict_xo_clients number DESTINATION /usr/lib)
-	install(TARGETS dict_xo_clients DESTINATION /usr/lib)
-	install(TARGETS htmllib2 DESTINATION /usr/lib)
+	install(
+		TARGETS
+			dict_xo_clients
+			htmllib2
+			list
+		DESTINATION
+			lib
+	)
 
 #
 # 5. INSTALL INCLUDES

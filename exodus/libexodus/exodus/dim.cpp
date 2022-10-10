@@ -434,7 +434,7 @@ bool dim::osread(CVR osfilename, const char* codepage) {\
 
 	std::string linesep = "\n";
 
-	// Detect \r\n
+	// Detect linesep \n or \r\n
 	auto first_nl = txt.var_str.find('\n');
 	if (first_nl != std::string::npos && first_nl > 0 && txt.var_str[first_nl - 1] == '\r')
 		linesep = "\r\n";

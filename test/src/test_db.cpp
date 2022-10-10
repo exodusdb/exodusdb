@@ -131,7 +131,8 @@ programinit()
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
 		//TRACE(xyz)
-		assert(xyz eq "xyz");
+		//assert(xyz eq "xyz");
+		assert(xyz.unassigned());
 
 		//read from cache ok
 		assert(xyz.reado(filename, k1));
@@ -144,7 +145,8 @@ programinit()
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
 		//TRACE(xyz)
-		assert(xyz eq "");
+		//assert(xyz eq "");
+		assert(xyz.unassigned());
 
 		//writing to real file also clears cache forcing a real reread
 		xyz = "abc";
@@ -287,11 +289,13 @@ programinit()
 	trec = "";
 	assert(read(trec, filename, decomp_a));
 
-	//check failure to read a record turns the record variable into unassigned and unusable
+	// Check failure to read a record turns the record variable into unassigned and unusable
+	// unlike pickos which leaves the variable untouched.
 	var rec = "abc";
 	assert(not rec.read("dict.voc", "LJLKJLKJLKJLKJLKJw"));
 	try {
 		printl(rec.quote());
+		assert(false);
 	} catch (VarError e) {
 		printl("OK failure to read a record makes the record variable unassigned. For programming safety");
 	}

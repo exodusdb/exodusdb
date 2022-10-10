@@ -119,8 +119,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not filename) break;
 			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
 				if (tt.osread(filename)) {
-					tt.replacer("\r\n", FM);
-					tt.converter("\r\n", FM ^ FM);
+					tt.replacer("\r\n", _FM);
+					tt.converter("\r\n", _FM _FM);
 					//dont start if there is a database stop command
 					if (not((tt.f(1).lcase() ^ ".end").osfile())) {
 						if (tt.f(5)) {
@@ -377,7 +377,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				if (skipreason) {
 					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
 				}
-				let nfiles = rec.f(3).count(VM) + 1;
+				let nfiles = rec.f(3).fcount(_VM);
 				for (const var filen : range(1, nfiles)) {
 					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
 				} //filen;
@@ -458,8 +458,7 @@ nextpatch:;
 		//swap sm with '\' in logx;*backslash
 		//swap tm with "[" in logx
 		logx.converter(_FM _VM _SM _TM, "^]\\[");
-		//fefdfcfb=char(254):char(253):char(252):char(251)
-		//convert fefdfcfb to '^]\[' in logx;*backslash
+		//logx.converter(_ALL_FMS, _VISIBLE_FMS);
 		logx.replacer(ST, "%FA");
 
 		logx.replacer("%20", " ");
@@ -535,9 +534,9 @@ getvalues:
 			//convert rm to fm in iodat
 			//iodat[-1,1]=''
 			//v119 C/ASM sort routine cannot be easily converted/reimplemented in c++
-			data_.converter(FM, VM);
+			data_.converter(_FM, _VM);
 			call sortarray(data_, 1, sortby);
-			data_.converter(VM, FM);
+			data_.converter(_VM, _FM);
 		}
 
 		var execstoplist;
@@ -546,10 +545,10 @@ getvalues:
 			//execs will be in field 1
 			//stopped reason will be in parallel in field 2
 			//stopped execs will be at the end
-			data_.converter(FM, VM);
+			data_.converter(_FM, _VM);
 
 			//remove or move any stopped execs to the end and add reason
-			var nn = data_.count(VM) + 1;
+			var nn = data_.fcount(_VM);
 			var nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
 				var execcode = data_.f(1, ii);
@@ -586,12 +585,12 @@ getvalues:
 		} else if (request_.contains("XML")) {
 			if (data_) {
 				call htmllib2("STRIPTAGS", data_);
-				data_.replacer(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
+				data_.replacer(_FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
 				data_.prefixer("<record><" ^ fieldname ^ ">");
 				data_ ^= "</" ^ fieldname ^ ">" "</record>";
-				if (data_.contains(VM)) {
+				if (data_.contains(_VM)) {
 					data_.replacer("</" ^ fieldname ^ ">", "</STOPPED>");
-					data_.replacer(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
+					data_.replacer(_VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
 			}
 			data_.prefixer("<records>");
@@ -691,7 +690,7 @@ nextlock:
 					goto nextlock;
 				}
 				nlocks += 1;
-				select2data(nlocks, 1) = lockx.f(4) ^ VM ^ lockx.f(3) ^ VM ^ lockid.field("*", 1) ^ VM ^ lockid.field("*", 2, 999);
+				select2data(nlocks, 1) = lockx.f(4) ^ _VM ^ lockx.f(3) ^ _VM ^ lockid.field("*", 1) ^ _VM ^ lockid.field("*", 2, 999);
 				goto nextlock;
 			}
 		}
@@ -843,7 +842,7 @@ nextlock:
 		}
 
 		response_ = msg_;
-		response_.converter(FM ^ VM, "\r\r");
+		response_.converter(_FM _VM, "\r\r");
 
 		call sysmsg(response_, "EXODUS Backup");
 

@@ -18,7 +18,8 @@ function main() {
 	TRACE(oslist())
 	TRACE(EXECPATH)
 	var execdir = EXECPATH.field(OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
-	execdir = "";
+//	execdir = "";
+	execdir = "./";
     assert(osshellread(execdir ^ "testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
     assert(osshellread(execdir ^ "testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");
 

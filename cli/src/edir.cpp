@@ -117,7 +117,7 @@ function main() {
 			// Unescape text back to data format
 			if (filename ne "DOS") {
 
-				trimmerlast(text2, "\r\n");
+				trimmerlast(text2, _EOL);
 
 				//convert to original format
 				text2 = text2.iconv(txtfmt);
@@ -134,7 +134,7 @@ function main() {
 
 				// Convert to FMs to check dict item format
 				if (filename eq "DOS") {
-					trimmerlast(dictrec, "\r\n");
+					trimmerlast(dictrec, _EOL);
 					dictrec = dictrec.iconv(txtfmt);
 				}
 

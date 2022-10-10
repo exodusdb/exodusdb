@@ -6,18 +6,23 @@
 
 namespace exodus {
 
+	// clang-format off
+
 // SIMILAR code in exofuncs.h and varimpl.h
+// all defined to allow compile time concatenation
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-#	define _OSSLASH "\\"
-#	define OSSLASH_ '\\'
-#	define SLASH_IS_BACKSLASH true
-#	define EOL "\r\n"
+#	define _EOL      "\r\n"
+#	define _OSSLASH  "\\"
+#	define  OSSLASH_ '\\'
+#	define  SLASH_IS_BACKSLASH true
 #else
-#	define _OSSLASH "/"
-#	define OSSLASH_ '/'
-#	define SLASH_IS_BACKSLASH false
-#	define EOL "\n"
+#	define _EOL      "\n"
+#	define _OSSLASH  "/"
+#	define  OSSLASH_ '/'
+#	define  SLASH_IS_BACKSLASH false
 #endif
+
+	// clang-format on
 
 } // namespace exodus
 

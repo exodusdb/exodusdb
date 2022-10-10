@@ -662,7 +662,7 @@ var build_conn_info(CVR conninfo) {
 		not result.contains("user=") or not result.contains("password=")) {
 
 		// discover any configuration file parameters
-		// TODO parse config properly instead of just changing \n\r to spaces!
+		// TODO parse config properly instead of just changing \r\n to spaces!
 		var configfilename = "";
 		var home = "";
 		if (home.osgetenv("HOME"))
@@ -1161,31 +1161,51 @@ bool var::reado(CVR filehandle, CVR key) {
 	if (!dbconn_no)
 		throw VarDBException("get_dbconn_no() failed");
 
+	// Initialise the record var to unassigned
+	// unless record and key are the same variable
+	// in which case allow failure to read to leave the record (key) untouched
+	// PICKOS leaves the variable untouched but we decide
+	// to make use of a variable after unsuccessful read to be runtime error
+	if (this != &key) {
+		var_typ = VARTYP_UNA;
+		var_str.clear();
+	}
+
 	// Attempt to get record from the cache
 	// TODO cache non-existent records as empty
 	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
-	std::string cachedrecord =
-		thread_dbconnector.getrecord(dbconn_no, hash64);
-	if (!cachedrecord.empty()) {
-
-		//(*this) = cachedrecord;
-		var_str = std::move(cachedrecord);
-		var_typ = VARTYP_STR;
-		//var("*").output();
-		//this->lasterror();
-
-		return true;
-
+	//TRACE("reado " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
+	std::string cachedrecord;
+	if (thread_dbconnector.getrecord(dbconn_no, hash64, cachedrecord)) {
+		if (cachedrecord.empty()) {
+			//TRACE("cache hit-" ^ key);
+			return false;
+		} else {
+			//TRACE("cache hit+" ^ key);
+			var_str = std::move(cachedrecord);
+			var_typ = VARTYP_STR;
+			return true;
+		}
 	}
+	//TRACE("cache miss" ^ key);
 
 	Timer t2(247);//reado cache_miss
 
-	// ordinary read
+	// Ordinary read from the database
 	bool result = this->read(filehandle, key);
 
-	//cache the ordinary read if successful
-	if (result)
-		this->writeo(filehandle, key);
+	if (result) {
+		// Cache the ordinary read
+		//this->writeo(filehandle, key);
+		//TRACE("cache add+ " ^ key);
+		thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
+	} else {
+		// Empty if failure
+		var("").writeo(filehandle, key);
+		//TRACE("cache add-" ^ key);
+		thread_dbconnector.putrecord(dbconn_no, hash64, "");
+
+	}
 
 	return result;
 }
@@ -1204,6 +1224,7 @@ bool var::writeo(CVR filehandle, CVR key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
+	//TRACE("writeo " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 
 	return true;
@@ -1222,6 +1243,7 @@ bool var::deleteo(CVR key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
+	//TRACE("deleteo " ^ (*this) ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	thread_dbconnector.delrecord(dbconn_no, hash64);
 
 	return true;
@@ -1241,15 +1263,15 @@ bool var::read(CVR filehandle, CVR key) {
 	//var_typ = VARTYP_UNA;
 	//var_str.resize(0);
 
-	// LEAVE RECORD UNTOUCHED UNLESS RECORD IS SUCCESSFULLY READ
-	// initialise the record to unassigned (actually empty string at the moment)
+	// Initialise the record var to unassigned
 	// unless record and key are the same variable
 	// in which case allow failure to read to leave the record (key) untouched
-	//if (this != &key) {
-	//	var_typ = VARTYP_UNA;
-	//	//var_typ = VARTYP_STR;
-	//	var_str.resize(0);
-	//}
+	// PICKOS leaves the variable untouched but we decide
+	// to make use of a variable after unsuccessful read to be runtime error
+	if (this != &key) {
+		var_typ = VARTYP_UNA;
+		var_str.clear();
+	}
 
 	// lower case key if reading from dictionary
 	// std::string key2;
@@ -1351,6 +1373,8 @@ bool var::read(CVR filehandle, CVR key) {
 	}
 
 	if (PQntuples(dbresult) < 1) {
+
+		// Leave unassigned if not read
 		//leave record (this) untouched if record cannot be read
 		// *this = "";
 

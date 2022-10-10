@@ -3,12 +3,11 @@
 
 #include <exodus/htmllib2.h>
 
-subroutine printnext() {
-	bodyln = 999;
-	pagen = 0;
-	return;
-
-}
+#if __has_include(<xselect.h>)
+#   include <xselect.h>
+#else
+#   define xselect select
+#endif
 
 /////////////////////////////////////////////////////
 // STUBS to pass old function calls to htmllib2 modes
@@ -373,6 +372,13 @@ subroutine getheadfoot() {
 	//cannot work out header lines anymore from html eg nlist includes fm in colheads
 	nbodylns = 999999;
 
+	return;
+
+}
+
+subroutine printnext() {
+	bodyln = 999;
+	pagen = 0;
 	return;
 
 }

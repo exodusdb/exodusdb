@@ -23,7 +23,7 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 	return dbconn_no_;
 }
 
-PGconn* DBConnector::get_pgconn(int index) const {
+PGconn* DBConnector::get_pgconn(const int index) const {
 	//TimeAcc t(100);
 	//std::lock_guard lock(dbconns_mutex); 
 
@@ -36,7 +36,7 @@ PGconn* DBConnector::get_pgconn(int index) const {
 	return reinterpret_cast<PGconn*>(iter == dbconns_.end() ? 0 : iter->second.pgconn_);
 }
 
-DBConn* DBConnector::get_dbconn(int index) const {
+DBConn* DBConnector::get_dbconn(const int index) const {
 	//TimeAcc t(103);
 	//std::lock_guard lock(dbconns_mutex);
 	const auto iter = dbconns_.find(index);
@@ -50,7 +50,7 @@ DBConn* DBConnector::get_dbconn(int index) const {
 //	return (ConnectionLocks*)(iter == dbconns_.end() ? 0 : iter->second.locks__);
 //}
 
-DBCache* DBConnector::get_dbcache(int index) const {
+DBCache* DBConnector::get_dbcache(const int index) const {
 	//TimeAcc t(104);
 	//std::lock_guard lock(dbconns_mutex);
 	const auto iter = dbconns_.find(index);
@@ -59,43 +59,53 @@ DBCache* DBConnector::get_dbcache(int index) const {
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-std::string DBConnector::getrecord(const int connid, uint64_t file_and_key) const {
+bool DBConnector::getrecord(const int connid, const uint64_t hash64, std::string& record) const {
 	//TimeAcc t(105);
 	auto dbcache = get_dbcache(connid);
-	auto cacheentry = dbcache->find(file_and_key);
-	if (cacheentry == dbcache->end())
-		return "";
-
-	return dbcache->at(file_and_key);
+	auto cacheentry = dbcache->find(hash64);
+	if (cacheentry == dbcache->end()) {
+		return false;
+	} else {
+		//record = dbcache->at(hash64);
+		record = cacheentry->second;
+		//TRACE(record)
+		return true;
+	}
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-void DBConnector::putrecord(const int connid, uint64_t file_and_key, const std::string& record) {
+void DBConnector::putrecord(const int connid, const uint64_t hash64, const std::string& record) {
 	//TimeAcc t(106);
 	auto dbcache = get_dbcache(connid);
-	dbcache->insert_or_assign(file_and_key, record);
+	dbcache->insert_or_assign(hash64, record);
+	//TRACE("added " + record)
 	return;
 }
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
-void DBConnector::delrecord(const int connid, uint64_t file_and_key) {
+void DBConnector::delrecord(const int connid, const uint64_t hash64) {
 	//TimeAcc t(106);
 	auto dbcache = get_dbcache(connid);
 	//(*dbcache)[filenameandkey] = "";
-	//dbcache->erase(filenameandkey);
-	dbcache->insert_or_assign(file_and_key, "");
+	dbcache->erase(hash64);
+	//Must remove since empty entries indicate no present and could be writing a record
+	//dbcache->insert_or_assign(hash64, "");
 	return;
 }
 
 void DBConnector::cleardbcache(const int connid) {
 	//TimeAcc t(107);
 	auto dbcache = get_dbcache(connid);
+
+//	for (const auto& iter : *dbcache)
+//		var(iter.first % 1'000'000'000).errputl("Clearing cache of ");
+
 	dbcache->clear();
 	return;
 }
 
-void DBConnector::del_dbconn(int index) {
+void DBConnector::del_dbconn(const int index) {
 	//std::lock_guard lock(dbconns_mutex);
 	//TimeAcc t(108);
 	auto iter = dbconns_.find(index);
@@ -108,7 +118,7 @@ void DBConnector::del_dbconn(int index) {
 	}
 }
 
-void DBConnector::del_dbconns(int from_index) {
+void DBConnector::del_dbconns(const int from_index) {
 	//std::lock_guard lock(dbconns_mutex);
 	//TimeAcc t(109);
 	auto ix = dbconns_.begin();
@@ -124,7 +134,8 @@ void DBConnector::del_dbconns(int from_index) {
 			ix++;
 		}
 	}
-	dbconn_no_ = from_index -= 1;
+	//dbconn_no_ = from_index -= 1;
+	dbconn_no_ = from_index - 1;
 }
 
 DBConnector::~DBConnector() {

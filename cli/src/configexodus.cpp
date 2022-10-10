@@ -272,7 +272,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		//locate target directory (postgresql libdir)
 		var pglibdir;
 		var pgenvvar = "POSTGRESQL";
-		if (index(PLATFORM_, "64"))
+		if (PLATFORM.contains("64"))
 			pgenvvar ^= "64";
 		else
 			pgenvvar ^= "32";

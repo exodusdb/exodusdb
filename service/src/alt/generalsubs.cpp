@@ -174,10 +174,10 @@ subroutine getdatasets() {
 	directory.ucaser();
 	//DIRECTORY=TRIM(DIRECTORY[1,\1A\]);*DOS TEXT EOF IS CONTROL-Z
 	var dosformat = directory.contains(chr(13));
-	directory.converter(" " ^ FM ^ "\r\n", FM ^ " " " " " ");
+	directory.converter(" " _FM  "\r\n", _FM "   ");
 	directory.trimmer();
-	directory.converter(" " ^ FM, FM ^ " ");
-	var nvols = directory.count(FM) + 1;
+	directory.converter(" " _FM, _FM " ");
+	var nvols = directory.fcount(FM);
 
 	datasetparams = directory.f(1);
 	if (not(datasetparams.contains(","))) {

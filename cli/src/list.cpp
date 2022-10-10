@@ -1,26 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <colrowspan.h>
-//#include <getsortjs.h>
-//#include <getmark.h>
-//#include <convcss.h>
-//#include <htmllib2.h>
-#include <xselect.h>
-//#include <addunits.h>
-//#include <sendmail.h>
-//#include <gethtml.h>
-//#include <getcss.h>
-//#include <docmods.h>
-//#include <timedate2.h>
-
 #include <exodus/printtx.hpp>
 
-//#include <system_common.h>
-
-#include <sys_common.h>
-
-var copyright;
 var showborder;//num
 var headtabperpage;//num
 var colorprefix;
@@ -98,7 +80,7 @@ var emailsubject;
 var nextemailto;
 var nextemailcc;
 var nextemailsubject;
-var ss;
+var sortselect;
 var wordn;//num
 var onlyauthorised;//num
 var word;
@@ -228,20 +210,16 @@ let ulchar = "-";
 
 function main() {
 	//
-	copyright = "Copyright NEOSYS All Rights Reserved";
-	copyright = "";
 	showborder = 0;
 	headtabperpage = 1;
 	colorprefix = "\x19";
 
-	//compile nlist without linemarks. its inner loops benefit from efficiency
-
-	//for safety in case we are called with (PE) options, to avoid hanging
+	// Compile list with optimisation. Its inner loops benefit from efficiency
 
 	if (USERNAME eq "EXODUS") {
 		var(SENTENCE).oswrite("nlist");
-		printl();
-		printl(SENTENCE);
+		logputl();
+		logputl(SENTENCE);
 	}
 
 	//for printtx
@@ -345,9 +323,19 @@ function main() {
 		decimalchar = ".";
 	}
 
-	html = SYSTEM.f(2).lcase().ends("htm");
+	html = SYSTEM.f(2).lcase().ends("htm") or OPTIONS.contains("h");
 
 	if (html) {
+
+		// Prevent printtx from creating a random .htm file for output
+		// and make it output to stdout
+		if (not SYSTEM.f(2))
+			SYSTEM(2) = "-";
+
+		tt = SYSTEM.f(2);
+		tt.replacer(".txt", ".htm");
+		SYSTEM(2) = tt;
+
 		td0 = "";
 		nbsp = "&nbsp;";
 		td = td0 ^ "<td>";
@@ -356,9 +344,7 @@ function main() {
 		thx = "</th>";
 		tr = "<tr>";
 		trx = "</tr>";
-		tt = SYSTEM.f(2);
-		tt.replacer(".txt", ".htm");
-		SYSTEM(2) = tt;
+
 	} else {
 		td0 = "";
 		td = "";
@@ -461,18 +447,110 @@ function main() {
 	nextemailcc = "";
 	nextemailsubject = "";
 
-	//initphrase:
-	///////////
-	ss = "";
-	wordn = 0;
-	//onlyauthorised=0
+	// Remove AUTHORISED since it can be filtered locally
+	// and avoid triggering a 2 stage select
 	tt = " AND WITH AUTHORISED AND ";
 	onlyauthorised = sentencex.contains(tt);
 	if (onlyauthorised) {
 		sentencex.replacer(tt, " AND ");
 	}
 
-///////////
+//initphrase:
+/////////////
+
+	// First phrase must be LIST|SORT [SORT] [NNNN] filename [itemid ...]
+
+	wordn = 0;
+	sortselect = "SELECT";
+
+	// Note that getword gets 'word' and 'nextword' to allow look ahead
+	gosub getword();
+
+	if (word ne "LIST" and word ne "SORT" and word ne "OLIST") {
+		call mssg(word.quote() ^ " first word must be LIST or SORT");
+		stop();
+	}
+
+	// Decide initial ordering SELECT (No order) or SSELECT (by key)
+	if (word eq "SORT")
+		sortselect = "SSELECT";
+	else
+		sortselect = "SELECT";
+
+	// 2nd word is SORT or number of records or filename
+	gosub getword();
+
+	// SORT changes SELECT to SSELECT which sorts
+	// finally (i.e. after any other BY phrases) by ID
+	if (word eq "SORT") {
+		if (sortselect.field(" ", 1) eq "SELECT")
+			// Prefix 'S' to change 'SELECT' to 'SSELECT'
+			sortselect.prefixer("S");
+		gosub getword();
+	}
+
+	// Limit number of records if 2nd word is digits like 9999
+	if (word.match("^\\d+$")) {
+		maxnrecs = word;
+		sortselect ^= " " ^ maxnrecs;
+		gosub getword();
+	}
+
+	if (not word) {
+		call mssg("FILE NAME IS REQUIRED");
+		stop();
+	}
+
+	// Filename
+	filename = word;
+	if (word eq "DICT") {
+		gosub getword();
+		filename = "DICT." ^ word;
+	}
+	if (filename.starts("DICT.")) {
+		dictfilename = "VOC";
+	} else {
+		dictfilename = filename;
+	}
+	if (not(DICT.open("DICT." ^ dictfilename))) {
+		//commented so that list dict_clients gives dict.voc columns
+		//crtx=1
+		DICT = dictvoc;
+	}
+	sortselect ^= " " ^ word;
+
+	// Decide if we wil filter by AUTHORISED
+	if (xx.read(DICT, "AUTHORISED")) {
+		onlyauthorised = 1;
+	}
+
+	//NEOSYS custom TODO remove to SYSTEM
+	if (html) {
+
+		if (var("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS").locateusing(",", filename, xx)) {
+			printtxmark = "Media Management";
+		}
+
+		if (var("JOBS,JOB_ORDERS,JOB_INVOICES").locateusing(",", filename, xx)) {
+			printtxmark = "Job Management";
+		}
+
+		if (var("CHARTS,RECURRING").locateusing(",", filename, xx)) {
+			printtxmark = "Financial";
+		}
+
+	}
+
+	// Get any specfic keys.
+	// which are value words starting with 0-9, " or '
+	while (nextword.len() and (nextword.isnum() or nextword.starts("'") or nextword.starts(DQ))) {
+		keylist = 1;
+		sortselect ^= " " ^ nextword;
+		gosub getword();
+	}
+
+	TRACE(sortselect)
+
 nextphrase:
 ///////////
 
@@ -483,104 +561,21 @@ nextphrase:
 
 phraseinit:
 ///////////
-	if (word.starts("SORT") or word.starts("NSORT")) {
-		ss ^= "SSELECT";
 
-filename:
-		gosub getword();
-		if (not word) {
-			call mssg("FILE NAME IS REQUIRED");
-			stop();
-		}
-
-		//limit number of records
-		if (word.match("^\\d+$")) {
-			maxnrecs = word;
-			ss ^= " " ^ maxnrecs;
-			gosub getword();
-		}
-
-		//get the file name
-		filename = word;
-		if (word eq "DICT") {
-			gosub getword();
-			filename = "DICT." ^ word;
-		}
-		if (filename.starts("DICT.")) {
-			dictfilename = "VOC";
-		} else {
-			dictfilename = filename;
-		}
-		if (not(DICT.open("DICT." ^ dictfilename))) {
-			//commented so that list dict_clients gives dict.voc columns
-			//crtx=1
-			DICT = dictvoc;
-		}
-		ss ^= " " ^ word;
-
-		if (xx.read(DICT, "AUTHORISED")) {
-			onlyauthorised = 1;
-		}
-
-		//exodus custom
-
-		if (html) {
-
-			if (var("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS").locateusing(",", filename, xx)) {
-				printtxmark = "Media Management";
-			}
-
-			if (var("JOBS,JOB_ORDERS,JOB_INVOICES").locateusing(",", filename, xx)) {
-				printtxmark = "Job Management";
-			}
-
-			if (var("CHARTS,RECURRING").locateusing(",", filename, xx)) {
-				printtxmark = "Financial";
-			}
-
-		}
-	/*;
-			//get any specfic keys
-			loop;
-			while num(nextword) or nextword[1,1]="'" or nextword[1,1]='"';
-				keylist=1;
-				gosub getword;
-			if word='' then goto exitloop;
-				ss:=' ':word;
-				repeat;
-	exitloop:
-	*/
-
-		//get any specfic keys
-nextkey:
-		if ((nextword.isnum() or (nextword.starts("'"))) or (nextword.starts(DQ))) {
-			keylist = 1;
-			ss ^= " " ^ nextword;
-			gosub getword();
-			if (nextword.len()) {
-				goto nextkey;
-			}
-		}
-
-	} else if ((word.starts("LIST") or word.starts("NLIST")) or word eq "XLIST") {
-		ss ^= "SELECT";
-		goto filename;
-		{}
-
-	} else if (word eq "GETLIST") {
+	if (word eq "GETLIST") {
 		gosub getword();
 		getlist("" ^ word ^ " (S)");
 
 	} else if (word eq "AND" or word eq "OR") {
-		ss ^= " " ^ word;
+		sortselect ^= " " ^ word;
 
 	} else if (word eq "(" or word eq ")") {
-		ss ^= " " ^ word;
+		sortselect ^= " " ^ word;
 
 	} else if (word eq "BY" or word eq "BY-DSND") {
-		ss ^= " " ^ word;
+		sortselect ^= " " ^ word;
 		gosub getword();
-		ss ^= " " ^ word;
+		sortselect ^= " " ^ word;
 
 		//determine if limited nrecs sorted by mv field (which needs preselect)
 		if ((maxnrecs and not(preselect)) and DICT) {
@@ -594,8 +589,8 @@ nextkey:
 		if (nextword eq "AUTHORISED") {
 			onlyauthorised = 1;
 			gosub getword();
-			if (ss.ends(" AND")) {
-				ss.cutter(-4);
+			if (sortselect.ends(" AND")) {
+				sortselect.cutter(-4);
 			}
 			if (nextword eq "AND") {
 				gosub getword();
@@ -603,7 +598,7 @@ nextkey:
 			goto nextphrase;
 		}
 
-		ss ^= " " ^ word;
+		sortselect ^= " " ^ word;
 
 		limitx = word eq "LIMIT";
 		if (limitx) {
@@ -614,12 +609,12 @@ nextkey:
 
 		//NO/EVERY
 		if ((word eq "NOT" or word eq "NO") or word eq "EVERY") {
-			ss ^= " " ^ word;
+			sortselect ^= " " ^ word;
 			gosub getword();
 		}
 
 		//field or NO
-		ss ^= " " ^ word;
+		sortselect ^= " " ^ word;
 		if (limitx) {
 			limits(1, nlimits) = word;
 			if (not(dictrec.reado(DICT, word))) {
@@ -638,14 +633,14 @@ nextkey:
 		if (var("NOT,NE,<>").locateusing(",", nextword, xx)) {
 			nextword = "NOT";
 			gosub getword();
-			ss ^= " " ^ word;
+			sortselect ^= " " ^ word;
 		}
 
 		//comparision
 		if (var("MATCH,EQ,,NE,GT,LT,GE,LE,<,>,<=,>=,=,[],[,]").locateusing(",", nextword, xx)) {
 	//only EQ works at the moment
 			gosub getword();
-			ss ^= " " ^ word;
+			sortselect ^= " " ^ word;
 			if (limitx) {
 				limits(2, nlimits) = word;
 			}
@@ -655,13 +650,13 @@ nextkey:
 		//with xx from y to z
 		if (nextword eq "BETWEEN" or nextword eq "FROM") {
 			gosub getword();
-			ss ^= " " ^ word;
+			sortselect ^= " " ^ word;
 			gosub getword();
-			ss ^= " " ^ word;
+			sortselect ^= " " ^ word;
 			gosub getword();
-			ss ^= " " ^ word;
+			sortselect ^= " " ^ word;
 			gosub getword();
-			ss ^= " " ^ word;
+			sortselect ^= " " ^ word;
 
 		} else {
 
@@ -669,7 +664,7 @@ nextkey:
 			while (nextword ne "" and (nextword.isnum() or nextword.starts(DQ) or nextword.starts(SQ))) {
 
 				gosub getword();
-				ss ^= " " ^ word;
+				sortselect ^= " " ^ word;
 				if (limitx) {
 //					if ((DQ ^ SQ).contains(word[1])) {
 					if (word.starts(DQ) or word.starts(SQ)) {
@@ -688,8 +683,8 @@ nextkey:
 
 	} else if (word eq "BREAK-ON") {
 		tt = coln + 1;
-		breakcolns.prefixer(tt ^ FM);
-		breakopts.prefixer(FM);
+		breakcolns.prefixer(tt ^ _FM);
+		breakopts.prefixer(_FM);
 		nbreaks += 1;
 		breakonflag = 1;
 
@@ -729,7 +724,7 @@ nextkey:
 			call fsmsg();
 			stop();
 		}
-		ss ^= " USING " ^ dictfilename;
+		sortselect ^= " USING " ^ dictfilename;
 
 	} else if (word eq "HEADINGTABLE") {
 
@@ -814,7 +809,7 @@ nextkey:
 		//double any single quotes to avoid them being understood as options
 		title.replacer("'", "''");
 
-		headtab(hrown, tcoln) = title.convert(FM ^ VM, "  ");
+		headtab(hrown, tcoln) = title.convert(_FM _VM, "  ");
 		headtab(hrown, tcoln + 1) = value;
 		hrown += 1;
 
@@ -856,7 +851,7 @@ nextkey:
 		gosub getquotedword();
 		//skip if detsupp2 and column is being skipped
 		if (not(coldict(coln).unassigned())) {
-			word.converter("|", VM);
+			word.converter("|", _VM);
 			coldict(coln)(3) = word;
 		}
 
@@ -925,7 +920,7 @@ nextkey:
 			colname(coln) = word;
 
 			//increase column width if column title needs it
-			nn = dictrec.f(3).count(VM) + 1;
+			nn = dictrec.f(3).fcount(_VM);
 			for (ii = 1; ii <= nn; ++ii) {
 				tt = dictrec.f(3, ii);
 				if (dictrec.f(10) and tt.len() gt dictrec.f(10)) {
@@ -1021,7 +1016,7 @@ nextkey:
 								hcoln = 1;
 							}
 							tcoln = (hcoln - 1) * 2 + 1;
-							headtab(hrown, tcoln) = coldict(coln).f(3).convert(VM, " ") ^ nbsp ^ ":";
+							headtab(hrown, tcoln) = coldict(coln).f(3).convert(_VM, " ") ^ nbsp ^ ":";
 							headtab(hrown, tcoln + 1) = "'B" ^ tt2 ^ "'";
 							hrown += 1;
 						}
@@ -1096,10 +1091,11 @@ x1exit:
 		} //coln;
 
 		//set column 1
-		colname(1) = "@" "ID";
-		if (not(coldict(1).reado(DICT, "@" "ID"))) {
-			if (not(coldict(1).reado(dictvoc, "@" "ID"))) {
-				coldict(1) = "F" ^ FM ^ FM ^ "Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "L" ^ FM ^ 15;
+		colname(1) = "@ID";
+		if (not(coldict(1).reado(DICT, "@ID"))) {
+			if (not(coldict(1).reado(dictvoc, "@ID"))) {
+				//coldict(1) = "F" ^ FM ^ FM ^ "Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "L" ^ FM ^ 15;
+				coldict(1) = "F^^Ref^^^^^^L^15"_var;
 			}
 		}
 		if (html) {
@@ -1121,15 +1117,15 @@ x1exit:
 		// pagebreakcolns<1,ii>=tt+1
 		// next ii
 		if (pagebreaks) {
-			pagebreaks = "" ^ FM ^ pagebreaks;
+			pagebreaks = _FM ^ pagebreaks;
 		}
 
 	}
 
-	if (breakcolns.ends(FM)) {
+	if (breakcolns.ends(_FM)) {
 		breakcolns.popper();
 	}
-	if (breakopts.ends(FM)) {
+	if (breakopts.ends(_FM)) {
 		breakopts.popper();
 	}
 
@@ -1208,13 +1204,13 @@ x1exit:
 				//vm indicates folding, \\ indicates rows in column headings
 				tt = coldict(coln).f(3);
 				if (not multirowcolhdg) {
-					tt.replacer(VM, "<br />");
+					tt.replacer(_VM, "<br />");
 				}
-				tt.replacer("\\\\", VM);
+				tt.replacer("\\\\", _VM);
 
 				colhdg(coln2) = tt;
-				if (tt.count(VM) gt vmcount) {
-					vmcount = tt.count(VM);
+				if (tt.count(_VM) gt vmcount) {
+					vmcount = tt.count(_VM);
 				}
 
 				//swap vm with '<br />' in colhdg
@@ -1245,7 +1241,7 @@ x1exit:
 				//nth child style column justification in case <col> doesnt work like on FF
 				if (align) {
 					//works per table if the table is assigned a class (.maintable) here
-					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" "\r\n";
+					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" _EOL;
 				}
 
 			} else {
@@ -1257,14 +1253,17 @@ x1exit:
 	} //coln;
 
 	if (style) {
-		style = "<style type=\"text/css\">" "\r\n" ^ style ^ "</style>" "\r\n";
+		style = "<style type=\"text/css\">" _EOL ^ style ^ "</style>" _EOL;
 	}
 
 	//convert to html with colspan/rowspan where necessary and (Base) as currcode
 	//thproperties='style="background-color:':thcolor:'"'
 	if (html) {
 		//call colrowspan(colhdg, thproperties, nobase, sys.company.f(3));
-		call htmllib2("COLROWSPAN", colhdg, thproperties, nobase, sys.company.f(3));
+		//var basecurrcode = sys.company.f(3)
+		//var basecurrcode = SYSTEM(999);
+		var basecurrcode = "";
+		call htmllib2("COLROWSPAN", colhdg, thproperties, nobase, basecurrcode);
 	}
 
 	//trim off blank lines (due to the 9 above)
@@ -1276,7 +1275,7 @@ x1exit:
 
 		if (not rawtable) {
 			call getmark("CLIENT", html, clientmark);
-			htmlcode ^= clientmark ^ "\r\n";
+			htmlcode ^= clientmark ^ _EOL;
 		}
 
 		//htmlcode:='<table border="1" cellspacing="0" cellpadding="2"'
@@ -1290,30 +1289,25 @@ x1exit:
 		htmlcode ^= ";page-break-after:avoid";
 		//htmlcode:=';background-color:':tdcolor
 		htmlcode ^= "\">";
-		htmlcode ^= FM ^ "<colgroup>" ^ coltags ^ "</colgroup>";
+		htmlcode ^= _FM "<colgroup>" ^ coltags ^ "</colgroup>";
 		//<thead> may be hardcoded elsewhere for page heading
 		//!!!if you change it here, search and change it there too
 
-		htmlcode ^= FM ^ "<thead style=\"cursor:pointer\" onclick=\"sorttable(event)\">";
+		htmlcode ^= _FM "<thead style=\"cursor:pointer\" onclick=\"sorttable(event)\">";
 		posttheadmark = "<postthead/>";
 		if (headtab) {
 			htmlcode ^= posttheadmark;
 		}
 		//htmlcode:=fm:coltags
 
-		htmlcode ^= colhdg ^ FM ^ "</thead>";
-		htmlcode ^= FM ^ "<tbody>";
+		htmlcode ^= colhdg ^ _FM "</thead>";
+		htmlcode ^= _FM "<tbody>";
 		htmlcode.move(colhdg);
 
 		//allow for single quotes
 		colhdg.replacer("'", "''");
 
 	} else {
-//		while (true) {
-//			///BREAK;
-//			if (not(colhdg and ((" " ^ FM).contains(colhdg[-1])))) break;
-//			colhdg.popper();
-//		}//loop;
 		colhdg.trimmerlast(" " _FM);
 	}
 
@@ -1325,7 +1319,7 @@ x1exit:
 	}
 
 	if (html) {
-		head.replacer(FM, "<br />");
+		head.replacer(_FM, "<br />");
 		//div to make header as wide as body
 		//the report title
 		if (head) {
@@ -1347,43 +1341,43 @@ x1exit:
 		tt = "<table id=\"headtab0\" width=100% align=center cellpadding=3>";
 
 		//older MSIE <col> styling
-		headtabcols = " <col style=\"text-align:left\"/>" ^ VM ^ "<col style=\"text-align: left;font-weight:bold\"/>";
+		headtabcols = " <col style=\"text-align:left\"/>" _VM "<col style=\"text-align: left;font-weight:bold\"/>";
 		//allow 8 max pair of headtab columns
-		headtabcols = (headtabcols ^ VM).str(8);
+		headtabcols = (headtabcols ^ _VM).str(8);
 		headtabcols.popper();
 
-		tt ^= "<colgroup>" "\r\n" ^ headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
+		tt ^= "<colgroup>" _EOL ^ headtabcols.replace(_VM, _EOL) ^ "</colgroup>";
 
 		//style columns where '<col>' not supported.
 		//call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		call htmllib2("CONVCSS", headtabstyle, "headtab0", headtabcols);
-		style ^= "\r\n" ^ headtabstyle;
+		style ^= _EOL ^ headtabstyle;
 
-		tt ^= "<colgroup>" "\r\n" ^ headtabcols.replace(VM, "\r\n") ^ "</colgroup>";
+		tt ^= "<colgroup>" _EOL ^ headtabcols.replace(_VM, _EOL) ^ "</colgroup>";
 
-		tt ^= "\r\n" "<TBODY>";
+		tt ^= _EOL "<TBODY>";
 		call htmllib2("TABLE.MAKE", headtab, tt, "");
-		headtab.replacer("</TR>", "</TR>" "\r\n");
+		headtab.replacer("</TR>", "</TR>" _EOL);
 		if (headtabperpage) {
 			colhdg.replacer(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:white\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
 		} else {
 			headtab.replacer(posttheadmark, "");
-			head ^= FM ^ headtab ^ FM;
+			head ^= _FM ^ headtab ^ _FM;
 		}
 	}
 
 	if (dblspc) {
-		head ^= FM;
+		head ^= _FM;
 	}
 	if (not html) {
-		head ^= FM ^ colul;
+		head ^= _FM ^ colul;
 	}
-	head ^= FM ^ colhdg;
+	head ^= _FM ^ colhdg;
 	if (not html) {
-		head ^= FM ^ colul;
+		head ^= _FM ^ colul;
 	}
 	if (dblspc) {
-		head ^= FM;
+		head ^= _FM;
 	}
 
 	head.prefixer(FM);
@@ -1406,7 +1400,7 @@ nextdict:
 				if (dictrec.f(4).field(".", 1) eq limits.f(4, limitn)) {
 					tt = dictrec.f(2);
 					if (tt) {
-						if (not(limits.f(5, limitn).locateusing(SM, tt, xx))) {
+						if (not(limits.f(5, limitn).locateusing(_SM, tt, xx))) {
 							limits(5, limitn, -1) = dictrec.f(2);
 						}
 					}
@@ -1420,18 +1414,18 @@ nextdict:
 	////////
 	//initrec:
 	////////
-	if (ss.count(" ") gt 2 or keylist) {
+	if (sortselect.count(" ") gt 2 or keylist) {
 
 		//preselect if sselect is by any mv fields since that ignores maxnrecs
 		if (not(LISTACTIVE)) {
 			if (preselect) {
-				call xselect(ss.field(" ", 1, 3) ^ " (SR)");
+				call xselect(sortselect.field(" ", 1, 3) ^ " (SR)");
 			}
 			maxnrecs = "";
 		}
 
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
-		call xselect(ss ^ " (SR)");
+		call xselect(sortselect ^ " (SR)");
 		//call mssg('','DB',buffer,'')
 
 		if (not LISTACTIVE) {
@@ -1547,13 +1541,13 @@ nextrec:
 
 			//find maximum mv number for the associated group of fns
 			fns = limits.f(5, limitn);
-			nfns = fns.fcount(SM);
+			nfns = fns.fcount(_SM);
 			nmvs = 0;
 			for (fnn = 1; fnn <= nfns; ++fnn) {
 				fn = fns.f(1, 1, fnn);
 				tt = RECORD.f(fn);
 				if (tt.len()) {
-					tt = tt.count(VM) + 1;
+					tt = tt.count(_VM) + 1;
 					if (tt gt nmvs) {
 						nmvs = tt;
 					}
@@ -1567,7 +1561,7 @@ nextrec:
 					tt = "\"\"";
 				}
 				//locate tt in (limits<3,limitn>)<1,1> using sm setting xx else
-				if (not(limits.f(3, limitn).locateusing(SM, tt, xx))) {
+				if (not(limits.f(3, limitn).locateusing(_SM, tt, xx))) {
 					for (fnn = 1; fnn <= nfns; ++fnn) {
 						RECORD.remover(fns.f(1, 1, fnn), mvx);
 					} //fnn;
@@ -1594,13 +1588,13 @@ nextrec:
 	if (not(silent) and not(printfilename.unassigned())) {
 		//put.cursor(cursor)
 		if (recn le 2) {
-			printl();
+			logputl();
 		}
-		if (printfilename and not(recn.mod(100))) {
+		if (printfilename and not(recn.mod(10))) {
 			//first recn will be 2
 			//similar in recinit and x2exit
 			if (TERMINAL) {
-				output(AT(-40), recn, ". ", ID, " ", MV);
+				logput(AT(-40), recn, ". ", ID, " ", MV);
 				osflush();
 			}
 		}
@@ -1684,7 +1678,7 @@ recexit:
 					//breaktotal(coln,1)+=i.col(coln)
 					//call addunits(icol(coln), breaktotal(coln, 1), VM);
 					// breaktotal <- icol
-					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol(coln),VM);
+					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol(coln), _VM);
 				} else {
 					if (breaktotal(coln, 1).isnum() and icol(coln).isnum()) {
 						breaktotal(coln, 1) += icol(coln);
@@ -1709,7 +1703,7 @@ recexit:
 			nblocks += 1;
 			blockn = nblocks;
 			//tx:='<span style="display:none" id="B':blockn:'">'
-			tx ^= FM;
+			tx ^= _FM;
 		}
 
 		//print one row of text
@@ -1774,7 +1768,7 @@ recexit:
 				if (tt eq "") {
 					//tt=nbsp
 				} else {
-					tt.replacer("\r\n", "<br />");
+					tt.replacer(_EOL, "<br />");
 				}
 
 				//colored cells starting with colorprefix
@@ -1847,7 +1841,7 @@ x2exit:
 
 	//similar in recinit and x2exit
 	if (TERMINAL) {
-		output(AT(-40), recn, ". ");
+		logput(AT(-40), recn, ". ");
 		osflush();
 	}
 
@@ -1862,7 +1856,7 @@ x2exit:
 	bodyln = 1;
 
 	if (html and not(bottomline.unassigned())) {
-		tx(-1) = FM ^ bottomline ^ FM;
+		tx(-1) = _FM ^ bottomline ^ _FM;
 	}
 	//tx:=bottomline:fm:fm
 
@@ -1897,23 +1891,23 @@ x2exit:
 	if (html) {
 
 		if (not detsupp) {
-			tx(-1) = "<script type=\"text/javascript\">" ^ FM ^ " togglendisplayed=" ^ nblocks ^ FM ^ "</script>";
+			tx(-1) = "<script type=\"text/javascript\">" _FM " togglendisplayed=" ^ nblocks ^ _FM "</script>";
 		}
 
-		tx(-1) = "<script type=\"text/javascript\">" ^ FM;
+		tx(-1) = "<script type=\"text/javascript\">" _FM;
 		tx ^= "function nwin(key,url,readonly) {";
-		tx ^= FM ^ " gwindowopenparameters={};";
-		tx ^= FM ^ " if (readonly) gwindowopenparameters.readonlymode=true;";
-		tx ^= FM ^ " gwindowopenparameters.key=key;";
-		tx ^= FM ^ " glogincode=\"" ^ SYSTEM.f(17) ^ "*" ^ USERNAME ^ "*\";";
+		tx ^= _FM " gwindowopenparameters={};";
+		tx ^= _FM " if (readonly) gwindowopenparameters.readonlymode=true;";
+		tx ^= _FM " gwindowopenparameters.key=key;";
+		tx ^= _FM " glogincode=\"" ^ SYSTEM.f(17) ^ "*" ^ USERNAME ^ "*\";";
 		//tx:='window.open(url)}'
 		//similar code in NLIST and LEDGER2
-		tx ^= FM ^ " var vhtm=window.opener.location.toString().split(\"/\");";
-		tx ^= FM ^ " vhtm[vhtm.length-1]=url;";
+		tx ^= _FM " var vhtm=window.opener.location.toString().split(\"/\");";
+		tx ^= _FM " vhtm[vhtm.length-1]=url;";
 		//tx:='alert(vhtm.join("/"));'
-		tx ^= FM ^ " window.open(vhtm.join(\"/\"));";
+		tx ^= _FM " window.open(vhtm.join(\"/\"));";
 		tx ^= "}";
-		tx ^= FM ^ "</script>";
+		tx ^= _FM "</script>";
 	}
 
 x2bexit:
@@ -2092,7 +2086,7 @@ subroutine getwordexit() {
 maindict:
 		if (dictrec.f(1) eq "G") {
 			tt = dictrec.f(3);
-			tt.converter(VM, " ");
+			tt.converter(_VM, " ");
 			sentencex.paster(startcharn, word.len(), tt);
 			charn = startcharn - 1;
 			wordn -= 1;
@@ -2120,7 +2114,7 @@ gotdictvoc:
 			dictrec = "";
 		}
 	}
-	dictrec.converter("|", VM);
+	dictrec.converter("|", _VM);
 
 	if (word eq "=") {
 		word = "EQ";
@@ -2187,24 +2181,24 @@ subroutine printbreaks() {
 		lastblockn = blockn;
 		blockn = 0;
 		if (detsupp) {
-			if (tx and not tx.ends(FM)) {
-				tx ^= FM;
+			if (tx and not tx.ends(_FM)) {
+				tx ^= _FM;
 			}
 			if (leveln gt 1 and not(html)) {
-				tx ^= underline ^ FM;
+				tx ^= underline ^ _FM;
 			}
 		} else {
 			if (not html) {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 				underline2 = leveln eq 1 ? underline : bar;
 				if (not((tx.last(2)).contains(ulchar))) {
-					if (not tx.ends(FM)) {
-						tx ^= FM;
+					if (not tx.ends(_FM)) {
+						tx ^= _FM;
 					}
 					tx ^= underline2;
 				}
 			}
-			tx ^= FM;
+			tx ^= _FM;
 		}
 
 		//print one row of totals
@@ -2235,7 +2229,7 @@ subroutine printbreaks() {
 							//breaktotal(coln,leveln+1)+=cell
 							//call addunits(cell, breaktotal(coln, leveln + 1), VM);
 							// breaktotal <- cell
-							call htmllib2("ADDUNITS", breaktotal(coln, leveln + 1), cell, VM);
+							call htmllib2("ADDUNITS", breaktotal(coln, leveln + 1), cell, _VM);
 						} else {
 							if (((breaktotal(coln, leveln + 1)).isnum()) and cell.isnum()) {
 								breaktotal(coln, leveln + 1) += cell;
@@ -2258,7 +2252,7 @@ subroutine printbreaks() {
 				}
 
 				if (html) {
-					cell.replacer(VM, "<br />");
+					cell.replacer(_VM, "<br />");
 				}
 
 				//if html and cell='' then cell=nbsp
@@ -2316,7 +2310,7 @@ subroutine printbreaks() {
 				//if 1 or detsupp<2 then
 					//cell=oldbreakvalue(coln)
 				cell = oconv(oldbreakvalue(coln), coldict(coln).f(7));
-				if (breakcolns.locateusing(FM, coln, colbreakn)) {
+				if (breakcolns.locateusing(_FM, coln, colbreakn)) {
 					if (colbreakn lt leveln) {
 						cell = "Total";
 					}
@@ -2370,7 +2364,7 @@ subroutine printbreaks() {
 			//if leveln>1 and not(html) then tx:=fm:underline
 		} else {
 			if (not html) {
-				tx ^= FM ^ underline2;
+				tx ^= _FM ^ underline2;
 			}
 		}
 
