@@ -1363,7 +1363,7 @@ nextreport:
 	var anyfixed = -1;
 fixnextcompany:
 	anyfixed += 1;
-	sys.gcurrcompany = "";
+	sys.gcurrcompcode = "";
 	var maxyear = "";
 	if (readnext(companycode)) {
 		if (not(sys.company.read(sys.companies, companycode))) {
@@ -1378,7 +1378,7 @@ fixnextcompany:
 		tt = sys.company.f(2).field("/", 2);
 		if (tt gt maxyear) {
 			maxyear = tt;
-			sys.gcurrcompany = companycode;
+			sys.gcurrcompcode = companycode;
 		}
 
 		var marketcode = sys.company.f(30);
@@ -1475,8 +1475,8 @@ convcompany:
 	//force acquisition of language
 	sys.glang = "";
 	//gcurr.company=''
-	call initcompany(sys.gcurrcompany);
-	SYSTEM(37) = sys.gcurrcompany;
+	call initcompany(sys.gcurrcompcode);
+	SYSTEM(37) = sys.gcurrcompcode;
 
 	call log2("*ensure random key exists", logtime);
 	var datasetid;

@@ -31,15 +31,15 @@ function main(in nextcompanycode) {
 				}
 			}
 
-		sys.gcurrcompany = nextcompanycode;
+		sys.gcurrcompcode = nextcompanycode;
 		//curr.company=nextcompanycode
 	}
 
 	var oldcompany = sys.company;
-	if (sys.gcurrcompany) {
-		if (not(sys.company.read(sys.companies, sys.gcurrcompany))) {
-			call mssg("COMPANY " ^ (sys.gcurrcompany.quote()) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
-			sys.company = sys.gcurrcompany;
+	if (sys.gcurrcompcode) {
+		if (not(sys.company.read(sys.companies, sys.gcurrcompcode))) {
+			call mssg("COMPANY " ^ (sys.gcurrcompcode.quote()) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
+			sys.company = sys.gcurrcompcode;
 		}
 	} else {
 		sys.company = "";
@@ -65,8 +65,8 @@ function main(in nextcompanycode) {
 
 	//if company code2 is not specified then use company code IF alphabetic
 	if (not(sys.company.f(28))) {
-		if (sys.gcurrcompany.match("^[A-Za-z]*$")) {
-			sys.company(28) = sys.gcurrcompany;
+		if (sys.gcurrcompcode.match("^[A-Za-z]*$")) {
+			sys.company(28) = sys.gcurrcompcode;
 		}
 	}
 

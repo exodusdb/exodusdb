@@ -6,7 +6,7 @@ libraryinit()
 
 //#include <system_common.h>
 
-// For sys.gcurrcompany (for compcode), sys.companies (to read letterheadcompany and imagecompany) and sys.glang (months for langdate)
+// For sys.gcurrcompcode (for compcode), sys.companies (to read letterheadcompany and imagecompany) and sys.glang (months for langdate)
 #include <sys_common.h>
 
 var modex;
@@ -38,13 +38,13 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	compcode = "";
 	if (compcode0.unassigned()) {
 		if (hascompanies) {
-			compcode = sys.gcurrcompany;
+			compcode = sys.gcurrcompcode;
 		}
 	} else if (compcode0) {
 		compcode = compcode0;
 	} else {
 		if (hascompanies) {
-			compcode = sys.gcurrcompany;
+			compcode = sys.gcurrcompcode;
 		}
 	}
 

@@ -1,10 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <sys_common.h>
-
-#define sep_ " "
-
 var logfilename;
 var logfilelength;//num
 var temposfilename83;
@@ -56,13 +52,13 @@ function main(in msg0, io time0) {
 		//entry:=oconv(date(),'D2-J')
 		entry = date().oconv("D2-E");
 		entry = entry.last(2) ^ "-" ^ entry.first(5);
-		entry ^= sep_ ^ time2.oconv("MTS") ^ sep_;
+		entry ^= " " ^ time2.oconv("MTS") ^ " ";
 		//entry:=field(time2,'.',2) 'MD20P'
 	}
 	//similar in listen and log2
 	entry ^= SYSTEM.f(24) ^ ": " ^ (time2 - time0).oconv("MD20P");
 	//entry:=sep:sep:sep:sep
-	entry ^= sep_ ^ msg0;
+	entry ^= " " ^ msg0;
 
 	if (TERMINAL) {
 		printl(entry);

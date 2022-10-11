@@ -1154,7 +1154,7 @@ subroutine addwhoistx() {
 }
 
 subroutine switchcompany() {
-	if (not(ucomps.locate(sys.gcurrcompany, xx))) {
+	if (not(ucomps.locate(sys.gcurrcompcode, xx))) {
 		var tc = ucomps.f(1, 1);
 		if (xx.read(sys.companies, tc)) {
 			call initcompany(tc);

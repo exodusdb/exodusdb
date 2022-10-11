@@ -147,7 +147,6 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//development systems ALWAYS email hardcoded in next line
 		//1. exodus.id always indicates a test system (dos or exodus)
 		//2. on exodus lack of live.txt file indicates a test system
-		//if (var("exodus.id").osfile() or ((not(VOLUMES) and not(var("live.txt").osfile()))) or subject.contains("mvdbpostgres")) {
 		if (var("exodus.id").osfile() or subject.contains("mvdbpostgres")) {
 			forcedemailx = "dev@neosys.com";
 			//toaddress=xlate('USERS','EXODUS',7,'X')
@@ -297,9 +296,7 @@ forcedemail:
 
 		attachfilename.replacer("\\\\", "\\");
 		var cwd = oscwd();
-		if (not(VOLUMES)) {
-			cwd ^= _OSSLASH;
-		}
+		cwd ^= _OSSLASH;
 		if (attachfilename.starts("..")) {
 			attachfilename.paster(1, 2, cwd.field(_OSSLASH, 1, oscwd().count(_OSSLASH) - 1));
 		} else if (attachfilename.starts(".")) {

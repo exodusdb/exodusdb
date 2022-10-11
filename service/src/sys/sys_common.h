@@ -10,7 +10,7 @@ commoninit(sys,sys_common_no)
 
 	var address;
 	var addresses;
-	var gcurrcompany;
+	var gcurrcompcode;
 	var alanguage;
 	var company;
 	var companies;

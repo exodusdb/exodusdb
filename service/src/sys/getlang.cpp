@@ -33,7 +33,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 			origlanguagecode = "";
 		}
 		if (not origlanguagecode) {
-			origlanguagecode = sys.gcurrcompany;
+			origlanguagecode = sys.gcurrcompcode;
 		}
 	}
 
