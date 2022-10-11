@@ -398,10 +398,16 @@ bool CallableBase::openlib(std::string newlibraryname) {
 	plibrary_ = (void*)dlopen(libraryfilename_.c_str(), RTLD_NOW);
 
 	// Try without path in case the library is system installed e.g. in /usr/local/lib
+	std::size_t fnpos0;
+	std::string purelibraryfilename;
 	if (plibrary_ == nullptr) {
-		auto pos0 = libraryfilename_.rfind(OSSLASH_);
-		if (pos0 != std::string::npos && pos0 != libraryfilename_.size() - 1) {
-			auto purelibraryfilename = libraryfilename_.substr(pos0 + 1);
+
+		fnpos0 = libraryfilename_.rfind(OSSLASH_);
+		if (fnpos0 != std::string::npos && fnpos0 != libraryfilename_.size() - 1) {
+
+			// In two places
+			purelibraryfilename = libraryfilename_.substr(fnpos0 + 1);
+
 			//TRACE(purelibraryfilename)
 			plibrary_ = (void*)dlopen(purelibraryfilename.c_str(), RTLD_NOW);
 
@@ -429,8 +435,9 @@ bool CallableBase::openlib(std::string newlibraryname) {
 			throw VarError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
 			^ libraryfilename ^ "' to check its sublibs are available. Also run 'nm -C " ^ libraryfilename ^ "' to check its content.)"
 			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exodus::var::var()");
-		else
-			throw VarError(libraryfilename ^ " does not exist or cannot be found.");
+		else {
+			throw VarError(libraryfilename ^ " does not exist or cannot be found, or " ^ purelibraryfilename ^ " cannot be linked/wrong version?");
+		}
 		return false;
 	}
 

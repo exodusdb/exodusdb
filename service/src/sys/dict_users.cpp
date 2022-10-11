@@ -185,7 +185,7 @@ libraryexit(keys)
 
 libraryinit(last_browser)
 //-----------------------
-#include <htmllib2.h>
+#include <exodus/htmllib2.h>
 
 function main() {
 	var ans = RECORD.f(39, 6);
@@ -197,7 +197,7 @@ libraryexit(last_browser)
 
 libraryinit(last_os)
 //------------------
-#include <htmllib2.h>
+#include <exodus/htmllib2.h>
 
 function main() {
 	var ans = RECORD.f(39, 6);

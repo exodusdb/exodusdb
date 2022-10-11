@@ -3,6 +3,34 @@
 
 #include <exodus/htmllib2.h>
 
+//////////////////////////////////////////////////////////////
+// gethtml2, sendmail and xselect will found in the ~/inc  dir
+// when using printtx.hpp in service programs but will not
+// be available when building cli/list.cpp library
+//////////////////////////////////////////////////////////////
+
+#if __has_include(<gethtml.h>)
+#	include <gethtml.h>
+#	define EXO_HAS_GETHTML
+#else
+//subroutine gethtml(in mode0, out html_letterhead, in compcode0="", in qr_text="") {
+subroutine gethtml(in, out html_letterhead, in = "", in = "") {
+	html_letterhead = "";
+	return;
+}
+#endif
+
+#if __has_include(<sendmail.h>)
+#	include <sendmail.h>
+#	define EXO_HAS_SENDMAIL
+#else
+//subroutine sendmail(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
+subroutine sendmail(in, in, in, in, in, in, out errormsg, in = var(), in = var()) {
+	errormsg = "";
+	return;
+}
+#endif
+
 #if __has_include(<xselect.h>)
 #   include <xselect.h>
 #else
@@ -25,29 +53,6 @@ subroutine docmods(io tx, in params = "") {
 subroutine getmark(in mode, in html, io mark) {
 	call htmllib2("GETMARK", mark, mode, html);
 }
-
-#if __has_include(<gethtml.h>)
-#	include <gethtml.h>
-#	define EXO_HAS_GETHTML
-#else
-//subroutine gethtml(in mode0, out html_letterhead, in compcode0="", in qr_text="") {
-subroutine gethtml(in, out html_letterhead, in = "", in = "") {
-//	call htmllib2("GETHTML", html_letterhead, mode0, compcode0, qr_text);
-	html_letterhead = "";
-	return;
-}
-#endif
-
-#if __has_include(<sendmail.h>)
-#	include <sendmail.h>
-#	define EXO_HAS_SENDMAIL
-#else
-//subroutine sendmail(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
-subroutine sendmail(in, in, in, in, in, in, out errormsg, in = var(), in = var()) {
-	errormsg = "";
-	return;
-}
-#endif
 
 //////////////////////////
 // Main printtx() function

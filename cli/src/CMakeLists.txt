@@ -51,11 +51,11 @@
 	#install(
 
 	# nlist -> bin/list
-	add_executable(nlist nlist.cpp)
-	# cmake - handling executable and library with same name
-	# https://gist.github.com/jlgerber/eafc4ee2b9954e27dd2bb009496b1b03
-	#set_target_properties(nlist PROPERTIES OUTPUT_NAME list)
-	set_target_properties(nlist PROPERTIES RUNTIME_OUTPUT_NAME list)
+	add_executable(list list.cpp)
+#	# cmake - handling executable and library with same name
+#	# https://gist.github.com/jlgerber/eafc4ee2b9954e27dd2bb009496b1b03
+#	#set_target_properties(nlist PROPERTIES OUTPUT_NAME list)
+#	set_target_properties(nlist PROPERTIES RUNTIME_OUTPUT_NAME list)
 
 	#largest first
 	add_executable(compile compile.cpp)
@@ -96,7 +96,7 @@
 
 	# lib #
 	add_library(htmllib2 SHARED htmllib2.cpp)
-	add_library(list SHARED list.cpp)
+	add_library(nlist SHARED nlist.cpp)
 	add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
 	#add_library(number SHARED number.cpp)
 
@@ -109,7 +109,7 @@
 	# Largest first
 	target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
 
-	target_link_libraries(nlist exodus stdc++fs ${LIBS})
+	target_link_libraries(list exodus stdc++fs ${LIBS})
 	target_link_libraries(olist exodus stdc++fs ${LIBS})
 	target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
 	target_link_libraries(edic exodus stdc++fs ${LIBS})
@@ -171,7 +171,7 @@
 			edic
 			dict2sql
 			exodus-cli
-			nlist
+			list
 			olist
 			listfiles
 			listdict
@@ -198,11 +198,27 @@
 		TARGETS
 			dict_xo_clients
 			htmllib2
-			list
+			nlist
 		DESTINATION
 			lib
 	)
 
+	# In libexodus and cli now that both install into lib
+	install(CODE
+	"
+	        execute_process(
+	            COMMAND
+	                ldconfig
+	                OUTPUT_VARIABLE OUTVAR
+	                ERROR_VARIABLE ERRVAR
+	                RESULT_VARIABLE RESVAR
+	        )
+	        message(ldconfig <\${OUTVAR}>\n
+	            <\${ERRVAR}>\n
+	            <\${RESVAR}>\n
+	        )
+	    "
+	)
 #
 # 5. INSTALL INCLUDES
 # ###################

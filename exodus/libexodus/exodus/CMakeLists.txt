@@ -182,6 +182,7 @@
 		DESTINATION share/exodus
 	)
 
+	# In libexodus and cli now that both install into lib
 	install(CODE
 	"
 	        execute_process(
