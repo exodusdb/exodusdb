@@ -3,8 +3,8 @@ libraryinit()
 
 function main() {
 
-	//redirect to execute/perform 'list'
-	SENTENCE.prefixer("LIST ");
+	//redirect to cli 'nlist' library
+	SENTENCE.prefixer("NLIST ");
 
 	perform(SENTENCE);
 

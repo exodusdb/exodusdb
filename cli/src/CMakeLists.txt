@@ -204,30 +204,43 @@
 	)
 
 	# In libexodus and cli now that both install into lib
-	install(CODE
-	"
-	        execute_process(
-	            COMMAND
-	                ldconfig
-	                OUTPUT_VARIABLE OUTVAR
-	                ERROR_VARIABLE ERRVAR
-	                RESULT_VARIABLE RESVAR
-	        )
-	        message(ldconfig <\${OUTVAR}>\n
+	install(
+		CODE
+		"
+			execute_process(
+				COMMAND
+					ldconfig
+				OUTPUT_VARIABLE
+					OUTVAR
+				ERROR_VARIABLE
+					ERRVAR
+				RESULT_VARIABLE
+					RESVAR
+			)
+	        message(
+				ldconfig <\${OUTVAR}>\n
 	            <\${ERRVAR}>\n
 	            <\${RESVAR}>\n
 	        )
-	    "
+		"
 	)
-#
+
 # 5. INSTALL INCLUDES
 # ###################
 #
-	# Moved to libexodus/exodus so that can be included when building cli
-	#install(FILES
-	# printtx.hpp
-	# htmllib2.h
-	#DESTINATION include/exodus)
+	install(
+		FILES
+			# Moved to libexodus/exodus so that can be included when building cli
+			# Also widely used service programs
+			# printtx.hpp
+			# htmllib2.h
+
+			# For any programs that prefer to call nlist instead of perform/execute it
+			nlist.h
+
+		DESTINATION
+			include/exodus
+	)
 
 #
 # Exit
