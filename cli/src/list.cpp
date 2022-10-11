@@ -3,16 +3,16 @@ libraryinit()
 
 #include <exodus/printtx.hpp>
 
-var showborder;//num
-var headtabperpage;//num
-var colorprefix;
+//bool showborder;//num
+//int headtabperpage;//num
+//var colorprefix;
 var nblocks;//num
 var blockn;//num
 var fromdate;
 var fromtime;
-var usecols;//num
-var decimalchar;
-var html;//num
+bool usecols;//num
+//var decimalchar;
+bool html;//num
 var td0;
 var nbsp;
 var td;
@@ -29,16 +29,16 @@ var reportfont;
 var printptr;//num
 var cssver;//num
 var sentencex;
-var maxncols;//num
-var maxnrecs;
+int maxncols;//num
+int maxnrecs;
 var preselect;//num
 var keylist;//num
 var crtx;//num
 var idsupp;//num
 var dblspc;//num
 var detsupp;//num
-var gtotsupp;//num
-var gtotreq;//num
+bool gtotsupp;//num
+bool gtotreq;//num
 var nobase;//num
 var rawtable;//num
 var silent;//num
@@ -51,10 +51,10 @@ dim ccol;
 dim scol;
 dim icol;
 var bheadfn;//num
-var coln;//num
+int coln;//num
 var head;
 var foot2;
-var nbreaks;//num
+int nbreaks;//num
 var breakcolns;
 var breakopts;
 var pagebreaks;
@@ -62,14 +62,14 @@ var headtab;
 var hrown;//num
 var hcoln;//num
 var replacements;
-var nreplacements;//num
+int nreplacements;//num
 var topmargin;//num
 var totalflag;//num
 var breakonflag;//num
 var anytotals;//num
 var multirowcolhdg;//num
 var limits;
-var nlimits;//num
+int nlimits;//num
 var ignorewords;
 var emailtoid;
 var emailccid;
@@ -81,7 +81,7 @@ var nextemailto;
 var nextemailcc;
 var nextemailsubject;
 var sortselect;
-var wordn;//num
+int wordn;//num
 var onlyauthorised;//num
 var word;
 var filename;
@@ -95,14 +95,14 @@ var lastword;
 var title;
 var value;
 var rec;
-var tcoln;//num
-var nn;
-var ii;//num
+int tcoln;//num
+//int nn;
+//int ii;//num
 var tt2;
 var charx;
-var charn;//num
-var ncols;//num
-var breakn;//num
+int charn;//num
+int ncols;//num
+int breakn;//num
 var underline;
 var colul;
 var bar;
@@ -116,7 +116,7 @@ var colhdg;
 var coltags;
 var style;
 var coln2;//num
-var vmcount;//num
+int vmcount;//num
 var thproperties;
 var align;
 var clientmark;
@@ -129,44 +129,44 @@ var v69;
 var v70;
 var v71;
 var dictid;
-var limitn;//num
-var recn;//num
+int limitn;//num
+int recn;//num
 var lastid;
-var ok;//num
+//bool ok;//num
 var readerr;//num
-var fns;
-var nfns;
-var nmvs;//num
-var fnn;//num
-var fn;
+//var fns;
+//int nfns;
+//int nmvs;//num
+//int fnn;//num
+//int fn;
 var limitvals;
-var mvx;
+//var mvx;
 var newhead;
 var printfilename;
-var breakleveln;//num
-var leveln;//num
-var previousmarklevel;//num
-var newmarklevel;//num
+int breakleveln;//num
+int leveln;//num
+int previousmarklevel;//num
+int newmarklevel;//num
 var str1;
 var str2;
 var str3;
 var tx1;
 var oconvx;
-var bodyln;//num
+int bodyln;//num
 var bottomline;
 var lastrecord;//num
 var printfile;
-var storewordn;
-var storecharn;
+int storewordn;
+int storecharn;
 var storeword;
 var storedictrec;
-var startcharn;//num
+int startcharn;//num
 var searchchar;
 var letterhead;
 var wordexpanded;//num
-var breakcoln;
+int breakcoln;
 var storetx;
-var anycell;//num
+//var anycell;//num
 var lastblockn;
 var underline2;
 var cell;//num
@@ -182,14 +182,14 @@ var ownprintfile;//num
 var ptx_filenamelen;
 var ptx_random;
 
-var pagelns;
-var realpagen;//num
-var pagen;//num
+int pagelns;
+int realpagen;//num
+int pagen;//num
 var newpage;//num
 var rfmt;
 var foot;
-var ntxlns;//num
-var nbodylns;//num
+int ntxlns;//num
+int nbodylns;//num
 var ptx_temp;
 var headx;
 var newpagetag;
@@ -199,20 +199,17 @@ var htmltitle;
 var head_or_foot;
 var footx;
 var head1;
-//var optioncharn;//num
-//var optionchars;
-//var optionchar;
 var newoptions;
-var printtx_ii;//num
-var spaceoptionsize;
+int printtx_ii;//num
+//var spaceoptionsize;
 
 let ulchar = "-";
 
 function main() {
-	//
-	showborder = 0;
-	headtabperpage = 1;
-	colorprefix = "\x19";
+
+	bool showborder = false;
+	bool headtabperpage = 1;
+	const char* colorprefix = "\x19";
 
 	// Compile list with optimisation. Its inner loops benefit from efficiency
 
@@ -301,9 +298,6 @@ function main() {
 
 	*/
 
-	//print @AW<30>
-	//get.cursor(cursor)
-
 	nblocks = 0;
 	blockn = 0;
 
@@ -317,11 +311,11 @@ function main() {
 	//use <COL> for hiding non-totalled cols in det-supp (slow)
 	usecols = 0;
 
-	if (BASEFMT[2] eq "C") {
-		decimalchar = ",";
-	} else {
-		decimalchar = ".";
-	}
+//	if (BASEFMT[2] eq "C") {
+//		decimalchar = ",";
+//	} else {
+//		decimalchar = ".";
+//	}
 
 	html = SYSTEM.f(2).lcase().ends("htm") or OPTIONS.contains("h");
 
@@ -356,15 +350,13 @@ function main() {
 		trx = " ";
 	}
 
-	//////
-	//init1:
-	//////
+////////
+//init1:
+////////
 
 	thcolor = SYSTEM.f(46, 1);
 	tdcolor = SYSTEM.f(46, 2);
 	reportfont = SYSTEM.f(46, 3);
-	//if tdcolor else tdcolor='#FFFFC0'
-	//if thcolor else thcolor='#FFFF80'
 
 	//@sentence='LIST 10 SCHEDULES BY VEHICLE_CODE with vehicle_code "kjh kjh" VEHICLE_NAME BREAK-ON VEHICLE_CODE BREAK-ON VEHICLE_CODE TOTAL PRICE (SX)'
 	//@sentence='list markets code name'
@@ -376,7 +368,7 @@ function main() {
 	DICT = "";
 	maxncols = 256;
 
-	maxnrecs = "";
+	maxnrecs = 0;
 	preselect = 0;
 	keylist = "";
 
@@ -390,8 +382,8 @@ function main() {
 	if (sentencex.contains(" DET-SUPP2")) {
 		detsupp = 2;
 	}
-	gtotsupp = "";
-	gtotreq = "";
+	gtotsupp = false;
+	gtotreq = false;
 	nobase = "";
 	rawtable = 0;
 	silent = 0;
@@ -492,7 +484,8 @@ function main() {
 	// Limit number of records if 2nd word is digits like 9999
 	if (word.match("^\\d+$")) {
 		maxnrecs = word;
-		sortselect ^= " " ^ maxnrecs;
+		sortselect ^= " ";
+		sortselect ^= maxnrecs;
 		gosub getword();
 	}
 
@@ -549,7 +542,7 @@ function main() {
 		gosub getword();
 	}
 
-	TRACE(sortselect)
+	//TRACE(sortselect)
 
 nextphrase:
 ///////////
@@ -691,7 +684,7 @@ phraseinit:
 	} else if (word eq "GRAND-TOTAL") {
 		//zzz throw away the grand total options for the time being
 		gosub getword();
-		gtotreq = 1;
+		gtotreq = true;
 
 	} else if (word eq "NO-BASE") {
 		nobase = 1;
@@ -706,7 +699,7 @@ phraseinit:
 
 	//"GTOT-SUPP"
 	} else if (word eq "GTS" or word eq "GTOT-SUPP") {
-		gtotsupp = 1;
+		gtotsupp = true;
 
 	//"MULTIROW-COLHDG"
 	} else if (word eq "DS" or word eq "MULTIROW-COLHDG") {
@@ -920,13 +913,15 @@ phraseinit:
 			colname(coln) = word;
 
 			//increase column width if column title needs it
-			nn = dictrec.f(3).fcount(_VM);
-			for (ii = 1; ii <= nn; ++ii) {
-				tt = dictrec.f(3, ii);
-				if (dictrec.f(10) and tt.len() gt dictrec.f(10)) {
-					dictrec(10) = tt.len();
-				}
-			} //ii;
+			{
+				int nn = dictrec.f(3).fcount(_VM);
+				for (int ii = 1; ii <= nn; ++ii) {
+					tt = dictrec.f(3, ii);
+					if (dictrec.f(10) and tt.len() gt dictrec.f(10)) {
+						dictrec(10) = tt.len();
+					}
+				} //ii;
+			}
 
 			dictrec(bheadfn) = "";
 
@@ -982,7 +977,7 @@ phraseinit:
 					gosub getword();
 
 					//zzz break  options
-					tt = word.index("B");
+					int tt = word.index("B");
 					if (tt) {
 
 						//suppress columns that appear in the heading
@@ -992,7 +987,7 @@ phraseinit:
 
 						//determine B99.99 format for row and col
 						tt2 = "";
-						var wordlen = word.len();
+						int wordlen = word.len();
 						for (tt += 1; tt <= wordlen; ++tt) {
 							charx = word[tt];
 
@@ -1088,7 +1083,7 @@ x1exit:
 		for (coln = ncols; coln >= 2; --coln) {
 			coldict(coln) = coldict(coln - 1);
 			colname(coln) = colname(coln - 1);
-		} //coln;
+		}
 
 		//set column 1
 		colname(1) = "@ID";
@@ -1108,14 +1103,9 @@ x1exit:
 		//increment the list of breaking columns by one as well
 		for (breakn = 1; breakn <= nbreaks; ++breakn) {
 			breakcolns(breakn) = breakcolns.f(breakn) + 1;
-		} //breakn;
+		}
 
 		//and the page break colns
-		//for ii=1 to 9999
-		// tt=pagebreakcolns<1,ii>
-		//while tt
-		// pagebreakcolns<1,ii>=tt+1
-		// next ii
 		if (pagebreaks) {
 			pagebreaks = _FM ^ pagebreaks;
 		}
@@ -1147,9 +1137,9 @@ x1exit:
 		bar = ulchar.str(colul.len() - 1);
 	}
 
-	//////
-	//init2:
-	//////
+//////
+//init2:
+//////
 
 	tx = "";
 
@@ -1190,14 +1180,6 @@ x1exit:
 				//suppressing non-totalled columns may not work well with multi-row colhdg
 				tt = coldict(coln).f(bheadfn);
 
-				//tt2=index(tt,'style="',1)
-				//tt3='background-color:':thcolor
-				//if tt2 then
-				// tt[tt2+7,0]=tt3:';'
-				//end else
-				// tt:=' style=':quote(tt3)
-				// end
-
 				thproperties(coln2) = tt;
 
 				//without the MULTIROW_COLHDG keyword,
@@ -1218,16 +1200,9 @@ x1exit:
 				coltags(-1) = " <col";
 				align = coldict(coln).f(9);
 				if (align eq "R") {
-					//if index(coldict(coln)<7>,'[NUMBER',1) then
-					// *http://www.w3.org/TR/html401/struct/tables.html#adef-align-TD
-					// coltags:=' align="char" char="':decimalchar:'"'
-					//end else
-						//coltags:=' align="right"'
 					align = "right";
 					coltags ^= " style=\"text-align:right\"";
-					// end
 				} else if (align eq "T") {
-					//coltags:=' align="left"'
 					align = "left";
 					coltags ^= " style=\"text-align:left\"";
 				} else {
@@ -1245,9 +1220,9 @@ x1exit:
 				}
 
 			} else {
-				for (ii = 1; ii <= 9; ++ii) {
+				for (int ii = 1; ii <= 9; ++ii) {
 					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict(coln).f(3, ii), coldict(coln).f(11)) ^ " ";
-				} //ii;
+				}
 			}
 		}
 	} //coln;
@@ -1257,9 +1232,7 @@ x1exit:
 	}
 
 	//convert to html with colspan/rowspan where necessary and (Base) as currcode
-	//thproperties='style="background-color:':thcolor:'"'
 	if (html) {
-		//call colrowspan(colhdg, thproperties, nobase, sys.company.f(3));
 		//var basecurrcode = sys.company.f(3)
 		//var basecurrcode = SYSTEM(999);
 		var basecurrcode = "";
@@ -1270,7 +1243,6 @@ x1exit:
 	if (html) {
 
 		var htmlcode;
-		//call getsortjs(htmlcode);
 		call htmllib2("GETSORTJS", htmlcode);
 
 		if (not rawtable) {
@@ -1278,27 +1250,19 @@ x1exit:
 			htmlcode ^= clientmark ^ _EOL;
 		}
 
-		//htmlcode:='<table border="1" cellspacing="0" cellpadding="2"'
-		//htmlcode:=' align="center" '
-		//htmlcode:=' class="maintable"'
-
 		htmlcode ^= "<table class=\"exodustable\"";
-		//cellspacing is only required up to IE7 (or border-collapse)
 		htmlcode ^= " cellspacing=\"0\"";
 		htmlcode ^= " style=\"font-size:66%";
 		htmlcode ^= ";page-break-after:avoid";
-		//htmlcode:=';background-color:':tdcolor
 		htmlcode ^= "\">";
 		htmlcode ^= _FM "<colgroup>" ^ coltags ^ "</colgroup>";
 		//<thead> may be hardcoded elsewhere for page heading
 		//!!!if you change it here, search and change it there too
-
 		htmlcode ^= _FM "<thead style=\"cursor:pointer\" onclick=\"sorttable(event)\">";
 		posttheadmark = "<postthead/>";
 		if (headtab) {
 			htmlcode ^= posttheadmark;
 		}
-		//htmlcode:=fm:coltags
 
 		htmlcode ^= colhdg ^ _FM "</thead>";
 		htmlcode ^= _FM "<tbody>";
@@ -1349,7 +1313,6 @@ x1exit:
 		tt ^= "<colgroup>" _EOL ^ headtabcols.replace(_VM, _EOL) ^ "</colgroup>";
 
 		//style columns where '<col>' not supported.
-		//call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		call htmllib2("CONVCSS", headtabstyle, "headtab0", headtabcols);
 		style ^= _EOL ^ headtabstyle;
 
@@ -1411,9 +1374,9 @@ nextdict:
 		call popselect(0, v69, v70, v71);
 	}
 
-	////////
-	//initrec:
-	////////
+////////
+//initrec:
+////////
 	if (sortselect.count(" ") gt 2 or keylist) {
 
 		//preselect if sselect is by any mv fields since that ignores maxnrecs
@@ -1421,15 +1384,14 @@ nextdict:
 			if (preselect) {
 				call xselect(sortselect.field(" ", 1, 3) ^ " (SR)");
 			}
-			maxnrecs = "";
+			maxnrecs = 0;
 		}
 
-		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
 		call xselect(sortselect ^ " (SR)");
-		//call mssg('','DB',buffer,'')
 
 		if (not LISTACTIVE) {
-			//the words "No record" is hardcoded in autorun and maybe elsewhere
+			// The words "No record" is hardcoded in autorun and maybe elsewhere
+			// so if you change it here, CHANGE IT THERE TOO
 			call mssg("No records found");
 			stop();
 		}
@@ -1448,12 +1410,8 @@ nextdict:
 			call xselect("SELECT " ^ filename ^ " (SR)");
 		}
 	}
-	recn = "";
+	recn = 0;
 	RECCOUNT = 0;
-
-	//cmd='LIST ':filename:' ':matunparse(colnames)
-	//convert fm to ' ' in cmd
-	//call perf(cmd)
 
 	lastid = "%NONE%";
 
@@ -1482,10 +1440,8 @@ nextrec:
 	FILEERRORMODE = 1;
 	FILEERROR = "";
 
-	ok = 0;
 	RECORD = "";
-	ok=readnext(RECORD, ID, MV);
-	if (not ok) {
+	if (not readnext(RECORD, ID, MV)) {
 		FILEERRORMODE = 0;
 		if (STATUS) {
 			tx = "*** Fatal Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
@@ -1540,14 +1496,15 @@ nextrec:
 		for (limitn = 1; limitn <= nlimits; ++limitn) {
 
 			//find maximum mv number for the associated group of fns
-			fns = limits.f(5, limitn);
-			nfns = fns.fcount(_SM);
-			nmvs = 0;
-			for (fnn = 1; fnn <= nfns; ++fnn) {
-				fn = fns.f(1, 1, fnn);
+			var fns = limits.f(5, limitn).convert(_SM, _FM);
+//			nfns = fns.fcount(_SM);
+			int nmvs = 0;
+//			for (fnn = 1; fnn <= nfns; ++fnn) {
+//				fn = fns.f(1, 1, fnn);
+			for (const int fn : fns) {
 				tt = RECORD.f(fn);
 				if (tt.len()) {
-					tt = tt.count(_VM) + 1;
+					tt = tt.fcount(_VM);
 					if (tt gt nmvs) {
 						nmvs = tt;
 					}
@@ -1555,16 +1512,17 @@ nextrec:
 			} //fnn;
 
 			limitvals = calculate(limits.f(1, limitn));
-			for (mvx = nmvs; mvx >= 1; --mvx) {
+			for (int mvx = nmvs; mvx >= 1; --mvx) {
 				tt = limitvals.f(1, mvx);
 				if (tt eq "") {
 					tt = "\"\"";
 				}
-				//locate tt in (limits<3,limitn>)<1,1> using sm setting xx else
 				if (not(limits.f(3, limitn).locateusing(_SM, tt, xx))) {
-					for (fnn = 1; fnn <= nfns; ++fnn) {
-						RECORD.remover(fns.f(1, 1, fnn), mvx);
-					} //fnn;
+//					for (int fnn = 1; fnn <= nfns; ++fnn) {
+//						RECORD.remover(fns.f(1, 1, fnn), mvx);
+//					}
+					for (int fn : fns)
+						RECORD.remover(fn, mvx);
 				}
 			} //mvx;
 		} //limitn;
@@ -1574,9 +1532,9 @@ nextrec:
 	recn += 1;
 	RECCOUNT += 1;
 
-	////////
-	//recinit:
-	////////
+//////////
+//recinit:
+//////////
 
 	if (recn eq 1) {
 		head.move(newhead);
@@ -1590,7 +1548,7 @@ nextrec:
 		if (recn le 2) {
 			logputl();
 		}
-		if (printfilename and not(recn.mod(10))) {
+		if (printfilename and not(mod(recn, 10))) {
 			//first recn will be 2
 			//similar in recinit and x2exit
 			if (TERMINAL) {
@@ -1605,7 +1563,6 @@ nextrec:
 	//get the data from the record into an array of columns
 
 	for (coln = 1; coln <= ncols; ++coln) {
-	//  @mv=0
 
 		if (coldict(coln).f(9) eq "T" and not(html)) {
 
@@ -1615,8 +1572,6 @@ nextrec:
 
 			mcol(coln) = calculate(colname(coln));
 
-			//swap '<' with '&lt;' in m.col(coln)
-			//swap '>' with '&gt;' in m.col(coln)
 			if (html) {
 				mcol(coln).replacer(TM, "<br />");
 			}
@@ -1702,7 +1657,6 @@ recexit:
 		if (anytotals and not(blockn)) {
 			nblocks += 1;
 			blockn = nblocks;
-			//tx:='<span style="display:none" id="B':blockn:'">'
 			tx ^= _FM;
 		}
 
@@ -1710,33 +1664,12 @@ recexit:
 		tx1 = "";
 		if (html) {
 
-				/*;
-				//sadly cannot indicate border on tr element
-				begin case;
-				case new.mark.level;
-					if previous.mark.level then;
-						//no top or bottom border
-						tdz=td0:'<td class="nx">';
-					end else;
-						//no bottom border
-						tdz=td0:'<td class="nb">';
-						end;
-				case if previous.mark.level;
-					//no top border
-					tdz=td0:'<td class="nt">';
-				case 1;
-					//normal top and bottom border
-					tdz=td;
-					end case;
-				*/
 			tdz = td;
 
 			tx1 ^= "<tr";
 			if (blockn) {
 				tx1 ^= " id=\"B" ^ blockn ^ DQ;
 				tx1 ^= " class=\"B" ^ blockn ^ DQ;
-				//tx1:=' name="B':blockn:'"'
-				//clicking expanded det-supped details collapses it
 				if (detsupp) {
 					tx1 ^= " style=\"cursor:pointer";
 					if (detsupp eq 1) {
@@ -1778,18 +1711,15 @@ recexit:
 						if (tt.len()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
 						} else {
-							//tx1:=td:nbsp:tdx
 							tx1 ^= td ^ tdx;
 						}
 					} else {
-						//tx1:=td0:'<td bgcolor=':field(tt,' ',1)[2,9999]:'>'
 						//TODO do with class? to save document space?
 						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).cut(1) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= tt ^ tdx;
 						} else {
-							//tx1:=nbsp:tdx
 							tx1 ^= tdx;
 						}
 					}
@@ -1798,7 +1728,6 @@ recexit:
 					if (tt.len()) {
 						tx1 ^= tdz ^ tt ^ tdx;
 					} else {
-						//tx1:=tdz:nbsp:tdx
 						tx1 ^= tdz ^ tdx;
 					}
 				}
@@ -1806,12 +1735,9 @@ recexit:
 			}
 		} //coln;
 
-		//swap '<td' with '<th' in tx1
-		//swap '<\td' with '<\th' in tx1
 		tx ^= tx1;
 
 		if (html) {
-			//swap '<td></td>' with '<td>':nbsp:'</td>' in tx
 			tx ^= "</tr>";
 		}
 
@@ -1821,7 +1747,7 @@ recexit:
 		if (newmarklevel) {
 			for (coln = 1; coln <= ncols; ++coln) {
 				scol(coln) = "";
-			} //coln;
+			} 
 			previousmarklevel = newmarklevel;
 			goto recexit;
 		}
@@ -1835,9 +1761,9 @@ recexit:
 
 	goto nextrec;
 
-	//////
+//////
 x2exit:
-	//////
+//////
 
 	//similar in recinit and x2exit
 	if (TERMINAL) {
@@ -1847,7 +1773,6 @@ x2exit:
 
 	//print the closing subtotals
 	breakleveln = nbreaks;
-	//if not(gtotsupp) and (not(pagebreakcolns) or gtotreq) then
 	if (not(gtotsupp) and ((not(pagebreaks) or gtotreq))) {
 		breakleveln += 1;
 	}
@@ -1858,20 +1783,19 @@ x2exit:
 	if (html and not(bottomline.unassigned())) {
 		tx(-1) = _FM ^ bottomline ^ _FM;
 	}
-	//tx:=bottomline:fm:fm
 
 	//print number of records and elapsed time
 	if (not rawtable) {
 
 		//this results in duplication and is page-wide instead of report-wide so remove
 		//but will this cause problems in some reports?
-		//if recn and foot2 then tx:=fm:foot2
 
 		if (pagebreaks eq "" and headtab eq "") {
 			if (html) {
 				tx ^= "<p style=\"text-align:center\">";
 			}
-	//records
+
+			//records
 			tt = recn + 0;
 			tx ^= tt ^ " record";
 			if (recn ne 1) {
@@ -1900,11 +1824,9 @@ x2exit:
 		tx ^= _FM " if (readonly) gwindowopenparameters.readonlymode=true;";
 		tx ^= _FM " gwindowopenparameters.key=key;";
 		tx ^= _FM " glogincode=\"" ^ SYSTEM.f(17) ^ "*" ^ USERNAME ^ "*\";";
-		//tx:='window.open(url)}'
 		//similar code in NLIST and LEDGER2
 		tx ^= _FM " var vhtm=window.opener.location.toString().split(\"/\");";
 		tx ^= _FM " vhtm[vhtm.length-1]=url;";
-		//tx:='alert(vhtm.join("/"));'
 		tx ^= _FM " window.open(vhtm.join(\"/\"));";
 		tx ^= "}";
 		tx ^= _FM "</script>";
@@ -1950,9 +1872,6 @@ subroutine getquotedword2() {
 
 subroutine getword() {
 
-	//prevent adecom merging above and below labels
-	{}
-
 getnextword:
 ////////////
 	gosub getword2();
@@ -1978,18 +1897,13 @@ getnextword:
 		charn = storecharn;
 	}
 
-	//!** call note(quote(word):' ':quote(nextword))
-
 	return;
 }
 
 subroutine getword2() {
 
-	//prevent adecom merging above and below labels
-	{}
-
 getword2b:
-	//////////
+//////////
 
 	word = "";
 	wordn += 1;
@@ -2015,7 +1929,6 @@ getword2b:
 	//otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-//	if (charx and ("'" ^ DQ).contains(charx)) {
 	if (charx eq _DQ or charx eq _SQ) {
 		searchchar = charx;
 	} else {
@@ -2163,20 +2076,12 @@ subroutine printbreaks() {
 
 	//print breaks from minor level (1) up to required level
 	//required level can be nbreaks+1 (ie the grand total)
-	//for leveln=1 to breakleveln
-	//for leveln=breakleveln to 1 step -1
 
 	for (leveln = 1; leveln <= breakleveln; ++leveln) {
 		breakcoln = breakcolns.f(leveln);
 
 		storetx = tx;
-		anycell = 0;
-		//output any prior tx is this level is suppressed
-		//if index(breakopts<leveln>,'X',1) and tx then
-		// if recn>1 then
-		//  gosub printtx
-		//  end
-		// end
+		bool anycell = false;
 
 		lastblockn = blockn;
 		blockn = 0;
@@ -2189,7 +2094,6 @@ subroutine printbreaks() {
 			}
 		} else {
 			if (not html) {
-				//underline2=if breakleveln>=nbreaks then bar else underline
 				underline2 = leveln eq 1 ? underline : bar;
 				if (not((tx.last(2)).contains(ulchar))) {
 					if (not tx.ends(_FM)) {
@@ -2212,7 +2116,6 @@ subroutine printbreaks() {
 			if (lastblockn) {
 				tx ^= " style=\"cursor:pointer\" onclick=\"toggle(" "'" "B" ^ lastblockn ^ "'" ")\"";
 			}
-			//if detsupp<2 or (nbreaks>1 and leveln>1) then tx:=' style="font-weight:bold"'
 			tx ^= ">";
 		}
 		for (coln = 1; coln <= ncols; ++coln) {
@@ -2226,9 +2129,6 @@ subroutine printbreaks() {
 
 					if (cell) {
 						if (html) {
-							//breaktotal(coln,leveln+1)+=cell
-							//call addunits(cell, breaktotal(coln, leveln + 1), VM);
-							// breaktotal <- cell
 							call htmllib2("ADDUNITS", breaktotal(coln, leveln + 1), cell, _VM);
 						} else {
 							if (((breaktotal(coln, leveln + 1)).isnum()) and cell.isnum()) {
@@ -2255,8 +2155,6 @@ subroutine printbreaks() {
 					cell.replacer(_VM, "<br />");
 				}
 
-				//if html and cell='' then cell=nbsp
-
 				//and clear it
 				breaktotal(coln, leveln) = "";
 
@@ -2273,7 +2171,6 @@ subroutine printbreaks() {
 				//store the new break value
 				breakvalue(coln) = scol(coln);
 
-				//if coln=pagebreakcoln then
 				if (pagebreaks.f(coln)) {
 
 					//rebuild the heading
@@ -2290,7 +2187,6 @@ subroutine printbreaks() {
 					}
 					//ensure single quotes in data dont screw up the html
 					tt.replacer("'", "''");
-					//if tt='' and html then tt=nbsp
 
 					//insert the page break data
 					//swap "'B'" with tt in newhead
@@ -2307,23 +2203,16 @@ subroutine printbreaks() {
 			} else {
 				cell = "";
 
-				//if 1 or detsupp<2 then
-					//cell=oldbreakvalue(coln)
 				cell = oconv(oldbreakvalue(coln), coldict(coln).f(7));
 				if (breakcolns.locateusing(_FM, coln, colbreakn)) {
 					if (colbreakn lt leveln) {
 						cell = "Total";
 					}
 				}
-				// end
 
 			}
 
 			if (coldict(coln).f(10)) {
-				//if html else
-				// cell=(cell[1,coldict(coln)<10>])
-				// cell=(cell coldict(coln)<11>)
-				// end
 
 				if (html) {
 					tx ^= td0 ^ "<th";
@@ -2347,15 +2236,14 @@ subroutine printbreaks() {
 				} else {
 					tx ^= " ";
 				}
-				//if len(cell) then if cell<>nbsp then anycell=1
 				if (cell.len()) {
-					anycell = 1;
+					anycell = true;
 				}
 			}
 
 		} //coln;
 
-	//breakrowexit:
+		//breakrowexit:
 		if (html) {
 			tx ^= "</tr>";
 		}
@@ -2376,14 +2264,6 @@ subroutine printbreaks() {
 
 	} //leveln;
 
-	//force new page and new heading
-	//if newhead and detsupp<2 then
-	//if newhead then
-	// head=newhead
-	// bodyln=999
-	// end
-
-	//if recn>1 then
 	//if only one record found then avoid skipping printing totals for det-supp
 	if (detsupp lt 2 or recn gt 1) {
 
@@ -2395,12 +2275,9 @@ subroutine printbreaks() {
 
 		//ensure </td></tr></table> gets printed instead endless nesting every table
 		//resulting in only first part of any long report being shown in browser
-		//if newhead and html and tx then
 		if ((newhead and html) and printptr) {
 
 			gosub newheadreplacements();
-
-			//tx:='</tbody></table>'
 
 			//take over the bottomline so that we can print footer after it
 			if (bottomline.unassigned()) {
@@ -2447,15 +2324,13 @@ subroutine addstr() {
 	if (str3.len() lt str1.len()) {
 		str3 ^= (str1.len() - str2.len()).space();
 	}
-	for (ii = 1; ii <= str1.len(); ++ii) {
+	for (int ii = 1; ii <= str1.len(); ++ii) {
 		char1 = (str1[ii]).trim();
 		if (char1 ne "") {
 			char2 = str3[ii];
 			if (char2 eq " ") {
 				str3.paster(ii, 1, char1);
 			} else {
-				//if num(char1) else char1=1
-				//if num(char2) else char2=1
 				if (char1.isnum() and char2.isnum()) {
 					char3 = char1 + char2;
 					if (char3 gt 9) {
@@ -2473,9 +2348,7 @@ subroutine addstr() {
 }
 
 subroutine newheadreplacements() {
-	//if index(newhead,'{',1) else return
-	//replace any {DICTID} in the heading
-	for (ii = 1; ii <= nreplacements; ++ii) {
+	for (int ii = 1; ii <= nreplacements; ++ii) {
 		dictid = replacements.f(ii);
 		tt = "{" ^ dictid ^ "}";
 		tt2 = calculate(dictid);
@@ -2513,8 +2386,7 @@ subroutine emailing() {
 
 	if (printptr) {
 
-		//body='NONE'
-		//attachfilename=system<2>
+		//attachfilename
 		body = "@" ^ SYSTEM.f(2);
 
 		tt = emailto;
@@ -2526,7 +2398,6 @@ subroutine emailing() {
 		if (emailsubject) {
 			tt3 = emailsubject;
 		} else {
-			//tt3='EXODUS: ':field(head<1,1,1>,"'",1)
 			tt3 = head.f(1, 1, 1).field("'", 1);
 			if (tt3.contains(">")) {
 				tt3 = field2(tt3, ">", -1);
@@ -2534,7 +2405,6 @@ subroutine emailing() {
 			tt3 = "EXODUS: " ^ tt3;
 		}
 
-		//osclose printfile
 		//dont email stuff which has no email address
 		if (tt) {
 			call sendmail(tt, tt2, tt3, body, "", "", xxerrmsg);
@@ -2542,10 +2412,6 @@ subroutine emailing() {
 
 		printptr = 0;
 		var("").oswrite(SYSTEM.f(2));
-		//osopen system<2> to printfile else
-		// call msg(quote(system<2>):' failed to reopen')
-		// stop
-		// end
 
 	}
 

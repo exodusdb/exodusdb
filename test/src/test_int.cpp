@@ -203,6 +203,127 @@ programinit()
 		x.dump();
 	}
 
+	{
+		// Check Ramanujan
+		assert(var(17.29*100).toString() eq "1729");
+		assert(var(17.29*100).toDouble() eq 1729.0);
+		assert(var(17.29*100).toInt() eq 1729);
+
+		auto test_round_trip = [] (int test_int) {
+			for (int div = 1; div < 1'000'000'000; div*= 10) {
+				var test = test_int;
+				int mul = div;
+				test /= div;
+				test *= mul;
+				//printl(test_int, "/", div, "*", mul, "=", test);
+				// 997 / 100 * 100 = -997.0000000000001
+				//p4.cpp:28: ExodusProgram::main()::<lambda(int)>: Assertion `test.toString() eq var(test_int).toString()' failed.
+				//assert(test.toString() eq var(test_int).toString());
+				assert(test.toInt()    eq test_int);
+			}
+		};
+
+		test_round_trip(1729);
+		test_round_trip(-1729);
+
+		for (int ii = -1000; ii <= 1000; ii++)
+			test_round_trip(ii);
+
+	}
+	{
+		// Another round trip test
+
+		for (var x : range(-100, 100)) {
+			for (int j = -1000; j<= 1000; j++) {
+				if (not j) continue;
+				var y = x;
+				y /= j;
+				y *= j;
+				if (y.toInt() ne x.toInt()) {
+					printl(x, "/*", j, " = ", y.toInt());
+					//assert(x.toString() eq y.toString());
+					assert(y.toInt() eq x.toInt());
+				}
+			}
+		}
+	}
+
+	{
+		// Check positive doubles truncate int unless very close to upper int
+		assert(var(0.0).toInt()      eq 0);
+		assert(var(0.9).toInt()      eq 0);
+		assert(var(0.99).toInt()     eq 0);
+		assert(var(0.999).toInt()    eq 0);
+		assert(var(0.9999).toInt()   eq 0);
+		assert(var(0.99999).toInt()  eq 1);
+		assert(var(0.999999).toInt() eq 1);
+		assert(var(1.0).toInt()      eq 1);
+		assert(var(1.9).toInt()      eq 1);
+		assert(var(1.99).toInt()     eq 1);
+		assert(var(1.999).toInt()    eq 1);
+		assert(var(1.9999).toInt()   eq 1);
+		assert(var(1.99999).toInt()  eq 2);
+		assert(var(1.999999).toInt() eq 2);
+		assert(var(2.0).toInt()      eq 2);
+		assert(var(2.9).toInt()      eq 2);
+		assert(var(2.99).toInt()     eq 2);
+		assert(var(2.999).toInt()    eq 2);
+		assert(var(2.9999).toInt()   eq 2);
+		assert(var(2.99999).toInt()  eq 3);
+		assert(var(2.999999).toInt() eq 3);
+	}
+
+	{
+		// Check comparison of negative ints and double zero to positive and negative INT zero
+
+		assert(var(-0) eq 0);
+		assert(var(-0) eq 0);
+		assert(var(-0) eq -0);
+		assert(var(-0) eq -0);
+
+		assert(var(-0.0) eq 0);
+		assert(var(-0.0) eq 0);
+		assert(var(-0.0) eq -0);
+		assert(var(-0.0) eq -0);
+
+		// Check comparison of negative ints and double zero to positive and negative DOUBLE zero
+
+		assert(var(-0) eq 0.0);
+		assert(var(-0) eq 0.0);
+		assert(var(-0) eq -0.0);
+		assert(var(-0) eq -0.0);
+
+		assert(var(-0.0) eq 0.0);
+		assert(var(-0.0) eq 0.0);
+		assert(var(-0.0) eq -0.0);
+		assert(var(-0.0) eq -0.0);
+	}
+
+	{
+		// Check negative doubles truncate int unless very close to lower int
+		assert(var(-0.0).toInt()      eq 0);
+		assert(var(-0.9).toInt()      eq -0);
+		assert(var(-0.99).toInt()     eq -0);
+		assert(var(-0.999).toInt()    eq -0);
+		assert(var(-0.9999).toInt()   eq -0);
+		assert(var(-0.99999).toInt()  eq -1);
+		assert(var(-0.999999).toInt() eq -1);
+		assert(var(-1.0).toInt()      eq -1);
+		assert(var(-1.9).toInt()      eq -1);
+		assert(var(-1.99).toInt()     eq -1);
+		assert(var(-1.999).toInt()    eq -1);
+		assert(var(-1.9999).toInt()   eq -1);
+		assert(var(-1.99999).toInt()  eq -2);
+		assert(var(-1.999999).toInt() eq -2);
+		assert(var(-2.0).toInt()      eq -2);
+		assert(var(-2.9).toInt()      eq -2);
+		assert(var(-2.99).toInt()     eq -2);
+		assert(var(-2.999).toInt()    eq -2);
+		assert(var(-2.9999).toInt()   eq -2);
+		assert(var(-2.99999).toInt()  eq -3);
+		assert(var(-2.999999).toInt() eq -3);
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

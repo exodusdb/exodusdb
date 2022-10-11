@@ -19,12 +19,13 @@ function main() {
 
 	var exodusdir = osgetenv("GITHUB_WORKSPACE");
 
-	//Skip if fast testing required
-	if (not COMMAND(2) and osgetenv("EXO_FAST_TEST")) {
-		printl("EXO_FAST_TEST - skipping test.");
-		printl("Test passed");
-		return 0;
-	}
+// Parallel testing negates the need for this
+//	//Skip if fast testing required
+//	if (not COMMAND(2) and osgetenv("EXO_FAST_TEST")) {
+//		printl("EXO_FAST_TEST - skipping test.");
+//		printl("Test passed");
+//		return 0;
+//	}
 
 	// skip regression testing for speed
 	// unless we are testing on github

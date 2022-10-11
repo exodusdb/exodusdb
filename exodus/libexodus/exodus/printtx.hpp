@@ -63,9 +63,6 @@ subroutine printtx() {
 	}
 	if (printptr == 0) {
 
-		//common /system/ system
-		//PRINTER OFF;
-
 		if (topmargin.unassigned()) {
 			topmargin = 8;
 		}
@@ -78,9 +75,10 @@ subroutine printtx() {
 
 		//if no printfile assume command mode and make an output file name
 		printfilename = SYSTEM.f(2);
-		if (html.unassigned()) {
-			html = printfilename.lcase().contains(".htm");
-		}
+		//if (html.unassigned()) {
+		if (printfilename.lcase().ends(".htm"))
+			html = 1;
+
 		var ownprintfile = 0;
 		//if (printfilename == "") {
 		//	printfilename = var(999999999).rnd().last(8);
