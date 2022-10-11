@@ -287,9 +287,11 @@ class PUBLIC var final {
 	}
 
 	//////////////////////
-	// 4. move constructor - Can default assuming that temporaries are unlikely to be undefined or unassigned
+	// 4. move constructor
 	//////////////////////
 	//
+	// If noexcept then STL containers will use move during various operations otherwise they will use copy
+	// We will use default since temporaries are unlikely to be undefined or unassigned and we will skip the usual checks
 	var(TVR fromvar) noexcept = default;
 
 	/////////////////////
@@ -2108,10 +2110,18 @@ class PUBLIC var final {
 			//var_int = std::floor(var_dbl);
 
 			// Truncate double to int
-			// -2.9 -> -2
-			// +2.9 -> +2
 			//var_int = std::trunc(var_dbl);
-			var_int = static_cast<varint_t>(var_dbl);
+			if (var_dbl >= 0) {
+				// 2.9 -> 2
+				// 2.9999 -> 2
+				// 2.99999 -> 3
+				var_int = static_cast<varint_t>(var_dbl + SMALLEST_NUMBER / 10);
+			} else {
+				// -2.9 -> -2
+				// -2.9999 -> -2.9
+				// -2.99999 -> -3
+				var_int = static_cast<varint_t>(var_dbl - SMALLEST_NUMBER / 10);
+			}
 
 			// Add int flag
 			var_typ |= VARTYP_INT;
