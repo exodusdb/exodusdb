@@ -4,8 +4,6 @@ libraryinit()
 #include <langdate.h>
 #include <authorised.h>
 
-//#include <system_common.h>
-
 // For sys.gcurrcompcode (for compcode), sys.companies (to read letterheadcompany and imagecompany) and sys.glang (months for langdate)
 #include <sys_common.h>
 
@@ -15,18 +13,32 @@ var compcode;
 var letterheadcompany;
 var keyx;
 var tt;
-var tdate;
-//var xx;
-//var div;
-//var divx;
 
-function main(in mode0, out html, in compcode0="", in qr_text="") {
+function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 
-	//$insert bp,agency.common
+	// gethtml may be "perform"ed, "execute"d  or "call"ed
+	//
+	// 1. PERFORM/EXECUTE
+	//
+	//  letterhead = perform("gethtml");
+	//
+	// nlist PERFORMs gethtml (via printtx.hpp) when service lib list.cpp performs nlist.
+	//
+	// nlist does not perform, nor calls, gethtml when cli list.cpp command line calls nlist.
+	//
+	// 2. CALL
+	//
+	//  call gethtml(mode, letterhead, compcode, qr_text);
+	//
+	// Lots of service and application code CALLs gethtml directly
+	// or indirectly via included printtx.hpp
+	//
 
-	var mode = mode0;
-	modex = mode;
-	html = "";
+	var mode;
+	if (mode0.assigned()) {
+		mode = mode0;
+		modex = mode;
+	}
 
 	//returns source in MODE ie COMPANY or definitions file key
 
@@ -36,7 +48,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	hascompanies = SYSTEM.f(133);
 
 	compcode = "";
-	if (compcode0.unassigned()) {
+	if (mode0.unassigned() or compcode0.unassigned()) {
 		if (hascompanies) {
 			compcode = sys.gcurrcompcode;
 		}
@@ -52,7 +64,7 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	if (hascompanies) {
 		if (not(sys.companies.unassigned() or sys.companies eq "")) {
 			if (not(letterheadcompany.read(sys.companies, compcode))) {
-				{}
+				letterheadcompany = "";
 			}
 		}
 	}
@@ -71,26 +83,27 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 	//////////////////////////////////////////
 
 	mode = "Company File ";
-	gosub getcompanyconfig(html, mode);
+	var letterhead;
+	gosub getcompanyconfig(letterhead, mode);
 
 	//otherwise get from definitions
 	///////////////////////////////
 
-	if (not html) {
-		gosub getheadhtm(html);
-		if (html) {
+	if (not letterhead) {
+		gosub getheadhtm(letterhead);
+		if (letterhead) {
 			mode = "DEFINITIONS " ^ keyx;
 		} else {
 			mode = "No letterhead defined";
 		}
 
 		//normalise handcoded html so later conversions will work
-		html.replacer("<image", "<img");
-		html.replacer("<IMAGE", "<img");
+		letterhead.replacer("<image", "<img");
+		letterhead.replacer("<IMAGE", "<img");
 
 		//image should not have closing tag but dont bother removing it
-		//swap '</image>' with '' in html
-		//swap '</IMAGE>' with '' in html
+		//swap '</image>' with '' in letterhead
+		//swap '</IMAGE>' with '' in letterhead
 
 	}
 
@@ -103,32 +116,33 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 			clientmark = SYSTEM.f(14);
 		}
 	}
-	html.replacer("%AGENCY%", clientmark);
+	letterhead.replacer("%AGENCY%", clientmark);
 
 	//similar code in GETHTML and GENERALMACROS TODO: use GENERALMACROS instead
 
-	html.replacer("%COMPANY_NAME%", letterheadcompany.f(1));
-	html.replacer("%TAX_REGISTRATION_NO%", letterheadcompany.f(21));
-	html.replacer("%TAX_REG_NO%", letterheadcompany.f(21));
-	html.replacer("%COMPANY_REG_NO%", letterheadcompany.f(59));
+	letterhead.replacer("%COMPANY_NAME%", letterheadcompany.f(1));
+	letterhead.replacer("%TAX_REGISTRATION_NO%", letterheadcompany.f(21));
+	letterhead.replacer("%TAX_REG_NO%", letterheadcompany.f(21));
+	letterhead.replacer("%COMPANY_REG_NO%", letterheadcompany.f(59));
 
 	var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 	tt = "L";
+	var tdate;
 	if (hascompanies) {
 		call langdate("OCONV", datetime, tt, tdate, sys.glang);
 	} else {
 		call langdate("OCONV", datetime, tt, tdate, "");
 	}
-	html.replacer("%DATE%", tdate);
-	html.replacer("%TIME%", oconv(datetime.field(".", 2), "[TIME2]"));
-	html.replacer("%STATION%", STATION);
+	letterhead.replacer("%DATE%", tdate);
+	letterhead.replacer("%TIME%", oconv(datetime.field(".", 2), "[TIME2]"));
+	letterhead.replacer("%STATION%", STATION);
 
-	html.replacer("%DATAURL%", "%URL%/data/%DATABASE%");
-	html.replacer("%URL%", SYSTEM.f(114, 1));
-	html.replacer("%DATABASE%", SYSTEM.f(17, 1));
+	letterhead.replacer("%DATAURL%", "%URL%/data/%DATABASE%");
+	letterhead.replacer("%URL%", SYSTEM.f(114, 1));
+	letterhead.replacer("%DATABASE%", SYSTEM.f(17, 1));
 
 	// QR code (requires apt install qrencode)
-	if (html.contains("%QR%")) {
+	if (letterhead.contains("%QR%")) {
 
 		var svg = "";
 		if (qr_text) {
@@ -155,28 +169,28 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 			"<p id='tooltip1'><a>" ^ svg ^ "<span> " ^ qr_tip.replace("\n","<br />") ^ "</span></a></p>";
 		}
 
-		html.replacer("%QR%", svg);
+		letterhead.replacer("%QR%", svg);
 	}
 
 	//check valid html .. html from company file is prechecked anyway
 
-	if (html) {
+	if (letterhead) {
 
 		//check simple HTML
-		if (html.count("<") ne html.count(">")) {
+		if (letterhead.count("<") ne letterhead.count(">")) {
 			call mssg(keyx.quote() ^ " page header is not valid HTML");
-			html = "";
+			letterhead = "";
 		}
 
 		//check various tags exist in equal numbers
 		//this doesnt check if they are in a correct sequence or hierarchy etc
 		var tags = "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
 		let ntags = tags.count(",") + 1;
-		var html2 = html.lcase();
+		var letterhead2 = letterhead.lcase();
 		for (const var tagn : range(1, ntags)) {
 			var tag = tags.field(",", tagn);
-			if (html2.count("<" ^ tag ^ ">") + html2.count("<" ^ tag ^ " ") ne html2.count("</" ^ tag ^ ">")) {
-				html = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
+			if (letterhead2.count("<" ^ tag ^ ">") + letterhead2.count("<" ^ tag ^ " ") ne letterhead2.count("</" ^ tag ^ ">")) {
+				letterhead = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
 				//tagn = ntags;
 				break;
 			}
@@ -184,8 +198,8 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 
 	}
 
-	html.replacer(_FM, _EOL);
-	html.trimmer(_EOL);
+	letterhead.replacer(_FM, _EOL);
+	letterhead.trimmer(_EOL);
 
 	if (authorised("EDIT PRINTOUTS")) {
 
@@ -205,21 +219,29 @@ function main(in mode0, out html, in compcode0="", in qr_text="") {
 		tt ^= " style=\"position:fixed;top:2px;left:2px;font-size:60%;display:none\"";
 		tt ^= " onclick=" ^ (onclick.quote());
 		tt ^= "></button>";
-		html.prefixer(tt);
+		letterhead.prefixer(tt);
 
 		//click logos to switch on/off editing
 		onclick = "javascript:edithtml.click()";
-		html.replacer("<IMG", "<img");
-		html.replacer("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
+		letterhead.replacer("<IMG", "<img");
+		letterhead.replacer("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
 
 	}
 
+	// Also return letterhead in ANS in case gethtml was performed, not called.
+	if (mode0.unassigned()) {
+		ANS = letterhead;
+		return ANS;
+	}
+
+	letterhead.move(letterhead_out);
 	return 0;
+
 }
 
-subroutine getcompanyconfig(io html, io mode) {
+subroutine getcompanyconfig(out letterhead, io mode) {
 
-	html = "";
+	letterhead = "";
 
 	var ncols = 0;
 	for (const var fn : range(61, 66)) {
@@ -390,14 +412,12 @@ subroutine getcompanyconfig(io html, io mode) {
 		tab(-1) = "</div>";
 	}
 
-	html = tab;
+	letterhead = tab;
 
 	return;
 }
 
-subroutine getheadhtm(io html) {
-
-	{}
+subroutine getheadhtm(io letterhead) {
 
 nextmodex:
 //////////
@@ -407,7 +427,7 @@ nextprefix:
 ///////////
 	keyx = prefix ^ modex.f(1, 1) ^ var(".htm").ucase();
 
-	if (not(html.read(DEFINITIONS, keyx))) {
+	if (not(letterhead.read(DEFINITIONS, keyx))) {
 
 		//try again same mode but without company code prefix
 		if (prefix) {

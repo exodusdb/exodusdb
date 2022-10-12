@@ -1481,10 +1481,10 @@ bool var::contains(SV str) const {
 	// Differ from c++, javascript, python3
 	if (str.empty()) {
 		var(function_sig).errputl();
-//		VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
-//		e.description.errput();
-//		//e.stack().f(1).errputl(", ");
-//		e.stack(1).f(1).errputl(", ");
+		VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
+		e.description.errput();
+		//e.stack().f(1).errputl(", ");
+		e.stack(1).f(1).errputl(", ");
 		return false;
 	}
 

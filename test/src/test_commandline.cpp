@@ -20,16 +20,18 @@ function main() {
 	var execdir = EXECPATH.field(OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
 //	execdir = "";
 	execdir = "./";
-    assert(osshellread(execdir ^ "testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
-    assert(osshellread(execdir ^ "testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");
+	TRACE(execdir ^ "testcommandline");
+	osshell(execdir ^ "testcommandline '(ab)'");
+	assert(osshellread(execdir ^ "testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
+	assert(osshellread(execdir ^ "testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");
 
-    assert(osshellread(execdir ^ "testcommandline a b c '(ab)'") eq "testcommandline a b c (ab)\ntestcommandline^a^b^c\nab\n");
-    assert(osshellread(execdir ^ "testcommandline a b c '{ab}'") eq "testcommandline a b c {ab}\ntestcommandline^a^b^c\nab\n");
+	assert(osshellread(execdir ^ "testcommandline a b c '(ab)'") eq "testcommandline a b c (ab)\ntestcommandline^a^b^c\nab\n");
+	assert(osshellread(execdir ^ "testcommandline a b c '{ab}'") eq "testcommandline a b c {ab}\ntestcommandline^a^b^c\nab\n");
 
-    assert(osshellread(execdir ^ "testcommandline a b c '(a b)'").outputl() eq "testcommandline a b c (a b)\ntestcommandline^a^b^c\na b\n");
-    assert(osshellread(execdir ^ "testcommandline a b c '{a b}'").outputl() eq "testcommandline a b c {a b}\ntestcommandline^a^b^c\na b\n");
+	assert(osshellread(execdir ^ "testcommandline a b c '(a b)'").outputl() eq "testcommandline a b c (a b)\ntestcommandline^a^b^c\na b\n");
+	assert(osshellread(execdir ^ "testcommandline a b c '{a b}'").outputl() eq "testcommandline a b c {a b}\ntestcommandline^a^b^c\na b\n");
 
-    assert(osshellread(execdir ^ "testcommandline a b c '(' a or b ')'").outputl() eq "testcommandline a b c ( a or b )\ntestcommandline^a^b^c^(^a^or^b^)\n\n");
+	assert(osshellread(execdir ^ "testcommandline a b c '(' a or b ')'").outputl() eq "testcommandline a b c ( a or b )\ntestcommandline^a^b^c^(^a^or^b^)\n\n");
 
 	// Syntax error
 //    assert(osshellread(execdir ^ "testcommandline a b c (a b)").outputl() eq "testcommandline a b c (a b)\ntestcommandline^a^b^c^(a^b)\n\n");

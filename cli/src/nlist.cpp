@@ -45,6 +45,7 @@ var silent;//num
 var dictvoc;
 dim colname;
 dim coldict;
+dim coldict2;
 dim mcol;
 dim pcol;
 dim ccol;
@@ -1112,11 +1113,23 @@ x1exit:
 
 	}
 
-	if (breakcolns.ends(_FM)) {
-		breakcolns.popper();
-	}
-	if (breakopts.ends(_FM)) {
-		breakopts.popper();
+//	if (breakcolns.ends(_FM)) {
+//		breakcolns.popper();
+//	}
+//	if (breakopts.ends(_FM)) {
+//		breakopts.popper();
+//	}
+	breakcolns.trimmerlast(_FM);
+	breakopts.trimmerlast(_FM);
+
+	// Split coldict into two dimensional array for speed
+	const int maxdictfn = 20;
+	coldict2.redim(ncols, maxdictfn);
+	for (auto coln : range(1, ncols)) {
+		var& dictrec = coldict(coln);
+		for (auto fn : range(1, maxdictfn)) {
+			coldict2(coln, fn) = dictrec.f(fn);
+		}
 	}
 
 	//make underline and column title underline
@@ -1124,22 +1137,22 @@ x1exit:
 		underline = "";
 		colul = "";
 		for (coln = 1; coln <= ncols; ++coln) {
-			if (coldict(coln).f(10)) {
-				if (coldict(coln).f(12)) {
+			if (coldict2(coln, 10)) {
+				if (coldict2(coln, 12)) {
 					tt = ulchar;
 				} else {
 					tt = " ";
 				}
-				underline ^= tt.str(coldict(coln).f(10)) ^ " ";
-				colul ^= ulchar.str(coldict(coln).f(10)) ^ " ";
+				underline ^= tt.str(coldict2(coln, 10)) ^ " ";
+				colul ^= ulchar.str(coldict2(coln, 10)) ^ " ";
 			}
 		} //coln;
 		bar = ulchar.str(colul.len() - 1);
 	}
 
-//////
+////////
 //init2:
-//////
+////////
 
 	tx = "";
 
@@ -1170,21 +1183,21 @@ x1exit:
 
 		//suppress drilldown if no totals or breakdown
 		if (not(anytotals) or not(nbreaks)) {
-			coldict(coln)(bheadfn) = "";
+			coldict2(coln, bheadfn) = "";
 		}
 
-		if (coldict(coln).f(10)) {
+		if (coldict2(coln, 10)) {
 			if (html) {
 				coln2 += 1;
 
 				//suppressing non-totalled columns may not work well with multi-row colhdg
-				tt = coldict(coln).f(bheadfn);
+				tt = coldict2(coln, bheadfn);
 
 				thproperties(coln2) = tt;
 
 				//without the MULTIROW_COLHDG keyword,
 				//vm indicates folding, \\ indicates rows in column headings
-				tt = coldict(coln).f(3);
+				tt = coldict2(coln, 3);
 				if (not multirowcolhdg) {
 					tt.replacer(_VM, "<br />");
 				}
@@ -1198,7 +1211,7 @@ x1exit:
 				//swap vm with '<br />' in colhdg
 
 				coltags(-1) = " <col";
-				align = coldict(coln).f(9);
+				align = coldict2(coln, 9);
 				if (align eq "R") {
 					align = "right";
 					coltags ^= " style=\"text-align:right\"";
@@ -1209,7 +1222,7 @@ x1exit:
 					align = "center";
 				}
 				if (usecols) {
-					coltags ^= coldict(coln).f(bheadfn);
+					coltags ^= coldict2(coln, bheadfn);
 				}
 				coltags ^= " />";
 
@@ -1221,7 +1234,7 @@ x1exit:
 
 			} else {
 				for (int ii = 1; ii <= 9; ++ii) {
-					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict(coln).f(3, ii), coldict(coln).f(11)) ^ " ";
+					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict2(coln,3).f(1, ii), coldict2(coln, 11)) ^ " ";
 				}
 			}
 		}
@@ -1564,9 +1577,9 @@ nextrec:
 
 	for (coln = 1; coln <= ncols; ++coln) {
 
-		if (coldict(coln).f(9) eq "T" and not(html)) {
+		if (coldict2(coln, 9) eq "T" and not(html)) {
 
-			mcol(coln) = oconv(calculate(colname(coln)), coldict(coln).f(11));
+			mcol(coln) = oconv(calculate(colname(coln)), coldict2(coln, 11));
 
 		} else {
 
@@ -1576,9 +1589,6 @@ nextrec:
 				mcol(coln).replacer(TM, "<br />");
 			}
 		}
-
-		//call note(' @id/coln/m.col/coldictx<11>=':@id:'/':coln:'/':m.col(coln):'/':coldict(coln)<11>)
-		//call note(' @id/@record<':(coldict(coln)<2>):'>=':@id:'/':(@record<coldict(coln)<2>))
 
 		pcol(coln) = 1;
 		ccol(coln) = 7;
@@ -1627,7 +1637,7 @@ recexit:
 	//break totals - add at the bottom level (1)
 	for (coln = 1; coln <= ncols; ++coln) {
 		//only totalled columns
-		if (coldict(coln).f(12)) {
+		if (coldict2(coln, 12)) {
 			if (icol(coln)) {
 				if (html) {
 					//breaktotal(coln,1)+=i.col(coln)
@@ -1683,7 +1693,7 @@ recexit:
 		}
 		for (coln = 1; coln <= ncols; ++coln) {
 			tt = scol(coln);
-			oconvx = coldict(coln).f(7);
+			oconvx = coldict2(coln, 7);
 			if (oconvx) {
 				tt = oconv(tt, oconvx);
 				if (html) {
@@ -1694,9 +1704,9 @@ recexit:
 					}
 				}
 			}
-			if (coldict(coln).f(10)) {
+			if (coldict2(coln, 10)) {
 				if (not html) {
-					tt = oconv(tt, coldict(coln).f(11));
+					tt = oconv(tt, coldict2(coln, 11));
 				}
 				if (tt eq "") {
 					//tt=nbsp
@@ -2121,7 +2131,7 @@ subroutine printbreaks() {
 		for (coln = 1; coln <= ncols; ++coln) {
 
 			//total column
-			if (coldict(coln).f(12)) {
+			if (coldict2(coln, 12)) {
 				cell = breaktotal(coln, leveln);
 
 				//add into the higher level
@@ -2146,7 +2156,7 @@ subroutine printbreaks() {
 				}
 
 				//format it
-				oconvx = coldict(coln).f(7);
+				oconvx = coldict2(coln, 7);
 				if (oconvx) {
 					cell = oconv(cell, oconvx);
 				}
@@ -2163,7 +2173,7 @@ subroutine printbreaks() {
 
 				//print the old break value
 				cell = breakvalue(coln);
-				oconvx = coldict(coln).f(7);
+				oconvx = coldict2(coln, 7);
 				if (oconvx) {
 					cell = oconv(cell, oconvx);
 				}
@@ -2203,7 +2213,7 @@ subroutine printbreaks() {
 			} else {
 				cell = "";
 
-				cell = oconv(oldbreakvalue(coln), coldict(coln).f(7));
+				cell = oconv(oldbreakvalue(coln), coldict2(coln, 7));
 				if (breakcolns.locateusing(_FM, coln, colbreakn)) {
 					if (colbreakn lt leveln) {
 						cell = "Total";
@@ -2212,23 +2222,23 @@ subroutine printbreaks() {
 
 			}
 
-			if (coldict(coln).f(10)) {
+			if (coldict2(coln, 10)) {
 
 				if (html) {
 					tx ^= td0 ^ "<th";
 				}
 				if (not usecols) {
-					tx ^= coldict(coln).f(bheadfn);
+					tx ^= coldict2(coln, bheadfn);
 				}
 				if (html) {
-					if (coldict(coln).f(9) eq "R") {
+					if (coldict2(coln, 9) eq "R") {
 						tx ^= " style=\"text-align:right\"";
 					}
 					tx ^= ">";
 				}
 				//eg L#20 R#20 T#20 etc
 				if (not html) {
-					cell = oconv(cell, coldict(coln).f(11));
+					cell = oconv(cell, coldict2(coln, 11));
 				}
 				tx ^= cell;
 				if (html) {

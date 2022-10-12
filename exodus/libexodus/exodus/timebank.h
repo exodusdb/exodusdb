@@ -14,7 +14,7 @@
 
 namespace exodus {
 
-//void get_timeacc0();
+void get_timeacc0();
 
 inline struct TimeBank {
 
@@ -44,74 +44,75 @@ inline struct TimeBank {
 		timeacc_list.converter("\n ", _FM _VM);
 		for (var timeacc_item : timeacc_list) {
 			timeacc_names_.at(timeacc_item.f(1, 1)) = timeacc_item.field(_VM, 2, 999).convert(_VM, " ").toString();
-
-		std::cout << std::endl;
+		}
 
 		// Print out all the time accounts
 		// Skip time_acno 0
 		int naccs = 0;
 		for (unsigned time_acno = 1; time_acno < timeaccs_.size(); time_acno++) {
 			auto count = timeaccs_[time_acno].count;
-			if (count) {
+			if (not count)
+				continue;
 
-				auto ns = timeaccs_[time_acno].ns;
+			auto ns = timeaccs_[time_acno].ns;
 
-				// Deduct pure deposit time * ndeposits
-				if (time_acno) {
-					auto tot_pure_deposit_time = pure_deposit_time * count;
-					if (ns > tot_pure_deposit_time)
-						ns -= tot_pure_deposit_time;
-					else
-						//instead of zero put 1 to indicate something special
-						ns = 1;
-				}
-
-				// Print column headings
-				if (naccs++ == 0)
-					std::cerr << "A/c.       n      ms   ms/op        μs     μs/op          ns       ns/op name" << std::endl;
-
-				// Print a row
-				std::cerr
-
-				// time_acno
-				<< std::right << std::setw(4)
-				<< time_acno
-
-				// Count
-				<< std::right << std::setw(8)
-				<< count
-
-				// ms
-				<< std::right << std::setw(8)
-				<< ns / 1'000'000
-
-				// ms/op
-				<< std::right << std::setw(8)
-				<< ns / 1'000'000/count
-
-				// us
-				<< std::right << std::setw(10)
-				<< ns / 1'000
-
-				// us/op
-				<< std::right << std::setw(10)
-				<< ns/1000/count
-
-				// ns
-				<< std::right << std::setw(12)
-				<< ns
-
-				//ns/op
-				<< std::right << std::setw(12)
-				<< ns/count << " "
-
-				// timeacc name
-				<< timeacc_names_[time_acno]
-
-				<< std::endl;
+			// Deduct pure deposit time * ndeposits
+			if (time_acno) {
+				auto tot_pure_deposit_time = pure_deposit_time * count;
+				if (ns > tot_pure_deposit_time)
+					ns -= tot_pure_deposit_time;
+				else
+					//instead of zero put 1 to indicate something special
+					ns = 1;
 			}
-		}
-	}
+
+			// Print column headings
+			if (naccs++ == 0) {
+				std::cout << std::endl;
+				std::cerr << "A/c.       n      ms   ms/op        μs     μs/op          ns       ns/op name" << std::endl;
+			}
+
+			// Print a row
+			std::cerr
+
+			// time_acno
+			<< std::right << std::setw(4)
+			<< time_acno
+
+			// Count
+			<< std::right << std::setw(8)
+			<< count
+
+			// ms
+			<< std::right << std::setw(8)
+			<< ns / 1'000'000
+
+			// ms/op
+			<< std::right << std::setw(8)
+			<< ns / 1'000'000/count
+
+			// us
+			<< std::right << std::setw(10)
+			<< ns / 1'000
+
+			// us/op
+			<< std::right << std::setw(10)
+			<< ns/1000/count
+
+			// ns
+			<< std::right << std::setw(12)
+			<< ns
+
+			//ns/op
+			<< std::right << std::setw(12)
+			<< ns/count << " "
+
+			// timeacc name
+			<< timeacc_names_[time_acno]
+
+			<< std::endl;
+		} // next timeacc
+	} // ~TimeBank
 
 } timebank;
 
@@ -141,110 +142,110 @@ struct Timer {
 
 };
 
-//void get_timeacc0() {
-//
-//	// 100 deposits to estimate pure deposit time
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//	{Timer {0};}
-//}
+void get_timeacc0() {
+
+	// 100 deposits to estimate pure deposit time
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+	{Timer {0};}
+}
 
 } // namespace exodus
 #endif // EXO_TIMEBANK

@@ -812,12 +812,12 @@ function loop_exit() {
 		return true;
 	}
 
-	//f10 or ? on linux
-	if (charx eq INTCONST.f(7)) {
-		//execute("RUNMENU " ^ ENVIRONSET.f(37));
-		execute("RUNMENU");
-		return true;
-	}
+//	//f10 or ? on linux
+//	if (charx eq INTCONST.f(7)) {
+//		//execute("RUNMENU " ^ ENVIRONSET.f(37));
+//		execute("RUNMENU");
+//		return true;
+//	}
 
 	if (charx ne "") {
 

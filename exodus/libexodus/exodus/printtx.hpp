@@ -15,7 +15,10 @@
 #else
 //subroutine gethtml(in mode0, out html_letterhead, in compcode0="", in qr_text="") {
 subroutine gethtml(in, out html_letterhead, in = "", in = "") {
-	html_letterhead = "";
+	if (APPLICATION)
+		html_letterhead = perform("gethtml");
+	else
+		html_letterhead = "";
 	return;
 }
 #endif
