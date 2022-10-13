@@ -308,7 +308,7 @@ function main() {
 				var matches = errors.match("\\w" ^ filename ^ ":(\\d+):(\\d+):");
 				if (matches) {
 
-					startatlineno = matches.f(1,2);
+					startatlineno = matches.f(1, 2);
 
 					// skip column because nano treats tab as one column
 					//startatlineno ^= "," ^ matches.f(1,3);
@@ -324,10 +324,10 @@ function main() {
 						osflush();
 						reply.inputn(1);
 						printl();
-						if (reply.convert("YyNn\n","") eq "")
+						if (reply.convert("YyNn\n", "") eq "")
 							break;
 					}
-					if (reply.convert("Yy\n","") eq "")
+					if (reply.convert("Yy\n", "") eq "")
 						continue;
 
 					abort("");
@@ -336,7 +336,7 @@ function main() {
 			} // handle compile errors
 
 			// If no errors, break out of edit/compile loop and go to the next file
-			print(compileoutputfilename);
+			//print(compileoutputfilename);
 			break;
 
 		} // next edit/compile

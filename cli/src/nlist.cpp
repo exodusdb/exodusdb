@@ -1025,10 +1025,10 @@ phraseinit:
 			}
 
 		}
-
-dictrecexit:;
-
-	} else if (word eq "IGNOREWORD") {
+dictrecexit:
+	{}
+	}
+	else if (word eq "IGNOREWORD") {
 		gosub getword();
 		ignorewords(1, -1) = word;
 
@@ -1234,7 +1234,7 @@ x1exit:
 
 			} else {
 				for (int ii = 1; ii <= 9; ++ii) {
-					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict2(coln,3).f(1, ii), coldict2(coln, 11)) ^ " ";
+					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict2(coln, 3).f(1, ii), coldict2(coln, 11)) ^ " ";
 				}
 			}
 		}
@@ -1626,7 +1626,7 @@ recexit:
 	newmarklevel = 0;
 	for (coln = 1; coln <= ncols; ++coln) {
 		if (ccol(coln) ge previousmarklevel) {
-			icol(coln)=mcol(coln).substr2(pcol(coln), ccol(coln));
+			icol(coln) = mcol(coln).substr2(pcol(coln), ccol(coln));
 			scol(coln) = icol(coln);
 		}
 		if (ccol(coln) gt newmarklevel) {
@@ -1757,7 +1757,7 @@ recexit:
 		if (newmarklevel) {
 			for (coln = 1; coln <= ncols; ++coln) {
 				scol(coln) = "";
-			} 
+			}
 			previousmarklevel = newmarklevel;
 			goto recexit;
 		}

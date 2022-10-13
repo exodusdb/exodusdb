@@ -6,7 +6,7 @@ var params2;
 var tagsep;
 
 //Note that the argument names are not accurate for GETCSS, GETSORTJS, COLROWSPAN, CONVCSS, ADDUNITS, DOCMODS, GETMARK modes
-function main(in mode, io dataio, in params0="", in params20="", in glang="") {
+function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") {
 
 	// First for speed since called for every column and row
 	if (mode eq "ADDUNITS") {
@@ -376,7 +376,7 @@ function main(in mode, io dataio, in params0="", in params20="", in glang="") {
 	} else if (mode eq "GETSORTJS") {
 
 		//in c++ get from raw text string below
-		dataio=getvogonpoetry_sortjs();
+		dataio = getvogonpoetry_sortjs();
 
 		dataio.replacer(FM, "\n");
 		dataio.replacer(FM, "\n");
@@ -579,7 +579,7 @@ if (!document.swapNode) {
 
 }
 
-function getcss(io css, in version="") {
+function getcss(io css, in version = "") {
 
 	//NB quirk in ie mimiced by mozilla table dont inherit size
 	//but work around is TABLE {FONT-SIZE:100%} in css
@@ -903,10 +903,10 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 	var thprop = thproperties;
 	var nocell = "%~%";
 	// Additional space to defeat convsyntax until clanf-format
-	for ( var rown = 1; rown <= nrows; rown++) {
+	for (var rown = 1; rown <= nrows; rown++) {
 
 		// Additional space to defeat convsyntax until clang-format
-		for ( var coln = 1; coln <= ncols2; coln++) {
+		for (var coln = 1; coln <= ncols2; coln++) {
 		// Reverted because we do need to skip coln's
 		//for (const var coln : range(1, ncols2)) {
 

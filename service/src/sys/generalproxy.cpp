@@ -131,7 +131,7 @@ function main() {
 			allhtml(-1) = "</style>";
 		}
 
-		let ncomps = compcodes.count(",") + 1;
+		let ncomps = compcodes.fcount(",");
 		for (const var compn : range(1, ncomps)) {
 
 			mode = "HEAD";

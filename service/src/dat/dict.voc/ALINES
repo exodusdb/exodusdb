@@ -5,7 +5,7 @@ S
 0
 
 
-	ANS = RECORD.count("\\n") + 1;\
+	ANS = RECORD.fcount("\\n");\
 	if (RECORD eq "") {\
 		ANS = 0;\
 	}\

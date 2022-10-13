@@ -5,7 +5,7 @@ S
 
 
 
-	return RECORD.count(FM) + 1;
+	return RECORD.fcount(FM);
 R
 10
 

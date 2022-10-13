@@ -532,7 +532,7 @@ nextline:
 
 					var CONV = "";
 					var just = "L";
-					var nn = dictid.count("_") + 1;
+					var nn = dictid.fcount("_");
 					for (const var ii : range(1, nn)) {
 						var word = dictid.field("_", ii);
 						if (datewords.locate(word, xx)) {

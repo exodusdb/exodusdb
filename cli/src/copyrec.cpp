@@ -48,7 +48,7 @@ function main() {
 	// copyrec file1 a b c to: file2 x y z
 	// pos1 = 6 (to:)
 	// pos1 -3 = 6 - 3 = 3 (a)
- 	var fromfilename = COMMAND.f(2);
+	var fromfilename = COMMAND.f(2);
 	var fromkeys = field(COMMAND, FM, 3, pos1 - 3);
 
 	// copyrec file1 a b c to: file2 x y z
@@ -139,7 +139,7 @@ function main() {
 
 			if (not silent_opt)
 				printl(fromkey.quote() ^ " deleted");
-		};
+		}
 
 		// goto nextrecord
 		continue;

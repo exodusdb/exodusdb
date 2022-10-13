@@ -28,7 +28,7 @@ function main() {
 
 	int nerrors = 0;
 
-	var exclude_filenames="dict.all";
+	var exclude_filenames = "dict.all";
 	var filenames = COMMAND.field(FM, 4, 9999);
 	if (not filenames) {
 		filenames = db1.listfiles();
@@ -40,7 +40,7 @@ function main() {
 		if (not silent)
 			outputl("\n", filename);
 
-		if (filename.starts("preselect_") or filename.starts("select_stage2_") or locate(filename,exclude_filenames))
+		if (filename.starts("preselect_") or filename.starts("select_stage2_") or locate(filename, exclude_filenames))
 			continue;
 
 		var file1;
@@ -127,7 +127,7 @@ function main() {
 					var nfs2 = fcount(rec2, FM);
 					//if (nfs2 gt nfs)
 					//	nfs = nfs2;
-					for (let fn : range(1, std::max(nfs,nfs2))) {
+					for (let fn : range(1, std::max(nfs, nfs2))) {
 						var f1 = RECORD.f(fn);
 						var f2 = rec2.f(fn);
 						if (f1 ne f2) {
@@ -145,11 +145,12 @@ function main() {
 	//call stopper("",timestarted,datestarted);
 
 	if (not silent) {
-		logputl();
-		var seconds = time() - timestarted;
-		while (seconds < 0)
-			seconds += 86400;
-		logputl("Finished in", int(seconds / 60), "minutes and", mod(seconds, 60), "seconds.");
+//		logputl();
+//		var seconds = time() - timestarted;
+//		while (seconds < 0)
+//			seconds += 86400;
+//		logputl("Finished in", int(seconds / 60), "minutes and", mod(seconds, 60), "seconds.");
+		logputl("Finished in", elapsedtimetext());
 	}
 
 	return nerrors;

@@ -34,7 +34,7 @@ libraryinit(full_name)
 //--------------------
 function main() {
 	ANS = RECORD.f(1).xlate("USERS", 1, "X");
-	let nn = ANS.count(VM) + 1;
+	let nn = ANS.fcount(VM);
 	for (const var ii : range(1, nn)) {
 		if (ANS.f(1, ii) eq RECORD.f(1, ii)) {
 			ANS(1, ii) = "";
@@ -73,7 +73,7 @@ libraryinit(last_login_age)
 //-------------------------
 function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");
-	let nn = ANS.count(VM) + 1;
+	let nn = ANS.fcount(VM);
 	for (const var ii : range(1, nn)) {
 		var logindate = ANS.f(1, ii).floor();
 		if (logindate) {
@@ -113,7 +113,7 @@ libraryinit(password_age)
 //-----------------------
 function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 36, "X");
-	let nn = ANS.count(VM) + 1;
+	let nn = ANS.fcount(VM);
 	for (const var ii : range(1, nn)) {
 		var passworddate = ANS.f(1, ii);
 		if (passworddate) {
@@ -201,7 +201,7 @@ libraryinit(user_code_html)
 function main() {
 	var usercodes = calculate("USERS");
 	var emails = usercodes.xlate("USERS", 7, "X");
-	let nusers = usercodes.count(VM) + 1;
+	let nusers = usercodes.fcount(VM);
 	for (const var usern : range(1, nusers)) {
 		var usercode = usercodes.f(1, usern);
 		if (usercode) {
@@ -221,7 +221,7 @@ function main() {
 	var usercodes = RECORD.f(1, MV);
 	var emails = RECORD.f(7, MV);
 
-	let nusers = usercodes.count(VM) + 1;
+	let nusers = usercodes.fcount(VM);
 	for (const var usern : range(1, nusers)) {
 		if (emails.f(1, usern) eq "") {
 			usercodes(1, usern) = "";

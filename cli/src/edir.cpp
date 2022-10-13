@@ -20,7 +20,7 @@ function main() {
 
 	// Allow for first argument to be an os file path
 	if (COMMAND.f(2).contains(OSSLASH))
-		COMMAND.inserter(2,"DOS");
+		COMMAND.inserter(2, "DOS");
 
 	//var filename = COMMAND.f(2).convert(".", "_");
 	var filename = COMMAND.f(2);

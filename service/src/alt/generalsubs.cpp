@@ -188,7 +188,7 @@ subroutine getdatasets() {
 	datasetparams.converter(",*", SM ^ VM);
 	var subst = datasetparams.field(" ", 1);
 	datasetparams = datasetparams.field(" ", 2, 9999);
-	let ndatasets = datasetparams.count(VM) + 1;
+	let ndatasets = datasetparams.fcount(VM);
 
 	datasetcodes = "";
 	var datasetnames = "";
@@ -231,7 +231,7 @@ subroutine getuserdept2() {
 	}
 
 	//locate divider, or usern+1
-	nusers = SECURITY.f(1).count(VM) + 1;
+	nusers = SECURITY.f(1).fcount(VM);
 	for (usern = 1; usern <= nusers; ++usern) {
 		///BREAK;
 		if (SECURITY.f(1, usern) == "---") break;

@@ -90,7 +90,7 @@ readmenu:
 	}
 
 	//reduce the menus to a list of authorised menus
-	var nmenus = menus.count(VM) + 1;
+	var nmenus = menus.fcount(VM);
 	//work backwards because we are deleting
 	for (var menun = nmenus; menun >= 1; --menun) {
 		var menu = menus.f(1, menun).ucase();
@@ -191,7 +191,7 @@ nextcomp:
 	sys.company = "";
 	call initcompany(compcode);
 
-	var ncompanies = compcodes.count(FM) + 1;
+	var ncompanies = compcodes.fcount(FM);
 	authcompcodes = compcodes;
 	authcompcodes.converter(FM, VM);
 

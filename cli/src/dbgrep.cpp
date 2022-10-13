@@ -22,7 +22,7 @@ function main() {
 	if (not padding)
 		padding = 256;
 
-	var colored_reqtext=reqtext;
+	var colored_reqtext = reqtext;
 	if (TERMINAL)
 				colored_reqtext = "\033[1;31m" ^ reqtext ^ "\033[0m";
 

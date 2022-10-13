@@ -247,7 +247,7 @@ notallowed:
 	keys.converter("," ^ VM, "  ");
 	locks.converter(",", " ");
 	locks.trimmer();
-	let nlocks = locks.count(" ") + 1;
+	let nlocks = locks.fcount(" ");
 
 	for (const var lockn : range(1, nlocks)) {
 		var lockx = locks.field(" ", lockn);

@@ -78,9 +78,9 @@ function main() {
 	//parse source
 	var sourcename = "";
 	var sourcefilenames = COMMAND.f(2);
-	if (index(sourcefilenames,":")) {
-		sourcename = field(sourcefilenames,":",1);
-		sourcefilenames = field(sourcefilenames,":",2);
+	if (index(sourcefilenames, ":")) {
+		sourcename = field(sourcefilenames, ":", 1);
+		sourcefilenames = field(sourcefilenames, ":", 2);
 	}
 
 	// / present in source without : treated as if : appended
@@ -92,9 +92,9 @@ function main() {
 	//parse target
 	targetname = "";
 	var targetfilenames = COMMAND.f(3);
-	if (index(targetfilenames,":")) {
-		targetname = field(targetfilenames,":",1);
-		targetfilenames = field(targetfilenames,":",2);
+	if (index(targetfilenames, ":")) {
+		targetname = field(targetfilenames, ":", 1);
+		targetfilenames = field(targetfilenames, ":", 2);
 	}
 
 	// / present in target without : treated as if : was appended
@@ -159,7 +159,7 @@ function main() {
 			//reset counters - duplicated in main() and getrec()
 			nsame = 0;
 			nchanged = 0;
-			nnew =0;
+			nnew = 0;
 
 			//open the source file
 			if (not file1.open(sourcefilename, sourcedb) )
@@ -226,7 +226,7 @@ function main() {
 		while(getrec()) {
 
 			//user interrupt
-			if (not mod(recn,1000)) {
+			if (not mod(recn, 1000)) {
 				//print(AT(-40), sourcefilename, recn ^ ".", ID);
 				if (esctoexit())
 					abort("");
@@ -236,7 +236,7 @@ function main() {
 			var oldrec;
 			var exists;
 			if (targetdb) {
-				exists = oldrec.read(file2,ID);
+				exists = oldrec.read(file2, ID);
 			} else {
 				exists = oldrec.osread(targetdir ^ ID);
 				//escape into special txt format
@@ -285,7 +285,7 @@ function main() {
 		print(AT(-40));
 		//if (nsame or nchanged or nnew) {
 		if (nchanged or nnew) {
-			printl("Same:",nsame,"Changed:",nchanged, "New:",nnew);
+			printl("Same:", nsame, "Changed:", nchanged, "New:", nnew);
 			//printl();
 		}
 
@@ -357,7 +357,7 @@ function getrec() {
 			//reset counters - duplicated in main() and getrec()
 			nsame = 0;
 			nchanged = 0;
-			nnew =0;
+			nnew = 0;
 
 			// Open the target file
 			if (targetdb) {
@@ -391,9 +391,9 @@ function getrec() {
 
 	recn++;
 
-	ID = RECORD.field("\t",1);
-	//RECORD[1,len(ID)+1] = ""
-	RECORD.paster(1,ID.len()+1,"");
+	ID = RECORD.field("\t", 1);
+	//RECORD[1, len(ID)+1] = ""
+	RECORD.paster(1, ID.len()+1, "");
 
 	gosub unescape_sql(ID);
 	gosub unescape_sql(RECORD);
@@ -409,13 +409,13 @@ subroutine unescape_sql(io arg1) {
 	if (not arg1.contains("\\"))
 		return;
 
-	arg1.replacer("\\n","\n");
-	arg1.replacer("\\b","\b");
-	arg1.replacer("\\t","\t");
-	arg1.replacer("\\v","\v");
-	arg1.replacer("\\f","\f");
-	arg1.replacer("\\r","\r");
-	arg1.replacer("\\\\","\\");
+	arg1.replacer("\\n", "\n");
+	arg1.replacer("\\b", "\b");
+	arg1.replacer("\\t", "\t");
+	arg1.replacer("\\v", "\v");
+	arg1.replacer("\\f", "\f");
+	arg1.replacer("\\r", "\r");
+	arg1.replacer("\\\\", "\\");
 
 	return;
 

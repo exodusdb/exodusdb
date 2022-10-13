@@ -837,8 +837,8 @@ COST 10;
 
 	// Remove unnecessary declaration of temp_xlate_key
 	// from the above standard sql template if not needed
-	if (not sql.contains("temp_xlate_key") ) {
-		sqltemplate.replacer("\n temp_xlate_key text;","");
+	if (not sql.contains("temp_xlate_key")) {
+		sqltemplate.replacer("\n temp_xlate_key text;", "");
 	}
 
 	//upload pgsql function to postgres

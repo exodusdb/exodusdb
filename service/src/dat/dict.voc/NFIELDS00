@@ -18,7 +18,7 @@ S
 	}//loop;\
 	//call msg('x')\
 	//remove comment lines\
-	let nfields = RECORD.count(FM) + 1;\
+	let nfields = RECORD.fcount(FM);\
 \
 	//dim x(nfields)\
 	//matparse @record into x\
@@ -33,7 +33,7 @@ S
 	//remove blank lines\
 	RECORD.converter(_FM " ", " " _FM);\
 \
-	var nfields2 = RECORD.trim().count(" ") + 1;\
+	var nfields2 = RECORD.trim().fcount(" ");\
 	return nfields2;
 R
 10

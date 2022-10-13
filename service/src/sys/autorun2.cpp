@@ -141,7 +141,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 		//check all users exist (even if they dont have emails)
 		if (targetusercodes) {
-			var nusers = targetusercodes.count(VM) + 1;
+			var nusers = targetusercodes.fcount(VM);
 			for (usern = nusers; usern >= 1; --usern) {
 				var usercode = targetusercodes.f(1, usern);
 				var userx;

@@ -81,7 +81,7 @@ function main(in mode, io logtime, in menu) {
 		//convert hosts.allow format to sv list of valid ip numbers or partial ip nos
 		hosts.replacer("sshd:", "");
 		hosts.converter(" ", "");
-		var nn = hosts.count(FM) + 1;
+		var nn = hosts.fcount(FM);
 		for (var ln = nn; ln >= 1; --ln) {
 			hosts(ln) = hosts.f(ln).field("#", 1);
 		} //ln;
@@ -154,7 +154,7 @@ function main(in mode, io logtime, in menu) {
 
 		//nb will NOT overwrite any manual entries in SYSTEM.CFG
 		let osenv = osgetenv().converter("\r\n", _FM _FM);
-//		let nenv = osenv.count(FM) + 1;
+//		let nenv = osenv.fcount(FM);
 //		for (const var ii : range(1, nenv)) {
 //			var enventry = osenv.f(ii);
 		for (let enventry : osenv) {

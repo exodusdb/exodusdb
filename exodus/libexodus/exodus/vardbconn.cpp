@@ -18,6 +18,8 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 	// no longer need locking since dbconns_ is thread_local
 	//std::lock_guard lock(dbconns_mutex);
 
+	//var(conninfo).errputl("add_dbconn: conninfo=");
+
 	dbconn_no_++;
 	dbconns_[dbconn_no_] = DBConn(conn_to_cache, conninfo);
 	return dbconn_no_;
@@ -101,6 +103,9 @@ void DBConnector::cleardbcache(const int connid) {
 //	for (const auto& iter : *dbcache)
 //		var(iter.first % 1'000'000'000).errputl("Clearing cache of ");
 
+	if (dbcache->size())
+		var(dbcache->size()).errputl("cleardbcache: dbcache.size was ");
+
 	dbcache->clear();
 	return;
 }
@@ -111,6 +116,10 @@ void DBConnector::del_dbconn(const int index) {
 	auto iter = dbconns_.find(index);
 	if (iter != dbconns_.end()) {
 		//	PGconn* p /*std::pair<int, void*> p*/ = ;
+
+		if (iter->second.dbcache_.size())
+			var(iter->second.dbcache_.size()).errputl("del_dbconn: dbcache size was ");
+
 		del_(reinterpret_cast<PGconn*>(iter /*dbconns_.find(index)*/->second.pgconn_));
 		//delete /*dbconns_.find(index)*/ iter->second.locks__;
 		//delete /*dbconns_.find(index)*/ iter->second.dbcache;
@@ -125,6 +134,10 @@ void DBConnector::del_dbconns(const int from_index) {
 	while (ix != dbconns_.end()) {
 		if (ix->first >= from_index) {
 			//TRACE(ix->first)
+
+			if (ix->second.dbcache_.size())
+				var(ix->second.dbcache_.size()).errputl("del_dbconns: []dbcache size was ");
+
 			del_(reinterpret_cast<PGconn*>(ix->second.pgconn_));
 			//delete ix->second.locks__;
 			//delete ix->second.dbcache;
@@ -142,8 +155,15 @@ DBConnector::~DBConnector() {
 	// std::lock_guard lock(dbconns_mutex);
 	//TimeAcc t(110);
 
+	if (dbconns_.size())
+		var(dbconns_.size()).errputl("~DBConnector: dbconns_.size was ");
+
 	auto ix = dbconns_.begin();
 	for (;ix != dbconns_.end(); ix++) {
+
+		if (ix->second.dbcache_.size())
+			var(ix->second.dbcache_.size()).errputl("~DBConnector: []dbcache_.size was ");
+
 		del_(reinterpret_cast<PGconn*>(ix->second.pgconn_));
 		//delete ix->second.locks__;
 		//delete ix->second.dbcache;

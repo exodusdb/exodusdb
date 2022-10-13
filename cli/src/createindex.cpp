@@ -13,7 +13,7 @@ function main() {
 		indexnames = var().listindex();
 		var indexnames2 = "";
 		for (auto index : indexnames) {
-			if (index.ends("_xref")) 
+			if (index.ends("_xref"))
 				indexnames2 ^= index ^ FM;
 		}
 		indexnames = indexnames2.pop();

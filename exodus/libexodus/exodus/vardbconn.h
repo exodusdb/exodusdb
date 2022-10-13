@@ -49,7 +49,8 @@
 namespace exodus {
 
 using ConnectionLocks = std::map<uint64_t, int>;
-using DBCache = std::unordered_map<uint64_t, std::string>;
+//using DBCache = std::unordered_map<uint64_t, std::string>;
+using DBCache = std::map<uint64_t, std::string>;
 //using DBCache = std::map<uint64_t, std::string>;
 using PGCONN_DELETER = void (*)(PGconn*);
 

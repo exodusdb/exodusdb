@@ -37,7 +37,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 
 	//otherwise do successive selects each one reducing the list
 	} else {
-		let nparts = parts.count("&") + 1;
+		let nparts = parts.fcount("&");
 		//parts.outputl("parts=");
 		for (const var partn : range(1, nparts)) {
 			var part = parts.field("&", partn);

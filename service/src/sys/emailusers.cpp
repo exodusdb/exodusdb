@@ -123,7 +123,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	}
 
 	var usercodes = SECURITY.f(1);
-	var nusers = usercodes.count(VM) + 1;
+	var nusers = usercodes.fcount(VM);
 	var usern = 0;
 	emaillog = "";
 	var alreadyemailed = "";
@@ -131,7 +131,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 
 	var groupids = groupids0;
 	groupids.converter(",", VM);
-	let ngroups = groupids.count(VM) + 1;
+	let ngroups = groupids.fcount(VM);
 
 	var userids = userids0;
 	userids.converter(",", VM);

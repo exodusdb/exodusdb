@@ -11,7 +11,7 @@ function main(io listitems) {
 
 	call sortarray(listitems, 1, "AR");
 
-	var nn = listitems.count(VM) + 1;
+	var nn = listitems.fcount(VM);
 
 	//convert single periods to single period ranges
 	for (const var ii : range(1, nn)) {

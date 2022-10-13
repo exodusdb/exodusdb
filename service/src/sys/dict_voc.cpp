@@ -3,7 +3,7 @@
 libraryinit(alines)
 //-----------------
 function main() {
-	ANS = RECORD.count("\n") + 1;
+	ANS = RECORD.fcount("\n");
 	if (RECORD eq "") {
 		ANS = 0;
 	}
@@ -325,7 +325,7 @@ function main() {
 	} else {
 		datax = RECORD;
 	}
-	let nn = datax.count(FM) + 1;
+	let nn = datax.fcount(FM);
 	datax.ucaser();
 	datax.converter(DQ, "'");
 	ANS = "";
@@ -516,7 +516,7 @@ libraryexit(mv)
 libraryinit(nfields)
 //------------------
 function main() {
-	return RECORD.count(FM) + 1;
+	return RECORD.fcount(FM);
 }
 libraryexit(nfields)
 
@@ -525,7 +525,7 @@ libraryinit(nfields0)
 //-------------------
 function main() {
 	RECORD.converter(_FM " ", " " _FM);
-	return RECORD.trim().count(" ") + 1;
+	return RECORD.trim().fcount(" ");
 }
 libraryexit(nfields0)
 
@@ -546,7 +546,7 @@ function main() {
 	}//loop;
 	//call msg('x')
 	//remove comment lines
-	let nfields = RECORD.count(FM) + 1;
+	let nfields = RECORD.fcount(FM);
 
 	//dim x(nfields)
 	//matparse @record into x
@@ -561,7 +561,7 @@ function main() {
 	//remove blank lines
 	RECORD.converter(_FM " ", " " _FM);
 
-	var nfields2 = RECORD.trim().count(" ") + 1;
+	var nfields2 = RECORD.trim().fcount(" ");
 	return nfields2;
 }
 libraryexit(nfields00)
@@ -570,7 +570,7 @@ libraryexit(nfields00)
 libraryinit(nlines)
 //-----------------
 function main() {
-	ANS = RECORD.count(FM) + 1;
+	ANS = RECORD.fcount(FM);
 	if (RECORD eq "") {
 		ANS = 0;
 	}

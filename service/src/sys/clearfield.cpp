@@ -56,7 +56,7 @@ function main() {
 		stop();
 	}
 	fns.converter(" ,", FM ^ FM);
-	var nfields = fns.count(FM) + 1;
+	var nfields = fns.fcount(FM);
 
 	//check numeric
 	// space to defeat convsyntax
@@ -79,7 +79,7 @@ tryagain:
 						var tt = dict.f(3);
 						tt.converter(" ", FM);
 						fns(ii) = tt;
-						nfields = fns.count(FM) + 1;
+						nfields = fns.fcount(FM);
 						goto tryagain;
 					}
 				}
@@ -96,7 +96,7 @@ tryagain:
 	if (not LISTACTIVE) {
 		select(file);
 	}
-	var count = 0;
+	var recn = 0;
 	var nrecs = file.reccount();
 	if (nrecs) {
 		nrecs = "/" ^ nrecs;
@@ -115,10 +115,10 @@ next:
 	if (ID.starts("%")) {
 		goto next;
 	}
-	count += 1;
+	recn += 1;
 	//if interactive then PRINT @(@crthigh/2,25) else print @(0):@(-4):
 	if (TERMINAL)
-		output(AT(-40), count, nrecs , "\x09" , ID.oconv("L#30"), " ");
+		output(AT(-40), recn, nrecs , "\x09" , ID.oconv("L#30"), " ");
 	if (RECORD.read(file, ID)) {
 
 		var cleartovalue2 = cleartovalue;

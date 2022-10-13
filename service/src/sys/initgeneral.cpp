@@ -411,7 +411,7 @@ updateversion:
 
 //	call log2("*reattach data", logtime);
 //	var volumesx = VOLUMES;
-//	let nvolumes = VOLUMES.count(FM) + 1;
+//	let nvolumes = VOLUMES.fcount(FM);
 //	for (const var volumen : range(1, nvolumes)) {
 //		var volume = volumesx.f(volumen);
 //		var tpath = "../" "DATA" "/";
@@ -910,7 +910,7 @@ nextreport:
 		cpu.replacer("Intel", "");
 		cpu.replacer("CPU", "");
 		cpu.converter("-", " ");
-		var nsockets = cpu.count(FM) + 1;
+		var nsockets = cpu.fcount(FM);
 		var nlogical = SYSTEM.f(9);
 		cpu = cpu.f(1).trim() ^ " ";
 		tt = nlogical / nsockets;
@@ -1783,7 +1783,7 @@ subroutine getsystem() {
 
 	//parameters in the exodus\system file override params from definitions
 	//ie global installation parameters override dataset parameters
-	let ni = systemx.count(FM) + 1;
+	let ni = systemx.fcount(FM);
 	for (const var ii : range(1, ni)) {
 		if (systemx.f(ii).len()) {
 			SYSTEM(ii) = systemx.f(ii);

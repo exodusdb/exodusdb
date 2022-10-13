@@ -86,7 +86,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		// end
 
 		//highlight last row if a total
-		var nlines = datax.count(FM) + 1;
+		var nlines = datax.fcount(FM);
 		var lastline = datax.f(nlines);
 	//Total
 		if (lastline.contains("<TD>" ^ sys.glang.f(28))) {
@@ -104,7 +104,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 	} else if (mode eq "HASHTABLE") {
 
-		let nv = datax.count(VM) + 1;
+		let nv = datax.fcount(VM);
 		for (const var vn : range(1, nv)) {
 			var data2 = datax.f(1, vn);
 
@@ -116,7 +116,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 			data2.converter(TM, FM);
 
-			let nlines = data2.count(FM) + 1;
+			let nlines = data2.fcount(FM);
 			if (nlines gt 1) {
 
 				for (const var ln : range(1, nlines)) {
@@ -366,7 +366,7 @@ subroutine fill(io datax) {
 		//find max number of columns
 	var n2 = 0;
 	for (const var ii : range(1, nn)) {
-		var tt = datax.f(ii).count(VM) + 1;
+		var tt = datax.f(ii).fcount(VM);
 		if (tt gt n2) {
 			n2 = tt;
 		}

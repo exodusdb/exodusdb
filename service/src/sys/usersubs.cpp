@@ -126,7 +126,7 @@ function main(in mode) {
 			if (sysemails) {
 
 				//strip out the domain names
-				let nn = sysemails.count(" ") + 1;
+				let nn = sysemails.fcount(" ");
 				for (const var ii : range(1, nn)) {
 					var word = sysemails.field(" ", ii);
 					word = field2(word, "@", -1);
@@ -148,7 +148,7 @@ function main(in mode) {
 			//emails=lcase(@record<7>)
 			var emails = win.is.lcase();
 			emails.converter(FM ^ VM ^ SM ^ ", ", ";;;;;");
-			var nn = emails.count(";") + 1;
+			var nn = emails.fcount(";");
 			for (const var ii : range(1, nn)) {
 				var email = emails.field(";", ii);
 				if (email) {
@@ -387,24 +387,6 @@ function main(in mode) {
 		gosub getdepts();
 		ANS = depts;
 
-//	} else if (mode eq "F2.DEPARTMENT") {
-//		gosub getdepts();
-//		if (not(decide("Which department do you want?", depts ^ "", reply))) {
-//			return 0;
-//		}
-//		ANS = depts.f(reply);
-//		DATA ^= ANS ^ "\r";
-//
-//	} else if (mode eq "VAL.DEPARTMENT") {
-//		if (win.is eq "") {
-//			return 0;
-//		}
-//		gosub getdepts();
-//		if (not(depts.locateusing(FM, win.is, xx))) {
-//			msg = win.is.quote() ^ " IS NOT A VALID DEPARTMENT";
-//			return invalid(msg);
-//		}
-//
 	} else {
 		msg = mode.quote() ^ " is invalid in USER.SUBS";
 		return invalid(msg);
@@ -463,7 +445,7 @@ subroutine getuserdept2(in mode) {
 	}
 
 	//locate divider, or usern+1
-	var nusers1 = SECURITY.f(1).count(VM) + 1;
+	var nusers1 = SECURITY.f(1).fcount(VM);
 	for (usern += 1; usern <= nusers1; ++usern) {
 		///BREAK;
 		if (SECURITY.f(1, usern) eq "---") break;
@@ -476,7 +458,7 @@ subroutine getuserdept2(in mode) {
 
 subroutine getdepts() {
 	depts = "";
-	var nusers2 = SECURITY.f(1).count(VM) + 1;
+	var nusers2 = SECURITY.f(1).fcount(VM);
 	for (usern = 2; usern <= nusers2 + 1; ++usern) {
 		text = SECURITY.f(1, usern);
 		if (text eq "---" or text eq "") {

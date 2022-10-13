@@ -13,15 +13,15 @@ libraryinit()
 #include <sys_common.h>
 
 var cmdline;//num
-var nrows;//num
-var ncols;//num
+int nrows;//num
+int ncols;//num
 var file;
 var dictvoc;
 var rowfields;
 var nrowfields;
 dim rowdict;
 dim rowfieldismv;
-var rowfn;//num
+int rowfn;//num
 var rowfield;
 var totcol;
 var coln;//num
@@ -30,7 +30,7 @@ var coldict;
 var datadict;
 var prefixn;//num
 var prefix;
-var recn;//num
+int recn;//num
 var tt;
 var nmvs;//num
 var xx;
@@ -101,25 +101,10 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	//prefix*1 prefix*2 etc
 
 	cmdline = 0;
-		/*;
-		if field(@sentence,' ',1)='CROSSTAB' then;
-			cmdline=1;
-			//convert ',' to vm in @sentence
-			filename=field(@sentence,' ',2);
-			rowfields=field(@sentence,' ',3);
-			colfield=field(@sentence,' ',4);
-			datafield=field(@sentence,' ',5);
 
-			gosub init;
-			gosub output;
-
-			stop;
-			end;
-		*/
-
-	//////
-	//init:
-	//////
+///////
+//init:
+///////
 	if ((output.unassigned() or allrowvals.unassigned()) or allcolvals.unassigned()) {
 		allcolvals = "";
 		allrowvals = "";
@@ -143,8 +128,6 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		filterout = "";
 	}
 
-	//pairs=''
-
 	if (not(file.open(filename, ""))) {
 		call fsmsg();
 		stop();
@@ -163,13 +146,11 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 
 	rowfields = rowfields0;
 	rowfields.converter(",", VM);
-	//nrowfields=count(rowfields,vm)+1
 	nrowfields = rowfields.fcount(VM);
 	rowdict.redim(20);
 	rowfieldismv.redim(20);
 	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 		rowfield = rowfields.f(1, rowfn);
-		//selectcmd:=' BY ':rowfield
 		if (not(rowdict(rowfn).read(DICT, rowfield))) {
 			if (not(rowdict(rowfn).read(dictvoc, rowfield))) {
 				call mssg(rowfield.quote() ^ " row field doesnt exist in " ^ filename);
@@ -300,7 +281,6 @@ nextmv:
 			if (nn gt nrowvals) {
 				nrowvals = nn;
 			}
-			//rowvals(rowfn) = tt;
 			pickreplacer(rowvals, rowfn, tt);
 		} //rowfn;
 	} else {
@@ -328,7 +308,6 @@ nextmv:
 				} else {
 					tt = rowvals.f(rowfn, 1);
 				}
-				//rowval(1, 1, rowfn) = tt;
 				pickreplacer(rowval, 1, 1, rowfn, tt);
 			} //rowfn;
 		} else {
@@ -408,10 +387,9 @@ exit:
 	if (not totcol) {
 		colconv = coldict.f(7);
 		if (colconv) {
-			//ncolvals=count(allcolvals,vm)+1
 			for (coln = 1; coln <= ncols; ++coln) {
 				output(1, 1 + coln) = oconv(output.f(1, 1 + coln), colconv);
-			} //coln;
+			}
 		}
 	}
 
@@ -420,7 +398,7 @@ exit:
 	} else {
 		for (coln = 1; coln <= ncols; ++coln) {
 			output(1, 1 + coln) = coldict.f(3) ^ " " ^ output.f(1, 1 + coln);
-		} //coln;
+		}
 		output(1, ncols + 2) = "Total " ^ datadict.f(3);
 	}
 
@@ -439,10 +417,9 @@ exit:
 
 		rowconv = rowdict(rowfn).f(7);
 		if (rowconv) {
-			//nrows=count(allrowvals,vm)+(allrowvals<>'')
 			for (rown = 1; rown <= nrows; ++rown) {
 				output(rown + 1, 1, rowfn) = oconv(output.f(rown + 1, 1, rowfn), rowconv);
-			} //rown;
+			}
 		}
 
 	} //rowfn;

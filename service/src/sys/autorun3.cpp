@@ -399,7 +399,7 @@ preventsameday:
 		toaddress = userx.f(7);
 	} else {
 		toaddress = "";
-		var nusers = usercodes.count(VM) + 1;
+		var nusers = usercodes.fcount(VM);
 		var backwards = 1;
 		for (var usern = nusers; usern >= 1; --usern) {
 
@@ -505,7 +505,7 @@ nextuser:;
 
 	//check if runasuser is authorised to run the task
 	if (authtasks) {
-		let ntasks = authtasks.count(VM) + 1;
+		let ntasks = authtasks.fcount(VM);
 		for (const var taskn : range(1, ntasks)) {
 			var task = authtasks.f(1, taskn);
 			if (not(authorised(task, msg_, "", runasusercode))) {

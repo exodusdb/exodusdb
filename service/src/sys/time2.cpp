@@ -54,7 +54,7 @@ function main(in type, in input0, in mode0, out output) {
 		//handle multivalues
 		if (input0.contains(VM)) {
 			output = "";
-			let nn = input0.count(VM) + 1;
+			let nn = input0.fcount(VM);
 			for (const var ii : range(1, nn)) {
 				call time2(type, input0.f(1, ii), mode, outputx);
 				pickreplacer(output, 1, ii, outputx);

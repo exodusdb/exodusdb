@@ -63,13 +63,6 @@ function main(in sentence0, in select0="", in filters0="") {
 		selectx = select0;
 		}
 
-//	if (nfilters0.unassigned()) {
-//		nfilters = 0;
-//	} else {
-//		filterfields = filters0.f(1);
-//		filtervalues = filters0.f(3);
-//		nfilters = filterfields.count(FM) + (filterfields ne 0);
-//	}
 	let nfilters = nfilters0.unassigned("").fcount(FM);
 	if (nfilters) {
 		filterfields = filters0.f(1);
@@ -179,7 +172,7 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	//expand any group fields in notexportable
 	if (notexportable) {
-		for (const var ii : range(1, notexportable.count(FM) + 1)) {
+		for (const var ii : range(1, notexportable.fcount(FM))) {
 			var dictrec;
 			if (dictrec.read(DICT, notexportable.f(ii))) {
 				if (dictrec.f(1) eq "G") {
@@ -201,7 +194,7 @@ function main(in sentence0, in select0="", in filters0="") {
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
 			keyx = exportable.first(exportable.index(FM ^ FM) - 1);
-			nkeys = keyx.count(FM) + 1;
+			nkeys = keyx.fcount(FM);
 			if (nkeys gt 2) {
 				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
 				//stop
@@ -494,23 +487,12 @@ nextrec:
 
 	} //filtern;
 
-	/*;
-		if normalise then;
-			nfields=count(@record,fm)+1;
-			for fn=1 to nfields;
-				temp=count(@record<fn>,vm)+1;
-				if temp>maxvn then maxvn=temp;
-				next fn;
-			nfields=count(@record,fm)+1;
-			end;
-	*/
-
 	for (const var coln : range(1, ncols)) {
 		MV = mvx;
 		dictid = dictids(coln);
 		temp = "";
 		if (dictid ne "LINE_NO" and dictrecs(coln).f(4) ne "S") {
-			temp = calculate(dictid).count(VM) + 1;
+			temp = calculate(dictid).fcount(VM);
 			if (temp gt maxvn) {
 				maxvn = temp;
 			}

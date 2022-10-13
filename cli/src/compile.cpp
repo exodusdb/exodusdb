@@ -1,6 +1,6 @@
 // NOTE The rhs comment in the following line is in a special format
 // REQUIRED instruction to compile and link with pthread library
-#include <thread> //gcc_link_options -lpthread
+#include <thread>  //gcc_link_options -lpthread
 #include <boost/asio/thread_pool.hpp>
 #include <boost/asio/post.hpp>
 // Create a threadpool of suitable size to handle
@@ -22,8 +22,8 @@ programinit()
 	let debugging = not contains(OPTIONS, "R");  //no symbols for backtrace
 	let optimise = count(OPTIONS, "O") - count(OPTIONS, "o");
 	let generateheadersonly = contains(OPTIONS, "h");
-	let force = contains(OPTIONS,"F");
-	let color_option = contains(OPTIONS,"C");
+	let force = contains(OPTIONS, "F");
+	let color_option = contains(OPTIONS, "C");
 
 	// Source extensions
 	let src_extensions = "cpp cxx cc";
@@ -154,7 +154,7 @@ function main() {
 		if (compiler) {
 			if (verbose)
 				printl("Using EXO_CXX environment variable for compiler " ^ compiler.quote());
-		} else if (compiler = osgetenv("CXX");compiler) {
+		} else if (compiler = osgetenv("CXX"); compiler) {
 			if (verbose)
 				printl("Using CXX environment variable for compiler " ^ compiler.quote());
 		} else {
@@ -176,9 +176,9 @@ function main() {
 		//basicoptions^=" -std=c++11";//gcc 4.7 and later DISABLES gnu extensions
 		//if  (__cplusplus >= 202003L)
 		if (__cplusplus >= 201709)
-			basicoptions ^= " -std=c++2a";	//gcc 4.7 and later DISABLES gnu extensions
+			basicoptions ^= " -std=c++2a";  //gcc 4.7 and later DISABLES gnu extensions
 		else
-			basicoptions ^= " -std=c++17";	//gcc 4.7 and later DISABLES gnu extensions
+			basicoptions ^= " -std=c++17";  //gcc 4.7 and later DISABLES gnu extensions
 
 		//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
 		basicoptions ^= " -Wall";
@@ -484,7 +484,7 @@ function main() {
 
 	// nfiles may increase during the loop as directories may be included
 	//for (const var fileno : range(1, nfiles)) {
-	for ( var fileno = 1; fileno <= nfiles; fileno++) {
+	for (var fileno = 1; fileno <= nfiles; fileno++) {
 
 		//var text = "";
 		//var filepath_without_ext;
@@ -836,7 +836,7 @@ function main() {
 						headertext ^= eol ^ funcdecl ^ ";";
 					} else {
 						var libname = filepath_without_ext;
-						var returnsvarorvoid = (word1 == "function") ? "var" : "void";
+						var returnsvarorvoid = (word1 eq "function") ? "var" : "void";
 						var callorreturn = (word1 == "function") ? "return" : "call";
 						var funcreturnvoid = (word1 == "function") ? 0 : 1;
 						var funcargsdecl = funcdecl.field("(", 2, 999999);
@@ -992,7 +992,7 @@ function main() {
 
 							//build a function with all the new arguments and dummy variables
 							add_func ^= _EOL;
-							add_func ^= _EOL "/" "/ Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn == 2 ? "" : "s");
+							add_func ^= _EOL "/" "/ Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn eq 2 ? "" : "s");
 							add_func ^= _EOL "var operator() (" ^ inbound_args ^ ") {";
 							add_func ^= _EOL ^ func_body;
 							add_func ^= " return operator()(" ^ outbound_args ^ ");";
@@ -1211,7 +1211,7 @@ function main() {
 			//TRACE(srcfileinfo)
 			//TRACE(exodus_include_dir_info)
 			//TRACE(outfileinfo)
-			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo,srcfileinfo) && is_newer(outfileinfo,exodus_include_dir_info)) {
+			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo, srcfileinfo) && is_newer(outfileinfo, exodus_include_dir_info)) {
 
 				// Recompile is required if any include file is younger than the current output binary
 				bool recompile_required = false;
@@ -1219,11 +1219,11 @@ function main() {
 				for (var line : text) {
 
 					// Skip lines unlike "#include <printplans7.h>"
-					if (! line.contains("#include"))
+					if (not line.contains("#include"))
 						continue;
 
 					// Acquire include file date/time
-					var incfilename=incdir ^ OSSLASH ^ line.field("<",2).field(">",1);
+					var incfilename = incdir ^ OSSLASH ^ line.field("<", 2).field(">", 1);
 					var incfileinfo = osfile(incfilename);
 					//TRACE(incfilename);
 					//TRACE(incfileinfo);
@@ -1238,7 +1238,7 @@ function main() {
 				}
 
 				//only skip if all headers are older than the current output file
-				if (! recompile_required) {
+				if (not recompile_required) {
 					if (verbose)
 						printl("Skipping compilation since the output file is newer than both the source code, its include files and libexodus, and no (F)orce option provided.");
 					//continue;
@@ -1470,7 +1470,7 @@ function static compile2(
 	}
 
 	//if new objfile
-	if (newobjfileinfo not_eq oldobjfileinfo) {
+	if (newobjfileinfo ne oldobjfileinfo) {
 		if (newobjfileinfo) {
 
 			//create the bin file directory if missing

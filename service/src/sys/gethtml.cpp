@@ -185,7 +185,7 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 		//check various tags exist in equal numbers
 		//this doesnt check if they are in a correct sequence or hierarchy etc
 		var tags = "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
-		let ntags = tags.count(",") + 1;
+		let ntags = tags.fcount(",");
 		var letterhead2 = letterhead.lcase();
 		for (const var tagn : range(1, ntags)) {
 			var tag = tags.field(",", tagn);
@@ -247,8 +247,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 	for (const var fn : range(61, 66)) {
 		tt = letterheadcompany.f(fn);
 		if (tt) {
-			//call max(count(tt,vm)+1,ncols,ncols)
-			tt = tt.count(VM) + 1;
+			tt = tt.fcount(VM);
 			if (tt gt ncols) {
 				ncols = tt;
 			}

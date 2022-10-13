@@ -277,7 +277,7 @@ function main(in mode) {
 
 					var otherkeys = "";
 					if (invisiblekeys) {
-						let nkeys = invisiblekeys.count(VM) + 1;
+						let nkeys = invisiblekeys.fcount(VM);
 						for (const var keyn : range(1, nkeys)) {
 							var keyx = invisiblekeys.f(1, keyn);
 							if (not(otherkeys.f(1).locate(keyx, xx))) {
@@ -726,7 +726,7 @@ function main(in mode) {
 
 			//email new users if requested to do so
 			if (newusers and emailnewusers_) {
-				let nn = newusers.count(FM) + 1;
+				let nn = newusers.fcount(FM);
 				for (const var ii : range(1, nn)) {
 
 					if (USERNAME eq "EXODUS") {
@@ -871,8 +871,8 @@ function main(in mode) {
 		//reverse users so department shows at the top (and higher users at bottom sadly)
 		if (mode.field(".", 2) eq "USERS") {
 			//trim any multivalued fields with more than nusers multivalues
-			var nusers = temprec.f(1).count(VM) + 1;
-			let nfs = temprec.count(FM) + 1;
+			var nusers = temprec.f(1).fcount(VM);
+			let nfs = temprec.fcount(FM);
 			for (const var fn : range(1, nfs)) {
 				temprec(fn) = temprec.f(fn).field(VM, 1, nusers);
 			} //fn;
@@ -923,7 +923,7 @@ function main(in mode) {
 		var locks2 = "";
 		var tasks = SECURITY.f(10);
 		var locks = SECURITY.f(11);
-		let ntasks = tasks.count(VM) + 1;
+		let ntasks = tasks.fcount(VM);
 		var lasttask = "";
 		for (const var taskn : range(1, ntasks)) {
 			var task = tasks.f(1, taskn);

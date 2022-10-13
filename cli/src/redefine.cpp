@@ -32,7 +32,7 @@ function main() {
 
 		var oldcpp, newcpp;
 		if (not osread(oldcpp from osfilename))
-			abort(lasterror());;
+			abort(lasterror());
 
 		if (TERMINAL) {
 			print(AT(-40), ++osfilen ^ "/" ^ nosfiles ^ ".", osfilename);

@@ -13,7 +13,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 
 	var texts = texts0;
 	msg = "";
-	var ntexts = texts.count(VM) + 1;
+	var ntexts = texts.fcount(VM);
 
 	//analogous code whereever allpunctuation is used
 	//ED BP LISTSCHED AGENCY.SUBS SCHEDULES.DICT

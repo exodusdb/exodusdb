@@ -69,7 +69,7 @@ function main() {
 
 	if (OPTIONS.contains("A"))
 		OPTIONS ^= "BSLCPGv[]";
-	var r2a = OPTIONS.contains("R") ;
+	var r2a = OPTIONS.contains("R");
 	var forrange = OPTIONS.contains("F");
 	var substr2b = OPTIONS.contains("B");
 	var b1eq2starts = OPTIONS.contains("S");
@@ -414,7 +414,7 @@ function hide_subsyntax(in line, io pos, in hidden_char) {
 
 	var line2 = line;
 	pos += 3; //skip over first paren
-	pos -=1;
+	pos -= 1;
 	var depth = 0;
 	bool inquotes = false;
 	while (++pos <= line.len()) {

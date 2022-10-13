@@ -221,7 +221,7 @@ nocommon:
 
 	//check/get dict recs
 
-	let ndictids = dictids.count(FM) + 1;
+	let ndictids = dictids.fcount(FM);
 	if (dictids ne "RECORD") {
 //		while (true) {
 //			///BREAK;

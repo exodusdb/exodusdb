@@ -110,11 +110,11 @@ function main() {
 	}
 
 	var datafield = "REQUESTS";
-	let nrowfields = rowfields.count(VM) + 1;
+	let nrowfields = rowfields.fcount(VM);
 	call crosstab(filename, rowfields, colfield, datafield, output);
 
-	var nrows = output.count(FM) + 1;
-	var ncols = output.f(1).count(VM) + 1;
+	var nrows = output.fcount(FM);
+	var ncols = output.f(1).fcount(VM);
 
 	//de-duplicate
 	if (dedup) {

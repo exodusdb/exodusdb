@@ -7,7 +7,7 @@ M1
 
 
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");\
-	let nn = ANS.count(VM) + 1;\
+	let nn = ANS.fcount(VM);\
 	for (const var ii : range(1, nn)) {\
 		var logindate = ANS.f(1, ii).floor();\
 		if (logindate) {\

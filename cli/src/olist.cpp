@@ -70,12 +70,6 @@ Example command line:
 
 #include <exodus/printtx.hpp>
 
-#if __has_include(<xselect.h>)
-#	include <xselect.h>
-#else
-#	define xselect select
-#endif
-
 //#include <gen_common.h>
 
 	var copyright;
@@ -1034,7 +1028,7 @@ nextkey:
 					if (part.len() gt dictrec.f(10)) {
 						dictrec(10) = part.len();
 					}
-				};	//ii;
+				} //ii;
 			}
 
 			dictrec(bheadfn) = "";
@@ -1107,7 +1101,7 @@ nextkey:
 							if (not(charx.len() and var("0123456789,").contains(charx)))
 								break;
 							tt2 ^= charx;
-						};	//tt;
+						} //tt;
 
 						//build table heading table if rown/column givem
 						if (tt2) {
@@ -1139,7 +1133,8 @@ nextkey:
 			}
 		}
 
-dictrecexit:;
+dictrecexit:
+	{}
 
 	} else if (word eq "IGNOREWORD") {
 		gosub getword();
@@ -1196,7 +1191,7 @@ x1exit:
 		for (coln = ncols; coln >= 2; --coln) {
 			coldict(coln) = coldict(coln - 1);
 			colname(coln) = colname(coln - 1);
-		};	//coln;
+		} //coln;
 
 		//set column 1
 		colname(1) =
@@ -1221,7 +1216,7 @@ x1exit:
 		//increment the list of breaking columns by one as well
 		for (breakn = 1; breakn <= nbreaks; ++breakn) {
 			breakcolns(breakn) = breakcolns.f(breakn) + 1;
-		};	//breakn;
+		} //breakn;
 
 		//and the page break colns
 		//for ii=1 to 9999
@@ -1255,7 +1250,7 @@ x1exit:
 				underline ^= tt.str(coldict(coln).f(10)) ^ " ";
 				colul ^= ulchar.str(coldict(coln).f(10)) ^ " ";
 			}
-		};	//coln;
+		} //coln;
 		bar = ulchar.str(colul.len() - 1);
 	}
 
@@ -1361,10 +1356,10 @@ x1exit:
 			} else {
 				for (ii = 1; ii <= 9; ++ii) {
 					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict(coln).f(3, ii), coldict(coln).f(11)) ^ " ";
-				};	//ii;
+				} //ii;
 			}
 		}
-	};	//coln;
+	} //coln;
 
 	if (style) {
 		style =
@@ -1537,7 +1532,7 @@ nextdict:
 						}
 					}
 				}
-			};	//limitn;
+			} //limitn;
 			goto nextdict;
 		}
 		call popselect(0, v69, v70, v71);
@@ -1677,7 +1672,7 @@ nextrec:
 						nmvs = tt;
 					}
 				}
-			};	//fnn;
+			} //fnn;
 
 			limitvals = calculate(limits.f(1, limitn));
 			for (mvx = nmvs; mvx >= 1; --mvx) {
@@ -1689,10 +1684,10 @@ nextrec:
 				if (not(limits.f(3, limitn).locateusing(SM, tt, xx))) {
 					for (fnn = 1; fnn <= nfns; ++fnn) {
 						RECORD.remover(fns.f(1, 1, fnn), mvx);
-					};	//fnn;
+					} //fnn;
 				}
-			};	//mvx;
-		};		//limitn;
+			} //mvx;
+		} //limitn;
 	}
 
 	recn += 1;
@@ -1744,7 +1739,7 @@ nextrec:
 		pcol(coln) = 1;
 		ccol(coln) = 7;
 		scol(coln) = mcol(coln);
-	};	//coln;
+	} //coln;
 
 	//break subtotals
 	//detect most major level to break
@@ -1758,7 +1753,7 @@ nextrec:
 			///BREAK;
 			if (scol(coln) ne breakvalue(coln))
 				break;
-		};	//leveln;
+		} //leveln;
 		breakleveln = leveln;
 	}
 
@@ -1782,7 +1777,7 @@ recexit:
 		if (ccol(coln) gt newmarklevel) {
 			newmarklevel = ccol(coln);
 		}
-	};	//coln;
+	} //coln;
 
 	//break totals - add at the bottom level (1)
 	for (coln = 1; coln <= ncols; ++coln) {
@@ -1812,7 +1807,7 @@ recexit:
 			breakcount(1) += 1;
 			icol(coln) = "";
 		}
-	};	//coln;
+	} //coln;
 
 	if (detsupp lt 2) {
 
@@ -1926,7 +1921,7 @@ recexit:
 					}
 				}
 			}
-		};	//coln;
+		} //coln;
 
 		//replace '<td' with '<th' in tx1
 		//replace '<\td' with '<\th' in tx1
@@ -1943,7 +1938,7 @@ recexit:
 		if (newmarklevel) {
 			for (coln = 1; coln <= ncols; ++coln) {
 				scol(coln) = "";
-			};	//coln;
+			} //coln;
 			previousmarklevel = newmarklevel;
 			goto recexit;
 		}
@@ -2468,7 +2463,7 @@ subroutine printbreaks() {
 				}
 			}
 
-		};	//coln;
+		} //coln;
 
 		//breakrowexit:
 		if (html) {
@@ -2489,7 +2484,7 @@ subroutine printbreaks() {
 			tx = storetx;
 		}
 
-	};	//leveln;
+	} //leveln;
 
 	//force new page and new heading
 	//if newhead and detsupp<2 then
@@ -2580,7 +2575,7 @@ subroutine addstr() {
 				str3.paster(ii, 1, char3);
 			}
 		}
-	};	//ii;
+	} //ii;
 
 	return;
 }
@@ -2594,7 +2589,7 @@ subroutine newheadreplacements() {
 		tt2 = calculate(dictid);
 		tt2.replacer("'", "''");
 		newhead.replacer(tt, tt2);
-	};	//ii;
+	} //ii;
 	return;
 }
 

@@ -38,7 +38,7 @@ function main(in mode0) {
 
 	keywords = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";
 	mode = mode0;
-	nkeywords = keywords.count(VM) + 1;
+	nkeywords = keywords.fcount(VM);
 
 	if (not(openfile("CHANGELOG", changelog))) {
 		call fsmsg();

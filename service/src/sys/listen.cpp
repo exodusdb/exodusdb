@@ -991,7 +991,7 @@ function got_link() {
 
 	gosub gettimeouttime();
 
-	nlinkfiles = linkfilenames.count(FM) + 1;
+	nlinkfiles = linkfilenames.fcount(FM);
 
 	//find a request to process
 	for (linkfilen = 1; linkfilen <= nlinkfiles; ++linkfilen) {
@@ -2589,9 +2589,6 @@ function request_exit() {
 	//trace responded
 	responsetime = ostime();
 	if (tracing) {
-		//tt=''
-		//call program.stack(tt)
-		//tt=count(tt,fm)+1:'/':count(tt,fm)+1
 		tt = " " ^ oconv((responsetime - requesttime).mod(86400), "[NUMBER,2]") ^ "s ";
 		//seconds
 		tt ^= rawresponse.f(1, 1).field("|", 1).f(1, 1);
@@ -2602,11 +2599,6 @@ function request_exit() {
 		printl(tt);
 		//print linkfilename1
 	}
-
-	//flush
-	//suspend 'dir>nul'
-
-	//if tracing then print
 
 	if (halt) {
 		//gosub main_exit();

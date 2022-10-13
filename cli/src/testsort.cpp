@@ -45,7 +45,7 @@ function main() {
 
 	printl("\nPrepare some dictionary records");
 
-	
+
 	var dictrecs =
 		"CODE         |F|0|Code         ||||          ||L|8"  _FM
 		"NAME         |F|1|Name         ||||          ||T|15" _FM

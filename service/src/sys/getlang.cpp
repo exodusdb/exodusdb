@@ -50,8 +50,8 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		//bilingual
 		if (lang2 and lang2 ne lang1) {
 			lang = "";
-			var n1 = lang1.count(FM) + 1;
-			var n2 = lang2.count(FM) + 1;
+			var n1 = lang1.fcount(FM);
+			var n2 = lang2.fcount(FM);
 //			if (n1 lt n2) {
 //				nn = n2;
 //			} else {
@@ -121,7 +121,7 @@ exit:
 
 	var custlang;
 	if (custlang.read(DEFINITIONS, "LANGUAGE*" ^ langkey)) {
-		let nn = custlang.count(FM) + 1;
+		let nn = custlang.fcount(FM);
 		for (const var fn : range(1, nn)) {
 			var tt = custlang.f(fn);
 			if (tt.len()) {
@@ -203,7 +203,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 
 		//strip out English pretext
 		if (lang.contains(chr(170))) {
-			let nn = lang.count(FM) + 1;
+			let nn = lang.fcount(FM);
 			for (const var ii : range(1, nn)) {
 				var tt = lang.f(ii).field(chr(170), 2);
 				if (tt) {

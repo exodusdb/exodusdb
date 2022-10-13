@@ -771,7 +771,7 @@ gotip:
 	}
 	if (ips) {
 		ips.converter(FM, ",");
-		nips = ips.count(",") + 1;
+		nips = ips.fcount(",");
 		//limit to 5 ips, replace middle ones with - to indicate suppressed
 		maxips = 5;
 		if (nips gt maxips) {
