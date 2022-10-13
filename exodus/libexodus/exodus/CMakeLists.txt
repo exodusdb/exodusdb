@@ -30,12 +30,6 @@
 	# Sanitizer
 	#
 	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
-	execute_process(
-	        COMMAND rm /root/inc/printtx.hpp
-	        OUTPUT_VARIABLE OUTVAR
-	        ERROR_VARIABLE  ERRVAR
-	        RESULT_VARIABLE RESVAR
-	)
 
 #
 # POSTGRES
@@ -198,6 +192,17 @@
 	        )
 	    "
 	)
+
+# 6. CLEAN OUT ANY HOME DIR FILES THAT MAY SHADOW THE REAL FILE IN /usr/local/...
+#################################################################################
+    install(
+        CODE "
+            execute_process(
+	            COMMAND
+    	            rm -f $ENV{HOME}/inc/printtx.hpp
+            )
+        "
+    )
 
 #
 # EXIT

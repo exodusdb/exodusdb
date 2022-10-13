@@ -242,6 +242,18 @@
 			include/exodus
 	)
 
+# 6. CLEAN OUT ANY EDIC/COMPILE libs in ~/lib THAT WILL SHADOW THE REAL FILE IN /usr/local/lib
+#############################################
+	install(
+		CODE "
+			execute_process(
+				COMMAND
+					rm -f $ENV{HOME}/lib/libdict_xo_clients.so $ENV{HOME}/lib/libhtmllib2.so $ENV{HOME}/lib/libnlist.so
+			)
+		"
+    )
+
+
 #
 # Exit
 # ####
