@@ -75,40 +75,40 @@ PUBLIC void osclose(CVR osfilevar) {
 	osfilevar.osclose();
 }
 
-// 4 argument version for statement format
-// osbread(data from x at y length z)
-// PUBLIC VARREF osbread(VARREF data, CVR osfilevar, const int offset, const int
-// length)
-//VARREF osbread(VARREF data, CVR osfilevar, VARREF offset, const int length,
-//	     const bool adjust)
-PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length) {
-	return data.osbread(osfilevar, offset, length);
-}
-
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-// 4 argument version for statement format BUT ALLOWING offset TO BE A CONSTANT ie output
-// ignored osbread(data from x at y length z) PUBLIC VARREF osbread(VARREF data, CVR
-// osfilevar, const int offset, const int length)
-//VARREF osbread(VARREF data, CVR osfilevar, CVR offset, const int length,
-//	     const bool adjust)
-PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length) {
-	return data.osbread(osfilevar, const_cast<VARREF>(offset), length);
-}
-#endif
-
-//PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset,
-//			 const bool adjust = true)
-PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset) {
-	return data.osbwrite(osfilevar, offset);
-}
-
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-//PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset,
-//			 const bool adjust)
-PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset) {
-	return data.osbwrite(osfilevar, const_cast<VARREF>(offset));
-}
-#endif
+//// 4 argument version for statement format
+//// osbread(data from x at y length z)
+//// PUBLIC VARREF osbread(VARREF data, CVR osfilevar, const int offset, const int
+//// length)
+////VARREF osbread(VARREF data, CVR osfilevar, VARREF offset, const int length,
+////	     const bool adjust)
+//PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length) {
+//	return data.osbread(osfilevar, offset, length);
+//}
+//
+//#ifdef VAR_OSBREADWRITE_CONST_OFFSET
+//// 4 argument version for statement format BUT ALLOWING offset TO BE A CONSTANT ie output
+//// ignored osbread(data from x at y length z) PUBLIC VARREF osbread(VARREF data, CVR
+//// osfilevar, const int offset, const int length)
+////VARREF osbread(VARREF data, CVR osfilevar, CVR offset, const int length,
+////	     const bool adjust)
+//PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length) {
+//	return data.osbread(osfilevar, const_cast<VARREF>(offset), length);
+//}
+//#endif
+//
+////PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset,
+////			 const bool adjust = true)
+//PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset) {
+//	return data.osbwrite(osfilevar, offset);
+//}
+//
+//#ifdef VAR_OSBREADWRITE_CONST_OFFSET
+////PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset,
+////			 const bool adjust)
+//PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset) {
+//	return data.osbwrite(osfilevar, const_cast<VARREF>(offset));
+//}
+//#endif
 
 // two argument version returns success/failure to be used in if statement
 // target variable first to be like "osread x from y else" and "read x from y else"
@@ -253,8 +253,8 @@ PUBLIC bool osgetenv(CVR code, VARREF value) {
 }
 
 // like "if set xxx=yyy"
-PUBLIC bool ossetenv(CVR code, CVR value) {
-	return value.ossetenv(code);
+PUBLIC void ossetenv(CVR code, CVR value) {
+	value.ossetenv(code);
 }
 
 }  // namespace exodus

@@ -248,14 +248,6 @@ PUBLIC var crop(CVR instring) {
 	return instring.crop();
 }
 
-PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key) {
-	return dimrecord.read(dbfilevar, key);
-}
-
-PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key) {
-	return dimrecord.write(dbfilevar, key);
-}
-
 
 PUBLIC var chr(const int integer) {
 	return var().chr(integer);
@@ -542,59 +534,40 @@ PUBLIC void cleardbcache() {
 	var().cleardbcache();
 }
 
-
-PUBLIC bool lock(CVR dbfilevar, CVR key) {
-	return (bool)dbfilevar.lock(key);
-}
-
-PUBLIC void unlock(CVR dbfilevar, CVR key) {
-	dbfilevar.unlock(key);
-}
-
-PUBLIC void unlockall() {
-	var().unlockall();
-}
-
-PUBLIC bool open(CVR dbfilename, VARREF dbfilevar) {
-	return dbfilevar.open(dbfilename);
-}
-
-PUBLIC bool open(CVR dbfilename) {
-	var dbfilevar;
-	return dbfilevar.open(dbfilename);
-}
-
-PUBLIC bool read(VARREF record, CVR dbfilevar, CVR key) {
-	return record.read(dbfilevar, key);
-}
-
-PUBLIC bool reado(VARREF record, CVR dbfilevar, CVR key) {
-	return record.reado(dbfilevar, key);
-}
-
-PUBLIC bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber) {
-	return record.readv(dbfilevar, key, fieldnumber);
-}
-
-PUBLIC bool write(CVR record, CVR dbfilevar, CVR key) {
-	return record.write(dbfilevar, key);
-}
-
-PUBLIC bool writeo(CVR record, CVR dbfilevar, CVR key) {
-	return record.writeo(dbfilevar, key);
-}
-
-PUBLIC bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno) {
-	return record.writev(dbfilevar, key, fieldno);
-}
-
-PUBLIC bool updaterecord(CVR record, CVR dbfilevar, CVR key) {
-	return record.updaterecord(dbfilevar, key);
-}
-
-PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key) {
-	return record.insertrecord(dbfilevar, key);
-}
+//
+//ND PUBLIC bool lock(CVR dbfilevar, CVR key) {
+//	return (bool)dbfilevar.lock(key);
+//}
+//
+//PUBLIC void unlock(CVR dbfilevar, CVR key) {
+//	dbfilevar.unlock(key);
+//}
+//
+//PUBLIC void unlockall() {
+//	var().unlockall();
+//}
+//
+//ND PUBLIC bool open(CVR dbfilename, VARREF dbfilevar) {
+//	return dbfilevar.open(dbfilename);
+//}
+//
+//ND PUBLIC bool open(CVR dbfilename) {
+//	var dbfilevar;
+//	return dbfilevar.open(dbfilename);
+//}
+//
+//ND PUBLIC bool read(VARREF record, CVR dbfilevar, CVR key) {
+//	return record.read(dbfilevar, key);
+//}
+//
+//ND PUBLIC bool reado(VARREF record, CVR dbfilevar, CVR key) {
+//	return record.reado(dbfilevar, key);
+//}
+//
+//ND PUBLIC bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber) {
+//	return record.readv(dbfilevar, key, fieldnumber);
+//}
+//
 
 // PUBLIC var remove(CVR fromstr, VARREF startindex, VARREF delimiterno)
 PUBLIC var substr2(CVR fromstr, VARREF startindex, VARREF delimiterno) {

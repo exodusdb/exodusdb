@@ -78,7 +78,7 @@ PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv,
 
 PUBLIC ND var osgetenv(CVR code = "");
 PUBLIC bool osgetenv(CVR code, VARREF value);
-PUBLIC bool ossetenv(CVR code, CVR value);
+PUBLIC void ossetenv(CVR code, CVR value);
 
 PUBLIC ND var ostempdirpath();
 PUBLIC ND var ostempfilename();
@@ -100,26 +100,30 @@ PUBLIC ND var timestamp();
 PUBLIC void ossleep(const int milliseconds);
 PUBLIC var oswait(const int milliseconds, SV dirpath);
 
+// 4 argument version for statement format
+// osbread(data from x at y length z)
 // Read/write osfile at specified offset. Must open/close.
-PUBLIC bool osopen(CVR osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
+PUBLIC ND bool osopen(CVR osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
 PUBLIC void osclose(CVR osfilevar);
-// Versions where offset is input and output
-PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length);
-PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
-// Allow calling with const offset e.g. numeric ints
-PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
-PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset);
+// Versions where offset is i/o
+PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length) {return data.osbread(osfilevar, offset, length);}
+PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset) {return data.osbwrite(osfilevar, offset);}
+// Versions where offset is const offset e.g. numeric ints
+#ifdef VAR_OSBREADWRITE_CONST_OFFSET
+PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length) {return data.osbread(osfilevar, const_cast<VARREF>(offset), length);}
+PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset) {return data.osbwrite(osfilevar, const_cast<VARREF>(offset));}
+#endif
 
 // Read/Write whole osfile
 PUBLIC bool oswrite(CVR data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
 PUBLIC bool osread(VARREF data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
-// Simple version without codepage returns the contents or "" if file cannot be read
-PUBLIC ND var osread(CVR osfilepath);
+// Simple version with just osfilepath returns the contents or "" if file cannot be read
+PUBLIC var osread(CVR osfilepath);
 
-PUBLIC bool osremove(CVR ospath);
-PUBLIC bool osrename(CVR old_ospath, CVR new_ospath);
-PUBLIC bool oscopy(CVR from_ospath, CVR to_ospath);
-PUBLIC bool osmove(CVR from_ospath, CVR to_ospath);
+PUBLIC ND bool osremove(CVR ospath);
+PUBLIC ND bool osrename(CVR old_ospath, CVR new_ospath);
+PUBLIC ND bool oscopy(CVR from_ospath, CVR to_ospath);
+PUBLIC ND bool osmove(CVR from_ospath, CVR to_ospath);
 
 PUBLIC ND var oslist(CVR path DEFAULT_DOT, SV globpattern DEFAULT_EMPTY, const int mode = 0);
 PUBLIC ND var oslistf(CVR filepath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
@@ -129,8 +133,8 @@ PUBLIC ND var osinfo(CVR path, const int mode = 0);
 PUBLIC ND var osfile(CVR filepath);
 PUBLIC ND var osdir(CVR dirpath);
 
-PUBLIC bool osmkdir(CVR dirpath);
-PUBLIC bool osrmdir(CVR dirpath, const bool evenifnotempty = false);
+PUBLIC ND bool osmkdir(CVR dirpath);
+PUBLIC ND bool osrmdir(CVR dirpath, const bool evenifnotempty = false);
 
 PUBLIC ND var oscwd();
 PUBLIC var oscwd(CVR dirpath);
@@ -138,10 +142,10 @@ PUBLIC var oscwd(CVR dirpath);
 PUBLIC void osflush();
 PUBLIC ND var ospid();
 
-PUBLIC bool osshell(CVR command);
+PUBLIC ND bool osshell(CVR command);
 PUBLIC var osshellread(CVR command);
-PUBLIC bool osshellread(VARREF readstr, CVR command);
-PUBLIC bool osshellwrite(CVR writestr, CVR command);
+PUBLIC ND bool osshellread(VARREF readstr, CVR command);
+PUBLIC ND bool osshellwrite(CVR writestr, CVR command);
 
 // Moved to exoprog
 //PUBLIC void stop(CVR text DEFAULT_EMPTY);
@@ -422,26 +426,27 @@ PUBLIC bool rollbacktrans();
 PUBLIC bool committrans();
 PUBLIC void cleardbcache();
 
-PUBLIC bool lock(CVR dbfilevar, CVR key);
-PUBLIC void unlock(CVR dbfilevar, CVR key);
-PUBLIC void unlockall();
+PUBLIC ND bool lock(CVR dbfilevar, CVR key) {return (bool)dbfilevar.lock(key);}
+PUBLIC void unlock(CVR dbfilevar, CVR key) {dbfilevar.unlock(key);}
+PUBLIC void unlockall() {var().unlockall();}
 
-PUBLIC bool open(CVR dbfilename, VARREF dbfilevar);
-PUBLIC bool open(CVR dbfilename);
+PUBLIC ND bool open(CVR dbfilename, VARREF dbfilevar) {return dbfilevar.open(dbfilename);}
+PUBLIC ND bool open(CVR dbfilename) {return var().open(dbfilename);}
 // PUBLIC bool open(CVR dictdata, CVR dbfilename, VARREF dbfilevar);
 
-PUBLIC bool read(VARREF record, CVR dbfilevar, CVR key);
-PUBLIC bool reado(VARREF record, CVR dbfilevar, CVR key);
-PUBLIC bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber);
+PUBLIC ND bool read(VARREF record, CVR dbfilevar, CVR key) {return record.read(dbfilevar, key);}
+PUBLIC ND bool reado(VARREF record, CVR dbfilevar, CVR key) {return record.reado(dbfilevar, key);}
+PUBLIC ND bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber) {return record.readv(dbfilevar, key, fieldnumber);}
 
-PUBLIC bool write(CVR record, CVR dbfilevar, CVR key);
-PUBLIC bool writeo(CVR record, CVR dbfilevar, CVR key);
-PUBLIC bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno);
-PUBLIC bool updaterecord(CVR record, CVR dbfilevar, CVR key);
-PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key);
+PUBLIC bool write(CVR record, CVR dbfilevar, CVR key) {return record.write(dbfilevar, key);}
+PUBLIC bool writeo(CVR record, CVR dbfilevar, CVR key) {return record.writeo(dbfilevar, key);}
+PUBLIC bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno) {return record.writev(dbfilevar, key, fieldno);}
+PUBLIC ND bool updaterecord(CVR record, CVR dbfilevar, CVR key) {return record.updaterecord(dbfilevar, key);}
+PUBLIC ND bool insertrecord(CVR record, CVR dbfilevar, CVR key) {return record.insertrecord(dbfilevar, key);}
 
-PUBLIC bool dimread(dim& dimrecord, CVR dbfilevar, CVR key);
-PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
+PUBLIC ND bool dimread(dim& dimrecord, CVR dbfilevar, CVR key) {return dimrecord.read(dbfilevar, key);}
+PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key) {return dimrecord.write(dbfilevar, key);}
+
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // PUBLIC bool select(CVR sortselectclause DEFAULT_EMPTY);
