@@ -97,7 +97,8 @@
 		var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
 		varchrono.cpp
 		varfuncs.cpp varioconv.cpp
-		exoenv.cpp exofuncs.cpp exoos.cpp
+		#exoenv.cpp exofuncs.cpp exoos.cpp
+		exoenv.cpp exofuncs.cpp
 		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp #mvbrackets.cpp
 		# mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
 		murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
