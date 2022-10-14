@@ -137,7 +137,7 @@ class PUBLIC ExodusProgramBase {
 	var authorised(CVR task0, VARREF msg, CVR defaultlock = "", CVR username0 = "");
 	var authorised(CVR task0);
 	void readuserprivs() const;
-	bool writeuserprivs() const;
+	void writeuserprivs() const;
 
 	ND var capitalise(CVR str0, CVR mode = var(), CVR wordseps = var()) const;
 

@@ -106,10 +106,7 @@ function main() {
 			//	printl(recn);
 			if (not read(RECORD, transactions, ID))
 				RECORD = "";
-			if (not write(RECORD+1, transactions, ID)) {
-				response_ = "ERROR: " ^ var().lasterror();
-				stop();
-			}
+			write(RECORD+1, transactions, ID);
 		}
 		//printl();
 		//printl("TRANTEST 2.", THREADNO);

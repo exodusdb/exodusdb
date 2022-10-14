@@ -428,7 +428,7 @@ bool dim::osread(CVR osfilename, const char* codepage) {\
 
 	var txt;
 	if (not txt.osread(osfilename, codepage)) {
-		var().lasterror(osfilename.quote() ^ " cannot be osread.");
+		var().setlasterror(osfilename.quote() ^ " cannot be osread.");
 		return false;
 	}
 

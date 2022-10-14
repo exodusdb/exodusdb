@@ -2649,7 +2649,7 @@ subroutine emailing() {
 		}
 
 		printptr = 0;
-		var("").oswrite(SYSTEM.f(2));
+		var("").oswrite(SYSTEM.f(2)) or true;
 		//osopen system<2> to printfile else
 		// call msg(quote(system<2>):' failed to reopen')
 		// stop

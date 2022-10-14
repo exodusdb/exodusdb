@@ -134,7 +134,7 @@ function test(in option) {
 
 	//osshell("test_asyncupd 1 & test_asyncupd 2 & test_asyncupd 3 & test_asyncupd 4 & test_asyncupd 5 &");
 	printl(cmd);
-	osshell(cmd);
+	assert(osshell(cmd));
 	while (osshellread("pgrep test_asyncupd").count("\n") gt 1) {
 
 		if (not silent)

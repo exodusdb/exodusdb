@@ -93,7 +93,8 @@ function main() {
 
 		//fire up the editor
 		printl(editcmd);
-		osshell(editor ^ " " ^ temposfilename);
+		if (not osshell(editor ^ " " ^ temposfilename))
+			lasterror().errputl("edir:");
 
 		//process after editor has been closed
 
@@ -107,8 +108,7 @@ function main() {
 		//file has been edited
 		else if (fileinfo2 ne fileinfo) {
 
-			var text2;
-			osread(text2, temposfilename);
+			var text2 = osread(text2, temposfilename);
 
 			if (text2 == "") {
 				abort("Could not read local copy after editing " ^ temposfilename);
@@ -178,7 +178,8 @@ function main() {
 						if (isdict and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
 																												"*pgsql")) {
 							var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
-							osshell(oscmd);
+							if (not osshell(oscmd))
+								lasterror().errputl("edir:");
 						}
 
 						break;
@@ -192,7 +193,7 @@ function main() {
 	}
 
 	//clean up any temporary file
-	osremove(temposfilename);
+	osremove(temposfilename) or true;
 
 	return 0;
 }

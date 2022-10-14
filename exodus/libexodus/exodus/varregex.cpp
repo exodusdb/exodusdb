@@ -20,8 +20,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/*
+//using ECMAScript grammar. It's the default grammar and offers far more features that the
+other grammars. Most C++ references talk as if C++11 implements regular expressions as
+defined in the ECMA-262v3 and POSIX standards. But in reality the C++ implementation is very
+loosely based these standards. The syntax is quite close. The only significant differences
+are that std::regex supports POSIX classes even in ECMAScript mode, and that it is a bit
+peculiar about which characters must be escaped (like curly braces and closing square
+brackets) and which must not be escaped (like letters).
+
+But there are important differences in the actual behavior of this syntax.
+The caret and dollar always match at embedded line breaks in std::regex, while in JavaScript
+and POSIX this is an option. Backreferences to non-participating groups fail to match as in
+most regex flavors, while in JavaScript they find a zero-length match. In JavaScript, \d and
+\w are ASCII-only while \s matches all Unicode whitespace. This is odd, but all modern
+browsers follow the spec. In std::regex all the shorthands are ASCII-only when using strings
+of char.
+*/
+
+// U32REGEX/MATCH/SEARCH/REPLACE/TOKEN_ITERATOR ARE THIN ITERATOR WRAPPERS TO MAKE UTF8 ETC
+// APPEAR LIKE UTF32
+////////////////////////////////////////////////////////////////////////////////////////////
+
+// u32regex etc come from <boost/regex/icu.hpp>
+// the header <boost/regex/icu.hpp> provides a series of thin wrappers around these
+// algorithms,
+// called u32regex_match, u32regex_search, and u32regex_replace. These wrappers use
+// iterator-adapters internally
+// to make external UTF-8 or UTF-16 data look as though it's really a UTF-32 sequence, that
+// can then be passed on to the "real" algorithm.
+// https://www.boost.org/doc/libs/1_70_0/libs/regex/doc/html/boost_regex/ref/non_std_strings/icu/unicode_algo.html
+
+// ICU in BOOST REGEX
+// https://www.boost.org/doc/libs/1_34_1/libs/regex/doc/icu_strings.html
+
 /* UNICODE regex
 https://www.boost.org/doc/libs/1_78_0/libs/regex/doc/html/boost_regex/ref/non_std_strings/icu/unicode_iter.html
+
+REGEX SYNTAX normal = perl/javascript
+https://www.boost.org/doc/libs/1_80_0/libs/regex/doc/html/boost_regex/ref/syntax_option_type/syntax_option_type_synopsis.html
 
 u32regex_iterator
 
@@ -38,7 +75,6 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #define USE_BOOST
 #ifdef USE_BOOST
 #define std_boost boost
-#include <boost/regex/config.hpp>
 #include <boost/regex/icu.hpp>
 #include <boost/regex.hpp>
 
@@ -52,44 +88,6 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 
 namespace exodus {
 
-// ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
-// regular expressions for ICONV_MT
-// var var::iconv_MT(const char* conversion) const
-var var::iconv_MT() const {
-	//THISIS("var var::iconv_MT() const")
-	//assertString(function_sig);
-	// ignore everything else and just get first three groups of digits "99 99 99"
-	// remove leading and trailing non-digits and replace internal strings of non-digits with
-	// single space
-
-	// var time=(*this).replace("^\\D+|\\D+$", "", "r").replace("\\D+", " ", "r");
-
-	static std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",
-														std_boost::regex_constants::icase);
-
-	static std_boost::regex inner_nondigits_regex("\\D+", std_boost::regex_constants::icase);
-
-	var time = var(std_boost::regex_replace(var_str, surrounding_nondigits_regex, ""));
-	time = var(std_boost::regex_replace(time.var_str, inner_nondigits_regex, " "));
-
-	int hours = time.field(" ", 1).toInt();
-	int mins = time.field(" ", 2).toInt();
-	int secs = time.field(" ", 3).toInt();
-
-	int inttime = hours * 3600 + mins * 60 + secs;
-
-	if (inttime >= 86400)
-		return "";
-
-	// PM
-	if (inttime < 43200 && (*this).contains("P"))
-		inttime += 43200;
-	else if (inttime >= 43200 && (*this).contains("A"))
-		inttime -= 43200;
-
-	return inttime;
-}
-
 // From here on we need to use Boost's u32_regex, u32_match, u32_replace
 // in order to correctly process no-ASCII/multibyte characters
 
@@ -100,14 +98,19 @@ var var::iconv_MT() const {
 	using syntax_flags_typ = int;
 
     static const boost::u32regex digits_regex = boost::make_u32regex("\\d+");  //\d numeric
+
     static const boost::u32regex alpha_regex =
         boost::make_u32regex("[^\\W\\d]+");  // \a alphabetic
+
     static const boost::u32regex alphanum_regex =
         boost::make_u32regex("\\w+");  // \w alphanumeric
+
     static const boost::u32regex non_digits_regex =
         boost::make_u32regex("[^\\d]+");  // \D non-numeric
+
     static const boost::u32regex non_alpha_regex =
         boost::make_u32regex("[\\W\\d]+");  // \A non-alphabetic
+
     static const boost::u32regex non_alphanum_regex =
         boost::make_u32regex("\\W+");  // \W non-alphanumeric
 
@@ -117,134 +120,29 @@ var var::iconv_MT() const {
 	using syntax_flags_typ = std::regex::flag_type;
 
 	static const std::regex digits_regex("\\d+");  //\d numeric
+
 	static const std::regex alpha_regex("[^\\W\\d]+");	 // \a alphabetic
+
 	static const std::regex alphanum_regex("\\w+");  // \w alphanumeric
+
 	static const std::regex non_digits_regex("[^\\d]+");  // \D non-numeric
+
 	static const std::regex non_alpha_regex("[\\W\\d]+");	// \A non-alphabetic
+
 	static const std::regex non_alphanum_regex("\\W+");  // \W non-alphanumeric
 
 #endif
 
-// OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
-// regular expressions for ICONV_MC
-VARREF var::oconv_MR(const char* conversionchar) {
-	//THISIS("VARREF var::oconv_MR(const char* conversionchar)")
-	//assertString(function_sig);
-	// conversionchar arrives pointing to 3rd character (eg A in MCA)
-
-	// abort if no 3rd char
-	if (*conversionchar == '\0')
-		return (*this);
-
-	// in case changes to/from numeric
-	var_typ = VARTYP_STR;
-
-	// form of unicode specific regular expressions
-	// http://www.regular-expressions.info/unicode.html
-
-	// availability of unicode regular expressions
-	// http://www.boost.org/doc/libs/1_35_0/libs/regex/doc/html/boost_regex/unicode.html
-
-	/*
-	\w=alphanumeric characters, \W all the rest
-	\d=decimal characters, \D all the rest
-
-	but there is no such code to indicate ALPHABETIC (NON_DECIMAL) characters only (i.e. \w but
-	not \d) Imagine we also had the codes \a alphabetic characters, \A all the rest \a = [^\W\d]
-	... which is characters which are a) "NOT NON-WORD CHARACTERS" and b) "NOT DECIMAL DIGITS"
-	\A = [\W\d]  ... which is a) NON-WORD CHARACTERS and b) decimal digits
-
-	if boost has icu then \w and \d includes letters and decimal digits from all languages
-
-	123456|abcdefghi|!"$%^&* ()-+[]
-	dddddd|DDDDDDDDD|DDDDDDDDDDDDDD all characters divided into \d (decimal)		and
-	\D (non-decimals) AAAAAA|aaaaaaaaa|AAAAAAAAAAAAAA all characters divided into \a
-	(alphabetic)		and \A (non-alphabetic) wwwwww|wwwwwwwww|WWWWWWWWWWWWWW all
-	characters divided into \w (alphanumeric)	and \W (non-alphanumeric)
-	*/
-
-	/* unicode regex extensions
-	http://userguide.icu-project.org/strings/regexp
-	http://www.regular-expressions.info/unicode.html
-	sometimes unicode extension for regular expressions have \pL for \a and [^\pL] for \A
-	Match a word character. Word characters are [\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}].
-	l=lowercase u=uppercase t=titlecase o=other Nd=decimal digitboost_regexp
-	\N{UNICODE CHARACTER NAME}	Match the named character.
-	\p{UNICODE PROPERTY NAME}	Match any character with the specified Unicode Property.
-	\P{UNICODE PROPERTY NAME}	Match any character not having the specified Unicode
-	Property.
-	*/
-
-	// negate if /
-	if (*conversionchar == '/') {
-		++conversionchar;
-		switch (*conversionchar) {
-			// MC/N return everything except digits i.e. remove all digits 0123456789
-			case 'N': {
-				//var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
-				var_str = REGEX_REPLACE(var_str, digits_regex, "");
-				break;
-			}
-
-			// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
-			case 'A': {
-				//var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
-				var_str = REGEX_REPLACE(var_str, alpha_regex, "");
-				break;
-			}
-			// MC/B return everything except "alphanumeric" remove all "alphanumeric"
-			case 'B': {
-				//var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
-				var_str = REGEX_REPLACE(var_str, alphanum_regex, "");
-				break;
-			}
-		}
-		return *this;
-	}
-
-	// http://www.boost.org/doc/libs/1_37_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
-	// std_boost::regex_replace
-
-	switch (*conversionchar) {
-		// MCN return only digits i.e. remove all non-digits
-		case 'N': {
-			// var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
-			var_str = REGEX_REPLACE(var_str, non_digits_regex, "");
-			break;
-		}
-		// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
-		case 'A': {
-			// var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
-			var_str = REGEX_REPLACE(var_str, non_alpha_regex, "");
-			break;
-		}
-		// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
-		case 'B': {
-			// var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
-			var_str = REGEX_REPLACE(var_str, non_alphanum_regex, "");
-			break;
-		}
-		// MCL to lower case
-		case 'L': {
-			lcaser();
-			break;
-		}
-		// MCU to upper case
-		case 'U': {
-			ucaser();
-			break;
-		}
-	}
-
-	return *this;
-}
-
 syntax_flags_typ get_regex_syntax_flags(SV options) {
 	// determine options from string
 
+	// Default flavour is ECMAScript/Perl
+	// https://www.boost.org/doc/libs/1_80_0/libs/regex/doc/html/boost_regex/ref/syntax_option_type/syntax_option_type_perl.html
+	// https://en.cppreference.com/w/cpp/regex/syntax_option_type
+
 	// default
-	// ECMAScript	Use the Modified ECMAScript regular expression grammar
 	// collate	Character ranges of the form "[a-b]" will be locale sensitive.
+	// if the normal/ECMAScript/perl engine is selected.
 	syntax_flags_typ regex_syntax_flags = std_boost::regex_constants::collate;
 
 	// i = icase
@@ -252,10 +150,17 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 	if (options.find('i') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::icase;
 
-	// m = multiline (TODO should be present c++17 onwards)
+	// m = multiline (The default in boost but not std::regex
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
-	// if the ECMAScript engine is selected. if (options.contains("m"))
+	// if the normal/perl/ECMAScript engine is selected.
+	//if (options.find('m') != std::string::npos)
 	//	regex_syntax_flags|=std_boost::regex_constants::multiline;
+
+	// n = no multiline (The default in std::regex but not boost
+	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
+	// if the normal/perl/ECMAScript engine is selected.
+	if (options.find('n') != std::string::npos)
+		regex_syntax_flags|=std_boost::regex_constants::no_mod_m;
 
 	// b = basic (withdrawn after c++17?)
 	// Use the basic POSIX regular expression grammar
@@ -365,40 +270,6 @@ var var::match(SV matchstr, SV options) const {
 		return this->match(matchstr3);
 	}
 
-	/*
-	//using ECMAScript grammar. It's the default grammar and offers far more features that the
-	other grammars. Most C++ references talk as if C++11 implements regular expressions as
-	defined in the ECMA-262v3 and POSIX standards. But in reality the C++ implementation is very
-	loosely based these standards. The syntax is quite close. The only significant differences
-	are that std::regex supports POSIX classes even in ECMAScript mode, and that it is a bit
-	peculiar about which characters must be escaped (like curly braces and closing square
-	brackets) and which must not be escaped (like letters).
-
-	But there are important differences in the actual behavior of this syntax.
-	The caret and dollar always match at embedded line breaks in std::regex, while in JavaScript
-	and POSIX this is an option. Backreferences to non-participating groups fail to match as in
-	most regex flavors, while in JavaScript they find a zero-length match. In JavaScript, \d and
-	\w are ASCII-only while \s matches all Unicode whitespace. This is odd, but all modern
-	browsers follow the spec. In std::regex all the shorthands are ASCII-only when using strings
-	of char.
-	*/
-
-	// U32REGEX/MATCH/SEARCH/REPLACE/TOKEN_ITERATOR ARE THIN ITERATOR WRAPPERS TO MAKE UTF8 ETC
-	// APPEAR LIKE UTF32
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	// u32regex etc come from <boost/regex/icu.hpp>
-	// the header <boost/regex/icu.hpp> provides a series of thin wrappers around these
-	// algorithms,
-	// called u32regex_match, u32regex_search, and u32regex_replace. These wrappers use
-	// iterator-adapters internally
-	// to make external UTF-8 or UTF-16 data look as though it's really a UTF-32 sequence, that
-	// can then be passed on to the "real" algorithm.
-	// https://www.boost.org/doc/libs/1_70_0/libs/regex/doc/html/boost_regex/ref/non_std_strings/icu/unicode_algo.html
-
-	// ICU in BOOST REGEX
-	// https://www.boost.org/doc/libs/1_34_1/libs/regex/doc/icu_strings.html
-
 	REGEX& regex = getregex(matchstr, options);
 
 	/*
@@ -464,19 +335,20 @@ var var::match(SV matchstr, SV options) const {
 
 }
 
-// simple case sensitive substr replacement
+// Simple non-regex case sensitive substr replacement
+/////////////////////////////////////////////////////
+
+// const
 var var::replace(SV what, SV with) const& {
-	var newmv = *this;
-	return newmv.replacer(what, with);
+	var nrvo = *this;
+	return nrvo.replacer(what, with);
 }
 
-// in-place
+// mutator
 VARREF var::replacer(SV what, SV with) {
 
 	THISIS("VARREF var::replacer(SV what, SV with)")
 	assertStringMutator(function_sig);
-	//ISSTRING(what)
-	//ISSTRING(with)
 
 	// nothing to do if oldstr is ""
 	if (what.empty())
@@ -503,14 +375,18 @@ VARREF var::replacer(SV what, SV with) {
 	return *this;
 }
 
-//regex based string replacement
+// Regex based string replacement
+/////////////////////////////////
+
 // only here really because boost regex is included here for file matching
+
+// const
 var var::regex_replace(SV regexstr, SV replacementstr, SV options) const& {
-	var newmv = *this;
-	return newmv.regex_replacer(regexstr, replacementstr, options);
+	var nrvo = *this;
+	return nrvo.regex_replacer(regexstr, replacementstr, options);
 }
 
-// in-place
+// mutator
 VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 
 	THISIS(
@@ -552,6 +428,162 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 
 	// Acquire the output
 	var_str = std::move(oss1).str();
+
+	return *this;
+}
+
+// ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
+///////////
+
+// regular expressions for ICONV_MT
+// var var::iconv_MT(const char* conversion) const
+var var::iconv_MT() const {
+	//THISIS("var var::iconv_MT() const")
+	//assertString(function_sig);
+	// ignore everything else and just get first three groups of digits "99 99 99"
+	// remove leading and trailing non-digits and replace internal strings of non-digits with
+	// single space
+
+	// var time=(*this).replace("^\\D+|\\D+$", "", "r").replace("\\D+", " ", "r");
+
+	static std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",
+														std_boost::regex_constants::icase);
+
+	static std_boost::regex inner_nondigits_regex("\\D+", std_boost::regex_constants::icase);
+
+	var time = var(std_boost::regex_replace(var_str, surrounding_nondigits_regex, ""));
+	time = var(std_boost::regex_replace(time.var_str, inner_nondigits_regex, " "));
+
+	int hours = time.field(" ", 1).toInt();
+	int mins = time.field(" ", 2).toInt();
+	int secs = time.field(" ", 3).toInt();
+
+	int inttime = hours * 3600 + mins * 60 + secs;
+
+	if (inttime >= 86400)
+		return "";
+
+	// PM
+	if (inttime < 43200 && (*this).contains("P"))
+		inttime += 43200;
+	else if (inttime >= 43200 && (*this).contains("A"))
+		inttime -= 43200;
+
+	return inttime;
+}
+
+// OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
+///////////
+
+// regular expressions for ICONV_MC
+VARREF var::oconv_MR(const char* conversionchar) {
+	//THISIS("VARREF var::oconv_MR(const char* conversionchar)")
+	//assertString(function_sig);
+	// conversionchar arrives pointing to 3rd character (eg A in MCA)
+
+	// abort if no 3rd char
+	if (*conversionchar == '\0')
+		return (*this);
+
+	// in case changes to/from numeric
+	var_typ = VARTYP_STR;
+
+	// form of unicode specific regular expressions
+	// http://www.regular-expressions.info/unicode.html
+
+	// availability of unicode regular expressions
+	// http://www.boost.org/doc/libs/1_35_0/libs/regex/doc/html/boost_regex/unicode.html
+
+	/*
+	\w=alphanumeric characters, \W all the rest
+	\d=decimal characters, \D all the rest
+
+	but there is no such code to indicate ALPHABETIC (NON_DECIMAL) characters only (i.e. \w but
+	not \d) Imagine we also had the codes \a alphabetic characters, \A all the rest \a = [^\W\d]
+	... which is characters which are a) "NOT NON-WORD CHARACTERS" and b) "NOT DECIMAL DIGITS"
+	\A = [\W\d]  ... which is a) NON-WORD CHARACTERS and b) decimal digits
+
+	if boost has icu then \w and \d includes letters and decimal digits from all languages
+
+	123456|abcdefghi|!"$%^&* ()-+[]
+	dddddd|DDDDDDDDD|DDDDDDDDDDDDDD all characters divided into \d (decimal)		and
+	\D (non-decimals) AAAAAA|aaaaaaaaa|AAAAAAAAAAAAAA all characters divided into \a
+	(alphabetic)		and \A (non-alphabetic) wwwwww|wwwwwwwww|WWWWWWWWWWWWWW all
+	characters divided into \w (alphanumeric)	and \W (non-alphanumeric)
+	*/
+
+	/* unicode regex extensions
+	http://userguide.icu-project.org/strings/regexp
+	http://www.regular-expressions.info/unicode.html
+	sometimes unicode extension for regular expressions have \pL for \a and [^\pL] for \A
+	Match a word character. Word characters are [\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}].
+	l=lowercase u=uppercase t=titlecase o=other Nd=decimal digitboost_regexp
+	\N{UNICODE CHARACTER NAME}	Match the named character.
+	\p{UNICODE PROPERTY NAME}	Match any character with the specified Unicode Property.
+	\P{UNICODE PROPERTY NAME}	Match any character not having the specified Unicode
+	Property.
+	*/
+
+	// negate if /
+	if (*conversionchar == '/') {
+		++conversionchar;
+		switch (*conversionchar) {
+			// MC/N return everything except digits i.e. remove all digits 0123456789
+			case 'N': {
+				//var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
+				var_str = REGEX_REPLACE(var_str, digits_regex, "");
+				break;
+			}
+
+			// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
+			case 'A': {
+				//var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
+				var_str = REGEX_REPLACE(var_str, alpha_regex, "");
+				break;
+			}
+			// MC/B return everything except "alphanumeric" remove all "alphanumeric"
+			case 'B': {
+				//var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
+				var_str = REGEX_REPLACE(var_str, alphanum_regex, "");
+				break;
+			}
+		}
+		return *this;
+	}
+
+	// http://www.boost.org/doc/libs/1_37_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
+	// std_boost::regex_replace
+
+	switch (*conversionchar) {
+		// MCN return only digits i.e. remove all non-digits
+		case 'N': {
+			// var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
+			var_str = REGEX_REPLACE(var_str, non_digits_regex, "");
+			break;
+		}
+		// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
+		case 'A': {
+			// var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
+			var_str = REGEX_REPLACE(var_str, non_alpha_regex, "");
+			break;
+		}
+		// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
+		case 'B': {
+			// var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
+			var_str = REGEX_REPLACE(var_str, non_alphanum_regex, "");
+			break;
+		}
+		// MCL to lower case
+		case 'L': {
+			lcaser();
+			break;
+		}
+		// MCU to upper case
+		case 'U': {
+			ucaser();
+			break;
+		}
+	}
 
 	return *this;
 }

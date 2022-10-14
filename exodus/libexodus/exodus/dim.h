@@ -180,12 +180,12 @@ friend class var;
 	/////////////
 
 	// db
-	bool read(CVR filevar, CVR key);
+	ND bool read(CVR filevar, CVR key);
 	bool write(CVR filevar, CVR key) const;
 
 	// os
-	bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
-	bool oswrite(CVR osfilename,const char* codepage DEFAULT_EMPTY) const;
+	ND bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
+	ND bool oswrite(CVR osfilename,const char* codepage DEFAULT_EMPTY) const;
 
 	////////////
 	// ITERATORS

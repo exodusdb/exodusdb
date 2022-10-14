@@ -302,48 +302,59 @@ programinit()
 
 	//write two greeksmallgammas (4 bytes)
 	assert(oswrite(charout ^ charout, testfilename));
+	//xxd t_vm.txt
+	//00000000: ceb3 ceb3                                ....
 
-	//check reading 1 byte results in nothing
-	TRACE(testfilex);
-	TRACE(offsetx);
-	//assert(testdata.osbread(testfilex,offsetx=0,1));
-	assert(testdata.osbread(testfilex, offsetx, 1));
-	assert(testdata.len()         eq 0);
-	assert(testdata.oconv("HEX2") eq "");
-	assert(offsetx                eq 0);
-
-	//check reading 2 bytes results in 1 unicode character (2 bytes)
+	//check reading 5 bytes results in 2 unicode characters (4 bytes)
 	offsetx = 0;
-	testdata.osbread(testfilex, offsetx, 2);
-	assert(testdata               eq charout);
-	assert(testdata.len()         eq 2);
-	assert(testdata.oconv("HEX2") eq "CEB3");
-	assert(offsetx                eq 2);
+	assert(testdata.osbread(testfilex, offsetx, 5));
+	assert(testdata               eq (charout ^ charout));
+	assert(testdata.len()         eq 4);
+	assert(testdata.oconv("HEX2") eq "CEB3CEB3");
+	assert(offsetx                eq 4);
+
+	//check reading 4 bytes results in 2 unicode characters (4 bytes)
+	offsetx = 0;
+	assert(testdata.osbread(testfilex, offsetx, 4));
+	assert(testdata               eq (charout ^ charout));
+	assert(testdata.len()         eq 4);
+	assert(testdata.oconv("HEX2") eq "CEB3CEB3");
+	assert(offsetx                eq 4);
 
 	//check reading 3 bytes results in 1 unicode character (2 bytes)
 	offsetx = 0;
-	testdata.osbread(testfilex, offsetx, 3);
+	assert(testdata.osbread(testfilex, offsetx, 3));
 	assert(testdata               eq charout);
 	assert(testdata.len()         eq 2);
 	assert(testdata.oconv("HEX2") eq "CEB3");
 	printl(offsetx);
 	assert(offsetx                eq 2);
 
-	//check reading 4 bytes results in 2 unicode characters (4 bytes)
+	//check reading 2 bytes results in 1 unicode character (2 bytes)
 	offsetx = 0;
-	testdata.osbread(testfilex, offsetx, 4);
-	assert(testdata               eq (charout ^ charout));
-	assert(testdata.len()         eq 4);
-	assert(testdata.oconv("HEX2") eq "CEB3CEB3");
-	assert(offsetx                eq 4);
+	assert(testdata.osbread(testfilex, offsetx, 2));
+	assert(testdata               eq charout);
+	assert(testdata.len()         eq 2);
+	assert(testdata.oconv("HEX2") eq "CEB3");
+	assert(offsetx                eq 2);
 
-	//check reading 5 bytes results in 2 unicode characters (4 bytes)
+	//check reading 1 byte results in nothing (and result is false)
+	TRACE(testfilex);
+	TRACE(offsetx);
 	offsetx = 0;
-	testdata.osbread(testfilex, offsetx, 5);
-	assert(testdata               eq (charout ^ charout));
-	assert(testdata.len()         eq 4);
-	assert(testdata.oconv("HEX2") eq "CEB3CEB3");
-	assert(offsetx                eq 4);
+	assert(not testdata.osbread(testfilex, offsetx, 1));
+	assert(testdata.len()         eq 0);
+	assert(testdata.oconv("HEX2") eq "");
+	assert(offsetx                eq 0);
+
+	//check reading 0 byte results in nothing (but result is true)
+	TRACE(testfilex);
+	TRACE(offsetx);
+	offsetx = 0;
+	assert(testdata.osbread(testfilex, offsetx, 0));
+	assert(testdata.len()         eq 0);
+	assert(testdata.oconv("HEX2") eq "");
+	assert(offsetx                eq 0);
 
 	//	assert(testfilename.osfile().f(1) eq 2);
 	var charin;
@@ -433,7 +444,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	osread(tx2, "test_main.$1", "ISO-8859-5");
 	//assert(tx2==tx);
 
-	osremove("test_main.$1");
+	osremove("test_main.$1") or lasterror().errputl("test_main1:");
 
 	//hash
 	var("xyz").hash(1000).outputl("hash(1000) of \"xyz\"=");

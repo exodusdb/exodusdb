@@ -1915,8 +1915,8 @@ class PUBLIC var final {
 	bool sqlexec(CVR sqlcmd) const;
 	bool sqlexec(CVR sqlcmd, VARREF response) const;
 
-	ND var lasterror() const;
-	void lasterror(CVR msg) const;
+	ND const var lasterror() const;
+	const var loglasterror(CVR source DEFAULT_EMPTY) const;
 
 	// DATABASE MANAGEMENT
 	//////////////////////
@@ -1942,29 +1942,29 @@ class PUBLIC var final {
 	ND var reccount(CVR filename DEFAULT_EMPTY) const;
 	var flushindex(CVR filename DEFAULT_EMPTY) const;
 
-	bool open(CVR dbfilename, CVR connection DEFAULT_EMPTY);
+	ND bool open(CVR dbfilename, CVR connection DEFAULT_EMPTY);
 	void close();
 
 	// 1=ok, 0=failed, ""=already locked
-	var lock(CVR key) const;
+	ND var lock(CVR key) const;
 	// void unlock(CVR key) const;
 	// void unlockall() const;
 	bool unlock(CVR key) const;
 	bool unlockall() const;
 
 	// db file i/o
-	bool read(CVR filehandle, CVR key);
+	ND bool read(CVR filehandle, CVR key);
 	bool write(CVR filehandle, CVR key) const;
 	bool deleterecord(CVR key) const;
-	bool updaterecord(CVR filehandle, CVR key) const;
-	bool insertrecord(CVR filehandle, CVR key) const;
+	ND bool updaterecord(CVR filehandle, CVR key) const;
+	ND bool insertrecord(CVR filehandle, CVR key) const;
 
 	// specific db field i/o
-	bool readv(CVR filehandle, CVR key, const int fieldno);
+	ND bool readv(CVR filehandle, CVR key, const int fieldno);
 	bool writev(CVR filehandle, CVR key, const int fieldno) const;
 
 	// cached db file i/o
-	bool reado(CVR filehandle, CVR key);
+	ND bool reado(CVR filehandle, CVR key);
 	bool writeo(CVR filehandle, CVR key) const;
 	bool deleteo(CVR key) const;
 
@@ -1982,9 +1982,9 @@ class PUBLIC var final {
 
 	//ND bool hasnext() const;
 	ND bool hasnext();
-	bool readnext(VARREF key);
-	bool readnext(VARREF key, VARREF valueno);
-	bool readnext(VARREF record, VARREF key, VARREF valueno);
+	ND bool readnext(VARREF key);
+	ND bool readnext(VARREF key, VARREF valueno);
+	ND bool readnext(VARREF record, VARREF key, VARREF valueno);
 
 	bool savelist(CVR listname);
 	bool getlist(CVR listname);
@@ -2009,23 +2009,19 @@ class PUBLIC var final {
 	// OS FILE SYSTEM
 	/////////////////
 
-	bool osopen(CVR filename, const char* locale DEFAULT_EMPTY) const;
+	ND bool osopen(CVR filename, const char* locale DEFAULT_EMPTY) const;
 	bool osbread(CVR osfilevar, VARREF offset, const int length);
 	bool osbwrite(CVR osfilevar, VARREF offset) const;
-//#define VAR_OSBREADWRITE_CONST_OFFSET
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-	bool osbread(CVR osfilevar, CVR offset, const int length);
-	bool osbwrite(CVR osfilevar, CVR offset) const;
-#endif
 	void osclose() const;
 
-	bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
-	bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
-	bool osremove() const;
-	bool osremove(CVR osfilename) const;
-	bool osrename(CVR new_dirpath_or_filepath) const;
-	bool oscopy(CVR to_osfilename) const;
-	bool osmove(CVR to_osfilename) const;
+	//ND bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
+	ND bool osread(const char* osfilename, const char* codepage DEFAULT_EMPTY);
+	ND bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
+	ND bool osremove() const;
+	ND bool osremove(CVR osfilename) const;
+	ND bool osrename(CVR new_dirpath_or_filepath) const;
+	ND bool oscopy(CVR to_osfilename) const;
+	ND bool osmove(CVR to_osfilename) const;
 
 	ND var oslist(SV globpattern DEFAULT_EMPTY, const int mode = 0) const;
 	ND var oslistf(SV globpattern DEFAULT_EMPTY) const;
@@ -2043,13 +2039,6 @@ class PUBLIC var final {
 	bool oscwd(CVR newpath) const;
 	void osflush() const;
 
-	// TODO add performance enhancing char* argumented versions of many os functions
-	// to avoid unnecessary conversion to and from var format
-	// same again but this time allowing native strings without needing automatic conversion of
-	// var->char* this is to only to avoid convertion too and from var but will usage of hard
-	// coded filenames etc really be in fast loops and performance related? perhaps only provide
-	bool osread(const char* osfilename, const char* codepage DEFAULT_EMPTY);
-
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
 
@@ -2060,7 +2049,7 @@ class PUBLIC var final {
 	ND var ostempfilename() const;
 
 	bool osgetenv(const char* code);
-	bool ossetenv(const char* code) const;
+	void ossetenv(const char* code) const;
 
 
 	///////////////////////////
@@ -2153,6 +2142,8 @@ class PUBLIC var final {
 
 	ND bool cursorexists();//database, not terminal
 	bool selectx(CVR fieldnames, CVR sortselectclause);
+
+	const var setlasterror(CVR msg) const;
 
 	//ND var build_conn_info(CVR conninfo) const;
 

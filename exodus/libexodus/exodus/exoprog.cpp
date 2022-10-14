@@ -100,8 +100,9 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 	var dictfilename = calc_fields.f(5, 1);
 
 	//debugging
-	var calc_fields_file = "";
-	calc_fields_file.open("calc_fields");
+	var calc_fields_file;
+	if (!calc_fields_file.open("calc_fields"))
+		calc_fields_file = "";
 
 	//open the dictionary
 	if (not dictfilename.lcase().starts("dict."))
@@ -939,12 +940,12 @@ void ExodusProgramBase::readuserprivs() const {
 }
 
 // writeuserprivs
-bool ExodusProgramBase::writeuserprivs() const {
+void ExodusProgramBase::writeuserprivs() const {
 	SECURITY.r(9, "");
 	if (DEFINITIONS) {
-		return SECURITY.write(DEFINITIONS, "SECURITY");
+		SECURITY.write(DEFINITIONS, "SECURITY");
 	}
-	return true;
+	return;
 }
 
 // capitalise
@@ -2414,30 +2415,30 @@ var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptoda
 	//CALL DOSTIME(uptotime)
 
 	//NSECS=INT(uptotime-fromTIME)
-	var nsecs = uptotime - fromtime;
+	var secs = uptotime - fromtime;
 	//IF NSECS ELSE NSECS=1
 	//uptodate=date()
 	if (fromdate ne uptodate) {
-		nsecs += (uptodate - fromdate) * 24 * 3600;
+		secs += (uptodate - fromdate) * 24 * 3600;
 	}
 
 	//cater for bug where start date isnt known and time has crossed midnight
 	//so the 2nd time is less than the first
-	if (nsecs < 0) {
-		nsecs += 86400;
+	if (secs < 0) {
+		secs += 86400;
 	}
 
-	var weeks = (nsecs / 604800).floor();
-	nsecs -= weeks * 604800;
+	var weeks = (secs / 604800).floor();
+	secs -= weeks * 604800;
 
-	var days = (nsecs / 86400).floor();
-	nsecs -= days * 86400;
+	var days = (secs / 86400).floor();
+	secs -= days * 86400;
 
-	var hours = (nsecs / 3600).floor();
-	nsecs -= hours * 3600;
+	var hours = (secs / 3600).floor();
+	secs -= hours * 3600;
 
-	var minutes = (nsecs / 60).floor();
-	nsecs -= minutes * 60;
+	var minutes = (secs / 60).floor();
+	secs -= minutes * 60;
 
 	if (weeks) {
 		text.r(-1, weeks ^ " week");
@@ -2464,18 +2465,19 @@ var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptoda
 		}
 	}
 	if (not(hours) and (minutes < 5)) {
-		if (nsecs) {
-			if (minutes or (nsecs - 10 > 0)) {
-				nsecs = nsecs.oconv("MD00P");
+		if (secs) {
+			if (minutes or (secs - 10 > 0)) {
+				secs = secs.round(0);
 			} else {
-				nsecs = (nsecs.oconv("MD40P")) + 0;
-				if (nsecs.starts(".")) {
-					nsecs.prefixer("0");
+				//secs = (secs.oconv("MD40P")) + 0;
+				secs = secs.round(6) + 0;
+				if (secs.starts(".")) {
+					secs.prefixer("0");
 				}
 			}
-			if (nsecs) {
-				text.r(-1, nsecs ^ " sec");
-				if (nsecs ne 1) {
+			if (secs) {
+				text.r(-1, secs ^ " sec");
+				if (secs ne 1) {
 					text ^= "s";
 				}
 			} else if (not(minutes)) {

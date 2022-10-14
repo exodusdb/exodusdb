@@ -12,8 +12,8 @@ var xo_dict_conn;
 function main() {
 
 	printl("\n   --- clear any existing EXO_DATA/DICT env ---\n");
-	assert(ossetenv("EXO_DATA", ""));
-	assert(ossetenv("EXO_DICT", ""));
+	ossetenv("EXO_DATA", "");
+	ossetenv("EXO_DICT", "");
 
 	printl("\n   --- default connection first thing before anything else to ensure clean ---\n");
 	printl("\n   --- quit (pass test) if no default database connection ---\n");
@@ -42,7 +42,7 @@ function main() {
 		assert(xo_dict_conn.connect(xo_dict));
 
 		printl("\n   --- say that dicts are on the specific database " ^ xo_dict ^ " ---\n");
-		assert(ossetenv("EXO_DICT", xo_dict));
+		ossetenv("EXO_DICT", xo_dict);
 		assert(var(osgetenv("EXO_DICT")) eq xo_dict);
 
 		printl("\n   --- create a dict on the specific database implicitly ---\n");
@@ -80,7 +80,7 @@ function main() {
 		printl("\n   --- connect to the specific database (although not used for dict here) ---\n");
 
 		printl("\n   --- say that dicts are on the default database ---\n");
-		assert(ossetenv("EXO_DICT", ""));
+		ossetenv("EXO_DICT", "");
 		assert(var(osgetenv("EXO_DICT")) eq "");
 
 		printl("\n   --- needed to remove default dict connection ---\n");

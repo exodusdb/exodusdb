@@ -226,7 +226,7 @@ bool var::osgetenv(const char* envcode) {
 	// Example: pos -> 0
 	auto pos = thread_environ.find(target);
 
-	// If not found then fail
+	// If not found then return false (no error)
 	// If environ was "^x=1^y=2" then pos->npos
 	if (pos == std::string::npos)
 		return false;
@@ -261,7 +261,7 @@ bool var::osgetenv(const char* envcode) {
 
 }
 
-bool var::ossetenv(const char* envcode) const {
+void var::ossetenv(const char* envcode) const {
 
 	THISIS("bool var::ossetenv(const char* envcode) const")
 	assertString(function_sig);
@@ -283,19 +283,19 @@ bool var::ossetenv(const char* envcode) const {
 
 		// Finish creating the old pair "^a=b"
 		old_pair.append(oldvalue.var_str);
-TRACE(old_pair)
+//TRACE(old_pair)
 		// Replace in thread_environ, old pair with new pair
 		auto pos = thread_environ.find(old_pair.data(), 0, old_pair.length());
 		if (pos != old_pair.npos)
 			thread_environ.replace(pos, old_pair.length(), new_pair.data(), new_pair.length());
 
 	} else {
-TRACE(new_pair)
+//TRACE(new_pair)
 		// Append new pair
 		thread_environ.append(new_pair);
 	}
 
-	return true;
+	return;
 }
 
 var var::ospid() const {

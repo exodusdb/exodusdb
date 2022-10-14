@@ -40,10 +40,11 @@ inline struct TimeBank {
 
 		//TODO make independent of install location
 		var timeacc_list;
-		timeacc_list.osread("/usr/local/share/exodus/timeaccs.txt");
-		timeacc_list.converter("\n ", _FM _VM);
-		for (var timeacc_item : timeacc_list) {
-			timeacc_names_.at(timeacc_item.f(1, 1)) = timeacc_item.field(_VM, 2, 999).convert(_VM, " ").toString();
+		if (timeacc_list.osread("/usr/local/share/exodus/timeaccs.txt")) {
+			timeacc_list.converter("\n ", _FM _VM);
+			for (var timeacc_item : timeacc_list) {
+				timeacc_names_.at(timeacc_item.f(1, 1)) = timeacc_item.field(_VM, 2, 999).convert(_VM, " ").toString();
+			}
 		}
 
 		// Print out all the time accounts

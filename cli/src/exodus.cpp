@@ -44,10 +44,10 @@ function main() {
 
 	var command = COMMAND.field(" ", 2, 999999);
 
-	//non-windows
 	var shell = osgetenv("SHELL");
-	//if (OSSLASH eq "/" and shell.osgetenv("SHELL")) {
-	if (OSSLASH eq "/" and shell) {
+	if (not(OSSLASH_IS_BACKSLASH) and shell) {
+
+		// Posix
 
 		var home = osgetenv("HOME");
 		var path = osgetenv("PATH");
@@ -83,25 +83,29 @@ function main() {
 		}
 
 		//enable core dumps
-		osshell("ulimit -c unlimited");
+		if (not osshell("ulimit -c unlimited"))
+			lasterror().errputl("exodus:");
 
 		//execute command or enter exodus shell
 		//if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
 
+		// This may have no effect since setting environment variables is error prone
 		var shellcmd = setenv ^ " " ^ (command ? command : shell);
 		if (verbose)
 			printl("SHELL=\n" ^ shellcmd);
-		osshell(shellcmd);
+		if (not osshell(shellcmd))
+			lasterror().errputl("exodus: ");
+
+	} else if (OSSLASH eq "\\" and shell.osgetenv("ComSpec")) {
 
 		//windows
-	} else if (OSSLASH eq "\\" and shell.osgetenv("ComSpec")) {
 
 		//set EXO_PATH used by compile to find LIB and INCLUDE paths
 		var exoduspath = exodusbinpath;
 		if (exoduspath.field2(OSSLASH, -1) eq "bin")
 			exoduspath = field(exoduspath, OSSLASH, 1, fcount(exoduspath, OSSLASH) - 1);
-		if (exoduspath and not ossetenv("EXO_PATH", exoduspath))
-			errput("Couldnt set EXO_PATH environment variable");
+		if (exoduspath)
+			ossetenv("EXO_PATH", exoduspath);
 
 		var oldpath = osgetenv("PATH");
 		var newpath = oldpath;
@@ -121,8 +125,8 @@ function main() {
 		}
 
 		//update path
-		if (newpath ne oldpath and not ossetenv("PATH", newpath))
-			errput("Couldnt set PATH environment variable");
+		if (newpath ne oldpath)
+			ossetenv("PATH", newpath);
 
 		//set INCLUDE path
 		//prefix path to exodus.h to INCLUDE environment variable
@@ -143,15 +147,14 @@ function main() {
 			exodusincludepath = osgetenv("EXO_INCLUDE");
 			searched(-1) = exodusincludepath;
 			if (!osfile(exodusincludepath ^ "\\exodus.h")) {
-				errputl("Couldnt find exodus include path (exodus.h)");
-				errputl(searched.replace(FM, "\n"));
+				errputl("exodus: Couldnt find exodus include path (exodus.h)");
+				errputl("exodus: " ^ searched.replace(FM, "\n"));
 				exodusincludepath = "";
 			}
 		}
-		if (not ossetenv("EXO_INCLUDE", exodusincludepath))
-			errput("Couldnt set EXODUS_INCLUDE environment variable");
-		if (exodusincludepath and not ossetenv("INCLUDE", (exodusincludepath ^ ";" ^ osgetenv("INCLUDE"))))
-			errput("Couldnt set INCLUDE environment variable");
+		ossetenv("EXO_INCLUDE", exodusincludepath);
+		if (exodusincludepath)
+			ossetenv("INCLUDE", (exodusincludepath ^ ";" ^ osgetenv("INCLUDE")));
 
 		//set LIB path
 		//prefix path to exodus.lib to LIB environment variable
@@ -166,16 +169,18 @@ function main() {
 		if (!osfile(exoduslibpath ^ "\\exodus.lib")) {
 			exoduslibpath = osgetenv("EXO_LIBPATH");
 			if (!osfile(exoduslibpath ^ "\\exodus.lib")) {
-				errput("Couldnt find exodus include path (exodus.h)");
+				errput("exodus: Couldnt find exodus include path (exodus.h)");
 				exoduslibpath = "";
 			}
 		}
-		if (not ossetenv("EXO_LIBPATH", exoduslibpath))
-			errput("Couldnt set EXO_LIBPATH environment variable");
-		if (exoduslibpath and not ossetenv("LIB", (exoduslibpath ^ ";" ^ osgetenv("LIB"))))
-			errput("Couldnt set LIB environment variable");
+		// This may have no effect since setting environment variable is error prone
+		ossetenv("EXO_LIBPATH", exoduslibpath);
+		if (exoduslibpath)
+			ossetenv("LIB", (exoduslibpath ^ ";" ^ osgetenv("LIB")));
 
-		osshell((command ? command : shell));
+		if (not osshell((command ?: shell)))
+			lasterror().errputl("exodus: ");
+
 	} else
 		abort("Cannot find SHELL or ComSpec in environment");
 

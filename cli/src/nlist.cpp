@@ -215,7 +215,7 @@ function main() {
 	// Compile list with optimisation. Its inner loops benefit from efficiency
 
 	if (USERNAME eq "EXODUS") {
-		var(SENTENCE).oswrite("nlist");
+		var(SENTENCE).oswrite("nlist") or lasterror().errputl("nlist:");
 		logputl();
 		logputl(SENTENCE);
 	}
@@ -2420,8 +2420,9 @@ subroutine emailing() {
 			call sendmail(tt, tt2, tt3, body, "", "", xxerrmsg);
 		}
 
+		// Reset the output file to start another email
 		printptr = 0;
-		var("").oswrite(SYSTEM.f(2));
+		var("").oswrite(SYSTEM.f(2)) or lasterror().errputl("nlist:");
 
 	}
 

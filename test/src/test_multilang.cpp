@@ -33,20 +33,20 @@ programinit()
 	if (not buf.osread(utf8_html) )	//default external and internal format is utf8
 	 abort("test_multilang needs access to test data file utf8.html");
 
-	buf.oswrite("t_utf8copy.html");
+	assert(buf.oswrite("t_utf8copy.html"));
 	cmd = "diff " ^ utf8_html ^ " t_utf8copy.html";
 	printl(cmd);
 	assert(osshell(cmd));
 
-	buf.osread(utf8_html, "utf8");			 // read with boost_utf8-facet
-	buf.oswrite("t_utf8utf8.html", "utf8");	 // write with boost_utf8_facet
+	assert(buf.osread(utf8_html, "utf8"));			 // read with boost_utf8-facet
+	assert(buf.oswrite("t_utf8utf8.html", "utf8"));	 // write with boost_utf8_facet
 	cmd = "diff " ^ utf8_html ^ " t_utf8utf8.html";
 	printl(cmd);
 	assert(osshell(cmd));
 
 	// and chinese page
-	buf.osread("calblur8.html", "utf8");
-	buf.oswrite("t_calblur8utf8.html", "utf8");
+	assert(buf.osread("calblur8.html", "utf8"));
+	assert(buf.oswrite("t_calblur8utf8.html", "utf8"));
 	cmd = "diff calblur8.html t_calblur8utf8.html";
 	printl(cmd);
 	assert(osshell(cmd));
@@ -99,7 +99,7 @@ programinit()
 	var MIXTURE_file = "t_test_MIXTURE.txt";
 	oswrite(MIXTURE_txt1, MIXTURE_file, "utf8");
 	MIXTURE_file.osclose();
-	MIXTURE_txt2.osread(MIXTURE_file, "utf8");
+	assert(MIXTURE_txt2.osread(MIXTURE_file, "utf8"));
 	MIXTURE_txt1.outputl("Written   text:");
 	MIXTURE_txt2.outputl("Read back text:");
 

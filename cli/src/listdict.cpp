@@ -50,7 +50,7 @@ function main() {
 	if (OPTIONS.contains("V"))
 		logputl(cmd);
 
-	osshell(cmd);
+	osshell(cmd) or lasterror().errputl("listdict:");
 
 	return 0;
 }

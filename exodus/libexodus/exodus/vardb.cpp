@@ -251,7 +251,7 @@ static void PGconn_DELETER(PGconn* pgconn) {
 thread_local int thread_default_data_dbconn_no = 0;
 thread_local int thread_default_dict_dbconn_no = 0;
 //thread_local var thread_connparams = "";
-thread_local var thread_dblasterror = "";
+thread_local var thread_lasterror = "";
 thread_local DBConnector thread_dbconnector(PGconn_DELETER);
 thread_local std::map<std::string, std::string> thread_file_handles;
 
@@ -572,7 +572,7 @@ DBConn* get_dbconn(CVR dbhandle) {
 	return thread_dbconnector.get_dbconn(dbconn_no);
 }
 
-void var::lasterror(CVR msg) const {
+const var var::setlasterror(CVR msg) const {
 	// no checking for speed
 	// THISIS("void var::lasterror(CVR msg")
 	// ISSTRING(msg)
@@ -583,12 +583,17 @@ void var::lasterror(CVR msg) const {
 	// dereferencing an invalid pointer or using some object after it has been freed. EVADE
 	// error for now by commenting next line
 
-	thread_dblasterror = msg;
+	thread_lasterror = msg;
+	return lasterror();
 }
 
-var var::lasterror() const {
+const var var::lasterror() const {
 	//TRACE(thread_file_handles.size());
-	return thread_dblasterror ?: "";
+	return thread_lasterror;
+}
+
+const var var::loglasterror(CVR source) const {
+	return thread_lasterror.logputl(source ^ " ");
 }
 
 static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn);
@@ -670,8 +675,8 @@ var build_conn_info(CVR conninfo) {
 		else if (home.osgetenv("USERPROFILE"))
 			configfilename ^= home ^ "\\Exodus\\.exodus";
 		var configconn = "";
-		if (!configconn.osread(configfilename))
-			configconn.osread("exodus.cfg");
+		if (!configconn.osread(configfilename) and !configconn.osread("exodus.cfg"))
+			configconn = "";
 		//postgres ignores after \n?
 		configconn.converter("\r\n","  ");
 
@@ -749,7 +754,7 @@ bool var::connect(CVR conninfo) {
 			// var libname="libpq.so";
 			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
 				". Verify configuration PATH contains postgres's \\bin.";
-			this->lasterror(errmsg);
+			this->setlasterror(errmsg);
 			return false;
 		}
 #else
@@ -774,7 +779,7 @@ bool var::connect(CVR conninfo) {
 
 		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
 
-		this->lasterror(errmsg);
+		this->setlasterror(errmsg);
 
 		// required even if connect fails according to docs
 		PQfinish(pgconn);
@@ -878,7 +883,7 @@ bool var::attach(CVR filenames) {
 	//fail if anything not attached
 	if (notattached_filenames) {
 		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ (*this).f(1).quote();
-		this->lasterror(errmsg);
+		this->setlasterror(errmsg);
 		return false;
 	}
 
@@ -1094,12 +1099,12 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	if (result[-1] != "t") {
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
 					") file does not exist.";
-		this->lasterror(errmsg);
+		this->setlasterror(errmsg);
 		return false;
 	}
 	// */
 
-	//this->lasterror();
+	//this->setlasterror();
 	// var becomes a filehandle containing the filename and connection no
 //	(*this) = normal_filename ^ FM ^ get_dbconn_no_or_default(connection2);
 //	normal_filename.var_str.push_back(FM_);
@@ -1212,7 +1217,7 @@ bool var::reado(CVR filehandle, CVR key) {
 
 bool var::writeo(CVR filehandle, CVR key) const {
 
-	THISIS("bool var::writeo(CVR filehandle,CVR key)")
+	THISIS("void var::writeo(CVR filehandle,CVR key)")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1244,9 +1249,7 @@ bool var::deleteo(CVR key) const {
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
 	//TRACE("deleteo " ^ (*this) ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
-	thread_dbconnector.delrecord(dbconn_no, hash64);
-
-	return true;
+	return thread_dbconnector.delrecord(dbconn_no, hash64);
 }
 
 bool var::read(CVR filehandle, CVR key) {
@@ -1291,7 +1294,7 @@ bool var::read(CVR filehandle, CVR key) {
 	// asking to read DOS file! do osread using key as osfilename!
 	if (filehandle == "") {
 		var errmsg = "read(...) filename not specified, probably not opened.";
-		this->lasterror(errmsg);
+		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1333,7 +1336,7 @@ bool var::read(CVR filehandle, CVR key) {
 		if (var_str.back() == FM_)
 			var_str.pop_back();
 
-		//this->lasterror();
+		//this->setlasterror();
 
 		return true;
 	}
@@ -1368,7 +1371,7 @@ bool var::read(CVR filehandle, CVR key) {
 		else
 			errmsg ^= var(PQerrorMessage(pgconn)) ^ " SQLERROR:" ^ sqlstate;
 		;
-		this->lasterror(errmsg);
+		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1378,7 +1381,7 @@ bool var::read(CVR filehandle, CVR key) {
 		//leave record (this) untouched if record cannot be read
 		// *this = "";
 
-		this->lasterror("ERROR: mvdbpostgres read() record does not exist " ^
+		this->setlasterror("ERROR: mvdbpostgres read() record does not exist " ^
 					key.quote());
 		return false;
 	}
@@ -1596,7 +1599,7 @@ bool var::unlockall() const {
 bool var::sqlexec(CVR sql) const {
 	var response = -1;	//no response required
 	if (!this->sqlexec(sql, response)) {
-		this->lasterror(response);
+		this->setlasterror(response);
 		//skip table does not exist because it is very normal to check if table exists
 		//if ((true && !response.contains("sqlstate:42P01")) || response.contains("syntax") || DBTRACE)
 		//	response.logputl();
@@ -1729,8 +1732,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
 		//this->oswrite(key2); //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
-		this->oswrite(key); //.convert("\\",OSSLASH));
-		return true;
+		return this->oswrite(key);
 	}
 
 	var sql;
@@ -1745,7 +1747,7 @@ bool var::write(CVR filehandle, CVR key) const {
 
 	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::write get_pgconn() failed for " ^ filehandle);;
 
 	// Parameter array
 	const char* paramValues[] = {key2.data(), data2.data()};
@@ -1771,8 +1773,9 @@ bool var::write(CVR filehandle, CVR key) const {
 		throw VarDBException(errmsg);
 	}
 
-	// if not updated 1 then fail
+	// success if inserted or updated 1 record
 	//return strcmp(PQcmdTuples(dbresult), "1") != 0;
+
 	return true;
 }
 
@@ -2066,11 +2069,11 @@ bool var::statustrans() const {
 //
 //	auto pgconn = get_pgconn(*this);
 //	if (!pgconn) {
-//		this->lasterror("db connection " ^ var(get_dbconn_no(*this)) ^ "not opened");
+//		this->setlasterror("db connection " ^ var(get_dbconn_no(*this)) ^ "not opened");
 //		return false;
 //	}
 //
-//	//this->lasterror();
+//	//this->setlasterror();
 //
 //	// only idle is considered to be not in a transaction
 //	return (PQtransactionStatus(pgconn) != PQTRANS_IDLE);
@@ -4944,7 +4947,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 	// record is third column
 	if (PQnfields(pgresult) < 3) {
 		//var errmsg = "readnext() must follow a select() clause with option (R)";
-		//this->lasterror(errmsg);
+		//this->setlasterror(errmsg);
 		//throw VarDBException(errmsg);
 		// return false;
 

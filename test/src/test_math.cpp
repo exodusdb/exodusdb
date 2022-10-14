@@ -363,6 +363,10 @@ subroutine test2(in as, in bs) {
 		//we resolved the issue here by being specific about the namespace
 
 		//trig on integers
+		TRACE(exodus::sin(30))
+		TRACE(exodus::cos(30))
+		TRACE(exodus::tan(30))
+		TRACE(exodus::atan(1))
 		assert(exodus::sin(30).round(8)   eq 0.5);
 		assert(exodus::cos(60).round(8)   eq 0.5);
 		assert(exodus::tan(45).round(8)   eq 1);
@@ -379,12 +383,31 @@ subroutine test2(in as, in bs) {
 		assert(exodus::abs(30.00)  eq 30);
 		assert(exodus::abs(30.10)  eq 30.1);
 		assert(exodus::abs(30.90)  eq 30.9);
+
+		assert(exodus::abs(0.01) eq 0.01);
+		assert(exodus::abs(0.001) eq 0.001);
+		assert(exodus::abs(0.0001) eq 0.0001);
+		assert(exodus::abs(0.00001) eq 0.00001);
+		assert(exodus::abs(0.000001) eq 0.000001);
+		assert(exodus::abs(0.0000001) eq 0.0000001);
+		assert(exodus::abs(0.00000001) eq 0.00000001);
+		assert(exodus::abs(0.000000001) eq 0.000000001);
+
 		//abs negatives
 		assert(exodus::abs(-0)     eq 0);
 		assert(exodus::abs(-30)    eq 30);
 		assert(exodus::abs(-30.00) eq 30);
 		assert(exodus::abs(-30.10) eq 30.1);
 		assert(exodus::abs(-30.90) eq 30.9);
+
+		assert(exodus::abs(-0.01) eq 0.01);
+		assert(exodus::abs(-0.001) eq 0.001);
+		assert(exodus::abs(-0.0001) eq 0.0001);
+		assert(exodus::abs(-0.00001) eq 0.00001);
+		assert(exodus::abs(-0.000001) eq 0.000001);
+		assert(exodus::abs(-0.0000001) eq 0.0000001);
+		assert(exodus::abs(-0.00000001) eq 0.00000001);
+		assert(exodus::abs(-0.000000001) eq 0.000000001);
 
 		// exponents and roots on integers and doubls
 		assert(exodus::exp(1).round(9)            eq 2.718281828);

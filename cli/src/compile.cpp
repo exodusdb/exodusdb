@@ -101,7 +101,6 @@ function main() {
 	if (basicoptions and verbose)
 		printl("Using CPP_OPTIONS environment variable " ^ basicoptions.quote());
 	var linkoptions = false;
-	var manifest = "";
 	var binoptions = "";
 	var liboptions = "";
 
@@ -321,13 +320,10 @@ function main() {
 		include.prefixer(exoduspath ^ "include\\exodus;");
 		lib.prefixer(exoduspath ^ "lib;");
 
-		//set the new environment
-		if (not ossetenv("PATH", path))
-			errputl("Failed to set PATH environment variable");
-		if (not ossetenv("INCLUDE", include))
-			errputl("Failed to set INCLUDE  environment variable");
-		if (not ossetenv("LIB", lib))
-			errputl("Failed to set BIN environment variable");
+		// Set the new environment (may not be received by child processes)
+		ossetenv("PATH", path);
+		ossetenv("INCLUDE", include);
+		ossetenv("LIB", lib);
 		if (verbose) {
 			path.errputl("\nPATH=");
 			include.errputl("\nINCLUDE=");
@@ -425,11 +421,6 @@ function main() {
 		}
 
 		linkoptions = " /link exodus.lib";
-
-		//http://msdn.microsoft.com/en-us/library/f2c0w594%28v=VS.80%29.aspx
-		manifest = true;
-		if (not manifest)
-			linkoptions ^= " /MANIFEST:NO";
 
 		if (not verbose)
 			linkoptions ^= " /nologo";
@@ -684,7 +675,6 @@ function main() {
 				liboptions,
 				linkoptions,
 				loadtimelinking,
-				manifest,
 				objfileextension,
 				outputoption,
 				srcfilename,
@@ -878,17 +868,6 @@ function main() {
 
 						int nargs = fcount(funcargsdecl, ",");
 
-	/* no longer generate default arguments using a dumb process since some pedantic compilers eg g++ 4.2.1 on osx 10.6 refuse to default non-constant parameters (io/out)
-	for now, programmers can still manually define defaults eg "func1(in arg1=var(), in arg2=var())"
-
-	new possibility can default ALL arguments regardless of i/o status:
-	eg:
-		var lib1(in aaa,out bbb)
-	could generate the following overloads in the lib's .h header
-		var lib1(in aaa){var bbb;return lib1(aaa,bbb);}
-		var lib1(){var aaa;var bbb;return lib1(aaa,bbb);}
-
-	*/
 						nodefaults = 0;
 						for (int argn = 1; argn <= nargs; ++argn) {
 							var funcarg = field(funcargsdecl, ",", argn).trim();
@@ -1170,16 +1149,21 @@ function main() {
 					print("header file " ^ headerfilename ^ " ");
 
 				//check if changed
+				//var headertext2 = osread(headertext2, headerfilename, locale);
 				var headertext2;
-				osread(headertext2, headerfilename, locale);
+				if (not osread(headertext2, headerfilename, locale)) {
+				}
 				if (headertext2 ne headertext) {
 
 					//over/write if changed
-					oswrite(headertext, headerfilename, locale);
+					if (not oswrite(headertext, headerfilename, locale))
+						loglasterror();
 
 					//verify written ok
+					//var headertext3 = osread(headertext3, headerfilename, locale);
 					var headertext3;
-					osread(headertext3, headerfilename, locale);
+					if (not osread(headertext3, headerfilename, locale))
+						loglasterror();
 					if (headertext3 ne headertext) {
 						atomic_ncompilation_failures++;
 
@@ -1207,10 +1191,6 @@ function main() {
 			//////////////////////////////////////////////////////////////////////////////////////
 
 			var outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
-			//TRACE(outputdir ^ OSSLASH ^ field2(binfilename, OSSLASH, -1))
-			//TRACE(srcfileinfo)
-			//TRACE(exodus_include_dir_info)
-			//TRACE(outfileinfo)
 			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo, srcfileinfo) && is_newer(outfileinfo, exodus_include_dir_info)) {
 
 				// Recompile is required if any include file is younger than the current output binary
@@ -1225,8 +1205,6 @@ function main() {
 					// Acquire include file date/time
 					var incfilename = incdir ^ OSSLASH ^ line.field("<", 2).field(">", 1);
 					var incfileinfo = osfile(incfilename);
-					//TRACE(incfilename);
-					//TRACE(incfileinfo);
 
 					if (incfileinfo) {
 						if (is_newer(incfileinfo, outfileinfo)) {
@@ -1237,7 +1215,7 @@ function main() {
 
 				}
 
-				//only skip if all headers are older than the current output file
+				// Only skip compilation if all headers are older than the current output file
 				if (not recompile_required) {
 					if (verbose)
 						printl("Skipping compilation since the output file is newer than both the source code, its include files and libexodus, and no (F)orce option provided.");
@@ -1246,7 +1224,25 @@ function main() {
 				}
 			}
 
-			manifest = "";
+			// Warn about undefined behaviour not picked up by compilers
+			////////////////////////////////////////////////////////////
+
+			// xxx cannot be used in the same statement that it is being defined
+			// var xxx = osread(xxx, yyy, zzz);
+			let matches = text.match("[\\n \\t]{2,}(var|let) (\\b[a-zA-Z0-9_]+\\b) [^\n:;]*?\\b\\2\\b");
+			if (matches) {
+				var nmatches = 0;
+				for (var match : matches) {
+					// Skip matches with an odd number of double quotes since it indicates quoted xxx on the right
+					if (match.count(_DQ).mod(2))
+						continue;
+					if (not nmatches++) {
+						logputl(srcfilename ^ ":9999:99: warning: Use before constructed is undefined behaviour.");
+						atomic_ncompilation_failures++;
+					}
+					logputl(match.f(1,1).trimmer(" \t\n"));
+				}
+			}
 
 			// Call the actual compile function
 			///////////////////////////////////
@@ -1270,9 +1266,7 @@ function main() {
 				compileoptions,
 				outputoption,
 				linkoptions,
-				isprogram,
-				installcmd,
-				manifest
+				installcmd
 			);
 
 		} // end of big lambda
@@ -1285,17 +1279,18 @@ function main() {
 //exit:
 ///////
 
-	//join any outstanding threads before terminating
-//	limit_threads(0);
+	// Join any outstanding threads before terminating
 	threadpool1.join();
 
 	if (nasterisks)
 		printl();
 
 	return atomic_ncompilation_failures > 0;
-}  //main
+
+}  //main program
 
 function static compile(
+
 	in verbose,
 	in objfileextension,
 	in binfileextension,
@@ -1311,9 +1306,7 @@ function static compile(
 	in compileoptions,
 	in outputoption,
 	in linkoptions,
-	in isprogram,
-	in installcmd,
-	in manifest) {
+	in installcmd) {
 
 //	atomic_count++;
 
@@ -1333,9 +1326,7 @@ function static compile(
 	compileoptions,
 	outputoption,
 	linkoptions,
-	isprogram,
-	installcmd,
-	manifest);
+	installcmd);
 
 //	atomic_count--;
 
@@ -1359,29 +1350,11 @@ function static compile2(
 	in compileoptions,
 	in outputoption,
 	in linkoptions,
-	in isprogram,
-	in installcmd,
-	in manifest) {
-
-//#if EXODUS_EXPORT_USING_DEF
-//	//add .def file to linker so that functions get exported without "c++ name decoration"
-//	//then the runtime loader dlsym() can find the functions by their original (undecorated) name
-//	//http://wyw.dcweb.cn/stdcall.htm
-//	//CL can accept a DEF file on the command line, and it simply passes the file name to LINK
-//	// cl /LD testdll.obj testdll.def
-//	//will become
-//	// link /out:testdll.dll /dll /implib:testdll.lib /def:testdll.def testdll.obj
-//	if (deftext) {
-//		deftext.prefixer("LIBRARY " ^ filepath_without_ext ^ eol ^ "EXPORTS");
-//		var deffilename = filepath_without_ext ^ ".def";
-//		oswrite(deftext, deffilename);
-//		if (compiler == "cl" and usedeffile)
-//			linkoptions ^= " /def:" ^ filepath_without_ext ^ ".def";
-//	}
-//#endif
+	in installcmd) {
 
 	var objfilename = objfilename0;
 
+	// Logging
 	if (verbose) {
 		binfileextension.outputl("Bin file extension=");
 		objfileextension.outputl("Obj file extension=");
@@ -1391,11 +1364,11 @@ function static compile2(
 		compileoptions.outputl("Compile options=");
 	}
 
-	//record the current bin file update timestamp so we can
-	//later detect if compiler produces anything to be installed
+	// Record the current bin file update timestamp so we can
+	// later detect if compiler produces anything to be installed
 	var oldobjfileinfo = osfile(objfilename);
 
-	//check object code can be produced.
+	// Check object code can be produced.
 	if (oldobjfileinfo) {
 		if (osopen(objfilename, objfilename))
 			osclose(objfilename);
@@ -1409,23 +1382,15 @@ function static compile2(
 		}
 	}
 
-	//build the compiler command
+	// Build the compiler command
 	var compilecmd = compiler ^ " " ^ srcfilename ^ " " ^ basicoptions ^ " " ^ compileoptions;
 	if (outputoption)
 		compilecmd ^= " " ^ outputoption ^ " " ^ objfilename;
 	compilecmd ^= linkoptions;
-	//capture the output
-	//compilecmd ^= " 2>&1 | tee " ^ srcfilename ^ ".err~";
-	//no tee on windows so cannot monitor output at the moment until implement popen() call it osopen(cmd)?
-	//similar tie syntax but different order
-	//		var compileoutputfilename=srcfilename ^ ".~";
-	//if (OSSLASH eq "/")
-	//	compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
-	//else
-	//			compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
 
-	//call the compiler
-	///////////////////
+	////////////////////
+	// Call the compiler
+	////////////////////
 	if (verbose)
 		printl(compilecmd);
 	var compileroutput;
@@ -1434,42 +1399,31 @@ function static compile2(
 		atomic_ncompilation_failures++;
 	}
 
-	//handle compiler output
+	// Handle compiler output
 	var startatlineno;
-	//		if (osread(compileroutput,compileoutputfilename)) {
 	{
-		//if (verbose) {
-		//	compileroutput.outputl("Compiler output:");
-		//}
 		if (compileroutput)
-			// leave for editor
 			compileroutput.outputl();
-		//			else
-		//				osremove(compileoutputfilename);
-		//leave for editor
-		//osremove(compileoutputfilename);
 		var charn = index(compileroutput, ": error:");
 		if (charn) {
 			startatlineno = compileroutput.b(charn - 9, 9);
 			startatlineno = startatlineno.field2(":", -1);
-			//				print("ERROR(S) FOUND IN " ^ srcfilename ^ " STARTING IN LINE "^startatlineno^" ... ");
-			//				var().input(1);
 			return "";	//continue;
 		}
 	}
 
-	//get new objfile info or continue
+	// Get new objfile info or continue
 	var newobjfileinfo = osfile(objfilename);
 	if (not newobjfileinfo) {
 		if (compileok)
 			atomic_ncompilation_failures++;
 		errputl(oscwd());
 		objfilename.errputl("Error: Cannot output file ");
-		//var("Press Enter").input();
 		return "";	//continue;
 	}
 
-	//if new objfile
+	// Handle new objfile
+
 	if (newobjfileinfo ne oldobjfileinfo) {
 		if (newobjfileinfo) {
 
@@ -1486,26 +1440,11 @@ function static compile2(
 			//	outputfilename=outputfilename.field(".",1,outputfilename.count("."));
 			//}
 
-			//How to: Embed a Manifest Inside a C/C++ Application
-			//http://msdn.microsoft.com/en-us/library/ms235591%28VS.80%29.aspx
-			//mt.exe manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
-			//mt.exe manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
-			if (OSSLASH_IS_BACKSLASH and PLATFORM ne "x64") {
-				var cmd = "mt.exe";
-				if (not verbose) {
-					cmd ^= " -nologo";
-					cmd ^= " -manifest " ^ objfilename ^ ".manifest";
-					cmd ^= " -outputresource:" ^ objfilename ^ ";" ^ (isprogram ? "1" : "2");
-					cmd ^= " 1> nul >2 nul";
-					//if (osshell(cmd)==0)
-					osremove(objfilename ^ ".manifest");
-				}
-			}
-
-			//copy the obj file to the output directory
+			// Copy the obj file to the output directory
+			////////////////////////////////////////////
 			if (installcmd) {
 
-				//make the target directory
+				// Make the target directory
 				if (not osdir(outputdir)) {
 					var cmd = "mkdir " ^ outputdir;
 					if (verbose)
@@ -1515,7 +1454,7 @@ function static compile2(
 						cmd.errputl("ERROR: Failed to make directory");
 				}
 
-				//check can install file
+				// Check can install file
 				var outputpathandfile = outputdir ^ field2(binfilename, OSSLASH, -1);
 				if (osfile(outputpathandfile)) {
 					if (osopen(outputpathandfile, outputpathandfile)) {
@@ -1536,40 +1475,15 @@ function static compile2(
 					}
 				}
 
+				// Install the file
 				var cmd = installcmd ^ " " ^ objfilename ^ " " ^ outputpathandfile;
 				if (verbose)
 					printl(cmd);
-				osshell(cmd);
-				if (osfile(outputpathandfile) and osfile(objfilename))
-					osremove(outputpathandfile);
-				//if (!oscopy(objfilename,outputpathandfile))
-				//	printl("ERROR: Failed to "^cmd);
-
-				//save a backlink to the source code
-				/* no longer required since backlink is stored in generated .h files
-					var basicfilename = srcfilename.field2(OSSLASH,-1);
-					var backlinkfilename = outputdir ^ basicfilename;
-					var abs_srcfilename = srcfilename;
-					if (abs_srcfilename[1] != OSSLASH) {
-					    abs_srcfilename.paster(1, oscwd() ^ OSSLASH);
-					}
-					if (verbose)
-					    printl("backlink " ^ backlinkfilename ^ " > " ^ abs_srcfilename);
-					oswrite(abs_srcfilename, backlinkfilename);
-					*/
-
-				//delete any manifest from early versions of compile which didnt have the
-				//MANIFEST:NO option
-				//was try to copy ms manifest so that the program can be run from anywhere?
-				if (OSSLASH_IS_BACKSLASH and PLATFORM ne "x64") {
-					if (true or (isprogram and manifest)) {
-						if (not oscopy(objfilename ^ ".manifest", outputpathandfile ^ ".manifest")) {
-							atomic_ncompilation_failures++;
-						}  //errputl("ERROR: Failed to "^cmd);
-					} else {
-						osremove(objfilename ^ ".manifest");
-						osremove(outputpathandfile ^ ".manifest");
-					}
+				if (not osshell(cmd))
+					lasterror().errputl("compile could not install ");
+				if (osfile(outputpathandfile) and osfile(objfilename)) {
+					if (not osremove(outputpathandfile))
+						outputpathandfile.errput("compile: Could not remove output path and file ");
 				}
 			}
 		}
@@ -1586,33 +1500,33 @@ function set_environment() {
 
 	searchdirs ^= FM ^ osgetenv("CC");
 
-	//Visual Studio future?
+	// Visual Studio future?
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio 11.0\\Common7\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("VS110COMNTOOLS");
 
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\bin\\";
 
-	//Visual Studio 2010?
+	// Visual Studio 2010?
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("VS100COMNTOOLS");
 
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft SDKs\\Windows\\v7.0a\\bin\\";
 
-	//Visual Studio 2008 (Paid and Express)
+	// Visual Studio 2008 (Paid and Express)
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio 9.0\\Common7\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("VS90COMNTOOLS");
 
-	//Visual Studio 2005
+	// Visual Studio 2005
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("VS80COMNTOOLS");
 
 	//http://syzygy.isl.uiuc.edu/szg/doc/VisualStudioBuildVars.html for VS6 and VS2003 folder info
 
-	//Visual Studio .NET 2003
+	// Visual Studio .NET 2003
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio .NET 2003\\Common7\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("V70COMNTOOLS");
 
-	//Visual Studio 6.0
+	// Visual Studio 6.0
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio\\Common\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("VS60COMNTOOLS");
 
@@ -1630,7 +1544,7 @@ function set_environment() {
 			msvs ^= OSSLASH;
 		searched ^= "\n" ^ msvs;
 
-		//get lib/path/include from batch file
+		// Get lib/path/include from batch file
 		if (osdir(msvs)) {
 			batfilename = msvs ^ "setenv.cmd";
 			if (osfile(batfilename))
@@ -1643,11 +1557,11 @@ function set_environment() {
 				break;
 		}
 
-		//look for path on C:
+		// Look for path on C:
 		msvs.prefixer("C:");
 		searched ^= "\n" ^ msvs;
 
-		//get lib/path/include from batch file
+		// Get lib/path/include from batch file
 		if (osdir(msvs)) {
 			batfilename = msvs ^ "setenv.cmd";
 			if (osfile(batfilename))
@@ -1667,7 +1581,7 @@ function set_environment() {
 
 	var script = "call " ^ batfilename.quote();
 
-	//work out the options from the PLATFORM_ (and perhaps debug mode)
+	// Work out the options from the PLATFORM_ (and perhaps debug mode)
 	var options = PLATFORM;
 	if (contains(batfilename, "setenv.cmd")) {
 		//sdk71 wants x86 or x64
@@ -1678,12 +1592,12 @@ function set_environment() {
 
 	var tempfilenamebase = osgetenv("TEMP") ^ "\\exoduscomp$" ^ rnd(99999999);
 
-	//capture errors from the setenv
-	//like the annoying
-	//ERROR: The system was unable to find the specified registry key or value.
+	// Capture errors from the setenv
+	// like the annoying
+	// ERROR: The system was unable to find the specified registry key or value.
 	script ^= " 2> " ^ tempfilenamebase ^ ".$2";
 
-	//track first line of batch file which is the compiler configuration line
+	// Track first line of batch file which is the compiler configuration line
 	if (verbose)
 		printl("COMPILER=" ^ script);
 
@@ -1691,55 +1605,31 @@ function set_environment() {
 	if (verbose)
 		printl("Calling script ", script);
 
-	//create a temporary command file
-	oswrite(script, tempfilenamebase ^ ".cmd");
+	// Create a temporary command file
+	if (not oswrite(script, tempfilenamebase ^ ".cmd"))
+		loglasterror();
 
-	//run and get the output of the command
-	osshell(tempfilenamebase ^ ".cmd > " ^ tempfilenamebase ^ ".$$$");
+	// Run and get the output of the command
+	if (not osshell(tempfilenamebase ^ ".cmd > " ^ tempfilenamebase ^ ".$$$"))
+		lasterror().errputl("compile failed. ");
 	var result;
 	if (osread(result, tempfilenamebase ^ ".$$$")) {
 
-		//if (verbose)
-		//	printl(result);
-		//printl(result);
-
 		dim vars = split(result.converter("\r\n", _FM _FM));
-//		let nvars = vars.rows();
-//		for (const var varn : range(1, nvars)) {
-//			ossetenv(
-//				field(vars(varn), '=', 1), field(vars(varn), '=', 2, 999999));
-//		}
 		for (in line : vars) {
 			ossetenv(
 				field(line, "=", 1), field(line, "=", 2, 999999));
 		}
-		/*
-		var value;
-		if (getparam(result,"PATH",value))
-				path=value;
-		if (getparam(result,"INCLUDE",value))
-				include=value;
-		if (getparam(result,"LIB",value))
-				lib=value;
-
-		//if (verbose)
-		//{
-		//	printl("\nPATH=",path);
-		//	printl("\nINCLUDE=",include);
-		//	printl("\nLIB=",lib);
-		//}
-
-	*/
 	}
-	osremove(tempfilenamebase ^ ".cmd");
-	osremove(tempfilenamebase ^ ".$$$");
+	osremove(tempfilenamebase ^ ".cmd") or true;
+	osremove(tempfilenamebase ^ ".$$$") or true;
 	if (verbose) {
 		var errtemp;
 		if (osread(errtemp, tempfilenamebase ^ ".$2")) {
 			//printl(errtemp);
 		}
 	}
-	osremove(tempfilenamebase ^ ".$2");
+	osremove(tempfilenamebase ^ ".$2") or true;
 
 	return true;
 }
@@ -1761,36 +1651,6 @@ function make_include_dir(in incdir) {
 	}
 	return true;
 }
-
-//subroutine limit_threads(in maxn_threads) {
-//
-//	if (maxn_threads) {
-//		while (atomic_count > maxn_threads) {
-//			//errputl("atomic count", atomic_count);
-//			ossleep(100);
-//		}
-//		return;
-//	}
-//
-//	//errputl("subroutine limit_threads", maxn_threads);
-//	//remove terminated threads (ones that have already been joined)
-//	threadlist.remove_if([](const std::thread& th) { return !th.joinable(); });
-//
-//	//quit if the number of active threads is < maxn_threads
-//	if (int(threadlist.size()) <= maxn_threads)
-//		return;
-//
-//	//find an active thread to wait for completion
-//	//or, if maxn_threads == 0 then wait on all active threads for completion
-//	for (std::thread& th : threadlist) {
-//		if (th.joinable()) {
-//			//errputl("Joining a thread at random.");
-//			th.join();
-//			if (maxn_threads)
-//				break;
-//		}
-//	}
-//}
 
 function is_newer(in new_file_info, in old_file_info) {
 

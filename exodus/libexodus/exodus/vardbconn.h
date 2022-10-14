@@ -140,7 +140,7 @@ class DBConnector final {
 	DBCache* get_dbcache(const int dbconn_no) const;
 	bool getrecord(const int dbconn_no, const uint64_t hash64, std::string& record) const;
 	void putrecord(const int dbconn_no, const uint64_t hash64, const std::string& record);
-	void delrecord(const int dbconn_no, const uint64_t hash64);
+	bool delrecord(const int dbconn_no, const uint64_t hash64);
 	void cleardbcache(const int dbconn_no);
 
    private:

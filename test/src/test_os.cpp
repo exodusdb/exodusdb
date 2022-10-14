@@ -57,8 +57,8 @@ programinit()
 	// Cannot oswrite to a file in a non-existent dir
 	assert(not oswrite("xxx" on "d2/abc"));
 
-	osrmdir("test_main.1");
-	osrmdir("test_main.2");
+	osrmdir("test_main.1") or lasterror().errputl("test_os:");
+	osrmdir("test_main.2") or lasterror().errputl("test_os:");
 
 	assert(osmkdir("test_main.1"));
 	assert(osmkdir("test_main.2"));
@@ -127,8 +127,8 @@ programinit()
 		assert(oslistd("*").convert(FM, "") eq osshellread("find . -maxdepth 1 ! -path . -type d -printf '%f\n\'").convert("\n\r", ""));
 	}
 
-	osrmdir("test_main.1");
-	osrmdir("test_main.2");
+	osrmdir("test_main.1") or lasterror().errputl("test_os:");
+	osrmdir("test_main.2") or lasterror().errputl("test_os:");
 
 	printl();
 	assert(osdir(_OSSLASH).match(_FM "\\d{5}" _FM "\\d{1,5}"));
@@ -141,13 +141,13 @@ programinit()
 	var subdir2	 = topdir1 ^ _OSSLASH "abcd";
 	var subdir2b = topdir1b ^ _OSSLASH "abcd";
 
-	osrmdir(tempdir, true);
+	osrmdir(tempdir, true) or lasterror().errputl("test_os:");
 
 	//try to remove any old versions (subdir first to avoid problems)
-	osrmdir(topdir1b, true);
-	osrmdir(topdir1);
-	osrmdir(subdir2b, true);
-	osrmdir(subdir2);
+	osrmdir(topdir1b, true) or lasterror().errputl("test_os:");
+	osrmdir(topdir1) or lasterror().errputl("test_os:");
+	osrmdir(subdir2b, true) or lasterror().errputl("test_os:");
+	osrmdir(subdir2) or lasterror().errputl("test_os:");
 
 	//need oermission to test root directory access
 	if (osmkdir(subdir2)) {
@@ -194,8 +194,8 @@ programinit()
 		assert(osremove("t_move2.txt"));
 		assert(osmove("t_move1.txt", "t_move2.txt"));
 
-		// Verify cannot rename non-existent file
-		osremove("t_move3.txt");
+		// Verify cannot remove or rename non-existent file
+		assert(not osremove("t_move3.txt"));
 		assert(not osrename("t_move1.txt", "t_move3.txt"));
 
 		// Verify cannot remove non-existent file
@@ -210,8 +210,8 @@ programinit()
 
 	{
 		// Verify cannot move a dir to an existing dir
-		osrmdir("t_move1.dir");
-		osrmdir("t_move2.dir");
+		osrmdir("t_move1.dir") or lasterror().errputl("test_os:");
+		osrmdir("t_move2.dir") or lasterror().errputl("test_os:");
 		assert(osmkdir("t_move1.dir"));
 		assert(osmkdir("t_move2.dir"));
 		assert(not osmove("t_move1.dir", "t_move2.dir"));
@@ -220,8 +220,8 @@ programinit()
 		assert(osrmdir("t_move2.dir"));
 		assert(osmove("t_move1.dir", "t_move2.dir"));
 
-		// Verify cannot move non-existent dir
-		osrmdir("t_move3.dir");
+		// Verify cannot remove or move non-existent dir
+		assert(not osrmdir("t_move3.dir"));
 		assert(not osmove("t_move1.dir", "t_move3.dir"));
 
 		// Verify cannot remove non-existent dir
@@ -369,7 +369,7 @@ programinit()
 		assert(osread(tempfilename) eq testdata);
 
 		printl("Cleanup");
-		osremove(tempfilename);
+		assert(osremove(tempfilename));
 	}
 
 	printl("osflush()");
@@ -425,8 +425,8 @@ programinit()
 		assert(oswrite("" on "t_qwe1.cpp"));
 		assert(oswrite("" on "t_qwe2.cpp"));
 
-		osrmdir("t_qwe1", true);
-		osrmdir("t_qwe2", true);
+		osrmdir("t_qwe1", true) or lasterror().errputl("test_os:");
+		osrmdir("t_qwe2", true) or lasterror().errputl("test_os:");
 		//assert(osmkdir("t_qwe1"));
 		//assert(osmkdir("t_qwe2"));
 		assert(osmkdir("t_qwe1/t_qwe1a"));

@@ -358,13 +358,15 @@ dict(AGE_IN_YEARS) {
 		//while(myclients.readnext(key)) {
 		//	key.outputl("t4 key=");
 		//}
-		myclients.readnext(key);
+		assert(myclients.readnext(key));
 		assert(key eq "SB1");
-		myclients.readnext(key);
+		assert(myclients.readnext(key));
 		assert(key eq "JB2");
-		myclients.readnext(key);
+		assert(myclients.readnext(key));
 		assert(key eq "SB001");
-		myclients.readnext(key);
+
+		// Should fail if no more records and leave key untouched
+		assert(not myclients.readnext(key));
 		assert(key eq "SB001");
 		//committrans();
 		//rollbacktrans();

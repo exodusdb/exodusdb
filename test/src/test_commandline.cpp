@@ -21,7 +21,7 @@ function main() {
 //	execdir = "";
 	execdir = "./";
 	TRACE(execdir ^ "testcommandline");
-	osshell(execdir ^ "testcommandline '(ab)'");
+	assert(osshell(execdir ^ "testcommandline '(ab)'"));
 	assert(osshellread(execdir ^ "testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
 	assert(osshellread(execdir ^ "testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");
 

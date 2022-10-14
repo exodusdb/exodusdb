@@ -86,14 +86,13 @@ void DBConnector::putrecord(const int connid, const uint64_t hash64, const std::
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
-void DBConnector::delrecord(const int connid, const uint64_t hash64) {
+bool DBConnector::delrecord(const int connid, const uint64_t hash64) {
 	//TimeAcc t(106);
 	auto dbcache = get_dbcache(connid);
-	//(*dbcache)[filenameandkey] = "";
-	dbcache->erase(hash64);
 	//Must remove since empty entries indicate no present and could be writing a record
 	//dbcache->insert_or_assign(hash64, "");
-	return;
+	//(*dbcache)[filenameandkey] = "";
+	return dbcache->erase(hash64);
 }
 
 void DBConnector::cleardbcache(const int connid) {

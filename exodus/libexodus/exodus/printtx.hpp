@@ -104,7 +104,8 @@ subroutine printtx() {
 		if (html and printfilename ne "-" and not printfilename.lcase().ends(".htm")) {
 
 			printfilename.osclose();
-			printfilename.osremove();
+			if (not printfilename.osremove())
+				lasterror().errputl("printtx:");
 
 			//create a new filename
 			var ptx_filenamelen = (field2(printfilename, "\\", -1)).len();
@@ -120,10 +121,8 @@ subroutine printtx() {
 
 		//open printout file
 		if (printfilename) {
-			call oswrite("", printfilename);
-			if (not(printfile.osopen(printfilename))) {
-				call mssg("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
-				stop();
+			if (not oswrite("", printfilename) or not printfile.osopen(printfilename)) {
+				abort(lasterror());
 			}
 		}
 
@@ -262,8 +261,10 @@ subroutine printtx2() {
 	// Convert fields to text lines
 	tx.replacer(FM, EOL);
 
-	if (printfilename)
-		call osbwrite(tx, printfile,  printptr);
+	if (printfilename) {
+		if (osbwrite(tx on printfile, printptr))
+			abort(lasterror());
+	}
 	else {
 		tx.output();
 		printptr+=tx.len();

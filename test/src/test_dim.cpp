@@ -452,7 +452,7 @@ function main() {
 		// Check dim.oswrite preserves line endings
 		var tfilename = ostempfilename();
 		var tx = "\n\nA\n\nB\n\n";
-		tx.split("\n").oswrite(tfilename);
+		assert(tx.split("\n").oswrite(tfilename));
 		assert(osfile(tfilename).f(1) eq 8);
 
 		// Check dim.osread preserves line endings

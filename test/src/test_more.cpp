@@ -216,7 +216,7 @@ programinit()
 
 		//oswrite dim to file
 		var tfilename = "t_dimoswrite.txt";
-		d.oswrite(tfilename);
+		assert(d.oswrite(tfilename));
 
 		//check roundtrip agrees
 		assert(osread(tfilename) eq(d.join("\n")));

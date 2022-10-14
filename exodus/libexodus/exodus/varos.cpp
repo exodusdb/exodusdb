@@ -133,8 +133,6 @@ bool checknotabsoluterootfolder(std::string dirpath) {
 			   "not supported for safety but you can use cwd() and relative path."
 			<< dirpath << std::endl;
 
-		var().lasterror(var(dirpath).quote() ^ " Cannot be deleted or moved (absolute) because it is a top level dir");
-
 		return false;
 	}
 	return true;
@@ -266,7 +264,7 @@ bool var::osshellread(CVR oscmd) {
 	std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
 	// return a code to indicate program failure. but can this ever happen?
 	if (pfile == nullptr) {
-		this->lasterror(oscmd.quote() ^ " osshell failed.");
+		this->setlasterror("osshell failed. " ^ oscmd.quote());
 		return false;
 	}
 
@@ -320,7 +318,6 @@ bool var::osopen(CVR osfilename, const char* locale) const {
 	ISSTRING(osfilename)
 
 	// if reopening an osfile that is already opened then close and reopen
-	// dont call if not necessary
 	if (THIS_IS_OSFILE())
 		osclose();
 
@@ -333,7 +330,6 @@ static void del_fstream(void* handle) {
 
 std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 
-	// IDENTICAL code in osbread and osbwrite
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
 	// osbwrite/osbread Using fstream instead of ofstream so that we can mix reads and writes on
 	// the same filehandle
@@ -349,39 +345,43 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 		}
 	}
 
-	// if the file has NOT already been opened then open it now with the current default locale
-	// and add it to the cache. but normally the filehandle will have been previously opened
-	// with osopen and perhaps a specific locale.
+	// If not already cached
 	if (pmyfile == 0) {
 
-		// delay checking until necessary
+		// The file has NOT already been opened so open it now with the current default locale
+		// and add it to the cache. but normally the filehandle will have been previously opened
+		// with osopen and perhaps a specific locale.
+
+		// Delay checking until necessary
 		THISIS("bool var::osopenx(CVR osfilename, const char* locale)")
 		ISSTRING(osfilename)
-		//ISSTRING(locale)
 
+		// TODO replace new/delete with some object
 		pmyfile = new std::fstream;
 
+		// Apply the locale
 		if (locale)
 			pmyfile->imbue(get_locale(locale));
 
-		// open the file for i/o (fail if the file doesnt exist and do NOT delete any
+		// Open the file for i/o (fail if the file doesnt exist and do NOT delete any
 		// existing file) binary and in/out to allow reading and writing from same file
 		// handle
-		pmyfile->open(to_path_string(osfilename).c_str(),
-					  std::ios::out | std::ios::in | std::ios::binary);
+		pmyfile->open(to_path_string(osfilename).c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (!(*pmyfile)) {
-			//delete pmyfile;
 
-			//try to open read-only
+			// Cannot open for output. Try to open read-only
 			pmyfile->open(to_path_string(osfilename).c_str(),
 						  std::ios::in | std::ios::binary);
+
+			// Fail if cannot open read-only
 			if (!(*pmyfile)) {
+				this->setlasterror(osfilename.quote() ^ " cannot be opened.");
 				delete pmyfile;
 				return 0;
 			}
 		}
 
-		// cache the file handle (we use the int to store the "file number"
+		// Cache the file handle (we use the int to store the "file number"
 		// and NAN to prevent isnum trashing mvint in the possible case that the osfilename
 		// is an integer can addhandle fail?
 		var_int =
@@ -433,16 +433,16 @@ WINDOWS-1257
 WINDOWS-1258
 */
 
-// no binary conversion is performed on input unless
-// codepage is provided then exodus converts from the
-// specified codepage (not locale) on input to utf-8 internally
-bool var::osread(CVR osfilename, const char* codepage) {
-
-	THISIS("bool var::osread(CVR osfilename, const char* codepage")
-	ISSTRING(osfilename)
-	return osread(to_path_string(osfilename).c_str(), codepage);
-}
-
+//// no binary conversion is performed on input unless
+//// codepage is provided then exodus converts from the
+//// specified codepage (not locale) on input to utf-8 internally
+//bool var::osread(CVR osfilename, const char* codepage) {
+//
+//	THISIS("bool var::osread(CVR osfilename, const char* codepage")
+//	ISSTRING(osfilename)
+//	return osread(to_path_string(osfilename).c_str(), codepage);
+//}
+//
 bool var::osread(const char* osfilename, const char* codepage) {
 
 	THISIS("bool var::osread(const char* osfilename, const char* codepage")
@@ -456,9 +456,10 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	std::ifstream myfile;
 
 	// open in binary (and position "at end" to find the file size with tellg)
+	// TODO check myfile.close() on all exit paths or setup an object to do that
 	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate);
 	if (!myfile) {
-		this->lasterror(var(osfilename) ^ " cannot be osread (1)");
+		this->setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist or cannot be accessed.");
 		return false;
 	}
 
@@ -487,10 +488,9 @@ bool var::osread(const char* osfilename, const char* codepage) {
 		// resize the string to receive the whole file
 		var_str.resize(bytesize);
 	} catch (std::bad_alloc& ex) {
+		myfile.close();
 		throw VarOutOfMemory("Could not obtain " ^ var(bytesize * sizeof(char)) ^
 							" bytes of memory to read " ^ var(osfilename));
-		// myfile.close();
-		// return false;
 	}
 
 	// read the file into the reserved memory block
@@ -511,7 +511,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 
 	// failure can indicate that we didnt get as many characters as requested
 	if (failed && !bytesize) {
-		this->lasterror(var(osfilename).quote() ^ " cannot be osread (2)");
+		this->setlasterror("osread failed. " ^ var(osfilename).quote() ^ " 0 bytes read.");
 		return false;
 	}
 
@@ -572,18 +572,19 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 	assertString(function_sig);
 	ISSTRING(osfilename)
 
-	// get a file structure
+	// A file structure
 	std::ofstream myfile;
 
-	// delete any previous file,
+	// Truncate any previous file,
+	// TODO check myfile.close() on all exit paths or setup an object to do that
 	myfile.open(to_path_string(osfilename).c_str(),
 				std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile) {
-		this->lasterror(osfilename.quote() ^ " osopen failed.");
+		this->setlasterror("oswrite failed. " ^ osfilename.quote() ^ " cannot be opened for output.");
 		return false;
 	}
 
-	// write out the full string or fail
+	// Write out the full string or fail
 	if (*codepage) {
 		std::string tempstr = boost::locale::conv::from_utf<char>(var_str, codepage);
 		myfile.write(tempstr.data(), tempstr.size());
@@ -592,6 +593,8 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 	}
 	bool failed = myfile.fail();
 	myfile.close();
+	if (failed)
+		this->setlasterror("oswrite failed. " ^ osfilename.quote() ^ " Unknown reason.");
 	return !failed;
 }
 
@@ -620,24 +623,20 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 	assertString(function_sig);
 	ISNUMERIC(offset)
 
-	// test the following only if necessary in osopenx
-	// ISSTRING(osfilename)
-
 	// get the buffered file handle/open on the fly
 	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
 	if (pmyfile == 0) {
-		this->lasterror(osfilevar.quote() ^ " osbwrite failed (1)");
+		//throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
+		this->setlasterror("osbwrite failed. " ^ this->lasterror());
 		return false;
 	}
-
 	// std::cout << pmyfile->getloc().name();
 
 	// NOTE 1/2 seekp goes by bytes regardless of the fact that it is a wide stream
 	// myfile.seekp (offset*sizeof(char));
 	// offset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
-	if (offset < 0) {
+	if (offset < 0)
 		pmyfile->seekp(offset.toInt() + 1, std::ios_base::end);
-    }
 	else
 		pmyfile->seekp(offset.toInt());
 
@@ -651,8 +650,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 	if (pmyfile->fail()) {
 		// saved in cache, DO NOT CLOSE!
 		// myfile.close();
-		this->lasterror(osfilevar.quote() ^ " osbwrite failed (2)");
-		return false;
+		throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite write failed"));
 	}
 
 	// pass back the file pointer offset
@@ -666,18 +664,6 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 
 	return true;
 }
-
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-// a version that ignores output of offset
-//VARREF var::osbread(CVR osfilevar, CVR offset, const int bytesize,
-//		  const bool adjust)
-bool var::osbread(CVR osfilevar, CVR offset, const int bytesize) {
-	// var offset_nonconst;
-	// if (offset.assigned())
-	//	offset_nonconst=offset;
-	return this->osbread(osfilevar, const_cast<VARREF>(offset), bytesize);
-}
-#endif
 
 unsigned count_excess_UTF8_bytes(const std::string& str) {
 
@@ -736,15 +722,11 @@ unsigned count_excess_UTF8_bytes(const std::string& str) {
 //not being an exact number of valid utf-8 code units) are trimmed off the return value
 //The new offset is changed to reflect the above and is simply increased by bytesize
 
-//VARREF var::osbread(CVR osfilevar, VARREF offset, const int bytesize, const bool adjust)
 bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 
 	THISIS("bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize")
 	assertDefined(function_sig);
 	ISNUMERIC(offset)
-
-	// will be done if necessary in osopenx()
-	// ISSTRING(osfilename)
 
 	// default is to return empty string in any case
 	var_str.clear();
@@ -757,10 +739,9 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// get the buffered file handle/open on the fly
 	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
 	if (pmyfile == 0) {
-		this->lasterror(osfilevar.quote() ^ " osopen failed.");
+		this->setlasterror("osbread failed. " ^ this->lasterror());
 		return false;
 	}
-
 	/*
 		//NB all file sizes are in bytes NOT characters despite this being a wide character
 	fstream
@@ -788,10 +769,10 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// get a memory block to read into
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	//std::unique_ptr memblock(new char[bytesize]);
-	if (memblock == 0)
-		throw VarOutOfMemory("Could not obtain " ^ var(bytesize * sizeof(char)) ^
+	if (memblock == 0) {
+		throw VarOutOfMemory("osbread could not obtain " ^ var(bytesize * sizeof(char)) ^
 							" bytes of memory to read " ^ osfilevar);
-	// return *this;
+	}
 
 	// read the data (converting characters on the fly)
 	pmyfile->read(memblock.get(), bytesize);
@@ -824,7 +805,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 		}
 	}
 
-	return true;
+	return !var_str.empty();
 }
 
 void var::osclose() const {
@@ -847,22 +828,27 @@ bool var::osrename(CVR new_dirpath_or_filepath) const {
 	std::string path1 = to_path_string(*this);
 	std::string path2 = to_path_string(new_dirpath_or_filepath);
 
-	// prevent overwrite of existing file
-    // ACQUIRE
+	// Prevent overwrite of existing file
+    // *** ACQUIRE ***
 	std::ifstream myfile;
 	myfile.open(path2.c_str(), std::ios::binary);
 	if (myfile) {
-		// RELEASE
+		// *** RELEASE ***
 		myfile.close();
-		this->lasterror(new_dirpath_or_filepath.quote() ^ " already exists. Cannot osrename " ^ this->quote());
+		this->setlasterror("osrename failed. " ^ new_dirpath_or_filepath.quote() ^ " already exists.");
 		return false;
 	}
 
-	// safety
-	if (!checknotabsoluterootfolder(path1))
+	// Safety
+	if (!checknotabsoluterootfolder(path1)) {
+		this->setlasterror("osrename failed. " ^ var(path1).quote() ^ " cannot be renamed because it is a top level dir");
 		return false;
-	if (!checknotabsoluterootfolder(path2))
+	}
+
+	if (!checknotabsoluterootfolder(path2)) {
+		this->setlasterror("osrename failed. " ^ var(path2).quote() ^ " cannot be overwritten because it is a top level dir");
 		return false;
+	}
 
 	return !std::rename(path1.c_str(), path2.c_str());
 }
@@ -887,7 +873,7 @@ bool var::oscopy(CVR new_dirpath_or_filepath) const {
 
     // Handle error
     if (error_code) {
-		this->lasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote());
+		this->setlasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote());
 		return false;
     }
 
@@ -911,15 +897,19 @@ bool var::osmove(CVR new_dirpath_or_filepath) const {
 	if (myfile) {
 		// RELEASE
 		myfile.close();
-		this->lasterror(new_dirpath_or_filepath.quote() ^ " already exists. Cannot osmove " ^ this->quote());
+		this->setlasterror("osmove " ^ this->quote() ^ " failed. " ^ new_dirpath_or_filepath.quote() ^ " already exists.");
 		return false;
 	}
 
 	// Safety
-	if (!checknotabsoluterootfolder(path1))
+	if (!checknotabsoluterootfolder(path1)) {
+	 	this->setlasterror(var(path1).quote() ^ " Cannot be moved or deleted because it is a top level dir");
 		return false;
-	if (!checknotabsoluterootfolder(path2))
+	}
+	if (!checknotabsoluterootfolder(path2)) {
+	 	this->setlasterror(var(path2).quote() ^ " Cannot be overwritten because it is a top level dir");
 		return false;
+	}
 
 	// Try to rename but will fail to move across file systems
 	//////////////////////////////////////////////////////////
@@ -929,20 +919,22 @@ bool var::osmove(CVR new_dirpath_or_filepath) const {
 	// To copy and delete instead of move
 	////////////////////////////////////////
 	if (!this->oscopy(new_dirpath_or_filepath)) {
-		this->lasterror(this->quote() ^ " failed to osmove to " ^ new_dirpath_or_filepath.quote());
+		this->setlasterror("osmove failed. " ^ this->lasterror());
 		return false;
 	}
 
 	// Delete original only after copy to target is successful
-	if (this->osremove())
-		return true;
+	if (!this->osremove()) {
 
-    // Too dangerous to remove target in case of failure to delete source
-	//otherwise delete the target too
-	//new_dirpath_or_filepath.osremove();
+	    // Too dangerous to remove target in case of failure to delete source
+		// otherwise delete the target too
+		// new_dirpath_or_filepath.osremove();
 
-	this->lasterror(this->quote() ^ " osmove failed to remove source after copying to " ^ new_dirpath_or_filepath.quote());
-	return false;
+		this->setlasterror(this->quote() ^ " osmove failed to remove source after copying to " ^ new_dirpath_or_filepath.quote());
+		return false;
+	}
+
+	return true;
 }
 
 bool var::osremove() const {
@@ -958,12 +950,12 @@ bool var::osremove(CVR osfilename) const {
 
 	// Prevent removal of dirs. Use osrmdir for that.
 	if (std::filesystem::is_directory(osfilename.toString())) {
-		this->lasterror(osfilename.quote() ^ " osremove failed - is a directory.");
+		this->setlasterror(osfilename.quote() ^ " osremove failed - is a directory.");
 		return false;
 	}
 
 	if (std::remove(to_path_string(osfilename).c_str())) {
-		this->lasterror(osfilename.quote() ^ " failed to osremove");
+		this->setlasterror(osfilename.quote() ^ " failed to osremove");
 		return false;
 	}
 	return true;
@@ -977,7 +969,7 @@ bool var::osmkdir() const {
 	std::filesystem::path pathx(to_path_string(*this).c_str());
 
 //	if (std::filesystem::exists(pathx))	{
-//		this->lasterror(this->quote() ^ " osmkdir failed. Target already exists.");
+//		this->setlasterror(this->quote() ^ " osmkdir failed. Target already exists.");
 //		return false;
 //	}
 //
@@ -987,12 +979,12 @@ bool var::osmkdir() const {
 	// https://en.cppreference.com/w/cpp/filesystem/create_directory
 	bool created = std::filesystem::create_directories(pathx, ec);
 	if (ec or ! created) {
-		this->lasterror(this->quote() ^ " osmkdir failed. " ^ ec.message());
+		this->setlasterror(this->quote() ^ " osmkdir failed. " ^ ec.message());
 		return false;
 	}
 
 	if (!std::filesystem::exists(pathx)) {
-		this->lasterror(this->quote() ^ " osmkdir failed. Target could not be created.");
+		this->setlasterror(this->quote() ^ " osmkdir failed. Target could not be created.");
 		return false;
 	}
 
@@ -1010,12 +1002,12 @@ bool var::osrmdir(bool evenifnotempty) const {
 		std::filesystem::path pathx(to_path_string(*this).c_str());
 
 		if (!std::filesystem::exists(pathx)) {
-		this->lasterror(this->quote() ^ " osrmdir failed - does not exist.");
+			this->setlasterror("osrmdir failed. " ^ this->quote() ^ " does not exist.");
 			return false;
 		}
 
 		if (!std::filesystem::is_directory(pathx)) {
-			this->lasterror(this->quote() ^ " osrmdir failed - is not a directory.");
+			this->setlasterror("osrmdir failed. " ^ this->quote() ^ " is not a directory.");
 			return false;
 		}
 
@@ -1023,14 +1015,16 @@ bool var::osrmdir(bool evenifnotempty) const {
 
 			// safety .. simply REFUSE to rm top level folders if not empty
 			// find some other way e.g. shell command if you must
-			if (!checknotabsoluterootfolder(toString()))
+			if (!checknotabsoluterootfolder(toString())) {
+				this->setlasterror("osrmdir failed " ^ this->quote() ^ " is a top level dir.");
 				return false;
+			}
 
 			std::filesystem::remove_all(pathx);
 		} else
 			std::filesystem::remove(pathx);
 	} catch (...) {
-		this->lasterror(this->quote() ^ " osrmdir failed - unknown cause.");
+		this->setlasterror("osrmdir failed. " ^ this->quote() ^ " Unknown cause.");
 		return false;
 	}
 
@@ -1290,7 +1284,7 @@ bool var::oscwd(CVR newpath) const {
 	} catch (...) {
 		// filesystem error: cannot set current path: No such file or directory
 		// ignore all errors
-		this->lasterror(var(newpath).quote() ^ " oscwd failed - unknown cause.");
+		this->setlasterror(var(newpath).quote() ^ " oscwd failed - unknown cause.");
 		return false;
 	}
 

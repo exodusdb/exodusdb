@@ -20,6 +20,8 @@ libraryinit()
 function main(in code, in fs, io handle, in keyorfilename, in fmc, io record, io status) {
 	true||code||fs||handle||keyorfilename||fmc||record||status;
 
+// clang-format off
+
 /*
              |CODE|    BFS         |     HANDLE     |    NAME        |    FMC         |    RECORD      |    STATUS      |
 -------------|----|----------------|----------------|----------------|----------------|----------------|----------------|
@@ -92,14 +94,7 @@ INSTALL      | 22 | Passed         | Unused         | Unused         | Unused   
 -------------|----|----------------|----------------|----------------|----------------|----------------|----------------|
 26 PURGE CACHE
 28 get nrecs
-
- if release()>= 2.1 then
-  lock=36
-  unlock=37
- end else
-  lock=23
-  unlock=24
-  end
+// clang-format on
 */
 
 	//code 3 write record on file, key
@@ -116,35 +111,36 @@ INSTALL      | 22 | Passed         | Unused         | Unused         | Unused   
 
 	//write record on file,key
 	case 3:
-		status=record.write(handle,keyorfilename);
+		record.write(handle, keyorfilename);
+		status = 1;
 		break;
 
 	//delete file,key
 	case 4:
-		status=handle.deleterecord(keyorfilename);
+		status = handle.deleterecord(keyorfilename);
 		break;
 
 	//lock file,key
 	case 5:
-		status=handle.lock(keyorfilename);
+		status = handle.lock(keyorfilename);
 		break;
 
 	//unlock file,key
 	case 6:
-		status=handle.unlock(keyorfilename);
+		status = handle.unlock(keyorfilename);
 		break;
 
 	//open filename to filehandle
 	case 11:
-		status=handle.open(keyorfilename);
+		status = handle.open(keyorfilename);
 		break;
 
 	case 23:
-		status=var("").lock(keyorfilename);
+		status = var("").lock(keyorfilename);
 		break;
 
 	case 24:
-		status=var("").unlock(keyorfilename);
+		status = var("").unlock(keyorfilename);
 		break;
 
 	default:
