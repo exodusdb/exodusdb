@@ -1,5 +1,7 @@
-#ifndef EXOPROG_H
-#define EXOPROG_H
+#ifndef EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
+#define EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
+
+#include <string>
 
 // Using map for dict function cache instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
@@ -41,14 +43,18 @@ namespace exodus {
 class PUBLIC ExodusProgramBase {
 
  private:
+
 	// used by calculate to call dict libraries
 	mutable std::string cached_dictid_;
 	mutable var cached_dictrec_ = "";
-	mutable CallableBase* cached_dictcallablebase_= nullptr;
-	std::map<std::string, CallableBase*> cached_dict_functions;
 
-	// used by perform to call libraries WITH NO ARGUMENTS
-	mutable CallableBase perform_callablebase_;
+	// A callable used in ExodusProgramBase::calculate to call dict items in dict_xxxxxx.cpp
+	mutable Callable* dict_callable_ = nullptr;
+
+	std::map<std::string, Callable*> cached_dict_functions;
+
+	// A callable used in ExodusProgramBase::perform to call libraries WITH NO ARGUMENTS
+	mutable Callable perform_callable_;
 
  public:
 
@@ -77,13 +83,14 @@ class PUBLIC ExodusProgramBase {
 	ExoEnv& mv;
 
  public:
+
 	// Function arguments
 	using in  = const var&; // same as CVR
 	using io  =       var&; // same as VARREF
 	using out =       var&; // same as VARREF
 
 	// Constant var
-	using let = const var ; // same as CV
+	using let = const var; // same as CV
 
 	// Not passing io/out parameters by pointer as per several style guides because
 	// it is far too easy to type
@@ -100,8 +107,8 @@ class PUBLIC ExodusProgramBase {
 
 #include <exodus/ioconv_custom.h>
 
-	ExodusProgramBase(ExoEnv& inmv);
-	ExodusProgramBase(ExoEnv&& inmv) = delete;
+	explicit ExodusProgramBase(ExoEnv& inmv);
+	explicit ExodusProgramBase(ExoEnv&& inmv) = delete;
 	//ExodusProgramBase();
 	ExodusProgramBase() = default;
 
@@ -238,12 +245,12 @@ class PUBLIC ExodusProgramBase {
 
 // clang-format off
 
-class PUBLIC MVStop     {public:explicit MVStop(    CVR var1 DEFAULT_EMPTY);var description;};
-class PUBLIC MVAbort    {public:explicit MVAbort(   CVR var1 DEFAULT_EMPTY);var description;};
-class PUBLIC MVAbortAll {public:explicit MVAbortAll(CVR var1 DEFAULT_EMPTY);var description;};
-class PUBLIC MVLogoff   {public:explicit MVLogoff(  CVR var1 DEFAULT_EMPTY);var description;};
+class PUBLIC MVStop     {public:explicit MVStop    (CVR var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVAbort    {public:explicit MVAbort   (CVR var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVAbortAll {public:explicit MVAbortAll(CVR var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVLogoff   {public:explicit MVLogoff  (CVR var1 DEFAULT_EMPTY); var description;};
 
 // clang-format on
 
 }  // namespace exodus
-#endif	// EXOPROG_H
+#endif	// EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_

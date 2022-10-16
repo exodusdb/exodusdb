@@ -1,6 +1,8 @@
 #ifndef VARTYP_H
 #define VARTYP_H
 
+namespace exodus {
+
 class VARTYP {
 
    private:
@@ -92,5 +94,7 @@ constexpr unsigned int VARTYP_NANSTR_OSFILE {VARTYP_NANSTR | VARTYP_OSFILE};
 //constexpr unsigned int VARTYP_DESTRUCTED {0xFFFFF0};
 
 constexpr unsigned int VARTYP_MASK {~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE)};
+
+} // namespace exodus
 
 #endif //VARTYP_H

@@ -85,6 +85,48 @@ var_iter var_iter::operator++() {
 	return *this;
 }
 
+//DECREMENT PREFIX
+var_iter var_iter::operator--() {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
+
+	// Decrement below zero is not allowed and throws if attempted
+	if (startpos_ < 1)
+		throw VarError(__PRETTY_FUNCTION__);
+
+	// Point to the separator before the current field
+	// and record the new endpos as that pos
+	startpos_--;
+	endpos_ = startpos_;
+
+	// The first char could be a FM in which case startpos and endpos will be 0
+	// resulting in an empty field
+	if (startpos_ == 0)
+		return *this;
+
+	// Skip before the separator
+	startpos_--;
+
+	// Find the separator marking the beginning of the previous field
+	startpos_ = pvar_->var_str.rfind(FM_, startpos_);
+
+	if (startpos_ == std::string::npos)
+		// If not found then then new field starts from 0 the first char
+		startpos_ = 0;
+	else
+		// new field starts one after the found separator
+		startpos_++;
+
+	return *this;
+}
+
+//DECREMENT POSTFIX
+var_iter var_iter::operator--(int) {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	var_iter before = *this;
+	--*this;
+	return before;
+}
+
 //BEGIN - free function to create an iterator -> begin
 PUBLIC var_iter begin(CVR var1) {
 	//std::cerr << __PRETTY_FUNCTION__ << std::endl;

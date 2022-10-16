@@ -4,17 +4,17 @@
 
 // A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly.
 
-class Callable_htmllib2 : public CallableBase
+class Callable_htmllib2 : public Callable
 {
 public:
 
 // A constructor providing:
 // 1. the name of the shared library to open,
 // 2. the name of the function within the shared library that will create an exodus program object,
-Callable_htmllib2(ExoEnv& mv) : CallableBase("htmllib2", "exodusprogrambasecreatedelete_", mv) {}
+Callable_htmllib2(ExoEnv& mv) : Callable("htmllib2", "exodusprogrambasecreatedelete_", mv) {}
 
 // Allow assignment of library name to override the default constructed
-using CallableBase::operator=;
+using Callable::operator=;
 
 // A callable member function with the right arguments, returning a var or void
 var operator() (in mode, io dataio, in params0="", in params20="", in glang="")

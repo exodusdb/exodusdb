@@ -29,7 +29,7 @@ THE SOFTWARE.
 //#include <sstream>
 #include <vector>
 
-#define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
+#define EXO_VAR_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <var.h>
 #include <varerr.h>
 //#include <exodus/varimpl.h>
@@ -37,7 +37,7 @@ THE SOFTWARE.
 
 namespace exodus {
 
-// most help from Thinking in C++ Volume 1 Chapter 12
+// Originally most help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
 
 // Also - very clearly written
@@ -45,17 +45,9 @@ namespace exodus {
 // C++ Primer, Third Edition 1998 Stanley B Lippman
 // Chapter 15 Overloaded operators and User-Defined Conversions
 
-// could also use http://www.informit.com/articles/article.asp?p=25264&seqNum=1
+// Could also use http://www.informit.com/articles/article.asp?p=25264&seqNum=1
 // which is effectively about makeing objects behave like ordinary variable syntactically
 // implementing smartpointers
-
-// NOTE
-// if priv variables are moved directly into the var object then
-// then mvtype etc should be initialised in proper initialisers to gain performance in those
-// compilers
-// that initialise basic types. ie prevent initialisation AND assignment
-// currently the default priv object initialisation of mvint to 0 is inefficient since is ALSO
-// assigned in most var constructions
 
 void var::throwUndefined(CVR message) const {
 	throw VarUndefined(message);
@@ -82,14 +74,6 @@ void var::throwNumUnderflow(CVR message) const {
 }
 
 CVR var::dump(SV text) const {
-//	std::clog << "DUMP: " << text << " ";
-//	if (var_typ & VARTYP_STR)
-//		std::clog << "str: " _DQ << var(var_str).convert(_ALL_FMS, _VISIBLE_FMS) << _DQ " ";
-//	if (var_typ & VARTYP_INT)
-//		std::clog << "int:" << var_int << " ";
-//	if (var_typ & VARTYP_DBL)
-//		std::clog << "dbl:" << var_dbl << " ";
-//	std::clog << "typ:" << var_typ << std::endl;
 	this->clone().dump(text);
 	return *this;
 }
@@ -97,7 +81,6 @@ CVR var::dump(SV text) const {
 VARREF var::dump(SV text) {
 	std::clog << "DUMP: " << text << " ";
 	if (var_typ & VARTYP_STR)
-		//std::clog << "str: \"" << var_str << "\" ";
 		std::clog << "str: " _DQ << var(var_str).convert(_ALL_FMS, _VISIBLE_FMS) << _DQ " ";
 	if (var_typ & VARTYP_INT)
 		std::clog << "int:" << var(var_int) << " ";
@@ -1174,11 +1157,11 @@ PUBLIC bool var_lt_int(CVR lhs, const int int2) {
 		if (lhs.var_typ & VARTYP_DBL)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			return (static_cast<double>(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
-	}
 
-	// go back and try again if can be converted to number
-	// Will check unassigned
-	while (lhs.isnum());
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (lhs.isnum());
 
 	// Non-numerical lhs
 	return lhs.var_str < std::to_string(int2);
@@ -1206,10 +1189,11 @@ PUBLIC bool int_lt_var(const int int1, CVR rhs) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			return (rhs.var_dbl - static_cast<double>(int1)) >= SMALLEST_NUMBER;
 		}
-	}
-	// go back and try again if can be converted to number
-	// Will check unassigned
-	while (rhs.isnum());
+
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (rhs.isnum());
 
 	// Non-numerical rhs
 	return std::to_string(int1) < rhs.var_str;
@@ -1237,10 +1221,10 @@ PUBLIC bool var_lt_dbl(CVR lhs, const double dbl2) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			return (dbl2 - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
 
-	}
-	// go back and try again if can be converted to number
-	// will throw if unassigned
-	while (lhs.isnum());
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (lhs.isnum());
 
 	// Non-numerical lhs
 	return lhs.var_str < std::to_string(dbl2);
@@ -1269,10 +1253,10 @@ PUBLIC bool dbl_lt_var(const double dbl1, CVR rhs) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			return (static_cast<double>(rhs.var_int) - dbl1) >= SMALLEST_NUMBER;
 
-	}
-	// go back and try again if can be converted to number
-	// Will check assigned
-	while (rhs.isnum());
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (rhs.isnum());
 
 	// Non-numerical rhs
 	return std::to_string(dbl1) < rhs.var_str;
@@ -1319,9 +1303,11 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 			return almost_equal(dbl1, static_cast<double>(lhs.var_int));
 
 		}
-	}
-	// try to convert to numeric string
-	while (lhs.isnum());
+
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (lhs.isnum());
 
 	// 4. NON-NUMERIC STRING - always false
 	//std::clog << "var_eq_dbl 4. Non-numeric string can never equal any number" << std::endl;;
@@ -1364,7 +1350,7 @@ PUBLIC bool var_eq_bool(CVR lhs, const bool bool1) {
 		// 3. LHS INT
 		//
 		// 0 equates to false
-		// All other ints equate to 
+		// All other ints equate to
 		//
 		else if (lhs.var_typ & VARTYP_INT) {
 			//std::clog << "var_eq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
@@ -1372,9 +1358,11 @@ PUBLIC bool var_eq_bool(CVR lhs, const bool bool1) {
 			return result;
 
 		}
-	}
-	// try to convert to numeric string and try again if successful
-	while (lhs.isnum());
+
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (lhs.isnum());
 
 	// 4. NON-NUMERIC STRING dont equate to false or true
 	//
@@ -1412,9 +1400,11 @@ PUBLIC bool var_eq_int(CVR lhs, const int int1) {
 			return lhs.var_int == int1;
 
 		}
-	}
-	// try to convert to numeric string
-	while (lhs.isnum());
+
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	}  while (lhs.isnum());
 
 	// 4. NON-NUMERIC STRING - always false
 	//std::clog << "var_eq_int 4. Non-numeric string can never equal any number" << std::endl;;
@@ -1445,9 +1435,10 @@ var var::operator-() const{
 		if (var_typ & VARTYP_INT)
 			return -var_int;
 
-	}
-	// must be string - try to convert to numeric
-	while (this->isnum());
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (this->isnum());
 
 	// non-numeric
 	this->assertNumeric(__PRETTY_FUNCTION__);
@@ -1593,21 +1584,21 @@ void save_stack_addresses();
 
 // clang-format off
 
-VarUnassigned     ::VarUnassigned(    CVR errmsg) : VarError("VarUnassigned:"     ^ errmsg) {}
-VarDivideByZero   ::VarDivideByZero(  CVR errmsg) : VarError("VarDivideByZero:"   ^ errmsg) {}
-VarNonNumeric     ::VarNonNumeric(    CVR errmsg) : VarError("VarNonNumeric:"     ^ errmsg) {}
-VarNonPositive    ::VarNonPositive(   CVR errmsg) : VarError("VarNonPositive:"    ^ errmsg) {}
-VarNumOverflow    ::VarNumOverflow(   CVR errmsg) : VarError("VarNumOverflow:"    ^ errmsg) {}
-VarNumUnderflow   ::VarNumUnderflow(  CVR errmsg) : VarError("VarNumUnderflow:"   ^ errmsg) {}
-VarUndefined      ::VarUndefined(     CVR errmsg) : VarError("VarUndefined:"      ^ errmsg) {}
-VarOutOfMemory    ::VarOutOfMemory(   CVR errmsg) : VarError("VarOutOfMemory:"    ^ errmsg) {}
+VarUnassigned     ::VarUnassigned    (CVR errmsg) : VarError("VarUnassigned:"     ^ errmsg) {}
+VarDivideByZero   ::VarDivideByZero  (CVR errmsg) : VarError("VarDivideByZero:"   ^ errmsg) {}
+VarNonNumeric     ::VarNonNumeric    (CVR errmsg) : VarError("VarNonNumeric:"     ^ errmsg) {}
+VarNonPositive    ::VarNonPositive   (CVR errmsg) : VarError("VarNonPositive:"    ^ errmsg) {}
+VarNumOverflow    ::VarNumOverflow   (CVR errmsg) : VarError("VarNumOverflow:"    ^ errmsg) {}
+VarNumUnderflow   ::VarNumUnderflow  (CVR errmsg) : VarError("VarNumUnderflow:"   ^ errmsg) {}
+VarUndefined      ::VarUndefined     (CVR errmsg) : VarError("VarUndefined:"      ^ errmsg) {}
+VarOutOfMemory    ::VarOutOfMemory   (CVR errmsg) : VarError("VarOutOfMemory:"    ^ errmsg) {}
 VarInvalidPointer ::VarInvalidPointer(CVR errmsg) : VarError("VarInvalidPointer:" ^ errmsg) {}
-VarDBException    ::VarDBException(   CVR errmsg) : VarError("VarDBException:"    ^ errmsg) {}
+VarDBException    ::VarDBException   (CVR errmsg) : VarError("VarDBException:"    ^ errmsg) {}
 VarNotImplemented ::VarNotImplemented(CVR errmsg) : VarError("VarNotImplemented:" ^ errmsg) {}
-VarDebug          ::VarDebug(         CVR errmsg) : VarError("VarDebug"           ^ errmsg) {}
+VarDebug          ::VarDebug         (CVR errmsg) : VarError("VarDebug"           ^ errmsg) {}
 
-DimNotDimensioned   ::DimNotDimensioned(  CVR errmsg) : VarError("DimNotDimensioned"    ^ errmsg) {}
-DimDimensionedZero  ::DimDimensionedZero( CVR errmsg) : VarError("DimDimensionedZero:"  ^ errmsg) {}
+DimNotDimensioned   ::DimNotDimensioned  (CVR errmsg) : VarError("DimNotDimensioned"    ^ errmsg) {}
+DimDimensionedZero  ::DimDimensionedZero (CVR errmsg) : VarError("DimDimensionedZero:"  ^ errmsg) {}
 DimIndexOutOfBounds ::DimIndexOutOfBounds(CVR errmsg) : VarError("DimIndexOutOfBounds:" ^ errmsg) {}
 
 // clang-format on

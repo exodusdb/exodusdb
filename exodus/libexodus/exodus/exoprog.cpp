@@ -21,10 +21,12 @@ namespace exodus {
 // but this means that mv must be provided at program construction
 // and cannot be changed thereafter
 ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
-	: mv(inmv)
+	:
+	perform_callable_(inmv),
+	mv(inmv)
 {
 	cached_dictid_ = "";
-	cached_dictcallablebase_ = nullptr;
+	dict_callable_ = nullptr;
 }
 #pragma GCC diagnostic pop
 
@@ -32,7 +34,7 @@ ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
 ExodusProgramBase::~ExodusProgramBase(){}
 
 var ExodusProgramBase::libinfo(CVR command) {
-	return var(perform_callablebase_.libfilename(command.toString())).osfile();
+	return var(perform_callable_.libfilepath(command.toString())).osfile();
 }
 
 // select
@@ -1093,13 +1095,13 @@ var ExodusProgramBase::perform(CVR sentence) {
 	// return ID^"*"^dictid;
 
 	// wire up the the library linker to have the current exoenv
-	// if (!perform_callablebase_.mv_)
-	//	perform_callablebase_.mv_=this;
+	// if (!perform_callable_.mv_)
+	//	perform_callable_.mv_=this;
 
 	// lowercase all library functions to aid in conversion from pickos
 	// TODO remove after conversion complete
 
-	perform_callablebase_.mv_ = (&mv);
+	//perform_callable_.mv_ = (&mv);
 
 	// save some environment
 	var savesentence;
@@ -1177,10 +1179,12 @@ var ExodusProgramBase::perform(CVR sentence) {
 		// load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();
 		std::string libname = libid.toString();
-		if (!perform_callablebase_.initsmf(libname.c_str(),
-												"exodusprogrambasecreatedelete_",
-												true  // forcenew each perform/execute
-												)) {
+		if (!perform_callable_.initsmf(
+											mv,
+											libname.c_str(),
+											"exodusprogrambasecreatedelete_",
+											true  // forcenew each perform/execute
+											)) {
 			USER4 ^= "perform() Cannot find shared library \"" + libname +
 					 "\", or \"libraryexit()\" is not present in it.";
 			// throw VarError(USER4);
@@ -1190,7 +1194,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 		// call the shared library exodus object's main function
 		try {
-			ANS = perform_callablebase_.callsmf();
+			ANS = perform_callable_.callsmf();
 
 		// TODO reimplement this
 //		} catch (const VarUndefined&) {
@@ -1434,32 +1438,37 @@ baddict:
 			else
 				libname = DICT.f(1).lcase().convert(".", "_").toString();
 
-			// get from cache
-			std::string callablecachekey = dictid.lcase().toString() + "_" + libname;
-			cached_dictcallablebase_ = cached_dict_functions[callablecachekey];
-			// if (dict_callablebase_) {
-			//	delete dict_callablebase_;
-			//	dict_callablebase_=nullptr;
-			//}
+			// Try to get dict_callable from cache
+			std::string callable_cachekey = dictid.lcase().toString() + "_" + libname;
+			dict_callable_ = cached_dict_functions[callable_cachekey];
 
-			// if not in cache then create new one and save it in the cache
-			if (!cached_dictcallablebase_) {
+			// If not in cache
+			if (!dict_callable_) {
 				// var(cachekey).logputl("cachekey=");
 
-				cached_dictcallablebase_ = new CallableBase;
-				cached_dict_functions[callablecachekey] = cached_dictcallablebase_;
+				// Create a new dict_callable
+				dict_callable_ = new Callable;
 
-				// wire up the the library linker to have the current exoenv
-				// if (!dict_callablebase_.mv_)
-				cached_dictcallablebase_->mv_ = (&mv);
+//				// Patch in the current exoenv
+//				if (!dict_callable_->mv_)
+//					dict_callable_->mv_ = (&mv);
 
+				// Wire it up with the necessary ExoEnv mv
+				// and locate the correct function object in the library
 				std::string str_funcname =
 					("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
-				if (!cached_dictcallablebase_->initsmf(libname.c_str(),
-													  str_funcname.c_str()))
+				if (!dict_callable_->initsmf(
+														mv,
+														libname.c_str(),
+														str_funcname.c_str())
+													)
 					throw VarError("ExodusProgramBase::calculate() Cannot find Library " +
 								  libname + ", or function " +
 								  dictid.lcase() + " is not present");
+
+				// Cache it
+				cached_dict_functions[callable_cachekey] = dict_callable_;
+
 			}
 		}
 
@@ -1474,15 +1483,15 @@ baddict:
 		//	MV = 0;
 		//}
 
-		// return dict_callablebase_.calldict();
+		// return dict_callable_.calldict();
 		// return ANS;
 
 		// call the shared library object main function with the right args (none for
 		// dicts), returning a var std::cout<<"precal"<<std::endl;
-		ANS = CALLMEMBERFUNCTION(*(cached_dictcallablebase_->pobject_),
-								 ((pExodusProgramBaseMemberFunction)(
-									 cached_dictcallablebase_->pmemberfunction_)))();
-		// std::cout<<"postcal"<<std::endl;
+//		ANS = CALLMEMBERFUNCTION(*(dict_callable_->pobject_),
+//								 ((pExodusProgramBaseMemberFunction)(
+//									 cached_dictcallable_base_->pmemberfunction_)))();
+		ANS = dict_callable_->callsmf();
 
 		// restore the MV if necessary
 		//if (!ismv)
@@ -2164,7 +2173,7 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 				ioconv_custom = functionname;
 
 				// wire in the current environment
-				ioconv_custom.mv_ = &mv;
+				//ioconv_custom.mv_ = &mv;
 
 				// and call it
 				//call ioconv_custom("OCONV", result, mode, output);
@@ -2244,7 +2253,7 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 				ioconv_custom = functionname;
 
 				// wire up the current environment
-				ioconv_custom.mv_ = (&mv);
+				//ioconv_custom.mv_ = (&mv);
 
 				// and call it
 				call ioconv_custom("ICONV", result, mode, outx);

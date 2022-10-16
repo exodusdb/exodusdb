@@ -262,7 +262,7 @@ subroutine printtx2() {
 	tx.replacer(FM, EOL);
 
 	if (printfilename) {
-		if (osbwrite(tx on printfile, printptr))
+		if (not osbwrite(tx on printfile, printptr))
 			abort(lasterror());
 	}
 	else {

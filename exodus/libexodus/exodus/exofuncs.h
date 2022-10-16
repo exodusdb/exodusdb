@@ -25,10 +25,6 @@ THE SOFTWARE.
 
 #include <exodus/var.h>
 
-#ifndef PUBLIC
-#	define PUBLIC
-#endif
-
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h
 namespace exodus {
@@ -37,20 +33,20 @@ namespace exodus {
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 
-	inline const var       EOL      = "\r\n";
+	const var              EOL      = "\r\n";
 #	define                _EOL        "\r\n"
 
-	inline const var       OSSLASH  = "\\";
+	const var              OSSLASH  = "\\";
 #	define                _OSSLASH    "\\"
 	constexpr char         OSSLASH_ = '\\';
 	constexpr bool         OSSLASH_IS_BACKSLASH = true;
 
 #else
 
-	inline const var       EOL      = "\n";
+	const var              EOL      = "\n";
 #	define                _EOL        "\n"
 
-	inline const var       OSSLASH  = "/";
+	const var              OSSLASH  = "/";
 #	define                _OSSLASH    "/"
 	constexpr char         OSSLASH_ = '/';
 	constexpr bool         OSSLASH_IS_BACKSLASH = false;
@@ -58,10 +54,10 @@ namespace exodus {
 #endif
 
 #if defined(_WIN64) or defined(_LP64)
-	inline const var       PLATFORM = "x64";
+	const var              PLATFORM = "x64";
 #	define                _PLATFORM   "x84"
 #else
-	inline const var       PLATFORM = "x86";
+	const var              PLATFORM = "x86";
 #	define                _PLATFORM   "x86"
 #endif
 
@@ -74,394 +70,391 @@ namespace exodus {
 //#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
 #define LOCKIOSTREAM
 
-PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno);
+#define DEFAULT_EMPTY = ""
+#define DEFAULT_DOT = "."
+#define DEFAULT_CSPACE = ' '
+#define DEFAULT__FM = _FM
+#define DEFAULT_0 = 0
+#define DEFAULT_1  = 1
+#define DEFAULT_M1 = -1
+#define DEFAULT_FALSE = false
 
-PUBLIC ND var osgetenv(CVR envcode = "") {
-    var envvalue = "";
-    envvalue.osgetenv(envcode);
-    return envvalue;
-}
-PUBLIC bool osgetenv(CVR code, VARREF value) {return value.osgetenv(code);}
-PUBLIC void ossetenv(CVR code, CVR value) {return value.ossetenv(code);}
+int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno);
 
-PUBLIC ND var ostempdirpath() {return var().ostempdirpath();}
-PUBLIC ND var ostempfilename() {return var().ostempfilename();}
+ND var osgetenv(CVR envcode DEFAULT_SPACE);
+ND bool osgetenv(CVR code, VARREF value);
+void ossetenv(CVR code, CVR value);
 
-PUBLIC ND bool assigned(CVR var1) {return var1.assigned();}
-PUBLIC ND bool unassigned(CVR var1) {return !var1.assigned();}
+ND var ostempdirpath();
+ND var ostempfilename();
 
-PUBLIC void move(VARREF fromvar, VARREF tovar) {fromvar.move(tovar);}
-PUBLIC void swap(VARREF var1, VARREF var2) {var1.swap(var2);}
+ND bool assigned(CVR var1);
+ND bool unassigned(CVR var1);
+
+void move(VARREF fromvar, VARREF tovar);
+void swap(VARREF var1, VARREF var2);
 
 // OS
 
-PUBLIC ND var date() {return var().date();}
-PUBLIC ND var time() {return var().time();}
-PUBLIC ND var ostime() {return var().ostime();}
-PUBLIC ND var timestamp() {return var().timestamp();}
-//PUBLIC ND var timedate();
+ND var date();
+ND var time();
+ND var ostime();
+ND var timestamp();
+//ND var timedate();
 
-PUBLIC void ossleep(const int milliseconds) {var().ossleep(milliseconds);}
-PUBLIC var oswait(const int milliseconds, SV dirpath) {return var().oswait(milliseconds, dirpath);}
+void ossleep(const int milliseconds);
+ND var oswait(const int milliseconds, SV dirpath);
 
 // 4 argument version for statement format
 // osbread(data from x at y length z)
 // Read/write osfile at specified offset. Must open/close.
-PUBLIC ND bool osopen(CVR osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY) {return osfilevar.osopen(osfilepath, locale);}
-PUBLIC void osclose(CVR osfilevar) {osfilevar.osclose();}
+ND bool osopen(CVR osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
+void osclose(CVR osfilevar);
 // Versions where offset is input and output
-PUBLIC ND bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length) {return data.osbread(osfilevar, offset, length);}
-PUBLIC ND bool osbwrite(CVR data, CVR osfilevar, VARREF offset) {return data.osbwrite(osfilevar, offset);}
+ND bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length);
+ND bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
 // Versions where offset is const offset e.g. numeric ints
 #ifdef VAR_OSBREADWRITE_CONST_OFFSET
-PUBLIC ND bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length) {return data.osbread(osfilevar, const_cast<VARREF>(offset), length);}
-PUBLIC ND bool osbwrite(CVR data, CVR osfilevar, CVR offset) {return data.osbwrite(osfilevar, const_cast<VARREF>(offset));}
+ND bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length);
+ND bool osbwrite(CVR data, CVR osfilevar, CVR offset);
 #endif
 
 // Read/Write whole osfile
-PUBLIC ND bool oswrite(CVR data, CVR osfilepath, const char* codepage DEFAULT_EMPTY) {return data.oswrite(osfilepath, codepage);}
-PUBLIC ND bool osread(VARREF data, CVR osfilepath, const char* codepage DEFAULT_EMPTY) {return data.osread(osfilepath, codepage);}
+ND bool oswrite(CVR data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
+ND bool osread(VARREF data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
 // Simple version without codepage returns the contents or "" if file cannot be read
 // one argument returns the contents directly to be used in assignments
-PUBLIC ND var osread(CVR osfilepath) {
-    var data;
-    if (data.osread(osfilepath))
-        return data;
-    else
-        return "";
-}
+ND var osread(CVR osfilepath);
 
-PUBLIC ND bool osremove(CVR ospath) {return ospath.osremove();}
-PUBLIC ND bool osrename(CVR old_ospath, CVR new_ospath) {return old_ospath.osrename(new_ospath);}
-PUBLIC ND bool oscopy(CVR from_ospath, CVR to_ospath) {return from_ospath.oscopy(to_ospath);}
-PUBLIC ND bool osmove(CVR from_ospath, CVR to_ospath) {return from_ospath.osmove(to_ospath);}
+ND bool osremove(CVR ospath);
+ND bool osrename(CVR old_ospath, CVR new_ospath);
+ND bool oscopy(CVR from_ospath, CVR to_ospath);
+ND bool osmove(CVR from_ospath, CVR to_ospath);
 
-PUBLIC ND var oslist(CVR path DEFAULT_DOT, SV globpattern DEFAULT_EMPTY, const int mode = 0) {return path.oslist(globpattern, mode);}
-PUBLIC ND var oslistf(CVR filepath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY) {return filepath.oslistf(globpattern);}
-PUBLIC ND var oslistd(CVR dirpath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY) {return dirpath.oslistd(globpattern);}
+ND var oslist(CVR path DEFAULT_DOT, SV globpattern DEFAULT_EMPTY, const int mode DEFAULT_0);
+ND var oslistf(CVR filepath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
+ND var oslistd(CVR dirpath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
 
-PUBLIC ND var osinfo(CVR path, const int mode = 0) {return path.osinfo(mode);}
-PUBLIC ND var osfile(CVR filepath) {return filepath.osfile();}
-PUBLIC ND var osdir(CVR dirpath) {return dirpath.osdir();}
+ND var osinfo(CVR path, const int mode DEFAULT_0);
+ND var osfile(CVR filepath);
+ND var osdir(CVR dirpath);
 
 
-PUBLIC ND bool osmkdir(CVR dirpath) {return dirpath.osmkdir();}
-PUBLIC ND bool osrmdir(CVR dirpath, const bool evenifnotempty = false) {return dirpath.osrmdir(evenifnotempty);}
+ND bool osmkdir(CVR dirpath);
+ND bool osrmdir(CVR dirpath, const bool evenifnotempty DEFAULT_FALSE);
 
-PUBLIC ND var oscwd() {return var().oscwd();}
-PUBLIC var oscwd(CVR dirpath) {return dirpath.oscwd(dirpath);}
+ND var oscwd();
+ND var oscwd(CVR dirpath);
 
-PUBLIC void osflush() {return var().osflush();}
-PUBLIC ND var ospid() {return var().ospid();}
+void osflush();
+ND var ospid();
 
-PUBLIC ND bool osshell(CVR command) {return command.osshell();}
-PUBLIC ND bool osshellwrite(CVR writestr, CVR command) {return writestr.osshellwrite(command);}
-PUBLIC ND bool osshellread(VARREF readstr, CVR command) {return readstr.osshellread(command);}
-PUBLIC var osshellread(CVR command) {
-    var result;
-    result.osshellread(command);
-    return result;
-}
+ND bool osshell(CVR command);
+ND bool osshellwrite(CVR writestr, CVR command);
+ND bool osshellread(VARREF readstr, CVR command);
+ND var osshellread(CVR command);
 
-PUBLIC var execute(CVR command);
+//var execute(CVR command);
 
-//PUBLIC void debug(CVR DEFAULT_EMPTY);
-PUBLIC ND var backtrace();
+//void debug(CVR DEFAULT_EMPTY);
+ND var backtrace();
 
-PUBLIC bool setxlocale(const char* locale) {return var(locale).setxlocale();}
-PUBLIC ND var getxlocale() {return var().getxlocale();}
+bool setxlocale(const char* locale);
+ND var getxlocale();
 
 // MATH
 
-PUBLIC ND var abs(CVR num1) {return num1.abs();}
-PUBLIC ND var pwr(CVR base, CVR exponent) {return base.pwr(exponent);}
-PUBLIC ND var exp(CVR power) {return power.exp();}
-PUBLIC ND var sqrt(CVR num1) {return num1.sqrt();}
-PUBLIC ND var sin(CVR degrees) {return degrees.sin();}
-PUBLIC ND var cos(CVR degrees) {return degrees.cos();}
-PUBLIC ND var tan(CVR degrees) {return degrees.tan();}
-PUBLIC ND var atan(CVR degrees) {return degrees.atan();}
-PUBLIC ND var loge(CVR num1) {return num1.loge();}
-PUBLIC ND var mod(CVR dividend, CVR divisor) {return dividend.mod(divisor);}
-PUBLIC ND var mod(CVR dividend, const double divisor) {return dividend.mod(divisor);}
-PUBLIC ND var mod(CVR dividend, const int divisor) {return dividend.mod(divisor);}
+ND var abs(CVR num1);
+ND var pwr(CVR base, CVR exponent);
+ND var exp(CVR power);
+ND var sqrt(CVR num1);
+ND var sin(CVR degrees);
+ND var cos(CVR degrees);
+ND var tan(CVR degrees);
+ND var atan(CVR degrees);
+ND var loge(CVR num1);
+ND var mod(CVR dividend, CVR divisor);
+ND var mod(CVR dividend, const double divisor);
+ND var mod(CVR dividend, const int divisor);
 
 // integer() represents pick int() because int() is reserved word in c/c++
 // Note that integer like pick int() is the same as floor()
 // whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any fractional
 // decimal places) to get the usual c/c++ effect use toInt() (although toInt() returns an int
 // instead of a var like normal exodus functions)
-PUBLIC ND var integer(CVR num1) {return num1.integer();}
-PUBLIC ND var floor(CVR num1) {return num1.floor();}
-PUBLIC ND var round(CVR num1, const int ndecimals = 0) {return num1.round(ndecimals);}
+ND var integer(CVR num1);
+ND var floor(CVR num1);
+ND var round(CVR num1, const int ndecimals DEFAULT_0);
 
-PUBLIC ND var rnd(const int number) {return var(number).rnd();}
-PUBLIC void initrnd(CVR seed = 0) {seed.initrnd();}
+ND var rnd(const int number);
+void initrnd(CVR seed DEFAULT_0);
 
 // INPUT
 
-PUBLIC ND var getprompt();
-PUBLIC void setprompt(CVR prompt);
+ND var getprompt();
+void setprompt(CVR prompt);
 
-PUBLIC var input();
-PUBLIC var input(CVR prompt);
-PUBLIC var inputn(const int nchars);
+var input();
 
-PUBLIC ND bool isterminal() {return var().isterminal();}
-PUBLIC ND bool hasinput(const int millisecs = 0) {return var().hasinput(millisecs);}
-PUBLIC ND bool eof() {return var().eof();}
-PUBLIC bool echo(const int on_off) {return var().echo(on_off);}
+var input(CVR prompt);
 
-PUBLIC void breakon();
-PUBLIC void breakoff();
+var inputn(const int nchars);
+
+ND bool isterminal();
+ND bool hasinput(const int millisecs DEFAULT_0);
+ND bool eof();
+bool echo(const int on_off);
+
+void breakon();
+void breakoff();
 
 // SIMPLE STRINGS
 
-PUBLIC ND var len(CVR var1) {return var1.len();}
-PUBLIC ND var textlen(CVR var1) {return var1.textlen();}
+ND var len(CVR var1);
+ND var textlen(CVR var1);
 
-PUBLIC ND var convert(CVR instring, SV fromchars, SV tochars) {return instring.convert(fromchars, tochars);}
-PUBLIC VARREF converter(VARREF iostring, SV fromchars, SV tochars) {return iostring.converter(fromchars, tochars);}
+ND var convert(CVR instring, SV fromchars, SV tochars);
+VARREF converter(VARREF iostring, SV fromchars, SV tochars);
 
-PUBLIC ND var textconvert(CVR instring, SV fromchars, SV tochars) {return instring.textconvert(fromchars, tochars);}
-PUBLIC VARREF textconverter(VARREF iostring, SV fromchars, SV tochars) {return iostring.textconverter(fromchars, tochars);}
+ND var textconvert(CVR instring, SV fromchars, SV tochars);
+VARREF textconverter(VARREF iostring, SV fromchars, SV tochars);
 
-PUBLIC ND var replace(CVR instring, SV fromstr, SV tostr);
-PUBLIC VARREF replacer(VARREF iostring, SV fromstr, SV tostr) {return iostring.replacer(fromstr, tostr);}
+ND var replace(CVR instring, SV fromstr, SV tostr);
+VARREF replacer(VARREF iostring, SV fromstr, SV tostr);
 
-PUBLIC ND var regex_replace(CVR instring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
-PUBLIC VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options DEFAULT_EMPTY) {return iostring.regex_replacer(regex, replacement, options);}
+ND var regex_replace(CVR instring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
+VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
 
-PUBLIC ND var ucase(CVR instring) {return instring.ucase();}
-PUBLIC VARREF ucaser(VARREF iostring) {return iostring.ucaser();}
+ND var ucase(CVR instring);
+VARREF ucaser(VARREF iostring);
 
-PUBLIC ND var lcase(CVR instring) {return instring.lcase();}
-PUBLIC VARREF lcaser(VARREF iostring) {return iostring.lcaser();}
+ND var lcase(CVR instring);
+VARREF lcaser(VARREF iostring);
 
-PUBLIC ND var tcase(CVR instring) {return instring.tcase();}
-PUBLIC VARREF tcaser(VARREF iostring) {return iostring.tcaser();}
+ND var tcase(CVR instring);
+VARREF tcaser(VARREF iostring);
 
-PUBLIC ND var fcase(CVR instring) {return instring.fcase();}
-PUBLIC VARREF fcaser(VARREF iostring) { return iostring.fcaser();}
+ND var fcase(CVR instring);
+VARREF fcaser(VARREF iostring);
 
-PUBLIC ND var normalize(CVR instring) {return instring.normalize();}
-PUBLIC VARREF normalizer(VARREF iostring) {return iostring.normalizer();}
+ND var normalize(CVR instring);
+VARREF normalizer(VARREF iostring);
 
-PUBLIC VARREF uniquer(VARREF iostring) {return iostring.uniquer();}
-PUBLIC ND var unique(CVR instring) {return instring.unique();}
+VARREF uniquer(VARREF iostring);
+ND var unique(CVR instring);
 
-PUBLIC ND var invert(CVR instring) {return var(instring).invert();}
-PUBLIC VARREF inverter(VARREF iostring) {return iostring.inverter();}
-PUBLIC ND var invert(var&& instring) {return instring.inverter();}
-//PUBLIC VARREF inverter(VARREF iostring) {return instring.inverter();};
-//PUBLIC ND var invert(CVR instring) {return var(instring).inverter();};
-//PUBLIC ND var invert(var&& instring) {return instring.inverter();};
-//template<typename T> PUBLIC T invert(var && instring) {return T (std::forward<var>(instring));}
+ND var invert(CVR instring);
+VARREF inverter(VARREF iostring);
+ND var invert(var&& instring);
+//VARREF inverter(VARREF iostring);;
+//ND var invert(CVR instring);;
+//ND var invert(var&& instring);;
+//template<typename T> T invert(var && instring);
 
-PUBLIC ND var lower(CVR instring) {return instring.lower();}
-PUBLIC VARREF lowerer(VARREF iostring) {return iostring.lowerer();}
+ND var lower(CVR instring);
+VARREF lowerer(VARREF iostring);
 
-PUBLIC ND var raise(CVR instring) {return instring.raise();}
-PUBLIC VARREF raiser(VARREF iostring) {return iostring.raiser();}
+ND var raise(CVR instring);
+VARREF raiser(VARREF iostring);
 
 // PASTER
 
 // 1. paste replace
-PUBLIC ND var paste(CVR instring, const int pos1, const int length, CVR str) {return instring.paste(pos1, length, str);}
-PUBLIC VARREF paster(VARREF iostring, const int pos1, const int length, CVR str) {return iostring.paster(pos1, length, str);}
+ND var paste(CVR instring, const int pos1, const int length, CVR str);
+VARREF paster(VARREF iostring, const int pos1, const int length, CVR str);
 
 //// 2. paste over to end
-//PUBLIC VARREF pasterall(VARREF iostring, const int pos1, CVR str);
-//PUBLIC ND var pasteall(CVR instring, const int pos1, CVR str);
+//VARREF pasterall(VARREF iostring, const int pos1, CVR str);
+//ND var pasteall(CVR instring, const int pos1, CVR str);
 
 // 3. paste insert at pos1
-PUBLIC ND var paste(CVR instring, const int pos1, CVR str) {return instring.paste(pos1, str);}
-PUBLIC VARREF paster(VARREF iostring, const int pos1, CVR str) {return iostring.paster(pos1, str);}
+ND var paste(CVR instring, const int pos1, CVR str);
+VARREF paster(VARREF iostring, const int pos1, CVR str);
 
 // PREFIX
-PUBLIC ND var prefix(CVR instring, CVR str) {return instring.prefix(str);}
-PUBLIC VARREF prefixer(VARREF iostring, CVR str) {return iostring.prefixer(str);}
+ND var prefix(CVR instring, CVR str);
+VARREF prefixer(VARREF iostring, CVR str);
 
-PUBLIC ND var pop(CVR instring) {return instring.pop();}
-PUBLIC VARREF popper(VARREF iostring) {return iostring.popper();}
-
-
-PUBLIC ND var quote(CVR instring) {return instring.quote();}
-PUBLIC VARREF quoter(VARREF iostring) {return iostring.quoter();}
-
-PUBLIC ND var squote(CVR instring) {return instring.squote();}
-PUBLIC VARREF squoter(VARREF iostring) {return iostring.squoter();}
-
-PUBLIC ND var unquote(CVR instring) {return instring.unquote();}
-PUBLIC VARREF unquoter(VARREF iostring) {return iostring.unquoter();}
+ND var pop(CVR instring);
+VARREF popper(VARREF iostring);
 
 
-PUBLIC ND var fieldstore(CVR instring, SV sepchar, const int fieldno, const int nfields, CVR replacement) {return instring.fieldstore(sepchar, fieldno, nfields, replacement);}
-PUBLIC VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement) {return iostring.fieldstorer(sepchar, fieldno, nfields, replacement);}
+ND var quote(CVR instring);
+VARREF quoter(VARREF iostring);
+
+ND var squote(CVR instring);
+VARREF squoter(VARREF iostring);
+
+ND var unquote(CVR instring);
+VARREF unquoter(VARREF iostring);
 
 
-PUBLIC ND var trim(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trim(trimchars);}
-PUBLIC ND var trimfirst(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trimfirst(trimchars);}
-PUBLIC ND var trimlast(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trimlast(trimchars);}
-PUBLIC ND var trimboth(CVR instring, SV trimchars DEFAULT_SPACE) {return instring.trimboth(trimchars);}
-
-PUBLIC VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmer(trimchars);}
-PUBLIC VARREF trimmerfirst(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerfirst(trimchars);}
-PUBLIC VARREF trimmerlast(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerlast(trimchars);}
-PUBLIC VARREF trimmerboth(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerboth(trimchars);}
+ND var fieldstore(CVR instring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
+VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, CVR replacement);
 
 
-PUBLIC ND var chr(const int integer) {return var().chr(integer);}
-PUBLIC ND var textchr(const int integer) {return var().textchr(integer);}
-PUBLIC ND var match(CVR instring, CVR matchstr, CVR options DEFAULT_EMPTY) {return instring.match(matchstr, options);}
-PUBLIC ND var seq(CVR char1) {return char1.seq();}
-PUBLIC ND var textseq(CVR char1) {return char1.textseq();}
-PUBLIC ND var str(CVR instring, const int number) {return instring.str(number);}
-PUBLIC ND var space(const int number) {return var(number).space();}
-PUBLIC ND var fcount(CVR instring, SV substr) {return instring.fcount(substr);}
-PUBLIC ND var count(CVR instring, SV substr) {return instring.count(substr);}
+ND var trim(CVR instring, SV trimchars DEFAULT_SPACE);
+ND var trimfirst(CVR instring, SV trimchars DEFAULT_SPACE);
+ND var trimlast(CVR instring, SV trimchars DEFAULT_SPACE);
+ND var trimboth(CVR instring, SV trimchars DEFAULT_SPACE);
 
-PUBLIC ND var substr(CVR instring, const int startindex) {return instring.b(startindex);}
-PUBLIC ND var substr(CVR instring, const int startindex, const int length) {return instring.b(startindex, length);}
-PUBLIC VARREF substrer(VARREF iostring, const int startindex) {return iostring.substrer(startindex);}
-PUBLIC VARREF substrer(VARREF iostring, const int startindex, const int length) {return iostring.substrer(startindex, length);}
+VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE);
+VARREF trimmerfirst(VARREF iostring, SV trimchars DEFAULT_SPACE);
+VARREF trimmerlast(VARREF iostring, SV trimchars DEFAULT_SPACE);
+VARREF trimmerboth(VARREF iostring, SV trimchars DEFAULT_SPACE);
 
-PUBLIC bool starts(CVR instring, SV substr) {return instring.starts(substr);}
-PUBLIC bool end(CVR instring, SV substr) {return instring.ends(substr);}
-PUBLIC bool contains(CVR instring, SV substr) {return instring.contains(substr);}
 
-PUBLIC ND var index(CVR instring, SV substr, const int startindex = 1) {return instring.index(substr, startindex);}
-PUBLIC ND var indexn(CVR instring, SV substr, int occurrence) {return instring.indexn(substr, occurrence);}
-PUBLIC ND var indexr(CVR instring, SV substr, const int startindex = -1) {return instring.indexr(substr, startindex);}
+ND var chr(const int integer);
+ND var textchr(const int integer);
+ND var match(CVR instring, CVR matchstr, CVR options DEFAULT_EMPTY);
+ND var seq(CVR char1);
+ND var textseq(CVR char1);
+ND var str(CVR instring, const int number);
+ND var space(const int number);
+ND var fcount(CVR instring, SV substr);
+ND var count(CVR instring, SV substr);
 
-PUBLIC ND var field(CVR instring, SV substr, const int fieldno, const int nfields = 1) {return instring.field(substr, fieldno, nfields);}
-PUBLIC ND var field2(CVR instring, SV substr, const int fieldno, const int nfields = 1) {return instring.field2(substr, fieldno, nfields);}
+ND var substr(CVR instring, const int startindex);
+ND var substr(CVR instring, const int startindex, const int length);
+VARREF substrer(VARREF iostring, const int startindex);
+VARREF substrer(VARREF iostring, const int startindex, const int length);
+
+ND bool starts(CVR instring, SV substr);
+ND bool end(CVR instring, SV substr);
+ND bool contains(CVR instring, SV substr);
+
+ND var index(CVR instring, SV substr, const int startindex DEFAULT_1);
+ND var indexn(CVR instring, SV substr, int occurrence);
+ND var indexr(CVR instring, SV substr, const int startindex DEFAULT_M1);
+
+ND var field(CVR instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
+ND var field2(CVR instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
 
 // STRINGS WITH FIELD MARKS
 
-PUBLIC var substr2(CVR fromstr, VARREF startindex, VARREF delimiterno) {return fromstr.substr2(startindex, delimiterno);}
+ND var substr2(CVR fromstr, VARREF startindex, VARREF delimiterno);
 
-PUBLIC ND dim split(CVR sourcevar, SV sepchar = _FM) {return sourcevar.split(sepchar);}
-PUBLIC ND var join(const dim& sourcedim, SV sepchar = _FM) {return sourcedim.join(sepchar);}
+ND dim split(CVR sourcevar, SV sepchar DEFAULT__FM);
+ND var join(const dim& sourcedim, SV sepchar DEFAULT__FM);
 
-PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement) {return instring.pickreplace(fieldno, valueno, subvalueno, replacement);}
-PUBLIC ND var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement) {return instring.pickreplace(fieldno, valueno, replacement);}
-PUBLIC ND var pickreplace(CVR instring, const int fieldno, CVR replacement) {return instring.pickreplace(fieldno, replacement);}
+ND var pickreplace(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
+ND var pickreplace(CVR instring, const int fieldno, const int valueno, CVR replacement);
+ND var pickreplace(CVR instring, const int fieldno, CVR replacement);
 
-PUBLIC ND var extract(CVR instring, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) {return instring.f(fieldno, valueno, subvalueno);}
+ND var extract(CVR instring, const int fieldno DEFAULT_0, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion) {return instring.insert(fieldno, valueno, subvalueno, insertion);}
-PUBLIC ND var insert(CVR instring, const int fieldno, const int valueno, CVR insertion) {return instring.insert(fieldno, valueno, insertion);}
-PUBLIC ND var insert(CVR instring, const int fieldno, CVR insertion) {return instring.insert(fieldno, insertion);}
+ND var insert(CVR instring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
+ND var insert(CVR instring, const int fieldno, const int valueno, CVR insertion);
+ND var insert(CVR instring, const int fieldno, CVR insertion);
 
-// PUBLIC var erase(CVR instring, const int fieldno, const int valueno=0, const int
+// var erase(CVR instring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-PUBLIC ND var remove(CVR instring, const int fieldno, const int valueno = 0, const int subvalueno = 0) {return instring.remove(fieldno, valueno, subvalueno);}
+ND var remove(CVR instring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR replacement) {return iostring.r(fieldno, valueno, subvalueno, replacement);}
-PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, CVR replacement) {return iostring.r(fieldno, valueno, replacement);}
-PUBLIC VARREF pickreplacer(VARREF iostring, const int fieldno, CVR replacement) {return iostring.r(fieldno, replacement);}
+VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR replacement);
+VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, CVR replacement);
+VARREF pickreplacer(VARREF iostring, const int fieldno, CVR replacement);
 
-PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR insertion) {return iostring.inserter(fieldno, valueno, subvalueno, insertion);}
-PUBLIC VARREF inserter(VARREF iostring, const int fieldno, const int valueno, CVR insertion) {return iostring.inserter(fieldno, valueno, insertion);}
-PUBLIC VARREF inserter(VARREF iostring, const int fieldno, CVR insertion) {return iostring.inserter(fieldno, insertion);}
+VARREF inserter(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, CVR insertion);
+VARREF inserter(VARREF iostring, const int fieldno, const int valueno, CVR insertion);
+VARREF inserter(VARREF iostring, const int fieldno, CVR insertion);
 
-// PUBLIC VARREF eraser(VARREF iostring, const int fieldno, const int valueno=0, const int
+// VARREF eraser(VARREF iostring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-PUBLIC VARREF remover(VARREF iostring, const int fieldno, const int valueno = 0, const int subvalueno = 0) {return iostring.remover(fieldno, valueno, subvalueno);}
+VARREF remover(VARREF iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-PUBLIC ND bool locate(CVR target, CVR instring) {return instring.locate(target);}
-PUBLIC bool locate(CVR target, CVR instring, VARREF setting) {return instring.locate(target, setting);}
-PUBLIC bool locate(CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0) {return instring.locate(target, setting, fieldno, valueno);}
+ND bool locate(CVR target, CVR instring);
+ND bool locate(CVR target, CVR instring, VARREF setting);
+ND bool locate(CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0);
 
-PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting) {return instring.locateby(ordercode, target, setting);}
-PUBLIC bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0) {return instring.locateby(ordercode, target, setting, fieldno, valueno);}
+ND bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting);
+ND bool locateby(const char* ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0);
 
-PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting) {return instring.locateby(ordercode, target, setting);}
-PUBLIC bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0) {return instring.locateby(ordercode, target, setting, fieldno, valueno);}
+ND bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting);
+ND bool locateby(CVR ordercode, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0);
 
-PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring) {return instring.locateusing(usingchar, target);}
-PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting) {return instring.locateusing(usingchar, target, setting);}
-PUBLIC bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno = 0, const int subvalueno = 0) {return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);}
+ND bool locateusing(CVR usingchar, CVR target, CVR instring);
+ND bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting);
+ND bool locateusing(CVR usingchar, CVR target, CVR instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-PUBLIC ND var sum(CVR instring, SV sepchar) {return instring.sum(sepchar);}
-PUBLIC ND var sum(CVR instring) {return instring.sum();}
+ND var sum(CVR instring, SV sepchar);
+ND var sum(CVR instring);
 
-PUBLIC ND var crop(CVR instring) {return instring.crop();}
-PUBLIC VARREF cropper(VARREF iostring) {return iostring.cropper();}
+ND var crop(CVR instring);
+VARREF cropper(VARREF iostring);
 
-PUBLIC ND var sort(CVR instring, SV sepchar = _FM) {return instring.sort(sepchar);}
-PUBLIC VARREF sorter(VARREF iostring, SV sepchar = _FM) {return iostring.sorter(sepchar);}
+ND var sort(CVR instring, SV sepchar DEFAULT__FM);
+VARREF sorter(VARREF iostring, SV sepchar DEFAULT__FM);
 
-PUBLIC ND var reverse(CVR instring, SV sepchar = _FM) {return instring.reverse(sepchar);}
-PUBLIC VARREF reverser(VARREF iostring, SV sepchar = _FM) {return iostring.reverser(sepchar);}
+ND var reverse(CVR instring, SV sepchar DEFAULT__FM);
+VARREF reverser(VARREF iostring, SV sepchar DEFAULT__FM);
 
-PUBLIC ND var parser(CVR instring, char sepchar = ' ') {return instring.parse(sepchar);}
-PUBLIC VARREF parser(VARREF iostring, char sepchar = ' ') {return iostring.parser(sepchar);}
+ND var parser(CVR instring, char sepchar DEFAULT_CSPACE);
+VARREF parser(VARREF iostring, char sepchar DEFAULT_CSPACE);
 
 // DATABASE
 
-PUBLIC bool connect(CVR connectionstring DEFAULT_EMPTY);
-PUBLIC void disconnect() {var().disconnect();}
-PUBLIC void disconnectall() {var().disconnectall();}
+ND bool connect(CVR connectioninfo DEFAULT_EMPTY);
+void disconnect();
+void disconnectall();
 
-PUBLIC bool dbcreate(CVR dbname) {return dbname.dbcreate(dbname);}
-PUBLIC ND var dblist() {return var().dblist();}
-PUBLIC bool dbcopy(CVR from_dbname, CVR to_dbname) {return var().dbcopy(from_dbname, to_dbname);}
-PUBLIC bool dbdelete(CVR dbname) {return var().dbdelete(dbname);}
+ND bool dbcreate(CVR dbname);
+ND var dblist();
+ND bool dbcopy(CVR from_dbname, CVR to_dbname);
+ND bool dbdelete(CVR dbname);
 
-PUBLIC bool createfile(CVR dbfilename);
-PUBLIC bool deletefile(CVR dbfilename_or_var);
-PUBLIC bool clearfile(CVR dbfilename_or_var);
-PUBLIC bool renamefile(CVR old_dbfilename, CVR new_dbfilename) {return old_dbfilename.renamefile(old_dbfilename.f(1), new_dbfilename);}
-PUBLIC ND var listfiles() {return var().listfiles();}
+ND bool createfile(CVR dbfilename);
+ND bool deletefile(CVR dbfilename_or_var);
+ND bool clearfile(CVR dbfilename_or_var);
+ND bool renamefile(CVR old_dbfilename, CVR new_dbfilename);
+ND var listfiles();
 
-PUBLIC ND var reccount(CVR dbfilename_or_var) {return dbfilename_or_var.reccount();}
+ND var reccount(CVR dbfilename_or_var);
 
-PUBLIC bool createindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY, CVR dictfilename DEFAULT_EMPTY);
-PUBLIC bool deleteindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY);
-PUBLIC ND var listindex(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) {return var().listindex(dbfilename, fieldname);}
+ND bool createindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY, CVR dictfilename DEFAULT_EMPTY);
+ND bool deleteindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY);
+ND var listindex(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
 
-PUBLIC bool begintrans() {return var().begintrans();}
-PUBLIC bool statustrans() {return var().statustrans();}
-PUBLIC bool rollbacktrans() {return var().rollbacktrans();}
-PUBLIC bool committrans() {return var().committrans();}
-PUBLIC void cleardbcache() {var().cleardbcache();}
+ND bool begintrans();
+ND bool statustrans();
+ND bool rollbacktrans();
+ND bool committrans();
+void cleardbcache();
 
-PUBLIC ND bool lock(CVR dbfilevar, CVR key) {return (bool)dbfilevar.lock(key);}
-PUBLIC void unlock(CVR dbfilevar, CVR key) {dbfilevar.unlock(key);}
-PUBLIC void unlockall() {var().unlockall();}
+ND bool lock(CVR dbfilevar, CVR key);
+void unlock(CVR dbfilevar, CVR key);
+void unlockall();
 
-PUBLIC ND bool open(CVR dbfilename, VARREF dbfilevar) {return dbfilevar.open(dbfilename);}
-PUBLIC ND bool open(CVR dbfilename) {return var().open(dbfilename);}
-// PUBLIC bool open(CVR dictdata, CVR dbfilename, VARREF dbfilevar);
+ND bool open(CVR dbfilename, VARREF dbfilevar);
+ND bool open(CVR dbfilename);
+// bool open(CVR dictdata, CVR dbfilename, VARREF dbfilevar);
 
-PUBLIC ND bool read(VARREF record, CVR dbfilevar, CVR key) {return record.read(dbfilevar, key);}
-PUBLIC ND bool reado(VARREF record, CVR dbfilevar, CVR key) {return record.reado(dbfilevar, key);}
-PUBLIC ND bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber) {return record.readv(dbfilevar, key, fieldnumber);}
+ND bool read(VARREF record, CVR dbfilevar, CVR key);
+ND bool reado(VARREF record, CVR dbfilevar, CVR key);
+ND bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber);
 
-PUBLIC bool write(CVR record, CVR dbfilevar, CVR key) {return record.write(dbfilevar, key);}
-PUBLIC bool writeo(CVR record, CVR dbfilevar, CVR key) {return record.writeo(dbfilevar, key);}
-PUBLIC bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno) {return record.writev(dbfilevar, key, fieldno);}
-PUBLIC ND bool updaterecord(CVR record, CVR dbfilevar, CVR key) {return record.updaterecord(dbfilevar, key);}
-PUBLIC ND bool insertrecord(CVR record, CVR dbfilevar, CVR key) {return record.insertrecord(dbfilevar, key);}
+bool write(CVR record, CVR dbfilevar, CVR key);
+bool writeo(CVR record, CVR dbfilevar, CVR key);
+bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno);
+ND bool updaterecord(CVR record, CVR dbfilevar, CVR key);
+ND bool insertrecord(CVR record, CVR dbfilevar, CVR key);
 
-PUBLIC ND bool dimread(dim& dimrecord, CVR dbfilevar, CVR key) {return dimrecord.read(dbfilevar, key);}
-PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key) {return dimrecord.write(dbfilevar, key);}
+ND bool dimread(dim& dimrecord, CVR dbfilevar, CVR key);
+ND bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
-// PUBLIC bool select(CVR sortselectclause DEFAULT_EMPTY);
-// PUBLIC void clearselect();
-// PUBLIC bool readnext(VARREF key);
-// PUBLIC bool readnext(VARREF key, VARREF valueno);
-// PUBLIC bool readnext(VARREF record, VARREF key, VARREF value);
-// PUBLIC bool deleterecord(CVR dbfilename_or_var_or_command, CVR key DEFAULT_EMPTY);
+// bool select(CVR sortselectclause DEFAULT_EMPTY);
+// void clearselect();
+// bool readnext(VARREF key);
+// bool readnext(VARREF key, VARREF valueno);
+// bool readnext(VARREF record, VARREF key, VARREF value);
+// bool deleterecord(CVR dbfilename_or_var_or_command, CVR key DEFAULT_EMPTY);
 
-PUBLIC ND var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode);
-PUBLIC ND var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode);
+ND var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode);
+ND var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode);
 
-PUBLIC ND const var lasterror() {return var().lasterror();}
-PUBLIC const var loglasterror(CVR source = "") {return var().loglasterror(source);}
+ND const var lasterror();
+const var loglasterror(CVR source DEFAULT_SPACE);
 
 ////////////////////////////////////////////
 //output(args), outputl(args), outputt(args)
@@ -477,7 +470,7 @@ PUBLIC const var loglasterror(CVR source = "") {return var().loglasterror(source
 // output(args...)
 
 template <typename... Printable>
-PUBLIC void output(const Printable&... value) {
+void output(const Printable&... value) {
 	LOCKIOSTREAM
 	(var(value).output(), ...);
 }
@@ -485,7 +478,7 @@ PUBLIC void output(const Printable&... value) {
 // outputl(args) appends \n and flushes output
 
 template <typename... Printable>
-PUBLIC void outputl(const Printable&... value) {
+void outputl(const Printable&... value) {
 	LOCKIOSTREAM
 	(var(value).output(), ...);
 	var("").outputl();
@@ -494,7 +487,7 @@ PUBLIC void outputl(const Printable&... value) {
 // outputt(args)  \t separator appends nothing
 
 template <typename... Printable>
-PUBLIC void outputt(const Printable&... value) {
+void outputt(const Printable&... value) {
 	LOCKIOSTREAM
 	(var(value).outputt(), ...);
 	//var("").outputt();
@@ -520,8 +513,8 @@ PUBLIC void outputt(const Printable&... value) {
 
 // printl(args) to cout
 
-template <auto sep = ' ', typename Printable, typename... Additional>
-PUBLIC void printl(const Printable& value, const Additional&... values) {
+template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+void printl(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cout << value;
 	((std::cout << sep << values), ...);
@@ -530,8 +523,8 @@ PUBLIC void printl(const Printable& value, const Additional&... values) {
 
 // errputl(args) to cerr
 
-template <auto sep = ' ', typename Printable, typename... Additional>
-PUBLIC void errputl(const Printable& value, const Additional&... values) {
+template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+void errputl(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cerr << value;
 	((std::cerr << sep << values), ...);
@@ -540,8 +533,8 @@ PUBLIC void errputl(const Printable& value, const Additional&... values) {
 
 // logputl(args) to clog
 
-template <auto sep = ' ', typename Printable, typename... Additional>
-PUBLIC void logputl(const Printable& value, const Additional&... values) {
+template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+void logputl(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::clog << value;
 	((std::clog << sep << values), ...);
@@ -559,8 +552,8 @@ PUBLIC void logputl(const Printable& value, const Additional&... values) {
 
 // print(args) to cout
 
-template <auto sep = ' ', typename Printable, typename... Additional>
-PUBLIC void print(const Printable& value, const Additional&... values) {
+template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+void print(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cout << value;
 	((std::cout << sep << values), ...);
@@ -568,8 +561,8 @@ PUBLIC void print(const Printable& value, const Additional&... values) {
 
 // errput(args) to cerr
 
-template <auto sep = ' ', typename Printable, typename... Additional>
-PUBLIC void errput(const Printable& value, const Additional&... values) {
+template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+void errput(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cerr << value;
 	((std::cerr << sep << values), ...);
@@ -577,8 +570,8 @@ PUBLIC void errput(const Printable& value, const Additional&... values) {
 
 // logput(args) to clog
 
-template <auto sep = ' ', typename Printable, typename... Additional>
-PUBLIC void logput(const Printable& value, const Additional&... values) {
+template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+void logput(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::clog << value;
 	((std::clog << sep << values), ...);
@@ -593,21 +586,21 @@ PUBLIC void logput(const Printable& value, const Additional&... values) {
 
 // printl() to cout
 
-PUBLIC void printl() {
+void printl() {
 	LOCKIOSTREAM
 	std::cout << std::endl;
 }
 
 // errputl() to cerr
 
-PUBLIC void errputl() {
+void errputl() {
 	LOCKIOSTREAM
 	std::cerr << std::endl;
 }
 
 // logputl() to clog
 
-PUBLIC void logputl() {
+void logputl() {
 	LOCKIOSTREAM
 	std::clog << std::endl;
 }
@@ -624,7 +617,7 @@ PUBLIC void logputl() {
 // printt(args) to cout
 
 template <auto sep = '\t', typename... Printable>
-PUBLIC void printt(const Printable&... values) {
+void printt(const Printable&... values) {
 	LOCKIOSTREAM
 	((std::cout << values << sep), ...);
 }
@@ -641,7 +634,7 @@ PUBLIC void printt(const Printable&... values) {
 // printt() to cout
 
 template <auto sep = '\t'>
-PUBLIC void printt() {
+void printt() {
 	LOCKIOSTREAM
 	std::cout << sep;
 }

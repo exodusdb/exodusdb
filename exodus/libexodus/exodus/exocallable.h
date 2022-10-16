@@ -95,111 +95,119 @@ using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
 // programs
 using ExodusProgramBaseCreateDeleteFunction = auto (*)(pExodusProgramBase&, ExoEnv&, pExodusProgramBaseMemberFunction&) -> void;
 
-class PUBLIC CallableBase {
+class PUBLIC Callable {
 
-	//TODO remove this
-	friend ExodusProgramBase;
+ protected:
 
- public:
-    // only public for rather hacked mvipc getResponseToRequest()
     mutable ExoEnv* mv_;
 
- public:
-
-	// Default
-	CallableBase();
-
-	// Destructor
-	// destructors of base classes must be virtual (if derived classes are going to be
-	// new/deleted?) otherwise the destructor of the derived class is not called when it should
-	// be
-	virtual ~CallableBase();
-
-	// Copy constructor
-	CallableBase(const CallableBase&) = delete;
-
-	// Constructor to provide everything immediately
-	CallableBase(const std::string libname, const std::string funcname, ExoEnv& mv);
-
-	// Constructor to provide library and function names immediately
-	CallableBase(const std::string libname, const std::string funcname);
-
-	// constructor to provide environment immediately
-	CallableBase(ExoEnv& mv);
-
-	// Assignment
-	// to allow function name to be assigned a name and this name is the name of the library
-	// called pickos call @
-	virtual void operator=(const char* libname);
-
- protected:
-	// for call or die (smf)
-	bool init(const char* libraryname, const char* functionname, ExoEnv& mv);
-	//bool init(const char* libraryname, const char* functionname);
-
-	// assumes name and mv setup on initialisation then opens library on first call
-	bool init();
-
-	// for dict/perform/execute (external shared member functions)
-	// forcenew used by perform/execute to delete and create new object each time
-	// so that global variables start out unassigned each time performed/executed
-	bool initsmf(const char* libraryname, const char* functionname, const bool forcenew = false);
-
-	// external shared global functions (not member functions)
-	bool initsgf(const char* libraryname, const char* functionname);
-
-	// TODO move to private
-	void closelib();
-
  private:
-	bool openlib(std::string libraryname);
-	bool openfunc(std::string functionname);
-	void closefunc();
 
- //protected:
-	bool checkload(std::string libraryname, std::string functionname);
+	// Records the library opened so we can close and reopen new libraries automatically
+	std::string libname_;
 
-	// call shared member function
-	var callsmf();
+	// Records the function opened so we can close and reopen new function automatically
+	std::string funcname_;
 
-	// call shared global function
-	var callsgf();
+	// Path to or searched for library file name
+	std::string libfilepath_;
 
-	/*
-	//constructor to provide library and function names immediately
-	CallableBase(const std::string libname,const std::string funcname);
-	*/
+	// Pointer to the shared lib file
+	void* plib_;
 
-	// only public for rather hacked mvipc getResponseToRequest()
-	//mutable ExoEnv* mv_;
-
-	// TODO move to private
-	// records the library opened so we can close and reopen new libraries automatically
-	std::string libraryname_;
-
- private:
-	// normally something like
-	// exodusprogrambasecreatedelete_
-	// or exodusprogrambasecreatedelete_{dictid}
-	// one function is used to create and delete the shared library object
-	std::string functionname_;
-
-	// internal memory of the actual library file name. only used for error messages
-	std::string libraryfilename_;
-	// pointer to the shared library file
-	void* plibrary_;
-
- protected:
-	// functioname_ is used to open a dl shared function to this point
+	// Function used to create and delete the ExodusProgramBase object
 	ExodusProgramBaseCreateDeleteFunction pfunction_;
 
-// public:
-	// holds the
-	// not used if callable is calling global functions in the shared object
+ protected:
+
+	// Not used if callable is calling global functions in the shared object
 	pExodusProgramBase pobject_;
 	pExodusProgramBaseMemberFunction pmemberfunction_;
 
-	std::string libfilename(std::string libraryname) const;
+ public:
+
+	///////////////////////////
+	// Special Member Functions
+	///////////////////////////
+
+	// 1. Default Constructor
+
+	Callable();
+
+	// 2. Destructor
+
+	// Destructors of base classes must be virtual (if derived classes are going to be
+	// new/deleted?) otherwise the destructor of the derived class is not called when it should
+	// be
+	virtual ~Callable();
+
+	// 3. Copy and Move constructors - deleted
+
+	Callable(const Callable&) = delete;
+
+
+	//////////////////////
+	// Custom Constructors
+	//////////////////////
+
+	// Constructor to provide everything immediately
+	Callable(const std::string_view libname, const std::string_view funcname, ExoEnv& mv);
+
+	// Constructor to provide library and function names immediately
+	Callable(const std::string_view libname, const std::string_view funcname);
+
+	// Constructor to provide environment immediately
+	Callable(ExoEnv& mv);
+
+
+	/////////////
+	// Assignment
+	/////////////
+
+	// Allow actual lib/func called to be changed at will at runtime
+	// PickOS 'call @xxxx(...)' calls lib/func named in the variable xxx
+	// PickOS 'call xxxx(...)' calls lib/func actually called xxx
+	virtual void operator=(const char* libname);
+
+	///////////////
+	// Other public
+	///////////////
+
+	// For dict/perform/execute (external shared member functions)
+	// forcenew used by perform/execute to delete and create new object each time
+	// so that global variables start out unassigned each time performed/executed
+	bool initsmf(ExoEnv& mv, const char* libname, const char* funcname, const bool forcenew = false);
+
+	// Call a shared member function
+	var callsmf();
+
+	// Call a shared global function
+	var callsgf();
+
+	// Build a path to the shared library file
+	std::string libfilepath(const std::string_view libname) const;
+
+ protected:
+
+	// Assumes name and mv setup on initialisation then opens library on first call
+	bool init();
+
+	// Call or die (smf)
+	bool init(const char* libname, const char* funcname, ExoEnv& mv);
+
+	// External shared global functions (not member functions)
+	bool initsgf(const char* libname, const char* funcname);
+
+private:
+
+	bool openlib(const std::string libname);
+	void closelib();
+
+	bool openfunc(const std::string funcname);
+	void closefunc();
+
+	bool checkload(const std::string libname, const std::string funcname);
+
 };
 
 }  // namespace exodus

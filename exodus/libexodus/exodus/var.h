@@ -56,6 +56,12 @@ THE SOFTWARE.
 
 #endif // not windows
 
+//#ifndef EXO_VAR_CPP
+#	define EXTERN extern
+//#else
+//#	define EXTERN
+//#endif
+
 // #define EXO_SNITCH
 #ifdef EXO_SNITCH
 #	include <iostream> // only for debugging
@@ -1880,40 +1886,40 @@ class PUBLIC var final {
 	// should these be like extract, replace, insert, delete
 	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY)
 	ND bool locate(CVR target) const;
-	bool locate(CVR target, VARREF setting) const;
-	bool locate(CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
+	ND bool locate(CVR target, VARREF setting) const;
+	ND bool locate(CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
 
-	bool locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
-	bool locateusing(const char* usingchar, CVR target) const;
+	ND bool locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locateusing(const char* usingchar, CVR target) const;
 
 	// locateby without fieldno or valueno arguments uses character VM
-	bool locateby(const char* ordercode, CVR target, VARREF setting) const;
+	ND bool locateby(const char* ordercode, CVR target, VARREF setting) const;
 
 	// locateby with fieldno=0 uses character FM
-	bool locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
+	ND bool locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
 
 	// locatebyusing
-	bool locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// DATABASE ACCESS
 	//////////////////
 
-	bool connect(CVR conninfo DEFAULT_EMPTY);
+	ND bool connect(CVR conninfo DEFAULT_EMPTY);
 	void disconnect();
 	void disconnectall();
 
-	bool attach(CVR filenames);
+	ND bool attach(CVR filenames);
 	void detach(CVR filenames);
 
 	// var() is a db connection or default connection
-	bool begintrans() const;
-	bool rollbacktrans() const;
-	bool committrans() const;
-	bool statustrans() const;
+	ND bool begintrans() const;
+	ND bool rollbacktrans() const;
+	ND bool committrans() const;
+	ND bool statustrans() const;
 	void cleardbcache() const;
 
-	bool sqlexec(CVR sqlcmd) const;
-	bool sqlexec(CVR sqlcmd, VARREF response) const;
+	ND bool sqlexec(CVR sqlcmd) const;
+	ND bool sqlexec(CVR sqlcmd, VARREF response) const;
 
 	ND const var lasterror() const;
 	const var loglasterror(CVR source DEFAULT_EMPTY) const;
@@ -1921,19 +1927,19 @@ class PUBLIC var final {
 	// DATABASE MANAGEMENT
 	//////////////////////
 
-	bool dbcreate(CVR dbname) const;
+	ND bool dbcreate(CVR dbname) const;
 	ND var dblist() const;
-	bool dbcopy(CVR from_dbname, CVR to_dbname) const;
-	bool dbdelete(CVR dbname) const;
+	ND bool dbcopy(CVR from_dbname, CVR to_dbname) const;
+	ND bool dbdelete(CVR dbname) const;
 
-	bool createfile(CVR filename) const;
-	bool renamefile(CVR filename, CVR newfilename) const;
-	bool deletefile(CVR filename) const;
-	bool clearfile(CVR filename) const;
+	ND bool createfile(CVR filename) const;
+	ND bool renamefile(CVR filename, CVR newfilename) const;
+	ND bool deletefile(CVR filename) const;
+	ND bool clearfile(CVR filename) const;
 	ND var listfiles() const;
 
-	bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY) const;
-	bool deleteindex(CVR fieldname) const;
+	ND bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY) const;
+	ND bool deleteindex(CVR fieldname) const;
 	ND var listindex(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
 
 	// bool selftest() const;
@@ -1977,7 +1983,7 @@ class PUBLIC var final {
 	// DATABASE SORT/SELECT
 	///////////////////////
 
-	bool select(CVR sortselectclause DEFAULT_EMPTY);
+	ND bool select(CVR sortselectclause DEFAULT_EMPTY);
 	void clearselect();
 
 	//ND bool hasnext() const;
@@ -1987,10 +1993,10 @@ class PUBLIC var final {
 	ND bool readnext(VARREF record, VARREF key, VARREF valueno);
 
 	bool savelist(CVR listname);
-	bool getlist(CVR listname);
-	bool makelist(CVR listname, CVR keys);
+	ND bool getlist(CVR listname);
+	ND bool makelist(CVR listname, CVR keys);
 	bool deletelist(CVR listname) const;
-	bool formlist(CVR keys, CVR fieldno = 0);
+	ND bool formlist(CVR keys, CVR fieldno = 0);
 
 	//bool saveselect(CVR filename);
 
@@ -2010,8 +2016,8 @@ class PUBLIC var final {
 	/////////////////
 
 	ND bool osopen(CVR filename, const char* locale DEFAULT_EMPTY) const;
-	bool osbread(CVR osfilevar, VARREF offset, const int length);
-	bool osbwrite(CVR osfilevar, VARREF offset) const;
+	ND bool osbread(CVR osfilevar, VARREF offset, const int length);
+	ND bool osbwrite(CVR osfilevar, VARREF offset) const;
 	void osclose() const;
 
 	//ND bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
@@ -2030,25 +2036,25 @@ class PUBLIC var final {
 	ND var osfile() const;
 	ND var osdir() const;
 	ND var osinfo() const;
-	bool osmkdir() const;
-	bool osrmdir(bool evenifnotempty = false) const;
+	ND bool osmkdir() const;
+	ND bool osrmdir(bool evenifnotempty = false) const;
 
 	// TODO check for threadsafe
 	ND var ospid() const;
 	ND var oscwd() const;
-	bool oscwd(CVR newpath) const;
+	ND bool oscwd(CVR newpath) const;
 	void osflush() const;
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
 
-	bool osshell() const;
-	bool osshellread(CVR oscmd);
-	bool osshellwrite(CVR oscmd) const;
+	ND bool osshell() const;
+	ND bool osshellread(CVR oscmd);
+	ND bool osshellwrite(CVR oscmd) const;
 	ND var ostempdirpath() const;
 	ND var ostempfilename() const;
 
-	bool osgetenv(const char* code);
+	ND bool osgetenv(const char* code);
 	void ossetenv(const char* code) const;
 
 
@@ -2141,7 +2147,7 @@ class PUBLIC var final {
 	void createString() const;
 
 	ND bool cursorexists();//database, not terminal
-	bool selectx(CVR fieldnames, CVR sortselectclause);
+	ND bool selectx(CVR fieldnames, CVR sortselectclause);
 
 	const var setlasterror(CVR msg) const;
 
@@ -2263,6 +2269,12 @@ class PUBLIC var_iter {
 	//iter++
 	var_iter operator++();
 
+	//iter-- prefix
+	var_iter operator--();
+
+	//--iter postfix
+	var_iter operator--(int);
+
 }; // class var_iter
 
 //class var_proxy1 - replace or extract fn
@@ -2380,16 +2392,28 @@ class PUBLIC var_proxy3 {
 }; // class var_proxy3
 
 // var versions of separator characters. Must be after class declaration
-thread_local inline const var RM = RM_;
-thread_local inline const var FM = FM_;
-thread_local inline const var VM = VM_;
-thread_local inline const var SM = SM_;
-thread_local inline const var TM = TM_;
-thread_local inline const var ST = ST_;
+	PUBLIC extern const var RM;
+	PUBLIC extern const var FM;
+	PUBLIC extern const var VM;
+	PUBLIC extern const var SM;
+	PUBLIC extern const var TM;
+	PUBLIC extern const var ST;
 
-thread_local inline const var BS = BS_;
-thread_local inline const var DQ = DQ_;
-thread_local inline const var SQ = SQ_;
+	PUBLIC extern const var BS;
+	PUBLIC extern const var DQ;
+	PUBLIC extern const var SQ;
+#ifdef EXO_VAR_CPP
+	const var RM = RM_;
+	const var FM = FM_;
+	const var VM = VM_;
+	const var SM = SM_;
+	const var TM = TM_;
+	const var ST = ST_;
+
+	const var BS = BS_;
+	const var DQ = DQ_;
+	const var SQ = SQ_;
+#endif
 
 // A global flag used in mvdbpostgres
 [[maybe_unused]] static inline int DBTRACE = var().osgetenv("EXO_DBTRACE");

@@ -3,18 +3,15 @@
 #define EXODUSDLFUNC_IOCONV_CUSTOM_H
 
 // a member variable/object to cache a pointer/object for the shared library function
-// CallableBase Callable_ioconv_custom;
-class Callable_ioconv_custom : public CallableBase {
+// Callable Callable_ioconv_custom;
+class Callable_ioconv_custom : public Callable {
    public:
 	Callable_ioconv_custom(ExoEnv& mv)
-		: CallableBase("ioconv_custom", "exodusprogrambasecreatedelete_", mv) {
+		: Callable("ioconv_custom", "exodusprogrambasecreatedelete_", mv) {
 	}
 
-	Callable_ioconv_custom& operator=(CVR newlibraryname) {
-		closelib();
-		libraryname_ = newlibraryname.toString();
-		return (*this);
-	}
+	// Allow assignment of library name to override the default constructed
+	using Callable::operator=;
 
 	// a member function with the right arguments, returning a var or void
 	var operator()(in type, in input, in mode, out output) {

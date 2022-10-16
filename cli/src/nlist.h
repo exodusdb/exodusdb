@@ -4,7 +4,7 @@
 
 // A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly.
 
-class Callable_nlist : public CallableBase
+class Callable_nlist : public Callable
 {
 public:
 
@@ -12,10 +12,10 @@ public:
 // 1. the name of the shared library to open,
 // 2. the name of the function within the shared library that will create an exodus program object,
 // 3. and the current program's mv environment to share with it.
-Callable_nlist(ExoEnv& mv) : CallableBase("nlist", "exodusprogrambasecreatedelete_", mv) {}
+Callable_nlist(ExoEnv& mv) : Callable("nlist", "exodusprogrambasecreatedelete_", mv) {}
 
 // Allow assignment of library name to override the default constructed
-using CallableBase::operator=;
+using Callable::operator=;
 
 // A callable member function with the right arguments, returning a var or void
 var operator() ()

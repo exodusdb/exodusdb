@@ -187,6 +187,8 @@ function main() {
 		// no-xxxxxxxx means switch off warning xxxxxxxx
 		basicoptions ^= " -Wno-unknown-pragmas";
 		basicoptions ^= " -Wno-cast-function-type";
+		// Minor space savings
+		basicoptions ^= " -fvisibility=hidden -ffunction-sections -fdata-sections";
 
 		//not available on gcc 4.1.2 TODO work out gcc version
 		//basicoptions^=" -Wno-unused-parameters"; //dont want if functions dont use their parameters
@@ -989,7 +991,7 @@ function main() {
 							_EOL
 							_EOL "/" "/ A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
 							_EOL
-							_EOL "class Callable_funcx : public CallableBase"
+							_EOL "class Callable_funcx : public Callable"
 							_EOL "{"
 							_EOL "public:"
 							_EOL
@@ -997,10 +999,10 @@ function main() {
 							_EOL "/" "/ 1. the name of the shared library to open,"
 							_EOL "/" "/ 2. the name of the function within the shared library that will create an exodus program object,"
 							_EOL "/" "/ 3. and the current program's mv environment to share with it."
-							_EOL "Callable_funcx(ExoEnv& mv) : CallableBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+							_EOL "Callable_funcx(ExoEnv& mv) : Callable(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
 							_EOL
 							_EOL "/" "/ Allow assignment of library name to override the default constructed"
-							_EOL "using CallableBase::operator=;"
+							_EOL "using Callable::operator=;"
 							_EOL
 							_EOL "/" "/ A callable member function with the right arguments, returning a var or void"
 							_EOL "var operator() (in arg1=var(), out arg2=var(), out arg3=var())"

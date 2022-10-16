@@ -258,6 +258,47 @@ programinit()
 		assert(var(2.1) - 1.1   eq 1.0);
 	}
 
+	{
+		// INCREMENTING ITER (var_iter)
+
+		var rec = "^aa^^cc^"_var;
+		auto i = begin(rec);
+
+		TRACE(*i);//
+		assert(*i eq "");
+		++i;
+		TRACE(*i);//aa
+		assert(*i eq "aa");
+		++i;
+		TRACE(*i);//
+		assert(*i eq "");
+		++i;
+		TRACE(*i);//cc
+		assert(*i eq "cc");
+		++i;
+		TRACE(*i);//
+		assert(*i eq "");
+		//++i; //throws
+		//TRACE(*i);//
+
+		//DECREMENTING ITER
+
+		--i;
+		TRACE(*i);//cc
+		assert(*i eq "cc");
+		--i;
+		TRACE(*i);//
+		assert(*i eq "");
+		--i;
+		TRACE(*i);//aa
+		assert(*i eq "aa");
+		--i;
+		TRACE(*i);//
+		assert(*i eq "");
+		//--i; //throws
+		//TRACE(*i);//
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

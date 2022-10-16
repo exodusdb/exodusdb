@@ -39,8 +39,8 @@ THE SOFTWARE.
 // external subroutines since external subroutines are implemented in exodus
 // as member functions which require special coding to be called from global functions
 
-//#define TRACING 0
-#define TRACING 1
+#define TRACING 0
+//#define TRACING 5
 
 #include <iostream>
 
@@ -117,42 +117,42 @@ namespace exodus {
 // using namespace exodus;
 
 // default constructor.  probably followed by .init(libname,funcname,mv)
-CallableBase::CallableBase()
+Callable::Callable()
 	// TODO optimise by only initialise one and detect usage on that only
-	: mv_(nullptr), libraryname_(""), functionname_(""), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
+	: mv_(nullptr), libname_(""), funcname_(""), plib_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
 // constructor to provide everything immediately
-CallableBase::CallableBase(const std::string libname, const std::string funcname, ExoEnv& mv)
-	: mv_(&mv), libraryname_(libname), functionname_(funcname), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
+Callable::Callable(const std::string_view libname, const std::string_view funcname, ExoEnv& mv)
+	: mv_(&mv), libname_(libname), funcname_(funcname), plib_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
 // constructor to provide library name and function immediately
-CallableBase::CallableBase(const std::string libname, const std::string funcname)
-	: mv_(nullptr), libraryname_(libname), functionname_(funcname), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
+Callable::Callable(const std::string_view libname, const std::string_view funcname)
+	: mv_(nullptr), libname_(libname), funcname_(funcname), plib_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
 // constructor to provide environment immediately. probably followed by .init(libname,funcname)
-CallableBase::CallableBase(ExoEnv& mv)
-	: mv_(&mv), libraryname_(""), functionname_(""), plibrary_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
+Callable::Callable(ExoEnv& mv)
+	: mv_(&mv), libname_(""), funcname_(""), plib_(nullptr), pfunction_(nullptr), pobject_(nullptr), pmemberfunction_(nullptr) {
 	pobject_ = 0;
 }
 
-CallableBase::~CallableBase() {
+Callable::~Callable() {
 	// will delete any shared object first
 	closelib();
 }
 
 // atm designed to be called once only the first time an external function is called
-bool CallableBase::init(const char* newlibraryname, const char* newfunctionname, ExoEnv& mv) {
+bool Callable::init(const char* newlibname, const char* newfuncname, ExoEnv& mv) {
 #if TRACING >= 4
-	std::cout << "exocallable:init(lib,func)  " << libraryname_ << ", " << functionname_ << std::endl;
+	std::cout << "exocallable:init(lib,func)  " << libname_ << ", " << funcname_ << std::endl;
 #endif
 	mv_ = &mv;
-	checkload(newlibraryname, newfunctionname);
+	checkload(newlibname, newfuncname);
 
 	// call a function in the library to create one of its "exodus program" objects
 	// nb we MUST call the same library to delete it
@@ -171,7 +171,7 @@ bool CallableBase::init(const char* newlibraryname, const char* newfunctionname,
 		return false;
 
 #if TRACING >= 3
-	std::cout << "exocallable:init(lib,func)OK" << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
+	std::cout << "exocallable:init(lib,func)OK" << libname_ << ", " << funcname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
 #endif
 	return true;
 }
@@ -179,11 +179,11 @@ bool CallableBase::init(const char* newlibraryname, const char* newfunctionname,
 // called from every library .h file if _pmemberfunction is nullptr
 // atm designed to be called once only the first time an external function is called
 // assuming library and function names and mv are already set
-bool CallableBase::init() {
+bool Callable::init() {
 #if TRACING >= 4
-	std::cout << "exocallable:init()          " << libraryname_ << ", " << functionname_ << std::endl;
+	std::cout << "exocallable:init()          " << libname_ << ", " << funcname_ << std::endl;
 #endif
-	checkload(libraryname_, functionname_);
+	checkload(libname_, funcname_);
 
 	// call a function in the library to create one of its "exodus program" objects
 	// nb we MUST call the same library to delete it
@@ -200,25 +200,29 @@ bool CallableBase::init() {
 	// CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
 	if (pobject_ == nullptr || pmemberfunction_ == nullptr) {
 #if TRACING >= 1
-		std::cout << "exocallable:init() NOK " << libraryname_ << ", " << functionname_ << std::endl;
+		std::cout << "exocallable:init() NOK " << libname_ << ", " << funcname_ << std::endl;
 #endif
 		return false;
 	}
 #if TRACING >= 3
-	std::cout << "exocallable:init()          " << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
+	std::cout << "exocallable:init()          " << libname_ << ", " << funcname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
 #endif
 	return true;
 }
 
 // called by dict/perform/execute ... can be called repeatably since buffers lib and func
 // perform/execute call with forcenew=true to ensure global variables are unassigned initially
-bool CallableBase::initsmf(const char* newlibraryname, const char* newfunctionname, const bool forcenew) {
+bool Callable::initsmf(ExoEnv& mv, const char* newlibname, const char* newfuncname, const bool forcenew) {
 
 #if TRACING >= 4
-	std::cout << "exocallable:initsmf: === in === " << newlibraryname << std::endl;
+	std::cout << "exocallable:initsmf: === in === " << newlibname << std::endl;
 #endif
 
-	if (newlibraryname != libraryname_ && !openlib(newlibraryname)) {
+	// Get our environment in place first because the library/function cache is within it
+	mv_ = &mv;
+
+	// Open the library
+	if (newlibname != libname_ && !openlib(newlibname)) {
 		return false;
 	}
 
@@ -226,8 +230,8 @@ bool CallableBase::initsmf(const char* newlibraryname, const char* newfunctionna
 	// forcenew is used in perform/execute to ensure that all global variables
 	// are initialised ie performing the same command twice
 	// starts from scratch each time
-	if (forcenew || newfunctionname != functionname_) {
-		if (!openfunc(newfunctionname)) {
+	if (forcenew || newfuncname != funcname_) {
+		if (!openfunc(newfuncname)) {
 			return false;
 		}
 		// call a function in the library to create one of its "exodus program" objects
@@ -249,14 +253,14 @@ bool CallableBase::initsmf(const char* newlibraryname, const char* newfunctionna
 			return false;
 
 #if TRACING >= 1
-			std::cout << "exocallable:initsmf: ko: no pobject_" << libraryname_ << " "
-					  << functionname_ << std::endl;
+			std::cout << "exocallable:initsmf: ko: no pobject_" << libname_ << " "
+					  << funcname_ << std::endl;
 #endif
 		}
 	}
 
 #if TRACING >= 3
-	std::cout << "exocallable:initsmf()       " << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
+	std::cout << "exocallable:initsmf()       " << libname_ << ", " << funcname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
 #endif
 
 	return true;
@@ -264,13 +268,13 @@ bool CallableBase::initsmf(const char* newlibraryname, const char* newfunctionna
 
 // this version just gets a pointer to an external shared global function
 // not used atm?
-bool CallableBase::initsgf(const char* newlibraryname, const char* newfunctionname) {
-	if (newlibraryname != libraryname_ and !openlib(newlibraryname)) {
+bool Callable::initsgf(const char* newlibname, const char* newfuncname) {
+	if (newlibname != libname_ and !openlib(newlibname)) {
 		return false;
 	}
 
 	// make sure we have the right program object creation/deletion function
-	if (newfunctionname != functionname_ and !openfunc(newfunctionname)) {
+	if (newfuncname != funcname_ and !openfunc(newfuncname)) {
 		return false;
 	}
 
@@ -278,72 +282,74 @@ bool CallableBase::initsgf(const char* newlibraryname, const char* newfunctionna
 }
 
 // assign (case sensitive)
-// pickos xxx="functionname"; call @xxx
-void CallableBase::operator=(const char* newlibraryname) {
-	if (newlibraryname != libraryname_) {
+// pickos xxx="funcname"; call @xxx
+void Callable::operator=(const char* newlibname) {
+	if (newlibname != libname_) {
 		closelib();
-		libraryname_ = newlibraryname;
+		libname_ = newlibname;
 	}
 	return;
 }
 
-bool CallableBase::checkload(std::string newlibraryname, std::string newfunctionname) {
+bool Callable::checkload(const std::string newlibname, const std::string newfuncname) {
 #if TRACING >= 4
-	std::cout << "exocallable:checkload: in>" << newlibraryname << " " << newfunctionname
+	std::cout << "exocallable:checkload: in>" << newlibname << " " << newfuncname
 			  << std::endl;
 #endif
 
 	// find the library or fail
-	if (not openlib(newlibraryname)) {
+	if (not openlib(newlibname)) {
 
 #if TRACING >= 1
-		std::cout << "exocallable:checkload: ko:" << newlibraryname << std::endl;
+		std::cout << "exocallable:checkload: ko:" << newlibname << std::endl;
 #endif
 
-		throw VarError("Unable to load " ^ var(libraryfilename_));
+		throw VarError("Unable to load " ^ var(libfilepath_));
 		return false;
 	}
 
 	// find the function or fail
-	if (not openfunc(newfunctionname)) {
+	if (not openfunc(newfuncname)) {
 #if TRACING >= 1
-		std::cout << "exocallable:checkload: ko:" << libraryname_ << " " << newfunctionname
+		std::cout << "exocallable:checkload: ko:" << libname_ << " " << newfuncname
 				  << std::endl;
 #endif
 
-		throw VarError("Unable to find function " ^ var(newfunctionname) ^ " in " ^
-					  var(libraryfilename_));
+		throw VarError("Unable to find function " ^ var(newfuncname) ^ " in " ^
+					  var(libfilepath_));
 		return false;
 	}
 
 #if TRACING >= 4
-	std::cout << "exocallable:checkload: ok<" << libraryname_ << std::endl;
+	std::cout << "exocallable:checkload: ok<" << libname_ << std::endl;
 #endif
 
 	return true;
 }
 
-std::string CallableBase::libfilename(std::string libraryname) const {
+std::string Callable::libfilepath(const std::string_view libname) const {
 
 	//look for lib file in ~/lib/libXXXXXX.so
-	std::string libfilename = EXODUSLIBPREFIX + libraryname + EXODUSLIBEXT;
-	if (libfilename[0] == '~') {
+	std::string libfilepath = EXODUSLIBPREFIX;
+	libfilepath += libname;
+	libfilepath += EXODUSLIBEXT;
+	if (libfilepath[0] == '~') {
 		// env string is copied into string so following getenv usage is safe
 		var exo_HOME;
 		if (not exo_HOME.osgetenv("EXO_HOME"))
 			exo_HOME.osgetenv("HOME");
-		libfilename.replace(0, 1, exo_HOME.toString());
+		libfilepath.replace(0, 1, exo_HOME.toString());
 	}
 
-	return libfilename;
+	return libfilepath;
 }
 
-bool CallableBase::openlib(std::string newlibraryname) {
+bool Callable::openlib(const std::string newlibname) {
 
 	//uses a cache in mv_->dlopen_cache
 
 #if TRACING >= 4
-	std::cout << "exocallable:openlib: >>> in >>> " << newlibraryname << std::endl;
+	std::cout << "exocallable:openlib: >>> in >>> " << newlibname << std::endl;
 #endif
 
 	// open the library or return 0
@@ -360,34 +366,38 @@ bool CallableBase::openlib(std::string newlibraryname) {
 		LOCKDLCACHE
 
 		//look for library in cache
-		auto cacheentry = mv_->dlopen_cache.find(newlibraryname);
+		auto cacheentry = mv_->dlopen_cache.find(newlibname);
 		if (cacheentry != mv_->dlopen_cache.end()) {
 			//std::cout << "using dlopen cache for " << newlibraryname << std::endl;
-			plibrary_ = mv_->dlopen_cache.at(newlibraryname);
-			libraryname_ = newlibraryname;
+			plib_ = mv_->dlopen_cache.at(newlibname);
+			libname_ = newlibname;
 			return true;
 		}
 	}
 
 	//look for lib file in ~/lib/libXXXXXX.so
-//	libraryfilename_ = EXODUSLIBPREFIX + newlibraryname + EXODUSLIBEXT;
-//	if (libraryfilename_[0] == '~') {
+//	libraryfilepath_ = EXODUSLIBPREFIX + newlibname + EXODUSLIBEXT;
+//	if (libfilepath_[0] == '~') {
 //		// env string is copied into string so following getenv usage is safe
 //		var exo_HOME;
 //		if (not exo_HOME.osgetenv("EXO_HOME"))
 //			exo_HOME.osgetenv("HOME");
-//		libraryfilename_.replace(0, 1, exo_HOME.toString());
-//		//var(libraryfilename_).logputl();
+//		libfilepath_.replace(0, 1, exo_HOME.toString());
+//		//var(libfilepath_).logputl();
 //	}
-	libraryfilename_ = libfilename(newlibraryname);
+	libfilepath_ = libfilepath(newlibname);
 
-//	FILE* file = fopen(libraryfilename_.c_str(), "r");
+#if TRACING >= 4
+	std::cout << "exocallable:openlib: libfilepath_ now " << libfilepath_ << std::endl;
+#endif
+
+//	FILE* file = fopen(libfilepath_.c_str(), "r");
 //	if (file)
 //		fclose(file);
 //	else
-//		libraryfilename_ = "lib" + newlibraryname + EXODUSLIBEXT;
+//		libfilepath_ = "lib" + newlibname + EXODUSLIBEXT;
 
-	// var(libraryfilename_).logputl();
+	// var(libfilepath_).logputl();
 
 		// RTLD_NOW
 	// All necessary relocations shall be performed when the object is first loaded.
@@ -395,24 +405,24 @@ bool CallableBase::openlib(std::string newlibraryname) {
 	// referenced. This behavior may be useful for applications that need to know as soon as an
 	// object is loaded that all symbols referenced during execution are available.
 	// RTLD_LAZY|RTLD_LOCAL may be a better option
-	plibrary_ = (void*)dlopen(libraryfilename_.c_str(), RTLD_NOW);
+	plib_ = (void*)dlopen(libfilepath_.c_str(), RTLD_NOW);
 
 	// Try without path in case the library is system installed e.g. in /usr/local/lib
 	std::size_t fnpos0;
-	std::string purelibraryfilename;
-	if (plibrary_ == nullptr) {
+	std::string purelibfilename;
+	if (plib_ == nullptr) {
 
-		fnpos0 = libraryfilename_.rfind(OSSLASH_);
-		if (fnpos0 != std::string::npos && fnpos0 != libraryfilename_.size() - 1) {
+		fnpos0 = libfilepath_.rfind(OSSLASH_);
+		if (fnpos0 != std::string::npos && fnpos0 != libfilepath_.size() - 1) {
 
 			// In two places
-			purelibraryfilename = libraryfilename_.substr(fnpos0 + 1);
+			purelibfilename = libfilepath_.substr(fnpos0 + 1);
 
 			//TRACE(purelibraryfilename)
-			plibrary_ = (void*)dlopen(purelibraryfilename.c_str(), RTLD_NOW);
+			plib_ = (void*)dlopen(purelibfilename.c_str(), RTLD_NOW);
 
 //			// Try on the same path as the executable
-//			if (plibrary_ == nullptr) {
+//			if (plib_ == nullptr) {
 //			}
 		}
 	}
@@ -425,18 +435,18 @@ bool CallableBase::openlib(std::string newlibraryname) {
 		var(dlsym_error).errputl();
 #endif
 
-	if (plibrary_ == nullptr) {
+	if (plib_ == nullptr) {
 		//#if TRACING >= 1
-		//		std::cerr << "exocallable:openlib: <<< ko <<< " << libraryfilename_ << std::endl;
+		//		std::cerr << "exocallable:openlib: <<< ko <<< " << libfilepath_ << std::endl;
 		//#endif
-		// std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
-		var libraryfilename = libraryfilename_;
-		if (libraryfilename.osfile())
-			throw VarError(libraryfilename ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
-			^ libraryfilename ^ "' to check its sublibs are available. Also run 'nm -C " ^ libraryfilename ^ "' to check its content.)"
+		// std::cerr<<libfilepath_<<" cannot be found or cannot be opened"<<std::endl;
+		var libfilepath = libfilepath_;
+		if (libfilepath.osfile())
+			throw VarError(libfilepath ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
+			^ libfilepath ^ "' to check its sublibs are available. Also run 'nm -C " ^ libfilepath ^ "' to check its content.)"
 			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exodus::var::var()");
 		else {
-			throw VarError(libraryfilename ^ " does not exist or cannot be found, or " ^ purelibraryfilename ^ " cannot be linked/wrong version?");
+			throw VarError(libfilepath ^ " does not exist or cannot be found, or " ^ purelibfilename ^ " cannot be linked/wrong version?");
 		}
 		return false;
 	}
@@ -446,26 +456,26 @@ bool CallableBase::openlib(std::string newlibraryname) {
 		//no need for this?
 		LOCKDLCACHE
 
-		mv_->dlopen_cache[newlibraryname] = plibrary_;
+		mv_->dlopen_cache[newlibname] = plib_;
 	}
 
-	libraryname_ = newlibraryname;
+	libname_ = newlibname;
 
 #if TRACING >= 3
-	std::cout << "exocallable:dlopen()        " << libraryname_ << ", " << plibrary_ << std::endl;
+	std::cout << "exocallable:dlopen()        " << libname_ << ", " << plib_ << std::endl;
 #endif
 
 	return true;
 }
 
-bool CallableBase::openfunc(std::string newfunctionname) {
+bool Callable::openfunc(const std::string newfuncname) {
 
 #if TRACING >= 4
-	std::cout << "exocallable:openfunc: >>> in >>> " << libraryname_ << std::endl;
+	std::cout << "exocallable:openfunc: >>> in >>> " << libname_ << std::endl;
 #endif
 
 	// find the function and return true/false
-	// pfunction_ = (EXODUSFUNCTYPE) dlsym(plibrary_, functionname_.c_str());
+	// pfunction_ = (EXODUSFUNCTYPE) dlsym(plib_, funcname_.c_str());
 
 	// close any existing function
 	closefunc();
@@ -474,11 +484,11 @@ bool CallableBase::openfunc(std::string newfunctionname) {
 	dlerror();
 #endif
 
-	// var(libraryfilename_)^" "^var(newfunctionname).logputl();
+	// var(libfilepath_)^" "^var(newfuncname).logputl();
 
-	// pfunction_ = (void*) dlsym((library_t) plibrary_, newfunctionname.c_str());
-	pfunction_ = (ExodusProgramBaseCreateDeleteFunction)dlsym((library_t)plibrary_,
-															  newfunctionname.c_str());
+	// pfunction_ = (void*) dlsym((lib_t) plib_, newfuncname.c_str());
+	pfunction_ = (ExodusProgramBaseCreateDeleteFunction)dlsym((library_t)plib_,
+															  newfuncname.c_str());
 
 #ifdef DLERROR
 	const char* dlsym_error = dlerror();
@@ -488,28 +498,28 @@ bool CallableBase::openfunc(std::string newfunctionname) {
 
 	if (pfunction_ == nullptr) {
 		//#if TRACING >= 1
-		//		std::cout << "exocallable:openfunc: <<< ko <<< " << libraryname_ << " " << newfunctionname
+		//		std::cout << "exocallable:openfunc: <<< ko <<< " << libname_ << " " << newfuncname
 		//			  << std::endl;
 		//#endif
 
-		// std::cerr<<functionname_<<" function cannot be found in
-		// "<<libraryfilename_<<std::endl;
-		throw VarError(var(newfunctionname).replace("exodusprogrambasecreatedelete_", "").quote() ^ " function cannot be found in lib " ^
-					  var(libraryfilename_).quote());
+		// std::cerr<<funcname_<<" function cannot be found in
+		// "<<libfilepath_<<std::endl;
+		throw VarError(var(newfuncname).replace("exodusprogrambasecreatedelete_", "").quote() ^ " function cannot be found in lib " ^
+					  var(libfilepath_).quote());
 		return false;
 	}
 
-	functionname_ = newfunctionname;
+	funcname_ = newfuncname;
 
 #if TRACING >= 3
-	std::cout << "exocallable:dlsym           " << libraryname_ << ", " << functionname_ << " " << pfunction_ << std::endl;
+	std::cout << "exocallable:dlsym           " << libname_ << ", " << funcname_ << " " << pfunction_ << std::endl;
 #endif
 
 	return true;
 }
 
 // call shared global function (not used atm)
-var CallableBase::callsgf() {
+var Callable::callsgf() {
 	// dictionaries are libraries of subroutines (ie return void) that
 	// have one argument "ExoEnv". They set their response in ANS.
 	// they are global functions and receive mv environment reference as their one and only
@@ -517,7 +527,7 @@ var CallableBase::callsgf() {
 	using ExodusDynamic = var (*)(ExoEnv & mv);
 
 #if TRACING >= 3
-	std::cout << "exocallable:CALLING SGF " << libraryname_ << ", " << functionname_ << std::endl;
+	std::cout << "exocallable:CALLING SGF " << libname_ << ", " << funcname_ << std::endl;
 #endif
 
 	// call the function via its pointer
@@ -529,14 +539,14 @@ var CallableBase::callsgf() {
 }
 
 // call shared member function
-var CallableBase::callsmf() {
+var Callable::callsmf() {
 	// define a function type (pExodusProgramBaseMemberFunction)
 	// that can call the shared library object member function
 	// with the right arguments and returning a var
 	//using pExodusProgramBaseMemberFunction = var (ExodusProgramBase::*)();
 
 #if TRACING >= 3
-	std::cout << "exocallable:callsmf()       " << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
+	std::cout << "exocallable:callsmf()       " << libname_ << ", " << funcname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
 #endif
 
 	// call the shared library object main function with the right args, returning a var
@@ -544,7 +554,7 @@ var CallableBase::callsmf() {
 							  ((pExodusProgramBaseMemberFunction)(pmemberfunction_)))();
 }
 
-void CallableBase::closelib() {
+void Callable::closelib() {
 
 	//does not actually close any library but does close the function object
 	//since libraries are cached in mv_->dlopen_cache
@@ -556,32 +566,32 @@ void CallableBase::closelib() {
 	closefunc();
 
 	// close any existing connection to the (cached) library
-	if (plibrary_ != nullptr) {
+	if (plib_ != nullptr) {
 		//#if TRACING >= 2
-		//		std::cout << "exocallable:CLOSED LIBRARY  " << libraryname_ << " " << plibrary_ << std::endl;
+		//		std::cout << "exocallable:CLOSED LIBRARY  " << libname_ << " " << plib_ << std::endl;
 		//#endif
-		//dlclose((library_t)plibrary_);
+		//dlclose((lib_t)plib_);
 
 		// record the library share no longer exists
-		plibrary_ = nullptr;
+		plib_ = nullptr;
 
 	} else {
 		//#if TRACING >= 5
-		//		std::cout << "exocallable:close not required for library : " << libraryname_ << std::endl;
+		//		std::cout << "exocallable:close not required for library : " << libname_ << std::endl;
 		//#endif
 	}
 	// flag that this library is no longer connected
-	libraryname_ = "";
+	libname_ = "";
 }
 
 // actually this deletes any shared object created by the shared global function
-void CallableBase::closefunc() {
+void Callable::closefunc() {
 	// the *library* function must be called to delete the object that it created
 	//(cant delete the object in the main process since it might have a different memory
 	// allocator)
 	if (pobject_ != nullptr) {
 #if TRACING >= 2
-		std::cout << "exocallable:CLOSED function " << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
+		std::cout << "exocallable:CLOSED function " << libname_ << ", " << funcname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
 #endif
 		// second call will delete
 		pfunction_(pobject_, *mv_, pmemberfunction_);
@@ -590,11 +600,11 @@ void CallableBase::closefunc() {
 
 	} else {
 #if TRACING >= 5
-		std::cout << "exocallable:close function not required for function in library : " << libraryname_ << std::endl;
+		std::cout << "exocallable:closefunc: not required for function in library : " << libname_ << std::endl;
 #endif
 	}
 	// record this function (and object) no longer exists
-	// functionname_="";
+	// funcname_="";
 }
 
 }  // namespace exodus

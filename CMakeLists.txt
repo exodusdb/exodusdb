@@ -54,7 +54,8 @@
 
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wconversion -Wextra -g -march=native")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden") # Force g++ to hide by default
-	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")               # Link time optimisation. very slow and no observed performance increase
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections") # linker reduces size of output
+	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")               # Link time optimisation. Makes linking of libexodus.so very slow
 
 #
 # Coverage testing
