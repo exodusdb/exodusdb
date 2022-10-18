@@ -38,7 +38,7 @@
 	# See /usr/share/cmake-3.16/Modules/FindPostgreSQL.cmake for documentation
 
 	message("POSTGRES")
-	set(PostgreSQL_ADDITIONAL_VERSIONS "15" "14")
+	set(PostgreSQL_ADDITIONAL_VERSIONS "14.5")
 	find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
 	#message(" PostgreSQL_LIBRARY_DIRS=${PostgreSQL_LIBRARY_DIRS}")
 	message(" PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES}")
