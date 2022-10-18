@@ -16,7 +16,7 @@ programinit()
 
 	printl();
 
-	int nn = 1000000;
+	int nn = 1'000'000;
 	var setup_time;
 
 	bool   the_truth_hurts = false;
@@ -71,7 +71,7 @@ programinit()
 
 	printl("Exp: 650  ns - Conversion of double var 12345.67 to string and return length (Using RYU D2S on Ubuntu 20.04/g++v9.3 and std::to_chars on Ubuntu 22.04/g++v11.2)");
 	{
-		var nn		= 10'000'000;
+		var nn		= 100'000;
 		var started = ostime();
 		for (int ii = 0; ii < nn; ii++) {
 			some_char = var(12345.67).toChar();
@@ -96,7 +96,7 @@ programinit()
 			printl();
 			for (int repeatn = 0; repeatn < 3; repeatn++) {
 
-				int nn = 100'000'000;
+				int nn = 1'000'000;
 
 				int i1 = 1;
 				//			double d1 = 0;
@@ -114,7 +114,7 @@ programinit()
 					case 0:
 						if (repeatn eq 0)
 							printl("Exp: 35     ns - old var method - for (var;;)");
-						nn = 10'000'000;
+						nn = 1'000'000;
 						for (var v2 = 0; v2 <= nn; v2++) {
 							i1 = v2;
 						};
