@@ -517,9 +517,10 @@ programinit()
 	}
 
 	{
-		var bt = backtrace();
-		printl(bt);
-		assert(bt.match(R"__(\d+:\s+test_except.cpp:\d+: var bt = backtrace\(\);)__", ""));
+		var backtracex = backtrace();
+		TRACE(backtracex)
+		// Not available if built without -g option for including debugging info
+		//assert(bt.match(R"__(\d+:\s+test_except.cpp:\d+: var bt = backtrace\(\);)__", ""));
 	}
 
 	printl(elapsedtimetext());

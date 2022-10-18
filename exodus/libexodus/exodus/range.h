@@ -15,7 +15,6 @@ class PUBLIC range {
 
 	int first_;
 	int last_;
-	int inc_;
 
  public:
 
@@ -48,7 +47,7 @@ class PUBLIC range {
 	};
 
 	// Construct a range from two ints
-	range(int_t first, int_t last, int_t inc = 0) : first_(first), last_(last + 1), inc_(inc) {}
+	range(int_t first, int_t last) : first_(first), last_(last + 1){}
 
 	// Return our first int
 	Iterator begin() { return Iterator(first_); }

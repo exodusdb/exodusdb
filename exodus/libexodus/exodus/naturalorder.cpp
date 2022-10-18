@@ -180,7 +180,7 @@ void appenddouble2sortstring(const double& double1, std::ostringstream& stringst
 	stringstream1 << integer1;
 }
 
-PUBLIC ND std::string naturalorder(const std::string& string1) {
+ND PUBLIC std::string naturalorder(const std::string& string1) {
 
 	// using goto here to break out of multiple embedded loops
 	// since c/c++ break/continue is unable to do this

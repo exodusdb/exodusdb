@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iomanip>
 #include <limits>
+#include <sstream>
 
 // 1. TO_CHARS from Ubuntu 22.04
 #if __GNUC__ >= 11

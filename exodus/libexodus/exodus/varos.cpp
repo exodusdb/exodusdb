@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <codecvt>
 
 //used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>

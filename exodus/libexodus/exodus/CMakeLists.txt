@@ -35,76 +35,70 @@
 # POSTGRES
 # ########
 #
+	# See /usr/share/cmake-3.16/Modules/FindPostgreSQL.cmake for documentation
+
+	message("POSTGRES")
 	##set(PostgreSQL_ADDITIONAL_VERSIONS "9.3" "9.3.4")
-	##find_package(PostgreSQL REQUIRED)
-	##find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
-	#message(PostgreSQL_INCLUDE_DIRS=${PostgreSQL_INCLUDE_DIRS})
-	execute_process(
-	        COMMAND                 pg_config --includedir
-	        OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
-	        OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
-	message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
-	include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR} ../../../fast_float/include)
+	find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+	#message(" PostgreSQL_LIBRARY_DIRS=${PostgreSQL_LIBRARY_DIRS}")
+	message(" PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES}")
+	message(" PostgreSQL_INCLUDEDIRS=${PostgreSQL_INCLUDE_DIRS}")
+	message(" PostgreSQL_VERSION_STRING=${PostgreSQL_VERSION_STRING}")
+	include_directories(${PostgreSQL_INCLUDE_DIRS})
 
 #
 # BOOST
 # #####
 #
-	#date_time appears to be header only in later boost versions eg 55
-	#find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
-	#find_package(Boost REQUIRED COMPONENTS filesystem system regex thread)
-	#find_package(Boost REQUIRED COMPONENTS system regex thread locale)
-	#find_package(Boost REQUIRED COMPONENTS filesystem system regex locale)
-	#find_package(Boost REQUIRED COMPONENTS filesystem regex locale)
-	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
-	message("BUT LOOKING IN /usr/local/lib and /usr/local/include FIRST!")
+	# See /usr/share/cmake-3.16/Modules/FindBoost.cmake for documentation
 
-	set(Boost_USE_STATIC_LIBS        ON)
-	set(Boost_USE_MULTITHREADED      ON)
-	set(Boost_USE_STATIC_RUNTIME     ON)
+	message("BOOST")
+	set(Boost_USE_STATIC_LIBS         OFF)
+	set(Boost Boost_USE_DEBUG_LIBS    OFF)
+	set(Boost_USE_MULTITHREADED       ON)
+	set(Boost_USE_STATIC_RUNTIME      OFF)
+	set(Boost_Boost_USE_DEBUG_RUNTIME OFF)
+	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
+
+	#message(" Boost_LIBRARY_DIRS=${Boost_LIBRARY_DIRS}")
+	message(" Boost_LIBRARIES=${Boost_LIBRARIES}")
+	message(" Boost_INCLUDEDIR=${Boost_INCLUDE_DIR}")
+	message(" Boost_VERSION=${Boost_VERSION}")
+	include_directories(${BOOST_INCLUDE_DIR})
 
 #
 # ICU
 # ###
 #
-	#FindICU.cmake in cmake directory look in three levels of parent directories of source too
-	#set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};cmake;${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/../cmake/;${PROJECT_SOURCE_DIR}/../../cmake;${PROJECT_SOURCE_DIR}/../../../cmake")
+	message("OTHER")
 	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 	#note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
-	message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
-	#NOICU find_package(ICU 4.4 REQUIRED)
+	message(" CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
 
 #
 # RYU
 # ###
 #
 	find_library(RYU_LIBRARIES NAMES ryu)
-	message(${RYU_LIBRARIES})
-	#find_library(RYULIBRARIES NAMES ryu ryu_parse)
+	message(" RYU_LIBRARIES=${RYU_LIBRARIES}")
 
 #
-# Define an output called exodus of type shared library - list all its source files
-# ######################################################
+# A shared library output called exodus - list all its source files
+# #################################################################
 #
 	add_library(exodus SHARED
-		# mvutf.cpp
-		# ConvertUTF.c
-		# mvlocale.cpp
-		#big ones first for efficient parallel compilation
+		# Big ones first for efficient parallel compilation
 		exoprog.cpp
 		vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
 		var.cpp dim.cpp varnum.cpp varmath.cpp mvdebug.cpp
 		varchrono.cpp
 		varfuncs.cpp varioconv.cpp
-		#exoenv.cpp exofuncs.cpp exoos.cpp
 		exoenv.cpp exofuncs.cpp
-		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp #mvbrackets.cpp
-		# mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
+		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp
 		murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
 		varoshandle.cpp vardbconn.cpp mvprocessno.cpp
 		variter.cpp
-		# little ones last for quick parallel finishing
+		# Little ones last for quick parallel finishing
 		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 	)
 
@@ -112,19 +106,12 @@
 # Specify what libraries are to be linked in when building libexodus
 # ##################################################################
 #
-	message("Boost_LIBRARIES=${Boost_LIBRARIES}")
-	#postgres libraries seem not to be set but we include -pq directly to solve
-	message("PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES}")
-	message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
-	#NOICU message("ICU_LIBRARIES=${ICU_LIBRARIES}")
-	#pq is needed for postgresql client library code
+	include_directories(. .. ../../../fast_float/include)
 	#dl is needed for dynamic link library code
-	#target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
-	#if (RYU_LIBRARIES STREQUAL "NOTFOUND")
 	if (RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-NOTFOUND")
-		target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
+		target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} dl)
 	else()
-		target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl ${RYU_LIBRARIES})
+		target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} dl ${RYU_LIBRARIES})
 	endif()
 
 #
@@ -178,8 +165,8 @@
 	)
 
 	# In libexodus and cli now that both install into lib
-	install(CODE
-	"
+	install(
+		CODE "
 	        execute_process(
 	            COMMAND
 	                ldconfig
@@ -187,7 +174,8 @@
 	                ERROR_VARIABLE ERRVAR
 	                RESULT_VARIABLE RESVAR
 	        )
-	        message(ldconfig <\${OUTVAR}>\n
+	        message(
+				ldconfig <\${OUTVAR}>\n
 	            <\${ERRVAR}>\n
 	            <\${RESVAR}>\n
 	        )
@@ -196,6 +184,7 @@
 
 # 6. CLEAN OUT ANY HOME DIR FILES THAT MAY SHADOW THE REAL FILE IN /usr/local/...
 #################################################################################
+#
     install(
         CODE "
             execute_process(

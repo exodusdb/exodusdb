@@ -58,28 +58,28 @@ class PUBLIC ExodusProgramBase {
 
  public:
 
-	// mv.xyz is going to be used a lot by exodus programmers for exodus "global variables"
-	// eg mv.RECORD mv.DICT
+	// mv.XXXXXX is going to be used a lot by exodus programmers for exodus "global variables"
+	// e.g. mv.RECORD mv.DICT etc.
 	//
-	// threadsafe! it is member data so it is global to the class/object and not global to the
-	// program
+	// Threadsafe. Environment vars are member data so they are "global" to the
+	// ExoProgram class/object and not global to the program.
 	//
-	// it is a reference/pointer so that an external "subroutine" can be created which has
+	// Not using thread_local for ExoProgram environment so they are safe even if you have
+	// multiple ExodusProgram with different environments in the same thread.
+	// However vardb.cpp uses a lot of threadlocal storage for database connectivity.
+	//
+	// External "subroutine" ExodusProgram objects in shared libraries can be created which has
 	// identical exodus global variables to the "main program" as far as the exodus application
-	// programmer thinks
+	// programmer can tell.
 	//
-	// being a reference ensures that exodus programs cannot exist without an mv
-	// however this restriction might be relaxed
+	// mv being a reference ensures that exodus programs cannot exist without an mv
 	//
-	// mv was initially a reference so that exodus application programmers could writew
-	// things like mv.ID (instead of the harder to understand, for an application programmer,
-	// mv->ID style) however now that a macro is used to generate mv.ID from just ID we could
-	// make mv to be a pointer and assign it as and when desired we would just need to change
-	//#define ID mv.ID
-	// to
-	//#define ID mv->ID
-	// so that ID RECORD etc. continue to appear to the application programmer to be "threadsafe
-	// global" variables
+	// Using a reference instead of a pointer allows debugging via mv.ID instead of mv->ID
+	//
+	// Macros are provided for all env vars like
+	// #define ID mv.ID
+	// to allow code to be written without the mv. prefix for readability
+	// #define ID mv->ID //This form is not required because mv is reference.
 	ExoEnv& mv;
 
  public:
@@ -109,8 +109,11 @@ class PUBLIC ExodusProgramBase {
 
 	explicit ExodusProgramBase(ExoEnv& inmv);
 	explicit ExodusProgramBase(ExoEnv&& inmv) = delete;
-	//ExodusProgramBase();
-	ExodusProgramBase() = default;
+
+	// No default constructor
+	// data member mv is a reference and we only provide constructors for preexisting ExoEnv.
+	//ExodusProgramBase() = default;
+	ExodusProgramBase() = delete;
 
 	// doing virtual isnt much use because external functions (which are based on
 	// ExodusProgramBase) need to have complete freedom of arguments to main(...) virtual var

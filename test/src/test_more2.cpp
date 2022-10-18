@@ -23,6 +23,7 @@ programinit()
 
 	//move constructor
 	{
+		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move
 		var x = std::move(var("xyz"));
 		assert(x eq "xyz");
 	}
@@ -30,6 +31,7 @@ programinit()
 	//move assign
 	{
 		var x;
+		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move
 		x = std::move(var("xyz"));
 		assert(x eq "xyz");
 	}

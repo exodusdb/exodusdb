@@ -4904,7 +4904,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 
 	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
-		return "";
+		return false;
 
 	// Avoid generating sql errors since they abort transactions
 	if (!this->cursorexists())
@@ -5172,7 +5172,7 @@ bool var::cursorexists() {
 
 	auto pgconn = get_pgconn(*this);
 	if (! pgconn)
-		return "";
+		return false;
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 	var sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ cursorcode ^ "'";

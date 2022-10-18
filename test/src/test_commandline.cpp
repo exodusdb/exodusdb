@@ -13,14 +13,22 @@ function main() {
 		return 0;
 	}
 
+	var env = osgetenv();
 	TRACE(osgetenv("PATH"))
-	TRACE(osgetenv())
+	TRACE(env)
 	TRACE(oslist())
+	assert(env.fcount(FM));
+
+	TRACE(COMMAND)
 	TRACE(EXECPATH)
 	var execdir = EXECPATH.field(OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
 //	execdir = "";
 	execdir = "./";
 	TRACE(execdir ^ "testcommandline");
+
+	if (not osfile(execdir ^ "testcommandline"))
+		abort("Test passed because testcommandline cannot be found");
+
 	assert(osshell(execdir ^ "testcommandline '(ab)'"));
 	assert(osshellread(execdir ^ "testcommandline '(ab)'") eq "testcommandline (ab)\ntestcommandline\nab\n");
 	assert(osshellread(execdir ^ "testcommandline '{ab}'") eq "testcommandline {ab}\ntestcommandline\nab\n");

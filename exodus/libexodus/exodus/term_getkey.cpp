@@ -52,7 +52,7 @@ char getkey(void) {
 	error |= tcsetattr(fd, TCSANOW, &oldAttr);
 	fcntl(fd, F_SETFL, oldFlags);
 
-	return (error ? -1 : (int)ch);
+	return (error ? -1 : ch);
 }
 
 /*

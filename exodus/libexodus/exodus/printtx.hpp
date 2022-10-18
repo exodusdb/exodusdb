@@ -168,7 +168,9 @@ subroutine printtx() {
 	tx ^= FM;
 
 	var ntxlns = tx.count(FM);
-	bodyln += ntxlns;
+	// clang error: use of overloaded operator '+=' is ambiguous (with operand types 'int' and 'exodus::var'
+	//bodyln += ntxlns;
+	bodyln = bodyln + ntxlns;
 
 	if (((bodyln == ntxlns) or (bodyln > nbodylns)) or newpage) {
 

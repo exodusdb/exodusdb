@@ -5,7 +5,7 @@ namespace exodus {
 
 PUBLIC void debug(CVR = "");
 PUBLIC void mv_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_size);
-PUBLIC ND var mv_backtrace( void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size, size_t limit = 0);
+ND PUBLIC var mv_backtrace( void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size, size_t limit = 0);
 
 // Set by signals for threads to poll
 PUBLIC inline bool TERMINATE_req = false;

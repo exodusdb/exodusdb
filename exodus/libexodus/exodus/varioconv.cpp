@@ -487,9 +487,9 @@ convert:
 
 	// rounding
 	//if (ndecimals != std::string::npos) {
-		newmv = newmv.round(static_cast<int>(ndecimals));
-		if (!(newmv.var_typ & VARTYP_STR))
-			newmv.createString();
+	newmv = newmv.round(static_cast<int>(ndecimals));
+	if (!(newmv.var_typ & VARTYP_STR))
+		newmv.createString();
 	//}
 
 	// Option to suppress zeros - if no digits 1-9

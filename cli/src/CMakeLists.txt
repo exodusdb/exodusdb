@@ -23,22 +23,6 @@
 	link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
 #
-# Determine C++ version - C++17/18 for Ubuntu 20+
-# ###############################################
-#
-	execute_process(
-	        COMMAND         grep "Ubuntu 2" /etc/lsb-release
-	        OUTPUT_VARIABLE OUTVAR
-	        ERROR_VARIABLE  ERRVAR
-	        RESULT_VARIABLE RESVAR
-	)
-	if(RESVAR EQUAL "0")
-	        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
-	else()
-	        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-	endif()
-
-#
 # 1. COMPILE
 # ##########
 #
@@ -98,7 +82,6 @@
 	add_library(htmllib2 SHARED htmllib2.cpp)
 	add_library(nlist SHARED nlist.cpp)
 	add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
-	#add_library(number SHARED number.cpp)
 
 #
 # 2. LINK
@@ -133,7 +116,6 @@
 	target_link_libraries(deletefile exodus stdc++fs ${LIBS})
 	target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
 	target_link_libraries(edir exodus stdc++fs ${LIBS})
-	#target_link_libraries(number exodus stdc++fs ${LIBS})
 	target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 	target_link_libraries(listfiles exodus stdc++fs ${LIBS})
 	target_link_libraries(listdict exodus stdc++fs ${LIBS})
@@ -205,8 +187,7 @@
 
 	# In libexodus and cli now that both install into lib
 	install(
-		CODE
-		"
+		CODE "
 			execute_process(
 				COMMAND
 					ldconfig

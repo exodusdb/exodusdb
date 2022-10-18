@@ -42,12 +42,12 @@ THE SOFTWARE.
 
 namespace exodus {
 
-PUBLIC ND int getenvironmentn();
+ND PUBLIC int getenvironmentn();
 PUBLIC void setenvironmentn(const int environmentn);
 
-PUBLIC ND int getenvironmentn(); 
-PUBLIC ND var getprocessn();
-PUBLIC ND var getexecpath();
+ND PUBLIC int getenvironmentn(); 
+ND PUBLIC var getprocessn();
+ND PUBLIC var getexecpath();
 
 // to avoid gcc 4 "warning: type attributes are honored only at type definition"
 // dont declare PUBLIC on forward declarations

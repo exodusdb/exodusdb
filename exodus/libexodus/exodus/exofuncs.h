@@ -81,7 +81,7 @@ namespace exodus {
 
 int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno);
 
-ND var osgetenv(CVR envcode DEFAULT_SPACE);
+ND var osgetenv(CVR envcode DEFAULT_EMPTY);
 ND bool osgetenv(CVR code, VARREF value);
 void ossetenv(CVR code, CVR value);
 

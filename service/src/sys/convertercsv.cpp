@@ -11,6 +11,8 @@ function main(in mode, io line, in params, in filename) {
 	//and if importing VOUCHERS, put an entry CONVERTER*VOUCHERS
 	//if DEFINITIONS with first line XYZ
 
+	if (true or line) {}
+
 	//line conversion code below
 	//
 	if (filename eq "xxxxxx") {
@@ -19,12 +21,12 @@ function main(in mode, io line, in params, in filename) {
 			}
 
 			//...
-			line = line;
+			//line = line;
 
 		} else {
 
 			//...
-			line = line;
+			//line = line;
 
 		}
 

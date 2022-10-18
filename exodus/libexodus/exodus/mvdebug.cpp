@@ -378,7 +378,7 @@ PUBLIC void breakon()  {
 }
 
 // Get a stack list on demand
-PUBLIC ND var backtrace() {
+ND PUBLIC var backtrace() {
 	VarError e("backtrace()");
 	return e.stack();
 }

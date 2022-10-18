@@ -68,11 +68,15 @@
 # Add cmake commands for every test_*.cpp present
 # ###############################################
 #
+	#message(PROJECT_LIBS="${PROJECT_LIBS}")
+
 	foreach(file ${files})
+
 		string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
 
 		add_executable(${file_without_ext} ${file})
-		target_link_libraries(${file_without_ext} ${PROJECT_LIBS} exodus)
+		#target_link_libraries(${file_without_ext} ${PROJECT_LIBS} exodus)
+		target_link_libraries(${file_without_ext} exodus)
 
 		#setup a classic test i.e. requiring output of "Test passed"
 		add_test(NAME ${file_without_ext} COMMAND ${file_without_ext} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

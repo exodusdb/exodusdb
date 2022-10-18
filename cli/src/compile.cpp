@@ -210,12 +210,31 @@ function main() {
 		//always look in header install path eg ~/inc
 		basicoptions ^= " -I" ^ incdir;
 
-		//enable function names in backtrace
-		//nopie to prevent ALSR preventing backtrace
 		if (debugging) {
-			//basicoptions^=" -g -rdynamic";
-			basicoptions ^= " -no-pie -rdynamic";
-			basicoptions ^= " -ggdb";
+
+			//nopie to prevent ALSR preventing backtrace
+			basicoptions ^= " -no-pie";
+
+			//enable function names in backtrace?
+			basicoptions ^= " -rdynamic";
+
+
+			// https://stackoverflow.com/questions/10475040/gcc-g-vs-g3-gdb-flag-what-is-the-difference
+			//basicoptions ^= " -ggdb";
+			//basicoptions ^= " -g";
+			basicoptions ^= " -g3";
+
+//clang
+//			basicoptions ^= " -Wno-bad-function-cast";
+//			basicoptions ^= " -Wno-uninitialized";
+//			basicoptions ^= " -Wno-unused-result";
+//			basicoptions ^= " -Wno-unused-value";
+//			basicoptions ^= " -Wno-unknown-warning";
+//			basicoptions ^= " -Wno-unknown-warning-option";
+//			basicoptions ^= " -Wno-unused-command-line-argument";
+//			basicoptions ^= " -Wno-unused-private-field";
+			basicoptions ^= " ";
+			basicoptions ^= " ";
 		}
 
 		//optimiser unfortunately prevents backtrace
