@@ -38,9 +38,7 @@
 	# See /usr/share/cmake-3.16/Modules/FindPostgreSQL.cmake for documentation
 
 	message("POSTGRES")
-	set(PostgreSQL_ADDITIONAL_VERSIONS "14.5")
-	find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
-	#message(" PostgreSQL_LIBRARY_DIRS=${PostgreSQL_LIBRARY_DIRS}")
+	find_package(PostgreSQL)
 	message(" PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES}")
 	message(" PostgreSQL_INCLUDEDIRS=${PostgreSQL_INCLUDE_DIRS}")
 	message(" PostgreSQL_VERSION_STRING=${PostgreSQL_VERSION_STRING}")
@@ -54,7 +52,7 @@
 
 	message("BOOST")
 	set(Boost_USE_STATIC_LIBS         OFF)
-	set(Boost Boost_USE_DEBUG_LIBS    OFF)
+	set(Boost_USE_DEBUG_LIBS          OFF)
 	set(Boost_USE_MULTITHREADED       ON)
 	set(Boost_USE_STATIC_RUNTIME      OFF)
 	set(Boost_Boost_USE_DEBUG_RUNTIME OFF)
