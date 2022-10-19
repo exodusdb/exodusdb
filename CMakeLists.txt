@@ -88,7 +88,13 @@
 #
 	# clang
 	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++") #24 bytes strings. apt install libc++-dev libc++abi-dev
+		# This requires boost to be be compiled with clang
+		#https://www.boost.org/doc/libs/1_80_0/more/getting_started/unix-variants.html
+		#
+		#./bootstrap.shwith-toolset=clang
+		#./b2 clean
+		#./b2 toolset=clang cxxflags="-stdlib=libc++" linkflags="-stdlib=libc++"
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++") #24 bytes strings. apt install libc++-dev libc++abi-dev
 	endif()
 
 #

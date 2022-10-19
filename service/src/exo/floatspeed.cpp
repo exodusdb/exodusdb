@@ -11,7 +11,7 @@ var nn = 1000;
 
 function main() {
 	//call savescreenss1, ss2);
-	printl(chr(12));
+	//printl(chr(12));
 	var ntries = 0;
 	var tot = 0;
 	var ntots = 0;
@@ -27,7 +27,11 @@ function main() {
 		ntries += 1;
 		//if ntries>2 and secs then
 		//print(ntries, AT(-40));
-		if (secs) {
+		// Using xx to defeat optimiser
+		if (secs and xx) {
+
+			// Adjust time to account for change from var to double in loop
+			secs *= 6;
 
 			print(ntries, " ");
 			tot += nn / secs;
@@ -50,7 +54,7 @@ function main() {
 	var msg = "";
 	msg(-1) = "FLOATSPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed;
 	msg(-1) = "More is faster.";
-	msg(-1) = "Typical speed for an entry level server in 2007 was 1";
+	msg(-1) = "Typical unoptimised speed for an entry level server in 2007 was 1";
 
 	call mssg(msg.oconv("L#60"));
 
@@ -62,9 +66,10 @@ function main() {
 
 subroutine getspeed() {
 	time1 = ostime();
-	for (const var ii : range(1.1, nn)) {
-		xx = ii;
-	} //ii;
+	//for (var dd = 1.1; dd < nn; ++dd) {
+	for (double dd = 1.1; dd < nn; ++dd) {
+		xx = dd;
+	} //dd;
 	time2 = ostime();
 	secs = time2 - time1;
 

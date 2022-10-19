@@ -213,28 +213,56 @@ function main() {
 		if (debugging) {
 
 			//nopie to prevent ALSR preventing backtrace
-			basicoptions ^= " -no-pie";
+			// From man g++
+			/*
+				-no-pie
+					Don't produce a dynamically linked position independent executable.
+*/
+			//basicoptions ^= " -no-pie";
 
-			//enable function names in backtrace?
-			basicoptions ^= " -rdynamic";
-
+			// Enable function names for backtrace in executables?
+			// From man g++
+			/*
+				-rdynamic
+					Pass the flag -export-dynamic to the ELF linker, on targets that support it. This instructs the linker to add all symbols, not only used ones, to the dynamic symbol table. This option is
+					needed for some uses of "dlopen" or to allow obtaining backtraces from within a program.
+			*/
+			//basicoptions ^= " -rdynamic";
 
 			// https://stackoverflow.com/questions/10475040/gcc-g-vs-g3-gdb-flag-what-is-the-difference
 			//basicoptions ^= " -ggdb";
 			//basicoptions ^= " -g";
 			basicoptions ^= " -g3";
 
-//clang
-//			basicoptions ^= " -Wno-bad-function-cast";
-//			basicoptions ^= " -Wno-uninitialized";
-//			basicoptions ^= " -Wno-unused-result";
-//			basicoptions ^= " -Wno-unused-value";
-//			basicoptions ^= " -Wno-unknown-warning";
-//			basicoptions ^= " -Wno-unknown-warning-option";
-//			basicoptions ^= " -Wno-unused-command-line-argument";
-//			basicoptions ^= " -Wno-unused-private-field";
-			basicoptions ^= " ";
-			basicoptions ^= " ";
+			// GCC
+			basicoptions ^= " -Wno-unknown-warning-option";
+
+			// CLANG
+			if (true) {
+
+				// Allow strange call to exodus shared libs
+				//basicoptions ^= " -Wno-bad-function-cast";
+
+				basicoptions ^= " -Wno-uninitialized";
+
+				// Ignore these warnings for now
+				// warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+				basicoptions ^= " -Wno-unused-result";
+
+				// Ignore warnings for now about code like
+				// open("PROCESSES") or createfile("PROCESSES");
+				// warning: expression result unused [-Wunused-value]
+				//basicoptions ^= " -Wno-unused-value";
+
+				// Ignore GCC warning flags
+				basicoptions ^= " -Wno-unknown-warning";
+
+				// Ignore GCC compile flags
+				//basicoptions ^= " -Wno-unused-command-line-argument";
+
+				// Ignore some warning related to exodus' "labelled commons"
+				basicoptions ^= " -Wno-unused-private-field";
+			}
 		}
 
 		//optimiser unfortunately prevents backtrace
@@ -243,9 +271,9 @@ function main() {
 		//basicoptions^=" -O3";
 		//-Og means optimise but has compatible with gdb
 		if (optimise > 0) {
-			if (optimise eq 1)
-				basicoptions ^= " -Og";
-			else
+//			if (optimise eq 1)
+//				basicoptions ^= " -Og";
+//			else
 				basicoptions ^= " -O" ^ optimise;
 		}
 		//}
