@@ -1977,7 +1977,7 @@ void var::cleardbcache() const {
 
 	// Warning if any cursors have not been closed/cleaned up.
 	for (auto& entry : thread_dbresults)
-		var(entry.first).errputl("WARNING: Cursor not cleaned up.");
+		var(entry.first).errputl("clearcache: WARNING: Cursor not cleaned up. Clearing it now.");
 
 	// Clean up cursors - RAII/SBRM will call PQClear on the related PGresult* objects
 	thread_dbresults.clear();

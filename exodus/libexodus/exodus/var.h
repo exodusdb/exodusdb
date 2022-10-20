@@ -395,20 +395,21 @@ class PUBLIC var final {
 		char
 		signed char
 		unsigned char
+
 		wchar_t
 		char8_t (C++20)
 		char16_t (C++11)
 		char32_t (C++11)
 
-		short
+		signed short
+		signed int
+		signed long
+		signed long long (C++11)
+
 		unsigned short
-		int
 		unsigned int
-		long
 		unsigned long
-		long long (C++11)
 		unsigned long long (C++11)
-		etc.
 	*/
 	var(I rhs)
 		:
@@ -639,22 +640,26 @@ class PUBLIC var final {
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		bool
+
 		char
 		signed char
 		unsigned char
+
 		wchar_t
 		char8_t (C++20)
 		char16_t (C++11)
 		char32_t (C++11)
-		short
+
+		signed short
+		signed int
+		signed long
+		signed long long (C++11)
+
 		unsigned short
-		int
 		unsigned int
-		long
 		unsigned long
-		long long (C++11)
 		unsigned long long (C++11)
-		etc.
+
 	*/
 	operator I() const {
 		assertInteger(__PRETTY_FUNCTION__);
@@ -1172,6 +1177,8 @@ class PUBLIC var final {
 	// they could be defined outide of var class but we leave them in for clarity
 	//
 	// note that the friend word is required to define free functions inside a class even if they do not need to be friends
+	//
+	// friend function defined in class scope can be found via argument-dependent lookup
 
 	//////////////////
 	// ITERATOR FRIEND

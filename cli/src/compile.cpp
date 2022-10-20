@@ -24,6 +24,7 @@ programinit()
 	let generateheadersonly = contains(OPTIONS, "h");
 	let force = contains(OPTIONS, "F");
 	let color_option = contains(OPTIONS, "C");
+	let warnings = count(OPTIONS, "W") - count(OPTIONS, "w");
 
 	// Source extensions
 	let src_extensions = "cpp cxx cc";
@@ -81,10 +82,15 @@ function main() {
 			"	R = Release (No symbols)\n"
 			"	O/OO/OOO = Optimisation levels (Poorer debugging/backtrace)\n"
 			"	o/oo/ooo = Unoptimise (cancels 'O's)\n"
+			"	W = Increase warnings\n"
+			"	w = Reduce warnings\n"
 			"	V = Verbose\n"
 			"	S = Silent (stars only)\n"
 			"	h = Generate headers only\n"
 			"	X = Skip compilation\n"
+			"ENVIRONMENT\n"
+			"	CXX_OPTIONS"
+			"	CXX e.g. g++, clang, c++ with or without full path"
 		);
 
 
@@ -97,9 +103,9 @@ function main() {
 	var usedeffile = false;
 
 	var compiler = "";
-	var basicoptions = osgetenv("CPP_OPTIONS");
+	var basicoptions = osgetenv("CXX_OPTIONS");
 	if (basicoptions and verbose)
-		printl("Using CPP_OPTIONS environment variable " ^ basicoptions.quote());
+		printl("Using CXX_OPTIONS environment variable " ^ basicoptions.quote());
 	var linkoptions = false;
 	var binoptions = "";
 	var liboptions = "";
@@ -149,13 +155,10 @@ function main() {
 
 		installcmd = "mv";
 
-		compiler = osgetenv("EXO_CXX");
+		compiler = osgetenv("CXX");
 		if (compiler) {
 			if (verbose)
 				printl("Using EXO_CXX environment variable for compiler " ^ compiler.quote());
-		} else if (compiler = osgetenv("CXX"); compiler) {
-			if (verbose)
-				printl("Using CXX environment variable for compiler " ^ compiler.quote());
 		} else {
 			compiler = "c++";
 #ifdef __APPLE__
@@ -179,14 +182,6 @@ function main() {
 		else
 			basicoptions ^= " -std=c++17";  //gcc 4.7 and later DISABLES gnu extensions
 
-		//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
-		basicoptions ^= " -Wall";
-		basicoptions ^= " -Wextra";
-		//basicoptions ^= " -Wpedantic"; // allow "Elvis operator" ?:
-
-		// no-xxxxxxxx means switch off warning xxxxxxxx
-		basicoptions ^= " -Wno-unknown-pragmas";
-		basicoptions ^= " -Wno-cast-function-type";
 		// Minor space savings
 		basicoptions ^= " -fvisibility=hidden -ffunction-sections -fdata-sections";
 
@@ -234,10 +229,44 @@ function main() {
 			//basicoptions ^= " -g";
 			basicoptions ^= " -g3";
 
+		} // debugging
+
+		//optimiser unfortunately prevents backtrace
+		//if (optimise) {
+		//basicoptions^=" -O1";
+		//basicoptions^=" -O3";
+		//-Og means optimise but has compatible with gdb
+		if (optimise > 0) {
+//			if (optimise eq 1)
+//				basicoptions ^= " -Og";
+//			else
+				basicoptions ^= " -O" ^ optimise;
+		}
+		//}
+
+		if (color_option)
+			basicoptions ^= " -fdiagnostics-color=always";
+
+		// Show various warnings by default or by command
+		if (warnings >= 0) {
+
+			//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
+			basicoptions ^= " -Wall";
+			basicoptions ^= " -Wextra";
+			//basicoptions ^= " -Wpedantic"; // allow "Elvis operator" ?:
+
+			// no-xxxxxxxx means switch off warning xxxxxxxx
+			basicoptions ^= " -Wno-unknown-pragmas";
+			basicoptions ^= " -Wno-cast-function-type";
+		}
+
+		// Suppress various warnings by default or by command
+		if (warnings <= 0) {
+
 			// GCC
 			basicoptions ^= " -Wno-unknown-warning-option";
 
-			// CLANG
+			// CLANG -- how to tell?
 			if (true) {
 
 				// Allow strange call to exodus shared libs
@@ -262,24 +291,10 @@ function main() {
 
 				// Ignore some warning related to exodus' "labelled commons"
 				basicoptions ^= " -Wno-unused-private-field";
-			}
-		}
 
-		//optimiser unfortunately prevents backtrace
-		//if (optimise) {
-		//basicoptions^=" -O1";
-		//basicoptions^=" -O3";
-		//-Og means optimise but has compatible with gdb
-		if (optimise > 0) {
-//			if (optimise eq 1)
-//				basicoptions ^= " -Og";
-//			else
-				basicoptions ^= " -O" ^ optimise;
-		}
-		//}
+			} //clang
 
-		if (color_option)
-			basicoptions ^= " -fdiagnostics-color=always";
+		}
 
 		//how to output to a named file
 		outputoption = " -o ";
