@@ -205,7 +205,7 @@ function main() {
 		//	linkoptions=" -lexodus-gd";
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
-		linkoptions = " -lexodus -lstdc++fs";
+		linkoptions = " -lexodus -lstdc++fs -lstdc++";
 
 		//always look in header install path eg ~/inc
 		basicoptions ^= " -I" ^ incdir;

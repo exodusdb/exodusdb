@@ -96,7 +96,7 @@ function main() {
 		return 0;
 	}
 
-	begintrans();
+	begintrans() or loglasterror();
 
 	// Process each subdir in turn. each one represents a db file.
 	if (not dirnames) {
@@ -315,7 +315,7 @@ function main() {
 	if (not generate and definitions)
 		write(date() ^ FM ^ time() on definitions, definitions_key);
 
-	committrans();
+	committrans() or loglasterror();
 
 	return 0;
 }

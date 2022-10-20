@@ -546,9 +546,10 @@ PGconn* get_pgconn(CVR dbhandle) {
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
 	// var(dbconn_no).logputl("dbconn_no1=");
 
-	// otherwise error
+	// otherwise fail
 	if (!dbconn_no)
-		throw VarDBException("pgconnection() requested when not connected.");
+//		throw VarDBException("pgconnection() requested when not connected.");
+		return nullptr;
 
 	if (DBTRACE) {
 		std::cout << std::endl;
@@ -1969,7 +1970,8 @@ void var::cleardbcache() const {
 
 	int dbconn_no = get_dbconn_no_or_default(*this);
 	if (!dbconn_no)
-		throw VarDBException("get_dbconn_no() failed in cleardbcache");
+//		throw VarDBException("get_dbconn_no() failed in cleardbcache");
+		return;
 
 	thread_dbconnector.cleardbcache(dbconn_no);
 

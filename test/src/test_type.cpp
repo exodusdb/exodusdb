@@ -1,5 +1,6 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
+#include <limits>
 
 #include <iomanip>
 
