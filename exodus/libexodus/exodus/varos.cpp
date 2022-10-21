@@ -810,8 +810,6 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 }
 
 void var::osclose() const {
-	// THISIS("void var::osclose() const")
-	// assertString(function_sig);
 	if (THIS_IS_OSFILE()) {
 		mv_handles_cache.del_handle(static_cast<int>(var_int));
 		var_int = 0L;
@@ -939,24 +937,18 @@ bool var::osmove(CVR new_dirpath_or_filepath) const {
 }
 
 bool var::osremove() const {
-	return this->osremove(*this);
-}
 
-bool var::osremove(CVR osfilename) const {
-
-	THISIS("bool var::osremove(CVR osfilename) const")
-	assertDefined(function_sig);
-	ISSTRING(osfilename)
-	osfilename.osclose();  // in case this is cached opened file handle
+	assertDefined(__PRETTY_FUNCTION__);
+	this->osclose();  // in case this is cached opened file handle
 
 	// Prevent removal of dirs. Use osrmdir for that.
-	if (std::filesystem::is_directory(osfilename.toString())) {
-		this->setlasterror(osfilename.quote() ^ " osremove failed - is a directory.");
+	if (std::filesystem::is_directory(this->toString())) {
+		this->setlasterror(this->quote() ^ " osremove failed - is a directory.");
 		return false;
 	}
 
-	if (std::remove(to_path_string(osfilename).c_str())) {
-		this->setlasterror(osfilename.quote() ^ " failed to osremove");
+	if (std::remove(to_path_string(*this).c_str())) {
+		this->setlasterror(this->quote() ^ " failed to osremove");
 		return false;
 	}
 	return true;
@@ -964,8 +956,7 @@ bool var::osremove(CVR osfilename) const {
 
 bool var::osmkdir() const {
 
-	THISIS("bool var::osmkdir() const")
-	assertString(function_sig);
+	assertString(__PRETTY_FUNCTION__);
 
 	std::filesystem::path pathx(to_path_string(*this).c_str());
 
