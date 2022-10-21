@@ -1207,9 +1207,10 @@ var ExodusProgramBase::perform(CVR sentence) {
 			// without needing to setup chains of returns
 			// to exit from nested functions
 			ANS = "";
-		} catch (const MVAbort&) {
+		} catch (const MVAbort& e) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
+			mssg(e.description);
 			ANS = "";
 		} catch (const MVAbortAll&) {
 			// similar to stop for the time being
