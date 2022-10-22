@@ -42,7 +42,7 @@ var locks;
 var styles2;
 var fields;
 
-function main(in request1, in request2, in request3, in request4, io request5, in request6="") {
+function main(in request1, in request2, in request3, in request4, io request5, in request6 = "") {
 
 	/* LISTEN COMMANDS;
 
@@ -158,7 +158,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		if (users.open("USERS", "")) {
 			//EXODUS may have no user record
 			if (not(userx.read(users, username))) {
-				{}
+				userx = "";
 			}
 		}
 

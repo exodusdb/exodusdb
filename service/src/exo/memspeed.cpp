@@ -28,7 +28,7 @@ function main() {
 		ntries += 1;
 		//if ntries>2 and secs then
 //		print(ntries, AT(-40));
-		if (secs) {
+		if (secs and xx) {
 
 			print(ntries, " ");
 			tot += nn / secs;
@@ -64,7 +64,8 @@ function main() {
 
 subroutine getspeed() {
 	time1 = ostime();
-	for (const var ii : range(1, nn)) {
+	//for (const var ii : range(1, nn)) {
+	for (int ii = 1; ii <= nn; ++ii) {
 		xx = yy;
 	} //ii;
 	time2 = ostime();

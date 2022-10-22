@@ -1503,7 +1503,7 @@ subroutine process2() {
 //	if (listenfailure) {
 //
 //	//invalid username or password or connection
-//	} else 
+//	} else
 
 	if (invaliduser) {
 		data_ = "";
@@ -2476,10 +2476,10 @@ function request_exit() {
 		call log("LISTEN", response_);
 	}
 
-	USERNAME=(listenusername);
+	USERNAME = listenusername;
 	//call sysvar('SET',109,110,listenstation)
 	//call sysvar_109_110('SET',listenstation)
-	STATION=(listenstation);
+	STATION = listenstation;
 
 	//if ucase(response[1,6])='ERROR:' then iodat=''
 
@@ -2928,7 +2928,7 @@ function openleaselocks(in file) {
 
 	// Open the leaselocks on the same connection as the data file
 	if (not(leaselocks.open("LOCKS", file))) {
-		response_="Error: LOCKS for " ^ file ^ " cannot be opened.";
+		response_ = "Error: LOCKS for " ^ file ^ " cannot be opened.";
 		//call listen4(9, response_, win.datafile);
 		return false;
 	}
