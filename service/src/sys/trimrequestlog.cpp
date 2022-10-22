@@ -25,11 +25,6 @@ function main() {
 		stop();
 	}
 
-	//osfilename=field2(file,vm,-1)[14,9999]
-	//osfilename[-3,3]=''
-	//osopen osfilename:'.lk' to lkfile else call fsmsg();stop
-	//osopen osfilename:'.ov' to ovfile else call fsmsg();stop
-
 	//stage1:
 	////////
 

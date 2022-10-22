@@ -81,8 +81,7 @@ nexttest:
 	rec = var("X").str(recsize);
 
 	if (not(tempfile.open(tempfilename, ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 
 	starttime = ostime();

@@ -30,18 +30,15 @@ function main() {
 	dictfilename = SENTENCE.field(" ", 3);
 
 	if (not(filename and dictfilename)) {
-		call mssg("Syntax is builddict sourcefilename targetdictfilename" ^ FM ^ "e.g. builddict DOS dict.ads");
-		stop();
+		abort("Syntax is builddict sourcefilename targetdictfilename" ^ FM ^ "e.g. builddict DOS dict.ads");
 	}
 
 	var file;
 	if (not(file.open(filename, ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 	if (not(DICT.open(dictfilename))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 
 	var key = dictfilename ^ ".txt";

@@ -499,13 +499,13 @@ nextline:
 			if (file eq "") {
 
 				if (not(file.open(filename, ""))) {
-					call fsmsg();
+					call mssg(lasterror());
 					win.valid = 0;
 					gosub cleanup();
 					return 0;
 				}
 				if (not(dictfile.open(dictfilename, ""))) {
-					call fsmsg();
+					call mssg(lasterror());
 					win.valid = 0;
 					gosub cleanup();
 					return 0;

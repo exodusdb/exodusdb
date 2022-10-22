@@ -42,8 +42,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 	if (listid) {
 		if (not(lists.open("LISTS", ""))) {
-			call fsmsg();
-			stop();
+			abort(lasterror());
 		}
 		listn = "";
 		keys = "";

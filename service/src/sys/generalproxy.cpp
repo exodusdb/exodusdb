@@ -166,8 +166,7 @@ function main() {
 		}
 		var todb = SYSTEM.f(63, dbn);
 		if (not todb) {
-			call mssg("\"Copy to\" database must be configured (and saved) for database " ^ copydb ^ " first");
-			stop();
+			abort("\"Copy to\" database must be configured (and saved) for database " ^ copydb ^ " first");
 		}
 
 		//ensure authorised to login to one or the other database
@@ -176,14 +175,12 @@ function main() {
 			msg_ = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
 			msg_(-1) = "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote());
 			msg_(-1) = "but you are currently logged in to database " ^ (SYSTEM.f(17).quote());
-			call mssg(msg_);
-			stop();
+			abort(msg_);
 		}
 
 		//should really have an option to close the live dataset and then copy
 		if (not(authorised("DATASET COPY", msg_, "LS"))) {
-			call mssg(msg_);
-			stop();
+			abort(msg_);
 		}
 
 		var started = time().oconv("MTS");
@@ -206,15 +203,13 @@ function main() {
 		var jobfunctionids = "";
 		var userids = data_.f(2);
 		if (not((groupids or jobfunctionids) or userids)) {
-			call mssg("You must specify some groups or users to email");
-			stop();
+			abort("You must specify some groups or users to email");
 		}
 
 		//ensure sender has an email address
 		//not absolutely necessary but provides a return email address
 		if (USERNAME ne "EXODUS" and not(USERNAME.xlate("USERS", 7, "X"))) {
-			call mssg("You cannot send email because you do not have an email address for replies");
-			stop();
+			abort("You cannot send email because you do not have an email address for replies");
 		}
 
 		//T=
@@ -240,7 +235,7 @@ function main() {
 		//For patsalides
 
 		if (not(authorised("DATASET CREATE",msg_))) {
-		    stop();
+		    abort(msg_);
 		}
 
 		var targetdbname = data_.f(1);
@@ -320,14 +315,12 @@ function main() {
 	} else if (mode eq "PASSWORDRESET") {
 
 		if (not(authorised("PASSWORD RESET", msg_))) {
-			call mssg(msg_);
-			stop();
+			abort(msg_);
 		}
 
 		var users;
 		if (not(users.open("USERS", ""))) {
-			call mssg("USERS file is missing");
-			stop();
+			abort("USERS file is missing");
 		}
 
 		ID = request_.f(2);
@@ -368,15 +361,14 @@ function main() {
 
 		if (baduseroremail) {
 			userrec.write(usersordefinitions, userkey);
-			call mssg(baduseroremail);
-			stop();
+			abort(baduseroremail);
 		}
 
 		//prewrite (locks authorisation file or fails)
 		win.valid = 1;
 		call usersubs("PREWRITE");
 		if (not(win.valid)) {
-			stop();
+			abort();
 		}
 
 		userrec.write(usersordefinitions, userkey);
@@ -422,8 +414,7 @@ function main() {
 
 	} else if (mode eq "SETCODEPAGE") {
 		if (not(sys.alanguage.open("ALANGUAGE", ""))) {
-			call fsmsg();
-			stop();
+			abort(lasterror());
 		}
 
 		var codepage = request_.f(3);
@@ -571,12 +562,12 @@ badsetcodepage:
 		win.templatex = "SECURITY";
 		call securitysubs("SETUP");
 		if (not(win.valid)) {
-			stop();
+			abort();
 		}
 		//call security.subs('LISTAUTH')
 		call securitysubs(mode);
 		if (not(win.valid)) {
-			stop();
+			abort();
 		}
 		call securitysubs("POSTAPP");
 
@@ -587,7 +578,7 @@ badsetcodepage:
 		win.templatex = "SECURITY";
 		call securitysubs("SETUP");
 		if (not(win.valid)) {
-			stop();
+			abort();
 		}
 
 		data_ = RECORD;
@@ -599,8 +590,7 @@ badsetcodepage:
 		gosub gettaskprefix();
 		if (taskprefix) {
 			if (not(authorised(taskprefix ^ " ACCESS", msg_, ""))) {
-				call mssg(msg_);
-				stop();
+				abort(msg_);
 			}
 		}
 
@@ -685,8 +675,7 @@ nextrep:
 
 		var doc;
 		if (not(doc.read(sys.documents, request_.f(2)))) {
-			call mssg("Document " ^ (request_.f(2).quote()) ^ " is missing");
-			stop();
+			abort("Document " ^ (request_.f(2).quote()) ^ " is missing");
 		}
 
 		//TODO security
@@ -701,22 +690,20 @@ nextrep:
 
 		var doc;
 		if (not(doc.read(sys.documents, request_.f(2)))) {
-			call mssg("Document " ^ (request_.f(2).quote()) ^ " is missing");
-			stop();
+			abort("Document " ^ (request_.f(2).quote()) ^ " is missing");
 		}
 
 		task = doc.f(5);
 		gosub gettaskprefix();
 		if (taskprefix) {
 			if (not(authorised(taskprefix ^ " CREATE", msg_, ""))) {
-				call mssg(msg_);
-				stop();
+				abort(msg_);
 			}
 		}
 
 		call getsubs("DEF.DOCUMENT.NO");
 		if (not(win.valid)) {
-			stop();
+			abort();
 		}
 
 		var description = doc.f(2);
@@ -741,16 +728,14 @@ nextrep:
 
 		if (not(sys.document.read(sys.documents, request_.f(2)))) {
 			msg_ = "Document " ^ (request_.f(2).quote()) ^ " does not exist";
-			call mssg(msg_);
-			stop();
+			abort(msg_);
 		}
 
 		task = sys.document.f(5);
 		gosub gettaskprefix();
 		if (taskprefix) {
 			if (not(authorised(taskprefix ^ " ACCESS", msg_, ""))) {
-				call mssg(msg_);
-				stop();
+				abort(msg_);
 			}
 		}
 
@@ -881,8 +866,6 @@ performreport:
 /////
 exit:
 /////
-	stop();
-
 	return "";
 }
 
@@ -925,18 +908,18 @@ subroutine initlog() {
 		var logtoyear = tt2.oconv("D").last(4);
 		if (logyear ne logtoyear) {
 			response_ = "Dates must be within one calendar year";
-			stop();
+			abort();
 		}
 	}
 
 	if (not(authorised("LOG ACCESS", msg_, ""))) {
 		response_ = msg_;
-		stop();
+		abort();
 	}
 
 	if (not(authorised("LOG ACCESS " ^ (logkey.quote()), msg_, ""))) {
 		response_ = msg_;
-		stop();
+		abort();
 	}
 
 	return;
@@ -961,8 +944,7 @@ subroutine gettaskprefix() {
 
 subroutine opendocuments() {
 	if (not(sys.documents.open("DOCUMENTS", ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 	return;
 }

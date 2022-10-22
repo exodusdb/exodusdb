@@ -129,16 +129,13 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	}
 
 	if (not(file.open(filename, ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 	if (not(DICT.open("DICT." ^ filename, ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 	if (not(dictvoc.open("DICT.voc", ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 
 	//selectcmd='SELECT ':filename

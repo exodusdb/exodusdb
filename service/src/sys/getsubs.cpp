@@ -34,8 +34,8 @@ function main(in mode) {
 
 	if (sys.documents.unassigned()) {
 		if (not(sys.documents.open("DOCUMENTS", ""))) {
-			call fsmsg();
 			win.valid = 0;
+			mssg(lasterror());
 			return 0;
 		}
 	}

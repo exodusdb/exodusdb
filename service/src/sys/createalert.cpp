@@ -45,8 +45,7 @@ function main() {
 		if (not silent) {
 			var xx;
 			if (not(xx.read(sys.documents, alertid))) {
-				call fsmsg();
-				stop();
+				abort(alertid.quote() ^ " document doesnt exist");
 			}
 		}
 
@@ -81,8 +80,7 @@ syntax:
 
 	var users;
 	if (not(users.open("USERS", ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 
 	if (not targetusercodes) {

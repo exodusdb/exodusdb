@@ -41,11 +41,11 @@ function main(in mode0) {
 	nkeywords = keywords.fcount(VM);
 
 	if (not(openfile("CHANGELOG", changelog))) {
-		call fsmsg();
+		call mssg(lasterror());
 		return 0;
 	}
 	if (not(openfile("DICT.CHANGELOG", DICT))) {
-		call fsmsg();
+		call mssg(lasterror());
 		return 0;
 	}
 

@@ -52,8 +52,6 @@ function main(in docids0="", in options0="") {
 	//LISTEN calls this every minute
 	//print 'autorun'
 
-
-
 	if (docids0.unassigned()) {
 		docids = "";
 	} else {
@@ -78,18 +76,10 @@ function main(in docids0="", in options0="") {
 
 	var users;
 	if (not(users.open("USERS", ""))) {
-		call fsmsg();
+		call mssg(lasterror());
 		return 0;
 	}
 
-	//if (not(sys.markets.open("MARKETS", ""))) {
-	//	if (not(APPLICATION eq "ACCOUNTS")) {
-	//		call fsmsg();
-	//	}
-	//	sys.markets = "";
-	//	return 0;
-	//}
-	
 	var datasetcode = SYSTEM.f(17);
 	if (not datasetcode) {
 		printl("========== DATASETCODE MISSING ==========");

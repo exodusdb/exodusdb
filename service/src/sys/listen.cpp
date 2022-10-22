@@ -350,7 +350,7 @@ function main_init() {
 	}
 	webpath.converter("/", OSSLASH);
 	if (not(voc.open("VOC", ""))) {
-		call fsmsg();
+		call mssg(lasterror());
 		//gosub main_exit();
 		return false;
 	}
@@ -406,7 +406,7 @@ function main_init() {
 	//image=''
 
 	if (not(openfile("LOCKS", locks1, "DEFINITIONS", 1))) {
-		call fsmsg();
+		call mssg(lasterror());
 		//gosub main_exit();
 		return false;
 	}
@@ -2863,7 +2863,7 @@ nolock:
 	response_ = "OK";
 	lockrec.write(leaselocks, lockkey);
 	if (FILEERROR) {
-		call fsmsg();
+		call mssg(lasterror());
 		gosub geterrorresponse();
 	}
 
@@ -3000,7 +3000,7 @@ subroutine leaseunlock() {
 	leaselocks.deleterecord(lockkey);
 
 	if (FILEERROR) {
-		call fsmsg();
+		call mssg(lasterror());
 		gosub geterrorresponse();
 	}
 

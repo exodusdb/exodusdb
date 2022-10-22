@@ -356,7 +356,7 @@ function main() {
 		declare function decide2;
 		if decide2(@id:@fm:tx:'','',reply,2) else stop;
 		if reply=1 then;
-			open 'TEMP' to file else call fsmsg();stop;
+			open 'TEMP' to file else call abort(lasterror());
 			//writev tx on file,@id,fn
 			if @record<1>='S' then;
 				@record<8,fn>=tx;

@@ -31,13 +31,13 @@ function main(in mode, in previous0="") {
 
 	var keyfile;
 	if (not(keyfile.open(keyfilename, ""))) {
-		call fsmsg();
+		call mssg(lasterror());
 		return ANS;
 	}
 
 	var actfile;
 	if (not(actfile.open(actfilename, ""))) {
-		call fsmsg();
+		call mssg(lasterror());
 		return ANS;
 	}
 

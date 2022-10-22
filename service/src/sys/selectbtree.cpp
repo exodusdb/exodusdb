@@ -30,8 +30,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 
 	var srcdict;
 	if (not(srcdict.open("DICT." ^ filename, ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 
 	temp = indexid ^ VM ^ temp ^ FM;
@@ -51,8 +50,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 
 	var lists;
 	if (not(lists.open("LISTS", ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 	foundkeys.converter(VM, FM);
 	var listkey = "SELECTBTREE:" ^ SYSTEM.f(24);

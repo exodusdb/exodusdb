@@ -97,7 +97,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	var filename = sentencex.field(" ", 2);
 	var file;
 	if (not(file.open(filename, ""))) {
-		call fsmsg();
+		call mssg(lasterror());
 		return 0;
 	}
 
@@ -133,7 +133,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		tt = filename;
 	}
 	if (not(DICT.open("DICT." ^ tt))) {
-		call fsmsg();
+		call mssg(lasterror());
 		return 0;
 	}
 
@@ -392,7 +392,7 @@ nextdict:
 
 	call oswrite("", outfilename);
 	if (not(outfile.osopen(outfilename))) {
-		call fsmsg();
+		call mssg(lasterror());
 		gosub exit2();
 		return 0;
 	}

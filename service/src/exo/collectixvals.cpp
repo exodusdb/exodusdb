@@ -10,8 +10,7 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 	//check file exists
 	var file;
 	if (not open(filename,file)) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 
         //separate cursor

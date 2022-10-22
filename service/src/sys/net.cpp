@@ -31,8 +31,7 @@ function main() {
 	}
 
 	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
-		call fsmsg();
-		stop();
+		abort(lasterror());
 	}
 
 listen:
