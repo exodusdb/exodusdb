@@ -103,10 +103,17 @@ function main() {
 	var usedeffile = false;
 
 	var compiler = "";
-	var basicoptions = osgetenv("CXX_OPTIONS");
-	if (basicoptions and verbose)
-		printl("Using CXX_OPTIONS environment variable " ^ basicoptions.quote());
-	var linkoptions = false;
+
+	var basicoptions = "";
+	let addoptions = osgetenv("CXX_OPTIONS");
+	if (addoptions and verbose)
+		printl("Using CXX_OPTIONS environment variable " ^ addoptions.quote());
+
+	var linkoptions = "";
+	let addlinkoptions = osgetenv("CXX_LINK_OPTIONS");
+	if (addlinkoptions and verbose)
+		printl("Using CXX_LINK_OPTIONS environment variable " ^ addlinkoptions.quote());
+
 	var binoptions = "";
 	var liboptions = "";
 
@@ -139,6 +146,8 @@ function main() {
 
 		if (verbose)
 			printl("Posix environment detected.");
+
+		var gcc = osshellread("c++ --version").contains("Free Software Foundation");
 
 		//target directories
 		bindir = exo_HOME ^ "/bin";
@@ -251,49 +260,84 @@ function main() {
 		if (warnings >= 0) {
 
 			//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
+//			This enables all the warnings about constructions that
+//			some users consider questionable, and that are easy to avoid
+//			(or modify to prevent the warning), even in conjunction with
+//			macros. This also enables some language-specific warnings
+//			described in C++ Dialect Options and Objective-C and
+//			Objective-C++ Dialect Options.
+//
+//			Note that some warning flags are not implied by -Wall.
+//			Some of them warn about constructions that users generally
+//			do not consider questionable, but which occasionally you
+//			might wish to check for; others warn about constructions
+//			that are necessary or hard to avoid in some cases, and there
+//			is no simple way to modify the code to suppress the warning.
+//			Some of them are enabled by -Wextra but many of them must be
+//			enabled individually.
 			basicoptions ^= " -Wall";
+
+			//This enables some extra warning flags that are not enabled by -Wall.
 			basicoptions ^= " -Wextra";
-			//basicoptions ^= " -Wpedantic"; // allow "Elvis operator" ?:
+
+			// Allow "Elvis operator" ?:
+			//warning: ISO C++ does not allow ?: with omitted middle operand [-Wpedantic]
+			//basicoptions ^= " -Wpedantic";
 
 			// no-xxxxxxxx means switch off warning xxxxxxxx
+			//basicoptions ^= " -Wno-cast-function-type";
+		}
+
+		// Suppress GCC and clang's warnings about each others warning flags
+		if (warnings lt 2) {
 			basicoptions ^= " -Wno-unknown-pragmas";
-			basicoptions ^= " -Wno-cast-function-type";
+			if (not gcc) {
+				// Presume clang
+				basicoptions ^= " -Wno-unknown-warning-option";
+				basicoptions ^= " -Wno-unknown-warning";
+			}
 		}
 
 		// Suppress various warnings by default or by command
 		if (warnings <= 0) {
 
-			// GCC
-			basicoptions ^= " -Wno-unknown-warning-option";
+			// Option to turn off all warnings
+			if (warnings < 0) {
+				basicoptions ^= " -w";
+			} else {
 
-			// CLANG -- how to tell?
-			if (true) {
+				// CLANG -- how to tell?
+				if (true) {
 
-				// Allow strange call to exodus shared libs
-				//basicoptions ^= " -Wno-bad-function-cast";
+					// Handled in code with #pragma GCC/clang diagnostics ...
+					// Allow strange call to exodus shared libs
+					//basicoptions ^= " -Wno-bad-function-cast";
 
-				basicoptions ^= " -Wno-uninitialized";
+					// exodus var doesnt initialise all its members but does copy/move them
+					// TODO disable the warning in code so real warnings can be show in general
+					basicoptions ^= " -Wno-uninitialized";
 
-				// Ignore these warnings for now
-				// warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
-				basicoptions ^= " -Wno-unused-result";
+					// Ignore these warnings caused by [[no-discard]] for now
+					// TODO Remove when all such code in exodus service and apps is replaced
+					// warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+					basicoptions ^= " -Wno-unused-result";
 
-				// Ignore warnings for now about code like
-				// open("PROCESSES") or createfile("PROCESSES");
-				// warning: expression result unused [-Wunused-value]
-				//basicoptions ^= " -Wno-unused-value";
+					// Ignore warnings for now about code like
+					// open("PROCESSES") or createfile("PROCESSES");
+					// warning: expression result unused [-Wunused-value]
+					//basicoptions ^= " -Wno-unused-value";
 
-				// Ignore GCC warning flags
-				basicoptions ^= " -Wno-unknown-warning";
+					// Ignore GCC warning flags
+					//basicoptions ^= " -Wno-unknown-warning";
 
-				// Ignore GCC compile flags
-				//basicoptions ^= " -Wno-unused-command-line-argument";
+					// Ignore GCC compile flags
+					//basicoptions ^= " -Wno-unused-command-line-argument";
 
-				// Ignore some warning related to exodus' "labelled commons"
-				basicoptions ^= " -Wno-unused-private-field";
+					// Ignore some warning related to exodus' "labelled commons"
+					//basicoptions ^= " -Wno-unused-private-field";
 
-			} //clang
-
+				} //clang
+			}
 		}
 
 		//how to output to a named file
@@ -528,6 +572,9 @@ function main() {
 		libdir ^= OSSLASH;
 
 	var srcfilenames = "";
+
+	basicoptions ^= " " ^ addoptions;
+	linkoptions ^= " " ^ addlinkoptions;
 
 ///////////
 //initfile:
@@ -894,6 +941,11 @@ function main() {
 						var callorreturn = (word1 == "function") ? "return" : "call";
 						var funcreturnvoid = (word1 == "function") ? 0 : 1;
 						var funcargsdecl = funcdecl.field("(", 2, 999999);
+
+						// Allow for unused arguments to be annotated or commented out to avoid warnings
+						// Wrapping parameter names in /* */ also works
+						funcargsdecl.replacer("[[maybe_unused]]", "").trimmer();
+
 						//funcargsdecl=funcargsdecl.field(")",1);
 						int level = 0;
 						int charn;
@@ -1058,10 +1110,10 @@ function main() {
 							_EOL "public:"
 							_EOL
 							_EOL "/" "/ A constructor providing:"
-							_EOL "/" "/ 1. the name of the shared library to open,"
-							_EOL "/" "/ 2. the name of the function within the shared library that will create an exodus program object,"
-							_EOL "/" "/ 3. and the current program's mv environment to share with it."
-							_EOL "Callable_funcx(ExoEnv& mv) : Callable(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+							_EOL "/" "/ 1. The name of the shared library to open,"
+							_EOL "/" "/ 2. The name of the function within the shared library that will create an exodus program object,"
+							_EOL "/" "/ 3. The current program's mv environment to share with it."
+							_EOL "Callable_funcx(ExoEnv& mv) : Callable(mv) {}"
 							_EOL
 							_EOL "/" "/ Allow assignment of library name to override the default constructed"
 							_EOL "using Callable::operator=;"
@@ -1072,8 +1124,9 @@ function main() {
 							_EOL
 							_EOL " /" "/ The first call will link to the shared lib and create/cache an object from it."
 							_EOL " /" "/ passing current standard variables in mv"
-							_EOL " if (this->pmemberfunction_==NULL)"
-							_EOL "  this->init();"
+							_EOL " if (this->pmemberfunc_==NULL)"
+//							_EOL "  this->init();"
+							_EOL "  this->attach(\"funcx\");"
 							_EOL
 							_EOL " /" "/ Define a function type (pExodusProgramBaseMemberFunction)"
 							_EOL " /" "/ that can call the shared library object member function"
@@ -1084,8 +1137,8 @@ function main() {
 							_EOL " /" "/ Call the shared library object main function with the right args,"
 							_EOL " /" "/  returning a var or void"
 							_EOL " {before_call}"
-							_EOL " return CALLMEMBERFUNCTION(*(this->pobject_),"
-							_EOL " ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
+							_EOL " return CALLMEMBERFUNCTION(*(this->plibobject_),"
+							_EOL " ((pExodusProgramBaseMemberFunction) (this->pmemberfunc_)))"
 							_EOL "  (ARG1,ARG2,ARG3);"
 							_EOL " {after_call}"
 							_EOL
@@ -1106,7 +1159,7 @@ function main() {
 						replacer(inclusion, "callorreturn", callorreturn);
 						replacer(inclusion, "{additional_funcs}", add_funcs);
 
-						if (text.contains("-Wcast-function-type")) {
+						if (true or text.contains("-Wcast-function-type")) {
 							replacer(inclusion, "{before_call}",
 									"#pragma GCC diagnostic push"
 									_EOL " #pragma GCC diagnostic ignored \"-Wcast-function-type\"");

@@ -243,6 +243,8 @@ bool var::osshell() const {
 
 	// breakoff();
 	int shellresult = system(to_oscmd_string(*this).c_str());
+	//TRACE(*this)
+	//TRACE(shellresult)
 	// breakon();
 
 	return !shellresult;

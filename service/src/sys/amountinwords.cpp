@@ -42,7 +42,7 @@ function main(in amountfmlanguage, in currcode0) {
 	} else {
 		currcode = currcode0;
 		if (not(amountcurrency.read(sys.currencies, currcode))) {
-			{}
+			amountcurrency = "";
 		}
 	}
 

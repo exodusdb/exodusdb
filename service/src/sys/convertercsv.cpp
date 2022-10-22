@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in mode, io line, in params, in filename) {
+function main(in mode, io /*line*/, in params, in filename) {
 
 	//mode=HEAD or LINE
 	//input line,params,filename
@@ -10,8 +10,6 @@ function main(in mode, io line, in params, in filename) {
 	//copy this example and create another like CONVERTER.XYZ
 	//and if importing VOUCHERS, put an entry CONVERTER*VOUCHERS
 	//if DEFINITIONS with first line XYZ
-
-	if (true or line) {}
 
 	//line conversion code below
 	//

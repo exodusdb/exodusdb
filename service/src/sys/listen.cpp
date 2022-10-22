@@ -1389,7 +1389,7 @@ cannotopenlinkfile2:
 
 	//update security table every few secs and every login
 	//if request1='LOGIN' or index('036',time()[-1,1],1) then gosub getsecurity
-	if (var newsecurity; SECURITY.read(DEFINITIONS, "SECURITY")) {
+	if (var newsecurity; newsecurity.read(DEFINITIONS, "SECURITY")) {
 		SECURITY = newsecurity;
 	}
 

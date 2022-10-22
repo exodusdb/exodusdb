@@ -435,7 +435,7 @@ preventsameday:
 					market = marketcode;
 					if (sys.markets) {
 						if (not(market.read(sys.markets, marketcode))) {
-							{}
+							market = marketcode;
 						}
 					}
 

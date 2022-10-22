@@ -116,13 +116,13 @@ class PUBLIC Callable {
 	void* plib_;
 
 	// Function used to create and delete the ExodusProgramBase object
-	ExodusProgramBaseCreateDeleteFunction pfunction_;
+	ExodusProgramBaseCreateDeleteFunction pfunc_;
 
  protected:
 
 	// Not used if callable is calling global functions in the shared object
-	pExodusProgramBase pobject_;
-	pExodusProgramBaseMemberFunction pmemberfunction_;
+	pExodusProgramBase plibobject_;
+	pExodusProgramBaseMemberFunction pmemberfunc_;
 
  public:
 
@@ -182,7 +182,7 @@ class PUBLIC Callable {
 	var callsmf();
 
 	// Call a shared global function
-	var callsgf();
+	//var callsgf();
 
 	// Build a path to the shared library file
 	std::string libfilepath(const std::string_view libname) const;
@@ -190,13 +190,13 @@ class PUBLIC Callable {
  protected:
 
 	// Assumes name and mv setup on initialisation then opens library on first call
-	bool init();
+	//bool init();
 
-	// Call or die (smf)
-	bool init(const char* libname, const char* funcname, ExoEnv& mv);
+	//bool attach(const char* libname, const char* funcname, ExoEnv& mv);
+	bool attach(const char* libname);
 
 	// External shared global functions (not member functions)
-	bool initsgf(const char* libname, const char* funcname);
+	//bool initsgf(const char* libname, const char* funcname);
 
 private:
 
@@ -204,7 +204,7 @@ private:
 	void closelib();
 
 	bool openfunc(const std::string funcname);
-	void closefunc();
+	void delete_shared_object();
 
 	bool checkload(const std::string libname, const std::string funcname);
 

@@ -47,7 +47,7 @@ noconv:
 
 		//two digit year expected
 		if (inx.len() eq 2) {
-			{}
+			//ok
 
 		//pad to two digits 1 -> 01 -> 2001
 		} else if (inx.len() eq 1) {

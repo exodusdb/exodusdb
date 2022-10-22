@@ -22,9 +22,9 @@ class Functordict_myclients : public ExodusFunctorBase {
 		//passing current standard variables in mv
 		//first time link to the shared lib and create/cache an object from it
 		//passing current standard variables in mv
-		//if (Functorgetlang.pmemberfunction_==NULL)
+		//if (Functorgetlang.pmemberfunc_==NULL)
 		// Functorgetlang.init("getlang","exodusprogrambasecreatedelete_",mv);
-		if (this->pmemberfunction_ == NULL)
+		if (this->pmemberfunc_ == NULL)
 			this->init();
 
 		//define a function type (pExodusProgramBaseMemberFunction)
@@ -34,11 +34,11 @@ class Functordict_myclients : public ExodusFunctorBase {
 		using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
 		//call the shared library object main function with the right args,
 		// returning a var or void
-		//return CALLMEMBERFUNCTION(*(Functordict_myclients.pobject_),
-		//((pExodusProgramBaseMemberFunction) (Functordict_myclients.pmemberfunction_)))
+		//return CALLMEMBERFUNCTION(*(Functordict_myclients.plibobject_),
+		//((pExodusProgramBaseMemberFunction) (Functordict_myclients.pmemberfunc_)))
 		// (mode);
-		return CALLMEMBERFUNCTION(*(this->pobject_),
-								  ((pExodusProgramBaseMemberFunction)(this->pmemberfunction_)))();
+		return CALLMEMBERFUNCTION(*(this->plibobject_),
+								  ((pExodusProgramBaseMemberFunction)(this->pmemberfunc_)))();
 	}
 };
 Functordict_myclients dict_myclients{mv};
@@ -63,9 +63,9 @@ class Functordict_myclients : public ExodusFunctorBase {
 		//passing current standard variables in mv
 		//first time link to the shared lib and create/cache an object from it
 		//passing current standard variables in mv
-		//if (Functorgetlang.pmemberfunction_==NULL)
+		//if (Functorgetlang.pmemberfunc_==NULL)
 		// Functorgetlang.init("getlang","exodusprogrambasecreatedelete_",mv);
-		if (this->pmemberfunction_ == NULL)
+		if (this->pmemberfunc_ == NULL)
 			this->init();
 
 		//define a function type (pExodusProgramBaseMemberFunction)
@@ -75,11 +75,11 @@ class Functordict_myclients : public ExodusFunctorBase {
 
 		//call the shared library object main function with the right args,
 		// returning a var or void
-		//return CALLMEMBERFUNCTION(*(Functordict_myclients.pobject_),
-		//((pExodusProgramBaseMemberFunction) (Functordict_myclients.pmemberfunction_)))
+		//return CALLMEMBERFUNCTION(*(Functordict_myclients.plibobject_),
+		//((pExodusProgramBaseMemberFunction) (Functordict_myclients.pmemberfunc_)))
 		// (mode);
-		return CALLMEMBERFUNCTION(*(this->pobject_),
-								  ((pExodusProgramBaseMemberFunction)(this->pmemberfunction_)))();
+		return CALLMEMBERFUNCTION(*(this->plibobject_),
+								  ((pExodusProgramBaseMemberFunction)(this->pmemberfunc_)))();
 	}
 };
 Functordict_myclients dict_myclients{mv};

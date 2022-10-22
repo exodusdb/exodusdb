@@ -123,11 +123,13 @@ function main(in mode, io logtime, in menu) {
 		for (const var ii : range(nn, 1)) {
 			var ipno = configips.f(1, 1, ii);
 			if (ipno.field(".", 1) eq "10") {
-				{}
+				// OK
 			} else if (ipno.field(".", 1) eq "172") {
+				// OK
 			} else if (ipno.field(".", 1, 2) eq "192.168") {
+				// OK
 			} else {
-				//delete all WAN (non-LAN) ranges and allow only fully specced WAN ips
+				// Delete all WAN (non-LAN) ranges and allow only fully specced WAN ips
 				if (ipno.count(SM) ne 3) {
 					configips.remover(1, 1, ii);
 				}

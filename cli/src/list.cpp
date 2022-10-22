@@ -16,7 +16,8 @@ function main() {
 
 		//TRACE(SENTENCE)
 		// Change list into nlist in order to call the nlist library
-		return perform("n" ^ SENTENCE);
+		var result = perform("n" ^ SENTENCE);
+		return result;
 	}
 
 	//////////////////////////////////////////
@@ -65,9 +66,10 @@ function main() {
 	// Pipe into pager
 	oscmd ^= " | pager --chop-long-lines --quit-if-one-screen";
 
-	//TRACE(oscmd)
-	return osshell(oscmd);
+	if (not osshell(oscmd))
+		abort(lasterror());
 
+	return 0;
 }
 
 programexit()

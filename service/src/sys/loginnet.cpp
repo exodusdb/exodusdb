@@ -26,11 +26,6 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 	cookie = "";
 	authcompcodes = "";
 
-	//evade c++ unused variable warning
-	if (not(dataset.unassigned())) {
-		{}
-	}
-
 	//return allowable menus if legacy menu in users file
 	//legacy menus from pre 03JUN10 code per user settings on Authorisation File
 	//assignment of locks on menus and/or clearing userprivs<3>
@@ -43,8 +38,8 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 				var menufile;
 				if (menufile.open("ADMENUS", "")) {
 readmenu:
-					if (not(oldmenus.readv(menufile, menuid, 6))) {
-						{}
+					if (not oldmenus.readv(menufile, menuid, 6)) {
+						oldmenus = "";
 					}
 				} else {
 					if (menufile.open("MENUS", "")) {

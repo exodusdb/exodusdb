@@ -398,7 +398,7 @@ function main() {
 		createfile("DICT.voc");
 		if (not(dictvoc.open("DICT.voc", ""))) {
 			call fsmsg();
-			stop();
+			abort();
 		}
 	}
 
@@ -466,7 +466,7 @@ function main() {
 
 	if (word ne "LIST" and word ne "SORT" and word ne "NLIST" and word ne "OLIST") {
 		call mssg(word.quote() ^ " first word must be LIST or SORT");
-		stop();
+		abort();
 	}
 
 	// Decide initial ordering SELECT (No order) or SSELECT (by key)
@@ -497,7 +497,7 @@ function main() {
 
 	if (not word) {
 		call mssg("FILE NAME IS REQUIRED");
-		stop();
+		abort();
 	}
 
 	// Filename
@@ -618,12 +618,12 @@ phraseinit:
 			limits(1, nlimits) = word;
 			if (not(dictrec.reado(DICT, word))) {
 				call mssg(word.quote() ^ " is not a valid dictionary item (1)");
-				stop();
+				abort();
 			}
 			tt = dictrec.f(4).field(".", 1);
 			if (not tt.starts("M")) {
 				call mssg(word.quote() ^ " limit must be a multivalued dict item");
-				stop();
+				abort();
 			}
 			limits(4, nlimits) = tt;
 		}
@@ -718,7 +718,7 @@ phraseinit:
 		dictfilename = word;
 		if (not(DICT.open("DICT." ^ dictfilename))) {
 			call fsmsg();
-			stop();
+			abort();
 		}
 		sortselect ^= " USING " ^ dictfilename;
 
@@ -786,7 +786,7 @@ phraseinit:
 			if (not(rec.reado(DICT, tt))) {
 				if (not(rec.reado(dictvoc, tt))) {
 					call mssg(tt.quote() ^ " is not a valid dictionary item (2)");
-					stop();
+					abort();
 				}
 			}
 			if (title eq "") {
@@ -833,7 +833,7 @@ phraseinit:
 	} else if (word eq "JL" or word eq "JUSTLEN") {
 		if (not coln) {
 			call mssg("JUSTLEN/JL must follow a column name");
-			stop();
+			abort();
 		}
 		// Skip if detsupp2 and column is being skipped
 		if (not(coldict(coln).unassigned())) {
@@ -847,7 +847,7 @@ phraseinit:
 	} else if (word eq "CH" or word eq "COLHEAD") {
 		if (not coln) {
 			call mssg("COLHEAD/CH must follow a column name");
-			stop();
+			abort();
 		}
 		gosub getquotedword();
 		// Skip if detsupp2 and column is being skipped
@@ -859,7 +859,7 @@ phraseinit:
 	} else if (word eq "OC" or word eq "OCONV") {
 		if (not coln) {
 			call mssg("OCONV/OC must follow a column name");
-			stop();
+			abort();
 		}
 		gosub getquotedword();
 		// Skip if detsupp2 and column is being skipped
@@ -1044,7 +1044,7 @@ dictrecexit:
 		var oldword = word;
 		call mssg(tt, "RCE", word, "");
 		if (word eq oldword or word eq "\x1B") {
-			stop();
+			abort();
 		}
 		gosub getwordexit();
 		goto phraseinit;
@@ -1156,7 +1156,7 @@ x1exit:
 
 	if (not(srcfile.open(filename, ""))) {
 		call fsmsg();
-		stop();
+		abort();
 	}
 
 	breakcount.redim(nbreaks + 1);
@@ -1400,7 +1400,7 @@ nextdict:
 			// The words "No record" is hardcoded in autorun and maybe elsewhere
 			// so if you change it here, CHANGE IT THERE TOO
 			call mssg("No records found");
-			stop();
+			abort();
 		}
 
 		if (not LISTACTIVE) {
@@ -1455,18 +1455,18 @@ nextrec:
 		if (STATUS) {
 			tx = "*** Fatal Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
 			gosub printtx();
-			stop();
+			abort();
 		}
 		if (FILEERROR.f(1) eq 421) {
 			tx = "Operation aborted by user.";
 			gosub printtx();
-			stop();
+			abort();
 		}
 		if (FILEERROR and FILEERROR.f(1) ne 111) {
 			tx = "*** Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
 			gosub printtx();
 			readerr += 1;
-			stop();
+			abort();
 		}
 		goto x2exit;
 	}
@@ -1835,8 +1835,6 @@ x2bexit:
 	gosub emailing();
 
 	printfile.osclose();
-
-	stop();
 
 	return "";
 }

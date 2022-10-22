@@ -2030,6 +2030,7 @@ class PUBLIC var final {
 	//ND bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
 	ND bool osread(const char* osfilename, const char* codepage DEFAULT_EMPTY);
 	ND bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
+	ND bool osremove() const;
 	ND bool osrename(CVR new_dirpath_or_filepath) const;
 	ND bool oscopy(CVR to_osfilename) const;
 	ND bool osmove(CVR to_osfilename) const;

@@ -24,7 +24,7 @@
 	~COMMON_NAME##_common() = default;     \
 	}                                      \
 	;                                      \
-	COMMON_NAME##_common&& COMMON_NAME =   \
+	[[maybe_unused]] COMMON_NAME##_common&& COMMON_NAME =   \
 		reinterpret_cast<COMMON_NAME##_common&&>(*mv.labelledcommon[COMMON_NO]);
 // if (!COMMON_NAME) mv.labelledcommon[COMMON_NO]=new COMMON_NAME##_common;
 

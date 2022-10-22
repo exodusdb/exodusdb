@@ -9,20 +9,12 @@ var direction;//num
 var xx;
 var daten;
 
-function main(in mode, io idate, in usercode, in userx, in marketcode, in market, in agp, out holidaytype, out workdate) {
+function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, in market, in agp, out holidaytype, out workdate) {
 
 	//returns holidaytype given date,userx,market and global params
 
 	//holiday type is one of the following (priority in the same order)
 	//1=weekend, 2=public, 3=personal, 4=expired login, 0=not holiday
-
-	//prevent c++ warnings about unused variables
-	if (usercode.unassigned()) {
-		{}
-	}
-	if (marketcode.unassigned()) {
-		{}
-	}
 
 	if (mode eq "GETTYPE") {
 		gosub getholidaytype(idate, userx, agp, market, holidaytype);
@@ -113,8 +105,8 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	var fromdates = userx.f(22);
 	var uptodates = userx.f(23);
 	//from dates must be in reverse sorted order
-	if (not(fromdates.f(1).locateby("DR", idate, daten))) {
-		{}
+	if (not fromdates.f(1).locateby("DR", idate, daten)) {
+		// Not found. daten points to the last + 1
 	}
 	var uptodate = uptodates.f(1, daten);
 	if (uptodate and idate le uptodates.f(1, daten)) {

@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in type, in inx, in mode, out outx) {
+function main(in type, in inx, in /*mode*/, out outx) {
 
 	var status = 0;
 	if (type eq "OCONV") {
@@ -37,11 +37,6 @@ function main(in type, in inx, in mode, out outx) {
 	} else if (type eq "ICONV") {
 		outx = inx;
 
-	} else if (0) {
-		//evade c++ compiler warning
-		if (mode) {
-			{}
-		}
 	}
 
 	return 0;

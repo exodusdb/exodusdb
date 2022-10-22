@@ -3,7 +3,7 @@
 libraryinit(chequedesign_account_name)
 //------------------------------------
 function main() {
-	//@ans=xlate('ACCOUNTS',field(@id,'*',2),1,'X')
+	// @ans=xlate('ACCOUNTS',field(@id,'*',2),1,'X')
 	return ID.field("*", 2).xlate("ACCOUNTS", 1, "X");
 }
 libraryexit(chequedesign_account_name)

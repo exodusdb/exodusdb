@@ -318,7 +318,7 @@ nextmln:;
 						macrotext.replacer(old, newx);
 					} //paramn;
 
-					//speed up fieldwise {} for F fields. avoid calling a dict subroutine
+					//speed up fieldwise { } for F fields. avoid calling a dict subroutine
 					var allfields = "";
 					var fields = "";
 //					var findfieldn = 0;

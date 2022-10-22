@@ -48,7 +48,7 @@ set -euxo pipefail
 : S - Silent
 : V - Verbose
 :
-	compile alt exo sys {OS${COMPILER_OPTIONS}}
+	compile alt exo sys {S${COMPILER_OPTIONS}}
 
 :
 : Flag sync_dat to review all and sync_dat to exodus

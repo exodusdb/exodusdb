@@ -8,7 +8,7 @@ var processresult;
 var processcomments;
 var timex;
 
-function main(io processid, in processcategory0, in sparevar="", in processparameters0="", in processresult0="", in processcomments0="") {
+function main(io processid, in processcategory0, in /*sparevar*/="", in processparameters0="", in processresult0="", in processcomments0="") {
 
 	//obsolete since moved to processes from definitions
 
@@ -17,9 +17,9 @@ function main(io processid, in processcategory0, in sparevar="", in processparam
 	if (processid.unassigned()) {
 		processid = "";
 	}
-	if (sparevar.unassigned()) {
-		{}
-	}
+//	if (sparevar.unassigned()) {
+//		sparevar = "";
+//	}
 	if (processcategory0.unassigned()) {
 		processcategory = "";
 	} else {

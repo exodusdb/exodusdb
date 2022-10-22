@@ -210,7 +210,8 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					//this is to allow terminating access without explanation
 					//realreason=''
 
-					goto passfail;
+					//goto passfail;
+					goto validateexit;
 				}
 
 				//TODO prevent login after termination
@@ -237,9 +238,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 				realreason = "Wrong password";
 
-passfail:
-				{}
-
+//passfail:
 			//password is correct
 			} else {
 

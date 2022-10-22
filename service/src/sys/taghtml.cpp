@@ -3,12 +3,7 @@ libraryinit()
 
 var xx;
 
-function main(in type, in in0, in mode, out output) {
-
-	//prevent c++ var not used
-	if (var(0) or type) {
-		{}
-	}
+function main(in /*type*/, in in0, in mode, out output) {
 
 	output = in0;
 	if (output eq "") {
@@ -30,18 +25,6 @@ function main(in type, in in0, in mode, out output) {
 		}
 	}
 
-	//convert "&" to &amp; except if already &amp; &nbsp; etc.
-//	for (const var ii : range(1, 99999)) {
-//		var charn = output.contains("&", ii);
-//
-//		///BREAK;
-//		if (not charn) break;
-//
-//		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",", (output.b(charn + 1, 10)).field(";", 1), xx))) {
-//			output.paster(charn, 1, "&amp;");
-//		}
-//
-//	} //ii;
 	var precoded = _VM "nbsp" _VM "amp" _VM "lt" _VM "gt" _VM "infin" _VM;
 	for (var pos = 1; ; pos++) {
 		pos = output.index("&", pos);

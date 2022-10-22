@@ -152,7 +152,6 @@ getupperlower:
 				codepage = "";
 			}
 			goto getupperlower;
-			{}
 		}
 
 	}

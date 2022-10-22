@@ -1487,11 +1487,6 @@ baddict:
 		// return dict_callable_.calldict();
 		// return ANS;
 
-		// call the shared library object main function with the right args (none for
-		// dicts), returning a var std::cout<<"precal"<<std::endl;
-//		ANS = CALLMEMBERFUNCTION(*(dict_callable_->pobject_),
-//								 ((pExodusProgramBaseMemberFunction)(
-//									 cached_dictcallable_base_->pmemberfunction_)))();
 		ANS = dict_callable_->callsmf();
 
 		// restore the MV if necessary

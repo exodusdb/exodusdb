@@ -25,7 +25,7 @@ var xx;
 var nn;
 var errormsg;
 
-function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in userids0, in options, io emaillog) {
+function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
 
 
 	var interactive = false; //not(SYSTEM.f(33));
@@ -38,11 +38,6 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 		var mod = "";
 	} else {
 		mode = mode0;
-	}
-
-	//evade c++ warning variable not used
-	if (jobids0.unassigned()) {
-		{}
 	}
 
 	if (SENTENCE.field(" ", 1) eq "EMAILUSERS") {

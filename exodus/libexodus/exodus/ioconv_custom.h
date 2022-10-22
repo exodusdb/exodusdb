@@ -7,7 +7,7 @@
 class Callable_ioconv_custom : public Callable {
    public:
 	Callable_ioconv_custom(ExoEnv& mv)
-		: Callable("ioconv_custom", "exodusprogrambasecreatedelete_", mv) {
+		: Callable(mv) {
 	}
 
 	// Allow assignment of library name to override the default constructed
@@ -20,10 +20,10 @@ class Callable_ioconv_custom : public Callable {
 		// passing current standard variables in mv
 		// first time link to the shared lib and create/cache an object from it
 		// passing current standard variables in mv
-		// if (Callable_getlang.pmemberfunction_==nullptr)
+		// if (Callable_getlang.pmemberfunc_==nullptr)
 		// Callable_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
-		if (this->pmemberfunction_ == nullptr)
-			this->init();
+		if (this->pmemberfunc_ == nullptr)
+			this->attach("ioconv_custom");
 
 		// define a function type (pExodusProgramBaseMemberFunction)
 		// that can call the shared library object member function
@@ -32,14 +32,14 @@ class Callable_ioconv_custom : public Callable {
 
 		// call the shared library object main function with the right args,
 		// returning a var or void
-		// return CALLMEMBERFUNCTION(*(Callable_ioconv_custom.pobject_),
-		//((pExodusProgramBaseMemberFunction) (Callable_ioconv_custom.pmemberfunction_)))
+		// return CALLMEMBERFUNCTION(*(Callable_ioconv_custom.plibobject_),
+		//((pExodusProgramBaseMemberFunction) (Callable_ioconv_custom.pmemberfunc_)))
 		// (mode);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-function-type"
-		return CALLMEMBERFUNCTION(*(this->pobject_),
+		return CALLMEMBERFUNCTION(*(this->plibobject_),
 								  ((pExodusProgramBaseMemberFunction)(
-									  this->pmemberfunction_)))(type, input, mode, output);
+									  this->pmemberfunc_)))(type, input, mode, output);
 #pragma GCC diagnostic pop
 	}
 

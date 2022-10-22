@@ -565,35 +565,16 @@ nextreport:
 
 	call log2("*check the operating system date", logtime);
 	//CHECKSYSDATE:
-	var config = "";
-	if (not(config.osread("EXODUS.CFG"))) {
+	var config;
+	if (not config.osread("EXODUS.CFG")) {
 		var lastdate = "/lastdate.rev/";
 		lastdate.converter("/", OSSLASH);
-		if (config.osread(lastdate)) {
-			{}
+		if (not config.osread(lastdate)) {
+			config = "";
 		}
 	}
 	var lastdate = config.f(1);
-	/*;
-		IF LASTDATE and interactive THEN;
-			IF DATE() LT LASTDATE OR DATE() GT (LASTDATE+14) THEN;
-				MSG='';
-				MSG<-1>="Is today's date ":OCONV(DATE(),'D4'):' ?';
-				MSG<-1>=' ';
-				MSG<-1>='(According to internal records, the';
-				MSG<-1>='computer was last used on the ':LASTDATE 'D4':",|but the computer's date is now ":DATE() 'D4':')';
-				MSG<-1>=' ';
-				MSG<-1>=' ';
-				if DECIDE(MSG,'',REPLY) ELSE EXECUTE 'OFF';logoff;
-				//if not today's date then use DOS to set it
-				IF REPLY NE 1 THEN;
-					DATA '';
-					PERFORM 'PC DATE';
-					GOTO CHECKSYSDATE;
-					END;
-				END;
-			END;
-	*/
+
 	call log2("*update \"last used date\"", logtime);
 	if (date() ne lastdate) {
 		config(1) = date();
@@ -711,9 +692,9 @@ nextreport:
 		if (not(smtp.f(1))) {
 			call osread(smtp, "smtp.cfg");
 		}
-		if (not(smtp.f(1))) {
-			if (not(smtp.read(DEFINITIONS, "SMTP.CFG"))) {
-				{}
+		if (not smtp.f(1)) {
+			if (not smtp.read(DEFINITIONS, "SMTP.CFG")) {
+				smtp = "";
 			}
 		}
 		if (smtp.f(1)) {
@@ -880,11 +861,12 @@ nextreport:
 	SYSTEM(9) = ncpus;
 
 	//save VER
-	if (not(SYSTEM.f(12).locate("VER", tt))) {
-		{}
+	var envn;
+	if (not SYSTEM.f(12).locate("VER", envn)) {
+		// Not found. envn points to last + 1
 	}
-	SYSTEM(12, tt) = "VER";
-	SYSTEM(13, tt) = ver.trim();
+	SYSTEM(12, envn) = "VER";
+	SYSTEM(13, envn) = ver.trim();
 
 	call log2("*get cpu version", logtime);
 	if (var("wmic.cfg").osfile()) {
@@ -988,61 +970,61 @@ nextreport:
 	// tt='EXODUS'
 	// end
 	if (not(authorised("DATABASE STOP", msg, tt))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("DATABASE RESTART", msg, tt))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("DATASET COPY", msg, tt))) {
-		{}
+		// Task added
 	}
 	//if security('%RENAME%':'AUTHORISATION UPDATE KEYS',msg,'AUTHORISATION UPDATE GROUPS') else null
 	if (not(authorised("AUTHORISATION UPDATE", msg, tt))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("AUTHORISATION UPDATE LOCKS", msg, tt))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, tt))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, tt))) {
-		{}
+		// Task added
 	}
 
 	if (tt eq "GS") {
 		tt = "LS";
 	}
 	if (not(authorised("SYSTEM CONFIGURATION CREATE", msg, tt))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("SYSTEM CONFIGURATION UPDATE", msg, tt))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("SYSTEM CONFIGURATION DELETE", msg, tt))) {
-		{}
+		// Task added
 	}
 
 	if (not(authorised("CURRENCY UPDATE DECIMALS", msg, "EXODUS"))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("MENU SUPPORT", msg, "LS"))) {
-		{}
+		// Task added
 	}
 	//if security('%DELETE%':'SUPPORT MENU ACCESS',xx) else null
 	//if security('%DELETE%':'USE TCL COMMAND KEY F5',xx) else null
 	if (not(authorised("UPLOAD CREATE", xx))) {
-		{}
+		// Task added
 	}
 	if (not(authorised("REQUESTLOG ACCESS", msg, "LS"))) {
-		{}
+		// Task added
 	}
 
 	//if security('%RENAME%':'AUTHORISATION CREATE USERS',xx,'USER CREATE') else null
 	//if security('%RENAME%':'AUTHORISATION DELETE USERS',xx,'USER DELETE') else null
 	//!if security('%UPDATE%':'USER UPDATE',xx,'AUTHORISATION UPDATE') else null
 	if (not(authorised("USER UPDATE", xx, "AUTHORISATION UPDATE"))) {
-		{}
+		// Task added
 	}
 
 	call log2("*create user file", logtime);
@@ -1050,7 +1032,7 @@ nextreport:
 	if (not(users.open("USERS", ""))) {
 
 		if (not(openfile("USERS", users, "DEFINITIONS", 1))) {
-			{}
+			// Ignore
 		}
 
 		call log2("*zzz should create full user record not just the name", logtime);
@@ -1231,7 +1213,7 @@ nextreport:
 //	}
 
 	if (not(openfile("LISTS", lists, "DEFINITIONS"))) {
-		{}
+		// Ignore
 	}
 
 	//call log2('*check lists file are not corrupted and zero them if they are',logtime)

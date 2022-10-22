@@ -19,13 +19,7 @@ var cmd;
 var exe;
 var errors;
 
-function main(in mode, in ipno, out text) {
-
-
-	//prevent unused warning
-	if (mode) {
-		{}
-	}
+function main(in /*mode*/, in ipno, out text) {
 
 	if (SENTENCE.field(" ", 1) eq "WHOIS") {
 		SENTENCE.move(sentencex);

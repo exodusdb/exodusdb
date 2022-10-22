@@ -201,7 +201,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//relies on unlock all in listen
 	if (mode eq "ASAP") {
 		if (not(sys.documents.lock( docid))) {
-			{}
+			//ignore and proceed even cannot lock the document. why?
 		}
 	}
 

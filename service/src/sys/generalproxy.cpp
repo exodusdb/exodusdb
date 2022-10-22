@@ -162,7 +162,7 @@ function main() {
 
 		var copydb = request_.f(3);
 		if (not(SYSTEM.f(58).locate(copydb, dbn))) {
-			{}
+			// Not found. dbn points to last + 1
 		}
 		var todb = SYSTEM.f(63, dbn);
 		if (not todb) {

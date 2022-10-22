@@ -3,15 +3,12 @@ libraryinit()
 
 #include <otherusers.h>
 
-function main(in mode, in datasetcode, out result) {
+function main(in /*mode*/, in datasetcode, out result) {
 
 	var shutdownfilename = datasetcode.lcase() ^ ".end";
 	if (shutdownfilename.osfile()) {
 		result = 2;
 		return 0;
-	}
-	if (not mode) {
-		{}
 	}
 
 	call oswrite(_EOL "BACKUP", shutdownfilename);

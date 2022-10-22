@@ -4,11 +4,7 @@ libraryinit()
 var list1n;
 var xx;
 
-function main(in mode, io list1, io list2, in seps) {
-
-	if (mode.unassigned()) {
-		{}
-	}
+function main(in /*mode*/, io list1, io list2, in seps) {
 
 	if (not(list1.len() and list2.len())) {
 		return 0;

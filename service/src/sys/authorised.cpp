@@ -32,7 +32,6 @@ nousername0:
 		msgusername = USERNAME;
 	} else if (username0 eq "") {
 		goto nousername0;
-		{}
 	} else {
 		username = username0;
 		msgusername = username;
@@ -198,7 +197,6 @@ updateprivs:
 
 		//positive and no lock always fail
 		} else {
-			{}
 notallowed:
 			//MSG=capitalise(TASK):'||Sorry ':capitalise(msgusername):', you are not authorised to do this.|'
 			if (msgusername ne USERNAME) {
@@ -219,9 +217,7 @@ notallowed:
 
 	//special lock NOONE
 	} else if (locks eq "NOONE") {
-		{}
 		goto notallowed;
-		{}
 
 	//special lock EVERYONE
 	} else if (locks eq "EVERYONE") {

@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-function main(in alerttype0, in runasuser, out tasks, out title, out request, out datax) {
+function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request, out datax) {
 
 	//1) list of all active users
 	//at 7am on the 14th of each month (ie regularly but not everyday)
@@ -13,9 +13,6 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 
 	var alerttype = alerttype0.field(":", 1);
 	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);
-	if (runasuser.unassigned()) {
-		{}
-	}
 
 	var mode = "";
 

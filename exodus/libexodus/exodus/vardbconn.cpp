@@ -7,6 +7,8 @@
 //#define INSIDE_MVDBCONNS_CPP
 #include <exodus/vardbconn.h>
 
+constexpr int TRACING = 0;
+
 namespace exodus {
 
 DBConnector::DBConnector(PGCONN_DELETER del)
@@ -18,10 +20,13 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 	// no longer need locking since dbconns_ is thread_local
 	//std::lock_guard lock(dbconns_mutex);
 
-	//var(conninfo).errputl("add_dbconn: conninfo=");
-
 	dbconn_no_++;
 	dbconns_[dbconn_no_] = DBConn(conn_to_cache, conninfo);
+
+	if (TRACING >= 3) {
+		var(conninfo).errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo=");
+	}
+
 	return dbconn_no_;
 }
 

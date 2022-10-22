@@ -212,7 +212,7 @@ forcedemail:
 	var params1 = "";
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
 		if (not(params1.read(DEFINITIONS, "SMTP.CFG"))) {
-			{}
+			params1 = "";
 		}
 	}
 
@@ -556,7 +556,7 @@ TRACE(offset)
 	}
 
 	if (errormsg) {
-		{}
+		// OK got errormsg
 	} else if (errorfilename) {
 		var().osflush();
 		errorfilename.osclose();

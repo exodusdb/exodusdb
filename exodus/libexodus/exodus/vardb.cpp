@@ -202,7 +202,8 @@ Within transactions, lock requests for locks that have already been obtained SUC
 
 #include "timebank.h"
 
-#define DBTRACE2 DBTRACE
+#define DBTRACE_SELECT DBTRACE
+#define DBTRACE_CONN 0
 
 namespace exodus {
 
@@ -450,9 +451,8 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 	// otherwise get the default connection
 	if (!dbconn_no) {
 
-		//if (DBTRACE and dbhandle.assigned()) {
-		//	dbhandle.logputl("DBTR get_dbconn_no_or_default=");
-		//}
+		if (DBTRACE_CONN and dbhandle.assigned())
+			TRACE(dbhandle);
 
 		//dbhandle MUST always arrive in lower case to detect if "dict."
 		bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
@@ -464,7 +464,12 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 		else
 			dbconn_no = thread_default_data_dbconn_no;
 
-		// var(dbconn_no).logputl("dbconn_no2=");
+		if (DBTRACE_CONN) {
+			TRACE(thread_default_data_dbconn_no);
+			TRACE(thread_default_dict_dbconn_no);
+			if (dbhandle.assigned()) TRACE(dbhandle);
+			TRACE(dbconn_no);
+		}
 
 		// otherwise try the default connection
 		if (!dbconn_no) {
@@ -483,14 +488,19 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 			} else {
 				defaultdb = "";
 			}
-			//TRACE(defaultdb)
+
+			if (DBTRACE_CONN)
+				TRACE(defaultdb);
 
 			//try to connect
-			if (defaultdb.connect())
+			if (defaultdb.connect()) {
 				dbconn_no = get_dbconn_no(defaultdb);
 
+				if (DBTRACE_CONN)
+					TRACE("defaultdb connected");
+
 			//if cannot connect then for dictionaries look on default connection
-			else if (isdict) {
+			} else if (isdict) {
 
 				//attempt a default connection if not already done
 				if (!thread_default_data_dbconn_no) {
@@ -499,18 +509,25 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 				}
 
 				dbconn_no = thread_default_data_dbconn_no;
+
+				if (DBTRACE_CONN)
+					TRACE(thread_default_data_dbconn_no);
+
 			}
+
+			if (DBTRACE_CONN)
+				TRACE(dbconn_no);
 
 			//save default dict/data connections
 			if (isdict) {
 				thread_default_dict_dbconn_no = dbconn_no;
-				if (DBTRACE) {
+				if (DBTRACE or DBTRACE_CONN) {
 					var(dbconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
 				}
 			}
 			else {
 				thread_default_data_dbconn_no = dbconn_no;
-				if (DBTRACE) {
+				if (DBTRACE or DBTRACE_CONN) {
 					var(dbconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
 				}
 			}
@@ -1920,7 +1937,7 @@ bool var::deleterecord(CVR key) const {
 	if (var_str.size() == 3 && (var_str == "dos" || var_str == "DOS")) {
 		//return this->osremove(key2);
 		//use osfilenames unnormalised so we can read and write as is
-		return this->osremove(key);
+		return key.osremove();
 	}
 
 	// Parameter array
@@ -2427,6 +2444,11 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 				sqlexpression =
 					"exodus_extract_time(" ^ sqlexpression ^ ",0,0,0)";
 
+			if (DBTRACE) {
+				TRACE(fieldno)
+				TRACE(sqlexpression)
+			}
+
 			return sqlexpression;
 
 		} // of key field, Fieldno = 0
@@ -2463,13 +2485,18 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		while (function_src.f(1,1).contains("#include "))
 			function_src.remover(1,1);
 		var pgsql_pos = function_src.index(_VM "/" "*pgsql");
+//		var is_ans_xlate = (!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(");
+//TRACE(is_ans_xlate);// 0 ??
+//		is_ans_xlate = ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate("));
+//TRACE(is_ans_xlate);// 0 ??
 		var x = (!ismv1 || stage2_calculated);
-		var y = function_src.trimfirst("\t /").lcase().starts("@ans=xlate(");
-		var is_ans_xlate = (!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(");
-//TRACE(is_ans_xlate);// 0 ??
-		is_ans_xlate = ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate("));
-//TRACE(is_ans_xlate);// 0 ??
-		is_ans_xlate = x and y;
+		var y = function_src.trimfirst("\t /").convert(" ","").lcase().starts("@ans=xlate(");
+		var is_ans_xlate = x and y;
+		if (DBTRACE) {
+			TRACE(pgsql_pos)
+			TRACE(function_src.f(1,1))
+			TRACE(is_ans_xlate)
+		}
 
 //TRACE(ismv1)
 //TRACE(stage2_calculated)
@@ -2576,9 +2603,16 @@ TRACE: "QQQ"="QQQ"
 		//@ANS=XLATE("SELECT_CURSOR_STAGE2_1",@ID,CPP_TEXT_calc,"X")
 		//else if ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(")) {
 		else if (is_ans_xlate) {
+
+			// Expect things like:
+			// "\t// @ans=xlate('SUPPLIERS',@record<22>,1,'X')"
 //			TRACE("function_src starts @ans=")
-			function_src = function_src.f(1, 1).trimfirst("\t ");
-			function_src.cutter(13);
+
+			// Remove leading white space and slashes and remove all other spaces
+			function_src = function_src.f(1, 1).trimfirst("\t /").convert(" ", "");
+
+			// Remove "@ans=xlate("
+			function_src.cutter(11);
 
 			// Hide comma in arg3 like <1,@mv>
 			function_src.replacer(",@mv", "|@mv");
@@ -2605,6 +2639,14 @@ TRACE: "QQQ"="QQQ"
 				goto exodus_call;
 //				TRACE("goto exodus_call")
 			}
+			if (DBTRACE) {
+				TRACE(function_src)
+				TRACE(xlatetargetfilename)
+				TRACE(xlatefromfieldname)
+				TRACE(xlatetargetfieldname)
+				TRACE(xlatemode)
+			}
+
 //			TRACE("doing a join")
 			// Assume we have a good simple xlate function_src and can convert to a JOIN
 			// Determine the expression in the xlate target file
@@ -2680,6 +2722,9 @@ TRACE: "QQQ"="QQQ"
 			//and do not do any join
 			if (xlatekeyexpression.contains("exodus_call")) {
 				sqlexpression = "exodus_call(";
+				if (DBTRACE)
+					TRACE(sqlexpression)
+
 				return sqlexpression;
 			}
 
@@ -2708,13 +2753,15 @@ TRACE: "QQQ"="QQQ"
 				//joins.r(joinsectionn, -1, join_part1 ^ join_part2);
 				joins(joinsectionn, -1) = join_part1 ^ join_part2;
 
+			if (DBTRACE)
+				TRACE(sqlexpression)
+
 			return sqlexpression;
 
 		}
 
 		else {
 exodus_call:
-//			TRACE("QQQ")
 			// FOLLOWING IS CURRENTLY DISABLED since postgres has no way to call exodus
 			// if we get here then we were unable to work out any sql expression or function
 			// so originally we instructed postgres to CALL EXODUS VIA IPC to run exodus
@@ -2733,6 +2780,9 @@ exodus_call:
 			//sqlexpression.logputl("sqlexpression=");
 			// TODO apply naturalorder conversion by passing forsort
 			// option to exodus_call
+
+			if (DBTRACE)
+				TRACE(sqlexpression)
 
 			return sqlexpression;
 		}
@@ -2845,6 +2895,9 @@ exodus_call:
 			sqlexpression = fieldname;
 		}
 	}
+
+	if (DBTRACE)
+		TRACE(sqlexpression)
 
 	return sqlexpression;
 }
@@ -3162,7 +3215,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					keycodes ^= FM;
 				keycodes ^= word1;
 			}
-			if (DBTRACE2) TRACE(keycodes);
+			if (DBTRACE_SELECT) TRACE(keycodes);
 			continue;
 		}
 
@@ -3174,7 +3227,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 									" file cannot be opened");
 
 			}
-			if (DBTRACE2) TRACE(dictfilename);
+			if (DBTRACE_SELECT) TRACE(dictfilename);
 			continue;
 		}
 
@@ -3203,7 +3256,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 								distinctexpression;
 				orderclause ^= ", " ^ naturalsort_distinctexpression;
 			}
-			if (DBTRACE2) TRACE(orderclause);
+			if (DBTRACE_SELECT) TRACE(orderclause);
 			continue;
 		}
 
@@ -3242,7 +3295,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (ucword == "BY-DSND")
 				orderclause ^= " DESC";
 
-			if (DBTRACE2) TRACE(orderclause);
+			if (DBTRACE_SELECT) TRACE(orderclause);
 			continue;
 		}
 
@@ -3254,7 +3307,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (ucword == "OR") {
 				orwith = true;
 			}
-			if (DBTRACE2) TRACE(whereclause)
+			if (DBTRACE_SELECT) TRACE(whereclause)
 			continue;
 		}
 
@@ -3264,7 +3317,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (whereclause[-1] == ")" and ucword == "(")
 				whereclause ^= "\nor";
 			whereclause ^= "\n " ^ ucword;
-			if (DBTRACE2) TRACE(whereclause);
+			if (DBTRACE_SELECT) TRACE(whereclause);
 			continue;
 		}
 
@@ -3676,7 +3729,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				calc_fields(3, calc_fieldn) = value.unquote().replace("'" _FM "'", FM).convert(FM, SM);
 
 				//place holder to be removed before issuing actual sql command
-	            if (DBTRACE2) TRACE(whereclause);
+	            if (DBTRACE_SELECT) TRACE(whereclause);
 				whereclause ^= " true";
 
 				continue;
@@ -4010,13 +4063,13 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// Filter Stage 10 - COMBINE INTO WHERE CLAUSE
 			//////////////////////////////////////////////
 
-			if (DBTRACE2) TRACE(whereclause);
+			if (DBTRACE_SELECT) TRACE(whereclause);
 			// Default to OR between with clauses
 			if (whereclause) {
 				var lastpart = whereclause.field2(" ", -1);
 				if (not var("OR AND (").locateusing(" ", lastpart))
 					whereclause ^= " or ";
-				if (DBTRACE2) TRACE(whereclause);
+				if (DBTRACE_SELECT) TRACE(whereclause);
 			}
 
 			//negate
@@ -4028,7 +4081,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			else
 				whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 
-			if (DBTRACE2) TRACE(whereclause);
+			if (DBTRACE_SELECT) TRACE(whereclause);
 
 		}  //with/without
 

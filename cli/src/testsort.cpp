@@ -14,6 +14,8 @@ function main() {
 	//if (not connect())
 	//	abort("Cannot connect to database. Please check configuration or run configexodus.");
 
+	begintrans();
+
 	var dictfilename = "dict." ^ filename;
 
 	// Leave the test data files around for playing with after the program finishes
@@ -121,29 +123,29 @@ function main() {
 		rec.convert("|", FM).trimlast().write(file, key.trim());
 	}
 
-	var prefix = "select " ^ filename;
+	gosub sortselect(file, " by code");
 
-	gosub sortselect(file, prefix ^ " by code (R)");
+	gosub sortselect(file, " by balance by code");
 
-	gosub sortselect(file, prefix ^ " by balance by code (R)");
+	gosub sortselect(file, " by timestamp");
 
-	gosub sortselect(file, prefix ^ " by timestamp (R)");
-
-	gosub sortselect(file, prefix ^ " with type 'B' by balance (R)");
+	gosub sortselect(file, " with type 'B' by balance");
 
 	var cmd = "list " ^ filename ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
-	osshell(cmd) or lasterror().errputl("testsort:");
+	osshell(cmd) or loglasterror("testsort:" ^ cmd);
 
 	cmd = "list " ^ dictfilename;
 	printl("\nList the dict using ", quote(cmd));
-	osshell(cmd) or lasterror().errputl("testsort:");
+	osshell(cmd) or loglasterror("testsort:" ^ cmd);
 
 	if (cleanup) {
 		printl("\nCleaning up. Delete the files");
 		deletefile(file);
 		deletefile(dictfile);
 	}
+
+	committrans();
 
 	printl("\nJust type 'list' to see the syntax of list");
 	printl("or list dict." ^ filename ^ " to see the dictionary");
@@ -153,13 +155,11 @@ function main() {
 	return 0;
 }
 
-subroutine sortselect(in file, in sortselectcmd) {
+subroutine sortselect(in file, in sortselectclause) {
 
-	printl("\nsselect the data - ", sortselectcmd);
+	printl("\nsselect the data - ", sortselectclause);
 
-	//	begintrans();
-
-	if (!select(sortselectcmd)) {
+	if (!select("select xo_clients " ^ sortselectclause ^ " (R)")) {
 		printl("Cannot sselect in testsort");
 		return;
 	}
@@ -181,6 +181,10 @@ subroutine sortselect(in file, in sortselectcmd) {
 
 		printl(ID, ": ", convert(RECORD, FM, "|"));
 	}
+
+	var cmd = "list " ^ filename ^ " " ^ sortselectclause ^ " id-supp (R)";
+	printl("\nList the file using ", quote(cmd));
+	perform(cmd) or loglasterror("testsort:" ^ cmd);
 
 	//	rollbacktrans();
 }
