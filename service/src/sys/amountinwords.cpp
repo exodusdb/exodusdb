@@ -7,21 +7,21 @@ libraryinit()
 
 #include <sys_common.h>
 
-var comma;
+	var comma;
 var sentencex;
 var amountcurrency;
 var currcode;
-var amount;//num
+var amount;	 //num
 var language;
 var words;
 var millions;
 var thousands;
 var hundreds;
-var unitsx;//num
+var unitsx;	 //num
 var text;
 var cents;
-var tens;//num
-var ones;//num
+var tens;  //num
+var ones;  //num
 var temp;
 
 function main(in amountfmlanguage, in currcode0) {
@@ -30,7 +30,7 @@ function main(in amountfmlanguage, in currcode0) {
 
 	if (SENTENCE.field(" ", 1) eq "AMOUNT.IN.WORDS") {
 		sentencex = SENTENCE;
-		SENTENCE = "";
+		SENTENCE  = "";
 		printl();
 		printl(amountinwords(sentencex.field(" ", 2) ^ FM ^ sentencex.field(" ", 4), sentencex.field(" ", 3)));
 		stop();
@@ -46,7 +46,7 @@ function main(in amountfmlanguage, in currcode0) {
 		}
 	}
 
-	amount = amountfmlanguage.f(1);
+	amount	 = amountfmlanguage.f(1);
 	language = amountfmlanguage.f(2);
 
 	amount.converter("-", "");
@@ -92,7 +92,7 @@ function main(in amountfmlanguage, in currcode0) {
 
 	//units
 	unitsx = "00" ^ amount.mod(100).floor();
-	text = "Zero" _VM "One" _VM "Two" _VM "Three" _VM "Four" _VM "Five" _VM "Six" _VM "Seven" _VM "Eight" _VM "Nine" _VM "Ten" _VM "Eleven" _VM "Twelve" _VM "Thirteen" _VM "Fourteen" _VM "Fifteen" _VM "Sixteen" _VM "Seventeen" _VM "Eighteen" _VM "Nineteen" _VM "Twenty" _VM "Thirty" _VM "Forty" _VM "Fifty" _VM "Sixty" _VM "Seventy" _VM "Eighty" _VM "Ninety";
+	text   = "Zero" _VM "One" _VM "Two" _VM "Three" _VM "Four" _VM "Five" _VM "Six" _VM "Seven" _VM "Eight" _VM "Nine" _VM "Ten" _VM "Eleven" _VM "Twelve" _VM "Thirteen" _VM "Fourteen" _VM "Fifteen" _VM "Sixteen" _VM "Seventeen" _VM "Eighteen" _VM "Nineteen" _VM "Twenty" _VM "Thirty" _VM "Forty" _VM "Fifty" _VM "Sixty" _VM "Seventy" _VM "Eighty" _VM "Ninety";
 	if (unitsx) {
 		if (words ne "") {
 			words ^= " and ";
@@ -100,9 +100,9 @@ function main(in amountfmlanguage, in currcode0) {
 		if (unitsx le 20) {
 			words ^= text.f(1, unitsx + 1);
 		} else {
-		//IF UNITSx LE 20 THEN
-		// WORDS:=TEXT<1,UNITSx+1>
-		//end else
+			//IF UNITSx LE 20 THEN
+			// WORDS:=TEXT<1,UNITSx+1>
+			//end else
 			words ^= text.f(1, 19 + unitsx[-2]);
 			if (not unitsx.ends("0")) {
 				words ^= "-" ^ text.f(1, unitsx[-1] + 1);
@@ -138,14 +138,13 @@ function main(in amountfmlanguage, in currcode0) {
 		if (amountcurrency) {
 			words ^= " " ^ amountcurrency.f(1);
 		}
-
 	}
 
 	return words.trim();
 
 ///////
 french:
-///////
+	///////
 	//millions
 	millions = amount.field(".", 1);
 	millions.cutter(-6);
@@ -183,7 +182,7 @@ french:
 
 	//units
 	unitsx = "00" ^ amount.mod(100).floor();
-	text = "zero" _VM "un" _VM "deux" _VM "trois" _VM "quatre" _VM "cinq" _VM "six" _VM "sept" _VM "huit" _VM "neuf" _VM "dix" _VM "onze" _VM "douze" _VM "treize" _VM "quatorze" _VM "quinze" _VM "seize" _VM "dix-sept" _VM "dix-huit" _VM "dix-neuf" _VM "vingt" _VM "trente" _VM "quarante" _VM "cinquante" _VM "soixante" _VM "soixante-dix" _VM "quatre-vingt" _VM "quatre-vingt-dix";
+	text   = "zero" _VM "un" _VM "deux" _VM "trois" _VM "quatre" _VM "cinq" _VM "six" _VM "sept" _VM "huit" _VM "neuf" _VM "dix" _VM "onze" _VM "douze" _VM "treize" _VM "quatorze" _VM "quinze" _VM "seize" _VM "dix-sept" _VM "dix-huit" _VM "dix-neuf" _VM "vingt" _VM "trente" _VM "quarante" _VM "cinquante" _VM "soixante" _VM "soixante-dix" _VM "quatre-vingt" _VM "quatre-vingt-dix";
 	if (unitsx) {
 		if (words ne "") {
 			words ^= " ";
@@ -215,7 +214,6 @@ french:
 				temp.lcaser();
 				words ^= temp;
 			}
-
 		}
 	}
 

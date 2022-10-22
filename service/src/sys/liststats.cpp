@@ -3,12 +3,6 @@ libraryinit()
 
 #include <authorised.h>
 #include <crosstab.h>
-//#include <htmllib2.h>
-//#include <gethtml.h>
-//#include <getmark.h>
-//#include <getcss.h>
-//#include <docmods.h>
-//#include <timedate2.h>
 
 #include <exodus/printtx.hpp>
 
@@ -16,57 +10,56 @@ libraryinit()
 
 #include <sys_common.h>
 
-var msg;
+	var msg;
 var html;
 var reqdate;
 var vn;
 var output;
-var usercoln;//num
+var usercoln;  //num
 var tx;
 var userx;
 
-var printptr;//num
-var topmargin;//num
+var printptr;	//num
+var topmargin;	//num
 var printfilename;
-var ownprintfile;//num
+var ownprintfile;  //num
 var ptx_filenamelen;
 var ptx_random;
 var printfile;
 var letterhead;
 var pagelns;
-var bodyln;//num
-var realpagen;//num
-var pagen;//num
-var newpage;//num
+var bodyln;		//num
+var realpagen;	//num
+var pagen;		//num
+var newpage;	//num
 var bottomline;
 var printtxmark;
 var rfmt;
 var head;
 var foot;
-var ntxlns;//num
-var nbodylns;//num
+var ntxlns;	   //num
+var nbodylns;  //num
 var ptx_temp;
 var headx;
 var newpagetag;
 var ptx_css;
 var cssver;
 var style;
-var stylennx;//num
+var stylennx;  //num
 var htmltitle;
 var head_or_foot;
 var footx;
 var head1;
-var optioncharn;//num
+var optioncharn;  //num
 var optionchars;
 var optionchar;
 var newoptions;
-var printtx_ii;//num
+var printtx_ii;	 //num
 var spaceoptionsize;
 
 function main() {
 
 	//for printtx
-
 
 	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {
 		call mssg(msg);
@@ -74,12 +67,12 @@ function main() {
 	}
 
 	var rowfields = PSEUDO.f(1);
-	var colfield = PSEUDO.f(2);
-	var format = PSEUDO.f(3);
-	var datemode = PSEUDO.f(4);
+	var colfield  = PSEUDO.f(2);
+	var format	  = PSEUDO.f(3);
+	var datemode  = PSEUDO.f(4);
 
-	html = format eq 1;
-	var dedup = html;
+	html				= format eq 1;
+	var			  dedup = html;
 
 	if (datemode gt 1) {
 		var selectcmd = "SELECT STATISTICS WITH DATE ";
@@ -95,7 +88,6 @@ function main() {
 			call mssg("No records found");
 			stop();
 		}
-
 	}
 
 	//usercodename=',DEPARTMENT,USER_NAME'
@@ -109,8 +101,8 @@ function main() {
 		rowfields.remover(1, vn);
 	}
 
-	var datafield = "REQUESTS";
-	let nrowfields = rowfields.fcount(VM);
+	var	 datafield	= "REQUESTS";
+	let	 nrowfields = rowfields.fcount(VM);
 	call crosstab(filename, rowfields, colfield, datafield, output);
 
 	var nrows = output.fcount(FM);
@@ -120,19 +112,20 @@ function main() {
 	if (dedup) {
 		var row1 = output.f(nrows);
 		for (var rown = nrows; rown >= 3; --rown) {
-			var row2 = row1;
-			row1 = output.f(rown - 1);
+			var row2	 = row1;
+			row1		 = output.f(rown - 1);
 			var replaced = 0;
 			for (const var coln : range(1, nrowfields)) {
 				///BREAK;
-				if (not(row1.f(1, coln) eq row2.f(1, coln))) break;
-				replaced = 1;
+				if (not(row1.f(1, coln) eq row2.f(1, coln)))
+					break;
+				replaced	  = 1;
 				row2(1, coln) = "-";
-			} //coln;
+			}  //coln;
 			if (replaced) {
 				output(rown) = row2;
 			}
-		} //rown;
+		}  //rown;
 	}
 
 	if (not(rowfields.locate("USER_CODE", usercoln))) {
@@ -140,12 +133,12 @@ function main() {
 	}
 
 	if (html) {
-		var tr = "<TR valign=top>";
-		var trx = "</TR>" _EOL;
-		var th = "<TH>";
-		var thx = "</TH>" _EOL;
-		var td = "<TD>";
-		var tdx = "</TD>" _EOL;
+		var tr	 = "<TR valign=top>";
+		var trx	 = "</TR>" _EOL;
+		var th	 = "<TH>";
+		var thx	 = "</TH>" _EOL;
+		var td	 = "<TD>";
+		var tdx	 = "</TD>" _EOL;
 		var nbsp = "&nbsp;";
 
 		tx = "<H1 align=center>EXODUS USAGE STATISTICS</H1>";
@@ -168,7 +161,7 @@ function main() {
 			if (coln eq usercoln) {
 				tx ^= "<col>";
 			}
-		} //coln;
+		}  //coln;
 
 		tx ^= tr;
 		for (const var coln : range(1, ncols)) {
@@ -181,13 +174,13 @@ function main() {
 			if (coln eq usercoln) {
 				tx ^= th ^ "Browser Last Seen" ^ thx;
 			}
-		} //coln;
+		}  //coln;
 		tx ^= trx;
 
 		tx ^= "</thead>";
 
 		for (const var rown : range(2, nrows)) {
-			var row = output.f(rown);
+			var row	  = output.f(rown);
 			var rowtx = "";
 			for (const var coln : range(1, ncols)) {
 				var cell = row.f(1, coln);
@@ -196,9 +189,10 @@ function main() {
 						var rowspan = 1;
 						for (const var rown2 : range(rown + 1, nrows)) {
 							///BREAK;
-							if (not(output.f(rown2, coln) eq "-")) break;
+							if (not(output.f(rown2, coln) eq "-"))
+								break;
 							rowspan += 1;
-						} //rown2;
+						}  //rown2;
 
 						var celltd = "<TD";
 						if (rowspan gt 1) {
@@ -212,7 +206,7 @@ function main() {
 
 						//convert to user name
 						if (coln eq usercoln) {
-							userx = xlate("USERS", cell, "", "X");
+							userx  = xlate("USERS", cell, "", "X");
 							var tt = userx.f(1);
 							if (tt and cell ne tt) {
 								cell = tt ^ " (" ^ cell ^ ")";
@@ -231,7 +225,6 @@ function main() {
 							rowtx ^= agent;
 							rowtx ^= tdx;
 						}
-
 					}
 				} else {
 					if (not(cell.len())) {
@@ -242,12 +235,12 @@ function main() {
 						rowtx ^= td ^ nbsp ^ tdx;
 					}
 				}
-			} //coln;
+			}  //coln;
 			tx ^= tr ^ rowtx ^ trx;
 			if (tx.len() gt 64000) {
 				gosub printtx();
 			}
-		} //rown;
+		}  //rown;
 		tx ^= "</table>" _EOL;
 
 		gosub printtx();
@@ -255,13 +248,12 @@ function main() {
 	} else {
 
 		SYSTEM(3) = 1;
-		var sys2 = SYSTEM.f(2);
+		var sys2  = SYSTEM.f(2);
 		sys2.paster(-3, 3, "xls");
 		SYSTEM(2) = sys2;
 		output.replacer(FM, _EOL);
 		output.replacer(VM, "\t");
 		call oswrite(output, SYSTEM.f(2));
-
 	}
 
 	stop();

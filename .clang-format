@@ -3,16 +3,30 @@ Language:                         Cpp
 Standard:                         c++20
 BasedOnStyle:                     Chromium
 ColumnLimit:                      0
-BreakBeforeBraces:                Attach
 IndentWidth:                      4
 TabWidth:                         4
 UseTab:                           Always
 PointerAlignment:                 Left
 IndentGotoLabels:                 false
+#IndentFunctions:                 false
 KeepEmptyLinesAtTheStartOfBlocks: true
 
 BreakStringLiterals:              false
 
+AlignAfterOpenBracket:            true
 AlignConsecutiveMacros:           true
-AlignConsecutiveAssignments:      true
+
+AlignConsecutiveAssignments: true
+#AlignConsecutiveAssignmentsOptions: Compound
+
 AlignConsecutiveDeclarations:     true
+
+#clang13
+#SpacesInLineCommentPrefix:
+#  Minimum: 1
+#  Maximum: 1
+
+BreakBeforeBraces:                Attach
+#BreakBeforeBraces: Custom
+#BraceWrapping:
+#  SplitEmptyFunction: false

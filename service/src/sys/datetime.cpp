@@ -41,16 +41,16 @@ function main(in type, in inx, in mode, out outx) {
 			timemode.replacer("DOS", "");
 			in2 = 86400 * ("." ^ in2);
 
-		//fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0
+			//fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0
 		} else if (in2.len() ne 5) {
 			in2 = (in2 ^ "00000").first(5);
 		}
 
 		//move time and date into the local date time
 		if (SW.f(1)) {
-			in2 = (in2 + SW.f(1) + 0.5).floor();
+			in2			= (in2 + SW.f(1) + 0.5).floor();
 			var in2orig = in2;
-			in2 = in2.mod(86400);
+			in2			= in2.mod(86400);
 			if (in2 lt in2orig) {
 				in1 += 1;
 			} else if (in2 gt in2orig) {
@@ -62,7 +62,7 @@ function main(in type, in inx, in mode, out outx) {
 		if (timemode eq "") {
 			timemode = "MT";
 
-		//numeric means just convert to local date time numeric ddddd.ttttt
+			//numeric means just convert to local date time numeric ddddd.ttttt
 		} else if (timemode eq "NUMERIC") {
 			if (dostime) {
 				outx = (in1 + in2 / 86400).oconv("MD50P");
@@ -75,10 +75,10 @@ function main(in type, in inx, in mode, out outx) {
 		outx = oconv(in1, datemode) ^ " " ^ oconv(in2, timemode);
 
 	} else if (type eq "ICONV") {
-		outx = inx;
+		outx	  = inx;
 		var odate = inx.field(" ", 1);
 		var otime = inx.field(" ", 2);
-		outx = iconv(odate, "[DATE]");
+		outx	  = iconv(odate, "[DATE]");
 		if (outx and otime) {
 			var itime = iconv(otime, "[TIME2]");
 			if (itime) {

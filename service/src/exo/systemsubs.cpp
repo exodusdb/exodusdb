@@ -7,7 +7,7 @@ libraryinit()
 
 #include <window.hpp>
 
-var mode;
+	var mode;
 
 function main(in mode0) {
 
@@ -40,11 +40,16 @@ function main(in mode0) {
 
 	mode = mode0;
 
-	if (mode.field(",", 1) == "PREREAD") ;
-	else if (mode.field(",", 1) == "POSTREAD") ;
-	else if (mode.field(",", 1) == "PREWRITE") ;
-	else if (mode.field(",", 1) == "POSTWRITE") ;
-	else if (mode.field(",", 1) == "PREDELETE") ;
+	if (mode.field(",", 1) == "PREREAD")
+		;
+	else if (mode.field(",", 1) == "POSTREAD")
+		;
+	else if (mode.field(",", 1) == "PREWRITE")
+		;
+	else if (mode.field(",", 1) == "POSTWRITE")
+		;
+	else if (mode.field(",", 1) == "PREDELETE")
+		;
 	else if (mode.field(",", 1) == "POSTDELETE") {
 	} else {
 		chr(7).output();
@@ -52,7 +57,6 @@ function main(in mode0) {
 		//valid=0
 	}
 	return 0;
-
 }
 
 libraryexit()

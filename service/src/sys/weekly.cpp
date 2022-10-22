@@ -3,20 +3,20 @@ libraryinit()
 
 #include <addcent4.h>
 
-var firstdate;
-var firstdayofweek;//num
-var weeksperperiod;//num
-var maxperiod;//num
+	var firstdate;
+var firstdayofweek;	 //num
+var weeksperperiod;	 //num
+var maxperiod;		 //num
 var temp;
-var year;//num
-var period;//num
+var year;	 //num
+var period;	 //num
 var year2;
-var firstdateofyear2;//num
-var firstdateofyear;//num
-var dayofyear;//num
-var diff;//num
-var firstdayofyear;//num
-var difference;//num
+var firstdateofyear2;  //num
+var firstdateofyear;   //num
+var dayofyear;		   //num
+var diff;			   //num
+var firstdayofyear;	   //num
+var difference;		   //num
 
 function main(in type, in input0, in mode, out output) {
 
@@ -29,7 +29,7 @@ function main(in type, in input0, in mode, out output) {
 		output = "";
 		return 0;
 	}
-	firstdate = mode.field(",", 1);
+	firstdate	   = mode.field(",", 1);
 	firstdayofweek = mode.field(",", 2);
 	weeksperperiod = mode.field(",", 3);
 	if (not weeksperperiod) {
@@ -40,8 +40,8 @@ function main(in type, in input0, in mode, out output) {
 	//if oconv then convert internal date to year:period
 	///////////////////////////////////////////////////
 	if (type eq "OCONV") {
-		temp = input0.oconv("D2-E");
-		year = temp.last(2);
+		temp   = input0.oconv("D2-E");
+		year   = temp.last(2);
 		period = temp.b(4, 2);
 
 		//guess the right financial year from the date
@@ -69,7 +69,7 @@ tryyear:
 		}
 
 		dayofyear = input0 - firstdateofyear2 + 1;
-		period = ((dayofyear - 1) / (7 * weeksperperiod)).floor() + 1;
+		period	  = ((dayofyear - 1) / (7 * weeksperperiod)).floor() + 1;
 		if (period gt maxperiod) {
 			period = maxperiod;
 		}
@@ -83,9 +83,9 @@ tryyear:
 	//return the last day of the period (internal format)
 	if (input0.contains("/")) {
 		period = input0.field("/", 1);
-		year = input0.field("/", 2);
+		year   = input0.field("/", 2);
 	} else {
-		year = input0.first(2);
+		year   = input0.first(2);
 		period = input0.last(2);
 	}
 
@@ -110,7 +110,7 @@ tryyear:
 		if (diff gt 3) {
 			diff -= 7;
 		}
-		if (diff lt -3) {
+		if (diff lt - 3) {
 			diff += 7;
 		}
 		output -= diff;
@@ -130,11 +130,11 @@ subroutine getfirstdateofyear() {
 	//   start of week is friday (day 5)
 	//therefore start of year is 2/7/93
 	firstdayofyear = (firstdateofyear - 1).mod(7) + 1;
-	difference = firstdayofyear - firstdayofweek;
+	difference	   = firstdayofyear - firstdayofweek;
 	if (difference gt 3) {
 		difference -= 7;
 	}
-	if (difference lt -3) {
+	if (difference lt - 3) {
 		difference += 7;
 	}
 	firstdateofyear -= difference;

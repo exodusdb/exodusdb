@@ -38,14 +38,14 @@ libraryinit()
 // 12 = backup disk for uploads (images) folder if different from 7. Put 0 to suppress backup.
 // 13 = '' is default (weekly rotation) 1=wrong media doesnt fail the backup
 // max 30 since copied into system.cfg for editing
-// clang-format on
+	// clang-format on
 
-var process;
-var tt;//num
+	var process;
+var tt;	 //num
 var dbn;
 var xx;
 
-function main(out bakpars, in process0=var()) {
+function main(out bakpars, in process0 = var()) {
 
 	//optonally get the backpars for a specific process if given
 	if (process0.unassigned()) {
@@ -64,7 +64,7 @@ function main(out bakpars, in process0=var()) {
 			if (tt.f(ii).len()) {
 				bakpars(ii) = tt.f(ii);
 			}
-		} //ii;
+		}  //ii;
 	}
 	//osread tt from '..\..\backup.cfg' then
 	var configfilename = "../../backup.cfg";
@@ -74,7 +74,7 @@ function main(out bakpars, in process0=var()) {
 			if (tt.f(ii).len()) {
 				bakpars(ii) = tt.f(ii);
 			}
-		} //ii;
+		}  //ii;
 	}
 
 	if (VOLUMES) {
@@ -118,7 +118,7 @@ function main(out bakpars, in process0=var()) {
 
 	//backup depending on configuration file
 	//if any database listed there
-	var dbcode = process.f(17).lcase();
+	var dbcode	= process.f(17).lcase();
 	var dbcodes = process.f(58).lcase();
 
 	if (dbcodes and VOLUMES) {
@@ -135,7 +135,7 @@ function main(out bakpars, in process0=var()) {
 		//test/nonlive data
 		bakpars(11) = not(tt);
 
-	//otherwise backup depending on backup.cfg etc
+		//otherwise backup depending on backup.cfg etc
 	} else {
 
 		//autodetermine if it is "test" data
@@ -154,7 +154,6 @@ function main(out bakpars, in process0=var()) {
 			}
 			bakpars(11) = testdata;
 		}
-
 	}
 
 	return 0;

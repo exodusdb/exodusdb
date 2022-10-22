@@ -1,22 +1,22 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <gethtml.h>
+#include <addcent4.h>
 #include <authorised.h>
-#include <otherusers.h>
-#include <sysmsg.h>
+#include <changelogsubs.h>
 #include <emailusers.h>
-#include <usersubs.h>
+#include <generalsubs.h>
+#include <gethtml.h>
+#include <getsubs.h>
+#include <otherusers.h>
+#include <proxysubs.h>
+#include <safeselect.h>
 #include <securitysubs.h>
 #include <sendmail.h>
-#include <uploadsubs.h>
-#include <generalsubs.h>
-#include <changelogsubs.h>
-#include <safeselect.h>
-#include <getsubs.h>
-#include <proxysubs.h>
-#include <addcent4.h>
 #include <singular.h>
+#include <sysmsg.h>
+#include <uploadsubs.h>
+#include <usersubs.h>
 
 #include <system_common.h>
 
@@ -25,7 +25,7 @@ libraryinit()
 
 #include <window.hpp>
 
-var stationery;
+	var stationery;
 var mode;
 var html;
 var dbn;
@@ -35,7 +35,7 @@ var userkey;
 var userx;
 var newpassword;
 var xx;
-var fn;//num
+var fn;	 //num
 var task;
 var taskprefix;
 var reportid;
@@ -48,14 +48,13 @@ var logsearch;
 function main() {
 	//!subroutine general(request,data,response)
 
+	//use app specific version of generalsubs
+	if (APPLICATION ne "EXODUS") {
+		generalsubs = "generalsubs_app";
+	}
 
-    //use app specific version of generalsubs
-    if (APPLICATION ne "EXODUS") {
-        generalsubs = "generalsubs_app" ;
-    }
-
-	win.valid = 1;
-	msg_ = "";
+	win.valid  = 1;
+	msg_	   = "";
 	stationery = "";
 
 	call cropper(request_);
@@ -65,7 +64,7 @@ function main() {
 	//request 2 - can be anything actually
 
 	win.datafile = request_.f(2);
-	var keyx = request_.f(3);
+	var keyx	 = request_.f(3);
 
 	response_ = "OK";
 
@@ -88,7 +87,7 @@ function main() {
 		*/
 
 		var transactions = "exodus_trantest";
-		if (not open(transactions,transactions))
+		if (not open(transactions, transactions))
 			createfile(transactions);
 
 		//ERROR:  VACUUM cannot run inside a transaction block sqlstate:25001
@@ -97,7 +96,7 @@ function main() {
 		//	stop();
 		//}
 
-		ID = "1";
+		ID		   = "1";
 		let ntrans = 100;
 		//printl();
 		//printl("TRANTEST 1.", THREADNO);
@@ -106,7 +105,7 @@ function main() {
 			//	printl(recn);
 			if (not read(RECORD, transactions, ID))
 				RECORD = "";
-			write(RECORD+1, transactions, ID);
+			write(RECORD + 1, transactions, ID);
 		}
 		//printl();
 		//printl("TRANTEST 2.", THREADNO);
@@ -116,7 +115,7 @@ function main() {
 
 		//comma sep
 		var compcodes = request_.f(2);
-		var testing = request_.f(3);
+		var testing	  = request_.f(3);
 
 		var allhtml = "";
 
@@ -131,8 +130,8 @@ function main() {
 		let ncomps = compcodes.fcount(",");
 		for (const var compn : range(1, ncomps)) {
 
-			mode = "HEAD";
-			var compcode = compcodes.field(",", compn);
+			mode		  = "HEAD";
+			var	 compcode = compcodes.field(",", compn);
 			call gethtml(mode, html, compcode);
 
 			allhtml(-1) = "<br />Company " ^ compcode ^ " from " ^ mode;
@@ -143,7 +142,7 @@ function main() {
 			allhtml(-1) = html;
 			//if testing else allhtml<-1>='<hr/>'
 
-		} //compn;
+		}  //compn;
 		allhtml(-1) = "Press F5 to refresh any images just uploaded.";
 		allhtml.replacer(_FM, _EOL);
 		var(allhtml).oswrite(SYSTEM.f(2));
@@ -151,7 +150,7 @@ function main() {
 
 	} else if (mode eq "PERIODTABLE") {
 
-		var year = request_.f(2).field("-", 1).field("/", 2);
+		var year	= request_.f(2).field("-", 1).field("/", 2);
 		var finyear = request_.f(3);
 
 		perform("PERIODTABLE " ^ year ^ " " ^ finyear ^ " (H)");
@@ -172,7 +171,7 @@ function main() {
 		//ensure authorised to login to one or the other database
 		//by ensuring the user is currently logged in to one or other database
 		if ((USERNAME ne "EXODUS" and copydb ne SYSTEM.f(17)) and todb ne SYSTEM.f(17)) {
-			msg_ = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
+			msg_	 = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
 			msg_(-1) = "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote());
 			msg_(-1) = "but you are currently logged in to database " ^ (SYSTEM.f(17).quote());
 			abort(msg_);
@@ -183,9 +182,9 @@ function main() {
 			abort(msg_);
 		}
 
-		var started = time().oconv("MTS");
+		var started		= time().oconv("MTS");
 		var otherusersx = otherusers(copydb);
-		var log = started ^ " Started copy database " ^ copydb ^ " to " ^ todb;
+		var log			= started ^ " Started copy database " ^ copydb ^ " to " ^ todb;
 		log ^= "|" ^ started ^ " Other processes online:" ^ otherusersx.f(1);
 
 		perform("COPYDB " ^ copydb ^ " " ^ todb);
@@ -199,9 +198,9 @@ function main() {
 
 	} else if (mode eq "EMAILUSERS") {
 
-		var groupids = data_.f(1);
+		var groupids	   = data_.f(1);
 		var jobfunctionids = "";
-		var userids = data_.f(2);
+		var userids		   = data_.f(2);
 		if (not((groupids or jobfunctionids) or userids)) {
 			abort("You must specify some groups or users to email");
 		}
@@ -225,8 +224,11 @@ function main() {
 
 		if (emailresult) {
 			emailresult.converter(_VM _FM, "\r\r");
-			response_ = "OK Email Sent to" "\r" ^ emailresult;
-			} else {
+			response_ =
+				"OK Email Sent to"
+				"\r" ^
+				emailresult;
+		} else {
 			call mssg("No users can be found to email,|or some problem with email server");
 		}
 		data_ = "";
@@ -234,8 +236,8 @@ function main() {
 	} else if (mode eq "CREATEDATABASE") {
 		//For patsalides
 
-		if (not(authorised("DATASET CREATE",msg_))) {
-		    abort(msg_);
+		if (not(authorised("DATASET CREATE", msg_))) {
+			abort(msg_);
 		}
 
 		var targetdbname = data_.f(1);
@@ -248,11 +250,11 @@ function main() {
 		var dbcodes = dblist();
 
 		//source database services will be stopped for source to target database copy
-        //reject source db if same as current database.
-        var currentdbcode = SYSTEM(17);
-        if (sourcedbcode eq currentdbcode) {
-            return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
-        }
+		//reject source db if same as current database.
+		var currentdbcode = SYSTEM(17);
+		if (sourcedbcode eq currentdbcode) {
+			return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
+		}
 
 		//check source database exists
 		if (not locateusing(_FM, sourcedbcode, dbcodes)) {
@@ -270,8 +272,8 @@ function main() {
 		}
 
 		//Copy source db to target db
-        // ERROR:  CREATE DATABASE cannot run inside a transaction block
-        //if (not dbcopy(sourcedbcode,targetdbcode)) {
+		// ERROR:  CREATE DATABASE cannot run inside a transaction block
+		//if (not dbcopy(sourcedbcode,targetdbcode)) {
 		osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode);
 
 		//start source live service
@@ -286,9 +288,9 @@ function main() {
 		//create target data dir
 		//oscopy(sourcedatadir, targetdatadir);
 		//KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
-        osshell("mkdir -p " ^ targetdatadir);
-        osshell("chmod a+srw " ^ targetdatadir);
-        osshell("setfacl -d -m g::rw " ^ targetdatadir);
+		osshell("mkdir -p " ^ targetdatadir);
+		osshell("chmod a+srw " ^ targetdatadir);
+		osshell("setfacl -d -m g::rw " ^ targetdatadir);
 		if (not osdir(targetdatadir)) {
 			return invalid("Error in creating target data directory");
 		}
@@ -296,7 +298,7 @@ function main() {
 		//skip - target image dir created on first upload
 
 		//update database name file
-		if (not	oswrite(targetdbname, "../data/" ^ targetdbcode ^ "/name")) {
+		if (not oswrite(targetdbname, "../data/" ^ targetdbcode ^ "/name")) {
 			return invalid("Cannot update database file name");
 		}
 
@@ -309,8 +311,8 @@ function main() {
 		win.is = request_;
 		call usersubs(mode);
 
-	//case mode[-3,3]='SSH'
-	// call ssh(mode)
+		//case mode[-3,3]='SSH'
+		// call ssh(mode)
 
 	} else if (mode eq "PASSWORDRESET") {
 
@@ -323,7 +325,7 @@ function main() {
 			abort("USERS file is missing");
 		}
 
-		ID = request_.f(2);
+		ID				 = request_.f(2);
 		var emailaddress = request_.f(3);
 
 		var baduseroremail = "Either " ^ (ID.quote()) ^ " or " ^ (emailaddress.quote()) ^ " does not exist";
@@ -331,7 +333,7 @@ function main() {
 		var userrec;
 		if (userrec.read(users, ID)) {
 			usersordefinitions = users;
-			userkey = ID;
+			userkey			   = ID;
 
 			if (emailaddress.ucase() eq userx.f(7).ucase()) {
 
@@ -340,13 +342,12 @@ function main() {
 
 				call securitysubs("GENERATEPASSWORD");
 				newpassword = ANS;
-				userrec(4) = newpassword;
-
+				userrec(4)	= newpassword;
 			}
 
 		} else {
 			usersordefinitions = DEFINITIONS;
-			userkey = "BADUSER*" ^ ID;
+			userkey			   = "BADUSER*" ^ ID;
 			if (not(userrec.read(usersordefinitions, userkey))) {
 				userrec = "";
 			}
@@ -381,10 +382,10 @@ function main() {
 
 		//send the new password to the user
 		var emailaddrs = userrec.f(7);
-		var ccaddrs = "";
-		var subject = "EXODUS Password Reset";
-		var body = "User: " ^ ID;
-		body(-1) = "Your new password is " ^ newpassword;
+		var ccaddrs	   = "";
+		var subject	   = "EXODUS Password Reset";
+		var body	   = "User: " ^ ID;
+		body(-1)	   = "Your new password is " ^ newpassword;
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
 	} else if (mode eq "MAKEUPLOADPATH") {
@@ -408,7 +409,7 @@ function main() {
 		//somewhere on the way to the browser (not in revelation)
 		for (const var ii : range(1, 255)) {
 			data_ ^= chr(ii);
-		} //ii;
+		}  //ii;
 		//data='xxx'
 		response_ = "OK";
 
@@ -449,7 +450,7 @@ setcodepagecase:
 
 			recordx.write(sys.alanguage, "GENERAL*" ^ codepage);
 
-				/*;
+			/*;
 				//check lower=lcase(upper) and vice versa
 				//but ucase() may strip accents whereas lcase() may leave them
 				x=@lower.case;
@@ -530,7 +531,7 @@ badsetcodepage:
 
 	} else if (mode eq "GETDEPTS") {
 		call usersubs("GETDEPTS");
-		data_ = ANS;
+		data_	  = ANS;
 		response_ = "OK";
 
 	} else if (mode eq "LISTACTIVITIES") {
@@ -554,11 +555,11 @@ badsetcodepage:
 		perform("PROG");
 		response_ = "OK";
 
-	//LISTAUTH.TASKS = list of tasks LISTTASKS
-	//LISTAUTH.USERS = list of users LISTUSERS
+		//LISTAUTH.TASKS = list of tasks LISTTASKS
+		//LISTAUTH.USERS = list of users LISTUSERS
 	} else if (mode.field(".", 1) eq "LISTAUTH") {
 
-		win.wlocked = 0;
+		win.wlocked	  = 0;
 		win.templatex = "SECURITY";
 		call securitysubs("SETUP");
 		if (not(win.valid)) {
@@ -581,7 +582,7 @@ badsetcodepage:
 			abort();
 		}
 
-		data_ = RECORD;
+		data_	  = RECORD;
 		response_ = "OK";
 
 	} else if (mode eq "GETREPORTS") {
@@ -608,7 +609,7 @@ badsetcodepage:
 
 		gosub opendocuments();
 
-		data_ = "";
+		data_	 = "";
 		var repn = 0;
 nextrep:
 		if (readnext(reportid)) {
@@ -630,11 +631,11 @@ nextrep:
 				let nn = report.fcount(_FM);
 				for (const var ii : range(1, nn)) {
 					data_(ii, repn) = report.f(ii);
-				} //ii;
+				}  //ii;
 
 				data_(9, repn) = reportid;
 
-	//print repn,data<1>
+				//print repn,data<1>
 			}
 			//if len(data)<65000 then goto nextrep
 			if (data_.len() lt maxstrsize_ - 530) {
@@ -667,7 +668,7 @@ nextrep:
 					}
 				}
 			}
-		} //docn;
+		}  //docn;
 
 	} else if (mode eq "UPDATEREPORT") {
 
@@ -707,7 +708,7 @@ nextrep:
 		}
 
 		var description = doc.f(2);
-		doc(2) = description ^ " (Copy)";
+		doc(2)			= description ^ " (Copy)";
 
 		//prevent copy from appearing like a exodus standard
 		doc(10) = "";
@@ -752,7 +753,7 @@ nextrep:
 			if (tt) {
 				PSEUDO(fn) = tt;
 			}
-		} //fn;
+		}  //fn;
 		data_ = "";
 
 		//save runtime params in case saving below for scheduled reruns
@@ -789,7 +790,6 @@ performreport:
 
 				gosub postproc();
 			}
-
 		}
 
 	} else if (mode eq "USAGESTATISTICS") {
@@ -803,7 +803,7 @@ performreport:
 	} else if (mode eq "VIEWLOG") {
 
 		gosub initlog();
-		var datedict = "LOG_DATE";
+		var	  datedict = "LOG_DATE";
 
 		var cmd = "LIST LOG" ^ logyear;
 		cmd ^= " BY LOG_DATE BY LOG_TIME";
@@ -860,12 +860,11 @@ performreport:
 
 	} else {
 		call mssg("System Error: " ^ (mode.quote()) ^ " invalid request in GENERALPROXY");
-
 	}
 
 /////
 exit:
-/////
+	/////
 	return "";
 }
 
@@ -876,19 +875,19 @@ subroutine postproc() {
 
 subroutine initlog() {
 
-	logkey = request_.f(2);
-	logyear = request_.f(3);
-	var logformat = request_.f(4);
+	logkey		   = request_.f(2);
+	logyear		   = request_.f(3);
+	var logformat  = request_.f(4);
 	var logoptions = request_.f(5);
 
 	if (logoptions.match("^\\d*/\\d{2}$")) {
-		logyear = addcent4(logoptions.field("/", 2));
+		logyear	   = addcent4(logoptions.field("/", 2));
 		logoptions = "";
 	}
 
 	logfromdate = data_.f(5);
 	loguptodate = data_.f(6);
-	logsearch = data_.f(7);
+	logsearch	= data_.f(7);
 
 	if (logoptions eq "TODAY") {
 		logfromdate = date();
@@ -896,7 +895,7 @@ subroutine initlog() {
 	}
 
 	if (not logyear) {
-		var tt = logfromdate;
+		var tt	= logfromdate;
 		var tt2 = loguptodate;
 		if (not tt) {
 			tt = date();
@@ -904,7 +903,7 @@ subroutine initlog() {
 		if (not tt2) {
 			tt2 = tt;
 		}
-		logyear = tt.oconv("D").last(4);
+		logyear		  = tt.oconv("D").last(4);
 		var logtoyear = tt2.oconv("D").last(4);
 		if (logyear ne logtoyear) {
 			response_ = "Dates must be within one calendar year";
@@ -929,7 +928,7 @@ subroutine initlog() {
 
 subroutine gettaskprefix() {
 	taskprefix = "";
-	task = task.field(" ", 1);
+	task	   = task.field(" ", 1);
 	if (task eq "ANAL") {
 		taskprefix = "BILLING REPORT";
 	} else if (task eq "BALANCES") {

@@ -11,16 +11,16 @@ function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request
 	//at 7am on the 14th of each month (ie regularly but not everyday)
 	//CREATEALERT CURRUSERS GENERAL CURRUSERS 7:14 EXODUS (ROS)
 
-	var alerttype = alerttype0.field(":", 1);
+	var alerttype	 = alerttype0.field(":", 1);
 	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);
 
 	var mode = "";
 
 	if (alerttype eq "CURRUSERS") {
-		tasks = "AUTHORISATION ACCESS";
-		title = "List of Current Users";
+		tasks	= "AUTHORISATION ACCESS";
+		title	= "List of Current Users";
 		request = "LISTAUTH.USERS";
-		datax = "";
+		datax	= "";
 
 	} else {
 		call mssg(alerttype.quote() ^ " unrecognised alert type in GENERAL.ALERTS");

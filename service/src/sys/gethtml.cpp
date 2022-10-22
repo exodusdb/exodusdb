@@ -1,20 +1,20 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <langdate.h>
 #include <authorised.h>
+#include <langdate.h>
 
 // For sys.gcurrcompcode (for compcode), sys.companies (to read letterheadcompany and imagecompany) and sys.glang (months for langdate)
 #include <sys_common.h>
 
-var modex;
+	var modex;
 var hascompanies;
 var compcode;
 var letterheadcompany;
 var keyx;
 var tt;
 
-function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
+function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") {
 
 	// gethtml may be "perform"ed, "execute"d  or "call"ed
 	//
@@ -36,7 +36,7 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 
 	var mode;
 	if (mode0.assigned()) {
-		mode = mode0;
+		mode  = mode0;
 		modex = mode;
 	}
 
@@ -83,7 +83,7 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 	//////////////////////////////////////////
 
 	mode = "Company File ";
-	var letterhead;
+	var	  letterhead;
 	gosub getcompanyconfig(letterhead, mode);
 
 	//otherwise get from definitions
@@ -104,7 +104,6 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 		//image should not have closing tag but dont bother removing it
 		//swap '</image>' with '' in letterhead
 		//swap '</IMAGE>' with '' in letterhead
-
 	}
 
 	//process the HTML, adding various macros
@@ -126,7 +125,7 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 	letterhead.replacer("%COMPANY_REG_NO%", letterheadcompany.f(59));
 
 	var datetime = date() ^ "." ^ time().oconv("R(0)#5");
-	tt = "L";
+	tt			 = "L";
 	var tdate;
 	if (hascompanies) {
 		call langdate("OCONV", datetime, tt, tdate, sys.glang);
@@ -148,25 +147,27 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 		if (qr_text) {
 
 			var qr_body = qr_text.f(1);
-			var qr_tip = qr_text.f(2) ^ qr_body;
-			var cmd = "qrencode --size=2 --type=SVG " ^ qr_body.squote();
-			svg = osshellread(cmd);
+			var qr_tip	= qr_text.f(2) ^ qr_body;
+			var cmd		= "qrencode --size=2 --type=SVG " ^ qr_body.squote();
+			svg			= osshellread(cmd);
 
 			//remove everything like xml and comments before the opening <svg tag
 			svg.cutter(svg.index("<svg") - 1);
 
-//			#tooltip1 { position: relative; }
-//			#tooltip1 a span { display: none; color: #FFFFFF; }
-//			#tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
-//			The html markup is:-
-//			<p id="tooltip1"><a href="introduction.php">Introduction<span>Introduction to HTML and CSS: tooltip with extra text</span></a></p>
+			//			#tooltip1 { position: relative; }
+			//			#tooltip1 a span { display: none; color: #FFFFFF; }
+			//			#tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
+			//			The html markup is:-
+			//			<p id="tooltip1"><a href="introduction.php">Introduction<span>Introduction to HTML and CSS: tooltip with extra text</span></a></p>
 
-			svg ="<style>\n"
-			"#tooltip1 { position: relative; }\n"
-			"#tooltip1 a span { display: none; color: #FFFFFF; }\n"
-			"#tooltip1 a:hover span { display: block; position: absolute; white-space: nowrap; background-color: #222; left: 20px; top: 20px; color: #FFFFFF; padding: 0 5px; font-size:170%}\n"
-			"</style>\n"
-			"<p id='tooltip1'><a>" ^ svg ^ "<span> " ^ qr_tip.replace("\n","<br />") ^ "</span></a></p>";
+			svg =
+				"<style>\n"
+				"#tooltip1 { position: relative; }\n"
+				"#tooltip1 a span { display: none; color: #FFFFFF; }\n"
+				"#tooltip1 a:hover span { display: block; position: absolute; white-space: nowrap; background-color: #222; left: 20px; top: 20px; color: #FFFFFF; padding: 0 5px; font-size:170%}\n"
+				"</style>\n"
+				"<p id='tooltip1'><a>" ^
+				svg ^ "<span> " ^ qr_tip.replace("\n", "<br />") ^ "</span></a></p>";
 		}
 
 		letterhead.replacer("%QR%", svg);
@@ -184,8 +185,8 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 
 		//check various tags exist in equal numbers
 		//this doesnt check if they are in a correct sequence or hierarchy etc
-		var tags = "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
-		let ntags = tags.fcount(",");
+		var tags		= "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
+		let ntags		= tags.fcount(",");
 		var letterhead2 = letterhead.lcase();
 		for (const var tagn : range(1, ntags)) {
 			var tag = tags.field(",", tagn);
@@ -194,8 +195,7 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 				//tagn = ntags;
 				break;
 			}
-		} //tagn;
-
+		}  //tagn;
 	}
 
 	letterhead.replacer(_FM, _EOL);
@@ -225,7 +225,6 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 		onclick = "javascript:edithtml.click()";
 		letterhead.replacer("<IMG", "<img");
 		letterhead.replacer("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
-
 	}
 
 	// Also return letterhead in ANS in case gethtml was performed, not called.
@@ -236,7 +235,6 @@ function main(in mode0, out letterhead_out, in compcode0="", in qr_text="") {
 
 	letterhead.move(letterhead_out);
 	return 0;
-
 }
 
 subroutine getcompanyconfig(out letterhead, io mode) {
@@ -252,17 +250,17 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 				ncols = tt;
 			}
 		}
-	} //fn;
+	}  //fn;
 	if (not ncols) {
 		return;
 	}
 
-	var aligns = letterheadcompany.f(61);
-	var imagetypes = letterheadcompany.f(62);
-	var texts = letterheadcompany.f(63);
-	var fontsizes = letterheadcompany.f(64);
+	var aligns		   = letterheadcompany.f(61);
+	var imagetypes	   = letterheadcompany.f(62);
+	var texts		   = letterheadcompany.f(63);
+	var fontsizes	   = letterheadcompany.f(64);
 	var imagecompcodes = letterheadcompany.f(65);
-	var textcompcodes = letterheadcompany.f(66);
+	var textcompcodes  = letterheadcompany.f(66);
 
 	var tab = "";
 
@@ -289,11 +287,11 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 
 	for (const var coln : range(1, ncols)) {
 
-		var align = aligns.f(1, coln);
-		var imagetype = imagetypes.f(1, coln);
+		var align		  = aligns.f(1, coln);
+		var imagetype	  = imagetypes.f(1, coln);
 		var imagecompcode = imagecompcodes.f(1, coln);
-		var text = texts.f(1, coln);
-		var fontsize = fontsizes.f(1, coln);
+		var text		  = texts.f(1, coln);
+		var fontsize	  = fontsizes.f(1, coln);
 		if (fontsize and fontsize.isnum()) {
 			fontsize ^= "%";
 		}
@@ -319,15 +317,15 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		if (fontsize) {
 			divstyle ^= "font-size:" ^ fontsize ^ ";";
 		}
-//		if (divstyle) {
-//			div = FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">";
-//			divx = FM ^ "   </div>";
-//		} else {
-//			div = "";
-//			divx = "";
-//		}
-		var	div = divstyle ? FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">" : "";
-		var	divx = divstyle ? FM ^ "   </div>" : "";
+		//		if (divstyle) {
+		//			div = FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">";
+		//			divx = FM ^ "   </div>";
+		//		} else {
+		//			div = "";
+		//			divx = "";
+		//		}
+		var div	 = divstyle ? FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">" : "";
+		var divx = divstyle ? FM ^ "   </div>" : "";
 		//add image
 		if (imagetype or imagecompcode) {
 			tab ^= div;
@@ -343,7 +341,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 
 				mode ^= ", Col " ^ coln ^ " image from company " ^ imagecompcode;
 
-			//use this company image and type
+				//use this company image and type
 			} else {
 				imagecompcode = compcode;
 			}
@@ -361,11 +359,11 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			//logo_companycode_coln .jpg .png /gif
 			var imagefilename = "logo_" ^ imagecompcode ^ "_" ^ coln ^ "." ^ imagetype;
 
-			var fullimageurl = url ^ imagepath ^ imagefilename;
+			var fullimageurl		  = url ^ imagepath ^ imagefilename;
 			var relativeimagefilename = "../.." ^ imagepath ^ imagefilename;
 
 			tab(-1) = "   <img src=" ^ (fullimageurl.quote()) ^ " alt=" ^ (fullimageurl.quote());
-			var sq = "'";
+			var sq	= "'";
 			tab ^= " onerror=\"this.onerror=null;this.src=" ^ sq ^ relativeimagefilename ^ sq ^ ";\"";
 			tab ^= " style=\"margin:0;border:0\"";
 
@@ -377,7 +375,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		var textcompcode = textcompcodes.f(1, coln);
 		if (textcompcode) {
 			//ignore any given text if textcompany given
-			text = "";
+			text			= "";
 			var textcompany = "";
 			if (hascompanies) {
 				if (not(textcompany.read(sys.companies, textcompcode))) {
@@ -401,7 +399,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			tab(-1) = "  </td>";
 		}
 
-	} //coln;
+	}  //coln;
 
 	if (usetable) {
 		tab(-1) = "";
@@ -419,11 +417,11 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 subroutine getheadhtm(io letterhead) {
 
 nextmodex:
-//////////
+	//////////
 	var prefix = compcode ^ "_";
 
 nextprefix:
-///////////
+	///////////
 	keyx = prefix ^ modex.f(1, 1) ^ var(".htm").ucase();
 
 	if (not(letterhead.read(DEFINITIONS, keyx))) {
@@ -439,7 +437,6 @@ nextprefix:
 			modex = modex.field(VM, 2, 9999);
 			goto nextmodex;
 		}
-
 	}
 
 	return;

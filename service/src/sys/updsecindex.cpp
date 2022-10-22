@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var indexingfilename;
+	var indexingfilename;
 var indexingrecord;
 var recordx;
 
@@ -24,11 +24,11 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 	//5. CALL('INDEXING' - to unlock !INDEXING
 
 	var secstowaitforindexinglock = 99;
-	var secstowaitforlock = 9;
-	var indexingkey = "0";
+	var secstowaitforlock		  = 9;
+	var indexingkey				  = "0";
 
 	valid = 0;
-	msg = "Unknown error in UPD.SECINDEX";
+	msg	  = "Unknown error in UPD.SECINDEX";
 
 	if (VOLUMES) {
 		indexingfilename = "!INDEXING";
@@ -109,22 +109,21 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 						cnt += 1;
 					}
 
-				} //fieldn;
+				}  //fieldn;
 
 				//duplicate code in UPDATE and UNLOCK
 				call unlockrecord(filename, file, keyx);
-
 			}
 
 			//random comment to trigger correct adecom to c++ code
-		} //keyn;
+		}  //keyn;
 
 		//update
 		if (mode eq "UPDATE" and upd ne "") {
 
 			var fileaccount = filename.xlate("FILES", 3, "X");
-			var filevolume = filename.xlate("FILES", 1, "X");
-			var volid = filevolume.xlate("VOLUMES", 1, "X");
+			var filevolume	= filename.xlate("FILES", 1, "X");
+			var volid		= filevolume.xlate("VOLUMES", 1, "X");
 
 			//list:= 'YYY*ADAGENCY*22:06:18  18 JAN 2004':@FM:YYY.CNT:@FM:YYY.UPD
 			indexinglist ^= filename ^ "*" ^ fileaccount ^ "*" ^ volid ^ FM ^ cnt ^ FM ^ upd;
@@ -139,13 +138,11 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 			indexingrecord ^= indexinglist;
 
 			indexingrecord.write(indexingfile, indexingkey);
-
 		}
-
 	}
 
 	valid = 1;
-	msg = "";
+	msg	  = "";
 
 	return 0;
 }

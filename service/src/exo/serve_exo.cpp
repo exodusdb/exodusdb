@@ -1,21 +1,20 @@
 #include <exodus/program.h>
 programinit()
 
-#include <win_common.h>
-#include <sys_common.h>
-//#include <agy_common.h>
-#include <initcompany.h>
 #include <hashpass.h>
+#include <initcompany.h>
 #include <initgeneral.h>
 #include <initgeneral2.h>
+#include <sys_common.h>
+#include <win_common.h>
 
-var xx;
+	var xx;
 
 function main() {
 
 	//NB numbers and names MUST match those in the matching common .h files
-	mv.labelledcommon[win_common_no]=new win_common;
-	mv.labelledcommon[sys_common_no]=new sys_common;
+	mv.labelledcommon[win_common_no] = new win_common;
+	mv.labelledcommon[sys_common_no] = new sys_common;
 	//mv.labelledcommon[agy_common_no]=new agy_common;
 
 	/*cat ~/pickos/dic/ *.SQL | psql -h 127.0.0.1 -U exodus exodus*/
@@ -43,14 +42,14 @@ function main() {
 	SYSTEM(33) = "X";
 
 	//module
-	APPLICATION="EXODUS";
+	APPLICATION = "EXODUS";
 
 	//user
 	//USERNAME="exodus";
-	USERNAME="EXODUS";
+	USERNAME = "EXODUS";
 
 	//database
-	var databasecode=osgetenv("EXO_DATA");
+	var databasecode = osgetenv("EXO_DATA");
 	if (not databasecode)
 		databasecode = "exodus";
 	SYSTEM(17) = databasecode;
@@ -61,19 +60,19 @@ function main() {
 	//system mode
 	SYSTEM(33, 1) = "1";
 	//user
-	SYSTEM(17) = "exodus";//database code
-	SYSTEM(23) = "EXODUS";//database name
-	SYSTEM(33, 2) = "EXODUS";//connection
+	SYSTEM(17)	  = "exodus";  //database code
+	SYSTEM(23)	  = "EXODUS";  //database name
+	SYSTEM(33, 2) = "EXODUS";  //connection
 	SYSTEM(33, 3) = "EXODUS";
 
 	//f5 key
 	PRIORITYINT(2) = "x";
 
 	//create database dir
-	var datadir="../data/";
+	var datadir = "../data/";
 	if (not osdir(datadir))
 		abort(datadir.quote() ^ " data directory does not exist");
-	var databasedir=datadir ^ databasecode;
+	var databasedir = datadir ^ databasecode;
 	if (osmkdir(databasedir)) {
 		osshell("chmod g+rws " ^ databasedir);
 		osshell("setfacl -d -m g::rw " ^ databasedir);
@@ -87,7 +86,7 @@ function main() {
 	if (hasnext())
 		clearselect();
 	else
-		write("All Markets","MARKETS","ALL");
+		write("All Markets", "MARKETS", "ALL");
 
 	/*
 	var agp="";
@@ -101,10 +100,10 @@ function main() {
 	*/
 
 	//exodus pass
-	var rec="";
+	var rec = "";
 	//printl(hashpass("ALSOWINE"));
 	rec(7) = hashpass("ALSOWINE");
-	write(rec on "DEFINITIONS","EXODUS");
+	write(rec on "DEFINITIONS", "EXODUS");
 
 	//call initgeneral();
 	perform("initgeneral LOGIN");
@@ -122,7 +121,7 @@ function main() {
 	*/
 
 	//kick off with initgeneral or some custom command
-	var cmd=SENTENCE.field(" ",2,9999);
+	var cmd = SENTENCE.field(" ", 2, 9999);
 	if (cmd)
 		perform(cmd);
 	else

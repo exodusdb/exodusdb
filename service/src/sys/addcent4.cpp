@@ -3,7 +3,7 @@ libraryinit()
 
 #include <system_common.h>
 
-var inx;//num
+	var inx;  //num
 
 function main(in type, in in0, in /*mode*/, out outx) {
 
@@ -14,7 +14,7 @@ function main(in type, in in0, in /*mode*/, out outx) {
 		inx = type;
 
 oconvx:
-///////
+		///////
 		//nothing in - no conv
 		if (inx.len() eq 0) {
 noconv:
@@ -49,15 +49,15 @@ noconv:
 		if (inx.len() eq 2) {
 			//ok
 
-		//pad to two digits 1 -> 01 -> 2001
+			//pad to two digits 1 -> 01 -> 2001
 		} else if (inx.len() eq 1) {
 			inx = "0" ^ inx;
 
-		//more than four digit - no conv
+			//more than four digit - no conv
 		} else if (inx.len() gt 4) {
 			goto noconv;
 
-		//three digits - use right most two digits
+			//three digits - use right most two digits
 		} else {
 			inx.laster(2);
 		}
@@ -72,12 +72,11 @@ noconv:
 
 		return outx;
 
-	//OCONV
-	///////
+		//OCONV
+		///////
 	} else if (type eq "OCONV") {
 		inx = in0;
 		goto oconvx;
-
 	}
 
 	//ICONV
@@ -114,7 +113,6 @@ noconv:
 	//0       2000
 	//-1      1999
 	//-2      1998
-
 }
 
 libraryexit()

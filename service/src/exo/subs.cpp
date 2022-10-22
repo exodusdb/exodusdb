@@ -6,18 +6,18 @@ function main(in args1, in args2, in sep) {
 	if (args1 == "" and args2 == "") {
 		return args1;
 	}
-//	dim array1;
-//	dim array2;
-//	var nn1=array1.split(args1.convert(sep,FM));
-//	var nn2=array2.split(args2.convert(sep,FM));
+	//	dim array1;
+	//	dim array2;
+	//	var nn1=array1.split(args1.convert(sep,FM));
+	//	var nn2=array2.split(args2.convert(sep,FM));
 
 	dim array1 = args1.split(sep);
 	dim array2 = args2.split(sep);
-	int nn1 = array1.rows();
-	int nn2 = array2.rows();
+	int nn1	   = array1.rows();
+	int nn2	   = array2.rows();
 
-	int min_nn = nn2>nn1?nn1:nn2;
-	int max_nn = nn2>nn1?nn2:nn1;
+	int min_nn = nn2 > nn1 ? nn1 : nn2;
+	int max_nn = nn2 > nn1 ? nn2 : nn1;
 
 	dim output(max_nn);
 
@@ -33,11 +33,11 @@ function main(in args1, in args2, in sep) {
 	}
 
 	//deal with the remaining elements which must all be null or zero
-	for (int ii = min_nn+1; ii <= max_nn; ++ii) {
+	for (int ii = min_nn + 1; ii <= max_nn; ++ii) {
 		if (ii > nn1) {
 			//array2 is longer than array1
 			if (array2(ii).len())
-				output(ii) =- array2(ii);
+				output(ii) = -array2(ii);
 			else
 				output(ii) = "";
 		} else {

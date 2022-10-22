@@ -2,10 +2,10 @@
 libraryinit()
 
 #include <authorised.h>
-#include <sysmsg.h>
-#include <usersubs.h>
 #include <securitysubs.h>
 #include <singular.h>
+#include <sysmsg.h>
+#include <usersubs.h>
 
 #include <system_common.h>
 
@@ -14,10 +14,10 @@ libraryinit()
 
 #include <window.hpp>
 
-var msg;
+	var msg;
 var xx;
-var usern;//num
-var newuser;//num
+var usern;	  //num
+var newuser;  //num
 var text;
 var usercode;
 var depts;
@@ -36,7 +36,7 @@ function main(in mode) {
 	if (not(users.open("USERS", ""))) {
 		msg = "USERS file is missing";
 		return invalid(msg);
-		}
+	}
 
 	if (mode eq "POSTREAD") {
 
@@ -69,15 +69,17 @@ function main(in mode) {
 				win.srcfile.unlock(ID);
 				win.wlocked = 0;
 			}
-
 		}
 
 		//prevent new users with punctuation characters etc
 		if (win.orec eq "" and win.wlocked) {
 			var temp = ID;
-			temp.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789", "");
+			temp.converter(
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				"0123456789",
+				"");
 			if (temp) {
-				msg = ID.quote() ^ " user doesnt exist and new usercodes";
+				msg		= ID.quote() ^ " user doesnt exist and new usercodes";
 				msg(-1) = "must be alphanumeric characters only";
 				return invalid(msg);
 			}
@@ -92,10 +94,10 @@ function main(in mode) {
 			//and they would not have been able to login with it.
 			if (not(RECORD.f(36))) {
 				var lastlogindate = RECORD.f(13).field(".", 1);
-				RECORD(36) = lastlogindate;
+				RECORD(36)		  = lastlogindate;
 			}
 			var expirydate = RECORD.f(36) + expirydays;
-			RECORD(37) = expirydate;
+			RECORD(37)	   = expirydate;
 		} else {
 			//indicate no expiry
 			RECORD(37) = "";
@@ -129,13 +131,13 @@ function main(in mode) {
 				let nn = sysemails.fcount(" ");
 				for (const var ii : range(1, nn)) {
 					var word = sysemails.field(" ", ii);
-					word = field2(word, "@", -1);
+					word	 = field2(word, "@", -1);
 					//remove smtp. mailout. etc from smtp host domain
 					if (var("smtp,mail,mailout").locateusing(",", word.field(".", 1), xx)) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);
-				} //ii;
+				}  //ii;
 				emaildomains ^= " " ^ sysemails;
 			}
 		}
@@ -160,10 +162,10 @@ function main(in mode) {
 						}
 					}
 				}
-			} //ii;
+			}  //ii;
 		}
 
-	//can be PREWRITE.RESETPASSWORD
+		//can be PREWRITE.RESETPASSWORD
 	} else if (mode.field(".", 1) eq "PREWRITE") {
 
 		var resetpassword = mode.field(".", 2) eq "RESETPASSWORD";
@@ -177,7 +179,7 @@ function main(in mode) {
 				resetpassword = 1;
 			}
 		} else {
-			newuser = 1;
+			newuser		  = 1;
 			resetpassword = 0;
 		}
 
@@ -194,7 +196,7 @@ function main(in mode) {
 		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 			msg = "SECURITY is missing from DEFINITIONS";
 			gosub unlocksec();
-			call sysmsg(msg);
+			call  sysmsg(msg);
 			return invalid(msg);
 		}
 
@@ -229,7 +231,6 @@ function main(in mode) {
 					//department2
 					RECORD(21) = win.orec.f(21);
 				}
-
 			}
 		}
 
@@ -262,10 +263,10 @@ function main(in mode) {
 			//insert an empty user
 			for (const var fn : range(1, 9)) {
 				SECURITY.inserter(fn, usern, "");
-			} //fn;
+			}  //fn;
 
-			var newusername = RECORD.f(1);
-			var newipnos = RECORD.f(40);
+			var newusername		= RECORD.f(1);
+			var newipnos		= RECORD.f(40);
 			var newemailaddress = RECORD.f(7);
 
 			SECURITY(1, usern) = ID;
@@ -276,7 +277,6 @@ function main(in mode) {
 			SECURITY(6, usern) = newipnos;
 			SECURITY(7, usern) = newemailaddress;
 			SECURITY(8, usern) = newusername;
-
 		}
 
 		gosub getusern();
@@ -292,7 +292,6 @@ function main(in mode) {
 
 			//user name
 			SECURITY(8, usern) = RECORD.f(1);
-
 		}
 
 		//reencrypt new password
@@ -310,10 +309,9 @@ function main(in mode) {
 			//update security if managed to lock it
 			if (resetpassword lt 2) {
 				ans.converter(FM, TM);
-				var tt = "<hidden>" ^ SM ^ ans;
+				var tt			   = "<hidden>" ^ SM ^ ans;
 				SECURITY(4, usern) = tt;
 			}
-
 		}
 
 		if (resetpassword lt 2 and SECURITY ne olduserprivs) {
@@ -360,13 +358,14 @@ function main(in mode) {
 				ID = "*!%";
 			}
 			///BREAK;
-			if (not(ID ne "*!%")) break;
+			if (not(ID ne "*!%"))
+				break;
 			if (not(ID.starts("%"))) {
 				if (RECORD.read(users, ID)) {
 					gosub updatemirror();
 				}
 			}
-		}//loop;
+		}  //loop;
 
 	} else if (mode.field(",", 1) eq "GETUSERDEPTX") {
 		//does not popup any errormessage
@@ -390,7 +389,6 @@ function main(in mode) {
 	} else {
 		msg = mode.quote() ^ " is invalid in USER.SUBS";
 		return invalid(msg);
-
 	}
 
 	return 0;
@@ -421,11 +419,11 @@ subroutine updatemirror() {
 	//save the user keyed as username too
 	//because we save the user name and executive code in many places
 	//and we still need to get the executive email if they are a user
-	var mirror = RECORD.fieldstore(FM, 13, 5, "");
-	mirror = RECORD.fieldstore(FM, 31, 3, "");
-	var username = RECORD.f(1).ucase();
+	var mirror	  = RECORD.fieldstore(FM, 13, 5, "");
+	mirror		  = RECORD.fieldstore(FM, 31, 3, "");
+	var username  = RECORD.f(1).ucase();
 	var mirrorkey = "%" ^ username ^ "%";
-	mirror(1) = ID;
+	mirror(1)	  = ID;
 	mirror.write(win.srcfile, mirrorkey);
 	return;
 }
@@ -448,8 +446,9 @@ subroutine getuserdept2(in mode) {
 	var nusers1 = SECURITY.f(1).fcount(VM);
 	for (usern += 1; usern <= nusers1; ++usern) {
 		///BREAK;
-		if (SECURITY.f(1, usern) eq "---") break;
-	} //usern;
+		if (SECURITY.f(1, usern) eq "---")
+			break;
+	}  //usern;
 
 	//get the department code
 	ANS = SECURITY.f(1, usern - 1);
@@ -457,7 +456,7 @@ subroutine getuserdept2(in mode) {
 }
 
 subroutine getdepts() {
-	depts = "";
+	depts		= "";
 	var nusers2 = SECURITY.f(1).fcount(VM);
 	for (usern = 2; usern <= nusers2 + 1; ++usern) {
 		text = SECURITY.f(1, usern);
@@ -471,7 +470,7 @@ subroutine getdepts() {
 				}
 			}
 		}
-	} //usern;
+	}  //usern;
 
 	return;
 }

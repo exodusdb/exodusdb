@@ -7,12 +7,11 @@ libraryinit()
 
 #include <sys_common.h>
 
-var startmode;
+	var startmode;
 var temp;
-var reply;//num
+var reply;	//num
 
 function main(in startmode0, out starttime, out startdate, out startbuffer) {
-
 
 	if (startmode0.unassigned()) {
 		startmode = "";

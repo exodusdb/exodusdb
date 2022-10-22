@@ -1,30 +1,29 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <authorised.h>
 #include <generalsubs.h>
 #include <getsubs.h>
 #include <nextkey.h>
-#include <authorised.h>
 #include <singular.h>
 
-//#include <sys_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
 
-var mode;
+	var mode;
 var datasetparams;
 var msg;
 var datasetcodes;
 var xx;
 var usercode;
-var usern0;//num
-var usern;//num
+var usern0;	 //num
+var usern;	 //num
 var depts;
 var reply;
 var tt;
-var no;//num
-var nusers;//num
+var no;		 //num
+var nusers;	 //num
 var deptn;
 var directory;
 var lastbackup;
@@ -34,18 +33,16 @@ var wspos;
 var wsmsg;
 
 function main(in mode0) {
-	//#include <sys_common.h>
-
 
 	//nb general.subs can only be called from programs with win_common.h
 	//because msg etc are common variables and must be defined in caller
 
 	mode = mode0;
 
-    //use app specific version of generalsubs
-    if (APPLICATION ne "EXODUS") {
-        generalsubs = "generalsubs_app";
-    }
+	//use app specific version of generalsubs
+	if (APPLICATION ne "EXODUS") {
+		generalsubs = "generalsubs_app";
+	}
 
 	if (mode == "GETDATASETS") {
 		gosub getdatasets();
@@ -59,7 +56,7 @@ function main(in mode0) {
 
 		gosub getdatasets();
 
-		if (not(datasetcodes.f(1).locate(win.is,xx))) {
+		if (not(datasetcodes.f(1).locate(win.is, xx))) {
 			msg = win.is.quote() ^ " is not a dataset";
 			return invalid(msg);
 		}
@@ -82,21 +79,23 @@ function main(in mode0) {
 	} else if (mode == "GETGROUPUSERS") {
 
 		var groupusers = "";
-		if (SECURITY.f(1).locate(USERNAME,usern0)) {
+		if (SECURITY.f(1).locate(USERNAME, usern0)) {
 			//add lower users in group
 			for (usern = usern0 + 1; usern <= 9999; ++usern) {
 				usercode = SECURITY.f(1, usern);
 				///BREAK;
-				if (not(usercode and usercode ne "---")) break;
+				if (not(usercode and usercode ne "---"))
+					break;
 				groupusers ^= VM ^ usercode;
-			}//usern;
+			}  //usern;
 			//add higher users in group
 			for (usern = usern0 - 1; usern >= 1; --usern) {
 				usercode = SECURITY.f(1, usern);
 				///BREAK;
-				if (not(usercode ne "---")) break;
+				if (not(usercode ne "---"))
+					break;
 				groupusers ^= VM ^ usercode;
-			}//usern;
+			}  //usern;
 		}
 
 		ANS = groupusers;
@@ -116,7 +115,6 @@ function main(in mode0) {
 					win.isdflt = ID;
 					return 0;
 				}
-
 			}
 
 			//convert SK in datafile to SK in definitions
@@ -128,7 +126,6 @@ function main(in mode0) {
 					no = 1;
 				}
 				no.writev(DEFINITIONS, win.datafile ^ ".SK", 1);
-
 			}
 
 next:
@@ -174,7 +171,7 @@ subroutine getdatasets() {
 	directory.ucaser();
 	//DIRECTORY=TRIM(DIRECTORY[1,\1A\]);*DOS TEXT EOF IS CONTROL-Z
 	var dosformat = directory.contains(chr(13));
-	directory.converter(" " _FM  "\r\n", _FM "   ");
+	directory.converter(" " _FM "\r\n", _FM "   ");
 	directory.trimmer();
 	directory.converter(" " _FM, _FM " ");
 	var nvols = directory.fcount(FM);
@@ -186,33 +183,33 @@ subroutine getdatasets() {
 	}
 
 	datasetparams.converter(",*", SM ^ VM);
-	var subst = datasetparams.field(" ", 1);
+	var subst	  = datasetparams.field(" ", 1);
 	datasetparams = datasetparams.field(" ", 2, 9999);
 	let ndatasets = datasetparams.fcount(VM);
 
-	datasetcodes = "";
+	datasetcodes	 = "";
 	var datasetnames = "";
 
 	for (const var datasetn : range(1, ndatasets)) {
-		var temp = datasetparams.f(1, datasetn);
+		var temp		= datasetparams.f(1, datasetn);
 		var datasetcode = temp.f(1, 1, 2);
 		var datasetname = temp.f(1, 1, 1);
-		tt = "../data/" ^ datasetcode.lcase() ^ "/general/revmedia.lk";
+		tt				= "../data/" ^ datasetcode.lcase() ^ "/general/revmedia.lk";
 		tt.converter("/", OSSLASH);
 		if (not(tt.osfile())) {
-			datasetname = "*" ^ datasetname;
+			datasetname					  = "*" ^ datasetname;
 			datasetparams(1, datasetn, 1) = datasetname;
 		}
 		datasetcodes(1, datasetn) = datasetcode;
 		datasetnames(1, datasetn) = datasetname;
-		tt = "../data/" ^ temp.f(1, 1, 2).lcase() ^ "/params2";
+		tt						  = "../data/" ^ temp.f(1, 1, 2).lcase() ^ "/params2";
 		tt.converter("/", OSSLASH);
 		if (not(lastbackup.osread(tt))) {
 			lastbackup = "";
 		}
-		lastbackup = lastbackup.f(2);
+		lastbackup					  = lastbackup.f(2);
 		datasetparams(1, datasetn, 4) = lastbackup.oconv("D");
-	}//datasetn;
+	}  //datasetn;
 
 	return;
 }
@@ -220,7 +217,7 @@ subroutine getdatasets() {
 subroutine getuserdept2() {
 	//locate the user in the table
 	usercode = mode.field(",", 2);
-	if (not(SECURITY.f(1).locate(usercode,usern))) {
+	if (not(SECURITY.f(1).locate(usercode, usern))) {
 		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return;
@@ -234,8 +231,9 @@ subroutine getuserdept2() {
 	nusers = SECURITY.f(1).fcount(VM);
 	for (usern = 1; usern <= nusers; ++usern) {
 		///BREAK;
-		if (SECURITY.f(1, usern) == "---") break;
-	}//usern;
+		if (SECURITY.f(1, usern) == "---")
+			break;
+	}  //usern;
 
 	//get the department code
 	ANS = SECURITY.f(1, usern - 1);

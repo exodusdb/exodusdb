@@ -1,17 +1,17 @@
 #include <exodus/program.h>
 programinit()
 
-var blocktype;
+	var blocktype;
 var blockid;
 var blockline;
 var block;
 var ans;
 var xx;
 var macron;
-var paramn;//num
+var paramn;	 //num
 var lineparam;
 var wordn;
-var fieldn;//num
+var fieldn;	 //num
 
 var macros;
 var nmacros;
@@ -26,7 +26,7 @@ var ln;
 
 function main() {
 
-	filename = SENTENCE.field(" ", 2);
+	filename	 = SENTENCE.field(" ", 2);
 	dictfilename = SENTENCE.field(" ", 3);
 
 	if (not(filename and dictfilename)) {
@@ -46,18 +46,18 @@ function main() {
 		call mssg(key.quote() ^ " is missing from " ^ filename);
 		stop();
 	}
-	doc.converter("\n",FM);
-	doc.converter("\t"," ");
+	doc.converter("\n", FM);
+	doc.converter("\t", " ");
 	nlns = doc.fcount(FM);
 
 	//note the dictids are oswritten out to 'BDICT'
 	//you are advised to LIST filename with those bdicts to test
 
-	ln = 1;
-	macros = "";
+	ln		= 1;
+	macros	= "";
 	nmacros = "";
 	dictids = "";
-	doall = "";
+	doall	= "";
 
 	while (true) {
 		gosub getblock();
@@ -79,7 +79,7 @@ function main() {
 			stop();
 		}
 
-	}//loop;
+	}  //loop;
 
 	stop();
 
@@ -89,7 +89,7 @@ function main() {
 subroutine definemacro() {
 	nmacros += 1;
 	macros(1, nmacros) = blockid;
-	splitline = blockline.trim();
+	splitline		   = blockline.trim();
 	splitline.converter(" ", VM);
 	macros(2, nmacros) = lower(splitline.field(VM, 4, 999999));
 	macros(3, nmacros) = lower(lower(block));
@@ -113,7 +113,7 @@ subroutine writedict() {
 	var basedictrec;
 	for (var suffixno : range(suffix_from, suffix_upto)) {
 
-		var dictid = blockid.field("|",1);
+		var dictid = blockid.field("|", 1);
 
 		// Suffix can be 0
 		if (suffixno) {
@@ -136,7 +136,6 @@ subroutine writedict() {
 			}
 
 			dictid ^= "_" ^ suffixno;
-
 		}
 
 		var osdatfilename = "dat/" ^ dictfilename ^ "/" ^ dictid;
@@ -155,8 +154,8 @@ subroutine writedict() {
 		dictids ^= " " ^ dictid;
 		//var(dictids).oswrite("bdict");
 
-		var f8 = dictrec.f(8).trimlast(VM);
-		dictrec(8) = f8;
+		var f8			= dictrec.f(8).trimlast(VM);
+		dictrec(8)		= f8;
 		var origdictrec = dictrec;
 
 		// Update the source code
@@ -177,12 +176,12 @@ subroutine writedict() {
 			if (doall) {
 				ans = "Y";
 			} else {
-	//			print("press any key:");
-	//			osflush();
-	//			xx.inputn(1);
-	//			if (var("Qq").contains(xx)) {
-	//				stop();
-	//			}
+				//			print("press any key:");
+				//			osflush();
+				//			xx.inputn(1);
+				//			if (var("Qq").contains(xx)) {
+				//				stop();
+				//			}
 				printl("---------- NEW ", dictid, " ----------");
 				printl(dictrec.f(8).replace(VM, "\n"));
 				print("Update (y=yes, q=quit, a=all, n=no)");
@@ -193,16 +192,15 @@ subroutine writedict() {
 					stop();
 				}
 				if (var("Aa").contains(ans)) {
-					ans = "Y";
+					ans	  = "Y";
 					doall = "Y";
 				}
 			}
 			if (ans eq "Y" or ans eq "y") {
 				//dictrec.write(DICT, dictid);
-				oswrite(oconv(dictrec,"TX") on osdatfilename);
+				oswrite(oconv(dictrec, "TX") on osdatfilename);
 			}
 		}
-
 	}
 
 	return;
@@ -210,21 +208,21 @@ subroutine writedict() {
 
 subroutine getblock() {
 	blocktype = "";
-	blockid = "";
+	blockid	  = "";
 	blockline = "";
-	block = "";
+	block	  = "";
 	for (; ln <= nlns; ++ln) {
-		var line = doc.f(ln);
+		var line  = doc.f(ln);
 		var word1 = line.field(" ", 1);
 
 		if (word1 eq "#define" or word1 eq "#comment") {
 
 			if (blocktype) {
 				block.cutter(1);
-//				while (true) {
-//					if (not(block.ends(FM))) break;
-//					block.popper();
-//				}//loop;
+				//				while (true) {
+				//					if (not(block.ends(FM))) break;
+				//					block.popper();
+				//				}//loop;
 				block.trimmerlast(FM);
 				return;
 			}
@@ -235,7 +233,7 @@ subroutine getblock() {
 				blockline = line.trim();
 			}
 			blocktype = blockline.field(" ", 2);
-			blockid = blockline.field(" ", 3);
+			blockid	  = blockline.field(" ", 3);
 
 			//cater for macro on the define dict line
 			if (blocktype eq "dict") {
@@ -253,7 +251,7 @@ addline:
 			splitline.converter(" ", VM);
 			word1 = splitline.f(1, 1);
 			if (word1 eq "#include") {
-				var macroid = splitline.f(1, 2);
+				var macroid	   = splitline.f(1, 2);
 				var lineparams = splitline.field(VM, 3, 999999);
 				if (macros.f(1).locate(macroid, macron)) {
 					var macroline = raise(macros.f(2, macron));
@@ -261,9 +259,9 @@ addline:
 
 					var nmlns = macrotext.fcount(FM);
 					// Additional space to defeat convsyntax until clang-format
-					for ( var mln = 1; mln <= nmlns; mln++) {
-						var mline0 = macrotext.f(mln).convert("\t"," ");
-						var mline = mline0.trim(" ");
+					for (var mln = 1; mln <= nmlns; mln++) {
+						var mline0 = macrotext.f(mln).convert("\t", " ");
+						var mline  = mline0.trim(" ");
 						var mword1 = mline.field(" ", 1);
 						if (mword1 eq "#ifdef" or mword1 eq "#ifndef") {
 							var mword2 = mline.field(" ", 2);
@@ -293,7 +291,7 @@ insertmline:
 									mline0.remover(1, wordn);
 								}
 								mline0.converter(" " ^ VM, VM ^ " ");
-								mline0 = str("\t", len(mline0) - len(mline0.trimfirst())) ^ mline0.trimfirst();
+								mline0		   = str("\t", len(mline0) - len(mline0.trimfirst())) ^ mline0.trimfirst();
 								macrotext(mln) = mline0;
 
 							} else {
@@ -302,27 +300,26 @@ insertmline:
 								}
 								goto insertmline;
 							}
-
 						}
 nextmln:;
-					} //mln;
+					}  //mln;
 
 					//substitute all macro parameters
 					var nparams = macroline.fcount(VM);
 					for (paramn = 1; paramn <= nparams; ++paramn) {
-						var old = macroline.f(1, paramn);
+						var old	 = macroline.f(1, paramn);
 						var newx = lineparams.f(1, paramn);
 						macrotext.replacer(old, newx);
-					} //paramn;
+					}  //paramn;
 
 					//speed up fieldwise { } for F fields. avoid calling a dict subroutine
 					var allfields = "";
-					var fields = "";
-//					var findfieldn = 0;
-//					while (true) {
+					var fields	  = "";
+					//					var findfieldn = 0;
+					//					while (true) {
 					for (var findpos = 1;; findpos++) {
 
-//						findfieldn += 1;
+						//						findfieldn += 1;
 						//findpos = macrotext.index2("{", findpos);
 						findpos = macrotext.index("{", findpos);
 
@@ -348,10 +345,15 @@ nextmln:;
 								call mssg(fieldname.quote() ^ " field is missing from DICT " ^ DICT);
 							}
 						}
-					}//loop;
+					}  //loop;
 
-					var equates = "\t/" "/GENERATED BY " ^ SENTENCE.quote();
-					equates ^= FM ^ "\t/" "/DO NOT EDIT MANUALLY";
+					var equates =
+						"\t/"
+						"/GENERATED BY " ^
+						SENTENCE.quote();
+					equates ^= FM ^
+							   "\t/"
+							   "/DO NOT EDIT MANUALLY";
 					if (fields) {
 						var nfields = fields.f(1).fcount(VM);
 						for (fieldn = 1; fieldn <= nfields; ++fieldn) {
@@ -359,7 +361,7 @@ nextmln:;
 							macrotext.replacer("{" ^ fieldname ^ "}", fieldname);
 							//swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext
 							equates(-1) = "\t#define " ^ fieldname ^ "\tRECORD.f(" ^ fields.f(2, fieldn) ^ ")";
-						} //fieldn;
+						}  //fieldn;
 						macrotext.prefixer(equates ^ FM);
 					}
 
@@ -369,17 +371,15 @@ nextmln:;
 					//call mssg(macroid.quote() ^ " macro is undefined in line " ^ ln ^ FM ^ doc.f(ln));
 					//stop();
 				}
-
 			}
 
-			var indents = len(line)-len(trimfirst(line));
+			var indents = len(line) - len(trimfirst(line));
 
-			block ^= FM ^ str("\t",indents) ^ trimfirst(line);
-
+			block ^= FM ^ str("\t", indents) ^ trimfirst(line);
 		}
 
-//nextln:;
-	} //ln;
+		//nextln:;
+	}  //ln;
 
 	return;
 }

@@ -12,13 +12,12 @@ function main(in x, in y, in x2, in y2, in readwrite, io buffer) {
 	//evade warning "usused"
 	false and x and y and x2 and y2 and readwrite;
 
-	if (readwrite=="R") {
-		buffer="";
-	} else if (readwrite=="W") {
+	if (readwrite == "R") {
+		buffer = "";
+	} else if (readwrite == "W") {
 	}
 
 	return 0;
 }
 
 libraryexit()
-

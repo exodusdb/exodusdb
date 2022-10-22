@@ -5,18 +5,17 @@ libraryinit()
 
 #include <sys_common.h>
 
-var ntries;//num
+	var ntries;	 //num
 var lockdesc;
 var xx;
-var allowduplicate;//num
+var allowduplicate;	 //num
 //var lockitem;
-var lockn;//num
+var lockn;	//num
 var lockfile;
 
 #define lockitemsep_ "*"
 
 function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
-
 
 	if (locklist.unassigned()) {
 		locklist = "";
@@ -30,7 +29,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 		lockdesc = "";
 	} else {
 		lockdesc = lockdesc0;
-		}
+	}
 	if (not ntries) {
 		ntries = 100;
 	}
@@ -68,7 +67,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 
 ///////
 lockit:
-///////
+	///////
 
 	var lockitem = lockfilename ^ lockitemsep_ ^ lockkey;
 	if (locklist.locateusing(FM, lockitem, lockn)) {
@@ -106,14 +105,13 @@ tryagain:
 					print("*");
 				}
 				msg = "";
-				call ossleep(1000*1);
+				call ossleep(1000 * 1);
 				tryn += 1;
 				goto tryagain;
 			}
 		}
 
 		return 0;
-
 	}
 
 	locklist(-1) = lockitem;
@@ -147,17 +145,17 @@ subroutine unlockit(in lockfilename, in lockkey, io locklist) {
 subroutine unlockall(io locklist, io msg) {
 
 	var filename2 = "";
-	var file = "";
-//	for (lockn = 1; lockn <= 9999; ++lockn) {
-//		lockitem = locklist.f(lockn);
-//		///BREAK;
-//		if (not lockitem) break;
+	var file	  = "";
+	//	for (lockn = 1; lockn <= 9999; ++lockn) {
+	//		lockitem = locklist.f(lockn);
+	//		///BREAK;
+	//		if (not lockitem) break;
 	for (in lockitem : locklist) {
 		var filename = lockitem.field(lockitemsep_, 1);
 		var lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
 		if (filename ne filename2) {
 			if (not(lockfile.open(filename, ""))) {
-				msg(-1) = filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL";
+				msg(-1)	 = filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL";
 				lockfile = "";
 			}
 			filename2 = filename;
@@ -165,7 +163,7 @@ subroutine unlockall(io locklist, io msg) {
 		if (lockfile ne "") {
 			xx = unlockrecord("", lockfile, lockkeyx);
 		}
-	} // lockitem
+	}  // lockitem
 
 	locklist = "";
 

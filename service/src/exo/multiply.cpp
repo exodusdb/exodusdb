@@ -10,7 +10,7 @@ function main(in multipliers, in multiplicand, in sep) {
 	//dim output;
 	//var nn=output.split(multipliers.convert(sep,FM));
 	dim output = multipliers.split(sep);
-	int nn = output.rows();
+	int nn	   = output.rows();
 	for (int ii = 1; ii <= nn; ++ii) {
 		//return null if null
 		//return zero if multiplicand is zero
@@ -20,6 +20,5 @@ function main(in multipliers, in multiplicand, in sep) {
 	}
 	return output.join(sep);
 }
-
 
 libraryexit()

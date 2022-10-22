@@ -2,9 +2,9 @@
 libraryinit()
 
 #include <exodus/htmllib2.h>
-#include <log.h>
 #include <getbackpars.h>
 #include <htmllib.h>
+#include <log.h>
 #include <roundrobin.h>
 #include <sendmail.h>
 
@@ -12,7 +12,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var subjectin;
+	var subjectin;
 var username;
 var bakpars;
 var body;
@@ -22,7 +22,7 @@ var xx;
 var errormsg;
 var exceededmsg;
 
-function main(in msg0, in subject0="", in username0="") {
+function main(in msg0, in subject0 = "", in username0 = "") {
 
 	//logs a message and sends it to all the technical support emails (backup)
 
@@ -32,7 +32,7 @@ function main(in msg0, in subject0="", in username0="") {
 	//if msg0 starts with @@something then sendmail sends file @something
 	//not tested or used currently
 
-	var interactive = false; //not(SYSTEM.f(33));
+	var interactive = false;  //not(SYSTEM.f(33));
 	var datasetcode = SYSTEM.f(17);
 
 	//NB this routine is called automatically from msg()
@@ -42,7 +42,7 @@ function main(in msg0, in subject0="", in username0="") {
 	var msg = msg0;
 	if (subject0.unassigned()) {
 		subjectin = "";
-		} else {
+	} else {
 		subjectin = subject0;
 	}
 	if (username0.unassigned()) {
@@ -86,11 +86,11 @@ function main(in msg0, in subject0="", in username0="") {
 	//get technical emailaddrs to send to
 	//nb if any emailaddrs and neosys.com not in them
 	//then exodus will not receive any message
-	var useremail = username.xlate("USERS", 7, "X").lcase();
+	var useremail	 = username.xlate("USERS", 7, "X").lcase();
 	var userfullname = username.xlate("USERS", 1, "X");
 	//if username='EXODUS' and @username<>'EXODUS' then
 	var emailaddrs = bakpars.f(6);
-	var ccaddrs = "";
+	var ccaddrs	   = "";
 	if (bakpars.f(10)) {
 		if (emailaddrs) {
 			emailaddrs ^= "/";
@@ -110,7 +110,7 @@ function main(in msg0, in subject0="", in username0="") {
 	//prevent a weird error going to users
 	var addhw = 0;
 	if (msg.contains("The process cannot access the file because it is being")) {
-		addhw = 1;
+		addhw	   = 1;
 		emailaddrs = "";
 		subjectin ^= " V2";
 	}
@@ -150,7 +150,7 @@ function main(in msg0, in subject0="", in username0="") {
 	//determine subject
 	//subject='EXODUS System Message: ':datasetcode
 	var subject = "EXODUS System: " ^ datasetcode;
-	var tt = msg.index("ERROR NO:");
+	var tt		= msg.index("ERROR NO:");
 	if (tt) {
 		subject ^= " " ^ msg.cut(tt - 1).f(1, 1, 1);
 	}
@@ -163,7 +163,7 @@ function main(in msg0, in subject0="", in username0="") {
 
 	} else {
 		var l9 = "L#9";
-		body = "";
+		body   = "";
 		//body<-1>='Message=':fm:msg
 		body(-1) = msg;
 		body ^= FM;
@@ -204,7 +204,6 @@ function main(in msg0, in subject0="", in username0="") {
 			agent = SYSTEM.f(40, 6);
 			call htmllib("OCONV.AGENT.BROWSER", agent);
 			body(-1) = oconv("Browser:", l9) ^ agent;
-
 		}
 
 		if (addhw) {
@@ -249,18 +248,23 @@ function main(in msg0, in subject0="", in username0="") {
 			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(date(), requeststarttime);
 		}
 
-		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
+		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|",
+					   "\r"
+					   "\r"
+					   "\r"
+					   "\r"
+					   "\r"
+					   "\r");
 		body.replacer("\r", "\r\n");
-
 	}
 
 	//limit max 60 sysmsg emails per hour
-	var params = "";
-	params(1) = 60;
-	params(2) = 60;
-	params(3) = 60;
-	params(4) = "DOS";
-	params(5) = "sysmsg.$rr";
+	var params	  = "";
+	params(1)	  = 60;
+	params(2)	  = 60;
+	params(3)	  = 60;
+	params(4)	  = "DOS";
+	params(5)	  = "sysmsg.$rr";
 	var exceedmsg = "SYSMSG email suppressed because > 60 in last 60 mins";
 	//call roundrobin('ONEVENT',params,result,errormsg)
 	call roundrobin("ONEVENT", params, result, xx);
@@ -274,7 +278,7 @@ function main(in msg0, in subject0="", in username0="") {
 		}
 
 	} else {
-	//print 'EXCEEDED'
+		//print 'EXCEEDED'
 		//log excessive sysmsg
 		call log("SYSMSG", exceededmsg);
 	}

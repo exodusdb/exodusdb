@@ -1,18 +1,18 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <sysmsg.h>
 #include <emailusers.h>
 #include <sendmail.h>
+#include <sysmsg.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var mode;
+	var mode;
 var subject;
 var body;
-var nsent;//num
+var nsent;	//num
 var replyto;
 var toemails;
 var ccemails;
@@ -20,15 +20,14 @@ var usercode;
 var userx;
 var expirydate;
 var emails;
-var ok;//num
+var ok;	 //num
 var xx;
 var nn;
 var errormsg;
 
 function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
 
-
-	var interactive = false; //not(SYSTEM.f(33));
+	var interactive = false;  //not(SYSTEM.f(33));
 
 	//options
 	//R = REPLYTO=@username email address if exists
@@ -42,9 +41,9 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 	if (SENTENCE.field(" ", 1) eq "EMAILUSERS") {
 
-		mode = SENTENCE.field(" ", 2);
+		mode		= SENTENCE.field(" ", 2);
 		var version = SENTENCE.field(" ", 3, 9999);
-		SENTENCE = "";
+		SENTENCE	= "";
 
 		if (mode ne "UPGRADE") {
 			var msg = mode.quote() ^ " is invalid in EMAILUSERS";
@@ -96,10 +95,10 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	//if target and options='' or index(options,'U',1) then
 	// end
 	bool groupword = options.contains("W");
-	nsent = 0;
+	nsent		   = 0;
 
 	subject = subject0;
-	body = body0;
+	body	= body0;
 
 	//read fromuser from users,@username else fromuser=''
 	replyto = "";
@@ -108,7 +107,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 			replyto = "support@neosys.com";
 		} else {
 			var fromuser = xlate("USERS", USERNAME, "", "X");
-			replyto = fromuser.f(7);
+			replyto		 = fromuser.f(7);
 			var fromline = "From " ^ fromuser.f(1);
 			if (USERNAME ne fromuser.f(1)) {
 				fromline ^= " (" ^ USERNAME ^ ")";
@@ -117,10 +116,10 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		}
 	}
 
-	var usercodes = SECURITY.f(1);
-	var nusers = usercodes.fcount(VM);
-	var usern = 0;
-	emaillog = "";
+	var usercodes	   = SECURITY.f(1);
+	var nusers		   = usercodes.fcount(VM);
+	var usern		   = 0;
+	emaillog		   = "";
 	var alreadyemailed = "";
 	body.converter(FM ^ VM, chr(13) ^ chr(13));
 
@@ -131,8 +130,8 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	var userids = userids0;
 	userids.converter(",", VM);
 
-	toemails = "";
-	ccemails = "";
+	toemails	 = "";
+	ccemails	 = "";
 	var currdept = "";
 
 	var users;
@@ -143,7 +142,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 /////////
 nextuser:
-/////////
+	/////////
 	if (esctoexit()) {
 		goto exit;
 	}
@@ -200,8 +199,9 @@ nextuser:
 			for (const var groupn : range(1, ngroups)) {
 				ok = userx.f(5).contains(groupids.f(1, groupn));
 				///BREAK;
-				if (not(not(ok))) break;
-			} //groupn;
+				if (not(not(ok)))
+					break;
+			}  //groupn;
 		} else {
 			//exact groups
 			if (groupids.locate(userx.f(21), xx)) {
@@ -222,10 +222,10 @@ nextuser:
 		var email = emails.f(1, ii);
 		if (alreadyemailed.locate(email, xx)) {
 			emails.remover(1, ii);
-			} else {
+		} else {
 			alreadyemailed ^= VM ^ email;
 		}
-	} //ii;
+	}  //ii;
 	emails.converter(VM, ";");
 
 	//skip users that have already been emailed before
@@ -245,11 +245,11 @@ nextuser:
 	if (toemails eq "") {
 		toemails = emails;
 
-	//sending to users (or groups and users)
+		//sending to users (or groups and users)
 	} else if (userids) {
 		toemails ^= ";" ^ emails;
 
-	//sending to groups then to the first and cc the rest
+		//sending to groups then to the first and cc the rest
 	} else {
 		ccemails ^= ";" ^ emails;
 	}
@@ -261,14 +261,15 @@ nextuser:
 	goto nextuser;
 
 exit:
-/////
+	/////
 	gosub sendemails(emaillog);
 
 	while (true) {
 		///BREAK;
-		if (not(("." ^ VM ^ FM).contains(emaillog[-1]))) break;
+		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
+			break;
 		emaillog.popper();
-	}//loop;
+	}  //loop;
 
 	//always email to self
 	if (nsent and replyto) {
@@ -286,9 +287,10 @@ exit:
 
 	while (true) {
 		///BREAK;
-		if (not(("." ^ VM ^ FM).contains(emaillog[-1]))) break;
+		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
+			break;
 		emaillog.popper();
-	}//loop;
+	}  //loop;
 
 	return 0;
 }

@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-var bit;
+	var bit;
 var term;
 
 function main(in list0, out min, out max) {
@@ -12,8 +12,8 @@ function main(in list0, out min, out max) {
 
 	//initialise min and max to the first element
 	var result = "";
-	var start = 0;
-	bit=list0.substr2(start, term);
+	var start  = 0;
+	bit		   = list0.substr2(start, term);
 	if (bit.len()) {
 		min = bit;
 		max = bit;
@@ -21,8 +21,9 @@ function main(in list0, out min, out max) {
 
 	while (true) {
 		///BREAK;
-		if (not term) break;
-		bit=list0.substr2(start, term);
+		if (not term)
+			break;
+		bit = list0.substr2(start, term);
 		if (bit.len()) {
 			if (bit lt min) {
 				min = bit;
@@ -31,7 +32,7 @@ function main(in list0, out min, out max) {
 				max = bit;
 			}
 		}
-	}//loop;
+	}  //loop;
 
 	return result;
 }

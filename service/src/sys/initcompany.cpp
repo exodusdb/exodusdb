@@ -1,24 +1,23 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <sysmsg.h>
 #include <getlang.h>
 #include <initcompany2.h>
+#include <sysmsg.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var ndec;//num
+	var ndec;  //num
 var temp;
 
 function main(in nextcompanycode) {
 
-
-    //use app specific version of initcompany2
-    if (APPLICATION ne "EXODUS") {
-        initcompany2 = "initcompany2_app" ;
-    }
+	//use app specific version of initcompany2
+	if (APPLICATION ne "EXODUS") {
+		initcompany2 = "initcompany2_app";
+	}
 
 	if (not(nextcompanycode.unassigned())) {
 
@@ -28,8 +27,8 @@ function main(in nextcompanycode) {
 				call sysmsg(nextcompanycode.quote() ^ " COMPANY IS MISSING IN INIT.COMPANY()");
 				//TODO return abort code and change all callers to handle failure
 				return 0;
-				}
 			}
+		}
 
 		sys.gcurrcompcode = nextcompanycode;
 		//curr.company=nextcompanycode
@@ -42,7 +41,7 @@ function main(in nextcompanycode) {
 			sys.company = sys.gcurrcompcode;
 		}
 	} else {
-		sys.company = "";
+		sys.company	   = "";
 		sys.company(2) = date().oconv("D2/E").field("/", 2, 2);
 	}
 
@@ -58,7 +57,7 @@ function main(in nextcompanycode) {
 			sys.company(27) = sys.company.f(27).invert();
 		}
 		SYSTEM(14) = sys.company.f(27);
-		SYSTEM(8) = "";
+		SYSTEM(8)  = "";
 	} else {
 		SYSTEM(14) = SYSTEM.f(36);
 	}
@@ -71,7 +70,7 @@ function main(in nextcompanycode) {
 	}
 
 	//date format
-	DATEFMT = "D2/E";
+	DATEFMT		   = "D2/E";
 	var dateformat = sys.company.f(10);
 	if (dateformat eq "") {
 		DATEFMT = "D2/E";
@@ -87,41 +86,41 @@ function main(in nextcompanycode) {
 		DATEFMT = "D2/";
 	} else if (dateformat.starts("01-31-")) {
 		DATEFMT = "D2-";
-	//CASE DATE.FORMAT[-6,6]='90/01/31';@DATE.FORMAT='D2J'
+		//CASE DATE.FORMAT[-6,6]='90/01/31';@DATE.FORMAT='D2J'
 
-	//CASE DATE.FORMAT='31/01/2000';@DATE.FORMAT='D2/E'
-	//CASE DATE.FORMAT='31-01-2000';@DATE.FORMAT='D2-E'
+		//CASE DATE.FORMAT='31/01/2000';@DATE.FORMAT='D2/E'
+		//CASE DATE.FORMAT='31-01-2000';@DATE.FORMAT='D2-E'
 	} else if (dateformat eq "31 JAN 2000") {
 		DATEFMT = "D2E";
 	} else if (dateformat eq "31 JAN 2000.") {
 		DATEFMT = "D2";
-	//CASE DATE.FORMAT='01/31/2000';@DATE.FORMAT='D2/'
-	//CASE DATE.FORMAT='01-31-2000';@DATE.FORMAT='D2-'
-	//CASE DATE.FORMAT='2000/01/31';@DATE.FORMAT='D2J'
+		//CASE DATE.FORMAT='01/31/2000';@DATE.FORMAT='D2/'
+		//CASE DATE.FORMAT='01-31-2000';@DATE.FORMAT='D2-'
+		//CASE DATE.FORMAT='2000/01/31';@DATE.FORMAT='D2J'
 	}
 
 	//in init.company and init.general
 
 	if (sys.glang eq "" or sys.company.f(14) ne oldcompany.f(14)) {
 		call getlang("GENERAL", "", "", sys.alanguage, sys.glang);
-//		if (sys.glang.f(9)) {
-//			UPPERCASE = sys.glang.f(9);
-//		}
-//		if (sys.glang.f(10)) {
-//			LOWERCASE = sys.glang.f(10);
-//		}
-//		UPPERCASE.replacer("%FF", RM);
-//		LOWERCASE.replacer("%FF", RM);
-//		UPPERCASE.replacer("%FE", FM);
-//		LOWERCASE.replacer("%FE", FM);
-//		UPPERCASE.replacer("%FD", VM);
-//		LOWERCASE.replacer("%FD", VM);
-//		UPPERCASE.replacer("%25", "%");
-//		LOWERCASE.replacer("%25", "%");
-//		if (UPPERCASE.len() ne LOWERCASE.len()) {
-//			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
-//			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//		}
+		//		if (sys.glang.f(9)) {
+		//			UPPERCASE = sys.glang.f(9);
+		//		}
+		//		if (sys.glang.f(10)) {
+		//			LOWERCASE = sys.glang.f(10);
+		//		}
+		//		UPPERCASE.replacer("%FF", RM);
+		//		LOWERCASE.replacer("%FF", RM);
+		//		UPPERCASE.replacer("%FE", FM);
+		//		LOWERCASE.replacer("%FE", FM);
+		//		UPPERCASE.replacer("%FD", VM);
+		//		LOWERCASE.replacer("%FD", VM);
+		//		UPPERCASE.replacer("%25", "%");
+		//		LOWERCASE.replacer("%25", "%");
+		//		if (UPPERCASE.len() ne LOWERCASE.len()) {
+		//			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+		//			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		//		}
 
 		//sort.order
 		//read sortorder from alanguage,'SORTORDER*':company<14> else
@@ -130,7 +129,6 @@ function main(in nextcompanycode) {
 		//if len(sortorder)=256 then
 		// call sysvar('SET',109,147,sortorder)
 		// end
-
 	}
 
 	if (not(sys.company.f(4))) {
@@ -185,7 +183,7 @@ function main(in nextcompanycode) {
 	//dateperiod conversion in case not done in init.company2 above
 	//financial year dates
 	var financialyear = sys.company.f(6);
-	var firstmonth = financialyear.field(",", 1);
+	var firstmonth	  = financialyear.field(",", 1);
 	if (firstmonth.isnum()) {
 		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",", firstmonth, temp))) {
 			firstmonth = 1;

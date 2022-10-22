@@ -3,7 +3,7 @@ libraryinit()
 
 function main(out hostsallow) {
 
-hostsallow =R"V0G0N(
+	hostsallow = R"V0G0N(
 #dubai barsha office
 sshd: 94.200.49.94
 #use netmask instead of individual ips for speed
@@ -49,4 +49,3 @@ sshd: 5.79.74.40
 }
 
 libraryexit()
-

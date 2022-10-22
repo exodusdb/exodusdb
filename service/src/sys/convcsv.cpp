@@ -2,27 +2,27 @@
 libraryinit()
 
 #include <convcsv.h>
-#include <xselect.h>
 #include <convertercsv.h>
 #include <uconvfile.h>
+#include <xselect.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var sentencex;
+	var sentencex;
 var selectx;
 var nfilters0;
-var nfilters;//num
+var nfilters;  //num
 var filterfields;
 var filtervalues;
 dim filters;
-var temp;//num
-var ptr;//num
+var temp;  //num
+var ptr;   //num
 var tt;
-var dicthasauthorised;//num
+var dicthasauthorised;	//num
 var keyx;
-var nkeys;//num
+var nkeys;	//num
 dim xfilenames;
 dim oconvxs;
 dim fmtxs;
@@ -42,7 +42,7 @@ var converterparams;
 var result;
 var errors;
 
-function main(in sentence0, in select0="", in filters0="") {
+function main(in sentence0, in select0 = "", in filters0 = "") {
 
 	//called from
 	//BP ANALTIME    call with filters
@@ -50,7 +50,6 @@ function main(in sentence0, in select0="", in filters0="") {
 	//BP EXPORTADS   ditto
 	//BP MEDIADIARY2 ditto
 	//ABP JOURNALS   ditto
-
 
 	if (sentence0.unassigned()) {
 		sentencex = "";
@@ -61,7 +60,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		selectx = "";
 	} else {
 		selectx = select0;
-		}
+	}
 
 	let nfilters = nfilters0.unassigned("").fcount(FM);
 	if (nfilters) {
@@ -71,7 +70,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		for (const var filtern : range(1, nfilters)) {
 			filters(1, filtern) = filterfields.f(1, filtern).convert(SM, VM);
 			filters(3, filtern) = filtervalues.f(1, filtern).convert(SM, VM);
-		} //filtern;
+		}  //filtern;
 	}
 
 	//convert command line to subroutine call
@@ -81,7 +80,7 @@ function main(in sentence0, in select0="", in filters0="") {
 
 		//locate and remove SELECT statement from end of command
 		if (sentencex.locateusing(" ", "SELECT", temp)) {
-			selectx = sentencex.field(" ", temp + 1, 9999);
+			selectx	  = sentencex.field(" ", temp + 1, 9999);
 			sentencex = sentencex.field(" ", 1, temp - 1);
 		} else {
 			selectx = "";
@@ -89,7 +88,6 @@ function main(in sentence0, in select0="", in filters0="") {
 
 		call convcsv(sentencex, selectx);
 		return 0;
-
 	}
 
 	ptr = 0;
@@ -161,12 +159,12 @@ function main(in sentence0, in select0="", in filters0="") {
 	}
 
 	var notexportable = "";
-	var exportable = sentencex.field(" ", 3, 9999);
+	var exportable	  = sentencex.field(" ", 3, 9999);
 	if (exportable) {
 		exportable.converter(" ", FM);
 		if (exportable.f(1) eq "EXCEPT") {
 			notexportable = exportable.field(FM, 2, 9999);
-			exportable = "";
+			exportable	  = "";
 		}
 	}
 
@@ -181,7 +179,7 @@ function main(in sentence0, in select0="", in filters0="") {
 					notexportable(ii) = temp;
 				}
 			}
-		} //ii;
+		}  //ii;
 	}
 
 	var listkey = var(1000000).rnd();
@@ -193,7 +191,7 @@ function main(in sentence0, in select0="", in filters0="") {
 				exportable = exportable.f(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
-			keyx = exportable.first(exportable.index(FM ^ FM) - 1);
+			keyx  = exportable.first(exportable.index(FM ^ FM) - 1);
 			nkeys = keyx.fcount(FM);
 			if (nkeys gt 2) {
 				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
@@ -202,9 +200,8 @@ function main(in sentence0, in select0="", in filters0="") {
 			}
 		} else {
 			exportable = "";
-			keyx = "";
+			keyx	   = "";
 		}
-
 	}
 
 	var exportable2 = exportable;
@@ -217,7 +214,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		tt = "";
 	}
 
-	exportable = tt ^ exportable2.field("%", 1);
+	exportable	= tt ^ exportable2.field("%", 1);
 	exportable2 = exportable2.field("%", 2, 9999);
 
 	var outfilename = SYSTEM.f(2);
@@ -230,19 +227,19 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	outfilename.osremove();
 	if (outfilename.osfile()) {
-		var msg = "CANNOT EXPORT BECAUSE " ^ outfilename ^ " IS ALREADY|OPEN IN ANOTHER PROGRAM, OR CANNOT BE ACCESSED";
-		call mssg(msg);
+		var	  msg = "CANNOT EXPORT BECAUSE " ^ outfilename ^ " IS ALREADY|OPEN IN ANOTHER PROGRAM, OR CANNOT BE ACCESSED";
+		call  mssg(msg);
 		gosub exit2();
 		return 0;
 	}
 
 	xfilenames.redim(255);
-	xfilenames = "";//dim
+	xfilenames = "";  //dim
 	oconvxs.redim(255);
 	fmtxs.redim(255);
 	dictrecs.redim(255);
-	oconvxs = "";//dim
-	fmtxs = "";//dim
+	oconvxs = "";  //dim
+	fmtxs	= "";  //dim
 	xfiles.redim(255);
 	var nfields = 0;
 
@@ -273,10 +270,10 @@ function main(in sentence0, in select0="", in filters0="") {
 	dictids.redim(255);
 	colgroups.redim(255);
 
-	dictids = "";//dim
-	colgroups = "";//dim
+	dictids		 = "";	//dim
+	colgroups	 = "";	//dim
 	var headingx = "";
-	var coln = 0;
+	var coln	 = 0;
 
 nextdict:
 	if (readnext(dictid, MV)) {
@@ -291,16 +288,16 @@ nextdict:
 
 		if (dictid eq "LINE_NO") {
 			coln += 1;
-			dictids(coln) = dictid;
+			dictids(coln)  = dictid;
 			headingx(coln) = "Line No.";
-			fmtxs(coln) = "R";
+			fmtxs(coln)	   = "R";
 			dictrecs(coln) = "";
 		} else {
 			if (dict.read(DICT, dictid)) {
 				//TODO implement JBASE/PICK dict types I/A/D
 				//call dicti2a(dict)
 				coln += 1;
-			//if dict<2> matches '0N' then
+				//if dict<2> matches '0N' then
 				var fn = dict.f(2);
 				if (fn gt nfields) {
 					nfields = fn;
@@ -334,10 +331,10 @@ nextdict:
 
 				//extract file
 				if (dict.f(11).starts("<")) {
-					temp = dict.f(11).cut(1).field(">", 1);
+					temp			 = dict.f(11).cut(1).field(">", 1);
 					xfilenames(coln) = temp;
 					if (not(xfiles(coln).open(temp, ""))) {
-						call mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
+						call  mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
 						gosub exit2();
 						return 0;
 					}
@@ -365,7 +362,7 @@ nextdict:
 						}
 						//end
 
-					//no commas to be added to numbers
+						//no commas to be added to numbers
 					} else if (oconvx.starts("[NUMBER")) {
 						oconvx = "";
 					}
@@ -374,11 +371,10 @@ nextdict:
 				}
 
 				colgroups(coln) = dict.f(4).starts("M");
-				dictids(coln) = dictid;
-				dictrecs(coln) = dict;
-
+				dictids(coln)	= dictid;
+				dictrecs(coln)	= dict;
 			}
-				//end
+			//end
 		}
 		goto nextdict;
 	}
@@ -392,7 +388,7 @@ nextdict:
 
 	call oswrite("", outfilename);
 	if (not(outfile.osopen(outfilename))) {
-		call mssg(lasterror());
+		call  mssg(lasterror());
 		gosub exit2();
 		return 0;
 	}
@@ -404,7 +400,7 @@ nextdict:
 	}
 
 	if (selectx) {
-	//selectx:=' AND WITH PERSON_CODE "HARRIS"'
+		//selectx:=' AND WITH PERSON_CODE "HARRIS"'
 		//perform 'SELECT ':filename:' ':selectx
 		tt = "SELECT " ^ filename ^ " " ^ selectx;
 		call xselect(tt);
@@ -428,7 +424,7 @@ nextdict:
 
 ////////
 nextrec:
-////////
+	////////
 
 	if (esctoexit()) {
 		gosub exit();
@@ -480,47 +476,47 @@ nextrec:
 				goto nextrec;
 			}
 
-		//no reqvalues means skip if no value present
+			//no reqvalues means skip if no value present
 		} else if (not(value)) {
 			goto nextrec;
 		}
 
-	} //filtern;
+	}  //filtern;
 
 	for (const var coln : range(1, ncols)) {
-		MV = mvx;
+		MV	   = mvx;
 		dictid = dictids(coln);
-		temp = "";
+		temp   = "";
 		if (dictid ne "LINE_NO" and dictrecs(coln).f(4) ne "S") {
 			temp = calculate(dictid).fcount(VM);
 			if (temp gt maxvn) {
 				maxvn = temp;
 			}
 		}
-	} //coln;
+	}  //coln;
 	//d ebug
 	//get the data
-	rec = "";//dim
+	rec			= "";  //dim
 	var anydata = 0;
 	for (const var coln : range(1, ncols)) {
-		MV = mvx;
+		MV	   = mvx;
 		dictid = dictids(coln);
 		if (dictid eq "LINE_NO") {
 		} else {
 			var cell = calculate(dictid);
 			if (cell ne "") {
 				rec(coln) = cell;
-				anydata = 1;
+				anydata	  = 1;
 			}
 		}
-	} //coln;
+	}  //coln;
 
 	//normalise the data and output to csv file
 	//if rec<>'' then
 	if (anydata) {
 
 		//mat mvrec=mat rec
-		mvrec = rec;//dim
+		mvrec = rec;  //dim
 
 		var vn = 0;
 nextvn:
@@ -567,7 +563,6 @@ nextvn:
 					if (oconvxs(coln)) {
 						cell = oconv(cell, oconvxs(coln));
 					}
-
 				}
 
 				if (cell.starts("+")) {
@@ -606,23 +601,21 @@ nextvn:
 					} else {
 						cell.quoter();
 					}
-
 				}
-	//gotcell:
+				//gotcell:
 				rec(coln) = cell;
-
 			}
 
-		} //coln;
+		}  //coln;
 
 		var line = rec.join();
 
 		//remove trailing or all tab chars
-//		while (true) {
-//			///BREAK;
-//			if (not(line.ends(FM))) break;
-//			line.popper();
-//		}//loop;
+		//		while (true) {
+		//			///BREAK;
+		//			if (not(line.ends(FM))) break;
+		//			line.popper();
+		//		}//loop;
 		line.trimmerlast(FM);
 
 		//suppress output of empty amv rows
@@ -672,13 +665,11 @@ nextvn:
 			}
 
 			call osbwrite(line, outfile, ptr);
-
 		}
 
 		if (not(firstmvonly) and vn lt maxvn) {
 			goto nextvn;
 		}
-
 	}
 
 	goto nextrec;

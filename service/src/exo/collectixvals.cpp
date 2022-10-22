@@ -1,23 +1,23 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in filename0, in dictid, in prefix="", in orderby="") {
+function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 
 	var lenprefix = prefix.len();
 
-	var filename = filename0.convert(".","_");
+	var filename = filename0.convert(".", "_");
 
 	//check file exists
 	var file;
-	if (not open(filename,file)) {
+	if (not open(filename, file)) {
 		abort(lasterror());
 	}
 
-        //separate cursor
-        var v69;
-        var v70;
-        var v71;
-        call pushselect(0, v69, v70, v71);
+	//separate cursor
+	var	 v69;
+	var	 v70;
+	var	 v71;
+	call pushselect(0, v69, v70, v71);
 
 	var cmd = "SELECT " ^ filename ^ " DISTINCT " ^ dictid;
 	if (prefix)
@@ -37,7 +37,7 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 			//remove prefix
 			indexvalue.cutter(lenprefix);
 		}
-//indexvalue.outputl("index value=");
+		//indexvalue.outputl("index value=");
 		//accumulate the index values
 		if (orderby) {
 			var indexn;
@@ -50,18 +50,17 @@ function main(in filename0, in dictid, in prefix="", in orderby="") {
 
 	//correct the output
 	if (orderby)
-		indexvalues.converter(VM,FM);
+		indexvalues.converter(VM, FM);
 	else
 		indexvalues.popper();
 
 	//return value in PSEUDO
 	move(indexvalues, PSEUDO);
 
-        clearselect();
-        call popselect(0, v69, v70, v71);
+	clearselect();
+	call popselect(0, v69, v70, v71);
 
 	return 0;
-
 }
 
 libraryexit()

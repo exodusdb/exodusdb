@@ -1,33 +1,34 @@
 #include <exodus/program.h>
 programinit()
 
-var ss1;
+	var ss1;
 var ss2;
 var xx;
 var yy;
-var secs;//num
-var time1;//num
-var time2;//num
+var secs;	//num
+var time1;	//num
+var time2;	//num
 var nn = 1000;
 
 function main() {
 	//call savescreenss1, ss2);
 	printl(chr(12));
-	var ntries = 0;
-	var tot = 0;
-	var ntots = 0;
+	var ntries	 = 0;
+	var tot		 = 0;
+	var ntots	 = 0;
 	var minspeed = "";
 	var maxspeed = "";
 	var avgspeed = "";
 	while (true) {
 		xx.inputn(-1);
 		///BREAK;
-		if (not(xx eq "" and ntots lt 10)) break;
+		if (not(xx eq "" and ntots lt 10))
+			break;
 		yy = var("x").str(65530);
 		gosub getspeed();
 		ntries += 1;
 		//if ntries>2 and secs then
-//		print(ntries, AT(-40));
+		//		print(ntries, AT(-40));
 		if (secs and xx) {
 
 			print(ntries, " ");
@@ -45,9 +46,8 @@ function main() {
 			avgspeed = (tot / ntots / 100000).oconv("MD20P");
 
 			printl(speed, " x=64Kb str/sec ", secs.oconv("MD10P"), " ", nn, " ", time());
-
 		}
-	}//loop;
+	}  //loop;
 
 	var msg = "";
 	msg(-1) = "MEMSPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed;
@@ -67,17 +67,17 @@ subroutine getspeed() {
 	//for (const var ii : range(1, nn)) {
 	for (int ii = 1; ii <= nn; ++ii) {
 		xx = yy;
-	} //ii;
+	}  //ii;
 	time2 = ostime();
-	secs = time2 - time1;
+	secs  = time2 - time1;
 
 	//increase number of loops
 	if (secs lt 1) {
-		nn = nn * 2;
+		nn	 = nn * 2;
 		secs = "";
 	}
 	if (secs gt 5) {
-		nn = nn / 2;
+		nn	 = nn / 2;
 		secs = "";
 	}
 

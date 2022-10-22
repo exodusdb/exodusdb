@@ -5,7 +5,7 @@ function main(in type, in in0, in mode0, out output, in glang) {
 
 	//should really be sensitive to timezone in @SW
 
-	var inx = in0;
+	var inx	 = in0;
 	var mode = mode0;
 
 	if (inx eq "") {
@@ -32,7 +32,6 @@ function main(in type, in in0, in mode0, out output, in glang) {
 		} else {
 			mode = "D2/E";
 		}
-
 	}
 
 	//status=0
@@ -50,9 +49,9 @@ ok:
 			//language specific (date format could be a pattern in lang?)
 			if (mode eq "L") {
 
-				var tt = inx.oconv("D4/E");
-				var mth = glang.f(2).field("|", tt.field("/", 2));
-				var day = tt.field("/", 1);
+				var tt	 = inx.oconv("D4/E");
+				var mth	 = glang.f(2).field("|", tt.field("/", 2));
+				var day	 = tt.field("/", 1);
 				var year = tt.field("/", 3);
 				//if 1 then
 				output = day ^ " " ^ mth ^ " " ^ year;
@@ -80,7 +79,6 @@ ok:
 				if (nospaces) {
 					output.converter(" ", "");
 				}
-
 			}
 
 		} else {
@@ -94,7 +92,6 @@ ok:
 		}
 
 		output = iconv(inx, mode);
-
 	}
 
 	return 0;

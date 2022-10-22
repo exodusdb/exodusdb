@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var encoding1;
+	var encoding1;
 var encoding2;
 var exe;
 var ii;
@@ -56,8 +56,8 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	//determine the encoding1
 	if (encoding1 eq "CODEPAGE") {
 		call osgetenv("CODEPAGE", encoding1);
-		var oemcodepages = "437" _VM "720" _VM "737" _VM "775" _VM "850" _VM "852" _VM "855" _VM "857" _VM "858" _VM "862" _VM "866" _VM "874" _VM "932" _VM "936" _VM "949" _VM "950" _VM "1258";
-		var wincodepages = "1252" _VM "1256" _VM "1253" _VM "1257" _VM "1252" _VM "1252" _VM "1251" _VM "1254" _VM "1252" _VM "1255" _VM "1251" _VM "874" _VM "932" _VM "936" _VM "949" _VM "950" _VM "874";
+		var	 oemcodepages = "437]720]737]775]850]852]855]857]858]862]866]874]932]936]949]950]1258"_var;
+		var	 wincodepages = "1252]1256]1253]1257]1252]1252]1251]1254]1252]1255]1251]874]932]936]949]950]874"_var;
 		if (oemcodepages.locate(encoding1, ii)) {
 			encoding1 = wincodepages.f(1, ii);
 		}
@@ -114,7 +114,6 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 		//delete the temporary
 		tempfilename.osremove();
-
 	}
 
 	result = 1;

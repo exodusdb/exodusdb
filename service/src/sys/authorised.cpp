@@ -7,16 +7,16 @@ libraryinit()
 
 #include <sys_common.h>
 
-var username;
+	var username;
 var msgusername;
-var isexodus;//num
-var taskn;//num
+var isexodus;  //num
+var taskn;	   //num
 var taskn2;
 var xx;
 var newlock;
 var usern;
 
-function main(in task0, out msg, in defaultlock="", in username0="") {
+function main(in task0, out msg, in defaultlock = "", in username0 = "") {
 
 	//NB de bugging afer recompile requires restart since SECURITY is in PRELOAD
 	//call msg(task)
@@ -28,12 +28,12 @@ nousername0:
 		//allow for username like FINANCE(STEVE)
 		//so security is done like FINANCE but record is kept of actual user
 		//this allows for example billing module users to post as finance module users
-		username = USERNAME.field("(", 1);
+		username	= USERNAME.field("(", 1);
 		msgusername = USERNAME;
 	} else if (username0 eq "") {
 		goto nousername0;
 	} else {
-		username = username0;
+		username	= username0;
 		msgusername = username;
 	}
 
@@ -60,7 +60,7 @@ nousername0:
 	//!*CALL note(' ':TASK)
 
 	if (task.starts("..")) {
-	// call note(task:'')
+		// call note(task:'')
 		return 1;
 	}
 
@@ -141,7 +141,7 @@ updateprivs:
 		}
 		if (renaming) {
 			//if the task to be renamed doesnt exist .. just add the target task
-			var newtask = defaultlock;
+			var	 newtask = defaultlock;
 			call authorised(newtask, xx);
 			return 1;
 		}
@@ -158,7 +158,7 @@ updateprivs:
 		if (not noadd) {
 			gosub readuserprivs();
 			if (username eq "EXODUS") {
-				var interactive = false; //not(SYSTEM.f(33));
+				var interactive = false;  //not(SYSTEM.f(33));
 				if (interactive) {
 					call note(task ^ "|TASK ADDED");
 				}
@@ -191,11 +191,11 @@ updateprivs:
 		if (not(positive)) {
 			return 1;
 
-		//exodus always ok
+			//exodus always ok
 		} else if (isexodus) {
 			return 1;
 
-		//positive and no lock always fail
+			//positive and no lock always fail
 		} else {
 notallowed:
 			//MSG=capitalise(TASK):'||Sorry ':capitalise(msgusername):', you are not authorised to do this.|'
@@ -213,13 +213,13 @@ notallowed:
 			return "";
 		}
 
-	//NB not NOBODY/EVERYBODY
+		//NB not NOBODY/EVERYBODY
 
-	//special lock NOONE
+		//special lock NOONE
 	} else if (locks eq "NOONE") {
 		goto notallowed;
 
-	//special lock EVERYONE
+		//special lock EVERYONE
 	} else if (locks eq "EVERYONE") {
 		return 1;
 	}
@@ -251,7 +251,7 @@ notallowed:
 		} else {
 			goto notallowed;
 		}
-	} //lockn;
+	}  //lockn;
 
 	//OK:
 	return 1;

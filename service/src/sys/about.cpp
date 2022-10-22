@@ -5,14 +5,14 @@ libraryinit()
 
 #include <sys_common.h>
 
-var interactive;
+	var interactive;
 var l10;
 var l20;
 var l30;
 var colsep;
 var text;
 var file;
-var nrecs;//num
+var nrecs;	//num
 var mod;
 var dir;
 var versiondata;
@@ -20,17 +20,17 @@ var ver;
 
 function main() {
 
-	interactive = false; //not(SYSTEM.f(33));
+	interactive = false;  //not(SYSTEM.f(33));
 
 	if (interactive) {
-		l10 = "L#10";
-		l20 = "L#20";
-		l30 = "L#30";
+		l10	   = "L#10";
+		l20	   = "L#20";
+		l30	   = "L#30";
 		colsep = " ";
 	} else {
-		l10 = "";
-		l20 = "";
-		l30 = "";
+		l10	   = "";
+		l20	   = "";
+		l30	   = "";
 		colsep = "   ";
 	}
 	text = "Copyright NEOSYS Software. All rights reserved.";

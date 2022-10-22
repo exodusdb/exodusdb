@@ -5,7 +5,6 @@ S
 
 
 
-//#include <reverse.h>\
 \
 function main() {\
 	RECORD = invertarray(reverse(invertarray(RECORD)));\

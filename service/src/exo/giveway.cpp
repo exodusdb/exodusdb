@@ -1,11 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <otherusers2.h>
-
-
-var nowtime;//num
-var longprocesslockno;//num
+	var nowtime;		//num
+var longprocesslockno;	//num
 
 function main() {
 	if (USERNAME == "xEXODUS") {
@@ -32,7 +29,7 @@ function main() {
 
 	//get time now
 	//call dostime(nowtime);
-	nowtime=ostime().round(2);
+	nowtime = ostime().round(2);
 	//if no start time then no aborting (in initialisation and may be converting)
 	//or running a long maintenance process that must not be aborted
 	var starttime = SYSTEM.f(25);
@@ -63,7 +60,7 @@ function main() {
 		return 0;
 	}
 
-/*
+	/*
 	//if otherusers2(system<9>) then
 	if (not SYSTEM.f(48)) {
 
@@ -90,7 +87,7 @@ function main() {
 */
 
 	//save the time last slept or return to avoid checking otherusers all the time
-	nowtime=ostime().round(2);
+	nowtime	   = ostime().round(2);
 	SYSTEM(26) = nowtime;
 
 	//do this after the delay so that parent processes that do not abort
@@ -101,8 +98,6 @@ function main() {
 	}
 
 	return 0;
-
 }
-
 
 libraryexit()

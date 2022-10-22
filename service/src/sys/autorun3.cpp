@@ -1,23 +1,23 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <holiday.h>
-#include <generalalerts.h>
 #include <authorised.h>
+#include <generalalerts.h>
+#include <holiday.h>
 #include <listen2.h>
-#include <sysmsg.h>
-#include <sendmail.h>
 #include <listen4.h>
+#include <sendmail.h>
+#include <sysmsg.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 #include <win_common.h>
 
-var docids;
+	var docids;
 var options;
 var inpath;
-var docn;//num
+var docn;  //num
 var docid;
 var xx;
 var forceemail;
@@ -28,26 +28,26 @@ var market;
 var agp;
 var holidaytype;
 var workdate;
-var tt;//num
+var tt;	 //num
 var authtasks;
 var title;
 var datax;
 var fromtime;
-var daysago;//num
-var xdate;//num
-var opendate;//num
+var daysago;   //num
+var xdate;	   //num
+var opendate;  //num
 var printfilename;
 var body;
 var attachfilename;
 var errormsg;
 var voccmd;
-var tracing;//num
+var tracing;  //num
 var linkfilename2;
-var requeststarttime;//num
-var requeststoptime;//num
+var requeststarttime;  //num
+var requeststoptime;   //num
 var printfile;
 
-function main(in docids0="", in options0="") {
+function main(in docids0 = "", in options0 = "") {
 
 	//LISTEN calls this every minute
 	//print 'autorun'
@@ -88,19 +88,20 @@ function main(in docids0="", in options0="") {
 
 	//allow one autorun per database - hopefully this wont overload the server
 	var lockfilename = "DOCUMENTS";
-	var lockfile = sys.documents;
-	var lockkey = "%" ^ datasetcode ^ "%";
+	var lockfile	 = sys.documents;
+	var lockkey		 = "%" ^ datasetcode ^ "%";
 	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 1))) {
 
 		return 0;
-
 	}
 
 	//path to output reports
 	var webpath = "";
 	//if webpath else webpath='..\':'data\'
 	if (not webpath) {
-		webpath = "../" "data/";
+		webpath =
+			"../"
+			"data/";
 	}
 	webpath.converter("/", OSSLASH);
 	if (not webpath.ends(OSSLASH)) {
@@ -116,11 +117,11 @@ function main(in docids0="", in options0="") {
 	} else {
 		select(sys.documents);
 	}
-	var locked = 0;
+	var locked		   = 0;
 	var ndocsprocessed = 0;
 
 nextdoc:
-////////
+	////////
 
 	if (locked) {
 		call unlockrecord("DOCUMENTS", sys.documents, docid);
@@ -149,7 +150,7 @@ nextdoc:
 	}
 
 readdoc:
-////////
+	////////
 	//to save processing time, dont lock initially until looks like it needs processing
 	//then lock/read/check again in case other processes doing the same
 	//depending on the autorunkey then this may be redundant
@@ -161,10 +162,10 @@ readdoc:
 		goto nextdoc;
 	}
 
-    //skip List of Current Users on ACCOUNTS systems
-    if (APPLICATION eq "ACCOUNTS" and docid eq "CURRUSERS") {
-        goto nextdoc;
-    }
+	//skip List of Current Users on ACCOUNTS systems
+	if (APPLICATION eq "ACCOUNTS" and docid eq "CURRUSERS") {
+		goto nextdoc;
+	}
 
 	//only do saved and enabled documents for now
 	//0/1 saved disabled/enabled. Blank=Ordinary documents
@@ -178,7 +179,7 @@ readdoc:
 
 	//determine current datetime
 currdatetime:
-/////////////
+	/////////////
 	var itime = time();
 	var idate = date();
 	//handle rare case where passes midnight between time() and date()
@@ -221,7 +222,7 @@ currdatetime:
 
 		//only run scheduled reports on live data (but do run queued reports)
 		//queued reports have only maxtimes=1 set
-		if (((restrictions ne (FM.str(6) ^ 1)) and not(islivedb)) and not(var("exodus.id").osfile())) {
+		if (((restrictions ne(FM.str(6) ^ 1)) and not(islivedb)) and not(var("exodus.id").osfile())) {
 			if (logging) {
 				printl("scheduled report but not live db");
 			}
@@ -245,7 +246,7 @@ currdatetime:
 					goto preventsameday;
 				}
 
-			//or specific multiple hours
+				//or specific multiple hours
 			} else {
 				if (not(hours.locate(hournow, xx))) {
 					if (logging) {
@@ -255,7 +256,7 @@ currdatetime:
 				}
 			}
 
-		//if no hourly restrictions then skip if already run today
+			//if no hourly restrictions then skip if already run today
 		} else {
 preventsameday:
 			if (currdatetime.floor() eq lastdatetime.floor()) {
@@ -310,7 +311,6 @@ preventsameday:
 
 		//would be better to work out next run time once - but how to work it out
 		//if not(docids) and currdatetime<nextdatetime then goto nextdoc
-
 	}
 
 	//lock documents that need processing
@@ -365,7 +365,7 @@ preventsameday:
 	}
 	//allow running as EXODUS and emailing to sysmsg@neosys.com
 	if (userx.f(7) eq "" and runasusercode eq "EXODUS") {
-		userx = "EXODUS";
+		userx	 = "EXODUS";
 		userx(7) = sysmsgatexodus;
 	}
 
@@ -388,8 +388,8 @@ preventsameday:
 	if (usercodes eq "") {
 		toaddress = userx.f(7);
 	} else {
-		toaddress = "";
-		var nusers = usercodes.fcount(VM);
+		toaddress	  = "";
+		var nusers	  = usercodes.fcount(VM);
 		var backwards = 1;
 		for (var usern = nusers; usern >= 1; --usern) {
 
@@ -415,7 +415,7 @@ preventsameday:
 				if (USERNAME eq "EXODUS" and usercode eq "EXODUS") {
 					goto adduseraddress;
 
-				//optionally skip people on holiday (even EXODUS unless running as EXODUS)
+					//optionally skip people on holiday (even EXODUS unless running as EXODUS)
 				} else {
 
 					marketcode = userx.f(25);
@@ -430,7 +430,7 @@ preventsameday:
 					}
 
 					idate = date();
-					agp = "";
+					agp	  = "";
 					call holiday("GETTYPE", idate, usercode, userx, marketcode, market, agp, holidaytype, workdate);
 
 					if (not(holidaytype)) {
@@ -442,10 +442,9 @@ adduseraddress:
 						}
 					}
 				}
-
 			}
 nextuser:;
-		} //usern;
+		}  //usern;
 
 		//skip if nobody to email to
 		if (not toaddress) {
@@ -456,11 +455,10 @@ nextuser:;
 		}
 
 		toaddress.converter(_FM, ";");
-
 	}
 
 	//before running the document refresh the title, request and data
-	var module = sys.document.f(31);
+	var module	  = sys.document.f(31);
 	var alerttype = sys.document.f(32);
 
 	if (module and alerttype) {
@@ -478,7 +476,7 @@ nextuser:;
 
 		//update the document and documents file if necessary
 		call cropper(sys.document);
-		var origdocument = sys.document;
+		var	 origdocument = sys.document;
 
 		sys.document(2) = title;
 		sys.document(5) = lower(module ^ "PROXY" _FM ^ request_);
@@ -503,7 +501,7 @@ nextuser:;
 				printl(msg_);
 				goto nextdoc;
 			}
-		} //taskn;
+		}  //taskn;
 	}
 
 	//docinit:
@@ -513,16 +511,16 @@ nextuser:;
 	}
 
 	var fromdate = date();
-	fromtime = ostime();
+	fromtime	 = ostime();
 
 	ndocsprocessed += 1;
 
 	//become the user so security is relative to the document "owner"
 	var connection = "VERSION 3";
-	connection(2) = "0.0.0.0";
-	connection(3) = "SERVER";
-	connection(4) = "";
-	connection(5) = "";
+	connection(2)  = "0.0.0.0";
+	connection(3)  = "SERVER";
+	connection(4)  = "";
+	connection(5)  = "";
 	call listen2("BECOMEUSERANDCONNECTION", runasusercode, "", connection, xx);
 
 	//request='EXECUTE':fm:'GENERAL':fm:'GETREPORT':fm:docid
@@ -612,7 +610,7 @@ nextsign:
 				goto nextdoc;
 			}
 
-			body = "";
+			body	 = "";
 			body(-1) = response_;
 			if (response_.starts("Error:")) {
 				response_.paster(1, 6, "Result:");
@@ -680,7 +678,6 @@ nextsign:
 			call sysmsg(errormsg);
 			printl(errormsg);
 		}
-
 	}
 
 	printl();
@@ -698,15 +695,16 @@ subroutine exec() {
 		//linkfilename2=inpath:str(rnd(10^15),8)[1,8]
 		linkfilename2 = inpath ^ ("00000000" ^ var(99999999).rnd()).last(8);
 		///BREAK;
-		if (not(oslistf(linkfilename2 ^ ".*"))) break;
-	}//loop;
+		if (not(oslistf(linkfilename2 ^ ".*")))
+			break;
+	}  //loop;
 
 	linkfilename2 ^= ".2";
 	call oswrite("", linkfilename2);
 
 	//turn interactive off in case running from command line
 	//to avoid any reports prompting for input here
-	var s33 = SYSTEM.f(33);
+	var s33	   = SYSTEM.f(33);
 	SYSTEM(33) = 1;
 
 	gosub exec2();
@@ -722,7 +720,7 @@ subroutine exec2() {
 	//system<25>=requeststarttime
 	//allow autorun processes to run for ever
 	SYSTEM(25) = "";
-	request_ = request_.field(_FM, 3, 99999);
+	request_   = request_.field(_FM, 3, 99999);
 
 	//localtime=mod(time()+@sw<1>,86400)
 	//print @(0):@(-4):localtime 'MTS':' AUTORUN ':docid:
@@ -741,7 +739,7 @@ subroutine exec2() {
 	//will be obtained from the output file name LISTEN2 RESPOND
 	//this could be improved to work
 	printfilename = linkfilename2;
-	tt = oscwd();
+	tt			  = oscwd();
 	tt.cutter(-7);
 	if (printfilename.starts(tt)) {
 		printfilename.paster(1, tt.len(), "../");
@@ -762,7 +760,7 @@ subroutine exec2() {
 	//execute instead of call prevents program crashes from crashing LISTEN
 	response_ = "OK";
 	win.valid = 1;
-	msg_ = "";
+	msg_	  = "";
 
 	//pass the output file in linkfilename2
 	//not good method, pass in system?
@@ -818,14 +816,14 @@ sysmsgit:
 	call cropper(response_);
 
 	if (msg_) {
-		data_ = "";
+		data_	  = "";
 		response_ = "Error: " ^ msg_;
 		gosub fmtresp();
 	}
 
 	if (response_ eq "") {
 		//response='Error: No OK from ':voccmd:' ':request
-		call listen4(18, response_, voccmd);
+		call  listen4(18, response_, voccmd);
 		gosub fmtresp();
 	}
 
@@ -860,7 +858,7 @@ sysmsgit:
 	return;
 }
 
-subroutine exit(in lockfilename,io lockfile,in lockkey) {
+subroutine exit(in lockfilename, io lockfile, in lockkey) {
 
 	call unlockrecord(lockfilename, lockfile, lockkey);
 
@@ -888,7 +886,7 @@ subroutine fmtresp() {
 
 subroutine getdaysago() {
 	var weekend = "67";
-	marketcode = sys.company.f(30, 1);
+	marketcode	= sys.company.f(30, 1);
 	if (marketcode) {
 		tt = marketcode.xlate("MARKETS", 9, "X");
 		if (tt) {
@@ -903,8 +901,9 @@ subroutine getdaysago() {
 			daysago -= 1;
 		}
 		///BREAK;
-		if (not daysago) break;
-	}//loop;
+		if (not daysago)
+			break;
+	}  //loop;
 
 	return;
 }

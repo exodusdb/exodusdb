@@ -3,18 +3,17 @@ libraryinit()
 
 #include <rtp57.h>
 
-var databasecode;
-var usercode;//num
+	var databasecode;
+var usercode;  //num
 var lockprefix;
 var result;
 var xx;
 var yy;
 var zz;
 
-function main(in databasecode0="", in usercode0="") {
+function main(in databasecode0 = "", in usercode0 = "") {
 
 	//returns the number of other users of EXODUS
-
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		databasecode = SENTENCE.field(" ", 2);
@@ -36,7 +35,7 @@ function main(in databasecode0="", in usercode0="") {
 	//curruserlockid.sys134=sysvar('GET',109,134)
 	var curruserlockid = THREADNO;
 
-	var returndata = 0;
+	var returndata	   = 0;
 	var otherusercodes = "";
 
 	//IF @STATION # '' THEN
@@ -46,7 +45,7 @@ function main(in databasecode0="", in usercode0="") {
 	// lockmode=36
 	// unlockmode=37
 	//END ELSE
-	var lockmode = 23;
+	var lockmode   = 23;
 	var unlockmode = 24;
 	// END
 
@@ -78,8 +77,8 @@ function main(in databasecode0="", in usercode0="") {
 
 		//attempt to lock
 		result = "";
-		xx = "";
-		yy = "";
+		xx	   = "";
+		yy	   = "";
 		call rtp57(lockmode, "", xx, lockid, "", yy, result);
 
 		//if successful, then unlock
@@ -119,7 +118,6 @@ function main(in databasecode0="", in usercode0="") {
 				if (usercode and process.f(40, 10) ne usercode) {
 					goto nextlock;
 				}
-
 			}
 
 			//end of database or user code provided
@@ -130,7 +128,7 @@ function main(in databasecode0="", in usercode0="") {
 		returndata += 1;
 
 nextlock:;
-	} //lockno;
+	}  //lockno;
 
 	returndata -= 1;
 	if (returndata lt 0) {
@@ -145,13 +143,14 @@ nextlock:;
 	for (const var ii : range(1, 9999)) {
 		usercode = returndata.f(2, ii);
 		///BREAK;
-		if (not usercode) break;
+		if (not usercode)
+			break;
 		usercode.cutter(5);
 		if (not(curruserlockid.isnum())) {
 			usercode -= (usercode / 10).floor();
 		}
 		returndata(2, ii) = "PROCESS" ^ usercode;
-	} //ii;
+	}  //ii;
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		call note(returndata.f(1) ^ " other users");

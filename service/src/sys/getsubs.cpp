@@ -11,7 +11,7 @@ libraryinit()
 
 #include <window.hpp>
 
-var xx;
+	var xx;
 var tt;
 var task;
 var taskprefix;
@@ -109,7 +109,7 @@ nextdoc:
 			if (taskprefix) {
 				if (not(authorised(taskprefix ^ " UPDATE", msg, ""))) {
 					call mssg(msg);
-					xx = unlockrecord(win.datafile, win.srcfile, ID);
+					xx			= unlockrecord(win.datafile, win.srcfile, ID);
 					win.wlocked = 0;
 				}
 			}
@@ -117,10 +117,9 @@ nextdoc:
 			//always prevent users from editing documents designed by EXODUS
 			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
 				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
-				xx = unlockrecord(win.datafile, win.srcfile, ID);
+				xx			= unlockrecord(win.datafile, win.srcfile, ID);
 				win.wlocked = 0;
 			}
-
 		}
 
 		RECORD(101) = raise(RECORD.f(6));
@@ -140,13 +139,12 @@ nextdoc:
 					return invalid(msg);
 				}
 			}
-
 		}
 
 		//move fields 101 onwards into field 6 (after lowering)
 		//and remove fields 101 onwards
 		RECORD(6) = lower(RECORD.field(FM, 101, 9999));
-		RECORD = RECORD.field(FM, 1, 100);
+		RECORD	  = RECORD.field(FM, 1, 100);
 
 		if (RECORD.f(1) eq "") {
 			RECORD(1) = USERNAME;
@@ -192,7 +190,6 @@ nextdoc:
 				msg = "You cannot delete report designs created by EXODUS";
 				return invalid(msg);
 			}
-
 		}
 
 		//update exodus standard (in case doing this on the programming system)
@@ -215,7 +212,7 @@ nextdoc:
 
 	} else {
 		call mssg(mode.quote() ^ " is invalid in GET.SUBS");
-		}
+	}
 
 	return 0;
 
@@ -224,7 +221,7 @@ nextdoc:
 
 subroutine gettaskprefix() {
 	taskprefix = "";
-	task = task.field(" ", 1);
+	task	   = task.field(" ", 1);
 	if (task eq "ANAL") {
 		taskprefix = "BILLING REPORT";
 	} else if (task eq "BALANCES") {

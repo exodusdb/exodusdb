@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-var fromquestion;
+	var fromquestion;
 var uptoquestion;
 var defaultperiod;
 
@@ -38,7 +38,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 inpfromdate:
 	call note(fromquestion, "RCE", fromdate, "");
 	if (fromdate eq "" or fromdate eq chr(27)) {
-	//cancel:
+		//cancel:
 		ifromdate = "";
 		iuptodate = "";
 		return 0;

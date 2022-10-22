@@ -20,14 +20,15 @@ function main(in /*mode*/, in datasetcode, out result) {
 	var ii = "";
 	for (const var ii : range(1, 120)) {
 		///BREAK;
-		if (not(otherusers(datasetcode))) break;
+		if (not(otherusers(datasetcode)))
+			break;
 		print(".");
-		call ossleep(1000*1);
+		call ossleep(1000 * 1);
 		if (esctoexit()) {
 			//ii = 99999;
 			break;
 		}
-	} //ii;
+	}  //ii;
 
 	shutdownfilename.osremove();
 

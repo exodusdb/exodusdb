@@ -11,7 +11,7 @@ libraryinit()
 
 #define origfullrec_ win.registerx(7)
 
-var taskn;//num
+	var taskn;	//num
 var oldtaskn;
 var newtaskn;
 var xx;
@@ -32,7 +32,7 @@ function main(in mode) {
 		var newlocks = RECORD.f(11);
 		var oldtasks = origfullrec_.f(10);
 		var oldlocks = origfullrec_.f(11);
-		var ntasks = newtasks.fcount(VM);
+		var ntasks	 = newtasks.fcount(VM);
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
 			var task = newtasks.f(1, taskn);
 			if (task) {
@@ -47,41 +47,77 @@ function main(in mode) {
 					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CREATED*" ^ FM ^ "Lock : " ^ newlock;
 				}
 			}
-		} //taskn;
+		}  //taskn;
 
 		ntasks = oldtasks.fcount(VM);
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
 			var task = oldtasks.f(1, taskn);
 			if (task) {
 				if (not(newtasks.locate(task, newtaskn))) {
-					var oldlock = oldlocks.f(1, taskn);
+					var oldlock	 = oldlocks.f(1, taskn);
 					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
 				}
 			}
-		} //taskn;
+		}  //taskn;
 
 		ANS = emailtx2;
 
 	} else if (mode eq "FIXUSERPRIVS") {
 
 		//obsolete tasks
-		call authorised("%DELETE%" "CHANGE NETWORK TYPE", xx);
-		call authorised("%DELETE%" "CHANGE PRINTER DEFINITIONS", xx);
-		call authorised("%DELETE%" "CHANGE PRINTER TYPE", xx);
-		call authorised("%DELETE%" "CHANGE SCREEN TYPE", xx);
-		call authorised("%DELETE%" "CHANGE SCREEN COLORS", xx);
-		call authorised("%DELETE%" "CHANGE VIEWER", xx);
-		call authorised("%DELETE%" "CHANGE VIEWER CENTRAL", xx);
-		call authorised("%DELETE%" "ACCESS OPERATING SYSTEM", xx);
-		call authorised("%DELETE%" "OPERATING SYSTEM ACCESS", xx);
-		call authorised("%DELETE%" "OTHER OPTIONS ACCESS", xx);
-		call authorised("%DELETE%" "OTHER OPTIONS UPDATE", xx);
+		call authorised(
+			"%DELETE%"
+			"CHANGE NETWORK TYPE",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"CHANGE PRINTER DEFINITIONS",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"CHANGE PRINTER TYPE",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"CHANGE SCREEN TYPE",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"CHANGE SCREEN COLORS",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"CHANGE VIEWER",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"CHANGE VIEWER CENTRAL",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"ACCESS OPERATING SYSTEM",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"OPERATING SYSTEM ACCESS",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"OTHER OPTIONS ACCESS",
+			xx);
+		call authorised(
+			"%DELETE%"
+			"OTHER OPTIONS UPDATE",
+			xx);
 
 		//new safe method for renaming tasks
 		//copy from old if missing, then delete old
 		//is safer method in case install old program and get the old task again!
 		call authorised("CURRENCY EXCHANGE RATE OVERRIDE", xx, "JOURNAL POST OVERRIDE EXCHANGE RATE");
-		call authorised("%DELETE%" "JOURNAL POST OVERRIDE EXCHANGE RATE", xx);
+		call authorised(
+			"%DELETE%"
+			"JOURNAL POST OVERRIDE EXCHANGE RATE",
+			xx);
 
 		//old method
 
@@ -146,14 +182,16 @@ function main(in mode) {
 		call log2("*fix an error", logtime);
 		while (true) {
 			///BREAK;
-			if (not(t10.contains("MEDIA MEDIA "))) break;
+			if (not(t10.contains("MEDIA MEDIA ")))
+				break;
 			t10.replacer("MEDIA MEDIA ", "MEDIA ");
-		}//loop;
+		}  //loop;
 		while (true) {
 			///BREAK;
-			if (not(t10.contains("JOB JOB "))) break;
+			if (not(t10.contains("JOB JOB ")))
+				break;
 			t10.replacer("JOB JOB ", "JOB ");
-		}//loop;
+		}  //loop;
 
 		t10.trimmer();
 		newuserprivs(10) = t10;
@@ -166,17 +204,18 @@ function main(in mode) {
 		}
 
 		call log2("*delete some obsolete tasks", logtime);
-		var obsoletetasks = "COMPANY ACCESS PARTIAL";
-		obsoletetasks(-1) = "MARKET ACCESS PARTIAL";
+		var	 obsoletetasks = "COMPANY ACCESS PARTIAL";
+		obsoletetasks(-1)  = "MARKET ACCESS PARTIAL";
 		for (const var ii : range(1, 9999)) {
 			var tt = obsoletetasks.f(ii);
 			///BREAK;
-			if (not tt) break;
+			if (not tt)
+				break;
 			if (newuserprivs.f(10).locate(tt, taskn)) {
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			}
-		} //ii;
+		}  //ii;
 
 		//ensure certain documents cannot be deleted
 		if (newuserprivs.f(10).locate("JOB ORDER DELETE", taskn)) {
@@ -190,12 +229,12 @@ function main(in mode) {
 		}
 
 		call log2("*delete any superfluous tasks", logtime);
-		var tasks = newuserprivs.f(10);
-		var locks = newuserprivs.f(11);
-		var ntasks = tasks.fcount(VM);
+		var	 tasks	= newuserprivs.f(10);
+		var	 locks	= newuserprivs.f(11);
+		var	 ntasks = tasks.fcount(VM);
 		for (taskn = ntasks; taskn >= 1; --taskn) {
 			var lockx = locks.f(1, taskn);
-			var task = tasks.f(1, taskn);
+			var task  = tasks.f(1, taskn);
 			if (lockx eq "" and (task.ends(DQ))) {
 deletetask:
 				newuserprivs.remover(10, taskn);
@@ -208,7 +247,7 @@ deletetask:
 					}
 				}
 			}
-		} //taskn;
+		}  //taskn;
 
 		if (newuserprivs ne SECURITY) {
 			call log2("*write userprivs back", logtime);
@@ -219,7 +258,6 @@ deletetask:
 				SECURITY.write(DEFINITIONS, "SECURITY");
 			}
 		}
-
 	}
 
 	return 0;

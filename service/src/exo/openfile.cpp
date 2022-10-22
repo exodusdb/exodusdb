@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in filename, io file, in similarfilename="", in /*autocreate*/="") {
+function main(in filename, io file, in similarfilename = "", in /*autocreate*/ = "") {
 
 	// Success in the usual case that the file can be opened
 	if (file.open(filename)) {
@@ -29,8 +29,6 @@ function main(in filename, io file, in similarfilename="", in /*autocreate*/="")
 	// Success
 	call note(filename.quote() ^ " WARNING: FILE CREATED AND OPENED");
 	return true;
-
 }
-
 
 libraryexit()

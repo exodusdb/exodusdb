@@ -1,15 +1,15 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <generalalerts.h>
 #include <authorised.h>
 #include <autorun2.h>
+#include <generalalerts.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var msg;
+	var msg;
 var runasuser;
 var authtasks;
 var title;
@@ -22,19 +22,19 @@ function main() {
 	//cheap parser requires ~ for spaces
 	sentencex.converter(" ~", FM ^ " ");
 
-	var alertid = sentencex.f(2);
-	var module = sentencex.f(3);
-	var alerttype = sentencex.f(4);
-	var runhours = sentencex.f(5);
+	var alertid		  = sentencex.f(2);
+	var module		  = sentencex.f(3);
+	var alerttype	  = sentencex.f(4);
+	var runhours	  = sentencex.f(5);
 	var runasusercode = sentencex.f(6);
 	//fixed to suppress at the moment TODO provide more control
 	var skipdaysoffandholidays = "*";
 
 	var targetusercodes = sentencex.f(7).convert(",", VM);
-	var testemail = sentencex.f(8);
+	var testemail		= sentencex.f(8);
 
-	var options = SENTENCE.field("(", 2);
-	var silent = options.contains("S");
+	var options	  = SENTENCE.field("(", 2);
+	var silent	  = options.contains("S");
 	var overwrite = options.contains("O");
 
 	if (options.contains("R")) {
@@ -68,7 +68,7 @@ function main() {
 
 	if (not runasusercode) {
 syntax:
-		msg = "Syntax is";
+		msg		= "Syntax is";
 		msg(-1) = "CREATEALERT alertid module alerttype runhours,...:rundoms,...";
 		msg(-1) = "runasusercode {targetusercode,...} {testemail} (options)";
 		msg(-1) = FM ^ "module=GENERAL/FINANCE/AGENCY/MEDIA/JOB";
@@ -94,7 +94,7 @@ syntax:
 	}
 	tt.converter(":0123456789," ^ VM, "");
 	if (tt) {
-		msg = runhours.quote() ^ " invalid runhours/rundates";
+		msg		= runhours.quote() ^ " invalid runhours/rundates";
 		msg(-1) = "Examples:";
 		msg(-1) = "2,17 for noon and 5pm";
 		msg(-1) = "2,17:7,14 for noon and 5pm on the 7th and 14th";
@@ -130,12 +130,12 @@ syntax:
 				call mssg(msg);
 				stop();
 			}
-		} //taskn;
+		}  //taskn;
 	}
 
 	var docid = alertid;
 
-	sys.document = "";
+	sys.document	 = "";
 	sys.document(30) = testemail;
 	sys.document(22) = runhours.field(":", 1);
 	sys.document(23) = runhours.field(":", 2);

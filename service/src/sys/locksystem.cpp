@@ -6,7 +6,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var interactive;
+	var interactive;
 var mode;
 var dataset;
 var voc;
@@ -17,14 +17,14 @@ var tt;
 var options;
 var t2;
 var t3;
-var reply;//num
+var reply;	//num
 var result;
 var msg;
 var datasetcode;
 
 function main(in mode0, in dataset0) {
 
-	interactive = false; //not(SYSTEM.f(33));
+	interactive = false;  //not(SYSTEM.f(33));
 	if (mode0.unassigned()) {
 		mode = "";
 	} else {
@@ -41,7 +41,7 @@ function main(in mode0, in dataset0) {
 
 	if (dataset eq "CURRENTDATASET") {
 		dataset = SYSTEM.f(17);
-		}
+	}
 
 	if (not(voc.open("VOC", ""))) {
 		call mssg("CANNOT OPEN VOC FILE FOR LOCKING");
@@ -53,7 +53,7 @@ function main(in mode0, in dataset0) {
 
 	if (mode eq "UNLOCK") {
 		if (not dataset) {
-			voc.unlock( "BACKUP*");
+			voc.unlock("BACKUP*");
 		}
 		//why again?
 		xx = unlockrecord("", voc, "BACKUP*" ^ dataset);
@@ -111,7 +111,7 @@ checkotherusers:
 	}
 
 lockit:
-	msg = "YOU CANNOT USE THE SYSTEM AT THE MOMENT";
+	msg		= "YOU CANNOT USE THE SYSTEM AT THE MOMENT";
 	msg(-1) = "BECAUSE SOMEBODY ELSE IS PERFORMING A PROCESS";
 	msg(-1) = "THAT REQUIRES EXCLUSIVE USE OF THE SYSTEM";
 
@@ -156,12 +156,11 @@ invalidx:
 		if (not(lockrecord("", voc, "BACKUP*"))) {
 			goto invalidx;
 		}
-
 	}
 
 ////////
 success:
-////////
+	////////
 	return 1;
 }
 

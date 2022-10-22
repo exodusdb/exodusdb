@@ -7,4 +7,3 @@ function main(in /*mode*/, io /*text*/) {
 }
 
 libraryexit()
-

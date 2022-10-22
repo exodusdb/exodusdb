@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var mode;
+	var mode;
 
 function main(in mode0, in time, in date, io buffer, out msg) {
 

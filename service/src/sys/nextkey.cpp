@@ -1,9 +1,9 @@
 #include <exodus/library.h>
 libraryinit()
 
-var previous;//num
+	var previous;  //num
 
-function main(in mode, in previous0="") {
+function main(in mode, in previous0 = "") {
 	//jbase linemark
 	if (previous0.unassigned()) {
 		previous = 0;
@@ -12,13 +12,13 @@ function main(in mode, in previous0="") {
 	}
 
 	var result = "";
-	ANS = "";
-	var keyx = "";
+	ANS		   = "";
+	var keyx   = "";
 
 	var actfilename = mode.field(":", 1);
-	var seqkey = mode.field(":", 2);
+	var seqkey		= mode.field(":", 2);
 	var keyfilename = mode.field(":", 3);
-	var prefix = mode.field(":", 4);
+	var prefix		= mode.field(":", 4);
 
 	if (actfilename eq "") {
 		var temp = seqkey.index(".SK");
@@ -56,7 +56,7 @@ lockit:
 			call mssg("", "DB", buffer, "");
 			return "";
 		}
-		call ossleep(1000*1);
+		call ossleep(1000 * 1);
 		goto lockit;
 	}
 	if (buffer) {
@@ -84,9 +84,9 @@ lockit:
 
 	keyx = "";
 	if (nextno ne "") {
-		result = nextno;
+		result		   = nextno;
 		var currnextno = result;
-		var notok = 1;
+		var notok	   = 1;
 
 checkrec:
 
@@ -113,7 +113,6 @@ checkrec:
 				if (notok eq 1) {
 					if (currnextno gt nextno) {
 						currnextno.writev(keyfile, seqkey, 1);
-
 					}
 					notok = 2;
 				}

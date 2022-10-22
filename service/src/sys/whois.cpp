@@ -1,15 +1,15 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <whois.h>
 #include <readhostsallow.h>
 #include <shell2.h>
+#include <whois.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var sentencex;
+	var sentencex;
 var ip12;
 var ip1;
 var ip2;
@@ -62,16 +62,22 @@ function main(in /*mode*/, in ipno, out text) {
 	//allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
 	call readhostsallow(allowedips);
 	allowedips(-1) = SYSTEM.f(39);
-	allowedips.converter(_FM _VM "," "\r\n", var(100).space());
+	allowedips.converter(_FM _VM
+						 ","
+						 "\r\n",
+						 var(100).space());
 	if (allowedips.locateusing(" ", ipno, xx)) {
 returnzero:
 		text = "0";
 		return 0;
 	}
 
-    if (true) {
-        text = "http:/" "/geoiplookup.net/ip/" ^ ipno;
-    } else {
+	if (true) {
+		text =
+			"http:/"
+			"/geoiplookup.net/ip/" ^
+			ipno;
+	} else {
 		cmd = SYSTEM.f(50);
 
 		//check cygwin whois present otherwise quit

@@ -8,7 +8,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var msg;
+	var msg;
 
 function main() {
 
@@ -17,14 +17,14 @@ function main() {
 		stop();
 	}
 
-	var ifromdate = PSEUDO.f(5);
-	var iuptodate = PSEUDO.f(6);
-	var fromtime = PSEUDO.f(7);
-	var uptotime = PSEUDO.f(8);
+	var ifromdate  = PSEUDO.f(5);
+	var iuptodate  = PSEUDO.f(6);
+	var fromtime   = PSEUDO.f(7);
+	var uptotime   = PSEUDO.f(8);
 	var containing = PSEUDO.f(9);
-	var duration = PSEUDO.f(10);
-	var usercodes = PSEUDO.f(11);
-	var relocks = PSEUDO.f(12);
+	var duration   = PSEUDO.f(10);
+	var usercodes  = PSEUDO.f(11);
+	var relocks	   = PSEUDO.f(12);
 
 	var cmd = "SORT REQUESTLOG BY SEQ";
 

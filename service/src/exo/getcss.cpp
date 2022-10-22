@@ -1,8 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-
-function main(io css, in version="") {
+function main(io css, in version = "") {
 
 	//NB quirk in ie mimiced by mozilla table dont inherit size
 	//but work around is TABLE {FONT-SIZE:100%} in css
@@ -66,15 +65,13 @@ function main(io css, in version="") {
 	}
 
 	return 0;
-
 }
-
 
 function getvogonpoetry(in version) {
 
-if (version.assigned() and version eq 2) {
+	if (version.assigned() and version eq 2) {
 
-return R"V0G0N(
+		return R"V0G0N(
 <style type="text/css">
 /*ver2*/
 .BHEAD {display:none}
@@ -212,11 +209,9 @@ window.onload=function (){
 </script>
 )V0G0N";
 
+	} else {
 
-} else {
-
-
-return R"V0G0N(
+		return R"V0G0N(
 <style type="text/css">
 /*ver1*/
 .BHEAD {display:none}
@@ -293,9 +288,7 @@ function toggle(t,mode)
 }
 </script>
 )V0G0N";
-
-}
-
+	}
 }
 
 libraryexit()

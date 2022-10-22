@@ -25,7 +25,6 @@ function main(in mode, io /*line*/, in params, in filename) {
 
 			//...
 			//line = line;
-
 		}
 
 	} else {

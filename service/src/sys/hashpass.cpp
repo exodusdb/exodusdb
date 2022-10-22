@@ -10,18 +10,20 @@ function main(in password) {
 	//pass1
 	while (true) {
 		///BREAK;
-		if (not(hashedpassword ne "")) break;
+		if (not(hashedpassword ne ""))
+			break;
 		encryptkey = (encryptkey.mod(390001)) * (hashedpassword[1]).seq() + 1;
 		hashedpassword.cutter(1);
-	}//loop;
+	}  //loop;
 
 	//pass2
 	while (true) {
 		hashedpassword ^= chr(65 + (encryptkey.mod(50)));
 		encryptkey = (encryptkey / 50).floor();
 		///BREAK;
-		if (not encryptkey) break;
-	}//loop;
+		if (not encryptkey)
+			break;
+	}  //loop;
 
 	return hashedpassword;
 }

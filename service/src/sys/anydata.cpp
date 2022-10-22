@@ -1,12 +1,12 @@
 #include <exodus/library.h>
 libraryinit()
 
-var v69;
+	var v69;
 var v70;
 var v71;
 var filenamesx;
 var filename;
-var nrecs;//num
+var nrecs;	//num
 
 function main(in filenames0, out result) {
 
@@ -31,7 +31,7 @@ function main(in filenames0, out result) {
 			goto exit;
 		}
 
-	} //filen;
+	}  //filen;
 
 	result = 0;
 

@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-var docrep;
+	var docrep;
 var scrn;
 var temp;
 
@@ -11,13 +11,13 @@ function main() {
 	// a much simpler non-interactive version of GET
 
 	var where = "";
-	var html = 1;
-	var cmd = SENTENCE;
+	var html  = 1;
+	var cmd	  = SENTENCE;
 
 	while (cmd) {
-		var word1=field(cmd," ",1);
+		var word1 = field(cmd, " ", 1);
 		if (word1 eq "GET" or word1 eq "NEW")
-			cmd = field(cmd," ",2,99999).trimlast();
+			cmd = field(cmd, " ", 2, 99999).trimlast();
 		else
 			break;
 	}
@@ -32,9 +32,9 @@ function main() {
 		dfs ^= ".htm";
 	} else {
 		dfs ^= ".txt";
-		}
+	}
 	var prnfile = dfs;
-	SYSTEM(2) = prnfile;
+	SYSTEM(2)	= prnfile;
 
 	//redirect printed output to a dos file
 	call oswrite("", prnfile);
@@ -66,10 +66,10 @@ function main() {
 	//program may change the output file
 	if (SYSTEM.f(2) ne prnfile) {
 		prnfile = SYSTEM.f(2);
-		dfs = prnfile;
+		dfs		= prnfile;
 	}
 
-	SYSTEM(2) = "";
+	SYSTEM(2)	= "";
 	var filelen = prnfile.osfile().f(1);
 
 	//fail if print file less than 2 characters long
@@ -81,8 +81,8 @@ nooutput:
 
 	//fail if only spaces output
 	if (not SYSTEM.f(3)) {
-		var offset = 0;
-		call osbread(temp, prnfile,  offset, 1024);
+		var	 offset = 0;
+		call osbread(temp, prnfile, offset, 1024);
 		//convert \200d0a0c1a\ to '' in temp
 		temp.converter(var("200D0A0C1A").iconv("HEX2"), "");
 		if (temp == "") {
@@ -106,8 +106,6 @@ nooutput:
 	stop();
 	//for c++
 	return 0;
-
 }
-
 
 libraryexit()

@@ -1,13 +1,13 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <giveway.h>
 #include <flushindex.h>
+#include <giveway.h>
 
 #include <sys_common.h>
 
-var options;
-var nindexed;//num
+	var options;
+var nindexed;  //num
 
 function main() {
 	//
@@ -21,15 +21,15 @@ function main() {
 	}
 
 	var filename = SENTENCE.field(" ", 2);
-	var syntax = "Syntax is:";
-	syntax(-1) = "CLEARFIELD filename fieldnoorname ... /\"clear to value\"";
-	syntax(-1) = "eg CLEARFIELD TASKS STATUS /\"Completed\"";
+	var syntax	 = "Syntax is:";
+	syntax(-1)	 = "CLEARFIELD filename fieldnoorname ... /\"clear to value\"";
+	syntax(-1)	 = "eg CLEARFIELD TASKS STATUS /\"Completed\"";
 	if (not filename) {
 		call mssg(syntax);
 		stop();
 	}
 
-	var fns = SENTENCE.field(" ", 3, 9999).field("/",1).trim();
+	var fns			 = SENTENCE.field(" ", 3, 9999).field("/", 1).trim();
 	var cleartovalue = SENTENCE.field("/", 2, 9999);
 	if ((cleartovalue.starts(DQ)) and (cleartovalue.ends(DQ))) {
 		cleartovalue.cutter(1);
@@ -60,7 +60,7 @@ function main() {
 
 	//check numeric
 	// space to defeat convsyntax
-	for ( var ii = 1; ii <= nfields; ii++) {
+	for (var ii = 1; ii <= nfields; ii++) {
 tryagain:
 		var fn = fns.f(ii);
 		//prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0
@@ -91,12 +91,12 @@ tryagain:
 				stop();
 			}
 		}
-	} //ii;
+	}  //ii;
 
 	if (not LISTACTIVE) {
 		select(file);
 	}
-	var recn = 0;
+	var recn  = 0;
 	var nrecs = file.reccount();
 	if (nrecs) {
 		nrecs = "/" ^ nrecs;
@@ -105,7 +105,7 @@ tryagain:
 	var isindexed = file.contains("SI.MFS") ne 0;
 
 next:
-/////
+	/////
 
 	call giveway();
 	if (not(readnext(ID))) {
@@ -118,7 +118,7 @@ next:
 	recn += 1;
 	//if interactive then PRINT @(@crthigh/2,25) else print @(0):@(-4):
 	if (TERMINAL)
-		output(AT(-40), recn, nrecs , "\x09" , ID.oconv("L#30"), " ");
+		output(AT(-40), recn, nrecs, "\x09", ID.oconv("L#30"), " ");
 	if (RECORD.read(file, ID)) {
 
 		var cleartovalue2 = cleartovalue;
@@ -135,13 +135,14 @@ next:
 				//RECORD(fns.f(ii)) = cleartovalue2;
 				pickreplacer(RECORD, fns.f(ii), cleartovalue2);
 			}
-		} //ii;
+		}  //ii;
 		if (cleared) {
 			while (true) {
 				///BREAK;
-				if (not(RECORD and ((FM ^ VM ^ SM).contains(RECORD[-1])))) break;
+				if (not(RECORD and ((FM ^ VM ^ SM).contains(RECORD[-1]))))
+					break;
 				RECORD.popper();
-			}//loop;
+			}  //loop;
 			if (RECORD eq "") {
 				file.deleterecord(ID);
 
@@ -161,7 +162,7 @@ next:
 
 /////
 exit:
-/////
+	/////
 	gosub flush(filename);
 	stop();
 

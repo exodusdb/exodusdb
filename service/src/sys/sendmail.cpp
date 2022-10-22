@@ -24,15 +24,11 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <log.h>
 #include <sendmail.h>
 #include <shell2.h>
-#include <log.h>
 
-//#include <system_common.h>
-
-//#include <sys_common.h>
-
-var ccaddress;
+	var ccaddress;
 var subject;
 var body;
 var attachfilename;
@@ -46,10 +42,10 @@ var v5;
 var v6;
 var v8;
 var forcedemailx;
-var tt;//num
+var tt;	 //num
 var params2;
 var osfilename;
-var osfilesize;//num
+var osfilesize;	 //num
 var bodyfilename;
 var paramfilename;
 var errorfilename;
@@ -59,10 +55,7 @@ var errors;
 var errorfile;
 var home = "";
 
-function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
-
-	//uses sendmail.js
-
+function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0 = var(), in params0 = var()) {
 
 	if (ccaddress0.unassigned()) {
 		ccaddress = "";
@@ -115,7 +108,11 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 			toaddress = "support@neosys.com";
 		}
 		SENTENCE.move(savesentence);
-		call sendmail(toaddress, "", "test email test subject", "test body line 1" "\r" "test body line2", v5, v6, errormsg, v8, params);
+		call sendmail(toaddress, "", "test email test subject",
+					  "test body line 1"
+					  "\r"
+					  "test body line2",
+					  v5, v6, errormsg, v8, params);
 		savesentence.move(SENTENCE);
 		//if errormsg then call msg(toaddress:' ':@fm:errormsg)
 		//call msg(toaddress:' ':@fm:errormsg)
@@ -131,7 +128,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 			msg(-1) = "STEP 2. Now check if actually received by recipient to verify";
 			msg(-1) = " that the mail server can actually deliver email to " ^ toaddress;
 			msg(-1) = " and that " ^ toaddress ^ " can receive email from the server" _FM;
-			msg = msg.oconv("T#75");
+			msg		= msg.oconv("T#75");
 			msg.converter(_TM, _FM);
 			call note(msg);
 		}
@@ -172,13 +169,12 @@ forcedemail:
 			ccaddress = "";
 			subject ^= ")";
 
-		//each request can set a global forced email address
-		//for the duration of the request
+			//each request can set a global forced email address
+			//for the duration of the request
 		} else if (SYSTEM.f(117)) {
 			forcedemailx = SYSTEM.f(117);
 			goto forcedemail;
 		}
-
 	}
 
 	//limit development system to steve
@@ -227,8 +223,8 @@ forcedemail:
 			if (params2.f(ii)) {
 				params1(ii) = params2.f(ii);
 			}
-		} //ii;
-	} //filen;
+		}  //ii;
+	}	   //filen;
 
 	//default exodus smtp parameters
 	if (not(params1.f(1))) {
@@ -245,7 +241,7 @@ forcedemail:
 		params1(3) = "2500";
 	}
 
-	params = "";
+	params	   = "";
 	params(-1) = "fromaddress=" ^ params1.f(1);
 	params(-1) = "smtphostname=" ^ params1.f(2);
 	params(-1) = "smtpportno=" ^ params1.f(3);
@@ -273,7 +269,6 @@ forcedemail:
 		} else {
 			msgsize += osfilesize;
 		}
-
 	}
 
 	msgsize += body.len();
@@ -370,7 +365,7 @@ forcedemail:
 
 		//optional cc address
 		if (ccaddress) {
-			//cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote()); 
+			//cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote());
 			cmd ^= _VM "-aCC: " ^ (ccaddress.convert(";", ",").quote());
 		}
 
@@ -384,7 +379,7 @@ forcedemail:
 			tt = "";
 			if (bodyfile.osopen(body.cut(1))) {
 				//osbread tt from bodyfile at 0 length 100
-				var offset = 0;
+				var	 offset = 0;
 				call osbread(tt, bodyfile, offset, 100);
 			}
 		} else {
@@ -400,7 +395,7 @@ forcedemail:
 		if (replyto) {
 			cmd ^= _VM "-a \"Reply-To: " ^ replyto ^ DQ;
 
-		//otherwise request suppression of replies, particularly automatic ones
+			//otherwise request suppression of replies, particularly automatic ones
 		} else {
 			cmd ^= _VM "-a \"X-Auto-Response-Suppress: RN, NRN, OOF\"";
 			//maybe Precedence: list would have better results
@@ -417,24 +412,23 @@ forcedemail:
 			if (body.starts("@")) {
 				bodyfilename = body.cut(1);
 
-			//otherwise generate a random filename and write it
+				//otherwise generate a random filename and write it
 			} else {
 				bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
 				var(body).oswrite(bodyfilename);
 				bodyfilename.osclose();
 			}
-
 		}
 
 		//use sendmail instead of mail if attachment
 		//because strangely ubuntu mail doesnt support the -A option
 		if (attachfilename) {
 			var headers = "";
-			let nn = cmd.fcount(_VM);
+			let nn		= cmd.fcount(_VM);
 			for (const var ii : range(2, nn)) {
 				var line = cmd.f(1, ii);
-				var opt = line.field(" ", 1);
-				var arg = line.field(" ", 2, 9999);
+				var opt	 = line.field(" ", 1);
+				var arg	 = line.field(" ", 2, 9999);
 				if (arg.starts(_DQ)) {
 					arg.cutter(1);
 					arg.popper();
@@ -453,9 +447,9 @@ forcedemail:
 				} else if (opt eq "-a") {
 					headers ^= _VM ^ arg;
 
-				//case opt='-A'
+					//case opt='-A'
 				}
-			} //ii;
+			}  //ii;
 
 			headers.cutter(1);
 			headers ^= _VM;
@@ -470,27 +464,32 @@ forcedemail:
 			var delimiter = "--------------5723BF0875E398DEC19D9328--";
 
 			// Use linux 'file' utility to determine mimetype
-			var mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n","");
+			var mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n", "");
 			//TRACE(mimetype)
 
 			var attachfilename_only = attachfilename.field2(_OSSLASH, -1);
 			var mimetext =
-                "MIME-Version: 1.0\r\n"
-                "Content-Type: multipart/mixed;\r\n"
-                " boundary=\"------------5723BF0875E398DEC19D9328\"\r\n"
-                "Content-Language: en-GB\r\n"
+				"MIME-Version: 1.0\r\n"
+				"Content-Type: multipart/mixed;\r\n"
+				" boundary=\"------------5723BF0875E398DEC19D9328\"\r\n"
+				"Content-Language: en-GB\r\n"
 				"\r\n"
-                "This is a multi-part message in MIME format.\r\n"
-                "--------------5723BF0875E398DEC19D9328\r\n"
-                "Content-Type: text/plain; charset=utf-8; format=flowed\r\n"
-                "Content-Transfer-Encoding: 7bit\r\n"
+				"This is a multi-part message in MIME format.\r\n"
+				"--------------5723BF0875E398DEC19D9328\r\n"
+				"Content-Type: text/plain; charset=utf-8; format=flowed\r\n"
+				"Content-Transfer-Encoding: 7bit\r\n"
 				"\r\n"
-                "--------------5723BF0875E398DEC19D9328\r\n"
-                "Content-Type: " ^ mimetype ^ ";\r\n"
-                " name=" ^ attachfilename_only.quote() ^ "\r\n"
-                "Content-Transfer-Encoding: base64\r\n"
-                "Content-Disposition: attachment;\r\n"
-                " filename=" ^ attachfilename_only.quote() ^ "\r\n\r\n";
+				"--------------5723BF0875E398DEC19D9328\r\n"
+				"Content-Type: " ^
+				mimetype ^
+				";\r\n"
+				" name=" ^
+				attachfilename_only.quote() ^
+				"\r\n"
+				"Content-Transfer-Encoding: base64\r\n"
+				"Content-Disposition: attachment;\r\n"
+				" filename=" ^
+				attachfilename_only.quote() ^ "\r\n\r\n";
 			headers ^= mimetext;
 
 			//TRACE(headers)
@@ -499,10 +498,10 @@ forcedemail:
 			var tempfilename = var().ostempfilename();
 			oswrite(headers, tempfilename);
 
-//TRACE(headers);
+			//TRACE(headers);
 			// Append the attached file as base64
 			osshell("openssl base64 -in " ^ attachfilename.quote() ^ " >> " ^ tempfilename ^ " && printf \"\r\n" ^ delimiter ^ "\r\n\" >> " ^ tempfilename);
-/*
+			/*
 			// Append a closing delimiter
 			var fileinfo = osfile(tempfilename);
 			var offset = fileinfo.f(1);
@@ -525,7 +524,6 @@ TRACE(offset)
 			//tempfilename.osrename(bodyfilename);
 			tempfilename.oscopy(bodyfilename);
 			tempfilename.osremove();
-
 		}
 
 		//TRACE(cmd)
@@ -536,7 +534,6 @@ TRACE(offset)
 		bodyfilename.converter(tt, _OSSLASH);
 		bodyfilename.replacer("$", "\\$");
 		cmd ^= " < " ^ (bodyfilename.quote());
-
 	}
 
 	//printl();
@@ -566,7 +563,7 @@ TRACE(offset)
 			printl(errorfilename, " ko");
 		}
 		if (not(errormsg.osread(errorfilename))) {
-			errormsg = "Unknown error in sendmail.js Failed to complete";
+			errormsg	 = "Unknown error in sendmail.js Failed to complete";
 			errormsg(-1) = cmd;
 			//errormsg<-1>=params 'T#60'
 			errormsg(-1) = params;
@@ -627,28 +624,28 @@ TRACE(offset)
 }
 
 subroutine addlinks2osfilename() {
-    tt = osfilename;
-    //tt.converter("\\", "/");
-    //if (tt.starts("../")) {
-    //  tt.cutter(3);
-    //}
+	tt = osfilename;
+	//tt.converter("\\", "/");
+	//if (tt.starts("../")) {
+	//  tt.cutter(3);
+	//}
 
-    //attachment path must start with '/data/'
-    //Apache will replace the alias /data/ to absolute path from /
-    //eg /root/hosts/test/work/../data/test/xxxxxx.xls
-    if (tt.contains("../")){
-        //becomes: /data/test/xxxxxx.xls
-        tt.cutter(tt.index("../")+2);
-    }
-    if (body) {
-        body ^= _FM;
-    }
+	//attachment path must start with '/data/'
+	//Apache will replace the alias /data/ to absolute path from /
+	//eg /root/hosts/test/work/../data/test/xxxxxx.xls
+	if (tt.contains("../")) {
+		//becomes: /data/test/xxxxxx.xls
+		tt.cutter(tt.index("../") + 2);
+	}
 	if (body) {
 		body ^= _FM;
 	}
-	body(-1) = "Your report is too large to email. (" ^ oconv(osfilesize, "[XBYTES]") ^ ", max " ^ oconv(maxemailsize, "[XBYTES]") ^ ")";
-	body(-1) = "but you can download it by clicking the following link.";
-	body(-1) = _FM "*Link is only available for ONE HOUR from creation*";
+	if (body) {
+		body ^= _FM;
+	}
+	body(-1)   = "Your report is too large to email. (" ^ oconv(osfilesize, "[XBYTES]") ^ ", max " ^ oconv(maxemailsize, "[XBYTES]") ^ ")";
+	body(-1)   = "but you can download it by clicking the following link.";
+	body(-1)   = _FM "*Link is only available for ONE HOUR from creation*";
 	let nlinks = SYSTEM.f(114).fcount(_VM);
 	for (const var linkn : range(1, nlinks)) {
 		body ^= _FM;
@@ -657,7 +654,7 @@ subroutine addlinks2osfilename() {
 			body(-1) = linkdesc;
 		}
 		body(-1) = SYSTEM.f(114, linkn) ^ tt;
-	} //linkn;
+	}  //linkn;
 	return;
 }
 

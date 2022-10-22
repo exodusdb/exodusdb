@@ -26,7 +26,7 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 	//so the 2nd time is less than the first
 	if (nsecs lt 0) {
 		nsecs += 86400;
-		}
+	}
 
 	var weeks = (nsecs / 604800).floor();
 	nsecs -= weeks * 604800;

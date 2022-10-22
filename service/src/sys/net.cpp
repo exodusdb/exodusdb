@@ -1,17 +1,17 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <log.h>
-#include <sysmsg.h>
 #include <getbackpars.h>
+#include <log.h>
 #include <sendmail.h>
+#include <sysmsg.h>
 #include <upgrade.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var tt;//num
+	var tt;	 //num
 var bakpars;
 var ver;
 
@@ -22,10 +22,10 @@ function main() {
 
 	var cmd = "LISTEN " ^ SENTENCE.field(" ", 2, 9999);
 
-	PSEUDO = "";
-	msg_ = "";
+	PSEUDO			 = "";
+	msg_			 = "";
 	PRIORITYINT(100) = "";
-	var dbcode = SYSTEM.f(17);
+	var dbcode		 = SYSTEM.f(17);
 	if (dbcode eq "") {
 		dbcode = "DEFAULT";
 	}
@@ -39,21 +39,21 @@ listen:
 	var s33 = SYSTEM.f(33);
 
 	//forces OFF in listen on esc
-	if (cmd.field(" ",1) ne "LISTEN") {
+	if (cmd.field(" ", 1) ne "LISTEN") {
 		SYSTEM(33) = 1;
 	}
 
 	if (osgetenv("EXO_DEBUG"))
-	 execute(cmd);
-	else try {
+		execute(cmd);
+	else
+		try {
 
-	execute(cmd);
+			execute(cmd);
 
-	}
-	catch (VarError varerror) {
-		// Similar code in net.cpp and listen.cpp
-	    msg_ = varerror.description.unassigned("No error message") ^ FM ^ backtrace();
-	}
+		} catch (VarError varerror) {
+			// Similar code in net.cpp and listen.cpp
+			msg_ = varerror.description.unassigned("No error message") ^ FM ^ backtrace();
+		}
 
 	//unlock all
 	var xx = unlockrecord();
@@ -71,7 +71,7 @@ listen:
 
 		if (msg_ eq "RESTART $LISTEN") {
 			SYSTEM(100, 3) = "";
-			SYSTEM(33) = s33;
+			SYSTEM(33)	   = s33;
 			goto listen;
 		}
 
@@ -80,7 +80,6 @@ listen:
 
 		stop();
 		////
-
 	}
 
 	if (msg_ eq "" or msg_ eq "TERMINATED OK") {
@@ -96,7 +95,7 @@ listen:
 
 	//check lists and indexing files are not corrupted and zero them if they are
 	//listen selects the locks file every 10 secs and may detect corruption
-	s33 = SYSTEM.f(33);
+	s33		   = SYSTEM.f(33);
 	SYSTEM(33) = 1;
 	//call checkfile"LISTS");
 	//call checkfile"!INDEXING");
@@ -106,7 +105,7 @@ listen:
 	//detect memory corruption?
 	var halt = 0;
 	if (msg_.contains("R18.6")) {
-		halt = 1;
+		halt	 = 1;
 		msg_(-1) = "Corrupt temporary file. Restart Needed.";
 		msg_(-1) = "exodus.net TERMINATED";
 	}
@@ -121,13 +120,13 @@ listen:
 	var normal = 0;
 	if (msg_.contains("INDEX.REDUCER")) {
 		normal = 1;
-		msg_ = "Error: Please select fewer records";
+		msg_   = "Error: Please select fewer records";
 	}
 
 	if (not normal) {
 
 		//determine subject
-		var subject = "";
+		var subject		   = "";
 		var attachfilename = "";
 
 		//either BACKUP or BACKUP2 followed by space and drive letter
@@ -136,7 +135,7 @@ listen:
 			subject = "EXODUS Backup " ^ dbcode;
 
 			//add drive letter(s)
-			tt = PSEUDO.field(" ", 2).first(2);
+			tt		= PSEUDO.field(" ", 2).first(2);
 			var tt2 = PSEUDO.field(" ", 3).first(2);
 			subject ^= " -> " ^ tt;
 			if (tt2 and tt2 ne tt) {
@@ -150,7 +149,7 @@ listen:
 			}
 
 			//add success, WARNING or FAILURE
-			tt = "";
+			tt	= "";
 			tt2 = msg_.ucase();
 			if (not(tt2.contains("SUCCESS")) or tt2.contains("FAIL")) {
 				tt = "FAILURE";
@@ -170,7 +169,7 @@ listen:
 			//subject:=' Ver: ':versiondate 'D4/J'
 
 			//log it
-			var errormsg = msg_;
+			var	 errormsg = msg_;
 			call log(cmd, errormsg ^ "");
 
 		} else {
@@ -180,9 +179,8 @@ listen:
 			if (VOLUMES) {
 				printl(msg_);
 			}
-			var techmsg = msg_.f(1).first(256);
+			var	 techmsg = msg_.f(1).first(256);
 			call sysmsg(msg_, techmsg);
-
 		}
 
 		if (subject) {
@@ -217,14 +215,20 @@ listen:
 				verfilename.converter("/", OSSLASH);
 				if (ver.osread(verfilename)) {
 					body(-1) = "EXODUS Ver:" ^ ver.f(1);
-					}
+				}
 
 				//too slow so ignore it
 				//servername=getdrivepath(drive()[1,2])[3,'\']
 				//if servername then body:=fm:'ServerName=':servername
 
 				body ^= FM ^ FM ^ msg_;
-				body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
+				body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|",
+							   "\r"
+							   "\r"
+							   "\r"
+							   "\r"
+							   "\r"
+							   "\r");
 				body.replacer("\r", "\r\n");
 
 				//sendmail - if it fails, there will be an entry in the log
@@ -247,9 +251,7 @@ listen:
 						call sendmail(address2, "", subject, body, attachfilename);
 					}
 				}
-
 			}
-
 		}
 
 		//terminate after automatic backup in order to allow os filesystem backups
@@ -272,7 +274,6 @@ listen:
 				logoff();
 			}
 		}
-
 	}
 
 	// Respond to web client e.g. program crash due to Variable not Assigned
@@ -290,11 +291,11 @@ listen:
 	//noninteractive avoids any further messages on OFF command
 	SYSTEM(33) = s33;
 	if (SYSTEM.f(43)) {
-		USERNAME=(SYSTEM.f(43));
+		USERNAME = (SYSTEM.f(43));
 	}
 	//if system<44> then call sysvar_109_110('SET',system<44>)
 	if (SYSTEM.f(44)) {
-		STATION=(SYSTEM.f(44));
+		STATION = (SYSTEM.f(44));
 	}
 
 	if (halt) {
@@ -302,7 +303,7 @@ listen:
 		logoff();
 	}
 
-	if (cmd.field(" ",1) eq "LISTEN") {
+	if (cmd.field(" ", 1) eq "LISTEN") {
 		//if NET LISTEN LISTEN LISTEN - then terminate if too many errors
 		if (cmd.len() gt 100) {
 			printl(msg_);

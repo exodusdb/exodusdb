@@ -2,7 +2,7 @@
 libraryinit()
 
 function main(io v1, io v2, io v3, io v4, io v5, io v6) {
-/* pushsession
+	/* pushsession
         v1=var().getcursor();
         SENTENCE.move(v2);
         RECORD.move(v3);
@@ -18,13 +18,11 @@ function main(io v1, io v2, io v3, io v4, io v5, io v6) {
 	v4.move(ID);
 	v5.move(DICT);
 	v6.move(MV);
-	MV=v6.field(RM,1);
+	MV = v6.field(RM, 1);
 	//INSERT=v6.field(RM,2);
 	//print(v6.field(RM,3));
 	v6 = "";
 	return 0;
-
 }
 
 libraryexit()
-

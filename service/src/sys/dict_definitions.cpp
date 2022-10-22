@@ -187,7 +187,6 @@ libraryexit(process_weekcommencing)
 
 libraryinit(reverse_the_users)
 //----------------------------
-//#include <reverse.h>
 
 function main() {
 	RECORD = invertarray(reverse(invertarray(RECORD)));

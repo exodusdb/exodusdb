@@ -1,96 +1,92 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <gethtml.h>
-//#include <getmark.h>
-//#include <getcss.h>
 #include <exodus/htmllib2.h>
-//#include <docmods.h>
-//#include <timedate2.h>
+#include <gethtml.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var cmdline;//num
-int nrows;//num
-int ncols;//num
+	var cmdline;  //num
+int nrows;		  //num
+int ncols;		  //num
 var file;
 var dictvoc;
 var rowfields;
 var nrowfields;
 dim rowdict;
 dim rowfieldismv;
-int rowfn;//num
+int rowfn;	//num
 var rowfield;
 var totcol;
-var coln;//num
+var coln;  //num
 var colorder;
 var coldict;
 var datadict;
-var prefixn;//num
+var prefixn;  //num
 var prefix;
-int recn;//num
+int recn;  //num
 var tt;
-var nmvs;//num
+var nmvs;  //num
 var xx;
-var datavals;//num
-var nrowvals;//num
+var datavals;  //num
+var nrowvals;  //num
 var rowvals;
 var fieldname;
 var nn;
 var colvals;
 var ncolvals;
-var rowvaln;//num
+var rowvaln;  //num
 var rowval;
-var rown;//num
+var rown;  //num
 var msg;
-var colvaln;//num
+var colvaln;  //num
 var colval;
-var rownx;//num
-var oldval;//num
+var rownx;	 //num
+var oldval;	 //num
 var colconv;
 var rowconv;
 
-var printptr;//num
-var topmargin;//num
+var printptr;	//num
+var topmargin;	//num
 var tx;
 var system;
 var printfilename;
 var html;
-var ownprintfile;//num
+var ownprintfile;  //num
 var ptx_filenamelen;
 var ptx_random;
 var printfile;
 var letterhead;
 var pagelns;
-var bodyln;//num
-var realpagen;//num
-var pagen;//num
-var newpage;//num
+var bodyln;		//num
+var realpagen;	//num
+var pagen;		//num
+var newpage;	//num
 var bottomline;
 var printtxmark;
 var rfmt;
 var head;
 var foot;
-var ntxlns;//num
-var nbodylns;//num
+var ntxlns;	   //num
+var nbodylns;  //num
 var ptx_temp;
 var headx;
 var newpagetag;
 var ptx_css;
 var cssver;
 var style;
-var stylennx;//num
+var stylennx;  //num
 var htmltitle;
 var head_or_foot;
 var footx;
 var head1;
-var optioncharn;//num
+var optioncharn;  //num
 var optionchars;
 var optionchar;
 var newoptions;
-var printtx_ii;//num
+var printtx_ii;	 //num
 var spaceoptionsize;
 
 function main(in filename, in rowfields0, in colfield, in datafield, io output, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
@@ -102,16 +98,16 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 
 	cmdline = 0;
 
-///////
-//init:
-///////
+	///////
+	//init:
+	///////
 	if ((output.unassigned() or allrowvals.unassigned()) or allcolvals.unassigned()) {
 		allcolvals = "";
 		allrowvals = "";
-		output = "";
+		output	   = "";
 	}
 	if (prefixes.unassigned()) {
-		prefixes = "";
+		prefixes   = "";
 		prefixmvfn = "";
 	}
 
@@ -158,10 +154,10 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).f(1) eq "F") {
 			prefixmvfn = rowdict(rowfn).f(2);
 		}
-	} //rowfn;
+	}  //rowfn;
 
 	totcol = colfield eq "TOTAL";
-	coln = 1;
+	coln   = 1;
 	if (totcol) {
 		colorder = "AR";
 	} else {
@@ -177,7 +173,6 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		} else {
 			colorder = "AL";
 		}
-
 	}
 
 	if (not(datadict.read(DICT, datafield))) {
@@ -190,14 +185,14 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	if (prefixes) {
 		prefixn = 0;
 nextprefix:
-///////////
+		///////////
 		prefixn += 1;
 		prefix = prefixes.f(1, prefixn);
 		if (not prefix) {
 			goto exit;
 		}
 		recn = 0;
-		MV = 0;
+		MV	 = 0;
 
 	} else {
 		if (not LISTACTIVE) {
@@ -207,7 +202,7 @@ nextprefix:
 	}
 
 nextrecord:
-///////////
+	///////////
 	if (prefixes) {
 		recn += 1;
 		MV = 0;
@@ -225,17 +220,17 @@ nextrecord:
 	}
 
 	if (prefixmvfn) {
-		tt = RECORD.f(prefixmvfn);
+		tt	 = RECORD.f(prefixmvfn);
 		nmvs = tt.fcount(VM);
 nextmv:
-///////
+		///////
 		//if prefixes else goto nextrecord
 		MV += 1;
 		if (MV gt nmvs) {
 			goto nextrecord;
 		}
 	} else {
-		MV = 1;
+		MV	 = 1;
 		nmvs = 1;
 	}
 
@@ -266,11 +261,11 @@ nextmv:
 	}
 
 	nrowvals = 0;
-	rowvals = "";
+	rowvals	 = "";
 	if (nrowfields) {
 		for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 			fieldname = rowfields.f(1, rowfn);
-			tt = calculate(fieldname);
+			tt		  = calculate(fieldname);
 			if (fieldname eq "HOUR") {
 				tt = ("00" ^ tt).last(2);
 			}
@@ -279,9 +274,9 @@ nextmv:
 				nrowvals = nn;
 			}
 			pickreplacer(rowvals, rowfn, tt);
-		} //rowfn;
+		}  //rowfn;
 	} else {
-		rowvals = "Total";
+		rowvals	 = "Total";
 		nrowvals = 1;
 	}
 
@@ -306,7 +301,7 @@ nextmv:
 					tt = rowvals.f(rowfn, 1);
 				}
 				pickreplacer(rowval, 1, 1, rowfn, tt);
-			} //rowfn;
+			}  //rowfn;
 		} else {
 			rowval = rowvals;
 		}
@@ -346,7 +341,7 @@ toobig:
 				output.inserter(1, 1 + coln, colval);
 				for (rownx = 2; rownx <= nrows + 1; ++rownx) {
 					output.inserter(rownx, 1 + coln, "");
-				} //rownx;
+				}  //rownx;
 			}
 
 			if (output.len() + datavals.len() gt 6500) {
@@ -366,9 +361,9 @@ toobig:
 				pickreplacer(output, rown + 1, ncols + 2, oldval + datavals);
 			}
 
-		} //colvaln;
+		}  //colvaln;
 
-	} //rowvaln;
+	}  //rowvaln;
 
 	/////////
 	//recexit:
@@ -379,7 +374,7 @@ toobig:
 
 /////
 exit:
-/////
+	/////
 	//format the column title values
 	if (not totcol) {
 		colconv = coldict.f(7);
@@ -404,7 +399,7 @@ exit:
 			goto toobig;
 		}
 		output(rown + 1, 1) = allrowvals.f(1, rown);
-	} //rown;
+	}  //rown;
 
 	//format the row title values
 	output(1, 1, 1) = "";
@@ -419,13 +414,12 @@ exit:
 			}
 		}
 
-	} //rowfn;
+	}  //rowfn;
 
 	//convert sm row keys into columns
 	output.converter(SM, VM);
 
 	return 0;
-
 }
 
 libraryexit()

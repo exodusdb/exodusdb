@@ -7,17 +7,17 @@ function main(in input0, in max) {
 	var maxx;
 	var iscmd;
 	if (SENTENCE.field(" ", 1) eq "secid") {
-		iscmd = true;
+		iscmd  = true;
 		inputx = SENTENCE.field(" ", 2);
-		maxx = SENTENCE.field(" ", 3);
+		maxx   = SENTENCE.field(" ", 3);
 		if (not inputx or maxx eq "" or not maxx.isnum()) {
 			errputl("Syntax is 'secid TEXT NUMBER'\nTEXT must have no spaces.");
 			stop();
 		}
 	} else {
-		iscmd = false;
+		iscmd  = false;
 		inputx = input0;
-		maxx = max;
+		maxx   = max;
 	}
 
 	//use the max as part of the randomisation so that
@@ -25,7 +25,10 @@ function main(in input0, in max) {
 	inputx = maxx ^ inputx;
 
 	//insensitive to ascii punctuation and spaces
-	inputx.converter(" ~!\"$%^&*()_+|{}:@<>?#-=\\[];,./" "\'", "");
+	inputx.converter(
+		" ~!\"$%^&*()_+|{}:@<>?#-=\\[];,./"
+		"\'",
+		"");
 
 	//insensitive to case
 	inputx.ucaser();
@@ -41,13 +44,6 @@ function main(in input0, in max) {
 	}
 
 	return rnd(maxx);
-
 }
 
-
 libraryexit()
-
-
-
-
-

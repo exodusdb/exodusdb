@@ -1,8 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <openfile.h>
 #include <listen3.h>
+#include <openfile.h>
 #include <safeselect.h>
 #include <systemsubs.h>
 
@@ -11,12 +11,12 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-var dictids;
+	var dictids;
 var options;
 var maxnrecs;
 //var nlimitfields;//num
 dim hexx;
-var useactivelist;//num
+var useactivelist;	//num
 var v69;
 var v70;
 var v71;
@@ -24,7 +24,7 @@ var storer;
 var storeid;
 var storedict;
 var storemv;
-var commonsaved;//num
+var commonsaved;  //num
 var savesrcfile;
 var savedatafile;
 var savewlocked;
@@ -42,7 +42,7 @@ var ndictids;
 var xx;
 var row;
 
-function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, io response, in limitfields="", in limitchecks="", in limitvalues="", in maxnrecs0=0) {
+function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, io response, in limitfields = "", in limitchecks = "", in limitvalues = "", in maxnrecs0 = 0) {
 
 	//NB add %SELECTLIST% to sortselect to use active select list
 	//or provide an FM terminated list of keys
@@ -50,10 +50,10 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	//given a sort/select statement
 	//returns a dynamic array or file of xml data
 
-    //use app specific version of listen3
-    if (APPLICATION ne "EXODUS") {
-        listen3 = "listen3_app" ;
-    }
+	//use app specific version of listen3
+	if (APPLICATION ne "EXODUS") {
+		listen3 = "listen3_app";
+	}
 
 	var filename = filenamex;
 
@@ -73,14 +73,14 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	} else {
 		maxnrecs = maxnrecs0;
 	}
-//	if (limitfields.unassigned()) {
-//		nlimitfields = 0;
-//	} else {
-//		nlimitfields = limitfields.fcount(VM);
-//	}
+	//	if (limitfields.unassigned()) {
+	//		nlimitfields = 0;
+	//	} else {
+	//		nlimitfields = limitfields.fcount(VM);
+	//	}
 	let nlimitfields = limitfields.unassigned("").fcount(VM);
 
-	var xml = options.contains("XML");
+	var xml		= options.contains("XML");
 	var rawread = options.contains("RAW");
 
 	datax = "";
@@ -90,7 +90,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		//changed to allow language characters to pass through x80-xF9
 		for (const var ii : range(249, 255)) {
 			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
-		} //ii;
+		}  //ii;
 	}
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
@@ -137,7 +137,7 @@ nocommon:
 	var filename0 = filename;
 	if (filename.field(" ", 2) eq "USING") {
 		dictfilename = filename.field(" ", 3);
-		filename = filename.field(" ", 1);
+		filename	 = filename.field(" ", 1);
 	} else {
 		dictfilename = filename;
 	}
@@ -150,7 +150,6 @@ nocommon:
 		//abort
 		gosub exit();
 		return 0;
-
 	}
 
 	if (linkfilename2) {
@@ -161,7 +160,6 @@ nocommon:
 			//abort
 			gosub exit();
 			return 0;
-
 		}
 	} else {
 		datax = "";
@@ -182,7 +180,6 @@ nocommon:
 		//abort
 		gosub exit();
 		return 0;
-
 	}
 
 	var oconvsx = "";
@@ -202,7 +199,6 @@ nocommon:
 		//abort
 		gosub exit();
 		return 0;
-
 	}
 
 	if (not(openfile("DICT.voc", dictvoc))) {
@@ -214,8 +210,8 @@ nocommon:
 	} else {
 		call listen3(filename, "READ", realfilename, triggers);
 		//postread=triggers<3>
-		haspostread = triggers.f(3) ne "";
-		systemsubs = triggers.f(3);
+		haspostread	 = triggers.f(3) ne "";
+		systemsubs	 = triggers.f(3);
 		postreadmode = triggers.f(4);
 	}
 
@@ -223,11 +219,11 @@ nocommon:
 
 	let ndictids = dictids.fcount(FM);
 	if (dictids ne "RECORD") {
-//		while (true) {
-//			///BREAK;
-//			if (not(dictids.ends(FM))) break;
-//			dictids.popper();
-//		}//loop;
+		//		while (true) {
+		//			///BREAK;
+		//			if (not(dictids.ends(FM))) break;
+		//			dictids.popper();
+		//		}//loop;
 		dictids.trimmerlast(FM);
 		if (dictids eq "") {
 			dictids = "ID";
@@ -246,7 +242,6 @@ nocommon:
 						//abort
 						gosub exit();
 						return 0;
-
 					}
 				}
 			}
@@ -257,17 +252,19 @@ nocommon:
 			//pick A is revelation F
 			if (dictrec.f(1) eq "A") {
 				dictrec(1) = "F";
-				}
+			}
 
-			dictrec = lower(dictrec);
+			dictrec			  = lower(dictrec);
 			dictrecs(dictidn) = dictrec;
-			oconvsx(dictidn) = dictrec.f(1, 7);
-		} //dictidn;
+			oconvsx(dictidn)  = dictrec.f(1, 7);
+		}  //dictidn;
 	}
 
 	var tx = "";
 	if (xml and linkfilename2) {
-		tx ^= "<records>" "\n";
+		tx ^=
+			"<records>"
+			"\n";
 		call osbwrite(tx, linkfile2, dataptr);
 	}
 
@@ -287,7 +284,7 @@ nocommon:
 		//zzz should for validity of select parameters first
 		//otherwise in server mode it loops with a very long error message
 
-	//perform 'SELECT XXXXXXX WITH BRAND_CODE "LU" BY YEAR_PERIOD AND WITH ID NE "[*I" BY ID'
+		//perform 'SELECT XXXXXXX WITH BRAND_CODE "LU" BY YEAR_PERIOD AND WITH ID NE "[*I" BY ID'
 
 		//if filename='JOBS' or filename='COMPANIES' then
 
@@ -330,9 +327,7 @@ nocommon:
 			//abort
 			gosub exit();
 			return 0;
-
 		}
-
 	}
 
 	//return empty results even if no records selected
@@ -342,14 +337,14 @@ nocommon:
 
 	if (not rawread) {
 		win.datafile = filename;
-		win.srcfile = file;
+		win.srcfile	 = file;
 	}
 
 	//read each record and add the required columns to the selectresult
 
 ////////
 nextrec:
-////////
+	////////
 	//if recn then if recn>=maxnrecs then goto nomore
 
 	if (givenkeys) {
@@ -371,7 +366,7 @@ nextrec:
 	if (ID eq "") {
 
 		if (xml and linkfilename2) {
-			var tt = "</records>";
+			var	 tt = "</records>";
 			call osbwrite(tt, linkfile2, dataptr);
 		}
 
@@ -401,8 +396,8 @@ nextrec:
 
 	//filter out unwanted multivalues that the stupid rev sortselect leaves in
 	for (const var limitfieldn : range(1, nlimitfields)) {
-		var value = calculate(limitfields.f(1, limitfieldn));
-		var reqvalue = limitvalues.f(1, limitfieldn);
+		var value	   = calculate(limitfields.f(1, limitfieldn));
+		var reqvalue   = limitvalues.f(1, limitfieldn);
 		var limitcheck = limitchecks.f(1, limitfieldn);
 
 		if (limitcheck eq "EQ") {
@@ -422,9 +417,8 @@ nextrec:
 			gosub exit();
 			stop();
 			return 0;
-
 		}
-	} //limitfieldn;
+	}  //limitfieldn;
 
 	recn += 1;
 
@@ -438,8 +432,8 @@ nextrec:
 			//wlocked=1
 			//simulate unlocked read to avoid warning messages like job cannot be updated
 			win.wlocked = 0;
-			msg_ = "";
-			win.reset = 0;
+			msg_		= "";
+			win.reset	= 0;
 
 			call systemsubs(postreadmode);
 			DATA = "";
@@ -450,7 +444,6 @@ nextrec:
 			if (win.reset ge 5 or msg_) {
 				goto nextrec;
 			}
-
 		}
 
 		//prevent reading passwords postread and postwrite
@@ -469,12 +462,12 @@ nextrec:
 		}
 		row.prefixer(prefix);
 
-	//dictids ne RECORD
+		//dictids ne RECORD
 	} else {
 		row = "";
 
 		for (const var dictidn : range(1, ndictids)) {
-			var dictid = dictids.f(dictidn);
+			var dictid	= dictids.f(dictidn);
 			var dictid2 = dictid;
 			dictid2.converter("@", "");
 			var cell = calculate(dictid);
@@ -490,14 +483,21 @@ nextrec:
 				cell.replacer(">", "&gt;");
 				//if cell then deb ug
 				//cell=quote(str(cell,10))
-				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^ ">" "\n";
+				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^
+					   ">"
+					   "\n";
 			} else {
 				row(1, dictidn) = cell;
 			}
-		} //dictidn;
+		}  //dictidn;
 
 		if (xml) {
-			row = "<RECORD>" "\n" ^ row ^ "</RECORD>" "\n";
+			row =
+				"<RECORD>"
+				"\n" ^
+				row ^
+				"</RECORD>"
+				"\n";
 			//move up
 			//swap '&' with '&amp;' in row
 			//swap "'" with "" in row
@@ -508,10 +508,11 @@ nextrec:
 			}
 		} else {
 			if (xml) {
-				row.prefixer("<records>" "\n");
+				row.prefixer(
+					"<records>"
+					"\n");
 			}
 		}
-
 	}
 
 	if (linkfilename2) {
@@ -529,13 +530,13 @@ nextrec:
 			//changed to allow language characters to pass through x80-xF9
 			for (const var ii : range(249, 255)) {
 				rowpart.replacer(chr(ii), hexx(ii - 249));
-			} //ii;
+			}  //ii;
 
 			//output converted row part
 			call osbwrite(rowpart, linkfile2, dataptr);
 
 			blockn += 1;
-		}//loop;
+		}  //loop;
 
 	} else {
 		datax ^= row;

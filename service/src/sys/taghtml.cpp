@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-var xx;
+	var xx;
 
 function main(in /*type*/, in in0, in mode, out output) {
 
@@ -26,7 +26,7 @@ function main(in /*type*/, in in0, in mode, out output) {
 	}
 
 	var precoded = _VM "nbsp" _VM "amp" _VM "lt" _VM "gt" _VM "infin" _VM;
-	for (var pos = 1; ; pos++) {
+	for (var pos = 1;; pos++) {
 		pos = output.index("&", pos);
 		if (not pos)
 			break;

@@ -1,16 +1,16 @@
 #include <exodus/library.h>
 libraryinit()
 
-var logfilename;
-var logfilelength;//num
+	var logfilename;
+var logfilelength;	//num
 var temposfilename83;
 var logfile;
 var datax;
-var time2;//num
+var time2;	//num
 
 function main(in msg0, io time0) {
 
-	var interactive = false; //not(SYSTEM.f(33));
+	var interactive = false;  //not(SYSTEM.f(33));
 	if (interactive) {
 		return 0;
 	}
@@ -25,21 +25,20 @@ function main(in msg0, io time0) {
 
 		// Try multiple start points in case hit middle of multibyte character
 		// space to defeat convsyntax
-		for ( var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
-		//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
-		//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
+		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
+			//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
+			//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
 			call osbread(datax, logfile, ptr, 1024);
 			//if any data then break out of loop
 			if (datax.len()) {
 				ptr = logfilelength;
 			}
-		} //ptr;
+		}  //ptr;
 
 		logfile.osclose();
 		datax.converter("\r\n", FM ^ FM);
 		time0 = logfilename ^ " " ^ field2(datax, FM, -3, 3);
 		return 0;
-
 	}
 
 	time2 = ostime();

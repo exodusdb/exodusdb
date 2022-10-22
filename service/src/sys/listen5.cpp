@@ -1,27 +1,27 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <listen5.h>
-#include <sysmsg.h>
 #include <authorised.h>
 #include <collectixvals.h>
-#include <exodus/htmllib2.h>
-#include <select2.h>
-#include <openfile.h>
-#include <rtp57.h>
-#include <listen4.h>
-#include <otherusers.h>
-#include <getbackpars.h>
 #include <esctoattr.h>
+#include <exodus/htmllib2.h>
+#include <getbackpars.h>
+#include <listen4.h>
+#include <listen5.h>
+#include <openfile.h>
+#include <otherusers.h>
+#include <rtp57.h>
 #include <scrnio.h>
+#include <select2.h>
 #include <singular.h>
+#include <sysmsg.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 #include <win_common.h>
 
-var initdir;
+	var initdir;
 var request2;
 var request3;
 var request4;
@@ -34,8 +34,8 @@ var tt;
 var xx;
 var inpath;
 var pattern;
-var ageinsecs;//num
-var ii;//num
+var ageinsecs;	//num
+var ii;			//num
 var patchfile;
 var offset;
 var firstblock;
@@ -46,7 +46,7 @@ var versiondatetime;
 var versionkey;
 var patchdatetime;
 var skipreason;
-var skipemail;//num
+var skipemail;	//num
 var lastpatchid;
 var runoncekey;
 var runonce;
@@ -54,7 +54,7 @@ var bottomline;
 var stopn;
 var locks;
 var lockid;
-var dostime;//num
+var dostime;  //num
 var yy;
 var zz;
 var serverend;
@@ -72,7 +72,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 
 	var tracing = 1;
-	initdir = "";
+	initdir		= "";
 
 	//no output in arguments allowed since c++ doesnt allow
 	// defaulting or value based arguments and setting them
@@ -116,7 +116,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		for (var filename : filenamesx) {
 			//filename = filenamesx.f(filen);
 			///BREAK;
-			if (not filename) break;
+			if (not filename)
+				break;
 			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
 				if (tt.osread(filename)) {
 					tt.replacer("\r\n", _FM);
@@ -130,12 +131,12 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							//TRACE: osgetenv("EXO_SERVICE_CODE")="agy_live@tamra"
 
 							//var application = tt.f(5).first(3).lcase();
-							var app_code = osgetenv("EXO_SERVICE_CODE").field("_",1);
+							var app_code = osgetenv("EXO_SERVICE_CODE").field("_", 1);
 							if (not app_code)
 								app_code = osgetenv("APP_CODE");
 
 							var database = tt.f(1);
-							var mode="live";
+							var mode	 = "live";
 							if (database.ends("_test")) {
 								mode = "test";
 								database.cutter(-5);
@@ -154,12 +155,12 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				}
 				xx = unlockrecord("", processes, "START*" ^ filename);
 			}
-		} //filen;
+		}  //filen;
 
 	} else if (request1 eq "DELETEOLDFILES2") {
 
 		inpath = request3;
-		tt = "\\/";
+		tt	   = "\\/";
 		inpath.converter(tt, OSSLASH_ OSSLASH_);
 		//delete old response and temp files every 1 minute
 		call listen5("DELETEOLDFILES", "*.4", inpath);
@@ -172,7 +173,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	} else if (request1 eq "DELETEOLDFILES") {
 
 		pattern = request2;
-		inpath = request3;
+		inpath	= request3;
 
 		//delete files older than x
 		ageinsecs = request4;
@@ -187,27 +188,27 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	} else if (request1 eq "CHECKRESTART") {
 
-//		//check for corruption in system record
-//		//if index(system,char(0),1) then
-//		if (SYSTEM.contains(chr(0))) {
-//			var(SYSTEM).oswrite("system.bad");
-//			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
-//			ANS = "CORRUPTSYSTEM";
-//			SYSTEM.converter(chr(0), "");
-//			ANS = "RESTART " ^ ANS;
-//			return 0;
-//		}
+		//		//check for corruption in system record
+		//		//if index(system,char(0),1) then
+		//		if (SYSTEM.contains(chr(0))) {
+		//			var(SYSTEM).oswrite("system.bad");
+		//			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
+		//			ANS = "CORRUPTSYSTEM";
+		//			SYSTEM.converter(chr(0), "");
+		//			ANS = "RESTART " ^ ANS;
+		//			return 0;
+		//		}
 
 		//detect system parameter changes and restart
 		//this has the effect of detecting corruption in system which inserts lines
-		var s100 = SYSTEM.f(100);
-		var exohome=osgetenv("EXO_HOME");
+		var s100	= SYSTEM.f(100);
+		var exohome = osgetenv("EXO_HOME");
 		var ospaths = "../../system.cfg,system.cfg";
 		ospaths ^= "," ^ exohome ^ "/dat/";
 		ospaths.converter("/", OSSLASH);
 		let npaths = fcount(ospaths, ",");
 		for (const var ii : range(1, npaths)) {
-			var ospath = ospaths.field(",",ii);
+			var ospath = ospaths.field(",", ii);
 			//order is significant
 			var newtime = (ospath.ends(OSSLASH)) ? ospath.osdir().f(3) : ospath.osfile().f(3);
 			var oldtime = s100.f(1, ii);
@@ -219,26 +220,26 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					SYSTEM(100, ii) = newtime;
 				}
 			}
-		} //ii;
+		}  //ii;
 
-//		//check for upgrade to LISTEN
-//		var gbp;
-//		if (gbp.open("GBP", "")) {
-//			var listen;
-//			if (listen.read(gbp, "$LISTEN")) {
-//				listen = field2(listen, FM, -1);
-//				if (s100.f(1, 3)) {
-//					if (s100.f(1, 3) ne listen) {
-//						//this will only restart listen, not the whole process/thread
-//						ANS = "RESTART $LISTEN";
-//						return 0;
-//					}
-//						//comment to solve c++ decomp problem
-//				} else {
-//					SYSTEM(100, 3) = listen;
-//				}
-//			}
-//		}
+		//		//check for upgrade to LISTEN
+		//		var gbp;
+		//		if (gbp.open("GBP", "")) {
+		//			var listen;
+		//			if (listen.read(gbp, "$LISTEN")) {
+		//				listen = field2(listen, FM, -1);
+		//				if (s100.f(1, 3)) {
+		//					if (s100.f(1, 3) ne listen) {
+		//						//this will only restart listen, not the whole process/thread
+		//						ANS = "RESTART $LISTEN";
+		//						return 0;
+		//					}
+		//						//comment to solve c++ decomp problem
+		//				} else {
+		//					SYSTEM(100, 3) = listen;
+		//				}
+		//			}
+		//		}
 
 		ANS = "";
 		return 0;
@@ -254,7 +255,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			return 0;
 		}
 
-		var live = request2;
+		var live  = request2;
 		processes = request3;
 
 		////////////////////////////////////////////////////////////////////////////
@@ -290,7 +291,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			//ensure patch file is complete
 			offset = patchfileinfo.f(1) - 18;
 			call osbread(tt, patchfile, offset, 18);
-			if (tt ne ("!" ^ FM ^ "!END!OF!INSTALL!")) {
+			if (tt ne("!" ^ FM ^ "!END!OF!INSTALL!")) {
 				goto nextpatch;
 			}
 
@@ -332,7 +333,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 			//get current EXODUS version timestamp
 			versiondatetime = "";
-			versionkey = "general/version.dat";
+			versionkey		= "general/version.dat";
 			versionkey.converter("/", OSSLASH);
 			if (tt.osread(versionkey)) {
 				tt.trimmer();
@@ -348,10 +349,10 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 			//skip patch if older than installation
 			skipreason = "";
-			skipemail = "";
+			skipemail  = "";
 			if (versiondatetime and patchdatetime lt versiondatetime) {
 				skipreason = "Patch is older than installation version - " ^ oconv(versiondatetime, "[DATETIME,4*]");
-				skipemail = 1;
+				skipemail  = 1;
 			}
 
 			//skip patch if older than last patch
@@ -373,18 +374,17 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 				//list the files and records that were installed
 				var subject = rec.f(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
-				var body = subject ^ " " ^ patchfilename ^ FM;
+				var body	= subject ^ " " ^ patchfilename ^ FM;
 				if (skipreason) {
 					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
 				}
 				let nfiles = rec.f(3).fcount(_VM);
 				for (const var filen : range(1, nfiles)) {
 					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
-				} //filen;
+				}  //filen;
 
 				//message EXODUS only
 				call sysmsg(body, "NEOPATCH: " ^ subject, "EXODUS");
-
 			}
 
 			if (not skipreason) {
@@ -393,7 +393,6 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().first(2) ^ " (IO)";
 				printl(cmd);
 				perform(cmd);
-
 			}
 
 			//record success/failure before any autorun
@@ -435,7 +434,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			return 0;
 
 nextpatch:;
-		} //patchn;
+		}  //patchn;
 
 		ANS = "";
 
@@ -476,11 +475,11 @@ nextpatch:;
 
 	} else if (request1.starts("GETINDEX")) {
 
-		data_ = "";
-		var filename = request2;
+		data_		  = "";
+		var filename  = request2;
 		var fieldname = request3;
-		var prefix = request4;
-		var sortby = request5;
+		var prefix	  = request4;
+		var sortby	  = request5;
 		if (not sortby) {
 			sortby = "AL";
 		}
@@ -548,7 +547,7 @@ getvalues:
 			data_.converter(_FM, _VM);
 
 			//remove or move any stopped execs to the end and add reason
-			var nn = data_.fcount(_VM);
+			var nn	= data_.fcount(_VM);
 			var nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
 				var execcode = data_.f(1, ii);
@@ -565,7 +564,7 @@ getvalues:
 						nn -= 1;
 					}
 				}
-			} //ii;
+			}  //ii;
 
 			//show inactive if none are active
 			if (data_ eq "" and active) {
@@ -575,8 +574,7 @@ getvalues:
 
 			//1=force vm to ensure xml has empty not missing tags
 			data_(2, 1) = data_.f(2, 1);
-			data_ = invertarray(data_, 1);
-
+			data_		= invertarray(data_, 1);
 		}
 
 		if (request_.contains("RECORD")) {
@@ -585,12 +583,21 @@ getvalues:
 		} else if (request_.contains("XML")) {
 			if (data_) {
 				call htmllib2("STRIPTAGS", data_);
-				data_.replacer(_FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
+				data_.replacer(_FM, "</" ^ fieldname ^
+										">"
+										"</record>"
+										"\r\n"
+										"<record><" ^
+										fieldname ^ ">");
 				data_.prefixer("<record><" ^ fieldname ^ ">");
-				data_ ^= "</" ^ fieldname ^ ">" "</record>";
+				data_ ^= "</" ^ fieldname ^
+						 ">"
+						 "</record>";
 				if (data_.contains(_VM)) {
 					data_.replacer("</" ^ fieldname ^ ">", "</STOPPED>");
-					data_.replacer(_VM, "</" ^ fieldname ^ ">" "<STOPPED>");
+					data_.replacer(_VM, "</" ^ fieldname ^
+											">"
+											"<STOPPED>");
 				}
 			}
 			data_.prefixer("<records>");
@@ -599,7 +606,7 @@ getvalues:
 			//convert fm to vm in iodat
 		}
 
-	//also called from financeproxy to return voucher details for popup
+		//also called from financeproxy to return voucher details for popup
 	} else if (request1 eq "SELECT") {
 
 		var filename0 = request2;
@@ -607,11 +614,11 @@ getvalues:
 			filename0.converter(".", "_");
 			filename0.replacer("MEDIA_TYPE", "JOB_TYPE");
 		}
-		var filename = filename0.field(" ", 1);
+		var filename   = filename0.field(" ", 1);
 		var sortselect = request3;
-		var dictids = request4;
-		var options = request5;
-		var maxnrecs = request6;
+		var dictids	   = request4;
+		var options	   = request5;
+		var maxnrecs   = request6;
 
 		if (not(sortselect.contains("%SELECTLIST%"))) {
 			clearselect();
@@ -681,7 +688,7 @@ getvalues:
 
 		select(locks);
 		var select2data = "";
-		var nlocks = 0;
+		var nlocks		= 0;
 nextlock:
 		if (readnext(lockid)) {
 			var lockx;
@@ -700,7 +707,7 @@ nextlock:
 		} else {
 			print(AT(0, 1));
 		}
-		var nn = select2data.count(FM);
+		var nn		 = select2data.count(FM);
 		var maxlines = 20;
 		if (not tracing) {
 			nn = maxlines;
@@ -714,7 +721,8 @@ nextlock:
 		}
 		for (ii = 1; ii <= nn; ++ii) {
 			///BREAK;
-			if (tracing and nn gt 20) break;
+			if (tracing and nn gt 20)
+				break;
 			var row = select2data.f(ii);
 			if (not tracing) {
 				print("|");
@@ -730,13 +738,13 @@ nextlock:
 			if (tracing) {
 				printl(" ", row.f(1, 2).oconv("L#19"), " ", row.f(1, 3).oconv("L#19"), " ", row.f(1, 4).oconv("L#19"));
 			}
-		} //ii;
+		}  //ii;
 
 		if (not tracing) {
 			printl("+-------------------+");
 		}
 
-		select2data = "";
+		select2data			= "";
 		var select2response = "";
 
 	} else if (request1 eq "UNLOCKLONGPROCESS") {
@@ -745,7 +753,7 @@ nextlock:
 		// lockmode=36
 		// unlockmode=37
 		//END ELSE
-		var lockmode = 23;
+		var lockmode   = 23;
 		var unlockmode = 24;
 		// END
 
@@ -793,9 +801,10 @@ nextlock:
 			var timex = time();
 			while (true) {
 				///BREAK;
-				if (not(otherusers().f(1) and ((time() - timex).abs() lt 30))) break;
-				call ossleep(1000*1);
-			}//loop;
+				if (not(otherusers().f(1) and ((time() - timex).abs() lt 30)))
+					break;
+				call ossleep(1000 * 1);
+			}  //loop;
 
 			data_ = "";
 
@@ -949,14 +958,13 @@ nextfiles:
 				//and delete it if older than the cut off time
 				//and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
-				filetime = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
+				filetime	   = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
 				if (((filename.last(4)).contains(".")) and filetime le deletetime) {
 deleteit:
 					filename.osremove();
 				} else {
 				}
 			}
-
 		}
 
 		goto nextfiles;

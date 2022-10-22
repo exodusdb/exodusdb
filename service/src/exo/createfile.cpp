@@ -10,33 +10,33 @@ function main() {
 
 	//volumename is ignored
 
-	var command=COMMAND.convert(FM," ").lcase();
+	var command = COMMAND.convert(FM, " ").lcase();
 
-	command.replacer(" dict."," dict ");
-	command.replacer(" dict_"," dict ");
-	var dataonly=command.contains(" data ");
-	var dictonly=command.contains(" dict ");
-	command.replacer(" data "," ");
-	command.replacer(" dict "," ");
+	command.replacer(" dict.", " dict ");
+	command.replacer(" dict_", " dict ");
+	var dataonly = command.contains(" data ");
+	var dictonly = command.contains(" dict ");
+	command.replacer(" data ", " ");
+	command.replacer(" dict ", " ");
 
 	//printl(command);
 
 	//something like DATAVOL\NEOS0001 or REVBOOT will be ignored
-	var volname=field(command," ",2);
+	var volname = field(command, " ", 2);
 
-	var filename=field(command," ",3);
+	var filename = field(command, " ", 3);
 	if (not filename) {
-		filename=volname;
-		volname="";
+		filename = volname;
+		volname	 = "";
 	}
 
 	//TODO support volume in createfile
 
-    //dict file
+	//dict file
 	if (not dataonly)
-		create("DICT."^filename);
+		create("DICT." ^ filename);
 
-    //data file
+	//data file
 	if (not dictonly)
 		create(filename);
 
@@ -44,13 +44,12 @@ function main() {
 }
 
 subroutine create(in filename) {
-	var msg=filename;
+	var msg = filename;
 	if (createfile(filename))
-		msg^=" created";
+		msg ^= " created";
 	else
-		msg^=" not created";
-	if (not index(OPTIONS,"S"))
+		msg ^= " not created";
+	if (not index(OPTIONS, "S"))
 		printl(msg);
-
 }
 libraryexit()

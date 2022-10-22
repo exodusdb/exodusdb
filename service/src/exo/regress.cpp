@@ -6,45 +6,45 @@ programinit()
 
 function main() {
 	printl("regress says 'Hello World!'");
-	var osfilename=field(SENTENCE," ",2);
+	var osfilename = field(SENTENCE, " ", 2);
 	var osfile;
-	if (not(osopen(osfilename,osfile)))
-		stop("cant open "^osfilename);
+	if (not(osopen(osfilename, osfile)))
+		stop("cant open " ^ osfilename);
 	var data;
-	if (not(osread(data,osfilename)))
-		stop("cant open "^osfilename);
+	if (not(osread(data, osfilename)))
+		stop("cant open " ^ osfilename);
 
 	data.converter("\r\n", _RM _RM);
-	var bit=data.first(100);
-	var ix=0;
+	var bit = data.first(100);
+	var ix	= 0;
 	var delimiter;
-	int ln=0;
+	int ln = 0;
 	while (true) {
 		++ln;
-		if (not(mod(ln,1000)))
+		if (not(mod(ln, 1000)))
 			printl(ln);
-		var line=data.substr2(ix,delimiter);
-//		line.outputl();
-		var output=line.field("\t",1);
-		var op=line.field("\t",2);
-		var inputx=line.field("\t",3);
-		var arg1=line.field("\t",4);
+		var line = data.substr2(ix, delimiter);
+		//		line.outputl();
+		var output = line.field("\t", 1);
+		var op	   = line.field("\t", 2);
+		var inputx = line.field("\t", 3);
+		var arg1   = line.field("\t", 4);
 		//op.outputl();
 		var test;
 		//if (op=="LOCATEUSING") {
 		//	//0 1     LOCATEUSING     BCCCB   A               B               -1      -1      -1
 		//	test=locateusing(inputx.f(,
 		//}
-		if (op=="OCONV") {
-			test=oconv(inputx,arg1);
-		} else if (op=="ISNUM") {
-			test=inputx.isnum();
+		if (op == "OCONV") {
+			test = oconv(inputx, arg1);
+		} else if (op == "ISNUM") {
+			test = inputx.isnum();
 		} else {
 			printl(line);
 			stop();
 		}
 		if (test ne output) {
-			printt(ln,op,inputx.convert(FM^VM^SM,"^]\\"),arg1,output.convert(FM^VM^SM,"^]\\"),test.convert(FM^VM^SM,"^]\\"));
+			printt(ln, op, inputx.convert(FM ^ VM ^ SM, "^]\\"), arg1, output.convert(FM ^ VM ^ SM, "^]\\"), test.convert(FM ^ VM ^ SM, "^]\\"));
 			printl();
 		}
 		if (not delimiter)

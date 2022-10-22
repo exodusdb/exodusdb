@@ -1,19 +1,19 @@
 #include <exodus/program.h>
 programinit()
 
-var tempfilename;
+	var tempfilename;
 var rec;
 var tempfile;
-var starttime;//num
-var endtime;//num
-var testtime;//num
+var starttime;	//num
+var endtime;	//num
+var testtime;	//num
 
 function main() {
 
 	//declare function esc.to.exit
 	var deletefilex = 1;
 
-	var usetransaction=true;
+	var usetransaction = true;
 
 	if (deletefilex) {
 		tempfilename = "BENCHMARK" ^ SYSTEM.f(24);
@@ -44,20 +44,20 @@ function main() {
 		ntests = 10;
 	}
 
-	var testn = 0;
+	var testn	= 0;
 	var tottime = 0;
 	var mintime = 999999;
 	var maxtime = "";
 	var avgtime = "";
 	printl(chr(12), "writing then deleting ", nreps, " x ", recsize, " byte records ", ntests, " times");
-	printl("Test" , "\t" , "Time" , "\t" , "Min." , "\t" , "Avg." , "\t" , "Max.");
+	printl("Test", "\t", "Time", "\t", "Min.", "\t", "Avg.", "\t", "Max.");
 	var minspeed = 0;
 	var maxspeed = 0;
 	var avgspeed = 0;
 
 /////////
 nexttest:
-/////////
+	/////////
 	if (testn >= ntests) {
 		goto exit;
 	}
@@ -73,7 +73,6 @@ nexttest:
 	//PERFORM 'MAKEFILE ':TEMPFILENAME:' ':recsize:' ':N:' (S)'
 	createfile(tempfilename ^ " (S)");
 	//perform 'SELECT ':tempfilename
-
 
 	if (esctoexit()) {
 		goto exit;
@@ -92,22 +91,22 @@ nexttest:
 	//print
 	//print 'Writing 1Kb records'
 	for (const var ii : range(1, nreps)) {
-//		if (esctoexit()) {
-//			goto exit;
-//		}
-//		print(AT(0), "W", ii);
+		//		if (esctoexit()) {
+		//			goto exit;
+		//		}
+		//		print(AT(0), "W", ii);
 		rec.write(tempfile, ii);
-	}//ii;
+	}  //ii;
 
 	//print
 	//print 'Deleting 1Kb records'
 	for (const var ii : range(1, nreps)) {
-//		if (esctoexit()) {
-//			goto exit;
-//		}
-//		print(AT(0), "D", ii);
+		//		if (esctoexit()) {
+		//			goto exit;
+		//		}
+		//		print(AT(0), "D", ii);
 		tempfile.deleterecord(ii);
-	}//ii;
+	}  //ii;
 
 	if (usetransaction)
 		committrans();
@@ -128,7 +127,7 @@ nexttest:
 	minspeed = (1 / maxtime).oconv("MD20P");
 	avgspeed = (1 / avgtime).oconv("MD20P");
 	maxspeed = (1 / mintime).oconv("MD20P");
-	printl(" ", testn, ". " , "\t" , testtime.oconv("MD20P") , "\t" , minspeed , "\t" , avgspeed , "\t" , maxspeed);
+	printl(" ", testn, ". ", "\t", testtime.oconv("MD20P"), "\t", minspeed, "\t", avgspeed, "\t", maxspeed);
 
 	//call note(endtime-starttime:' Seconds')
 	if (deletefilex) {
@@ -139,7 +138,7 @@ nexttest:
 
 /////
 exit:
-/////
+	/////
 	if (deletefilex) {
 		deletefile(tempfilename ^ " (S)");
 	}
@@ -159,7 +158,6 @@ exit:
 
 	call mssg(msg.oconv("L#60"));
 	return 0;
-
 }
 
 programexit()

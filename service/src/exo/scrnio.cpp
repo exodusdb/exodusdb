@@ -1,8 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in coln,in rown,in data,in attribute) {
-//function main(in, in, in, in) {
+function main(in coln, in rown, in data, in attribute) {
+	//function main(in, in, in, in) {
 
 	//obsolete or reimplement
 
@@ -15,4 +15,3 @@ function main(in coln,in rown,in data,in attribute) {
 }
 
 libraryexit()
-

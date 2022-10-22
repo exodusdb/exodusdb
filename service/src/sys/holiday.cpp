@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var direction;//num
+	var direction;	//num
 var xx;
 var daten;
 
@@ -33,13 +33,14 @@ function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, i
 
 		while (true) {
 			///BREAK;
-			if (not(workdate and idate ne mindate)) break;
+			if (not(workdate and idate ne mindate))
+				break;
 			idate += direction;
 			gosub getholidaytype(idate, userx, agp, market, holidaytype);
 			if (not holidaytype) {
 				workdate -= direction;
 			}
-		}//loop;
+		}  //loop;
 
 	} else {
 		call mssg(mode.quote() ^ " invalid mode in HOLIDAY()");
@@ -75,7 +76,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 			//else from global parameter "last day of week" plus the day before
 			if (not weekenddows) {
 				//weekenddows=agp<13>:sm:mod(agp<13>-1-1,7)+1
-				var tt = (agp.f(13) - 1 - 1).mod(7) + 1;
+				var tt		= (agp.f(13) - 1 - 1).mod(7) + 1;
 				weekenddows = agp.f(13) ^ SM ^ tt;
 			}
 		}

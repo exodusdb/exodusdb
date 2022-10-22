@@ -7,14 +7,13 @@ libraryinit()
 
 #include <sys_common.h>
 
-//var nn;
-var progname;
+	//var nn;
+	var progname;
 var languagecode;
 var langkey;
 var codepage;
 
 function main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
-
 
 	lang = "";
 	if (languagefile.unassigned()) {
@@ -39,30 +38,30 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 
 	if (origlanguagecode.contains("*")) {
 
-		var langcode1 = origlanguagecode.field("*", 1);
+		var	 langcode1 = origlanguagecode.field("*", 1);
 		call getlang(origprogname, langcode1, origdatatype, languagefile, lang);
-		var lang1 = lang;
+		var	 lang1 = lang;
 
-		var langcode2 = origlanguagecode.field("*", 2);
+		var	 langcode2 = origlanguagecode.field("*", 2);
 		call getlang(origprogname, langcode2, origdatatype, languagefile, lang);
-		var lang2 = lang;
+		var	 lang2 = lang;
 
 		//bilingual
 		if (lang2 and lang2 ne lang1) {
-			lang = "";
+			lang   = "";
 			var n1 = lang1.fcount(FM);
 			var n2 = lang2.fcount(FM);
-//			if (n1 lt n2) {
-//				nn = n2;
-//			} else {
-//				nn = n1;
-//			}
+			//			if (n1 lt n2) {
+			//				nn = n2;
+			//			} else {
+			//				nn = n1;
+			//			}
 			let nn = (n1 < n2) ? n2 : n1;
 			for (const var fn : range(1, nn)) {
 				//lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
 				var lang1line = lang1.f(fn);
 				var lang2line = lang2.f(fn);
-				var nparts = fcount(lang1line, "|");
+				var nparts	  = fcount(lang1line, "|");
 				if (nparts eq 1) {
 					//eg English Arabic
 					lang(fn) = (lang1line ^ " " ^ lang2line).trim();
@@ -70,13 +69,13 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 					//eg January Janvier|February Fevruar| etc.
 					var bilingual = "";
 					for (const var partn : range(1, nparts)) {
-						bilingual ^= trim(field(lang1line, "|", partn) ^  " " ^ field(lang2line, "|", partn)) ^ "|";
+						bilingual ^= trim(field(lang1line, "|", partn) ^ " " ^ field(lang2line, "|", partn)) ^ "|";
 					}
 					//bilingual[-1,1]="";
 					bilingual.popper();
 					lang(fn) = bilingual;
 				}
-			} //fn;
+			}  //fn;
 		} else {
 			lang = lang1;
 		}
@@ -84,7 +83,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		return 0;
 	}
 
-	progname = origprogname;
+	progname	 = origprogname;
 	languagecode = origlanguagecode;
 	var datatype = origdatatype;
 
@@ -100,7 +99,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 
 	//try without data type
 	languagecode = origlanguagecode;
-	datatype = "";
+	datatype	 = "";
 	gosub getlang2(origprogname, datatype, languagefile, lang);
 	if (lang) {
 		goto exit;
@@ -117,7 +116,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 	//IF REPLY=2 THEN ABORT
 
 exit:
-/////
+	/////
 
 	var custlang;
 	if (custlang.read(DEFINITIONS, "LANGUAGE*" ^ langkey)) {
@@ -130,7 +129,7 @@ exit:
 				}
 				lang(fn) = custlang.f(fn);
 			}
-		} //fn;
+		}  //fn;
 	}
 
 	//force 737 greek codepage characters so indexing is ok etc
@@ -143,17 +142,16 @@ exit:
 				codepage = "";
 			}
 getupperlower:
-			lang(9) = codepage.f(1, 9);
+			lang(9)	 = codepage.f(1, 9);
 			lang(10) = codepage.f(1, 10);
 
-		//central european including poland
+			//central european including poland
 		} else if (codepage eq "852") {
 			if (not(codepage.read(languagefile, "GENERAL*POLISH"))) {
 				codepage = "";
 			}
 			goto getupperlower;
 		}
-
 	}
 
 	//swap '(Base)' with '(':base.currency:')' in lang
@@ -208,9 +206,8 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 				if (tt) {
 					lang(ii) = tt;
 				}
-			} //ii;
+			}  //ii;
 		}
-
 	}
 
 	return;

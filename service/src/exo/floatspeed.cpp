@@ -1,28 +1,29 @@
 #include <exodus/program.h>
 programinit()
 
-var ss1;
+	var ss1;
 var ss2;
 var xx;
-var secs;//num
-var time1;//num
-var time2;//num
+var secs;	//num
+var time1;	//num
+var time2;	//num
 var nn = 1000;
 
 function main() {
 	//call savescreenss1, ss2);
 	//printl(chr(12));
-	var ntries = 0;
-	var tot = 0;
-	var ntots = 0;
+	var ntries	 = 0;
+	var tot		 = 0;
+	var ntots	 = 0;
 	var minspeed = "";
 	var maxspeed = "";
 	var avgspeed = "";
 	while (true) {
 		xx.inputn(-1);
 		///BREAK;
-		if (not(xx eq "" and ntots lt 10)) break;
-		var yy = var("x").str(65530);
+		if (not(xx eq "" and ntots lt 10))
+			break;
+		var	  yy = var("x").str(65530);
 		gosub getspeed();
 		ntries += 1;
 		//if ntries>2 and secs then
@@ -49,7 +50,7 @@ function main() {
 
 			printl(speed, " x=i ", secs.oconv("MD10P"), " ", nn, " ", time());
 		}
-	}//loop;
+	}  //loop;
 
 	var msg = "";
 	msg(-1) = "FLOATSPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed;
@@ -69,17 +70,17 @@ subroutine getspeed() {
 	//for (var dd = 1.1; dd < nn; ++dd) {
 	for (double dd = 1.1; dd < nn; ++dd) {
 		xx = dd;
-	} //dd;
+	}  //dd;
 	time2 = ostime();
-	secs = time2 - time1;
+	secs  = time2 - time1;
 
 	//increase number of loops
 	if (secs lt 1) {
-		nn = nn * 2;
+		nn	 = nn * 2;
 		secs = "";
 	}
 	if (secs gt 5) {
-		nn = nn / 2;
+		nn	 = nn / 2;
 		secs = "";
 	}
 

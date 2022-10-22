@@ -1,8 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
-var output2;
-var ndecs;//num
+	var output2;
+var ndecs;	//num
 
 function main(in type, in input0, in mode, out output) {
 
@@ -25,7 +25,7 @@ function main(in type, in input0, in mode, out output) {
 				if (output lt 1024) {
 					output2 = "MiB";
 				} else {
-					output = output / 1024;
+					output	= output / 1024;
 					output2 = "GiB";
 				}
 			}

@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var xx;
+	var xx;
 var origusername;
 
 function main(in cmd, in username) {
@@ -15,9 +15,9 @@ function main(in cmd, in username) {
 			call mssg(username.quote() ^ " user does not exist in executeas()");
 			return 0;
 		}
-		origusername = USERNAME;
+		origusername	= USERNAME;
 		var newusername = username ^ "(" ^ USERNAME ^ ")";
-		USERNAME=(newusername);
+		USERNAME		= (newusername);
 	}
 
 	///////////
@@ -25,7 +25,7 @@ function main(in cmd, in username) {
 	///////////
 
 	if (username) {
-		USERNAME=(origusername);
+		USERNAME = (origusername);
 	}
 
 	return 0;

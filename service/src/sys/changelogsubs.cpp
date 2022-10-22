@@ -1,12 +1,12 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <openfile.h>
+#include <authorised.h>
+#include <daterangetext.h>
 #include <initcompany.h>
+#include <openfile.h>
 #include <quote2.h>
 #include <safeselect.h>
-#include <daterangetext.h>
-#include <authorised.h>
 #include <singular.h>
 
 #include <system_common.h>
@@ -16,13 +16,13 @@ libraryinit()
 
 #include <window.hpp>
 
-var keywords;
+	var keywords;
 var mode;
 var nkeywords;
 var changelog;
 var currentversiondatetime;
 var tt;
-var versionn;//num
+var versionn;  //num
 var cmd;
 var versionlog;
 var idate;
@@ -35,9 +35,8 @@ var wsmsg;
 
 function main(in mode0) {
 
-
-	keywords = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";
-	mode = mode0;
+	keywords  = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";
+	mode	  = mode0;
 	nkeywords = keywords.fcount(VM);
 
 	if (not(openfile("CHANGELOG", changelog))) {
@@ -68,12 +67,12 @@ function main(in mode0) {
 		//call changelog.subs('LIST':fm:data)
 		gosub list();
 
-	//called from LOGIN.NET. not UI. UI calls SELECTANDLIST
+		//called from LOGIN.NET. not UI. UI calls SELECTANDLIST
 	} else if (mode.f(1) eq "WHATSNEW") {
 
 		var menucodes = mode.f(2);
-		mode = mode.f(1);
-		ANS = "";
+		mode		  = mode.f(1);
+		ANS			  = "";
 
 		var users;
 		if (not(users.open("USERS", ""))) {
@@ -92,7 +91,6 @@ function main(in mode0) {
 					userrec.f(17).writev(users, USERNAME, 17);
 
 					var("").writev(DEFINITIONS, changelogkey, 8);
-
 				}
 			}
 
@@ -114,7 +112,6 @@ function main(in mode0) {
 			//show nothing the very first time they logon
 			ANS = "";
 			return 0;
-
 		}
 
 		gosub getcurrentversiondatetime();
@@ -157,7 +154,6 @@ function main(in mode0) {
 			// @ans=''
 			// return
 			// end
-
 		}
 
 		//indicate need to select whats new preferences (by numeric whatsnew)
@@ -183,7 +179,7 @@ function main(in mode0) {
 		gosub list();
 		ANS = SYSTEM.f(2);
 
-	//actually this is GETINSTALLEDVERSION DATES!
+		//actually this is GETINSTALLEDVERSION DATES!
 	} else if (mode eq "GETVERSIONDATES") {
 
 		gosub getversiondates();
@@ -195,7 +191,6 @@ function main(in mode0) {
 	} else if (mode.f(1) eq "LIST") {
 
 		gosub list();
-
 	}
 
 	return 0;
@@ -233,7 +228,7 @@ subroutine select() {
 	//force all
 	//data<2>=0
 
-	cmd = "SELECT CHANGELOG";
+	cmd		 = "SELECT CHANGELOG";
 	var andx = "";
 	if (data_.f(1)) {
 		cmd ^= " WITH KEYWORD " ^ quote2(data_.f(1));
@@ -272,7 +267,7 @@ subroutine list() {
 	cmd ^= " BY KEYWORDS";
 	cmd ^= " BY NUMBER";
 
-	var headingx = "What''s New in EXODUS";
+	var	  headingx = "What''s New in EXODUS";
 	gosub getcurrentversiondatetime();
 	if (data_.f(2)) {
 		//heading:=' version ':data<2> '[DATE,4*]':' -'
@@ -292,7 +287,6 @@ subroutine list() {
 
 	perform(cmd);
 	return;
-
 }
 
 subroutine getcurrentversiondatetime() {
@@ -319,7 +313,7 @@ subroutine getversiondates() {
 	call osread(versionlog, "upgrade.cfg");
 	//versionlog=trim(field(versionlog,\1A\,1))
 	versionlog.converter("\r\n", _FM _FM);
-	let nn = versionlog.fcount(FM);
+	let nn			= versionlog.fcount(FM);
 	var versiondata = "";
 	for (const var ii : range(1, nn)) {
 		idate = versionlog.f(ii, 1).field(" ", 2, 3).iconv("D");
@@ -329,7 +323,7 @@ subroutine getversiondates() {
 		if (not(versiondata.locateusing(FM, idate, xx))) {
 			versiondata(-1) = idate;
 		}
-	} //ii;
+	}  //ii;
 
 	//list of installed versions
 	data_ = versiondata;

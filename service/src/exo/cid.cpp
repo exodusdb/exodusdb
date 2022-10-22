@@ -8,4 +8,3 @@ function main() {
 }
 
 libraryexit()
-

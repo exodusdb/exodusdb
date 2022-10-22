@@ -1,8 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <locking.h>
 #include <authorised.h>
+#include <locking.h>
 #include <singular.h>
 
 #include <system_common.h>
@@ -12,9 +12,9 @@ libraryinit()
 
 #include <window.hpp>
 
-var msg;
-var deleting;//num
-var validating;//num
+	var msg;
+var deleting;	 //num
+var validating;	 //num
 var mastercode;
 var vn;
 var op;
@@ -57,7 +57,7 @@ nextbuild:
 			if (RECORD.f(subfn) eq "") {
 				goto nextbuild;
 			}
-			deleting = 0;
+			deleting   = 0;
 			validating = 0;
 			gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 			goto nextbuild;
@@ -80,7 +80,7 @@ nextbuild:
 
 	} else if (mode eq "PREDELETE") {
 		validating = 1;
-		deleting = 1;
+		deleting   = 1;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
 	} else if (mode eq "WRITE") {
@@ -139,7 +139,7 @@ nextbuild:
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
 	} else if (mode eq "POSTDELETE") {
-		deleting = 1;
+		deleting   = 1;
 		validating = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
@@ -190,7 +190,6 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 			}
 		} else {
 		}
-
 	}
 
 	return;

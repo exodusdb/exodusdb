@@ -1,17 +1,17 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <authorised.h>
-#include <initcompany.h>
 #include <addcent4.h>
+#include <authorised.h>
 #include <changelogsubs.h>
+#include <initcompany.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var menuid;
-var taskn;//num
+	var menuid;
+var taskn;	//num
 var xx;
 var menun2;
 var compcodex;
@@ -23,7 +23,7 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 	//declare function validcode1
 	//$insert abp,common
 	//$insert bp,agency.common
-	cookie = "";
+	cookie		  = "";
 	authcompcodes = "";
 
 	//return allowable menus if legacy menu in users file
@@ -81,7 +81,6 @@ readmenu:
 		if (authorised("TIMESHEET ACCESS", msg, "")) {
 			menus(1, -1) = "TIMESHEETS";
 		}
-
 	}
 
 	//reduce the menus to a list of authorised menus
@@ -105,15 +104,14 @@ deleteit:
 					}
 				}
 
-			//not specifically locked - only allow if in legacy menus
+				//not specifically locked - only allow if in legacy menus
 			} else {
 				if (not(oldmenus.locate(menu, xx))) {
 					goto deleteit;
 				}
 			}
-
 		}
-	} //menun;
+	}  //menun;
 
 	//if they have MENU then ANALYSIS=MEDIAANALYSIS
 	if (menus.contains("MEDIA")) {
@@ -150,7 +148,8 @@ nextcomp:
 		for (const var ii : range(1, 9999)) {
 			compcode = allcomps.f(ii);
 			///BREAK;
-			if (not compcode) break;
+			if (not compcode)
+				break;
 			//if validcode2(compcode,'','',xx,yy) then compcodes<-1>=compcode
 			//if validcode1(compcode,'','',xx,yy) then compcodes<-1>=compcode
 			//dont use general subroutine in system module
@@ -162,7 +161,7 @@ nextcomp:
 				compcodes(-1) = compcode;
 			}
 
-		} //ii;
+		}  //ii;
 	} else {
 		compcodes = allcomps.f(1);
 	}
@@ -187,7 +186,7 @@ nextcomp:
 	call initcompany(compcode);
 
 	var ncompanies = compcodes.fcount(FM);
-	authcompcodes = compcodes;
+	authcompcodes  = compcodes;
 	authcompcodes.converter(FM, VM);
 
 	//market
@@ -201,7 +200,7 @@ nextcomp:
 	if (xx.open("MARKETS", "")) {
 		//defmarketcode=agp<37>
 		defmarketcode = SYSTEM.f(137);
-		maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
+		maincurrcode  = defmarketcode.xlate("MARKETS", 5, "X");
 	}
 
 	//main currencycode
@@ -272,10 +271,10 @@ nextcomp:
 	//whats new
 
 	call changelogsubs("WHATSNEW" ^ FM ^ menus);
-	var ans = ANS;
+	var	 ans = ANS;
 	cookie ^= "&wn=" ^ ans;
 
-    cookie ^= "&ap=" ^ APPLICATION;
+	cookie ^= "&ap=" ^ APPLICATION;
 
 	//call backupreminder(dataset,msg)
 
@@ -292,7 +291,7 @@ nextcomp:
 	//if lastbackupdate and lastbackupdate lt date()-1 then
 	//assume backup on same day (ie after last midnight)
 	if (lastbackupdate and lastbackupdate lt date()) {
-		msg = "The last backup was ";
+		msg		  = "The last backup was ";
 		var ndays = date() - lastbackupdate;
 		msg ^= ndays ^ " day" ^ var("s").first(ndays ne 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";

@@ -3,7 +3,7 @@ libraryinit()
 
 #include <sysmsg.h>
 
-var id;
+	var id;
 
 function main(in mode, io tx, in arg3, io arg4, in arg5) {
 

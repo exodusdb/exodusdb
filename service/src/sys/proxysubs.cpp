@@ -8,7 +8,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var outfile;
+	var outfile;
 var errors;
 
 function main(in module, in mode, in stationery) {
@@ -29,10 +29,9 @@ function main(in module, in mode, in stationery) {
 	//2. put converted filename(s) into DATA - to web ui with ../../data/
 	//3. error response set if file(s) do not exist or < 5 bytes
 
-
 	var outfiles = SYSTEM.f(2);
 	outfiles.converter(";", VM);
-	data_ = outfiles;
+	data_	   = outfiles;
 	let nfiles = outfiles.fcount(VM);
 	for (const var filen : range(1, nfiles)) {
 
@@ -53,7 +52,7 @@ function main(in module, in mode, in stationery) {
 			data_(1, filen) = outfile;
 		}
 
-	} //filen;
+	}  //filen;
 
 	data_.converter(VM, ";");
 	//convert vm to ';' in outfiles
@@ -110,7 +109,6 @@ fileok:
 		if (response_.first(6) ne "Error:") {
 			response_.prefixer("Error:");
 		}
-
 	}
 
 	return;

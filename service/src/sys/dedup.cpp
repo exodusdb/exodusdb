@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-var list1n;
+	var list1n;
 var xx;
 
 function main(in /*mode*/, io list1, io list2, in seps) {
@@ -21,7 +21,7 @@ function main(in /*mode*/, io list1, io list2, in seps) {
 			list1.remover(list1n);
 			list2.remover(list2n);
 		}
-	} //list2n;
+	}  //list2n;
 
 	//any list1 that are in origlist2 are duplicates - consider as not removed
 	var nlist1 = list1.fcount(FM);
@@ -29,7 +29,7 @@ function main(in /*mode*/, io list1, io list2, in seps) {
 		if (alllist2.locateusing(FM, list1.f(list1n), xx)) {
 			list1.remover(list1n);
 		}
-	} //list1n;
+	}  //list1n;
 
 	list1.converter(FM, seps[1]);
 	list2.converter(FM, seps[1]);

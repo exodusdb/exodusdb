@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-var reqdate;
+	var reqdate;
 var tt;
 
 function main() {
@@ -33,11 +33,11 @@ function main() {
 	var periodago = date() - perioddays;
 	select(requestlog);
 	var periodsize = 0;
-	var recn = 0;
-	var mindate = 999999;
+	var recn	   = 0;
+	var mindate	   = 999999;
 
 nextrec1:
-/////////
+	/////////
 	if (esctoexit()) {
 		stop();
 	}
@@ -68,7 +68,7 @@ nextrec1:
 
 ///////
 stage2:
-///////
+	///////
 
 	//calculate approx how many periods to keep
 	//and delete all records prior to that
@@ -79,10 +79,10 @@ stage2:
 	}
 
 	var nperiodskept = (maxsize / periodsize).oconv("MD10P");
-	var ndayskept = (nperiodskept * perioddays).floor();
+	var ndayskept	 = (nperiodskept * perioddays).floor();
 	if (ndayskept gt 9999) {
 		var datekept = var("1/1/2000").iconv("D");
-		ndayskept = date() - datekept + 1;
+		ndayskept	 = date() - datekept + 1;
 	}
 	var datekept = date() - ndayskept;
 
@@ -109,11 +109,11 @@ stage2:
 	var sizedeleted = 0;
 
 	select(requestlog);
-	recn = 0;
+	recn		 = 0;
 	var ndeleted = 0;
 
 nextrec2:
-/////////
+	/////////
 	if (esctoexit()) {
 		stop();
 	}

@@ -2,30 +2,28 @@
 libraryinit()
 
 #include <cid.h>
-#include <monitor2b.h>
-#include <getbackpars.h>
-#include <shell2.h>
 #include <diskfreespace.h>
-//#include <getdatetime.h>
+#include <getbackpars.h>
+#include <monitor2b.h>
 #include <sendmail.h>
+#include <shell2.h>
 #include <sysmsg.h>
-//#include <upgrade.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var checkinterval;//num
+	var checkinterval;	//num
 var forced;
 //var upgradeready;//num
-var anyusers;//num
+var anyusers;  //num
 //var upgradefilename;
 var processes;
 var request;
 var tempfilename;
 var monitorkey;
 var monitordata;
-var currenttime;//num
+var currenttime;  //num
 var cidx;
 var hostid;
 var installid;
@@ -36,8 +34,8 @@ var minusagetime;
 var delusagetime;
 var statistics;
 dim netid;
-var hourn;//num
-var ii;//num
+var hourn;	//num
+var ii;		//num
 var tt;
 var processcount;
 var backuprequired;
@@ -45,12 +43,12 @@ var backupdrives;
 var dbasesystems;
 var dbasecodes;
 var dbasecode;
-var dbasen;//num
+var dbasen;	 //num
 var status;
 var statusn;
 var bakpars;
 var descriptions;
-var status0123;//num
+var status0123;	 //num
 var ndbases;
 var nok;
 var temp;
@@ -58,8 +56,8 @@ var secs;
 var description;
 var minreq;
 var nhung;
-var first;//num
-var startit;//num
+var first;	  //num
+var startit;  //num
 var voc;
 var xx;
 var dbasesystem;
@@ -68,20 +66,20 @@ var backupdrive;
 var tpath;
 var paramrec;
 var home;
-var lastbackupsize;//num
-var lastbackupdatetime;//num
-var currentdatetime;//num
-var backupdriven;//num
-var freespace;//num
+var lastbackupsize;		 //num
+var lastbackupdatetime;	 //num
+var currentdatetime;	 //num
+var backupdriven;		 //num
+var freespace;			 //num
 var testdata;
 var testfile;
-var nextbackupdate;//num
+var nextbackupdate;	 //num
 var dow;
 var nextbackupfilename;
 var nextbackupfileinfo;
-var reminderhours;//num
+var reminderhours;	//num
 var localdate;
-var localtime;//num
+var localtime;	//num
 var xx2;
 var xx3;
 var xx4;
@@ -92,7 +90,7 @@ var subject;
 var body;
 var nbackupdrives;
 var present;
-var deletingsize;//num
+var deletingsize;  //num
 var hostdescriptions;
 var versionnote;
 var versiondate;
@@ -103,7 +101,7 @@ var errors;
 //var upgradex;
 //var upgradefiledatetime;
 var wgetoutput;
-var jj;//num
+var jj;	 //num
 var osver;
 var cpudesc;
 var nprocs;
@@ -111,12 +109,11 @@ var result;
 var nn;
 var ips;
 var line;
-var nips;//num
-var maxips;//num
+var nips;	 //num
+var maxips;	 //num
 //var upgflagfile;
 
 function main() {
-
 
 	//NB the PROCESSES file is central to all databases in one installation
 	//so this update of the monitor covers all the installations running processes
@@ -130,7 +127,7 @@ function main() {
 	//quit if disabled and not forced
 	if (not(forced) and var("../../disabled.cfg").osfile()) {
 		return 0;
-		}
+	}
 
 	//upgradeready = 0;
 	//only counts web users
@@ -211,7 +208,7 @@ function main() {
 
 	//count users (unique sessionids) in the last hour
 	usertab.redim(25, 3);
-	usertab = "";//dim
+	usertab = "";  //dim
 	//last 24 hours or back to midnight
 	minusagetime = currenttime - 1;
 	//minusagetime=int(currenttime)
@@ -231,7 +228,6 @@ nextstatistic:
 				//trim out usage records older than one week
 				if (RECORD.f(1) lt delusagetime) {
 					statistics.deleterecord(ID);
-
 				}
 				goto nextstatistic;
 			}
@@ -241,27 +237,26 @@ nextstatistic:
 			netid(1) = ID.field("*", 2);
 			netid(2) = ID.field("*", 3);
 			netid(3) = ID.field("*", 4);
-			hourn = ((currenttime - RECORD.f(1)) * 24).floor() + 1;
-			hourn = (hourn - 1).mod(24) + 1;
+			hourn	 = ((currenttime - RECORD.f(1)) * 24).floor() + 1;
+			hourn	 = (hourn - 1).mod(24) + 1;
 			for (ii = 1; ii <= 3; ++ii) {
 				if (not(usertab(hourn, ii).locate(netid(ii), tt))) {
 					usertab(hourn, ii)(1, -1) = netid(ii);
 				}
-			} //ii;
+			}  //ii;
 
 			goto nextstatistic;
-
 		}
 	}
 
 	//get the number of processes by database and status
 	select(processes);
-	processcount = "";
+	processcount   = "";
 	backuprequired = "";
 	//checkeddrives=''
 	backupdrives = "";
 	dbasesystems = "";
-	dbasecodes = SYSTEM.f(58);
+	dbasecodes	 = SYSTEM.f(58);
 
 nextprocess:
 	if (readnext(ID)) {
@@ -282,7 +277,7 @@ nextprocess:
 			dbasecodes(1, dbasen) = dbasecode;
 		}
 		dbasesystems(1, dbasen) = RECORD.f(51);
-		status = calculate("STATUS");
+		status					= calculate("STATUS");
 		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
 			//statusn will be 6
 			processcount(20, dbasen) = status;
@@ -322,7 +317,6 @@ nextprocess:
 				}
 				backuprequired(1, dbasen) = tt;
 			}
-
 		}
 
 		goto nextprocess;
@@ -337,8 +331,8 @@ nextprocess:
 	//prepare the data to be sent to the monitor
 	//checking minumum number of processes required
 	descriptions = "";
-	status0123 = 0;
-	ndbases = dbasecodes.fcount(VM);
+	status0123	 = 0;
+	ndbases		 = dbasecodes.fcount(VM);
 	for (dbasen = 1; dbasen <= ndbases; ++dbasen) {
 		dbasecode = dbasecodes.f(1, dbasen);
 		if (not dbasecode) {
@@ -350,7 +344,7 @@ nextprocess:
 		if (not(nok) and not(VOLUMES)) {
 			temp = ("../data/" ^ dbasecode ^ "/" ^ dbasecode ^ ".svr").osfile();
 			secs = date() * 86400 + time() - (temp.f(2) * 86400 + temp.f(3));
-			nok = secs lt 600;
+			nok	 = secs lt 600;
 			//otherwise flag hung
 			if (not nok) {
 				processcount(2, dbasen) = 1;
@@ -384,13 +378,13 @@ nextprocess:
 		//not if this is a test database (only those with codes ending in TEST')
 		//unless configured to all it
 		first = 1;
-		if ((( not SYSTEM.f(17, 1).ends("_test") or SYSTEM.f(126)) and nok lt minreq) and nhung lt 5) {
+		if (((not SYSTEM.f(17, 1).ends("_test") or SYSTEM.f(126)) and nok lt minreq) and nhung lt 5) {
 			//if locksystem('LOCK',dbasecode) then
-				//unlock immediately to enable startup - which will fail if anyone locks
-				//call locksystem('UNLOCK',dbasecode)
+			//unlock immediately to enable startup - which will fail if anyone locks
+			//call locksystem('UNLOCK',dbasecode)
 
-				//dont bother trying to start it if another process is backing up
-				//or it has been stopped or is the database is missing
+			//dont bother trying to start it if another process is backing up
+			//or it has been stopped or is the database is missing
 			startit = not((dbasecode.lcase() ^ ".end").osfile());
 			if (startit) {
 				tt = "../data/" ^ dbasecode.lcase() ^ "/general/revmedia.lk";
@@ -409,9 +403,9 @@ nextprocess:
 				}
 			}
 
-				//dont start anything if another process is still starting up
-				//this lock is in INIT.GENERAL and MONITOR2
-				//dont
+			//dont start anything if another process is still starting up
+			//this lock is in INIT.GENERAL and MONITOR2
+			//dont
 			if (startit) {
 				if (lockrecord("VOC", voc, "INIT.GENERAL.LOGIN")) {
 					call unlockrecord("VOC", voc, "INIT.GENERAL.LOGIN");
@@ -426,17 +420,17 @@ nextprocess:
 					dbasesystem = APPLICATION;
 				}
 				tt = "start exodus.js /system " ^ dbasesystem ^ " /database " ^ dbasecode;
-					//pid:=' /pid ':tt<6>
-					//print @(0):@(-4):time() 'MTS':' ':tt
+				//pid:=' /pid ':tt<6>
+				//print @(0):@(-4):time() 'MTS':' ':tt
 				if (first) {
 					printl();
 					first = 0;
 				}
 				print(tt, " ...");
-					//pcperform tt
+				//pcperform tt
 				print("monitor2 calling shell2 ", tt, " ...");
 				call shell2(tt, xx);
-				call ossleep(1000*5);
+				call ossleep(1000 * 5);
 				printl("done.");
 			}
 
@@ -474,8 +468,8 @@ nextprocess:
 		}
 		if (backupdrive) {
 
-	//uncomment to test non-existent drive
-	//backupdrive='1'
+			//uncomment to test non-existent drive
+			//backupdrive='1'
 			description ^= " Backup->" ^ backupdrive;
 			tpath = "../data/" ^ dbasecode.lcase() ^ "/params2";
 			tpath.converter("/", OSSLASH);
@@ -486,7 +480,7 @@ nextprocess:
 				}
 			} else {
 				//time fm date
-				tt = tpath.osfile();
+				tt		 = tpath.osfile();
 				paramrec = tt.f(3) ^ FM ^ tt.f(2);
 				//size
 				call osgetenv("HOME", home);
@@ -499,14 +493,14 @@ nextprocess:
 			if (lastbackupsize) {
 				description ^= " " ^ oconv(lastbackupsize, "[XBYTES,1]");
 			}
-	//uncomment to test insufficient backup space
-	//lastbackupsize=999999999
+			//uncomment to test insufficient backup space
+			//lastbackupsize=999999999
 			lastbackupdatetime = (paramrec.f(2) + paramrec.f(1) / 86400).oconv("MD50P");
 			//if integer datetime then old format missing time so add 2 hours
 			//if lastbackupdatetime and int(lastbackupdatetime)=lastbackupdatetime then lastbackupdatetime+=2/24
 			//assume backup on same day (ie after last midnight)
 			currentdatetime = (date() + time() / 86400).oconv("MD50P");
-			tt = currentdatetime - lastbackupdatetime;
+			tt				= currentdatetime - lastbackupdatetime;
 			//allow one day and one hour
 			if (lastbackupdatetime and (tt gt 1 + 1 / 24.0)) {
 				//warning if one day missed and critical if more than one
@@ -589,7 +583,7 @@ nextprocess:
 							reminderhours = 5.5;
 							call getdatetime(localdate, localtime, xx, xx2, xx3, xx4);
 							//if (localtime ge 21600 and localtime le 64800) {
-							if (localtime ge iconv("06:00", "MT") and localtime le iconv("18:00", "MT")){
+							if (localtime ge iconv("06:00", "MT") and localtime le iconv("18:00", "MT")) {
 								//only one email per installation
 								call osread(lastnote, "lastnote.cfg");
 								if (lastnote.f(1) ne localdate or (lastnote.f(2) lt localtime - 3600 * reminderhours)) {
@@ -602,21 +596,24 @@ nextprocess:
 									toaddresses = trim(toaddresses, ";");
 									if (toaddresses) {
 										remindern = (localtime - 21600).mod(3600 * reminderhours) + 1;
-										subject = "EXODUS Backup Reminder";
+										subject	  = "EXODUS Backup Reminder";
 										if (remindern gt 1) {
 											subject ^= " (" ^ remindern ^ ")";
 										}
 										body = "It is time to change the EXODUS backup media (e.g. USB Flash Drive)";
 										if (localtime lt 43200) {
-											body(-1) = FM ^ "Please change it " "before 12:00 midday today.";
+											body(-1) = FM ^
+													   "Please change it "
+													   "before 12:00 midday today.";
 										} else {
-											body(-1) = FM ^ "Please change it " "before 00:00 midnight tonight.";
+											body(-1) = FM ^
+													   "Please change it "
+													   "before 00:00 midnight tonight.";
 										}
 										printl(body);
 										body.replacer(FM, chr(13));
 										call sendmail(toaddresses, "", subject, body, "", "", xx);
 									}
-
 								}
 							}
 
@@ -624,18 +621,13 @@ nextprocess:
 							if (localtime ge var("12:00").iconv("MT")) {
 								description ^= " Change Backup!";
 							}
-
 						}
-
 					}
-
 				}
-
 			}
 
 			//accumulate size of existing backups that will be deleted and overwritten
 			backupdrives(4, backupdriven) = backupdrives.f(4, backupdriven) + lastbackupsize;
-
 		}
 
 		//if index(description,'!',1) or nok or nhung or nmaint then
@@ -647,7 +639,7 @@ nextprocess:
 		}
 
 nextdbasen:;
-	} //dbasen;
+	}  //dbasen;
 
 	//check for free space on backup drive(s)
 	nbackupdrives = backupdrives.f(1).fcount(VM);
@@ -656,10 +648,10 @@ nextdbasen:;
 		present = backupdrives.f(3, backupdriven);
 		if (present) {
 
-			backupdrive = backupdrives.f(1, backupdriven);
-			freespace = backupdrives.f(2, backupdriven);
+			backupdrive	   = backupdrives.f(1, backupdriven);
+			freespace	   = backupdrives.f(2, backupdriven);
 			lastbackupsize = backupdrives.f(4, backupdriven);
-			deletingsize = backupdrives.f(5, backupdriven);
+			deletingsize   = backupdrives.f(5, backupdriven);
 			freespace += deletingsize;
 
 			description = " Drive " ^ backupdrive ^ " Free:" ^ oconv(freespace, "[XBYTES,1]");
@@ -677,10 +669,9 @@ nextdbasen:;
 			if (description) {
 				descriptions ^= " " ^ description;
 			}
-
 		}
 
-	} //backupdriven;
+	}  //backupdriven;
 	//oswrite descriptions on 'DESCRIPS'
 	if (descriptions.contains("!!") and status0123 lt 2) {
 		status0123 = 2;
@@ -696,8 +687,8 @@ nextdbasen:;
 	tt.converter("/", OSSLASH);
 	call osread(versionnote, tt);
 	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
-	tt = versiondate.oconv("D2/");
-	tt = tt.last(2) ^ "/" ^ tt.first(5);
+	tt			= versiondate.oconv("D2/");
+	tt			= tt.last(2) ^ "/" ^ tt.first(5);
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 	//show local time
@@ -710,8 +701,8 @@ nextdbasen:;
 			if (usertab(ii, jj) gt usertab(25, jj)) {
 				usertab(25, jj) = usertab(ii, jj);
 			}
-		} //jj;
-	} //ii;
+		}  //jj;
+	}	   //ii;
 
 	//list number of users (in last hour)
 	hostdescriptions ^= " - Users:";
@@ -725,7 +716,7 @@ nextdbasen:;
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= tt;
-	} //ii;
+	}  //ii;
 
 	//list max number of users
 	hostdescriptions ^= " - Max:";
@@ -736,7 +727,7 @@ nextdbasen:;
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= usertab(hourn, ii);
-	} //ii;
+	}  //ii;
 
 	//os description
 	call osgetenv("VER", osver);
@@ -751,17 +742,17 @@ nextdbasen:;
 	if (VOLUMES) {
 		result = shell2("ipconfig /all", errors).ucase();
 		result.converter("\r\n", _FM _FM).trimmer();
-		nn = result.fcount(FM);
+		nn	= result.fcount(FM);
 		ips = "";
 		for (ii = 1; ii <= nn; ++ii) {
 			line = result.f(ii).trim();
 			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
 			if (line.starts("IP ADDRESS")) {
 				ips(-1) = line.field(":", 2).trim().field("(", 1);
-			//only display the first
+				//only display the first
 				goto gotip;
 			}
-		} //ii;
+		}  //ii;
 	} else {
 		ips = shell2("printf $(hostname -I | cut -d' ' -f 1)");
 	}

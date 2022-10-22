@@ -3,7 +3,7 @@ programinit()
 
 #include <sendmail.h>
 
-//command line shim to call exodus sendmail lib
+	//command line shim to call exodus sendmail lib
 
 function main() {
 	call sendmail();
@@ -11,4 +11,3 @@ function main() {
 }
 
 programexit()
-

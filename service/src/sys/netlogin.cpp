@@ -1,29 +1,29 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <secid.h>
 #include <hashpass.h>
-#include <systemfile.h>
 #include <inputbox.h>
+#include <secid.h>
+#include <systemfile.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-let prikey_ = {1000, 100};
+	let prikey_ = {1000, 100};
 
 var mode;
 var userx;
 var password;
-var ok;//num
+var ok;	 //num
 var usern;
 var xdata;
 var msg;
-var show;//num
-var maxlen;//num
-var now;//num
+var show;	 //num
+var maxlen;	 //num
+var now;	 //num
 var escx;
-var now2;//num
+var now2;  //num
 var encryptx;
 var allowablechars;
 
@@ -40,24 +40,24 @@ function main(in mode0) {
 
 	//prevent time out
 	var timeoutx = SYSTEM.f(22);
-	SYSTEM(22) = "";
+	SYSTEM(22)	 = "";
 
-	var nfailures = "";
+	var nfailures  = "";
 	var nallowable = 3;
-	var lockx = "";
-	var speed = 0;
+	var lockx	   = "";
+	var speed	   = 0;
 
 	//autologin
 	if (SYSTEM.f(33)) {
 		//break on
-		userx = SYSTEM.f(33, 2).ucase();
+		userx	 = SYSTEM.f(33, 2).ucase();
 		password = SYSTEM.f(33, 3).ucase();
 		goto chknameandpass;
 	}
 
 	gosub getsec();
 
-		/*dos and not supported any longer;
+	/*dos and not supported any longer;
 		//auto login for particular station ids
 		if addresses='' then;
 			if len(@station) then;
@@ -77,9 +77,9 @@ function main(in mode0) {
 		if (SECURITY.f(1).locate("MASTER", usern)) {
 			if (SECURITY.f(4, usern, 2).field(TM, 7) eq "") {
 				SYSTEM(22) = 1000000;
-				userx = "MASTER";
+				userx	   = "MASTER";
 				SYSTEM(15) = 1;
-				ok = 1;
+				ok		   = 1;
 				goto okfail;
 			}
 		}
@@ -101,14 +101,14 @@ inpname:
 		var xx = unlockrecord();
 
 		//prevent any messages to the old name
-		USERNAME=(APPLICATION);
+		USERNAME = (APPLICATION);
 		//unfortunately this is removing the workstation lock on messages
 		//so we cannot see the dataset being in use
 		//unlock all
 		xx = unlockrecord();
 
-		msg = "EXODUS SECURITY|What is your name ?| || |Please enter your name,|or press Esc to exit.";
-		show = 1;
+		msg	   = "EXODUS SECURITY|What is your name ?| || |Please enter your name,|or press Esc to exit.";
+		show   = 1;
 		maxlen = 20;
 		gosub inputx();
 	}
@@ -116,7 +116,7 @@ inpname:
 	//exit the system if name not given
 	if (xdata eq "") {
 fail:
-	//  if @username='EXODUS' then stop
+		//  if @username='EXODUS' then stop
 		perform("OFF");
 		logoff();
 	}
@@ -135,10 +135,10 @@ fail:
 	}
 
 	//get the password
-	msg = "EXODUS SECURITY|What is your PASSWORD ?| || |Please enter your password,|or press Esc to cancel.";
-	show = 0;
+	msg	   = "EXODUS SECURITY|What is your PASSWORD ?| || |Please enter your password,|or press Esc to cancel.";
+	show   = 0;
 	maxlen = 20;
-	now = ostime();
+	now	   = ostime();
 	gosub inputx();
 
 	if (escx eq "0") {
@@ -146,7 +146,7 @@ fail:
 		//defeats the password entry speed check
 		speed = 0;
 	} else {
-		now2 = ostime();
+		now2  = ostime();
 		speed = now2 - now;
 	}
 	//call note(speed)
@@ -176,11 +176,13 @@ fail:
 		}
 
 		var keyfail = 0;
-	//inp.key:
-		var keyx = "";
+		//inp.key:
+		var	 keyx = "";
 		call mssg("The lock is " ^ (lockx.quote()) ^ "|What is the key ?", "RC", keyx, "");
 
-		ok = keyx eq secid(lockx, "1000" "100");
+		ok = keyx eq secid(lockx,
+						   "1000"
+						   "100");
 		if (ok) {
 			goto okfail;
 		}
@@ -200,11 +202,10 @@ fail:
 		//if keyfail ge 3 then goto fail
 		//keyfail+=1
 		//goto inp.key
-
 	}
 
 chknameandpass:
-///////////////
+	///////////////
 	//encrypt the password
 	//encryptx=password
 	//gosub makepass
@@ -222,7 +223,7 @@ chknameandpass:
 	if (not(ok)) {
 		if (SYSTEM.f(33)) {
 			userx = APPLICATION;
-			ok = 1;
+			ok	  = 1;
 		}
 	}
 
@@ -267,7 +268,7 @@ okfail:
 		goto fail;
 	}
 
-	USERNAME=(userx);
+	USERNAME = (userx);
 
 	var sysrec;
 	if (not(sysrec.read(systemfile(), userx))) {

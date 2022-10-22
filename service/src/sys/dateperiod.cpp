@@ -3,22 +3,22 @@ libraryinit()
 
 #include <addcent4.h>
 
-var period;//num
-var year;//num
+	var period;	 //num
+var year;		 //num
 
 function main(in type, in input0, in mode, out output) {
 
 	var firstmonth = mode.field(",", 1);
-	var maxperiod = mode.field(",", 2);
+	var maxperiod  = mode.field(",", 2);
 
 	//if iconv then convert period (MM/YY or YYMM) to internal last date of month
 	if (type eq "ICONV") {
 		//return the last day of the period (internal format)
 		if (input0.contains("/")) {
 			period = input0.field("/", 1) + 1;
-			year = input0.field("/", 2);
+			year   = input0.field("/", 2);
 		} else {
-			year = input0.first(2);
+			year   = input0.first(2);
 			period = input0.last(2) + 1;
 		}
 		if (firstmonth and firstmonth.isnum()) {
@@ -44,8 +44,8 @@ function main(in type, in input0, in mode, out output) {
 
 	//if oconv then convert internal date to year:period
 	var temp = input0.oconv("D2-E");
-	year = temp.last(2);
-	period = temp.b(4, 2);
+	year	 = temp.last(2);
+	period	 = temp.b(4, 2);
 	if (firstmonth and firstmonth.isnum()) {
 		period -= firstmonth - 1;
 		if (period lt 1) {

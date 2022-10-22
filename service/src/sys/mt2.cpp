@@ -10,7 +10,7 @@ function main(in type, in in0, in mode, out out0) {
 	//iconv  is the reverse
 
 	var in2 = in0;
-	out0 = "";
+	out0	= "";
 
 	//call msg(in2:'')
 
@@ -32,7 +32,7 @@ function main(in type, in in0, in mode, out out0) {
 		}
 
 		var hours = in2.field(":", 1);
-		var mins = in2.field(":", 2);
+		var mins  = in2.field(":", 2);
 
 		//check numeric
 		if (not(hours.isnum() and mins.isnum())) {
@@ -44,18 +44,17 @@ function main(in type, in in0, in mode, out out0) {
 
 	} else {
 		if (not(in2.isnum())) {
-			out0 = "";
+			out0   = "";
 			STATUS = 2;
 			return 0;
 		}
-		out0 = (in2.field(".", 1) + 0) ^ ":";
+		out0	 = (in2.field(".", 1) + 0) ^ ":";
 		var temp = in2.field(".", 2);
 		if (temp) {
 			temp.prefixer(".");
 		}
 		temp = (temp * 60).oconv("MD00P");
 		out0 ^= temp.oconv("R(0)#2");
-
 	}
 
 	return 0;

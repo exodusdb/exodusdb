@@ -909,7 +909,8 @@ function main() {
 ///////////
 //			for (int ln = 1; ln <= nlines; ++ln) {
 //				var line = trimfirst(text2(ln));
-			for (const var& line : text2) {
+			for (var& line : text2) {
+				line.trimmer(" \t");
 				var word1 = line.field(" ", 1);
 
 				//for external subroutines (dll/so libraries), build up .h

@@ -1,18 +1,16 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in mode, in processno, out result) {
+function main(in /*mode*/, in /*processno*/, out result) {
 
 	//returns 1 if processno is busy/cannot be locked, otherwise 0
-	false and mode and processno;//evade warning
 
 	//not longer implemented
 	//result=not mv.processno_islocked(processno);
 
-	result=0;
+	result = 0;
 
 	return result;
 }
 
 libraryexit()
-

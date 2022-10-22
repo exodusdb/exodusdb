@@ -8,11 +8,11 @@ libraryinit()
 
 #include <sys_common.h>
 
-var wgetrc;
+	var wgetrc;
 var authurl;
 var params;
 var text;
-var hashcode;//num
+var hashcode;  //num
 var errors;
 var log;
 
@@ -42,16 +42,16 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	}
 
 	//make linux/cygwin command
-	var cmd = "wget";
+	var cmd		 = "wget";
 	var httpsbug = 0;
 	if (VOLUMES) {
 		wgetrc = "";
 		//look for local or cygwin wget.exe otherwise quit
 		var exe = oscwd().contains(":") ? ".exe" : "";
-		cmd = SYSTEM.f(50) ^ "wget" ^ exe;
+		cmd		= SYSTEM.f(50) ^ "wget" ^ exe;
 		if (not(cmd.osfile())) {
 			httpsbug = 1;
-			cmd = "wget" ^ exe;
+			cmd		 = "wget" ^ exe;
 		}
 		if (not(cmd.osfile())) {
 			//avoid error in READ/UPGRADE phase of MONITOR2
@@ -68,7 +68,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	msg = "unknown error in control";
 
-	var logfilename = tempfilename ^ ".XWG";
+	var logfilename	  = tempfilename ^ ".XWG";
 	var tempfilename2 = tempfilename ^ ".XRE";
 
 	//user and pass currently not required for some reason
@@ -79,10 +79,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	//stay within 31 bit integers for php sake
 	var salt = 3923517;
-	var max = 4752137;
+	var max	 = 4752137;
 
 	var sessionid = (date().pwr(3) * 7 + 5).b(9999, -9999);
-	var cidx = cid();
+	var cidx	  = cid();
 
 	if (mode eq "WRITE") {
 
@@ -113,7 +113,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			//proxies that demand an HTTP LENGTH header for POST
 			//but -N is supposed to not be used with POST
 			params = datax;
-
 		}
 
 		if (request eq "UPDATE") {
@@ -148,7 +147,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			text = params;
 			gosub hash(salt, max, hashcode);
 			params.prefixer("hashcode=" ^ hashcode ^ "&");
-
 		}
 
 		//add basic wget commands
@@ -201,7 +199,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 					wgetrc(-1) = "proxy_password=" ^ SYSTEM.f(56, 4);
 				}
 			}
-
 		}
 		//cmd:=' --execute https_proxy=xyz'
 
@@ -213,8 +210,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			} else {
 				wgetrc(-1) = "user=" ^ httpuser;
 				wgetrc(-1) = "password=" ^ httppass;
-				}
 			}
+		}
 
 		if (cleanup) {
 			logfilename.osremove();
@@ -260,7 +257,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			//add url
 			cmd ^= " " ^ ((authurl ^ params).quote());
 
-	//if cleanup else oswrite cmd on tempfilename:'.CMD'
+			//if cleanup else oswrite cmd on tempfilename:'.CMD'
 
 			//run the wget command
 			//print @(0):@(-4):time() 'MTS':' CONTROL ':cmd[1,50]:'... ':
@@ -295,9 +292,9 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 			wgetrcfilename.converter(OSSLASH, "/");
 
-			var cmdfilename = tempfilename ^ ".cmd";
+			var cmdfilename	  = tempfilename ^ ".cmd";
 			var errorfilename = tempfilename ^ ".XER";
-			var cmdfile = "set WGETRC=" ^ wgetrcfilename;
+			var cmdfile		  = "set WGETRC=" ^ wgetrcfilename;
 			cmdfile ^= _EOL ^ cmd ^ " 2>" ^ errorfilename;
 			var(cmdfile).oswrite(cmdfilename);
 
@@ -319,7 +316,6 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				wgetrcfilename.osremove();
 				errorfilename.osremove();
 			}
-
 		}
 
 		//catches option errors
@@ -372,8 +368,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			msg = "wrong response";
 badresponse:
 			datax.replacer("<br />", _FM);
-			gosub getlog(logfilename, cleanup, log);
-			msg ^=_FM _FM ^ datax ^ log;
+			gosub	   getlog(logfilename, cleanup, log);
+			msg ^= _FM _FM ^ datax ^ log;
 			msg = msg.oconv("T#60");
 			msg.converter(_TM, _FM);
 			msg.trimmer();
@@ -389,7 +385,6 @@ badresponse:
 		datax = datax.field(",", 14, 999999);
 
 		msg = "";
-
 	}
 
 	return 1;
@@ -425,7 +420,6 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 	//1. the computer number plus the request number plus a hash of the auth data
 	//2. the first eight digits of the sin of the above
 	//3. reversed
-
 }
 
 subroutine hash(in salt, in max, out hashcode) {
@@ -433,7 +427,7 @@ subroutine hash(in salt, in max, out hashcode) {
 	hashcode = salt;
 	for (const int ii : range(1, text.len())) {
 		hashcode = (hashcode * (text[ii]).seq()).mod(max);
-	} //ii;
+	}  //ii;
 	return;
 }
 

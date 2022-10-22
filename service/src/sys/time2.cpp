@@ -3,7 +3,7 @@ libraryinit()
 
 #include <time2.h>
 
-var mode;
+	var mode;
 var outputx;
 
 function main(in type, in input0, in mode0, out output) {
@@ -48,7 +48,7 @@ function main(in type, in input0, in mode0, out output) {
 		//if INPUT0>86340 then output=(output+24) 'R(0)#5'
 		//convert '.' to ':' in output
 
-	//mode eg 48MT etc completely ignored in iconv
+		//mode eg 48MT etc completely ignored in iconv
 	} else if (type eq "ICONV") {
 
 		//handle multivalues
@@ -58,7 +58,7 @@ function main(in type, in input0, in mode0, out output) {
 			for (const var ii : range(1, nn)) {
 				call time2(type, input0.f(1, ii), mode, outputx);
 				pickreplacer(output, 1, ii, outputx);
-			} //ii;
+			}  //ii;
 			return 0;
 		}
 
@@ -79,7 +79,6 @@ function main(in type, in input0, in mode0, out output) {
 			//output=mod(iconv(INPUT0,'MT')-@sw<1>,86400)
 			output = input0.iconv("MT").mod(86400);
 		}
-
 	}
 
 	return 0;

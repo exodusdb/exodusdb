@@ -7,10 +7,10 @@ libraryinit()
 
 #include <sys_common.h>
 
-var status;
-var processno;//num
+	var status;
+var processno;	//num
 
-function main(in mode, in status0="") {
+function main(in mode, in status0 = "") {
 
 	//called from
 	//1. LISTEN every 10 seconds or per potential request
@@ -89,7 +89,6 @@ function main(in mode, in status0="") {
 		process(53) = status;
 
 		process.write(processes, processno);
-
 	}
 
 	//2. check if should logoff

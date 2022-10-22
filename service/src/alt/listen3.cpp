@@ -24,16 +24,16 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	//5/6 typically blank since raw read/write/delete etc. dont need custom code
 
 	filetitle = "";
-	triggers = "";
+	triggers  = "";
 
 	//determine pre and post delete routines
-	var preread = "";
-	var prereadmode = "PREREAD";
-	var postread = "";
-	var postreadmode = "POSTREAD";
-	var updatesubs = "";
-	var replaceread = "";
-	var replacewrite = "";
+	var preread		  = "";
+	var prereadmode	  = "PREREAD";
+	var postread	  = "";
+	var postreadmode  = "POSTREAD";
+	var updatesubs	  = "";
+	var replaceread	  = "";
+	var replacewrite  = "";
 	var replacedelete = "";
 
 	//fix filenames from PICKOS to EXODUS style
@@ -43,18 +43,18 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	}
 
 	if (filename eq "DEFINITIONS") {
-		preread = "DEFINITION.SUBS";
+		preread	 = "DEFINITION.SUBS";
 		postread = "DEFINITION.SUBS";
 		//security remove passwords,sort tasks,remove unauth tasks and higher/lower users/groups
 		//chequedesign get default
 		updatesubs = "DEFINITION.SUBS";
 
 	} else if (filename eq "USERS") {
-		postread = "USER.SUBS";
+		postread   = "USER.SUBS";
 		updatesubs = "USER.SUBS";
 
 	} else if (filename eq "COMPANIES") {
-		postread = "COMPANY.SUBS";
+		postread   = "COMPANY.SUBS";
 		updatesubs = "COMPANY.SUBS";
 
 	} else if (filename eq "DOCUMENTS") {
@@ -63,7 +63,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 		updatesubs = "GET.SUBS";
 
 	} else if (filename eq "CHANGELOG") {
-		postread = "CHANGELOG.SUBS";
+		postread   = "CHANGELOG.SUBS";
 		updatesubs = "CHANGELOG.SUBS";
 
 	} else {
@@ -109,7 +109,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	} else if (mode eq "RELOCK") {
 	} else if (mode eq "UNLOCK") {
 	} else if (mode eq "SELECT") {
-	//case mode='GETINDEXVALUES'
+		//case mode='GETINDEXVALUES'
 	} else {
 		call mssg(mode.quote() ^ " is invalid in LISTEN3");
 		return 0;
@@ -122,12 +122,12 @@ function main(io filename, in mode, out filetitle, out triggers) {
 
 	//c++ variation
 	if (not(VOLUMES)) {
-		for (var ii = 1; ii <= 5; ii+=2) {
+		for (var ii = 1; ii <= 5; ii += 2) {
 			var tt = triggers.f(ii);
 			tt.lcaser();
 			tt.converter(".", "");
 			triggers(ii) = tt;
-		}//ii;
+		}  //ii;
 	}
 
 	return 0;

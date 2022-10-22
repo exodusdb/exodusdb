@@ -1,30 +1,30 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <log2.h>
+#include <authorised.h>
+#include <cid.h>
+#include <diskfreespace.h>
+#include <getauthorisation.h>
+#include <getbackpars.h>
+#include <initcompany.h>
 #include <initgeneral2.h>
 #include <inputbox.h>
-#include <shadowmfs.h>
-#include <systemfile.h>
-#include <otherusers.h>
-#include <getauthorisation.h>
-#include <cid.h>
-#include <getbackpars.h>
-#include <shell2.h>
-#include <diskfreespace.h>
-#include <authorised.h>
-#include <openfile.h>
+#include <log2.h>
 #include <logprocess.h>
 #include <netlogin.h>
+#include <openfile.h>
+#include <otherusers.h>
+#include <shadowmfs.h>
+#include <shell2.h>
 #include <sysmsg.h>
+#include <systemfile.h>
 #include <systemsubs.h>
-#include <initcompany.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var lastlog;
+	var lastlog;
 var logtime;
 var msg;
 var pidfilename;
@@ -34,10 +34,10 @@ var dbtime;
 var dbdatetimerequired;
 var reply;
 var reply2;
-var tt;//num
+var tt;	 //num
 var colors;
 var reportkey;
-var tt2;//num
+var tt2;  //num
 var s33;
 var smtp;
 var bakpars;
@@ -66,7 +66,6 @@ function main() {
 	//NB @VOLUMES blank on C++ and used to run slightly differently on C++
 	//eg function called is generalalerts instead of general.alerts
 
-
 	//!WARNING decide() returns REPLY number instead of VALUE when not interactive
 
 	//ensure cursor on the left
@@ -85,9 +84,9 @@ function main() {
 	//gosub getenv
 	call initgeneral2("GETENV", logtime);
 
-	var resetting = PSEUDO eq "RESET";
-	var initmode = SENTENCE.field(" ", 2);
-	PSEUDO = "";
+	var resetting					= PSEUDO eq "RESET";
+	var					   initmode = SENTENCE.field(" ", 2);
+	PSEUDO							= "";
 	//equ request to @user0
 	//equ data to @user1
 	//equ response to @user3
@@ -147,7 +146,7 @@ function main() {
 	//accounting<3> for allocationorder
 	//accounting<4> for mv buffer of currency or unitcodes
 	//accounting<5> for mv buffer of fmts for <4>
-	var interactive = false; //not(SYSTEM.f(33));
+	var interactive = false;  //not(SYSTEM.f(33));
 	//equ generalresultcode to system<34>
 	//equ nrequests=system<35>
 	//equ defaultclientmark to system<36>
@@ -248,7 +247,7 @@ function main() {
 	//system<140> cid eg 79350001
 
 	call log2("*init.general obtaining exclusive access:", logtime);
-	var voc;
+	var	 voc;
 	if (voc.open("VOC", "")) {
 		//timeout and crash out quickly otherwise might get unlimited processes
 		//this lock is in INIT.GENERAL and MONITOR2 (to avoid starting processes)
@@ -261,7 +260,7 @@ function main() {
 		}
 		//also in LOGON.OLD and INIT.GENERAL
 		var lockkey = "INIT.GENERAL.LOGIN";
-		if (not(voc.lock( lockkey))) {
+		if (not(voc.lock(lockkey))) {
 			//np if own lock
 			if (FILEERROR ne "414") {
 				if (not(lockrecord("VOC", voc, "INIT.GENERAL.LOGIN", "", initwaitsecs))) {
@@ -284,16 +283,16 @@ function main() {
 	if (not(SYSTEM.f(54))) {
 		SYSTEM(54) = SYSTEM.f(33);
 	}
-//	if (VOLUMES) {
-//		pidfilename = SYSTEM.f(54, 5) ^ ".pid";
-//	} else {
-		pidfilename = "/run/neo/neo@" ^ SYSTEM.f(17);
-		if (SYSTEM.f(17).ends("_test")) {
-			pidfilename.replacer("neo@", "tst@");
-			pidfilename.replacer("_test", "");
-			pidfilename ^= ".pid";
-		}
-//	}
+	//	if (VOLUMES) {
+	//		pidfilename = SYSTEM.f(54, 5) ^ ".pid";
+	//	} else {
+	pidfilename = "/run/neo/neo@" ^ SYSTEM.f(17);
+	if (SYSTEM.f(17).ends("_test")) {
+		pidfilename.replacer("neo@", "tst@");
+		pidfilename.replacer("_test", "");
+		pidfilename ^= ".pid";
+	}
+	//	}
 	call osread(pidrec, pidfilename);
 	//osremove pidfilename
 	if (pidrec) {
@@ -306,8 +305,8 @@ function main() {
 	if (not exodusid) {
 		var oldmethod = 1;
 		if (oldmethod) {
-			dbdate = "30 MAR 2007";
-			dbtime = "12:00:00";
+			dbdate			   = "30 MAR 2007";
+			dbtime			   = "12:00:00";
 			dbdatetimerequired = dbdate.iconv("D") + dbtime.iconv("MT") / 86400;
 		} else {
 		}
@@ -337,7 +336,7 @@ decideversion:
 					if (reply eq 1) {
 						goto badversion;
 					}
-					var msgx = "!WARNING *UNPREDICTABLE* CONSEQUENCES" ^ FM ^ FM ^ "WHAT IS THE PASSWORD?";
+					var	 msgx = "!WARNING *UNPREDICTABLE* CONSEQUENCES" ^ FM ^ FM ^ "WHAT IS THE PASSWORD?";
 					call inputbox(msgx, 20, 0, "", reply2, "\x1B");
 					if (reply2 ne "UNPREDICTABLE") {
 						call note("THAT IS NOT THE CORRECT PASSWORD");
@@ -349,12 +348,11 @@ decideversion:
 				}
 			} else if (dbversion.f(1) lt dbdatetimerequired) {
 updateversion:
-				dbversion = dbdatetimerequired;
+				dbversion	 = dbdatetimerequired;
 				dbversion(2) = dbdate;
 				dbversion(3) = dbtime;
 				dbversion.write(DEFINITIONS, "DBVERSION");
 			}
-
 		}
 	}
 
@@ -365,7 +363,7 @@ updateversion:
 		osshell("sync_dat");
 
 	call log2("*copy any new data records", logtime);
-	var bp;
+	var	 bp;
 	if (bp.open("GBP", "")) {
 		for (const var ii : range(1, 9999)) {
 			var rec;
@@ -373,15 +371,16 @@ updateversion:
 				rec = "";
 			}
 			///BREAK;
-			if (rec eq "") break;
+			if (rec eq "")
+				break;
 			var filename = rec.f(1);
-			var id = rec.f(2);
-			rec = rec.field(FM, 3, 99999);
+			var id		 = rec.f(2);
+			rec			 = rec.field(FM, 3, 99999);
 			var file;
 			if (file.open(filename, "")) {
 				rec.write(file, id);
 			}
-		} //ii;
+		}  //ii;
 	}
 
 	//syslock=if revrelease()>=2.1 then 36 else 23
@@ -409,22 +408,22 @@ updateversion:
 	call log2("*force replication system to reinitialise", logtime);
 	call shadowmfs("EXODUSINIT", "");
 
-//	call log2("*reattach data", logtime);
-//	var volumesx = VOLUMES;
-//	let nvolumes = VOLUMES.fcount(FM);
-//	for (const var volumen : range(1, nvolumes)) {
-//		var volume = volumesx.f(volumen);
-//		var tpath = "../" "DATA" "/";
-//		tpath.converter("/", OSSLASH);
-//		if (volume.first(8) eq tpath) {
-//			execute("ATTACH " ^ volume ^ " (S)");
-//		}
-//	} //volumen;
-//
-//	if (VOLUMES) {
-//		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
-//		perform("RUN GBP LOGON.OLD UPGRADEVOC");
-//	}
+	//	call log2("*reattach data", logtime);
+	//	var volumesx = VOLUMES;
+	//	let nvolumes = VOLUMES.fcount(FM);
+	//	for (const var volumen : range(1, nvolumes)) {
+	//		var volume = volumesx.f(volumen);
+	//		var tpath = "../" "DATA" "/";
+	//		tpath.converter("/", OSSLASH);
+	//		if (volume.first(8) eq tpath) {
+	//			execute("ATTACH " ^ volume ^ " (S)");
+	//		}
+	//	} //volumen;
+	//
+	//	if (VOLUMES) {
+	//		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
+	//		perform("RUN GBP LOGON.OLD UPGRADEVOC");
+	//	}
 
 	//call log2('*set workstation time to server time',logtime)
 	//call settime('')
@@ -444,29 +443,29 @@ updateversion:
 		perform("DELETEFILE MERGES (S)");
 	}
 
-//	call log2("*get user video table if any", logtime);
-//	var temp = ENVIRONKEYS.f(2);
-//	temp.converter(".", "");
-//	if (colors.osread(temp ^ ".vid")) {
-//		var color2;
-//		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
-//			color2 = "";
-//		}
-//		if (colors ne color2) {
-//			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
-//			//call colortoescold);
-//		}
-//	}
-//
-//	call log2("*setup escape sequence for standard color and background", logtime);
-//	temp = HW.f(3)[4] ^ HW.f(8)[4];
-//	if (temp eq "00") {
-//		temp = "70";
-//	}
-//	tt = "\x1B";
-//	tt ^= "C";
-//	tt ^= temp;
-//	AW(30) = tt;
+	//	call log2("*get user video table if any", logtime);
+	//	var temp = ENVIRONKEYS.f(2);
+	//	temp.converter(".", "");
+	//	if (colors.osread(temp ^ ".vid")) {
+	//		var color2;
+	//		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
+	//			color2 = "";
+	//		}
+	//		if (colors ne color2) {
+	//			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
+	//			//call colortoescold);
+	//		}
+	//	}
+	//
+	//	call log2("*setup escape sequence for standard color and background", logtime);
+	//	temp = HW.f(3)[4] ^ HW.f(8)[4];
+	//	if (temp eq "00") {
+	//		temp = "70";
+	//	}
+	//	tt = "\x1B";
+	//	tt ^= "C";
+	//	tt ^= temp;
+	//	AW(30) = tt;
 
 	call log2("*convert reports file", logtime);
 	if (SYSTEM.f(17) ne "DEVDTEST") {
@@ -488,7 +487,6 @@ nextreport:
 								//if rec<1>='EXODUS' then delete file,keyx
 								//if rec<8>='EXODUS' then delete file,keyx
 								file.deleterecord(keyx);
-
 							}
 						} else {
 							var oldrecord;
@@ -512,7 +510,7 @@ nextreport:
 
 	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
 		chr(7).output();
-		msg = "The DEFINITIONS file is missing";
+		msg		= "The DEFINITIONS file is missing";
 		msg(-1) = "Did you startup using the right command file/datasettype?";
 		call note(msg);
 	}
@@ -537,7 +535,6 @@ nextreport:
 			call note(msg);
 			perform("OFF");
 			logoff();
-
 		}
 
 		call log2("*check users", logtime);
@@ -551,12 +548,11 @@ nextreport:
 			perform("OFF");
 			logoff();
 		}
-
 	}
 
 	call log2("*prevent use of this program via F10", logtime);
 	if (((initmode ne "LOGIN" and LEVEL ne 1) and interactive) and not(resetting)) {
-		msg = "You cannot quit from within another program via F10.";
+		msg		= "You cannot quit from within another program via F10.";
 		msg(-1) = "Please quit all programs first and then try again.";
 		chr(7).output();
 		call note(msg);
@@ -611,30 +607,30 @@ nextreport:
 	if (not(SYSTEM.read(DEFINITIONS, "SYSTEM"))) {
 		SYSTEM = "";
 	}
-	tt = "system.cfg";
+	tt	= "system.cfg";
 	tt2 = 2;
 	gosub getsystem();
-	var tpath = "../../";
+	var	  tpath = "../../";
 	tpath.converter("/", OSSLASH);
-	tt = tpath ^ "system.cfg";
+	tt	= tpath ^ "system.cfg";
 	tt2 = 1;
 	gosub getsystem();
 
 	////c++ only
 	//SYSTEM(58) = oslistd("../data/").convert(FM,VM);
 	//SYSTEM.fieldstorer(FM, 59, 5, "");
-    //update dbcodes with dir dbcodes if dbcodes in sys cfg file contain lcase
-    var ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx","").len();
-    if(ttdbcodes eq SYSTEM.f(58).len()){
-        //c++ only
-        SYSTEM(58) = oslistd("../data/").convert(FM,VM);
-        SYSTEM.fieldstorer(FM, 59, 5, "");
+	//update dbcodes with dir dbcodes if dbcodes in sys cfg file contain lcase
+	var ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx", "").len();
+	if (ttdbcodes eq SYSTEM.f(58).len()) {
+		//c++ only
+		SYSTEM(58) = oslistd("../data/").convert(FM, VM);
+		SYSTEM.fieldstorer(FM, 59, 5, "");
 	}
 
 	call log2("*restore session parameters", logtime);
 	//restore IMMEDIATELY to avoid bugs creeping in
 	SYSTEM(33) = oldsystem.f(33);
-	SYSTEM(1) = oldsystem.f(1);
+	SYSTEM(1)  = oldsystem.f(1);
 	//masterlogin
 	SYSTEM(15) = oldsystem.f(15);
 	//cleaned
@@ -645,11 +641,11 @@ nextreport:
 	//server mode (not interactive)
 	s33 = SYSTEM.f(33);
 	//currdatasetname
-    SYSTEM(23) = oldsystem.f(23);
-    var tt = osread("../data/" ^ oldsystem.f(17) ^ "/name");
-    if (tt){
-        SYSTEM(23) = tt;
-    }
+	SYSTEM(23) = oldsystem.f(23);
+	var tt	   = osread("../data/" ^ oldsystem.f(17) ^ "/name");
+	if (tt) {
+		SYSTEM(23) = tt;
+	}
 	//process/connection number
 	SYSTEM(24) = oldsystem.f(24);
 	//datasetno
@@ -660,8 +656,8 @@ nextreport:
 	SYSTEM(44) = oldsystem.f(44);
 	SYSTEM(45) = oldsystem.f(45);
 	//processlock
-	SYSTEM(48) = oldsystem.f(48);
-	SYSTEM(54) = oldsystem.f(54);
+	SYSTEM(48)	= oldsystem.f(48);
+	SYSTEM(54)	= oldsystem.f(54);
 	SYSTEM(133) = "GENERAL";
 
 	oldsystem = "";
@@ -773,7 +769,7 @@ nextreport:
 			//CHANGETZ to gmt/utc
 			//put something in database system<118> (even 0 for display in gmt)
 
-	/*meaningless while we only support user tz if server is gmt/utc;
+			/*meaningless while we only support user tz if server is gmt/utc;
 				//cid sets system<120> server tz (only use server tz if display tz set)
 				tt=system<120>;
 				@sw<1>=@sw<1>+tt;
@@ -835,11 +831,12 @@ nextreport:
 			}
 			SYSTEM(127) = tt;
 		}
-
 	}
 
 	//allpunctuation
-	SYSTEM(130) = " `~@#$%^&*()_+-=[]{};\\:\"|,./<>?\\|" "'";
+	SYSTEM(130) =
+		" `~@#$%^&*()_+-=[]{};\\:\"|,./<>?\\|"
+		"'";
 
 	SYSTEM(9) = 1;
 
@@ -894,8 +891,8 @@ nextreport:
 		cpu.converter("-", " ");
 		var nsockets = cpu.fcount(FM);
 		var nlogical = SYSTEM.f(9);
-		cpu = cpu.f(1).trim() ^ " ";
-		tt = nlogical / nsockets;
+		cpu			 = cpu.f(1).trim() ^ " ";
+		tt			 = nlogical / nsockets;
 		if (tt gt 1) {
 			cpu ^= nsockets ^ "x" ^ tt;
 		} else {
@@ -909,13 +906,13 @@ nextreport:
 	var currdataset = SYSTEM.f(17);
 
 	call log2("*get diskfreespace", logtime);
-	var reqfreemb = 10;
-	var freemb = (diskfreespace(oscwd()) / 1024 / 1024).oconv("MD00");
+	var	 reqfreemb = 10;
+	var	 freemb	   = (diskfreespace(oscwd()) / 1024 / 1024).oconv("MD00");
 
 	call log2("*check if diskfreespace is sufficient " ^ freemb ^ "Mb", logtime);
 	//notherusers=otherusers('')+1
 	if (freemb lt reqfreemb * notherusers) {
-	//if 1 then
+		//if 1 then
 		msg = "THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE";
 		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().first(2) ^ " but";
 		msg ^= "|there is only " ^ freemb ^ "Mb available.";
@@ -1028,7 +1025,7 @@ nextreport:
 	}
 
 	call log2("*create user file", logtime);
-	var users;
+	var	 users;
 	if (not(users.open("USERS", ""))) {
 
 		if (not(openfile("USERS", users, "DEFINITIONS", 1))) {
@@ -1036,16 +1033,14 @@ nextreport:
 		}
 
 		call log2("*zzz should create full user record not just the name", logtime);
-		var usercodes = SECURITY.f(1);
-		let nusers = usercodes.fcount(VM);
+		var	 usercodes = SECURITY.f(1);
+		let	 nusers	   = usercodes.fcount(VM);
 		for (const var usern : range(1, nusers)) {
 			var userx = usercodes.f(1, usern);
 			if (not(userx.contains("---"))) {
 				userx.writev(users, userx, 1);
-
 			}
-		} //usern;
-
+		}  //usern;
 	}
 
 	call log2("*terminate old session", logtime);
@@ -1078,30 +1073,30 @@ nextreport:
 	//	INDEXTIME = 0;
 	//}
 
-//	call log2("*suppress words not to be indexed", logtime);
-//	//see ED SYSTEM * ... ENVIRONMENT words like LTD
-//	DEFAULTSTOPS = "";
+	//	call log2("*suppress words not to be indexed", logtime);
+	//	//see ED SYSTEM * ... ENVIRONMENT words like LTD
+	//	DEFAULTSTOPS = "";
 
-//	//this may not be necessary now that menus are determined by authorisation
-//	call log2("*get maintenance user menu if any", logtime);
-//	if (xx.open("SCHEDULES", "")) {
-//		temp = "ADAGENCY";
-//	} else {
-//		temp = "EXODUS2";
-//	}
-//	//ENVIRONSET(37) = temp;
+	//	//this may not be necessary now that menus are determined by authorisation
+	//	call log2("*get maintenance user menu if any", logtime);
+	//	if (xx.open("SCHEDULES", "")) {
+	//		temp = "ADAGENCY";
+	//	} else {
+	//		temp = "EXODUS2";
+	//	}
+	//	//ENVIRONSET(37) = temp;
 
 	call log2("*force the F1 key to be general help (Ctrl+F1) instead of context help", logtime);
 	PRIORITYINT(1) = chr(0) ^ ";";
 
 	//if security('USE SPECIAL KEYS',MSG,'') then
-	INTCONST(4) = chr(0) ^ var("41").iconv("HEX2");
-	INTCONST(18) = chr(0) ^ var("1F").iconv("HEX2");
-	INTCONST(26) = chr(0) ^ var("19").iconv("HEX2");
+	INTCONST(4)	   = chr(0) ^ var("41").iconv("HEX2");
+	INTCONST(18)   = chr(0) ^ var("1F").iconv("HEX2");
+	INTCONST(26)   = chr(0) ^ var("19").iconv("HEX2");
 	PRIORITYINT(7) = var("1F").iconv("HEX2");
-//	MOVEKEYS(27) = var("14").iconv("HEX2");
-//	MOVEKEYS(25) = var("05").iconv("HEX2");
-		//break key on
+	//	MOVEKEYS(27) = var("14").iconv("HEX2");
+	//	MOVEKEYS(25) = var("05").iconv("HEX2");
+	//break key on
 	//end else
 	// @int.const<4>=''
 	// @int.const<18>=''
@@ -1121,12 +1116,12 @@ nextreport:
 	// *@priority.int<2>=''
 	// end
 
-//	if (VOLUMES) {
-//		perform("ADDMFS SHADOW.MFS FILEORDER.COMMON");
-//	}
+	//	if (VOLUMES) {
+	//		perform("ADDMFS SHADOW.MFS FILEORDER.COMMON");
+	//	}
 
 	call log2("*open general files", logtime);
-	var valid = 1;
+	var	 valid = 1;
 	//DEFINITIONS='' why was this commented out?
 	if (not(openfile("ALANGUAGE", sys.alanguage, "DEFINITIONS"))) {
 		valid = 0;
@@ -1150,7 +1145,7 @@ nextreport:
 		valid = 0;
 	}
 	if (not(openfile("UNITS", sys.units, "CURRENCIES"))) {
-		valid = 0;
+		valid	  = 0;
 		sys.units = "";
 	}
 	if (not(openfile("ADDRESSES", sys.addresses, "DEFINITIONS"))) {
@@ -1171,46 +1166,46 @@ nextreport:
 		}
 	}
 
-//	if (VOLUMES) {
-//
-//		call log2("*open processes own lists file", logtime);
-//
-//		var workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
-//		var workpath = "DATAVOL/" ^ workdir ^ "/";
-//		workpath.converter("/", OSSLASH);
-//
-//		//check/create folder
-//		//initdir workpath:'REVMEDIA.*'
-//		//tt=dirlist()
-//		tt = oslistf(workpath ^ "REVMEDIA.*");
-//		if (not tt) {
-//			osshell("mkdir " ^ workpath);
-//			perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
-//		}
-//
-//		//attach folder
-//		perform("ATTACH " ^ workpath ^ " (S)");
-//
-//		//check/make LISTS file
-//		if (not(lists.open("LISTS", ""))) {
-//			lists = "";
-//		}
-//		if (not(lists.contains(workpath))) {
-//			createfile("" ^ workpath ^ " LISTS (S)");
-//			if (not(lists.open("LISTS", ""))) {
-//				lists = "";
-//			}
-//			if (not(lists.contains(workpath))) {
-//				//call note('FAILED TO MAKE LISTS FILE ON ':workpath
-//			}
-//		}
-//
-//		call log2("*check lists file exists", logtime);
-//		if (not(lists.open("LISTS", ""))) {
-//			clearfile(lists);
-//		}
-//
-//	}
+	//	if (VOLUMES) {
+	//
+	//		call log2("*open processes own lists file", logtime);
+	//
+	//		var workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
+	//		var workpath = "DATAVOL/" ^ workdir ^ "/";
+	//		workpath.converter("/", OSSLASH);
+	//
+	//		//check/create folder
+	//		//initdir workpath:'REVMEDIA.*'
+	//		//tt=dirlist()
+	//		tt = oslistf(workpath ^ "REVMEDIA.*");
+	//		if (not tt) {
+	//			osshell("mkdir " ^ workpath);
+	//			perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
+	//		}
+	//
+	//		//attach folder
+	//		perform("ATTACH " ^ workpath ^ " (S)");
+	//
+	//		//check/make LISTS file
+	//		if (not(lists.open("LISTS", ""))) {
+	//			lists = "";
+	//		}
+	//		if (not(lists.contains(workpath))) {
+	//			createfile("" ^ workpath ^ " LISTS (S)");
+	//			if (not(lists.open("LISTS", ""))) {
+	//				lists = "";
+	//			}
+	//			if (not(lists.contains(workpath))) {
+	//				//call note('FAILED TO MAKE LISTS FILE ON ':workpath
+	//			}
+	//		}
+	//
+	//		call log2("*check lists file exists", logtime);
+	//		if (not(lists.open("LISTS", ""))) {
+	//			clearfile(lists);
+	//		}
+	//
+	//	}
 
 	if (not(openfile("LISTS", lists, "DEFINITIONS"))) {
 		// Ignore
@@ -1259,26 +1254,27 @@ nextreport:
 	*/
 
 	call log2("*make global per installation files", logtime);
-	var filenamesx = "PROCESSES,STATISTICS,REQUESTLOG";
+	var	 filenamesx = "PROCESSES,STATISTICS,REQUESTLOG";
 	for (const var ii : range(1, 999)) {
 		var filename = filenamesx.field(",", ii);
 		///BREAK;
-		if (not filename) break;
+		if (not filename)
+			break;
 		//TODO lock/prevent double create with other processes
 		var file;
 		if (not(file.open(filename, ""))) {
 			createfile("REVBOOT " ^ filename ^ " (S)");
-//			if (VOLUMES) {
-//				perform("CONVGLOBAL REVBOOT GLOBAL " ^ filename ^ " (S)");
-//				perform("DELETEFILE DICT." ^ filename ^ " (S)");
-//				perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
-//				perform("ATTACH REVBOOT " ^ filename ^ " (S)");
-//			}
+			//			if (VOLUMES) {
+			//				perform("CONVGLOBAL REVBOOT GLOBAL " ^ filename ^ " (S)");
+			//				perform("DELETEFILE DICT." ^ filename ^ " (S)");
+			//				perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
+			//				perform("ATTACH REVBOOT " ^ filename ^ " (S)");
+			//			}
 			if (not(file.open(filename, ""))) {
 				call sysmsg(filename.quote() ^ " could not be created by INIT.GENERAL");
 			}
 		}
-	} //ii;
+	}  //ii;
 
 	call log2("*perform any autoexec task BEFORE initialising other systems", logtime);
 	if (not exodusid) {
@@ -1295,10 +1291,10 @@ nextreport:
 	//var foreignfiles = osshellread("dbattach {L}").converter("\n ", FM ^ VM).trim(FM);
 	// Copy "attach" code from dbattach cli command ... UNTESTED
 	// TODO provide some support from libexodus to do all or part of this
-	var sql = "select foreign_server_name, foreign_table_name from information_schema.foreign_tables;";
+	var sql			 = "select foreign_server_name, foreign_table_name from information_schema.foreign_tables;";
 	var foreignfiles = "";
 	if (not var().sqlexec(sql, foreignfiles))
-	    errput(lasterror());
+		errput(lasterror());
 	else {
 		// change RM to FM etc. and remove column headings
 		foreignfiles.lowerer();
@@ -1317,8 +1313,8 @@ nextreport:
 		attach.inserter(2, foreign_dbno, -1, filename);
 	}
 	call log2("attach filenames per foreign dbname", logtime);
-	var foreign_dbnames = attach.f(1).convert(VM, FM);
-	foreign_dbno = 0;
+	var	 foreign_dbnames = attach.f(1).convert(VM, FM);
+	foreign_dbno		 = 0;
 	for (var foreign_dbname : foreign_dbnames) {
 		if (not(foreign_dbname))
 			continue;
@@ -1328,7 +1324,7 @@ nextreport:
 		foreign_dbno++;
 		var foreign_filenames = attach.f(2, foreign_dbno);
 		if (not foreign_dbconn.attach(foreign_filenames.convert(SM, FM))) {
-			var msg="Error: serve_agy: Cannot attach to " ^ foreign_filenames.convert(FM, " ") ^ " on " ^ foreign_dbconn;
+			var msg = "Error: serve_agy: Cannot attach to " ^ foreign_filenames.convert(FM, " ") ^ " on " ^ foreign_dbconn;
 			msg.errputl();
 			abort(msg);
 		}
@@ -1346,20 +1342,20 @@ nextreport:
 fixnextcompany:
 	anyfixed += 1;
 	sys.gcurrcompcode = "";
-	var maxyear = "";
+	var maxyear		  = "";
 	if (readnext(companycode)) {
 		if (not(sys.company.read(sys.companies, companycode))) {
 			goto fixnextcompany;
 		}
 
-//		if (VOLUMES) {
-//			sys.company(27) = sys.company.f(27).invert();
-//		}
+		//		if (VOLUMES) {
+		//			sys.company(27) = sys.company.f(27).invert();
+		//		}
 
 		//initialise with a recent company
 		tt = sys.company.f(2).field("/", 2);
 		if (tt gt maxyear) {
-			maxyear = tt;
+			maxyear			  = tt;
 			sys.gcurrcompcode = companycode;
 		}
 
@@ -1369,7 +1365,7 @@ fixnextcompany:
 				var market;
 				if (not(market.read(sys.markets, marketcode))) {
 					market = "";
-					msg = marketcode.quote() ^ " is missing from company " ^ companycode;
+					msg	   = marketcode.quote() ^ " is missing from company " ^ companycode;
 					call note(msg);
 					goto fixcompany;
 				}
@@ -1401,20 +1397,20 @@ fixcompany:
 		systemsubs = "initacc";
 		call systemsubs(menu);
 	}
-//	if (VOLUMES) {
-//		perform("MACRO ACCOUNTS");
-//	}
+	//	if (VOLUMES) {
+	//		perform("MACRO ACCOUNTS");
+	//	}
 
 	call log2("*open advertising system files INIT.AGENCY", logtime);
 	if (APPLICATION eq "ADAGENCY") {
 		//call init.agency()
 		//call indirectly to avoid c++ include
-		systemsubs = "initagency";
-		var agencymenu = "";
+		systemsubs		= "initagency";
+		var	 agencymenu = "";
 		call systemsubs(agencymenu);
 		//insert the agency menu media/jobs/timesheets before (to the right)
 		//of the finance menu from above above
-		menu = agencymenu ^ FM ^ menu;
+		menu	   = agencymenu ^ FM ^ menu;
 		agencymenu = "";
 	}
 
@@ -1427,7 +1423,7 @@ fixcompany:
 	clearselect();
 	select(sys.companies);
 	var numberformat = "";
-	var compcode = "";
+	var compcode	 = "";
 convcompany:
 	if (readnext(compcode)) {
 		var tempcompany;
@@ -1450,7 +1446,7 @@ convcompany:
 	clearselect();
 
 	call log2("*get the company description", logtime);
-	sys.company = "";
+	sys.company	   = "";
 	var currperiod = "";
 	//call init.company('')
 	//change so that interactive ADAGENCY gets a company code
@@ -1461,10 +1457,10 @@ convcompany:
 	SYSTEM(37) = sys.gcurrcompcode;
 
 	call log2("*ensure random key exists", logtime);
-	var datasetid;
+	var	 datasetid;
 	if (not(datasetid.read(DEFINITIONS, "GLOBALDATASETID"))) {
 newdatasetid:
-		dostime = ostime();
+		dostime	  = ostime();
 		datasetid = date() ^ "." ^ dostime;
 		datasetid.converter(".", "");
 		datasetid = datasetid.oconv("MX");
@@ -1524,12 +1520,12 @@ adddatasetcodename:
 	if (not resetting) {
 
 		call log2("*show and update last login time", logtime);
-		var userx;
+		var	 userx;
 		if (not(userx.read(DEFINITIONS, "USER*" ^ USERNAME))) {
 			userx = "";
 		}
 		if (userx.f(4) and interactive) {
-			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
+			var	 day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
 			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.f(4).oconv("D") ^ " at " ^ userx.f(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.f(6).trim()).oconv("C#40") ^ "|");
 		}
 
@@ -1545,7 +1541,6 @@ adddatasetcodename:
 		//call log2('*check processes',logtime)
 		//clearselect
 		//if interactive and ems.allocated then perform 'LISTPROCESSES CHECK'
-
 	}
 
 	call log2("*clean up document keys", logtime);
@@ -1559,7 +1554,6 @@ nextdoc:
 				if (doc.read(sys.documents, docid)) {
 					doc.write(sys.documents, docid2);
 					sys.documents.deleterecord(docid);
-
 				}
 			}
 			goto nextdoc;
@@ -1570,46 +1564,46 @@ nextdoc:
 		perform("FINDDEADALL");
 	}
 
-//	if (VOLUMES) {
-//		if (not(VOLUMES.locateusing(FM, "DATAVOL", xx))) {
-//			//pcperform 'MD DATAVOL'
-//			//call mkdir('DATAVOL':char(0),xx)
-//			call osmkdir("DATAVOL");
-//			perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
-//			perform("ATTACH DATAVOL (S)");
-//		}
-//	}
-//
-//	//windows stuff
-//	if (VOLUMES) {
-//
-//		call log2("*convert codepage", logtime);
-//		if (codepaging.osread("CODEPAGE.CFG")) {
-//			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
-//				codepage = "0" ^ FM ^ codepaging.f(2);
-//			}
-//			if ((codepage.f(2) eq "737" and not(codepage.f(1))) and codepaging.f(3) eq "1253") {
-//				perform("CONVGREEK (U)");
-//			}
-//		}
-//
-//		call log2("*installing authorised keys", logtime);
-//		perform("INSTALLAUTHKEYS (S)");
-//
-//		call log2("*installing authorised hosts", logtime);
-//		perform("INSTALLALLOWHOSTS (S)");
-//
-//		voc.deleterecord("$FILEMAN");
-//
-//		call log2("*put the admenus program as the system menu file", logtime);
-//		//as there is no way to have multiple menus files
-//		if (APPLICATION eq "ADAGENCY") {
-//			var setfilecmd = "SETFILE ./ADAGENCY GLOBAL ADMENUS SYS.MENUS";
-//			setfilecmd.converter("/", OSSLASH);
-//			perform(setfilecmd);
-//		}
-//
-//	}
+	//	if (VOLUMES) {
+	//		if (not(VOLUMES.locateusing(FM, "DATAVOL", xx))) {
+	//			//pcperform 'MD DATAVOL'
+	//			//call mkdir('DATAVOL':char(0),xx)
+	//			call osmkdir("DATAVOL");
+	//			perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
+	//			perform("ATTACH DATAVOL (S)");
+	//		}
+	//	}
+	//
+	//	//windows stuff
+	//	if (VOLUMES) {
+	//
+	//		call log2("*convert codepage", logtime);
+	//		if (codepaging.osread("CODEPAGE.CFG")) {
+	//			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
+	//				codepage = "0" ^ FM ^ codepaging.f(2);
+	//			}
+	//			if ((codepage.f(2) eq "737" and not(codepage.f(1))) and codepaging.f(3) eq "1253") {
+	//				perform("CONVGREEK (U)");
+	//			}
+	//		}
+	//
+	//		call log2("*installing authorised keys", logtime);
+	//		perform("INSTALLAUTHKEYS (S)");
+	//
+	//		call log2("*installing authorised hosts", logtime);
+	//		perform("INSTALLALLOWHOSTS (S)");
+	//
+	//		voc.deleterecord("$FILEMAN");
+	//
+	//		call log2("*put the admenus program as the system menu file", logtime);
+	//		//as there is no way to have multiple menus files
+	//		if (APPLICATION eq "ADAGENCY") {
+	//			var setfilecmd = "SETFILE ./ADAGENCY GLOBAL ADMENUS SYS.MENUS";
+	//			setfilecmd.converter("/", OSSLASH);
+	//			perform(setfilecmd);
+	//		}
+	//
+	//	}
 
 	//call log2('*create user name index',logtime)
 	//convkey='CONVERTED*USERNAMEINDEX'
@@ -1635,7 +1629,6 @@ nextdoc:
 			call initgeneral2("TRIMREQUESTLOG", logtime);
 			call initgeneral2("REORDERDBS", logtime);
 		}
-
 	}
 
 	//in INIT.GENERAL and DEFINITION.SUBS
@@ -1653,7 +1646,7 @@ nextdoc:
 
 		//get version last run
 		call osread(upgradelog, "UPGRADE.CFG");
-		var versionlastrun = field2(upgradelog, chr(10), -1);
+		var	 versionlastrun = field2(upgradelog, chr(10), -1);
 
 		//if changed then log and email users
 		if (versioninstalled ne versionlastrun) {
@@ -1674,7 +1667,6 @@ nextdoc:
 			//make dos screen run at full speed-must have been done everywhere now
 			//call log2('*fixvideo',logtime)
 			//call fixvideo
-
 		}
 
 		//update software version in database
@@ -1700,9 +1692,7 @@ nextdoc:
 					call sysmsg("EXODUS Software Upgrade " ^ tt);
 				}
 			}
-
 		}
-
 	}
 
 	call log2("*emailing any notifications, warnings or errors", logtime);
@@ -1740,7 +1730,6 @@ nextdoc:
 			call log2("*chain to NET AUTO (" ^ SYSTEM.f(17) ^ ") INIT.GENERAL Quitting.", logtime);
 			chain("NET AUTO");
 		}
-
 	}
 
 	stop();
@@ -1770,7 +1759,7 @@ subroutine getsystem() {
 		if (systemx.f(ii).len()) {
 			SYSTEM(ii) = systemx.f(ii);
 		}
-	} //ii;
+	}  //ii;
 
 	//save config file time so can detect if restart required
 	SYSTEM(100, tt2) = tt.osfile().f(3);
@@ -1786,7 +1775,7 @@ subroutine failsys() {
 	call log2(tt, logtime);
 
 	//onscreen message
-	s33 = SYSTEM.f(33);
+	s33		   = SYSTEM.f(33);
 	SYSTEM(33) = "";
 	call mssg(msg ^ "", "T3", yy, "");
 	SYSTEM(33) = s33;

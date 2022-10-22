@@ -1,10 +1,10 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <sysmsg.h>
 #include <authorised.h>
 #include <shell2.h>
 #include <singular.h>
+#include <sysmsg.h>
 
 #include <system_common.h>
 
@@ -13,28 +13,28 @@ libraryinit()
 
 #include <window.hpp>
 
-var filename;
+	var filename;
 var key;
 var msg;
 var file;
 var errors;
-var lengthx;//num
+var lengthx;  //num
 var osfile;
 var temposfilename83;
-var nimported;//num
-var fileptr;//num
+var nimported;	//num
+var fileptr;	//num
 var buff;
-var linenox;//num
-var eof;//num
+var linenox;  //num
+var eof;	  //num
 var line;
 var csv;
-var ptr;//num
+var ptr;  //num
 //var ncols;
 var dictfile;
 var xx;
 var cell;
 var temp;
-var nquotes;//num
+var nquotes;  //num
 var recordx;
 var allowduplicate;
 var op;
@@ -48,7 +48,6 @@ function main(in mode) {
 	//test wrote 1,000,000 files containing the filenumber 1,2,3 etc in about 5 mins
 	//and the files could be randomly read and written at excellent speed
 
-
 	//determine upload directory
 	var uploadroot = SYSTEM.f(49);
 	//if uploadroot='' then uploadroot='..\images\'
@@ -58,10 +57,10 @@ function main(in mode) {
 
 	if (mode eq "POSTUPLOAD") {
 
-		filename = request_.f(3);
-		key = request_.f(4);
+		filename		   = request_.f(3);
+		key				   = request_.f(4);
 		var targetfilename = request_.f(5);
-		var newstatus = request_.f(6);
+		var newstatus	   = request_.f(6);
 
 		//lock it
 		gosub lockfile();
@@ -74,19 +73,19 @@ function main(in mode) {
 			msg = "upload.subs cannot read " ^ filename ^ " " ^ key;
 postuploadfail:
 			gosub unlockfile();
-			call sysmsg(msg);
+			call  sysmsg(msg);
 			return invalid(msg);
 		}
 
-		var dictids = "VERSION^STATUS^USERNAME^DATETIME^STATION"_var;
-		var fns = "";
+		var dictids		 = "VERSION^STATUS^USERNAME^DATETIME^STATION"_var;
+		var fns			 = "";
 		var dictfilename = "DICT." ^ filename;
-//		for (const var ii : range(1, 99)) {
-//			var dictid = dictids.field("*", ii);
-//
-//			///BREAK;
-//			if (not dictid)
-//				break;
+		//		for (const var ii : range(1, 99)) {
+		//			var dictid = dictids.field("*", ii);
+		//
+		//			///BREAK;
+		//			if (not dictid)
+		//				break;
 		for (var dictid : dictids) {
 			var fn = (dictid ^ "_ARCHIVED").xlate(dictfilename, 2, "X");
 			if (not(fn) or not(fn.isnum())) {
@@ -94,10 +93,10 @@ postuploadfail:
 				goto postuploadfail;
 			}
 			fns ^= fn ^ _FM;
-		} //ii;
+		}  //ii;
 		fns.popper();
 
-		var ii2 = rec.f(fns.f(1)).fcount(_VM);
+		var ii2			   = rec.f(fns.f(1)).fcount(_VM);
 		rec(fns.f(1), ii2) = targetfilename;
 		rec(fns.f(2), ii2) = newstatus;
 		rec(fns.f(3), ii2) = USERNAME;
@@ -115,8 +114,8 @@ postuploadfail:
 		}
 
 		//additional option to check file and key is not locked
-		filename = request_.f(3);
-		key = request_.f(4);
+		filename			= request_.f(3);
+		key					= request_.f(4);
 		var ensurenotlocked = request_.f(5);
 		if (ensurenotlocked eq "undefined") {
 			ensurenotlocked = "";
@@ -200,9 +199,8 @@ postuploadfail:
 					msg(-1) = errors;
 					return invalid(msg);
 				}
-
 			}
-		} //subfoldern;
+		}  //subfoldern;
 
 	} else if (mode.field(".", 1) eq "VERIFYUPLOAD") {
 
@@ -245,7 +243,7 @@ postuploadfail:
 		}
 
 		//lcase upload path (not filenames which must retain case)
-		var filename = virtualfilebase.field2(OSSLASH, -1 , 1 );
+		var filename = virtualfilebase.field2(OSSLASH, -1, 1);
 		//virtualfilebase.lcaser().paster(-len(filename), filename);
 		//virtualfilebase.lcaser().pasterall(-len(filename), filename);
 		virtualfilebase.lcaser();
@@ -289,14 +287,13 @@ postuploadfail:
 		if (uploadfilenames) {
 
 			let nuploads = uploadfilenames.fcount(_FM);
-			var ndeep = virtualfilebase.fcount(OSSLASH);
+			var ndeep	 = virtualfilebase.fcount(OSSLASH);
 			for (const var uploadn : range(1, nuploads)) {
-				var uploadfilename = uploadfilenames.f(uploadn);
-				uploadfilename = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
+				var uploadfilename		 = uploadfilenames.f(uploadn);
+				uploadfilename			 = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
 				uploadfilenames(uploadn) = uploadfilename;
-			} //uploadn;
+			}  //uploadn;
 			uploadfilenames.converter(_FM, _VM);
-
 		}
 
 		data_(2) = uploadfilenames;
@@ -356,25 +353,25 @@ postuploadfail:
 		}
 
 	} else if (mode eq "IMPORT") {
-		var uploadpath = RECORD.f(1);
-		var startatrown = RECORD.f(2);
-		var headertype = RECORD.f(3);
-		lengthx = RECORD.f(4);
-		filename = RECORD.f(5);
-		var dictfilename = RECORD.f(6);
+		var uploadpath	  = RECORD.f(1);
+		var startatrown	  = RECORD.f(2);
+		var headertype	  = RECORD.f(3);
+		lengthx			  = RECORD.f(4);
+		filename		  = RECORD.f(5);
+		var dictfilename  = RECORD.f(6);
 		var dictcolprefix = RECORD.f(7).ucase();
-		var keydictid = RECORD.f(8);
-		var keyfunction = RECORD.f(9);
+		var keydictid	  = RECORD.f(8);
+		var keyfunction	  = RECORD.f(9);
 		//reserve first 10 for non-imported additional info
-		var fieldoffset = RECORD.f(10);
-		var importcode = RECORD.f(11);
-		var linenofn = RECORD.f(12);
+		var fieldoffset		 = RECORD.f(10);
+		var importcode		 = RECORD.f(11);
+		var linenofn		 = RECORD.f(12);
 		var importfilenamefn = RECORD.f(13);
-		var importcodefn = RECORD.f(14);
-		var datewords = RECORD.f(15);
-		var timewords = RECORD.f(16);
-		var validating = RECORD.f(17);
-		osfile = "";
+		var importcodefn	 = RECORD.f(14);
+		var datewords		 = RECORD.f(15);
+		var timewords		 = RECORD.f(16);
+		var validating		 = RECORD.f(17);
+		osfile				 = "";
 
 		if (uploadpath.cut(2).contains("..")) {
 			msg = uploadpath.quote() ^ " .. is not allowed";
@@ -417,14 +414,18 @@ postuploadfail:
 		temposfilename83 = (SYSTEM.f(24) ^ var(1000000).rnd()).first(8) ^ "._IM";
 
 		msg = (uploadroot ^ uploadpath).quote() ^ "\r\n";
-		msg = "Uploaded file cannot be found/copied" "\r\n";
-		msg ^= temposfilename83.quote() ^ " file cannot be opened" ")";
+		msg =
+			"Uploaded file cannot be found/copied"
+			"\r\n";
+		msg ^= temposfilename83.quote() ^
+			   " file cannot be opened"
+			   ")";
 
 		nimported = "";
 
 		//from here on gosub cleanup to clean up temporary file
 
-		var cmd = "cp " ^ ((uploadroot ^ uploadpath).quote()) ^ " " ^ temposfilename83;
+		var	 cmd = "cp " ^ ((uploadroot ^ uploadpath).quote()) ^ " " ^ temposfilename83;
 		call shell2(cmd, errors);
 		if (errors) {
 			printl(errors);
@@ -440,16 +441,16 @@ postuploadfail:
 		}
 
 		fileptr = 0;
-		buff = "";
+		buff	= "";
 		linenox = 0;
 		//cols os "name vm start vm len" etc one col per fm
-		var cols = "";
+		var cols  = "";
 		nimported = 0;
 
 		while (true) {
 
 nextline:
-/////////
+			/////////
 			gosub getline();
 
 			if (eof)
@@ -483,15 +484,14 @@ nextline:
 							if (line[ptr + 1] ne " ")
 								break;
 
-						} //ptr;
+						}  //ptr;
 						cols ^= VM ^ ptr;
 						offset += ptr;
 						line.cutter(ptr);
-					}//loop;
+					}  //loop;
 				}
 
 				goto nextline;
-
 			}
 
 			let ncols = cols.fcount(_FM);
@@ -525,14 +525,14 @@ nextline:
 
 				for (const var coln : range(1, ncols)) {
 					var dictrec = "F";
-					dictrec(2) = coln + fieldoffset;
-					dictrec(3) = capitalise(cols.f(coln, 1));
+					dictrec(2)	= coln + fieldoffset;
+					dictrec(3)	= capitalise(cols.f(coln, 1));
 					dictrec(10) = "10";
-					var dictid = dictcolprefix ^ "_" ^ cols.f(coln, 1).convert(" ", "_").ucase();
+					var dictid	= dictcolprefix ^ "_" ^ cols.f(coln, 1).convert(" ", "_").ucase();
 
 					var CONV = "";
 					var just = "L";
-					var nn = dictid.fcount("_");
+					var nn	 = dictid.fcount("_");
 					for (const var ii : range(1, nn)) {
 						var word = dictid.field("_", ii);
 						if (datewords.locate(word, xx)) {
@@ -544,14 +544,14 @@ nextline:
 								just = "R";
 							}
 						}
-					} //ii;
+					}  //ii;
 					cols(coln, 4) = CONV;
-					dictrec(7) = CONV;
-					dictrec(9) = just;
+					dictrec(7)	  = CONV;
+					dictrec(9)	  = just;
 
 					grec ^= dictid ^ " ";
 					dictrec.write(dictfile, dictid);
-				} //coln;
+				}  //coln;
 				grec.popper();
 				("G" _FM _FM ^ grec).write(dictfile, dictcolprefix);
 				("G" _FM _FM ^ grec).write(dictfile, "@CRT");
@@ -561,13 +561,12 @@ nextline:
 						keydictid = dictcolprefix ^ "_TEMPKEY";
 					}
 					var tt = "S" _FM _FM ^ keydictid;
-					tt(8) = keyfunction;
-					tt(9) = "R";
+					tt(8)  = keyfunction;
+					tt(9)  = "R";
 					tt(10) = 10;
 
 					tt.write(dictfile, keydictid);
 				}
-
 			}
 
 			if (csv) {
@@ -585,9 +584,9 @@ nextline:
 				if (cell.len()) {
 					if (col.f(1, 4)) {
 						var cell0 = cell;
-						var CONV = col.f(1, 4);
+						var CONV  = col.f(1, 4);
 						if (CONV.contains("TIME")) {
-						//if no : in time then assume is already seconds
+							//if no : in time then assume is already seconds
 							if (cell.contains(":")) {
 								cell = iconv(cell, CONV);
 							}
@@ -596,13 +595,13 @@ nextline:
 						}
 						if (not(cell.len())) {
 							call mssg(cell0.quote() ^ " cannot be converted in line " ^ linenox ^ " col " ^ coln);
-						//indicate strange but leave workable date/time
+							//indicate strange but leave workable date/time
 							cell = "00";
 						}
 					}
 				}
 				rec(coln + fieldoffset) = cell;
-			} //coln;
+			}  //coln;
 
 			key = importcode ^ "*" ^ linenox;
 			if (importfilenamefn) {
@@ -626,7 +625,7 @@ nextline:
 				rec.write(file, key);
 			}
 
-		}//loop;
+		}  //loop;
 
 		gosub cleanup();
 
@@ -650,7 +649,7 @@ subroutine getline() {
 	if (buff.len() lt lengthx) {
 
 addbuff:
-////////
+		////////
 		call osbread(temp, osfile, fileptr, lengthx);
 		temp.converter("\n\f", "\r\r");
 		buff ^= temp;
@@ -661,19 +660,18 @@ addbuff:
 		}
 
 		if (not(buff.len())) {
-			eof = 1;
+			eof	 = 1;
 			line = "";
 			return;
 		}
-
 	}
 
 	//skip empty lines
-//	while (true) {
-//		///BREAK;
-//		if (not(buff.starts("\r"))) break;
-//		buff.cutter(1);
-//	}//loop;
+	//	while (true) {
+	//		///BREAK;
+	//		if (not(buff.starts("\r"))) break;
+	//		buff.cutter(1);
+	//	}//loop;
 	buff.trimmerfirst("\r");
 	if (not(buff.len())) {
 		goto addbuff;
@@ -685,13 +683,14 @@ addbuff:
 	nquotes = line.count(DQ);
 	while (true) {
 		///BREAK;
-		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.len())) break;
+		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.len()))
+			break;
 		var line2 = buff.field("\r", 1);
 		nquotes += line2.count(DQ);
 		buff.cutter(line2.len() + 1);
 		line ^= "\n";
 		line ^= line2;
-	}//loop;
+	}  //loop;
 
 	linenox += 1;
 	eof = 0;
@@ -709,8 +708,8 @@ subroutine lockfile() {
 	var waitsecs = 3;
 	if (not(lockrecord(filename, file, key, recordx, waitsecs, allowduplicate))) {
 		gosub unlockfile();
-		msg = "Cannot upload at the moment because";
-		msg(-1) = filename ^ " " ^ (key.quote()) ^ " is being updated by ";
+		msg			 = "Cannot upload at the moment because";
+		msg(-1)		 = filename ^ " " ^ (key.quote()) ^ " is being updated by ";
 		var lockuser = (filename ^ "*" ^ key).xlate("LOCKS", 4, "X");
 		if (lockuser) {
 			msg ^= lockuser;
@@ -734,13 +733,13 @@ subroutine parseline(io line) {
 
 	//preserve commas inside quotes
 	nquotes = line.count(DQ);
-	for (var quoten = 2; quoten <= nquotes; quoten+=2) {
+	for (var quoten = 2; quoten <= nquotes; quoten += 2) {
 		var tt = line.field(DQ, quoten);
 		if (tt.contains(",")) {
 			tt.replacer(",", "&comma;");
 			line = line.fieldstore(DQ, quoten, 1, tt);
 		}
-	} //quoten;
+	}  //quoten;
 
 	line.converter(",", _VM);
 

@@ -1,13 +1,10 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <openfile.h>
 #include <getbackpars.h>
 #include <sendmail.h>
 
-//#include <sys_common.h>
-
-var programname;
+	var programname;
 var text;
 var xstation;
 var time;
@@ -37,7 +34,7 @@ function main(in programname0, in text0) {
 	var year = date().oconv("D").last(4);
 	if (s33) {
 		xstation = SYSTEM.f(40, 2);
-		} else {
+	} else {
 		xstation = STATION.trim();
 	}
 	time = ostime();
@@ -58,7 +55,7 @@ function main(in programname0, in text0) {
 	if (log) {
 
 getlogkey:
-		time = ostime();
+		time	   = ostime();
 		var logkey = xstation.trim() ^ "*" ^ USERNAME ^ "*" ^ date() ^ "*" ^ time;
 		if (xx.read(log, logkey)) {
 			goto getlogkey;

@@ -1,10 +1,10 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <sysmsg.h>
 #include <shell2.h>
+#include <sysmsg.h>
 
-var printopts;
+	var printopts;
 var pdfcmd;
 
 function main(io osfilename, in printopts0, out errors) {
@@ -12,7 +12,7 @@ function main(io osfilename, in printopts0, out errors) {
 	//osfilename in  ../data/xxxxxxxx.htm
 	//osfilename out ../data/xxxxxxxx.pdf (if successful)
 
-		/* Installation of wkhtmltopdf cmd for Ubuntu;
+	/* Installation of wkhtmltopdf cmd for Ubuntu;
 
 		//doesnt work well on 18.04 or 20.04
 		sudo apt-get install wkhtmltopdf;
@@ -60,7 +60,7 @@ function main(io osfilename, in printopts0, out errors) {
 
 	if (VOLUMES) {
 		var exe = oscwd().contains(":") ? ".exe" : "";
-		pdfcmd = "html2pdf";
+		pdfcmd	= "html2pdf";
 		if (exe) {
 			pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;
 		}

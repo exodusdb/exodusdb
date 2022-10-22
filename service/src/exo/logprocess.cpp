@@ -1,14 +1,14 @@
 #include <exodus/library.h>
 libraryinit()
 
-var processcategory;
+	var processcategory;
 var processrec;
 var processparameters;
 var processresult;
 var processcomments;
 var timex;
 
-function main(io processid, in processcategory0, in /*sparevar*/="", in processparameters0="", in processresult0="", in processcomments0="") {
+function main(io processid, in processcategory0, in /*sparevar*/ = "", in processparameters0 = "", in processresult0 = "", in processcomments0 = "") {
 
 	//obsolete since moved to processes from definitions
 
@@ -17,14 +17,14 @@ function main(io processid, in processcategory0, in /*sparevar*/="", in processp
 	if (processid.unassigned()) {
 		processid = "";
 	}
-//	if (sparevar.unassigned()) {
-//		sparevar = "";
-//	}
+	//	if (sparevar.unassigned()) {
+	//		sparevar = "";
+	//	}
 	if (processcategory0.unassigned()) {
 		processcategory = "";
 	} else {
 		processcategory = processcategory0;
-		}
+	}
 	if (processrec.unassigned()) {
 		processrec = "";
 	}
@@ -66,29 +66,27 @@ function main(io processid, in processcategory0, in /*sparevar*/="", in processp
 			processrec(12) = time();
 
 			processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
-
 		}
 	} else if (processcategory == "LOGOFF" or processcategory == "DELETE") {
 
 		DEFINITIONS.deleterecord("PROCESS*" ^ processid);
-		
+
 		processid = "";
 
 	} else {
 
 		//generate a new processid and record
 		if (processid == "") {
-			gosub newprocessid( processid);
+			gosub newprocessid(processid);
 
 		} else {
 
 			if (not(processrec.read(DEFINITIONS, "PROCESS*" ^ processid))) {
-				gosub newprocessid( processid);
+				gosub newprocessid(processid);
 			}
 
 			processrec(11) = date();
 			processrec(12) = time();
-
 		}
 
 		if (processcategory) {
@@ -106,11 +104,9 @@ function main(io processid, in processcategory0, in /*sparevar*/="", in processp
 		}
 
 		processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
-
 	}
-//L468:
+	//L468:
 	return 0;
-
 }
 
 subroutine newprocessid(io processid) {
@@ -123,9 +119,10 @@ subroutine newprocessid(io processid) {
 		if (not(xx.read(DEFINITIONS, "PROCESS*" ^ processid))) {
 			xx = "";
 		}
-	///BREAK;
-	if (not xx) break;
-	}//loop;
+		///BREAK;
+		if (not xx)
+			break;
+	}  //loop;
 
 	processrec(1) = date();
 	processrec(2) = timex;
@@ -133,8 +130,6 @@ subroutine newprocessid(io processid) {
 	processrec(4) = SYSTEM.f(17);
 	processrec(5) = USERNAME;
 	return;
-
 }
-
 
 libraryexit()

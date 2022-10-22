@@ -2,16 +2,16 @@
 libraryinit()
 
 #include <log2.h>
+#include <menusubs.h>
 #include <readhostsallow.h>
 #include <shell2.h>
 #include <sysmsg.h>
-#include <menusubs.h>
 
 #include <system_common.h>
 
 #include <sys_common.h>
 
-var tt;
+	var tt;
 var hosts;
 var vn;
 var conf;
@@ -84,7 +84,7 @@ function main(in mode, io logtime, in menu) {
 		var nn = hosts.fcount(FM);
 		for (var ln = nn; ln >= 1; --ln) {
 			hosts(ln) = hosts.f(ln).field("#", 1);
-		} //ln;
+		}  //ln;
 
 		//remove blank lines and convert fm to sm
 		hosts.converter(FM, " ");
@@ -134,7 +134,7 @@ function main(in mode, io logtime, in menu) {
 					configips.remover(1, 1, ii);
 				}
 			}
-		} //ii;
+		}  //ii;
 
 		//allow exodus login from 127.*, LAN and any config default ips
 		//although any full 4 part LAN ips in configips will be BLOCKED in LISTEN2
@@ -156,9 +156,9 @@ function main(in mode, io logtime, in menu) {
 
 		//nb will NOT overwrite any manual entries in SYSTEM.CFG
 		let osenv = osgetenv().converter("\r\n", _FM _FM);
-//		let nenv = osenv.fcount(FM);
-//		for (const var ii : range(1, nenv)) {
-//			var enventry = osenv.f(ii);
+		//		let nenv = osenv.fcount(FM);
+		//		for (const var ii : range(1, nenv)) {
+		//			var enventry = osenv.f(ii);
 		for (let enventry : osenv) {
 			if (not enventry)
 				continue;
@@ -172,7 +172,7 @@ function main(in mode, io logtime, in menu) {
 				SYSTEM(12, vn) = envkey;
 				SYSTEM(13, vn) = envval;
 			}
-		} //ii;
+		}  //ii;
 
 	} else if (mode eq "FIXURLS") {
 
@@ -180,7 +180,7 @@ function main(in mode, io logtime, in menu) {
 
 		//remove any obvious page addresses
 		//ensure ends in slash
-		var baselinks = SYSTEM.f(114);
+		var baselinks	  = SYSTEM.f(114);
 		var baselinkdescs = SYSTEM.f(115);
 		if (not baselinks) {
 			var baselink = "System Configuration File";
@@ -201,7 +201,7 @@ function main(in mode, io logtime, in menu) {
 				}
 				baselinks(1, linkn) = tt;
 			}
-		} //linkn;
+		}  //linkn;
 		SYSTEM(114) = baselinks;
 		SYSTEM(115) = baselinkdescs;
 
@@ -223,15 +223,13 @@ function main(in mode, io logtime, in menu) {
 				printl(cmd);
 				printl(shell2(cmd, errors));
 				printl(errors);
-
 			}
-
 		}
 
 		call log2("*compress logs with gzip", logtime);
-		var dbcode = SYSTEM.f(17);
-		var curryear = date().oconv("D").last(4);
-		var minyear = 2000;
+		var	 dbcode	  = SYSTEM.f(17);
+		var	 curryear = date().oconv("D").last(4);
+		var	 minyear  = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
 
 			//dir='..\logs\':dbcode:'\':year
@@ -241,18 +239,19 @@ function main(in mode, io logtime, in menu) {
 
 			tt = oslistf(filenamesx);
 			///BREAK;
-			if (not tt) break;
+			if (not tt)
+				break;
 
 			filenamesx.converter("\\", "/");
 
 			var cygwinbin = SYSTEM.f(50);
-			var cmd = cygwinbin ^ "gzip " ^ filenamesx;
+			var cmd		  = cygwinbin ^ "gzip " ^ filenamesx;
 
 			call log2("*compress logs with gzip to .gz" ^ filenamesx, logtime);
 			printl(cmd);
 			call shell2(cmd, xx);
 
-		} //year;
+		}  //year;
 
 	} else if (mode eq "UPDATEUSERS") {
 
@@ -277,8 +276,8 @@ nextuser:
 			if (not(SECURITY.f(1).locate(userid, usern))) {
 				goto nextuser;
 			}
-			userx(40) = SECURITY.f(6, usern);
-			userx(41) = SECURITY.f(2, usern);
+			userx(40)	 = SECURITY.f(6, usern);
+			userx(41)	 = SECURITY.f(2, usern);
 			origuser(40) = origuser.f(40);
 			origuser(41) = origuser.f(41);
 			if (userx ne origuser) {
@@ -299,14 +298,14 @@ nextuser:
 		}
 
 		//exclusive get and update the last date run otherwise skip
-		if (not(DEFINITIONS.lock( "TRIMREQUESTLOG"))) {
+		if (not(DEFINITIONS.lock("TRIMREQUESTLOG"))) {
 			return 0;
 		}
 		if (not(lastdate.osread("reqlog.cfg"))) {
 			lastdate = "";
 		}
 		var(date()).oswrite("reqlog.cfg");
-		DEFINITIONS.unlock( "TRIMREQUESTLOG");
+		DEFINITIONS.unlock("TRIMREQUESTLOG");
 
 		//dont run twice on same day
 		if (lastdate eq date()) {
@@ -330,7 +329,7 @@ nextuser:
 	} else if (mode.f(1) eq "LASTLOGWARNING") {
 
 		var lastlog = mode.field(FM, 2, 999);
-		lastlog = trim(lastlog, FM);
+		lastlog		= trim(lastlog, FM);
 		//first word is logfilename
 		lastlog = lastlog.field(" ", 2, 999);
 		if (not lastlog) {
@@ -352,11 +351,11 @@ nextuser:
 		//initdir '..\VDM*.TMP'
 		//temps=dirlist()
 		if (VOLUMES) {
-			var temps = oslistf("..\\vdm*.tmp");
+			var temps  = oslistf("..\\vdm*.tmp");
 			let ntemps = temps.fcount(FM);
 			for (const var tempn : range(1, ntemps)) {
 				("..\\" ^ temps.f(tempn)).osremove();
-			} //tempn;
+			}  //tempn;
 		}
 
 	} else if (mode eq "MAKEMENU") {
@@ -372,8 +371,8 @@ nextuser:
 
 		call menusubs("ADDMENU", menutx, "_Support");
 
-		var item = "_Authorisation File";
-		var href = "../exodus/authorisation.htm";
+		var	 item = "_Authorisation File";
+		var	 href = "../exodus/authorisation.htm";
 		call menusubs("ADDITEM", menutx, item, href);
 
 		item = "System Con_figuration File";
@@ -391,33 +390,33 @@ nextuser:
 		call menusubs("ADDITEM", menutx, item, href);
 
 		item = "Re_questLog";
-			//style="display: none"
-			//id="exodussupportmenuitem1"
+		//style="display: none"
+		//id="exodussupportmenuitem1"
 		href = "../exodus/requestlog.htm";
 		call menusubs("ADDITEM", menutx, item, href);
-			//<br style="display: none" id="exodussupportmenuitem2" />
+		//<br style="display: none" id="exodussupportmenuitem2" />
 
 		item = "_Usage Statistics";
 		href = "../exodus/usagestatistics.htm";
 		call menusubs("ADDITEM", menutx, item, href);
 
-        item = "_Create Database";
-        href = "../exodus/createdatabase.htm";
-        call menusubs("ADDITEM", menutx, item, href);
+		item = "_Create Database";
+		href = "../exodus/createdatabase.htm";
+		call menusubs("ADDITEM", menutx, item, href);
 
 		call menusubs("ADDSEP", menutx);
 
 		if (VOLUMES) {
-			item = "List of Database _Processes";
+			item		= "List of Database _Processes";
 			var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
-				//backslash
+			//backslash
 			onclick.converter("|", chr(92));
 			call menusubs("ADDITEM", menutx, item, href, onclick);
 		}
 
-		item = "_List of Documents in Use";
+		item		= "_List of Documents in Use";
 		var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTLOCKS');return false";
-			//backslash
+		//backslash
 		onclick.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
@@ -436,7 +435,7 @@ nextuser:
 
 		item = "_What's new in EXODUS";
 		href = "javascript:window.location.assign((typeof gusername!='undefined'&&gusername=='EXODUS'&&confirm('EXODUS only option|n|nChange Log File=OK|nWhats New Report=Cancel'))?'../exodus/changelog.htm':'../exodus/whatsnew.htm')";
-			//backslash
+		//backslash
 		href.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href);
 
@@ -464,13 +463,13 @@ nextuser:
 		href = "http://www.neosys.com/help";
 		call menusubs("ADDITEM", menutx, item, href);
 
-		item = "_About";
+		item	= "_About";
 		onclick = "javascript:displayresponsedata_sync('EXECUTE|rGENERAL|rABOUT');return false";
-			//backslash
+		//backslash
 		onclick.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
-			//this element at the end determines when the menu is fully loaded
+		//this element at the end determines when the menu is fully loaded
 		menutx ^= FM ^ "<div id=\"menucompleted\"></div>";
 
 		call menusubs("ENDMENU", menutx);
@@ -493,7 +492,6 @@ nextuser:
 	} else {
 
 		call log2(mode.quote() ^ " is invalid in init.general2", logtime);
-
 	}
 
 	return 0;

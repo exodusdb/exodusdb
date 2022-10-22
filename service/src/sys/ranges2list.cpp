@@ -5,14 +5,14 @@ libraryinit()
 
 #include <sys_common.h>
 
-var basekey;
+	var basekey;
 var listid;
 var lists;
-var listn;//num
+var listn;	//num
 var keys;
 var key;
 
-function main(io ranges0, in basekey0="", in listid0="") {
+function main(io ranges0, in basekey0 = "", in listid0 = "") {
 
 	//generate individual numbers given a list of ranges
 	//eg 1000,1100-1200,2000-2100,3000
@@ -45,7 +45,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 			abort(lasterror());
 		}
 		listn = "";
-		keys = "";
+		keys  = "";
 	}
 
 	//comma/space/fm separated ranges
@@ -64,7 +64,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	var allchars = "";
 	for (const var ii : range(32, 255)) {
 		allchars ^= chr(ii);
-	} //ii;
+	}  //ii;
 	allchars.converter("0123456789-", "");
 
 	for (var ii = nn; ii >= 1; --ii) {
@@ -80,28 +80,30 @@ function main(io ranges0, in basekey0="", in listid0="") {
 		while (true) {
 			var lastchar = prefix[-1];
 			///BREAK;
-			if (not(var("0123456789").contains(lastchar))) break;
+			if (not(var("0123456789").contains(lastchar)))
+				break;
 			startx.prefixer(lastchar);
 			prefix.popper();
-		}//loop;
+		}  //loop;
 
 		//range of numbers
 		var temp0 = rangex;
-		var temp = temp0;
+		var temp  = temp0;
 		temp.converter(allchars, "");
 
 		if (temp.match("^\\d+-\\d+$")) {
 
 			//finish=field(temp,'-',2)
 			var finish = "";
-			var tt = ranges.f(ii).field("-", 2);
+			var tt	   = ranges.f(ii).field("-", 2);
 			while (true) {
 				var lastchar = tt[-1];
 				///BREAK;
-				if (not(var("0123456789").contains(lastchar))) break;
+				if (not(var("0123456789").contains(lastchar)))
+					break;
 				finish.prefixer(lastchar);
 				tt.popper();
-			}//loop;
+			}  //loop;
 
 			if (finish lt startx) {
 				ranges0 = "";
@@ -139,14 +141,14 @@ function main(io ranges0, in basekey0="", in listid0="") {
 					range2 ^= " " ^ key;
 				}
 
-			} //i2;
+			}  //i2;
 
 			if (not listid) {
 				range2.cutter(1);
 				ranges(ii) = range2;
 			}
 
-		//not range
+			//not range
 		} else {
 			if (listid) {
 
@@ -166,14 +168,13 @@ makekey:
 
 				keys ^= FM ^ key;
 			}
-
 		}
 
-	//nextrange:;
-	} //ii;
+		//nextrange:;
+	}  //ii;
 
 exit:
-/////
+	/////
 	if (listid) {
 		if (keys) {
 			//return nlistparts in vnos to indicate success

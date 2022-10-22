@@ -1,14 +1,14 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <systemsubs.h>
-#include <authorised.h>
-#include <securitysubs.h>
-#include <collectixvals.h>
 #include <anydata.h>
-#include <shell2.h>
+#include <authorised.h>
+#include <collectixvals.h>
 #include <definitionsubs.h>
+#include <securitysubs.h>
+#include <shell2.h>
 #include <singular.h>
+#include <systemsubs.h>
 
 #include <system_common.h>
 
@@ -17,7 +17,7 @@ libraryinit()
 
 #include <window.hpp>
 
-var xx;
+	var xx;
 var op;
 var msg;
 var backuprec;
@@ -76,7 +76,7 @@ function main(in mode) {
 		}
 
 		if (ID eq "SECURITY*USERS") {
-			ID = "SECURITY";
+			ID			  = "SECURITY";
 			win.templatex = "USERS";
 			if (not(authorised("USER LIST", msg, "USER ACCESS"))) {
 				win.valid = 0;
@@ -113,7 +113,7 @@ function main(in mode) {
 					smtprec = "";
 				}
 
-			//get system and backup rec from dos
+				//get system and backup rec from dos
 			} else {
 				if (not(RECORD.osread(ID.lcase()))) {
 					RECORD = "";
@@ -124,14 +124,12 @@ function main(in mode) {
 				if (not(smtprec.osread(smtpkey.lcase()))) {
 					smtprec = "";
 				}
-
 			}
 
 			RECORD = RECORD.fieldstore(_FM, 71, 29, backuprec.field(_FM, 1, 29));
 			RECORD = RECORD.fieldstore(_FM, 101, 9, smtprec.field(_FM, 1, 9));
 
 			return 0;
-
 		}
 
 		if (ID eq "SECURITY") {
@@ -154,7 +152,7 @@ function main(in mode) {
 
 			//prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
-				win.srcfile.unlock( ID);
+				win.srcfile.unlock(ID);
 				win.wlocked = "";
 			}
 
@@ -177,14 +175,12 @@ nochequeformat:
 							}
 						}
 					}
-
 				}
 
 				//flag a new record despite being copied
 				RECORD(10) = "";
 				RECORD(11) = "";
 				RECORD(14) = "";
-
 			}
 
 			return 0;
@@ -209,10 +205,10 @@ nochequeformat:
 
 			//add any additional exectives that somehow crept into the index
 			//without being added to DEFINITIONS record
-			var filename = ID.field("*", 2);
-			var fieldname = ID.field("*", 3);
+			var	 filename  = ID.field("*", 2);
+			var	 fieldname = ID.field("*", 3);
 			call collectixvals(filename, fieldname);
-			let nn = PSEUDO.fcount(_FM);
+			let	 nn = PSEUDO.fcount(_FM);
 			for (const var ii : range(1, nn)) {
 				var val = PSEUDO.f(ii);
 				if (val) {
@@ -222,7 +218,7 @@ nochequeformat:
 						//any more in parallel
 					}
 				}
-			} //ii;
+			}  //ii;
 
 			//return
 		}
@@ -233,7 +229,7 @@ nochequeformat:
 			if (not(authorised("BILLING REPORT ACCESS", msg, ""))) {
 unlockdefinitions:
 				win.reset = 5;
-				xx = unlockrecord("DEFINITIONS", win.srcfile, ID);
+				xx		  = unlockrecord("DEFINITIONS", win.srcfile, ID);
 				return invalid(msg);
 			}
 
@@ -250,7 +246,7 @@ unlockdefinitions:
 			if ((win.wlocked and RECORD.f(8).contains("EXODUS")) and not(USERNAME.contains("EXODUS"))) {
 preventupdate:
 				win.wlocked = 0;
-				xx = unlockrecord("DEFINITIONS", win.srcfile, ID);
+				xx			= unlockrecord("DEFINITIONS", win.srcfile, ID);
 			}
 
 			return 0;
@@ -262,7 +258,6 @@ preventupdate:
 			if (not(authorised("AGENCY CONFIGURATION UPDATE", xx, "EXODUS"))) {
 				goto preventupdate;
 			}
-
 		}
 
 		gosub postreadfix();
@@ -318,11 +313,8 @@ preventupdate:
 				//remove as default (assume is this account)
 				if (win.orec.f(14)) {
 					win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
-
 				}
-
 			}
-
 		}
 
 		//update exodus standard (in case doing this on the programming system)
@@ -348,8 +340,8 @@ preventupdate:
 				call anydata("", anydataexists);
 				if (anydataexists) {
 					RECORD(48) = win.orec.f(48);
-					msg = "You cannot change Invoice Number Sequence after data is entered";
-					msg(-1) = "That change has been ignored.";
+					msg		   = "You cannot change Invoice Number Sequence after data is entered";
+					msg(-1)	   = "That change has been ignored.";
 					call note(msg);
 				}
 			}
@@ -375,9 +367,9 @@ preventupdate:
 						}
 					}
 				}
-			} //fn;
+			}  //fn;
 
-			var t49 = field2(RECORD.f(49), _VM, -1);
+			var t49	 = field2(RECORD.f(49), _VM, -1);
 			var t149 = field2(RECORD.f(149), _VM, -1);
 			var t150 = field2(RECORD.f(150), _VM, -1);
 			if (t49 and t49 eq t149) {
@@ -414,7 +406,6 @@ preventupdate:
 			if (RECORD.f(125) ne win.orec.f(125)) {
 				RECORD(128) = USERNAME;
 			}
-
 		}
 
 	} else if (mode eq "POSTWRITE") {
@@ -455,7 +446,7 @@ preventupdate:
 				smtpkey = "SMTP.CFG";
 				smtprec.write(DEFINITIONS, smtpkey);
 
-			//write system and backup rec in dos
+				//write system and backup rec in dos
 			} else {
 				call oswrite(RECORD, ID.lcase());
 				call oswrite(backuprec, backupkey.lcase());
@@ -470,7 +461,8 @@ preventupdate:
 			for (const var driven : range(1, 999)) {
 				var drive = backupdrives.f(driven)[1];
 				///BREAK;
-				if (not drive) break;
+				if (not drive)
+					break;
 				//TODO replace with checkwritable()
 				drive ^= ":";
 				call osmkdir(drive ^ OSSLASH_ "data.bak");
@@ -479,7 +471,11 @@ preventupdate:
 					call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
 				} else {
 					//tempfilename=lcase(drive:'\data.bak':'\':rnd(8))
-					var tempfilename = (drive ^ "/data.bak" "/" ^ var(8).rnd()).lcase();
+					var tempfilename = (drive ^
+										"/data.bak"
+										"/" ^
+										var(8).rnd())
+										   .lcase();
 					if (VOLUMES) {
 						tempfilename ^= ".$$$";
 					} else {
@@ -493,7 +489,7 @@ preventupdate:
 						call note("Note: Cannot write to backup drive " ^ drive);
 					}
 				}
-			} //driven;
+			}  //driven;
 
 			//create/update ddns configuration if necessary
 			//actually only the ddns.cmd file really need be updated
@@ -512,7 +508,6 @@ preventupdate:
 			gosub reorderdbs();
 
 			return 0;
-
 		}
 
 		//have to pass back the partial record
@@ -528,7 +523,6 @@ preventupdate:
 
 			//to the get the filtered record again
 			call definitionsubs("POSTREAD");
-
 		}
 
 		gosub postreadfix();
@@ -561,7 +555,6 @@ preventupdate:
 			}
 
 			return 0;
-
 		}
 
 		if (ID eq "SECURITY") {
@@ -584,14 +577,12 @@ preventupdate:
 					return 0;
 				}
 			}
-
 		}
 
 		//remove default cheque design
 		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
 			if (RECORD.f(14)) {
 				win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
-
 			}
 		}
 
@@ -645,24 +636,24 @@ subroutine reorderdbs() {
 
 	//extract substitution and dblist from dbdir line 1
 	var substitution = dbdir.f(1).field(" ", 1);
-	var dblist = dbdir.f(1).field(" ", 2, 9999);
+	var dblist		 = dbdir.f(1).field(" ", 2, 9999);
 
 	//create newdblist in order of given newdbcodes
 	//if not found in new order then append in order found
-	let ndbs = dblist.fcount(_VM);
+	let ndbs	  = dblist.fcount(_VM);
 	var newdblist = "";
 	for (const var dbn : range(1, ndbs)) {
-		var db = dblist.f(1, dbn);
+		var db	   = dblist.f(1, dbn);
 		var dbcode = db.f(1, 1, 2);
 		if (not(newdbcodes.locate(dbcode, newdbcoden))) {
 			newdbcodes(1, newdbcoden) = dbcode;
 		}
 		newdblist(1, newdbcoden) = db;
-	} //dbn;
+	}  //dbn;
 
 	//replace substitution and dblist
 	var newdbdir = dbdir;
-	newdbdir(1) = substitution ^ " " ^ newdblist;
+	newdbdir(1)	 = substitution ^ " " ^ newdblist;
 
 	//convert to DOS
 	if (not newdbdir.ends(_FM)) {
@@ -738,7 +729,6 @@ subroutine postreadfix() {
 		if (not(RECORD.f(34))) {
 			RECORD(34) = RECORD.f(11);
 		}
-
 	}
 
 	return;

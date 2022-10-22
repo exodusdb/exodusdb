@@ -17,9 +17,9 @@ libraryinit()
 #define maxeventsperwindow_ params.f(3)
 #define roundrobinfilename_ params.f(4)
 #define roundrobinkey_      params.f(5)
-// clang-format on
+	// clang-format on
 
-var errormsg;
+	var errormsg;
 
 function main(in mode, in params, io result, io msg) {
 
@@ -29,7 +29,7 @@ function main(in mode, in params, io result, io msg) {
 	//msg if any error
 
 	result = "";
-	msg = "";
+	msg	   = "";
 
 	//roundrobin
 	//minutes are the number of minutes since 1/1/1970 provided by date()/time()
@@ -40,20 +40,21 @@ function main(in mode, in params, io result, io msg) {
 
 		//here we have maximum of 6 events per last 6x6 seconds
 		var params2 = "";
-		params2(1) = 6;
-		params2(2) = 6;
-		params2(3) = 6;
-		params2(4) = "DOS";
-		params2(5) = "TEST.DAT";
+		params2(1)	= 6;
+		params2(2)	= 6;
+		params2(3)	= 6;
+		params2(4)	= "DOS";
+		params2(5)	= "TEST.DAT";
 		//osremove params2<5>
 
 		printl();
 		while (true) {
 			///BREAK;
-			if (not(not(esctoexit()))) break;
-			call ossleep(1000*var(3).rnd());
+			if (not(not(esctoexit())))
+				break;
+			call ossleep(1000 * var(3).rnd());
 			call roundrobin("ONEVENT", params2, result, errormsg);
-		}//loop;
+		}  //loop;
 
 	} else if (mode eq "ONEVENT") {
 
@@ -90,7 +91,7 @@ function main(in mode, in params, io result, io msg) {
 		//determine current and last timeperiod
 		//currentperiodn=date()*24*secsperperiod+mod(time(),secsperperiod)
 		let currentperiodn = ((date() * 24 * 60 * 60 + time()) / secsperperiod_).floor();
-		var lastperiodn = roundrobin.f(1);
+		var lastperiodn	   = roundrobin.f(1);
 
 		//prevent catch up longer than periodsperwindow (add 2 for safety)
 		if (currentperiodn - lastperiodn gt periodsperwindow_ + 2) {
@@ -102,11 +103,11 @@ function main(in mode, in params, io result, io msg) {
 		//ie clear only on the first time that we arrive in it
 		for (const var periodn : range(lastperiodn + 1, currentperiodn)) {
 			roundrobin(2, periodn.mod(periodsperwindow_) + 1) = "";
-		} //periodn;
+		}  //periodn;
 
 		//record the current period as the last period so that in the next call
 		//we can clear skipped periods (but not the current period again)
-		roundrobin(1) = currentperiodn;
+		roundrobin(1)	  = currentperiodn;
 		var currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
 
 		if (roundrobin.f(2).sum() lt maxeventsperwindow_) {
@@ -126,11 +127,10 @@ function main(in mode, in params, io result, io msg) {
 		}
 		roundrobin.write(roundrobinfile, roundrobinkey_);
 
-	//for testing
-	//print lastperiodn,currentperiodn,currentbreakn,result,roundrobin<2>
+		//for testing
+		//print lastperiodn,currentperiodn,currentbreakn,result,roundrobin<2>
 
 		call unlockrecord("VOC", voc, roundrobinlock);
-
 	}
 
 	return 0;

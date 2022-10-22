@@ -5,12 +5,12 @@ libraryinit()
 
 #include <sys_common.h>
 
-var params;
+	var params;
 var params2;
 var filler;
 var tagsep;
 
-function main(in mode, io datax, in params0="", in params20="") {
+function main(in mode, io datax, in params0 = "", in params20 = "") {
 
 	//BEING REPLACED BY LOWERCASE VERSION HTMLLIB2()
 	//GBP all HTMLLIB2
@@ -19,9 +19,9 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 	//jbase
 
-	var td = "<td>";
+	var td	= "<td>";
 	var tdx = "</td>";
-	var tr = "<tr>";
+	var tr	= "<tr>";
 	var trx = "</tr>";
 
 	if (params0.unassigned()) {
@@ -40,15 +40,17 @@ function main(in mode, io datax, in params0="", in params20="") {
 		var tt = " " ^ VM;
 		while (true) {
 			///BREAK;
-			if (not(datax.contains(tt))) break;
+			if (not(datax.contains(tt)))
+				break;
 			datax.replacer(tt, VM);
-		}//loop;
+		}  //loop;
 		tt = " " ^ FM;
 		while (true) {
 			///BREAK;
-			if (not(datax.contains(tt))) break;
+			if (not(datax.contains(tt)))
+				break;
 			datax.replacer(tt, FM);
-		}//loop;
+		}  //loop;
 		filler = "&nbsp;";
 		gosub fill(datax);
 
@@ -86,9 +88,9 @@ function main(in mode, io datax, in params0="", in params20="") {
 		// end
 
 		//highlight last row if a total
-		var nlines = datax.fcount(FM);
+		var nlines	 = datax.fcount(FM);
 		var lastline = datax.f(nlines);
-	//Total
+		//Total
 		if (lastline.contains("<TD>" ^ sys.glang.f(28))) {
 			lastline.replacer("TD>", "TH>");
 			lastline.replacer("td>", "th>");
@@ -97,7 +99,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 		datax.converter(FM ^ VM, "");
 
-	//fill in the missing cells
+		//fill in the missing cells
 	} else if (mode eq "TABLE.FILL") {
 		filler = "<TD>&nbsp;</TD>";
 		gosub fill(datax);
@@ -139,26 +141,26 @@ function main(in mode, io datax, in params0="", in params20="") {
 					} else {
 						data2(ln) = "<td colspan=2>" ^ line ^ tdx;
 					}
-				} //ln;
+				}  //ln;
 
 				data2.replacer(FM, trx ^ tr);
 				data2.prefixer("<table class=\"hashtable\">" ^ tr);
 				data2 ^= trx ^ "</table>";
 
 				datax(1, vn) = data2;
-
 			}
 
-		} //vn;
+		}  //vn;
 
 	} else if (mode eq "STRIPTAGS") {
 		while (true) {
 			var tag1 = datax.index("<");
 			var tag2 = datax.index(">");
 			///BREAK;
-			if (not(tag1 and tag1 lt tag2)) break;
+			if (not(tag1 and tag1 lt tag2))
+				break;
 			datax.paster(tag1, tag2 - tag1 + 1, "");
-		}//loop;
+		}  //loop;
 
 	} else if (mode eq "DECODEHTML") {
 		datax.replacer("&nbsp;", " ");
@@ -363,23 +365,23 @@ subroutine fill(io datax) {
 
 	let nn = datax.fcount(FM);
 
-		//find max number of columns
+	//find max number of columns
 	var n2 = 0;
 	for (const var ii : range(1, nn)) {
 		var tt = datax.f(ii).fcount(VM);
 		if (tt gt n2) {
 			n2 = tt;
 		}
-	} //ii;
+	}  //ii;
 
-		//make sure all columns are filled
+	//make sure all columns are filled
 	for (const var ii : range(1, nn)) {
 		for (const var i2 : range(1, n2)) {
 			if (datax.f(ii, i2) eq "") {
 				datax(ii, i2) = filler;
 			}
-		} //i2;
-	} //ii;
+		}  //i2;
+	}	   //ii;
 
 	return;
 }

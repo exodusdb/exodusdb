@@ -1,34 +1,33 @@
 #include <exodus/library.h>
 libraryinit()
 
-var t2;
+	var t2;
 
 function main(io tx) {
-        //c xxx io
-        //TODO consider merging with readcss() perhaps with mode
+	//c xxx io
+	//TODO consider merging with readcss() perhaps with mode
 
 	//in c++ get from raw text string below
-	tx=getvogonpoetry();
+	tx = getvogonpoetry();
 
-        tx.replacer(_FM, "\r\n");
+	tx.replacer(_FM, "\r\n");
 
-        if (DATEFMT.contains("E")) {
-                t2 = "d/M/yyyy";
-        } else if (DATEFMT.contains("J")) {
-                t2 = "yyyy/M/d";
-        } else {
-                t2 = "M/d/yyyy";
-        }
+	if (DATEFMT.contains("E")) {
+		t2 = "d/M/yyyy";
+	} else if (DATEFMT.contains("J")) {
+		t2 = "yyyy/M/d";
+	} else {
+		t2 = "M/d/yyyy";
+	}
 
-        tx.replacer("gdateformat='d/M/yyyy'", "gdateformat='" ^ t2 ^ "'");
+	tx.replacer("gdateformat='d/M/yyyy'", "gdateformat='" ^ t2 ^ "'");
 
-        return 0;
-
+	return 0;
 }
 
 function getvogonpoetry() {
 
-return R"V0G0N(
+	return R"V0G0N(
 <script type="text/javascript">
 gdateformat='d/M/yyyy'
 function sorttable(event)
@@ -160,7 +159,6 @@ if (!document.swapNode) {
 }
 </script>
 )V0G0N";
-
 }
 
 libraryexit()

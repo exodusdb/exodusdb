@@ -7,12 +7,12 @@ libraryinit()
 
 #include <sys_common.h>
 
-var foundkeys;
+	var foundkeys;
 
 function main(in filename, in indexid, in texts0, io msg) {
 
-	var texts = texts0;
-	msg = "";
+	var texts  = texts0;
+	msg		   = "";
 	var ntexts = texts.fcount(VM);
 
 	//analogous code whereever allpunctuation is used
