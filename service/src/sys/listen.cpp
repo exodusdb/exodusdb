@@ -1009,6 +1009,7 @@ function got_link() {
 	//print 'lock locks,REQUEST*':linkfilename1
 
 		var().osflush();
+openlink1:
 		if (not(linkfile1.osopen(linkfilename1))) {
 			//remove from future candidate files?
 			call ossleep(1000*1 / 10.0);
@@ -1020,7 +1021,7 @@ function got_link() {
 
 		//get the .1 file which contains the request
 		timex = time();
-readlink1:
+//readlink1:
 		request_ = "";
 		//osbread request from linkfile1 at 0 length 256*256-4
 		tt = 0;
@@ -1031,10 +1032,11 @@ readlink1:
 			var().osflush();
 			call ossleep(1000*1 / 10.0);
 			linkfile1.osclose();
-			if (not(linkfile1.osopen(linkfilename1))) {
-				{}
-			}
-			goto readlink1;
+//			if (not(linkfile1.osopen(linkfilename1))) {
+//				{}
+//			}
+//			goto readlink1;
+			goto openlink1;
 		}
 
 		//cleanup the input file
@@ -1387,7 +1389,8 @@ cannotopenlinkfile2:
 
 	//update security table every few secs and every login
 	//if request1='LOGIN' or index('036',time()[-1,1],1) then gosub getsecurity
-	if (SECURITY.read(DEFINITIONS, "SECURITY")) {
+	if (var newsecurity; SECURITY.read(DEFINITIONS, "SECURITY")) {
+		SECURITY = newsecurity;
 	}
 
 	//validate username and password ('LOGIN' gets special treatment)
