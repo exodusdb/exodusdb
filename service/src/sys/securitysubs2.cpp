@@ -11,7 +11,7 @@ libraryinit()
 
 #define origfullrec_ win.registerx(7)
 
-	var taskn;	//num
+	var taskn;	// num
 var oldtaskn;
 var newtaskn;
 var xx;
@@ -21,13 +21,13 @@ var vn;
 var taskn2;
 
 function main(in mode) {
-	//jbase
+	// jbase
 
 	if (mode eq "GETCHANGEDTASKS") {
 
 		var emailtx2 = "";
 
-		//email changed tasks
+		// email changed tasks
 		var newtasks = RECORD.f(10);
 		var newlocks = RECORD.f(11);
 		var oldtasks = origfullrec_.f(10);
@@ -40,7 +40,7 @@ function main(in mode) {
 				if (oldtasks.locate(task, oldtaskn)) {
 					var oldlock = oldlocks.f(1, oldtaskn);
 					if (newlock ne oldlock) {
-						//changed
+						// changed
 						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock;
 					}
 				} else {
@@ -64,7 +64,7 @@ function main(in mode) {
 
 	} else if (mode eq "FIXUSERPRIVS") {
 
-		//obsolete tasks
+		// obsolete tasks
 		call authorised(
 			"%DELETE%"
 			"CHANGE NETWORK TYPE",
@@ -110,21 +110,21 @@ function main(in mode) {
 			"OTHER OPTIONS UPDATE",
 			xx);
 
-		//new safe method for renaming tasks
-		//copy from old if missing, then delete old
-		//is safer method in case install old program and get the old task again!
+		// new safe method for renaming tasks
+		// copy from old if missing, then delete old
+		// is safer method in case install old program and get the old task again!
 		call authorised("CURRENCY EXCHANGE RATE OVERRIDE", xx, "JOURNAL POST OVERRIDE EXCHANGE RATE");
 		call authorised(
 			"%DELETE%"
 			"JOURNAL POST OVERRIDE EXCHANGE RATE",
 			xx);
 
-		//old method
+		// old method
 
 		var newuserprivs = SECURITY;
 
-		//customisation to convert old databases at ptcy/patsalides
-		//which had blank passwords not allowed in the new system
+		// customisation to convert old databases at ptcy/patsalides
+		// which had blank passwords not allowed in the new system
 		if (SECURITY.f(1).locate("MICHAEL", xx)) {
 			if (newuserprivs.osread("PATSALID.CFG")) {
 			}
@@ -163,7 +163,7 @@ function main(in mode) {
 			}
 			t10(1, tn) = "JOURNAL POST";
 		}
-		//swap vm:'POSTING' with vm:'JOURNAL POST' in t10
+		// swap vm:'POSTING' with vm:'JOURNAL POST' in t10
 		t10.replacer(VM ^ "REPOSTING", VM ^ "JOURNAL REPOST");
 		t10.replacer(VM ^ "UNPOSTING", VM ^ "JOURNAL UNPOST");
 		t10.replacer(VM ^ "POST ", VM ^ "JOURNAL POST ");
@@ -171,9 +171,9 @@ function main(in mode) {
 		t10.replacer("JOURNAL JOURNAL", "JOURNAL");
 		t10.replacer("RATECARDS ", "RATECARD ");
 		t10.replacer("UNITS ", "UNIT ");
-		//swap 'SUPPLIER INVOICE ACCESS' with 'MEDIA ':'SUPPLIER INVOICE ACCESS' in t10
-		//swap 'SUPPLIER INVOICE CREATE' with 'MEDIA ':'SUPPLIER INVOICE CREATE' in t10
-		//swap 'SUPPLIER INVOICE UPDATE' with 'JOB ':'SUPPLIER INVOICE UPDATE' in t10
+		// swap 'SUPPLIER INVOICE ACCESS' with 'MEDIA ':'SUPPLIER INVOICE ACCESS' in t10
+		// swap 'SUPPLIER INVOICE CREATE' with 'MEDIA ':'SUPPLIER INVOICE CREATE' in t10
+		// swap 'SUPPLIER INVOICE UPDATE' with 'JOB ':'SUPPLIER INVOICE UPDATE' in t10
 
 		t10.replacer("OWN ORDER NO", "OWN NO");
 		t10.replacer("OWN ESTIMATE NO", "OWN NO");
@@ -181,13 +181,13 @@ function main(in mode) {
 
 		call log2("*fix an error", logtime);
 		while (true) {
-			///BREAK;
+			// /BREAK;
 			if (not(t10.contains("MEDIA MEDIA ")))
 				break;
 			t10.replacer("MEDIA MEDIA ", "MEDIA ");
 		}  //loop;
 		while (true) {
-			///BREAK;
+			// /BREAK;
 			if (not(t10.contains("JOB JOB ")))
 				break;
 			t10.replacer("JOB JOB ", "JOB ");
@@ -208,7 +208,7 @@ function main(in mode) {
 		obsoletetasks(-1)  = "MARKET ACCESS PARTIAL";
 		for (const var ii : range(1, 9999)) {
 			var tt = obsoletetasks.f(ii);
-			///BREAK;
+			// /BREAK;
 			if (not tt)
 				break;
 			if (newuserprivs.f(10).locate(tt, taskn)) {
@@ -217,7 +217,7 @@ function main(in mode) {
 			}
 		}  //ii;
 
-		//ensure certain documents cannot be deleted
+		// ensure certain documents cannot be deleted
 		if (newuserprivs.f(10).locate("JOB ORDER DELETE", taskn)) {
 			newuserprivs(11, taskn) = "EXODUS";
 		}
@@ -240,7 +240,7 @@ deletetask:
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			} else {
-				//delete duplicate tasks
+				// delete duplicate tasks
 				if (tasks.f(1).locate(task, taskn2)) {
 					if (taskn2 lt taskn) {
 						goto deletetask;

@@ -12,7 +12,7 @@ libraryinit()
 	var mode;
 var subject;
 var body;
-var nsent;	//num
+var nsent;	// num
 var replyto;
 var toemails;
 var ccemails;
@@ -29,9 +29,9 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 	var interactive = false;  //not(SYSTEM.f(33));
 
-	//options
-	//R = REPLYTO=@username email address if exists
-	//W = Groups by Word eg user with dept MEDIA BUYING matches group MEDIA
+	// options
+	// R = REPLYTO=@username email address if exists
+	// W = Groups by Word eg user with dept MEDIA BUYING matches group MEDIA
 
 	if (mode.unassigned()) {
 		var mod = "";
@@ -62,22 +62,22 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 		body = "";
 		body ^= "The EXODUS system software has been upgraded.";
-		//body:=vm
-		//body:=vm:'In case of errors, please follow the instructions at'
-		//body:=vm:'http://userwiki.neosys.com/index.php/cache.'
+		// body:=vm
+		// body:=vm:'In case of errors, please follow the instructions at'
+		// body:=vm:'http://userwiki.neosys.com/index.php/cache.'
 		body ^= VM;
 		body ^= VM ^ "Please email SUPPORT@EXODUS.COM for any assistance.";
-		//body:=vm
-		//body:=vm:'This is an automated email. You cannot reply to it.'
+		// body:=vm
+		// body:=vm:'This is an automated email. You cannot reply to it.'
 		body.converter(VM, chr(13));
 
-		//call emailusers(mode,subject,body,'','','','R',emaillog)
-		//no more replyto support@neosys.com because no longer needed
-		//because installations sender emails like clientxyz@neosys.com
-		//are configured as aliases of support@neosys.com
-		//and replyto option suppresses the email header
-		//urn:schemas:mailheader:X-Auto-Response-Suppress = RN, NRN, OOF
-		//thereby allowing Out of Office replies which we do not want
+		// call emailusers(mode,subject,body,'','','','R',emaillog)
+		// no more replyto support@neosys.com because no longer needed
+		// because installations sender emails like clientxyz@neosys.com
+		// are configured as aliases of support@neosys.com
+		// and replyto option suppresses the email header
+		// urn:schemas:mailheader:X-Auto-Response-Suppress = RN, NRN, OOF
+		// thereby allowing Out of Office replies which we do not want
 		call emailusers(mode, subject, body, "", "", "", "", emaillog);
 
 		if (not emaillog) {
@@ -90,9 +90,9 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		stop();
 	}
 
-	//init:
-	/////
-	//if target and options='' or index(options,'U',1) then
+	// init:
+	// ///
+	// if target and options='' or index(options,'U',1) then
 	// end
 	bool groupword = options.contains("W");
 	nsent		   = 0;
@@ -100,7 +100,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	subject = subject0;
 	body	= body0;
 
-	//read fromuser from users,@username else fromuser=''
+	// read fromuser from users,@username else fromuser=''
 	replyto = "";
 	if (options.contains("R")) {
 		if ((USERNAME eq "EXODUS" or USERNAME eq "ADAGENCY") or USERNAME eq "ACCOUNTS") {
@@ -142,7 +142,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 /////////
 nextuser:
-	/////////
+	// ///////
 	if (esctoexit()) {
 		goto exit;
 	}
@@ -152,31 +152,31 @@ nextuser:
 		goto exit;
 	}
 
-	//skip empty users
+	// skip empty users
 	usercode = usercodes.f(1, usern);
 	if (usercode eq "") {
 		goto nextuser;
 	}
 
-	//only users on file
+	// only users on file
 	if (not(userx.read(users, usercode))) {
 		goto nextuser;
 	}
 
-	//not expired users
+	// not expired users
 	expirydate = userx.f(35);
 	if (expirydate and expirydate le date()) {
 		goto nextuser;
 	}
 
-	//skip users with no email at all
-	//users may have 0 or more email addresses eg xyz@abc.com;123@345.com etc
+	// skip users with no email at all
+	// users may have 0 or more email addresses eg xyz@abc.com;123@345.com etc
 	emails = userx.f(7);
 	if (emails eq "") {
 		goto nextuser;
 	}
 
-	//always email to self last
+	// always email to self last
 	if (usercode eq USERNAME and replyto) {
 		goto nextuser;
 	}
@@ -191,19 +191,19 @@ nextuser:
 		}
 	}
 
-	//skip users not of required type (eg FINANCE is ok in FINANCE CONTROLLER)
-	//could determine user type from what menus they can access eg MEDIA
+	// skip users not of required type (eg FINANCE is ok in FINANCE CONTROLLER)
+	// could determine user type from what menus they can access eg MEDIA
 	if (not(ok) and groupids) {
 		if (groupword) {
-			//eq search for MEDIA in user department like MEDIA BUYER
+			// eq search for MEDIA in user department like MEDIA BUYER
 			for (const var groupn : range(1, ngroups)) {
 				ok = userx.f(5).contains(groupids.f(1, groupn));
-				///BREAK;
+				// /BREAK;
 				if (not(not(ok)))
 					break;
 			}  //groupn;
 		} else {
-			//exact groups
+			// exact groups
 			if (groupids.locate(userx.f(21), xx)) {
 				ok = 1;
 			}
@@ -213,8 +213,8 @@ nextuser:
 		}
 	}
 
-	//must be last to avoid adding emails to sent list unless actually sent
-	//remove any emails that have already been emailed before
+	// must be last to avoid adding emails to sent list unless actually sent
+	// remove any emails that have already been emailed before
 	emails.converter(" ", "");
 	emails.converter(";", VM);
 	nn = emails.fcount(VM);
@@ -228,13 +228,13 @@ nextuser:
 	}  //ii;
 	emails.converter(VM, ";");
 
-	//skip users that have already been emailed before
+	// skip users that have already been emailed before
 	if (emails eq "") {
 		goto nextuser;
 	}
 
-	//userinit:
-	/////////
+	// userinit:
+	// ///////
 	print(usercode, " ");
 
 	if (currdept and userx.f(5) ne currdept) {
@@ -245,33 +245,33 @@ nextuser:
 	if (toemails eq "") {
 		toemails = emails;
 
-		//sending to users (or groups and users)
+		// sending to users (or groups and users)
 	} else if (userids) {
 		toemails ^= ";" ^ emails;
 
-		//sending to groups then to the first and cc the rest
+		// sending to groups then to the first and cc the rest
 	} else {
 		ccemails ^= ";" ^ emails;
 	}
 
 	emaillog ^= VM ^ usercode ^ " " ^ emails;
 
-	//userexit:
-	/////////
+	// userexit:
+	// ///////
 	goto nextuser;
 
 exit:
-	/////
+	// ///
 	gosub sendemails(emaillog);
 
 	while (true) {
-		///BREAK;
+		// /BREAK;
 		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
 			break;
 		emaillog.popper();
 	}  //loop;
 
-	//always email to self
+	// always email to self
 	if (nsent and replyto) {
 		toemails = replyto;
 		body ^= VM ^ VM ^ "-- Sent to --" ^ emaillog;
@@ -279,14 +279,14 @@ exit:
 		gosub sendemails(emaillog);
 	}
 
-	//no longer suppress sendmail errors
-	//since this hides problems with email server/configuration
-	//if nsent else
+	// no longer suppress sendmail errors
+	// since this hides problems with email server/configuration
+	// if nsent else
 	// emaillog=''
 	// end
 
 	while (true) {
-		///BREAK;
+		// /BREAK;
 		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
 			break;
 		emaillog.popper();

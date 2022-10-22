@@ -12,12 +12,12 @@ var rec;\
 function main() {\
 	#include <system_common.h>\
 \
-	//COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE\
-	//IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999\
-	//!IF @RECCOUNT LT LAST.RECCOUNT THEN\
-	//!  FN=''\
-	//!  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')\
-	//\
+	// COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE\
+	// IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999\
+	// !IF @RECCOUNT LT LAST.RECCOUNT THEN\
+	// !  FN=''\
+	// !  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')\
+	// \
 \
 	var fn = "QFILE";\
 	var comparefile;\
@@ -26,7 +26,7 @@ function main() {\
 		stop();\
 	}\
 \
-	//END\
+	// END\
 	var lastreccount = RECCOUNT;\
 	if (rec.reado(comparefile, ID)) {\
 		if (RECORD eq rec) {\

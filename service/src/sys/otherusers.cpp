@@ -13,7 +13,7 @@ var zz;
 
 function main(in databasecode0 = "", in usercode0 = "") {
 
-	//returns the number of other users of EXODUS
+	// returns the number of other users of EXODUS
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		databasecode = SENTENCE.field(" ", 2);
@@ -32,19 +32,19 @@ function main(in databasecode0 = "", in usercode0 = "") {
 
 	var processes = "";
 
-	//curruserlockid.sys134=sysvar('GET',109,134)
+	// curruserlockid.sys134=sysvar('GET',109,134)
 	var curruserlockid = THREADNO;
 
 	var returndata	   = 0;
 	var otherusercodes = "";
 
-	//IF @STATION # '' THEN
+	// IF @STATION # '' THEN
 
-	//we are at rev 2.0
-	//IF revRELEASE()>= 2.1 THEN
+	// we are at rev 2.0
+	// IF revRELEASE()>= 2.1 THEN
 	// lockmode=36
 	// unlockmode=37
-	//END ELSE
+	// END ELSE
 	var lockmode   = 23;
 	var unlockmode = 24;
 	// END
@@ -55,33 +55,33 @@ function main(in databasecode0 = "", in usercode0 = "") {
 		lockprefix = "U" ^ var("99999").last(4);
 	}
 
-	//FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
+	// FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
 
 	for (const var lockno : range(1, 100)) {
 
 		var lockid = lockprefix ^ lockno;
 
-		//skip current user
+		// skip current user
 		if (lockid eq curruserlockid) {
 			goto nextlock;
 		}
 
-		//skip 10,20,100 etc because they appear to be equivalent to
+		// skip 10,20,100 etc because they appear to be equivalent to
 		// their equivalents without trailing zeroes
 		if ((lockno.ends("0")) and lockprefix) {
 			goto nextlock;
 		}
 
 		lockid = lockprefix ^ lockno;
-		//IF lockid # SYS134 THEN
+		// IF lockid # SYS134 THEN
 
-		//attempt to lock
+		// attempt to lock
 		result = "";
 		xx	   = "";
 		yy	   = "";
 		call rtp57(lockmode, "", xx, lockid, "", yy, result);
 
-		//if successful, then unlock
+		// if successful, then unlock
 		if (result) {
 			xx = "";
 			yy = "";
@@ -89,9 +89,9 @@ function main(in databasecode0 = "", in usercode0 = "") {
 			goto nextlock;
 		}
 
-		//check process records
+		// check process records
 
-		//skip processes in wrong database or wrong usercode
+		// skip processes in wrong database or wrong usercode
 		if (databasecode or usercode) {
 
 			if (processes eq "") {
@@ -103,11 +103,11 @@ function main(in databasecode0 = "", in usercode0 = "") {
 				var processno = lockno - (lockno / 10).floor();
 				var process;
 				if (not(process.read(processes, processno))) {
-					//if no process record then assume no process
-					//and failed lock because another OTHERUSERS is testing the same lock
-					//could really skip further checking since should not be
-					//any higher processes but lock fail on missing process is infrequent
-					//but does happen when with many eg 10+ processes on diff dbs
+					// if no process record then assume no process
+					// and failed lock because another OTHERUSERS is testing the same lock
+					// could really skip further checking since should not be
+					// any higher processes but lock fail on missing process is infrequent
+					// but does happen when with many eg 10+ processes on diff dbs
 					goto nextlock;
 				}
 
@@ -120,7 +120,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 				}
 			}
 
-			//end of database or user code provided
+			// end of database or user code provided
 		}
 
 		otherusercodes(1, -1) = lockid;
@@ -142,7 +142,7 @@ nextlock:;
 
 	for (const var ii : range(1, 9999)) {
 		usercode = returndata.f(2, ii);
-		///BREAK;
+		// /BREAK;
 		if (not usercode)
 			break;
 		usercode.cutter(5);

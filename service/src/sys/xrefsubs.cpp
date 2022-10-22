@@ -25,11 +25,11 @@ var xx;
 
 function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist) {
 
-	//also needs
-	//datafile,src.file
+	// also needs
+	// datafile,src.file
 
-	//and (except build)
-	//@id,@record,orec
+	// and (except build)
+	// @id,@record,orec
 
 	if (masterfile.unassigned()) {
 		if (not(masterfile.open(masterfilename, ""))) {
@@ -40,8 +40,8 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 
 	if (mode eq "BUILD") {
 
-		//zzz build updates masterfile without locking
-		//so should be run exclusively
+		// zzz build updates masterfile without locking
+		// so should be run exclusively
 
 		clearselect();
 		perform("SELECT " ^ win.datafile ^ " (S)");

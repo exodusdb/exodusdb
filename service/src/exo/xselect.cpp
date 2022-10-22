@@ -2,8 +2,8 @@
 libraryinit()
 
 function main(in cmd) {
-	//if @username='EXODUS' then oswrite cmd on 'XSELECT.'
-	//oswrite cmd on 'XSELECT.'
+	// if @username='EXODUS' then oswrite cmd on 'XSELECT.'
+	// oswrite cmd on 'XSELECT.'
 	var supersilent = index(cmd, "(SS");
 	if (SYSTEM.f(33) and not supersilent) {
 		printl();

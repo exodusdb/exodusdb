@@ -4,13 +4,13 @@ programinit()
 	var tempfilename;
 var rec;
 var tempfile;
-var starttime;	//num
-var endtime;	//num
-var testtime;	//num
+var starttime;	// num
+var endtime;	// num
+var testtime;	// num
 
 function main() {
 
-	//declare function esc.to.exit
+	// declare function esc.to.exit
 	var deletefilex = 1;
 
 	var usetransaction = true;
@@ -21,14 +21,14 @@ function main() {
 		tempfilename = "BENCHMARK.FILESPEED";
 	}
 
-	//locate tempfilename in @files using @fm setting x then
+	// locate tempfilename in @files using @fm setting x then
 	if (deletefilex) {
 		deletefile(tempfilename ^ " (S)");
 	}
 	clearselect();
 	// end
 
-	//syntax is FILESPEED nreps(1000) recsize(1000) ntests(10)
+	// syntax is FILESPEED nreps(1000) recsize(1000) ntests(10)
 	var nreps = SENTENCE.field(" ", 2);
 	if (not nreps) {
 		nreps = 1000;
@@ -57,7 +57,7 @@ function main() {
 
 /////////
 nexttest:
-	/////////
+	// ///////
 	if (testn >= ntests) {
 		goto exit;
 	}
@@ -70,9 +70,9 @@ nexttest:
 		stop();
 	}
 
-	//PERFORM 'MAKEFILE ':TEMPFILENAME:' ':recsize:' ':N:' (S)'
+	// PERFORM 'MAKEFILE ':TEMPFILENAME:' ':recsize:' ':N:' (S)'
 	createfile(tempfilename ^ " (S)");
-	//perform 'SELECT ':tempfilename
+	// perform 'SELECT ':tempfilename
 
 	if (esctoexit()) {
 		goto exit;
@@ -88,23 +88,23 @@ nexttest:
 	if (usetransaction)
 		begintrans();
 
-	//print
-	//print 'Writing 1Kb records'
+	// print
+	// print 'Writing 1Kb records'
 	for (const var ii : range(1, nreps)) {
-		//		if (esctoexit()) {
-		//			goto exit;
-		//		}
-		//		print(AT(0), "W", ii);
+		// 		if (esctoexit()) {
+		// 			goto exit;
+		// 		}
+		// 		print(AT(0), "W", ii);
 		rec.write(tempfile, ii);
 	}  //ii;
 
-	//print
-	//print 'Deleting 1Kb records'
+	// print
+	// print 'Deleting 1Kb records'
 	for (const var ii : range(1, nreps)) {
-		//		if (esctoexit()) {
-		//			goto exit;
-		//		}
-		//		print(AT(0), "D", ii);
+		// 		if (esctoexit()) {
+		// 			goto exit;
+		// 		}
+		// 		print(AT(0), "D", ii);
 		tempfile.deleterecord(ii);
 	}  //ii;
 
@@ -123,13 +123,13 @@ nexttest:
 	}
 	avgtime = (tottime / testn).oconv("MD20P");
 
-	//print ' ':testn:'. ',testtime 'MD20P',mintime,avgtime,maxtime
+	// print ' ':testn:'. ',testtime 'MD20P',mintime,avgtime,maxtime
 	minspeed = (1 / maxtime).oconv("MD20P");
 	avgspeed = (1 / avgtime).oconv("MD20P");
 	maxspeed = (1 / mintime).oconv("MD20P");
 	printl(" ", testn, ". ", "\t", testtime.oconv("MD20P"), "\t", minspeed, "\t", avgspeed, "\t", maxspeed);
 
-	//call note(endtime-starttime:' Seconds')
+	// call note(endtime-starttime:' Seconds')
 	if (deletefilex) {
 		deletefile(tempfilename ^ " (S)");
 	}
@@ -138,18 +138,18 @@ nexttest:
 
 /////
 exit:
-	/////
+	// ///
 	if (deletefilex) {
 		deletefile(tempfilename ^ " (S)");
 	}
 
-	//msg=''
-	//msg<-1>='FILESPEED: Write then Delete'
-	//msg<-1>='Recs: ':n:' '
-	//msg<-1>='Size: ':recsize:' bytes'
-	//msg<-1>='Tests: ':testn:' '
-	//msg<-1>='|RESULTS:'
-	//msg<-1>='Min/Avg/Max:':mintime:'/':avgtime:'/':maxtime:' secs'
+	// msg=''
+	// msg<-1>='FILESPEED: Write then Delete'
+	// msg<-1>='Recs: ':n:' '
+	// msg<-1>='Size: ':recsize:' bytes'
+	// msg<-1>='Tests: ':testn:' '
+	// msg<-1>='|RESULTS:'
+	// msg<-1>='Min/Avg/Max:':mintime:'/':avgtime:'/':maxtime:' secs'
 
 	var msg = "";
 	msg(-1) = "FILESPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed;

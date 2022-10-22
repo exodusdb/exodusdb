@@ -10,16 +10,16 @@ var timex;
 
 function main(io processid, in processcategory0, in /*sparevar*/ = "", in processparameters0 = "", in processresult0 = "", in processcomments0 = "") {
 
-	//obsolete since moved to processes from definitions
+	// obsolete since moved to processes from definitions
 
-	//"heartbeat" called from messaging
+	// "heartbeat" called from messaging
 
 	if (processid.unassigned()) {
 		processid = "";
 	}
-	//	if (sparevar.unassigned()) {
-	//		sparevar = "";
-	//	}
+	// 	if (sparevar.unassigned()) {
+	// 		sparevar = "";
+	// 	}
 	if (processcategory0.unassigned()) {
 		processcategory = "";
 	} else {
@@ -44,7 +44,7 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 		processcomments = processcomments0;
 	}
 
-	//if definitions else
+	// if definitions else
 	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
 		return 0;
 	}
@@ -75,7 +75,7 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 
 	} else {
 
-		//generate a new processid and record
+		// generate a new processid and record
 		if (processid == "") {
 			gosub newprocessid(processid);
 
@@ -105,12 +105,12 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 
 		processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
 	}
-	//L468:
+	// L468:
 	return 0;
 }
 
 subroutine newprocessid(io processid) {
-	//newprocessid(io processid)
+	// newprocessid(io processid)
 	timex = ostime();
 
 	while (true) {
@@ -119,7 +119,7 @@ subroutine newprocessid(io processid) {
 		if (not(xx.read(DEFINITIONS, "PROCESS*" ^ processid))) {
 			xx = "";
 		}
-		///BREAK;
+		// /BREAK;
 		if (not xx)
 			break;
 	}  //loop;

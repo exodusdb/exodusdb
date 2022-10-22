@@ -3,13 +3,13 @@ libraryinit()
 
 function main(in list1, in infix, in list2) {
 
-	//joins multivalue lists in parallel with a separator
+	// joins multivalue lists in parallel with a separator
 
-	//list1 = a vm b
-	//infix = :
-	//list2 = c vm d vm e
-	//output =
-	//a : c vm b : d vm : e
+	// list1 = a vm b
+	// infix = :
+	// list2 = c vm d vm e
+	// output =
+	// a : c vm b : d vm : e
 
 	var nl1	   = list1.fcount(VM);
 	var nl2	   = list2.fcount(VM);

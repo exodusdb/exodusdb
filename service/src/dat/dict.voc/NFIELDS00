@@ -5,10 +5,10 @@ S
 
 
 
-	//remove comment blocks\
+	// remove comment blocks\
 	while (true) {\
 		var pos1 = RECORD.index("/*");\
-		///BREAK;\
+		// /BREAK;\
 		if (not pos1) break;\
 		var pos2 = RECORD.index("*/");\
 		if (not pos2) {\
@@ -16,21 +16,21 @@ S
 		}\
 		RECORD.paster(pos1, pos2 - pos1 + 2, "");\
 	}//loop;\
-	//call msg('x')\
-	//remove comment lines\
+	// call msg('x')\
+	// remove comment lines\
 	let nfields = RECORD.fcount(FM);\
 \
-	//dim x(nfields)\
-	//matparse @record into x\
+	// dim x(nfields)\
+	// matparse @record into x\
 	for (const var ii : range(1, nfields)) {\
-	//if trim(x(i))[1,1]='*' then x(i)=''\
+	// if trim(x(i))[1,1]='*' then x(i)=''\
 		if (RECORD.f(ii).trim().starts("*")) {\
 			RECORD(ii) = "";\
 		}\
 	} //ii;\
-	//@record=matunparse(x)\
+	// @record=matunparse(x)\
 	//             call msg('y')\
-	//remove blank lines\
+	// remove blank lines\
 	RECORD.converter(_FM " ", " " _FM);\
 \
 	var nfields2 = RECORD.trim().fcount(" ");\

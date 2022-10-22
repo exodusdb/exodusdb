@@ -13,21 +13,21 @@ var errors;
 
 function main(in module, in mode, in stationery) {
 
-	//checks there is some output and converts htm to pdf if necessary
+	// checks there is some output and converts htm to pdf if necessary
 
-	//given stationery
-	//
+	// given stationery
+	// 
 	//   1 Preprinted letterhead
 	//   2 Blank paper/PDF/Email
 	//   P PDF - Portrait
 	//   L PDF - Landscape
 
-	//perform
-	//
-	//0. convert the file if necessary
-	//1. filename(s) in system<2> may be converted from .htm to .pdf
-	//2. put converted filename(s) into DATA - to web ui with ../../data/
-	//3. error response set if file(s) do not exist or < 5 bytes
+	// perform
+	// 
+	// 0. convert the file if necessary
+	// 1. filename(s) in system<2> may be converted from .htm to .pdf
+	// 2. put converted filename(s) into DATA - to web ui with ../../data/
+	// 3. error response set if file(s) do not exist or < 5 bytes
 
 	var outfiles = SYSTEM.f(2);
 	outfiles.converter(";", VM);
@@ -39,11 +39,11 @@ function main(in module, in mode, in stationery) {
 
 		gosub check_exists_and_maybe_convert(module, mode, stationery, outfile);
 
-		//save back into list in case htm file converted to pdf and changed name
+		// save back into list in case htm file converted to pdf and changed name
 		outfiles(1, filen) = outfile;
 
-		//save the web ui "data" in ../../data/ format
-		//TODO web gui to be smarter in accepting files like */data/xxxx/yyyy.htm
+		// save the web ui "data" in ../../data/ format
+		// TODO web gui to be smarter in accepting files like */data/xxxx/yyyy.htm
 		var t2 = OSSLASH;
 		var tt = outfile.index(t2 ^ "data" ^ t2);
 		if (tt) {
@@ -55,10 +55,10 @@ function main(in module, in mode, in stationery) {
 	}  //filen;
 
 	data_.converter(VM, ";");
-	//convert vm to ';' in outfiles
+	// convert vm to ';' in outfiles
 	SYSTEM(2) = outfiles;
 
-	//if returning many files then always return ok, with any messages as warnings
+	// if returning many files then always return ok, with any messages as warnings
 	if (nfiles gt 1) {
 		response_ = "OK";
 		if (msg_) {
@@ -76,7 +76,7 @@ subroutine check_exists_and_maybe_convert(in module, in mode, in stationery, io 
 	if (diroutfile.f(1) gt 5) {
 fileok:
 
-		//convert to pdf
+		// convert to pdf
 		if (stationery gt 2) {
 			call convpdf(outfile, stationery, errors);
 			if (errors) {
@@ -92,7 +92,7 @@ fileok:
 
 	} else {
 
-		//check for long filenames too (DOS limit was 8.3)
+		// check for long filenames too (DOS limit was 8.3)
 		if (not(diroutfile)) {
 			if (oslistf(outfile)) {
 				goto fileok;
@@ -105,7 +105,7 @@ fileok:
 			call sysmsg(response_);
 		}
 
-		//force error
+		// force error
 		if (response_.first(6) ne "Error:") {
 			response_.prefixer("Error:");
 		}

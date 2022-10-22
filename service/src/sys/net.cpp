@@ -17,8 +17,8 @@ var ver;
 
 function main() {
 
-	//if @username='EXODUS' then break on
-	//BREAK ON;
+	// if @username='EXODUS' then break on
+	// BREAK ON;
 
 	var cmd = "LISTEN " ^ SENTENCE.field(" ", 2, 9999);
 
@@ -38,7 +38,7 @@ listen:
 
 	var s33 = SYSTEM.f(33);
 
-	//forces OFF in listen on esc
+	// forces OFF in listen on esc
 	if (cmd.field(" ", 1) ne "LISTEN") {
 		SYSTEM(33) = 1;
 	}
@@ -55,15 +55,15 @@ listen:
 			msg_ = varerror.description.unassigned("No error message") ^ FM ^ backtrace();
 		}
 
-	//unlock all
+	// unlock all
 	var xx = unlockrecord();
 
 	SYSTEM(33) = "";
 
-	//trim off uninteresting back trace into listen
-	//leave for now in case of errors in listen while converting to exodus
-	//tt=index(@user4,fm:'listen.cpp',1)
-	//if tt then
+	// trim off uninteresting back trace into listen
+	// leave for now in case of errors in listen while converting to exodus
+	// tt=index(@user4,fm:'listen.cpp',1)
+	// if tt then
 	// @user4[tt,99999]=''
 	// end
 
@@ -79,30 +79,30 @@ listen:
 		printl(THREADNO ^ ":", msg_);
 
 		stop();
-		////
+		// //
 	}
 
 	if (msg_ eq "" or msg_ eq "TERMINATED OK") {
 		stop();
-		////
+		// //
 	}
 
-	//stop if cant backup because another process is backing up or hung processes
+	// stop if cant backup because another process is backing up or hung processes
 	if (msg_.contains("FILEMAN-SHUTDOWN")) {
 		perform("OFF");
 		logoff();
 	}
 
-	//check lists and indexing files are not corrupted and zero them if they are
-	//listen selects the locks file every 10 secs and may detect corruption
+	// check lists and indexing files are not corrupted and zero them if they are
+	// listen selects the locks file every 10 secs and may detect corruption
 	s33		   = SYSTEM.f(33);
 	SYSTEM(33) = 1;
-	//call checkfile"LISTS");
-	//call checkfile"!INDEXING");
-	//call checkfile"LOCKS");
+	// call checkfile"LISTS");
+	// call checkfile"!INDEXING");
+	// call checkfile"LOCKS");
 	SYSTEM(33) = s33;
 
-	//detect memory corruption?
+	// detect memory corruption?
 	var halt = 0;
 	if (msg_.contains("R18.6")) {
 		halt	 = 1;
@@ -116,7 +116,7 @@ listen:
 		halt = 1;
 	}
 
-	//convert error messages
+	// convert error messages
 	var normal = 0;
 	if (msg_.contains("INDEX.REDUCER")) {
 		normal = 1;
@@ -125,16 +125,16 @@ listen:
 
 	if (not normal) {
 
-		//determine subject
+		// determine subject
 		var subject		   = "";
 		var attachfilename = "";
 
-		//either BACKUP or BACKUP2 followed by space and drive letter
+		// either BACKUP or BACKUP2 followed by space and drive letter
 		if (PSEUDO.starts("BACKUP")) {
 
 			subject = "EXODUS Backup " ^ dbcode;
 
-			//add drive letter(s)
+			// add drive letter(s)
 			tt		= PSEUDO.field(" ", 2).first(2);
 			var tt2 = PSEUDO.field(" ", 3).first(2);
 			subject ^= " -> " ^ tt;
@@ -142,13 +142,13 @@ listen:
 				subject ^= "/" ^ tt2;
 			}
 
-			//note new or changed media
+			// note new or changed media
 			tt = msg_.contains("Media: ");
 			if (tt) {
 				subject ^= " " ^ (msg_.cut(tt + 6)).f(1);
 			}
 
-			//add success, WARNING or FAILURE
+			// add success, WARNING or FAILURE
 			tt	= "";
 			tt2 = msg_.ucase();
 			if (not(tt2.contains("SUCCESS")) or tt2.contains("FAIL")) {
@@ -159,22 +159,22 @@ listen:
 				}
 				attachfilename = SYSTEM.f(42);
 			}
-			//no need for specific success message. most succeed, can find FAIL or WARN
-			//if tt='' then tt='Success'
+			// no need for specific success message. most succeed, can find FAIL or WARN
+			// if tt='' then tt='Success'
 			subject ^= " " ^ tt;
 
-			//add exodus version for info
-			//call osread(versionnote,'general\version.dat')
-			//versiondate=iconv(field(trim(versionnote),' ',2,3),'D')
-			//subject:=' Ver: ':versiondate 'D4/J'
+			// add exodus version for info
+			// call osread(versionnote,'general\version.dat')
+			// versiondate=iconv(field(trim(versionnote),' ',2,3),'D')
+			// subject:=' Ver: ':versiondate 'D4/J'
 
-			//log it
+			// log it
 			var	 errormsg = msg_;
 			call log(cmd, errormsg ^ "");
 
 		} else {
 
-			//subject='EXODUS Technical Message :'
+			// subject='EXODUS Technical Message :'
 			subject = "";
 			if (VOLUMES) {
 				printl(msg_);
@@ -185,11 +185,11 @@ listen:
 
 		if (subject) {
 
-			//get backup parameters
+			// get backup parameters
 			call getbackpars(bakpars);
 
-			//send email of error
-			//readv address from definitions,'BACKUP',6 else address=''
+			// send email of error
+			// readv address from definitions,'BACKUP',6 else address=''
 			sys.address = bakpars.f(6);
 			if (bakpars.f(10)) {
 				if (sys.address) {
@@ -210,16 +210,16 @@ listen:
 				var body = "Server=" ^ SYSTEM.f(44).trim();
 				body(-1) = "Client=" ^ STATION.trim();
 				body(-1) = "User=" ^ USERNAME.trim();
-				//osread ver from 'general\version.dat' then
+				// osread ver from 'general\version.dat' then
 				var verfilename = "general/version.dat";
 				verfilename.converter("/", OSSLASH);
 				if (ver.osread(verfilename)) {
 					body(-1) = "EXODUS Ver:" ^ ver.f(1);
 				}
 
-				//too slow so ignore it
-				//servername=getdrivepath(drive()[1,2])[3,'\']
-				//if servername then body:=fm:'ServerName=':servername
+				// too slow so ignore it
+				// servername=getdrivepath(drive()[1,2])[3,'\']
+				// if servername then body:=fm:'ServerName=':servername
 
 				body ^= FM ^ FM ^ msg_;
 				body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|",
@@ -231,17 +231,17 @@ listen:
 							   "\r");
 				body.replacer("\r", "\r\n");
 
-				//sendmail - if it fails, there will be an entry in the log
+				// sendmail - if it fails, there will be an entry in the log
 				var address1 = sys.address.field("/", 1);
 				var errormsg = "";
 				if (address1) {
 					call sendmail(address1, "", subject, body, "", "", errormsg);
 				}
 
-				//optionally email backup.zip
+				// optionally email backup.zip
 				if ((errormsg eq "" or errormsg.starts("OK")) and attachfilename) {
 					var address2 = sys.address.field("/", 2);
-					//remove exodus from the backup.zip recipients
+					// remove exodus from the backup.zip recipients
 					if (address2.locateusing(";", "backups@neosys.com", xx)) {
 						address2.converter(";", VM);
 						address2.remover(1, xx);
@@ -254,19 +254,19 @@ listen:
 			}
 		}
 
-		//terminate after automatic backup in order to allow os filesystem backups
-		//BACKUP2 means dont copydb/upgrade/quit - just resume
+		// terminate after automatic backup in order to allow os filesystem backups
+		// BACKUP2 means dont copydb/upgrade/quit - just resume
 		if (PSEUDO.field(" ", 1) eq "BACKUP") {
 
-			//before termination do any copy to testdata etc
+			// before termination do any copy to testdata etc
 			if (SYSTEM.f(58).locate(dbcode, tt)) {
 				if (SYSTEM.f(62, tt)) {
 					perform("COPYDB " ^ dbcode);
 				}
 			}
 
-			//also before termination do any upgrade
-			//why call not perform?
+			// also before termination do any upgrade
+			// why call not perform?
 			call upgrade();
 
 			if (SYSTEM.f(125)) {
@@ -279,21 +279,21 @@ listen:
 	// Respond to web client e.g. program crash due to Variable not Assigned
 	var linkfilename3 = PRIORITYINT.f(100);
 	if (linkfilename3) {
-		//cannot remove these since they may be codepage letters now
+		// cannot remove these since they may be codepage letters now
 		msg_.replacer("|", "\r\n");
 		msg_.replacer(FM, "\r\n");
 		msg_.replacer(VM, "\r\n");
 		call oswrite("Error: " ^ msg_, linkfilename3);
-		//osclose linkfilename3
+		// osclose linkfilename3
 	}
 
-	//restore the original settings
-	//noninteractive avoids any further messages on OFF command
+	// restore the original settings
+	// noninteractive avoids any further messages on OFF command
 	SYSTEM(33) = s33;
 	if (SYSTEM.f(43)) {
 		USERNAME = (SYSTEM.f(43));
 	}
-	//if system<44> then call sysvar_109_110('SET',system<44>)
+	// if system<44> then call sysvar_109_110('SET',system<44>)
 	if (SYSTEM.f(44)) {
 		STATION = (SYSTEM.f(44));
 	}
@@ -304,7 +304,7 @@ listen:
 	}
 
 	if (cmd.field(" ", 1) eq "LISTEN") {
-		//if NET LISTEN LISTEN LISTEN - then terminate if too many errors
+		// if NET LISTEN LISTEN LISTEN - then terminate if too many errors
 		if (cmd.len() gt 100) {
 			printl(msg_);
 			perform("OFF");

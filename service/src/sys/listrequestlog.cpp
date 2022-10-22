@@ -43,13 +43,13 @@ function main() {
 		}
 	}
 
-	//UI restricted to HH:MM not HH:MM:SS
+	// UI restricted to HH:MM not HH:MM:SS
 	if (not uptotime) {
 		uptotime = fromtime;
 	}
 	if (fromtime) {
 
-		//allow 12:00:59.99 to match UPTO 12:00
+		// allow 12:00:59.99 to match UPTO 12:00
 		uptotime += 60;
 
 		cmd ^= " %AND% WITH TIME BETWEEN " ^ (fromtime.oconv("MT").quote()) ^ " AND " ^ (uptotime.oconv("MT").quote());
@@ -91,7 +91,7 @@ function main() {
 	}
 	cmd.replacer("%AND% ", "AND ");
 
-	//cmd:=' HEADING ':quote(title)
+	// cmd:=' HEADING ':quote(title)
 	title = cmd.oconv("T#60");
 	title.replacer(TM, " 'L' ");
 	title.replacer(DQ, "''");

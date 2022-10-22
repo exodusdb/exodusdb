@@ -2,7 +2,7 @@
 libraryinit()
 
 function main() {
-	//printl("deletefile says 'Hello World!'");
+	// printl("deletefile says 'Hello World!'");
 	deletefile(field(COMMAND, _FM, 2, 999));
 	return 0;
 }

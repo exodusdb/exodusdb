@@ -4,10 +4,10 @@ libraryinit()
 	var t2;
 
 function main(io tx) {
-	//c xxx io
-	//TODO consider merging with readcss() perhaps with mode
+	// c xxx io
+	// TODO consider merging with readcss() perhaps with mode
 
-	//in c++ get from raw text string below
+	// in c++ get from raw text string below
 	tx = getvogonpoetry();
 
 	tx.replacer(_FM, "\r\n");

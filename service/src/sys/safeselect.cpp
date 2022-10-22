@@ -12,8 +12,8 @@ function main(in selectx) {
 	RECORD.move(rr);
 	ID.move(id);
 	DICT.move(dict);
-	//if @username='EXODUS' then oswrite selectx on 'SAFESELE'
-	//CALL PERF(selectX)
+	// if @username='EXODUS' then oswrite selectx on 'SAFESELE'
+	// CALL PERF(selectX)
 	call xselect(selectx);
 
 	rr.move(RECORD);

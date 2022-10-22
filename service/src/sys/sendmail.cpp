@@ -96,10 +96,10 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		deletex = "";
 	}
 
-	//send files as links if too large (>10MB) for email to handle efficiently
+	// send files as links if too large (>10MB) for email to handle efficiently
 	maxemailsize = 10 * 1024 * 1024;
 
-	//sendmail is silent
+	// sendmail is silent
 	errormsg = "";
 
 	if (SENTENCE.field(" ", 1).ucase() eq "SENDMAIL" and toaddress0.unassigned()) {
@@ -114,9 +114,9 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 					  "test body line2",
 					  v5, v6, errormsg, v8, params);
 		savesentence.move(SENTENCE);
-		//if errormsg then call msg(toaddress:' ':@fm:errormsg)
-		//call msg(toaddress:' ':@fm:errormsg)
-		//if errormsg then call msg(toaddress:' ':@fm:errormsg)
+		// if errormsg then call msg(toaddress:' ':@fm:errormsg)
+		// call msg(toaddress:' ':@fm:errormsg)
+		// if errormsg then call msg(toaddress:' ':@fm:errormsg)
 		if (errormsg) {
 			errormsg = (toaddress ^ " " _FM ^ errormsg).oconv("T#60");
 			errormsg.converter(_TM, _FM);
@@ -141,22 +141,22 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		if (toaddress eq "TBQBB")
 			toaddress = "support@neosys.com";
 
-		//development systems ALWAYS email hardcoded in next line
-		//1. exodus.id always indicates a test system (dos or exodus)
-		//2. on exodus lack of live.txt file indicates a test system
+		// development systems ALWAYS email hardcoded in next line
+		// 1. exodus.id always indicates a test system (dos or exodus)
+		// 2. on exodus lack of live.txt file indicates a test system
 		if (var("exodus.id").osfile() or subject.contains("mvdbpostgres")) {
 			forcedemailx = "dev@neosys.com";
-			//toaddress=xlate('USERS','EXODUS',7,'X')
-			//if toaddress else toaddress='dev@neosys.com'
+			// toaddress=xlate('USERS','EXODUS',7,'X')
+			// if toaddress else toaddress='dev@neosys.com'
 			goto forcedemail;
 		}
 
-		//testdata and user exodus - always email sysmsg@neosys.com
-		//if system<61> or (@username='EXODUS' and system<17,1>[-4,4]='TEST') then
+		// testdata and user exodus - always email sysmsg@neosys.com
+		// if system<61> or (@username='EXODUS' and system<17,1>[-4,4]='TEST') then
 
-		//testdata and user exodus - always email sysmsg@neosys.com
+		// testdata and user exodus - always email sysmsg@neosys.com
 		home.osgetenv("HOME");
-		//if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.f(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
+		// if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.f(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
 		if (not osfile("live.txt") or (SYSTEM.f(61) and USERNAME.ucase() eq "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
@@ -169,21 +169,21 @@ forcedemail:
 			ccaddress = "";
 			subject ^= ")";
 
-			//each request can set a global forced email address
-			//for the duration of the request
+			// each request can set a global forced email address
+			// for the duration of the request
 		} else if (SYSTEM.f(117)) {
 			forcedemailx = SYSTEM.f(117);
 			goto forcedemail;
 		}
 	}
 
-	//limit development system to steve
+	// limit development system to steve
 	if (SYSTEM.contains("1EEC633B")) {
 		toaddress = "steve.bush@neosys.com";
 		ccaddress = "";
 	}
 
-	//cut off any cc addresses from the toaddress (after ;;)
+	// cut off any cc addresses from the toaddress (after ;;)
 	tt = toaddress.index(";;");
 	if (tt) {
 		if (ccaddress) {
@@ -193,10 +193,10 @@ forcedemail:
 		toaddress.firster(tt - 1);
 	}
 
-	//send mail requires confirmation if user is EXODUS
-	//CANNOT because backup in exodus.net would be interrupted
-	//declare function decide
-	//if @username='EXODUS' then
+	// send mail requires confirmation if user is EXODUS
+	// CANNOT because backup in exodus.net would be interrupted
+	// declare function decide
+	// if @username='EXODUS' then
 	// s33=system<33>
 	// q='You are EXODUS.|Send mail to ':toaddress:'|':subject:'|':body0
 	// convert "\r\n" to @fm in q
@@ -216,8 +216,8 @@ forcedemail:
 	filenamesx.converter("/", _OSSLASH);
 	for (const var filen : range(1, 2)) {
 		call osread(params2, filenamesx.f(1, filen));
-		//cut off after end of file character
-		//params2=field(params2,char(26),1)
+		// cut off after end of file character
+		// params2=field(params2,char(26),1)
 		params2.converter("\r\n", _FM _FM).trimmer(_FM);
 		for (const var ii : range(1, 9)) {
 			if (params2.f(ii)) {
@@ -226,7 +226,7 @@ forcedemail:
 		}  //ii;
 	}	   //filen;
 
-	//default exodus smtp parameters
+	// default exodus smtp parameters
 	if (not(params1.f(1))) {
 		var sysname = SYSTEM.f(57);
 		if (not sysname) {
@@ -262,7 +262,7 @@ forcedemail:
 		osfilename = body.cut(1);
 		osfilesize = osfilename.osfile().f(1);
 
-		//convert to link if file is too big to email
+		// convert to link if file is too big to email
 		if (osfilesize gt maxemailsize) {
 			body = "";
 			gosub addlinks2osfilename();
@@ -273,8 +273,8 @@ forcedemail:
 
 	msgsize += body.len();
 
-	//convert to links if attachfile is too big to email
-	//assumes attachfilename is in data dir accessible by web
+	// convert to links if attachfile is too big to email
+	// assumes attachfilename is in data dir accessible by web
 	if (attachfilename) {
 		attachfilename.osclose();
 
@@ -286,7 +286,7 @@ forcedemail:
 		}
 	}
 
-	//for CDO attachfilename must be full path
+	// for CDO attachfilename must be full path
 	if (attachfilename) {
 
 		attachfilename.replacer("\\\\", "\\");
@@ -302,15 +302,15 @@ forcedemail:
 		attachfilename.replacer("\\", "\\\\");
 	}
 
-	////////////
+	// //////////
 	// IMPORTANT use \r\n to be compatible with EMAIL TEXT FORMAT
-	////////////
+	// //////////
 	body.replacer(_FM, "\r\n");
 
 	if (body and not body.starts("@")) {
 		bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
-		//solve stupid outlook joining lines together if > 40 chars
-		//by adding tab on the end of every line
+		// solve stupid outlook joining lines together if > 40 chars
+		// by adding tab on the end of every line
 		body.replacer("\r", "\t\r");
 		call oswrite(body, bodyfilename);
 		bodyfilename.osclose();
@@ -320,10 +320,10 @@ forcedemail:
 		bodyfilename = "";
 	}
 
-	//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
-	//if delete then params:=' /d ':delete
+	// params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
+	// if delete then params:=' /d ':delete
 
-	//condition subject start standard with 'EXODUS: '
+	// condition subject start standard with 'EXODUS: '
 	if (subject.first(8) ne "EXODUS: ") {
 		if (subject.starts("EXODUS")) {
 			subject.cutter(6).trimmerfirst();
@@ -356,29 +356,29 @@ forcedemail:
 		paramfilename = "";
 		errorfilename = "";
 
-		//subject
+		// subject
 		cmd ^= _VM "-s " ^ (subject.quote());
 
-		//from
+		// from
 		var fromaddress = params1.f(1);
 		cmd ^= _VM "-r " ^ (fromaddress.quote());
 
-		//optional cc address
+		// optional cc address
 		if (ccaddress) {
-			//cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote());
+			// cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote());
 			cmd ^= _VM "-aCC: " ^ (ccaddress.convert(";", ",").quote());
 		}
 
-		//optional attach file
+		// optional attach file
 		if (attachfilename) {
 			cmd ^= _VM "-A " ^ (attachfilename.quote());
 		}
 
-		//mark html formatted messages as such
+		// mark html formatted messages as such
 		if (body.starts("@")) {
 			tt = "";
 			if (bodyfile.osopen(body.cut(1))) {
-				//osbread tt from bodyfile at 0 length 100
+				// osbread tt from bodyfile at 0 length 100
 				var	 offset = 0;
 				call osbread(tt, bodyfile, offset, 100);
 			}
@@ -391,28 +391,28 @@ forcedemail:
 			cmd ^= _VM "-a \"MIME-Version: 1.0\"";
 		}
 
-		//if there is a specific reply email address then give it
+		// if there is a specific reply email address then give it
 		if (replyto) {
 			cmd ^= _VM "-a \"Reply-To: " ^ replyto ^ DQ;
 
-			//otherwise request suppression of replies, particularly automatic ones
+			// otherwise request suppression of replies, particularly automatic ones
 		} else {
 			cmd ^= _VM "-a \"X-Auto-Response-Suppress: RN, NRN, OOF\"";
-			//maybe Precedence: list would have better results
+			// maybe Precedence: list would have better results
 			cmd ^= _VM "-a \"Precedence: bulk\"";
 		}
 
-		//to address(es) go last
+		// to address(es) go last
 		cmd ^= _VM " " ^ toaddress.convert(";", " ");
 
-		//ensure the email body is in a file
+		// ensure the email body is in a file
 		if (bodyfilename eq "") {
 
-			//body may already be in a file
+			// body may already be in a file
 			if (body.starts("@")) {
 				bodyfilename = body.cut(1);
 
-				//otherwise generate a random filename and write it
+				// otherwise generate a random filename and write it
 			} else {
 				bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
 				var(body).oswrite(bodyfilename);
@@ -420,8 +420,8 @@ forcedemail:
 			}
 		}
 
-		//use sendmail instead of mail if attachment
-		//because strangely ubuntu mail doesnt support the -A option
+		// use sendmail instead of mail if attachment
+		// because strangely ubuntu mail doesnt support the -A option
 		if (attachfilename) {
 			var headers = "";
 			let nn		= cmd.fcount(_VM);
@@ -447,7 +447,7 @@ forcedemail:
 				} else if (opt eq "-a") {
 					headers ^= _VM ^ arg;
 
-					//case opt='-A'
+					// case opt='-A'
 				}
 			}  //ii;
 
@@ -456,7 +456,7 @@ forcedemail:
 			headers.converter("'", "");
 			headers.replacer(_VM, "\r\n");
 
-			//cmd = "neomail " ^ (toaddress.quote()) ^ " " ^ (attachfilename.quote()) ^ " " "'" ^ headers ^ "'";
+			// cmd = "neomail " ^ (toaddress.quote()) ^ " " ^ (attachfilename.quote()) ^ " " "'" ^ headers ^ "'";
 
 			// -t  Extract recipients from message headers. These are added to any recipients specified on the command line.
 			cmd = "sendmail -t " ^ toaddress;
@@ -465,7 +465,7 @@ forcedemail:
 
 			// Use linux 'file' utility to determine mimetype
 			var mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n", "");
-			//TRACE(mimetype)
+			// TRACE(mimetype)
 
 			var attachfilename_only = attachfilename.field2(_OSSLASH, -1);
 			var mimetext =
@@ -492,13 +492,13 @@ forcedemail:
 				attachfilename_only.quote() ^ "\r\n\r\n";
 			headers ^= mimetext;
 
-			//TRACE(headers)
+			// TRACE(headers)
 
 			// Output the headers
 			var tempfilename = var().ostempfilename();
 			oswrite(headers, tempfilename);
 
-			//TRACE(headers);
+			// TRACE(headers);
 			// Append the attached file as base64
 			osshell("openssl base64 -in " ^ attachfilename.quote() ^ " >> " ^ tempfilename ^ " && printf \"\r\n" ^ delimiter ^ "\r\n\" >> " ^ tempfilename);
 			/*
@@ -521,29 +521,29 @@ TRACE(offset)
 			}
 */
 			// Reconstruct the complete input for sendmail
-			//tempfilename.osrename(bodyfilename);
+			// tempfilename.osrename(bodyfilename);
 			tempfilename.oscopy(bodyfilename);
 			tempfilename.osremove();
 		}
 
-		//TRACE(cmd)
+		// TRACE(cmd)
 		cmd.converter(_VM, " ");
 
-		//and pipe the body file into the program as standard input
+		// and pipe the body file into the program as standard input
 		tt = "\\";
 		bodyfilename.converter(tt, _OSSLASH);
 		bodyfilename.replacer("$", "\\$");
 		cmd ^= " < " ^ (bodyfilename.quote());
 	}
 
-	//printl();
-	//TRACE(cmd)
+	// printl();
+	// TRACE(cmd)
 	errormsg = shell2(cmd, errors);
 	if (errormsg)
 		TRACE(errormsg)
 	if (errors)
 		TRACE(errors)
-	//pcperform 'CMD /c ':cmd
+	// pcperform 'CMD /c ':cmd
 
 	if (bodyfilename) {
 		bodyfilename.osremove();
@@ -565,14 +565,14 @@ TRACE(offset)
 		if (not(errormsg.osread(errorfilename))) {
 			errormsg	 = "Unknown error in sendmail.js Failed to complete";
 			errormsg(-1) = cmd;
-			//errormsg<-1>=params 'T#60'
+			// errormsg<-1>=params 'T#60'
 			errormsg(-1) = params;
 		}
 	} else {
 		if (errormsg eq "") {
 			if (errors) {
 				errormsg = errors;
-				//call sysmsg(errors);
+				// call sysmsg(errors);
 				errputl(errors);
 			} else {
 				errormsg = "OK";
@@ -593,16 +593,16 @@ TRACE(offset)
 	details(-1) = "Size:     " ^ oconv(msgsize, "[XBYTES]");
 
 	errormsg(1) = errormsg.f(1).trim();
-	//in what situation can it return OK+message ??
+	// in what situation can it return OK+message ??
 	if (errormsg.f(1) eq "OK") {
 		errormsg.remover(1);
 		call log("SENDMAIL", details);
 	} else {
 		errormsg.trimmerlast(_FM);
-		//errormsg<-1>=@fm:'Size:     ':msgsize '[XBYTES]'
-		//errormsg<-1>='From:     ':params1<1>
-		//errormsg<-1>='To:       ':toaddress
-		//if ccaddress then
+		// errormsg<-1>=@fm:'Size:     ':msgsize '[XBYTES]'
+		// errormsg<-1>='From:     ':params1<1>
+		// errormsg<-1>='To:       ':toaddress
+		// if ccaddress then
 		// errormsg<-1>='cc:       ':ccaddress
 		// end
 		errormsg(-1) = _FM ^ details;
@@ -625,16 +625,16 @@ TRACE(offset)
 
 subroutine addlinks2osfilename() {
 	tt = osfilename;
-	//tt.converter("\\", "/");
-	//if (tt.starts("../")) {
+	// tt.converter("\\", "/");
+	// if (tt.starts("../")) {
 	//  tt.cutter(3);
-	//}
+	// }
 
-	//attachment path must start with '/data/'
-	//Apache will replace the alias /data/ to absolute path from /
-	//eg /root/hosts/test/work/../data/test/xxxxxx.xls
+	// attachment path must start with '/data/'
+	// Apache will replace the alias /data/ to absolute path from /
+	// eg /root/hosts/test/work/../data/test/xxxxxx.xls
 	if (tt.contains("../")) {
-		//becomes: /data/test/xxxxxx.xls
+		// becomes: /data/test/xxxxxx.xls
 		tt.cutter(tt.index("../") + 2);
 	}
 	if (body) {

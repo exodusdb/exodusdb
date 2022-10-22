@@ -19,8 +19,8 @@ function main(io v1, io v2, io v3, io v4, io v5, io v6) {
 	v5.move(DICT);
 	v6.move(MV);
 	MV = v6.field(RM, 1);
-	//INSERT=v6.field(RM,2);
-	//print(v6.field(RM,3));
+	// INSERT=v6.field(RM,2);
+	// print(v6.field(RM,3));
 	v6 = "";
 	return 0;
 }

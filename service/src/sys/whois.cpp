@@ -28,22 +28,22 @@ function main(in /*mode*/, in ipno, out text) {
 		stop();
 	}
 
-	//skip standard LAN or EXODUS ip no and exit - no delay for these ips
-	//medialine lan is 100.100.100.* iana "carrier grade NAT"
-	//test in order of frequency installed at clients
+	// skip standard LAN or EXODUS ip no and exit - no delay for these ips
+	// medialine lan is 100.100.100.* iana "carrier grade NAT"
+	// test in order of frequency installed at clients
 
 	ip12 = ipno.field(".", 1, 2);
 	if (ip12 eq "192.168") {
 		goto returnzero;
 	}
 
-	//skip 10.*.*.*
+	// skip 10.*.*.*
 	ip1 = ipno.field(".", 1);
 	if (ip1 eq "10") {
 		goto returnzero;
 	}
 
-	//skip 172.16-32.*.* and 100.64-127.*.*
+	// skip 172.16-32.*.* and 100.64-127.*.*
 	ip2 = ipno.field(".", 2);
 	if ((ip1 eq 172 and ip2 ge 16) and ip2 le 31) {
 		goto returnzero;
@@ -52,14 +52,14 @@ function main(in /*mode*/, in ipno, out text) {
 		goto returnzero;
 	}
 
-	//skip 127.*.*.*
+	// skip 127.*.*.*
 	if (ip1 eq "127") {
 		goto returnzero;
 	}
 
-	//skip EXODUS internet ip numbers and those in system configuration file
-	//ZZZ should really detect net ranges like /24 and .*
-	//allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
+	// skip EXODUS internet ip numbers and those in system configuration file
+	// ZZZ should really detect net ranges like /24 and .*
+	// allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
 	call readhostsallow(allowedips);
 	allowedips(-1) = SYSTEM.f(39);
 	allowedips.converter(_FM _VM
@@ -80,18 +80,18 @@ returnzero:
 	} else {
 		cmd = SYSTEM.f(50);
 
-		//check cygwin whois present otherwise quit
+		// check cygwin whois present otherwise quit
 		exe = oscwd().contains(":") ? ".exe" : "";
 
-		//build the command
+		// build the command
 		cmd ^= "whois " ^ ipno;
 
-		//dont wait for a long time - in case internet access is blocked
+		// dont wait for a long time - in case internet access is blocked
 		if ((cmd ^ "timeout.exe").osfile()) {
 			cmd.prefixer(SYSTEM.f(50) ^ "timeout 5 ");
 		}
 
-		//capture the output of the whois command
+		// capture the output of the whois command
 		text = shell2(cmd, errors);
 
 		if (errors) {

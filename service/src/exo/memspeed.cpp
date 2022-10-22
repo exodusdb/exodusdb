@@ -5,13 +5,13 @@ programinit()
 var ss2;
 var xx;
 var yy;
-var secs;	//num
-var time1;	//num
-var time2;	//num
+var secs;	// num
+var time1;	// num
+var time2;	// num
 var nn = 1000;
 
 function main() {
-	//call savescreenss1, ss2);
+	// call savescreenss1, ss2);
 	printl(chr(12));
 	var ntries	 = 0;
 	var tot		 = 0;
@@ -21,14 +21,14 @@ function main() {
 	var avgspeed = "";
 	while (true) {
 		xx.inputn(-1);
-		///BREAK;
+		// /BREAK;
 		if (not(xx eq "" and ntots lt 10))
 			break;
 		yy = var("x").str(65530);
 		gosub getspeed();
 		ntries += 1;
-		//if ntries>2 and secs then
-		//		print(ntries, AT(-40));
+		// if ntries>2 and secs then
+		// 		print(ntries, AT(-40));
 		if (secs and xx) {
 
 			print(ntries, " ");
@@ -56,7 +56,7 @@ function main() {
 
 	call mssg(msg.oconv("L#60"));
 
-	//call restorescreenss1, ss2);
+	// call restorescreenss1, ss2);
 	stop();
 
 	return "";
@@ -64,14 +64,14 @@ function main() {
 
 subroutine getspeed() {
 	time1 = ostime();
-	//for (const var ii : range(1, nn)) {
+	// for (const var ii : range(1, nn)) {
 	for (int ii = 1; ii <= nn; ++ii) {
 		xx = yy;
 	}  //ii;
 	time2 = ostime();
 	secs  = time2 - time1;
 
-	//increase number of loops
+	// increase number of loops
 	if (secs lt 1) {
 		nn	 = nn * 2;
 		secs = "";

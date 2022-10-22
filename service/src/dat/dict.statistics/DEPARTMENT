@@ -6,11 +6,11 @@ S
 
 
 	ANS = RECORD.f(3);\
-	//may be missing try to get from user file\
+	// may be missing try to get from user file\
 	if (not ANS) {\
 		ANS = ID.field("*", 3).xlate("USERS", 5, "X");\
 	}\
-	//use database as better than blank/unknown\
+	// use database as better than blank/unknown\
 	if (not ANS) {\
 		if (ID.field("*", 3) eq "EXODUS") {\
 			ANS = "EXODUS";\

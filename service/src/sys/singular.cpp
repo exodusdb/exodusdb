@@ -8,11 +8,11 @@ function main(in pluralnoun) {
 
 	if (temp2.ends("ES")) {
 
-		//COMPANIES=COMPANY
+		// COMPANIES=COMPANY
 		if (temp2.ends("IES")) {
 			temp.paster(-3, 3, "Y");
 
-			//ADDRESSES=ADDRESS
+			// ADDRESSES=ADDRESS
 		} else if (temp2.ends("SSES")) {
 			temp.cutter(-2);
 		} else if (temp2.ends("SHES")) {
@@ -23,11 +23,11 @@ function main(in pluralnoun) {
 			temp.popper();
 		}
 
-		//comment to help c++ decompiler
+		// comment to help c++ decompiler
 	} else {
 
 		if (temp2.ends("S")) {
-			//ANALYSIS, DOS
+			// ANALYSIS, DOS
 			if ((temp2.last(2) ne "IS") and (temp2.last(2) ne "OS")) {
 				temp.popper();
 			}

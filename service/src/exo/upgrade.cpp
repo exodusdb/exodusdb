@@ -2,7 +2,7 @@
 libraryinit()
 
 function main(in mode) {
-	//TODO implement or obsolete
+	// TODO implement or obsolete
 
 	false and mode;	 //evade compiler warning
 

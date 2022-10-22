@@ -24,17 +24,17 @@ function main() {
 		if (not(mod(ln, 1000)))
 			printl(ln);
 		var line = data.substr2(ix, delimiter);
-		//		line.outputl();
+		// 		line.outputl();
 		var output = line.field("\t", 1);
 		var op	   = line.field("\t", 2);
 		var inputx = line.field("\t", 3);
 		var arg1   = line.field("\t", 4);
-		//op.outputl();
+		// op.outputl();
 		var test;
-		//if (op=="LOCATEUSING") {
-		//	//0 1     LOCATEUSING     BCCCB   A               B               -1      -1      -1
-		//	test=locateusing(inputx.f(,
-		//}
+		// if (op=="LOCATEUSING") {
+		// 	//0 1     LOCATEUSING     BCCCB   A               B               -1      -1      -1
+		// 	test=locateusing(inputx.f(,
+		// }
 		if (op == "OCONV") {
 			test = oconv(inputx, arg1);
 		} else if (op == "ISNUM") {

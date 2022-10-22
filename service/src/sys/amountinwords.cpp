@@ -62,9 +62,9 @@ function main(in amountfmlanguage, in currcode0) {
 		goto french;
 	}
 
-	//millions
-	//MILLIONS=field(AMOUNT,'.',1)
-	//MILLIONS[-6,6]=''
+	// millions
+	// MILLIONS=field(AMOUNT,'.',1)
+	// MILLIONS[-6,6]=''
 	// convert ',' to '' in amount
 	millions = (amount / 1000000).floor();
 
@@ -72,7 +72,7 @@ function main(in amountfmlanguage, in currcode0) {
 		words = amountinwords(millions ^ FM ^ language) ^ " Million";
 	}
 
-	//thousands
+	// thousands
 	thousands = ((amount.mod(1000000)) / 1000).floor();
 	if (thousands) {
 		if (words ne "") {
@@ -81,7 +81,7 @@ function main(in amountfmlanguage, in currcode0) {
 		words ^= amountinwords(thousands ^ FM ^ language) ^ " Thousand";
 	}
 
-	//hundreds
+	// hundreds
 	hundreds = ((amount.mod(1000)) / 100).floor();
 	if (hundreds) {
 		if (words ne "") {
@@ -90,7 +90,7 @@ function main(in amountfmlanguage, in currcode0) {
 		words ^= amountinwords(hundreds ^ FM ^ language) ^ " Hundred";
 	}
 
-	//units
+	// units
 	unitsx = "00" ^ amount.mod(100).floor();
 	text   = "Zero" _VM "One" _VM "Two" _VM "Three" _VM "Four" _VM "Five" _VM "Six" _VM "Seven" _VM "Eight" _VM "Nine" _VM "Ten" _VM "Eleven" _VM "Twelve" _VM "Thirteen" _VM "Fourteen" _VM "Fifteen" _VM "Sixteen" _VM "Seventeen" _VM "Eighteen" _VM "Nineteen" _VM "Twenty" _VM "Thirty" _VM "Forty" _VM "Fifty" _VM "Sixty" _VM "Seventy" _VM "Eighty" _VM "Ninety";
 	if (unitsx) {
@@ -100,9 +100,9 @@ function main(in amountfmlanguage, in currcode0) {
 		if (unitsx le 20) {
 			words ^= text.f(1, unitsx + 1);
 		} else {
-			//IF UNITSx LE 20 THEN
+			// IF UNITSx LE 20 THEN
 			// WORDS:=TEXT<1,UNITSx+1>
-			//end else
+			// end else
 			words ^= text.f(1, 19 + unitsx[-2]);
 			if (not unitsx.ends("0")) {
 				words ^= "-" ^ text.f(1, unitsx[-1] + 1);
@@ -110,7 +110,7 @@ function main(in amountfmlanguage, in currcode0) {
 		}
 	}
 
-	//if base.currency='MYR' and currcode='MYR' then
+	// if base.currency='MYR' and currcode='MYR' then
 	if (currcode eq "MYR") {
 		words.replacer(" and ", " ");
 		cents = ((amount - amount.floor()) * 100).oconv("MD00P");
@@ -121,7 +121,7 @@ function main(in amountfmlanguage, in currcode0) {
 	} else if (amountcurrency.f(2)) {
 		words ^= " " ^ amountcurrency.f(1);
 
-		//subunits
+		// subunits
 		if (amount.floor() ne amount) {
 			words ^= " and ";
 			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.f(3) ^ "0PZ")).cut(1);
@@ -130,7 +130,7 @@ function main(in amountfmlanguage, in currcode0) {
 
 	} else {
 
-		//subunits
+		// subunits
 		if (amount.floor() ne amount) {
 			words ^= " ." ^ amount.field(".", 2);
 		}
@@ -144,8 +144,8 @@ function main(in amountfmlanguage, in currcode0) {
 
 ///////
 french:
-	///////
-	//millions
+	// /////
+	// millions
 	millions = amount.field(".", 1);
 	millions.cutter(-6);
 	if (millions) {
@@ -155,7 +155,7 @@ french:
 		}
 	}
 
-	//thousands
+	// thousands
 	thousands = ((amount.mod(1000000)) / 1000).floor();
 	if (thousands) {
 		if (words ne "") {
@@ -167,7 +167,7 @@ french:
 		words ^= " mille";
 	}
 
-	//hundreds
+	// hundreds
 	hundreds = ((amount.mod(1000)) / 100).floor();
 	if (hundreds) {
 		if (words ne "") {
@@ -177,10 +177,10 @@ french:
 			words ^= amountinwords(hundreds ^ FM ^ language);
 		}
 		words ^= " cent";
-		//IF HUNDREDS GT 1 THEN WORDS:='s'
+		// IF HUNDREDS GT 1 THEN WORDS:='s'
 	}
 
-	//units
+	// units
 	unitsx = "00" ^ amount.mod(100).floor();
 	text   = "zero" _VM "un" _VM "deux" _VM "trois" _VM "quatre" _VM "cinq" _VM "six" _VM "sept" _VM "huit" _VM "neuf" _VM "dix" _VM "onze" _VM "douze" _VM "treize" _VM "quatorze" _VM "quinze" _VM "seize" _VM "dix-sept" _VM "dix-huit" _VM "dix-neuf" _VM "vingt" _VM "trente" _VM "quarante" _VM "cinquante" _VM "soixante" _VM "soixante-dix" _VM "quatre-vingt" _VM "quatre-vingt-dix";
 	if (unitsx) {
@@ -194,16 +194,16 @@ french:
 			tens = unitsx[-2];
 			ones = unitsx[-1];
 
-			//70's and 90's
+			// 70's and 90's
 			if (tens eq 9 or tens eq 7) {
 				tens -= 1;
 				ones += 10;
 			}
 
-			//tens
+			// tens
 			words ^= text.f(1, 19 + tens);
 
-			//ones
+			// ones
 			if (ones ne "0") {
 				if (tens and ones eq 1) {
 					words ^= " et ";
@@ -217,7 +217,7 @@ french:
 		}
 	}
 
-	//subunits
+	// subunits
 	if (amount.floor() ne amount) {
 		words ^= " ." ^ amount.field(".", 2);
 	}

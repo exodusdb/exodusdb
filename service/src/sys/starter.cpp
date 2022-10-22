@@ -9,7 +9,7 @@ libraryinit()
 
 	var startmode;
 var temp;
-var reply;	//num
+var reply;	// num
 
 function main(in startmode0, out starttime, out startdate, out startbuffer) {
 
@@ -27,8 +27,8 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	startdate = date();
 	starttime = ostime();
 
-	//autostart in system mode
-	//if @volumes else return 1
+	// autostart in system mode
+	// if @volumes else return 1
 
 	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
 
@@ -51,7 +51,7 @@ inpreply:
 
 	} else {
 		reply = "Y";
-		//IF DECIDE(TEMP:'OK to start ?|','',REPLY) ELSE REPLY=2
+		// IF DECIDE(TEMP:'OK to start ?|','',REPLY) ELSE REPLY=2
 		call note(temp ^ "OK to start ? (Y/n)", "RC", reply);
 		reply = reply.starts("Y");
 		if (not reply) {

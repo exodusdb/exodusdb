@@ -34,8 +34,8 @@ function main(in mode0) {
 
 	*/
 
-	//this is a template used for calling all filexxxsubs() routines
-	//they must have ONE in arg
+	// this is a template used for calling all filexxxsubs() routines
+	// they must have ONE in arg
 	return 0;
 
 	mode = mode0;
@@ -54,7 +54,7 @@ function main(in mode0) {
 	} else {
 		chr(7).output();
 		call mssg(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored");
-		//valid=0
+		// valid=0
 	}
 	return 0;
 }

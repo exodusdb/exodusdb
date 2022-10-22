@@ -22,16 +22,16 @@ function main() {\
 		var tx = datax.f(fn).trim();\
 \
 		if (tx.contains("xlate(") and ((tx.contains("','C')") or tx.contains("','X')")))) {\
-		//gosub change2\
+		// gosub change2\
 			ANS(1, -1) = tx;\
 		}\
 \
-	//if index(tx,'MSG(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) ) then\
+	// if index(tx,'MSG(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) ) then\
 	// gosub change\
 	// @ans<1,-1>=tx\
 	// end\
 \
-	//if index(tx,'NOTE(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) or index(tx,",'T",1)) then\
+	// if index(tx,'NOTE(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) or index(tx,",'T",1)) then\
 	// gosub change\
 	// @ans<1,-1>=tx\
 	// end\
@@ -46,7 +46,7 @@ function main() {\
 		if decide2(@id:@fm:tx:'','',reply,2) else stop;\
 		if reply=1 then;\
 			open 'TEMP' to file else call abort(lasterror());\
-			//writev tx on file,@id,fn\
+			// writev tx on file,@id,fn\
 			if @record<1>='S' then;\
 				@record<8,fn>=tx;\
 			end else;\

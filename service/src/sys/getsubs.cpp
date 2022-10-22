@@ -23,12 +23,12 @@ var wsmsg;
 
 function main(in mode) {
 
-	//declare function lockposting
+	// declare function lockposting
 
-	//"where" is not really functional in the intranet system
-	//since all document text is temp placed in the ..\data\datasetcode\ folder
-	//but it is still used to store the last document number though
-	//where='docs\public\'
+	// "where" is not really functional in the intranet system
+	// since all document text is temp placed in the ..\data\datasetcode\ folder
+	// but it is still used to store the last document number though
+	// where='docs\public\'
 	var where = "docs/public/";
 	where.converter("/", OSSLASH);
 
@@ -42,14 +42,14 @@ function main(in mode) {
 
 	if (mode eq "DEF.DOCUMENT.NO") {
 
-		//lock source of document numbers
+		// lock source of document numbers
 		printl("*lock source of document numbers");
 		if (not(lockrecord("DOCUMENTS", sys.documents, "0", xx, 10))) {
 			win.valid = 0;
 			return 0;
 		}
 
-		//get/update next document number
+		// get/update next document number
 		var nextno;
 		if (not(nextno.read(sys.documents, "0"))) {
 			if (not(nextno.osread(where ^ "0"))) {
@@ -59,9 +59,9 @@ function main(in mode) {
 
 nextdoc:
 		nextno += 1;
-		//call oswrite(nextno,where:'0')
+		// call oswrite(nextno,where:'0')
 
-		//build new file name
+		// build new file name
 		if (USERNAME eq "EXODUS") {
 			tt = "NEO";
 		} else {
@@ -69,13 +69,13 @@ nextdoc:
 		}
 		ID = tt ^ ("00000" ^ nextno).oconv("R#5");
 
-		//skip to next file if already exists
-		//osopen lcase(where:temp) to temp2 then
+		// skip to next file if already exists
+		// osopen lcase(where:temp) to temp2 then
 		// osclose temp2
 		// goto nextdoc
 		// end
 
-		//skip if document already exists
+		// skip if document already exists
 		if (tt.read(sys.documents, ID)) {
 			goto nextdoc;
 		}
@@ -94,18 +94,18 @@ nextdoc:
 		task = win.orec.f(5);
 		gosub gettaskprefix();
 
-		//dont know task at this point
-		//if taskprefix then
+		// dont know task at this point
+		// if taskprefix then
 		// if security(taskprefix:' CREATE',msg,'') else
 		//  call msg(msg)
 		//  reset=5
 		//  end
 		// end
 
-		//user can always modify own reports
+		// user can always modify own reports
 		if ((win.wlocked and RECORD.f(1)) and RECORD.f(1) ne USERNAME) {
 
-			//check if allowed to modify
+			// check if allowed to modify
 			if (taskprefix) {
 				if (not(authorised(taskprefix ^ " UPDATE", msg, ""))) {
 					call mssg(msg);
@@ -114,7 +114,7 @@ nextdoc:
 				}
 			}
 
-			//always prevent users from editing documents designed by EXODUS
+			// always prevent users from editing documents designed by EXODUS
 			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
 				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
 				xx			= unlockrecord(win.datafile, win.srcfile, ID);
@@ -130,7 +130,7 @@ nextdoc:
 
 	} else if (mode eq "PREWRITE") {
 
-		//check if allowed to create
+		// check if allowed to create
 		if (win.orec eq "") {
 			task = RECORD.f(5);
 			gosub gettaskprefix();
@@ -141,8 +141,8 @@ nextdoc:
 			}
 		}
 
-		//move fields 101 onwards into field 6 (after lowering)
-		//and remove fields 101 onwards
+		// move fields 101 onwards into field 6 (after lowering)
+		// and remove fields 101 onwards
 		RECORD(6) = lower(RECORD.field(FM, 101, 9999));
 		RECORD	  = RECORD.field(FM, 1, 100);
 
@@ -153,12 +153,12 @@ nextdoc:
 		RECORD(4) = time();
 		RECORD(7) = APPLICATION;
 
-		//update exodus standard (in case doing this on the programming system)
-		//the programming standard is installed into all clients
-		//on first login after upgrade
-		//this is also done in copygbp perhaps could be removed from there
-		//almost identical code in definition.subs and get.subs (for documents)
-		//field 10 in documents and definitions xxx*analdesign means the same
+		// update exodus standard (in case doing this on the programming system)
+		// the programming standard is installed into all clients
+		// on first login after upgrade
+		// this is also done in copygbp perhaps could be removed from there
+		// almost identical code in definition.subs and get.subs (for documents)
+		// field 10 in documents and definitions xxx*analdesign means the same
 		if (USERNAME eq "EXODUS" and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
@@ -175,26 +175,26 @@ nextdoc:
 		task = win.orec.f(5);
 		gosub gettaskprefix();
 
-		//user can always delete their own reports
+		// user can always delete their own reports
 		if (RECORD.f(1) and RECORD.f(1) ne USERNAME) {
 
-			//check if allowed to delete
+			// check if allowed to delete
 			if (taskprefix) {
 				if (not(authorised(taskprefix ^ " DELETE", msg, ""))) {
 					return invalid(msg);
 				}
 			}
 
-			//always prevent users from deleting documents designed by EXODUS
+			// always prevent users from deleting documents designed by EXODUS
 			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
 				msg = "You cannot delete report designs created by EXODUS";
 				return invalid(msg);
 			}
 		}
 
-		//update exodus standard (in case doing this on the programming system)
-		//%DELETED% ensures that deleted EXODUS documents get deleted
-		//on upgrading clients
+		// update exodus standard (in case doing this on the programming system)
+		// %DELETED% ensures that deleted EXODUS documents get deleted
+		// on upgrading clients
 		if (USERNAME eq "EXODUS" and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
@@ -204,7 +204,7 @@ nextdoc:
 				if (xx.read(reports, key)) {
 					var("%DELETED%").write(reports, key);
 				}
-				//delete reports,key
+				// delete reports,key
 			}
 		}
 
@@ -216,7 +216,7 @@ nextdoc:
 
 	return 0;
 
-	//in get.subs and generalproxy
+	// in get.subs and generalproxy
 }
 
 subroutine gettaskprefix() {

@@ -6,11 +6,11 @@ var v70;
 var v71;
 var filenamesx;
 var filename;
-var nrecs;	//num
+var nrecs;	// num
 
 function main(in filenames0, out result) {
 
-	//$insert bp,agency.common
+	// $insert bp,agency.common
 
 	call pushselect(0, v69, v70, v71);
 

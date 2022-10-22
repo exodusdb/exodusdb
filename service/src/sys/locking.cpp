@@ -10,7 +10,7 @@ var lockdesc;
 var xx;
 var allowduplicate;	 //num
 //var lockitem;
-var lockn;	//num
+var lockn;	// num
 var lockfile;
 
 #define lockitemsep_ "*"
@@ -35,7 +35,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	}
 	msg = "";
 
-	//NOTE: not(SYSTEM.f(33));
+	// NOTE: not(SYSTEM.f(33));
 	var interactive = false;
 
 	if (var(0) and USERNAME eq "EXODUS") {
@@ -67,7 +67,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 
 ///////
 lockit:
-	///////
+	// /////
 
 	var lockitem = lockfilename ^ lockitemsep_ ^ lockkey;
 	if (locklist.locateusing(FM, lockitem, lockn)) {
@@ -146,10 +146,10 @@ subroutine unlockall(io locklist, io msg) {
 
 	var filename2 = "";
 	var file	  = "";
-	//	for (lockn = 1; lockn <= 9999; ++lockn) {
-	//		lockitem = locklist.f(lockn);
-	//		///BREAK;
-	//		if (not lockitem) break;
+	// 	for (lockn = 1; lockn <= 9999; ++lockn) {
+	// 		lockitem = locklist.f(lockn);
+	// 		// /BREAK;
+	// 		if (not lockitem) break;
 	for (in lockitem : locklist) {
 		var filename = lockitem.field(lockitemsep_, 1);
 		var lockkeyx = lockitem.field(lockitemsep_, 2, 9999);

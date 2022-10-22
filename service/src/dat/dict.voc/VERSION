@@ -10,9 +10,9 @@ function main() {\
 		ANS = xlate(RECORD.f(3), "$" ^ RECORD.f(4), "VERSION", "X");\
 	} else {\
 		ANS = field2(RECORD, FM, -1);\
-	//IF @ANS[1,1] = 'V' THEN\
+	// IF @ANS[1,1] = 'V' THEN\
 	//  @ANS=@ANS[2,99]\
-	//END ELSE\
+	// END ELSE\
 	//  @ANS = ''\
 	}\
 	return ANS;\

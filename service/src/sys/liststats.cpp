@@ -19,8 +19,8 @@ var usercoln;  //num
 var tx;
 var userx;
 
-var printptr;	//num
-var topmargin;	//num
+var printptr;	// num
+var topmargin;	// num
 var printfilename;
 var ownprintfile;  //num
 var ptx_filenamelen;
@@ -28,10 +28,10 @@ var ptx_random;
 var printfile;
 var letterhead;
 var pagelns;
-var bodyln;		//num
-var realpagen;	//num
-var pagen;		//num
-var newpage;	//num
+var bodyln;		// num
+var realpagen;	// num
+var pagen;		// num
+var newpage;	// num
 var bottomline;
 var printtxmark;
 var rfmt;
@@ -59,7 +59,7 @@ var spaceoptionsize;
 
 function main() {
 
-	//for printtx
+	// for printtx
 
 	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {
 		call mssg(msg);
@@ -90,13 +90,13 @@ function main() {
 		}
 	}
 
-	//usercodename=',DEPARTMENT,USER_NAME'
+	// usercodename=',DEPARTMENT,USER_NAME'
 	var usercodename = ",USER_CODE";
 
 	var filename = "STATISTICS";
 	rowfields.converter(SM, VM);
 
-	//remove col field from row fields because not logical or useful
+	// remove col field from row fields because not logical or useful
 	if (rowfields.locate(colfield, vn)) {
 		rowfields.remover(1, vn);
 	}
@@ -108,7 +108,7 @@ function main() {
 	var nrows = output.fcount(FM);
 	var ncols = output.f(1).fcount(VM);
 
-	//de-duplicate
+	// de-duplicate
 	if (dedup) {
 		var row1 = output.f(nrows);
 		for (var rown = nrows; rown >= 3; --rown) {
@@ -116,7 +116,7 @@ function main() {
 			row1		 = output.f(rown - 1);
 			var replaced = 0;
 			for (const var coln : range(1, nrowfields)) {
-				///BREAK;
+				// /BREAK;
 				if (not(row1.f(1, coln) eq row2.f(1, coln)))
 					break;
 				replaced	  = 1;
@@ -157,7 +157,7 @@ function main() {
 				tx ^= " align=right";
 			}
 			tx ^= ">";
-			//extra col for user browser
+			// extra col for user browser
 			if (coln eq usercoln) {
 				tx ^= "<col>";
 			}
@@ -170,7 +170,7 @@ function main() {
 				cell = nbsp;
 			}
 			tx ^= th ^ cell ^ thx;
-			//extra col for user browser
+			// extra col for user browser
 			if (coln eq usercoln) {
 				tx ^= th ^ "Browser Last Seen" ^ thx;
 			}
@@ -188,7 +188,7 @@ function main() {
 					if (cell ne "-") {
 						var rowspan = 1;
 						for (const var rown2 : range(rown + 1, nrows)) {
-							///BREAK;
+							// /BREAK;
 							if (not(output.f(rown2, coln) eq "-"))
 								break;
 							rowspan += 1;
@@ -204,7 +204,7 @@ function main() {
 							cell = nbsp;
 						}
 
-						//convert to user name
+						// convert to user name
 						if (coln eq usercoln) {
 							userx  = xlate("USERS", cell, "", "X");
 							var tt = userx.f(1);
@@ -215,7 +215,7 @@ function main() {
 
 						rowtx ^= celltd ^ cell ^ tdx;
 
-						//browser after user
+						// browser after user
 						if (coln eq usercoln) {
 							rowtx ^= celltd;
 							var agent = userx.f(39, 6);

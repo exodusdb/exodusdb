@@ -13,9 +13,9 @@ function main(in type, in inx, in /*mode*/, out outx) {
 			if (exp lt 0) {
 				outx.paster(2, 1, "");
 				outx = ("." ^ var("0").str(-(exp + 1)) ^ outx).first(15);
-				//				while (true) {
-				//					///BREAK;
-				//					if (not(outx.len() gt 2 and (outx.ends("0")))) break;
+				// 				while (true) {
+				// 					// /BREAK;
+				// 					if (not(outx.len() gt 2 and (outx.ends("0")))) break;
 				while (outx.len() gt 2 and outx.ends("0")) {
 					outx.popper();
 				}

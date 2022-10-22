@@ -3,12 +3,12 @@ libraryinit()
 
 function main(io css, in version = "") {
 
-	//NB quirk in ie mimiced by mozilla table dont inherit size
-	//but work around is TABLE {FONT-SIZE:100%} in css
+	// NB quirk in ie mimiced by mozilla table dont inherit size
+	// but work around is TABLE {FONT-SIZE:100%} in css
 
-	//prevents IE later versions from working in standards mode
-	//<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-	//<meta http-equiv="x-ua-compatible" content="IE=6" />
+	// prevents IE later versions from working in standards mode
+	// <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	// <meta http-equiv="x-ua-compatible" content="IE=6" />
 
 	var charset = SYSTEM.f(127);
 	if (charset) {
@@ -19,11 +19,11 @@ function main(io css, in version = "") {
 
 	css ^= getvogonpoetry(version);
 
-	//css.converter(FM, "\r\n");
+	// css.converter(FM, "\r\n");
 
-	//remove trailing EOL characters
-	//while (var("\r\n").contains(css[-1]))
-	//	css.popper();
+	// remove trailing EOL characters
+	// while (var("\r\n").contains(css[-1]))
+	// 	css.popper();
 
 	var thcolor = SYSTEM.f(46, 1);
 	var tdcolor = SYSTEM.f(46, 2);

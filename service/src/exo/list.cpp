@@ -3,7 +3,7 @@ libraryinit()
 
 function main() {
 
-	//redirect to cli 'nlist' library
+	// redirect to cli 'nlist' library
 	SENTENCE.prefixer("N");
 
 	perform(SENTENCE);

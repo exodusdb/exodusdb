@@ -42,7 +42,7 @@ sshd: 127.
 sshd: 5.79.74.40
 )V0G0N";
 
-	//fm instead of crlf
+	// fm instead of crlf
 	hostsallow.converter("\n\r", FM);
 
 	return 0;

@@ -37,8 +37,8 @@ function main(in /*type*/, in in0, in mode, out output) {
 		}
 	}
 
-	//swap '<' with '&lt;' in output
-	//swap '>' with '&gt;' in output
+	// swap '<' with '&lt;' in output
+	// swap '>' with '&gt;' in output
 
 	if (mode ne "") {
 		output = "<" ^ mode ^ ">" ^ output ^ "</" ^ mode.field(" ", 1) ^ ">";

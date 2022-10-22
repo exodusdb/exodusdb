@@ -2,11 +2,11 @@
 libraryinit()
 
 	var logfilename;
-var logfilelength;	//num
+var logfilelength;	// num
 var temposfilename83;
 var logfile;
 var datax;
-var time2;	//num
+var time2;	// num
 
 function main(in msg0, io time0) {
 
@@ -26,10 +26,10 @@ function main(in msg0, io time0) {
 		// Try multiple start points in case hit middle of multibyte character
 		// space to defeat convsyntax
 		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
-			//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
-			//for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
+			// for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
+			// for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
 			call osbread(datax, logfile, ptr, 1024);
-			//if any data then break out of loop
+			// if any data then break out of loop
 			if (datax.len()) {
 				ptr = logfilelength;
 			}
@@ -48,15 +48,15 @@ function main(in msg0, io time0) {
 
 	var entry = "";
 	if (TERMINAL) {
-		//entry:=oconv(date(),'D2-J')
+		// entry:=oconv(date(),'D2-J')
 		entry = date().oconv("D2-E");
 		entry = entry.last(2) ^ "-" ^ entry.first(5);
 		entry ^= " " ^ time2.oconv("MTS") ^ " ";
-		//entry:=field(time2,'.',2) 'MD20P'
+		// entry:=field(time2,'.',2) 'MD20P'
 	}
-	//similar in listen and log2
+	// similar in listen and log2
 	entry ^= SYSTEM.f(24) ^ ": " ^ (time2 - time0).oconv("MD20P");
-	//entry:=sep:sep:sep:sep
+	// entry:=sep:sep:sep:sep
 	entry ^= " " ^ msg0;
 
 	if (TERMINAL) {

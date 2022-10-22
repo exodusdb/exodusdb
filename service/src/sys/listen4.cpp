@@ -13,7 +13,7 @@ function main(in msgno, io msg, in params0 = "") {
 	switch (msgno.toInt()) {
 
 		default:
-			//should never get here
+			// should never get here
 			msg = msgno.quote() ^ " unknown message no in LISTEN4";
 			return 0;
 
@@ -42,11 +42,11 @@ function main(in msgno, io msg, in params0 = "") {
 			msg = "Error: NO RECORD";
 			return 0;
 		case 9:
-			//same in 9 and 10
+			// same in 9 and 10
 			msg = params.quote() ^ " file cannot be opened (9)";
 			return 0;
 		case 10:
-			//same in 9 and 10 but 10 never used
+			// same in 9 and 10 but 10 never used
 			msg = params.quote() ^ " file cannot be opened (10)";
 			return 0;
 		case 11:
@@ -109,11 +109,11 @@ function main(in msgno, io msg, in params0 = "") {
 			msg = "Error: " ^ (params.f(1).quote()) ^ " new record keys must not contain spaces";
 			return 0;
 		case 29:
-			//29 and 30 the same
+			// 29 and 30 the same
 			msg = "Unknown message " ^ (msgno.quote()) ^ " in LISTEN";
 			return 0;
 		case 30:
-			//29 and 30 the same
+			// 29 and 30 the same
 			msg = "Unknown message " ^ (msgno.quote()) ^ " in LISTEN";
 			return 0;
 		case 31:
@@ -123,7 +123,7 @@ function main(in msgno, io msg, in params0 = "") {
 			msg = "LISTEN:EXECUTE: Module name is missing from request";
 			return 0;
 
-			//keyword to force adecom to insert a c++ }  to close the switch statement
+			// keyword to force adecom to insert a c++ }  to close the switch statement
 	}
 
 	return 0;

@@ -6,11 +6,11 @@ var term;
 
 function main(in list0, out min, out max) {
 
-	//find the min and max in a list
+	// find the min and max in a list
 
-	//linemark
+	// linemark
 
-	//initialise min and max to the first element
+	// initialise min and max to the first element
 	var result = "";
 	var start  = 0;
 	bit		   = list0.substr2(start, term);
@@ -20,7 +20,7 @@ function main(in list0, out min, out max) {
 	}
 
 	while (true) {
-		///BREAK;
+		// /BREAK;
 		if (not term)
 			break;
 		bit = list0.substr2(start, term);

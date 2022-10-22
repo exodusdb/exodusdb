@@ -20,9 +20,9 @@ dim filters;
 var temp;  //num
 var ptr;   //num
 var tt;
-var dicthasauthorised;	//num
+var dicthasauthorised;	// num
 var keyx;
-var nkeys;	//num
+var nkeys;	// num
 dim xfilenames;
 dim oconvxs;
 dim fmtxs;
@@ -44,12 +44,12 @@ var errors;
 
 function main(in sentence0, in select0 = "", in filters0 = "") {
 
-	//called from
-	//BP ANALTIME    call with filters
-	//BP AUDITINVS   perform then self call
-	//BP EXPORTADS   ditto
-	//BP MEDIADIARY2 ditto
-	//ABP JOURNALS   ditto
+	// called from
+	// BP ANALTIME    call with filters
+	// BP AUDITINVS   perform then self call
+	// BP EXPORTADS   ditto
+	// BP MEDIADIARY2 ditto
+	// ABP JOURNALS   ditto
 
 	if (sentence0.unassigned()) {
 		sentencex = "";
@@ -73,12 +73,12 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		}  //filtern;
 	}
 
-	//convert command line to subroutine call
+	// convert command line to subroutine call
 	if (SENTENCE.field(" ", 1) eq "CONVCSV" and sentence0.unassigned()) {
 
 		SENTENCE.move(sentencex);
 
-		//locate and remove SELECT statement from end of command
+		// locate and remove SELECT statement from end of command
 		if (sentencex.locateusing(" ", "SELECT", temp)) {
 			selectx	  = sentencex.field(" ", temp + 1, 9999);
 			sentencex = sentencex.field(" ", 1, temp - 1);
@@ -135,7 +135,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		return 0;
 	}
 
-	//eg ABP converter.maconomy
+	// eg ABP converter.maconomy
 	convertercsv = "";
 	var hasconverter;
 	if (not(hasconverter.read(DEFINITIONS, "CONVERTER*" ^ filename))) {
@@ -143,7 +143,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	}
 	if (hasconverter.f(1)) {
 		tt = "CONVERTER." ^ hasconverter.f(1);
-		//c++ variation
+		// c++ variation
 		if (not(VOLUMES)) {
 			tt.lcaser();
 			tt.converter(".", "");
@@ -168,7 +168,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		}
 	}
 
-	//expand any group fields in notexportable
+	// expand any group fields in notexportable
 	if (notexportable) {
 		for (const var ii : range(1, notexportable.fcount(FM))) {
 			var dictrec;
@@ -194,8 +194,8 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 			keyx  = exportable.first(exportable.index(FM ^ FM) - 1);
 			nkeys = keyx.fcount(FM);
 			if (nkeys gt 2) {
-				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
-				//stop
+				// call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
+				// stop
 				nkeys = 0;
 			}
 		} else {
@@ -206,7 +206,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 
 	var exportable2 = exportable;
 
-	//nextmvgroup:
+	// nextmvgroup:
 
 	if (mvgroupno) {
 		tt = keyx ^ FM ^ "LINE_NO" ^ FM;
@@ -218,7 +218,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	exportable2 = exportable2.field("%", 2, 9999);
 
 	var outfilename = SYSTEM.f(2);
-	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
+	// zzz if mvgroupno then outfilename[8,1]=mvgroupno
 	if (outfilename.lcase().ends(".htm")) {
 		outfilename.paster(-3, 3, "xls");
 		SYSTEM(2) = outfilename;
@@ -250,9 +250,9 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 
 	if (exportable) {
 		makelist("", exportable);
-		//write exportable on lists,listkey
-		//perform 'GET-LIST ':listkey:' (S)'
-		//delete lists,listkey
+		// write exportable on lists,listkey
+		// perform 'GET-LIST ':listkey:' (S)'
+		// delete lists,listkey
 
 	} else {
 		if (filename.starts("DICT")) {
@@ -270,8 +270,8 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	dictids.redim(255);
 	colgroups.redim(255);
 
-	dictids		 = "";	//dim
-	colgroups	 = "";	//dim
+	dictids		 = "";	// dim
+	colgroups	 = "";	// dim
 	var headingx = "";
 	var coln	 = 0;
 
@@ -294,10 +294,10 @@ nextdict:
 			dictrecs(coln) = "";
 		} else {
 			if (dict.read(DICT, dictid)) {
-				//TODO implement JBASE/PICK dict types I/A/D
-				//call dicti2a(dict)
+				// TODO implement JBASE/PICK dict types I/A/D
+				// call dicti2a(dict)
 				coln += 1;
-				//if dict<2> matches '0N' then
+				// if dict<2> matches '0N' then
 				var fn = dict.f(2);
 				if (fn gt nfields) {
 					nfields = fn;
@@ -309,27 +309,27 @@ nextdict:
 					headingx(coln) = dictid;
 				} else {
 
-					//extract title
+					// extract title
 					var title = dict.f(3).trim();
 					title.replacer("<WBR/>", "");
 					title.replacer("<wbr/>", " ");
-					//title.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ" "|_" _VM, "abcdefghijklmnopqrstuvwxyz" "   ");
+					// title.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ" "|_" _VM, "abcdefghijklmnopqrstuvwxyz" "   ");
 					title.lcaser();
 					title.converter("|_" _VM, "   ");
 
-					//t=title[1,1]
-					//convert @lower.case to @upper.case in t
-					//title[1,1]=t
+					// t=title[1,1]
+					// convert @lower.case to @upper.case in t
+					// title[1,1]=t
 					title = capitalise(title);
 
 					title.replacer("(Base)", "(" ^ sys.company.f(3) ^ ")");
 
-					//swap ' code' with '' in title
+					// swap ' code' with '' in title
 
 					headingx(coln) = title.trim();
 				}
 
-				//extract file
+				// extract file
 				if (dict.f(11).starts("<")) {
 					temp			 = dict.f(11).cut(1).field(">", 1);
 					xfilenames(coln) = temp;
@@ -345,24 +345,24 @@ nextdict:
 					}
 				}
 
-				//extract conversion
+				// extract conversion
 				if (dict.f(7)) {
 					var oconvx = dict.f(7);
 
-					//force long date format
+					// force long date format
 					if (oconvx.contains("DATE") or (oconvx.starts("D"))) {
-						//if raw then
+						// if raw then
 						// oconvx='D4/J'
-						//end else
+						// end else
 						if (oconvx eq "[SCH.DATES]") {
 							oconvx = "";
 						} else {
 							oconvx = DATEFMT;
 							oconvx.converter("2", "4");
 						}
-						//end
+						// end
 
-						//no commas to be added to numbers
+						// no commas to be added to numbers
 					} else if (oconvx.starts("[NUMBER")) {
 						oconvx = "";
 					}
@@ -374,13 +374,13 @@ nextdict:
 				dictids(coln)	= dictid;
 				dictrecs(coln)	= dict;
 			}
-			//end
+			// end
 		}
 		goto nextdict;
 	}
 	let ncols = coln;
 
-	//if @username='EXODUS' then oswrite matunparse(dictids) on 'csv'
+	// if @username='EXODUS' then oswrite matunparse(dictids) on 'csv'
 
 	if (selectlist) {
 		call popselect(0, v69, v70, v71);
@@ -392,16 +392,16 @@ nextdict:
 		gosub exit2();
 		return 0;
 	}
-	//ptr=0
+	// ptr=0
 
-	//suppress headerrow if not required
+	// suppress headerrow if not required
 	if (not colheaderrow) {
 		headingx = "";
 	}
 
 	if (selectx) {
-		//selectx:=' AND WITH PERSON_CODE "HARRIS"'
-		//perform 'SELECT ':filename:' ':selectx
+		// selectx:=' AND WITH PERSON_CODE "HARRIS"'
+		// perform 'SELECT ':filename:' ':selectx
 		tt = "SELECT " ^ filename ^ " " ^ selectx;
 		call xselect(tt);
 		if (not LISTACTIVE) {
@@ -420,18 +420,18 @@ nextdict:
 	rec.redim(ncols);
 	mvrec.redim(ncols);
 
-	//oswrite matunparse(dictids) on 'DICTIDS'
+	// oswrite matunparse(dictids) on 'DICTIDS'
 
 ////////
 nextrec:
-	////////
+	// //////
 
 	if (esctoexit()) {
 		gosub exit();
 		return 0;
 	}
 
-	//get the next key
+	// get the next key
 	var mvx = 0;
 	if (not(readnext(ID, mvx))) {
 		gosub exit();
@@ -446,7 +446,7 @@ nextrec:
 	if (TERMINAL)
 		output(AT(-40), recn, ". ");
 
-	//get the record
+	// get the record
 	if (not(RECORD.read(file, ID))) {
 		goto nextrec;
 	}
@@ -463,20 +463,20 @@ nextrec:
 		}
 	}
 
-	//find the maximum multivalue
+	// find the maximum multivalue
 	var maxvn = 1;
 
-	//skip multivalues
+	// skip multivalues
 	for (const var filtern : range(1, nfilters)) {
 		var value = calculate(filters(1, filtern));
 		if (filters(3, filtern).len()) {
 
-			//if reqvalue then skip if not matching
+			// if reqvalue then skip if not matching
 			if (not(filters(3, filtern).locate(value, xx))) {
 				goto nextrec;
 			}
 
-			//no reqvalues means skip if no value present
+			// no reqvalues means skip if no value present
 		} else if (not(value)) {
 			goto nextrec;
 		}
@@ -494,8 +494,8 @@ nextrec:
 			}
 		}
 	}  //coln;
-	//d ebug
-	//get the data
+	// d ebug
+	// get the data
 	rec			= "";  //dim
 	var anydata = 0;
 	for (const var coln : range(1, ncols)) {
@@ -511,11 +511,11 @@ nextrec:
 		}
 	}  //coln;
 
-	//normalise the data and output to csv file
-	//if rec<>'' then
+	// normalise the data and output to csv file
+	// if rec<>'' then
 	if (anydata) {
 
-		//mat mvrec=mat rec
+		// mat mvrec=mat rec
 		mvrec = rec;  //dim
 
 		var vn = 0;
@@ -528,10 +528,10 @@ nextvn:
 			return 0;
 		}
 
-		//conversions
+		// conversions
 		for (const var coln : range(1, ncols)) {
 
-			//choose the right mv
+			// choose the right mv
 			if (dictids(coln) eq "LINE_NO") {
 				rec(coln) = vn;
 			} else {
@@ -547,7 +547,7 @@ nextvn:
 
 				if (mvx or vn eq 1) {
 
-					//convert codes to names
+					// convert codes to names
 					if (xfilenames(coln) and not(raw)) {
 						var rec2;
 						if (rec2.read(xfiles(coln), cell)) {
@@ -559,7 +559,7 @@ nextvn:
 						}
 					}
 
-					//other conversions
+					// other conversions
 					if (oconvxs(coln)) {
 						cell = oconv(cell, oconvxs(coln));
 					}
@@ -582,7 +582,7 @@ nextvn:
 				}
 				if (fmtxs(coln) ne "R" or not(cell.isnum())) {
 
-					//make sure "1-12" is not interpreted as a formula
+					// make sure "1-12" is not interpreted as a formula
 					if (var(1) or excel) {
 						if (var(".-+0123456789").contains(cell[1])) {
 							if (not(cell.isnum())) {
@@ -602,7 +602,7 @@ nextvn:
 						cell.quoter();
 					}
 				}
-				//gotcell:
+				// gotcell:
 				rec(coln) = cell;
 			}
 
@@ -610,39 +610,39 @@ nextvn:
 
 		var line = rec.join();
 
-		//remove trailing or all tab chars
-		//		while (true) {
-		//			///BREAK;
-		//			if (not(line.ends(FM))) break;
-		//			line.popper();
-		//		}//loop;
+		// remove trailing or all tab chars
+		// 		while (true) {
+		// 			// /BREAK;
+		// 			if (not(line.ends(FM))) break;
+		// 			line.popper();
+		// 		}//loop;
 		line.trimmerlast(FM);
 
-		//suppress output of empty amv rows
+		// suppress output of empty amv rows
 		if (mvgroupno and nkeys) {
 			if (line.field(FM, nkeys + 2, 9999) eq "") {
 				line = "";
 			}
 		}
 
-		//skip zero hours in timesheets
-		//already skipped above probably
-		//if filename='TIMESHEETS' then if @record<2,vn> else line=''
+		// skip zero hours in timesheets
+		// already skipped above probably
+		// if filename='TIMESHEETS' then if @record<2,vn> else line=''
 
-		//remove leading equal signs in order not to confuse Excel
+		// remove leading equal signs in order not to confuse Excel
 		line.replacer(FM ^ "=", FM);
 
-		//output one line
+		// output one line
 		if (line ne "") {
 
-			//output header row if first line and not suppressed
+			// output header row if first line and not suppressed
 
 			if (headingx) {
 
 				if (hasconverter) {
-					//headingx will come back converted and maybe as multiple lines
-					//converterparams initially contains first line so heading can put some columns into heading if required
-					//converterparams comes back with info to speed convertion of lines
+					// headingx will come back converted and maybe as multiple lines
+					// converterparams initially contains first line so heading can put some columns into heading if required
+					// converterparams comes back with info to speed convertion of lines
 					converterparams = line;
 					call convertercsv("HEAD", headingx, converterparams, filename);
 				} else {
@@ -655,7 +655,7 @@ nextvn:
 				headingx = "";
 			}
 
-			//output line
+			// output line
 
 			if (hasconverter) {
 				call convertercsv("LINE", line, converterparams, filename);
@@ -677,29 +677,29 @@ nextvn:
 
 subroutine exit() {
 	outfile.osclose();
-	//will not do anything unless uconv is available
-	//call uconvfile(outfile,'CODEPAGE','UTF16',result,errors)
-	//we need to convert to UTF-8 since csv files have no way to specify
-	//what codepage the charset is and this can result in failure to open correctly
+	// will not do anything unless uconv is available
+	// call uconvfile(outfile,'CODEPAGE','UTF16',result,errors)
+	// we need to convert to UTF-8 since csv files have no way to specify
+	// what codepage the charset is and this can result in failure to open correctly
 	call uconvfile(outfile, "CODEPAGE", "UTF8", result, errors);
-	//ignore errors like "uconv cannot be found" for now
-	//otherwise will have to install cygwin uconv everywhere and add to installations
-	//call msg(errors)
+	// ignore errors like "uconv cannot be found" for now
+	// otherwise will have to install cygwin uconv everywhere and add to installations
+	// call msg(errors)
 	SYSTEM(34) = 1;
 	gosub exit3();
 	return;
 }
 
 subroutine exit2() {
-	//general result code
+	// general result code
 	SYSTEM(34) = 0;
 	gosub exit3();
 	return;
 }
 
 subroutine exit3() {
-	//TODO reimplement multiple mv group export
-	//if raw and exportable2 then
+	// TODO reimplement multiple mv group export
+	// if raw and exportable2 then
 	// mvgroupno+=1
 	// if mvgroupno=1 then mvgroupno=2
 	// goto nextmvgroup

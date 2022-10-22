@@ -47,14 +47,14 @@ var xx;
 
 function main(out bakpars, in process0 = var()) {
 
-	//optonally get the backpars for a specific process if given
+	// optonally get the backpars for a specific process if given
 	if (process0.unassigned()) {
 		process = SYSTEM;
 	} else {
 		process = process0;
 	}
 
-	//by test data means any non-live data that doesnt require backup
+	// by test data means any non-live data that doesnt require backup
 
 	if (not(bakpars.read(DEFINITIONS, "BACKUP"))) {
 		bakpars = "";
@@ -66,7 +66,7 @@ function main(out bakpars, in process0 = var()) {
 			}
 		}  //ii;
 	}
-	//osread tt from '..\..\backup.cfg' then
+	// osread tt from '..\..\backup.cfg' then
 	var configfilename = "../../backup.cfg";
 	configfilename.converter("/", OSSLASH);
 	if (tt.osread(configfilename)) {
@@ -78,8 +78,8 @@ function main(out bakpars, in process0 = var()) {
 	}
 
 	if (VOLUMES) {
-		//if bakpars<3>='' then bakpars<3>='2:00'
-		//if bakpars<4>='' then bakpars<4>='2:05'
+		// if bakpars<3>='' then bakpars<3>='2:00'
+		// if bakpars<4>='' then bakpars<4>='2:05'
 		if (minbaktime_ eq "") {
 			bakpars(3) = "1:00";
 		}
@@ -96,12 +96,12 @@ function main(out bakpars, in process0 = var()) {
 			bakpars(5) = "1234567";
 		}
 	} else {
-		//suppress on exodus
+		// suppress on exodus
 		bakpars(3) = -1;
 		bakpars(4) = -1;
 	}
 
-	//fix bug in data entry that allows : and :: to be entered
+	// fix bug in data entry that allows : and :: to be entered
 	if (bakdisk_.starts(":")) {
 		bakpars(7) = "";
 	}
@@ -116,29 +116,29 @@ function main(out bakpars, in process0 = var()) {
 		bakpars(12) = bakdisk_;
 	}
 
-	//backup depending on configuration file
-	//if any database listed there
+	// backup depending on configuration file
+	// if any database listed there
 	var dbcode	= process.f(17).lcase();
 	var dbcodes = process.f(58).lcase();
 
 	if (dbcodes and VOLUMES) {
 
-		//databases to be excluded
+		// databases to be excluded
 		bakpars(8) = "";
 
-		//decide backup required or not by indicating testdata
+		// decide backup required or not by indicating testdata
 		if (dbcodes.locate(dbcode, dbn)) {
 			tt = process.f(60, dbn);
 		} else {
 			tt = 0;
 		}
-		//test/nonlive data
+		// test/nonlive data
 		bakpars(11) = not(tt);
 
-		//otherwise backup depending on backup.cfg etc
+		// otherwise backup depending on backup.cfg etc
 	} else {
 
-		//autodetermine if it is "test" data
+		// autodetermine if it is "test" data
 		if (baktestdata_ eq "") {
 			var testdata = 1;
 			if (process.f(17).ends("_test")) {
@@ -146,8 +146,8 @@ function main(out bakpars, in process0 = var()) {
 			} else if (process.f(23).ucase().contains("TESTING")) {
 			} else if (osfile("~/hosts/disabled.cfg")) {
 			} else {
-				//not otherwise specified then exclude database if in list of non-live data
-				//none-live could include test data or consolidated copies
+				// not otherwise specified then exclude database if in list of non-live data
+				// none-live could include test data or consolidated copies
 				if (not(bakexcludedatasets_.locate(process.f(17), xx))) {
 					testdata = 0;
 				}

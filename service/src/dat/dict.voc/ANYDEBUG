@@ -24,8 +24,8 @@ S
 		return 0;\
 	}\
 \
-	//upper=@record\
-	//convert @lower.case to @upper.case in upper\
+	// upper=@record\
+	// convert @lower.case to @upper.case in upper\
 \
 	if (RECORD.contains("debug")) {\
 		return 1;\

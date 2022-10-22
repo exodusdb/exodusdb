@@ -27,16 +27,16 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 			id = arg4;
 		}
 
-		//<a id="menu_SUPPORT">_Support</a>
-		//<div class="menu">
+		// <a id="menu_SUPPORT">_Support</a>
+		// <div class="menu">
 
-		//use menu title as menu id
+		// use menu title as menu id
 		if (not id) {
 			id = mainmenu.ucase();
 			id.converter("_", "");
 		}
 
-		//convert _x to <u>x</u> to indicate keyboard shortcut
+		// convert _x to <u>x</u> to indicate keyboard shortcut
 		var tt = mainmenu.index("_");
 		if (tt) {
 			mainmenu.paster(tt, 2, "<u>" ^ mainmenu[tt + 1] ^ "</u>");
@@ -49,36 +49,36 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 
 	} else if (mode eq "SUBMENU") {
 
-		//<a>_Reports</a>
-		//<div class="menu">
+		// <a>_Reports</a>
+		// <div class="menu">
 
 		var submenu = arg3;
 
-		//convert _x to <u>x</u> to indicate keyboard shortcut
+		// convert _x to <u>x</u> to indicate keyboard shortcut
 		var tt = submenu.index("_");
 		if (tt) {
 			submenu.paster(tt, 2, "<u>" ^ submenu[tt + 1] ^ "</u>");
 		}
 
 		tx ^= FM ^ "<a>" ^ submenu ^ "</a>";
-		//submenus are same class as menus
+		// submenus are same class as menus
 		tx ^= FM ^ " <div class=\"menu\">";
 
 	} else if (mode eq "ADDITEM") {
 
 		var item = arg3;
-		//equate href to arg4
-		//equate onclick to arg5
+		// equate href to arg4
+		// equate onclick to arg5
 
-		//<a href="../media/schedules.htm?filename=PLANS&amp;plantype=1&ratings=1"><u>M</u>onth Plan File</a><br />
+		// <a href="../media/schedules.htm?filename=PLANS&amp;plantype=1&ratings=1"><u>M</u>onth Plan File</a><br />
 		var props = "";
-		//if unassigned(id) else props:=' id=':quote(id)
-		//if unassigned(onclick) else props:=' onclick = ':quote(onclick)
+		// if unassigned(id) else props:=' id=':quote(id)
+		// if unassigned(onclick) else props:=' onclick = ':quote(onclick)
 		if (not(arg5.unassigned())) {
 			props ^= " onclick = " ^ (arg5.quote());
 		}
 
-		//convert _x to <u>x</u> to indicate keyboard shortcut
+		// convert _x to <u>x</u> to indicate keyboard shortcut
 		var tt = item.index("_");
 		if (tt) {
 			item.paster(tt, 2, "<u>" ^ item[tt + 1] ^ "</u>");
@@ -111,7 +111,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		call sysmsg(mode.quote() ^ " invalid mode in MENU.SUBS");
 	}
 
-	//prevent href being carried forwards to ADDITEM which use onclick instead
+	// prevent href being carried forwards to ADDITEM which use onclick instead
 	arg4 = "";
 
 	return 0;

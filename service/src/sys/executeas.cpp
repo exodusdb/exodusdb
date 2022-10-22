@@ -20,9 +20,9 @@ function main(in cmd, in username) {
 		USERNAME		= (newusername);
 	}
 
-	///////////
+	// /////////
 	execute(cmd);
-	///////////
+	// /////////
 
 	if (username) {
 		USERNAME = (origusername);

@@ -5,7 +5,7 @@ libraryinit()
 
 function main(in string0) {
 	if (string0.unassigned()) {
-		//de bug
+		// de bug
 		string1 = "UNASSIGNED";
 	} else {
 		string1 = string0;

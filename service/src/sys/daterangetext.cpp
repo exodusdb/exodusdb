@@ -7,16 +7,16 @@ libraryinit()
 
 function main(in d1, in d2, out result, io lang) {
 
-	//returns minimal text representation of date range
+	// returns minimal text representation of date range
 	// if @sentence='DATERANGETEXT' then goto testit
-	//1 Jan 2010
-	//Jan 2010
-	//2 - 20 Jan 2010
-	//Jan - Feb 2010
-	//15 Feb - 20 Mar 2010
-	//Jan - Dec 2010
-	//Feb 2010 - Jan 2011
-	//10 Mar 2010 - 5 Feb 2010
+	// 1 Jan 2010
+	// Jan 2010
+	// 2 - 20 Jan 2010
+	// Jan - Feb 2010
+	// 15 Feb - 20 Mar 2010
+	// Jan - Dec 2010
+	// Feb 2010 - Jan 2011
+	// 10 Mar 2010 - 5 Feb 2010
 
 	if (lang.unassigned()) {
 		lang = sys.glang;
@@ -30,17 +30,17 @@ function main(in d1, in d2, out result, io lang) {
 	tt(4) = tt.f(4) + 0;
 
 	if (tt.f(3) eq tt.f(6)) {
-		//dont show both years if same
+		// dont show both years if same
 		tt(3) = "";
 		if (tt.f(2) eq tt.f(5)) {
-			//dont show both months if same year and month
+			// dont show both months if same year and month
 			tt(2) = "";
 		}
 	}
 
-	//dont show start and end day of month if complete calendar months
+	// dont show start and end day of month if complete calendar months
 	if (tt.f(1) eq 1) {
-		//calculate end of month of stop date
+		// calculate end of month of stop date
 		t2 = iconv(t2.oconv("D2/E").field("/", 2, 2), "[DATEPERIOD]");
 		if (tt.f(4) eq t2.oconv("D2/E").field("/", 1)) {
 			tt(1) = "";
@@ -48,7 +48,7 @@ function main(in d1, in d2, out result, io lang) {
 		}
 	}
 
-	//monthnames
+	// monthnames
 	if (tt.f(2)) {
 		tt(2) = lang.f(2).field("|", tt.f(2));
 	}
@@ -56,12 +56,12 @@ function main(in d1, in d2, out result, io lang) {
 		tt(5) = lang.f(2).field("|", tt.f(5));
 	}
 
-	//eliminate first dom if same dom
+	// eliminate first dom if same dom
 	if ((tt.f(1) eq tt.f(4) and not(tt.f(2))) and not(tt.f(3))) {
 		tt(1) = "";
 	}
 
-	//add hyphen if still a range
+	// add hyphen if still a range
 	if (not(tt.first(3) eq(FM ^ FM ^ FM))) {
 		if (tt.f(2) eq "" and tt.f(3) eq "") {
 			tt(3) = tt.f(3) ^ " ^ ";
@@ -90,7 +90,7 @@ function main(in d1, in d2, out result, io lang) {
 
 			dd='1/1/2010 31/12/2010';gosub test;
 
-			//multi-year
+			// multi-year
 			dd='1/2/2010 31/1/2011';gosub test;
 			dd='1/1/2010 31/12/2011';gosub test;
 			dd='10/3/2010 5/2/2011';gosub test;

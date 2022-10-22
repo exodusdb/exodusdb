@@ -3,10 +3,10 @@ libraryinit()
 
 function main(in instr, in sepchars, in stoplist, in mode) {
 
-	//split into words by separators
+	// split into words by separators
 	var outstr = instr.convert(sepchars, str(VM, sepchars.len()));
 
-	//remove stop words
+	// remove stop words
 	if (mode) {
 		var xx;
 		for (var ii = outstr.fcount(VM); ii > 0; --ii) {

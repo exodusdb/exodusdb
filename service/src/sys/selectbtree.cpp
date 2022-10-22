@@ -15,14 +15,14 @@ function main(in filename, in indexid, in texts0, io msg) {
 	msg		   = "";
 	var ntexts = texts.fcount(VM);
 
-	//analogous code whereever allpunctuation is used
-	//ED BP LISTSCHED AGENCY.SUBS SCHEDULES.DICT
+	// analogous code whereever allpunctuation is used
+	// ED BP LISTSCHED AGENCY.SUBS SCHEDULES.DICT
 	var allpunctuation = SYSTEM.f(130);
 	texts.converter(allpunctuation, var(50).space());
 	var temp = texts.trim();
 
 	temp.replacer(" ", "&");
-	//if 1 then
+	// if 1 then
 	temp.replacer("&", "]&");
 	temp.replacer(VM, "]" ^ VM);
 	temp ^= "]";
@@ -36,8 +36,8 @@ function main(in filename, in indexid, in texts0, io msg) {
 	temp = indexid ^ VM ^ temp ^ FM;
 	call btreeextract(temp, filename, srcdict, foundkeys);
 
-	//suppress maximum message
-	//similar code in LISTSCHED and AGENCY.SUBS
+	// suppress maximum message
+	// similar code in LISTSCHED and AGENCY.SUBS
 	if (msg_.contains("maximum")) {
 		msg_ = "Too many records found. Some may have been excluded.";
 	}
@@ -56,7 +56,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 	var listkey = "SELECTBTREE:" ^ SYSTEM.f(24);
 	foundkeys.write(lists, listkey);
 	getlist("" ^ listkey ^ " (S)");
-	//delete lists,listkey
+	// delete lists,listkey
 
 	return 0;
 }

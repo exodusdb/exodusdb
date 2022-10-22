@@ -34,27 +34,27 @@ var wsmsg;
 
 function main(in mode) {
 
-	//use agp<> instead of @record<> to assist source code searching for agp<?>
+	// use agp<> instead of @record<> to assist source code searching for agp<?>
 
 	if (ID eq "TAXES") {
-		//call tax.subs(mode)
-		//make definition.subs independent for c++
+		// call tax.subs(mode)
+		// make definition.subs independent for c++
 		systemsubs = "taxsubs";
 		call systemsubs(mode);
 		return 0;
 	}
 
 	if (ID eq "ALL") {
-		//call voucher.type.subs(mode)
-		//make definition.subs independent for c++
+		// call voucher.type.subs(mode)
+		// make definition.subs independent for c++
 		systemsubs = "vouchertypesubs";
 		call systemsubs(mode);
 		return 0;
 	}
 
 	if (ID eq "TIMESHEET.PARAMS") {
-		//call timesheetparam.subs(mode)
-		//make definition.subs independent for c++
+		// call timesheetparam.subs(mode)
+		// make definition.subs independent for c++
 		systemsubs = "timesheetparamsubs";
 		call systemsubs(mode);
 		return 0;
@@ -64,8 +64,8 @@ function main(in mode) {
 
 	if (mode eq "PREREAD") {
 
-		//system configuration
-		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
+		// system configuration
+		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
 		if (systemcodes.locateusing(",", ID, xx)) {
 
 			op = "SYSTEM CONFIGURATION";
@@ -86,10 +86,10 @@ function main(in mode) {
 
 	} else if (mode eq "POSTREAD") {
 
-		//NB also called from postwrite
+		// NB also called from postwrite
 
-		//system configuration
-		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
+		// system configuration
+		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
 		if (systemcodes.locateusing(",", ID, xx)) {
 
 			op = "SYSTEM CONFIGURATION";
@@ -113,7 +113,7 @@ function main(in mode) {
 					smtprec = "";
 				}
 
-				//get system and backup rec from dos
+				// get system and backup rec from dos
 			} else {
 				if (not(RECORD.osread(ID.lcase()))) {
 					RECORD = "";
@@ -138,8 +138,8 @@ function main(in mode) {
 				return 0;
 			}
 
-			//template now provided by readenvironment in client
-			//either SECURITY or HOURLYRATES
+			// template now provided by readenvironment in client
+			// either SECURITY or HOURLYRATES
 			if (win.templatex eq "") {
 				win.templatex = "SECURITY";
 			}
@@ -147,10 +147,10 @@ function main(in mode) {
 			return 0;
 		}
 
-		//default cheque format
+		// default cheque format
 		if (win.wlocked and ID.field("*", 1) eq "CHEQUEDESIGN") {
 
-			//prevent update
+			// prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
 				win.srcfile.unlock(ID);
 				win.wlocked = "";
@@ -177,7 +177,7 @@ nochequeformat:
 					}
 				}
 
-				//flag a new record despite being copied
+				// flag a new record despite being copied
 				RECORD(10) = "";
 				RECORD(11) = "";
 				RECORD(14) = "";
@@ -186,14 +186,14 @@ nochequeformat:
 			return 0;
 		}
 
-		//control access and updating of things like
-		//INDEXVALUES*PLANS*EXECUTIVE_CODE
-		//INDEXVALUES*SCHEDULES*EXECUTIVE_CODE
-		//INDEXVALUES*JOBS*EXECUTIVE_CODE
+		// control access and updating of things like
+		// INDEXVALUES*PLANS*EXECUTIVE_CODE
+		// INDEXVALUES*SCHEDULES*EXECUTIVE_CODE
+		// INDEXVALUES*JOBS*EXECUTIVE_CODE
 		if (ID.field("*", 1) eq "INDEXVALUES") {
 
-			//currently only EXECUTIVE from UI
-			//default to authorised ATM
+			// currently only EXECUTIVE from UI
+			// default to authorised ATM
 			var pretendfile = ID.field("*", 3).field("_", 1);
 			if (not(authorised(pretendfile ^ " ACCESS", msg))) {
 				goto unlockdefinitions;
@@ -203,8 +203,8 @@ nochequeformat:
 				goto preventupdate;
 			}
 
-			//add any additional exectives that somehow crept into the index
-			//without being added to DEFINITIONS record
+			// add any additional exectives that somehow crept into the index
+			// without being added to DEFINITIONS record
 			var	 filename  = ID.field("*", 2);
 			var	 fieldname = ID.field("*", 3);
 			call collectixvals(filename, fieldname);
@@ -215,17 +215,17 @@ nochequeformat:
 					if (not(RECORD.f(1).locateby("AL", val, vn))) {
 						RECORD.inserter(1, vn, val);
 						RECORD.inserter(2, vn, "");
-						//any more in parallel
+						// any more in parallel
 					}
 				}
 			}  //ii;
 
-			//return
+			// return
 		}
 
 		if (ID.field("*", 2) eq "ANALDESIGN") {
 
-			//check allowed access
+			// check allowed access
 			if (not(authorised("BILLING REPORT ACCESS", msg, ""))) {
 unlockdefinitions:
 				win.reset = 5;
@@ -233,7 +233,7 @@ unlockdefinitions:
 				return invalid(msg);
 			}
 
-			//always allowed to update or delete own records
+			// always allowed to update or delete own records
 			if (RECORD.f(8) ne USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
@@ -242,7 +242,7 @@ unlockdefinitions:
 				}
 			}
 
-			//prevent update or delete of EXODUS definitions
+			// prevent update or delete of EXODUS definitions
 			if ((win.wlocked and RECORD.f(8).contains("EXODUS")) and not(USERNAME.contains("EXODUS"))) {
 preventupdate:
 				win.wlocked = 0;
@@ -254,7 +254,7 @@ preventupdate:
 
 		if (ID eq "AGENCY.PARAMS") {
 
-			//configuration is locked to EXODUS initially
+			// configuration is locked to EXODUS initially
 			if (not(authorised("AGENCY CONFIGURATION UPDATE", xx, "EXODUS"))) {
 				goto preventupdate;
 			}
@@ -266,9 +266,9 @@ preventupdate:
 
 		if (ID eq "SECURITY") {
 
-			//no difference between security update and hourlyrate update now
-			//template='SECURITY'
-			//now there is!
+			// no difference between security update and hourlyrate update now
+			// template='SECURITY'
+			// now there is!
 			if (win.templatex eq "") {
 				win.templatex = "SECURITY";
 			}
@@ -278,17 +278,17 @@ preventupdate:
 			return 0;
 		}
 
-		//save cheque design for exodus
+		// save cheque design for exodus
 		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
 
-			//prevent update
+			// prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
 				return invalid(msg);
 			}
 
 			if (RECORD.f(14)) {
 
-				//remove old default
+				// remove old default
 				var temp;
 				if (temp.read(win.srcfile, "CHEQUEDESIGN*DEFAULT")) {
 					var temp2;
@@ -298,10 +298,10 @@ preventupdate:
 					}
 				}
 
-				//set new default
+				// set new default
 				ID.field("*", 2).write(win.srcfile, "CHEQUEDESIGN*DEFAULT");
 
-				//if EXODUS then save the default as EXODUS programs default
+				// if EXODUS then save the default as EXODUS programs default
 				if (USERNAME eq "EXODUS") {
 					if (temp.open("ALANGUAGE", "")) {
 						RECORD.write(temp, "VOUCHERS**CHEQUE");
@@ -310,19 +310,19 @@ preventupdate:
 
 			} else {
 
-				//remove as default (assume is this account)
+				// remove as default (assume is this account)
 				if (win.orec.f(14)) {
 					win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 				}
 			}
 		}
 
-		//update exodus standard (in case doing this on the programming system)
-		//the programming standard is installed into all clients
-		//on first login after upgrade
-		//this is also done in copygbp perhaps could be removed from there
-		//almost identical code in definition.subs and get.subs (for documents)
-		//field 10 in documents and definitions xxx*analdesign means the same
+		// update exodus standard (in case doing this on the programming system)
+		// the programming standard is installed into all clients
+		// on first login after upgrade
+		// this is also done in copygbp perhaps could be removed from there
+		// almost identical code in definition.subs and get.subs (for documents)
+		// field 10 in documents and definitions xxx*analdesign means the same
 		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
@@ -335,7 +335,7 @@ preventupdate:
 
 		if (ID eq "AGENCY.PARAMS") {
 
-			//prevent changing "invno by company" after data is entered
+			// prevent changing "invno by company" after data is entered
 			if (RECORD.f(48) ne win.orec.f(48)) {
 				call anydata("", anydataexists);
 				if (anydataexists) {
@@ -346,7 +346,7 @@ preventupdate:
 				}
 			}
 
-			//check authorised to set posting
+			// check authorised to set posting
 			for (const var fn : range(100, 102)) {
 				var usercode = RECORD.f(fn);
 				if (usercode) {
@@ -355,12 +355,12 @@ preventupdate:
 						return invalid(msg);
 					}
 					if (usercode ne win.orec.f(fn)) {
-						//updater must themselves be authorised to post journals
+						// updater must themselves be authorised to post journals
 						if (not(authorised("JOURNAL POST", msg))) {
 							msg = "You are not authorised to change financial usercode" _FM _FM ^ msg;
 							return invalid(msg);
 						}
-						//financial usercode must be authorised to post journals
+						// financial usercode must be authorised to post journals
 						if (not(authorised("JOURNAL POST", msg, "", usercode))) {
 							msg = usercode.quote() ^ " financial user is not authorised to do Journal Post";
 							return invalid(msg);
@@ -402,7 +402,7 @@ preventupdate:
 				return invalid(msg);
 			}
 
-			//save the requester if requested createads
+			// save the requester if requested createads
 			if (RECORD.f(125) ne win.orec.f(125)) {
 				RECORD(128) = USERNAME;
 			}
@@ -410,12 +410,12 @@ preventupdate:
 
 	} else if (mode eq "POSTWRITE") {
 
-		//system configuration
+		// system configuration
 		if (systemcodes.locateusing(",", ID, xx)) {
 
-			//op='SYSTEM CONFIGURATION'
-			//gosub security2
-			//if valid else return
+			// op='SYSTEM CONFIGURATION'
+			// gosub security2
+			// if valid else return
 
 			var backupkey = ID;
 			backupkey.replacer("SYSTEM", "BACKUP");
@@ -425,7 +425,7 @@ preventupdate:
 			smtpkey.replacer("SYSTEM", "SMTP");
 			smtprec = RECORD.field(_FM, 101, 9);
 
-			//ensure default style is null
+			// ensure default style is null
 			tt = RECORD.f(46);
 			tt.converter(_VM, "");
 			tt.replacer("Default", "");
@@ -433,10 +433,10 @@ preventupdate:
 				RECORD(46) = "";
 			}
 
-			//write backup rec on definitions
+			// write backup rec on definitions
 			if (ID eq "SYSTEM") {
 
-				//get lastbackupdate in unlikely event that it has changed during update
+				// get lastbackupdate in unlikely event that it has changed during update
 				if (not(tt.readv(DEFINITIONS, backupkey, 1))) {
 					tt = "";
 				}
@@ -446,31 +446,31 @@ preventupdate:
 				smtpkey = "SMTP.CFG";
 				smtprec.write(DEFINITIONS, smtpkey);
 
-				//write system and backup rec in dos
+				// write system and backup rec in dos
 			} else {
 				call oswrite(RECORD, ID.lcase());
 				call oswrite(backuprec, backupkey.lcase());
 				call oswrite(smtprec, smtpkey.lcase());
 			}
 
-			//warning if backup drive does not exist/cannot be written to
+			// warning if backup drive does not exist/cannot be written to
 			var backupdrives = RECORD.f(77);
 			if (RECORD.f(82) ne RECORD.f(77)) {
 				backupdrives(-1) = RECORD.f(82);
 			}
 			for (const var driven : range(1, 999)) {
 				var drive = backupdrives.f(driven)[1];
-				///BREAK;
+				// /BREAK;
 				if (not drive)
 					break;
-				//TODO replace with checkwritable()
+				// TODO replace with checkwritable()
 				drive ^= ":";
 				call osmkdir(drive ^ OSSLASH_ "data.bak");
 				call shell2("dir " ^ drive.first(2), errors);
 				if (errors) {
 					call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
 				} else {
-					//tempfilename=lcase(drive:'\data.bak':'\':rnd(8))
+					// tempfilename=lcase(drive:'\data.bak':'\':rnd(8))
 					var tempfilename = (drive ^
 										"/data.bak"
 										"/" ^
@@ -491,14 +491,14 @@ preventupdate:
 				}
 			}  //driven;
 
-			//create/update ddns configuration if necessary
-			//actually only the ddns.cmd file really need be updated
-			//but atm it recreates everything from scratch
+			// create/update ddns configuration if necessary
+			// actually only the ddns.cmd file really need be updated
+			// but atm it recreates everything from scratch
 			var oldhostname = win.orec.f(57);
 			var newhostname = RECORD.f(57);
 			if (newhostname and newhostname ne oldhostname) {
 				SYSTEM(57) = newhostname;
-				//in INIT.GENERAL and DEFINITION.SUBS
+				// in INIT.GENERAL and DEFINITION.SUBS
 				if (var("ddns.cmd").osfile()) {
 					perform("STARTDDNS");
 				}
@@ -510,28 +510,28 @@ preventupdate:
 			return 0;
 		}
 
-		//have to pass back the partial record
+		// have to pass back the partial record
 		if (ID eq "SECURITY") {
 
-			//could be HOURLYRATES which has different authorisation
+			// could be HOURLYRATES which has different authorisation
 			if (win.templatex eq "") {
 				win.templatex = "SECURITY";
 			}
 
-			//to get lastest userprivs
+			// to get lastest userprivs
 			call securitysubs("POSTAPP");
 
-			//to the get the filtered record again
+			// to the get the filtered record again
 			call definitionsubs("POSTREAD");
 		}
 
 		gosub postreadfix();
 
-		//trigger restart if necessary (is this really necessary now)
-		//TODO make it only per database
+		// trigger restart if necessary (is this really necessary now)
+		// TODO make it only per database
 		if (USERNAME ne "EXODUS") {
 			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",", ID, xx)) {
-				//TODO prevent a write from system configuration file
+				// TODO prevent a write from system configuration file
 				call osread(tt, "system.cfg");
 				call oswrite(tt, "system.cfg");
 			}
@@ -539,8 +539,8 @@ preventupdate:
 
 	} else if (mode eq "PREDELETE") {
 
-		//system configuration
-		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
+		// system configuration
+		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
 		if (systemcodes.locateusing(",", ID, xx)) {
 
 			op = "SYSTEM CONFIGURATION";
@@ -549,7 +549,7 @@ preventupdate:
 				return 0;
 			}
 
-			//get from operating system
+			// get from operating system
 			if (ID ne "SYSTEM") {
 				ID.osremove();
 			}
@@ -564,12 +564,12 @@ preventupdate:
 
 		if (ID.field("*", 2) eq "ANALDESIGN") {
 
-			//prevent update
+			// prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
 				return invalid(msg);
 			}
 
-			//always allowed to delete own records
+			// always allowed to delete own records
 			if (RECORD.f(8) ne USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
@@ -579,16 +579,16 @@ preventupdate:
 			}
 		}
 
-		//remove default cheque design
+		// remove default cheque design
 		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
 			if (RECORD.f(14)) {
 				win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 			}
 		}
 
-		//update exodus standard (in case doing this on the programming system)
-		//%DELETED% ensures that deleted EXODUS documents get deleted
-		//on upgrading clients
+		// update exodus standard (in case doing this on the programming system)
+		// %DELETED% ensures that deleted EXODUS documents get deleted
+		// on upgrading clients
 		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
@@ -598,7 +598,7 @@ preventupdate:
 				if (xx.read(reports, key)) {
 					var("%DELETED%").write(reports, key);
 				}
-				//delete reports,key
+				// delete reports,key
 			}
 		}
 
@@ -617,29 +617,29 @@ preventupdate:
 
 subroutine reorderdbs() {
 
-	//reorder dbs in ADAGENCY.VOL, ACCOUNTS.VOL etc
-	//according to dbs listed in configuration
+	// reorder dbs in ADAGENCY.VOL, ACCOUNTS.VOL etc
+	// according to dbs listed in configuration
 	var newdbcodes = SYSTEM.f(58);
 
-	//read the existing dbdir or silently quit
+	// read the existing dbdir or silently quit
 	var dbdirfilename = APPLICATION.lcase() ^ ".vol";
 	if (not(dbdir.osread(dbdirfilename))) {
 		return;
 	}
 	var olddbdir = dbdir;
 
-	//convert from DOS
-	//dbdir=field(dbdir,char(26),1)
+	// convert from DOS
+	// dbdir=field(dbdir,char(26),1)
 	dbdir.converter("\r\n", _FM _FM);
 	dbdir.replacer(_FM _FM, _FM);
 	dbdir.converter(",*", _SM _VM);
 
-	//extract substitution and dblist from dbdir line 1
+	// extract substitution and dblist from dbdir line 1
 	var substitution = dbdir.f(1).field(" ", 1);
 	var dblist		 = dbdir.f(1).field(" ", 2, 9999);
 
-	//create newdblist in order of given newdbcodes
-	//if not found in new order then append in order found
+	// create newdblist in order of given newdbcodes
+	// if not found in new order then append in order found
 	let ndbs	  = dblist.fcount(_VM);
 	var newdblist = "";
 	for (const var dbn : range(1, ndbs)) {
@@ -651,11 +651,11 @@ subroutine reorderdbs() {
 		newdblist(1, newdbcoden) = db;
 	}  //dbn;
 
-	//replace substitution and dblist
+	// replace substitution and dblist
 	var newdbdir = dbdir;
 	newdbdir(1)	 = substitution ^ " " ^ newdblist;
 
-	//convert to DOS
+	// convert to DOS
 	if (not newdbdir.ends(_FM)) {
 		newdbdir ^= _FM;
 	}
@@ -664,7 +664,7 @@ subroutine reorderdbs() {
 
 	if (newdbdir ne olddbdir) {
 		call oswrite(newdbdir, dbdirfilename);
-		//call sysmsg(newdbcodes,'List of databases reordered')
+		// call sysmsg(newdbcodes,'List of databases reordered')
 	}
 	return;
 }
@@ -701,7 +701,7 @@ subroutine postreadfix() {
 			RECORD(50, 1, 2) = "2000.01";
 		}
 
-		//done in agency.subs getnextid
+		// done in agency.subs getnextid
 		if (RECORD.f(53) eq "") {
 			RECORD(53) = "<NUMBER>";
 		}
@@ -725,7 +725,7 @@ subroutine postreadfix() {
 			RECORD(26) = "WIP<YEAR>";
 		}
 
-		//copy schedule footer to plan footer
+		// copy schedule footer to plan footer
 		if (not(RECORD.f(34))) {
 			RECORD(34) = RECORD.f(11);
 		}

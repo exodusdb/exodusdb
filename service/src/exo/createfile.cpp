@@ -3,12 +3,12 @@ libraryinit()
 
 function main() {
 
-	//syntax is:
-	//createfile filename dictfilename
-	//or
-	//createfile filename
+	// syntax is:
+	// createfile filename dictfilename
+	// or
+	// createfile filename
 
-	//volumename is ignored
+	// volumename is ignored
 
 	var command = COMMAND.convert(FM, " ").lcase();
 
@@ -19,9 +19,9 @@ function main() {
 	command.replacer(" data ", " ");
 	command.replacer(" dict ", " ");
 
-	//printl(command);
+	// printl(command);
 
-	//something like DATAVOL\NEOS0001 or REVBOOT will be ignored
+	// something like DATAVOL\NEOS0001 or REVBOOT will be ignored
 	var volname = field(command, " ", 2);
 
 	var filename = field(command, " ", 3);
@@ -30,13 +30,13 @@ function main() {
 		volname	 = "";
 	}
 
-	//TODO support volume in createfile
+	// TODO support volume in createfile
 
-	//dict file
+	// dict file
 	if (not dataonly)
 		create("DICT." ^ filename);
 
-	//data file
+	// data file
 	if (not dictonly)
 		create(filename);
 

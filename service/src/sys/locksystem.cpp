@@ -17,7 +17,7 @@ var tt;
 var options;
 var t2;
 var t3;
-var reply;	//num
+var reply;	// num
 var result;
 var msg;
 var datasetcode;
@@ -48,22 +48,22 @@ function main(in mode0, in dataset0) {
 		return 0;
 	}
 
-	//unlocking
-	//////////
+	// unlocking
+	// ////////
 
 	if (mode eq "UNLOCK") {
 		if (not dataset) {
 			voc.unlock("BACKUP*");
 		}
-		//why again?
+		// why again?
 		xx = unlockrecord("", voc, "BACKUP*" ^ dataset);
 		goto success;
 	}
 
-	//locking
-	////////
+	// locking
+	// //////
 
-	//check no other users
+	// check no other users
 checkotherusers:
 	otherusersx = otherusers(dataset);
 	if (otherusersx) {
@@ -74,19 +74,19 @@ checkotherusers:
 		otherusersx = otherusersx.f(2);
 		otherusersx.converter(VM, " ");
 
-		//t=if dataset then ' of dataset ':dataset else ''
+		// t=if dataset then ' of dataset ':dataset else ''
 		if (dataset) {
 			tt = " of dataset " ^ dataset;
 		} else {
 			tt = "";
 		}
 
-		//if decide('!There ':(if n=1 then 'is ' else 'are '):n:' other workstation':(if n>1 then 's' else ''):'|using EXODUS ':dataset:' at the moment.||All other users':t:' must exit EXODUS|before you can continue.||':otherusersx:'|','Retry|Cancel',reply) else reply=0
+		// if decide('!There ':(if n=1 then 'is ' else 'are '):n:' other workstation':(if n>1 then 's' else ''):'|using EXODUS ':dataset:' at the moment.||All other users':t:' must exit EXODUS|before you can continue.||':otherusersx:'|','Retry|Cancel',reply) else reply=0
 		options = "Retry|Cancel";
 		if (dataset) {
 			options ^= "|Attempt to close the " ^ dataset ^ " processes and retry";
 		}
-		//if decide('!There ':(if n=1 then 'is ' else 'are '):n:' other workstation':(if n>1 then 's' else ''):'|using EXODUS ':dataset:' at the moment.||All other users':t:' must exit EXODUS|before you can continue.||':otherusersx:'|',options,reply) else reply=0
+		// if decide('!There ':(if n=1 then 'is ' else 'are '):n:' other workstation':(if n>1 then 's' else ''):'|using EXODUS ':dataset:' at the moment.||All other users':t:' must exit EXODUS|before you can continue.||':otherusersx:'|',options,reply) else reply=0
 		if (nn eq 1) {
 			t2 = "is ";
 		} else {
@@ -117,7 +117,7 @@ lockit:
 
 	if (dataset) {
 
-		//temporary exclusive lock
+		// temporary exclusive lock
 		if (not(lockrecord("", voc, "BACKUP*"))) {
 			goto invalidx;
 		}
@@ -126,7 +126,7 @@ lockit:
 
 			xx = unlockrecord("", voc, "BACKUP*");
 
-			//msg2=msg
+			// msg2=msg
 			if (dataset) {
 				msg(-1) = dataset.quote() ^ "- SYSTEM IS LOCKED";
 			}
@@ -148,7 +148,7 @@ invalidx:
 			goto lockit;
 		}
 
-		//release exclusive lock
+		// release exclusive lock
 		xx = unlockrecord("", voc, "BACKUP*");
 
 	} else {
@@ -160,7 +160,7 @@ invalidx:
 
 ////////
 success:
-	////////
+	// //////
 	return 1;
 }
 

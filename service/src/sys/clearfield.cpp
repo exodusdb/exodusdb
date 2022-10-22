@@ -10,7 +10,7 @@ libraryinit()
 var nindexed;  //num
 
 function main() {
-	//
+	// 
 
 	if (SENTENCE.contains("(")) {
 		options = field2(SENTENCE, "(", -1);
@@ -58,19 +58,19 @@ function main() {
 	fns.converter(" ,", FM ^ FM);
 	var nfields = fns.fcount(FM);
 
-	//check numeric
+	// check numeric
 	// space to defeat convsyntax
 	for (var ii = 1; ii <= nfields; ii++) {
 tryagain:
 		var fn = fns.f(ii);
-		//prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0
+		// prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0
 		if (not(fn)) {
 			call mssg(fn.quote() ^ " field number is not supported");
 			stop();
 		}
 		if (not(fn.isnum())) {
 			if (DICT) {
-				//readv fn from @dict,fns<i>,2 else null
+				// readv fn from @dict,fns<i>,2 else null
 				var dict;
 				if (dict.read(DICT, fns.f(ii))) {
 					if (dict.f(1) eq "F") {
@@ -105,7 +105,7 @@ tryagain:
 	var isindexed = file.contains("SI.MFS") ne 0;
 
 next:
-	/////
+	// ///
 
 	call giveway();
 	if (not(readnext(ID))) {
@@ -116,7 +116,7 @@ next:
 		goto next;
 	}
 	recn += 1;
-	//if interactive then PRINT @(@crthigh/2,25) else print @(0):@(-4):
+	// if interactive then PRINT @(@crthigh/2,25) else print @(0):@(-4):
 	if (TERMINAL)
 		output(AT(-40), recn, nrecs, "\x09", ID.oconv("L#30"), " ");
 	if (RECORD.read(file, ID)) {
@@ -132,13 +132,13 @@ next:
 		for (const var ii : range(1, nfields)) {
 			if (RECORD.f(fns.f(ii)) ne cleartovalue2) {
 				cleared = 1;
-				//RECORD(fns.f(ii)) = cleartovalue2;
+				// RECORD(fns.f(ii)) = cleartovalue2;
 				pickreplacer(RECORD, fns.f(ii), cleartovalue2);
 			}
 		}  //ii;
 		if (cleared) {
 			while (true) {
-				///BREAK;
+				// /BREAK;
 				if (not(RECORD and ((FM ^ VM ^ SM).contains(RECORD[-1]))))
 					break;
 				RECORD.popper();
@@ -153,16 +153,16 @@ next:
 			if (nindexed gt 100) {
 				gosub flush(filename);
 			}
-			//PRINT 'CLEARED':
-			//print
+			// PRINT 'CLEARED':
+			// print
 		}
 	}
-	//PRINT
+	// PRINT
 	goto next;
 
 /////
 exit:
-	/////
+	// ///
 	gosub flush(filename);
 	stop();
 

@@ -12,7 +12,7 @@ var l30;
 var colsep;
 var text;
 var file;
-var nrecs;	//num
+var nrecs;	// num
 var mod;
 var dir;
 var versiondata;
@@ -35,7 +35,7 @@ function main() {
 	}
 	text = "Copyright NEOSYS Software. All rights reserved.";
 	text ^= FM ^ FM ^ oconv("Module", l20) ^ colsep ^ oconv("Build date", l30);
-	//text:='Year 2000' l10
+	// text:='Year 2000' l10
 
 	file = "SCHEDULES";
 	gosub getnrecs();
@@ -83,13 +83,13 @@ function main() {
 subroutine getver() {
 	versiondata = "/version.dat";
 	versiondata.converter("/", OSSLASH);
-	//osread ver from dir:'\version.dat' else return;*ver='Not installed'
+	// osread ver from dir:'\version.dat' else return;*ver='Not installed'
 	if (not(ver.osread(dir ^ versiondata))) {
 		return;
 	}
 
 	text ^= FM ^ oconv(mod, l20) ^ colsep ^ oconv(ver, l30);
-	//text:='Tested OK' l10
+	// text:='Tested OK' l10
 
 	return;
 }

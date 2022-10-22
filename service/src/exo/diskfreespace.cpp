@@ -11,13 +11,13 @@ function main(in path0) {
 		path = path0;
 
 	var cmd = "df --output=avail " ^ path;
-	//TRACE(cmd)
+	// TRACE(cmd)
 	var available = osshellread(cmd).convert("\x0D\x0A", "  ").trim().field(" ", 2);
 
 	if (available == "" or not available.isnum())
 		available = 999999999;
 	else
-		//available*=1024; // not implemented yet?
+		// available*=1024; // not implemented yet?
 		available = available * 1024;
 
 	return available;

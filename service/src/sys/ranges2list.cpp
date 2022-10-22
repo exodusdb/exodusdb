@@ -8,24 +8,24 @@ libraryinit()
 	var basekey;
 var listid;
 var lists;
-var listn;	//num
+var listn;	// num
 var keys;
 var key;
 
 function main(io ranges0, in basekey0 = "", in listid0 = "") {
 
-	//generate individual numbers given a list of ranges
-	//eg 1000,1100-1200,2000-2100,3000
-	//in a comma, space or fm separated list
-	//
-	//basekey if given will allow creation of formatted numbers
-	//18/M/1000
-	//
-	//listid if given will store the generated numbers/codes as a list in LISTS
-	//
-	//Returns: result in ranges0 unless listid given
+	// generate individual numbers given a list of ranges
+	// eg 1000,1100-1200,2000-2100,3000
+	// in a comma, space or fm separated list
+	// 
+	// basekey if given will allow creation of formatted numbers
+	// 18/M/1000
+	// 
+	// listid if given will store the generated numbers/codes as a list in LISTS
+	// 
+	// Returns: result in ranges0 unless listid given
 
-	//equ maxlistpartsize to 32000
+	// equ maxlistpartsize to 32000
 	var maxlistpartsize = maxstrsize_ / 2;
 
 	if (basekey0.unassigned()) {
@@ -48,11 +48,11 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 		keys  = "";
 	}
 
-	//comma/space/fm separated ranges
+	// comma/space/fm separated ranges
 
 	var ranges = ranges0.trim();
-	//convert ',/' to '  ' in ranges
-	//dont convert / since an invoice number may contain a slash
+	// convert ',/' to '  ' in ranges
+	// dont convert / since an invoice number may contain a slash
 	ranges.converter(",", " ");
 	ranges.trimmer();
 	ranges.converter(" ", FM);
@@ -71,34 +71,34 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 
 		var rangex = ranges.f(ii);
 
-		//if enter something like P13/1000-2000 then
-		//prefix=P13/ start=1000 stop=2000
-		//ie TRAILING number range but wont work if trailing year like 1000/13
-		//startx=field(temp,'-',1)
+		// if enter something like P13/1000-2000 then
+		// prefix=P13/ start=1000 stop=2000
+		// ie TRAILING number range but wont work if trailing year like 1000/13
+		// startx=field(temp,'-',1)
 		var startx = "";
 		var prefix = rangex.field("-", 1);
 		while (true) {
 			var lastchar = prefix[-1];
-			///BREAK;
+			// /BREAK;
 			if (not(var("0123456789").contains(lastchar)))
 				break;
 			startx.prefixer(lastchar);
 			prefix.popper();
 		}  //loop;
 
-		//range of numbers
+		// range of numbers
 		var temp0 = rangex;
 		var temp  = temp0;
 		temp.converter(allchars, "");
 
 		if (temp.match("^\\d+-\\d+$")) {
 
-			//finish=field(temp,'-',2)
+			// finish=field(temp,'-',2)
 			var finish = "";
 			var tt	   = ranges.f(ii).field("-", 2);
 			while (true) {
 				var lastchar = tt[-1];
-				///BREAK;
+				// /BREAK;
 				if (not(var("0123456789").contains(lastchar)))
 					break;
 				finish.prefixer(lastchar);
@@ -125,15 +125,15 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 
 				if (listid) {
 					keys ^= FM ^ key;
-					//assumes key is not too long
+					// assumes key is not too long
 					if (keys.len() gt maxlistpartsize) {
 						gosub writelist();
 					}
 
 				} else {
-					//if (len(range)+len(ranges))>65000 then
+					// if (len(range)+len(ranges))>65000 then
 					if (range2.len() + ranges.len() gt maxstrsize_ - 530) {
-						//call msg('Range exceeds maximum of 65,000 characters|Please enter a smaller range')
+						// call msg('Range exceeds maximum of 65,000 characters|Please enter a smaller range')
 						call mssg("Range exceeds maximum|Please enter a smaller range");
 						ranges = "";
 						goto exit;
@@ -148,7 +148,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 				ranges(ii) = range2;
 			}
 
-			//not range
+			// not range
 		} else {
 			if (listid) {
 
@@ -162,7 +162,7 @@ makekey:
 					goto makekey;
 
 				} else {
-					//key=prefix:i2
+					// key=prefix:i2
 					key = rangex;
 				}
 
@@ -170,21 +170,21 @@ makekey:
 			}
 		}
 
-		//nextrange:;
+		// nextrange:;
 	}  //ii;
 
 exit:
-	/////
+	// ///
 	if (listid) {
 		if (keys) {
-			//return nlistparts in vnos to indicate success
+			// return nlistparts in vnos to indicate success
 			var vnos = listn;
 			if (not vnos) {
 				vnos = 1;
 			}
 			gosub writelist();
 		} else {
-			//return '' in vnos if none found (unlikely)
+			// return '' in vnos if none found (unlikely)
 			var vnos = "";
 		}
 	} else {

@@ -19,7 +19,7 @@ var datax;
 function main() {
 
 	var sentencex = SENTENCE.field("(", 1);
-	//cheap parser requires ~ for spaces
+	// cheap parser requires ~ for spaces
 	sentencex.converter(" ~", FM ^ " ");
 
 	var alertid		  = sentencex.f(2);
@@ -27,7 +27,7 @@ function main() {
 	var alerttype	  = sentencex.f(4);
 	var runhours	  = sentencex.f(5);
 	var runasusercode = sentencex.f(6);
-	//fixed to suppress at the moment TODO provide more control
+	// fixed to suppress at the moment TODO provide more control
 	var skipdaysoffandholidays = "*";
 
 	var targetusercodes = sentencex.f(7).convert(",", VM);
@@ -51,7 +51,7 @@ function main() {
 
 		sys.documents.deleterecord(alertid);
 
-		//RO means delete and overwrite to force rerun now (loss of lastrun time)
+		// RO means delete and overwrite to force rerun now (loss of lastrun time)
 		if (not overwrite) {
 			stop();
 		}
@@ -85,7 +85,7 @@ syntax:
 
 	if (not targetusercodes) {
 		targetusercodes = runasusercode;
-		//goto syntax
+		// goto syntax
 	}
 
 	var tt = runhours;
@@ -107,13 +107,13 @@ syntax:
 		stop();
 	}
 
-	//alertroutine=module:'.ALERTS'
-	//call @alertroutine(alerttype,runasuser, authtasks,title,request,data)
-	//name the variable after any one of the existing functions
-	//so c++ conversion works
-	//GENERAL.ALERTS MEDIA.ALERTS JOB.ALERTS FINANCE.ALERTS
+	// alertroutine=module:'.ALERTS'
+	// call @alertroutine(alerttype,runasuser, authtasks,title,request,data)
+	// name the variable after any one of the existing functions
+	// so c++ conversion works
+	// GENERAL.ALERTS MEDIA.ALERTS JOB.ALERTS FINANCE.ALERTS
 	tt = module ^ ".ALERTS";
-	//c++ variation
+	// c++ variation
 	if (not(VOLUMES)) {
 		tt.lcaser();
 		tt.converter(".", "");
@@ -143,7 +143,7 @@ syntax:
 	sys.document(25) = runhours.field(":", 4);
 	sys.document(26) = runhours.field(":", 5);
 	sys.document(27) = runhours.field(":", 6);
-	//document<28>=
+	// document<28>=
 	sys.document(31) = module;
 	sys.document(32) = alerttype;
 

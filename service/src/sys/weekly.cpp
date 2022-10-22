@@ -20,10 +20,10 @@ var difference;		   //num
 
 function main(in type, in input0, in mode, out output) {
 
-	//eg mode is WEEKLY,1/7,1,4
-	//ie year starts on the first monday as near as possible to 1st July
-	//and there are 4 weeks per period (which results in 13 periods per year)
-	//weeks per period MUST divide into 52 exactly
+	// eg mode is WEEKLY,1/7,1,4
+	// ie year starts on the first monday as near as possible to 1st July
+	// and there are 4 weeks per period (which results in 13 periods per year)
+	// weeks per period MUST divide into 52 exactly
 
 	if (input0 eq "") {
 		output = "";
@@ -37,30 +37,30 @@ function main(in type, in input0, in mode, out output) {
 	}
 	maxperiod = 52 / weeksperperiod;
 
-	//if oconv then convert internal date to year:period
-	///////////////////////////////////////////////////
+	// if oconv then convert internal date to year:period
+	// /////////////////////////////////////////////////
 	if (type eq "OCONV") {
 		temp   = input0.oconv("D2-E");
 		year   = temp.last(2);
 		period = temp.b(4, 2);
 
-		//guess the right financial year from the date
+		// guess the right financial year from the date
 		year += 1;
 		year = year.oconv("R(0)#2");
 
-		//get the first date of the financial year
+		// get the first date of the financial year
 tryyear:
 		year2 = year;
 		gosub getfirstdateofyear();
 		firstdateofyear2 = firstdateofyear;
-		//go to previous year if date before start of year
+		// go to previous year if date before start of year
 		if (input0 lt firstdateofyear) {
 			year = (addcent4(year) - 1).last(2);
 			goto tryyear;
 		} else {
 			year2 = (year + 1).oconv("R(0)#2");
 			gosub getfirstdateofyear();
-			//go to next year if date after last date of year
+			// go to next year if date after last date of year
 			if (input0 gt firstdateofyear - 1) {
 				year += 1;
 				year = year.oconv("R(0)#2");
@@ -78,9 +78,9 @@ tryyear:
 		return 0;
 	}
 
-	//if iconv then convert period (MM/YY or YYMM) to internal last date of month
-	////////////////////////////////////////////////////////////////////////////
-	//return the last day of the period (internal format)
+	// if iconv then convert period (MM/YY or YYMM) to internal last date of month
+	// //////////////////////////////////////////////////////////////////////////
+	// return the last day of the period (internal format)
 	if (input0.contains("/")) {
 		period = input0.field("/", 1);
 		year   = input0.field("/", 2);
@@ -89,7 +89,7 @@ tryyear:
 		period = input0.last(2);
 	}
 
-	//get the first date of the next period then subtract 1 day
+	// get the first date of the next period then subtract 1 day
 	period += 1;
 	if (period gt maxperiod) {
 		period -= maxperiod;
@@ -97,8 +97,8 @@ tryyear:
 		year = year.oconv("R(0)#2");
 	}
 
-	//financial year 93/94 is referred to as 94
-	//year2=year-1;gosub getfirstdateofyear
+	// financial year 93/94 is referred to as 94
+	// year2=year-1;gosub getfirstdateofyear
 	year2 = year;
 	gosub getfirstdateofyear();
 
@@ -116,7 +116,7 @@ tryyear:
 		output -= diff;
 	}
 
-	//why?
+	// why?
 	output -= 1;
 
 	return 0;
@@ -125,10 +125,10 @@ tryyear:
 subroutine getfirstdateofyear() {
 	firstdateofyear = (firstdate ^ "/" ^ year2).iconv("D2/E");
 
-	//move start of year to nearest start of week
-	//eg start of year 1/7/93 is thursday (day 1)
+	// move start of year to nearest start of week
+	// eg start of year 1/7/93 is thursday (day 1)
 	//   start of week is friday (day 5)
-	//therefore start of year is 2/7/93
+	// therefore start of year is 2/7/93
 	firstdayofyear = (firstdateofyear - 1).mod(7) + 1;
 	difference	   = firstdayofyear - firstdayofweek;
 	if (difference gt 3) {

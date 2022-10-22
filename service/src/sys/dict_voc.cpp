@@ -64,8 +64,8 @@ function main() {
 		return 0;
 	}
 
-	//upper=@record
-	//convert @lower.case to @upper.case in upper
+	// upper=@record
+	// convert @lower.case to @upper.case in upper
 
 	if (RECORD.contains("debug")) {
 		return 1;
@@ -155,12 +155,12 @@ var rec;
 function main() {
 	#include <system_common.h>
 
-	//COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE
-	//IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999
-	//!IF @RECCOUNT LT LAST.RECCOUNT THEN
-	//!  FN=''
-	//!  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')
-	//
+	// COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE
+	// IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999
+	// !IF @RECCOUNT LT LAST.RECCOUNT THEN
+	// !  FN=''
+	// !  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')
+	// 
 
 	var fn = "QFILE";
 	var comparefile;
@@ -169,7 +169,7 @@ function main() {
 		stop();
 	}
 
-	//END
+	// END
 	var lastreccount = RECCOUNT;
 	if (rec.reado(comparefile, ID)) {
 		if (RECORD eq rec) {
@@ -333,16 +333,16 @@ function main() {
 		var tx = datax.f(fn).trim();
 
 		if (tx.contains("xlate(") and ((tx.contains("','C')") or tx.contains("','X')")))) {
-		//gosub change2
+		// gosub change2
 			ANS(1, -1) = tx;
 		}
 
-	//if index(tx,'MSG(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) ) then
+	// if index(tx,'MSG(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) ) then
 	// gosub change
 	// @ans<1,-1>=tx
 	// end
 
-	//if index(tx,'NOTE(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) or index(tx,",'T",1)) then
+	// if index(tx,'NOTE(',1) and ( index(tx,",'U",1) or index(tx,",'D",1) or index(tx,",'R",1) or index(tx,",'T",1)) then
 	// gosub change
 	// @ans<1,-1>=tx
 	// end
@@ -357,7 +357,7 @@ function main() {
 		if decide2(@id:@fm:tx:'','',reply,2) else stop;
 		if reply=1 then;
 			open 'TEMP' to file else call abort(lasterror());
-			//writev tx on file,@id,fn
+			// writev tx on file,@id,fn
 			if @record<1>='S' then;
 				@record<8,fn>=tx;
 			end else;
@@ -533,10 +533,10 @@ libraryexit(nfields0)
 libraryinit(nfields00)
 //--------------------
 function main() {
-	//remove comment blocks
+	// remove comment blocks
 	while (true) {
 		var pos1 = RECORD.index("/*");
-		///BREAK;
+		// /BREAK;
 		if (not pos1) break;
 		var pos2 = RECORD.index("*/");
 		if (not pos2) {
@@ -544,21 +544,21 @@ function main() {
 		}
 		RECORD.paster(pos1, pos2 - pos1 + 2, "");
 	}//loop;
-	//call msg('x')
-	//remove comment lines
+	// call msg('x')
+	// remove comment lines
 	let nfields = RECORD.fcount(FM);
 
-	//dim x(nfields)
-	//matparse @record into x
+	// dim x(nfields)
+	// matparse @record into x
 	for (const var ii : range(1, nfields)) {
-	//if trim(x(i))[1,1]='*' then x(i)=''
+	// if trim(x(i))[1,1]='*' then x(i)=''
 		if (RECORD.f(ii).trim().starts("*")) {
 			RECORD(ii) = "";
 		}
 	} //ii;
-	//@record=matunparse(x)
+	// @record=matunparse(x)
 	//             call msg('y')
-	//remove blank lines
+	// remove blank lines
 	RECORD.converter(_FM " ", " " _FM);
 
 	var nfields2 = RECORD.trim().fcount(" ");
@@ -611,7 +611,7 @@ libraryexit(program_date)
 libraryinit(recnum)
 //-----------------
 function main() {
-	//@reccount is the same thing
+	// @reccount is the same thing
 	return RECCOUNT;
 }
 libraryexit(recnum)
@@ -708,9 +708,9 @@ function main() {
 		ANS = xlate(RECORD.f(3), "$" ^ RECORD.f(4), "VERSION", "X");
 	} else {
 		ANS = field2(RECORD, FM, -1);
-	//IF @ANS[1,1] = 'V' THEN
+	// IF @ANS[1,1] = 'V' THEN
 	//  @ANS=@ANS[2,99]
-	//END ELSE
+	// END ELSE
 	//  @ANS = ''
 	}
 	return ANS;

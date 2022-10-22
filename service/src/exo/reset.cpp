@@ -2,7 +2,7 @@
 libraryinit()
 
 function main() {
-	//printl("reset - obsolete");
+	// printl("reset - obsolete");
 	return 0;
 }
 

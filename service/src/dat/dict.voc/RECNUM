@@ -5,7 +5,7 @@ S
 
 
 
-	//@reccount is the same thing\
+	// @reccount is the same thing\
 	return RECCOUNT;
 L
 10

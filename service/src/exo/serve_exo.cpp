@@ -12,19 +12,19 @@ programinit()
 
 function main() {
 
-	//NB numbers and names MUST match those in the matching common .h files
+	// NB numbers and names MUST match those in the matching common .h files
 	mv.labelledcommon[win_common_no] = new win_common;
 	mv.labelledcommon[sys_common_no] = new sys_common;
-	//mv.labelledcommon[agy_common_no]=new agy_common;
+	// mv.labelledcommon[agy_common_no]=new agy_common;
 
 	/*cat ~/pickos/dic/ *.SQL | psql -h 127.0.0.1 -U exodus exodus*/
 
-	//gen.addresses="addresses";
-	//gen.timesheets="timesheets";
-	//gen.companies="companies";
-	//gen.currencies="currencies";
-	//gen.documents="documents";
-	//gen.units="units";
+	// gen.addresses="addresses";
+	// gen.timesheets="timesheets";
+	// gen.companies="companies";
+	// gen.currencies="currencies";
+	// gen.documents="documents";
+	// gen.units="units";
 
 	createfile("VOC");
 	createfile("DICT.DEFINITIONS");
@@ -41,34 +41,34 @@ function main() {
 
 	SYSTEM(33) = "X";
 
-	//module
+	// module
 	APPLICATION = "EXODUS";
 
-	//user
-	//USERNAME="exodus";
+	// user
+	// USERNAME="exodus";
 	USERNAME = "EXODUS";
 
-	//database
+	// database
 	var databasecode = osgetenv("EXO_DATA");
 	if (not databasecode)
 		databasecode = "exodus";
 	SYSTEM(17) = databasecode;
 
-	//process no
+	// process no
 	SYSTEM(24) = THREADNO;
 
-	//system mode
+	// system mode
 	SYSTEM(33, 1) = "1";
-	//user
+	// user
 	SYSTEM(17)	  = "exodus";  //database code
 	SYSTEM(23)	  = "EXODUS";  //database name
 	SYSTEM(33, 2) = "EXODUS";  //connection
 	SYSTEM(33, 3) = "EXODUS";
 
-	//f5 key
+	// f5 key
 	PRIORITYINT(2) = "x";
 
-	//create database dir
+	// create database dir
 	var datadir = "../data/";
 	if (not osdir(datadir))
 		abort(datadir.quote() ^ " data directory does not exist");
@@ -78,7 +78,7 @@ function main() {
 		osshell("setfacl -d -m g::rw " ^ databasedir);
 	}
 
-	//ensure MARKETS file exists and has at least an ALL markets record
+	// ensure MARKETS file exists and has at least an ALL markets record
 	if (not open("MARKETS")) {
 		createfile("MARKETS");
 	}
@@ -93,19 +93,19 @@ function main() {
 	if (not read(agp,"DEFINITIONS","AGENCY.PARAMS")) {
 		agp=invert("DEVELOPMENT DATABASE");
 		agp(4) = 1;//short dates
-		//agp(5) = 1;//split extras
+		// agp(5) = 1;//split extras
 		agp(7) = 1;//wording on schedules
 		write(agp,"DEFINITIONS","AGENCY.PARAMS");
 	}
 	*/
 
-	//exodus pass
+	// exodus pass
 	var rec = "";
-	//printl(hashpass("ALSOWINE"));
+	// printl(hashpass("ALSOWINE"));
 	rec(7) = hashpass("ALSOWINE");
 	write(rec on "DEFINITIONS", "EXODUS");
 
-	//call initgeneral();
+	// call initgeneral();
 	perform("initgeneral LOGIN");
 	/*
 	call initcompany();
@@ -120,7 +120,7 @@ function main() {
     //call initgeneral2("OSCLEANUP");
 	*/
 
-	//kick off with initgeneral or some custom command
+	// kick off with initgeneral or some custom command
 	var cmd = SENTENCE.field(" ", 2, 9999);
 	if (cmd)
 		perform(cmd);

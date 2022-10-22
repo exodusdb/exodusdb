@@ -11,9 +11,9 @@ function main(in type, in input0, in mode, out output) {
 	var firstmonth = mode.field(",", 1);
 	var maxperiod  = mode.field(",", 2);
 
-	//if iconv then convert period (MM/YY or YYMM) to internal last date of month
+	// if iconv then convert period (MM/YY or YYMM) to internal last date of month
 	if (type eq "ICONV") {
-		//return the last day of the period (internal format)
+		// return the last day of the period (internal format)
 		if (input0.contains("/")) {
 			period = input0.field("/", 1) + 1;
 			year   = input0.field("/", 2);
@@ -42,7 +42,7 @@ function main(in type, in input0, in mode, out output) {
 		return 0;
 	}
 
-	//if oconv then convert internal date to year:period
+	// if oconv then convert internal date to year:period
 	var temp = input0.oconv("D2-E");
 	year	 = temp.last(2);
 	period	 = temp.b(4, 2);

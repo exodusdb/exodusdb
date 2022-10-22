@@ -38,7 +38,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 inpfromdate:
 	call note(fromquestion, "RCE", fromdate, "");
 	if (fromdate eq "" or fromdate eq chr(27)) {
-		//cancel:
+		// cancel:
 		ifromdate = "";
 		iuptodate = "";
 		return 0;
@@ -50,7 +50,7 @@ inpfromdate:
 	}
 	fromdate = oconv(ifromdate2, "[DATE,*4]");
 
-	//uptodate is fromdate plus defaultperiod
+	// uptodate is fromdate plus defaultperiod
 	if (iuptodate.unassigned()) {
 		iuptodate = "";
 	}
@@ -68,7 +68,7 @@ inpfromdate:
 		}
 	}
 
-	//make sure todate is not before fromdate
+	// make sure todate is not before fromdate
 	if (iuptodate lt ifromdate2) {
 		iuptodate = ifromdate2;
 	}

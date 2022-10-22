@@ -11,19 +11,19 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 	if (uptotime.unassigned()) {
 		uptotime = ostime();
 	}
-	//uptodate=date()
-	//CALL DOSTIME(uptotime)
+	// uptodate=date()
+	// CALL DOSTIME(uptotime)
 
-	//NSECS=INT(uptotime-fromTIME)
+	// NSECS=INT(uptotime-fromTIME)
 	var nsecs = uptotime - fromtime;
-	//IF NSECS ELSE NSECS=1
-	//uptodate=date()
+	// IF NSECS ELSE NSECS=1
+	// uptodate=date()
 	if (fromdate ne uptodate) {
 		nsecs += (uptodate - fromdate) * 24 * 3600;
 	}
 
-	//cater for bug where start date isnt known and time has crossed midnight
-	//so the 2nd time is less than the first
+	// cater for bug where start date isnt known and time has crossed midnight
+	// so the 2nd time is less than the first
 	if (nsecs lt 0) {
 		nsecs += 86400;
 	}
@@ -69,7 +69,7 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 			if (minutes or (nsecs - 10 gt 0)) {
 				nsecs = nsecs.oconv("MD00P");
 			} else {
-				//nsecs=(nsecs 'MD40P')+0
+				// nsecs=(nsecs 'MD40P')+0
 				nsecs = (nsecs.oconv("MD30P")) + 0;
 				if (nsecs.starts(".")) {
 					nsecs.prefixer("0");

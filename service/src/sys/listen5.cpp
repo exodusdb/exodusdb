@@ -34,8 +34,8 @@ var tt;
 var xx;
 var inpath;
 var pattern;
-var ageinsecs;	//num
-var ii;			//num
+var ageinsecs;	// num
+var ii;			// num
 var patchfile;
 var offset;
 var firstblock;
@@ -46,7 +46,7 @@ var versiondatetime;
 var versionkey;
 var patchdatetime;
 var skipreason;
-var skipemail;	//num
+var skipemail;	// num
 var lastpatchid;
 var runoncekey;
 var runonce;
@@ -66,18 +66,18 @@ var offset_zero;
 
 function main(in request1, in request2in, in request3in, in request4in, in request5in, in request6in) {
 
-	//$insert abp,common
-	//$insert bp,agency.common
+	// $insert abp,common
+	// $insert bp,agency.common
 
-	//TODO share various files with LISTEN to prevent slowing down by opening?
+	// TODO share various files with LISTEN to prevent slowing down by opening?
 
 	var tracing = 1;
 	initdir		= "";
 
-	//no output in arguments allowed since c++ doesnt allow
+	// no output in arguments allowed since c++ doesnt allow
 	// defaulting or value based arguments and setting them
 	// and this means calling listen2 would require passing variables for all
-	//in the few cases listen2 need to respond to caller, it sets @ans
+	// in the few cases listen2 need to respond to caller, it sets @ans
 	if (request2in.unassigned()) {
 		request2 = "";
 	} else {
@@ -109,28 +109,28 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	if (request1 eq "RUNS") {
 
-		//db start commands from xhttp.php
+		// db start commands from xhttp.php
 		var filenamesx = oslistf("*.run");
 
-		//for (const var filen : range(1, 9999)) {
+		// for (const var filen : range(1, 9999)) {
 		for (var filename : filenamesx) {
-			//filename = filenamesx.f(filen);
-			///BREAK;
+			// filename = filenamesx.f(filen);
+			// /BREAK;
 			if (not filename)
 				break;
 			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
 				if (tt.osread(filename)) {
 					tt.replacer("\r\n", _FM);
 					tt.converter("\r\n", _FM _FM);
-					//dont start if there is a database stop command
+					// dont start if there is a database stop command
 					if (not((tt.f(1).lcase() ^ ".end").osfile())) {
 						if (tt.f(5)) {
-							//var cmd = "CMD /C START EXODUS.JS /system " ^ tt.f(5) ^ " /database " ^ tt.f(1) ^ " /pid " ^ tt.f(6);
+							// var cmd = "CMD /C START EXODUS.JS /system " ^ tt.f(5) ^ " /database " ^ tt.f(1) ^ " /pid " ^ tt.f(6);
 
-							//TRACE: tt="tamra2^EXODUS^^^ADAGENCY^/root/hosts/tamra/data/tamra2/~4025798^"
-							//TRACE: osgetenv("EXO_SERVICE_CODE")="agy_live@tamra"
+							// TRACE: tt="tamra2^EXODUS^^^ADAGENCY^/root/hosts/tamra/data/tamra2/~4025798^"
+							// TRACE: osgetenv("EXO_SERVICE_CODE")="agy_live@tamra"
 
-							//var application = tt.f(5).first(3).lcase();
+							// var application = tt.f(5).first(3).lcase();
 							var app_code = osgetenv("EXO_SERVICE_CODE").field("_", 1);
 							if (not app_code)
 								app_code = osgetenv("APP_CODE");
@@ -143,7 +143,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							}
 
 							var cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
-							//printl(AT(-40), time().oconv("MTS"), " ", tt);
+							// printl(AT(-40), time().oconv("MTS"), " ", tt);
 							if (TERMINAL)
 								print(AT(-40));
 							printl(time().oconv("MTS"), " ", cmd);
@@ -162,11 +162,11 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		inpath = request3;
 		tt	   = "\\/";
 		inpath.converter(tt, OSSLASH_ OSSLASH_);
-		//delete old response and temp files every 1 minute
+		// delete old response and temp files every 1 minute
 		call listen5("DELETEOLDFILES", "*.4", inpath);
 		call listen5("DELETEOLDFILES", "*.5", inpath);
-		//call listen5('DELETEOLDFILES','*.$2','./',tt,yy,zz)
-		//shell2 cannot/does not delete its tempfiles due to wget remaining in background
+		// call listen5('DELETEOLDFILES','*.$2','./',tt,yy,zz)
+		// shell2 cannot/does not delete its tempfiles due to wget remaining in background
 		call listen5("DELETEOLDFILES", "vdm*.tmp", "./", 60);
 		call listen5("DELETEOLDFILES", "*.$$*", "./", 60);
 
@@ -175,7 +175,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		pattern = request2;
 		inpath	= request3;
 
-		//delete files older than x
+		// delete files older than x
 		ageinsecs = request4;
 		if (not ageinsecs) {
 			ageinsecs = SYSTEM.f(28);
@@ -188,19 +188,19 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	} else if (request1 eq "CHECKRESTART") {
 
-		//		//check for corruption in system record
-		//		//if index(system,char(0),1) then
-		//		if (SYSTEM.contains(chr(0))) {
-		//			var(SYSTEM).oswrite("system.bad");
-		//			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
-		//			ANS = "CORRUPTSYSTEM";
-		//			SYSTEM.converter(chr(0), "");
-		//			ANS = "RESTART " ^ ANS;
-		//			return 0;
-		//		}
+		// 		// check for corruption in system record
+		// 		// if index(system,char(0),1) then
+		// 		if (SYSTEM.contains(chr(0))) {
+		// 			var(SYSTEM).oswrite("system.bad");
+		// 			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
+		// 			ANS = "CORRUPTSYSTEM";
+		// 			SYSTEM.converter(chr(0), "");
+		// 			ANS = "RESTART " ^ ANS;
+		// 			return 0;
+		// 		}
 
-		//detect system parameter changes and restart
-		//this has the effect of detecting corruption in system which inserts lines
+		// detect system parameter changes and restart
+		// this has the effect of detecting corruption in system which inserts lines
 		var s100	= SYSTEM.f(100);
 		var exohome = osgetenv("EXO_HOME");
 		var ospaths = "../../system.cfg,system.cfg";
@@ -209,7 +209,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		let npaths = fcount(ospaths, ",");
 		for (const var ii : range(1, npaths)) {
 			var ospath = ospaths.field(",", ii);
-			//order is significant
+			// order is significant
 			var newtime = (ospath.ends(OSSLASH)) ? ospath.osdir().f(3) : ospath.osfile().f(3);
 			var oldtime = s100.f(1, ii);
 			if (newtime ne oldtime) {
@@ -222,34 +222,34 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 		}  //ii;
 
-		//		//check for upgrade to LISTEN
-		//		var gbp;
-		//		if (gbp.open("GBP", "")) {
-		//			var listen;
-		//			if (listen.read(gbp, "$LISTEN")) {
-		//				listen = field2(listen, FM, -1);
-		//				if (s100.f(1, 3)) {
-		//					if (s100.f(1, 3) ne listen) {
-		//						//this will only restart listen, not the whole process/thread
-		//						ANS = "RESTART $LISTEN";
-		//						return 0;
-		//					}
-		//						//comment to solve c++ decomp problem
-		//				} else {
-		//					SYSTEM(100, 3) = listen;
-		//				}
-		//			}
-		//		}
+		// 		// check for upgrade to LISTEN
+		// 		var gbp;
+		// 		if (gbp.open("GBP", "")) {
+		// 			var listen;
+		// 			if (listen.read(gbp, "$LISTEN")) {
+		// 				listen = field2(listen, FM, -1);
+		// 				if (s100.f(1, 3)) {
+		// 					if (s100.f(1, 3) ne listen) {
+		// 						// this will only restart listen, not the whole process/thread
+		// 						ANS = "RESTART $LISTEN";
+		// 						return 0;
+		// 					}
+		// 						// comment to solve c++ decomp problem
+		// 				} else {
+		// 					SYSTEM(100, 3) = listen;
+		// 				}
+		// 			}
+		// 		}
 
 		ANS = "";
 		return 0;
 
 	} else if (request1 eq "PATCHANDRUNONCE") {
 
-		//never patch and run on development systems (therefore can only test elsewhere)
-		//OFF while developing this feature
+		// never patch and run on development systems (therefore can only test elsewhere)
+		// OFF while developing this feature
 		isdevsys = isdevsys and date() gt 19034;
-		//if system<61> or isdevsys then
+		// if system<61> or isdevsys then
 		if (isdevsys or not(VOLUMES)) {
 			ANS = "";
 			return 0;
@@ -258,17 +258,17 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		var live  = request2;
 		processes = request3;
 
-		////////////////////////////////////////////////////////////////////////////
-		//Look for NEOPATCH.1 file in three locations
-		////////////////////////////////////////////////////////////////////////////
-		//The file must have been created after the exodus version date
+		// //////////////////////////////////////////////////////////////////////////
+		// Look for NEOPATCH.1 file in three locations
+		// //////////////////////////////////////////////////////////////////////////
+		// The file must have been created after the exodus version date
 		// and after the last patch date if any
-		////////////////////////////////////////////////////////////////////////////
-		//1. DATA\CLIENTX\NEOPATCH.1
+		// //////////////////////////////////////////////////////////////////////////
+		// 1. DATA\CLIENTX\NEOPATCH.1
 		//               > install in one EXODUS database
-		//2. DATA\NEOPATCH.1
+		// 2. DATA\NEOPATCH.1
 		//               > install in all active EXODUS databases in one installation
-		//3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
+		// 3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
 		//               > install in all active EXODUS database and installations
 		var patchcode = "NEOPATCH";
 		var patchdirs = "../DATA/" ^ SYSTEM.f(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
@@ -276,26 +276,26 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 		for (const var patchn : range(1, 3)) {
 
-			//skip if no patch file or not dated today
+			// skip if no patch file or not dated today
 			var patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
 			var patchfileinfo = patchfilename.osfile();
 			if (patchfileinfo.f(2) lt date()) {
 				goto nextpatch;
 			}
 
-			//open patch file
+			// open patch file
 			if (not(patchfile.osopen(patchfilename))) {
 				goto nextpatch;
 			}
 
-			//ensure patch file is complete
+			// ensure patch file is complete
 			offset = patchfileinfo.f(1) - 18;
 			call osbread(tt, patchfile, offset, 18);
 			if (tt ne("!" ^ FM ^ "!END!OF!INSTALL!")) {
 				goto nextpatch;
 			}
 
-			//verify correct file heading and determine patchid from the file
+			// verify correct file heading and determine patchid from the file
 			offset_zero = 0;
 			call osbread(firstblock, patchfile, offset_zero, 65000);
 			patchid = firstblock.f(2).cut(5);
@@ -303,35 +303,35 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				goto nextpatch;
 			}
 
-			//skip if patchid is older than 30 days
-			//if field(patchid,'*',3) lt date()-30 then
+			// skip if patchid is older than 30 days
+			// if field(patchid,'*',3) lt date()-30 then
 			// goto nextpatch
 			// end
 
-			//extract DEFINITIONS install key and rec from first block
-			//rec is "00000DEFINITIONS^00033INSTALL*X*19034*35287^...."
-			//remove 00000DEFINITIONS^
+			// extract DEFINITIONS install key and rec from first block
+			// rec is "00000DEFINITIONS^00033INSTALL*X*19034*35287^...."
+			// remove 00000DEFINITIONS^
 			firstblock.remover(1);
-			//remove 5 byte length field and cut out key+rec
+			// remove 5 byte length field and cut out key+rec
 			keyandrec = firstblock.b(6, firstblock.first(5));
-			//remove key
+			// remove key
 			rec = keyandrec.remove(1, 0, 0);
 
-			//installation wide lock on it
+			// installation wide lock on it
 			if (not(lockrecord("", processes, patchid))) {
 				goto nextpatch;
 			}
 
-			//skip if already installed in this database
+			// skip if already installed in this database
 			if (xx.read(DEFINITIONS, patchid)) {
 				call unlockrecord("", processes, patchid);
 				goto nextpatch;
 			}
 
-			//prevent from ever running this patch again on this database
+			// prevent from ever running this patch again on this database
 			rec.write(DEFINITIONS, patchid);
 
-			//get current EXODUS version timestamp
+			// get current EXODUS version timestamp
 			versiondatetime = "";
 			versionkey		= "general/version.dat";
 			versionkey.converter("/", OSSLASH);
@@ -344,10 +344,10 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				}
 			}
 
-			//get patch timestamp
+			// get patch timestamp
 			patchdatetime = patchid.field("*", 3);
 
-			//skip patch if older than installation
+			// skip patch if older than installation
 			skipreason = "";
 			skipemail  = "";
 			if (versiondatetime and patchdatetime lt versiondatetime) {
@@ -355,7 +355,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				skipemail  = 1;
 			}
 
-			//skip patch if older than last patch
+			// skip patch if older than last patch
 			if (not(lastpatchid.read(DEFINITIONS, "INSTALL*LAST"))) {
 				lastpatchid = "";
 			}
@@ -366,13 +366,13 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				}
 			}
 
-			//ensure that we only ever runonce something just loaded from a patch
+			// ensure that we only ever runonce something just loaded from a patch
 			runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
 			DEFINITIONS.deleterecord(runoncekey);
 
 			if (not skipemail) {
 
-				//list the files and records that were installed
+				// list the files and records that were installed
 				var subject = rec.f(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
 				var body	= subject ^ " " ^ patchfilename ^ FM;
 				if (skipreason) {
@@ -383,54 +383,54 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
 				}  //filen;
 
-				//message EXODUS only
+				// message EXODUS only
 				call sysmsg(body, "NEOPATCH: " ^ subject, "EXODUS");
 			}
 
 			if (not skipreason) {
 
-				//perform the installation
+				// perform the installation
 				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().first(2) ^ " (IO)";
 				printl(cmd);
 				perform(cmd);
 			}
 
-			//record success/failure before any autorun
+			// record success/failure before any autorun
 			(date() ^ "." ^ time().oconv("R(0)#5")).writev(DEFINITIONS, patchid, 6);
 
 			skipreason.writev(DEFINITIONS, patchid, 7);
 
 			if (skipreason) {
-				//release
+				// release
 				call unlockrecord("", processes, patchid);
 				goto nextpatch;
 			}
 
-			//save the last patch info - used to prevent backward patching
+			// save the last patch info - used to prevent backward patching
 			patchid.write(DEFINITIONS, "INSTALL*LAST");
 
-			//post install runonce if installed
-			//if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
-			//if the runonce record appears in the definitions then
-			//run it, save it and delete it
+			// post install runonce if installed
+			// if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
+			// if the runonce record appears in the definitions then
+			// run it, save it and delete it
 			if (runonce.read(DEFINITIONS, runoncekey)) {
 				perform("RUN DEFINITIONS " ^ runoncekey.cut(1));
-				//leave it for inspection
-				//delete definitions,runoncekey
+				// leave it for inspection
+				// delete definitions,runoncekey
 			}
 
-			//trigger other processes to restart by updating SYSTEM.CFG
+			// trigger other processes to restart by updating SYSTEM.CFG
 			if (tt.osread("system.cfg")) {
 				var(tt).oswrite("system.cfg");
 			}
 
-			//release
+			// release
 			call unlockrecord("", processes, patchid);
 
-			//indicate patches applied and may need restart
+			// indicate patches applied and may need restart
 			ANS = 1;
 
-			//dont check any other patchdirs
+			// dont check any other patchdirs
 			return 0;
 
 nextpatch:;
@@ -440,9 +440,9 @@ nextpatch:;
 
 	} else if (request1 eq "CONVLOG") {
 
-		//assumes at least 0-31 and 128-255 encoded like $hh
+		// assumes at least 0-31 and 128-255 encoded like $hh
 
-		//reserve/use special characters for field separators
+		// reserve/use special characters for field separators
 		logx.replacer("^", "%5E");
 		logx.replacer("]", "%5D");
 		logx.replacer("\\", "%5C");
@@ -452,17 +452,17 @@ nextpatch:;
 		logx.replacer("%FC", "\\");
 		logx.replacer("%FB", "[");
 		logx.replacer(RM, "%FF");
-		//swap fm with '^' in logx
-		//swap vm with ']' in logx
-		//swap sm with '\' in logx;*backslash
-		//swap tm with "[" in logx
+		// swap fm with '^' in logx
+		// swap vm with ']' in logx
+		// swap sm with '\' in logx;*backslash
+		// swap tm with "[" in logx
 		logx.converter(_FM _VM _SM _TM, "^]\\[");
-		//logx.converter(_ALL_FMS, _VISIBLE_FMS);
+		// logx.converter(_ALL_FMS, _VISIBLE_FMS);
 		logx.replacer(ST, "%FA");
 
 		logx.replacer("%20", " ");
-		//does not seem to format in XML
-		//swap '%20' with '&nbsp;' in logx
+		// does not seem to format in XML
+		// swap '%20' with '&nbsp;' in logx
 
 		logx.replacer("&", "&amp;");
 		logx.replacer(DQ, "&quot;");
@@ -505,10 +505,10 @@ nextpatch:;
 			}
 		}
 
-		//security check
+		// security check
 		var temp = filename;
 
-		//zzz
+		// zzz
 		if (temp eq "JOURNALS") {
 			temp = "JOURNAL";
 		}
@@ -527,12 +527,12 @@ getvalues:
 		response_ = "OK";
 
 		if (sortby and data_) {
-			//convert fm to rm in iodat
-			//iodat:=rm
-			//call v119('S','',sortby[1,1],sortby[2,1],iodat,flag)
-			//convert rm to fm in iodat
-			//iodat[-1,1]=''
-			//v119 C/ASM sort routine cannot be easily converted/reimplemented in c++
+			// convert fm to rm in iodat
+			// iodat:=rm
+			// call v119('S','',sortby[1,1],sortby[2,1],iodat,flag)
+			// convert rm to fm in iodat
+			// iodat[-1,1]=''
+			// v119 C/ASM sort routine cannot be easily converted/reimplemented in c++
 			data_.converter(_FM, _VM);
 			call sortarray(data_, 1, sortby);
 			data_.converter(_VM, _FM);
@@ -541,12 +541,12 @@ getvalues:
 		var execstoplist;
 		if (execstoplist.read(DEFINITIONS, "INDEXVALUES*" ^ filename ^ "*" ^ fieldname)) {
 
-			//execs will be in field 1
-			//stopped reason will be in parallel in field 2
-			//stopped execs will be at the end
+			// execs will be in field 1
+			// stopped reason will be in parallel in field 2
+			// stopped execs will be at the end
 			data_.converter(_FM, _VM);
 
-			//remove or move any stopped execs to the end and add reason
+			// remove or move any stopped execs to the end and add reason
 			var nn	= data_.fcount(_VM);
 			var nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
@@ -566,13 +566,13 @@ getvalues:
 				}
 			}  //ii;
 
-			//show inactive if none are active
+			// show inactive if none are active
 			if (data_ eq "" and active) {
 				active = "";
 				goto getvalues;
 			}
 
-			//1=force vm to ensure xml has empty not missing tags
+			// 1=force vm to ensure xml has empty not missing tags
 			data_(2, 1) = data_.f(2, 1);
 			data_		= invertarray(data_, 1);
 		}
@@ -603,10 +603,10 @@ getvalues:
 			data_.prefixer("<records>");
 			data_ ^= "</records>";
 		} else {
-			//convert fm to vm in iodat
+			// convert fm to vm in iodat
 		}
 
-		//also called from financeproxy to return voucher details for popup
+		// also called from financeproxy to return voucher details for popup
 	} else if (request1 eq "SELECT") {
 
 		var filename0 = request2;
@@ -635,10 +635,10 @@ getvalues:
 			return 0;
 		}
 
-		//get the current program stack
-		//programstack=program.stack(nostack)
+		// get the current program stack
+		// programstack=program.stack(nostack)
 
-		//and data passed to SELECT is assumed to be a selectlist
+		// and data passed to SELECT is assumed to be a selectlist
 
 		if (data_) {
 			makelist("", data_);
@@ -647,15 +647,15 @@ getvalues:
 		}
 
 		call select2(filename0, SYSTEM.f(2), sortselect, dictids, options, data_, response_, "", "", "", maxnrecs);
-		//restore the program stack although this is done in LISTEN per request
-		//rev has a limit on 299 "programs" and dictionary entries count as 1 each!
-		//call program.stack(programstack)
+		// restore the program stack although this is done in LISTEN per request
+		// rev has a limit on 299 "programs" and dictionary entries count as 1 each!
+		// call program.stack(programstack)
 
 		if (msg_) {
 			response_ = trim(msg_.f(1), FM);
 		} else {
 			data_ = "%DIRECTOUTPUT%";
-			//response='OK'
+			// response='OK'
 		}
 
 	} else if (request1 eq "LISTLOCKS") {
@@ -667,7 +667,7 @@ getvalues:
 			msg='';
 
 			filename='LOCKS';
-			//sortselect='BY DATETIME_EXPIRES'
+			// sortselect='BY DATETIME_EXPIRES'
 			sortselect='BY USER';
 			sortselect:=' WITH DATETIME_EXPIRES >= ':dostime;
 			dictids='USER STATION FILENAME KEY';
@@ -676,7 +676,7 @@ getvalues:
 
 			call select2(filename,'',sortselect,dictids,options,select2data,select2response,'','','');
 
-			//abort to net program which will clear the lists file
+			// abort to net program which will clear the lists file
 			if msg then stop;
 
 		*/
@@ -720,7 +720,7 @@ nextlock:
 			printl(var("User").oconv("L#19"), " ", var("Station").oconv("L#19"), " ", var("File").oconv("L#19"), " ", var("Record").oconv("L#19"));
 		}
 		for (ii = 1; ii <= nn; ++ii) {
-			///BREAK;
+			// /BREAK;
 			if (tracing and nn gt 20)
 				break;
 			var row = select2data.f(ii);
@@ -749,20 +749,20 @@ nextlock:
 
 	} else if (request1 eq "UNLOCKLONGPROCESS") {
 
-		//IF revRELEASE()>= 2.1 THEN
+		// IF revRELEASE()>= 2.1 THEN
 		// lockmode=36
 		// unlockmode=37
-		//END ELSE
+		// END ELSE
 		var lockmode   = 23;
 		var unlockmode = 24;
 		// END
 
-		//NB ZZZ will hang if is not locked eg via unlock all
-		//unlock long process unlimited cpu time flag
+		// NB ZZZ will hang if is not locked eg via unlock all
+		// unlock long process unlimited cpu time flag
 		tt = SYSTEM.f(48);
 		if (tt) {
-			//unlock in request loop using lockkey stored in system<48> by giveway
-			//lock first to avoid hanging if try to unlock when not locked
+			// unlock in request loop using lockkey stored in system<48> by giveway
+			// lock first to avoid hanging if try to unlock when not locked
 			xx = "";
 			call rtp57(lockmode, "", xx, tt, "", yy, zz);
 			call rtp57(unlockmode, "", xx, tt, "", yy, zz);
@@ -771,10 +771,10 @@ nextlock:
 
 	} else if (request1 eq "STOPDB") {
 
-		//equ install.end to request3
-		//equ server.end to request4
+		// equ install.end to request3
+		// equ server.end to request4
 
-		//check authorised
+		// check authorised
 		tt = request2;
 		if (not tt) {
 			tt = "STOP";
@@ -785,22 +785,22 @@ nextlock:
 		}
 
 		if (request3.osfile() or serverend.osfile()) {
-			//response='Error: Database already stopped/stopping'
+			// response='Error: Database already stopped/stopping'
 			call listen4(19, response_);
 
 		} else {
 
 			call oswrite("", request3);
 
-			//stop server
+			// stop server
 			if (request2.contains("ALL")) {
 				call oswrite("", request4);
 			}
 
-			//wait up to 30 seconds for other users to quit
+			// wait up to 30 seconds for other users to quit
 			var timex = time();
 			while (true) {
-				///BREAK;
+				// /BREAK;
 				if (not(otherusers().f(1) and ((time() - timex).abs() lt 30)))
 					break;
 				call ossleep(1000 * 1);
@@ -810,7 +810,7 @@ nextlock:
 
 			var otherusersx = otherusers();
 			if (otherusersx) {
-				//response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
+				// response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, response_, otherusersx);
 				request3.osremove();
 			} else {
@@ -831,18 +831,18 @@ nextlock:
 
 	} else if (request1 eq "BACKUP") {
 
-		//similar code in LISTEN and LISTEN2
+		// similar code in LISTEN and LISTEN2
 
-		//gosub getbakpars
+		// gosub getbakpars
 		call getbackpars(bakpars);
 
-		//backup may respond to user itself if it starts
+		// backup may respond to user itself if it starts
 		msg_ = "";
 		perform("FILEMAN BACKUP " ^ SYSTEM.f(17) ^ " " ^ bakpars.f(7));
 
-		//if backup has already responded to user
-		//then quit and indicate to calling program that a backup has been done
-		//user will be emailed
+		// if backup has already responded to user
+		// then quit and indicate to calling program that a backup has been done
+		// user will be emailed
 		if (SYSTEM.f(2) eq "") {
 			PSEUDO = "BACKUP2 " ^ bakpars.f(7);
 			if (msg_) {
@@ -859,8 +859,8 @@ nextlock:
 			response_.prefixer("OK ");
 		}
 
-		//note: if backup did not respond already then the requestexit will
-		//respond as usual with the error message from backup
+		// note: if backup did not respond already then the requestexit will
+		// respond as usual with the error message from backup
 		data_ = "";
 
 	} else {
@@ -872,8 +872,8 @@ nextlock:
 
 subroutine getdostime() {
 	dostime = ostime();
-	//convert to Windows based date/time (ndays since 1/1/1900)
-	//31/12/67 in rev date() format equals 24837 in windows date format
+	// convert to Windows based date/time (ndays since 1/1/1900)
+	// 31/12/67 in rev date() format equals 24837 in windows date format
 	dostime = 24837 + date() + dostime / 24 / 3600;
 	return;
 }
@@ -886,19 +886,19 @@ subroutine fileaccesscheck(in filename) {
 		securityfilename = "JOURNALS";
 	}
 
-	//security check
-	//dont check markets and companies because really must have access to some
-	//and eliminates need for clumsy task COMPANY ACCESS PARTIAL task
+	// security check
+	// dont check markets and companies because really must have access to some
+	// and eliminates need for clumsy task COMPANY ACCESS PARTIAL task
 	if (not(var("MENUS,ADMENUS").locateusing(",", filename, xx))) {
 		var temp = securityfilename;
 		temp.converter(".", " ");
 		temp = singular(temp);
 		if (not(authorised(temp ^ " ACCESS", msg_, ""))) {
-			//we could use securityfilename LIST instead of securityfilename ACCESS PARTIAL clumsy
-			//ie list without general access means there are some records
-			//specifically allowed
+			// we could use securityfilename LIST instead of securityfilename ACCESS PARTIAL clumsy
+			// ie list without general access means there are some records
+			// specifically allowed
 			if (not(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msg2, ""))) {
-				//if there is an authorised dictionary item then leave it up to that
+				// if there is an authorised dictionary item then leave it up to that
 				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).contains("ALLOWPARTIALACCESS"))) {
 					response_ = msg_;
 					return;
@@ -917,7 +917,7 @@ subroutine deleteoldfiles() {
 
 	var filespec = (inpath ^ pattern).lcase();
 
-	//failsafe - only allow delete .* in data folder
+	// failsafe - only allow delete .* in data folder
 	if (filespec.ends(".*")) {
 		var tdir = "/data/";
 		tdir.converter("/", OSSLASH);
@@ -926,24 +926,24 @@ subroutine deleteoldfiles() {
 		}
 	}
 
-	//for each suitable file
+	// for each suitable file
 	var filenamesx = oslistf(filespec);
 
 nextfiles:
 	if (filenamesx) {
 
-		//get the file time
+		// get the file time
 		var filename0 = filenamesx.field(FM, 1);
 		filenamesx.paster(1, filenamesx.field(FM, 1).len() + 1, "");
 
 		var filename = inpath ^ filename0;
 
-		//replaced by databasecode.SVR
-		//if filename0='GLOBAL.SVR' then goto deleteit
+		// replaced by databasecode.SVR
+		// if filename0='GLOBAL.SVR' then goto deleteit
 
 		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.last(4)).lcase(), xx))) {
 
-			//a file ending .4 is a request to delete the .2 and .3 files
+			// a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.ends(".4")) {
 				filename.osremove();
 				filename.paster(-1, 1, "2");
@@ -955,8 +955,8 @@ nextfiles:
 				if (filename.ends(".TMP")) {
 					goto deleteit;
 				}
-				//and delete it if older than the cut off time
-				//and has a file extension (ie leave PARAMS and PARAMS2)
+				// and delete it if older than the cut off time
+				// and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime	   = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
 				if (((filename.last(4)).contains(".")) and filetime le deletetime) {

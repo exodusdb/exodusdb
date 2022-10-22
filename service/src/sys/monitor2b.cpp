@@ -18,19 +18,19 @@ var log;
 
 function main(in mode, in request, in tempfilename, out datax, out msg) {
 
-	//mode is WRITE or READ
-	//request is required sent to the server and
+	// mode is WRITE or READ
+	// request is required sent to the server and
 	// used to save the results in definitions CONTROL*request
-	//tempfilename must be a valid dos style file eg '99999999' WITHOUT EXTENSION
-	//data is required for WRITE and returned for READ
-	//return 1 for ok or 0 for failure
-	//msg returns any error information
+	// tempfilename must be a valid dos style file eg '99999999' WITHOUT EXTENSION
+	// data is required for WRITE and returned for READ
+	// return 1 for ok or 0 for failure
+	// msg returns any error information
 
-	//http://www.gnu.org/software/wget/manual/wget.html
-	//windows version at http://users.ugent.be/~bpuype/wget/
+	// http://www.gnu.org/software/wget/manual/wget.html
+	// windows version at http://users.ugent.be/~bpuype/wget/
 
 	var post = 1;
-	//cleanup=0;*@username<>'EXODUS'
+	// cleanup=0;*@username<>'EXODUS'
 	var cleanup = mode eq "READ";
 	if (mode eq "READ") {
 		datax = "";
@@ -41,12 +41,12 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		return 0;
 	}
 
-	//make linux/cygwin command
+	// make linux/cygwin command
 	var cmd		 = "wget";
 	var httpsbug = 0;
 	if (VOLUMES) {
 		wgetrc = "";
-		//look for local or cygwin wget.exe otherwise quit
+		// look for local or cygwin wget.exe otherwise quit
 		var exe = oscwd().contains(":") ? ".exe" : "";
 		cmd		= SYSTEM.f(50) ^ "wget" ^ exe;
 		if (not(cmd.osfile())) {
@@ -54,16 +54,16 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			cmd		 = "wget" ^ exe;
 		}
 		if (not(cmd.osfile())) {
-			//avoid error in READ/UPGRADE phase of MONITOR2
-			//msg='wget.exe not available in CONTROL()'
+			// avoid error in READ/UPGRADE phase of MONITOR2
+			// msg='wget.exe not available in CONTROL()'
 			msg = "";
 			return 0;
 		}
 	}
 
-	//!!!
-	//flush is REQUIRED and dir(xxx.exe) otherwise get an error in other processes
-	//The process cannot access the file because it is being used by another process.
+	// !!!
+	// flush is REQUIRED and dir(xxx.exe) otherwise get an error in other processes
+	// The process cannot access the file because it is being used by another process.
 	var().osflush();
 
 	msg = "unknown error in control";
@@ -71,13 +71,13 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	var logfilename	  = tempfilename ^ ".XWG";
 	var tempfilename2 = tempfilename ^ ".XRE";
 
-	//user and pass currently not required for some reason
-	//but leave configured in case they are re-instated on the server
+	// user and pass currently not required for some reason
+	// but leave configured in case they are re-instated on the server
 	var httpuser = "exodusclient";
-	//Only one way to make a good password Memorable & Randomish"
+	// Only one way to make a good password Memorable & Randomish"
 	var httppass = "OowtmagpM&R";
 
-	//stay within 31 bit integers for php sake
+	// stay within 31 bit integers for php sake
 	var salt = 3923517;
 	var max	 = 4752137;
 
@@ -86,10 +86,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	if (mode eq "WRITE") {
 
-		//baseurl='http://monitor.neosys.com/'
-		//baseurl='https://monitor.hosts.neosys.com:4428/'
+		// baseurl='http://monitor.neosys.com/'
+		// baseurl='https://monitor.hosts.neosys.com:4428/'
 		var baseurl = "https://monitor.hosts.neosys.com";
-		//add configured or default port
+		// add configured or default port
 		var monitorport = SYSTEM.f(131);
 		if (not monitorport) {
 			monitorport = 4428;
@@ -101,17 +101,17 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		if (request eq "UPGRADE") {
 
-			//only get if newer
+			// only get if newer
 			cmd ^= " -N";
 
-			//nagios
-			//authurl='http://monitor.neosys.com/upgrade.php'
+			// nagios
+			// authurl='http://monitor.neosys.com/upgrade.php'
 			authurl = baseurl ^ "upgrade.php";
 
-			//actually will be appended to URL because
-			//http POST and -N option are incompatible with some
-			//proxies that demand an HTTP LENGTH header for POST
-			//but -N is supposed to not be used with POST
+			// actually will be appended to URL because
+			// http POST and -N option are incompatible with some
+			// proxies that demand an HTTP LENGTH header for POST
+			// but -N is supposed to not be used with POST
 			params = datax;
 		}
 
@@ -119,21 +119,21 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 			authurl = SYSTEM.f(55);
 			if (not authurl) {
-				//authurl='http://monitor.neosys.com/monitor.php'
+				// authurl='http://monitor.neosys.com/monitor.php'
 				authurl = baseurl ^ "monitor.php";
 			}
 
-			//cmd:=' --no-cache'
+			// cmd:=' --no-cache'
 
-			//databaseid is eight character hexadecimal from DEFINITIONS GLOBALDATASETID
-			//databasecode is the data folder
-			//installationid is the computer no
-			//sessionid is a hashcode of the day
-			//eg databaseid=FFFFFFFF&databasecode=XXXXXXXX&installationid=999999&sessionid=
+			// databaseid is eight character hexadecimal from DEFINITIONS GLOBALDATASETID
+			// databasecode is the data folder
+			// installationid is the computer no
+			// sessionid is a hashcode of the day
+			// eg databaseid=FFFFFFFF&databasecode=XXXXXXXX&installationid=999999&sessionid=
 
 			var hostname = SYSTEM.f(57);
 
-			//prepare params
+			// prepare params
 			params = "databaseid=" ^ SYSTEM.f(45);
 			params ^= "&databasecode=" ^ SYSTEM.f(17);
 			params ^= "&installationid=" ^ cidx;
@@ -149,21 +149,21 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			params.prefixer("hashcode=" ^ hashcode ^ "&");
 		}
 
-		//add basic wget commands
+		// add basic wget commands
 		var referer = "exodusclient-" ^ SYSTEM.f(17) ^ "-" ^ cidx;
 		if (post) {
 			cmd ^= " --no-cache";
 			if (httpsbug) {
 				cmd ^= " --no-check-certificate";
 			}
-			//cmd:=' -O ':tempfilename2
+			// cmd:=' -O ':tempfilename2
 			cmd ^= " --output-file=" ^ logfilename;
 			cmd ^= " --referer=" ^ referer;
 			cmd ^= " --tries=3";
 			cmd ^= " --timeout=60";
 			cmd ^= " --background";
 		} else {
-			//wgetrc<-1>='output_document=':tempfilename2
+			// wgetrc<-1>='output_document=':tempfilename2
 			if (httpsbug) {
 				wgetrc(-1) = "check-certificate=off";
 			}
@@ -175,11 +175,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			wgetrc(-1) = "background=on";
 		}
 
-		//http proxy
-		//!cmd:=' --http-proxy=':httpproxyhost
-		//above option doesnt exist - must have http_proxy environment variable
-		//or in a .wgetrc file
-		//TODO exclude from proxy if in bypasslist in system<56,2>
+		// http proxy
+		// !cmd:=' --http-proxy=':httpproxyhost
+		// above option doesnt exist - must have http_proxy environment variable
+		// or in a .wgetrc file
+		// TODO exclude from proxy if in bypasslist in system<56,2>
 		if (SYSTEM.f(56)) {
 
 			if (post) {
@@ -200,9 +200,9 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				}
 			}
 		}
-		//cmd:=' --execute https_proxy=xyz'
+		// cmd:=' --execute https_proxy=xyz'
 
-		//authorisation
+		// authorisation
 		if (httpuser) {
 			if (post) {
 				cmd ^= " --user=" ^ httpuser;
@@ -217,7 +217,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			logfilename.osremove();
 		}
 
-		//UPDATE also gets a response
+		// UPDATE also gets a response
 		if (request eq "UPDATE") {
 			if (post) {
 				cmd ^= " -O " ^ tempfilename2;
@@ -226,7 +226,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 		}
 
-		//always post at the moment
+		// always post at the moment
 		if (post) {
 
 			if (params) {
@@ -235,7 +235,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				} else {
 					var datafilename = tempfilename ^ ".XDA";
 
-					//encodeuri
+					// encodeuri
 					params.replacer("%", "%25");
 					params.replacer("&", "%26");
 					params.replacer("`", "%60");
@@ -243,43 +243,43 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 					var(params).oswrite(datafilename);
 					cmd ^= " --post-file=" ^ datafilename;
-					//not added to authurl
+					// not added to authurl
 					params = "";
 				}
 			}
 
-			//encodeuri
+			// encodeuri
 			cmd.replacer("%", "%25");
 			cmd.replacer("&", "%26");
 			cmd.replacer("`", "%60");
 			cmd.replacer("+", "%2B");
 
-			//add url
+			// add url
 			cmd ^= " " ^ ((authurl ^ params).quote());
 
-			//if cleanup else oswrite cmd on tempfilename:'.CMD'
+			// if cleanup else oswrite cmd on tempfilename:'.CMD'
 
-			//run the wget command
-			//print @(0):@(-4):time() 'MTS':' CONTROL ':cmd[1,50]:'... ':
+			// run the wget command
+			// print @(0):@(-4):time() 'MTS':' CONTROL ':cmd[1,50]:'... ':
 
 			var().osflush();
 			var result = shell2(cmd, errors);
 			var().osflush();
 
-			//print 'done ':
+			// print 'done ':
 			if (errors) {
 				printl(errors);
 			}
 
 			if (cleanup) {
 				(tempfilename ^ ".CMD").osremove();
-				//cannot delete postdata until command has executed
-				//osremove datafilename
+				// cannot delete postdata until command has executed
+				// osremove datafilename
 			}
 
 		} else {
 
-			//finally add location to get
+			// finally add location to get
 			cmd ^= " " ^ ((authurl ^ "?" ^ params).quote());
 
 			wgetrc.replacer(_FM, _EOL);
@@ -298,14 +298,14 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			cmdfile ^= _EOL ^ cmd ^ " 2>" ^ errorfilename;
 			var(cmdfile).oswrite(cmdfilename);
 
-			//print
-			//print 'CONTROL cmd /c ':cmdfilename:' ... ':
+			// print
+			// print 'CONTROL cmd /c ':cmdfilename:' ... ':
 
 			var().osflush();
 			("cmd /c " ^ cmdfilename).osshell();
 			var().osflush();
 
-			//print 'done'
+			// print 'done'
 
 			if (not(errors.osread(errorfilename))) {
 				errors = "";
@@ -318,7 +318,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 		}
 
-		//catches option errors
+		// catches option errors
 		if (errors) {
 			errors.converter("\r\n", _FM _FM).trimmer(_FM);
 			call note(trim(errors, _FM));
@@ -329,7 +329,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	} else if (mode eq "READ") {
 
 		var tt = tempfilename2.osfile().f(1);
-		//if tt gt 32000 then
+		// if tt gt 32000 then
 		if (tt gt maxstrsize_ / 2) {
 			datax = "";
 			gosub getlog(logfilename, cleanup, log);
@@ -353,14 +353,14 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			return 0;
 		}
 
-		//verify echo
+		// verify echo
 		var expect = SYSTEM.f(45) ^ "," ^ SYSTEM.f(17) ^ "," ^ cidx ^ "," ^ sessionid;
 		if (datax.field(",", 2, 4) ne expect) {
 			msg = "Bad response";
 			goto badresponse;
 		}
 
-		//verify response or abort
+		// verify response or abort
 		text = datax.field(",", 2, 999999);
 		gosub hash(salt, max, hashcode);
 		hashcode = hashcode.b(9999, -9999);
@@ -376,7 +376,7 @@ badresponse:
 			return 0;
 		}
 
-		//from here on the response is ok
+		// from here on the response is ok
 		msg = "";
 		if (cleanup) {
 			logfilename.osremove();
@@ -408,18 +408,18 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 	}
 	return;
 
-	//request is
-	//the computer number
-	//a request number is a hashcode of the date
+	// request is
+	// the computer number
+	// a request number is a hashcode of the date
 
-	//response is
-	//various authorisation data
-	//a magic number
+	// response is
+	// various authorisation data
+	// a magic number
 
-	//the magic number is calculated as
-	//1. the computer number plus the request number plus a hash of the auth data
-	//2. the first eight digits of the sin of the above
-	//3. reversed
+	// the magic number is calculated as
+	// 1. the computer number plus the request number plus a hash of the auth data
+	// 2. the first eight digits of the sin of the above
+	// 3. reversed
 }
 
 subroutine hash(in salt, in max, out hashcode) {

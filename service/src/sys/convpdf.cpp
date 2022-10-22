@@ -9,15 +9,15 @@ var pdfcmd;
 
 function main(io osfilename, in printopts0, out errors) {
 
-	//osfilename in  ../data/xxxxxxxx.htm
-	//osfilename out ../data/xxxxxxxx.pdf (if successful)
+	// osfilename in  ../data/xxxxxxxx.htm
+	// osfilename out ../data/xxxxxxxx.pdf (if successful)
 
 	/* Installation of wkhtmltopdf cmd for Ubuntu;
 
-		//doesnt work well on 18.04 or 20.04
+		// doesnt work well on 18.04 or 20.04
 		sudo apt-get install wkhtmltopdf;
 
-		//THIS WORKS
+		// THIS WORKS
 
 		https://wkhtmltopdf.org/downloads.html;
 
@@ -36,14 +36,14 @@ function main(io osfilename, in printopts0, out errors) {
 		dpkg -i wkhtmltox_0.12.5-1.bionic_amd64.deb;
 		apt --fix-broken install;
 
-		//test
+		// test
 		/usr/local/bin/wkhtmltopdf http://google.com google.pdf;
 
 		*/
 
 	errors = "";
 
-	//X means dont convert
+	// X means dont convert
 	if (printopts0.unassigned()) {
 		printopts = "";
 	} else {
@@ -53,7 +53,7 @@ function main(io osfilename, in printopts0, out errors) {
 		return 0;
 	}
 
-	//only convert .htm files
+	// only convert .htm files
 	if (osfilename.lcase().last(4) ne ".htm") {
 		return 0;
 	}
@@ -71,18 +71,18 @@ function main(io osfilename, in printopts0, out errors) {
 		}
 	}
 
-	//quit without conversion if conversion program doesnt exist
+	// quit without conversion if conversion program doesnt exist
 	if (not(pdfcmd.osfile())) {
 		errors = "html2pdf is not installed.|EXODUS support has been emailed.";
 		call sysmsg(errors, "html2pdf");
 		return 0;
 	}
 
-	//generate an output filename
+	// generate an output filename
 	var pdffilename = osfilename;
 	pdffilename.paster(-3, 3, "pdf");
 
-	//if index(printopts,'F',1) then
+	// if index(printopts,'F',1) then
 	pdfcmd ^= " --footer-left [page]/[topage]";
 	// end
 
@@ -91,7 +91,7 @@ function main(io osfilename, in printopts0, out errors) {
 	}
 
 	pdfcmd ^= " --print-media-type";
-	//required on 18.04 to access local images
+	// required on 18.04 to access local images
 	pdfcmd ^= " --enable-local-file-access";
 
 	pdfcmd ^= " -q " ^ osfilename ^ " " ^ pdffilename;

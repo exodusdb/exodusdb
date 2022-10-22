@@ -24,7 +24,7 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 		return 0;
 	}
 
-	//gosub gettext
+	// gosub gettext
 	var text = elapsedtimetext(date, time);
 
 	printl();
@@ -33,7 +33,7 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 	if (mode) {
 		text.replacer(", ", FM);
 	} else {
-		//SWAP @FM WITH ', ' IN TEXT
+		// SWAP @FM WITH ', ' IN TEXT
 		var msgx = msg;
 		if (msgx) {
 			msgx ^= "||";

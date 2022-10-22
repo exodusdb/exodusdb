@@ -16,7 +16,7 @@ var options;
 var maxnrecs;
 //var nlimitfields;//num
 dim hexx;
-var useactivelist;	//num
+var useactivelist;	// num
 var v69;
 var v70;
 var v71;
@@ -44,13 +44,13 @@ var row;
 
 function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, io response, in limitfields = "", in limitchecks = "", in limitvalues = "", in maxnrecs0 = 0) {
 
-	//NB add %SELECTLIST% to sortselect to use active select list
-	//or provide an FM terminated list of keys
+	// NB add %SELECTLIST% to sortselect to use active select list
+	// or provide an FM terminated list of keys
 
-	//given a sort/select statement
-	//returns a dynamic array or file of xml data
+	// given a sort/select statement
+	// returns a dynamic array or file of xml data
 
-	//use app specific version of listen3
+	// use app specific version of listen3
 	if (APPLICATION ne "EXODUS") {
 		listen3 = "listen3_app";
 	}
@@ -73,11 +73,11 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	} else {
 		maxnrecs = maxnrecs0;
 	}
-	//	if (limitfields.unassigned()) {
-	//		nlimitfields = 0;
-	//	} else {
-	//		nlimitfields = limitfields.fcount(VM);
-	//	}
+	// 	if (limitfields.unassigned()) {
+	// 		nlimitfields = 0;
+	// 	} else {
+	// 		nlimitfields = limitfields.fcount(VM);
+	// 	}
 	let nlimitfields = limitfields.unassigned("").fcount(VM);
 
 	var xml		= options.contains("XML");
@@ -87,7 +87,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 
 	if (linkfilename2) {
 		hexx.redim(8);
-		//changed to allow language characters to pass through x80-xF9
+		// changed to allow language characters to pass through x80-xF9
 		for (const var ii : range(249, 255)) {
 			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
 		}  //ii;
@@ -99,7 +99,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		useactivelist = 0;
 	}
 
-	//fm termination indicates list of keys and optionally mvnos
+	// fm termination indicates list of keys and optionally mvnos
 	var givenkeys = sortselect.ends(FM);
 	var givenkeyn = 0;
 
@@ -112,8 +112,8 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	DICT.move(storedict);
 	MV.move(storemv);
 
-	//detect if called without common
-	//NB cant run without common in caller since perform gives some RTP20 error
+	// detect if called without common
+	// NB cant run without common in caller since perform gives some RTP20 error
 	if (rawread) {
 		goto nocommon;
 	}
@@ -130,9 +130,9 @@ nocommon:
 		win.valid.move(savevalid);
 	}
 
-	//if unassigned(limitfields) then limitfields=''
+	// if unassigned(limitfields) then limitfields=''
 
-	//filename can be 'filename USING dictfilename'
+	// filename can be 'filename USING dictfilename'
 
 	var filename0 = filename;
 	if (filename.field(" ", 2) eq "USING") {
@@ -147,7 +147,7 @@ nocommon:
 	if (not(file.open(filename, ""))) {
 		response = "Error: select2: " ^ (filename.quote()) ^ " file is not available";
 
-		//abort
+		// abort
 		gosub exit();
 		return 0;
 	}
@@ -157,7 +157,7 @@ nocommon:
 		if (not(linkfile2.osopen(linkfilename2))) {
 			response = "Error: select2: " ^ (linkfilename2.quote()) ^ " cannot open output file";
 
-			//abort
+			// abort
 			gosub exit();
 			return 0;
 		}
@@ -171,13 +171,13 @@ nocommon:
 		cmd ^= " " ^ maxnrecs;
 	}
 	cmd ^= " " ^ filename0;
-	//if trim(@station)='SBCP1800' then cmd='SELECT 10 ':filename
+	// if trim(@station)='SBCP1800' then cmd='SELECT 10 ':filename
 
-	//check no @ in xml dict ids because cannot return xml tag with @
+	// check no @ in xml dict ids because cannot return xml tag with @
 	if (xml and dictids.contains("@")) {
 		response = "Error: select2: XML dictids cannot contain @ characters";
 
-		//abort
+		// abort
 		gosub exit();
 		return 0;
 	}
@@ -196,7 +196,7 @@ nocommon:
 	if (not(DICT.open("DICT." ^ dictfilename))) {
 		response = "Error: select2: " ^ (("DICT." ^ filename).quote()) ^ " file is not available";
 
-		//abort
+		// abort
 		gosub exit();
 		return 0;
 	}
@@ -209,21 +209,21 @@ nocommon:
 		haspostread = "";
 	} else {
 		call listen3(filename, "READ", realfilename, triggers);
-		//postread=triggers<3>
+		// postread=triggers<3>
 		haspostread	 = triggers.f(3) ne "";
 		systemsubs	 = triggers.f(3);
 		postreadmode = triggers.f(4);
 	}
 
-	//check/get dict recs
+	// check/get dict recs
 
 	let ndictids = dictids.fcount(FM);
 	if (dictids ne "RECORD") {
-		//		while (true) {
-		//			///BREAK;
-		//			if (not(dictids.ends(FM))) break;
-		//			dictids.popper();
-		//		}//loop;
+		// 		while (true) {
+		// 			// /BREAK;
+		// 			if (not(dictids.ends(FM))) break;
+		// 			dictids.popper();
+		// 		}//loop;
 		dictids.trimmerlast(FM);
 		if (dictids eq "") {
 			dictids = "ID";
@@ -239,17 +239,17 @@ nocommon:
 					} else {
 						response = "Error: select2: " ^ (dictid.quote()) ^ " IS MISSING FROM DICT." ^ filename ^ " in SELECT2";
 
-						//abort
+						// abort
 						gosub exit();
 						return 0;
 					}
 				}
 			}
 
-			//pick items
-			//if index('DI',dictrec<1>,1) then call dicti2a(dictrec)
+			// pick items
+			// if index('DI',dictrec<1>,1) then call dicti2a(dictrec)
 
-			//pick A is revelation F
+			// pick A is revelation F
 			if (dictrec.f(1) eq "A") {
 				dictrec(1) = "F";
 			}
@@ -268,7 +268,7 @@ nocommon:
 		call osbwrite(tx, linkfile2, dataptr);
 	}
 
-	//read xx from @dict,'AUTHORISED' then
+	// read xx from @dict,'AUTHORISED' then
 	// if index(sortselect,' WITH AUTHORISED',1) else
 	//  if index(' ':sortselect,' WITH ',1) then sortselect:=' AND'
 	//  sortselect:=' WITH AUTHORISED'
@@ -281,26 +281,26 @@ nocommon:
 
 	if (not givenkeys) {
 
-		//zzz should for validity of select parameters first
-		//otherwise in server mode it loops with a very long error message
+		// zzz should for validity of select parameters first
+		// otherwise in server mode it loops with a very long error message
 
-		//perform 'SELECT XXXXXXX WITH BRAND_CODE "LU" BY YEAR_PERIOD AND WITH ID NE "[*I" BY ID'
+		// perform 'SELECT XXXXXXX WITH BRAND_CODE "LU" BY YEAR_PERIOD AND WITH ID NE "[*I" BY ID'
 
-		//if filename='JOBS' or filename='COMPANIES' then
+		// if filename='JOBS' or filename='COMPANIES' then
 
-		//do after readnext to avoid two stage sort/select in c++
-		//read xx from @dict,'AUTHORISED' then
+		// do after readnext to avoid two stage sort/select in c++
+		// read xx from @dict,'AUTHORISED' then
 		// if index(sortselect,' WITH AUTHORISED',1) else
 		//  if index(' ':sortselect,' WITH ',1) then sortselect:=' AND'
 		//  sortselect:=' WITH AUTHORISED'
 		//  end
 		// end
 
-		//if not sorted then try use %RECORDS% if present and <200 chars
+		// if not sorted then try use %RECORDS% if present and <200 chars
 		var records = "";
-		//if @list.active or index(' ':sortselect,' BY ',1) or index(sortselect,'WITH AUTHORISED',1) else
+		// if @list.active or index(' ':sortselect,' BY ',1) or index(sortselect,'WITH AUTHORISED',1) else
 		if (not(LISTACTIVE or ((" " ^ sortselect).contains(" BY ")))) {
-			//only look in selected files otherwise c++ takes too long on some files
+			// only look in selected files otherwise c++ takes too long on some files
 			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex, xx)) {
 				if (records.read(file, "%RECORDS%")) {
 					if (records.len() lt 200) {
@@ -311,26 +311,26 @@ nocommon:
 			}
 		}
 
-		//if @list.active else call safeselect(cmd:' ':sortselect:' (S)')
+		// if @list.active else call safeselect(cmd:' ':sortselect:' (S)')
 		if (not(LISTACTIVE) or sortselect) {
 			call safeselect(cmd ^ " " ^ sortselect ^ " (S)");
 		}
 
-		//handle invalid cmd
-		//R18.1 is normal 'No records found' message
+		// handle invalid cmd
+		// R18.1 is normal 'No records found' message
 		if (msg_ and not(msg_.contains("R18.1"))) {
 			if (msg_.field(" ", 1) eq "W156") {
 				msg_ = msg_.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
 			}
 			response = msg_;
 
-			//abort
+			// abort
 			gosub exit();
 			return 0;
 		}
 	}
 
-	//return empty results even if no records selected
+	// return empty results even if no records selected
 	var selectresult = "";
 
 	var recn = "";
@@ -340,12 +340,12 @@ nocommon:
 		win.srcfile	 = file;
 	}
 
-	//read each record and add the required columns to the selectresult
+	// read each record and add the required columns to the selectresult
 
 ////////
 nextrec:
-	////////
-	//if recn then if recn>=maxnrecs then goto nomore
+	// //////
+	// if recn then if recn>=maxnrecs then goto nomore
 
 	if (givenkeys) {
 
@@ -362,7 +362,7 @@ nextrec:
 		}
 	}
 
-	//if no more
+	// if no more
 	if (ID eq "") {
 
 		if (xml and linkfilename2) {
@@ -375,7 +375,7 @@ nextrec:
 			var().osflush();
 		}
 
-		//finished
+		// finished
 		gosub exit();
 		return 0;
 	}
@@ -387,14 +387,14 @@ nextrec:
 		goto nextrec;
 	}
 
-	//filter out unauthorised
+	// filter out unauthorised
 	if (chk_authorised) {
 		if (not(calculate("AUTHORISED"))) {
 			goto nextrec;
 		}
 	}
 
-	//filter out unwanted multivalues that the stupid rev sortselect leaves in
+	// filter out unwanted multivalues that the stupid rev sortselect leaves in
 	for (const var limitfieldn : range(1, nlimitfields)) {
 		var value	   = calculate(limitfields.f(1, limitfieldn));
 		var reqvalue   = limitvalues.f(1, limitfieldn);
@@ -413,7 +413,7 @@ nextrec:
 		} else {
 			call mssg(limitcheck.quote() ^ " invalid limitcheck in select2");
 
-			//abort
+			// abort
 			gosub exit();
 			stop();
 			return 0;
@@ -424,13 +424,13 @@ nextrec:
 
 	if (dictids eq "RECORD") {
 
-		//postread (something similar also in listen/READ)
+		// postread (something similar also in listen/READ)
 		if (haspostread) {
 
-			//simulate window environment for POSTREAD
+			// simulate window environment for POSTREAD
 			win.orec = RECORD;
-			//wlocked=1
-			//simulate unlocked read to avoid warning messages like job cannot be updated
+			// wlocked=1
+			// simulate unlocked read to avoid warning messages like job cannot be updated
 			win.wlocked = 0;
 			msg_		= "";
 			win.reset	= 0;
@@ -438,20 +438,20 @@ nextrec:
 			call systemsubs(postreadmode);
 			DATA = "";
 
-			//call trimexcessmarks(iodat)
+			// call trimexcessmarks(iodat)
 
-			//postread can request abort by setting msg or reset>=5
+			// postread can request abort by setting msg or reset>=5
 			if (win.reset ge 5 or msg_) {
 				goto nextrec;
 			}
 		}
 
-		//prevent reading passwords postread and postwrite
+		// prevent reading passwords postread and postwrite
 		if (filename eq "DEFINITIONS" and ID eq "SECURITY") {
 			RECORD(4) = "";
 		}
 
-		///
+		// /
 
 		RECORD.move(row);
 
@@ -462,7 +462,7 @@ nextrec:
 		}
 		row.prefixer(prefix);
 
-		//dictids ne RECORD
+		// dictids ne RECORD
 	} else {
 		row = "";
 
@@ -475,14 +475,14 @@ nextrec:
 				cell = oconv(cell, oconvsx.f(dictidn));
 			}
 			if (xml) {
-				//cell='X'
-				//convert "'":'".+/,()&%:-1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz' to '' in cell
+				// cell='X'
+				// convert "'":'".+/,()&%:-1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz' to '' in cell
 				cell.replacer("%", "%25");
 				cell.replacer("&", "&amp;");
 				cell.replacer("<", "&lt;");
 				cell.replacer(">", "&gt;");
-				//if cell then deb ug
-				//cell=quote(str(cell,10))
+				// if cell then deb ug
+				// cell=quote(str(cell,10))
 				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^
 					   ">"
 					   "\n";
@@ -498,9 +498,9 @@ nextrec:
 				row ^
 				"</RECORD>"
 				"\n";
-			//move up
-			//swap '&' with '&amp;' in row
-			//swap "'" with "" in row
+			// move up
+			// swap '&' with '&amp;' in row
+			// swap "'" with "" in row
 		}
 		if (dataptr) {
 			if (not xml) {
@@ -517,7 +517,7 @@ nextrec:
 
 	if (linkfilename2) {
 
-		//in LISTEN and SELECT2 for direct output
+		// in LISTEN and SELECT2 for direct output
 
 		var blockn = 0;
 		while (true) {
@@ -527,12 +527,12 @@ nextrec:
 				break;
 
 			rowpart.replacer("%", "%25");
-			//changed to allow language characters to pass through x80-xF9
+			// changed to allow language characters to pass through x80-xF9
 			for (const var ii : range(249, 255)) {
 				rowpart.replacer(chr(ii), hexx(ii - 249));
 			}  //ii;
 
-			//output converted row part
+			// output converted row part
 			call osbwrite(rowpart, linkfile2, dataptr);
 
 			blockn += 1;
@@ -543,9 +543,9 @@ nextrec:
 		dataptr += row.len();
 	}
 
-	//get next if output to file or space for more data
-	//goto nextrec
-	//if xml or len(DATAX)<64000 then goto nextrec
+	// get next if output to file or space for more data
+	// goto nextrec
+	// if xml or len(DATAX)<64000 then goto nextrec
 	if (xml or (datax.len() lt maxstrsize_ - 1530)) {
 		goto nextrec;
 	}

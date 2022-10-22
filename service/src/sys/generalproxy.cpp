@@ -46,9 +46,9 @@ var logkey;
 var logsearch;
 
 function main() {
-	//!subroutine general(request,data,response)
+	// !subroutine general(request,data,response)
 
-	//use app specific version of generalsubs
+	// use app specific version of generalsubs
 	if (APPLICATION ne "EXODUS") {
 		generalsubs = "generalsubs_app";
 	}
@@ -61,7 +61,7 @@ function main() {
 	call cropper(data_);
 	mode = request_.f(1).ucase();
 
-	//request 2 - can be anything actually
+	// request 2 - can be anything actually
 
 	win.datafile = request_.f(2);
 	var keyx	 = request_.f(3);
@@ -90,36 +90,36 @@ function main() {
 		if (not open(transactions, transactions))
 			createfile(transactions);
 
-		//ERROR:  VACUUM cannot run inside a transaction block sqlstate:25001
-		//if (not transactions.sqlexec("vacuum " ^ transactions.f(1))) {
-		//	response_ = var().lasterror();
-		//	stop();
-		//}
+		// ERROR:  VACUUM cannot run inside a transaction block sqlstate:25001
+		// if (not transactions.sqlexec("vacuum " ^ transactions.f(1))) {
+		// 	response_ = var().lasterror();
+		// 	stop();
+		// }
 
 		ID		   = "1";
 		let ntrans = 100;
-		//printl();
-		//printl("TRANTEST 1.", THREADNO);
+		// printl();
+		// printl("TRANTEST 1.", THREADNO);
 		for (const var recn : range(1, ntrans)) {
-			//if (TERMINAL and recn % 100)
-			//	printl(recn);
+			// if (TERMINAL and recn % 100)
+			// 	printl(recn);
 			if (not read(RECORD, transactions, ID))
 				RECORD = "";
 			write(RECORD + 1, transactions, ID);
 		}
-		//printl();
-		//printl("TRANTEST 2.", THREADNO);
+		// printl();
+		// printl("TRANTEST 2.", THREADNO);
 		response_ = "OK Thread No. " ^ THREADNO ^ ", Total: " ^ (RECORD + 1);
 
 	} else if (mode.f(1) eq "PREVIEWLETTERHEAD") {
 
-		//comma sep
+		// comma sep
 		var compcodes = request_.f(2);
 		var testing	  = request_.f(3);
 
 		var allhtml = "";
 
-		//if testing, style borders of td and divs for visual insight
+		// if testing, style borders of td and divs for visual insight
 		if (testing) {
 			allhtml(-1) = "<style>";
 			allhtml(-1) = "td {border:dotted 1px #EEEEEE;}";
@@ -137,10 +137,10 @@ function main() {
 			allhtml(-1) = "<br />Company " ^ compcode ^ " from " ^ mode;
 			allhtml(-1) = "<br />";
 
-			//if not testing then wrap html in hr for clarity
-			//if testing else allhtml<-1>='<hr/>'
+			// if not testing then wrap html in hr for clarity
+			// if testing else allhtml<-1>='<hr/>'
 			allhtml(-1) = html;
-			//if testing else allhtml<-1>='<hr/>'
+			// if testing else allhtml<-1>='<hr/>'
 
 		}  //compn;
 		allhtml(-1) = "Press F5 to refresh any images just uploaded.";
@@ -168,8 +168,8 @@ function main() {
 			abort("\"Copy to\" database must be configured (and saved) for database " ^ copydb ^ " first");
 		}
 
-		//ensure authorised to login to one or the other database
-		//by ensuring the user is currently logged in to one or other database
+		// ensure authorised to login to one or the other database
+		// by ensuring the user is currently logged in to one or other database
 		if ((USERNAME ne "EXODUS" and copydb ne SYSTEM.f(17)) and todb ne SYSTEM.f(17)) {
 			msg_	 = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
 			msg_(-1) = "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote());
@@ -177,7 +177,7 @@ function main() {
 			abort(msg_);
 		}
 
-		//should really have an option to close the live dataset and then copy
+		// should really have an option to close the live dataset and then copy
 		if (not(authorised("DATASET COPY", msg_, "LS"))) {
 			abort(msg_);
 		}
@@ -205,15 +205,15 @@ function main() {
 			abort("You must specify some groups or users to email");
 		}
 
-		//ensure sender has an email address
-		//not absolutely necessary but provides a return email address
+		// ensure sender has an email address
+		// not absolutely necessary but provides a return email address
 		if (USERNAME ne "EXODUS" and not(USERNAME.xlate("USERS", 7, "X"))) {
 			abort("You cannot send email because you do not have an email address for replies");
 		}
 
-		//T=
-		//R=reply to is current user
-		//W=group is word to be found in user department
+		// T=
+		// R=reply to is current user
+		// W=group is word to be found in user department
 		var options = "TR";
 
 		var subject = data_.f(4);
@@ -234,7 +234,7 @@ function main() {
 		data_ = "";
 
 	} else if (mode eq "CREATEDATABASE") {
-		//For patsalides
+		// For patsalides
 
 		if (not(authorised("DATASET CREATE", msg_))) {
 			abort(msg_);
@@ -249,45 +249,45 @@ function main() {
 
 		var dbcodes = dblist();
 
-		//source database services will be stopped for source to target database copy
-		//reject source db if same as current database.
+		// source database services will be stopped for source to target database copy
+		// reject source db if same as current database.
 		var currentdbcode = SYSTEM(17);
 		if (sourcedbcode eq currentdbcode) {
 			return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
 		}
 
-		//check source database exists
+		// check source database exists
 		if (not locateusing(_FM, sourcedbcode, dbcodes)) {
 			return invalid("Source database doesn't exists.");
 		}
 
-		//check new database and data dir dont already exist
+		// check new database and data dir dont already exist
 		if (locateusing(_FM, targetdbcode, dbcodes)) {
 			return invalid("Sorry, " ^ targetdbcode.quote() ^ " already exists");
 		}
 
-		//stop source live service
+		// stop source live service
 		if (not osshell("systemctl stop agy_live@" ^ sourcedbcode)) {
 			return invalid("Cannot stop " ^ sourcedbcode ^ "'s service");
 		}
 
-		//Copy source db to target db
+		// Copy source db to target db
 		// ERROR:  CREATE DATABASE cannot run inside a transaction block
-		//if (not dbcopy(sourcedbcode,targetdbcode)) {
+		// if (not dbcopy(sourcedbcode,targetdbcode)) {
 		osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode);
 
-		//start source live service
+		// start source live service
 		osshell("systemctl start agy_live@" ^ sourcedbcode);
 
-		//check target db created
+		// check target db created
 		var newdbcodes = dblist();
 		if (not locateusing(_FM, targetdbcode, newdbcodes)) {
 			return invalid(targetdbname ^ targetdbcode.quote() ^ " not created");
 		}
 
-		//create target data dir
-		//oscopy(sourcedatadir, targetdatadir);
-		//KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
+		// create target data dir
+		// oscopy(sourcedatadir, targetdatadir);
+		// KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
 		osshell("mkdir -p " ^ targetdatadir);
 		osshell("chmod a+srw " ^ targetdatadir);
 		osshell("setfacl -d -m g::rw " ^ targetdatadir);
@@ -295,14 +295,14 @@ function main() {
 			return invalid("Error in creating target data directory");
 		}
 
-		//skip - target image dir created on first upload
+		// skip - target image dir created on first upload
 
-		//update database name file
+		// update database name file
 		if (not oswrite(targetdbname, "../data/" ^ targetdbcode ^ "/name")) {
 			return invalid("Cannot update database file name");
 		}
 
-		//email confirmaion
+		// email confirmaion
 		call sysmsg("", targetdbname ^ " - (" ^ targetdbcode ^ ") created");
 
 		response_ = "OK Database " ^ targetdbname ^ " " ^ targetdbcode.quote() ^ " has been created.";
@@ -311,7 +311,7 @@ function main() {
 		win.is = request_;
 		call usersubs(mode);
 
-		//case mode[-3,3]='SSH'
+		// case mode[-3,3]='SSH'
 		// call ssh(mode)
 
 	} else if (mode eq "PASSWORDRESET") {
@@ -337,7 +337,7 @@ function main() {
 
 			if (emailaddress.ucase() eq userx.f(7).ucase()) {
 
-				//signify ok
+				// signify ok
 				baduseroremail = "";
 
 				call securitysubs("GENERATEPASSWORD");
@@ -353,8 +353,8 @@ function main() {
 			}
 		}
 
-		//record historical resets/attempts
-		//datetime=(date():'.':time() 'R(0)#5')+0
+		// record historical resets/attempts
+		// datetime=(date():'.':time() 'R(0)#5')+0
 		var datetime = date() ^ "." ^ time().oconv("R(0)#5");
 		userrec.inserter(15, 1, datetime);
 		userrec.inserter(16, 1, SYSTEM.f(40, 2));
@@ -365,7 +365,7 @@ function main() {
 			abort(baduseroremail);
 		}
 
-		//prewrite (locks authorisation file or fails)
+		// prewrite (locks authorisation file or fails)
 		win.valid = 1;
 		call usersubs("PREWRITE");
 		if (not(win.valid)) {
@@ -374,13 +374,13 @@ function main() {
 
 		userrec.write(usersordefinitions, userkey);
 
-		//postwrite
+		// postwrite
 		call usersubs("POSTWRITE");
 
-		//cc the user too if the username is valid
-		//call sysmsg('User: ':username:fm:'From IP: ':system<40,2>:fm:text,'Password Reset',userkey)
+		// cc the user too if the username is valid
+		// call sysmsg('User: ':username:fm:'From IP: ':system<40,2>:fm:text,'Password Reset',userkey)
 
-		//send the new password to the user
+		// send the new password to the user
 		var emailaddrs = userrec.f(7);
 		var ccaddrs	   = "";
 		var subject	   = "EXODUS Password Reset";
@@ -405,12 +405,12 @@ function main() {
 
 	} else if (mode eq "GETCODEPAGE") {
 		data_ = "";
-		//have to skip char zero it seems to be treated as string terminator
-		//somewhere on the way to the browser (not in revelation)
+		// have to skip char zero it seems to be treated as string terminator
+		// somewhere on the way to the browser (not in revelation)
 		for (const var ii : range(1, 255)) {
 			data_ ^= chr(ii);
 		}  //ii;
-		//data='xxx'
+		// data='xxx'
 		response_ = "OK";
 
 	} else if (mode eq "SETCODEPAGE") {
@@ -451,8 +451,8 @@ setcodepagecase:
 			recordx.write(sys.alanguage, "GENERAL*" ^ codepage);
 
 			/*;
-				//check lower=lcase(upper) and vice versa
-				//but ucase() may strip accents whereas lcase() may leave them
+				// check lower=lcase(upper) and vice versa
+				// but ucase() may strip accents whereas lcase() may leave them
 				x=@lower.case;
 				y=@upper.case;
 				convert @lower.case to @upper.case in x;
@@ -460,7 +460,7 @@ setcodepagecase:
 				convert @lower.case to @upper.case in y;
 				convert @upper.case to @lower.case in x;
 				for ii=1 to len(x);
-					//if x[ii,1] ne @lower.case[ii,1] then print 'x: ':ii:' ':seq(x[ii,1]) 'MX':' ':seq(@lower.case[ii,1]) 'MX'
+					// if x[ii,1] ne @lower.case[ii,1] then print 'x: ':ii:' ':seq(x[ii,1]) 'MX':' ':seq(@lower.case[ii,1]) 'MX'
 					if y[ii,1] ne @upper.case[ii,1] then print 'y: ':ii:' ':seq(y[ii,1]) 'MX':' ':seq(@upper.case[ii,1]) 'MX';
 					next ii;
 				*/
@@ -498,7 +498,7 @@ badsetcodepage:
 		PSEUDO = data_;
 		perform("LISTREQUESTLOG");
 
-		//printopts='L'
+		// printopts='L'
 		gosub postproc();
 
 	} else if (mode eq "LISTLOCKS") {
@@ -519,14 +519,14 @@ badsetcodepage:
 			stop();
 		}
 
-		//printopts='L'
+		// printopts='L'
 		gosub postproc();
 
 	} else if (mode eq "LISTADDRESSES") {
 
 		perform("LISTADDRESSES");
 
-		//printopts='L'
+		// printopts='L'
 		gosub postproc();
 
 	} else if (mode eq "GETDEPTS") {
@@ -542,8 +542,8 @@ badsetcodepage:
 
 	} else if (mode eq "ABOUT") {
 		perform("ABOUT");
-		//transfer @user4 to data
-		//response='OK'
+		// transfer @user4 to data
+		// response='OK'
 		msg_.move(response_);
 		response_.prefixer("OK ");
 
@@ -555,8 +555,8 @@ badsetcodepage:
 		perform("PROG");
 		response_ = "OK";
 
-		//LISTAUTH.TASKS = list of tasks LISTTASKS
-		//LISTAUTH.USERS = list of users LISTUSERS
+		// LISTAUTH.TASKS = list of tasks LISTTASKS
+		// LISTAUTH.USERS = list of users LISTUSERS
 	} else if (mode.field(".", 1) eq "LISTAUTH") {
 
 		win.wlocked	  = 0;
@@ -565,7 +565,7 @@ badsetcodepage:
 		if (not(win.valid)) {
 			abort();
 		}
-		//call security.subs('LISTAUTH')
+		// call security.subs('LISTAUTH')
 		call securitysubs(mode);
 		if (not(win.valid)) {
 			abort();
@@ -623,9 +623,9 @@ nextrep:
 				temp.replacer(">", "&gt;");
 				report(2) = temp;
 
-				//!dont send instructions since takes up space and not needed
-				//DO send now to have info in requestlog
-				//report<5>=''
+				// !dont send instructions since takes up space and not needed
+				// DO send now to have info in requestlog
+				// report<5>=''
 
 				report.converter(_VM, _RM);
 				let nn = report.fcount(_FM);
@@ -635,9 +635,9 @@ nextrep:
 
 				data_(9, repn) = reportid;
 
-				//print repn,data<1>
+				// print repn,data<1>
 			}
-			//if len(data)<65000 then goto nextrep
+			// if len(data)<65000 then goto nextrep
 			if (data_.len() lt maxstrsize_ - 530) {
 				goto nextrep;
 			}
@@ -679,7 +679,7 @@ nextrep:
 			abort("Document " ^ (request_.f(2).quote()) ^ " is missing");
 		}
 
-		//TODO security
+		// TODO security
 
 		doc(6) = lower(data_);
 
@@ -710,7 +710,7 @@ nextrep:
 		var description = doc.f(2);
 		doc(2)			= description ^ " (Copy)";
 
-		//prevent copy from appearing like a exodus standard
+		// prevent copy from appearing like a exodus standard
 		doc(10) = "";
 
 		doc(1) = USERNAME;
@@ -722,10 +722,10 @@ nextrep:
 
 	} else if (mode eq "GETREPORT") {
 
-		//printopts='L'
+		// printopts='L'
 		gosub opendocuments();
 
-		//get parameters from documents into @pseudo
+		// get parameters from documents into @pseudo
 
 		if (not(sys.document.read(sys.documents, request_.f(2)))) {
 			msg_ = "Document " ^ (request_.f(2).quote()) ^ " does not exist";
@@ -740,14 +740,14 @@ nextrep:
 			}
 		}
 
-		//if task='BALANCES' then printopts='P'
-		//if index(task,'MEDIADIARY',1) then printopts='X'
+		// if task='BALANCES' then printopts='P'
+		// if index(task,'MEDIADIARY',1) then printopts='X'
 
 		PSEUDO = sys.document.f(6);
 		PSEUDO.converter(_RM, _VM);
 		PSEUDO = raise(PSEUDO);
 
-		//merge any runtime parameters into the real parameters
+		// merge any runtime parameters into the real parameters
 		for (fn = 1; fn <= 999; ++fn) {
 			var tt = data_.f(fn);
 			if (tt) {
@@ -756,23 +756,23 @@ nextrep:
 		}  //fn;
 		data_ = "";
 
-		//save runtime params in case saving below for scheduled reruns
-		//document<11>=lower(data)
+		// save runtime params in case saving below for scheduled reruns
+		// document<11>=lower(data)
 
 		var sentencex = sys.document.f(5);
 		sentencex.converter(_VM, " ");
 		data_ = PSEUDO;
 
-		//in case we are calling another proxy
+		// in case we are calling another proxy
 		if (sys.document.f(5, 1).ends("PROXY")) {
 
-			//run but suppress email
-			//perform 'TEST ':request<2>:' (S)'
+			// run but suppress email
+			// perform 'TEST ':request<2>:' (S)'
 
 			request_ = raise(sys.document.f(5)).field(_FM, 2, 999999) ^ FM ^ request_.f(2);
-			//moved up so parameters show in any emailed error messages
-			//data=@pseudo
-			//override the saved period with a current period
+			// moved up so parameters show in any emailed error messages
+			// data=@pseudo
+			// override the saved period with a current period
 			var runtimeperiod = date().oconv("D2/E").b(4, 5);
 			if (runtimeperiod.starts("0")) {
 				runtimeperiod.cutter(1);
@@ -797,7 +797,7 @@ performreport:
 		PSEUDO = data_;
 		perform("LISTSTATS");
 
-		//printopts='L'
+		// printopts='L'
 		gosub postproc();
 
 	} else if (mode eq "VIEWLOG") {
@@ -829,7 +829,7 @@ performreport:
 		cmd.replacer("xAND", "AND");
 		perform(cmd);
 
-		//printopts='L'
+		// printopts='L'
 		gosub postproc();
 
 	} else if (mode eq "LISTMARKETS") {
@@ -850,7 +850,7 @@ performreport:
 
 		perform("LISTCOMPANIES");
 
-		//printopts='L'
+		// printopts='L'
 		gosub postproc();
 
 	} else if (mode.field(".", 1) eq "GETTASKS") {
@@ -864,7 +864,7 @@ performreport:
 
 /////
 exit:
-	/////
+	// ///
 	return "";
 }
 
@@ -923,7 +923,7 @@ subroutine initlog() {
 
 	return;
 
-	//in get.subs and generalproxy
+	// in get.subs and generalproxy
 }
 
 subroutine gettaskprefix() {

@@ -8,11 +8,11 @@ function main(in type, in inx, in mode, out outx) {
 		return 0;
 	}
 
-	//nospaces=index(mode,'*',1)
-	//if nospaces then convert '*' to '' in mode
-	//IF MODE THEN
+	// nospaces=index(mode,'*',1)
+	// if nospaces then convert '*' to '' in mode
+	// IF MODE THEN
 	// IF MODE='4' THEN MODE=@DATE.FORMAT;MODE[2,1]='4'
-	//END ELSE
+	// END ELSE
 	// IF @DATE.FORMAT THEN MODE=@DATE.FORMAT ELSE MODE='D2/E'
 	// END
 
@@ -25,28 +25,28 @@ function main(in type, in inx, in mode, out outx) {
 		var in1 = inx.field(".", 1);
 		var in2 = inx.field(".", 2);
 
-		//find all DOS in accessible columns
-		//find all DOS related code by searching GBP for /86400
+		// find all DOS in accessible columns
+		// find all DOS related code by searching GBP for /86400
 		if (datemode.contains("DOS")) {
 			datemode.replacer("DOS", "");
-			//in1-=24873
+			// in1-=24873
 			in1 -= 24837;
 		}
 
-		//DOS time is 0-.99999 means 00:00-24:00
-		//convert to 0-86400 seconds basis
+		// DOS time is 0-.99999 means 00:00-24:00
+		// convert to 0-86400 seconds basis
 		var dostime = 0;
 		if (timemode.contains("DOS")) {
 			dostime = 1;
 			timemode.replacer("DOS", "");
 			in2 = 86400 * ("." ^ in2);
 
-			//fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0
+			// fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0
 		} else if (in2.len() ne 5) {
 			in2 = (in2 ^ "00000").first(5);
 		}
 
-		//move time and date into the local date time
+		// move time and date into the local date time
 		if (SW.f(1)) {
 			in2			= (in2 + SW.f(1) + 0.5).floor();
 			var in2orig = in2;
@@ -58,11 +58,11 @@ function main(in type, in inx, in mode, out outx) {
 			}
 		}
 
-		//use MT since date and time are now local
+		// use MT since date and time are now local
 		if (timemode eq "") {
 			timemode = "MT";
 
-			//numeric means just convert to local date time numeric ddddd.ttttt
+			// numeric means just convert to local date time numeric ddddd.ttttt
 		} else if (timemode eq "NUMERIC") {
 			if (dostime) {
 				outx = (in1 + in2 / 86400).oconv("MD50P");

@@ -7,13 +7,13 @@ function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 
 	var filename = filename0.convert(".", "_");
 
-	//check file exists
+	// check file exists
 	var file;
 	if (not open(filename, file)) {
 		abort(lasterror());
 	}
 
-	//separate cursor
+	// separate cursor
 	var	 v69;
 	var	 v70;
 	var	 v71;
@@ -28,17 +28,17 @@ function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 	var indexvalues = "";
 	while (file.readnext(indexvalue)) {
 
-		//remove prefix if specified
+		// remove prefix if specified
 		if (prefix) {
-			//failsafe - skip indexes with wrong prefix
+			// failsafe - skip indexes with wrong prefix
 			if (not indexvalue.starts(prefix)) {
 				continue;
 			}
-			//remove prefix
+			// remove prefix
 			indexvalue.cutter(lenprefix);
 		}
-		//indexvalue.outputl("index value=");
-		//accumulate the index values
+		// indexvalue.outputl("index value=");
+		// accumulate the index values
 		if (orderby) {
 			var indexn;
 			if (not(indexvalues.locateby(orderby, indexvalue, indexn)))
@@ -48,13 +48,13 @@ function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 		}
 	}
 
-	//correct the output
+	// correct the output
 	if (orderby)
 		indexvalues.converter(VM, FM);
 	else
 		indexvalues.popper();
 
-	//return value in PSEUDO
+	// return value in PSEUDO
 	move(indexvalues, PSEUDO);
 
 	clearselect();

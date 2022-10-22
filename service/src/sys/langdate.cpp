@@ -3,7 +3,7 @@ libraryinit()
 
 function main(in type, in in0, in mode0, out output, in glang) {
 
-	//should really be sensitive to timezone in @SW
+	// should really be sensitive to timezone in @SW
 
 	var inx	 = in0;
 	var mode = mode0;
@@ -34,28 +34,28 @@ function main(in type, in in0, in mode0, out output, in glang) {
 		}
 	}
 
-	//status=0
+	// status=0
 	if (type eq "OCONV") {
 
-		//dont oconv 1 or 2 digits as they are probably day of month being converted
+		// dont oconv 1 or 2 digits as they are probably day of month being converted
 		// to proper dates
-		//IF len(inx) gt 2 and inx MATCHES '0N' OR inx MATCHES '"-"0N' OR inx MATCHES '0N.0N' THEN
+		// IF len(inx) gt 2 and inx MATCHES '0N' OR inx MATCHES '"-"0N' OR inx MATCHES '0N.0N' THEN
 		if (inx.len() gt 2 and inx.match("^\\d*$")) {
 			goto ok;
 		}
 
 		if (inx.match("^-\\d*$") or inx.match("^\\d*\\.\\d*$")) {
 ok:
-			//language specific (date format could be a pattern in lang?)
+			// language specific (date format could be a pattern in lang?)
 			if (mode eq "L") {
 
 				var tt	 = inx.oconv("D4/E");
 				var mth	 = glang.f(2).field("|", tt.field("/", 2));
 				var day	 = tt.field("/", 1);
 				var year = tt.field("/", 3);
-				//if 1 then
+				// if 1 then
 				output = day ^ " " ^ mth ^ " " ^ year;
-				//end else
+				// end else
 				// output=mth:' ':day:' ':year
 				// end
 

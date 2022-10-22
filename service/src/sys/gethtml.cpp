@@ -17,22 +17,22 @@ var tt;
 function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") {
 
 	// gethtml may be "perform"ed, "execute"d  or "call"ed
-	//
+	// 
 	// 1. PERFORM/EXECUTE
-	//
+	// 
 	//  letterhead = perform("gethtml");
-	//
+	// 
 	// nlist PERFORMs gethtml (via printtx.hpp) when service lib list.cpp performs nlist.
-	//
+	// 
 	// nlist does not perform, nor calls, gethtml when cli list.cpp command line calls nlist.
-	//
+	// 
 	// 2. CALL
-	//
+	// 
 	//  call gethtml(mode, letterhead, compcode, qr_text);
-	//
+	// 
 	// Lots of service and application code CALLs gethtml directly
 	// or indirectly via included printtx.hpp
-	//
+	// 
 
 	var mode;
 	if (mode0.assigned()) {
@@ -40,11 +40,11 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 		modex = mode;
 	}
 
-	//returns source in MODE ie COMPANY or definitions file key
+	// returns source in MODE ie COMPANY or definitions file key
 
-	//TODO what about letterhead with vehicle logos?
+	// TODO what about letterhead with vehicle logos?
 
-	//cant use global company info if not initialised in c++
+	// cant use global company info if not initialised in c++
 	hascompanies = SYSTEM.f(133);
 
 	compcode = "";
@@ -69,25 +69,25 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 		}
 	}
 
-	//0. get config from company file if present
+	// 0. get config from company file if present
 
-	//otherwise old style DEFINITIONS X_HEAD,HEAD.HTM,INVHEAD.HTM etc
-	//order of searching if multiple modes like INVHEAD]HEAD
-	//where X is the compcode
-	//1. X_INVHEAD.HTM
-	//2. INVHEAD.HTM
-	//3. X_HEAD.HTM
-	//4. HEAD.HTM
+	// otherwise old style DEFINITIONS X_HEAD,HEAD.HTM,INVHEAD.HTM etc
+	// order of searching if multiple modes like INVHEAD]HEAD
+	// where X is the compcode
+	// 1. X_INVHEAD.HTM
+	// 2. INVHEAD.HTM
+	// 3. X_HEAD.HTM
+	// 4. HEAD.HTM
 
-	//get html depending on company file config
-	//////////////////////////////////////////
+	// get html depending on company file config
+	// ////////////////////////////////////////
 
 	mode = "Company File ";
 	var	  letterhead;
 	gosub getcompanyconfig(letterhead, mode);
 
-	//otherwise get from definitions
-	///////////////////////////////
+	// otherwise get from definitions
+	// /////////////////////////////
 
 	if (not letterhead) {
 		gosub getheadhtm(letterhead);
@@ -97,27 +97,27 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 			mode = "No letterhead defined";
 		}
 
-		//normalise handcoded html so later conversions will work
+		// normalise handcoded html so later conversions will work
 		letterhead.replacer("<image", "<img");
 		letterhead.replacer("<IMAGE", "<img");
 
-		//image should not have closing tag but dont bother removing it
-		//swap '</image>' with '' in letterhead
-		//swap '</IMAGE>' with '' in letterhead
+		// image should not have closing tag but dont bother removing it
+		// swap '</image>' with '' in letterhead
+		// swap '</IMAGE>' with '' in letterhead
 	}
 
-	//process the HTML, adding various macros
+	// process the HTML, adding various macros
 
 	var clientmark = letterheadcompany.f(27);
 	if (hascompanies) {
-		//if clientmark else clientmark=agp<1>
+		// if clientmark else clientmark=agp<1>
 		if (not clientmark) {
 			clientmark = SYSTEM.f(14);
 		}
 	}
 	letterhead.replacer("%AGENCY%", clientmark);
 
-	//similar code in GETHTML and GENERALMACROS TODO: use GENERALMACROS instead
+	// similar code in GETHTML and GENERALMACROS TODO: use GENERALMACROS instead
 
 	letterhead.replacer("%COMPANY_NAME%", letterheadcompany.f(1));
 	letterhead.replacer("%TAX_REGISTRATION_NO%", letterheadcompany.f(21));
@@ -151,14 +151,14 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 			var cmd		= "qrencode --size=2 --type=SVG " ^ qr_body.squote();
 			svg			= osshellread(cmd);
 
-			//remove everything like xml and comments before the opening <svg tag
+			// remove everything like xml and comments before the opening <svg tag
 			svg.cutter(svg.index("<svg") - 1);
 
-			//			#tooltip1 { position: relative; }
-			//			#tooltip1 a span { display: none; color: #FFFFFF; }
-			//			#tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
-			//			The html markup is:-
-			//			<p id="tooltip1"><a href="introduction.php">Introduction<span>Introduction to HTML and CSS: tooltip with extra text</span></a></p>
+			// 			#tooltip1 { position: relative; }
+			// 			#tooltip1 a span { display: none; color: #FFFFFF; }
+			// 			#tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
+			// 			The html markup is:-
+			// 			<p id="tooltip1"><a href="introduction.php">Introduction<span>Introduction to HTML and CSS: tooltip with extra text</span></a></p>
 
 			svg =
 				"<style>\n"
@@ -173,18 +173,18 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 		letterhead.replacer("%QR%", svg);
 	}
 
-	//check valid html .. html from company file is prechecked anyway
+	// check valid html .. html from company file is prechecked anyway
 
 	if (letterhead) {
 
-		//check simple HTML
+		// check simple HTML
 		if (letterhead.count("<") ne letterhead.count(">")) {
 			call mssg(keyx.quote() ^ " page header is not valid HTML");
 			letterhead = "";
 		}
 
-		//check various tags exist in equal numbers
-		//this doesnt check if they are in a correct sequence or hierarchy etc
+		// check various tags exist in equal numbers
+		// this doesnt check if they are in a correct sequence or hierarchy etc
 		var tags		= "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
 		let ntags		= tags.fcount(",");
 		var letterhead2 = letterhead.lcase();
@@ -192,7 +192,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 			var tag = tags.field(",", tagn);
 			if (letterhead2.count("<" ^ tag ^ ">") + letterhead2.count("<" ^ tag ^ " ") ne letterhead2.count("</" ^ tag ^ ">")) {
 				letterhead = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
-				//tagn = ntags;
+				// tagn = ntags;
 				break;
 			}
 		}  //tagn;
@@ -203,7 +203,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 
 	if (authorised("EDIT PRINTOUTS")) {
 
-		//button
+		// button
 		var onclick = "javascript:";
 		onclick ^= "if (document.body.getAttribute('contentEditable')) {";
 		onclick ^= " edithtml.innerHTML='Edit is Off';";
@@ -221,7 +221,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 		tt ^= "></button>";
 		letterhead.prefixer(tt);
 
-		//click logos to switch on/off editing
+		// click logos to switch on/off editing
 		onclick = "javascript:edithtml.click()";
 		letterhead.replacer("<IMG", "<img");
 		letterhead.replacer("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
@@ -264,18 +264,18 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 
 	var tab = "";
 
-	//using a table because
-	//a) to give the divs something left/center/right to float within
-	//b) to provide a central block in case of left+center+right style heads
+	// using a table because
+	// a) to give the divs something left/center/right to float within
+	// b) to provide a central block in case of left+center+right style heads
 
-	//table columns currently forced equal to allow centralisation in the page
-	//but may need allow configuration control over the column widths
-	//in case need to allow more space in some columns and less in others
-	//eg 20% 60% 20% if the central letterhead is very wide for example
+	// table columns currently forced equal to allow centralisation in the page
+	// but may need allow configuration control over the column widths
+	// in case need to allow more space in some columns and less in others
+	// eg 20% 60% 20% if the central letterhead is very wide for example
 
 	var usetable = 1;
 
-	//start a one row 100% width table to aid formatting
+	// start a one row 100% width table to aid formatting
 	if (usetable) {
 		tab(-1) = "<table width=100% cellspacing=0 cellpadding=0 borderpadding=0";
 		tab ^= " style=\"border-collapse:collapse\"";
@@ -296,7 +296,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			fontsize ^= "%";
 		}
 
-		//start a new TD
+		// start a new TD
 		if (usetable) {
 			tab(-1) = "";
 			tab(-1) = "  <td";
@@ -304,11 +304,11 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			tab ^= ">";
 		}
 
-		//wrap td contents in a div if any styling
+		// wrap td contents in a div if any styling
 		var divstyle = "";
 		if (align) {
 			if (align eq "center") {
-				//there is no FLOAT CENTER
+				// there is no FLOAT CENTER
 				divstyle ^= "display:table;margin-left:auto;margin-right:auto;";
 			} else {
 				divstyle ^= "float:" ^ align ^ ";";
@@ -317,22 +317,22 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		if (fontsize) {
 			divstyle ^= "font-size:" ^ fontsize ^ ";";
 		}
-		//		if (divstyle) {
-		//			div = FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">";
-		//			divx = FM ^ "   </div>";
-		//		} else {
-		//			div = "";
-		//			divx = "";
-		//		}
+		// 		if (divstyle) {
+		// 			div = FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">";
+		// 			divx = FM ^ "   </div>";
+		// 		} else {
+		// 			div = "";
+		// 			divx = "";
+		// 		}
 		var div	 = divstyle ? FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">" : "";
 		var divx = divstyle ? FM ^ "   </div>" : "";
-		//add image
+		// add image
 		if (imagetype or imagecompcode) {
 			tab ^= div;
 
-			//use other company image and type
+			// use other company image and type
 			if (imagecompcode) {
-				//get image type from the other company
+				// get image type from the other company
 				var imagecomp;
 				if (not(imagecomp.read(sys.companies, imagecompcode))) {
 					imagecomp = "";
@@ -341,22 +341,22 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 
 				mode ^= ", Col " ^ coln ^ " image from company " ^ imagecompcode;
 
-				//use this company image and type
+				// use this company image and type
 			} else {
 				imagecompcode = compcode;
 			}
 
-			//FULL http path to images so EMAIL/OFFICE programs can get images
+			// FULL http path to images so EMAIL/OFFICE programs can get images
 			var url = SYSTEM.f(114, 1);
 			if (url.ends("/")) {
 				url.popper();
 			}
 
-			//path to uploaded company logo files
-			//var imagepath = "/images/" ^ SYSTEM.f(17) ^ "/UPLOAD/COMPANIES/";
+			// path to uploaded company logo files
+			// var imagepath = "/images/" ^ SYSTEM.f(17) ^ "/UPLOAD/COMPANIES/";
 			var imagepath = "/images/" ^ SYSTEM.f(17) ^ "/upload/companies/";
 
-			//logo_companycode_coln .jpg .png /gif
+			// logo_companycode_coln .jpg .png /gif
 			var imagefilename = "logo_" ^ imagecompcode ^ "_" ^ coln ^ "." ^ imagetype;
 
 			var fullimageurl		  = url ^ imagepath ^ imagefilename;
@@ -371,10 +371,10 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			tab ^= divx;
 		}
 
-		//maybe get text from another company
+		// maybe get text from another company
 		var textcompcode = textcompcodes.f(1, coln);
 		if (textcompcode) {
-			//ignore any given text if textcompany given
+			// ignore any given text if textcompany given
 			text			= "";
 			var textcompany = "";
 			if (hascompanies) {
@@ -382,12 +382,12 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 					textcompany = "";
 				}
 			}
-			//get text from different company SAME COLUMN NO
+			// get text from different company SAME COLUMN NO
 			text = textcompany.f(63, coln);
 			mode ^= ", Col " ^ coln ^ " text from company " ^ textcompcode;
 		}
 
-		//add text div
+		// add text div
 		if (text) {
 			text.replacer(_TM, "<br />" _EOL);
 			tab ^= div;
@@ -417,22 +417,22 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 subroutine getheadhtm(io letterhead) {
 
 nextmodex:
-	//////////
+	// ////////
 	var prefix = compcode ^ "_";
 
 nextprefix:
-	///////////
+	// /////////
 	keyx = prefix ^ modex.f(1, 1) ^ var(".htm").ucase();
 
 	if (not(letterhead.read(DEFINITIONS, keyx))) {
 
-		//try again same mode but without company code prefix
+		// try again same mode but without company code prefix
 		if (prefix) {
 			prefix = "";
 			goto nextprefix;
 		}
 
-		//try again with next mode and with company code prefix
+		// try again with next mode and with company code prefix
 		if (modex.f(1, 2)) {
 			modex = modex.field(VM, 2, 9999);
 			goto nextmodex;

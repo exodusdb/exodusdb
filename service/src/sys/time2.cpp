@@ -8,8 +8,8 @@ var outputx;
 
 function main(in type, in input0, in mode0, out output) {
 
-	//uses @sw to output to or input from "local time"
-	//NO LONGER since requires date to be effective (use [DATETIME])
+	// uses @sw to output to or input from "local time"
+	// NO LONGER since requires date to be effective (use [DATETIME])
 
 	if (input0 eq "") {
 		output = "";
@@ -34,24 +34,24 @@ function main(in type, in input0, in mode0, out output) {
 				output = output.fieldstore(":", 1, 1, (output.field(":", 1) + 24).oconv("R(0)#2"));
 			}
 		} else {
-			//modex=mode
-			//swap '48' with '' in modex
-			//if modex='' then modex='MT'
-			//output=OCONV(INPUT0,modex)
-			//output=OCONV(INPUT0,mode)
-			//output=OCONV(mod(INPUT0+@sw<1>,86400),mode)
+			// modex=mode
+			// swap '48' with '' in modex
+			// if modex='' then modex='MT'
+			// output=OCONV(INPUT0,modex)
+			// output=OCONV(INPUT0,mode)
+			// output=OCONV(mod(INPUT0+@sw<1>,86400),mode)
 			output = oconv(input0.mod(86400), mode);
 		}
 
-		//25 hour format (25:00 is 01:00 the next day)
-		//output=oconv(INPUT0,'MT.')
-		//if INPUT0>86340 then output=(output+24) 'R(0)#5'
-		//convert '.' to ':' in output
+		// 25 hour format (25:00 is 01:00 the next day)
+		// output=oconv(INPUT0,'MT.')
+		// if INPUT0>86340 then output=(output+24) 'R(0)#5'
+		// convert '.' to ':' in output
 
-		//mode eg 48MT etc completely ignored in iconv
+		// mode eg 48MT etc completely ignored in iconv
 	} else if (type eq "ICONV") {
 
-		//handle multivalues
+		// handle multivalues
 		if (input0.contains(VM)) {
 			output = "";
 			let nn = input0.fcount(VM);
@@ -67,16 +67,16 @@ function main(in type, in input0, in mode0, out output) {
 		var temp = input2.field(":", 1);
 		if (temp.isnum() and temp ge 24) {
 			input2 = input2.fieldstore(":", 1, 1, temp - 24);
-			//output=iconv(input2,'MT')
-			//output=mod(iconv(input2,'MT')-@sw<1>,86400)
+			// output=iconv(input2,'MT')
+			// output=mod(iconv(input2,'MT')-@sw<1>,86400)
 			output = input2.iconv("MT").mod(86400);
 			output += 86400;
 		} else {
-			//modex=mode
-			//swap '48' with '' in modex
-			//if modex else modex='MT'
-			//output=iconv(INPUT0,modex)
-			//output=mod(iconv(INPUT0,'MT')-@sw<1>,86400)
+			// modex=mode
+			// swap '48' with '' in modex
+			// if modex else modex='MT'
+			// output=iconv(INPUT0,modex)
+			// output=mod(iconv(INPUT0,'MT')-@sw<1>,86400)
 			output = input0.iconv("MT").mod(86400);
 		}
 	}

@@ -13,7 +13,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var checkinterval;	//num
+	var checkinterval;	// num
 var forced;
 //var upgradeready;//num
 var anyusers;  //num
@@ -34,8 +34,8 @@ var minusagetime;
 var delusagetime;
 var statistics;
 dim netid;
-var hourn;	//num
-var ii;		//num
+var hourn;	// num
+var ii;		// num
 var tt;
 var processcount;
 var backuprequired;
@@ -77,9 +77,9 @@ var nextbackupdate;	 //num
 var dow;
 var nextbackupfilename;
 var nextbackupfileinfo;
-var reminderhours;	//num
+var reminderhours;	// num
 var localdate;
-var localtime;	//num
+var localtime;	// num
 var xx2;
 var xx3;
 var xx4;
@@ -115,24 +115,24 @@ var maxips;	 //num
 
 function main() {
 
-	//NB the PROCESSES file is central to all databases in one installation
-	//so this update of the monitor covers all the installations running processes
+	// NB the PROCESSES file is central to all databases in one installation
+	// so this update of the monitor covers all the installations running processes
 
-	//monitor every three minutes so there are 3 checks within the monitor 10 min
+	// monitor every three minutes so there are 3 checks within the monitor 10 min
 	checkinterval = 180;
 
-	//command mode forces, call mode only every x minutes
+	// command mode forces, call mode only every x minutes
 	forced = SENTENCE.field(" ", 1).ucase() eq "MONITOR2";
 
-	//quit if disabled and not forced
+	// quit if disabled and not forced
 	if (not(forced) and var("../../disabled.cfg").osfile()) {
 		return 0;
 	}
 
-	//upgradeready = 0;
-	//only counts web users
+	// upgradeready = 0;
+	// only counts web users
 	anyusers = 0;
-	//upgradefilename = "upgrade.php";
+	// upgradefilename = "upgrade.php";
 
 	if (not(processes.open("PROCESSES", ""))) {
 		call mssg(lasterror());
@@ -140,52 +140,52 @@ function main() {
 	}
 
 	if (not(DICT.open("DICT.PROCESSES", ""))) {
-		//call mssg(lasterror());
+		// call mssg(lasterror());
 		return 0;
 	}
 
-	//the monitor command to record exodus process status
-	//TODO get reply with new exodus auth and other info
+	// the monitor command to record exodus process status
+	// TODO get reply with new exodus auth and other info
 	request = "UPDATE";
 
-	//assume cannot have more than one update pending per installation
+	// assume cannot have more than one update pending per installation
 	tempfilename = request;
 
-	//surrounded in % to evade being selected except by direct read
+	// surrounded in % to evade being selected except by direct read
 	monitorkey = "%" ^ request ^ "%";
 
-	//attempt lock and keep it locked while we check (async so very quick)
-	//so that we can update monitor status on the way out
+	// attempt lock and keep it locked while we check (async so very quick)
+	// so that we can update monitor status on the way out
 	if (not(lockrecord("PROCESSES", processes, monitorkey))) {
-		//print 'MONITOR2 is busy. Skipping Nagios update.'
+		// print 'MONITOR2 is busy. Skipping Nagios update.'
 		return 0;
 	}
 
-	//get the current monitor info
+	// get the current monitor info
 	if (not(monitordata.read(processes, monitorkey))) {
 		monitordata = "";
 	}
 
-	//work out the current and nextchecktime
+	// work out the current and nextchecktime
 	currenttime = (date() + time() / 86400).oconv("MD50P");
-	//nextchecktime=monitordata<1>+checkinterval/86400
+	// nextchecktime=monitordata<1>+checkinterval/86400
 
-	//only process if current time is > last checktime plus check interval
-	//change to if difference > check interval in case clock is turned back
-	//if forced or currenttime>nextchecktime then
+	// only process if current time is > last checktime plus check interval
+	// change to if difference > check interval in case clock is turned back
+	// if forced or currenttime>nextchecktime then
 	if (not(forced or ((currenttime - monitordata.f(1)).abs() gt checkinterval / 86400))) {
 
-		/////////
-		//goto exit
+		// ///////
+		// goto exit
 		call unlockrecord("PROCESSES", processes, monitorkey);
 		return 0;
-		/////////
+		// ///////
 	}
 
-	//get the unique computer installation number
+	// get the unique computer installation number
 	cidx = cid();
 
-	//get the host name
+	// get the host name
 	hostid = SYSTEM.f(57);
 	if (not hostid) {
 		hostid = SYSTEM.f(44);
@@ -194,25 +194,25 @@ function main() {
 
 	installid = SYSTEM.f(139) ^ hostid ^ "_" ^ cidx;
 
-	//READ
-	/////
+	// READ
+	// ///
 
-	//TODO call READ before write to get any results
+	// TODO call READ before write to get any results
 	msg = "";
 	if (cidx) {
 		call monitor2b("READ", request, tempfilename, datax, msg);
 	}
 
-	//WRITE
-	//////
+	// WRITE
+	// ////
 
-	//count users (unique sessionids) in the last hour
+	// count users (unique sessionids) in the last hour
 	usertab.redim(25, 3);
 	usertab = "";  //dim
-	//last 24 hours or back to midnight
+	// last 24 hours or back to midnight
 	minusagetime = currenttime - 1;
-	//minusagetime=int(currenttime)
-	//31 days ago
+	// minusagetime=int(currenttime)
+	// 31 days ago
 	delusagetime = date() - 31;
 
 	if (statistics.open("STATISTICS", "")) {
@@ -223,16 +223,16 @@ nextstatistic:
 				goto nextstatistic;
 			}
 
-			//skip/delete usage records older than x
+			// skip/delete usage records older than x
 			if (RECORD.f(1) lt minusagetime) {
-				//trim out usage records older than one week
+				// trim out usage records older than one week
 				if (RECORD.f(1) lt delusagetime) {
 					statistics.deleterecord(ID);
 				}
 				goto nextstatistic;
 			}
 
-			//count the "user"
+			// count the "user"
 			netid.redim(3);
 			netid(1) = ID.field("*", 2);
 			netid(2) = ID.field("*", 3);
@@ -249,11 +249,11 @@ nextstatistic:
 		}
 	}
 
-	//get the number of processes by database and status
+	// get the number of processes by database and status
 	select(processes);
 	processcount   = "";
 	backuprequired = "";
-	//checkeddrives=''
+	// checkeddrives=''
 	backupdrives = "";
 	dbasesystems = "";
 	dbasecodes	 = SYSTEM.f(58);
@@ -264,7 +264,7 @@ nextprocess:
 			goto nextprocess;
 		}
 
-		//handle special records in processes
+		// handle special records in processes
 		if (ID.starts("%")) {
 			goto nextprocess;
 		}
@@ -279,39 +279,39 @@ nextprocess:
 		dbasesystems(1, dbasen) = RECORD.f(51);
 		status					= calculate("STATUS");
 		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
-			//statusn will be 6
+			// statusn will be 6
 			processcount(20, dbasen) = status;
 		}
 		processcount(statusn, dbasen) = processcount.f(statusn, dbasen) + 1;
 
-		//works out if backup is required from ok processes by preference
-		//use hung and maintenance processes if no ok processes
-		//dont use closed and crashed processes because maybe old and obsolete
-		//TODO make sensitive to definitions BACKUP records
+		// works out if backup is required from ok processes by preference
+		// use hung and maintenance processes if no ok processes
+		// dont use closed and crashed processes because maybe old and obsolete
+		// TODO make sensitive to definitions BACKUP records
 		if (statusn eq 1 or ((backuprequired.f(1, dbasen) eq "" and statusn le 3))) {
 
-			//get the bakpars for a specific process
+			// get the bakpars for a specific process
 			call getbackpars(bakpars, RECORD);
 
-			//not suppressed and not test (non-live)
+			// not suppressed and not test (non-live)
 			backuprequired(1, dbasen) = not(bakpars.f(9)) and not(bakpars.f(11));
 
-			//no backups required if database processes are all automatically started
-			//except BASIC which we presume is used to startup and backup data.bak
-			//if (SYSTEM.f(58) eq "" and dbasecode ne "BASIC") {
+			// no backups required if database processes are all automatically started
+			// except BASIC which we presume is used to startup and backup data.bak
+			// if (SYSTEM.f(58) eq "" and dbasecode ne "BASIC") {
 			if (SYSTEM.f(58) eq "") {
 				backuprequired(1, dbasen) = 0;
 			}
 
-			//work out backup targets (data and uploads)
-			//get datatarget sm uploadstarget sm backuptimefrom
+			// work out backup targets (data and uploads)
+			// get datatarget sm uploadstarget sm backuptimefrom
 			if (backuprequired.f(1, dbasen)) {
 				tt = bakpars.f(7);
-				//backpars 12 (upload backup target) can be 0 to suppress
+				// backpars 12 (upload backup target) can be 0 to suppress
 				if (bakpars.f(12) and bakpars.f(12) ne bakpars.f(7)) {
 					tt(1, 1, 2) = bakpars.f(12);
 				}
-				//backuptime
+				// backuptime
 				if (tt) {
 					tt(1, 1, 3) = bakpars.f(3);
 				}
@@ -322,14 +322,14 @@ nextprocess:
 		goto nextprocess;
 	}
 
-	//add self into list of ok (should already be in OK list)
-	//locate system<17> in dbasecodes<1> setting dbasen else
+	// add self into list of ok (should already be in OK list)
+	// locate system<17> in dbasecodes<1> setting dbasen else
 	// dbasecodes<1,dbasen>=system<17>
 	// end
-	//processcount<1,dbasen>=processcount<1,dbasen>+1
+	// processcount<1,dbasen>=processcount<1,dbasen>+1
 
-	//prepare the data to be sent to the monitor
-	//checking minumum number of processes required
+	// prepare the data to be sent to the monitor
+	// checking minumum number of processes required
 	descriptions = "";
 	status0123	 = 0;
 	ndbases		 = dbasecodes.fcount(VM);
@@ -339,52 +339,52 @@ nextprocess:
 			goto nextdbasen;
 		}
 
-		//show nok (number ok)
+		// show nok (number ok)
 		nok = processcount.f(1, dbasen);
 		if (not(nok) and not(VOLUMES)) {
 			temp = ("../data/" ^ dbasecode ^ "/" ^ dbasecode ^ ".svr").osfile();
 			secs = date() * 86400 + time() - (temp.f(2) * 86400 + temp.f(3));
 			nok	 = secs lt 600;
-			//otherwise flag hung
+			// otherwise flag hung
 			if (not nok) {
 				processcount(2, dbasen) = 1;
 			}
 		}
 		description = dbasecode;
-		//if nok then description:=' ':nok:':Ok'
+		// if nok then description:=' ':nok:':Ok'
 		if (nok gt 1) {
 			description ^= " " ^ nok;
 		}
 
-		//warning if one less than required and critical if even less
-		//! for warning, !! for critical
+		// warning if one less than required and critical if even less
+		// ! for warning, !! for critical
 		minreq = SYSTEM.f(59, dbasen);
-		//if nok=minreq-1 then
+		// if nok=minreq-1 then
 		// if status0123<1 then status0123=1
 		// description:=' but ':minreq:' req.!'
-		//end else if nok<minreq then
+		// end else if nok<minreq then
 		// if status0123<2 then status0123=2
 		// description:=' but ':minreq:' req!!'
-		//end else
+		// end else
 		// end
 
-		//show and critical if any hung
+		// show and critical if any hung
 		nhung = processcount.f(2, dbasen);
 		if (nhung) {
 			description ^= " " ^ nhung ^ ":Hung!!";
 		}
 
-		//start up new required processes unless a lot (currently 5) hung processes
-		//not if this is a test database (only those with codes ending in TEST')
-		//unless configured to all it
+		// start up new required processes unless a lot (currently 5) hung processes
+		// not if this is a test database (only those with codes ending in TEST')
+		// unless configured to all it
 		first = 1;
 		if (((not SYSTEM.f(17, 1).ends("_test") or SYSTEM.f(126)) and nok lt minreq) and nhung lt 5) {
-			//if locksystem('LOCK',dbasecode) then
-			//unlock immediately to enable startup - which will fail if anyone locks
-			//call locksystem('UNLOCK',dbasecode)
+			// if locksystem('LOCK',dbasecode) then
+			// unlock immediately to enable startup - which will fail if anyone locks
+			// call locksystem('UNLOCK',dbasecode)
 
-			//dont bother trying to start it if another process is backing up
-			//or it has been stopped or is the database is missing
+			// dont bother trying to start it if another process is backing up
+			// or it has been stopped or is the database is missing
 			startit = not((dbasecode.lcase() ^ ".end").osfile());
 			if (startit) {
 				tt = "../data/" ^ dbasecode.lcase() ^ "/general/revmedia.lk";
@@ -403,9 +403,9 @@ nextprocess:
 				}
 			}
 
-			//dont start anything if another process is still starting up
-			//this lock is in INIT.GENERAL and MONITOR2
-			//dont
+			// dont start anything if another process is still starting up
+			// this lock is in INIT.GENERAL and MONITOR2
+			// dont
 			if (startit) {
 				if (lockrecord("VOC", voc, "INIT.GENERAL.LOGIN")) {
 					call unlockrecord("VOC", voc, "INIT.GENERAL.LOGIN");
@@ -420,14 +420,14 @@ nextprocess:
 					dbasesystem = APPLICATION;
 				}
 				tt = "start exodus.js /system " ^ dbasesystem ^ " /database " ^ dbasecode;
-				//pid:=' /pid ':tt<6>
-				//print @(0):@(-4):time() 'MTS':' ':tt
+				// pid:=' /pid ':tt<6>
+				// print @(0):@(-4):time() 'MTS':' ':tt
 				if (first) {
 					printl();
 					first = 0;
 				}
 				print(tt, " ...");
-				//pcperform tt
+				// pcperform tt
 				print("monitor2 calling shell2 ", tt, " ...");
 				call shell2(tt, xx);
 				call ossleep(1000 * 5);
@@ -437,7 +437,7 @@ nextprocess:
 			// end
 		}
 
-		//show maintenance
+		// show maintenance
 		nmaint = processcount.f(3, dbasen);
 		if (nmaint) {
 			if ((description[-1]).isnum()) {
@@ -448,41 +448,41 @@ nextprocess:
 			description ^= nmaint ^ "M";
 		}
 
-		//ignore closed
+		// ignore closed
 
-		//ignore crashed
-		//TODO flag crashed ONCE and perhaps delete or mark as warning sent
+		// ignore crashed
+		// TODO flag crashed ONCE and perhaps delete or mark as warning sent
 
-		//show any unknown statuses (shouldnt be any really since all in {STATUS})
-		//but catch them here anyway and critical
+		// show any unknown statuses (shouldnt be any really since all in {STATUS})
+		// but catch them here anyway and critical
 		if (processcount.f(6, dbasen)) {
 			description ^= " " ^ processcount.f(20, dbasen) ^ "?!!";
 		}
 
-		//warning if backup required but not done.
-		//Warning for 1 day or never
-		//Critical for more
+		// warning if backup required but not done.
+		// Warning for 1 day or never
+		// Critical for more
 		backupdrive = backuprequired.f(1, dbasen, 1).ucase();
 		if (not(VOLUMES)) {
 			backupdrive = not dbasecode.ends("_test");
 		}
 		if (backupdrive) {
 
-			//uncomment to test non-existent drive
-			//backupdrive='1'
+			// uncomment to test non-existent drive
+			// backupdrive='1'
 			description ^= " Backup->" ^ backupdrive;
 			tpath = "../data/" ^ dbasecode.lcase() ^ "/params2";
 			tpath.converter("/", OSSLASH);
 			if (VOLUMES) {
-				//time fm date fm size
+				// time fm date fm size
 				if (not(paramrec.osread(tpath))) {
 					paramrec = "";
 				}
 			} else {
-				//time fm date
+				// time fm date
 				tt		 = tpath.osfile();
 				paramrec = tt.f(3) ^ FM ^ tt.f(2);
-				//size
+				// size
 				call osgetenv("HOME", home);
 				tpath ^= "/backups/sql/" ^ dbasecode.lcase() ^ ".sql.gz";
 				tpath.converter("/", OSSLASH);
@@ -493,17 +493,17 @@ nextprocess:
 			if (lastbackupsize) {
 				description ^= " " ^ oconv(lastbackupsize, "[XBYTES,1]");
 			}
-			//uncomment to test insufficient backup space
-			//lastbackupsize=999999999
+			// uncomment to test insufficient backup space
+			// lastbackupsize=999999999
 			lastbackupdatetime = (paramrec.f(2) + paramrec.f(1) / 86400).oconv("MD50P");
-			//if integer datetime then old format missing time so add 2 hours
-			//if lastbackupdatetime and int(lastbackupdatetime)=lastbackupdatetime then lastbackupdatetime+=2/24
-			//assume backup on same day (ie after last midnight)
+			// if integer datetime then old format missing time so add 2 hours
+			// if lastbackupdatetime and int(lastbackupdatetime)=lastbackupdatetime then lastbackupdatetime+=2/24
+			// assume backup on same day (ie after last midnight)
 			currentdatetime = (date() + time() / 86400).oconv("MD50P");
 			tt				= currentdatetime - lastbackupdatetime;
-			//allow one day and one hour
+			// allow one day and one hour
 			if (lastbackupdatetime and (tt gt 1 + 1 / 24.0)) {
-				//warning if one day missed and critical if more than one
+				// warning if one day missed and critical if more than one
 				description ^= " not done " ^ tt.oconv("MD10P") ^ " days!";
 				if (paramrec and tt gt 2) {
 					description ^= "!";
@@ -513,13 +513,13 @@ nextprocess:
 			if (not(backupdrives.f(1).locate(backupdrive, backupdriven))) {
 				backupdrives(1, backupdriven) = backupdrive;
 
-				//ensure something is on the target
-				//otherwise diskfreespace fails
+				// ensure something is on the target
+				// otherwise diskfreespace fails
 				tt = backupdrive ^ "/data.bak";
 				tt.converter("/", OSSLASH);
 				call osmkdir(tt);
 
-				//check target exists
+				// check target exists
 				freespace = diskfreespace(backupdrive);
 				if (freespace eq 999999999) {
 					freespace = 0;
@@ -550,48 +550,48 @@ nextprocess:
 				if (not osshell("test -L " ^ backupdir ^ " -o -e " ^ backupdir)) {
 					description ^= " impossible!!";
 				} else {
-					//present
+					// present
 					backupdrives(3, backupdriven) = 1;
 
-					//determine next backup filename
-					//similar in MONITOR2 and FILEMAN
+					// determine next backup filename
+					// similar in MONITOR2 and FILEMAN
 					nextbackupdate = date();
-					//add 1 if next backup is tomorrow
+					// add 1 if next backup is tomorrow
 					if (time() gt backuprequired.f(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
 					dow = ((sys.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).first(8)).ucase();
 					// eg 1/data.bak/adlined/wednesda/backup.zip
-					//nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
+					// nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
 					nextbackupfilename = "../../backup." ^ ((nextbackupdate - 1).mod(7) + 1) ^ ".txt";
 					nextbackupfilename.converter("/", OSSLASH);
 					nextbackupfileinfo = nextbackupfilename.osfile();
 
-					//if the next backup file exists (going to be overwritten)
-					//TODO this should be checked for all databases not just the first
+					// if the next backup file exists (going to be overwritten)
+					// TODO this should be checked for all databases not just the first
 					if (nextbackupfileinfo) {
 
-						//add its space to the freespace
+						// add its space to the freespace
 						freespace += nextbackupfileinfo.f(2);
 
-						//print a warning if havent changed the backup media and not suppressed
+						// print a warning if havent changed the backup media and not suppressed
 						if (not(bakpars.f(13)) and (nextbackupfileinfo.f(2) eq nextbackupdate - 7)) {
 
-							//email a request to change usb
-							//from 0600 to 1800 and not sent in the last 5.5 hours
-							//usually 0600 1130 1700
+							// email a request to change usb
+							// from 0600 to 1800 and not sent in the last 5.5 hours
+							// usually 0600 1130 1700
 							reminderhours = 5.5;
 							call getdatetime(localdate, localtime, xx, xx2, xx3, xx4);
-							//if (localtime ge 21600 and localtime le 64800) {
+							// if (localtime ge 21600 and localtime le 64800) {
 							if (localtime ge iconv("06:00", "MT") and localtime le iconv("18:00", "MT")) {
-								//only one email per installation
+								// only one email per installation
 								call osread(lastnote, "lastnote.cfg");
 								if (lastnote.f(1) ne localdate or (lastnote.f(2) lt localtime - 3600 * reminderhours)) {
 									call oswrite(localdate ^ FM ^ localtime, "lastnote.cfg");
 
-									//sendmail - if it fails, there will be an entry in the log
+									// sendmail - if it fails, there will be an entry in the log
 									toaddresses = bakpars.f(6);
-									//never send reminders to exodus since we will get nagios warnings at 12:00
+									// never send reminders to exodus since we will get nagios warnings at 12:00
 									toaddresses.replacer("backups@neosys.com", "");
 									toaddresses = trim(toaddresses, ";");
 									if (toaddresses) {
@@ -617,7 +617,7 @@ nextprocess:
 								}
 							}
 
-							//warning if they have not changed the usb by noon
+							// warning if they have not changed the usb by noon
 							if (localtime ge var("12:00").iconv("MT")) {
 								description ^= " Change Backup!";
 							}
@@ -626,11 +626,11 @@ nextprocess:
 				}
 			}
 
-			//accumulate size of existing backups that will be deleted and overwritten
+			// accumulate size of existing backups that will be deleted and overwritten
 			backupdrives(4, backupdriven) = backupdrives.f(4, backupdriven) + lastbackupsize;
 		}
 
-		//if index(description,'!',1) or nok or nhung or nmaint then
+		// if index(description,'!',1) or nok or nhung or nmaint then
 		if ((nok or nhung) or nmaint) {
 			if (descriptions) {
 				descriptions ^= ", ";
@@ -641,7 +641,7 @@ nextprocess:
 nextdbasen:;
 	}  //dbasen;
 
-	//check for free space on backup drive(s)
+	// check for free space on backup drive(s)
 	nbackupdrives = backupdrives.f(1).fcount(VM);
 	for (backupdriven = 1; backupdriven <= nbackupdrives; ++backupdriven) {
 
@@ -656,8 +656,8 @@ nextdbasen:;
 
 			description = " Drive " ^ backupdrive ^ " Free:" ^ oconv(freespace, "[XBYTES,1]");
 
-			//ensure 10% free space over last backup size
-			//if we know the last backup size (this could fail if a NEW db is added)
+			// ensure 10% free space over last backup size
+			// if we know the last backup size (this could fail if a NEW db is added)
 			if (lastbackupsize gt 0 and (freespace lt lastbackupsize * 11 / 10)) {
 				description ^= " only!!";
 			}
@@ -672,7 +672,7 @@ nextdbasen:;
 		}
 
 	}  //backupdriven;
-	//oswrite descriptions on 'DESCRIPS'
+	// oswrite descriptions on 'DESCRIPS'
 	if (descriptions.contains("!!") and status0123 lt 2) {
 		status0123 = 2;
 	}
@@ -682,7 +682,7 @@ nextdbasen:;
 
 	hostdescriptions = "EXODUS ";
 
-	//add exodus version for info
+	// add exodus version for info
 	tt = "general/version.dat";
 	tt.converter("/", OSSLASH);
 	call osread(versionnote, tt);
@@ -691,10 +691,10 @@ nextdbasen:;
 	tt			= tt.last(2) ^ "/" ^ tt.first(5);
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
-	//show local time
+	// show local time
 	hostdescriptions ^= " - At:" ^ time().oconv("MT");
 
-	//find max nusersperhour by type
+	// find max nusersperhour by type
 	for (ii = 1; ii <= 24; ++ii) {
 		for (jj = 1; jj <= 3; ++jj) {
 			usertab(ii, jj) = usertab(ii, jj).fcount(VM);
@@ -704,7 +704,7 @@ nextdbasen:;
 		}  //jj;
 	}	   //ii;
 
-	//list number of users (in last hour)
+	// list number of users (in last hour)
 	hostdescriptions ^= " - Users:";
 	hourn = 1;
 	for (ii = 1; ii <= 3; ++ii) {
@@ -718,7 +718,7 @@ nextdbasen:;
 		hostdescriptions ^= tt;
 	}  //ii;
 
-	//list max number of users
+	// list max number of users
 	hostdescriptions ^= " - Max:";
 	hourn = 25;
 	for (ii = 1; ii <= 3; ++ii) {
@@ -729,16 +729,16 @@ nextdbasen:;
 		hostdescriptions ^= usertab(hourn, ii);
 	}  //ii;
 
-	//os description
+	// os description
 	call osgetenv("VER", osver);
 	hostdescriptions ^= " - " ^ osver;
 
-	//cpu description
+	// cpu description
 	call osgetenv("CPU", cpudesc);
 	nprocs = SYSTEM.f(9);
 	hostdescriptions ^= " - " ^ cpudesc ^ " x " ^ nprocs;
 
-	//list ipnos
+	// list ipnos
 	if (VOLUMES) {
 		result = shell2("ipconfig /all", errors).ucase();
 		result.converter("\r\n", _FM _FM).trimmer();
@@ -749,7 +749,7 @@ nextdbasen:;
 			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
 			if (line.starts("IP ADDRESS")) {
 				ips(-1) = line.field(":", 2).trim().field("(", 1);
-				//only display the first
+				// only display the first
 				goto gotip;
 			}
 		}  //ii;
@@ -763,65 +763,65 @@ gotip:
 	if (ips) {
 		ips.converter(FM, ",");
 		nips = ips.fcount(",");
-		//limit to 5 ips, replace middle ones with - to indicate suppressed
+		// limit to 5 ips, replace middle ones with - to indicate suppressed
 		maxips = 5;
 		if (nips gt maxips) {
 			ips = ips.fieldstore(",", (maxips / 2).floor(), maxips - nips, "...");
 		}
 		hostdescriptions ^= " - " ^ ips;
-		//hostdescriptions:=' - ':ips:' - '
+		// hostdescriptions:=' - ':ips:' - '
 	}
 
-	//oswrite hostdescriptions on 'xx'
+	// oswrite hostdescriptions on 'xx'
 
-	//package the data for the monitor
+	// package the data for the monitor
 	datax = "";
 
-	//host passive check line
-	//currently any exodus update indicates that the host is ok
+	// host passive check line
+	// currently any exodus update indicates that the host is ok
 	if (datax) {
 		datax ^= chr(10);
 	}
 	datax ^= "PROCESS_HOST_CHECK_RESULT;" ^ installid ^ ";0;" ^ hostdescriptions;
 
-	//service passive check line
+	// service passive check line
 	if (datax) {
 		datax ^= chr(10);
 	}
 	datax ^= "PROCESS_SERVICE_CHECK_RESULT;" ^ installid ^ ";exodus;" ^ status0123 ^ ";" ^ descriptions;
 
-	//request info to be sent to the monitor asynchronously - doesnt wait
+	// request info to be sent to the monitor asynchronously - doesnt wait
 
-	//request it to be done
-	//currently just uses wget to http post the info in the background
+	// request it to be done
+	// currently just uses wget to http post the info in the background
 	msg = "";
 	if (cidx) {
 		call monitor2b("WRITE", request, tempfilename, datax, msg);
 	}
 
-	//any error is going to be up front like error in parameters or missing wget
-	//errors in hostnames and connectivity must be obtained
-	//with a mode='READ' and the same tempfilename
-	//report and prevent further checking/reporting for an hour
-	//unless somehow forced
+	// any error is going to be up front like error in parameters or missing wget
+	// errors in hostnames and connectivity must be obtained
+	// with a mode='READ' and the same tempfilename
+	// report and prevent further checking/reporting for an hour
+	// unless somehow forced
 	if (msg) {
 		monitordata(1) = currenttime.f(1) + 1 / 24.0;
 		call sysmsg(msg);
 	} else {
-		//register checked at current time
+		// register checked at current time
 		monitordata(1) = currenttime;
 	}
 
-	//NOTE and errors in hostnames and connectivity timeouts/response etc
-	//can be obtained after timeout etc with a mode='READ' and same tempfilename
-	//but how to know when ready (or timedout)?
+	// NOTE and errors in hostnames and connectivity timeouts/response etc
+	// can be obtained after timeout etc with a mode='READ' and same tempfilename
+	// but how to know when ready (or timedout)?
 
-	//update the monitor status
+	// update the monitor status
 	monitordata.write(processes, monitorkey);
 
-	/////
-	//exit:
-	/////
+	// ///
+	// exit:
+	// ///
 	call unlockrecord("PROCESSES", processes, monitorkey);
 
 	return 0;

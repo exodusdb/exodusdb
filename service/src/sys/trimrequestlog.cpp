@@ -14,10 +14,10 @@ function main() {
 
 	var update = 1;
 
-	//keep approx nn Mb
+	// keep approx nn Mb
 	var maxsize = 20 * 1024 * 1024;
 
-	//estimate based on size in last n days
+	// estimate based on size in last n days
 	var perioddays = 7;
 
 	var requestlog;
@@ -25,10 +25,10 @@ function main() {
 		stop();
 	}
 
-	//stage1:
-	////////
+	// stage1:
+	// //////
 
-	//calculate the size of the last month of requestlog entries
+	// calculate the size of the last month of requestlog entries
 
 	var periodago = date() - perioddays;
 	select(requestlog);
@@ -37,7 +37,7 @@ function main() {
 	var mindate	   = 999999;
 
 nextrec1:
-	/////////
+	// ///////
 	if (esctoexit()) {
 		stop();
 	}
@@ -68,12 +68,12 @@ nextrec1:
 
 ///////
 stage2:
-	///////
+	// /////
 
-	//calculate approx how many periods to keep
-	//and delete all records prior to that
+	// calculate approx how many periods to keep
+	// and delete all records prior to that
 
-	//if no data in last period then quit
+	// if no data in last period then quit
 	if (not periodsize) {
 		stop();
 	}
@@ -105,7 +105,7 @@ stage2:
 		stop();
 	}
 
-	//delete older recs
+	// delete older recs
 	var sizedeleted = 0;
 
 	select(requestlog);
@@ -113,14 +113,14 @@ stage2:
 	var ndeleted = 0;
 
 nextrec2:
-	/////////
+	// ///////
 	if (esctoexit()) {
 		stop();
 	}
 
 	if (not(readnext(ID))) {
 
-		//email results of deletions
+		// email results of deletions
 		if (update) {
 			tt = "Deleted";
 		} else {
@@ -129,7 +129,7 @@ nextrec2:
 		tx(-1) = "";
 		tx(-1) = tt.oconv("L#22") ^ ndeleted ^ " records - " ^ oconv(sizedeleted, "[XBYTES]");
 
-		//call sysmsg(tx)
+		// call sysmsg(tx)
 		call log("TRIMREQUESTLOG", tx);
 
 		tx.replacer(_FM, _EOL);
@@ -165,7 +165,7 @@ nextrec2:
 
 	goto nextrec2;
 
-	//for c++
+	// for c++
 	return 0;
 }
 

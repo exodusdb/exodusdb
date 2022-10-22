@@ -2,7 +2,7 @@
 libraryinit()
 
 	var output2;
-var ndecs;	//num
+var ndecs;	// num
 
 function main(in type, in input0, in mode, out output) {
 
@@ -42,7 +42,7 @@ function main(in type, in input0, in mode, out output) {
 		}
 
 	} else if (type eq "ICONV") {
-		//not implemented yet
+		// not implemented yet
 		output = input0;
 
 	} else {

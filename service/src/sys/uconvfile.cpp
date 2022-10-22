@@ -16,11 +16,11 @@ var errors;
 
 function main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
 
-	//currently only used by convcsv
+	// currently only used by convcsv
 
-	//uses the unicode uconv to convert file format
-	//
-	//http://www.microsoft.com/globaldev/reference/cphome.mspx
+	// uses the unicode uconv to convert file format
+	// 
+	// http://www.microsoft.com/globaldev/reference/cphome.mspx
 
 	if (encoding1i.unassigned()) {
 		encoding1 = "";
@@ -34,8 +34,8 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	}
 	result = 0;
 
-	//make cygwin command
-	//look for local or cygwin wget.exe otherwise quit
+	// make cygwin command
+	// look for local or cygwin wget.exe otherwise quit
 	if (oscwd().contains(":")) {
 		exe = ".exe";
 	} else {
@@ -47,13 +47,13 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	}
 	if (not(cmd.osfile())) {
 		msg = "UCONVFILE: Cannot find " ^ cmd;
-		//indicate failed but because of lack of uconv.exe file
+		// indicate failed but because of lack of uconv.exe file
 		result = "";
 
 		return 0;
 	}
 
-	//determine the encoding1
+	// determine the encoding1
 	if (encoding1 eq "CODEPAGE") {
 		call osgetenv("CODEPAGE", encoding1);
 		var	 oemcodepages = "437]720]737]775]850]852]855]857]858]862]866]874]932]936]949]950]1258"_var;
@@ -67,14 +67,14 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		return 0;
 	}
 
-	//dont convert if latin
-	//hopefully to reduce chance of screwups/reduce filesize when latin
+	// dont convert if latin
+	// hopefully to reduce chance of screwups/reduce filesize when latin
 	if (encoding1 eq 1252) {
 		result = 1;
 		return 0;
 	}
 
-	//determine the encoding2
+	// determine the encoding2
 	if (encoding2 eq "CODEPAGE") {
 		call osgetenv("CODEPAGE", encoding2);
 	}
@@ -84,7 +84,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 	if (encoding1 ne encoding) {
 
-		//invent a temporary filename
+		// invent a temporary filename
 		var tempfilename = inputfilename;
 		tempfilename.paster(-3, 3, "$CP");
 
@@ -93,14 +93,14 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		cmd ^= " -o " ^ tempfilename;
 		cmd ^= " " ^ inputfilename;
 
-		//run the conversion command
+		// run the conversion command
 		result = shell2(cmd, errors);
 		if (errors) {
 			msg = "UCONVFILE: uconv " ^ errors;
 			return 0;
 		}
 
-		//overwrite the input file with the temporary
+		// overwrite the input file with the temporary
 		if (VOLUMES) {
 			cmd = "xcopy " ^ tempfilename ^ " " ^ inputfilename ^ " /y";
 		} else {
@@ -112,7 +112,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 			return 0;
 		}
 
-		//delete the temporary
+		// delete the temporary
 		tempfilename.osremove();
 	}
 

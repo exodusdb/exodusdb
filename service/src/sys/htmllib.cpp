@@ -12,12 +12,12 @@ var tagsep;
 
 function main(in mode, io datax, in params0 = "", in params20 = "") {
 
-	//BEING REPLACED BY LOWERCASE VERSION HTMLLIB2()
-	//GBP all HTMLLIB2
-	//BP mostly HTMLLIB still
-	//ABP neither used
+	// BEING REPLACED BY LOWERCASE VERSION HTMLLIB2()
+	// GBP all HTMLLIB2
+	// BP mostly HTMLLIB still
+	// ABP neither used
 
-	//jbase
+	// jbase
 
 	var td	= "<td>";
 	var tdx = "</td>";
@@ -39,14 +39,14 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		datax.trimmer();
 		var tt = " " ^ VM;
 		while (true) {
-			///BREAK;
+			// /BREAK;
 			if (not(datax.contains(tt)))
 				break;
 			datax.replacer(tt, VM);
 		}  //loop;
 		tt = " " ^ FM;
 		while (true) {
-			///BREAK;
+			// /BREAK;
 			if (not(datax.contains(tt)))
 				break;
 			datax.replacer(tt, FM);
@@ -58,9 +58,9 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		datax.replacer(VM, "</TD>" ^ VM ^ "<TD>");
 		datax = "<TR><TD>" ^ datax ^ "</TD></TR>";
 
-		//trth='<TR><TD>'
+		// trth='<TR><TD>'
 		if (params2) {
-			//trth='<TH>'
+			// trth='<TH>'
 			var line1 = datax.f(1);
 			line1.replacer("</TR>", "</tr>");
 			line1.replacer("</tr>", "</TR></THEAD><TBODY>");
@@ -71,26 +71,26 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			datax(1) = line1;
 		}
 
-		//prefix
-		//tableid='T':rnd(999999999)[-7,7]
+		// prefix
+		// tableid='T':rnd(999999999)[-7,7]
 		params2 = params;
-		//if params2 else params2='<TABLE><THEAD>'
+		// if params2 else params2='<TABLE><THEAD>'
 		params2.replacer("<TABLE", "<table");
-		//swap '<table' with '<table id=':tableid in params2
+		// swap '<table' with '<table id=':tableid in params2
 		datax.prefixer(params2 ^ "<TBODY>");
 
-		//postfix
+		// postfix
 		datax ^= "</TBODY></TABLE>";
-		//datax=datax:'</TBODY></TABLE ID=':tableid:'>'
+		// datax=datax:'</TBODY></TABLE ID=':tableid:'>'
 
-		//if not(count(datax,fm)) and index(datax<1>,'<TH>',1) then
+		// if not(count(datax,fm)) and index(datax<1>,'<TH>',1) then
 		// swap '</TD>' with '</TH>' in datax
 		// end
 
-		//highlight last row if a total
+		// highlight last row if a total
 		var nlines	 = datax.fcount(FM);
 		var lastline = datax.f(nlines);
-		//Total
+		// Total
 		if (lastline.contains("<TD>" ^ sys.glang.f(28))) {
 			lastline.replacer("TD>", "TH>");
 			lastline.replacer("td>", "th>");
@@ -99,7 +99,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 
 		datax.converter(FM ^ VM, "");
 
-		//fill in the missing cells
+		// fill in the missing cells
 	} else if (mode eq "TABLE.FILL") {
 		filler = "<TD>&nbsp;</TD>";
 		gosub fill(datax);
@@ -110,10 +110,10 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		for (const var vn : range(1, nv)) {
 			var data2 = datax.f(1, vn);
 
-			//insert a break before all space+#
+			// insert a break before all space+#
 			data2.replacer(" #", FM ^ "#");
 
-			//restore #+space to be NOT broken
+			// restore #+space to be NOT broken
 			data2.replacer(FM ^ "# ", " # ");
 
 			data2.converter(TM, FM);
@@ -125,7 +125,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 					var line = data2.f(ln).trim();
 					if (line.starts("#")) {
 						line.cutter(1);
-						//if colon : present then before colon is the tag name
+						// if colon : present then before colon is the tag name
 						if (line.contains(":")) {
 							tagsep = ":";
 						} else {
@@ -156,7 +156,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		while (true) {
 			var tag1 = datax.index("<");
 			var tag2 = datax.index(">");
-			///BREAK;
+			// /BREAK;
 			if (not(tag1 and tag1 lt tag2))
 				break;
 			datax.paster(tag1, tag2 - tag1 + 1, "");
@@ -170,24 +170,24 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 
 	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
 
-		//to check versus DOS BROWSERS.TXT
-		//GET NEW RUN GBP2 CHK.AGENTSTRING
+		// to check versus DOS BROWSERS.TXT
+		// GET NEW RUN GBP2 CHK.AGENTSTRING
 
-		//equ agent to datax
+		// equ agent to datax
 
-		//Windows NT 6.3     Windows 8.1
-		//Windows NT 6.2     Windows 8
-		//Windows NT 6.1     Windows 7
-		//Windows NT 6.0     Windows Server 2008/Vista
-		//Windows NT 5.2     Windows Server 2003; Windows XP x64 Edition
-		//Windows NT 5.1     Windows XP
+		// Windows NT 6.3     Windows 8.1
+		// Windows NT 6.2     Windows 8
+		// Windows NT 6.1     Windows 7
+		// Windows NT 6.0     Windows Server 2008/Vista
+		// Windows NT 5.2     Windows Server 2003; Windows XP x64 Edition
+		// Windows NT 5.1     Windows XP
 
-		//MS useragent string documentation
-		//https://msdn.microsoft.com/en-us/library/ms537503%28v=vs.85%29.aspx
-		//MS Window Versions
-		//https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832%28v=vs.85%29.aspx
-		//similar code in INIT.GENERAL and HTMLLIB
-		//name can be CLIENT OS or SERVER OS
+		// MS useragent string documentation
+		// https://msdn.microsoft.com/en-us/library/ms537503%28v=vs.85%29.aspx
+		// MS Window Versions
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832%28v=vs.85%29.aspx
+		// similar code in INIT.GENERAL and HTMLLIB
+		// name can be CLIENT OS or SERVER OS
 		var osname = "";
 		if (datax.contains("NT 10.0")) {
 			osname = "10";
@@ -212,7 +212,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		}
 		if (osname) {
 			osname = "Win" ^ osname;
-			//add touch if Windows but not Windows Phone
+			// add touch if Windows but not Windows Phone
 			if (datax.contains("Touch")) {
 				osname ^= " Touch";
 			}
@@ -254,7 +254,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 				}
 				tt = osname.index(" like ");
 				if (tt) {
-					//osname.paster(tt, 9999, "");
+					// osname.paster(tt, 9999, "");
 					osname.firster(tt - 1);
 				}
 				osname = osname.field(";", 1);
@@ -266,7 +266,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			osname.cutter(-2);
 		}
 
-		//Trident tells you the actual browser software for MS
+		// Trident tells you the actual browser software for MS
 		var browser = "";
 		if (datax.contains("Trident/7.0")) {
 			browser = "11";
@@ -278,12 +278,12 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			browser = "8";
 		}
 
-		//MSIE tells you the operating mode for MS
-		//MSIE 10.0 Internet Explorer 10
-		//MSIE 9.0  Internet Explorer 9
-		//MSIE 8.0  Internet Explorer 8 or IE8 Compatibility View/Browser Mode
-		//MSIE 7.0  Windows Internet Explorer 7 or IE7 Compatibility View/Browser Mode
-		//MSIE 6.0  Microsoft Internet Explorer 6
+		// MSIE tells you the operating mode for MS
+		// MSIE 10.0 Internet Explorer 10
+		// MSIE 9.0  Internet Explorer 9
+		// MSIE 8.0  Internet Explorer 8 or IE8 Compatibility View/Browser Mode
+		// MSIE 7.0  Windows Internet Explorer 7 or IE7 Compatibility View/Browser Mode
+		// MSIE 6.0  Microsoft Internet Explorer 6
 		var iemode = "";
 		if (datax.contains("MSIE 10.0")) {
 			iemode = "10";
@@ -297,7 +297,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			iemode = "6";
 		}
 
-		//add the mode to the browser if different (MS only)
+		// add the mode to the browser if different (MS only)
 		if (not browser) {
 			browser = iemode;
 		}
@@ -348,11 +348,11 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			} else {
 				osname ^= datax;
 			}
-			//tt=osname:'<br>':datax
+			// tt=osname:'<br>':datax
 			datax = osname;
 		}
 
-		//returns agent in datax see equate above
+		// returns agent in datax see equate above
 
 	} else {
 		call mssg(mode.quote() ^ " unknown mode in HTMLLIB");
@@ -365,7 +365,7 @@ subroutine fill(io datax) {
 
 	let nn = datax.fcount(FM);
 
-	//find max number of columns
+	// find max number of columns
 	var n2 = 0;
 	for (const var ii : range(1, nn)) {
 		var tt = datax.f(ii).fcount(VM);
@@ -374,7 +374,7 @@ subroutine fill(io datax) {
 		}
 	}  //ii;
 
-	//make sure all columns are filled
+	// make sure all columns are filled
 	for (const var ii : range(1, nn)) {
 		for (const var i2 : range(1, n2)) {
 			if (datax.f(ii, i2) eq "") {

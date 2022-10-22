@@ -34,12 +34,12 @@ var wsmsg;
 
 function main(in mode0) {
 
-	//nb general.subs can only be called from programs with win_common.h
-	//because msg etc are common variables and must be defined in caller
+	// nb general.subs can only be called from programs with win_common.h
+	// because msg etc are common variables and must be defined in caller
 
 	mode = mode0;
 
-	//use app specific version of generalsubs
+	// use app specific version of generalsubs
 	if (APPLICATION ne "EXODUS") {
 		generalsubs = "generalsubs_app";
 	}
@@ -62,7 +62,7 @@ function main(in mode0) {
 		}
 
 	} else if (mode.field(",", 1) == "GETUSERDEPTX") {
-		//does not popup any errormessage
+		// does not popup any errormessage
 		gosub getuserdept2();
 		if (ANS == "") {
 			ANS = "Deleted";
@@ -80,18 +80,18 @@ function main(in mode0) {
 
 		var groupusers = "";
 		if (SECURITY.f(1).locate(USERNAME, usern0)) {
-			//add lower users in group
+			// add lower users in group
 			for (usern = usern0 + 1; usern <= 9999; ++usern) {
 				usercode = SECURITY.f(1, usern);
-				///BREAK;
+				// /BREAK;
 				if (not(usercode and usercode ne "---"))
 					break;
 				groupusers ^= VM ^ usercode;
 			}  //usern;
-			//add higher users in group
+			// add higher users in group
 			for (usern = usern0 - 1; usern >= 1; --usern) {
 				usercode = SECURITY.f(1, usern);
-				///BREAK;
+				// /BREAK;
 				if (not(usercode ne "---"))
 					break;
 				groupusers ^= VM ^ usercode;
@@ -104,12 +104,12 @@ function main(in mode0) {
 	} else if ((mode.field(".", 1, 2) == "DEF.SK") or (mode.field(".", 1, 2) == "DEF.SK2")) {
 
 		if (not(win.wlocked or RECORD)) {
-			//is.dflt=nextkey(':%SK%:':datafile,'')
+			// is.dflt=nextkey(':%SK%:':datafile,'')
 
-			//special defaults for special files
+			// special defaults for special files
 			if (mode ne "DEF.SK2") {
 
-				//documents
+				// documents
 				if (win.datafile == "DOCUMENTS") {
 					call getsubs("DEF.DOCUMENT.NO");
 					win.isdflt = ID;
@@ -117,7 +117,7 @@ function main(in mode0) {
 				}
 			}
 
-			//convert SK in datafile to SK in definitions
+			// convert SK in datafile to SK in definitions
 			if (not(no.readv(DEFINITIONS, win.datafile ^ ".SK", 1))) {
 				if (no.readv(win.srcfile, "%SK%", 1)) {
 					win.srcfile.deleterecord("%SK%");
@@ -147,7 +147,7 @@ next:
 	} else {
 		chr(7).output();
 		call mssg(mode.quote() ^ " - invalid mode ignored");
-		//valid=0
+		// valid=0
 	}
 
 	return 0;
@@ -166,10 +166,10 @@ subroutine getdatasets() {
 	}
 
 	var nodata = directory.field("\r", 1).ends(" ");
-	//call msg(nodata:' ')
-	//convert dos text to revelation format and standardise
+	// call msg(nodata:' ')
+	// convert dos text to revelation format and standardise
 	directory.ucaser();
-	//DIRECTORY=TRIM(DIRECTORY[1,\1A\]);*DOS TEXT EOF IS CONTROL-Z
+	// DIRECTORY=TRIM(DIRECTORY[1,\1A\]);*DOS TEXT EOF IS CONTROL-Z
 	var dosformat = directory.contains(chr(13));
 	directory.converter(" " _FM "\r\n", _FM "   ");
 	directory.trimmer();
@@ -178,8 +178,8 @@ subroutine getdatasets() {
 
 	datasetparams = directory.f(1);
 	if (not(datasetparams.contains(","))) {
-		//CALL MSG('LINE 1 OF THE DOS FILE ':DOS.FILENAME:' IS INVALID')
-		//STOP
+		// CALL MSG('LINE 1 OF THE DOS FILE ':DOS.FILENAME:' IS INVALID')
+		// STOP
 	}
 
 	datasetparams.converter(",*", SM ^ VM);
@@ -215,7 +215,7 @@ subroutine getdatasets() {
 }
 
 subroutine getuserdept2() {
-	//locate the user in the table
+	// locate the user in the table
 	usercode = mode.field(",", 2);
 	if (not(SECURITY.f(1).locate(usercode, usern))) {
 		if (usercode == "EXODUS") {
@@ -227,15 +227,15 @@ subroutine getuserdept2() {
 		}
 	}
 
-	//locate divider, or usern+1
+	// locate divider, or usern+1
 	nusers = SECURITY.f(1).fcount(VM);
 	for (usern = 1; usern <= nusers; ++usern) {
-		///BREAK;
+		// /BREAK;
 		if (SECURITY.f(1, usern) == "---")
 			break;
 	}  //usern;
 
-	//get the department code
+	// get the department code
 	ANS = SECURITY.f(1, usern - 1);
 	return;
 }

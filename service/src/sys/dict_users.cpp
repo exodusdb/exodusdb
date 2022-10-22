@@ -20,24 +20,24 @@ function main() {
 			ans = 1;
 			return ans;
 		}
-	//may not be allowed to access higher users/groups
+	// may not be allowed to access higher users/groups
 		if (usern gt RECORD.f(11)) {
 			ans = authorised("AUTHORISATION UPDATE HIGHER GROUPS");
 		} else {
 
-		//look for the user in the same group as the active user
+		// look for the user in the same group as the active user
 			for (const var usern2 : range(usern, 9999)) {
 				userx = SECURITY.f(1, usern2);
-				///BREAK;
+				// /BREAK;
 				if (not((userx and userx ne "---") and userx ne ID)) break;
 			} //usern2;
 
-		//if found then same group therefore ok
+		// if found then same group therefore ok
 			if (userx eq ID) {
 				ans = 1;
 			} else {
 
-			//not found therefore possibly not allowed access
+			// not found therefore possibly not allowed access
 				ans = authorised("AUTHORISATION UPDATE LOWER GROUPS");
 
 			}

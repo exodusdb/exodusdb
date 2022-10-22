@@ -7,20 +7,20 @@ function main(in password) {
 
 	var hashedpassword = password;
 
-	//pass1
+	// pass1
 	while (true) {
-		///BREAK;
+		// /BREAK;
 		if (not(hashedpassword ne ""))
 			break;
 		encryptkey = (encryptkey.mod(390001)) * (hashedpassword[1]).seq() + 1;
 		hashedpassword.cutter(1);
 	}  //loop;
 
-	//pass2
+	// pass2
 	while (true) {
 		hashedpassword ^= chr(65 + (encryptkey.mod(50)));
 		encryptkey = (encryptkey / 50).floor();
-		///BREAK;
+		// /BREAK;
 		if (not encryptkey)
 			break;
 	}  //loop;

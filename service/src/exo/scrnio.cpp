@@ -2,14 +2,14 @@
 libraryinit()
 
 function main(in coln, in rown, in data, in attribute) {
-	//function main(in, in, in, in) {
+	// function main(in, in, in, in) {
 
-	//obsolete or reimplement
+	// obsolete or reimplement
 
-	//evade warning
+	// evade warning
 	false and coln and rown and data and attribute;
 
-	//print(data);
+	// print(data);
 
 	return 0;
 }

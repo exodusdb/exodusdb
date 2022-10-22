@@ -18,16 +18,16 @@ var usern;
 
 function main(in task0, out msg, in defaultlock = "", in username0 = "") {
 
-	//NB de bugging afer recompile requires restart since SECURITY is in PRELOAD
-	//call msg(task)
+	// NB de bugging afer recompile requires restart since SECURITY is in PRELOAD
+	// call msg(task)
 
 	var task = task0;
 
 	if (username0.unassigned()) {
 nousername0:
-		//allow for username like FINANCE(STEVE)
-		//so security is done like FINANCE but record is kept of actual user
-		//this allows for example billing module users to post as finance module users
+		// allow for username like FINANCE(STEVE)
+		// so security is done like FINANCE but record is kept of actual user
+		// this allows for example billing module users to post as finance module users
 		username	= USERNAME.field("(", 1);
 		msgusername = USERNAME;
 	} else if (username0 eq "") {
@@ -37,13 +37,13 @@ nousername0:
 		msgusername = username;
 	}
 
-	//if username='EXODUS' or username='STEVE' then call msg(task:'')
+	// if username='EXODUS' or username='STEVE' then call msg(task:'')
 
 	if (task.starts(" ")) {
 		call mssg(task.quote());
 	}
-	//Each task may have many "locks", each users may have many "keys"
-	//A user must have keys to all the locks in order to pass
+	// Each task may have many "locks", each users may have many "keys"
+	// A user must have keys to all the locks in order to pass
 
 	if (not task) {
 		return 1;
@@ -57,7 +57,7 @@ nousername0:
 	task.trimmer();
 
 	msg = "";
-	//!*CALL note(' ':TASK)
+	// !*CALL note(' ':TASK)
 
 	if (task.starts("..")) {
 		// call note(task:'')
@@ -76,8 +76,8 @@ nousername0:
 		positive = "";
 	}
 
-	//? as first character of task (after positive) means
-	//security is being used as a configuration and user exodus has no special privs
+	// ? as first character of task (after positive) means
+	// security is being used as a configuration and user exodus has no special privs
 	if (task.starts("?")) {
 		isexodus = 0;
 		task.cutter(1);
@@ -98,7 +98,7 @@ nousername0:
 		task.cutter(8);
 	}
 
-	//find the task
+	// find the task
 	if (SECURITY.f(10).locate(task, taskn)) {
 
 		if (deleting) {
@@ -108,7 +108,7 @@ updateprivs:
 			gosub writeuserprivs();
 			return 1;
 		} else if (renaming) {
-			//delete any existing rename target task
+			// delete any existing rename target task
 			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
@@ -118,7 +118,7 @@ updateprivs:
 			}
 			SECURITY(10, taskn) = defaultlock;
 			if (renaming) {
-				//skip warning except for live databases included in startup
+				// skip warning except for live databases included in startup
 				if (not(SYSTEM.f(61))) {
 					if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
 						call note("Task renamed:|Old: " ^ task ^ "|New: " ^ defaultlock);
@@ -140,15 +140,15 @@ updateprivs:
 			return 1;
 		}
 		if (renaming) {
-			//if the task to be renamed doesnt exist .. just add the target task
+			// if the task to be renamed doesnt exist .. just add the target task
 			var	 newtask = defaultlock;
 			call authorised(newtask, xx);
 			return 1;
 		}
 		if (not(noadd)) {
-			//NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
+			// NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
 			noadd = (task.ends(DQ)) or (SECURITY.len() gt maxstrsize_ * 2 / 3);
-			//if passed a default lock then add even tasks ending like "XXXXX"
+			// if passed a default lock then add even tasks ending like "XXXXX"
 			if (not(defaultlock.unassigned())) {
 				if (defaultlock) {
 					noadd = 0;
@@ -163,7 +163,7 @@ updateprivs:
 					call note(task ^ "|TASK ADDED");
 				}
 			}
-			//if len(userprivs) lt 65000 then
+			// if len(userprivs) lt 65000 then
 			if (SECURITY.len() lt maxstrsize_ - 530) {
 				if (not(SECURITY.f(10).locateby("AL", task, taskn))) {
 					if (defaultlock.unassigned()) {
@@ -183,22 +183,22 @@ updateprivs:
 		}
 	}
 
-	//if no locks then pass ok unless positive locking required
+	// if no locks then pass ok unless positive locking required
 	var locks = SECURITY.f(11, taskn);
 	if (locks eq "") {
 
-		//not positive ok
+		// not positive ok
 		if (not(positive)) {
 			return 1;
 
-			//exodus always ok
+			// exodus always ok
 		} else if (isexodus) {
 			return 1;
 
-			//positive and no lock always fail
+			// positive and no lock always fail
 		} else {
 notallowed:
-			//MSG=capitalise(TASK):'||Sorry ':capitalise(msgusername):', you are not authorised to do this.|'
+			// MSG=capitalise(TASK):'||Sorry ':capitalise(msgusername):', you are not authorised to do this.|'
 			if (msgusername ne USERNAME) {
 				msg = capitalise(msgusername) ^ "is not";
 			} else {
@@ -209,32 +209,32 @@ notallowed:
 				msg ^= " specifically";
 			}
 			msg ^= " authorised to do||" ^ capitalise(task);
-			//RETURN 0
+			// RETURN 0
 			return "";
 		}
 
-		//NB not NOBODY/EVERYBODY
+		// NB not NOBODY/EVERYBODY
 
-		//special lock NOONE
+		// special lock NOONE
 	} else if (locks eq "NOONE") {
 		goto notallowed;
 
-		//special lock EVERYONE
+		// special lock EVERYONE
 	} else if (locks eq "EVERYONE") {
 		return 1;
 	}
 
-	//exodus user always passes
+	// exodus user always passes
 	if (isexodus) {
 		return 1;
 	}
 
-	//find the user
+	// find the user
 	if (not(SECURITY.f(1).locate(username, usern))) {
 	}
 
-	//user must have all the keys for all the locks on this task
-	//following users up to first blank line also have the same keys
+	// user must have all the keys for all the locks on this task
+	// following users up to first blank line also have the same keys
 	var keys = SECURITY.f(2).field(VM, usern, 65535);
 	var temp = keys.index("---");
 	if (temp) {
@@ -253,12 +253,12 @@ notallowed:
 		}
 	}  //lockn;
 
-	//OK:
+	// OK:
 	return 1;
 }
 
 subroutine readuserprivs() {
-	//in case called from FILEMAN due to no datasets
+	// in case called from FILEMAN due to no datasets
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
 		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 			SECURITY = "";

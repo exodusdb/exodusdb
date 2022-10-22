@@ -28,8 +28,8 @@ function main(in programname0, in text0) {
 		text = text0;
 	}
 
-	//update the log
-	///////////////
+	// update the log
+	// /////////////
 
 	var year = date().oconv("D").last(4);
 	if (s33) {
@@ -45,7 +45,7 @@ function main(in programname0, in text0) {
 
 	// Open or create a LOG file per year
 	// TODO use only one file and clear old entries perhaps once a year
-	//if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
+	// if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
 	var logfilename = "LOG" ^ year;
 	if (not log.open(logfilename)) {
 		createfile(logfilename);
@@ -67,26 +67,26 @@ getlogkey:
 		entry.write(log, logkey);
 	}
 
-	//send a logging email address
-	/////////////////////////////
+	// send a logging email address
+	// ///////////////////////////
 
-	//get backup parameters
+	// get backup parameters
 	call getbackpars(bakpars);
 
 	var emailaddrs = bakpars.f(14);
 	if ((programname ne "SYSMSG" and programname ne "SENDMAIL") and emailaddrs) {
 
-		//determine subject
+		// determine subject
 		var subject = "EXODUS Log: " ^ SYSTEM.f(17) ^ " " ^ programname;
 
 		var body = "";
 		body ^= _FM "Date=" ^ date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local";
 		body ^= _FM "Server=" ^ SYSTEM.f(44).trim();
 		body ^= _FM "Install=" ^ oscwd();
-		//osread ver from 'general\version.dat' then
+		// osread ver from 'general\version.dat' then
 		var verfilename = "general/version.dat";
 		if (VOLUMES) {
-			//detect Windows with @volumes since we dont include GENERAL.SUBS for OSSLASH
+			// detect Windows with @volumes since we dont include GENERAL.SUBS for OSSLASH
 			verfilename.converter("/", "\\");
 		}
 		if (ver.osread(verfilename)) {
@@ -105,11 +105,11 @@ getlogkey:
 		body = trim(body, "\r");
 		body.replacer("\r", "\r\n");
 
-		//sendmail - if it fails, there will be an entry in the log
+		// sendmail - if it fails, there will be an entry in the log
 		call sendmail(emailaddrs, "", subject, body, "", "", xx);
 	}
 
-	//restore interactivity
+	// restore interactivity
 	SYSTEM(33) = s33;
 
 	return 0;

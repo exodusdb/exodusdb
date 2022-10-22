@@ -17,7 +17,7 @@ var rowfields;
 var nrowfields;
 dim rowdict;
 dim rowfieldismv;
-int rowfn;	//num
+int rowfn;	// num
 var rowfield;
 var totcol;
 var coln;  //num
@@ -48,8 +48,8 @@ var oldval;	 //num
 var colconv;
 var rowconv;
 
-var printptr;	//num
-var topmargin;	//num
+var printptr;	// num
+var topmargin;	// num
 var tx;
 var system;
 var printfilename;
@@ -60,10 +60,10 @@ var ptx_random;
 var printfile;
 var letterhead;
 var pagelns;
-var bodyln;		//num
-var realpagen;	//num
-var pagen;		//num
-var newpage;	//num
+var bodyln;		// num
+var realpagen;	// num
+var pagen;		// num
+var newpage;	// num
 var bottomline;
 var printtxmark;
 var rfmt;
@@ -91,16 +91,16 @@ var spaceoptionsize;
 
 function main(in filename, in rowfields0, in colfield, in datafield, io output, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
 
-	//for printtx
+	// for printtx
 
-	//if prefixes then it will not select records but read sequentially
-	//prefix*1 prefix*2 etc
+	// if prefixes then it will not select records but read sequentially
+	// prefix*1 prefix*2 etc
 
 	cmdline = 0;
 
-	///////
-	//init:
-	///////
+	// /////
+	// init:
+	// /////
 	if ((output.unassigned() or allrowvals.unassigned()) or allcolvals.unassigned()) {
 		allcolvals = "";
 		allrowvals = "";
@@ -134,8 +134,8 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		abort(lasterror());
 	}
 
-	//selectcmd='SELECT ':filename
-	//selectcmd:=' BY ':colfield
+	// selectcmd='SELECT ':filename
+	// selectcmd:=' BY ':colfield
 
 	rowfields = rowfields0;
 	rowfields.converter(",", VM);
@@ -185,7 +185,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	if (prefixes) {
 		prefixn = 0;
 nextprefix:
-		///////////
+		// /////////
 		prefixn += 1;
 		prefix = prefixes.f(1, prefixn);
 		if (not prefix) {
@@ -198,11 +198,11 @@ nextprefix:
 		if (not LISTACTIVE) {
 			select(file);
 		}
-		//perform selectcmd
+		// perform selectcmd
 	}
 
 nextrecord:
-	///////////
+	// /////////
 	if (prefixes) {
 		recn += 1;
 		MV = 0;
@@ -223,8 +223,8 @@ nextrecord:
 		tt	 = RECORD.f(prefixmvfn);
 		nmvs = tt.fcount(VM);
 nextmv:
-		///////
-		//if prefixes else goto nextrecord
+		// /////
+		// if prefixes else goto nextrecord
 		MV += 1;
 		if (MV gt nmvs) {
 			goto nextrecord;
@@ -291,7 +291,7 @@ nextmv:
 	ncolvals = colvals.fcount(VM);
 	for (rowvaln = 1; rowvaln <= nrowvals; ++rowvaln) {
 
-		//build row value (multiple fields sm separated)
+		// build row value (multiple fields sm separated)
 		if (nrowfields) {
 			rowval = "";
 			for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
@@ -306,7 +306,7 @@ nextmv:
 			rowval = rowvals;
 		}
 
-		//determine which row to add into
+		// determine which row to add into
 		if (not(allrowvals.f(1).locateby("AL", rowval, rown))) {
 			if (allrowvals.len() + rowval.len() gt 65000) {
 toobig:
@@ -325,7 +325,7 @@ toobig:
 
 		for (colvaln = 1; colvaln <= ncolvals; ++colvaln) {
 
-			//determine which column to add into
+			// determine which column to add into
 			colval = colvals.f(1, colvaln);
 			if (not(allcolvals.f(1).locateby(colorder, colval, coln))) {
 				ncols += 1;
@@ -349,15 +349,15 @@ toobig:
 			}
 
 			oldval = output.f(rown + 1, coln + 1);
-			//output(rown + 1, coln + 1) = oldval + datavals;
-			//output(1, 1) = output.f(1, 1) + 1;
+			// output(rown + 1, coln + 1) = oldval + datavals;
+			// output(1, 1) = output.f(1, 1) + 1;
 			pickreplacer(output, rown + 1, coln + 1, oldval + datavals);
 			pickreplacer(output, 1, 1, output.f(1, 1) + 1);
 
-			//total column at the end
+			// total column at the end
 			if (not totcol) {
 				oldval = output.f(rown + 1, ncols + 2);
-				//output(rown + 1, ncols + 2) = oldval + datavals;
+				// output(rown + 1, ncols + 2) = oldval + datavals;
 				pickreplacer(output, rown + 1, ncols + 2, oldval + datavals);
 			}
 
@@ -365,17 +365,17 @@ toobig:
 
 	}  //rowvaln;
 
-	/////////
-	//recexit:
-	/////////
-	//if prefixes then goto nextmv
+	// ///////
+	// recexit:
+	// ///////
+	// if prefixes then goto nextmv
 	goto nextmv;
-	//goto nextrecord
+	// goto nextrecord
 
 /////
 exit:
-	/////
-	//format the column title values
+	// ///
+	// format the column title values
 	if (not totcol) {
 		colconv = coldict.f(7);
 		if (colconv) {
@@ -401,10 +401,10 @@ exit:
 		output(rown + 1, 1) = allrowvals.f(1, rown);
 	}  //rown;
 
-	//format the row title values
+	// format the row title values
 	output(1, 1, 1) = "";
 	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
-		//output<1,1,rowfn>=rowfields<1,rowfn>
+		// output<1,1,rowfn>=rowfields<1,rowfn>
 		output(1, 1, rowfn) = rowdict(rowfn).f(3);
 
 		rowconv = rowdict(rowfn).f(7);
@@ -416,7 +416,7 @@ exit:
 
 	}  //rowfn;
 
-	//convert sm row keys into columns
+	// convert sm row keys into columns
 	output.converter(SM, VM);
 
 	return 0;

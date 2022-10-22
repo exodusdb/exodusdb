@@ -2,7 +2,7 @@
 libraryinit()
 
 function main() {
-	//TODO OBSOLETE/implement
+	// TODO OBSOLETE/implement
 	return "definitions";
 }
 

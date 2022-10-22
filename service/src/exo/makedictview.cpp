@@ -4,14 +4,14 @@ programinit()
 function main() {
 	var sql		  = "";
 	var filenames = listfiles();
-	//var nfiles=filenames.count(FM);
-	//for ( var filen=1;filen<=nfiles;filen++) {
-	//	var filename=filenames.f(filen);
+	// var nfiles=filenames.count(FM);
+	// for ( var filen=1;filen<=nfiles;filen++) {
+	// 	var filename=filenames.f(filen);
 	for (var filename : filenames) {
 		if (filename.first(5) ne "DICT.")
 			continue;
-		//var filesql =" select '" ^ filename ^ "' as filename,convert_from(key, 'UTF-8') as key, translate(convert_from(data, 'UTF-8'),'" ^ RM ^ FM ^ VM ^ SM ^ TM ^ ST ^ L"','\u02FF\u02FE\u02FD\u02FC\u02FB\u02FA') as data from " ^ filename ^ "\n";
-		//var filesql =" select '" ^ filename ^ "' as filename, key, data from " ^ filename ^ "\n";
+		// var filesql =" select '" ^ filename ^ "' as filename,convert_from(key, 'UTF-8') as key, translate(convert_from(data, 'UTF-8'),'" ^ RM ^ FM ^ VM ^ SM ^ TM ^ ST ^ L"','\u02FF\u02FE\u02FD\u02FC\u02FB\u02FA') as data from " ^ filename ^ "\n";
+		// var filesql =" select '" ^ filename ^ "' as filename, key, data from " ^ filename ^ "\n";
 		var filesql = " select ('" ^ filename ^ "'::bytea || '*' || key) as key, data from " ^ filename ^ "\n";
 		if (not var().sqlexec(filesql)) {
 			printl("OMITTED FROM VIEW BECAUSE PROBLEM EXECUTING:\n", sql);

@@ -2,7 +2,7 @@
 libraryinit()
 
 function main() {
-	//obsolete or reimplement
+	// obsolete or reimplement
 	return 0;
 }
 

@@ -24,7 +24,7 @@ libraryexit(chequedesign_is_default)
 libraryinit(email_address)
 //------------------------
 function main() {
-	//@ans=xlate('USERS',@record<1>,7,'X')
+	// @ans=xlate('USERS',@record<1>,7,'X')
 	return RECORD.f(1).xlate("USERS", 7, "X");
 }
 libraryexit(email_address)

@@ -7,9 +7,9 @@ libraryinit()
 
 function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request, out datax) {
 
-	//1) list of all active users
-	//at 7am on the 14th of each month (ie regularly but not everyday)
-	//CREATEALERT CURRUSERS GENERAL CURRUSERS 7:14 EXODUS (ROS)
+	// 1) list of all active users
+	// at 7am on the 14th of each month (ie regularly but not everyday)
+	// CREATEALERT CURRUSERS GENERAL CURRUSERS 7:14 EXODUS (ROS)
 
 	var alerttype	 = alerttype0.field(":", 1);
 	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);

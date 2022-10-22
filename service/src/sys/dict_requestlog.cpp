@@ -11,7 +11,7 @@ function main() {
 		}
 		ANS = (ANS.oconv("MD20P")) + 0;
 	} else {
-	//blank if no response time (crashed)
+	// blank if no response time (crashed)
 		ANS = "";
 	}
 	return ANS;

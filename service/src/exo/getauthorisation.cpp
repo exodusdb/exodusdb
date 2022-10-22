@@ -2,7 +2,7 @@
 libraryinit()
 
 function main() {
-	//TODO implement or obsolete
+	// TODO implement or obsolete
 	return 999;
 }
 

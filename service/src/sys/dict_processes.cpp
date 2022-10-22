@@ -33,9 +33,9 @@ function main() {
 
 	return trim(ans);
 
-	////////////////
+	// //////////////
 	addintervaldesc:
-	////////////////
+	// //////////////
 	if interval=1 or elapsedsecs>interval then;
 		nintervals=int(elapsedsecs/interval);
 		elapsedsecs-=nintervals*interval;
@@ -80,7 +80,7 @@ libraryinit(status)
 var islocked;
 
 function main() {
-	//NB add any new statuses to MONITORING program
+	// NB add any new statuses to MONITORING program
 	if (RECORD.f(52)) {
 		ANS = "Closed";
 		return ANS;
@@ -92,7 +92,7 @@ function main() {
 	}
 
 	var dostimenow = date() + 24873 + time() / 86400;
-	//10 mins
+	// 10 mins
 	var hungtime = 10 * 60 / 86400.0;
 	var r33 = RECORD.f(33);
 	if (r33 and (dostimenow - RECORD.f(27) gt hungtime)) {

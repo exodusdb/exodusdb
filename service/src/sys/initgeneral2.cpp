@@ -29,20 +29,20 @@ function main(in mode, io logtime, in menu) {
 
 	if (mode eq "INSTALLNEWPASS") {
 
-		//not used anywhere 2017/05/17
+		// not used anywhere 2017/05/17
 
-		//change the current user (EXODUS) password to something new
-		//this is in the SYSTEM file' in EXODUS/EXODUS
+		// change the current user (EXODUS) password to something new
+		// this is in the SYSTEM file' in EXODUS/EXODUS
 		perform("PASSWORD3");
 
-		//get access to the SYSTEM file here (in EXODUS/EXODUS)
-		//also gets access to SYSTEM file in EXODUS2/EXODUS (as SYSTEM2)
+		// get access to the SYSTEM file here (in EXODUS/EXODUS)
+		// also gets access to SYSTEM file in EXODUS2/EXODUS (as SYSTEM2)
 		perform("SETSO");
 
-		//get access to the SYSTEM file in EXODUS2/EXODUS (the build directory)
-		//perform 'SETFILE ../EXODUS2/EXODUS SYSPROG,SALADS SYSTEM'
+		// get access to the SYSTEM file in EXODUS2/EXODUS (the build directory)
+		// perform 'SETFILE ../EXODUS2/EXODUS SYSPROG,SALADS SYSTEM'
 
-		//copy the local user over to the build directory
+		// copy the local user over to the build directory
 		perform("COPY SYSTEM " ^ USERNAME ^ " (O) TO: (QFILE)");
 
 	} else if (mode eq "CREATEALERTS") {
@@ -54,15 +54,15 @@ function main(in mode, io logtime, in menu) {
 		}
 		if (tt lt 17203) {
 
-			//to EXODUS only at the moment
+			// to EXODUS only at the moment
 			var cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} EXODUS (ROS)";
 
-			//run once on first installation
+			// run once on first installation
 			tt = cmd;
 			tt.replacer("{}", "7:::::1");
 			perform(tt);
 
-			//run every 1st of the month
+			// run every 1st of the month
 			tt = cmd;
 			tt.replacer("{}", "7:1");
 			perform(tt);
@@ -74,11 +74,11 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*update EXODUS-allowed ipnos from GBP file", logtime);
 
-		//open 'GBP' to gbp else return
-		//read hosts from gbp,'$HOSTS.ALLOW' else return
+		// open 'GBP' to gbp else return
+		// read hosts from gbp,'$HOSTS.ALLOW' else return
 		call readhostsallow(hosts);
 
-		//convert hosts.allow format to sv list of valid ip numbers or partial ip nos
+		// convert hosts.allow format to sv list of valid ip numbers or partial ip nos
 		hosts.replacer("sshd:", "");
 		hosts.converter(" ", "");
 		var nn = hosts.fcount(FM);
@@ -86,32 +86,32 @@ function main(in mode, io logtime, in menu) {
 			hosts(ln) = hosts.f(ln).field("#", 1);
 		}  //ln;
 
-		//remove blank lines and convert fm to sm
+		// remove blank lines and convert fm to sm
 		hosts.converter(FM, " ");
 		hosts.trimmer();
 		hosts.converter(" ", SM);
 
-		//remove any trailing . from 10. etc which is valid syntax for hosts.allow
+		// remove any trailing . from 10. etc which is valid syntax for hosts.allow
 		hosts.replacer("." ^ SM, SM);
 		if (hosts.ends(".")) {
 			hosts.popper();
 		}
 
-		//exodus can login from
-		//1) 127 always
-		//2) EXODUS office/vpn static ips (hardcoded in each exodus version)
+		// exodus can login from
+		// 1) 127 always
+		// 2) EXODUS office/vpn static ips (hardcoded in each exodus version)
 
-		//exodus can also login from System Configuration ip ranges and numbers
-		//default system configuration ips is standard lan ips "192.168 10 172"
-		//3) standard LAN ips 192.168, 10, 172 RANGES BUT NOT FULLY FORMED IPS
-		//4) Config File Fully formed WAN ips BUT NOT RANGES
-		//5) NB the above 2 rules mean "*" for all is NOT allowed even if present
+		// exodus can also login from System Configuration ip ranges and numbers
+		// default system configuration ips is standard lan ips "192.168 10 172"
+		// 3) standard LAN ips 192.168, 10, 172 RANGES BUT NOT FULLY FORMED IPS
+		// 4) Config File Fully formed WAN ips BUT NOT RANGES
+		// 5) NB the above 2 rules mean "*" for all is NOT allowed even if present
 
-		//WARNING to disallow EXODUS login from outside the office via NAT router
-		//(which makes the connection appear like a LAN access)
-		//you MUST put the FULLY FORMED LAN IP of the router eg 192.168.1.1
-		//in the System Configuration file (even if 192.168 is config for true LAN)
-		//then EXODUS LOGINS FROM ANY *LISTED FULLY FORMED LAN IPS* WILL BE BLOCKED
+		// WARNING to disallow EXODUS login from outside the office via NAT router
+		// (which makes the connection appear like a LAN access)
+		// you MUST put the FULLY FORMED LAN IP of the router eg 192.168.1.1
+		// in the System Configuration file (even if 192.168 is config for true LAN)
+		// then EXODUS LOGINS FROM ANY *LISTED FULLY FORMED LAN IPS* WILL BE BLOCKED
 
 		var configips = SYSTEM.f(39);
 		if (configips eq "") {
@@ -136,9 +136,9 @@ function main(in mode, io logtime, in menu) {
 			}
 		}  //ii;
 
-		//allow exodus login from 127.*, LAN and any config default ips
-		//although any full 4 part LAN ips in configips will be BLOCKED in LISTEN2
-		//since they are deemed to be inwardly NATTING routers (see LISTEN2)
+		// allow exodus login from 127.*, LAN and any config default ips
+		// although any full 4 part LAN ips in configips will be BLOCKED in LISTEN2
+		// since they are deemed to be inwardly NATTING routers (see LISTEN2)
 		hosts.inserter(1, 1, 1, "127.0.0.1");
 		hosts.inserter(1, 1, 2, "127");
 		hosts.inserter(1, 1, 3, "192.168");
@@ -154,11 +154,11 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*get osenv", logtime);
 
-		//nb will NOT overwrite any manual entries in SYSTEM.CFG
+		// nb will NOT overwrite any manual entries in SYSTEM.CFG
 		let osenv = osgetenv().converter("\r\n", _FM _FM);
-		//		let nenv = osenv.fcount(FM);
-		//		for (const var ii : range(1, nenv)) {
-		//			var enventry = osenv.f(ii);
+		// 		let nenv = osenv.fcount(FM);
+		// 		for (const var ii : range(1, nenv)) {
+		// 			var enventry = osenv.f(ii);
 		for (let enventry : osenv) {
 			if (not enventry)
 				continue;
@@ -178,8 +178,8 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*condition the http links", logtime);
 
-		//remove any obvious page addresses
-		//ensure ends in slash
+		// remove any obvious page addresses
+		// ensure ends in slash
 		var baselinks	  = SYSTEM.f(114);
 		var baselinkdescs = SYSTEM.f(115);
 		if (not baselinks) {
@@ -207,7 +207,7 @@ function main(in mode, io logtime, in menu) {
 
 	} else if (mode eq "COMPRESSLOGS") {
 
-		//use WINDOWS COMPACT to save disk space
+		// use WINDOWS COMPACT to save disk space
 		if (VOLUMES) {
 
 			call log2("*once off call to windows COMPACT command on ..LOGS", logtime);
@@ -232,13 +232,13 @@ function main(in mode, io logtime, in menu) {
 		var	 minyear  = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
 
-			//dir='..\logs\':dbcode:'\':year
-			//filenames='..\logs\':dbcode:'\':year:'\*.xml'
+			// dir='..\logs\':dbcode:'\':year
+			// filenames='..\logs\':dbcode:'\':year:'\*.xml'
 			var filenamesx = "../logs/" ^ dbcode ^ "/" ^ year ^ "/*.xml";
 			filenamesx.converter("/", OSSLASH);
 
 			tt = oslistf(filenamesx);
-			///BREAK;
+			// /BREAK;
 			if (not tt)
 				break;
 
@@ -282,8 +282,8 @@ nextuser:
 			origuser(41) = origuser.f(41);
 			if (userx ne origuser) {
 				userx.write(users, userid);
-				//user<1>=userid
-				//write user on users,'%':userid:'%'
+				// user<1>=userid
+				// write user on users,'%':userid:'%'
 			}
 			goto nextuser;
 		}
@@ -292,12 +292,12 @@ nextuser:
 
 		call log2("*trim requestlog", logtime);
 
-		//only run on saturdays and only run once per day per installation
+		// only run on saturdays and only run once per day per installation
 		if ((date() - 1).mod(7) + 1 ne 6) {
 			return 0;
 		}
 
-		//exclusive get and update the last date run otherwise skip
+		// exclusive get and update the last date run otherwise skip
 		if (not(DEFINITIONS.lock("TRIMREQUESTLOG"))) {
 			return 0;
 		}
@@ -307,7 +307,7 @@ nextuser:
 		var(date()).oswrite("reqlog.cfg");
 		DEFINITIONS.unlock("TRIMREQUESTLOG");
 
-		//dont run twice on same day
+		// dont run twice on same day
 		if (lastdate eq date()) {
 			return 0;
 		}
@@ -318,7 +318,7 @@ nextuser:
 
 		call log2("*reorder databases", logtime);
 
-		//only run once per installation
+		// only run once per installation
 		if (tt.osread("reorder.cfg")) {
 			return 0;
 		}
@@ -330,7 +330,7 @@ nextuser:
 
 		var lastlog = mode.field(FM, 2, 999);
 		lastlog		= trim(lastlog, FM);
-		//first word is logfilename
+		// first word is logfilename
 		lastlog = lastlog.field(" ", 2, 999);
 		if (not lastlog) {
 			return 0;
@@ -340,7 +340,7 @@ nextuser:
 			return 0;
 		}
 
-		//email anything unexpected
+		// email anything unexpected
 		if (not(lastlog.contains("Quitting."))) {
 			if (not(lastlog.contains("*chain to NET AUTO"))) {
 				call sysmsg("Unexpected last log entry||" ^ lastlog, "Unexpected Log", "EXODUS");
@@ -348,8 +348,8 @@ nextuser:
 		}
 
 	} else if (mode eq "OSCLEANUP") {
-		//initdir '..\VDM*.TMP'
-		//temps=dirlist()
+		// initdir '..\VDM*.TMP'
+		// temps=dirlist()
 		if (VOLUMES) {
 			var temps  = oslistf("..\\vdm*.tmp");
 			let ntemps = temps.fcount(FM);
@@ -363,11 +363,11 @@ nextuser:
 		call menusubs("INITMENUS", menutx);
 
 		// MODULE MENUS FIRST ON RIGHT SIDE
-		//////////////////////////////////
+		// ////////////////////////////////
 		menutx ^= FM ^ menu;
 
 		// SUPPORT MENU
-		//////////////
+		// ////////////
 
 		call menusubs("ADDMENU", menutx, "_Support");
 
@@ -390,11 +390,11 @@ nextuser:
 		call menusubs("ADDITEM", menutx, item, href);
 
 		item = "Re_questLog";
-		//style="display: none"
-		//id="exodussupportmenuitem1"
+		// style="display: none"
+		// id="exodussupportmenuitem1"
 		href = "../exodus/requestlog.htm";
 		call menusubs("ADDITEM", menutx, item, href);
-		//<br style="display: none" id="exodussupportmenuitem2" />
+		// <br style="display: none" id="exodussupportmenuitem2" />
 
 		item = "_Usage Statistics";
 		href = "../exodus/usagestatistics.htm";
@@ -409,14 +409,14 @@ nextuser:
 		if (VOLUMES) {
 			item		= "List of Database _Processes";
 			var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
-			//backslash
+			// backslash
 			onclick.converter("|", chr(92));
 			call menusubs("ADDITEM", menutx, item, href, onclick);
 		}
 
 		item		= "_List of Documents in Use";
 		var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTLOCKS');return false";
-		//backslash
+		// backslash
 		onclick.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
@@ -429,13 +429,13 @@ nextuser:
 		call menusubs("ENDMENU", menutx);
 
 		// HELP MENU
-		///////////
+		// /////////
 
 		call menusubs("ADDMENU", menutx, "_Help");
 
 		item = "_What's new in EXODUS";
 		href = "javascript:window.location.assign((typeof gusername!='undefined'&&gusername=='EXODUS'&&confirm('EXODUS only option|n|nChange Log File=OK|nWhats New Report=Cancel'))?'../exodus/changelog.htm':'../exodus/whatsnew.htm')";
-		//backslash
+		// backslash
 		href.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href);
 
@@ -465,16 +465,16 @@ nextuser:
 
 		item	= "_About";
 		onclick = "javascript:displayresponsedata_sync('EXECUTE|rGENERAL|rABOUT');return false";
-		//backslash
+		// backslash
 		onclick.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
-		//this element at the end determines when the menu is fully loaded
+		// this element at the end determines when the menu is fully loaded
 		menutx ^= FM ^ "<div id=\"menucompleted\"></div>";
 
 		call menusubs("ENDMENU", menutx);
 
-		//<!-- </div> -->
+		// <!-- </div> -->
 
 		call menusubs("EXITMENUS", menutx);
 

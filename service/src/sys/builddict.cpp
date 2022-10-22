@@ -50,8 +50,8 @@ function main() {
 	doc.converter("\t", " ");
 	nlns = doc.fcount(FM);
 
-	//note the dictids are oswritten out to 'BDICT'
-	//you are advised to LIST filename with those bdicts to test
+	// note the dictids are oswritten out to 'BDICT'
+	// you are advised to LIST filename with those bdicts to test
 
 	ln		= 1;
 	macros	= "";
@@ -72,7 +72,7 @@ function main() {
 			gosub writedict();
 
 		} else if (blocktype eq "comment") {
-			//ignore
+			// ignore
 
 		} else {
 			call mssg(blocktype.quote() ^ " unknown blocktype");
@@ -152,7 +152,7 @@ subroutine writedict() {
 		dictrec = dictrec.iconv("TX");
 
 		dictids ^= " " ^ dictid;
-		//var(dictids).oswrite("bdict");
+		// var(dictids).oswrite("bdict");
 
 		var f8			= dictrec.f(8).trimlast(VM);
 		dictrec(8)		= f8;
@@ -176,12 +176,12 @@ subroutine writedict() {
 			if (doall) {
 				ans = "Y";
 			} else {
-				//			print("press any key:");
-				//			osflush();
-				//			xx.inputn(1);
-				//			if (var("Qq").contains(xx)) {
-				//				stop();
-				//			}
+				// 			print("press any key:");
+				// 			osflush();
+				// 			xx.inputn(1);
+				// 			if (var("Qq").contains(xx)) {
+				// 				stop();
+				// 			}
 				printl("---------- NEW ", dictid, " ----------");
 				printl(dictrec.f(8).replace(VM, "\n"));
 				print("Update (y=yes, q=quit, a=all, n=no)");
@@ -197,7 +197,7 @@ subroutine writedict() {
 				}
 			}
 			if (ans eq "Y" or ans eq "y") {
-				//dictrec.write(DICT, dictid);
+				// dictrec.write(DICT, dictid);
 				oswrite(oconv(dictrec, "TX") on osdatfilename);
 			}
 		}
@@ -219,10 +219,10 @@ subroutine getblock() {
 
 			if (blocktype) {
 				block.cutter(1);
-				//				while (true) {
-				//					if (not(block.ends(FM))) break;
-				//					block.popper();
-				//				}//loop;
+				// 				while (true) {
+				// 					if (not(block.ends(FM))) break;
+				// 					block.popper();
+				// 				}//loop;
 				block.trimmerlast(FM);
 				return;
 			}
@@ -235,7 +235,7 @@ subroutine getblock() {
 			blocktype = blockline.field(" ", 2);
 			blockid	  = blockline.field(" ", 3);
 
-			//cater for macro on the define dict line
+			// cater for macro on the define dict line
 			if (blocktype eq "dict") {
 				var tt = blockline.field(" ", 4, 999999);
 				if (tt) {
@@ -267,7 +267,7 @@ addline:
 							var mword2 = mline.field(" ", 2);
 							if (macroline.locate(mword2, paramn)) {
 								lineparam = lineparams.f(1, paramn);
-								//dot means not defined while we are using spaces to separate params
+								// dot means not defined while we are using spaces to separate params
 								if (lineparam eq ".") {
 									lineparam = "";
 								}
@@ -282,7 +282,7 @@ deletemline:
 									goto nextmln;
 								}
 insertmline:
-								//remove #ifdef xxx
+								// remove #ifdef xxx
 								mline0.converter(" " ^ VM, VM ^ " ");
 								if (mline0.locate(mword1, wordn)) {
 									mline0.remover(1, wordn);
@@ -304,7 +304,7 @@ insertmline:
 nextmln:;
 					}  //mln;
 
-					//substitute all macro parameters
+					// substitute all macro parameters
 					var nparams = macroline.fcount(VM);
 					for (paramn = 1; paramn <= nparams; ++paramn) {
 						var old	 = macroline.f(1, paramn);
@@ -312,15 +312,15 @@ nextmln:;
 						macrotext.replacer(old, newx);
 					}  //paramn;
 
-					//speed up fieldwise { } for F fields. avoid calling a dict subroutine
+					// speed up fieldwise { } for F fields. avoid calling a dict subroutine
 					var allfields = "";
 					var fields	  = "";
-					//					var findfieldn = 0;
-					//					while (true) {
+					// 					var findfieldn = 0;
+					// 					while (true) {
 					for (var findpos = 1;; findpos++) {
 
-						//						findfieldn += 1;
-						//findpos = macrotext.index2("{", findpos);
+						// 						findfieldn += 1;
+						// findpos = macrotext.index2("{", findpos);
 						findpos = macrotext.index("{", findpos);
 
 						if (not findpos)
@@ -359,7 +359,7 @@ nextmln:;
 						for (fieldn = 1; fieldn <= nfields; ++fieldn) {
 							var fieldname = fields.f(1, fieldn);
 							macrotext.replacer("{" ^ fieldname ^ "}", fieldname);
-							//swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext
+							// swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext
 							equates(-1) = "\t#define " ^ fieldname ^ "\tRECORD.f(" ^ fields.f(2, fieldn) ^ ")";
 						}  //fieldn;
 						macrotext.prefixer(equates ^ FM);
@@ -368,8 +368,8 @@ nextmln:;
 					macrotext.move(line);
 
 				} else {
-					//call mssg(macroid.quote() ^ " macro is undefined in line " ^ ln ^ FM ^ doc.f(ln));
-					//stop();
+					// call mssg(macroid.quote() ^ " macro is undefined in line " ^ ln ^ FM ^ doc.f(ln));
+					// stop();
 				}
 			}
 
@@ -378,7 +378,7 @@ nextmln:;
 			block ^= FM ^ str("\t", indents) ^ trimfirst(line);
 		}
 
-		//nextln:;
+		// nextln:;
 	}  //ln;
 
 	return;

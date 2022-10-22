@@ -36,9 +36,9 @@ function main() {\
 \
 	return trim(ans);\
 \
-	////////////////\
+	// //////////////\
 	addintervaldesc:\
-	////////////////\
+	// //////////////\
 	if interval=1 or elapsedsecs>interval then;\
 		nintervals=int(elapsedsecs/interval);\
 		elapsedsecs-=nintervals*interval;\
