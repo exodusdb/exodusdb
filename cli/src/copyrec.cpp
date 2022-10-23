@@ -63,11 +63,11 @@ function main() {
 
 	var fromfile;
 	if (not open(fromfilename to fromfile))
-		abort(fsmsg());
+		abort(lasterror());
 
 	var tofile;
 	if (not open(tofilename to tofile))
-		abort(fsmsg());
+		abort(lasterror());
 
 	var itemn = 0;
 

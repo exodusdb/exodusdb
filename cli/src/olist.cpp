@@ -510,8 +510,7 @@ function main() {
 	if (not(dictvoc.open("dict.voc", ""))) {
 		createfile("dict.voc");
 		if (not(dictvoc.open("dict.voc", ""))) {
-			call fsmsg();
-			abort("");
+			abort(lasterror());
 		}
 	}
 
@@ -817,9 +816,8 @@ nextkey:
 	} else if (word eq "USING") {
 		gosub getword();
 		dictfilename = word;
-		if (not(DICT.open("dict." ^ dictfilename))) {
-			call fsmsg();
-			abort("");
+		if (not DICT.open("dict." ^ dictfilename)) {
+			abort(lasterror());
 		}
 
 	} else if (word eq "HEADINGTABLE") {
@@ -1260,9 +1258,8 @@ x1exit:
 
 	tx = "";
 
-	if (not(srcfile.open(filename, ""))) {
-		call fsmsg();
-		abort("");
+	if (not srcfile.open(filename, "")) {
+		abort(lasterror());
 	}
 
 	breakcount.redim(nbreaks + 1);

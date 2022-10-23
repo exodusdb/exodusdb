@@ -1354,14 +1354,22 @@ function main() {
 			if (matches) {
 				var nmatches = 0;
 				for (var match : matches) {
+
 					// Skip matches with an odd number of double quotes since it indicates quoted xxx on the right
 					if (match.count(_DQ).mod(2))
 						continue;
+
+					// Skip if there is a function or member function with the same name as the variable
+					// e.g. "var reccount = file1.reccount();"
+					var varname = match.f(1, 1).field(" ", 2);
+					if (match.contains("." ^ varname) or match.contains(varname ^ "("))
+						continue;
+
 					if (not nmatches++) {
 						logputl(srcfilename ^ ":9999:99: warning: Use before constructed is undefined behaviour.");
 						atomic_ncompilation_failures++;
 					}
-					logputl(match.f(1,1).trimmer(" \t\n"));
+					logputl(match.f(1,1).trimmer(" \t\n").quote());
 				}
 			}
 

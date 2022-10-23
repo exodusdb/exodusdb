@@ -396,9 +396,8 @@ function main() {
 
 	if (not(dictvoc.open("DICT.voc", ""))) {
 		createfile("DICT.voc");
-		if (not(dictvoc.open("DICT.voc", ""))) {
-			call fsmsg();
-			abort();
+		if (not dictvoc.open("DICT.voc", "")) {
+			abort(lasterror());
 		}
 	}
 
@@ -716,9 +715,8 @@ phraseinit:
 	} else if (word eq "USING") {
 		gosub getword();
 		dictfilename = word;
-		if (not(DICT.open("DICT." ^ dictfilename))) {
-			call fsmsg();
-			abort();
+		if (not DICT.open("DICT." ^ dictfilename)) {
+			abort(lasterror());
 		}
 		sortselect ^= " USING " ^ dictfilename;
 
@@ -1154,9 +1152,8 @@ x1exit:
 
 	tx = "";
 
-	if (not(srcfile.open(filename, ""))) {
-		call fsmsg();
-		abort();
+	if (not srcfile.open(filename, "")) {
+		abort(lasterror());
 	}
 
 	breakcount.redim(nbreaks + 1);

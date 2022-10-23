@@ -13,19 +13,20 @@ function main() {
 	for (let filename : filenames) {
 
 		if (not open(filename)) {
-			errputl(fsmsg());
+			errputl(lasterror());
 			result = 1;
 			continue;
 		}
 
 		if (not deletefile(filename)) {
-			errputl("Cannot delete", filename);
+			errputl(lasterror());
 			result = 1;
 			continue;
 		}
 
 		printl("Deleted", filename);
 	}
+
 	return result;
 }
 

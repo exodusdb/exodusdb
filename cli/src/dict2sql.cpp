@@ -416,8 +416,7 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 		return;
 
 	if (!open(dictfilename, dictfile)) {
-		call fsmsg();
-		abort("dict2sql cannot open " ^ dictfilename);
+		abort(lasterror());
 	}
 
 	if (reqdictid)

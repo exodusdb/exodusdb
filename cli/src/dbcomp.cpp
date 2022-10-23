@@ -8,23 +8,22 @@ function main() {
 	var db1 = COMMAND.f(2);
 	var db2 = COMMAND.f(3);
 
+	if (not db1 or not db2)
+		abort("Syntax is: dbcomp DBCODE1 DBCODE2");
+
 	var silent = OPTIONS.contains("S");
 
 	if (not silent)
 		db1.logputl("dbcomp connecting to ");
 
-	if (not(db1.connect())) {
-		call fsmsg();
-		abort(1);
-	}
+	if (not db1.connect())
+		abort(lasterror());
 
 	if (not silent)
 		db2.logputl("dbcomp connecting to ");
 
-	if (not(db2.connect())) {
-		call fsmsg();
-		abort(1);
-	}
+	if (not db2.connect())
+		abort(lasterror());
 
 	int nerrors = 0;
 
@@ -44,25 +43,16 @@ function main() {
 			continue;
 
 		var file1;
-		if (not file1.open(filename, db1)) {
-			call fsmsg();
-			abort(1);
-		}
+		if (not file1.open(filename, db1))
+			abort(lasterror());
 
-		var reccount = file1.reccount();
+		var nrecs = file1.reccount();
 
 		var file2;
-		if (not file2.open(filename, db2)) {
-			call fsmsg();
-			abort(1);
-		}
+		if (not file2.open(filename, db2))
+			abort(lasterror());
 
-		//var keys;
-		//if (keys.osread("qwerty")) {
-		//	keys.converter("\n", FM);
-		//	file1.makelist("", keys);
-		//} else
-			file1.select("SELECT " ^ filename ^ " (SR)");
+		file1.select("SELECT " ^ filename ^ " (SR)");
 
 		var recn = 0;
 		while (file1.readnext(RECORD, ID, MV)) {
@@ -72,9 +62,8 @@ function main() {
 
 			recn++;
 			if (not silent) {
-				output(AT(-40), recn, "/", reccount, " ", ID);
-				//printl("",RECORD.len());
-				if ((recn % 1000) eq 1)
+				output(AT(-40), recn, "/", nrecs, " ", ID);
+				if ((recn % 100) eq 1)
 					osflush();
 			}
 
