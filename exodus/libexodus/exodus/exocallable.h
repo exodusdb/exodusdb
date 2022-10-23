@@ -106,22 +106,53 @@ class PUBLIC Callable {
 	// Records the library opened so we can close and reopen new libraries automatically
 	std::string libname_;
 
-	// Records the function opened so we can close and reopen new function automatically
+	// Records the function opened so we can close and reopen new functions automatically
 	std::string funcname_;
 
-	// Path to or searched for library file name
+	// Full path to library file name
+	// or just the file name if opened by standard lib search
 	std::string libfilepath_;
 
-	// Pointer to the shared lib file
+	// Handle on the opened shared lib
 	void* plib_;
 
-	// Function used to create and delete the ExodusProgramBase object
+	// Pointer to a function used to create and delete a ExodusProgramBase object defined in the shared library.
+	// Could also be used to call any global function in the shared library
 	ExodusProgramBaseCreateDeleteFunction pfunc_;
 
  protected:
 
-	// Not used if callable is calling global functions in the shared object
+	// Not used if callable is only calling global functions in the shared library
 	pExodusProgramBase plibobject_;
+
+	/*
+		Note: We will be using the following pointer to member function to call
+		member functions (in shared libraries) that have different arguments.
+
+		ISO C++ doesnt support casting between member function pointers unless they are "similar".
+
+		But many C++ compilers relax this rule, as a non-standard language extension,
+		to allow wrong-type access through the inactive member of a union.
+		Such access is not undefined in C.
+		https://gcc.gnu.org/onlinedocs/gcc/Cast-to-Union.html#Cast-to-Union
+
+		This has worked in gcc and clang 2000 to date (2022) and worked in msvc at least 2000-2015
+		using a c-style cast. Broad and long standing compiler support is unlikely to be revoked.
+		It also works with reinterpret_cast in gcc and clang 2022.
+
+		So we will be getting the following warning which will have to ignored.
+
+		warning: cast between incompatible pointer to member types from
+		‘exodus::pExodusProgramBaseMemberFunction’ {aka ‘exodus::var (exodus::ExodusProgramBase::*)()’} to
+		        ‘pExodusProgramBaseMemberFunction’ {aka ‘exodus::var (exodus::ExodusProgramBase::*)(const exodus::var&)’}
+
+		We can ignore such warnings using something like [-Wcast-function-type] in gcc and clang.
+
+		TODO Reimplement as a call to a global function in the shared library.
+
+	*/
+
+	// Not used if callable is only calling global functions in the shared library
 	pExodusProgramBaseMemberFunction pmemberfunc_;
 
  public:

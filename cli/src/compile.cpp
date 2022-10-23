@@ -1139,7 +1139,10 @@ function main() {
 							_EOL " /" "/  returning a var or void"
 							_EOL " {before_call}"
 							_EOL " return CALLMEMBERFUNCTION(*(this->plibobject_),"
-							_EOL " ((pExodusProgramBaseMemberFunction) (this->pmemberfunc_)))"
+							// 2022-10-23
+							// Use reinterpret_cast instead of c-style cast for clarity in code review and assuming equivalence
+							//_EOL " ((pExodusProgramBaseMemberFunction) (this->pmemberfunc_)))"
+							_EOL " (reinterpret_cast<pExodusProgramBaseMemberFunction>(this->pmemberfunc_)))"
 							_EOL "  (ARG1,ARG2,ARG3);"
 							_EOL " {after_call}"
 							_EOL

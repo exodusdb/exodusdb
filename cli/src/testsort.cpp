@@ -133,11 +133,11 @@ function main() {
 
 	var cmd = "list " ^ filename ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
-	osshell(cmd) or loglasterror("testsort:" ^ cmd);
+	perform(cmd);
 
 	cmd = "list " ^ dictfilename;
 	printl("\nList the dict using ", quote(cmd));
-	osshell(cmd) or loglasterror("testsort:" ^ cmd);
+	perform(cmd);
 
 	if (cleanup) {
 		printl("\nCleaning up. Delete the files");

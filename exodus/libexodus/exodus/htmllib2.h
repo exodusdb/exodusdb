@@ -36,7 +36,7 @@ var operator() (in mode, io dataio, in params0 = "", in params20 = "", in glang 
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wcast-function-type"
  return CALLMEMBERFUNCTION(*(this->plibobject_),
- ((pExodusProgramBaseMemberFunction) (this->pmemberfunc_)))
+ (reinterpret_cast<pExodusProgramBaseMemberFunction>(this->pmemberfunc_)))
   (mode,dataio,params0,params20,glang);
  #pragma GCC diagnostic pop
 
