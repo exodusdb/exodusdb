@@ -812,6 +812,9 @@ $RETVAR := array_to_string
 
 	replace_FM_etc(sql);
 
+	// sql function might need to know what file they are being called on
+	sql.replacer("${SQLFILENAME}", dictfilename.cut(5));
+
 	//convert to text
 	sql.trimmerfirst(VM).trimmerlast(VM);
 	sql.converter(VM, "\n");
