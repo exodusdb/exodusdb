@@ -1514,10 +1514,10 @@ baddict:
 //}
 
 // fsmg
-bool ExodusProgramBase::fsmsg(CVR msg) const {
-	mssg(msg ^ var().lasterror());
-	return false;
-}
+//bool ExodusProgramBase::fsmsg(CVR msg) const {
+//	mssg(msg ^ var().lasterror());
+//	return false;
+//}
 
 // sysvar
 var ExodusProgramBase::sysvar(CVR errmsg, CVR var2, CVR var3, CVR var4) {
@@ -2946,10 +2946,10 @@ MVAbort    ::MVAbort(CVR errmsg)    : description(errmsg) {}
 MVAbortAll ::MVAbortAll(CVR errmsg) : description(errmsg) {}
 MVLogoff   ::MVLogoff(CVR errmsg)   : description(errmsg) {}
 
-void ExodusProgramBase::stop(CVR errmsg)     const {throw MVStop(errmsg);}
-void ExodusProgramBase::abort(CVR errmsg)    const {throw MVAbort(errmsg);}
-void ExodusProgramBase::abortall(CVR errmsg) const {throw MVAbortAll(errmsg);}
-void ExodusProgramBase::logoff(CVR errmsg)   const {throw MVLogoff(errmsg);}
+bool ExodusProgramBase::stop(CVR errmsg)     const {throw MVStop(errmsg);}
+bool ExodusProgramBase::abort(CVR errmsg)    const {throw MVAbort(errmsg);}
+bool ExodusProgramBase::abortall(CVR errmsg) const {throw MVAbortAll(errmsg);}
+bool ExodusProgramBase::logoff(CVR errmsg)   const {throw MVLogoff(errmsg);}
 
 // clang-format on
 

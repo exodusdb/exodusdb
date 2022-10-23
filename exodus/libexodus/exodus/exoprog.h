@@ -165,7 +165,7 @@ class PUBLIC ExodusProgramBase {
 	ND var otherusers(CVR param);
 	ND var otherdatasetusers(CVR param);
 
-	bool fsmsg(CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
+	//bool fsmsg(CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
 	ND var sysvar(CVR var1, CVR var2, CVR mv3, CVR mv4);
 	void setprivilege(CVR var1);
 
@@ -225,18 +225,22 @@ class PUBLIC ExodusProgramBase {
 
 	// Return to parent exoprog
 	// or quit to OS WITHOUT an error
-	void stop(CVR description DEFAULT_EMPTY) const;
+	// bool to allow "or stop()"
+	bool stop(CVR description DEFAULT_EMPTY) const;
 
 	// Return to parent exoprog
 	// or quit to OS WITH an error 1
-	void abort(CVR description DEFAULT_EMPTY) const;
+	// bool to allow "or abort()"
+	bool abort(CVR description DEFAULT_EMPTY) const;
 
 	// Quit to OS WITH an error 2
-	void abortall(CVR description DEFAULT_EMPTY) const;
+	// bool to allow "or abortall()"
+	bool abortall(CVR description DEFAULT_EMPTY) const;
 
 	// Quit to OS WITHOUT an error
+	// bool to allow "or logoff()"
 	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
-	void logoff(CVR description DEFAULT_EMPTY) const;
+	bool logoff(CVR description DEFAULT_EMPTY) const;
 
  private:
 

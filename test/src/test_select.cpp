@@ -19,10 +19,9 @@ function main() {
 
 	//ensure dict_voc has f1m
 	var dictvoc;
-	if (not(dictvoc.open("dict.voc", ""))) {
-		call fsmsg();
-		stop();
-	}
+	if (not dictvoc.open("dict.voc", ""))
+		abort(lasterror());
+
 	if (not read(RECORD, dictvoc, "F1M")) {
 		var rr = "F";
 		for (const var ii : range(1, 12)) {

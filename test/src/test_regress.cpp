@@ -124,8 +124,7 @@ function onefile(in filename, in maxndifferences) {
 
 	var data;
 	if (not osread(data from filename)) {
-		call fsmsg();
-		stop("cant osopen " ^ filename);
+		abort(lasterror());
 	}
 
 	var rec, subrec, by, sep, what, setting;

@@ -156,10 +156,10 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 	//if (options.find('m') != std::string::npos)
 	//	regex_syntax_flags|=std_boost::regex_constants::multiline;
 
-	// n = no multiline (The default in std::regex but not boost
+	// s = single/no multiline (The default in std::regex but not boost
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
 	// if the normal/perl/ECMAScript engine is selected.
-	if (options.find('n') != std::string::npos)
+	if (options.find('s') != std::string::npos)
 		regex_syntax_flags|=std_boost::regex_constants::no_mod_m;
 
 	// b = basic (withdrawn after c++17?)
