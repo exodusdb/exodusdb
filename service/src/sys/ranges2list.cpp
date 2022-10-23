@@ -17,12 +17,12 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 	// generate individual numbers given a list of ranges
 	// eg 1000,1100-1200,2000-2100,3000
 	// in a comma, space or fm separated list
-	// 
+	//
 	// basekey if given will allow creation of formatted numbers
 	// 18/M/1000
-	// 
+	//
 	// listid if given will store the generated numbers/codes as a list in LISTS
-	// 
+	//
 	// Returns: result in ranges0 unless listid given
 
 	// equ maxlistpartsize to 32000

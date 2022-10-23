@@ -1408,21 +1408,21 @@ subroutine process() {
 
 	// ACID Transactions and record locking
 	// ------------------------------------
-	// 
+	//
 	// ACID = atomic, consistent, isolated, and durable.
-	// 
+	//
 	// Exodus is currently using Postgresql Isolation Level "Read Committed"
 	// https://www.postgresql.org/docs/12/transaction-iso.html
-	// 
+	//
 	// TODO consider using stricter Postgreql isolation levels. These may require resubmitting transactions in case of concurrent updates.
-	// 
+	//
 	// The application programmer must use locks to stop any other transaction from starting that may update
 	// any of the records that are going to be read or updated. Otherwise transaction commit may fail?
-	// 
+	//
 	// As long as locks are used as above then transactions are only necessary to rollback partial updates in case of program errors mid updating.
-	// 
+	//
 	// It is up to the application programmer to perform steps 2 and 3 strictly in order otherwise data inconsistency may occur.
-	// 
+	//
 	// 1. Transaction BEGIN
 	// 2. "lock" ALL records to be read or updated (new/amend/delete)
 	//    - These are logical locks per database.
@@ -1432,25 +1432,25 @@ subroutine process() {
 	//    - All writes appear simultaneously in the database
 	//    - All logical locks are removed automatically afterwards
 	//    - Commit may fail if any conflicting updates occur. Due to failure to implement steps 2 and 3?
-	// 
+	//
 	// Notes:
-	// 
+	//
 	// Locks:
-	// 
+	//
 	// 1. All "locks" remain in place until the transaction is committed or rolled back. Unlocking cannot be done except in transaction commit/rollback.
 	// 2. It is critical to obtain ALL locks required before reading/updating ANY record. OTHERWISE TRANSACTION IS NOT ACID.
 	//    You MUST stop any other transaction from starting that may read and update any of the records you are going to read or update.
 	// 3. Locks are nominally per file and record but actually are logical and by agreement can be anything suitable.
 	// 4. Locks are logical and do not prevent updates. i.e. they are by agreement, not enforced by the database.
 	// 5. The "locks" file actually holds "leases" and does not represent the logical locks discussed here.
-	// 
+	//
 	// Data visibility:
-	// 
+	//
 	// 1. No writes are visible to other processes until transaction is committed
 	// 2. All reads see records that have been committed by other transactions up to the time of the read operation.
 
 	// Postgresql lock types
-	// 
+	//
 	// Exodus does not use postgres table, page or row locks. It uses "advisory" locks.
 	// Within transactions Exodus uses pg_try_advisory_xact_lock()
 	// Outside transactions Exodus uses pg_try_advisory_lock()
@@ -1496,7 +1496,7 @@ subroutine process2() {
 
 	// 	//failure in LISTEN above
 	// 	if (listenfailure) {
-	// 
+	//
 	// 	//invalid username or password or connection
 	// 	} else
 

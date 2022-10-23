@@ -82,7 +82,7 @@ postuploadfail:
 		var dictfilename = "DICT." ^ filename;
 		// 		for (const var ii : range(1, 99)) {
 		// 			var dictid = dictids.field("*", ii);
-		// 
+		//
 		// 			// /BREAK;
 		// 			if (not dictid)
 		// 				break;

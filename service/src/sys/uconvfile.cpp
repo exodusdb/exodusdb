@@ -19,7 +19,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	// currently only used by convcsv
 
 	// uses the unicode uconv to convert file format
-	// 
+	//
 	// http://www.microsoft.com/globaldev/reference/cphome.mspx
 
 	if (encoding1i.unassigned()) {

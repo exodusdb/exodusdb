@@ -123,7 +123,10 @@ libraryexit(count)
 libraryinit(cpp_text)
 //-------------------
 function main() {
-	return RECORD.f(8).field("/" "*pgsql", 1);
+	return RECORD.f(8).field(
+		"/"
+		"*pgsql",
+		1);
 }
 libraryexit(cpp_text)
 
@@ -537,7 +540,8 @@ function main() {
 	while (true) {
 		var pos1 = RECORD.index("/*");
 		// /BREAK;
-		if (not pos1) break;
+		if (not pos1)
+			break;
 		var pos2 = RECORD.index("*/");
 		if (not pos2) {
 			pos2 = RECORD.len() + 1;

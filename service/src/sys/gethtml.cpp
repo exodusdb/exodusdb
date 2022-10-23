@@ -17,22 +17,22 @@ var tt;
 function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") {
 
 	// gethtml may be "perform"ed, "execute"d  or "call"ed
-	// 
+	//
 	// 1. PERFORM/EXECUTE
-	// 
+	//
 	//  letterhead = perform("gethtml");
-	// 
+	//
 	// nlist PERFORMs gethtml (via printtx.hpp) when service lib list.cpp performs nlist.
-	// 
+	//
 	// nlist does not perform, nor calls, gethtml when cli list.cpp command line calls nlist.
-	// 
+	//
 	// 2. CALL
-	// 
+	//
 	//  call gethtml(mode, letterhead, compcode, qr_text);
-	// 
+	//
 	// Lots of service and application code CALLs gethtml directly
 	// or indirectly via included printtx.hpp
-	// 
+	//
 
 	var mode;
 	if (mode0.assigned()) {

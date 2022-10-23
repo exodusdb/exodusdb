@@ -10,7 +10,7 @@ libraryinit()
 var nindexed;  //num
 
 function main() {
-	// 
+	//
 
 	if (SENTENCE.contains("(")) {
 		options = field2(SENTENCE, "(", -1);

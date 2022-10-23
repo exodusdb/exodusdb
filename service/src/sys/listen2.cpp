@@ -482,12 +482,12 @@ passwordexpired:
 					// as it can be configured per workstation to be the same for different users
 					// the only reliable test is the session no but this prevents multiple
 					// login on the same computer in different tabs or browsers
-					// 
+					//
 					// if there is no need for user number control (unilimited user licence)
 					// or some user name should allow multiple logins then need
 					// an option to allow no control or max no logins per database or user
-					// 
-					// 
+					//
+					//
 					// if session number agrees then dont test anything else
 					// this will allow ip number to change due to network proxy etc
 					if (connection.f(1, 5) ne userx.f(39, 5) and username ne "EXODUS") {

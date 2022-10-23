@@ -16,14 +16,14 @@ function main(in module, in mode, in stationery) {
 	// checks there is some output and converts htm to pdf if necessary
 
 	// given stationery
-	// 
+	//
 	//   1 Preprinted letterhead
 	//   2 Blank paper/PDF/Email
 	//   P PDF - Portrait
 	//   L PDF - Landscape
 
 	// perform
-	// 
+	//
 	// 0. convert the file if necessary
 	// 1. filename(s) in system<2> may be converted from .htm to .pdf
 	// 2. put converted filename(s) into DATA - to web ui with ../../data/

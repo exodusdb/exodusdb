@@ -12,7 +12,7 @@ libraryinit()
 	var xx;
 
 function main() {
-	// 
+	//
 
 	var options	  = SENTENCE.field("(", 2);
 	var sentencex = SENTENCE.field("(", 1);

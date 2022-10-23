@@ -9,7 +9,8 @@ S
 	while (true) {\
 		var pos1 = RECORD.index("/*");\
 		// /BREAK;\
-		if (not pos1) break;\
+		if (not pos1)\
+			break;\
 		var pos2 = RECORD.index("*/");\
 		if (not pos2) {\
 			pos2 = RECORD.len() + 1;\

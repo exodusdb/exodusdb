@@ -61,7 +61,7 @@ var systemx;
 var yy;
 
 function main() {
-	// 
+	//
 
 	// NB @VOLUMES blank on C++ and used to run slightly differently on C++
 	// eg function called is generalalerts instead of general.alerts
@@ -419,7 +419,7 @@ updateversion:
 	// 			execute("ATTACH " ^ volume ^ " (S)");
 	// 		}
 	// 	} //volumen;
-	// 
+	//
 	// 	if (VOLUMES) {
 	// 		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
 	// 		perform("RUN GBP LOGON.OLD UPGRADEVOC");
@@ -456,7 +456,7 @@ updateversion:
 	// 			// call colortoescold);
 	// 		}
 	// 	}
-	// 
+	//
 	// 	call log2("*setup escape sequence for standard color and background", logtime);
 	// 	temp = HW.f(3)[4] ^ HW.f(8)[4];
 	// 	if (temp eq "00") {
@@ -1167,13 +1167,13 @@ nextreport:
 	}
 
 	// 	if (VOLUMES) {
-	// 
+	//
 	// 		call log2("*open processes own lists file", logtime);
-	// 
+	//
 	// 		var workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
 	// 		var workpath = "DATAVOL/" ^ workdir ^ "/";
 	// 		workpath.converter("/", OSSLASH);
-	// 
+	//
 	// 		// check/create folder
 	// 		// initdir workpath:'REVMEDIA.*'
 	// 		// tt=dirlist()
@@ -1182,10 +1182,10 @@ nextreport:
 	// 			osshell("mkdir " ^ workpath);
 	// 			perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
 	// 		}
-	// 
+	//
 	// 		// attach folder
 	// 		perform("ATTACH " ^ workpath ^ " (S)");
-	// 
+	//
 	// 		// check/make LISTS file
 	// 		if (not(lists.open("LISTS", ""))) {
 	// 			lists = "";
@@ -1199,12 +1199,12 @@ nextreport:
 	// 				// call note('FAILED TO MAKE LISTS FILE ON ':workpath
 	// 			}
 	// 		}
-	// 
+	//
 	// 		call log2("*check lists file exists", logtime);
 	// 		if (not(lists.open("LISTS", ""))) {
 	// 			clearfile(lists);
 	// 		}
-	// 
+	//
 	// 	}
 
 	if (not(openfile("LISTS", lists, "DEFINITIONS"))) {
@@ -1287,7 +1287,7 @@ nextreport:
 
 	call log2("Attach foreign files BEFORE any database operations", logtime);
 	// Why is this necessary since foreign tables are mapped inside the database anyway
-	// 
+	//
 	// var foreignfiles = osshellread("dbattach {L}").converter("\n ", FM ^ VM).trim(FM);
 	// Copy "attach" code from dbattach cli command ... UNTESTED
 	// TODO provide some support from libexodus to do all or part of this
@@ -1573,10 +1573,10 @@ nextdoc:
 	// 			perform("ATTACH DATAVOL (S)");
 	// 		}
 	// 	}
-	// 
+	//
 	// 	//windows stuff
 	// 	if (VOLUMES) {
-	// 
+	//
 	// 		call log2("*convert codepage", logtime);
 	// 		if (codepaging.osread("CODEPAGE.CFG")) {
 	// 			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
@@ -1586,15 +1586,15 @@ nextdoc:
 	// 				perform("CONVGREEK (U)");
 	// 			}
 	// 		}
-	// 
+	//
 	// 		call log2("*installing authorised keys", logtime);
 	// 		perform("INSTALLAUTHKEYS (S)");
-	// 
+	//
 	// 		call log2("*installing authorised hosts", logtime);
 	// 		perform("INSTALLALLOWHOSTS (S)");
-	// 
+	//
 	// 		voc.deleterecord("$FILEMAN");
-	// 
+	//
 	// 		call log2("*put the admenus program as the system menu file", logtime);
 	// 		// as there is no way to have multiple menus files
 	// 		if (APPLICATION eq "ADAGENCY") {
@@ -1602,7 +1602,7 @@ nextdoc:
 	// 			setfilecmd.converter("/", OSSLASH);
 	// 			perform(setfilecmd);
 	// 		}
-	// 
+	//
 	// 	}
 
 	// call log2('*create user name index',logtime)

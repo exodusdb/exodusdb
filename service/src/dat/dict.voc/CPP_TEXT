@@ -5,6 +5,9 @@ CPP_TEXT
 
 
 
-	return RECORD.f(8).field("/" "*pgsql", 1);
+	return RECORD.f(8).field(\
+		"/"\
+		"*pgsql",\
+		1);
 T
 80

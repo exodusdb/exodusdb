@@ -12,7 +12,7 @@ function main(in mode, io /*line*/, in params, in filename) {
 	// if DEFINITIONS with first line XYZ
 
 	// line conversion code below
-	// 
+	//
 	if (filename eq "xxxxxx") {
 		if (mode eq "HEAD") {
 			if (params) {
