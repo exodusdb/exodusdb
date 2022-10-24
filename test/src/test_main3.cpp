@@ -306,7 +306,24 @@ programinit()
 
 		//14:30:46 04 JAN 2021
 		//assert(timedate().match("\\d{2}:\\d{2}:\\d{2} \\d{2} [A-Z]{3} \\d{4}"));
+		// Check twice in case date() changes over midnight
 		assert(date() eq int(timestamp()) or date() eq int(timestamp()));
+
+		// Check constuction of a timestamp manually agrees closely with plain timestamp.
+		{
+			var ts1 = date().timestamp(time());
+			var ts2 = timestamp();
+			assert((ts2 - ts1) < 0.001);
+		}
+
+		// Check constuction of a timestamp manually agrees closely with plain timestamp.
+		{
+			var ts0 = timestamp();
+			var dt = int(ts0);
+			var tm = ts0.mod(1) * 86'400;
+			var ts1 = dt.timestamp(tm);
+			assert((ts1 - ts0) < 0.001);
+		}
 
 		printl("----------------------------------------------");
 

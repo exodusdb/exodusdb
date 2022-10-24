@@ -167,6 +167,17 @@ var var::timestamp() const {
 
 }
 
+// -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
+var var::timestamp(CVR ostime) const {
+
+    THISIS("var var::timestamp(CVR ostime) const")
+    assertNumeric(function_sig);
+    assertNumeric(function_sig, ostime);
+
+	return this->floor() + ostime / 86'400;
+
+}
+
 //var var::timedate() const {
 //	// output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
 //
