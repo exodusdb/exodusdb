@@ -387,7 +387,7 @@ class PUBLIC var final {
 
 	// var(integer)
 
-	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
+	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		bool
@@ -411,13 +411,13 @@ class PUBLIC var final {
 		unsigned long
 		unsigned long long (C++11)
 	*/
-	var(I rhs)
+	var(Integer rhs)
 		:
 		var_int(rhs),
 		var_typ(VARTYP_INT) {
 
 		// Prevent overlarge unsigned ints resulting in negative ints
-		if (std::is_unsigned<I>::value) {
+		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
 				throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 		}
@@ -430,20 +430,20 @@ class PUBLIC var final {
 
 	// var = floating point
 
-	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		float,
 		double,
 		long double
 	*/
-	var(F rhs)
+	var(FloatingPoint rhs)
 		:
 		var_dbl(static_cast<double>(rhs)),
 		var_typ(VARTYP_DBL) {
 
 		// Prevent overlarge or overnegative long doubles entering var's double
-		if (std::is_same<F, long double>::value) {
+		if (std::is_same<FloatingPoint, long double>::value) {
 			if (rhs > VAR_MAX_DOUBLE)
 			    throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 			if (rhs < VAR_LOW_DOUBLE)
@@ -458,7 +458,7 @@ class PUBLIC var final {
 
 	// var = string-like
 
-	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
+	template <typename StringView, std::enable_if_t<std::is_convertible<StringView, std::string_view>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		// Accepts l and r values efficiently hopefully
@@ -466,9 +466,9 @@ class PUBLIC var final {
 		std::string_view,
 		char*,
 	*/
-	var(S&& fromstr)
+	var(StringView&& fromstr)
 		:
-		var_str(std::forward<S>(fromstr)),
+		var_str(std::forward<StringView>(fromstr)),
 		var_typ(VARTYP_STR) {
 
 		//std::cerr << "var(str)" << std::endl;
@@ -636,7 +636,7 @@ class PUBLIC var final {
 
 	// necessary to allow conversion to int in many functions like extract(x,y,z)
 
-	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = false>
+	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = false>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		bool
@@ -661,32 +661,32 @@ class PUBLIC var final {
 		unsigned long long (C++11)
 
 	*/
-	operator I() const {
+	operator Integer() const {
 		assertInteger(__PRETTY_FUNCTION__);
 
 		// Prevent conversion of negative numbers to unsigned integers
-		if (std::is_unsigned<I>::value) {
+		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
 				throwNonPositive(__PRETTY_FUNCTION__);
 		}
 		// Similar code in constructor(int) operator=(int) and int()
 
-		return static_cast<I>(var_int);
+		return static_cast<Integer>(var_int);
 	}
 
 	// floating point <- var
 	////////////////////////
 
-	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		float,
 		double,
 		long double
 	*/
-	operator F() const {
+	operator FloatingPoint() const {
 		assertDecimal(__PRETTY_FUNCTION__);
-		return static_cast<F>(var_dbl);
+		return static_cast<FloatingPoint>(var_dbl);
 	}
 
 	// void* <- var
@@ -744,7 +744,7 @@ class PUBLIC var final {
 	// string-like <- var
 	/////////////////////
 
-//	template <typename S, std::enable_if_t<std::is_convertible<S, std::string_view>::value, bool> = true>
+//	template <typename StringView, std::enable_if_t<std::is_convertible<StringView, std::string_view>::value, bool> = true>
 //	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 //	/*
 //	// Accepts l and r values efficiently hopefully
@@ -752,7 +752,7 @@ class PUBLIC var final {
 //	std::string_view,
 //	char*,
 //	*/
-//	operator S() {
+//	operator StringView() {
 //		assertString(__PRETTY_FUNCTION__);
 //		return std::string_view(var_str);
 //		//std::cerr << "var(str)" << std::endl;
@@ -862,7 +862,7 @@ class PUBLIC var final {
 	// var = Integral
 	/////////////////
 
-	template <typename I, std::enable_if_t<std::is_integral<I>::value, bool> = true>
+	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
 	/*
 		bool
 
@@ -885,7 +885,7 @@ class PUBLIC var final {
 		etc.
 	*/
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	void operator=(I rhs) & {
+	void operator=(Integer rhs) & {
 
 		// Similar code in constructor(int) operator=(int) and int()
 
@@ -893,7 +893,7 @@ class PUBLIC var final {
 		var_typ = VARTYP_INT;
 
 		// Prevent overlarge unsigned ints resulting in negative ints
-		if (std::is_unsigned<I>::value) {
+		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
 				throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 		}
@@ -911,14 +911,14 @@ class PUBLIC var final {
 	// var = Floating Point
 	///////////////////////
 
-	template <typename F, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
+	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
 	/*
 		float,
 		double,
 		long double
 	*/
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
-	void operator=(F rhs) & {
+	void operator=(FloatingPoint rhs) & {
 		var_dbl = rhs;
 		var_typ = VARTYP_DBL;
 	}
