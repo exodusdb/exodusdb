@@ -900,7 +900,7 @@ bool var::attach(CVR filenames) {
 
 	//fail if anything not attached
 	if (notattached_filenames) {
-		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ (*this).f(1).quote();
+		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ this->f(1).quote();
 		this->setlasterror(errmsg);
 		return false;
 	}
@@ -1266,7 +1266,7 @@ bool var::deleteo(CVR key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
-	//TRACE("deleteo " ^ (*this) ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
+	//TRACE("deleteo " ^ *this ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	return thread_dbconnector.delrecord(dbconn_no, hash64);
 }
 
@@ -1362,7 +1362,7 @@ bool var::read(CVR filehandle, CVR key) {
 	// get filehandle specific connection or fail
 	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::read() get_pgconn() failed for " ^ filehandle);
 
 	// Parameter array
 	const char* paramValues[] = {key2.data()};
@@ -1465,7 +1465,7 @@ var var::lock(CVR key) const {
 
 	PGconn* pgconn = get_pgconn(*this);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::lock() get_pgconn() failed for " ^ *this);
 
 	auto dbconn = get_dbconn(*this);
 
@@ -1497,7 +1497,7 @@ var var::lock(CVR key) const {
 
 	// Debugging
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ *this ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1509,7 +1509,7 @@ var var::lock(CVR key) const {
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK || PQntuples(dbresult) != 1) {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "lock(" ^ (*this) ^ ", " ^ key ^ ")\n" ^
+		var errmsg = "lock(" ^ *this ^ ", " ^ key ^ ")\n" ^
 			var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 			var(PQresultStatus(dbresult)) ^ ", PQntuples=" ^
 			var(PQntuples(dbresult));
@@ -1539,7 +1539,7 @@ bool var::unlock(CVR key) const {
 
 	auto pgconn = get_pgconn(*this);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::unlock() get_pgconn() failed for " ^ *this);
 
 	auto dbconn = get_dbconn(*this);
 
@@ -1563,7 +1563,7 @@ bool var::unlock(CVR key) const {
 	const char* sql = "SELECT PG_ADVISORY_UNLOCK($1)";
 
 	if (DBTRACE)
-		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ (*this) ^ " key:" ^ key)).logputl("SQLL ");
+		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ *this ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1593,7 +1593,7 @@ bool var::unlockall() const {
 
 	auto pgconn = get_pgconn(*this);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::unlockall() get_pgconn() failed for " ^ *this);
 
 	auto dbconn = get_dbconn(*this);
 
@@ -1638,10 +1638,8 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	ISSTRING(sqlcmd)
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn) {
-		response = "Error: sqlexec cannot find thread database connection";
-		return false;
-	}
+	if (!pgconn)
+		throw VarDBException("var::sqlexec() get_pgconn() failed for " ^ *this);
 
 	// log the sql command
 	if (DBTRACE)
@@ -1721,9 +1719,7 @@ bool var::writef(CVR filehandle, CVR key, const int fieldno) const {
 	record(fieldno) = var_str;
 
 	// write it back
-	record.write(filehandle, key);
-
-	return true;
+	return record.write(filehandle, key);
 }
 
 /* "prepared statement" version doesnt seem to make much difference approx -10% - possibly because
@@ -1765,7 +1761,7 @@ bool var::write(CVR filehandle, CVR key) const {
 
 	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
-		throw VarDBException("var::write get_pgconn() failed for " ^ filehandle);;
+		throw VarDBException("var::write() get_pgconn() failed for " ^ filehandle);
 
 	// Parameter array
 	const char* paramValues[] = {key2.data(), data2.data()};
@@ -1822,7 +1818,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 
 	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::updaterecord() get_pgconn() failed for " ^ filehandle);
 
 	DEBUG_LOG_SQL1
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1882,7 +1878,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 
 	auto pgconn = get_pgconn(filehandle);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::insertrecord() get_pgconn() failed for " ^ filehandle);
 
 	DEBUG_LOG_SQL1
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1948,7 +1944,7 @@ bool var::deleterecord(CVR key) const {
 
 	auto pgconn = get_pgconn(*this);
 	if (!pgconn)
-		return false;
+		throw VarDBException("var::deleterecord() get_pgconn() failed for " ^ *this);
 
 	DEBUG_LOG_SQL1
 	DBresult dbresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
@@ -2085,19 +2081,11 @@ bool var::statustrans() const {
 
 	THISIS("bool var::statustrans() const")
 	assertDefined(function_sig);
-//
-//	auto pgconn = get_pgconn(*this);
-//	if (!pgconn) {
-//		this->setlasterror("db connection " ^ var(get_dbconn_no(*this)) ^ "not opened");
-//		return false;
-//	}
-//
-//	//this->setlasterror();
-//
-//	// only idle is considered to be not in a transaction
-//	return (PQtransactionStatus(pgconn) != PQTRANS_IDLE);
 
 	auto dbconn = get_dbconn(*this);
+	if (!dbconn)
+		throw VarDBException("var::statustrans get_dbconn() failed for " ^ *this);
+
 	return dbconn->in_transaction_;
 
 }
@@ -4196,7 +4184,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 	//DECLARE - cursor
 	// WITH HOLD is a very significant addition
-	// var sql="DECLARE cursor1_" ^ (*this) ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
+	// var sql="DECLARE cursor1_" ^ *this ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
 	// ^ " FROM ";
 	//TRACE(*this);
 	var sql = "DECLARE\n cursor1_" ^ this->f(1).convert(".", "_") ^ " SCROLL CURSOR WITH HOLD FOR";
@@ -4831,10 +4819,8 @@ bool var::hasnext() {
 		return false;
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn) {
-		// this->clearselect();
-		return false;
-	}
+	if (!pgconn)
+		throw VarDBException("var::hasnext() get_pgconn() failed for " ^ *this);
 
 	// The following pair of db requests is rather slow
 
