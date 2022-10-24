@@ -166,9 +166,41 @@ programinit()
 	assert(oconv(15036, "D2E")  eq "01 MAR 09");
 	assert(oconv(15036, "D2/E") eq "01/03/09");
 
+	// Quarter of year
 	assert(oconv(15036, "DQ")  eq "1");
+	assert(oconv(iconv("1/1/2000","DE"),"DQ") eq 1);
+	assert(oconv(iconv("1/4/2000","DE"),"DQ") eq 2);
+	assert(oconv(iconv("1/7/2000","DE"),"DQ") eq 3);
+	assert(oconv(iconv("1/10/2000","DE"),"DQ") eq 4);
+
+	assert(oconv(iconv("31/12/2000","DE"),"DQ") eq 4);
+	assert(oconv(iconv("31/3/2000","DE"),"DQ") eq 1);
+	assert(oconv(iconv("30/6/2000","DE"),"DQ") eq 2);
+	assert(oconv(iconv("30/9/2000","DE"),"DQ") eq 3);
+
+	// Weekday number 1-7
 	assert(oconv(15036, "DW")  eq "7");
+	assert(oconv(15029, "DW")  eq "7");
+	assert(oconv(15030, "DW")  eq "1");
+	assert(oconv(15031, "DW")  eq "2");
+	assert(oconv(15032, "DW")  eq "3");
+	assert(oconv(15033, "DW")  eq "4");
+	assert(oconv(15034, "DW")  eq "5");
+	assert(oconv(15035, "DW")  eq "6");
+	assert(oconv(15036, "DW")  eq "7");
+	assert(oconv(15037, "DW")  eq "1");
+
+	// Weekday name
 	assert(oconv(15036, "DWA") eq "SUNDAY");
+	assert(oconv(15029, "DWA")  eq "SUNDAY");
+	assert(oconv(15030, "DWA")  eq "MONDAY");
+	assert(oconv(15031, "DWA")  eq "TUESDAY");
+	assert(oconv(15032, "DWA")  eq "WEDNESDAY");
+	assert(oconv(15033, "DWA")  eq "THURSDAY");
+	assert(oconv(15034, "DWA")  eq "FRIDAY");
+	assert(oconv(15035, "DWA")  eq "SATURDAY");
+	assert(oconv(15036, "DWA")  eq "SUNDAY");
+	assert(oconv(15037, "DWA")  eq "MONDAY");
 
 	assert(oconv(6666, "D2-") eq "04-01-86");
 	assert(oconv(0, "D4")     eq "31 DEC 1967");
@@ -178,29 +210,29 @@ programinit()
 	assert(oconv("1.5", "D")  eq "01 JAN 1968");
 	assert(oconv("1.5" _FM "-1.5", "D") eq("01 JAN 1968" _FM "29 DEC 1967"));
 
-	assert(oconv(14276, "D")    eq "31 JAN 2007");
-	assert(oconv(14276, "D2")   eq "31 JAN 07");
-	assert(oconv(14276, "D4")   eq "31 JAN 2007");
-	assert(oconv(14276, "D/")   eq "01/31/2007");
-	assert(oconv(14276, "D ")   eq "01 31 2007");
-	assert(oconv(14276, "D2/")  eq "01/31/07");
-	assert(oconv(14276, "D2-")  eq "01-31-07");
-	assert(oconv(14276, "D/")   eq "01/31/2007");
-	assert(oconv(14276, "D/E")  eq "31/01/2007");
-	assert(oconv(14276, "D2 E") eq "31 01 07");
-	assert(oconv(14276, "D S")  eq "2007 01 31");
-	assert(oconv(14276, "DM")   eq "1");
-	assert(oconv(14276, "DMA")  eq "JANUARY");
-	assert(oconv(14276, "DW")   eq "3");
-	assert(oconv(14276, "DWA")  eq "WEDNESDAY");
-	assert(oconv(14276, "DY")   eq "2007");
-	assert(oconv(14276, "DY2")  eq "07");
-	assert(oconv(14276, "D2Y")  eq "07 JAN 31");
-	assert(oconv(14276, "D5Y")  eq "02007 JAN 31");
-	assert(oconv(14276, "DD")   eq "31");
-	assert(oconv(14276, "DL")   eq "31");
-	assert(oconv(14276, "DQ")   eq "1");
-	assert(oconv(14276, "DJ")   eq "31");
+	assert(oconv(14276, "D")    eq "31 JAN 2007");  // dd mmm yyyy
+	assert(oconv(14276, "D2")   eq "31 JAN 07");    // dd mmm yy
+	assert(oconv(14276, "D4")   eq "31 JAN 2007");  // dd mmmm yyyy
+	assert(oconv(14276, "D/")   eq "01/31/2007");   // mm/dd/yyyy
+	assert(oconv(14276, "D ")   eq "01 31 2007");   // mm dd yyyy
+	assert(oconv(14276, "D2/")  eq "01/31/07");     // mm/dd/yyyy
+	assert(oconv(14276, "D2-")  eq "01-31-07");     // mm-dd-yyyy
+	assert(oconv(14276, "D/")   eq "01/31/2007");   // mm/dd/yyyy
+	assert(oconv(14276, "D/E")  eq "31/01/2007");   // dd/mm/yyyy
+	assert(oconv(14276, "D2 E") eq "31 01 07");     // dd mm yy
+	assert(oconv(14276, "D S")  eq "2007 01 31");   // yyyy mm dd
+	assert(oconv(14276, "DM")   eq "1");            // Month number 1-12
+	assert(oconv(14276, "DMA")  eq "JANUARY");      // Month name
+	assert(oconv(14276, "DW")   eq "3");            // week day number 1-7
+	assert(oconv(14276, "DWA")  eq "WEDNESDAY");    // week day name
+	assert(oconv(14276, "DY")   eq "2007");         // year 4 digits
+	assert(oconv(14276, "DY2")  eq "7");            // year with 2 digits
+	assert(oconv(14276, "D2Y")  eq "07 JAN 31");    // two digit year
+	assert(oconv(14276, "D5Y")  eq "02007 JAN 31"); // 5 digit year?
+	assert(oconv(14276, "DD")   eq "31");           // day number of month 1-31
+	assert(oconv(14276, "DL")   eq "31");           // last day number of month
+	assert(oconv(14276, "DQ")   eq "1");            // quarter number 1-4
+	assert(oconv(14276, "DJ")   eq "31");           // day number of month 1-31
 
 	var feb29_2004 = 13209;	 //iconv("29 FEB 2004","D");
 	assert(oconv(feb29_2004, "DL") eq "29");
