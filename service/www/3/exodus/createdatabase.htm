@@ -28,7 +28,7 @@
 
             di = dict[++din] = dictrec('OLD_DATABASE_CODE', 'F', 3)
 			yield* system_dict_datasetcode(di, false, false,'')
-			di.validation = 'yield* database_val_olddatabasecode()
+			di.validation = 'yield* database_val_olddatabasecode()'
 			exodus_dict_text(di,20)
             di.required = true
 
@@ -40,9 +40,11 @@
             di = dict[++din] = dictrec('NEW_DATABASE_NAME', 'F', 1)
 			di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 			di.validcharacters += di.validcharacters.toLowerCase()
-			di.validcharacters += '0123456789-\'&() '
+			//di.validcharacters += '0123456789-\'&() '
+			di.validcharacters += '0123456789-\'&() .'
 			di.lowercase = true
-			di.maxlength = '25'
+			//di.maxlength = '25'
+			di.maxlength = '80'
             di.required = true
 
             return dict
