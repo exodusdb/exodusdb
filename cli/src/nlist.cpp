@@ -575,7 +575,7 @@ phraseinit:
 
 		// Determine if limited nrecs sorted by mv field (which needs preselect)
 		if ((maxnrecs and not(preselect)) and DICT) {
-			if (dictrec.reado(DICT, word)) {
+			if (dictrec.readc(DICT, word)) {
 				preselect = dictrec.f(4).starts("M");
 			}
 		}
@@ -613,7 +613,7 @@ phraseinit:
 		sortselect ^= " " ^ word;
 		if (limitx) {
 			limits(1, nlimits) = word;
-			if (not(dictrec.reado(DICT, word))) {
+			if (not(dictrec.readc(DICT, word))) {
 				call mssg(word.quote() ^ " is not a valid dictionary item (1)");
 				abort();
 			}
@@ -779,8 +779,8 @@ phraseinit:
 			tt = word.cut(1).pop();
 			replacements(-1) = tt;
 			nreplacements += 1;
-			if (not(rec.reado(DICT, tt))) {
-				if (not(rec.reado(dictvoc, tt))) {
+			if (not(rec.readc(DICT, tt))) {
+				if (not(rec.readc(dictvoc, tt))) {
 					call mssg(tt.quote() ^ " is not a valid dictionary item (2)");
 					abort();
 				}
@@ -1059,9 +1059,9 @@ x1exit:
 	// If no columns selected then try to use default @crt or @lptr group item
 	if (not(coln or crtx)) {
 		word = "@LPTR";
-		if (not(xx.reado(DICT, word))) {
+		if (not(xx.readc(DICT, word))) {
 			word = "@CRT";
-			if (not(xx.reado(DICT, word))) {
+			if (not(xx.readc(DICT, word))) {
 				word = "";
 			}
 		}
@@ -1089,8 +1089,8 @@ x1exit:
 
 		// Set column 1
 		colname(1) = "@ID";
-		if (not(coldict(1).reado(DICT, "@ID"))) {
-			if (not(coldict(1).reado(dictvoc, "@ID"))) {
+		if (not(coldict(1).readc(DICT, "@ID"))) {
+			if (not(coldict(1).readc(dictvoc, "@ID"))) {
 				coldict(1) = "F^^Ref^^^^^^L^15"_var;
 			}
 		}
@@ -1355,7 +1355,7 @@ x1exit:
 		select(DICT);
 nextdict:
 		if (readnext(dictid)) {
-			if (not(dictrec.reado(DICT, dictid))) {
+			if (not(dictrec.readc(DICT, dictid))) {
 				goto nextdict;
 			}
 			if (dictrec.f(1) ne "F") {
@@ -1472,7 +1472,7 @@ nextrec:
 	}
 
 	// The select (R) option should have provided RECORD already
-	if (not RECORD.len() and not RECORD.reado(srcfile, ID)) {
+	if (not RECORD.len() and not RECORD.readc(srcfile, ID)) {
 		goto nextrec;
 	}
 
@@ -1976,7 +1976,7 @@ subroutine getwordexit() {
 	if (DICT eq "") {
 		goto dictvoc;
 	}
-	if (dictrec.reado(DICT, word)) {
+	if (dictrec.readc(DICT, word)) {
 maindict:
 		if (dictrec.f(1) eq "G") {
 			tt = dictrec.f(3);
@@ -1988,12 +1988,12 @@ maindict:
 			return;
 		}
 	} else {
-		if (dictrec.reado(DICT, word.ucase())) {
+		if (dictrec.readc(DICT, word.ucase())) {
 			goto maindict;
 		}
 dictvoc:
 		dictrec = "";
-		if (dictrec.reado(dictvoc, word)) {
+		if (dictrec.readc(dictvoc, word)) {
 gotdictvoc:
 			if (dictrec.f(1) eq "RLIST") {
 				if (dictrec.f(4)) {
@@ -2002,7 +2002,7 @@ gotdictvoc:
 				dictrec = "";
 			}
 		} else {
-			if (dictrec.reado(dictvoc, word.ucase())) {
+			if (dictrec.readc(dictvoc, word.ucase())) {
 				goto gotdictvoc;
 			}
 			dictrec = "";

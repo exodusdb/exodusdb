@@ -684,7 +684,7 @@ nextkey:
 
 		//determine if limited nrecs sorted by mv field (which needs preselect)
 		if ((maxnrecs and not(preselect)) and DICT) {
-			if (dictrec.reado(DICT, word)) {
+			if (dictrec.readc(DICT, word)) {
 				preselect = dictrec.f(4).starts("M");
 			}
 		}
@@ -709,7 +709,7 @@ nextkey:
 		ss ^= " " ^ word;
 		if (limitx) {
 			limits(1, nlimits) = word;
-			if (not(dictrec.reado(DICT, word))) {
+			if (not(dictrec.readc(DICT, word))) {
 				call mssg(word ^ " is not a valid dictionary item");
 				abort("");
 			}
@@ -873,8 +873,8 @@ nextkey:
 			tt = word.cut(1).pop();
 			replacements(-1) = tt;
 			nreplacements += 1;
-			if (not(tt.reado(DICT, tt))) {
-				if (not(tt.reado(dictvoc, tt))) {
+			if (not(tt.readc(DICT, tt))) {
+				if (not(tt.readc(dictvoc, tt))) {
 					call mssg(tt ^ " is not a valid dictionary item");
 					abort("");
 				}
@@ -1160,9 +1160,9 @@ x1exit:
 	//if no columns selected then try to use default @crt or @lptr group item
 	if (not(coln or crtx)) {
 		word = "@LPTR";
-		if (not(xx.reado(DICT, word))) {
+		if (not(xx.readc(DICT, word))) {
 			word = "@CRT";
-			if (not(xx.reado(DICT, word))) {
+			if (not(xx.readc(DICT, word))) {
 				word = "";
 			}
 		}
@@ -1192,10 +1192,10 @@ x1exit:
 		colname(1) =
 			"@"
 			"ID";
-		if (not(coldict(1).reado(DICT,
+		if (not(coldict(1).readc(DICT,
 								 "@"
 								 "ID"))) {
-			if (not(coldict(1).reado(dictvoc,
+			if (not(coldict(1).readc(dictvoc,
 									 "@"
 									 "ID"))) {
 				coldict(1) = "F" ^ FM ^ FM ^ "Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "L" ^ FM ^ 15;
@@ -1511,7 +1511,7 @@ x1exit:
 		select(DICT);
 nextdict:
 		if (readnext(dictid)) {
-			if (not(dictrec.reado(DICT, dictid))) {
+			if (not(dictrec.readc(DICT, dictid))) {
 				goto nextdict;
 			}
 			if (dictrec.f(1) ne "F") {
@@ -2191,7 +2191,7 @@ subroutine getwordexit() {
 	}
 	if (not(html) and word.ends("_LINK"))
 		word.cutter(-5);
-	if (dictrec.reado(DICT, word)) {
+	if (dictrec.readc(DICT, word)) {
 maindict:
 		if (dictrec.f(1) eq "G") {
 			tt = dictrec.f(3);
@@ -2203,12 +2203,12 @@ maindict:
 			return;
 		}
 	} else {
-		if (dictrec.reado(DICT, word.ucase())) {
+		if (dictrec.readc(DICT, word.ucase())) {
 			goto maindict;
 		}
 dictvoc:
 		dictrec = "";
-		if (dictrec.reado(dictvoc, word)) {
+		if (dictrec.readc(dictvoc, word)) {
 gotdictvoc:
 			if (dictrec.f(1) eq "RLIST") {
 				if (dictrec.f(4)) {
@@ -2217,7 +2217,7 @@ gotdictvoc:
 				dictrec = "";
 			}
 		} else {
-			if (dictrec.reado(dictvoc, word.ucase())) {
+			if (dictrec.readc(dictvoc, word.ucase())) {
 				goto gotdictvoc;
 			}
 			dictrec = "";

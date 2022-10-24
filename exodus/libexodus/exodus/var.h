@@ -1977,9 +1977,9 @@ class PUBLIC var final {
 	bool writef(CVR filehandle, CVR key, const int fieldno) const;
 
 	// cached db file i/o
-	ND bool reado(CVR filehandle, CVR key);
-	bool writeo(CVR filehandle, CVR key) const;
-	bool deleteo(CVR key) const;
+	ND bool readc(CVR filehandle, CVR key);
+	bool writec(CVR filehandle, CVR key) const;
+	bool deletec(CVR key) const;
 
 	// ExoEnv function now to allow access to RECORD ID DICT etc. and call external
 	// functions

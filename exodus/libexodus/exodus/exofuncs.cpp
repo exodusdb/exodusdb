@@ -385,11 +385,11 @@ ND PUBLIC bool open(CVR dbfilename, VARREF dbfilevar) {return dbfilevar.open(dbf
 ND PUBLIC bool open(CVR dbfilename) {return var().open(dbfilename);}
 
 ND PUBLIC bool read(VARREF record, CVR dbfilevar, CVR key) {return record.read(dbfilevar, key);}
-ND PUBLIC bool reado(VARREF record, CVR dbfilevar, CVR key) {return record.reado(dbfilevar, key);}
+ND PUBLIC bool readc(VARREF record, CVR dbfilevar, CVR key) {return record.readc(dbfilevar, key);}
 ND PUBLIC bool readf(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber) {return record.readf(dbfilevar, key, fieldnumber);}
 
 PUBLIC bool write(CVR record, CVR dbfilevar, CVR key) {return record.write(dbfilevar, key);}
-PUBLIC bool writeo(CVR record, CVR dbfilevar, CVR key) {return record.writeo(dbfilevar, key);}
+PUBLIC bool writec(CVR record, CVR dbfilevar, CVR key) {return record.writec(dbfilevar, key);}
 PUBLIC bool writef(CVR record, CVR dbfilevar, CVR key, const int fieldno) {return record.writef(dbfilevar, key, fieldno);}
 ND PUBLIC bool updaterecord(CVR record, CVR dbfilevar, CVR key) {return record.updaterecord(dbfilevar, key);}
 ND PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key) {return record.insertrecord(dbfilevar, key);}

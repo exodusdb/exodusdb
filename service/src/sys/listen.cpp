@@ -2044,7 +2044,7 @@ noupdate:
 			// a) return new record (done) or at least DATE_TIME in WRITEU to client
 			// b) provide record in DELETE
 			if (allcols ne "") {
-				if (dictrec.reado(allcols, filename ^ "*DATE_TIME")) {
+				if (dictrec.readc(allcols, filename ^ "*DATE_TIME")) {
 					datetimefn	= dictrec.f(2);
 					olddatetime = win.orec.f(datetimefn);
 					newdatetime = RECORD.f(datetimefn);
@@ -3067,7 +3067,7 @@ subroutine checkcompany() {
 	if (not allcols) {
 		return;
 	}
-	if (not(xx.reado(allcols, filename ^ "*COMPANY_CODE"))) {
+	if (not(xx.readc(allcols, filename ^ "*COMPANY_CODE"))) {
 		return;
 	}
 

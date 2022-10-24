@@ -2133,7 +2133,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 		// read the record
 		var key = this->f(1, vn);
 		var record;
-		if (!record.reado(file, key)) {
+		if (!record.readc(file, key)) {
 			// if record doesnt exist then "", or original key if mode is "C"
 
 			// no record and mode C returns the key

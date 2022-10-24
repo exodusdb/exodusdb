@@ -154,7 +154,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		var dictid = calc_fields.f(1, fieldn);
 
 		var dictrec;
-		if (not dictrec.reado(DICT,dictid))
+		if (not dictrec.readc(DICT,dictid))
 			dictrec="";
 		ioconvs(fieldn) = dictrec.f(7);
 
@@ -1368,10 +1368,10 @@ var ExodusProgramBase::calculate(CVR dictid) {
 			throw VarError("ExodusProgramBase::calculate(" ^ dictid ^
 						  ") DICT file variable has not been set");
 
-		if (not cached_dictrec_.reado(DICT, dictid)) {
+		if (not cached_dictrec_.readc(DICT, dictid)) {
 
 			// try lower case
-			if (not cached_dictrec_.reado(DICT, dictid.lcase())) {
+			if (not cached_dictrec_.readc(DICT, dictid.lcase())) {
 
 				// try dict.voc
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
@@ -1381,9 +1381,9 @@ baddict:
 								  ") dictionary record not in DICT " ^
 								  DICT.f(1).quote() ^ " nor in dict.voc");
 				}
-				if (not cached_dictrec_.reado(dictvoc, dictid)) {
+				if (not cached_dictrec_.readc(dictvoc, dictid)) {
 					// try lower case
-					if (not cached_dictrec_.reado(dictvoc, dictid.lcase())) {
+					if (not cached_dictrec_.readc(dictvoc, dictid.lcase())) {
 						goto baddict;
 					}
 				}
@@ -1394,7 +1394,7 @@ baddict:
 			// as if it was found in the initial file,key requested
 			// this will save repeated drill down searching on every access.
 			cached_dictrec_.r(16, indictvoc);
-			cached_dictrec_.writeo(DICT, dictid);
+			cached_dictrec_.writec(DICT, dictid);
 		}
 		cached_dictid_ = curr_dictid;
 

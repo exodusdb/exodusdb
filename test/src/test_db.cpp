@@ -117,13 +117,13 @@ programinit()
 	clearselect();
 	assert(not LISTACTIVE);
 
-	//check writeo creates a cached record readable by reado but not read
+	//check writec creates a cached record readable by readc but not read
 	{
 		var k1 = "tempkey";
 
 		//write to cache
 		var xyz = "xyz";
-		assert(xyz.writeo(filename, k1));
+		assert(xyz.writec(filename, k1));
 
 		//ensure wasnt written to real file
 		assert(not xyz.read(filename, k1));
@@ -135,13 +135,13 @@ programinit()
 		assert(xyz.unassigned());
 
 		//read from cache ok
-		assert(xyz.reado(filename, k1));
+		assert(xyz.readc(filename, k1));
 
 		//writing empty record to cache is like a deletion
 		xyz = "";
-		assert(xyz.writeo(filename, k1));
-		assert(not xyz.reado(filename, k1));
-		//and ensure failure to reado results in unassigned variable
+		assert(xyz.writec(filename, k1));
+		assert(not xyz.readc(filename, k1));
+		//and ensure failure to readc results in unassigned variable
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
 		//TRACE(xyz)
@@ -150,25 +150,25 @@ programinit()
 
 		//writing to real file also clears cache forcing a real reread
 		xyz = "abc";
-		assert(xyz.writeo(filename, k1));
-		assert(xyz.reado(filename, k1));
+		assert(xyz.writec(filename, k1));
+		assert(xyz.readc(filename, k1));
 		xyz = "123";
 		assert(xyz.write(filename, k1));
-		assert(xyz.reado(filename, k1));
+		assert(xyz.readc(filename, k1));
 		assert(xyz eq "123");
 
-		//not testing deleteo because write and delete always call it?
+		//not testing deletec because write and delete always call it?
 
 		//deleting a record deletes it from both real and cache file
 		assert(deleterecord(filename, k1));
 		assert(not xyz.read(filename, k1));
-		assert(not xyz.reado(filename, k1));
+		assert(not xyz.readc(filename, k1));
 
 		//writing empty record to cache is like a deletion
 		xyz = "";
-		assert(xyz.writeo(filename, k1));
+		assert(xyz.writec(filename, k1));
 		//deletion from cache
-		assert(not xyz.reado(filename, k1));
+		assert(not xyz.readc(filename, k1));
 
 		assert(not xyz.read(filename, k1));
 	}
@@ -492,15 +492,15 @@ programinit()
 		assert(write("11.^22.^33."_var on tempfilename, "key2"));
 		assert(reccount(tempfilename) eq 2);
 
-		assert(reado(RECORD from tempfilename, "key2"));
+		assert(readc(RECORD from tempfilename, "key2"));
 		assert(RECORD                 eq "11.^22.^33."_var);
 		assert(reccount(tempfilename) eq 2);
 
 		// Test write to cache but not file
-		assert(writeo("111^222^333"_var on tempfilename, "key9"));
+		assert(writec("111^222^333"_var on tempfilename, "key9"));
 		assert(not read(RECORD from tempfilename, "key9"));
 		// Read from cache should succeed
-		assert(reado(RECORD from tempfilename, "key9"));
+		assert(readc(RECORD from tempfilename, "key9"));
 		assert(RECORD eq "111^222^333"_var);
 
 		assert(lock(tempfilename, "k1"));

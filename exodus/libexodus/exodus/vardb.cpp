@@ -1168,11 +1168,11 @@ bool var::readf(CVR filehandle, CVR key, const int fieldno) {
 	return true;
 }
 
-bool var::reado(CVR filehandle, CVR key) {
+bool var::readc(CVR filehandle, CVR key) {
 
-	Timer t(246);//reado
+	Timer t(246);//readc
 
-	THISIS("bool var::reado(CVR filehandle,CVR key)")
+	THISIS("bool var::readc(CVR filehandle,CVR key)")
 	assertDefined(function_sig);
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
@@ -1197,7 +1197,7 @@ bool var::reado(CVR filehandle, CVR key) {
 	// Attempt to get record from the cache
 	// TODO cache non-existent records as empty
 	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
-	//TRACE("reado " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
+	//TRACE("readc " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	std::string cachedrecord;
 	if (thread_dbconnector.getrecord(dbconn_no, hash64, cachedrecord)) {
 		if (cachedrecord.empty()) {
@@ -1212,19 +1212,19 @@ bool var::reado(CVR filehandle, CVR key) {
 	}
 	//TRACE("cache miss" ^ key);
 
-	Timer t2(247);//reado cache_miss
+	Timer t2(247);//readc cache_miss
 
 	// Ordinary read from the database
 	bool result = this->read(filehandle, key);
 
 	if (result) {
 		// Cache the ordinary read
-		//this->writeo(filehandle, key);
+		//this->writec(filehandle, key);
 		//TRACE("cache add+ " ^ key);
 		thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 	} else {
 		// Empty if failure
-		var("").writeo(filehandle, key);
+		var("").writec(filehandle, key);
 		//TRACE("cache add-" ^ key);
 		thread_dbconnector.putrecord(dbconn_no, hash64, "");
 
@@ -1233,9 +1233,9 @@ bool var::reado(CVR filehandle, CVR key) {
 	return result;
 }
 
-bool var::writeo(CVR filehandle, CVR key) const {
+bool var::writec(CVR filehandle, CVR key) const {
 
-	THISIS("void var::writeo(CVR filehandle,CVR key)")
+	THISIS("void var::writec(CVR filehandle,CVR key)")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1247,15 +1247,15 @@ bool var::writeo(CVR filehandle, CVR key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
-	//TRACE("writeo " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
+	//TRACE("writec " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 
 	return true;
 }
 
-bool var::deleteo(CVR key) const {
+bool var::deletec(CVR key) const {
 
-	THISIS("bool var::deleteo(CVR key)")
+	THISIS("bool var::deletec(CVR key)")
 	assertString(function_sig);
 	ISSTRING(key)
 
@@ -1266,7 +1266,7 @@ bool var::deleteo(CVR key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
-	//TRACE("deleteo " ^ *this ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
+	//TRACE("deletec " ^ *this ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	return thread_dbconnector.delrecord(dbconn_no, hash64);
 }
 
@@ -1740,7 +1740,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	std::string data2 = this->normalize().var_str;
 
 	// clear any cache
-	filehandle.deleteo(key2);
+	filehandle.deletec(key2);
 
 	// filehandle dos or DOS means osread/oswrite/osremove
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
@@ -1803,7 +1803,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	ISSTRING(key)
 
 	// clear any cache
-	filehandle.deleteo(key);
+	filehandle.deletec(key);
 
 	// std::string key2=key.var_str;
 	// std::string data2=var_str;
@@ -1862,7 +1862,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	ISSTRING(key)
 
 	// clear any cache
-	filehandle.deleteo(key);
+	filehandle.deletec(key);
 
 	// std::string key2=key.var_str;
 	// std::string data2=var_str;
@@ -1924,7 +1924,7 @@ bool var::deleterecord(CVR key) const {
 	ISSTRING(key)
 
 	// clear any cache
-	this->deleteo(key);
+	this->deletec(key);
 
 	// std::string key2=key.var_str;
 	std::string key2 = key.normalize().var_str;

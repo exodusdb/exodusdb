@@ -28,7 +28,7 @@ function main() {\
 \
 	// END\
 	var lastreccount = RECCOUNT;\
-	if (rec.reado(comparefile, ID)) {\
+	if (rec.readc(comparefile, ID)) {\
 		if (RECORD eq rec) {\
 			ANS = "";\
 		} else {\
