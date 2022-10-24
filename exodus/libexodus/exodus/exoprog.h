@@ -213,9 +213,9 @@ class PUBLIC ExodusProgramBase {
 	ND var timedate2(in localdate0, in localtime0, in glang = "");
 	void getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
 
-	ND var elapsedtimetext();
-	ND var elapsedtimetext(CVR fromdate, CVR fromtime);
-	ND var elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime);
+	ND var elapsedtimetext() const; // Since TIMESTAMP
+	ND var elapsedtimetext(CVR timestamp_difference) const;
+	ND var elapsedtimetext(CVR timestamp1, CVR timestamp2) const;
 
 	ND var amountunit(in input0);
 	var amountunit(in input0, out unitx);

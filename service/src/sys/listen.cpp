@@ -598,7 +598,7 @@ nextsearch0:
 	tt = time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^
 		 " Listening"
 		 " " ^
-		 elapsedtimetext(lastrequestdate, lastrequesttime);
+		 elapsedtimetext(lastrequestdate.timestamp(lastrequesttime), timestamp());
 	var(tt).oswrite("process." ^ THREADNO);
 
 	call unlockrecord("PROCESSES", processes, THREADNO);

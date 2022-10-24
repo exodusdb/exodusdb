@@ -2,9 +2,6 @@
 
 libraryinit(last_updated2)
 //------------------------
-var uptodate;
-var uptotime;
-
 function main() {
 	/*;
 	dostimenow=date()+24873+time()/86400;
@@ -47,7 +44,7 @@ function main() {
 
 	var fromdate = RECORD.f(27).floor() - 24873;
 	var fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;
-	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);
+	return elapsedtimetext(fromdate.timestamp(fromtime), timestamp());
 }
 libraryexit(last_updated2)
 

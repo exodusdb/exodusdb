@@ -8,8 +8,7 @@ libraryinit()
 //var colorprefix;
 var nblocks;//num
 var blockn;//num
-var fromdate;
-var fromtime;
+var fromtimestamp;
 bool usecols;//num
 //var decimalchar;
 bool html;//num
@@ -307,11 +306,10 @@ function main() {
 		abort("");
 	}
 
-	fromdate = date();
 	if (LISTACTIVE) {
-		fromtime = SYSTEM.f(25);
+		fromtimestamp = date().timestamp(SYSTEM.f(25));
 	} else {
-		fromtime = ostime();
+		fromtimestamp = timestamp();
 	}
 
 	// Use <COL> for hiding non-totalled cols in det-supp (slow)
@@ -1788,8 +1786,8 @@ x2exit:
 				tx ^= "s";
 			}
 
-			if (fromtime) {
-				tx ^= ", " ^ elapsedtimetext(fromdate, fromtime);
+			if (fromtimestamp) {
+				tx ^= ", " ^ elapsedtimetext(fromtimestamp, timestamp());
 			}
 			if (html) {
 				tx ^= "</p>";

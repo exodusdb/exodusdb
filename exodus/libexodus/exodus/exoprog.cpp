@@ -2393,45 +2393,21 @@ var ExodusProgramBase::timedate2(in localdate0, in localtime0, in glang) {
 
 
 // elapsedtimetext 1 - from program start/TIMESTAMP
-var ExodusProgramBase::elapsedtimetext() {
-	var uptodate, uptotime;
-	return elapsedtimetext(int(TIMESTAMP), TIMESTAMP.mod(1) * 86400, uptodate, uptotime);
+var ExodusProgramBase::elapsedtimetext() const {
+	return elapsedtimetext(TIMESTAMP, var().timestamp());
 }
 
-// elapsedtimetext 2 - automatic upto date/time
-var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime) {
-	var uptodate, uptotime;
-	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);
+// elapsedtimetext 2 - from duration
+var ExodusProgramBase::elapsedtimetext(CVR timestamp_difference) const {
+	return elapsedtimetext(0, timestamp_difference);
 }
 
-// elapsedtimetext 4 - given from and to
-var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptodate, VARREF uptotime) {
-	//c sys in,in,io,io
+// elapsedtimetext 3 - given two timestamps
+var ExodusProgramBase::elapsedtimetext(CVR timestamp1, CVR timestamp2) const {
 
 	var text = "";
 
-	if (uptodate.unassigned()) {
-		uptodate = var().date();
-	}
-	if (uptotime.unassigned()) {
-		uptotime = var().ostime();
-	}
-	//uptodate=date()
-	//CALL DOSTIME(uptotime)
-
-	//NSECS=INT(uptotime-fromTIME)
-	var secs = uptotime - fromtime;
-	//IF NSECS ELSE NSECS=1
-	//uptodate=date()
-	if (fromdate ne uptodate) {
-		secs += (uptodate - fromdate) * 24 * 3600;
-	}
-
-	//cater for bug where start date isnt known and time has crossed midnight
-	//so the 2nd time is less than the first
-	if (secs < 0) {
-		secs += 86400;
-	}
+	var secs = (timestamp2 - timestamp1) * 86'400;
 
 	var weeks = (secs / 604800).floor();
 	secs -= weeks * 604800;
@@ -2485,17 +2461,19 @@ var ExodusProgramBase::elapsedtimetext(CVR fromdate, CVR fromtime, VARREF uptoda
 				if (secs ne 1) {
 					text ^= "s";
 				}
-			} else if (not(minutes)) {
+			} else if (not minutes and not hours and not days and not weeks) {
 zero:
-				text.r(-1, "< 1 msec");
+				if (not text)
+					//text.r(-1, "< 1 ms");
+					text = "< 1 ms";
 			} else {
-				text.r(-1, "exactly");
+				//text.r(-1, "exactly");
 			}
 		} else {
-			if (not(minutes)) {
+			if (not minutes and not hours and not days and not weeks) {
 				goto zero;
 			}
-			text.r(3, "exactly");
+			//text.r(3, "exactly");
 		}
 	}
 

@@ -32,7 +32,7 @@ var tt;	 //num
 var authtasks;
 var title;
 var datax;
-var fromtime;
+var start_timestamp;
 var daysago;   //num
 var xdate;	   //num
 var opendate;  //num
@@ -510,8 +510,7 @@ nextuser:;
 		printl("running as ", runasusercode);
 	}
 
-	var fromdate = date();
-	fromtime	 = ostime();
+	start_timestamp	 = timestamp();
 
 	ndocsprocessed += 1;
 
@@ -639,7 +638,7 @@ nextsign:
 
 		} else {
 
-			var timetext = elapsedtimetext(fromdate, fromtime);
+			var timetext = elapsedtimetext(start_timestamp, timestamp());
 
 			// if ucase(printfilename[-4,4])='.XLS' then
 			// locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then

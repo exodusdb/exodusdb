@@ -6,12 +6,13 @@ function main(in cmd) {
 	// oswrite cmd on 'XSELECT.'
 	var supersilent = index(cmd, "(SS");
 	if (SYSTEM.f(33) and not supersilent) {
-		printl();
-		print(cmd, ":");
+		logputl();
+		logput(cmd, ":");
 	}
+	var started = timestamp();
 	select(cmd);
 	if (SYSTEM.f(33) and not supersilent) {
-		printl("done");
+		logputl(" done", elapsedtimetext(started, timestamp()));
 	}
 	return 0;
 }

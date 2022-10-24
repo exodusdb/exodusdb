@@ -325,6 +325,29 @@ programinit()
 			assert((ts1 - ts0) < 0.001);
 		}
 
+
+		{
+			TRACE(TIMESTAMP)
+			TRACE(timestamp())
+			var onesec = 1.0/86'400;
+			TRACE(onesec);
+			TRACE(elapsedtimetext());
+			assert(elapsedtimetext());
+			TRACE(elapsedtimetext(1));
+			TRACE(elapsedtimetext(1));
+			assert(elapsedtimetext(7.0).logputl() eq "1 week");//??
+			assert(elapsedtimetext(3.5).logputl() eq "3 days, 12 hours");//??
+			assert(elapsedtimetext(1.0).logputl() eq "1 day");//??
+			assert(elapsedtimetext(onesec).logputl() eq "1 sec");
+			assert(elapsedtimetext(0, onesec * 10).logputl() eq "10 secs");
+			assert(elapsedtimetext(onesec * 10, onesec * 30).logputl() eq "20 secs");
+			assert(elapsedtimetext(onesec/1'000).logputl() eq "0.001 secs");
+			assert(elapsedtimetext(onesec/10'000).logputl() eq "0.0001 secs");
+			assert(elapsedtimetext(onesec/100'000).logputl() eq "< 1 ms");
+			//assert(elapsedtimetext(onesec/1'000'000).logputl() eq "0.000001 secs");
+			//assert(elapsedtimetext(onesec/10'000'000).logputl() eq "0.0000001 secs");
+		}
+
 		printl("----------------------------------------------");
 
 		assert("abc"_var    eq "abc");

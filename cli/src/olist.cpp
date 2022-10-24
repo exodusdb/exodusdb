@@ -78,8 +78,7 @@ Example command line:
 	var ulchar;
 	var nblocks;  //num
 	var blockn;	  //num
-	var fromdate;
-	var fromtime;
+	var fromtimestamp;
 	var usecols;  //num
 	var decimalchar;
 	var html;  //num
@@ -426,11 +425,9 @@ function main() {
 	blockn = 0;
 
 	if (LISTACTIVE) {
-		fromdate = "";
-		fromtime = "";
+		fromtimestamp = "";
 	} else {
-		fromdate = var().date();
-		fromtime = ostime();
+		fromtimestamp = timestamp();
 	}
 
 	//use <COL> for hiding non-totalled cols in det-supp (slow)
@@ -1985,8 +1982,8 @@ x2exit:
 				tx ^= "s";
 			}
 
-			if (fromdate) {
-				tx ^= ", " ^ elapsedtimetext(fromdate, fromtime) ^ ".";
+			if (fromtimestamp) {
+				tx ^= ", " ^ elapsedtimetext(fromtimestamp, timestamp()) ^ ".";
 			}
 			if (html) {
 				tx ^= "</p>";
