@@ -31,7 +31,7 @@ function main(in programname0, in text0) {
 	// update the log
 	// /////////////
 
-	var year = date().oconv("D").last(4);
+	var year = date().oconv("DY");
 	if (s33) {
 		xstation = SYSTEM.f(40, 2);
 	} else {

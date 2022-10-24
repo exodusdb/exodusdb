@@ -903,8 +903,8 @@ subroutine initlog() {
 		if (not tt2) {
 			tt2 = tt;
 		}
-		logyear		  = tt.oconv("D").last(4);
-		var logtoyear = tt2.oconv("D").last(4);
+		logyear		  = tt.oconv("DY");
+		var logtoyear = tt2.oconv("DY");
 		if (logyear ne logtoyear) {
 			response_ = "Dates must be within one calendar year";
 			abort();

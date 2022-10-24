@@ -228,7 +228,7 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*compress logs with gzip", logtime);
 		var	 dbcode	  = SYSTEM.f(17);
-		var	 curryear = date().oconv("D").last(4);
+		var	 curryear = date().oconv("DY");
 		var	 minyear  = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
 
