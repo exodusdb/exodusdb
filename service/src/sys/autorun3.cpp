@@ -896,7 +896,8 @@ subroutine getdaysago() {
 	xdate = date();
 	while (true) {
 		xdate -= 1;
-		if (not(weekend.contains((xdate - 1).mod(7) + 1))) {
+		//if (not(weekend.contains((xdate - 1).mod(7) + 1))) {
+		if (not weekend.contains(xdate.oconv("DW"))) {
 			daysago -= 1;
 		}
 		// /BREAK;

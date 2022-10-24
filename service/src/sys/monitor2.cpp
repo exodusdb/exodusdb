@@ -560,10 +560,12 @@ nextprocess:
 					if (time() gt backuprequired.f(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
-					dow = ((sys.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).first(8)).ucase();
+					//dow = ((sys.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).first(8)).ucase();
+					dow = sys.glang.f(22).field("|", nextbackupdate.oconv("DW")).first(8).ucase();
 					// eg 1/data.bak/adlined/wednesda/backup.zip
 					// nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
-					nextbackupfilename = "../../backup." ^ ((nextbackupdate - 1).mod(7) + 1) ^ ".txt";
+					//nextbackupfilename = "../../backup." ^ ((nextbackupdate - 1).mod(7) + 1) ^ ".txt";
+					nextbackupfilename = "../../backup." ^ nextbackupdate.oconv("DW") ^ ".txt";
 					nextbackupfilename.converter("/", OSSLASH);
 					nextbackupfileinfo = nextbackupfilename.osfile();
 

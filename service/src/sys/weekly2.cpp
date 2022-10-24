@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var firstmonth;
+var firstmonth;
 var firstdayofweek;
 var maxperiod;	// num
 var temp;
@@ -98,7 +98,8 @@ subroutine getfirstdom() {
 	// if period<>1 then
 	while (true) {
 		// /BREAK;
-		if (not((idate - 1).mod(7) + 1 ne firstdayofweek))
+		//if (not((idate - 1).mod(7) + 1 ne firstdayofweek))
+		if ( idate.oconv("DW") eq firstdayofweek)
 			break;
 		idate += 1;
 	}  //loop;

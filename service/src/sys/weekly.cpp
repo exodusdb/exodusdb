@@ -104,7 +104,7 @@ tryyear:
 
 	output = (firstdateofyear + (period - 1) * (7 * weeksperperiod) - 1).floor();
 
-	diff = (output - 1).mod(7) + 1 - firstdayofweek;
+	diff = output.oconv("DW") - firstdayofweek;
 
 	if (diff) {
 		if (diff gt 3) {
@@ -129,7 +129,8 @@ subroutine getfirstdateofyear() {
 	// eg start of year 1/7/93 is thursday (day 1)
 	//   start of week is friday (day 5)
 	// therefore start of year is 2/7/93
-	firstdayofyear = (firstdateofyear - 1).mod(7) + 1;
+	//firstdayofyear = (firstdateofyear - 1).mod(7) + 1;
+	firstdayofyear = firstdateofyear.oconv("DW");
 	difference	   = firstdayofyear - firstdayofweek;
 	if (difference gt 3) {
 		difference -= 7;

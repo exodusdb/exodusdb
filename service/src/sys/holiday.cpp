@@ -61,7 +61,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	// type 1 is weekends (of the user otherwise of market)
 	// ///////////////////////////////////////////////////
 
-	var dow = (idate - 1).mod(7) + 1;
+	var dow = idate.oconv("DW");
 
 	// from user
 	var weekenddows = trim(userx.f(24), SM);
@@ -76,7 +76,8 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 			// else from global parameter "last day of week" plus the day before
 			if (not weekenddows) {
 				// weekenddows=agp<13>:sm:mod(agp<13>-1-1,7)+1
-				var tt		= (agp.f(13) - 1 - 1).mod(7) + 1;
+				//var tt		= (agp.f(13) - 1 - 1).mod(7) + 1;
+				var tt		= (agp.f(13) - 1).oconv("DW");
 				weekenddows = agp.f(13) ^ SM ^ tt;
 			}
 		}

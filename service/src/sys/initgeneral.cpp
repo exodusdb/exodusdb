@@ -24,7 +24,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var lastlog;
+var lastlog;
 var logtime;
 var msg;
 var pidfilename;
@@ -1525,7 +1525,8 @@ adddatasetcodename:
 			userx = "";
 		}
 		if (userx.f(4) and interactive) {
-			var	 day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
+			//var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
+			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", userx.f(4).oconv("DW"));
 			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.f(4).oconv("D") ^ " at " ^ userx.f(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.f(6).trim()).oconv("C#40") ^ "|");
 		}
 

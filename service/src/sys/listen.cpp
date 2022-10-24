@@ -884,7 +884,7 @@ function loop_exit() {
 		// delay closedown randomly to avoid conflict with identically configured processes
 		call ossleep(1000 * var(10).rnd());
 
-		dow = (date() - 1).mod(7) + 1;
+		dow = date().oconv("DW");
 
 		// optionally perform backup and/or shutdown and not backed up today
 		if (bakpars.f(9)) {

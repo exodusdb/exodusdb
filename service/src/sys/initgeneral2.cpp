@@ -293,7 +293,8 @@ nextuser:
 		call log2("*trim requestlog", logtime);
 
 		// only run on saturdays and only run once per day per installation
-		if ((date() - 1).mod(7) + 1 ne 6) {
+		//if ((date() - 1).mod(7) + 1 ne 6) {
+		if (date().oconv("DW") ne 6) {
 			return 0;
 		}
 
