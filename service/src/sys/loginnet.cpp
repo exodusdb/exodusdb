@@ -33,12 +33,12 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 	var oldmenus = "";
 	var users;
 	if (users.open("USERS", "")) {
-		if (menuid.readv(users, username, 34)) {
+		if (menuid.readf(users, username, 34)) {
 			if (menuid) {
 				var menufile;
 				if (menufile.open("ADMENUS", "")) {
 readmenu:
-					if (not oldmenus.readv(menufile, menuid, 6)) {
+					if (not oldmenus.readf(menufile, menuid, 6)) {
 						oldmenus = "";
 					}
 				} else {
@@ -195,7 +195,7 @@ nextcomp:
 	// if unassigned(markets) then markets=''
 	// TODO maybe use the market on the user file?
 	// markets is not open in finance only module
-	// readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
+	// readf maincurrcode from markets,defmarketcode,5 else maincurrcode=''
 	var maincurrcode = "";
 	if (xx.open("MARKETS", "")) {
 		// defmarketcode=agp<37>

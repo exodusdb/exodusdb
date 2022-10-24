@@ -1971,7 +1971,7 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 	 //if unassigned(markets) then markets=''
 
 	 //markets is not open in finance only module
-	 //readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
+	 //readf maincurrcode from markets,defmarketcode,5 else maincurrcode=''
 	 var maincurrcode = "";
 	 if (FILES[0].locateusing(FM,"MARKETS", FM))
 	 maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");

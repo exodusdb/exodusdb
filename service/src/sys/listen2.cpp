@@ -1078,7 +1078,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 			var styles = userrec.f(19);
 			styles.replacer("Default", "");
-			if (not(styles2.readv(users, userrec.f(21), 19))) {
+			if (not(styles2.readf(users, userrec.f(21), 19))) {
 				styles2 = "";
 			}
 

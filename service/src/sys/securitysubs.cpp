@@ -53,7 +53,7 @@ libraryinit()
 
 	// NB (not any more) valid companies are buffered in userprivs<9>
 
-	var newpassword;
+var newpassword;
 var userx;
 var sysrec;
 var passwordfn;	 //num
@@ -430,8 +430,8 @@ function main(in mode) {
 						if (ousern) {
 							var users;
 							if (users.open("USERS", "")) {
-								// writev field(@record<4,usern,2>,tm,7) on users,userx,4
-								var("").writev(users, userx, 4);
+								// writef field(@record<4,usern,2>,tm,7) on users,userx,4
+								var("").writef(users, userx, 4);
 							}
 						}
 
@@ -582,7 +582,7 @@ function main(in mode) {
 					for (const var usern2 : range(usern + 1, nusers)) {
 						var usercode2 = usercodes.f(1, usern2);
 						if (usercode2) {
-							if (not(menuid.readv(users, usercode2, 34))) {
+							if (not(menuid.readf(users, usercode2, 34))) {
 								menuid = "";
 							}
 						}

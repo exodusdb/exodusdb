@@ -11,7 +11,7 @@ libraryinit()
 
 #include <window.hpp>
 
-	var mode;
+var mode;
 var datasetparams;
 var msg;
 var datasetcodes;
@@ -118,14 +118,14 @@ function main(in mode0) {
 			}
 
 			// convert SK in datafile to SK in definitions
-			if (not(no.readv(DEFINITIONS, win.datafile ^ ".SK", 1))) {
-				if (no.readv(win.srcfile, "%SK%", 1)) {
+			if (not(no.readf(DEFINITIONS, win.datafile ^ ".SK", 1))) {
+				if (no.readf(win.srcfile, "%SK%", 1)) {
 					win.srcfile.deleterecord("%SK%");
 
 				} else {
 					no = 1;
 				}
-				no.writev(DEFINITIONS, win.datafile ^ ".SK", 1);
+				no.writef(DEFINITIONS, win.datafile ^ ".SK", 1);
 			}
 
 next:
@@ -136,7 +136,7 @@ next:
 			if (xx.read(win.srcfile, win.isdflt)) {
 				if (win.isdflt.isnum()) {
 					win.isdflt += 1;
-					win.isdflt.writev(DEFINITIONS, win.datafile ^ ".SK", 1);
+					win.isdflt.writef(DEFINITIONS, win.datafile ^ ".SK", 1);
 
 					goto next;
 				}

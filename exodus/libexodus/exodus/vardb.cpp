@@ -1153,8 +1153,8 @@ void var::close() {
 	*/
 }
 
-bool var::readv(CVR filehandle, CVR key, const int fieldno) {
-	//THISIS("bool var::readv(CVR filehandle,CVR key,const int fieldno)")
+bool var::readf(CVR filehandle, CVR key, const int fieldno) {
+	//THISIS("bool var::readf(CVR filehandle,CVR key,const int fieldno)")
 	//assertDefined(function_sig);
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
@@ -1699,13 +1699,13 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	return true;
 }
 
-// writev writes a specific field number in a record
-//(why it is "writev" instead of "writef" isnt known!
-bool var::writev(CVR filehandle, CVR key, const int fieldno) const {
+// writef writes a specific field number in a record
+//(why it is "writef" instead of "writef" isnt known!
+bool var::writef(CVR filehandle, CVR key, const int fieldno) const {
 	if (fieldno <= 0)
 		return write(filehandle, key);
 
-	THISIS("bool var::writev(CVR filehandle,CVR key,const int fieldno) const")
+	THISIS("bool var::writef(CVR filehandle,CVR key,const int fieldno) const")
 	// will be duplicated in read and write but do here to present the correct function name on
 	// error
 	assertString(function_sig);

@@ -21,7 +21,7 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-	var initdir;
+var initdir;
 var request2;
 var request3;
 var request4;
@@ -396,9 +396,9 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 
 			// record success/failure before any autorun
-			(date() ^ "." ^ time().oconv("R(0)#5")).writev(DEFINITIONS, patchid, 6);
+			(date() ^ "." ^ time().oconv("R(0)#5")).writef(DEFINITIONS, patchid, 6);
 
-			skipreason.writev(DEFINITIONS, patchid, 7);
+			skipreason.writef(DEFINITIONS, patchid, 7);
 
 			if (skipreason) {
 				// release

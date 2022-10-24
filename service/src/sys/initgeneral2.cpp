@@ -49,7 +49,7 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*createalert currusers", logtime);
 
-		if (not(tt.readv(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1))) {
+		if (not(tt.readf(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1))) {
 			tt = "";
 		}
 		if (tt lt 17203) {

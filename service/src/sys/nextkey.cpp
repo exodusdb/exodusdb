@@ -112,7 +112,7 @@ checkrec:
 			} else {
 				if (notok eq 1) {
 					if (currnextno gt nextno) {
-						currnextno.writev(keyfile, seqkey, 1);
+						currnextno.writef(keyfile, seqkey, 1);
 					}
 					notok = 2;
 				}

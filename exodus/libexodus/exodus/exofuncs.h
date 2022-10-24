@@ -431,11 +431,11 @@ ND bool open(CVR dbfilename);
 
 ND bool read(VARREF record, CVR dbfilevar, CVR key);
 ND bool reado(VARREF record, CVR dbfilevar, CVR key);
-ND bool readv(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber);
+ND bool readf(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber);
 
 bool write(CVR record, CVR dbfilevar, CVR key);
 bool writeo(CVR record, CVR dbfilevar, CVR key);
-bool writev(CVR record, CVR dbfilevar, CVR key, const int fieldno);
+bool writef(CVR record, CVR dbfilevar, CVR key, const int fieldno);
 ND bool updaterecord(CVR record, CVR dbfilevar, CVR key);
 ND bool insertrecord(CVR record, CVR dbfilevar, CVR key);
 

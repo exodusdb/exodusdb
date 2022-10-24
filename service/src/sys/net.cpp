@@ -189,7 +189,7 @@ listen:
 			call getbackpars(bakpars);
 
 			// send email of error
-			// readv address from definitions,'BACKUP',6 else address=''
+			// readf address from definitions,'BACKUP',6 else address=''
 			sys.address = bakpars.f(6);
 			if (bakpars.f(10)) {
 				if (sys.address) {
@@ -198,7 +198,7 @@ listen:
 				sys.address ^= bakpars.f(10);
 			}
 			if (sys.address eq "") {
-				if (not(sys.address.readv(DEFINITIONS, "REPLICATION", 12))) {
+				if (not(sys.address.readf(DEFINITIONS, "REPLICATION", 12))) {
 					sys.address = "";
 				}
 			}

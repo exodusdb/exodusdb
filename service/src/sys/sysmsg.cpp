@@ -98,7 +98,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 		emailaddrs ^= bakpars.f(10);
 	}
 	emailaddrs = emailaddrs.field("/", 1);
-	// if emailaddrs='' then readv emailaddrs from definitions,'REPLICATION',12 else emailaddrs=''
+	// if emailaddrs='' then readf emailaddrs from definitions,'REPLICATION',12 else emailaddrs=''
 	emailaddrs.replacer("backups@neosys.com", "sysmsg@neosys.com");
 
 	// suppress login failure messages

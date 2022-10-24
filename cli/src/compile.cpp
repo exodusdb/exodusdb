@@ -147,8 +147,6 @@ function main() {
 		if (verbose)
 			printl("Posix environment detected.");
 
-		var gcc = osshellread("c++ --version").contains("Free Software Foundation");
-
 		//target directories
 		bindir = exo_HOME ^ "/bin";
 		libdir = exo_HOME ^ "/lib";
@@ -287,6 +285,8 @@ function main() {
 			// no-xxxxxxxx means switch off warning xxxxxxxx
 			//basicoptions ^= " -Wno-cast-function-type";
 		}
+
+		var gcc = osshellread(compiler ^ " --version").contains("Free Software Foundation");
 
 		// Suppress GCC and clang's warnings about each others warning flags
 		if (warnings lt 2) {

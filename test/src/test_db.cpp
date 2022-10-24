@@ -208,17 +208,17 @@ programinit()
 
 		{
 			printl("Update single field");
-			assert(writev("22" on tempfile, "X", 2));
+			assert(writef("22" on tempfile, "X", 2));
 			var rec;
 			assert(read(rec from tempfile, "X"));
 			assert(rec eq "aa^22^cc"_var);
 
 			printl("Check single field updated");
-			assert(readv(rec from tempfile, "X", 2));
+			assert(readf(rec from tempfile, "X", 2));
 			assert(rec eq "22"_var);
 
-			printl("Writev on empty record");
-			assert(writev("22" on tempfile, "Y", 2));
+			printl("writef on empty record");
+			assert(writef("22" on tempfile, "Y", 2));
 			assert(read(rec from tempfile, "Y"));
 			assert(rec eq "^22"_var);
 

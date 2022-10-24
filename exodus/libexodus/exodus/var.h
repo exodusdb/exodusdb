@@ -1973,8 +1973,8 @@ class PUBLIC var final {
 	ND bool insertrecord(CVR filehandle, CVR key) const;
 
 	// specific db field i/o
-	ND bool readv(CVR filehandle, CVR key, const int fieldno);
-	bool writev(CVR filehandle, CVR key, const int fieldno) const;
+	ND bool readf(CVR filehandle, CVR key, const int fieldno);
+	bool writef(CVR filehandle, CVR key, const int fieldno) const;
 
 	// cached db file i/o
 	ND bool reado(CVR filehandle, CVR key);

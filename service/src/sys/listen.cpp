@@ -905,7 +905,7 @@ function loop_exit() {
 
 		} else {
 			// call log2('Preventing further automatic backups today',logtime)
-			((date() + time() / 86400).oconv("MD50P")).writev(DEFINITIONS, "BACKUP", 1);
+			((date() + time() / 86400).oconv("MD50P")).writef(DEFINITIONS, "BACKUP", 1);
 
 backup:
 			// similar code in LISTEN and LISTEN2
@@ -2084,7 +2084,7 @@ badwrite:
 
 			// double check that the record has not been updated since read
 			// Cannot do this unless during WRITE (not WRITEU) we pass back the new timedate
-			// readv datetimefn from @dict,'DATE_TIME',2 then
+			// readf datetimefn from @dict,'DATE_TIME',2 then
 			// if @record<datetimefn> ne orec<datetimefn> then
 			//  response='Somebody else has updated this record.|Your update cannot be applied'
 			//  gosub properunlock

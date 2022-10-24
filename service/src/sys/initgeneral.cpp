@@ -1038,7 +1038,7 @@ nextreport:
 		for (const var usern : range(1, nusers)) {
 			var userx = usercodes.f(1, usern);
 			if (not(userx.contains("---"))) {
-				userx.writev(users, userx, 1);
+				userx.writef(users, userx, 1);
 			}
 		}  //usern;
 	}
@@ -1437,7 +1437,7 @@ convcompany:
 						numberformat = "1,000.00";
 					}
 				}
-				numberformat.writev(sys.companies, compcode, 22);
+				numberformat.writef(sys.companies, compcode, 22);
 
 				goto convcompany;
 			}

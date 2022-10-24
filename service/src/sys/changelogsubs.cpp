@@ -88,9 +88,9 @@ function main(in mode0) {
 				var changelogkey = "USER*" ^ USERNAME;
 				if (changelog.read(DEFINITIONS, changelogkey)) {
 					userrec(17) = changelog.f(8);
-					userrec.f(17).writev(users, USERNAME, 17);
+					userrec.f(17).writef(users, USERNAME, 17);
 
-					var("").writev(DEFINITIONS, changelogkey, 8);
+					var("").writef(DEFINITIONS, changelogkey, 8);
 				}
 			}
 
@@ -122,7 +122,7 @@ function main(in mode0) {
 			return 0;
 		}
 
-		currentversiondatetime.writev(users, USERNAME, 17);
+		currentversiondatetime.writef(users, USERNAME, 17);
 
 		// build preferences from menus if not specified
 		if (not(mode.f(2))) {

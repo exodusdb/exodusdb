@@ -17,7 +17,7 @@ libraryinit()
 
 #include <window.hpp>
 
-	var xx;
+var xx;
 var op;
 var msg;
 var backuprec;
@@ -437,7 +437,7 @@ preventupdate:
 			if (ID eq "SYSTEM") {
 
 				// get lastbackupdate in unlikely event that it has changed during update
-				if (not(tt.readv(DEFINITIONS, backupkey, 1))) {
+				if (not(tt.readf(DEFINITIONS, backupkey, 1))) {
 					tt = "";
 				}
 				backuprec(1) = tt;

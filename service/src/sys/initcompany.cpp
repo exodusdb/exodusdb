@@ -162,7 +162,7 @@ function main(in nextcompanycode) {
 	SYSTEM(134) = sys.company.f(3);
 
 	// number format (@USER2)
-	if (not(ndec.readv(sys.currencies, sys.company.f(3), 3))) {
+	if (not(ndec.readf(sys.currencies, sys.company.f(3), 3))) {
 		ndec = 2;
 	}
 	// default to dot for decimal point

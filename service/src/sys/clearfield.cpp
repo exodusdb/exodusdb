@@ -70,7 +70,7 @@ tryagain:
 		}
 		if (not(fn.isnum())) {
 			if (DICT) {
-				// readv fn from @dict,fns<i>,2 else null
+				// readf fn from @dict,fns<i>,2 else null
 				var dict;
 				if (dict.read(DICT, fns.f(ii))) {
 					if (dict.f(1) eq "F") {

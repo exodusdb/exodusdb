@@ -101,7 +101,7 @@ function main(in mode, in filename, io keys, in fieldnameornos, in oldvalues, in
 
 					if (oldvalues.f(fieldn) ne newvalues.f(fieldn)) {
 						if (fieldnameorno.isnum()) {
-							newvalues.f(fieldn).writev(file, keyx, fieldnameorno);
+							newvalues.f(fieldn).writef(file, keyx, fieldnameorno);
 
 						} else {
 							upd ^= fieldnameorno ^ FM ^ keyx ^ FM ^ oldvalues.f(fieldn) ^ FM ^ newvalues.f(fieldn) ^ FM;
