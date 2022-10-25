@@ -311,17 +311,17 @@ programinit()
 
 		// Check constuction of a timestamp manually agrees closely with plain timestamp.
 		{
-			var ts1 = date().timestamp(time());
+			var ts1 = timestamp(date(), time());
 			var ts2 = timestamp();
 			assert((ts2 - ts1) < 0.001);
 		}
 
-		// Check constuction of a timestamp manually agrees closely with plain timestamp.
+		// Check construction of a timestamp manually agrees closely with plain timestamp.
 		{
 			var ts0 = timestamp();
 			var dt = int(ts0);
 			var tm = ts0.mod(1) * 86'400;
-			var ts1 = dt.timestamp(tm);
+			var ts1 = timestamp(dt, tm);
 			assert((ts1 - ts0) < 0.001);
 		}
 

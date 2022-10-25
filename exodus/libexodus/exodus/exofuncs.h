@@ -100,6 +100,7 @@ ND var date();
 ND var time();
 ND var ostime();
 ND var timestamp();
+ND var timestamp(CVR date, CVR time);
 //ND var timedate();
 
 void ossleep(const int milliseconds);
