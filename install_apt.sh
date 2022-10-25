@@ -30,7 +30,7 @@ set -euxo pipefail
 : "Linux lucid64 2.6.32-31-server" #61-Ubuntu SMP Fri Apr 8 19:44:42 UTC 2011 x86_64 GNU/Linux
 : "Debian GNU/Linux 6.0 \n \l"
 : "Linux debian32 2.6.32-5-686" #1 SMP Wed May 18 07:08:50 UTC 2011 i686 GNU/Linux
-:
+
 :
 : 1. Building and Installing Exodus
 : =================================
@@ -53,22 +53,26 @@ set -euxo pipefail
 		#
 		# was:
 		#libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
+
 :
 : Download exodus if not already present
 :
 	cd ~
 	[ ! -d exodus ] && git clone https://github.com/exodusdb/exodusdb exodus
+
 :
 : Refresh git in case reinstalling
 :
 	cd ~/exodus
 	git stash
 	git pull
+
 :
-: Config make with all cpus in parallel
+: Config make with all CPUs in parallel
 :
 	cd ~/exodus
-	cmake .
+	cmake . -D CMAKE_BUILD_TYPE=${BUILD_TYPE:-RelWithDebInfo}
+
 :
 : Clean all - unless suppressed for speed. Required in case half-built with wrong libs somehow.
 :
@@ -76,11 +80,19 @@ set -euxo pipefail
 	cmake .
 
 :
-: Make all exodus lib, cli and pgexodus
+: Make all exodus lib, cli and pgexodus with all CPUs in parallel. Hopefully enough memory.
 :
 	make -j `nproc`
+
+:
+: Skip full testing unless FORCE_TEST is set
+:
+	${FORCE_TEST:-} && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` make test
+
 :
 : Install all exodus lib and cli
+:
+: Probably into /usr/local ... lib, bin, include/exodus and share/exodus
 :
 	sudo make install
 
@@ -93,6 +105,7 @@ set -euxo pipefail
         #yum -y install postgresql-server
         sudo DEBIAN_FRONTEND=noninteractive \
         apt-get -y install postgresql postgresql-client
+
 :
 : Restart postgres
 :
@@ -118,6 +131,7 @@ set -euxo pipefail
 	user=exodus \
 	password=somesillysecret \
 	> ~/.config/exodus/exodus.cfg
+
 :
 : 4. Add some postgres utility functions
 : ======================================
@@ -125,6 +139,7 @@ set -euxo pipefail
 : one of the exodus cli programs
 :
 	dict2sql
+
 :
 : 5. Testing Exodus
 : =================
@@ -133,6 +148,7 @@ set -euxo pipefail
 	createfile lists || true
 	cd ~
 	testsort
+
 :
 : 6. Programming with Exodus
 : ==========================
@@ -140,6 +156,7 @@ set -euxo pipefail
 : edic hello
 : hello
 : compile hello
+
 :
 : 7. Finished $0 $* in $((SECONDS / 60)) minutes and $((SECONDS % 60)) seconds
 : ======================================================================
