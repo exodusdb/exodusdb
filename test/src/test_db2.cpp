@@ -244,6 +244,7 @@ dict(AGE_IN_YEARS) {
 		printl("cannot write dict_ads, BRAND_CODE");
 
 	//oo style
+	if (not ads.deleteindex("BRAND_CODE")) {};
 	assert(ads.createindex("BRAND_CODE"));
 	assert(ads.deleteindex("BRAND_CODE"));
 

@@ -1,6 +1,10 @@
 #include <exodus/program.h>
 programinit()
 
+	let force = index(OPTIONS, "F");
+	let generate = index(OPTIONS, "G");
+	let verbose = index(OPTIONS, "V");
+
 	var last_sync_date;
 	var last_sync_time;
 
@@ -44,35 +48,29 @@ function main() {
 		return 0;
 	}
 
-	var homedir;
-	if (not homedir.osgetenv("EXO_HOME"))
-		homedir = osgetenv("HOME");
-	var homedatpath = homedir ^ "/dat";
+	let homedir = osgetenv("EXO_HOME") ?: osgetenv("HOME");
+	let homedatpath = homedir ^ "/dat";
 
-	// Get list of dirs from here
-	// NOTE we will always process items in the homedatpath
+	// Get list of dirs from command line or ~/dat
+	// BUT we will always process items found in ~/dat
 	// so that any merged items from exodus and apps will
 	// be correctly added and cpp files fully generated
-	var datpath = COMMAND.f(2);
-	if (not datpath) {
-		datpath = homedatpath;
-	}
+	//let datpath = COMMAND.f(2) ?: homedatpath;
+	let f2 = COMMAND.f(2);
+	let datpath = f2 ?: homedatpath;
+	let f3 = COMMAND.field(FM, 3, 999999);
+	let dirnames = f3 ?: oslistd(datpath ^ "/" "*").sort();
 
-	var dirnames = COMMAND.field(FM, 3, 999999);
+	let txtfmt = "TX";
 
-	var force = index(OPTIONS, "F");
-	var generate = index(OPTIONS, "G");
-	var verbose = index(OPTIONS, "V");
+	let prefix = THREADNO ^ ": sync_dat:";
 
-	var txtfmt = "TX";
-
-	var prefix = THREADNO ^ ": sync_dat:";
-
-	// Skip if no definitions file
+	// Warn if no definitions file
 	var definitions;
-	if (generate or not open("DEFINITIONS", definitions)) {
-		//abort(prefix ^ " Warning: No DEFINITIONS file");
-		logputl(prefix, "Warning: No DEFINITIONS file");
+	if (not open("DEFINITIONS", definitions)) {
+		if (not generate)
+			//abort(prefix ^ " Warning: No DEFINITIONS file");
+			logputl(prefix, "Warning: No DEFINITIONS file");
 		definitions = "";
 	}
 
@@ -96,22 +94,19 @@ function main() {
 		return 0;
 	}
 
-	begintrans() or loglasterror();
+	if (not begintrans())
+		loglasterror();
 
 	// Process each subdir in turn. each one represents a db file.
-	if (not dirnames) {
-		dirnames = oslistd(datpath ^ "/" "*").sort();
-	}
-	//printl(prefix, "Scanning", dirnames.convert(FM, "^"));
 
 	var dictcppfilenames = "";
 
 	for (var dirname : dirnames) {
 
-		var dbfilename = dirname;
-		var isdict = dbfilename.starts("dict.");
+		let dbfilename = dirname;
+		let isdict = dbfilename.starts("dict.");
 
-		var dirpath = homedatpath ^ "/" ^ dirname ^ "/";
+		let dirpath = homedatpath ^ "/" ^ dirname ^ "/";
 
 // Dont skip old dirs, since we skip old files below , and it doesnt take much time to scan dirs
 //		// Skip dirs which are not newer i.e. have no newer records
@@ -126,7 +121,7 @@ function main() {
 
 		// Open or create the target db file
 		var dbfile;
-		if (not open(dbfilename, dbfile)) {
+		if (not generate and not open(dbfilename, dbfile)) {
 			createfile(dbfilename);
 			if (not open(dbfilename, dbfile)) {
 				errputl(prefix, "Error: Cannot create " ^ dbfilename);
@@ -138,7 +133,7 @@ function main() {
 
 		// Process each dat file/record in the subdir
 		//printl(prefix, dirpath);
-		var osfilenames = oslistf(dirpath ^ "*").sort();
+		let osfilenames = oslistf(dirpath ^ "*").sort();
 		for (var osfilename : osfilenames) {
 
 			ID = osfilename;
@@ -150,7 +145,7 @@ function main() {
 				continue;
 
 			// Get the dat record
-			var filepath = dirpath ^ ID;
+			let filepath = dirpath ^ ID;
 			if (not osread(RECORD from filepath)) {
 				errputl(prefix, "Error: Cannot read " ^ ID ^ " from " ^ filepath);
 				continue;
@@ -161,6 +156,19 @@ function main() {
 
 			// RECORD may be empty indicating that it should be deleted
 			// if present in the target dbfile
+
+			// Very similar code in edir and sync_dat
+			let f1 = RECORD.f(1);
+			if (generate and isdict and f1 and var("FS").contains(RECORD.f(1))) {
+
+				// Check justification
+				if (not var("LRTC").contains(RECORD.f(9)))
+					abort("syncdat: Error: In " ^ filepath.quote() ^ " Field 9 of F/S dict items cannot be " ^ RECORD.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.");
+
+				// Check width
+				if (not RECORD.f(10).isnum())
+					abort("syncdat: Error: In " ^ filepath.quote() ^ " Field 10 of F/S items cannot be " ^ RECORD.f(10).quote() ^ "\nField 10 of F/S items must be numeric");
+			}
 
 			// Add it to newcpptext
 			if (generate and isdict and RECORD.f(1) eq "S") {
@@ -315,7 +323,8 @@ function main() {
 	if (not generate and definitions)
 		write(date() ^ FM ^ time() on definitions, definitions_key);
 
-	committrans() or loglasterror();
+	if (not committrans())
+		loglasterror();
 
 	return 0;
 }
@@ -335,4 +344,3 @@ function is_newer(in fsinfo) {
 }
 
 programexit()
-
