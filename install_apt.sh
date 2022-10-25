@@ -12,11 +12,13 @@ set -euxo pipefail
 : or
 : "curl https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | less"
 : "curl https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | bash"
+
 :
 : Installing on:
 :
 	uname -a
 	cat /etc/issue
+
 :
 : Tested on:
 :
@@ -35,9 +37,16 @@ set -euxo pipefail
 : 1. Building and Installing Exodus
 : =================================
 :
+:
+: 'Install into $1, $EXODUSDIR or ~/exodus'
+:
+	EXODUSDIR=${1:-${EXODUSDIR:-~/exodus}}
+
+:
 : Update repos in case building on a pristine installation
 :
 	sudo apt-get update
+
 :
 : Install dependencies
 :
@@ -63,14 +72,14 @@ set -euxo pipefail
 :
 : Refresh git in case reinstalling
 :
-	cd ~/exodus
+	cd $EXODUSDIR
 	git stash
 	git pull
 
 :
 : Config make with all CPUs in parallel
 :
-	cd ~/exodus
+	cd $EXODUSDIR
 	cmake . -D CMAKE_BUILD_TYPE=${BUILD_TYPE:-RelWithDebInfo}
 
 :
@@ -90,7 +99,7 @@ set -euxo pipefail
 	${FORCE_TEST:-} && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` make test
 
 :
-: Install all exodus lib and cli
+: Install all exodus lib and cli - Probably into /usr/local ... lib, bin, include/exodus and share/exodus
 :
 : Probably into /usr/local ... lib, bin, include/exodus and share/exodus
 :
@@ -116,7 +125,7 @@ set -euxo pipefail
 :
 : make install again to install pgexodus extension and functions, and exodus user and database
 :
-        cd ~/exodus
+        cd $EXODUSDIR
         make install
 
 :
@@ -136,13 +145,14 @@ set -euxo pipefail
 : 4. Add some postgres utility functions
 : ======================================
 :
-: one of the exodus cli programs
+: Use an exodus cli program
 :
 	dict2sql
 
 :
 : 5. Testing Exodus
 : =================
+:
 : Every database requires a lists file in order to store select lists
 :
 	createfile lists || true
@@ -152,7 +162,7 @@ set -euxo pipefail
 :
 : 6. Programming with Exodus
 : ==========================
-: you must make some change to hello or actually save it, not just quit
+: You must make some change to hello or actually save it, not just quit.
 : edic hello
 : hello
 : compile hello
