@@ -27,7 +27,7 @@ function main() {
 	//get existing/defaults
 
 	//first from the command
-	var origconfig = field(sentence(), " ", 2, 999999999);
+	var origconfig = field(SENTENCE, " ", 2, 999999999);
 
 	//second from environment
 	//TODO should be per parameter

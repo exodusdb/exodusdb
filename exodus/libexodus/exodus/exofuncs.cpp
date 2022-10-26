@@ -389,9 +389,9 @@ ND PUBLIC bool read(VARREF record, CVR dbfilevar, CVR key) {return record.read(d
 ND PUBLIC bool readc(VARREF record, CVR dbfilevar, CVR key) {return record.readc(dbfilevar, key);}
 ND PUBLIC bool readf(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber) {return record.readf(dbfilevar, key, fieldnumber);}
 
-PUBLIC bool write(CVR record, CVR dbfilevar, CVR key) {return record.write(dbfilevar, key);}
-PUBLIC bool writec(CVR record, CVR dbfilevar, CVR key) {return record.writec(dbfilevar, key);}
-PUBLIC bool writef(CVR record, CVR dbfilevar, CVR key, const int fieldno) {return record.writef(dbfilevar, key, fieldno);}
+   PUBLIC bool write(CVR record, CVR dbfilevar, CVR key) {return record.write(dbfilevar, key);}
+   PUBLIC bool writec(CVR record, CVR dbfilevar, CVR key) {return record.writec(dbfilevar, key);}
+   PUBLIC bool writef(CVR record, CVR dbfilevar, CVR key, const int fieldno) {return record.writef(dbfilevar, key, fieldno);}
 ND PUBLIC bool updaterecord(CVR record, CVR dbfilevar, CVR key) {return record.updaterecord(dbfilevar, key);}
 ND PUBLIC bool insertrecord(CVR record, CVR dbfilevar, CVR key) {return record.insertrecord(dbfilevar, key);}
 
@@ -401,8 +401,8 @@ ND PUBLIC bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key) {return di
 ND PUBLIC var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode);
 ND PUBLIC var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode);
 
-ND PUBLIC const var lasterror() {return var().lasterror();}
-PUBLIC const var loglasterror(CVR source DEFAULT_EMPTY) {return var().loglasterror(source);}
+ND PUBLIC var lasterror() {return var().lasterror();}
+   PUBLIC var loglasterror(CVR source DEFAULT_EMPTY) {return var().loglasterror(source);}
 
 
 

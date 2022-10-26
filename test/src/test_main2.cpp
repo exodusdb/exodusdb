@@ -651,7 +651,7 @@ programinit()
 	tconv = tconv.oconv("T#8");
 	assert(tconv eq("xxxxx/xx" ^ TM ^ "xxx xxx " _FM "xx      "));
 
-	var sentence = sentence();
+	var sentence = SENTENCE;
 
 	{
 

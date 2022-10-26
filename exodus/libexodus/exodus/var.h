@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// clang-format off
+
 #define EXODUS_RELEASE "22.09"
 #define EXODUS_PATCH "22.09.0"
 
@@ -44,15 +46,12 @@ THE SOFTWARE.
 #		define PUBLIC __declspec(dllimport)
 #	endif
 
-#	define DLL_LOCAL
-
 #else
 
 	// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
 	// see nm -D libexodus.so --demangle |grep T -w
 
 #	define PUBLIC __attribute__((visibility("default")))
-#	define DLL_LOCAL __attribute__((visibility("hidden")))
 
 #endif // not windows
 
@@ -1085,64 +1084,60 @@ class PUBLIC var final {
 	// SELF ASSIGN OPERATORS ON TEMPORARIES - all deprecated or deleted to prevent unusual and unnecessary coding
 	///////////////////////////////////////
 
-	#define EXO_DEP	[[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign. ")]]
+	#define DEPRECATE [[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign, to achieve the same.")]]
 
-	EXO_DEP VARREF operator+=(CVR rhs) && {(*this) += rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator*=(CVR rhs) && {(*this) *= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator-=(CVR rhs) && {(*this) -= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator/=(CVR rhs) && {(*this) /= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator%=(CVR rhs) && {(*this) %= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator^=(CVR rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator+=(CVR rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator*=(CVR rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator-=(CVR rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator/=(CVR rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator%=(CVR rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(CVR rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	// Specialisations
 
-	// clang-format off
-
 	// Add
-	EXO_DEP VARREF operator+=(const int    rhs) && {(*this) += rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator+=(const double rhs) && {(*this) += rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator+=(const char   rhs) && {(*this) += rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator+=(const char*  rhs) && {(*this) += rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator+=(const bool   rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator+=(const int    rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator+=(const double rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator+=(const char   rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator+=(const char*  rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator+=(const bool   rhs) && {(*this) += rhs; return *this;}// = delete;
 
 	// Multiply
-	EXO_DEP VARREF operator*=(const int    rhs) && {(*this) *= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator*=(const double rhs) && {(*this) *= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator*=(const char   rhs) && {(*this) *= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator*=(const char*  rhs) && {(*this) *= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator*=(const bool   rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator*=(const int    rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator*=(const double rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator*=(const char   rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator*=(const char*  rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator*=(const bool   rhs) && {(*this) *= rhs; return *this;}// = delete;
 
 	// Subtract
-	EXO_DEP VARREF operator-=(const int    rhs) && {(*this) -= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator-=(const double rhs) && {(*this) -= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator-=(const char   rhs) && {(*this) -= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator-=(const char*  rhs) && {(*this) -= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator-=(const bool   rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator-=(const int    rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator-=(const double rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator-=(const char   rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator-=(const char*  rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator-=(const bool   rhs) && {(*this) -= rhs; return *this;}// = delete;
 
 	// Divide
-	EXO_DEP VARREF operator/=(const int    rhs) && {(*this) /= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator/=(const double rhs) && {(*this) /= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator/=(const char   rhs) && {(*this) /= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator/=(const char*  rhs) && {(*this) /= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator/=(const bool   rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator/=(const int    rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator/=(const double rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator/=(const char   rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator/=(const char*  rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator/=(const bool   rhs) && {(*this) /= rhs; return *this;}// = delete;
 
 	// Modulo
-	EXO_DEP VARREF operator%=(const int    rhs) && {(*this) %= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator%=(const double rhs) && {(*this) %= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator%=(const char   rhs) && {(*this) %= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator%=(const char*  rhs) && {(*this) %= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator%=(const bool   rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator%=(const int    rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator%=(const double rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator%=(const char   rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator%=(const char*  rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator%=(const bool   rhs) && {(*this) %= rhs; return *this;}// = delete;
 
 	// Concat
-	EXO_DEP VARREF operator^=(const int          rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator^=(const double       rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	EXO_DEP VARREF operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(const int          rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(const double       rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
-	// clang-format on
-
-	#undef EXO_DEP
+	#undef DEPRECATE
 
 	//////////////////////
 	// INCREMENT/DECREMENT
@@ -1155,7 +1150,6 @@ class PUBLIC var final {
 	// increment/decrement as prefix - only allow lvalue
 	VARREF operator++() &;
 	VARREF operator--() &;
-
 
 	//////////////////
 	// UNARY OPERATORS
@@ -1192,8 +1186,6 @@ class PUBLIC var final {
 
 	friend class dim;
 	//friend class var_brackets_proxy;
-
-	// clang-format off
 
 	///////////////
 	// FRIEND UTILS
@@ -1443,8 +1435,6 @@ class PUBLIC var final {
 	PUBLIC friend var operator^(TVR            lhs,   const char   char2 ) {return lhs ^= char2 ; }
 	PUBLIC friend var operator^(TVR            lhs,   const int    int2  ) {return lhs ^= int2  ; }
 	PUBLIC friend var operator^(TVR            lhs,   const double dbl2  ) {return lhs ^= dbl2  ; }
-
-	// clang-format on
 
 	// OUTPUT
 	/////////
@@ -1923,19 +1913,19 @@ class PUBLIC var final {
 	ND bool rollbacktrans() const;
 	ND bool committrans() const;
 	ND bool statustrans() const;
-	void cleardbcache() const;
+	   void cleardbcache() const;
 
 	ND bool sqlexec(CVR sqlcmd) const;
 	ND bool sqlexec(CVR sqlcmd, VARREF response) const;
 
-	ND const var lasterror() const;
-	const var loglasterror(CVR source DEFAULT_EMPTY) const;
+	ND var  lasterror() const;
+	   var  loglasterror(CVR source DEFAULT_EMPTY) const;
 
 	// DATABASE MANAGEMENT
 	//////////////////////
 
 	ND bool dbcreate(CVR dbname) const;
-	ND var dblist() const;
+	ND var  dblist() const;
 	ND bool dbcopy(CVR from_dbname, CVR to_dbname) const;
 	ND bool dbdelete(CVR dbname) const;
 
@@ -1943,55 +1933,55 @@ class PUBLIC var final {
 	ND bool renamefile(CVR filename, CVR newfilename) const;
 	ND bool deletefile(CVR filename) const;
 	ND bool clearfile(CVR filename) const;
-	ND var listfiles() const;
+	ND var  listfiles() const;
 
 	ND bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY) const;
 	ND bool deleteindex(CVR fieldname) const;
-	ND var listindex(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
+	ND var  listindex(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
 
 	// bool selftest() const;
-	ND var version() const;
+	ND var  version() const;
 
-	ND var reccount(CVR filename DEFAULT_EMPTY) const;
-	var flushindex(CVR filename DEFAULT_EMPTY) const;
+	ND var  reccount(CVR filename DEFAULT_EMPTY) const;
+	   var  flushindex(CVR filename DEFAULT_EMPTY) const;
 
 	ND bool open(CVR dbfilename, CVR connection DEFAULT_EMPTY);
-	void close();
+	   void close();
 
 	// 1=ok, 0=failed, ""=already locked
-	ND var lock(CVR key) const;
+	ND var  lock(CVR key) const;
 	// void unlock(CVR key) const;
 	// void unlockall() const;
-	bool unlock(CVR key) const;
-	bool unlockall() const;
+	   bool unlock(CVR key) const;
+	   bool unlockall() const;
 
 	// db file i/o
 	ND bool read(CVR filehandle, CVR key);
-	bool write(CVR filehandle, CVR key) const;
-	bool deleterecord(CVR key) const;
+	   bool write(CVR filehandle, CVR key) const;
+	   bool deleterecord(CVR key) const;
 	ND bool updaterecord(CVR filehandle, CVR key) const;
 	ND bool insertrecord(CVR filehandle, CVR key) const;
 
 	// specific db field i/o
 	ND bool readf(CVR filehandle, CVR key, const int fieldno);
-	bool writef(CVR filehandle, CVR key, const int fieldno) const;
+	   bool writef(CVR filehandle, CVR key, const int fieldno) const;
 
 	// cached db file i/o
 	ND bool readc(CVR filehandle, CVR key);
-	bool writec(CVR filehandle, CVR key) const;
-	bool deletec(CVR key) const;
+	   bool writec(CVR filehandle, CVR key) const;
+	   bool deletec(CVR key) const;
 
 	// ExoEnv function now to allow access to RECORD ID DICT etc. and call external
 	// functions
 	// var calculate() const;
 
-	ND var xlate(CVR filename, CVR fieldno, const char* mode) const;
+	ND var  xlate(CVR filename, CVR fieldno, const char* mode) const;
 
 	// DATABASE SORT/SELECT
 	///////////////////////
 
 	ND bool select(CVR sortselectclause DEFAULT_EMPTY);
-	void clearselect();
+	   void clearselect();
 
 	//ND bool hasnext() const;
 	ND bool hasnext();
@@ -1999,10 +1989,10 @@ class PUBLIC var final {
 	ND bool readnext(VARREF key, VARREF valueno);
 	ND bool readnext(VARREF record, VARREF key, VARREF valueno);
 
-	bool savelist(CVR listname);
+	   bool savelist(CVR listname);
 	ND bool getlist(CVR listname);
 	ND bool makelist(CVR listname, CVR keys);
-	bool deletelist(CVR listname) const;
+	   bool deletelist(CVR listname) const;
 	ND bool formlist(CVR keys, CVR fieldno = 0);
 
 	//bool saveselect(CVR filename);
@@ -2010,15 +2000,14 @@ class PUBLIC var final {
 	// OS TIME/DATE
 	///////////////
 
-	ND var date() const;//int days since pick epoch 1967-12-31
-	ND var time() const;//int seconds since last midnight
-	ND var ostime() const;
-	ND var timestamp() const; // floating point fractional days since pick epoch 1967-12-31 00:00:00
-	ND var timestamp(CVR ostime) const; // construct a timestamp from a date and time
-	//ND var timedate() const;// current date and time string eg 09:28:43 09 SEP 2022
+	ND var  date() const;//int days since pick epoch 1967-12-31
+	ND var  time() const;//int seconds since last midnight
+	ND var  ostime() const;
+	ND var  timestamp() const; // floating point fractional days since pick epoch 1967-12-31 00:00:00
+	ND var  timestamp(CVR ostime) const; // construct a timestamp from a date and time
 
-	void ossleep(const int milliseconds) const;
-	var oswait(const int milliseconds, SV directory) const;
+	   void ossleep(const int milliseconds) const;
+	   var  oswait(const int milliseconds, SV directory) const;
 
 	// OS FILE SYSTEM
 	/////////////////
@@ -2026,9 +2015,8 @@ class PUBLIC var final {
 	ND bool osopen(CVR filename, const char* locale DEFAULT_EMPTY) const;
 	ND bool osbread(CVR osfilevar, VARREF offset, const int length);
 	ND bool osbwrite(CVR osfilevar, VARREF offset) const;
-	void osclose() const;
+	   void osclose() const;
 
-	//ND bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
 	ND bool osread(const char* osfilename, const char* codepage DEFAULT_EMPTY);
 	ND bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
 	ND bool osremove() const;
@@ -2036,13 +2024,13 @@ class PUBLIC var final {
 	ND bool oscopy(CVR to_osfilename) const;
 	ND bool osmove(CVR to_osfilename) const;
 
-	ND var oslist(SV globpattern DEFAULT_EMPTY, const int mode = 0) const;
-	ND var oslistf(SV globpattern DEFAULT_EMPTY) const;
-	ND var oslistd(SV globpattern DEFAULT_EMPTY) const;
-	ND var osinfo(const int mode) const;
-	ND var osfile() const;
-	ND var osdir() const;
-	ND var osinfo() const;
+	ND var  oslist(SV globpattern DEFAULT_EMPTY, const int mode = 0) const;
+	ND var  oslistf(SV globpattern DEFAULT_EMPTY) const;
+	ND var  oslistd(SV globpattern DEFAULT_EMPTY) const;
+	ND var  osinfo(const int mode) const;
+	ND var  osfile() const;
+	ND var  osdir() const;
+	ND var  osinfo() const;
 	ND bool osmkdir() const;
 	ND bool osrmdir(bool evenifnotempty = false) const;
 
@@ -2058,11 +2046,11 @@ class PUBLIC var final {
 	ND bool osshell() const;
 	ND bool osshellread(CVR oscmd);
 	ND bool osshellwrite(CVR oscmd) const;
-	ND var ostempdirpath() const;
-	ND var ostempfilename() const;
+	ND var  ostempdirpath() const;
+	ND var  ostempfilename() const;
 
 	ND bool osgetenv(const char* code);
-	void ossetenv(const char* code) const;
+	   void ossetenv(const char* code) const;
 
 
 	///////////////////////////
@@ -2078,8 +2066,8 @@ class PUBLIC var final {
 	void throwNumOverflow(CVR message) const;
 	void throwNumUnderflow(CVR message) const;
 
-	// WARNING: MUST not use any var when checking Undefined
-	// otherwise will get recursion/segfault
+	// WARNING: MUST NOT use any var when checking Undefined
+	// OTHERWISE *WILL* get recursion/segfault
 	void assertDefined(const char* message, const char* varname = "") const {
 		if (var_typ & VARTYP_MASK)
 			throwUndefined(var(varname) ^ " in " ^ message);
@@ -2143,8 +2131,8 @@ class PUBLIC var final {
 		assertString(message, varname);
 		// VERY IMPORTANT:
 		// If var_str is mutated then we MUST
-		// reset all flags to ensure that the int/dbl are lazily
-		// derived from the new string if and when required.
+		// reset all flags to ensure that the int/dbl, if needed,
+		// are again lazily derived from the new string when required.
 		var_typ = VARTYP_STR;
 	}
 
@@ -2153,49 +2141,46 @@ class PUBLIC var final {
 
 	void createString() const;
 
-	ND bool cursorexists();//database, not terminal
+	ND bool cursorexists(); //database, not terminal
 	ND bool selectx(CVR fieldnames, CVR sortselectclause);
 
-	const var setlasterror(CVR msg) const;
-
-	//ND var build_conn_info(CVR conninfo) const;
+	   var  setlasterror(CVR msg) const;
 
 	// TODO check if can speed up by returning reference to converted self like MC
-	// left/right justification
+
+	// Text -> left/right/center padded and truncated
 	ND var oconv_LRC(CVR format) const;
-	// text justification
+	// Text -> justified and folded
 	ND var oconv_T(CVR format) const;
-	// date
+	// Int -> Date
 	ND var oconv_D(const char* conversion) const;
-	// time
+	// Int -> Time
 	ND var oconv_MT(const char* conversion) const;
-	// decimal
+	// Decimal -> Decimal
 	ND var oconv_MD(const char* conversion) const;
-	// character replacement
+	// Character replacement
 	ND VARREF oconv_MR(const char* conversion);
-	// hex
+	// Hex output
+	// Chars -> Hex
 	ND var oconv_HEX(const int ioratio) const;
-	// text fm <-> \+nl
+	// Record (FM) -> text (\n) and \ line endings
 	ND var oconv_TX(const int raw = 0) const;
 
-	// faster primitive arguments
+	// Faster primitive iconv
+	// Int <- Date
 	ND var iconv_D(const char* conversion) const;
-	// var iconv_MT(const char* conversion) const;
+	// Int <- Time
 	ND var iconv_MT() const;
+	// Decimal <- Decimal
 	ND var iconv_MD(const char* conversion) const;
+	// Chars <- Hex
 	ND var iconv_HEX(const int ioratio) const;
+	// Record (FM) <- text (\n) and \ line endings
 	ND var iconv_TX(const int raw = 0) const;
-
-	//ND const std::string to_path_string() const;
-
-	//VARREF localeAwareChangeCase(const int lowerupper);
 
 	ND std::fstream* osopenx(CVR osfilename, const char* locale) const;
 
-	//bool THIS_IS_DBCONN() const { return ((var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
 	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
-	// bool THIS_IS_DBCONN() const    { return var_typ & VARTYP_DBCONN; }
-	// bool THIS_IS_OSFILE() const    { return var_typ & VARTYP_OSFILE; }
 
 	// Convert _VISIBLE_FMS to _ALL_FMS
 	// In header to perhaps aid runtime string literal conversion for operator""_var
@@ -2233,7 +2218,7 @@ class PUBLIC var final {
 		return *this;
 	}
 
-};    // class "var"
+};  // class "var"
 
 // NB we should probably NEVER add operator^(VARREF var1, bool)
 // this is a trick to avoid a problem that exodus concat operator
@@ -2253,7 +2238,9 @@ class PUBLIC var final {
 // or, if you do want to concatenate the result of a comparison do this
 // a^var(b>c)
 
-//class var_iter
+/////////////////////////////////
+// var_iter - iterate over fields
+/////////////////////////////////
 class PUBLIC var_iter {
 
 	const var* pvar_;
@@ -2261,30 +2248,32 @@ class PUBLIC var_iter {
 	mutable std::string::size_type endpos_ = std::string::npos;
 
  public:
-	//default constructor
+	// Default constructor
 	var_iter() = default;
 
-	//construct from var
+	// Construct from var
 	var_iter(CVR v);
 
-	//check iter != iter (i.e. iter != string::npos)
+	// Check iter != iter (i.e. iter != string::npos)
 	bool operator!=(const var_iter& vi);
 
-	//convert to var
+	// Convert to var
 	var operator*() const;
 
-	//iter++
+	// Iter++
 	var_iter operator++();
 
-	//iter-- prefix
+	// Iter-- prefix
 	var_iter operator--();
 
-	//--iter postfix
+	// --iter postfix
 	var_iter operator--(int);
 
-}; // class var_iter
+};
 
-//class var_proxy1 - replace or extract fn
+///////////////////////////////////////////////
+// var_proxy1 - replace or extract fields by fn
+///////////////////////////////////////////////
 class PUBLIC var_proxy1 {
 
  private:
@@ -2296,32 +2285,36 @@ class PUBLIC var_proxy1 {
 
  public:
 
-	//constructor
+	// Constructor for var + fn
 	var_proxy1(var& var1, int fn) : var_(var1), fn_(fn) {}
 
-	//implicit conversion to var if on the right hand side
+	// Implicit conversion to var if on the right hand side
+	// Equivalent to PickOS expression 'xxx<fn>' but with round instead of angle brackets
 	operator var() const {
 		return var_.f(fn_);
 	}
 
-	//operator assign = old pickos "replace()" but with round instead of angle brackets
+	// Operator assign using =
+	// Equivalent to PickOS statement 'xxx<fn> = yyy' but with round instead of angle brackets
 	void operator=(CVR replacement) {
 		var_.r(fn_, replacement);
 	}
 
-	//operator bool
+	// Operator bool. Allow usage in if statements etc.
+	// if (xxxx<fn>)
 	explicit operator bool() const {
 		return var_.f(fn_);
 	}
 
-	//operator []
+	// Operator []. Allow character extraction.
+	// xxx(fn)[cn]
 	ND var operator[](const int pos1) const {
 		return var_.f(fn_)[pos1];
 	}
 
-}; // class var_proxy1
+};
 
-//class var_proxy2 - replace or extract fn, sn
+// class var_proxy2 - replace or extract fn, sn
 class PUBLIC var_proxy2 {
 
  private:
@@ -2334,32 +2327,27 @@ class PUBLIC var_proxy2 {
 
  public:
 
-	//constructor
 	var_proxy2(var& var1, int fn, int vn) : var_(var1), fn_(fn), vn_(vn) {}
 
-	//implicit conversion to var if on the right hand side
 	operator var() const {
 		return var_.f(fn_, vn_);
 	}
 
-	//operator assign = old pick replace but with round instead of angle brackets
 	void operator=(CVR replacement) {
 		var_.r(fn_, vn_, replacement);
 	}
 
-	//operator bool
 	explicit operator bool() const {
 		return var_.f(fn_, vn_);
 	}
 
-	//operator []
 	ND var operator[](const int pos1) const {
 		return var_.f(fn_, vn_)[pos1];
 	}
 
-}; // class var_proxy2
+};
 
-//class var_proxy3 - replace or extract fn, vn, sn
+// class var_proxy3 - replace or extract fn, vn, sn
 class PUBLIC var_proxy3 {
 
  private:
@@ -2373,32 +2361,29 @@ class PUBLIC var_proxy3 {
 
  public:
 
-	//constructor
 	var_proxy3(var& var1, int fn, int vn = 0, int sn = 0) : var_(var1), fn_(fn), vn_(vn), sn_(sn) {}
 
-	//implicit conversion to var if on the right hand side
 	operator var() const {
 		return var_.f(fn_, vn_, sn_);
 	}
 
-	//operator assign = old pick replace but with round instead of angle brackets
 	void operator=(CVR replacement) {
 		var_.r(fn_, vn_, sn_, replacement);
 	}
 
-	//operator bool
 	explicit operator bool() const {
 		return var_.f(fn_, vn_, sn_);
 	}
 
-	//operator []
 	ND var operator[](const int pos1) const {
 		return var_.f(fn_, vn_, sn_)[pos1];
 	}
 
-}; // class var_proxy3
+};
 
-// var versions of separator characters. Must be after class declaration
+////////////////////////////////////////////////
+// var versions of various field mark characters
+////////////////////////////////////////////////
 	PUBLIC extern const var RM;
 	PUBLIC extern const var FM;
 	PUBLIC extern const var VM;
@@ -2422,11 +2407,14 @@ class PUBLIC var_proxy3 {
 	const var SQ = SQ_;
 #endif
 
+/////////////////////////////////////
 // A global flag used in mvdbpostgres
+/////////////////////////////////////
 [[maybe_unused]] static inline int DBTRACE = var().osgetenv("EXO_DBTRACE");
 
-// A public base exception for all other exceptions so exodus programmers can catch
-// var exceptions generally
+/////////////////////////
+// A base exception class - Provide stack tracing
+/////////////////////////
 class PUBLIC VarError {
  public:
 
@@ -2444,25 +2432,24 @@ class PUBLIC VarError {
 
 };
 
-//user literal _var
-///////////////////
+////////////////////
+// _var user literal
+////////////////////
 
-//inline avoids hitting ODR rule
+//inline to evade ODR rule
 
+// "abc^def"_var
 ND inline var operator""_var(const char* cstr, std::size_t size) {
-	//return var(cstr, size).convert(_VISIBLE_FMS, _RM _FM _VM _SM _TM _ST);
-	var result = var(cstr, size);
-	result.fmiconverter();
-	return result;
+	return var(cstr, size).fmiconverter();
 }
 
+// 123456_var
 ND inline var operator""_var(unsigned long long int i) {
-	//return var(int64_t(i));
 	return var(i);
 }
 
+// 123.456_var
 ND inline var operator""_var(long double d) {
-	//return var(static_cast<double>(d));
 	return var(d);
 }
 

@@ -590,7 +590,7 @@ DBConn* get_dbconn(CVR dbhandle) {
 	return thread_dbconnector.get_dbconn(dbconn_no);
 }
 
-const var var::setlasterror(CVR msg) const {
+var var::setlasterror(CVR msg) const {
 	// no checking for speed
 	// THISIS("void var::lasterror(CVR msg")
 	// ISSTRING(msg)
@@ -605,12 +605,12 @@ const var var::setlasterror(CVR msg) const {
 	return lasterror();
 }
 
-const var var::lasterror() const {
+var var::lasterror() const {
 	//TRACE(thread_file_handles.size());
 	return thread_lasterror;
 }
 
-const var var::loglasterror(CVR source) const {
+var var::loglasterror(CVR source) const {
 	return thread_lasterror.logputl(source ^ " ");
 }
 
@@ -1302,7 +1302,7 @@ bool var::read(CVR filehandle, CVR key) {
 	//	key2=key.var_str;
 	std::string key2 = key.normalize().var_str;
 
-	// filehandle dos or DOS means osread/oswrite/osremove
+	// dos or DOS filehandle means osread/oswrite/osremove
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
 		//return this->osread(key2);  //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is

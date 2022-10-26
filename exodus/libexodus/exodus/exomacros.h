@@ -46,49 +46,47 @@ THE SOFTWARE.
 // #define eq ==
 //(regrettably eq is defined in global namespace in some libraries)
 
-// for dll/so determine how functions are to be exported without name mangling
-#ifndef EXODUS_LINK_MAPORDEF
-#	define EXODUS_LINK_MAPORDEF 0
-#endif
-
-#if EXODUS_LINK_MAPORDEF == 0
-	#define EXODUS_EXTERN_C extern "C"
-	// disable the following warning because seems it can be ignored at least in MSVC 2005 32bit
-	// warning C4190: 'xyz' has C-linkage specified, but returns UDT 'exodus::var' which is incompatible
-	// with C
-#endif
-
-// work out if any functions are being exported or imported
-// used in function and subroutine macros
-// also perhaps need to avoid "gnu export all" performance issue
-// http://gcc.gnu.org/wiki/Visibility
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-#	if defined _DLL || defined _SO
-#		ifdef __GNUC__
-#			define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((dllexport))
-#		else
-#			define EXODUSMACRO_IMPORTEXPORT \
-	EXODUS_EXTERN_C __declspec(  \
-		dllexport)	// Note: actually gcc seems to also support this syntax.
-#		endif
-#	else
-#		ifdef __GNUC__
-#			define EXODUSMACRO_IMPORTEXPORT __attribute__((dllimport))
-#		else
-#			define EXODUSMACRO_IMPORTEXPORT \
-	__declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
-#		endif
-#	endif
-#else
-#	if __GNUC__ >= 4
-// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
-#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((visibility("default")))
-#		define DLL_LOCAL __attribute__((visibility("hidden")))
-#	else
-#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C
-#		define DLL_LOCAL
-#	endif
-#endif
+//// for dll/so determine how functions are to be exported without name mangling
+//#ifndef EXODUS_LINK_MAPORDEF
+//#	define EXODUS_LINK_MAPORDEF 0
+//#endif
+//
+//#if EXODUS_LINK_MAPORDEF == 0
+//	#define EXODUS_EXTERN_C extern "C"
+//	// disable the following warning because seems it can be ignored at least in MSVC 2005 32bit
+//	// warning C4190: 'xyz' has C-linkage specified, but returns UDT 'exodus::var' which is incompatible
+//	// with C
+//#endif
+//
+////// work out if any functions are being exported or imported
+//// used in function and subroutine macros
+//// also perhaps need to avoid "gnu export all" performance issue
+//// http://gcc.gnu.org/wiki/Visibility
+//#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+//#	if defined _DLL || defined _SO
+//#		ifdef __GNUC__
+//#			define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((dllexport))
+//#		else
+//#			define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __declspec(  dllexport)
+//// Note: actually gcc seems to also support this syntax.
+//#		endif
+//#	else
+//#		ifdef __GNUC__
+//#			define EXODUSMACRO_IMPORTEXPORT __attribute__((dllimport))
+//#		else
+//#			define EXODUSMACRO_IMPORTEXPORT __declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
+//#		endif
+//#	endif
+//#else
+//#	if __GNUC__ >= 4
+//// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
+//#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((visibility("default")))
+////#		define DLL_LOCAL __attribute__((visibility("hidden")))
+//#	else
+//#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C
+////#		define DLL_LOCAL
+//#	endif
+//#endif
 
 // allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
 #define subroutine EXODUSMACRO_IMPORTEXPORT void
@@ -101,7 +99,7 @@ THE SOFTWARE.
 #define gosub
 
 // allow pseudo pick syntax
-#define sentence() SENTENCE
+//#define sentence() SENTENCE
 
 // class init
 // allow multiple named "exodus classes" useful for dictionary item programs where each dict item

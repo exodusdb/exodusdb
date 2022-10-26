@@ -6,3 +6,6 @@ t_*.cpp
 
 test_*
 !test_*.cpp
+
+testcommandline
+libtestcommandlib.so

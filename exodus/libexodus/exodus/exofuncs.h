@@ -81,9 +81,9 @@ namespace exodus {
 
 int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno);
 
-ND var osgetenv(CVR envcode DEFAULT_EMPTY);
+ND var  osgetenv(CVR envcode DEFAULT_EMPTY);
 ND bool osgetenv(CVR code, VARREF value);
-void ossetenv(CVR code, CVR value);
+   void ossetenv(CVR code, CVR value);
 
 ND var ostempdirpath();
 ND var ostempfilename();
@@ -91,8 +91,8 @@ ND var ostempfilename();
 ND bool assigned(CVR var1);
 ND bool unassigned(CVR var1);
 
-void move(VARREF fromvar, VARREF tovar);
-void swap(VARREF var1, VARREF var2);
+   void move(VARREF fromvar, VARREF tovar);
+   void swap(VARREF var1, VARREF var2);
 
 // OS
 
@@ -103,14 +103,14 @@ ND var timestamp();
 ND var timestamp(CVR date, CVR time);
 //ND var timedate();
 
-void ossleep(const int milliseconds);
-ND var oswait(const int milliseconds, SV dirpath);
+   void ossleep(const int milliseconds);
+ND var  oswait(const int milliseconds, SV dirpath);
 
 // 4 argument version for statement format
 // osbread(data from x at y length z)
 // Read/write osfile at specified offset. Must open/close.
 ND bool osopen(CVR osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
-void osclose(CVR osfilevar);
+   void osclose(CVR osfilevar);
 // Versions where offset is input and output
 ND bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length);
 ND bool osbwrite(CVR data, CVR osfilevar, VARREF offset);
@@ -125,43 +125,43 @@ ND bool oswrite(CVR data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
 ND bool osread(VARREF data, CVR osfilepath, const char* codepage DEFAULT_EMPTY);
 // Simple version without codepage returns the contents or "" if file cannot be read
 // one argument returns the contents directly to be used in assignments
-ND var osread(CVR osfilepath);
+ND var  osread(CVR osfilepath);
 
 ND bool osremove(CVR ospath);
 ND bool osrename(CVR old_ospath, CVR new_ospath);
 ND bool oscopy(CVR from_ospath, CVR to_ospath);
 ND bool osmove(CVR from_ospath, CVR to_ospath);
 
-ND var oslist(CVR path DEFAULT_DOT, SV globpattern DEFAULT_EMPTY, const int mode DEFAULT_0);
-ND var oslistf(CVR filepath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
-ND var oslistd(CVR dirpath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
+ND var  oslist(CVR path DEFAULT_DOT, SV globpattern DEFAULT_EMPTY, const int mode DEFAULT_0);
+ND var  oslistf(CVR filepath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
+ND var  oslistd(CVR dirpath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
 
-ND var osinfo(CVR path, const int mode DEFAULT_0);
-ND var osfile(CVR filepath);
-ND var osdir(CVR dirpath);
+ND var  osinfo(CVR path, const int mode DEFAULT_0);
+ND var  osfile(CVR filepath);
+ND var  osdir(CVR dirpath);
 
 
 ND bool osmkdir(CVR dirpath);
 ND bool osrmdir(CVR dirpath, const bool evenifnotempty DEFAULT_FALSE);
 
-ND var oscwd();
-ND var oscwd(CVR dirpath);
+ND var  oscwd();
+ND var  oscwd(CVR dirpath);
 
-void osflush();
-ND var ospid();
+   void osflush();
+ND var  ospid();
 
 ND bool osshell(CVR command);
 ND bool osshellwrite(CVR writestr, CVR command);
 ND bool osshellread(VARREF readstr, CVR command);
-ND var osshellread(CVR command);
+ND var  osshellread(CVR command);
 
 //var execute(CVR command);
 
 //void debug(CVR DEFAULT_EMPTY);
 ND var backtrace();
 
-bool setxlocale(const char* locale);
-ND var getxlocale();
+   bool setxlocale(const char* locale);
+ND var  getxlocale();
 
 // MATH
 
@@ -188,12 +188,12 @@ ND var floor(CVR num1);
 ND var round(CVR num1, const int ndecimals DEFAULT_0);
 
 ND var rnd(const int number);
-void initrnd(CVR seed DEFAULT_0);
+   void initrnd(CVR seed DEFAULT_0);
 
 // INPUT
 
 ND var getprompt();
-void setprompt(CVR prompt);
+   void setprompt(CVR prompt);
 
 var input();
 
@@ -204,10 +204,10 @@ var inputn(const int nchars);
 ND bool isterminal();
 ND bool hasinput(const int millisecs DEFAULT_0);
 ND bool eof();
-bool echo(const int on_off);
+   bool echo(const int on_off);
 
-void breakon();
-void breakoff();
+   void breakon();
+   void breakoff();
 
 // SIMPLE STRINGS
 
@@ -396,11 +396,11 @@ VARREF parser(VARREF iostring, char sepchar DEFAULT_CSPACE);
 // DATABASE
 
 ND bool connect(CVR connectioninfo DEFAULT_EMPTY);
-void disconnect();
-void disconnectall();
+   void disconnect();
+   void disconnectall();
 
 ND bool dbcreate(CVR dbname);
-ND var dblist();
+ND var  dblist();
 ND bool dbcopy(CVR from_dbname, CVR to_dbname);
 ND bool dbdelete(CVR dbname);
 
@@ -408,23 +408,23 @@ ND bool createfile(CVR dbfilename);
 ND bool deletefile(CVR dbfilename_or_var);
 ND bool clearfile(CVR dbfilename_or_var);
 ND bool renamefile(CVR old_dbfilename, CVR new_dbfilename);
-ND var listfiles();
+ND var  listfiles();
 
-ND var reccount(CVR dbfilename_or_var);
+ND var  reccount(CVR dbfilename_or_var);
 
 ND bool createindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY, CVR dictfilename DEFAULT_EMPTY);
 ND bool deleteindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY);
-ND var listindex(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
+ND var  listindex(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
 
 ND bool begintrans();
 ND bool statustrans();
 ND bool rollbacktrans();
 ND bool committrans();
-void cleardbcache();
+   void cleardbcache();
 
 ND bool lock(CVR dbfilevar, CVR key);
-void unlock(CVR dbfilevar, CVR key);
-void unlockall();
+   void unlock(CVR dbfilevar, CVR key);
+   void unlockall();
 
 ND bool open(CVR dbfilename, VARREF dbfilevar);
 ND bool open(CVR dbfilename);
@@ -434,9 +434,9 @@ ND bool read(VARREF record, CVR dbfilevar, CVR key);
 ND bool readc(VARREF record, CVR dbfilevar, CVR key);
 ND bool readf(VARREF record, CVR dbfilevar, CVR key, CVR fieldnumber);
 
-bool write(CVR record, CVR dbfilevar, CVR key);
-bool writec(CVR record, CVR dbfilevar, CVR key);
-bool writef(CVR record, CVR dbfilevar, CVR key, const int fieldno);
+   bool write(CVR record, CVR dbfilevar, CVR key);
+   bool writec(CVR record, CVR dbfilevar, CVR key);
+   bool writef(CVR record, CVR dbfilevar, CVR key, const int fieldno);
 ND bool updaterecord(CVR record, CVR dbfilevar, CVR key);
 ND bool insertrecord(CVR record, CVR dbfilevar, CVR key);
 
@@ -454,8 +454,8 @@ ND bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
 ND var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode);
 ND var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode);
 
-ND const var lasterror();
-const var loglasterror(CVR source DEFAULT_SPACE);
+ND var lasterror();
+   var loglasterror(CVR source DEFAULT_SPACE);
 
 ////////////////////////////////////////////
 //output(args), outputl(args), outputt(args)

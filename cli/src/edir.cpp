@@ -108,7 +108,7 @@ function main() {
 		//file has been edited
 		else if (fileinfo2 ne fileinfo) {
 
-			var text2 = osread(text2, temposfilename);
+			var text2 = osread(temposfilename);
 
 			if (text2 == "") {
 				abort("Could not read local copy after editing " ^ temposfilename);
