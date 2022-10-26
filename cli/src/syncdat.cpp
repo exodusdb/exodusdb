@@ -44,6 +44,13 @@ function main() {
 			"                  # Generate/compile dict*.cpp files.\n"
 			"\n"
 			"    syncdat '' voc dict.voc # Just the voc and dict.voc files\n"
+			"\n"
+			"NOTES\n"
+			"\n"
+			"An empty dat file causes deletion of the database RECORD.\n"
+			"\n"
+			"An empty dat dir or a dir containing the file 'SYNCDAT_DELETE'\n"
+			"causes deletion of the database FILE\n"
 		);
 		return 0;
 	}
@@ -106,6 +113,7 @@ function main() {
 
 	for (var dirname : dirnames) {
 
+		var dbfile;
 		let dbfilename = dirname;
 		let isdict = dbfilename.starts("dict.");
 
@@ -122,23 +130,41 @@ function main() {
 //			}
 //		}
 
-		// Open or create the target db file
-		var dbfile;
-		if (not generate and not open(dbfilename, dbfile)) {
-			createfile(dbfilename);
-			if (not open(dbfilename, dbfile)) {
-				errors(-1) = lasterror();
-				loglasterror();
-				continue;
+		let osfilenames = oslistf(dirpath ^ "*").sort();
+
+		if (not generate) {
+
+			// Empty dirs or dirs containing a file SYNCDAT_DELETE
+			// cause deletion of the database file with the same name as the dir
+			if (osfilenames.locate("SYNCDAT_DELETE", MV, 0) or osfilenames eq "") {
+				if (var().open(dbfilename)) {
+
+					//TODO delete all functions first for S dict items with pgsql
+
+					if (not var("").deletefile(dbfilename)) {
+						errors(-1) = lasterror();
+						loglasterror();
+					}
+				}
+				continue; // next dirname
 			}
+
+			// Open or create the target db file
+			if (not open(dbfilename, dbfile)) {
+				createfile(dbfilename);
+				if (not open(dbfilename, dbfile)) {
+					errors(-1) = lasterror();
+					loglasterror();
+					continue;
+				}
+			}
+
 		}
 
 		var newcpptext = "#include <exodus/library.h>\n";
 		var dict2sql_ids = "";
 
 		// Process each dat file/record in the subdir
-		//printl(prefix, dirpath);
-		let osfilenames = oslistf(dirpath ^ "*").sort();
 		for (var osfilename : osfilenames) {
 
 			ID = osfilename;
@@ -277,7 +303,7 @@ function main() {
 
 		} // next dat file
 
-		// Load and chanegd functions into database
+		// Load and changed functions into database
 		if (dict2sql_ids) {
 			var cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids;
 			//cmd ^= " {V}";
