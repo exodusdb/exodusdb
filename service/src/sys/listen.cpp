@@ -804,7 +804,7 @@ function loop_exit() {
 
 				USERNAME = username;
 
-			} catch (VarError e) {
+			} catch (VarError& e) {
 				errputl(e.description);
 			}
 		}
@@ -1483,7 +1483,7 @@ subroutine process() {
 			if (not committrans())
 				response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
 
-		} catch (VarError e) {
+		} catch (VarError& e) {
 			rollbacktrans();
 			// Similar code in net.cpp and listen.cpp
 			response_ = e.description.unassigned("No error message") ^ FM ^ e.stack();

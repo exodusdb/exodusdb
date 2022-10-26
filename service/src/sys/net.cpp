@@ -50,7 +50,7 @@ listen:
 
 			execute(cmd);
 
-		} catch (VarError varerror) {
+		} catch (VarError& varerror) {
 			// Similar code in net.cpp and listen.cpp
 			msg_ = varerror.description.unassigned("No error message") ^ FM ^ backtrace();
 		}
