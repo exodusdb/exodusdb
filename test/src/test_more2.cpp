@@ -21,20 +21,22 @@ programinit()
 		assert(x.toInt()    eq 123);
 	}
 
-	//move constructor
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+	// Test move constructor
 	{
-		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move
+		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
 		var x = std::move(var("xyz"));
 		assert(x eq "xyz");
 	}
-
-	//move assign
+	// Test move assign
 	{
 		var x;
-		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move
+		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
 		x = std::move(var("xyz"));
 		assert(x eq "xyz");
 	}
+#pragma clang diagnostic pop
 
 	//++
 	{

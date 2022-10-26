@@ -27,6 +27,7 @@ THE SOFTWARE.
 #define EXODUS_RELEASE "22.09"
 #define EXODUS_PATCH "22.09.0"
 
+#include <iostream>
 #include <string>
 #include <string_view>
 //#include "timeaccount.h"
@@ -60,11 +61,6 @@ THE SOFTWARE.
 //#else
 //#	define EXTERN
 //#endif
-
-// #define EXO_SNITCH
-#ifdef EXO_SNITCH
-#	include <iostream> // only for debugging
-#endif
 
 #define ND [[nodiscard]]
 

@@ -144,7 +144,7 @@ function main() {
 	// accounting<1>=1 for accounting system present
 	// accounting<2>=1 for only stock ledgers
 	// accounting<3> for allocationorder
-	// accounting<4> for mv buffer of currency or unitcodes
+	// accounting<4> for mv buffer of currency codes
 	// accounting<5> for mv buffer of fmts for <4>
 	var interactive = false;  //not(SYSTEM.f(33));
 	// equ generalresultcode to system<34>
@@ -1144,9 +1144,12 @@ nextreport:
 	if (not(openfile("MARKET_VERSIONS", xx, "MARKETS"))) {
 		valid = 0;
 	}
-	if (not(openfile("UNITS", sys.units, "CURRENCIES"))) {
-		valid	  = 0;
-		sys.units = "";
+//	if (not(openfile("UNITS", sys.units, "CURRENCIES"))) {
+//		valid	  = 0;
+//		sys.units = "";
+//	}
+	if (xx.open("UNITS", "")) {
+		perform("DELETEFILE UNITS (S)");
 	}
 	if (not(openfile("ADDRESSES", sys.addresses, "DEFINITIONS"))) {
 		valid = 0;

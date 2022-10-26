@@ -24,7 +24,6 @@ function main() {
 	// gen.companies="companies";
 	// gen.currencies="currencies";
 	// gen.documents="documents";
-	// gen.units="units";
 
 	createfile("VOC");
 	createfile("DICT.DEFINITIONS");

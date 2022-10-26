@@ -18,12 +18,12 @@ commoninit(sys,sys_common_no)
 	var currencies;
 	var document;
 	var documents;
-	var unit;
-	var units;
+//	var unit;
+//	var units;
 	var markets;
-	var _security;
+//	var _security;
 	var glang;
-	var _definitions;
+//	var _definitions;
 	var accounting;
 
 commonexit(sys,sys_common_no)
