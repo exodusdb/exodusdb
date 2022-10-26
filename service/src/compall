@@ -34,7 +34,7 @@ set -euxo pipefail
 : Regenerate dict_xxxxxxxx.cpp files where dat have files changed
 : ===============================================================
 :
-	sync_dat dat {G$COMPILER_OPTIONS}
+	syncdat dat {G$COMPILER_OPTIONS}
 
 :
 : Compile EXODUS service
@@ -51,11 +51,11 @@ set -euxo pipefail
 	compile alt exo sys {S${COMPILER_OPTIONS}}
 
 :
-: Flag sync_dat to review all and sync_dat to exodus
+: Flag syncdat to review all and syncdat to exodus
 : ==================================================
 :
 	touch ~/dat
-	sync_dat
+	syncdat
 
 :
 : Finished compiling EXODUS service in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.

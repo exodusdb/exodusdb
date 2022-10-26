@@ -70,7 +70,7 @@
 	add_executable(edir edir.cpp)
 	add_executable(listindex listindex.cpp)
 	add_executable(testsort testsort.cpp)
-	add_executable(sync_dat sync_dat.cpp)
+	add_executable(syncdat syncdat.cpp)
 	add_executable(convsyntax convsyntax.cpp)
 	add_executable(redefine redefine.cpp)
 
@@ -121,7 +121,7 @@
 	target_link_libraries(listdict exodus stdc++fs ${LIBS})
 	target_link_libraries(listindex exodus stdc++fs ${LIBS})
 	target_link_libraries(testsort exodus stdc++fs ${LIBS})
-	target_link_libraries(sync_dat exodus stdc++fs ${LIBS})
+	target_link_libraries(syncdat exodus stdc++fs ${LIBS})
 	target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
 	target_link_libraries(redefine exodus stdc++fs ${LIBS})
 
@@ -160,7 +160,7 @@
 			listindex
 			testsort
 			configexodus
-			sync_dat
+			syncdat
 			convsyntax
 			redefine
 

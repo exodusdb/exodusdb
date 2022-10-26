@@ -360,7 +360,7 @@ updateversion:
 	// also load any new or amended pgsql functions found in dict files in dat
 	call log2("*install any new db dat data if thread 0 or 1", logtime);
 	if (THREADNO le 1)
-		osshell("sync_dat");
+		osshell("syncdat");
 
 	call log2("*copy any new data records", logtime);
 	var	 bp;

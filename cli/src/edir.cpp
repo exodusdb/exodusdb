@@ -138,7 +138,7 @@ function main() {
 					dictrec = dictrec.iconv(txtfmt);
 				}
 
-				// Very similar code in edir and sync_dat
+				// Very similar code in edir and syncdat
 				if (var("FS").contains(dictrec.f(1))) {
 
 					var options = "";

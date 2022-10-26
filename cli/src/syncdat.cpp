@@ -14,7 +14,7 @@ function main() {
 		logputl(
 			"NAME\n"
 			"\n"
-			"    sync_dat\n"
+			"    syncdat\n"
 			"\n"
 			"DESCRIPTION\n"
 			"\n"
@@ -23,14 +23,14 @@ function main() {
 			"\n"
 			"SYNTAX\n"
 			"\n"
-			"    sync_dat [datpath] [filename]... [{OPTIONS}]\n"
+			"    syncdat [datpath] [filename]... [{OPTIONS}]\n"
 			"\n"
 			"    datpath defaults to $EXO_HOME/dat or $HOME/dat\n"
 			"\n"
 			"OPTIONS {inside braces}\n"
 			"\n"
 			"    F = Force. Dont skip dirs/files older than\n"
-			"               last sync_dat recorded in DEFINITIONS file\n"
+			"               last syncdat recorded in DEFINITIONS file\n"
 			"\n"
 			"    G = Generate and compile dict_*.cpp\n"
 			"\n"
@@ -38,12 +38,12 @@ function main() {
 			"\n"
 			"EXAMPLES\n"
 			"\n"
-			"    sync_dat # Do all dat files not done already\n"
+			"    syncdat # Do all dat files not done already\n"
 			"\n"
-			"    sync_dat {FG} # Do all dat files\n"
+			"    syncdat {FG} # Do all dat files\n"
 			"                  # Generate/compile dict*.cpp files.\n"
 			"\n"
-			"    sync_dat '' voc dict.voc # Just the voc and dict.voc files\n"
+			"    syncdat '' voc dict.voc # Just the voc and dict.voc files\n"
 		);
 		return 0;
 	}
@@ -63,7 +63,7 @@ function main() {
 
 	let txtfmt = "TX";
 
-	let prefix = THREADNO ^ ": sync_dat:";
+	let prefix = THREADNO ^ ": syncdat:";
 
 	// Warn if no definitions file
 	var definitions;
@@ -76,7 +76,7 @@ function main() {
 
 	// Get the date and time of last sync
 	var last_sync;
-	var definitions_key = "LAST_SYNC_DATE_TIME*DAT";
+	var definitions_key = "LAST_SYNCDATE_TIME*DAT";
 	if (not definitions or not read(last_sync, definitions, definitions_key))
 		last_sync = "";
 	last_sync_date = last_sync.f(1);
@@ -164,7 +164,7 @@ function main() {
 			// RECORD may be empty indicating that it should be deleted
 			// if present in the target dbfile
 
-			// Very similar code in edir and sync_dat
+			// Very similar code in edir and syncdat
 			let f1 = RECORD.f(1);
 			if (generate and isdict and f1 and var("FS").contains(RECORD.f(1))) {
 
@@ -259,11 +259,11 @@ function main() {
 					if (RECORD.len() eq 0) {
 						// Delete the RECORD
 						deleterecord(dbfile, ID);
-						printl("sync_dat:", dbfilename, ID, "Deleted");
+						printl("syncdat:", dbfilename, ID, "Deleted");
 					} else {
 						// Write the RECORD
 						write(RECORD on dbfile, ID);
-						printl("sync_dat:", dbfilename, ID, "Written");
+						printl("syncdat:", dbfilename, ID, "Written");
 					}
 				}
 
@@ -299,7 +299,7 @@ function main() {
 
 			var incfiletext;
 			if (not osread(incfiletext from incfilename)) {
-				//abort("sync_dat cannot read " ^ incfilename);
+				//abort("syncdat cannot read " ^ incfilename);
 				errputl(prefix, "Warning: Cannot read " ^ incfilename);
 				continue;
 			}
@@ -319,7 +319,7 @@ function main() {
 			} else {
 				//if (not oswrite(newcpptext on dbfilename))
 				if (not oswrite(newcpptext on dictcppfilename))
-					abort("sync_dat cannot write " ^ dictcppfilename);
+					abort("syncdat cannot write " ^ dictcppfilename);
 				printl("Updated", dictcppfilename);
 			}
 
@@ -333,7 +333,7 @@ function main() {
 		var cmd = "compile " ^ dictcppfilenames ^ "{S}";
 		printl(cmd);
 		if (not osshell(cmd))
-			abort("sync_dat could not compile one or more dict_xxxx.cpp files");
+			abort("syncdat could not compile one or more dict_xxxx.cpp files");
 	}
 
 	// Record the current sync date and time
