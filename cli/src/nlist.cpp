@@ -1238,8 +1238,9 @@ x1exit:
 	// Convert to html with colspan/rowspan where necessary and (Base) as currcode
 	if (html) {
 		//var basecurrcode = sys.company.f(3)
-		//var basecurrcode = SYSTEM(999);
-		var basecurrcode = "";
+		//var basecurrcode = "";
+		// basecurrencycode stored in SYSTEM in initcompany
+		var basecurrcode = SYSTEM.f(134);
 		call htmllib2("COLROWSPAN", colhdg, thproperties, nobase, basecurrcode);
 	}
 

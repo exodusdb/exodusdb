@@ -28,7 +28,7 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-	var logfilename;
+var logfilename;
 var portno;			  //num
 var lastmonitortime;  //num
 var lastautorun;	  //num
@@ -785,7 +785,10 @@ function loop_exit() {
 					begintrans();
 				}
 
+				// Manual commands
+				//////////////////////
 				var ok = execute(cmd);
+				//////////////////////
 
 				if (statustrans()) {
 					if (decide("Commit any database updates ?", "Commit" _VM "Rollback") eq "Commit") {
@@ -1479,10 +1482,11 @@ subroutine process() {
 			gosub process2();
 			if (not committrans())
 				response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
-		} catch (VarError varerror) {
+
+		} catch (VarError e) {
 			rollbacktrans();
 			// Similar code in net.cpp and listen.cpp
-			response_ = varerror.description.unassigned("No error message") ^ FM ^ varerror.stack();
+			response_ = e.description.unassigned("No error message") ^ FM ^ e.stack();
 		}
 
 	return;
