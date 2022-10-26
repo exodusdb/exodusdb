@@ -3,7 +3,7 @@
 
 	SYNTAX
 
-		dict2sql [EXTENSIONS] [FILENAME,...] [DICTID]
+		dict2sql [EXTENSIONS] [FILENAME,...] [DICTID] ...
 
 	EXTENSIONS
 
@@ -24,9 +24,9 @@
 
 		Use comma to separate multiple files WITHOUT any spaces.
 
-	DICTID
+	DICTID ...
 
-		If provided then only that dictionary item will be processed.
+		If provided then only those dictionary items will be processed.
 
 */
 
@@ -56,7 +56,7 @@ function main() {
 	//TODO update comment to reflect the move to schema "dict" and allow for $EXO_DICT and exodus_dict
 
 	// Syntax:
-	// dict2sql {filename {dictid}} {V}
+	// dict2sql {filename {dictid} ...} {V}
 
 	// 1. Creates pgsql functions to calculate columns given data and key
 	//    for each dictitem in each dictfile
@@ -93,13 +93,17 @@ function main() {
 	// ...
 
 	//establish the default connection BEFORE opening a connection to dict database
-	connect();
+	if (not connect())
+		abort(lasterror());
+
+	if (not begintrans())
+		abort(lasterror());
 
 	//for dicts if not default
 	var dictconnection = "";
 
 	var filenames = COMMAND.f(2).lcase();
-	var dictid = COMMAND.f(3);
+	var dictids = COMMAND.field(FM, 3, 999999);
 	verbose = index(OPTIONS, "V");
 	var doall = true;
 
@@ -286,7 +290,7 @@ COST 10;
 	// Do one or many/all files
 	// ========================
 	for (var filename : filenames)
-		onefile(filename, dictid, viewsql);
+		onefile(filename, dictids, viewsql);
 
 	if (doall) {
 		//ignore error if doesnt exist
@@ -308,6 +312,9 @@ COST 10;
 			}
 		}
 	}
+
+	if (not committrans())
+		errors(-1) = lasterror();
 
 	if (errors)
 		errors.errputl("\ndict2sql Errors: ");
@@ -410,7 +417,12 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	return;
 }
 
-subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
+subroutine onefile(in dictfilename, in dictids, io viewsql) {
+	for (var dictid : dictids)
+		onefileonedict(dictfilename, dictid, viewsql);
+}
+
+subroutine onefileonedict(in dictfilename, in reqdictid, io viewsql) {
 
 	if (not dictfilename.starts("dict.") or dictfilename == "dict.all")
 		return;

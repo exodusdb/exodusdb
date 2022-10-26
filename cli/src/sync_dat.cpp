@@ -94,8 +94,11 @@ function main() {
 		return 0;
 	}
 
-	if (not begintrans())
+	var errors = "";
+	if (not begintrans()) {
+		errors(-1) = lasterror();
 		loglasterror();
+	}
 
 	// Process each subdir in turn. each one represents a db file.
 
@@ -124,12 +127,14 @@ function main() {
 		if (not generate and not open(dbfilename, dbfile)) {
 			createfile(dbfilename);
 			if (not open(dbfilename, dbfile)) {
-				errputl(prefix, "Error: Cannot create " ^ dbfilename);
+				errors(-1) = lasterror();
+				loglasterror();
 				continue;
 			}
 		}
 
 		var newcpptext = "#include <exodus/library.h>\n";
+		var dict2sql_ids = "";
 
 		// Process each dat file/record in the subdir
 		//printl(prefix, dirpath);
@@ -147,7 +152,9 @@ function main() {
 			// Get the dat record
 			let filepath = dirpath ^ ID;
 			if (not osread(RECORD from filepath)) {
-				errputl(prefix, "Error: Cannot read " ^ ID ^ " from " ^ filepath);
+				//errputl(prefix, "Error: Cannot read " ^ ID ^ " from " ^ filepath);
+				errors(-1) = lasterror();
+				loglasterror();
 				continue;
 			}
 
@@ -263,15 +270,25 @@ function main() {
 				// Create pgsql using dict2sql
 				// DONT SKIP SINCE PGSQL FUNCTIONS MUST BE IN EVERY DATABASE
 				if (dbfilename.starts("dict.") and RECORD.contains("/" "*pgsql")) {
-					var cmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
-					//cmd ^= " {V}";
-					if (not osshell(cmd))
-						errputl(prefix, "Error: In dict2sql for " ^ ID ^ " in " ^ dbfilename);
+					dict2sql_ids ^= ID ^ " ";
 				}
 
 			} // of not generate
 
 		} // next dat file
+
+		// Load and chanegd functions into database
+		if (dict2sql_ids) {
+			var cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids;
+			//cmd ^= " {V}";
+			if (verbose)
+				cmd.logputl();
+			if (not osshell(cmd)) {
+				//errputl(prefix, "Error: In dict2sql for " ^ dbfilename);
+				errors(-1) = lasterror();
+				loglasterror();
+			}
+		}
 
 		// Store and compile the generated dict_xxxxxxx.cpp text
 		if (generate and isdict) {
@@ -324,9 +341,13 @@ function main() {
 		write(date() ^ FM ^ time() on definitions, definitions_key);
 
 	if (not committrans())
-		loglasterror();
+		errors(-1) = lasterror();
 
-	return 0;
+	if (errors)
+		errors.errputl("\nsyncdat: Errors: ");
+
+	return errors ne "";
+
 }
 
 function is_newer(in fsinfo) {
