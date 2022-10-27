@@ -136,7 +136,7 @@ function main() {
 
 			// Empty dirs or dirs containing a file SYNCDAT_DELETE
 			// cause deletion of the database file with the same name as the dir
-			if (osfilenames.locate("SYNCDAT_DELETE", MV, 0) or osfilenames eq "") {
+			if (osfilenames.lower().locate("SYNCDAT_DELETE") or osfilenames eq "") {
 				if (var().open(dbfilename)) {
 
 					//TODO delete all functions first for S dict items with pgsql

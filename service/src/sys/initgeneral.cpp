@@ -719,10 +719,6 @@ nextreport:
 	SYSTEM(111) = "";
 
 	SYSTEM(111) = cid();
-	// try twice because was unreliable and is important
-	if (not(SYSTEM.f(111))) {
-		SYSTEM(111) = cid();
-	}
 
 	SYSTEM(51) = APPLICATION;
 
@@ -1550,71 +1546,16 @@ adddatasetcodename:
 	call log2("*clean up document keys", logtime);
 	if (sys.documents.open("DOCUMENTS", "")) {
 		select(sys.documents);
-nextdoc:
-		if (readnext(docid)) {
-			var docid2 = (field2(docid, "\\", -1)).field(".", 1);
+		while (readnext(docid)) {
+			let docid2 = docid.field2(OSSLASH, -1).field(".", 1);
 			if (docid2 ne docid) {
-				var doc;
-				if (doc.read(sys.documents, docid)) {
+				if (var doc; doc.read(sys.documents, docid)) {
 					doc.write(sys.documents, docid2);
 					sys.documents.deleterecord(docid);
 				}
 			}
-			goto nextdoc;
-		}
+		} // nextdoc
 	}
-
-	if (interactive and USERNAME eq "EXODUS") {
-		perform("FINDDEADALL");
-	}
-
-	// 	if (VOLUMES) {
-	// 		if (not(VOLUMES.locateusing(FM, "DATAVOL", xx))) {
-	// 			// pcperform 'MD DATAVOL'
-	// 			// call mkdir('DATAVOL':char(0),xx)
-	// 			call osmkdir("DATAVOL");
-	// 			perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
-	// 			perform("ATTACH DATAVOL (S)");
-	// 		}
-	// 	}
-	//
-	// 	//windows stuff
-	// 	if (VOLUMES) {
-	//
-	// 		call log2("*convert codepage", logtime);
-	// 		if (codepaging.osread("CODEPAGE.CFG")) {
-	// 			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
-	// 				codepage = "0" ^ FM ^ codepaging.f(2);
-	// 			}
-	// 			if ((codepage.f(2) eq "737" and not(codepage.f(1))) and codepaging.f(3) eq "1253") {
-	// 				perform("CONVGREEK (U)");
-	// 			}
-	// 		}
-	//
-	// 		call log2("*installing authorised keys", logtime);
-	// 		perform("INSTALLAUTHKEYS (S)");
-	//
-	// 		call log2("*installing authorised hosts", logtime);
-	// 		perform("INSTALLALLOWHOSTS (S)");
-	//
-	// 		voc.deleterecord("$FILEMAN");
-	//
-	// 		call log2("*put the admenus program as the system menu file", logtime);
-	// 		// as there is no way to have multiple menus files
-	// 		if (APPLICATION eq "ADAGENCY") {
-	// 			var setfilecmd = "SETFILE ./ADAGENCY GLOBAL ADMENUS SYS.MENUS";
-	// 			setfilecmd.converter("/", OSSLASH);
-	// 			perform(setfilecmd);
-	// 		}
-	//
-	// 	}
-
-	// call log2('*create user name index',logtime)
-	// convkey='CONVERTED*USERNAMEINDEX'
-	// read xx from definitions,convkey else
-	// perform 'WINDOWSTUB USER.SUBS CREATEUSERNAMEINDEX'
-	// write date() on definitions,convkey
-	// end
 
 	if (not resetting) {
 

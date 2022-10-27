@@ -1444,7 +1444,7 @@ bool var::starts(SV str) const {
 	//      bool exodus::var::starts(const exodus::VARREF) const
 	assertString(function_sig);
 
-	// Differ from c++, javascript, python3
+	// Differ from c++, javascript, python3 - see comment on var::contains
 	if (str.empty()) {
 		var(function_sig).errputl();
 //		VarError e(__PRETTY_FUNCTION__);
@@ -1461,7 +1461,7 @@ bool var::ends(SV str) const {
 	THISIS("bool var::ends(SV str) const")
 	assertString(function_sig);
 
-	// Differ from c++, javascript, python3
+	// Differ from c++, javascript, python3 - see comment on var:contains
 	if (str.empty()) {
 		var(function_sig).errputl();
 //		VarError e(__PRETTY_FUNCTION__);
@@ -1479,12 +1479,24 @@ bool var::contains(SV str) const {
 	assertString(function_sig);
 
 	// Differ from c++, javascript, python3
+	//
+	// Human logic: "" is not equal to "x" therefore x does not contain "".
+	//
+	// Human logic: Check each item (character) in the list for equality with what I am looking for and return success if any are equal.
+	//
+	// Programmer logic: Compare as many characters as are in the search string for presence in the list of characters and return success if there are no failures.
+	//
 	if (str.empty()) {
+
 		var(function_sig).errputl();
-		VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
-		e.description.errput();
-		//e.stack().f(1).errputl(", ");
-		e.stack(1).f(1).errputl(", ");
+		if (not var().osgetenv("EXO_DEBUG")) {
+			// The following triggers a break when EXO_DEBUG is set
+			VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
+			e.description.errput();
+			//e.stack().f(1).errputl(", ");
+			e.stack(1).f(1).errputl(", ");
+		}
+
 		return false;
 	}
 
