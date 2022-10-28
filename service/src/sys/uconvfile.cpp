@@ -101,11 +101,11 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		}
 
 		// overwrite the input file with the temporary
-		if (VOLUMES) {
-			cmd = "xcopy " ^ tempfilename ^ " " ^ inputfilename ^ " /y";
-		} else {
+//		if (VOLUMES) {
+//			cmd = "xcopy " ^ tempfilename ^ " " ^ inputfilename ^ " /y";
+//		} else {
 			cmd = "cp " ^ tempfilename ^ " " ^ inputfilename;
-		}
+//		}
 		result = shell2(cmd, errors);
 		if (errors) {
 			msg = "UCONVFILE: xcopy " ^ errors;

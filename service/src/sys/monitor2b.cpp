@@ -44,22 +44,22 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	// make linux/cygwin command
 	var cmd		 = "wget";
 	var httpsbug = 0;
-	if (VOLUMES) {
-		wgetrc = "";
-		// look for local or cygwin wget.exe otherwise quit
-		var exe = oscwd().contains(":") ? ".exe" : "";
-		cmd		= SYSTEM.f(50) ^ "wget" ^ exe;
-		if (not(cmd.osfile())) {
-			httpsbug = 1;
-			cmd		 = "wget" ^ exe;
-		}
-		if (not(cmd.osfile())) {
-			// avoid error in READ/UPGRADE phase of MONITOR2
-			// msg='wget.exe not available in CONTROL()'
-			msg = "";
-			return 0;
-		}
-	}
+//	if (VOLUMES) {
+//		wgetrc = "";
+//		// look for local or cygwin wget.exe otherwise quit
+//		var exe = oscwd().contains(":") ? ".exe" : "";
+//		cmd		= SYSTEM.f(50) ^ "wget" ^ exe;
+//		if (not(cmd.osfile())) {
+//			httpsbug = 1;
+//			cmd		 = "wget" ^ exe;
+//		}
+//		if (not(cmd.osfile())) {
+//			// avoid error in READ/UPGRADE phase of MONITOR2
+//			// msg='wget.exe not available in CONTROL()'
+//			msg = "";
+//			return 0;
+//		}
+//	}
 
 	// !!!
 	// flush is REQUIRED and dir(xxx.exe) otherwise get an error in other processes

@@ -176,9 +176,9 @@ listen:
 
 			// subject='EXODUS Technical Message :'
 			subject = "";
-			if (VOLUMES) {
-				printl(msg_);
-			}
+//			if (VOLUMES) {
+//				printl(msg_);
+//			}
 			var	 techmsg = msg_.f(1).first(256);
 			call sysmsg(msg_, techmsg);
 		}

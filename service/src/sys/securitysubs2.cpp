@@ -252,11 +252,11 @@ deletetask:
 		if (newuserprivs ne SECURITY) {
 			call log2("*write userprivs back", logtime);
 			SECURITY = newuserprivs;
-			if (VOLUMES) {
-				SECURITY.invert().write(DEFINITIONS, "SECURITY");
-			} else {
+//			if (VOLUMES) {
+//				SECURITY.invert().write(DEFINITIONS, "SECURITY");
+//			} else {
 				SECURITY.write(DEFINITIONS, "SECURITY");
-			}
+//			}
 		}
 	}
 

@@ -85,10 +85,10 @@ getlogkey:
 		body ^= _FM "Install=" ^ oscwd();
 		// osread ver from 'general\version.dat' then
 		var verfilename = "general/version.dat";
-		if (VOLUMES) {
-			// detect Windows with @volumes since we dont include GENERAL.SUBS for OSSLASH
-			verfilename.converter("/", "\\");
-		}
+//		if (VOLUMES) {
+//			// detect Windows with @volumes since we dont include GENERAL.SUBS for OSSLASH
+//			verfilename.converter("/", "\\");
+//		}
 		if (ver.osread(verfilename)) {
 			body ^= _FM "Version=" ^ ver.f(1);
 		}

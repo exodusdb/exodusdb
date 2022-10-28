@@ -250,7 +250,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		// OFF while developing this feature
 		isdevsys = isdevsys and date() gt 19034;
 		// if system<61> or isdevsys then
-		if (isdevsys or not(VOLUMES)) {
+		//if (isdevsys or not(VOLUMES)) {
+		if (isdevsys) {
 			ANS = "";
 			return 0;
 		}

@@ -341,15 +341,15 @@ nextprocess:
 
 		// show nok (number ok)
 		nok = processcount.f(1, dbasen);
-		if (not(nok) and not(VOLUMES)) {
-			temp = ("../data/" ^ dbasecode ^ "/" ^ dbasecode ^ ".svr").osfile();
-			secs = date() * 86400 + time() - (temp.f(2) * 86400 + temp.f(3));
-			nok	 = secs lt 600;
-			// otherwise flag hung
-			if (not nok) {
-				processcount(2, dbasen) = 1;
-			}
-		}
+//		if (not(nok) and not(VOLUMES)) {
+//			temp = ("../data/" ^ dbasecode ^ "/" ^ dbasecode ^ ".svr").osfile();
+//			secs = date() * 86400 + time() - (temp.f(2) * 86400 + temp.f(3));
+//			nok	 = secs lt 600;
+//			// otherwise flag hung
+//			if (not nok) {
+//				processcount(2, dbasen) = 1;
+//			}
+//		}
 		description = dbasecode;
 		// if nok then description:=' ':nok:':Ok'
 		if (nok gt 1) {
@@ -463,9 +463,9 @@ nextprocess:
 		// Warning for 1 day or never
 		// Critical for more
 		backupdrive = backuprequired.f(1, dbasen, 1).ucase();
-		if (not(VOLUMES)) {
-			backupdrive = not dbasecode.ends("_test");
-		}
+//		if (not(VOLUMES)) {
+//			backupdrive = not dbasecode.ends("_test");
+//		}
 		if (backupdrive) {
 
 			// uncomment to test non-existent drive
@@ -473,12 +473,12 @@ nextprocess:
 			description ^= " Backup->" ^ backupdrive;
 			tpath = "../data/" ^ dbasecode.lcase() ^ "/params2";
 			tpath.converter("/", OSSLASH);
-			if (VOLUMES) {
-				// time fm date fm size
-				if (not(paramrec.osread(tpath))) {
-					paramrec = "";
-				}
-			} else {
+//			if (VOLUMES) {
+//				// time fm date fm size
+//				if (not(paramrec.osread(tpath))) {
+//					paramrec = "";
+//				}
+//			} else {
 				// time fm date
 				tt		 = tpath.osfile();
 				paramrec = tt.f(3) ^ FM ^ tt.f(2);
@@ -488,7 +488,7 @@ nextprocess:
 				tpath.converter("/", OSSLASH);
 
 				paramrec(3) = tpath.osfile().f(1);
-			}
+//			}
 			lastbackupsize = paramrec.f(3);
 			if (lastbackupsize) {
 				description ^= " " ^ oconv(lastbackupsize, "[XBYTES,1]");
@@ -741,24 +741,24 @@ nextdbasen:;
 	hostdescriptions ^= " - " ^ cpudesc ^ " x " ^ nprocs;
 
 	// list ipnos
-	if (VOLUMES) {
-		result = shell2("ipconfig /all", errors).ucase();
-		result.converter("\r\n", _FM _FM).trimmer();
-		nn	= result.fcount(FM);
-		ips = "";
-		for (ii = 1; ii <= nn; ++ii) {
-			line = result.f(ii).trim();
-			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
-			if (line.starts("IP ADDRESS")) {
-				ips(-1) = line.field(":", 2).trim().field("(", 1);
-				// only display the first
-				goto gotip;
-			}
-		}  //ii;
-	} else {
+//	if (VOLUMES) {
+//		result = shell2("ipconfig /all", errors).ucase();
+//		result.converter("\r\n", _FM _FM).trimmer();
+//		nn	= result.fcount(FM);
+//		ips = "";
+//		for (ii = 1; ii <= nn; ++ii) {
+//			line = result.f(ii).trim();
+//			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
+//			if (line.starts("IP ADDRESS")) {
+//				ips(-1) = line.field(":", 2).trim().field("(", 1);
+//				// only display the first
+//				goto gotip;
+//			}
+//		}  //ii;
+//	} else {
 		ips = shell2("printf $(hostname -I | cut -d' ' -f 1)");
-	}
-gotip:
+//	}
+//gotip:
 	if (not ips) {
 		ips = "0.0.0.0";
 	}

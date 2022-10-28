@@ -53,9 +53,9 @@ function main(in nextcompanycode) {
 
 	// clientmark
 	if (sys.company.f(27)) {
-		if (VOLUMES) {
-			sys.company(27) = sys.company.f(27).invert();
-		}
+//		if (VOLUMES) {
+//			sys.company(27) = sys.company.f(27).invert();
+//		}
 		SYSTEM(14) = sys.company.f(27);
 		SYSTEM(8)  = "";
 	} else {

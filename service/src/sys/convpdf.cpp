@@ -58,18 +58,18 @@ function main(io osfilename, in printopts0, out errors) {
 		return 0;
 	}
 
-	if (VOLUMES) {
-		var exe = oscwd().contains(":") ? ".exe" : "";
-		pdfcmd	= "html2pdf";
-		if (exe) {
-			pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;
-		}
-	} else {
+//	if (VOLUMES) {
+//		var exe = oscwd().contains(":") ? ".exe" : "";
+//		pdfcmd	= "html2pdf";
+//		if (exe) {
+//			pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;
+//		}
+//	} else {
 		pdfcmd = "/usr/local/bin/wkhtmltopdf";
 		if (not(pdfcmd.osfile())) {
 			pdfcmd = "/usr/bin/wkhtmltopdf";
 		}
-	}
+//	}
 
 	// quit without conversion if conversion program doesnt exist
 	if (not(pdfcmd.osfile())) {

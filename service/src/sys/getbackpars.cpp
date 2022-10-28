@@ -77,29 +77,29 @@ function main(out bakpars, in process0 = var()) {
 		}  //ii;
 	}
 
-	if (VOLUMES) {
-		// if bakpars<3>='' then bakpars<3>='2:00'
-		// if bakpars<4>='' then bakpars<4>='2:05'
-		if (minbaktime_ eq "") {
-			bakpars(3) = "1:00";
-		}
-		if (maxbaktime_ eq "") {
-			bakpars(4) = "1:05";
-		}
-		if (not(minbaktime_.isnum())) {
-			bakpars(3) = minbaktime_.iconv("MT");
-		}
-		if (not(maxbaktime_.isnum())) {
-			bakpars(4) = maxbaktime_.iconv("MT");
-		}
-		if (bakdows_ eq "") {
-			bakpars(5) = "1234567";
-		}
-	} else {
+//	if (VOLUMES) {
+//		// if bakpars<3>='' then bakpars<3>='2:00'
+//		// if bakpars<4>='' then bakpars<4>='2:05'
+//		if (minbaktime_ eq "") {
+//			bakpars(3) = "1:00";
+//		}
+//		if (maxbaktime_ eq "") {
+//			bakpars(4) = "1:05";
+//		}
+//		if (not(minbaktime_.isnum())) {
+//			bakpars(3) = minbaktime_.iconv("MT");
+//		}
+//		if (not(maxbaktime_.isnum())) {
+//			bakpars(4) = maxbaktime_.iconv("MT");
+//		}
+//		if (bakdows_ eq "") {
+//			bakpars(5) = "1234567";
+//		}
+//	} else {
 		// suppress on exodus
 		bakpars(3) = -1;
 		bakpars(4) = -1;
-	}
+//	}
 
 	// fix bug in data entry that allows : and :: to be entered
 	if (bakdisk_.starts(":")) {
@@ -121,22 +121,22 @@ function main(out bakpars, in process0 = var()) {
 	var dbcode	= process.f(17).lcase();
 	var dbcodes = process.f(58).lcase();
 
-	if (dbcodes and VOLUMES) {
-
-		// databases to be excluded
-		bakpars(8) = "";
-
-		// decide backup required or not by indicating testdata
-		if (dbcodes.locate(dbcode, dbn)) {
-			tt = process.f(60, dbn);
-		} else {
-			tt = 0;
-		}
-		// test/nonlive data
-		bakpars(11) = not(tt);
-
-		// otherwise backup depending on backup.cfg etc
-	} else {
+//	if (dbcodes and VOLUMES) {
+//
+//		// databases to be excluded
+//		bakpars(8) = "";
+//
+//		// decide backup required or not by indicating testdata
+//		if (dbcodes.locate(dbcode, dbn)) {
+//			tt = process.f(60, dbn);
+//		} else {
+//			tt = 0;
+//		}
+//		// test/nonlive data
+//		bakpars(11) = not(tt);
+//
+//		// otherwise backup depending on backup.cfg etc
+//	} else {
 
 		// autodetermine if it is "test" data
 		if (baktestdata_ eq "") {
@@ -154,7 +154,7 @@ function main(out bakpars, in process0 = var()) {
 			}
 			bakpars(11) = testdata;
 		}
-	}
+//	}
 
 	return 0;
 }

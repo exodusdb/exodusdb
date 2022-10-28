@@ -476,11 +476,11 @@ preventupdate:
 										"/" ^
 										var(8).rnd())
 										   .lcase();
-					if (VOLUMES) {
-						tempfilename ^= ".$$$";
-					} else {
+					//if (VOLUMES) {
+					//	tempfilename ^= ".$$$";
+					//} else {
 						tempfilename ^= "./$";
-					}
+					//}
 					tempfilename.converter("/", OSSLASH);
 					var(date()).oswrite(tempfilename);
 					if (tt.osread(tempfilename)) {
