@@ -1463,6 +1463,8 @@ subroutine process() {
 	// Process the request - inside a transaction or not
 	// ////////////////////
 
+	//  ISOLATION LEVEL READ COMMITTED
+
 	// Without try/catch so will break into debugger
 	if (osgetenv("EXO_DEBUG")) {
 

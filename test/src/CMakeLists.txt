@@ -112,6 +112,8 @@
 
 	endforeach()
 
+	target_compile_options(test_regress PUBLIC "-O2")
+
 #
 # Exit
 # ####

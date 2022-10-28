@@ -602,6 +602,10 @@ var var::setlasterror(CVR msg) const {
 	// error for now by commenting next line
 
 	thread_lasterror = msg;
+
+	if (DBTRACE)
+		TRACE(thread_lasterror);
+
 	return lasterror();
 }
 
@@ -1613,17 +1617,11 @@ bool var::unlockall() const {
 
 }
 
-// returns only success or failure so any response is logged and saved for future lasterror() call
+// returns only success or failure and any response is logged and saved for future lasterror() call
 bool var::sqlexec(CVR sql) const {
 	var response = -1;	//no response required
 	if (!this->sqlexec(sql, response)) {
 		this->setlasterror(response);
-		//skip table does not exist because it is very normal to check if table exists
-		//if ((true && !response.contains("sqlstate:42P01")) || response.contains("syntax") || DBTRACE)
-		//	response.logputl();
-
-		// For now, all sqlexec calls that do not accept a response have any error response sent to cerr
-		response.errputl();
 		return false;
 	}
 	return true;
@@ -2110,32 +2108,39 @@ bool var::dbcopy(CVR from_dbname, CVR to_dbname) const {
 	ISSTRING(from_dbname)
 	ISSTRING(to_dbname)
 
-	//create a database
+	// TODO Fail neatly if the source db doesnt exist or the target db already exists
+
+	// Prepare the SQL
 	var sql = "CREATE DATABASE " ^ to_dbname ^ " WITH";
 	sql ^= " ENCODING='UTF8' ";
+
+	// Optionally copy from an existing database
 	if (from_dbname)
 		sql ^= " TEMPLATE " ^ from_dbname;
+
+	// Create the database
 	if (!this->sqlexec(sql)) {
+		//newdb.lasterror().errputl();
 		return false;
 	}
 
-	///connect to the new db
+	// Connect to the new db
 	var newdb;
 	if (not newdb.connect(to_dbname)) {
-		newdb.lasterror().errputl();
+		//newdb.lasterror().errputl();
 		return false;
 	}
 
-	//add dict schema to allow creation of dict files like dict.xxxxxxxx
+	// Add dict schema to allow creation of dict files like dict.xxxxxxxx
 	sql = "CREATE SCHEMA IF NOT EXISTS dict";
 	//sql ^= "AUTHORIZATION exodus;"
 	var result = true;
 	if (!newdb.sqlexec(sql)) {
-		newdb.lasterror().errputl();
+		//newdb.lasterror().errputl();
 		result = false;
 	}
 
-	//disconnec
+	// Disconnect from the new database
 	newdb.disconnect();
 
 	return result;
@@ -2147,6 +2152,13 @@ bool var::dbdelete(CVR dbname) const {
 	THISIS("bool var::dbdelete(CVR dbname)")
 	assertDefined(function_sig);
 	ISSTRING(dbname)
+
+	// Fail neatly if the database does not exist.
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (!this->clone().dblist().lower().locate(dbname)) {
+		setlasterror(dbname.quote() ^ " db does not exist.");
+		return false;
+	}
 
 	return this->sqlexec("DROP DATABASE " ^ dbname);
 }
@@ -2164,6 +2176,13 @@ bool var::createfile(CVR filename) const {
 	// has some differences. If the ON COMMIT clause is omitted, SQL specifies that the default
 	// behavior is ON COMMIT DELETE ROWS. However, the default behavior in PostgreSQL is ON
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
+
+	// Fail neatly if the file already exists.
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (this->clone().open(filename)) {
+		setlasterror(filename.quote() ^ " already exists.");
+		return false;
+	}
 
 	var sql = "CREATE";
 	if (filename.ends("_temp"))
@@ -2184,6 +2203,23 @@ bool var::renamefile(CVR filename, CVR newfilename) const {
 	ISSTRING(filename)
 	ISSTRING(newfilename)
 
+	// Fail neatly if the old file does not exist.
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (!this->clone().open(filename)) {
+		setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
+		return false;
+	}
+
+	// Fail neatly if the new file exists
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (this->clone().open(newfilename)) {
+		setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
+		return false;
+	}
+
+	// Remove from the cache of file handles
+	this->clone().detach(filename);
+
 	var sql = "ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename;
 
 	if (this->assigned())
@@ -2198,10 +2234,10 @@ bool var::deletefile(CVR filename) const {
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
-	// False if file does not exist
-	// Avoid generating sql errors since they abort transactions
-	if (!var().open(filename, *this)) {
-		//this->errputl(filename ^ " cannot be deleted because it does not exist. ");
+	// Fail neatly if the file does not exist
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (!this->clone().open(filename)) {
+		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
 
@@ -2228,6 +2264,13 @@ bool var::clearfile(CVR filename) const {
 	THISIS("bool var::clearfile(CVR filename)")
 	assertDefined(function_sig);
 	ISSTRING(filename)
+
+	// Fail neatly if the file does not exist
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (!this->clone().open(filename, *this)) {
+		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
+		return false;
+	}
 
 	var sql = "DELETE FROM " ^ filename.f(1);
 	if (this->assigned())
@@ -5069,7 +5112,14 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 
 	}
 
-	// create postgres index
+	// Fail neatly if the index already exists
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (this->listindex(filename, fieldname)) {
+		setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index already exists.");
+		return false;
+	}
+
+	// Create postgres index
 	sql = "CREATE INDEX index__" ^ filename ^ "__" ^ fieldname ^ " ON " ^ filename;
 	//if (ismv || fieldname.lcase().ends("_xref"))
 	if (dictexpression.contains("to_tsvector("))
@@ -5106,13 +5156,16 @@ bool var::deleteindex(CVR fieldname0) const {
 	//if (var().sqlexec("alter table " ^ filename ^ " drop " ^ index_fieldname))
 	//	return true;
 
-	// delete the index.
-	// var filename=*this;
+	// Fail neatly if the index does not exist
+	// SQL errors during a transaction cause the whole transaction to fail.
+	if (not this->listindex(filename, fieldname)) {
+		setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index does not exist.");
+		return false;
+	}
+
+	// Delete the index.
 	var sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
-	bool result = this->sqlexec(sql);
-	//if (!result)
-	//	this->lasterror().errputl();
-	return result;
+	return this->sqlexec(sql);
 }
 
 var var::listfiles() const {

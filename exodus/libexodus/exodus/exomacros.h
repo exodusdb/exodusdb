@@ -157,8 +157,12 @@ namespace exodus {
 // They could all be referenced individually but that would slow creation
 // of exodus callable "programs".
 // When debugging you will have to remember to inspect mv.ID instead of ID.
+
+// Keep in sync in exoenv.h and exomacros.h
+
 #define ID mv.ID
 #define RECORD mv.RECORD
+#define FILE mv.FILE
 #define DICT mv.DICT
 #define ANS mv.ANS
 #define MV mv.MV

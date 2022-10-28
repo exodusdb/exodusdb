@@ -15,7 +15,8 @@ programinit()
 	}
 
 	// Comment this out if you want to see anything in the database after an assert failure
-	begintrans();
+	///////////////////////////////////////////////////////////////////////////////////////
+	assert(begintrans());
 
 	//  //Skip if fast testing required
 	//	if (osgetenv("EXO_FAST_TEST")) {
@@ -24,21 +25,37 @@ programinit()
 	//		return 0;
 	//	}
 
-	var FILE = "xo_users";
-	DICT	 = "dict.xo_users";
+	var xdataname = "xo_users";
+	var xdictname = "dict.xo_users";
 
-	deletefile(FILE);
-	deletefile(DICT);
+	if (deletefile(xdataname))
+		logputl(xdataname, "deleted");
+	else
+		loglasterror();
 
-	printl("Create " ^ FILE ^ " and " ^ DICT);
-	assert(createfile(FILE));
-	assert(createfile(DICT));
+	if (deletefile(xdictname))
+		logputl(xdictname, "deleted");
+	else
+		loglasterror();
 
-	printl(R"(Create some dictionary records (field descriptions)
-	PERSON_NO    Type 'F', Key Field (0)
-	BIRTHDAY     Type 'F', Data Field 1
-	AGE IN DAYS  Type 'S', Source Code needs a dictionary subroutine library called dict_xo_users
-	AGE IN YEARS Type 'S', Source Code ditto)");
+	assert(not listfiles().lower().locate(xdataname));
+	assert(not listfiles().lower().locate(xdictname));
+
+	printl("Create " ^ xdataname ^ " and " ^ xdictname);
+	assert(createfile(xdataname) or (loglasterror() and false));
+	assert(createfile(xdictname) or (loglasterror() and false));
+
+	printl("Open " ^ xdataname ^ " and " ^ xdictname);
+	assert(open(xdataname to FILE));
+	assert(open(xdictname to DICT));
+
+	printl(R"(
+Create some dictionary records (field descriptions)
+PERSON_NO    Type 'F', Key Field (0)
+BIRTHDAY     Type 'F', Data Field 1
+AGE IN DAYS  Type 'S', Source Code needs a dictionary subroutine library called dict_xo_users
+AGE IN YEARS Type 'S', Source Code ditto
+)");
 	assert(write(convert("F|0|Person No||||||R|10", "|", FM), DICT, "PERSON_NO"));
 	assert(write(convert("F|1|Birthday||||D||R|12", "|", FM), DICT, "BIRTHDAY"));
 	assert(write(convert("S||Age in Days||||||R|10", "|", FM), DICT, "AGE_IN_DAYS"));
@@ -65,7 +82,7 @@ programinit()
 	//errmsg = {var_mvstr="ERROR:  function exodus_extract_date(bytea, integer, integer, integer) does not exist
 	//use DBTRACE to see the error
 	printl("CHECKING IF PGEXODUS POSTGRES PLUGIN IS INSTALLED");
-	var pluginok = createindex(FILE, "BIRTHDAY");
+	var pluginok = createindex(xdataname, "BIRTHDAY");
 	if (not pluginok) {
 		printl("Error: pgexodus, Exodus's plugin to PostgreSQL is not working. Run configexodus.");
 	} else {
@@ -83,22 +100,22 @@ programinit()
 		assert(tt.locate(tt2, fn, 0));
 
 		// Check our index is present in the list for our file
-		assert(listindex(FILE)             eq "xo_users]birthday"_var);
+		assert(listindex(xdataname)             eq "xo_users]birthday"_var);
 
 		// Check our index is present specifically
-		assert(listindex(FILE, "birthday") eq "xo_users]birthday"_var);
+		assert(listindex(xdataname, "birthday") eq "xo_users]birthday"_var);
 
-//		TRACE(listindex(FILE, "birthday"))
-//		TRACE(listindex(FILE, "birthday").oswrite("z2"))
+//		TRACE(listindex(xfilename, "birthday"))
+//		TRACE(listindex(xfilename, "birthday").oswrite("z2"))
 //		TRACE("xo_users]birthday"_var)
 //
-//		var x = listindex(FILE, "birthday").oswrite("z2");
+//		var x = listindex(xfilename, "birthday").oswrite("z2");
 //		var y = "xo_users]birthday"_var;
 //		assert(x eq y);
 
 		assert(listindex() ne "");
-		//ALN: do not delete to make subsequent select work::	assert(deleteindex(FILE,"BIRTHDAY"));
-		//		assert(listindex(FILE) eq "");
+		//ALN: do not delete to make subsequent select work::	assert(deleteindex(xfilename,"BIRTHDAY"));
+		//		assert(listindex(xfilename) eq "");
 	}
 
 	printl("check can select and readnext through the records");
@@ -120,7 +137,7 @@ programinit()
 	if (not select("SELECT xo_users (R)"))
 		assert(false and var("Failed to Select xo_users!"));
 
-	DICT = "dict.xo_users";
+	//DICT = "dict.xo_users";
 	while (readnext(RECORD, ID, MV))
 	//	while (readnext(ID))
 	{
@@ -149,7 +166,7 @@ dict(AGE_IN_YEARS) {
 
 	//#endif
 
-	committrans();
+	assert(committrans());
 
 	var filenames  = listfiles();
 	var indexnames = listindex("test_people");
@@ -221,7 +238,7 @@ dict(AGE_IN_YEARS) {
 
 	var ads;
 	if (!ads.open("xo_ads")) {
-		var().createfile("xo_ads");
+		assert(createfile("xo_ads"));
 		if (!ads.open("xo_ads"))
 			printl("Cannot create xo_ads");
 		//abort("Cannot create xo_ads");
@@ -272,7 +289,7 @@ dict(AGE_IN_YEARS) {
 	int ii = 0;
 	//	cin>>ii;
 	var record;
-	begintrans();
+	assert(begintrans());
 	if (ads.select("SELECT xo_ads")) {
 		while (ii < 3 && ads.readnext(record, key, MV)) {
 			++ii;
@@ -283,29 +300,29 @@ dict(AGE_IN_YEARS) {
 		}
 	}
 	clearselect();
-	committrans();
+	assert(committrans());
 
 	//#ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
 	{  // test to reproduce cached_handles error
 		var file1("t_FILE1.txt");
-		oswrite("", file1);
+		assert(oswrite("", file1));
 		var off1 = 0;
-		osbwrite("This text is written to the file 't_FILE1.txt'", file1, off1);
+		assert(osbwrite("This text is written to the file 't_FILE1.txt'", file1, off1));
 
 		var file2("t_FILE2.txt");
-		oswrite("", file2);
+		assert(oswrite("", file2));
 		var off2 = 0;
-		osbwrite("This text is written to the file 't_FILE2.txt'", file2, off2);
+		assert(osbwrite("This text is written to the file 't_FILE2.txt'", file2, off2));
 
 		var file1x = file1;	 // wicked copy of file handle
 		file1x.osclose();	 // we could even do: var( file1).osclose();
 
 		var file3("t_FILE3.txt");
-		oswrite("", file3);
+		assert(oswrite("", file3));
 		var off3 = 0;
-		osbwrite("This text is written to the file 't_FILE3.txt'", file3, off3);
+		assert(osbwrite("This text is written to the file 't_FILE3.txt'", file3, off3));
 
-		osbwrite("THIS TEXT INTENDED FOR FILE 't_FILE1.txt' BUT IT GOES TO 't_FILE3.txt'", file1, off1);
+		assert(osbwrite("THIS TEXT INTENDED FOR FILE 't_FILE1.txt' BUT IT GOES TO 't_FILE3.txt'", file1, off1));
 	}
 	//#endif
 
@@ -327,14 +344,14 @@ dict(AGE_IN_YEARS) {
 
 		printl();
 		printl("1. test full output with no selection clause or preselect");
-		myclients.select();
+		assert(myclients.select());
 		while (myclients.readnext(key)) {
 			key.outputl("t1 key=");
 		}
 
 		printl();
 		printl("2. test with default cursor (unassigned var) - select clause needs filename");
-		myclients.select("select " ^ clients_filename ^ " with type 'B'");
+		assert(myclients.select("select " ^ clients_filename ^ " with type 'B'"));
 		while (myclients.readnext(key)) {
 			key.outputl("t2 key=");
 		}
@@ -343,9 +360,9 @@ dict(AGE_IN_YEARS) {
 		printl("3. tests with named cursor (assigned var) - if is file name then select clause can omit filename");
 		myclients = clients_filename;
 		printl("test preselect affects following select");
-		myclients.select("with type 'B'");
+		assert(myclients.select("with type 'B'"));
 		printl("Normally the following select would output all records but it only shows the preselected ones (2)");
-		myclients.select();
+		assert(myclients.select());
 		while (myclients.readnext(key)) {
 			key.outputl("t3 key=");
 		}
@@ -353,7 +370,7 @@ dict(AGE_IN_YEARS) {
 		printl();
 		printl("4. Normally the following select would output all records but it only shows 3 keys from makelist");
 		var keys = "SB1" _FM "JB2" _FM "SB001";
-		myclients.makelist("", keys);
+		assert(myclients.makelist("", keys));
 		myclients.outputl();
 		//      myclients.select();
 		//while(myclients.readnext(key)) {
@@ -427,14 +444,16 @@ dict(AGE_IN_YEARS) {
 		printl("Check temporary files are deleted after closing connection");
 		disconnect();
 		//disconnectall();
-		connect();
+		assert(connect());
 		assert(not open(filename to file));
 	}
 
 	{
 
 		var filename = "xo_naturals";
-		createfile(filename);
+		if (not deletefile(filename))
+			loglasterror();
+		assert(createfile(filename));
 		var naturals;
 		assert(open(filename, naturals));
 

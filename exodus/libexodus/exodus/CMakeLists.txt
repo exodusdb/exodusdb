@@ -94,7 +94,7 @@
 		exoenv.cpp exofuncs.cpp
 		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp
 		murmurhash2_64.cpp naturalorder.cpp gettimeofday.cpp
-		varoshandle.cpp vardbconn.cpp mvprocessno.cpp
+		varoshandle.cpp vardbconn.cpp
 		variter.cpp
 		# Little ones last for quick parallel finishing
 		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp

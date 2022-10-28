@@ -5,16 +5,16 @@
 #include <exodus/program.h>
 programinit()
 
-	var key        = 1;
-	var max        = 5;
-	var nprocesses = 10;//50;
+	let key        = 1;
+	let max        = 5;
+	let nprocesses = 10;//50;
 
 	// Create a temporary file (ending _temp)
-	var filename = "xo_test";
+	let filename = "xo_test";
 
 	var file;
 
-	var silent = OPTIONS.count("S");
+	let silent = OPTIONS.count("S") or TERMINAL;
 
 function main() {
 
@@ -39,9 +39,6 @@ function main() {
 
 	// Will work with and without transactions
 	var use_transaction = not OPTIONS.count("T");
-
-	if (not TERMINAL)
-		silent = 1;
 
 	if (not open(filename to file)) {
 		createfile(filename);

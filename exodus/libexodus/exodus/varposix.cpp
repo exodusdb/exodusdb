@@ -1,17 +1,24 @@
-#include <unistd.h> // for getpid
+#include <unistd.h>
 
 #include <exodus/var.h>
 
 namespace exodus {
 
-var getprocessn() {
+ND PUBLIC var getprocessn() {
 	return var(getpid());
 }
 
-var getexecpath() {
+ND PUBLIC var getexecpath() {
 	var osenv;
 	osenv.osgetenv("_");
 	return osenv;
+}
+
+ND PUBLIC std::string gethostname() {
+    char hostname[1024];
+    hostname[1023] = '\0';
+    ::gethostname(hostname, 1023);
+    return hostname;
 }
 
 }  // namespace exodus

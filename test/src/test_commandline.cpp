@@ -49,10 +49,13 @@ function main() {
 
 	if (libinfo("testcommandlib")) {
 		perform("testcommandlib a b c (xyz)");
+		//if (not oswrite(USER1 on "x"))
+		//	loglasterror();
 		TRACE(USER1)
 		// TODO COMMAND should be parsed in libexodus (exoprog.cpp) in FM separated parts as is done for COMMAND from the command line
 		//assert(USER1 eq "testcommandlib a b c (xyz)\ntestcommandlib^a^b^c\nxyz\n");
-		assert(USER1 eq "testcommandlib a b c (xyz)\ntestcommandlib a b c\nxyz\n");
+		//assert(USER1 eq "testcommandlib a b c (xyz)\ntestcommandlib a b c\nxyz\n");
+		assert(USER1 eq "testcommandlib a b c (xyz)\ntestcommandlib^a^b^c\nxyz\n"_var);
 	}
 
 	printl(elapsedtimetext());

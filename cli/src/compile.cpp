@@ -320,7 +320,7 @@ function main() {
 					// Ignore these warnings caused by [[no-discard]] for now
 					// TODO Remove when all such code in exodus service and apps is replaced
 					// warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
-					basicoptions ^= " -Wno-unused-result";
+					//basicoptions ^= " -Wno-unused-result";
 
 					// Ignore warnings for now about code like
 					// open("PROCESSES") or createfile("PROCESSES");
@@ -625,11 +625,14 @@ function main() {
 					errputl(" Error: Could not copy '" ^ srcfilename ^ "' to '" ^ targetfilename ^ "'");
 				} else if (not silent) {
 					printl(srcfilename);
+					//print(srcfilename ^ _EOL);
 				}
 			} else {
 				if (not silent)
 					printl(srcfilename);
+					//print(srcfilename ^ _EOL);
 			}
+			//osflush();
 			continue;
 		}
 
@@ -798,11 +801,12 @@ function main() {
 				printl("thread: sourcefilename=", srcfilename);
 			else if (not silent)
 				printl(srcfilename);
+				//print(srcfilename ^ _EOL);
 			else if (silent eq 1) {
 				nasterisks++;
 				print("*");
-				osflush();
 			}
+			//osflush();
 
 			// Get file text
 			////////////////
@@ -1350,26 +1354,28 @@ function main() {
 
 			// xxx cannot be used in the same statement that it is being defined
 			// var xxx = osread(xxx, yyy, zzz);
-			let matches = text.match("[\\n \\t]{2,}(var|let) (\\b[a-zA-Z0-9_]+\\b) [^\n:;]*?\\b\\2\\b");
-			if (matches) {
-				var nmatches = 0;
-				for (var match : matches) {
+			if (warnings ge 0) {
+				let matches = text.match("[\\n \\t]{2,}(var|let) (\\b[a-zA-Z0-9_]+\\b) [^\n:;]*?\\b\\2\\b");
+				if (matches) {
+					var nmatches = 0;
+					for (var match : matches) {
 
-					// Skip matches with an odd number of double quotes since it indicates quoted xxx on the right
-					if (match.count(_DQ).mod(2))
-						continue;
+						// Skip matches with an odd number of double quotes since it indicates quoted xxx on the right
+						if (match.count(_DQ).mod(2))
+							continue;
 
-					// Skip if there is a function or member function with the same name as the variable
-					// e.g. "var reccount = file1.reccount();"
-					var varname = match.f(1, 1).field(" ", 2);
-					if (match.contains("." ^ varname) or match.contains(varname ^ "("))
-						continue;
+						// Skip if there is a function or member function with the same name as the variable
+						// e.g. "var reccount = file1.reccount();"
+						var varname = match.f(1, 1).field(" ", 2);
+						if (match.contains("." ^ varname) or match.contains(varname ^ "("))
+							continue;
 
-					if (not nmatches++) {
-						logputl(srcfilename ^ ":9999:99: warning: Use before constructed is undefined behaviour.");
-						atomic_ncompilation_failures++;
+						if (not nmatches++) {
+							logputl(srcfilename ^ ":9999:99: warning: Use before constructed is undefined behaviour.");
+							atomic_ncompilation_failures++;
+						}
+						logputl(match.f(1,1).trimmer(" \t\n").quote());
 					}
-					logputl(match.f(1,1).trimmer(" \t\n").quote());
 				}
 			}
 
@@ -1529,6 +1535,7 @@ function static compile2(
 	}
 
 	// Handle compiler output
+	compileroutput.trimmerlast("\n\t\r ");
 	var startatlineno;
 	{
 		if (compileroutput)

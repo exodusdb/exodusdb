@@ -482,26 +482,18 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	// mv.DICT.outputl("DICT=");
 	//	global_environments[environmentn] = &mv;
 
-	mv.EXECPATH = getexecpath();
-	if (not mv.EXECPATH) {
-		if (exodus__argc)
-			mv.EXECPATH = var(exodus__argv[0]);
-		if (not mv.EXECPATH.contains(OSSLASH))
-			mv.EXECPATH.prefixer(oscwd() ^ OSSLASH);
-	}
-	//"see getting path to current executable" above
-	// or use "which EXECPATH somehow like in mvdebug.cpp
-	// if (not EXECPATH.contains(OSSLASH) && not EXECPATH.contains(":"))
-	//{
-	//	EXECPATH.prefixer(oscwd()^OSSLASH);
-	//	if (OSSLASH=="\\")
-	//		EXECPATH.converter("/","\\");
+	// Done in exoenv contructors now
+	// mv.EXECPATH = getexecpath();
+
+	// No longer done here; to allow EXECPATH to be const
+	//if (not mv.EXECPATH) {
+	//	if (exodus__argc)
+	//		mv.EXECPATH = var(exodus__argv[0]);
+	//	if (not mv.EXECPATH.contains(OSSLASH))
+	//		mv.EXECPATH.prefixer(oscwd() ^ OSSLASH);
 	//}
-	// leave a global copy where backtrace can get at it
-	//EXECPATH2 = mv.EXECPATH;
 
 	mv.SENTENCE = "";  // ALN:TODO: hm, again, char->var-> op=(var)
-
 	mv.COMMAND = "";
 	mv.OPTIONS = "";
 
@@ -551,9 +543,6 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	// main2(exodus__argc, exodus__argv);
 
 	//atexit(exodus_atexit);
-
-	if (isterminal())
-		mv.TERMINAL = osgetenv("TERM");
 
 	return 0;
 }

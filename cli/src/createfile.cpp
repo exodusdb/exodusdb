@@ -6,7 +6,7 @@ function main() {
 	var filenames = COMMAND.field(FM, 2, 999999);
 
 	if (not filenames)
-		abort("Syntax is createfile filename ...");
+		abort("Syntax is createfile filename ... {OPTIONS}");
 
 	var result = 0;
 
@@ -24,7 +24,8 @@ function main() {
 			continue;
 		}
 
-		printl("Created", filename);
+		if (not OPTIONS.contains("S"))
+			printl("Created", filename);
 
 	}
 

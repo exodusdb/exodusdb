@@ -62,11 +62,8 @@ ExoEnv::~ExoEnv() {
 // keep in sync both 1) declaration in class and 2) contruction initialisation
 bool ExoEnv::init(const int threadno) {
 
-	this->TIMESTAMP = var().timestamp();
-
 	// std::wcout<<"ExoEnv::init("<<threadno<<")"<<std::endl;
 
-	// per process
 	this->THREADNO = threadno;
 
 	// pretty obsolete nowadays
@@ -79,20 +76,9 @@ bool ExoEnv::init(const int threadno) {
 	if (not this->CRTHIGH)
 		this->CRTHIGH = 25;
 
-	//	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
-	//	this->PROCESSNO = getprocessno(this->EXECPATH.toString().c_str(), &processnolockfd);
-	//	var tmplockfile = var().ostempdirpath() ^ "exodus_" ^ var().oscwd().convert("/\\","__");
-
-	//eg thread id = 140737353977344
-	//std::cout<<std::this_thread::get_id()<< std::endl;
-
-	//this->PROCESSNO = getprocessno(tmplockfile.toString().c_str(), &processnolockfd);
-	//this->PROCESSNO = std::this_thread::get_id();
-	this->THREADNO = threadno;
-
 	//	this->THREADNO.outputl("PROCESS NO ===================================================== ");
 
-	this->STATION = var(mvgethostname()).field(".", 1);
+	//this->STATION = var(mvgethostname()).field(".", 1);
 
 	return true;
 }

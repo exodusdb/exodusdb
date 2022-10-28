@@ -24,6 +24,7 @@ THE SOFTWARE.
 #define EXODUSFUNCS_H 1
 
 #include <exodus/var.h>
+#include <mutex>
 
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h
@@ -61,14 +62,17 @@ namespace exodus {
 #	define                _PLATFORM   "x86"
 #endif
 
-	// clang-format on
+// clang-format on
 
-// Removed to reduce compile time of exodus programs.
-// Use .output() .errput() and .logput() for threadsafe output.
-// print() errput() logput() to output all arguments together in a thread-safe manner
-//inline std::mutex global_mutex_threadstream;
-//#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
-#define LOCKIOSTREAM
+inline std::mutex global_mutex_threadstream;
+//
+// SLOW = threadsafe. With locking.  Output all arguments together.
+//      = print/printl/printt, errput/errputl
+#define LOCKIOSTREAM_SLOW std::lock_guard guard(global_mutex_threadstream);
+//
+// FAST = not threadsafe. No locking. As fast as possible. Intermingled output.
+//      = output/outputl/outputt, logput/logputl
+#define LOCKIOSTREAM_FAST
 
 #define DEFAULT_EMPTY = ""
 #define DEFAULT_DOT = "."
@@ -139,7 +143,6 @@ ND var  oslistd(CVR dirpath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
 ND var  osinfo(CVR path, const int mode DEFAULT_0);
 ND var  osfile(CVR filepath);
 ND var  osdir(CVR dirpath);
-
 
 ND bool osmkdir(CVR dirpath);
 ND bool osrmdir(CVR dirpath, const bool evenifnotempty DEFAULT_FALSE);
@@ -472,7 +475,7 @@ ND var lasterror();
 
 template <typename... Printable>
 void output(const Printable&... value) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_FAST
 	(var(value).output(), ...);
 }
 
@@ -480,7 +483,7 @@ void output(const Printable&... value) {
 
 template <typename... Printable>
 void outputl(const Printable&... value) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_FAST
 	(var(value).output(), ...);
 	var("").outputl();
 }
@@ -489,7 +492,7 @@ void outputl(const Printable&... value) {
 
 template <typename... Printable>
 void outputt(const Printable&... value) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_FAST
 	(var(value).outputt(), ...);
 	//var("").outputt();
 }
@@ -516,7 +519,7 @@ void outputt(const Printable&... value) {
 
 template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
 void printl(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	std::cout << value;
 	((std::cout << sep << values), ...);
 	std::cout << std::endl;
@@ -526,7 +529,7 @@ void printl(const Printable& value, const Additional&... values) {
 
 template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
 void errputl(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	std::cerr << value;
 	((std::cerr << sep << values), ...);
 	std::cerr << std::endl;
@@ -536,7 +539,7 @@ void errputl(const Printable& value, const Additional&... values) {
 
 template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
 void logputl(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_FAST
 	std::clog << value;
 	((std::clog << sep << values), ...);
 	std::clog << std::endl;
@@ -555,7 +558,7 @@ void logputl(const Printable& value, const Additional&... values) {
 
 template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
 void print(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	std::cout << value;
 	((std::cout << sep << values), ...);
 }
@@ -564,7 +567,7 @@ void print(const Printable& value, const Additional&... values) {
 
 template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
 void errput(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	std::cerr << value;
 	((std::cerr << sep << values), ...);
 }
@@ -573,7 +576,7 @@ void errput(const Printable& value, const Additional&... values) {
 
 template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
 void logput(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_FAST
 	std::clog << value;
 	((std::clog << sep << values), ...);
 }
@@ -588,21 +591,21 @@ void logput(const Printable& value, const Additional&... values) {
 // printl() to cout
 
 void printl() {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	std::cout << std::endl;
 }
 
 // errputl() to cerr
 
 void errputl() {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	std::cerr << std::endl;
 }
 
 // logputl() to clog
 
 void logputl() {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_FAST
 	std::clog << std::endl;
 }
 
@@ -619,7 +622,7 @@ void logputl() {
 
 template <auto sep = '\t', typename... Printable>
 void printt(const Printable&... values) {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	((std::cout << values << sep), ...);
 }
 
@@ -636,7 +639,7 @@ void printt(const Printable&... values) {
 
 template <auto sep = '\t'>
 void printt() {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_SLOW
 	std::cout << sep;
 }
 

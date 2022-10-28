@@ -69,8 +69,8 @@ programinit()
 		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
 		for (auto i : range(0, n - 1)) {
 			printt(i, d1(i), "\n");
-			assert(d1(i) > ntests / n * 0.99);
-			assert(d1(i) < ntests / n * 1.01);
+			assert(d1(i) > ntests / n * 0.98);
+			assert(d1(i) < ntests / n * 1.02);
 		}
 	}
 

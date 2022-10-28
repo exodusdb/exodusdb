@@ -63,8 +63,9 @@ programinit()
 	assert(createfile(filename));
 
 	printl("Test rename, and rename back");
-	assert(renamefile(filename, filename ^ "_renamed"));
-	assert(renamefile(filename ^ "_renamed", filename));
+	if (not deletefile(filename ^ "_renamed")) {}
+	assert(renamefile(filename, filename ^ "_renamed") or (loglasterror() and false));
+	assert(renamefile(filename ^ "_renamed", filename) or (loglasterror() and false));
 
 	printl("Test reccount");
 	for (var recn : range(1, 10))
