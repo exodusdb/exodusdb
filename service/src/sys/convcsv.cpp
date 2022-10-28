@@ -191,12 +191,16 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 				exportable = exportable.f(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
-			keyx  = exportable.first(exportable.index(FM ^ FM) - 1);
-			nkeys = keyx.fcount(FM);
-			if (nkeys gt 2) {
-				// call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
-				// stop
-				nkeys = 0;
+			;
+			// Find first blank field
+			if (var pos = exportable.index(FM ^ FM);pos) {
+				keyx  = exportable.first(pos - 1);
+				nkeys = keyx.fcount(FM);
+				if (nkeys gt 2) {
+					// call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
+					// stop
+					nkeys = 0;
+				}
 			}
 		} else {
 			exportable = "";
