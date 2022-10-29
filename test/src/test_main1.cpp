@@ -449,7 +449,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//hash
 	var("xyz").hash(1000).outputl("hash(1000) of \"xyz\"=");
 	//assert(var("xyz").hash(1000)==894);//wchar/wstring vars
-	assert(var("xyz").hash(1000) eq 274);
+	//assert(var("xyz").hash(1000) eq 274);//Murmurhash2
+	assert(var("xyz").hash(1000) eq 586);//Murmurhash3
 
 	{
 		//null characters cannot be embedded in string constants in c/c++

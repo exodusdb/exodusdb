@@ -175,19 +175,38 @@ Within transactions, lock requests for locks that have already been obtained SUC
 
 #include <iostream>
 
-// see exports.txt for all PQ functions
+
+// To see Postgres PQlib calls
+//////////////////////////////
+//
+// All calls
+//
+//  grep -P '\bPQ[\w]+' vardb.cpp --color=always|less
+//
+// or without transaction related calls
+//
+//  grep -P '\bPQ[\w]+' *.cpp --color=always|grep -vP 'errorMessage|resultStatus|ntuples|getisnull|cmdTuples|PQexec|getvalue|getlength|nfields|PQfname|resultError'
+//
 #include <libpq-fe.h>  //in postgres/include
 
 //#include <arpa/inet.h>//for ntohl()
 
 // All three hashing methods are about 80-90ns
 // but c++ std::hash is not guaranteed stable except within a single running process
-#define USE_MURMURHASH
+// https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
+#define USE_MURMURHASH3
 //#define USE_WYHASH
+
 #if defined (USE_WYHASH)
 #	include "wyhash.h"
-#elif defined(USE_MURMURHASH)
+
+#elif defined(USE_MURMURHASH3)
+#	include "murmurhash3.h"
+	static const uint32_t murmurhash_seed = 0xf00dba11;
+
+#elif defined(USE_MURMURHASH2)
 #	include "murmurhash2_64.h" // it has included in vardbconn.h (uint64_t defined)
+
 #else
 	// c++ std Hash functions are only required to produce the same result for the same input within a single execution of a program;
 	// therefore different processes would not be able to perform coordinated record locking
@@ -304,9 +323,39 @@ var get_normal_filename(CVR filename_or_handle) {
 // eg "xxx" 'xxx' 123 .123 +123 -123
 static const var valuechars("\"'.0123456789-+");
 
+// hash64 a std::string
+///////////////////////
+inline uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
+
+#if defined(USE_WYHASH)
+	return wyhash(str1.data(), str1.size(), 0, _wyp);
+#elif defined(USE_MURMURHASH3)
+
+	uint64_t u128[2];
+	MurmurHash3_x64_128(str1.data(), static_cast<int>(str1.size()), murmurhash_seed, u128);
+
+	// From above function's finalizer.
+	//	((uint64_t*)out)[0] = h1;
+	//	((uint64_t*)out)[1] = h2;
+
+	// xor bottom 64 bits with top 64 bits in attempt not to completely throw away the top half commpletely.
+	((uint64_t*)u128)[0] ^= ((uint64_t*)u128)[1];
+	// Return only 64 bits of u128;
+	return ((uint64_t*)u128)[0];
+
+#elif defined(USE_MURMURHASH2)
+	return MurmurHash64(str1.data(), static_cast<int>(str1.size()), 0);
+#else
+	return std::hash<std::string>{}(str1);
+#endif
+
+}
+
+// Cross platform lock number
+/////////////////////////////
 // Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
 // TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
-uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
+inline uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
 
 	// Use the pure filename and disregard any connection number
 	std::string fileandkey = get_normal_filename(filehandle);
@@ -320,13 +369,7 @@ uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
 	// Normalise all alternative utf8 encodings of the same unicode points so they hash identically
 	fileandkey.append(key.normalize().toString());
 
-#if defined(USE_WYHASH)
-	return wyhash(fileandkey.data(), fileandkey.size(), 0, _wyp);
-#elif defined(USE_MURMURHASH)
-	return MurmurHash64(fileandkey.data(), static_cast<int>(fileandkey.size()), 0);
-#else
-	return std::hash<std::string>{}(fileandkey);
-#endif
+	return mvdbpostgres_hash_stdstr(fileandkey);
 
 }
 
@@ -1426,21 +1469,22 @@ var var::hash(const uint64_t modulus) const {
 	assertString(function_sig);
 	// ISNUMERIC(modulus)
 
-	// https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
-
-	// not normalizing for speed
+	// not normalizing for speed and allow different non-normalised keys
 	// std::string tempstr=this->normalize();
 
-	// uint64_t
-	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),static_cast<int>(fileandkey.size()*sizeof(wchar_t)),0);
-
-#if defined(USE_WYHASH)
-	uint64_t hash64 = wyhash(var_str.data(), var_str.size(), 0, _wyp);
-#elif defined(USE_MURMURHASH)
-	uint64_t hash64 = MurmurHash64(var_str.data(), static_cast<int>(var_str.size()), 0);
-#else
-	uint64_t hash64 = std::hash<std::string>{}(var_str);
-#endif
+//
+//	// uint64_t
+//	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),static_cast<int>(fileandkey.size()*sizeof(wchar_t)),0);
+//
+//#if defined(USE_WYHASH)
+//	uint64_t hash64 = wyhash(var_str.data(), var_str.size(), 0, _wyp);
+//#elif defined(USE_MURMURHASH)
+//	uint64_t hash64 = MurmurHash64(var_str.data(), static_cast<int>(var_str.size()), 0);
+//#else
+//	uint64_t hash64 = std::hash<std::string>{}(var_str);
+//#endif
+//
+	uint64_t hash64 = mvdbpostgres_hash_stdstr(this->var_str);
 
 	if (modulus)
 		return var_int = hash64 % modulus;

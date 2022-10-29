@@ -23,26 +23,29 @@
    public:       \
 	var
 
-// a program is just a class with an following
-// int main() function that creates and calls it
-#define programinit(PROGRAMNAME) classinit(PROGRAMNAME)
-
 // SIMILAR CODE IN
-// program.h programexit
-// exodusmacros.h libraryexit()
+// program.h library.h
+
+// A program is just a class with an following
+// int main() function that creates and calls it
+#define programinit(PROGRAMCLASSNAME) \
+class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {
 
 //OPTION I=Ignore. Causes error exit to be suppressed
 //OPTION D=Debug. Suppress try/catch exception handling so debuggers can catch errors
-#define programexit(PROGRAMNAME)                                                                                \
-	classexit(PROGRAMNAME) int PROGRAMNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno) { \
+#define programexit(PROGRAMCLASSNAME)                                                                           \
+ public:                                                                                                        \
+    PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                                      \
+};                                                                                                              \
+int PROGRAMCLASSNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno) {                       \
 		ExoEnv mv;                                                                                              \
 		exodus_main(exodus__argc, exodus__argv, mv, threadno);                                                  \
 		int result = 0;                                                                                         \
-		PROGRAMNAME##ExodusProgram exodusprogram1(mv);                                                          \
+		PROGRAMCLASSNAME##ExodusProgram exodusprogram1(mv);                                                     \
 		if (osgetenv("EXO_DEBUG")) {                                                                            \
-			errputl("Debug Init Thread:", THREADNO, #PROGRAMNAME, SENTENCE);                                    \
+			errputl("Debug Init Thread:", THREADNO, #PROGRAMCLASSNAME, SENTENCE);                               \
 			result = exodusprogram1.main().toInt();                                                             \
-			errputl("Debug Exit Thread:", THREADNO, #PROGRAMNAME, SENTENCE);                                    \
+			errputl("Debug Exit Thread:", THREADNO, #PROGRAMCLASSNAME, SENTENCE);                               \
 		} else {                                                                                                \
 			try {                                                                                               \
 				result = exodusprogram1.main().toInt();                                                         \
@@ -85,6 +88,7 @@
 			result = 0;                                                                                         \
 		return result;                                                                                          \
 	}                                                                                                           \
-	int PROGRAMNAME##main(int exodus__argc, const char* exodus__argv[]) {                                       \
-		return PROGRAMNAME##main2(exodus__argc, exodus__argv, 0);                                               \
+	                                                                                                            \
+	int PROGRAMCLASSNAME##main(int exodus__argc, const char* exodus__argv[]) {                                  \
+		return PROGRAMCLASSNAME##main2(exodus__argc, exodus__argv, 0);                                          \
 	}

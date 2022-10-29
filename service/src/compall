@@ -40,8 +40,8 @@ set -euxo pipefail
 : Compile EXODUS service
 : ======================
 :
-: O - Increase optimisation level
-: o - Reduce optimisation level
+: O/o Increase/reduce optimisation level
+: W/w Increase/reduce warning level
 : F - Force
 : h - Headers only
 : X - Suppress compilation

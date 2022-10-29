@@ -805,8 +805,8 @@ function main() {
 			else if (silent eq 1) {
 				nasterisks++;
 				print("*");
+				osflush();
 			}
-			//osflush();
 
 			// Get file text
 			////////////////

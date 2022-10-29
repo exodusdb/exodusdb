@@ -2,11 +2,11 @@
 
 #include <exodus/exoimpl.h>
 
-//allows and *requires* coding style like exodus application programming
+// Allows and *requires* coding style like exodus application programming
 // e.g. must use USERNAME not mv.USERNAME
 #include <exodus/exomacros.h>
 
-// putting various member functions into all exodus programs allows access to the mv environment
+// Putting various member functions into all exodus programs allows access to the mv environment
 // variable which is also available in all exodus programs.
 
 //#include <unordered_map>
@@ -16,10 +16,25 @@ namespace exodus {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
 
-// constructor with an exoenv mv 
+///////////////////////////
+// Special Member Functions
+///////////////////////////
+
+// 2. Destructor
+ExodusProgramBase::~ExodusProgramBase(){}
+
+var ExodusProgramBase::libinfo(CVR command) {
+	return var(perform_callable_.libfilepath(command.toString())).osfile();
+}
+
+/////////////////////
+// Other Constructors
+/////////////////////
+
+// Constructor from an ExoEnv
 // mv is a reference to allow mv.xxxxxx syntax instead of mv->xxxxxx
-// but this means that mv must be provided at program construction
-// and cannot be changed thereafter
+// However, being a reference, it must be provided at ExodusProgram construction time
+// and cannot be changed thereafter.
 ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
 	:
 	perform_callable_(inmv),
@@ -28,14 +43,12 @@ ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
 	cached_dictid_ = "";
 	dict_callable_ = nullptr;
 }
+
 #pragma GCC diagnostic pop
 
-// destructor
-ExodusProgramBase::~ExodusProgramBase(){}
-
-var ExodusProgramBase::libinfo(CVR command) {
-	return var(perform_callable_.libfilepath(command.toString())).osfile();
-}
+//////////////////
+// Other functions
+//////////////////
 
 // select
 bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {

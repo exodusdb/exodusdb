@@ -14,6 +14,16 @@ programinit()
 		return 0;
 	}
 
+	// Check there are no hung transactions from cancelled test runs
+	//var sql = "SELECT query,state,backend_start FROM pg_stat_activity WHERE state IN ('active', 'idle in transaction') AND pid <> pg_backend_pid();";
+	var sql = "SELECT query,state,backend_start FROM pg_stat_activity WHERE state IN ('idle in transaction') AND pid <> pg_backend_pid();";
+	TRACE(sql)
+	assert(var().sqlexec(sql, ANS));
+	if (ANS) {
+		TRACE(ANS.convert(RM, _EOL).convert(FM, "\t"))
+		abort("There should be no 'idle in transaction'");
+	}
+
 	// Comment this out if you want to see anything in the database after an assert failure
 	///////////////////////////////////////////////////////////////////////////////////////
 	assert(begintrans());

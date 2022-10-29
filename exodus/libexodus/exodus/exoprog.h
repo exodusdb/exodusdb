@@ -108,7 +108,8 @@ class PUBLIC ExodusProgramBase {
 #include <exodus/ioconv_custom.h>
 
 	explicit ExodusProgramBase(ExoEnv& inmv);
-	explicit ExodusProgramBase(ExoEnv&& inmv) = delete;
+	//ExodusProgramBase(ExoEnv& mv);
+	//explicit ExodusProgramBase(ExoEnv&& inmv) = delete;
 
 	// No default constructor
 	// data member mv is a reference and we only provide constructors for preexisting ExoEnv.

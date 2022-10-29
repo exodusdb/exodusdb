@@ -1,32 +1,38 @@
 #define BUILDING_LIBRARY
 #include <exodus/exodus.h>
 
-// a library section is a just a class stored in an so/dll shared library that can be
-// called like a function or subroutine from another executable.
+// A library section is a just a c++ class stored in an so/dll shared library that can be
+// called like a function or subroutine from an exodus program or other library.
+//
+//  libraryinit()
+//  function main(parameters ...){
+//   ...
+//  }
+//  libraryexit()
+//
+// A library can have multiple libraryinit/exit sections and all are publically available
+//
+//  libraryinit(funcx)
+//  function main(parameters ...){
+//   ...
+//  }
+//  libraryexit(funcx)
+//
+// by including its xxxxxxxx.h file name in other programs and libraries.
+//
+// A library's header file is generated when compiled using exodos/cli/compile which also calls c++.
+//
+// A library can also include other classes. Classes are identical to library sections but they are
+// private to the library since they are not published in its xxxxxxxx.h file.
 
-// library could have MULTIPLE libraryinit/exit sections and all are publically available
-// by including the libraryfilename.h file name in other programs and libraries.
-// the libraryinit() libraryexit() macros would have to modified to create function names
-// eg libraryinit(funcx) libraryexit(funcx)
-
-// a library can also have classes. classes are identical to library sections but they are
-// private to the library since they are not published in the libraryfilename.h file.
-
-// exodus subroutines and functions in libraries are just local subroutines and functions
-// and are redefined without DLLEXPORT here
-#undef subroutine
-#undef function
-#define subroutine \
-   public:         \
-	void
-#define function \
-   public:       \
-	var
+// SIMILAR CODE IN
+// program.h library.h
 
 // a library section is just a class plus a global exported function that allows the class
 // to be instantiated and its main(...) called from another program via so/dll delay loading
 // AND share the mv environment variables of the calling program!
-#define libraryinit(CLASSNAME) classinit(CLASSNAME)
+#define libraryinit(PROGRAMCLASSNAME) \
+class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {
 
 // to undo an ms optimisation that prevents casting between member function pointers
 // http://social.msdn.microsoft.com/Forums/en/vclanguage/thread/a9cfa5c4-d90b-4c33-89b1-9366e5fbae74
@@ -53,10 +59,11 @@ call ExodusProgram::* )(exodus::in)' to 'exodus::pExodusProgramBaseMemberFunctio
 Pointers to members have different representations; cannot cast between them
 */
 
-_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")
-
-#define libraryexit(CLASSNAME)                                                                 \
-	classexit(CLASSNAME) extern "C" PUBLIC void exodusprogrambasecreatedelete_##CLASSNAME(     \
+#define libraryexit(PROGRAMCLASSNAME)                                                          \
+ public:                                                                                       \
+	PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                     \
+};                                                                                             \
+extern "C" PUBLIC void exodusprogrambasecreatedelete_##PROGRAMCLASSNAME(                       \
 		pExodusProgramBase& pexodusprogrambase, ExoEnv& mv,                                    \
 		pExodusProgramBaseMemberFunction& pmemberfunction) {                                   \
 		if (pexodusprogrambase) {                                                              \
@@ -64,10 +71,11 @@ _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")
 			pexodusprogrambase = nullptr;                                                      \
 			pmemberfunction = nullptr;                                                         \
 		} else {                                                                               \
-			pexodusprogrambase = new CLASSNAME##ExodusProgram(mv);                             \
+			pexodusprogrambase = new PROGRAMCLASSNAME##ExodusProgram(mv);                      \
 			_Pragma("GCC diagnostic push")                                                     \
+            _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")                         \
 				pmemberfunction =                                                              \
-					(pExodusProgramBaseMemberFunction)&CLASSNAME##ExodusProgram::main;         \
+					(pExodusProgramBaseMemberFunction)&PROGRAMCLASSNAME##ExodusProgram::main;  \
 			_Pragma("GCC diagnostic pop")                                                      \
 		}                                                                                      \
 		return;                                                                                \
