@@ -7,7 +7,7 @@ libraryinit()
 #include <nextkey.h>
 #include <singular.h>
 
-#include <win_common.h>
+#include <req_common.h>
 
 #include <request.hpp>
 
@@ -34,7 +34,7 @@ var wsmsg;
 
 function main(in mode0) {
 
-	// nb general.subs can only be called from programs with win_common.h
+	// nb general.subs can only be called from programs with req_common.h
 	// because msg etc are common variables and must be defined in caller
 
 	mode = mode0;

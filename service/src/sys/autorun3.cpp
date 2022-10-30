@@ -12,7 +12,7 @@ libraryinit()
 #include <system_common.h>
 
 #include <sys_common.h>
-#include <win_common.h>
+#include <req_common.h>
 
 var docids;
 var options;

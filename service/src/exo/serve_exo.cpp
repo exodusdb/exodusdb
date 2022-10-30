@@ -6,7 +6,7 @@ programinit()
 #include <initgeneral.h>
 #include <initgeneral2.h>
 #include <sys_common.h>
-#include <win_common.h>
+#include <req_common.h>
 
 var xx;
 

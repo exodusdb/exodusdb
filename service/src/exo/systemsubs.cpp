@@ -3,7 +3,7 @@ libraryinit()
 
 #include <singular.h>
 
-#include <win_common.h>
+#include <req_common.h>
 
 #include <request.hpp>
 
