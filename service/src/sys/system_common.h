@@ -6,7 +6,7 @@
 //#define crlf_ "\n"
 
 #define maxstrsize_ 1048576
-#define OSSLASH_ "/"
+//#define OSSLASH_ "/"
 
 //keep "centuryyear" in sync in frontend exodus.js
 //and backend ADDCENT ADDCENT2 ADDCENT4

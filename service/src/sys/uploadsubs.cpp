@@ -168,7 +168,7 @@ postuploadfail:
 			// if result else
 			var fullsubfolder = (uploadroot ^ subfolder).lcase();
 			// remove doubled up separators - \\ on winddows or // on linux
-			fullsubfolder.replacer(OSSLASH_ OSSLASH_, OSSLASH);
+			fullsubfolder.replacer(_OSSLASH _OSSLASH, OSSLASH);
 			// osopen fullsubfolder to xx else if status() ne 2 then
 			// cannot use dos 8 characters since keys can be > 8 characters
 			call shell2("dir " ^ fullsubfolder, errors);

@@ -1241,7 +1241,7 @@ nextreport:
 				perform 'RENAMEFILE LOG':year:' LOG':year:'.BAD (S)';
 				// get back to any existing correct file
 				tattach='ATTACH ../data/':system<17>:'/GENERAL LOG':year:' (S)';
-				convert '/' to OSSLASH_ in tattach;
+				convert '/' to _OSSLASH in tattach;
 				perform tattach;
 				// open/create new in the right place
 				if openfile('LOG':year,log,'DEFINITIONS') then;
@@ -1584,7 +1584,7 @@ adddatasetcodename:
 	// FOLLOWING MUST ALL BE DONE LAST OF ALL
 
 	call log2("*save upgrade history and email notification", logtime);
-	if (version.osread("GENERAL" OSSLASH_ "VERSION.DAT")) {
+	if (version.osread("GENERAL" _OSSLASH "VERSION.DAT")) {
 
 		// get version installed
 		var versioninstalled = version.field("\r", 1).field("\n", 1).trim();

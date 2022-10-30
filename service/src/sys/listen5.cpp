@@ -161,7 +161,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 		inpath = request3;
 		tt	   = "\\/";
-		inpath.converter(tt, OSSLASH_ OSSLASH_);
+		inpath.converter(tt, _OSSLASH _OSSLASH);
 		// delete old response and temp files every 1 minute
 		call listen5("DELETEOLDFILES", "*.4", inpath);
 		call listen5("DELETEOLDFILES", "*.5", inpath);
