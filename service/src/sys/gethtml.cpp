@@ -7,7 +7,7 @@ libraryinit()
 // For sys.gcurrcompcode (for compcode), sys.companies (to read letterheadcompany and imagecompany) and sys.glang (months for langdate)
 #include <sys_common.h>
 
-	var modex;
+var modex;
 var hascompanies;
 var compcode;
 var letterheadcompany;
@@ -195,7 +195,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 				// tagn = ntags;
 				break;
 			}
-		}  //tagn;
+		}  // tagn;
 	}
 
 	letterhead.replacer(_FM, _EOL);
@@ -250,7 +250,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 				ncols = tt;
 			}
 		}
-	}  //fn;
+	}  // fn;
 	if (not ncols) {
 		return;
 	}
@@ -399,7 +399,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			tab(-1) = "  </td>";
 		}
 
-	}  //coln;
+	}  // coln;
 
 	if (usetable) {
 		tab(-1) = "";

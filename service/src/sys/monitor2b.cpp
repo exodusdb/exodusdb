@@ -8,11 +8,11 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var wgetrc;
+var wgetrc;
 var authurl;
 var params;
 var text;
-var hashcode;  //num
+var hashcode;  // num
 var errors;
 var log;
 
@@ -427,7 +427,7 @@ subroutine hash(in salt, in max, out hashcode) {
 	hashcode = salt;
 	for (const int ii : range(1, text.len())) {
 		hashcode = (hashcode * (text[ii]).seq()).mod(max);
-	}  //ii;
+	}  // ii;
 	return;
 }
 

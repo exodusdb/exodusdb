@@ -5,10 +5,10 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var ntries;	 //num
+var ntries;	 // num
 var lockdesc;
 var xx;
-var allowduplicate;	 //num
+var allowduplicate;	 // num
 //var lockitem;
 var lockn;	// num
 var lockfile;

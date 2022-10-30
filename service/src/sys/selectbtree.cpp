@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var foundkeys;
+var foundkeys;
 
 function main(in filename, in indexid, in texts0, io msg) {
 

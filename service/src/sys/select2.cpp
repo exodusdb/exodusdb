@@ -11,10 +11,10 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-	var dictids;
+var dictids;
 var options;
 var maxnrecs;
-//var nlimitfields;//num
+//var nlimitfields; // num
 dim hexx;
 var useactivelist;	// num
 var v69;
@@ -24,7 +24,7 @@ var storer;
 var storeid;
 var storedict;
 var storemv;
-var commonsaved;  //num
+var commonsaved;  // num
 var savesrcfile;
 var savedatafile;
 var savewlocked;
@@ -90,7 +90,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		// changed to allow language characters to pass through x80-xF9
 		for (const var ii : range(249, 255)) {
 			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
-		}  //ii;
+		}  // ii;
 	}
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
@@ -223,7 +223,7 @@ nocommon:
 		// 			// /BREAK;
 		// 			if (not(dictids.ends(FM))) break;
 		// 			dictids.popper();
-		// 		}//loop;
+		// 		}// loop;
 		dictids.trimmerlast(FM);
 		if (dictids eq "") {
 			dictids = "ID";
@@ -257,7 +257,7 @@ nocommon:
 			dictrec			  = lower(dictrec);
 			dictrecs(dictidn) = dictrec;
 			oconvsx(dictidn)  = dictrec.f(1, 7);
-		}  //dictidn;
+		}  // dictidn;
 	}
 
 	var tx = "";
@@ -418,7 +418,7 @@ nextrec:
 			stop();
 			return 0;
 		}
-	}  //limitfieldn;
+	}  // limitfieldn;
 
 	recn += 1;
 
@@ -489,7 +489,7 @@ nextrec:
 			} else {
 				row(1, dictidn) = cell;
 			}
-		}  //dictidn;
+		}  // dictidn;
 
 		if (xml) {
 			row =
@@ -530,13 +530,13 @@ nextrec:
 			// changed to allow language characters to pass through x80-xF9
 			for (const var ii : range(249, 255)) {
 				rowpart.replacer(chr(ii), hexx(ii - 249));
-			}  //ii;
+			}  // ii;
 
 			// output converted row part
 			call osbwrite(rowpart, linkfile2, dataptr);
 
 			blockn += 1;
-		}  //loop;
+		}  // loop;
 
 	} else {
 		datax ^= row;

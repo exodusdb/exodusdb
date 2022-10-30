@@ -9,7 +9,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var ndec;  //num
+var ndec;  // num
 var temp;
 
 function main(in nextcompanycode) {

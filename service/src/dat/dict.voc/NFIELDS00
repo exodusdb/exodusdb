@@ -16,7 +16,7 @@ S
 			pos2 = RECORD.len() + 1;\
 		}\
 		RECORD.paster(pos1, pos2 - pos1 + 2, "");\
-	}//loop;\
+	}// loop;\
 	// call msg('x')\
 	// remove comment lines\
 	let nfields = RECORD.fcount(FM);\
@@ -28,7 +28,7 @@ S
 		if (RECORD.f(ii).trim().starts("*")) {\
 			RECORD(ii) = "";\
 		}\
-	} //ii;\
+	} // ii;\
 	// @record=matunparse(x)\
 	//             call msg('y')\
 	// remove blank lines\

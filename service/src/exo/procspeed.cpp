@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	var ss1;
+var ss1;
 var ss2;
 var xx;
 var secs;	// num
@@ -50,7 +50,7 @@ function main() {
 
 			printl(speed, " x=i ", secs.oconv("MD10P"), " ", nn, " ", time());
 		}
-	}  //loop;
+	}  // loop;
 
 	var msg = "";
 	msg(-1) = "PROCSPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed;
@@ -70,7 +70,7 @@ subroutine getspeed() {
 	// for (const var ii : range(1, nn)) {
 	for (int ii = 1; ii <= nn; ++ii) {
 		xx = ii;
-	}  //ii;
+	}  // ii;
 	time2 = ostime();
 	secs  = time2 - time1;
 

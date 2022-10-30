@@ -28,7 +28,7 @@ function main(in /*mode*/, in datasetcode, out result) {
 			// ii = 99999;
 			break;
 		}
-	}  //ii;
+	}  // ii;
 
 	shutdownfilename.osremove();
 

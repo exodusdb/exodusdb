@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var output2;
+var output2;
 var ndecs;	// num
 
 function main(in type, in input0, in mode, out output) {

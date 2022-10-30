@@ -56,14 +56,14 @@ libraryinit()
 var newpassword;
 var userx;
 var sysrec;
-var passwordfn;	 //num
-var lastfn;		 //num
+var passwordfn;	 // num
+var lastfn;		 // num
 var filename;
 var defaultlock;
 var msg;
 var usern;	// num
 var xx;
-var ousern;	 //num
+var ousern;	 // num
 var newtaskn;
 var userfields;
 //var nuserfields;
@@ -76,7 +76,7 @@ var replyto;
 var attachfilename;
 var deletex;
 var errormsg;
-var ok;	 //num
+var ok;	 // num
 var encryptx;
 var op;
 var op2;
@@ -210,7 +210,7 @@ function main(in mode) {
 					RECORD.remover(10, taskn);
 					RECORD.remover(11, taskn);
 				}
-			}  //taskn;
+			}  // taskn;
 		}
 
 		// hide higher/lower users
@@ -235,7 +235,7 @@ function main(in mode) {
 					if (not(startn_ gt 1 and (RECORD.f(2, startn_ - 1) eq "")))
 						break;
 					startn_ -= 1;
-				}  //loop;
+				}  // loop;
 			}
 
 			// hide lower users
@@ -248,7 +248,7 @@ function main(in mode) {
 					if (not(endn_ lt nusers and (RECORD.f(1, endn_ + 1) ne "---")))
 						break;
 					endn_ += 1;
-				}  //loop;
+				}  // loop;
 			}
 
 			// extract out the allowable users and keys
@@ -286,7 +286,7 @@ function main(in mode) {
 									otherkeys ^= VM ^ keyx;
 								}
 							}
-						}  //keyn;
+						}  // keyn;
 						otherkeys.cutter(1);
 						otherkeys.converter(VM, ",");
 					}
@@ -296,7 +296,7 @@ function main(in mode) {
 				// delete higher and lower users if not allowed
 				for (const var fn : range(1, 8)) {
 					RECORD(fn) = RECORD.f(fn).field(VM, startn_, nn);
-				}  //fn;
+				}  // fn;
 
 			} else {
 				startn_ = "";
@@ -324,7 +324,7 @@ function main(in mode) {
 					RECORD(4, usern) = "<hidden>" ^ SM ^ sysrec2;
 				}
 			}
-		}  //usern;
+		}  // usern;
 
 		RECORD(20) = startn_;
 		RECORD(21) = endn_;
@@ -342,7 +342,7 @@ function main(in mode) {
 				var temp = RECORD.f(fn);
 				temp.replacer("---", "");
 				RECORD(fn) = temp;
-			}  //fn;
+			}  // fn;
 
 			// save orec (after removing stuff) for prewrite
 			if (win.wlocked) {
@@ -468,7 +468,7 @@ function main(in mode) {
 					return 0;
 				}
 
-			}  //usern;
+			}  // usern;
 
 			// mark empty users and keys with "---" to assist identification of groups
 			// let nusers = RECORD.f(1).fcount(VM);
@@ -479,7 +479,7 @@ function main(in mode) {
 					RECORD(1, usern) = "---";
 					RECORD(2, usern) = "---";
 				}
-			}  //usern;
+			}  // usern;
 
 			// put back any hidden users
 			if (startn_) {
@@ -489,7 +489,7 @@ function main(in mode) {
 					var temp = RECORD.f(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
 					RECORD(fn) = origfullrec_.f(fn).fieldstore(VM, startn_, -nn, temp);
-				}  //fn;
+				}  // fn;
 			}
 
 			// put back any hidden tasks
@@ -508,7 +508,7 @@ function main(in mode) {
 						}
 					}
 				}
-			}  //taskn;
+			}  // taskn;
 		}
 
 		// backup copy one per day
@@ -589,7 +589,7 @@ function main(in mode) {
 						// /BREAK;
 						if (not(not(menuid)))
 							break;
-					}  //usern2;
+					}  // usern2;
 				}
 
 				// update the users file
@@ -664,7 +664,7 @@ function main(in mode) {
 					}
 				}
 			}
-		}  //usern;
+		}  // usern;
 
 		// subsection for deletion of old
 		{
@@ -693,7 +693,7 @@ function main(in mode) {
 						}
 					}
 				}
-			}  //usern;
+			}  // usern;
 
 		}  // deletion of old
 
@@ -756,7 +756,7 @@ function main(in mode) {
 						for (const var linkn : range(1, nlinks)) {
 							body(1, -1) = baselinkdescs.f(1, linkn) ^ " " ^ baselinks.f(1, linkn);
 							// if @account='ACCOUNTS' then body:='?ACCOUNTS'
-						}  //linkn;
+						}  // linkn;
 						body.replacer("Internet Explorer", "MS Edge");
 					} else {
 						body(1, -1) = "Please contact your IT support or colleagues";
@@ -791,7 +791,7 @@ function main(in mode) {
 						call note(errormsg);
 					}
 
-				}  //ii;
+				}  // ii;
 			}
 
 			// prepare to write the inverted record in noninteractive mode
@@ -827,10 +827,10 @@ function main(in mode) {
 						if (tt) {
 							temprec(fn) = tt.remove(1, ii, 0);
 						}
-					}  //fn;
+					}  // fn;
 				}
 			}
-		}  //ii;
+		}  // ii;
 
 		// remove empty groups
 		{
@@ -846,11 +846,11 @@ function main(in mode) {
 								if (tt) {
 									temprec(fn) = tt.remove(1, ii, 0);
 								}
-							}  //fn;
+							}  // fn;
 						}
 					}
 				}
-			}  //ii;
+			}  // ii;
 		}
 
 		// add group marks
@@ -863,7 +863,7 @@ function main(in mode) {
 			let nfs	   = temprec.fcount(FM);
 			for (const var fn : range(1, nfs)) {
 				temprec(fn) = temprec.f(fn).field(VM, 1, nusers);
-			}  //fn;
+			}  // fn;
 			// temprec = invertarray(reverse(invertarray(temprec)));
 			temprec = invertarray(reverse(invertarray(temprec)));
 		}
@@ -939,7 +939,7 @@ function main(in mode) {
 					// /BREAK;
 					if (not temp)
 						break;
-				}  //ii;
+				}  // ii;
 				task ^= "   ";
 				task.replacer("%SAME% ", "+");
 				task.trimmerlast();
@@ -948,7 +948,7 @@ function main(in mode) {
 				tasks2 ^= VM ^ task;
 				locks2 ^= VM ^ locks.f(1, taskn);
 			}
-		}  //taskn;
+		}  // taskn;
 		tasks2.cutter(1);
 		locks2.cutter(1);
 		// transfer tasks2 to @ans
@@ -1005,7 +1005,7 @@ subroutine generatepassword() {
 	for (const var ii : range(1, minpasswordchars_ / 2)) {
 		newpassword ^= consonants[consonants.len().rnd() + 1];
 		newpassword ^= vowels[vowels.len().rnd() + 1];
-	}  //ii;
+	}  // ii;
 	return;
 }
 
@@ -1083,7 +1083,7 @@ subroutine cleartemp() {
 	// 24 other keys
 	for (const var ii : range(20, 24)) {
 		RECORD(ii) = "";
-	}  //ii;
+	}  // ii;
 	return;
 }
 
@@ -1129,7 +1129,7 @@ subroutine getemailtx(in nuserfields) {
 				}
 			}
 		}
-	}  //fieldn;
+	}  // fieldn;
 
 	if (tx) {
 		emailtx(-1) = FM ^ var("User Code:").oconv("L#10") ^ userx;

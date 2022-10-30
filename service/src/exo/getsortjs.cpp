@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var t2;
+var t2;
 
 function main(io tx) {
 	// c xxx io
@@ -141,7 +141,7 @@ function QuickSort(rows,coln,min,max){
    high--;
   }
 
-  //pauseSort();
+  // pauseSort();
 
  } while (low <= high);
 

@@ -3,7 +3,7 @@ libraryinit()
 
 #include <system_common.h>
 
-	var inx;  //num
+var inx;  // num
 
 function main(in type, in in0, in /*mode*/, out outx) {
 

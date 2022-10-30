@@ -47,7 +47,7 @@ function main(in mode) {
 					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CREATED*" ^ FM ^ "Lock : " ^ newlock;
 				}
 			}
-		}  //taskn;
+		}  // taskn;
 
 		ntasks = oldtasks.fcount(VM);
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
@@ -58,7 +58,7 @@ function main(in mode) {
 					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
 				}
 			}
-		}  //taskn;
+		}  // taskn;
 
 		ANS = emailtx2;
 
@@ -185,13 +185,13 @@ function main(in mode) {
 			if (not(t10.contains("MEDIA MEDIA ")))
 				break;
 			t10.replacer("MEDIA MEDIA ", "MEDIA ");
-		}  //loop;
+		}  // loop;
 		while (true) {
 			// /BREAK;
 			if (not(t10.contains("JOB JOB ")))
 				break;
 			t10.replacer("JOB JOB ", "JOB ");
-		}  //loop;
+		}  // loop;
 
 		t10.trimmer();
 		newuserprivs(10) = t10;
@@ -215,7 +215,7 @@ function main(in mode) {
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			}
-		}  //ii;
+		}  // ii;
 
 		// ensure certain documents cannot be deleted
 		if (newuserprivs.f(10).locate("JOB ORDER DELETE", taskn)) {
@@ -247,7 +247,7 @@ deletetask:
 					}
 				}
 			}
-		}  //taskn;
+		}  // taskn;
 
 		if (newuserprivs ne SECURITY) {
 			call log2("*write userprivs back", logtime);

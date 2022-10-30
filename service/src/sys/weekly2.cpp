@@ -5,9 +5,9 @@ var firstmonth;
 var firstdayofweek;
 var maxperiod;	// num
 var temp;
-var year;	 //num
-var period;	 //num
-var idate;	 //num
+var year;	 // num
+var period;	 // num
+var idate;	 // num
 
 function main(in type, in input0, in mode, out output) {
 
@@ -74,7 +74,7 @@ function main(in type, in input0, in mode, out output) {
 		period -= maxperiod;
 		year += 1;
 		year = year.oconv("R(0)#2");
-	}  //loop;
+	}  // loop;
 
 	// get the first day of the next period
 	// if period=1 then
@@ -98,11 +98,11 @@ subroutine getfirstdom() {
 	// if period<>1 then
 	while (true) {
 		// /BREAK;
-		//if (not((idate - 1).mod(7) + 1 ne firstdayofweek))
+		// if (not((idate - 1).mod(7) + 1 ne firstdayofweek))
 		if ( idate.oconv("DW") eq firstdayofweek)
 			break;
 		idate += 1;
-	}  //loop;
+	}  // loop;
 	// end
 	return;
 }

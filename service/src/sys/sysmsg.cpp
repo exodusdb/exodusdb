@@ -12,7 +12,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var subjectin;
+var subjectin;
 var username;
 var bakpars;
 var body;

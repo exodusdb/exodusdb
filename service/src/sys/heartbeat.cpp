@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var status;
+var status;
 var processno;	// num
 
 function main(in mode, in status0 = "") {

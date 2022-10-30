@@ -3,20 +3,20 @@ libraryinit()
 
 #include <addcent4.h>
 
-	var firstdate;
-var firstdayofweek;	 //num
-var weeksperperiod;	 //num
-var maxperiod;		 //num
+var firstdate;
+var firstdayofweek;	 // num
+var weeksperperiod;	 // num
+var maxperiod;		 // num
 var temp;
-var year;	 //num
-var period;	 //num
+var year;	 // num
+var period;	 // num
 var year2;
-var firstdateofyear2;  //num
-var firstdateofyear;   //num
-var dayofyear;		   //num
-var diff;			   //num
-var firstdayofyear;	   //num
-var difference;		   //num
+var firstdateofyear2;  // num
+var firstdateofyear;   // num
+var dayofyear;		   // num
+var diff;			   // num
+var firstdayofyear;	   // num
+var difference;		   // num
 
 function main(in type, in input0, in mode, out output) {
 
@@ -129,7 +129,7 @@ subroutine getfirstdateofyear() {
 	// eg start of year 1/7/93 is thursday (day 1)
 	//   start of week is friday (day 5)
 	// therefore start of year is 2/7/93
-	//firstdayofyear = (firstdateofyear - 1).mod(7) + 1;
+	// firstdayofyear = (firstdateofyear - 1).mod(7) + 1;
 	firstdayofyear = firstdateofyear.oconv("DW");
 	difference	   = firstdayofyear - firstdayofweek;
 	if (difference gt 3) {

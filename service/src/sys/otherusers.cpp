@@ -3,8 +3,8 @@ libraryinit()
 
 #include <rtp57.h>
 
-	var databasecode;
-var usercode;  //num
+var databasecode;
+var usercode;  // num
 var lockprefix;
 var result;
 var xx;
@@ -128,7 +128,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 		returndata += 1;
 
 nextlock:;
-	}  //lockno;
+	}  // lockno;
 
 	returndata -= 1;
 	if (returndata lt 0) {
@@ -150,7 +150,7 @@ nextlock:;
 			usercode -= (usercode / 10).floor();
 		}
 		returndata(2, ii) = "PROCESS" ^ usercode;
-	}  //ii;
+	}  // ii;
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		call note(returndata.f(1) ^ " other users");

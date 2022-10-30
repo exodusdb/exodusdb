@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var previous;  //num
+var previous;  // num
 
 function main(in mode, in previous0 = "") {
 	// jbase linemark

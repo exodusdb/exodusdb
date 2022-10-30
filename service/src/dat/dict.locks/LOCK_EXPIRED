@@ -6,7 +6,7 @@ S
 
 
 
-var dostime;//num\
+var dostime; //num\
 \
 function main() {\
 	dostime = ostime();\

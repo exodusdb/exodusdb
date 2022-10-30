@@ -10,7 +10,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var menuid;
+var menuid;
 var taskn;	// num
 var xx;
 var menun2;
@@ -111,7 +111,7 @@ deleteit:
 				}
 			}
 		}
-	}  //menun;
+	}  // menun;
 
 	// if they have MENU then ANALYSIS=MEDIAANALYSIS
 	if (menus.contains("MEDIA")) {
@@ -161,7 +161,7 @@ nextcomp:
 				compcodes(-1) = compcode;
 			}
 
-		}  //ii;
+		}  // ii;
 	} else {
 		compcodes = allcomps.f(1);
 	}

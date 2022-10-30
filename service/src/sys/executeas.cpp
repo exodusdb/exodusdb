@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var xx;
+var xx;
 var origusername;
 
 function main(in cmd, in username) {

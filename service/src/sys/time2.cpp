@@ -3,7 +3,7 @@ libraryinit()
 
 #include <time2.h>
 
-	var mode;
+var mode;
 var outputx;
 
 function main(in type, in input0, in mode0, out output) {
@@ -58,7 +58,7 @@ function main(in type, in input0, in mode0, out output) {
 			for (const var ii : range(1, nn)) {
 				call time2(type, input0.f(1, ii), mode, outputx);
 				pickreplacer(output, 1, ii, outputx);
-			}  //ii;
+			}  // ii;
 			return 0;
 		}
 

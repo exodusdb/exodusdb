@@ -10,19 +10,19 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var msg;
+var msg;
 var html;
 var reqdate;
 var vn;
 var output;
-var usercoln;  //num
+var usercoln;  // num
 var tx;
 var userx;
 
 var printptr;	// num
 var topmargin;	// num
 var printfilename;
-var ownprintfile;  //num
+var ownprintfile;  // num
 var ptx_filenamelen;
 var ptx_random;
 var printfile;
@@ -37,24 +37,24 @@ var printtxmark;
 var rfmt;
 var head;
 var foot;
-var ntxlns;	   //num
-var nbodylns;  //num
+var ntxlns;	   // num
+var nbodylns;  // num
 var ptx_temp;
 var headx;
 var newpagetag;
 var ptx_css;
 var cssver;
 var style;
-var stylennx;  //num
+var stylennx;  // num
 var htmltitle;
 var head_or_foot;
 var footx;
 var head1;
-var optioncharn;  //num
+var optioncharn;  // num
 var optionchars;
 var optionchar;
 var newoptions;
-var printtx_ii;	 //num
+var printtx_ii;	 // num
 var spaceoptionsize;
 
 function main() {
@@ -121,11 +121,11 @@ function main() {
 					break;
 				replaced	  = 1;
 				row2(1, coln) = "-";
-			}  //coln;
+			}  // coln;
 			if (replaced) {
 				output(rown) = row2;
 			}
-		}  //rown;
+		}  // rown;
 	}
 
 	if (not(rowfields.locate("USER_CODE", usercoln))) {
@@ -161,7 +161,7 @@ function main() {
 			if (coln eq usercoln) {
 				tx ^= "<col>";
 			}
-		}  //coln;
+		}  // coln;
 
 		tx ^= tr;
 		for (const var coln : range(1, ncols)) {
@@ -174,7 +174,7 @@ function main() {
 			if (coln eq usercoln) {
 				tx ^= th ^ "Browser Last Seen" ^ thx;
 			}
-		}  //coln;
+		}  // coln;
 		tx ^= trx;
 
 		tx ^= "</thead>";
@@ -192,7 +192,7 @@ function main() {
 							if (not(output.f(rown2, coln) eq "-"))
 								break;
 							rowspan += 1;
-						}  //rown2;
+						}  // rown2;
 
 						var celltd = "<TD";
 						if (rowspan gt 1) {
@@ -235,12 +235,12 @@ function main() {
 						rowtx ^= td ^ nbsp ^ tdx;
 					}
 				}
-			}  //coln;
+			}  // coln;
 			tx ^= tr ^ rowtx ^ trx;
 			if (tx.len() gt 64000) {
 				gosub printtx();
 			}
-		}  //rown;
+		}  // rown;
 		tx ^= "</table>" _EOL;
 
 		gosub printtx();

@@ -6,7 +6,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var interactive;
+var interactive;
 var mode;
 var dataset;
 var voc;
@@ -158,7 +158,7 @@ invalidx:
 		}
 	}
 
-////////
+// //////
 success:
 	// //////
 	return 1;

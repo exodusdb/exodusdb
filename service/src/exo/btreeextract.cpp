@@ -50,7 +50,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 			if (not LISTACTIVE)
 				break;
 
-		}  //partn;
+		}  // partn;
 	}
 
 	// turn the select list into a string of fields

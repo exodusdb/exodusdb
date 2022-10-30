@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var params;
+var params;
 
 function main(in msgno, io msg, in params0 = "") {
 	if (params0.unassigned()) {

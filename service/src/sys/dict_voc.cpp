@@ -350,7 +350,7 @@ function main() {
 	// @ans<1,-1>=tx
 	// end
 
-	} //fn;
+	} // fn;
 	return ANS;
 	/*;
 	change:
@@ -547,7 +547,7 @@ function main() {
 			pos2 = RECORD.len() + 1;
 		}
 		RECORD.paster(pos1, pos2 - pos1 + 2, "");
-	}//loop;
+	}// loop;
 	// call msg('x')
 	// remove comment lines
 	let nfields = RECORD.fcount(FM);
@@ -559,7 +559,7 @@ function main() {
 		if (RECORD.f(ii).trim().starts("*")) {
 			RECORD(ii) = "";
 		}
-	} //ii;
+	} // ii;
 	// @record=matunparse(x)
 	//             call msg('y')
 	// remove blank lines

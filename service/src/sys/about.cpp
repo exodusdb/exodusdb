@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var interactive;
+var interactive;
 var l10;
 var l20;
 var l30;

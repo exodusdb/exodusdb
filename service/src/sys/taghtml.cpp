@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var xx;
+var xx;
 
 function main(in /*type*/, in in0, in mode, out output) {
 
@@ -47,7 +47,7 @@ function main(in /*type*/, in in0, in mode, out output) {
 	return 0;
 }
 
-//subroutine test() {
+// subroutine test() {
 //	// test oconv [TAGHTML]
 //	var text = "&nbsp" _VM "&amp" _VM "&lt" _VM "&gt" _VM "&infin" _VM;
 //	assert(oconv(text,"[TAGHTML,XYZ]").convert(VM,"]") eq "<XYZ>&nbsp</XYZ>]<XYZ>&amp</XYZ>]<XYZ>&lt</XYZ>]<XYZ>&gt</XYZ>]<XYZ>&infin</XYZ>]");

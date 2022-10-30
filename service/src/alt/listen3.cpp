@@ -127,7 +127,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 			tt.lcaser();
 			tt.converter(".", "");
 			triggers(ii) = tt;
-		}  //ii;
+		}  // ii;
 	}
 
 	return 0;

@@ -83,7 +83,7 @@ function main() {
 		return ANS;
 	}
 	call processlocking("ISLOCKED", ID, islocked);
-	//if (not(islocked) and VOLUMES) {
+	// if (not(islocked) and VOLUMES) {
 	//	ANS = "Crashed";
 	//	return ANS;
 	//}
@@ -93,7 +93,7 @@ function main() {
 	var hungtime = 10 * 60 / 86400.0;
 	var r33 = RECORD.f(33);
 	if (r33 and (dostimenow - RECORD.f(27) gt hungtime)) {
-		//if (VOLUMES) {
+		// if (VOLUMES) {
 		//	ANS = "Hung";
 		//} else {
 			ANS = "Closed";

@@ -10,15 +10,15 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var sentencex;
+var sentencex;
 var selectx;
 var nfilters0;
-var nfilters;  //num
+var nfilters;  // num
 var filterfields;
 var filtervalues;
 dim filters;
-var temp;  //num
-var ptr;   //num
+var temp;  // num
+var ptr;   // num
 var tt;
 var dicthasauthorised;	// num
 var keyx;
@@ -70,7 +70,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		for (const var filtern : range(1, nfilters)) {
 			filters(1, filtern) = filterfields.f(1, filtern).convert(SM, VM);
 			filters(3, filtern) = filtervalues.f(1, filtern).convert(SM, VM);
-		}  //filtern;
+		}  // filtern;
 	}
 
 	// convert command line to subroutine call
@@ -179,7 +179,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 					notexportable(ii) = temp;
 				}
 			}
-		}  //ii;
+		}  // ii;
 	}
 
 	var listkey = var(1000000).rnd();
@@ -485,7 +485,7 @@ nextrec:
 			goto nextrec;
 		}
 
-	}  //filtern;
+	}  // filtern;
 
 	for (const var coln : range(1, ncols)) {
 		MV	   = mvx;
@@ -497,7 +497,7 @@ nextrec:
 				maxvn = temp;
 			}
 		}
-	}  //coln;
+	}  // coln;
 	// d ebug
 	// get the data
 	rec			= "";  //dim
@@ -513,7 +513,7 @@ nextrec:
 				anydata	  = 1;
 			}
 		}
-	}  //coln;
+	}  // coln;
 
 	// normalise the data and output to csv file
 	// if rec<>'' then
@@ -610,7 +610,7 @@ nextvn:
 				rec(coln) = cell;
 			}
 
-		}  //coln;
+		}  // coln;
 
 		var line = rec.join();
 
@@ -619,7 +619,7 @@ nextvn:
 		// 			// /BREAK;
 		// 			if (not(line.ends(FM))) break;
 		// 			line.popper();
-		// 		}//loop;
+		// 		}// loop;
 		line.trimmerlast(FM);
 
 		// suppress output of empty amv rows

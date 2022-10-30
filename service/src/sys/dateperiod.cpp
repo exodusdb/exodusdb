@@ -3,8 +3,8 @@ libraryinit()
 
 #include <addcent4.h>
 
-	var period;	 //num
-var year;		 //num
+var period;	 // num
+var year;		 // num
 
 function main(in type, in input0, in mode, out output) {
 

@@ -1,17 +1,17 @@
 #include <exodus/program.h>
 programinit()
 
-	var blocktype;
+var blocktype;
 var blockid;
 var blockline;
 var block;
 var ans;
 var xx;
 var macron;
-var paramn;	 //num
+var paramn;	 // num
 var lineparam;
 var wordn;
-var fieldn;	 //num
+var fieldn;	 // num
 
 var macros;
 var nmacros;
@@ -79,7 +79,7 @@ function main() {
 			stop();
 		}
 
-	}  //loop;
+	}  // loop;
 
 	stop();
 
@@ -222,7 +222,7 @@ subroutine getblock() {
 				// 				while (true) {
 				// 					if (not(block.ends(FM))) break;
 				// 					block.popper();
-				// 				}//loop;
+				// 				}// loop;
 				block.trimmerlast(FM);
 				return;
 			}
@@ -302,7 +302,7 @@ insertmline:
 							}
 						}
 nextmln:;
-					}  //mln;
+					}  // mln;
 
 					// substitute all macro parameters
 					var nparams = macroline.fcount(VM);
@@ -310,7 +310,7 @@ nextmln:;
 						var old	 = macroline.f(1, paramn);
 						var newx = lineparams.f(1, paramn);
 						macrotext.replacer(old, newx);
-					}  //paramn;
+					}  // paramn;
 
 					// speed up fieldwise { } for F fields. avoid calling a dict subroutine
 					var allfields = "";
@@ -345,7 +345,7 @@ nextmln:;
 								call mssg(fieldname.quote() ^ " field is missing from DICT " ^ DICT);
 							}
 						}
-					}  //loop;
+					}  // loop;
 
 					var equates =
 						"\t/"
@@ -361,7 +361,7 @@ nextmln:;
 							macrotext.replacer("{" ^ fieldname ^ "}", fieldname);
 							// swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext
 							equates(-1) = "\t#define " ^ fieldname ^ "\tRECORD.f(" ^ fields.f(2, fieldn) ^ ")";
-						}  //fieldn;
+						}  // fieldn;
 						macrotext.prefixer(equates ^ FM);
 					}
 
@@ -379,7 +379,7 @@ nextmln:;
 		}
 
 		// nextln:;
-	}  //ln;
+	}  // ln;
 
 	return;
 }

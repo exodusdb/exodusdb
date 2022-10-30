@@ -54,7 +54,7 @@ function main(in mode, in params, io result, io msg) {
 				break;
 			call ossleep(1000 * var(3).rnd());
 			call roundrobin("ONEVENT", params2, result, errormsg);
-		}  //loop;
+		}  // loop;
 
 	} else if (mode eq "ONEVENT") {
 
@@ -103,7 +103,7 @@ function main(in mode, in params, io result, io msg) {
 		// ie clear only on the first time that we arrive in it
 		for (const var periodn : range(lastperiodn + 1, currentperiodn)) {
 			roundrobin(2, periodn.mod(periodsperwindow_) + 1) = "";
-		}  //periodn;
+		}  // periodn;
 
 		// record the current period as the last period so that in the next call
 		// we can clear skipped periods (but not the current period again)

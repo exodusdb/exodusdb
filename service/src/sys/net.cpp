@@ -11,7 +11,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var tt;	 //num
+var tt;	 // num
 var bakpars;
 var ver;
 

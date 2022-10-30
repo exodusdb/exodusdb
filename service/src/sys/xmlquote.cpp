@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var string1;
+var string1;
 
 function main(in string0) {
 	if (string0.unassigned()) {

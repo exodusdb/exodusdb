@@ -35,7 +35,7 @@ var userkey;
 var userx;
 var newpassword;
 var xx;
-var fn;	 //num
+var fn;	 // num
 var task;
 var taskprefix;
 var reportid;
@@ -142,7 +142,7 @@ function main() {
 			allhtml(-1) = html;
 			// if testing else allhtml<-1>='<hr/>'
 
-		}  //compn;
+		}  // compn;
 		allhtml(-1) = "Press F5 to refresh any images just uploaded.";
 		allhtml.replacer(_FM, _EOL);
 		var(allhtml).oswrite(SYSTEM.f(2));
@@ -409,7 +409,7 @@ function main() {
 		// somewhere on the way to the browser (not in revelation)
 		for (const var ii : range(1, 255)) {
 			data_ ^= chr(ii);
-		}  //ii;
+		}  // ii;
 		// data='xxx'
 		response_ = "OK";
 
@@ -631,7 +631,7 @@ nextrep:
 				let nn = report.fcount(_FM);
 				for (const var ii : range(1, nn)) {
 					data_(ii, repn) = report.f(ii);
-				}  //ii;
+				}  // ii;
 
 				data_(9, repn) = reportid;
 
@@ -668,7 +668,7 @@ nextrep:
 					}
 				}
 			}
-		}  //docn;
+		}  // docn;
 
 	} else if (mode eq "UPDATEREPORT") {
 
@@ -753,7 +753,7 @@ nextrep:
 			if (tt) {
 				PSEUDO(fn) = tt;
 			}
-		}  //fn;
+		}  // fn;
 		data_ = "";
 
 		// save runtime params in case saving below for scheduled reruns
@@ -862,7 +862,7 @@ performreport:
 		call mssg("System Error: " ^ (mode.quote()) ^ " invalid request in GENERALPROXY");
 	}
 
-/////
+// ///
 exit:
 	// ///
 	return "";

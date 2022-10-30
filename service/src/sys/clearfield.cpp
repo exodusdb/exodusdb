@@ -6,8 +6,8 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var options;
-var nindexed;  //num
+var options;
+var nindexed;  // num
 
 function main() {
 	//
@@ -91,7 +91,7 @@ tryagain:
 				stop();
 			}
 		}
-	}  //ii;
+	}  // ii;
 
 	if (not LISTACTIVE) {
 		select(file);
@@ -135,14 +135,14 @@ next:
 				// RECORD(fns.f(ii)) = cleartovalue2;
 				pickreplacer(RECORD, fns.f(ii), cleartovalue2);
 			}
-		}  //ii;
+		}  // ii;
 		if (cleared) {
 			while (true) {
 				// /BREAK;
 				if (not(RECORD and ((FM ^ VM ^ SM).contains(RECORD[-1]))))
 					break;
 				RECORD.popper();
-			}  //loop;
+			}  // loop;
 			if (RECORD eq "") {
 				file.deleterecord(ID);
 

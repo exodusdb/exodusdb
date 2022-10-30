@@ -218,7 +218,7 @@ nochequeformat:
 						// any more in parallel
 					}
 				}
-			}  //ii;
+			}  // ii;
 
 			// return
 		}
@@ -367,7 +367,7 @@ preventupdate:
 						}
 					}
 				}
-			}  //fn;
+			}  // fn;
 
 			var t49	 = field2(RECORD.f(49), _VM, -1);
 			var t149 = field2(RECORD.f(149), _VM, -1);
@@ -476,7 +476,7 @@ preventupdate:
 										"/" ^
 										var(8).rnd())
 										   .lcase();
-					//if (VOLUMES) {
+					// if (VOLUMES) {
 					//	tempfilename ^= ".$$$";
 					//} else {
 						tempfilename ^= "./$";
@@ -489,7 +489,7 @@ preventupdate:
 						call note("Note: Cannot write to backup drive " ^ drive);
 					}
 				}
-			}  //driven;
+			}  // driven;
 
 			// create/update ddns configuration if necessary
 			// actually only the ddns.cmd file really need be updated
@@ -649,7 +649,7 @@ subroutine reorderdbs() {
 			newdbcodes(1, newdbcoden) = dbcode;
 		}
 		newdblist(1, newdbcoden) = db;
-	}  //dbn;
+	}  // dbn;
 
 	// replace substitution and dblist
 	var newdbdir = dbdir;

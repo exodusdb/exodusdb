@@ -19,14 +19,14 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-	var usern;	// num
+var usern;	// num
 var xx;
 var userencrypt0;
 var validips;
 var addvalidips;
-var ii;	 //num
+var ii;	 // num
 var ipno;
-var maxnologindays;	 //num
+var maxnologindays;	 // num
 var lastlogindate;
 var whoistx;
 var body;
@@ -189,7 +189,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					// /BREAK;
 					if (not(tt ne "" and tt.first(2) ne "OK"))
 						break;
-				}  //failn;
+				}  // failn;
 				   //do normal authorisation to show type of failure - but fail even if ok
 				   //if failn>=maxnfails then
 				   // goto validateexit
@@ -273,7 +273,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 						// /BREAK;
 						if (not(SECURITY.f(1, ii + 1) ne "---"))
 							break;
-					}  //ii;
+					}  // ii;
 					validips = SECURITY.f(6, ii);
 
 					// + in group ipnos means add to system config ip ranges
@@ -545,7 +545,7 @@ passwordexpired:
 									// /BREAK;
 									if (not isnewipnet)
 										break;
-								}  //ii;
+								}  // ii;
 
 								// email if login unrestricted and on new non-lan ipno
 								// locate ipno in uipnos setting xx else
@@ -1109,7 +1109,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 							if (not(authorised("USER UPDATE " ^ (fieldname.field(" ", ii).quote()), xx))) {
 								tt2 = "";
 							}
-						}  //ii;
+						}  // ii;
 					}
 				}
 
@@ -1125,7 +1125,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				} else {
 					runstyles(1, vn) = tt2;
 				}
-			}  //vn;
+			}  // vn;
 			SYSTEM(46) = runstyles;
 			// system<10,1>=userrec<1>
 			// system<10,2>=userrec<7>

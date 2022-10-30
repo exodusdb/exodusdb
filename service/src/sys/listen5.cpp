@@ -54,7 +54,7 @@ var bottomline;
 var stopn;
 var locks;
 var lockid;
-var dostime;  //num
+var dostime;  // num
 var yy;
 var zz;
 var serverend;
@@ -155,7 +155,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				}
 				xx = unlockrecord("", processes, "START*" ^ filename);
 			}
-		}  //filen;
+		}  // filen;
 
 	} else if (request1 eq "DELETEOLDFILES2") {
 
@@ -220,7 +220,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					SYSTEM(100, ii) = newtime;
 				}
 			}
-		}  //ii;
+		}  // ii;
 
 		// 		// check for upgrade to LISTEN
 		// 		var gbp;
@@ -250,7 +250,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		// OFF while developing this feature
 		isdevsys = isdevsys and date() gt 19034;
 		// if system<61> or isdevsys then
-		//if (isdevsys or not(VOLUMES)) {
+		// if (isdevsys or not(VOLUMES)) {
 		if (isdevsys) {
 			ANS = "";
 			return 0;
@@ -382,7 +382,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				let nfiles = rec.f(3).fcount(_VM);
 				for (const var filen : range(1, nfiles)) {
 					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
-				}  //filen;
+				}  // filen;
 
 				// message EXODUS only
 				call sysmsg(body, "NEOPATCH: " ^ subject, "EXODUS");
@@ -435,7 +435,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			return 0;
 
 nextpatch:;
-		}  //patchn;
+		}  // patchn;
 
 		ANS = "";
 
@@ -565,7 +565,7 @@ getvalues:
 						nn -= 1;
 					}
 				}
-			}  //ii;
+			}  // ii;
 
 			// show inactive if none are active
 			if (data_ eq "" and active) {
@@ -739,7 +739,7 @@ nextlock:
 			if (tracing) {
 				printl(" ", row.f(1, 2).oconv("L#19"), " ", row.f(1, 3).oconv("L#19"), " ", row.f(1, 4).oconv("L#19"));
 			}
-		}  //ii;
+		}  // ii;
 
 		if (not tracing) {
 			printl("+-------------------+");
@@ -805,7 +805,7 @@ nextlock:
 				if (not(otherusers().f(1) and ((time() - timex).abs() lt 30)))
 					break;
 				call ossleep(1000 * 1);
-			}  //loop;
+			}  // loop;
 
 			data_ = "";
 

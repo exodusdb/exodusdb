@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var docrep;
+var docrep;
 var scrn;
 var temp;
 

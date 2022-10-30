@@ -9,7 +9,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var mode;
+var mode;
 var subject;
 var body;
 var nsent;	// num
@@ -20,7 +20,7 @@ var usercode;
 var userx;
 var expirydate;
 var emails;
-var ok;	 //num
+var ok;	 // num
 var xx;
 var nn;
 var errormsg;
@@ -140,7 +140,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		return 0;
 	}
 
-/////////
+// ///////
 nextuser:
 	// ///////
 	if (esctoexit()) {
@@ -201,7 +201,7 @@ nextuser:
 				// /BREAK;
 				if (not(not(ok)))
 					break;
-			}  //groupn;
+			}  // groupn;
 		} else {
 			// exact groups
 			if (groupids.locate(userx.f(21), xx)) {
@@ -225,7 +225,7 @@ nextuser:
 		} else {
 			alreadyemailed ^= VM ^ email;
 		}
-	}  //ii;
+	}  // ii;
 	emails.converter(VM, ";");
 
 	// skip users that have already been emailed before
@@ -269,7 +269,7 @@ exit:
 		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
 			break;
 		emaillog.popper();
-	}  //loop;
+	}  // loop;
 
 	// always email to self
 	if (nsent and replyto) {
@@ -290,7 +290,7 @@ exit:
 		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
 			break;
 		emaillog.popper();
-	}  //loop;
+	}  // loop;
 
 	return 0;
 }

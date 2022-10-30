@@ -13,17 +13,17 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var checkinterval;	// num
+var checkinterval;	// num
 var forced;
-//var upgradeready;//num
-var anyusers;  //num
+//var upgradeready; // num
+var anyusers;  // num
 //var upgradefilename;
 var processes;
 var request;
 var tempfilename;
 var monitorkey;
 var monitordata;
-var currenttime;  //num
+var currenttime;  // num
 var cidx;
 var hostid;
 var installid;
@@ -43,12 +43,12 @@ var backupdrives;
 var dbasesystems;
 var dbasecodes;
 var dbasecode;
-var dbasen;	 //num
+var dbasen;	 // num
 var status;
 var statusn;
 var bakpars;
 var descriptions;
-var status0123;	 //num
+var status0123;	 // num
 var ndbases;
 var nok;
 var temp;
@@ -56,8 +56,8 @@ var secs;
 var description;
 var minreq;
 var nhung;
-var first;	  //num
-var startit;  //num
+var first;	  // num
+var startit;  // num
 var voc;
 var xx;
 var dbasesystem;
@@ -66,14 +66,14 @@ var backupdrive;
 var tpath;
 var paramrec;
 var home;
-var lastbackupsize;		 //num
-var lastbackupdatetime;	 //num
-var currentdatetime;	 //num
-var backupdriven;		 //num
-var freespace;			 //num
+var lastbackupsize;		 // num
+var lastbackupdatetime;	 // num
+var currentdatetime;	 // num
+var backupdriven;		 // num
+var freespace;			 // num
 var testdata;
 var testfile;
-var nextbackupdate;	 //num
+var nextbackupdate;	 // num
 var dow;
 var nextbackupfilename;
 var nextbackupfileinfo;
@@ -90,7 +90,7 @@ var subject;
 var body;
 var nbackupdrives;
 var present;
-var deletingsize;  //num
+var deletingsize;  // num
 var hostdescriptions;
 var versionnote;
 var versiondate;
@@ -101,7 +101,7 @@ var errors;
 //var upgradex;
 //var upgradefiledatetime;
 var wgetoutput;
-var jj;	 //num
+var jj;	 // num
 var osver;
 var cpudesc;
 var nprocs;
@@ -109,8 +109,8 @@ var result;
 var nn;
 var ips;
 var line;
-var nips;	 //num
-var maxips;	 //num
+var nips;	 // num
+var maxips;	 // num
 //var upgflagfile;
 
 function main() {
@@ -243,7 +243,7 @@ nextstatistic:
 				if (not(usertab(hourn, ii).locate(netid(ii), tt))) {
 					usertab(hourn, ii)(1, -1) = netid(ii);
 				}
-			}  //ii;
+			}  // ii;
 
 			goto nextstatistic;
 		}
@@ -560,11 +560,11 @@ nextprocess:
 					if (time() gt backuprequired.f(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
-					//dow = ((sys.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).first(8)).ucase();
+					// dow = ((sys.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).first(8)).ucase();
 					dow = sys.glang.f(22).field("|", nextbackupdate.oconv("DW")).first(8).ucase();
 					// eg 1/data.bak/adlined/wednesda/backup.zip
 					// nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
-					//nextbackupfilename = "../../backup." ^ ((nextbackupdate - 1).mod(7) + 1) ^ ".txt";
+					// nextbackupfilename = "../../backup." ^ ((nextbackupdate - 1).mod(7) + 1) ^ ".txt";
 					nextbackupfilename = "../../backup." ^ nextbackupdate.oconv("DW") ^ ".txt";
 					nextbackupfilename.converter("/", OSSLASH);
 					nextbackupfileinfo = nextbackupfilename.osfile();
@@ -641,7 +641,7 @@ nextprocess:
 		}
 
 nextdbasen:;
-	}  //dbasen;
+	}  // dbasen;
 
 	// check for free space on backup drive(s)
 	nbackupdrives = backupdrives.f(1).fcount(VM);
@@ -673,7 +673,7 @@ nextdbasen:;
 			}
 		}
 
-	}  //backupdriven;
+	}  // backupdriven;
 	// oswrite descriptions on 'DESCRIPS'
 	if (descriptions.contains("!!") and status0123 lt 2) {
 		status0123 = 2;
@@ -703,8 +703,8 @@ nextdbasen:;
 			if (usertab(ii, jj) gt usertab(25, jj)) {
 				usertab(25, jj) = usertab(ii, jj);
 			}
-		}  //jj;
-	}	   //ii;
+		}  // jj;
+	}	   // ii;
 
 	// list number of users (in last hour)
 	hostdescriptions ^= " - Users:";
@@ -718,7 +718,7 @@ nextdbasen:;
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= tt;
-	}  //ii;
+	}  // ii;
 
 	// list max number of users
 	hostdescriptions ^= " - Max:";
@@ -729,7 +729,7 @@ nextdbasen:;
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= usertab(hourn, ii);
-	}  //ii;
+	}  // ii;
 
 	// os description
 	call osgetenv("VER", osver);
@@ -754,11 +754,11 @@ nextdbasen:;
 //				// only display the first
 //				goto gotip;
 //			}
-//		}  //ii;
+//		}  // ii;
 //	} else {
 		ips = shell2("printf $(hostname -I | cut -d' ' -f 1)");
 //	}
-//gotip:
+// gotip:
 	if (not ips) {
 		ips = "0.0.0.0";
 	}

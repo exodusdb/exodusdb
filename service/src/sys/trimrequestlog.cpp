@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var reqdate;
+var reqdate;
 var tt;
 
 function main() {

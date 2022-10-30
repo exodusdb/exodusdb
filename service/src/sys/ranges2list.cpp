@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var basekey;
+var basekey;
 var listid;
 var lists;
 var listn;	// num
@@ -64,7 +64,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 	var allchars = "";
 	for (const var ii : range(32, 255)) {
 		allchars ^= chr(ii);
-	}  //ii;
+	}  // ii;
 	allchars.converter("0123456789-", "");
 
 	for (var ii = nn; ii >= 1; --ii) {
@@ -84,7 +84,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 				break;
 			startx.prefixer(lastchar);
 			prefix.popper();
-		}  //loop;
+		}  // loop;
 
 		// range of numbers
 		var temp0 = rangex;
@@ -103,7 +103,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 					break;
 				finish.prefixer(lastchar);
 				tt.popper();
-			}  //loop;
+			}  // loop;
 
 			if (finish lt startx) {
 				ranges0 = "";
@@ -141,7 +141,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 					range2 ^= " " ^ key;
 				}
 
-			}  //i2;
+			}  // i2;
 
 			if (not listid) {
 				range2.cutter(1);
@@ -171,7 +171,7 @@ makekey:
 		}
 
 		// nextrange:;
-	}  //ii;
+	}  // ii;
 
 exit:
 	// ///

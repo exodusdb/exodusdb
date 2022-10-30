@@ -13,8 +13,8 @@ libraryinit()
 #include <window.hpp>
 
 	var msg;
-var deleting;	 //num
-var validating;	 //num
+var deleting;	 // num
+var validating;	 // num
 var mastercode;
 var vn;
 var op;

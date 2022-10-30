@@ -41,7 +41,7 @@ libraryinit()
 	// clang-format on
 
 	var process;
-var tt;	 //num
+var tt;	 // num
 var dbn;
 var xx;
 
@@ -64,7 +64,7 @@ function main(out bakpars, in process0 = var()) {
 			if (tt.f(ii).len()) {
 				bakpars(ii) = tt.f(ii);
 			}
-		}  //ii;
+		}  // ii;
 	}
 	// osread tt from '..\..\backup.cfg' then
 	var configfilename = "../../backup.cfg";
@@ -74,7 +74,7 @@ function main(out bakpars, in process0 = var()) {
 			if (tt.f(ii).len()) {
 				bakpars(ii) = tt.f(ii);
 			}
-		}  //ii;
+		}  // ii;
 	}
 
 //	if (VOLUMES) {

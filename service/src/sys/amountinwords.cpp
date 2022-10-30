@@ -7,21 +7,21 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var comma;
+var comma;
 var sentencex;
 var amountcurrency;
 var currcode;
-var amount;	 //num
+var amount;	 // num
 var language;
 var words;
 var millions;
 var thousands;
 var hundreds;
-var unitsx;	 //num
+var unitsx;	 // num
 var text;
 var cents;
-var tens;  //num
-var ones;  //num
+var tens;  // num
+var ones;  // num
 var temp;
 
 function main(in amountfmlanguage, in currcode0) {

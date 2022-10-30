@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var processcategory;
+var processcategory;
 var processrec;
 var processparameters;
 var processresult;
@@ -122,7 +122,7 @@ subroutine newprocessid(io processid) {
 		// /BREAK;
 		if (not xx)
 			break;
-	}  //loop;
+	}  // loop;
 
 	processrec(1) = date();
 	processrec(2) = timex;

@@ -8,9 +8,9 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var cmdline;  //num
-int nrows;		  //num
-int ncols;		  //num
+var cmdline;  // num
+int nrows;		  // num
+int ncols;		  // num
 var file;
 var dictvoc;
 var rowfields;
@@ -20,31 +20,31 @@ dim rowfieldismv;
 int rowfn;	// num
 var rowfield;
 var totcol;
-var coln;  //num
+var coln;  // num
 var colorder;
 var coldict;
 var datadict;
-var prefixn;  //num
+var prefixn;  // num
 var prefix;
-int recn;  //num
+int recn;  // num
 var tt;
-var nmvs;  //num
+var nmvs;  // num
 var xx;
-var datavals;  //num
-var nrowvals;  //num
+var datavals;  // num
+var nrowvals;  // num
 var rowvals;
 var fieldname;
 var nn;
 var colvals;
 var ncolvals;
-var rowvaln;  //num
+var rowvaln;  // num
 var rowval;
-var rown;  //num
+var rown;  // num
 var msg;
-var colvaln;  //num
+var colvaln;  // num
 var colval;
-var rownx;	 //num
-var oldval;	 //num
+var rownx;	 // num
+var oldval;	 // num
 var colconv;
 var rowconv;
 
@@ -54,7 +54,7 @@ var tx;
 var system;
 var printfilename;
 var html;
-var ownprintfile;  //num
+var ownprintfile;  // num
 var ptx_filenamelen;
 var ptx_random;
 var printfile;
@@ -69,24 +69,24 @@ var printtxmark;
 var rfmt;
 var head;
 var foot;
-var ntxlns;	   //num
-var nbodylns;  //num
+var ntxlns;	   // num
+var nbodylns;  // num
 var ptx_temp;
 var headx;
 var newpagetag;
 var ptx_css;
 var cssver;
 var style;
-var stylennx;  //num
+var stylennx;  // num
 var htmltitle;
 var head_or_foot;
 var footx;
 var head1;
-var optioncharn;  //num
+var optioncharn;  // num
 var optionchars;
 var optionchar;
 var newoptions;
-var printtx_ii;	 //num
+var printtx_ii;	 // num
 var spaceoptionsize;
 
 function main(in filename, in rowfields0, in colfield, in datafield, io output, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
@@ -154,7 +154,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).f(1) eq "F") {
 			prefixmvfn = rowdict(rowfn).f(2);
 		}
-	}  //rowfn;
+	}  // rowfn;
 
 	totcol = colfield eq "TOTAL";
 	coln   = 1;
@@ -274,7 +274,7 @@ nextmv:
 				nrowvals = nn;
 			}
 			pickreplacer(rowvals, rowfn, tt);
-		}  //rowfn;
+		}  // rowfn;
 	} else {
 		rowvals	 = "Total";
 		nrowvals = 1;
@@ -301,7 +301,7 @@ nextmv:
 					tt = rowvals.f(rowfn, 1);
 				}
 				pickreplacer(rowval, 1, 1, rowfn, tt);
-			}  //rowfn;
+			}  // rowfn;
 		} else {
 			rowval = rowvals;
 		}
@@ -341,7 +341,7 @@ toobig:
 				output.inserter(1, 1 + coln, colval);
 				for (rownx = 2; rownx <= nrows + 1; ++rownx) {
 					output.inserter(rownx, 1 + coln, "");
-				}  //rownx;
+				}  // rownx;
 			}
 
 			if (output.len() + datavals.len() gt 6500) {
@@ -361,9 +361,9 @@ toobig:
 				pickreplacer(output, rown + 1, ncols + 2, oldval + datavals);
 			}
 
-		}  //colvaln;
+		}  // colvaln;
 
-	}  //rowvaln;
+	}  // rowvaln;
 
 	// ///////
 	// recexit:
@@ -399,7 +399,7 @@ exit:
 			goto toobig;
 		}
 		output(rown + 1, 1) = allrowvals.f(1, rown);
-	}  //rown;
+	}  // rown;
 
 	// format the row title values
 	output(1, 1, 1) = "";
@@ -414,7 +414,7 @@ exit:
 			}
 		}
 
-	}  //rowfn;
+	}  // rowfn;
 
 	// convert sm row keys into columns
 	output.converter(SM, VM);

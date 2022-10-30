@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var logfilename;
+var logfilename;
 var logfilelength;	// num
 var temposfilename83;
 var logfile;
@@ -33,7 +33,7 @@ function main(in msg0, io time0) {
 			if (datax.len()) {
 				ptr = logfilelength;
 			}
-		}  //ptr;
+		}  // ptr;
 
 		logfile.osclose();
 		datax.converter("\r\n", FM ^ FM);

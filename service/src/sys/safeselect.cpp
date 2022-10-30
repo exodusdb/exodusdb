@@ -3,7 +3,7 @@ libraryinit()
 
 #include <xselect.h>
 
-	var rr;
+var rr;
 var id;
 var dict;
 

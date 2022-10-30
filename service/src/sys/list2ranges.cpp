@@ -16,7 +16,7 @@ function main(io listitems) {
 	// convert single periods to single period ranges
 	for (const var ii : range(1, nn)) {
 		listitems(1, ii, 2) = listitems.f(1, ii, 1);
-	}  //ii;
+	}  // ii;
 
 	// merge ranges if consecutive
 	// working backwards deleting merged ranges
@@ -31,7 +31,7 @@ function main(io listitems) {
 			listitems.remover(1, ii);
 			nn -= 1;
 		}
-	}  //ii;
+	}  // ii;
 
 	// convert single period ranges to single periods
 	for (const var ii : range(1, nn)) {
@@ -40,7 +40,7 @@ function main(io listitems) {
 		if (tt1 eq tt.f(1, 1, 2)) {
 			listitems(1, ii) = tt1;
 		}
-	}  //ii;
+	}  // ii;
 
 	listitems.converter(SM, "-");
 

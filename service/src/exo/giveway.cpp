@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var nowtime;		// num
+var nowtime;		// num
 var longprocesslockno;	// num
 
 function main() {

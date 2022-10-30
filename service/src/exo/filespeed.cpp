@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	var tempfilename;
+var tempfilename;
 var rec;
 var tempfile;
 var starttime;	// num
@@ -96,7 +96,7 @@ nexttest:
 		// 		}
 		// 		print(AT(0), "W", ii);
 		rec.write(tempfile, ii);
-	}  //ii;
+	}  // ii;
 
 	// print
 	// print 'Deleting 1Kb records'
@@ -106,7 +106,7 @@ nexttest:
 		// 		}
 		// 		print(AT(0), "D", ii);
 		tempfile.deleterecord(ii);
-	}  //ii;
+	}  // ii;
 
 	if (usetransaction)
 		committrans();

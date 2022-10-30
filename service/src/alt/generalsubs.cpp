@@ -17,13 +17,13 @@ var msg;
 var datasetcodes;
 var xx;
 var usercode;
-var usern0;	 //num
-var usern;	 //num
+var usern0;	 // num
+var usern;	 // num
 var depts;
 var reply;
 var tt;
-var no;		 //num
-var nusers;	 //num
+var no;		 // num
+var nusers;	 // num
 var deptn;
 var directory;
 var lastbackup;
@@ -87,7 +87,7 @@ function main(in mode0) {
 				if (not(usercode and usercode ne "---"))
 					break;
 				groupusers ^= VM ^ usercode;
-			}  //usern;
+			}  // usern;
 			// add higher users in group
 			for (usern = usern0 - 1; usern >= 1; --usern) {
 				usercode = SECURITY.f(1, usern);
@@ -95,7 +95,7 @@ function main(in mode0) {
 				if (not(usercode ne "---"))
 					break;
 				groupusers ^= VM ^ usercode;
-			}  //usern;
+			}  // usern;
 		}
 
 		ANS = groupusers;
@@ -209,7 +209,7 @@ subroutine getdatasets() {
 		}
 		lastbackup					  = lastbackup.f(2);
 		datasetparams(1, datasetn, 4) = lastbackup.oconv("D");
-	}  //datasetn;
+	}  // datasetn;
 
 	return;
 }
@@ -233,7 +233,7 @@ subroutine getuserdept2() {
 		// /BREAK;
 		if (SECURITY.f(1, usern) == "---")
 			break;
-	}  //usern;
+	}  // usern;
 
 	// get the department code
 	ANS = SECURITY.f(1, usern - 1);

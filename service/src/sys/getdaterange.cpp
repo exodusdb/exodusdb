@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var fromquestion;
+var fromquestion;
 var uptoquestion;
 var defaultperiod;
 

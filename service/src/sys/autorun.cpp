@@ -9,7 +9,7 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-	var xx;
+var xx;
 
 function main() {
 	//

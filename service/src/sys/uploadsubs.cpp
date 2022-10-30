@@ -18,23 +18,23 @@ var key;
 var msg;
 var file;
 var errors;
-var lengthx;  //num
+var lengthx;  // num
 var osfile;
 var temposfilename83;
 var nimported;	// num
 var fileptr;	// num
 var buff;
-var linenox;  //num
-var eof;	  //num
+var linenox;  // num
+var eof;	  // num
 var line;
 var csv;
-var ptr;  //num
+var ptr;  // num
 //var ncols;
 var dictfile;
 var xx;
 var cell;
 var temp;
-var nquotes;  //num
+var nquotes;  // num
 var recordx;
 var allowduplicate;
 var op;
@@ -93,7 +93,7 @@ postuploadfail:
 				goto postuploadfail;
 			}
 			fns ^= fn ^ _FM;
-		}  //ii;
+		}  // ii;
 		fns.popper();
 
 		var ii2			   = rec.f(fns.f(1)).fcount(_VM);
@@ -200,7 +200,7 @@ postuploadfail:
 					return invalid(msg);
 				}
 			}
-		}  //subfoldern;
+		}  // subfoldern;
 
 	} else if (mode.field(".", 1) eq "VERIFYUPLOAD") {
 
@@ -292,7 +292,7 @@ postuploadfail:
 				var uploadfilename		 = uploadfilenames.f(uploadn);
 				uploadfilename			 = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
 				uploadfilenames(uploadn) = uploadfilename;
-			}  //uploadn;
+			}  // uploadn;
 			uploadfilenames.converter(_FM, _VM);
 		}
 
@@ -484,11 +484,11 @@ nextline:
 							if (line[ptr + 1] ne " ")
 								break;
 
-						}  //ptr;
+						}  // ptr;
 						cols ^= VM ^ ptr;
 						offset += ptr;
 						line.cutter(ptr);
-					}  //loop;
+					}  // loop;
 				}
 
 				goto nextline;
@@ -544,14 +544,14 @@ nextline:
 								just = "R";
 							}
 						}
-					}  //ii;
+					}  // ii;
 					cols(coln, 4) = CONV;
 					dictrec(7)	  = CONV;
 					dictrec(9)	  = just;
 
 					grec ^= dictid ^ " ";
 					dictrec.write(dictfile, dictid);
-				}  //coln;
+				}  // coln;
 				grec.popper();
 				("G" _FM _FM ^ grec).write(dictfile, dictcolprefix);
 				("G" _FM _FM ^ grec).write(dictfile, "@CRT");
@@ -601,7 +601,7 @@ nextline:
 					}
 				}
 				rec(coln + fieldoffset) = cell;
-			}  //coln;
+			}  // coln;
 
 			key = importcode ^ "*" ^ linenox;
 			if (importfilenamefn) {
@@ -625,7 +625,7 @@ nextline:
 				rec.write(file, key);
 			}
 
-		}  //loop;
+		}  // loop;
 
 		gosub cleanup();
 
@@ -671,7 +671,7 @@ addbuff:
 	// 		// /BREAK;
 	// 		if (not(buff.starts("\r"))) break;
 	// 		buff.cutter(1);
-	// 	}//loop;
+	// 	}// loop;
 	buff.trimmerfirst("\r");
 	if (not(buff.len())) {
 		goto addbuff;
@@ -690,7 +690,7 @@ addbuff:
 		buff.cutter(line2.len() + 1);
 		line ^= "\n";
 		line ^= line2;
-	}  //loop;
+	}  // loop;
 
 	linenox += 1;
 	eof = 0;
@@ -739,7 +739,7 @@ subroutine parseline(io line) {
 			tt.replacer(",", "&comma;");
 			line = line.fieldstore(DQ, quoten, 1, tt);
 		}
-	}  //quoten;
+	}  // quoten;
 
 	line.converter(",", _VM);
 

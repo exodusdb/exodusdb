@@ -8,7 +8,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var msg;
+var msg;
 
 function main() {
 

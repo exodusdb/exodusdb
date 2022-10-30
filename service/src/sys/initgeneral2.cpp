@@ -11,7 +11,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var tt;
+var tt;
 var hosts;
 var vn;
 var conf;
@@ -84,7 +84,7 @@ function main(in mode, io logtime, in menu) {
 		var nn = hosts.fcount(FM);
 		for (var ln = nn; ln >= 1; --ln) {
 			hosts(ln) = hosts.f(ln).field("#", 1);
-		}  //ln;
+		}  // ln;
 
 		// remove blank lines and convert fm to sm
 		hosts.converter(FM, " ");
@@ -134,7 +134,7 @@ function main(in mode, io logtime, in menu) {
 					configips.remover(1, 1, ii);
 				}
 			}
-		}  //ii;
+		}  // ii;
 
 		// allow exodus login from 127.*, LAN and any config default ips
 		// although any full 4 part LAN ips in configips will be BLOCKED in LISTEN2
@@ -172,7 +172,7 @@ function main(in mode, io logtime, in menu) {
 				SYSTEM(12, vn) = envkey;
 				SYSTEM(13, vn) = envval;
 			}
-		}  //ii;
+		}  // ii;
 
 	} else if (mode eq "FIXURLS") {
 
@@ -201,7 +201,7 @@ function main(in mode, io logtime, in menu) {
 				}
 				baselinks(1, linkn) = tt;
 			}
-		}  //linkn;
+		}  // linkn;
 		SYSTEM(114) = baselinks;
 		SYSTEM(115) = baselinkdescs;
 
@@ -251,7 +251,7 @@ function main(in mode, io logtime, in menu) {
 			printl(cmd);
 			call shell2(cmd, xx);
 
-		}  //year;
+		}  // year;
 
 	} else if (mode eq "UPDATEUSERS") {
 
@@ -293,7 +293,7 @@ nextuser:
 		call log2("*trim requestlog", logtime);
 
 		// only run on saturdays and only run once per day per installation
-		//if ((date() - 1).mod(7) + 1 ne 6) {
+		// if ((date() - 1).mod(7) + 1 ne 6) {
 		if (date().oconv("DW") ne 6) {
 			return 0;
 		}
@@ -356,7 +356,7 @@ nextuser:
 //			let ntemps = temps.fcount(FM);
 //			for (const var tempn : range(1, ntemps)) {
 //				("..\\" ^ temps.f(tempn)).osremove();
-//			}  //tempn;
+//			}  // tempn;
 //		}
 
 	} else if (mode eq "MAKEMENU") {

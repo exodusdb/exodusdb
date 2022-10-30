@@ -9,7 +9,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var sentencex;
+var sentencex;
 var ip12;
 var ip1;
 var ip2;

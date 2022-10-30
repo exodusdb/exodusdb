@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var startmode;
+var startmode;
 var temp;
 var reply;	// num
 

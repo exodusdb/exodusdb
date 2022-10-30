@@ -5,7 +5,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var params;
+var params;
 var params2;
 var filler;
 var tagsep;
@@ -43,14 +43,14 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			if (not(datax.contains(tt)))
 				break;
 			datax.replacer(tt, VM);
-		}  //loop;
+		}  // loop;
 		tt = " " ^ FM;
 		while (true) {
 			// /BREAK;
 			if (not(datax.contains(tt)))
 				break;
 			datax.replacer(tt, FM);
-		}  //loop;
+		}  // loop;
 		filler = "&nbsp;";
 		gosub fill(datax);
 
@@ -141,7 +141,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 					} else {
 						data2(ln) = "<td colspan=2>" ^ line ^ tdx;
 					}
-				}  //ln;
+				}  // ln;
 
 				data2.replacer(FM, trx ^ tr);
 				data2.prefixer("<table class=\"hashtable\">" ^ tr);
@@ -150,7 +150,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 				datax(1, vn) = data2;
 			}
 
-		}  //vn;
+		}  // vn;
 
 	} else if (mode eq "STRIPTAGS") {
 		while (true) {
@@ -160,7 +160,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			if (not(tag1 and tag1 lt tag2))
 				break;
 			datax.paster(tag1, tag2 - tag1 + 1, "");
-		}  //loop;
+		}  // loop;
 
 	} else if (mode eq "DECODEHTML") {
 		datax.replacer("&nbsp;", " ");
@@ -372,7 +372,7 @@ subroutine fill(io datax) {
 		if (tt gt n2) {
 			n2 = tt;
 		}
-	}  //ii;
+	}  // ii;
 
 	// make sure all columns are filled
 	for (const var ii : range(1, nn)) {
@@ -380,8 +380,8 @@ subroutine fill(io datax) {
 			if (datax.f(ii, i2) eq "") {
 				datax(ii, i2) = filler;
 			}
-		}  //i2;
-	}	   //ii;
+		}  // i2;
+	}	   // ii;
 
 	return;
 }

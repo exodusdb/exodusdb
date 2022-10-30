@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-	var bit;
+var bit;
 var term;
 
 function main(in list0, out min, out max) {
@@ -32,7 +32,7 @@ function main(in list0, out min, out max) {
 				max = bit;
 			}
 		}
-	}  //loop;
+	}  // loop;
 
 	return result;
 }

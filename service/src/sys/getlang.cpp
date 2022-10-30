@@ -75,7 +75,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 					bilingual.popper();
 					lang(fn) = bilingual;
 				}
-			}  //fn;
+			}  // fn;
 		} else {
 			lang = lang1;
 		}
@@ -129,7 +129,7 @@ exit:
 				}
 				lang(fn) = custlang.f(fn);
 			}
-		}  //fn;
+		}  // fn;
 	}
 
 	// force 737 greek codepage characters so indexing is ok etc
@@ -206,7 +206,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 				if (tt) {
 					lang(ii) = tt;
 				}
-			}  //ii;
+			}  // ii;
 		}
 	}
 

@@ -9,7 +9,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var msg;
+var msg;
 var runasuser;
 var authtasks;
 var title;
@@ -130,7 +130,7 @@ syntax:
 				call mssg(msg);
 				stop();
 			}
-		}  //taskn;
+		}  // taskn;
 	}
 
 	var docid = alertid;

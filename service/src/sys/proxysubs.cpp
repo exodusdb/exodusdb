@@ -8,7 +8,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var outfile;
+var outfile;
 var errors;
 
 function main(in module, in mode, in stationery) {
@@ -52,7 +52,7 @@ function main(in module, in mode, in stationery) {
 			data_(1, filen) = outfile;
 		}
 
-	}  //filen;
+	}  // filen;
 
 	data_.converter(VM, ";");
 	// convert vm to ';' in outfiles

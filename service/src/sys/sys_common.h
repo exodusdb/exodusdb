@@ -4,9 +4,10 @@
 
 #include <exodus/common.h>
 
-#define sys_common_no 0
+//#define sys_common_no 0
+const int sys_common_no = 0;
 
-commoninit(sys,sys_common_no)
+commoninit(sys, sys_common_no)
 
 	var address;
 	var addresses;
@@ -26,6 +27,6 @@ commoninit(sys,sys_common_no)
 //	var _definitions;
 	var accounting;
 
-commonexit(sys,sys_common_no)
+commonexit(sys, sys_common_no)
 
 //#endif // SERVICE_SRC_SYS_SYS_COMMON_H_

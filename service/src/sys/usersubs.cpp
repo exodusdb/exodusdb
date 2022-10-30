@@ -16,8 +16,8 @@ libraryinit()
 
 	var msg;
 var xx;
-var usern;	  //num
-var newuser;  //num
+var usern;	  // num
+var newuser;  // num
 var text;
 var usercode;
 var depts;
@@ -137,7 +137,7 @@ function main(in mode) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);
-				}  //ii;
+				}  // ii;
 				emaildomains ^= " " ^ sysemails;
 			}
 		}
@@ -162,7 +162,7 @@ function main(in mode) {
 						}
 					}
 				}
-			}  //ii;
+			}  // ii;
 		}
 
 		// can be PREWRITE.RESETPASSWORD
@@ -263,7 +263,7 @@ function main(in mode) {
 			// insert an empty user
 			for (const var fn : range(1, 9)) {
 				SECURITY.inserter(fn, usern, "");
-			}  //fn;
+			}  // fn;
 
 			var newusername		= RECORD.f(1);
 			var newipnos		= RECORD.f(40);
@@ -365,7 +365,7 @@ function main(in mode) {
 					gosub updatemirror();
 				}
 			}
-		}  //loop;
+		}  // loop;
 
 	} else if (mode.field(",", 1) eq "GETUSERDEPTX") {
 		// does not popup any errormessage
@@ -448,7 +448,7 @@ subroutine getuserdept2(in mode) {
 		// /BREAK;
 		if (SECURITY.f(1, usern) eq "---")
 			break;
-	}  //usern;
+	}  // usern;
 
 	// get the department code
 	ANS = SECURITY.f(1, usern - 1);
@@ -470,7 +470,7 @@ subroutine getdepts() {
 				}
 			}
 		}
-	}  //usern;
+	}  // usern;
 
 	return;
 }

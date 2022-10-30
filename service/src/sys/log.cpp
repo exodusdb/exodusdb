@@ -4,7 +4,7 @@ libraryinit()
 #include <getbackpars.h>
 #include <sendmail.h>
 
-	var programname;
+var programname;
 var text;
 var xstation;
 var time;

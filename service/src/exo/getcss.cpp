@@ -184,7 +184,7 @@ window.onload=function (){
  //ctrl+click doesnt provide window.opener
  //glogincode="DEVDTEST*EXODUS*"
  //gwindowopenparameters={}
- //glogincode=window.opener.glogincode
+ // glogincode=window.opener.glogincode
  //gwindowopenparameters.readonlymode=true
  var links=document.getElementsByTagName('a')
  var vhtm

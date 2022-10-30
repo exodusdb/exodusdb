@@ -14,7 +14,7 @@ function main(in password) {
 			break;
 		encryptkey = (encryptkey.mod(390001)) * (hashedpassword[1]).seq() + 1;
 		hashedpassword.cutter(1);
-	}  //loop;
+	}  // loop;
 
 	// pass2
 	while (true) {
@@ -23,7 +23,7 @@ function main(in password) {
 		// /BREAK;
 		if (not encryptkey)
 			break;
-	}  //loop;
+	}  // loop;
 
 	return hashedpassword;
 }

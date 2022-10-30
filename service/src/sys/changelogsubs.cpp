@@ -22,7 +22,7 @@ var nkeywords;
 var changelog;
 var currentversiondatetime;
 var tt;
-var versionn;  //num
+var versionn;  // num
 var cmd;
 var versionlog;
 var idate;
@@ -323,7 +323,7 @@ subroutine getversiondates() {
 		if (not(versiondata.locateusing(FM, idate, xx))) {
 			versiondata(-1) = idate;
 		}
-	}  //ii;
+	}  // ii;
 
 	// list of installed versions
 	data_ = versiondata;

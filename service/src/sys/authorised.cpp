@@ -7,10 +7,10 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var username;
+var username;
 var msgusername;
-var isexodus;  //num
-var taskn;	   //num
+var isexodus;  // num
+var taskn;	   // num
 var taskn2;
 var xx;
 var newlock;
@@ -251,7 +251,7 @@ notallowed:
 		} else {
 			goto notallowed;
 		}
-	}  //lockn;
+	}  // lockn;
 
 	// OK:
 	return 1;

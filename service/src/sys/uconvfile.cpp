@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var encoding1;
+var encoding1;
 var encoding2;
 var exe;
 var ii;

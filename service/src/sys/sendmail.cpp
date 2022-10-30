@@ -28,7 +28,7 @@ libraryinit()
 #include <sendmail.h>
 #include <shell2.h>
 
-	var ccaddress;
+var ccaddress;
 var subject;
 var body;
 var attachfilename;
@@ -42,10 +42,10 @@ var v5;
 var v6;
 var v8;
 var forcedemailx;
-var tt;	 //num
+var tt;	 // num
 var params2;
 var osfilename;
-var osfilesize;	 //num
+var osfilesize;	 // num
 var bodyfilename;
 var paramfilename;
 var errorfilename;
@@ -223,8 +223,8 @@ forcedemail:
 			if (params2.f(ii)) {
 				params1(ii) = params2.f(ii);
 			}
-		}  //ii;
-	}	   //filen;
+		}  // ii;
+	}	   // filen;
 
 	// default exodus smtp parameters
 	if (not(params1.f(1))) {
@@ -449,7 +449,7 @@ forcedemail:
 
 					// case opt='-A'
 				}
-			}  //ii;
+			}  // ii;
 
 			headers.cutter(1);
 			headers ^= _VM;
@@ -509,7 +509,7 @@ TRACE(offset)
 			var osfile;
 			if (osfile.osopen(tempfilename)) {
 
-				offset = -1;//append
+				offset = -1; //append
 TRACE(offset)
 				delimiter.osbwrite(osfile, offset);
 TRACE(offset)
@@ -654,7 +654,7 @@ subroutine addlinks2osfilename() {
 			body(-1) = linkdesc;
 		}
 		body(-1) = SYSTEM.f(114, linkn) ^ tt;
-	}  //linkn;
+	}  // linkn;
 	return;
 }
 

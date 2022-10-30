@@ -15,15 +15,15 @@ libraryinit()
 var mode;
 var userx;
 var password;
-var ok;	 //num
+var ok;	 // num
 var usern;
 var xdata;
 var msg;
-var show;	 //num
-var maxlen;	 //num
-var now;	 //num
+var show;	 // num
+var maxlen;	 // num
+var now;	 // num
 var escx;
-var now2;  //num
+var now2;  // num
 var encryptx;
 var allowablechars;
 

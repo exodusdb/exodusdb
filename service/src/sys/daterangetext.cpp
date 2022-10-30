@@ -42,7 +42,7 @@ function main(in d1, in d2, out result, io lang) {
 	if (tt.f(1) eq 1) {
 		// calculate end of month of stop date
 		t2 = iconv(t2.oconv("D2/E").field("/", 2, 2), "[DATEPERIOD]");
-		//if (tt.f(4) eq t2.oconv("D2/E").field("/", 1)) {
+		// if (tt.f(4) eq t2.oconv("D2/E").field("/", 1)) {
 		if (tt.f(4) eq t2.oconv("DD")) {
 			tt(1) = "";
 			tt(4) = "";

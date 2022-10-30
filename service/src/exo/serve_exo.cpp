@@ -8,7 +8,7 @@ programinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-	var xx;
+var xx;
 
 function main() {
 
@@ -91,7 +91,7 @@ function main() {
 	var agp="";
 	if (not read(agp,"DEFINITIONS","AGENCY.PARAMS")) {
 		agp=invert("DEVELOPMENT DATABASE");
-		agp(4) = 1;//short dates
+		agp(4) = 1; //short dates
 		// agp(5) = 1;//split extras
 		agp(7) = 1;//wording on schedules
 		write(agp,"DEFINITIONS","AGENCY.PARAMS");

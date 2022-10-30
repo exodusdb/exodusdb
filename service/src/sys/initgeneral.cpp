@@ -34,10 +34,10 @@ var dbtime;
 var dbdatetimerequired;
 var reply;
 var reply2;
-var tt;	 //num
+var tt;	 // num
 var colors;
 var reportkey;
-var tt2;  //num
+var tt2;  // num
 var s33;
 var smtp;
 var bakpars;
@@ -380,7 +380,7 @@ updateversion:
 			if (file.open(filename, "")) {
 				rec.write(file, id);
 			}
-		}  //ii;
+		}  // ii;
 	}
 
 	// syslock=if revrelease()>=2.1 then 36 else 23
@@ -418,7 +418,7 @@ updateversion:
 	// 		if (volume.first(8) eq tpath) {
 	// 			execute("ATTACH " ^ volume ^ " (S)");
 	// 		}
-	// 	} //volumen;
+	// 	} // volumen;
 	//
 	// 	if (VOLUMES) {
 	// 		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
@@ -1036,7 +1036,7 @@ nextreport:
 			if (not(userx.contains("---"))) {
 				userx.writef(users, userx, 1);
 			}
-		}  //usern;
+		}  // usern;
 	}
 
 	call log2("*terminate old session", logtime);
@@ -1070,17 +1070,17 @@ nextreport:
 	// }
 
 	// 	call log2("*suppress words not to be indexed", logtime);
-	// 	//see ED SYSTEM * ... ENVIRONMENT words like LTD
+	// 	// see ED SYSTEM * ... ENVIRONMENT words like LTD
 	// 	DEFAULTSTOPS = "";
 
-	// 	//this may not be necessary now that menus are determined by authorisation
+	// 	// this may not be necessary now that menus are determined by authorisation
 	// 	call log2("*get maintenance user menu if any", logtime);
 	// 	if (xx.open("SCHEDULES", "")) {
 	// 		temp = "ADAGENCY";
 	// 	} else {
 	// 		temp = "EXODUS2";
 	// 	}
-	// 	//ENVIRONSET(37) = temp;
+	// 	// ENVIRONSET(37) = temp;
 
 	call log2("*force the F1 key to be general help (Ctrl+F1) instead of context help", logtime);
 	PRIORITYINT(1) = chr(0) ^ ";";
@@ -1273,7 +1273,7 @@ nextreport:
 				call sysmsg(filename.quote() ^ " could not be created by INIT.GENERAL");
 			}
 		}
-	}  //ii;
+	}  // ii;
 
 	call log2("*perform any autoexec task BEFORE initialising other systems", logtime);
 	if (not exodusid) {
@@ -1524,7 +1524,7 @@ adddatasetcodename:
 			userx = "";
 		}
 		if (userx.f(4) and interactive) {
-			//var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
+			// var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
 			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", userx.f(4).oconv("DW"));
 			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.f(4).oconv("D") ^ " at " ^ userx.f(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.f(6).trim()).oconv("C#40") ^ "|");
 		}
@@ -1704,7 +1704,7 @@ subroutine getsystem() {
 		if (systemx.f(ii).len()) {
 			SYSTEM(ii) = systemx.f(ii);
 		}
-	}  //ii;
+	}  // ii;
 
 	// save config file time so can detect if restart required
 	SYSTEM(100, tt2) = tt.osfile().f(3);

@@ -14,10 +14,10 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-	var docids;
+var docids;
 var options;
 var inpath;
-var docn;  //num
+var docn;  // num
 var docid;
 var xx;
 var forceemail;
@@ -28,23 +28,23 @@ var market;
 var agp;
 var holidaytype;
 var workdate;
-var tt;	 //num
+var tt;	 // num
 var authtasks;
 var title;
 var datax;
 var start_timestamp;
-var daysago;   //num
-var xdate;	   //num
-var opendate;  //num
+var daysago;   // num
+var xdate;	   // num
+var opendate;  // num
 var printfilename;
 var body;
 var attachfilename;
 var errormsg;
 var voccmd;
-var tracing;  //num
+var tracing;  // num
 var linkfilename2;
-var requeststarttime;  //num
-var requeststoptime;   //num
+var requeststarttime;  // num
+var requeststoptime;   // num
 var printfile;
 
 function main(in docids0 = "", in options0 = "") {
@@ -444,7 +444,7 @@ adduseraddress:
 				}
 			}
 nextuser:;
-		}  //usern;
+		}  // usern;
 
 		// skip if nobody to email to
 		if (not toaddress) {
@@ -501,7 +501,7 @@ nextuser:;
 				printl(msg_);
 				goto nextdoc;
 			}
-		}  //taskn;
+		}  // taskn;
 	}
 
 	// docinit:
@@ -696,7 +696,7 @@ subroutine exec() {
 		// /BREAK;
 		if (not(oslistf(linkfilename2 ^ ".*")))
 			break;
-	}  //loop;
+	}  // loop;
 
 	linkfilename2 ^= ".2";
 	call oswrite("", linkfilename2);
@@ -896,14 +896,14 @@ subroutine getdaysago() {
 	xdate = date();
 	while (true) {
 		xdate -= 1;
-		//if (not(weekend.contains((xdate - 1).mod(7) + 1))) {
+		// if (not(weekend.contains((xdate - 1).mod(7) + 1))) {
 		if (not weekend.contains(xdate.oconv("DW"))) {
 			daysago -= 1;
 		}
 		// /BREAK;
 		if (not daysago)
 			break;
-	}  //loop;
+	}  // loop;
 
 	return;
 }

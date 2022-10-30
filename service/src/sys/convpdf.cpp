@@ -4,7 +4,7 @@ libraryinit()
 #include <shell2.h>
 #include <sysmsg.h>
 
-	var printopts;
+var printopts;
 var pdfcmd;
 
 function main(io osfilename, in printopts0, out errors) {

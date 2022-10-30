@@ -7,7 +7,7 @@ libraryinit()
 
 #include <sys_common.h>
 
-	var mode;
+var mode;
 var datax;
 var runasusercode;
 var targetusercodes;
@@ -135,7 +135,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				// /BREAK;
 				if (not((usern and tt) and tt ne "---"))
 					break;
-			}  //loop;
+			}  // loop;
 		}
 	} else {
 
@@ -152,7 +152,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 					}
 					userx = "";
 				}
-			}  //usern;
+			}  // usern;
 		}
 	}
 

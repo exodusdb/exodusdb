@@ -7,7 +7,7 @@ libraryinit(authorised)
 #include <sys_common.h>
 
 var usern;
-var ans;//num
+var ans; // num
 var userx;
 
 function main() {
@@ -31,7 +31,7 @@ function main() {
 				// /BREAK;
 				if (not((userx and userx ne "---") and userx ne ID))
 					break;
-			} //usern2;
+			} // usern2;
 
 		// if found then same group therefore ok
 			if (userx eq ID) {

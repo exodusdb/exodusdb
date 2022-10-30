@@ -29,14 +29,14 @@ libraryinit()
 #include <win_common.h>
 
 var logfilename;
-var portno;			  //num
-var lastmonitortime;  //num
-var lastautorun;	  //num
-var halt;			  //num
+var portno;			  // num
+var lastmonitortime;  // num
+var lastautorun;	  // num
+var halt;			  // num
 var origsentence;
 var processes;
 var reqlog;
-var defaultlockmins;  //num
+var defaultlockmins;  // num
 var datasetcode;
 var live;
 //var processno;
@@ -45,19 +45,19 @@ var installend;
 var serverend;
 var databaseend;
 var allcols;
-var maxstrlen;	  //num
-var nblocks;	  //num
-var inblocksize;  //num
+var maxstrlen;	  // num
+var nblocks;	  // num
+var inblocksize;  // num
 var outblocksize;
 dim datx;
 dim hexx;
-var ii;	 //num
+var ii;	 // num
 var servername;
 var onserver;
 var request1;
-var waitfor;   //num
-var waitsecs;  //num
-var sleepms;   //num
+var waitfor;   // num
+var waitsecs;  // num
+var sleepms;   // num
 var serverflagfilename;
 var origsysmode;
 var webpath;
@@ -67,22 +67,22 @@ var listenusername;
 var listenstation;
 var origscrn;
 var origattr;
-var tracing;	  //num
-var nrequests;	  //num
-var timeoutsecs;  //num
+var tracing;	  // num
+var nrequests;	  // num
+var timeoutsecs;  // num
 var sysmode;
 var origprivilege;
 var locks1;
 var leaselocks;
-var onactive;  //num
+var onactive;  // num
 var bakpars;
 var datex;
 var logpath;
 var tdir;
 var xx;
 var logfile;
-var logptr;	 //num
-var tt;		 //num
+var logptr;	 // num
+var tt;		 // num
 var logx;
 var linkfilename1;
 var replyfilename;
@@ -94,7 +94,7 @@ var timenow;
 var cmd;
 var linkfilename0;
 var linkfilenames;
-var dostime;  //num
+var dostime;  // num
 var now;
 var s33;
 var charx;
@@ -104,48 +104,48 @@ var patched;
 var dow;
 var logtime;
 var requestdate;
-var requesttime;  //num
+var requesttime;  // num
 var nlinkfiles;
 var linkfilen;	// num
 var linkfile1;
 var timex;
-var ntries;	 //num
-//var listenfailure;//num
+var ntries;	 // num
+//var listenfailure; // num
 var connection;
 var datasetx;
 var username;
 var password;
 var ipno;
 var netid;
-var firstrequestfieldn;	 //num
+var firstrequestfieldn;	 // num
 var request2;
 var request3;
 var request4;
 var request5;
 var request6;
-var responsetime;  //num
+var responsetime;  // num
 var rawresponse;
 var t2;
 var yy;
 var req6up;
-var anydata;  //num
+var anydata;  // num
 var linkfilename2;
 var linkfilename3;
 var linkfile2size;
 var linkfile2;
-var inptr;	  //num
-var blockn;	  //num
-var lendata;  //num
+var inptr;	  // num
+var blockn;	  // num
+var lendata;  // num
 var savelogptr;
 var invaliduser;
-var secs;  //num
+var secs;  // num
 var iodatlen;
-var ptr;  //num
+var ptr;  // num
 var blk;
 var filename;
 var keyx;
 var sessionid;
-var lockmins;  //num
+var lockmins;  // num
 var masterlock;
 var withlock;
 var readenv;
@@ -154,14 +154,14 @@ var triggers;
 var postread;
 var filetitle2;
 var secmode;
-var ok;	 //num
+var ok;	 // num
 var file;
 var keyx0;
 var preread;
-var autokey;  //num
+var autokey;  // num
 var lockkeyx;
 var badcomp;
-var lockauthorised;	 //num
+var lockauthorised;	 // num
 var createnotallowed;
 var origresponse;
 var keyx2;
@@ -170,12 +170,12 @@ var fieldno;
 var prewrite;
 var lockkey;
 var lockrec;
-var lockduration;  //num
+var lockduration;  // num
 var dictrec;
 var datetimefn;
 var olddatetime;
 var newdatetime;
-var postroutine;  //num
+var postroutine;  // num
 var replacewrite;
 var postwrite;
 var predelete;
@@ -185,18 +185,18 @@ var printfilename;
 var user4x;
 var printfile;
 var fileerrorx;
-var timeouttime;  //num
-var timeoutdate;  //num
+var timeouttime;  // num
+var timeoutdate;  // num
 var srcfile2;
 var newsessionid;
 var state;	// num
 var masterlockkey;
 var sublockrec;
-var code;  //num
+var code;  // num
 var nextbfs;
 var handle;
 //var keyorfilename;
-//var fmc;//num
+//var fmc; // num
 var msg0;
 var positive;
 var posmsg;
@@ -786,9 +786,9 @@ function loop_exit() {
 				}
 
 				// Manual commands
-				//////////////////////
+				// ////////////////////
 				var ok = execute(cmd);
-				//////////////////////
+				// ////////////////////
 
 				if (statustrans()) {
 					if (decide("Commit any database updates ?", "Commit" _VM "Rollback") eq "Commit") {
@@ -818,7 +818,7 @@ function loop_exit() {
 		return true;
 	}
 
-	// 	//f10 or ? on linux
+	// 	// f10 or ? on linux
 	// 	if (charx eq INTCONST.f(7)) {
 	// 		// execute("RUNMENU " ^ ENVIRONSET.f(37));
 	// 		execute("RUNMENU");
@@ -936,7 +936,7 @@ backup:
 
 	return true;
 
-}  //loop_exit()
+}  // loop_exit()
 
 subroutine main_exit() {
 
@@ -1091,7 +1091,7 @@ deleterequest:
 		// gosub onerequest();
 		return true;
 
-	}  //linkfilen;
+	}  // linkfilen;
 
 	return false;
 
@@ -1281,7 +1281,7 @@ function request_init() {
 					}
 				}
 
-			}  //blockn;
+			}  // blockn;
 
 			// unescape all blocks
 			lendata = 0;
@@ -1307,7 +1307,7 @@ function request_init() {
 					lendata += datx(blockn).len();
 				}
 
-			}  //blockn;
+			}  // blockn;
 
 			// check max iodat size <= maxstrlen
 			if (lendata gt maxstrlen) {
@@ -1322,7 +1322,7 @@ function request_init() {
 				for (blockn = 1; blockn <= nblocks; ++blockn) {
 					data_ ^= datx(blockn);
 					datx(blockn) = "";
-				}  //blockn;
+				}  // blockn;
 			}
 
 			// cannot open linkfilename2 means no iodat
@@ -1500,10 +1500,10 @@ subroutine process2() {
 	// process the input
 	// /////////////////
 
-	// 	//failure in LISTEN above
+	// 	// failure in LISTEN above
 	// 	if (listenfailure) {
 	//
-	// 	//invalid username or password or connection
+	// 	// invalid username or password or connection
 	// 	} else
 
 	if (invaliduser) {
@@ -2543,7 +2543,7 @@ function request_exit() {
 
 				blk = "";
 
-			}  //blockn;
+			}  // blockn;
 
 			linkfile2.osclose();
 
@@ -2721,7 +2721,7 @@ subroutine leaselock() {
 		newsessionid = "";
 		for (ii = 1; ii <= 8; ++ii) {
 			newsessionid ^= var("01234567890ABDCEF")[var(16).rnd() + 1];
-		}  //ii;
+		}  // ii;
 	}
 
 	if (not(file.open(filename, ""))) {
@@ -2894,7 +2894,7 @@ subroutine rawunlock() {
 	return;
 }
 
-//subroutine rawlock2(in code, in nextbfs, io handle, in keyorfilename, in fmc, io state) {
+// subroutine rawlock2(in code, in nextbfs, io handle, in keyorfilename, in fmc, io state) {
 //
 //	// called from rawlock and rawunlock
 //	call rtp57(code, nextbfs, handle, keyorfilename, fmc, xx, state);
