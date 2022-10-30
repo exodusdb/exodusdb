@@ -10,7 +10,7 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-#include <window.hpp>
+#include <request.hpp>
 
 	var msg;
 var deleting;	 // num

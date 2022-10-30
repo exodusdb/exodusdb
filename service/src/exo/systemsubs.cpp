@@ -5,7 +5,7 @@ libraryinit()
 
 #include <win_common.h>
 
-#include <window.hpp>
+#include <request.hpp>
 
 	var mode;
 

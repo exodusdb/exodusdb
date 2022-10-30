@@ -16,7 +16,7 @@ libraryinit()
 #include <sys_common.h>
 #include <win_common.h>
 
-#include <window.hpp>
+#include <request.hpp>
 
 // SEE AUTHORISATION_DICT in UI
 //
