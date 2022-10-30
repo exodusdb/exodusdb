@@ -243,6 +243,10 @@ bool var::osshell() const {
 
 	// breakoff();
 	int shellresult = system(to_oscmd_string(*this).c_str());
+
+	if (shellresult)
+		setlasterror("osshell failed: " ^ this->quote());
+
 	//TRACE(*this)
 	//TRACE(shellresult)
 	// breakon();
@@ -264,10 +268,12 @@ bool var::osshellread(CVR oscmd) {
 	// fflush?
 
 	//"r" means read
-	std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
-	// return a code to indicate program failure. but can this ever happen?
+	//std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
+	auto* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
+
+	// Detect program failure.
 	if (pfile == nullptr) {
-		this->setlasterror("osshell failed. " ^ oscmd.quote());
+		this->setlasterror("osshellread failed. " ^ oscmd.quote());
 		return false;
 	}
 
@@ -283,8 +289,14 @@ bool var::osshellread(CVR oscmd) {
 		var_str += cstr1;
 	}
 
+	int shellresult = pclose(pfile);
+
+	if (shellresult)
+		setlasterror("osshellread failed. " ^ oscmd.quote());
+
 	//return true if no error code
-	return !pclose(pfile);
+	return !shellresult;
+
 }
 
 bool var::osshellwrite(CVR oscmd) const {
@@ -296,16 +308,26 @@ bool var::osshellwrite(CVR oscmd) const {
 	ISSTRING(oscmd)
 
 	//"w" means read
-	std::FILE* cmd = popen(to_oscmd_string(oscmd).c_str(), "w");
-	// return a code to indicate program failure. but can this ever happen?
-	if (cmd == nullptr)
-		return 1;
+	//std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "w");
+	auto* pfile = popen(to_oscmd_string(oscmd).c_str(), "w");
+
+	// Detect program failure.
+	if (pfile == nullptr) {
+		this->setlasterror("osshellwrite failed. " ^ oscmd.quote());
+		return false;
+	}
 
 	// decided not to convert slashes here .. may be the wrong decision
-	fputs(this->var_str.c_str(), cmd);
+	fputs(this->var_str.c_str(), pfile);
 
-	// return the process termination status
-	return !pclose(cmd);
+	int shellresult = pclose(pfile);
+
+	if (shellresult)
+		setlasterror("osshellwrite failed. " ^ oscmd.quote());
+
+	//return true if no error code
+	return !shellresult;
+
 }
 
 void var::osflush() const {
