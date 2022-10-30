@@ -500,13 +500,13 @@ nextline:
 
 				if (not(file.open(filename, ""))) {
 					call mssg(lasterror());
-					win.valid = 0;
+					req.valid = 0;
 					gosub cleanup();
 					return 0;
 				}
 				if (not(dictfile.open(dictfilename, ""))) {
 					call mssg(lasterror());
-					win.valid = 0;
+					req.valid = 0;
 					gosub cleanup();
 					return 0;
 				}

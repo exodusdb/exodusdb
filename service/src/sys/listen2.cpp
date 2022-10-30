@@ -678,7 +678,7 @@ validateexit2:
 			// open 'USERS' to users then
 			if (users) {
 
-				win.srcfile = users;
+				req.srcfile = users;
 
 				if (RECORD.read(users, username)) {
 					usersordefinitions = users;
@@ -700,7 +700,7 @@ validateexit2:
 
 							// random pseudoword
 							call securitysubs("GENERATEPASSWORD");
-							newpassword = win.is;
+							newpassword = req.is;
 
 							RECORD(4) = newpassword;
 
@@ -755,10 +755,10 @@ validateexit2:
 					ID = username;
 
 					// prewrite locks authorisation file or fails
-					win.valid = 1;
-					win.orec  = RECORD;
+					req.valid = 1;
+					req.orec  = RECORD;
 					call usersubs("PREWRITE.RESETPASSWORD");
-					if (not(win.valid)) {
+					if (not(req.valid)) {
 						msg_.move(request5);
 						return 0;
 					}

@@ -42,13 +42,13 @@ libraryinit()
 #define minpasswordchars_ 4
 #define emailnewusers_ RECORD.f(26)
 
-#define tstore_             win.registerx(3)
-#define updatelowergroups_  win.registerx(4)
-#define updatehighergroups_ win.registerx(5)
-#define curruser_           win.registerx(6)
-#define origfullrec_        win.registerx(7)
-#define startn_             win.registerx(8)
-#define endn_               win.registerx(9)
+#define tstore_             req.registerx(3)
+#define updatelowergroups_  req.registerx(4)
+#define updatehighergroups_ req.registerx(5)
+#define curruser_           req.registerx(6)
+#define origfullrec_        req.registerx(7)
+#define startn_             req.registerx(8)
+#define endn_               req.registerx(9)
 	// clang-format on
 
 	// NB (not any more) valid companies are buffered in userprivs<9>
@@ -87,7 +87,7 @@ function main(in mode) {
 
 	var interactive = false;  //not(SYSTEM.f(33));
 
-	win.valid = 1;
+	req.valid = 1;
 
 	// no validation for EXODUS
 	if (curruser_.contains("EXODUS")) {
@@ -98,39 +98,39 @@ function main(in mode) {
 
 	if (mode eq "GENERATEPASSWORD") {
 		gosub generatepassword();
-		win.is = newpassword;
+		req.is = newpassword;
 
 		// only to allow maintenance mode
 	} else if (mode eq "VAL.USER") {
 	} else if (mode eq "PERP") {
 
 	} else if (mode eq "MAKESYSREC") {
-		userx		= win.is.f(1);
-		newpassword = win.is.f(2);
+		userx		= req.is.f(1);
+		newpassword = req.is.f(2);
 		sysrec		= "";
 		passwordfn	= 7;
 		lastfn		= 9;
 		gosub makesysrec();
-		win.is = sysrec;
+		req.is = sysrec;
 
 		// called from DEFINITION.SUBS POSTREAD for key SECURITY
 	} else if (mode eq "SETUP") {
 
 		// check allowed access
-		if (win.templatex.unassigned()) {
-			win.templatex = "";
+		if (req.templatex.unassigned()) {
+			req.templatex = "";
 		}
-		if (win.templatex eq "SECURITY") {
+		if (req.templatex eq "SECURITY") {
 			filename	= "AUTHORISATION";
 			defaultlock = "GS";
 		} else {
-			if (win.templatex eq "HOURLYRATES") {
+			if (req.templatex eq "HOURLYRATES") {
 				filename			= "HOURLY RATE";
 				updatehighergroups_ = 1;
 				updatelowergroups_	= 1;
 				defaultlock			= "TA";
 			} else {
-				msg = win.templatex.quote() ^ " unknown template in security.subs";
+				msg = req.templatex.quote() ^ " unknown template in security.subs";
 				return invalid(msg);
 			}
 		}
@@ -143,11 +143,11 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (win.templatex eq "SECURITY") {
+		if (req.templatex eq "SECURITY") {
 
 			// check guest status
 			gosub gueststatus();
-			if (not(win.valid)) {
+			if (not(req.valid)) {
 				stop();
 			}
 
@@ -167,7 +167,7 @@ function main(in mode) {
 		if (authorised(filename ^ " UPDATE", msg, defaultlock)) {
 		} else {
 			if (not interactive) {
-				win.wlocked = 0;
+				req.wlocked = 0;
 			}
 		}
 
@@ -193,7 +193,7 @@ function main(in mode) {
 		// @record<9>=curruser
 
 		// don't delete users for hourly rates
-		if (win.templatex eq "HOURLYRATES") {
+		if (req.templatex eq "HOURLYRATES") {
 			updatehighergroups_ = 1;
 			updatelowergroups_	= 1;
 		}
@@ -345,7 +345,7 @@ function main(in mode) {
 			}  // fn;
 
 			// save orec (after removing stuff) for prewrite
-			if (win.wlocked) {
+			if (req.wlocked) {
 				RECORD.write(DEFINITIONS, "SECURITY.OREC");
 			}
 		}
@@ -364,17 +364,17 @@ function main(in mode) {
 			}
 
 			// simulate orec
-			if (win.orec.read(DEFINITIONS, "SECURITY.OREC")) {
+			if (req.orec.read(DEFINITIONS, "SECURITY.OREC")) {
 			} else {
 				msg = "SECURITY.OREC is missing from DEFINITIONS";
 				return invalid(msg);
 			}
 
 			// safety check
-			if (win.orec.f(20) ne startn_ or win.orec.f(21) ne endn_) {
+			if (req.orec.f(20) ne startn_ or req.orec.f(21) ne endn_) {
 
 				// trace
-				win.orec.write(DEFINITIONS, "SECURITY.OREC.BAD");
+				req.orec.write(DEFINITIONS, "SECURITY.OREC.BAD");
 				RECORD.write(DEFINITIONS, "SECURITY.REC.BAD");
 
 				msg = "An internal error: REC 20 AND 21 DO NOT AGREE WITH .OREC";
@@ -385,11 +385,11 @@ function main(in mode) {
 		gosub cleartemp();
 
 		// if locked then skip out
-		if (interactive and win.ww(2).f(18).count("P")) {
+		if (interactive and req.ww(2).f(18).count("P")) {
 			return 0;
 		}
 
-		if (not(interactive) or win.templatex eq "SECURITY") {
+		if (not(interactive) or req.templatex eq "SECURITY") {
 
 			// check all users have names/passwords
 			var usercodes = RECORD.f(1);
@@ -416,8 +416,8 @@ function main(in mode) {
 
 					if (newpassword) {
 
-						win.mvx = usern;
-						win.is	= "";
+						req.mvx = usern;
+						req.is	= "";
 						gosub changepassx();
 
 						// remove old password so that changing password TO THE SAME PASSWORD
@@ -462,9 +462,9 @@ function main(in mode) {
 				}
 
 				// check ALL emails in one pass
-				win.is = RECORD.f(7);
+				req.is = RECORD.f(7);
 				call usersubs("VAL.EMAIL");
-				if (not(win.valid)) {
+				if (not(req.valid)) {
 					return 0;
 				}
 
@@ -499,7 +499,7 @@ function main(in mode) {
 			for (const var taskn : range(1, ntasks)) {
 				var task = tasks.f(1, taskn);
 				if (task) {
-					if (not(win.orec.f(10).locate(task, newtaskn))) {
+					if (not(req.orec.f(10).locate(task, newtaskn))) {
 						var lockx = locks.f(1, taskn);
 
 						if (not(RECORD.f(10).locateby("AL", task, newtaskn))) {
@@ -534,7 +534,7 @@ function main(in mode) {
 		RECORD(2) = keys;
 
 		// no further processing if HOURLYRATES
-		if (interactive and win.templatex ne "SECURITY") {
+		if (interactive and req.templatex ne "SECURITY") {
 			return 0;
 		}
 
@@ -669,7 +669,7 @@ function main(in mode) {
 		// subsection for deletion of old
 		{
 			// delete any deleted users from the system file for direct login
-			var usercodes = win.orec.f(1);
+			var usercodes = req.orec.f(1);
 			let nusers	  = usercodes.fcount(VM);
 			// for (usern = 1; usern <= nusers; ++usern) {
 			for (const var usern : range(1, nusers)) {
@@ -971,7 +971,7 @@ function main(in mode) {
 }
 
 subroutine changepassx() {
-	var datax = RECORD.f(4, win.mvx);
+	var datax = RECORD.f(4, req.mvx);
 	sysrec	  = datax.f(1, 1, 2);
 	sysrec.converter(TM ^ ST ^ chr(249), FM ^ VM ^ SM);
 	if (not sysrec) {
@@ -984,15 +984,15 @@ subroutine changepassx() {
 
 	gosub newpass3();
 
-	if (win.valid) {
+	if (req.valid) {
 		// on screen the password shows as <hidden>
-		win.is(1, 1, 1) = "<hidden>";
+		req.is(1, 1, 1) = "<hidden>";
 
 		// store the new password and system record
 		var temp = sysrec;
 		temp.converter(FM ^ VM ^ SM, TM ^ ST ^ chr(249));
-		win.is(1, 1, 2)	   = temp;
-		RECORD(4, win.mvx) = win.is;
+		req.is(1, 1, 2)	   = temp;
+		RECORD(4, req.mvx) = req.is;
 	}
 	return;
 }
@@ -1011,7 +1011,7 @@ subroutine generatepassword() {
 
 subroutine newpass3() {
 
-	win.valid = 0;
+	req.valid = 0;
 	lastfn	  = 9;
 
 	if (sysrec.f(1) eq "USER" or sysrec eq "") {
@@ -1060,7 +1060,7 @@ subroutine makesysrec() {
 	encryptx	   = hashpass(encryptx);
 	sysrec(lastfn) = encryptx;
 
-	win.valid = 1;
+	req.valid = 1;
 
 	return;
 }

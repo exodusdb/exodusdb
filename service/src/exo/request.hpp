@@ -1,9 +1,9 @@
-#ifndef EXO_WINDOW_HPP_
-#define EXO_WINDOW_HPP_
+#ifndef EXO_REQUEST_HPP_
+#define EXO_REQUEST_HPP_
 
 function security(in mode)
 {
-	var op = singular(win.datafile);
+	var op = singular(req.datafile);
 	return security2(mode,op);
 }
 
@@ -22,10 +22,10 @@ function security2(in mode, in op0)
 			return invalid(msg);
 
 	}else if (mode.contains("READ") || mode.contains("WRITE")) {
-		if (!win.wlocked) {
+		if (!req.wlocked) {
 			op ^= " ACCESS";
 		} else {
-			if (win.orec) {
+			if (req.orec) {
 				op ^= " UPDATE";
 			} else {
 				op ^= " CREATE";
@@ -33,13 +33,13 @@ function security2(in mode, in op0)
 		}
 		var msg;
 		if (!(authorised(op ^ op2, msg, ""))) {
-			if (win.orec == "" || !win.wlocked) {
+			if (req.orec == "" || !req.wlocked) {
 				invalid();
-				win.reset = 5;
+				req.reset = 5;
 			}
-			if (win.wlocked) {
-				unlockrecord(win.datafile, win.srcfile, ID);
-				win.wlocked = 0;
+			if (req.wlocked) {
+				unlockrecord(req.datafile, req.srcfile, ID);
+				req.wlocked = 0;
 			}
 		}
 
@@ -66,7 +66,7 @@ function security3(in op, in op2)
 
 function invalidq(in msg)
 {
-	return invalid(win.is.f(1, 1, 1).quote() ^ " " ^ msg);
+	return invalid(req.is.f(1, 1, 1).quote() ^ " " ^ msg);
 }
 
 function invalid()
@@ -76,11 +76,11 @@ function invalid()
 
 function invalid(in msg)
 {
-	win.valid = 0;
-	if (!win.isorig.unassigned()) {
-		win.is = win.isorig;
-		if (!win.reset)
-			win.reset = 1;
+	req.valid = 0;
+	if (!req.isorig.unassigned()) {
+		req.is = req.isorig;
+		if (!req.reset)
+			req.reset = 1;
 	}
 	if (!msg) return true;
 	note(msg);
@@ -88,14 +88,14 @@ function invalid(in msg)
 }
 
 function invalid2(in msg) {
-	if (not(win.registerx(3))) {
+	if (not(req.registerx(3))) {
 		invalid(msg);
 	}
-	if (win.isorig) {
-		win.is = win.isorig;
+	if (req.isorig) {
+		req.is = req.isorig;
 	}
-	win.valid = 0;
-	win.reset = 1;
+	req.valid = 0;
+	req.reset = 1;
 	return 0;
 }
 
@@ -103,7 +103,7 @@ function note3(in msg) {
 	if (not msg) {
 		return 0;
 	}
-	if (win.registerx(3)) {
+	if (req.registerx(3)) {
 		return 0;
  	}
 	note(msg);
@@ -113,14 +113,14 @@ function note3(in msg) {
 function badchars(io msg) {
 
 	msg = "";
-	if (not win.is) {
+	if (not req.is) {
 		return 0;
 	}
-	var tt = win.is;
+	var tt = req.is;
 	var bad = "\'" "~!@#$%^&*()_+|\\{}[]:\";,?";
 	tt.converter(bad, RM.str(bad.len()));
-	if (tt ne win.is) {
-		var t2 = win.is;
+	if (tt ne req.is) {
+		var t2 = req.is;
 		t2.converter(tt, "");
 		msg = "SORRY, YOU CANNOT USE|" ^ t2 ^ " CHARACTERS IN KEY FIELDS";
 		gosub invalid(msg);
@@ -128,4 +128,4 @@ function badchars(io msg) {
 	return 0;
 }
 
-#endif // EXO_WINDOW_HPP_
+#endif // EXO_REQUEST_HPP_

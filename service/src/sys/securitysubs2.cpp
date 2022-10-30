@@ -9,7 +9,7 @@ libraryinit()
 #include <sys_common.h>
 #include <req_common.h>
 
-#define origfullrec_ win.registerx(7)
+#define origfullrec_ req.registerx(7)
 
 	var taskn;	// num
 var oldtaskn;

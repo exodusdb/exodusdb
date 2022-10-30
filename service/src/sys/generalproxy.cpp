@@ -53,7 +53,7 @@ function main() {
 		generalsubs = "generalsubs_app";
 	}
 
-	win.valid  = 1;
+	req.valid  = 1;
 	msg_	   = "";
 	stationery = "";
 
@@ -63,7 +63,7 @@ function main() {
 
 	// request 2 - can be anything actually
 
-	win.datafile = request_.f(2);
+	req.datafile = request_.f(2);
 	var keyx	 = request_.f(3);
 
 	response_ = "OK";
@@ -308,7 +308,7 @@ function main() {
 		response_ = "OK Database " ^ targetdbname ^ " " ^ targetdbcode.quote() ^ " has been created.";
 
 	} else if (mode eq "VAL.EMAIL") {
-		win.is = request_;
+		req.is = request_;
 		call usersubs(mode);
 
 		// case mode[-3,3]='SSH'
@@ -366,9 +366,9 @@ function main() {
 		}
 
 		// prewrite (locks authorisation file or fails)
-		win.valid = 1;
+		req.valid = 1;
 		call usersubs("PREWRITE");
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			abort();
 		}
 
@@ -559,15 +559,15 @@ badsetcodepage:
 		// LISTAUTH.USERS = list of users LISTUSERS
 	} else if (mode.field(".", 1) eq "LISTAUTH") {
 
-		win.wlocked	  = 0;
-		win.templatex = "SECURITY";
+		req.wlocked	  = 0;
+		req.templatex = "SECURITY";
 		call securitysubs("SETUP");
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			abort();
 		}
 		// call security.subs('LISTAUTH')
 		call securitysubs(mode);
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			abort();
 		}
 		call securitysubs("POSTAPP");
@@ -576,9 +576,9 @@ badsetcodepage:
 
 	} else if (mode eq "READUSERS") {
 
-		win.templatex = "SECURITY";
+		req.templatex = "SECURITY";
 		call securitysubs("SETUP");
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			abort();
 		}
 
@@ -655,13 +655,13 @@ nextrep:
 			ID = docnos.f(1, docn);
 			if (ID) {
 				if (RECORD.read(sys.documents, ID)) {
-					win.orec = RECORD;
+					req.orec = RECORD;
 					call getsubs("PREDELETE");
-					if (not(win.valid)) {
+					if (not(req.valid)) {
 						goto exit;
 					}
 
-					if (win.valid) {
+					if (req.valid) {
 						sys.documents.deleterecord(ID);
 
 						call getsubs("POSTDELETE");
@@ -703,7 +703,7 @@ nextrep:
 		}
 
 		call getsubs("DEF.DOCUMENT.NO");
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			abort();
 		}
 

@@ -13,7 +13,7 @@ var xx;
 function main() {
 
 	// NB numbers and names MUST match those in the matching common .h files
-	mv.labelledcommon[win_common_no] = new win_common;
+	mv.labelledcommon[req_common_no] = new req_common;
 	mv.labelledcommon[sys_common_no] = new sys_common;
 	// mv.labelledcommon[agy_common_no]=new agy_common;
 

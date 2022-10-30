@@ -50,14 +50,14 @@ function main(in mode0) {
 
 	} else if (mode == "VAL.DATASET") {
 
-		if (win.is == win.isorig) {
+		if (req.is == req.isorig) {
 			return 0;
 		}
 
 		gosub getdatasets();
 
-		if (not(datasetcodes.f(1).locate(win.is, xx))) {
-			msg = win.is.quote() ^ " is not a dataset";
+		if (not(datasetcodes.f(1).locate(req.is, xx))) {
+			msg = req.is.quote() ^ " is not a dataset";
 			return invalid(msg);
 		}
 
@@ -103,40 +103,40 @@ function main(in mode0) {
 
 	} else if ((mode.field(".", 1, 2) == "DEF.SK") or (mode.field(".", 1, 2) == "DEF.SK2")) {
 
-		if (not(win.wlocked or RECORD)) {
+		if (not(req.wlocked or RECORD)) {
 			// is.dflt=nextkey(':%SK%:':datafile,'')
 
 			// special defaults for special files
 			if (mode ne "DEF.SK2") {
 
 				// documents
-				if (win.datafile == "DOCUMENTS") {
+				if (req.datafile == "DOCUMENTS") {
 					call getsubs("DEF.DOCUMENT.NO");
-					win.isdflt = ID;
+					req.isdflt = ID;
 					return 0;
 				}
 			}
 
 			// convert SK in datafile to SK in definitions
-			if (not(no.readf(DEFINITIONS, win.datafile ^ ".SK", 1))) {
-				if (no.readf(win.srcfile, "%SK%", 1)) {
-					win.srcfile.deleterecord("%SK%");
+			if (not(no.readf(DEFINITIONS, req.datafile ^ ".SK", 1))) {
+				if (no.readf(req.srcfile, "%SK%", 1)) {
+					req.srcfile.deleterecord("%SK%");
 
 				} else {
 					no = 1;
 				}
-				no.writef(DEFINITIONS, win.datafile ^ ".SK", 1);
+				no.writef(DEFINITIONS, req.datafile ^ ".SK", 1);
 			}
 
 next:
 
-			var params = ":" ^ win.datafile ^ ".SK:DEFINITIONS";
+			var params = ":" ^ req.datafile ^ ".SK:DEFINITIONS";
 
-			win.isdflt = nextkey(params, "");
-			if (xx.read(win.srcfile, win.isdflt)) {
-				if (win.isdflt.isnum()) {
-					win.isdflt += 1;
-					win.isdflt.writef(DEFINITIONS, win.datafile ^ ".SK", 1);
+			req.isdflt = nextkey(params, "");
+			if (xx.read(req.srcfile, req.isdflt)) {
+				if (req.isdflt.isnum()) {
+					req.isdflt += 1;
+					req.isdflt.writef(DEFINITIONS, req.datafile ^ ".SK", 1);
 
 					goto next;
 				}

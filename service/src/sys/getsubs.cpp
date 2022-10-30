@@ -34,7 +34,7 @@ function main(in mode) {
 
 	if (sys.documents.unassigned()) {
 		if (not(sys.documents.open("DOCUMENTS", ""))) {
-			win.valid = 0;
+			req.valid = 0;
 			mssg(lasterror());
 			return 0;
 		}
@@ -45,7 +45,7 @@ function main(in mode) {
 		// lock source of document numbers
 		printl("*lock source of document numbers");
 		if (not(lockrecord("DOCUMENTS", sys.documents, "0", xx, 10))) {
-			win.valid = 0;
+			req.valid = 0;
 			return 0;
 		}
 
@@ -91,7 +91,7 @@ nextdoc:
 			return 0;
 		}
 
-		task = win.orec.f(5);
+		task = req.orec.f(5);
 		gosub gettaskprefix();
 
 		// dont know task at this point
@@ -103,22 +103,22 @@ nextdoc:
 		// end
 
 		// user can always modify own reports
-		if ((win.wlocked and RECORD.f(1)) and RECORD.f(1) ne USERNAME) {
+		if ((req.wlocked and RECORD.f(1)) and RECORD.f(1) ne USERNAME) {
 
 			// check if allowed to modify
 			if (taskprefix) {
 				if (not(authorised(taskprefix ^ " UPDATE", msg, ""))) {
 					call mssg(msg);
-					xx			= unlockrecord(win.datafile, win.srcfile, ID);
-					win.wlocked = 0;
+					xx			= unlockrecord(req.datafile, req.srcfile, ID);
+					req.wlocked = 0;
 				}
 			}
 
 			// always prevent users from editing documents designed by EXODUS
 			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
 				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
-				xx			= unlockrecord(win.datafile, win.srcfile, ID);
-				win.wlocked = 0;
+				xx			= unlockrecord(req.datafile, req.srcfile, ID);
+				req.wlocked = 0;
 			}
 		}
 
@@ -131,7 +131,7 @@ nextdoc:
 	} else if (mode eq "PREWRITE") {
 
 		// check if allowed to create
-		if (win.orec eq "") {
+		if (req.orec eq "") {
 			task = RECORD.f(5);
 			gosub gettaskprefix();
 			if (taskprefix) {
@@ -172,7 +172,7 @@ nextdoc:
 
 	} else if (mode eq "PREDELETE") {
 
-		task = win.orec.f(5);
+		task = req.orec.f(5);
 		gosub gettaskprefix();
 
 		// user can always delete their own reports

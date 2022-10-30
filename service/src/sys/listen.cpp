@@ -507,7 +507,7 @@ function loop_init() {
 
 	lastrequestdate = date();
 	lastrequesttime = time();
-	win.registerx	= "";  //dim
+	req.registerx	= "";  //dim
 
 	// forcedemail
 	SYSTEM(117) = "";
@@ -527,7 +527,7 @@ function loop_init() {
 	data_		= "";
 	response_	= "";
 	msg_		= "";
-	win.wlocked = "";
+	req.wlocked = "";
 
 	// linkfilename1=''
 
@@ -1598,12 +1598,12 @@ subroutine process2() {
 		lockmins = request4;
 
 		readenv		  = request5;
-		win.templatex = readenv;
+		req.templatex = readenv;
 		call listen3(filename, request1, filetitle, triggers);
 		postread = triggers.f(3);
 
 		// reduce chance of using old common
-		win.registerx = "";	 //dim
+		req.registerx = "";	 //dim
 
 		// allow read to unknown files for the time being
 		if (filetitle eq "") {
@@ -1636,8 +1636,8 @@ subroutine process2() {
 		preread = triggers.f(1);
 		if (preread) {
 			keyx.move(ID);
-			win.srcfile	 = file;
-			win.datafile = filename;
+			req.srcfile	 = file;
+			req.datafile = filename;
 			systemsubs	 = preread;
 			call systemsubs(triggers.f(2));
 			DATA = "";
@@ -1658,17 +1658,17 @@ subroutine process2() {
 getnextkey:
 
 			// setup environment for DEF.SK
-			win.wlocked	 = 0;
+			req.wlocked	 = 0;
 			RECORD		 = "";
 			ID			 = keyx;
 			MV			 = 0;
-			win.datafile = filename;
-			win.srcfile	 = file;
-			win.isdflt	 = "";
+			req.datafile = filename;
+			req.srcfile	 = file;
+			req.isdflt	 = "";
 
 			call generalsubs("DEF.SK." ^ readenv);
 
-			keyx = win.isdflt;
+			keyx = req.isdflt;
 
 			if (keyx eq "") {
 				// response='Error: Next number was not produced':fm:msg
@@ -1812,25 +1812,25 @@ noupdate:
 		if (postread) {
 
 			// simulate window environment for POSTREAD
-			win.srcfile	 = file;
-			win.datafile = filename;
-			if (not(DICT.open("DICT." ^ win.datafile))) {
+			req.srcfile	 = file;
+			req.datafile = filename;
+			if (not(DICT.open("DICT." ^ req.datafile))) {
 				if (sessionid) {
 					gosub leaseunlock();
 				}
 				// response=quote('DICT.':datafile):' CANNOT BE OPENED'
-				call  listen4(9, response_, "DICT." ^ win.datafile);
+				call  listen4(9, response_, "DICT." ^ req.datafile);
 				gosub fmtresp();
 				return;
 			}
 			keyx.move(ID);
 			data_.move(RECORD);
-			win.orec	 = RECORD;
-			win.wlocked	 = sessionid;
+			req.orec	 = RECORD;
+			req.wlocked	 = sessionid;
 			origresponse = response_;
 			// response=''
 			msg_	  = "";
-			win.reset = 0;
+			req.reset = 0;
 
 			systemsubs = postread;
 			call systemsubs(triggers.f(4));
@@ -1845,7 +1845,7 @@ noupdate:
 			// postread can request abort by setting msg or reset>=5
 			// msg with reset<0 results in comment to client
 			// if reset>=5 or msg then
-			if (win.reset ge 5 or ((msg_ and (win.reset ne - 1)))) {
+			if (req.reset ge 5 or ((msg_ and (req.reset ne - 1)))) {
 				if (withlock) {
 					gosub leaseunlock();
 					// wlocked=0
@@ -1863,7 +1863,7 @@ noupdate:
 				// postread may have provided a record where non-was found
 				// ONLY if it unlocks it as well! otherwise
 				// removal of NO RECORD will cause failure in client
-				if (not(win.wlocked) and data_) {
+				if (not(req.wlocked) and data_) {
 
 					if (withlock and sessionid) {
 
@@ -1900,7 +1900,7 @@ noupdate:
 			// postread may have unlocked the record
 			// (and removed it from the locks file)
 			// but make sure
-			if (sessionid and not(win.wlocked)) {
+			if (sessionid and not(req.wlocked)) {
 
 				storeresponse = response_;
 				gosub leaseunlock();
@@ -1941,12 +1941,12 @@ noupdate:
 		sessionid = request5;
 
 		readenv		  = request6;
-		win.templatex = readenv;
+		req.templatex = readenv;
 		call listen3(filename, request1, filetitle, triggers);
 		prewrite = triggers.f(1);
 
 		// reduce chance of using old common
-		win.registerx = "";	 //dim
+		req.registerx = "";	 //dim
 
 		// disallow read/write to unknown files for the time being
 		if (filetitle eq "") {
@@ -1976,25 +1976,25 @@ noupdate:
 		ID = keyx;
 		MV = 0;
 		data_.move(RECORD);
-		win.datafile = filename;
+		req.datafile = filename;
 		// not really needed because pre/post code should assume that it is wlocked
 		// but some code does not know that (eg postread called from postwrite)
-		win.wlocked	  = sessionid;
-		win.saverec	  = request1   ne "DELETE";
-		win.deleterec = request1 eq "DELETE";
+		req.wlocked	  = sessionid;
+		req.saverec	  = request1   ne "DELETE";
+		req.deleterec = request1 eq "DELETE";
 
 		// trim excess field and value marks
 		call cropper(RECORD);
 
-		if (not(win.srcfile.open(win.datafile, ""))) {
+		if (not(req.srcfile.open(req.datafile, ""))) {
 			// response=quote(datafile):' CANNOT BE OPENED'
-			call listen4(9, response_, win.datafile);
+			call listen4(9, response_, req.datafile);
 			return;
 		}
 
-		if (not(DICT.open("DICT." ^ win.datafile))) {
+		if (not(DICT.open("DICT." ^ req.datafile))) {
 			// response=quote('DICT.':datafile):' file is not available'
-			call listen4(9, response_, "DICT." ^ win.datafile);
+			call listen4(9, response_, "DICT." ^ req.datafile);
 			return;
 		}
 
@@ -2002,7 +2002,7 @@ noupdate:
 		//     and or getting a properlock before doing it
 
 		// Open the leaselocks on the same connection as the data file
-		if (not openleaselocks(win.srcfile))
+		if (not openleaselocks(req.srcfile))
 			return;
 
 		// make sure that the record is already leaselocked to the user
@@ -2029,18 +2029,18 @@ noupdate:
 		// possibly not necessary as the leaselocks file entry will prevent other programs
 		// proper lock will prevent index mfs hanging on write
 
-		win.valid = 1;
+		req.valid = 1;
 		gosub properlock();
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			return;
 		}
 
-		if (not(win.orec.read(win.srcfile, ID))) {
-			win.orec = "";
+		if (not(req.orec.read(req.srcfile, ID))) {
+			req.orec = "";
 		}
 
 		// trim excess field and value marks
-		call cropper(win.orec);
+		call cropper(req.orec);
 
 		// double check not updated by somebody else
 		// nb this does not work for delete until client provides
@@ -2052,7 +2052,7 @@ noupdate:
 			if (allcols ne "") {
 				if (dictrec.readc(allcols, filename ^ "*DATE_TIME")) {
 					datetimefn	= dictrec.f(2);
-					olddatetime = win.orec.f(datetimefn);
+					olddatetime = req.orec.f(datetimefn);
 					newdatetime = RECORD.f(datetimefn);
 					if (olddatetime and olddatetime ne newdatetime) {
 						gosub properunlock();
@@ -2107,7 +2107,7 @@ badwrite:
 				DATA = "";
 			}
 
-			if (not(win.valid)) {
+			if (not(req.valid)) {
 				gosub properunlock();
 				response_ = msg_;
 				gosub fmtresp();
@@ -2139,7 +2139,7 @@ badwrite:
 				}
 
 				gosub properlock();
-				if (not(win.valid)) {
+				if (not(req.valid)) {
 					return;
 				}
 			}
@@ -2159,11 +2159,11 @@ badwrite:
 				systemsubs = replacewrite;
 				call systemsubs(triggers.f(6));
 				// in case it changes @record?
-				if (not(RECORD.read(win.srcfile, keyx))) {
+				if (not(RECORD.read(req.srcfile, keyx))) {
 					RECORD = "";
 				}
 			} else {
-				RECORD.write(win.srcfile, keyx);
+				RECORD.write(req.srcfile, keyx);
 			}
 
 			// post write processing
@@ -2194,7 +2194,7 @@ badwrite:
 			predelete = triggers.f(1);
 
 			// ensure that deletion works on the orig record
-			RECORD = win.orec;
+			RECORD = req.orec;
 
 			// prevent deleting if record does not exist
 			if (RECORD eq "") {
@@ -2225,14 +2225,14 @@ badwrite:
 				call systemsubs(triggers.f(2));
 				DATA = "";
 			}
-			if (not(win.valid)) {
+			if (not(req.valid)) {
 				gosub properunlock();
 				response_ = msg_;
 				gosub fmtresp();
 				return;
 			}
 
-			win.srcfile.deleterecord(keyx);
+			req.srcfile.deleterecord(keyx);
 
 			// post delete processing
 			postdelete = triggers.f(3);
@@ -2253,7 +2253,7 @@ badwrite:
 			leaselocks.deleterecord(lockkey);
 
 			// unlock local lock
-			win.srcfile.unlock(keyx);
+			req.srcfile.unlock(keyx);
 
 		} else {
 			gosub properunlock();
@@ -2261,7 +2261,7 @@ badwrite:
 
 		// even postwrite/postdelete can now set invalid (to indicate invalid mode etc)
 		// if valid then response='OK' else response='Error:'
-		response_ = win.valid ? "OK" : "Error:";
+		response_ = req.valid ? "OK" : "Error:";
 
 		if (request1 ne "DELETE") {
 			tt = ID;
@@ -2327,7 +2327,7 @@ badwrite:
 
 		// execute the program
 		response_ = "OK";
-		win.valid = 1;
+		req.valid = 1;
 		msg_	  = "";
 
 		// request, iodat and response are now passed and returned in @user0,1 and 3
@@ -2656,14 +2656,14 @@ subroutine gettimeouttime() {
 subroutine properlock() {
 	// must lock it properly otherwise indexing will try to lock it and fail
 	// because it is only in the LOCKS file and not properly locked
-	win.valid = 1;
+	req.valid = 1;
 
 	// must exclude the shadowing system otherwise the entry in the LOCKS file
 	// also in balances
 	// will cause the LOCK statement to fail
-	srcfile2 = win.srcfile;
+	srcfile2 = req.srcfile;
 	/*
-	if (not(win.srcfile.unassigned())) {
+	if (not(req.srcfile.unassigned())) {
 		srcfile2.replacer("SHADOW.MFS" ^ SM, "");
 	}
 	*/
@@ -2672,7 +2672,7 @@ subroutine properlock() {
 	// in jbase version of lockrecord()
 	if (not(lockrecord("", srcfile2, keyx, xx))) {
 		if (STATUS ne 1) {
-			win.valid = 0;
+			req.valid = 0;
 			// response='Error: ':quote(keyx):' CANNOT BE WRITTEN BECAUSE IT IS LOCKED ELSEWHERE'
 			call listen4(23, response_, keyx);
 		}
@@ -2689,7 +2689,7 @@ subroutine properunlock() {
 
 	// must exclude the shadowing system otherwise the entry in the LOCKS file
 	// will be removed as well
-	srcfile2 = win.srcfile;
+	srcfile2 = req.srcfile;
 	/*
 	srcfile2.replacer("SHADOW.MFS" ^ SM, "");
 	*/
@@ -2913,7 +2913,7 @@ function openleaselocks(in file) {
 	// Open the leaselocks on the same connection as the data file
 	if (not(leaselocks.open("LOCKS", file))) {
 		response_ = "Error: LOCKS for " ^ file ^ " cannot be opened.";
-		// call listen4(9, response_, win.datafile);
+		// call listen4(9, response_, req.datafile);
 		return false;
 	}
 

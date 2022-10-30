@@ -1,12 +1,12 @@
 // dont use guard since may required multiple times eg in dict_xxxxx.cpp files
-//#ifndef SERVICE_SRC_EXO_WIN_COMMON_H_
-//#define SERVICE_SRC_EXO_WIN_COMMON_H_
+//#ifndef SERVICE_SRC_EXO_REQ_COMMON_H_
+//#define SERVICE_SRC_EXO_REQ_COMMON_H_
 
 #include <exodus/common.h>
 
-#define win_common_no 1
+#define req_common_no 1
 
-commoninit(win,win_common_no)
+commoninit(req,req_common_no)
 
 	//not generated automatically - manually add whatever are required
 	var srcfile = "";
@@ -56,11 +56,11 @@ commoninit(win,win_common_no)
 	dim registerx;
 	//
 	// Default constructor to properly dimension the dim arrays
-	win_common() {
+	req_common() {
 		ww.redim(100);
 		registerx.redim(10);
 	}
 
-commonexit(win,win_common_no)
+commonexit(req,req_common_no)
 
-//#endif // SERVICE_SRC_EXO_WIN_COMMON_H_
+//#endif // SERVICE_SRC_EXO_REQ_COMMON_H_

@@ -70,16 +70,16 @@ function main(in mode) {
 
 			op = "SYSTEM CONFIGURATION";
 			gosub security2(mode, op);
-			if (not(win.valid)) {
+			if (not(req.valid)) {
 				return 0;
 			}
 		}
 
 		if (ID eq "SECURITY*USERS") {
 			ID			  = "SECURITY";
-			win.templatex = "USERS";
+			req.templatex = "USERS";
 			if (not(authorised("USER LIST", msg, "USER ACCESS"))) {
-				win.valid = 0;
+				req.valid = 0;
 			}
 			return 0;
 		}
@@ -94,7 +94,7 @@ function main(in mode) {
 
 			op = "SYSTEM CONFIGURATION";
 			gosub security2(mode, op);
-			if (not(win.valid)) {
+			if (not(req.valid)) {
 				return 0;
 			}
 
@@ -134,41 +134,41 @@ function main(in mode) {
 
 		if (ID eq "SECURITY") {
 
-			if (win.templatex eq "USERS") {
+			if (req.templatex eq "USERS") {
 				return 0;
 			}
 
 			// template now provided by readenvironment in client
 			// either SECURITY or HOURLYRATES
-			if (win.templatex eq "") {
-				win.templatex = "SECURITY";
+			if (req.templatex eq "") {
+				req.templatex = "SECURITY";
 			}
 			call securitysubs("SETUP");
 			return 0;
 		}
 
 		// default cheque format
-		if (win.wlocked and ID.field("*", 1) eq "CHEQUEDESIGN") {
+		if (req.wlocked and ID.field("*", 1) eq "CHEQUEDESIGN") {
 
 			// prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
-				win.srcfile.unlock(ID);
-				win.wlocked = "";
+				req.srcfile.unlock(ID);
+				req.wlocked = "";
 			}
 
 			if (not(RECORD.f(1))) {
 
 				var temp;
-				if (temp.read(win.srcfile, "CHEQUEDESIGN*DEFAULT")) {
+				if (temp.read(req.srcfile, "CHEQUEDESIGN*DEFAULT")) {
 
-					if (not(RECORD.read(win.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1)))) {
+					if (not(RECORD.read(req.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1)))) {
 						goto nochequeformat;
 					}
 
 				} else {
 
 nochequeformat:
-					if (not(temp.read(win.srcfile, "CHEQUEDESIGN*ZZZ999"))) {
+					if (not(temp.read(req.srcfile, "CHEQUEDESIGN*ZZZ999"))) {
 						if (temp.open("ALANGUAGE", "")) {
 							if (not(RECORD.read(temp, "VOUCHERS**CHEQUE"))) {
 								RECORD = "";
@@ -199,7 +199,7 @@ nochequeformat:
 				goto unlockdefinitions;
 			}
 
-			if (win.wlocked and (not(authorised(pretendfile ^ " UPDATE", msg)))) {
+			if (req.wlocked and (not(authorised(pretendfile ^ " UPDATE", msg)))) {
 				goto preventupdate;
 			}
 
@@ -228,8 +228,8 @@ nochequeformat:
 			// check allowed access
 			if (not(authorised("BILLING REPORT ACCESS", msg, ""))) {
 unlockdefinitions:
-				win.reset = 5;
-				xx		  = unlockrecord("DEFINITIONS", win.srcfile, ID);
+				req.reset = 5;
+				xx		  = unlockrecord("DEFINITIONS", req.srcfile, ID);
 				return invalid(msg);
 			}
 
@@ -237,16 +237,16 @@ unlockdefinitions:
 			if (RECORD.f(8) ne USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
-				if (not(win.valid)) {
+				if (not(req.valid)) {
 					return 0;
 				}
 			}
 
 			// prevent update or delete of EXODUS definitions
-			if ((win.wlocked and RECORD.f(8).contains("EXODUS")) and not(USERNAME.contains("EXODUS"))) {
+			if ((req.wlocked and RECORD.f(8).contains("EXODUS")) and not(USERNAME.contains("EXODUS"))) {
 preventupdate:
-				win.wlocked = 0;
-				xx			= unlockrecord("DEFINITIONS", win.srcfile, ID);
+				req.wlocked = 0;
+				xx			= unlockrecord("DEFINITIONS", req.srcfile, ID);
 			}
 
 			return 0;
@@ -269,8 +269,8 @@ preventupdate:
 			// no difference between security update and hourlyrate update now
 			// template='SECURITY'
 			// now there is!
-			if (win.templatex eq "") {
-				win.templatex = "SECURITY";
+			if (req.templatex eq "") {
+				req.templatex = "SECURITY";
 			}
 
 			call securitysubs("SAVE");
@@ -290,16 +290,16 @@ preventupdate:
 
 				// remove old default
 				var temp;
-				if (temp.read(win.srcfile, "CHEQUEDESIGN*DEFAULT")) {
+				if (temp.read(req.srcfile, "CHEQUEDESIGN*DEFAULT")) {
 					var temp2;
-					if (temp2.read(win.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1))) {
+					if (temp2.read(req.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1))) {
 						temp2(14) = "";
-						temp2.write(win.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1));
+						temp2.write(req.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1));
 					}
 				}
 
 				// set new default
-				ID.field("*", 2).write(win.srcfile, "CHEQUEDESIGN*DEFAULT");
+				ID.field("*", 2).write(req.srcfile, "CHEQUEDESIGN*DEFAULT");
 
 				// if EXODUS then save the default as EXODUS programs default
 				if (USERNAME eq "EXODUS") {
@@ -311,8 +311,8 @@ preventupdate:
 			} else {
 
 				// remove as default (assume is this account)
-				if (win.orec.f(14)) {
-					win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
+				if (req.orec.f(14)) {
+					req.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 				}
 			}
 		}
@@ -336,10 +336,10 @@ preventupdate:
 		if (ID eq "AGENCY.PARAMS") {
 
 			// prevent changing "invno by company" after data is entered
-			if (RECORD.f(48) ne win.orec.f(48)) {
+			if (RECORD.f(48) ne req.orec.f(48)) {
 				call anydata("", anydataexists);
 				if (anydataexists) {
-					RECORD(48) = win.orec.f(48);
+					RECORD(48) = req.orec.f(48);
 					msg		   = "You cannot change Invoice Number Sequence after data is entered";
 					msg(-1)	   = "That change has been ignored.";
 					call note(msg);
@@ -354,7 +354,7 @@ preventupdate:
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
-					if (usercode ne win.orec.f(fn)) {
+					if (usercode ne req.orec.f(fn)) {
 						// updater must themselves be authorised to post journals
 						if (not(authorised("JOURNAL POST", msg))) {
 							msg = "You are not authorised to change financial usercode" _FM _FM ^ msg;
@@ -403,7 +403,7 @@ preventupdate:
 			}
 
 			// save the requester if requested createads
-			if (RECORD.f(125) ne win.orec.f(125)) {
+			if (RECORD.f(125) ne req.orec.f(125)) {
 				RECORD(128) = USERNAME;
 			}
 		}
@@ -494,7 +494,7 @@ preventupdate:
 			// create/update ddns configuration if necessary
 			// actually only the ddns.cmd file really need be updated
 			// but atm it recreates everything from scratch
-			var oldhostname = win.orec.f(57);
+			var oldhostname = req.orec.f(57);
 			var newhostname = RECORD.f(57);
 			if (newhostname and newhostname ne oldhostname) {
 				SYSTEM(57) = newhostname;
@@ -514,8 +514,8 @@ preventupdate:
 		if (ID eq "SECURITY") {
 
 			// could be HOURLYRATES which has different authorisation
-			if (win.templatex eq "") {
-				win.templatex = "SECURITY";
+			if (req.templatex eq "") {
+				req.templatex = "SECURITY";
 			}
 
 			// to get lastest userprivs
@@ -545,7 +545,7 @@ preventupdate:
 
 			op = "SYSTEM CONFIGURATION";
 			gosub security2(mode, op);
-			if (not(win.valid)) {
+			if (not(req.valid)) {
 				return 0;
 			}
 
@@ -573,7 +573,7 @@ preventupdate:
 			if (RECORD.f(8) ne USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
-				if (not(win.valid)) {
+				if (not(req.valid)) {
 					return 0;
 				}
 			}
@@ -582,7 +582,7 @@ preventupdate:
 		// remove default cheque design
 		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
 			if (RECORD.f(14)) {
-				win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
+				req.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 			}
 		}
 

@@ -117,17 +117,17 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	if (rawread) {
 		goto nocommon;
 	}
-	if (win.srcfile.unassigned()) {
+	if (req.srcfile.unassigned()) {
 nocommon:
 		commonsaved = 0;
 	} else {
 		commonsaved = 1;
-		win.srcfile.move(savesrcfile);
-		win.datafile.move(savedatafile);
-		win.wlocked.move(savewlocked);
+		req.srcfile.move(savesrcfile);
+		req.datafile.move(savedatafile);
+		req.wlocked.move(savewlocked);
 		msg_.move(savemsg);
-		win.reset.move(savereset);
-		win.valid.move(savevalid);
+		req.reset.move(savereset);
+		req.valid.move(savevalid);
 	}
 
 	// if unassigned(limitfields) then limitfields=''
@@ -336,8 +336,8 @@ nocommon:
 	var recn = "";
 
 	if (not rawread) {
-		win.datafile = filename;
-		win.srcfile	 = file;
+		req.datafile = filename;
+		req.srcfile	 = file;
 	}
 
 	// read each record and add the required columns to the selectresult
@@ -428,12 +428,12 @@ nextrec:
 		if (haspostread) {
 
 			// simulate window environment for POSTREAD
-			win.orec = RECORD;
+			req.orec = RECORD;
 			// wlocked=1
 			// simulate unlocked read to avoid warning messages like job cannot be updated
-			win.wlocked = 0;
+			req.wlocked = 0;
 			msg_		= "";
-			win.reset	= 0;
+			req.reset	= 0;
 
 			call systemsubs(postreadmode);
 			DATA = "";
@@ -441,7 +441,7 @@ nextrec:
 			// call trimexcessmarks(iodat)
 
 			// postread can request abort by setting msg or reset>=5
-			if (win.reset ge 5 or msg_) {
+			if (req.reset ge 5 or msg_) {
 				goto nextrec;
 			}
 		}
@@ -556,12 +556,12 @@ nextrec:
 
 subroutine exit() {
 	if (commonsaved) {
-		savesrcfile.move(win.srcfile);
-		savedatafile.move(win.datafile);
-		savewlocked.move(win.wlocked);
+		savesrcfile.move(req.srcfile);
+		savedatafile.move(req.datafile);
+		savewlocked.move(req.wlocked);
 		savemsg.move(msg_);
-		savereset.move(win.reset);
-		savevalid.move(win.valid);
+		savereset.move(req.reset);
+		savevalid.move(req.valid);
 	}
 
 	storer.move(RECORD);

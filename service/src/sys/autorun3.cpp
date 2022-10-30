@@ -758,7 +758,7 @@ subroutine exec2() {
 	// other messages are passed back in @user4
 	// execute instead of call prevents program crashes from crashing LISTEN
 	response_ = "OK";
-	win.valid = 1;
+	req.valid = 1;
 	msg_	  = "";
 
 	// pass the output file in linkfilename2

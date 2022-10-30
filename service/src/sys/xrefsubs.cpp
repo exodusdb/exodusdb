@@ -44,14 +44,14 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 		// so should be run exclusively
 
 		clearselect();
-		perform("SELECT " ^ win.datafile ^ " (S)");
+		perform("SELECT " ^ req.datafile ^ " (S)");
 		if (not LISTACTIVE) {
 			return 0;
 		}
 
 nextbuild:
 		if (readnext(ID)) {
-			if (not(RECORD.read(win.srcfile, ID))) {
+			if (not(RECORD.read(req.srcfile, ID))) {
 				goto nextbuild;
 			}
 			if (RECORD.f(subfn) eq "") {
@@ -64,14 +64,14 @@ nextbuild:
 		}
 
 	} else if (mode eq "PREWRITE") {
-		if (win.orec.f(subfn) eq RECORD.f(subfn)) {
+		if (req.orec.f(subfn) eq RECORD.f(subfn)) {
 			return 0;
 		}
 		validating = 1;
 
 		deleting = 1;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			return 0;
 		}
 
@@ -89,13 +89,13 @@ nextbuild:
 
 		deleting = 1;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			return 0;
 		}
 
 		deleting = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			return 0;
 		}
 
@@ -103,13 +103,13 @@ nextbuild:
 
 		deleting = 1;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			return 0;
 		}
 
 		deleting = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			return 0;
 		}
 
@@ -127,7 +127,7 @@ nextbuild:
 		gosub unlockall(locklist);
 
 	} else if (mode eq "POSTWRITE") {
-		if (win.orec.f(subfn) eq RECORD.f(subfn)) {
+		if (req.orec.f(subfn) eq RECORD.f(subfn)) {
 			return 0;
 		}
 		validating = 0;
@@ -154,7 +154,7 @@ nextbuild:
 subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterfn, io locklist) {
 
 	if (deleting) {
-		mastercode = win.orec.f(subfn);
+		mastercode = req.orec.f(subfn);
 	} else {
 		mastercode = RECORD.f(subfn);
 	}

@@ -49,7 +49,7 @@ function main(in mode) {
 		// it is in the user file already
 		// if @id ne 'EXODUS' then @record<7>=userprivs<7,usern>
 
-		if (win.wlocked and ID ne USERNAME) {
+		if (req.wlocked and ID ne USERNAME) {
 
 			// only exodus to access exodus
 			if (ID eq "EXODUS") {
@@ -66,13 +66,13 @@ function main(in mode) {
 			// maybe can only update self
 			// if security('AUTHORISATION UPDATE',xx) else
 			if (not(authorised("USER UPDATE", xx))) {
-				win.srcfile.unlock(ID);
-				win.wlocked = 0;
+				req.srcfile.unlock(ID);
+				req.wlocked = 0;
 			}
 		}
 
 		// prevent new users with punctuation characters etc
-		if (win.orec eq "" and win.wlocked) {
+		if (req.orec eq "" and req.wlocked) {
 			var temp = ID;
 			temp.converter(
 				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -148,7 +148,7 @@ function main(in mode) {
 		if (emaildomains) {
 			// check emails
 			// emails=lcase(@record<7>)
-			var emails = win.is.lcase();
+			var emails = req.is.lcase();
 			emails.converter(FM ^ VM ^ SM ^ ", ", ";;;;;");
 			var nn = emails.fcount(";");
 			for (const var ii : range(1, nn)) {
@@ -175,7 +175,7 @@ function main(in mode) {
 
 		if (SECURITY.f(1).locate(ID, usern)) {
 			newuser = 0;
-			if (RECORD.f(4) and RECORD.f(4) ne win.orec.f(4)) {
+			if (RECORD.f(4) and RECORD.f(4) ne req.orec.f(4)) {
 				resetpassword = 1;
 			}
 		} else {
@@ -210,34 +210,34 @@ function main(in mode) {
 		// prevent amendment of expiry date and password date in UI if not authorised
 		// also name, email and department
 		if (mode eq "PREWRITE") {
-			if (win.orec) {
+			if (req.orec) {
 				if (not(authorised("AUTHORISATION UPDATE", xx))) {
 					// expiry date
-					if (win.orec.f(35)) {
-						RECORD(35) = win.orec.f(35);
+					if (req.orec.f(35)) {
+						RECORD(35) = req.orec.f(35);
 					}
 					// password date
-					if (win.orec.f(36)) {
-						RECORD(36) = win.orec.f(36);
+					if (req.orec.f(36)) {
+						RECORD(36) = req.orec.f(36);
 					}
 					// tt=@record<19>
 					// swap 'Default' with '' in tt
 					// username
-					RECORD(1) = win.orec.f(1);
+					RECORD(1) = req.orec.f(1);
 					// department
-					RECORD(5) = win.orec.f(5);
+					RECORD(5) = req.orec.f(5);
 					// email
-					RECORD(7) = win.orec.f(7);
+					RECORD(7) = req.orec.f(7);
 					// department2
-					RECORD(21) = win.orec.f(21);
+					RECORD(21) = req.orec.f(21);
 				}
 			}
 		}
 
 		// verify email domains
-		win.is = RECORD.f(7);
+		req.is = RECORD.f(7);
 		call usersubs("VAL.EMAIL");
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			gosub unlocksec();
 			return 0;
 		}
@@ -280,7 +280,7 @@ function main(in mode) {
 		}
 
 		gosub getusern();
-		if (not(win.valid)) {
+		if (not(req.valid)) {
 			gosub unlocksec();
 			return 0;
 		}
@@ -298,10 +298,10 @@ function main(in mode) {
 		var ans = RECORD.f(4);
 		if ((newuser or resetpassword) and ans) {
 
-			win.is = ID ^ FM ^ ans.f(1);
+			req.is = ID ^ FM ^ ans.f(1);
 			// uses hasspass to encrypt
 			call securitysubs("MAKESYSREC");
-			ans = win.is;
+			ans = req.is;
 
 			// save the encrypted bit in case we cannot update userprivs
 			RECORD(4) = ans.f(7);
@@ -350,8 +350,8 @@ function main(in mode) {
 		return 0;
 
 	} else if (mode eq "CREATEUSERNAMEINDEX") {
-		win.srcfile = users;
-		select(win.srcfile);
+		req.srcfile = users;
+		select(req.srcfile);
 
 		while (true) {
 			if (not(readnext(ID))) {
@@ -424,7 +424,7 @@ subroutine updatemirror() {
 	var username  = RECORD.f(1).ucase();
 	var mirrorkey = "%" ^ username ^ "%";
 	mirror(1)	  = ID;
-	mirror.write(win.srcfile, mirrorkey);
+	mirror.write(req.srcfile, mirrorkey);
 	return;
 }
 
