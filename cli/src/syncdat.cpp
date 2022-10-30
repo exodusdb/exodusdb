@@ -8,8 +8,10 @@ programinit()
 	var last_sync_date;
 	var last_sync_time;
 
-function main() {
+	var errors = "";
 
+function main() {
+try{
 	if (index(OPTIONS, "H")) {
 		logputl(
 			"NAME\n"
@@ -55,7 +57,12 @@ function main() {
 		return 0;
 	}
 
-	let homedir = osgetenv("EXO_HOME") ?: osgetenv("HOME");
+	// "Elvis" operator and temporaries dont mix.
+	// DONT USE USE TEMPORARY CONDITION WITHOUT PROVIDING THE MIDDLE ARGUMENT
+	// Creates random runtime crash
+	//let homedir = osgetenv("EXO_HOME") ?: osgetenv("HOME");
+	let exo_home = osgetenv("EXO_HOME");
+	let homedir = exo_home ?: osgetenv("HOME");
 	let homedatpath = homedir ^ "/dat";
 
 	// Get list of dirs from command line or ~/dat
@@ -66,6 +73,7 @@ function main() {
 	let f2 = COMMAND.f(2);
 	let datpath = f2 ?: homedatpath;
 	let f3 = COMMAND.field(FM, 3, 999999);
+
 	let dirnames = f3 ?: oslistd(datpath ^ "/" "*").sort();
 
 	let txtfmt = "TX";
@@ -101,7 +109,7 @@ function main() {
 		return 0;
 	}
 
-	var errors = "";
+	//errors = "";
 	if (not begintrans()) {
 		errors(-1) = lasterror();
 		loglasterror();
@@ -371,6 +379,16 @@ function main() {
 
 	if (errors)
 		errors.errputl("\nsyncdat: Errors: ");
+
+} catch(VarError e) {
+	errputl(e.description);
+	errputl(e.stack());
+}
+catch(...) {
+	errputl("Some error");
+}
+
+	logputl("syncdata finishing.");
 
 	return errors ne "";
 
