@@ -303,5 +303,10 @@ var var::ospid() const {
 	return getpid();
 }
 
+var var::ostid() const {
+	//THISIS("var var::ospid() const")
+	return gettid();
+}
+
 }  // namespace exodus
 

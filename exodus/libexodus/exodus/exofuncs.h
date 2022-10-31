@@ -152,6 +152,7 @@ ND var  oscwd(CVR dirpath);
 
    void osflush();
 ND var  ospid();
+ND var  ostid();
 
 ND bool osshell(CVR command);
 ND bool osshellwrite(CVR writestr, CVR command);

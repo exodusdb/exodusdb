@@ -116,6 +116,7 @@ ND PUBLIC var oscwd(CVR dirpath) {return dirpath.oscwd(dirpath);}
 
 PUBLIC void osflush() {return var().osflush();}
 ND PUBLIC var ospid() {return var().ospid();}
+ND PUBLIC var ostid() {return var().ostid();}
 
 ND PUBLIC bool osshell(CVR command) {return command.osshell();}
 ND PUBLIC bool osshellwrite(CVR writestr, CVR command) {return writestr.osshellwrite(command);}

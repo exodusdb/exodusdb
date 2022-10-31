@@ -2032,6 +2032,7 @@ class PUBLIC var final {
 
 	// TODO check for threadsafe
 	ND var ospid() const;
+	ND var ostid() const;
 	ND var oscwd() const;
 	ND bool oscwd(CVR newpath) const;
 	void osflush() const;
