@@ -28,7 +28,7 @@ set -euxo pipefail
 : Generate all headers first
 : ==========================
 :
-	compile alt exo sys {hS$COMPILER_OPTIONS}
+	compile alt exo srv {hS$COMPILER_OPTIONS}
 
 :
 : Regenerate dict_xxxxxxxx.cpp files where dat have files changed
@@ -48,7 +48,7 @@ set -euxo pipefail
 : S - Silent
 : V - Verbose
 :
-	compile alt exo sys {S${COMPILER_OPTIONS}}
+	compile alt exo srv {S${COMPILER_OPTIONS}}
 
 :
 : Flag syncdat to review all and syncdat to exodus

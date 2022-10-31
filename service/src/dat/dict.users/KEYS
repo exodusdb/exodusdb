@@ -5,12 +5,12 @@ S
 
 
 
-#include <sys_common.h>\
+#include <srv_common.h>\
 \
 var usern;\
 \
 function main() {\
-	#include <system_common.h>\
+	#include <service_common.h>\
 	if (SECURITY.f(1).locate(ID, usern)) {\
 		ANS = SECURITY.f(2, usern);\
 	} else {\

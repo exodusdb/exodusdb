@@ -7,14 +7,14 @@ S
 
 #include <authorised.h>\
 \
-#include <sys_common.h>\
+#include <srv_common.h>\
 \
 var usern;\
 var ans; //num\
 var userx;\
 \
 function main() {\
-	#include <system_common.h>\
+	#include <service_common.h>\
 	if (ID eq "EXODUS") {\
 		goto unknown;\
 	}\

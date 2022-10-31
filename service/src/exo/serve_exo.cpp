@@ -5,7 +5,7 @@ programinit()
 #include <initcompany.h>
 #include <initgeneral.h>
 #include <initgeneral2.h>
-#include <sys_common.h>
+#include <srv_common.h>
 #include <req_common.h>
 
 var xx;
@@ -14,7 +14,7 @@ function main() {
 
 	// NB numbers and names MUST match those in the matching common .h files
 	mv.labelledcommon[req_common_no] = new req_common;
-	mv.labelledcommon[sys_common_no] = new sys_common;
+	mv.labelledcommon[srv_common_no] = new srv_common;
 	// mv.labelledcommon[agy_common_no]=new agy_common;
 
 	/*cat ~/pickos/dic/ *.SQL | psql -h 127.0.0.1 -U exodus exodus*/

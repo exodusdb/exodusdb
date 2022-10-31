@@ -5,7 +5,7 @@ S
 
 
 
-#include <sys_common.h>\
+#include <srv_common.h>\
 \
 function main() {\
 	ANS = "";\

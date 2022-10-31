@@ -5,10 +5,10 @@ S
 
 
 
-#include <sys_common.h>\
+#include <srv_common.h>\
 \
 function main() {\
-	#include <system_common.h>\
+	#include <service_common.h>\
 	var ans = field2(RECORD, FM, -1);\
 	if (ans.starts("V")) {\
 		ans = field2(RECORD, FM, -2);\

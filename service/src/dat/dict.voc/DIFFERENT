@@ -5,12 +5,12 @@ S
 
 
 
-#include <sys_common.h>\
+#include <srv_common.h>\
 \
 var rec;\
 \
 function main() {\
-	#include <system_common.h>\
+	#include <service_common.h>\
 \
 	// COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE\
 	// IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999\

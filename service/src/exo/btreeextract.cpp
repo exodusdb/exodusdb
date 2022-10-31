@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <system_common.h>
+#include <service_common.h>
 
 function main(in cmd, in filename, in dictfile, out hits) {
 
