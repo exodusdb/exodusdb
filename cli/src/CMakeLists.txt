@@ -73,6 +73,7 @@
 	add_executable(syncdat syncdat.cpp)
 	add_executable(convsyntax convsyntax.cpp)
 	add_executable(redefine redefine.cpp)
+	add_executable(fire fire.cpp)
 
 	#name is name only ... input and output files are exodus
 	add_executable(exodus-cli exodus.cpp)
@@ -126,6 +127,7 @@
 	target_link_libraries(syncdat exodus stdc++fs ${LIBS})
 	target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
 	target_link_libraries(redefine exodus stdc++fs ${LIBS})
+	target_link_libraries(fire exodus stdc++fs ${LIBS})
 
 #
 # 3. INSTALL BINs
@@ -165,6 +167,7 @@
 			syncdat
 			convsyntax
 			redefine
+			fire
 
 		DESTINATION
 			bin
