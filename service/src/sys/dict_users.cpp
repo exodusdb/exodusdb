@@ -7,7 +7,7 @@ libraryinit(authorised)
 #include <sys_common.h>
 
 var usern;
-var ans; // num
+var ans; //num
 var userx;
 
 function main() {

@@ -10,7 +10,7 @@ libraryexit(key2)
 
 libraryinit(lock_expired)
 //-----------------------
-var dostime; // num
+var dostime; //num
 
 function main() {
 	dostime = ostime();
