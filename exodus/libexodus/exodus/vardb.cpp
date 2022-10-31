@@ -627,9 +627,10 @@ PGconn* get_pgconn(CVR dbhandle) {
 // gets lock_table, associated with connection, associated with this object
 DBConn* get_dbconn(CVR dbhandle) {
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
-	if (!dbconn_no)
-		throw VarDBException("get_dbconn() attempted when not connected");
-
+	if (!dbconn_no) {
+		var errmsg = "get_dbconn() attempted when not connected";
+		throw VarDBException(errmsg);
+	}
 	return thread_dbconnector.get_dbconn(dbconn_no);
 }
 
@@ -856,7 +857,8 @@ bool var::connect(CVR conninfo) {
 #ifdef PQisthreadsafe
 	if (!PQisthreadsafe()) {
 		// TODO only abort if environmentn>0
-		throw VarDBException("connect(): Postgres PQ library is not threadsafe");
+		var errmsg = "connect(): Postgres PQ library is not threadsafe";
+		throw VarDBException(errmsg);
 
 	}
 #endif
@@ -1408,9 +1410,12 @@ bool var::read(CVR filehandle, CVR key) {
 
 	// get filehandle specific connection or fail
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn)
-		throw VarDBException("var::read() get_pgconn() failed for " ^ filehandle);
-
+	if (!pgconn) {
+		var errmsg = "var::read() get_pgconn() failed for " ^ filehandle;
+		this->setlasterror(errmsg);
+		// // this->loglasterror(errmsg);
+		throw VarDBException(errmsg);
+	}
 	// Parameter array
 	const char* paramValues[] = {key2.data()};
 	int paramLengths[] = {static_cast<int>(key2.size())};
@@ -1437,6 +1442,7 @@ bool var::read(CVR filehandle, CVR key) {
 			errmsg ^= var(PQerrorMessage(pgconn)) ^ " SQLERROR:" ^ sqlstate;
 		;
 		this->setlasterror(errmsg);
+		// // this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -1454,6 +1460,8 @@ bool var::read(CVR filehandle, CVR key) {
 	// A serious error
 	if (PQntuples(dbresult) > 1) {
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
+		this->setlasterror(errmsg);
+		// this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -1512,8 +1520,15 @@ var var::lock(CVR key) const {
 	ISSTRING(key)
 
 	PGconn* pgconn = get_pgconn(*this);
-	if (!pgconn)
-		throw VarDBException("var::lock() get_pgconn() failed for " ^ *this);
+	if (!pgconn) {
+		var errmsg = "var::lock() get_pgconn() failed. ";
+		if (this->assigned())
+			errmsg ^= *this ^ ", ";
+		errmsg ^= key;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	auto dbconn = get_dbconn(*this);
 
@@ -1559,8 +1574,10 @@ var var::lock(CVR key) const {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "lock(" ^ *this ^ ", " ^ key ^ ")\n" ^
 			var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
-			var(PQresultStatus(dbresult)) ^ ", PQntuples=" ^
+			var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 			var(PQntuples(dbresult));
+		this->setlasterror(errmsg);
+		// this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -1586,8 +1603,15 @@ bool var::unlock(CVR key) const {
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn)
-		throw VarDBException("var::unlock() get_pgconn() failed for " ^ *this);
+	if (!pgconn) {
+		var errmsg = "var::unlock() get_pgconn() failed. ";
+		if (this->assigned())
+			errmsg ^= *this ^ ", ";
+		errmsg ^= key;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	auto dbconn = get_dbconn(*this);
 
@@ -1625,8 +1649,10 @@ bool var::unlock(CVR key) const {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "unlock(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")\n" ^
 				var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
-				var(PQresultStatus(dbresult)) ^ ", PQntuples=" ^
+				var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 				var(PQntuples(dbresult));
+		this->setlasterror(errmsg);
+		// this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -1640,8 +1666,14 @@ bool var::unlockall() const {
 	assertDefined(function_sig);
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn)
-		throw VarDBException("var::unlockall() get_pgconn() failed for " ^ *this);
+	if (!pgconn) {
+		var errmsg = "var::unlockall() get_pgconn() failed. ";
+		if (this->assigned())
+			errmsg ^= *this;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	auto dbconn = get_dbconn(*this);
 
@@ -1680,8 +1712,14 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	ISSTRING(sqlcmd)
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn)
-		throw VarDBException("var::sqlexec() get_pgconn() failed for " ^ *this);
+	if (!pgconn) {
+		var errmsg = "var::sqlexec() get_pgconn() failed. ";
+		if (this->assigned())
+			errmsg ^= *this;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	// log the sql command
 	if (DBTRACE)
@@ -1802,8 +1840,13 @@ bool var::write(CVR filehandle, CVR key) const {
 	sql ^= " DO UPDATE SET data = $2";
 
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn)
-		throw VarDBException("var::write() get_pgconn() failed for " ^ filehandle);
+	if (!pgconn) {
+		var errmsg = "var::write() get_pgconn() failed. ";
+		errmsg ^= filehandle ^ ", " ^ key;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	// Parameter array
 	const char* paramValues[] = {key2.data(), data2.data()};
@@ -1824,8 +1867,15 @@ bool var::write(CVR filehandle, CVR key) const {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM, "^") ^
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
-					var(PQresultStatus(dbresult)) ^ " " ^
+					var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
 					var(PQerrorMessage(pgconn));
+		// ERROR: mvdbpostgres write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: SQLERROR:25P02
+		// PQresultStatus=PGRES_FATAL_ERROR ERROR:  current transaction is aborted, commands ignored until end of transaction block
+
+		//errmsg.logputl();
+		//errmsg.oswrite("/tmp/x");
+		this->setlasterror(errmsg);
+		// this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -1859,8 +1909,13 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn)
-		throw VarDBException("var::updaterecord() get_pgconn() failed for " ^ filehandle);
+	if (!pgconn) {
+		var errmsg = "var::updaterecord() get_pgconn() failed. ";
+		errmsg ^= filehandle ^ ", " ^ key;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	DEBUG_LOG_SQL1
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1878,6 +1933,8 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
+		this->setlasterror(errmsg);
+		// this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -1919,8 +1976,13 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn)
-		throw VarDBException("var::insertrecord() get_pgconn() failed for " ^ filehandle);
+	if (!pgconn) {
+		var errmsg = "var::insertrecord() get_pgconn() failed. ";
+		errmsg ^= filehandle ^ ", " ^ key;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	DEBUG_LOG_SQL1
 	DBresult dbresult = PQexecParams(pgconn,
@@ -1944,6 +2006,8 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 				filehandle.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(dbresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
 				var(PQerrorMessage(pgconn));
+		this->setlasterror(errmsg);
+		// this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -1985,8 +2049,15 @@ bool var::deleterecord(CVR key) const {
 	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn)
-		throw VarDBException("var::deleterecord() get_pgconn() failed for " ^ *this);
+	if (!pgconn) {
+		var errmsg = "var::deleterecord() get_pgconn() failed. ";
+		if (this->assigned())
+			errmsg ^= *this ^ ", ";
+		errmsg ^= key;
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	DEBUG_LOG_SQL1
 	DBresult dbresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
@@ -2001,6 +2072,8 @@ bool var::deleterecord(CVR key) const {
 		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
+		this->setlasterror(errmsg);
+		// this->loglasterror();
 		throw VarDBException(errmsg);
 	}
 
@@ -2125,8 +2198,6 @@ bool var::statustrans() const {
 	assertDefined(function_sig);
 
 	auto dbconn = get_dbconn(*this);
-	if (!dbconn)
-		throw VarDBException("var::statustrans get_dbconn() failed for " ^ *this);
 
 	return dbconn->in_transaction_;
 
@@ -2249,27 +2320,33 @@ bool var::renamefile(CVR filename, CVR newfilename) const {
 
 	// Fail neatly if the old file does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (!this->clone().open(filename)) {
+	// Make sure we use the right connection
+	var filehandle = this->clone();
+	if (!filehandle.open(filename)) {
 		setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
 		return false;
 	}
 
 	// Fail neatly if the new file exists
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (this->clone().open(newfilename)) {
+	if (filehandle.open(newfilename)) {
 		setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
 		return false;
 	}
 
 	// Remove from the cache of file handles
-	this->clone().detach(filename);
+	filehandle.detach(filename);
 
 	var sql = "ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename;
 
-	if (this->assigned())
-		return this->sqlexec(sql);
-	else
-		return filename.sqlexec(sql);
+//	if (this->assigned())
+//		return this->sqlexec(sql);
+//	else
+//		return filename.sqlexec(sql);
+	if (!filehandle.sqlexec(sql))
+		throw VarDBException(this->lasterror());
+
+	return true;
 }
 
 bool var::deletefile(CVR filename) const {
@@ -2280,7 +2357,9 @@ bool var::deletefile(CVR filename) const {
 
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (!this->clone().open(filename)) {
+	// Delete the file on whatever connection it exists;
+	var filehandle = this->clone();
+	if (!filehandle.open(filename)) {
 		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
@@ -2297,10 +2376,14 @@ bool var::deletefile(CVR filename) const {
 	var sql = "DROP TABLE " ^ filename.f(1) ^ " CASCADE";
 	//var sql = "DROP TABLE IF EXISTS " ^ filename.f(1) ^ " CASCADE";
 
-	if (this->assigned())
-		return this->sqlexec(sql);
-	else
-		return filename.sqlexec(sql);
+//	if (this->assigned())
+//		return this->sqlexec(sql);
+//	else
+//		return filename.sqlexec(sql);
+	if (!filehandle.sqlexec(sql))
+		throw VarDBException(this->lasterror());
+
+	return true;
 }
 
 bool var::clearfile(CVR filename) const {
@@ -2311,16 +2394,21 @@ bool var::clearfile(CVR filename) const {
 
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (!this->clone().open(filename, *this)) {
+	var filehandle = this->clone();
+	if (!filehandle.open(filename, *this)) {
 		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
 
 	var sql = "DELETE FROM " ^ filename.f(1);
-	if (this->assigned())
-		return this->sqlexec(sql);
-	else
-		return filename.sqlexec(sql);
+//	if (this->assigned())
+//		return this->sqlexec(sql);
+//	else
+//		return filename.sqlexec(sql);
+	if (!filehandle.sqlexec(sql))
+		throw VarDBException(this->lasterror());
+
+	return true;
 }
 
 inline void unquoter_inline(VARREF iovar) {
@@ -2393,9 +2481,10 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		if (!actualdictfile.open(dictfilename)) {
 			dictfilename = "dict.voc";
 			if (!actualdictfile.open(dictfilename)) {
-
-				throw VarDBException("get_dictexpression() cannot open " ^
-									dictfilename.quote());
+				var errmsg = "get_dictexpression() cannot open " ^ dictfilename.quote();
+				//this->setlasterror(errmsg);
+				//this->loglasterror();
+				throw VarDBException(errmsg);
 			}
 		}
 	}
@@ -2440,12 +2529,12 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 								FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
 								15;
 						else {
-							throw VarDBException(
-								"get_dictexpression() cannot read " ^
+							var errmsg = "get_dictexpression() cannot read " ^
 								fieldname.quote() ^ " from " ^
 								actualdictfile.convert(FM, "^")
 									.quote() ^
-								" or \"dict.voc\"");
+								" or \"dict.voc\"";
+							throw VarDBException(errmsg);
 							//					exodus::errputl("ERROR:
 							// mvdbpostgres get_dictexpression() cannot
 							// read " ^ fieldname.quote() ^ " from " ^
@@ -2744,9 +2833,10 @@ TRACE: "QQQ"="QQQ"
 				// ismv;
 				var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
 				var xlatetargetdictfile;
-				if (!xlatetargetdictfile.open(xlatetargetdictfilename))
-					throw VarDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ function_src);
-
+				if (!xlatetargetdictfile.open(xlatetargetdictfilename)) {
+					var errmsg = xlatetargetdictfilename ^ " cannot be opened for " ^ function_src;
+					throw VarDBException(errmsg);
+				}
 				sqlexpression = get_dictexpression(cursor,
 					filename, xlatetargetfilename, xlatetargetdictfilename,
 					xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
@@ -3201,8 +3291,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	this->r(10, "");
 
 	//catch bad FM character
-	if (sortselectclause.var_str.find(FM_) != std::string::npos)
-		throw VarDBException("Illegal FM character in " ^ sortselectclause);
+	if (sortselectclause.var_str.find(FM_) != std::string::npos) {
+		var errmsg = "Illegal FM character in " ^ sortselectclause;
+		throw VarDBException(errmsg);
+	}
 
 	// sortselect clause can be a filehandle in which case we extract the filename from field1
 	// omitted if filename.select() or filehandle.select()
@@ -3258,7 +3350,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// actualfilename.logputl("actualfilename=");
 	if (!actualfilename) {
 		// this->outputl("this=");
-		throw VarDBException("filename missing from select statement:" ^ sortselectclause);
+		var errmsg = "filename missing from select statement:" ^ sortselectclause;
+		throw VarDBException(errmsg);
 	}
 
 	while (remaining.len()) {
@@ -3298,9 +3391,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		else if (ucword == "USING" && remaining) {
 			dictfilename = getword(remaining, xx);
 			if (!dictfile.open("dict." ^ dictfilename)) {
-				throw VarDBException("select() dict_" ^ dictfilename ^
-									" file cannot be opened");
-
+				var errmsg = "select() dict_" ^ dictfilename ^ " file cannot be opened";
+				throw VarDBException(errmsg);
 			}
 			if (DBTRACE_SELECT) TRACE(dictfilename);
 			continue;
@@ -3310,12 +3402,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		else if (ucword == "DISTINCT" && remaining) {
 
 			var distinctfieldname = getword(remaining, xx);
-			var distinctexpression = get_dictexpression(*this, 
-				actualfilename, actualfilename, dictfilename, dictfile,
-				distinctfieldname, joins, unnests, selects, ismv, false);
-			var naturalsort_distinctexpression = get_dictexpression(*this, 
-				actualfilename, actualfilename, dictfilename, dictfile,
-				distinctfieldname, joins, unnests, selects, ismv, true);
+			var distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, false);
+			var naturalsort_distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, true);
 
 			if (true) {
 				// this produces the right values but in random order
@@ -3340,8 +3428,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// next word must be dictid
 			var dictid = getword(remaining, xx);
 			var dictexpression =
-				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
-							dictfile, dictid, joins, unnests, selects, ismv, true);
+				get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, dictid, joins, unnests, selects, ismv, true);
 
 			// dictexpression.logputl("dictexpression=");
 			// orderclause.logputl("orderclause=");
@@ -3478,9 +3565,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				//prevent BETWEEN being used on fields
 				if (dictexpression_isvector) {
-					throw VarDBException(
-						sortselectclause ^
-						" 'BETWEEN x AND y' and 'FROM x TO y' ... are not currently supported for mv or xref columns");
+					var errmsg = sortselectclause ^ " 'BETWEEN x AND y' and 'FROM x TO y' ... are not currently supported for mv or xref columns";
+					throw VarDBException(errmsg);
 				}
 
 				// get and append first value
@@ -3496,9 +3582,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				// check we have two values (in word1 and word2)
 				if (!valuechars.contains(word1[1]) || !valuechars.contains(word2[1])) {
-					throw VarDBException(
-						sortselectclause ^
-						"BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)");
+					var errmsg = sortselectclause ^ "BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)";
+					throw VarDBException(errmsg);
 				}
 
 				// Replaced by COLLATE
@@ -3522,8 +3607,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 					//prevent WITH XXX appearing twice in the same sort/select clause
 					//unless and until implemented
-					if (calc_fields.f(2, calc_fieldn))
-						throw VarDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
+					if (calc_fields.f(2, calc_fieldn)) {
+						var errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
+						throw VarDBException(errmsg);
+					}
 
 					//calc_fields.r(2, calc_fieldn, opid);
 					//calc_fields.r(3, calc_fieldn, word1.lowerer());
@@ -3712,8 +3799,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//only ops <> and != are supported when using the regular expression operator (starting/ending/containing)
 				if (op == "<>")
 					negative = !negative;
-				else if (op != "=" and op != "")
-					throw VarDBException("SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote());
+				else if (op != "=" and op != "") {
+					var errmsg = "SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote();
+					throw VarDBException(errmsg);
+				}
 
 				// use regular expression operator
 				op = "~";
@@ -3792,8 +3881,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					//calc_fields.r(1, calc_fieldn, dictid);
 					calc_fields(1, calc_fieldn) = dictid;
 				}
-				if (calc_fields.f(2, calc_fieldn))
-					throw VarDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
+				if (calc_fields.f(2, calc_fieldn)) {
+					var errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
+					throw VarDBException(errmsg);
+				}
 
 				//save the op
 				//calc_fields.r(2, calc_fieldn, op);
@@ -4259,9 +4350,10 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')");
 		}
 
-		if (this->f(3))
-			throw VarDBException("Internal Error. this->f(3) must be empty");
-
+		if (this->f(3)) {
+			var errmsg = "selectx: Error. this->f(3) must be empty";
+			throw VarDBException(errmsg);
+		}
 		//must be empty!
 
 		joins.inserter(1, 1, "\n RIGHT JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");
@@ -4559,9 +4651,10 @@ bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, 
 		}
 
 		// any other error
-		if (errmsg)
-			throw VarDBException(errmsg ^ " sqlstate= " ^ sqlstate.quote() ^ " in SQL " ^
-								sql);
+		if (errmsg) {
+			errmsg ^= " sqlstate= " ^ sqlstate.quote() ^ " in SQL " ^ sql;
+			throw VarDBException(errmsg);
+		}
 
 		return false;
 	}
@@ -4649,8 +4742,12 @@ bool var::savelist(CVR listname) {
 
 	// open the lists file on the same connection
 	var lists = *this;
-	if (!lists.open("LISTS"))
-		throw VarDBException("savelist() LISTS file cannot be opened");
+	if (!lists.open("LISTS")) {
+		var errmsg = "savelist() LISTS file cannot be opened";
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	var listno = 1;
 	var listkey = listname;
@@ -4737,8 +4834,12 @@ bool var::getlist(CVR listname) {
 
 	// open the lists file on the same connection
 	var lists = *this;
-	if (!lists.open("LISTS"))
-		throw VarDBException("getlist() LISTS file cannot be opened");
+	if (!lists.open("LISTS")) {
+		var errmsg = "getlist() LISTS file cannot be opened";
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 
 	var keys;
 	if (!keys.read(lists, listname))
@@ -4815,9 +4916,12 @@ bool var::makelist(CVR listname, CVR keys) {
 
 		// open the lists file on the same connection
 		var lists = *this;
-		if (!lists.open("LISTS"))
-			throw VarDBException("makelist() LISTS file cannot be opened");
-
+		if (!lists.open("LISTS")) {
+			var errmsg = "makelist() LISTS file cannot be opened";
+			this->setlasterror(errmsg);
+			// this->loglasterror();
+			throw VarDBException(errmsg);
+		}
 		keys.write(lists, listname);
 		return true;
 	}
@@ -4875,8 +4979,6 @@ bool var::hasnext() {
 
 		// otherwise try and get another block
 		var lists = *this;
-		if (!lists.open("LISTS"))
-			throw VarDBException("hasnext() LISTS file cannot be opened");
 
 		var listno = this->f(4);
 		listno++;
@@ -4906,9 +5008,12 @@ bool var::hasnext() {
 		return false;
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn)
-		throw VarDBException("var::hasnext() get_pgconn() failed for " ^ *this);
-
+	if (!pgconn) {
+		var errmsg = "var::hasnext() get_pgconn() failed for " ^ this->quote();
+		this->setlasterror(errmsg);
+		// this->loglasterror();
+		throw VarDBException(errmsg);
+	}
 	// The following pair of db requests is rather slow
 
 	// Try to move the cursor forward
@@ -4998,8 +5103,12 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 				}
 
 				var lists = *this;
-				if (!lists.open("LISTS"))
-					throw VarDBException("readnext() LISTS file cannot be opened");
+				if (!lists.open("LISTS")) {
+					var errmsg = "readnext() LISTS file cannot be opened";
+			        this->setlasterror(errmsg);
+       				// this->loglasterror();
+       				throw VarDBException(errmsg);
+				}
 
 				var listno = this->f(4);
 				listno++;

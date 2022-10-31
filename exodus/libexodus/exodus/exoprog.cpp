@@ -1719,7 +1719,7 @@ lock:
 
 	// Fail if global terminate or reload requested
 	if (TERMINATE_req or RELOAD_req) {
-		var("").errputl("Lock request for " ^ file.f(1).quote() ^ ", " ^ keyx.quote() ^ " failed because 'terminate' or 'reload' requested.");
+		var("").errputl("Lock request for " ^ file.f(1).quote() ^ ", " ^ keyx.quote() ^ " cancelled because 'terminate' or 'reload' requested.");
 		return false;
 	}
 

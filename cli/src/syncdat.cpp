@@ -11,7 +11,7 @@ programinit()
 	var errors = "";
 
 function main() {
-try{
+
 	if (index(OPTIONS, "H")) {
 		logputl(
 			"NAME\n"
@@ -147,11 +147,16 @@ try{
 			if (osfilenames.lower().locate("SYNCDAT_DELETE") or osfilenames eq "") {
 				if (var().open(dbfilename)) {
 
-					//TODO delete all functions first for S dict items with pgsql
+					//if (verbose)
+					logputl("syncdat: DELETING " ^ dbfilename.quote());
+
+					// TODO delete all functions first for S dict items with pgsql
 
 					if (not var("").deletefile(dbfilename)) {
 						errors(-1) = lasterror();
 						loglasterror();
+						logputl(dbfilename, "could not be deleted");
+						continue;
 					}
 				}
 				continue; // next dirname
@@ -159,7 +164,10 @@ try{
 
 			// Open or create the target db file
 			if (not open(dbfilename, dbfile)) {
-				createfile(dbfilename);
+				if (not createfile(dbfilename)) {
+					loglasterror();
+					continue;
+				}
 				if (not open(dbfilename, dbfile)) {
 					errors(-1) = lasterror();
 					loglasterror();
@@ -371,24 +379,15 @@ try{
 	}
 
 	// Record the current sync date and time
-	if (not generate and definitions)
+	if (not generate and definitions) {
 		write(date() ^ FM ^ time() on definitions, definitions_key);
+	}
 
 	if (not committrans())
 		errors(-1) = lasterror();
 
 	if (errors)
 		errors.errputl("\nsyncdat: Errors: ");
-
-} catch(VarError e) {
-	errputl(e.description);
-	errputl(e.stack());
-}
-catch(...) {
-	errputl("Some error");
-}
-
-	logputl("syncdata finishing.");
 
 	return errors ne "";
 
