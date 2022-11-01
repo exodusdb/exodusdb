@@ -269,7 +269,10 @@ postuploadfail:
 		if (request_.f(3) eq "NEW") {
 			if (oslistf(dirpatt)) {
 				var cmd = "rm " ^ (dirpatt.quote());
-				osshell(cmd);
+				//osshell(cmd);
+				if (not osshell(cmd)) {
+					loglasterror();
+				}
 			}
 			return 0;
 		}
@@ -345,7 +348,10 @@ postuploadfail:
 		}
 
 		var cmd = "rm " ^ (tt.quote());
-		osshell(cmd);
+		//osshell(cmd);
+		if (not osshell(cmd)) {
+			loglasterror();
+		}
 
 		if (oslistf(uploadroot ^ uploadpath)) {
 			msg = (uploadroot ^ uploadpath ^ " file cannot be deleted").quote();
@@ -639,7 +645,10 @@ nextline:
 
 subroutine cleanup() {
 	osfile.osclose();
-	temposfilename83.osremove();
+	//temposfilename83.osremove();
+	if (osfile(temposfilename83) and not temposfilename83.osremove()) {
+		loglasterror();
+	}
 	ANS = nimported;
 	return;
 }
@@ -650,7 +659,10 @@ subroutine getline() {
 
 addbuff:
 		// //////
-		call osbread(temp, osfile, fileptr, lengthx);
+		//call osbread(temp, osfile, fileptr, lengthx);
+		if (not osbread(temp, osfile, fileptr, lengthx)) {
+			abort(lasterror());
+		}
 		temp.converter("\n\f", "\r\r");
 		buff ^= temp;
 

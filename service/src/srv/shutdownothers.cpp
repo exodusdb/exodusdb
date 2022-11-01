@@ -11,7 +11,10 @@ function main(in /*mode*/, in datasetcode, out result) {
 		return 0;
 	}
 
-	call oswrite(_EOL "BACKUP", shutdownfilename);
+	//call oswrite(_EOL "BACKUP", shutdownfilename);
+	if (not oswrite(_EOL "BACKUP", shutdownfilename)) {
+		abort(lasterror());
+	}
 
 	// wait for 120 secs for other database users to quit
 	// randomise randomising doesnt make any difference
@@ -30,7 +33,10 @@ function main(in /*mode*/, in datasetcode, out result) {
 		}
 	}  // ii;
 
-	shutdownfilename.osremove();
+	//shutdownfilename.osremove();
+	if (shutdownfilename.osfile() and not shutdownfilename.osremove()) {
+		abort(lasterror());
+	}
 
 	if (ii ge 120) {
 		result = 0;
