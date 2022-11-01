@@ -7,7 +7,7 @@ libraryinit()
 // For srv.gcurrcompcode (for compcode), srv.companies (to read letterheadcompany and imagecompany) and srv.glang (months for langdate)
 #include <srv_common.h>
 
-var modex;
+var modex = "";
 var hascompanies;
 var compcode;
 var letterheadcompany;
@@ -437,6 +437,7 @@ nextprefix:
 			modex = modex.field(VM, 2, 9999);
 			goto nextmodex;
 		}
+		letterhead = "";
 	}
 
 	return;
