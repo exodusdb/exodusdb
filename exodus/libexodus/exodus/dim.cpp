@@ -227,13 +227,13 @@ dim& dim::init(CVR sourcevar) {
 		throw DimNotDimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
-	//size_t arraysize = nrows_ * ncols_ + 1;
-	size_t arraysize = data_.size();
+	//size_t data_size = nrows_ * ncols_ + 1;
+	auto data_size = data_.size();
 
 	// init starts from element[0]
-	for (unsigned int ii = 0; ii < arraysize; ii++)
-	//for (size_t ii = 1; ii < arraysize; ii++)
-		data_[ii] = sourcevar;
+	for (unsigned int elementn = 0; elementn < data_size; elementn++)
+	//for (size_t elementn = 1; elementn < data_size; elementn++)
+		data_[elementn] = sourcevar;
 
 	return *this;
 }
@@ -244,24 +244,36 @@ var dim::join(SV sepchar) const {
 		throw DimNotDimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
-	//size_t arraysize = nrows_ * ncols_;
-	size_t arraysize = data_.size();
+	//size_t data_size = nrows_ * ncols_;
+	auto data_size = data_.size();
+	auto sepchar_size = sepchar.size();
 
-	if (arraysize < 2)
+	if (data_size < 2)
 		return "";
 
-	// We are not interest in element 0
-	arraysize -= 1;
-	//TRACE(arraysize)
-
 	// find the last assigned element
-	size_t nn;
-	for (nn = arraysize; nn > 0; --nn) {
-		//if (data_[nn].assigned() && data_[nn].len())
-		if (data_[nn].assigned())
+	// and total output string size to we can reserve string size
+	// and convert all elements to string
+//	for (nelements = data_size; nelements > 0; --nelements) {
+//		//if (data_[nelements].assigned() && data_[nelements].len())
+//		if (data_[nelements].assigned())
+//			break;
+//	}
+	std::size_t nchars_joined = 0;
+	std::size_t nelements;
+	for (nelements = 1; nelements < data_size; ++nelements) {
+		//if (data_[nelements].assigned() && data_[nelements].len())
+		const var& data_element = data_[nelements];
+		if (!data_element.assigned()) {
 			break;
+		}
+		nchars_joined += data_element.var_str.size() + sepchar_size;
 	}
-	//TRACE(nn)
+	--nelements;
+	// The additional trailing sepchar_size can be left in the total
+	// to allow for trailing char(0)
+	//TRACE(nelements)
+	//TRACE(nchars_joined)
 
 	// join always starts from element[1] and ignores element[0]
 
@@ -270,31 +282,34 @@ var dim::join(SV sepchar) const {
 	var output = "";
 
 	// if no elements
-	if (!nn)
+	if (!nelements)
 		return output;
 
-	// ensuring converted to a string
+	// Reserve the total number of characters required. Avoid resizing/mallocs
+	output.var_str.reserve(nchars_joined);
+
+	// Ensure converted to a string by using concatenate operator
 	output ^= data_[1];
 
-	//when sepchar is one byte (usual case), use push_back for speed
-	if (sepchar.size() == 1) {
+	// When sepchar is one byte (usual case), use push_back for speed
+	if (sepchar_size == 1) {
 
 		[[likely]];
 
 		char sepbyte = sepchar[0];
 
-		// append any additional elements
-		for (size_t ii = 2; ii <= nn; ++ii) {
+		// Append any additional elements. Single byte sepchar
+		for (size_t elementn = 2; elementn <= nelements; ++elementn) {
 			output.var_str.push_back(sepbyte);
-			output ^= data_[ii];
+			output ^= data_[elementn];
 		}
 
 	} else {
 
-		// append any additional elements
-		for (size_t ii = 2; ii <= nn; ++ii) {
+		// Append any additional elements. Multibyte sepchar
+		for (size_t elementn = 2; elementn <= nelements; ++elementn) {
 			output.var_str += sepchar;
-			output ^= data_[ii];
+			output ^= data_[elementn];
 		}
 	}
 

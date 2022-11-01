@@ -163,8 +163,8 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 
 		// Skip libexodus source code
 		//if (not exo_debug and objfilename.contains("libexodus.so"))
-		if (objfilename.contains("libexodus.so"))
-			continue;
+		//if (objfilename.contains("libexodus.so"))
+		//	continue;
 
 #ifdef TRACING
 		objfilename.errput("objfilename=");

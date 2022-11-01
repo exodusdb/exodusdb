@@ -37,7 +37,7 @@ function main() {
 
 		d0.redim(2, 2);
 		d0 = "x";
-		assert(d0.join() eq "x^x^x^x"_var);
+		assert(d0.join().outputl() eq "x^x^x^x"_var);
 
 		// Redim to empty array is allowed
 		d0.redim(0, 0);
@@ -692,6 +692,27 @@ function main() {
 		TRACE(d3.join())
 		assert(d3.join() eq rec);
 		assert(d3(2) eq "bb^cc"_var);
+	}
+
+	{
+		dim d = {str("a",30), str("b",30), str("c",30)};
+		var s = {str("a",30), str("b",30), str("c",30)};
+		TRACE(d.join())
+		TRACE(s)
+		assert(d.join() eq
+							"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa^"
+							"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb^"
+							"cccccccccccccccccccccccccccccc"_var);
+		assert(d.join() eq
+							"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa^"
+							"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb^"
+							"cccccccccccccccccccccccccccccc"_var);
+
+		// Test JOIN on rvalue dim;
+		assert(s.split().join() eq
+							"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa^"
+							"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb^"
+							"cccccccccccccccccccccccccccccc"_var);
 	}
 
 	{
