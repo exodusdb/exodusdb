@@ -283,7 +283,9 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		createtablesql ^= ";DELETE FROM " ^ temptablename ^ ";\n";
 
 		//create the temporary table
-		CURSOR.sqlexec(createtablesql);
+		if (!CURSOR.sqlexec(createtablesql))
+			throw VarError("ExodusProgramBase::select " ^ var().lasterror());
+
 	} else
 		baseinsertsql = "";
 
@@ -1261,6 +1263,23 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 	// restore some environment
 	restore_environment();
+
+//	// Futile attempt to recover from performing a subroutine which returns void instead of var
+//	// This is attrocious undefined behaviour in C++
+//	// TODO check that we only callsmf on libraries that provide FUNCTION main
+//	// OR call libraries with SUBROUTINE main with new function maybe callsubroutine
+//	//if (ANS.undefined() or ANS.unassigned()) {
+//	// unassigned also checks undefined i.e. illegal bits in ANS.vartyp
+//	TRACE("QWE1")
+//	if (ANS.unassigned()) {
+//		TRACE("QWE2")
+//		ANS = "";
+//	}
+//	var bad;
+//	ANS.swap(bad);
+//	TRACE("QWE3")
+//	ANS = "";
+//	TRACE("QWE4")
 
 	return ANS;
 }

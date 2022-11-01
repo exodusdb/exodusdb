@@ -235,6 +235,7 @@
 			execute_process(
 				COMMAND
 					rm -f $ENV{HOME}/lib/libdict_xo_clients.so $ENV{HOME}/lib/libhtmllib2.so $ENV{HOME}/lib/libnlist.so
+					      $ENV{HOME}/inc/htmllib2.h $ENV{HOME}/inc/nlist.h
 			)
 		"
     )

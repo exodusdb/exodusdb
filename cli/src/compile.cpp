@@ -942,7 +942,8 @@ function main() {
 						headertext ^= eol ^ funcdecl ^ ";";
 					} else {
 						var libname = filepath_without_ext;
-						var returnsvarorvoid = (word1 eq "function") ? "var" : "void";
+						var returntype = word1 eq "subroutine" ? "void" : "var";
+						//var returnsvarorvoid = (word1 eq "function") ? "var" : "void";
 						var callorreturn = (word1 == "function") ? "return" : "call";
 						var funcreturnvoid = (word1 == "function") ? 0 : 1;
 						var funcargsdecl = funcdecl.field("(", 2, 999999);
@@ -1093,7 +1094,7 @@ function main() {
 							//build a function with all the new arguments and dummy variables
 							add_func ^= _EOL;
 							add_func ^= _EOL "/" "/ Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn eq 2 ? "" : "s");
-							add_func ^= _EOL "var operator() (" ^ inbound_args ^ ") {";
+							add_func ^= _EOL ^ returntype ^ " operator() (" ^ inbound_args ^ ") {";
 							add_func ^= _EOL ^ func_body;
 							add_func ^= " return operator()(" ^ outbound_args ^ ");";
 							add_func ^= _EOL "}";
@@ -1124,7 +1125,7 @@ function main() {
 							_EOL "using Callable::operator=;"
 							_EOL
 							_EOL "/" "/ A callable member function with the right arguments, returning a var or void"
-							_EOL "var operator() (in arg1=var(), out arg2=var(), out arg3=var())"
+							_EOL "RETURNTYPE operator() (in arg1=var(), out arg2=var(), out arg3=var())"
 							_EOL "{"
 							_EOL
 							_EOL " /" "/ The first call will link to the shared lib and create/cache an object from it."
@@ -1136,8 +1137,8 @@ function main() {
 							_EOL " /" "/ Define a function type (pExodusProgramBaseMemberFunction)"
 							_EOL " /" "/ that can call the shared library object member function"
 							_EOL " /" "/ with the right arguments and returning a var or void"
-							//_EOL " typedef VARORVOID (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
-							_EOL " using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> VARORVOID;"
+							//_EOL " typedef RETURNTYPE (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
+							_EOL " using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> RETURNTYPE;"
 							_EOL
 							_EOL " /" "/ Call the shared library object main function with the right args,"
 							_EOL " /" "/  returning a var or void"
@@ -1163,7 +1164,7 @@ function main() {
 						replacer(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
 						replacer(inclusion, "IN,OUT,OUT", funcargstype);
 						replacer(inclusion, "ARG1,ARG2,ARG3", funcargs);
-						replacer(inclusion, "VARORVOID", returnsvarorvoid);
+						replacer(inclusion, "RETURNTYPE", returntype);
 						replacer(inclusion, "callorreturn", callorreturn);
 						replacer(inclusion, "{additional_funcs}", add_funcs);
 
@@ -1179,8 +1180,10 @@ function main() {
 						}
 						var usepredefinedcallable = nargs <= exodus_callable_maxnargs;
 						if (useclassmemberfunctions) {
-							if (funcname eq "main")
+							if (funcname eq "main") {
+								// Functions return var and subroutines return void
 								headertext ^= inclusion;
+							}
 						}
 
 						else if (usepredefinedcallable) {
@@ -1211,7 +1214,7 @@ function main() {
 							headertext ^= "#define EXODUSLIBNAME " ^ libname.quote() ^ eol;
 							headertext ^= "#define EXODUSFUNCNAME " ^ funcname.quote() ^ eol;
 							headertext ^= "#define EXODUSFUNCNAME0 " ^ funcname ^ eol;
-							headertext ^= "#define EXODUSFUNCRETURN " ^ returnsvarorvoid ^ eol;
+							headertext ^= "#define EXODUSFUNCRETURN " ^ returntype ^ eol;
 							headertext ^= "#define EXODUSFUNCRETURNVOID " ^ funcreturnvoid ^ eol;
 							headertext ^= "#define EXODUSfuncargsdecl " ^ funcargsdecl ^ eol;
 							headertext ^= "#define EXODUSfuncargs " ^ funcargs ^ eol;
