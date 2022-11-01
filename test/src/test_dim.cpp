@@ -304,21 +304,21 @@ function main() {
 		std::reverse(d1.begin(), d1.end());
 		assert(d1.join() eq v2);
 
-//		// remove_if
-//		d1 = "10^2^1^20"_var.split();
-//		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
-//		TRACE(d1.join("^"));
-//		assert(d1.join() eq "10^1^20"_var);
-//
-//		// remove_if
-//		d1 = v1.split();
-//		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
-//		assert(d1.join() eq "10^1^20"_var);
-//
-//		// unique?
-//		d1 = "b^a^a^b^c"_var.split();
-//		std::unique(d1.begin(), d1.end());
-//		assert(d1.join().outputl() eq "b^a^b^c"_var);
+		// remove_if
+		d1 = "10^2^1^20"_var.split();
+		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
+		TRACE(d1.join("^"));
+		assert(d1.join() eq "10^1^20^"_var);
+
+		// remove_if
+		d1 = v1.split();
+		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
+		assert(d1.join() eq "10^1^20^"_var);
+
+		// unique?
+		d1 = "b^a^a^b^c"_var.split();
+		std::unique(d1.begin(), d1.end());
+		assert(d1.join().outputl() eq "b^a^b^c^"_var);
 
 		// std::find
 		d1 = "b^a^a^b^c"_var.split();

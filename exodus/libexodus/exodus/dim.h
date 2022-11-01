@@ -18,7 +18,7 @@ friend class var;
 
  private:
 
-	unsigned int nrows_, ncols_;
+	mutable unsigned int nrows_, ncols_;
 	std::vector<var> data_;
 	bool initialised_ = false;
 

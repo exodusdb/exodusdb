@@ -32,6 +32,19 @@ THE SOFTWARE.
 
 namespace exodus {
 
+	// Not currently used because we only provide begin/end iterator for dim
+	// and these cannot change the number of vector elements, only reorder them
+	//
+	// Examples how to calculate nrows from overall array size
+	// cols_ 3, data_ 7 (including element 0), rows = 7 - 1 -> 6, 6 / 3 -> 2 complete rows
+	// cols_ 3, data_ 8 (including element 0), rows = 8 - 1 -> 7, 7 / 3 -> 2 complete rows plus 1 extra element
+	// cols_ 3, data_ 1 (including element 0), rows = 1 - 1 -> 0, 0 / 3 -> 0 complete rows
+	// cols_ 3, data_ 4 (including element 0), rows = 3 - 1 -> 2, 2 / 3 -> 0 complete rows plus 2 extra elements
+	//#define EXO_DIM_RECALC_NROWS(DIM)\//
+	//	auto data_size = static_cast<unsigned int>((DIM).data_.size());\//
+	//	(DIM).nrows_ = data_size ? (--data_size / (DIM).ncols_) : 0;
+#define EXO_DIM_RECALC_NROWS(DIM)
+
 // SPECIAL MEMBER FUNCTIONS
 
 /////////////////////
@@ -44,6 +57,8 @@ void dim::operator=(const dim& sourcedim) &{
 	if (!sourcedim.initialised_)
 		throw DimNotDimensioned("");
 
+	//this->redim(sourcedim.nrows_, sourcedim.ncols_);
+	EXO_DIM_RECALC_NROWS(sourcedim)
 	this->redim(sourcedim.nrows_, sourcedim.ncols_);
 
 	// Copy element 0 as well to allow a degree
@@ -74,6 +89,7 @@ void dim::operator=(dim&& sourcedim) & {
 	if (!sourcedim.initialised_)
 		throw DimNotDimensioned("");
 
+	EXO_DIM_RECALC_NROWS(sourcedim)
 	nrows_ = sourcedim.nrows_;
 	ncols_ = sourcedim.ncols_;
 	initialised_ = sourcedim.ncols_;
@@ -122,6 +138,7 @@ void dim::operator=(const double sourcedbl) {
 var dim::rows() const {
 	if (!this->initialised_)
 		throw DimNotDimensioned("");
+	EXO_DIM_RECALC_NROWS(*this)
 	return nrows_;
 }
 
@@ -157,7 +174,7 @@ bool dim::redim(unsigned int rows, unsigned int cols) {
 		//std::cout<< "created[] " << newdata << std::endl;
 	}
 	catch (const std::bad_alloc& e) {
-		throw VarOutOfMemory("redim("_var ^ var(nrows_) ^ ", " ^ var(ncols_) ^ ") " ^ e.what());
+		throw VarOutOfMemory("redim("_var ^ var(rows) ^ ", " ^ var(cols) ^ ") " ^ e.what());
 	}
 
 	initialised_ = true;
@@ -170,6 +187,8 @@ bool dim::redim(unsigned int rows, unsigned int cols) {
 // the same () function is called regardless of being on LHS or RHS
 // second version is IDENTICAL except for lack of const (used only on "const dim")
 VARREF dim::operator()(unsigned int rowno, unsigned int colno) {
+
+	EXO_DIM_RECALC_NROWS(*this)
 
 	// check bounds
 	if (rowno > nrows_)
@@ -184,6 +203,8 @@ VARREF dim::operator()(unsigned int rowno, unsigned int colno) {
 }
 
 CVR dim::operator()(unsigned int rowno, unsigned int colno) const {
+
+	EXO_DIM_RECALC_NROWS(*this)
 
 	// check bounds
 	//if (rowno > nrows_ || rowno < 0)
@@ -301,6 +322,8 @@ dim& dim::splitter(CVR str1, SV sepchar) {
 	THISIS("var dim::split(CVR str1, SV sepchar = FM)")
 	ISSTRING(str1);
 
+	EXO_DIM_RECALC_NROWS(*this)
+
 	// maybe dimension to the size of the string
 	// do NOT redimension always since pick matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
@@ -361,6 +384,9 @@ dim& dim::splitter(CVR str1, SV sepchar) {
 dim& dim::sorter(bool reverseorder) {
 	//THISIS("var dim::sorter(bool reverseorder = false)")
 
+	// There is no different between sort and stable_sort here because we are using the default var < var operation to sort
+	// std::sort(d.begin(), d.end() , [](auto x){return xxxxxx}) could be used to sort on part of each var
+
 	// We must use dim's custom begin to skip element zero
 	//note that _data[0] may be empty
 	//std::cout<<nfields<<std::endl;
@@ -368,6 +394,7 @@ dim& dim::sorter(bool reverseorder) {
 	//std::sort(std::begin(data_), std::end(data_), reverseorder ? std::greater<var>{} : std::less<var>{});
 	if (!reverseorder)
 		//std::sort(std::begin(data_), std::end(data_));
+		//std::sort(this->begin(), this->end());
 		std::sort(this->begin(), this->end());
 	else
 		std::sort(this->begin(), this->end(), std::greater<var>());
