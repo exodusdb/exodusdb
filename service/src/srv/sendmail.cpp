@@ -155,7 +155,11 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		// if system<61> or (@username='EXODUS' and system<17,1>[-4,4]='TEST') then
 
 		// testdata and user exodus - always email sysmsg@neosys.com
-		home.osgetenv("HOME");
+		//home.osgetenv("HOME");
+		//if (not home.osgetenv("HOME")) {
+		//	//set in systemd service file
+		//	abort(lasterror());
+		//}
 		// if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.f(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
 		if (not osfile("live.txt") or (SYSTEM.f(61) and USERNAME.ucase() eq "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
@@ -215,7 +219,10 @@ forcedemail:
 	var filenamesx = "smtp.cfg" ^ VM ^ "../../smtp.cfg";
 	filenamesx.converter("/", _OSSLASH);
 	for (const var filen : range(1, 2)) {
-		call osread(params2, filenamesx.f(1, filen));
+		//call osread(params2, filenamesx.f(1, filen));
+		if (not osread(params2, filenamesx.f(1, filen))) {
+			abort(lasterror());
+		}
 		// cut off after end of file character
 		// params2=field(params2,char(26),1)
 		params2.converter("\r\n", _FM _FM).trimmer(_FM);
@@ -312,7 +319,10 @@ forcedemail:
 		// solve stupid outlook joining lines together if > 40 chars
 		// by adding tab on the end of every line
 		body.replacer("\r", "\t\r");
-		call oswrite(body, bodyfilename);
+		//call oswrite(body, bodyfilename);
+		if (not oswrite(body, bodyfilename)) {
+			abort(lasterror());
+		}
 		bodyfilename.osclose();
 		body = "@" ^ bodyfilename;
 	} else {
@@ -380,7 +390,10 @@ forcedemail:
 			if (bodyfile.osopen(body.cut(1))) {
 				// osbread tt from bodyfile at 0 length 100
 				var	 offset = 0;
-				call osbread(tt, bodyfile, offset, 100);
+				//call osbread(tt, bodyfile, offset, 100);
+				if (not osbread(tt, bodyfile, offset, 100)) {
+					abort(lasterror());
+				}
 			}
 		} else {
 			tt = body.first(20);
@@ -415,7 +428,10 @@ forcedemail:
 				// otherwise generate a random filename and write it
 			} else {
 				bodyfilename = var(999999999).rnd().first(7) ^ ".tmp";
-				var(body).oswrite(bodyfilename);
+				//var(body).oswrite(bodyfilename);
+				if (not var(body).oswrite(bodyfilename)) {
+					abort(lasterror());
+				}
 				bodyfilename.osclose();
 			}
 		}
@@ -496,11 +512,17 @@ forcedemail:
 
 			// Output the headers
 			var tempfilename = var().ostempfilename();
-			oswrite(headers, tempfilename);
+			//oswrite(headers, tempfilename);
+			if (not oswrite(headers, tempfilename)) {
+				abort(lasterror());
+			}
 
 			// TRACE(headers);
 			// Append the attached file as base64
-			osshell("openssl base64 -in " ^ attachfilename.quote() ^ " >> " ^ tempfilename ^ " && printf \"\r\n" ^ delimiter ^ "\r\n\" >> " ^ tempfilename);
+			//osshell("openssl base64 -in " ^ attachfilename.quote() ^ " >> " ^ tempfilename ^ " && printf \"\r\n" ^ delimiter ^ "\r\n\" >> " ^ tempfilename);
+			if (not osshell("openssl base64 -in " ^ attachfilename.quote() ^ " >> " ^ tempfilename ^ " && printf \"\r\n" ^ delimiter ^ "\r\n\" >> " ^ tempfilename)) {
+				abort(lasterror());
+			}
 			/*
 			// Append a closing delimiter
 			var fileinfo = osfile(tempfilename);
@@ -522,8 +544,14 @@ TRACE(offset)
 */
 			// Reconstruct the complete input for sendmail
 			// tempfilename.osrename(bodyfilename);
-			tempfilename.oscopy(bodyfilename);
-			tempfilename.osremove();
+			//tempfilename.oscopy(bodyfilename);
+			if (not tempfilename.oscopy(bodyfilename)) {
+				abort(lasterror());
+			}
+			//tempfilename.osremove();
+			if (tempfilename.osfile() and not tempfilename.osremove()) {
+				abort(lasterror());
+	        }
 		}
 
 		// TRACE(cmd)
@@ -546,10 +574,16 @@ TRACE(offset)
 	// pcperform 'CMD /c ':cmd
 
 	if (bodyfilename) {
-		bodyfilename.osremove();
+		//bodyfilename.osremove();
+		if (bodyfilename.osfile() and not bodyfilename.osremove()) {
+			abort(lasterror());
+        }
 	}
 	if (paramfilename) {
-		paramfilename.osremove();
+		//paramfilename.osremove();
+		if (paramfilename.osfile() and not paramfilename.osremove()) {
+			abort(lasterror());
+		}
 	}
 
 	if (errormsg) {
@@ -582,7 +616,10 @@ TRACE(offset)
 	errormsg.converter(_TM, _FM);
 
 	if (errorfilename) {
-		errorfilename.osremove();
+		//errorfilename.osremove();
+		if (errorfilename.osfile() and not errorfilename.osremove()) {
+			abort(lasterror());
+		}
 	}
 
 	var details = "To:       " ^ toaddress;

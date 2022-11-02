@@ -48,7 +48,10 @@ function main(in programname0, in text0) {
 	// if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
 	var logfilename = "LOG" ^ year;
 	if (not log.open(logfilename)) {
-		createfile(logfilename);
+		//createfile(logfilename);
+		if (not createfile(logfilename)) {
+			abort(lasterror());
+		}
 		if (not log.open(logfilename))
 			log = "";
 	}

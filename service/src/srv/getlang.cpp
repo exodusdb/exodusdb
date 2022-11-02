@@ -7,8 +7,8 @@ libraryinit()
 
 #include <srv_common.h>
 
-	// var nn;
-	var progname;
+// var nn;
+var progname;
 var languagecode;
 var langkey;
 var codepage;
@@ -134,7 +134,11 @@ exit:
 
 	// force 737 greek codepage characters so indexing is ok etc
 	if (origprogname eq "GENERAL") {
-		call osgetenv("CODEPAGE", codepage);
+
+		//call osgetenv("CODEPAGE", codepage);
+		if (not osgetenv("CODEPAGE", codepage)) {
+			loglasterror();
+		}
 
 		// greek
 		if (codepage eq "737") {

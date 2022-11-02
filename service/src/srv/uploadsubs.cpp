@@ -13,7 +13,7 @@ libraryinit()
 
 #include <request.hpp>
 
-	var filename;
+var filename;
 var key;
 var msg;
 var file;
@@ -268,10 +268,12 @@ postuploadfail:
 
 		if (request_.f(3) eq "NEW") {
 			if (oslistf(dirpatt)) {
-				var cmd = "rm " ^ (dirpatt.quote());
+				//var cmd = "rm " ^ (dirpatt.quote());
 				//osshell(cmd);
-				if (not osshell(cmd)) {
-					loglasterror();
+				//if (not osshell(cmd)) {
+				//	loglasterror();
+				if (osfile(dirpatt) and not dirpatt.osremove()) {
+					abort(lasterror());
 				}
 			}
 			return 0;
@@ -347,14 +349,19 @@ postuploadfail:
 			return invalid(msg);
 		}
 
-		var cmd = "rm " ^ (tt.quote());
+		//var cmd = "rm " ^ (tt.quote());
 		//osshell(cmd);
-		if (not osshell(cmd)) {
-			loglasterror();
-		}
+		//if (not osshell(cmd)) {
+		//	loglasterror();
+		//}
 
-		if (oslistf(uploadroot ^ uploadpath)) {
-			msg = (uploadroot ^ uploadpath ^ " file cannot be deleted").quote();
+		//if (oslistf(uploadroot ^ uploadpath)) {
+		//	msg = (uploadroot ^ uploadpath ^ " file cannot be deleted").quote();
+		//	return invalid(msg);
+		//}
+
+		if (osfile(tt) and not tt.osremove()) {
+			msg = (tt ^ " file cannot be deleted").quote();
 			return invalid(msg);
 		}
 

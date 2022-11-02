@@ -153,9 +153,18 @@ nocommon:
 	}
 
 	if (linkfilename2) {
-		call oswrite("", linkfilename2);
+		//call oswrite("", linkfilename2);
+		if (not oswrite("", linkfilename2)) {
+			//abort(lasterror());
+			response = "Error: select2: Cannot write to output file" ^ (linkfilename2.quote());
+
+			// abort
+			gosub exit();
+			return 0;
+		}
 		if (not(linkfile2.osopen(linkfilename2))) {
-			response = "Error: select2: " ^ (linkfilename2.quote()) ^ " cannot open output file";
+			//response = "Error: select2: " ^ (linkfilename2.quote()) ^ " cannot open output file";
+			response = "Error: select2: Cannot open output file" ^ (linkfilename2.quote());
 
 			// abort
 			gosub exit();
@@ -265,7 +274,10 @@ nocommon:
 		tx ^=
 			"<records>"
 			"\n";
-		call osbwrite(tx, linkfile2, dataptr);
+		//call osbwrite(tx, linkfile2, dataptr);
+		if (not osbwrite(tx, linkfile2, dataptr)) {
+			abort(lasterror());
+		}
 	}
 
 	// read xx from @dict,'AUTHORISED' then
@@ -367,7 +379,10 @@ nextrec:
 
 		if (xml and linkfilename2) {
 			var	 tt = "</records>";
-			call osbwrite(tt, linkfile2, dataptr);
+			//call osbwrite(tt, linkfile2, dataptr);
+			if (not osbwrite(tt, linkfile2, dataptr)) {
+				abort(lasterror());
+			}
 		}
 
 		if (linkfilename2) {
@@ -533,7 +548,10 @@ nextrec:
 			}  // ii;
 
 			// output converted row part
-			call osbwrite(rowpart, linkfile2, dataptr);
+			//call osbwrite(rowpart, linkfile2, dataptr);
+			if (not osbwrite(rowpart, linkfile2, dataptr)) {
+				abort(lasterror());
+			}
 
 			blockn += 1;
 		}  // loop;

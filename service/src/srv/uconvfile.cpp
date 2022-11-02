@@ -57,7 +57,8 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	if (encoding1 eq "CODEPAGE") {
 		//call osgetenv("CODEPAGE", encoding1);
 		if (not osgetenv("CODEPAGE", encoding1)) {
-			abort(lasterror());
+			//abort(lasterror());
+			loglasterror();
 		}
 		var	 oemcodepages = "437]720]737]775]850]852]855]857]858]862]866]874]932]936]949]950]1258"_var;
 		var	 wincodepages = "1252]1256]1253]1257]1252]1252]1251]1254]1252]1255]1251]874]932]936]949]950]874"_var;
@@ -81,7 +82,8 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	if (encoding2 eq "CODEPAGE") {
 		//call osgetenv("CODEPAGE", encoding2);
 		if (not osgetenv("CODEPAGE", encoding2)) {
-			abort(lasterror());
+			//abort(lasterror());
+			loglasterror();
 		}
 	}
 	if (not encoding2) {
