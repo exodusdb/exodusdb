@@ -25,7 +25,7 @@ libraryinit()
 
 #include <request.hpp>
 
-	var stationery;
+var stationery;
 var mode;
 var html;
 var dbn;
@@ -88,7 +88,9 @@ function main() {
 
 		var transactions = "exodus_trantest";
 		if (not open(transactions, transactions))
-			createfile(transactions);
+			//createfile(transactions);
+			if (not createfile(transactions))
+				abort(lasterror());
 
 		// ERROR:  VACUUM cannot run inside a transaction block sqlstate:25001
 		// if (not transactions.sqlexec("vacuum " ^ transactions.f(1))) {
@@ -145,7 +147,9 @@ function main() {
 		}  // compn;
 		allhtml(-1) = "Press F5 to refresh any images just uploaded.";
 		allhtml.replacer(_FM, _EOL);
-		var(allhtml).oswrite(SYSTEM.f(2));
+		//var(allhtml).oswrite(SYSTEM.f(2));
+		if (not var(allhtml).oswrite(SYSTEM.f(2)))
+			abort(lasterror());
 		gosub postproc();
 
 	} else if (mode eq "PERIODTABLE") {
@@ -274,28 +278,42 @@ function main() {
 		// Copy source db to target db
 		// ERROR:  CREATE DATABASE cannot run inside a transaction block
 		// if (not dbcopy(sourcedbcode,targetdbcode)) {
-		osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode);
+		//osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode);
+		// check target db created
+		//var newdbcodes = dblist();
+		//if (not locateusing(_FM, targetdbcode, newdbcodes)) {
+		//	return invalid(targetdbname ^ targetdbcode.quote() ^ " not created");
+		//}
+
+		if (not osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode)) {
+			return invalid("Failed to create new database: " ^ targetdbcode.quote() ^ " - " ^ targetdbname);
+		}
 
 		// start source live service
-		osshell("systemctl start agy_live@" ^ sourcedbcode);
-
-		// check target db created
-		var newdbcodes = dblist();
-		if (not locateusing(_FM, targetdbcode, newdbcodes)) {
-			return invalid(targetdbname ^ targetdbcode.quote() ^ " not created");
-		}
+		//osshell("systemctl start agy_live@" ^ sourcedbcode);
+		if (not osshell("systemctl start agy_live@" ^ sourcedbcode))
+			return invalid("Failed to start source database " ^ sourcedbcode.quote() ^ " services");
 
 		// create target data dir
 		// oscopy(sourcedatadir, targetdatadir);
 		// KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
-		osshell("mkdir -p " ^ targetdatadir);
-		osshell("chmod a+srw " ^ targetdatadir);
-		osshell("setfacl -d -m g::rw " ^ targetdatadir);
+		//osshell("mkdir -p " ^ targetdatadir);
+		//osshell("chmod a+srw " ^ targetdatadir);
+		//osshell("setfacl -d -m g::rw " ^ targetdatadir);
+		if (not osshell("mkdir -p " ^ targetdatadir))
+			return invalid(lasterror());
+
+		if (not osshell("chmod a+srw " ^ targetdatadir))
+			return invalid(lasterror());
+
+		if (not osshell("setfacl -d -m g::rw " ^ targetdatadir))
+			return invalid(lasterror());
+
 		if (not osdir(targetdatadir)) {
 			return invalid("Error in creating target data directory");
 		}
 
-		// skip - target image dir created on first upload
+		// skip - target image dir on first upload
 
 		// update database name file
 		if (not oswrite(targetdbname, "../data/" ^ targetdbcode ^ "/name")) {

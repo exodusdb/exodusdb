@@ -616,7 +616,9 @@ nextsign:
 			}
 			if (response_.contains("Error")) {
 				subject ^= " ERROR";
-				var(response_).oswrite("xyz.xyz");
+				//var(response_).oswrite("xyz.xyz");
+				if (not var(response_).oswrite("xyz.xyz"))
+					loglasterror();
 			}
 			// swap 'Error:' with 'Result:' in body
 			body(-1) = ("Document: " ^ srv.document.f(2) ^ " (" ^ docid ^ ")").trim();
@@ -699,7 +701,9 @@ subroutine exec() {
 	}  // loop;
 
 	linkfilename2 ^= ".2";
-	call oswrite("", linkfilename2);
+	//call oswrite("", linkfilename2);
+	if (not oswrite("", linkfilename2))
+		abort(lasterror());
 
 	// turn interactive off in case running from command line
 	// to avoid any reports prompting for input here
