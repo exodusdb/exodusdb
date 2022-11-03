@@ -1,16 +1,24 @@
+#ifndef EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
+#define EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
 #include <exodus/exodus.h>
 
-// the section of an exodus program delimited by programinit/exit statements simulates
-// a normal multivalue basic program with global variables and local subroutines.
-// unlike multivalue basic, local subroutines can have parameters, return values and private
-// variables there can only be one programinit/exit section per compilable file
+// An Exodus command line program is just a C++ class that inherits from ExodusProgram and
+// is followed by a standard free "int main()" function. int main instantiates an object
+// of the exodus program class and calls its int main member function.
+//
+// The above functionality is provided by the programinit() and programexit() macros.
+//
+// Programmers must write an int main member function between the programinit/exit statements.
+//
+// The section of an exodus program delimited by programinit/exit statements simulates
+// a normal PickOS/multivalue Basic program with global variables and local subroutines.
+//
+// Unlike PickOS/multivalue Basic, local subroutines can have parameters, return values and private
+// variables.
 
-// an exodus program or library can have zero or more classes. classes are identical to program and
-// library sections except that they are not executed unless explicitly called by the other
-// sections. For example if you have written a class called MyClass (using "classinit(MyClass)" and
-//"classexit(MyClass)" you can create objects of that type in your main program or library, set
-// their data elements and/or call their functions MyClass myclass1; myclass1.xyz="xx";
-// myclass1.functionx("arg1");
+// There must be one matching pair of programinit/exit statements per compilable file with empty
+// argument. Additional matching pairs of statements can delineate additional subprograms as long
+// as each pair has a unique argument since their argument names are used as part of the class name.
 
 #undef subroutine
 #undef function
@@ -92,3 +100,4 @@ int PROGRAMCLASSNAME##main2(int exodus__argc, const char* exodus__argv[], int th
 	int PROGRAMCLASSNAME##main(int exodus__argc, const char* exodus__argv[]) {                                  \
 		return PROGRAMCLASSNAME##main2(exodus__argc, exodus__argv, 0);                                          \
 	}
+#endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_

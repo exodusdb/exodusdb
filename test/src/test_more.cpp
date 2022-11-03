@@ -47,26 +47,26 @@ bool equal(A a, B b) {
 template <class A, class B>
 bool numtest(A a, B b, in c, in d) {
 
-	c.dump("c");
+	c.outputl("c");
 
-	d.dump("d");
+	d.outputl("d");
 
 	errputl("numtest: a,b,c,d", a, b, c, d);
 
 	var no	= 1;
 	var no2 = 1;
 	var add = c + d;
-	add.dump("add = c+d");
+	add.outputl("add = c+d");
 
 	assert(var(a + b).errput(no++ ^ ". ")           eq (add).errputl(" should be "));			   //return false;
 	assert(var(var(a) + b).errput(no++ ^ ". ")      eq (add).errputl(" should be "));	   //return false;
 	assert(var(a + var(b)).errput(no++ ^ ". ")      eq (add).errputl(" should be "));	   //return false;
 	assert(var(var(a) + var(b)).errput(no++ ^ ". ") eq (add).errputl(" should be "));  //return false;
 	assert(var(b + a).errput(no++ ^ ". ")           eq (add).errputl(" should be "));			   //return false;
-	assert(var(b + var(a)).dump("222")              eq (add).errputl(" should be ").dump("1"));	   //return false;
+	assert(var(b + var(a)).outputl("222")              eq (add).errputl(" should be ").outputl("1"));	   //return false;
 
-	//assert((    b  + var(a)).dump("1") != add.dump("2"));//return false;
-	assert(var(var(b) + var(a)).errput(no++ ^ ". ").dump("1B") eq (add).errputl(" should be ").dump("2B"));	 //return false;
+	//assert((    b  + var(a)).outputl("1") != add.outputl("2"));//return false;
+	assert(var(var(b) + var(a)).errput(no++ ^ ". ").outputl("1B") eq (add).errputl(" should be ").outputl("2B"));	 //return false;
 
 	var sub = c - d;
 	assert(var(a - b).errput(no++ ^ ". ")           eq (sub).errputl(" should be "));			   //return false;

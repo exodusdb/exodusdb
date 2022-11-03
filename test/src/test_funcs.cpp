@@ -50,7 +50,7 @@ programinit()
 		assert(s2         eq "2");
 	}
 	{
-		var started = ostime().dump("ostime=");
+		var started = ostime().outputl("ostime=");
 		ossleep(200);
 		var stopped = ostime();
 		// avoid testing if time crosses 00:00:00
@@ -58,7 +58,7 @@ programinit()
 			assert(ostime() - started > 0.1);
 	}
 	{
-		assert(ospid().dump("ospid=").match("\\d+"));
+		assert(ospid().outputl("ospid=").match("\\d+"));
 	}
 	{
 		try {
@@ -115,25 +115,25 @@ programinit()
 	{
 		var g = "Γιάννης";
 		assert(ucase(g) eq "ΓΙΆΝΝΗΣ");
-		ucaser(g).dump("ucaser=");
+		ucaser(g).outputl("ucaser=");
 		assert(g        eq "ΓΙΆΝΝΗΣ");
 	}
 	{
 		var g = "Γιάννης AbCd";
 		assert(lcase(g) eq "γιάννης abcd");
-		lcaser(g).dump("lcaser=");
+		lcaser(g).outputl("lcaser=");
 		assert(g        eq "γιάννης abcd");
 	}
 	{
 		var g = "γιάννης γιάννης abcd";
 		assert(tcase(g) eq "Γιάννης Γιάννης Abcd");
-		tcaser(g).dump("tcaser=");
+		tcaser(g).outputl("tcaser=");
 		assert(g        eq "Γιάννης Γιάννης Abcd");
 	}
 	{
 		var g = "Γιάννης Γιάννης Abcd";
 		assert(fcase(g) eq "γιάννησ γιάννησ abcd");
-		fcaser(g).dump("fcaser=");
+		fcaser(g).outputl("fcaser=");
 		assert(g        eq "γιάννησ γιάννησ abcd");
 	}
 

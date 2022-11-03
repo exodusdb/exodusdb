@@ -112,12 +112,12 @@ function main() {
 		}
 		TRACE(d1.join());
 
-		assert(d1.join().dump() eq "aa" _FM "bb");	//default separator is FM
-		assert(d1.join("").dump() eq
+		assert(d1.join().outputl() eq "aa" _FM "bb");	//default separator is FM
+		assert(d1.join("").outputl() eq
 			   "aa"
 			   "bb");								 //sep can be ""
-		assert(d1.join("Δ").dump() eq "aaΔbb");		 //sep can be multibyte UTF8
-		assert(d1.join("XYZ").dump() eq "aaXYZbb");	 //sep can be multichar
+		assert(d1.join("Δ").outputl() eq "aaΔbb");		 //sep can be multibyte UTF8
+		assert(d1.join("XYZ").outputl() eq "aaXYZbb");	 //sep can be multichar
 	}
 
 	{
@@ -176,7 +176,7 @@ function main() {
 		// Construct from list
 		dim d1 = {1, 2, 3};
 		TRACE(d1.join());
-		TRACE(d1.join().dump());
+		TRACE(d1.join().outputl());
 		assert(d1.join() eq "1^2^3"_var);
 
 		// Copy construction (from lvalue)
@@ -326,6 +326,16 @@ function main() {
 		const auto pos = std::distance(d1.begin(), x);
 		assert(pos == 4);
 		//assert(d1.join().outputl() eq "b^a^b^c"_var);
+
+		// erase_if?
+		printl("erase_if doesnt compile despite dim having an erase function");
+		printl("but remove_if combined with dim::erase will achieve the same result");
+		d1 = "1^2^4^5^3"_var.split();
+		TRACE(d1.join())
+		//std::erase_if(d.begin(), d.end(), [](auto i){return i < 3;});
+		d1.eraser(std::remove_if(d1.begin(), d1.end(), [](auto i){return i < 3;}), d1.end());
+		TRACE(d1.join())
+		assert(d1.join() eq "4^5^3"_var);
 
 	}
 
@@ -497,7 +507,7 @@ function main() {
 		assert(d1.join("\n") eq txt);
 
 		printl("Make a wintext file");
-		var temposfilename = ostempfilename().dump();
+		var temposfilename = ostempfilename().outputl();
 		var wintext1 =
 			"aaa\r\n"
 			"bbb\r\n"
@@ -523,7 +533,7 @@ function main() {
 		assert(d2.join("\r\n") eq wintext1);
 
 		printl("Check writing dim array to wintext file");
-		var temposfilename2 = ostempfilename().dump();
+		var temposfilename2 = ostempfilename().outputl();
 		assert(d2.oswrite(temposfilename2));
 
 		printl("Check round trip");

@@ -174,6 +174,7 @@ friend class var;
 	dim& sorter(bool reverse = false);
 	dim& reverser();
 	dim& splitter(CVR str1, SV sepchar = _FM);
+	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
 
 	/////////////
 	// READ/WRITE
@@ -191,9 +192,16 @@ friend class var;
 	// ITERATORS
 	////////////
 
-	// begin needs to skip the first vector element 0,0
+	// Allow use of std algorithms
+	//
+	// Note that remove, remove_if, unique and other algorithms operate on a range of elements denoted by two forward iterators,
+	// and have no knowledge of the underlying container or collection. Therefore they only move "removed" elements
+	// to the end of the container. They return an iter to the first "removed" element so vector::erase can actually do the removal.
+	//
+	// begin() needs to skip the first vector element 0,0
 	// because dim uses 1 based indexing
 	// but we still allow use of vestigial dim(0)/dim(0, 0)
+	//
 	PUBLIC auto begin() {return ++data_.begin();}
 	PUBLIC auto end()   {return data_.end();}
 

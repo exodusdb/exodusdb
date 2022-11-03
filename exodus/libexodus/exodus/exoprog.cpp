@@ -1209,30 +1209,61 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 		// call the shared library exodus object's main function
 		try {
-			ANS = perform_callable_.callsmf();
+
+			//ANS = perform_callable_.callsmf();
+			var* retval = new var;
+			*retval = perform_callable_.callsmf();
+
+			// Detect corrupt return if we are lucky
+			// If we are unlucky the corrupt data will look good
+			// OK: var_typ will have only bottom 5 bits set
+			// KO: var_typ will have other bits set
+			// By throwing without deleting the new head var, we will avoid
+			// segfault: free(): invalid pointer" when the var's std:string is "destructed"
+			// but the memory will leak.
+			if (retval->unassigned()) {
+				retval->dump().errputl();
+				restore_environment();
+				throw VarError("exoprog::perform corrupt result. perform only functions, not subroutines.");
+			}
+
+			// Since the returned var appears OK, use it.
+			ANS = *retval;
+
+			// Since the returned var appears OK, delete it.
+			// If retval was not actually returned by callsmf then we may get a segfault: free(): invalid pointer
+			// from the fake var's std::string destructor
+			delete retval;
+
+		}
 
 		// TODO reimplement this
 //		} catch (const VarUndefined&) {
 //			// if return "" is missing then default ANS to ""
 //			ANS = "";
 
-		} catch (const MVStop&) {
+		catch (const MVStop&) {
 			// stop is normal way of stopping a perform
 			// functions can call it to terminate the whole "program"
 			// without needing to setup chains of returns
 			// to exit from nested functions
 			ANS = "";
-		} catch (const MVAbort& e) {
+		}
+
+		catch (const MVAbort& e) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			mssg(e.description);
 			ANS = "";
-		} catch (const MVAbortAll&) {
+		}
+
+		catch (const MVAbortAll&) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			// and abort multiple levels of perform?
 			ANS = "";
 		}
+
 		//TODO create a second version of this whole try/catch block
 		//that omits catch (VarError) if EXO_DEBUG is set
 		//so that gdb will catch the original error and allow backtracing there

@@ -1531,8 +1531,7 @@ class PUBLIC var final {
 		return clone;
 	}
 
-	CVR dump(SV text DEFAULT_EMPTY) const;
-	VARREF dump(SV text DEFAULT_EMPTY);
+	ND var dump() const;
 
 	// MATH/BOOLEAN
 	///////////////

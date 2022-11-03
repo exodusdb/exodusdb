@@ -73,21 +73,25 @@ void var::throwNumUnderflow(CVR message) const {
 	throw VarNumUnderflow(message);
 }
 
-CVR var::dump(SV text) const {
-	this->clone().dump(text);
-	return *this;
-}
-
-VARREF var::dump(SV text) {
-	std::clog << "DUMP: " << text << " ";
+var var::dump() const {
+//	std::clog << "DUMP: " << text << " ";
+//	if (var_typ & VARTYP_STR)
+//		std::clog << "str: " _DQ << var(var_str).first(1024).convert(_ALL_FMS, _VISIBLE_FMS) << _DQ " ";
+//	if (var_typ & VARTYP_INT)
+//		std::clog << "int:" << var(var_int) << " ";
+//	if (var_typ & VARTYP_DBL)
+//		std::clog << "dbl:" << var(var_dbl) << " ";
+//	std::clog << "typ:" << var_typ << std::endl;
+//	return *this;
+	var nrvo = "var: ";
 	if (var_typ & VARTYP_STR)
-		std::clog << "str: " _DQ << var(var_str).convert(_ALL_FMS, _VISIBLE_FMS) << _DQ " ";
+		nrvo ^= "str: " _DQ ^ var(var_str).first(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ " ";
 	if (var_typ & VARTYP_INT)
-		std::clog << "int:" << var(var_int) << " ";
+		nrvo ^= "int:" ^ var(var_int) ^ " ";
 	if (var_typ & VARTYP_DBL)
-		std::clog << "dbl:" << var(var_dbl) << " ";
-	std::clog << "typ:" << var_typ << std::endl;
-	return *this;
+		nrvo ^= "dbl:" ^ var(var_dbl) ^ " ";
+	nrvo ^= "typ:" ^ var(int(var_typ)).oconv("MB").trimfirst("0");
+	return nrvo;
 }
 
 //^= is not templated since slightly slower to go through the creation of an var()

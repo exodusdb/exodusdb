@@ -20,11 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <cstring>//for strlen
 #include <math.h> //for pow
 
+#include <cstring>//for strlen
 #include <string>
 #include <sstream>
+#include <bitset>
 
 #include <exodus/varimpl.h>
 
@@ -150,6 +151,33 @@ var var::iconv(const char* convstr) const {
 							// ss << std::hex << std::uppercase << part.round().toInt();
 							// outx ^= ss.str();
 							// break;
+
+						// "MB" binary to decimal
+						case 'B':
+
+							// var_str is like "101010110" max 64 digits;
+							part.trimmerfirst("0");
+							if (part.var_str.size() > 64) {
+								break;
+							}
+
+							try {
+
+								auto int1 = static_cast<varint_t>(std::bitset<64>(part.var_str).to_ullong());
+
+								// Cannot create using ordinary var construction from uint64_t
+								// because they throw VarIntOverflow if bit 64 is set.
+								var opart;
+								opart.var_typ = VARTYP_INT;
+								opart.var_int = int1;
+
+								outx ^= opart;
+							}
+							catch (std::invalid_argument& e) {
+								// If anything but 0 and 1 in string
+							}
+
+							break;
 					}
 				}
 
@@ -813,6 +841,27 @@ var var::oconv(const char* conversion) const {
 								   << part.var_int;
 
 								outx ^= ss.str();
+							}
+
+							break;
+
+						// MB - number to binary
+						case 'B':
+							if (notemptystring) {
+
+								//convert decimal to long
+								if (!(part.var_typ & VARTYP_INT)) {
+									part = part.round();  //actually to var_int i.e. int64_t
+									//part.toLong();
+									part.toInt();
+								}
+
+//								//convert to binary string
+//								std::ostringstream ss;
+//								ss << std::bitset<64>(part.var_int);
+//
+//								outx ^= ss.str();
+								outx ^= std::bitset<64>(part.var_int).to_string();
 							}
 
 							break;

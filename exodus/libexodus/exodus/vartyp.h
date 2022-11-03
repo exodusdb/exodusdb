@@ -5,11 +5,16 @@ namespace exodus {
 
 class VARTYP {
 
-   private:
+ private:
 
+	// bit 1 string
+	// bit 2 int
+	// bit 3 double
+	// bit 4 nan
+	// bit 5 osfile
 	unsigned int flags_ = 0;
 
-   public:
+ public:
 
 	// constructor from unsigned int
 	VARTYP(unsigned int rhs)

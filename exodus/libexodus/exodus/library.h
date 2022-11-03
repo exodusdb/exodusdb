@@ -1,3 +1,5 @@
+#ifndef EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
+#define EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
 #define BUILDING_LIBRARY
 #include <exodus/exodus.h>
 
@@ -82,3 +84,5 @@ extern "C" PUBLIC void exodusprogrambasecreatedelete_##PROGRAMCLASSNAME(        
 	}
 	// purpose of the above is to either return a new exodusprogram object
 	// and a pointer to its main function - or to delete an exodusprogram object
+#endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
+

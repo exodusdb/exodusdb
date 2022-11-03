@@ -30,8 +30,8 @@ programinit()
 	var notposix_extended = R"(\(XYZ\))";  //escaped () will indicate groups to be captured
 	var posix_extended	  = R"((XYZ))";	   //unescaped () will match () in the source string
 
-	assert("raw(XYZ)raw"_var.match(posix_extended, "i").dump()    eq "XYZ]XYZ"_var);
-	assert("raw(XYZ)raw"_var.match(notposix_extended, "i").dump() eq "(XYZ)"_var);
+	assert("raw(XYZ)raw"_var.match(posix_extended, "i").outputl()    eq "XYZ]XYZ"_var);
+	assert("raw(XYZ)raw"_var.match(notposix_extended, "i").outputl() eq "(XYZ)"_var);
 
 	// no need to backslash many letters
 

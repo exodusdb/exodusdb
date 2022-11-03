@@ -121,6 +121,11 @@ namespace exodus {
 // Forcibly redefine "eq" even if already previously defined in some other library like iostream
 // to generate a compilation error so that the issue can be corrected (see heading) and the "eq"
 // keyword remain available
+//
+// Note: https://gcc.gnu.org/onlinedocs/cpp/System-Headers.html
+// Macros defined in a system header are immune to a few warnings wherever they are expanded.
+// (g++9 seems to treat /usr/local/include (where exodus includes are installed) as system headers
+//
 #define eq ==
 // alternative
 #define EQ ==
@@ -133,9 +138,9 @@ namespace exodus {
 
 // Meaningful commas
 // =================
-// Perhaps a little crazy but included last so should not interfer with other heads
-// allow syntax like "read(rec from file)" and "convert(a to b)"
-// sadly "in" cannot be used since it is already used for "cnst var&"
+// Experimental. Included last so least likely to interfere with other heads
+// Allow syntax like "read(rec from file)" and "convert(a to b)"
+// Sadly "in" cannot be used since it is already used for "cnst var&"
 #define on ,
 #define from ,
 #define with ,

@@ -27,12 +27,12 @@ programinit()
 
 		var xi = "";
 		TRACE(xi.toInt())
-		xi.dump("xi");
+		xi.outputl("xi");
 		assert(xi != 0.0);
 
 		var xd = "";
 		TRACE(xd.toDouble())
-		xd.dump("xd");
+		xd.outputl("xd");
 		assert(xd != 0.0);
 
 		assert(var(0.0)  eq 0.0);
@@ -66,12 +66,12 @@ programinit()
 
 		var xi = "";
 		TRACE(xi.toInt())
-		xi.dump("xi");
+		xi.outputl("xi");
 		assert(xi != 0);
 
 		var xd = "";
 		TRACE(xd.toDouble())
-		xd.dump("xd");
+		xd.outputl("xd");
 		assert(xd != 0);
 
 		assert(var(0)   eq 0);
