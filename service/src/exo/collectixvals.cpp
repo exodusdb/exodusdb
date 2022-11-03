@@ -22,7 +22,10 @@ function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 	var cmd = "SELECT " ^ filename ^ " DISTINCT " ^ dictid;
 	if (prefix)
 		cmd ^= " WITH " ^ dictid ^ " STARTING " ^ prefix.quote();
-	file.select(cmd);
+	//file.select(cmd);
+	if (not file.select(cmd)) {
+		//null
+	}
 
 	var indexvalue;
 	var indexvalues = "";

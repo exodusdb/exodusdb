@@ -137,7 +137,7 @@ exit:
 
 		//call osgetenv("CODEPAGE", codepage);
 		if (not osgetenv("CODEPAGE", codepage)) {
-			loglasterror();
+			//null
 		}
 
 		// greek

@@ -483,7 +483,10 @@ nextprocess:
 				tt		 = tpath.osfile();
 				paramrec = tt.f(3) ^ FM ^ tt.f(2);
 				// size
-				call osgetenv("HOME", home);
+				//call osgetenv("HOME", home);
+				if (not osgetenv("HOME", home)) {
+					//null
+				}
 				tpath ^= "/backups/sql/" ^ dbasecode.lcase() ^ ".sql.gz";
 				tpath.converter("/", OSSLASH);
 
@@ -517,7 +520,10 @@ nextprocess:
 				// otherwise diskfreespace fails
 				tt = backupdrive ^ "/data.bak";
 				tt.converter("/", OSSLASH);
-				call osmkdir(tt);
+				//call osmkdir(tt);
+				if (osdir(tt) and not osrmdir(tt)) {
+					abort(lasterror());
+				}
 
 				// check target exists
 				freespace = diskfreespace(backupdrive);
@@ -587,9 +593,15 @@ nextprocess:
 							// if (localtime ge 21600 and localtime le 64800) {
 							if (localtime ge iconv("06:00", "MT") and localtime le iconv("18:00", "MT")) {
 								// only one email per installation
-								call osread(lastnote, "lastnote.cfg");
+								//call osread(lastnote, "lastnote.cfg");
+								if (not osread(lastnote, "lastnote.cfg")) {
+									//null
+								}
 								if (lastnote.f(1) ne localdate or (lastnote.f(2) lt localtime - 3600 * reminderhours)) {
-									call oswrite(localdate ^ FM ^ localtime, "lastnote.cfg");
+									//call oswrite(localdate ^ FM ^ localtime, "lastnote.cfg");
+									if (not oswrite(localdate ^ FM ^ localtime, "lastnote.cfg")) {
+										abort(lasterror());
+									}
 
 									// sendmail - if it fails, there will be an entry in the log
 									toaddresses = bakpars.f(6);
@@ -687,7 +699,10 @@ nextdbasen:;
 	// add exodus version for info
 	tt = "general/version.dat";
 	tt.converter("/", OSSLASH);
-	call osread(versionnote, tt);
+	//call osread(versionnote, tt);
+	if (not osread(versionnote, tt)) {
+		//null
+	}
 	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
 	tt			= versiondate.oconv("D2/");
 	tt			= tt.last(2) ^ "/" ^ tt.first(5);
@@ -732,13 +747,14 @@ nextdbasen:;
 	}  // ii;
 
 	// os description
-	call osgetenv("VER", osver);
-	hostdescriptions ^= " - " ^ osver;
+	//call osgetenv("VER", osver);
+	//hostdescriptions ^= " - " ^ osver;
 
 	// cpu description
-	call osgetenv("CPU", cpudesc);
+	//call osgetenv("CPU", cpudesc);
 	nprocs = SYSTEM.f(9);
-	hostdescriptions ^= " - " ^ cpudesc ^ " x " ^ nprocs;
+	//hostdescriptions ^= " - " ^ cpudesc ^ " x " ^ nprocs;
+	hostdescriptions ^= " - nprocs:" ^ nprocs;
 
 	// list ipnos
 //	if (VOLUMES) {

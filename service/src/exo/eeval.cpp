@@ -13,9 +13,18 @@ function main() {
 
 	var tempfilebase = "eevalt";
 	var tempfilesrc	 = tempfilebase ^ ".cpp";
-	oswrite(prog, tempfilesrc);
-	osshell("compile " ^ tempfilesrc);
-	osshell(tempfilebase);
+	//oswrite(prog, tempfilesrc);
+	if (not oswrite(prog, tempfilesrc)) {
+		loglasterror();
+	}
+	//osshell("compile " ^ tempfilesrc);
+	if (not osshell("compile " ^ tempfilesrc)) {
+		loglasterror();
+	}
+	//osshell(tempfilebase);
+	if (not osshell(tempfilebase)) {
+		loglasterror();
+	}
 
 	return 0;
 }

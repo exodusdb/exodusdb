@@ -617,8 +617,8 @@ nextsign:
 			if (response_.contains("Error")) {
 				subject ^= " ERROR";
 				//var(response_).oswrite("xyz.xyz");
-				if (not var(response_).oswrite("xyz.xyz"))
-					loglasterror();
+				//if (not var(response_).oswrite("xyz.xyz"))
+				//	loglasterror();
 			}
 			// swap 'Error:' with 'Result:' in body
 			body(-1) = ("Document: " ^ srv.document.f(2) ^ " (" ^ docid ^ ")").trim();
