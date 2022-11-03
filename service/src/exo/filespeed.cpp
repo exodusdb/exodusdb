@@ -1,6 +1,8 @@
 #include <exodus/program.h>
 programinit()
 
+#include <openfile.h>
+
 var tempfilename;
 var rec;
 var tempfile;
@@ -23,7 +25,10 @@ function main() {
 
 	// locate tempfilename in @files using @fm setting x then
 	if (deletefilex) {
-		deletefile(tempfilename ^ " (S)");
+		//deletefile(tempfilename ^ " (S)");
+		if (var().open(tempfilename) and not deletefile(tempfilename ^ " (S)")) {
+			abort(lasterror());
+		}
 	}
 	clearselect();
 	// end
@@ -71,7 +76,10 @@ nexttest:
 	}
 
 	// PERFORM 'MAKEFILE ':TEMPFILENAME:' ':recsize:' ':N:' (S)'
-	createfile(tempfilename ^ " (S)");
+	//createfile(tempfilename ^ " (S)");
+	if (not createfile(tempfilename ^ " (S)")) {
+		abort(lasterror());
+	}
 	// perform 'SELECT ':tempfilename
 
 	if (esctoexit()) {
@@ -86,7 +94,9 @@ nexttest:
 	starttime = ostime();
 
 	if (usetransaction)
-		begintrans();
+		//begintrans();
+		if (not begintrans())
+			abort(lasterror());
 
 	// print
 	// print 'Writing 1Kb records'
@@ -109,7 +119,9 @@ nexttest:
 	}  // ii;
 
 	if (usetransaction)
-		committrans();
+		//committrans();
+		if (not committrans())
+			loglasterror();
 
 	endtime = ostime();
 
@@ -127,11 +139,15 @@ nexttest:
 	minspeed = (1 / maxtime).oconv("MD20P");
 	avgspeed = (1 / avgtime).oconv("MD20P");
 	maxspeed = (1 / mintime).oconv("MD20P");
-	printl(" ", testn, ". ", "\t", testtime.oconv("MD20P"), "\t", minspeed, "\t", avgspeed, "\t", maxspeed);
+	//printl(" ", testn, ". ", "\t", testtime.oconv("MD20P"), "\t", minspeed, "\t", avgspeed, "\t", maxspeed);
+	printl(testn ^ ".", "\t", testtime.oconv("MD20P"), "\t", minspeed, "\t", avgspeed, "\t", maxspeed);
 
 	// call note(endtime-starttime:' Seconds')
 	if (deletefilex) {
-		deletefile(tempfilename ^ " (S)");
+		//deletefile(tempfilename ^ " (S)");
+        if (var().open(tempfilename) and not deletefile(tempfilename ^ " (S)")) {
+            abort(lasterror());
+        }
 	}
 
 	goto nexttest;
@@ -140,7 +156,10 @@ nexttest:
 exit:
 	// ///
 	if (deletefilex) {
-		deletefile(tempfilename ^ " (S)");
+		//deletefile(tempfilename ^ " (S)");
+        if (var().open(tempfilename) and not deletefile(tempfilename ^ " (S)")) {
+            abort(lasterror());
+        }
 	}
 
 	// msg=''
