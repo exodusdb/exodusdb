@@ -283,7 +283,10 @@ listen:
 		msg_.replacer("|", "\r\n");
 		msg_.replacer(FM, "\r\n");
 		msg_.replacer(VM, "\r\n");
-		call oswrite("Error: " ^ msg_, linkfilename3);
+		//call oswrite("Error: " ^ msg_, linkfilename3);
+		if (not oswrite("Error: " ^ msg_, linkfilename3)) {
+			abort(lasterror());
+		}
 		// osclose linkfilename3
 	}
 

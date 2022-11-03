@@ -28,7 +28,10 @@ function main(in msg0, io time0) {
 		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
 			// for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
 			// for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
-			call osbread(datax, logfile, ptr, 1024);
+			//call osbread(datax, logfile, ptr, 1024);
+			if (not osbread(datax, logfile, ptr, 1024)) {
+				abort(lasterror());
+			}
 			// if any data then break out of loop
 			if (datax.len()) {
 				ptr = logfilelength;
@@ -68,7 +71,10 @@ function main(in msg0, io time0) {
 	time0 = time2;
 
 	if (logfile) {
-		call osbwrite(entry, logfile, logfilelength);
+		//call osbwrite(entry, logfile, logfilelength);
+		if (not osbwrite(entry, logfile, logfilelength)) {
+			abort(lasterror());
+		}
 		logfile.osclose();
 	}
 

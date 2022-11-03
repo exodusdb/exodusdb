@@ -293,7 +293,9 @@ function main() {
 		pidfilename ^= ".pid";
 	}
 	// 	}
-	call osread(pidrec, pidfilename);
+	//call osread(pidrec, pidfilename);
+	if (not osread(pidrec, pidfilename)) {}
+		//abort(lasterror());
 	// osremove pidfilename
 	if (pidrec) {
 		SYSTEM(54, 5) = pidrec.f(1);
@@ -577,7 +579,9 @@ nextreport:
 	if (date() ne lastdate) {
 		config(1) = date();
 		// call OSWRITE(CONFIG,'exodus.cfg')
-		var(config).oswrite("exodus.cfg");
+		//var(config).oswrite("exodus.cfg");
+		if (not var(config).oswrite("exodus.cfg"))
+			loglasterror();
 	}
 
 	call log2("*check for invalid characters in workstation name", logtime);
@@ -595,7 +599,9 @@ nextreport:
 	// can be deleted manually
 	if (tt.osread("system")) {
 		if (not(var("system.cfg").osfile())) {
-			var(tt).oswrite("system.cfg");
+			//var(tt).oswrite("system.cfg");
+			if (not var(tt).oswrite("system.cfg"))
+				loglasterror();
 		}
 	}
 
@@ -686,9 +692,13 @@ nextreport:
 		call log2("*determine systemid from old smtp sender name", logtime);
 		tpath = "../../";
 		tpath.converter("/", OSSLASH);
-		call osread(smtp, tpath ^ "smtp.cfg");
+		//call osread(smtp, tpath ^ "smtp.cfg");
+		if (not osread(smtp, tpath ^ "smtp.cfg"))
+			loglasterror();
 		if (not(smtp.f(1))) {
-			call osread(smtp, "smtp.cfg");
+			//call osread(smtp, "smtp.cfg");
+			if (not osread(smtp, "smtp.cfg"))
+				loglasterror();
 		}
 		if (not smtp.f(1)) {
 			if (not smtp.read(DEFINITIONS, "SMTP.CFG")) {
@@ -706,7 +716,9 @@ nextreport:
 			}
 			tt(57) = sysname;
 			// call oswrite(tt,'system.cfg')
-			var(tt).oswrite("system.cfg");
+			//var(tt).oswrite("system.cfg");
+			if (not var(tt).oswrite("system.cfg"))
+				loglasterror();
 		}
 	}
 
@@ -807,7 +819,9 @@ nextreport:
 	if (not(SYSTEM.f(12).locate("CODEPAGE", vn))) {
 
 		// en_US.UTF-8
-		call osgetenv("LANG", codepage);
+		//call osgetenv("LANG", codepage);
+		if (not osgetenv("LANG", codepage))
+			loglasterror();
 
 		SYSTEM(12, vn) = "CODEPAGE";
 		SYSTEM(13, vn) = codepage;
@@ -1264,16 +1278,18 @@ nextreport:
 		// TODO lock/prevent double create with other processes
 		var file;
 		if (not(file.open(filename, ""))) {
-			createfile("REVBOOT " ^ filename ^ " (S)");
+			//createfile("REVBOOT " ^ filename ^ " (S)");
+			//if (not createfile("REVBOOT " ^ filename ^ " (S)"))
+			//	abort(lasterror());
 			// 			if (VOLUMES) {
 			// 				perform("CONVGLOBAL REVBOOT GLOBAL " ^ filename ^ " (S)");
 			// 				perform("DELETEFILE DICT." ^ filename ^ " (S)");
 			// 				perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
 			// 				perform("ATTACH REVBOOT " ^ filename ^ " (S)");
 			// 			}
-			if (not(file.open(filename, ""))) {
+			//if (not(file.open(filename, ""))) {
 				call sysmsg(filename.quote() ^ " could not be created by INIT.GENERAL");
-			}
+			//}
 		}
 	}  // ii;
 
@@ -1592,7 +1608,9 @@ adddatasetcodename:
 		var versioninstalled = version.field("\r", 1).field("\n", 1).trim();
 
 		// get version last run
-		call osread(upgradelog, "UPGRADE.CFG");
+		//call osread(upgradelog, "UPGRADE.CFG");
+		//if (not osread(upgradelog, "UPGRADE.CFG"))
+		//	loglasterror();
 		var	 versionlastrun = field2(upgradelog, chr(10), -1);
 
 		// if changed then log and email users
@@ -1604,7 +1622,9 @@ adddatasetcodename:
 			}
 			upgradelog ^= versioninstalled;
 			// call oswrite(upgradelog,'UPGRADE.CFG')
-			var(upgradelog).oswrite("upgrade.cfg");
+			//var(upgradelog).oswrite("upgrade.cfg");
+			if (not var(upgradelog).oswrite("upgrade.cfg"))
+				loglasterror();
 
 			// upgrade locally installed SYSOBJ files
 			call log2("*update sysobj $msg $rtp25", logtime);
@@ -1671,7 +1691,9 @@ adddatasetcodename:
 			call log2("*indicate success to LOGIN", logtime);
 			if (SYSTEM.f(33, 10)) {
 				// call oswrite('OK',system<33,10>:'.$2')
-				var("OK").oswrite(SYSTEM.f(33, 10) ^ ".$2");
+				//var("OK").oswrite(SYSTEM.f(33, 10) ^ ".$2");
+				if (not var("OK").oswrite(SYSTEM.f(33, 10) ^ ".$2"))
+					loglasterror();
 			}
 
 			call log2("*chain to NET AUTO (" ^ SYSTEM.f(17) ^ ") INIT.GENERAL Quitting.", logtime);
@@ -1731,7 +1753,9 @@ subroutine failsys() {
 	msg.replacer(FM ^ FM, FM);
 	msg.converter(FM, "|");
 	// call oswrite(msg,system<33,10>:'.$2')
-	var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2");
+	//var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2");
+	if (not var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2"))
+		loglasterror();
 
 	// and quit
 	perform("OFF");

@@ -299,13 +299,16 @@ nextuser:
 		}
 
 		// exclusive get and update the last date run otherwise skip
-		if (not(DEFINITIONS.lock("TRIMREQUESTLOG"))) {
+		if (not DEFINITIONS.lock("TRIMREQUESTLOG")) {
 			return 0;
 		}
-		if (not(lastdate.osread("reqlog.cfg"))) {
+		if (not lastdate.osread("reqlog.cfg")) {
 			lastdate = "";
 		}
-		var(date()).oswrite("reqlog.cfg");
+		//var(date()).oswrite("reqlog.cfg");
+		if (not var(date()).oswrite("reqlog.cfg")) {
+			loglasterror();
+		}
 		DEFINITIONS.unlock("TRIMREQUESTLOG");
 
 		// dont run twice on same day
@@ -323,7 +326,10 @@ nextuser:
 		if (tt.osread("reorder.cfg")) {
 			return 0;
 		}
-		var(date()).oswrite("reorder.cfg");
+		//var(date()).oswrite("reorder.cfg");
+		if (not var(date()).oswrite("reorder.cfg")) {
+			loglasterror();
+		}
 
 		perform("WINDOWSTUB DEFINITION.SUBS REORDERDBS");
 
@@ -487,7 +493,10 @@ nextuser:
 		}
 		if (menutx ne oldmenu) {
 			call log2("Updating " ^ menuosfilename, logtime);
-			var(menutx).oswrite(menuosfilename);
+			//var(menutx).oswrite(menuosfilename);
+			if (not var(menutx).oswrite(menuosfilename)) {
+				abort(lasterror());
+			}
 		}
 
 	} else {

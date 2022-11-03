@@ -85,7 +85,10 @@ function main(in mode, in params, io result, io msg) {
 		}
 		if (roundrobin.contains(chr(0))) {
 			roundrobin.converter(chr(0), "");
-			var(date() ^ FM ^ time()).oswrite("rrobin");
+			//var(date() ^ FM ^ time()).oswrite("rrobin");
+			if (not var(date() ^ FM ^ time()).oswrite("rrobin")) {
+				loglasterror();
+			}
 		}
 
 		// determine current and last timeperiod
@@ -123,7 +126,10 @@ function main(in mode, in params, io result, io msg) {
 
 		if (roundrobin.contains(chr(0))) {
 			roundrobin.converter(chr(0), "");
-			var(date() ^ FM ^ time()).oswrite("RRW");
+			//var(date() ^ FM ^ time()).oswrite("RRW");
+			if (not var(date() ^ FM ^ time()).oswrite("RRW")) {
+				loglasterror();
+			}
 		}
 		roundrobin.write(roundrobinfile, roundrobinkey_);
 

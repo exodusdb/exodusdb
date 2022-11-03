@@ -253,7 +253,10 @@ function main() {
 		SYSTEM(2) = sys2;
 		output.replacer(FM, _EOL);
 		output.replacer(VM, "\t");
-		call oswrite(output, SYSTEM.f(2));
+		//call oswrite(output, SYSTEM.f(2));
+		if (not oswrite(output, SYSTEM.f(2))) {
+			abort(lasterror());
+		}
 	}
 
 	stop();

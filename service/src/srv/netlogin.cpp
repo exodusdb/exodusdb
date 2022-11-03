@@ -243,7 +243,10 @@ okfail:
 
 		if (SYSTEM.f(33)) {
 			msg = "INVALID USERNAME OR PASSWORD " ^ (userx.quote());
-			call oswrite(msg, SYSTEM.f(33, 10) ^ ".$2");
+			//call oswrite(msg, SYSTEM.f(33, 10) ^ ".$2");
+			if (not oswrite(msg, SYSTEM.f(33, 10) ^ ".$2")) {
+				loglasterror();
+			}
 			// print char(12):char(7):msg
 			printl(msg);
 			logoff();
