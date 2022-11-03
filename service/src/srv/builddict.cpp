@@ -198,7 +198,9 @@ subroutine writedict() {
 			}
 			if (ans eq "Y" or ans eq "y") {
 				// dictrec.write(DICT, dictid);
-				oswrite(oconv(dictrec, "TX") on osdatfilename);
+				//oswrite(oconv(dictrec, "TX") on osdatfilename);
+				if (not oswrite(oconv(dictrec, "TX") on osdatfilename))
+					abort(lasterror());
 			}
 		}
 	}

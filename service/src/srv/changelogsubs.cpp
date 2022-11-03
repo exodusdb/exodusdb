@@ -310,7 +310,10 @@ subroutine getcurrentversiondatetime() {
 
 subroutine getversiondates() {
 	// extract installed version dates from upgrade.cfg
-	call osread(versionlog, "upgrade.cfg");
+	//call osread(versionlog, "upgrade.cfg");
+	if (not osread(versionlog, "upgrade.cfg"))
+		loglasterror();
+
 	// versionlog=trim(field(versionlog,\1A\,1))
 	versionlog.converter("\r\n", _FM _FM);
 	let nn			= versionlog.fcount(FM);

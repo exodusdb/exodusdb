@@ -107,6 +107,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	var isdevsys = var("exodus.id").osfile();
 
+	// Auto start databases on request
+	//////////////////////////////////
 	if (request1 eq "RUNS") {
 
 		// db start commands from xhttp.php
@@ -148,9 +150,13 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 								print(AT(-40));
 							printl(time().oconv("MTS"), " ", cmd);
 
-							cmd.osshell();
+							//cmd.osshell();
+							if (not cmd.osshell())
+								abort(lasterror());
 						}
-						filename.osremove();
+						//filename.osremove();
+						if (filename and not filename.osremove())
+							abort(lasterror());
 					}
 				}
 				xx = unlockrecord("", processes, "START*" ^ filename);
@@ -291,14 +297,18 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 			// ensure patch file is complete
 			offset = patchfileinfo.f(1) - 18;
-			call osbread(tt, patchfile, offset, 18);
+			//call osbread(tt, patchfile, offset, 18);
+			if (not osbread(tt, patchfile, offset, 18))
+				abort(lasterror());
 			if (tt ne("!" ^ FM ^ "!END!OF!INSTALL!")) {
 				goto nextpatch;
 			}
 
 			// verify correct file heading and determine patchid from the file
 			offset_zero = 0;
-			call osbread(firstblock, patchfile, offset_zero, 65000);
+			//call osbread(firstblock, patchfile, offset_zero, 65000);
+			if (not osbread(firstblock, patchfile, offset_zero, 65000))
+				abort(lasterror());
 			patchid = firstblock.f(2).cut(5);
 			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.first(8) ne "INSTALL*") {
 				goto nextpatch;
@@ -422,7 +432,9 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 			// trigger other processes to restart by updating SYSTEM.CFG
 			if (tt.osread("system.cfg")) {
-				var(tt).oswrite("system.cfg");
+				//var(tt).oswrite("system.cfg");
+				if (not var(tt).oswrite("system.cfg"))
+					abort(lasterror());
 			}
 
 			// release
@@ -791,11 +803,15 @@ nextlock:
 
 		} else {
 
-			call oswrite("", request3);
+			//call oswrite("", request3);
+			if (not oswrite("", request3))
+				abort(lasterror());
 
 			// stop server
 			if (request2.contains("ALL")) {
-				call oswrite("", request4);
+				//call oswrite("", request4);
+				if (not oswrite("", request4))
+					abort(lasterror());
 			}
 
 			// wait up to 30 seconds for other users to quit
@@ -813,20 +829,31 @@ nextlock:
 			if (otherusersx) {
 				// response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, response_, otherusersx);
-				request3.osremove();
+				//request3.osremove();
+				if (request3 and not request3.osremove())
+					abort(lasterror());
 			} else {
-				osshell("NET STOP EXODUSSERVICE");
+				//osshell("NET STOP EXODUSSERVICE");
+				if (not osshell("NET STOP EXODUSSERVICE"))
+					abort(lasterror());
 
 				if (request2.starts("RESTART")) {
-					request3.osremove();
-					osshell("NET START EXODUSSERVICE");
+					//request3.osremove();
+					if (request3 and not request3.osremove())
+						abort(lasterror());
+					//osshell("NET START EXODUSSERVICE");
+					if (not osshell("NET START EXODUSSERVICE"))
+						abort(lasterror());
+
 				}
 
 				response_ = "OK";
 			}
 
 			if (request2.contains("ALL")) {
-				request4.osremove();
+				//request4.osremove();
+				if (request4 and not request4.osremove())
+					abort(lasterror());
 			}
 		}
 
@@ -946,11 +973,17 @@ nextfiles:
 
 			// a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.ends(".4")) {
-				filename.osremove();
+				//filename.osremove();
+				if (filename and not filename.osremove())
+					abort(lasterror());
 				filename.paster(-1, 1, "2");
-				filename.osremove();
+				//filename.osremove();
+				if (filename and not filename.osremove())
+					abort(lasterror());
 				filename.paster(-1, 1, "3");
-				filename.osremove();
+				//filename.osremove();
+				if (filename and not filename.osremove())
+					abort(lasterror());
 
 			} else {
 				if (filename.ends(".TMP")) {
@@ -962,7 +995,9 @@ nextfiles:
 				filetime	   = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
 				if (((filename.last(4)).contains(".")) and filetime le deletetime) {
 deleteit:
-					filename.osremove();
+					//filename.osremove();
+					if (filename and not filename.osremove())
+						abort(lasterror());
 				} else {
 				}
 			}

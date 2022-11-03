@@ -1025,7 +1025,9 @@ validateexit2:
 		response_.converter(_VM "|", _FM _FM);
 		response_.replacer(_FM, _EOL);
 
-		call oswrite(response_, responsefilename);
+		//call oswrite(response_, responsefilename);
+		if (not oswrite(response_, responsefilename))
+			abort(lasterror());
 		// osclose responsefilename
 
 		call ossleep(1000 * 2);

@@ -229,7 +229,9 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	}
 	var excel = outfilename.lcase().ends("xls");
 
-	outfilename.osremove();
+	//outfilename.osremove();
+	if (outfilename.osfile() and not outfilename.osremove())
+		abort(lasterror());
 	if (outfilename.osfile()) {
 		var	  msg = "CANNOT EXPORT BECAUSE " ^ outfilename ^ " IS ALREADY|OPEN IN ANOTHER PROGRAM, OR CANNOT BE ACCESSED";
 		call  mssg(msg);
@@ -390,7 +392,9 @@ nextdict:
 		call popselect(0, v69, v70, v71);
 	}
 
-	call oswrite("", outfilename);
+	//call oswrite("", outfilename);
+	if (not oswrite("", outfilename))
+		abort(lasterror());
 	if (not(outfile.osopen(outfilename))) {
 		call  mssg(lasterror());
 		gosub exit2();
@@ -410,7 +414,9 @@ nextdict:
 		call xselect(tt);
 		if (not LISTACTIVE) {
 			outfile.osclose();
-			outfilename.osremove();
+			//outfilename.osremove();
+			if (outfilename.osfile() and not outfilename.osremove())
+				abort(lasterror());
 			call mssg("No records found");
 			return 0;
 		}
@@ -654,7 +660,9 @@ nextvn:
 					headingx ^= _EOL;
 				}
 
-				call osbwrite(headingx, outfile, ptr);
+				//call osbwrite(headingx, outfile, ptr);
+				if (not osbwrite(headingx, outfile, ptr))
+					abort(lasterror());
 
 				headingx = "";
 			}
@@ -668,7 +676,9 @@ nextvn:
 				line ^= _EOL;
 			}
 
-			call osbwrite(line, outfile, ptr);
+			//call osbwrite(line, outfile, ptr);
+			if (not osbwrite(line, outfile, ptr))
+				abort(lasterror());
 		}
 
 		if (not(firstmvonly) and vn lt maxvn) {

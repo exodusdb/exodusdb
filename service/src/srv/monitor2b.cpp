@@ -214,7 +214,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		if (cleanup) {
-			logfilename.osremove();
+			//logfilename.osremove();
+			if (logfilename.osfile() and not logfilename.osremove()) {
+				abort(lasterror());
+			}
 		}
 
 		// UPDATE also gets a response
@@ -241,7 +244,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 					params.replacer("`", "%60");
 					params.replacer("+", "%2B");
 
-					var(params).oswrite(datafilename);
+					//var(params).oswrite(datafilename);
+					if (not var(params).oswrite(datafilename)) {
+						loglasterror();
+					}
 					cmd ^= " --post-file=" ^ datafilename;
 					// not added to authurl
 					params = "";
@@ -272,7 +278,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 
 			if (cleanup) {
-				(tempfilename ^ ".CMD").osremove();
+				//(tempfilename ^ ".CMD").osremove();
+				if (osfile(tempfilename ^ ".CMD") and not (tempfilename ^ ".CMD").osremove()) {
+					abort(lasterror());
+				}
 				// cannot delete postdata until command has executed
 				// osremove datafilename
 			}
@@ -284,7 +293,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 			wgetrc.replacer(_FM, _EOL);
 			var wgetrcfilename = oscwd() ^ tempfilename ^ ".XRC";
-			var(wgetrc).oswrite(wgetrcfilename);
+			//var(wgetrc).oswrite(wgetrcfilename);
+			if (not var(wgetrc).oswrite(wgetrcfilename)) {
+				loglasterror();
+			}
 
 			if (wgetrcfilename[2] eq ":") {
 				wgetrcfilename.paster(2, 1, "");
@@ -296,13 +308,19 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			var errorfilename = tempfilename ^ ".XER";
 			var cmdfile		  = "set WGETRC=" ^ wgetrcfilename;
 			cmdfile ^= _EOL ^ cmd ^ " 2>" ^ errorfilename;
-			var(cmdfile).oswrite(cmdfilename);
+			//var(cmdfile).oswrite(cmdfilename);
+			if (not var(cmdfile).oswrite(cmdfilename)) {
+				loglasterror();
+			}
 
 			// print
 			// print 'CONTROL cmd /c ':cmdfilename:' ... ':
 
 			var().osflush();
-			("cmd /c " ^ cmdfilename).osshell();
+			//("cmd /c " ^ cmdfilename).osshell();
+			if (not ("cmd /c " ^ cmdfilename).osshell()) {
+				loglasterror();
+			}
 			var().osflush();
 
 			// print 'done'
@@ -312,9 +330,18 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 
 			if (cleanup) {
-				cmdfilename.osremove();
-				wgetrcfilename.osremove();
-				errorfilename.osremove();
+				//cmdfilename.osremove();
+				if (cmdfilename.osfile() and not cmdfilename.osremove()) {
+					abort(lasterror());
+				}
+				//wgetrcfilename.osremove();
+				if (wgetrcfilename.osfile() and not wgetrcfilename.osremove()) {
+					abort(lasterror());
+				}
+				//errorfilename.osremove();
+				if (errorfilename.osfile() and not errorfilename.osremove()) {
+					abort(lasterror());
+				}
 			}
 		}
 
@@ -338,7 +365,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 		if (datax.osread(tempfilename2)) {
 			if (cleanup) {
-				tempfilename2.osremove();
+				//tempfilename2.osremove();
+				if (tempfilename2.osfile() and not tempfilename2.osremove()) {
+					abort(lasterror());
+				}
+
 			}
 		} else {
 			datax = "";
@@ -379,7 +410,10 @@ badresponse:
 		// from here on the response is ok
 		msg = "";
 		if (cleanup) {
-			logfilename.osremove();
+			//logfilename.osremove();
+			if (logfilename.osfile() and not logfilename.osremove()) {
+				abort(lasterror());
+			}
 		}
 
 		datax = datax.field(",", 14, 999999);
@@ -394,7 +428,10 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 
 	if (log.osread(logfilename)) {
 		if (cleanup) {
-			logfilename.osremove();
+			//logfilename.osremove();
+			if (logfilename.osfile() and not logfilename.osremove()) {
+				abort(lasterror());
+			}
 		}
 		log.converter("\r\n", _FM _FM).trimmer(_FM);
 		log.replacer("<br />", _FM);

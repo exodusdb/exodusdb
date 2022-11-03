@@ -432,7 +432,9 @@ function main_init() {
 	tdir.converter("/", OSSLASH);
 	if (not(xx.osopen(tdir.lcase()))) {
 		if (STATUS ne 2) {
-			call osmkdir(tdir.lcase());
+			//call osmkdir(tdir.lcase());
+			if (not osmkdir(tdir.lcase()))
+				abort(lasterror());
 		}
 	}
 
@@ -440,7 +442,9 @@ function main_init() {
 	// call shell('MD ':logpath)
 	if (not(xx.osopen(logpath))) {
 		if (STATUS ne 2) {
-			call osmkdir(logpath);
+			//call osmkdir(logpath);
+			if (not osmkdir(logpath))
+				abort(lasterror());
 		}
 	}
 
@@ -460,7 +464,9 @@ function main_init() {
 
 		// backup and read the last 6 characters of the log
 		logptr -= 6;
-		call osbread(tt, logfile, logptr, 6);
+		//call osbread(tt, logfile, logptr, 6);
+		if (not osbread(tt, logfile, logptr, 6))
+			abort(lasterror());
 		// maybe backup the log pointer to overwrite the closing tag
 		if (tt eq "</Log>") {
 			logptr -= 6;
@@ -469,7 +475,9 @@ function main_init() {
 	} else {
 
 		// initialise xml log file header
-		call oswrite("", logfilename);
+		//call oswrite("", logfilename);
+		if (not oswrite("", logfilename))
+			abort(lasterror());
 		if (logfile.osopen(logfilename)) {
 			logptr = 0;
 			logx   = "<?xml version=\"1.0\"?>" _EOL;
@@ -494,7 +502,9 @@ function main_init() {
 	stack = "";
 	// call programstackstack);
 
-	nextconnection.connect(getenv("EXO_DATA"));
+	//nextconnection.connect(getenv("EXO_DATA"));
+	if (not nextconnection.connect(getenv("EXO_DATA")))
+		loglasterror();
 
 	return true;
 
@@ -599,7 +609,9 @@ nextsearch0:
 		 " Listening"
 		 " " ^
 		 elapsedtimetext(lastrequestdate.timestamp(lastrequesttime), timestamp());
-	var(tt).oswrite("process." ^ THREADNO);
+	//var(tt).oswrite("process." ^ THREADNO);
+	if (not var(tt).oswrite("process." ^ THREADNO))
+		loglasterror();
 
 	call unlockrecord("PROCESSES", processes, THREADNO);
 
@@ -664,7 +676,10 @@ subroutine wait() {
 	cmd ^= " " ^ inpath ^ "*.1 " ^ waitsecs ^ " " ^ sleepms ^ " " ^ serverend;
 
 	linkfilename1 = inpath ^ "neos" ^ THREADNO.oconv("R(0)#4") ^ ".0";
-	linkfilename1.osremove();
+	//linkfilename1.osremove();
+	if (osfile(linkfilename1) and not linkfilename1.osremove())
+		abort(lasterror());
+
 	if (linkfilename1.osfile()) {
 		if (tracing) {
 			printl("CANNOT DELETE ", linkfilename1, " GENERATING ANOTHER");
@@ -782,7 +797,9 @@ function loop_exit() {
 
 				if (not cmd.starts("list")) {
 					printl("Begin transaction");
-					begintrans();
+					//begintrans();
+					if (not begintrans())
+						abort(lasterror());
 				}
 
 				// Manual commands
@@ -793,11 +810,15 @@ function loop_exit() {
 				if (statustrans()) {
 					if (decide("Commit any database updates ?", "Commit" _VM "Rollback") eq "Commit") {
 						print("Committing transaction ... ");
-						committrans();
+						//committrans();
+						if (not committrans())
+							loglasterror();
 						printl("done.");
 					} else {
 						print("*ROLLING BACK* transaction ... ");
-						rollbacktrans();
+						//rollbacktrans();
+						if (not rollbacktrans())
+							loglasterror();
 						printl("done.");
 					}
 				}
@@ -829,7 +850,9 @@ function loop_exit() {
 
 		// "U" = unlock all locks
 		if (charx eq "U") {
-			clearfile(locks1);
+			//clearfile(locks1);
+			if (not clearfile(locks1))
+				abort(lasterror());
 			printl(" ", "ALL LOCKS RELEASED");
 		}
 
@@ -1028,7 +1051,9 @@ openlink1:
 		request_ = "";
 		// osbread request from linkfile1 at 0 length 256*256-4
 		tt = 0;
-		call osbread(request_, linkfile1, tt, 256 * 256 - 4);
+		//call osbread(request_, linkfile1, tt, 256 * 256 - 4);
+		if (not osbread(request_, linkfile1, tt, 256 * 256 - 4))
+			abort(lasterror());
 
 		// if cannot read it then try again
 		if (request_ eq "" and time() eq timex) {
@@ -1068,7 +1093,9 @@ openlink1:
 		ntries = 0;
 deleterequest:
 		linkfile1.osclose();
-		linkfilename1.osremove();
+		//linkfilename1.osremove();
+		if (osfile(linkfilename1) and not linkfilename1.osremove())
+			abort(lasterror());
 		if (linkfilename1.osfile()) {
 			var().osflush();
 			call ossleep(1000 * 1 / 10.0);
@@ -1267,7 +1294,9 @@ function request_init() {
 
 				// osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
 				// tt=(blockn-1)*inblocksize
-				call osbread(datx(blockn), linkfile2, inptr, inblocksize);
+				//call osbread(datx(blockn), linkfile2, inptr, inblocksize);
+				if (not osbread(datx(blockn), linkfile2, inptr, inblocksize))
+					abort(lasterror());
 
 				if (not(datx(blockn).len()))
 					break;
@@ -1348,7 +1377,9 @@ cannotopenlinkfile2:
 
 			// read whole file upto limit
 			var	 offset_zero = 0;
-			call osbread(data_, linkfile2, offset_zero, maxstrlen);
+			//call osbread(data_, linkfile2, offset_zero, maxstrlen);
+			if (not osbread(data_, linkfile2, offset_zero, maxstrlen))
+				abort(lasterror());
 
 			// output to log
 			if (logfilename) {
@@ -1368,7 +1399,9 @@ cannotopenlinkfile2:
 
 	if (linkfile2.osopen(linkfilename2)) {
 		linkfile2.osclose();
-		linkfilename2.osremove();
+		//linkfilename2.osremove();
+		if (osfile(linkfilename2) and not linkfilename2.osremove())
+			abort(lasterror());
 		// osread response from linkfilename3 else response=''
 	}
 
@@ -1469,7 +1502,9 @@ subroutine process() {
 	if (osgetenv("EXO_DEBUG")) {
 
 		// Identical below
-		begintrans();
+		//begintrans();
+		if (not begintrans())
+			abort(lasterror());
 		gosub process2();
 		if (not committrans())
 			response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
@@ -1480,13 +1515,17 @@ subroutine process() {
 		try {
 
 			// Identical above
-			begintrans();
+			//begintrans();
+			if (not begintrans())
+				abort(lasterror());
 			gosub process2();
 			if (not committrans())
 				response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
 
 		} catch (VarError& e) {
-			rollbacktrans();
+			//rollbacktrans();
+			if (not rollbacktrans())
+				loglasterror();
 			// Similar code in net.cpp and listen.cpp
 			response_ = e.description.unassigned("No error message") ^ FM ^ e.stack();
 		}
@@ -2419,7 +2458,10 @@ badwrite:
 	} else if (request1 eq "BACKUP") {
 
 		// trigger additional processes that should fail due to backup lock
-		(inpath ^ serverflagfilename).osremove();
+		//(inpath ^ serverflagfilename).osremove();
+		var serverflagfilepath = inpath ^ serverflagfilename;
+		if (serverflagfilepath.osfile() and not serverflagfilepath.osremove())
+			abort(lasterror());
 
 		call listen5(request1);
 
@@ -2520,7 +2562,9 @@ function request_exit() {
 
 	} else {
 
-		call oswrite("", linkfilename2);
+		//call oswrite("", linkfilename2);
+		if (not oswrite("", linkfilename2))
+			abort(lasterror());
 		if (linkfile2.osopen(linkfilename2)) {
 
 			// split into blocks and convert to escape chars
@@ -2534,7 +2578,9 @@ function request_exit() {
 					break;
 
 				// in LISTEN and SELECT2 for direct output
-				call osbwrite(blk, linkfile2, ptr);
+				//call osbwrite(blk, linkfile2, ptr);
+				if (not osbwrite(blk, linkfile2, ptr))
+					abort(lasterror());
 
 				if (logfilename) {
 					blk.move(logx);
@@ -2575,7 +2621,9 @@ function request_exit() {
 	// swap fm with char(13) in response
 
 	// write the response
-	call oswrite(response_, linkfilename3);
+	//call oswrite(response_, linkfilename3);
+	if (not oswrite(response_, linkfilename3))
+		abort(lasterror());
 
 	// trace responded
 	responsetime = ostime();
@@ -3007,7 +3055,9 @@ subroutine flagserveractive() {
 
 	// flag that this dataset is being served ("listened") (needed for old MAC)
 	// does not seem to cause any filesharing errors (stress tested at max speed)
-	call oswrite("", inpath ^ serverflagfilename);
+	//call oswrite("", inpath ^ serverflagfilename);
+	if (not oswrite("", inpath ^ serverflagfilename))
+		abort(lasterror());
 
 	return;
 }
@@ -3028,7 +3078,9 @@ subroutine writelogxclose() {
 }
 
 subroutine writelogx2() {
-	call osbwrite(logx, logfile, logptr);
+	//call osbwrite(logx, logfile, logptr);
+	if (not osbwrite(logx, logfile, logptr))
+		abort(lasterror());
 	logx = "";
 	return;
 }
