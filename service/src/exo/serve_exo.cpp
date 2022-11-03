@@ -25,18 +25,54 @@ function main() {
 	// gen.currencies="currencies";
 	// gen.documents="documents";
 
-	createfile("VOC");
-	createfile("DICT.DEFINITIONS");
-	createfile("DEFINITIONS");
-	createfile("PROCESSES");
-	createfile("REQUESTLOG");
-	createfile("SYS_MESSAGES");
-	createfile("COMPANIES");
-	createfile("DOCUMENTS");
-	createfile("USERS");
-	createfile("LOCKS");
-	createfile("STATISTICS");
-	createfile("CHANGELOG");
+	//createfile("VOC");
+	//createfile("DICT.DEFINITIONS");
+	//createfile("DEFINITIONS");
+	//createfile("PROCESSES");
+	//createfile("REQUESTLOG");
+	//createfile("SYS_MESSAGES");
+	//createfile("COMPANIES");
+	//createfile("DOCUMENTS");
+	//createfile("USERS");
+	//createfile("LOCKS");
+	//createfile("STATISTICS");
+	//createfile("CHANGELOG");
+
+	if (not createfile("VOC"))
+		abort(lasterror());
+
+	if (not createfile("DICT.DEFINITIONS"))
+		abort(lasterror());
+
+	if (not createfile("DEFINITIONS"))
+		abort(lasterror());
+
+	if (not createfile("PROCESSES"))
+		abort(lasterror());
+
+	if (not createfile("REQUESTLOG"))
+		abort(lasterror());
+
+	if (not createfile("SYS_MESSAGES"))
+		abort(lasterror());
+
+	if (not createfile("COMPANIES"))
+		abort(lasterror());
+
+	if (not createfile("DOCUMENTS"))
+		abort(lasterror());
+
+	if (not createfile("USERS"))
+		abort(lasterror());
+
+	if (not createfile("LOCKS"))
+		abort(lasterror());
+
+	if (not createfile("STATISTICS"))
+		abort(lasterror());
+
+	if (not createfile("CHANGELOG"))
+		abort(lasterror());
 
 	SYSTEM(33) = "X";
 
@@ -73,13 +109,22 @@ function main() {
 		abort(datadir.quote() ^ " data directory does not exist");
 	var databasedir = datadir ^ databasecode;
 	if (osmkdir(databasedir)) {
-		osshell("chmod g+rws " ^ databasedir);
-		osshell("setfacl -d -m g::rw " ^ databasedir);
+		//osshell("chmod g+rws " ^ databasedir);
+		if (not osshell("chmod g+rws " ^ databasedir)) {
+			abort(lasterror());
+		}
+		//osshell("setfacl -d -m g::rw " ^ databasedir);
+		if (not osshell("setfacl -d -m g::rw " ^ databasedir)) {
+			abort(lasterror());
+		}
 	}
 
 	// ensure MARKETS file exists and has at least an ALL markets record
 	if (not open("MARKETS")) {
-		createfile("MARKETS");
+		//createfile("MARKETS");
+		if (not createfile("MARKETS")) {
+			abort(lasterror());
+		}
 	}
 	select("MARKETS");
 	if (hasnext())

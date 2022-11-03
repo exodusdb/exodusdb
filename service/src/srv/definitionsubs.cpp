@@ -448,48 +448,62 @@ preventupdate:
 
 				// write system and backup rec in dos
 			} else {
-				call oswrite(RECORD, ID.lcase());
-				call oswrite(backuprec, backupkey.lcase());
-				call oswrite(smtprec, smtpkey.lcase());
+				//call oswrite(RECORD, ID.lcase());
+				if (not oswrite(RECORD, ID.lcase()))
+					loglasterror();
+				//call oswrite(backuprec, backupkey.lcase());
+				if (not oswrite(backuprec, backupkey.lcase()))
+					loglasterror();
+				//call oswrite(smtprec, smtpkey.lcase());
+				if (not oswrite(smtprec, smtpkey.lcase()))
+					loglasterror();
 			}
-
-			// warning if backup drive does not exist/cannot be written to
-			var backupdrives = RECORD.f(77);
-			if (RECORD.f(82) ne RECORD.f(77)) {
-				backupdrives(-1) = RECORD.f(82);
-			}
-			for (const var driven : range(1, 999)) {
-				var drive = backupdrives.f(driven)[1];
-				// /BREAK;
-				if (not drive)
-					break;
-				// TODO replace with checkwritable()
-				drive ^= ":";
-				call osmkdir(drive ^ _OSSLASH "data.bak");
-				call shell2("dir " ^ drive.first(2), errors);
-				if (errors) {
-					call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
-				} else {
-					// tempfilename=lcase(drive:'\data.bak':'\':rnd(8))
-					var tempfilename = (drive ^
-										"/data.bak"
-										"/" ^
-										var(8).rnd())
-										   .lcase();
-					// if (VOLUMES) {
-					//	tempfilename ^= ".$$$";
-					//} else {
-						tempfilename ^= "./$";
-					//}
-					tempfilename.converter("/", OSSLASH);
-					var(date()).oswrite(tempfilename);
-					if (tt.osread(tempfilename)) {
-						tempfilename.osremove();
-					} else {
-						call note("Note: Cannot write to backup drive " ^ drive);
-					}
-				}
-			}  // driven;
+			//// Since exodus backups handled outside of service in bash scripts
+			//// warning if backup drive does not exist/cannot be written to
+			//var backupdrives = RECORD.f(77);
+			//if (RECORD.f(82) ne RECORD.f(77)) {
+			//	backupdrives(-1) = RECORD.f(82);
+			//}
+			//for (const var driven : range(1, 999)) {
+			//	var drive = backupdrives.f(driven)[1];
+			//	// /BREAK;
+			//	if (not drive)
+			//		break;
+			//	// TODO replace with checkwritable()
+			//	drive ^= ":";
+			//
+			//	//call osmkdir(drive ^ _OSSLASH "data.bak");
+			//	if (not osmkdir(drive ^ _OSSLASH "data.bak"))
+			//		abort(lasterror());
+			//
+			//	call shell2("dir " ^ drive.first(2), errors);
+			//
+			//	if (errors) {
+			//		call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
+			//	} else {
+			//		// tempfilename=lcase(drive:'\data.bak':'\':rnd(8))
+			//		var tempfilename = (drive ^
+			//							"/data.bak"
+			//							"/" ^
+			//							var(8).rnd())
+			//							   .lcase();
+			//		// if (VOLUMES) {
+			//		//	tempfilename ^= ".$$$";
+			//		//} else {
+			//			tempfilename ^= "./$";
+			//		//}
+			//		tempfilename.converter("/", OSSLASH);
+			//
+			//		//var(date()).oswrite(tempfilename);
+			//		//if (tt.osread(tempfilename)) {
+			//		//	tempfilename.osremove();
+			//		//} else {
+			//		//	call note("Note: Cannot write to backup drive " ^ drive);
+			//		//}
+			//		if (not date().oswrite(tempfilename))
+			//			abort("Note: Cannot write to backup drive " ^ drive);
+			//	}
+			//}  // driven;
 
 			// create/update ddns configuration if necessary
 			// actually only the ddns.cmd file really need be updated
@@ -527,13 +541,20 @@ preventupdate:
 
 		gosub postreadfix();
 
-		// trigger restart if necessary (is this really necessary now)
+		// Trigger restart if necessary (is this really necessary now)
+		// Processes restart if system.cfg date/time changes
 		// TODO make it only per database
 		if (USERNAME ne "EXODUS") {
 			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",", ID, xx)) {
-				// TODO prevent a write from system configuration file
-				call osread(tt, "system.cfg");
-				call oswrite(tt, "system.cfg");
+//				// TODO prevent a write from system configuration file
+//				//call osread(tt, "system.cfg");
+//				if (not osread(tt, "system.cfg"))
+//					abort(lasterror());
+//				//call oswrite(tt, "system.cfg");
+//				if (not oswrite(tt, "system.cfg"))
+//					loglasterror();
+				if (not osshell("touch system.cfg"))
+					abort(lasterror());
 			}
 		}
 
@@ -551,7 +572,9 @@ preventupdate:
 
 			// get from operating system
 			if (ID ne "SYSTEM") {
-				ID.osremove();
+				//ID.osremove();
+				if (ID.osfile() and not ID.osremove())
+					abort(lasterror());
 			}
 
 			return 0;
@@ -663,7 +686,9 @@ subroutine reorderdbs() {
 	newdbdir.replacer(_FM, _EOL);
 
 	if (newdbdir ne olddbdir) {
-		call oswrite(newdbdir, dbdirfilename);
+		//call oswrite(newdbdir, dbdirfilename);
+		if (not oswrite(newdbdir, dbdirfilename))
+			loglasterror();
 		// call sysmsg(newdbcodes,'List of databases reordered')
 	}
 	return;

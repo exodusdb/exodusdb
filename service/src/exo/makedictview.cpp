@@ -25,7 +25,10 @@ function main() {
 	sql.paster(1, "create or replace view " ^ viewname ^ " as \n");
 	sql ^= " order by key";
 
-	var().sqlexec("drop view " ^ viewname);
+	//var().sqlexec("drop view " ^ viewname);
+	if (not var().sqlexec("drop view " ^ viewname)) {
+		loglasterror();
+	}
 
 	printl(sql);
 	if (not var().sqlexec(sql))

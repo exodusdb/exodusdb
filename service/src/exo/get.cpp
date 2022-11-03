@@ -37,7 +37,10 @@ function main() {
 	SYSTEM(2)	= prnfile;
 
 	// redirect printed output to a dos file
-	call oswrite("", prnfile);
+	//call oswrite("", prnfile);
+	if (not oswrite("", prnfile)) {
+		abort(lasterror());
+	}
 
 	// check file has been prepared
 	if (not(prnfile.osfile())) {
@@ -75,14 +78,20 @@ function main() {
 	// fail if print file less than 2 characters long
 	if (filelen < 2) {
 nooutput:
-		dfs.osremove();
+		//dfs.osremove();
+		if (dfs.osfile() and not dfs.osremove()) {
+			abort(lasterror());
+		}
 		stop();
 	}
 
 	// fail if only spaces output
 	if (not SYSTEM.f(3)) {
 		var	 offset = 0;
-		call osbread(temp, prnfile, offset, 1024);
+		//call osbread(temp, prnfile, offset, 1024);
+		if (not osbread(temp, prnfile, offset, 1024)) {
+			abort(lasterror());
+		}
 		// convert \200d0a0c1a\ to '' in temp
 		temp.converter(var("200D0A0C1A").iconv("HEX2"), "");
 		if (temp == "") {
