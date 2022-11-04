@@ -22,8 +22,13 @@ function main() {
 	}
 
 	// Save edic history
-	if (not osdir(edic_hist_dir))
-		osmkdir(edic_hist_dir);
+	//if (not osdir(edic_hist_dir))
+	//	osmkdir(edic_hist_dir);
+	if (not osdir(edic_hist_dir)) {
+		if (not osmkdir(edic_hist_dir)) {
+			abort(lasterror());
+		}
+	}
 	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS on edic_hist))
 		printl("Cannot write to ", edic_hist);
 
@@ -261,7 +266,10 @@ function main() {
 			///////
 			if (verbose)
 				printl(editcmd);
-			osshell(editcmd);
+			//osshell(editcmd);
+			if (not osshell(editcmd)) {
+				abort(lasterror());
+			}
 
 // editexit:
 ////////////
@@ -273,15 +281,23 @@ function main() {
 			else {
 				//delete the skeleton
 				printl("File unchanged. Not saving.");
-				if (newfile)
-					osremove(filename);
+				//if (newfile)
+				//	osremove(filename);
+				if (newfile) {
+					if (osfile(filename) and not osremove(filename)) {
+						abort(lasterror());
+					}
+				}
 				//move to the next file
 				break;
 			}
 
 			//clear the screen (should be cls on win)
 			if (OSSLASH eq "/")
-				osshell("clear");
+				//osshell("clear");
+				if (not osshell("clear")) {
+					abort(lasterror());
+				}
 			//else
 			//	osshell("cls");
 
@@ -308,12 +324,18 @@ function main() {
 			//////////
 			if (verbose)
 				printl(compilecmd);
-			osshell(compilecmd);
+			//osshell(compilecmd);
+			if (not osshell(compilecmd)) {
+				abort(lasterror());
+			}
 
 			// If any errors then optionally loop back to edit again
 			var errors;
 			if (osread(errors, compileoutputfilename, "utf8")) {
-				osremove(compileoutputfilename);
+				//osremove(compileoutputfilename);
+				if (osfile(compileoutputfilename) and not osremove(compileoutputfilename)) {
+					abort(lasterror());
+				}
 				if (OSSLASH ne "/")
 					print(errors);
 
@@ -368,7 +390,10 @@ subroutine geteditor(out editor, out linenopattern) {
 	linenopattern = "$LINENO ";
 	if (not editor)
 		// get nano on linux possibly
-		editor.osgetenv("EDITOR");
+		//editor.osgetenv("EDITOR");
+		if (not editor.osgetenv("EDITOR")) {
+			//null
+		}
 
 	//TODO simplify this editor finding code
 

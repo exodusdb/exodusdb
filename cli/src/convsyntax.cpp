@@ -395,7 +395,9 @@ function main() {
 
 		// Update the source file
 		if (replaced && OPTIONS.contains("U"))
-			txt.oswrite(osfilename);
+			//txt.oswrite(osfilename);
+			if (not txt.oswrite(osfilename))
+				abort(lasterror());
 	}
 
 	return 0;
