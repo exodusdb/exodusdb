@@ -378,6 +378,8 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		//in c++ get from raw text string below
 		dataio = getvogonpoetry_sortjs();
 
+		gosub replace_literal_comparison_operators(dataio);
+
 		dataio.replacer(FM, "\n");
 		dataio.replacer(FM, "\n");
 
@@ -596,6 +598,8 @@ function getcss(io css, in version = "") {
 	}
 
 	css ^= getvogonpoetry_css(version);
+
+	gosub replace_literal_comparison_operators(css);
 
 	var thcolor = SYSTEM.f(46, 1);
 	var tdcolor = SYSTEM.f(46, 2);
@@ -1204,6 +1208,16 @@ var link;
 	}
 
 	return 0;
+}
+
+// In case refactoring c++ code mangles javascript code
+subroutine replace_literal_comparison_operators(io dataio) {
+	dataio.replacer(" eq ", " == ");
+	dataio.replacer(" ne ", " != ");
+	dataio.replacer(" lt ", " < ");
+	dataio.replacer(" le ", " <= ");
+	dataio.replacer(" gt ", " > ");
+	dataio.replacer(" ge ", " >= ");
 }
 
 libraryexit()

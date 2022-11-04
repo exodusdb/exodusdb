@@ -56,7 +56,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 			// 			} else {
 			// 				nn = n1;
 			// 			}
-			let nn = (n1 < n2) ? n2 : n1;
+			let nn = (n1 lt n2) ? n2 : n1;
 			for (const var fn : range(1, nn)) {
 				// lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
 				var lang1line = lang1.f(fn);

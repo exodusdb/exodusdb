@@ -852,7 +852,7 @@ performreport:
 			if (loguptodate) {
 				cmd ^= "  xAND WITH LOG_DATE BETWEEN " ^ (logfromdate.oconv("D4").quote()) ^ " AND " ^ (loguptodate.oconv("D4").quote());
 			} else {
-				cmd ^= "  xAND WITH " ^ datedict ^ " >= " ^ (logfromdate.oconv("D4").quote());
+				cmd ^= "  xAND WITH " ^ datedict ^ " GE " ^ (logfromdate.oconv("D4").quote());
 			}
 		}
 		if (logkey) {

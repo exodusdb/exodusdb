@@ -265,7 +265,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	params(3)	  = 60;
 	params(4)	  = "DOS";
 	params(5)	  = "sysmsg.$rr";
-	var exceedmsg = "SYSMSG email suppressed because > 60 in last 60 mins";
+	var exceedmsg = "SYSMSG email suppressed because more than 60 in last 60 mins";
 	// call roundrobin('ONEVENT',params,result,errormsg)
 	call roundrobin("ONEVENT", params, result, xx);
 	if (result) {

@@ -1338,7 +1338,7 @@ function request_init() {
 
 			}  // blockn;
 
-			// check max iodat size <= maxstrlen
+			// check max iodat size not greater than maxstrlen
 			if (lendata gt maxstrlen) {
 				data_ = "";
 				// response='Error: Maximum record size of ':maxstrlen '[XBYTES]':' exceeded in LISTEN'

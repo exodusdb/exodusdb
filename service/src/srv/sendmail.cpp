@@ -561,7 +561,7 @@ TRACE(offset)
 		tt = "\\";
 		bodyfilename.converter(tt, _OSSLASH);
 		bodyfilename.replacer("$", "\\$");
-		cmd ^= " < " ^ (bodyfilename.quote());
+		cmd ^= " " "<" " " ^ (bodyfilename.quote());
 	}
 
 	// printl();

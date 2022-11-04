@@ -878,13 +878,8 @@ function main(in mode) {
 		if (mode2 eq "TASKS") {
 			cmd ^= " TASKS LOCKS";
 		} else {
-			// cmd:=' LIMIT USER_EXPIRY_DATE < ':quote(date() 'D4')
-			// cmd:=' REMOVE_EXPIRED_USERS'
-			// cmd:=' ADD_GROUP_MARKS'
-			// cmd:=' REVERSE_MULTIVALUES'
 			cmd ^= " USER_CODE_HTML FULL_NAME EMAIL_ADDRESS";
 			cmd ^= " LAST_LOGIN_DATE_TIME LAST_LOGIN_LOCATION";
-			// cmd:=' PASSWORD_AGE USER_EXPIRY_DATE LAST_BROWSER KEYS'
 			cmd ^= " LAST_LOGIN_AGE PASSWORD_AGE LAST_OS LAST_BROWSER KEYS";
 		}
 		cmd ^= " HEADING " ^ (("LIST OF " ^ mode2 ^ "   'T'   Page 'PL'").quote());

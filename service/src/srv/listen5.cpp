@@ -272,11 +272,11 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		// and after the last patch date if any
 		// //////////////////////////////////////////////////////////////////////////
 		// 1. DATA\CLIENTX\NEOPATCH.1
-		//               > install in one EXODUS database
+		//               - install in one EXODUS database
 		// 2. DATA\NEOPATCH.1
-		//               > install in all active EXODUS databases in one installation
+		//               - install in all active EXODUS databases in one installation
 		// 3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
-		//               > install in all active EXODUS database and installations
+		//               - install in all active EXODUS database and installations
 		var patchcode = "NEOPATCH";
 		var patchdirs = "../DATA/" ^ SYSTEM.f(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
 		patchdirs.converter("/", OSSLASH);
@@ -674,25 +674,6 @@ getvalues:
 	} else if (request1 eq "LISTLOCKS") {
 
 		gosub getdostime();
-
-		/*;
-
-			msg='';
-
-			filename='LOCKS';
-			// sortselect='BY DATETIME_EXPIRES'
-			sortselect='BY USER';
-			sortselect:=' WITH DATETIME_EXPIRES >= ':dostime;
-			dictids='USER STATION FILENAME KEY';
-			options='';
-			msg='';
-
-			call select2(filename,'',sortselect,dictids,options,select2data,select2response,'','','');
-
-			// abort to net program which will clear the lists file
-			if msg then stop;
-
-		*/
 
 		if (not(openfile("LOCKS", locks))) {
 			call mssg("LISTEN2 CANNOT OPEN LOCKS FILE");

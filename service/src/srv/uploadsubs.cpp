@@ -170,14 +170,14 @@ postuploadfail:
 			// remove doubled up separators - \\ on winddows or // on linux
 			fullsubfolder.replacer(_OSSLASH _OSSLASH, OSSLASH);
 			// osopen fullsubfolder to xx else if status() ne 2 then
-			// cannot use dos 8 characters since keys can be > 8 characters
+			// cannot use dos 8 characters since keys can be more than 8 characters
 			call shell2("dir " ^ fullsubfolder, errors);
 			if (errors) {
 
 				// call shell('md ':uploadroot:subfolder)
 				// call mkdir(fullsubfolder:char(0),xx)
 				// call mkdir2(fullsubfolder)
-				// cannot use dos 8 characters since keys can be > 8 characters
+				// cannot use dos 8 characters since keys can be more than 8 characters
 				// actually mkdir2 calls md so it is the same thing
 				call shell2("mkdir " ^ fullsubfolder, errors);
 
