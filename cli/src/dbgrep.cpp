@@ -45,7 +45,10 @@ function main() {
 			continue;
 		}
 
-		file.select("SELECT " ^ filename ^ " (SR)");
+		//file.select("SELECT " ^ filename ^ " (SR)");
+		if (not file.select("SELECT " ^ filename ^ " (SR)")) {
+			loglasterror();
+		}
 
 		var nresults = 1;
 		while (file.readnext(RECORD, ID, MV)) {

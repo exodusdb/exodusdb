@@ -79,7 +79,10 @@ function main() {
 		temposfilename ^= ".sql";
 	else
 		temposfilename ^= ".tmp";
-	oswrite(text, temposfilename);
+	//oswrite(text, temposfilename);
+	if (not oswrite(text, temposfilename)) {
+		abort(lasterror());
+	}
 
 	//record file update timedate
 	var fileinfo = osfile(temposfilename);

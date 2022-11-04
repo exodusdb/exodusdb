@@ -87,7 +87,9 @@ function main() {
 		if (newcpp ne oldcpp) {
 			printt(osfilename, "");
 			if (OPTIONS.contains("U")) {
-				oswrite(newcpp on osfilename);
+				//oswrite(newcpp on osfilename);
+				if (not oswrite(newcpp on osfilename))
+					abort(lasterror());
 				printl(" updated");
 			} else {
 				//newcpp.output();
