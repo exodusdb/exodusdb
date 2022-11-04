@@ -255,24 +255,35 @@ function main() {
 
 		// source database services will be stopped for source to target database copy
 		// reject source db if same as current database.
-		var currentdbcode = SYSTEM(17);
+		var currentdbcode = SYSTEM.f(17);
 		if (sourcedbcode eq currentdbcode) {
-			return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
+			//return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
+			abort("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
 		}
 
 		// check source database exists
 		if (not locateusing(_FM, sourcedbcode, dbcodes)) {
-			return invalid("Source database doesn't exists.");
+			//return invalid("Source database doesn't exists.");
+			abort(sourcedbcode ^ " is not in list of databases");
 		}
 
-		// check new database and data dir dont already exist
+		// verify new database doesnt already exist
 		if (locateusing(_FM, targetdbcode, dbcodes)) {
-			return invalid("Sorry, " ^ targetdbcode.quote() ^ " already exists");
+			//return invalid("Sorry, " ^ targetdbcode.quote() ^ " already exists");
+			abort(targetdbcode ^ " already exists in list of databases");
 		}
 
-		// stop source live service
-		if (not osshell("systemctl stop agy_live@" ^ sourcedbcode)) {
-			return invalid("Cannot stop " ^ sourcedbcode ^ "'s service");
+		// determine whether source db live or test service needs stopping
+		var liveortest = "live";
+		var srcservicecode = sourcedbcode;
+		if (srcservicecode.regex_replacer("_test$", ""))
+			liveortest = "test";
+
+		// stop source db live/test service
+		//if (not osshell("systemctl stop agy_live@" ^ sourcedbcode)) {
+		if (not osshell("service agy_" ^ liveortest ^ "@" ^ srcservicecode ^ " stop")) {
+			//return invalid("Cannot stop " ^ sourcedbcode ^ "'s service");
+			abort(lasterror());
 		}
 
 		// Copy source db to target db
@@ -284,40 +295,51 @@ function main() {
 		//if (not locateusing(_FM, targetdbcode, newdbcodes)) {
 		//	return invalid(targetdbname ^ targetdbcode.quote() ^ " not created");
 		//}
+		//if (not osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode)) {
+		//	return invalid("Failed to create new database: " ^ targetdbcode.quote() ^ " - " ^ targetdbname);
+		//}
+		if (not osshell("XXXdbcopy " ^ sourcedbcode ^ " " ^ targetdbcode)) {
+			//lasterror() sent to user only after source service started again
+			var dbcopyfailmsg = lasterror();
 
-		if (not osshell("dbcopy " ^ sourcedbcode ^ " " ^ targetdbcode)) {
-			return invalid("Failed to create new database: " ^ targetdbcode.quote() ^ " - " ^ targetdbname);
+			// ensure source service started before aborting dbcopy error
+			if (not osshell("service XXXagy_" ^ liveortest ^ "@" ^ srcservicecode ^ " start")) {
+				abort(dbcopyfailmsg ^ "\n" ^ lasterror());
+			}
+
+			abort(dbcopyfailmsg);
 		}
 
 		// start source live service
 		//osshell("systemctl start agy_live@" ^ sourcedbcode);
-		if (not osshell("systemctl start agy_live@" ^ sourcedbcode))
-			return invalid("Failed to start source database " ^ sourcedbcode.quote() ^ " services");
+		//if (not osshell("systemctl start agy_live@" ^ sourcedbcode))
+		if (not osshell("service agy_" ^ liveortest ^ "@" ^ srcservicecode ^ " start")) {
+			//return invalid("Failed to start source database " ^ sourcedbcode.quote() ^ " services");
+			abort(lasterror());
+		}
 
-		// create target data dir
+		// Setup target database data dir.
+		// Target image dir created automatically on first upload
 		// oscopy(sourcedatadir, targetdatadir);
 		// KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
 		//osshell("mkdir -p " ^ targetdatadir);
 		//osshell("chmod a+srw " ^ targetdatadir);
 		//osshell("setfacl -d -m g::rw " ^ targetdatadir);
 		if (not osshell("mkdir -p " ^ targetdatadir))
-			return invalid(lasterror());
-
+			//return invalid(lasterror());
+			abort(lasterror());
 		if (not osshell("chmod a+srw " ^ targetdatadir))
-			return invalid(lasterror());
-
+			//return invalid(lasterror());
+			abort(lasterror());
 		if (not osshell("setfacl -d -m g::rw " ^ targetdatadir))
-			return invalid(lasterror());
+			//return invalid(lasterror());
+			abort(lasterror());
 
-		if (not osdir(targetdatadir)) {
-			return invalid("Error in creating target data directory");
-		}
-
-		// skip - target image dir on first upload
+        // TODO create service - skip ptcy auto creates services
 
 		// update database name file
 		if (not oswrite(targetdbname, "../data/" ^ targetdbcode ^ "/name")) {
-			return invalid("Cannot update database file name");
+			abort(lasterror());
 		}
 
 		// email confirmaion
