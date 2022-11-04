@@ -8,6 +8,14 @@ programinit()
 
 	function main() {
 
+	{
+		// first
+		assert(regex_replace("aaa bbb ccc", "b", "Q", "f") eq "aaa Qbb ccc");
+
+		// all
+		assert(regex_replace("aaa bbb ccc", "b", "Q") eq "aaa QQQ ccc");
+	}
+
 	//match returning what it finds
 
 	//groups

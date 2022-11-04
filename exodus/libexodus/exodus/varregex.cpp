@@ -312,10 +312,10 @@ var var::match(SV matchstr, SV options) const {
 #else
 	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex);
 #endif
+
+	// Using declarative functional style "for_each with lambda" instead of "while (iter!=end)" loop
 	decltype(iter) end{};
 	std::for_each(iter, end,
-		// using declarative functional style "for_each with lambda" instead of old
-		// fashioned "while (iter!=end)" loop
 		[&found](auto what) {
 		  for (int groupn = 0; uint(groupn) <= what.size(); ++groupn) {
 			  // std::cout<< what[0] << std::endl;
@@ -408,6 +408,14 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 	std::ostringstream oss1(std::ios::out | std::ios::binary);
 	std::ostream_iterator<char, char> oiter(oss1);
 
+	auto match_flags = std_boost::match_flag_type(boost::match_default);
+	// Option f = first only, otherwise all
+	//c++23 if (options.contains("f"))
+	if (options.find("f") != std::string::npos)
+		match_flags |= boost::format_first_only;
+	else
+		match_flags |= boost::format_all;
+
 	// Generate output
 	try {
 		std_boost::u32regex_replace(
@@ -416,7 +424,8 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 			var_str.end(),
 			regex,
 			std::string(replacementstr),
-			boost::match_default | boost::format_all
+			//boost::match_default | boost::format_all
+			match_flags
 		);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
 		var errmsg = "Error: (3) Invalid data or replacement during regex replace of " ^ var(regexstr).quote() ^ " with " ^ var(replacementstr).quote() ^ ". " ^ var(e.what());
