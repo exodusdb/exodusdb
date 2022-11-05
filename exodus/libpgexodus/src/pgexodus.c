@@ -1,3 +1,12 @@
+
+// Make sure PG MAGIC BLOCK is present in the .so file
+//
+//  nm pgexodus.so|grep "T Pg_magic_func"
+//
+// Otherwise when trying to load functions:
+//
+//  ERROR:  incompatible library "/usr/lib/postgresql/12/lib/pgexodus.so": missing magic block
+
 /*
 severely hacked to get around problem building in VS2005
 http://www.mail-archive.com/pgsql-general@postgresql.org/msg116145.html
@@ -100,6 +109,7 @@ extern "C"
 
 #include "postgres.h"
 #include "fmgr.h"
+
 /*#include "utils/geo_decls.h"*/
 #include <utils/timestamp.h> //for PG_RETURN_TIMESTAMP
 #include <utils/date.h> //for PG_RETURN_TIME_ADT
@@ -277,7 +287,7 @@ pgexodus.c:462: warning: 'input' may be used uninitialized in this function
 		fieldno = PG_GETARG_INT32(1);\
 		valueno = PG_GETARG_INT32(2);\
 		subvalueno = PG_GETARG_INT32(3);\
-		extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);\
+		extract(VARDATA(input), (int)VARSIZE(input)-VARHDRSZ, (int)fieldno, (int)valueno, (int)subvalueno, &outstart, &outlen);\
 	}\
 
 //extern "C" {
@@ -308,7 +318,7 @@ exodus_count(PG_FUNCTION_ARGS)
 	text *arg2 = PG_GETARG_TEXT_P(1);
 
 	char* instring=VARDATA(arg1);
-	int nn=VARSIZE(arg1);
+	int nn=(int)VARSIZE(arg1);
 
 	//only count the 1st char of the sep at the moment
 	int sepchar=*VARDATA(arg2);
@@ -322,213 +332,213 @@ exodus_count(PG_FUNCTION_ARGS)
 	PG_RETURN_INT32(count);
 }
 
-PG_FUNCTION_INFO_V1(exodus_call);
-
-Datum
-exodus_call(PG_FUNCTION_ARGS)
-{
-
-#define MAXREPLYBYTES 1048576
-
-	//get a pointer to the first parameter (0)
-	text *serverid = PG_GETARG_BYTEA_P(0);
-	text *tablename = PG_GETARG_TEXT_P(1);
-	text *dictkey = PG_GETARG_TEXT_P(2);
-	text *datakey = PG_GETARG_TEXT_P(3);
-	text *data = PG_GETARG_TEXT_P(4);
-	int32 valueno = PG_GETARG_INT32(5);
-	int32 subvalueno = PG_GETARG_INT32(6);
-
-	char* prequest;
-	char* appendpoint;
-	int32** lengthpoint;
-	char serverid2[4096];
-	char* presponse;
-	int32 nresponsebytes;
-	text* output;
-
-	/////////////////////
-	//DONT CALL ANYTHING!
-	/////////////////////
-	nresponsebytes=0;
-	output = (text*) palloc(VARHDRSZ+nresponsebytes+4);
-	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
-	PG_RETURN_TEXT_P(output);
-/*
-	//calculate length of pipe data
-	//total length
-	int32 nrequestbytes=sizeof(int32);
-	//length and tablename
-	nrequestbytes+=sizeof(int32)+VARSIZE(tablename)-VARHDRSZ;
-	//length and dictkey
-	nrequestbytes+=sizeof(int32)+VARSIZE(dictkey)-VARHDRSZ;
-	//length and datakey
-	nrequestbytes+=sizeof(int32)+VARSIZE(datakey)-VARHDRSZ;
-	//length and data
-	nrequestbytes+=sizeof(int32)+VARSIZE(data)-VARHDRSZ;
-	//valueno and subvalueno
-	nrequestbytes+=sizeof(int32)*2;
-
-	//acquire space for pipedata
-	prequest=(char*) palloc(nrequestbytes);
-	//TODO: check if successful
-//	delete prequest;
-
-	//start appending at beginning
-	appendpoint=prequest;
-
-	//pointer to enable saving of an integer (will track appendpoint)
-	lengthpoint=(int32**)&appendpoint;
-
-	//length of whole thing
-	**lengthpoint=nrequestbytes;
-	appendpoint+=sizeof(int32);
-//?	*lengthpoint++;
-
-	//length of tablename
-	// *appendpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
-	**lengthpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
-	appendpoint+=sizeof(int32);
-
-	//tablename
-	memcpy((void *) (appendpoint)	// destination
-		   ,(void *) VARDATA(tablename)	// starting from
-		   ,VARSIZE(tablename)-VARHDRSZ	// how many bytes
-		   );
-	appendpoint+=VARSIZE(tablename)-VARHDRSZ;
-
-	//length of dictkey
-	// *appendpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
-	**lengthpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
-	appendpoint+=sizeof(int32);
-
-	//dictkey
-	memcpy((void *) (appendpoint)	// destination
-		   ,(void *) VARDATA(dictkey)	// starting from
-		   ,VARSIZE(dictkey)-VARHDRSZ	// how many bytes
-		   );
-	appendpoint+=VARSIZE(dictkey)-VARHDRSZ;
-
-	//length of datakey
-	// *appendpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
-	**lengthpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
-	appendpoint+=sizeof(int32);
-
-	//datakey
-	memcpy((void *) (appendpoint)	// destination
-			,(void *) VARDATA(datakey)	// starting from
-			,VARSIZE(datakey)-VARHDRSZ	// how many bytes
-			);
-	appendpoint+=VARSIZE(datakey)-VARHDRSZ;
-
-	//length of data
-	// *appendpoint=(int32)(VARSIZE(data)-VARHDRSZ);
-	**lengthpoint=(int32)(VARSIZE(data)-VARHDRSZ);
-	appendpoint+=sizeof(int32);
-
-	//data
-	memcpy((void *) (appendpoint)	// destination
-		   ,(void *) VARDATA(data)	// starting from
-		   ,VARSIZE(data)-VARHDRSZ	// how many bytes
-		   );
-	appendpoint+=VARSIZE(data)-VARHDRSZ;
-
-	//value number
-	// *appendpoint=(int32)(valueno);
-	**lengthpoint=(int32)(valueno);
-	appendpoint+=sizeof(int32);
-
-	//subvalue number
-	// *appendpoint=(int32)(subvalueno);
-	**lengthpoint=(int32)(subvalueno);
-	appendpoint+=sizeof(int32);
-
-	//failsafe check is correct total length
-	if (appendpoint-prequest-nrequestbytes)
-	{
-		pfree(prequest);
-		elog(ERROR, "pgexodus exodus_call: Incorrect request structure.");
-		PG_RETURN_NULL();
-	}
-
-	//convert serverid to cstr
-	memset(serverid2,0,4096);
-	memcpy((void *) (serverid2)	// destination
-		   ,(void *) VARDATA(serverid)	// starting from
-		   ,VARSIZE(serverid)-VARHDRSZ	// how many bytes
-		   );
-
-	//allocate space for reply
-	presponse = (char*) palloc(MAXREPLYBYTES);
-
-	////elog(WARNING, "exodus_call: callexodus()");
-	if (!callexodus(serverid2, prequest, nrequestbytes, presponse, &nresponsebytes))
-	{
-		//convert tablename to cstr
-		char tablename2[4096];
-		memset(tablename2,0,4096);
-		memcpy((void *) (tablename2)	// destination
-		   ,(void *) VARDATA(tablename)	// starting from
-		   ,VARSIZE(tablename)-VARHDRSZ	// how many bytes
-		   );
-		//elog(ERROR, "pgexodus tablename '%s'", tablename2);
-
-		//convert dictkey to cstr
-		char dictkey2[4096];
-		memset(dictkey2,0,4096);
-		memcpy((void *) (dictkey2)	// destination
-		   ,(void *) VARDATA(dictkey)	// starting from
-		   ,VARSIZE(dictkey)-VARHDRSZ	// how many bytes
-		   );
-		//elog(ERROR, "pgexodus dictkey '%s'", dictkey2);
-
-		//convert datakey to cstr
-		char datakey2[4096];
-		memset(datakey2,0,4096);
-		memcpy((void *) (datakey2)	// destination
-		   ,(void *) VARDATA(datakey)	// starting from
-		   ,VARSIZE(datakey)-VARHDRSZ	// how many bytes
-		   );
-		//elog(ERROR, "pgexodus dictkey '%s'", dictkey2);
-
-		//elog(ERROR, "pgexodus exodus_call: Failed with %s ", presponse);
-
-		//SHOULD NOT BE COMMENTED OUT!
-		//but getting a very mysterious error when writing NEW client records:
-		//file=dict_clients dictid=sequence id=Z response=Cannot connect to /tmp/exodusservice......
-		elog(ERROR, "pgexodus exodus_call failed. file=%s dictid=%s id=%s response=%s", tablename2,dictkey2,datakey2,presponse);
-
-		pfree(prequest);
-		pfree(presponse);
-		PG_RETURN_NULL();
-	}
-
-	//extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
-
-	//elog(WARNING, "exodus_call: palloc'ing");
-	//prepare a new output
-	output = (text*) palloc(VARHDRSZ+nresponsebytes+4);
-
-	//set the complete size of the output
-	//elog(WARNING, "exodus_call: initialising palloc'ed structure");
-	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
-
-	//copy the input to the output
-	//elog(WARNING, "exodus_call: copying response to palloc'ed");
-	memcpy((void *) VARDATA(output),	// destination
-//		(void *) (int)(presponse),	// starting from
-		(void *) (presponse),		// starting from
-		nresponsebytes);		// how many bytes
-
-
-	//elog(WARNING, "exodus_call: freeing temp data");
-	pfree(prequest);
-	pfree(presponse);
-
-	//elog(WARNING, "exodus_call: returning response");
-	PG_RETURN_TEXT_P(output);
-*/
-};
+//PG_FUNCTION_INFO_V1(exodus_call);
+//
+//Datum
+//exodus_call(PG_FUNCTION_ARGS)
+//{
+//
+//#define MAXREPLYBYTES 1048576
+//
+//	//get a pointer to the first parameter (0)
+//	text *serverid = PG_GETARG_BYTEA_P(0);
+//	text *tablename = PG_GETARG_TEXT_P(1);
+//	text *dictkey = PG_GETARG_TEXT_P(2);
+//	text *datakey = PG_GETARG_TEXT_P(3);
+//	text *data = PG_GETARG_TEXT_P(4);
+//	int32 valueno = PG_GETARG_INT32(5);
+//	int32 subvalueno = PG_GETARG_INT32(6);
+//
+//	char* prequest;
+//	char* appendpoint;
+//	int32** lengthpoint;
+//	char serverid2[4096];
+//	char* presponse;
+//	int32 nresponsebytes;
+//	//text* output;
+//
+//	/////////////////////
+//	//DONT CALL ANYTHING!
+//	/////////////////////
+//	nresponsebytes=0;
+//	output = (text*) palloc((VARHDRSZ+(size_t)nresponsebytes+4);
+//	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
+//	PG_RETURN_TEXT_P(output);
+///*
+//	//calculate length of pipe data
+//	//total length
+//	int32 nrequestbytes=sizeof(int32);
+//	//length and tablename
+//	nrequestbytes+=sizeof(int32)+VARSIZE(tablename)-VARHDRSZ;
+//	//length and dictkey
+//	nrequestbytes+=sizeof(int32)+VARSIZE(dictkey)-VARHDRSZ;
+//	//length and datakey
+//	nrequestbytes+=sizeof(int32)+VARSIZE(datakey)-VARHDRSZ;
+//	//length and data
+//	nrequestbytes+=sizeof(int32)+VARSIZE(data)-VARHDRSZ;
+//	//valueno and subvalueno
+//	nrequestbytes+=sizeof(int32)*2;
+//
+//	//acquire space for pipedata
+//	prequest=(char*) palloc(nrequestbytes);
+//	//TODO: check if successful
+////	delete prequest;
+//
+//	//start appending at beginning
+//	appendpoint=prequest;
+//
+//	//pointer to enable saving of an integer (will track appendpoint)
+//	lengthpoint=(int32**)&appendpoint;
+//
+//	//length of whole thing
+//	**lengthpoint=nrequestbytes;
+//	appendpoint+=sizeof(int32);
+////?	*lengthpoint++;
+//
+//	//length of tablename
+//	// *appendpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
+//	**lengthpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
+//	appendpoint+=sizeof(int32);
+//
+//	//tablename
+//	memcpy((void *) (appendpoint)	// destination
+//		   ,(void *) VARDATA(tablename)	// starting from
+//		   ,VARSIZE(tablename)-VARHDRSZ	// how many bytes
+//		   );
+//	appendpoint+=VARSIZE(tablename)-VARHDRSZ;
+//
+//	//length of dictkey
+//	// *appendpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
+//	**lengthpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
+//	appendpoint+=sizeof(int32);
+//
+//	//dictkey
+//	memcpy((void *) (appendpoint)	// destination
+//		   ,(void *) VARDATA(dictkey)	// starting from
+//		   ,VARSIZE(dictkey)-VARHDRSZ	// how many bytes
+//		   );
+//	appendpoint+=VARSIZE(dictkey)-VARHDRSZ;
+//
+//	//length of datakey
+//	// *appendpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
+//	**lengthpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
+//	appendpoint+=sizeof(int32);
+//
+//	//datakey
+//	memcpy((void *) (appendpoint)	// destination
+//			,(void *) VARDATA(datakey)	// starting from
+//			,VARSIZE(datakey)-VARHDRSZ	// how many bytes
+//			);
+//	appendpoint+=VARSIZE(datakey)-VARHDRSZ;
+//
+//	//length of data
+//	// *appendpoint=(int32)(VARSIZE(data)-VARHDRSZ);
+//	**lengthpoint=(int32)(VARSIZE(data)-VARHDRSZ);
+//	appendpoint+=sizeof(int32);
+//
+//	//data
+//	memcpy((void *) (appendpoint)	// destination
+//		   ,(void *) VARDATA(data)	// starting from
+//		   ,VARSIZE(data)-VARHDRSZ	// how many bytes
+//		   );
+//	appendpoint+=VARSIZE(data)-VARHDRSZ;
+//
+//	//value number
+//	// *appendpoint=(int32)(valueno);
+//	**lengthpoint=(int32)(valueno);
+//	appendpoint+=sizeof(int32);
+//
+//	//subvalue number
+//	// *appendpoint=(int32)(subvalueno);
+//	**lengthpoint=(int32)(subvalueno);
+//	appendpoint+=sizeof(int32);
+//
+//	//failsafe check is correct total length
+//	if (appendpoint-prequest-nrequestbytes)
+//	{
+//		pfree(prequest);
+//		elog(ERROR, "pgexodus exodus_call: Incorrect request structure.");
+//		PG_RETURN_NULL();
+//	}
+//
+//	//convert serverid to cstr
+//	memset(serverid2,0,4096);
+//	memcpy((void *) (serverid2)	// destination
+//		   ,(void *) VARDATA(serverid)	// starting from
+//		   ,VARSIZE(serverid)-VARHDRSZ	// how many bytes
+//		   );
+//
+//	//allocate space for reply
+//	presponse = (char*) palloc(MAXREPLYBYTES);
+//
+//	////elog(WARNING, "exodus_call: callexodus()");
+//	if (!callexodus(serverid2, prequest, nrequestbytes, presponse, &nresponsebytes))
+//	{
+//		//convert tablename to cstr
+//		char tablename2[4096];
+//		memset(tablename2,0,4096);
+//		memcpy((void *) (tablename2)	// destination
+//		   ,(void *) VARDATA(tablename)	// starting from
+//		   ,VARSIZE(tablename)-VARHDRSZ	// how many bytes
+//		   );
+//		//elog(ERROR, "pgexodus tablename '%s'", tablename2);
+//
+//		//convert dictkey to cstr
+//		char dictkey2[4096];
+//		memset(dictkey2,0,4096);
+//		memcpy((void *) (dictkey2)	// destination
+//		   ,(void *) VARDATA(dictkey)	// starting from
+//		   ,VARSIZE(dictkey)-VARHDRSZ	// how many bytes
+//		   );
+//		//elog(ERROR, "pgexodus dictkey '%s'", dictkey2);
+//
+//		//convert datakey to cstr
+//		char datakey2[4096];
+//		memset(datakey2,0,4096);
+//		memcpy((void *) (datakey2)	// destination
+//		   ,(void *) VARDATA(datakey)	// starting from
+//		   ,VARSIZE(datakey)-VARHDRSZ	// how many bytes
+//		   );
+//		//elog(ERROR, "pgexodus dictkey '%s'", dictkey2);
+//
+//		//elog(ERROR, "pgexodus exodus_call: Failed with %s ", presponse);
+//
+//		//SHOULD NOT BE COMMENTED OUT!
+//		//but getting a very mysterious error when writing NEW client records:
+//		//file=dict_clients dictid=sequence id=Z response=Cannot connect to /tmp/exodusservice......
+//		elog(ERROR, "pgexodus exodus_call failed. file=%s dictid=%s id=%s response=%s", tablename2,dictkey2,datakey2,presponse);
+//
+//		pfree(prequest);
+//		pfree(presponse);
+//		PG_RETURN_NULL();
+//	}
+//
+//	//extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
+//
+//	//elog(WARNING, "exodus_call: palloc'ing");
+//	//prepare a new output
+//	output = (text*) palloc(VARHDRSZ+nresponsebytes+4);
+//
+//	//set the complete size of the output
+//	//elog(WARNING, "exodus_call: initialising palloc'ed structure");
+//	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
+//
+//	//copy the input to the output
+//	//elog(WARNING, "exodus_call: copying response to palloc'ed");
+//	memcpy((void *) VARDATA(output),	// destination
+////		(void *) (int)(presponse),	// starting from
+//		(void *) (presponse),		// starting from
+//		nresponsebytes);		// how many bytes
+//
+//
+//	//elog(WARNING, "exodus_call: freeing temp data");
+//	pfree(prequest);
+//	pfree(presponse);
+//
+//	//elog(WARNING, "exodus_call: returning response");
+//	PG_RETURN_TEXT_P(output);
+//*/
+//};
 
 PG_FUNCTION_INFO_V1(exodus_extract_bytea);
 
@@ -557,21 +567,21 @@ exodus_extract_bytea(PG_FUNCTION_ARGS)
 
 	subvalueno = PG_GETARG_INT32(3);
 
-	extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
+	extract(VARDATA(input), (int)VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
 
 
 	//prepare a new output
 	//bytea	   *output = (bytea *) palloc(VARSIZE(input));
-	output = (bytea *) palloc(VARHDRSZ+outlen);
+	output = (bytea *) palloc(VARHDRSZ+(size_t)outlen);
 
 	//set the complete size of the output
 	SET_VARSIZE(output,VARSIZE(input));
-	SET_VARSIZE(output,VARHDRSZ+outlen);
+	SET_VARSIZE(output,VARHDRSZ+(size_t)outlen);
 
 	//copy the input to the output
 	memcpy((void *) VARDATA(output),			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 
 	PG_RETURN_BYTEA_P(output);
 
@@ -610,16 +620,16 @@ exodus_extract_text(PG_FUNCTION_ARGS)
 //PG_RETURN_NULL();
 	//prepare a new output
 	//text	   *output = (text *) palloc(VARSIZE(input));
-	output = (text *) palloc(VARHDRSZ+outlen);
+	output = (text *) palloc(VARHDRSZ+(size_t)outlen);
 
 	//set the complete size of the output
 	//SET_VARSIZE(output,VARSIZE(input));
-	SET_VARSIZE(output,VARHDRSZ+outlen);
+	SET_VARSIZE(output,VARHDRSZ+(size_t)outlen);
 
 	//copy the input to the output
 	memcpy((void *) VARDATA(output),			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 
 	PG_RETURN_TEXT_P(output);
 
@@ -645,16 +655,16 @@ exodus_extract_text2(PG_FUNCTION_ARGS)
 
 	//prepare a new output
 	//text	   *output = (text *) palloc(VARSIZE(input));
-	output = (text *) palloc(VARHDRSZ+outlen);
+	output = (text *) palloc(VARHDRSZ+(size_t)outlen);
 
 	//set the complete size of the output
 	SET_VARSIZE(output,VARSIZE(input));
-	SET_VARSIZE(output,VARHDRSZ+outlen);
+	SET_VARSIZE(output,VARHDRSZ+(size_t)outlen);
 
 	//copy the input to the output
 	memcpy((void *) VARDATA(output),			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 
 	PG_RETURN_TEXT_P(output);
 
@@ -694,7 +704,7 @@ exodus_extract_date(PG_FUNCTION_ARGS)
 
 	memcpy(intstr,			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 	intstr[outlen]='\0';
 
 	//convert the c str to an int
@@ -742,7 +752,7 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 	intstr[20]='\0';
 	memcpy(intstr,			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 	intstr[outlen]='\0';
 
 	//convert the c str to an int
@@ -802,7 +812,7 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 
 	memcpy(intstr,			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 	intstr[outlen]='\0';
 
 	//convert the c str to an int
@@ -850,7 +860,7 @@ exodus_extract_datetime(PG_FUNCTION_ARGS)
 	datetimestr[20]='\0';
 	memcpy(datetimestr,			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 	datetimestr[outlen]='\0';
 
 	//convert the c str to an double
@@ -896,7 +906,7 @@ exodus_extract_number(PG_FUNCTION_ARGS)
 	doublestr[20]='\0';
 	memcpy(doublestr,			// destination
 		   (void *) (VARDATA(input)+outstart),	// starting from
-		   outlen);						// how many bytes
+		   (size_t)outlen);						// how many bytes
 	doublestr[outlen]='\0';
 
 	//convert the c str to an double
@@ -970,19 +980,19 @@ allocandcopy:
 	++nextrachars;
 	++nextrachars;
 
-	output = (text *) palloc(VARHDRSZ+outlen+nextrachars);
+	output = (text *) palloc(VARHDRSZ+(size_t)outlen+nextrachars);
 
 	//set the complete size of the output
 	//SET_VARSIZE(output,VARSIZE(input));
-	SET_VARSIZE(output,VARHDRSZ+outlen+nextrachars);
+	SET_VARSIZE(output,VARHDRSZ+(size_t)outlen+nextrachars);
 
 	//get a pointer to the last character of the output buffer
-	outputiter=(VARDATA(output)+outlen+nextrachars);
+	outputiter=(VARDATA(output)+(size_t)outlen+nextrachars);
 
 	//copy the input to the output
 	//memcpy((void *) VARDATA(output),			// destination
 	//	   (void *) (VARDATA(input)+outstart),	// starting from
-	//	   outlen);						// how many bytes
+	//	   (size_t)outlen);						// how many bytes
 
 	//walk backwards looking for whole numbers (before the decimal point)
 	//and prefix nn before them depending on the number of digits.
@@ -990,7 +1000,7 @@ allocandcopy:
 	//copy the input to the output
 	//memcpy((void *) VARDATA(output),			// destination
 	//	   (void *) (VARDATA(input)+outstart),	// starting from
-	//	   outlen);						// how many bytes
+	//	   (size_t)outlen);						// how many bytes
 
 	inputiter=VARDATA(input)+outstart+outlen;
 	//one byte before the first input character
