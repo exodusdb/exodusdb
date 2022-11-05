@@ -49,6 +49,7 @@ function main() {
 ////////////
 
 	var filen = 0;
+	var startatlineno = 0;
 	while (filen < nfiles) {
 		filen += 1;
 		var filename = filenames.f(filen).unquote();
@@ -56,13 +57,18 @@ function main() {
 		if (not filename.len())
 			continue;
 
+		if (filename.starts("+") and filename.cut(1).isnum()) {
+			startatlineno = filename.cut(1);
+			continue;
+		}
+
 ////////////
 // fileinit:
 ////////////
 
 		// Split out trailing line number after :
 		// common compiler/linter error reporting like 'somefile.cpp:21:33'
-		var startatlineno = field(filename, ":", 2);
+		startatlineno = field(filename, ":", 2);
 		if (startatlineno.isnum())
 			filename = field(filename, ":", 1);
 		else
