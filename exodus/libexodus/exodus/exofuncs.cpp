@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 namespace exodus {
 
-ND PUBLIC var osgetenv(CVR envcode DEFAULT_EMPTY) {var envvalue = ""; envvalue.osgetenv(envcode); return envvalue;}
+ND PUBLIC var osgetenv(CVR envcode DEFAULT_EMPTY) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {}; return envvalue;}
 ND PUBLIC bool osgetenv(CVR code, VARREF value) {return value.osgetenv(code);}
 PUBLIC void ossetenv(CVR code, CVR value) {return value.ossetenv(code);}
 
@@ -121,7 +121,7 @@ ND PUBLIC var ostid() {return var().ostid();}
 ND PUBLIC bool osshell(CVR command) {return command.osshell();}
 ND PUBLIC bool osshellwrite(CVR writestr, CVR command) {return writestr.osshellwrite(command);}
 ND PUBLIC bool osshellread(VARREF readstr, CVR command) {return readstr.osshellread(command);}
-ND PUBLIC var osshellread(CVR command) {var result; result.osshellread(command); return result;}
+ND PUBLIC var osshellread(CVR command) {var result = ""; if (not result.osshellread(command)) {}; return result;}
 
 ND PUBLIC var backtrace();
 

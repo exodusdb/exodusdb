@@ -524,8 +524,7 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 			//2. db "dict" if present
 			//3. the default db connection
 			if (isdict) {
-				defaultdb.osgetenv("EXO_DICT");
-				if (!defaultdb)
+				if (not defaultdb.osgetenv("EXO_DICT") or not defaultdb)
 					//must be the same in mvdbpostgres.cpp and dict2sql
 					defaultdb="exodus";
 			} else {
@@ -548,7 +547,9 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 				//attempt a default connection if not already done
 				if (!thread_default_data_dbconn_no) {
 					defaultdb = "";
-					defaultdb.connect();
+					if (not defaultdb.connect()) {
+						//null
+					}
 				}
 
 				dbconn_no = thread_default_data_dbconn_no;
@@ -903,7 +904,8 @@ bool var::connect(CVR conninfo) {
 	// this turns off the notice when creating tables with a primary key
 	// DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
 	//this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"));
-	this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"));
+	if (not this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING")))
+		this->loglasterror();
 
 	return true;
 }
@@ -1138,7 +1140,8 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 				WHERE  table_name = " ^ tablename.squote() ^ and_schema_clause ^ "\
 				)";
 	var result;
-	connection2.sqlexec(sql, result);
+	if (not connection2.sqlexec(sql, result))
+		throw VarDBException(this->lasterror());
 	//result.convert(RM,"|").logputl("result=");
 
 	//if (DBTRACE) {
@@ -1159,7 +1162,8 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 						and matviewname = '" ^ tablename ^	"'\
 					)\
 		";
-		connection2.sqlexec(sql, result);
+		if (not connection2.sqlexec(sql, result))
+			throw VarDBException(lasterror());
 	}
 
 	//failure if not found
@@ -4347,7 +4351,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		var key;
 		while (this->readnext(key)) {
 			//std::cout<<key<<std::endl;
-			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')");
+			if (not this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')"))
+				throw VarDBException(lasterror());
 		}
 
 		if (this->f(3)) {
@@ -4888,7 +4893,8 @@ bool var::formlist(CVR keys, CVR fieldno) {
 	if (fieldno)
 		record = record.f(fieldno).converter(VM, FM);
 
-	this->makelist("", record);
+	if (not this->makelist("", record))
+		throw VarDBException(this->lasterror());
 
 	return true;
 }

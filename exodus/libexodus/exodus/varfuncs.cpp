@@ -221,7 +221,8 @@ VARREF var::input(CVR prompt) {
 		default_input.replacer("\"", "\\\"");
 		var cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
 		//cmd.outputl("cmd=");
-		this->osshellread(cmd);
+		if (not this->osshellread(cmd))
+			lasterror().logputl();
 		if ((*this) == "")
 			std::cout << std::endl;
 	}
@@ -2221,7 +2222,8 @@ var var::numberinwords(CVR langname_or_locale_id) {
 		var("locale_id " ^ locale_id.quote() ^ " does not exist. Trying to generate it.").errputl();
 		var cmd = "locale-gen " ^ locale_id;
 		cmd.errputl();
-		cmd.osshell();
+		if (not cmd.osshell())
+			this->lasterror().logputl();
 		try {
 			// Try again after attempted generation of locale
 			std::locale mylocale(locale_id.toString());

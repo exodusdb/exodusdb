@@ -175,7 +175,9 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		if (not objfilename.osfile()) {
 			// loadable program
 			var temp;
-			temp.osshellread("which " ^ objfilename.field2(_POSIX_OSSLASH, -1));
+			if (not temp.osshellread("which " ^ objfilename.field2(_POSIX_OSSLASH, -1))) {
+				//null
+			}
 			temp = temp.field("\n", 1).field("\r", 1);
 			if (temp)
 				objfilename = temp;
@@ -195,7 +197,8 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		var cmd = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
 						 objaddress ^ " --disassemble -l " ^ objfilename;
 		//cmd.errputl();
-		temp.osshellread(cmd);
+		if (not temp.osshellread(cmd))
+			continue;
 		////////////////////////
 
 		temp.converter("\r\n", _FM _FM);
@@ -333,7 +336,8 @@ void SIGINT_handler(int sig [[maybe_unused]]) {
 			var pid = getpid();
 			var cmd = "gdb -p " ^ pid;
 			cmd.logputl(" ");
-			cmd.osshell();
+			if (not cmd.osshell())
+				var().lasterror().logputl();
 
 		} else if (cmd1 == "A") {
 

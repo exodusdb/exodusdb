@@ -69,11 +69,9 @@ bool ExoEnv::init(const int threadno) {
 	// pretty obsolete nowadays
 	// environment variables may not be available until exported
 	// do set -p to find out exported variables instead of all
-	this->CRTWIDE.osgetenv("COLUMNS");
-	this->CRTHIGH.osgetenv("LINES");
-	if (not this->CRTWIDE)
+	if (not this->CRTWIDE.osgetenv("COLUMNS") or not this->CRTWIDE)
 		this->CRTWIDE = 80;
-	if (not this->CRTHIGH)
+	if (not this->CRTHIGH.osgetenv("LINES") or not this->CRTHIGH)
 		this->CRTHIGH = 25;
 
 	//	this->THREADNO.outputl("PROCESS NO ===================================================== ");

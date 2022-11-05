@@ -1631,8 +1631,7 @@ VarError::VarError(CVR description_)
 	// Break into debugger if EXO_DEBUG is set to non-zero
 	// otherwise allow catch at a higher level or terminate
 	var exo_debug;
-	exo_debug.osgetenv("EXO_DEBUG");
-	if (exo_debug) {
+	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
 		description.errputl("\n");
 		stack().convert(FM, "\n").errputl();
 		debug();

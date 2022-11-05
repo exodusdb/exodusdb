@@ -371,8 +371,9 @@ std::string Callable::libfilepath(const std::string_view libname) const {
 	if (libfilepath[0] == '~') {
 		// env string is copied into string so following getenv usage is safe
 		var exo_HOME;
-		if (not exo_HOME.osgetenv("EXO_HOME"))
-			exo_HOME.osgetenv("HOME");
+		if (not exo_HOME.osgetenv("EXO_HOME") and not exo_HOME.osgetenv("HOME"))
+			exo_HOME = "";
+		//std::string replace
 		libfilepath.replace(0, 1, exo_HOME.toString());
 	}
 

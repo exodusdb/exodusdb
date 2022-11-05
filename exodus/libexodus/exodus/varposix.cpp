@@ -10,7 +10,8 @@ ND PUBLIC var getprocessn() {
 
 ND PUBLIC var getexecpath() {
 	var osenv;
-	osenv.osgetenv("_");
+	if (not osenv.osgetenv("_"))
+		osenv = "";
 	return osenv;
 }
 
