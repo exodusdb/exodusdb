@@ -15,6 +15,12 @@
 	message("--EXODUS TEST CMAKE INIT --")
 
 #
+# Ignore nodiscard warnings
+# #########################
+#
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result") #switch off nodiscard warnings
+
+#
 # Configure test options
 # ######################
 #
