@@ -179,15 +179,16 @@ bool var::osgetenv(const char* envcode) {
 		// later location of specific codes
 		thread_environ.push_back(FM_);
 
-		// Read the global environ into a list
-		// of CODE=VALUE pairs separated by FM
-		int i = 1;
-		char* s = *environ;
-		for (; s; i++) {
-			//printf("%s\n", s);
-			thread_environ.append(s);
+		// Read the global environ pairs into a FM separated std::string list of pairs
+		// e.g. *cstr = HOME=/root
+		// man environ
+		// extern char **environ;
+		// environ is a pointer to an array of pointers to char* env pairs like xxx=yyy
+		// the last pointer in the array is nullptr
+		for (auto envn = 0; environ[envn]; ++envn) {
+			//printf("%s\n", environ[i]);
+			thread_environ.append(environ[envn]);
 			thread_environ.push_back(FM_);
-			s = *(environ + i);
 		}
 
 		// Remove the last (or only) trailing FM_
