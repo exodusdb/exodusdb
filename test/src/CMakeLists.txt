@@ -18,8 +18,11 @@
 # Ignore nodiscard warnings
 # #########################
 #
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result") #switch off nodiscard warnings
-
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result") #switch off nodiscard warnings
+	add_compile_options(-Wno-unused-result) #switch off nodiscard warnings
+	#set(CMAKE_CXX_FLAGS qqqqqqqqq)
+	#add_compile_definitions(-Wno-unused-result) #switch off nodiscard warnings
+	#COMPILE_DEFINITIONS
 #
 # Configure test options
 # ######################
@@ -55,14 +58,15 @@
 	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 #
-# Build a specific test program
-# #############################
+# Build test programs not like test_*.cpp
+# #######################################
 #
 	add_executable(testcommandline testcommandline.cpp)
 	target_link_libraries(testcommandline ${PROJECT_LIBS} exodus)
     # lib #
     add_library(testcommandlib SHARED testcommandlib.cpp)
 
+#
 # Trigger cmake update if any new test_*.cpp files appear
 # #######################################################
 #
@@ -81,26 +85,21 @@
 		string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
 
 		add_executable(${file_without_ext} ${file})
+
 		#target_link_libraries(${file_without_ext} ${PROJECT_LIBS} exodus)
 		target_link_libraries(${file_without_ext} exodus)
 
 		#setup a classic test i.e. requiring output of "Test passed"
 		add_test(NAME ${file_without_ext} COMMAND ${file_without_ext} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
 		set_tests_properties(
 			${file_without_ext}
 			PROPERTIES
 			PASS_REGULAR_EXPRESSION "Test passed"
-		)
-		set_tests_properties(
-			${file_without_ext}
-			PROPERTIES
 			FAIL_REGULAR_EXPRESSION "(Test failed)"
-		)
-		set_tests_properties(
-			${file_without_ext}
-			PROPERTIES
 			TIMEOUT 120
 		)
+
 #		# NOT possible to easily customise tests until cmake 3.17 using CMAKE_CTEST_ARGUMENTS
 #		# https://stackoverflow.com/questions/16158091/cmake-setting-an-environmental-variable-for-ctest-or-otherwise-getting-failed
 #		set_tests_properties(
@@ -118,6 +117,7 @@
 
 	endforeach()
 
+	# test_regress must be built with optimisation otherwise it runs very slowly
 	target_compile_options(test_regress PUBLIC "-O2")
 
 #
