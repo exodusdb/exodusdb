@@ -94,7 +94,7 @@ class PUBLIC ExoEnv {
 	// All performed/executed/xlated/called exoprograms (libraries) share the same exodus environment
 	var THREADNO  = "";
 	let TIMESTAMP = var().timestamp();
-	let TERMINAL  = var().isterminal();
+	var TERMINAL  = var().isterminal() ? osgetenv("TERM") : "";
 	let EXECPATH  = getexecpath();
 	// Updated to requestor's ip address in service listen
 	var STATION   = var(gethostname()).field(".", 1);
@@ -192,6 +192,14 @@ class PUBLIC ExoEnv {
 	// A cache of handles to dynamically loaded shared libraries
 	std::map<std::string, void*> dlopen_cache;
 
+ private:
+
+var osgetenv(const char* envcode) {
+	var envvalue;
+	if (envvalue.osgetenv(envcode))
+		return envvalue;
+	return "";
+}
 };
 
 }  // namespace exodus
