@@ -31,6 +31,7 @@ function showmax() {
 		show max_connections;
 		show shared_buffers;
 		show random_page_cost;
+		show synchronous_commit;
 V0G0N
 }
 
