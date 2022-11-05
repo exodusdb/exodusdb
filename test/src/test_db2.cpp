@@ -228,7 +228,7 @@ dict(AGE_IN_YEARS) {
 	var tempfile;
 	printl();
 	var nfiles = fcount(filenames2, FM);
-	for (int ii = 1; ii <= nfiles; ++ii) {
+	for (int ii = 1; ii le nfiles; ++ii) {
 		var filename = filenames2.f(ii);
 
 		printl(filename);
@@ -301,7 +301,7 @@ dict(AGE_IN_YEARS) {
 	var record;
 	assert(begintrans());
 	if (ads.select("SELECT xo_ads")) {
-		while (ii < 3 && ads.readnext(record, key, MV)) {
+		while (ii lt 3 && ads.readnext(record, key, MV)) {
 			++ii;
 			if (!(ii % 10000))
 				printl(" " ^ key);
@@ -472,35 +472,35 @@ dict(AGE_IN_YEARS) {
 		var alphanum1 = "Flat 10a";
 		var alphanum2 = "Flat 2b";
 		//Flat 2b is before Flat 10a
-		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 
 		alphanum1 = "Part A-10";
 		alphanum2 = "Part A-2";
 		//Part A-2 is before Part A-10
-		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 
 		alphanum1 = "Xart -10";
 		alphanum2 = "Xart -2";
 		//Part -10 is before Part -2
-		//assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) lt naturalorder(alphanum2.toString()));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 
 		alphanum1 = "-10";
 		alphanum2 = "-2";
 		//-10 is before -2
-		//assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) lt naturalorder(alphanum2.toString()));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 
 		alphanum1 = "-1.11";
 		alphanum2 = "-1.2";
 		//-1.2 is before -1.11
-		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 
@@ -514,7 +514,7 @@ dict(AGE_IN_YEARS) {
 		alphanum1 = "A B C..C+";
 		alphanum2 = "A B C.C";
 		//A B C..C+ is before A B C.C
-		//assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) lt naturalorder(alphanum2.toString()));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 
@@ -525,13 +525,13 @@ dict(AGE_IN_YEARS) {
 		//printl(naturalorder(alphanum2));
 		//printl(oconv(naturalorder(alphanum1), "HEX"));
 		//printl(oconv(naturalorder(alphanum2), "HEX"));
-		//assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
+		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 
 		alphanum1 = "10a";
 		alphanum2 = "2b";
-		//assert(naturalorder(alphanum1) > naturalorder(alphanum2));
+		//assert(naturalorder(alphanum1) gt naturalorder(alphanum2));
 		assert(write(++key on naturals, alphanum1));
 		assert(write(++key on naturals, alphanum2));
 

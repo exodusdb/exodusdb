@@ -71,7 +71,7 @@ programinit()
 			assert(i32_max.toInt()    eq std::numeric_limits<int32_t>::max());
 			assert(i32_max.toString() eq "2147483647");
 
-			assert(static_cast<varint_t>(++i32_max) == 2147483648);
+			assert(static_cast<varint_t>(++i32_max) eq 2147483648);
 		}
 		{  //min int(32)
 
@@ -85,7 +85,7 @@ programinit()
 			assert(i32_min.toInt()    eq std::numeric_limits<int32_t>::min());
 			assert(i32_min.toString() eq "-2147483648");
 
-			assert(static_cast<varint_t>(--i32_min) == -2147483649);
+			assert(static_cast<varint_t>(--i32_min) eq -2147483649);
 		}
 
 		{  //max int64
@@ -210,7 +210,7 @@ programinit()
 		assert(var(17.29*100).toInt() eq 1729);
 
 		auto test_round_trip = [] (int test_int) {
-			for (int div = 1; div < 1'000'000'000; div*= 10) {
+			for (int div = 1; div lt 1'000'000'000; div*= 10) {
 				var test = test_int;
 				int mul = div;
 				test /= div;
@@ -226,7 +226,7 @@ programinit()
 		test_round_trip(1729);
 		test_round_trip(-1729);
 
-		for (int ii = -1000; ii <= 1000; ii++)
+		for (int ii = -1000; ii le 1000; ii++)
 			test_round_trip(ii);
 
 	}

@@ -10,7 +10,7 @@ using namespace std::string_literals;
 
 template <class A, class B>
 bool less(A a, B b) {
-	return a < b and a <= b and b > a and b >= a;
+	return a lt b and a le b and b gt a and b ge a;
 }
 
 template <class A, class B>
@@ -19,24 +19,24 @@ bool equal(A a, B b) {
 	{
 		errputl("equal:", a, b);
 
-		assert((var(a) eq b and var(b) eq a and var(a) <= b and var(a) >= b and var(b) <= a and var(b) >= a));								  //return false;
-		assert((a      eq var(b) and b eq var(a) and a <= var(b) and a >= var(b) and b <= var(a) and b >= var(a)));								  //return false;
-		assert((var(a) eq var(b) and var(b) eq var(a) and var(a) <= var(b) and var(a) >= var(b) and var(b) <= var(a) and var(b) >= var(a)));  //return false;
+		assert((var(a) eq b and var(b) eq a and var(a) le b and var(a) ge b and var(b) le a and var(b) ge a));								  //return false;
+		assert((a      eq var(b) and b eq var(a) and a le var(b) and a ge var(b) and b le var(a) and b ge var(a)));								  //return false;
+		assert((var(a) eq var(b) and var(b) eq var(a) and var(a) le var(b) and var(a) ge var(b) and var(b) le var(a) and var(b) ge var(a)));  //return false;
 
 		assert((a      eq a && b eq b));						 //return false;
 		assert((var(a) eq a && var(b) eq b));			 //return false;
 		assert((a      eq var(a) && b eq var(b)));			 //return false;
 		assert((var(a) eq var(a) && var(b) eq var(b)));	 //return false;
 
-		assert((a >= a && b >= b));						 //return false;
-		assert((var(a) >= a && var(b) >= b));			 //return false;
-		assert((a >= var(a) && b >= var(b)));			 //return false;
-		assert((var(a) >= var(a) && var(b) >= var(b)));	 //return false;
+		assert((a ge a && b ge b));						 //return false;
+		assert((var(a) ge a && var(b) ge b));			 //return false;
+		assert((a ge var(a) && b ge var(b)));			 //return false;
+		assert((var(a) ge var(a) && var(b) ge var(b)));	 //return false;
 
-		assert((a <= a && b <= b));						 //return false;
-		assert((var(a) <= a && var(b) <= b));			 //return false;
-		assert((a <= var(a) && b <= var(b)));			 //return false;
-		assert((var(a) <= var(a) && var(b) <= var(b)));	 //return false;
+		assert((a le a && b le b));						 //return false;
+		assert((var(a) le a && var(b) le b));			 //return false;
+		assert((a le var(a) && b le var(b)));			 //return false;
+		assert((var(a) le var(a) && var(b) le var(b)));	 //return false;
 	}
 
 	return true;
@@ -65,7 +65,7 @@ bool numtest(A a, B b, in c, in d) {
 	assert(var(b + a).errput(no++ ^ ". ")           eq (add).errputl(" should be "));			   //return false;
 	assert(var(b + var(a)).outputl("222")              eq (add).errputl(" should be ").outputl("1"));	   //return false;
 
-	//assert((    b  + var(a)).outputl("1") != add.outputl("2"));//return false;
+	//assert((    b  + var(a)).outputl("1") ne add.outputl("2"));//return false;
 	assert(var(var(b) + var(a)).errput(no++ ^ ". ").outputl("1B") eq (add).errputl(" should be ").outputl("2B"));	 //return false;
 
 	var sub = c - d;
@@ -96,7 +96,7 @@ bool numtest(A a, B b, in c, in d) {
 	assert(var(1 / (var(b) / var(a))).errput(no++ ^ ". ") eq div.errputl(" should be "));  //return false;
 
 	var mod = var(c) % var(d);
-	//assert((    a  %     b)  != mod);//return false;
+	//assert((    a  %     b)  ne mod);//return false;
 	assert((var(a) % b).errput(no++ ^ ". ")      eq mod.errputl(" should be "));		  //return false;
 	assert((a % var(b)).errput(no++ ^ ". ")      eq mod.errputl(" should be "));		  //return false;
 	assert((var(a) % var(b)).errput(no++ ^ ". ") eq mod.errputl(" should be "));  //return false;

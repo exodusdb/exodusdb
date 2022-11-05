@@ -12,7 +12,7 @@ programinit()
 
 	var begin, end;
 
-	for (int i = 0; i < LOOPS; i++)
+	for (int i = 0; i lt LOOPS; i++)
 	// mixture of strings in the following proporsion: ([14:58:30] neosys: )
 	//	15% 11111
 	//	 5% -11111

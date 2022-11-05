@@ -2,7 +2,7 @@
 #include <cassert>
 
 // 1. TO_CHARS from Ubuntu 22.04
-#if __GNUC__ >= 11
+#if __GNUC__ >=11
 #define USE_TO_CHARS_G
 
 // 2. RYU
@@ -35,18 +35,18 @@ programinit()
 	assert((str + 0) eq (str + 0));
 
 	//in pick/arev
-	// 0 != ''
+	// 0 ne ''
 	//and
 	// '' |= 0
 	TRACE(str)
 	TRACE(double(str))
 	if (len(str) eq 0) {
-		assert((str + 0) != str);
-		assert(str != (str + 0));
-		assert((str - 0) != str);
-		assert(str != (str - 0));
-		assert(double(str) != str);
-		assert(str != double(str));
+		assert((str + 0) ne str);
+		assert(str ne (str + 0));
+		assert((str - 0) ne str);
+		assert(str ne (str - 0));
+		assert(double(str) ne str);
+		assert(str ne double(str));
 		return 0;
 	}
 
@@ -58,13 +58,13 @@ programinit()
 	assert(double(str) eq str);
 	assert(str         eq double(str));
 
-	var str2 = (len(str2o) > 0) ? str2o : str;
+	var str2 = (len(str2o) gt 0) ? str2o : str;
 	print("\t\t\t\t", quote(str), " -> ", quote(str2));
 	printl((quote(str + 0) eq quote(str2)) ? " is true" : " is false");
 	//var x=str+0;
 	//var y=quote(str+0);
 	//var z=quote(str2);
-	//if (quote(str+0) != quote(str2))
+	//if (quote(str+0) ne quote(str2))
 	//	debug();
 #ifdef USE_RYU
 	assert(quote(str + 0) eq quote(str2));	//RYU converts 99.9+0 (99.90000000000000006) to 99.9
@@ -75,7 +75,7 @@ programinit()
 	//var x = str+0;
 	//printl();
 	//TRACE(x)
-	//if (quote(str + 0) != quote(str2))
+	//if (quote(str + 0) ne quote(str2))
 	//	debug();
 	//var a=quote(str);
 	//var b=quote(str+0);

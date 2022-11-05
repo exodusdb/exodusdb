@@ -107,8 +107,8 @@ programinit()
 
 		//assert(var("Ⅻ").regex_replace(R"(\p{Number})","yes").outputl()!="yes");
 		//assert(var("⅝").regex_replace(R"(\p{Number})","yes").outputl()!="yes");
-		assert(var("Ⅻ").regex_replace(R"([[:digit:]])", "yes").outputl() != "yes");
-		assert(var("⅝").regex_replace(R"([[:digit:]])", "yes").outputl() != "yes");
+		assert(var("Ⅻ").regex_replace(R"([[:digit:]])", "yes").outputl() ne "yes");
+		assert(var("⅝").regex_replace(R"([[:digit:]])", "yes").outputl() ne "yes");
 	}
 
 	//test glob matching using * ? eg *.* and *.??? etc

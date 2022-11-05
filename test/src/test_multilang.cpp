@@ -321,7 +321,7 @@ programexit()
 	//	begin = begin.timedate();
 	//	printl( begin.oconv( L"MTS"));
 	//
-	//	for( int i = 0; i < 3459406 / 5; i += 5)
+	//	for( int i = 0; i lt 3459406 / 5; i += 5)
 	//	{
 	//		var buf;
 	//		buf.osbread( stroustrup, i, 5);
@@ -346,7 +346,7 @@ programexit()
 	//	print( L"Start of osbwrite() benchmark: ");
 	//	begin = begin.timedate();
 	//	printl( begin.oconv( L"MTS"));
-	//	for( int i = 0; i < 3459406 / 5; i += 5)
+	//	for( int i = 0; i lt 3459406 / 5; i += 5)
 	//	{
 	//		var buf(i);
 	//		buf ^= L"\n";

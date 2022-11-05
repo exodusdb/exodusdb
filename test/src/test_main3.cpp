@@ -69,8 +69,8 @@ programinit()
 		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
 		for (auto i : range(0, n - 1)) {
 			printt(i, d1(i), "\n");
-			assert(d1(i) > ntests / n * 0.98);
-			assert(d1(i) < ntests / n * 1.02);
+			assert(d1(i) gt ntests / n * 0.98);
+			assert(d1(i) lt ntests / n * 1.02);
 		}
 	}
 
@@ -94,8 +94,8 @@ programinit()
 		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
 		for (auto i : range(0, n - 1)) {
 			printt(i, d1(i), "\n");
-			assert(d1(i) > ntests / n * 0.98);
-			assert(d1(i) < ntests / n * 1.02);
+			assert(d1(i) gt ntests / n * 0.98);
+			assert(d1(i) lt ntests / n * 1.02);
 		}
 	}
 
@@ -110,7 +110,7 @@ programinit()
 
 		//test reseed is *not* the same
 		initrnd();
-		assert(rnd(1'000'000'000) != r1);
+		assert(rnd(1'000'000'000) ne r1);
 	}
 
 	{
@@ -123,7 +123,7 @@ programinit()
 
 		//test reseed is *not* the same
 		initrnd(0);
-		assert(rnd(1'000'000'000) != r1);
+		assert(rnd(1'000'000'000) ne r1);
 	}
 
 	{
@@ -313,7 +313,7 @@ programinit()
 		{
 			var ts1 = timestamp(date(), time());
 			var ts2 = timestamp();
-			assert((ts2 - ts1) < 0.001);
+			assert((ts2 - ts1) lt 0.001);
 		}
 
 		// Check construction of a timestamp manually agrees closely with plain timestamp.
@@ -322,7 +322,7 @@ programinit()
 			var dt = int(ts0);
 			var tm = ts0.mod(1) * 86'400;
 			var ts1 = timestamp(dt, tm);
-			assert((ts1 - ts0) < 0.001);
+			assert((ts1 - ts0) lt 0.001);
 		}
 
 
@@ -355,29 +355,29 @@ programinit()
 		assert(1234.567_var eq 1234.567);
 
 		var v = 123.456;
-		assert(int(v) != v);
+		assert(int(v) ne v);
 		assert(int(v)    eq 123);
 		assert(double(v) eq v);
 		assert(double(v) eq 123.456);
-		assert(floor(v) != v);
+		assert(floor(v) ne v);
 		assert(floor(v)  eq int(v));
 
 		v = "123.456";
-		assert(int(v) != v);
+		assert(int(v) ne v);
 		assert(int(v)    eq 123);
 		assert(double(v) eq v);
 		assert(double(v) eq 123.456);
-		assert(floor(v) != v);
+		assert(floor(v) ne v);
 		assert(floor(v)  eq int(v));
 
 		v = 123456;
 		v = v / 1000;
 		TRACE(v)
-		assert(int(v) != v);
+		assert(int(v) ne v);
 		assert(int(v)    eq 123);
 		assert(double(v) eq v);
 		assert(double(v) eq 123.456);
-		assert(floor(v) != v);
+		assert(floor(v) ne v);
 		assert(floor(v)  eq int(v));
 
 		double d = 1234.567;

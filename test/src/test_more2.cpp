@@ -385,7 +385,7 @@ programinit()
 		TRACE(x.oconv("HEX"));
 		assert(x.oconv("HEX") eq "00");
 		assert(x              eq '\0');
-		assert(x != "\0");	//cannot include char 0 in cstr
+		assert(x ne "\0");	//cannot include char 0 in cstr
 	}
 	{
 		var x('\0');
@@ -393,7 +393,7 @@ programinit()
 		TRACE(x.oconv("HEX"));
 		assert(x.oconv("HEX") eq "00");
 		assert(x              eq '\0');
-		assert(x != "\0");	//cannot include char 0 in cstr
+		assert(x ne "\0");	//cannot include char 0 in cstr
 	}
 	{
 		var x{'\0'};
@@ -401,7 +401,7 @@ programinit()
 		TRACE(x.oconv("HEX"));
 		assert(x.oconv("HEX") eq "00");
 		assert(x              eq '\0');
-		assert(x != "\0");	//cannot include char 0 in cstr
+		assert(x ne "\0");	//cannot include char 0 in cstr
 	}
 
 	//std strings variables (lvalues)
@@ -495,26 +495,26 @@ programinit()
 		assert(var("1")   eq "01");
 		assert(var("1.1") eq "01.1");
 		//
-		assert(var(1) != var("01x"));
-		assert(var(1.1) != var("01.1x"));
-		assert(1 != var("01x"));
-		assert(1.1 != var("01.1x"));
-		assert(var(1) != "01x");
-		assert(var(1.1) != "01.1x");
+		assert(var(1) ne var("01x"));
+		assert(var(1.1) ne var("01.1x"));
+		assert(1 ne var("01x"));
+		assert(1.1 ne var("01.1x"));
+		assert(var(1) ne "01x");
+		assert(var(1.1) ne "01.1x");
 
-		assert(var("01x") != var(1));
-		assert(var("01.1x") != var(1.1));
-		assert("01x" != var(1));
-		assert("01.1x" != var(1.1));
-		assert(var("01x") != 1);
-		assert(var("01.1x") != 1.1);
+		assert(var("01x") ne var(1));
+		assert(var("01.1x") ne var(1.1));
+		assert("01x" ne var(1));
+		assert("01.1x" ne var(1.1));
+		assert(var("01x") ne 1);
+		assert(var("01.1x") ne 1.1);
 
-		assert(var("1x") != var("01x"));
-		assert(var("1.1x") != var("01.1x"));
-		assert("1x" != var("01x"));
-		assert("1.1x" != var("01.1x"));
-		assert(var("1x") != "01x");
-		assert(var("1.1x") != "01.1x");
+		assert(var("1x") ne var("01x"));
+		assert(var("1.1x") ne var("01.1x"));
+		assert("1x" ne var("01x"));
+		assert("1.1x" ne var("01.1x"));
+		assert(var("1x") ne "01x");
+		assert(var("1.1x") ne "01.1x");
 	}
 
 	{
@@ -589,58 +589,58 @@ programinit()
 
 	//<
 	{
-		assert(var(1) < var(2));
-		assert(var(1.1) < var(2.1));
-		assert(1 < var(2));
-		assert(1.1 < var(2.1));
-		assert(var(1) < 2);
-		assert(var(1.1) < 2.1);
+		assert(var(1) lt var(2));
+		assert(var(1.1) lt var(2.1));
+		assert(1 lt var(2));
+		assert(1.1 lt var(2.1));
+		assert(var(1) lt 2);
+		assert(var(1.1) lt 2.1);
 
-		assert(var(1) < var("02"));
-		assert(var(1.1) < var("02.1"));
-		assert(1 < var("02"));
-		assert(1.1 < var("02.1"));
-		assert(var(1) < "02");
-		assert(var(1.1) < "02.1");
+		assert(var(1) lt var("02"));
+		assert(var(1.1) lt var("02.1"));
+		assert(1 lt var("02"));
+		assert(1.1 lt var("02.1"));
+		assert(var(1) lt "02");
+		assert(var(1.1) lt "02.1");
 
-		assert(var("01") < var(2));
-		assert(var("01.1") < var(2.1));
-		assert("01" < var(2));
-		assert("01.1" < var(2.1));
-		assert(var("01") < 2);
-		assert(var("01.1") < 2.1);
+		assert(var("01") lt var(2));
+		assert(var("01.1") lt var(2.1));
+		assert("01" lt var(2));
+		assert("01.1" lt var(2.1));
+		assert(var("01") lt 2);
+		assert(var("01.1") lt 2.1);
 
-		assert(var("1") < var("02"));
-		assert(var("1.1") < var("02.1"));
-		assert("1" < var("02"));
-		assert("1.1" < var("02.1"));
-		assert(var("1") < "02");
-		assert(var("1.1") < "02.1");
+		assert(var("1") lt var("02"));
+		assert(var("1.1") lt var("02.1"));
+		assert("1" lt var("02"));
+		assert("1.1" lt var("02.1"));
+		assert(var("1") lt "02");
+		assert(var("1.1") lt "02.1");
 		//
-		assert(var(1) < var("2x"));
-		assert(var(1.1) < var("2.1x"));
-		assert(1 < var("2x"));
-		assert(1.1 < var("2.1x"));
-		assert(var(1) < "2x");
-		assert(var(1.1) < "2.1x");
+		assert(var(1) lt var("2x"));
+		assert(var(1.1) lt var("2.1x"));
+		assert(1 lt var("2x"));
+		assert(1.1 lt var("2.1x"));
+		assert(var(1) lt "2x");
+		assert(var(1.1) lt "2.1x");
 
-		assert(var("01x") < var(2));
-		assert(var("01.1x") < var(2.1));
-		assert("01x" < var(2));
-		assert("01.1x" < var(2.1));
-		assert(var("01x") < 2);
-		assert(var("01.1x") < 2.1);
+		assert(var("01x") lt var(2));
+		assert(var("01.1x") lt var(2.1));
+		assert("01x" lt var(2));
+		assert("01.1x" lt var(2.1));
+		assert(var("01x") lt 2);
+		assert(var("01.1x") lt 2.1);
 
-		assert(var("1x") < var("2x"));
-		assert(var("1.1x") < var("2.1x"));
-		assert("1x" < var("2x"));
-		assert("1.1x" < var("2.1x"));
-		assert(var("1x") < "2x");
-		assert(var("1.1x") < "2.1x");
+		assert(var("1x") lt var("2x"));
+		assert(var("1.1x") lt var("2.1x"));
+		assert("1x" lt var("2x"));
+		assert("1.1x" lt var("2.1x"));
+		assert(var("1x") lt "2x");
+		assert(var("1.1x") lt "2.1x");
 	}
 
 	{
-		assert(!(var("22.1x") < 211.1));
+		assert(!(var("22.1x") lt 211.1));
 	}
 
 	assert(+var(123)    eq 123);
@@ -667,14 +667,14 @@ programinit()
 	assert(var("0")   eq var("0.0"));
 	assert(var("0.0") eq var("0"));
 
-	assert(var("") != var(0));
-	assert(var(0) != var(""));
+	assert(var("") ne var(0));
+	assert(var(0) ne var(""));
 
-	assert(var("") < var(0));
-	assert(var(0) > var(""));
+	assert(var("") lt var(0));
+	assert(var(0) gt var(""));
 
-	assert(!(var("") > var(0)));
-	assert(!(var(0) < var("")));
+	assert(!(var("") gt var(0)));
+	assert(!(var(0) lt var("")));
 
 	assert("xxx"_var   eq "xxx");
 	assert(""_var      eq "");

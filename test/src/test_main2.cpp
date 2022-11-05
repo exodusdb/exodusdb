@@ -148,23 +148,23 @@ programinit()
 	assert((true % e2)  eq 1);
 	assert((false % e2) eq 0);
 
-	//the six logical comparisons >= <= > < and the lesser precedence eq  ne
+	//the six logical comparisons ge le gt lt and the lesser precedence eq  ne
 	//between logical results and vars are not supported by exodus
 	//because they seem useless, probably non existant in real code
 	//and because I am too lazy at this point.
 	//real code would have to be something like
-	// if (cc eq aa > bb)
+	// if (cc eq aa gt bb)
 	//which due to lower precendence of eq and ne is actually
-	// if (cc eq (aa > bb))
+	// if (cc eq (aa gt bb))
 	assert((e1    eq true)eq true);
 	assert((e1    eq false)eq false);
 	assert((true  eq e1)eq true);
 	assert((false eq e1)eq false);
 
-	assert((e1 != true)  eq false);
-	assert((e1 != false) eq true);
-	assert((true != e1)  eq false);
-	assert((false != e1) eq true);
+	assert((e1 ne true)  eq false);
+	assert((e1 ne false) eq true);
+	assert((true ne e1)  eq false);
+	assert((false ne e1) eq true);
 
 	assert((e1    eq true)eq 1);
 	assert((e1    eq false)eq 0);
@@ -184,7 +184,7 @@ programinit()
 	//printl(e1^e2>e3); //wont compile (because it would produce the wrong result)
 
 	//just add brackets to clarify and correct the precedence for exodus and it will compile
-	assert(((e1 ^ e2) > e3) eq 1);	//=1 ... correct result because (1^2)>3 i.e. "12">3 is true
+	assert(((e1 ^ e2) gt e3) eq 1);	//=1 ... correct result because (1^2)>3 i.e. "12">3 is true
 
 	var s1, s2;
 	/* why wont this compile??
@@ -397,7 +397,7 @@ programinit()
 	//ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	a	  = "a";
 	var A = "A";
-	assert(a < A);
+	assert(a lt A);
 
 	//gosub is a throwaway word to indicate calling a local member function
 	//call is similar but conventionally used for external function (shared lib functions)
@@ -418,7 +418,7 @@ programinit()
 
 	assert(oconv(1234, "MD20P") eq "1234.00");
 
-	assert(var("a") < var("B"));
+	assert(var("a") lt var("B"));
 
 	//select("select test_alphanum with f1 between 20 and 21");
 	assert(oconv(10.1, "MD20") eq "10.10");
@@ -427,15 +427,15 @@ programinit()
 		printl("Investigate the bytes of a double in hex for naturalorder");
 		double d2 = 1;
 		double d3 = 2;
-		if (d2 < d3)
+		if (d2 lt d3)
 			d2 = d3;
 		union {
 			double d1;
 			char   chars[8];
 		};
-		for (d1 = -5; d1 <= 5; ++d1) {
+		for (d1 = -5; d1 le 5; ++d1) {
 			print("Decimal ", d1, "= ");
-			for (unsigned int partn = 0; partn < sizeof(chars); ++partn) {
+			for (unsigned int partn = 0; partn lt sizeof(chars); ++partn) {
 				//var(chars[partn]).oconv("HEX").output();
 				//std::cout << std::hex << static_cast<unsigned int>(chars[partn]) << " " ;
 				print(oconv(chars[partn], "HEX"), "");
@@ -641,7 +641,7 @@ programinit()
 		assert(var(-12345678).oconv("MD20P,") eq "-12,345,678.00");
 	}
 
-	assert(var("0") < var(".5"));
+	assert(var("0") lt var(".5"));
 
 	var ss;
 

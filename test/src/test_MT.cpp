@@ -42,7 +42,7 @@ programinit()
 	//test that some random times iconv/oconv roundtrip ok
 	initrnd(1000);
 	var timex;
-	for (int ii = 1; ii <= 1000; ++ii) {
+	for (int ii = 1; ii le 1000; ++ii) {
 		timex = rnd(18600);
 		//		timex.oconv("MTHS").output(" ").iconv("MTHS").outputl(" ");
 		assert(timex.oconv("MTHS").iconv("MTHS") eq timex);
@@ -168,7 +168,7 @@ programinit()
 
 	printl("Checking time oconv/iconv roundtrip for time (seconds) = 0 to 86400");
 	//initrnd(999);
-	//for (int ii = 0; ii <= 86400-1; ++ii) {
+	//for (int ii = 0; ii le 86400-1; ++ii) {
 	//	var time=ii;
 	var started = ostime();
 	for (const var itime : range(0, 86399)) {

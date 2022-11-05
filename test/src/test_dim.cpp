@@ -306,13 +306,13 @@ function main() {
 
 		// remove_if
 		d1 = "10^2^1^20"_var.split();
-		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
+		std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
 		TRACE(d1.join("^"));
 		assert(d1.join() eq "10^1^20^"_var);
 
 		// remove_if
 		d1 = v1.split();
-		std::remove_if(d1.begin(), d1.end(), [](var x){return x == "2";});
+		std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
 		assert(d1.join() eq "10^1^20^"_var);
 
 		// unique?
@@ -324,7 +324,7 @@ function main() {
 		d1 = "b^a^a^b^c"_var.split();
 		auto x = std::find(d1.begin(), d1.end(), "c");
 		const auto pos = std::distance(d1.begin(), x);
-		assert(pos == 4);
+		assert(pos eq 4);
 		//assert(d1.join().outputl() eq "b^a^b^c"_var);
 
 		// erase_if?
@@ -332,8 +332,8 @@ function main() {
 		printl("but remove_if combined with dim::erase will achieve the same result");
 		d1 = "1^2^4^5^3"_var.split();
 		TRACE(d1.join())
-		//std::erase_if(d.begin(), d.end(), [](auto i){return i < 3;});
-		d1.eraser(std::remove_if(d1.begin(), d1.end(), [](auto i){return i < 3;}), d1.end());
+		//std::erase_if(d.begin(), d.end(), [](auto i){return i lt 3;});
+		d1.eraser(std::remove_if(d1.begin(), d1.end(), [](auto i){return i lt 3;}), d1.end());
 		TRACE(d1.join())
 		assert(d1.join() eq "4^5^3"_var);
 
@@ -351,22 +351,22 @@ function main() {
 
 	dim a7(2, 3);
 
-	for (int ii = 1; ii <= 2; ++ii) {
-		for (int jj = 1; jj <= 3; ++jj) {
+	for (int ii = 1; ii le 2; ++ii) {
+		for (int jj = 1; jj le 3; ++jj) {
 			a7(ii, jj) = ii ^ var(".") ^ jj;
 		}
 	}
 
 	dim a8(4, 5);
-	for (int ii = 1; ii <= 4; ++ii) {
-		for (int jj = 1; jj <= 5; ++jj) {
+	for (int ii = 1; ii le 4; ++ii) {
+		for (int jj = 1; jj le 5; ++jj) {
 			a8(ii, jj) = ii ^ var(".") ^ jj;
 		}
 	}
 	a8 = 2.2;
 
-	for (int ii = 1; ii <= 4; ++ii) {
-		for (int jj = 1; jj <= 5; ++jj) {
+	for (int ii = 1; ii le 4; ++ii) {
+		for (int jj = 1; jj le 5; ++jj) {
 			a8(ii, jj).outputt("=");
 		}
 		//		printl();
@@ -374,8 +374,8 @@ function main() {
 
 	a8 = a7;
 
-	for (int ii = 1; ii <= 2; ++ii) {
-		for (int jj = 1; jj <= 3; ++jj) {
+	for (int ii = 1; ii le 2; ++ii) {
+		for (int jj = 1; jj le 3; ++jj) {
 			a8(ii, jj).outputt("=");
 			assert(a8(ii, jj) eq a7(ii, jj));
 			//		printl();
@@ -403,17 +403,17 @@ function main() {
 	dim arr1(3), arr2(3, 3);
 	arr1(0)	   = 0;
 	arr1(0, 0) = 0;
-	for (int ii = 1; ii <= 3; ++ii) {
+	for (int ii = 1; ii le 3; ++ii) {
 		arr1(ii) = ii;
-		for (int jj = 1; jj <= 3; ++jj) {
+		for (int jj = 1; jj le 3; ++jj) {
 			arr2(ii, jj) = ii * 3 + jj;
 		}
 	}
 	assert(arr1(0)        eq "0");
 	assert(arr1(0, 0)     eq "0");
-	for (int ii = 1; ii <= 3; ++ii) {
+	for (int ii = 1; ii le 3; ++ii) {
 		assert(arr1(ii)      eq ii);
-		for (int jj = 1; jj <= 3; ++jj) {
+		for (int jj = 1; jj le 3; ++jj) {
 			assert(arr2(ii, jj) eq ii * 3 + jj);
 		}
 	}

@@ -165,7 +165,7 @@ programinit()
 	assert(compact_a.oconv("HEX") eq "C3A1");
 
 	//test normalize (to NFC)
-	assert(decomp_a != compact_a);
+	assert(decomp_a ne compact_a);
 	assert(decomp_a.normalize()              eq compact_a);
 	assert(normalize(decomp_a) eq compact_a);  //func
 	assert(decomp_a.normalize().oconv("HEX") eq "C3A1");
@@ -431,7 +431,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//test all 8 bit bytes can be written and read
 	var tx = "";
 	var tx2;
-	for (int ii = 0; ii <= 65535; ii++)
+	for (int ii = 0; ii le 65535; ii++)
 		tx ^= chr(ii);
 
 	//output to binary - check roundtrip
@@ -879,7 +879,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		var cc = textchr(ii);
 		if (cc.len())
 			testinvert(cc);
-		else if (ii < 0xD800 or ii > 0xDFFF)
+		else if (ii lt 0xD800 or ii gt 0xDFFF)
 			printl(ii);
 	}
 
@@ -887,11 +887,11 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(invert("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") eq "ÏÎÍÌËÊÉÈÇÆ¾½¼»º¹¸·¶µ´³²±°¯®­¬«ª©¨§¦¥");
 
 	//check unicode is invalid from 0xD800-0xDFF (UTF16 encoding) and 0x110000 onwards
-	assert(textchr(0xD7FF) != "");
+	assert(textchr(0xD7FF) ne "");
 	assert(textchr(0xD800)   eq "");
 	assert(textchr(0xDFFF)   eq "");
-	assert(textchr(0xE000) != "");
-	assert(textchr(0x10FFFF) != "");
+	assert(textchr(0xE000) ne "");
+	assert(textchr(0x10FFFF) ne "");
 	assert(textchr(0x110000) eq "");
 
 	var cmd = "c:\\xwindowspath_test_main1_\\to\\xyz.exe arg1 arg2";
@@ -909,15 +909,15 @@ function test_codepage(in codepage, in lang) {
 	printl("---------- " ^ lang ^ " " ^ codepage ^ " ----------");
 
 	var v256 = "";
-	for (int ii = 0; ii <= 255; ++ii)
+	for (int ii = 0; ii le 255; ++ii)
 		v256 ^= chr(ii);
 	oswrite(v256, "t_codep.bin");
 	assert(osfile("t_codep.bin").f(1) eq 256);
 
 	//convert to utf8
 	var as_utf8a = v256.from_codepage(codepage);
-	assert(as_utf8a != v256);
-	assert(as_utf8a.len() > v256.len());
+	assert(as_utf8a ne v256);
+	assert(as_utf8a.len() gt v256.len());
 
 	//convert back to codepage
 	var as_cp = as_utf8a.to_codepage(codepage);

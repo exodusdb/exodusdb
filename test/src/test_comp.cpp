@@ -3,7 +3,7 @@
 
 #include <exodus/program.h>
 
-//exodus/c++ > uses SMALLEST_NUMBER to compare equality
+//exodus/c++ gt uses SMALLEST_NUMBER to compare equality
 ////0.0001 for pick/arev compatibility
 
 programinit()
@@ -64,97 +64,97 @@ programinit()
 
 	//big <
 
-	assert(not(bigs < bigs));
-	assert(bigs > bigi);
-	assert(not(bigs > bigd));
+	assert(not(bigs lt bigs));
+	assert(bigs gt bigi);
+	assert(not(bigs gt bigd));
 
-	assert(bigi < bigs);
-	assert(not(bigi < bigi));
-	assert(bigi < bigd);
+	assert(bigi lt bigs);
+	assert(not(bigi lt bigi));
+	assert(bigi lt bigd);
 
-	assert(not(bigd < bigs));
-	assert(bigd > bigi);
-	assert(not(bigd > bigd));
+	assert(not(bigd lt bigs));
+	assert(bigd gt bigi);
+	assert(not(bigd gt bigd));
 
-	assert(bigs > lits);
-	assert(bigs > litd);
+	assert(bigs gt lits);
+	assert(bigs gt litd);
 
-	assert(bigs > tinys);
-	assert(bigs > tinyd);
+	assert(bigs gt tinys);
+	assert(bigs gt tinyd);
 
 	assert(bigs eq bigs);
-	assert(bigs != bigi);
+	assert(bigs ne bigi);
 	assert(bigs eq bigd);
 
-	assert(bigi != bigs);
+	assert(bigi ne bigs);
 	assert(bigi eq bigi);
-	assert(bigi != bigd);
+	assert(bigi ne bigd);
 
 	assert(bigd eq bigs);
-	assert(bigd != bigi);
+	assert(bigd ne bigi);
 	assert(bigd eq bigd);
 
-	assert(bigs != lits);
-	assert(bigs != litd);
+	assert(bigs ne lits);
+	assert(bigs ne litd);
 
-	assert(bigs != tinys);
-	assert(bigs != tinyd);
+	assert(bigs ne tinys);
+	assert(bigs ne tinyd);
 
-	assert(bigi > lits);
-	assert(bigi > litd);
+	assert(bigi gt lits);
+	assert(bigi gt litd);
 
-	assert(bigi > tinys);
-	assert(bigi > tinyd);
+	assert(bigi gt tinys);
+	assert(bigi gt tinyd);
 
-	assert(bigd > lits);
-	assert(bigd > litd);
-	assert(bigd > tinys);
-	assert(bigd > tinyd);
+	assert(bigd gt lits);
+	assert(bigd gt litd);
+	assert(bigd gt tinys);
+	assert(bigd gt tinyd);
 
-	assert(bigs > zeros);
-	assert(bigs > zeroi);
-	assert(bigs > zerod);
+	assert(bigs gt zeros);
+	assert(bigs gt zeroi);
+	assert(bigs gt zerod);
 
-	assert(bigs > 0);
-	assert(bigi > 0);
-	assert(bigd > 0);
+	assert(bigs gt 0);
+	assert(bigi gt 0);
+	assert(bigd gt 0);
 
-	assert(lits > 0);
+	assert(lits gt 0);
 	//assert(liti>0);
-	assert(litd > 0);
+	assert(litd gt 0);
 
-	assert(not(tinys > 0));
+	assert(not(tinys gt 0));
 	//assert(not(tinyi>0));
-	assert(not(tinyd > 0));
+	assert(not(tinyd gt 0));
 
-	assert(not(zeros > 0));
-	assert(not(zeroi > 0));
+	assert(not(zeros gt 0));
+	assert(not(zeroi gt 0));
 	//printl(zerod);
-	assert(not(zerod > 0));
+	assert(not(zerod gt 0));
 
-	assert(0 < bigs);
-	assert(0 < bigi);
-	assert(0 < bigd);
+	assert(0 lt bigs);
+	assert(0 lt bigi);
+	assert(0 lt bigd);
 
-	assert(0 < lits);
+	assert(0 lt lits);
 	//assert(0<liti);
-	assert(0 < litd);
+	assert(0 lt litd);
 
-	assert(not(0 < tinys));
+	assert(not(0 lt tinys));
 	//assert(0<tinyi);
-	assert(not(0 < tinyd));
+	assert(not(0 lt tinyd));
 
-	assert(not(0 < zeros));
-	assert(not(0 < zeroi));
-	assert(not(0 < zerod));
+	assert(not(0 lt zeros));
+	assert(not(0 lt zeroi));
+	assert(not(0 lt zerod));
 
-	assert(bigs != 0);
-	assert(bigi != 0);
-	assert(bigd != 0);
+	assert(bigs ne 0);
+	assert(bigi ne 0);
+	assert(bigd ne 0);
 
-	assert(lits != 0);
+	assert(lits ne 0);
 	//assert(liti>0);
-	assert(litd != 0);
+	assert(litd ne 0);
 
 	//checking a floating point number against zero accurately is impossible
 	//because the its effective epsilon cannot be calculated because the
@@ -196,13 +196,13 @@ programinit()
 	assert(zeroi eq 0);
 	assert(zerod eq 0);
 
-	assert(0 != bigs);
-	assert(0 != bigi);
-	assert(0 != bigd);
+	assert(0 ne bigs);
+	assert(0 ne bigi);
+	assert(0 ne bigd);
 
-	assert(0 != lits);
+	assert(0 ne lits);
 	//assert(0<liti);
-	assert(0 != litd);
+	assert(0 ne litd);
 
 	//if (not using_epsilon) {
 	assert(0   eq tinys);
@@ -223,14 +223,14 @@ programinit()
 	assert(pwr(10, -7) eq 0);	//.0000001
 	assert(pwr(10, -6) eq 0);	//.000001
 	assert(pwr(10, -5) eq 0);	//.00001
-	assert(pwr(10, -4) != 0);	//.0001
-	assert(pwr(10, -3) != 0);	//.001
-	assert(pwr(10, -2) != 0);	//.01
-	assert(pwr(10, -1) != 0);	//.1
-	assert(pwr(10, 0) != 0);	//1
-	assert(pwr(10, 1) != 0);	//10
-	assert(pwr(10, 2) != 0);	//100
-	assert(pwr(10, 3) != 0);	//1000
+	assert(pwr(10, -4) ne 0);	//.0001
+	assert(pwr(10, -3) ne 0);	//.001
+	assert(pwr(10, -2) ne 0);	//.01
+	assert(pwr(10, -1) ne 0);	//.1
+	assert(pwr(10, 0) ne 0);	//1
+	assert(pwr(10, 1) ne 0);	//10
+	assert(pwr(10, 2) ne 0);	//100
+	assert(pwr(10, 3) ne 0);	//1000
 
 	assert(pwr(10, -10) eq 0.0);  //.0000000001
 	assert(pwr(10, -9) eq 0.0);	  //.000000001
@@ -238,14 +238,14 @@ programinit()
 	assert(pwr(10, -7) eq 0.0);	  //.0000001
 	assert(pwr(10, -6) eq 0.0);	  //.000001
 	assert(pwr(10, -5) eq 0.0);	  //.00001
-	assert(pwr(10, -4) != 0.0);	  //.0001
-	assert(pwr(10, -3) != 0.0);	  //.001
-	assert(pwr(10, -2) != 0.0);	  //.01
-	assert(pwr(10, -1) != 0.0);	  //.1
-	assert(pwr(10, 0) != 0.0);	  //1
-	assert(pwr(10, 1) != 0.0);	  //10
-	assert(pwr(10, 2) != 0.0);	  //100
-	assert(pwr(10, 3) != 0.0);	  //1000
+	assert(pwr(10, -4) ne 0.0);	  //.0001
+	assert(pwr(10, -3) ne 0.0);	  //.001
+	assert(pwr(10, -2) ne 0.0);	  //.01
+	assert(pwr(10, -1) ne 0.0);	  //.1
+	assert(pwr(10, 0) ne 0.0);	  //1
+	assert(pwr(10, 1) ne 0.0);	  //10
+	assert(pwr(10, 2) ne 0.0);	  //100
+	assert(pwr(10, 3) ne 0.0);	  //1000
 
 	assert(pwr(10, -10) eq 0.0);  //.0000000001
 	assert(pwr(10, -9) eq 0.0);	  //.000000001
@@ -253,14 +253,14 @@ programinit()
 	assert(pwr(10, -7) eq 0.0);	  //.0000001
 	assert(pwr(10, -6) eq 0.0);	  //.000001
 	assert(pwr(10, -5) eq 0.0);	  //.00001
-	assert(pwr(10, -4) != 0.0);	  //.0001
-	assert(pwr(10, -3) != 0.0);	  //.001
-	assert(pwr(10, -2) != 0.0);	  //.01
-	assert(pwr(10, -1) != 0.0);	  //.1
-	assert(pwr(10, 0) != 0.0);	  //1
-	assert(pwr(10, 1) != 0.0);	  //10
-	assert(pwr(10, 2) != 0.0);	  //100
-	assert(pwr(10, 3) != 0.0);	  //1000
+	assert(pwr(10, -4) ne 0.0);	  //.0001
+	assert(pwr(10, -3) ne 0.0);	  //.001
+	assert(pwr(10, -2) ne 0.0);	  //.01
+	assert(pwr(10, -1) ne 0.0);	  //.1
+	assert(pwr(10, 0) ne 0.0);	  //1
+	assert(pwr(10, 1) ne 0.0);	  //10
+	assert(pwr(10, 2) ne 0.0);	  //100
+	assert(pwr(10, 3) ne 0.0);	  //1000
 
 	assert(var(0.0000)             eq var(0.00001));
 	assert(var(0.0001 / 10)        eq var(0.00001));
@@ -281,34 +281,34 @@ programinit()
 
 	//on exodus/c++ all numbers different by 0.0001 are considered the same
 	//whereas on pick/arev they are considered different down to
-	assert((var(0.0001) > 0));
-	assert((var(1e-4) > 0));
+	assert((var(0.0001) gt 0));
+	assert((var(1e-4) gt 0));
 
 	//on arev gt le ge le comparison does not use the same logic as eq and bool
-	assert(not(var(0.00001) > 0));
-	assert(not(var(0.000000000000000001) > 0));
-	assert(not(var(1e-5) > 0));
-	assert(not(var(1e-18) > 0));
+	assert(not(var(0.00001) gt 0));
+	assert(not(var(0.000000000000000001) gt 0));
+	assert(not(var(1e-5) gt 0));
+	assert(not(var(1e-18) gt 0));
 	printl("tt", pwr(10.0, -16));
-	assert(not(pwr(10.0, -16) > 0));
-	assert(not(pwr(10.0, -17) > 0));
-	assert(not(pwr(10.0, -18) > 0));
+	assert(not(pwr(10.0, -16) gt 0));
+	assert(not(pwr(10.0, -17) gt 0));
+	assert(not(pwr(10.0, -18) gt 0));
 
-	assert(not(pwr(10.0, -10) > 0));  //.0000000001
-	assert(not(pwr(10.0, -9) > 0));	  //.000000001
-	assert(not(pwr(10.0, -8) > 0));	  //.00000001
-	assert(not(pwr(10.0, -7) > 0));	  //.0000001
-	assert(not(pwr(10.0, -6) > 0));	  //.000001
-	assert(not(pwr(10.0, -5) > 0));	  //.00001
+	assert(not(pwr(10.0, -10) gt 0));  //.0000000001
+	assert(not(pwr(10.0, -9) gt 0));	  //.000000001
+	assert(not(pwr(10.0, -8) gt 0));	  //.00000001
+	assert(not(pwr(10.0, -7) gt 0));	  //.0000001
+	assert(not(pwr(10.0, -6) gt 0));	  //.000001
+	assert(not(pwr(10.0, -5) gt 0));	  //.00001
 	//
-	assert((pwr(10.0, -4) > 0));  //.0001
-	assert((pwr(10.0, -3) > 0));  //.001
-	assert((pwr(10.0, -2) > 0));  //.01
-	assert((pwr(10.0, -1) > 0));  //.1
-	assert((pwr(10.0, 0) > 0));	  //1
-	assert((pwr(10.0, 1) > 0));	  //10
-	assert((pwr(10.0, 2) > 0));	  //100
-	assert((pwr(10.0, 3) > 0));	  //1000
+	assert((pwr(10.0, -4) gt 0));  //.0001
+	assert((pwr(10.0, -3) gt 0));  //.001
+	assert((pwr(10.0, -2) gt 0));  //.01
+	assert((pwr(10.0, -1) gt 0));  //.1
+	assert((pwr(10.0, 0) gt 0));	  //1
+	assert((pwr(10.0, 1) gt 0));	  //10
+	assert((pwr(10.0, 2) gt 0));	  //100
+	assert((pwr(10.0, 3) gt 0));	  //1000
 
 	var smaller			 = SMALLEST_NUMBER - 0.000000000001;
 	var negative_smaller = -SMALLEST_NUMBER + 0.000000000001;
@@ -316,62 +316,62 @@ programinit()
 	// var double
 
 	{
-		printl("Test var double > int 0");
+		printl("Test var double gt int 0");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) > 0);
+		assert(var(SMALLEST_NUMBER) gt 0);
 
 		printl("Slightly smaller number is *not* greater than 0");
-		assert(not(var(smaller) > 0));
+		assert(not(var(smaller) gt 0));
 	}
 	{
-		printl("Test var double > double");
+		printl("Test var double gt double");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) > 0.0);
+		assert(var(SMALLEST_NUMBER) gt 0.0);
 
 		printl("Slightly smaller number is *not* greater than 0");
-		assert(not(var(smaller) > 0.0));
+		assert(not(var(smaller) gt 0.0));
 	}
 
 	{
-		printl("Test var double > var int  0");
+		printl("Test var double gt var int  0");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) > var(0));
+		assert(var(SMALLEST_NUMBER) gt var(0));
 
 		printl("Slightly smaller number is *not* greater than 0");
-		assert(not(var(smaller) > var(0)));
+		assert(not(var(smaller) gt var(0)));
 	}
 	{
-		printl("Test var double > var double 0");
+		printl("Test var double gt var double 0");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) > var(0.0));
+		assert(var(SMALLEST_NUMBER) gt var(0.0));
 
 		printl("Slightly smaller number is *not* greater than 0");
-		assert(not(var(smaller) > var(0.0)));
+		assert(not(var(smaller) gt var(0.0)));
 	}
 
 	// <
 
 	{
-		printl("Test var double < var int  0");
+		printl("Test var double lt var int  0");
 
-		printl("Smallest neg number is < than 0");
-		assert(var(-SMALLEST_NUMBER) < 0);
+		printl("Smallest neg number is lt than 0");
+		assert(var(-SMALLEST_NUMBER) lt 0);
 
-		printl("Slightly smaller neg number is *not* < than 0");
-		assert(not(var(negative_smaller) < 0));
+		printl("Slightly smaller neg number is *not* lt than 0");
+		assert(not(var(negative_smaller) lt 0));
 	}
 	{
-		printl("Test var double < var double 0");
+		printl("Test var double lt var double 0");
 
-		printl("Smallest number is < than 0.0");
-		assert(var(-SMALLEST_NUMBER) < var(0.0));
+		printl("Smallest number is lt than 0.0");
+		assert(var(-SMALLEST_NUMBER) lt var(0.0));
 
 		printl("Slightly smaller neg number is *not* greater than 0.0");
-		assert(not(var(negative_smaller) < var(0.0)));
+		assert(not(var(negative_smaller) lt var(0.0)));
 	}
 
 	{
@@ -381,89 +381,89 @@ programinit()
 		// Leading spaces are not acceptable on otherwise numeric strings
 
 		// Differences from Javascript
-		// 0.999999999999 != 1 and  != true
+		// 0.999999999999 ne 1 and  ne true
 
-		assert((var("") == true) == false); //same as javascript
-		assert((var("") != true) == true); //same as javascript
+		assert((var("") eq true) eq false); //same as javascript
+		assert((var("") ne true) eq true); //same as javascript
 
-		assert((var("") == false) == true); //javascript
-		assert((var("") != false) == false); //javascript
+		assert((var("") eq false) eq true); //javascript
+		assert((var("") ne false) eq false); //javascript
 
-//		assert(var("") == false);
-		assert(var("") != true);
+//		assert(var("") eq false);
+		assert(var("") ne true);
 
-//		assert(var(" ") == false);//javascript
-		assert(var(" ") != false);//exodus
-		assert(var(" ") != true);
+//		assert(var(" ") eq false);//javascript
+		assert(var(" ") ne false);//exodus
+		assert(var(" ") ne true);
 
 
-		assert(var("1") != false);
-		assert(var("1") == true);
+		assert(var("1") ne false);
+		assert(var("1") eq true);
 
-		assert(var("2") != false);
-		assert(var("2") != true);
+		assert(var("2") ne false);
+		assert(var("2") ne true);
 
-		assert(var("x") != false);
-		assert(var("x") != true);
+		assert(var("x") ne false);
+		assert(var("x") ne true);
 
-		assert(var("1.01") != false); // only zero and empty string are false
-		assert(var("1.01") != true);  // not quite = 1
+		assert(var("1.01") ne false); // only zero and empty string are false
+		assert(var("1.01") ne true);  // not quite = 1
 
-		assert(var("1.001") != false); // only zero and empty string are false
-		assert(var("1.001") != true);  // not quite = 1
+		assert(var("1.001") ne false); // only zero and empty string are false
+		assert(var("1.001") ne true);  // not quite = 1
 
-		assert(var("1.0001") != false); // only zero and empty string are false
+		assert(var("1.0001") ne false); // only zero and empty string are false
 
-//		assert(var("1.0001") != true);  // not quite = 1
-//		assert(var("1.0001") != true);  // not quite = 1
-		assert(var("1.00001") == true); //too small a difference from 1
-		assert(var("1.00001") != false); //too small a difference from 1
+//		assert(var("1.0001") ne true);  // not quite = 1
+//		assert(var("1.0001") ne true);  // not quite = 1
+		assert(var("1.00001") eq true); //too small a difference from 1
+		assert(var("1.00001") ne false); //too small a difference from 1
 
-		assert(var("1.0001") != false);//close enough to 1 to be true?
-		assert(var("1.0001") == true);
+		assert(var("1.0001") ne false);//close enough to 1 to be true?
+		assert(var("1.0001") eq true);
 
-		assert(var("2.0") != false);//neither true nor false
-		assert(var("2.0") != true);
+		assert(var("2.0") ne false);//neither true nor false
+		assert(var("2.0") ne true);
 
-		assert(var("x") != false);//neither true nor false
-		assert(var("x") != true);
+		assert(var("x") ne false);//neither true nor false
+		assert(var("x") ne true);
 
-		assert(0.9999 != true);// not close enough to 1
-		assert(0.9999 != false);
+		assert(0.9999 ne true);// not close enough to 1
+		assert(0.9999 ne false);
 
-		assert(0.99999 != true);// close enough to 1
-		assert(0.99999 != false);
+		assert(0.99999 ne true);// close enough to 1
+		assert(0.99999 ne false);
 
-		assert(var(1.01) != false); // only number 1 is true
-		assert(var(1.01) != true);  // not quite = 1
+		assert(var(1.01) ne false); // only number 1 is true
+		assert(var(1.01) ne true);  // not quite = 1
 
-		assert(var(1.001) != false); // only zero and empty string are false
-		assert(var(1.001) != true);  // not quite = 1
+		assert(var(1.001) ne false); // only zero and empty string are false
+		assert(var(1.001) ne true);  // not quite = 1
 
-		assert(var(1.0001) != false); // Only zero and empty string are false
-//		assert(var(1.0001) != true);  // not quite = 1
-		assert(var(1.00001) == true); //too small a difference from 1
-		assert(var(1.00001) != false); //too small a difference from 1
+		assert(var(1.0001) ne false); // Only zero and empty string are false
+//		assert(var(1.0001) ne true);  // not quite = 1
+		assert(var(1.00001) eq true); //too small a difference from 1
+		assert(var(1.00001) ne false); //too small a difference from 1
 
-		assert(var(1.0001) != false);
-		assert(var(1.0001) == true);
+		assert(var(1.0001) ne false);
+		assert(var(1.0001) eq true);
 
-		assert(var(1) != false);
-		assert(var(1) == true);
+		assert(var(1) ne false);
+		assert(var(1) eq true);
 
-		assert(var(2) != false);//neither true nor false
-		assert(var(2) != true);
+		assert(var(2) ne false);//neither true nor false
+		assert(var(2) ne true);
 
-		assert(var(1.0) != false);
-		assert(var(1.0) == true);
+		assert(var(1.0) ne false);
+		assert(var(1.0) eq true);
 
-		assert(var(2.0) != false);//neither true nor false
-		assert(var(2.0) != true);
+		assert(var(2.0) ne false);//neither true nor false
+		assert(var(2.0) ne true);
 
 	}
 	{
-		assert( var("xxx") != true);
-		assert( true != var("xxx"));
+		assert( var("xxx") ne true);
+		assert( true ne var("xxx"));
 
 		assert(true eq var(1));
 		assert(true eq var(1.0));
@@ -481,7 +481,7 @@ programinit()
 		assert(true ne var(0));
 		assert(true ne var(0.0));
 
-		assert(var("") < true);
+		assert(var("") lt true);
 	}
 	{
 		assert(not(var("1x")   lt true));
@@ -566,160 +566,160 @@ programinit()
 	}
 
 	{
-		assert((var("x") == true) == false);
-		assert((var("x") == false) == false);
+		assert((var("x") eq true) eq false);
+		assert((var("x") eq false) eq false);
 
-		assert((var("x") != true) == true);
-		assert((var("x") != false) == true);
+		assert((var("x") ne true) eq true);
+		assert((var("x") ne false) eq true);
 
-		assert((var("x") < true) == false);
-		assert((var("x") < false) == false);
+		assert((var("x") lt true) eq false);
+		assert((var("x") lt false) eq false);
 
-		assert((var("x") <= true) == false);
-		assert((var("x") <= false) == false);
+		assert((var("x") le true) eq false);
+		assert((var("x") le false) eq false);
 
-		assert((var("x") > true) == true);
-		assert((var("x") > false) == true);
+		assert((var("x") gt true) eq true);
+		assert((var("x") gt false) eq true);
 
-		assert((var("x") >= true) == true);
-		assert((var("x") >= false) == true);
+		assert((var("x") ge true) eq true);
+		assert((var("x") ge false) eq true);
 	}
 
 	{
-		assert((true == var("x")) == false);
-		assert((false == var("x")) == false);
+		assert((true eq var("x")) eq false);
+		assert((false eq var("x")) eq false);
 
-		assert((true != var("x")) == true);
-		assert((false != var("x")) == true);
+		assert((true ne var("x")) eq true);
+		assert((false ne var("x")) eq true);
 
-		assert((true < var("x")) == true);
-		assert((false < var("x")) == true);
+		assert((true lt var("x")) eq true);
+		assert((false lt var("x")) eq true);
 
-		assert((true <= var("x")) == true);
-		assert((false <= var("x")) == true);
+		assert((true le var("x")) eq true);
+		assert((false le var("x")) eq true);
 
-		assert((true > var("x")) == false);
-		assert((false > var("x")) == false);
+		assert((true gt var("x")) eq false);
+		assert((false gt var("x")) eq false);
 
-		assert((true >= var("x")) == false);
-		assert((false >= var("x")) == false);
+		assert((true ge var("x")) eq false);
+		assert((false ge var("x")) eq false);
 	}
 
 
-	for (var j = -1; j <= 1; j++) {
-		for (var i = -6; i <= 1; i++) {
+	for (var j = -1; j le 1; j++) {
+		for (var i = -6; i le 1; i++) {
 			var d = pwr(10, i);
 			var d2 = d + j;
 	//		TRACE(d)
-	//		TRACE(d == true)
-	//		TRACE(d == false)
+	//		TRACE(d eq true)
+	//		TRACE(d eq false)
 			var line;
 			printl();
-			line = var("assert((var(") ^ d2 ^ ") == true)  == " ^ ((d2 == true)  ? "true " : "false") ^ ");";
+			line = var("assert((var(") ^ d2 ^ ") eq true)  eq " ^ ((d2 eq true)  ? "true " : "false") ^ ");";
 			printl(line);
-			line = var("assert((var(") ^ d2 ^ ") == false) == " ^ ((d2 == false) ? "true " : "false") ^ ");";
+			line = var("assert((var(") ^ d2 ^ ") eq false) eq " ^ ((d2 eq false) ? "true " : "false") ^ ");";
 			printl(line);
 		}
 	}
 
-	assert((var(0.000001) == true)  == false);
-	assert((var(0.000001) == false) == true );
-	assert((var(0.00001) == true)  == false);
-	assert((var(0.00001) == false) == true );
-	assert((var(0.0001) == true)  == false);
-	assert((var(0.0001) == false) == false);
-	assert((var(0.001) == true)  == false);
-	assert((var(0.001) == false) == false);
-	assert((var(0.01) == true)  == false);
-	assert((var(0.01) == false) == false);
-	assert((var(0.1) == true)  == false);
-	assert((var(0.1) == false) == false);
-	assert((var(1) == true)  == true );
-	assert((var(1) == false) == false);
-	assert((var(10) == true)  == false);
-	assert((var(10) == false) == false);
-	assert((var(100) == true)  == false);
-	assert((var(100) == false) == false);
-	assert((var(1000) == true)  == false);
-	assert((var(1000) == false) == false);
-	assert((var(10000) == true)  == false);
-	assert((var(10000) == false) == false);
-	assert((var(100000) == true)  == false);
-	assert((var(100000) == false) == false);
-	assert((var(1000000) == true)  == false);
-	assert((var(1000000) == false) == false);
+	assert((var(0.000001) eq true)  eq false);
+	assert((var(0.000001) eq false) eq true );
+	assert((var(0.00001) eq true)  eq false);
+	assert((var(0.00001) eq false) eq true );
+	assert((var(0.0001) eq true)  eq false);
+	assert((var(0.0001) eq false) eq false);
+	assert((var(0.001) eq true)  eq false);
+	assert((var(0.001) eq false) eq false);
+	assert((var(0.01) eq true)  eq false);
+	assert((var(0.01) eq false) eq false);
+	assert((var(0.1) eq true)  eq false);
+	assert((var(0.1) eq false) eq false);
+	assert((var(1) eq true)  eq true );
+	assert((var(1) eq false) eq false);
+	assert((var(10) eq true)  eq false);
+	assert((var(10) eq false) eq false);
+	assert((var(100) eq true)  eq false);
+	assert((var(100) eq false) eq false);
+	assert((var(1000) eq true)  eq false);
+	assert((var(1000) eq false) eq false);
+	assert((var(10000) eq true)  eq false);
+	assert((var(10000) eq false) eq false);
+	assert((var(100000) eq true)  eq false);
+	assert((var(100000) eq false) eq false);
+	assert((var(1000000) eq true)  eq false);
+	assert((var(1000000) eq false) eq false);
 
-	assert((var(-0.999999) == true)  == false);
-	assert((var(-0.999999) == false) == false);
+	assert((var(-0.999999) eq true)  eq false);
+	assert((var(-0.999999) eq false) eq false);
 
-	assert((var(-0.99999) == true)  == false);
-	assert((var(-0.99999) == false) == false);
+	assert((var(-0.99999) eq true)  eq false);
+	assert((var(-0.99999) eq false) eq false);
 
-	assert((var(-0.9999) == true)  == false);
-	assert((var(-0.9999) == false) == false);
+	assert((var(-0.9999) eq true)  eq false);
+	assert((var(-0.9999) eq false) eq false);
 
-	assert((var(-0.999) == true)  == false);
-	assert((var(-0.999) == false) == false);
+	assert((var(-0.999) eq true)  eq false);
+	assert((var(-0.999) eq false) eq false);
 
-	assert((var(-0.99) == true)  == false);
-	assert((var(-0.99) == false) == false);
+	assert((var(-0.99) eq true)  eq false);
+	assert((var(-0.99) eq false) eq false);
 
-	assert((var(-0.9) == true)  == false);
-	assert((var(-0.9) == false) == false);
+	assert((var(-0.9) eq true)  eq false);
+	assert((var(-0.9) eq false) eq false);
 
-	assert((var(0) == true)  == false);
-	assert((var(0) == false) == true );
+	assert((var(0) eq true)  eq false);
+	assert((var(0) eq false) eq true );
 
-	assert((var(9) == true)  == false);
-	assert((var(9) == false) == false);
+	assert((var(9) eq true)  eq false);
+	assert((var(9) eq false) eq false);
 
-	assert((var(0.000001) == true)  == false);
-	assert((var(0.000001) == false) == true );
+	assert((var(0.000001) eq true)  eq false);
+	assert((var(0.000001) eq false) eq true );
 
-	assert((var(0.00001) == true)  == false);
-	assert((var(0.00001) == false) == true );
+	assert((var(0.00001) eq true)  eq false);
+	assert((var(0.00001) eq false) eq true );
 
-	assert((var(0.0001) == true)  == false);
-	assert((var(0.0001) == false) == false);
+	assert((var(0.0001) eq true)  eq false);
+	assert((var(0.0001) eq false) eq false);
 
-	assert((var(0.001) == true)  == false);
-	assert((var(0.001) == false) == false);
+	assert((var(0.001) eq true)  eq false);
+	assert((var(0.001) eq false) eq false);
 
-	assert((var(0.01) == true)  == false);
-	assert((var(0.01) == false) == false);
+	assert((var(0.01) eq true)  eq false);
+	assert((var(0.01) eq false) eq false);
 
-	assert((var(0.1) == true)  == false);
-	assert((var(0.1) == false) == false);
+	assert((var(0.1) eq true)  eq false);
+	assert((var(0.1) eq false) eq false);
 
-	assert((var(1) == true)  == true );
-	assert((var(1) == false) == false);
+	assert((var(1) eq true)  eq true );
+	assert((var(1) eq false) eq false);
 
-	assert((var(10) == true)  == false);
-	assert((var(10) == false) == false);
+	assert((var(10) eq true)  eq false);
+	assert((var(10) eq false) eq false);
 
-	assert((var(1.000001) == true)  == true );
-	assert((var(1.000001) == false) == false);
+	assert((var(1.000001) eq true)  eq true );
+	assert((var(1.000001) eq false) eq false);
 
-	assert((var(1.00001) == true)  == true );
-	assert((var(1.00001) == false) == false);
+	assert((var(1.00001) eq true)  eq true );
+	assert((var(1.00001) eq false) eq false);
 
-	assert((var(1.0001) == true)  == true );
-	assert((var(1.0001) == false) == false);
+	assert((var(1.0001) eq true)  eq true );
+	assert((var(1.0001) eq false) eq false);
 
-	assert((var(1.001) == true)  == false);
-	assert((var(1.001) == false) == false);
+	assert((var(1.001) eq true)  eq false);
+	assert((var(1.001) eq false) eq false);
 
-	assert((var(1.01) == true)  == false);
-	assert((var(1.01) == false) == false);
+	assert((var(1.01) eq true)  eq false);
+	assert((var(1.01) eq false) eq false);
 
-	assert((var(1.1) == true)  == false);
-	assert((var(1.1) == false) == false);
+	assert((var(1.1) eq true)  eq false);
+	assert((var(1.1) eq false) eq false);
 
-	assert((var(2) == true)  == false);
-	assert((var(2) == false) == false);
+	assert((var(2) eq true)  eq false);
+	assert((var(2) eq false) eq false);
 
-	assert((var(11) == true)  == false);
-	assert((var(11) == false) == false);
+	assert((var(11) eq true)  eq false);
+	assert((var(11) eq false) eq false);
 
 	printl(elapsedtimetext());
 	printl("Test passed");

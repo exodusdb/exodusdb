@@ -27,70 +27,70 @@ programinit()
 		assert(1.0   eq v2);
 		assert(true  eq v2);
 
-		// != ne
-		assert(!(v1 != v2));
-		assert(!(v1 != "1.0"));
-		assert(!(v1 != '1'));
-		assert(!(v1 != 1));
-		assert(!(v1 != 1.0));
-		assert(!(v1 != true));
-		assert(!("1.0" != v2));
-		assert(!('1' != v2));
-		assert(!(1 != v2));
-		assert(!(1.0 != v2));
-		assert(!(true != v2));
+		// ne ne
+		assert(!(v1 ne v2));
+		assert(!(v1 ne "1.0"));
+		assert(!(v1 ne '1'));
+		assert(!(v1 ne 1));
+		assert(!(v1 ne 1.0));
+		assert(!(v1 ne true));
+		assert(!("1.0" ne v2));
+		assert(!('1' ne v2));
+		assert(!(1 ne v2));
+		assert(!(1.0 ne v2));
+		assert(!(true ne v2));
 
-		// < lt
-		assert(!(v1 < v2));
-		assert(!(v1 < "1.0"));
-		assert(!(v1 < '1'));
-		assert(!(v1 < 1));
-		assert(!(v1 < 1.0));
-		assert(!(v1 < true));
-		assert(!("1.0" < v2));
-		assert(!('1' < v2));
-		assert(!(1 < v2));
-		assert(!(1.0 < v2));
-		assert(!(true < v2));
+		// lt lt
+		assert(!(v1 lt v2));
+		assert(!(v1 lt "1.0"));
+		assert(!(v1 lt '1'));
+		assert(!(v1 lt 1));
+		assert(!(v1 lt 1.0));
+		assert(!(v1 lt true));
+		assert(!("1.0" lt v2));
+		assert(!('1' lt v2));
+		assert(!(1 lt v2));
+		assert(!(1.0 lt v2));
+		assert(!(true lt v2));
 
-		// <= le
-		assert((v1 <= v2));
-		assert((v1 <= "1.0"));
-		assert((v1 <= '1'));
-		assert((v1 <= 1));
-		assert((v1 <= 1.0));
-		assert((v1 <= true));
-		assert(("1.0" <= v2));
-		assert(('1' <= v2));
-		assert((1 <= v2));
-		assert((1.0 <= v2));
-		assert((true <= v2));
+		// le le
+		assert((v1 le v2));
+		assert((v1 le "1.0"));
+		assert((v1 le '1'));
+		assert((v1 le 1));
+		assert((v1 le 1.0));
+		assert((v1 le true));
+		assert(("1.0" le v2));
+		assert(('1' le v2));
+		assert((1 le v2));
+		assert((1.0 le v2));
+		assert((true le v2));
 
-		/// > lt
-		assert(!(v1 > v2));
-		assert(!(v1 > "1.0"));
-		assert(!(v1 > '1'));
-		assert(!(v1 > 1));
-		assert(!(v1 > 1.0));
-		assert(!(v1 > true));
-		assert(!("1.0" > v2));
-		assert(!('1' > v2));
-		assert(!(1 > v2));
-		assert(!(1.0 > v2));
-		assert(!(true > v2));
+		/// gt lt
+		assert(!(v1 gt v2));
+		assert(!(v1 gt "1.0"));
+		assert(!(v1 gt '1'));
+		assert(!(v1 gt 1));
+		assert(!(v1 gt 1.0));
+		assert(!(v1 gt true));
+		assert(!("1.0" gt v2));
+		assert(!('1' gt v2));
+		assert(!(1 gt v2));
+		assert(!(1.0 gt v2));
+		assert(!(true gt v2));
 
-		// >= ge
-		assert((v1 >= v2));
-		assert((v1 >= "1.0"));
-		assert((v1 >= '1'));
-		assert((v1 >= 1));
-		assert((v1 >= 1.0));
-		assert((v1 >= true));
-		assert(("1.0" >= v2));
-		assert(('1' >= v2));
-		assert((1 >= v2));
-		assert((1.0 >= v2));
-		assert((true >= v2));
+		// ge ge
+		assert((v1 ge v2));
+		assert((v1 ge "1.0"));
+		assert((v1 ge '1'));
+		assert((v1 ge 1));
+		assert((v1 ge 1.0));
+		assert((v1 ge true));
+		assert(("1.0" ge v2));
+		assert(('1' ge v2));
+		assert((1 ge v2));
+		assert((1.0 ge v2));
+		assert((true ge v2));
 
 		{
 			var v1 = 10;
@@ -228,82 +228,82 @@ programinit()
 		assert(!(2     eq v2));
 		assert(!(2.0   eq v2));
 
-		//assert(!(true != v2));	//v1.toBool()
-		assert( (true != v2));
-		assert( (false != v2));
+		//assert(!(true ne v2));	//v1.toBool()
+		assert( (true ne v2));
+		assert( (false ne v2));
 
-		// != ne
-		assert(v1 != v2);
-		assert(v1 != "3.0");
-		assert(v1 != '3');
-		assert(v1 != 3);
-		assert(v1 != 3.0);
+		// ne ne
+		assert(v1 ne v2);
+		assert(v1 ne "3.0");
+		assert(v1 ne '3');
+		assert(v1 ne 3);
+		assert(v1 ne 3.0);
 		assert(!(v1   eq true));
 		assert(  v1   ne true);
 		assert(!(v1   eq false));
 		assert(  v1   ne true);
 		;  //v1.toBool()
-		assert("2.0" != v2);
-		assert('2' != v2);
-		assert(2 != v2);
-		assert(2.0 != v2);
+		assert("2.0" ne v2);
+		assert('2' ne v2);
+		assert(2 ne v2);
+		assert(2.0 ne v2);
 		assert(!(true eq v2));
 		assert(  true ne v2);
 		assert(!(false eq v2));
 		assert(  false ne v2);
 		;
 
-		// < lt
-		assert((v1 < v2));
-		assert((v1 < "3.0"));
-		assert((v1 < '3'));
-		assert((v1 < 3));
-		assert((v1 < 3.0));
-		assert(!(v1 < true));
-		assert(("2.0" < v2));
-		assert(('2' < v2));
-		assert((2 < v2));
-		assert((2.0 < v2));
-		assert(true < v2);
+		// lt lt
+		assert((v1 lt v2));
+		assert((v1 lt "3.0"));
+		assert((v1 lt '3'));
+		assert((v1 lt 3));
+		assert((v1 lt 3.0));
+		assert(!(v1 lt true));
+		assert(("2.0" lt v2));
+		assert(('2' lt v2));
+		assert((2 lt v2));
+		assert((2.0 lt v2));
+		assert(true lt v2);
 
-		// <= le
-		assert((v1 <= v2));
-		assert((v1 <= "3.0"));
-		assert((v1 <= '3'));
-		assert((v1 <= 3));
-		assert((v1 <= 3.0));
-		assert(!(v1 <= true));
-		assert(("2.0" <= v2));
-		assert(('2' <= v2));
-		assert((2 <= v2));
-		assert((2.0 <= v2));
-		assert((true <= v2));
+		// le le
+		assert((v1 le v2));
+		assert((v1 le "3.0"));
+		assert((v1 le '3'));
+		assert((v1 le 3));
+		assert((v1 le 3.0));
+		assert(!(v1 le true));
+		assert(("2.0" le v2));
+		assert(('2' le v2));
+		assert((2 le v2));
+		assert((2.0 le v2));
+		assert((true le v2));
 
-		/// > lt
-		assert(!(v1 > v2));
-		assert(!(v1 > "3.0"));
-		assert(!(v1 > '3'));
-		assert(!(v1 > 3));
-		assert(!(v1 > 3.0));
-		assert( (v1 > true));
-		assert(!("2.0" > v2));
-		assert(!('2' > v2));
-		assert(!(2 > v2));
-		assert(!(2.0 > v2));
-		assert(!(true > v2));
+		/// gt lt
+		assert(!(v1 gt v2));
+		assert(!(v1 gt "3.0"));
+		assert(!(v1 gt '3'));
+		assert(!(v1 gt 3));
+		assert(!(v1 gt 3.0));
+		assert( (v1 gt true));
+		assert(!("2.0" gt v2));
+		assert(!('2' gt v2));
+		assert(!(2 gt v2));
+		assert(!(2.0 gt v2));
+		assert(!(true gt v2));
 
-		// >= ge
-		assert(!(v1 >= v2));
-		assert(!(v1 >= "3.0"));
-		assert(!(v1 >= '3'));
-		assert(!(v1 >= 3));
-		assert(!(v1 >= 3.0));
-		assert((v1 >= true));
-		assert(!("2.0" >= v2));
-		assert(!('2' >= v2));
-		assert(!(2 >= v2));
-		assert(!(2.0 >= v2));
-		assert(!(true >= v2));
+		// ge ge
+		assert(!(v1 ge v2));
+		assert(!(v1 ge "3.0"));
+		assert(!(v1 ge '3'));
+		assert(!(v1 ge 3));
+		assert(!(v1 ge 3.0));
+		assert((v1 ge true));
+		assert(!("2.0" ge v2));
+		assert(!('2' ge v2));
+		assert(!(2 ge v2));
+		assert(!(2.0 ge v2));
+		assert(!(true ge v2));
 
 		// + add
 		assert((v1 + v2)    eq 5);

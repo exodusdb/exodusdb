@@ -10,7 +10,7 @@ function main() {
 
 	printl("test_regress says 'Hello World!'");
 
-	//TRACE(var("") < var("A"));  //is true (1)
+	//TRACE(var("") lt var("A"));  //is true (1)
 	//stop();
 
 	var filenames = COMMAND.remove(1);
@@ -90,7 +90,7 @@ Lines: 190125 differences: 2 Max differences: 2
 	}
 
 	printl(elapsedtimetext());
-	if (totndifferences < 1)
+	if (totndifferences lt 1)
 		printl("Test passed");
 	else
 		printl("Test failed with ", totndifferences, "differences");
@@ -178,23 +178,23 @@ function onefile(in filename, in maxndifferences) {
 				break;
 
 			case 6:	 // ne
-				result = ARG0 != ARG1;
+				result = ARG0 ne ARG1;
 				break;
 
 			case 7:	 // lt
-				result = ARG0 < ARG1;
+				result = ARG0 lt ARG1;
 				break;
 
 			case 8:	 // le
-				result = ARG0 <= ARG1;
+				result = ARG0 le ARG1;
 				break;
 
 			case 9:	 // gt
-				result = ARG0 > ARG1;
+				result = ARG0 gt ARG1;
 				break;
 
 			case 10:  // ge
-				result = ARG0 >= ARG1;
+				result = ARG0 ge ARG1;
 				break;
 
 			case 11:  // field
@@ -215,7 +215,7 @@ function onefile(in filename, in maxndifferences) {
 				//71. 0   OCONV   -.5     MX result differs: FFFFFFFFFFFFFFFF
 				//119. 0  OCONV   .5      MX result differs: 1
 				if (ARG1 eq "MX") {
-					if (ARG0 eq 0.5 or ARG0 == -0.5)
+					if (ARG0 eq 0.5 or ARG0 eq -0.5)
 						continue;
 				}
 
@@ -239,7 +239,7 @@ function onefile(in filename, in maxndifferences) {
 				//TRACE(LOCATE_VN)
 				//TRACE(LOCATE_SN)
 				sep = LOCATE_USING;
-				if (sep > RM && ARG0.f(1, 1, 1) ne ARG0) {
+				if (sep gt RM && ARG0.f(1, 1, 1) ne ARG0) {
 					result = TARGET;
 				} else {
 					result = ARG0.locateusing(LOCATE_USING, LOCATE_WHAT, setting, LOCATE_FN, LOCATE_VN, LOCATE_SN);
@@ -281,7 +281,7 @@ function onefile(in filename, in maxndifferences) {
 				}
 
 				//skip difference when separator is 0 because it is not required
-				if (sep >= "0" and sep <= "9" and (LOCATE_BY eq "AR" or LOCATE_BY == "DR"))
+				if (sep ge "0" and sep le "9" and (LOCATE_BY eq "AR" or LOCATE_BY eq "DR"))
 					continue;
 
 				/*
@@ -301,7 +301,7 @@ function onefile(in filename, in maxndifferences) {
 					else
 						sep = FM;
 				}
-				if (sep and sep <= RM) {
+				if (sep and sep le RM) {
 					pick_sep = chr(seq(sep)+256-32);
 					converter(what,pick_sep,sep);
 					converter(subrec,pick_sep,sep);
@@ -322,14 +322,14 @@ function onefile(in filename, in maxndifferences) {
 				} else {
 
 					/*
-				//skip some case where Pick/AREV are strange ie compare FM:'A' < 'A' in order by
+				//skip some case where Pick/AREV are strange ie compare FM:'A' lt 'A' in order by
 				//i.e. skip lines where PICK/AREV thinks that "A"> FM:A (something that we can say is "undefined behaviour" for locate by
-				if (LOCATE_FN eq 0 and LOCATE_VN == 0 and LOCATE_SN == 0) {
+				if (LOCATE_FN eq 0 and LOCATE_VN eq 0 and LOCATE_SN eq 0) {
 					if (subrec.contains("\xFE")) {
-						if (sep eq VM or sep == SM or sep > RM)
+						if (sep eq VM or sep eq SM or sep gt RM)
 							continue;
 					}
-					else if (subrec.contains("\xFD") and ( sep eq SM or sep > RM))
+					else if (subrec.contains("\xFD") and ( sep eq SM or sep gt RM))
 						continue;
 				}
 				*/
@@ -382,7 +382,7 @@ function onefile(in filename, in maxndifferences) {
 
 	printl("Lines:", lineno, "differences:", ndifferences, "Max differences allowed:", maxndifferences);
 
-	if (ndifferences <= maxndifferences)
+	if (ndifferences le maxndifferences)
 		ndifferences = 0;
 	else
 		ndifferences -= maxndifferences;

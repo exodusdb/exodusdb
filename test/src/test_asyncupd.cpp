@@ -66,11 +66,11 @@ function main() {
 	}
 
 	// Perform one process updates
-	if (silent < 2)
+	if (silent lt 2)
 		printl("Starting", THREADNO, OPTIONS);
 
 	var n = "";
-	while (n < max and not esctoexit()) {
+	while (n lt max and not esctoexit()) {
 
 		// Start transaction
 		if (use_transaction)
@@ -112,7 +112,7 @@ function main() {
 		}
 	}
 
-	if (silent < 2)
+	if (silent lt 2)
 		printl("Finished", THREADNO, OPTIONS);
 
 	return 0;

@@ -14,7 +14,7 @@ void test_min_max(std::string typetitle, int max_min = 0)
 {
 	// Test largest positive number round trips into/out of var
 
-	if (max_min != 2) {
+	if (max_min ne 2) {
 		TYPE max = std::numeric_limits<TYPE>::max();
 		printl("\nTesting IMPLICIT conversion from and to", typetitle, max, "MAX");
 		TYPE vmax = var(max);
@@ -26,7 +26,7 @@ void test_min_max(std::string typetitle, int max_min = 0)
 		assert(vmax eq max);
 	}
 
-	if (max_min != 1) {
+	if (max_min ne 1) {
 		// Test lowest negative number round trips into/out of var
 		// NB
 		// ::min is the smallest POSITIVE number
@@ -166,10 +166,10 @@ function main() {
 			printl("IMPLICIT conversion from and to bool");
 
 			bool t = var(true);
-			assert(t == true);
+			assert(t eq true);
 
 			bool f = var(false);
-			assert(f == false);
+			assert(f eq false);
 		}
 
 		printl("IMPLICIT to char conversion is via var.toInt().");

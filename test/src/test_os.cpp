@@ -135,7 +135,7 @@ programinit()
 
 	//root directories
 
-	//check one step multilevel subfolder creation (requires boost version > ?)
+	//check one step multilevel subfolder creation (requires boost version gt ?)
 	var topdir1	 = _OSSLASH "exodus544";
 	var topdir1b = topdir1 ^ "b";
 	var subdir2	 = topdir1 ^ _OSSLASH "abcd";
@@ -362,7 +362,7 @@ programinit()
 
 		printl("Linux only using 'cat'");
 		TRACE(testdata)
-		assert(osshellwrite(testdata on "cat > " ^ tempfilename));
+		assert(osshellwrite(testdata on "cat >" ^ tempfilename));
 		TRACE(testdata)
 
 		printl("Check data was processed correctly");

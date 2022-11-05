@@ -4,7 +4,7 @@
 #include <iomanip>	// for setprecision
 
 // 1. TO_CHARS from Ubuntu 22.04
-#if __GNUC__ >= 11
+#if __GNUC__ >=11
 #define USE_TO_CHARS_G
 
 // 2. RYU

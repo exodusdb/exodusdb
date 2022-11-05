@@ -22,86 +22,86 @@ programinit()
 
 	{
 		//empty string is never equal to any double
-		assert(var("") != 3.3);
-		assert(var("") != 0.0);
+		assert(var("") ne 3.3);
+		assert(var("") ne 0.0);
 
 		var xi = "";
 		TRACE(xi.toInt())
 		xi.outputl("xi");
-		assert(xi != 0.0);
+		assert(xi ne 0.0);
 
 		var xd = "";
 		TRACE(xd.toDouble())
 		xd.outputl("xd");
-		assert(xd != 0.0);
+		assert(xd ne 0.0);
 
 		assert(var(0.0)  eq 0.0);
 		assert(var(3.3)  eq 3.3);
 		assert(var(-3.3) eq -3.3);
-		assert(var(3.4) != 3.3);
+		assert(var(3.4) ne 3.3);
 
 		assert(var("0.0")  eq 0.0);
 		assert(var("3.3")  eq 3.3);
 		assert(var("-3.3") eq -3.3);
-		assert(var("3.4") != 3.3);
+		assert(var("3.4") ne 3.3);
 
 		assert(var(0)  eq 0.0);
-		assert(var(0) != 3.3);
-		assert(var(4) != 3.3);
+		assert(var(0) ne 3.3);
+		assert(var(4) ne 3.3);
 		assert(var(3)  eq 3.0);
 		assert(var(-3) eq -3.0);
 
 		assert(var("0")  eq 0.0);
-		assert(var("0") != 3.3);
-		assert(var("4") != 3.3);
+		assert(var("0") ne 3.3);
+		assert(var("4") ne 3.3);
 		assert(var("3")  eq 3.0);
 		assert(var("-3") eq -3.0);
 
-		assert(var("xxxx") != 3.0);
+		assert(var("xxxx") ne 3.0);
 	}
 	{
 		//empty string is never equal to any double
-		assert(var("") != 3);
-		assert(var("") != 0);
+		assert(var("") ne 3);
+		assert(var("") ne 0);
 
 		var xi = "";
 		TRACE(xi.toInt())
 		xi.outputl("xi");
-		assert(xi != 0);
+		assert(xi ne 0);
 
 		var xd = "";
 		TRACE(xd.toDouble())
 		xd.outputl("xd");
-		assert(xd != 0);
+		assert(xd ne 0);
 
 		assert(var(0)   eq 0);
 		assert(var(0.)  eq 0);
 		assert(var(3.)  eq 3);
 		assert(var(-3.) eq -3);
-		assert(var(4.) != 3);
+		assert(var(4.) ne 3);
 
 		assert(var("0.0") eq 0);
 		assert(var("3.")  eq 3);
 		assert(var("-3.") eq -3);
-		assert(var("3.0") != 0);
+		assert(var("3.0") ne 0);
 
 		assert(var(0)  eq 0);
 		assert(var(0)  eq -0);
-		assert(var(0) != 3);
-		assert(var(4) != 3);
+		assert(var(0) ne 3);
+		assert(var(4) ne 3);
 		assert(var(3)  eq 3);
 		assert(var(-3) eq -3);
 
 		assert(var("0")  eq 0);
 		assert(var("-0") eq 0);
-		assert(var("0") != 3);
-		assert(var("4") != 3);
+		assert(var("0") ne 3);
+		assert(var("4") ne 3);
 		assert(var("3")  eq 3);
 		assert(var("-3") eq -3);
 
-		assert(var("xxxx") != 3);
-		assert(var("xxxx") != 0);
-		assert(var("xxxx") != -0);
+		assert(var("xxxx") ne 3);
+		assert(var("xxxx") ne 0);
+		assert(var("xxxx") ne -0);
 	}
 
 	// Test comparison with bool true/false
@@ -158,26 +158,26 @@ programinit()
 		assert(false ne var("10.0"));
 	}
 	{
-		assert(var("") != true);
-		assert(var("0") != true);
-		assert(var("0.") != true);
-		assert(var("0.0") != true);
+		assert(var("") ne true);
+		assert(var("0") ne true);
+		assert(var("0.") ne true);
+		assert(var("0.0") ne true);
 
-		assert(var("x") != false);
-		assert(var("10") != false);
-		assert(var("10.") != false);
-		assert(var("10.0") != false);
+		assert(var("x") ne false);
+		assert(var("10") ne false);
+		assert(var("10.") ne false);
+		assert(var("10.0") ne false);
 	}
 	{
-		assert(true != var(""));
-		assert(true != var("0"));
-		assert(true != var("0."));
-		assert(true != var("0.0"));
+		assert(true ne var(""));
+		assert(true ne var("0"));
+		assert(true ne var("0."));
+		assert(true ne var("0.0"));
 
-		assert(false != var("x"));
-		assert(false != var("10"));
-		assert(false != var("10."));
-		assert(false != var("10.0"));
+		assert(false ne var("x"));
+		assert(false ne var("10"));
+		assert(false ne var("10."));
+		assert(false ne var("10.0"));
 	}
 
 	{
@@ -206,7 +206,7 @@ programinit()
 		x = 1;
 		//assert(x.f(1)++ eq 1);//pointless. should not compile
 		assert(x.f(1)     eq 1);
-		//assert(++x.f(1) eq 2);//will not compile because "." priority > "++"
+		//assert(++x.f(1) eq 2);//will not compile because "." priority gt "++"
 		assert((++x).f(1) eq 2);
 		assert(x.f(1)     eq 2);
 
@@ -227,7 +227,7 @@ programinit()
 		x = 1;
 		//assert(x.f(1)-- eq 1);//pointless. should not compile
 		assert(x.f(1)     eq 1);
-		//assert(--x.f(1) eq 2);//will not compile because "." priority > "--"
+		//assert(--x.f(1) eq 2);//will not compile because "." priority gt "--"
 		assert((--x).f(1) eq 0);
 		assert(x.f(1)     eq 0);
 	}

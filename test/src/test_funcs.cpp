@@ -54,8 +54,8 @@ programinit()
 		ossleep(200);
 		var stopped = ostime();
 		// avoid testing if time crosses 00:00:00
-		if (stopped > started)
-			assert(ostime() - started > 0.1);
+		if (stopped gt started)
+			assert(ostime() - started gt 0.1);
 	}
 	{
 		assert(ospid().outputl("ospid=").match("\\d+"));

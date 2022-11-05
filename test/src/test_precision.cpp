@@ -6,7 +6,7 @@
 #include <sstream>
 
 // 1. TO_CHARS from Ubuntu 22.04
-#if __GNUC__ >= 11
+#if __GNUC__ >=11
 #define USE_TO_CHARS_G
 
 // 2. RYU
@@ -646,7 +646,7 @@ programexit()
 	//	assert(var(1e-14 ).outputl().toString() eq "1.0e-14");
 	//#endif
 
-	for (int i = -1000; i <= 1000; ++i) {
+	for (int i = -1000; i le 1000; ++i) {
 		std::stringstream ss;
 		ss << i;
 		assert((var(i) ^ "x").outputl() eq ss.str() + "x");
@@ -654,13 +654,13 @@ programexit()
 
 	printl("Checking -101.00 to +101.00 in steps of 0.01");
 	var started = ostime();
-	for (double d = -101.00; d <= 101.00; d += 0.01) {
+	for (double d = -101.00; d le 101.00; d += 0.01) {
 		std::stringstream ss;
 		ss.precision(2);
 		ss << std::fixed << d;
 		var v{d};
 		v = round(v, 2);
-		if ((v ^ "x") != ss.str() + "x") {
+		if ((v ^ "x") ne ss.str() + "x") {
 			TRACE(d)
 			TRACE(ss.str())
 			TRACE(v)
@@ -768,7 +768,7 @@ function test2(const std::string str1, const std::string str2 = std::string()) {
 	dv1		= dd1;
 	dv2		= str1;
 	sv1		= dv1 ^ "x";
-	var pad = (dd1 >= 0) ? " " : "";
+	var pad = (dd1 ge 0) ? " " : "";
 	print(pad, str1, "->", pad, sv1, "target:", pad, str2);
 	//printf(" printf:  %.17g\n", dd1);
 	//print(std::format("{:10g}", dd1);
@@ -781,7 +781,7 @@ function test2(const std::string str1, const std::string str2 = std::string()) {
 			printl("", " PASS");
 
 			//also test negative
-			if (str1[0] != '-' and str1[0] != '+') {
+			if (str1[0] ne '-' and str1[0] ne '+') {
 				if (var(str1).toDouble()) {
 					//not zero
 					return test2("-" + str1, "-" + str2);

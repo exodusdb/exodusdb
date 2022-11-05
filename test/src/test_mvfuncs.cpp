@@ -51,7 +51,7 @@ programinit()
 	TRACE(a.oconv("HEX"));
 	TRACE(textconvert("0123456789#", w, a));
 
-	assert(convert("0123456789#", w, a) != a);	//bytewise conversion of utf8 must not work
+	assert(convert("0123456789#", w, a) ne a);	//bytewise conversion of utf8 must not work
 
 	assert(textconvert("0123456789#", w, a) eq "٠١٢٣٤٥٦٧٨٩#");
 	assert(textconvert("0123456789#", w, a) eq a);
