@@ -329,6 +329,20 @@ subroutine replace_FM_etc(io sql) {
 	sql.regex_replacer(R"(\bSM\b)", R"(E'\\x1C')");
 	sql.regex_replacer(R"(\bTM\b)", R"(E'\\x1B')");
 	sql.regex_replacer(R"(\bST\b)", R"(E'\\x1A')");
+
+	// In case refactoring c++ code mangles pgsql code
+	//
+	// = is the SQL notation for "equals"
+	// sql.replacer(" eq ", " == ");
+	//
+	// <> is the standard SQL notation for "not equal". != is an alias, which is converted to <> at a very early stage of parsing.
+	sql.replacer(" ne ", " != ");
+	//
+	sql.replacer(" lt ", " < ");
+	sql.replacer(" le ", " <= ");
+	sql.replacer(" gt ", " > ");
+	sql.replacer(" ge ", " >= ");
+
 }
 
 subroutine create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
