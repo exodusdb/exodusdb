@@ -82,11 +82,11 @@ THE SOFTWARE.
 #define gosub
 
 
-// Labelled Common
+// Named Common
 // ===============
-// Utility macro to test if a "labelled common" is available.
+// Utility macro to test if a "Named common" is available.
 //
-#define iscommon(COMMONNAME) ((&COMMONNAME) != nullptr)
+#define iscommon(COMMONNAME) ((&COMMONNAME)!=nullptr)
 
 
 // Parameter types in, io, out

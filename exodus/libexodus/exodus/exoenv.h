@@ -75,13 +75,15 @@ extern PUBLIC std::vector<ExoEnv*> global_environments;
 // "env" - run a program in a modified environment
 // See man bash for more info
 
-class LabelledCommon {
-   public:
-	virtual ~LabelledCommon(){};
+// Abstract base class
+class NamedCommon {
+ public:
+	// Virtual because derived class's members should be destructed
+	virtual ~NamedCommon(){};
 };
 
-class PUBLIC ExoEnv {
-   public:
+class PUBLIC ExoEnv final {
+ public:
 	virtual ~ExoEnv();
 
 	bool init(const int threadno);
@@ -94,7 +96,8 @@ class PUBLIC ExoEnv {
 	// All performed/executed/xlated/called exoprograms (libraries) share the same exodus environment
 	var THREADNO  = "";
 	let TIMESTAMP = var().timestamp();
-	var TERMINAL  = var().isterminal() ? osgetenv("TERM") : "";
+	// Note that osgetenv is member function not a exofuncs free function
+	let TERMINAL  = var().isterminal() ? osgetenv("TERM") : "";
 	let EXECPATH  = getexecpath();
 	// Updated to requestor's ip address in service listen
 	var STATION   = var(gethostname()).field(".", 1);
@@ -186,8 +189,8 @@ class PUBLIC ExoEnv {
 	int COL1 = 0;
 	int COL2 = 0;
 
-	// define a type of object that holds many LabelledCommons
-	LabelledCommon* labelledcommon[99] = {0};
+	// define a type of object that holds many NamedCommons
+	NamedCommon* namedcommon[99] = {0};
 
 	// A cache of handles to dynamically loaded shared libraries
 	std::map<std::string, void*> dlopen_cache;
@@ -200,6 +203,7 @@ var osgetenv(const char* envcode) {
 		return envvalue;
 	return "";
 }
+
 };
 
 }  // namespace exodus

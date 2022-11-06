@@ -1,49 +1,63 @@
 #define BUILDING_LIBRARY
 #include <exodus/exodus.h>
 
-// a common section is a just a class section that can be instantiated by other programs.
+// Provides commoninit() and commonexit() which create blocks of "named common" variables.
+//
+// A common section is a just a C++ class that can be used by other programs.
+//
+// Named commons inherit from NamedCommon so that they can be stored in mv.namedcommon[]
+//
+// An xxx_common.h file may have multiple commoninit/exit sections.
+//
 
-// common can have MULTIPLE commoninit/exit sections and all are publically available
-// by including the libraryfilename.h file name in other programs and libraries.
-
+// Why is this needed here? It is needed in program.h library.h.
 #undef subroutine
 #undef function
 #define subroutine \
-   public:         \
+ public:           \
 	void
 #define function \
-   public:       \
+ public:         \
 	var
 
-// a common section is just a class plus a definition into the common array
-#define commoninit(COMMON_NAME, COMMON_NO)               \
-	class COMMON_NAME##_common : public LabelledCommon { \
-	   public:
+////////////////////////////////////////
+// Open a class derived from NamedCommon
+////////////////////////////////////////
+#define commoninit(COMMON_CODE, COMMON_NO)        \
+class COMMON_CODE##_common : public NamedCommon { \
+ public:
 
-#define commonexit(COMMON_NAME, COMMON_NO) \
-	~COMMON_NAME##_common() = default;     \
-	}                                      \
-	;                                      \
-	[[maybe_unused]] COMMON_NAME##_common&& COMMON_NAME =   \
-		reinterpret_cast<COMMON_NAME##_common&&>(*mv.labelledcommon[COMMON_NO]);
-// if (!COMMON_NAME) mv.labelledcommon[COMMON_NO]=new COMMON_NAME##_common;
+//////////////////////////////////////////////////////////////////////
+// Close the class and define a variable to access it and its members.
+//////////////////////////////////////////////////////////////////////
+#define commonexit(COMMON_CODE, COMMON_NO)                                             \
+~COMMON_CODE##_common() = default;/*{std::cout << __PRETTY_FUNCTION__ << std::endl;}*/ \
+};                                                                                     \
+[[maybe_unused]]                                                                       \
+	COMMON_CODE##_common& COMMON_CODE = static_cast<COMMON_CODE##_common&>(*mv.namedcommon[COMMON_NO]);
 
-/*
-//works but is hard to to debug since there is no variable gen
-//#define gen (*((gen_common*) mv.labelledcommon[gen_common_no]))
+///////////
+// Comments
+///////////
 
-//cannot run conditional code during class member initialisation
-//but can only create new common if not already done
-//if (mv.labelledcommon[gen_common_no]==0)
-//      mv.labelledcommon[gen_common_no]=new gen_common;
-
-//works nicely but only if common already created otherwise points to nothing
-//and if you try to reset it later, it tried to replace out nothing, causing segfault
-gen_common&& gen=reinterpret_cast<gen_common&&> (*mv.labelledcommon[gen_common_no]);
-
-//could use pointers but syntax is ugly gen->companies (and adecom must not recognise -> as an
-operator)
-//gen_common*
-
-//#define gen_isdefined (mv.labelledcommon[gen_common_no] != nullptr)
-*/
+// if (!COMMON_CODE) mv.namedcommon[COMMON_NO]=new COMMON_CODE##_common;
+//
+// Works but is hard to to debug since there is no variable gen
+//
+//  #define gen (*((gen_common*) mv.namedcommon[gen_common_no]))
+//
+// Cannot run conditional code during class member initialisation
+// but can only create new common if not already done
+//
+//  if (mv.namedcommon[gen_common_no]==0)
+//      mv.namedcommon[gen_common_no]=new gen_common;
+//
+// Works nicely but only if common already created otherwise points to nothing
+// and if you try to reset it later, it tried to replace out nothing, causing segfault
+//
+//  gen_common& gen = static_cast<gen_common&>(*mv.namedcommon[gen_common_no]);
+//
+// Could use pointers but syntax is ugly gen->companies
+//
+//  gen_common*
+//  #define gen_isdefined (mv.namedcommon[gen_common_no] != nullptr)
