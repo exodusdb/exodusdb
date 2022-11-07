@@ -22,15 +22,13 @@ function main() {
 	if (not connect()) {
 	//if (true or not connect()) {
 		////
-		printl("No default db connection to perform test_asyncupd");
-		printl("Test passed");
+		printl("Test passed. Not really. No default db connection to perform test_asyncupd");
 		return 0;
 	}
 
 	//Skip if fast testing required
 	if (osgetenv("EXO_FAST_TEST")) {
-		printl("EXO_FAST_TEST - skipping test.");
-		printl("Test passed");
+		printl("Test passed. Not really. EXO_FAST_TEST - skipping test.");
 		return 0;
 	}
 

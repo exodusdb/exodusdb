@@ -18,15 +18,15 @@ function main() {
 	printl("\n   --- default connection first thing before anything else to ensure clean ---\n");
 	printl("\n   --- quit (pass test) if no default database connection ---\n");
 	if (not default_conn.connect()) {
-		printl("\n   --- No default db connection to perform db testing. Test passed ---\n");
+		printl("\n   --- No default db connection to perform db testing.\n");
+		printl("Test passed. Not really. No default db connection.");
 		return 0;
 	}
 	TRACE(default_conn)
 
 	//Skip if fast testing required
 	if (osgetenv("EXO_FAST_TEST")) {
-		printl("EXO_FAST_TEST - skipping test.");
-		printl("Test passed");
+		printl("Test passed. Not really. EXO_FAST_TEST - skipping");
 		return 0;
 	}
 

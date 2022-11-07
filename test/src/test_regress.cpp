@@ -22,8 +22,7 @@ function main() {
 // Parallel testing negates the need for this
 //	//Skip if fast testing required
 //	if (not COMMAND(2) and osgetenv("EXO_FAST_TEST")) {
-//		printl("EXO_FAST_TEST - skipping test.");
-//		printl("Test passed");
+//		printl("Test passed. Not really. EXO_FAST_TEST - skipping.");
 //		return 0;
 //	}
 
@@ -32,8 +31,7 @@ function main() {
 	// or manually testing specific files
 	if (not exodusdir) {
 		if (not filenames) {
-			//printl("Test skipped for speed - command is 'test_regress ALL' for full testing");
-			//printl("Test passed");
+			//printl("Test passed. Not really. Test skipped for speed - command is 'test_regress ALL' for full testing");
 			//return 0;
 			filenames = "ALL";
 		}
