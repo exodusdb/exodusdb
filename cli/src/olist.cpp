@@ -504,14 +504,17 @@ function main() {
 	rawtable = 0;
 	silent = 0;
 
-	if (not(dictvoc.open("dict.voc", ""))) {
-		createfile("dict.voc");
-		if (not(dictvoc.open("dict.voc", ""))) {
+	if (not dictvoc.open("dict.voc", "")) {
+		//createfile("dict.voc");
+		if (not createfile("dict.voc")) {
+			abort(lasterror());
+		}
+		if (not dictvoc.open("dict.voc", "")) {
 			abort(lasterror());
 		}
 	}
 
-	if (not(tt.read(dictvoc, "@ID"))) {
+	if (not tt.read(dictvoc, "@ID")) {
 		write("F^0^TABLE_NAME^S^1^^^^L^20^^VARCHAR"_var on dictvoc, "TABLE_NAME");
 		write("F^0^COLUMN_NAME^S^2^^^^L^20"_var on dictvoc, "COLUMN_NAME");
 		write("G^^TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG^^^^^^^^^^^^^^^^^^^^^^^^^0"_var on dictvoc, "@CRT");

@@ -13,12 +13,33 @@ function main() {
 
 		//copy of rules in mvdbpostgres.cpp
 		var dictdb = "";
-		dictdb.osgetenv("EXO_DICT");
-		if (not dictdb)
-			dictdb = "exodus_dict";
+		//dictdb.osgetenv("EXO_DICT");
+		if (not dictdb.osgetenv("EXO_DICT")) {
+			//null
+		}
+		if (not dictdb) {
+			//dictdb = "exodus_dict";
+			dictdb = "exodus";
+		}
 		var conn;
-		if (not conn.connect(dictdb))
-			conn.connect();
+		if (not conn.connect(dictdb)) {
+			//connect to default db
+			//conn.connect();
+			if (not conn.connect()) {
+				abort(lasterror());
+			}
+		}
+//GB version
+//		var dictdb = "";
+//		if (not dictdb.osgetenv("EXO_DICT")) {
+//			dictdb = "";
+//			//default is exodus i.e ""
+//		}
+//		var conn;
+//		if (not conn.connect(dictdb)) {
+//			abort();
+
+
 
 		var dictfilenames = "";
 		var filenames = conn.listfiles();

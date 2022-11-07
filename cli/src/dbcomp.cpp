@@ -52,7 +52,10 @@ function main() {
 		if (not file2.open(filename, db2))
 			abort(lasterror());
 
-		file1.select("SELECT " ^ filename ^ " (SR)");
+		//file1.select("SELECT " ^ filename ^ " (SR)");
+		if (file1.select("SELECT " ^ filename ^ " (SR)")) {
+			//null
+		}
 
 		var recn = 0;
 		while (file1.readnext(RECORD, ID, MV)) {

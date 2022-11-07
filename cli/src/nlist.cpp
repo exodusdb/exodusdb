@@ -392,8 +392,11 @@ function main() {
 	rawtable = 0;
 	silent = 0;
 
-	if (not(dictvoc.open("DICT.voc", ""))) {
-		createfile("DICT.voc");
+	if (not dictvoc.open("DICT.voc", "")) {
+		//createfile("DICT.voc");
+		if (not createfile("DICT.voc")) {
+			abort(lasterror());
+		}
 		if (not dictvoc.open("DICT.voc", "")) {
 			abort(lasterror());
 		}

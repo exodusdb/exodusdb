@@ -14,7 +14,9 @@ function main() {
 	//if (not connect())
 	//	abort("Cannot connect to database. Please check configuration or run configexodus.");
 
-	begintrans();
+	//begintrans();
+	if (not begintrans())
+		abort(lasterror());
 
 	var dictfilename = "dict." ^ filename;
 
@@ -23,15 +25,22 @@ function main() {
 
 	// Always delete and start from scratch (ignore fact that files will not exist the first time)
 	//if (cleanup) {
-	deletefile(filename);
-	deletefile(dictfilename);
-	//	}
+	//deletefile(filename);
+	if (var().open(filename) and not deletefile(filename)) {
+		abort(lasterror());
+	}
+	//deletefile(dictfilename);
+	if (var().open(dictfilename) and not deletefile(dictfilename)) {
+		abort(lasterror());
+	}
 
 	printl("\nOpen or create test file ", filename);
 
 	var file;
 	if (not open(filename, file)) {
-		createfile(filename);
+		//createfile(filename);
+		if (not createfile(filename))
+			abort(lasterror());
 		if (not open(filename, file))
 			abort("Cannot create/open " ^ filename);
 	}
@@ -40,7 +49,10 @@ function main() {
 
 	var dictfile;
 	if (not open(dictfilename, dictfile)) {
-		createfile(dictfilename);
+		//createfile(dictfilename);
+		if (not createfile(dictfilename)) {
+			abort(lasterror());
+		}
 		if (not open(dictfilename, dictfile))
 			abort("Cannot create/open dictionary " ^ dictfilename);
 	}
@@ -95,7 +107,10 @@ function main() {
 	printl("\nNB 'name_and_type' dictionary item S type calls dict_xo_clients.cpp library function!");
 
 	printl("\nClear the client file");
-	clearfile(filename);
+	//clearfile(filename);
+	if (var().open(filename) and not clearfile(filename)) {
+		abort(lasterror());
+	}
 
 	printl("\nPrepare some data records in a readable format");
 
@@ -141,11 +156,19 @@ function main() {
 
 	if (cleanup) {
 		printl("\nCleaning up. Delete the files");
-		deletefile(file);
-		deletefile(dictfile);
+		//deletefile(file);
+		if (var().open(filename) and not deletefile(file)) {
+			abort(lasterror());
+		}
+		//deletefile(dictfile);
+		if (var().open(dictfilename) and not deletefile(dictfile)) {
+			abort(lasterror());
+		}
 	}
 
-	committrans();
+	//committrans();
+	if (not committrans())
+		abort(lasterror());
 
 	printl("\nJust type 'list' to see the syntax of list");
 	printl("or list dict." ^ filename ^ " to see the dictionary");
