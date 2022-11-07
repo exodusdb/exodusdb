@@ -132,20 +132,24 @@ set -euxo pipefail
 :
 : 20.04/bionic and 18.04/focal are available
 :
-: 22.04/jammy not available as at 2022/01/14
+: #22.04/jammy not available as at 2022/01/14
+: 22.04/jammy available as at 2022/06/29
 :
 	RELEASE=`lsb_release -cs`
-	if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
+	VERSION=0.12.6.1-2
+	#if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
+	if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb; then
 :
 : Fall back to bionic which works on 22.04/jammy, at least on the simple html test below.
 :
 		RELEASE=bionic
-		curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb
+		VERSION=0.12.6-1
+		curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb
 	fi
 :
 : Install the deb package
 :
-	dpkg -i wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb || true
+	dpkg -i wkhtmltox_$VERSION.${RELEASE}_amd64.deb || true
 :
 : The package is missing dependencies but those will and must be fixed as follows:
 :
