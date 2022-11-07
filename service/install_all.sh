@@ -81,8 +81,10 @@ set -euxo pipefail
 	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
 	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
 	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus_live
-	EXO_DATA=exodus EXO_DICT=exodus sync_dat
-	EXO_DATA=exodus EXO_DICT=exodus_live sync_dat
+	#EXO_DATA=exodus EXO_DICT=exodus sync_dat
+	EXO_DATA=exodus EXO_DICT=exodus syncdat
+	#EXO_DATA=exodus EXO_DICT=exodus_live sync_dat
+	EXO_DATA=exodus EXO_DICT=exodus_live syncdat
 
 :
 : Configure the exodus service
