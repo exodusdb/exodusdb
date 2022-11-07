@@ -71,6 +71,7 @@
 	add_executable(listindex listindex.cpp)
 	add_executable(testsort testsort.cpp)
 	add_executable(syncdat syncdat.cpp)
+	add_executable(cpp2dat cpp2dat.cpp)
 	add_executable(convsyntax convsyntax.cpp)
 	add_executable(redefine redefine.cpp)
 	add_executable(fire fire.cpp)
@@ -125,6 +126,7 @@
 	target_link_libraries(listindex exodus stdc++fs ${LIBS})
 	target_link_libraries(testsort exodus stdc++fs ${LIBS})
 	target_link_libraries(syncdat exodus stdc++fs ${LIBS})
+	target_link_libraries(cpp2dat exodus stdc++fs ${LIBS})
 	target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
 	target_link_libraries(redefine exodus stdc++fs ${LIBS})
 	target_link_libraries(fire exodus stdc++fs ${LIBS})
@@ -165,6 +167,7 @@
 			testsort
 			configexodus
 			syncdat
+			cpp2dat
 			convsyntax
 			redefine
 			fire
