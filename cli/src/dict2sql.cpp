@@ -121,7 +121,10 @@ function main() {
 
 	} else if (doall) {
 		var dictdbname = "";
-		osgetenv("EXO_DICT", dictdbname);
+		//osgetenv("EXO_DICT", dictdbname);
+		if (not osgetenv("EXO_DICT", dictdbname)) {
+			//null;
+		}
 		if (not dictdbname)
 			//must be the same in mvdbpostgres.cpp and dict2sql
 			dictdbname = "exodus";
@@ -366,7 +369,10 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	var reindex_if_indexed = false;
 	var oldfunction;
 	var functionname = field(functionname_and_args, "(", 1).lcase();
-	var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
+	//var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
+	if (not var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction)) {
+		//null
+	}
 	oldfunction.substrer(oldfunction.index("\n") + 1);
 	if (oldfunction and not functionsql.contains(oldfunction)) {
 		reindex_if_indexed = true;
@@ -422,9 +428,15 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "").trimmer("_");
 		if (filename.listindex(filename, fieldname)) {
 			logputl("Deleting index " ^ filename ^ " " ^ fieldname);
-			filename.deleteindex(fieldname);
+			//filename.deleteindex(fieldname);
+			if (not filename.deleteindex(fieldname)) {
+				abort(lasterror());
+			}
 			logputl("Creating index " ^ filename ^ " " ^ fieldname);
-			filename.createindex(fieldname);
+			//filename.createindex(fieldname);
+			if (not filename.createindex(fieldname)) {
+				abort(lasterror());
+			}
 		}
 	}
 
@@ -1433,7 +1445,10 @@ subroutine rawsqlexec(in sql) {
 
 subroutine rawsqlexec(in sql, out errormsg) {
 	printl(sql.field("RETURNS", 1));
-	var().sqlexec(sql, errormsg);
+	//var().sqlexec(sql, errormsg);
+	if (not var().sqlexec(sql, errormsg)) {
+		//null
+	}
 	return;
 }
 

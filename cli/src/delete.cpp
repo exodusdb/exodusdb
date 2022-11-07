@@ -19,7 +19,9 @@ function main() {
 	for (var itemid : itemids) {
 
 		if (itemid == "*") {
-			clearfile(file);
+			//clearfile(file);
+			if (not clearfile(file))
+				abort(lasterror());
 			//printl("All records deleted");
 			//stop();
 			ndeleted = "ALL";

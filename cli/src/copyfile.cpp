@@ -211,14 +211,22 @@ function main() {
 		}
 
 		// Speed up updates
-		if (targetdb)
-			targetdb.begintrans();
+		//if (targetdb)
+		//	targetdb.begintrans();
+		if (targetdb) {
+			if (not targetdb.begintrans()) {
+				abort(lasterror());
+			}
+		}
 
 		// Select source file if source is a db
 		// In ID order to be consistent so diff will work better
 		if (sourcedb) {
 			printl(sourcefilename);
-			file1.select(sourcefilename ^ " BY ID (R)");
+			//file1.select(sourcefilename ^ " BY ID (R)");
+			if (not file1.select(sourcefilename ^ " BY ID (R)")) {
+				//null
+			}
 		}
 
 		//process source file
@@ -290,8 +298,13 @@ function main() {
 		}
 
 		//commit all target db updates
-		if (targetdb)
-			targetdb.committrans();
+		//if (targetdb)
+		//	targetdb.committrans();
+		if (targetdb) {
+			if (not targetdb.committrans()) {
+				loglasterror();
+			}
+		}
 
 		printl();
 
