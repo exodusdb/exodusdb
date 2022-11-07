@@ -503,7 +503,7 @@ void outputt(const Printable&... value) {
 /////////////////////////////////////////////
 
 // Multi-argument
-// Default sep is " "
+// Default sep is " " for printl
 // Always appends \n
 // Flushes output
 
@@ -526,23 +526,41 @@ void printl(const Printable& value, const Additional&... values) {
 	std::cout << std::endl;
 }
 
+//// errputl(args) to cerr
+//
+//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//void errputl(const Printable& value, const Additional&... values) {
+//	LOCKIOSTREAM_SLOW
+//	std::cerr << value;
+//	((std::cerr << sep << values), ...);
+//	std::cerr << std::endl;
+//}
+//
+//// logputl(args) to clog
+//
+//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//void logputl(const Printable& value, const Additional&... values) {
+//	LOCKIOSTREAM_FAST
+//	std::clog << value;
+//	((std::clog << sep << values), ...);
+//	std::clog << std::endl;
+//}
+
 // errputl(args) to cerr
 
-template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
-void errputl(const Printable& value, const Additional&... values) {
+template <typename... Printable>
+void errputl(const Printable&... values) {
 	LOCKIOSTREAM_SLOW
-	std::cerr << value;
-	((std::cerr << sep << values), ...);
+	((std::cerr << values), ...);
 	std::cerr << std::endl;
 }
 
 // logputl(args) to clog
 
-template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
-void logputl(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM_FAST
-	std::clog << value;
-	((std::clog << sep << values), ...);
+template <typename... Printable>
+void logputl(const Printable&... values) {
+	LOCKIOSTREAM_SLOW
+	((std::clog << values), ...);
 	std::clog << std::endl;
 }
 
@@ -552,7 +570,7 @@ void logputl(const Printable& value, const Additional&... values) {
 
 // Does *not* append \n
 // Multi-argument
-// Default sep is " "
+// Default sep is ' ' for print
 // Does *not* flush output
 
 // print(args) to cout
@@ -564,22 +582,38 @@ void print(const Printable& value, const Additional&... values) {
 	((std::cout << sep << values), ...);
 }
 
+//// errput(args) to cerr
+//
+//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//void errput(const Printable& value, const Additional&... values) {
+//	LOCKIOSTREAM_SLOW
+//	std::cerr << value;
+//	((std::cerr << sep << values), ...);
+//}
+//
+//// logput(args) to clog
+//
+//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//void logput(const Printable& value, const Additional&... values) {
+//	LOCKIOSTREAM_FAST
+//	std::clog << value;
+//	((std::clog << sep << values), ...);
+//}
+
 // errput(args) to cerr
 
-template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
-void errput(const Printable& value, const Additional&... values) {
+template <typename... Printable>
+void errput(const Printable&... values) {
 	LOCKIOSTREAM_SLOW
-	std::cerr << value;
-	((std::cerr << sep << values), ...);
+	((std::cerr << values), ...);
 }
 
 // logput(args) to clog
 
-template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
-void logput(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM_FAST
-	std::clog << value;
-	((std::clog << sep << values), ...);
+template <typename... Printable>
+void logput(const Printable&... values) {
+	LOCKIOSTREAM_SLOW
+	((std::clog << values), ...);
 }
 
 /////////////////////////////////
