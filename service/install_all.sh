@@ -138,7 +138,7 @@ set -euxo pipefail
 	RELEASE=`lsb_release -cs`
 	VERSION=0.12.6.1-2
 	#if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
-	if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb; then
+	if ! curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb; then
 :
 : Fall back to bionic which works on 22.04/jammy, at least on the simple html test below.
 :
