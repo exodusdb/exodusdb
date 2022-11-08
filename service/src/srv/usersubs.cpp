@@ -14,9 +14,9 @@ libraryinit()
 
 #include <request.hpp>
 
-	var msg;
+var msg;
 var xx;
-var usern;	  // num
+//var usern;	  // num
 var newuser;  // num
 var text;
 var usercode;
@@ -173,7 +173,7 @@ function main(in mode) {
 		if (SECURITY.read(DEFINITIONS, "SECURITY")) {
 		}
 
-		if (SECURITY.f(1).locate(ID, usern)) {
+		if (SECURITY.f(1).locate(ID)) {
 			newuser = 0;
 			if (RECORD.f(4) and RECORD.f(4) ne req.orec.f(4)) {
 				resetpassword = 1;
@@ -253,7 +253,8 @@ function main(in mode) {
 				return 0;
 			}
 
-			if (not(SECURITY.f(1).locate(userdept, usern))) {
+			var newusern;
+			if (not(SECURITY.f(1).locate(userdept, newusern))) {
 				msg = (userdept ^ " USER GROUP does not exist").quote();
 				gosub invalid(msg);
 				gosub unlocksec();
@@ -262,24 +263,24 @@ function main(in mode) {
 
 			// insert an empty user
 			for (const var fn : range(1, 9)) {
-				SECURITY.inserter(fn, usern, "");
+				SECURITY.inserter(fn, newusern, "");
 			}  // fn;
 
 			let newusername		= RECORD.f(1);
 			let newipnos		= RECORD.f(40);
 			let newemailaddress = RECORD.f(7);
 
-			SECURITY(1, usern) = ID;
-			// userprivs<2,usern>=newkeys
-			// userprivs<3,usern>=newexpirydate
-			// userprivs<4,usern>=newpass
-			// userprivs<5,usern>=newhourlyrate
-			SECURITY(6, usern) = newipnos;
-			SECURITY(7, usern) = newemailaddress;
-			SECURITY(8, usern) = newusername;
+			SECURITY(1, newusern) = ID;
+			// userprivs<2,newusern>=newkeys
+			// userprivs<3,newusern>=newexpirydate
+			// userprivs<4,newusern>=newpass
+			// userprivs<5,newusern>=newhourlyrate
+			SECURITY(6, newusern) = newipnos;
+			SECURITY(7, newusern) = newemailaddress;
+			SECURITY(8, newusern) = newusername;
 		}
 
-		gosub getusern();
+		let usern = gosub getusern();
 		if (not(req.valid)) {
 			gosub unlocksec();
 			return 0;
@@ -399,7 +400,8 @@ subroutine unlocksec() {
 	return;
 }
 
-subroutine getusern() {
+function getusern() {
+	var usern;
 	// fail safe only allowed to update existing users
 	if (ID eq "EXODUS") {
 		// usern remains unassigned to force an error if used later on
@@ -407,10 +409,10 @@ subroutine getusern() {
 		if (not(SECURITY.f(1).locate(ID, usern))) {
 			msg = ID.quote() ^ " User does not exist";
 			gosub invalid(msg);
-			return;
+			return 0;
 		}
 	}
-	return;
+	return usern;
 
 	// similar code in user.subs and security.subs
 }
@@ -432,6 +434,7 @@ subroutine getuserdept2(in mode) {
 
 	// locate the user in the table
 	usercode = mode.field(",", 2);
+	var usern;
 	if (not(SECURITY.f(1).locate(usercode, usern))) {
 		if (usercode eq "EXODUS") {
 			ANS = "EXODUS";
@@ -458,7 +461,7 @@ subroutine getuserdept2(in mode) {
 subroutine getdepts() {
 	depts		= "";
 	let nusers2 = SECURITY.f(1).fcount(VM);
-	for (usern = 2; usern <= nusers2 + 1; ++usern) {
+	for (let usern : range(2, nusers2 + 1)) {
 		text = SECURITY.f(1, usern);
 		if (text eq "---" or text eq "") {
 			text = SECURITY.f(1, usern - 1);

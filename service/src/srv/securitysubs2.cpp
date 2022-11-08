@@ -11,9 +11,9 @@ libraryinit()
 
 #define origfullrec_ req.registerx(7)
 
-	var taskn;	// num
-var oldtaskn;
-var newtaskn;
+//var taskn;	// num
+//var oldtaskn;
+//var newtaskn;
 var xx;
 var logtime;
 var tn;
@@ -32,11 +32,12 @@ function main(in mode) {
 		let newlocks = RECORD.f(11);
 		let oldtasks = origfullrec_.f(10);
 		let oldlocks = origfullrec_.f(11);
-		var ntasks	 = newtasks.fcount(VM);
-		for (taskn = 1; taskn <= ntasks; ++taskn) {
+		let ntasks	 = newtasks.fcount(VM);
+		for (let taskn : range(1, ntasks)) {
 			let task = newtasks.f(1, taskn);
 			if (task) {
 				let newlock = newlocks.f(1, taskn);
+				var oldtaskn;
 				if (oldtasks.locate(task, oldtaskn)) {
 					let oldlock = oldlocks.f(1, oldtaskn);
 					if (newlock ne oldlock) {
@@ -49,16 +50,19 @@ function main(in mode) {
 			}
 		}  // taskn;
 
-		ntasks = oldtasks.fcount(VM);
-		for (taskn = 1; taskn <= ntasks; ++taskn) {
-			let task = oldtasks.f(1, taskn);
-			if (task) {
-				if (not(newtasks.locate(task, newtaskn))) {
-					let oldlock	 = oldlocks.f(1, taskn);
-					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
+		{
+			let ntasks = oldtasks.fcount(VM);
+			for (let taskn : range(1, ntasks)) {
+				let task = oldtasks.f(1, taskn);
+				if (task) {
+					var newtaskn;
+					if (not(newtasks.locate(task, newtaskn))) {
+						let oldlock	 = oldlocks.f(1, taskn);
+						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
+					}
 				}
-			}
-		}  // taskn;
+			}  // taskn;
+		}
 
 		ANS = emailtx2;
 
@@ -206,6 +210,7 @@ function main(in mode) {
 		call log2("*delete some obsolete tasks", logtime);
 		var	 obsoletetasks = "COMPANY ACCESS PARTIAL";
 		obsoletetasks(-1)  = "MARKET ACCESS PARTIAL";
+		var taskn;
 		for (const var ii : range(1, 9999)) {
 			let tt = obsoletetasks.f(ii);
 			// /BREAK;

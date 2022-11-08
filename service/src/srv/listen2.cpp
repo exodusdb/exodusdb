@@ -24,7 +24,7 @@ var xx;
 var userencrypt0;
 var validips;
 var addvalidips;
-var ii;	 // num
+//var ii;	 // num
 var ipno;
 var maxnologindays;	 // num
 var lastlogindate;
@@ -184,7 +184,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				// TODO implement the same on bad usernames to avoid
 				// different response to good versus bad usernames
 				// which would allow detection of valid usernames
-				for (failn = 1; failn <= 999999; failn++) {
+				for (failn = 1; failn <= 999999; ++failn) {
 					let tt = userx.f(18, failn);
 					// /BREAK;
 					if (not(tt ne "" and tt.first(2) ne "OK"))
@@ -269,6 +269,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					let nn = SECURITY.f(6).fcount(_VM);
 
 					// get ipnos of group user
+					var ii;
 					for (ii = usern + 1; ii <= nn; ++ii) {
 						// /BREAK;
 						if (not(SECURITY.f(1, ii + 1) ne "---"))
@@ -538,7 +539,7 @@ passwordexpired:
 								let ipno12	   = ipno.field(".", 1, 2);
 								let uipnos	   = userx.f(16);
 								let nn		   = uipnos.count(_VM);
-								for (ii = 1; ii <= nn; ++ii) {
+								for (let ii : range(1, nn)) {
 									if (ulogins.f(1, ii) eq "OK" and uipnos.f(1, ii).field(".", 1, 2) eq ipno12) {
 										isnewipnet = 0;
 									}
@@ -1103,7 +1104,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				if (chkauth) {
 					let fieldname = fields.f(vn);
 					if (fieldname) {
-						for (ii = 1; ii <= 3; ++ii) {
+						for (let ii : range(1, 3)) {
 							// USER UPDATE "REPORT"
 							// USER UPDATE "REPORT HEAD"
 							// USER UPDATE "REPORT HEAD COLOR"

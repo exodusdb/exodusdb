@@ -28,7 +28,7 @@ var linenox;  // num
 var eof;	  // num
 var line;
 var csv;
-var ptr;  // num
+//var ptr;  // num
 //var ncols;
 var dictfile;
 var xx;
@@ -492,12 +492,13 @@ nextline:
 							break;
 
 						cols(-1) = line.first(tt - 1) ^ VM ^ offset;
+						var ptr;
 						for (ptr = tt; ptr <= 999999; ++ptr) {
 
 							if (line[ptr + 1] ne " ")
 								break;
 
-						}  // ptr;
+						}  // ptrx;
 						cols ^= VM ^ ptr;
 						offset += ptr;
 						line.cutter(ptr);

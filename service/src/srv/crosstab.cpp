@@ -17,7 +17,7 @@ var rowfields;
 var nrowfields;
 dim rowdict;
 dim rowfieldismv;
-int rowfn;	// num
+//int rowfn;	// num
 var rowfield;
 var totcol;
 var coln;  // num
@@ -37,13 +37,13 @@ var fieldname;
 var nn;
 var colvals;
 var ncolvals;
-var rowvaln;  // num
+//var rowvaln;  // num
 var rowval;
 var rown;  // num
 var msg;
-var colvaln;  // num
+//var colvaln;  // num
 var colval;
-var rownx;	 // num
+//var rownx;	 // num
 var oldval;	 // num
 var colconv;
 var rowconv;
@@ -142,7 +142,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	nrowfields = rowfields.fcount(VM);
 	rowdict.redim(20);
 	rowfieldismv.redim(20);
-	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
+	for (const int rowfn : range(1, nrowfields)) {
 		rowfield = rowfields.f(1, rowfn);
 		if (not(rowdict(rowfn).read(DICT, rowfield))) {
 			if (not(rowdict(rowfn).read(dictvoc, rowfield))) {
@@ -263,7 +263,7 @@ nextmv:
 	nrowvals = 0;
 	rowvals	 = "";
 	if (nrowfields) {
-		for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
+		for (const int rowfn : range(1, nrowfields)) {
 			fieldname = rowfields.f(1, rowfn);
 			tt		  = calculate(fieldname);
 			if (fieldname eq "HOUR") {
@@ -289,12 +289,12 @@ nextmv:
 		}
 	}
 	ncolvals = colvals.fcount(VM);
-	for (rowvaln = 1; rowvaln <= nrowvals; ++rowvaln) {
+	for (const int rowvaln : range(1, nrowvals)) {
 
 		// build row value (multiple fields sm separated)
 		if (nrowfields) {
 			rowval = "";
-			for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
+			for (const int rowfn : range(1, nrowfields)) {
 				if (rowfieldismv(rowfn)) {
 					tt = rowvals.f(rowfn, rowvaln);
 				} else {
@@ -309,43 +309,36 @@ nextmv:
 		// determine which row to add into
 		if (not(allrowvals.f(1).locateby("AL", rowval, rown))) {
 			if (allrowvals.len() + rowval.len() gt 65000) {
-toobig:
-				clearselect();
-				msg = "Crosstab too complex. Please simplify your request.";
-				if (filename eq "STATISTICS") {
-					msg(-1) = "Perhaps choose Columns=Date and dont select Session or IP No.";
-				}
-				call mssg(msg);
-				stop();
+				gosub abort_toobig(filename);
 			}
 			nrows += 1;
 			allrowvals.inserter(1, rown, rowval);
 			output.inserter(rown + 1, "");
 		}
 
-		for (colvaln = 1; colvaln <= ncolvals; ++colvaln) {
+		for (const int colvaln : range(1, ncolvals)) {
 
 			// determine which column to add into
 			colval = colvals.f(1, colvaln);
 			if (not(allcolvals.f(1).locateby(colorder, colval, coln))) {
 				ncols += 1;
 				if (allcolvals.len() + colval.len() gt 65000) {
-					goto toobig;
+					gosub abort_toobig(filename);
 				}
 				allcolvals.inserter(1, coln, colval);
 
 				if (output.len() + nrows * 2 gt 65000) {
-					goto toobig;
+					gosub abort_toobig(filename);
 				}
 
 				output.inserter(1, 1 + coln, colval);
-				for (rownx = 2; rownx <= nrows + 1; ++rownx) {
+				for (const int rownx : range(2, nrows + 1)) {
 					output.inserter(rownx, 1 + coln, "");
 				}  // rownx;
 			}
 
 			if (output.len() + datavals.len() gt 6500) {
-				goto toobig;
+				gosub abort_toobig(filename);
 			}
 
 			oldval = output.f(rown + 1, coln + 1);
@@ -379,7 +372,7 @@ exit:
 	if (not totcol) {
 		colconv = coldict.f(7);
 		if (colconv) {
-			for (coln = 1; coln <= ncols; ++coln) {
+			for (const int coln : range(1, ncols)) {
 				output(1, 1 + coln) = oconv(output.f(1, 1 + coln), colconv);
 			}
 		}
@@ -388,28 +381,28 @@ exit:
 	if (totcol) {
 		output(1, 1 + coln) = datadict.f(3);
 	} else {
-		for (coln = 1; coln <= ncols; ++coln) {
+		for (const int coln : range(1, ncols)) {
 			output(1, 1 + coln) = coldict.f(3) ^ " " ^ output.f(1, 1 + coln);
 		}
 		output(1, ncols + 2) = "Total " ^ datadict.f(3);
 	}
 
-	for (rown = 1; rown <= nrows; ++rown) {
+	for (const int rown : range(1, nrows)) {
 		if (output.len() + allrowvals.len() gt 65000) {
-			goto toobig;
+			gosub abort_toobig(filename);
 		}
 		output(rown + 1, 1) = allrowvals.f(1, rown);
 	}  // rown;
 
 	// format the row title values
 	output(1, 1, 1) = "";
-	for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
+	for (const int rowfn : range(1, nrowfields)) {
 		// output<1,1,rowfn>=rowfields<1,rowfn>
 		output(1, 1, rowfn) = rowdict(rowfn).f(3);
 
 		rowconv = rowdict(rowfn).f(7);
 		if (rowconv) {
-			for (rown = 1; rown <= nrows; ++rown) {
+			for (const int rown : range(1, nrows)) {
 				output(rown + 1, 1, rowfn) = oconv(output.f(rown + 1, 1, rowfn), rowconv);
 			}
 		}
@@ -422,4 +415,13 @@ exit:
 	return 0;
 }
 
+subroutine abort_toobig(in filename) {
+
+	clearselect();
+	msg = "Crosstab too complex. Please simplify your request.";
+	if (filename eq "STATISTICS") {
+		msg(-1) = "Perhaps choose Columns=Date and dont select Session or IP No.";
+	}
+	abort(msg);
+}
 libraryexit()

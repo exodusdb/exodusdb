@@ -51,7 +51,7 @@ var inblocksize;  // num
 var outblocksize;
 dim datx;
 dim hexx;
-var ii;	 // num
+//var ii;	 // num
 var servername;
 var onserver;
 var request1;
@@ -105,8 +105,8 @@ var dow;
 var logtime;
 var requestdate;
 var requesttime;  // num
-var nlinkfiles;
-var linkfilen;	// num
+//var nlinkfiles;
+//var linkfilen;	// num
 var linkfile1;
 var timex;
 var ntries;	 // num
@@ -1017,10 +1017,10 @@ function got_link() {
 
 	gosub gettimeouttime();
 
-	nlinkfiles = linkfilenames.fcount(FM);
+	let nlinkfiles = linkfilenames.fcount(FM);
 
 	// find a request to process
-	for (linkfilen = 1; linkfilen <= nlinkfiles; ++linkfilen) {
+	for (let linkfilen : range(1, nlinkfiles)) {
 
 		linkfilename1 = inpath ^ linkfilenames.f(linkfilen);
 
@@ -1290,7 +1290,7 @@ function request_init() {
 			// read blocks of iodat
 			datx  = "";	 //dim
 			inptr = 0;
-			for (blockn = 1; blockn <= nblocks; ++blockn) {
+			for (let blockn : range(1, nblocks)) {
 
 				// osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
 				// tt=(blockn-1)*inblocksize
@@ -1314,7 +1314,7 @@ function request_init() {
 
 			// unescape all blocks
 			lendata = 0;
-			for (blockn = 1; blockn <= nblocks; ++blockn) {
+			for (let blockn : range(1, nblocks)) {
 
 				if (datx(blockn).len()) {
 
@@ -1348,7 +1348,7 @@ function request_init() {
 				// otherwise join the blocks
 			} else {
 				data_ = "";
-				for (blockn = 1; blockn <= nblocks; ++blockn) {
+				for (let blockn : range(1, nblocks)) {
 					data_ ^= datx(blockn);
 					datx(blockn) = "";
 				}  // blockn;
@@ -2570,7 +2570,7 @@ function request_exit() {
 			// split into blocks and convert to escape chars
 			datx = "";	// dim
 			ptr	 = 0;
-			for (blockn = 1; blockn <= nblocks; ++blockn) {
+			for (let blockn : range(1, nblocks)) {
 				blk = data_.first(outblocksize);
 				data_.cutter(outblocksize);
 
@@ -2767,7 +2767,7 @@ subroutine leaselock() {
 		newsessionid = sessionid;
 	} else {
 		newsessionid = "";
-		for (ii = 1; ii <= 8; ++ii) {
+		for (let ii : range(1, 8)) {
 			newsessionid ^= var("01234567890ABDCEF")[var(16).rnd() + 1];
 		}  // ii;
 	}

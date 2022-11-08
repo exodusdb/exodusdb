@@ -8,10 +8,10 @@ var block;
 var ans;
 var xx;
 var macron;
-var paramn;	 // num
+//var paramn;	 // num
 var lineparam;
 var wordn;
-var fieldn;	 // num
+//var fieldn;	 // num
 
 var macros;
 var nmacros;
@@ -267,6 +267,7 @@ addline:
 						let mword1 = mline.field(" ", 1);
 						if (mword1 eq "#ifdef" or mword1 eq "#ifndef") {
 							let mword2 = mline.field(" ", 2);
+							var paramn;
 							if (macroline.locate(mword2, paramn)) {
 								lineparam = lineparams.f(1, paramn);
 								// dot means not defined while we are using spaces to separate params
@@ -308,7 +309,7 @@ nextmln:;
 
 					// substitute all macro parameters
 					let nparams = macroline.fcount(VM);
-					for (paramn = 1; paramn <= nparams; ++paramn) {
+					for (let paramn : range(1, nparams)) {
 						let old	 = macroline.f(1, paramn);
 						let newx = lineparams.f(1, paramn);
 						macrotext.replacer(old, newx);
@@ -334,6 +335,7 @@ nextmln:;
 						if (not fieldname.match("^[A-Za-z_]\\w*$"))
 							continue;
 
+						var fieldn;
 						if (not(allfields.locate(fieldname, fieldn))) {
 							allfields(1, -1) = fieldname;
 							var tempdict;
@@ -358,7 +360,7 @@ nextmln:;
 							   "/DO NOT EDIT MANUALLY";
 					if (fields) {
 						let nfields = fields.f(1).fcount(VM);
-						for (fieldn = 1; fieldn <= nfields; ++fieldn) {
+						for (let fieldn : range(1, nfields)) {
 							let fieldname = fields.f(1, fieldn);
 							macrotext.replacer("{" ^ fieldname ^ "}", fieldname);
 							// swap '{':fieldname:'}' with '@record<':fields<2,fieldn>:'>' in macrotext

@@ -35,7 +35,7 @@ var xx;
 var inpath;
 var pattern;
 var ageinsecs;	// num
-var ii;			// num
+//var ii;			// num
 var patchfile;
 var offset;
 var firstblock;
@@ -562,7 +562,7 @@ getvalues:
 			// remove or move any stopped execs to the end and add reason
 			var nn	= data_.fcount(_VM);
 			let nn2 = nn;
-			for (ii = 1; ii <= nn; ++ii) {
+			for (int ii = 1; ii <= nn; ++ii) {
 				let execcode = data_.f(1, ii);
 				if (execstoplist.f(1).locate(execcode, stopn)) {
 					let reason = execstoplist.f(2, stopn);
@@ -713,7 +713,7 @@ nextlock:
 		if (tracing) {
 			printl(var("User").oconv("L#19"), " ", var("Station").oconv("L#19"), " ", var("File").oconv("L#19"), " ", var("Record").oconv("L#19"));
 		}
-		for (ii = 1; ii <= nn; ++ii) {
+		for (const int ii : range(1, nn)) {
 			// /BREAK;
 			if (tracing and nn gt 20)
 				break;

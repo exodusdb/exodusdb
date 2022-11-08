@@ -35,8 +35,8 @@ var delusagetime;
 var statistics;
 dim netid;
 var hourn;	// num
-var ii;		// num
-var tt;
+//var ii;		// num
+//var tt;
 var processcount;
 var backuprequired;
 var backupdrives;
@@ -91,7 +91,7 @@ var body;
 var nbackupdrives;
 var present;
 var deletingsize;  // num
-var hostdescriptions;
+//var hostdescriptions;
 var versionnote;
 var versiondate;
 //var upgradefilename83;
@@ -239,8 +239,8 @@ nextstatistic:
 			netid(3) = ID.field("*", 4);
 			hourn	 = ((currenttime - RECORD.f(1)) * 24).floor() + 1;
 			hourn	 = (hourn - 1).mod(24) + 1;
-			for (ii = 1; ii <= 3; ++ii) {
-				if (not(usertab(hourn, ii).locate(netid(ii), tt))) {
+			for (const int ii : range(1, 3)) {
+				if (not usertab(hourn, ii).locate(netid(ii))) {
 					usertab(hourn, ii)(1, -1) = netid(ii);
 				}
 			}  // ii;
@@ -306,7 +306,7 @@ nextprocess:
 			// work out backup targets (data and uploads)
 			// get datatarget sm uploadstarget sm backuptimefrom
 			if (backuprequired.f(1, dbasen)) {
-				tt = bakpars.f(7);
+				var tt = bakpars.f(7);
 				// backpars 12 (upload backup target) can be 0 to suppress
 				if (bakpars.f(12) and bakpars.f(12) ne bakpars.f(7)) {
 					tt(1, 1, 2) = bakpars.f(12);
@@ -333,7 +333,7 @@ nextprocess:
 	descriptions = "";
 	status0123	 = 0;
 	ndbases		 = dbasecodes.fcount(VM);
-	for (dbasen = 1; dbasen <= ndbases; ++dbasen) {
+	for (const int dbasen : range(1, ndbases)) {
 		dbasecode = dbasecodes.f(1, dbasen);
 		if (not dbasecode) {
 			goto nextdbasen;
@@ -387,7 +387,7 @@ nextprocess:
 			// or it has been stopped or is the database is missing
 			startit = not((dbasecode.lcase() ^ ".end").osfile());
 			if (startit) {
-				tt = "../data/" ^ dbasecode.lcase() ^ "/general/revmedia.lk";
+				var tt = "../data/" ^ dbasecode.lcase() ^ "/general/revmedia.lk";
 				tt.converter("/", OSSLASH);
 				if (not(tt.osfile())) {
 					startit = 0;
@@ -419,17 +419,17 @@ nextprocess:
 				if (not dbasesystem) {
 					dbasesystem = APPLICATION;
 				}
-				tt = "start exodus.js /system " ^ dbasesystem ^ " /database " ^ dbasecode;
-				// pid:=' /pid ':tt<6>
-				// print @(0):@(-4):time() 'MTS':' ':tt
+				var cmd = "start exodus.js /system " ^ dbasesystem ^ " /database " ^ dbasecode;
+				// pid:=' /pid ':cmd<6>
+				// print @(0):@(-4):time() 'MTS':' ':cmd
 				if (first) {
 					printl();
 					first = 0;
 				}
-				print(tt, " ...");
-				// pcperform tt
-				print("monitor2 calling shell2 ", tt, " ...");
-				call shell2(tt, xx);
+				print(cmd, " ...");
+				// pcperform cmd
+				print("monitor2 calling shell2 ", cmd, " ...");
+				call shell2(cmd, xx);
 				call ossleep(1000 * 5);
 				printl("done.");
 			}
@@ -473,25 +473,19 @@ nextprocess:
 			description ^= " Backup->" ^ backupdrive;
 			tpath = "../data/" ^ dbasecode.lcase() ^ "/params2";
 			tpath.converter("/", OSSLASH);
-//			if (VOLUMES) {
-//				// time fm date fm size
-//				if (not(paramrec.osread(tpath))) {
-//					paramrec = "";
-//				}
-//			} else {
-				// time fm date
-				tt		 = tpath.osfile();
-				paramrec = tt.f(3) ^ FM ^ tt.f(2);
-				// size
-				//call osgetenv("HOME", home);
-				if (not osgetenv("HOME", home)) {
-					//null
-				}
-				tpath ^= "/backups/sql/" ^ dbasecode.lcase() ^ ".sql.gz";
-				tpath.converter("/", OSSLASH);
 
-				paramrec(3) = tpath.osfile().f(1);
-//			}
+			let fileinfo  = tpath.osfile();
+			paramrec	  = fileinfo.f(3) ^ FM ^ fileinfo.f(2);
+			// size
+			//call osgetenv("HOME", home);
+			if (not osgetenv("HOME", home)) {
+				//null
+			}
+			tpath ^= "/backups/sql/" ^ dbasecode.lcase() ^ ".sql.gz";
+			tpath.converter("/", OSSLASH);
+
+			paramrec(3) = tpath.osfile().f(1);
+
 			lastbackupsize = paramrec.f(3);
 			if (lastbackupsize) {
 				description ^= " " ^ oconv(lastbackupsize, "[XBYTES,1]");
@@ -502,13 +496,13 @@ nextprocess:
 			// if integer datetime then old format missing time so add 2 hours
 			// if lastbackupdatetime and int(lastbackupdatetime)=lastbackupdatetime then lastbackupdatetime+=2/24
 			// assume backup on same day (ie after last midnight)
-			currentdatetime = (date() + time() / 86400).oconv("MD50P");
-			tt				= currentdatetime - lastbackupdatetime;
+			currentdatetime		= (date() + time() / 86400).oconv("MD50P");
+			let days_since_backup	= currentdatetime - lastbackupdatetime;
 			// allow one day and one hour
-			if (lastbackupdatetime and (tt gt 1 + 1 / 24.0)) {
+			if (lastbackupdatetime and (days_since_backup gt 1 + 1 / 24.0)) {
 				// warning if one day missed and critical if more than one
-				description ^= " not done " ^ tt.oconv("MD10P") ^ " days!";
-				if (paramrec and tt gt 2) {
+				description ^= " not done " ^ days_since_backup.oconv("MD10P") ^ " days!";
+				if (paramrec and days_since_backup gt 2) {
 					description ^= "!";
 				}
 			}
@@ -518,10 +512,9 @@ nextprocess:
 
 				// ensure something is on the target
 				// otherwise diskfreespace fails
-				tt = backupdrive ^ "/data.bak";
-				tt.converter("/", OSSLASH);
-				//call osmkdir(tt);
-				if (osdir(tt) and not osrmdir(tt)) {
+				var oldbackuppath = backupdrive ^ "/data.bak";
+				oldbackuppath.converter("/", OSSLASH);
+				if (osdir(oldbackuppath) and not osrmdir(oldbackuppath)) {
 					abort(lasterror());
 				}
 
@@ -531,23 +524,6 @@ nextprocess:
 					freespace = 0;
 				}
 				backupdrives(2, backupdriven) = freespace;
-
-				/*
-				testdata = date() ^ FM ^ time();
-				if (freespace) {
-					testfile = backupdrive.f(1, 1, 1) ^ "/MONITOR.$$$";
-					testfile.converter("/", OSSLASH);
-					var(testdata).oswrite(testfile);
-					if (not(tt.osread(testfile))) {
-						tt = "";
-					}
-					testfile.osremove();
-				} else {
-					tt = "";
-				}
-
-				if (tt ne testdata) {
-				*/
 
 				// Check Presence of external device (possibly in container host server)
 				// Can be a link (deref not required) or simply exists
@@ -656,8 +632,8 @@ nextdbasen:;
 	}  // dbasen;
 
 	// check for free space on backup drive(s)
-	nbackupdrives = backupdrives.f(1).fcount(VM);
-	for (backupdriven = 1; backupdriven <= nbackupdrives; ++backupdriven) {
+	let nbackupdrives = backupdrives.f(1).fcount(VM);
+	for (const int backupdriven : range(1, nbackupdrives)) {
 
 		present = backupdrives.f(3, backupdriven);
 		if (present) {
@@ -694,26 +670,28 @@ nextdbasen:;
 		status0123 = 1;
 	}
 
-	hostdescriptions = "EXODUS ";
+	var hostdescriptions = "EXODUS ";
 
 	// add exodus version for info
-	tt = "general/version.dat";
-	tt.converter("/", OSSLASH);
-	//call osread(versionnote, tt);
-	if (not osread(versionnote, tt)) {
-		//null
-	}
-	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
-	tt			= versiondate.oconv("D2/");
-	tt			= tt.last(2) ^ "/" ^ tt.first(5);
-	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
+	{
+		var versionpath = "general/version.dat";
+		versionpath.converter("/", OSSLASH);
+		//call osread(versionnote, tt);
+		if (not osread(versionnote, versionpath)) {
+			//null
+		}
+		versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
+		versiondate = versiondate.oconv("D2/");
+		versiondate = versiondate.last(2) ^ "/" ^ versiondate.first(5);
+		hostdescriptions ^= "Ver" ^ versiondate ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
-	// show local time
-	hostdescriptions ^= " - At:" ^ time().oconv("MT");
+		// show local time
+		hostdescriptions ^= " - At:" ^ time().oconv("MT");
+	}
 
 	// find max nusersperhour by type
-	for (ii = 1; ii <= 24; ++ii) {
-		for (jj = 1; jj <= 3; ++jj) {
+	for (const int ii : range(1, 24)) {
+		for (const int jj : range(1, 3)) {
 			usertab(ii, jj) = usertab(ii, jj).fcount(VM);
 			if (usertab(ii, jj) gt usertab(25, jj)) {
 				usertab(25, jj) = usertab(ii, jj);
@@ -724,22 +702,22 @@ nextdbasen:;
 	// list number of users (in last hour)
 	hostdescriptions ^= " - Users:";
 	hourn = 1;
-	for (ii = 1; ii <= 3; ++ii) {
-		tt = usertab(hourn, ii);
-		if (tt) {
+	for (const int ii : range(1, 3)) {
+		let hourlyusers = usertab(hourn, ii);
+		if (hourlyusers) {
 			anyusers = 1;
 		}
 		if (ii gt 1) {
 			hostdescriptions ^= "/";
 		}
-		hostdescriptions ^= tt;
+		hostdescriptions ^= hourlyusers;
 	}  // ii;
 
 	// list max number of users
 	hostdescriptions ^= " - Max:";
 	hourn = 25;
-	for (ii = 1; ii <= 3; ++ii) {
-		tt = usertab(1, ii);
+	for (const int ii : range(1, 3)) {
+		//let tt = usertab(1, ii);
 		if (ii gt 1) {
 			hostdescriptions ^= "/";
 		}
@@ -756,24 +734,7 @@ nextdbasen:;
 	//hostdescriptions ^= " - " ^ cpudesc ^ " x " ^ nprocs;
 	hostdescriptions ^= " - nprocs:" ^ nprocs;
 
-	// list ipnos
-//	if (VOLUMES) {
-//		result = shell2("ipconfig /all", errors).ucase();
-//		result.converter("\r\n", _FM _FM).trimmer();
-//		nn	= result.fcount(FM);
-//		ips = "";
-//		for (ii = 1; ii <= nn; ++ii) {
-//			line = result.f(ii).trim();
-//			line.replacer("IPV4 ADDRESS", "IP ADDRESS");
-//			if (line.starts("IP ADDRESS")) {
-//				ips(-1) = line.field(":", 2).trim().field("(", 1);
-//				// only display the first
-//				goto gotip;
-//			}
-//		}  // ii;
-//	} else {
-		ips = shell2("printf $(hostname -I | cut -d' ' -f 1)");
-//	}
+	ips = shell2("printf $(hostname -I | cut -d' ' -f 1)");
 // gotip:
 	if (not ips) {
 		ips = "0.0.0.0";

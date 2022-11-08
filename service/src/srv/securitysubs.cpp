@@ -61,7 +61,7 @@ var lastfn;		 // num
 var filename;
 var defaultlock;
 var msg;
-var usern;	// num
+//var usern;	// num
 var xx;
 var ousern;	 // num
 var newtaskn;
@@ -219,6 +219,7 @@ function main(in mode) {
 			let usercodes = RECORD.f(1);
 			let nusers	  = usercodes.fcount(VM);
 
+			var usern;
 			if (not(usercodes.f(1).locate(USERNAME, usern))) {
 				msg = USERNAME ^ " user not in in authorisation file";
 				return invalid(msg);

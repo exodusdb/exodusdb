@@ -146,7 +146,7 @@ subroutine unlockall(io locklist, io msg) {
 
 	var filename2 = "";
 	let file	  = "";
-	// 	for (lockn = 1; lockn <= 9999; ++lockn) {
+	// 	for (lockn : range(1, 9999)) {
 	// 		lockitem = locklist.f(lockn);
 	// 		// /BREAK;
 	// 		if (not lockitem) break;

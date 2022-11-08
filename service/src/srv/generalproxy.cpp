@@ -35,7 +35,7 @@ var userkey;
 var userx;
 var newpassword;
 var xx;
-var fn;	 // num
+//var fn;	 // num
 var task;
 var taskprefix;
 var reportid;
@@ -473,9 +473,8 @@ function main() {
 				write char(0):data on alanguage,'SORTORDER*':codepage;
 			*/
 
-		} else if (request_.f(2) eq "UPPERCASE") {
-			fn = 9;
-setcodepagecase:
+		} else if (request_.f(2) eq "UPPERCASE" or request_.f(2) eq "LOWERCASE") {
+
 			var recordx;
 			if (not(recordx.read(srv.alanguage, "GENERAL*" ^ codepage))) {
 				if (not(recordx.read(srv.alanguage, "GENERAL"))) {
@@ -486,28 +485,24 @@ setcodepagecase:
 			temp.replacer(_RM, "%FF");
 			temp.replacer(_FM, "%FE");
 			temp.replacer(_VM, "%FD");
+
+			let fn = request_.f(2) eq "UPPERCASE" ? 9 : 10;
 			recordx(1, fn) = temp;
 
 			recordx.write(srv.alanguage, "GENERAL*" ^ codepage);
 
-			/*;
-				// check lower=lcase(upper) and vice versa
-				// but ucase() may strip accents whereas lcase() may leave them
-				x=@lower.case;
-				y=@upper.case;
-				convert @lower.case to @upper.case in x;
-				convert @upper.case to @lower.case in y;
-				convert @lower.case to @upper.case in y;
-				convert @upper.case to @lower.case in x;
-				for ii=1 to len(x);
-					// if x[ii,1] ne @lower.case[ii,1] then print 'x: ':ii:' ':seq(x[ii,1]) 'MX':' ':seq(@lower.case[ii,1]) 'MX'
-					if y[ii,1] ne @upper.case[ii,1] then print 'y: ':ii:' ':seq(y[ii,1]) 'MX':' ':seq(@upper.case[ii,1]) 'MX';
-					next ii;
-				*/
-
-		} else if (request_.f(2) eq "LOWERCASE") {
-			fn = 10;
-			goto setcodepagecase;
+//			// check lower=lcase(upper) and vice versa
+//			// but ucase() may strip accents whereas lcase() may leave them
+//			x=@lower.case;
+//			y=@upper.case;
+//			convert @lower.case to @upper.case in x;
+//			convert @upper.case to @lower.case in y;
+//			convert @lower.case to @upper.case in y;
+//			convert @upper.case to @lower.case in x;
+//			for ii=1 to len(x);
+//				// if x[ii,1] ne @lower.case[ii,1] then print 'x: ':ii:' ':seq(x[ii,1]) 'MX':' ':seq(@lower.case[ii,1]) 'MX'
+//				if y[ii,1] ne @upper.case[ii,1] then print 'y: ':ii:' ':seq(y[ii,1]) 'MX':' ':seq(@upper.case[ii,1]) 'MX';
+//				next ii;
 
 		} else {
 badsetcodepage:
@@ -788,7 +783,7 @@ nextrep:
 		PSEUDO = raise(PSEUDO);
 
 		// merge any runtime parameters into the real parameters
-		for (fn = 1; fn <= 999; ++fn) {
+		for (let fn : range(1, 999)) {
 			let tt = data_.f(fn);
 			if (tt) {
 				PSEUDO(fn) = tt;
