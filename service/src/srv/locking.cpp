@@ -36,7 +36,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	msg = "";
 
 	// NOTE: not(SYSTEM.f(33));
-	var interactive = false;
+	let interactive = false;
 
 	if (var(0) and USERNAME eq "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
@@ -69,7 +69,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 lockit:
 	// /////
 
-	var lockitem = lockfilename ^ lockitemsep_ ^ lockkey;
+	let lockitem = lockfilename ^ lockitemsep_ ^ lockkey;
 	if (locklist.locateusing(FM, lockitem, lockn)) {
 		return 1;
 	}
@@ -145,14 +145,14 @@ subroutine unlockit(in lockfilename, in lockkey, io locklist) {
 subroutine unlockall(io locklist, io msg) {
 
 	var filename2 = "";
-	var file	  = "";
+	let file	  = "";
 	// 	for (lockn = 1; lockn <= 9999; ++lockn) {
 	// 		lockitem = locklist.f(lockn);
 	// 		// /BREAK;
 	// 		if (not lockitem) break;
 	for (in lockitem : locklist) {
-		var filename = lockitem.field(lockitemsep_, 1);
-		var lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
+		let filename = lockitem.field(lockitemsep_, 1);
+		let lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
 		if (filename ne filename2) {
 			if (not(lockfile.open(filename, ""))) {
 				msg(-1)	 = filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL";

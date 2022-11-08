@@ -67,9 +67,9 @@ function main() {
 	}
 
 	var rowfields = PSEUDO.f(1);
-	var colfield  = PSEUDO.f(2);
-	var format	  = PSEUDO.f(3);
-	var datemode  = PSEUDO.f(4);
+	let colfield  = PSEUDO.f(2);
+	let format	  = PSEUDO.f(3);
+	let datemode  = PSEUDO.f(4);
 
 	html				= format eq 1;
 	var			  dedup = html;
@@ -91,9 +91,9 @@ function main() {
 	}
 
 	// usercodename=',DEPARTMENT,USER_NAME'
-	var usercodename = ",USER_CODE";
+	let usercodename = ",USER_CODE";
 
-	var filename = "STATISTICS";
+	let filename = "STATISTICS";
 	rowfields.converter(SM, VM);
 
 	// remove col field from row fields because not logical or useful
@@ -105,8 +105,8 @@ function main() {
 	let	 nrowfields = rowfields.fcount(VM);
 	call crosstab(filename, rowfields, colfield, datafield, output);
 
-	var nrows = output.fcount(FM);
-	var ncols = output.f(1).fcount(VM);
+	let nrows = output.fcount(FM);
+	let ncols = output.f(1).fcount(VM);
 
 	// de-duplicate
 	if (dedup) {
@@ -133,13 +133,13 @@ function main() {
 	}
 
 	if (html) {
-		var tr	 = "<TR valign=top>";
-		var trx	 = "</TR>" _EOL;
-		var th	 = "<TH>";
-		var thx	 = "</TH>" _EOL;
-		var td	 = "<TD>";
-		var tdx	 = "</TD>" _EOL;
-		var nbsp = "&nbsp;";
+		let tr	 = "<TR valign=top>";
+		let trx	 = "</TR>" _EOL;
+		let th	 = "<TH>";
+		let thx	 = "</TH>" _EOL;
+		let td	 = "<TD>";
+		let tdx	 = "</TD>" _EOL;
+		let nbsp = "&nbsp;";
 
 		tx = "<H1 align=center>EXODUS USAGE STATISTICS</H1>";
 		gosub printtx();
@@ -180,7 +180,7 @@ function main() {
 		tx ^= "</thead>";
 
 		for (const var rown : range(2, nrows)) {
-			var row	  = output.f(rown);
+			let row	  = output.f(rown);
 			var rowtx = "";
 			for (const var coln : range(1, ncols)) {
 				var cell = row.f(1, coln);
@@ -207,7 +207,7 @@ function main() {
 						// convert to user name
 						if (coln eq usercoln) {
 							userx  = xlate("USERS", cell, "", "X");
-							var tt = userx.f(1);
+							let tt = userx.f(1);
 							if (tt and cell ne tt) {
 								cell = tt ^ " (" ^ cell ^ ")";
 							}

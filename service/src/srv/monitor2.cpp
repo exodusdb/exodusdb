@@ -552,7 +552,7 @@ nextprocess:
 				// Check Presence of external device (possibly in container host server)
 				// Can be a link (deref not required) or simply exists
 				// lxc containers can see but often not dereference links due to permissions issues)
-				var backupdir = "/backups/usb";
+				let backupdir = "/backups/usb";
 				if (not osshell("test -L " ^ backupdir ^ " -o -e " ^ backupdir)) {
 					description ^= " impossible!!";
 				} else {

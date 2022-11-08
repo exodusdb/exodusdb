@@ -232,7 +232,7 @@ listen:
 				body.replacer("\r", "\r\n");
 
 				// sendmail - if it fails, there will be an entry in the log
-				var address1 = srv.address.field("/", 1);
+				let address1 = srv.address.field("/", 1);
 				var errormsg = "";
 				if (address1) {
 					call sendmail(address1, "", subject, body, "", "", errormsg);
@@ -277,7 +277,7 @@ listen:
 	}
 
 	// Respond to web client e.g. program crash due to Variable not Assigned
-	var linkfilename3 = PRIORITYINT.f(100);
+	let linkfilename3 = PRIORITYINT.f(100);
 	if (linkfilename3) {
 		// cannot remove these since they may be codepage letters now
 		msg_.replacer("|", "\r\n");

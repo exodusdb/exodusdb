@@ -175,7 +175,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 
 		var masterrecord;
 		if (masterrecord.read(masterfile, mastercode)) {
-			var origmasterrecord = masterrecord;
+			let origmasterrecord = masterrecord;
 			if (masterrecord.f(masterfn).locateby("AL", ID, vn)) {
 				if (deleting) {
 					masterrecord.remover(masterfn, vn);

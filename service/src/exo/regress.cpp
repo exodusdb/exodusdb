@@ -6,7 +6,7 @@ programinit()
 
 function main() {
 	printl("regress says 'Hello World!'");
-	var osfilename = field(SENTENCE, " ", 2);
+	let osfilename = field(SENTENCE, " ", 2);
 	var osfile;
 	if (not(osopen(osfilename, osfile)))
 		stop("cant open " ^ osfilename);
@@ -15,7 +15,7 @@ function main() {
 		stop("cant open " ^ osfilename);
 
 	data.converter("\r\n", _RM _RM);
-	var bit = data.first(100);
+	let bit = data.first(100);
 	var ix	= 0;
 	var delimiter;
 	int ln = 0;
@@ -23,12 +23,12 @@ function main() {
 		++ln;
 		if (not(mod(ln, 1000)))
 			printl(ln);
-		var line = data.substr2(ix, delimiter);
+		let line = data.substr2(ix, delimiter);
 		// 		line.outputl();
-		var output = line.field("\t", 1);
-		var op	   = line.field("\t", 2);
-		var inputx = line.field("\t", 3);
-		var arg1   = line.field("\t", 4);
+		let output = line.field("\t", 1);
+		let op	   = line.field("\t", 2);
+		let inputx = line.field("\t", 3);
+		let arg1   = line.field("\t", 4);
 		// op.outputl();
 		var test;
 		// if (op=="LOCATEUSING") {

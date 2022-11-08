@@ -24,7 +24,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 		print(dictfile);
 
 	// XREF should be able to do it all in one go
-	var fieldname = cmd.f(1, 1);
+	let fieldname = cmd.f(1, 1);
 	var parts	  = cmd.f(1, 2);
 	if (fieldname.ends("XREF")) {
 
@@ -33,7 +33,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 		// XREF sql was implemented as STARTING so ] was not required
 		parts.converter("]", "");
 
-		var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(parts) ^ " (S)";
+		let selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(parts) ^ " (S)";
 		select(selectcmd);
 
 		// otherwise do successive selects each one reducing the list
@@ -41,8 +41,8 @@ function main(in cmd, in filename, in dictfile, out hits) {
 		let nparts = parts.fcount("&");
 		// parts.outputl("parts=");
 		for (const var partn : range(1, nparts)) {
-			var part	  = parts.field("&", partn);
-			var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
+			let part	  = parts.field("&", partn);
+			let selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
 			// selectcmd.outputl("selectcmd=");
 			// call safeselect(select);
 			select(selectcmd);

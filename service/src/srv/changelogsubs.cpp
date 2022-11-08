@@ -52,7 +52,7 @@ function main(in mode0) {
 
 		// change to the user selected company
 		// merely to get the right letterhead
-		var compcode = mode.f(5);
+		let compcode = mode.f(5);
 		if (compcode) {
 			call initcompany(compcode);
 		}
@@ -70,7 +70,7 @@ function main(in mode0) {
 		// called from LOGIN.NET. not UI. UI calls SELECTANDLIST
 	} else if (mode.f(1) eq "WHATSNEW") {
 
-		var menucodes = mode.f(2);
+		let menucodes = mode.f(2);
 		mode		  = mode.f(1);
 		ANS			  = "";
 
@@ -85,7 +85,7 @@ function main(in mode0) {
 			// backward compatible - can be deleted after all upgraded
 			// leave in case reloading ancient data
 			if (not(userrec.f(17))) {
-				var changelogkey = "USER*" ^ USERNAME;
+				let changelogkey = "USER*" ^ USERNAME;
 				if (changelog.read(DEFINITIONS, changelogkey)) {
 					userrec(17) = changelog.f(8);
 					userrec.f(17).writef(users, USERNAME, 17);

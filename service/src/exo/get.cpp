@@ -10,12 +10,12 @@ function main() {
 
 	// a much simpler non-interactive version of GET
 
-	var where = "";
-	var html  = 1;
+	let where = "";
+	let html  = 1;
 	var cmd	  = SENTENCE;
 
 	while (cmd) {
-		var word1 = field(cmd, " ", 1);
+		let word1 = field(cmd, " ", 1);
 		if (word1 eq "GET" or word1 eq "NEW")
 			cmd = field(cmd, " ", 2, 99999).trimlast();
 		else
@@ -58,7 +58,7 @@ function main() {
 	if (not OPTIONS.contains("S"))
 		printl("Making a new document/report " ^ SYSTEM.f(2) ^ ":");
 
-	var timestarted = time();
+	let timestarted = time();
 
 	// execute the cmd to produce the report
 	perform(cmd);
@@ -73,7 +73,7 @@ function main() {
 	}
 
 	SYSTEM(2)	= "";
-	var filelen = prnfile.osfile().f(1);
+	let filelen = prnfile.osfile().f(1);
 
 	// fail if print file less than 2 characters long
 	if (filelen < 2) {

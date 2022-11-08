@@ -5,7 +5,6 @@ S
 
 
 
-function main() {\
 	/*;\
 	dostimenow=date()+24873+time()/86400;\
 	elapsedsecs=int((dostimenow-@record<27>)*86400);\
@@ -45,10 +44,9 @@ function main() {\
 	return 0;\
 	*/\
 \
-	var fromdate = RECORD.f(27).floor() - 24873;\
-	var fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;\
-	return elapsedtimetext(fromdate.timestamp(fromtime), timestamp());\
-}
+	let fromdate = RECORD.f(27).floor() - 24873;\
+	let fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;\
+	return elapsedtimetext(fromdate.timestamp(fromtime), timestamp());
 T
 10
 

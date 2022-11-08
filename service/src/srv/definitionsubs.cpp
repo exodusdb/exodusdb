@@ -60,7 +60,7 @@ function main(in mode) {
 		return 0;
 	}
 
-	var systemcodes = "SYSTEM.CFG,SYSTEM,..\\..\\SYSTEM.CFG";
+	let systemcodes = "SYSTEM.CFG,SYSTEM,..\\..\\SYSTEM.CFG";
 
 	if (mode eq "PREREAD") {
 
@@ -194,7 +194,7 @@ nochequeformat:
 
 			// currently only EXECUTIVE from UI
 			// default to authorised ATM
-			var pretendfile = ID.field("*", 3).field("_", 1);
+			let pretendfile = ID.field("*", 3).field("_", 1);
 			if (not(authorised(pretendfile ^ " ACCESS", msg))) {
 				goto unlockdefinitions;
 			}
@@ -210,7 +210,7 @@ nochequeformat:
 			call collectixvals(filename, fieldname);
 			let	 nn = PSEUDO.fcount(_FM);
 			for (const var ii : range(1, nn)) {
-				var val = PSEUDO.f(ii);
+				let val = PSEUDO.f(ii);
 				if (val) {
 					if (not(RECORD.f(1).locateby("AL", val, vn))) {
 						RECORD.inserter(1, vn, val);
@@ -348,7 +348,7 @@ preventupdate:
 
 			// check authorised to set posting
 			for (const var fn : range(100, 102)) {
-				var usercode = RECORD.f(fn);
+				let usercode = RECORD.f(fn);
 				if (usercode) {
 					if (not(SECURITY.f(1).locate(usercode, xx))) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
@@ -369,9 +369,9 @@ preventupdate:
 				}
 			}  // fn;
 
-			var t49	 = field2(RECORD.f(49), _VM, -1);
-			var t149 = field2(RECORD.f(149), _VM, -1);
-			var t150 = field2(RECORD.f(150), _VM, -1);
+			let t49	 = field2(RECORD.f(49), _VM, -1);
+			let t149 = field2(RECORD.f(149), _VM, -1);
+			let t150 = field2(RECORD.f(150), _VM, -1);
 			if (t49 and t49 eq t149) {
 				msg = "Media adjustment no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);
@@ -465,7 +465,7 @@ preventupdate:
 			//	backupdrives(-1) = RECORD.f(82);
 			//}
 			//for (const var driven : range(1, 999)) {
-			//	var drive = backupdrives.f(driven)[1];
+			//	let drive = backupdrives.f(driven)[1];
 			//	// /BREAK;
 			//	if (not drive)
 			//		break;
@@ -482,7 +482,7 @@ preventupdate:
 			//		call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
 			//	} else {
 			//		// tempfilename=lcase(drive:'\data.bak':'\':rnd(8))
-			//		var tempfilename = (drive ^
+			//		let tempfilename = (drive ^
 			//							"/data.bak"
 			//							"/" ^
 			//							var(8).rnd())
@@ -508,8 +508,8 @@ preventupdate:
 			// create/update ddns configuration if necessary
 			// actually only the ddns.cmd file really need be updated
 			// but atm it recreates everything from scratch
-			var oldhostname = req.orec.f(57);
-			var newhostname = RECORD.f(57);
+			let oldhostname = req.orec.f(57);
+			let newhostname = RECORD.f(57);
 			if (newhostname and newhostname ne oldhostname) {
 				SYSTEM(57) = newhostname;
 				// in INIT.GENERAL and DEFINITION.SUBS
@@ -645,11 +645,11 @@ subroutine reorderdbs() {
 	var newdbcodes = SYSTEM.f(58);
 
 	// read the existing dbdir or silently quit
-	var dbdirfilename = APPLICATION.lcase() ^ ".vol";
+	let dbdirfilename = APPLICATION.lcase() ^ ".vol";
 	if (not(dbdir.osread(dbdirfilename))) {
 		return;
 	}
-	var olddbdir = dbdir;
+	let olddbdir = dbdir;
 
 	// convert from DOS
 	// dbdir=field(dbdir,char(26),1)
@@ -658,16 +658,16 @@ subroutine reorderdbs() {
 	dbdir.converter(",*", _SM _VM);
 
 	// extract substitution and dblist from dbdir line 1
-	var substitution = dbdir.f(1).field(" ", 1);
-	var dblist		 = dbdir.f(1).field(" ", 2, 9999);
+	let substitution = dbdir.f(1).field(" ", 1);
+	let dblist		 = dbdir.f(1).field(" ", 2, 9999);
 
 	// create newdblist in order of given newdbcodes
 	// if not found in new order then append in order found
 	let ndbs	  = dblist.fcount(_VM);
 	var newdblist = "";
 	for (const var dbn : range(1, ndbs)) {
-		var db	   = dblist.f(1, dbn);
-		var dbcode = db.f(1, 1, 2);
+		let db	   = dblist.f(1, dbn);
+		let dbcode = db.f(1, 1, 2);
 		if (not(newdbcodes.locate(dbcode, newdbcoden))) {
 			newdbcodes(1, newdbcoden) = dbcode;
 		}

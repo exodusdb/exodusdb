@@ -37,7 +37,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		}
 
 		// convert _x to <u>x</u> to indicate keyboard shortcut
-		var tt = mainmenu.index("_");
+		let tt = mainmenu.index("_");
 		if (tt) {
 			mainmenu.paster(tt, 2, "<u>" ^ mainmenu[tt + 1] ^ "</u>");
 		}
@@ -55,7 +55,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		var submenu = arg3;
 
 		// convert _x to <u>x</u> to indicate keyboard shortcut
-		var tt = submenu.index("_");
+		let tt = submenu.index("_");
 		if (tt) {
 			submenu.paster(tt, 2, "<u>" ^ submenu[tt + 1] ^ "</u>");
 		}
@@ -79,7 +79,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		}
 
 		// convert _x to <u>x</u> to indicate keyboard shortcut
-		var tt = item.index("_");
+		let tt = item.index("_");
 		if (tt) {
 			item.paster(tt, 2, "<u>" ^ item[tt + 1] ^ "</u>");
 		}
@@ -102,7 +102,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 	} else if (mode eq "EXITMENUS") {
 
 		tx ^= FM ^ "<button tabindex=\"-1\" style=\"background-color: white; height: 1px; width: 1px; border-style: none; margin: 0; padding: 0\" accesskey=\"M\"";
-		var onclickx = "javascript:if (typeof menuonmouseover!='undefined') menuonmouseover('click')";
+		let onclickx = "javascript:if (typeof menuonmouseover!='undefined') menuonmouseover('click')";
 		tx ^= FM ^ " onclick=" ^ (onclickx.quote()) ^ ">";
 		tx ^= FM ^ "</button>";
 		tx ^= FM ^ "</body>";

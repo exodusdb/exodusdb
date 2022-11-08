@@ -14,15 +14,15 @@ var xx;
 function main() {
 	//
 
-	var options	  = SENTENCE.field("(", 2);
-	var sentencex = SENTENCE.field("(", 1);
+	let options	  = SENTENCE.field("(", 2);
+	let sentencex = SENTENCE.field("(", 1);
 
 	// if not called with X option then reexecute with X option
 	// so that after crash the original user and station can be restored
 	if (not(options.contains("X"))) {
-		var origuser	= USERNAME;
-		var origstation = STATION;
-		var origsysmode = SYSTEM.f(33);
+		let origuser	= USERNAME;
+		let origstation = STATION;
+		let origsysmode = SYSTEM.f(33);
 
 		execute(sentencex ^ " (X" ^ options);
 
@@ -36,7 +36,7 @@ function main() {
 		stop();
 	}
 
-	var docids = SENTENCE.field(" ", 2, 9999);
+	let docids = SENTENCE.field(" ", 2, 9999);
 
 	call autorun3(docids, options);
 

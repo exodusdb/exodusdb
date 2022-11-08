@@ -5,7 +5,7 @@ libraryinit()
 
 function main(in /*mode*/, in datasetcode, out result) {
 
-	var shutdownfilename = datasetcode.lcase() ^ ".end";
+	let shutdownfilename = datasetcode.lcase() ^ ".end";
 	if (shutdownfilename.osfile()) {
 		result = 2;
 		return 0;
@@ -20,7 +20,7 @@ function main(in /*mode*/, in datasetcode, out result) {
 	// randomise randomising doesnt make any difference
 	printl();
 	printl("Waiting up to 120 seconds for other ", datasetcode, " processes to close:");
-	var ii = "";
+	let ii = "";
 	for (const var ii : range(1, 120)) {
 		// /BREAK;
 		if (not(otherusers(datasetcode)))

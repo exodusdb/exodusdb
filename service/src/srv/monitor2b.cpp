@@ -29,9 +29,9 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	// http://www.gnu.org/software/wget/manual/wget.html
 	// windows version at http://users.ugent.be/~bpuype/wget/
 
-	var post = 1;
+	let post = 1;
 	// cleanup=0;*@username<>'EXODUS'
-	var cleanup = mode eq "READ";
+	let cleanup = mode eq "READ";
 	if (mode eq "READ") {
 		datax = "";
 	}
@@ -43,11 +43,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	// make linux/cygwin command
 	var cmd		 = "wget";
-	var httpsbug = 0;
+	let httpsbug = 0;
 //	if (VOLUMES) {
 //		wgetrc = "";
 //		// look for local or cygwin wget.exe otherwise quit
-//		var exe = oscwd().contains(":") ? ".exe" : "";
+//		let exe = oscwd().contains(":") ? ".exe" : "";
 //		cmd		= SYSTEM.f(50) ^ "wget" ^ exe;
 //		if (not(cmd.osfile())) {
 //			httpsbug = 1;
@@ -68,21 +68,21 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	msg = "unknown error in control";
 
-	var logfilename	  = tempfilename ^ ".XWG";
-	var tempfilename2 = tempfilename ^ ".XRE";
+	let logfilename	  = tempfilename ^ ".XWG";
+	let tempfilename2 = tempfilename ^ ".XRE";
 
 	// user and pass currently not required for some reason
 	// but leave configured in case they are re-instated on the server
-	var httpuser = "exodusclient";
+	let httpuser = "exodusclient";
 	// Only one way to make a good password Memorable & Randomish"
-	var httppass = "OowtmagpM&R";
+	let httppass = "OowtmagpM&R";
 
 	// stay within 31 bit integers for php sake
-	var salt = 3923517;
-	var max	 = 4752137;
+	let salt = 3923517;
+	let max	 = 4752137;
 
-	var sessionid = (date().pwr(3) * 7 + 5).b(9999, -9999);
-	var cidx	  = cid();
+	let sessionid = (date().pwr(3) * 7 + 5).b(9999, -9999);
+	let cidx	  = cid();
 
 	if (mode eq "WRITE") {
 
@@ -131,7 +131,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			// sessionid is a hashcode of the day
 			// eg databaseid=FFFFFFFF&databasecode=XXXXXXXX&installationid=999999&sessionid=
 
-			var hostname = SYSTEM.f(57);
+			let hostname = SYSTEM.f(57);
 
 			// prepare params
 			params = "databaseid=" ^ SYSTEM.f(45);
@@ -150,7 +150,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		// add basic wget commands
-		var referer = "exodusclient-" ^ SYSTEM.f(17) ^ "-" ^ cidx;
+		let referer = "exodusclient-" ^ SYSTEM.f(17) ^ "-" ^ cidx;
 		if (post) {
 			cmd ^= " --no-cache";
 			if (httpsbug) {
@@ -236,7 +236,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				if (cmd.contains(" -N ")) {
 					params = "?data=" ^ params;
 				} else {
-					var datafilename = tempfilename ^ ".XDA";
+					let datafilename = tempfilename ^ ".XDA";
 
 					// encodeuri
 					params.replacer("%", "%25");
@@ -269,7 +269,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			// print @(0):@(-4):time() 'MTS':' CONTROL ':cmd[1,50]:'... ':
 
 			var().osflush();
-			var result = shell2(cmd, errors);
+			let result = shell2(cmd, errors);
 			var().osflush();
 
 			// print 'done ':
@@ -304,8 +304,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			}
 			wgetrcfilename.converter(OSSLASH, "/");
 
-			var cmdfilename	  = tempfilename ^ ".cmd";
-			var errorfilename = tempfilename ^ ".XER";
+			let cmdfilename	  = tempfilename ^ ".cmd";
+			let errorfilename = tempfilename ^ ".XER";
 			var cmdfile		  = "set WGETRC=" ^ wgetrcfilename;
 			cmdfile ^= _EOL ^ cmd ^ " 2>" ^ errorfilename;
 			//var(cmdfile).oswrite(cmdfilename);
@@ -355,7 +355,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	} else if (mode eq "READ") {
 
-		var tt = tempfilename2.osfile().f(1);
+		let tt = tempfilename2.osfile().f(1);
 		// if tt gt 32000 then
 		if (tt gt maxstrsize_ / 2) {
 			datax = "";
@@ -385,7 +385,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		// verify echo
-		var expect = SYSTEM.f(45) ^ "," ^ SYSTEM.f(17) ^ "," ^ cidx ^ "," ^ sessionid;
+		let expect = SYSTEM.f(45) ^ "," ^ SYSTEM.f(17) ^ "," ^ cidx ^ "," ^ sessionid;
 		if (datax.field(",", 2, 4) ne expect) {
 			msg = "Bad response";
 			goto badresponse;

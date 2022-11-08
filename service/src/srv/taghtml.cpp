@@ -25,12 +25,12 @@ function main(in /*type*/, in in0, in mode, out output) {
 		}
 	}
 
-	var precoded = _VM "nbsp" _VM "amp" _VM "lt" _VM "gt" _VM "infin" _VM;
+	let precoded = _VM "nbsp" _VM "amp" _VM "lt" _VM "gt" _VM "infin" _VM;
 	for (var pos = 1;; pos++) {
 		pos = output.index("&", pos);
 		if (not pos)
 			break;
-		var ss = _VM ^ output.b(pos + 1, 10).field(";", 1) ^ _VM;
+		let ss = _VM ^ output.b(pos + 1, 10).field(";", 1) ^ _VM;
 		if (not precoded.contains(ss)) {
 			output.paster(pos + 1, "amp;");
 			pos += 4;
@@ -49,10 +49,10 @@ function main(in /*type*/, in in0, in mode, out output) {
 
 // subroutine test() {
 //	// test oconv [TAGHTML]
-//	var text = "&nbsp" _VM "&amp" _VM "&lt" _VM "&gt" _VM "&infin" _VM;
+//	let text = "&nbsp" _VM "&amp" _VM "&lt" _VM "&gt" _VM "&infin" _VM;
 //	assert(oconv(text,"[TAGHTML,XYZ]").convert(VM,"]") eq "<XYZ>&nbsp</XYZ>]<XYZ>&amp</XYZ>]<XYZ>&lt</XYZ>]<XYZ>&gt</XYZ>]<XYZ>&infin</XYZ>]");
 //
-//	var text2 =  "&&___&amp;___&lt;___&gt&gt___&&";
+//	let text2 =  "&&___&amp;___&lt;___&gt&gt___&&";
 //	assert(oconv(text2,"[TAGHTML,XYZ]").convert(VM,"]").outputl() eq "<XYZ>&amp;&amp;___&amp;___&lt;___&amp;gt&amp;gt___&amp;&amp;</XYZ>");
 //}
 

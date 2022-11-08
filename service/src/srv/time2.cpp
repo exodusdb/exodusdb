@@ -64,7 +64,7 @@ function main(in type, in input0, in mode0, out output) {
 
 		var input2 = input0;
 		input2.converter(":.", "::");
-		var temp = input2.field(":", 1);
+		let temp = input2.field(":", 1);
 		if (temp.isnum() and temp ge 24) {
 			input2 = input2.fieldstore(":", 1, 1, temp - 24);
 			// output=iconv(input2,'MT')

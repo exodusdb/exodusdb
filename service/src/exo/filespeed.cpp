@@ -13,9 +13,9 @@ var testtime;	// num
 function main() {
 
 	// declare function esc.to.exit
-	var deletefilex = 1;
+	let deletefilex = 1;
 
-	var usetransaction = true;
+	let usetransaction = true;
 
 	if (deletefilex) {
 		tempfilename = "BENCHMARK" ^ SYSTEM.f(24);

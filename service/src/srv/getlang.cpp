@@ -49,8 +49,8 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		// bilingual
 		if (lang2 and lang2 ne lang1) {
 			lang   = "";
-			var n1 = lang1.fcount(FM);
-			var n2 = lang2.fcount(FM);
+			let n1 = lang1.fcount(FM);
+			let n2 = lang2.fcount(FM);
 			// 			if (n1 lt n2) {
 			// 				nn = n2;
 			// 			} else {
@@ -59,9 +59,9 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 			let nn = (n1 lt n2) ? n2 : n1;
 			for (const var fn : range(1, nn)) {
 				// lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
-				var lang1line = lang1.f(fn);
-				var lang2line = lang2.f(fn);
-				var nparts	  = fcount(lang1line, "|");
+				let lang1line = lang1.f(fn);
+				let lang2line = lang2.f(fn);
+				let nparts	  = fcount(lang1line, "|");
 				if (nparts eq 1) {
 					// eg English Arabic
 					lang(fn) = (lang1line ^ " " ^ lang2line).trim();
@@ -206,7 +206,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 		if (lang.contains(chr(170))) {
 			let nn = lang.fcount(FM);
 			for (const var ii : range(1, nn)) {
-				var tt = lang.f(ii).field(chr(170), 2);
+				let tt = lang.f(ii).field(chr(170), 2);
 				if (tt) {
 					lang(ii) = tt;
 				}

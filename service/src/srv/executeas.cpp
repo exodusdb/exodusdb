@@ -16,7 +16,7 @@ function main(in cmd, in username) {
 			return 0;
 		}
 		origusername	= USERNAME;
-		var newusername = username ^ "(" ^ USERNAME ^ ")";
+		let newusername = username ^ "(" ^ USERNAME ^ ")";
 		USERNAME		= (newusername);
 	}
 

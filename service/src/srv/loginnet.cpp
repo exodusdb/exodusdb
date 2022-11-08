@@ -87,9 +87,9 @@ readmenu:
 	var nmenus = menus.fcount(VM);
 	// work backwards because we are deleting
 	for (var menun = nmenus; menun >= 1; --menun) {
-		var menu = menus.f(1, menun).ucase();
+		let menu = menus.f(1, menun).ucase();
 		if (menu) {
-			var menutask = "MENU " ^ menu;
+			let menutask = "MENU " ^ menu;
 			if (not(SECURITY.f(10).locate(menutask, taskn))) {
 				taskn = 0;
 			}
@@ -185,7 +185,7 @@ nextcomp:
 	srv.company = "";
 	call initcompany(compcode);
 
-	var ncompanies = compcodes.fcount(FM);
+	let ncompanies = compcodes.fcount(FM);
 	authcompcodes  = compcodes;
 	authcompcodes.converter(FM, VM);
 
@@ -286,13 +286,13 @@ nextcomp:
 	}
 	// var lastbackupdate = paramrec.f(2);
 	// backup_db script updates params2 date/time
-	var lastbackupdate = paramfilename.osfile().f(2);
+	let lastbackupdate = paramfilename.osfile().f(2);
 
 	// if lastbackupdate and lastbackupdate lt date()-1 then
 	// assume backup on same day (ie after last midnight)
 	if (lastbackupdate and lastbackupdate lt date()) {
 		msg		  = "The last backup was ";
-		var ndays = date() - lastbackupdate;
+		let ndays = date() - lastbackupdate;
 		msg ^= ndays ^ " day" ^ var("s").first(ndays ne 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
 		msg.replacer("(0", "(");

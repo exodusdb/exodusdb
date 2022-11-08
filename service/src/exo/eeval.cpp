@@ -2,7 +2,7 @@
 programinit()
 function main() {
 
-	var prog =
+	let prog =
 		"#include <exodus/program.h>\n"
 		"programinit()\n"
 		"function main() {\n" ^
@@ -11,8 +11,8 @@ function main() {
 		"return 0;}\n"
 		"programexit()\n";
 
-	var tempfilebase = "eevalt";
-	var tempfilesrc	 = tempfilebase ^ ".cpp";
+	let tempfilebase = "eevalt";
+	let tempfilesrc	 = tempfilebase ^ ".cpp";
 	//oswrite(prog, tempfilesrc);
 	if (not oswrite(prog, tempfilesrc)) {
 		loglasterror();

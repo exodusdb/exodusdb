@@ -11,7 +11,7 @@ function main(in list0, out min, out max) {
 	// linemark
 
 	// initialise min and max to the first element
-	var result = "";
+	let result = "";
 	var start  = 0;
 	bit		   = list0.substr2(start, term);
 	if (bit.len()) {

@@ -20,7 +20,7 @@ function main() {
 		options = "";
 	}
 
-	var filename = SENTENCE.field(" ", 2);
+	let filename = SENTENCE.field(" ", 2);
 	var syntax	 = "Syntax is:";
 	syntax(-1)	 = "CLEARFIELD filename fieldnoorname ... /\"clear to value\"";
 	syntax(-1)	 = "eg CLEARFIELD TASKS STATUS /\"Completed\"";
@@ -102,7 +102,7 @@ tryagain:
 		nrecs = "/" ^ nrecs;
 	}
 
-	var isindexed = file.contains("SI.MFS") ne 0;
+	let isindexed = file.contains("SI.MFS") ne 0;
 
 next:
 	// ///

@@ -130,7 +130,7 @@ function main(in mode0) {
 
 next:
 
-			var params = ":" ^ req.datafile ^ ".SK:DEFINITIONS";
+			let params = ":" ^ req.datafile ^ ".SK:DEFINITIONS";
 
 			req.isdflt = nextkey(params, "");
 			if (xx.read(req.srcfile, req.isdflt)) {
@@ -157,7 +157,7 @@ subroutine getdatasets() {
 	var dospath = oscwd().first(2) ^ "../data/";
 	dospath.converter("/", OSSLASH);
 
-	var dosfilename = APPLICATION ^ ".vol";
+	let dosfilename = APPLICATION ^ ".vol";
 	if (not(directory.osread(dosfilename))) {
 		if (not(directory.osread(APPLICATION ^ ".vox"))) {
 			call mssg(APPLICATION ^ ".vol is missing");
@@ -165,16 +165,16 @@ subroutine getdatasets() {
 		}
 	}
 
-	var nodata = directory.field("\r", 1).ends(" ");
+	let nodata = directory.field("\r", 1).ends(" ");
 	// call msg(nodata:' ')
 	// convert dos text to revelation format and standardise
 	directory.ucaser();
 	// DIRECTORY=TRIM(DIRECTORY[1,\1A\]);*DOS TEXT EOF IS CONTROL-Z
-	var dosformat = directory.contains(chr(13));
+	let dosformat = directory.contains(chr(13));
 	directory.converter(" " _FM "\r\n", _FM "   ");
 	directory.trimmer();
 	directory.converter(" " _FM, _FM " ");
-	var nvols = directory.fcount(FM);
+	let nvols = directory.fcount(FM);
 
 	datasetparams = directory.f(1);
 	if (not(datasetparams.contains(","))) {
@@ -183,7 +183,7 @@ subroutine getdatasets() {
 	}
 
 	datasetparams.converter(",*", SM ^ VM);
-	var subst	  = datasetparams.field(" ", 1);
+	let subst	  = datasetparams.field(" ", 1);
 	datasetparams = datasetparams.field(" ", 2, 9999);
 	let ndatasets = datasetparams.fcount(VM);
 
@@ -191,8 +191,8 @@ subroutine getdatasets() {
 	var datasetnames = "";
 
 	for (const var datasetn : range(1, ndatasets)) {
-		var temp		= datasetparams.f(1, datasetn);
-		var datasetcode = temp.f(1, 1, 2);
+		let temp		= datasetparams.f(1, datasetn);
+		let datasetcode = temp.f(1, 1, 2);
 		var datasetname = temp.f(1, 1, 1);
 		tt				= "../data/" ^ datasetcode.lcase() ^ "/general/revmedia.lk";
 		tt.converter("/", OSSLASH);

@@ -80,8 +80,8 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	// 	}
 	let nlimitfields = limitfields.unassigned("").fcount(VM);
 
-	var xml		= options.contains("XML");
-	var rawread = options.contains("RAW");
+	let xml		= options.contains("XML");
+	let rawread = options.contains("RAW");
 
 	datax = "";
 
@@ -100,7 +100,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	}
 
 	// fm termination indicates list of keys and optionally mvnos
-	var givenkeys = sortselect.ends(FM);
+	let givenkeys = sortselect.ends(FM);
 	var givenkeyn = 0;
 
 	if (not useactivelist) {
@@ -134,7 +134,7 @@ nocommon:
 
 	// filename can be 'filename USING dictfilename'
 
-	var filename0 = filename;
+	let filename0 = filename;
 	if (filename.field(" ", 2) eq "USING") {
 		dictfilename = filename.field(" ", 3);
 		filename	 = filename.field(" ", 1);
@@ -238,7 +238,7 @@ nocommon:
 			dictids = "ID";
 		}
 		for (const var dictidn : range(1, ndictids)) {
-			var dictid = dictids.f(dictidn);
+			let dictid = dictids.f(dictidn);
 			var dictrec;
 			if (not(dictrec.read(DICT, dictid))) {
 				if (not(dictrec.read(dictvoc, dictid))) {
@@ -343,7 +343,7 @@ nocommon:
 	}
 
 	// return empty results even if no records selected
-	var selectresult = "";
+	let selectresult = "";
 
 	var recn = "";
 
@@ -411,9 +411,9 @@ nextrec:
 
 	// filter out unwanted multivalues that the stupid rev sortselect leaves in
 	for (const var limitfieldn : range(1, nlimitfields)) {
-		var value	   = calculate(limitfields.f(1, limitfieldn));
-		var reqvalue   = limitvalues.f(1, limitfieldn);
-		var limitcheck = limitchecks.f(1, limitfieldn);
+		let value	   = calculate(limitfields.f(1, limitfieldn));
+		let reqvalue   = limitvalues.f(1, limitfieldn);
+		let limitcheck = limitchecks.f(1, limitfieldn);
 
 		if (limitcheck eq "EQ") {
 			if (value ne reqvalue) {
@@ -482,7 +482,7 @@ nextrec:
 		row = "";
 
 		for (const var dictidn : range(1, ndictids)) {
-			var dictid	= dictids.f(dictidn);
+			let dictid	= dictids.f(dictidn);
 			var dictid2 = dictid;
 			dictid2.converter("@", "");
 			var cell = calculate(dictid);

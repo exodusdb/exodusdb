@@ -41,7 +41,7 @@ function main(in mode, in status0 = "") {
 		// WARNING: Before selection of dataset/init.general this is not available
 
 		// userlockid=sysvar('GET',109,134)
-		var userlockid = THREADNO;
+		let userlockid = THREADNO;
 
 		// on advanced revelation the pattern is U7906nnnn where 7906
 		// where 7906 appears to be the last 4 digits of the DOS serial() number

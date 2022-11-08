@@ -29,7 +29,7 @@ function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, i
 			direction = -1;
 		}
 
-		var mindate = var("1/1/2000").iconv("D/E");
+		let mindate = var("1/1/2000").iconv("D/E");
 
 		while (true) {
 			// /BREAK;
@@ -61,7 +61,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	// type 1 is weekends (of the user otherwise of market)
 	// ///////////////////////////////////////////////////
 
-	var dow = idate.oconv("DW");
+	let dow = idate.oconv("DW");
 
 	// from user
 	var weekenddows = trim(userx.f(24), SM);
@@ -77,7 +77,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 			if (not weekenddows) {
 				// weekenddows=agp<13>:sm:mod(agp<13>-1-1,7)+1
 				// var tt		= (agp.f(13) - 1 - 1).mod(7) + 1;
-				var tt		= (agp.f(13) - 1).oconv("DW");
+				let tt		= (agp.f(13) - 1).oconv("DW");
 				weekenddows = agp.f(13) ^ SM ^ tt;
 			}
 		}
@@ -91,7 +91,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	// /////////////////////////
 
 	// general holidays only from market currently
-	var holidays = market.f(7);
+	let holidays = market.f(7);
 	// if holidays else
 	// holidays=
 	// end
@@ -104,13 +104,13 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	// //////////////////////////
 
 	// personal holidays only from user currently
-	var fromdates = userx.f(22);
-	var uptodates = userx.f(23);
+	let fromdates = userx.f(22);
+	let uptodates = userx.f(23);
 	// from dates must be in reverse sorted order
 	if (not fromdates.f(1).locateby("DR", idate, daten)) {
 		// Not found. daten points to the last + 1
 	}
-	var uptodate = uptodates.f(1, daten);
+	let uptodate = uptodates.f(1, daten);
 	if (uptodate and idate le uptodates.f(1, daten)) {
 		holidaytype = 3;
 		return;

@@ -85,7 +85,7 @@ var wsmsg;
 
 function main(in mode) {
 
-	var interactive = false;  //not(SYSTEM.f(33));
+	let interactive = false;  //not(SYSTEM.f(33));
 
 	req.valid = 1;
 
@@ -200,12 +200,12 @@ function main(in mode) {
 
 		// delete disallowed tasks (except all master type user to see all tasks)
 		if (not(updatehighergroups_ and updatelowergroups_)) {
-			var tasks  = RECORD.f(10);
-			var locks  = RECORD.f(11);
+			let tasks  = RECORD.f(10);
+			let locks  = RECORD.f(11);
 			let ntasks = tasks.fcount(VM);
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
-				var task = tasks.f(1, taskn);
-				var temp = task.starts("DOCUMENT: ") ? "#" : "";
+				let task = tasks.f(1, taskn);
+				let temp = task.starts("DOCUMENT: ") ? "#" : "";
 				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
 					RECORD.remover(10, taskn);
 					RECORD.remover(11, taskn);
@@ -216,8 +216,8 @@ function main(in mode) {
 		// hide higher/lower users
 		if (not(curruser_.contains("EXODUS"))) {
 
-			var usercodes = RECORD.f(1);
-			var nusers	  = usercodes.fcount(VM);
+			let usercodes = RECORD.f(1);
+			let nusers	  = usercodes.fcount(VM);
 
 			if (not(usercodes.f(1).locate(USERNAME, usern))) {
 				msg = USERNAME ^ " user not in in authorisation file";
@@ -255,7 +255,7 @@ function main(in mode) {
 			// also in prewrite
 
 			if (startn_ ne 1 or endn_ ne nusers) {
-				var nn = endn_ - startn_ + 1;
+				let nn = endn_ - startn_ + 1;
 
 				if (not interactive) {
 
@@ -280,7 +280,7 @@ function main(in mode) {
 					if (invisiblekeys) {
 						let nkeys = invisiblekeys.fcount(VM);
 						for (const var keyn : range(1, nkeys)) {
-							var keyx = invisiblekeys.f(1, keyn);
+							let keyx = invisiblekeys.f(1, keyn);
 							if (not(otherkeys.f(1).locate(keyx, xx))) {
 								if (not(visiblekeys.f(1).locate(keyx, xx))) {
 									otherkeys ^= VM ^ keyx;
@@ -306,13 +306,13 @@ function main(in mode) {
 
 		// get the local passwords from the system file for users that exist there
 		// also get any user generated passwords
-		var usercodes = RECORD.f(1);
+		let usercodes = RECORD.f(1);
 		let nusers	  = usercodes.fcount(VM);
 		// for (usern = 1; usern <= nusers; ++usern) {
 		for (const var usern : range(1, nusers)) {
 			userx	 = usercodes.f(1, usern);
 			sysrec	 = RECORD.f(4, usern, 2);
-			var pass = userx.xlate("USERS", 4, "X");
+			let pass = userx.xlate("USERS", 4, "X");
 			if (pass and pass ne sysrec.field(TM, 7)) {
 				RECORD(4, usern, 2) = sysrec.fieldstore(TM, 7, 1, pass);
 			}
@@ -438,7 +438,7 @@ function main(in mode) {
 					} else {
 						// recover old password
 						if (ousern) {
-							var oldpassword	 = origfullrec_.f(4, ousern);
+							let oldpassword	 = origfullrec_.f(4, ousern);
 							RECORD(4, usern) = oldpassword;
 						}
 					}
@@ -474,7 +474,7 @@ function main(in mode) {
 			// let nusers = RECORD.f(1).fcount(VM);
 			// or (usern = 1; usern <= nusers; ++usern) {
 			for (const var usern : range(1, nusers)) {
-				var temp = RECORD.f(1, usern);
+				let temp = RECORD.f(1, usern);
 				if (temp eq "" or temp.contains("---")) {
 					RECORD(1, usern) = "---";
 					RECORD(2, usern) = "---";
@@ -483,8 +483,8 @@ function main(in mode) {
 
 			// put back any hidden users
 			if (startn_) {
-				var nn	 = endn_ - startn_ + 1;
-				var nvms = RECORD.f(1).count(VM);
+				let nn	 = endn_ - startn_ + 1;
+				let nvms = RECORD.f(1).count(VM);
 				for (const var fn : range(1, 8)) {
 					var temp = RECORD.f(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
@@ -493,14 +493,14 @@ function main(in mode) {
 			}
 
 			// put back any hidden tasks
-			var tasks  = origfullrec_.f(10);
-			var locks  = origfullrec_.f(11);
+			let tasks  = origfullrec_.f(10);
+			let locks  = origfullrec_.f(11);
 			let ntasks = tasks.fcount(VM);
 			for (const var taskn : range(1, ntasks)) {
-				var task = tasks.f(1, taskn);
+				let task = tasks.f(1, taskn);
 				if (task) {
 					if (not(req.orec.f(10).locate(task, newtaskn))) {
-						var lockx = locks.f(1, taskn);
+						let lockx = locks.f(1, taskn);
 
 						if (not(RECORD.f(10).locateby("AL", task, newtaskn))) {
 							RECORD.inserter(10, newtaskn, task);
@@ -557,10 +557,10 @@ function main(in mode) {
 			users = "";
 		}
 		// update users in the central system file if they exist there (direct login)
-		var usercodes	  = RECORD.f(1);
-		var useremails	  = RECORD.f(7);
-		var usernames	  = RECORD.f(8);
-		var userpasswords = RECORD.f(4);
+		let usercodes	  = RECORD.f(1);
+		let useremails	  = RECORD.f(7);
+		let usernames	  = RECORD.f(8);
+		let userpasswords = RECORD.f(4);
 		let nusers		  = usercodes.fcount(VM);
 		// for (usern = 1; usern <= nusers; ++usern) {
 		for (const var usern : range(1, nusers)) {
@@ -574,13 +574,13 @@ function main(in mode) {
 				var menuid = "";
 				if (origfullrec_.f(1).locate(userx, ousern)) {
 					// oSYSREC=orec<4,ousern,2>
-					var osysrec = origfullrec_.f(4, ousern, 2);
+					let osysrec = origfullrec_.f(4, ousern, 2);
 				} else {
-					var osysrec = "";
+					let osysrec = "";
 
 					// new users look for legacy menu in following (lower rank) users
 					for (const var usern2 : range(usern + 1, nusers)) {
-						var usercode2 = usercodes.f(1, usern2);
+						let usercode2 = usercodes.f(1, usern2);
 						if (usercode2) {
 							if (not(menuid.readf(users, usercode2, 34))) {
 								menuid = "";
@@ -628,15 +628,15 @@ function main(in mode) {
 					// new password cause entry in users log to renable login if blocked
 					// save historical logins/password resets in listen2 and security.subs
 					// similar in security.subs and user.subs
-					var userpass  = userpasswords.f(1, usern);
-					var ouserpass = origfullrec_.f(4, ousern);
+					let userpass  = userpasswords.f(1, usern);
+					let ouserpass = origfullrec_.f(4, ousern);
 					if (userpass ne ouserpass) {
 						// datetime=(date():'.':time() 'R(0)#5')+0
-						var datetime = date() ^ "." ^ time().oconv("R(0)#5");
+						let datetime = date() ^ "." ^ time().oconv("R(0)#5");
 						userrec.inserter(15, 1, datetime);
 						userrec.inserter(16, 1, SYSTEM.f(40, 2));
 
-						var text = "OK New password by " ^ USERNAME ^ ".";
+						let text = "OK New password by " ^ USERNAME ^ ".";
 						userrec.inserter(18, 1, text);
 
 						userrec(36) = datetime;
@@ -654,7 +654,7 @@ function main(in mode) {
 						// and we still need to get the executive email if they are a user
 						var mirror	  = userrec.fieldstore(FM, 13, 5, "");
 						mirror		  = userrec.fieldstore(FM, 31, 3, "");
-						var mirrorkey = "%" ^ userrec.f(1).ucase() ^ "%";
+						let mirrorkey = "%" ^ userrec.f(1).ucase() ^ "%";
 						mirror(1)	  = userx;
 						mirror.write(users, mirrorkey);
 
@@ -669,7 +669,7 @@ function main(in mode) {
 		// subsection for deletion of old
 		{
 			// delete any deleted users from the system file for direct login
-			var usercodes = req.orec.f(1);
+			let usercodes = req.orec.f(1);
 			let nusers	  = usercodes.fcount(VM);
 			// for (usern = 1; usern <= nusers; ++usern) {
 			for (const var usern : range(1, nusers)) {
@@ -724,7 +724,7 @@ function main(in mode) {
 						replyto = USERNAME.xlate("USERS", 7, "X");
 					}
 
-					var toaddress = newusers.f(ii, 3);
+					let toaddress = newusers.f(ii, 3);
 					var ccaddress = replyto;
 
 					// also inform accounts although cancelled users are not emailed to accounts
@@ -735,7 +735,7 @@ function main(in mode) {
 						ccaddress ^= "accounts@neosys.com";
 					}
 
-					var subject = "EXODUS New User " ^ newusers.f(ii, 2) ^ " (" ^ newusers.f(ii, 1) ^ ")";
+					let subject = "EXODUS New User " ^ newusers.f(ii, 2) ^ " (" ^ newusers.f(ii, 1) ^ ")";
 
 					var body	= "";
 					body(1, -1) = "A new EXODUS user account has been created for you.";
@@ -749,8 +749,8 @@ function main(in mode) {
 
 					body ^= VM;
 					body(1, -1)		  = "Login:";
-					var baselinks	  = SYSTEM.f(114);
-					var baselinkdescs = SYSTEM.f(115);
+					let baselinks	  = SYSTEM.f(114);
+					let baselinkdescs = SYSTEM.f(115);
 					let nlinks		  = baselinks.fcount(VM);
 					if (nlinks) {
 						for (const var linkn : range(1, nlinks)) {
@@ -816,14 +816,14 @@ function main(in mode) {
 		temprec(4)	= "";
 
 		// remove expired users
-		var expirydates = temprec.f(3);
+		let expirydates = temprec.f(3);
 		let nn			= expirydates.fcount(VM);
 		for (var ii = nn; ii >= 1; --ii) {
-			var expirydate = expirydates.f(1, ii);
+			let expirydate = expirydates.f(1, ii);
 			if (expirydate) {
 				if (expirydate le date()) {
 					for (const var fn : range(1, 9)) {
-						var tt = temprec.f(fn);
+						let tt = temprec.f(fn);
 						if (tt) {
 							temprec(fn) = tt.remove(1, ii, 0);
 						}
@@ -834,15 +834,15 @@ function main(in mode) {
 
 		// remove empty groups
 		{
-			var usercodes = temprec.f(1);
+			let usercodes = temprec.f(1);
 			let nn		  = usercodes.fcount(VM);
 			for (var ii = nn; ii >= 2; --ii) {
-				var usercode = usercodes.f(1, ii);
+				let usercode = usercodes.f(1, ii);
 				if (usercode) {
 					if (temprec.f(8, ii) eq "" or temprec.f(7, ii) eq "") {
 						if (temprec.f(1, ii - 1) eq "") {
 							for (const var fn : range(1, 9)) {
-								var tt = temprec.f(fn);
+								let tt = temprec.f(fn);
 								if (tt) {
 									temprec(fn) = tt.remove(1, ii, 0);
 								}
@@ -859,7 +859,7 @@ function main(in mode) {
 		// reverse users so department shows at the top (and higher users at bottom sadly)
 		if (mode.field(".", 2) eq "USERS") {
 			// trim any multivalued fields with more than nusers multivalues
-			var nusers = temprec.f(1).fcount(VM);
+			let nusers = temprec.f(1).fcount(VM);
 			let nfs	   = temprec.fcount(FM);
 			for (const var fn : range(1, nfs)) {
 				temprec(fn) = temprec.f(fn).field(VM, 1, nusers);
@@ -868,12 +868,12 @@ function main(in mode) {
 			temprec = invertarray(reverse(invertarray(temprec)));
 		}
 
-		var tempkey = "SECURITY." ^ var(1000000).rnd() ^ "." ^ time() ^ ".$$$";
+		let tempkey = "SECURITY." ^ var(1000000).rnd() ^ "." ^ time() ^ ".$$$";
 		temprec.write(DEFINITIONS, tempkey);
 		// call oswrite(temprec,'x')
-		var temp = "";
+		let temp = "";
 
-		var mode2 = mode.field(".", 2);
+		let mode2 = mode.field(".", 2);
 		var cmd	  = "LIST DEFINITIONS " ^ (tempkey.quote());
 		if (mode2 eq "TASKS") {
 			cmd ^= " TASKS LOCKS";
@@ -894,18 +894,18 @@ function main(in mode) {
 
 	} else if (mode.field(".", 1) eq "GETTASKS") {
 
-		var disallowed = mode.field(".", 2) eq "NOT";
-		var username   = mode.field(".", 3);
+		let disallowed = mode.field(".", 2) eq "NOT";
+		let username   = mode.field(".", 3);
 
-		var origuser = USERNAME;
+		let origuser = USERNAME;
 		if (username) {
 			USERNAME = (username);
 		}
 
 		var tasks2	 = "";
 		var locks2	 = "";
-		var tasks	 = SECURITY.f(10);
-		var locks	 = SECURITY.f(11);
+		let tasks	 = SECURITY.f(10);
+		let locks	 = SECURITY.f(11);
 		let ntasks	 = tasks.fcount(VM);
 		var lasttask = "";
 		for (const var taskn : range(1, ntasks)) {
@@ -921,7 +921,7 @@ function main(in mode) {
 			if (ok) {
 
 				// shorten duplicated task names
-				var task2 = task;
+				let task2 = task;
 				for (const var ii : range(1, 9)) {
 					var temp = task.field(" ", ii);
 					if (temp) {
@@ -966,7 +966,7 @@ function main(in mode) {
 }
 
 subroutine changepassx() {
-	var datax = RECORD.f(4, req.mvx);
+	let datax = RECORD.f(4, req.mvx);
 	sysrec	  = datax.f(1, 1, 2);
 	sysrec.converter(TM ^ ST ^ chr(249), FM ^ VM ^ SM);
 	if (not sysrec) {
@@ -994,7 +994,7 @@ subroutine changepassx() {
 
 subroutine generatepassword() {
 	var consonants = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	var vowels	   = "AEIOUY";
+	let vowels	   = "AEIOUY";
 	consonants.converter(vowels ^ "QX", "");
 	newpassword = "";
 	for (const var ii : range(1, minpasswordchars_ / 2)) {
@@ -1018,7 +1018,7 @@ subroutine newpass3() {
 		return;
 	}
 
-	var v12 = 0;
+	let v12 = 0;
 
 	gosub makesysrec();
 	return;
@@ -1096,8 +1096,8 @@ subroutine getemailtx(in nuserfields) {
 	// build up log email for sysmsg
 	var tx = "";
 	for (const var fieldn : range(1, nuserfields)) {
-		var fieldx = userfields.f(fieldn);
-		var fn	   = fieldx.f(1, 2);
+		let fieldx = userfields.f(fieldn);
+		let fn	   = fieldx.f(1, 2);
 		var old	   = oconv(origuserrec.f(fn), fieldx.f(1, 3));
 		var newx   = oconv(userrec.f(fn), fieldx.f(1, 3));
 		if (newx ne old) {

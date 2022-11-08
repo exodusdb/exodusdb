@@ -64,15 +64,15 @@ function main(in docids0 = "", in options0 = "") {
 	}
 
 	// used to email EXODUS if EXODUS user in list of recipients
-	var sysmsgatexodus = "sysmsg@neosys.com";
+	let sysmsgatexodus = "sysmsg@neosys.com";
 
 	// used to email if run as EXODUS unless document's forced email address is set
-	var devatexodus = "dev@neosys.com";
+	let devatexodus = "dev@neosys.com";
 
 	// logging=@username='EXODUS'
-	var logging = 0;
+	let logging = 0;
 
-	var suppressemail = options.contains("S");
+	let suppressemail = options.contains("S");
 
 	var users;
 	if (not(users.open("USERS", ""))) {
@@ -80,16 +80,16 @@ function main(in docids0 = "", in options0 = "") {
 		return 0;
 	}
 
-	var datasetcode = SYSTEM.f(17);
+	let datasetcode = SYSTEM.f(17);
 	if (not datasetcode) {
 		printl("========== DATASETCODE MISSING ==========");
 	}
-	var islivedb = not(SYSTEM.f(61));
+	let islivedb = not(SYSTEM.f(61));
 
 	// allow one autorun per database - hopefully this wont overload the server
-	var lockfilename = "DOCUMENTS";
+	let lockfilename = "DOCUMENTS";
 	var lockfile	 = srv.documents;
-	var lockkey		 = "%" ^ datasetcode ^ "%";
+	let lockkey		 = "%" ^ datasetcode ^ "%";
 	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 1))) {
 
 		return 0;
@@ -180,13 +180,13 @@ readdoc:
 	// determine current datetime
 currdatetime:
 	// ///////////
-	var itime = time();
+	let itime = time();
 	var idate = date();
 	// handle rare case where passes midnight between time() and date()
 	if (time() lt itime) {
 		goto currdatetime;
 	}
-	var currdatetime = idate + itime / 86400;
+	let currdatetime = idate + itime / 86400;
 
 	// skip if scanning all docs and not time to process yet
 	// allow processing individual docs manually despite timing/scheduling
@@ -195,7 +195,7 @@ currdatetime:
 		// would be faster to work out nextdatetime once initially - but how to do it?
 		// if not(docids) and currdatetime<nextdatetime then goto nextdoc
 
-		var lastdatetime = srv.document.f(13);
+		let lastdatetime = srv.document.f(13);
 
 		// skip if already run in the last 60 minutes. this is an easy way
 		// to avoid reruns but maximum scheduling frequency is hourly
@@ -230,9 +230,9 @@ currdatetime:
 		}
 
 		// hour of day restrictions
-		var hours = restrictions.f(2);
+		let hours = restrictions.f(2);
 		if (hours ne "") {
-			var hournow = itime.oconv("MT").first(2) + 0;
+			let hournow = itime.oconv("MT").first(2) + 0;
 
 			// if one hour then treat it as a minimum hour
 			if (hours.isnum()) {
@@ -267,7 +267,7 @@ preventsameday:
 			}
 		}
 
-		var date = idate.oconv("D/E");
+		let date = idate.oconv("D/E");
 
 		// day of month restrictions
 		if (restrictions.f(3)) {
@@ -354,7 +354,7 @@ preventsameday:
 		forceemail = devatexodus;
 
 	// report is always run as the document owning user
-	var runasusercode = srv.document.f(1);
+	let runasusercode = srv.document.f(1);
 	var userx;
 	if (not(userx.read(users, runasusercode))) {
 		if (not(runasusercode eq "EXODUS")) {
@@ -383,18 +383,18 @@ preventsameday:
 	// The runasuser (if have emailaddress) will get
 	// any output regardless of if they are on holiday
 
-	var ccaddress = "";
-	var usercodes = srv.document.f(14);
+	let ccaddress = "";
+	let usercodes = srv.document.f(14);
 	if (usercodes eq "") {
 		toaddress = userx.f(7);
 	} else {
 		toaddress	  = "";
-		var nusers	  = usercodes.fcount(VM);
-		var backwards = 1;
+		let nusers	  = usercodes.fcount(VM);
+		let backwards = 1;
 		for (var usern = nusers; usern >= 1; --usern) {
 
 			// get the user record
-			var usercode = usercodes.f(1, usern);
+			let usercode = usercodes.f(1, usern);
 			if (not(userx.read(users, usercode))) {
 				if (not(usercode eq "EXODUS")) {
 					goto nextuser;
@@ -458,8 +458,8 @@ nextuser:;
 	}
 
 	// before running the document refresh the title, request and data
-	var module	  = srv.document.f(31);
-	var alerttype = srv.document.f(32);
+	let module	  = srv.document.f(31);
+	let alerttype = srv.document.f(32);
 
 	if (module and alerttype) {
 
@@ -495,7 +495,7 @@ nextuser:;
 	if (authtasks) {
 		let ntasks = authtasks.fcount(VM);
 		for (const var taskn : range(1, ntasks)) {
-			var task = authtasks.f(1, taskn);
+			let task = authtasks.f(1, taskn);
 			if (not(authorised(task, msg_, "", runasusercode))) {
 				msg_ = runasusercode.quote() ^ " is not authorised to do " ^ task;
 				printl(msg_);
@@ -560,7 +560,7 @@ nextuser:;
 		gosub getdaysago();
 		data_.replacer("{3WORKINGDAYSAGO}", xdate);
 	}
-	var closedperiod = srv.company.f(37);
+	let closedperiod = srv.company.f(37);
 	if (closedperiod) {
 		opendate = iconv(closedperiod, srv.company.f(6)) + 1;
 	} else {
@@ -574,7 +574,7 @@ nextuser:;
 nextsign:
 	tt = data_.index("{TODAY" ^ sign);
 	if (tt) {
-		var t2 = (data_.cut(tt)).field("}", 1);
+		let t2 = (data_.cut(tt)).field("}", 1);
 		data_.replacer("{" ^ t2 ^ "}", date() + t2.cut(5));
 	}
 	if (sign eq "-") {
@@ -640,7 +640,7 @@ nextsign:
 
 		} else {
 
-			var timetext = elapsedtimetext(start_timestamp, timestamp());
+			let timetext = elapsedtimetext(start_timestamp, timestamp());
 
 			// if ucase(printfilename[-4,4])='.XLS' then
 			// locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
@@ -663,7 +663,7 @@ nextsign:
 		body.replacer(_FM, chr(13));
 
 		// Option to force the actual email recipient
-		var system117 = SYSTEM.f(117);
+		let system117 = SYSTEM.f(117);
 		if (forceemail)
 			SYSTEM(117) = forceemail;
 
@@ -707,7 +707,7 @@ subroutine exec() {
 
 	// turn interactive off in case running from command line
 	// to avoid any reports prompting for input here
-	var s33	   = SYSTEM.f(33);
+	let s33	   = SYSTEM.f(33);
 	SYSTEM(33) = 1;
 
 	gosub exec2();
@@ -783,7 +783,7 @@ subroutine exec2() {
 	// detect memory corruption?
 	// @user4='R18.6'
 	if (msg_.contains("R18.6")) {
-		var halt = 1;
+		let halt = 1;
 		msg_(-1) = "Corrupt temporary file. Restart Needed.";
 		msg_(-1) = "EXODUS.NET TERMINATED";
 	}

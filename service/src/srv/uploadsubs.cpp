@@ -49,7 +49,7 @@ function main(in mode) {
 	// and the files could be randomly read and written at excellent speed
 
 	// determine upload directory
-	var uploadroot = SYSTEM.f(49);
+	let uploadroot = SYSTEM.f(49);
 	// if uploadroot='' then uploadroot='..\images\'
 	// if uploadroot[-1,1] ne '\' then uploadroot:='\'
 	var virtualroot = "../images/";
@@ -59,8 +59,8 @@ function main(in mode) {
 
 		filename		   = request_.f(3);
 		key				   = request_.f(4);
-		var targetfilename = request_.f(5);
-		var newstatus	   = request_.f(6);
+		let targetfilename = request_.f(5);
+		let newstatus	   = request_.f(6);
 
 		// lock it
 		gosub lockfile();
@@ -77,17 +77,17 @@ postuploadfail:
 			return invalid(msg);
 		}
 
-		var dictids		 = "VERSION^STATUS^USERNAME^DATETIME^STATION"_var;
+		let dictids		 = "VERSION^STATUS^USERNAME^DATETIME^STATION"_var;
 		var fns			 = "";
-		var dictfilename = "DICT." ^ filename;
+		let dictfilename = "DICT." ^ filename;
 		// 		for (const var ii : range(1, 99)) {
-		// 			var dictid = dictids.field("*", ii);
+		// 			let dictid = dictids.field("*", ii);
 		//
 		// 			// /BREAK;
 		// 			if (not dictid)
 		// 				break;
 		for (var dictid : dictids) {
-			var fn = (dictid ^ "_ARCHIVED").xlate(dictfilename, 2, "X");
+			let fn = (dictid ^ "_ARCHIVED").xlate(dictfilename, 2, "X");
 			if (not(fn) or not(fn.isnum())) {
 				msg = (dictid ^ "_ARCHIVED").quote() ^ " is missing from " ^ dictfilename ^ " in upload.subs";
 				goto postuploadfail;
@@ -96,7 +96,7 @@ postuploadfail:
 		}  // ii;
 		fns.popper();
 
-		var ii2			   = rec.f(fns.f(1)).fcount(_VM);
+		let ii2			   = rec.f(fns.f(1)).fcount(_VM);
 		rec(fns.f(1), ii2) = targetfilename;
 		rec(fns.f(2), ii2) = newstatus;
 		rec(fns.f(3), ii2) = USERNAME;
@@ -134,7 +134,7 @@ postuploadfail:
 		if (uploadpath eq "") {
 			return 0;
 		}
-		var tt = "\\";
+		let tt = "\\";
 		uploadpath.converter(tt, OSSLASH);
 
 		if (uploadpath.cut(2).contains("..")) {
@@ -163,7 +163,7 @@ postuploadfail:
 		// otherwise make the folders in parent order
 		let nsubfolders = uploadpath.count(OSSLASH);
 		for (const var subfoldern : range(1, nsubfolders)) {
-			var subfolder = uploadpath.field(OSSLASH, 1, subfoldern);
+			let subfolder = uploadpath.field(OSSLASH, 1, subfoldern);
 			// call subdirs(uploadroot:subfolder:char(0),result)
 			// if result else
 			var fullsubfolder = (uploadroot ^ subfolder).lcase();
@@ -205,14 +205,14 @@ postuploadfail:
 	} else if (mode.field(".", 1) eq "VERIFYUPLOAD") {
 
 		// similar in VERIFY AND DELETEUPLOAD
-		var uploadpath = mode.field(".", 2, 9999).lcase();
+		let uploadpath = mode.field(".", 2, 9999).lcase();
 		// fixed in ui now
 		// convert '\/:*?<>|' to '--------' in uploadpath
 		// convert '"' to "'" in uploadpath
 
 		// initdir uploadroot:uploadpath
 		// if dirlist() else
-		var tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
+		let tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
 		if (tt eq "" or tt.contains("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
@@ -243,7 +243,7 @@ postuploadfail:
 		}
 
 		// lcase upload path (not filenames which must retain case)
-		var filename = virtualfilebase.field2(OSSLASH, -1, 1);
+		let filename = virtualfilebase.field2(OSSLASH, -1, 1);
 		// virtualfilebase.lcaser().paster(-len(filename), filename);
 		// virtualfilebase.lcaser().pasterall(-len(filename), filename);
 		virtualfilebase.lcaser();
@@ -292,7 +292,7 @@ postuploadfail:
 		if (uploadfilenames) {
 
 			let nuploads = uploadfilenames.fcount(_FM);
-			var ndeep	 = virtualfilebase.fcount(OSSLASH);
+			let ndeep	 = virtualfilebase.fcount(OSSLASH);
 			for (const var uploadn : range(1, nuploads)) {
 				var uploadfilename		 = uploadfilenames.f(uploadn);
 				uploadfilename			 = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
@@ -330,7 +330,7 @@ postuploadfail:
 		// MODE eg = "DELETEUPLOAD.test\upload\jobs\j1003\7.Selection_206.png"
 
 		// similar in VERIFY AND DELETEUPLOAD
-		var uploadpath = mode.field(".", 2, 9999).lcase();
+		let uploadpath = mode.field(".", 2, 9999).lcase();
 		// fixed in UI now
 		// convert '\/:*?<>|' to '--------' in uploadpath
 		// convert '"' to "'" in uploadpath
@@ -366,24 +366,24 @@ postuploadfail:
 		}
 
 	} else if (mode eq "IMPORT") {
-		var uploadpath	  = RECORD.f(1);
-		var startatrown	  = RECORD.f(2);
-		var headertype	  = RECORD.f(3);
+		let uploadpath	  = RECORD.f(1);
+		let startatrown	  = RECORD.f(2);
+		let headertype	  = RECORD.f(3);
 		lengthx			  = RECORD.f(4);
 		filename		  = RECORD.f(5);
 		var dictfilename  = RECORD.f(6);
 		var dictcolprefix = RECORD.f(7).ucase();
 		var keydictid	  = RECORD.f(8);
-		var keyfunction	  = RECORD.f(9);
+		let keyfunction	  = RECORD.f(9);
 		// reserve first 10 for non-imported additional info
 		var fieldoffset		 = RECORD.f(10);
 		var importcode		 = RECORD.f(11);
-		var linenofn		 = RECORD.f(12);
-		var importfilenamefn = RECORD.f(13);
-		var importcodefn	 = RECORD.f(14);
-		var datewords		 = RECORD.f(15);
-		var timewords		 = RECORD.f(16);
-		var validating		 = RECORD.f(17);
+		let linenofn		 = RECORD.f(12);
+		let importfilenamefn = RECORD.f(13);
+		let importcodefn	 = RECORD.f(14);
+		let datewords		 = RECORD.f(15);
+		let timewords		 = RECORD.f(16);
+		let validating		 = RECORD.f(17);
 		osfile				 = "";
 
 		if (uploadpath.cut(2).contains("..")) {
@@ -413,7 +413,7 @@ postuploadfail:
 			importcode = (field2(uploadpath, OSSLASH, -1)).ucase();
 		}
 		if (importcode.contains(".")) {
-			var tt = field2(uploadpath, ".", -1);
+			let tt = field2(uploadpath, ".", -1);
 			importcode.cutter(-tt.len() - 1);
 		}
 		importcode.converter(" .", "--");
@@ -486,7 +486,7 @@ nextline:
 				} else {
 					var offset = 1;
 					while (true) {
-						var tt = line.index("  ");
+						let tt = line.index("  ");
 
 						if (not tt)
 							break;
@@ -532,7 +532,7 @@ nextline:
 
 				if (linenofn) {
 					grec ^= "LINE_NO ";
-					var dictrec = "F" _FM ^ linenofn ^ _FM "Line No." ^ str(FM, 6) ^ "R" _FM ^ "10";
+					let dictrec = "F" _FM ^ linenofn ^ _FM "Line No." ^ str(FM, 6) ^ "R" _FM ^ "10";
 					dictrec.write(dictfile, "LINE_NO");
 				}
 
@@ -541,13 +541,13 @@ nextline:
 					dictrec(2)	= coln + fieldoffset;
 					dictrec(3)	= capitalise(cols.f(coln, 1));
 					dictrec(10) = "10";
-					var dictid	= dictcolprefix ^ "_" ^ cols.f(coln, 1).convert(" ", "_").ucase();
+					let dictid	= dictcolprefix ^ "_" ^ cols.f(coln, 1).convert(" ", "_").ucase();
 
 					var CONV = "";
 					var just = "L";
-					var nn	 = dictid.fcount("_");
+					let nn	 = dictid.fcount("_");
 					for (const var ii : range(1, nn)) {
-						var word = dictid.field("_", ii);
+						let word = dictid.field("_", ii);
 						if (datewords.locate(word, xx)) {
 							CONV = "[DATE,4*]";
 							just = "R";
@@ -588,7 +588,7 @@ nextline:
 
 			var rec = "";
 			for (const var coln : range(1, ncols)) {
-				var col = cols.f(coln);
+				let col = cols.f(coln);
 				if (csv) {
 					cell = line.f(1, coln);
 				} else {
@@ -596,8 +596,8 @@ nextline:
 				}
 				if (cell.len()) {
 					if (col.f(1, 4)) {
-						var cell0 = cell;
-						var CONV  = col.f(1, 4);
+						let cell0 = cell;
+						let CONV  = col.f(1, 4);
 						if (CONV.contains("TIME")) {
 							// if no : in time then assume is already seconds
 							if (cell.contains(":")) {
@@ -704,7 +704,7 @@ addbuff:
 		// /BREAK;
 		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.len()))
 			break;
-		var line2 = buff.field("\r", 1);
+		let line2 = buff.field("\r", 1);
 		nquotes += line2.count(DQ);
 		buff.cutter(line2.len() + 1);
 		line ^= "\n";
@@ -724,12 +724,12 @@ subroutine lockfile() {
 		return;
 	}
 
-	var waitsecs = 3;
+	let waitsecs = 3;
 	if (not(lockrecord(filename, file, key, recordx, waitsecs, allowduplicate))) {
 		gosub unlockfile();
 		msg			 = "Cannot upload at the moment because";
 		msg(-1)		 = filename ^ " " ^ (key.quote()) ^ " is being updated by ";
-		var lockuser = (filename ^ "*" ^ key).xlate("LOCKS", 4, "X");
+		let lockuser = (filename ^ "*" ^ key).xlate("LOCKS", 4, "X");
 		if (lockuser) {
 			msg ^= lockuser;
 		} else {

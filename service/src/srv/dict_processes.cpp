@@ -42,8 +42,8 @@ function main() {
 	return 0;
 	*/
 
-	var fromdate = RECORD.f(27).floor() - 24873;
-	var fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;
+	let fromdate = RECORD.f(27).floor() - 24873;
+	let fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;
 	return elapsedtimetext(fromdate.timestamp(fromtime), timestamp());
 }
 libraryexit(last_updated2)
@@ -88,10 +88,10 @@ function main() {
 	//	return ANS;
 	//}
 
-	var dostimenow = date() + 24873 + time() / 86400;
+	let dostimenow = date() + 24873 + time() / 86400;
 	// 10 mins
-	var hungtime = 10 * 60 / 86400.0;
-	var r33 = RECORD.f(33);
+	let hungtime = 10 * 60 / 86400.0;
+	let r33 = RECORD.f(33);
 	if (r33 and (dostimenow - RECORD.f(27) gt hungtime)) {
 		// if (VOLUMES) {
 		//	ANS = "Hung";

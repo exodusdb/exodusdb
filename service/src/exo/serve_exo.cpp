@@ -105,10 +105,10 @@ function main() {
 	PRIORITYINT(2) = "x";
 
 	// create database dir
-	var datadir = "../data/";
+	let datadir = "../data/";
 	if (not osdir(datadir))
 		abort(datadir.quote() ^ " data directory does not exist");
-	var databasedir = datadir ^ databasecode;
+	let databasedir = datadir ^ databasecode;
 	if (osmkdir(databasedir)) {
 		//osshell("chmod g+rws " ^ databasedir);
 		if (not osshell("chmod g+rws " ^ databasedir)) {
@@ -134,7 +134,7 @@ function main() {
 		write("All Markets", "MARKETS", "ALL");
 
 	/*
-	var agp="";
+	let agp="";
 	if (not read(agp,"DEFINITIONS","AGENCY.PARAMS")) {
 		agp=invert("DEVELOPMENT DATABASE");
 		agp(4) = 1; //short dates
@@ -166,7 +166,7 @@ function main() {
 	*/
 
 	// kick off with initgeneral or some custom command
-	var cmd = SENTENCE.field(" ", 2, 9999);
+	let cmd = SENTENCE.field(" ", 2, 9999);
 	if (cmd)
 		perform(cmd);
 	else

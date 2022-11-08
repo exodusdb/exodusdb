@@ -10,7 +10,7 @@ function main(in path0) {
 	else
 		path = path0;
 
-	var cmd = "df --output=avail " ^ path;
+	let cmd = "df --output=avail " ^ path;
 	// TRACE(cmd)
 	var available = osshellread(cmd).convert("\x0D\x0A", "  ").trim().field(" ", 2);
 

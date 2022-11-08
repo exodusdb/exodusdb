@@ -3,9 +3,9 @@ libraryinit()
 
 function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 
-	var lenprefix = prefix.len();
+	let lenprefix = prefix.len();
 
-	var filename = filename0.convert(".", "_");
+	let filename = filename0.convert(".", "_");
 
 	// check file exists
 	var file;

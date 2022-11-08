@@ -10,7 +10,7 @@ var time2;	// num
 
 function main(in msg0, io time0) {
 
-	var interactive = false;  //not(SYSTEM.f(33));
+	let interactive = false;  //not(SYSTEM.f(33));
 	if (interactive) {
 		return 0;
 	}

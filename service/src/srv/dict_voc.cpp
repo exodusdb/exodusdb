@@ -15,7 +15,7 @@ libraryexit(alines)
 libraryinit(all)
 //--------------
 function main() {
-	var ans = ID ^ FM ^ RECORD;
+	let ans = ID ^ FM ^ RECORD;
 	return ans;
 }
 libraryexit(all)
@@ -27,7 +27,7 @@ function main() {
 	return RECORD.ucaser();
 }
 /*pgsql
-    return upper(data);
+	return upper(data);
 */
 libraryexit(alluppercase)
 
@@ -100,8 +100,8 @@ function main() {
 	xx.converter("abcdefghijklmnopqrstuvwxyz", "");
 	var yy = RECORD;
 	yy.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
-	var uu = RECORD.len() - yy.len();
-	var ll = RECORD.len() - xx.len();
+	let uu = RECORD.len() - yy.len();
+	let ll = RECORD.len() - xx.len();
 	if (uu gt ll) {
 		ANS = uu / (ll + 1);
 	} else {
@@ -156,16 +156,15 @@ libraryinit(different)
 var rec;
 
 function main() {
-	#include <service_common.h>
+#include <service_common.h>
 
 	// COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE
 	// IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999
 	// !IF @RECCOUNT LT LAST.RECCOUNT THEN
 	// !  FN=''
 	// !  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')
-	// 
 
-	var fn = "QFILE";
+	let fn = "QFILE";
 	var comparefile;
 	if (not(comparefile.open(fn))) {
 		printl("CANNOT OPEN " ^ fn);
@@ -173,7 +172,7 @@ function main() {
 	}
 
 	// END
-	var lastreccount = RECCOUNT;
+	let lastreccount = RECCOUNT;
 	if (rec.readc(comparefile, ID)) {
 		if (RECORD eq rec) {
 			ANS = "";

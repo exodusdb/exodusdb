@@ -5,7 +5,7 @@ S
 
 
 
-	var usercode = ID.field("*", 3);\
+	let usercode = ID.field("*", 3);\
 	ANS = usercode.xlate("USERS", 1, "X");\
 	if (ANS eq "") {\
 		ANS = usercode;\

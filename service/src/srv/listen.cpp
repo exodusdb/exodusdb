@@ -792,7 +792,7 @@ function loop_exit() {
 			try {
 
 				// Execute the command as user EXODUS
-				var username = USERNAME;
+				let username = USERNAME;
 				USERNAME	 = "EXODUS";
 
 				if (not cmd.starts("list")) {
@@ -804,7 +804,7 @@ function loop_exit() {
 
 				// Manual commands
 				// ////////////////////
-				var ok = execute(cmd);
+				let ok = execute(cmd);
 				// ////////////////////
 
 				if (statustrans()) {
@@ -2459,7 +2459,7 @@ badwrite:
 
 		// trigger additional processes that should fail due to backup lock
 		//(inpath ^ serverflagfilename).osremove();
-		var serverflagfilepath = inpath ^ serverflagfilename;
+		let serverflagfilepath = inpath ^ serverflagfilename;
 		if (serverflagfilepath.osfile() and not serverflagfilepath.osremove())
 			abort(lasterror());
 

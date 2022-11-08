@@ -19,7 +19,7 @@ function main(in type, in inx, in mode, out outx) {
 	var datemode = "[DATE," ^ mode.field(",", 1) ^ "]";
 	var timemode = mode.field(",", 2);
 
-	var status = 0;
+	let status = 0;
 	if (type eq "OCONV") {
 
 		var in1 = inx.field(".", 1);
@@ -49,7 +49,7 @@ function main(in type, in inx, in mode, out outx) {
 		// move time and date into the local date time
 		if (SW.f(1)) {
 			in2			= (in2 + SW.f(1) + 0.5).floor();
-			var in2orig = in2;
+			let in2orig = in2;
 			in2			= in2.mod(86400);
 			if (in2 lt in2orig) {
 				in1 += 1;
@@ -76,11 +76,11 @@ function main(in type, in inx, in mode, out outx) {
 
 	} else if (type eq "ICONV") {
 		outx	  = inx;
-		var odate = inx.field(" ", 1);
-		var otime = inx.field(" ", 2);
+		let odate = inx.field(" ", 1);
+		let otime = inx.field(" ", 2);
 		outx	  = iconv(odate, "[DATE]");
 		if (outx and otime) {
-			var itime = iconv(otime, "[TIME2]");
+			let itime = iconv(otime, "[TIME2]");
 			if (itime) {
 				outx ^= "." ^ itime.oconv("R(0)#5");
 			}

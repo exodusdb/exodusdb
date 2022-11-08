@@ -59,7 +59,7 @@ function main(io osfilename, in printopts0, out errors) {
 	}
 
 //	if (VOLUMES) {
-//		var exe = oscwd().contains(":") ? ".exe" : "";
+//		let exe = oscwd().contains(":") ? ".exe" : "";
 //		pdfcmd	= "html2pdf";
 //		if (exe) {
 //			pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;

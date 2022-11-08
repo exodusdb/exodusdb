@@ -19,10 +19,10 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 
 	// jbase
 
-	var td	= "<td>";
-	var tdx = "</td>";
-	var tr	= "<tr>";
-	var trx = "</tr>";
+	let td	= "<td>";
+	let tdx = "</td>";
+	let tr	= "<tr>";
+	let trx = "</tr>";
 
 	if (params0.unassigned()) {
 		params = "";
@@ -88,7 +88,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		// end
 
 		// highlight last row if a total
-		var nlines	 = datax.fcount(FM);
+		let nlines	 = datax.fcount(FM);
 		var lastline = datax.f(nlines);
 		// Total
 		if (lastline.contains("<TD>" ^ srv.glang.f(28))) {
@@ -154,8 +154,8 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 
 	} else if (mode eq "STRIPTAGS") {
 		while (true) {
-			var tag1 = datax.index("<");
-			var tag2 = datax.index(">");
+			let tag1 = datax.index("<");
+			let tag2 = datax.index(">");
 			// /BREAK;
 			if (not(tag1 and tag1 lt tag2))
 				break;
@@ -204,7 +204,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		} else if (datax.contains("NT 5.1")) {
 			osname = "XP";
 		} else if (datax.contains("Windows NT ")) {
-			var tt = datax.index("Windows NT ");
+			let tt = datax.index("Windows NT ");
 			osname = ((datax.cut(tt + 10)).field(";", 1)).field(")", 1);
 		}
 		if (datax.contains("WOW64")) {
@@ -330,7 +330,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			browser.cutter(-2);
 		}
 
-		var submode = mode.field(".", 3);
+		let submode = mode.field(".", 3);
 		if (submode eq "OS") {
 			datax = osname;
 			return 0;
@@ -368,7 +368,7 @@ subroutine fill(io datax) {
 	// find max number of columns
 	var n2 = 0;
 	for (const var ii : range(1, nn)) {
-		var tt = datax.f(ii).fcount(VM);
+		let tt = datax.f(ii).fcount(VM);
 		if (tt gt n2) {
 			n2 = tt;
 		}

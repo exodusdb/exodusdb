@@ -3,10 +3,10 @@ libraryinit()
 
 function main(in type, in inx, in /*mode*/, out outx) {
 
-	var status = 0;
+	let status = 0;
 	if (type eq "OCONV") {
 		outx	= "" ^ inx;
-		var exp = outx.field("E", 2);
+		let exp = outx.field("E", 2);
 		if (exp.len()) {
 			outx = outx.field("E", 1);
 

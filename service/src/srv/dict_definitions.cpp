@@ -75,7 +75,7 @@ function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 13, "X");
 	let nn = ANS.fcount(VM);
 	for (const var ii : range(1, nn)) {
-		var logindate = ANS.f(1, ii).floor();
+		let logindate = ANS.f(1, ii).floor();
 		if (logindate) {
 			ANS(1, ii) = (date() - logindate).oconv("MD00P");
 		}
@@ -115,7 +115,7 @@ function main() {
 	ANS = calculate("USER_CODE_WITH_EMAIL").xlate("USERS", 36, "X");
 	let nn = ANS.fcount(VM);
 	for (const var ii : range(1, nn)) {
-		var passworddate = ANS.f(1, ii);
+		let passworddate = ANS.f(1, ii);
 		if (passworddate) {
 			ANS(1, ii) = (date() - passworddate).oconv("MD00P");
 		}
@@ -156,7 +156,7 @@ libraryexit(process_count)
 libraryinit(process_duration)
 //---------------------------
 function main() {
-	var secsperday = 24 * 60 * 60;
+	let secsperday = 24 * 60 * 60;
 	var uptodate = RECORD.f(11);
 	var uptotime = RECORD.f(12);
 	if (uptodate eq "") {
@@ -165,13 +165,13 @@ function main() {
 	if (uptotime eq "") {
 		uptotime = time();
 	}
-	var daysecs = (uptodate - RECORD.f(1)) * secsperday;
-	var timesecs = uptotime - RECORD.f(2);
-	var totsecs = daysecs + timesecs;
+	let daysecs = (uptodate - RECORD.f(1)) * secsperday;
+	let timesecs = uptotime - RECORD.f(2);
+	let totsecs = daysecs + timesecs;
 
-	var hours = (totsecs / 60 / 60).floor();
-	var mins = ((totsecs / 60).floor()).mod(60);
-	var secs = totsecs.mod(60).floor();
+	let hours = (totsecs / 60 / 60).floor();
+	let mins = ((totsecs / 60).floor()).mod(60);
+	let secs = totsecs.mod(60).floor();
 	return hours ^ ":" ^ mins.oconv("R(0)#2") ^ ":" ^ secs.oconv("R(0)#2") ^ "." ^ totsecs.field(".", 2).oconv("R#2");
 }
 libraryexit(process_duration)
@@ -187,7 +187,6 @@ libraryexit(process_weekcommencing)
 
 libraryinit(reverse_the_users)
 //----------------------------
-
 function main() {
 	RECORD = invertarray(reverse(invertarray(RECORD)));
 	return ANS;
@@ -199,10 +198,10 @@ libraryinit(user_code_html)
 //-------------------------
 function main() {
 	var usercodes = calculate("USERS");
-	var emails = usercodes.xlate("USERS", 7, "X");
+	let emails = usercodes.xlate("USERS", 7, "X");
 	let nusers = usercodes.fcount(VM);
 	for (const var usern : range(1, nusers)) {
-		var usercode = usercodes.f(1, usern);
+		let usercode = usercodes.f(1, usern);
 		if (usercode) {
 			if (emails.f(1, usern) eq "") {
 				usercodes(1, usern) = "<B>" ^ usercode ^ "</B>";
@@ -218,7 +217,7 @@ libraryinit(user_code_with_email)
 //-------------------------------
 function main() {
 	var usercodes = RECORD.f(1, MV);
-	var emails = RECORD.f(7, MV);
+	let emails = RECORD.f(7, MV);
 
 	let nusers = usercodes.fcount(VM);
 	for (const var usern : range(1, nusers)) {

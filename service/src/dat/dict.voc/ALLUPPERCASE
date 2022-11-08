@@ -6,8 +6,9 @@ S
 
 
 	return RECORD.ucaser();\
+\
 /*pgsql\
-    return upper(data);\
+	return upper(data);\
 */
 T
 30

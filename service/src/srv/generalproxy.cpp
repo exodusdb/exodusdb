@@ -64,7 +64,7 @@ function main() {
 	// request 2 - can be anything actually
 
 	req.datafile = request_.f(2);
-	var keyx	 = request_.f(3);
+	let keyx	 = request_.f(3);
 
 	response_ = "OK";
 
@@ -116,8 +116,8 @@ function main() {
 	} else if (mode.f(1) eq "PREVIEWLETTERHEAD") {
 
 		// comma sep
-		var compcodes = request_.f(2);
-		var testing	  = request_.f(3);
+		let compcodes = request_.f(2);
+		let testing	  = request_.f(3);
 
 		var allhtml = "";
 
@@ -154,8 +154,8 @@ function main() {
 
 	} else if (mode eq "PERIODTABLE") {
 
-		var year	= request_.f(2).field("-", 1).field("/", 2);
-		var finyear = request_.f(3);
+		let year	= request_.f(2).field("-", 1).field("/", 2);
+		let finyear = request_.f(3);
 
 		perform("PERIODTABLE " ^ year ^ " " ^ finyear ^ " (H)");
 
@@ -163,11 +163,11 @@ function main() {
 
 	} else if (mode eq "FILEMAN" and request_.f(2) eq "COPYDB") {
 
-		var copydb = request_.f(3);
+		let copydb = request_.f(3);
 		if (not(SYSTEM.f(58).locate(copydb, dbn))) {
 			// Not found. dbn points to last + 1
 		}
-		var todb = SYSTEM.f(63, dbn);
+		let todb = SYSTEM.f(63, dbn);
 		if (not todb) {
 			abort("\"Copy to\" database must be configured (and saved) for database " ^ copydb ^ " first");
 		}
@@ -186,8 +186,8 @@ function main() {
 			abort(msg_);
 		}
 
-		var started		= time().oconv("MTS");
-		var otherusersx = otherusers(copydb);
+		let started		= time().oconv("MTS");
+		let otherusersx = otherusers(copydb);
 		var log			= started ^ " Started copy database " ^ copydb ^ " to " ^ todb;
 		log ^= "|" ^ started ^ " Other processes online:" ^ otherusersx.f(1);
 
@@ -202,9 +202,9 @@ function main() {
 
 	} else if (mode eq "EMAILUSERS") {
 
-		var groupids	   = data_.f(1);
-		var jobfunctionids = "";
-		var userids		   = data_.f(2);
+		let groupids	   = data_.f(1);
+		let jobfunctionids = "";
+		let userids		   = data_.f(2);
 		if (not((groupids or jobfunctionids) or userids)) {
 			abort("You must specify some groups or users to email");
 		}
@@ -218,9 +218,9 @@ function main() {
 		// T=
 		// R=reply to is current user
 		// W=group is word to be found in user department
-		var options = "TR";
+		let options = "TR";
 
-		var subject = data_.f(4);
+		let subject = data_.f(4);
 		var message = data_.f(5);
 
 		message.converter(_TM, _VM);
@@ -244,18 +244,18 @@ function main() {
 			abort(msg_);
 		}
 
-		var targetdbname = data_.f(1);
-		var targetdbcode = data_.f(2).lcase();
-		var sourcedbcode = data_.f(3).lcase();
+		let targetdbname = data_.f(1);
+		let targetdbcode = data_.f(2).lcase();
+		let sourcedbcode = data_.f(3).lcase();
 
-		var sourcedatadir = "../data/" ^ sourcedbcode;
-		var targetdatadir = "../data/" ^ targetdbcode;
+		let sourcedatadir = "../data/" ^ sourcedbcode;
+		let targetdatadir = "../data/" ^ targetdbcode;
 
-		var dbcodes = dblist();
+		let dbcodes = dblist();
 
 		// source database services will be stopped for source to target database copy
 		// reject source db if same as current database.
-		var currentdbcode = SYSTEM.f(17);
+		let currentdbcode = SYSTEM.f(17);
 		if (sourcedbcode eq currentdbcode) {
 			//return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
 			abort("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
@@ -300,7 +300,7 @@ function main() {
 		//}
 		if (not osshell("XXXdbcopy " ^ sourcedbcode ^ " " ^ targetdbcode)) {
 			//lasterror() sent to user only after source service started again
-			var dbcopyfailmsg = lasterror();
+			let dbcopyfailmsg = lasterror();
 
 			// ensure source service started before aborting dbcopy error
 			if (not osshell("service XXXagy_" ^ liveortest ^ "@" ^ srcservicecode ^ " start")) {
@@ -366,7 +366,7 @@ function main() {
 		}
 
 		ID				 = request_.f(2);
-		var emailaddress = request_.f(3);
+		let emailaddress = request_.f(3);
 
 		var baduseroremail = "Either " ^ (ID.quote()) ^ " or " ^ (emailaddress.quote()) ^ " does not exist";
 
@@ -395,7 +395,7 @@ function main() {
 
 		// record historical resets/attempts
 		// datetime=(date():'.':time() 'R(0)#5')+0
-		var datetime = date() ^ "." ^ time().oconv("R(0)#5");
+		let datetime = date() ^ "." ^ time().oconv("R(0)#5");
 		userrec.inserter(15, 1, datetime);
 		userrec.inserter(16, 1, SYSTEM.f(40, 2));
 		userrec.inserter(18, 1, ("Password Reset " ^ baduseroremail).trim());
@@ -421,9 +421,9 @@ function main() {
 		// call sysmsg('User: ':username:fm:'From IP: ':system<40,2>:fm:text,'Password Reset',userkey)
 
 		// send the new password to the user
-		var emailaddrs = userrec.f(7);
-		var ccaddrs	   = "";
-		var subject	   = "EXODUS Password Reset";
+		let emailaddrs = userrec.f(7);
+		let ccaddrs	   = "";
+		let subject	   = "EXODUS Password Reset";
 		var body	   = "User: " ^ ID;
 		body(-1)	   = "Your new password is " ^ newpassword;
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
@@ -458,7 +458,7 @@ function main() {
 			abort(lasterror());
 		}
 
-		var codepage = request_.f(3);
+		let codepage = request_.f(3);
 		if (not codepage) {
 			goto badsetcodepage;
 		}
@@ -688,7 +688,7 @@ nextrep:
 
 		gosub opendocuments();
 
-		var docnos = request_.f(2);
+		let docnos = request_.f(2);
 
 		let ndocs = docnos.fcount(_VM);
 		for (const var docn : range(1, ndocs)) {
@@ -747,7 +747,7 @@ nextrep:
 			abort();
 		}
 
-		var description = doc.f(2);
+		let description = doc.f(2);
 		doc(2)			= description ^ " (Copy)";
 
 		// prevent copy from appearing like a exodus standard
@@ -789,7 +789,7 @@ nextrep:
 
 		// merge any runtime parameters into the real parameters
 		for (fn = 1; fn <= 999; ++fn) {
-			var tt = data_.f(fn);
+			let tt = data_.f(fn);
 			if (tt) {
 				PSEUDO(fn) = tt;
 			}
@@ -862,7 +862,7 @@ performreport:
 			cmd ^= " xAND WITH ALLUPPERCASE CONTAINING " ^ (logsearch.quote());
 		}
 		cmd ^= " ID-SUPP";
-		var temp = cmd.index("xAND");
+		let temp = cmd.index("xAND");
 		if (temp) {
 			cmd.paster(temp, 5, "");
 		}
@@ -917,7 +917,7 @@ subroutine initlog() {
 
 	logkey		   = request_.f(2);
 	logyear		   = request_.f(3);
-	var logformat  = request_.f(4);
+	let logformat  = request_.f(4);
 	var logoptions = request_.f(5);
 
 	if (logoptions.match("^\\d*/\\d{2}$")) {
@@ -944,7 +944,7 @@ subroutine initlog() {
 			tt2 = tt;
 		}
 		logyear		  = tt.oconv("DY");
-		var logtoyear = tt2.oconv("DY");
+		let logtoyear = tt2.oconv("DY");
 		if (logyear ne logtoyear) {
 			response_ = "Dates must be within one calendar year";
 			abort();

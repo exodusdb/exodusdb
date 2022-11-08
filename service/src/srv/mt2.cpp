@@ -9,7 +9,7 @@ function main(in type, in in0, in mode, out out0) {
 	// input decimal hours, output hours:mins but allow more than 24 (eg 30:00)
 	// iconv  is the reverse
 
-	var in2 = in0;
+	let in2 = in0;
 	out0	= "";
 
 	// call msg(in2:'')
@@ -31,8 +31,8 @@ function main(in type, in in0, in mode, out out0) {
 			return 0;
 		}
 
-		var hours = in2.field(":", 1);
-		var mins  = in2.field(":", 2);
+		let hours = in2.field(":", 1);
+		let mins  = in2.field(":", 2);
 
 		// check numeric
 		if (not(hours.isnum() and mins.isnum())) {

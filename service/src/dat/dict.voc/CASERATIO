@@ -9,8 +9,8 @@ MD00P
 	xx.converter("abcdefghijklmnopqrstuvwxyz", "");\
 	var yy = RECORD;\
 	yy.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");\
-	var uu = RECORD.len() - yy.len();\
-	var ll = RECORD.len() - xx.len();\
+	let uu = RECORD.len() - yy.len();\
+	let ll = RECORD.len() - xx.len();\
 	if (uu gt ll) {\
 		ANS = uu / (ll + 1);\
 	} else {\

@@ -70,7 +70,7 @@ function main(in mode, in params, io result, io msg) {
 			return 0;
 		}
 
-		var roundrobinlock = "ROUNDROBIN*" ^ roundrobinfilename_ ^ "*" ^ roundrobinkey_;
+		let roundrobinlock = "ROUNDROBIN*" ^ roundrobinfilename_ ^ "*" ^ roundrobinkey_;
 
 		// try to lock for 9 seconds since other locks should be brief
 		if (not(lockrecord("VOC", voc, roundrobinlock, "", 9))) {
@@ -111,7 +111,7 @@ function main(in mode, in params, io result, io msg) {
 		// record the current period as the last period so that in the next call
 		// we can clear skipped periods (but not the current period again)
 		roundrobin(1)	  = currentperiodn;
-		var currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
+		let currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
 
 		if (roundrobin.f(2).sum() lt maxeventsperwindow_) {
 

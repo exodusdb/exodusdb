@@ -5,7 +5,6 @@ S
 
 
 
-\
 function main() {\
 	RECORD = invertarray(reverse(invertarray(RECORD)));\
 	return ANS;\

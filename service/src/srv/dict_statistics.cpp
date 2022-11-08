@@ -32,7 +32,7 @@ libraryexit(last_access_time)
 libraryinit(user_browser)
 //-----------------------
 function main() {
-	var usercode = ID.field("*", 3);
+	let usercode = ID.field("*", 3);
 	return usercode.xlate("USERS", 39, "X").f(1, 6);
 }
 libraryexit(user_browser)
@@ -51,7 +51,7 @@ libraryexit(user_code)
 libraryinit(user_name)
 //--------------------
 function main() {
-	var usercode = ID.field("*", 3);
+	let usercode = ID.field("*", 3);
 	ANS = usercode.xlate("USERS", 1, "X");
 	if (ANS eq "") {
 		ANS = usercode;

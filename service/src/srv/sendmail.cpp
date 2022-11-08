@@ -370,7 +370,7 @@ forcedemail:
 		cmd ^= _VM "-s " ^ (subject.quote());
 
 		// from
-		var fromaddress = params1.f(1);
+		let fromaddress = params1.f(1);
 		cmd ^= _VM "-r " ^ (fromaddress.quote());
 
 		// optional cc address
@@ -442,8 +442,8 @@ forcedemail:
 			var headers = "";
 			let nn		= cmd.fcount(_VM);
 			for (const var ii : range(2, nn)) {
-				var line = cmd.f(1, ii);
-				var opt	 = line.field(" ", 1);
+				let line = cmd.f(1, ii);
+				let opt	 = line.field(" ", 1);
 				var arg	 = line.field(" ", 2, 9999);
 				if (arg.starts(_DQ)) {
 					arg.cutter(1);
@@ -477,14 +477,14 @@ forcedemail:
 			// -t  Extract recipients from message headers. These are added to any recipients specified on the command line.
 			cmd = "sendmail -t " ^ toaddress;
 
-			var delimiter = "--------------5723BF0875E398DEC19D9328--";
+			let delimiter = "--------------5723BF0875E398DEC19D9328--";
 
 			// Use linux 'file' utility to determine mimetype
-			var mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n", "");
+			let mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n", "");
 			// TRACE(mimetype)
 
-			var attachfilename_only = attachfilename.field2(_OSSLASH, -1);
-			var mimetext =
+			let attachfilename_only = attachfilename.field2(_OSSLASH, -1);
+			let mimetext =
 				"MIME-Version: 1.0\r\n"
 				"Content-Type: multipart/mixed;\r\n"
 				" boundary=\"------------5723BF0875E398DEC19D9328\"\r\n"
@@ -511,7 +511,7 @@ forcedemail:
 			// TRACE(headers)
 
 			// Output the headers
-			var tempfilename = var().ostempfilename();
+			let tempfilename = var().ostempfilename();
 			//oswrite(headers, tempfilename);
 			if (not oswrite(headers, tempfilename)) {
 				abort(lasterror());
@@ -525,10 +525,10 @@ forcedemail:
 			}
 			/*
 			// Append a closing delimiter
-			var fileinfo = osfile(tempfilename);
-			var offset = fileinfo.f(1);
+			let fileinfo = osfile(tempfilename);
+			let offset = fileinfo.f(1);
 TRACE(offset)
-			var osfile;
+			let osfile;
 			if (osfile.osopen(tempfilename)) {
 
 				offset = -1; //append
@@ -686,7 +686,7 @@ subroutine addlinks2osfilename() {
 	let nlinks = SYSTEM.f(114).fcount(_VM);
 	for (const var linkn : range(1, nlinks)) {
 		body ^= _FM;
-		var linkdesc = SYSTEM.f(115, linkn);
+		let linkdesc = SYSTEM.f(115, linkn);
 		if (linkdesc) {
 			body(-1) = linkdesc;
 		}

@@ -35,8 +35,8 @@ function main(io listitems) {
 
 	// convert single period ranges to single periods
 	for (const var ii : range(1, nn)) {
-		var tt	= listitems.f(1, ii);
-		var tt1 = tt.f(1, 1, 1);
+		let tt	= listitems.f(1, ii);
+		let tt1 = tt.f(1, 1, 1);
 		if (tt1 eq tt.f(1, 1, 2)) {
 			listitems(1, ii) = tt1;
 		}

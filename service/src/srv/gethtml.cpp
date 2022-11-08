@@ -124,7 +124,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 	letterhead.replacer("%TAX_REG_NO%", letterheadcompany.f(21));
 	letterhead.replacer("%COMPANY_REG_NO%", letterheadcompany.f(59));
 
-	var datetime = date() ^ "." ^ time().oconv("R(0)#5");
+	let datetime = date() ^ "." ^ time().oconv("R(0)#5");
 	tt			 = "L";
 	var tdate;
 	if (hascompanies) {
@@ -146,9 +146,9 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 		var svg = "";
 		if (qr_text) {
 
-			var qr_body = qr_text.f(1);
-			var qr_tip	= qr_text.f(2) ^ qr_body;
-			var cmd		= "qrencode --size=2 --type=SVG " ^ qr_body.squote();
+			let qr_body = qr_text.f(1);
+			let qr_tip	= qr_text.f(2) ^ qr_body;
+			let cmd		= "qrencode --size=2 --type=SVG " ^ qr_body.squote();
 			svg			= osshellread(cmd);
 
 			// remove everything like xml and comments before the opening <svg tag
@@ -185,11 +185,11 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 
 		// check various tags exist in equal numbers
 		// this doesnt check if they are in a correct sequence or hierarchy etc
-		var tags		= "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
+		let tags		= "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
 		let ntags		= tags.fcount(",");
-		var letterhead2 = letterhead.lcase();
+		let letterhead2 = letterhead.lcase();
 		for (const var tagn : range(1, ntags)) {
-			var tag = tags.field(",", tagn);
+			let tag = tags.field(",", tagn);
 			if (letterhead2.count("<" ^ tag ^ ">") + letterhead2.count("<" ^ tag ^ " ") ne letterhead2.count("</" ^ tag ^ ">")) {
 				letterhead = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
 				// tagn = ntags;
@@ -255,12 +255,12 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		return;
 	}
 
-	var aligns		   = letterheadcompany.f(61);
-	var imagetypes	   = letterheadcompany.f(62);
-	var texts		   = letterheadcompany.f(63);
-	var fontsizes	   = letterheadcompany.f(64);
-	var imagecompcodes = letterheadcompany.f(65);
-	var textcompcodes  = letterheadcompany.f(66);
+	let aligns		   = letterheadcompany.f(61);
+	let imagetypes	   = letterheadcompany.f(62);
+	let texts		   = letterheadcompany.f(63);
+	let fontsizes	   = letterheadcompany.f(64);
+	let imagecompcodes = letterheadcompany.f(65);
+	let textcompcodes  = letterheadcompany.f(66);
 
 	var tab = "";
 
@@ -273,7 +273,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 	// in case need to allow more space in some columns and less in others
 	// eg 20% 60% 20% if the central letterhead is very wide for example
 
-	var usetable = 1;
+	let usetable = 1;
 
 	// start a one row 100% width table to aid formatting
 	if (usetable) {
@@ -287,7 +287,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 
 	for (const var coln : range(1, ncols)) {
 
-		var align		  = aligns.f(1, coln);
+		let align		  = aligns.f(1, coln);
 		var imagetype	  = imagetypes.f(1, coln);
 		var imagecompcode = imagecompcodes.f(1, coln);
 		var text		  = texts.f(1, coln);
@@ -324,8 +324,8 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		// 			div = "";
 		// 			divx = "";
 		// 		}
-		var div	 = divstyle ? FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">" : "";
-		var divx = divstyle ? FM ^ "   </div>" : "";
+		let div	 = divstyle ? FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">" : "";
+		let divx = divstyle ? FM ^ "   </div>" : "";
 		// add image
 		if (imagetype or imagecompcode) {
 			tab ^= div;
@@ -354,16 +354,16 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 
 			// path to uploaded company logo files
 			// var imagepath = "/images/" ^ SYSTEM.f(17) ^ "/UPLOAD/COMPANIES/";
-			var imagepath = "/images/" ^ SYSTEM.f(17) ^ "/upload/companies/";
+			let imagepath = "/images/" ^ SYSTEM.f(17) ^ "/upload/companies/";
 
 			// logo_companycode_coln .jpg .png /gif
-			var imagefilename = "logo_" ^ imagecompcode ^ "_" ^ coln ^ "." ^ imagetype;
+			let imagefilename = "logo_" ^ imagecompcode ^ "_" ^ coln ^ "." ^ imagetype;
 
-			var fullimageurl		  = url ^ imagepath ^ imagefilename;
-			var relativeimagefilename = "../.." ^ imagepath ^ imagefilename;
+			let fullimageurl		  = url ^ imagepath ^ imagefilename;
+			let relativeimagefilename = "../.." ^ imagepath ^ imagefilename;
 
 			tab(-1) = "   <img src=" ^ (fullimageurl.quote()) ^ " alt=" ^ (fullimageurl.quote());
-			var sq	= "'";
+			let sq	= "'";
 			tab ^= " onerror=\"this.onerror=null;this.src=" ^ sq ^ relativeimagefilename ^ sq ^ ";\"";
 			tab ^= " style=\"margin:0;border:0\"";
 
@@ -372,7 +372,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		}
 
 		// maybe get text from another company
-		var textcompcode = textcompcodes.f(1, coln);
+		let textcompcode = textcompcodes.f(1, coln);
 		if (textcompcode) {
 			// ignore any given text if textcompany given
 			text			= "";

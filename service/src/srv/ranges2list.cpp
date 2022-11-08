@@ -26,7 +26,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 	// Returns: result in ranges0 unless listid given
 
 	// equ maxlistpartsize to 32000
-	var maxlistpartsize = maxstrsize_ / 2;
+	let maxlistpartsize = maxstrsize_ / 2;
 
 	if (basekey0.unassigned()) {
 		basekey = "";
@@ -59,7 +59,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 	ranges.replacer(" -", "-");
 	ranges.replacer("- ", "-");
 
-	var nn = ranges.fcount(FM);
+	let nn = ranges.fcount(FM);
 
 	var allchars = "";
 	for (const var ii : range(32, 255)) {
@@ -69,7 +69,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 
 	for (var ii = nn; ii >= 1; --ii) {
 
-		var rangex = ranges.f(ii);
+		let rangex = ranges.f(ii);
 
 		// if enter something like P13/1000-2000 then
 		// prefix=P13/ start=1000 stop=2000
@@ -78,7 +78,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 		var startx = "";
 		var prefix = rangex.field("-", 1);
 		while (true) {
-			var lastchar = prefix[-1];
+			let lastchar = prefix[-1];
 			// /BREAK;
 			if (not(var("0123456789").contains(lastchar)))
 				break;
@@ -87,7 +87,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 		}  // loop;
 
 		// range of numbers
-		var temp0 = rangex;
+		let temp0 = rangex;
 		var temp  = temp0;
 		temp.converter(allchars, "");
 
@@ -97,7 +97,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 			var finish = "";
 			var tt	   = ranges.f(ii).field("-", 2);
 			while (true) {
-				var lastchar = tt[-1];
+				let lastchar = tt[-1];
 				// /BREAK;
 				if (not(var("0123456789").contains(lastchar)))
 					break;
@@ -185,7 +185,7 @@ exit:
 			gosub writelist();
 		} else {
 			// return '' in vnos if none found (unlikely)
-			var vnos = "";
+			let vnos = "";
 		}
 	} else {
 		ranges0 = ranges;

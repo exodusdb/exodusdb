@@ -35,7 +35,7 @@ function main() {
 			tot += nn / secs;
 			ntots += 1;
 
-			var speed = (nn / secs / 100000).oconv("MD20P");
+			let speed = (nn / secs / 100000).oconv("MD20P");
 			if (speed lt minspeed or not(minspeed)) {
 				minspeed = speed;
 			}

@@ -17,14 +17,14 @@ function main() {
 		stop();
 	}
 
-	var ifromdate  = PSEUDO.f(5);
+	let ifromdate  = PSEUDO.f(5);
 	var iuptodate  = PSEUDO.f(6);
-	var fromtime   = PSEUDO.f(7);
+	let fromtime   = PSEUDO.f(7);
 	var uptotime   = PSEUDO.f(8);
-	var containing = PSEUDO.f(9);
-	var duration   = PSEUDO.f(10);
-	var usercodes  = PSEUDO.f(11);
-	var relocks	   = PSEUDO.f(12);
+	let containing = PSEUDO.f(9);
+	let duration   = PSEUDO.f(10);
+	let usercodes  = PSEUDO.f(11);
+	let relocks	   = PSEUDO.f(12);
 
 	var cmd = "SORT REQUESTLOG BY SEQ";
 
@@ -85,7 +85,7 @@ function main() {
 		cmd ^= " %AND% WITH USERCODE " ^ quote2(usercodes);
 	}
 
-	var tt = cmd.index("%AND% ");
+	let tt = cmd.index("%AND% ");
 	if (tt) {
 		cmd.paster(tt, 6, "");
 	}

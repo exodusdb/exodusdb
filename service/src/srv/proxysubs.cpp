@@ -44,8 +44,8 @@ function main(in module, in mode, in stationery) {
 
 		// save the web ui "data" in ../../data/ format
 		// TODO web gui to be smarter in accepting files like */data/xxxx/yyyy.htm
-		var t2 = OSSLASH;
-		var tt = outfile.index(t2 ^ "data" ^ t2);
+		let t2 = OSSLASH;
+		let tt = outfile.index(t2 ^ "data" ^ t2);
 		if (tt) {
 			data_(1, filen) = ".." ^ t2 ^ ".." ^ outfile.cut(tt - 1);
 		} else {
@@ -72,7 +72,7 @@ function main(in module, in mode, in stationery) {
 
 subroutine check_exists_and_maybe_convert(in module, in mode, in stationery, io outfile) {
 
-	var diroutfile = outfile.osfile();
+	let diroutfile = outfile.osfile();
 	if (diroutfile.f(1) gt 5) {
 fileok:
 

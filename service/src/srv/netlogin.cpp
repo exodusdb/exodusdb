@@ -39,11 +39,11 @@ function main(in mode0) {
 	// break off
 
 	// prevent time out
-	var timeoutx = SYSTEM.f(22);
+	let timeoutx = SYSTEM.f(22);
 	SYSTEM(22)	 = "";
 
 	var nfailures  = "";
-	var nallowable = 3;
+	let nallowable = 3;
 	var lockx	   = "";
 	var speed	   = 0;
 
@@ -156,7 +156,7 @@ fail:
 			goto inpname;
 		}
 		// if decide2('!WARNING: Unsaved work (if any) will|be lost if you continue.||','OK|Cancel',reply,2) else reply=2
-		var reply = 2;
+		let reply = 2;
 		if (reply ne 1) {
 			goto inpname;
 		}
@@ -175,7 +175,7 @@ fail:
 			}
 		}
 
-		var keyfail = 0;
+		let keyfail = 0;
 		// inp.key:
 		var	 keyx = "";
 		call mssg("The lock is " ^ (lockx.quote()) ^ "|What is the key ?", "RC", keyx, "");

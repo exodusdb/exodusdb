@@ -212,7 +212,7 @@ libraryinit(live_user_with_email)
 //-------------------------------
 function main() {
 	if (RECORD.f(7)) {
-		var expired = RECORD.f(35);
+		let expired = RECORD.f(35);
 		if (expired and expired le date()) {
 			ANS = 0;
 		} else {

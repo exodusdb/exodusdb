@@ -15,7 +15,7 @@ var ver;
 
 function main(in programname0, in text0) {
 
-	var s33 = SYSTEM.f(33);
+	let s33 = SYSTEM.f(33);
 
 	if (programname0.unassigned()) {
 		programname = "";
@@ -31,7 +31,7 @@ function main(in programname0, in text0) {
 	// update the log
 	// /////////////
 
-	var year = date().oconv("DY");
+	let year = date().oconv("DY");
 	if (s33) {
 		xstation = SYSTEM.f(40, 2);
 	} else {
@@ -46,7 +46,7 @@ function main(in programname0, in text0) {
 	// Open or create a LOG file per year
 	// TODO use only one file and clear old entries perhaps once a year
 	// if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
-	var logfilename = "LOG" ^ year;
+	let logfilename = "LOG" ^ year;
 	if (not log.open(logfilename)) {
 		//createfile(logfilename);
 		if (not createfile(logfilename)) {
@@ -59,7 +59,7 @@ function main(in programname0, in text0) {
 
 getlogkey:
 		time	   = ostime();
-		var logkey = xstation.trim() ^ "*" ^ USERNAME ^ "*" ^ date() ^ "*" ^ time;
+		let logkey = xstation.trim() ^ "*" ^ USERNAME ^ "*" ^ date() ^ "*" ^ time;
 		if (xx.read(log, logkey)) {
 			goto getlogkey;
 		}
@@ -76,18 +76,18 @@ getlogkey:
 	// get backup parameters
 	call getbackpars(bakpars);
 
-	var emailaddrs = bakpars.f(14);
+	let emailaddrs = bakpars.f(14);
 	if ((programname ne "SYSMSG" and programname ne "SENDMAIL") and emailaddrs) {
 
 		// determine subject
-		var subject = "EXODUS Log: " ^ SYSTEM.f(17) ^ " " ^ programname;
+		let subject = "EXODUS Log: " ^ SYSTEM.f(17) ^ " " ^ programname;
 
 		var body = "";
 		body ^= _FM "Date=" ^ date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local";
 		body ^= _FM "Server=" ^ SYSTEM.f(44).trim();
 		body ^= _FM "Install=" ^ oscwd();
 		// osread ver from 'general\version.dat' then
-		var verfilename = "general/version.dat";
+		let verfilename = "general/version.dat";
 //		if (VOLUMES) {
 //			// detect Windows with @volumes since we dont include GENERAL.SUBS for OSSLASH
 //			verfilename.converter("/", "\\");

@@ -14,8 +14,8 @@ function main() {
 
 	command.replacer(" dict.", " dict ");
 	command.replacer(" dict_", " dict ");
-	var dataonly = command.contains(" data ");
-	var dictonly = command.contains(" dict ");
+	let dataonly = command.contains(" data ");
+	let dictonly = command.contains(" dict ");
 	command.replacer(" data ", " ");
 	command.replacer(" dict ", " ");
 

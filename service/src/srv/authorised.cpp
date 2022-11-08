@@ -85,15 +85,15 @@ nousername0:
 		isexodus = username eq "EXODUS";
 	}
 
-	var deleting = task.starts("%DELETE%");
+	let deleting = task.starts("%DELETE%");
 	if (deleting) {
 		task.cutter(8);
 	}
-	var updating = task.starts("%UPDATE%");
+	let updating = task.starts("%UPDATE%");
 	if (updating) {
 		task.cutter(8);
 	}
-	var renaming = task.starts("%RENAME%");
+	let renaming = task.starts("%RENAME%");
 	if (renaming) {
 		task.cutter(8);
 	}
@@ -158,7 +158,7 @@ updateprivs:
 		if (not noadd) {
 			gosub readuserprivs();
 			if (username eq "EXODUS") {
-				var interactive = false;  //not(SYSTEM.f(33));
+				let interactive = false;  //not(SYSTEM.f(33));
 				if (interactive) {
 					call note(task ^ "|TASK ADDED");
 				}
@@ -246,7 +246,7 @@ notallowed:
 	let nlocks = locks.fcount(" ");
 
 	for (const var lockn : range(1, nlocks)) {
-		var lockx = locks.field(" ", lockn);
+		let lockx = locks.field(" ", lockn);
 		if (keys.locateusing(" ", lockx, temp)) {
 		} else {
 			goto notallowed;

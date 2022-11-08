@@ -71,7 +71,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	// TODO share various files with LISTEN to prevent slowing down by opening?
 
-	var tracing = 1;
+	let tracing = 1;
 	initdir		= "";
 
 	// no output in arguments allowed since c++ doesnt allow
@@ -112,7 +112,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	if (request1 eq "RUNS") {
 
 		// db start commands from xhttp.php
-		var filenamesx = oslistf("*.run");
+		let filenamesx = oslistf("*.run");
 
 		// for (const var filen : range(1, 9999)) {
 		for (var filename : filenamesx) {
@@ -144,7 +144,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 								database.cutter(-5);
 							}
 
-							var cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
+							let cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
 							// printl(AT(-40), time().oconv("MTS"), " ", tt);
 							if (TERMINAL)
 								print(AT(-40));
@@ -207,17 +207,17 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 		// detect system parameter changes and restart
 		// this has the effect of detecting corruption in system which inserts lines
-		var s100	= SYSTEM.f(100);
-		var exohome = osgetenv("EXO_HOME");
+		let s100	= SYSTEM.f(100);
+		let exohome = osgetenv("EXO_HOME");
 		var ospaths = "../../system.cfg,system.cfg";
 		ospaths ^= "," ^ exohome ^ "/dat/";
 		ospaths.converter("/", OSSLASH);
 		let npaths = fcount(ospaths, ",");
 		for (const var ii : range(1, npaths)) {
-			var ospath = ospaths.field(",", ii);
+			let ospath = ospaths.field(",", ii);
 			// order is significant
-			var newtime = (ospath.ends(OSSLASH)) ? ospath.osdir().f(3) : ospath.osfile().f(3);
-			var oldtime = s100.f(1, ii);
+			let newtime = (ospath.ends(OSSLASH)) ? ospath.osdir().f(3) : ospath.osfile().f(3);
+			let oldtime = s100.f(1, ii);
 			if (newtime ne oldtime) {
 				if (oldtime) {
 					ANS = "RESTART " ^ ospath;
@@ -229,9 +229,9 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		}  // ii;
 
 		// 		// check for upgrade to LISTEN
-		// 		var gbp;
+		// 		let gbp;
 		// 		if (gbp.open("GBP", "")) {
-		// 			var listen;
+		// 			let listen;
 		// 			if (listen.read(gbp, "$LISTEN")) {
 		// 				listen = field2(listen, FM, -1);
 		// 				if (s100.f(1, 3)) {
@@ -262,7 +262,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			return 0;
 		}
 
-		var live  = request2;
+		let live  = request2;
 		processes = request3;
 
 		// //////////////////////////////////////////////////////////////////////////
@@ -277,15 +277,15 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		//               - install in all active EXODUS databases in one installation
 		// 3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
 		//               - install in all active EXODUS database and installations
-		var patchcode = "NEOPATCH";
+		let patchcode = "NEOPATCH";
 		var patchdirs = "../DATA/" ^ SYSTEM.f(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
 		patchdirs.converter("/", OSSLASH);
 
 		for (const var patchn : range(1, 3)) {
 
 			// skip if no patch file or not dated today
-			var patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
-			var patchfileinfo = patchfilename.osfile();
+			let patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
+			let patchfileinfo = patchfilename.osfile();
 			if (patchfileinfo.f(2) lt date()) {
 				goto nextpatch;
 			}
@@ -348,8 +348,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			versionkey.converter("/", OSSLASH);
 			if (tt.osread(versionkey)) {
 				tt.trimmer();
-				var vdate = tt.field(" ", 2, 3).iconv("D");
-				var vtime = tt.field(" ", 1).iconv("MT");
+				let vdate = tt.field(" ", 2, 3).iconv("D");
+				let vtime = tt.field(" ", 1).iconv("MT");
 				if (vdate and vtime) {
 					versiondatetime = vdate ^ "." ^ vtime.oconv("R(0)#5");
 				}
@@ -371,7 +371,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				lastpatchid = "";
 			}
 			if (lastpatchid) {
-				var lastpatchdatetime = lastpatchid.field("*", 3);
+				let lastpatchdatetime = lastpatchid.field("*", 3);
 				if (patchdatetime lt lastpatchdatetime) {
 					skipreason = "Patch is older than the last patch - " ^ oconv(lastpatchdatetime, "[DATETIME,4*]");
 				}
@@ -384,7 +384,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not skipemail) {
 
 				// list the files and records that were installed
-				var subject = rec.f(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
+				let subject = rec.f(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
 				var body	= subject ^ " " ^ patchfilename ^ FM;
 				if (skipreason) {
 					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
@@ -401,7 +401,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not skipreason) {
 
 				// perform the installation
-				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().first(2) ^ " (IO)";
+				let cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().first(2) ^ " (IO)";
 				printl(cmd);
 				perform(cmd);
 			}
@@ -490,8 +490,8 @@ nextpatch:;
 
 		data_		  = "";
 		var filename  = request2;
-		var fieldname = request3;
-		var prefix	  = request4;
+		let fieldname = request3;
+		let prefix	  = request4;
 		var sortby	  = request5;
 		if (not sortby) {
 			sortby = "AL";
@@ -561,11 +561,11 @@ getvalues:
 
 			// remove or move any stopped execs to the end and add reason
 			var nn	= data_.fcount(_VM);
-			var nn2 = nn;
+			let nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
-				var execcode = data_.f(1, ii);
+				let execcode = data_.f(1, ii);
 				if (execstoplist.f(1).locate(execcode, stopn)) {
-					var reason = execstoplist.f(2, stopn);
+					let reason = execstoplist.f(2, stopn);
 					if (reason) {
 						data_.remover(1, ii);
 						data_.remover(2, ii);
@@ -627,11 +627,11 @@ getvalues:
 			filename0.converter(".", "_");
 			filename0.replacer("MEDIA_TYPE", "JOB_TYPE");
 		}
-		var filename   = filename0.field(" ", 1);
+		let filename   = filename0.field(" ", 1);
 		var sortselect = request3;
-		var dictids	   = request4;
-		var options	   = request5;
-		var maxnrecs   = request6;
+		let dictids	   = request4;
+		let options	   = request5;
+		let maxnrecs   = request6;
 
 		if (not(sortselect.contains("%SELECTLIST%"))) {
 			clearselect();
@@ -702,7 +702,7 @@ nextlock:
 			print(AT(0, 1));
 		}
 		var nn		 = select2data.count(FM);
-		var maxlines = 20;
+		let maxlines = 20;
 		if (not tracing) {
 			nn = maxlines;
 			if (nn gt maxlines) {
@@ -717,7 +717,7 @@ nextlock:
 			// /BREAK;
 			if (tracing and nn gt 20)
 				break;
-			var row = select2data.f(ii);
+			let row = select2data.f(ii);
 			if (not tracing) {
 				print("|");
 			}
@@ -739,7 +739,7 @@ nextlock:
 		}
 
 		select2data			= "";
-		var select2response = "";
+		let select2response = "";
 
 	} else if (request1 eq "UNLOCKLONGPROCESS") {
 
@@ -747,8 +747,8 @@ nextlock:
 		// lockmode=36
 		// unlockmode=37
 		// END ELSE
-		var lockmode   = 23;
-		var unlockmode = 24;
+		let lockmode   = 23;
+		let unlockmode = 24;
 		// END
 
 		// NB ZZZ will hang if is not locked eg via unlock all
@@ -796,7 +796,7 @@ nextlock:
 			}
 
 			// wait up to 30 seconds for other users to quit
-			var timex = time();
+			let timex = time();
 			while (true) {
 				// /BREAK;
 				if (not(otherusers().f(1) and ((time() - timex).abs() lt 30)))
@@ -806,7 +806,7 @@ nextlock:
 
 			data_ = "";
 
-			var otherusersx = otherusers();
+			let otherusersx = otherusers();
 			if (otherusersx) {
 				// response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, response_, otherusersx);
@@ -922,9 +922,9 @@ subroutine fileaccesscheck(in filename) {
 
 subroutine deleteoldfiles() {
 
-	var deletetime = date() * 24 * 60 * 60 + time() - ageinsecs;
+	let deletetime = date() * 24 * 60 * 60 + time() - ageinsecs;
 
-	var filespec = (inpath ^ pattern).lcase();
+	let filespec = (inpath ^ pattern).lcase();
 
 	// failsafe - only allow delete .* in data folder
 	if (filespec.ends(".*")) {
@@ -942,7 +942,7 @@ nextfiles:
 	if (filenamesx) {
 
 		// get the file time
-		var filename0 = filenamesx.field(FM, 1);
+		let filename0 = filenamesx.field(FM, 1);
 		filenamesx.paster(1, filenamesx.field(FM, 1).len() + 1, "");
 
 		var filename = inpath ^ filename0;

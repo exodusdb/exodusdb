@@ -5,10 +5,10 @@ libraryinit()
 
 function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request, out datax) {
 
-	var alerttype	 = alerttype0.field(":", 1);
-	var alertoptions = (alerttype0.field(":", 2, 9999)).convert(":", FM);
+	let alerttype	 = alerttype0.field(":", 1);
+	let alertoptions = (alerttype0.field(":", 2, 9999)).convert(":", FM);
 
-	var mode = "";
+	let mode = "";
 
 	// dummy example
 

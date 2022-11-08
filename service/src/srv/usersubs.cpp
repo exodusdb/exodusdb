@@ -87,16 +87,16 @@ function main(in mode) {
 
 		// password autoexpiry inform UI directly to allow warning
 		// without an additional request to the server to get the expiry days
-		var expirydays = SECURITY.f(25);
+		let expirydays = SECURITY.f(25);
 		if (expirydays) {
 			// password date default to lastlogin date
 			// if no login date then consider the account to have expired
 			// and they would not have been able to login with it.
 			if (not(RECORD.f(36))) {
-				var lastlogindate = RECORD.f(13).field(".", 1);
+				let lastlogindate = RECORD.f(13).field(".", 1);
 				RECORD(36)		  = lastlogindate;
 			}
-			var expirydate = RECORD.f(36) + expirydays;
+			let expirydate = RECORD.f(36) + expirydays;
 			RECORD(37)	   = expirydate;
 		} else {
 			// indicate no expiry
@@ -150,11 +150,11 @@ function main(in mode) {
 			// emails=lcase(@record<7>)
 			var emails = req.is.lcase();
 			emails.converter(FM ^ VM ^ SM ^ ", ", ";;;;;");
-			var nn = emails.fcount(";");
+			let nn = emails.fcount(";");
 			for (const var ii : range(1, nn)) {
-				var email = emails.field(";", ii);
+				let email = emails.field(";", ii);
 				if (email) {
-					var emaildomain = email.field("@", 2);
+					let emaildomain = email.field("@", 2);
 					if (not(emaildomains.locateusing(" ", emaildomain, xx))) {
 						if (not(emaildomains.locateusing(" ", email, xx))) {
 							msg = "Neither " ^ (emaildomain.quote()) ^ " nor " ^ (email.quote()) ^ "|is in the list of allowed email domains/addresses";
@@ -200,7 +200,7 @@ function main(in mode) {
 			return invalid(msg);
 		}
 
-		var olduserprivs = SECURITY;
+		let olduserprivs = SECURITY;
 
 		// exodus usually not in the users list or shouldnt update security record
 		if (ID eq "EXODUS") {
@@ -245,7 +245,7 @@ function main(in mode) {
 		// create new user in userprivs
 		if (newuser) {
 
-			var userdept = RECORD.f(21);
+			let userdept = RECORD.f(21);
 			if (not userdept) {
 				msg = "USER GROUP CODE is required to create new users";
 				gosub invalid(msg);
@@ -265,9 +265,9 @@ function main(in mode) {
 				SECURITY.inserter(fn, usern, "");
 			}  // fn;
 
-			var newusername		= RECORD.f(1);
-			var newipnos		= RECORD.f(40);
-			var newemailaddress = RECORD.f(7);
+			let newusername		= RECORD.f(1);
+			let newipnos		= RECORD.f(40);
+			let newemailaddress = RECORD.f(7);
 
 			SECURITY(1, usern) = ID;
 			// userprivs<2,usern>=newkeys
@@ -309,7 +309,7 @@ function main(in mode) {
 			// update security if managed to lock it
 			if (resetpassword lt 2) {
 				ans.converter(FM, TM);
-				var tt			   = "<hidden>" ^ SM ^ ans;
+				let tt			   = "<hidden>" ^ SM ^ ans;
 				SECURITY(4, usern) = tt;
 			}
 		}
@@ -324,7 +324,7 @@ function main(in mode) {
 		// similar in security.subs and user.subs
 		if (resetpassword or newuser) {
 			// datetime=(date():'.':time() 'R(0)#5')+0
-			var datetime = date() ^ "." ^ time().oconv("R(0)#5");
+			let datetime = date() ^ "." ^ time().oconv("R(0)#5");
 			RECORD.inserter(15, 1, datetime);
 			RECORD.inserter(16, 1, SYSTEM.f(40, 2));
 
@@ -421,8 +421,8 @@ subroutine updatemirror() {
 	// and we still need to get the executive email if they are a user
 	var mirror	  = RECORD.fieldstore(FM, 13, 5, "");
 	mirror		  = RECORD.fieldstore(FM, 31, 3, "");
-	var username  = RECORD.f(1).ucase();
-	var mirrorkey = "%" ^ username ^ "%";
+	let username  = RECORD.f(1).ucase();
+	let mirrorkey = "%" ^ username ^ "%";
 	mirror(1)	  = ID;
 	mirror.write(req.srcfile, mirrorkey);
 	return;
@@ -443,7 +443,7 @@ subroutine getuserdept2(in mode) {
 	}
 
 	// locate divider, or usern+1
-	var nusers1 = SECURITY.f(1).fcount(VM);
+	let nusers1 = SECURITY.f(1).fcount(VM);
 	for (usern += 1; usern <= nusers1; ++usern) {
 		// /BREAK;
 		if (SECURITY.f(1, usern) eq "---")
@@ -457,7 +457,7 @@ subroutine getuserdept2(in mode) {
 
 subroutine getdepts() {
 	depts		= "";
-	var nusers2 = SECURITY.f(1).fcount(VM);
+	let nusers2 = SECURITY.f(1).fcount(VM);
 	for (usern = 2; usern <= nusers2 + 1; ++usern) {
 		text = SECURITY.f(1, usern);
 		if (text eq "---" or text eq "") {

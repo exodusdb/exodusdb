@@ -28,17 +28,17 @@ function main(in mode) {
 		var emailtx2 = "";
 
 		// email changed tasks
-		var newtasks = RECORD.f(10);
-		var newlocks = RECORD.f(11);
-		var oldtasks = origfullrec_.f(10);
-		var oldlocks = origfullrec_.f(11);
+		let newtasks = RECORD.f(10);
+		let newlocks = RECORD.f(11);
+		let oldtasks = origfullrec_.f(10);
+		let oldlocks = origfullrec_.f(11);
 		var ntasks	 = newtasks.fcount(VM);
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
-			var task = newtasks.f(1, taskn);
+			let task = newtasks.f(1, taskn);
 			if (task) {
-				var newlock = newlocks.f(1, taskn);
+				let newlock = newlocks.f(1, taskn);
 				if (oldtasks.locate(task, oldtaskn)) {
-					var oldlock = oldlocks.f(1, oldtaskn);
+					let oldlock = oldlocks.f(1, oldtaskn);
 					if (newlock ne oldlock) {
 						// changed
 						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock;
@@ -51,10 +51,10 @@ function main(in mode) {
 
 		ntasks = oldtasks.fcount(VM);
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
-			var task = oldtasks.f(1, taskn);
+			let task = oldtasks.f(1, taskn);
 			if (task) {
 				if (not(newtasks.locate(task, newtaskn))) {
-					var oldlock	 = oldlocks.f(1, taskn);
+					let oldlock	 = oldlocks.f(1, taskn);
 					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
 				}
 			}
@@ -207,7 +207,7 @@ function main(in mode) {
 		var	 obsoletetasks = "COMPANY ACCESS PARTIAL";
 		obsoletetasks(-1)  = "MARKET ACCESS PARTIAL";
 		for (const var ii : range(1, 9999)) {
-			var tt = obsoletetasks.f(ii);
+			let tt = obsoletetasks.f(ii);
 			// /BREAK;
 			if (not tt)
 				break;
@@ -233,8 +233,8 @@ function main(in mode) {
 		var	 locks	= newuserprivs.f(11);
 		var	 ntasks = tasks.fcount(VM);
 		for (taskn = ntasks; taskn >= 1; --taskn) {
-			var lockx = locks.f(1, taskn);
-			var task  = tasks.f(1, taskn);
+			let lockx = locks.f(1, taskn);
+			let task  = tasks.f(1, taskn);
 			if (lockx eq "" and (task.ends(DQ))) {
 deletetask:
 				newuserprivs.remover(10, taskn);

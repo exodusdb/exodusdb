@@ -33,7 +33,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 	var processes = "";
 
 	// curruserlockid.sys134=sysvar('GET',109,134)
-	var curruserlockid = THREADNO;
+	let curruserlockid = THREADNO;
 
 	var returndata	   = 0;
 	var otherusercodes = "";
@@ -45,8 +45,8 @@ function main(in databasecode0 = "", in usercode0 = "") {
 	// lockmode=36
 	// unlockmode=37
 	// END ELSE
-	var lockmode   = 23;
-	var unlockmode = 24;
+	let lockmode   = 23;
+	let unlockmode = 24;
 	// END
 
 	if (curruserlockid.isnum()) {
@@ -100,7 +100,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 				}
 			}
 			if (processes) {
-				var processno = lockno - (lockno / 10).floor();
+				let processno = lockno - (lockno / 10).floor();
 				var process;
 				if (not(process.read(processes, processno))) {
 					// if no process record then assume no process

@@ -10,31 +10,31 @@ function main() {
 	// eg for a database called devdtest and process 3
 	// waiting ../data/devdtest/*.1 10 10 ../../global.end neos0000.3 ../data/devdtest/ 5700
 	// printl(SENTENCE);
-	var filepattern			= field(SENTENCE, " ", 2);
-	var waitsecs			= field(SENTENCE, " ", 3);
-	var sleepms				= field(SENTENCE, " ", 4);
-	var globalendfilename	= field(SENTENCE, " ", 5);
-	var databaseendfilename = "global.end";
-	var newfilename			= field(SENTENCE, " ", 7) ^ field(SENTENCE, " ", 6);
+	let filepattern			= field(SENTENCE, " ", 2);
+	let waitsecs			= field(SENTENCE, " ", 3);
+	let sleepms				= field(SENTENCE, " ", 4);
+	let globalendfilename	= field(SENTENCE, " ", 5);
+	let databaseendfilename = "global.end";
+	let newfilename			= field(SENTENCE, " ", 7) ^ field(SENTENCE, " ", 6);
 
 	// printl("Waiting for file ", filename);
 	// printl("New file will be ",newfilename);
 	// printl();
 
-	var n		   = 0;
+	let n		   = 0;
 	var oswaitsecs = 1;
 
-	var starttime = ostime();
+	let starttime = ostime();
 	do {
 
 		if (TERMINATE_req || RELOAD_req)
 			return 0;
 
 		// limit remaining seconds to 0-10
-		var elapsedsecs = (ostime() - starttime);
+		let elapsedsecs = (ostime() - starttime);
 		if (elapsedsecs < 0)
 			break;
-		var remainingsecs = waitsecs - elapsedsecs;
+		let remainingsecs = waitsecs - elapsedsecs;
 		if (remainingsecs < 1)
 			break;
 
@@ -56,7 +56,7 @@ function main() {
 			break;
 
 		// look for required file
-		var filenames = oslist(filepattern);
+		let filenames = oslist(filepattern);
 
 		if (filenames) {
 
@@ -73,7 +73,7 @@ function main() {
 			// if renaming then rename and quit, or process loop if cannot rename
 
 			// rename and quit
-			var oldfilename = filepattern.fieldstore(OSSLASH, -1, 1, filenames.f(1));
+			let oldfilename = filepattern.fieldstore(OSSLASH, -1, 1, filenames.f(1));
 			if (osrename(oldfilename, newfilename)) {
 				// printl("File renamed from ",oldfilename, " to ", newfilename);
 				// var x;

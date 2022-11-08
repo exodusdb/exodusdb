@@ -92,35 +92,35 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 
 	ptr = 0;
 
-	var filename = sentencex.field(" ", 2);
+	let filename = sentencex.field(" ", 2);
 	var file;
 	if (not(file.open(filename, ""))) {
 		call mssg(lasterror());
 		return 0;
 	}
 
-	var normalise = sentencex.contains(" NORMALISE");
+	let normalise = sentencex.contains(" NORMALISE");
 	if (normalise) {
 		sentencex.replacer(" NORMALISE", "");
 	}
 
-	var firstmvonly = sentencex.contains(" FIRSTMVONLY");
+	let firstmvonly = sentencex.contains(" FIRSTMVONLY");
 	if (firstmvonly) {
 		sentencex.replacer(" FIRSTMVONLY", "");
 	}
 
-	var mv1only = sentencex.contains(" MV1ONLY");
+	let mv1only = sentencex.contains(" MV1ONLY");
 	if (mv1only) {
 		sentencex.replacer(" MV1ONLY", "");
 	}
 
-	var raw = sentencex.contains(" RAW");
+	let raw = sentencex.contains(" RAW");
 	if (raw) {
 		sentencex.replacer(" RAW", "");
 	}
-	var mvgroupno = "";
+	let mvgroupno = "";
 
-	var colheaderrow = not(sentencex.contains(" NOCOLHEADER"));
+	let colheaderrow = not(sentencex.contains(" NOCOLHEADER"));
 	if (not colheaderrow) {
 		sentencex.replacer(" NOCOLHEADER", "");
 	}
@@ -182,7 +182,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		}  // ii;
 	}
 
-	var listkey = var(1000000).rnd();
+	let listkey = var(1000000).rnd();
 
 	if (not exportable) {
 
@@ -227,7 +227,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		outfilename.paster(-3, 3, "xls");
 		SYSTEM(2) = outfilename;
 	}
-	var excel = outfilename.lcase().ends("xls");
+	let excel = outfilename.lcase().ends("xls");
 
 	//outfilename.osremove();
 	if (outfilename.osfile() and not outfilename.osremove())
@@ -249,7 +249,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	xfiles.redim(255);
 	var nfields = 0;
 
-	var selectlist = LISTACTIVE;
+	let selectlist = LISTACTIVE;
 	if (selectlist) {
 		call pushselect(0, v69, v70, v71);
 	}
@@ -304,7 +304,7 @@ nextdict:
 				// call dicti2a(dict)
 				coln += 1;
 				// if dict<2> matches '0N' then
-				var fn = dict.f(2);
+				let fn = dict.f(2);
 				if (fn gt nfields) {
 					nfields = fn;
 				}
@@ -478,7 +478,7 @@ nextrec:
 
 	// skip multivalues
 	for (const var filtern : range(1, nfilters)) {
-		var value = calculate(filters(1, filtern));
+		let value = calculate(filters(1, filtern));
 		if (filters(3, filtern).len()) {
 
 			// if reqvalue then skip if not matching
@@ -513,7 +513,7 @@ nextrec:
 		dictid = dictids(coln);
 		if (dictid eq "LINE_NO") {
 		} else {
-			var cell = calculate(dictid);
+			let cell = calculate(dictid);
 			if (cell ne "") {
 				rec(coln) = cell;
 				anydata	  = 1;

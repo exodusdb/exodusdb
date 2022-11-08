@@ -10,7 +10,7 @@ function main(io css, in version = "") {
 	// <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	// <meta http-equiv="x-ua-compatible" content="IE=6" />
 
-	var charset = SYSTEM.f(127);
+	let charset = SYSTEM.f(127);
 	if (charset) {
 		css = "<meta http-equiv=\"content-type\" content=\"text/html;charset=" ^ charset ^ "\" />\n";
 	} else {
@@ -25,8 +25,8 @@ function main(io css, in version = "") {
 	// while (var("\r\n").contains(css[-1]))
 	// 	css.popper();
 
-	var thcolor = SYSTEM.f(46, 1);
-	var tdcolor = SYSTEM.f(46, 2);
+	let thcolor = SYSTEM.f(46, 1);
+	let tdcolor = SYSTEM.f(46, 2);
 
 	var font = SYSTEM.f(46, 3);
 	if (font == "Default") {
@@ -59,7 +59,7 @@ function main(io css, in version = "") {
 	css.replacer("exodusfont,", font);
 	css.replacer("exodussize", fontsize);
 
-	var agent = SYSTEM.f(40);
+	let agent = SYSTEM.f(40);
 	if (agent.contains("MSIE 7")) {
 		css.replacer("xborder-collapse", "border-collapse");
 	}

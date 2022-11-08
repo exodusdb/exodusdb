@@ -6,7 +6,7 @@ M
 
 
 	var usercodes = RECORD.f(1, MV);\
-	var emails = RECORD.f(7, MV);\
+	let emails = RECORD.f(7, MV);\
 \
 	let nusers = usercodes.fcount(VM);\
 	for (const var usern : range(1, nusers)) {\

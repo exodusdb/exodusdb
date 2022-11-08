@@ -13,11 +13,11 @@ function main(in filename, in indexid, in texts0, io msg) {
 
 	var texts  = texts0;
 	msg		   = "";
-	var ntexts = texts.fcount(VM);
+	let ntexts = texts.fcount(VM);
 
 	// analogous code whereever allpunctuation is used
 	// ED BP LISTSCHED AGENCY.SUBS SCHEDULES.DICT
-	var allpunctuation = SYSTEM.f(130);
+	let allpunctuation = SYSTEM.f(130);
 	texts.converter(allpunctuation, var(50).space());
 	var temp = texts.trim();
 
@@ -53,7 +53,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 		abort(lasterror());
 	}
 	foundkeys.converter(VM, FM);
-	var listkey = "SELECTBTREE:" ^ SYSTEM.f(24);
+	let listkey = "SELECTBTREE:" ^ SYSTEM.f(24);
 	foundkeys.write(lists, listkey);
 	getlist("" ^ listkey ^ " (S)");
 	// delete lists,listkey

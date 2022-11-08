@@ -63,7 +63,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		srv.document(27) = 1;
 	}
 
-	var fullrequest = module ^ "PROXY" ^ FM ^ request;
+	let fullrequest = module ^ "PROXY" ^ FM ^ request;
 
 	// get target usercodes
 
@@ -91,7 +91,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 		// run as the bottom user in the current users group
 		// assuming we are going to send it to all members of the group
-		var usercode  = USERNAME;
+		let usercode  = USERNAME;
 		runasusercode = usercode.xlate("USERS", 5, "");
 
 		// if not a proper user (eg EXODUS then skip)
@@ -113,7 +113,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	}
 
 	// auto targeting
-	var initialtargetusercodes = targetusercodes;
+	let initialtargetusercodes = targetusercodes;
 	if (targetusercodes eq "{GROUP}") {
 		var tt = runasusercode;
 		if (SECURITY.f(1).locate(tt, usern)) {
@@ -122,7 +122,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				if (userx.read(users, tt)) {
 					// only to users with emails
 					if (userx.f(7)) {
-						var seniorfirst = 1;
+						let seniorfirst = 1;
 						if (seniorfirst) {
 							targetusercodes.inserter(1, 1, tt);
 						} else {
@@ -141,9 +141,9 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 		// check all users exist (even if they dont have emails)
 		if (targetusercodes) {
-			var nusers = targetusercodes.fcount(VM);
+			let nusers = targetusercodes.fcount(VM);
 			for (usern = nusers; usern >= 1; --usern) {
-				var usercode = targetusercodes.f(1, usern);
+				let usercode = targetusercodes.f(1, usern);
 				var userx;
 				if (not(userx.read(users, usercode))) {
 					if (not(usercode eq "EXODUS")) {

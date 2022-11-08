@@ -8,8 +8,8 @@ var year;		 // num
 
 function main(in type, in input0, in mode, out output) {
 
-	var firstmonth = mode.field(",", 1);
-	var maxperiod  = mode.field(",", 2);
+	let firstmonth = mode.field(",", 1);
+	let maxperiod  = mode.field(",", 2);
 
 	// if iconv then convert period (MM/YY or YYMM) to internal last date of month
 	if (type eq "ICONV") {
@@ -43,7 +43,7 @@ function main(in type, in input0, in mode, out output) {
 	}
 
 	// if oconv then convert internal date to year:period
-	var temp = input0.oconv("D2-E");
+	let temp = input0.oconv("D2-E");
 	year	 = temp.last(2);
 	period	 = temp.b(4, 2);
 	if (firstmonth and firstmonth.isnum()) {

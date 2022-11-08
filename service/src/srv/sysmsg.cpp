@@ -32,8 +32,8 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	// if msg0 starts with @@something then sendmail sends file @something
 	// not tested or used currently
 
-	var interactive = false;  //not(SYSTEM.f(33));
-	var datasetcode = SYSTEM.f(17);
+	let interactive = false;  //not(SYSTEM.f(33));
+	let datasetcode = SYSTEM.f(17);
 
 	// NB this routine is called automatically from msg()
 	// whenever the msg starts with SYSTEM ERROR
@@ -87,7 +87,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	// nb if any emailaddrs and neosys.com not in them
 	// then exodus will not receive any message
 	var useremail	 = username.xlate("USERS", 7, "X").lcase();
-	var userfullname = username.xlate("USERS", 1, "X");
+	let userfullname = username.xlate("USERS", 1, "X");
 	// if username='EXODUS' and @username<>'EXODUS' then
 	var emailaddrs = bakpars.f(6);
 	var ccaddrs	   = "";
@@ -150,7 +150,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	// determine subject
 	// subject='EXODUS System Message: ':datasetcode
 	var subject = "EXODUS System: " ^ datasetcode;
-	var tt		= msg.index("ERROR NO:");
+	let tt		= msg.index("ERROR NO:");
 	if (tt) {
 		subject ^= " " ^ msg.cut(tt - 1).f(1, 1, 1);
 	}
@@ -162,7 +162,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 		body = msg.cut(1);
 
 	} else {
-		var l9 = "L#9";
+		let l9 = "L#9";
 		body   = "";
 		// body<-1>='Message=':fm:msg
 		body(-1) = msg;
@@ -243,7 +243,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 			body(-1) = oconv("Data:", l9) ^ temp;
 		}
 
-		var requeststarttime = SYSTEM.f(25);
+		let requeststarttime = SYSTEM.f(25);
 		if (requeststarttime) {
 			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(date().timestamp(requeststarttime), timestamp());
 		}
@@ -265,7 +265,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	params(3)	  = 60;
 	params(4)	  = "DOS";
 	params(5)	  = "sysmsg.$rr";
-	var exceedmsg = "SYSMSG email suppressed because more than 60 in last 60 mins";
+	let exceedmsg = "SYSMSG email suppressed because more than 60 in last 60 mins";
 	// call roundrobin('ONEVENT',params,result,errormsg)
 	call roundrobin("ONEVENT", params, result, xx);
 	if (result) {

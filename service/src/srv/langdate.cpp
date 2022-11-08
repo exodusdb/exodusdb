@@ -13,7 +13,7 @@ function main(in type, in in0, in mode0, out output, in glang) {
 		return 0;
 	}
 
-	var nospaces = mode.contains("*");
+	let nospaces = mode.contains("*");
 	if (nospaces) {
 		mode.converter("*", "");
 	}
@@ -49,10 +49,10 @@ ok:
 			// language specific (date format could be a pattern in lang?)
 			if (mode eq "L") {
 
-				var tt	 = inx.oconv("D4/E");
-				var mth	 = glang.f(2).field("|", tt.field("/", 2));
-				var day	 = tt.field("/", 1);
-				var year = tt.field("/", 3);
+				let tt	 = inx.oconv("D4/E");
+				let mth	 = glang.f(2).field("|", tt.field("/", 2));
+				let day	 = tt.field("/", 1);
+				let year = tt.field("/", 3);
 				// if 1 then
 				output = day ^ " " ^ mth ^ " " ^ year;
 				// end else

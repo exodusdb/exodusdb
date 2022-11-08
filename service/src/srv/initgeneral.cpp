@@ -84,7 +84,7 @@ function main() {
 	// gosub getenv
 	call initgeneral2("GETENV", logtime);
 
-	var resetting					= PSEUDO eq "RESET";
+	let resetting					= PSEUDO eq "RESET";
 	var					   initmode = SENTENCE.field(" ", 2);
 	PSEUDO							= "";
 	// equ request to @user0
@@ -146,7 +146,7 @@ function main() {
 	// accounting<3> for allocationorder
 	// accounting<4> for mv buffer of currency codes
 	// accounting<5> for mv buffer of fmts for <4>
-	var interactive = false;  //not(SYSTEM.f(33));
+	let interactive = false;  //not(SYSTEM.f(33));
 	// equ generalresultcode to system<34>
 	// equ nrequests=system<35>
 	// equ defaultclientmark to system<36>
@@ -259,7 +259,7 @@ function main() {
 			initwaitsecs = 600 + var(10).rnd();
 		}
 		// also in LOGON.OLD and INIT.GENERAL
-		var lockkey = "INIT.GENERAL.LOGIN";
+		let lockkey = "INIT.GENERAL.LOGIN";
 		if (not(voc.lock(lockkey))) {
 			// np if own lock
 			if (FILEERROR ne "414") {
@@ -277,7 +277,7 @@ function main() {
 		}
 	}
 
-	var exodusid = var("exodus.id").osfile();
+	let exodusid = var("exodus.id").osfile();
 
 	call log2("*determine the pid if possible", logtime);
 	if (not(SYSTEM.f(54))) {
@@ -305,7 +305,7 @@ function main() {
 	// prevent login (except as maintenance with confirmation)
 	// NB this date should be revised whenever any conversion or upgrade is done
 	if (not exodusid) {
-		var oldmethod = 1;
+		let oldmethod = 1;
 		if (oldmethod) {
 			dbdate			   = "30 MAR 2007";
 			dbtime			   = "12:00:00";
@@ -377,8 +377,8 @@ updateversion:
 			// /BREAK;
 			if (rec eq "")
 				break;
-			var filename = rec.f(1);
-			var id		 = rec.f(2);
+			let filename = rec.f(1);
+			let id		 = rec.f(2);
 			rec			 = rec.field(FM, 3, 99999);
 			var file;
 			if (file.open(filename, "")) {
@@ -413,11 +413,11 @@ updateversion:
 	call shadowmfs("EXODUSINIT", "");
 
 	// 	call log2("*reattach data", logtime);
-	// 	var volumesx = VOLUMES;
+	// 	let volumesx = VOLUMES;
 	// 	let nvolumes = VOLUMES.fcount(FM);
 	// 	for (const var volumen : range(1, nvolumes)) {
-	// 		var volume = volumesx.f(volumen);
-	// 		var tpath = "../" "DATA" "/";
+	// 		let volume = volumesx.f(volumen);
+	// 		let tpath = "../" "DATA" "/";
 	// 		tpath.converter("/", OSSLASH);
 	// 		if (volume.first(8) eq tpath) {
 	// 			execute("ATTACH " ^ volume ^ " (S)");
@@ -448,10 +448,10 @@ updateversion:
 	}
 
 	// 	call log2("*get user video table if any", logtime);
-	// 	var temp = ENVIRONKEYS.f(2);
+	// 	let temp = ENVIRONKEYS.f(2);
 	// 	temp.converter(".", "");
 	// 	if (colors.osread(temp ^ ".vid")) {
-	// 		var color2;
+	// 		let color2;
 	// 		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
 	// 			color2 = "";
 	// 		}
@@ -480,7 +480,7 @@ nextreport:
 			if (readnext(reportkey)) {
 				var recordx;
 				if (recordx.read(reports, reportkey)) {
-					var filename = reportkey.field("*", 1);
+					let filename = reportkey.field("*", 1);
 					var file;
 					if (file.open(filename, "")) {
 						var keyx = reportkey.field("*", 2);
@@ -519,11 +519,11 @@ nextreport:
 		call note(msg);
 	}
 
-	var notherusers = otherusers("").f(1);
+	let notherusers = otherusers("").f(1);
 
 	call log2("*check/get authorisation", logtime);
 	if (SYSTEM.f(4) eq "" and not(SYSTEM.f(33))) {
-		var nusers = getauthorisation();
+		let nusers = getauthorisation();
 		if (not nusers) {
 
 			call log2("*if sysmode then respond to response file and close", logtime);
@@ -573,7 +573,7 @@ nextreport:
 			config = "";
 		}
 	}
-	var lastdate = config.f(1);
+	let lastdate = config.f(1);
 
 	call log2("*update \"last used date\"", logtime);
 	if (date() ne lastdate) {
@@ -628,7 +628,7 @@ nextreport:
 	// SYSTEM(58) = oslistd("../data/").convert(FM,VM);
 	// SYSTEM.fieldstorer(FM, 59, 5, "");
 	// update dbcodes with dir dbcodes if dbcodes in sys cfg file contain lcase
-	var ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx", "").len();
+	let ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx", "").len();
 	if (ttdbcodes eq SYSTEM.f(58).len()) {
 		// c++ only
 		SYSTEM(58) = oslistd("../data/").convert(FM, VM);
@@ -901,8 +901,8 @@ nextreport:
 		cpu.replacer("Intel", "");
 		cpu.replacer("CPU", "");
 		cpu.converter("-", " ");
-		var nsockets = cpu.fcount(FM);
-		var nlogical = SYSTEM.f(9);
+		let nsockets = cpu.fcount(FM);
+		let nlogical = SYSTEM.f(9);
 		cpu			 = cpu.f(1).trim() ^ " ";
 		tt			 = nlogical / nsockets;
 		if (tt gt 1) {
@@ -915,7 +915,7 @@ nextreport:
 	SYSTEM(12, -1) = "CPU";
 	SYSTEM(13, -1) = cpu;
 
-	var currdataset = SYSTEM.f(17);
+	let currdataset = SYSTEM.f(17);
 
 	call log2("*get diskfreespace", logtime);
 	var	 reqfreemb = 10;
@@ -1048,7 +1048,7 @@ nextreport:
 		var	 usercodes = SECURITY.f(1);
 		let	 nusers	   = usercodes.fcount(VM);
 		for (const var usern : range(1, nusers)) {
-			var userx = usercodes.f(1, usern);
+			let userx = usercodes.f(1, usern);
 			if (not(userx.contains("---"))) {
 				userx.writef(users, userx, 1);
 			}
@@ -1185,8 +1185,8 @@ nextreport:
 	//
 	// 		call log2("*open processes own lists file", logtime);
 	//
-	// 		var workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
-	// 		var workpath = "DATAVOL/" ^ workdir ^ "/";
+	// 		let workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
+	// 		let workpath = "DATAVOL/" ^ workdir ^ "/";
 	// 		workpath.converter("/", OSSLASH);
 	//
 	// 		// check/create folder
@@ -1271,7 +1271,7 @@ nextreport:
 	call log2("*make global per installation files", logtime);
 	var	 filenamesx = "PROCESSES,STATISTICS,REQUESTLOG";
 	for (const var ii : range(1, 999)) {
-		var filename = filenamesx.field(",", ii);
+		let filename = filenamesx.field(",", ii);
 		// /BREAK;
 		if (not filename)
 			break;
@@ -1308,7 +1308,7 @@ nextreport:
 	// var foreignfiles = osshellread("dbattach {L}").converter("\n ", FM ^ VM).trim(FM);
 	// Copy "attach" code from dbattach cli command ... UNTESTED
 	// TODO provide some support from libexodus to do all or part of this
-	var sql			 = "select foreign_server_name, foreign_table_name from information_schema.foreign_tables;";
+	let sql			 = "select foreign_server_name, foreign_table_name from information_schema.foreign_tables;";
 	var foreignfiles = "";
 	if (not var().sqlexec(sql, foreignfiles))
 		errput(lasterror());
@@ -1321,10 +1321,10 @@ nextreport:
 	var foreign_dbno;
 	// group filenames by foreign dbname
 	for (var foreignfile : foreignfiles) {
-		var foreign_dbname = foreignfile.f(1, 1);
+		let foreign_dbname = foreignfile.f(1, 1);
 		if (not foreign_dbname)
 			continue;
-		var filename = foreignfile.f(1, 2);
+		let filename = foreignfile.f(1, 2);
 		if (not attach.locate(foreign_dbname, foreign_dbno, 1))
 			attach.inserter(1, foreign_dbno, foreign_dbname);
 		attach.inserter(2, foreign_dbno, -1, filename);
@@ -1339,9 +1339,9 @@ nextreport:
 		if (not foreign_dbconn.connect(foreign_dbname))
 			abort("Error: serve_agy: Cannot connect attach to " ^ foreign_dbname.quote());
 		foreign_dbno++;
-		var foreign_filenames = attach.f(2, foreign_dbno);
+		let foreign_filenames = attach.f(2, foreign_dbno);
 		if (not foreign_dbconn.attach(foreign_filenames.convert(SM, FM))) {
-			var msg = "Error: serve_agy: Cannot attach to " ^ foreign_filenames.convert(FM, " ") ^ " on " ^ foreign_dbconn;
+			let msg = "Error: serve_agy: Cannot attach to " ^ foreign_filenames.convert(FM, " ") ^ " on " ^ foreign_dbconn;
 			msg.errputl();
 			abort(msg);
 		}
@@ -1376,7 +1376,7 @@ fixnextcompany:
 			srv.gcurrcompcode = companycode;
 		}
 
-		var marketcode = srv.company.f(30);
+		let marketcode = srv.company.f(30);
 		if (marketcode) {
 			if (srv.markets.open("MARKETS", "")) {
 				var market;
@@ -1464,7 +1464,7 @@ convcompany:
 
 	call log2("*get the company description", logtime);
 	srv.company	   = "";
-	var currperiod = "";
+	let currperiod = "";
 	// call init.company('')
 	// change so that interactive ADAGENCY gets a company code
 	// force acquisition of language
@@ -1543,7 +1543,7 @@ adddatasetcodename:
 		}
 		if (userx.f(4) and interactive) {
 			// var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.f(4) - 1).mod(7) + 1);
-			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", userx.f(4).oconv("DW"));
+			let day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", userx.f(4).oconv("DW"));
 			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.f(4).oconv("D") ^ " at " ^ userx.f(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.f(6).trim()).oconv("C#40") ^ "|");
 		}
 
@@ -1605,7 +1605,7 @@ adddatasetcodename:
 	if (version.osread("GENERAL" _OSSLASH "VERSION.DAT")) {
 
 		// get version installed
-		var versioninstalled = version.field("\r", 1).field("\n", 1).trim();
+		let versioninstalled = version.field("\r", 1).field("\n", 1).trim();
 
 		// get version last run
 		//call osread(upgradelog, "UPGRADE.CFG");
@@ -1647,8 +1647,8 @@ adddatasetcodename:
 			// email users on live systems LISTED IN SYSTEM CONFIGURATION only
 			if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
 				if (not(SYSTEM.f(61))) {
-					var idate = version.field(" ", 2, 4).iconv("D");
-					var itime = version.field(" ", 1).iconv("MT");
+					let idate = version.field(" ", 2, 4).iconv("D");
+					let itime = version.field(" ", 1).iconv("MT");
 					// tt=idate 'D/J':' ':itime 'MT'
 					tt = idate.oconv("D/E");
 					tt = idate.last(4) ^ "/" ^ tt.first(5) ^ " " ^ itime.oconv("MT");

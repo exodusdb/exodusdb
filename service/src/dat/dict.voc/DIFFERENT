@@ -10,16 +10,15 @@ S
 var rec;\
 \
 function main() {\
-	#include <service_common.h>\
+#include <service_common.h>\
 \
 	// COMMON /DIFFERENT/ LAST.RECCOUNT, COMPARE.FILE\
 	// IF COMPARE.FILE EQ '' THEN LAST.RECCOUNT = 9999\
 	// !IF @RECCOUNT LT LAST.RECCOUNT THEN\
 	// !  FN=''\
 	// !  CALL MSG('DIFFERENT FROM WHAT FILE','RC',FN,'')\
-	// \
 \
-	var fn = "QFILE";\
+	let fn = "QFILE";\
 	var comparefile;\
 	if (not(comparefile.open(fn))) {\
 		printl("CANNOT OPEN " ^ fn);\
@@ -27,7 +26,7 @@ function main() {\
 	}\
 \
 	// END\
-	var lastreccount = RECCOUNT;\
+	let lastreccount = RECCOUNT;\
 	if (rec.readc(comparefile, ID)) {\
 		if (RECORD eq rec) {\
 			ANS = "";\

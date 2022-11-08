@@ -8,8 +8,8 @@ function main(in args1, in args2, in sep) {
 	}
 	// 	dim array1;
 	// 	dim array2;
-	// 	var nn1=array1.split(args1.convert(sep,FM));
-	// 	var nn2=array2.split(args2.convert(sep,FM));
+	// 	let nn1=array1.split(args1.convert(sep,FM));
+	// 	let nn2=array2.split(args2.convert(sep,FM));
 
 	dim array1 = args1.split(sep);
 	dim array2 = args2.split(sep);

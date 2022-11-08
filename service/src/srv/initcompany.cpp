@@ -34,7 +34,7 @@ function main(in nextcompanycode) {
 		// curr.company=nextcompanycode
 	}
 
-	var oldcompany = srv.company;
+	let oldcompany = srv.company;
 	if (srv.gcurrcompcode) {
 		if (not(srv.company.read(srv.companies, srv.gcurrcompcode))) {
 			call mssg("COMPANY " ^ (srv.gcurrcompcode.quote()) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
@@ -46,7 +46,7 @@ function main(in nextcompanycode) {
 	}
 
 	// in LISTEN2 and INIT.COMPANY
-	var companystyle = srv.company.f(70);
+	let companystyle = srv.company.f(70);
 	if (companystyle) {
 		SYSTEM(46) = companystyle;
 	}
@@ -71,7 +71,7 @@ function main(in nextcompanycode) {
 
 	// date format
 	DATEFMT		   = "D2/E";
-	var dateformat = srv.company.f(10);
+	let dateformat = srv.company.f(10);
 	if (dateformat eq "") {
 		DATEFMT = "D2/E";
 	} else if (dateformat.starts("31/01/")) {
@@ -182,7 +182,7 @@ function main(in nextcompanycode) {
 
 	// dateperiod conversion in case not done in init.company2 above
 	// financial year dates
-	var financialyear = srv.company.f(6);
+	let financialyear = srv.company.f(6);
 	var firstmonth	  = financialyear.field(",", 1);
 	if (firstmonth.isnum()) {
 		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",", firstmonth, temp))) {

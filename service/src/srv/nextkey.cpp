@@ -16,12 +16,12 @@ function main(in mode, in previous0 = "") {
 	var keyx   = "";
 
 	var actfilename = mode.field(":", 1);
-	var seqkey		= mode.field(":", 2);
-	var keyfilename = mode.field(":", 3);
-	var prefix		= mode.field(":", 4);
+	let seqkey		= mode.field(":", 2);
+	let keyfilename = mode.field(":", 3);
+	let prefix		= mode.field(":", 4);
 
 	if (actfilename eq "") {
-		var temp = seqkey.index(".SK");
+		let temp = seqkey.index(".SK");
 		if (temp) {
 			actfilename = seqkey.first(temp - 1);
 		} else {
@@ -127,10 +127,10 @@ checkrec:
 			goto checkrec;
 		}
 
-		var xx = unlockrecord(actfilename, actfile, keyx);
+		let xx = unlockrecord(actfilename, actfile, keyx);
 	}
 
-	var xx = unlockrecord(keyfilename, keyfile, seqkey);
+	let xx = unlockrecord(keyfilename, keyfile, seqkey);
 
 	ANS = keyx;
 	return keyx;

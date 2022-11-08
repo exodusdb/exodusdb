@@ -8,7 +8,7 @@ function main(in numerators, in denominator, in sep) {
 		return numerators;
 	}
 	// 	dim output;
-	// 	var nn=output.split(numerators.convert(sep,FM));
+	// 	let nn=output.split(numerators.convert(sep,FM));
 	dim output = numerators.split(sep);
 	int nn	   = output.rows();
 	for (int ii = 1; ii <= nn; ++ii) {

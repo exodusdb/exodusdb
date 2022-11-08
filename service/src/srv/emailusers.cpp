@@ -27,14 +27,14 @@ var errormsg;
 
 function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
 
-	var interactive = false;  //not(SYSTEM.f(33));
+	let interactive = false;  //not(SYSTEM.f(33));
 
 	// options
 	// R = REPLYTO=@username email address if exists
 	// W = Groups by Word eg user with dept MEDIA BUYING matches group MEDIA
 
 	if (mode.unassigned()) {
-		var mod = "";
+		let mod = "";
 	} else {
 		mode = mode0;
 	}
@@ -42,11 +42,11 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	if (SENTENCE.field(" ", 1) eq "EMAILUSERS") {
 
 		mode		= SENTENCE.field(" ", 2);
-		var version = SENTENCE.field(" ", 3, 9999);
+		let version = SENTENCE.field(" ", 3, 9999);
 		SENTENCE	= "";
 
 		if (mode ne "UPGRADE") {
-			var msg = mode.quote() ^ " is invalid in EMAILUSERS";
+			let msg = mode.quote() ^ " is invalid in EMAILUSERS";
 			if (interactive) {
 				call mssg(msg);
 			} else {
@@ -106,7 +106,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		if ((USERNAME eq "EXODUS" or USERNAME eq "ADAGENCY") or USERNAME eq "ACCOUNTS") {
 			replyto = "support@neosys.com";
 		} else {
-			var fromuser = xlate("USERS", USERNAME, "", "X");
+			let fromuser = xlate("USERS", USERNAME, "", "X");
 			replyto		 = fromuser.f(7);
 			var fromline = "From " ^ fromuser.f(1);
 			if (USERNAME ne fromuser.f(1)) {
@@ -116,8 +116,8 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		}
 	}
 
-	var usercodes	   = SECURITY.f(1);
-	var nusers		   = usercodes.fcount(VM);
+	let usercodes	   = SECURITY.f(1);
+	let nusers		   = usercodes.fcount(VM);
 	var usern		   = 0;
 	emaillog		   = "";
 	var alreadyemailed = "";
@@ -219,7 +219,7 @@ nextuser:
 	emails.converter(";", VM);
 	nn = emails.fcount(VM);
 	for (var ii = nn; ii >= 1; --ii) {
-		var email = emails.f(1, ii);
+		let email = emails.f(1, ii);
 		if (alreadyemailed.locate(email, xx)) {
 			emails.remover(1, ii);
 		} else {

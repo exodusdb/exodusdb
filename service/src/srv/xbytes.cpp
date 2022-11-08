@@ -7,9 +7,9 @@ var ndecs;	// num
 function main(in type, in input0, in mode, out output) {
 
 	if (mode) {
-		var sigfigs = mode;
+		let sigfigs = mode;
 	} else {
-		var sigfigs = 3;
+		let sigfigs = 3;
 	}
 
 	if (type eq "OCONV") {

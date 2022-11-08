@@ -19,20 +19,20 @@ function main() {
 	var abortafterseconds = 600 + 10;
 
 	// longprocesssecs=5*(rnd(50)+51)/50
-	var longprocesssecs = 3;
+	let longprocesssecs = 3;
 
 	// random 1 to 2 seconds
-	var sleepms = 1000 * (var(50).rnd() + 51) / 50;
+	let sleepms = 1000 * (var(50).rnd() + 51) / 50;
 
 	// random 3 to 4 seconds
-	var sleepeverysecs = 2 + 1 * (var(50).rnd() + 51) / 50;
+	let sleepeverysecs = 2 + 1 * (var(50).rnd() + 51) / 50;
 
 	// get time now
 	// call dostime(nowtime);
 	nowtime = ostime().round(2);
 	// if no start time then no aborting (in initialisation and may be converting)
 	// or running a long maintenance process that must not be aborted
-	var starttime = SYSTEM.f(25);
+	let starttime = SYSTEM.f(25);
 	if (starttime == "") {
 		abortafterseconds = 99999;
 	}
@@ -42,7 +42,7 @@ function main() {
 	}
 
 	// determine processing time of current request
-	var processingtime = nowtime - starttime;
+	let processingtime = nowtime - starttime;
 
 	// quit if not a long process
 	if (processingtime < longprocesssecs) {
@@ -52,7 +52,7 @@ function main() {
 	// print 'long processing time: ':processingtime
 
 	// determine time since last sleep
-	var processingtime2 = nowtime - SYSTEM.f(26);
+	let processingtime2 = nowtime - SYSTEM.f(26);
 
 	// quit if not worked enough since last sleep
 
@@ -65,7 +65,7 @@ function main() {
 	if (not SYSTEM.f(48)) {
 
 		// allow (ncpus-1) processes to run at full speed
-		var nprocesslocks = SYSTEM.f(9) - 1;
+		let nprocesslocks = SYSTEM.f(9) - 1;
 		if (nprocesslocks) {
 			longprocesslockno = otherusers2(nprocesslocks);
 			SYSTEM(48) = longprocesslockno;
@@ -77,7 +77,7 @@ function main() {
 			cout << "elapsedsecs: "<< (processingtime2 * 1000).oconv("MD00P")<< " sleepeveryms:"<< sleepeverysecs * 1000<< " sleepingms:"<< sleepms<< " ...";
 			cout << processingtime.oconv("MD00P");
 			cout << " activems:";
-			var cmd = "WAITING.EXE Q$W$E$R$T$.Y$U 0 " ^ sleepms;
+			let cmd = "WAITING.EXE Q$W$E$R$T$.Y$U 0 " ^ sleepms;
 			// print cmd
 			cmd.osperform();
 			cout << endl;

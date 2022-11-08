@@ -12,13 +12,13 @@ var tt;
 
 function main() {
 
-	var update = 1;
+	let update = 1;
 
 	// keep approx nn Mb
-	var maxsize = 20 * 1024 * 1024;
+	let maxsize = 20 * 1024 * 1024;
 
 	// estimate based on size in last n days
-	var perioddays = 7;
+	let perioddays = 7;
 
 	var requestlog;
 	if (not(requestlog.open("REQUESTLOG", ""))) {
@@ -30,7 +30,7 @@ function main() {
 
 	// calculate the size of the last month of requestlog entries
 
-	var periodago = date() - perioddays;
+	let periodago = date() - perioddays;
 	select(requestlog);
 	var periodsize = 0;
 	var recn	   = 0;
@@ -78,13 +78,13 @@ stage2:
 		stop();
 	}
 
-	var nperiodskept = (maxsize / periodsize).oconv("MD10P");
+	let nperiodskept = (maxsize / periodsize).oconv("MD10P");
 	var ndayskept	 = (nperiodskept * perioddays).floor();
 	if (ndayskept gt 9999) {
-		var datekept = var("1/1/2000").iconv("D");
+		let datekept = var("1/1/2000").iconv("D");
 		ndayskept	 = date() - datekept + 1;
 	}
-	var datekept = date() - ndayskept;
+	let datekept = date() - ndayskept;
 
 	var tx = "TRIM REQUESTLOG";
 	tx(-1) = "";

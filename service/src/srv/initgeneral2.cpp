@@ -55,7 +55,7 @@ function main(in mode, io logtime, in menu) {
 		if (tt lt 17203) {
 
 			// to EXODUS only at the moment
-			var cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} EXODUS (ROS)";
+			let cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} EXODUS (ROS)";
 
 			// run once on first installation
 			tt = cmd;
@@ -121,7 +121,7 @@ function main(in mode, io logtime, in menu) {
 		configips.replacer(".*", "");
 		nn = configips.fcount(SM);
 		for (const var ii : range(nn, 1)) {
-			var ipno = configips.f(1, 1, ii);
+			let ipno = configips.f(1, 1, ii);
 			if (ipno.field(".", 1) eq "10") {
 				// OK
 			} else if (ipno.field(".", 1) eq "172") {
@@ -158,7 +158,7 @@ function main(in mode, io logtime, in menu) {
 		let osenv = osgetenv().converter("\r\n", _FM _FM);
 		// 		let nenv = osenv.fcount(FM);
 		// 		for (const var ii : range(1, nenv)) {
-		// 			var enventry = osenv.f(ii);
+		// 			let enventry = osenv.f(ii);
 		for (let enventry : osenv) {
 			if (not enventry)
 				continue;
@@ -166,8 +166,8 @@ function main(in mode, io logtime, in menu) {
 			// unless they start after the process global env is changed
 			if (THREADNO eq 1)
 				printl(THREADNO ^ ":", enventry);
-			var envkey = enventry.field("=", 1);
-			var envval = enventry.field("=", 2, 999999);
+			let envkey = enventry.field("=", 1);
+			let envval = enventry.field("=", 2, 999999);
 			if (not(SYSTEM.f(12).locate(envkey, vn))) {
 				SYSTEM(12, vn) = envkey;
 				SYSTEM(13, vn) = envval;
@@ -183,7 +183,7 @@ function main(in mode, io logtime, in menu) {
 		var baselinks	  = SYSTEM.f(114);
 		var baselinkdescs = SYSTEM.f(115);
 		if (not baselinks) {
-			var baselink = "System Configuration File";
+			let baselink = "System Configuration File";
 		}
 		if (not baselinkdescs) {
 			baselinkdescs = "Pending Configuration";
@@ -192,7 +192,7 @@ function main(in mode, io logtime, in menu) {
 		for (const var linkn : range(1, nlinks)) {
 			tt = baselinks.f(1, linkn);
 			if (tt) {
-				var tt2 = (field2(tt, "/", -1)).lcase();
+				let tt2 = (field2(tt, "/", -1)).lcase();
 				if (tt2.first(4).contains(".htm")) {
 					tt.cutter(-tt2.len());
 				}
@@ -217,7 +217,7 @@ function main(in mode, io logtime, in menu) {
 //			}
 //			if (not(conf.contains("NOTREQ"))) {
 //
-//				var cmd = "compact /C /S /F ..\\LOGS ..\\LOGS\\*.*";
+//				let cmd = "compact /C /S /F ..\\LOGS ..\\LOGS\\*.*";
 //				var(cmd ^ " DONE,NOTREQ").oswrite("..\\LOGS\\exodus.ini");
 //
 //				printl(cmd);
@@ -244,8 +244,8 @@ function main(in mode, io logtime, in menu) {
 
 			filenamesx.converter("\\", "/");
 
-			var cygwinbin = SYSTEM.f(50);
-			var cmd		  = cygwinbin ^ "gzip " ^ filenamesx;
+			let cygwinbin = SYSTEM.f(50);
+			let cmd		  = cygwinbin ^ "gzip " ^ filenamesx;
 
 			call log2("*compress logs with gzip to .gz" ^ filenamesx, logtime);
 			printl(cmd);
@@ -358,7 +358,7 @@ nextuser:
 		// initdir '..\VDM*.TMP'
 		// temps=dirlist()
 //		if (VOLUMES) {
-//			var temps  = oslistf("..\\vdm*.tmp");
+//			let temps  = oslistf("..\\vdm*.tmp");
 //			let ntemps = temps.fcount(FM);
 //			for (const var tempn : range(1, ntemps)) {
 //				("..\\" ^ temps.f(tempn)).osremove();
@@ -415,7 +415,7 @@ nextuser:
 
 //		if (VOLUMES) {
 //			item		= "List of Database _Processes";
-//			var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
+//			let onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
 //			// backslash
 //			onclick.converter("|", chr(92));
 //			call menusubs("ADDITEM", menutx, item, href, onclick);
@@ -487,7 +487,7 @@ nextuser:
 
 		menutx.replacer(FM, _EOL);
 
-		var menuosfilename = "../data/menu.htm";
+		let menuosfilename = "../data/menu.htm";
 		if (not(oldmenu.osread(menuosfilename))) {
 			oldmenu = "";
 		}

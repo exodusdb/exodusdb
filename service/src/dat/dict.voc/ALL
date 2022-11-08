@@ -5,7 +5,7 @@ S
 
 
 
-	var ans = ID ^ FM ^ RECORD;\
+	let ans = ID ^ FM ^ RECORD;\
 	return ans;
 L
 20

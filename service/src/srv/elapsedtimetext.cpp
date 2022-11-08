@@ -28,16 +28,16 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 		nsecs += 86400;
 	}
 
-	var weeks = (nsecs / 604800).floor();
+	let weeks = (nsecs / 604800).floor();
 	nsecs -= weeks * 604800;
 
-	var days = (nsecs / 86400).floor();
+	let days = (nsecs / 86400).floor();
 	nsecs -= days * 86400;
 
-	var hours = (nsecs / 3600).floor();
+	let hours = (nsecs / 3600).floor();
 	nsecs -= hours * 3600;
 
-	var minutes = (nsecs / 60).floor();
+	let minutes = (nsecs / 60).floor();
 	nsecs -= minutes * 60;
 
 	if (weeks) {

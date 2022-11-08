@@ -118,8 +118,8 @@ function main(out bakpars, in process0 = var()) {
 
 	// backup depending on configuration file
 	// if any database listed there
-	var dbcode	= process.f(17).lcase();
-	var dbcodes = process.f(58).lcase();
+	let dbcode	= process.f(17).lcase();
+	let dbcodes = process.f(58).lcase();
 
 //	if (dbcodes and VOLUMES) {
 //

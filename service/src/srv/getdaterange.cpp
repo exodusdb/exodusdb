@@ -18,7 +18,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 		uptoquestion = uptoquestion0;
 	}
 	if (ifromdate.unassigned()) {
-		var fromdate = "";
+		let fromdate = "";
 	}
 
 	if (fromquestion eq "") {
@@ -28,7 +28,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 		uptoquestion = "Up to date ?";
 	}
 	if (ifromdate eq "") {
-		var fromdate = date();
+		let fromdate = date();
 	}
 	if (defaultperiod.unassigned()) {
 		defaultperiod = "";
@@ -43,7 +43,7 @@ inpfromdate:
 		iuptodate = "";
 		return 0;
 	}
-	var ifromdate2 = iconv(fromdate, "[DATE,*4]");
+	let ifromdate2 = iconv(fromdate, "[DATE,*4]");
 	if (not ifromdate2) {
 		call mssg(fromdate ^ "  is not a valid date");
 		goto inpfromdate;
@@ -80,7 +80,7 @@ inpuptodate:
 		goto inpfromdate;
 	}
 
-	var iuptodate2 = iconv(uptodate, "[DATE,*4]");
+	let iuptodate2 = iconv(uptodate, "[DATE,*4]");
 	if (not iuptodate2) {
 		call mssg(uptodate ^ "  is not a valid date");
 		goto inpuptodate;

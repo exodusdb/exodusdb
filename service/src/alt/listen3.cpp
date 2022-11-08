@@ -28,13 +28,13 @@ function main(io filename, in mode, out filetitle, out triggers) {
 
 	// determine pre and post delete routines
 	var preread		  = "";
-	var prereadmode	  = "PREREAD";
+	let prereadmode	  = "PREREAD";
 	var postread	  = "";
-	var postreadmode  = "POSTREAD";
+	let postreadmode  = "POSTREAD";
 	var updatesubs	  = "";
-	var replaceread	  = "";
-	var replacewrite  = "";
-	var replacedelete = "";
+	let replaceread	  = "";
+	let replacewrite  = "";
+	let replacedelete = "";
 
 	// fix filenames from PICKOS to EXODUS style
 	if (not(VOLUMES)) {
