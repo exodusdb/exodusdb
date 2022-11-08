@@ -336,7 +336,8 @@ subroutine replace_FM_etc(io sql) {
 	// In case refactoring c++ code mangles pgsql code
 	//
 	// = is the SQL notation for "equals"
-	// sql.replacer(" eq ", " == ");
+	sql.replacer(" == ", " = ");
+	sql.replacer(" eq ", " = ");
 	//
 	// <> is the standard SQL notation for "not equal". != is an alias, which is converted to <> at a very early stage of parsing.
 	sql.replacer(" ne ", " != ");
