@@ -13,7 +13,7 @@ libraryinit()
 
 #include <request.hpp>
 
-var filename;
+//var filename;
 var key;
 var msg;
 var file;
@@ -52,18 +52,18 @@ function main(in mode) {
 	let uploadroot = SYSTEM.f(49);
 	// if uploadroot='' then uploadroot='..\images\'
 	// if uploadroot[-1,1] ne '\' then uploadroot:='\'
-	var virtualroot = "../images/";
-	virtualroot.converter("/", OSSLASH);
+	var relative_root = "../images/";
+	relative_root.converter("/", OSSLASH);
 
 	if (mode eq "POSTUPLOAD") {
 
-		filename		   = request_.f(3);
+		let filename	   = request_.f(3);
 		key				   = request_.f(4);
 		let targetfilename = request_.f(5);
 		let newstatus	   = request_.f(6);
 
 		// lock it
-		gosub lockfile();
+		gosub lockfile(filename);
 		if (msg) {
 			return invalid(msg);
 		}
@@ -72,7 +72,7 @@ function main(in mode) {
 		if (not(rec.read(file, key))) {
 			msg = "upload.subs cannot read " ^ filename ^ " " ^ key;
 postuploadfail:
-			gosub unlockfile();
+			gosub unlockfile(filename);
 			call  sysmsg(msg);
 			return invalid(msg);
 		}
@@ -105,7 +105,7 @@ postuploadfail:
 
 		rec.write(file, key);
 
-		gosub unlockfile();
+		gosub unlockfile(filename);
 
 	} else if (mode.field(".", 1) eq "MAKEUPLOADPATH") {
 
@@ -114,20 +114,20 @@ postuploadfail:
 		}
 
 		// additional option to check file and key is not locked
-		filename			= request_.f(3);
+		let filename		= request_.f(3);
 		key					= request_.f(4);
 		var ensurenotlocked = request_.f(5);
 		if (ensurenotlocked eq "undefined") {
 			ensurenotlocked = "";
 		}
 		if (filename and ensurenotlocked) {
-			gosub lockfile();
+			gosub lockfile(filename);
 			if (msg) {
 				// if we cant lock then why should be unlock?
 				// gosub unlockfile
 				return invalid(msg);
 			}
-			gosub unlockfile();
+			gosub unlockfile(filename);
 		}
 
 		var uploadpath = mode.field(".", 2, 9999).lcase();
@@ -139,7 +139,7 @@ postuploadfail:
 
 		if (uploadpath.cut(2).contains("..")) {
 			msg = uploadpath.quote() ^ " ..  is not allowed";
-			gosub unlockfile();
+			gosub unlockfile(filename);
 			return invalid(msg);
 		}
 
@@ -222,104 +222,94 @@ postuploadfail:
 
 		// MODE eg = "OPENUPLOAD.test\upload\jobs\j1003\7.Selection_206.png"
 
-		data_ = virtualroot;
-		// data<2>=filenames
+		// request_.f(3) can be "NEW" to delete the selected files
 
-		// var virtualfilebase = mode.field(".", 2, 9999).lcase(); //done below
-		var virtualfilebase = mode.field(".", 2, 9999);
+		// Returns:
+		//
+		// Field 1 = relative root e.g. ../images needed for browser to access image directly
+		data_ = relative_root;
+		// Field 2 = filenames VM separated
+		// Done below
+		//data_(2) = filenames
+
+
+		// Get relative file part
+		//
+		// Can receive the following which need to be prefixed by uploadroot
+		//
+		// ddd/ddd/7.       Deletes all files ddd/ddd/7.*
+		// ddd/ddd/fff      Deletes all files ddd/ddd/ffff*
+		// ddd/ddd/fff.png  Deletes one file  ddd/ddd/fff.png*
+		var relative_file_part = mode.field(".", 2, 9999);
 
 		// Convert \ and / to OSSLASH
-		virtualfilebase.converter("\\", "/");
-		virtualfilebase.converter("/", OSSLASH);
+		relative_file_part.converter("\\", "/");
+		relative_file_part.converter("/", OSSLASH);
 		// fixed in UI now
-		// convert '\/:*?<>|' to '--------' in virtualfilebase
-		// convert '"' to "'" in virtualfilebase
+		// convert '\/:*?<>|' to '--------' in relative_file_part
+		// convert '"' to "'" in relative_file_part
 
-		if (virtualfilebase.contains(OSSLASH)) {
-			// uploadpath=field(virtualfilebase,OSSLASH,1,count(virtualfilebase,OSSLASH))
-		} else {
-			// uploadpath='*'
-			// virtualfilebase='*'
-		}
-
-		// lcase upload path (not filenames which must retain case)
-		let filename = virtualfilebase.field2(OSSLASH, -1, 1);
-		// virtualfilebase.lcaser().paster(-len(filename), filename);
-		// virtualfilebase.lcaser().pasterall(-len(filename), filename);
-		virtualfilebase.lcaser();
-		// virtualfilebase.cutter(-len(filename)) ^= filename;
-		virtualfilebase.cutter(-len(filename));
-		virtualfilebase ^= filename;
-
-		// search for extensions
-		// may be only one extension now
-		var dirpatt = uploadroot ^ virtualfilebase;
-
-		// if dirpatt[-1,1]<>'.' then dirpatt:='.'
-		dirpatt ^= "*";
-
-		if (dirpatt.cut(2).contains("..")) {
-			msg = dirpatt.quote() ^ " .. is not allowed";
+		// Prevent uploading to anything with ".." in it (security risk)
+		if (relative_file_part.contains("..")) {
+			msg = relative_file_part.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
 
-		// why does % come encoded as %25?
-		dirpatt.replacer("%25", "%");
+		// Lower case the upload path but NOT the filename part which must retain case
+		//////////////////////////////////////////////////////////////////////////////
 
+		// 1. Extract the file name part only
+		let filename_part = relative_file_part.field2(OSSLASH, -1);
+
+		// 2. Remove the trailing file name part
+		relative_file_part.cutter(-len(filename_part));
+
+		// 3. Lower case the relative path
+		relative_file_part.lcaser();
+
+		// 4. Capture the relative path
+		var relative_path = relative_file_part;
+
+		// 5. Restore the file name part onto the end of the relative path
+		relative_file_part ^= filename_part;
+
+		// Search for extensions and p
+		// May be only one extension now
+		var dir_pattern = uploadroot ^ relative_file_part ^ "*";
+
+		// if dir_pattern[-1,1]<>'.' then dir_pattern:='.'
+
+		// why does % come encoded as %25?
+		dir_pattern.replacer("%25", "%");
+
+		var uploadfilenames = oslistf(dir_pattern);
+
+		// Option to DELETE all the files found
+		///////////////////////////////////////
 		if (request_.f(3) eq "NEW") {
-			if (oslistf(dirpatt)) {
-				//var cmd = "rm " ^ (dirpatt.quote());
-				//osshell(cmd);
-				//if (not osshell(cmd)) {
-				//	loglasterror();
-				if (osfile(dirpatt) and not dirpatt.osremove()) {
+			for (let file : uploadfilenames) {
+				if (not osremove(uploadroot ^ relative_path ^ file)) {
 					abort(lasterror());
 				}
 			}
 			return 0;
 		}
 
-		var uploadfilenames = oslistf(dirpatt);
-
-		// check one or more files exist
-		// if uploadfilenames else
-		// msg='UPLOAD_NOT_FOUND'
-		// goto invalid
-		// end
-
-		// select extensions if many .jpg .gif .mpg etc.
-		// insert the missing virtual path
+		// Select extensions if many .jpg .gif .mpg etc.
+		// insert the missing relative_ path
 		if (uploadfilenames) {
 
 			let nuploads = uploadfilenames.fcount(_FM);
-			let ndeep	 = virtualfilebase.fcount(OSSLASH);
+			let ndeep	 = relative_file_part.fcount(OSSLASH);
 			for (const var uploadn : range(1, nuploads)) {
 				var uploadfilename		 = uploadfilenames.f(uploadn);
-				uploadfilename			 = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
+				uploadfilename			 = relative_file_part.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
 				uploadfilenames(uploadn) = uploadfilename;
 			}  // uploadn;
 			uploadfilenames.converter(_FM, _VM);
 		}
 
 		data_(2) = uploadfilenames;
-
-		// no longer required since updated in PLAN.SUBS POSTREAD
-		// since VIEW/OPENUPLOAD is no longer being called automatically after upload
-		// hack to register material uploads after uploading (relies on view after)
-		// only materials upload directly into images folder
-		// hack since a media file should not be referred to in GBP upload.subs
-		// if index(virtualfilebase,'/',1) else
-		// open 'MATERIALS' to materials then
-		//  materialid=virtualfilebase
-		//  read material from materials,materialid then
-		//   if material<16> ne uploadfilenames then
-		//    material<16>=uploadfilenames
-		//    *write without lock - any user updating it save will be blocked - but unlikely
-		//    write material on materials,materialid
-		//    end
-		//   end
-		//  end
-		// end
 
 	} else if (mode.field(".", 1) eq "DELETEUPLOAD") {
 
@@ -370,7 +360,7 @@ postuploadfail:
 		let startatrown	  = RECORD.f(2);
 		let headertype	  = RECORD.f(3);
 		lengthx			  = RECORD.f(4);
-		filename		  = RECORD.f(5);
+		let filename	  = RECORD.f(5);
 		var dictfilename  = RECORD.f(6);
 		var dictcolprefix = RECORD.f(7).ucase();
 		var keydictid	  = RECORD.f(8);
@@ -718,7 +708,7 @@ addbuff:
 	return;
 }
 
-subroutine lockfile() {
+subroutine lockfile(in filename) {
 	msg = "";
 	if (not(file.open(filename, ""))) {
 		msg = filename.quote() ^ " file cannot be opened";
@@ -727,7 +717,7 @@ subroutine lockfile() {
 
 	let waitsecs = 3;
 	if (not(lockrecord(filename, file, key, recordx, waitsecs, allowduplicate))) {
-		gosub unlockfile();
+		gosub unlockfile(filename);
 		msg			 = "Cannot upload at the moment because";
 		msg(-1)		 = filename ^ " " ^ (key.quote()) ^ " is being updated by ";
 		let lockuser = (filename ^ "*" ^ key).xlate("LOCKS", 4, "X");
@@ -741,7 +731,7 @@ subroutine lockfile() {
 	return;
 }
 
-subroutine unlockfile() {
+subroutine unlockfile(in filename) {
 	call unlockrecord(filename, file, key);
 	return;
 }
