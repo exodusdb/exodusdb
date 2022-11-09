@@ -15,15 +15,15 @@ var mode;
 var datasetparams;
 var msg;
 var datasetcodes;
-var xx;
+//var xx;
 var usercode;
-var usern0;	 // num
-var usern;	 // num
+//var usern0;	 // num
+//var usern;	 // num
 var depts;
 var reply;
-var tt;
-var no;		 // num
-var nusers;	 // num
+//var tt;
+//var no;		 // num
+//var nusers;	 // num
 var deptn;
 var directory;
 var lastbackup;
@@ -56,7 +56,7 @@ function main(in mode0) {
 
 		gosub getdatasets();
 
-		if (not(datasetcodes.f(1).locate(req.is, xx))) {
+		if (not datasetcodes.f(1).locate(req.is)) {
 			msg = req.is.quote() ^ " is not a dataset";
 			return invalid(msg);
 		}
@@ -78,28 +78,37 @@ function main(in mode0) {
 
 	} else if (mode == "GETGROUPUSERS") {
 
-		var groupusers = "";
-		if (SECURITY.f(1).locate(USERNAME, usern0)) {
-			// add lower users in group
-			for (usern = usern0 + 1; usern <= 9999; ++usern) {
-				usercode = SECURITY.f(1, usern);
-				// /BREAK;
-				if (not(usercode and usercode ne "---"))
-					break;
-				groupusers ^= VM ^ usercode;
-			}  // usern;
-			// add higher users in group
-			for (usern = usern0 - 1; usern >= 1; --usern) {
-				usercode = SECURITY.f(1, usern);
-				// /BREAK;
-				if (not(usercode ne "---"))
-					break;
-				groupusers ^= VM ^ usercode;
-			}  // usern;
+		// Gets other users above and below the user, in the same group,
+		// excluding the specified user.
+
+		var usern0;
+		if (not SECURITY.f(1).locate(USERNAME, usern0)) {
+			ANS = "";
+			return 0;
 		}
 
-		ANS = groupusers;
-		ANS.cutter(1);
+		var groupusers = "";
+
+		// Add lower users in group
+		//for (usern = usern0 + 1; usern <= 9999; ++usern) {
+		for (let usern : range(usern0 + 1, 999999)) {
+			usercode = SECURITY.f(1, usern);
+			// /BREAK;
+			if (usercode eq "" or usercode eq "---")
+				break;
+			groupusers ^= usercode ^ VM;
+		}  // usern;
+
+		// Add higher users in group
+		for (var usern = usern0 - 1; usern >= 1; --usern) {
+			usercode = SECURITY.f(1, usern);
+			// /BREAK;
+			if (usercode eq "---")
+				break;
+			groupusers ^= usercode ^ VM;
+		}  // usern;
+
+		ANS = groupusers.pop();
 
 	} else if ((mode.field(".", 1, 2) == "DEF.SK") or (mode.field(".", 1, 2) == "DEF.SK2")) {
 
@@ -118,14 +127,15 @@ function main(in mode0) {
 			}
 
 			// convert SK in datafile to SK in definitions
-			if (not(no.readf(DEFINITIONS, req.datafile ^ ".SK", 1))) {
-				if (no.readf(req.srcfile, "%SK%", 1)) {
+			var sk;
+			if (not(sk.readf(DEFINITIONS, req.datafile ^ ".SK", 1))) {
+				if (sk.readf(req.srcfile, "%SK%", 1)) {
 					req.srcfile.deleterecord("%SK%");
 
 				} else {
-					no = 1;
+					sk = 1;
 				}
-				no.writef(DEFINITIONS, req.datafile ^ ".SK", 1);
+				sk.writef(DEFINITIONS, req.datafile ^ ".SK", 1);
 			}
 
 next:
@@ -133,6 +143,7 @@ next:
 			let params = ":" ^ req.datafile ^ ".SK:DEFINITIONS";
 
 			req.isdflt = nextkey(params, "");
+			var xx;
 			if (xx.read(req.srcfile, req.isdflt)) {
 				if (req.isdflt.isnum()) {
 					req.isdflt += 1;
@@ -154,12 +165,13 @@ next:
 }
 
 subroutine getdatasets() {
+
 	var dospath = oscwd().first(2) ^ "../data/";
 	dospath.converter("/", OSSLASH);
 
 	let dosfilename = APPLICATION ^ ".vol";
-	if (not(directory.osread(dosfilename))) {
-		if (not(directory.osread(APPLICATION ^ ".vox"))) {
+	if (not directory.osread(dosfilename)) {
+		if (not directory.osread(APPLICATION ^ ".vox")) {
 			call mssg(APPLICATION ^ ".vol is missing");
 			stop();
 		}
@@ -194,17 +206,18 @@ subroutine getdatasets() {
 		let temp		= datasetparams.f(1, datasetn);
 		let datasetcode = temp.f(1, 1, 2);
 		var datasetname = temp.f(1, 1, 1);
-		tt				= "../data/" ^ datasetcode.lcase() ^ "/general/revmedia.lk";
-		tt.converter("/", OSSLASH);
-		if (not(tt.osfile())) {
+
+		//var tt			= "../data/" ^ datasetcode.lcase() ^ "/general/revmedia.lk";
+		//tt.converter("/", OSSLASH);
+		//if (not tt.osfile()) {
 			datasetname					  = "*" ^ datasetname;
 			datasetparams(1, datasetn, 1) = datasetname;
-		}
+		//}
 		datasetcodes(1, datasetn) = datasetcode;
 		datasetnames(1, datasetn) = datasetname;
-		tt						  = "../data/" ^ temp.f(1, 1, 2).lcase() ^ "/params2";
-		tt.converter("/", OSSLASH);
-		if (not(lastbackup.osread(tt))) {
+		var osfilename			  = "../data/" ^ temp.f(1, 1, 2).lcase() ^ "/params2";
+		osfilename.converter("/", OSSLASH);
+		if (not lastbackup.osread(osfilename)) {
 			lastbackup = "";
 		}
 		lastbackup					  = lastbackup.f(2);
@@ -215,28 +228,35 @@ subroutine getdatasets() {
 }
 
 subroutine getuserdept2() {
-	// locate the user in the table
-	usercode = mode.field(",", 2);
-	if (not(SECURITY.f(1).locate(usercode, usern))) {
+
+	// Locate the user in the table otherwise department is ""
+	let usercode = mode.field(",", 2);
+	var usern0;
+	if (not SECURITY.f(1).locate(usercode, usern0)) {
+
+		// If EXODUS user isnt in the table then its dept is also EXODUS
 		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return;
-		} else {
-			ANS = "";
-			return;
 		}
+
+		ANS = "";
+		return;
 	}
 
-	// locate divider, or usern+1
-	nusers = SECURITY.f(1).fcount(VM);
-	for (usern = 1; usern <= nusers; ++usern) {
-		// /BREAK;
-		if (SECURITY.f(1, usern) == "---")
-			break;
+	// Locate the next "---" divider
+	// and return the department code/name above it
+	let nusers = SECURITY.f(1).fcount(VM);
+	for (let usern : range(usern0 + 1, nusers)) {
+		if (SECURITY.f(1, usern) == "---") {
+			ANS = SECURITY.f(1, usern - 1);
+			return;
+		}
 	}  // usern;
 
-	// get the department code
-	ANS = SECURITY.f(1, usern - 1);
+	// Otherwise get the last user as the department code
+	// TODO Should this be ""
+	ANS = SECURITY.f(1, nusers);
 	return;
 }
 

@@ -20,7 +20,7 @@ libraryinit()
 #include <req_common.h>
 
 var usern;	// num
-var xx;
+//var xx;
 var userencrypt0;
 var validips;
 var addvalidips;
@@ -108,7 +108,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				// only if email address occurs more than once
 				tt(1, usern) = "";
 				tt.converter("; ", _VM);
-				if (not(tt.locate(password.ucase(), xx))) {
+				if (not(tt.locate(password.ucase()))) {
 					username = SECURITY.f(1, usern);
 				}
 			}
@@ -324,7 +324,8 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					// 2. otherwise add allowable connection from 127.* always
 					// 3. trailing space indicates defaults and wild cards expanded
 					//   and can use cache
-					if (validips.locateusing(" ", "*", xx)) {
+					//if (validips.locateusing(" ", "*", xx)) {
+					if (validips.locateusing(" ", "*")) {
 						validips = " ";
 					} else {
 						validips ^= " 127 ";
@@ -354,10 +355,10 @@ checkip:
 					// look for 192.168 first since most common
 					// then full ip number, then first bit (eg 10), then 1.2.3 last
 					let ip2 = ipno.field(".", 1, 2);
-					if (not(validips.locateusing(" ", ip2, xx))) {
-						if (not(validips.locateusing(" ", ipno, xx))) {
-							if (not(validips.locateusing(" ", ipno.field(".", 1), xx))) {
-								if (not(validips.locateusing(" ", ipno.field(".", 1, 3), xx))) {
+					if (not(validips.locateusing(" ", ip2))) {
+						if (not(validips.locateusing(" ", ipno))) {
+							if (not(validips.locateusing(" ", ipno.field(".", 1)))) {
+								if (not(validips.locateusing(" ", ipno.field(".", 1, 3)))) {
 invalidip:
 									invalidlogin = username ^ " is not authorised to login from this location (IP Number: " ^ ipno ^ ")";
 									invalidlogin ^= "|Allowed:" ^ (validips.quote());
@@ -376,7 +377,7 @@ invalidip:
 					if (username eq "EXODUS" and not(SYSTEM.f(17).contains("DEMO"))) {
 						if (ip2 eq "192.168") {
 exoduslocalip:
-							if (validips.locateusing(" ", ipno, xx)) {
+							if (validips.locateusing(" ", ipno)) {
 								goto invalidip;
 							}
 						} else {
@@ -461,6 +462,7 @@ exoduslocalip:
 passwordexpired:
 
 							// some users may be allowed to login rarely without password renewal
+							var xx;
 							if (not(authorised("AUTHORISATION PASSWORD NEVER EXPIRES", xx, "EXODUS", username))) {
 								invalidlogin = "Password has expired. Get a new one using Password Reset";
 								goto validateexit;
@@ -529,7 +531,7 @@ passwordexpired:
 					if (username ne "EXODUS" or isdevsys) {
 
 						let ulogins = userx.f(18);
-						if (ulogins.locate("OK", xx)) {
+						if (ulogins.locate("OK")) {
 
 							// if ipno unrestricted
 							if (validips eq " " or isdevsys) {
@@ -801,6 +803,7 @@ validateexit2:
 					body(-1)	   = "System: " ^ SYSTEM.f(44);
 
 					body.replacer(_FM, "\r\n");
+					var xx;
 					call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
 					// "Password Reset" is hardcoded in index.htm
@@ -1109,7 +1112,8 @@ subroutine becomeuserandconnection(in request2, in request4) {
 							// USER UPDATE "REPORT HEAD"
 							// USER UPDATE "REPORT HEAD COLOR"
 							// etc
-							if (not(authorised("USER UPDATE " ^ (fieldname.field(" ", ii).quote()), xx))) {
+							var xx;
+							if (not authorised("USER UPDATE " ^ (fieldname.field(" ", ii).quote()), xx)) {
 								tt2 = "";
 							}
 						}  // ii;
@@ -1150,9 +1154,10 @@ subroutine addwhoistx() {
 }
 
 subroutine switchcompany() {
-	if (not(ucomps.locate(srv.gcurrcompcode, xx))) {
+	if (not ucomps.locate(srv.gcurrcompcode)) {
 		let tc = ucomps.f(1, 1);
-		if (xx.read(srv.companies, tc)) {
+		var tt;
+		if (tt.read(srv.companies, tc)) {
 			call initcompany(tc);
 		}
 	}

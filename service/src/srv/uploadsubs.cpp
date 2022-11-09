@@ -31,7 +31,7 @@ var csv;
 //var ptr;  // num
 //var ncols;
 var dictfile;
-var xx;
+//var xx;
 var cell;
 var temp;
 var nquotes;  // num
@@ -549,11 +549,11 @@ nextline:
 					let nn	 = dictid.fcount("_");
 					for (const var ii : range(1, nn)) {
 						let word = dictid.field("_", ii);
-						if (datewords.locate(word, xx)) {
+						if (datewords.locate(word)) {
 							CONV = "[DATE,4*]";
 							just = "R";
 						} else {
-							if (timewords.locate(word, xx)) {
+							if (timewords.locate(word)) {
 								CONV = "[TIME2,48MTS]";
 								just = "R";
 							}
