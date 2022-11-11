@@ -100,8 +100,8 @@ function main() {
 			printl("Cant read ", key, " back");
 	}
 
-	var rec;
-	if (not read(rec, dictfile, "BALANCE"))
+	var temprec;
+	if (not read(temprec, dictfile, "BALANCE"))
 		printl("Cant read 'balance' record from dictionary");
 
 	printl("\nNB 'name_and_type' dictionary item S type calls dict_xo_clients.cpp library function!");
@@ -125,7 +125,7 @@ function main() {
 
 	printl("\nWrite the data records to the data file");
 
-	let maxrec = 100;
+	//let maxrec = 100;
 
 	for (var rec : recs) {
 		var key = field(rec, "|", 1);
