@@ -37,7 +37,7 @@ var reply2;
 var tt;	 // num
 var colors;
 var reportkey;
-var tt2;  // num
+//var tt2;  // num
 var s33;
 var smtp;
 var bakpars;
@@ -615,14 +615,15 @@ nextreport:
 	if (not(SYSTEM.read(DEFINITIONS, "SYSTEM"))) {
 		SYSTEM = "";
 	}
-	tt	= "system.cfg";
-	tt2 = 2;
-	gosub getsystem();
+//	tt	= "system.cfg";
+//	tt2 = 2;
+	gosub getsystem("system.cfg", 2);
+
 	var	  tpath = "../../";
 	tpath.converter("/", OSSLASH);
 	tt	= tpath ^ "system.cfg";
-	tt2 = 1;
-	gosub getsystem();
+//	tt2 = 1;
+	gosub getsystem(tt, 1);
 
 	// //c++ only
 	// SYSTEM(58) = oslistd("../data/").convert(FM,VM);
@@ -1637,12 +1638,12 @@ adddatasetcodename:
 		}
 
 		// update software version in database
-		tt2 = "VERSION*LASTEMAILED";
-		if (not(tt.read(DEFINITIONS, tt2))) {
+		let lastupdate_key = "VERSION*LASTEMAILED";
+		if (not(tt.read(DEFINITIONS, lastupdate_key))) {
 			tt = "";
 		}
 		if (tt ne versioninstalled) {
-			versioninstalled.write(DEFINITIONS, tt2);
+			versioninstalled.write(DEFINITIONS, lastupdate_key);
 
 			// email users on live systems LISTED IN SYSTEM CONFIGURATION only
 			if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
@@ -1707,13 +1708,14 @@ adddatasetcodename:
 	return "";
 }
 
-subroutine getsystem() {
-	call log2("*get " ^ tt ^ " parameters", logtime);
-	if (not(systemx.osread(tt))) {
+subroutine getsystem(in config_osfilename, in confign) {
+
+	call log2("*get " ^ config_osfilename ^ " parameters", logtime);
+	if (not systemx.osread(config_osfilename)) {
 		return;
 	}
 
-	// ensure default style is null
+	// Ensure default style is null
 	var tt3 = systemx.f(46);
 	tt3.converter(VM, "");
 	tt3.replacer("Default", "");
@@ -1722,16 +1724,16 @@ subroutine getsystem() {
 	}
 
 	// parameters in the exodus\system file override params from definitions
-	// ie global installation parameters override dataset parameters
-	let ni = systemx.fcount(FM);
-	for (const var ii : range(1, ni)) {
-		if (systemx.f(ii).len()) {
-			SYSTEM(ii) = systemx.f(ii);
+	// i.e. global installation parameters override dataset parameters
+	let nfs = systemx.fcount(FM);
+	for (const var fn : range(1, nfs)) {
+		if (systemx.f(fn).len()) {
+			SYSTEM(fn) = systemx.f(fn);
 		}
-	}  // ii;
+	}  // fn;
 
 	// save config file time so can detect if restart required
-	SYSTEM(100, tt2) = tt.osfile().f(3);
+	SYSTEM(100, confign) = config_osfilename.osfile().f(3);
 
 	return;
 }
