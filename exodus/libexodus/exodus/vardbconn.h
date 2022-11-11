@@ -128,12 +128,17 @@ class DBConnector final {
 	///////////////
 
 	int add_dbconn(PGconn* connection_with_file, const std::string conninfo);
+
+	// Singular version deletes one
 	void del_dbconn(const int dbconn_no);
+
+	// Plural version deletes many
 	void del_dbconns(const int from_dbconn_no);
 
 	// observers
 	////////////
 
+	int max_dbconn_no();
 	PGconn* get_pgconn(const int dbconn_no) const;
 	DBConn* get_dbconn(const int dbconn_no) const;
 

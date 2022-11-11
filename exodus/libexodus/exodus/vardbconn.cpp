@@ -178,4 +178,8 @@ DBConnector::~DBConnector() {
 	// lock.unlock();
 }
 
+int DBConnector::max_dbconn_no() {
+	return dbconn_no_;
+}
+
 }  // namespace exodus

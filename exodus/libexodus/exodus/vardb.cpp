@@ -494,98 +494,94 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 		return dbconn_no;
 
 	// otherwise get the default connection
+	if (DBTRACE_CONN >= 3 and dbhandle.assigned())
+		TRACE(dbhandle);
+
+	//dbhandle MUST always arrive in lower case to detect if "dict."
+	bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
+	//bool isdict = dbhandle.unassigned() ? false : (dbhandle.starts("dict.") || dbhandle.starts("DICT."));
+	//bool isdict = false;
+
+	if (isdict)
+		dbconn_no = thread_default_dict_dbconn_no;
+	else
+		dbconn_no = thread_default_data_dbconn_no;
+
+	if (DBTRACE_CONN >= 3 ) {
+		TRACE(thread_default_data_dbconn_no);
+		TRACE(thread_default_dict_dbconn_no);
+		if (dbhandle.assigned()) TRACE(dbhandle);
+		TRACE(dbconn_no);
+	}
+
+	// otherwise try the default connection
 	if (!dbconn_no) {
 
-		if (DBTRACE_CONN and dbhandle.assigned())
-			TRACE(dbhandle);
+		var defaultdb;
 
-		//dbhandle MUST always arrive in lower case to detect if "dict."
-		bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
-		//bool isdict = dbhandle.unassigned() ? false : (dbhandle.starts("dict.") || dbhandle.starts("DICT."));
-		//bool isdict = false;
+		//look for dicts in the following order
+		//1. $EXO_DICT if defines
+		//2. db "dict" if present
+		//3. the default db connection
+		if (isdict) {
+			if (not defaultdb.osgetenv("EXO_DICT") or not defaultdb)
+				//must be the same in mvdbpostgres.cpp and dict2sql
+				defaultdb="exodus";
+		} else {
+			defaultdb = "";
+		}
 
-		if (isdict)
-			dbconn_no = thread_default_dict_dbconn_no;
-		else
+		if (DBTRACE_CONN >= 3)
+			TRACE(defaultdb);
+
+		//try to connect
+		if (defaultdb.connect()) {
+			dbconn_no = get_dbconn_no(defaultdb);
+
+			if (DBTRACE_CONN >= 3 )
+				TRACE("defaultdb connected");
+
+		//if cannot connect then for dictionaries look on default connection
+		} else if (isdict) {
+
+			//attempt a default connection if not already done
+			if (!thread_default_data_dbconn_no) {
+				defaultdb = "";
+				if (not defaultdb.connect()) {
+					//null
+				}
+			}
+
 			dbconn_no = thread_default_data_dbconn_no;
 
-		if (DBTRACE_CONN) {
-			TRACE(thread_default_data_dbconn_no);
-			TRACE(thread_default_dict_dbconn_no);
-			if (dbhandle.assigned()) TRACE(dbhandle);
+			if (DBTRACE_CONN >= 3)
+				TRACE(thread_default_data_dbconn_no);
+
+		}
+
+		if (DBTRACE_CONN >= 3)
 			TRACE(dbconn_no);
-		}
 
-		// otherwise try the default connection
-		if (!dbconn_no) {
-
-			var defaultdb;
-
-			//look for dicts in the following order
-			//1. $EXO_DICT if defines
-			//2. db "dict" if present
-			//3. the default db connection
-			if (isdict) {
-				if (not defaultdb.osgetenv("EXO_DICT") or not defaultdb)
-					//must be the same in mvdbpostgres.cpp and dict2sql
-					defaultdb="exodus";
-			} else {
-				defaultdb = "";
-			}
-
-			if (DBTRACE_CONN)
-				TRACE(defaultdb);
-
-			//try to connect
-			if (defaultdb.connect()) {
-				dbconn_no = get_dbconn_no(defaultdb);
-
-				if (DBTRACE_CONN)
-					TRACE("defaultdb connected");
-
-			//if cannot connect then for dictionaries look on default connection
-			} else if (isdict) {
-
-				//attempt a default connection if not already done
-				if (!thread_default_data_dbconn_no) {
-					defaultdb = "";
-					if (not defaultdb.connect()) {
-						//null
-					}
-				}
-
-				dbconn_no = thread_default_data_dbconn_no;
-
-				if (DBTRACE_CONN)
-					TRACE(thread_default_data_dbconn_no);
-
-			}
-
-			if (DBTRACE_CONN)
-				TRACE(dbconn_no);
-
-			//save default dict/data connections
-			if (isdict) {
-				thread_default_dict_dbconn_no = dbconn_no;
-				if (DBTRACE or DBTRACE_CONN) {
-					var(dbconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
-				}
-			}
-			else {
-				thread_default_data_dbconn_no = dbconn_no;
-				if (DBTRACE or DBTRACE_CONN) {
-					var(dbconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
-				}
+		//save default dict/data connections
+		if (isdict) {
+			thread_default_dict_dbconn_no = dbconn_no;
+			if (DBTRACE or DBTRACE_CONN) {
+				var(dbconn_no).logputl("DBTR NEW DEFAULT DICT CONN ");
 			}
 		}
-
-		//save the connection number in the dbhandle
-		//if (dbconn_no) {
-		//	dbhandle.unassigned("");
-		//	dbhandle.r(2, dbconn_no);
-		//}
-
+		else {
+			thread_default_data_dbconn_no = dbconn_no;
+			if (DBTRACE or DBTRACE_CONN) {
+				var(dbconn_no).logputl("DBTR NEW DEFAULT DATA CONN ");
+			}
+		}
 	}
+
+	//save the connection number in the dbhandle
+	//if (dbconn_no) {
+	//	dbhandle.unassigned("");
+	//	dbhandle.r(2, dbconn_no);
+	//}
 
 	return dbconn_no;
 }
@@ -819,6 +815,10 @@ bool var::connect(CVR conninfo) {
 	assertDefined(function_sig);
 	ISSTRING(conninfo)
 
+	if (DBTRACE or DBTRACE_CONN) {
+		TRACE(__PRETTY_FUNCTION__);
+		TRACE(conninfo)
+	}
 	var fullconninfo = conninfo.trimboth();
 
 	//use *this if conninfo not specified;
@@ -827,6 +827,14 @@ bool var::connect(CVR conninfo) {
 		if (this->assigned())
 			fullconninfo = *this;
 		isdefault = !fullconninfo;
+		if (DBTRACE_CONN) {
+			TRACE(fullconninfo)
+			TRACE(isdefault)
+			TRACE(thread_default_data_dbconn_no)
+		}
+		if (isdefault && thread_default_data_dbconn_no) {
+			return thread_default_data_dbconn_no;
+		}
 	}
 
 	//add dbname= if missing
@@ -835,9 +843,9 @@ bool var::connect(CVR conninfo) {
 
 	fullconninfo = build_conn_info(fullconninfo);
 
-	if (DBTRACE) {
-		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
-		conninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect( ) ");
+	if (DBTRACE_CONN) {
+		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect( ) ");
+		fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("\nvar::connect( ) ");
 	}
 
 	PGconn* pgconn;
@@ -896,18 +904,22 @@ bool var::connect(CVR conninfo) {
 
 	// cache the new connection handle
 	int dbconn_no = thread_dbconnector.add_dbconn(pgconn, fullconninfo.var_str);
+	if (DBTRACE_CONN) {
+		TRACE(thread_default_data_dbconn_no)
+		TRACE(thread_default_dict_dbconn_no)
+	}
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
 	if (not this->f(1))
 		//this->r(1,fullconninfo.field(" ",1));
-		this->r(1,fullconninfo.field2("dbname=",-1).field(" ",1));
-	this->r(2, dbconn_no);
-	this->r(3, dbconn_no);
+		this->r(1,fullconninfo.field2("dbname=", -1).field(" ", 1));
+	(*this)(2) = dbconn_no;
+	(*this)(3) = dbconn_no;
 
-	if (DBTRACE) {
-		fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("DBTR var::connect() OK ");
-		this->logput("DBTR var::connect() OK ");
+	if (DBTRACE_CONN) {
+		fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect() OK ");
+		this->logput("var::connect() OK ");
 		std::clog << " " << pgconn << std::endl;
 	}
 
@@ -916,8 +928,8 @@ bool var::connect(CVR conninfo) {
 	// set default connection - ONLY IF THERE ISNT ONE ALREADY
 	if (isdefault && !thread_default_data_dbconn_no) {
 		thread_default_data_dbconn_no = dbconn_no;
-		if (DBTRACE) {
-			this->logputl("DBTR NEW DEFAULT DATA CONN " ^ var(dbconn_no) ^ " on ");
+		if (DBTRACE_CONN) {
+			this->logputl("NEW DEFAULT DATA CONN " ^ var(dbconn_no) ^ " on ");
 		}
 
 	}
@@ -1008,40 +1020,59 @@ void var::disconnect() {
 	THISIS("bool var::disconnect()")
 	assertDefined(function_sig);
 
-	if (DBTRACE)
+	if (DBTRACE or DBTRACE_CONN)
 		(this->assigned() ? *this : var("")).logputl("DBTR var::disconnect() ");
 
+	// Disconnect the specified connection or default data connection
 	var dbconn_no = get_dbconn_no(*this);
 	if (!dbconn_no)
 		dbconn_no = thread_default_data_dbconn_no;
 
-	if (dbconn_no) {
+	// Quit if no connection
+	if (not dbconn_no)
+		return;
 
-		//disconnect
-		// note singular form of dbconn
-		thread_dbconnector.del_dbconn(dbconn_no);
-		var_typ = VARTYP_UNA;
+	//disconnect
+	// note singular form of dbconn
+	thread_dbconnector.del_dbconn(dbconn_no);
+	var_typ = VARTYP_UNA;
 
-		// if we happen to be disconnecting the same connection as the default connection
-		// then reset the default connection so that it will be reconnected to the next
-		// connect this is rather too smart but will probably do what people expect
-		if (dbconn_no == thread_default_data_dbconn_no) {
-			thread_default_data_dbconn_no = 0;
-			if (DBTRACE) {
-				var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
-			}
-		}
-
-		// if we happen to be disconnecting the same connection as the default connection FOR DICT
-		// then reset the default connection so that it will be reconnected to the next
-		// connect this is rather too smart but will probably do what people expect
-		if (dbconn_no == thread_default_dict_dbconn_no) {
-			thread_default_dict_dbconn_no = 0;
-			if (DBTRACE) {
-				var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
-			}
+	// if we happen to be disconnecting the same connection as the default connection
+	// then reset the default connection so that it will be reconnected to the next
+	// connect this is rather too smart but will probably do what people expect
+	if (dbconn_no == thread_default_data_dbconn_no) {
+		thread_default_data_dbconn_no = 0;
+		if (DBTRACE or DBTRACE_CONN) {
+			var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
 		}
 	}
+
+	// if we happen to be disconnecting the same connection as the default connection FOR DICT
+	// then reset the default connection so that it will be reconnected to the next
+	// connect this is rather too smart but will probably do what people expect
+	if (dbconn_no == thread_default_dict_dbconn_no) {
+		thread_default_dict_dbconn_no = 0;
+		if (DBTRACE or DBTRACE_CONN) {
+			var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
+		}
+	}
+
+	// Remove all cached files handles referring to the disconnected connection
+	std::erase_if(
+		thread_file_handles,
+		[dbconn_no](auto iter){
+			var filehandle = iter.second;
+			// Don't erase if not the desired dbconn_no
+			if (filehandle.f(2) != dbconn_no)
+				return false;
+			if (DBTRACE_CONN >= 3) {
+				var(iter.second).logputl("var::disconnect() remove cached filehandle ");
+			}
+			// Do erase this file handle cache entry
+			return true;
+		}
+	);
+
 	return;
 }
 
@@ -1057,22 +1088,34 @@ void var::disconnectall() {
 	if (DBTRACE)
 		dbconn_no.logputl("DBTR var::disconnectall() >= ");
 
-	//note the plural for of dbconns
+//	// Note the plural for dbconn"S" to delete all starting from
+//	thread_dbconnector.del_dbconns(dbconn_no);
+//
+//	if (thread_default_data_dbconn_no >= dbconn_no) {
+//		thread_default_data_dbconn_no = 0;
+//		if (DBTRACE) {
+//			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
+//		}
+//	}
+//
+//	if (thread_default_dict_dbconn_no >= dbconn_no) {
+//		thread_default_dict_dbconn_no = 0;
+//		if (DBTRACE) {
+//			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
+//		}
+//	}
+
+	// Disconnect all connections >= dbconn_no
+	auto max_dbconn_no = thread_dbconnector.max_dbconn_no();
+	for (auto dbconn_no2 = dbconn_no; dbconn_no2 <= max_dbconn_no; ++dbconn_no2) {
+		var connection2 = FM ^ dbconn_no2;
+		connection2.disconnect();
+	}
+
+	// Make sure the max dbconn_no is reduced
+	// although the connections will have already been disconnected
+	// Note the PLURAL form of dbconn"S" to delete all starting from
 	thread_dbconnector.del_dbconns(dbconn_no);
-
-	if (thread_default_data_dbconn_no >= dbconn_no) {
-		thread_default_data_dbconn_no = 0;
-		if (DBTRACE) {
-			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
-		}
-	}
-
-	if (thread_default_dict_dbconn_no >= dbconn_no) {
-		thread_default_dict_dbconn_no = 0;
-		if (DBTRACE) {
-			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
-		}
-	}
 
 	return;
 }
