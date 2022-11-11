@@ -49,7 +49,7 @@ function main() {
 	if (not read(RECORD, file, ID)) {
 		//check if exists in upper or lower case
 		var key2 = ID.ucase();
-		if (key2 eq ID)
+		if (key2 == ID)
 			key2.lcaser();
 		if (read(RECORD, file, key2))
 			ID = key2;
@@ -67,7 +67,7 @@ function main() {
 		text.raiser();
 
 	// Escape data format to text format
-	if (filename ne "DOS")
+	if (filename != "DOS")
 		text = text.oconv(txtfmt);
 
 	//put the text on a temp file in order to edit it
@@ -89,7 +89,7 @@ function main() {
 	if (not fileinfo)
 		abort("Could not write local copy for editing " ^ temposfilename);
 
-	let isdict = filename.starts("dict.") or (filename eq "DOS" and ID.contains("dat/dict."));
+	let isdict = filename.starts("dict.") or (filename == "DOS" and ID.contains("dat/dict."));
 
 	let editcmd = editor ^ " " ^ temposfilename.quote();
 	while (true) {
@@ -109,7 +109,7 @@ function main() {
 		}
 
 		//file has been edited
-		else if (fileinfo2 ne fileinfo) {
+		else if (fileinfo2 != fileinfo) {
 
 			var text2 = osread(temposfilename);
 
@@ -118,7 +118,7 @@ function main() {
 			}
 
 			// Unescape text back to data format
-			if (filename ne "DOS") {
+			if (filename != "DOS") {
 
 				trimmerlast(text2, _EOL);
 
@@ -136,7 +136,7 @@ function main() {
 				var dictrec = text2;
 
 				// Convert to FMs to check dict item format
-				if (filename eq "DOS") {
+				if (filename == "DOS") {
 					trimmerlast(dictrec, _EOL);
 					dictrec = dictrec.iconv(txtfmt);
 				}
@@ -149,21 +149,21 @@ function main() {
 
 					// Check justification
 					if (not var("LRTC").contains(dictrec.f(9))) {
-						if (decide("Field 9 of F/S dict items cannot be " ^ dictrec.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.\nFix it?", options, reply, 1) ne "Yes")
+						if (decide("Field 9 of F/S dict items cannot be " ^ dictrec.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.\nFix it?", options, reply, 1) != "Yes")
 							abort("");
 						continue;
 					}
 
 					// Check width
 					if (not dictrec.f(10).isnum()) {
-						if (decide("Field 10 of F/S items cannot be " ^ dictrec.f(10).quote() ^ "\nField 10 of F/S items must be numeric\nFix it?", options, reply, 1) ne "Yes")
+						if (decide("Field 10 of F/S items cannot be " ^ dictrec.f(10).quote() ^ "\nField 10 of F/S items must be numeric\nFix it?", options, reply, 1) != "Yes")
 							abort("");
 						continue;
 					}
 				}
 			}
 
-			if (text2 ne text) {
+			if (text2 != text) {
 
 				//print("Ok to update? ");
 				//var reply=inputl();
@@ -179,7 +179,7 @@ function main() {
 						printl(filename ^ " " ^ ID ^ " > db");
 
 						//generate/update database functions if saved a symbolic dictionary record
-						if (isdict and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
+						if (isdict and newrecord.f(1) == "S" and newrecord.f(8).contains("/"
 																												"*pgsql")) {
 							let oscmd = "dict2sql " ^ filename ^ " " ^ ID;
 							if (not osshell(oscmd))

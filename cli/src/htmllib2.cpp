@@ -9,7 +9,7 @@ var tagsep;
 function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") {
 
 	// First for speed since called for every column and row
-	if (mode eq "ADDUNITS") {
+	if (mode == "ADDUNITS") {
 
 		// Add/merge aa into bb
 
@@ -42,7 +42,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		params2 = params20;
 	}
 
-	if (mode eq "TABLE.MAKE") {
+	if (mode == "TABLE.MAKE") {
 
 		dataio.trimmer();
 		var tt = " " ^ VM;
@@ -106,12 +106,12 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		dataio.converter(VM, "");
 
 	//fill in the missing cells
-	} else if (mode eq "TABLE.FILL") {
+	} else if (mode == "TABLE.FILL") {
 
 		let filler = "<TD>&nbsp;</TD>";
 		//gosub fill
 
-	} else if (mode eq "HASHTABLE") {
+	} else if (mode == "HASHTABLE") {
 
 		let nv = dataio.count(VM) + 1;
 		for (const var vn : range(1, nv)) {
@@ -126,7 +126,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 			datax.converter(TM, FM);
 
 			let nlines = datax.count(FM) + 1;
-			if (nlines gt 1) {
+			if (nlines > 1) {
 
 				for (const var ln : range(1, nlines)) {
 					var line = datax.f(ln).trim();
@@ -160,22 +160,22 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 		} //vn;
 
-	} else if (mode eq "STRIPTAGS") {
+	} else if (mode == "STRIPTAGS") {
 		while (true) {
 			let tag1 = dataio.index("<");
 			let tag2 = dataio.index(">");
 			///BREAK;
-			if (not(tag1 and tag1 lt tag2)) break;
+			if (not(tag1 and tag1 < tag2)) break;
 			dataio.paster(tag1, tag2 - tag1 + 1, "");
 		}//loop;
 
-	} else if (mode eq "DECODEHTML") {
+	} else if (mode == "DECODEHTML") {
 		dataio.replacer("&nbsp;", " ");
 		dataio.replacer("&lt;", "<");
 		dataio.replacer("&gt;", ">");
 		dataio.replacer("&amp;", "&");
 
-	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
+	} else if (mode.field(".", 1, 2) == "OCONV.AGENT") {
 
 		//to check versus DOS BROWSERS.TXT
 		//GET NEW RUN GBP2 CHK.AGENTSTRING
@@ -307,7 +307,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		if (not browser) {
 			browser = iemode;
 		}
-		if ((browser and iemode) and iemode ne browser) {
+		if ((browser and iemode) and iemode != browser) {
 			browser ^= " IE" ^ iemode ^ "mode";
 		}
 		if (browser) {
@@ -350,10 +350,10 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		}
 
 		let submode = mode.field(".", 3);
-		if (submode eq "OS") {
+		if (submode == "OS") {
 			dataio = osname;
 			return 0;
-		} else if (submode eq "BROWSER") {
+		} else if (submode == "BROWSER") {
 			dataio = browser;
 			return 0;
 		}
@@ -373,7 +373,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 		//returns agent in dataio see equate above
 
-	} else if (mode eq "GETSORTJS") {
+	} else if (mode == "GETSORTJS") {
 
 		//in c++ get from raw text string below
 		dataio = getvogonpoetry_sortjs();
@@ -394,14 +394,14 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 		dataio.replacer("gdateformat='d/M/yyyy'", "gdateformat='" ^ jsdatefmt ^ "'");
 
-	} else if (mode eq "GETCSS") {
+	} else if (mode == "GETCSS") {
 
 		//wire up accurate names to the given parameters
 		let& version = params0;
 
 		gosub getcss(dataio, version);
 
-	} else if (mode eq "COLROWSPAN") {
+	} else if (mode == "COLROWSPAN") {
 
 		//wire up accurate names to the given parameters
 		var& colhdg = dataio;
@@ -411,7 +411,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 		gosub colrowspan(colhdg, thproperties, nobase0, basecurrcode);
 
-	} else if (mode eq "CONVCSS") {
+	} else if (mode == "CONVCSS") {
 
 		//wire up accurate names to the given parameters
 		var& outx = dataio;
@@ -420,11 +420,11 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 		gosub convcss(outx, tableid, in0);
 
-	} else if (mode eq "DOCMODS") {
+	} else if (mode == "DOCMODS") {
 
 		gosub docmods(dataio, params0);
 
-	} else if (mode eq "GETMARK") {
+	} else if (mode == "GETMARK") {
 
 		//wire up accurate names to the given parameters
 		var& mark = dataio;
@@ -646,7 +646,7 @@ function getcss(io css, in version = "") {
 
 function getvogonpoetry_css(in version) {
 
-	if (version.assigned() and version eq 2) {
+	if (version.assigned() and version == 2) {
 
 		return
 R"V0G0N(
@@ -895,7 +895,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 	var nrows = 1;
 	for (const var coln : range(1, ncols2)) {
 		let tt = colhdg.f(coln).count(VM) + 1;
-		if (tt gt nrows) {
+		if (tt > nrows) {
 			nrows = tt;
 		}
 	} //coln;
@@ -915,7 +915,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 		//for (const var coln : range(1, ncols2)) {
 
 			let tt = colhdg.f(coln, rown);
-			if (tt eq nocell) {
+			if (tt == nocell) {
 				continue;
 			}
 
@@ -933,14 +933,14 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 				let coln2 = coln + colspan;
 				let t3 = colhdg.f(coln2, rown);
 				///BREAK;
-				if (not((coln2 le ncols2 and t3 eq tt) and t3 ne nocell)) break;
+				if (not((coln2 <= ncols2 and t3 == tt) and t3 != nocell)) break;
 				colspan += 1;
 				//colhdg(coln2, rown) = nocell;
 				pickreplacer(colhdg, coln2, rown, nocell);
 			}//loop;
 
 			//if usecols else t:=coldict(coln)<14>
-			if (colspan gt 1) {
+			if (colspan > 1) {
 				t2 ^= " colspan=" ^ colspan ^ " align=center";
 
 			} else {
@@ -950,13 +950,13 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 					let rown2 = rown + rowspan;
 					let t3 = colhdg.f(coln, rown2);
 					///BREAK;
-					if (not((rown2 le nrows and ((t3 eq tt or t3 eq ""))) and t3 ne nocell)) break;
+					if (not((rown2 <= nrows and ((t3 == tt or t3 == ""))) and t3 != nocell)) break;
 					rowspan += 1;
 					//colhdg(coln, rown2) = nocell;
 					pickreplacer(colhdg, coln, rown2, nocell);
 				}//loop;
 
-				if (rowspan gt 1) {
+				if (rowspan > 1) {
 					t2 ^= " rowspan=" ^ rowspan;
 				}
 			}
@@ -1045,7 +1045,7 @@ subroutine addunits(in a0, io bb, in sep) {
 	//BP  ANALSCH vm
 	//GBP NLIST   vm
 
-	if (a0 eq "") {
+	if (a0 == "") {
 		return;
 	}
 	//add a to b
@@ -1061,7 +1061,7 @@ subroutine addunits(in a0, io bb, in sep) {
 	var aa = a0;
 
 	//work as if vms
-	if (sep eq SM) {
+	if (sep == SM) {
 		aa.converter(SM, VM);
 		bb.converter(SM, VM);
 	}
@@ -1081,15 +1081,15 @@ subroutine addunits(in a0, io bb, in sep) {
 		while (true) {
 			bn += 1;
 			///BREAK;
-			if (not(bn le nb)) break;
+			if (not(bn <= nb)) break;
 			let bnum = amountunit(bb.f(1, bn), bcode);
 			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
 
-			if (bcode eq acode) {
+			if (bcode == acode) {
 				if (bnum.len() or anum.len()) {
 					var ndecs = anum.field(".", 2).len();
 					let bndecs = bnum.field(".", 2).len();
-					if (bndecs gt ndecs) {
+					if (bndecs > ndecs) {
 						ndecs = bndecs;
 					}
 					if (anum.isnum() and bnum.isnum()) {
@@ -1108,14 +1108,14 @@ subroutine addunits(in a0, io bb, in sep) {
 		}//loop;
 
 		//if bcode<>acode and len(anum) then
-		if (bcode ne acode) {
+		if (bcode != acode) {
 			bb.inserter(1, bn, anum ^ acode);
 		}
 
 	} //an;
 
 	//work as if vms
-	if (sep eq SM) {
+	if (sep == SM) {
 		bb.converter(VM, SM);
 	}
 
@@ -1156,7 +1156,7 @@ function getmark(in mode, in html, io mark) {
 
 var link;
 
-	if (mode eq "OWN") {
+	if (mode == "OWN") {
 
 		if (mark) {
 			mark ^= " ";
@@ -1212,12 +1212,12 @@ var link;
 
 // In case refactoring c++ code mangles javascript code
 subroutine replace_literal_comparison_operators(io dataio) {
-	dataio.replacer(" eq ", " == ");
-	dataio.replacer(" ne ", " != ");
-	dataio.replacer(" lt ", " < ");
-	dataio.replacer(" le ", " <= ");
-	dataio.replacer(" gt ", " > ");
-	dataio.replacer(" ge ", " >= ");
+	dataio.replacer(" == ", " == ");
+	dataio.replacer(" != ", " != ");
+	dataio.replacer(" < ", " < ");
+	dataio.replacer(" <= ", " <= ");
+	dataio.replacer(" > ", " > ");
+	dataio.replacer(" >= ", " >= ");
 }
 
 libraryexit()

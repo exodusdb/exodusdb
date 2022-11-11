@@ -94,7 +94,7 @@ function main() {
 		// Check we can read the record back
 		var rec2;
 		if (read(rec2, dictfile, key)) {
-			if (rec2 ne rec)
+			if (rec2 != rec)
 				printl("record differs?!");
 		} else
 			printl("Cant read ", key, " back");

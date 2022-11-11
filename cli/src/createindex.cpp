@@ -9,7 +9,7 @@ function main() {
 	if (not indexnames)
 		abort("Syntax is 'createindex [filename] [filename__]fieldname... {F=Force}'");
 
-	if (indexnames eq "xref") {
+	if (indexnames == "xref") {
 		indexnames = var().listindex();
 		var indexnames2 = "";
 		for (var index : indexnames) {

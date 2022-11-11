@@ -66,7 +66,7 @@ function main() {
 			recn++;
 			if (not silent) {
 				output(AT(-40), recn, "/", nrecs, " ", ID);
-				if ((recn % 100) eq 1)
+				if ((recn % 100) == 1)
 					osflush();
 			}
 
@@ -85,7 +85,7 @@ function main() {
 				continue;
 			}
 
-			if (rec2 ne RECORD and not ID.ends("_XREF")) {
+			if (rec2 != RECORD and not ID.ends("_XREF")) {
 
 				/*
 				//revert both records to leading zero 0.1, -0.1 instead of old pickos .1 and -.1;
@@ -95,13 +95,13 @@ function main() {
 				//RECORD is db1 and rec2 is db2
 
 				//temp suppress ads field 56
-				if (filename eq "ads") {
+				if (filename == "ads") {
 					RECORD(56) = rec2.f(56);
 					RECORD.replacer(".000", "");
 					rec2.replacer(".000", "");
 					RECORD.replacer("\\.00([\x1A-\x1F])", "$1");
 					rec2.replacer("\\.00([\x1A-\x1F])", "$1");
-				} else if (filename eq "brands") {
+				} else if (filename == "brands") {
 					RECORD(14) = rec2.f(14);
 					RECORD(15) = rec2.f(15);
 				}
@@ -110,19 +110,19 @@ function main() {
 				RECORD.cropper();
 				rec2.cropper();
 				*/
-				if (rec2 ne RECORD) {
+				if (rec2 != RECORD) {
 					nerrors++;
 					//errputl(" ", ID, " different.");
 					//printl(RECORD);
 					//printl(rec2);
 					let nfs = fcount(RECORD, FM);
 					let nfs2 = fcount(rec2, FM);
-					//if (nfs2 gt nfs)
+					//if (nfs2 > nfs)
 					//	nfs = nfs2;
 					for (let fn : range(1, std::max(nfs, nfs2))) {
 						let f1 = RECORD.f(fn);
 						let f2 = rec2.f(fn);
-						if (f1 ne f2) {
+						if (f1 != f2) {
 							errputl();
 							errputl(filename, " ", ID, " ", fn, "-", f1);
 							errputl(filename, " ", ID, " ", fn, "+", f2);

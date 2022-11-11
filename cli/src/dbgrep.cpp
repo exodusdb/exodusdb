@@ -35,7 +35,7 @@ function main() {
 			continue;
 
 		// filter by reqfilename. "-" means all files
-		if (reqfile and reqfile ne "-" and filename ne reqfile.lcase())
+		if (reqfile and reqfile != "-" and filename != reqfile.lcase())
 			continue;
 
 		// OPEN FILE or skip file

@@ -41,7 +41,7 @@ function main() {
 		newcpp = oldcpp;
 		for (in def : defs) {
 
-			if (def.field(" ", 1) ne "#define")
+			if (def.field(" ", 1) != "#define")
 				continue;
 
 			var value = def.field(" ", 3);
@@ -61,7 +61,7 @@ function main() {
 //
 //			newcpp.regex_replacer(oldcode, newcode);
 
-			if (name[-1] eq "+")
+			if (name[-1] == "+")
 				name.popper() ^= value;
 
 			value.replacer("(", "\\(");
@@ -84,7 +84,7 @@ function main() {
 
 		}
 
-		if (newcpp ne oldcpp) {
+		if (newcpp != oldcpp) {
 			printt(osfilename, "");
 			if (OPTIONS.contains("U")) {
 				//oswrite(newcpp on osfilename);

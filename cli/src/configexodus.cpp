@@ -38,7 +38,7 @@ function main() {
 	//third from config file
 	//should be same logic in mvdbpostgres and configexodus
 	var configfilename = "";
-	if (OSSLASH eq "\\") {
+	if (OSSLASH == "\\") {
 		let userprofile_exodusdir = osgetenv("USERPROFILE") ^ OSSLASH ^ "Exodus";
 		if (not osdir(userprofile_exodusdir)) {
 			if (not(osmkdir(userprofile_exodusdir)))
@@ -81,7 +81,7 @@ function main() {
 	getinput("New user code", dbusername);
 	getinput("New user password", dbuserpass);
 
-	//if (OSSLASH eq "\\")
+	//if (OSSLASH == "\\")
 	//	configure_via_connection(adminconfig, dbname, dbusername, dbuserpass);
 	//else
 	//	configure_via_script(adminconfig, dbname, dbusername, dbuserpass);
@@ -123,7 +123,7 @@ subroutine getinput(in prompt, io data) {
 		text = oconv(text, "L#30");
 	print(text, " ? ");
 	let result = input();
-	if (result ne "")
+	if (result != "")
 		data = result;
 }
 
@@ -163,7 +163,7 @@ function input_adminconfig(in origconfig, out serverconfig) {
 		}
 
 		getinput("\nCannot connect. Try Again? ", yesno);
-		if (yesno.ucase()[1] ne "Y")
+		if (yesno.ucase()[1] != "Y")
 			return false;  //stop("Cancelled.");
 
 	} while (true);
@@ -254,7 +254,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		abort("Stopping. Cannot connect to new database");
 	printl("done!");
 
-	if (OSSLASH eq "\\") {
+	if (OSSLASH == "\\") {
 
 		printl(oconv("Installing pgexodus postgres plugin ... ", "L#40"));
 

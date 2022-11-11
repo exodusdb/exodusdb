@@ -32,13 +32,13 @@ OPTIONS
 		-> .b(
 	s - Change .b(1, n) eq/== to .starts(
 	    and    '.b(n, n)' to .first(n)
-		   .b(1, n) eq "XXX"
+		   .b(1, n) == "XXX"
 		-> .starts("XXX")
 		   .b(3, 3)
 		-> .first(3)
 	l - Change '.b(-n, n) eq' to .ends(n)
 	    and    '.b(-n, n)' to .last(n)
-		   .b(1, n) eq "XXX"
+		   .b(1, n) == "XXX"
 		-> .starts("XXX")
 		   .b(-3, 3)
 		-> .last(3)
@@ -188,7 +188,7 @@ function main() {
 				let pattern = "for (var ";
 				pos = line.index(pattern);
 				if (pos) {
-					if (forrange ne 2) {
+					if (forrange != 2) {
 						// for (var dictidn = 1
 						let part1 = line2.b(pos).field(";", 1).trim();
 						let varname = part1.field(" ", 3);
@@ -197,16 +197,16 @@ function main() {
 						// dictidn <= ndictids + 20
 						let part2 = line2.field(";", 2).trim();
 						let varname2 = part2.field(" ", 1).trim();
-						if (varname2 ne varname)
+						if (varname2 != varname)
 							fail = true;
 						let compare = part2.field(" ", 2);
-						if (compare ne "<=" and compare ne "le")
+						if (compare != "<=" and compare != "le")
 							fail = true;
 						let ending = part2.field(" ", 3, 999);
 
 						// ++dictidn) {
 						let part3 = line2.field(";", 3).trim();
-						if (part3 ne ("++" ^ varname ^ ") {") and part3 ne (varname ^ "++) {"))
+						if (part3 != ("++" ^ varname ^ ") {") and part3 != (varname ^ "++) {"))
 							fail = true;
 
 						// Cannot really occur since part3 is checked for ++varname
@@ -225,7 +225,7 @@ function main() {
 							line2.paster(pos, 99999, "for (const var " ^ varname ^ " : range(" ^ starting ^ ", " ^ ending ^ ")) {");
 						}
 					}
-				} else if (forrange eq 2) {
+				} else if (forrange == 2) {
 					line2.regex_replacer(
 						R"___(\tfor \((.+?) = (.+?); \1 (<=|le) (.+?); (\+\+\1|\1\+\+)\))___",
 						R"___(\tfor \(\1 : range\(\2, \4\)\))___");
@@ -249,7 +249,7 @@ function main() {
 					//printl("-", line);
 
 					//line = restore_subsyntax(line2, ',');
-					if (line2 ne line) {
+					if (line2 != line) {
 						line = line2;
 						replaced = true;
 						output(osfilename, ":", linen, " ");
@@ -270,8 +270,8 @@ function main() {
 				line2.regex_replacer(R"__(\.substr\()__", R"__(.b\()__");
 			}
 
-			// S - .b(1, ..) eq -> .starts(..
-			//var newrec = RECORD.regex_replace(R"(\.b\(1, \d+\) eq (".*"))", R"(.starts(\1)");
+			// S - .b(1, ..) == -> .starts(..
+			//var newrec = RECORD.regex_replace(R"(\.b\(1, \d+\) == (".*"))", R"(.starts(\1)");
 			if (b1eq2starts) {
 				line2.regex_replacer(
 					R"__(\.b\(1, ?\d+\) ?(eq|==) ?(".*?"))__",
@@ -403,7 +403,7 @@ function main() {
 			// Finally
 
 			//line = restore_subsyntax(line2, ',');
-			if (line2 ne line) {
+			if (line2 != line) {
 				printl('-', osfilename, line.replace("\t", "    "));
 				printl('+', osfilename, line2.replace("\t", "    "));
 				line = line2;

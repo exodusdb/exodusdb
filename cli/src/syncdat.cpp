@@ -144,7 +144,7 @@ function main() {
 
 			// Empty dirs or dirs containing a file SYNCDAT_DELETE
 			// cause deletion of the database file with the same name as the dir
-			if (osfilenames.lower().locate("SYNCDAT_DELETE") or osfilenames eq "") {
+			if (osfilenames.lower().locate("SYNCDAT_DELETE") or osfilenames == "") {
 				if (var().open(dbfilename)) {
 
 					//if (verbose)
@@ -220,7 +220,7 @@ function main() {
 			}
 
 			// Add it to newcpptext
-			if (generate and isdict and RECORD.f(1) eq "S") {
+			if (generate and isdict and RECORD.f(1) == "S") {
 
 				// dict intro
 				let line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
@@ -250,7 +250,7 @@ function main() {
 
 				// Close function main if not already done
 				if (addfunctionmain) {
-					if (newcpptext[-1] ne "\n")
+					if (newcpptext[-1] != "\n")
 						newcpptext ^= '\n';
 					newcpptext ^= "}\n";
 				}
@@ -288,8 +288,8 @@ function main() {
 					exists = false;
 				}
 
-				if (RECORD eq oldrecord) {
-					if (exists and RECORD.len() eq 0) {
+				if (RECORD == oldrecord) {
+					if (exists and RECORD.len() == 0) {
 						// Delete the RECORD
 						deleterecord(dbfile, ID);
 						printl(prefix, dbfilename, ID, "Deleted");
@@ -298,7 +298,7 @@ function main() {
 							printl("Not changed", dbfilename, ID);
 					}
 				} else {
-					if (RECORD.len() eq 0) {
+					if (RECORD.len() == 0) {
 						// Delete the RECORD
 						deleterecord(dbfile, ID);
 						printl("syncdat:", dbfilename, ID, "Deleted");
@@ -355,7 +355,7 @@ function main() {
 			newcpptext.popper();
 
 			// Update
-			if (newcpptext eq oldcpptext) {
+			if (newcpptext == oldcpptext) {
 				if (verbose)
 					printl("Already up to date", dictcppfilename);
 			} else {
@@ -389,7 +389,7 @@ function main() {
 	if (errors)
 		errors.errputl("\nsyncdat: Errors: ");
 
-	return errors ne "";
+	return errors != "";
 
 }
 

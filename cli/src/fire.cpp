@@ -42,7 +42,7 @@ function main() {
 		else
 			RECORD.regex_replacer(find, repl, rxopts);
 
-		if (RECORD ne origrec) {
+		if (RECORD != origrec) {
 
 			printl(osfilename);
 

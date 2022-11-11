@@ -82,7 +82,7 @@ function main() {
 				// and there is only one function
 				// and first line is function main()
 				var functionmain = true;
-				if (newdictsrc.f(1,1) eq "function main() {" and not newdictsrc.contains("#include") and newdictsrc.count("function ") eq 1) {
+				if (newdictsrc.f(1,1) == "function main() {" and not newdictsrc.contains("#include") and newdictsrc.count("function ") == 1) {
 					functionmain = false;
 					newdictsrc.replacer("function main() {" ^ VM, "");
 					newdictsrc.cutter(-2);
@@ -92,7 +92,7 @@ function main() {
 
 //				// Remove trailing RETURN ANS;
 //				let nlines = fcount(newdictsrc, VM);
-//				if (newdictsrc.f(1, nlines).trim().trim("\t") eq "return ANS;") {
+//				if (newdictsrc.f(1, nlines).trim().trim("\t") == "return ANS;") {
 //					newdictsrc.remover(1,nlines);
 //				}
 
@@ -151,7 +151,7 @@ function main() {
 						oldpgsql.replacer(" " _VM, _VM);
 
 					// Add one indent if none present
-					if (oldpgsql.f(1, 2) ne "DECLARE" and oldpgsql.f(1,2)[1] ne "\t") {
+					if (oldpgsql.f(1, 2) != "DECLARE" and oldpgsql.f(1,2)[1] != "\t") {
 						oldpgsql.replacer(_VM, _VM "\t");
 						//unindent the closing comment
 						oldpgsql.replacer(_VM "\t" "*" "/", _VM "*" "/");
@@ -163,7 +163,7 @@ function main() {
 				dictid = "";
 
 				// Sanity check for max one pgsql section
-				if (newdictsrc.count("/" "*pgsql") gt 1)
+				if (newdictsrc.count("/" "*pgsql") > 1)
 					abort(dictid.quote() ^ "/" "*pgsql must only appear once ... skipped. ");
 
 				// Generate the new dat rec with the new source
@@ -183,7 +183,7 @@ function main() {
 				newdatrec.replacer(VM, "\\" "\n");
 
 				// Update the dat file iif changed
-				if (newdatrec ne olddatrec) {
+				if (newdatrec != olddatrec) {
 					if (update) {
 						if (oswrite(newdatrec on datfilename)) {
 							datfilename.logputl("Updated: ");
@@ -219,19 +219,19 @@ function main() {
 				// Skip any pgsql function found in the .cpp file
 				// since all updates have been done in dat/dict files
 				if (not in_pgsql_block)
-					in_pgsql_block = line.convert("\t ;", "") eq "/*pgsql";
+					in_pgsql_block = line.convert("\t ;", "") == "/*pgsql";
 
 				if (not in_pgsql_block)
 					newdictsrc ^= line ^ VM;
 
-				if (in_pgsql_block and line.convert("\t ;", "") eq "*" "/")
+				if (in_pgsql_block and line.convert("\t ;", "") == "*" "/")
 					in_pgsql_block = false;
 			}
 
 		}
 
 		// Update dict cpp file
-		if (regen_cpp and newcpptext ne oldcpptext) {
+		if (regen_cpp and newcpptext != oldcpptext) {
 			printl(newcpptext);
 			if (update) {
 				if (not oswrite(newcpptext on cppfilename))

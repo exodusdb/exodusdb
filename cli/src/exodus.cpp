@@ -96,13 +96,13 @@ function main() {
 		if (not osshell(shellcmd))
 			lasterror().errputl("exodus: ");
 
-	} else if (OSSLASH eq "\\" and shell.osgetenv("ComSpec")) {
+	} else if (OSSLASH == "\\" and shell.osgetenv("ComSpec")) {
 
 		//windows
 
 		//set EXO_PATH used by compile to find LIB and INCLUDE paths
 		var exoduspath = exodusbinpath;
-		if (exoduspath.field2(OSSLASH, -1) eq "bin")
+		if (exoduspath.field2(OSSLASH, -1) == "bin")
 			exoduspath = field(exoduspath, OSSLASH, 1, fcount(exoduspath, OSSLASH) - 1);
 		if (exoduspath)
 			ossetenv("EXO_PATH", exoduspath);
@@ -125,7 +125,7 @@ function main() {
 		}
 
 		//update path
-		if (newpath ne oldpath)
+		if (newpath != oldpath)
 			ossetenv("PATH", newpath);
 
 		//set INCLUDE path

@@ -182,7 +182,7 @@ COST 10;
 
 	}
 
-	if (install_exodus_extensions eq "pgexodus") {
+	if (install_exodus_extensions == "pgexodus") {
 
 		let sqltemplate_strict =
 			R"V0G0N(
@@ -206,7 +206,7 @@ COST 10;
 		create_function("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate_strict);
 		create_function("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate_strict);
 
-	} else if (install_exodus_extensions eq "pgsql") {
+	} else if (install_exodus_extensions == "pgsql") {
 
 		//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);");
 
@@ -322,7 +322,7 @@ COST 10;
 	if (errors)
 		errors.errputl("\ndict2sql Errors: ");
 
-	return errors ne "";
+	return errors != "";
 }
 
 subroutine replace_FM_etc(io sql) {
@@ -337,15 +337,15 @@ subroutine replace_FM_etc(io sql) {
 	//
 	// = is the SQL notation for "equals"
 	sql.replacer(" == ", " = ");
-	sql.replacer(" eq ", " = ");
+	sql.replacer(" == ", " = ");
 	//
 	// <> is the standard SQL notation for "not equal". != is an alias, which is converted to <> at a very early stage of parsing.
-	sql.replacer(" ne ", " != ");
+	sql.replacer(" != ", " != ");
 	//
-	sql.replacer(" lt ", " < ");
-	sql.replacer(" le ", " <= ");
-	sql.replacer(" gt ", " > ");
-	sql.replacer(" ge ", " >= ");
+	sql.replacer(" < ", " < ");
+	sql.replacer(" <= ", " <= ");
+	sql.replacer(" > ", " > ");
+	sql.replacer(" >= ", " >= ");
 
 }
 
@@ -706,7 +706,7 @@ $RETVAR := array_to_string
 			//	errputl("> ", dictfilename, " ", dictid.quote(), " possible bad xlate");
 			//}
 			//allowing xlate jobs in dict_jobs text since it is used for other files
-			if (lcase(var("dict.") ^ target_filename) eq dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
+			if (lcase(var("dict.") ^ target_filename) == dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
 				line = " -- Sorry. In " ^ target_filename ^ ", " ^ dictid ^ " you cannot xlate to same file due to pgsql bug.\n -- " ^ line;
 			} else {
 
@@ -817,7 +817,7 @@ $RETVAR := array_to_string
 				// As per pickos xlate function 4th argument
 				// Option C return the key unchanged if no xlate record exists
 				// Option X (or anything else) return empty string
-				let coalesce_to = xlate_mode eq "C" ? "temp_xlate_key" : "''";
+				let coalesce_to = xlate_mode == "C" ? "temp_xlate_key" : "''";
 
 				// Convert macros
 				/////////////////

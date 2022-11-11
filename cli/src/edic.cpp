@@ -161,11 +161,11 @@ function main() {
 				else
 					progtype.input(question);
 
-				if (progtype eq 2)      progtype = "classlib";
-				else if (progtype eq 3)	progtype = "main";
-				else if (progtype eq 4)	progtype = "mainlib";
-				else if (progtype eq 1) progtype = "class";
-				else if (progtype eq 5)	progtype = "dict";
+				if (progtype == 2)      progtype = "classlib";
+				else if (progtype == 3)	progtype = "main";
+				else if (progtype == 4)	progtype = "mainlib";
+				else if (progtype == 1) progtype = "class";
+				else if (progtype == 5)	progtype = "dict";
 				else
 					abort("");
 				break;
@@ -173,18 +173,18 @@ function main() {
 
 			newfile = true;
 			var blankfile = "";
-			if (progtype eq "main" or progtype eq "mainlib") {
+			if (progtype == "main" or progtype == "mainlib") {
 				startatlineno = "4,9";
 				blankfile ^= "#include <exodus/exodus.h>\n";
 				blankfile ^= "\n";
 				blankfile ^= "program() {\n";
 				blankfile ^= "\tprintl(\"" ^ basefilename ^ " says 'Hello World!'\");\n";
-				if (progtype eq "mainlib")
+				if (progtype == "mainlib")
 					blankfile ^= "\treturn 0;\n";
 				blankfile ^= "}\n";
-				if (progtype eq "mainlib")
+				if (progtype == "mainlib")
 					blankfile.replacer("program()", "function " ^ basefilename ^ "()");
-			} else if (progtype eq "class" or progtype eq "classlib") {
+			} else if (progtype == "class" or progtype == "classlib") {
 				startatlineno = "6,9";
 				blankfile ^= "#include <exodus/program.h>\n";
 				//programinit() as 2nd line to avoid ppl in external functions before programinit
@@ -193,7 +193,7 @@ function main() {
 				blankfile ^= "\n";
 				blankfile ^= "function main(";
 				//the .h maker not able to parse this yet and is rather clumsy anyway
-				//if (progtype eq "classlib")
+				//if (progtype == "classlib")
 				//	blankfile^="/*in arg1, out arg2*/";
 				blankfile ^= ") {\n";
 				blankfile ^= "\tprintl(\"" ^ basefilename ^ " says 'Hello World!'\");\n";
@@ -202,9 +202,9 @@ function main() {
 				blankfile ^= "\nprogramexit()";
 				blankfile ^= "\n";
 
-				if (progtype eq "classlib")
+				if (progtype == "classlib")
 					blankfile.replacer("program", "library");
-			} else if (progtype eq "dict") {
+			} else if (progtype == "dict") {
 				startatlineno = "6,9";
 				blankfile ^= "#include <exodus/dict.h>\n\n";
 				//programinit() as 2nd line to avoid ppl in external functions before programinit
@@ -219,7 +219,7 @@ function main() {
 			}
 
 			//ensure ends in eol
-			if (blankfile.at(1) ne "\n")
+			if (blankfile.at(1) != "\n")
 				blankfile ^= "\n";
 
 			//convert to DOS format on Windows
@@ -282,7 +282,7 @@ function main() {
 
 			//if the file hasnt been updated
 			let fileinfo2 = osfile(filename);
-			if (fileinfo2 ne fileinfo)
+			if (fileinfo2 != fileinfo)
 				newfile = false;
 			else {
 				//delete the skeleton
@@ -299,7 +299,7 @@ function main() {
 			}
 
 			//clear the screen (should be cls on win)
-			if (OSSLASH eq "/")
+			if (OSSLASH == "/")
 				//osshell("clear");
 				if (not osshell("clear")) {
 					abort(lasterror());
@@ -316,7 +316,7 @@ function main() {
 			var compileoutputfilename = filename;
 			compileoutputfilename ^= ".~";
 			//var compileoutputfilename=filename ^ ".2";
-			if (OSSLASH eq "/") {
+			if (OSSLASH == "/") {
 				compilecmd ^= " 2>&1";
 				compilecmd ^= " | tee " ^ compileoutputfilename.quote();
 				compilecmd ^= " | pager --chop-long-lines --quit-if-one-screen";
@@ -342,7 +342,7 @@ function main() {
 				if (osfile(compileoutputfilename) and not osremove(compileoutputfilename)) {
 					abort(lasterror());
 				}
-				if (OSSLASH ne "/")
+				if (OSSLASH != "/")
 					print(errors);
 
 				startatlineno = "";
@@ -368,10 +368,10 @@ function main() {
 						osflush();
 						reply.inputn(1);
 						printl();
-						if (reply.convert("YyNn\n", "") eq "")
+						if (reply.convert("YyNn\n", "") == "")
 							break;
 					}
-					if (reply.convert("Yy\n", "") eq "")
+					if (reply.convert("Yy\n", "") == "")
 						continue;
 
 					abort("");
@@ -443,7 +443,7 @@ subroutine geteditor(out editor, out linenopattern) {
 
 	//otherwise on windows try to locate CYGWIN nano or vi
 	var cygwinpath = "";
-	if (not editor and OSSLASH eq "\\") {
+	if (not editor and OSSLASH == "\\") {
 		//from environment variable
 		cygwinpath = osgetenv("CYGWIN_BIN");
 		//else from current disk
@@ -456,7 +456,7 @@ subroutine geteditor(out editor, out linenopattern) {
 		if (not osdir(cygwinpath))
 			cygwinpath = "";
 
-		if (cygwinpath and cygwinpath[-1] ne OSSLASH)
+		if (cygwinpath and cygwinpath[-1] != OSSLASH)
 			cygwinpath ^= OSSLASH;
 		//editor=cygwinpath^"bash --login -i -c \"/bin/";
 		editor = cygwinpath;
@@ -474,7 +474,7 @@ subroutine geteditor(out editor, out linenopattern) {
 		} else
 			editor = "";
 	}
-	if (OSSLASH eq "\\") {
+	if (OSSLASH == "\\") {
 		//configure nanorc (on windows)
 		//TODO same for non-windows
 		//nano on windows looks for nanorc config file as follows (probably merges all found)
@@ -488,7 +488,7 @@ subroutine geteditor(out editor, out linenopattern) {
 			nanorcfilename = osgetenv("HOME");
 			if (not nanorcfilename)
 				nanorcfilename = osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
-			if (nanorcfilename[-1] ne OSSLASH)
+			if (nanorcfilename[-1] != OSSLASH)
 				nanorcfilename ^= OSSLASH;
 			nanorcfilename ^= ".nanorc";
 		}
@@ -511,7 +511,7 @@ subroutine geteditor(out editor, out linenopattern) {
 	}
 
 	if (not editor) {
-		if (OSSLASH eq "/")
+		if (OSSLASH == "/")
 			editor = "nano ";
 		else
 			editor = "notepad";

@@ -169,7 +169,7 @@ function main() {
 		} else {
 			compiler = "c++";
 #ifdef __APPLE__
-			if (PLATFORM eq "x86")
+			if (PLATFORM == "x86")
 				compiler = "g++-4.0";
 #endif
 			if (verbose)
@@ -244,7 +244,7 @@ function main() {
 		//basicoptions^=" -O3";
 		//-Og means optimise but has compatible with gdb
 		if (optimise > 0) {
-//			if (optimise eq 1)
+//			if (optimise == 1)
 //				basicoptions ^= " -Og";
 //			else
 				basicoptions ^= " -O" ^ optimise;
@@ -289,7 +289,7 @@ function main() {
 		let gcc = osshellread(compiler ^ " --version").contains("Free Software Foundation");
 
 		// Suppress GCC and clang's warnings about each others warning flags
-		if (warnings lt 2) {
+		if (warnings < 2) {
 			basicoptions ^= " -Wno-unknown-pragmas";
 			if (not gcc) {
 				// Presume clang
@@ -408,7 +408,7 @@ function main() {
 				}
 			}
 		}
-		if (exoduspath.last(1) ne OSSLASH)
+		if (exoduspath.last(1) != OSSLASH)
 			exoduspath ^= OSSLASH;
 		var exodusbin = exoduspath;
 		if (not osfile(exodusbin ^ "exodus.dll")) {
@@ -475,7 +475,7 @@ function main() {
 		basicoptions ^= " /D \"WIN32\"";
 
 		//define common windows indicator
-		if (PLATFORM eq "x64")
+		if (PLATFORM == "x64")
 			basicoptions ^= " /D \"WIN64\"";
 
 		//Uses the __cdecl calling convention (x86 only ie 32bit).
@@ -566,7 +566,7 @@ function main() {
 
 	} // of not posix
 
-	if (bindir[-1] ne OSSLASH)
+	if (bindir[-1] != OSSLASH)
 		bindir ^= OSSLASH;
 	if (libdir[-1] != OSSLASH)
 		libdir ^= OSSLASH;
@@ -802,7 +802,7 @@ function main() {
 			else if (not silent)
 				printl(srcfilename);
 				//print(srcfilename ^ _EOL);
-			else if (silent eq 1) {
+			else if (silent == 1) {
 				nasterisks++;
 				print("*");
 				osflush();
@@ -837,7 +837,7 @@ function main() {
 				//check all but utf8 and skip those not existing
 				//use dpkg-reconfigure locales to get more
 				//locale = alllocales.field(" ", localen);
-				if (locale2 ne "utf8") {
+				if (locale2 != "utf8") {
 					if (not setxlocale(locale2)) {
 						continue;
 					}
@@ -926,7 +926,7 @@ function main() {
 				// GENERATE HEADER IF LIB
 				/////////////////////////
 
-				if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine") and not filename_without_ext.starts("dict_")) {
+				if (not(isprogram) and (word1 == "function" or word1 == "subroutine") and not filename_without_ext.starts("dict_")) {
 
 					//extract out the function declaration in including arguments
 					//eg "function xyz(in arg1, out arg2)"
@@ -942,8 +942,8 @@ function main() {
 						headertext ^= eol ^ funcdecl ^ ";";
 					} else {
 						let libname = filepath_without_ext;
-						var returntype = word1 eq "subroutine" ? "void" : "var";
-						//var returnsvarorvoid = (word1 eq "function") ? "var" : "void";
+						var returntype = word1 == "subroutine" ? "void" : "var";
+						//var returnsvarorvoid = (word1 == "function") ? "var" : "void";
 						let callorreturn = (word1 == "function") ? "return" : "call";
 						let funcreturnvoid = (word1 == "function") ? 0 : 1;
 						var funcargsdecl = funcdecl.field("(", 2, 999999);
@@ -957,13 +957,13 @@ function main() {
 							int level = 0;
 							for (int charn : range(1, len(funcargsdecl))) {
 								let ch = funcargsdecl[charn];
-								if (ch eq ")") {
-									if (level eq 0) {
+								if (ch == ")") {
+									if (level == 0) {
 										funcargsdecl.firster(charn);
 										break;
 									}
 									--level;
-								} else if (ch eq "(")
+								} else if (ch == "(")
 									++level;
 							}
 						}
@@ -984,7 +984,7 @@ function main() {
 						var funcargs = "";
 						//default to one template argument for callables with zero arguments
 
-						var nodefaults = contains(funcargsdecl, "=") eq 0;
+						var nodefaults = contains(funcargsdecl, "=") == 0;
 						var funcargsdecl2 = funcargsdecl;
 
 						var funcargstype = "int";
@@ -1056,20 +1056,20 @@ function main() {
 								let argdefault = funcargsdecl2.field(",", argn).field("=", 2);
 
 								//do not generate functions for numbers of arguments that are equivalent to defaulted arguments in main function
-								if (argdefault ne "" and argn eq maxargn) {
+								if (argdefault != "" and argn == maxargn) {
 									skip_func = true;
 									break;
 								}
 
 								if (argn < maxargn) {
 									inbound_args ^= ", " ^ argtype ^ " " ^ argname;
-									if (argdefault ne "") {
+									if (argdefault != "") {
 										//build a new non-constant dummy variable name to be used as unassigned argument to the real function
 										argname2 = argname ^ "_" ^ argtype;
 										//declare it
 										func_body ^= " var " ^ argname2;
 										//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
-										if (argdefault ne "" and argdefault ne "var()")
+										if (argdefault != "" and argdefault != "var()")
 											func_body ^= " = " ^ argdefault;
 										func_body ^= ";" _EOL;
 									}
@@ -1079,7 +1079,7 @@ function main() {
 									//declare it
 									func_body ^= " var " ^ argname2;
 									//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
-									if (argdefault ne "" and argdefault ne "var()")
+									if (argdefault != "" and argdefault != "var()")
 										func_body ^= " = " ^ argdefault;
 									func_body ^= ";" _EOL;
 								}
@@ -1096,7 +1096,7 @@ function main() {
 
 							//build a function with all the new arguments and dummy variables
 							add_func ^= _EOL;
-							add_func ^= _EOL "/" "/ Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn eq 2 ? "" : "s");
+							add_func ^= _EOL "/" "/ Allow call with only " ^ var(maxargn-1) ^ " arg" ^ (maxargn == 2 ? "" : "s");
 							add_func ^= _EOL ^ returntype ^ " operator() (" ^ inbound_args ^ ") {";
 							add_func ^= _EOL ^ func_body;
 							add_func ^= " return operator()(" ^ outbound_args ^ ");";
@@ -1183,7 +1183,7 @@ function main() {
 						}
 						let usepredefinedcallable = nargs <= exodus_callable_maxnargs;
 						if (useclassmemberfunctions) {
-							if (funcname eq "main") {
+							if (funcname == "main") {
 								// Functions return var and subroutines return void
 								headertext ^= inclusion;
 							}
@@ -1232,7 +1232,7 @@ function main() {
 				} // generate header if lib
 
 				//build up list of loadtime libraries required by linker
-				if (loadtimelinking and word1 eq "#include") {
+				if (loadtimelinking and word1 == "#include") {
 					var word2 = line.field(" ", 2);
 					if (word2[1] == DQ) {
 						word2 = word2.cut(1).pop();
@@ -1284,7 +1284,7 @@ function main() {
 				var headertext2;
 				if (not osread(headertext2, headerfilename, locale)) {
 				}
-				if (headertext2 ne headertext) {
+				if (headertext2 != headertext) {
 
 					//over/write if changed
 					if (not oswrite(headertext, headerfilename, locale))
@@ -1295,7 +1295,7 @@ function main() {
 					var headertext3;
 					if (not osread(headertext3, headerfilename, locale))
 						loglasterror();
-					if (headertext3 ne headertext) {
+					if (headertext3 != headertext) {
 						atomic_ncompilation_failures++;
 
 						errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale: " ^ locale
@@ -1360,7 +1360,7 @@ function main() {
 
 			// xxx cannot be used in the same statement that it is being defined
 			// var xxx = osread(xxx, yyy, zzz);
-			if (warnings ge 0) {
+			if (warnings >= 0) {
 				let matches = text.match("[\\n \\t]{2,}(var|let) (\\b[a-zA-Z0-9_]+\\b) [^\n:;]*?\\b\\2\\b");
 				if (matches) {
 					var nmatches = 0;
@@ -1566,7 +1566,7 @@ function static compile2(
 
 	// Handle new objfile
 
-	if (newobjfileinfo ne oldobjfileinfo) {
+	if (newobjfileinfo != oldobjfileinfo) {
 		if (newobjfileinfo) {
 
 			//create the bin file directory if missing
@@ -1682,7 +1682,7 @@ function set_environment() {
 		if (not msvs)
 			break;
 
-		if (msvs[-1] ne OSSLASH)
+		if (msvs[-1] != OSSLASH)
 			msvs ^= OSSLASH;
 		searched ^= "\n" ^ msvs;
 

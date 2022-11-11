@@ -114,7 +114,7 @@ function main() {
 		targetdb = "";
 
 		//target name will be a dir path
-		if (targetname[-1] ne "/")
+		if (targetname[-1] != "/")
 			targetname ^= "/";
 	} else {
 		//connect to target db
@@ -123,7 +123,7 @@ function main() {
 	}
 
 	//dict means filter all and only dict files
-	dictonly = sourcefilenames eq "dict";
+	dictonly = sourcefilenames == "dict";
 	if (dictonly and sourcedb)
 		sourcefilenames = "";
 
@@ -146,7 +146,7 @@ function main() {
 		sourcefilename = temp;
 
 		//skip dict.all which is an sql view of all dict files
-		if (sourcefilename eq "dict.all")
+		if (sourcefilename == "dict.all")
 			continue;
 
 		//option to skip all but dict files
@@ -253,7 +253,7 @@ function main() {
 			if (exists) {
 
 				//skip update if no change
-				if (RECORD eq oldrec) {
+				if (RECORD == oldrec) {
 					nsame++;
 					print("\tNot changed");
 					continue;
@@ -335,7 +335,7 @@ function getrec() {
 
 		ln++;
 
-		if (ln gt nlines)
+		if (ln > nlines)
 			return false;
 
 		RECORD = sql_text_in(ln);
@@ -391,7 +391,7 @@ function getrec() {
 		}
 
 		// A line with just "\." indicates no more records for the current file
-		if (RECORD eq "\\.") {
+		if (RECORD == "\\.") {
 
 			// Trigger a search for the next line starting COPY
 			targetfilename = "";

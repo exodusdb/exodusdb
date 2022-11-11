@@ -282,7 +282,7 @@ function main() {
 
 	// Compile list with optimisation. Its inner loops benefit from efficiency
 
-	if (USERNAME eq "EXODUS") {
+	if (USERNAME == "EXODUS") {
 		var(SENTENCE).oswrite("nlist") or lasterror().errputl("nlist:");
 		logputl();
 		logputl(SENTENCE);
@@ -385,7 +385,7 @@ function main() {
 	// Use <COL> for hiding non-totalled cols in det-supp (slow)
 	usecols = 0;
 
-//	if (BASEFMT[2] eq "C") {
+//	if (BASEFMT[2] == "C") {
 //		decimalchar = ",";
 //	} else {
 //		decimalchar = ".";
@@ -534,13 +534,13 @@ function main() {
 	// Note that getword gets 'word' and 'nextword' to allow look ahead
 	gosub getword();
 
-	if (word ne "LIST" and word ne "SORT" and word ne "NLIST" and word ne "OLIST") {
+	if (word != "LIST" and word != "SORT" and word != "NLIST" and word != "OLIST") {
 		call mssg(word.quote() ^ " first word must be LIST or SORT");
 		abort();
 	}
 
 	// Decide initial ordering SELECT (No order) or SSELECT (by key)
-	if (word eq "SORT")
+	if (word == "SORT")
 		sortselect = "SSELECT";
 	else
 		sortselect = "SELECT";
@@ -550,8 +550,8 @@ function main() {
 
 	// SORT changes SELECT to SSELECT which sorts
 	// finally (i.e. after any other BY phrases) by ID
-	if (word eq "SORT") {
-		if (sortselect.field(" ", 1) eq "SELECT")
+	if (word == "SORT") {
+		if (sortselect.field(" ", 1) == "SELECT")
 			// Prefix 'S' to change 'SELECT' to 'SSELECT'
 			sortselect.prefixer("S");
 		gosub getword();
@@ -572,7 +572,7 @@ function main() {
 
 	// Filename
 	filename = word;
-	if (word eq "DICT") {
+	if (word == "DICT") {
 		gosub getword();
 		filename = "DICT." ^ word;
 	}
@@ -624,24 +624,24 @@ nextphrase:
 ///////////
 
 	gosub getword();
-	if (word eq "") {
+	if (word == "") {
 		goto x1exit;
 	}
 
 phraseinit:
 ///////////
 
-	if (word eq "GETLIST") {
+	if (word == "GETLIST") {
 		gosub getword();
 		getlist("" ^ word ^ " (S)");
 
-	} else if (word eq "AND" or word eq "OR") {
+	} else if (word == "AND" or word == "OR") {
 		sortselect ^= " " ^ word;
 
-	} else if (word eq "(" or word eq ")") {
+	} else if (word == "(" or word == ")") {
 		sortselect ^= " " ^ word;
 
-	} else if (word eq "BY" or word eq "BY-DSND") {
+	} else if (word == "BY" or word == "BY-DSND") {
 		sortselect ^= " " ^ word;
 		gosub getword();
 		sortselect ^= " " ^ word;
@@ -653,15 +653,15 @@ phraseinit:
 			}
 		}
 
-	} else if (((word eq "WITH NOT" or word eq "WITH") or word eq "WITHOUT") or word eq "LIMIT") {
+	} else if (((word == "WITH NOT" or word == "WITH") or word == "WITHOUT") or word == "LIMIT") {
 
-		if (nextword eq "AUTHORISED") {
+		if (nextword == "AUTHORISED") {
 			onlyauthorised = 1;
 			gosub getword();
 			if (sortselect.ends(" AND")) {
 				sortselect.cutter(-4);
 			}
-			if (nextword eq "AND") {
+			if (nextword == "AND") {
 				gosub getword();
 			}
 			goto nextphrase;
@@ -669,7 +669,7 @@ phraseinit:
 
 		sortselect ^= " " ^ word;
 
-		limitx = word eq "LIMIT";
+		limitx = word == "LIMIT";
 		if (limitx) {
 			nlimits += 1;
 		}
@@ -677,7 +677,7 @@ phraseinit:
 		gosub getword();
 
 		// NO/EVERY
-		if ((word eq "NOT" or word eq "NO") or word eq "EVERY") {
+		if ((word == "NOT" or word == "NO") or word == "EVERY") {
 			sortselect ^= " " ^ word;
 			gosub getword();
 		}
@@ -717,7 +717,7 @@ phraseinit:
 
 		// with xx between y and z
 		// with xx from y to z
-		if (nextword eq "BETWEEN" or nextword eq "FROM") {
+		if (nextword == "BETWEEN" or nextword == "FROM") {
 			gosub getword();
 			sortselect ^= " " ^ word;
 			gosub getword();
@@ -730,7 +730,7 @@ phraseinit:
 		} else {
 
 			// parameters
-			while (nextword ne "" and (nextword.isnum() or nextword.starts(DQ) or nextword.starts(SQ))) {
+			while (nextword != "" and (nextword.isnum() or nextword.starts(DQ) or nextword.starts(SQ))) {
 
 				gosub getword();
 				sortselect ^= " " ^ word;
@@ -740,7 +740,7 @@ phraseinit:
 							word.cutter(1).popper();
 						}
 					}
-					if (word eq "") {
+					if (word == "") {
 						word = "\"\"";
 					}
 					limits(3, nlimits, -1) = word;
@@ -749,41 +749,41 @@ phraseinit:
 
 		}
 
-	} else if (word eq "BREAK-ON") {
+	} else if (word == "BREAK-ON") {
 		tt = coln + 1;
 		breakcolns.prefixer(tt ^ _FM);
 		breakopts.prefixer(_FM);
 		nbreaks += 1;
 		breakonflag = 1;
 
-	} else if (word eq "GRAND-TOTAL") {
+	} else if (word == "GRAND-TOTAL") {
 		//zzz Throw away the grand total options for the time being
 		gosub getword();
 		gtotreq = true;
 
-	} else if (word eq "NO-BASE") {
+	} else if (word == "NO-BASE") {
 		nobase = 1;
 
 	//"DET-SUPP"
-	} else if (word eq "DS" or word eq "DET-SUPP") {
+	} else if (word == "DS" or word == "DET-SUPP") {
 		detsupp = 1;
 
 	//"DET-SUPP"
-	} else if (word eq "DS2" or word eq "DET-SUPP2") {
+	} else if (word == "DS2" or word == "DET-SUPP2") {
 		detsupp = 2;
 
 	//"GTOT-SUPP"
-	} else if (word eq "GTS" or word eq "GTOT-SUPP") {
+	} else if (word == "GTS" or word == "GTOT-SUPP") {
 		gtotsupp = true;
 
 	//"MULTIROW-COLHDG"
-	} else if (word eq "DS" or word eq "MULTIROW-COLHDG") {
+	} else if (word == "DS" or word == "MULTIROW-COLHDG") {
 		multirowcolhdg = 1;
 
-	} else if (word eq "TOTAL") {
+	} else if (word == "TOTAL") {
 		totalflag = 1;
 
-	} else if (word eq "USING") {
+	} else if (word == "USING") {
 		gosub getword();
 		dictfilename = word;
 		if (not DICT.open("DICT." ^ dictfilename)) {
@@ -791,7 +791,7 @@ phraseinit:
 		}
 		sortselect ^= " USING " ^ dictfilename;
 
-	} else if (word eq "HEADINGTABLE") {
+	} else if (word == "HEADINGTABLE") {
 
 		lastword = word;
 
@@ -821,7 +821,7 @@ phraseinit:
 			gosub getword();
 
 			//reset to row 1 if column changed
-			if (hcoln ne word) {
+			if (hcoln != word) {
 				hrown = 1;
 			}
 
@@ -858,7 +858,7 @@ phraseinit:
 					abort();
 				}
 			}
-			if (title eq "") {
+			if (title == "") {
 				title = rec.f(3) ^ nbsp ^ ":";
 			}
 		}
@@ -883,7 +883,7 @@ phraseinit:
 		headtab(hrown, tcoln + 1) = value;
 		hrown += 1;
 
-	} else if (word eq "HEADING" and dictrec.f(3) ne "HEADING") {
+	} else if (word == "HEADING" and dictrec.f(3) != "HEADING") {
 
 		gosub getquotedword();
 		head ^= word;
@@ -894,12 +894,12 @@ phraseinit:
 			head.replacer("Page 'P", "'");
 		}
 
-	} else if (word eq "FOOTING") {
+	} else if (word == "FOOTING") {
 		gosub getquotedword();
 		foot2 ^= word;
 
 	//justlen
-	} else if (word eq "JL" or word eq "JUSTLEN") {
+	} else if (word == "JL" or word == "JUSTLEN") {
 		if (not coln) {
 			call mssg("JUSTLEN/JL must follow a column name");
 			abort();
@@ -913,7 +913,7 @@ phraseinit:
 		}
 
 	//colhead
-	} else if (word eq "CH" or word eq "COLHEAD") {
+	} else if (word == "CH" or word == "COLHEAD") {
 		if (not coln) {
 			call mssg("COLHEAD/CH must follow a column name");
 			abort();
@@ -925,7 +925,7 @@ phraseinit:
 			coldict(coln)(3) = word;
 		}
 
-	} else if (word eq "OC" or word eq "OCONV") {
+	} else if (word == "OC" or word == "OCONV") {
 		if (not coln) {
 			call mssg("OCONV/OC must follow a column name");
 			abort();
@@ -939,17 +939,17 @@ phraseinit:
 			coldict(coln)(7) = word;
 		}
 
-	} else if (word eq "ID-SUPP" or word eq "IS") {
+	} else if (word == "ID-SUPP" or word == "IS") {
 		idsupp = 1;
 
-	} else if (word eq "DBL-SPC" or word eq "DB") {
+	} else if (word == "DBL-SPC" or word == "DB") {
 		dblspc = 1;
 
-	} else if (word eq "EMAIL_TO") {
+	} else if (word == "EMAIL_TO") {
 		gosub getword();
 		emailtoid = word;
 
-	} else if (word eq "EMAIL_CC") {
+	} else if (word == "EMAIL_CC") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
 			emailcc = word.cut(1).pop();
@@ -958,7 +958,7 @@ phraseinit:
 			emailccid = word;
 		}
 
-	} else if (word eq "EMAIL_SUBJECT") {
+	} else if (word == "EMAIL_SUBJECT") {
 		gosub getword();
 		if ((DQ ^ "'").contains(word[1])) {
 			emailsubject = word.cut(1).pop();
@@ -978,7 +978,7 @@ phraseinit:
 			//if dictrec<1>='A' then dictrec<1>='F'
 
 			// Suppress untotalled columns if doing detsupp2
-			if (detsupp eq 2 and (not(totalflag or breakonflag))) {
+			if (detsupp == 2 and (not(totalflag or breakonflag))) {
 				if (var("JL,JUSTLEN,CH,COLHEAD,OC,OCONV").locateusing(",", nextword, xx)) {
 					gosub getword();
 					gosub getword();
@@ -994,7 +994,7 @@ phraseinit:
 				int nn = dictrec.f(3).fcount(_VM);
 				for (int ii = 1; ii <= nn; ++ii) {
 					tt = dictrec.f(3, ii);
-					if (dictrec.f(10) and tt.len() gt dictrec.f(10)) {
+					if (dictrec.f(10) and tt.len() > dictrec.f(10)) {
 						dictrec(10) = tt.len();
 					}
 				} //ii;
@@ -1002,7 +1002,7 @@ phraseinit:
 
 			dictrec(bheadfn) = "";
 
-			if (detsupp lt 2) {
+			if (detsupp < 2) {
 				if (not(totalflag or breakonflag)) {
 					//tt=' id="BHEAD"'
 					//if detsupp then tt:=' style="display:none"'
@@ -1027,11 +1027,11 @@ phraseinit:
 			if (html) {
 				tt = dictrec.f(7);
 				tt.replacer("[DATE]", "[DATE,*]");
-				if (tt eq "[DATE,4]") {
+				if (tt == "[DATE,4]") {
 					tt = "[DATE,4*]";
 				}
 				dictrec(7) = tt;
-				if (tt eq "[DATE,*]") {
+				if (tt == "[DATE,*]") {
 					dictrec(9) = "R";
 				}
 			}
@@ -1101,7 +1101,7 @@ phraseinit:
 dictrecexit:
 	{}
 	}
-	else if (word eq "IGNOREWORD") {
+	else if (word == "IGNOREWORD") {
 		gosub getword();
 		ignorewords(1, -1) = word;
 
@@ -1112,7 +1112,7 @@ dictrecexit:
 		}
 		let oldword = word;
 		call mssg(tt, "RCE", word, "");
-		if (word eq oldword or word eq "\x1B") {
+		if (word == oldword or word == "\x1B") {
 			abort();
 		}
 		gosub getwordexit();
@@ -1270,16 +1270,16 @@ x1exit:
 				tt.replacer("\\\\", _VM);
 
 				colhdg(coln2) = tt;
-				if (tt.count(_VM) gt vmcount) {
+				if (tt.count(_VM) > vmcount) {
 					vmcount = tt.count(_VM);
 				}
 
 				coltags(-1) = " <col";
 				align = coldict2(coln, 9);
-				if (align eq "R") {
+				if (align == "R") {
 					align = "right";
 					coltags ^= " style=\"text-align:right\"";
-				} else if (align eq "T") {
+				} else if (align == "T") {
 					align = "left";
 					coltags ^= " style=\"text-align:left\"";
 				} else {
@@ -1355,7 +1355,7 @@ x1exit:
 
 	// Heading options
 
-	if (head eq "" and not(rawtable)) {
+	if (head == "" and not(rawtable)) {
 		head = filename ^ var(10).space() ^ " 'T'";
 	}
 
@@ -1432,11 +1432,11 @@ nextdict:
 			if (not(dictrec.readc(DICT, dictid))) {
 				goto nextdict;
 			}
-			if (dictrec.f(1) ne "F") {
+			if (dictrec.f(1) != "F") {
 				goto nextdict;
 			}
 			for (int limitn : range(1, nlimits)) {
-				if (dictrec.f(4).field(".", 1) eq limits.f(4, limitn)) {
+				if (dictrec.f(4).field(".", 1) == limits.f(4, limitn)) {
 					tt = dictrec.f(2);
 					if (tt) {
 						if (not(limits.f(5, limitn).locateusing(_SM, tt, xx))) {
@@ -1453,7 +1453,7 @@ nextdict:
 //////////
 //initrec:
 //////////
-	if (sortselect.count(" ") gt 2 or keylist) {
+	if (sortselect.count(" ") > 2 or keylist) {
 
 		// Preselect if sselect is by any mv fields since that ignores maxnrecs
 		if (not(LISTACTIVE)) {
@@ -1507,7 +1507,7 @@ nextrec:
 
 	// Limit number of records
 	if (maxnrecs) {
-		if (recn ge maxnrecs) {
+		if (recn >= maxnrecs) {
 			clearselect();
 		}
 	}
@@ -1526,12 +1526,12 @@ nextrec:
 			gosub printtx();
 			abort();
 		}
-		if (FILEERROR.f(1) eq 421) {
+		if (FILEERROR.f(1) == 421) {
 			tx = "Operation aborted by user.";
 			gosub printtx();
 			abort();
 		}
-		if (FILEERROR and FILEERROR.f(1) ne 111) {
+		if (FILEERROR and FILEERROR.f(1) != 111) {
 			tx = "*** Error " ^ FILEERROR.f(1) ^ " reading record " ^ ID ^ " ***";
 			gosub printtx();
 			readerr += 1;
@@ -1571,7 +1571,7 @@ nextrec:
 				tt = RECORD.f(fn);
 				if (tt.len()) {
 					tt = tt.fcount(_VM);
-					if (tt gt nmvs) {
+					if (tt > nmvs) {
 						nmvs = tt;
 					}
 				}
@@ -1580,7 +1580,7 @@ nextrec:
 			limitvals = calculate(limits.f(1, limitn));
 			for (int mvx = nmvs; mvx >= 1; --mvx) {
 				tt = limitvals.f(1, mvx);
-				if (tt eq "") {
+				if (tt == "") {
 					tt = "\"\"";
 				}
 				if (not(limits.f(3, limitn).locateusing(_SM, tt, xx))) {
@@ -1599,14 +1599,14 @@ nextrec:
 //recinit:
 //////////
 
-	if (recn eq 1) {
+	if (recn == 1) {
 		head.move(newhead);
 		gosub newheadreplacements();
 		newhead.move(head);
 	}
 
 	if (not(silent) and not(printfilename.unassigned())) {
-		if (recn le 2) {
+		if (recn <= 2) {
 			logputl();
 		}
 		if (printfilename and not(mod(recn, 10))) {
@@ -1625,7 +1625,7 @@ nextrec:
 
 	for (int coln : range(1, ncols)) {
 
-		if (coldict2(coln, 9) eq "T" and not(html)) {
+		if (coldict2(coln, 9) == "T" and not(html)) {
 
 			mcol(coln) = oconv(calculate(colname(coln)), coldict2(coln, 11));
 
@@ -1645,7 +1645,7 @@ nextrec:
 
 	// Break subtotals
 	// Detect most major level to break
-	if (recn eq 1) {
+	if (recn == 1) {
 		// Print breaks will not actually print before the first record
 		// but it needs to set the various break values
 		breakleveln = nbreaks;
@@ -1653,7 +1653,7 @@ nextrec:
 		for (leveln = nbreaks; leveln >= 1; --leveln) {
 			coln = breakcolns.f(leveln);
 
-			if (scol(coln) ne breakvalue(coln))
+			if (scol(coln) != breakvalue(coln))
 				break;
 
 		} //leveln;
@@ -1673,11 +1673,11 @@ recexit:
 	// Remove appropriate value from multi-valued column(s)
 	newmarklevel = 0;
 	for (int coln : range(1, ncols)) {
-		if (ccol(coln) ge previousmarklevel) {
+		if (ccol(coln) >= previousmarklevel) {
 			icol(coln) = mcol(coln).substr2(pcol(coln), ccol(coln));
 			scol(coln) = icol(coln);
 		}
-		if (ccol(coln) gt newmarklevel) {
+		if (ccol(coln) > newmarklevel) {
 			newmarklevel = ccol(coln);
 		}
 	} //coln;
@@ -1696,7 +1696,7 @@ recexit:
 					if (breaktotal(coln, 1).isnum() and icol(coln).isnum()) {
 						breaktotal(coln, 1) += icol(coln);
 					} else {
-						if (colname(coln) eq "DATEGRID") {
+						if (colname(coln) == "DATEGRID") {
 							str1 = icol(coln);
 							str2 = breaktotal(coln, 1);
 							gosub addstr();
@@ -1710,7 +1710,7 @@ recexit:
 		}
 	} //coln;
 
-	if (detsupp lt 2) {
+	if (detsupp < 2) {
 
 		if (anytotals and not(blockn)) {
 			nblocks += 1;
@@ -1730,7 +1730,7 @@ recexit:
 				tx1 ^= " class=\"B" ^ blockn ^ DQ;
 				if (detsupp) {
 					tx1 ^= " style=\"cursor:pointer";
-					if (detsupp eq 1) {
+					if (detsupp == 1) {
 						tx1 ^= ";display:none";
 					}
 					tx1 ^= DQ;
@@ -1756,7 +1756,7 @@ recexit:
 				if (not html) {
 					tt = oconv(tt, coldict2(coln, 11));
 				}
-				if (tt eq "") {
+				if (tt == "") {
 					//tt=nbsp
 				} else {
 					tt.replacer(_EOL, "<br />");
@@ -1764,7 +1764,7 @@ recexit:
 
 				// Colored cells starting with colorprefix
 				if (tt.starts(colorprefix)) {
-					if (tt[2] eq colorprefix) {
+					if (tt[2] == colorprefix) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
@@ -1848,7 +1848,7 @@ x2exit:
 		// This results in duplication and is page-wide instead of report-wide so remove
 		// but will this cause problems in some reports?
 
-		if (pagebreaks eq "" and headtab eq "") {
+		if (pagebreaks == "" and headtab == "") {
 			if (html) {
 				tx ^= "<p style=\"text-align:center\">";
 			}
@@ -1856,7 +1856,7 @@ x2exit:
 			// records
 			tt = recn + 0;
 			tx ^= tt ^ " record";
-			if (recn ne 1) {
+			if (recn != 1) {
 				tx ^= "s";
 			}
 
@@ -1937,7 +1937,7 @@ getnextword:
 		}
 	}
 
-	if (word eq "") {
+	if (word == "") {
 		nextword = "";
 	} else {
 		storewordn = wordn;
@@ -1965,7 +1965,7 @@ getword2b:
 
 	// Initialise pointer to zero (pointing before the first char which is 1)
 	// NB 1 based character indexing! not zero based!
-	if (wordn eq 1) {
+	if (wordn == 1) {
 		charn = 0;
 	}
 
@@ -1973,9 +1973,9 @@ getword2b:
 	charn += 1;
 
 	// Skip spaces
-	while (sentencex[charn] eq " ") {
+	while (sentencex[charn] == " ") {
 		charn += 1;
-		if (charn gt sentencex.len()) {
+		if (charn > sentencex.len()) {
 			return;
 		}
 	}
@@ -1984,7 +1984,7 @@ getword2b:
 	// otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-	if (charx eq _DQ or charx eq _SQ) {
+	if (charx == _DQ or charx == _SQ) {
 		searchchar = charx;
 	} else {
 		searchchar = " ";
@@ -1997,14 +1997,14 @@ getword2b:
 		charn += 1;
 		charx = sentencex[charn];
 
-		if (charx eq searchchar)
+		if (charx == searchchar)
 			break;
 
 		word ^= charx;
 	}
 
 	// If scanned for " or ' then add it to the word
-	if (searchchar ne " ") {
+	if (searchchar != " ") {
 		word ^= searchchar;
 		charn += 1;
 
@@ -2047,12 +2047,12 @@ subroutine getwordexit() {
 	wordexpanded = 0;
 
 	// Standardise using dict.voc to translate input words
-	if (DICT eq "") {
+	if (DICT == "") {
 		goto dictvoc;
 	}
 	if (dictrec.readc(DICT, word)) {
 maindict:
-		if (dictrec.f(1) eq "G") {
+		if (dictrec.f(1) == "G") {
 			tt = dictrec.f(3);
 			tt.converter(_VM, " ");
 			sentencex.paster(startcharn, word.len(), tt);
@@ -2069,7 +2069,7 @@ dictvoc:
 		dictrec = "";
 		if (dictrec.readc(dictvoc, word)) {
 gotdictvoc:
-			if (dictrec.f(1) eq "RLIST") {
+			if (dictrec.f(1) == "RLIST") {
 				if (dictrec.f(4)) {
 					word = dictrec.f(4);
 				}
@@ -2084,34 +2084,34 @@ gotdictvoc:
 	}
 	dictrec.converter("|", _VM);
 
-	if (word eq "=") {
+	if (word == "=") {
 		word = "EQ";
 	}
-	if (word eq "EQUAL") {
+	if (word == "EQUAL") {
 		word = "EQ";
 	}
-	if (word eq "<>") {
+	if (word == "<>") {
 		word = "NE";
 	}
-	if (word eq ">") {
+	if (word == ">") {
 		word = "GT";
 	}
-	if (word eq "<") {
+	if (word == "<") {
 		word = "LT";
 	}
-	if (word eq ">=") {
+	if (word == ">=") {
 		word = "GE";
 	}
-	if (word eq "<=") {
+	if (word == "<=") {
 		word = "LE";
 	}
-	if (word eq "CONTAINING") {
+	if (word == "CONTAINING") {
 		word = "[]";
 	}
-	if (word eq "ENDING") {
+	if (word == "ENDING") {
 		word = "[";
 	}
-	if (word eq "STARTING") {
+	if (word == "STARTING") {
 		word = "]";
 	}
 
@@ -2144,12 +2144,12 @@ subroutine printbreaks() {
 			if (tx and not tx.ends(_FM)) {
 				tx ^= _FM;
 			}
-			if (leveln gt 1 and not(html)) {
+			if (leveln > 1 and not(html)) {
 				tx ^= underline ^ _FM;
 			}
 		} else {
 			if (not html) {
-				underline2 = leveln eq 1 ? underline : bar;
+				underline2 = leveln == 1 ? underline : bar;
 				if (not((tx.last(2)).contains(ulchar))) {
 					if (not tx.ends(_FM)) {
 						tx ^= _FM;
@@ -2163,7 +2163,7 @@ subroutine printbreaks() {
 		// Print one row of totals
 		if (html) {
 			if (gtotreq) {
-				if (leveln gt nbreaks) {
+				if (leveln > nbreaks) {
 					tx ^= "</tbody><tbody>";
 				}
 			}
@@ -2180,7 +2180,7 @@ subroutine printbreaks() {
 				cell = breaktotal(coln, leveln);
 
 				// Add into the higher level
-				if (leveln le nbreaks) {
+				if (leveln <= nbreaks) {
 
 					if (cell) {
 						if (html) {
@@ -2214,7 +2214,7 @@ subroutine printbreaks() {
 				breaktotal(coln, leveln) = "";
 
 			// Break column
-			} else if (coln eq breakcoln) {
+			} else if (coln == breakcoln) {
 
 				// Print the old break value
 				cell = breakvalue(coln);
@@ -2229,7 +2229,7 @@ subroutine printbreaks() {
 				if (pagebreaks.f(coln)) {
 
 					// Rebuild the heading
-					if (newhead eq "") {
+					if (newhead == "") {
 						newhead = orighead;
 						gosub newheadreplacements();
 					}
@@ -2249,7 +2249,7 @@ subroutine printbreaks() {
 
 				}
 
-				if (detsupp lt 2 and not(anytotals)) {
+				if (detsupp < 2 and not(anytotals)) {
 					//cell=nbsp
 					cell = "";
 				}
@@ -2260,7 +2260,7 @@ subroutine printbreaks() {
 
 				cell = oconv(oldbreakvalue(coln), coldict2(coln, 7));
 				if (var colbreakn; breakcolns.locateusing(_FM, coln, colbreakn)) {
-					if (colbreakn lt leveln) {
+					if (colbreakn < leveln) {
 						cell = "Total";
 					}
 				}
@@ -2276,7 +2276,7 @@ subroutine printbreaks() {
 					tx ^= coldict2(coln, bheadfn);
 				}
 				if (html) {
-					if (coldict2(coln, 9) eq "R") {
+					if (coldict2(coln, 9) == "R") {
 						tx ^= " style=\"text-align:right\"";
 					}
 					tx ^= ">";
@@ -2304,7 +2304,7 @@ subroutine printbreaks() {
 			tx ^= "</tr>";
 		}
 
-		if (detsupp lt 2) {
+		if (detsupp < 2) {
 			//if leveln>1 and not(html) then tx:=fm:underline
 		} else {
 			if (not html) {
@@ -2314,14 +2314,14 @@ subroutine printbreaks() {
 
 		// Option to suppress the current level
 		// or if this is the first record cannot be any totals before it.
-		if ((not(anycell) or breakopts.f(leveln).contains("X")) or recn eq 1) {
+		if ((not(anycell) or breakopts.f(leveln).contains("X")) or recn == 1) {
 			tx = storetx;
 		}
 
 	} //leveln;
 
 	// If only one record found then avoid skipping printing totals for det-supp
-	if (detsupp lt 2 or recn gt 1) {
+	if (detsupp < 2 or recn > 1) {
 
 		if (not html) {
 			if (not anytotals) {
@@ -2376,19 +2376,19 @@ subroutine printbreaks() {
 subroutine addstr() {
 
 	str3 = str2;
-	if (str3.len() lt str1.len()) {
+	if (str3.len() < str1.len()) {
 		str3 ^= (str1.len() - str2.len()).space();
 	}
 	for (int ii = 1; ii <= str1.len(); ++ii) {
 		char1 = (str1[ii]).trim();
-		if (char1 ne "") {
+		if (char1 != "") {
 			char2 = str3[ii];
-			if (char2 eq " ") {
+			if (char2 == " ") {
 				str3.paster(ii, 1, char1);
 			} else {
 				if (char1.isnum() and char2.isnum()) {
 					char3 = char1 + char2;
-					if (char3 gt 9) {
+					if (char3 > 9) {
 						char3 = "*";
 					}
 				} else {
@@ -2432,9 +2432,9 @@ subroutine emailing() {
 
 	// Dont email if no change
 	if (lastrecord) {
-	} else if (nextemailto ne emailto) {
-	} else if (nextemailcc ne emailcc) {
-	} else if (nextemailsubject ne emailsubject) {
+	} else if (nextemailto != emailto) {
+	} else if (nextemailcc != emailcc) {
+	} else if (nextemailsubject != emailsubject) {
 	} else {
 		return;
 	}

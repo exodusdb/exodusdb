@@ -58,7 +58,7 @@ function main() {
 	var tofilename = COMMAND.f(pos1 + 1);
 	let tokeys = field(COMMAND, FM, pos1 + 2, 999'999'999);
 
-	if (tofilename eq ".")
+	if (tofilename == ".")
 		tofilename = fromfilename;
 
 	var fromfile;
