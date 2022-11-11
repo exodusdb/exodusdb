@@ -219,6 +219,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 #include <exodus/vardbconn.h>  // placed as last include, causes boost header compiler errors
 //#include <exodus/exoenv.h>
 //#include <exodus/mvutf.h>
+#include <exodus/dim.h>
 
 #include "timebank.h"
 
@@ -725,9 +726,14 @@ var build_conn_info(CVR conninfo) {
 	// 5) hard coded default parameters
 
 	var result(conninfo);
+	result.trimmer();
+
 	// if no conninfo details provided then use last connection details if any
 	//if (!conninfo)
 	//	result = thread_connparams;
+
+	// Remove spaces around = to enable parsing using space
+	result.regex_replacer("\\s+=\\s+", "=");
 
 	// otherwise search for details from exodus config file
 	// if incomplete connection parameters provided
@@ -777,6 +783,27 @@ var build_conn_info(CVR conninfo) {
 
 		result = defaultconninfo ^ " " ^ configconn ^ " " ^ envconn ^ " " ^ result;
 	}
+
+	// Remove excess spaces. Especially around = to enable parsing using space
+	result.regex_replacer("\\s+=\\s+", "=");
+	result.trimmer();
+
+	// Work backwards through parts
+	dim parts = result.split(" ").reverse();
+	result = "";
+	var keys = "";
+	for (const var& part : parts) {
+
+		// Ignore params already seen
+		const var key = part.field("=", 1);
+		if (keys.locate(key))
+			continue;
+		keys ^= key ^ VM;
+
+		result ^= part ^ " ";
+	}
+	result.popper();
+
 	return result;
 }
 
