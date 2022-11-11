@@ -121,7 +121,7 @@ dim ccol;
 dim scol;
 dim icol;
 var bheadfn;//num
-int coln;//num
+//int coln;//num
 var head;
 var foot2;
 int nbreaks;//num
@@ -172,7 +172,7 @@ var tt2;
 var charx;
 int charn;//num
 int ncols;//num
-int breakn;//num
+//int breakn;//num
 var underline;
 var colul;
 var bar;
@@ -239,7 +239,7 @@ var storetx;
 var lastblockn;
 var underline2;
 var cell;//num
-var colbreakn;
+//var colbreakn;
 var bottomline2;
 var char1;//num
 var char2;//num
@@ -480,7 +480,7 @@ function main() {
 	scol.redim(maxncols);
 	icol.redim(maxncols);
 	bheadfn = 15;
-	coln = 0;
+	int coln = 0;
 	head = "";
 	foot2 = "";
 	nbreaks = 0;
@@ -1175,7 +1175,7 @@ x1exit:
 		coldict(1)(11) = tt;
 
 		// Increment the list of breaking columns by one as well
-		for (breakn = 1; breakn <= nbreaks; ++breakn) {
+		for (int breakn : range(1, nbreaks)) {
 			breakcolns(breakn) = breakcolns.f(breakn) + 1;
 		}
 
@@ -1203,7 +1203,7 @@ x1exit:
 	if (not html) {
 		underline = "";
 		colul = "";
-		for (coln = 1; coln <= ncols; ++coln) {
+		for (int coln : range(1, ncols)) {
 			if (coldict2(coln, 10)) {
 				if (coldict2(coln, 12)) {
 					tt = ulchar;
@@ -1245,7 +1245,7 @@ x1exit:
 	vmcount = 0;
 	thproperties = "";
 
-	for (coln = 1; coln <= ncols; ++coln) {
+	for (int coln : range(1, ncols)) {
 
 		// Suppress drilldown if no totals or breakdown
 		if (not(anytotals) or not(nbreaks)) {
@@ -1435,7 +1435,7 @@ nextdict:
 			if (dictrec.f(1) ne "F") {
 				goto nextdict;
 			}
-			for (limitn = 1; limitn <= nlimits; ++limitn) {
+			for (int limitn : range(1, nlimits)) {
 				if (dictrec.f(4).field(".", 1) eq limits.f(4, limitn)) {
 					tt = dictrec.f(2);
 					if (tt) {
@@ -1562,7 +1562,7 @@ nextrec:
 	if (limits) {
 
 		// For each limit pass through record deleting all unwanted multivalues
-		for (limitn = 1; limitn <= nlimits; ++limitn) {
+		for (int limitn : range(1, nlimits)) {
 
 			// Find maximum mv number for the associated group of fns
 			let fns = limits.f(5, limitn).convert(_SM, _FM);
@@ -1623,7 +1623,7 @@ nextrec:
 	//unless you put TOTAL dictid
 	//get the data from the record into an array of columns
 
-	for (coln = 1; coln <= ncols; ++coln) {
+	for (int coln : range(1, ncols)) {
 
 		if (coldict2(coln, 9) eq "T" and not(html)) {
 
@@ -1672,7 +1672,7 @@ recexit:
 
 	// Remove appropriate value from multi-valued column(s)
 	newmarklevel = 0;
-	for (coln = 1; coln <= ncols; ++coln) {
+	for (int coln : range(1, ncols)) {
 		if (ccol(coln) ge previousmarklevel) {
 			icol(coln) = mcol(coln).substr2(pcol(coln), ccol(coln));
 			scol(coln) = icol(coln);
@@ -1683,7 +1683,7 @@ recexit:
 	} //coln;
 
 	// Break totals - add at the bottom level (1)
-	for (coln = 1; coln <= ncols; ++coln) {
+	for (int coln : range(1, ncols)) {
 		// Only totalled columns
 		if (coldict2(coln, 12)) {
 			if (icol(coln)) {
@@ -1739,7 +1739,7 @@ recexit:
 			}
 			tx1 ^= ">";
 		}
-		for (coln = 1; coln <= ncols; ++coln) {
+		for (int coln : range(1, ncols)) {
 			tt = scol(coln);
 			oconvx = coldict2(coln, 7);
 			if (oconvx) {
@@ -1803,7 +1803,7 @@ recexit:
 
 		// Folding text or multivalued lines
 		if (newmarklevel) {
-			for (coln = 1; coln <= ncols; ++coln) {
+			for (int coln : range(1, ncols)) {
 				scol(coln) = "";
 			}
 			previousmarklevel = newmarklevel;
@@ -2132,7 +2132,7 @@ subroutine printbreaks() {
 	// Print breaks from minor level (1) up to required level
 	// Required level can be nbreaks+1 (ie the grand total)
 
-	for (leveln = 1; leveln <= breakleveln; ++leveln) {
+	for (int leveln : range(1, breakleveln)) {
 		breakcoln = breakcolns.f(leveln);
 
 		storetx = tx;
@@ -2173,7 +2173,7 @@ subroutine printbreaks() {
 			}
 			tx ^= ">";
 		}
-		for (coln = 1; coln <= ncols; ++coln) {
+		for (int coln : range(1, ncols)) {
 
 			// Total column
 			if (coldict2(coln, 12)) {
@@ -2259,7 +2259,7 @@ subroutine printbreaks() {
 				cell = "";
 
 				cell = oconv(oldbreakvalue(coln), coldict2(coln, 7));
-				if (breakcolns.locateusing(_FM, coln, colbreakn)) {
+				if (var colbreakn; breakcolns.locateusing(_FM, coln, colbreakn)) {
 					if (colbreakn lt leveln) {
 						cell = "Total";
 					}

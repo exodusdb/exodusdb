@@ -12,7 +12,7 @@ function main() {
 	if (indexnames eq "xref") {
 		indexnames = var().listindex();
 		var indexnames2 = "";
-		for (auto index : indexnames) {
+		for (var index : indexnames) {
 			if (index.ends("_xref"))
 				indexnames2 ^= index ^ FM;
 		}
@@ -25,8 +25,7 @@ function main() {
 
 	var result = 0;
 
-	var indexn;
-	for (indexn = 1; indexn <= nindexes; ++indexn) {
+	for (var indexn : range(1, nindexes)) {
 
 		var filename = indexnames.f(indexn);
 		if (not filename)

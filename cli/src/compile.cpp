@@ -952,21 +952,24 @@ function main() {
 						// Wrapping parameter names in /* */ also works
 						funcargsdecl.replacer("[[maybe_unused]]", "").trimmer();
 
-						//funcargsdecl=funcargsdecl.field(")",1);
-						int level = 0;
-						int charn;
-						for (charn = 1; charn <= len(funcargsdecl); ++charn) {
-							let ch = funcargsdecl.b(charn, 1);
-							if (ch eq ")") {
-								if (level eq 0)
-									break;
-								--level;
-							} else if (ch eq "(")
-								++level;
+						// Cut after the closing ), ignoring any additional pairs of ( ) beforehand
+						{
+							int level = 0;
+							for (int charn : range(1, len(funcargsdecl))) {
+								let ch = funcargsdecl[charn];
+								if (ch eq ")") {
+									if (level eq 0) {
+										funcargsdecl.firster(charn);
+										break;
+									}
+									--level;
+								} else if (ch eq "(")
+									++level;
+							}
 						}
-						funcargsdecl.firster(charn - 1);
+//						funcargsdecl.firster(charn - 1);
 
-						//replace comment outs like /*arg1*/ with arg1
+						// Replace comment outs like /*arg1*/ with arg1
 						funcargsdecl.regex_replacer(
 										"/"
 										"\\*",
