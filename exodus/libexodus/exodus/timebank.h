@@ -2,7 +2,10 @@
 #define EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_
 
 #ifndef EXODUS_TIMEBANK
-	struct Timer{Timer(int){}};
+	struct Timer{
+		explicit Timer(int){
+		}
+	};
 #else
 
 #include <chrono>

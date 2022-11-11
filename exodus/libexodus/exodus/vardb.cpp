@@ -56,19 +56,19 @@ THE SOFTWARE.
 
 /* How do transactions work in EXODUS?
 
-1. Visibilty of updates you make in a transaction
+Exodus uses postgresql's default transaction isolation level which is "READ COMMITTED"
 
-Before you commit, any and all updates you make will not be read by any other connection.
+See https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED
 
-After you commit, any and all updates that you made will be immediately readable by all other connections regardless of whether they are in a transaction or not.
+1. Visibility of updates you make while in a transaction.
 
-Other connections can choose to be in a transaction mode where they CANNOT read any updates made after the commencement of their transaction. This allows reports to be consistent. NO IMPLEMENTED YET
+Any and all updates that you make while in a transaction will not be seen by any other connection until you commit your transaction.
 
-2. Visibility of other transactions while in a transaction.
+On committing, any and all updates that you made will be immediately visible to all other connections that were not in a transaction at the time you committed.
 
-During your transaction on a connection by default you can will read any and all committed updates from other connections immediately they occur.
+2. Visibility of other connections updates while you are in a transaction.
 
-Optionally you can be in a transaction mode where you will NOT read any updates made by other transactions after the commencement of your transaction.
+During your transaction you will not see any updates from transactions committed after you started your transaction.
 
 3. Lock visibility
 
@@ -76,7 +76,7 @@ Locks are essentially independent of transactions and can be seen by other conne
 
 However, locks placed during a transaction cannot be unlocked and are automatically released after you commit. Unlock commands are therefore ignored.
 
-Within transactions, lock requests for locks that have already been obtained SUCCEED. This is the opposite of repeated locks outside of transactions which FAIL.
+Within transactions, lock requests for locks that have already been obtained always SUCCEED. This is the opposite of duplicate locks outside of transactions, which FAIL.
 
 4. How to coordinate updates between asynchronous processes using locks.
 
@@ -99,7 +99,7 @@ Within transactions, lock requests for locks that have already been obtained SUC
 
 	Locks form a barrier between changed state.
 
-	In the above, WRITE encompasses INSERT, UPDATE and DELETE.
+	In the above, "WRITE" encompasses INSERT, UPDATE and DELETE.
 
 5. Postgres facilities used
 
@@ -157,6 +157,7 @@ Within transactions, lock requests for locks that have already been obtained SUC
 #include <cstring>	//for strcmp strlen
 
 #include <string>
+#include <string_view>
 
 // Using map for caches instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
@@ -390,8 +391,8 @@ class DBresult {
 	DBresult() = default;
 
 	// Allow construction from a PGresult*
-	DBresult(PGresult* pgresult)
-	//explicit DBresult(PGresult* pgresult)
+	//DBresult(PGresult* pgresult)
+	explicit DBresult(PGresult* pgresult)
 	:
 	pgresult_(pgresult) {
 
@@ -1427,7 +1428,7 @@ bool var::read(CVR filehandle, CVR key) {
 	var sql = "SELECT data FROM " ^ get_normal_filename(filehandle) ^ " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
-	DBresult dbresult = PQexecParams(pgconn,
+	auto dbresult = (DBresult) PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(), 1, /* one param */
 											nullptr,					/* let the backend deduce param type */
@@ -1567,7 +1568,7 @@ var var::lock(CVR key) const {
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ *this ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
-	DBresult dbresult = PQexecParams(pgconn,
+	auto dbresult = (DBresult) PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,                                      /* one param */
 											nullptr,                                     /* let the backend deduce param type */
@@ -1642,7 +1643,7 @@ bool var::unlock(CVR key) const {
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ *this ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
-	DBresult dbresult = PQexecParams(pgconn,
+	auto dbresult = (DBresult) PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										/* one param */
 											nullptr,									/* let the backend deduce param type */
@@ -1734,7 +1735,7 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
 	// whereas PQexecParams is the opposite
-	DBresult dbresult = PQexec(pgconn, sqlcmd.var_str.c_str());
+	auto dbresult = (DBresult) PQexec(pgconn, sqlcmd.var_str.c_str());
 
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK &&
 		PQresultStatus(dbresult) != PGRES_TUPLES_OK) {
@@ -1857,7 +1858,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
 	DEBUG_LOG_SQL1
-	DBresult dbresult = PQexecParams(pgconn,
+	auto dbresult = (DBresult) PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
@@ -1922,7 +1923,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	}
 
 	DEBUG_LOG_SQL1
-	DBresult dbresult = PQexecParams(pgconn,
+	auto dbresult = (DBresult) PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,        // two params (key and data)
@@ -1989,7 +1990,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	}
 
 	DEBUG_LOG_SQL1
-	DBresult dbresult = PQexecParams(pgconn,
+	auto dbresult = (DBresult) PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
@@ -2064,7 +2065,7 @@ bool var::deleterecord(CVR key) const {
 	}
 
 	DEBUG_LOG_SQL1
-	DBresult dbresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
+	auto dbresult = (DBresult) PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
 											nullptr,							/* let the backend deduce param type */
 											paramValues, paramLengths,
 											0,  // text arguments
@@ -2129,6 +2130,8 @@ bool var::begintrans() const {
 
 	// begin a transaction
 	//if (!this->sqlexec("BEGIN"))
+	// Read Committed is the default isolation level in PostgreSQL.
+	// https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED
 	if (!this->sqlexec("BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED"))
 		return false;
 
@@ -2460,7 +2463,7 @@ inline var get_fileexpression(CVR mainfilename, CVR filename, CVR keyordata) {
 	// "coalesce(" ^ expression ^", ''::text)";
 }
 
-var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, VARREF ismv, bool forsort) {
+var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool forsort) {
 
 	Timer t(262);//get_dictexpression
 
@@ -2562,19 +2565,19 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	var fieldno = dictrec.f(2);
 	var conversion = dictrec.f(7);
 
-	var isinteger = conversion == "[NUMBER,0]" || dictrec.f(11) == "0N" ||
+	bool isinteger = conversion == "[NUMBER,0]" || dictrec.f(11) == "0N" ||
 					dictrec.f(11).starts("0N_");
-	var isdecimal = conversion.starts("MD") || conversion.starts("[NUMBER") ||
+	bool isdecimal = conversion.starts("MD") || conversion.starts("[NUMBER") ||
 					dictrec.f(12) == "FLOAT" || dictrec.f(11).contains("0N");
 	//dont assume things that are R are numeric
 	//eg period 1/19 is right justified but not numeric and sql select will crash if ::float8 is used
 	//||dictrec.f(9) == "R";
-	var isnumeric = isinteger || isdecimal || dictrec.f(9) == "R";
-	var ismv1 = dictrec.f(4).starts("M");
+	bool isnumeric = isinteger || isdecimal || dictrec.f(9) == "R";
+	bool ismv1 = dictrec.f(4).starts("M");
 	var fromjoin = false;
 
-	var isdate = conversion.starts("D") || conversion.starts("[DATE");
-	var istime = !isdate && (conversion.starts("MT") || conversion.starts("[TIME"));
+	bool isdate = conversion.starts("D") || conversion.starts("[DATE");
+	bool istime = !isdate && (conversion.starts("MT") || conversion.starts("[TIME"));
 
 	var sqlexpression;
 	if (dicttype == "F") {
@@ -2653,13 +2656,13 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		while (function_src.f(1,1).contains("#include "))
 			function_src.remover(1,1);
 		var pgsql_pos = function_src.index(_VM "/" "*pgsql");
-//		var is_ans_xlate = (!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(");
+//		bool is_ans_xlate = (!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate(");
 //TRACE(is_ans_xlate);// 0 ??
 //		is_ans_xlate = ((!ismv1 || stage2_calculated) && function_src.trimfirst("\t /").lcase().starts("/" "/@ans=xlate("));
 //TRACE(is_ans_xlate);// 0 ??
-		var x = (!ismv1 || stage2_calculated);
-		var y = function_src.trimfirst("\t /").convert(" ","").lcase().starts("@ans=xlate(");
-		var is_ans_xlate = x and y;
+		bool x = (!ismv1 || stage2_calculated);
+		bool y = function_src.trimfirst("\t /").convert(" ","").lcase().starts("@ans=xlate(");
+		bool is_ans_xlate = x and y;
 		if (DBTRACE) {
 			TRACE(pgsql_pos)
 			TRACE(function_src.f(1,1))
@@ -2940,7 +2943,7 @@ exodus_call:
 			// request FROM the db - unless it were to setup ANOTHER threada and pgconnection to
 			// handle it. this is also perhaps SLOW since it has to copy the whole RECORD and ID
 			// etc to exodus via IPC for every call!
-			sqlexpression = "'" ^ fieldname ^ "'";
+			// sqlexpression = "'" ^ fieldname ^ "'";
 			int environmentn = 1;  // getenvironmentn()
 			sqlexpression = "exodus_call('exodusservice-" ^ var().ospid() ^ "." ^
 							environmentn ^ "', '" ^ dictfilename.lcase() ^ "', '" ^
@@ -3172,8 +3175,10 @@ var getword(VARREF remainingwords, VARREF ucword) {
 	}
 
 	ucword = word1.ucase();
-	if (DBTRACE) TRACE(word1);
-	if (DBTRACE) TRACE(remainingwords);
+	if (DBTRACE) {
+		TRACE(word1);
+		TRACE(remainingwords);
+	}
 	return word1;
 }
 
@@ -3284,7 +3289,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var joins = "";
 	var unnests = "";
 	var selects = "";
-	var ismv = false;
+	bool ismv = false;
 
 	var maxnrecs = "";
 	var xx; // throwaway return value
@@ -5227,7 +5232,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	var joins = "";   // throw away - cant index on joined fields at the moment
 	var unnests = ""; // unnests are only created for ORDER BY, not indexing or selecting
 	var selects = "";
-	var ismv;
+	bool ismv;
 	var forsort = false;
 	var dictexpression = get_dictexpression(*this, filename, filename, actualdictfile, actualdictfile,
 									fieldname, joins, unnests, selects, ismv, forsort);

@@ -20,11 +20,11 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 	// no longer need locking since dbconns_ is thread_local
 	//std::lock_guard lock(dbconns_mutex);
 
-	dbconn_no_++;
+	++dbconn_no_;
 	dbconns_[dbconn_no_] = DBConn(conn_to_cache, conninfo);
 
 	if (TRACING >= 3) {
-		var(conninfo).errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo=");
+		var(conninfo).regex_replacer(R"(password\s*=\s*\w*)", "").errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");
 	}
 
 	return dbconn_no_;
