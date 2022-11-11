@@ -27,7 +27,7 @@ var buff;
 var linenox;  // num
 var eof;	  // num
 var line;
-var csv;
+//var csv;
 //var ptr;  // num
 //var ncols;
 var dictfile;
@@ -449,6 +449,7 @@ postuploadfail:
 		// cols os "name vm start vm len" etc one col per fm
 		var cols  = "";
 		nimported = 0;
+		var csv;
 
 		while (true) {
 
@@ -463,10 +464,12 @@ nextline:
 				goto nextline;
 			}
 
-			// determine cols from first col heading
+			// Determine cols and if is csv from first line col headings
 			if (not(cols)) {
 
-				csv = line.index("\",\"");
+				//csv = line.index("\",\"");
+				csv = line.index(R"___(",")___");
+				//csv = line.index(_DQ "," _DQ);
 				if (csv) {
 
 					gosub parseline(line);
@@ -474,24 +477,37 @@ nextline:
 					cols = line;
 
 				} else {
-					var offset = 1;
+					var colstart = 1;
 					while (true) {
-						let tt = line.index("  ");
 
-						if (not tt)
+						// Fixed aligned columns must have at least two spaces between each column title
+						// allowing column titles to have single spaces within the title
+
+						// Find the first space after the column title otherwise we are done
+						var ptr = line.index("  ");
+						if (not ptr)
 							break;
 
-						cols(-1) = line.first(tt - 1) ^ VM ^ offset;
-						var ptr;
-						for (ptr = tt; ptr <= 999999; ++ptr) {
+						// Each column becomes a field in cols
+						// value 1 = column title
+						// value 2 = column start ptr
+						cols(-1) = line.first(ptr - 1) ^ VM ^ colstart;
 
-							if (line[ptr + 1] ne " ")
-								break;
+						// Find the end of the column title by skipping over spaces
+						while (line[ptr + 1] eq " ")
+								++ptr;
 
-						}  // ptrx;
+						// Save the length of the column
+						// value 3 = column width
 						cols ^= VM ^ ptr;
-						offset += ptr;
+
+						// Get the start of the next column if any
+						colstart += ptr;
+
+						// Cut off the processed column title and spaces
+						// leaving the remaining column titles to be processed
 						line.cutter(ptr);
+
 					}  // loop;
 				}
 
