@@ -155,7 +155,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 								abort(lasterror());
 						}
 						//filename.osremove();
-						if (filename and not filename.osremove())
+						if (osfile(filename) and not filename.osremove())
 							abort(lasterror());
 					}
 				}
@@ -811,7 +811,8 @@ nextlock:
 				// response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, response_, otherusersx);
 				//request3.osremove();
-				if (request3 and not request3.osremove())
+				//if (request3 and not request3.osremove())
+				if (osfile(request3) and not request3.osremove())
 					abort(lasterror());
 			} else {
 				//osshell("NET STOP EXODUSSERVICE");
@@ -820,7 +821,8 @@ nextlock:
 
 				if (request2.starts("RESTART")) {
 					//request3.osremove();
-					if (request3 and not request3.osremove())
+					//if (request3 and not request3.osremove())
+					if (request3 and osfile(request3) and not request3.osremove())
 						abort(lasterror());
 					//osshell("NET START EXODUSSERVICE");
 					if (not osshell("NET START EXODUSSERVICE"))
@@ -833,7 +835,8 @@ nextlock:
 
 			if (request2.contains("ALL")) {
 				//request4.osremove();
-				if (request4 and not request4.osremove())
+				//if (request4 and not request4.osremove())
+				if (request4 and osfile(request4) and not request4.osremove())
 					abort(lasterror());
 			}
 		}
@@ -955,15 +958,15 @@ nextfiles:
 			// a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.ends(".4")) {
 				//filename.osremove();
-				if (filename and not filename.osremove())
+				if (osfile(filename) and not filename.osremove())
 					abort(lasterror());
 				filename.paster(-1, 1, "2");
 				//filename.osremove();
-				if (filename and not filename.osremove())
+				if (osfile(filename) and not filename.osremove())
 					abort(lasterror());
 				filename.paster(-1, 1, "3");
 				//filename.osremove();
-				if (filename and not filename.osremove())
+				if (osfile(filename) and not filename.osremove())
 					abort(lasterror());
 
 			} else {
@@ -977,7 +980,7 @@ nextfiles:
 				if (((filename.last(4)).contains(".")) and filetime le deletetime) {
 deleteit:
 					//filename.osremove();
-					if (filename and not filename.osremove())
+					if (osfile(filename) and not filename.osremove())
 						abort(lasterror());
 				} else {
 				}
