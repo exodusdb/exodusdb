@@ -39,7 +39,7 @@ function main() {
 	//should be same logic in mvdbpostgres and configexodus
 	var configfilename = "";
 	if (OSSLASH eq "\\") {
-		var userprofile_exodusdir = osgetenv("USERPROFILE") ^ OSSLASH ^ "Exodus";
+		let userprofile_exodusdir = osgetenv("USERPROFILE") ^ OSSLASH ^ "Exodus";
 		if (not osdir(userprofile_exodusdir)) {
 			if (not(osmkdir(userprofile_exodusdir)))
 				printl("Cannot mkdir ", userprofile_exodusdir, " Maybe you dont have sufficient rights");
@@ -60,7 +60,7 @@ function main() {
 
 	printl(oconv("Input options and connect to postgres", "L#40"));
 	var serverconfig;
-	var adminconfig = input_adminconfig(origconfig, serverconfig);
+	let adminconfig = input_adminconfig(origconfig, serverconfig);
 	if (not adminconfig)
 		abort("Stopping. Cannot continue without a working connection.");
 
@@ -95,7 +95,7 @@ function main() {
 			break;
 
 		oconv("Saving user configuration in .exodus", "L#40").output();
-		var userconfig = serverconfig ^ " dbname=" ^ dbname ^ " user=" ^ dbusername ^ " password=" ^ dbuserpass;
+		let userconfig = serverconfig ^ " dbname=" ^ dbname ^ " user=" ^ dbusername ^ " password=" ^ dbuserpass;
 		if (oswrite(userconfig, configfilename)) {
 			printl("done!");
 			break;
@@ -110,7 +110,7 @@ function main() {
 
 //get the first definition of each parameter
 subroutine getorigparam(in config, in name, out value) {
-	var pos = index(config, name);
+	let pos = index(config, name);
 	if (!pos)
 		return;
 	value = config.b(pos).field(" ", 1).field("=", 2, 999999999);
@@ -122,7 +122,7 @@ subroutine getinput(in prompt, io data) {
 	if (len(text) < 30)
 		text = oconv(text, "L#30");
 	print(text, " ? ");
-	var result = input();
+	let result = input();
 	if (result ne "")
 		data = result;
 }
@@ -189,7 +189,7 @@ function runsomesql(in sql) {
 
 function add_pgexodus_postgres_plugin() {
 
-	var sql =
+	let sql =
 		"CREATE OR REPLACE FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;\n"
 		"CREATE OR REPLACE FUNCTION exodus_extract_bytea(bytea, int4, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_extract_bytea' LANGUAGE C IMMUTABLE;\n"
 		"CREATE OR REPLACE FUNCTION exodus_extract_text(bytea, int4, int4, int4) RETURNS text AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;\n"
@@ -247,7 +247,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 	printl("done!");
 
 	print(oconv("Connecting to new database ... ", "L#40"));
-	var connstr2 = adminconfig ^ " dbname=" ^ dbname;
+	let connstr2 = adminconfig ^ " dbname=" ^ dbname;
 
 	//^" user="^dbusername^" password="^dbuserpass;
 	if (not connect(connstr2))
@@ -261,7 +261,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		//locate pgexodus dll to install
 		var pgexodusdll = "pgexodus.dll";
 		if (not osfile(pgexodusdll)) {
-			var exodusbinpath = field(EXECPATH, OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
+			let exodusbinpath = field(EXECPATH, OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
 			pgexodusdll = exodusbinpath ^ OSSLASH ^ "pgexodus.dll";
 			if (not osfile(pgexodusdll)) {
 				printl("Cant find pgexodus.dll or " ^ pgexodusdll);
@@ -289,7 +289,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		pglibdir.replacer("PROGRA~1", "Program Files");
 		pglibdir.replacer("PROGRA~2", "Program Files (x86)");
 		pglibdir.replacer("POSTGR~1", "PostgreSQL");
-		var targetfilename = pglibdir ^ OSSLASH ^ "pgexodus.dll";
+		let targetfilename = pglibdir ^ OSSLASH ^ "pgexodus.dll";
 		while (not osdir(pglibdir)) {
 			printl(pglibdir ^ " does not exist");
 			printl("Cannot locate PostgreSQL lib directory to install plugin");
@@ -301,7 +301,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		//delete any existing pgexodus.dll. restart service if cannot initially delete
 		if (osfile(targetfilename) and not osremove(targetfilename)) {
 			//determine postgres service name
-			var pgversion = osshellread("pg_config --version").field(" ", 2).field(".", 1, 2);
+			let pgversion = osshellread("pg_config --version").field(" ", 2).field(".", 1, 2);
 			var servicename = (pgversion < 9) ? "pgsql" : "postgresql";
 			servicename ^= "-" ^ pgversion;
 
@@ -341,7 +341,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 	printl("done!");
 
 	print(oconv("Connecting to template1 database ... ", "L#40"));
-	var connstr3 = adminconfig ^ " dbname=template1";
+	let connstr3 = adminconfig ^ " dbname=template1";
 	if (not connect(connstr3))
 		abort("Stopping. Cannot connect to template1 database");
 	printl("done!");

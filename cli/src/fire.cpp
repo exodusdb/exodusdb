@@ -12,7 +12,7 @@ function main() {
 	COMMAND.remover(1);
 
 	if (not find) {
-		var syntax = "\n"
+		let syntax = "\n"
 			"SYNOPSIS\n"
 			"	fire FIND REPL filepath ... {OPTIONS}\n"
 			"\n"
@@ -33,7 +33,7 @@ function main() {
 
 		if (not RECORD.osread(osfilename))
 			abort(lasterror());
-		var origrec = RECORD;
+		let origrec = RECORD;
 
 		//RECORD.regex_replacer(R"___(\tcall fsmsg\(\);\n\t+stop\(\);)___", R"___(\tabort\(lasterror\);)___", "s");
 		//RECORD.regex_replacer(R"___(\breado\b)___", R"___(readc)___", "s");
@@ -55,7 +55,7 @@ function main() {
 			} else {
 
 				// Diff
-				var tmpfilename = ostempdirpath() ^ osfilename.convert(OSSLASH, "_");
+				let tmpfilename = ostempdirpath() ^ osfilename.convert(OSSLASH, "_");
 				oswrite(RECORD on tmpfilename) or abort(lasterror());
 				osshell("diff " ^ osfilename ^ " " ^ tmpfilename ^ " --color=always") or true;//abort(lasterror());
 				osremove(tmpfilename) or abort(lasterror());

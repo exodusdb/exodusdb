@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var force = OPTIONS.contains("F");
+	let force = OPTIONS.contains("F");
 	var indexnames = COMMAND.field(FM, 2, 999999);
 
 	if (not indexnames)
@@ -21,7 +21,7 @@ function main() {
 		printl(indexnames);
 	}
 
-	var nindexes = fcount(indexnames, FM);
+	let nindexes = fcount(indexnames, FM);
 
 	var result = 0;
 
@@ -32,7 +32,7 @@ function main() {
 		if (not filename)
 			break;
 		var fieldname;
-		var tt = filename.index("__");
+		let tt = filename.index("__");
 		if (tt) {
 			fieldname = filename.b(tt + 2);
 			filename = filename.first(tt - 1);
@@ -41,7 +41,7 @@ function main() {
 			indexn += 1;
 		}
 
-		var indexname = filename ^ "__" ^ fieldname;
+		let indexname = filename ^ "__" ^ fieldname;
 		if (force && listindex(filename, fieldname)) {
 			printl("Deleting index", indexname);
 			if (not filename.deleteindex(fieldname)) {

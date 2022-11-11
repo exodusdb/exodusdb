@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var filenames = COMMAND.field(FM, 2, 999999);
+	let filenames = COMMAND.field(FM, 2, 999999);
 
 	if (not filenames)
 		abort("Syntax is clearfile filename ...");

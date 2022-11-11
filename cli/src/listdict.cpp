@@ -30,19 +30,19 @@ function main() {
 			}
 		}
 //GB version
-//		var dictdb = "";
+//		let dictdb = "";
 //		if (not dictdb.osgetenv("EXO_DICT")) {
 //			dictdb = "";
 //			//default is exodus i.e ""
 //		}
-//		var conn;
+//		let conn;
 //		if (not conn.connect(dictdb)) {
 //			abort();
 
 
 
 		var dictfilenames = "";
-		var filenames = conn.listfiles();
+		let filenames = conn.listfiles();
 		for (var filename : filenames) {
 			if (filename.starts("dict."))
 				dictfilenames ^= filename ^ FM;

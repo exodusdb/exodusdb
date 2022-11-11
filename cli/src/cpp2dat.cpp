@@ -18,11 +18,11 @@ function main() {
 	//}
 	//libraryexit(brand_and_date)
 
-	var update = OPTIONS.contains("U");
+	let update = OPTIONS.contains("U");
 
-	var regen_cpp = false;
+	let regen_cpp = false;
 
-	var osfilenames = COMMAND.remove(1);
+	let osfilenames = COMMAND.remove(1);
 	for (in cppfilename : osfilenames) {
 
 		cppfilename.outputl("file: ");
@@ -46,7 +46,7 @@ function main() {
 
 //		datdirname.outputl("dat: ");
 
-		var dictfilename = cppfilename.cut(4).replace("dict_", "dict.").replace(".cpp", "");
+		let dictfilename = cppfilename.cut(4).replace("dict_", "dict.").replace(".cpp", "");
 		var dictfile;
 		if (not open(dictfilename to dictfile)) {
 			loglasterror();
@@ -91,13 +91,13 @@ function main() {
 				newdictsrc.trimmerfirst(VM).trimmerlast(VM);
 
 //				// Remove trailing RETURN ANS;
-//				var nlines = fcount(newdictsrc, VM);
+//				let nlines = fcount(newdictsrc, VM);
 //				if (newdictsrc.f(1, nlines).trim().trim("\t") eq "return ANS;") {
 //					newdictsrc.remover(1,nlines);
 //				}
 
 				// Get the existing dat file text
-				var datfilename = datdirname ^ "/" ^ dictid;
+				let datfilename = datdirname ^ "/" ^ dictid;
 				var olddatrec = "";
 				if (not osread(olddatrec from datfilename)) {
 					abort(datfilename.quote() ^ " datfile is missing ... skipped. ");
@@ -113,7 +113,7 @@ function main() {
 				var oldsrc = olddictrec.f(8);
 
 				// and append any pgsql function to our cpp source extracted from dict_xxxxx.cpp
-				var oldpgsql_index = oldsrc.index("/" "*pgsql");
+				let oldpgsql_index = oldsrc.index("/" "*pgsql");
 				var oldpgsql = "";
 				if (oldpgsql_index) {
 					oldpgsql = oldsrc.b(oldpgsql_index).trimlast(VM);

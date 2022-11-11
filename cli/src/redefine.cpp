@@ -18,16 +18,16 @@ function main() {
 	dim defs = defsrec.split();
 
 //	select("dict.schedules with FMC between 1 and 9999 (R)");
-//	var ids="";
+//	let ids="";
 //	while (readnext(RECORD, ID, MV)) {
-//		var fn = RECORD(2);
+//		let fn = RECORD(2);
 //		if (fn.isnum()) {
 //			ids(RECORD.f(2)) = ID;
 //		}
 //	}
 
 	var osfilen = 0;
-	var nosfiles = fcount(COMMAND, FM) -2;
+	let nosfiles = fcount(COMMAND, FM) -2;
 	for (var osfilename : COMMAND.remove(1).remove(1)) {
 
 		var oldcpp, newcpp;
@@ -51,8 +51,8 @@ function main() {
 			if (not value or not name or value.isnum())
 				continue;
 
-//			var oldcode = "(orec|RECORD)\\(" ^ value ^ "\\b";
-//			var newcode = "\\1\\(" ^ name ^ "";
+//			let oldcode = "(orec|RECORD)\\(" ^ value ^ "\\b";
+//			let newcode = "\\1\\(" ^ name ^ "";
 //
 //			newcpp.regex_replacer(oldcode, newcode);
 //
@@ -70,13 +70,13 @@ function main() {
 
 			//var regex = "\\b" ^ value ^ "\\b";
 			//var regex = "\\b" ^ value;
-			var regex = value;
+			let regex = value;
 
-			var newcode = name;
+			let newcode = name;
 
 //			printl("", regex, "->", newcode);
 
-			var found = newcpp.match(regex);
+			let found = newcpp.match(regex);
 			if (found)
 				printl("", found, "->", newcode);
 
@@ -97,16 +97,16 @@ function main() {
 			}
 		}
 
-//		var pending = newcpp.match("RECORD\\(([1-9].*?)\\)").unique();
+//		let pending = newcpp.match("RECORD\\(([1-9].*?)\\)").unique();
 //		if (pending) {
 //			printl(pending);
-//			var pending2 = "";
+//			let pending2 = "";
 //			for (var part : pending)
 //				pending2(-1) = part.f(1,2);
 //			pending2.uniquer().sorter();
 //			for (var part : pending2) {
 //				printl(osfilename, part);
-//				var value = part.field(" ", 1);
+//				let value = part.field(" ", 1);
 //				if (value.isnum() and fns(fn)) {
 //					printl("#define", fns.f(fn).lcase() ^ "_", fn);
 //				}

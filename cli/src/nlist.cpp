@@ -1,3 +1,73 @@
+/*
+//Copyright (c) 2009 Stephen Bush
+//Licence http://www.opensource.org/licenses/mit-license.php
+
+This is a complete ACCESS/ENGLISH/LIST replacement that can output in DOS or HTML format.
+
+It shows a substantial program written in Exodus's reincarnation of Multivalue Basic.
+The original Pick Basic version was in heavy production usage for many years.
+
+It is written using Exodus OO flavour syntax not traditional flavour.
+
+Procedural flavour: Function names on the left and parameters on the right.
+
+	printl(oconv(field(extract(xx,6),"/",2),"D2"));
+
+OO flavour: Does exactly the same thing but is perhaps easier to read from left to right in one pass:
+
+    xx.f(6).field("/",2).oconv("D2").outputl();
+
+xx.f(6) stands for "xx<6>" in mv/pick. <> brackets cannot be used for functions in c++. "a" stands for "attribute".
+
+Hybrid:
+
+	Perhaps the most readable syntax
+
+    printl(xx.f(6).field("/",2).oconv("D2"));
+
+Comments about style:
+
+	1. Should use int instead of var for "for" loop index variables despite the fact that int doesnt always behave
+		precisely like pick integers, speed is important in this program and C++ allows us access to raw power when we need it.
+
+	2. Many for loops should be converted to use range()
+
+	3. Note the familiar "goto" statement which considerably eases porting of mv basic to Exodus.
+		This can be a major point scorer for Exodus because "goto" is banished from almost all other languages.
+		Exodus's "goto" cannot jump over "var" statements or into/out of subroutines some code refactoring
+		may be still be required during porting.
+
+	For normal programs, global variables that should be generally available to all subroutines
+	should be declared, and optionally *simply* initialised, before or after the programinit() line.
+	"simply initialised" means set to expressons using raw numbers and strings.
+	eg 'var xx="xyz";' or 'var xx=100.5;' etc.
+
+	Before the programinit statement, variables are true free global and are not threadsafe unless
+	marked as thread_local. They also do not have access to all the mv global variable like ID, DICT etc.
+
+	After the programinit statement, variables are member variables of the program class.
+
+	Notably in Exodus libraries, which are separately edited and compiled callable functions,
+	class global variables are only initialised on the first call to the function.
+	If the function is performed/executed then class member variable are initialised on each perform/execute.
+
+Example command line:
+
+		list ads brand_code brand_name with brand_code 'XYZ' (N)
+
+	If using a shell like bash then quotes must be escaped or wrapped
+	and () should be done with {}
+
+		list ads brand_code brand_name with brand_code "'XYZ'" {N}
+
+	or
+
+		list ads brand_code brand_name with brand_code '"XYZ"' {N}
+
+	Type just list by itself to get a summary of its syntax
+
+*/
+
 #include <exodus/library.h>
 libraryinit()
 
@@ -1040,7 +1110,7 @@ dictrecexit:
 		if (isterminal()) {
 			tt ^= " Replace with? (Enter to cancel):";
 		}
-		var oldword = word;
+		let oldword = word;
 		call mssg(tt, "RCE", word, "");
 		if (word eq oldword or word eq "\x1B") {
 			abort();
@@ -1243,7 +1313,7 @@ x1exit:
 		//var basecurrcode = sys.company.f(3)
 		//var basecurrcode = "";
 		// basecurrencycode stored in SYSTEM in initcompany
-		var basecurrcode = SYSTEM.f(134);
+		let basecurrcode = SYSTEM.f(134);
 		call htmllib2("COLROWSPAN", colhdg, thproperties, nobase, basecurrcode);
 	}
 
@@ -1495,7 +1565,7 @@ nextrec:
 		for (limitn = 1; limitn <= nlimits; ++limitn) {
 
 			// Find maximum mv number for the associated group of fns
-			var fns = limits.f(5, limitn).convert(_SM, _FM);
+			let fns = limits.f(5, limitn).convert(_SM, _FM);
 			int nmvs = 0;
 			for (const int fn : fns) {
 				tt = RECORD.f(fn);

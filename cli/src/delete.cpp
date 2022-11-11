@@ -3,9 +3,9 @@ programinit()
 
 function main() {
 
-	var filename = COMMAND.f(2);
+	let filename = COMMAND.f(2);
 
-	var itemids = COMMAND.remove(1).remove(1);
+	let itemids = COMMAND.remove(1).remove(1);
 
 	if (not filename or not itemids)
 		abort("Syntax is 'delete filename itemid ... (S=Silent)'");

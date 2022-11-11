@@ -43,7 +43,6 @@
 
 	#largest first
 	add_executable(compile compile.cpp)
-	add_executable(olist olist.cpp)
 	add_executable(dict2sql dict2sql.cpp)
 	add_executable(edic edic.cpp)
 	add_executable(configexodus configexodus.cpp)
@@ -97,7 +96,6 @@
 	target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
 
 	target_link_libraries(list exodus stdc++fs ${LIBS})
-	target_link_libraries(olist exodus stdc++fs ${LIBS})
 	target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
 	target_link_libraries(edic exodus stdc++fs ${LIBS})
 	target_link_libraries(configexodus exodus stdc++fs ${LIBS})
@@ -160,7 +158,6 @@
 			dict2sql
 			exodus-cli
 			list
-			olist
 			listfiles
 			listdict
 			listindex

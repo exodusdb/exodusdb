@@ -5,7 +5,7 @@ function main() {
 
 	//hard coded editor at the moment
 	//http://www.nano-editor.org/docs.php
-	var editor = "nano";
+	let editor = "nano";
 
 	//quit if arguments
 	if (fcount(COMMAND, FM) < 2)
@@ -23,9 +23,9 @@ function main() {
 		COMMAND.inserter(2, "DOS");
 
 	//var filename = COMMAND.f(2).convert(".", "_");
-	var filename = COMMAND.f(2);
+	let filename = COMMAND.f(2);
 	ID = COMMAND.f(3).unquote().unquote();	 //spaces are quoted
-	var fieldno = COMMAND.f(4);
+	let fieldno = COMMAND.f(4);
 
 	// Raw
 	var txtfmt = "TX";
@@ -72,7 +72,7 @@ function main() {
 
 	//put the text on a temp file in order to edit it
 	var temposfilename = filename ^ "~" ^ ID;
-	var invalidfilechars = "/ \"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
+	let invalidfilechars = "/ \"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
 	temposfilename.lcaser().converter(invalidfilechars, str("-", len(invalidfilechars)));
 	temposfilename ^= "-pid" ^ ospid();
 	if (filename.starts("dict.") and fieldno)
@@ -85,13 +85,13 @@ function main() {
 	}
 
 	//record file update timedate
-	var fileinfo = osfile(temposfilename);
+	let fileinfo = osfile(temposfilename);
 	if (not fileinfo)
 		abort("Could not write local copy for editing " ^ temposfilename);
 
-	var isdict = filename.starts("dict.") or (filename eq "DOS" and ID.contains("dat/dict."));
+	let isdict = filename.starts("dict.") or (filename eq "DOS" and ID.contains("dat/dict."));
 
-	var editcmd = editor ^ " " ^ temposfilename.quote();
+	let editcmd = editor ^ " " ^ temposfilename.quote();
 	while (true) {
 
 		//fire up the editor
@@ -101,7 +101,7 @@ function main() {
 
 		//process after editor has been closed
 
-		var fileinfo2 = osfile(temposfilename);
+		let fileinfo2 = osfile(temposfilename);
 
 		//get edited file info or abort
 		if (not fileinfo2) {
@@ -144,7 +144,7 @@ function main() {
 				// Very similar code in edir and syncdat
 				if (var("FS").contains(dictrec.f(1))) {
 
-					var options = "";
+					let options = "";
 					var reply = "";
 
 					// Check justification
@@ -167,9 +167,9 @@ function main() {
 
 				//print("Ok to update? ");
 				//var reply=inputl();
-				var reply = "Y";
+				let reply = "Y";
 
-				var newrecord = fieldno ? RECORD.pickreplace(fieldno, text2) : text2;
+				let newrecord = fieldno ? RECORD.pickreplace(fieldno, text2) : text2;
 
 				//keep trying to update - perhaps futilely
 				//at least temp file will be left in the directory
@@ -181,7 +181,7 @@ function main() {
 						//generate/update database functions if saved a symbolic dictionary record
 						if (isdict and newrecord.f(1) eq "S" and newrecord.f(8).contains("/"
 																												"*pgsql")) {
-							var oscmd = "dict2sql " ^ filename ^ " " ^ ID;
+							let oscmd = "dict2sql " ^ filename ^ " " ^ ID;
 							if (not osshell(oscmd))
 								lasterror().errputl("edir:");
 						}

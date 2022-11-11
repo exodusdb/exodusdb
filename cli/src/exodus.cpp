@@ -29,12 +29,12 @@ function main() {
 	printl("http://www.opensource.org/licenses/mit-license.php");
 	printl("Using Library Version: ", var().version(), " ", _PLATFORM);
 
-	var verbose = OPTIONS.contains("V");
+	let verbose = OPTIONS.contains("V");
 
 	if (verbose)
 		EXECPATH.outputl("Executable:");
 
-	var exodusbinpath = field(EXECPATH, OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
+	let exodusbinpath = field(EXECPATH, OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
 
 	if (verbose)
 		exodusbinpath.outputl("Path:");
@@ -42,29 +42,29 @@ function main() {
 	//if (not var().load("libpq.dll"))
 	//	printl("Warning: Cannot find libpq.dll to connect to postgres");
 
-	var command = COMMAND.field(" ", 2, 999999);
+	let command = COMMAND.field(" ", 2, 999999);
 
 	var shell = osgetenv("SHELL");
 	if (not(OSSLASH_IS_BACKSLASH) and shell) {
 
 		// Posix
 
-		var home = osgetenv("HOME");
-		var path = osgetenv("PATH");
-		var libp = osgetenv("LD_LIBRARY_PATH");
+		let home = osgetenv("HOME");
+		let path = osgetenv("PATH");
+		let libp = osgetenv("LD_LIBRARY_PATH");
 
 		//ossetenv doesnt work in exodus due to problems with putenv/setenv memory loss/leak
 		//so prepend command with env changing statements
 		var setenv = "";
 
 		//prefer user binaries then exodus binaries AFTER existing path
-		var newpath = path ^ ":" ^ home ^ "/bin:/var/lib/exodus/bin";
+		let newpath = path ^ ":" ^ home ^ "/bin:/var/lib/exodus/bin";
 		//if (!ossetenv("PATH",newpath))
 		//	printl("Could not set PATH="^newpath);
 		setenv ^= "PATH=" ^ newpath;
 
 		//print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
-		var newlibpath = home ^ "/lib:" ^ libp;
+		let newlibpath = home ^ "/lib:" ^ libp;
 		//if (!ossetenv("LD_LIBRARY_PATH",newlibpath))
 		//	printl("Could not set LD_LIBRARY_PATH="^newlibpath);
 		setenv ^= " LD_LIBRARY_PATH=" ^ newlibpath;
@@ -90,7 +90,7 @@ function main() {
 		//if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
 
 		// This may have no effect since setting environment variables is error prone
-		var shellcmd = setenv ^ " " ^ (command ? command : shell);
+		let shellcmd = setenv ^ " " ^ (command ? command : shell);
 		if (verbose)
 			printl("SHELL=\n" ^ shellcmd);
 		if (not osshell(shellcmd))
@@ -107,7 +107,7 @@ function main() {
 		if (exoduspath)
 			ossetenv("EXO_PATH", exoduspath);
 
-		var oldpath = osgetenv("PATH");
+		let oldpath = osgetenv("PATH");
 		var newpath = oldpath;
 
 		//forcibly PREFIX exodus bin to path
@@ -117,9 +117,9 @@ function main() {
 
 		//APPEND user's Exodus binaries path (from compile/catalog)
 		//could use LOCALAPPDATA on WIN7 up but getting too complicated so lets use USERPROFILE everywhere
-		var homedir = osgetenv("USERPROFILE");
+		let homedir = osgetenv("USERPROFILE");
 		if (homedir) {
-			var bindir = homedir ^ "\\Exodus\\bin";
+			let bindir = homedir ^ "\\Exodus\\bin";
 			if (not newpath.locateusing(";", bindir))
 				newpath ^= ";" ^ bindir;
 		}

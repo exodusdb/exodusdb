@@ -5,7 +5,7 @@ programinit()
 	// with multivalue-mimicking "everything is a global function" syntax
 	// instead of exodus's oo-style syntax "xxx.yyy().zzz()".
 	//
-	var filename = "xo_clients";
+	let filename = "xo_clients";
 
 function main() {
 
@@ -18,10 +18,10 @@ function main() {
 	if (not begintrans())
 		abort(lasterror());
 
-	var dictfilename = "dict." ^ filename;
+	let dictfilename = "dict." ^ filename;
 
 	// Leave the test data files around for playing with after the program finishes
-	var cleanup = false;
+	let cleanup = false;
 
 	// Always delete and start from scratch (ignore fact that files will not exist the first time)
 	//if (cleanup) {
@@ -60,7 +60,7 @@ function main() {
 	printl("\nPrepare some dictionary records");
 
 
-	var dictrecs =
+	let dictrecs =
 		"CODE         |F|0|Code         ||||          ||L|8"  _FM
 		"NAME         |F|1|Name         ||||          ||T|15" _FM
 		"TYPE         |F|2|Type         ||||          ||L|5"  _FM
@@ -79,7 +79,7 @@ function main() {
 	// Using modern c++ range based for loop
 	for (var dictrec : dictrecs) {
 
-		var key = trim(field(dictrec, "|", 1));
+		let key = trim(field(dictrec, "|", 1));
 		var rec = field(dictrec, "|", 2, 999999);
 
 		printl(key, " : ", rec);
@@ -128,7 +128,7 @@ function main() {
 	//let maxrec = 100;
 
 	for (var rec : recs) {
-		var key = field(rec, "|", 1);
+		let key = field(rec, "|", 1);
 		rec = field(rec, "|", 2, 9999);
 		printl(key, ": ", rec);
 		while (index(rec, " |"))
@@ -205,7 +205,7 @@ subroutine sortselect(in file, in sortselectclause) {
 		printl(ID, ": ", convert(RECORD, FM, "|"));
 	}
 
-	var cmd = "list " ^ filename ^ " " ^ sortselectclause ^ " id-supp (R)";
+	let cmd = "list " ^ filename ^ " " ^ sortselectclause ^ " id-supp (R)";
 	printl("\nList the file using ", quote(cmd));
 	perform(cmd) or loglasterror("testsort:" ^ cmd);
 

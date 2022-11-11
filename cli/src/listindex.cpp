@@ -3,8 +3,8 @@ programinit()
 
 function main() {
 
-	var filename = COMMAND.f(2);
-	var fieldname = COMMAND.f(3);
+	let filename = COMMAND.f(2);
+	let fieldname = COMMAND.f(3);
 
 	//no arguments - lists all file indexes
 	//if (not filename)

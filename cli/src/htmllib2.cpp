@@ -26,10 +26,10 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 	//REPLACING UPPERCASE VERSION HTMLLIB()
 
-	var td = "<td>";
-	var tdx = "</td>";
-	var tr = "<tr>";
-	var trx = "</tr>";
+	let td = "<td>";
+	let tdx = "</td>";
+	let tr = "<tr>";
+	let trx = "</tr>";
 
 	if (params0.unassigned()) {
 		params = "";
@@ -92,7 +92,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		dataio ^= FM ^ "</tbody>" ^ FM ^ "</table>";
 
 		//highlight last row if a total
-		var nlines = dataio.count(FM) + 1;
+		let nlines = dataio.count(FM) + 1;
 		var lastline = dataio.f(nlines);
 	//Total
 		//if (lastline.contains("<td>" ^ sys.glang.f(28))) {
@@ -108,7 +108,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 	//fill in the missing cells
 	} else if (mode eq "TABLE.FILL") {
 
-		var filler = "<TD>&nbsp;</TD>";
+		let filler = "<TD>&nbsp;</TD>";
 		//gosub fill
 
 	} else if (mode eq "HASHTABLE") {
@@ -162,8 +162,8 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 	} else if (mode eq "STRIPTAGS") {
 		while (true) {
-			var tag1 = dataio.index("<");
-			var tag2 = dataio.index(">");
+			let tag1 = dataio.index("<");
+			let tag2 = dataio.index(">");
 			///BREAK;
 			if (not(tag1 and tag1 lt tag2)) break;
 			dataio.paster(tag1, tag2 - tag1 + 1, "");
@@ -211,7 +211,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		} else if (dataio.contains("NT 5.1")) {
 			osname = "XP";
 		} else if (dataio.contains("Windows NT ")) {
-			var tt = dataio.index("Windows NT ");
+			let tt = dataio.index("Windows NT ");
 			osname = ((dataio.cut(tt + 10)).field(";", 1)).field(")", 1);
 		}
 		if (dataio.contains("WOW64")) {
@@ -349,7 +349,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 			browser.cutter(-2);
 		}
 
-		var submode = mode.field(".", 3);
+		let submode = mode.field(".", 3);
 		if (submode eq "OS") {
 			dataio = osname;
 			return 0;
@@ -590,7 +590,7 @@ function getcss(io css, in version = "") {
 	//<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	//<meta http-equiv="x-ua-compatible" content="IE=6" />
 
-	var charset = SYSTEM.f(127);
+	let charset = SYSTEM.f(127);
 	if (charset) {
 		css = "<meta http-equiv=\"content-type\" content=\"text/html;charset=" ^ charset ^ "\" />\n";
 	} else {
@@ -601,8 +601,8 @@ function getcss(io css, in version = "") {
 
 	gosub replace_literal_comparison_operators(css);
 
-	var thcolor = SYSTEM.f(46, 1);
-	var tdcolor = SYSTEM.f(46, 2);
+	let thcolor = SYSTEM.f(46, 1);
+	let tdcolor = SYSTEM.f(46, 2);
 
 	var font = SYSTEM.f(46, 3);
 	if (font == "Default") {
@@ -635,7 +635,7 @@ function getcss(io css, in version = "") {
 	css.replacer("exodusfont,", font);
 	css.replacer("exodussize", fontsize);
 
-	var agent = SYSTEM.f(40);
+	let agent = SYSTEM.f(40);
 	if (agent.contains("MSIE 7")) {
 		css.replacer("xborder-collapse", "border-collapse");
 	}
@@ -889,12 +889,12 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 	}
 
 	//determine ncols
-	var ncols2 = colhdg.count(FM) + 1;
+	let ncols2 = colhdg.count(FM) + 1;
 
 	//determine nrows
 	var nrows = 1;
 	for (const var coln : range(1, ncols2)) {
-		var tt = colhdg.f(coln).count(VM) + 1;
+		let tt = colhdg.f(coln).count(VM) + 1;
 		if (tt gt nrows) {
 			nrows = tt;
 		}
@@ -905,7 +905,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 	var rowspan;//num
 
 	var thprop = thproperties;
-	var nocell = "%~%";
+	let nocell = "%~%";
 	// Additional space to defeat convsyntax until clanf-format
 	for (var rown = 1; rown <= nrows; rown++) {
 
@@ -914,7 +914,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 		// Reverted because we do need to skip coln's
 		//for (const var coln : range(1, ncols2)) {
 
-			var tt = colhdg.f(coln, rown);
+			let tt = colhdg.f(coln, rown);
 			if (tt eq nocell) {
 				continue;
 			}
@@ -930,8 +930,8 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 
 			//determine any colspan (duplicate cells to the right)
 			while (true) {
-				var coln2 = coln + colspan;
-				var t3 = colhdg.f(coln2, rown);
+				let coln2 = coln + colspan;
+				let t3 = colhdg.f(coln2, rown);
 				///BREAK;
 				if (not((coln2 le ncols2 and t3 eq tt) and t3 ne nocell)) break;
 				colspan += 1;
@@ -947,8 +947,8 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 
 				//determine any rowspan (duplicate cells below)
 				while (true) {
-					var rown2 = rown + rowspan;
-					var t3 = colhdg.f(coln, rown2);
+					let rown2 = rown + rowspan;
+					let t3 = colhdg.f(coln, rown2);
 					///BREAK;
 					if (not((rown2 le nrows and ((t3 eq tt or t3 eq ""))) and t3 ne nocell)) break;
 					rowspan += 1;
@@ -999,14 +999,14 @@ subroutine convcss(out outx, in tableid, in in0) {
 
 	//convert <COL ALIGN=RIGHT> to nth-child style
 
-	var inp = in0.trim().lcase();
+	let inp = in0.trim().lcase();
 
 	outx = "\n<style type=\"text/css\">\n";
 	var align = "left";
 
 	let ncols = inp.count(VM) + 1;
 	for (const var coln : range(1, ncols)) {
-		var tt = inp.f(1, coln);
+		let tt = inp.f(1, coln);
 
 		if (tt.contains("left")) {
 			align = "left";
@@ -1070,10 +1070,10 @@ subroutine addunits(in a0, io bb, in sep) {
 	let na = aa.fcount(VM);
 	for (const var an : range(1, na)) {
 
-		var anum = amountunit(aa.f(1, an), acode);
+		let anum = amountunit(aa.f(1, an), acode);
 		var bcode = "";
 
-		var nb = bb.fcount(VM);
+		let nb = bb.fcount(VM);
 		//assist ADECOM c++ decompiler to lift bn out of loop
 		//bn=1
 		//for bn=1 to nb
@@ -1082,13 +1082,13 @@ subroutine addunits(in a0, io bb, in sep) {
 			bn += 1;
 			///BREAK;
 			if (not(bn le nb)) break;
-			var bnum = amountunit(bb.f(1, bn), bcode);
+			let bnum = amountunit(bb.f(1, bn), bcode);
 			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
 
 			if (bcode eq acode) {
 				if (bnum.len() or anum.len()) {
 					var ndecs = anum.field(".", 2).len();
-					var bndecs = bnum.field(".", 2).len();
+					let bndecs = bnum.field(".", 2).len();
 					if (bndecs gt ndecs) {
 						ndecs = bndecs;
 					}

@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var dbname = COMMAND.f(2);
+	let dbname = COMMAND.f(2);
 	var connection = "";
 	if (dbname and not connection.connect(dbname)) {
 		abort(lasterror());

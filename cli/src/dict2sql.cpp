@@ -103,7 +103,7 @@ function main() {
 	var dictconnection = "";
 
 	var filenames = COMMAND.f(2).lcase();
-	var dictids = COMMAND.field(FM, 3, 999999);
+	let dictids = COMMAND.field(FM, 3, 999999);
 	verbose = index(OPTIONS, "V");
 	var doall = true;
 
@@ -136,7 +136,7 @@ function main() {
 		filenames = dictconnection.listfiles();
 	}
 
-	var sqltemplate = R"V0G0N(
+	let sqltemplate = R"V0G0N(
 CREATE OR REPLACE FUNCTION $functionname_and_args RETURNS $return_type
 AS
 $$
@@ -184,7 +184,7 @@ COST 10;
 
 	if (install_exodus_extensions eq "pgexodus") {
 
-		var sqltemplate_strict =
+		let sqltemplate_strict =
 			R"V0G0N(
 CREATE OR REPLACE FUNCTION $functionname_and_args RETURNS $return_type
 AS 'pgexodus', '$functionname'
@@ -195,7 +195,7 @@ DEFINER
 COST 10;
 )V0G0N";
 
-		var sqltemplate = sqltemplate_strict.replace(" STRICT", "");
+		let sqltemplate = sqltemplate_strict.replace(" STRICT", "");
 
 		create_function("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
 		create_function("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
@@ -240,7 +240,7 @@ COST 10;
 		//create exodus pgsql functions
 
 		//exodus_trim (leading, trailing and excess inner spaces)
-		var trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
+		let trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
 		create_function("exodus_trim(data text)", "text", trimsql, sqltemplate);
 
 		//exodus_field_replace (a field)
@@ -369,7 +369,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	//decide if reindex is required - only if function has changed
 	var reindex_if_indexed = false;
 	var oldfunction;
-	var functionname = field(functionname_and_args, "(", 1).lcase();
+	let functionname = field(functionname_and_args, "(", 1).lcase();
 	//var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
 	if (not var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction)) {
 		//null
@@ -389,7 +389,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	//do drop function first if suggested
 	if (errmsg.contains("DROP FUNCTION")) {
 
-		var dropsql = "drop function " ^ functionname_and_args;
+		let dropsql = "drop function " ^ functionname_and_args;
 		if (verbose)
 			dropsql.outputl();
 
@@ -424,7 +424,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
 		var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
 		//var fieldname = filename.convert(LOWERCASE, "").trim("_");
-		var fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
+		let fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
 		//filename = filename.convert(UPPERCASE, "").trim("_");
 		filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "").trimmer("_");
 		if (filename.listindex(filename, fieldname)) {
@@ -488,11 +488,11 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 			abort(quote(dictid) ^ " cannot be read in " ^ quote(dictfilename));
 	}
 	var sourcecode = dictrec.f(8);
-	var ismv = dictrec.f(4)[1] == "M";
+	let ismv = dictrec.f(4)[1] == "M";
 
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
-	var conversion = dictrec.f(7);
+	let conversion = dictrec.f(7);
 	if (conversion.starts("[DATE]") || conversion.starts("[DATE,") || conversion.starts("[DATE2"))
 		dict_returns = "date";
 	else if (conversion.starts("[DATETIME"))
@@ -508,18 +508,18 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 			dict_returns = "float";
 	}
 
-	var function_name_and_args = dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)";
+	let function_name_and_args = dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)";
 
 	//auto generate pgsql code for ..._XREF dict records (full text)
 	if (sourcecode.starts("CALL XREF({")) {
 
 		//remove any existing pgsql
-		var pos = index(sourcecode, "/" "*pgsql");
+		let pos = index(sourcecode, "/" "*pgsql");
 		if (pos) {
 			sourcecode = sourcecode.first(pos - 1).trimlast(VM);
 		}
 
-		var fulltext_dictid = field(field(sourcecode, "{", 2), "}", 1);
+		let fulltext_dictid = field(field(sourcecode, "{", 2), "}", 1);
 
 		//replace all punctuation and delimiters with spaces
 		var chars = field(sourcecode.trim("\\"), "\\", 2);
@@ -568,7 +568,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//var sql = sourcecode.b(pos + 8);
 	// Move pos to point to the start of the first line AFTER the / *pgsql line
 	// thereby ignoring any "arguments" on the first line
-	var temp = sourcecode.substr2(pos, delim);
+	let temp = sourcecode.substr2(pos, delim);
 
 	// Extract the pgsql function source code
 	var sql = sourcecode.b(pos);
@@ -579,7 +579,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//so pgsql comments like /* */ are respected ??
 	//remove anything after sql code
 	//find the LAST * /  pair and remove everything after it
-//	var lastpos = 0;
+//	let lastpos = 0;
 //	for (int ii = 1;; ++ii) {
 //		//find the ii'th * / terminator
 //		//pos = index2(sql,
@@ -591,7 +591,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 //			break;
 //		lastpos = pos;
 //	}
-	var lastpos = sql.indexr("*" "/");
+	let lastpos = sql.indexr("*" "/");
 	if (lastpos) {
 		//sql.pasterall(lastpos - 1, "");
 		sql.firster(lastpos - 1);
@@ -664,11 +664,11 @@ $RETVAR := array_to_string
 			//line.printl("xlate=");
 
 			//eg ans
-			var targetvariablename = line.field(" ", 1);
+			let targetvariablename = line.field(" ", 1);
 
 			// Arg 1 - Target file name
 			// e.g. JOBS
-			var target_filename = line.field(" ", 4).lcase();
+			let target_filename = line.field(" ", 4).lcase();
 
 			// Arg 2 - Target key source
 			// e.g. 3 for field 3 of source data
@@ -697,7 +697,7 @@ $RETVAR := array_to_string
 			// Arg 4 - Mode - What to do if record doesnt exist
 			// C = return key of target record
 			// X or anything else = return empty string
-			var xlate_mode = line.field(" ", 7).field(";", 1);
+			let xlate_mode = line.field(" ", 7).field(";", 1);
 
 			//TRACE(dictid)
 			//TRACE(reqdictid)
@@ -767,7 +767,7 @@ $RETVAR := array_to_string
 
 					// Check that the dict file item exists and does have a pgsql function
 					var errmsg = "Error in " ^ dictfilename ^ " " ^ dictid ^ " xlate target. ";
-					var target_dictfilename = "dict." ^ target_filename;
+					let target_dictfilename = "dict." ^ target_filename;
 					var target_dictfile;
 					if (not open(target_dictfilename to target_dictfile)) {
 						errmsg ^= target_dictfilename.quote() ^ " file does not exist.";
@@ -808,7 +808,7 @@ $RETVAR := array_to_string
 				////////////////////
 
 				if (not locate(xlate_mode, "]X]C"_var)) {
-					var errmsg = "Error in " ^ dictfilename ^ " " ^ dictid ^ " xlate mode " ^ xlate_mode.quote() ^ ". 4th argument must be X, C or omitted.";
+					let errmsg = "Error in " ^ dictfilename ^ " " ^ dictid ^ " xlate mode " ^ xlate_mode.quote() ^ ". 4th argument must be X, C or omitted.";
 					errmsg.errputl();
 					errors ^= "\n" ^ errmsg;
 					return;
@@ -817,7 +817,7 @@ $RETVAR := array_to_string
 				// As per pickos xlate function 4th argument
 				// Option C return the key unchanged if no xlate record exists
 				// Option X (or anything else) return empty string
-				var coalesce_to = xlate_mode eq "C" ? "temp_xlate_key" : "''";
+				let coalesce_to = xlate_mode eq "C" ? "temp_xlate_key" : "''";
 
 				// Convert macros
 				/////////////////
@@ -833,7 +833,7 @@ $RETVAR := array_to_string
 				//line^=target_expression;
 				//line^="\n FROM "^target_filename;
 				//line^="\n WHERE "^target_filename^".key="^source_key_expression^";";
-				var origline = line;
+				let origline = line;
 				line = xlatetemplate;
 				line.replacer("$COMMENT", origline);
 				line.replacer("$RETVAR", targetvariablename);
@@ -890,7 +890,7 @@ COST 10;
 
 	var calc_fields;
 	if (calc_fields.open("calc_fields")) {
-		var key = ucase(dictfilename.cut(5) ^ "*" ^ dictid);
+		let key = ucase(dictfilename.cut(5) ^ "*" ^ dictid);
 		if (calc_fields.deleterecord(key)) {
 			key.outputl("deleted calc_fields = ");
 		}

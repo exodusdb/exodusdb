@@ -71,18 +71,18 @@ function main() {
 
 	if (OPTIONS.contains("a"))
 		OPTIONS ^= "bslcpgv[]";
-	var r2a = OPTIONS.contains("r");
-	var forrange = OPTIONS.count("f");
-	var substr2b = OPTIONS.contains("b");
-	var b1eq2starts = OPTIONS.contains("s");
-	var b2last = OPTIONS.contains("l");
-	var general = OPTIONS.contains("g");
-	var emptyvar = OPTIONS.contains("v");
-	var cutting = OPTIONS.contains("c");
-	var splicing = OPTIONS.contains("p");
-	var onechar = OPTIONS.contains("[]");
+	let r2a = OPTIONS.contains("r");
+	let forrange = OPTIONS.count("f");
+	let substr2b = OPTIONS.contains("b");
+	let b1eq2starts = OPTIONS.contains("s");
+	let b2last = OPTIONS.contains("l");
+	let general = OPTIONS.contains("g");
+	let emptyvar = OPTIONS.contains("v");
+	let cutting = OPTIONS.contains("c");
+	let splicing = OPTIONS.contains("p");
+	let onechar = OPTIONS.contains("[]");
 
-	var verbose = OPTIONS.contains("V");
+	let verbose = OPTIONS.contains("V");
 
 	for (var osfilename : COMMAND) {
 
@@ -185,27 +185,27 @@ function main() {
 				bool fail = false;
 
 				//for (const var dictidn : range(1, ndictids)) {
-				var pattern = "for (var ";
+				let pattern = "for (var ";
 				pos = line.index(pattern);
 				if (pos) {
 					if (forrange ne 2) {
 						// for (var dictidn = 1
-						var part1 = line2.b(pos).field(";", 1).trim();
-						var varname = part1.field(" ", 3);
-						var starting = part1.field("=", 2, 999).trim();
+						let part1 = line2.b(pos).field(";", 1).trim();
+						let varname = part1.field(" ", 3);
+						let starting = part1.field("=", 2, 999).trim();
 
 						// dictidn <= ndictids + 20
-						var part2 = line2.field(";", 2).trim();
-						var varname2 = part2.field(" ", 1).trim();
+						let part2 = line2.field(";", 2).trim();
+						let varname2 = part2.field(" ", 1).trim();
 						if (varname2 ne varname)
 							fail = true;
-						var compare = part2.field(" ", 2);
+						let compare = part2.field(" ", 2);
 						if (compare ne "<=" and compare ne "le")
 							fail = true;
-						var ending = part2.field(" ", 3, 999);
+						let ending = part2.field(" ", 3, 999);
 
 						// ++dictidn) {
-						var part3 = line2.field(";", 3).trim();
+						let part3 = line2.field(";", 3).trim();
 						if (part3 ne ("++" ^ varname ^ ") {") and part3 ne (varname ^ "++) {"))
 							fail = true;
 
@@ -425,7 +425,7 @@ function main() {
 // Restore the hidden commas|semicolons etc
 function restore_subsyntax(in line2, in hidden_char) {
 	//var line = line2.convert(FM_, hidden_char);
-	var line = line2.convert(_FM, hidden_char);
+	let line = line2.convert(_FM, hidden_char);
 	return line;
 }
 // Hide commas|semicolons inside brackets and quotes

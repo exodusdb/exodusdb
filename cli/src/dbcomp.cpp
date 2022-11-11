@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var timestarted = time();
+	let timestarted = time();
 
 	var db1 = COMMAND.f(2);
 	var db2 = COMMAND.f(3);
@@ -11,7 +11,7 @@ function main() {
 	if (not db1 or not db2)
 		abort("Syntax is: dbcomp DBCODE1 DBCODE2");
 
-	var silent = OPTIONS.contains("S");
+	let silent = OPTIONS.contains("S");
 
 	if (not silent)
 		db1.logputl("dbcomp connecting to ");
@@ -46,7 +46,7 @@ function main() {
 		if (not file1.open(filename, db1))
 			abort(lasterror());
 
-		var nrecs = file1.reccount();
+		let nrecs = file1.reccount();
 
 		var file2;
 		if (not file2.open(filename, db2))
@@ -115,13 +115,13 @@ function main() {
 					//errputl(" ", ID, " different.");
 					//printl(RECORD);
 					//printl(rec2);
-					var nfs = fcount(RECORD, FM);
-					var nfs2 = fcount(rec2, FM);
+					let nfs = fcount(RECORD, FM);
+					let nfs2 = fcount(rec2, FM);
 					//if (nfs2 gt nfs)
 					//	nfs = nfs2;
 					for (let fn : range(1, std::max(nfs, nfs2))) {
-						var f1 = RECORD.f(fn);
-						var f2 = rec2.f(fn);
+						let f1 = RECORD.f(fn);
+						let f2 = rec2.f(fn);
 						if (f1 ne f2) {
 							errputl();
 							errputl(filename, " ", ID, " ", fn, "-", f1);
@@ -138,7 +138,7 @@ function main() {
 
 	if (not silent) {
 //		logputl();
-//		var seconds = time() - timestarted;
+//		let seconds = time() - timestarted;
 //		while (seconds < 0)
 //			seconds += 86400;
 //		logputl("Finished in", int(seconds / 60), "minutes and", mod(seconds, 60), "seconds.");

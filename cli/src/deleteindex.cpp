@@ -3,9 +3,9 @@ programinit()
 
 function main() {
 
-	var force = OPTIONS.contains("F");
-	var indexnames = COMMAND.field(FM, 2, 999999);
-	var nindexes = fcount(indexnames, FM);
+	let force = OPTIONS.contains("F");
+	let indexnames = COMMAND.field(FM, 2, 999999);
+	let nindexes = fcount(indexnames, FM);
 
 	if (not nindexes)
 		abort("Syntax is 'deleteindex filename__fieldname ...'");
@@ -19,7 +19,7 @@ function main() {
 		if (not filename)
 			break;
 		var fieldname;
-		var tt = filename.index("__");
+		let tt = filename.index("__");
 		if (tt) {
 			fieldname = filename.b(tt + 2);
 			filename = filename.first(tt - 1);

@@ -91,14 +91,14 @@ function main() {
 
 	// Get the date and time of last sync
 	var last_sync;
-	var definitions_key = "LAST_SYNCDATE_TIME*DAT";
+	let definitions_key = "LAST_SYNCDATE_TIME*DAT";
 	if (not definitions or not read(last_sync, definitions, definitions_key))
 		last_sync = "";
 	last_sync_date = last_sync.f(1);
 	last_sync_time = last_sync.f(2);
 
 	// Skip if nothing new
-	var datinfo = osdir(datpath);
+	let datinfo = osdir(datpath);
 	if (not datinfo) {
 		abort(prefix ^ " Error: " ^ datpath.quote() ^ " dat dir missing");
 	}
@@ -130,7 +130,7 @@ function main() {
 // Dont skip old dirs, since we skip old files below , and it doesnt take much time to scan dirs
 //		// Skip dirs which are not newer i.e. have no newer records
 //		if (not force and not generate) {
-//			var dirinfo = osdir(dirpath);
+//			let dirinfo = osdir(dirpath);
 //			if (not is_newer(dirinfo)) {
 //				//if (verbose)
 //					printl("Nothing new in", dirpath, dirinfo.f(2).oconv("D-Y"), dirinfo.f(3).oconv("MTS"));
@@ -223,7 +223,7 @@ function main() {
 			if (generate and isdict and RECORD.f(1) eq "S") {
 
 				// dict intro
-				var line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
+				let line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
 				newcpptext ^= line1 ^ "\n";
 				newcpptext ^= "/" "/" ^ str("-", len(line1) - 3) ^ "\n";
 
@@ -236,7 +236,7 @@ function main() {
 					newcpptext ^= "function main() {\n";
 
 					// Add closing brace before pgsql , if present
-					var t = dictsrc.index("\n/" "*pgsql");
+					let t = dictsrc.index("\n/" "*pgsql");
 					if (t) {
 						dictsrc.paster(t, 1, "\n}\n");
 						dictsrc.replacer("\n\n}", "\n}");
@@ -321,7 +321,7 @@ function main() {
 
 		// Load and changed functions into database
 		if (dict2sql_ids) {
-			var cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids;
+			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids;
 			//cmd ^= " {V}";
 			if (verbose)
 				cmd.logputl();
@@ -337,7 +337,7 @@ function main() {
 
 			var dictcppfilename = "dict_" ^ dirname;
 
-			var incfilename = homedir ^ "/inc/" ^ dbfilename.convert(".", "_") ^ ".h";
+			let incfilename = homedir ^ "/inc/" ^ dbfilename.convert(".", "_") ^ ".h";
 
 			var incfiletext;
 			if (not osread(incfiletext from incfilename)) {
@@ -372,7 +372,7 @@ function main() {
 	} // next dat dir
 
 	if (dictcppfilenames) {
-		var cmd = "compile " ^ dictcppfilenames ^ "{S}";
+		let cmd = "compile " ^ dictcppfilenames ^ "{S}";
 		printl(cmd);
 		if (not osshell(cmd))
 			abort("syncdat could not compile one or more dict_xxxx.cpp files");

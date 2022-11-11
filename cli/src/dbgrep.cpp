@@ -4,7 +4,7 @@ programinit()
 function main() {
 
 	//init:
-	var reqfile = COMMAND.f(2);
+	let reqfile = COMMAND.f(2);
 	var reqtext = COMMAND.f(3);
 	var padding = COMMAND.f(4);
 
@@ -27,7 +27,7 @@ function main() {
 				colored_reqtext = "\033[1;31m" ^ reqtext ^ "\033[0m";
 
 	// get filenames
-	var filenames = listfiles();
+	let filenames = listfiles();
 
 	for (var filename : filenames) {
 
@@ -50,14 +50,14 @@ function main() {
 			loglasterror();
 		}
 
-		var nresults = 1;
+		let nresults = 1;
 		while (file.readnext(RECORD, ID, MV)) {
 
 			if (esctoexit())
 				abort("");
 
 //			// get record or skip
-//			var RECORD;
+//			let RECORD;
 //			if (not(RECORD.read(file, ID))) {
 //				//abort(ID.quote()^" is missing from " ^ file.quote());
 //				continue;
@@ -74,14 +74,14 @@ function main() {
 
 			// padding & startpos used to contextualise found reqtext
 			var startpos = RECORD.index(reqtext);
-			var startpos2 = startpos - padding;
+			let startpos2 = startpos - padding;
 			if (startpos2 < 1) {
 				padding += startpos2;
 				startpos = 1;
 			}
 			//var leftcontext = RECORD.b(startpos - padding, padding).field2(FM, -1);
-			var leftcontext = RECORD.b(startpos2, padding).field2(FM, -1);
-			var rightcontext = RECORD.b(startpos + len(reqtext), padding).f(1);
+			let leftcontext = RECORD.b(startpos2, padding).field2(FM, -1);
+			let rightcontext = RECORD.b(startpos + len(reqtext), padding).f(1);
 
 			printl(filename, ID, leftcontext ^ colored_reqtext ^ rightcontext);
 			//var(filename ^ " : " ^ ID ^ " :: " ^ context).outputl();

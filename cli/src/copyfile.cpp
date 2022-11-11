@@ -22,7 +22,7 @@ function main() {
 
 	if (not COMMAND.f(2) or not COMMAND.f(3)) {
 
-		var syntax =
+		let syntax =
 		"Syntax is copyfile [SOURCE:][SOURCEFILENAME,...] [TARGET:][TARGETFILENAME] {OPTIONS}\n"
 		"\n"
 		"SOURCE can be a database name or an sql file containing COPY data like that produced by pg_dump\n"
@@ -62,7 +62,7 @@ function main() {
 	var allow_new        = OPTIONS.contains("N");
 	//var move_option    = OPTIONS.contains("M");
 	//var delete_option  = OPTIONS.contains("D");
-	var allow_createfile = OPTIONS.contains("C");
+	let allow_createfile = OPTIONS.contains("C");
 
 	if (allow_createfile) {
 		allow_overwrite = 1;
@@ -320,7 +320,7 @@ function getrec() {
 	// If source is database then simply readnext RECORD and ID
 	if (sourcedb) {
 
-		var result = file1.readnext(RECORD, ID, MV);
+		let result = file1.readnext(RECORD, ID, MV);
 
 		if (result) {
 			recn++;

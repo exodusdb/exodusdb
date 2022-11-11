@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var syntax =
+	let syntax =
 		"NAME\n"
 		"	\n"
 		"	copyrec - copies records between database files or os dirs\n"
@@ -36,10 +36,10 @@ function main() {
 	if (not COMMAND.f(2))
 		abort(syntax);
 
-	var delete_opt = OPTIONS.contains("D");
-	var overwrite_opt = OPTIONS.contains("O");
-	var create_opt = OPTIONS.contains("C");
-	var silent_opt = OPTIONS.contains("S");
+	let delete_opt = OPTIONS.contains("D");
+	let overwrite_opt = OPTIONS.contains("O");
+	let create_opt = OPTIONS.contains("C");
+	let silent_opt = OPTIONS.contains("S");
 
 	var pos1;
 	if (not COMMAND.locateusing(FM, "to:", pos1))
@@ -48,15 +48,15 @@ function main() {
 	// copyrec file1 a b c to: file2 x y z
 	// pos1 = 6 (to:)
 	// pos1 -3 = 6 - 3 = 3 (a)
-	var fromfilename = COMMAND.f(2);
-	var fromkeys = field(COMMAND, FM, 3, pos1 - 3);
+	let fromfilename = COMMAND.f(2);
+	let fromkeys = field(COMMAND, FM, 3, pos1 - 3);
 
 	// copyrec file1 a b c to: file2 x y z
 	// pos1 = 6 (to:)
 	// pos1 + 1 = 6 + 1 = 7 (file2)
 	// pos1 + 2 = 6 + 2 = 8 (x)
 	var tofilename = COMMAND.f(pos1 + 1);
-	var tokeys = field(COMMAND, FM, pos1 + 2, 999'999'999);
+	let tokeys = field(COMMAND, FM, pos1 + 2, 999'999'999);
 
 	if (tofilename eq ".")
 		tofilename = fromfilename;

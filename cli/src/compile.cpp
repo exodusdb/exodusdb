@@ -65,7 +65,7 @@ function main() {
 	// If no file/dirnames then default to previous edic
 	// SIMILAR code in edic and compile
 	if (fcount(COMMAND, FM) < 2) {
-		var edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
+		let edic_hist = osgetenv("HOME") ^ "/.config/exodus/edic_hist.txt";
 		if (osread(COMMAND, edic_hist)) {
 			COMMAND = raise(COMMAND.f(1));
 		}
@@ -98,9 +98,9 @@ function main() {
 	//////////////////////////////////////////////
 
 	// Use on demand/jit linking using dlopen/dlsym
-	var loadtimelinking = false;
+	let loadtimelinking = false;
 
-	var usedeffile = false;
+	let usedeffile = false;
 
 	var compiler = "";
 
@@ -133,7 +133,7 @@ function main() {
 	//Error: /home/neo/bin/server cannot be updated. In use or insufficient rights (2).
 	//false may result in messages similar to the following from running exodus programs
 	//BFD: reopening /home/neo/exodus/service/service2/sys/server: No such file or directory
-	var updateinusebinposix = true;
+	let updateinusebinposix = true;
 
 	// Hard coded compiler options at the moment
 	// Assume msvc (cl) on windows and c++ (g++/clang) otherwise
@@ -286,7 +286,7 @@ function main() {
 			//basicoptions ^= " -Wno-cast-function-type";
 		}
 
-		var gcc = osshellread(compiler ^ " --version").contains("Free Software Foundation");
+		let gcc = osshellread(compiler ^ " --version").contains("Free Software Foundation");
 
 		// Suppress GCC and clang's warnings about each others warning flags
 		if (warnings lt 2) {
@@ -384,7 +384,7 @@ function main() {
 		//EXO_PATH is the parent directory of bin and include etc.
 		//compile needs to locate the include and lib directories
 
-		var ndeep = fcount(EXECPATH, OSSLASH);
+		let ndeep = fcount(EXECPATH, OSSLASH);
 		var exoduspath = "";
 		//first guess is the parent directory of the executing command
 		//on the grounds that compile.exe is in EXO_PATH/bin
@@ -552,7 +552,7 @@ function main() {
 
 		//target directories
 
-		var homedir = osgetenv("USERPROFILE");
+		let homedir = osgetenv("USERPROFILE");
 		if (homedir) {
 			bindir = homedir ^ "\\Exodus\\bin";
 			libdir = bindir;
@@ -600,7 +600,7 @@ function main() {
 
 		//OK if one of the compilable default file extension
 		srcfilename.trimmerlast(".");
-		var fileext = srcfilename.field2(".", -1).lcase();
+		let fileext = srcfilename.field2(".", -1).lcase();
 		if (src_extensions.locateusing(" ", fileext)) {
 			//filepath_without_ext = srcfilename.cut(-len(fileext) - 1);
 		}
@@ -617,7 +617,7 @@ function main() {
 			//create include directory if doesnt already exist
 			call make_include_dir(incdir);
 
-			var targetfilename = incdir ^ OSSLASH ^ srcfilename.field2(OSSLASH, -1);
+			let targetfilename = incdir ^ OSSLASH ^ srcfilename.field2(OSSLASH, -1);
 
 			if (osread(targetfilename) != srctext) {
 				if (not srctext.oswrite(targetfilename)) {
@@ -700,7 +700,7 @@ function main() {
 		//search paths and convert to absolute filename
 		//SIMILAR CODE IN EDIC and COMPILE
 		if (not(osfile(srcfilename)) and not(srcfilename.contains(OSSLASH))) {
-			var paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
+			let paths = osgetenv("CPLUS_INCLUDE_PATH").convert(";", ":");
 			let npaths = fcount(paths, ":");
 			for (const var pathn : range(1, npaths -1)) {
 				var srcfilename2 = paths.field(":", pathn) ^ "/" ^ srcfilename;
@@ -811,11 +811,11 @@ function main() {
 			// Get file text
 			////////////////
 
-			var fileext = srcfilename.field2(".", -1).lcase();
+			let fileext = srcfilename.field2(".", -1).lcase();
 			var filepath_without_ext = srcfilename.cut(-len(fileext) - 1);
-			var filename_without_ext = filepath_without_ext.field2(OSSLASH, -1);
+			let filename_without_ext = filepath_without_ext.field2(OSSLASH, -1);
 
-			var srcfileinfo = osfile(srcfilename);
+			let srcfileinfo = osfile(srcfilename);
 			if (!srcfileinfo) {
 				atomic_ncompilation_failures++;
 				srcfilename.quote().errputl("srcfile doesnt exist: ");
@@ -825,11 +825,11 @@ function main() {
 
 			// Try reading the source text is various locales
 			var text;
-			var alllocales = "utf8" _FM "en_US.iso88591" _FM "en_GB.iso88591";
+			let alllocales = "utf8" _FM "en_US.iso88591" _FM "en_GB.iso88591";
 			var locales = "";
 			//var nlocales = fcount(alllocales, " ");
 			var locale;
-			var origlocale = getxlocale();
+			let origlocale = getxlocale();
 			//for (const var localen : range(1, nlocales)) {
 			//for (var locale : alllocales) {
 			for (var locale2 : alllocales) {
@@ -862,7 +862,7 @@ function main() {
 
 			// Determine if program or subroutine/function
 			// and decide compile/link options
-			var isprogram =
+			let isprogram =
 				contains(text, "<exodus/program.h>") or contains(text, "int main(") or contains(text, "program()");
 			if (verbose)
 				printl("Type=", isprogram ? "Program" : "Subroutine");
@@ -895,11 +895,11 @@ function main() {
 //initline:
 ///////////
 			//and, for subroutines and functions, create header file (even if compilation not successful)
-			var eol = EOL;
+			let eol = EOL;
 			var headertext = "";
 			converter(text, "\r\n", _FM _FM);
 			dim text2 = split(text);
-			var nlines = text2.rows();
+			let nlines = text2.rows();
 
 //#if EXODUS_EXPORT_USING_DEF
 //			var deftext = "";
@@ -930,9 +930,9 @@ function main() {
 
 					//extract out the function declaration in including arguments
 					//eg "function xyz(in arg1, out arg2)"
-					var funcdecl = line.field("{", 1);
+					let funcdecl = line.field("{", 1);
 
-					var funcname = funcdecl.field(" ", 2).field("(", 1);
+					let funcname = funcdecl.field(" ", 2).field("(", 1);
 
 //#if EXODUS_EXPORT_USING_DEF
 //					++defordinal;
@@ -941,11 +941,11 @@ function main() {
 					if (loadtimelinking) {
 						headertext ^= eol ^ funcdecl ^ ";";
 					} else {
-						var libname = filepath_without_ext;
+						let libname = filepath_without_ext;
 						var returntype = word1 eq "subroutine" ? "void" : "var";
 						//var returnsvarorvoid = (word1 eq "function") ? "var" : "void";
-						var callorreturn = (word1 == "function") ? "return" : "call";
-						var funcreturnvoid = (word1 == "function") ? 0 : 1;
+						let callorreturn = (word1 == "function") ? "return" : "call";
+						let funcreturnvoid = (word1 == "function") ? 0 : 1;
 						var funcargsdecl = funcdecl.field("(", 2, 999999);
 
 						// Allow for unused arguments to be annotated or commented out to avoid warnings
@@ -956,7 +956,7 @@ function main() {
 						int level = 0;
 						int charn;
 						for (charn = 1; charn <= len(funcargsdecl); ++charn) {
-							var ch = funcargsdecl.b(charn, 1);
+							let ch = funcargsdecl.b(charn, 1);
 							if (ch eq ")") {
 								if (level eq 0)
 									break;
@@ -1014,7 +1014,7 @@ function main() {
 							//assume everything except the last word (by spaces) is the variable type
 							//wrap it in brackets otherwise when filling in missing parameters
 							//the syntax could be wrong/fail to compile eg "const var&()" v. "(const var&)()"
-							var argtype = field(funcarg, " ", 1, fcount(funcarg, " ") - 1);
+							let argtype = field(funcarg, " ", 1, fcount(funcarg, " ") - 1);
 							fieldstorer(funcargstype, ",", argn, 1, argtype);
 						}
 
@@ -1023,12 +1023,12 @@ function main() {
 						//funcargdecl2 example:	in arg1=var(), out arg2=var(), out arg3=var()
 						//funcargstype example:	IN,OUT,OUT
 						//funcargs example: 	ARG1,ARG2,ARG3
-						var add_funcargsdecl = funcargsdecl2;
-						var add_funcargs = funcargs;
-						var add_vars = "";
+						let add_funcargsdecl = funcargsdecl2;
+						let add_funcargs = funcargs;
+						let add_vars = "";
 						var add_funcs = "";
 						var add_func = "";
-						var can_default = true;
+						let can_default = true;
 
 						//build nargs additional functions to cater for optional arguments in DOS
 
@@ -1043,14 +1043,14 @@ function main() {
 							for (int argn = 1; argn <= nargs; ++argn) {
 
 								//work out the variable name and default
-								var argname = funcargs.field(",", argn);
+								let argname = funcargs.field(",", argn);
 								var argname2 = argname;
 
 								//work out the argtype
-								var argtype = funcargstype.field(",", argn);
+								let argtype = funcargstype.field(",", argn);
 
 								//io/out cannot at the moment have defaults
-								var argdefault = funcargsdecl2.field(",", argn).field("=", 2);
+								let argdefault = funcargsdecl2.field(",", argn).field("=", 2);
 
 								//do not generate functions for numbers of arguments that are equivalent to defaulted arguments in main function
 								if (argdefault ne "" and argn eq maxargn) {
@@ -1178,7 +1178,7 @@ function main() {
 							replacer(inclusion, _EOL " {before_call}", "");
 							replacer(inclusion, _EOL " {after_call}", "");
 						}
-						var usepredefinedcallable = nargs <= exodus_callable_maxnargs;
+						let usepredefinedcallable = nargs <= exodus_callable_maxnargs;
 						if (useclassmemberfunctions) {
 							if (funcname eq "main") {
 								// Functions return var and subroutines return void
@@ -1193,7 +1193,7 @@ function main() {
 							//#include "xmvcallables1.h"
 							//ExodusCallableS1<in> func2("func2","func2");
 
-							var functype = funcreturnvoid ? "s" : "f";
+							let functype = funcreturnvoid ? "s" : "f";
 
 							var funcdecl = "ExodusCallable" ^ functype.ucase() ^ nargs ^ "<" ^ funcargstype ^ "> ";
 							funcdecl ^= funcname ^ "(" ^ libname.quote() ^ "," ^ funcname.quote() ^ ");";
@@ -1203,7 +1203,7 @@ function main() {
 							if (not headertext.contains(funcdecl)) {
 								headertext ^= eol;
 								headertext ^= eol;
-								var includecallable = "#include <exodus/xcallable" ^ functype ^ nargs ^ ".h>" ^ eol;
+								let includecallable = "#include <exodus/xcallable" ^ functype ^ nargs ^ ".h>" ^ eol;
 								if (not headertext.contains(includecallable))
 									headertext ^= includecallable;
 								headertext ^= funcdecl;
@@ -1262,13 +1262,13 @@ function main() {
 				var abs_srcfilename = srcfilename;
 				if (abs_srcfilename[1] != OSSLASH)
 					abs_srcfilename.prefixer(oscwd() ^ OSSLASH);
-				var EXODUS_CALLABLE_XXXXX_H = "EXODUS_CALLABLE_" ^ ucase(filename_without_ext) ^ "_H";
+				let EXODUS_CALLABLE_XXXXX_H = "EXODUS_CALLABLE_" ^ ucase(filename_without_ext) ^ "_H";
 				headertext.prefixer("#define " ^ EXODUS_CALLABLE_XXXXX_H);
 				headertext.prefixer("/" "/#ifndef" ^ EXODUS_CALLABLE_XXXXX_H ^ eol);
 				headertext.prefixer("/" "/generated by exodus \"compile " ^ abs_srcfilename ^ DQ ^ eol);
 				headertext ^= eol ^ "/" "/#endif" ^ eol;
 				//var headerfilename=filepath_without_ext^".h";
-				var headerfilename = incdir ^ OSSLASH ^ filename_without_ext ^ (isprogram ? ".H" : ".h");
+				let headerfilename = incdir ^ OSSLASH ^ filename_without_ext ^ (isprogram ? ".H" : ".h");
 
 				//create include directory if doesnt already exist
 				call make_include_dir(incdir);
@@ -1318,7 +1318,7 @@ function main() {
 			// Skip compilation if the output file is newer than source file and all include files
 			//////////////////////////////////////////////////////////////////////////////////////
 
-			var outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
+			let outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
 			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo, srcfileinfo) && is_newer(outfileinfo, exodus_include_dir_info)) {
 
 				// Recompile is required if any include file is younger than the current output binary
@@ -1331,8 +1331,8 @@ function main() {
 						continue;
 
 					// Acquire include file date/time
-					var incfilename = incdir ^ OSSLASH ^ line.field("<", 2).field(">", 1);
-					var incfileinfo = osfile(incfilename);
+					let incfilename = incdir ^ OSSLASH ^ line.field("<", 2).field(">", 1);
+					let incfileinfo = osfile(incfilename);
 
 					if (incfileinfo) {
 						if (is_newer(incfileinfo, outfileinfo)) {
@@ -1369,7 +1369,7 @@ function main() {
 
 						// Skip if there is a function or member function with the same name as the variable
 						// e.g. "var reccount = file1.reccount();"
-						var varname = match.f(1, 1).field(" ", 2);
+						let varname = match.f(1, 1).field(" ", 2);
 						if (match.contains("." ^ varname) or match.contains(varname ^ "("))
 							continue;
 
@@ -1448,7 +1448,7 @@ function static compile(
 
 //	atomic_count++;
 
-	var result = compile2(
+	let result = compile2(
 	verbose,
 	objfileextension,
 	binfileextension,
@@ -1504,7 +1504,7 @@ function static compile2(
 
 	// Record the current bin file update timestamp so we can
 	// later detect if compiler produces anything to be installed
-	var oldobjfileinfo = osfile(objfilename);
+	let oldobjfileinfo = osfile(objfilename);
 
 	// Check object code can be produced.
 	if (oldobjfileinfo) {
@@ -1532,7 +1532,7 @@ function static compile2(
 	if (verbose)
 		printl(compilecmd);
 	var compileroutput;
-	var compileok = osshellread(compileroutput, compilecmd);
+	let compileok = osshellread(compileroutput, compilecmd);
 	if (not compileok) {
 		atomic_ncompilation_failures++;
 	}
@@ -1543,7 +1543,7 @@ function static compile2(
 	{
 		if (compileroutput)
 			compileroutput.outputl();
-		var charn = index(compileroutput, ": error:");
+		let charn = index(compileroutput, ": error:");
 		if (charn) {
 			startatlineno = compileroutput.b(charn - 9, 9);
 			startatlineno = startatlineno.field2(":", -1);
@@ -1552,7 +1552,7 @@ function static compile2(
 	}
 
 	// Get new objfile info or continue
-	var newobjfileinfo = osfile(objfilename);
+	let newobjfileinfo = osfile(objfilename);
 	if (not newobjfileinfo) {
 		if (compileok)
 			atomic_ncompilation_failures++;
@@ -1585,7 +1585,7 @@ function static compile2(
 
 				// Make the target directory
 				if (not osdir(outputdir)) {
-					var cmd = "mkdir " ^ outputdir;
+					let cmd = "mkdir " ^ outputdir;
 					if (verbose)
 						printl(cmd);
 					//osshell(cmd);
@@ -1615,7 +1615,7 @@ function static compile2(
 				}
 
 				// Install the file
-				var cmd = installcmd ^ " " ^ objfilename ^ " " ^ outputpathandfile;
+				let cmd = installcmd ^ " " ^ objfilename ^ " " ^ outputpathandfile;
 				if (verbose)
 					printl(cmd);
 				if (not osshell(cmd))
@@ -1729,7 +1729,7 @@ function set_environment() {
 	}
 	script ^= " " ^ options;
 
-	var tempfilenamebase = osgetenv("TEMP") ^ "\\exoduscomp$" ^ rnd(99999999);
+	let tempfilenamebase = osgetenv("TEMP") ^ "\\exoduscomp$" ^ rnd(99999999);
 
 	// Capture errors from the setenv
 	// like the annoying
@@ -1774,7 +1774,7 @@ function set_environment() {
 }
 
 function getparam(in result, in paramname, out paramvalue) {
-	var posn = index(result.ucase(), "\n" ^ paramname.ucase() ^ "=");
+	let posn = index(result.ucase(), "\n" ^ paramname.ucase() ^ "=");
 	if (not posn)
 		return false;
 	paramvalue = result.b(posn + len(paramname) + 2).field("\n", 1);

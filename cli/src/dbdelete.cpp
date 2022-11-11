@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	var dbname = COMMAND.f(2);
+	let dbname = COMMAND.f(2);
 	if (not dbname)
 		abort("Syntax is dbdelete [dbname] ... {S}");
 

@@ -3,12 +3,12 @@ programinit()
 
 function main() {
 
-	var dbname2 = COMMAND.f(2);
+	let dbname2 = COMMAND.f(2);
 	var filenames = COMMAND.field(FM, 3, 999999);
 
 	if (not dbname2 and not OPTIONS) {
 
-		var syntax =
+		let syntax =
 			"NAME\n"
 			"    dbattach - Attach foreign database files to the current default database\n"
 			"\n"
@@ -61,7 +61,7 @@ function main() {
 		dbuser1 = "exodus";
 
 	// TODO Allow control over dbuser2/dbpass2
-	var dbuser2 = dbuser1;
+	let dbuser2 = dbuser1;
 	var dbpass2 = osgetenv("EXO_PASS");
 	if (not dbpass2)
 		dbpass2 = "somesillysecret";
@@ -184,9 +184,9 @@ function main() {
 				{};//abort(conn1.lasterror());
 		}
 		//logputl("Connect to the foreign table " ^ filename);
-		var sql = "IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ") FROM SERVER " ^ dbname2 ^ " INTO public";
+		let sql = "IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ") FROM SERVER " ^ dbname2 ^ " INTO public";
 		if (not conn1.sqlexec(sql)) {
-			var lasterror = conn1.lasterror();
+			let lasterror = conn1.lasterror();
 
 			// If the server is not already attached then attach it
 			// ERROR:  server "adlinek_test" does not exist

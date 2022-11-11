@@ -16,7 +16,7 @@ function main() {
 
 		//TRACE(SENTENCE)
 		// Change list into nlist in order to call the nlist library
-		var result = perform("n" ^ SENTENCE);
+		let result = perform("n" ^ SENTENCE);
 		return result;
 	}
 
@@ -40,7 +40,7 @@ function main() {
 			word.quoter();
 		}
 		else {
-			var word2 = word.convert(R"( `~!@#$%^&*(){}[]:;'"|<>?\)" to "");
+			let word2 = word.convert(R"( `~!@#$%^&*(){}[]:;'"|<>?\)" to "");
 			if (word2.len() < word.len()) {
 
 				// Single quotes inside single quotes can be represented as '"'"' for bash
