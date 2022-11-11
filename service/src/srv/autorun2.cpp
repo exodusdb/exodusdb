@@ -81,7 +81,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	if (runasusercode) {
 		var runasuser;
 		if (not(runasuser.read(users, runasusercode))) {
-			if (not(runasusercode eq "EXODUS")) {
+			if (not(runasusercode == "EXODUS")) {
 				msg = runasusercode.quote() ^ " user doesnt exist";
 				return 0;
 			}
@@ -103,7 +103,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	// if no targets specified then
 	// send to the "run as" user and all users above in the same group
-	if (targetusercodes eq "") {
+	if (targetusercodes == "") {
 		// allow for targetusers to be passed in document
 		targetusercodes = srv.document.f(14);
 		// runasuser is NOT a target unless there are no recipients
@@ -114,7 +114,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	// auto targeting
 	let initialtargetusercodes = targetusercodes;
-	if (targetusercodes eq "{GROUP}") {
+	if (targetusercodes == "{GROUP}") {
 		var tt = runasusercode;
 		if (SECURITY.f(1).locate(tt, usern)) {
 			while (true) {
@@ -133,7 +133,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				usern -= 1;
 				tt = SECURITY.f(1, usern);
 				// /BREAK;
-				if (not((usern and tt) and tt ne "---"))
+				if (not((usern and tt) and tt != "---"))
 					break;
 			}  // loop;
 		}
@@ -146,7 +146,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				let usercode = targetusercodes.f(1, usern);
 				var userx;
 				if (not(userx.read(users, usercode))) {
-					if (not(usercode eq "EXODUS")) {
+					if (not(usercode == "EXODUS")) {
 						msg = usercode.quote() ^ " user doesnt exist";
 						return 0;
 					}
@@ -157,7 +157,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	}
 
 	// if no targets have emails then skip
-	if (initialtargetusercodes and targetusercodes eq "") {
+	if (initialtargetusercodes and targetusercodes == "") {
 		msg = "No target users have email addresses";
 		return 0;
 	}
@@ -173,7 +173,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	srv.document(7) = APPLICATION;
 	srv.document(3) = date();
 	srv.document(4) = time();
-	if (srv.document.f(12) eq "") {
+	if (srv.document.f(12) == "") {
 		srv.document(12) = 1;
 	}
 
@@ -198,7 +198,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	// prevent document from being run until the request has been processed
 	// relies on unlock all in listen
-	if (mode eq "ASAP") {
+	if (mode == "ASAP") {
 		if (not(srv.documents.lock(docid))) {
 			// ignore and proceed even cannot lock the document. why?
 		}

@@ -150,13 +150,13 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 				stop();
 			}
 		}
-		rowfieldismv(rowfn) = rowdict(rowfn).f(4) ne "S";
-		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).f(1) eq "F") {
+		rowfieldismv(rowfn) = rowdict(rowfn).f(4) != "S";
+		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).f(1) == "F") {
 			prefixmvfn = rowdict(rowfn).f(2);
 		}
 	}  // rowfn;
 
-	totcol = colfield eq "TOTAL";
+	totcol = colfield == "TOTAL";
 	coln   = 1;
 	if (totcol) {
 		colorder = "AR";
@@ -168,7 +168,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 			}
 		}
 
-		if (coldict.f(9) eq "R") {
+		if (coldict.f(9) == "R") {
 			colorder = "AR";
 		} else {
 			colorder = "AL";
@@ -226,7 +226,7 @@ nextmv:
 		// /////
 		// if prefixes else goto nextrecord
 		MV += 1;
-		if (MV gt nmvs) {
+		if (MV > nmvs) {
 			goto nextrecord;
 		}
 	} else {
@@ -252,7 +252,7 @@ nextmv:
 		}
 	}
 
-	if (datafield.len() eq 0) {
+	if (datafield.len() == 0) {
 		datavals = 1;
 	} else if (datafield.match("^\\d*$")) {
 		datavals = RECORD.f(datafield);
@@ -266,11 +266,11 @@ nextmv:
 		for (const int rowfn : range(1, nrowfields)) {
 			fieldname = rowfields.f(1, rowfn);
 			tt		  = calculate(fieldname);
-			if (fieldname eq "HOUR") {
+			if (fieldname == "HOUR") {
 				tt = ("00" ^ tt).last(2);
 			}
 			nn = tt.fcount(VM);
-			if (nn gt nrowvals) {
+			if (nn > nrowvals) {
 				nrowvals = nn;
 			}
 			pickreplacer(rowvals, rowfn, tt);
@@ -284,7 +284,7 @@ nextmv:
 		colvals = "Total";
 	} else {
 		colvals = calculate(colfield);
-		if (colfield eq "HOUR") {
+		if (colfield == "HOUR") {
 			colvals = ("00" ^ colvals).last(2);
 		}
 	}
@@ -308,7 +308,7 @@ nextmv:
 
 		// determine which row to add into
 		if (not(allrowvals.f(1).locateby("AL", rowval, rown))) {
-			if (allrowvals.len() + rowval.len() gt 65000) {
+			if (allrowvals.len() + rowval.len() > 65000) {
 				gosub abort_toobig(filename);
 			}
 			nrows += 1;
@@ -322,12 +322,12 @@ nextmv:
 			colval = colvals.f(1, colvaln);
 			if (not(allcolvals.f(1).locateby(colorder, colval, coln))) {
 				ncols += 1;
-				if (allcolvals.len() + colval.len() gt 65000) {
+				if (allcolvals.len() + colval.len() > 65000) {
 					gosub abort_toobig(filename);
 				}
 				allcolvals.inserter(1, coln, colval);
 
-				if (output.len() + nrows * 2 gt 65000) {
+				if (output.len() + nrows * 2 > 65000) {
 					gosub abort_toobig(filename);
 				}
 
@@ -337,7 +337,7 @@ nextmv:
 				}  // rownx;
 			}
 
-			if (output.len() + datavals.len() gt 6500) {
+			if (output.len() + datavals.len() > 6500) {
 				gosub abort_toobig(filename);
 			}
 
@@ -388,7 +388,7 @@ exit:
 	}
 
 	for (const int rown : range(1, nrows)) {
-		if (output.len() + allrowvals.len() gt 65000) {
+		if (output.len() + allrowvals.len() > 65000) {
 			gosub abort_toobig(filename);
 		}
 		output(rown + 1, 1) = allrowvals.f(1, rown);
@@ -419,7 +419,7 @@ subroutine abort_toobig(in filename) {
 
 	clearselect();
 	msg = "Crosstab too complex. Please simplify your request.";
-	if (filename eq "STATISTICS") {
+	if (filename == "STATISTICS") {
 		msg(-1) = "Perhaps choose Columns=Date and dont select Session or IP No.";
 	}
 	abort(msg);

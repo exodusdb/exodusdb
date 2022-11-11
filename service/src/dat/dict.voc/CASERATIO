@@ -11,7 +11,7 @@ MD00P
 	yy.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");\
 	let uu = RECORD.len() - yy.len();\
 	let ll = RECORD.len() - xx.len();\
-	if (uu gt ll) {\
+	if (uu > ll) {\
 		ANS = uu / (ll + 1);\
 	} else {\
 		ANS = -(ll / (uu + 1));\

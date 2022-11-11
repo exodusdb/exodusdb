@@ -51,11 +51,11 @@ function main(in mode) {
 	// determine upload directory
 	let uploadroot = SYSTEM.f(49);
 	// if uploadroot='' then uploadroot='..\images\'
-	// if uploadroot[-1,1] ne '\' then uploadroot:='\'
+	// if uploadroot[-1,1] != '\' then uploadroot:='\'
 	var relative_root = "../images/";
 	relative_root.converter("/", OSSLASH);
 
-	if (mode eq "POSTUPLOAD") {
+	if (mode == "POSTUPLOAD") {
 
 		let filename	   = request_.f(3);
 		key				   = request_.f(4);
@@ -107,7 +107,7 @@ postuploadfail:
 
 		gosub unlockfile(filename);
 
-	} else if (mode.field(".", 1) eq "MAKEUPLOADPATH") {
+	} else if (mode.field(".", 1) == "MAKEUPLOADPATH") {
 
 		if (not(authorised("UPLOAD CREATE", msg, ""))) {
 			return invalid(msg);
@@ -117,7 +117,7 @@ postuploadfail:
 		let filename		= request_.f(3);
 		key					= request_.f(4);
 		var ensurenotlocked = request_.f(5);
-		if (ensurenotlocked eq "undefined") {
+		if (ensurenotlocked == "undefined") {
 			ensurenotlocked = "";
 		}
 		if (filename and ensurenotlocked) {
@@ -131,7 +131,7 @@ postuploadfail:
 		}
 
 		var uploadpath = mode.field(".", 2, 9999).lcase();
-		if (uploadpath eq "") {
+		if (uploadpath == "") {
 			return 0;
 		}
 		let tt = "\\";
@@ -169,7 +169,7 @@ postuploadfail:
 			var fullsubfolder = (uploadroot ^ subfolder).lcase();
 			// remove doubled up separators - \\ on winddows or // on linux
 			fullsubfolder.replacer(_OSSLASH _OSSLASH, OSSLASH);
-			// osopen fullsubfolder to xx else if status() ne 2 then
+			// osopen fullsubfolder to xx else if status() != 2 then
 			// cannot use dos 8 characters since keys can be more than 8 characters
 			call shell2("dir " ^ fullsubfolder, errors);
 			if (errors) {
@@ -188,9 +188,9 @@ postuploadfail:
 				// check that folder was created
 				// call subdirs(fullsubfolder:char(0),result)
 				// if result else
-				// osopen fullsubfolder to xx else if status() ne 2 then
+				// osopen fullsubfolder to xx else if status() != 2 then
 				if (errors) {
-					if (USERNAME eq "EXODUS") {
+					if (USERNAME == "EXODUS") {
 						msg = fullsubfolder;
 					} else {
 						msg = "(uploadroot)" ^ subfolder;
@@ -202,7 +202,7 @@ postuploadfail:
 			}
 		}  // subfoldern;
 
-	} else if (mode.field(".", 1) eq "VERIFYUPLOAD") {
+	} else if (mode.field(".", 1) == "VERIFYUPLOAD") {
 
 		// similar in VERIFY AND DELETEUPLOAD
 		let uploadpath = mode.field(".", 2, 9999).lcase();
@@ -213,12 +213,12 @@ postuploadfail:
 		// initdir uploadroot:uploadpath
 		// if dirlist() else
 		let tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
-		if (tt eq "" or tt.contains("FILE NOT FOUND")) {
+		if (tt == "" or tt.contains("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
 
-	} else if (mode.field(".", 1) eq "OPENUPLOAD") {
+	} else if (mode.field(".", 1) == "OPENUPLOAD") {
 
 		// MODE eg = "OPENUPLOAD.test\upload\jobs\j1003\7.Selection_206.png"
 
@@ -286,7 +286,7 @@ postuploadfail:
 
 		// Option to DELETE all the files found
 		///////////////////////////////////////
-		if (request_.f(3) eq "NEW") {
+		if (request_.f(3) == "NEW") {
 			for (let file : uploadfilenames) {
 				if (not osremove(uploadroot ^ relative_path ^ file)) {
 					abort(lasterror());
@@ -311,7 +311,7 @@ postuploadfail:
 
 		data_(2) = uploadfilenames;
 
-	} else if (mode.field(".", 1) eq "DELETEUPLOAD") {
+	} else if (mode.field(".", 1) == "DELETEUPLOAD") {
 
 		if (not(authorised("UPLOAD DELETE", msg, ""))) {
 			return invalid(msg);
@@ -328,7 +328,7 @@ postuploadfail:
 		// initdir uploadroot:uploadpath
 		// if dirlist() else
 		var tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
-		if (tt eq "" or tt.contains("FILE NOT FOUND")) {
+		if (tt == "" or tt.contains("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
@@ -355,7 +355,7 @@ postuploadfail:
 			return invalid(msg);
 		}
 
-	} else if (mode eq "IMPORT") {
+	} else if (mode == "IMPORT") {
 		let uploadpath	  = RECORD.f(1);
 		let startatrown	  = RECORD.f(2);
 		let headertype	  = RECORD.f(3);
@@ -387,7 +387,7 @@ postuploadfail:
 		if (not dictfilename) {
 			dictfilename = filename;
 		}
-		if (dictfilename.first(4) ne "DICT") {
+		if (dictfilename.first(4) != "DICT") {
 			dictfilename.prefixer("DICT.");
 		}
 		// if keydictid else keydictid='@ID'
@@ -460,7 +460,7 @@ nextline:
 			if (eof)
 				break;
 
-			if (not(line and linenox ge startatrown)) {
+			if (not(line and linenox >= startatrown)) {
 				goto nextline;
 			}
 
@@ -494,7 +494,7 @@ nextline:
 						cols(-1) = line.first(ptr - 1) ^ VM ^ colstart;
 
 						// Find the end of the column title by skipping over spaces
-						while (line[ptr + 1] eq " ")
+						while (line[ptr + 1] == " ")
 								++ptr;
 
 						// Save the length of the column
@@ -516,7 +516,7 @@ nextline:
 
 			let ncols = cols.fcount(_FM);
 			// first record, open files and create dictionary
-			if (file eq "") {
+			if (file == "") {
 
 				if (not(file.open(filename, ""))) {
 					call mssg(lasterror());
@@ -669,7 +669,7 @@ subroutine cleanup() {
 
 subroutine getline() {
 
-	if (buff.len() lt lengthx) {
+	if (buff.len() < lengthx) {
 
 addbuff:
 		// //////
@@ -709,7 +709,7 @@ addbuff:
 	nquotes = line.count(DQ);
 	while (true) {
 		// /BREAK;
-		if (not(((nquotes / 2).floor() * 2 ne nquotes) and buff.len()))
+		if (not(((nquotes / 2).floor() * 2 != nquotes) and buff.len()))
 			break;
 		let line2 = buff.field("\r", 1);
 		nquotes += line2.count(DQ);

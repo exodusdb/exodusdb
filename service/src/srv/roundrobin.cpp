@@ -36,7 +36,7 @@ function main(in mode, in params, io result, io msg) {
 	// field 1 = the last minute that was updated
 	// field 2 = 60 multivalues for minutes of the hour
 
-	if (mode eq "TEST") {
+	if (mode == "TEST") {
 
 		// here we have maximum of 6 events per last 6x6 seconds
 		var params2 = "";
@@ -56,7 +56,7 @@ function main(in mode, in params, io result, io msg) {
 			call roundrobin("ONEVENT", params2, result, errormsg);
 		}  // loop;
 
-	} else if (mode eq "ONEVENT") {
+	} else if (mode == "ONEVENT") {
 
 		var voc;
 		if (not(voc.open("VOC", ""))) {
@@ -97,7 +97,7 @@ function main(in mode, in params, io result, io msg) {
 		var lastperiodn	   = roundrobin.f(1);
 
 		// prevent catch up longer than periodsperwindow (add 2 for safety)
-		if (currentperiodn - lastperiodn gt periodsperwindow_ + 2) {
+		if (currentperiodn - lastperiodn > periodsperwindow_ + 2) {
 			lastperiodn = currentperiodn - periodsperwindow_ - 2;
 		}
 
@@ -113,7 +113,7 @@ function main(in mode, in params, io result, io msg) {
 		roundrobin(1)	  = currentperiodn;
 		let currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
 
-		if (roundrobin.f(2).sum() lt maxeventsperwindow_) {
+		if (roundrobin.f(2).sum() < maxeventsperwindow_) {
 
 			result = 1;
 

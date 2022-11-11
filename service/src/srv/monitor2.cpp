@@ -122,7 +122,7 @@ function main() {
 	checkinterval = 180;
 
 	// command mode forces, call mode only every x minutes
-	forced = SENTENCE.field(" ", 1).ucase() eq "MONITOR2";
+	forced = SENTENCE.field(" ", 1).ucase() == "MONITOR2";
 
 	// quit if disabled and not forced
 	if (not(forced) and var("../../disabled.cfg").osfile()) {
@@ -173,7 +173,7 @@ function main() {
 	// only process if current time is > last checktime plus check interval
 	// change to if difference > check interval in case clock is turned back
 	// if forced or currenttime>nextchecktime then
-	if (not(forced or ((currenttime - monitordata.f(1)).abs() gt checkinterval / 86400))) {
+	if (not(forced or ((currenttime - monitordata.f(1)).abs() > checkinterval / 86400))) {
 
 		// ///////
 		// goto exit
@@ -224,9 +224,9 @@ nextstatistic:
 			}
 
 			// skip/delete usage records older than x
-			if (RECORD.f(1) lt minusagetime) {
+			if (RECORD.f(1) < minusagetime) {
 				// trim out usage records older than one week
-				if (RECORD.f(1) lt delusagetime) {
+				if (RECORD.f(1) < delusagetime) {
 					statistics.deleterecord(ID);
 				}
 				goto nextstatistic;
@@ -288,7 +288,7 @@ nextprocess:
 		// use hung and maintenance processes if no ok processes
 		// dont use closed and crashed processes because maybe old and obsolete
 		// TODO make sensitive to definitions BACKUP records
-		if (statusn eq 1 or ((backuprequired.f(1, dbasen) eq "" and statusn le 3))) {
+		if (statusn == 1 or ((backuprequired.f(1, dbasen) == "" and statusn <= 3))) {
 
 			// get the bakpars for a specific process
 			call getbackpars(bakpars, RECORD);
@@ -298,8 +298,8 @@ nextprocess:
 
 			// no backups required if database processes are all automatically started
 			// except BASIC which we presume is used to startup and backup data.bak
-			// if (SYSTEM.f(58) eq "" and dbasecode ne "BASIC") {
-			if (SYSTEM.f(58) eq "") {
+			// if (SYSTEM.f(58) == "" and dbasecode != "BASIC") {
+			if (SYSTEM.f(58) == "") {
 				backuprequired(1, dbasen) = 0;
 			}
 
@@ -308,7 +308,7 @@ nextprocess:
 			if (backuprequired.f(1, dbasen)) {
 				var tt = bakpars.f(7);
 				// backpars 12 (upload backup target) can be 0 to suppress
-				if (bakpars.f(12) and bakpars.f(12) ne bakpars.f(7)) {
+				if (bakpars.f(12) and bakpars.f(12) != bakpars.f(7)) {
 					tt(1, 1, 2) = bakpars.f(12);
 				}
 				// backuptime
@@ -344,7 +344,7 @@ nextprocess:
 //		if (not(nok) and not(VOLUMES)) {
 //			temp = ("../data/" ^ dbasecode ^ "/" ^ dbasecode ^ ".svr").osfile();
 //			secs = date() * 86400 + time() - (temp.f(2) * 86400 + temp.f(3));
-//			nok	 = secs lt 600;
+//			nok	 = secs < 600;
 //			// otherwise flag hung
 //			if (not nok) {
 //				processcount(2, dbasen) = 1;
@@ -352,7 +352,7 @@ nextprocess:
 //		}
 		description = dbasecode;
 		// if nok then description:=' ':nok:':Ok'
-		if (nok gt 1) {
+		if (nok > 1) {
 			description ^= " " ^ nok;
 		}
 
@@ -378,7 +378,7 @@ nextprocess:
 		// not if this is a test database (only those with codes ending in TEST')
 		// unless configured to all it
 		first = 1;
-		if (((not SYSTEM.f(17, 1).ends("_test") or SYSTEM.f(126)) and nok lt minreq) and nhung lt 5) {
+		if (((not SYSTEM.f(17, 1).ends("_test") or SYSTEM.f(126)) and nok < minreq) and nhung < 5) {
 			// if locksystem('LOCK',dbasecode) then
 			// unlock immediately to enable startup - which will fail if anyone locks
 			// call locksystem('UNLOCK',dbasecode)
@@ -499,10 +499,10 @@ nextprocess:
 			currentdatetime		= (date() + time() / 86400).oconv("MD50P");
 			let days_since_backup	= currentdatetime - lastbackupdatetime;
 			// allow one day and one hour
-			if (lastbackupdatetime and (days_since_backup gt 1 + 1 / 24.0)) {
+			if (lastbackupdatetime and (days_since_backup > 1 + 1 / 24.0)) {
 				// warning if one day missed and critical if more than one
 				description ^= " not done " ^ days_since_backup.oconv("MD10P") ^ " days!";
-				if (paramrec and days_since_backup gt 2) {
+				if (paramrec and days_since_backup > 2) {
 					description ^= "!";
 				}
 			}
@@ -520,7 +520,7 @@ nextprocess:
 
 				// check target exists
 				freespace = diskfreespace(backupdrive);
-				if (freespace eq 999999999) {
+				if (freespace == 999999999) {
 					freespace = 0;
 				}
 				backupdrives(2, backupdriven) = freespace;
@@ -539,7 +539,7 @@ nextprocess:
 					// similar in MONITOR2 and FILEMAN
 					nextbackupdate = date();
 					// add 1 if next backup is tomorrow
-					if (time() gt backuprequired.f(1, dbasen, 3)) {
+					if (time() > backuprequired.f(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
 					// dow = ((srv.glang.f(22).field("|", (nextbackupdate - 1).mod(7) + 1)).first(8)).ucase();
@@ -559,21 +559,21 @@ nextprocess:
 						freespace += nextbackupfileinfo.f(2);
 
 						// print a warning if havent changed the backup media and not suppressed
-						if (not(bakpars.f(13)) and (nextbackupfileinfo.f(2) eq nextbackupdate - 7)) {
+						if (not(bakpars.f(13)) and (nextbackupfileinfo.f(2) == nextbackupdate - 7)) {
 
 							// email a request to change usb
 							// from 0600 to 1800 and not sent in the last 5.5 hours
 							// usually 0600 1130 1700
 							reminderhours = 5.5;
 							call getdatetime(localdate, localtime, xx, xx2, xx3, xx4);
-							// if (localtime ge 21600 and localtime le 64800) {
-							if (localtime ge iconv("06:00", "MT") and localtime le iconv("18:00", "MT")) {
+							// if (localtime >= 21600 and localtime <= 64800) {
+							if (localtime >= iconv("06:00", "MT") and localtime <= iconv("18:00", "MT")) {
 								// only one email per installation
 								//call osread(lastnote, "lastnote.cfg");
 								if (not osread(lastnote, "lastnote.cfg")) {
 									//null
 								}
-								if (lastnote.f(1) ne localdate or (lastnote.f(2) lt localtime - 3600 * reminderhours)) {
+								if (lastnote.f(1) != localdate or (lastnote.f(2) < localtime - 3600 * reminderhours)) {
 									//call oswrite(localdate ^ FM ^ localtime, "lastnote.cfg");
 									if (not oswrite(localdate ^ FM ^ localtime, "lastnote.cfg")) {
 										abort(lasterror());
@@ -587,11 +587,11 @@ nextprocess:
 									if (toaddresses) {
 										remindern = (localtime - 21600).mod(3600 * reminderhours) + 1;
 										subject	  = "EXODUS Backup Reminder";
-										if (remindern gt 1) {
+										if (remindern > 1) {
 											subject ^= " (" ^ remindern ^ ")";
 										}
 										body = "It is time to change the EXODUS backup media (e.g. USB Flash Drive)";
-										if (localtime lt 43200) {
+										if (localtime < 43200) {
 											body(-1) = FM ^
 													   "Please change it "
 													   "before 12:00 midday today.";
@@ -608,7 +608,7 @@ nextprocess:
 							}
 
 							// warning if they have not changed the usb by noon
-							if (localtime ge var("12:00").iconv("MT")) {
+							if (localtime >= var("12:00").iconv("MT")) {
 								description ^= " Change Backup!";
 							}
 						}
@@ -648,7 +648,7 @@ nextdbasen:;
 
 			// ensure 10% free space over last backup size
 			// if we know the last backup size (this could fail if a NEW db is added)
-			if (lastbackupsize gt 0 and (freespace lt lastbackupsize * 11 / 10)) {
+			if (lastbackupsize > 0 and (freespace < lastbackupsize * 11 / 10)) {
 				description ^= " only!!";
 			}
 
@@ -663,10 +663,10 @@ nextdbasen:;
 
 	}  // backupdriven;
 	// oswrite descriptions on 'DESCRIPS'
-	if (descriptions.contains("!!") and status0123 lt 2) {
+	if (descriptions.contains("!!") and status0123 < 2) {
 		status0123 = 2;
 	}
-	if (descriptions.contains("!") and status0123 lt 1) {
+	if (descriptions.contains("!") and status0123 < 1) {
 		status0123 = 1;
 	}
 
@@ -693,7 +693,7 @@ nextdbasen:;
 	for (const int ii : range(1, 24)) {
 		for (const int jj : range(1, 3)) {
 			usertab(ii, jj) = usertab(ii, jj).fcount(VM);
-			if (usertab(ii, jj) gt usertab(25, jj)) {
+			if (usertab(ii, jj) > usertab(25, jj)) {
 				usertab(25, jj) = usertab(ii, jj);
 			}
 		}  // jj;
@@ -707,7 +707,7 @@ nextdbasen:;
 		if (hourlyusers) {
 			anyusers = 1;
 		}
-		if (ii gt 1) {
+		if (ii > 1) {
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= hourlyusers;
@@ -718,7 +718,7 @@ nextdbasen:;
 	hourn = 25;
 	for (const int ii : range(1, 3)) {
 		//let tt = usertab(1, ii);
-		if (ii gt 1) {
+		if (ii > 1) {
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= usertab(hourn, ii);
@@ -744,7 +744,7 @@ nextdbasen:;
 		nips = ips.fcount(",");
 		// limit to 5 ips, replace middle ones with - to indicate suppressed
 		maxips = 5;
-		if (nips gt maxips) {
+		if (nips > maxips) {
 			ips = ips.fieldstore(",", (maxips / 2).floor(), maxips - nips, "...");
 		}
 		hostdescriptions ^= " - " ^ ips;

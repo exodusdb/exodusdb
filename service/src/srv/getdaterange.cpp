@@ -21,13 +21,13 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 		let fromdate = "";
 	}
 
-	if (fromquestion eq "") {
+	if (fromquestion == "") {
 		fromquestion = "From date ?";
 	}
-	if (uptoquestion eq "") {
+	if (uptoquestion == "") {
 		uptoquestion = "Up to date ?";
 	}
-	if (ifromdate eq "") {
+	if (ifromdate == "") {
 		let fromdate = date();
 	}
 	if (defaultperiod.unassigned()) {
@@ -37,7 +37,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 	var fromdate = oconv(ifromdate, "[DATE,*4]");
 inpfromdate:
 	call note(fromquestion, "RCE", fromdate, "");
-	if (fromdate eq "" or fromdate eq chr(27)) {
+	if (fromdate == "" or fromdate == chr(27)) {
 		// cancel:
 		ifromdate = "";
 		iuptodate = "";
@@ -54,12 +54,12 @@ inpfromdate:
 	if (iuptodate.unassigned()) {
 		iuptodate = "";
 	}
-	if (iuptodate eq "" or not(iuptodate.isnum())) {
-		if (iuptodate eq "TODAY") {
+	if (iuptodate == "" or not(iuptodate.isnum())) {
+		if (iuptodate == "TODAY") {
 			iuptodate = date();
-		} else if (iuptodate eq "YESTERDAY") {
+		} else if (iuptodate == "YESTERDAY") {
 			iuptodate = date() - 1;
-		} else if (iuptodate eq "TOMORROW") {
+		} else if (iuptodate == "TOMORROW") {
 			iuptodate = date() + 1;
 		} else if (iuptodate.match("^\\d*D$")) {
 			iuptodate = ifromdate2 + iuptodate.first(iuptodate.len() - 1);
@@ -69,14 +69,14 @@ inpfromdate:
 	}
 
 	// make sure todate is not before fromdate
-	if (iuptodate lt ifromdate2) {
+	if (iuptodate < ifromdate2) {
 		iuptodate = ifromdate2;
 	}
 
 	var uptodate = oconv(iuptodate, "[DATE,*4]");
 inpuptodate:
 	call note(uptoquestion, "RCE", uptodate, "");
-	if (uptodate eq "" or uptodate eq chr(27)) {
+	if (uptodate == "" or uptodate == chr(27)) {
 		goto inpfromdate;
 	}
 
@@ -86,7 +86,7 @@ inpuptodate:
 		goto inpuptodate;
 	}
 	uptodate = oconv(iuptodate2, "[DATE,*4]");
-	if (iuptodate2 lt ifromdate2) {
+	if (iuptodate2 < ifromdate2) {
 		call mssg("\"TO DATE\" " ^ uptodate ^ " CANNOT BE BEFORE \"FROM DATE\" " ^ fromdate);
 		goto inpuptodate;
 	}

@@ -21,7 +21,7 @@ var errors;
 
 function main(in /*mode*/, in ipno, out text) {
 
-	if (SENTENCE.field(" ", 1) eq "WHOIS") {
+	if (SENTENCE.field(" ", 1) == "WHOIS") {
 		SENTENCE.move(sentencex);
 		call whois("", sentencex.field(" ", 2), text);
 		call mssg(text);
@@ -33,27 +33,27 @@ function main(in /*mode*/, in ipno, out text) {
 	// test in order of frequency installed at clients
 
 	ip12 = ipno.field(".", 1, 2);
-	if (ip12 eq "192.168") {
+	if (ip12 == "192.168") {
 		goto returnzero;
 	}
 
 	// skip 10.*.*.*
 	ip1 = ipno.field(".", 1);
-	if (ip1 eq "10") {
+	if (ip1 == "10") {
 		goto returnzero;
 	}
 
 	// skip 172.16-32.*.* and 100.64-127.*.*
 	ip2 = ipno.field(".", 2);
-	if ((ip1 eq 172 and ip2 ge 16) and ip2 le 31) {
+	if ((ip1 == 172 and ip2 >= 16) and ip2 <= 31) {
 		goto returnzero;
 	}
-	if ((ip1 eq 100 and ip2 ge 64) and ip2 le 127) {
+	if ((ip1 == 100 and ip2 >= 64) and ip2 <= 127) {
 		goto returnzero;
 	}
 
 	// skip 127.*.*.*
-	if (ip1 eq "127") {
+	if (ip1 == "127") {
 		goto returnzero;
 	}
 

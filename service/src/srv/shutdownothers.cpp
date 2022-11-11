@@ -38,7 +38,7 @@ function main(in /*mode*/, in datasetcode, out result) {
 		abort(lasterror());
 	}
 
-	if (ii ge 120) {
+	if (ii >= 120) {
 		result = 0;
 		printl(" Failed");
 	} else {

@@ -16,14 +16,14 @@ function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, i
 	// holiday type is one of the following (priority in the same order)
 	// 1=weekend, 2=public, 3=personal, 4=expired login, 0=not holiday
 
-	if (mode eq "GETTYPE") {
+	if (mode == "GETTYPE") {
 		gosub getholidaytype(idate, userx, agp, market, holidaytype);
 
-	} else if (mode eq "GETWORKDATE") {
+	} else if (mode == "GETWORKDATE") {
 
 		// skipping forwards or backwards the next number of workdays
 		// eg -2 will change idate to the second workday BEFORE idate
-		if (workdate gt 0) {
+		if (workdate > 0) {
 			direction = 1;
 		} else {
 			direction = -1;
@@ -33,7 +33,7 @@ function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, i
 
 		while (true) {
 			// /BREAK;
-			if (not(workdate and idate ne mindate))
+			if (not(workdate and idate != mindate))
 				break;
 			idate += direction;
 			gosub getholidaytype(idate, userx, agp, market, holidaytype);
@@ -53,7 +53,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 
 	// type 4 is expired
 	// ////////////////
-	if (userx.f(35) and idate ge userx.f(35)) {
+	if (userx.f(35) and idate >= userx.f(35)) {
 		holidaytype = 4;
 		return;
 	}
@@ -111,7 +111,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 		// Not found. daten points to the last + 1
 	}
 	let uptodate = uptodates.f(1, daten);
-	if (uptodate and idate le uptodates.f(1, daten)) {
+	if (uptodate and idate <= uptodates.f(1, daten)) {
 		holidaytype = 3;
 		return;
 	}

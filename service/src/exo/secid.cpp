@@ -6,11 +6,11 @@ function main(in input0, in max) {
 	var inputx;
 	var maxx;
 	var iscmd;
-	if (SENTENCE.field(" ", 1) eq "secid") {
+	if (SENTENCE.field(" ", 1) == "secid") {
 		iscmd  = true;
 		inputx = SENTENCE.field(" ", 2);
 		maxx   = SENTENCE.field(" ", 3);
-		if (not inputx or maxx eq "" or not maxx.isnum()) {
+		if (not inputx or maxx == "" or not maxx.isnum()) {
 			errputl("Syntax is 'secid TEXT NUMBER'\nTEXT must have no spaces.");
 			stop();
 		}

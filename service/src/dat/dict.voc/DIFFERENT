@@ -28,7 +28,7 @@ function main() {\
 	// END\
 	let lastreccount = RECCOUNT;\
 	if (rec.readc(comparefile, ID)) {\
-		if (RECORD eq rec) {\
+		if (RECORD == rec) {\
 			ANS = "";\
 		} else {\
 			if (ID.starts("$")) {\
@@ -41,10 +41,10 @@ function main() {\
 				if (not(recdatetime and cmpdatetime)) {\
 					goto changed;\
 				}\
-				if (recdatetime eq cmpdatetime) {\
+				if (recdatetime == cmpdatetime) {\
 					goto changed;\
 				}\
-				if (recdatetime gt cmpdatetime) {\
+				if (recdatetime > cmpdatetime) {\
 					ANS = "REPLACES";\
 				} else {\
 					ANS = "REPLACED";\

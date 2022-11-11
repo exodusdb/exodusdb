@@ -102,7 +102,7 @@ syntax:
 		stop();
 	}
 
-	if (runasusercode ne "EXODUS" and not(runasusercode.xlate("USERS", 1, "X"))) {
+	if (runasusercode != "EXODUS" and not(runasusercode.xlate("USERS", 1, "X"))) {
 		call mssg(runasusercode.quote() ^ " runas user does not exist");
 		stop();
 	}

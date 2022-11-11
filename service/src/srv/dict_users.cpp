@@ -12,7 +12,7 @@ var userx;
 
 function main() {
 	#include <service_common.h>
-	if (ID eq "EXODUS") {
+	if (ID == "EXODUS") {
 		goto unknown;
 	}
 	if (SECURITY.f(1).locate(USERNAME, usern)) {
@@ -21,7 +21,7 @@ function main() {
 			return ans;
 		}
 	// may not be allowed to access higher users/groups
-		if (usern gt RECORD.f(11)) {
+		if (usern > RECORD.f(11)) {
 			ans = authorised("AUTHORISATION UPDATE HIGHER GROUPS");
 		} else {
 
@@ -29,12 +29,12 @@ function main() {
 			for (const var usern2 : range(usern, 9999)) {
 				userx = SECURITY.f(1, usern2);
 				// /BREAK;
-				if (not((userx and userx ne "---") and userx ne ID))
+				if (not((userx and userx != "---") and userx != ID))
 					break;
 			} // usern2;
 
 		// if found then same group therefore ok
-			if (userx eq ID) {
+			if (userx == ID) {
 				ans = 1;
 			} else {
 
@@ -45,7 +45,7 @@ function main() {
 		}
 	} else {
 unknown:
-		ans = USERNAME eq "EXODUS";
+		ans = USERNAME == "EXODUS";
 	}
 	return ans;
 }
@@ -150,7 +150,7 @@ libraryexit(dept_and_user_name)
 libraryinit(is_department)
 //------------------------
 function main() {
-	if (RECORD.f(5) eq ID) {
+	if (RECORD.f(5) == ID) {
 		return 1;
 	}
 	return "";
@@ -213,7 +213,7 @@ libraryinit(live_user_with_email)
 function main() {
 	if (RECORD.f(7)) {
 		let expired = RECORD.f(35);
-		if (expired and expired le date()) {
+		if (expired and expired <= date()) {
 			ANS = 0;
 		} else {
 			ANS = 1;

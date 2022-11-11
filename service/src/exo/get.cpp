@@ -16,7 +16,7 @@ function main() {
 
 	while (cmd) {
 		let word1 = field(cmd, " ", 1);
-		if (word1 eq "GET" or word1 eq "NEW")
+		if (word1 == "GET" or word1 == "NEW")
 			cmd = field(cmd, " ", 2, 99999).trimlast();
 		else
 			break;
@@ -67,7 +67,7 @@ function main() {
 
 	// redirect printed output back to the printer
 	// program may change the output file
-	if (SYSTEM.f(2) ne prnfile) {
+	if (SYSTEM.f(2) != prnfile) {
 		prnfile = SYSTEM.f(2);
 		dfs		= prnfile;
 	}
@@ -100,7 +100,7 @@ nooutput:
 	}
 
 	// copy print file to public documents if necessary
-	// if prnfile ne dfs then
+	// if prnfile != dfs then
 	// call shell('COPY /b ':PRNFILE:' ':dfS)
 	// osremove prnfile
 	// end

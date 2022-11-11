@@ -4,7 +4,7 @@ libraryinit(alines)
 //-----------------
 function main() {
 	ANS = RECORD.fcount("\n");
-	if (RECORD eq "") {
+	if (RECORD == "") {
 		ANS = 0;
 	}
 	return ANS;
@@ -48,19 +48,19 @@ function main() {
 	if (var("*$").contains(ID[1])) {
 		return 0;
 	}
-	if (ID eq "DEBUG") {
+	if (ID == "DEBUG") {
 		return 0;
 	}
-	if (ID eq "MSG") {
+	if (ID == "MSG") {
 		return 0;
 	}
-	if (ID eq "RTP25") {
+	if (ID == "RTP25") {
 		return 0;
 	}
-	if (ID eq "TEST") {
+	if (ID == "TEST") {
 		return 0;
 	}
-	if (ID eq "TESTBASIC") {
+	if (ID == "TESTBASIC") {
 		return 0;
 	}
 
@@ -70,10 +70,10 @@ function main() {
 	if (RECORD.contains("debug")) {
 		return 1;
 	}
-	if (ID eq "SENDMAIL") {
+	if (ID == "SENDMAIL") {
 		RECORD.converter("'EXODUS.ID'", "");
 	}
-	if (RECORD.contains("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {
+	if (RECORD.contains("'EXODUS.ID'") and ID != "INSTALLALLOWHOSTS") {
 		return 1;
 	}
 	return 0;
@@ -85,7 +85,7 @@ libraryinit(c_args)
 //-----------------
 function main() {
 	ANS = RECORD.f(2);
-	if (ANS.first(3) ne "*c ") {
+	if (ANS.first(3) != "*c ") {
 		ANS = "";
 	}
 	return ANS;
@@ -102,7 +102,7 @@ function main() {
 	yy.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
 	let uu = RECORD.len() - yy.len();
 	let ll = RECORD.len() - xx.len();
-	if (uu gt ll) {
+	if (uu > ll) {
 		ANS = uu / (ll + 1);
 	} else {
 		ANS = -(ll / (uu + 1));
@@ -174,7 +174,7 @@ function main() {
 	// END
 	let lastreccount = RECCOUNT;
 	if (rec.readc(comparefile, ID)) {
-		if (RECORD eq rec) {
+		if (RECORD == rec) {
 			ANS = "";
 		} else {
 			if (ID.starts("$")) {
@@ -187,10 +187,10 @@ function main() {
 				if (not(recdatetime and cmpdatetime)) {
 					goto changed;
 				}
-				if (recdatetime eq cmpdatetime) {
+				if (recdatetime == cmpdatetime) {
 					goto changed;
 				}
-				if (recdatetime gt cmpdatetime) {
+				if (recdatetime > cmpdatetime) {
 					ANS = "REPLACES";
 				} else {
 					ANS = "REPLACED";
@@ -253,7 +253,7 @@ function main() {
 			userx = xlate("USERS", executivecode.field(" ", 1), "", "X");
 		}
 
-		if (userx.f(35) and date() ge userx.f(35)) {
+		if (userx.f(35) and date() >= userx.f(35)) {
 		// expired
 			ANS = "";
 		} else {
@@ -284,7 +284,7 @@ function main() {
 	var ans = calculate("EXECUTIVE_CODE");
 	var ans2 = ans;
 	ans2.ucaser();
-	if (ans2 ne ans) {
+	if (ans2 != ans) {
 		ans.move(ANS);
 	} else {
 	// @ans=xlate('USERS','%':ans2:'%',1,'X')
@@ -292,7 +292,7 @@ function main() {
 		if (ANS) {
 			ans2 = ANS;
 			ans2.ucaser();
-			if (ans2 eq ANS) {
+			if (ans2 == ANS) {
 				ANS = capitalise(ANS);
 				}
 			} else {
@@ -383,7 +383,7 @@ function main() {
 	var brandcode1 = brand.f(8);
 	brandcode1.converter(SM, VM);
 	brandcode1 = brandcode1.f(1, 1);
-	if (brandcode1 and brandcode1 ne brandcode) {
+	if (brandcode1 and brandcode1 != brandcode) {
 		ans.prefixer(brandcode1.xlate("BRANDS", 2, "X") ^ " ");
 	}
 	return ans;
@@ -574,7 +574,7 @@ libraryinit(nlines)
 //-----------------
 function main() {
 	ANS = RECORD.fcount(FM);
-	if (RECORD eq "") {
+	if (RECORD == "") {
 		ANS = 0;
 	}
 	return ANS;

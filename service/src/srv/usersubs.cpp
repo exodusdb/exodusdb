@@ -38,7 +38,7 @@ function main(in mode) {
 		return invalid(msg);
 	}
 
-	if (mode eq "POSTREAD") {
+	if (mode == "POSTREAD") {
 
 		// no longer needed and prevents access to obsolete users
 		// ie ones left in the users file after being deleted from auth table
@@ -47,12 +47,12 @@ function main(in mode) {
 
 		// get email from userlist
 		// it is in the user file already
-		// if @id ne 'EXODUS' then @record<7>=userprivs<7,usern>
+		// if @id != 'EXODUS' then @record<7>=userprivs<7,usern>
 
-		if (req.wlocked and ID ne USERNAME) {
+		if (req.wlocked and ID != USERNAME) {
 
 			// only exodus to access exodus
-			if (ID eq "EXODUS") {
+			if (ID == "EXODUS") {
 				msg = "Not authorised";
 				return invalid(msg);
 			}
@@ -72,7 +72,7 @@ function main(in mode) {
 		}
 
 		// prevent new users with punctuation characters etc
-		if (req.orec eq "" and req.wlocked) {
+		if (req.orec == "" and req.wlocked) {
 			var temp = ID;
 			temp.converter(
 				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -103,7 +103,7 @@ function main(in mode) {
 			RECORD(37) = "";
 		}
 
-	} else if (mode eq "VAL.EMAIL") {
+	} else if (mode == "VAL.EMAIL") {
 
 		// assume email addresses in IS
 
@@ -166,16 +166,16 @@ function main(in mode) {
 		}
 
 		// can be PREWRITE.RESETPASSWORD
-	} else if (mode.field(".", 1) eq "PREWRITE") {
+	} else if (mode.field(".", 1) == "PREWRITE") {
 
-		var resetpassword = mode.field(".", 2) eq "RESETPASSWORD";
+		var resetpassword = mode.field(".", 2) == "RESETPASSWORD";
 
 		if (SECURITY.read(DEFINITIONS, "SECURITY")) {
 		}
 
 		if (SECURITY.f(1).locate(ID)) {
 			newuser = 0;
-			if (RECORD.f(4) and RECORD.f(4) ne req.orec.f(4)) {
+			if (RECORD.f(4) and RECORD.f(4) != req.orec.f(4)) {
 				resetpassword = 1;
 			}
 		} else {
@@ -203,13 +203,13 @@ function main(in mode) {
 		let olduserprivs = SECURITY;
 
 		// exodus usually not in the users list or shouldnt update security record
-		if (ID eq "EXODUS") {
+		if (ID == "EXODUS") {
 			return 0;
 		}
 
 		// prevent amendment of expiry date and password date in UI if not authorised
 		// also name, email and department
-		if (mode eq "PREWRITE") {
+		if (mode == "PREWRITE") {
 			if (req.orec) {
 				if (not(authorised("AUTHORISATION UPDATE", xx))) {
 					// expiry date
@@ -286,7 +286,7 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (resetpassword lt 2) {
+		if (resetpassword < 2) {
 
 			// email address
 			SECURITY(7, usern) = RECORD.f(7);
@@ -308,14 +308,14 @@ function main(in mode) {
 			RECORD(4) = ans.f(7);
 
 			// update security if managed to lock it
-			if (resetpassword lt 2) {
+			if (resetpassword < 2) {
 				ans.converter(FM, TM);
 				let tt			   = "<hidden>" ^ SM ^ ans;
 				SECURITY(4, usern) = tt;
 			}
 		}
 
-		if (resetpassword lt 2 and SECURITY ne olduserprivs) {
+		if (resetpassword < 2 and SECURITY != olduserprivs) {
 			SECURITY.write(DEFINITIONS, "SECURITY");
 			// no need on user if on userprivs
 			RECORD(4) = "";
@@ -329,7 +329,7 @@ function main(in mode) {
 			RECORD.inserter(15, 1, datetime);
 			RECORD.inserter(16, 1, SYSTEM.f(40, 2));
 
-			if (USERNAME eq APPLICATION) {
+			if (USERNAME == APPLICATION) {
 				text = "OK New password sent to " ^ RECORD.f(7);
 			} else {
 				text = "OK New password set by " ^ USERNAME;
@@ -342,7 +342,7 @@ function main(in mode) {
 		// sort holidays in reverse order
 		call sortarray(RECORD, 22 ^ VM ^ 23, "DR");
 
-	} else if (mode eq "POSTWRITE") {
+	} else if (mode == "POSTWRITE") {
 
 		gosub updatemirror();
 
@@ -350,7 +350,7 @@ function main(in mode) {
 
 		return 0;
 
-	} else if (mode eq "CREATEUSERNAMEINDEX") {
+	} else if (mode == "CREATEUSERNAMEINDEX") {
 		req.srcfile = users;
 		select(req.srcfile);
 
@@ -359,7 +359,7 @@ function main(in mode) {
 				ID = "*!%";
 			}
 			// /BREAK;
-			if (not(ID ne "*!%"))
+			if (not(ID != "*!%"))
 				break;
 			if (not(ID.starts("%"))) {
 				if (RECORD.read(users, ID)) {
@@ -368,22 +368,22 @@ function main(in mode) {
 			}
 		}  // loop;
 
-	} else if (mode.field(",", 1) eq "GETUSERDEPTX") {
+	} else if (mode.field(",", 1) == "GETUSERDEPTX") {
 		// does not popup any errormessage
 		gosub getuserdept2(mode);
-		if (ANS eq "") {
+		if (ANS == "") {
 			ANS = "Deleted";
 		}
 
-	} else if (mode.field(",", 1) eq "GETUSERDEPT") {
+	} else if (mode.field(",", 1) == "GETUSERDEPT") {
 		gosub getuserdept2(mode);
-		if (ANS eq "") {
+		if (ANS == "") {
 			msg = usercode.quote() ^ " - USER DOES NOT EXIST";
 			return invalid(msg);
 		}
 		return 0;
 
-	} else if (mode eq "GETDEPTS") {
+	} else if (mode == "GETDEPTS") {
 		gosub getdepts();
 		ANS = depts;
 
@@ -403,7 +403,7 @@ subroutine unlocksec() {
 function getusern() {
 	var usern;
 	// fail safe only allowed to update existing users
-	if (ID eq "EXODUS") {
+	if (ID == "EXODUS") {
 		// usern remains unassigned to force an error if used later on
 	} else {
 		if (not(SECURITY.f(1).locate(ID, usern))) {
@@ -436,7 +436,7 @@ subroutine getuserdept2(in mode) {
 	usercode = mode.field(",", 2);
 	var usern;
 	if (not(SECURITY.f(1).locate(usercode, usern))) {
-		if (usercode eq "EXODUS") {
+		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return;
 		} else {
@@ -449,7 +449,7 @@ subroutine getuserdept2(in mode) {
 	let nusers1 = SECURITY.f(1).fcount(VM);
 	for (usern += 1; usern <= nusers1; ++usern) {
 		// /BREAK;
-		if (SECURITY.f(1, usern) eq "---")
+		if (SECURITY.f(1, usern) == "---")
 			break;
 	}  // usern;
 
@@ -463,11 +463,11 @@ subroutine getdepts() {
 	let nusers2 = SECURITY.f(1).fcount(VM);
 	for (let usern : range(2, nusers2 + 1)) {
 		text = SECURITY.f(1, usern);
-		if (text eq "---" or text eq "") {
+		if (text == "---" or text == "") {
 			text = SECURITY.f(1, usern - 1);
 			text.converter("0123456789", "");
 			text.trimmer();
-			if (text and text ne "---") {
+			if (text and text != "---") {
 				if (not(depts.locateusing(FM, text, deptn))) {
 					depts(-1) = text;
 				}

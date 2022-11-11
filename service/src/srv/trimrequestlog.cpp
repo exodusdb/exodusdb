@@ -51,10 +51,10 @@ nextrec1:
 		output(AT(-40), recn, ". ", ID);
 
 	reqdate = ID.field("*", 2);
-	if (reqdate lt mindate) {
+	if (reqdate < mindate) {
 		mindate = reqdate;
 	}
-	if (reqdate lt periodago) {
+	if (reqdate < periodago) {
 		goto nextrec1;
 	}
 
@@ -80,7 +80,7 @@ stage2:
 
 	let nperiodskept = (maxsize / periodsize).oconv("MD10P");
 	var ndayskept	 = (nperiodskept * perioddays).floor();
-	if (ndayskept gt 9999) {
+	if (ndayskept > 9999) {
 		let datekept = var("1/1/2000").iconv("D");
 		ndayskept	 = date() - datekept + 1;
 	}
@@ -96,7 +96,7 @@ stage2:
 	tx(-1) = "";
 	tx(-1) = "Minimum date found    " ^ oconv(mindate, "[DATE,4*]");
 
-	if (mindate ge datekept) {
+	if (mindate >= datekept) {
 		tx(-1) = "";
 		tx(-1) = "No need to delete anything";
 		tx.replacer(_FM, _EOL);
@@ -145,7 +145,7 @@ nextrec2:
 
 	reqdate = ID.field("*", 2);
 
-	if (reqdate ge datekept) {
+	if (reqdate >= datekept) {
 		print(" kept");
 		goto nextrec2;
 	}

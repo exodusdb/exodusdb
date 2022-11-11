@@ -28,7 +28,7 @@ function main(in amountfmlanguage, in currcode0) {
 
 	comma = "";
 
-	if (SENTENCE.field(" ", 1) eq "AMOUNT.IN.WORDS") {
+	if (SENTENCE.field(" ", 1) == "AMOUNT.IN.WORDS") {
 		sentencex = SENTENCE;
 		SENTENCE  = "";
 		printl();
@@ -50,7 +50,7 @@ function main(in amountfmlanguage, in currcode0) {
 	language = amountfmlanguage.f(2);
 
 	amount.converter("-", "");
-	if (amount eq "") {
+	if (amount == "") {
 		return "";
 	}
 	if (not amount) {
@@ -58,7 +58,7 @@ function main(in amountfmlanguage, in currcode0) {
 	}
 	words = "";
 
-	if (language eq "FRENCH") {
+	if (language == "FRENCH") {
 		goto french;
 	}
 
@@ -68,14 +68,14 @@ function main(in amountfmlanguage, in currcode0) {
 	// convert ',' to '' in amount
 	millions = (amount / 1000000).floor();
 
-	if (millions gt 0) {
+	if (millions > 0) {
 		words = amountinwords(millions ^ FM ^ language) ^ " Million";
 	}
 
 	// thousands
 	thousands = ((amount.mod(1000000)) / 1000).floor();
 	if (thousands) {
-		if (words ne "") {
+		if (words != "") {
 			words ^= comma ^ " ";
 		}
 		words ^= amountinwords(thousands ^ FM ^ language) ^ " Thousand";
@@ -84,7 +84,7 @@ function main(in amountfmlanguage, in currcode0) {
 	// hundreds
 	hundreds = ((amount.mod(1000)) / 100).floor();
 	if (hundreds) {
-		if (words ne "") {
+		if (words != "") {
 			words ^= comma ^ " ";
 		}
 		words ^= amountinwords(hundreds ^ FM ^ language) ^ " Hundred";
@@ -94,10 +94,10 @@ function main(in amountfmlanguage, in currcode0) {
 	unitsx = "00" ^ amount.mod(100).floor();
 	text   = "Zero" _VM "One" _VM "Two" _VM "Three" _VM "Four" _VM "Five" _VM "Six" _VM "Seven" _VM "Eight" _VM "Nine" _VM "Ten" _VM "Eleven" _VM "Twelve" _VM "Thirteen" _VM "Fourteen" _VM "Fifteen" _VM "Sixteen" _VM "Seventeen" _VM "Eighteen" _VM "Nineteen" _VM "Twenty" _VM "Thirty" _VM "Forty" _VM "Fifty" _VM "Sixty" _VM "Seventy" _VM "Eighty" _VM "Ninety";
 	if (unitsx) {
-		if (words ne "") {
+		if (words != "") {
 			words ^= " and ";
 		}
-		if (unitsx le 20) {
+		if (unitsx <= 20) {
 			words ^= text.f(1, unitsx + 1);
 		} else {
 			// IF UNITSx LE 20 THEN
@@ -111,7 +111,7 @@ function main(in amountfmlanguage, in currcode0) {
 	}
 
 	// if base.currency='MYR' and currcode='MYR' then
-	if (currcode eq "MYR") {
+	if (currcode == "MYR") {
 		words.replacer(" and ", " ");
 		cents = ((amount - amount.floor()) * 100).oconv("MD00P");
 		if (cents) {
@@ -122,7 +122,7 @@ function main(in amountfmlanguage, in currcode0) {
 		words ^= " " ^ amountcurrency.f(1);
 
 		// subunits
-		if (amount.floor() ne amount) {
+		if (amount.floor() != amount) {
 			words ^= " and ";
 			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.f(3) ^ "0PZ")).cut(1);
 			words ^= " " ^ amountcurrency.f(2);
@@ -131,7 +131,7 @@ function main(in amountfmlanguage, in currcode0) {
 	} else {
 
 		// subunits
-		if (amount.floor() ne amount) {
+		if (amount.floor() != amount) {
 			words ^= " ." ^ amount.field(".", 2);
 		}
 
@@ -150,7 +150,7 @@ french:
 	millions.cutter(-6);
 	if (millions) {
 		words = amountinwords(millions ^ FM ^ language) ^ " million";
-		if (millions gt 1) {
+		if (millions > 1) {
 			words ^= "s";
 		}
 	}
@@ -158,10 +158,10 @@ french:
 	// thousands
 	thousands = ((amount.mod(1000000)) / 1000).floor();
 	if (thousands) {
-		if (words ne "") {
+		if (words != "") {
 			words ^= comma ^ " ";
 		}
-		if (thousands gt 1) {
+		if (thousands > 1) {
 			words ^= amountinwords(thousands ^ FM ^ language);
 		}
 		words ^= " mille";
@@ -170,10 +170,10 @@ french:
 	// hundreds
 	hundreds = ((amount.mod(1000)) / 100).floor();
 	if (hundreds) {
-		if (words ne "") {
+		if (words != "") {
 			words ^= comma ^ " ";
 		}
-		if (hundreds gt 1) {
+		if (hundreds > 1) {
 			words ^= amountinwords(hundreds ^ FM ^ language);
 		}
 		words ^= " cent";
@@ -184,10 +184,10 @@ french:
 	unitsx = "00" ^ amount.mod(100).floor();
 	text   = "zero" _VM "un" _VM "deux" _VM "trois" _VM "quatre" _VM "cinq" _VM "six" _VM "sept" _VM "huit" _VM "neuf" _VM "dix" _VM "onze" _VM "douze" _VM "treize" _VM "quatorze" _VM "quinze" _VM "seize" _VM "dix-sept" _VM "dix-huit" _VM "dix-neuf" _VM "vingt" _VM "trente" _VM "quarante" _VM "cinquante" _VM "soixante" _VM "soixante-dix" _VM "quatre-vingt" _VM "quatre-vingt-dix";
 	if (unitsx) {
-		if (words ne "") {
+		if (words != "") {
 			words ^= " ";
 		}
-		if (unitsx le 20) {
+		if (unitsx <= 20) {
 			words ^= text.f(1, unitsx + 1);
 		} else {
 
@@ -195,7 +195,7 @@ french:
 			ones = unitsx[-1];
 
 			// 70's and 90's
-			if (tens eq 9 or tens eq 7) {
+			if (tens == 9 or tens == 7) {
 				tens -= 1;
 				ones += 10;
 			}
@@ -204,8 +204,8 @@ french:
 			words ^= text.f(1, 19 + tens);
 
 			// ones
-			if (ones ne "0") {
-				if (tens and ones eq 1) {
+			if (ones != "0") {
+				if (tens and ones == 1) {
 					words ^= " et ";
 				} else {
 					words ^= "-";
@@ -218,7 +218,7 @@ french:
 	}
 
 	// subunits
-	if (amount.floor() ne amount) {
+	if (amount.floor() != amount) {
 		words ^= " ." ^ amount.field(".", 2);
 	}
 

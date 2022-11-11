@@ -13,8 +13,8 @@ function main(in mode, io /*line*/, in params, in filename) {
 
 	// line conversion code below
 	//
-	if (filename eq "xxxxxx") {
-		if (mode eq "HEAD") {
+	if (filename == "xxxxxx") {
+		if (mode == "HEAD") {
 			if (params) {
 			}
 

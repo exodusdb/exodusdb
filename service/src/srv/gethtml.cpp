@@ -62,7 +62,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 
 	letterheadcompany = "";
 	if (hascompanies) {
-		if (not(srv.companies.unassigned() or srv.companies eq "")) {
+		if (not(srv.companies.unassigned() or srv.companies == "")) {
 			if (not(letterheadcompany.read(srv.companies, compcode))) {
 				letterheadcompany = "";
 			}
@@ -178,7 +178,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 	if (letterhead) {
 
 		// check simple HTML
-		if (letterhead.count("<") ne letterhead.count(">")) {
+		if (letterhead.count("<") != letterhead.count(">")) {
 			call mssg(keyx.quote() ^ " page header is not valid HTML");
 			letterhead = "";
 		}
@@ -190,7 +190,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 		let letterhead2 = letterhead.lcase();
 		for (const var tagn : range(1, ntags)) {
 			let tag = tags.field(",", tagn);
-			if (letterhead2.count("<" ^ tag ^ ">") + letterhead2.count("<" ^ tag ^ " ") ne letterhead2.count("</" ^ tag ^ ">")) {
+			if (letterhead2.count("<" ^ tag ^ ">") + letterhead2.count("<" ^ tag ^ " ") != letterhead2.count("</" ^ tag ^ ">")) {
 				letterhead = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
 				// tagn = ntags;
 				break;
@@ -246,7 +246,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		tt = letterheadcompany.f(fn);
 		if (tt) {
 			tt = tt.fcount(VM);
-			if (tt gt ncols) {
+			if (tt > ncols) {
 				ncols = tt;
 			}
 		}
@@ -307,7 +307,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 		// wrap td contents in a div if any styling
 		var divstyle = "";
 		if (align) {
-			if (align eq "center") {
+			if (align == "center") {
 				// there is no FLOAT CENTER
 				divstyle ^= "display:table;margin-left:auto;margin-right:auto;";
 			} else {

@@ -15,7 +15,7 @@ var temp;
 function main(in nextcompanycode) {
 
 	// use app specific version of initcompany2
-	if (APPLICATION ne "EXODUS") {
+	if (APPLICATION != "EXODUS") {
 		initcompany2 = "initcompany2_app";
 	}
 
@@ -72,15 +72,15 @@ function main(in nextcompanycode) {
 	// date format
 	DATEFMT		   = "D2/E";
 	let dateformat = srv.company.f(10);
-	if (dateformat eq "") {
+	if (dateformat == "") {
 		DATEFMT = "D2/E";
 	} else if (dateformat.starts("31/01/")) {
 		DATEFMT = "D2/E";
 	} else if (dateformat.starts("31-01-")) {
 		DATEFMT = "D2-E";
-	} else if (dateformat eq "31 JAN 90") {
+	} else if (dateformat == "31 JAN 90") {
 		DATEFMT = "D2E";
-	} else if (dateformat eq "31 JAN 90.") {
+	} else if (dateformat == "31 JAN 90.") {
 		DATEFMT = "D2";
 	} else if (dateformat.starts("01/31/")) {
 		DATEFMT = "D2/";
@@ -90,9 +90,9 @@ function main(in nextcompanycode) {
 
 		// CASE DATE.FORMAT='31/01/2000';@DATE.FORMAT='D2/E'
 		// CASE DATE.FORMAT='31-01-2000';@DATE.FORMAT='D2-E'
-	} else if (dateformat eq "31 JAN 2000") {
+	} else if (dateformat == "31 JAN 2000") {
 		DATEFMT = "D2E";
-	} else if (dateformat eq "31 JAN 2000.") {
+	} else if (dateformat == "31 JAN 2000.") {
 		DATEFMT = "D2";
 		// CASE DATE.FORMAT='01/31/2000';@DATE.FORMAT='D2/'
 		// CASE DATE.FORMAT='01-31-2000';@DATE.FORMAT='D2-'
@@ -101,7 +101,7 @@ function main(in nextcompanycode) {
 
 	// in init.company and init.general
 
-	if (srv.glang eq "" or srv.company.f(14) ne oldcompany.f(14)) {
+	if (srv.glang == "" or srv.company.f(14) != oldcompany.f(14)) {
 		call getlang("GENERAL", "", "", srv.alanguage, srv.glang);
 		// 		if (srv.glang.f(9)) {
 		// 			UPPERCASE = srv.glang.f(9);
@@ -117,7 +117,7 @@ function main(in nextcompanycode) {
 		// 		LOWERCASE.replacer("%FD", VM);
 		// 		UPPERCASE.replacer("%25", "%");
 		// 		LOWERCASE.replacer("%25", "%");
-		// 		if (UPPERCASE.len() ne LOWERCASE.len()) {
+		// 		if (UPPERCASE.len() != LOWERCASE.len()) {
 		// 			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
 		// 			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		// 		}
@@ -189,7 +189,7 @@ function main(in nextcompanycode) {
 			firstmonth = 1;
 		}
 		var maxperiod = financialyear.field(",", 2);
-		if (not((maxperiod.match("^\\d*$") and maxperiod gt 0) and maxperiod le 99)) {
+		if (not((maxperiod.match("^\\d*$") and maxperiod > 0) and maxperiod <= 99)) {
 			maxperiod = 12;
 		}
 		srv.company(6) = "[DATEPERIOD," ^ firstmonth ^ "," ^ maxperiod ^ "]";

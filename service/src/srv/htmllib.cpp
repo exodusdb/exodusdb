@@ -35,7 +35,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		params2 = params20;
 	}
 
-	if (mode eq "TABLE.MAKE") {
+	if (mode == "TABLE.MAKE") {
 		datax.trimmer();
 		var tt = " " ^ VM;
 		while (true) {
@@ -100,11 +100,11 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		datax.converter(FM ^ VM, "");
 
 		// fill in the missing cells
-	} else if (mode eq "TABLE.FILL") {
+	} else if (mode == "TABLE.FILL") {
 		filler = "<TD>&nbsp;</TD>";
 		gosub fill(datax);
 
-	} else if (mode eq "HASHTABLE") {
+	} else if (mode == "HASHTABLE") {
 
 		let nv = datax.fcount(VM);
 		for (const var vn : range(1, nv)) {
@@ -119,7 +119,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 			data2.converter(TM, FM);
 
 			let nlines = data2.fcount(FM);
-			if (nlines gt 1) {
+			if (nlines > 1) {
 
 				for (const var ln : range(1, nlines)) {
 					var line = data2.f(ln).trim();
@@ -152,23 +152,23 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 
 		}  // vn;
 
-	} else if (mode eq "STRIPTAGS") {
+	} else if (mode == "STRIPTAGS") {
 		while (true) {
 			let tag1 = datax.index("<");
 			let tag2 = datax.index(">");
 			// /BREAK;
-			if (not(tag1 and tag1 lt tag2))
+			if (not(tag1 and tag1 < tag2))
 				break;
 			datax.paster(tag1, tag2 - tag1 + 1, "");
 		}  // loop;
 
-	} else if (mode eq "DECODEHTML") {
+	} else if (mode == "DECODEHTML") {
 		datax.replacer("&nbsp;", " ");
 		datax.replacer("&lt;", "<");
 		datax.replacer("&gt;", ">");
 		datax.replacer("&amp;", "&");
 
-	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
+	} else if (mode.field(".", 1, 2) == "OCONV.AGENT") {
 
 		// to check versus DOS BROWSERS.TXT
 		// GET NEW RUN GBP2 CHK.AGENTSTRING
@@ -301,7 +301,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		if (not browser) {
 			browser = iemode;
 		}
-		if ((browser and iemode) and iemode ne browser) {
+		if ((browser and iemode) and iemode != browser) {
 			browser ^= " IE" ^ iemode ^ "mode";
 		}
 		if (browser) {
@@ -331,10 +331,10 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		}
 
 		let submode = mode.field(".", 3);
-		if (submode eq "OS") {
+		if (submode == "OS") {
 			datax = osname;
 			return 0;
-		} else if (submode eq "BROWSER") {
+		} else if (submode == "BROWSER") {
 			datax = browser;
 			return 0;
 		}
@@ -369,7 +369,7 @@ subroutine fill(io datax) {
 	var n2 = 0;
 	for (const var ii : range(1, nn)) {
 		let tt = datax.f(ii).fcount(VM);
-		if (tt gt n2) {
+		if (tt > n2) {
 			n2 = tt;
 		}
 	}  // ii;
@@ -377,7 +377,7 @@ subroutine fill(io datax) {
 	// make sure all columns are filled
 	for (const var ii : range(1, nn)) {
 		for (const var i2 : range(1, n2)) {
-			if (datax.f(ii, i2) eq "") {
+			if (datax.f(ii, i2) == "") {
 				datax(ii, i2) = filler;
 			}
 		}  // i2;

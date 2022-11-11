@@ -71,12 +71,12 @@ function main() {
 	let format	  = PSEUDO.f(3);
 	let datemode  = PSEUDO.f(4);
 
-	html				= format eq 1;
+	html				= format == 1;
 	var			  dedup = html;
 
-	if (datemode gt 1) {
+	if (datemode > 1) {
 		var selectcmd = "SELECT STATISTICS WITH DATE ";
-		if (datemode eq 2) {
+		if (datemode == 2) {
 			reqdate = date();
 		} else {
 			reqdate = date() - 1;
@@ -117,7 +117,7 @@ function main() {
 			var replaced = 0;
 			for (const var coln : range(1, nrowfields)) {
 				// /BREAK;
-				if (not(row1.f(1, coln) eq row2.f(1, coln)))
+				if (not(row1.f(1, coln) == row2.f(1, coln)))
 					break;
 				replaced	  = 1;
 				row2(1, coln) = "-";
@@ -153,12 +153,12 @@ function main() {
 
 		for (const var coln : range(1, ncols)) {
 			tx ^= "<col";
-			if (coln gt nrowfields) {
+			if (coln > nrowfields) {
 				tx ^= " align=right";
 			}
 			tx ^= ">";
 			// extra col for user browser
-			if (coln eq usercoln) {
+			if (coln == usercoln) {
 				tx ^= "<col>";
 			}
 		}  // coln;
@@ -171,7 +171,7 @@ function main() {
 			}
 			tx ^= th ^ cell ^ thx;
 			// extra col for user browser
-			if (coln eq usercoln) {
+			if (coln == usercoln) {
 				tx ^= th ^ "Browser Last Seen" ^ thx;
 			}
 		}  // coln;
@@ -184,18 +184,18 @@ function main() {
 			var rowtx = "";
 			for (const var coln : range(1, ncols)) {
 				var cell = row.f(1, coln);
-				if (dedup and coln le nrowfields) {
-					if (cell ne "-") {
+				if (dedup and coln <= nrowfields) {
+					if (cell != "-") {
 						var rowspan = 1;
 						for (const var rown2 : range(rown + 1, nrows)) {
 							// /BREAK;
-							if (not(output.f(rown2, coln) eq "-"))
+							if (not(output.f(rown2, coln) == "-"))
 								break;
 							rowspan += 1;
 						}  // rown2;
 
 						var celltd = "<TD";
-						if (rowspan gt 1) {
+						if (rowspan > 1) {
 							celltd ^= " rowspan=" ^ rowspan;
 						}
 						celltd ^= ">";
@@ -205,10 +205,10 @@ function main() {
 						}
 
 						// convert to user name
-						if (coln eq usercoln) {
+						if (coln == usercoln) {
 							userx  = xlate("USERS", cell, "", "X");
 							let tt = userx.f(1);
-							if (tt and cell ne tt) {
+							if (tt and cell != tt) {
 								cell = tt ^ " (" ^ cell ^ ")";
 							}
 						}
@@ -216,7 +216,7 @@ function main() {
 						rowtx ^= celltd ^ cell ^ tdx;
 
 						// browser after user
-						if (coln eq usercoln) {
+						if (coln == usercoln) {
 							rowtx ^= celltd;
 							var agent = userx.f(39, 6);
 
@@ -231,13 +231,13 @@ function main() {
 						cell = nbsp;
 					}
 					rowtx ^= td ^ cell ^ tdx;
-					if (coln eq usercoln) {
+					if (coln == usercoln) {
 						rowtx ^= td ^ nbsp ^ tdx;
 					}
 				}
 			}  // coln;
 			tx ^= tr ^ rowtx ^ trx;
-			if (tx.len() gt 64000) {
+			if (tx.len() > 64000) {
 				gosub printtx();
 			}
 		}  // rown;

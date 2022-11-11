@@ -25,7 +25,7 @@ function main(in type, in input0, in mode, out output) {
 	// and there are 4 weeks per period (which results in 13 periods per year)
 	// weeks per period MUST divide into 52 exactly
 
-	if (input0 eq "") {
+	if (input0 == "") {
 		output = "";
 		return 0;
 	}
@@ -39,7 +39,7 @@ function main(in type, in input0, in mode, out output) {
 
 	// if oconv then convert internal date to year:period
 	// /////////////////////////////////////////////////
-	if (type eq "OCONV") {
+	if (type == "OCONV") {
 		temp   = input0.oconv("D2-E");
 		year   = temp.last(2);
 		period = temp.b(4, 2);
@@ -54,14 +54,14 @@ tryyear:
 		gosub getfirstdateofyear();
 		firstdateofyear2 = firstdateofyear;
 		// go to previous year if date before start of year
-		if (input0 lt firstdateofyear) {
+		if (input0 < firstdateofyear) {
 			year = (addcent4(year) - 1).last(2);
 			goto tryyear;
 		} else {
 			year2 = (year + 1).oconv("R(0)#2");
 			gosub getfirstdateofyear();
 			// go to next year if date after last date of year
-			if (input0 gt firstdateofyear - 1) {
+			if (input0 > firstdateofyear - 1) {
 				year += 1;
 				year = year.oconv("R(0)#2");
 				goto tryyear;
@@ -70,7 +70,7 @@ tryyear:
 
 		dayofyear = input0 - firstdateofyear2 + 1;
 		period	  = ((dayofyear - 1) / (7 * weeksperperiod)).floor() + 1;
-		if (period gt maxperiod) {
+		if (period > maxperiod) {
 			period = maxperiod;
 		}
 		output = year ^ ("00" ^ period).last(2);
@@ -91,7 +91,7 @@ tryyear:
 
 	// get the first date of the next period then subtract 1 day
 	period += 1;
-	if (period gt maxperiod) {
+	if (period > maxperiod) {
 		period -= maxperiod;
 		year += 1;
 		year = year.oconv("R(0)#2");
@@ -107,10 +107,10 @@ tryyear:
 	diff = output.oconv("DW") - firstdayofweek;
 
 	if (diff) {
-		if (diff gt 3) {
+		if (diff > 3) {
 			diff -= 7;
 		}
-		if (diff lt - 3) {
+		if (diff < - 3) {
 			diff += 7;
 		}
 		output -= diff;
@@ -132,10 +132,10 @@ subroutine getfirstdateofyear() {
 	// firstdayofyear = (firstdateofyear - 1).mod(7) + 1;
 	firstdayofyear = firstdateofyear.oconv("DW");
 	difference	   = firstdayofyear - firstdayofweek;
-	if (difference gt 3) {
+	if (difference > 3) {
 		difference -= 7;
 	}
-	if (difference lt - 3) {
+	if (difference < - 3) {
 		difference += 7;
 	}
 	firstdateofyear -= difference;

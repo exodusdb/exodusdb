@@ -48,7 +48,7 @@ function main(in mode0) {
 		return 0;
 	}
 
-	if (mode.f(1) eq "SELECTANDLIST") {
+	if (mode.f(1) == "SELECTANDLIST") {
 
 		// change to the user selected company
 		// merely to get the right letterhead
@@ -68,7 +68,7 @@ function main(in mode0) {
 		gosub list();
 
 		// called from LOGIN.NET. not UI. UI calls SELECTANDLIST
-	} else if (mode.f(1) eq "WHATSNEW") {
+	} else if (mode.f(1) == "WHATSNEW") {
 
 		let menucodes = mode.f(2);
 		mode		  = mode.f(1);
@@ -100,7 +100,7 @@ function main(in mode0) {
 
 			// fix a problem where people were missing most changes
 			// due to sv being represented as : eg user:support:technical
-			if (mode.f(3) and mode.f(3) lt 14773) {
+			if (mode.f(3) and mode.f(3) < 14773) {
 				mode(3) = 14153;
 			}
 
@@ -117,7 +117,7 @@ function main(in mode0) {
 		gosub getcurrentversiondatetime();
 
 		// nothing to see if seen matches (or after?) currentversiondate
-		if (mode.f(3) ge currentversiondatetime) {
+		if (mode.f(3) >= currentversiondatetime) {
 			ANS = "";
 			return 0;
 		}
@@ -180,15 +180,15 @@ function main(in mode0) {
 		ANS = SYSTEM.f(2);
 
 		// actually this is GETINSTALLEDVERSION DATES!
-	} else if (mode eq "GETVERSIONDATES") {
+	} else if (mode == "GETVERSIONDATES") {
 
 		gosub getversiondates();
 
-	} else if (mode.f(1) eq "SELECT") {
+	} else if (mode.f(1) == "SELECT") {
 
 		gosub select0();
 
-	} else if (mode.f(1) eq "LIST") {
+	} else if (mode.f(1) == "LIST") {
 
 		gosub list();
 	}
@@ -212,7 +212,7 @@ subroutine select0() {
 		tt = data_;
 		tt.converter(FM, VM);
 		if (not(tt.locateby("AR", mode.f(3), versionn))) {
-			if (versionn gt 1) {
+			if (versionn > 1) {
 				mode(3) = data_.f(versionn - 1);
 			}
 		}
@@ -238,7 +238,7 @@ subroutine select() {
 		cmd ^= andx ^ " WITH DATE GE " ^ (data_.f(2).oconv("D4").quote());
 		andx = " AND";
 	}
-	if (USERNAME ne "EXODUS") {
+	if (USERNAME != "EXODUS") {
 		// cmd:=andx:' WITH DISTRIBUTION ""'
 		// andx=' AND'
 		// cmd:=' "User"'
@@ -297,7 +297,7 @@ subroutine getcurrentversiondatetime() {
 	// temp = temp.xlate("DOS", 1, "X");
 	temp = osread(temp);
 	if (not(VOLUMES)) {
-		if (temp eq "") {
+		if (temp == "") {
 			temp = EXECPATH.osfile();
 			// 19:05:55  18 NOV 2020
 			temp = temp.f(3).oconv("MTS") ^ " " ^ temp.f(2).oconv("D");

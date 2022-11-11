@@ -85,7 +85,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 	let isdevsys = var("exodus.id").osfile();
 
 	// will return "" in request5 if valid or an error response message
-	if (request1.f(1) eq "VALIDATE") {
+	if (request1.f(1) == "VALIDATE") {
 
 		var username	 = request2;
 		let password	 = request3;
@@ -97,7 +97,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		// 2. email addresses are not secret and usernames are guessable
 		// 3. magic character in password on logins causes password reset if email
 		// as the password. Therefore NO @ characters in passwords
-		var passwordreset = origrequest1 eq "LOGIN" and password.contains("@");
+		var passwordreset = origrequest1 == "LOGIN" and password.contains("@");
 
 		// determine username from emailaddress
 		// only for users with single, unique emails
@@ -187,7 +187,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				for (failn = 1; failn <= 999999; ++failn) {
 					let tt = userx.f(18, failn);
 					// /BREAK;
-					if (not(tt ne "" and tt.first(2) ne "OK"))
+					if (not(tt != "" and tt.first(2) != "OK"))
 						break;
 				}  // failn;
 				   //do normal authorisation to show type of failure - but fail even if ok
@@ -195,11 +195,11 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				   // goto validateexit
 				   // end
 				   //too many consecutive fails
-				if (failn gt maxnfails) {
+				if (failn > maxnfails) {
 					goto validateexit;
 				}
 				// check account expiry
-				if (userx.f(35) and date() ge userx.f(35)) {
+				if (userx.f(35) and date() >= userx.f(35)) {
 
 					realreason = "Login user account expired";
 
@@ -226,7 +226,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 			// because new password might not have been put on authorisation file
 			// if the file was locked at the time user reset their password
 			userencrypt0 = userx.f(4, 1);
-			if (userencrypt0 eq "") {
+			if (userencrypt0 == "") {
 				// TODO remove all encrypted passwords from userprivs and put all on user
 				// in PREWRITE new security
 				userencrypt0 = SECURITY.f(4, usern, 2).field(TM, 7);
@@ -234,7 +234,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 			// check password is correct
 			// if encrypt0<>field(userencrypt0<1,1,2>,tm,7) then
-			if (encrypt0 ne userencrypt0) {
+			if (encrypt0 != userencrypt0) {
 
 				realreason = "Wrong password";
 
@@ -272,7 +272,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					var ii;
 					for (ii = usern + 1; ii <= nn; ++ii) {
 						// /BREAK;
-						if (not(SECURITY.f(1, ii + 1) ne "---"))
+						if (not(SECURITY.f(1, ii + 1) != "---"))
 							break;
 					}  // ii;
 					validips = SECURITY.f(6, ii);
@@ -338,7 +338,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				// check allowed access to this database - or exit
 				// only checking during LOGIN. TODO is this ok?
 				// no longer has to be done after setting @username
-				if (origrequest1 eq "LOGIN") {
+				if (origrequest1 == "LOGIN") {
 					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.f(17).quote()), msg_, "", username))) {
 						invalidlogin = msg_;
 						goto validateexit;
@@ -374,18 +374,18 @@ invalidip:
 					// prevent EXODUS from using CONFIGURED fully formed LAN ips
 					// which are deemed to be NAT routers possibly providing WAN access
 					// but EXODUS should not have unrestricted access from WAN
-					if (username eq "EXODUS" and not(SYSTEM.f(17).contains("DEMO"))) {
-						if (ip2 eq "192.168") {
+					if (username == "EXODUS" and not(SYSTEM.f(17).contains("DEMO"))) {
+						if (ip2 == "192.168") {
 exoduslocalip:
 							if (validips.locateusing(" ", ipno)) {
 								goto invalidip;
 							}
 						} else {
 							let tt = ipno.field(".", 1);
-							if (tt eq "10") {
+							if (tt == "10") {
 								goto exoduslocalip;
 							}
-							if (tt eq "172") {
+							if (tt == "172") {
 								goto exoduslocalip;
 							}
 						}
@@ -398,7 +398,7 @@ exoduslocalip:
 				// even if all login checks are ok, fail if too many successive failures
 				// since login is blocked, only a password reset or update
 				// can reenable the account by getting an OK into the user<18> log
-				if (failn gt maxnfails) {
+				if (failn > maxnfails) {
 
 					// but send the normal "invalid user/password" reply to user logging in
 					// since we dont want a guesser to know they have guessed the right pass
@@ -419,7 +419,7 @@ exoduslocalip:
 					goto validateexit2;
 				}
 
-				if (username ne "EXODUS") {
+				if (username != "EXODUS") {
 
 					var passworddate = userx.f(36);
 
@@ -435,7 +435,7 @@ exoduslocalip:
 
 						// int() to ignore time of day so expiring in one day means they can
 						// login on the day that the password was changed
-						if (date() ge passworddate.floor() + passwordexpirydays) {
+						if (date() >= passworddate.floor() + passwordexpirydays) {
 							goto passwordexpired;
 						}
 					}
@@ -443,7 +443,7 @@ exoduslocalip:
 					// check not exceeded max nologin days
 					// default is 31 days from last login or password reset
 					maxnologindays = SYSTEM.f(128);
-					if (maxnologindays eq "") {
+					if (maxnologindays == "") {
 						maxnologindays = 31;
 					}
 
@@ -452,12 +452,12 @@ exoduslocalip:
 						lastlogindate = userx.f(13);
 
 						// if password was reset more recently than last login date then use that
-						if (passworddate gt lastlogindate) {
+						if (passworddate > lastlogindate) {
 							lastlogindate = passworddate;
 						}
 
 						// int() to remove time part of date
-						if (date() ge lastlogindate.floor() + maxnologindays) {
+						if (date() >= lastlogindate.floor() + maxnologindays) {
 
 passwordexpired:
 
@@ -473,8 +473,8 @@ passwordexpired:
 
 				// check not concurrent use of same username - or exit
 				// allowing relock for now on duplicate logins TODO block them
-				if (origrequest1 ne "LOGIN" and origrequest1 ne "RELOCK") {
-					// if connection ne user<39> then
+				if (origrequest1 != "LOGIN" and origrequest1 != "RELOCK") {
+					// if connection != user<39> then
 					// ONLY CHECKING IP NUMBER FOR NOW
 					// if we check session number then it causes problem for multiple
 					// login on the same computer but
@@ -493,28 +493,28 @@ passwordexpired:
 					//
 					// if session number agrees then dont test anything else
 					// this will allow ip number to change due to network proxy etc
-					if (connection.f(1, 5) ne userx.f(39, 5) and username ne "EXODUS") {
+					if (connection.f(1, 5) != userx.f(39, 5) and username != "EXODUS") {
 
 						// the word "automatic" hardcoded in browser to unlock and lose any work
 						var tt = "You have been automatically logged out due to another login as " ^ (username.quote());
 						tt(-1) = "Please login or try again later.";
 
 						// refuse browser change
-						if (connection.f(1, 6) ne userx.f(39, 6)) {
+						if (connection.f(1, 6) != userx.f(39, 6)) {
 							invalidlogin = tt;
 							realreason	 = "Duplicate login.";
 							goto validateexit;
 						}
 
 						// refuse http/https change
-						if (connection.f(1, 4) ne userx.f(39, 4)) {
+						if (connection.f(1, 4) != userx.f(39, 4)) {
 							invalidlogin = tt;
 							realreason	 = "Duplicate login .";
 							goto validateexit;
 						}
 
 						// refuse ip number change
-						if (connection.f(1, 2) ne userx.f(39, 2)) {
+						if (connection.f(1, 2) != userx.f(39, 2)) {
 							invalidlogin = tt;
 							realreason	 = "Duplicate login";
 							goto validateexit;
@@ -527,14 +527,14 @@ passwordexpired:
 				}
 
 				// send email to user and IT on first or novel ipno logins (not EXODUS)
-				if (origrequest1 eq "LOGIN") {
-					if (username ne "EXODUS" or isdevsys) {
+				if (origrequest1 == "LOGIN") {
+					if (username != "EXODUS" or isdevsys) {
 
 						let ulogins = userx.f(18);
 						if (ulogins.locate("OK")) {
 
 							// if ipno unrestricted
-							if (validips eq " " or isdevsys) {
+							if (validips == " " or isdevsys) {
 
 								// find a previous SUCCESSFUL login from same ipnet (ip part 1 & 2 only)
 								var isnewipnet = 1;
@@ -542,7 +542,7 @@ passwordexpired:
 								let uipnos	   = userx.f(16);
 								let nn		   = uipnos.count(_VM);
 								for (let ii : range(1, nn)) {
-									if (ulogins.f(1, ii) eq "OK" and uipnos.f(1, ii).field(".", 1, 2) eq ipno12) {
+									if (ulogins.f(1, ii) == "OK" and uipnos.f(1, ii).field(".", 1, 2) == ipno12) {
 										isnewipnet = 0;
 									}
 									// /BREAK;
@@ -558,7 +558,7 @@ passwordexpired:
 									// whois returns 0 for lan ipnos (127 10 100 172 192.168 etc)
 									call whois("", ipno, whoistx);
 
-									if (whoistx ne "0") {
+									if (whoistx != "0") {
 
 										body = "This is an automated email from your EXODUS database " ^ SYSTEM.f(17, 1);
 										body ^= " recording a successful login from the ip number " ^ ipno;
@@ -603,7 +603,7 @@ passwordexpired:
 			}
 
 			// 2. EXODUS check pass in system.file
-		} else if (username eq "EXODUS") {
+		} else if (username == "EXODUS") {
 
 			// check for (EXODUS) user and password in revelation system file
 			var sysrec;
@@ -612,7 +612,7 @@ passwordexpired:
 			}
 
 			// check password
-			if (sysrec.f(7) ne encrypt0) {
+			if (sysrec.f(7) != encrypt0) {
 				realreason = "Wrong password";
 				goto validateexit;
 			}
@@ -663,7 +663,7 @@ validateexit2:
 					return 0;
 				}
 
-				if (failn gt maxnfails) {
+				if (failn > maxnfails) {
 					// var tt = failn + 1;
 					realreason = "Too many consecutive login failures: " ^ failn ^ ", max is " ^ maxnfails;
 					invalidlogin ^= "\r\n" ^ (username.quote()) ^ " login is disabled pending password reset by an administrator";
@@ -694,7 +694,7 @@ validateexit2:
 						// ONLY if user has an email address
 						// and account is not expired
 						let expirydate = RECORD.f(35);
-						if (RECORD.f(7) and ((expirydate eq "" or expirydate gt date()))) {
+						if (RECORD.f(7) and ((expirydate == "" or expirydate > date()))) {
 
 							// signify ok
 							passwordreset = 2;
@@ -723,7 +723,7 @@ validateexit2:
 				}
 
 				// save historical login results in listen2 and security.subs
-				if (passwordreset ne 2) {
+				if (passwordreset != 2) {
 
 					// datetime=(date():'.':time() 'R(0)#5')+0
 					let datetime = date() ^ "." ^ time().oconv("R(0)#5");
@@ -732,7 +732,7 @@ validateexit2:
 					text.replacer("username and/or ", "");
 
 					var tt = text.field("|", 1);
-					if (tt.len() gt 80) {
+					if (tt.len() > 80) {
 						// tt[81, 999999] = '...'
 						// tt.paster(81, 999999, "...");
 						// tt.pasterall(81, "...");
@@ -768,7 +768,7 @@ validateexit2:
 				}
 
 				// trim long user records
-				if (RECORD.len() gt 5000) {
+				if (RECORD.len() > 5000) {
 					let nitems = RECORD.f(15).fcount(_VM);
 					RECORD(15) = RECORD.f(15).field(_VM, 1, nitems - 5);
 					RECORD(16) = RECORD.f(16).field(_VM, 1, nitems - 5);
@@ -778,11 +778,11 @@ validateexit2:
 				// update without locking if not resetting password ?!
 				RECORD.write(usersordefinitions, userkey);
 
-				if (passwordreset eq 1) {
+				if (passwordreset == 1) {
 					invalidlogin = text;
 					text.move(request5);
 
-				} else if (passwordreset eq 2) {
+				} else if (passwordreset == 2) {
 
 					// postwrite updates and unlocks authorisation file
 					call usersubs("POSTWRITE");
@@ -825,7 +825,7 @@ validateexit2:
 			}
 
 			// cc the user too if the username is valid
-			if (passwordreset lt 2) {
+			if (passwordreset < 2) {
 				if (passwordreset) {
 					emailsubject = "Password Reset Failure " ^ password;
 				} else {
@@ -835,7 +835,7 @@ validateexit2:
 						emailsubject ^= " - " ^ realreason;
 					}
 				}
-				if (failn gt 1) {
+				if (failn > 1) {
 					emailsubject.replacer("Failure", "Failure (" ^ failn ^ ")");
 				}
 
@@ -849,7 +849,7 @@ validateexit2:
 					if (lastuser.read(users, lastuserid)) {
 						msg_ ^= " (last login was " ^ lastuser.f(1);
 						if (lastuser.f(1)) {
-							if (lastuserid ne lastuser.f(1)) {
+							if (lastuserid != lastuser.f(1)) {
 								msg_ ^= " (" ^ lastuserid ^ ")";
 							}
 						} else {
@@ -862,7 +862,7 @@ validateexit2:
 				body = msg_;
 
 				// add whoistx info for non-private ip nos with no prior successful login
-				if (lastuser eq "" or isdevsys) {
+				if (lastuser == "" or isdevsys) {
 					call whois("", fromipno, whoistx);
 					ipno = fromipno;
 					gosub addwhoistx();
@@ -902,7 +902,7 @@ validateexit2:
 				// by not doing 'MD50P'
 				// statistic<1>=(date()+time()/86400) 'MD50P'
 				statistic(1) = (date() + time() / 86400).first(12);
-				if (origrequest1 ne "RELOCK") {
+				if (origrequest1 != "RELOCK") {
 					statistic(2) = statistic.f(2) + 1;
 				}
 				// enable fast stats without cross database user access
@@ -911,14 +911,14 @@ validateexit2:
 			}
 		}
 
-	} else if (request1 eq "BECOMEUSERANDCONNECTION") {
+	} else if (request1 == "BECOMEUSERANDCONNECTION") {
 		gosub becomeuserandconnection(request2, request4);
 
-	} else if (request1 eq "CONNECTION") {
+	} else if (request1 == "CONNECTION") {
 
 		// username and password is already validated at this point
 		// but we need to get users cookies for company, market, menus etc (or fail)
-	} else if (request1 eq "LOGIN") {
+	} else if (request1 == "LOGIN") {
 
 		let dataset	 = request2.ucase();
 		let username = request3.ucase();
@@ -937,7 +937,7 @@ validateexit2:
 		call loginnet(dataset, username, cookie, loginmsg, authcompcodes);
 		data_ = cookie;
 		msg_  = loginmsg;
-		if (data_ eq "") {
+		if (data_ == "") {
 			response_ = msg_;
 			return 0;
 		}
@@ -959,7 +959,7 @@ validateexit2:
 			}
 
 			// convert old data
-			if (userrec.f(13) ne userrec.f(15, 1) and userrec.f(18) eq "") {
+			if (userrec.f(13) != userrec.f(15, 1) and userrec.f(18) == "") {
 				if (userrec.f(15) and not(userrec.f(18))) {
 					userrec(18) = "OK";
 				}
@@ -1003,7 +1003,7 @@ validateexit2:
 			}
 		}
 
-	} else if (request1 eq "RESPOND") {
+	} else if (request1 == "RESPOND") {
 
 		// method to allow sys programs to respond and detach before finishing
 
@@ -1056,7 +1056,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 	// set @station
 	var tt = connection.f(1, 2);
-	if (connection.f(1, 3) ne tt) {
+	if (connection.f(1, 3) != tt) {
 		tt ^= "_" ^ connection.f(1, 3);
 	}
 	tt.converter(". ", "_");
@@ -1126,9 +1126,9 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				}
 
 				// dont copy defaults so the system default will apply
-				if (tt2 eq "") {
-				} else if (tt2 eq "Default") {
-				} else if (tt2 eq "100") {
+				if (tt2 == "") {
+				} else if (tt2 == "Default") {
+				} else if (tt2 == "100") {
 				} else {
 					runstyles(1, vn) = tt2;
 				}

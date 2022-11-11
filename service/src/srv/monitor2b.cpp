@@ -31,8 +31,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	let post = 1;
 	// cleanup=0;*@username<>'EXODUS'
-	let cleanup = mode eq "READ";
-	if (mode eq "READ") {
+	let cleanup = mode == "READ";
+	if (mode == "READ") {
 		datax = "";
 	}
 
@@ -84,7 +84,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	let sessionid = (date().pwr(3) * 7 + 5).b(9999, -9999);
 	let cidx	  = cid();
 
-	if (mode eq "WRITE") {
+	if (mode == "WRITE") {
 
 		// baseurl='http://monitor.neosys.com/'
 		// baseurl='https://monitor.hosts.neosys.com:4428/'
@@ -94,12 +94,12 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		if (not monitorport) {
 			monitorport = 4428;
 		}
-		if (monitorport ne 443) {
+		if (monitorport != 443) {
 			baseurl ^= ":" ^ monitorport;
 		}
 		baseurl ^= "/";
 
-		if (request eq "UPGRADE") {
+		if (request == "UPGRADE") {
 
 			// only get if newer
 			cmd ^= " -N";
@@ -115,7 +115,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			params = datax;
 		}
 
-		if (request eq "UPDATE") {
+		if (request == "UPDATE") {
 
 			authurl = SYSTEM.f(55);
 			if (not authurl) {
@@ -221,7 +221,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		// UPDATE also gets a response
-		if (request eq "UPDATE") {
+		if (request == "UPDATE") {
 			if (post) {
 				cmd ^= " -O " ^ tempfilename2;
 			} else {
@@ -298,7 +298,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				loglasterror();
 			}
 
-			if (wgetrcfilename[2] eq ":") {
+			if (wgetrcfilename[2] == ":") {
 				wgetrcfilename.paster(2, 1, "");
 				wgetrcfilename.prefixer("/cygdrive/");
 			}
@@ -353,11 +353,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		msg = "";
 
-	} else if (mode eq "READ") {
+	} else if (mode == "READ") {
 
 		let tt = tempfilename2.osfile().f(1);
-		// if tt gt 32000 then
-		if (tt gt maxstrsize_ / 2) {
+		// if tt > 32000 then
+		if (tt > maxstrsize_ / 2) {
 			datax = "";
 			gosub getlog(logfilename, cleanup, log);
 			msg = "Excessive response (" ^ tt ^ ")" ^ log;
@@ -386,7 +386,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		// verify echo
 		let expect = SYSTEM.f(45) ^ "," ^ SYSTEM.f(17) ^ "," ^ cidx ^ "," ^ sessionid;
-		if (datax.field(",", 2, 4) ne expect) {
+		if (datax.field(",", 2, 4) != expect) {
 			msg = "Bad response";
 			goto badresponse;
 		}
@@ -395,7 +395,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		text = datax.field(",", 2, 999999);
 		gosub hash(salt, max, hashcode);
 		hashcode = hashcode.b(9999, -9999);
-		if (not(datax.field(",", 1) eq hashcode)) {
+		if (not(datax.field(",", 1) == hashcode)) {
 			msg = "wrong response";
 badresponse:
 			datax.replacer("<br />", _FM);

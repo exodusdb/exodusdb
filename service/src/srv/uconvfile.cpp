@@ -54,7 +54,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	}
 
 	// determine the encoding1
-	if (encoding1 eq "CODEPAGE") {
+	if (encoding1 == "CODEPAGE") {
 		//call osgetenv("CODEPAGE", encoding1);
 		if (not osgetenv("CODEPAGE", encoding1)) {
 			//abort(lasterror());
@@ -74,13 +74,13 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 	// dont convert if latin
 	// hopefully to reduce chance of screwups/reduce filesize when latin
-	if (encoding1 eq 1252) {
+	if (encoding1 == 1252) {
 		result = 1;
 		return 0;
 	}
 
 	// determine the encoding2
-	if (encoding2 eq "CODEPAGE") {
+	if (encoding2 == "CODEPAGE") {
 		//call osgetenv("CODEPAGE", encoding2);
 		if (not osgetenv("CODEPAGE", encoding2)) {
 			//abort(lasterror());
@@ -91,7 +91,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		msg = "UCONVFILE: Missing encoding2";
 	}
 
-	if (encoding1 ne encoding) {
+	if (encoding1 != encoding) {
 
 		// invent a temporary filename
 		var tempfilename = inputfilename;

@@ -19,7 +19,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 	if (languagefile.unassigned()) {
 		languagefile = "";
 	}
-	if (languagefile eq "") {
+	if (languagefile == "") {
 		if (not(languagefile.open("ALANGUAGE", ""))) {
 			return 0;
 		}
@@ -28,7 +28,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 	var origlanguagecode = languagecode0;
 	if (not origlanguagecode) {
 		origlanguagecode = srv.company.f(14);
-		if (origlanguagecode eq "ENGLISH") {
+		if (origlanguagecode == "ENGLISH") {
 			origlanguagecode = "";
 		}
 		if (not origlanguagecode) {
@@ -47,22 +47,22 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		var	 lang2 = lang;
 
 		// bilingual
-		if (lang2 and lang2 ne lang1) {
+		if (lang2 and lang2 != lang1) {
 			lang   = "";
 			let n1 = lang1.fcount(FM);
 			let n2 = lang2.fcount(FM);
-			// 			if (n1 lt n2) {
+			// 			if (n1 < n2) {
 			// 				nn = n2;
 			// 			} else {
 			// 				nn = n1;
 			// 			}
-			let nn = (n1 lt n2) ? n2 : n1;
+			let nn = (n1 < n2) ? n2 : n1;
 			for (const var fn : range(1, nn)) {
 				// lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
 				let lang1line = lang1.f(fn);
 				let lang2line = lang2.f(fn);
 				let nparts	  = fcount(lang1line, "|");
-				if (nparts eq 1) {
+				if (nparts == 1) {
 					// eg English Arabic
 					lang(fn) = (lang1line ^ " " ^ lang2line).trim();
 				} else {
@@ -124,7 +124,7 @@ exit:
 		for (const var fn : range(1, nn)) {
 			var tt = custlang.f(fn);
 			if (tt.len()) {
-				if (tt eq "\"\"") {
+				if (tt == "\"\"") {
 					tt = "";
 				}
 				lang(fn) = custlang.f(fn);
@@ -133,7 +133,7 @@ exit:
 	}
 
 	// force 737 greek codepage characters so indexing is ok etc
-	if (origprogname eq "GENERAL") {
+	if (origprogname == "GENERAL") {
 
 		//call osgetenv("CODEPAGE", codepage);
 		if (not osgetenv("CODEPAGE", codepage)) {
@@ -141,7 +141,7 @@ exit:
 		}
 
 		// greek
-		if (codepage eq "737") {
+		if (codepage == "737") {
 			if (not(codepage.read(languagefile, "GENERAL*GREEK"))) {
 				codepage = "";
 			}
@@ -150,7 +150,7 @@ getupperlower:
 			lang(10) = codepage.f(1, 10);
 
 			// central european including poland
-		} else if (codepage eq "852") {
+		} else if (codepage == "852") {
 			if (not(codepage.read(languagefile, "GENERAL*POLISH"))) {
 				codepage = "";
 			}
@@ -199,7 +199,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 
 	// convert to FM if not a format record
 	// IF orig.progname<>'SORTORDER' and LANG<8>='' then
-	if (origprogname ne "SORTORDER" and lang.f(1).count(VM)) {
+	if (origprogname != "SORTORDER" and lang.f(1).count(VM)) {
 		lang = raise(lang.f(1));
 
 		// strip out English pretext

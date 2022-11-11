@@ -84,7 +84,7 @@ function main() {
 	// gosub getenv
 	call initgeneral2("GETENV", logtime);
 
-	let resetting					= PSEUDO eq "RESET";
+	let resetting					= PSEUDO == "RESET";
 	var					   initmode = SENTENCE.field(" ", 2);
 	PSEUDO							= "";
 	// equ request to @user0
@@ -262,7 +262,7 @@ function main() {
 		let lockkey = "INIT.GENERAL.LOGIN";
 		if (not(voc.lock(lockkey))) {
 			// np if own lock
-			if (FILEERROR ne "414") {
+			if (FILEERROR != "414") {
 				if (not(lockrecord("VOC", voc, "INIT.GENERAL.LOGIN", "", initwaitsecs))) {
 					msg = "INIT.GENERAL couldnt get exclusive lock. Quitting.";
 					// maybe a long upgrade process is running
@@ -317,9 +317,9 @@ function main() {
 			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
 			}
-			if (oldmethod and dbversion.f(1) eq "14334.5") {
+			if (oldmethod and dbversion.f(1) == "14334.5") {
 			}
-			if (dbversion.f(1) gt dbdatetimerequired) {
+			if (dbversion.f(1) > dbdatetimerequired) {
 				msg = "Software version " ^ dbversion.f(1).oconv("D") ^ " " ^ dbversion.f(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
 				msg = msg.oconv("L#60");
 				// abort since db is advanced
@@ -335,20 +335,20 @@ decideversion:
 					options(-1) = "Continue";
 					options(-1) = "Mark database as version " ^ dbdate ^ " " ^ dbtime ^ " and continue";
 					call decide("!" ^ msg ^ "", options, reply);
-					if (reply eq 1) {
+					if (reply == 1) {
 						goto badversion;
 					}
 					var	 msgx = "!WARNING *UNPREDICTABLE* CONSEQUENCES" ^ FM ^ FM ^ "WHAT IS THE PASSWORD?";
 					call inputbox(msgx, 20, 0, "", reply2, "\x1B");
-					if (reply2 ne "UNPREDICTABLE") {
+					if (reply2 != "UNPREDICTABLE") {
 						call note("THAT IS NOT THE CORRECT PASSWORD");
 						goto decideversion;
 					}
-					if (reply eq 3) {
+					if (reply == 3) {
 						goto updateversion;
 					}
 				}
-			} else if (dbversion.f(1) lt dbdatetimerequired) {
+			} else if (dbversion.f(1) < dbdatetimerequired) {
 updateversion:
 				dbversion	 = dbdatetimerequired;
 				dbversion(2) = dbdate;
@@ -361,7 +361,7 @@ updateversion:
 	// install any dat files in the current database
 	// also load any new or amended pgsql functions found in dict files in dat
 	call log2("*install any new db dat data if thread 0 or 1", logtime);
-	if (THREADNO le 1) {
+	if (THREADNO <= 1) {
 		if (not osshell("syncdat"))
 			loglasterror();
 	}
@@ -375,7 +375,7 @@ updateversion:
 				rec = "";
 			}
 			// /BREAK;
-			if (rec eq "")
+			if (rec == "")
 				break;
 			let filename = rec.f(1);
 			let id		 = rec.f(2);
@@ -419,7 +419,7 @@ updateversion:
 	// 		let volume = volumesx.f(volumen);
 	// 		let tpath = "../" "DATA" "/";
 	// 		tpath.converter("/", OSSLASH);
-	// 		if (volume.first(8) eq tpath) {
+	// 		if (volume.first(8) == tpath) {
 	// 			execute("ATTACH " ^ volume ^ " (S)");
 	// 		}
 	// 	} // volumen;
@@ -455,7 +455,7 @@ updateversion:
 	// 		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
 	// 			color2 = "";
 	// 		}
-	// 		if (colors ne color2) {
+	// 		if (colors != color2) {
 	// 			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
 	// 			// call colortoescold);
 	// 		}
@@ -463,7 +463,7 @@ updateversion:
 	//
 	// 	call log2("*setup escape sequence for standard color and background", logtime);
 	// 	temp = HW.f(3)[4] ^ HW.f(8)[4];
-	// 	if (temp eq "00") {
+	// 	if (temp == "00") {
 	// 		temp = "70";
 	// 	}
 	// 	tt = "\x1B";
@@ -472,7 +472,7 @@ updateversion:
 	// 	AW(30) = tt;
 
 	call log2("*convert reports file", logtime);
-	if (SYSTEM.f(17) ne "DEVDTEST") {
+	if (SYSTEM.f(17) != "DEVDTEST") {
 		var reports;
 		if (reports.open("REPORTS", "")) {
 			select(reports);
@@ -485,7 +485,7 @@ nextreport:
 					if (file.open(filename, "")) {
 						var keyx = reportkey.field("*", 2);
 						keyx.replacer("%2A", "*");
-						if (recordx.f(1) eq "%DELETED%") {
+						if (recordx.f(1) == "%DELETED%") {
 							var rec;
 							if (rec.read(file, keyx)) {
 								// if rec<1>='EXODUS' then delete file,keyx
@@ -498,10 +498,10 @@ nextreport:
 								oldrecord = "";
 							}
 							// only update documents if changed anything except update timedate
-							if (filename eq "DOCUMENTS") {
+							if (filename == "DOCUMENTS") {
 								oldrecord(8) = recordx.f(8);
 							}
-							if (recordx ne oldrecord) {
+							if (recordx != oldrecord) {
 								recordx.write(file, keyx);
 							}
 						}
@@ -522,7 +522,7 @@ nextreport:
 	let notherusers = otherusers("").f(1);
 
 	call log2("*check/get authorisation", logtime);
-	if (SYSTEM.f(4) eq "" and not(SYSTEM.f(33))) {
+	if (SYSTEM.f(4) == "" and not(SYSTEM.f(33))) {
 		let nusers = getauthorisation();
 		if (not nusers) {
 
@@ -542,8 +542,8 @@ nextreport:
 		}
 
 		call log2("*check users", logtime);
-		// if nusers lt otherusers('')+1 then
-		if (nusers lt notherusers + 1) {
+		// if nusers < otherusers('')+1 then
+		if (nusers < notherusers + 1) {
 			msg = var("4D4158494D554D20415554484F5249534544204E554D424552204F46205553455253204558434545444544").iconv("HEX2");
 			call note(msg);
 			if (SYSTEM.f(33)) {
@@ -555,7 +555,7 @@ nextreport:
 	}
 
 	call log2("*prevent use of this program via F10", logtime);
-	if (((initmode ne "LOGIN" and LEVEL ne 1) and interactive) and not(resetting)) {
+	if (((initmode != "LOGIN" and LEVEL != 1) and interactive) and not(resetting)) {
 		msg		= "You cannot quit from within another program via F10.";
 		msg(-1) = "Please quit all programs first and then try again.";
 		chr(7).output();
@@ -576,7 +576,7 @@ nextreport:
 	let lastdate = config.f(1);
 
 	call log2("*update \"last used date\"", logtime);
-	if (date() ne lastdate) {
+	if (date() != lastdate) {
 		config(1) = date();
 		// call OSWRITE(CONFIG,'exodus.cfg')
 		//var(config).oswrite("exodus.cfg");
@@ -630,7 +630,7 @@ nextreport:
 	// SYSTEM.fieldstorer(FM, 59, 5, "");
 	// update dbcodes with dir dbcodes if dbcodes in sys cfg file contain lcase
 	let ttdbcodes = SYSTEM.f(58).convert("abcdefghijklmnopqrstuvwx", "").len();
-	if (ttdbcodes eq SYSTEM.f(58).len()) {
+	if (ttdbcodes == SYSTEM.f(58).len()) {
 		// c++ only
 		SYSTEM(58) = oslistd("../data/").convert(FM, VM);
 		SYSTEM.fieldstorer(FM, 59, 5, "");
@@ -677,7 +677,7 @@ nextreport:
 		SYSTEM(123) = "GLOBAL";
 	}
 	// upgrades yes
-	if (SYSTEM.f(124) eq "") {
+	if (SYSTEM.f(124) == "") {
 		SYSTEM(124) = 1;
 	}
 	// close after backup yes
@@ -791,7 +791,7 @@ nextreport:
 
 	call log2("*determine upload path", logtime);
 	tt = SYSTEM.f(49);
-	if (tt eq "") {
+	if (tt == "") {
 		// system<49>='..\images\'
 		var imagesdir = "../images/";
 		imagesdir.converter("/", OSSLASH);
@@ -829,7 +829,7 @@ nextreport:
 
 		// used in readcss for output reports and documents
 		// <meta http-equiv="content-type" content="text/html;charset=..." />
-		if (SYSTEM.f(127) eq "") {
+		if (SYSTEM.f(127) == "") {
 			// tt=''
 			// if codepage=720 then tt='windows-1256'
 			// if codepage=737 then tt='windows-1253'
@@ -906,7 +906,7 @@ nextreport:
 		let nlogical = SYSTEM.f(9);
 		cpu			 = cpu.f(1).trim() ^ " ";
 		tt			 = nlogical / nsockets;
-		if (tt gt 1) {
+		if (tt > 1) {
 			cpu ^= nsockets ^ "x" ^ tt;
 		} else {
 			cpu ^= "x" ^ nsockets;
@@ -924,7 +924,7 @@ nextreport:
 
 	call log2("*check if diskfreespace is sufficient " ^ freemb ^ "Mb", logtime);
 	// notherusers=otherusers('')+1
-	if (freemb lt reqfreemb * notherusers) {
+	if (freemb < reqfreemb * notherusers) {
 		// if 1 then
 		msg = "THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE";
 		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().first(2) ^ " but";
@@ -1002,7 +1002,7 @@ nextreport:
 		// Task added
 	}
 
-	if (tt eq "GS") {
+	if (tt == "GS") {
 		tt = "LS";
 	}
 	if (not(authorised("SYSTEM CONFIGURATION CREATE", msg, tt))) {
@@ -1057,7 +1057,7 @@ nextreport:
 	}
 
 	call log2("*terminate old session", logtime);
-	if (sessionid ne "") {
+	if (sessionid != "") {
 		call logprocess(sessionid, "LOGOFF", "", "", "", "");
 		SYSTEM(4) = "";
 	}
@@ -1372,7 +1372,7 @@ fixnextcompany:
 
 		// initialise with a recent company
 		tt = srv.company.f(2).field("/", 2);
-		if (tt gt maxyear) {
+		if (tt > maxyear) {
 			maxyear			  = tt;
 			srv.gcurrcompcode = companycode;
 		}
@@ -1409,7 +1409,7 @@ fixcompany:
 	var menu = "";
 
 	call log2("*open accounts system files", logtime);
-	if (APPLICATION eq "ACCOUNTS" or APPLICATION eq "ADAGENCY") {
+	if (APPLICATION == "ACCOUNTS" or APPLICATION == "ADAGENCY") {
 		// call init.acc()
 		// call indirectly to avoid c++ include
 		systemsubs = "initacc";
@@ -1420,7 +1420,7 @@ fixcompany:
 	// 	}
 
 	call log2("*open advertising system files INIT.AGENCY", logtime);
-	if (APPLICATION eq "ADAGENCY") {
+	if (APPLICATION == "ADAGENCY") {
 		// call init.agency()
 		// call indirectly to avoid c++ include
 		systemsubs		= "initagency";
@@ -1446,10 +1446,10 @@ convcompany:
 	if (readnext(compcode)) {
 		var tempcompany;
 		if (tempcompany.read(srv.companies, compcode)) {
-			if (tempcompany.f(22) eq "") {
+			if (tempcompany.f(22) == "") {
 				if (not numberformat) {
 					call decide("Which format do you want for numbers ?||(See \"NUMBER FORMAT\" on the company file)", "1.000,00 (dot for thousands)" ^ VM ^ "1,000.00 (comma for thousands)", reply);
-					if (reply eq 1) {
+					if (reply == 1) {
 						numberformat = "1.000,00";
 					} else {
 						numberformat = "1,000.00";
@@ -1488,7 +1488,7 @@ adddatasetcodename:
 		datasetid(3) = SYSTEM.f(17);
 		datasetid.write(DEFINITIONS, "GLOBALDATASETID");
 	}
-	if (datasetid.f(3) eq "" and SYSTEM.f(17)) {
+	if (datasetid.f(3) == "" and SYSTEM.f(17)) {
 		goto adddatasetcodename;
 	}
 
@@ -1508,12 +1508,12 @@ adddatasetcodename:
 	// system<61>=bakpars<11>
 
 	// suggest change globaldatasetid if changed datasetname or datasetid
-	if (datasetid.f(2) ne SYSTEM.f(23) or datasetid.f(3) ne SYSTEM.f(17)) {
+	if (datasetid.f(2) != SYSTEM.f(23) or datasetid.f(3) != SYSTEM.f(17)) {
 		// if system<17>[-4,4]<>'TEST' and interactive and @username='EXODUS' then
-		if ((not(SYSTEM.f(61)) and interactive) and USERNAME eq "EXODUS") {
-			if (datasetid.f(1) ne "1EEC633B") {
+		if ((not(SYSTEM.f(61)) and interactive) and USERNAME == "EXODUS") {
+			if (datasetid.f(1) != "1EEC633B") {
 				call decide("This database has been copied or|the database name or code has been changed.|Is this going to be a unique new master database?", "Yes - Going to be a new independent database" ^ VM ^ "No - just backing up, renaming or recoding the database", reply, 2);
-				if (reply eq 1) {
+				if (reply == 1) {
 					goto newdatasetid;
 				}
 			}
@@ -1567,7 +1567,7 @@ adddatasetcodename:
 		select(srv.documents);
 		while (readnext(docid)) {
 			let docid2 = docid.field2(OSSLASH, -1).field(".", 1);
-			if (docid2 ne docid) {
+			if (docid2 != docid) {
 				if (var doc; doc.read(srv.documents, docid)) {
 					doc.write(srv.documents, docid2);
 					srv.documents.deleterecord(docid);
@@ -1615,7 +1615,7 @@ adddatasetcodename:
 		var	 versionlastrun = field2(upgradelog, chr(10), -1);
 
 		// if changed then log and email users
-		if (versioninstalled ne versionlastrun) {
+		if (versioninstalled != versionlastrun) {
 
 			// log the upgraded version
 			if (upgradelog) {
@@ -1642,7 +1642,7 @@ adddatasetcodename:
 		if (not(tt.read(DEFINITIONS, lastupdate_key))) {
 			tt = "";
 		}
-		if (tt ne versioninstalled) {
+		if (tt != versioninstalled) {
 			versioninstalled.write(DEFINITIONS, lastupdate_key);
 
 			// email users on live systems LISTED IN SYSTEM CONFIGURATION only
@@ -1654,7 +1654,7 @@ adddatasetcodename:
 					tt = idate.oconv("D/E");
 					tt = idate.last(4) ^ "/" ^ tt.first(5) ^ " " ^ itime.oconv("MT");
 					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
-					if (reply eq 1) {
+					if (reply == 1) {
 						perform("EMAILUSERS UPGRADE " ^ tt);
 					}
 					call sysmsg("EXODUS Software Upgrade " ^ tt);
@@ -1676,7 +1676,7 @@ adddatasetcodename:
 
 		// perform 'REPLICATION UPDATE'
 
-		if (interactive and USERNAME ne "EXODUS.NET") {
+		if (interactive and USERNAME != "EXODUS.NET") {
 			call log2("*do a few escapes then F10 HOME to initialise the menu system", logtime);
 			// do home enter home to open the first menu at the first option
 			// DATA ^= chr(27) ^ chr(27) ^ chr(27) ^ INTCONST.f(7);
@@ -1719,7 +1719,7 @@ subroutine getsystem(in config_osfilename, in confign) {
 	var tt3 = systemx.f(46);
 	tt3.converter(VM, "");
 	tt3.replacer("Default", "");
-	if (tt3 eq "") {
+	if (tt3 == "") {
 		systemx(46) = "";
 	}
 

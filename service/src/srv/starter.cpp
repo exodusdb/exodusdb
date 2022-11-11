@@ -36,14 +36,14 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 		return 1;
 	}
 
-	if (startmode eq "CONFIRM") {
+	if (startmode == "CONFIRM") {
 		reply = "";
 inpreply:
 		call note("OK to start?|(Type Yes or No)", "RC", reply, "");
 
-		if (reply eq "YES") {
+		if (reply == "YES") {
 			reply = 1;
-		} else if (reply eq "NO") {
+		} else if (reply == "NO") {
 			reply = 2;
 		} else {
 			goto inpreply;
@@ -59,7 +59,7 @@ inpreply:
 		}
 	}
 
-	if (reply eq 1) {
+	if (reply == 1) {
 		return 1;
 	}
 	return 0;

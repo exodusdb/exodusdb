@@ -12,7 +12,7 @@ function main(in type, in input0, in mode, out output) {
 	let maxperiod  = mode.field(",", 2);
 
 	// if iconv then convert period (MM/YY or YYMM) to internal last date of month
-	if (type eq "ICONV") {
+	if (type == "ICONV") {
 		// return the last day of the period (internal format)
 		if (input0.contains("/")) {
 			period = input0.field("/", 1) + 1;
@@ -24,17 +24,17 @@ function main(in type, in input0, in mode, out output) {
 		if (firstmonth and firstmonth.isnum()) {
 			period += firstmonth - 1;
 		}
-		if (period gt 12) {
+		if (period > 12) {
 			period -= 12;
 			year = (year + 1).oconv("R(0)#2");
 		} else {
-			if (period lt 1) {
+			if (period < 1) {
 				period += 12;
 				year = (addcent4(year - 1)).oconv("R(0)#2");
 			}
 		}
 
-		if (firstmonth ge 7) {
+		if (firstmonth >= 7) {
 			year -= 1;
 		}
 
@@ -48,14 +48,14 @@ function main(in type, in input0, in mode, out output) {
 	period	 = temp.b(4, 2);
 	if (firstmonth and firstmonth.isnum()) {
 		period -= firstmonth - 1;
-		if (period lt 1) {
+		if (period < 1) {
 			period += 12;
 			year = (addcent4(year - 1)).oconv("R(0)#2");
 		}
 		period = ("00" ^ period).last(2);
 	}
 
-	if (year and firstmonth ge 7) {
+	if (year and firstmonth >= 7) {
 		year += 1;
 	}
 

@@ -10,7 +10,7 @@ M
 \
 	let nusers = usercodes.fcount(VM);\
 	for (const var usern : range(1, nusers)) {\
-		if (emails.f(1, usern) eq "") {\
+		if (emails.f(1, usern) == "") {\
 			usercodes(1, usern) = "";\
 		}\
 	} // usern;\

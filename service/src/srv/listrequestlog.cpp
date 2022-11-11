@@ -34,7 +34,7 @@ function main() {
 		iuptodate = ifromdate;
 	}
 	if (ifromdate) {
-		if (iuptodate eq ifromdate) {
+		if (iuptodate == ifromdate) {
 			cmd ^= " %AND% WITH DATE " ^ (ifromdate.oconv("D4").quote());
 			title ^= "'L'Filter : " ^ oconv(ifromdate, "[DATE,4*]");
 		} else {

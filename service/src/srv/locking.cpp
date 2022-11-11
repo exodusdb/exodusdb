@@ -38,24 +38,24 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	// NOTE: not(SYSTEM.f(33));
 	let interactive = false;
 
-	if (var(0) and USERNAME eq "EXODUS") {
+	if (var(0) and USERNAME == "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
 		xx.input();
 	}
 
-	if (mode eq "LOCK") {
+	if (mode == "LOCK") {
 		allowduplicate = 0;
 		goto lockit;
 
-	} else if (mode eq "RELOCK") {
+	} else if (mode == "RELOCK") {
 		allowduplicate = 1;
 		goto lockit;
 
-	} else if (mode eq "UNLOCK") {
+	} else if (mode == "UNLOCK") {
 		gosub unlockit(lockfilename, lockkey, locklist);
 		return 1;
 
-	} else if (mode eq "UNLOCKALL") {
+	} else if (mode == "UNLOCKALL") {
 		gosub unlockall(locklist, msg);
 		return 1;
 
@@ -83,7 +83,7 @@ lockit:
 tryagain:
 	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 0, allowduplicate))) {
 		var lockholder = (lockfilename ^ "*" ^ lockkey).xlate("LOCKS", 4, "X");
-		if (lockholder eq "") {
+		if (lockholder == "") {
 			lockholder = "Someone, maybe you,";
 		}
 		gosub getlockdesc(lockdesc, lockfilename, lockkey);
@@ -96,12 +96,12 @@ tryagain:
 			}
 		} else {
 			msg = lockholder ^ " is updating|" ^ lockdesc ^ "||PLEASE TRY LATER";
-			if (tryn ge ntries) {
+			if (tryn >= ntries) {
 				return 0;
 			} else {
-				if (tryn eq 1) {
+				if (tryn == 1) {
 					printl(msg, " trying for ", ntries, " secs");
-				} else if (ntries lt 1000) {
+				} else if (ntries < 1000) {
 					print("*");
 				}
 				msg = "";
@@ -153,14 +153,14 @@ subroutine unlockall(io locklist, io msg) {
 	for (in lockitem : locklist) {
 		let filename = lockitem.field(lockitemsep_, 1);
 		let lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
-		if (filename ne filename2) {
+		if (filename != filename2) {
 			if (not(lockfile.open(filename, ""))) {
 				msg(-1)	 = filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL";
 				lockfile = "";
 			}
 			filename2 = filename;
 		}
-		if (lockfile ne "") {
+		if (lockfile != "") {
 			xx = unlockrecord("", lockfile, lockkeyx);
 		}
 	}  // lockitem

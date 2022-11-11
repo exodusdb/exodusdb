@@ -39,13 +39,13 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		mode = mode0;
 	}
 
-	if (SENTENCE.field(" ", 1) eq "EMAILUSERS") {
+	if (SENTENCE.field(" ", 1) == "EMAILUSERS") {
 
 		mode		= SENTENCE.field(" ", 2);
 		let version = SENTENCE.field(" ", 3, 9999);
 		SENTENCE	= "";
 
-		if (mode ne "UPGRADE") {
+		if (mode != "UPGRADE") {
 			let msg = mode.quote() ^ " is invalid in EMAILUSERS";
 			if (interactive) {
 				call mssg(msg);
@@ -56,7 +56,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		}
 
 		subject = "EXODUS Upgrade: " ^ SYSTEM.f(23);
-		if (SYSTEM.f(17) ne SYSTEM.f(23)) {
+		if (SYSTEM.f(17) != SYSTEM.f(23)) {
 			subject ^= " (" ^ SYSTEM.f(17) ^ ")";
 		}
 
@@ -103,13 +103,13 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	// read fromuser from users,@username else fromuser=''
 	replyto = "";
 	if (options.contains("R")) {
-		if ((USERNAME eq "EXODUS" or USERNAME eq "ADAGENCY") or USERNAME eq "ACCOUNTS") {
+		if ((USERNAME == "EXODUS" or USERNAME == "ADAGENCY") or USERNAME == "ACCOUNTS") {
 			replyto = "support@neosys.com";
 		} else {
 			let fromuser = xlate("USERS", USERNAME, "", "X");
 			replyto		 = fromuser.f(7);
 			var fromline = "From " ^ fromuser.f(1);
-			if (USERNAME ne fromuser.f(1)) {
+			if (USERNAME != fromuser.f(1)) {
 				fromline ^= " (" ^ USERNAME ^ ")";
 			}
 			subject.prefixer(fromline ^ " : ");
@@ -148,13 +148,13 @@ nextuser:
 	}
 
 	usern += 1;
-	if (usern gt nusers) {
+	if (usern > nusers) {
 		goto exit;
 	}
 
 	// skip empty users
 	usercode = usercodes.f(1, usern);
-	if (usercode eq "") {
+	if (usercode == "") {
 		goto nextuser;
 	}
 
@@ -165,19 +165,19 @@ nextuser:
 
 	// not expired users
 	expirydate = userx.f(35);
-	if (expirydate and expirydate le date()) {
+	if (expirydate and expirydate <= date()) {
 		goto nextuser;
 	}
 
 	// skip users with no email at all
 	// users may have 0 or more email addresses eg xyz@abc.com;123@345.com etc
 	emails = userx.f(7);
-	if (emails eq "") {
+	if (emails == "") {
 		goto nextuser;
 	}
 
 	// always email to self last
-	if (usercode eq USERNAME and replyto) {
+	if (usercode == USERNAME and replyto) {
 		goto nextuser;
 	}
 
@@ -195,7 +195,7 @@ nextuser:
 	// could determine user type from what menus they can access eg MEDIA
 	if (not(ok) and groupids) {
 		if (groupword) {
-			// eq search for MEDIA in user department like MEDIA BUYER
+			// == search for MEDIA in user department like MEDIA BUYER
 			for (const var groupn : range(1, ngroups)) {
 				ok = userx.f(5).contains(groupids.f(1, groupn));
 				// /BREAK;
@@ -229,7 +229,7 @@ nextuser:
 	emails.converter(VM, ";");
 
 	// skip users that have already been emailed before
-	if (emails eq "") {
+	if (emails == "") {
 		goto nextuser;
 	}
 
@@ -237,12 +237,12 @@ nextuser:
 	// ///////
 	print(usercode, " ");
 
-	if (currdept and userx.f(5) ne currdept) {
+	if (currdept and userx.f(5) != currdept) {
 		gosub sendemails(emaillog);
 	}
 	currdept = userx.f(5);
 
-	if (toemails eq "") {
+	if (toemails == "") {
 		toemails = emails;
 
 		// sending to users (or groups and users)
@@ -307,7 +307,7 @@ subroutine sendemails(io emaillog) {
 
 	call sendmail(toemails, ccemails, subject, body, "", "", errormsg, replyto);
 
-	if (errormsg and errormsg ne "OK") {
+	if (errormsg and errormsg != "OK") {
 		emaillog ^= VM ^ errormsg;
 	} else {
 		nsent += 1;

@@ -40,7 +40,7 @@ function main(in mode0) {
 	mode = mode0;
 
 	// use app specific version of generalsubs
-	if (APPLICATION ne "EXODUS") {
+	if (APPLICATION != "EXODUS") {
 		generalsubs = "generalsubs_app";
 	}
 
@@ -94,7 +94,7 @@ function main(in mode0) {
 		for (let usern : range(usern0 + 1, 999999)) {
 			usercode = SECURITY.f(1, usern);
 			// /BREAK;
-			if (usercode eq "" or usercode eq "---")
+			if (usercode == "" or usercode == "---")
 				break;
 			groupusers ^= usercode ^ VM;
 		}  // usern;
@@ -103,7 +103,7 @@ function main(in mode0) {
 		for (var usern = usern0 - 1; usern >= 1; --usern) {
 			usercode = SECURITY.f(1, usern);
 			// /BREAK;
-			if (usercode eq "---")
+			if (usercode == "---")
 				break;
 			groupusers ^= usercode ^ VM;
 		}  // usern;
@@ -116,7 +116,7 @@ function main(in mode0) {
 			// is.dflt=nextkey(':%SK%:':datafile,'')
 
 			// special defaults for special files
-			if (mode ne "DEF.SK2") {
+			if (mode != "DEF.SK2") {
 
 				// documents
 				if (req.datafile == "DOCUMENTS") {

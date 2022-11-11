@@ -16,8 +16,8 @@ function main(in args1, in args2, in sep) {
 	int nn1	   = array1.rows();
 	int nn2	   = array2.rows();
 
-	int min_nn = nn2 gt nn1 ? nn1 : nn2;
-	int max_nn = nn2 gt nn1 ? nn2 : nn1;
+	int min_nn = nn2 > nn1 ? nn1 : nn2;
+	int max_nn = nn2 > nn1 ? nn2 : nn1;
 
 	dim output(max_nn);
 

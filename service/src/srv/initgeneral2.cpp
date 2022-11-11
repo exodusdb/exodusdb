@@ -27,7 +27,7 @@ function main(in mode, io logtime, in menu) {
 
 	call log2("*init.general2 " ^ mode.f(1), logtime);
 
-	if (mode eq "INSTALLNEWPASS") {
+	if (mode == "INSTALLNEWPASS") {
 
 		// not used anywhere 2017/05/17
 
@@ -45,14 +45,14 @@ function main(in mode, io logtime, in menu) {
 		// copy the local user over to the build directory
 		perform("COPY SYSTEM " ^ USERNAME ^ " (O) TO: (QFILE)");
 
-	} else if (mode eq "CREATEALERTS") {
+	} else if (mode == "CREATEALERTS") {
 
 		call log2("*createalert currusers", logtime);
 
 		if (not(tt.readf(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1))) {
 			tt = "";
 		}
-		if (tt lt 17203) {
+		if (tt < 17203) {
 
 			// to EXODUS only at the moment
 			let cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} EXODUS (ROS)";
@@ -70,7 +70,7 @@ function main(in mode, io logtime, in menu) {
 			date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
 		}
 
-	} else if (mode eq "UPDATEIPNOS4EXODUS") {
+	} else if (mode == "UPDATEIPNOS4EXODUS") {
 
 		call log2("*update EXODUS-allowed ipnos from GBP file", logtime);
 
@@ -114,7 +114,7 @@ function main(in mode, io logtime, in menu) {
 		// then EXODUS LOGINS FROM ANY *LISTED FULLY FORMED LAN IPS* WILL BE BLOCKED
 
 		var configips = SYSTEM.f(39);
-		if (configips eq "") {
+		if (configips == "") {
 			configips = "192.168 10 172";
 		}
 		configips.converter(" ", SM);
@@ -122,15 +122,15 @@ function main(in mode, io logtime, in menu) {
 		nn = configips.fcount(SM);
 		for (const var ii : range(nn, 1)) {
 			let ipno = configips.f(1, 1, ii);
-			if (ipno.field(".", 1) eq "10") {
+			if (ipno.field(".", 1) == "10") {
 				// OK
-			} else if (ipno.field(".", 1) eq "172") {
+			} else if (ipno.field(".", 1) == "172") {
 				// OK
-			} else if (ipno.field(".", 1, 2) eq "192.168") {
+			} else if (ipno.field(".", 1, 2) == "192.168") {
 				// OK
 			} else {
 				// Delete all WAN (non-LAN) ranges and allow only fully specced WAN ips
-				if (ipno.count(SM) ne 3) {
+				if (ipno.count(SM) != 3) {
 					configips.remover(1, 1, ii);
 				}
 			}
@@ -150,7 +150,7 @@ function main(in mode, io logtime, in menu) {
 
 		hosts.write(DEFINITIONS, "IPNOS*EXODUS");
 
-	} else if (mode eq "GETENV") {
+	} else if (mode == "GETENV") {
 
 		call log2("*get osenv", logtime);
 
@@ -164,7 +164,7 @@ function main(in mode, io logtime, in menu) {
 				continue;
 			// osenv being global is probably the same for all threads
 			// unless they start after the process global env is changed
-			if (THREADNO eq 1)
+			if (THREADNO == 1)
 				printl(THREADNO ^ ":", enventry);
 			let envkey = enventry.field("=", 1);
 			let envval = enventry.field("=", 2, 999999);
@@ -174,7 +174,7 @@ function main(in mode, io logtime, in menu) {
 			}
 		}  // ii;
 
-	} else if (mode eq "FIXURLS") {
+	} else if (mode == "FIXURLS") {
 
 		call log2("*condition the http links", logtime);
 
@@ -205,7 +205,7 @@ function main(in mode, io logtime, in menu) {
 		SYSTEM(114) = baselinks;
 		SYSTEM(115) = baselinkdescs;
 
-	} else if (mode eq "COMPRESSLOGS") {
+	} else if (mode == "COMPRESSLOGS") {
 
 		// use WINDOWS COMPACT to save disk space
 //		if (VOLUMES) {
@@ -253,7 +253,7 @@ function main(in mode, io logtime, in menu) {
 
 		}  // year;
 
-	} else if (mode eq "UPDATEUSERS") {
+	} else if (mode == "UPDATEUSERS") {
 
 		call log2("*add keys and ipnos to users", logtime);
 
@@ -280,7 +280,7 @@ nextuser:
 			userx(41)	 = SECURITY.f(2, usern);
 			origuser(40) = origuser.f(40);
 			origuser(41) = origuser.f(41);
-			if (userx ne origuser) {
+			if (userx != origuser) {
 				userx.write(users, userid);
 				// user<1>=userid
 				// write user on users,'%':userid:'%'
@@ -288,13 +288,13 @@ nextuser:
 			goto nextuser;
 		}
 
-	} else if (mode eq "TRIMREQUESTLOG") {
+	} else if (mode == "TRIMREQUESTLOG") {
 
 		call log2("*trim requestlog", logtime);
 
 		// only run on saturdays and only run once per day per installation
-		// if ((date() - 1).mod(7) + 1 ne 6) {
-		if (date().oconv("DW") ne 6) {
+		// if ((date() - 1).mod(7) + 1 != 6) {
+		if (date().oconv("DW") != 6) {
 			return 0;
 		}
 
@@ -312,13 +312,13 @@ nextuser:
 		DEFINITIONS.unlock("TRIMREQUESTLOG");
 
 		// dont run twice on same day
-		if (lastdate eq date()) {
+		if (lastdate == date()) {
 			return 0;
 		}
 
 		perform("TRIMREQUESTLOG");
 
-	} else if (mode eq "REORDERDBS") {
+	} else if (mode == "REORDERDBS") {
 
 		call log2("*reorder databases", logtime);
 
@@ -333,7 +333,7 @@ nextuser:
 
 		perform("WINDOWSTUB DEFINITION.SUBS REORDERDBS");
 
-	} else if (mode.f(1) eq "LASTLOGWARNING") {
+	} else if (mode.f(1) == "LASTLOGWARNING") {
 
 		var lastlog = mode.field(FM, 2, 999);
 		lastlog		= trim(lastlog, FM);
@@ -354,7 +354,7 @@ nextuser:
 			}
 		}
 
-	} else if (mode eq "OSCLEANUP") {
+	} else if (mode == "OSCLEANUP") {
 		// initdir '..\VDM*.TMP'
 		// temps=dirlist()
 //		if (VOLUMES) {
@@ -365,7 +365,7 @@ nextuser:
 //			}  // tempn;
 //		}
 
-	} else if (mode eq "MAKEMENU") {
+	} else if (mode == "MAKEMENU") {
 
 		call menusubs("INITMENUS", menutx);
 
@@ -491,7 +491,7 @@ nextuser:
 		if (not(oldmenu.osread(menuosfilename))) {
 			oldmenu = "";
 		}
-		if (menutx ne oldmenu) {
+		if (menutx != oldmenu) {
 			call log2("Updating " ^ menuosfilename, logtime);
 			//var(menutx).oswrite(menuosfilename);
 			if (not var(menutx).oswrite(menuosfilename)) {

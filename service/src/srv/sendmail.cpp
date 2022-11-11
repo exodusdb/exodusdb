@@ -102,7 +102,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	// sendmail is silent
 	errormsg = "";
 
-	if (SENTENCE.field(" ", 1).ucase() eq "SENDMAIL" and toaddress0.unassigned()) {
+	if (SENTENCE.field(" ", 1).ucase() == "SENDMAIL" and toaddress0.unassigned()) {
 		toaddress = SENTENCE.field(" ", 2);
 		if (not toaddress) {
 			toaddress = "support@neosys.com";
@@ -138,7 +138,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 
 		// TODO All these neosys.com emails to be configurable in SYSTEM
 
-		if (toaddress eq "TBQBB")
+		if (toaddress == "TBQBB")
 			toaddress = "support@neosys.com";
 
 		// development systems ALWAYS email hardcoded in next line
@@ -160,8 +160,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//	//set in systemd service file
 		//	abort(lasterror());
 		//}
-		// if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.f(61) and USERNAME eq "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
-		if (not osfile("live.txt") or (SYSTEM.f(61) and USERNAME.ucase() eq "EXODUS")) {
+		// if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.f(61) and USERNAME == "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
+		if (not osfile("live.txt") or (SYSTEM.f(61) and USERNAME.ucase() == "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:
@@ -241,10 +241,10 @@ forcedemail:
 		}
 		params1(1) = sysname ^ "@neosys.com";
 	}
-	if (params1.f(2) eq "") {
+	if (params1.f(2) == "") {
 		params1(2) = "mailout.neosys.com";
 	}
-	if (params1.f(3) eq "") {
+	if (params1.f(3) == "") {
 		params1(3) = "2500";
 	}
 
@@ -270,7 +270,7 @@ forcedemail:
 		osfilesize = osfilename.osfile().f(1);
 
 		// convert to link if file is too big to email
-		if (osfilesize gt maxemailsize) {
+		if (osfilesize > maxemailsize) {
 			body = "";
 			gosub addlinks2osfilename();
 		} else {
@@ -286,7 +286,7 @@ forcedemail:
 		attachfilename.osclose();
 
 		osfilesize = attachfilename.osfile().f(1);
-		if (osfilesize gt maxemailsize) {
+		if (osfilesize > maxemailsize) {
 			osfilename = attachfilename;
 			gosub addlinks2osfilename();
 			attachfilename = "";
@@ -334,7 +334,7 @@ forcedemail:
 	// if delete then params:=' /d ':delete
 
 	// condition subject start standard with 'EXODUS: '
-	if (subject.first(8) ne "EXODUS: ") {
+	if (subject.first(8) != "EXODUS: ") {
 		if (subject.starts("EXODUS")) {
 			subject.cutter(6).trimmerfirst();
 		}
@@ -419,7 +419,7 @@ forcedemail:
 		cmd ^= _VM " " ^ toaddress.convert(";", " ");
 
 		// ensure the email body is in a file
-		if (bodyfilename eq "") {
+		if (bodyfilename == "") {
 
 			// body may already be in a file
 			if (body.starts("@")) {
@@ -450,17 +450,17 @@ forcedemail:
 					arg.popper();
 				}
 
-				if (opt eq "-r") {
+				if (opt == "-r") {
 					headers ^= _VM "From: " ^ arg;
 					headers ^= _VM "To: " ^ toaddress;
 
-				} else if (opt eq "-s") {
+				} else if (opt == "-s") {
 					headers ^= _VM "Subject: " ^ arg;
 
-				} else if (opt eq "-c") {
+				} else if (opt == "-c") {
 					headers ^= _VM "cc: " ^ arg;
 
-				} else if (opt eq "-a") {
+				} else if (opt == "-a") {
 					headers ^= _VM ^ arg;
 
 					// case opt='-A'
@@ -603,7 +603,7 @@ TRACE(offset)
 			errormsg(-1) = params;
 		}
 	} else {
-		if (errormsg eq "") {
+		if (errormsg == "") {
 			if (errors) {
 				errormsg = errors;
 				// call sysmsg(errors);
@@ -631,7 +631,7 @@ TRACE(offset)
 
 	errormsg(1) = errormsg.f(1).trim();
 	// in what situation can it return OK+message ??
-	if (errormsg.f(1) eq "OK") {
+	if (errormsg.f(1) == "OK") {
 		errormsg.remover(1);
 		call log("SENDMAIL", details);
 	} else {

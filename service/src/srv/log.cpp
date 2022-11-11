@@ -77,7 +77,7 @@ getlogkey:
 	call getbackpars(bakpars);
 
 	let emailaddrs = bakpars.f(14);
-	if ((programname ne "SYSMSG" and programname ne "SENDMAIL") and emailaddrs) {
+	if ((programname != "SYSMSG" and programname != "SENDMAIL") and emailaddrs) {
 
 		// determine subject
 		let subject = "EXODUS Log: " ^ SYSTEM.f(17) ^ " " ^ programname;

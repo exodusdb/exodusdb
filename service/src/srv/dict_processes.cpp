@@ -92,7 +92,7 @@ function main() {
 	// 10 mins
 	let hungtime = 10 * 60 / 86400.0;
 	let r33 = RECORD.f(33);
-	if (r33 and (dostimenow - RECORD.f(27) gt hungtime)) {
+	if (r33 and (dostimenow - RECORD.f(27) > hungtime)) {
 		// if (VOLUMES) {
 		//	ANS = "Hung";
 		//} else {

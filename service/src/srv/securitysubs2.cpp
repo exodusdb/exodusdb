@@ -23,7 +23,7 @@ var taskn2;
 function main(in mode) {
 	// jbase
 
-	if (mode eq "GETCHANGEDTASKS") {
+	if (mode == "GETCHANGEDTASKS") {
 
 		var emailtx2 = "";
 
@@ -40,7 +40,7 @@ function main(in mode) {
 				var oldtaskn;
 				if (oldtasks.locate(task, oldtaskn)) {
 					let oldlock = oldlocks.f(1, oldtaskn);
-					if (newlock ne oldlock) {
+					if (newlock != oldlock) {
 						// changed
 						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock;
 					}
@@ -66,7 +66,7 @@ function main(in mode) {
 
 		ANS = emailtx2;
 
-	} else if (mode eq "FIXUSERPRIVS") {
+	} else if (mode == "FIXUSERPRIVS") {
 
 		// obsolete tasks
 		call authorised(
@@ -162,7 +162,7 @@ function main(in mode) {
 		t10.replacer("LEDGER RE-OPEN", "LEDGER REOPEN");
 
 		if (t10.f(1).locate("POSTING", tn)) {
-			if (newuserprivs.f(11, tn) eq "") {
+			if (newuserprivs.f(11, tn) == "") {
 				newuserprivs(11, tn) = "UA";
 			}
 			t10(1, tn) = "JOURNAL POST";
@@ -202,7 +202,7 @@ function main(in mode) {
 
 		call log2("*make sure all users have access to company file", logtime);
 		if (newuserprivs.f(10).locate("COMPANY ACCESS", vn)) {
-			if (newuserprivs.f(11, vn) eq "AA") {
+			if (newuserprivs.f(11, vn) == "AA") {
 				newuserprivs(11, vn) = "";
 			}
 		}
@@ -240,21 +240,21 @@ function main(in mode) {
 		for (taskn = ntasks; taskn >= 1; --taskn) {
 			let lockx = locks.f(1, taskn);
 			let task  = tasks.f(1, taskn);
-			if (lockx eq "" and (task.ends(DQ))) {
+			if (lockx == "" and (task.ends(DQ))) {
 deletetask:
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			} else {
 				// delete duplicate tasks
 				if (tasks.f(1).locate(task, taskn2)) {
-					if (taskn2 lt taskn) {
+					if (taskn2 < taskn) {
 						goto deletetask;
 					}
 				}
 			}
 		}  // taskn;
 
-		if (newuserprivs ne SECURITY) {
+		if (newuserprivs != SECURITY) {
 			call log2("*write userprivs back", logtime);
 			SECURITY = newuserprivs;
 //			if (VOLUMES) {

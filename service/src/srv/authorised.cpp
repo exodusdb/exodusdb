@@ -30,7 +30,7 @@ nousername0:
 		// this allows for example billing module users to post as finance module users
 		username	= USERNAME.field("(", 1);
 		msgusername = USERNAME;
-	} else if (username0 eq "") {
+	} else if (username0 == "") {
 		goto nousername0;
 	} else {
 		username	= username0;
@@ -70,7 +70,7 @@ nousername0:
 	}
 
 	var positive = task[1];
-	if (positive eq "#") {
+	if (positive == "#") {
 		task.cutter(1);
 	} else {
 		positive = "";
@@ -82,7 +82,7 @@ nousername0:
 		isexodus = 0;
 		task.cutter(1);
 	} else {
-		isexodus = username eq "EXODUS";
+		isexodus = username == "EXODUS";
 	}
 
 	let deleting = task.starts("%DELETE%");
@@ -112,7 +112,7 @@ updateprivs:
 			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
-				if (taskn2 lt taskn) {
+				if (taskn2 < taskn) {
 					taskn -= 1;
 				}
 			}
@@ -147,7 +147,7 @@ updateprivs:
 		}
 		if (not(noadd)) {
 			// NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
-			noadd = (task.ends(DQ)) or (SECURITY.len() gt maxstrsize_ * 2 / 3);
+			noadd = (task.ends(DQ)) or (SECURITY.len() > maxstrsize_ * 2 / 3);
 			// if passed a default lock then add even tasks ending like "XXXXX"
 			if (not(defaultlock.unassigned())) {
 				if (defaultlock) {
@@ -157,14 +157,14 @@ updateprivs:
 		}
 		if (not noadd) {
 			gosub readuserprivs();
-			if (username eq "EXODUS") {
+			if (username == "EXODUS") {
 				let interactive = false;  //not(SYSTEM.f(33));
 				if (interactive) {
 					call note(task ^ "|TASK ADDED");
 				}
 			}
-			// if len(userprivs) lt 65000 then
-			if (SECURITY.len() lt maxstrsize_ - 530) {
+			// if len(userprivs) < 65000 then
+			if (SECURITY.len() < maxstrsize_ - 530) {
 				if (not(SECURITY.f(10).locateby("AL", task, taskn))) {
 					if (defaultlock.unassigned()) {
 						newlock = "";
@@ -185,7 +185,7 @@ updateprivs:
 
 	// if no locks then pass ok unless positive locking required
 	var locks = SECURITY.f(11, taskn);
-	if (locks eq "") {
+	if (locks == "") {
 
 		// not positive ok
 		if (not(positive)) {
@@ -199,7 +199,7 @@ updateprivs:
 		} else {
 notallowed:
 			// MSG=capitalise(TASK):'||Sorry ':capitalise(msgusername):', you are not authorised to do this.|'
-			if (msgusername ne USERNAME) {
+			if (msgusername != USERNAME) {
 				msg = capitalise(msgusername) ^ "is not";
 			} else {
 				msg = "Sorry " ^ capitalise(msgusername) ^ ", you are";
@@ -216,11 +216,11 @@ notallowed:
 		// NB not NOBODY/EVERYBODY
 
 		// special lock NOONE
-	} else if (locks eq "NOONE") {
+	} else if (locks == "NOONE") {
 		goto notallowed;
 
 		// special lock EVERYONE
-	} else if (locks eq "EVERYONE") {
+	} else if (locks == "EVERYONE") {
 		return 1;
 	}
 

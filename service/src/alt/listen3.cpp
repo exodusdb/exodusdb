@@ -42,27 +42,27 @@ function main(io filename, in mode, out filetitle, out triggers) {
 		filename.replacer("MEDIA_TYPE", "JOB_TYPE");
 	}
 
-	if (filename eq "DEFINITIONS") {
+	if (filename == "DEFINITIONS") {
 		preread	 = "DEFINITION.SUBS";
 		postread = "DEFINITION.SUBS";
 		// security remove passwords,sort tasks,remove unauth tasks and higher/lower users/groups
 		// chequedesign get default
 		updatesubs = "DEFINITION.SUBS";
 
-	} else if (filename eq "USERS") {
+	} else if (filename == "USERS") {
 		postread   = "USER.SUBS";
 		updatesubs = "USER.SUBS";
 
-	} else if (filename eq "COMPANIES") {
+	} else if (filename == "COMPANIES") {
 		postread   = "COMPANY.SUBS";
 		updatesubs = "COMPANY.SUBS";
 
-	} else if (filename eq "DOCUMENTS") {
+	} else if (filename == "DOCUMENTS") {
 		postread = "GET.SUBS";
 		// move instructions to fn 101 plus, default time/date to DATE_TIME
 		updatesubs = "GET.SUBS";
 
-	} else if (filename eq "CHANGELOG") {
+	} else if (filename == "CHANGELOG") {
 		postread   = "CHANGELOG.SUBS";
 		updatesubs = "CHANGELOG.SUBS";
 
@@ -105,10 +105,10 @@ function main(io filename, in mode, out filetitle, out triggers) {
 				triggers(5) = updatesubs ^ FM ^ "DELETE";
 			}
 		}
-	} else if (mode eq "LOCK") {
-	} else if (mode eq "RELOCK") {
-	} else if (mode eq "UNLOCK") {
-	} else if (mode eq "SELECT") {
+	} else if (mode == "LOCK") {
+	} else if (mode == "RELOCK") {
+	} else if (mode == "UNLOCK") {
+	} else if (mode == "SELECT") {
 		// case mode='GETINDEXVALUES'
 	} else {
 		call mssg(mode.quote() ^ " is invalid in LISTEN3");
@@ -116,7 +116,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	}
 
 	// allow all files for the time being
-	if (filetitle eq "") {
+	if (filetitle == "") {
 		filetitle = filename;
 	}
 

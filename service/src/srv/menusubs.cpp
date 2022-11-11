@@ -7,7 +7,7 @@ var id;
 
 function main(in mode, io tx, in arg3, io arg4, in arg5) {
 
-	if (mode eq "INITMENUS") {
+	if (mode == "INITMENUS") {
 
 		tx = "<!DOCTYPE html>";
 		tx ^= FM ^ "<html>";
@@ -18,7 +18,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		tx ^= FM ^ "<body style=\"text-align: left\">";
 		tx ^= FM ^ "<div id=\"menudiv\" class=\"menu\" style=\"display: none; text-align: left\">";
 
-	} else if (mode eq "ADDMENU") {
+	} else if (mode == "ADDMENU") {
 
 		var mainmenu = arg3;
 		if (arg4.unassigned()) {
@@ -47,7 +47,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 
 		id = "";
 
-	} else if (mode eq "SUBMENU") {
+	} else if (mode == "SUBMENU") {
 
 		// <a>_Reports</a>
 		// <div class="menu">
@@ -64,7 +64,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		// submenus are same class as menus
 		tx ^= FM ^ " <div class=\"menu\">";
 
-	} else if (mode eq "ADDITEM") {
+	} else if (mode == "ADDITEM") {
 
 		var item = arg3;
 		// equate href to arg4
@@ -86,20 +86,20 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 
 		tx ^= FM ^ " <a" ^ props ^ " href=\"" ^ arg4 ^ "\">" ^ item ^ "</a><br />";
 
-	} else if (mode eq "ADDSEP") {
+	} else if (mode == "ADDSEP") {
 
 		tx ^= FM ^ " <hr class=\"menu_hr\" />";
 
-	} else if (mode eq "ENDSUBMENU") {
+	} else if (mode == "ENDSUBMENU") {
 
 		tx ^= FM ^ "</div>";
 		tx ^= FM ^ "<br />";
 
-	} else if (mode eq "ENDMENU") {
+	} else if (mode == "ENDMENU") {
 
 		tx ^= FM ^ "</div>";
 
-	} else if (mode eq "EXITMENUS") {
+	} else if (mode == "EXITMENUS") {
 
 		tx ^= FM ^ "<button tabindex=\"-1\" style=\"background-color: white; height: 1px; width: 1px; border-style: none; margin: 0; padding: 0\" accesskey=\"M\"";
 		let onclickx = "javascript:if (typeof menuonmouseover!='undefined') menuonmouseover('click')";

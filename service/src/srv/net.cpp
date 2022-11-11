@@ -26,7 +26,7 @@ function main() {
 	msg_			 = "";
 	PRIORITYINT(100) = "";
 	var dbcode		 = SYSTEM.f(17);
-	if (dbcode eq "") {
+	if (dbcode == "") {
 		dbcode = "DEFAULT";
 	}
 
@@ -39,7 +39,7 @@ listen:
 	var s33 = SYSTEM.f(33);
 
 	// forces OFF in listen on esc
-	if (cmd.field(" ", 1) ne "LISTEN") {
+	if (cmd.field(" ", 1) != "LISTEN") {
 		SYSTEM(33) = 1;
 	}
 
@@ -69,7 +69,7 @@ listen:
 
 	if (msg_.starts("RESTART")) {
 
-		if (msg_ eq "RESTART $LISTEN") {
+		if (msg_ == "RESTART $LISTEN") {
 			SYSTEM(100, 3) = "";
 			SYSTEM(33)	   = s33;
 			goto listen;
@@ -82,7 +82,7 @@ listen:
 		// //
 	}
 
-	if (msg_ eq "" or msg_ eq "TERMINATED OK") {
+	if (msg_ == "" or msg_ == "TERMINATED OK") {
 		stop();
 		// //
 	}
@@ -138,7 +138,7 @@ listen:
 			tt		= PSEUDO.field(" ", 2).first(2);
 			var tt2 = PSEUDO.field(" ", 3).first(2);
 			subject ^= " -> " ^ tt;
-			if (tt2 and tt2 ne tt) {
+			if (tt2 and tt2 != tt) {
 				subject ^= "/" ^ tt2;
 			}
 
@@ -197,12 +197,12 @@ listen:
 				}
 				srv.address ^= bakpars.f(10);
 			}
-			if (srv.address eq "") {
+			if (srv.address == "") {
 				if (not(srv.address.readf(DEFINITIONS, "REPLICATION", 12))) {
 					srv.address = "";
 				}
 			}
-			if (srv.address eq "") {
+			if (srv.address == "") {
 				srv.address = "backups@neosys.com";
 			}
 			if (srv.address) {
@@ -239,7 +239,7 @@ listen:
 				}
 
 				// optionally email backup.zip
-				if ((errormsg eq "" or errormsg.starts("OK")) and attachfilename) {
+				if ((errormsg == "" or errormsg.starts("OK")) and attachfilename) {
 					var address2 = srv.address.field("/", 2);
 					// remove exodus from the backup.zip recipients
 					if (address2.locateusing(";", "backups@neosys.com", xx)) {
@@ -256,7 +256,7 @@ listen:
 
 		// terminate after automatic backup in order to allow os filesystem backups
 		// BACKUP2 means dont copydb/upgrade/quit - just resume
-		if (PSEUDO.field(" ", 1) eq "BACKUP") {
+		if (PSEUDO.field(" ", 1) == "BACKUP") {
 
 			// before termination do any copy to testdata etc
 			if (SYSTEM.f(58).locate(dbcode, tt)) {
@@ -306,9 +306,9 @@ listen:
 		logoff();
 	}
 
-	if (cmd.field(" ", 1) eq "LISTEN") {
+	if (cmd.field(" ", 1) == "LISTEN") {
 		// if NET LISTEN LISTEN LISTEN - then terminate if too many errors
-		if (cmd.len() gt 100) {
+		if (cmd.len() > 100) {
 			printl(msg_);
 			perform("OFF");
 		}

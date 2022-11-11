@@ -105,7 +105,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 				tt.popper();
 			}  // loop;
 
-			if (finish lt startx) {
+			if (finish < startx) {
 				ranges0 = "";
 				call mssg(startx ^ "-" ^ finish ^ " range is not consecutive");
 				return 0;
@@ -126,13 +126,13 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 				if (listid) {
 					keys ^= FM ^ key;
 					// assumes key is not too long
-					if (keys.len() gt maxlistpartsize) {
+					if (keys.len() > maxlistpartsize) {
 						gosub writelist();
 					}
 
 				} else {
 					// if (len(range)+len(ranges))>65000 then
-					if (range2.len() + ranges.len() gt maxstrsize_ - 530) {
+					if (range2.len() + ranges.len() > maxstrsize_ - 530) {
 						// call msg('Range exceeds maximum of 65,000 characters|Please enter a smaller range')
 						call mssg("Range exceeds maximum|Please enter a smaller range");
 						ranges = "";

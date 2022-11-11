@@ -80,10 +80,10 @@ function main(out bakpars, in process0 = var()) {
 //	if (VOLUMES) {
 //		// if bakpars<3>='' then bakpars<3>='2:00'
 //		// if bakpars<4>='' then bakpars<4>='2:05'
-//		if (minbaktime_ eq "") {
+//		if (minbaktime_ == "") {
 //			bakpars(3) = "1:00";
 //		}
-//		if (maxbaktime_ eq "") {
+//		if (maxbaktime_ == "") {
 //			bakpars(4) = "1:05";
 //		}
 //		if (not(minbaktime_.isnum())) {
@@ -92,7 +92,7 @@ function main(out bakpars, in process0 = var()) {
 //		if (not(maxbaktime_.isnum())) {
 //			bakpars(4) = maxbaktime_.iconv("MT");
 //		}
-//		if (bakdows_ eq "") {
+//		if (bakdows_ == "") {
 //			bakpars(5) = "1234567";
 //		}
 //	} else {
@@ -112,7 +112,7 @@ function main(out bakpars, in process0 = var()) {
 	if (not(bakdisk_)) {
 		bakpars(7) = "C:";
 	}
-	if (bakdisk2_ eq "") {
+	if (bakdisk2_ == "") {
 		bakpars(12) = bakdisk_;
 	}
 
@@ -139,7 +139,7 @@ function main(out bakpars, in process0 = var()) {
 //	} else {
 
 		// autodetermine if it is "test" data
-		if (baktestdata_ eq "") {
+		if (baktestdata_ == "") {
 			var testdata = 1;
 			if (process.f(17).ends("_test")) {
 			} else if (process.f(23).ucase().contains("TRAINING")) {

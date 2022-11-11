@@ -69,7 +69,7 @@ function main(io css, in version = "") {
 
 function getvogonpoetry(in version) {
 
-	if (version.assigned() and version eq 2) {
+	if (version.assigned() and version == 2) {
 
 		return R"V0G0N(
 <style type="text/css">

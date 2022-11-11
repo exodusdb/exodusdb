@@ -59,7 +59,7 @@ function main(in module, in mode, in stationery) {
 	SYSTEM(2) = outfiles;
 
 	// if returning many files then always return ok, with any messages as warnings
-	if (nfiles gt 1) {
+	if (nfiles > 1) {
 		response_ = "OK";
 		if (msg_) {
 			response_ ^= " " ^ msg_;
@@ -73,11 +73,11 @@ function main(in module, in mode, in stationery) {
 subroutine check_exists_and_maybe_convert(in module, in mode, in stationery, io outfile) {
 
 	let diroutfile = outfile.osfile();
-	if (diroutfile.f(1) gt 5) {
+	if (diroutfile.f(1) > 5) {
 fileok:
 
 		// convert to pdf
-		if (stationery gt 2) {
+		if (stationery > 2) {
 			call convpdf(outfile, stationery, errors);
 			if (errors) {
 				msg_(-1) = errors;
@@ -100,13 +100,13 @@ fileok:
 		}
 
 		response_ = msg_;
-		if (response_ eq "") {
+		if (response_ == "") {
 			response_ = "Error: No output file in " ^ module ^ "PROXY " ^ mode;
 			call sysmsg(response_);
 		}
 
 		// force error
-		if (response_.first(6) ne "Error:") {
+		if (response_.first(6) != "Error:") {
 			response_.prefixer("Error:");
 		}
 	}

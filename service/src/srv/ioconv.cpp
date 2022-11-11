@@ -6,15 +6,15 @@ function main(in type, in input0, in mode, io output) {
 	// just wraps the standard iconv oconv
 	// so that we can find "[IOCONV,MT" etc in the source code instead of "MT"
 
-	if (input0 eq "") {
+	if (input0 == "") {
 		output = "";
 		return 0;
 	}
 
-	if (type eq "OCONV") {
+	if (type == "OCONV") {
 		output = oconv(input0, mode);
 
-	} else if (type eq "ICONV") {
+	} else if (type == "ICONV") {
 		output = iconv(input0, mode);
 	}
 

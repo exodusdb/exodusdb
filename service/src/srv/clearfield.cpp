@@ -73,9 +73,9 @@ tryagain:
 				// readf fn from @dict,fns<i>,2 else null
 				var dict;
 				if (dict.read(DICT, fns.f(ii))) {
-					if (dict.f(1) eq "F") {
+					if (dict.f(1) == "F") {
 						fn = dict.f(2);
-					} else if (dict.f(1) eq "G") {
+					} else if (dict.f(1) == "G") {
 						var tt = dict.f(3);
 						tt.converter(" ", FM);
 						fns(ii) = tt;
@@ -102,7 +102,7 @@ tryagain:
 		nrecs = "/" ^ nrecs;
 	}
 
-	let isindexed = file.contains("SI.MFS") ne 0;
+	let isindexed = file.contains("SI.MFS") != 0;
 
 next:
 	// ///
@@ -130,7 +130,7 @@ next:
 
 		var cleared = 0;
 		for (const var ii : range(1, nfields)) {
-			if (RECORD.f(fns.f(ii)) ne cleartovalue2) {
+			if (RECORD.f(fns.f(ii)) != cleartovalue2) {
 				cleared = 1;
 				// RECORD(fns.f(ii)) = cleartovalue2;
 				pickreplacer(RECORD, fns.f(ii), cleartovalue2);
@@ -143,14 +143,14 @@ next:
 					break;
 				RECORD.popper();
 			}  // loop;
-			if (RECORD eq "") {
+			if (RECORD == "") {
 				file.deleterecord(ID);
 
 			} else {
 				RECORD.write(file, ID);
 			}
 			nindexed += isindexed;
-			if (nindexed gt 100) {
+			if (nindexed > 100) {
 				gosub flush(filename);
 			}
 			// PRINT 'CLEARED':

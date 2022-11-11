@@ -51,7 +51,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	// returns a dynamic array or file of xml data
 
 	// use app specific version of listen3
-	if (APPLICATION ne "EXODUS") {
+	if (APPLICATION != "EXODUS") {
 		listen3 = "listen3_app";
 	}
 
@@ -135,7 +135,7 @@ nocommon:
 	// filename can be 'filename USING dictfilename'
 
 	let filename0 = filename;
-	if (filename.field(" ", 2) eq "USING") {
+	if (filename.field(" ", 2) == "USING") {
 		dictfilename = filename.field(" ", 3);
 		filename	 = filename.field(" ", 1);
 	} else {
@@ -195,7 +195,7 @@ nocommon:
 	if (dictids.unassigned()) {
 		dictids = "";
 	}
-	if (dictids eq "") {
+	if (dictids == "") {
 		dictids = "ID";
 	}
 	dictids.trimmer();
@@ -219,7 +219,7 @@ nocommon:
 	} else {
 		call listen3(filename, "READ", realfilename, triggers);
 		// postread=triggers<3>
-		haspostread	 = triggers.f(3) ne "";
+		haspostread	 = triggers.f(3) != "";
 		systemsubs	 = triggers.f(3);
 		postreadmode = triggers.f(4);
 	}
@@ -227,14 +227,14 @@ nocommon:
 	// check/get dict recs
 
 	let ndictids = dictids.fcount(FM);
-	if (dictids ne "RECORD") {
+	if (dictids != "RECORD") {
 		// 		while (true) {
 		// 			// /BREAK;
 		// 			if (not(dictids.ends(FM))) break;
 		// 			dictids.popper();
 		// 		}// loop;
 		dictids.trimmerlast(FM);
-		if (dictids eq "") {
+		if (dictids == "") {
 			dictids = "ID";
 		}
 		for (const var dictidn : range(1, ndictids)) {
@@ -242,7 +242,7 @@ nocommon:
 			var dictrec;
 			if (not(dictrec.read(DICT, dictid))) {
 				if (not(dictrec.read(dictvoc, dictid))) {
-					if (dictid eq "ID") {
+					if (dictid == "ID") {
 						dictrec = "F,0,No,,,,,,L,15,";
 						dictrec.converter(",", FM);
 					} else {
@@ -259,7 +259,7 @@ nocommon:
 			// if index('DI',dictrec<1>,1) then call dicti2a(dictrec)
 
 			// pick A is revelation F
-			if (dictrec.f(1) eq "A") {
+			if (dictrec.f(1) == "A") {
 				dictrec(1) = "F";
 			}
 
@@ -315,7 +315,7 @@ nocommon:
 			// only look in selected files otherwise c++ takes too long on some files
 			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex, xx)) {
 				if (records.read(file, "%RECORDS%")) {
-					if (records.len() lt 200) {
+					if (records.len() < 200) {
 						records.replacer(FM, "\" \"");
 						sortselect.prefixer(records.quote() ^ " ");
 					}
@@ -331,7 +331,7 @@ nocommon:
 		// handle invalid cmd
 		// R18.1 is normal 'No records found' message
 		if (msg_ and not(msg_.contains("R18.1"))) {
-			if (msg_.field(" ", 1) eq "W156") {
+			if (msg_.field(" ", 1) == "W156") {
 				msg_ = msg_.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
 			}
 			response = msg_;
@@ -375,7 +375,7 @@ nextrec:
 	}
 
 	// if no more
-	if (ID eq "") {
+	if (ID == "") {
 
 		if (xml and linkfilename2) {
 			var	 tt = "</records>";
@@ -415,13 +415,13 @@ nextrec:
 		let reqvalue   = limitvalues.f(1, limitfieldn);
 		let limitcheck = limitchecks.f(1, limitfieldn);
 
-		if (limitcheck eq "EQ") {
-			if (value ne reqvalue) {
+		if (limitcheck == "EQ") {
+			if (value != reqvalue) {
 				goto nextrec;
 			}
 
-		} else if (limitcheck eq "NE") {
-			if (value eq reqvalue) {
+		} else if (limitcheck == "NE") {
+			if (value == reqvalue) {
 				goto nextrec;
 			}
 
@@ -437,7 +437,7 @@ nextrec:
 
 	recn += 1;
 
-	if (dictids eq "RECORD") {
+	if (dictids == "RECORD") {
 
 		// postread (something similar also in listen/READ)
 		if (haspostread) {
@@ -456,13 +456,13 @@ nextrec:
 			// call trimexcessmarks(iodat)
 
 			// postread can request abort by setting msg or reset>=5
-			if (req.reset ge 5 or msg_) {
+			if (req.reset >= 5 or msg_) {
 				goto nextrec;
 			}
 		}
 
 		// prevent reading passwords postread and postwrite
-		if (filename eq "DEFINITIONS" and ID eq "SECURITY") {
+		if (filename == "DEFINITIONS" and ID == "SECURITY") {
 			RECORD(4) = "";
 		}
 
@@ -477,7 +477,7 @@ nextrec:
 		}
 		row.prefixer(prefix);
 
-		// dictids ne RECORD
+		// dictids != RECORD
 	} else {
 		row = "";
 
@@ -564,7 +564,7 @@ nextrec:
 	// get next if output to file or space for more data
 	// goto nextrec
 	// if xml or len(DATAX)<64000 then goto nextrec
-	if (xml or (datax.len() lt maxstrsize_ - 1530)) {
+	if (xml or (datax.len() < maxstrsize_ - 1530)) {
 		goto nextrec;
 	}
 

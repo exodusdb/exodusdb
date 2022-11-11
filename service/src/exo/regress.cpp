@@ -43,7 +43,7 @@ function main() {
 			printl(line);
 			stop();
 		}
-		if (test ne output) {
+		if (test != output) {
 			printt(ln, op, inputx.convert(FM ^ VM ^ SM, "^]\\"), arg1, output.convert(FM ^ VM ^ SM, "^]\\"), test.convert(FM ^ VM ^ SM, "^]\\"));
 			printl();
 		}

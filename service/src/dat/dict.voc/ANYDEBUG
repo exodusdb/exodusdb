@@ -8,19 +8,19 @@ S
 	if (var("*$").contains(ID[1])) {\
 		return 0;\
 	}\
-	if (ID eq "DEBUG") {\
+	if (ID == "DEBUG") {\
 		return 0;\
 	}\
-	if (ID eq "MSG") {\
+	if (ID == "MSG") {\
 		return 0;\
 	}\
-	if (ID eq "RTP25") {\
+	if (ID == "RTP25") {\
 		return 0;\
 	}\
-	if (ID eq "TEST") {\
+	if (ID == "TEST") {\
 		return 0;\
 	}\
-	if (ID eq "TESTBASIC") {\
+	if (ID == "TESTBASIC") {\
 		return 0;\
 	}\
 \
@@ -30,10 +30,10 @@ S
 	if (RECORD.contains("debug")) {\
 		return 1;\
 	}\
-	if (ID eq "SENDMAIL") {\
+	if (ID == "SENDMAIL") {\
 		RECORD.converter("'EXODUS.ID'", "");\
 	}\
-	if (RECORD.contains("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {\
+	if (RECORD.contains("'EXODUS.ID'") and ID != "INSTALLALLOWHOSTS") {\
 		return 1;\
 	}\
 	return 0;

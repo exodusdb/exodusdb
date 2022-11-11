@@ -10,7 +10,7 @@ function main() {
 	}
 	// use database as better than blank/unknown
 	if (not ANS) {
-		if (ID.field("*", 3) eq "EXODUS") {
+		if (ID.field("*", 3) == "EXODUS") {
 			ANS = "EXODUS";
 		} else {
 			ANS = ID.field("*", 1);
@@ -53,10 +53,10 @@ libraryinit(user_name)
 function main() {
 	let usercode = ID.field("*", 3);
 	ANS = usercode.xlate("USERS", 1, "X");
-	if (ANS eq "") {
+	if (ANS == "") {
 		ANS = usercode;
 		ANS.replacer(" ", "_");
-	} else if (ANS ne usercode) {
+	} else if (ANS != usercode) {
 		ANS ^= " (" ^ usercode ^ ")";
 	}
 	return ANS;

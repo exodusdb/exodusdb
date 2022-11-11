@@ -65,13 +65,13 @@ function main() {
 		if (not blocktype)
 			break;
 
-		if (blocktype eq "macro") {
+		if (blocktype == "macro") {
 			gosub definemacro();
 
-		} else if (blocktype eq "dict") {
+		} else if (blocktype == "dict") {
 			gosub writedict();
 
-		} else if (blocktype eq "comment") {
+		} else if (blocktype == "comment") {
 			// ignore
 
 		} else {
@@ -118,7 +118,7 @@ subroutine writedict() {
 		// Suffix can be 0
 		if (suffixno) {
 
-			if (suffixno eq 1) {
+			if (suffixno == 1) {
 				let osdatfilename = "dat/" ^ dictfilename ^ "/" ^ dictid;
 
 				var dictrec;
@@ -167,7 +167,7 @@ subroutine writedict() {
 		if (suffixno)
 			dictrec(3) = basedictrec.f(3, suffixno);
 
-		if (dictrec ne origdictrec) {
+		if (dictrec != origdictrec) {
 			printl(chr(12), dictid);
 			printl();
 			printl("---------- OLD ", dictid, " ----------");
@@ -196,7 +196,7 @@ subroutine writedict() {
 					doall = "Y";
 				}
 			}
-			if (ans eq "Y" or ans eq "y") {
+			if (ans == "Y" or ans == "y") {
 				// dictrec.write(DICT, dictid);
 				//oswrite(oconv(dictrec, "TX") on osdatfilename);
 				if (not oswrite(oconv(dictrec, "TX") on osdatfilename))
@@ -217,7 +217,7 @@ subroutine getblock() {
 		var line  = doc.f(ln);
 		var word1 = line.field(" ", 1);
 
-		if (word1 eq "#define" or word1 eq "#comment") {
+		if (word1 == "#define" or word1 == "#comment") {
 
 			if (blocktype) {
 				block.cutter(1);
@@ -229,7 +229,7 @@ subroutine getblock() {
 				return;
 			}
 
-			if (word1 eq "#comment") {
+			if (word1 == "#comment") {
 				blockline = "#define comment";
 			} else {
 				blockline = line.trim();
@@ -238,7 +238,7 @@ subroutine getblock() {
 			blockid	  = blockline.field(" ", 3);
 
 			// cater for macro on the define dict line
-			if (blocktype eq "dict") {
+			if (blocktype == "dict") {
 				let tt = blockline.field(" ", 4, 999999);
 				if (tt) {
 					line = "#include " ^ tt;
@@ -252,7 +252,7 @@ addline:
 			splitline = line.trim();
 			splitline.converter(" ", VM);
 			word1 = splitline.f(1, 1);
-			if (word1 eq "#include") {
+			if (word1 == "#include") {
 				let macroid	   = splitline.f(1, 2);
 				let lineparams = splitline.field(VM, 3, 999999);
 				if (macros.f(1).locate(macroid, macron)) {
@@ -265,20 +265,20 @@ addline:
 						var mline0 = macrotext.f(mln).convert("\t", " ");
 						let mline  = mline0.trim(" ");
 						let mword1 = mline.field(" ", 1);
-						if (mword1 eq "#ifdef" or mword1 eq "#ifndef") {
+						if (mword1 == "#ifdef" or mword1 == "#ifndef") {
 							let mword2 = mline.field(" ", 2);
 							var paramn;
 							if (macroline.locate(mword2, paramn)) {
 								lineparam = lineparams.f(1, paramn);
 								// dot means not defined while we are using spaces to separate params
-								if (lineparam eq ".") {
+								if (lineparam == ".") {
 									lineparam = "";
 								}
 							} else {
 								lineparam = "";
 							}
 							if (lineparam.len()) {
-								if (mword1 eq "#ifndef") {
+								if (mword1 == "#ifndef") {
 deletemline:
 									macrotext.remover(mln);
 									mln -= 1;
@@ -298,7 +298,7 @@ insertmline:
 								macrotext(mln) = mline0;
 
 							} else {
-								if (mword1 eq "#ifdef") {
+								if (mword1 == "#ifdef") {
 									goto deletemline;
 								}
 								goto insertmline;
@@ -340,7 +340,7 @@ nextmln:;
 							allfields(1, -1) = fieldname;
 							var tempdict;
 							if (tempdict.read(DICT, fieldname)) {
-								if (tempdict.f(1) eq "F") {
+								if (tempdict.f(1) == "F") {
 									fields(1, -1) = fieldname;
 									fields(2, -1) = tempdict.f(2);
 									fields(3, -1) = lower(tempdict.f(3));

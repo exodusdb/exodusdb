@@ -21,7 +21,7 @@ function main() {
 	while (true) {
 		xx.inputn(-1);
 		// /BREAK;
-		if (not(xx eq "" and ntots lt 10))
+		if (not(xx == "" and ntots < 10))
 			break;
 		var	  yy = var("x").str(65530);
 		gosub getspeed();
@@ -39,10 +39,10 @@ function main() {
 			ntots += 1;
 
 			let speed = (nn / secs / 1000000).oconv("MD20P");
-			if (speed lt minspeed or not(minspeed)) {
+			if (speed < minspeed or not(minspeed)) {
 				minspeed = speed;
 			}
-			if (speed gt maxspeed) {
+			if (speed > maxspeed) {
 				maxspeed = speed;
 			}
 
@@ -75,11 +75,11 @@ subroutine getspeed() {
 	secs  = time2 - time1;
 
 	// increase number of loops
-	if (secs lt 1) {
+	if (secs < 1) {
 		nn	 = nn * 2;
 		secs = "";
 	}
-	if (secs gt 5) {
+	if (secs > 5) {
 		nn	 = nn / 2;
 		secs = "";
 	}

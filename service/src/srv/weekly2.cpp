@@ -17,7 +17,7 @@ function main(in type, in input0, in mode, out output) {
 	// [WEEKLY2,1,6] year starts january, week starts saturday
 
 	// if no input0 then no output
-	if (input0 eq "") {
+	if (input0 == "") {
 		output = "";
 		return 0;
 	}
@@ -29,7 +29,7 @@ function main(in type, in input0, in mode, out output) {
 
 	// if oconv then convert internal date to year:period
 	// /////////////////////////////////////////////////
-	if (type eq "OCONV") {
+	if (type == "OCONV") {
 		// get the calendar month and year
 		temp   = input0.oconv("D2/E");
 		year   = temp.last(2);
@@ -40,9 +40,9 @@ function main(in type, in input0, in mode, out output) {
 
 		// if the date is less than the first day of that period
 		// then put into the previous period
-		if (input0 lt idate) {
+		if (input0 < idate) {
 			period -= 1;
-			if (period lt 1) {
+			if (period < 1) {
 				period = 12;
 				year -= 1;
 				year = year.oconv("R(0)#2");
@@ -69,7 +69,7 @@ function main(in type, in input0, in mode, out output) {
 	period += 1;
 	while (true) {
 		// /BREAK;
-		if (not(period gt maxperiod))
+		if (not(period > maxperiod))
 			break;
 		period -= maxperiod;
 		year += 1;
@@ -98,8 +98,8 @@ subroutine getfirstdom() {
 	// if period<>1 then
 	while (true) {
 		// /BREAK;
-		// if (not((idate - 1).mod(7) + 1 ne firstdayofweek))
-		if ( idate.oconv("DW") eq firstdayofweek)
+		// if (not((idate - 1).mod(7) + 1 != firstdayofweek))
+		if ( idate.oconv("DW") == firstdayofweek)
 			break;
 		idate += 1;
 	}  // loop;

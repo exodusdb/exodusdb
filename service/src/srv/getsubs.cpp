@@ -40,7 +40,7 @@ function main(in mode) {
 		}
 	}
 
-	if (mode eq "DEF.DOCUMENT.NO") {
+	if (mode == "DEF.DOCUMENT.NO") {
 
 		// lock source of document numbers
 		printl("*lock source of document numbers");
@@ -62,7 +62,7 @@ nextdoc:
 		// call oswrite(nextno,where:'0')
 
 		// build new file name
-		if (USERNAME eq "EXODUS") {
+		if (USERNAME == "EXODUS") {
 			tt = "NEO";
 		} else {
 			tt = "DOC";
@@ -85,7 +85,7 @@ nextdoc:
 
 		xx = unlockrecord("DOCUMENTS", srv.documents, "0");
 
-	} else if (mode eq "POSTREAD") {
+	} else if (mode == "POSTREAD") {
 
 		if (not RECORD) {
 			return 0;
@@ -103,7 +103,7 @@ nextdoc:
 		// end
 
 		// user can always modify own reports
-		if ((req.wlocked and RECORD.f(1)) and RECORD.f(1) ne USERNAME) {
+		if ((req.wlocked and RECORD.f(1)) and RECORD.f(1) != USERNAME) {
 
 			// check if allowed to modify
 			if (taskprefix) {
@@ -124,14 +124,14 @@ nextdoc:
 
 		RECORD(101) = raise(RECORD.f(6));
 
-		if (RECORD.f(8) eq "") {
+		if (RECORD.f(8) == "") {
 			RECORD(8) = RECORD.f(3) ^ "." ^ RECORD.f(4).oconv("R(0)#5");
 		}
 
-	} else if (mode eq "PREWRITE") {
+	} else if (mode == "PREWRITE") {
 
 		// check if allowed to create
-		if (req.orec eq "") {
+		if (req.orec == "") {
 			task = RECORD.f(5);
 			gosub gettaskprefix();
 			if (taskprefix) {
@@ -146,7 +146,7 @@ nextdoc:
 		RECORD(6) = lower(RECORD.field(FM, 101, 9999));
 		RECORD	  = RECORD.field(FM, 1, 100);
 
-		if (RECORD.f(1) eq "") {
+		if (RECORD.f(1) == "") {
 			RECORD(1) = USERNAME;
 		}
 		RECORD(3) = date();
@@ -159,7 +159,7 @@ nextdoc:
 		// this is also done in copygbp perhaps could be removed from there
 		// almost identical code in definition.subs and get.subs (for documents)
 		// field 10 in documents and definitions xxx*analdesign means the same
-		if (USERNAME eq "EXODUS" and RECORD.f(10)) {
+		if (USERNAME == "EXODUS" and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -168,15 +168,15 @@ nextdoc:
 			}
 		}
 
-	} else if (mode eq "POSTWRITE") {
+	} else if (mode == "POSTWRITE") {
 
-	} else if (mode eq "PREDELETE") {
+	} else if (mode == "PREDELETE") {
 
 		task = req.orec.f(5);
 		gosub gettaskprefix();
 
 		// user can always delete their own reports
-		if (RECORD.f(1) and RECORD.f(1) ne USERNAME) {
+		if (RECORD.f(1) and RECORD.f(1) != USERNAME) {
 
 			// check if allowed to delete
 			if (taskprefix) {
@@ -195,7 +195,7 @@ nextdoc:
 		// update exodus standard (in case doing this on the programming system)
 		// %DELETED% ensures that deleted EXODUS documents get deleted
 		// on upgrading clients
-		if (USERNAME eq "EXODUS" and RECORD.f(10)) {
+		if (USERNAME == "EXODUS" and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -208,7 +208,7 @@ nextdoc:
 			}
 		}
 
-	} else if (mode eq "POSTDELETE") {
+	} else if (mode == "POSTDELETE") {
 
 	} else {
 		call mssg(mode.quote() ^ " is invalid in GET.SUBS");
@@ -222,11 +222,11 @@ nextdoc:
 subroutine gettaskprefix() {
 	taskprefix = "";
 	task	   = task.field(" ", 1);
-	if (task eq "ANAL") {
+	if (task == "ANAL") {
 		taskprefix = "BILLING REPORT";
-	} else if (task eq "BALANCES") {
+	} else if (task == "BALANCES") {
 		taskprefix = "FINANCIAL REPORT";
-	} else if (task eq "ANALSCH") {
+	} else if (task == "ANALSCH") {
 		taskprefix = "BILLING REPORT";
 	} else {
 		taskprefix = "";

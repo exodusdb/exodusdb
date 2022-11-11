@@ -131,7 +131,7 @@ nextdoc:
 	// dont process all documents one after the other within one
 	// call of autorun to avoid overloading the subroutine stack cache etc
 	// so docexit doesnt goto nextdoc .. it goes to exit
-	if (ndocsprocessed gt 1) {
+	if (ndocsprocessed > 1) {
 		gosub exit(lockfilename, lockfile, lockkey);
 		return 0;
 	}
@@ -163,7 +163,7 @@ readdoc:
 	}
 
 	// skip List of Current Users on ACCOUNTS systems
-	if (APPLICATION eq "ACCOUNTS" and docid eq "CURRUSERS") {
+	if (APPLICATION == "ACCOUNTS" and docid == "CURRUSERS") {
 		goto nextdoc;
 	}
 
@@ -183,14 +183,14 @@ currdatetime:
 	let itime = time();
 	var idate = date();
 	// handle rare case where passes midnight between time() and date()
-	if (time() lt itime) {
+	if (time() < itime) {
 		goto currdatetime;
 	}
 	let currdatetime = idate + itime / 86400;
 
 	// skip if scanning all docs and not time to process yet
 	// allow processing individual docs manually despite timing/scheduling
-	if (docids eq "") {
+	if (docids == "") {
 
 		// would be faster to work out nextdatetime once initially - but how to do it?
 		// if not(docids) and currdatetime<nextdatetime then goto nextdoc
@@ -199,7 +199,7 @@ currdatetime:
 
 		// skip if already run in the last 60 minutes. this is an easy way
 		// to avoid reruns but maximum scheduling frequency is hourly
-		if ((currdatetime - lastdatetime).abs() le 1 / 24.0) {
+		if ((currdatetime - lastdatetime).abs() <= 1 / 24.0) {
 			goto nextdoc;
 		}
 
@@ -216,7 +216,7 @@ currdatetime:
 		restrictions.converter(",", _VM);
 
 		// skip if no restrictions applied yet
-		if (restrictions eq "") {
+		if (restrictions == "") {
 			goto nextdoc;
 		}
 
@@ -231,12 +231,12 @@ currdatetime:
 
 		// hour of day restrictions
 		let hours = restrictions.f(2);
-		if (hours ne "") {
+		if (hours != "") {
 			let hournow = itime.oconv("MT").first(2) + 0;
 
 			// if one hour then treat it as a minimum hour
 			if (hours.isnum()) {
-				if (hournow lt hours.mod(24)) {
+				if (hournow < hours.mod(24)) {
 					if (logging) {
 						printl("not yet hour");
 					}
@@ -259,7 +259,7 @@ currdatetime:
 			// if no hourly restrictions then skip if already run today
 		} else {
 preventsameday:
-			if (currdatetime.floor() eq lastdatetime.floor()) {
+			if (currdatetime.floor() == lastdatetime.floor()) {
 				if (logging) {
 					printl("already run today");
 				}
@@ -329,12 +329,12 @@ preventsameday:
 	// register that the document has been processed
 	// even if nobody present to be emailed
 	srv.document(13) = currdatetime;
-	if (srv.document.f(27) ne "") {
+	if (srv.document.f(27) != "") {
 		srv.document(27) = srv.document.f(27) - 1;
 	}
 
 	// Delete once-off documents
-	if (srv.document.f(27) ne "" and not(srv.document.f(27))) {
+	if (srv.document.f(27) != "" and not(srv.document.f(27))) {
 		srv.documents.deleterecord(docid);
 
 	} else {
@@ -357,14 +357,14 @@ preventsameday:
 	let runasusercode = srv.document.f(1);
 	var userx;
 	if (not(userx.read(users, runasusercode))) {
-		if (not(runasusercode eq "EXODUS")) {
+		if (not(runasusercode == "EXODUS")) {
 			printl("runas user ", runasusercode, " doesnt exist");
 			goto nextdoc;
 		}
 		userx = "";
 	}
 	// allow running as EXODUS and emailing to sysmsg@neosys.com
-	if (userx.f(7) eq "" and runasusercode eq "EXODUS") {
+	if (userx.f(7) == "" and runasusercode == "EXODUS") {
 		userx	 = "EXODUS";
 		userx(7) = sysmsgatexodus;
 	}
@@ -385,7 +385,7 @@ preventsameday:
 
 	let ccaddress = "";
 	let usercodes = srv.document.f(14);
-	if (usercodes eq "") {
+	if (usercodes == "") {
 		toaddress = userx.f(7);
 	} else {
 		toaddress	  = "";
@@ -396,14 +396,14 @@ preventsameday:
 			// get the user record
 			let usercode = usercodes.f(1, usern);
 			if (not(userx.read(users, usercode))) {
-				if (not(usercode eq "EXODUS")) {
+				if (not(usercode == "EXODUS")) {
 					goto nextuser;
 				}
 				userx = "EXODUS";
 			}
 
 			// skip if user has no email address
-			if (userx.f(7) eq "" and usercode eq "EXODUS") {
+			if (userx.f(7) == "" and usercode == "EXODUS") {
 				userx(7) = sysmsgatexodus;
 			}
 			useraddress = userx.f(7);
@@ -412,7 +412,7 @@ preventsameday:
 				// if running as EXODUS always add user EXODUS
 				// regardless of holidays - to allow testing on weekends etc
 				// if usercode='EXODUS' then
-				if (USERNAME eq "EXODUS" and usercode eq "EXODUS") {
+				if (USERNAME == "EXODUS" and usercode == "EXODUS") {
 					goto adduseraddress;
 
 					// optionally skip people on holiday (even EXODUS unless running as EXODUS)
@@ -483,7 +483,7 @@ nextuser:;
 		srv.document(6) = lower(datax);
 
 		call cropper(datax);
-		if (srv.document ne origdocument) {
+		if (srv.document != origdocument) {
 			srv.document.write(srv.documents, docid);
 		}
 
@@ -577,7 +577,7 @@ nextsign:
 		let t2 = (data_.cut(tt)).field("}", 1);
 		data_.replacer("{" ^ t2 ^ "}", date() + t2.cut(5));
 	}
-	if (sign eq "-") {
+	if (sign == "-") {
 		sign = "+";
 		goto nextsign;
 	}
@@ -596,16 +596,16 @@ nextsign:
 
 		var subject = "EXODUS";
 		// if repeatable then include report number to allow filtering
-		if (srv.document.f(27) eq "") {
+		if (srv.document.f(27) == "") {
 			subject ^= " " ^ docid;
 		}
 		subject ^= ": %RESULT%" ^ srv.document.f(2);
 
 		// email it
-		if (response_.first(2) ne "OK" or printfilename.osfile().f(1) lt 10) {
+		if (response_.first(2) != "OK" or printfilename.osfile().f(1) < 10) {
 
 			// plain "OK" with no file means nothing to email
-			if (response_ eq "OK") {
+			if (response_ == "OK") {
 				goto nextdoc;
 			}
 
@@ -645,7 +645,7 @@ nextsign:
 			// if ucase(printfilename[-4,4])='.XLS' then
 			// locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
 			tt = (field2(printfilename, ".", -1)).lcase();
-			if (tt.contains("htm") and srv.document.f(33) ne "2") {
+			if (tt.contains("htm") and srv.document.f(33) != "2") {
 				// insert body from file
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;
@@ -674,7 +674,7 @@ nextsign:
 		// Restore original forced email or lack thereof
 		SYSTEM(117) = system117;
 
-		if (errormsg and errormsg ne "OK") {
+		if (errormsg and errormsg != "OK") {
 			// call msg(errormsg)
 			call sysmsg(errormsg);
 			printl(errormsg);
@@ -807,7 +807,7 @@ subroutine exec2() {
 	}
 
 	// send errors to exodus
-	if (response_ eq "" or response_.first(2) ne "OK") {
+	if (response_ == "" or response_.first(2) != "OK") {
 		if (not response_) {
 			response_ = "No response from " ^ voccmd;
 		}
@@ -824,7 +824,7 @@ sysmsgit:
 		gosub fmtresp();
 	}
 
-	if (response_ eq "") {
+	if (response_ == "") {
 		// response='Error: No OK from ':voccmd:' ':request
 		call  listen4(18, response_, voccmd);
 		gosub fmtresp();

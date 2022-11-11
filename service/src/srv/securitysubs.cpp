@@ -91,20 +91,20 @@ function main(in mode) {
 
 	// no validation for EXODUS
 	if (curruser_.contains("EXODUS")) {
-		if (mode.starts("VAL.") and mode ne "VAL.USER") {
+		if (mode.starts("VAL.") and mode != "VAL.USER") {
 			return 0;
 		}
 	}
 
-	if (mode eq "GENERATEPASSWORD") {
+	if (mode == "GENERATEPASSWORD") {
 		gosub generatepassword();
 		req.is = newpassword;
 
 		// only to allow maintenance mode
-	} else if (mode eq "VAL.USER") {
-	} else if (mode eq "PERP") {
+	} else if (mode == "VAL.USER") {
+	} else if (mode == "PERP") {
 
-	} else if (mode eq "MAKESYSREC") {
+	} else if (mode == "MAKESYSREC") {
 		userx		= req.is.f(1);
 		newpassword = req.is.f(2);
 		sysrec		= "";
@@ -114,17 +114,17 @@ function main(in mode) {
 		req.is = sysrec;
 
 		// called from DEFINITION.SUBS POSTREAD for key SECURITY
-	} else if (mode eq "SETUP") {
+	} else if (mode == "SETUP") {
 
 		// check allowed access
 		if (req.templatex.unassigned()) {
 			req.templatex = "";
 		}
-		if (req.templatex eq "SECURITY") {
+		if (req.templatex == "SECURITY") {
 			filename	= "AUTHORISATION";
 			defaultlock = "GS";
 		} else {
-			if (req.templatex eq "HOURLYRATES") {
+			if (req.templatex == "HOURLYRATES") {
 				filename			= "HOURLY RATE";
 				updatehighergroups_ = 1;
 				updatelowergroups_	= 1;
@@ -143,7 +143,7 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (req.templatex eq "SECURITY") {
+		if (req.templatex == "SECURITY") {
 
 			// check guest status
 			gosub gueststatus();
@@ -193,7 +193,7 @@ function main(in mode) {
 		// @record<9>=curruser
 
 		// don't delete users for hourly rates
-		if (req.templatex eq "HOURLYRATES") {
+		if (req.templatex == "HOURLYRATES") {
 			updatehighergroups_ = 1;
 			updatelowergroups_	= 1;
 		}
@@ -233,7 +233,7 @@ function main(in mode) {
 				startn_ = usern;
 				while (true) {
 					// /BREAK;
-					if (not(startn_ gt 1 and (RECORD.f(2, startn_ - 1) eq "")))
+					if (not(startn_ > 1 and (RECORD.f(2, startn_ - 1) == "")))
 						break;
 					startn_ -= 1;
 				}  // loop;
@@ -246,7 +246,7 @@ function main(in mode) {
 				endn_ = usern;
 				while (true) {
 					// /BREAK;
-					if (not(endn_ lt nusers and (RECORD.f(1, endn_ + 1) ne "---")))
+					if (not(endn_ < nusers and (RECORD.f(1, endn_ + 1) != "---")))
 						break;
 					endn_ += 1;
 				}  // loop;
@@ -255,7 +255,7 @@ function main(in mode) {
 			// extract out the allowable users and keys
 			// also in prewrite
 
-			if (startn_ ne 1 or endn_ ne nusers) {
+			if (startn_ != 1 or endn_ != nusers) {
 				let nn = endn_ - startn_ + 1;
 
 				if (not interactive) {
@@ -314,14 +314,14 @@ function main(in mode) {
 			userx	 = usercodes.f(1, usern);
 			sysrec	 = RECORD.f(4, usern, 2);
 			let pass = userx.xlate("USERS", 4, "X");
-			if (pass and pass ne sysrec.field(TM, 7)) {
+			if (pass and pass != sysrec.field(TM, 7)) {
 				RECORD(4, usern, 2) = sysrec.fieldstore(TM, 7, 1, pass);
 			}
 			var sysrec2;
 			if (sysrec2.read(systemfile(), userx)) {
 				// convert \FE\:\FD\:\FC\ TO \FB\:\FA\:\F9\ in SYSREC2
 				sysrec2.converter(FM ^ VM ^ SM, TM ^ ST ^ chr(249));
-				if (sysrec2 ne sysrec) {
+				if (sysrec2 != sysrec) {
 					RECORD(4, usern) = "<hidden>" ^ SM ^ sysrec2;
 				}
 			}
@@ -352,7 +352,7 @@ function main(in mode) {
 		}
 
 		// called as prewrite in noninteractive mode
-	} else if (mode eq "SAVE") {
+	} else if (mode == "SAVE") {
 
 		// get/clear temporary storage
 		startn_ = RECORD.f(20);
@@ -372,7 +372,7 @@ function main(in mode) {
 			}
 
 			// safety check
-			if (req.orec.f(20) ne startn_ or req.orec.f(21) ne endn_) {
+			if (req.orec.f(20) != startn_ or req.orec.f(21) != endn_) {
 
 				// trace
 				req.orec.write(DEFINITIONS, "SECURITY.OREC.BAD");
@@ -390,7 +390,7 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (not(interactive) or req.templatex eq "SECURITY") {
+		if (not(interactive) or req.templatex == "SECURITY") {
 
 			// check all users have names/passwords
 			var usercodes = RECORD.f(1);
@@ -406,7 +406,7 @@ function main(in mode) {
 					userx = RECORD.f(1, usern);
 
 					newpassword = RECORD.f(4, usern);
-					if (newpassword and newpassword.len() lt 4) {
+					if (newpassword and newpassword.len() < 4) {
 						msg = userx.quote() ^ " user password cannot be less than " ^ minpasswordchars_;
 						return invalid(msg);
 					}
@@ -453,7 +453,7 @@ function main(in mode) {
 						username		 = "---";
 						RECORD(4, usern) = username;
 					}
-					if (not(username.contains("---") or username eq "BACKUP")) {
+					if (not(username.contains("---") or username == "BACKUP")) {
 						if (not(RECORD.f(7, usern))) {
 							// msg=quote(username):'|You must first give a password to this user'
 							msg = username.quote() ^ "|You must give an email or password for this user";
@@ -476,7 +476,7 @@ function main(in mode) {
 			// or (usern = 1; usern <= nusers; ++usern) {
 			for (const var usern : range(1, nusers)) {
 				let temp = RECORD.f(1, usern);
-				if (temp eq "" or temp.contains("---")) {
+				if (temp == "" or temp.contains("---")) {
 					RECORD(1, usern) = "---";
 					RECORD(2, usern) = "---";
 				}
@@ -535,7 +535,7 @@ function main(in mode) {
 		RECORD(2) = keys;
 
 		// no further processing if HOURLYRATES
-		if (interactive and req.templatex ne "SECURITY") {
+		if (interactive and req.templatex != "SECURITY") {
 			return 0;
 		}
 
@@ -631,7 +631,7 @@ function main(in mode) {
 					// similar in security.subs and user.subs
 					let userpass  = userpasswords.f(1, usern);
 					let ouserpass = origfullrec_.f(4, ousern);
-					if (userpass ne ouserpass) {
+					if (userpass != ouserpass) {
 						// datetime=(date():'.':time() 'R(0)#5')+0
 						let datetime = date() ^ "." ^ time().oconv("R(0)#5");
 						userrec.inserter(15, 1, datetime);
@@ -643,7 +643,7 @@ function main(in mode) {
 						userrec(36) = datetime;
 					}
 
-					if (userrec ne origuserrec) {
+					if (userrec != origuserrec) {
 						userrec.write(users, userx);
 
 						// similar code in user.subs and security.subs
@@ -659,7 +659,7 @@ function main(in mode) {
 						mirror(1)	  = userx;
 						mirror.write(users, mirrorkey);
 
-						isnew = origuserrec.f(1) eq "";
+						isnew = origuserrec.f(1) == "";
 						// only warn about new users with emails (ignore creation of groups/testusers)
 						gosub getemailtx(nuserfields);
 					}
@@ -687,7 +687,7 @@ function main(in mode) {
 								gosub getemailtx(nuserfields);
 							}
 							if (temp.read(systemfile(), userx)) {
-								if (temp.f(1) eq "USER") {
+								if (temp.f(1) == "USER") {
 									systemfile().deleterecord(userx);
 								}
 							}
@@ -719,7 +719,7 @@ function main(in mode) {
 				let nn = newusers.fcount(FM);
 				for (const var ii : range(1, nn)) {
 
-					if (USERNAME eq "EXODUS") {
+					if (USERNAME == "EXODUS") {
 						replyto = "support@neosys.com";
 					} else {
 						replyto = USERNAME.xlate("USERS", 7, "X");
@@ -801,7 +801,7 @@ function main(in mode) {
 			DEFINITIONS.deleterecord("SECURITY.OREC");
 		}
 
-	} else if (mode eq "POSTAPP") {
+	} else if (mode == "POSTAPP") {
 
 		// also called in postwrite in noninteractive mode
 
@@ -812,7 +812,7 @@ function main(in mode) {
 			xx = unlockrecord("", DEFINITIONS, "SECURITY");
 		}
 
-	} else if (mode.field(".", 1) eq "LISTAUTH") {
+	} else if (mode.field(".", 1) == "LISTAUTH") {
 		var temprec = RECORD;
 		temprec(4)	= "";
 
@@ -822,7 +822,7 @@ function main(in mode) {
 		for (var ii = nn; ii >= 1; --ii) {
 			let expirydate = expirydates.f(1, ii);
 			if (expirydate) {
-				if (expirydate le date()) {
+				if (expirydate <= date()) {
 					for (const var fn : range(1, 9)) {
 						let tt = temprec.f(fn);
 						if (tt) {
@@ -840,8 +840,8 @@ function main(in mode) {
 			for (var ii = nn; ii >= 2; --ii) {
 				let usercode = usercodes.f(1, ii);
 				if (usercode) {
-					if (temprec.f(8, ii) eq "" or temprec.f(7, ii) eq "") {
-						if (temprec.f(1, ii - 1) eq "") {
+					if (temprec.f(8, ii) == "" or temprec.f(7, ii) == "") {
+						if (temprec.f(1, ii - 1) == "") {
 							for (const var fn : range(1, 9)) {
 								let tt = temprec.f(fn);
 								if (tt) {
@@ -858,7 +858,7 @@ function main(in mode) {
 		temprec(1) = temprec.f(1).replace(VM ^ VM, VM ^ "<hr/>" ^ VM);
 
 		// reverse users so department shows at the top (and higher users at bottom sadly)
-		if (mode.field(".", 2) eq "USERS") {
+		if (mode.field(".", 2) == "USERS") {
 			// trim any multivalued fields with more than nusers multivalues
 			let nusers = temprec.f(1).fcount(VM);
 			let nfs	   = temprec.fcount(FM);
@@ -876,7 +876,7 @@ function main(in mode) {
 
 		let mode2 = mode.field(".", 2);
 		var cmd	  = "LIST DEFINITIONS " ^ (tempkey.quote());
-		if (mode2 eq "TASKS") {
+		if (mode2 == "TASKS") {
 			cmd ^= " TASKS LOCKS";
 		} else {
 			cmd ^= " USER_CODE_HTML FULL_NAME EMAIL_ADDRESS";
@@ -893,9 +893,9 @@ function main(in mode) {
 
 		DEFINITIONS.deleterecord(tempkey);
 
-	} else if (mode.field(".", 1) eq "GETTASKS") {
+	} else if (mode.field(".", 1) == "GETTASKS") {
 
-		let disallowed = mode.field(".", 2) eq "NOT";
+		let disallowed = mode.field(".", 2) == "NOT";
 		let username   = mode.field(".", 3);
 
 		let origuser = USERNAME;
@@ -926,7 +926,7 @@ function main(in mode) {
 				for (const var ii : range(1, 9)) {
 					var temp = task.field(" ", ii);
 					if (temp) {
-						if (temp eq lasttask.field(" ", ii)) {
+						if (temp == lasttask.field(" ", ii)) {
 							task = task.fieldstore(" ", ii, 1, "%SAME%");
 						} else {
 							temp = "";
@@ -1010,9 +1010,9 @@ subroutine newpass3() {
 	req.valid = 0;
 	lastfn	  = 9;
 
-	if (sysrec.f(1) eq "USER" or sysrec eq "") {
+	if (sysrec.f(1) == "USER" or sysrec == "") {
 		passwordfn = 7;
-	} else if (sysrec.f(1) eq "ACCOUNT") {
+	} else if (sysrec.f(1) == "ACCOUNT") {
 		passwordfn = 6;
 	} else {
 		call note("W123", "", xx, userx);
@@ -1027,7 +1027,7 @@ subroutine newpass3() {
 
 subroutine makesysrec() {
 	if (not(sysrec.f(1))) {
-		if (passwordfn eq 7) {
+		if (passwordfn == 7) {
 			sysrec(1) = "USER";
 		} else {
 			sysrec(1) = "ACCOUNT";
@@ -1090,7 +1090,7 @@ subroutine getemailtx(in nuserfields) {
 	}
 
 	// send to email about how to login to new users with email addresses
-	if (userrec.f(7) and isnew gt 0) {
+	if (userrec.f(7) and isnew > 0) {
 		newusers(-1) = userx ^ VM ^ userrec.f(1) ^ VM ^ userrec.f(7) ^ VM ^ userrec.f(5);
 	}
 
@@ -1101,10 +1101,10 @@ subroutine getemailtx(in nuserfields) {
 		let fn	   = fieldx.f(1, 2);
 		var old	   = oconv(origuserrec.f(fn), fieldx.f(1, 3));
 		var newx   = oconv(userrec.f(fn), fieldx.f(1, 3));
-		if (newx ne old) {
+		if (newx != old) {
 			var was = "was:";
 			// dedup ipnos and keys
-			if (not(isnew) and ((fn eq 40 or fn eq 41))) {
+			if (not(isnew) and ((fn == 40 or fn == 41))) {
 				call dedup("", old, newx, " ,");
 				if (newx) {
 					newx = "added " ^ newx;
@@ -1129,20 +1129,20 @@ subroutine getemailtx(in nuserfields) {
 
 	if (tx) {
 		emailtx(-1) = FM ^ var("User Code:").oconv("L#10") ^ userx;
-		if (isnew gt 0) {
+		if (isnew > 0) {
 			emailtx ^= " *CREATED*";
-		} else if (isnew lt 0) {
+		} else if (isnew < 0) {
 			emailtx ^= " *DELETED*";
 		} else {
 			// emailtx:=' *AMENDED*'
 		}
 
 		// always show user name, if different from user code
-		if (origuserrec.f(1) eq userrec.f(1) and userrec.f(1) ne userx) {
+		if (origuserrec.f(1) == userrec.f(1) and userrec.f(1) != userx) {
 			emailtx(-1) = var("User Name:").oconv("L#10") ^ userrec.f(1);
 		}
 		// always show user group
-		if (origuserrec.f(21) eq userrec.f(21)) {
+		if (origuserrec.f(21) == userrec.f(21)) {
 			emailtx(-1) = var("Group:").oconv("L#10") ^ userrec.f(21);
 		}
 		emailtx(-1) = tx;

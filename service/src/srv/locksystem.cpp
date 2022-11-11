@@ -35,11 +35,11 @@ function main(in mode0, in dataset0) {
 	} else {
 		dataset = dataset0;
 	}
-	if (mode eq "") {
+	if (mode == "") {
 		mode = "LOCK";
 	}
 
-	if (dataset eq "CURRENTDATASET") {
+	if (dataset == "CURRENTDATASET") {
 		dataset = SYSTEM.f(17);
 	}
 
@@ -51,7 +51,7 @@ function main(in mode0, in dataset0) {
 	// unlocking
 	// ////////
 
-	if (mode eq "UNLOCK") {
+	if (mode == "UNLOCK") {
 		if (not dataset) {
 			voc.unlock("BACKUP*");
 		}
@@ -87,12 +87,12 @@ checkotherusers:
 			options ^= "|Attempt to close the " ^ dataset ^ " processes and retry";
 		}
 		// if decide('!There ':(if n=1 then 'is ' else 'are '):n:' other workstation':(if n>1 then 's' else ''):'|using EXODUS ':dataset:' at the moment.||All other users':t:' must exit EXODUS|before you can continue.||':otherusersx:'|',options,reply) else reply=0
-		if (nn eq 1) {
+		if (nn == 1) {
 			t2 = "is ";
 		} else {
 			t2 = "are ";
 		}
-		if (nn gt 1) {
+		if (nn > 1) {
 			t3 = "s";
 		} else {
 			t3 = "";
@@ -100,11 +100,11 @@ checkotherusers:
 		if (not(decide("!There " ^ t2 ^ nn ^ " other workstation" ^ t3 ^ "|using EXODUS " ^ dataset ^ " at the moment.||All other users" ^ tt ^ " must exit EXODUS|before you can continue.||" ^ otherusersx ^ "|", options, reply))) {
 			reply = 0;
 		}
-		if (reply eq 3) {
+		if (reply == 3) {
 			call shutdownothers("", dataset, result);
 			reply = 1;
 		}
-		if (reply ne 1) {
+		if (reply != 1) {
 			return 0;
 		}
 		goto checkotherusers;
@@ -138,11 +138,11 @@ invalidx:
 			if (not(decide(msg, options, reply))) {
 				reply = 0;
 			}
-			if (reply eq 3) {
+			if (reply == 3) {
 				call shutdownothers("", datasetcode, result);
 				reply = 1;
 			}
-			if (reply ne 1) {
+			if (reply != 1) {
 				return 0;
 			}
 			goto lockit;

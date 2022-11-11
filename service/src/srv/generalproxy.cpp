@@ -49,7 +49,7 @@ function main() {
 	// !subroutine general(request,data,response)
 
 	// use app specific version of generalsubs
-	if (APPLICATION ne "EXODUS") {
+	if (APPLICATION != "EXODUS") {
 		generalsubs = "generalsubs_app";
 	}
 
@@ -68,9 +68,9 @@ function main() {
 
 	response_ = "OK";
 
-	if (mode eq "TEST") {
+	if (mode == "TEST") {
 
-	} else if (mode eq "TRANTEST") {
+	} else if (mode == "TRANTEST") {
 
 		/* TRANTEST - check speed and accuracy of "concurrent" updates by mass updating a single record.
 
@@ -113,7 +113,7 @@ function main() {
 		// printl("TRANTEST 2.", THREADNO);
 		response_ = "OK Thread No. " ^ THREADNO ^ ", Total: " ^ (RECORD + 1);
 
-	} else if (mode.f(1) eq "PREVIEWLETTERHEAD") {
+	} else if (mode.f(1) == "PREVIEWLETTERHEAD") {
 
 		// comma sep
 		let compcodes = request_.f(2);
@@ -152,7 +152,7 @@ function main() {
 			abort(lasterror());
 		gosub postproc();
 
-	} else if (mode eq "PERIODTABLE") {
+	} else if (mode == "PERIODTABLE") {
 
 		let year	= request_.f(2).field("-", 1).field("/", 2);
 		let finyear = request_.f(3);
@@ -161,7 +161,7 @@ function main() {
 
 		gosub postproc();
 
-	} else if (mode eq "FILEMAN" and request_.f(2) eq "COPYDB") {
+	} else if (mode == "FILEMAN" and request_.f(2) == "COPYDB") {
 
 		let copydb = request_.f(3);
 		if (not(SYSTEM.f(58).locate(copydb, dbn))) {
@@ -174,7 +174,7 @@ function main() {
 
 		// ensure authorised to login to one or the other database
 		// by ensuring the user is currently logged in to one or other database
-		if ((USERNAME ne "EXODUS" and copydb ne SYSTEM.f(17)) and todb ne SYSTEM.f(17)) {
+		if ((USERNAME != "EXODUS" and copydb != SYSTEM.f(17)) and todb != SYSTEM.f(17)) {
 			msg_	 = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
 			msg_(-1) = "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote());
 			msg_(-1) = "but you are currently logged in to database " ^ (SYSTEM.f(17).quote());
@@ -200,7 +200,7 @@ function main() {
 			response_ = "OK " ^ log;
 		}
 
-	} else if (mode eq "EMAILUSERS") {
+	} else if (mode == "EMAILUSERS") {
 
 		let groupids	   = data_.f(1);
 		let jobfunctionids = "";
@@ -211,7 +211,7 @@ function main() {
 
 		// ensure sender has an email address
 		// not absolutely necessary but provides a return email address
-		if (USERNAME ne "EXODUS" and not(USERNAME.xlate("USERS", 7, "X"))) {
+		if (USERNAME != "EXODUS" and not(USERNAME.xlate("USERS", 7, "X"))) {
 			abort("You cannot send email because you do not have an email address for replies");
 		}
 
@@ -237,7 +237,7 @@ function main() {
 		}
 		data_ = "";
 
-	} else if (mode eq "CREATEDATABASE") {
+	} else if (mode == "CREATEDATABASE") {
 		// For patsalides
 
 		if (not(authorised("DATASET CREATE", msg_))) {
@@ -256,7 +256,7 @@ function main() {
 		// source database services will be stopped for source to target database copy
 		// reject source db if same as current database.
 		let currentdbcode = SYSTEM.f(17);
-		if (sourcedbcode eq currentdbcode) {
+		if (sourcedbcode == currentdbcode) {
 			//return invalid("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
 			abort("The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.");
 		}
@@ -347,14 +347,14 @@ function main() {
 
 		response_ = "OK Database " ^ targetdbname ^ " " ^ targetdbcode.quote() ^ " has been created.";
 
-	} else if (mode eq "VAL.EMAIL") {
+	} else if (mode == "VAL.EMAIL") {
 		req.is = request_;
 		call usersubs(mode);
 
 		// case mode[-3,3]='SSH'
 		// call ssh(mode)
 
-	} else if (mode eq "PASSWORDRESET") {
+	} else if (mode == "PASSWORDRESET") {
 
 		if (not(authorised("PASSWORD RESET", msg_))) {
 			abort(msg_);
@@ -375,7 +375,7 @@ function main() {
 			usersordefinitions = users;
 			userkey			   = ID;
 
-			if (emailaddress.ucase() eq userx.f(7).ucase()) {
+			if (emailaddress.ucase() == userx.f(7).ucase()) {
 
 				// signify ok
 				baduseroremail = "";
@@ -428,22 +428,22 @@ function main() {
 		body(-1)	   = "Your new password is " ^ newpassword;
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
-	} else if (mode eq "MAKEUPLOADPATH") {
+	} else if (mode == "MAKEUPLOADPATH") {
 		call uploadsubs("MAKEUPLOADPATH." ^ request_.f(2));
 
-	} else if (mode eq "POSTUPLOAD") {
+	} else if (mode == "POSTUPLOAD") {
 		call uploadsubs("POSTUPLOAD");
 
-	} else if (mode eq "VERIFYUPLOAD") {
+	} else if (mode == "VERIFYUPLOAD") {
 		call uploadsubs("VERIFYUPLOAD." ^ request_.f(2));
 
-	} else if (mode eq "OPENUPLOAD") {
+	} else if (mode == "OPENUPLOAD") {
 		call uploadsubs("OPENUPLOAD." ^ request_.f(2));
 
-	} else if (mode eq "DELETEUPLOAD") {
+	} else if (mode == "DELETEUPLOAD") {
 		call uploadsubs("DELETEUPLOAD." ^ request_.f(2));
 
-	} else if (mode eq "GETCODEPAGE") {
+	} else if (mode == "GETCODEPAGE") {
 		data_ = "";
 		// have to skip char zero it seems to be treated as string terminator
 		// somewhere on the way to the browser (not in revelation)
@@ -453,7 +453,7 @@ function main() {
 		// data='xxx'
 		response_ = "OK";
 
-	} else if (mode eq "SETCODEPAGE") {
+	} else if (mode == "SETCODEPAGE") {
 		if (not(srv.alanguage.open("ALANGUAGE", ""))) {
 			abort(lasterror());
 		}
@@ -463,17 +463,17 @@ function main() {
 			goto badsetcodepage;
 		}
 
-		if (request_.f(2) eq "SORTORDER") {
+		if (request_.f(2) == "SORTORDER") {
 
 			/* should be inverted but bother since cant get DOS only collated ascii;
-				if len(data) ne 254 then;
+				if len(data) != 254 then;
 					call msg('SORTORDER data is ':len(data):' but must be 254 characters long|(initial char 0 excluded)');
 					stop;
 					end;
 				write char(0):data on alanguage,'SORTORDER*':codepage;
 			*/
 
-		} else if (request_.f(2) eq "UPPERCASE" or request_.f(2) eq "LOWERCASE") {
+		} else if (request_.f(2) == "UPPERCASE" or request_.f(2) == "LOWERCASE") {
 
 			var recordx;
 			if (not(recordx.read(srv.alanguage, "GENERAL*" ^ codepage))) {
@@ -486,7 +486,7 @@ function main() {
 			temp.replacer(_FM, "%FE");
 			temp.replacer(_VM, "%FD");
 
-			let fn = request_.f(2) eq "UPPERCASE" ? 9 : 10;
+			let fn = request_.f(2) == "UPPERCASE" ? 9 : 10;
 			recordx(1, fn) = temp;
 
 			recordx.write(srv.alanguage, "GENERAL*" ^ codepage);
@@ -500,8 +500,8 @@ function main() {
 //			convert @lower.case to @upper.case in y;
 //			convert @upper.case to @lower.case in x;
 //			for ii=1 to len(x);
-//				// if x[ii,1] ne @lower.case[ii,1] then print 'x: ':ii:' ':seq(x[ii,1]) 'MX':' ':seq(@lower.case[ii,1]) 'MX'
-//				if y[ii,1] ne @upper.case[ii,1] then print 'y: ':ii:' ':seq(y[ii,1]) 'MX':' ':seq(@upper.case[ii,1]) 'MX';
+//				// if x[ii,1] != @lower.case[ii,1] then print 'x: ':ii:' ':seq(x[ii,1]) 'MX':' ':seq(@lower.case[ii,1]) 'MX'
+//				if y[ii,1] != @upper.case[ii,1] then print 'y: ':ii:' ':seq(y[ii,1]) 'MX':' ':seq(@upper.case[ii,1]) 'MX';
 //				next ii;
 
 		} else {
@@ -512,7 +512,7 @@ badsetcodepage:
 
 		response_ = "OK";
 
-	} else if (mode eq "GETDATASETS") {
+	} else if (mode == "GETDATASETS") {
 		ANS = "";
 		call generalsubs("GETDATASETS");
 		data_ = ANS;
@@ -522,13 +522,13 @@ badsetcodepage:
 			response_ = "Error: No datasets found";
 		}
 
-	} else if (mode eq "LISTPROCESSES") {
+	} else if (mode == "LISTPROCESSES") {
 
 		perform("SORT PROCESSES");
 
 		gosub postproc();
 
-	} else if (mode eq "LISTREQUESTLOG") {
+	} else if (mode == "LISTREQUESTLOG") {
 
 		PSEUDO = data_;
 		perform("LISTREQUESTLOG");
@@ -536,17 +536,17 @@ badsetcodepage:
 		// printopts='L'
 		gosub postproc();
 
-	} else if (mode eq "LISTLOCKS") {
+	} else if (mode == "LISTLOCKS") {
 
 		perform("SORT LOCKS WITH NO LOCK_EXPIRED");
 
 		gosub postproc();
 
-	} else if (mode eq "GETVERSIONDATES") {
+	} else if (mode == "GETVERSIONDATES") {
 
 		call changelogsubs("GETVERSIONDATES");
 
-	} else if (mode.ucase() eq "WHATSNEW") {
+	} else if (mode.ucase() == "WHATSNEW") {
 
 		call changelogsubs("SELECTANDLIST" ^ FM ^ data_);
 		if (msg_) {
@@ -557,42 +557,42 @@ badsetcodepage:
 		// printopts='L'
 		gosub postproc();
 
-	} else if (mode eq "LISTADDRESSES") {
+	} else if (mode == "LISTADDRESSES") {
 
 		perform("LISTADDRESSES");
 
 		// printopts='L'
 		gosub postproc();
 
-	} else if (mode eq "GETDEPTS") {
+	} else if (mode == "GETDEPTS") {
 		call usersubs("GETDEPTS");
 		data_	  = ANS;
 		response_ = "OK";
 
-	} else if (mode eq "LISTACTIVITIES") {
+	} else if (mode == "LISTACTIVITIES") {
 
 		perform("LISTACTIVITIES " ^ request_.f(2));
 
 		gosub postproc();
 
-	} else if (mode eq "ABOUT") {
+	} else if (mode == "ABOUT") {
 		perform("ABOUT");
 		// transfer @user4 to data
 		// response='OK'
 		msg_.move(response_);
 		response_.prefixer("OK ");
 
-	} else if (mode eq "UTIL") {
+	} else if (mode == "UTIL") {
 		perform("UTIL");
 		response_ = "OK";
 
-	} else if (mode eq "PROG") {
+	} else if (mode == "PROG") {
 		perform("PROG");
 		response_ = "OK";
 
 		// LISTAUTH.TASKS = list of tasks LISTTASKS
 		// LISTAUTH.USERS = list of users LISTUSERS
-	} else if (mode.field(".", 1) eq "LISTAUTH") {
+	} else if (mode.field(".", 1) == "LISTAUTH") {
 
 		req.wlocked	  = 0;
 		req.templatex = "SECURITY";
@@ -609,7 +609,7 @@ badsetcodepage:
 
 		gosub postproc();
 
-	} else if (mode eq "READUSERS") {
+	} else if (mode == "READUSERS") {
 
 		req.templatex = "SECURITY";
 		call securitysubs("SETUP");
@@ -620,7 +620,7 @@ badsetcodepage:
 		data_	  = RECORD;
 		response_ = "OK";
 
-	} else if (mode eq "GETREPORTS") {
+	} else if (mode == "GETREPORTS") {
 
 		task = request_.f(2);
 		gosub gettaskprefix();
@@ -673,13 +673,13 @@ nextrep:
 				// print repn,data<1>
 			}
 			// if len(data)<65000 then goto nextrep
-			if (data_.len() lt maxstrsize_ - 530) {
+			if (data_.len() < maxstrsize_ - 530) {
 				goto nextrep;
 			}
 		}
 		response_ = "OK";
 
-	} else if (mode eq "DELETEREPORT") {
+	} else if (mode == "DELETEREPORT") {
 
 		gosub opendocuments();
 
@@ -705,7 +705,7 @@ nextrep:
 			}
 		}  // docn;
 
-	} else if (mode eq "UPDATEREPORT") {
+	} else if (mode == "UPDATEREPORT") {
 
 		gosub opendocuments();
 
@@ -720,7 +720,7 @@ nextrep:
 
 		doc.write(srv.documents, request_.f(2));
 
-	} else if (mode eq "COPYREPORT") {
+	} else if (mode == "COPYREPORT") {
 
 		gosub opendocuments();
 
@@ -755,7 +755,7 @@ nextrep:
 
 		response_ = "OK";
 
-	} else if (mode eq "GETREPORT") {
+	} else if (mode == "GETREPORT") {
 
 		// printopts='L'
 		gosub opendocuments();
@@ -827,7 +827,7 @@ performreport:
 			}
 		}
 
-	} else if (mode eq "USAGESTATISTICS") {
+	} else if (mode == "USAGESTATISTICS") {
 
 		PSEUDO = data_;
 		perform("LISTSTATS");
@@ -835,7 +835,7 @@ performreport:
 		// printopts='L'
 		gosub postproc();
 
-	} else if (mode eq "VIEWLOG") {
+	} else if (mode == "VIEWLOG") {
 
 		gosub initlog();
 		var	  datedict = "LOG_DATE";
@@ -867,7 +867,7 @@ performreport:
 		// printopts='L'
 		gosub postproc();
 
-	} else if (mode eq "LISTMARKETS") {
+	} else if (mode == "LISTMARKETS") {
 
 		var cmd = "SORT MARKETS WITH AUTHORISED BY SEQ";
 		cmd ^= " HEADING " ^ (var("List of Markets     'T'     Page 'PL'").quote());
@@ -875,20 +875,20 @@ performreport:
 
 		gosub postproc();
 
-	} else if (mode eq "LISTCURRENCIES") {
+	} else if (mode == "LISTCURRENCIES") {
 
 		perform("LISTCURRENCIES " ^ request_.f(2));
 
 		gosub postproc();
 
-	} else if (mode eq "LISTCOMPANIES") {
+	} else if (mode == "LISTCOMPANIES") {
 
 		perform("LISTCOMPANIES");
 
 		// printopts='L'
 		gosub postproc();
 
-	} else if (mode.field(".", 1) eq "GETTASKS") {
+	} else if (mode.field(".", 1) == "GETTASKS") {
 
 		call securitysubs("GETTASKS." ^ request_.f(2) ^ "." ^ request_.f(3));
 		data_ = ANS;
@@ -924,7 +924,7 @@ subroutine initlog() {
 	loguptodate = data_.f(6);
 	logsearch	= data_.f(7);
 
-	if (logoptions eq "TODAY") {
+	if (logoptions == "TODAY") {
 		logfromdate = date();
 		loguptodate = logfromdate;
 	}
@@ -940,7 +940,7 @@ subroutine initlog() {
 		}
 		logyear		  = tt.oconv("DY");
 		let logtoyear = tt2.oconv("DY");
-		if (logyear ne logtoyear) {
+		if (logyear != logtoyear) {
 			response_ = "Dates must be within one calendar year";
 			abort();
 		}
@@ -964,11 +964,11 @@ subroutine initlog() {
 subroutine gettaskprefix() {
 	taskprefix = "";
 	task	   = task.field(" ", 1);
-	if (task eq "ANAL") {
+	if (task == "ANAL") {
 		taskprefix = "BILLING REPORT";
-	} else if (task eq "BALANCES") {
+	} else if (task == "BALANCES") {
 		taskprefix = "FINANCIAL REPORT";
-	} else if (task eq "ANALSCH") {
+	} else if (task == "ANALSCH") {
 		taskprefix = "BILLING REPORT";
 	} else {
 		taskprefix = "";

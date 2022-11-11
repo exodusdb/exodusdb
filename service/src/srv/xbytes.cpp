@@ -12,28 +12,28 @@ function main(in type, in input0, in mode, out output) {
 		let sigfigs = 3;
 	}
 
-	if (type eq "OCONV") {
+	if (type == "OCONV") {
 		output = input0;
-		if (output lt 1024) {
+		if (output < 1024) {
 			output ^= " bytes";
 		} else {
 			output = output / 1024;
-			if (output lt 1024) {
+			if (output < 1024) {
 				output2 = "KiB";
 			} else {
 				output = output / 1024;
-				if (output lt 1024) {
+				if (output < 1024) {
 					output2 = "MiB";
 				} else {
 					output	= output / 1024;
 					output2 = "GiB";
 				}
 			}
-			if (output lt 1) {
+			if (output < 1) {
 				ndecs = 3;
-			} else if (output lt 10) {
+			} else if (output < 10) {
 				ndecs = 2;
-			} else if (output lt 100) {
+			} else if (output < 100) {
 				ndecs = 1;
 			} else {
 				ndecs = 0;
@@ -41,7 +41,7 @@ function main(in type, in input0, in mode, out output) {
 			output = output.oconv("MD" ^ ndecs ^ "0P") ^ output2;
 		}
 
-	} else if (type eq "ICONV") {
+	} else if (type == "ICONV") {
 		// not implemented yet
 		output = input0;
 

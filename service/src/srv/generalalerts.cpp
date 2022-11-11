@@ -16,7 +16,7 @@ function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request
 
 	let mode = "";
 
-	if (alerttype eq "CURRUSERS") {
+	if (alerttype == "CURRUSERS") {
 		tasks	= "AUTHORISATION ACCESS";
 		title	= "List of Current Users";
 		request = "LISTAUTH.USERS";

@@ -38,7 +38,7 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 		}
 	}
 
-	if (mode eq "BUILD") {
+	if (mode == "BUILD") {
 
 		// zzz build updates masterfile without locking
 		// so should be run exclusively
@@ -54,7 +54,7 @@ nextbuild:
 			if (not(RECORD.read(req.srcfile, ID))) {
 				goto nextbuild;
 			}
-			if (RECORD.f(subfn) eq "") {
+			if (RECORD.f(subfn) == "") {
 				goto nextbuild;
 			}
 			deleting   = 0;
@@ -63,8 +63,8 @@ nextbuild:
 			goto nextbuild;
 		}
 
-	} else if (mode eq "PREWRITE") {
-		if (req.orec.f(subfn) eq RECORD.f(subfn)) {
+	} else if (mode == "PREWRITE") {
+		if (req.orec.f(subfn) == RECORD.f(subfn)) {
 			return 0;
 		}
 		validating = 1;
@@ -78,12 +78,12 @@ nextbuild:
 		deleting = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
-	} else if (mode eq "PREDELETE") {
+	} else if (mode == "PREDELETE") {
 		validating = 1;
 		deleting   = 1;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
-	} else if (mode eq "WRITE") {
+	} else if (mode == "WRITE") {
 
 		validating = 1;
 
@@ -115,7 +115,7 @@ nextbuild:
 
 		gosub unlockall(locklist);
 
-	} else if (mode eq "DELETE") {
+	} else if (mode == "DELETE") {
 		deleting = 1;
 
 		validating = 1;
@@ -126,8 +126,8 @@ nextbuild:
 
 		gosub unlockall(locklist);
 
-	} else if (mode eq "POSTWRITE") {
-		if (req.orec.f(subfn) eq RECORD.f(subfn)) {
+	} else if (mode == "POSTWRITE") {
+		if (req.orec.f(subfn) == RECORD.f(subfn)) {
 			return 0;
 		}
 		validating = 0;
@@ -138,7 +138,7 @@ nextbuild:
 		deleting = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
-	} else if (mode eq "POSTDELETE") {
+	} else if (mode == "POSTDELETE") {
 		deleting   = 1;
 		validating = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
@@ -158,7 +158,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 	} else {
 		mastercode = RECORD.f(subfn);
 	}
-	if (mastercode eq "") {
+	if (mastercode == "") {
 		return;
 	}
 
@@ -185,7 +185,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 					masterrecord.inserter(masterfn, vn, ID);
 				}
 			}
-			if (masterrecord ne origmasterrecord) {
+			if (masterrecord != origmasterrecord) {
 				masterrecord.write(masterfile, mastercode);
 			}
 		} else {

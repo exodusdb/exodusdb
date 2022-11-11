@@ -6,7 +6,7 @@ S
 
 
 	ANS = RECORD.fcount(FM);\
-	if (RECORD eq "") {\
+	if (RECORD == "") {\
 		ANS = 0;\
 	}\
 	return ANS;

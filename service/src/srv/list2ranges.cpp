@@ -26,7 +26,7 @@ function main(io listitems) {
 		// if (listitem1+0.01)=listitem2 then
 		listitem1.converter(".", "");
 		listitem2.converter(".", "");
-		if (listitem1 + 1 eq listitem2) {
+		if (listitem1 + 1 == listitem2) {
 			listitems(1, ii - 1, 2) = listitems.f(1, ii, 2);
 			listitems.remover(1, ii);
 			nn -= 1;
@@ -37,7 +37,7 @@ function main(io listitems) {
 	for (const var ii : range(1, nn)) {
 		let tt	= listitems.f(1, ii);
 		let tt1 = tt.f(1, 1, 1);
-		if (tt1 eq tt.f(1, 1, 2)) {
+		if (tt1 == tt.f(1, 1, 2)) {
 			listitems(1, ii) = tt1;
 		}
 	}  // ii;

@@ -74,7 +74,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	}
 
 	// convert command line to subroutine call
-	if (SENTENCE.field(" ", 1) eq "CONVCSV" and sentence0.unassigned()) {
+	if (SENTENCE.field(" ", 1) == "CONVCSV" and sentence0.unassigned()) {
 
 		SENTENCE.move(sentencex);
 
@@ -162,7 +162,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	var exportable	  = sentencex.field(" ", 3, 9999);
 	if (exportable) {
 		exportable.converter(" ", FM);
-		if (exportable.f(1) eq "EXCEPT") {
+		if (exportable.f(1) == "EXCEPT") {
 			notexportable = exportable.field(FM, 2, 9999);
 			exportable	  = "";
 		}
@@ -173,7 +173,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		for (const var ii : range(1, notexportable.fcount(FM))) {
 			var dictrec;
 			if (dictrec.read(DICT, notexportable.f(ii))) {
-				if (dictrec.f(1) eq "G") {
+				if (dictrec.f(1) == "G") {
 					temp = dictrec.f(3);
 					temp.converter(VM ^ " ", FM ^ FM);
 					notexportable(ii) = temp;
@@ -187,7 +187,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	if (not exportable) {
 
 		if (exportable.read(DICT, "EXPORTABLE")) {
-			if (exportable.f(1) eq "G") {
+			if (exportable.f(1) == "G") {
 				exportable = exportable.f(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
@@ -196,7 +196,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 			if (var pos = exportable.index(FM ^ FM);pos) {
 				keyx  = exportable.first(pos - 1);
 				nkeys = keyx.fcount(FM);
-				if (nkeys gt 2) {
+				if (nkeys > 2) {
 					// call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
 					// stop
 					nkeys = 0;
@@ -292,7 +292,7 @@ nextdict:
 			goto nextdict;
 		}
 
-		if (dictid eq "LINE_NO") {
+		if (dictid == "LINE_NO") {
 			coln += 1;
 			dictids(coln)  = dictid;
 			headingx(coln) = "Line No.";
@@ -305,7 +305,7 @@ nextdict:
 				coln += 1;
 				// if dict<2> matches '0N' then
 				let fn = dict.f(2);
-				if (fn gt nfields) {
+				if (fn > nfields) {
 					nfields = fn;
 				}
 
@@ -360,7 +360,7 @@ nextdict:
 						// if raw then
 						// oconvx='D4/J'
 						// end else
-						if (oconvx eq "[SCH.DATES]") {
+						if (oconvx == "[SCH.DATES]") {
 							oconvx = "";
 						} else {
 							oconvx = DATEFMT;
@@ -448,7 +448,7 @@ nextrec:
 		return 0;
 	}
 
-	if (ID eq "") {
+	if (ID == "") {
 		goto nextrec;
 	}
 	recn += 1;
@@ -497,9 +497,9 @@ nextrec:
 		MV	   = mvx;
 		dictid = dictids(coln);
 		temp   = "";
-		if (dictid ne "LINE_NO" and dictrecs(coln).f(4) ne "S") {
+		if (dictid != "LINE_NO" and dictrecs(coln).f(4) != "S") {
 			temp = calculate(dictid).fcount(VM);
-			if (temp gt maxvn) {
+			if (temp > maxvn) {
 				maxvn = temp;
 			}
 		}
@@ -511,10 +511,10 @@ nextrec:
 	for (const var coln : range(1, ncols)) {
 		MV	   = mvx;
 		dictid = dictids(coln);
-		if (dictid eq "LINE_NO") {
+		if (dictid == "LINE_NO") {
 		} else {
 			let cell = calculate(dictid);
-			if (cell ne "") {
+			if (cell != "") {
 				rec(coln) = cell;
 				anydata	  = 1;
 			}
@@ -542,7 +542,7 @@ nextvn:
 		for (const var coln : range(1, ncols)) {
 
 			// choose the right mv
-			if (dictids(coln) eq "LINE_NO") {
+			if (dictids(coln) == "LINE_NO") {
 				rec(coln) = vn;
 			} else {
 				mvx = colgroups(coln);
@@ -553,15 +553,15 @@ nextvn:
 
 			var cell = rec(coln);
 
-			if (cell ne "") {
+			if (cell != "") {
 
-				if (mvx or vn eq 1) {
+				if (mvx or vn == 1) {
 
 					// convert codes to names
 					if (xfilenames(coln) and not(raw)) {
 						var rec2;
 						if (rec2.read(xfiles(coln), cell)) {
-							if (xfilenames(coln) eq "BRANDS") {
+							if (xfilenames(coln) == "BRANDS") {
 								cell = rec2.f(2, 1);
 							} else {
 								cell = rec2.f(1);
@@ -580,17 +580,17 @@ nextvn:
 						cell.cutter(1);
 					}
 				}
-				if (cell eq DQ) {
+				if (cell == DQ) {
 					cell = "''";
 				}
 				if (not cell.starts(DQ) or not cell.ends(DQ)) {
 					cell.replacer(DQ, "''");
 				}
-				if (cell.len() gt 255) {
+				if (cell.len() > 255) {
 					cell.firster(200);
 					cell ^= " ...";
 				}
-				if (fmtxs(coln) ne "R" or not(cell.isnum())) {
+				if (fmtxs(coln) != "R" or not(cell.isnum())) {
 
 					// make sure "1-12" is not interpreted as a formula
 					if (var(1) or excel) {
@@ -602,7 +602,7 @@ nextvn:
 					}
 
 					if (cell.contains(DQ)) {
-						if (fmtxs(coln) eq "T") {
+						if (fmtxs(coln) == "T") {
 							if (not cell.starts(DQ) or not cell.ends(DQ)) {
 								cell.replacer(DQ, "''");
 								cell.quoter();
@@ -630,7 +630,7 @@ nextvn:
 
 		// suppress output of empty amv rows
 		if (mvgroupno and nkeys) {
-			if (line.field(FM, nkeys + 2, 9999) eq "") {
+			if (line.field(FM, nkeys + 2, 9999) == "") {
 				line = "";
 			}
 		}
@@ -643,7 +643,7 @@ nextvn:
 		line.replacer(FM ^ "=", FM);
 
 		// output one line
-		if (line ne "") {
+		if (line != "") {
 
 			// output header row if first line and not suppressed
 
@@ -681,7 +681,7 @@ nextvn:
 				abort(lasterror());
 		}
 
-		if (not(firstmvonly) and vn lt maxvn) {
+		if (not(firstmvonly) and vn < maxvn) {
 			goto nextvn;
 		}
 	}

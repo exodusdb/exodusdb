@@ -109,7 +109,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	// Auto start databases on request
 	//////////////////////////////////
-	if (request1 eq "RUNS") {
+	if (request1 == "RUNS") {
 
 		// db start commands from xhttp.php
 		let filenamesx = oslistf("*.run");
@@ -163,7 +163,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 		}  // filen;
 
-	} else if (request1 eq "DELETEOLDFILES2") {
+	} else if (request1 == "DELETEOLDFILES2") {
 
 		inpath = request3;
 		tt	   = "\\/";
@@ -176,7 +176,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		call listen5("DELETEOLDFILES", "vdm*.tmp", "./", 60);
 		call listen5("DELETEOLDFILES", "*.$$*", "./", 60);
 
-	} else if (request1 eq "DELETEOLDFILES") {
+	} else if (request1 == "DELETEOLDFILES") {
 
 		pattern = request2;
 		inpath	= request3;
@@ -186,13 +186,13 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		if (not ageinsecs) {
 			ageinsecs = SYSTEM.f(28);
 		}
-		if (ageinsecs eq "") {
+		if (ageinsecs == "") {
 			ageinsecs = 60 * 60;
 		}
 
 		gosub deleteoldfiles();
 
-	} else if (request1 eq "CHECKRESTART") {
+	} else if (request1 == "CHECKRESTART") {
 
 		// 		// check for corruption in system record
 		// 		// if index(system,char(0),1) then
@@ -218,7 +218,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			// order is significant
 			let newtime = (ospath.ends(OSSLASH)) ? ospath.osdir().f(3) : ospath.osfile().f(3);
 			let oldtime = s100.f(1, ii);
-			if (newtime ne oldtime) {
+			if (newtime != oldtime) {
 				if (oldtime) {
 					ANS = "RESTART " ^ ospath;
 					return 0;
@@ -235,7 +235,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		// 			if (listen.read(gbp, "$LISTEN")) {
 		// 				listen = field2(listen, FM, -1);
 		// 				if (s100.f(1, 3)) {
-		// 					if (s100.f(1, 3) ne listen) {
+		// 					if (s100.f(1, 3) != listen) {
 		// 						// this will only restart listen, not the whole process/thread
 		// 						ANS = "RESTART $LISTEN";
 		// 						return 0;
@@ -250,11 +250,11 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		ANS = "";
 		return 0;
 
-	} else if (request1 eq "PATCHANDRUNONCE") {
+	} else if (request1 == "PATCHANDRUNONCE") {
 
 		// never patch and run on development systems (therefore can only test elsewhere)
 		// OFF while developing this feature
-		isdevsys = isdevsys and date() gt 19034;
+		isdevsys = isdevsys and date() > 19034;
 		// if system<61> or isdevsys then
 		// if (isdevsys or not(VOLUMES)) {
 		if (isdevsys) {
@@ -286,7 +286,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			// skip if no patch file or not dated today
 			let patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
 			let patchfileinfo = patchfilename.osfile();
-			if (patchfileinfo.f(2) lt date()) {
+			if (patchfileinfo.f(2) < date()) {
 				goto nextpatch;
 			}
 
@@ -310,12 +310,12 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not osbread(firstblock, patchfile, offset_zero, 65000))
 				abort(lasterror());
 			patchid = firstblock.f(2).cut(5);
-			if (firstblock.f(1) ne "00000DEFINITIONS" or patchid.first(8) ne "INSTALL*") {
+			if (firstblock.f(1) != "00000DEFINITIONS" or patchid.first(8) != "INSTALL*") {
 				goto nextpatch;
 			}
 
 			// skip if patchid is older than 30 days
-			// if field(patchid,'*',3) lt date()-30 then
+			// if field(patchid,'*',3) < date()-30 then
 			// goto nextpatch
 			// end
 
@@ -361,7 +361,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			// skip patch if older than installation
 			skipreason = "";
 			skipemail  = "";
-			if (versiondatetime and patchdatetime lt versiondatetime) {
+			if (versiondatetime and patchdatetime < versiondatetime) {
 				skipreason = "Patch is older than installation version - " ^ oconv(versiondatetime, "[DATETIME,4*]");
 				skipemail  = 1;
 			}
@@ -372,7 +372,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 			if (lastpatchid) {
 				let lastpatchdatetime = lastpatchid.field("*", 3);
-				if (patchdatetime lt lastpatchdatetime) {
+				if (patchdatetime < lastpatchdatetime) {
 					skipreason = "Patch is older than the last patch - " ^ oconv(lastpatchdatetime, "[DATETIME,4*]");
 				}
 			}
@@ -451,7 +451,7 @@ nextpatch:;
 
 		ANS = "";
 
-	} else if (request1 eq "CONVLOG") {
+	} else if (request1 == "CONVLOG") {
 
 		// assumes at least 0-31 and 128-255 encoded like $hh
 
@@ -505,12 +505,12 @@ nextpatch:;
 		var active = request6;
 
 		if (not(VOLUMES)) {
-			if (filename eq "JOURNALS") {
+			if (filename == "JOURNALS") {
 				filename = "JOURNALS";
 			}
 		}
 
-		if (filename eq "JOURNALS" or filename eq "JOURNALS") {
+		if (filename == "JOURNALS" or filename == "JOURNALS") {
 		} else {
 			gosub fileaccesscheck(filename);
 			if (response_) {
@@ -522,7 +522,7 @@ nextpatch:;
 		var temp = filename;
 
 		// zzz
-		if (temp eq "JOURNALS") {
+		if (temp == "JOURNALS") {
 			temp = "JOURNAL";
 		}
 
@@ -580,7 +580,7 @@ getvalues:
 			}  // ii;
 
 			// show inactive if none are active
-			if (data_ eq "" and active) {
+			if (data_ == "" and active) {
 				active = "";
 				goto getvalues;
 			}
@@ -620,7 +620,7 @@ getvalues:
 		}
 
 		// also called from financeproxy to return voucher details for popup
-	} else if (request1 eq "SELECT") {
+	} else if (request1 == "SELECT") {
 
 		var filename0 = request2;
 		if (not(VOLUMES)) {
@@ -671,7 +671,7 @@ getvalues:
 			// response='OK'
 		}
 
-	} else if (request1 eq "LISTLOCKS") {
+	} else if (request1 == "LISTLOCKS") {
 
 		gosub getdostime();
 
@@ -687,7 +687,7 @@ nextlock:
 		if (readnext(lockid)) {
 			var lockx;
 			if (lockx.read(locks, lockid)) {
-				if (lockx.f(1) lt dostime) {
+				if (lockx.f(1) < dostime) {
 					goto nextlock;
 				}
 				nlocks += 1;
@@ -705,7 +705,7 @@ nextlock:
 		let maxlines = 20;
 		if (not tracing) {
 			nn = maxlines;
-			if (nn gt maxlines) {
+			if (nn > maxlines) {
 				nn = maxlines;
 			}
 			printl("+------Active-------+");
@@ -715,7 +715,7 @@ nextlock:
 		}
 		for (const int ii : range(1, nn)) {
 			// /BREAK;
-			if (tracing and nn gt 20)
+			if (tracing and nn > 20)
 				break;
 			let row = select2data.f(ii);
 			if (not tracing) {
@@ -741,7 +741,7 @@ nextlock:
 		select2data			= "";
 		let select2response = "";
 
-	} else if (request1 eq "UNLOCKLONGPROCESS") {
+	} else if (request1 == "UNLOCKLONGPROCESS") {
 
 		// IF revRELEASE()>= 2.1 THEN
 		// lockmode=36
@@ -763,7 +763,7 @@ nextlock:
 			SYSTEM(48) = "";
 		}
 
-	} else if (request1 eq "STOPDB") {
+	} else if (request1 == "STOPDB") {
 
 		// equ install.end to request3
 		// equ server.end to request4
@@ -799,7 +799,7 @@ nextlock:
 			let timex = time();
 			while (true) {
 				// /BREAK;
-				if (not(otherusers().f(1) and ((time() - timex).abs() lt 30)))
+				if (not(otherusers().f(1) and ((time() - timex).abs() < 30)))
 					break;
 				call ossleep(1000 * 1);
 			}  // loop;
@@ -841,7 +841,7 @@ nextlock:
 			}
 		}
 
-	} else if (request1 eq "BACKUP") {
+	} else if (request1 == "BACKUP") {
 
 		// similar code in LISTEN and LISTEN2
 
@@ -855,7 +855,7 @@ nextlock:
 		// if backup has already responded to user
 		// then quit and indicate to calling program that a backup has been done
 		// user will be emailed
-		if (SYSTEM.f(2) eq "") {
+		if (SYSTEM.f(2) == "") {
 			PSEUDO = "BACKUP2 " ^ bakpars.f(7);
 			if (msg_) {
 				stop();
@@ -894,7 +894,7 @@ subroutine fileaccesscheck(in filename) {
 	response_ = "";
 
 	var securityfilename = filename;
-	if (filename eq "JOURNALS") {
+	if (filename == "JOURNALS") {
 		securityfilename = "JOURNALS";
 	}
 
@@ -977,7 +977,7 @@ nextfiles:
 				// and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime	   = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
-				if (((filename.last(4)).contains(".")) and filetime le deletetime) {
+				if (((filename.last(4)).contains(".")) and filetime <= deletetime) {
 deleteit:
 					//filename.osremove();
 					if (osfile(filename) and not filename.osremove())

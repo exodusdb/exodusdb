@@ -15,7 +15,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 
 	// returns the number of other users of EXODUS
 
-	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
+	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
 		databasecode = SENTENCE.field(" ", 2);
 	} else {
 		if (databasecode0.unassigned()) {
@@ -62,7 +62,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 		var lockid = lockprefix ^ lockno;
 
 		// skip current user
-		if (lockid eq curruserlockid) {
+		if (lockid == curruserlockid) {
 			goto nextlock;
 		}
 
@@ -94,7 +94,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 		// skip processes in wrong database or wrong usercode
 		if (databasecode or usercode) {
 
-			if (processes eq "") {
+			if (processes == "") {
 				if (not(processes.open("PROCESSES", ""))) {
 					processes = 0;
 				}
@@ -111,11 +111,11 @@ function main(in databasecode0 = "", in usercode0 = "") {
 					goto nextlock;
 				}
 
-				if (databasecode and process.f(17) ne databasecode) {
+				if (databasecode and process.f(17) != databasecode) {
 					goto nextlock;
 				}
 
-				if (usercode and process.f(40, 10) ne usercode) {
+				if (usercode and process.f(40, 10) != usercode) {
 					goto nextlock;
 				}
 			}
@@ -131,7 +131,7 @@ nextlock:;
 	}  // lockno;
 
 	returndata -= 1;
-	if (returndata lt 0) {
+	if (returndata < 0) {
 		returndata = 0;
 	}
 
@@ -152,7 +152,7 @@ nextlock:;
 		returndata(2, ii) = "PROCESS" ^ usercode;
 	}  // ii;
 
-	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
+	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
 		call note(returndata.f(1) ^ " other users");
 	}
 

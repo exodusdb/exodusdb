@@ -28,7 +28,7 @@ function main(in pluralnoun) {
 
 		if (temp2.ends("S")) {
 			// ANALYSIS, DOS
-			if ((temp2.last(2) ne "IS") and (temp2.last(2) ne "OS")) {
+			if ((temp2.last(2) != "IS") and (temp2.last(2) != "OS")) {
 				temp.popper();
 			}
 		}

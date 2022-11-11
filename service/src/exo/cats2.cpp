@@ -13,7 +13,7 @@ function main(in list1, in infix, in list2) {
 
 	let nl1	   = list1.fcount(VM);
 	let nl2	   = list2.fcount(VM);
-	let nn	   = nl2 gt nl2 ? nl2 : nl1;
+	let nn	   = nl2 > nl2 ? nl2 : nl1;
 	var output = "";
 	for (const var ii : range(1, nn)) {
 		output ^= list1.f(1, ii) ^ infix ^ list2.f(1, ii) ^ VM;

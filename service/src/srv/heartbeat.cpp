@@ -28,7 +28,7 @@ function main(in mode, in status0 = "") {
 	}
 
 	// mode is always CHECK
-	if (mode ne "CHECK") {
+	if (mode != "CHECK") {
 		return 0;
 	}
 
@@ -71,7 +71,7 @@ function main(in mode, in status0 = "") {
 			if (not(tt.read(DEFINITIONS, "ERROR*THREADNO"))) {
 				tt = "";
 			}
-			if (tt.f(1).count(VM) lt 10) {
+			if (tt.f(1).count(VM) < 10) {
 				tt(1, -1) = processno;
 				tt.write(DEFINITIONS, "ERROR*THREADNO");
 				call sysmsg(processno.quote() ^ "Non-numeric processno in HEARTBEAT " ^ userlockid);

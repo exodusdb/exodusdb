@@ -9,10 +9,10 @@ S
 	let secsperday = 24 * 60 * 60;\
 	var uptodate = RECORD.f(11);\
 	var uptotime = RECORD.f(12);\
-	if (uptodate eq "") {\
+	if (uptodate == "") {\
 		uptodate = date();\
 	}\
-	if (uptotime eq "") {\
+	if (uptotime == "") {\
 		uptotime = time();\
 	}\
 	let daysecs = (uptodate - RECORD.f(1)) * secsperday;\

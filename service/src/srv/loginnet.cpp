@@ -59,11 +59,11 @@ readmenu:
 
 	// all menus - not in order
 	var menus = "SUPPORT";
-	if (APPLICATION eq "ACCOUNTS" or APPLICATION eq "ADAGENCY") {
+	if (APPLICATION == "ACCOUNTS" or APPLICATION == "ADAGENCY") {
 		menus(1, -1) = "FINANCE";
 	}
 
-	if (APPLICATION eq "ADAGENCY") {
+	if (APPLICATION == "ADAGENCY") {
 
 		menus(1, -1) = "ANALYSIS";
 
@@ -95,7 +95,7 @@ readmenu:
 			}
 
 			// specifically locked or no legacy menus - only allow if authorised
-			if (oldmenus eq "" or ((menun and SECURITY.f(11, taskn).len()))) {
+			if (oldmenus == "" or ((menun and SECURITY.f(11, taskn).len()))) {
 				if (not(authorised(menutask, xx))) {
 deleteit:
 					if (menus.locate(menu, menun2)) {
@@ -144,7 +144,7 @@ nextcomp:
 
 	// build a list of authorised companies
 	var compcodes = "";
-	if (APPLICATION eq "ADAGENCY") {
+	if (APPLICATION == "ADAGENCY") {
 		for (const var ii : range(1, 9999)) {
 			compcode = allcomps.f(ii);
 			// /BREAK;
@@ -167,7 +167,7 @@ nextcomp:
 	}
 
 	// check there is at least one authorised company
-	if (allcomps and compcodes eq "") {
+	if (allcomps and compcodes == "") {
 		msg = "Error: You are not authorised to access any companies";
 		return 0;
 	}
@@ -208,7 +208,7 @@ nextcomp:
 		maincurrcode = "";
 	}
 	// if maincurrcode='' then maincurrcode=base.currency
-	if (maincurrcode eq "") {
+	if (maincurrcode == "") {
 		maincurrcode = SYSTEM.f(134);
 	}
 
@@ -263,7 +263,7 @@ nextcomp:
 	// first day of week
 	// tt=agp<13>+1
 	var tt = SYSTEM.f(138) + 1;
-	if (tt gt 7) {
+	if (tt > 7) {
 		tt = 1;
 	}
 	cookie ^= "&fd=" ^ tt;
@@ -288,12 +288,12 @@ nextcomp:
 	// backup_db script updates params2 date/time
 	let lastbackupdate = paramfilename.osfile().f(2);
 
-	// if lastbackupdate and lastbackupdate lt date()-1 then
+	// if lastbackupdate and lastbackupdate < date()-1 then
 	// assume backup on same day (ie after last midnight)
-	if (lastbackupdate and lastbackupdate lt date()) {
+	if (lastbackupdate and lastbackupdate < date()) {
 		msg		  = "The last backup was ";
 		let ndays = date() - lastbackupdate;
-		msg ^= ndays ^ " day" ^ var("s").first(ndays ne 1) ^ " ago.";
+		msg ^= ndays ^ " day" ^ var("s").first(ndays != 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
 		msg.replacer("(0", "(");
 		msg(-1) = "EXODUS recommends that you \"BACKUP\" your data ";

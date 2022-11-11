@@ -59,7 +59,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 		printl("sysmsg: ", subjectin, ", ", username, ", ", msg.f(1, 1).field("|", 1).f(1, 1));
 	}
 
-	if (msg eq "" and subjectin) {
+	if (msg == "" and subjectin) {
 		msg = subjectin;
 	}
 
@@ -68,7 +68,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	}
 
 	// remove html tags from message and decode things like &nbsp;
-	if (msg.first(2) ne "@@") {
+	if (msg.first(2) != "@@") {
 		call htmllib2("STRIPTAGS", msg);
 		call htmllib2("DECODEHTML", msg);
 	}
@@ -102,7 +102,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	emailaddrs.replacer("backups@neosys.com", "sysmsg@neosys.com");
 
 	// suppress login failure messages
-	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and subjectin.starts("Login Failure")) {
+	if ((APPLICATION != "ACCOUNTS" and username != "EXODUS") and subjectin.starts("Login Failure")) {
 		emailaddrs.replacer("sysmsg@neosys.com", "");
 		emailaddrs = trim(emailaddrs, ";");
 	}
@@ -116,14 +116,14 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	}
 
 	// username EXODUS and @username<>EXODUS means email EXODUS ONLY!
-	if (username eq "EXODUS" and USERNAME ne "EXODUS") {
+	if (username == "EXODUS" and USERNAME != "EXODUS") {
 		emailaddrs = "sysmsg@neosys.com";
 		// so we know who caused the message
 		username = USERNAME;
 	}
 
 	// sysmsg is not emailed to admins if testdata or user is EXODUS
-	if (USERNAME eq "EXODUS" or (SYSTEM.f(17).ends("_test"))) {
+	if (USERNAME == "EXODUS" or (SYSTEM.f(17).ends("_test"))) {
 
 		// this is disabled to ensure that all errors caused by EXODUS support
 		// are logged normally
@@ -137,13 +137,13 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 		// never email user
 		useremail = "";
 		// never email anybody but steve.bush@neosys.com or sysmsg@neosys.com
-		if (emailaddrs ne "dev@neosys.com" and emailaddrs ne "steve.bush@neosys.com") {
+		if (emailaddrs != "dev@neosys.com" and emailaddrs != "steve.bush@neosys.com") {
 			emailaddrs = "";
 		}
 	}
 
 	// if no email addresses then always email exodus
-	if (emailaddrs eq "") {
+	if (emailaddrs == "") {
 		emailaddrs = "sysmsg@neosys.com";
 	}
 
@@ -183,7 +183,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 			body(-1) = oconv("IP No:", l9) ^ SYSTEM.f(40, 2);
 		}
 		body(-1) = oconv("User:", l9) ^ username.trim();
-		if (userfullname and userfullname.trim().ucase() ne username) {
+		if (userfullname and userfullname.trim().ucase() != username) {
 			body ^= " (" ^ userfullname ^ ")";
 		}
 		if (useremail) {
@@ -273,7 +273,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", errormsg);
 
 		// log any sendmail failure or excessive emails
-		if (errormsg and errormsg ne "OK") {
+		if (errormsg and errormsg != "OK") {
 			call log("SENDMAIL", errormsg);
 		}
 

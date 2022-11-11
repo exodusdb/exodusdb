@@ -36,7 +36,7 @@ function main() {
 	ANS = RECORD.f(1).xlate("USERS", 1, "X");
 	let nn = ANS.fcount(VM);
 	for (const var ii : range(1, nn)) {
-		if (ANS.f(1, ii) eq RECORD.f(1, ii)) {
+		if (ANS.f(1, ii) == RECORD.f(1, ii)) {
 			ANS(1, ii) = "";
 		}
 	} // ii;
@@ -131,13 +131,13 @@ libraryinit(process_comment2)
 
 function main() {
 	ANS = "";
-	if (ID.field("*", 2) eq SYSTEM.f(32)) {
+	if (ID.field("*", 2) == SYSTEM.f(32)) {
 		ANS(1, -1) = "Current user session";
 	}
-	if (RECORD.f(3).trim() eq STATION.trim()) {
+	if (RECORD.f(3).trim() == STATION.trim()) {
 		ANS(1, -1) = "Current workstation";
 	}
-	if (RECORD.f(5) eq USERNAME) {
+	if (RECORD.f(5) == USERNAME) {
 		ANS(1, -1) = "Current user";
 		}
 	return ANS;
@@ -159,10 +159,10 @@ function main() {
 	let secsperday = 24 * 60 * 60;
 	var uptodate = RECORD.f(11);
 	var uptotime = RECORD.f(12);
-	if (uptodate eq "") {
+	if (uptodate == "") {
 		uptodate = date();
 	}
-	if (uptotime eq "") {
+	if (uptotime == "") {
 		uptotime = time();
 	}
 	let daysecs = (uptodate - RECORD.f(1)) * secsperday;
@@ -203,7 +203,7 @@ function main() {
 	for (const var usern : range(1, nusers)) {
 		let usercode = usercodes.f(1, usern);
 		if (usercode) {
-			if (emails.f(1, usern) eq "") {
+			if (emails.f(1, usern) == "") {
 				usercodes(1, usern) = "<B>" ^ usercode ^ "</B>";
 			}
 		}
@@ -221,7 +221,7 @@ function main() {
 
 	let nusers = usercodes.fcount(VM);
 	for (const var usern : range(1, nusers)) {
-		if (emails.f(1, usern) eq "") {
+		if (emails.f(1, usern) == "") {
 			usercodes(1, usern) = "";
 		}
 	} // usern;

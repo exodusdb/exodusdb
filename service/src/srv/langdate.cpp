@@ -8,7 +8,7 @@ function main(in type, in in0, in mode0, out output, in glang) {
 	var inx	 = in0;
 	var mode = mode0;
 
-	if (inx eq "") {
+	if (inx == "") {
 		output = "";
 		return 0;
 	}
@@ -20,7 +20,7 @@ function main(in type, in in0, in mode0, out output, in glang) {
 
 	if (mode) {
 
-		if (mode eq "4") {
+		if (mode == "4") {
 			mode = DATEFMT;
 			mode.paster(2, 1, "4");
 		}
@@ -35,19 +35,19 @@ function main(in type, in in0, in mode0, out output, in glang) {
 	}
 
 	// status=0
-	if (type eq "OCONV") {
+	if (type == "OCONV") {
 
 		// dont oconv 1 or 2 digits as they are probably day of month being converted
 		// to proper dates
-		// IF len(inx) gt 2 and inx MATCHES '0N' OR inx MATCHES '"-"0N' OR inx MATCHES '0N.0N' THEN
-		if (inx.len() gt 2 and inx.match("^\\d*$")) {
+		// IF len(inx) > 2 and inx MATCHES '0N' OR inx MATCHES '"-"0N' OR inx MATCHES '0N.0N' THEN
+		if (inx.len() > 2 and inx.match("^\\d*$")) {
 			goto ok;
 		}
 
 		if (inx.match("^-\\d*$") or inx.match("^\\d*\\.\\d*$")) {
 ok:
 			// language specific (date format could be a pattern in lang?)
-			if (mode eq "L") {
+			if (mode == "L") {
 
 				let tt	 = inx.oconv("D4/E");
 				let mth	 = glang.f(2).field("|", tt.field("/", 2));
@@ -67,7 +67,7 @@ ok:
 					output.paster(1, 1, " ");
 				}
 
-				if (output[4] eq "0") {
+				if (output[4] == "0") {
 					output.paster(4, 1, " ");
 				}
 
@@ -85,9 +85,9 @@ ok:
 			output = inx;
 		}
 
-	} else if (type eq "ICONV") {
+	} else if (type == "ICONV") {
 
-		if (inx.match("^\\d*$") and inx le 31) {
+		if (inx.match("^\\d*$") and inx <= 31) {
 			inx ^= date().oconv("D").b(4, 9);
 		}
 

@@ -36,7 +36,7 @@ function main(in mode) {
 
 	// use agp<> instead of @record<> to assist source code searching for agp<?>
 
-	if (ID eq "TAXES") {
+	if (ID == "TAXES") {
 		// call tax.subs(mode)
 		// make definition.subs independent for c++
 		systemsubs = "taxsubs";
@@ -44,7 +44,7 @@ function main(in mode) {
 		return 0;
 	}
 
-	if (ID eq "ALL") {
+	if (ID == "ALL") {
 		// call voucher.type.subs(mode)
 		// make definition.subs independent for c++
 		systemsubs = "vouchertypesubs";
@@ -52,7 +52,7 @@ function main(in mode) {
 		return 0;
 	}
 
-	if (ID eq "TIMESHEET.PARAMS") {
+	if (ID == "TIMESHEET.PARAMS") {
 		// call timesheetparam.subs(mode)
 		// make definition.subs independent for c++
 		systemsubs = "timesheetparamsubs";
@@ -62,7 +62,7 @@ function main(in mode) {
 
 	let systemcodes = "SYSTEM.CFG,SYSTEM,..\\..\\SYSTEM.CFG";
 
-	if (mode eq "PREREAD") {
+	if (mode == "PREREAD") {
 
 		// system configuration
 		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
@@ -75,7 +75,7 @@ function main(in mode) {
 			}
 		}
 
-		if (ID eq "SECURITY*USERS") {
+		if (ID == "SECURITY*USERS") {
 			ID			  = "SECURITY";
 			req.templatex = "USERS";
 			if (not(authorised("USER LIST", msg, "USER ACCESS"))) {
@@ -84,7 +84,7 @@ function main(in mode) {
 			return 0;
 		}
 
-	} else if (mode eq "POSTREAD") {
+	} else if (mode == "POSTREAD") {
 
 		// NB also called from postwrite
 
@@ -104,7 +104,7 @@ function main(in mode) {
 			smtpkey.replacer("SYSTEM", "SMTP");
 
 			// backup rec on definitions
-			if (ID eq "SYSTEM") {
+			if (ID == "SYSTEM") {
 				if (not(backuprec.read(DEFINITIONS, backupkey))) {
 					backuprec = "";
 				}
@@ -132,15 +132,15 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (ID eq "SECURITY") {
+		if (ID == "SECURITY") {
 
-			if (req.templatex eq "USERS") {
+			if (req.templatex == "USERS") {
 				return 0;
 			}
 
 			// template now provided by readenvironment in client
 			// either SECURITY or HOURLYRATES
-			if (req.templatex eq "") {
+			if (req.templatex == "") {
 				req.templatex = "SECURITY";
 			}
 			call securitysubs("SETUP");
@@ -148,7 +148,7 @@ function main(in mode) {
 		}
 
 		// default cheque format
-		if (req.wlocked and ID.field("*", 1) eq "CHEQUEDESIGN") {
+		if (req.wlocked and ID.field("*", 1) == "CHEQUEDESIGN") {
 
 			// prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
@@ -190,7 +190,7 @@ nochequeformat:
 		// INDEXVALUES*PLANS*EXECUTIVE_CODE
 		// INDEXVALUES*SCHEDULES*EXECUTIVE_CODE
 		// INDEXVALUES*JOBS*EXECUTIVE_CODE
-		if (ID.field("*", 1) eq "INDEXVALUES") {
+		if (ID.field("*", 1) == "INDEXVALUES") {
 
 			// currently only EXECUTIVE from UI
 			// default to authorised ATM
@@ -223,7 +223,7 @@ nochequeformat:
 			// return
 		}
 
-		if (ID.field("*", 2) eq "ANALDESIGN") {
+		if (ID.field("*", 2) == "ANALDESIGN") {
 
 			// check allowed access
 			if (not(authorised("BILLING REPORT ACCESS", msg, ""))) {
@@ -234,7 +234,7 @@ unlockdefinitions:
 			}
 
 			// always allowed to update or delete own records
-			if (RECORD.f(8) ne USERNAME) {
+			if (RECORD.f(8) != USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
 				if (not(req.valid)) {
@@ -252,7 +252,7 @@ preventupdate:
 			return 0;
 		}
 
-		if (ID eq "AGENCY.PARAMS") {
+		if (ID == "AGENCY.PARAMS") {
 
 			// configuration is locked to EXODUS initially
 			if (not(authorised("AGENCY CONFIGURATION UPDATE", xx, "EXODUS"))) {
@@ -262,14 +262,14 @@ preventupdate:
 
 		gosub postreadfix();
 
-	} else if (mode eq "PREWRITE") {
+	} else if (mode == "PREWRITE") {
 
-		if (ID eq "SECURITY") {
+		if (ID == "SECURITY") {
 
 			// no difference between security update and hourlyrate update now
 			// template='SECURITY'
 			// now there is!
-			if (req.templatex eq "") {
+			if (req.templatex == "") {
 				req.templatex = "SECURITY";
 			}
 
@@ -279,7 +279,7 @@ preventupdate:
 		}
 
 		// save cheque design for exodus
-		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
+		if (ID.field("*", 1) == "CHEQUEDESIGN") {
 
 			// prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
@@ -302,7 +302,7 @@ preventupdate:
 				ID.field("*", 2).write(req.srcfile, "CHEQUEDESIGN*DEFAULT");
 
 				// if EXODUS then save the default as EXODUS programs default
-				if (USERNAME eq "EXODUS") {
+				if (USERNAME == "EXODUS") {
 					if (temp.open("ALANGUAGE", "")) {
 						RECORD.write(temp, "VOUCHERS**CHEQUE");
 					}
@@ -323,7 +323,7 @@ preventupdate:
 		// this is also done in copygbp perhaps could be removed from there
 		// almost identical code in definition.subs and get.subs (for documents)
 		// field 10 in documents and definitions xxx*analdesign means the same
-		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.f(10)) {
+		if ((ID.field("*", 2) == "ANALDESIGN" and USERNAME == "EXODUS") and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -333,10 +333,10 @@ preventupdate:
 			}
 		}
 
-		if (ID eq "AGENCY.PARAMS") {
+		if (ID == "AGENCY.PARAMS") {
 
 			// prevent changing "invno by company" after data is entered
-			if (RECORD.f(48) ne req.orec.f(48)) {
+			if (RECORD.f(48) != req.orec.f(48)) {
 				call anydata("", anydataexists);
 				if (anydataexists) {
 					RECORD(48) = req.orec.f(48);
@@ -354,7 +354,7 @@ preventupdate:
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
-					if (usercode ne req.orec.f(fn)) {
+					if (usercode != req.orec.f(fn)) {
 						// updater must themselves be authorised to post journals
 						if (not(authorised("JOURNAL POST", msg))) {
 							msg = "You are not authorised to change financial usercode" _FM _FM ^ msg;
@@ -372,17 +372,17 @@ preventupdate:
 			let t49	 = field2(RECORD.f(49), _VM, -1);
 			let t149 = field2(RECORD.f(149), _VM, -1);
 			let t150 = field2(RECORD.f(150), _VM, -1);
-			if (t49 and t49 eq t149) {
+			if (t49 and t49 == t149) {
 				msg = "Media adjustment no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);
 			}
 
-			if (t49 and t49 eq t150) {
+			if (t49 and t49 == t150) {
 				msg = "Media credit note no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);
 			}
 
-			if (t149 and t149 eq t150) {
+			if (t149 and t149 == t150) {
 				msg = "Media adjustment no pattern must be different from Media credit note no pattern, or left blank";
 				return invalid(msg);
 			}
@@ -397,18 +397,18 @@ preventupdate:
 				return invalid(msg);
 			}
 
-			if (((RECORD.f(146) and RECORD.f(46) eq RECORD.f(146)) or ((RECORD.f(147) and RECORD.f(46) eq RECORD.f(147)))) or ((RECORD.f(147) and RECORD.f(146) eq RECORD.f(147)))) {
+			if (((RECORD.f(146) and RECORD.f(46) == RECORD.f(146)) or ((RECORD.f(147) and RECORD.f(46) == RECORD.f(147)))) or ((RECORD.f(147) and RECORD.f(146) == RECORD.f(147)))) {
 				msg = "Media Accounting Voucher type codes must all be different (or left blank)";
 				return invalid(msg);
 			}
 
 			// save the requester if requested createads
-			if (RECORD.f(125) ne req.orec.f(125)) {
+			if (RECORD.f(125) != req.orec.f(125)) {
 				RECORD(128) = USERNAME;
 			}
 		}
 
-	} else if (mode eq "POSTWRITE") {
+	} else if (mode == "POSTWRITE") {
 
 		// system configuration
 		if (systemcodes.locateusing(",", ID, xx)) {
@@ -429,12 +429,12 @@ preventupdate:
 			tt = RECORD.f(46);
 			tt.converter(_VM, "");
 			tt.replacer("Default", "");
-			if (tt eq "") {
+			if (tt == "") {
 				RECORD(46) = "";
 			}
 
 			// write backup rec on definitions
-			if (ID eq "SYSTEM") {
+			if (ID == "SYSTEM") {
 
 				// get lastbackupdate in unlikely event that it has changed during update
 				if (not(tt.readf(DEFINITIONS, backupkey, 1))) {
@@ -461,7 +461,7 @@ preventupdate:
 			//// Since exodus backups handled outside of service in bash scripts
 			//// warning if backup drive does not exist/cannot be written to
 			//var backupdrives = RECORD.f(77);
-			//if (RECORD.f(82) ne RECORD.f(77)) {
+			//if (RECORD.f(82) != RECORD.f(77)) {
 			//	backupdrives(-1) = RECORD.f(82);
 			//}
 			//for (const var driven : range(1, 999)) {
@@ -510,7 +510,7 @@ preventupdate:
 			// but atm it recreates everything from scratch
 			let oldhostname = req.orec.f(57);
 			let newhostname = RECORD.f(57);
-			if (newhostname and newhostname ne oldhostname) {
+			if (newhostname and newhostname != oldhostname) {
 				SYSTEM(57) = newhostname;
 				// in INIT.GENERAL and DEFINITION.SUBS
 				if (var("ddns.cmd").osfile()) {
@@ -525,10 +525,10 @@ preventupdate:
 		}
 
 		// have to pass back the partial record
-		if (ID eq "SECURITY") {
+		if (ID == "SECURITY") {
 
 			// could be HOURLYRATES which has different authorisation
-			if (req.templatex eq "") {
+			if (req.templatex == "") {
 				req.templatex = "SECURITY";
 			}
 
@@ -544,7 +544,7 @@ preventupdate:
 		// Trigger restart if necessary (is this really necessary now)
 		// Processes restart if system.cfg date/time changes
 		// TODO make it only per database
-		if (USERNAME ne "EXODUS") {
+		if (USERNAME != "EXODUS") {
 			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",", ID, xx)) {
 //				// TODO prevent a write from system configuration file
 //				//call osread(tt, "system.cfg");
@@ -558,7 +558,7 @@ preventupdate:
 			}
 		}
 
-	} else if (mode eq "PREDELETE") {
+	} else if (mode == "PREDELETE") {
 
 		// system configuration
 		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
@@ -571,7 +571,7 @@ preventupdate:
 			}
 
 			// get from operating system
-			if (ID ne "SYSTEM") {
+			if (ID != "SYSTEM") {
 				//ID.osremove();
 				if (ID.osfile() and not ID.osremove())
 					abort(lasterror());
@@ -580,12 +580,12 @@ preventupdate:
 			return 0;
 		}
 
-		if (ID eq "SECURITY") {
+		if (ID == "SECURITY") {
 			msg = "DELETE SECURITY not allowed in DEFINITION.SUBS";
 			return invalid(msg);
 		}
 
-		if (ID.field("*", 2) eq "ANALDESIGN") {
+		if (ID.field("*", 2) == "ANALDESIGN") {
 
 			// prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
@@ -593,7 +593,7 @@ preventupdate:
 			}
 
 			// always allowed to delete own records
-			if (RECORD.f(8) ne USERNAME) {
+			if (RECORD.f(8) != USERNAME) {
 				op = "BILLING REPORT";
 				gosub security2(mode, op);
 				if (not(req.valid)) {
@@ -603,7 +603,7 @@ preventupdate:
 		}
 
 		// remove default cheque design
-		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
+		if (ID.field("*", 1) == "CHEQUEDESIGN") {
 			if (RECORD.f(14)) {
 				req.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 			}
@@ -612,7 +612,7 @@ preventupdate:
 		// update exodus standard (in case doing this on the programming system)
 		// %DELETED% ensures that deleted EXODUS documents get deleted
 		// on upgrading clients
-		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.f(10)) {
+		if ((ID.field("*", 2) == "ANALDESIGN" and USERNAME == "EXODUS") and RECORD.f(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -625,9 +625,9 @@ preventupdate:
 			}
 		}
 
-	} else if (mode eq "POSTDELETE") {
+	} else if (mode == "POSTDELETE") {
 
-	} else if (mode eq "REORDERDBS") {
+	} else if (mode == "REORDERDBS") {
 		gosub reorderdbs();
 
 	} else {
@@ -685,7 +685,7 @@ subroutine reorderdbs() {
 	newdbdir.converter(_SM _VM, ",*");
 	newdbdir.replacer(_FM, _EOL);
 
-	if (newdbdir ne olddbdir) {
+	if (newdbdir != olddbdir) {
 		//call oswrite(newdbdir, dbdirfilename);
 		if (not oswrite(newdbdir, dbdirfilename))
 			loglasterror();
@@ -695,58 +695,58 @@ subroutine reorderdbs() {
 }
 
 subroutine postreadfix() {
-	if (ID eq "AGENCY.PARAMS") {
+	if (ID == "AGENCY.PARAMS") {
 
-		if (RECORD.f(55) eq "") {
+		if (RECORD.f(55) == "") {
 			RECORD(55) = "Budget";
 		}
-		if (RECORD.f(56) eq "") {
+		if (RECORD.f(56) == "") {
 			RECORD(56) = "F/cast";
 		}
-		if (RECORD.f(72) eq "") {
+		if (RECORD.f(72) == "") {
 			RECORD(72) = "Media Plan";
 		}
-		if (RECORD.f(73) eq "") {
+		if (RECORD.f(73) == "") {
 			RECORD(73) = "Media Schedule";
 		}
-		if (RECORD.f(74) eq "") {
+		if (RECORD.f(74) == "") {
 			RECORD(74) = "Estimate";
 		}
 
-		if (RECORD.f(49) eq "") {
+		if (RECORD.f(49) == "") {
 			RECORD(49) = "<NUMBER>";
 		}
-		if (RECORD.f(49, 1, 2) eq "") {
+		if (RECORD.f(49, 1, 2) == "") {
 			RECORD(49, 1, 2) = "2000.01";
 		}
-		if (RECORD.f(50) eq "") {
+		if (RECORD.f(50) == "") {
 			RECORD(50) = "<NUMBER>";
 		}
-		if (RECORD.f(50, 1, 2) eq "") {
+		if (RECORD.f(50, 1, 2) == "") {
 			RECORD(50, 1, 2) = "2000.01";
 		}
 
 		// done in agency.subs getnextid
-		if (RECORD.f(53) eq "") {
+		if (RECORD.f(53) == "") {
 			RECORD(53) = "<NUMBER>";
 		}
-		if (RECORD.f(63) eq "") {
+		if (RECORD.f(63) == "") {
 			RECORD(63) = "<NUMBER>";
 		}
-		if (RECORD.f(69) eq "") {
+		if (RECORD.f(69) == "") {
 			RECORD(69) = "<NUMBER>";
 		}
-		if (RECORD.f(70) eq "") {
+		if (RECORD.f(70) == "") {
 			RECORD(70) = "<NUMBER>";
 		}
-		if (RECORD.f(71) eq "") {
+		if (RECORD.f(71) == "") {
 			RECORD(71) = "<NUMBER>";
 		}
 
-		if (RECORD.f(25) eq "") {
+		if (RECORD.f(25) == "") {
 			RECORD(25) = "ACC<YEAR>";
 		}
-		if (RECORD.f(26) eq "") {
+		if (RECORD.f(26) == "") {
 			RECORD(26) = "WIP<YEAR>";
 		}
 

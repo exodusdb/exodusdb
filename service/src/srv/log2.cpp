@@ -17,7 +17,7 @@ function main(in msg0, io time0) {
 
 	logfile = "";
 
-	if (msg0 eq "GETLASTLOG") {
+	if (msg0 == "GETLASTLOG") {
 
 		if (not(VOLUMES)) {
 			return "";
