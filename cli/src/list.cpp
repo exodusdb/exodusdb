@@ -25,7 +25,8 @@ function main() {
 	//////////////////////////////////////////
 
 	// Switch off TERMINAL
-	var oscmd = "TERM=";
+	//var oscmd = "TERM=";
+	var oscmd = "";
 
 	// Prepare a bash command
 	// Reconstruct the list command into a format suitable for processing by bash
@@ -56,15 +57,16 @@ function main() {
 		if (var("(){}").contains(word))
 			word = _BS ^ word;
 
-		oscmd ^= " " ^ word;
+		oscmd ^= word ^ " ";
 	}
 
-	// Add any options
-	if (OPTIONS)
-		oscmd ^= " {"^ OPTIONS ^ "}";
+	// Add any options and NOPAGE option
+	//if (OPTIONS)
+		oscmd ^= "{N"^ OPTIONS ^ "}";
 
 	// Pipe into pager
 	oscmd ^= " | pager --chop-long-lines --quit-if-one-screen";
+	//oscmd ^= "";
 
 	if (not osshell(oscmd))
 		abort(lasterror());

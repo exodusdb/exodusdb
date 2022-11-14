@@ -15,8 +15,8 @@ function main() {
 	//	abort("Cannot connect to database. Please check configuration or run configexodus.");
 
 	//begintrans();
-	if (not begintrans())
-		abort(lasterror());
+//	if (not begintrans())
+//		abort(lasterror());
 
 	let dictfilename = "dict." ^ filename;
 
@@ -144,15 +144,19 @@ function main() {
 
 	gosub sortselect(file, " by timestamp");
 
-	gosub sortselect(file, " with type 'B' by balance");
+	gosub sortselect(file, " with type \"'B'\" by balance");
 
 	var cmd = "list " ^ filename ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
-	perform(cmd);
+	//perform(cmd);
+	if (not osshell(cmd))
+		loglasterror();
 
 	cmd = "list " ^ dictfilename;
 	printl("\nList the dict using ", quote(cmd));
-	perform(cmd);
+	//perform(cmd);
+	if (not osshell(cmd))
+		loglasterror();
 
 	if (cleanup) {
 		printl("\nCleaning up. Delete the files");
@@ -182,7 +186,7 @@ subroutine sortselect(in file, in sortselectclause) {
 
 	printl("\nsselect the data - ", sortselectclause);
 
-	if (!select("select xo_clients " ^ sortselectclause ^ " (R)")) {
+	if (!select("select xo_clients " ^ sortselectclause)) {
 		printl("Cannot sselect in testsort");
 		return;
 	}
@@ -205,9 +209,11 @@ subroutine sortselect(in file, in sortselectclause) {
 		printl(ID, ": ", convert(RECORD, FM, "|"));
 	}
 
-	let cmd = "list " ^ filename ^ " " ^ sortselectclause ^ " id-supp (R)";
+	let cmd = "list " ^ filename ^ " " ^ sortselectclause ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
-	perform(cmd) or loglasterror("testsort:" ^ cmd);
+	//perform(cmd) or loglasterror("testsort:" ^ cmd);
+	if (not osshell(cmd))
+		loglasterror();
 
 	//	rollbacktrans();
 }

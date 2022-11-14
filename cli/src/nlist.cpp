@@ -462,14 +462,30 @@ function main() {
 	rawtable = 0;
 	silent = 0;
 
-	if (not dictvoc.open("DICT.voc", "")) {
+	if (not dictvoc.open("DICT.voc")) {
 		//createfile("DICT.voc");
 		if (not createfile("DICT.voc")) {
 			abort(lasterror());
 		}
-		if (not dictvoc.open("DICT.voc", "")) {
+		if (not dictvoc.open("DICT.voc")) {
 			abort(lasterror());
 		}
+	}
+
+	if (not(tt.read(dictvoc, "@ID"))) {
+		"F^0^TABLE_NAME^S^1^^^^L^20^^VARCHAR"_var.write(dictvoc, "TABLE_NAME");
+		"F^0^COLUMN_NAME^S^2^^^^L^20"_var.write(dictvoc, "COLUMN_NAME");
+		"G^^TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG^^^^^^^^^^^^^^^^^^^^^^^^^0"_var.write(dictvoc, "@CRT");
+		"F^0^Ref.^S^0^^^^T^20"_var.write(dictvoc, "@ID");
+		"F^1^TYPE^S^0^^^^L^4"_var.write(dictvoc, "TYPE");
+		"F^2^FMC^S^0^^^^R^3"_var.write(dictvoc, "FMC");
+		"F^5^PART^S^0^^^^R^2"_var.write(dictvoc, "PART");
+		"F^3^HEADING^S^0^^^^T^20"_var.write(dictvoc, "HEADING");
+		"F^4^SM^S^0^^^^L^4"_var.write(dictvoc, "SM");
+		"F^7^CONV^S^0^^^^L^9"_var.write(dictvoc, "CONV");
+		"F^9^JST^S^0^^^^L^3"_var.write(dictvoc, "JUST");
+		"F^10^LEN^S^0^^^^R^3^^LENGTH"_var.write(dictvoc, "LEN");
+		"F^28^MST^S^^^BYes,^^L^4"_var.write(dictvoc, "MASTER_FLAG");
 	}
 
 	colname.redim(maxncols);
