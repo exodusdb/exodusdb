@@ -227,8 +227,8 @@ function main() {
 					}
 				} else if (forrange == 2) {
 					line2.regex_replacer(
-						R"___(\tfor \((.+?) = (.+?); \1 (<=|le) (.+?); (\+\+\1|\1\+\+)\))___",
-						R"___(\tfor \(\1 : range\(\2, \4\)\))___");
+						R"___(\tfor \(([a-z0-9_]+?) = (.+?); \1 (<=|le) (.+?); (\+\+\1|\1\+\+)\))___",
+						R"___(\tfor \(let \1 : range\(\2, \4\)\))___");
 						//R"___(\tfor \(([a-zA-Z_.0-9]+) =)___",
 						//R"___(QQQ : range\()___");
 	//				if (line.contains("QQQ"))

@@ -260,6 +260,8 @@ programinit()
 		if (osfile(tempfilename2))
 			assert(osremove(tempfilename2));
 		assert(oscopy(tempfilename, tempfilename2));
+		TRACE(osfile(tempfilename2))
+		TRACE(info)
 		assert(osfile(tempfilename2) eq info);
 
 		//check renaming
