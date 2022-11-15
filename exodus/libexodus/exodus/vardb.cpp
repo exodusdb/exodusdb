@@ -4439,14 +4439,20 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		joins.inserter(1, 1, "\n RIGHT JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");
 	}
 
-	// assemble the full sql select statement:
+	// Assemble the full sql select statement:
 
-	//DECLARE - cursor
-	// WITH HOLD is a very significant addition
-	// var sql="DECLARE cursor1_" ^ *this ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
-	// ^ " FROM ";
+	// DECLARE - cursor
+	//  WITH HOLD is a very significant addition
+	//  var sql="DECLARE cursor1_" ^ *this ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
+	//  ^ " FROM ";
 	//TRACE(*this);
 	var sql = "DECLARE\n cursor1_" ^ this->f(1).convert(".", "_") ^ " SCROLL CURSOR WITH HOLD FOR";
+	// Not using WITH HOLD because such cursors are not automatically closed at the end of transactions
+	// and hang around in the server until closed. Worse, in postgres 14, multiple selects
+	// to the same cursor name within a transaction, but not outside a transaction, seem to cause postgres
+	// to hang. testsort hangs on declaring a cursor.
+	// TODO why was WITH HOLD added in the first place?
+	//var sql = "DECLARE\n cursor1_" ^ this->f(1).convert(".", "_") ^ " SCROLL CURSOR FOR";
 
 	//SELECT - field/column names
 	sql ^= " \nSELECT\n " ^ actualfieldnames;

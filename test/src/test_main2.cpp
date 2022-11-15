@@ -30,16 +30,62 @@ programinit()
 
 	function main() {
 
-	// range based for loop
 	{
-		var tot	  = 0;
-		var count = 0;
-		for (const var ii : range(1, 10)) {
-			tot += ii;
-			count++;
+		// range based for loop
+		{
+			var tot	  = 0;
+			var count = 0;
+			var str   = "";
+			for (const var ii : range(1, 10)) {
+				tot += ii;
+				count++;
+				str ^= ii ^ " ";
+			}
+			assert(tot   eq 55);
+			assert(count eq 10);
+			assert(str == "1 2 3 4 5 6 7 8 9 10 ");
 		}
-		assert(tot   eq 55);
-		assert(count eq 10);
+
+		// range based for loop - bad range
+		{
+			var tot	  = 0;
+			var count = 0;
+			for (const var ii : range(10, 1)) {
+				tot += ii;
+				count++;
+			}
+			assert(tot   eq 0);
+			assert(count eq 0);
+		}
+	}
+	{
+		// reverse_range based for loop
+		{
+			var tot	  = 0;
+			var count = 0;
+			var str   = "";
+			for (const var ii : reverse_range(1, 10)) {
+				tot += ii;
+				count++;
+				str ^= ii ^ " ";;
+			}
+			assert(tot   eq 55);
+			assert(count eq 10);
+			TRACE(str);
+			assert(str == "10 9 8 7 6 5 4 3 2 1 ");
+		}
+
+		// reverse_range based for loop - bad range
+		{
+			var tot	  = 0;
+			var count = 0;
+			for (const var ii : reverse_range(10, 1)) {
+				tot += ii;
+				count++;
+			}
+			assert(tot   eq 0);
+			assert(count eq 0);
+		}
 	}
 
 	// range based field iteration

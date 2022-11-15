@@ -1,4 +1,5 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
+//#include <ranges>
 #include <boost/range/irange.hpp>
 #include <cassert>
 
@@ -152,6 +153,14 @@ programinit()
 						};
 
 						break;
+//					case 21:
+//						if (repeatn eq 0)
+//							printl("Exp: 0.840 ns - using std::iota - for (int:range)");
+//						for (int i2 : std::views::iota(0, nn)) {
+//							i1 = i2;
+//						};
+//
+//						break;
 					case 5:
 						if (repeatn eq 0)
 							printl("Exp: 6.5   ns - construct empty var + test");
@@ -285,6 +294,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							b1 = (v1 + 0.1).assigned();
 						};
+						break;
 				}
 				var ended = ostime();
 				if (i1 or b1 or v1)

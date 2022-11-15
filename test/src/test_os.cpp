@@ -111,6 +111,8 @@ programinit()
 
 		//check oslist = oslistd ^ oslistf (both sorted)
 		dir2 = (dirs ^ FM ^ files).sort();
+		TRACE(dir1)
+		TRACE(dir2)
 		assert(dir1 eq dir2);
 
 		// ls xxx*.yyy returns a sorted list regardless of the -U unordered option
