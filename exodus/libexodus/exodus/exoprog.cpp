@@ -1119,56 +1119,56 @@ var ExodusProgramBase::perform(CVR sentence) {
 	//perform_callable_.mv_ = (&mv);
 
 	// save some environment
-	var savesentence;
-	var savecommand;
-	var saveoptions;
-	var saverecur0;
-	var saverecur1;
-	var saverecur2;
-	var saverecur3;
-	var saverecur4;
+	var savesentence = "";
+	var savecommand = "";
+	var saveoptions = "";
+	var saverecur0 = "";
+	var saverecur1 = "";
+	var saverecur2 = "";
+	var saverecur3 = "";
+	var saverecur4 = "";
 	//
-	var saveid;
-	var saverecord;
-	var savemv;
-	var savedict;
+	var saveid = "";
+	var saverecord = "";
+	var savemv = "";
+	var savedict = "";
 
 	//SENTENCE.move(savesentence);
 	// Take a copy since they might be the same variable
 	// if called like 'perform(SENTENCE)'
 	savesentence = SENTENCE;
 
-	COMMAND.move(savecommand);
-	OPTIONS.move(saveoptions);
-	RECUR0.move(saverecur0);
-	RECUR1.move(saverecur1);
-	RECUR2.move(saverecur2);
-	RECUR3.move(saverecur3);
-	RECUR4.move(saverecur4);
+	COMMAND.swap(savecommand);
+	OPTIONS.swap(saveoptions);
+	RECUR0.swap(saverecur0);
+	RECUR1.swap(saverecur1);
+	RECUR2.swap(saverecur2);
+	RECUR3.swap(saverecur3);
+	RECUR4.swap(saverecur4);
 	LEVEL++;
 	//
-	ID.move(saveid);
-	RECORD.move(saverecord);
-	MV.move(savemv);
-	DICT.move(savedict);
+	ID.swap(saveid);
+	RECORD.swap(saverecord);
+	MV.swap(savemv);
+	DICT.swap(savedict);
 
 	//a lambda function to restore the environment
 	auto restore_environment = [&]() {
 		// restore some environment
-		savesentence.move(SENTENCE);
-		savecommand.move(COMMAND);
-		saveoptions.move(OPTIONS);
-		saverecur0.move(RECUR0);
-		saverecur1.move(RECUR1);
-		saverecur2.move(RECUR2);
-		saverecur3.move(RECUR3);
-		saverecur4.move(RECUR4);
+		savesentence.swap(SENTENCE);
+		savecommand.swap(COMMAND);
+		saveoptions.swap(OPTIONS);
+		saverecur0.swap(RECUR0);
+		saverecur1.swap(RECUR1);
+		saverecur2.swap(RECUR2);
+		saverecur3.swap(RECUR3);
+		saverecur4.swap(RECUR4);
 		LEVEL--;
 		//
-		saveid.move(ID);
-		saverecord.move(RECORD);
-		savemv.move(MV);
-		savedict.move(DICT);
+		saveid.swap(ID);
+		saverecord.swap(RECORD);
+		savemv.swap(MV);
+		savedict.swap(DICT);
 	};
 
 	SENTENCE = sentence;
