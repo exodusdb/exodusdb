@@ -558,9 +558,92 @@ var var::reverse(SV sepchar) const& {
 	THISIS("var var::reverse(SV sepchar = FM)")
 	assertString(function_sig);
 
-	//split into a temporary dim array for reverseing
+	//split into a temporary dim array for reversing
 	//then join it back up into a single string
-	var nrvo = this->split(sepchar).reverse().join(sepchar);
+	//var nrvo = this->split(sepchar).reverse().join(sepchar);
+
+	const auto sepcharsize = sepchar.size();
+
+	var nrvo = "";
+
+	// Empty string
+	if (var_str.empty())
+		return nrvo;
+
+	// Get a direct reference to the reversed std string for possible performance optimisation
+	auto& nrvo_var_str = nrvo.var_str;
+
+	// Prevent multiple allocations while reverse string is being built up
+	nrvo_var_str.reserve(var_str.size());
+
+	std::size_t startpos = var_str.size() - 1;
+
+	if (sepcharsize == 1) {
+
+		[[likely]];
+
+		// Single byte sepchar
+		//////////////////////
+
+		const char sepchar1 = sepchar[0];
+
+		for (;;) {
+
+			// if sepchar _FM
+			//  abc ... startpos = 2, nextpos = npos
+			auto nextpos = var_str.rfind(sepchar1, startpos);
+			if (nextpos == std::string::npos) {
+				nrvo_var_str.append(var_str, 0, startpos + 1);
+				break;
+			}
+
+			// if sepchar _FM
+			//  _FM     ... startpos = 0, nextpos = 0
+			//  _FM _FM ... startpos = 1, nextpos = 1
+
+			auto nextpos2 = nextpos + 1;
+			nrvo_var_str.append(var_str, nextpos2, startpos - nextpos2 + 1);
+
+			nrvo_var_str.push_back(sepchar1);
+
+			if (nextpos == 0)
+				break;
+
+			startpos = nextpos - 1;
+		}
+
+	} else {
+
+		// Multi-byte sepchar
+		/////////////////////
+
+		for (;;) {
+
+			// if sepchar _FM
+			//  abc ... startpos = 2, nextpos = npos
+			auto nextpos = var_str.rfind(sepchar, startpos);
+			if (nextpos == std::string::npos) {
+				nrvo_var_str.append(var_str, 0, startpos + 1);
+				break;
+			}
+
+			// if sepchar _FM
+			//  _FM     ... startpos = 0, nextpos = 0
+			//  _FM _FM ... startpos = 1, nextpos = 1
+
+			auto nextpos2 = nextpos + sepcharsize;
+			nrvo_var_str.append(var_str, nextpos2, startpos - nextpos2 + 1);
+
+			nrvo_var_str.append(sepchar);
+
+			if (nextpos == 0)
+				break;
+
+			startpos = nextpos - 1;
+		}
+
+	}  // multibyte sepchar
+
 	return nrvo;
 
 }
