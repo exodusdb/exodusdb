@@ -6,6 +6,8 @@ programinit()
 
 	function main() {
 
+	// Also tests var::reverse
+
 	var sep = "^";
 
 	assert(sort(var("10^20.1^2^1^20"), sep).outputl("Numbers sort correctly : ") eq "1^2^10^20^20.1");
@@ -63,6 +65,82 @@ programinit()
 
 	var dimsorted2 = un_sorted2.split(sep).sort().join(sep);
 	assert(dimsorted2 eq gccsorted2 or dimsorted2 eq clgsorted2);
+
+	{
+
+		// test var::reverse with single byte separator
+
+		var sepchar = FM;
+
+		// Identical code above/below
+
+		assert(reverse("", sepchar)    == "");
+		assert(reverse("a", sepchar)   == "a");
+		assert(reverse("ab", sepchar)  == "ab");
+		assert(reverse("abc", sepchar) == "abc");
+
+		assert(reverse(sepchar, sepchar)                         == sepchar);
+		assert(reverse(sepchar ^ sepchar, sepchar)               == (sepchar ^ sepchar));
+		assert(reverse(sepchar ^ sepchar ^ sepchar, sepchar)     == (sepchar ^ sepchar ^ sepchar));
+
+		assert(reverse(sepchar ^ "", sepchar)                    == (""    ^ sepchar));
+		assert(reverse(sepchar ^ "a", sepchar)                   == ("a"   ^ sepchar));
+		assert(reverse(sepchar ^ "ab", sepchar)                  == ("ab"  ^ sepchar));
+		assert(reverse(sepchar ^ "abc", sepchar)                 == ("abc" ^ sepchar));
+
+		assert(reverse("" ^ sepchar, sepchar)                    == (sepchar ^ ""));
+		assert(reverse("a" ^ sepchar, sepchar)                   == (sepchar ^ "a"));
+		assert(reverse("ab" ^ sepchar, sepchar)                  == (sepchar ^ "ab"));
+		assert(reverse("abc" ^ sepchar, sepchar)                 == (sepchar ^ "abc"));
+
+		assert(reverse("x" ^ sepchar ^ "", sepchar)              == (""    ^ sepchar ^ "x"));
+		assert(reverse("x" ^ sepchar ^ "a", sepchar)             == ("a"   ^ sepchar ^ "x"));
+		assert(reverse("x" ^ sepchar ^ "ab", sepchar)            == ("ab"  ^ sepchar ^ "x"));
+		assert(reverse("x" ^ sepchar ^ "abc", sepchar)           == ("abc" ^ sepchar ^ "x"));
+
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "", sepchar)    == (""    ^ sepchar ^ "x" ^ sepchar));
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "a", sepchar)   == ("a"   ^ sepchar ^ "x" ^ sepchar));
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "ab", sepchar)  == ("ab"  ^ sepchar ^ "x" ^ sepchar));
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "abc", sepchar) == ("abc" ^ sepchar ^ "x" ^ sepchar));
+
+	}
+	{
+		// test var::reverse with multiple byte separator
+
+		var sepchar = "qw";
+
+		// Identical code above/below
+
+		assert(reverse("", sepchar)    == "");
+		assert(reverse("a", sepchar)   == "a");
+		assert(reverse("ab", sepchar)  == "ab");
+		assert(reverse("abc", sepchar) == "abc");
+
+		assert(reverse(sepchar, sepchar)                         == sepchar);
+		assert(reverse(sepchar ^ sepchar, sepchar)               == (sepchar ^ sepchar));
+		assert(reverse(sepchar ^ sepchar ^ sepchar, sepchar)     == (sepchar ^ sepchar ^ sepchar));
+
+		assert(reverse(sepchar ^ "", sepchar)                    == (""    ^ sepchar));
+		assert(reverse(sepchar ^ "a", sepchar)                   == ("a"   ^ sepchar));
+		assert(reverse(sepchar ^ "ab", sepchar)                  == ("ab"  ^ sepchar));
+		assert(reverse(sepchar ^ "abc", sepchar)                 == ("abc" ^ sepchar));
+
+		assert(reverse("" ^ sepchar, sepchar)                    == (sepchar ^ ""));
+		assert(reverse("a" ^ sepchar, sepchar)                   == (sepchar ^ "a"));
+		assert(reverse("ab" ^ sepchar, sepchar)                  == (sepchar ^ "ab"));
+		assert(reverse("abc" ^ sepchar, sepchar)                 == (sepchar ^ "abc"));
+
+		assert(reverse("x" ^ sepchar ^ "", sepchar)              == (""    ^ sepchar ^ "x"));
+		assert(reverse("x" ^ sepchar ^ "a", sepchar)             == ("a"   ^ sepchar ^ "x"));
+		assert(reverse("x" ^ sepchar ^ "ab", sepchar)            == ("ab"  ^ sepchar ^ "x"));
+		assert(reverse("x" ^ sepchar ^ "abc", sepchar)           == ("abc" ^ sepchar ^ "x"));
+
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "", sepchar)    == (""    ^ sepchar ^ "x" ^ sepchar));
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "a", sepchar)   == ("a"   ^ sepchar ^ "x" ^ sepchar));
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "ab", sepchar)  == ("ab"  ^ sepchar ^ "x" ^ sepchar));
+		assert(reverse(sepchar ^ "x" ^ sepchar ^ "abc", sepchar) == ("abc" ^ sepchar ^ "x" ^ sepchar));
+
+	}
 
 	printl(elapsedtimetext());
 	printl("Test passed");
