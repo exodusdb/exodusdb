@@ -1488,14 +1488,14 @@ bool var::contains(SV str) const {
 	//
 	if (str.empty()) {
 
-		var(function_sig).errputl();
-		if (not var().osgetenv("EXO_DEBUG")) {
-			// The following triggers a break when EXO_DEBUG is set
-			VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
-			e.description.errput();
-			//e.stack().f(1).errputl(", ");
-			e.stack(1).f(1).errputl(", ");
-		}
+//		var(function_sig).errputl();
+//		if (not var().osgetenv("EXO_DEBUG")) {
+//			// The following triggers a break when EXO_DEBUG is set
+//			VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
+//			e.description.errput();
+//			//e.stack().f(1).errputl(", ");
+//			//e.stack(1).errputl(", ");
+//		}
 
 		return false;
 	}
