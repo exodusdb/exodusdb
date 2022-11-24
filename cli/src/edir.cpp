@@ -67,7 +67,8 @@ function main() {
 		text.raiser();
 
 	// Escape data format to text format
-	if (filename != "DOS")
+	let converttext = filename != "DOS" or text.contains(FM);
+	if (converttext)
 		text = text.oconv(txtfmt);
 
 	//put the text on a temp file in order to edit it
@@ -118,7 +119,8 @@ function main() {
 			}
 
 			// Unescape text back to data format
-			if (filename != "DOS") {
+			//if (filename != "DOS") {
+			if (converttext) {
 
 				trimmerlast(text2, _EOL);
 
