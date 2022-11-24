@@ -4561,6 +4561,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 void var::clearselect() {
 
+	if (DBTRACE)
+		var("clearselect");
+
 	// THISIS("void var::clearselect() const")
 	// assertString(function_sig);
 
@@ -5009,6 +5012,7 @@ bool var::makelist(CVR listname, CVR keys) {
 			// this->loglasterror();
 			throw VarDBException(errmsg);
 		}
+
 		keys.write(lists, listname);
 		return true;
 	}
@@ -5066,6 +5070,12 @@ bool var::hasnext() {
 
 		// otherwise try and get another block
 		var lists = *this;
+		if (!lists.open("LISTS")) {
+			var errmsg = "var::hasnext(): LISTS file cannot be opened";
+			this->setlasterror(errmsg);
+			// this->loglasterror();
+			throw VarDBException(errmsg);
+		}
 
 		var listno = this->f(4);
 		listno++;
