@@ -44,8 +44,8 @@
 programinit()
 
 var verbose;
-var dictfilename;
-var dictfile;
+//var dictfilename;
+//var dictfile;
 var dictrec;
 var errors = "";
 
@@ -292,20 +292,37 @@ COST 10;
 	// ========================
 	// Do one or many/all files
 	// ========================
-	for (var filename : filenames)
-		onefile(filename, dictids, viewsql);
+	for (var filename : filenames) {
+
+		if (not filename.starts("dict.") or filename == "dict.all")
+			continue;
+
+		onefile(filename, dictids);
+
+		//add one file for the dict_all sql using sql UNION
+		if (viewsql) {
+			viewsql ^= "SELECT '" ^ filename.cut(5).ucase() ^ "'||'*'||key as key, data\n";
+			viewsql ^= "FROM " ^ filename ^ "\n";
+			viewsql ^= "UNION\n";
+		}
+	}
 
 	if (doall) {
-		//ignore error if doesnt exist
-		if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW IF EXISTS dict.all"))
-			rawsqlexec("DROP VIEW IF EXISTS dict.all");
 
 		if (filenames.contains(FM)) {
+		//if (filenames.contains(FM) and viewsql.ends("UNION\n")) {
+
+			//ignore error if doesnt exist
+			if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW IF EXISTS dict.all"))
+				rawsqlexec("DROP VIEW IF EXISTS dict.all");
+
 			//remove trailing "UNION" word
 			viewsql.cutter(-6);
-			var errmsg;
+
 			if (verbose)
 				viewsql.output("SQL:");
+
+			var errmsg;
 			if (dictconnection.sqlexec(viewsql, errmsg))
 				printl("dict.all file created");
 			else {
@@ -389,7 +406,8 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	//do drop function first if suggested
 	if (errmsg.contains("DROP FUNCTION")) {
 
-		let dropsql = "drop function " ^ functionname_and_args;
+		let dropsql = "drop function if exists " ^ functionname_and_args;
+		//let dropsql = "drop function if exists " ^ functionname_and_args.field("(", 1);
 		if (verbose)
 			dropsql.outputl();
 
@@ -444,19 +462,22 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	return;
 }
 
-subroutine onefile(in dictfilename, in dictids, io viewsql) {
-	for (var dictid : dictids)
-		onefileonedict(dictfilename, dictid, viewsql);
-}
+subroutine onefile(in dictfilename, in dictids) {
 
-subroutine onefileonedict(in dictfilename, in reqdictid, io viewsql) {
-
-	if (not dictfilename.starts("dict.") or dictfilename == "dict.all")
-		return;
-
+	var dictfile;
 	if (!open(dictfilename, dictfile)) {
 		abort(lasterror());
 	}
+
+	if (dictids) {
+		for (var dictid : dictids)
+			onefileonedict(dictfile, dictfilename, dictid);
+	} else {
+			onefileonedict(dictfile, dictfilename, "");
+	}
+}
+
+subroutine onefileonedict(in dictfile, in dictfilename, in reqdictid) {
 
 	if (reqdictid)
 		makelist("", reqdictid);
@@ -465,20 +486,13 @@ subroutine onefileonedict(in dictfilename, in reqdictid, io viewsql) {
 
 	var dictid;
 	while (readnext(dictid)) {
-		onedictid(dictfilename, dictid, reqdictid);
-	}
-
-	//add one file for the dict_all sql using sql UNION
-	if (viewsql) {
-		viewsql ^= "SELECT '" ^ dictfilename.cut(5).ucase() ^ "'||'*'||key as key, data\n";
-		viewsql ^= "FROM " ^ dictfilename ^ "\n";
-		viewsql ^= "UNION\n";
+		onedictid(dictfile, dictfilename, dictid, reqdictid);
 	}
 
 	return;
 }
 
-subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
+subroutine onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 
 	//get the dict source code
 	var dictrec;
