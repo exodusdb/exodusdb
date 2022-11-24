@@ -1118,58 +1118,64 @@ var ExodusProgramBase::perform(CVR sentence) {
 
 	//perform_callable_.mv_ = (&mv);
 
-	// save some environment
-	var savesentence;
-	var savecommand;
-	var saveoptions;
-	var saverecur0;
-	var saverecur1;
-	var saverecur2;
-	var saverecur3;
-	var saverecur4;
-	//
-	var saveid;
-	var saverecord;
-	var savemv;
-	var savedict;
+	// Save some environment
+	////////////////////////
 
-	//SENTENCE.move(savesentence);
-	// Take a copy since they might be the same variable
+	var savesentence = "";
+	var savecommand = "";
+	var saveoptions = "";
+	var saverecur0 = "";
+	var saverecur1 = "";
+	var saverecur2 = "";
+	var saverecur3 = "";
+	var saverecur4 = "";
+	//
+	var saveid = "";
+	var saverecord = "";
+	var savemv = "";
+	var savedict = "";
+
+	//SENTENCE.swap(savesentence);
+	// Must take a *COPY* since sentence and SENTENCE might be the same variable
 	// if called like 'perform(SENTENCE)'
 	savesentence = SENTENCE;
 
-	COMMAND.move(savecommand);
-	OPTIONS.move(saveoptions);
-	RECUR0.move(saverecur0);
-	RECUR1.move(saverecur1);
-	RECUR2.move(saverecur2);
-	RECUR3.move(saverecur3);
-	RECUR4.move(saverecur4);
+	COMMAND.swap(savecommand);
+	OPTIONS.swap(saveoptions);
+	RECUR0.swap(saverecur0);
+	RECUR1.swap(saverecur1);
+	RECUR2.swap(saverecur2);
+	RECUR3.swap(saverecur3);
+	RECUR4.swap(saverecur4);
 	LEVEL++;
 	//
-	ID.move(saveid);
-	RECORD.move(saverecord);
-	MV.move(savemv);
-	DICT.move(savedict);
+	ID.swap(saveid);
+	RECORD.swap(saverecord);
+	MV.swap(savemv);
+	DICT.swap(savedict);
 
-	//a lambda function to restore the environment
+	// A function to restore the environment
+	////////////////////////////////////////
 	auto restore_environment = [&]() {
 		// restore some environment
-		savesentence.move(SENTENCE);
-		savecommand.move(COMMAND);
-		saveoptions.move(OPTIONS);
-		saverecur0.move(RECUR0);
-		saverecur1.move(RECUR1);
-		saverecur2.move(RECUR2);
-		saverecur3.move(RECUR3);
-		saverecur4.move(RECUR4);
+		savesentence.swap(SENTENCE);
+		savecommand.swap(COMMAND);
+		saveoptions.swap(OPTIONS);
+		saverecur0.swap(RECUR0);
+		saverecur1.swap(RECUR1);
+		saverecur2.swap(RECUR2);
+		saverecur3.swap(RECUR3);
+		saverecur4.swap(RECUR4);
 		LEVEL--;
 		//
-		saveid.move(ID);
-		saverecord.move(RECORD);
-		savemv.move(MV);
-		savedict.move(DICT);
+		saveid.swap(ID);
+		saverecord.swap(RECORD);
+		savemv.swap(MV);
+		savedict.swap(DICT);
 	};
+
+	// Do the perform
+	/////////////////
 
 	SENTENCE = sentence;
 	while (SENTENCE) {
@@ -1191,7 +1197,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 		}
 
 
-		// load the shared library file
+		// Load the shared library file
 		var libid = SENTENCE.field(" ", 1).lcase();
 		std::string libname = libid.toString();
 		if (!perform_callable_.initsmf(
@@ -1207,7 +1213,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			break;
 		}
 
-		// call the shared library exodus object's main function
+		// Call the shared library exodus object's main function
 		try {
 
 			//ANS = perform_callable_.callsmf();
@@ -1242,6 +1248,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 //			// if return "" is missing then default ANS to ""
 //			ANS = "";
 
+		// Stop
 		catch (const MVStop&) {
 			// stop is normal way of stopping a perform
 			// functions can call it to terminate the whole "program"
@@ -1250,6 +1257,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			ANS = "";
 		}
 
+		// Abort
 		catch (const MVAbort& e) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
@@ -1257,6 +1265,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			ANS = "";
 		}
 
+		// AbortAll
 		catch (const MVAbortAll&) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
@@ -1264,7 +1273,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			ANS = "";
 		}
 
-		//TODO create a second version of this whole try/catch block
+		//TODO Create a second version of this whole try/catch block
 		//that omits catch (VarError) if EXO_DEBUG is set
 		//so that gdb will catch the original error and allow backtracing there
 		//Until then, use gdb "catch throw" as mentioned below.
@@ -1273,11 +1282,11 @@ var ExodusProgramBase::perform(CVR sentence) {
 			//in caller and the program resumes processing
 			restore_environment();
 
-			//use gdb command "catch throw" to break at error line to get back traces there
+			// Use gdb command "catch throw" to break at error line to get back traces there
 			throw;
 		}
 
-		//dont catch MVLogoff in perform/execute. leave it for exoprog top level exit
+		// Dont catch MVLogoff in perform/execute. leave it for exoprog top level exit
 		//catch (const MVLogoff& e)
 		//{
 		//	// similar to stop for the time being
@@ -1286,17 +1295,17 @@ var ExodusProgramBase::perform(CVR sentence) {
 		//	ANS = "";
 		//}
 
-		// chain is a kind of optional follow controlled by the library function
+		// CHAIN is a kind of optional follow-on controlled by the library function
 		// to perform another function after the first
-		// go round again if anything in CHAIN
+		// Go round again if anything in CHAIN
 		CHAIN.move(SENTENCE);
 	}
 
-	// restore some environment
+	// restore various environment variables
 	restore_environment();
 
 //	// Futile attempt to recover from performing a subroutine which returns void instead of var
-//	// This is attrocious undefined behaviour in C++
+//	// This is atrocious undefined behaviour in C++
 //	// TODO check that we only callsmf on libraries that provide FUNCTION main
 //	// OR call libraries with SUBROUTINE main with new function maybe callsubroutine
 //	//if (ANS.undefined() or ANS.unassigned()) {
@@ -1320,7 +1329,7 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 
 	// TODO implement additional MV argument
 
-	// key can be multivalued and multivalued result will be returned
+	// Key can be multivalued and will return a multivalued result
 	var results = "";
 	var nkeys = key.fcount(VM);
 
@@ -1337,32 +1346,32 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 
 		var keyx = key.f(1, keyn);
 
-		// if ordinary numeric or "" fieldno
+		// If ordinary numeric or "" fieldno
 		if (is_fieldno) {
 			results.r(keyn, keyx.xlate(filename, fieldno_or_name, mode));
 		}
 
-		// otherwise handle non-numeric field_no ie dictionary field/column name
+		// Otherwise handle non-numeric field_no ie dictionary field/column name
 		else {
 
-			// get the whole record
+			// Get the whole record
 			var record = keyx.xlate(filename, "", mode);
 
 			// TODO what if key is multivalued?
 
-			// handle record not found and mode C
+			// Handle record not found and mode C
 			if (*mode == 'C' && record == keyx) {
 				results.r(keyn, key);
 				continue;
 			}
 
-			// handle record not found and mode X
+			// Handle record not found and mode X
 			if (not record.len()) {
 				results.r(keyn, "");
 				continue;
 			}
 
-			// use calculate()
+			// Use calculate() with four parameters
 			var result =
 				calculate(fieldno_or_name, dictfile, keyx, record);
 			if (nkeys > 1)
@@ -1396,13 +1405,16 @@ var ExodusProgramBase::calculate(CVR dictid, CVR dictfile, CVR id, CVR record, C
 	// and all it to work with const arguments.
 	// TODO replace with const_cast?
 
+	// Save and reconfigure the relevent environment variables
 	DICT.swap(dictfile);
 	ID.swap(id);
 	RECORD.swap(record);
 	MV.swap(mvno);
 
+	// Call the normal calculate function
 	var result = calculate(dictid);
 
+	// Restore the environment variables
 	DICT.swap(dictfile);
 	ID.swap(id);
 	RECORD.swap(record);
