@@ -341,9 +341,10 @@ var var::iconv_D(const char* conversion) const {
 	// or refuse anything but four digit years
 	if (year <= 99) {
 		if (year >= year_50) {
+			var year2 = year;
 			year += year_2000 - 100;
-			//std::cerr << "WARNING: 2 digit year >= " << year_50 << " being converted to " << year << std::endl;
-			errputl("WARNING: 2 digit year >= " ^ var(year_50) ^ " being converted to " ^ year);
+			var warning = "WARNING: 2 digit year " ^ year2.quote() ^ " between " ^ var(year_50) ^ " and 99 converted to " ^ var(year).quote();
+			warning.logputl();
 		} else
 			year += year_2000;
 	}
