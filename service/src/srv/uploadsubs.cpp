@@ -68,6 +68,7 @@ function main(in mode) {
 			return invalid(msg);
 		}
 
+		var file;
 		var rec;
 		if (not(rec.read(file, key))) {
 			msg = "upload.subs cannot read " ^ filename ^ " " ^ key;

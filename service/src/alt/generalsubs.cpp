@@ -156,7 +156,6 @@ next:
 		}
 
 	} else {
-		chr(7).output();
 		call mssg(mode.quote() ^ " - invalid mode ignored");
 		// valid=0
 	}

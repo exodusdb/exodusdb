@@ -513,7 +513,6 @@ nextreport:
 	}
 
 	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
-		chr(7).output();
 		msg		= "The DEFINITIONS file is missing";
 		msg(-1) = "Did you startup using the right command file/datasettype?";
 		call note(msg);
@@ -558,7 +557,6 @@ nextreport:
 	if (((initmode != "LOGIN" and LEVEL != 1) and interactive) and not(resetting)) {
 		msg		= "You cannot quit from within another program via F10.";
 		msg(-1) = "Please quit all programs first and then try again.";
-		chr(7).output();
 		call note(msg);
 		stop();
 	}
@@ -590,7 +588,6 @@ nextreport:
 		msg ^= FM ^ "YOUR WORKSTATION NAME (" ^ STATION.trim() ^ ")";
 		msg ^= FM ^ "CONTAINS QUOTATION MARKS. PLEASE ASK YOUR ";
 		msg ^= FM ^ "TECHNICIAN TO CHANGE THE WORKSTATION NAME.";
-		chr(7).output();
 		call note("!" ^ msg ^ "|");
 	}
 
@@ -932,7 +929,6 @@ nextreport:
 		if (notherusers) {
 			msg ^= "||There is/are " ^ notherusers ^ " other users online.";
 		}
-		chr(7).output();
 		call note(msg ^ "|");
 		// stop
 		// if freemb then perform 'OFF'
@@ -1176,7 +1172,6 @@ nextreport:
 	}
 
 	if (not valid) {
-		chr(7).output();
 		if (interactive) {
 			call note("DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING");
 		}
