@@ -34,6 +34,7 @@ set -euxo pipefail
 : Regenerate dict_xxxxxxxx.cpp files where dat have files changed
 : ===============================================================
 :
+	touch dat
 	syncdat dat {G$COMPILER_OPTIONS}
 
 :
