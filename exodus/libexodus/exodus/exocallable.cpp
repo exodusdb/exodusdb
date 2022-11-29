@@ -320,13 +320,20 @@ void Callable::operator=(const char* newlibname) {
 	if (newlibname != libname_) {
 		closelib();
 		// Attach immediately to prevent init("xxxxx") being called
-		//libname_ = newlibname;
-		this->attach(newlibname);
+		// and ease debugging at point of assignment in case of error
+		if (!*newlibname)
+			// After setting libname to "', a call will result in the init("xxxxxx") in the .h file being called
+			// i.e. the original library name will be called.
+			// e.g. the systemsubs.cpp stub provided for general calls
+			libname_ = newlibname;
+		else
+			this->attach(newlibname);
 	}
 	return;
 }
 
 bool Callable::checkload(const std::string newlibname, const std::string newfuncname) {
+
 	if (TRACING >= 4) {
 		std::cout << "exocallable:checkload: in>" << newlibname << " " << newfuncname
 			  << std::endl;
@@ -335,21 +342,20 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 	// find the library or fail
 	if (not openlib(newlibname)) {
 
-	if (TRACING >= 1) {
-		std::cout << "exocallable:checkload: ko:" << newlibname << std::endl;
-	}
-
+		if (TRACING >= 1) {
+			std::cout << "exocallable:checkload: ko:" << newlibname << std::endl;
+		}
 		throw VarError("Unable to load " ^ var(libfilepath_));
 		return false;
 	}
 
 	// find the function or fail
 	if (not openfunc(newfuncname)) {
-	if (TRACING >= 1) {
-		std::cout << "exocallable:checkload: ko:" << libname_ << " " << newfuncname
-				  << std::endl;
-	}
 
+		if (TRACING >= 1) {
+			std::cout << "exocallable:checkload: ko:" << libname_ << " " << newfuncname
+					  << std::endl;
+		}
 		throw VarError("Unable to find function " ^ var(newfuncname) ^ " in " ^
 					  var(libfilepath_));
 		return false;

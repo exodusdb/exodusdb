@@ -7,7 +7,7 @@ libraryinit()
 
 #include <request.hpp>
 
-	var mode;
+var mode;
 
 function main(in mode0) {
 
