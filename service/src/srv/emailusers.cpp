@@ -159,7 +159,7 @@ nextuser:
 	}
 
 	// only users on file
-	if (not(userx.read(users, usercode))) {
+	if (not userx.read(users, usercode)) {
 		goto nextuser;
 	}
 

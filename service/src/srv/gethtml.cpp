@@ -63,7 +63,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 	letterheadcompany = "";
 	if (hascompanies) {
 		if (not(srv.companies.unassigned() or srv.companies == "")) {
-			if (not(letterheadcompany.read(srv.companies, compcode))) {
+			if (not letterheadcompany.read(srv.companies, compcode)) {
 				letterheadcompany = "";
 			}
 		}
@@ -334,7 +334,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			if (imagecompcode) {
 				// get image type from the other company
 				var imagecomp;
-				if (not(imagecomp.read(srv.companies, imagecompcode))) {
+				if (not imagecomp.read(srv.companies, imagecompcode)) {
 					imagecomp = "";
 				}
 				imagetype = imagecomp.f(62, coln);
@@ -378,7 +378,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 			text			= "";
 			var textcompany = "";
 			if (hascompanies) {
-				if (not(textcompany.read(srv.companies, textcompcode))) {
+				if (not textcompany.read(srv.companies, textcompcode)) {
 					textcompany = "";
 				}
 			}
@@ -424,7 +424,7 @@ nextprefix:
 	// /////////
 	keyx = prefix ^ modex.f(1, 1) ^ var(".htm").ucase();
 
-	if (not(letterhead.read(DEFINITIONS, keyx))) {
+	if (not letterhead.read(DEFINITIONS, keyx)) {
 
 		// try again same mode but without company code prefix
 		if (prefix) {

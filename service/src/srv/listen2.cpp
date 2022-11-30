@@ -157,7 +157,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		var users;
 		if (users.open("USERS", "")) {
 			// EXODUS may have no user record
-			if (not(userx.read(users, username))) {
+			if (not userx.read(users, username)) {
 				userx = "";
 			}
 		}
@@ -463,7 +463,7 @@ passwordexpired:
 
 							// some users may be allowed to login rarely without password renewal
 							var xx;
-							if (not(authorised("AUTHORISATION PASSWORD NEVER EXPIRES", xx, "EXODUS", username))) {
+							if (not authorised("AUTHORISATION PASSWORD NEVER EXPIRES", xx, "EXODUS", username)) {
 								invalidlogin = "Password has expired. Get a new one using Password Reset";
 								goto validateexit;
 							}
@@ -717,7 +717,7 @@ validateexit2:
 					usersordefinitions = DEFINITIONS;
 					userkey			   = "BADUSER*" ^ username;
 					realreason		   = "Invalid usercode";
-					if (not(RECORD.read(usersordefinitions, userkey))) {
+					if (not RECORD.read(usersordefinitions, userkey)) {
 						RECORD = "";
 					}
 				}
@@ -896,7 +896,7 @@ validateexit2:
 				let tt = (time() / 3600).floor() + 1;
 				key ^= "*" ^ tt;
 				var statistic;
-				if (not(statistic.read(statistics, key))) {
+				if (not statistic.read(statistics, key)) {
 					statistic = "";
 				}
 				// by not doing 'MD50P'
@@ -954,7 +954,7 @@ validateexit2:
 		if (users.open("USERS", "")) {
 
 			// allow for EXODUS not in users - all others should be but if not then create
-			if (not(userrec.read(users, username))) {
+			if (not userrec.read(users, username)) {
 				userrec = "";
 			}
 

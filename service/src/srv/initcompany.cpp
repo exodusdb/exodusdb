@@ -23,7 +23,7 @@ function main(in nextcompanycode) {
 
 		if (nextcompanycode) {
 			var xx;
-			if (not(xx.read(srv.companies, nextcompanycode))) {
+			if (not xx.read(srv.companies, nextcompanycode)) {
 				call sysmsg(nextcompanycode.quote() ^ " COMPANY IS MISSING IN INIT.COMPANY()");
 				// TODO return abort code and change all callers to handle failure
 				return 0;
@@ -36,7 +36,7 @@ function main(in nextcompanycode) {
 
 	let oldcompany = srv.company;
 	if (srv.gcurrcompcode) {
-		if (not(srv.company.read(srv.companies, srv.gcurrcompcode))) {
+		if (not srv.company.read(srv.companies, srv.gcurrcompcode)) {
 			call mssg("COMPANY " ^ (srv.gcurrcompcode.quote()) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
 			srv.company = srv.gcurrcompcode;
 		}

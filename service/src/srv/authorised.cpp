@@ -119,7 +119,7 @@ updateprivs:
 			SECURITY(10, taskn) = defaultlock;
 			if (renaming) {
 				// skip warning except for live databases included in startup
-				if (not(SYSTEM.f(61))) {
+				if (not SYSTEM.f(61)) {
 					if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
 						call note("Task renamed:|Old: " ^ task ^ "|New: " ^ defaultlock);
 					}
@@ -260,7 +260,7 @@ notallowed:
 subroutine readuserprivs() {
 	// in case called from FILEMAN due to no datasets
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
-		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+		if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
 			SECURITY = "";
 		}
 	} else {

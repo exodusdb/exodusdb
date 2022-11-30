@@ -51,8 +51,8 @@ function main(in mode) {
 
 		// get/update next document number
 		var nextno;
-		if (not(nextno.read(srv.documents, "0"))) {
-			if (not(nextno.osread(where ^ "0"))) {
+		if (not nextno.read(srv.documents, "0")) {
+			if (not nextno.osread(where ^ "0")) {
 				nextno = "";
 			}
 		}
@@ -104,7 +104,7 @@ nextdoc:
 
 			// check if allowed to modify
 			if (taskprefix) {
-				if (not(authorised(taskprefix ^ " UPDATE", msg, ""))) {
+				if (not authorised(taskprefix ^ " UPDATE", msg, "")) {
 					call mssg(msg);
 					unlockrecord(req.datafile, req.srcfile, ID);
 					req.wlocked = 0;
@@ -132,7 +132,7 @@ nextdoc:
 			let task = RECORD.f(5);
 			let taskprefix = gosub gettaskprefix(task);
 			if (taskprefix) {
-				if (not(authorised(taskprefix ^ " CREATE", msg, ""))) {
+				if (not authorised(taskprefix ^ " CREATE", msg, "")) {
 					return invalid(msg);
 				}
 			}
@@ -177,7 +177,7 @@ nextdoc:
 
 			// check if allowed to delete
 			if (taskprefix) {
-				if (not(authorised(taskprefix ^ " DELETE", msg, ""))) {
+				if (not authorised(taskprefix ^ " DELETE", msg, "")) {
 					return invalid(msg);
 				}
 			}

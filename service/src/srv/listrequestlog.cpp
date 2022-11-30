@@ -12,7 +12,7 @@ var msg;
 
 function main() {
 
-	if (not(authorised("REQUESTLOG ACCESS", msg))) {
+	if (not authorised("REQUESTLOG ACCESS", msg)) {
 		call mssg(msg);
 		stop();
 	}

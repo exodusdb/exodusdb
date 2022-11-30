@@ -137,7 +137,7 @@ function main(in mode) {
 			}
 		}
 
-		if (not(authorised(filename ^ " ACCESS", msg, defaultlock))) {
+		if (not authorised(filename ^ " ACCESS", msg, defaultlock)) {
 			gosub invalid(msg);
 			if (interactive) {
 				stop();
@@ -173,7 +173,7 @@ function main(in mode) {
 			}
 		}
 
-		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+		if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
 			SECURITY = "";
 		}
 		// in case not cleared in save/write
@@ -361,7 +361,7 @@ function main(in mode) {
 		endn_	= RECORD.f(21);
 
 		if (not interactive) {
-			if (not(origfullrec_.read(DEFINITIONS, "SECURITY"))) {
+			if (not origfullrec_.read(DEFINITIONS, "SECURITY")) {
 				msg = "SECURITY missing from DEFINITIONS";
 				return invalid(msg);
 			}
@@ -606,7 +606,7 @@ function main(in mode) {
 
 					// get the current user record
 					var userrec;
-					if (not(userrec.read(users, userx))) {
+					if (not userrec.read(users, userx)) {
 						userrec		= "";
 						userrec(34) = menuid;
 					}
@@ -813,7 +813,7 @@ function main(in mode) {
 
 		// also called in postwrite in noninteractive mode
 
-		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+		if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
 			SECURITY = "";
 		}
 		if (interactive) {

@@ -280,7 +280,7 @@ function main() {
 	let exodusid = var("exodus.id").osfile();
 
 	call log2("*determine the pid if possible", logtime);
-	if (not(SYSTEM.f(54))) {
+	if (not SYSTEM.f(54)) {
 		SYSTEM(54) = SYSTEM.f(33);
 	}
 	// 	if (VOLUMES) {
@@ -314,7 +314,7 @@ function main() {
 		}
 		if (DEFINITIONS.open("DEFINITIONS", "")) {
 			var dbversion;
-			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
+			if (not dbversion.read(DEFINITIONS, "DBVERSION")) {
 				goto updateversion;
 			}
 			if (oldmethod and dbversion.f(1) == "14334.5") {
@@ -433,10 +433,10 @@ updateversion:
 	// call settime('')
 
 	call log2("*save the original username and station", logtime);
-	if (not(SYSTEM.f(43))) {
+	if (not SYSTEM.f(43)) {
 		SYSTEM(43) = USERNAME;
 	}
-	if (not(SYSTEM.f(44))) {
+	if (not SYSTEM.f(44)) {
 		SYSTEM(44) = STATION.trim();
 	}
 
@@ -494,7 +494,7 @@ nextreport:
 							}
 						} else {
 							var oldrecord;
-							if (not(oldrecord.read(file, keyx))) {
+							if (not oldrecord.read(file, keyx)) {
 								oldrecord = "";
 							}
 							// only update documents if changed anything except update timedate
@@ -609,7 +609,7 @@ nextreport:
 
 	call log2("*get DEFINITIONS SYSTEM parameters", logtime);
 	// do in reverse order so that the higher levels get priority
-	if (not(SYSTEM.read(DEFINITIONS, "SYSTEM"))) {
+	if (not SYSTEM.read(DEFINITIONS, "SYSTEM")) {
 		SYSTEM = "";
 	}
 //	tt	= "system.cfg";
@@ -670,7 +670,7 @@ nextreport:
 
 	// ! system configuration defaults
 	// installation group
-	if (not(SYSTEM.f(123))) {
+	if (not SYSTEM.f(123)) {
 		SYSTEM(123) = "GLOBAL";
 	}
 	// upgrades yes
@@ -678,15 +678,15 @@ nextreport:
 		SYSTEM(124) = 1;
 	}
 	// close after backup yes
-	if (not(SYSTEM.f(125))) {
+	if (not SYSTEM.f(125)) {
 		SYSTEM(125) = 2;
 	}
 	// test should start missing processes
-	if (not(SYSTEM.f(126))) {
+	if (not SYSTEM.f(126)) {
 		SYSTEM(126) = 0;
 	}
 
-	if (not(SYSTEM.f(57))) {
+	if (not SYSTEM.f(57)) {
 		call log2("*determine systemid from old smtp sender name", logtime);
 		tpath = "../../";
 		tpath.converter("/", OSSLASH);
@@ -709,7 +709,7 @@ nextreport:
 			sysname.converter("!\"#$%^&*()_+-=[]{};:@,./<>?", "");
 			SYSTEM(57) = sysname;
 			// call osread(tt,'system.cfg')
-			if (not(tt.osread("system.cfg"))) {
+			if (not tt.osread("system.cfg")) {
 				tt = "";
 			}
 			tt(57) = sysname;
@@ -798,10 +798,10 @@ nextreport:
 		SYSTEM(49) = tt ^ OSSLASH;
 	}
 
-	if (not(SYSTEM.f(46, 1))) {
+	if (not SYSTEM.f(46, 1)) {
 		SYSTEM(46, 1) = "#FFFF80";
 	}
-	if (not(SYSTEM.f(46, 2))) {
+	if (not SYSTEM.f(46, 2)) {
 		SYSTEM(46, 2) = "#FFFFC0";
 	}
 	// if system<46,3> else system<46,3>=''
@@ -946,7 +946,7 @@ nextreport:
 	DATEFMT = "D2/E";
 
 	call log2("*get security - also in LISTEN", logtime);
-	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+	if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
 		var temp;
 		if (temp.open("DICT.DEFINITIONS")) {
 			if (SECURITY.read(temp, "SECURITY")) {
@@ -975,61 +975,61 @@ nextreport:
 	// end else
 	// tt='EXODUS'
 	// end
-	if (not(authorised("DATABASE STOP", msg, tt))) {
+	if (not authorised("DATABASE STOP", msg, tt)) {
 		// Task added
 	}
-	if (not(authorised("DATABASE RESTART", msg, tt))) {
+	if (not authorised("DATABASE RESTART", msg, tt)) {
 		// Task added
 	}
-	if (not(authorised("DATASET COPY", msg, tt))) {
+	if (not authorised("DATASET COPY", msg, tt)) {
 		// Task added
 	}
 	// if security('%RENAME%':'AUTHORISATION UPDATE KEYS',msg,'AUTHORISATION UPDATE GROUPS') else null
-	if (not(authorised("AUTHORISATION UPDATE", msg, tt))) {
+	if (not authorised("AUTHORISATION UPDATE", msg, tt)) {
 		// Task added
 	}
-	if (not(authorised("AUTHORISATION UPDATE LOCKS", msg, tt))) {
+	if (not authorised("AUTHORISATION UPDATE LOCKS", msg, tt)) {
 		// Task added
 	}
-	if (not(authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, tt))) {
+	if (not authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, tt)) {
 		// Task added
 	}
-	if (not(authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, tt))) {
+	if (not authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, tt)) {
 		// Task added
 	}
 
 	if (tt == "GS") {
 		tt = "LS";
 	}
-	if (not(authorised("SYSTEM CONFIGURATION CREATE", msg, tt))) {
+	if (not authorised("SYSTEM CONFIGURATION CREATE", msg, tt)) {
 		// Task added
 	}
-	if (not(authorised("SYSTEM CONFIGURATION UPDATE", msg, tt))) {
+	if (not authorised("SYSTEM CONFIGURATION UPDATE", msg, tt)) {
 		// Task added
 	}
-	if (not(authorised("SYSTEM CONFIGURATION DELETE", msg, tt))) {
+	if (not authorised("SYSTEM CONFIGURATION DELETE", msg, tt)) {
 		// Task added
 	}
 
-	if (not(authorised("CURRENCY UPDATE DECIMALS", msg, "EXODUS"))) {
+	if (not authorised("CURRENCY UPDATE DECIMALS", msg, "EXODUS")) {
 		// Task added
 	}
-	if (not(authorised("MENU SUPPORT", msg, "LS"))) {
+	if (not authorised("MENU SUPPORT", msg, "LS")) {
 		// Task added
 	}
 	// if security('%DELETE%':'SUPPORT MENU ACCESS',xx) else null
 	// if security('%DELETE%':'USE TCL COMMAND KEY F5',xx) else null
-	if (not(authorised("UPLOAD CREATE", xx))) {
+	if (not authorised("UPLOAD CREATE", xx)) {
 		// Task added
 	}
-	if (not(authorised("REQUESTLOG ACCESS", msg, "LS"))) {
+	if (not authorised("REQUESTLOG ACCESS", msg, "LS")) {
 		// Task added
 	}
 
 	// if security('%RENAME%':'AUTHORISATION CREATE USERS',xx,'USER CREATE') else null
 	// if security('%RENAME%':'AUTHORISATION DELETE USERS',xx,'USER DELETE') else null
 	// !if security('%UPDATE%':'USER UPDATE',xx,'AUTHORISATION UPDATE') else null
-	if (not(authorised("USER UPDATE", xx, "AUTHORISATION UPDATE"))) {
+	if (not authorised("USER UPDATE", xx, "AUTHORISATION UPDATE")) {
 		// Task added
 	}
 
@@ -1357,7 +1357,7 @@ fixnextcompany:
 	srv.gcurrcompcode = "";
 	var maxyear		  = "";
 	if (readnext(companycode)) {
-		if (not(srv.company.read(srv.companies, companycode))) {
+		if (not srv.company.read(srv.companies, companycode)) {
 			goto fixnextcompany;
 		}
 
@@ -1376,7 +1376,7 @@ fixnextcompany:
 		if (marketcode) {
 			if (srv.markets.open("MARKETS", "")) {
 				var market;
-				if (not(market.read(srv.markets, marketcode))) {
+				if (not market.read(srv.markets, marketcode)) {
 					market = "";
 					msg	   = marketcode.quote() ^ " is missing from company " ^ companycode;
 					call note(msg);
@@ -1471,7 +1471,7 @@ convcompany:
 
 	call log2("*ensure random key exists", logtime);
 	var	 datasetid;
-	if (not(datasetid.read(DEFINITIONS, "GLOBALDATASETID"))) {
+	if (not datasetid.read(DEFINITIONS, "GLOBALDATASETID")) {
 newdatasetid:
 		dostime	  = ostime();
 		datasetid = date() ^ "." ^ dostime;
@@ -1534,7 +1534,7 @@ adddatasetcodename:
 
 		call log2("*show and update last login time", logtime);
 		var	 userx;
-		if (not(userx.read(DEFINITIONS, "USER*" ^ USERNAME))) {
+		if (not userx.read(DEFINITIONS, "USER*" ^ USERNAME)) {
 			userx = "";
 		}
 		if (userx.f(4) and interactive) {
@@ -1583,7 +1583,7 @@ adddatasetcodename:
 		// per installation or slow things done only in live
 		// so assuming test starts first then at least test is running
 		// live systems only
-		if (not(SYSTEM.f(61))) {
+		if (not SYSTEM.f(61)) {
 			call initgeneral2("COMPRESSLOGS", logtime);
 			call initgeneral2("TRIMREQUESTLOG", logtime);
 			call initgeneral2("REORDERDBS", logtime);
@@ -1634,7 +1634,7 @@ adddatasetcodename:
 
 		// update software version in database
 		let lastupdate_key = "VERSION*LASTEMAILED";
-		if (not(tt.read(DEFINITIONS, lastupdate_key))) {
+		if (not tt.read(DEFINITIONS, lastupdate_key)) {
 			tt = "";
 		}
 		if (tt != versioninstalled) {
@@ -1642,7 +1642,7 @@ adddatasetcodename:
 
 			// email users on live systems LISTED IN SYSTEM CONFIGURATION only
 			if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
-				if (not(SYSTEM.f(61))) {
+				if (not SYSTEM.f(61)) {
 					let idate = version.field(" ", 2, 4).iconv("D");
 					let itime = version.field(" ", 1).iconv("MT");
 					// tt=idate 'D/J':' ':itime 'MT'

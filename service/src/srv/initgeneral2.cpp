@@ -269,7 +269,7 @@ nextuser:
 				goto nextuser;
 			}
 			var userx;
-			if (not(userx.read(users, userid))) {
+			if (not userx.read(users, userid)) {
 				goto nextuser;
 			}
 			var origuser = userx;
@@ -488,7 +488,7 @@ nextuser:
 		menutx.replacer(FM, _EOL);
 
 		let menuosfilename = "../data/menu.htm";
-		if (not(oldmenu.osread(menuosfilename))) {
+		if (not oldmenu.osread(menuosfilename)) {
 			oldmenu = "";
 		}
 		if (menutx != oldmenu) {

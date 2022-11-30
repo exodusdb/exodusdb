@@ -64,7 +64,7 @@ function main(in mode) {
 
 			// maybe can only update self
 			// if security('AUTHORISATION UPDATE',xx) else
-			if (not(authorised("USER UPDATE"))) {
+			if (not authorised("USER UPDATE")) {
 				req.srcfile.unlock(ID);
 				req.wlocked = 0;
 			}
@@ -193,7 +193,7 @@ function main(in mode) {
 		}
 
 		// get the latest userprivs
-		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+		if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
 			msg = "SECURITY is missing from DEFINITIONS";
 			gosub unlocksec();
 			call  sysmsg(msg);
@@ -211,7 +211,7 @@ function main(in mode) {
 		// also name, email and department
 		if (mode == "PREWRITE") {
 			if (req.orec) {
-				if (not(authorised("AUTHORISATION UPDATE"))) {
+				if (not authorised("AUTHORISATION UPDATE")) {
 					// expiry date
 					if (req.orec.f(35)) {
 						RECORD(35) = req.orec.f(35);
@@ -355,7 +355,7 @@ function main(in mode) {
 		select(req.srcfile);
 
 		while (true) {
-			if (not(readnext(ID))) {
+			if (not readnext(ID)) {
 				ID = "*!%";
 			}
 			// /BREAK;

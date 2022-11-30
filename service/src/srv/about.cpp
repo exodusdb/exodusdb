@@ -84,7 +84,7 @@ subroutine getver() {
 	versiondata = "/version.dat";
 	versiondata.converter("/", OSSLASH);
 	// osread ver from dir:'\version.dat' else return;*ver='Not installed'
-	if (not(ver.osread(dir ^ versiondata))) {
+	if (not ver.osread(dir ^ versiondata)) {
 		return;
 	}
 

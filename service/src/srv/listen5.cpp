@@ -367,7 +367,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 
 			// skip patch if older than last patch
-			if (not(lastpatchid.read(DEFINITIONS, "INSTALL*LAST"))) {
+			if (not lastpatchid.read(DEFINITIONS, "INSTALL*LAST")) {
 				lastpatchid = "";
 			}
 			if (lastpatchid) {
@@ -773,7 +773,7 @@ nextlock:
 		if (not tt) {
 			tt = "STOP";
 		}
-		if (not(authorised("DATABASE " ^ tt, msg_, "LS"))) {
+		if (not authorised("DATABASE " ^ tt, msg_, "LS")) {
 			response_ = "Error: " ^ msg_;
 			return 0;
 		}
@@ -905,7 +905,7 @@ subroutine fileaccesscheck(in filename) {
 		var temp = securityfilename;
 		temp.converter(".", " ");
 		temp = singular(temp);
-		if (not(authorised(temp ^ " ACCESS", msg_, ""))) {
+		if (not authorised(temp ^ " ACCESS", msg_, "")) {
 			// we could use securityfilename LIST instead of securityfilename ACCESS PARTIAL clumsy
 			// ie list without general access means there are some records
 			// specifically allowed

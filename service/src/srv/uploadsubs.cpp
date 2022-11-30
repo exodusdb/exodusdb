@@ -69,7 +69,7 @@ function main(in mode) {
 
 		var file;
 		var rec;
-		if (not(rec.read(file, key))) {
+		if (not rec.read(file, key)) {
 			msg = "upload.subs cannot read " ^ filename ^ " " ^ key;
 postuploadfail:
 			gosub unlockfile(filename);
@@ -109,7 +109,7 @@ postuploadfail:
 
 	} else if (mode.field(".", 1) == "MAKEUPLOADPATH") {
 
-		if (not(authorised("UPLOAD CREATE", msg, ""))) {
+		if (not authorised("UPLOAD CREATE", msg, "")) {
 			return invalid(msg);
 		}
 
@@ -313,7 +313,7 @@ postuploadfail:
 
 	} else if (mode.field(".", 1) == "DELETEUPLOAD") {
 
-		if (not(authorised("UPLOAD DELETE", msg, ""))) {
+		if (not authorised("UPLOAD DELETE", msg, "")) {
 			return invalid(msg);
 		}
 

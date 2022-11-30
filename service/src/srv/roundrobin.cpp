@@ -80,7 +80,7 @@ function main(in mode, in params, io result, io msg) {
 
 		// get the round robin data
 		var roundrobin;
-		if (not(roundrobin.read(roundrobinfile, roundrobinkey_))) {
+		if (not roundrobin.read(roundrobinfile, roundrobinkey_)) {
 			roundrobin = "";
 		}
 		if (roundrobin.contains(chr(0))) {

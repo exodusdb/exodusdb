@@ -325,7 +325,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 			// print 'done'
 
-			if (not(errors.osread(errorfilename))) {
+			if (not errors.osread(errorfilename)) {
 				errors = "";
 			}
 

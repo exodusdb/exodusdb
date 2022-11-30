@@ -42,7 +42,7 @@ nextrec1:
 		stop();
 	}
 
-	if (not(readnext(ID))) {
+	if (not readnext(ID)) {
 		goto stage2;
 	}
 
@@ -58,7 +58,7 @@ nextrec1:
 		goto nextrec1;
 	}
 
-	if (not(RECORD.read(requestlog, ID))) {
+	if (not RECORD.read(requestlog, ID)) {
 		goto nextrec1;
 	}
 
@@ -118,7 +118,7 @@ nextrec2:
 		stop();
 	}
 
-	if (not(readnext(ID))) {
+	if (not readnext(ID)) {
 
 		// email results of deletions
 		if (update) {
@@ -151,7 +151,7 @@ nextrec2:
 	}
 
 	if (update) {
-		if (not(RECORD.read(requestlog, ID))) {
+		if (not RECORD.read(requestlog, ID)) {
 			goto nextrec2;
 		}
 		requestlog.deleterecord(ID);

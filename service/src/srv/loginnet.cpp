@@ -96,7 +96,7 @@ readmenu:
 
 			// specifically locked or no legacy menus - only allow if authorised
 			if (oldmenus == "" or ((menun and SECURITY.f(11, taskn).len()))) {
-				if (not(authorised(menutask, xx))) {
+				if (not authorised(menutask, xx)) {
 deleteit:
 					if (menus.locate(menu, menun2)) {
 						menus.remover(1, menun2);
@@ -154,7 +154,7 @@ nextcomp:
 			// if validcode1(compcode,'','',xx,yy) then compcodes<-1>=compcode
 			// dont use general subroutine in system module
 			var companypositive = "";
-			if (not(authorised("COMPANY ACCESS", xx, ""))) {
+			if (not authorised("COMPANY ACCESS", xx, "")) {
 				companypositive = "#";
 			}
 			if (authorised(companypositive ^ "COMPANY ACCESS " ^ (compcode.quote()), xx, "")) {
@@ -176,7 +176,7 @@ nextcomp:
 	compcode = compcodes.f(1);
 	if (compcode) {
 		var tempcompany;
-		if (not(tempcompany.read(srv.companies, compcode))) {
+		if (not tempcompany.read(srv.companies, compcode)) {
 			msg = "Error: " ^ (compcode.quote()) ^ " company code is missing";
 			return 0;
 		}
@@ -281,7 +281,7 @@ nextcomp:
 	// osread paramrec from '..\data\':lcase(dataset):'\params2' else return
 	var paramfilename = "../data/" ^ dataset.lcase() ^ "/params2";
 	paramfilename.converter("/", OSSLASH);
-	if (not(paramrec.osread(paramfilename))) {
+	if (not paramrec.osread(paramfilename)) {
 		return 0;
 	}
 	// var lastbackupdate = paramrec.f(2);

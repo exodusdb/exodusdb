@@ -102,7 +102,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 			if (processes) {
 				let processno = lockno - (lockno / 10).floor();
 				var process;
-				if (not(process.read(processes, processno))) {
+				if (not process.read(processes, processno)) {
 					// if no process record then assume no process
 					// and failed lock because another OTHERUSERS is testing the same lock
 					// could really skip further checking since should not be

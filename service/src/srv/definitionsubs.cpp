@@ -76,7 +76,7 @@ function main(in mode) {
 		if (ID == "SECURITY*USERS") {
 			ID			  = "SECURITY";
 			req.templatex = "USERS";
-			if (not(authorised("USER LIST", msg, "USER ACCESS"))) {
+			if (not authorised("USER LIST", msg, "USER ACCESS")) {
 				req.valid = 0;
 			}
 			return 0;
@@ -103,11 +103,11 @@ function main(in mode) {
 			var backuprec;
 			var smtprec;
 			if (ID == "SYSTEM") {
-				if (not(backuprec.read(DEFINITIONS, backupkey))) {
+				if (not backuprec.read(DEFINITIONS, backupkey)) {
 					backuprec = "";
 				}
 				smtpkey = "SMTP.CFG";
-				if (not(smtprec.read(DEFINITIONS, smtpkey))) {
+				if (not smtprec.read(DEFINITIONS, smtpkey)) {
 					smtprec = "";
 				}
 
@@ -149,7 +149,7 @@ function main(in mode) {
 		if (req.wlocked and ID.field("*", 1) == "CHEQUEDESIGN") {
 
 			// prevent update
-			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
+			if (not authorised("CHEQUE DESIGN", msg, "UA")) {
 				req.srcfile.unlock(ID);
 				req.wlocked = "";
 			}
@@ -166,9 +166,9 @@ function main(in mode) {
 				} else {
 
 nochequeformat:
-					if (not(temp.read(req.srcfile, "CHEQUEDESIGN*ZZZ999"))) {
+					if (not temp.read(req.srcfile, "CHEQUEDESIGN*ZZZ999")) {
 						if (temp.open("ALANGUAGE", "")) {
-							if (not(RECORD.read(temp, "VOUCHERS**CHEQUE"))) {
+							if (not RECORD.read(temp, "VOUCHERS**CHEQUE")) {
 								RECORD = "";
 							}
 						}
@@ -193,7 +193,7 @@ nochequeformat:
 			// currently only EXECUTIVE from UI
 			// default to authorised ATM
 			let pretendfile = ID.field("*", 3).field("_", 1);
-			if (not(authorised(pretendfile ^ " ACCESS", msg))) {
+			if (not authorised(pretendfile ^ " ACCESS", msg)) {
 				goto unlockdefinitions;
 			}
 
@@ -225,7 +225,7 @@ nochequeformat:
 		if (ID.field("*", 2) == "ANALDESIGN") {
 
 			// check allowed access
-			if (not(authorised("BILLING REPORT ACCESS", msg, ""))) {
+			if (not authorised("BILLING REPORT ACCESS", msg, "")) {
 unlockdefinitions:
 				req.reset = 5;
 				unlockrecord("DEFINITIONS", req.srcfile, ID);
@@ -254,7 +254,7 @@ preventupdate:
 
 			// configuration is locked to EXODUS initially
 			var dummy;
-			if (not(authorised("AGENCY CONFIGURATION UPDATE", dummy, "EXODUS"))) {
+			if (not authorised("AGENCY CONFIGURATION UPDATE", dummy, "EXODUS")) {
 				goto preventupdate;
 			}
 		}
@@ -281,7 +281,7 @@ preventupdate:
 		if (ID.field("*", 1) == "CHEQUEDESIGN") {
 
 			// prevent update
-			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
+			if (not authorised("CHEQUE DESIGN", msg, "UA")) {
 				return invalid(msg);
 			}
 
@@ -356,12 +356,12 @@ preventupdate:
 					}
 					if (usercode != req.orec.f(fn)) {
 						// updater must themselves be authorised to post journals
-						if (not(authorised("JOURNAL POST", msg))) {
+						if (not authorised("JOURNAL POST", msg)) {
 							msg = "You are not authorised to change financial usercode" _FM _FM ^ msg;
 							return invalid(msg);
 						}
 						// financial usercode must be authorised to post journals
-						if (not(authorised("JOURNAL POST", msg, "", usercode))) {
+						if (not authorised("JOURNAL POST", msg, "", usercode)) {
 							msg = usercode.quote() ^ " financial user is not authorised to do Journal Post";
 							return invalid(msg);
 						}
@@ -583,7 +583,7 @@ preventupdate:
 		if (ID.field("*", 2) == "ANALDESIGN") {
 
 			// prevent update
-			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
+			if (not authorised("CHEQUE DESIGN", msg, "UA")) {
 				return invalid(msg);
 			}
 

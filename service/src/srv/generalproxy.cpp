@@ -181,7 +181,7 @@ function main() {
 		}
 
 		// should really have an option to close the live dataset and then copy
-		if (not(authorised("DATASET COPY", msg_, "LS"))) {
+		if (not authorised("DATASET COPY", msg_, "LS")) {
 			abort(msg_);
 		}
 
@@ -239,7 +239,7 @@ function main() {
 	} else if (mode == "CREATEDATABASE") {
 		// For patsalides
 
-		if (not(authorised("DATASET CREATE", msg_))) {
+		if (not authorised("DATASET CREATE", msg_)) {
 			abort(msg_);
 		}
 
@@ -355,7 +355,7 @@ function main() {
 
 	} else if (mode == "PASSWORDRESET") {
 
-		if (not(authorised("PASSWORD RESET", msg_))) {
+		if (not authorised("PASSWORD RESET", msg_)) {
 			abort(msg_);
 		}
 
@@ -387,7 +387,7 @@ function main() {
 		} else {
 			usersordefinitions = DEFINITIONS;
 			userkey			   = "BADUSER*" ^ ID;
-			if (not(userrec.read(usersordefinitions, userkey))) {
+			if (not userrec.read(usersordefinitions, userkey)) {
 				userrec = "";
 			}
 		}
@@ -475,8 +475,8 @@ function main() {
 		} else if (request_.f(2) == "UPPERCASE" or request_.f(2) == "LOWERCASE") {
 
 			var recordx;
-			if (not(recordx.read(srv.alanguage, "GENERAL*" ^ codepage))) {
-				if (not(recordx.read(srv.alanguage, "GENERAL"))) {
+			if (not recordx.read(srv.alanguage, "GENERAL*" ^ codepage)) {
+				if (not recordx.read(srv.alanguage, "GENERAL")) {
 					recordx = "";
 				}
 			}
@@ -624,7 +624,7 @@ badsetcodepage:
 		task = request_.f(2);
 		gosub gettaskprefix();
 		if (taskprefix) {
-			if (not(authorised(taskprefix ^ " ACCESS", msg_, ""))) {
+			if (not authorised(taskprefix ^ " ACCESS", msg_, "")) {
 				abort(msg_);
 			}
 		}
@@ -731,7 +731,7 @@ nextrep:
 		task = doc.f(5);
 		gosub gettaskprefix();
 		if (taskprefix) {
-			if (not(authorised(taskprefix ^ " CREATE", msg_, ""))) {
+			if (not authorised(taskprefix ^ " CREATE", msg_, "")) {
 				abort(msg_);
 			}
 		}
@@ -769,7 +769,7 @@ nextrep:
 		task = srv.document.f(5);
 		gosub gettaskprefix();
 		if (taskprefix) {
-			if (not(authorised(taskprefix ^ " ACCESS", msg_, ""))) {
+			if (not authorised(taskprefix ^ " ACCESS", msg_, "")) {
 				abort(msg_);
 			}
 		}
@@ -945,7 +945,7 @@ subroutine initlog() {
 		}
 	}
 
-	if (not(authorised("LOG ACCESS", msg_, ""))) {
+	if (not authorised("LOG ACCESS", msg_, "")) {
 		response_ = msg_;
 		abort();
 	}

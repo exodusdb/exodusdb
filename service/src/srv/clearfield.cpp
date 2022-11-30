@@ -108,7 +108,7 @@ next:
 	// ///
 
 	call giveway();
-	if (not(readnext(ID))) {
+	if (not readnext(ID)) {
 		goto exit;
 	}
 

@@ -161,8 +161,8 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	if (totcol) {
 		colorder = "AR";
 	} else {
-		if (not(coldict.read(DICT, colfield))) {
-			if (not(coldict.read(dictvoc, colfield))) {
+		if (not coldict.read(DICT, colfield)) {
+			if (not coldict.read(dictvoc, colfield)) {
 				call mssg(colfield.quote() ^ " column field doesnt exist in " ^ filename);
 				stop();
 			}
@@ -175,8 +175,8 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		}
 	}
 
-	if (not(datadict.read(DICT, datafield))) {
-		if (not(datadict.read(dictvoc, datafield))) {
+	if (not datadict.read(DICT, datafield)) {
+		if (not datadict.read(dictvoc, datafield)) {
 			call mssg(datafield.quote() ^ " data field doesnt exist in " ^ filename);
 			stop();
 		}
@@ -208,11 +208,11 @@ nextrecord:
 		MV = 0;
 		ID = prefix ^ recn;
 	} else {
-		if (not(readnext(ID, MV))) {
+		if (not readnext(ID, MV)) {
 			goto exit;
 		}
 	}
-	if (not(RECORD.read(file, ID))) {
+	if (not RECORD.read(file, ID)) {
 		if (prefixes) {
 			goto nextprefix;
 		}

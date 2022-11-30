@@ -1754,7 +1754,7 @@ getnextkey:
 			// prevent update
 			// if withlock and updatenotallowed then
 			if (withlock) {
-				if (not(authorised(filetitle2 ^ " UPDATE"))) {
+				if (not authorised(filetitle2 ^ " UPDATE")) {
 					goto noupdate;
 				}
 
@@ -1805,7 +1805,7 @@ noupdate:
 				if (withlock and not(postread)) {
 
 					// must provide a key unless locking
-					if (not(authorised(filetitle2 ^ " CREATE", createnotallowed))) {
+					if (not authorised(filetitle2 ^ " CREATE", createnotallowed)) {
 						if (sessionid) {
 							gosub leaseunlock();
 						}
@@ -2046,7 +2046,7 @@ noupdate:
 
 		// make sure that the record is already leaselocked to the user
 		lockkey = filename ^ "*" ^ ID;
-		if (not(lockrec.read(leaselocks, lockkey))) {
+		if (not lockrec.read(leaselocks, lockkey)) {
 			lockrec = FM ^ FM ^ FM ^ FM ^ "NO LOCK RECORD";
 		}
 		if (sessionid != lockrec.f(5)) {
@@ -2074,7 +2074,7 @@ noupdate:
 			return;
 		}
 
-		if (not(req.orec.read(req.srcfile, ID))) {
+		if (not req.orec.read(req.srcfile, ID)) {
 			req.orec = "";
 		}
 
@@ -2198,7 +2198,7 @@ badwrite:
 				systemsubs = replacewrite;
 				call systemsubs(triggers.f(6));
 				// in case it changes @record?
-				if (not(RECORD.read(req.srcfile, keyx))) {
+				if (not RECORD.read(req.srcfile, keyx)) {
 					RECORD = "";
 				}
 			} else {
@@ -2815,7 +2815,7 @@ subroutine leaselock() {
 
 			// if masterlock is missing or doesnt have the same session id
 			// then the subsidiary is considered to have expired
-			if (not(lockrec.read(leaselocks, masterlockkey))) {
+			if (not lockrec.read(leaselocks, masterlockkey)) {
 				goto nolock;
 			}
 			if (lockrec.f(5) != sublockrec.f(5)) {
@@ -2994,7 +2994,7 @@ subroutine leaseunlock() {
 	lockkey		  = filename ^ "*" ^ keyx;
 	FILEERRORMODE = 1;
 	FILEERROR	  = "";
-	if (not(lockrec.read(leaselocks, lockkey))) {
+	if (not lockrec.read(leaselocks, lockkey)) {
 		lockrec = "";
 	}
 	if (not lockrec) {

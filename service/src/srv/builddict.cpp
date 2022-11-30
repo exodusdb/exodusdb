@@ -42,7 +42,7 @@ function main() {
 	}
 
 	let key = dictfilename ^ ".txt";
-	if (not(doc.read(file, key))) {
+	if (not doc.read(file, key)) {
 		call mssg(key.quote() ^ " is missing from " ^ filename);
 		stop();
 	}
@@ -122,11 +122,11 @@ subroutine writedict() {
 				let osdatfilename = "dat/" ^ dictfilename ^ "/" ^ dictid;
 
 				var dictrec;
-				if (not(dictrec.read(DICT, dictid))) {
+				if (not dictrec.read(DICT, dictid)) {
 					call mssg(dictid.quote() ^ " is missing from DICT." ^ dictfilename);
 					stop();
 				}
-				if (not(dictrec.osread(osdatfilename))) {
+				if (not dictrec.osread(osdatfilename)) {
 					call mssg(osdatfilename.quote() ^ " is missing");
 					stop();
 				}
@@ -141,11 +141,11 @@ subroutine writedict() {
 		let osdatfilename = "dat/" ^ dictfilename ^ "/" ^ dictid;
 
 		var dictrec;
-		if (not(dictrec.read(DICT, dictid))) {
+		if (not dictrec.read(DICT, dictid)) {
 			call mssg(dictid.quote() ^ " is missing from DICT." ^ dictfilename);
 			stop();
 		}
-		if (not(dictrec.osread(osdatfilename))) {
+		if (not dictrec.osread(osdatfilename)) {
 			call mssg(osdatfilename.quote() ^ " is missing");
 			stop();
 		}

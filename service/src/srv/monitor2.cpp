@@ -162,7 +162,7 @@ function main() {
 	}
 
 	// get the current monitor info
-	if (not(monitordata.read(processes, monitorkey))) {
+	if (not monitordata.read(processes, monitorkey)) {
 		monitordata = "";
 	}
 
@@ -219,7 +219,7 @@ function main() {
 		select(statistics);
 nextstatistic:
 		if (readnext(ID)) {
-			if (not(RECORD.read(statistics, ID))) {
+			if (not RECORD.read(statistics, ID)) {
 				goto nextstatistic;
 			}
 
@@ -260,7 +260,7 @@ nextstatistic:
 
 nextprocess:
 	if (readnext(ID)) {
-		if (not(RECORD.read(processes, ID))) {
+		if (not RECORD.read(processes, ID)) {
 			goto nextprocess;
 		}
 

@@ -143,7 +143,7 @@ nextdoc:
 			return 0;
 		}
 	} else {
-		if (not(readnext(docid))) {
+		if (not readnext(docid)) {
 			gosub exit(lockfilename, lockfile, lockkey);
 			return 0;
 		}
@@ -156,7 +156,7 @@ readdoc:
 	// depending on the autorunkey then this may be redundant
 
 	// get document
-	if (not(srv.document.read(srv.documents, docid))) {
+	if (not srv.document.read(srv.documents, docid)) {
 		printl(docid.quote(), " document doesnt exist in AUTORUN3");
 		// call ossleep(1000*1)
 		goto nextdoc;
@@ -356,7 +356,7 @@ preventsameday:
 	// report is always run as the document owning user
 	let runasusercode = srv.document.f(1);
 	var userx;
-	if (not(userx.read(users, runasusercode))) {
+	if (not userx.read(users, runasusercode)) {
 		if (not(runasusercode == "EXODUS")) {
 			printl("runas user ", runasusercode, " doesnt exist");
 			goto nextdoc;
@@ -395,7 +395,7 @@ preventsameday:
 
 			// get the user record
 			let usercode = usercodes.f(1, usern);
-			if (not(userx.read(users, usercode))) {
+			if (not userx.read(users, usercode)) {
 				if (not(usercode == "EXODUS")) {
 					goto nextuser;
 				}
@@ -424,7 +424,7 @@ preventsameday:
 					}
 					market = marketcode;
 					if (srv.markets) {
-						if (not(market.read(srv.markets, marketcode))) {
+						if (not market.read(srv.markets, marketcode)) {
 							market = marketcode;
 						}
 					}
@@ -496,7 +496,7 @@ nextuser:;
 		let ntasks = authtasks.fcount(VM);
 		for (const var taskn : range(1, ntasks)) {
 			let task = authtasks.f(1, taskn);
-			if (not(authorised(task, msg_, "", runasusercode))) {
+			if (not authorised(task, msg_, "", runasusercode)) {
 				msg_ = runasusercode.quote() ^ " is not authorised to do " ^ task;
 				printl(msg_);
 				goto nextdoc;

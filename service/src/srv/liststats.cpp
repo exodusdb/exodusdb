@@ -61,7 +61,7 @@ function main() {
 
 	// for printtx
 
-	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {
+	if (not authorised("STATISTICS ACCESS", msg, "LS")) {
 		call mssg(msg);
 		stop();
 	}

@@ -211,7 +211,7 @@ forcedemail:
 
 	var params1 = "";
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
-		if (not(params1.read(DEFINITIONS, "SMTP.CFG"))) {
+		if (not params1.read(DEFINITIONS, "SMTP.CFG")) {
 			params1 = "";
 		}
 	}
@@ -596,7 +596,7 @@ TRACE(offset)
 		} else {
 			printl(errorfilename, " ko");
 		}
-		if (not(errormsg.osread(errorfilename))) {
+		if (not errormsg.osread(errorfilename)) {
 			errormsg	 = "Unknown error in sendmail.js Failed to complete";
 			errormsg(-1) = cmd;
 			// errormsg<-1>=params 'T#60'

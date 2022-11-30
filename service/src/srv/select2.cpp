@@ -240,8 +240,8 @@ nocommon:
 		for (const var dictidn : range(1, ndictids)) {
 			let dictid = dictids.f(dictidn);
 			var dictrec;
-			if (not(dictrec.read(DICT, dictid))) {
-				if (not(dictrec.read(dictvoc, dictid))) {
+			if (not dictrec.read(DICT, dictid)) {
+				if (not dictrec.read(dictvoc, dictid)) {
 					if (dictid == "ID") {
 						dictrec = "F,0,No,,,,,,L,15,";
 						dictrec.converter(",", FM);
@@ -287,7 +287,7 @@ nocommon:
 	//  end
 	// end
 	var chk_authorised;
-	if (not(chk_authorised.read(DICT, "AUTHORISED"))) {
+	if (not chk_authorised.read(DICT, "AUTHORISED")) {
 		chk_authorised = 0;
 	}
 
@@ -369,7 +369,7 @@ nextrec:
 		}
 
 	} else {
-		if (not(readnext(ID, MV))) {
+		if (not readnext(ID, MV)) {
 			ID = "";
 		}
 	}
@@ -398,7 +398,7 @@ nextrec:
 	if (ID.starts("%")) {
 		goto nextrec;
 	}
-	if (not(RECORD.read(file, ID))) {
+	if (not RECORD.read(file, ID)) {
 		goto nextrec;
 	}
 

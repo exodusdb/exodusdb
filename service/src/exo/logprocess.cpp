@@ -58,7 +58,7 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 	if (processcategory == "HEARTBEAT") {
 
 		FILEERRORMODE = 1;
-		if (not(processrec.read(DEFINITIONS, "PROCESS*" ^ processid))) {
+		if (not processrec.read(DEFINITIONS, "PROCESS*" ^ processid)) {
 			processrec = "";
 		}
 		if (not FILEERROR) {
@@ -81,7 +81,7 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 
 		} else {
 
-			if (not(processrec.read(DEFINITIONS, "PROCESS*" ^ processid))) {
+			if (not processrec.read(DEFINITIONS, "PROCESS*" ^ processid)) {
 				gosub newprocessid(processid);
 			}
 
@@ -116,7 +116,7 @@ subroutine newprocessid(io processid) {
 	while (true) {
 		processid = var(999999999).rnd().last(8);
 		var xx;
-		if (not(xx.read(DEFINITIONS, "PROCESS*" ^ processid))) {
+		if (not xx.read(DEFINITIONS, "PROCESS*" ^ processid)) {
 			xx = "";
 		}
 		// /BREAK;

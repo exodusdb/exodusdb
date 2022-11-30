@@ -41,7 +41,7 @@ function main(in amountfmlanguage, in currcode0) {
 		currcode = "";
 	} else {
 		currcode = currcode0;
-		if (not(amountcurrency.read(srv.currencies, currcode))) {
+		if (not amountcurrency.read(srv.currencies, currcode)) {
 			amountcurrency = "";
 		}
 	}

@@ -49,7 +49,7 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 
 nextbuild:
 		if (readnext(ID)) {
-			if (not(RECORD.read(req.srcfile, ID))) {
+			if (not RECORD.read(req.srcfile, ID)) {
 				goto nextbuild;
 			}
 			if (RECORD.f(subfn) == "") {

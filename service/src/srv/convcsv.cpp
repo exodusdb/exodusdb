@@ -138,7 +138,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	// eg ABP converter.maconomy
 	convertercsv = "";
 	var hasconverter;
-	if (not(hasconverter.read(DEFINITIONS, "CONVERTER*" ^ filename))) {
+	if (not hasconverter.read(DEFINITIONS, "CONVERTER*" ^ filename)) {
 		hasconverter = "";
 	}
 	if (hasconverter.f(1)) {
@@ -443,7 +443,7 @@ nextrec:
 
 	// get the next key
 	var mvx = 0;
-	if (not(readnext(ID, mvx))) {
+	if (not readnext(ID, mvx)) {
 		gosub exit();
 		return 0;
 	}
@@ -457,7 +457,7 @@ nextrec:
 		output(AT(-40), recn, ". ");
 
 	// get the record
-	if (not(RECORD.read(file, ID))) {
+	if (not RECORD.read(file, ID)) {
 		goto nextrec;
 	}
 

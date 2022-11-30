@@ -73,7 +73,7 @@ function main(in mode0) {
 	// if there is a user called MASTER with no password then login automatically
 	// unless already automatically logged in
 	ok = 0;
-	if (not(SYSTEM.f(15))) {
+	if (not SYSTEM.f(15)) {
 		if (SECURITY.f(1).locate("MASTER", usern)) {
 			if (SECURITY.f(4, usern, 2).field(TM, 7) == "") {
 				SYSTEM(22) = 1000000;
@@ -319,7 +319,7 @@ subroutine inputx() {
 }
 
 subroutine getsec() {
-	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+	if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
 		SECURITY = "";
 	}
 	return;

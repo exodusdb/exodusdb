@@ -56,7 +56,7 @@ function main(out bakpars, in process0 = var()) {
 
 	// by test data means any non-live data that doesnt require backup
 
-	if (not(bakpars.read(DEFINITIONS, "BACKUP"))) {
+	if (not bakpars.read(DEFINITIONS, "BACKUP")) {
 		bakpars = "";
 	}
 	if (tt.osread("backup.cfg")) {

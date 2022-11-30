@@ -142,7 +142,7 @@ exit:
 
 		// greek
 		if (codepage == "737") {
-			if (not(codepage.read(languagefile, "GENERAL*GREEK"))) {
+			if (not codepage.read(languagefile, "GENERAL*GREEK")) {
 				codepage = "";
 			}
 getupperlower:
@@ -151,7 +151,7 @@ getupperlower:
 
 			// central european including poland
 		} else if (codepage == "852") {
-			if (not(codepage.read(languagefile, "GENERAL*POLISH"))) {
+			if (not codepage.read(languagefile, "GENERAL*POLISH")) {
 				codepage = "";
 			}
 			goto getupperlower;
@@ -192,7 +192,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 		langkey = langkey.fieldstore("*", 3, 1, datatype);
 	}
 	// CALL MSG(T)
-	if (not(lang.read(languagefile, langkey))) {
+	if (not lang.read(languagefile, langkey)) {
 		lang = "";
 		return;
 	}

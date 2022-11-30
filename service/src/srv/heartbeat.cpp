@@ -68,7 +68,7 @@ function main(in mode, in status0 = "") {
 
 		} else {
 			var tt;
-			if (not(tt.read(DEFINITIONS, "ERROR*THREADNO"))) {
+			if (not tt.read(DEFINITIONS, "ERROR*THREADNO")) {
 				tt = "";
 			}
 			if (tt.f(1).count(VM) < 10) {

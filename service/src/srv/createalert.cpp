@@ -44,7 +44,7 @@ function main() {
 		}
 		if (not silent) {
 			var xx;
-			if (not(xx.read(srv.documents, alertid))) {
+			if (not xx.read(srv.documents, alertid)) {
 				abort(alertid.quote() ^ " document doesnt exist");
 			}
 		}
@@ -125,7 +125,7 @@ syntax:
 		let ntasks = authtasks.fcount(VM);
 		for (const var taskn : range(1, ntasks)) {
 			let task = authtasks.f(1, taskn);
-			if (not(authorised(task, msg, "", runasusercode))) {
+			if (not authorised(task, msg, "", runasusercode)) {
 				msg = "\"Runas\" user is not authorised to do " ^ task ^ FM ^ FM ^ msg;
 				call mssg(msg);
 				stop();
