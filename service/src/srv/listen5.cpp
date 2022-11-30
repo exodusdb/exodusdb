@@ -125,7 +125,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					tt.replacer("\r\n", _FM);
 					tt.converter("\r\n", _FM _FM);
 					// dont start if there is a database stop command
-					if (not((tt.f(1).lcase() ^ ".end").osfile())) {
+					if (not (tt.f(1).lcase() ^ ".end").osfile()) {
 						if (tt.f(5)) {
 							// var cmd = "CMD /C START EXODUS.JS /system " ^ tt.f(5) ^ " /database " ^ tt.f(1) ^ " /pid " ^ tt.f(6);
 
@@ -497,7 +497,7 @@ nextpatch:;
 			sortby = "AL";
 		}
 		if (sortby) {
-			if (not(var("AL,AR,DL,DR").locateusing(",", sortby, xx))) {
+			if (not var("AL,AR,DL,DR").locateusing(",", sortby, xx)) {
 				response_ = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEXVALUES";
 				return 0;
 			}
@@ -526,7 +526,7 @@ nextpatch:;
 			temp = "JOURNAL";
 		}
 
-		if (not(authorised(singular(temp) ^ " LIST", msg_, ""))) {
+		if (not authorised(singular(temp) ^ " LIST", msg_, "")) {
 			response_ = msg_;
 			return 0;
 		}
@@ -633,7 +633,7 @@ getvalues:
 		let options	   = request5;
 		let maxnrecs   = request6;
 
-		if (not(sortselect.contains("%SELECTLIST%"))) {
+		if (not sortselect.contains("%SELECTLIST%")) {
 			clearselect();
 		}
 
@@ -901,7 +901,7 @@ subroutine fileaccesscheck(in filename) {
 	// security check
 	// dont check markets and companies because really must have access to some
 	// and eliminates need for clumsy task COMPANY ACCESS PARTIAL task
-	if (not(var("MENUS,ADMENUS").locateusing(",", filename, xx))) {
+	if (not var("MENUS,ADMENUS").locateusing(",", filename, xx)) {
 		var temp = securityfilename;
 		temp.converter(".", " ");
 		temp = singular(temp);
@@ -909,9 +909,9 @@ subroutine fileaccesscheck(in filename) {
 			// we could use securityfilename LIST instead of securityfilename ACCESS PARTIAL clumsy
 			// ie list without general access means there are some records
 			// specifically allowed
-			if (not(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msg2, ""))) {
+			if (not authorised("!#" ^ temp ^ " ACCESS PARTIAL", msg2, "")) {
 				// if there is an authorised dictionary item then leave it up to that
-				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).contains("ALLOWPARTIALACCESS"))) {
+				if (not (var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).contains("ALLOWPARTIALACCESS")) {
 					response_ = msg_;
 					return;
 				}
@@ -953,7 +953,7 @@ nextfiles:
 		// replaced by databasecode.SVR
 		// if filename0='GLOBAL.SVR' then goto deleteit
 
-		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.last(4)).lcase(), xx))) {
+		if (not var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.last(4)).lcase(), xx)) {
 
 			// a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.ends(".4")) {

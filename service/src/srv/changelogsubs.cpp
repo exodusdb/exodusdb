@@ -85,7 +85,7 @@ function main(in mode0) {
 
 			// backward compatible - can be deleted after all upgraded
 			// leave in case reloading ancient data
-			if (not(userrec.f(17))) {
+			if (not userrec.f(17)) {
 				let changelogkey = "USER*" ^ USERNAME;
 				if (changelog.read(DEFINITIONS, changelogkey)) {
 					userrec(17) = changelog.f(8);
@@ -126,7 +126,7 @@ function main(in mode0) {
 		currentversiondatetime.writef(users, USERNAME, 17);
 
 		// build preferences from menus if not specified
-		if (not(mode.f(2))) {
+		if (not mode.f(2)) {
 
 			// tt=capitalise(menucodes)
 			// swap 'Support' with 'Technical' in tt
@@ -212,7 +212,7 @@ subroutine select0(io mode) {
 		// locatebyusing() not available in c++
 		let tt = data_.convert(FM, VM);
 		var versionn;
-		if (not(tt.locateby("AR", mode.f(3), versionn))) {
+		if (not tt.locateby("AR", mode.f(3), versionn)) {
 			if (versionn > 1) {
 				mode(3) = data_.f(versionn - 1);
 			}
@@ -326,7 +326,7 @@ subroutine getversiondates() {
 		if (not idate)
 			continue;
 		// itime=iconv(field(versionlog,' ',1),'MT')
-		if (not(versiondata.locateusing(FM, idate))) {
+		if (not versiondata.locateusing(FM, idate)) {
 			versiondata(-1) = idate;
 		}
 	}  // ii;

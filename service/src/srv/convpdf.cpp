@@ -66,13 +66,13 @@ function main(io osfilename, in printopts0, out errors) {
 //		}
 //	} else {
 		pdfcmd = "/usr/local/bin/wkhtmltopdf";
-		if (not(pdfcmd.osfile())) {
+		if (not pdfcmd.osfile()) {
 			pdfcmd = "/usr/bin/wkhtmltopdf";
 		}
 //	}
 
 	// quit without conversion if conversion program doesnt exist
-	if (not(pdfcmd.osfile())) {
+	if (not pdfcmd.osfile()) {
 		errors = "html2pdf is not installed.|EXODUS support has been emailed.";
 		call sysmsg(errors, "html2pdf");
 		return 0;

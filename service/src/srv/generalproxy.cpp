@@ -163,7 +163,7 @@ function main() {
 	} else if (mode == "FILEMAN" and request_.f(2) == "COPYDB") {
 
 		let copydb = request_.f(3);
-		if (not(SYSTEM.f(58).locate(copydb, dbn))) {
+		if (not SYSTEM.f(58).locate(copydb, dbn)) {
 			// Not found. dbn points to last + 1
 		}
 		let todb = SYSTEM.f(63, dbn);
@@ -635,7 +635,7 @@ badsetcodepage:
 		instructions.replacer(_VM, "%FD");
 		select ^= " WITH INSTRUCTIONS2 " ^ (instructions.quote());
 
-		if (not(authorised("DOCUMENTS: ACCESS OTHER PEOPLES DOCUMENTS", xx, ""))) {
+		if (not authorised("DOCUMENTS: ACCESS OTHER PEOPLES DOCUMENTS", xx, "")) {
 			select ^= " AND WITH CREATEDBY " ^ (USERNAME.quote());
 		}
 
@@ -709,7 +709,7 @@ nextrep:
 		gosub opendocuments();
 
 		var doc;
-		if (not(doc.read(srv.documents, request_.f(2)))) {
+		if (not doc.read(srv.documents, request_.f(2))) {
 			abort("Document " ^ (request_.f(2).quote()) ^ " is missing");
 		}
 
@@ -724,7 +724,7 @@ nextrep:
 		gosub opendocuments();
 
 		var doc;
-		if (not(doc.read(srv.documents, request_.f(2)))) {
+		if (not doc.read(srv.documents, request_.f(2))) {
 			abort("Document " ^ (request_.f(2).quote()) ^ " is missing");
 		}
 
@@ -761,7 +761,7 @@ nextrep:
 
 		// get parameters from documents into @pseudo
 
-		if (not(srv.document.read(srv.documents, request_.f(2)))) {
+		if (not srv.document.read(srv.documents, request_.f(2))) {
 			msg_ = "Document " ^ (request_.f(2).quote()) ^ " does not exist";
 			abort(msg_);
 		}
@@ -950,7 +950,7 @@ subroutine initlog() {
 		abort();
 	}
 
-	if (not(authorised("LOG ACCESS " ^ (logkey.quote()), msg_, ""))) {
+	if (not authorised("LOG ACCESS " ^ (logkey.quote()), msg_, "")) {
 		response_ = msg_;
 		abort();
 	}

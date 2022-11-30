@@ -97,7 +97,7 @@ checkotherusers:
 		} else {
 			t3 = "";
 		}
-		if (not(decide("!There " ^ t2 ^ nn ^ " other workstation" ^ t3 ^ "|using EXODUS " ^ dataset ^ " at the moment.||All other users" ^ tt ^ " must exit EXODUS|before you can continue.||" ^ otherusersx ^ "|", options, reply))) {
+		if (not decide("!There " ^ t2 ^ nn ^ " other workstation" ^ t3 ^ "|using EXODUS " ^ dataset ^ " at the moment.||All other users" ^ tt ^ " must exit EXODUS|before you can continue.||" ^ otherusersx ^ "|", options, reply)) {
 			reply = 0;
 		}
 		if (reply == 3) {
@@ -118,11 +118,11 @@ lockit:
 	if (dataset) {
 
 		// temporary exclusive lock
-		if (not(lockrecord("", voc, "BACKUP*"))) {
+		if (not lockrecord("", voc, "BACKUP*")) {
 			goto invalidx;
 		}
 
-		if (not(lockrecord("", voc, "BACKUP*" ^ dataset))) {
+		if (not lockrecord("", voc, "BACKUP*" ^ dataset)) {
 
 			xx = unlockrecord("", voc, "BACKUP*");
 
@@ -135,7 +135,7 @@ invalidx:
 			if (dataset) {
 				options ^= "|Attempt to close the " ^ dataset ^ " processes and retry";
 			}
-			if (not(decide(msg, options, reply))) {
+			if (not decide(msg, options, reply)) {
 				reply = 0;
 			}
 			if (reply == 3) {
@@ -153,7 +153,7 @@ invalidx:
 
 	} else {
 
-		if (not(lockrecord("", voc, "BACKUP*"))) {
+		if (not lockrecord("", voc, "BACKUP*")) {
 			goto invalidx;
 		}
 	}

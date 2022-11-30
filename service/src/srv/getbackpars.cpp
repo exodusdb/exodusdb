@@ -86,10 +86,10 @@ function main(out bakpars, in process0 = var()) {
 //		if (maxbaktime_ == "") {
 //			bakpars(4) = "1:05";
 //		}
-//		if (not(minbaktime_.isnum())) {
+//		if (not minbaktime_.isnum()) {
 //			bakpars(3) = minbaktime_.iconv("MT");
 //		}
-//		if (not(maxbaktime_.isnum())) {
+//		if (not maxbaktime_.isnum()) {
 //			bakpars(4) = maxbaktime_.iconv("MT");
 //		}
 //		if (bakdows_ == "") {
@@ -148,7 +148,7 @@ function main(out bakpars, in process0 = var()) {
 			} else {
 				// not otherwise specified then exclude database if in list of non-live data
 				// none-live could include test data or consolidated copies
-				if (not(bakexcludedatasets_.locate(process.f(17), xx))) {
+				if (not bakexcludedatasets_.locate(process.f(17), xx)) {
 					testdata = 0;
 				}
 			}

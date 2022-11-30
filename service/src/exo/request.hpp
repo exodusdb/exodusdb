@@ -90,7 +90,7 @@ function invalid(in msg)
 }
 
 function invalid2(in msg) {
-	if (not(req.registerx(3))) {
+	if (not req.registerx(3)) {
 		invalid(msg);
 	}
 	if (req.isorig) {

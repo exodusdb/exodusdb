@@ -40,14 +40,14 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		var tt = " " ^ VM;
 		while (true) {
 			// /BREAK;
-			if (not(datax.contains(tt)))
+			if (not datax.contains(tt))
 				break;
 			datax.replacer(tt, VM);
 		}  // loop;
 		tt = " " ^ FM;
 		while (true) {
 			// /BREAK;
-			if (not(datax.contains(tt)))
+			if (not datax.contains(tt))
 				break;
 			datax.replacer(tt, FM);
 		}  // loop;

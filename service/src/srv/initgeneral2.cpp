@@ -168,7 +168,7 @@ function main(in mode, io logtime, in menu) {
 				printl(THREADNO ^ ":", enventry);
 			let envkey = enventry.field("=", 1);
 			let envval = enventry.field("=", 2, 999999);
-			if (not(SYSTEM.f(12).locate(envkey, vn))) {
+			if (not SYSTEM.f(12).locate(envkey, vn)) {
 				SYSTEM(12, vn) = envkey;
 				SYSTEM(13, vn) = envval;
 			}
@@ -196,7 +196,7 @@ function main(in mode, io logtime, in menu) {
 				if (tt2.first(4).contains(".htm")) {
 					tt.cutter(-tt2.len());
 				}
-				if (not(var("\\/").contains(tt[-1]))) {
+				if (not var("\\/").contains(tt[-1])) {
 					tt ^= "/";
 				}
 				baselinks(1, linkn) = tt;
@@ -212,7 +212,7 @@ function main(in mode, io logtime, in menu) {
 //
 //			call log2("*once off call to windows COMPACT command on ..LOGS", logtime);
 //
-//			if (not(conf.osread("..\\LOGS\\exodus.ini"))) {
+//			if (not conf.osread("..\\LOGS\\exodus.ini")) {
 //				conf = "";
 //			}
 //			if (not conf.contains("NOTREQ")) {
@@ -273,7 +273,7 @@ nextuser:
 				goto nextuser;
 			}
 			var origuser = userx;
-			if (not(SECURITY.f(1).locate(userid, usern))) {
+			if (not SECURITY.f(1).locate(userid, usern)) {
 				goto nextuser;
 			}
 			userx(40)	 = SECURITY.f(6, usern);

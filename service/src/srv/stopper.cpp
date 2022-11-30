@@ -44,7 +44,7 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 		}
 	}
 
-	if (not(buffer.unassigned())) {
+	if (not buffer.unassigned()) {
 		call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "W", buffer);
 	}
 

@@ -68,7 +68,7 @@ tryagain:
 			call mssg(fn.quote() ^ " field number is not supported");
 			stop();
 		}
-		if (not(fn.isnum())) {
+		if (not fn.isnum()) {
 			if (DICT) {
 				// readf fn from @dict,fns<i>,2 else null
 				var dict;

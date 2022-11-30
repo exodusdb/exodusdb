@@ -234,7 +234,7 @@ forcedemail:
 	}	   // filen;
 
 	// default exodus smtp parameters
-	if (not(params1.f(1))) {
+	if (not params1.f(1)) {
 		var sysname = SYSTEM.f(57);
 		if (not sysname) {
 			sysname = "unknown";

@@ -339,7 +339,7 @@ nextdict:
 				if (dict.f(11).starts("<")) {
 					temp			 = dict.f(11).cut(1).field(">", 1);
 					xfilenames(coln) = temp;
-					if (not(xfiles(coln).open(temp, ""))) {
+					if (not xfiles(coln).open(temp, "")) {
 						call  mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
 						gosub exit2();
 						return 0;
@@ -468,7 +468,7 @@ nextrec:
 	MV = mvx;
 
 	if (dicthasauthorised) {
-		if (not(calculate("AUTHORISED"))) {
+		if (not calculate("AUTHORISED")) {
 			goto nextrec;
 		}
 	}
@@ -482,7 +482,7 @@ nextrec:
 		if (filters(3, filtern).len()) {
 
 			// if reqvalue then skip if not matching
-			if (not(filters(3, filtern).locate(value, xx))) {
+			if (not filters(3, filtern).locate(value, xx)) {
 				goto nextrec;
 			}
 
@@ -595,7 +595,7 @@ nextvn:
 					// make sure "1-12" is not interpreted as a formula
 					if (var(1) or excel) {
 						if (var(".-+0123456789").contains(cell[1])) {
-							if (not(cell.isnum())) {
+							if (not cell.isnum()) {
 								cell.prefixer(" ");
 							}
 						}
@@ -623,7 +623,7 @@ nextvn:
 		// remove trailing or all tab chars
 		// 		while (true) {
 		// 			// /BREAK;
-		// 			if (not(line.ends(FM))) break;
+		// 			if (not line.ends(FM)) break;
 		// 			line.popper();
 		// 		}// loop;
 		line.trimmerlast(FM);

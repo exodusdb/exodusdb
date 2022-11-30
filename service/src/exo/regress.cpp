@@ -8,10 +8,10 @@ function main() {
 	printl("regress says 'Hello World!'");
 	let osfilename = field(SENTENCE, " ", 2);
 	var osfile;
-	if (not(osopen(osfilename, osfile)))
+	if (not osopen(osfilename, osfile))
 		stop("cant open " ^ osfilename);
 	var data;
-	if (not(osread(data, osfilename)))
+	if (not osread(data, osfilename))
 		stop("cant open " ^ osfilename);
 
 	data.converter("\r\n", _RM _RM);
@@ -21,7 +21,7 @@ function main() {
 	int ln = 0;
 	while (true) {
 		++ln;
-		if (not(mod(ln, 1000)))
+		if (not mod(ln, 1000))
 			printl(ln);
 		let line = data.substr2(ix, delimiter);
 		// 		line.outputl();

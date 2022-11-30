@@ -11,7 +11,7 @@ var origusername;
 function main(in cmd, in username) {
 
 	if (username) {
-		if (not(SECURITY.f(1).locate(username, xx))) {
+		if (not SECURITY.f(1).locate(username, xx)) {
 			call mssg(username.quote() ^ " user does not exist in executeas()");
 			return 0;
 		}

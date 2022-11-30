@@ -108,7 +108,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				// only if email address occurs more than once
 				tt(1, usern) = "";
 				tt.converter("; ", _VM);
-				if (not(tt.locate(password.ucase()))) {
+				if (not tt.locate(password.ucase())) {
 					username = SECURITY.f(1, usern);
 				}
 			}
@@ -165,7 +165,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		// NB if "EXODUS" is in Auth File then some user restrictions apply eg password/ips
 
 		// check username exists
-		if (not(SECURITY.f(1).locate(username, usern))) {
+		if (not SECURITY.f(1).locate(username, usern)) {
 			usern = 0;
 		}
 
@@ -339,7 +339,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				// only checking during LOGIN. TODO is this ok?
 				// no longer has to be done after setting @username
 				if (origrequest1 == "LOGIN") {
-					if (not(authorised("DATASET ACCESS " ^ (SYSTEM.f(17).quote()), msg_, "", username))) {
+					if (not authorised("DATASET ACCESS " ^ (SYSTEM.f(17).quote()), msg_, "", username)) {
 						invalidlogin = msg_;
 						goto validateexit;
 					}
@@ -355,10 +355,10 @@ checkip:
 					// look for 192.168 first since most common
 					// then full ip number, then first bit (eg 10), then 1.2.3 last
 					let ip2 = ipno.field(".", 1, 2);
-					if (not(validips.locateusing(" ", ip2))) {
-						if (not(validips.locateusing(" ", ipno))) {
-							if (not(validips.locateusing(" ", ipno.field(".", 1)))) {
-								if (not(validips.locateusing(" ", ipno.field(".", 1, 3)))) {
+					if (not validips.locateusing(" ", ip2)) {
+						if (not validips.locateusing(" ", ipno)) {
+							if (not validips.locateusing(" ", ipno.field(".", 1))) {
+								if (not validips.locateusing(" ", ipno.field(".", 1, 3))) {
 invalidip:
 									invalidlogin = username ^ " is not authorised to login from this location (IP Number: " ^ ipno ^ ")";
 									invalidlogin ^= "|Allowed:" ^ (validips.quote());
@@ -607,7 +607,7 @@ passwordexpired:
 
 			// check for (EXODUS) user and password in revelation system file
 			var sysrec;
-			if (not(sysrec.read(systemfile(), username))) {
+			if (not sysrec.read(systemfile(), username)) {
 				goto validateexit;
 			}
 
@@ -1084,7 +1084,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 			var styles = userrec.f(19);
 			styles.replacer("Default", "");
-			if (not(styles2.readf(users, userrec.f(21), 19))) {
+			if (not styles2.readf(users, userrec.f(21), 19)) {
 				styles2 = "";
 			}
 
@@ -1121,7 +1121,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				}
 
 				// departmental default
-				if (not(tt2.len())) {
+				if (not tt2.len()) {
 					tt2 = styles2.f(1, vn);
 				}
 

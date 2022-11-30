@@ -199,7 +199,7 @@ nextuser:
 			for (const var groupn : range(1, ngroups)) {
 				ok = userx.f(5).contains(groupids.f(1, groupn));
 				// /BREAK;
-				if (not(not(ok)))
+				if (not not(ok))
 					break;
 			}  // groupn;
 		} else {
@@ -266,7 +266,7 @@ exit:
 
 	while (true) {
 		// /BREAK;
-		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
+		if (not ("." ^ VM ^ FM).contains(emaillog[-1]))
 			break;
 		emaillog.popper();
 	}  // loop;
@@ -287,7 +287,7 @@ exit:
 
 	while (true) {
 		// /BREAK;
-		if (not(("." ^ VM ^ FM).contains(emaillog[-1])))
+		if (not ("." ^ VM ^ FM).contains(emaillog[-1]))
 			break;
 		emaillog.popper();
 	}  // loop;

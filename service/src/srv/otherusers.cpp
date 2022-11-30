@@ -146,7 +146,7 @@ nextlock:;
 		if (not usercode)
 			break;
 		usercode.cutter(5);
-		if (not(curruserlockid.isnum())) {
+		if (not curruserlockid.isnum()) {
 			usercode -= (usercode / 10).floor();
 		}
 		returndata(2, ii) = "PROCESS" ^ usercode;

@@ -19,7 +19,7 @@ function main(in nextcompanycode) {
 		initcompany2 = "initcompany2_app";
 	}
 
-	if (not(nextcompanycode.unassigned())) {
+	if (not nextcompanycode.unassigned()) {
 
 		if (nextcompanycode) {
 			var xx;
@@ -63,7 +63,7 @@ function main(in nextcompanycode) {
 	}
 
 	// if company code2 is not specified then use company code IF alphabetic
-	if (not(srv.company.f(28))) {
+	if (not srv.company.f(28)) {
 		if (srv.gcurrcompcode.match("^[A-Za-z]*$")) {
 			srv.company(28) = srv.gcurrcompcode;
 		}
@@ -131,10 +131,10 @@ function main(in nextcompanycode) {
 		// end
 	}
 
-	if (not(srv.company.f(4))) {
+	if (not srv.company.f(4)) {
 		srv.company(4) = srv.company.f(5);
 	}
-	if (not(srv.company.f(5))) {
+	if (not srv.company.f(5)) {
 		srv.company(5) = srv.company.f(4);
 	}
 	// if intercurrency conversion account is blank then
@@ -162,7 +162,7 @@ function main(in nextcompanycode) {
 	SYSTEM(134) = srv.company.f(3);
 
 	// number format (@USER2)
-	if (not(ndec.readf(srv.currencies, srv.company.f(3), 3))) {
+	if (not ndec.readf(srv.currencies, srv.company.f(3), 3)) {
 		ndec = 2;
 	}
 	// default to dot for decimal point
@@ -185,7 +185,7 @@ function main(in nextcompanycode) {
 	let financialyear = srv.company.f(6);
 	var firstmonth	  = financialyear.field(",", 1);
 	if (firstmonth.isnum()) {
-		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",", firstmonth, temp))) {
+		if (not var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",", firstmonth, temp)) {
 			firstmonth = 1;
 		}
 		var maxperiod = financialyear.field(",", 2);

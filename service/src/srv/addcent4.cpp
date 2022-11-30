@@ -23,7 +23,7 @@ noconv:
 		}
 
 		// non-numeric input - no conv
-		if (not(inx.isnum())) {
+		if (not inx.isnum()) {
 			goto noconv;
 		}
 
@@ -36,7 +36,7 @@ noconv:
 		}
 
 		// not pure digits - no conv
-		if (not(inx.match("^\\d*$"))) {
+		if (not inx.match("^\\d*$")) {
 			goto noconv;
 		}
 

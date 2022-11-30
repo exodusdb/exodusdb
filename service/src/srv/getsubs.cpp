@@ -44,7 +44,7 @@ function main(in mode) {
 		// lock source of document numbers
 		printl("*lock source of document numbers");
 		var dummy;
-		if (not(lockrecord("DOCUMENTS", srv.documents, "0", dummy, 10))) {
+		if (not lockrecord("DOCUMENTS", srv.documents, "0", dummy, 10)) {
 			req.valid = 0;
 			return 0;
 		}

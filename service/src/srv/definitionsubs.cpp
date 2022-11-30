@@ -113,13 +113,13 @@ function main(in mode) {
 
 				// get system and backup rec from dos
 			} else {
-				if (not(RECORD.osread(ID.lcase()))) {
+				if (not RECORD.osread(ID.lcase())) {
 					RECORD = "";
 				}
-				if (not(backuprec.osread(backupkey.lcase()))) {
+				if (not backuprec.osread(backupkey.lcase())) {
 					backuprec = "";
 				}
-				if (not(smtprec.osread(smtpkey.lcase()))) {
+				if (not smtprec.osread(smtpkey.lcase())) {
 					smtprec = "";
 				}
 			}
@@ -159,7 +159,7 @@ function main(in mode) {
 				var temp;
 				if (temp.read(req.srcfile, "CHEQUEDESIGN*DEFAULT")) {
 
-					if (not(RECORD.read(req.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1)))) {
+					if (not RECORD.read(req.srcfile, "CHEQUEDESIGN*" ^ temp.f(1, 1))) {
 						goto nochequeformat;
 					}
 
@@ -350,7 +350,7 @@ preventupdate:
 			for (const var fn : range(100, 102)) {
 				let usercode = RECORD.f(fn);
 				if (usercode) {
-					if (not(SECURITY.f(1).locate(usercode))) {
+					if (not SECURITY.f(1).locate(usercode)) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}

@@ -260,10 +260,10 @@ function main() {
 		}
 		// also in LOGON.OLD and INIT.GENERAL
 		let lockkey = "INIT.GENERAL.LOGIN";
-		if (not(voc.lock(lockkey))) {
+		if (not voc.lock(lockkey)) {
 			// np if own lock
 			if (FILEERROR != "414") {
-				if (not(lockrecord("VOC", voc, "INIT.GENERAL.LOGIN", "", initwaitsecs))) {
+				if (not lockrecord("VOC", voc, "INIT.GENERAL.LOGIN", "", initwaitsecs)) {
 					msg = "INIT.GENERAL couldnt get exclusive lock. Quitting.";
 					// maybe a long upgrade process is running
 					call note(msg);
@@ -371,7 +371,7 @@ updateversion:
 	if (bp.open("GBP", "")) {
 		for (const var ii : range(1, 9999)) {
 			var rec;
-			if (not(rec.read(bp, "$DATA." ^ ii))) {
+			if (not rec.read(bp, "$DATA." ^ ii)) {
 				rec = "";
 			}
 			// /BREAK;
@@ -452,7 +452,7 @@ updateversion:
 	// 	temp.converter(".", "");
 	// 	if (colors.osread(temp ^ ".vid")) {
 	// 		let color2;
-	// 		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
+	// 		if (not color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO")) {
 	// 			color2 = "";
 	// 		}
 	// 		if (colors != color2) {
@@ -595,7 +595,7 @@ nextreport:
 	// leave old SYSTEM around in case old version of software reinstalled
 	// can be deleted manually
 	if (tt.osread("system")) {
-		if (not(var("system.cfg").osfile())) {
+		if (not var("system.cfg").osfile()) {
 			//var(tt).oswrite("system.cfg");
 			if (not var(tt).oswrite("system.cfg"))
 				loglasterror();
@@ -814,7 +814,7 @@ nextreport:
 
 	call log2("*get codepage as an environment variable", logtime);
 	// will not override entries in SYSTEM.CFG
-	if (not(SYSTEM.f(12).locate("CODEPAGE", vn))) {
+	if (not SYSTEM.f(12).locate("CODEPAGE", vn)) {
 
 		// en_US.UTF-8
 		//call osgetenv("LANG", codepage);
@@ -1073,7 +1073,7 @@ nextreport:
 	call logprocess(sessionid, "LOGIN", "", "", "", "");
 	SYSTEM(4) = sessionid;
 
-	if (not(SYSTEM.f(22).len())) {
+	if (not SYSTEM.f(22).len()) {
 		SYSTEM(22) = 300;
 	}
 
@@ -1329,7 +1329,7 @@ nextreport:
 	var	 foreign_dbnames = attach.f(1).convert(VM, FM);
 	foreign_dbno		 = 0;
 	for (var foreign_dbname : foreign_dbnames) {
-		if (not(foreign_dbname))
+		if (not foreign_dbname)
 			continue;
 		var foreign_dbconn;
 		if (not foreign_dbconn.connect(foreign_dbname))
@@ -1491,7 +1491,7 @@ adddatasetcodename:
 	// if @username<>'EXODUS' and datasetid<4> then
 	// lock even to EXODUS to prevent installation where EXODUS pass is known
 	if (datasetid.f(4)) {
-		if (not(datasetid.f(4).locate(cid(), xx))) {
+		if (not datasetid.f(4).locate(cid(), xx)) {
 			msg_ = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
 			gosub failsys();
 			stop();

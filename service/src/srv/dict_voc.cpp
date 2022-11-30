@@ -166,7 +166,7 @@ function main() {
 
 	let fn = "QFILE";
 	var comparefile;
-	if (not(comparefile.open(fn))) {
+	if (not comparefile.open(fn)) {
 		printl("CANNOT OPEN " ^ fn);
 		stop();
 	}
@@ -678,7 +678,7 @@ function main() {
 	if (ans.starts("V")) {
 		ans = field2(RECORD, FM, -2);
 	}
-	if (not(ans.first(2).match("^\\d{2}$"))) {
+	if (not ans.first(2).match("^\\d{2}$")) {
 		ANS = "";
 	} else {
 		ANS = ans;

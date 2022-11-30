@@ -90,7 +90,7 @@ readmenu:
 		let menu = menus.f(1, menun).ucase();
 		if (menu) {
 			let menutask = "MENU " ^ menu;
-			if (not(SECURITY.f(10).locate(menutask, taskn))) {
+			if (not SECURITY.f(10).locate(menutask, taskn)) {
 				taskn = 0;
 			}
 
@@ -132,7 +132,7 @@ deleteit:
 	var compcode = "";
 
 	var allcomps;
-	if (not(allcomps.read(srv.companies, "%RECORDS%"))) {
+	if (not allcomps.read(srv.companies, "%RECORDS%")) {
 		select(srv.companies);
 		allcomps = "";
 nextcomp:

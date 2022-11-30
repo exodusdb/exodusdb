@@ -80,7 +80,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 		while (true) {
 			let lastchar = prefix[-1];
 			// /BREAK;
-			if (not(var("0123456789").contains(lastchar)))
+			if (not var("0123456789").contains(lastchar))
 				break;
 			startx.prefixer(lastchar);
 			prefix.popper();
@@ -99,7 +99,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 			while (true) {
 				let lastchar = tt[-1];
 				// /BREAK;
-				if (not(var("0123456789").contains(lastchar)))
+				if (not var("0123456789").contains(lastchar))
 					break;
 				finish.prefixer(lastchar);
 				tt.popper();
@@ -196,7 +196,7 @@ exit:
 }
 
 subroutine writelist() {
-	if (not(keys.len())) {
+	if (not keys.len()) {
 		return;
 	}
 	keys.cutter(1);

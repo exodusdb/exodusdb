@@ -144,8 +144,8 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	rowfieldismv.redim(20);
 	for (const int rowfn : range(1, nrowfields)) {
 		rowfield = rowfields.f(1, rowfn);
-		if (not(rowdict(rowfn).read(DICT, rowfield))) {
-			if (not(rowdict(rowfn).read(dictvoc, rowfield))) {
+		if (not rowdict(rowfn).read(DICT, rowfield)) {
+			if (not rowdict(rowfn).read(dictvoc, rowfield)) {
 				call mssg(rowfield.quote() ^ " row field doesnt exist in " ^ filename);
 				stop();
 			}

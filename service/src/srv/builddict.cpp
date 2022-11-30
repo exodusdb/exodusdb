@@ -222,7 +222,7 @@ subroutine getblock() {
 			if (blocktype) {
 				block.cutter(1);
 				// 				while (true) {
-				// 					if (not(block.ends(FM))) break;
+				// 					if (not block.ends(FM)) break;
 				// 					block.popper();
 				// 				}// loop;
 				block.trimmerlast(FM);

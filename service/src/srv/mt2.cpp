@@ -43,7 +43,7 @@ function main(in type, in in0, in mode, out out0) {
 		out0 = hours + mins / 60;
 
 	} else {
-		if (not(in2.isnum())) {
+		if (not in2.isnum()) {
 			out0   = "";
 			STATUS = 2;
 			return 0;

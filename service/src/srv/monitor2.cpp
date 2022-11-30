@@ -273,12 +273,12 @@ nextprocess:
 		if (not dbasecode) {
 			goto nextprocess;
 		}
-		if (not(dbasecodes.f(1).locate(dbasecode, dbasen))) {
+		if (not dbasecodes.f(1).locate(dbasecode, dbasen)) {
 			dbasecodes(1, dbasen) = dbasecode;
 		}
 		dbasesystems(1, dbasen) = RECORD.f(51);
 		status					= calculate("STATUS");
-		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
+		if (not var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn)) {
 			// statusn will be 6
 			processcount(20, dbasen) = status;
 		}
@@ -389,7 +389,7 @@ nextprocess:
 			if (startit) {
 				var tt = "../data/" ^ dbasecode.lcase() ^ "/general/revmedia.lk";
 				tt.converter("/", OSSLASH);
-				if (not(tt.osfile())) {
+				if (not tt.osfile()) {
 					startit = 0;
 				}
 			}
@@ -507,7 +507,7 @@ nextprocess:
 				}
 			}
 
-			if (not(backupdrives.f(1).locate(backupdrive, backupdriven))) {
+			if (not backupdrives.f(1).locate(backupdrive, backupdriven)) {
 				backupdrives(1, backupdriven) = backupdrive;
 
 				// ensure something is on the target

@@ -74,7 +74,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		var props = "";
 		// if unassigned(id) else props:=' id=':quote(id)
 		// if unassigned(onclick) else props:=' onclick = ':quote(onclick)
-		if (not(arg5.unassigned())) {
+		if (not arg5.unassigned()) {
 			props ^= " onclick = " ^ (arg5.quote());
 		}
 

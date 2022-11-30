@@ -50,7 +50,7 @@ function main(in mode, in params, io result, io msg) {
 		printl();
 		while (true) {
 			// /BREAK;
-			if (not(not(esctoexit())))
+			if (not not(esctoexit()))
 				break;
 			call ossleep(1000 * var(3).rnd());
 			call roundrobin("ONEVENT", params2, result, errormsg);

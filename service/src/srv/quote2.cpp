@@ -2,7 +2,7 @@
 libraryinit()
 
 function main(in string0) {
-	if (not(string0.len())) {
+	if (not string0.len()) {
 		return string0;
 	}
 

@@ -186,13 +186,13 @@ function main(in mode) {
 		call log2("*fix an error", logtime);
 		while (true) {
 			// /BREAK;
-			if (not(t10.contains("MEDIA MEDIA ")))
+			if (not t10.contains("MEDIA MEDIA "))
 				break;
 			t10.replacer("MEDIA MEDIA ", "MEDIA ");
 		}  // loop;
 		while (true) {
 			// /BREAK;
-			if (not(t10.contains("JOB JOB ")))
+			if (not t10.contains("JOB JOB "))
 				break;
 			t10.replacer("JOB JOB ", "JOB ");
 		}  // loop;

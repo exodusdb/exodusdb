@@ -208,7 +208,7 @@ function main(in mode) {
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
 				let task = tasks.f(1, taskn);
 				let temp = task.starts("DOCUMENT: ") ? "#" : "";
-				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
+				if (not authorised("!" ^ temp ^ task, msg, "")) {
 					RECORD.remover(10, taskn);
 					RECORD.remover(11, taskn);
 				}
@@ -222,7 +222,7 @@ function main(in mode) {
 			let nusers	  = usercodes.fcount(VM);
 
 			var usern;
-			if (not(usercodes.f(1).locate(USERNAME, usern))) {
+			if (not usercodes.f(1).locate(USERNAME, usern)) {
 				msg = USERNAME ^ " user not in in authorisation file";
 				return invalid(msg);
 				stop();
@@ -284,8 +284,8 @@ function main(in mode) {
 						let nkeys = invisiblekeys.fcount(VM);
 						for (const var keyn : range(1, nkeys)) {
 							let keyx = invisiblekeys.f(1, keyn);
-							if (not(otherkeys.f(1).locate(keyx))) {
-								if (not(visiblekeys.f(1).locate(keyx))) {
+							if (not otherkeys.f(1).locate(keyx)) {
+								if (not visiblekeys.f(1).locate(keyx)) {
 									otherkeys ^= VM ^ keyx;
 								}
 							}
@@ -414,7 +414,7 @@ function main(in mode) {
 					}
 
 					var ousern;
-					if (not(origfullrec_.f(1).locate(userx, ousern))) {
+					if (not origfullrec_.f(1).locate(userx, ousern)) {
 						ousern = 0;
 					}
 
@@ -504,7 +504,7 @@ function main(in mode) {
 				let task = tasks.f(1, taskn);
 				if (task) {
 					var newtaskn;
-					if (not(req.orec.f(10).locate(task, newtaskn))) {
+					if (not req.orec.f(10).locate(task, newtaskn)) {
 						let lockx = locks.f(1, taskn);
 
 						if (not RECORD.f(10).locateby("AL", task, newtaskn)) {
@@ -520,7 +520,7 @@ function main(in mode) {
 		var temp;
 		if (temp.read(DEFINITIONS, "SECURITY")) {
 			var dummy;
-			if (not(dummy.read(DEFINITIONS, "SECURITY." ^ date()))) {
+			if (not dummy.read(DEFINITIONS, "SECURITY." ^ date())) {
 				temp.write(DEFINITIONS, "SECURITY." ^ date());
 			}
 			temp = "";
@@ -596,7 +596,7 @@ function main(in mode) {
 							}
 						}
 						// /BREAK;
-						if (not(not(menuid)))
+						if (not not(menuid))
 							break;
 					}  // usern2;
 				}
@@ -686,7 +686,7 @@ function main(in mode) {
 				let userx = usercodes.f(1, usern);
 				if (not userx.contains("---")) {
 					if (userx and not(userx.contains("EXODUS"))) {
-						if (not(RECORD.f(1).locate(userx, temp))) {
+						if (not RECORD.f(1).locate(userx, temp)) {
 							var userrec;
 							if (userrec.read(users, userx)) {
 								if (users) {
@@ -734,7 +734,7 @@ function main(in mode) {
 					var ccaddress = replyto;
 
 					// also inform accounts although cancelled users are not emailed to accounts
-					if (not((toaddress ^ ccaddress).contains("accounts@neosys.com"))) {
+					if (not (toaddress ^ ccaddress).contains("accounts@neosys.com")) {
 						if (ccaddress) {
 							ccaddress ^= ";";
 						}
@@ -975,7 +975,7 @@ subroutine changepassx(in userx, in newpassword) {
 	var sysrec	  = datax.f(1, 1, 2);
 	sysrec.converter(TM ^ ST ^ chr(249), FM ^ VM ^ SM);
 	if (not sysrec) {
-		if (not(sysrec.read(systemfile(), userx))) {
+		if (not sysrec.read(systemfile(), userx)) {
 			sysrec	  = "USER";
 			sysrec(2) = APPLICATION;
 			sysrec(5) = "EXODUS";
@@ -1118,7 +1118,7 @@ subroutine getemailtx(io emailtx, io newusers, in isnew, in userx, in userrec, i
 				if (old) {
 					old = "removed " ^ old;
 				}
-				if (not(newx.len())) {
+				if (not newx.len()) {
 					old.move(newx);
 				}
 				was = "";

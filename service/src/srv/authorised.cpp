@@ -149,7 +149,7 @@ updateprivs:
 			// NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
 			noadd = (task.ends(DQ)) or (SECURITY.len() > maxstrsize_ * 2 / 3);
 			// if passed a default lock then add even tasks ending like "XXXXX"
-			if (not(defaultlock.unassigned())) {
+			if (not defaultlock.unassigned()) {
 				if (defaultlock) {
 					noadd = 0;
 				}
@@ -230,7 +230,7 @@ notallowed:
 	}
 
 	// find the user
-	if (not(SECURITY.f(1).locate(username, usern))) {
+	if (not SECURITY.f(1).locate(username, usern)) {
 	}
 
 	// user must have all the keys for all the locks on this task

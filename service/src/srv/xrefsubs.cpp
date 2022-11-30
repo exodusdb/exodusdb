@@ -159,7 +159,7 @@ subroutine validateupdate(in deleting, in validating, in subfn, in masterfilenam
 	if (validating) {
 
 		var msg;
-		if (not(locking("LOCK", masterfilename, mastercode, "", locklist, 1, msg))) {
+		if (not locking("LOCK", masterfilename, mastercode, "", locklist, 1, msg)) {
 			gosub unlockall(locklist);
 			msg = mastercode.quote() ^ " master record is in use elsewhere|Try again later";
 			gosub invalid(msg);

@@ -58,7 +58,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	}
 
 	// default runtime to once
-	if (not(srv.document.field(FM, 20, 10).convert(FM, ""))) {
+	if (not srv.document.field(FM, 20, 10).convert(FM, "")) {
 		// run once now
 		srv.document(27) = 1;
 	}
@@ -199,7 +199,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	// prevent document from being run until the request has been processed
 	// relies on unlock all in listen
 	if (mode == "ASAP") {
-		if (not(srv.documents.lock(docid))) {
+		if (not srv.documents.lock(docid)) {
 			// ignore and proceed even cannot lock the document. why?
 		}
 	}

@@ -274,7 +274,7 @@ okfail:
 	USERNAME = (userx);
 
 	var sysrec;
-	if (not(sysrec.read(systemfile(), userx))) {
+	if (not sysrec.read(systemfile(), userx)) {
 		sysrec = "";
 	}
 	if (USERNAME == "EXODUS") {

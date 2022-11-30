@@ -230,7 +230,7 @@ nocommon:
 	if (dictids != "RECORD") {
 		// 		while (true) {
 		// 			// /BREAK;
-		// 			if (not(dictids.ends(FM))) break;
+		// 			if (not dictids.ends(FM)) break;
 		// 			dictids.popper();
 		// 		}// loop;
 		dictids.trimmerlast(FM);
@@ -404,7 +404,7 @@ nextrec:
 
 	// filter out unauthorised
 	if (chk_authorised) {
-		if (not(calculate("AUTHORISED"))) {
+		if (not calculate("AUTHORISED")) {
 			goto nextrec;
 		}
 	}

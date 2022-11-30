@@ -169,7 +169,7 @@ readdoc:
 
 	// only do saved and enabled documents for now
 	// 0/1 saved disabled/enabled. Blank=Ordinary documents
-	if (not(srv.document.f(12))) {
+	if (not srv.document.f(12)) {
 		goto nextdoc;
 	}
 
@@ -271,7 +271,7 @@ preventsameday:
 
 		// day of month restrictions
 		if (restrictions.f(3)) {
-			if (not(restrictions.f(3).locate(date.field("/", 1) + 0, xx))) {
+			if (not restrictions.f(3).locate(date.field("/", 1) + 0, xx)) {
 				if (logging) {
 					printl("wrong day of month");
 				}
@@ -281,7 +281,7 @@ preventsameday:
 
 		// month of year restrictions
 		if (restrictions.f(4)) {
-			if (not(restrictions.f(4).locate(date.field("/", 2) + 0, xx))) {
+			if (not restrictions.f(4).locate(date.field("/", 2) + 0, xx)) {
 				if (logging) {
 					printl("wrong month");
 				}
@@ -291,7 +291,7 @@ preventsameday:
 
 		// day of week restrictions
 		if (restrictions.f(5)) {
-			if (not(restrictions.f(5).locate((idate - 1).mod(7) + 1, xx))) {
+			if (not restrictions.f(5).locate((idate - 1).mod(7) + 1, xx)) {
 				if (logging) {
 					printl("wrong day of week");
 				}
@@ -301,7 +301,7 @@ preventsameday:
 
 		// date restrictions
 		if (restrictions.f(6)) {
-			if (not(restrictions.f(6).locate(idate, xx))) {
+			if (not restrictions.f(6).locate(idate, xx)) {
 				if (logging) {
 					printl("wrong date");
 				}
@@ -316,7 +316,7 @@ preventsameday:
 	// lock documents that need processing
 	// but reread after lock in case another process has not started processing it
 	if (not locked) {
-		if (not(lockrecord("DOCUMENTS", srv.documents, docid))) {
+		if (not lockrecord("DOCUMENTS", srv.documents, docid)) {
 			if (logging) {
 				printl("locked");
 			}
@@ -696,7 +696,7 @@ subroutine exec() {
 		// linkfilename2=inpath:str(rnd(10^15),8)[1,8]
 		linkfilename2 = inpath ^ ("00000000" ^ var(99999999).rnd()).last(8);
 		// /BREAK;
-		if (not(oslistf(linkfilename2 ^ ".*")))
+		if (not oslistf(linkfilename2 ^ ".*"))
 			break;
 	}  // loop;
 
@@ -900,7 +900,7 @@ subroutine getdaysago() {
 	xdate = date();
 	while (true) {
 		xdate -= 1;
-		// if (not(weekend.contains((xdate - 1).mod(7) + 1))) {
+		// if (not weekend.contains((xdate - 1).mod(7) + 1)) {
 		if (not weekend.contains(xdate.oconv("DW"))) {
 			daysago -= 1;
 		}

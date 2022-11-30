@@ -387,7 +387,7 @@ function main_init() {
 	SYSTEM(33) = 1;
 
 	timeoutsecs = SYSTEM.f(33, 5);
-	if (not(timeoutsecs.isnum())) {
+	if (not timeoutsecs.isnum()) {
 		timeoutsecs = "";
 	}
 	// if timeoutsecs='' then timeoutsecs=20*60;*ie 20 minutes
@@ -430,7 +430,7 @@ function main_init() {
 	// if count(subdirs,fm) else
 	tdir = "../logs/" ^ datasetcode;
 	tdir.converter("/", OSSLASH);
-	if (not(xx.osopen(tdir.lcase()))) {
+	if (not xx.osopen(tdir.lcase())) {
 		if (STATUS != 2) {
 			//call osmkdir(tdir.lcase());
 			if (not osmkdir(tdir.lcase()))
@@ -647,7 +647,7 @@ nextsearch0:
 
 		// call autorun instead of perform to allow output to remain on screen
 		// (BUT errors cause listen to crash and restart)
-		if (not(var("autorun.end").osfile())) {
+		if (not var("autorun.end").osfile()) {
 			call autorun3();
 		}
 
@@ -1026,7 +1026,7 @@ function got_link() {
 
 		// lock it to prevent other listeners from processing it
 		// unlock locks,'REQUEST*':linkfilename1
-		if (not(lockrecord("", locks1, "REQUEST*" ^ linkfilename1, xx))) {
+		if (not lockrecord("", locks1, "REQUEST*" ^ linkfilename1, xx)) {
 			if (tracing) {
 				printl("CANNOT LOCK LOCKS,", ("REQUEST*" ^ linkfilename1).quote());
 			}
@@ -1082,7 +1082,7 @@ openlink1:
 
 		// lock the replyfilename to prevent other listeners from processing it
 		// unlock locks,'REQUEST*':replyfilename
-		if (not(lockrecord("", locks1, "REQUEST*" ^ replyfilename, xx))) {
+		if (not lockrecord("", locks1, "REQUEST*" ^ replyfilename, xx)) {
 			// if tracing then print 'CANNOT LOCK LOCKS,':quote('REQUEST*':replyfilename)
 			continue;
 		}
@@ -1298,7 +1298,7 @@ function request_init() {
 				if (not osbread(datx(blockn), linkfile2, inptr, inblocksize))
 					abort(lasterror());
 
-				if (not(datx(blockn).len()))
+				if (not datx(blockn).len())
 					break;
 
 				// avoid hexcode spanning block end by moving one or two bytes backwards
@@ -2574,7 +2574,7 @@ function request_exit() {
 				blk = data_.first(outblocksize);
 				data_.cutter(outblocksize);
 
-				if (not(blk.len()))
+				if (not blk.len())
 					break;
 
 				// in LISTEN and SELECT2 for direct output
@@ -2711,7 +2711,7 @@ subroutine properlock() {
 	// will cause the LOCK statement to fail
 	srcfile2 = req.srcfile;
 	/*
-	if (not(req.srcfile.unassigned())) {
+	if (not req.srcfile.unassigned()) {
 		srcfile2.replacer("SHADOW.MFS" ^ SM, "");
 	}
 	*/
@@ -2858,7 +2858,7 @@ nolock:
 	if (masterlock) {
 
 		// fail if masterlock is missing or doesnt have the right session id
-		if (not(tt.read(leaselocks, masterlock.field("*", 1, 2)))) {
+		if (not tt.read(leaselocks, masterlock.field("*", 1, 2))) {
 			goto nolock;
 		}
 		if (tt.f(5) != masterlock.field("*", 3)) {
@@ -3092,7 +3092,7 @@ subroutine filesecurity() {
 		return;
 	}
 	let positive = authorised(filetitle2 ^ " " ^ secmode, msg0, "") ? "" : "#";
-	if (not(authorised(positive ^ filetitle2 ^ " " ^ secmode ^ " " ^ (keyx.quote()), posmsg))) {
+	if (not authorised(positive ^ filetitle2 ^ " " ^ secmode ^ " " ^ (keyx.quote()), posmsg)) {
 		// !*use the FILENAME ACCESS/DELETE "ID" message because gives clue
 		// !*that they may be allowed to access other records
 		if (positive) {

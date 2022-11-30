@@ -23,7 +23,7 @@ function main(in /*mode*/, in datasetcode, out result) {
 	let ii = "";
 	for (const var ii : range(1, 120)) {
 		// /BREAK;
-		if (not(otherusers(datasetcode)))
+		if (not otherusers(datasetcode))
 			break;
 		print(".");
 		call ossleep(1000 * 1);

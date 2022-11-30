@@ -154,8 +154,8 @@ function main(in mode) {
 				let email = emails.field(";", ii);
 				if (email) {
 					let emaildomain = email.field("@", 2);
-					if (not(emaildomains.locateusing(" ", emaildomain))) {
-						if (not(emaildomains.locateusing(" ", email))) {
+					if (not emaildomains.locateusing(" ", emaildomain)) {
+						if (not emaildomains.locateusing(" ", email)) {
 							msg = "Neither " ^ (emaildomain.quote()) ^ " nor " ^ (email.quote()) ^ "|is in the list of allowed email domains/addresses";
 							return invalid(msg);
 						}
@@ -254,7 +254,7 @@ function main(in mode) {
 			}
 
 			var newusern;
-			if (not(SECURITY.f(1).locate(userdept, newusern))) {
+			if (not SECURITY.f(1).locate(userdept, newusern)) {
 				msg = (userdept ^ " USER GROUP does not exist").quote();
 				gosub invalid(msg);
 				gosub unlocksec();
@@ -361,7 +361,7 @@ function main(in mode) {
 			// /BREAK;
 			if (not(ID != "*!%"))
 				break;
-			if (not(ID.starts("%"))) {
+			if (not ID.starts("%")) {
 				if (RECORD.read(users, ID)) {
 					gosub updatemirror();
 				}
@@ -406,7 +406,7 @@ function getusern() {
 	if (ID == "EXODUS") {
 		// usern remains unassigned to force an error if used later on
 	} else {
-		if (not(SECURITY.f(1).locate(ID, usern))) {
+		if (not SECURITY.f(1).locate(ID, usern)) {
 			msg = ID.quote() ^ " User does not exist";
 			gosub invalid(msg);
 			return 0;
@@ -435,7 +435,7 @@ subroutine getuserdept2(in mode) {
 	// locate the user in the table
 	usercode = mode.field(",", 2);
 	var usern;
-	if (not(SECURITY.f(1).locate(usercode, usern))) {
+	if (not SECURITY.f(1).locate(usercode, usern)) {
 		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return;
@@ -468,7 +468,7 @@ subroutine getdepts() {
 			text.converter("0123456789", "");
 			text.trimmer();
 			if (text and text != "---") {
-				if (not(depts.locateusing(FM, text, deptn))) {
+				if (not depts.locateusing(FM, text, deptn)) {
 					depts(-1) = text;
 				}
 			}

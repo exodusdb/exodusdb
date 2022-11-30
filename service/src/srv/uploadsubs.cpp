@@ -613,7 +613,7 @@ nextline:
 						} else {
 							cell = iconv(cell, CONV);
 						}
-						if (not(cell.len())) {
+						if (not cell.len()) {
 							call mssg(cell0.quote() ^ " cannot be converted in line " ^ linenox ^ " col " ^ coln);
 							// indicate strange but leave workable date/time
 							cell = "00";
@@ -687,7 +687,7 @@ addbuff:
 			goto addbuff;
 		}
 
-		if (not(buff.len())) {
+		if (not buff.len()) {
 			eof	 = 1;
 			line = "";
 			return;
@@ -697,11 +697,11 @@ addbuff:
 	// skip empty lines
 	// 	while (true) {
 	// 		// /BREAK;
-	// 		if (not(buff.starts("\r"))) break;
+	// 		if (not buff.starts("\r")) break;
 	// 		buff.cutter(1);
 	// 	}// loop;
 	buff.trimmerfirst("\r");
-	if (not(buff.len())) {
+	if (not buff.len()) {
 		goto addbuff;
 	}
 
