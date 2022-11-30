@@ -357,7 +357,7 @@ preventsameday:
 	let runasusercode = srv.document.f(1);
 	var userx;
 	if (not userx.read(users, runasusercode)) {
-		if (not(runasusercode == "EXODUS")) {
+		if (runasusercode != "EXODUS") {
 			printl("runas user ", runasusercode, " doesnt exist");
 			goto nextdoc;
 		}
@@ -396,7 +396,7 @@ preventsameday:
 			// get the user record
 			let usercode = usercodes.f(1, usern);
 			if (not userx.read(users, usercode)) {
-				if (not(usercode == "EXODUS")) {
+				if (usercode != "EXODUS") {
 					goto nextuser;
 				}
 				userx = "EXODUS";

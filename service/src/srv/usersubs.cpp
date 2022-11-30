@@ -359,7 +359,7 @@ function main(in mode) {
 				ID = "*!%";
 			}
 			// /BREAK;
-			if (not(ID != "*!%"))
+			if (ID == "*!%")
 				break;
 			if (not ID.starts("%")) {
 				if (RECORD.read(users, ID)) {

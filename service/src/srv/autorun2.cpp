@@ -81,7 +81,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	if (runasusercode) {
 		var runasuser;
 		if (not runasuser.read(users, runasusercode)) {
-			if (not(runasusercode == "EXODUS")) {
+			if (runasusercode != "EXODUS") {
 				msg = runasusercode.quote() ^ " user doesnt exist";
 				return 0;
 			}
@@ -146,7 +146,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				let usercode = targetusercodes.f(1, usern);
 				var userx;
 				if (not userx.read(users, usercode)) {
-					if (not(usercode == "EXODUS")) {
+					if (usercode != "EXODUS") {
 						msg = usercode.quote() ^ " user doesnt exist";
 						return 0;
 					}

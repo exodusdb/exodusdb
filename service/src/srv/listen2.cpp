@@ -272,7 +272,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					var ii;
 					for (ii = usern + 1; ii <= nn; ++ii) {
 						// /BREAK;
-						if (not(SECURITY.f(1, ii + 1) != "---"))
+						if (SECURITY.f(1, ii + 1) == "---")
 							break;
 					}  // ii;
 					validips = SECURITY.f(6, ii);
