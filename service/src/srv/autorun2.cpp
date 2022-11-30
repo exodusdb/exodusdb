@@ -68,7 +68,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	// get target usercodes
 
 	var users;
-	if (not(users.open("USERS", ""))) {
+	if (not users.open("USERS", "")) {
 		msg = "USERS file is missing";
 		return 0;
 	}

@@ -135,7 +135,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	var currdept = "";
 
 	var users;
-	if (not(users.open("USERS", ""))) {
+	if (not users.open("USERS", "")) {
 		call mssg(lasterror());
 		return 0;
 	}

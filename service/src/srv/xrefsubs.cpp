@@ -30,7 +30,7 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 	// @id,@record,orec
 
 	if (masterfile.unassigned()) {
-		if (not(masterfile.open(masterfilename, ""))) {
+		if (not masterfile.open(masterfilename, "")) {
 			let msg = masterfilename.quote() ^ " file does not exist";
 			return invalid(msg);
 		}

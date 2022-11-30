@@ -134,12 +134,12 @@ function main() {
 	anyusers = 0;
 	// upgradefilename = "upgrade.php";
 
-	if (not(processes.open("PROCESSES", ""))) {
+	if (not processes.open("PROCESSES", "")) {
 		call mssg(lasterror());
 		return 0;
 	}
 
-	if (not(DICT.open("DICT.PROCESSES", ""))) {
+	if (not DICT.open("DICT.PROCESSES", "")) {
 		// call mssg(lasterror());
 		return 0;
 	}
@@ -156,7 +156,7 @@ function main() {
 
 	// attempt lock and keep it locked while we check (async so very quick)
 	// so that we can update monitor status on the way out
-	if (not(lockrecord("PROCESSES", processes, monitorkey))) {
+	if (not lockrecord("PROCESSES", processes, monitorkey)) {
 		// print 'MONITOR2 is busy. Skipping Nagios update.'
 		return 0;
 	}

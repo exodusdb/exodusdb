@@ -29,7 +29,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 	// end
 
 	var srcdict;
-	if (not(srcdict.open("DICT." ^ filename, ""))) {
+	if (not srcdict.open("DICT." ^ filename, "")) {
 		abort(lasterror());
 	}
 
@@ -49,7 +49,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 	}
 
 	var lists;
-	if (not(lists.open("LISTS", ""))) {
+	if (not lists.open("LISTS", "")) {
 		abort(lasterror());
 	}
 	foundkeys.converter(VM, FM);

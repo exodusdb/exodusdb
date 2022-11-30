@@ -124,13 +124,13 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		filterout = "";
 	}
 
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		abort(lasterror());
 	}
-	if (not(DICT.open("DICT." ^ filename, ""))) {
+	if (not DICT.open("DICT." ^ filename, "")) {
 		abort(lasterror());
 	}
-	if (not(dictvoc.open("DICT.voc", ""))) {
+	if (not dictvoc.open("DICT.voc", "")) {
 		abort(lasterror());
 	}
 
@@ -241,7 +241,7 @@ nextmv:
 			tt = calculate(filterdictid);
 		}
 		if (filterin) {
-			if (not(filterin.locate(tt, xx))) {
+			if (not filterin.locate(tt, xx)) {
 				goto nextmv;
 			}
 		}
@@ -307,7 +307,7 @@ nextmv:
 		}
 
 		// determine which row to add into
-		if (not(allrowvals.f(1).locateby("AL", rowval, rown))) {
+		if (not allrowvals.f(1).locateby("AL", rowval, rown)) {
 			if (allrowvals.len() + rowval.len() > 65000) {
 				gosub abort_toobig(filename);
 			}
@@ -320,7 +320,7 @@ nextmv:
 
 			// determine which column to add into
 			colval = colvals.f(1, colvaln);
-			if (not(allcolvals.f(1).locateby(colorder, colval, coln))) {
+			if (not allcolvals.f(1).locateby(colorder, colval, coln)) {
 				ncols += 1;
 				if (allcolvals.len() + colval.len() > 65000) {
 					gosub abort_toobig(filename);

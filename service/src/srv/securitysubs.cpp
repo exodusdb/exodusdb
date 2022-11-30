@@ -216,7 +216,7 @@ function main(in mode) {
 		}
 
 		// hide higher/lower users
-		if (not(curruser_.contains("EXODUS"))) {
+		if (not curruser_.contains("EXODUS")) {
 
 			let usercodes = RECORD.f(1);
 			let nusers	  = usercodes.fcount(VM);
@@ -448,7 +448,7 @@ function main(in mode) {
 					}
 				}
 
-				if (not(RECORD.f(4, usern))) {
+				if (not RECORD.f(4, usern)) {
 					var username = RECORD.f(1, usern);
 					if (not username) {
 						// msg='USER NAME IS MISSING IN LINE ':USERN
@@ -457,7 +457,7 @@ function main(in mode) {
 						RECORD(4, usern) = username;
 					}
 					if (not(username.contains("---") or username == "BACKUP")) {
-						if (not(RECORD.f(7, usern))) {
+						if (not RECORD.f(7, usern)) {
 							// msg=quote(username):'|You must first give a password to this user'
 							msg = username.quote() ^ "|You must give an email or password for this user";
 							return invalid(msg);
@@ -507,7 +507,7 @@ function main(in mode) {
 					if (not(req.orec.f(10).locate(task, newtaskn))) {
 						let lockx = locks.f(1, taskn);
 
-						if (not(RECORD.f(10).locateby("AL", task, newtaskn))) {
+						if (not RECORD.f(10).locateby("AL", task, newtaskn)) {
 							RECORD.inserter(10, newtaskn, task);
 							RECORD.inserter(11, newtaskn, lockx);
 						}
@@ -561,7 +561,7 @@ function main(in mode) {
 		var newusers = "";
 
 		var users;
-		if (not(users.open("USERS", ""))) {
+		if (not users.open("USERS", "")) {
 			users = "";
 		}
 		// update users in the central system file if they exist there (direct login)
@@ -574,7 +574,7 @@ function main(in mode) {
 		for (const var usern : range(1, nusers)) {
 			let userx = usercodes.f(1, usern);
 
-			if (not(userx.contains("---"))) {
+			if (not userx.contains("---")) {
 
 				// get the original and current system records
 				var sysrec = RECORD.f(4, usern, 2);
@@ -591,7 +591,7 @@ function main(in mode) {
 					for (const var usern2 : range(usern + 1, nusers)) {
 						let usercode2 = usercodes.f(1, usern2);
 						if (usercode2) {
-							if (not(menuid.readf(users, usercode2, 34))) {
+							if (not menuid.readf(users, usercode2, 34)) {
 								menuid = "";
 							}
 						}
@@ -684,7 +684,7 @@ function main(in mode) {
 			// for (usern = 1; usern <= nusers; ++usern) {
 			for (const var usern : range(1, nusers)) {
 				let userx = usercodes.f(1, usern);
-				if (not(userx.contains("---"))) {
+				if (not userx.contains("---")) {
 					if (userx and not(userx.contains("EXODUS"))) {
 						if (not(RECORD.f(1).locate(userx, temp))) {
 							var userrec;
@@ -1033,17 +1033,17 @@ subroutine newpass3(io sysrec, in userx, in newpassword) {
 
 subroutine makesysrec(io sysrec, in userx, in newpassword) {
 
-	if (not(sysrec.f(1))) {
+	if (not sysrec.f(1)) {
 		sysrec(1) = "USER";
 	}
-	if (not(sysrec.f(2))) {
+	if (not sysrec.f(2)) {
 		sysrec(2) = APPLICATION;
 	}
-	if (not(sysrec.f(5))) {
+	if (not sysrec.f(5)) {
 		sysrec(5) = "EXODUS";
 	}
 	// if SYSREC<last.fn> else SYSREC<last.fn>='xxxxx'
-	if (not(sysrec.f(9))) {
+	if (not sysrec.f(9)) {
 		sysrec(9) = "xxxxx";
 	}
 

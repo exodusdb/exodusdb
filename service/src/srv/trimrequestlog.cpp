@@ -21,7 +21,7 @@ function main() {
 	let perioddays = 7;
 
 	var requestlog;
-	if (not(requestlog.open("REQUESTLOG", ""))) {
+	if (not requestlog.open("REQUESTLOG", "")) {
 		stop();
 	}
 

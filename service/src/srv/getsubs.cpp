@@ -32,7 +32,7 @@ function main(in mode) {
 	where.converter("/", OSSLASH);
 
 	if (srv.documents.unassigned()) {
-		if (not(srv.documents.open("DOCUMENTS", ""))) {
+		if (not srv.documents.open("DOCUMENTS", "")) {
 			req.valid = 0;
 			mssg(lasterror());
 			return 0;

@@ -144,7 +144,7 @@ nocommon:
 
 	response = "OK";
 	var file;
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		response = "Error: select2: " ^ (filename.quote()) ^ " file is not available";
 
 		// abort
@@ -162,7 +162,7 @@ nocommon:
 			gosub exit();
 			return 0;
 		}
-		if (not(linkfile2.osopen(linkfilename2))) {
+		if (not linkfile2.osopen(linkfilename2)) {
 			//response = "Error: select2: " ^ (linkfilename2.quote()) ^ " cannot open output file";
 			response = "Error: select2: Cannot open output file" ^ (linkfilename2.quote());
 
@@ -202,7 +202,7 @@ nocommon:
 	dictids.converter(" ", FM);
 	var dictrecs = "";
 
-	if (not(DICT.open("DICT." ^ dictfilename))) {
+	if (not DICT.open("DICT." ^ dictfilename)) {
 		response = "Error: select2: " ^ (("DICT." ^ filename).quote()) ^ " file is not available";
 
 		// abort
@@ -210,7 +210,7 @@ nocommon:
 		return 0;
 	}
 
-	if (not(openfile("DICT.voc", dictvoc))) {
+	if (not openfile("DICT.voc", dictvoc)) {
 		dictvoc = "";
 	}
 

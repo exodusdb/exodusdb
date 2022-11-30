@@ -49,11 +49,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 //		// look for local or cygwin wget.exe otherwise quit
 //		let exe = oscwd().contains(":") ? ".exe" : "";
 //		cmd		= SYSTEM.f(50) ^ "wget" ^ exe;
-//		if (not(cmd.osfile())) {
+//		if (not cmd.osfile()) {
 //			httpsbug = 1;
 //			cmd		 = "wget" ^ exe;
 //		}
-//		if (not(cmd.osfile())) {
+//		if (not cmd.osfile()) {
 //			// avoid error in READ/UPGRADE phase of MONITOR2
 //			// msg='wget.exe not available in CONTROL()'
 //			msg = "";

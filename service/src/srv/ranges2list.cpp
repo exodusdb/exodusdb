@@ -41,7 +41,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 	}
 
 	if (listid) {
-		if (not(lists.open("LISTS", ""))) {
+		if (not lists.open("LISTS", "")) {
 			abort(lasterror());
 		}
 		listn = "";

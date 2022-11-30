@@ -512,7 +512,7 @@ nextreport:
 		}
 	}
 
-	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
+	if (not DEFINITIONS.open("DEFINITIONS", "")) {
 		msg		= "The DEFINITIONS file is missing";
 		msg(-1) = "Did you startup using the right command file/datasettype?";
 		call note(msg);
@@ -693,7 +693,7 @@ nextreport:
 		//call osread(smtp, tpath ^ "smtp.cfg");
 		if (not osread(smtp, tpath ^ "smtp.cfg"))
 			loglasterror();
-		if (not(smtp.f(1))) {
+		if (not smtp.f(1)) {
 			//call osread(smtp, "smtp.cfg");
 			if (not osread(smtp, "smtp.cfg"))
 				loglasterror();
@@ -1035,9 +1035,9 @@ nextreport:
 
 	call log2("*create user file", logtime);
 	var	 users;
-	if (not(users.open("USERS", ""))) {
+	if (not users.open("USERS", "")) {
 
-		if (not(openfile("USERS", users, "DEFINITIONS", 1))) {
+		if (not openfile("USERS", users, "DEFINITIONS", 1)) {
 			// Ignore
 		}
 
@@ -1046,7 +1046,7 @@ nextreport:
 		let	 nusers	   = usercodes.fcount(VM);
 		for (const var usern : range(1, nusers)) {
 			let userx = usercodes.f(1, usern);
-			if (not(userx.contains("---"))) {
+			if (not userx.contains("---")) {
 				userx.writef(users, userx, 1);
 			}
 		}  // usern;
@@ -1132,38 +1132,38 @@ nextreport:
 	call log2("*open general files", logtime);
 	var	 valid = 1;
 	// DEFINITIONS='' why was this commented out?
-	if (not(openfile("ALANGUAGE", srv.alanguage, "DEFINITIONS"))) {
+	if (not openfile("ALANGUAGE", srv.alanguage, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not(openfile("COMPANIES", srv.companies, "DEFINITIONS"))) {
+	if (not openfile("COMPANIES", srv.companies, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not(openfile("COMPANY_VERSIONS", xx, "COMPANIES"))) {
+	if (not openfile("COMPANY_VERSIONS", xx, "COMPANIES")) {
 		valid = 0;
 	}
-	if (not(openfile("CURRENCIES", srv.currencies, "DEFINITIONS"))) {
+	if (not openfile("CURRENCIES", srv.currencies, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not(openfile("CURRENCY_VERSIONS", xx, "CURRENCIES"))) {
+	if (not openfile("CURRENCY_VERSIONS", xx, "CURRENCIES")) {
 		valid = 0;
 	}
-	if (not(openfile("MARKETS", srv.markets, "DEFINITIONS"))) {
+	if (not openfile("MARKETS", srv.markets, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not(openfile("MARKET_VERSIONS", xx, "MARKETS"))) {
+	if (not openfile("MARKET_VERSIONS", xx, "MARKETS")) {
 		valid = 0;
 	}
-//	if (not(openfile("UNITS", srv.units, "CURRENCIES"))) {
+//	if (not openfile("UNITS", srv.units, "CURRENCIES")) {
 //		valid	  = 0;
 //		srv.units = "";
 //	}
 	if (xx.open("UNITS", "")) {
 		perform("DELETEFILE UNITS (S)");
 	}
-	if (not(openfile("ADDRESSES", srv.addresses, "DEFINITIONS"))) {
+	if (not openfile("ADDRESSES", srv.addresses, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not(openfile("DOCUMENTS", srv.documents, "DEFINITIONS"))) {
+	if (not openfile("DOCUMENTS", srv.documents, "DEFINITIONS")) {
 		valid = 0;
 	}
 	// IF OPENFILE2('SHADOW',shadow,'DEFINITIONS',1) ELSE valid=0
@@ -1198,27 +1198,27 @@ nextreport:
 	// 		perform("ATTACH " ^ workpath ^ " (S)");
 	//
 	// 		// check/make LISTS file
-	// 		if (not(lists.open("LISTS", ""))) {
+	// 		if (not lists.open("LISTS", "")) {
 	// 			lists = "";
 	// 		}
-	// 		if (not(lists.contains(workpath))) {
+	// 		if (not lists.contains(workpath)) {
 	// 			createfile("" ^ workpath ^ " LISTS (S)");
-	// 			if (not(lists.open("LISTS", ""))) {
+	// 			if (not lists.open("LISTS", "")) {
 	// 				lists = "";
 	// 			}
-	// 			if (not(lists.contains(workpath))) {
+	// 			if (not lists.contains(workpath)) {
 	// 				// call note('FAILED TO MAKE LISTS FILE ON ':workpath
 	// 			}
 	// 		}
 	//
 	// 		call log2("*check lists file exists", logtime);
-	// 		if (not(lists.open("LISTS", ""))) {
+	// 		if (not lists.open("LISTS", "")) {
 	// 			clearfile(lists);
 	// 		}
 	//
 	// 	}
 
-	if (not(openfile("LISTS", lists, "DEFINITIONS"))) {
+	if (not openfile("LISTS", lists, "DEFINITIONS")) {
 		// Ignore
 	}
 
@@ -1273,7 +1273,7 @@ nextreport:
 			break;
 		// TODO lock/prevent double create with other processes
 		var file;
-		if (not(file.open(filename, ""))) {
+		if (not file.open(filename, "")) {
 			//createfile("REVBOOT " ^ filename ^ " (S)");
 			//if (not createfile("REVBOOT " ^ filename ^ " (S)"))
 			//	abort(lasterror());
@@ -1283,7 +1283,7 @@ nextreport:
 			// 				perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
 			// 				perform("ATTACH REVBOOT " ^ filename ^ " (S)");
 			// 			}
-			//if (not(file.open(filename, ""))) {
+			//if (not file.open(filename, "")) {
 				call sysmsg(filename.quote() ^ " could not be created by INIT.GENERAL");
 			//}
 		}

@@ -75,7 +75,7 @@ function main(in docids0 = "", in options0 = "") {
 	let suppressemail = options.contains("S");
 
 	var users;
-	if (not(users.open("USERS", ""))) {
+	if (not users.open("USERS", "")) {
 		call mssg(lasterror());
 		return 0;
 	}
@@ -90,7 +90,7 @@ function main(in docids0 = "", in options0 = "") {
 	let lockfilename = "DOCUMENTS";
 	var lockfile	 = srv.documents;
 	let lockkey		 = "%" ^ datasetcode ^ "%";
-	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 1))) {
+	if (not lockrecord(lockfilename, lockfile, lockkey, "", 1)) {
 
 		return 0;
 	}
@@ -248,7 +248,7 @@ currdatetime:
 
 				// or specific multiple hours
 			} else {
-				if (not(hours.locate(hournow, xx))) {
+				if (not hours.locate(hournow, xx)) {
 					if (logging) {
 						printl("wrong hour");
 					}

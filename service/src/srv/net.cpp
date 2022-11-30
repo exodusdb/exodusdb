@@ -30,7 +30,7 @@ function main() {
 		dbcode = "DEFAULT";
 	}
 
-	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
+	if (not DEFINITIONS.open("DEFINITIONS", "")) {
 		abort(lasterror());
 	}
 
@@ -198,7 +198,7 @@ listen:
 				srv.address ^= bakpars.f(10);
 			}
 			if (srv.address == "") {
-				if (not(srv.address.readf(DEFINITIONS, "REPLICATION", 12))) {
+				if (not srv.address.readf(DEFINITIONS, "REPLICATION", 12)) {
 					srv.address = "";
 				}
 			}

@@ -74,14 +74,14 @@ lockit:
 		return 1;
 	}
 
-	if (not(lockfile.open(lockfilename, ""))) {
+	if (not lockfile.open(lockfilename, "")) {
 		msg = lockfilename.quote() ^ " file cannot be opened in LOCKING";
 		return 0;
 	}
 
 	var tryn = 1;
 tryagain:
-	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 0, allowduplicate))) {
+	if (not lockrecord(lockfilename, lockfile, lockkey, "", 0, allowduplicate)) {
 		var lockholder = (lockfilename ^ "*" ^ lockkey).xlate("LOCKS", 4, "X");
 		if (lockholder == "") {
 			lockholder = "Someone, maybe you,";
@@ -154,7 +154,7 @@ subroutine unlockall(io locklist, io msg) {
 		let filename = lockitem.field(lockitemsep_, 1);
 		let lockkeyx = lockitem.field(lockitemsep_, 2, 9999);
 		if (filename != filename2) {
-			if (not(lockfile.open(filename, ""))) {
+			if (not lockfile.open(filename, "")) {
 				msg(-1)	 = filename.quote() ^ " file cannot be opened in LOCKING,UNLOCKALL";
 				lockfile = "";
 			}

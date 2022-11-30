@@ -45,7 +45,7 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 	}
 
 	// if definitions else
-	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
+	if (not DEFINITIONS.open("DEFINITIONS", "")) {
 		return 0;
 	}
 	// if definitions else return

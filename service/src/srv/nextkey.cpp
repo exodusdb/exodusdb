@@ -30,13 +30,13 @@ function main(in mode, in previous0 = "") {
 	}
 
 	var keyfile;
-	if (not(keyfile.open(keyfilename, ""))) {
+	if (not keyfile.open(keyfilename, "")) {
 		call mssg(lasterror());
 		return ANS;
 	}
 
 	var actfile;
-	if (not(actfile.open(actfilename, ""))) {
+	if (not actfile.open(actfilename, "")) {
 		call mssg(lasterror());
 		return ANS;
 	}
@@ -44,7 +44,7 @@ function main(in mode, in previous0 = "") {
 	// lock the source of numbers
 	var buffer = "";
 lockit:
-	if (not(lockrecord(keyfilename, keyfile, seqkey))) {
+	if (not lockrecord(keyfilename, keyfile, seqkey)) {
 		var temp = keyfilename;
 		if (temp.ends("S")) {
 			temp.cutter(1);

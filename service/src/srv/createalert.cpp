@@ -79,7 +79,7 @@ syntax:
 	}
 
 	var users;
-	if (not(users.open("USERS", ""))) {
+	if (not users.open("USERS", "")) {
 		abort(lasterror());
 	}
 

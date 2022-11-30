@@ -20,7 +20,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		languagefile = "";
 	}
 	if (languagefile == "") {
-		if (not(languagefile.open("ALANGUAGE", ""))) {
+		if (not languagefile.open("ALANGUAGE", "")) {
 			return 0;
 		}
 	}

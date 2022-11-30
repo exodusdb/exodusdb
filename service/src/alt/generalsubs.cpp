@@ -127,7 +127,7 @@ function main(in mode0) {
 
 			// convert SK in datafile to SK in definitions
 			var sk;
-			if (not(sk.readf(DEFINITIONS, req.datafile ^ ".SK", 1))) {
+			if (not sk.readf(DEFINITIONS, req.datafile ^ ".SK", 1)) {
 				if (sk.readf(req.srcfile, "%SK%", 1)) {
 					req.srcfile.deleterecord("%SK%");
 
@@ -188,7 +188,7 @@ subroutine getdatasets() {
 	let nvols = directory.fcount(FM);
 
 	datasetparams = directory.f(1);
-	if (not(datasetparams.contains(","))) {
+	if (not datasetparams.contains(",")) {
 		// CALL MSG('LINE 1 OF THE DOS FILE ':DOS.FILENAME:' IS INVALID')
 		// STOP
 	}

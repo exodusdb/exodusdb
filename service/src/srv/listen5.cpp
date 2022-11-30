@@ -291,7 +291,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 
 			// open patch file
-			if (not(patchfile.osopen(patchfilename))) {
+			if (not patchfile.osopen(patchfilename)) {
 				goto nextpatch;
 			}
 
@@ -329,7 +329,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			rec = keyandrec.remove(1, 0, 0);
 
 			// installation wide lock on it
-			if (not(lockrecord("", processes, patchid))) {
+			if (not lockrecord("", processes, patchid)) {
 				goto nextpatch;
 			}
 
@@ -638,7 +638,7 @@ getvalues:
 		}
 
 		var file;
-		if (not(file.open(filename, ""))) {
+		if (not file.open(filename, "")) {
 			response_ = filename.quote() ^ " file does not exist in LISTEN SELECT";
 			return 0;
 		}
@@ -675,7 +675,7 @@ getvalues:
 
 		gosub getdostime();
 
-		if (not(openfile("LOCKS", locks))) {
+		if (not openfile("LOCKS", locks)) {
 			call mssg("LISTEN2 CANNOT OPEN LOCKS FILE");
 			return 0;
 		}
@@ -933,7 +933,7 @@ subroutine deleteoldfiles() {
 	if (filespec.ends(".*")) {
 		var tdir = "/data/";
 		tdir.converter("/", OSSLASH);
-		if (not(filespec.contains(tdir))) {
+		if (not filespec.contains(tdir)) {
 			return;
 		}
 	}

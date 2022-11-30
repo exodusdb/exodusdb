@@ -87,7 +87,7 @@ nexttest:
 	}
 	rec = var("X").str(recsize);
 
-	if (not(tempfile.open(tempfilename, ""))) {
+	if (not tempfile.open(tempfilename, "")) {
 		abort(lasterror());
 	}
 

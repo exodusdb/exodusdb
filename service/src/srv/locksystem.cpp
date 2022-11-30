@@ -43,7 +43,7 @@ function main(in mode0, in dataset0) {
 		dataset = SYSTEM.f(17);
 	}
 
-	if (not(voc.open("VOC", ""))) {
+	if (not voc.open("VOC", "")) {
 		call mssg("CANNOT OPEN VOC FILE FOR LOCKING");
 		return 0;
 	}

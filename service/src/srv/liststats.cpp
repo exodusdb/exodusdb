@@ -128,7 +128,7 @@ function main() {
 		}  // rown;
 	}
 
-	if (not(rowfields.locate("USER_CODE", usercoln))) {
+	if (not rowfields.locate("USER_CODE", usercoln)) {
 		usercoln = 0;
 	}
 

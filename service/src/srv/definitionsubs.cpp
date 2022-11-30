@@ -154,7 +154,7 @@ function main(in mode) {
 				req.wlocked = "";
 			}
 
-			if (not(RECORD.f(1))) {
+			if (not RECORD.f(1)) {
 
 				var temp;
 				if (temp.read(req.srcfile, "CHEQUEDESIGN*DEFAULT")) {
@@ -211,7 +211,7 @@ nochequeformat:
 				let val = PSEUDO.f(ii);
 				if (val) {
 					var vn;
-					if (not(RECORD.f(1).locateby("AL", val, vn))) {
+					if (not RECORD.f(1).locateby("AL", val, vn)) {
 						RECORD.inserter(1, vn, val);
 						RECORD.inserter(2, vn, "");
 						// any more in parallel
@@ -748,7 +748,7 @@ subroutine postreadfix() {
 		}
 
 		// copy schedule footer to plan footer
-		if (not(RECORD.f(34))) {
+		if (not RECORD.f(34)) {
 			RECORD(34) = RECORD.f(11);
 		}
 	}

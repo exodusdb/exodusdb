@@ -360,7 +360,7 @@ function main() {
 		}
 
 		var users;
-		if (not(users.open("USERS", ""))) {
+		if (not users.open("USERS", "")) {
 			abort("USERS file is missing");
 		}
 
@@ -453,7 +453,7 @@ function main() {
 		response_ = "OK";
 
 	} else if (mode == "SETCODEPAGE") {
-		if (not(srv.alanguage.open("ALANGUAGE", ""))) {
+		if (not srv.alanguage.open("ALANGUAGE", "")) {
 			abort(lasterror());
 		}
 
@@ -976,7 +976,7 @@ subroutine gettaskprefix() {
 }
 
 subroutine opendocuments() {
-	if (not(srv.documents.open("DOCUMENTS", ""))) {
+	if (not srv.documents.open("DOCUMENTS", "")) {
 		abort(lasterror());
 	}
 	return;

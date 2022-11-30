@@ -96,7 +96,7 @@ subroutine getver() {
 
 subroutine getnrecs() {
 	nrecs = "";
-	if (not(file.open(file, ""))) {
+	if (not file.open(file, "")) {
 		return;
 	}
 	nrecs = file.reccount();

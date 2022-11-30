@@ -106,7 +106,7 @@ deleteit:
 
 				// not specifically locked - only allow if in legacy menus
 			} else {
-				if (not(oldmenus.locate(menu, xx))) {
+				if (not oldmenus.locate(menu, xx)) {
 					goto deleteit;
 				}
 			}

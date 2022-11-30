@@ -59,13 +59,13 @@ function main(in mode, in params, io result, io msg) {
 	} else if (mode == "ONEVENT") {
 
 		var voc;
-		if (not(voc.open("VOC", ""))) {
+		if (not voc.open("VOC", "")) {
 			msg = "ROUNDROBIN: CANNOT OPEN VOC";
 			return 0;
 		}
 
 		var roundrobinfile;
-		if (not(roundrobinfile.open(roundrobinfilename_, ""))) {
+		if (not roundrobinfile.open(roundrobinfilename_, "")) {
 			msg = "ROUNDROBIN: CANNOT OPEN " ^ roundrobinfilename_;
 			return 0;
 		}
@@ -73,7 +73,7 @@ function main(in mode, in params, io result, io msg) {
 		let roundrobinlock = "ROUNDROBIN*" ^ roundrobinfilename_ ^ "*" ^ roundrobinkey_;
 
 		// try to lock for 9 seconds since other locks should be brief
-		if (not(lockrecord("VOC", voc, roundrobinlock, "", 9))) {
+		if (not lockrecord("VOC", voc, roundrobinlock, "", 9)) {
 			msg = "ROUNDROBIN: CANNOT LOCK VOC," ^ roundrobinlock;
 			return 0;
 		}

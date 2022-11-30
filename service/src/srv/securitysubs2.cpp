@@ -56,7 +56,7 @@ function main(in mode) {
 				let task = oldtasks.f(1, taskn);
 				if (task) {
 					var newtaskn;
-					if (not(newtasks.locate(task, newtaskn))) {
+					if (not newtasks.locate(task, newtaskn)) {
 						let oldlock	 = oldlocks.f(1, taskn);
 						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
 					}

@@ -49,7 +49,7 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*createalert currusers", logtime);
 
-		if (not(tt.readf(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1))) {
+		if (not tt.readf(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1)) {
 			tt = "";
 		}
 		if (tt < 17203) {
@@ -215,7 +215,7 @@ function main(in mode, io logtime, in menu) {
 //			if (not(conf.osread("..\\LOGS\\exodus.ini"))) {
 //				conf = "";
 //			}
-//			if (not(conf.contains("NOTREQ"))) {
+//			if (not conf.contains("NOTREQ")) {
 //
 //				let cmd = "compact /C /S /F ..\\LOGS ..\\LOGS\\*.*";
 //				var(cmd ^ " DONE,NOTREQ").oswrite("..\\LOGS\\exodus.ini");
@@ -258,7 +258,7 @@ function main(in mode, io logtime, in menu) {
 		call log2("*add keys and ipnos to users", logtime);
 
 		var users;
-		if (not(users.open("USERS", ""))) {
+		if (not users.open("USERS", "")) {
 			return 0;
 		}
 		clearselect();
@@ -348,8 +348,8 @@ nextuser:
 		}
 
 		// email anything unexpected
-		if (not(lastlog.contains("Quitting."))) {
-			if (not(lastlog.contains("*chain to NET AUTO"))) {
+		if (not lastlog.contains("Quitting.")) {
+			if (not lastlog.contains("*chain to NET AUTO")) {
 				call sysmsg("Unexpected last log entry||" ^ lastlog, "Unexpected Log", "EXODUS");
 			}
 		}

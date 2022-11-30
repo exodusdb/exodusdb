@@ -437,7 +437,7 @@ postuploadfail:
 			return 0;
 		}
 
-		if (not(osfile.osopen(temposfilename83))) {
+		if (not osfile.osopen(temposfilename83)) {
 			gosub invalid(msg);
 			gosub cleanup();
 			return 0;
@@ -518,13 +518,13 @@ nextline:
 			// first record, open files and create dictionary
 			if (file == "") {
 
-				if (not(file.open(filename, ""))) {
+				if (not file.open(filename, "")) {
 					call mssg(lasterror());
 					req.valid = 0;
 					gosub cleanup();
 					return 0;
 				}
-				if (not(dictfile.open(dictfilename, ""))) {
+				if (not dictfile.open(dictfilename, "")) {
 					call mssg(lasterror());
 					req.valid = 0;
 					gosub cleanup();
@@ -728,13 +728,13 @@ addbuff:
 
 subroutine lockfile(in filename) {
 	msg = "";
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		msg = filename.quote() ^ " file cannot be opened";
 		return;
 	}
 
 	let waitsecs = 3;
-	if (not(lockrecord(filename, file, key, recordx, waitsecs, allowduplicate))) {
+	if (not lockrecord(filename, file, key, recordx, waitsecs, allowduplicate)) {
 		gosub unlockfile(filename);
 		msg			 = "Cannot upload at the moment because";
 		msg(-1)		 = filename ^ " " ^ (key.quote()) ^ " is being updated by ";

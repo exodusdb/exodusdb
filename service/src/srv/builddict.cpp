@@ -34,10 +34,10 @@ function main() {
 	}
 
 	var file;
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		abort(lasterror());
 	}
-	if (not(DICT.open(dictfilename))) {
+	if (not DICT.open(dictfilename)) {
 		abort(lasterror());
 	}
 
@@ -336,7 +336,7 @@ nextmln:;
 							continue;
 
 						var fieldn;
-						if (not(allfields.locate(fieldname, fieldn))) {
+						if (not allfields.locate(fieldname, fieldn)) {
 							allfields(1, -1) = fieldname;
 							var tempdict;
 							if (tempdict.read(DICT, fieldname)) {

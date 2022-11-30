@@ -43,7 +43,7 @@ exit:
 subroutine getnrecs() {
 	nrecs = "";
 	var file;
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		return;
 	}
 	nrecs = file.reccount();

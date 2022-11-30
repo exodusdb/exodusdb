@@ -165,7 +165,7 @@ updateprivs:
 			}
 			// if len(userprivs) < 65000 then
 			if (SECURITY.len() < maxstrsize_ - 530) {
-				if (not(SECURITY.f(10).locateby("AL", task, taskn))) {
+				if (not SECURITY.f(10).locateby("AL", task, taskn)) {
 					if (defaultlock.unassigned()) {
 						newlock = "";
 					} else {

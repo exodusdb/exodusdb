@@ -32,7 +32,7 @@ function main(in mode) {
 	// $insert abp,common
 
 	var users;
-	if (not(users.open("USERS", ""))) {
+	if (not users.open("USERS", "")) {
 		msg = "USERS file is missing";
 		return invalid(msg);
 	}
@@ -91,7 +91,7 @@ function main(in mode) {
 			// password date default to lastlogin date
 			// if no login date then consider the account to have expired
 			// and they would not have been able to login with it.
-			if (not(RECORD.f(36))) {
+			if (not RECORD.f(36)) {
 				let lastlogindate = RECORD.f(13).field(".", 1);
 				RECORD(36)		  = lastlogindate;
 			}
@@ -183,7 +183,7 @@ function main(in mode) {
 		}
 
 		var dummy;
-		if (not(lockrecord("DEFINITIONS", DEFINITIONS, "SECURITY", dummy, 0))) {
+		if (not lockrecord("DEFINITIONS", DEFINITIONS, "SECURITY", dummy, 0)) {
 			if (resetpassword) {
 				resetpassword = 2;
 			} else {

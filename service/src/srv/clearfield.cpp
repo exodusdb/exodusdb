@@ -42,11 +42,11 @@ function main() {
 		cleartovalue.inverter();
 	}
 	var file;
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		call mssg(filename.quote() ^ " FILE IS MISSING");
 		stop();
 	}
-	if (not(DICT.open("DICT." ^ filename))) {
+	if (not DICT.open("DICT." ^ filename)) {
 		DICT = "";
 	}
 	nindexed = 0;

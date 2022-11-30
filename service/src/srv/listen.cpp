@@ -279,10 +279,10 @@ function main_init() {
 	origsentence = SENTENCE;
 
 	// need a file to do central locking not per database
-	if (not(processes.open("PROCESSES", ""))) {
+	if (not processes.open("PROCESSES", "")) {
 		processes = "";
 	}
-	if (not(reqlog.open("REQUESTLOG", ""))) {
+	if (not reqlog.open("REQUESTLOG", "")) {
 		reqlog = "";
 	}
 
@@ -301,7 +301,7 @@ function main_init() {
 	serverend.converter("/", OSSLASH);
 	databaseend = datasetcode.lcase() ^ ".end";
 
-	if (not(allcols.open("ACCESSIBLE_COLUMNS", ""))) {
+	if (not allcols.open("ACCESSIBLE_COLUMNS", "")) {
 		allcols = "";
 	}
 
@@ -348,7 +348,7 @@ function main_init() {
 		webpath ^= "/";
 	}
 	webpath.converter("/", OSSLASH);
-	if (not(voc.open("VOC", ""))) {
+	if (not voc.open("VOC", "")) {
 		call mssg(lasterror());
 		// gosub main_exit();
 		return false;
@@ -404,7 +404,7 @@ function main_init() {
 
 	// image=''
 
-	if (not(openfile("LOCKS", locks1, "DEFINITIONS", 1))) {
+	if (not openfile("LOCKS", locks1, "DEFINITIONS", 1)) {
 		call mssg(lasterror());
 		// gosub main_exit();
 		return false;
@@ -440,7 +440,7 @@ function main_init() {
 
 	// check/make the annual log folder
 	// call shell('MD ':logpath)
-	if (not(xx.osopen(logpath))) {
+	if (not xx.osopen(logpath)) {
 		if (STATUS != 2) {
 			//call osmkdir(logpath);
 			if (not osmkdir(logpath))
@@ -924,7 +924,7 @@ function loop_exit() {
 			perform("OFF");
 			logoff();
 
-		} else if (not(bakpars.f(5).contains(dow))) {
+		} else if (not bakpars.f(5).contains(dow)) {
 			call log2("Not right day of week " ^ bakpars.f(5) ^ " Logging off", logtime);
 			perform("OFF");
 			logoff();
@@ -1036,7 +1036,7 @@ function got_link() {
 
 		var().osflush();
 openlink1:
-		if (not(linkfile1.osopen(linkfilename1))) {
+		if (not linkfile1.osopen(linkfilename1)) {
 			// remove from future candidate files?
 			call ossleep(1000 * 1 / 10.0);
 			if (tracing) {
@@ -1060,7 +1060,7 @@ openlink1:
 			var().osflush();
 			call ossleep(1000 * 1 / 10.0);
 			linkfile1.osclose();
-			// 			if (not(linkfile1.osopen(linkfilename1))) {
+			// 			if (not linkfile1.osopen(linkfilename1)) {
 			// 				{}
 			// 			}
 			// 			goto readlink1;
@@ -1371,7 +1371,7 @@ cannotopenlinkfile2:
 
 		} else {
 
-			if (not(linkfile2.osopen(linkfilename2))) {
+			if (not linkfile2.osopen(linkfilename2)) {
 				goto cannotopenlinkfile2;
 			}
 
@@ -1601,7 +1601,7 @@ subroutine process2() {
 		// since their status is dependent on the master lock status
 		masterlock = request6;
 
-		if (not(file.open(filename, ""))) {
+		if (not file.open(filename, "")) {
 			gosub badfile();
 			return;
 		}
@@ -1617,7 +1617,7 @@ subroutine process2() {
 		keyx	  = request3;
 		sessionid = request4;
 
-		if (not(file.open(filename, ""))) {
+		if (not file.open(filename, "")) {
 			gosub badfile();
 			return;
 		}
@@ -1665,7 +1665,7 @@ subroutine process2() {
 		// if security(filetitle2:' CREATE',createnotallowed,'') then null
 		// end
 
-		if (not(file.open(filename, ""))) {
+		if (not file.open(filename, "")) {
 			gosub badfile();
 			return;
 		}
@@ -1853,7 +1853,7 @@ noupdate:
 			// simulate window environment for POSTREAD
 			req.srcfile	 = file;
 			req.datafile = filename;
-			if (not(DICT.open("DICT." ^ req.datafile))) {
+			if (not DICT.open("DICT." ^ req.datafile)) {
 				if (sessionid) {
 					gosub leaseunlock();
 				}
@@ -2025,13 +2025,13 @@ noupdate:
 		// trim excess field and value marks
 		call cropper(RECORD);
 
-		if (not(req.srcfile.open(req.datafile, ""))) {
+		if (not req.srcfile.open(req.datafile, "")) {
 			// response=quote(datafile):' CANNOT BE OPENED'
 			call listen4(9, response_, req.datafile);
 			return;
 		}
 
-		if (not(DICT.open("DICT." ^ req.datafile))) {
+		if (not DICT.open("DICT." ^ req.datafile)) {
 			// response=quote('DICT.':datafile):' file is not available'
 			call listen4(9, response_, "DICT." ^ req.datafile);
 			return;
@@ -2718,7 +2718,7 @@ subroutine properlock() {
 
 	// dont pass the filename because that causes persistent lock checking
 	// in jbase version of lockrecord()
-	if (not(lockrecord("", srcfile2, keyx, xx))) {
+	if (not lockrecord("", srcfile2, keyx, xx)) {
 		if (STATUS != 1) {
 			req.valid = 0;
 			// response='Error: ':quote(keyx):' CANNOT BE WRITTEN BECAUSE IT IS LOCKED ELSEWHERE'
@@ -2772,7 +2772,7 @@ subroutine leaselock() {
 		}  // ii;
 	}
 
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		gosub badfile();
 		return;
 	}
@@ -2959,7 +2959,7 @@ subroutine badfile() {
 function openleaselocks(in file) {
 
 	// Open the leaselocks on the same connection as the data file
-	if (not(leaselocks.open("LOCKS", file))) {
+	if (not leaselocks.open("LOCKS", file)) {
 		response_ = "Error: LOCKS for " ^ file ^ " cannot be opened.";
 		// call listen4(9, response_, req.datafile);
 		return false;
@@ -2971,7 +2971,7 @@ function openleaselocks(in file) {
 subroutine leaseunlock() {
 
 	// sessionid is used as a check that only the locker can unlock
-	if (not(file.open(filename, ""))) {
+	if (not file.open(filename, "")) {
 		gosub badfile();
 		return;
 	}
@@ -3121,11 +3121,11 @@ subroutine checkcompany() {
 	if (not allcols) {
 		return;
 	}
-	if (not(xx.readc(allcols, filename ^ "*COMPANY_CODE"))) {
+	if (not xx.readc(allcols, filename ^ "*COMPANY_CODE")) {
 		return;
 	}
 
-	if (not(dictfile.open("DICT." ^ filename, ""))) {
+	if (not dictfile.open("DICT." ^ filename, "")) {
 		return;
 	}
 

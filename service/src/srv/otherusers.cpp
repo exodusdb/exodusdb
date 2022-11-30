@@ -95,7 +95,7 @@ function main(in databasecode0 = "", in usercode0 = "") {
 		if (databasecode or usercode) {
 
 			if (processes == "") {
-				if (not(processes.open("PROCESSES", ""))) {
+				if (not processes.open("PROCESSES", "")) {
 					processes = 0;
 				}
 			}

@@ -40,11 +40,11 @@ function main(in mode0) {
 	let nkeywords = keywords.fcount(VM);
 
 	var changelog;
-	if (not(openfile("CHANGELOG", changelog))) {
+	if (not openfile("CHANGELOG", changelog)) {
 		call mssg(lasterror());
 		return 0;
 	}
-	if (not(openfile("DICT.CHANGELOG", DICT))) {
+	if (not openfile("DICT.CHANGELOG", DICT)) {
 		call mssg(lasterror());
 		return 0;
 	}
@@ -76,7 +76,7 @@ function main(in mode0) {
 		ANS			  = "";
 
 		var users;
-		if (not(users.open("USERS", ""))) {
+		if (not users.open("USERS", "")) {
 			return 0;
 		}
 
