@@ -167,7 +167,7 @@ fail:
 	// long distance override
 	if (xdata == "?") {
 
-		// if (not(userx == lockx.first(userx.len()))) {
+		// if (userx != lockx.first(userx.len())) {
 		if (not lockx.starts(userx)) {
 			lockx = userx ^ " " ^ var(1000000).rnd();
 			if (SECURITY.f(1).locate(userx, usern)) {

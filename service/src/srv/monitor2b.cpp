@@ -395,7 +395,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		text = datax.field(",", 2, 999999);
 		gosub hash(salt, max, hashcode);
 		hashcode = hashcode.b(9999, -9999);
-		if (not(datax.field(",", 1) == hashcode)) {
+		if (datax.field(",", 1) != hashcode) {
 			msg = "wrong response";
 badresponse:
 			datax.replacer("<br />", _FM);

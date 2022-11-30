@@ -117,7 +117,7 @@ function main() {
 			var replaced = 0;
 			for (const var coln : range(1, nrowfields)) {
 				// /BREAK;
-				if (not(row1.f(1, coln) == row2.f(1, coln)))
+				if (row1.f(1, coln) != row2.f(1, coln))
 					break;
 				replaced	  = 1;
 				row2(1, coln) = "-";
@@ -189,7 +189,7 @@ function main() {
 						var rowspan = 1;
 						for (const var rown2 : range(rown + 1, nrows)) {
 							// /BREAK;
-							if (not(output.f(rown2, coln) == "-"))
+							if (output.f(rown2, coln) != "-")
 								break;
 							rowspan += 1;
 						}  // rown2;

@@ -10,7 +10,7 @@ function main(in password) {
 	// pass1
 	while (true) {
 		// /BREAK;
-		if (not(hashedpassword != ""))
+		if (hashedpassword == "")
 			break;
 		encryptkey = (encryptkey.mod(390001)) * (hashedpassword[1]).seq() + 1;
 		hashedpassword.cutter(1);

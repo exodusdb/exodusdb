@@ -3011,7 +3011,7 @@ subroutine leaseunlock() {
 	}
 
 	// check that the current lock agrees with the session id provided
-	if (not(sessionid == lockrec.f(5))) {
+	if (sessionid != lockrec.f(5)) {
 
 		// cannot unlock because the lock belongs to somebody else
 		// response='Error: Cannot unlock - '

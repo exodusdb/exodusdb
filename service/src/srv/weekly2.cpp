@@ -69,7 +69,7 @@ function main(in type, in input0, in mode, out output) {
 	period += 1;
 	while (true) {
 		// /BREAK;
-		if (not(period > maxperiod))
+		if (period <= maxperiod)
 			break;
 		period -= maxperiod;
 		year += 1;
@@ -98,7 +98,7 @@ subroutine getfirstdom() {
 	// if period<>1 then
 	while (true) {
 		// /BREAK;
-		// if (not((idate - 1).mod(7) + 1 != firstdayofweek))
+		// if ((idate - 1).mod(7) + 1 == firstdayofweek)
 		if ( idate.oconv("DW") == firstdayofweek)
 			break;
 		idate += 1;
