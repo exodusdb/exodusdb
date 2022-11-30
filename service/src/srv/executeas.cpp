@@ -5,13 +5,13 @@ libraryinit()
 
 #include <srv_common.h>
 
-var xx;
+//var xx;
 var origusername;
 
 function main(in cmd, in username) {
 
 	if (username) {
-		if (not SECURITY.f(1).locate(username, xx)) {
+		if (not SECURITY.f(1).locate(username)) {
 			call mssg(username.quote() ^ " user does not exist in executeas()");
 			return 0;
 		}

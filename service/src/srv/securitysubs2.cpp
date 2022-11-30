@@ -14,7 +14,7 @@ libraryinit()
 //var taskn;	// num
 //var oldtaskn;
 //var newtaskn;
-var xx;
+//var xx;
 var logtime;
 var tn;
 var vn;
@@ -71,57 +71,58 @@ function main(in mode) {
 		// obsolete tasks
 		call authorised(
 			"%DELETE%"
-			"CHANGE NETWORK TYPE",
-			xx);
+			"CHANGE NETWORK TYPE"
+			);
 		call authorised(
 			"%DELETE%"
-			"CHANGE PRINTER DEFINITIONS",
-			xx);
+			"CHANGE PRINTER DEFINITIONS"
+			);
 		call authorised(
 			"%DELETE%"
-			"CHANGE PRINTER TYPE",
-			xx);
+			"CHANGE PRINTER TYPE"
+			);
 		call authorised(
 			"%DELETE%"
-			"CHANGE SCREEN TYPE",
-			xx);
+			"CHANGE SCREEN TYPE"
+			);
 		call authorised(
 			"%DELETE%"
-			"CHANGE SCREEN COLORS",
-			xx);
+			"CHANGE SCREEN COLORS"
+			);
 		call authorised(
 			"%DELETE%"
-			"CHANGE VIEWER",
-			xx);
+			"CHANGE VIEWER"
+			);
 		call authorised(
 			"%DELETE%"
-			"CHANGE VIEWER CENTRAL",
-			xx);
+			"CHANGE VIEWER CENTRAL"
+			);
 		call authorised(
 			"%DELETE%"
-			"ACCESS OPERATING SYSTEM",
-			xx);
+			"ACCESS OPERATING SYSTEM"
+			);
 		call authorised(
 			"%DELETE%"
-			"OPERATING SYSTEM ACCESS",
-			xx);
+			"OPERATING SYSTEM ACCESS"
+			);
 		call authorised(
 			"%DELETE%"
-			"OTHER OPTIONS ACCESS",
-			xx);
+			"OTHER OPTIONS ACCESS"
+			);
 		call authorised(
 			"%DELETE%"
-			"OTHER OPTIONS UPDATE",
-			xx);
+			"OTHER OPTIONS UPDATE"
+			);
 
 		// new safe method for renaming tasks
 		// copy from old if missing, then delete old
 		// is safer method in case install old program and get the old task again!
-		call authorised("CURRENCY EXCHANGE RATE OVERRIDE", xx, "JOURNAL POST OVERRIDE EXCHANGE RATE");
+		var dummy;
+		call authorised("CURRENCY EXCHANGE RATE OVERRIDE", dummy, "JOURNAL POST OVERRIDE EXCHANGE RATE");
 		call authorised(
 			"%DELETE%"
-			"JOURNAL POST OVERRIDE EXCHANGE RATE",
-			xx);
+			"JOURNAL POST OVERRIDE EXCHANGE RATE"
+			);
 
 		// old method
 
@@ -129,7 +130,7 @@ function main(in mode) {
 
 		// customisation to convert old databases at ptcy/patsalides
 		// which had blank passwords not allowed in the new system
-		if (SECURITY.f(1).locate("MICHAEL", xx)) {
+		if (SECURITY.f(1).locate("MICHAEL", dummy)) {
 			if (newuserprivs.osread("PATSALID.CFG")) {
 			}
 		}

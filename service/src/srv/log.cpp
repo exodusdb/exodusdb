@@ -9,7 +9,7 @@ var text;
 var xstation;
 var time;
 var log;
-var xx;
+//var xx;
 var bakpars;
 var ver;
 
@@ -60,7 +60,7 @@ function main(in programname0, in text0) {
 getlogkey:
 		time	   = ostime();
 		let logkey = xstation.trim() ^ "*" ^ USERNAME ^ "*" ^ date() ^ "*" ^ time;
-		if (xx.read(log, logkey)) {
+		if (var().read(log, logkey)) {
 			goto getlogkey;
 		}
 
@@ -109,7 +109,7 @@ getlogkey:
 		body.replacer("\r", "\r\n");
 
 		// sendmail - if it fails, there will be an entry in the log
-		call sendmail(emailaddrs, "", subject, body, "", "", xx);
+		call sendmail(emailaddrs, "", subject, body, "", "");
 	}
 
 	// restore interactivity

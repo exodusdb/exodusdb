@@ -43,8 +43,7 @@ function main() {
 			goto syntax;
 		}
 		if (not silent) {
-			var xx;
-			if (not xx.read(srv.documents, alertid)) {
+			if (not var().read(srv.documents, alertid)) {
 				abort(alertid.quote() ^ " document doesnt exist");
 			}
 		}
@@ -58,8 +57,7 @@ function main() {
 
 	} else {
 		if (not(silent or overwrite)) {
-			var xx;
-			if (xx.read(srv.documents, alertid)) {
+			if (var().read(srv.documents, alertid)) {
 				call mssg(alertid.quote() ^ " already exists");
 				stop();
 			}

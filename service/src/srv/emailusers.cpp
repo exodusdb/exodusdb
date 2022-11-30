@@ -21,7 +21,7 @@ var userx;
 var expirydate;
 var emails;
 var ok;	 // num
-var xx;
+//var xx;
 var nn;
 var errormsg;
 
@@ -183,7 +183,7 @@ nextuser:
 
 	ok = 0;
 	if (not(ok) and userids) {
-		if (userids.locate(usercode, xx)) {
+		if (userids.locate(usercode)) {
 			ok = 1;
 		}
 		if (not(ok) and not(groupids)) {
@@ -204,7 +204,7 @@ nextuser:
 			}  // groupn;
 		} else {
 			// exact groups
-			if (groupids.locate(userx.f(21), xx)) {
+			if (groupids.locate(userx.f(21))) {
 				ok = 1;
 			}
 		}
@@ -220,7 +220,7 @@ nextuser:
 	nn = emails.fcount(VM);
 	for (var ii = nn; ii >= 1; --ii) {
 		let email = emails.f(1, ii);
-		if (alreadyemailed.locate(email, xx)) {
+		if (alreadyemailed.locate(email)) {
 			emails.remover(1, ii);
 		} else {
 			alreadyemailed ^= VM ^ email;

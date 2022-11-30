@@ -10,7 +10,7 @@ libraryinit()
 
 #include <srv_common.h>
 
-	let prikey_ = {1000, 100};
+let prikey_ = {1000, 100};
 
 var mode;
 var userx;
@@ -98,14 +98,14 @@ inpname:
 	} else {
 
 		// unlock all
-		var xx = unlockrecord();
+		unlockrecord();
 
 		// prevent any messages to the old name
 		USERNAME = (APPLICATION);
 		// unfortunately this is removing the workstation lock on messages
 		// so we cannot see the dataset being in use
 		// unlock all
-		xx = unlockrecord();
+		unlockrecord();
 
 		msg	   = "EXODUS SECURITY|What is your name ?| || |Please enter your name,|or press Esc to exit.";
 		show   = 1;

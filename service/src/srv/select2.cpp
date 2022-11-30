@@ -39,7 +39,7 @@ var realfilename;
 var triggers;
 var postreadmode;
 var ndictids;
-var xx;
+//var xx;
 var row;
 
 function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, io response, in limitfields = "", in limitchecks = "", in limitvalues = "", in maxnrecs0 = 0) {
@@ -313,7 +313,7 @@ nocommon:
 		// if @list.active or index(' ':sortselect,' BY ',1) or index(sortselect,'WITH AUTHORISED',1) else
 		if (not(LISTACTIVE or ((" " ^ sortselect).contains(" BY ")))) {
 			// only look in selected files otherwise c++ takes too long on some files
-			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex, xx)) {
+			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex)) {
 				if (records.read(file, "%RECORDS%")) {
 					if (records.len() < 200) {
 						records.replacer(FM, "\" \"");

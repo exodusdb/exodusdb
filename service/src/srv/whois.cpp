@@ -14,7 +14,7 @@ var ip12;
 var ip1;
 var ip2;
 var allowedips;
-var xx;
+//var xx;
 var cmd;
 var exe;
 var errors;
@@ -66,7 +66,7 @@ function main(in /*mode*/, in ipno, out text) {
 						 ","
 						 "\r\n",
 						 var(100).space());
-	if (allowedips.locateusing(" ", ipno, xx)) {
+	if (allowedips.locateusing(" ", ipno)) {
 returnzero:
 		text = "0";
 		return 0;

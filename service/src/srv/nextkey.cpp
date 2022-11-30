@@ -127,10 +127,10 @@ checkrec:
 			goto checkrec;
 		}
 
-		let xx = unlockrecord(actfilename, actfile, keyx);
+		unlockrecord(actfilename, actfile, keyx);
 	}
 
-	let xx = unlockrecord(keyfilename, keyfile, seqkey);
+	unlockrecord(keyfilename, keyfile, seqkey);
 
 	ANS = keyx;
 	return keyx;

@@ -59,7 +59,7 @@ var nhung;
 var first;	  // num
 var startit;  // num
 var voc;
-var xx;
+//var xx;
 var dbasesystem;
 var nmaint;
 var backupdrive;
@@ -80,9 +80,6 @@ var nextbackupfileinfo;
 var reminderhours;	// num
 var localdate;
 var localtime;	// num
-var xx2;
-var xx3;
-var xx4;
 var lastnote;
 var toaddresses;
 var remindern;
@@ -396,7 +393,7 @@ nextprocess:
 			if (startit) {
 				if (voc.open("VOC", "")) {
 					if (lockrecord("", voc, "BACKUP*" ^ dbasecode)) {
-						xx = unlockrecord("", voc, "BACKUP*" ^ dbasecode);
+						unlockrecord("", voc, "BACKUP*" ^ dbasecode);
 					} else {
 						startit = 0;
 					}
@@ -429,7 +426,7 @@ nextprocess:
 				print(cmd, " ...");
 				// pcperform cmd
 				print("monitor2 calling shell2 ", cmd, " ...");
-				call shell2(cmd, xx);
+				call shell2(cmd);
 				call ossleep(1000 * 5);
 				printl("done.");
 			}
@@ -565,7 +562,11 @@ nextprocess:
 							// from 0600 to 1800 and not sent in the last 5.5 hours
 							// usually 0600 1130 1700
 							reminderhours = 5.5;
-							call getdatetime(localdate, localtime, xx, xx2, xx3, xx4);
+							var dummy3;
+							var dummy4;
+							var dummy5;
+							var dummy6;
+							call getdatetime(localdate, localtime, dummy3, dummy4, dummy5, dummy6);
 							// if (localtime >= 21600 and localtime <= 64800) {
 							if (localtime >= iconv("06:00", "MT") and localtime <= iconv("18:00", "MT")) {
 								// only one email per installation
@@ -602,7 +603,7 @@ nextprocess:
 										}
 										printl(body);
 										body.replacer(FM, chr(13));
-										call sendmail(toaddresses, "", subject, body, "", "", xx);
+										call sendmail(toaddresses, "", subject, body, "", "");
 									}
 								}
 							}
@@ -750,8 +751,6 @@ nextdbasen:;
 		hostdescriptions ^= " - " ^ ips;
 		// hostdescriptions:=' - ':ips:' - '
 	}
-
-	// oswrite hostdescriptions on 'xx'
 
 	// package the data for the monitor
 	datax = "";

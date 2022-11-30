@@ -12,7 +12,7 @@ var msgusername;
 var isexodus;  // num
 var taskn;	   // num
 var taskn2;
-var xx;
+//var xx;
 var newlock;
 var usern;
 
@@ -120,7 +120,7 @@ updateprivs:
 			if (renaming) {
 				// skip warning except for live databases included in startup
 				if (not SYSTEM.f(61)) {
-					if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
+					if (SYSTEM.f(58).locate(SYSTEM.f(17))) {
 						call note("Task renamed:|Old: " ^ task ^ "|New: " ^ defaultlock);
 					}
 				}
@@ -142,7 +142,7 @@ updateprivs:
 		if (renaming) {
 			// if the task to be renamed doesnt exist .. just add the target task
 			var	 newtask = defaultlock;
-			call authorised(newtask, xx);
+			call authorised(newtask);
 			return 1;
 		}
 		if (not noadd) {
@@ -169,8 +169,9 @@ updateprivs:
 					if (defaultlock.unassigned()) {
 						newlock = "";
 					} else {
-						if (SECURITY.f(10).locate(defaultlock, xx)) {
-							newlock = SECURITY.f(11, xx);
+						var lockn;
+						if (SECURITY.f(10).locate(defaultlock, lockn)) {
+							newlock = SECURITY.f(11, lockn);
 						} else {
 							newlock = defaultlock;
 						}

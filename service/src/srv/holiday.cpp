@@ -6,7 +6,7 @@ libraryinit()
 #include <srv_common.h>
 
 var direction;	// num
-var xx;
+//var xx;
 var daten;
 
 function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, in market, in agp, out holidaytype, out workdate) {
@@ -95,7 +95,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	// if holidays else
 	// holidays=
 	// end
-	if (holidays.f(1).locate(idate, xx)) {
+	if (holidays.f(1).locate(idate)) {
 		holidaytype = 2;
 		return;
 	}

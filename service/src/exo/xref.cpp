@@ -8,9 +8,8 @@ function main(in instr, in sepchars, in stoplist, in mode) {
 
 	// remove stop words
 	if (mode) {
-		var xx;
 		for (var ii = outstr.fcount(VM); ii > 0; --ii) {
-			if (stoplist.locate(outstr.f(1, ii), xx)) {
+			if (stoplist.locate(outstr.f(1, ii))) {
 				outstr.remover(1, ii);
 			}
 		}

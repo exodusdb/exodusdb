@@ -33,7 +33,7 @@ var usersordefinitions;
 var userkey;
 var userx;
 var newpassword;
-var xx;
+//var xx;
 //var fn;	 // num
 var task;
 var taskprefix;
@@ -425,7 +425,7 @@ function main() {
 		let subject	   = "EXODUS Password Reset";
 		var body	   = "User: " ^ ID;
 		body(-1)	   = "Your new password is " ^ newpassword;
-		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
+		call sendmail(emailaddrs, ccaddrs, subject, body, "", "");
 
 	} else if (mode == "MAKEUPLOADPATH") {
 		call uploadsubs("MAKEUPLOADPATH." ^ request_.f(2));
@@ -635,7 +635,8 @@ badsetcodepage:
 		instructions.replacer(_VM, "%FD");
 		select ^= " WITH INSTRUCTIONS2 " ^ (instructions.quote());
 
-		if (not authorised("DOCUMENTS: ACCESS OTHER PEOPLES DOCUMENTS", xx, "")) {
+		var dummy;
+		if (not authorised("DOCUMENTS: ACCESS OTHER PEOPLES DOCUMENTS", dummy, "")) {
 			select ^= " AND WITH CREATEDBY " ^ (USERNAME.quote());
 		}
 

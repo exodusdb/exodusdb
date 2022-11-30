@@ -16,7 +16,7 @@ var hosts;
 var vn;
 var conf;
 var errors;
-var xx;
+//var xx;
 var userid;
 var usern;
 var lastdate;
@@ -249,7 +249,7 @@ function main(in mode, io logtime, in menu) {
 
 			call log2("*compress logs with gzip to .gz" ^ filenamesx, logtime);
 			printl(cmd);
-			call shell2(cmd, xx);
+			call shell2(cmd);
 
 		}  // year;
 

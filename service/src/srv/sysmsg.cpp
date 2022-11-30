@@ -18,7 +18,7 @@ var bakpars;
 var body;
 var ver;
 var result;
-var xx;
+//var xx;
 var errormsg;
 var exceededmsg;
 
@@ -267,7 +267,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	params(5)	  = "sysmsg.$rr";
 	let exceedmsg = "SYSMSG email suppressed because more than 60 in last 60 mins";
 	// call roundrobin('ONEVENT',params,result,errormsg)
-	call roundrobin("ONEVENT", params, result, xx);
+	call roundrobin("ONEVENT", params, result);
 	if (result) {
 		// sendmail - if it fails, there will be an entry in the log
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", errormsg);

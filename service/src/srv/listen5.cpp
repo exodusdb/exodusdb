@@ -31,7 +31,7 @@ var request6;
 //var filename;
 var processes;
 var tt;
-var xx;
+//var xx;
 var inpath;
 var pattern;
 var ageinsecs;	// num
@@ -159,7 +159,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							abort(lasterror());
 					}
 				}
-				xx = unlockrecord("", processes, "START*" ^ filename);
+				unlockrecord("", processes, "START*" ^ filename);
 			}
 		}  // filen;
 
@@ -334,7 +334,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 
 			// skip if already installed in this database
-			if (xx.read(DEFINITIONS, patchid)) {
+			if (var().read(DEFINITIONS, patchid)) {
 				call unlockrecord("", processes, patchid);
 				goto nextpatch;
 			}
@@ -497,7 +497,7 @@ nextpatch:;
 			sortby = "AL";
 		}
 		if (sortby) {
-			if (not var("AL,AR,DL,DR").locateusing(",", sortby, xx)) {
+			if (not var("AL,AR,DL,DR").locateusing(",", sortby)) {
 				response_ = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEXVALUES";
 				return 0;
 			}
@@ -757,9 +757,9 @@ nextlock:
 		if (tt) {
 			// unlock in request loop using lockkey stored in system<48> by giveway
 			// lock first to avoid hanging if try to unlock when not locked
-			xx = "";
-			call rtp57(lockmode, "", xx, tt, "", yy, zz);
-			call rtp57(unlockmode, "", xx, tt, "", yy, zz);
+			var dummy = "";
+			call rtp57(lockmode, "", dummy, tt, "", yy, zz);
+			call rtp57(unlockmode, "", dummy, tt, "", yy, zz);
 			SYSTEM(48) = "";
 		}
 
@@ -901,7 +901,7 @@ subroutine fileaccesscheck(in filename) {
 	// security check
 	// dont check markets and companies because really must have access to some
 	// and eliminates need for clumsy task COMPANY ACCESS PARTIAL task
-	if (not var("MENUS,ADMENUS").locateusing(",", filename, xx)) {
+	if (not var("MENUS,ADMENUS").locateusing(",", filename)) {
 		var temp = securityfilename;
 		temp.converter(".", " ");
 		temp = singular(temp);
@@ -953,7 +953,7 @@ nextfiles:
 		// replaced by databasecode.SVR
 		// if filename0='GLOBAL.SVR' then goto deleteit
 
-		if (not var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.last(4)).lcase(), xx)) {
+		if (not var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.last(4)).lcase())) {
 
 			// a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.ends(".4")) {

@@ -44,7 +44,7 @@ var bakpars;
 var vn;
 var datacfg;
 var codepage;
-var xx;
+//var xx;
 var os;
 var ver;
 var vern;
@@ -1019,17 +1019,15 @@ nextreport:
 	}
 	// if security('%DELETE%':'SUPPORT MENU ACCESS',xx) else null
 	// if security('%DELETE%':'USE TCL COMMAND KEY F5',xx) else null
-	if (not authorised("UPLOAD CREATE", xx)) {
+	if (not authorised("UPLOAD CREATE")) {
 		// Task added
 	}
 	if (not authorised("REQUESTLOG ACCESS", msg, "LS")) {
 		// Task added
 	}
 
-	// if security('%RENAME%':'AUTHORISATION CREATE USERS',xx,'USER CREATE') else null
-	// if security('%RENAME%':'AUTHORISATION DELETE USERS',xx,'USER DELETE') else null
-	// !if security('%UPDATE%':'USER UPDATE',xx,'AUTHORISATION UPDATE') else null
-	if (not authorised("USER UPDATE", xx, "AUTHORISATION UPDATE")) {
+	var dummy;
+	if (not authorised("USER UPDATE", dummy, "AUTHORISATION UPDATE")) {
 		// Task added
 	}
 
@@ -1088,7 +1086,7 @@ nextreport:
 
 	// 	// this may not be necessary now that menus are determined by authorisation
 	// 	call log2("*get maintenance user menu if any", logtime);
-	// 	if (xx.open("SCHEDULES", "")) {
+	// 	if (var().open("SCHEDULES", "")) {
 	// 		temp = "ADAGENCY";
 	// 	} else {
 	// 		temp = "EXODUS2";
@@ -1138,26 +1136,26 @@ nextreport:
 	if (not openfile("COMPANIES", srv.companies, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not openfile("COMPANY_VERSIONS", xx, "COMPANIES")) {
+	if (not openfile("COMPANY_VERSIONS", dummy, "COMPANIES")) {
 		valid = 0;
 	}
 	if (not openfile("CURRENCIES", srv.currencies, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not openfile("CURRENCY_VERSIONS", xx, "CURRENCIES")) {
+	if (not openfile("CURRENCY_VERSIONS", dummy, "CURRENCIES")) {
 		valid = 0;
 	}
 	if (not openfile("MARKETS", srv.markets, "DEFINITIONS")) {
 		valid = 0;
 	}
-	if (not openfile("MARKET_VERSIONS", xx, "MARKETS")) {
+	if (not openfile("MARKET_VERSIONS", dummy, "MARKETS")) {
 		valid = 0;
 	}
 //	if (not openfile("UNITS", srv.units, "CURRENCIES")) {
 //		valid	  = 0;
 //		srv.units = "";
 //	}
-	if (xx.open("UNITS", "")) {
+	if (var().open("UNITS", "")) {
 		perform("DELETEFILE UNITS (S)");
 	}
 	if (not openfile("ADDRESSES", srv.addresses, "DEFINITIONS")) {
@@ -1167,7 +1165,7 @@ nextreport:
 		valid = 0;
 	}
 	// IF OPENFILE2('SHADOW',shadow,'DEFINITIONS',1) ELSE valid=0
-	if (xx.open("SHADOW", "")) {
+	if (var().open("SHADOW", "")) {
 		perform("DELETEFILE SHADOW (S)");
 	}
 
@@ -1491,7 +1489,7 @@ adddatasetcodename:
 	// if @username<>'EXODUS' and datasetid<4> then
 	// lock even to EXODUS to prevent installation where EXODUS pass is known
 	if (datasetid.f(4)) {
-		if (not datasetid.f(4).locate(cid(), xx)) {
+		if (not datasetid.f(4).locate(cid())) {
 			msg_ = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
 			gosub failsys();
 			stop();
@@ -1641,7 +1639,7 @@ adddatasetcodename:
 			versioninstalled.write(DEFINITIONS, lastupdate_key);
 
 			// email users on live systems LISTED IN SYSTEM CONFIGURATION only
-			if (SYSTEM.f(58).locate(SYSTEM.f(17), xx)) {
+			if (SYSTEM.f(58).locate(SYSTEM.f(17))) {
 				if (not SYSTEM.f(61)) {
 					let idate = version.field(" ", 2, 4).iconv("D");
 					let itime = version.field(" ", 1).iconv("MT");

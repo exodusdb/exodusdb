@@ -9,10 +9,10 @@ S
 #include <authorised.h>\
 \
 var msg;\
-var xx;\
 \
 function main() {\
-	if (authorised("TASK CREATE", msg, xx, ID)) {\
+	var dummy;\
+	if (authorised("TASK CREATE", msg, dummy, ID)) {\
 		ANS = 1;\
 	} else {\
 		ANS = 0;\

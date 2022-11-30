@@ -115,13 +115,9 @@ subroutine newprocessid(io processid) {
 
 	while (true) {
 		processid = var(999999999).rnd().last(8);
-		var xx;
-		if (not xx.read(DEFINITIONS, "PROCESS*" ^ processid)) {
-			xx = "";
-		}
-		// /BREAK;
-		if (not xx)
+		if (not var().read(DEFINITIONS, "PROCESS*" ^ processid)) {
 			break;
+		}
 	}  // loop;
 
 	processrec(1) = date();

@@ -142,8 +142,7 @@ next:
 			let params = ":" ^ req.datafile ^ ".SK:DEFINITIONS";
 
 			req.isdflt = nextkey(params, "");
-			var xx;
-			if (xx.read(req.srcfile, req.isdflt)) {
+			if (var().read(req.srcfile, req.isdflt)) {
 				if (req.isdflt.isnum()) {
 					req.isdflt += 1;
 					req.isdflt.writef(DEFINITIONS, req.datafile ^ ".SK", 1);

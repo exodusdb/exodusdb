@@ -29,7 +29,7 @@ var prefix;
 int recn;  // num
 var tt;
 var nmvs;  // num
-var xx;
+//var xx;
 var datavals;  // num
 var nrowvals;  // num
 var rowvals;
@@ -241,12 +241,12 @@ nextmv:
 			tt = calculate(filterdictid);
 		}
 		if (filterin) {
-			if (not filterin.locate(tt, xx)) {
+			if (not filterin.locate(tt)) {
 				goto nextmv;
 			}
 		}
 		if (filterout) {
-			if (filterout.locate(tt, xx)) {
+			if (filterout.locate(tt)) {
 				goto nextmv;
 			}
 		}

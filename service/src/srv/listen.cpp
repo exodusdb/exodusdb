@@ -79,7 +79,7 @@ var bakpars;
 var datex;
 var logpath;
 var tdir;
-var xx;
+//var xx;
 var logfile;
 var logptr;	 // num
 var tt;		 // num
@@ -430,7 +430,7 @@ function main_init() {
 	// if count(subdirs,fm) else
 	tdir = "../logs/" ^ datasetcode;
 	tdir.converter("/", OSSLASH);
-	if (not xx.osopen(tdir.lcase())) {
+	if (not var().osopen(tdir.lcase())) {
 		if (STATUS != 2) {
 			//call osmkdir(tdir.lcase());
 			if (not osmkdir(tdir.lcase()))
@@ -440,7 +440,7 @@ function main_init() {
 
 	// check/make the annual log folder
 	// call shell('MD ':logpath)
-	if (not xx.osopen(logpath)) {
+	if (not var().osopen(logpath)) {
 		if (STATUS != 2) {
 			//call osmkdir(logpath);
 			if (not osmkdir(logpath))
@@ -636,7 +636,6 @@ nextsearch0:
 	call listen5("RUNS");
 
 	// update process status and quit if global.end ../../global.end or database.end
-	// unassigned xx means trigger check for quitting
 	call heartbeat("CHECK");
 
 	gosub flagserveractive();
@@ -1026,7 +1025,7 @@ function got_link() {
 
 		// lock it to prevent other listeners from processing it
 		// unlock locks,'REQUEST*':linkfilename1
-		if (not lockrecord("", locks1, "REQUEST*" ^ linkfilename1, xx)) {
+		if (not lockrecord("", locks1, "REQUEST*" ^ linkfilename1)) {
 			if (tracing) {
 				printl("CANNOT LOCK LOCKS,", ("REQUEST*" ^ linkfilename1).quote());
 			}
@@ -1082,7 +1081,7 @@ openlink1:
 
 		// lock the replyfilename to prevent other listeners from processing it
 		// unlock locks,'REQUEST*':replyfilename
-		if (not lockrecord("", locks1, "REQUEST*" ^ replyfilename, xx)) {
+		if (not lockrecord("", locks1, "REQUEST*" ^ replyfilename)) {
 			// if tracing then print 'CANNOT LOCK LOCKS,':quote('REQUEST*':replyfilename)
 			continue;
 		}
@@ -1220,7 +1219,8 @@ function request_init() {
 		logx = request_;
 		// gosub convlogx
 		t2 = "CONVLOG";
-		call listen5(t2, logx, xx, yy);
+		var dummy;
+		call listen5(t2, logx, dummy, yy);
 		logx.converter("^", FM);
 		logx(1) = request1;
 		if (logx.f(1)) {
@@ -2378,7 +2378,7 @@ badwrite:
 
 		// pass the output file in linkfilename2
 		// not good method, pass in system?
-		if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1), xx)) {
+		if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1))) {
 			data_ = linkfilename2;
 		}
 		if (request_.f(1).starts("VAL.")) {
@@ -2718,7 +2718,7 @@ subroutine properlock() {
 
 	// dont pass the filename because that causes persistent lock checking
 	// in jbase version of lockrecord()
-	if (not lockrecord("", srcfile2, keyx, xx)) {
+	if (not lockrecord("", srcfile2, keyx)) {
 		if (STATUS != 1) {
 			req.valid = 0;
 			// response='Error: ':quote(keyx):' CANNOT BE WRITTEN BECAUSE IT IS LOCKED ELSEWHERE'
@@ -2785,7 +2785,7 @@ subroutine leaselock() {
 	if (request1 == "RELOCK") {
 		gosub rawlock();
 	} else {
-		if (lockrecord(filename, file, keyx, xx)) {
+		if (lockrecord(filename, file, keyx)) {
 			state = 1;
 		} else {
 			state = 0;
@@ -2930,7 +2930,8 @@ subroutine rawlock() {
 	// keyorfilename = keyx;
 	// fmc = 2;
 	// gosub rawlock2(code, nextbfs, handle, keyorfilename, fmc, state);
-	call rtp57(5, "", file, keyx, 2, xx, state);
+	var dummy;
+	call rtp57(5, "", file, keyx, 2, dummy, state);
 	return;
 }
 
@@ -2938,7 +2939,8 @@ subroutine rawunlock() {
 	// unlock file,keyx
 	// code = 6;
 	// gosub rawlock2(code, nextbfs, handle, keyorfilename, fmc, state);
-	call rtp57(6, "", file, keyx, 2, xx, state);
+	var dummy;
+	call rtp57(6, "", file, keyx, 2, dummy, state);
 	return;
 }
 
@@ -3064,7 +3066,8 @@ subroutine flagserveractive() {
 
 subroutine writelogx() {
 	t2 = "CONVLOG";
-	call  listen5(t2, logx, xx, yy);
+	var dummy;
+	call  listen5(t2, logx, dummy, yy);
 	gosub writelogx2();
 	return;
 }
@@ -3121,7 +3124,7 @@ subroutine checkcompany() {
 	if (not allcols) {
 		return;
 	}
-	if (not xx.readc(allcols, filename ^ "*COMPANY_CODE")) {
+	if (not var().readc(allcols, filename ^ "*COMPANY_CODE")) {
 		return;
 	}
 

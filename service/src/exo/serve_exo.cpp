@@ -9,7 +9,7 @@ programinit()
 #include <srv_common.h>
 #include <req_common.h>
 
-var xx;
+//var xx;
 
 function main() {
 

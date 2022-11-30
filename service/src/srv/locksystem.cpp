@@ -10,7 +10,7 @@ var interactive;
 var mode;
 var dataset;
 var voc;
-var xx;
+//var xx;
 var otherusersx;
 var nn;
 var tt;
@@ -56,7 +56,7 @@ function main(in mode0, in dataset0) {
 			voc.unlock("BACKUP*");
 		}
 		// why again?
-		xx = unlockrecord("", voc, "BACKUP*" ^ dataset);
+		unlockrecord("", voc, "BACKUP*" ^ dataset);
 		goto success;
 	}
 
@@ -124,7 +124,7 @@ lockit:
 
 		if (not lockrecord("", voc, "BACKUP*" ^ dataset)) {
 
-			xx = unlockrecord("", voc, "BACKUP*");
+			unlockrecord("", voc, "BACKUP*");
 
 			// msg2=msg
 			if (dataset) {
@@ -149,7 +149,7 @@ invalidx:
 		}
 
 		// release exclusive lock
-		xx = unlockrecord("", voc, "BACKUP*");
+		unlockrecord("", voc, "BACKUP*");
 
 	} else {
 

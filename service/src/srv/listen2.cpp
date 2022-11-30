@@ -324,7 +324,6 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					// 2. otherwise add allowable connection from 127.* always
 					// 3. trailing space indicates defaults and wild cards expanded
 					//   and can use cache
-					//if (validips.locateusing(" ", "*", xx)) {
 					if (validips.locateusing(" ", "*")) {
 						validips = " ";
 					} else {
@@ -462,8 +461,8 @@ exoduslocalip:
 passwordexpired:
 
 							// some users may be allowed to login rarely without password renewal
-							var xx;
-							if (not authorised("AUTHORISATION PASSWORD NEVER EXPIRES", xx, "EXODUS", username)) {
+							var dummy;
+							if (not authorised("AUTHORISATION PASSWORD NEVER EXPIRES", dummy, "EXODUS", username)) {
 								invalidlogin = "Password has expired. Get a new one using Password Reset";
 								goto validateexit;
 							}
@@ -551,7 +550,6 @@ passwordexpired:
 								}  // ii;
 
 								// email if login unrestricted and on new non-lan ipno
-								// locate ipno in uipnos setting xx else
 								if (isnewipnet) {
 
 									// send email for non-lan ipnos
@@ -690,7 +688,6 @@ validateexit2:
 					if (passwordreset) {
 
 						// !if password is one of users email addresses
-						// !locate ucase(password) in ucase(@record<7>) using ';' setting xx then
 						// ONLY if user has an email address
 						// and account is not expired
 						let expirydate = RECORD.f(35);
@@ -803,8 +800,7 @@ validateexit2:
 					body(-1)	   = "System: " ^ SYSTEM.f(44);
 
 					body.replacer(_FM, "\r\n");
-					var xx;
-					call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
+					call sendmail(emailaddrs, ccaddrs, subject, body, "", "");
 
 					// "Password Reset" is hardcoded in index.htm
 					request5 =
@@ -930,7 +926,6 @@ validateexit2:
 		// special login routine
 		// returns iodat (cookie string "x=1&y=2" etc and optional comment msg)
 		// open 'VOC' to voc then
-		// read xx from voc,'LOGIN.NET' then
 		var cookie	 = "";
 		var loginmsg = "";
 		// dont pass system variables
@@ -1112,8 +1107,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 							// USER UPDATE "REPORT HEAD"
 							// USER UPDATE "REPORT HEAD COLOR"
 							// etc
-							var xx;
-							if (not authorised("USER UPDATE " ^ (fieldname.field(" ", ii).quote()), xx)) {
+							if (not authorised("USER UPDATE " ^ (fieldname.field(" ", ii).quote()))) {
 								tt2 = "";
 							}
 						}  // ii;

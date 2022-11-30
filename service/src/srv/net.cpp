@@ -56,7 +56,7 @@ listen:
 		}
 
 	// unlock all
-	var xx = unlockrecord();
+	unlockrecord();
 
 	SYSTEM(33) = "";
 
@@ -242,9 +242,10 @@ listen:
 				if ((errormsg == "" or errormsg.starts("OK")) and attachfilename) {
 					var address2 = srv.address.field("/", 2);
 					// remove exodus from the backup.zip recipients
-					if (address2.locateusing(";", "backups@neosys.com", xx)) {
+					var addrn;
+					if (address2.locateusing(";", "backups@neosys.com", addrn)) {
 						address2.converter(";", VM);
-						address2.remover(1, xx);
+						address2.remover(1, addrn);
 						address2.converter(VM, ";");
 					}
 					if (address2) {

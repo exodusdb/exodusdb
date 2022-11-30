@@ -1,8 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-var xx;
-
 function main(in /*type*/, in in0, in mode, out output) {
 
 	output = in0;

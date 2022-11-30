@@ -9,7 +9,7 @@ libraryinit()
 #include <srv_common.h>
 #include <req_common.h>
 
-var xx;
+//var xx;
 
 function main() {
 	//
@@ -31,7 +31,7 @@ function main() {
 		var connection = "VERSION 3";
 		connection(2)  = origstation;
 		connection(3)  = origstation;
-		call listen2("BECOMEUSERANDCONNECTION", origuser, "", connection, xx);
+		call listen2("BECOMEUSERANDCONNECTION", origuser, "", connection);
 
 		stop();
 	}

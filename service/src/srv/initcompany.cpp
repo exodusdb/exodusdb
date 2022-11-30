@@ -22,8 +22,7 @@ function main(in nextcompanycode) {
 	if (not nextcompanycode.unassigned()) {
 
 		if (nextcompanycode) {
-			var xx;
-			if (not xx.read(srv.companies, nextcompanycode)) {
+			if (not var().read(srv.companies, nextcompanycode)) {
 				call sysmsg(nextcompanycode.quote() ^ " COMPANY IS MISSING IN INIT.COMPANY()");
 				// TODO return abort code and change all callers to handle failure
 				return 0;

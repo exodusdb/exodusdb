@@ -7,7 +7,7 @@ libraryinit()
 
 var ntries;	 // num
 var lockdesc;
-var xx;
+//var xx;
 var allowduplicate;	 // num
 //var lockitem;
 var lockn;	// num
@@ -40,7 +40,8 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 
 	if (var(0) and USERNAME == "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
-		xx.input();
+		var reply;
+		reply.input();
 	}
 
 	if (mode == "LOCK") {
@@ -88,7 +89,8 @@ tryagain:
 		}
 		gosub getlockdesc(lockdesc, lockfilename, lockkey);
 		if (interactive) {
-			call note(lockholder ^ " is using the " ^ lockdesc, "T1", xx, "");
+			var dummy;
+			call note(lockholder ^ " is using the " ^ lockdesc, "T1", dummy, "");
 			if (esctoexit()) {
 				return 0;
 			} else {
@@ -132,7 +134,7 @@ subroutine getlockdesc(io lockdesc, in lockfilename, in lockkey) {
 subroutine unlockit(in lockfilename, in lockkey, io locklist) {
 
 	if (lockfile.open(lockfilename, "")) {
-		xx = unlockrecord("", lockfile, lockkey);
+		unlockrecord("", lockfile, lockkey);
 	}
 
 	if (locklist.locateusing(FM, lockfilename ^ "*" ^ lockkey, lockn)) {
@@ -161,7 +163,7 @@ subroutine unlockall(io locklist, io msg) {
 			filename2 = filename;
 		}
 		if (lockfile != "") {
-			xx = unlockrecord("", lockfile, lockkeyx);
+			unlockrecord("", lockfile, lockkeyx);
 		}
 	}  // lockitem
 

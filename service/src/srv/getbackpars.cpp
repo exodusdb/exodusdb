@@ -40,10 +40,10 @@ libraryinit()
 // max 30 since copied into system.cfg for editing
 	// clang-format on
 
-	var process;
+var process;
 var tt;	 // num
 var dbn;
-var xx;
+//var xx;
 
 function main(out bakpars, in process0 = var()) {
 
@@ -148,7 +148,7 @@ function main(out bakpars, in process0 = var()) {
 			} else {
 				// not otherwise specified then exclude database if in list of non-live data
 				// none-live could include test data or consolidated copies
-				if (not bakexcludedatasets_.locate(process.f(17), xx)) {
+				if (not bakexcludedatasets_.locate(process.f(17))) {
 					testdata = 0;
 				}
 			}

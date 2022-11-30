@@ -3,7 +3,7 @@ programinit()
 
 var ss1;
 var ss2;
-var xx;
+//var retval;
 var secs;	// num
 var time1;	// num
 var time2;	// num
@@ -19,17 +19,19 @@ function main() {
 	var maxspeed = "";
 	var avgspeed = "";
 	while (true) {
-		xx.inputn(-1);
+		var reply;
+		reply.inputn(-1);
 		// /BREAK;
-		if (not(xx == "" and ntots < 10))
+		if (not(reply == "" and ntots < 10))
 			break;
 		var	  yy = var("x").str(65530);
-		gosub getspeed();
+		var retval;
+		gosub getspeed(retval);
 		ntries += 1;
 		// if ntries>2 and secs then
 		// 		print(ntries, AT(-40));
-		// Use xx to defeat optimiser
-		if (secs and xx) {
+		// Use retval to defeat optimiser
+		if (secs and retval) {
 
 			// Adjust time to account for change from var to int in loop
 			secs *= 6;
@@ -65,11 +67,11 @@ function main() {
 	return "";
 }
 
-subroutine getspeed() {
+subroutine getspeed(io retval) {
 	time1 = ostime();
 	// for (const var ii : range(1, nn)) {
 	for (int ii = 1; ii <= nn; ++ii) {
-		xx = ii;
+		retval = ii;
 	}  // ii;
 	time2 = ostime();
 	secs  = time2 - time1;

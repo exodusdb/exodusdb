@@ -7,9 +7,9 @@ var databasecode;
 var usercode;  // num
 var lockprefix;
 var result;
-var xx;
-var yy;
-var zz;
+//var xx;
+//var yy;
+//var zz;
 
 function main(in databasecode0 = "", in usercode0 = "") {
 
@@ -63,13 +63,13 @@ function main(in databasecode0 = "", in usercode0 = "") {
 
 		// skip current user
 		if (lockid == curruserlockid) {
-			goto nextlock;
+			continue;  // lockno
 		}
 
 		// skip 10,20,100 etc because they appear to be equivalent to
 		// their equivalents without trailing zeroes
 		if ((lockno.ends("0")) and lockprefix) {
-			goto nextlock;
+			continue;  // lockno
 		}
 
 		lockid = lockprefix ^ lockno;
@@ -77,16 +77,18 @@ function main(in databasecode0 = "", in usercode0 = "") {
 
 		// attempt to lock
 		result = "";
-		xx	   = "";
-		yy	   = "";
-		call rtp57(lockmode, "", xx, lockid, "", yy, result);
+		var dummy1 = "";
+		var dummy2 = "";
+		var dummy3 = "";
+		call rtp57(lockmode, "", dummy1, lockid, "", dummy2, result);
 
 		// if successful, then unlock
 		if (result) {
-			xx = "";
-			yy = "";
-			call rtp57(unlockmode, "", xx, lockid, "", yy, zz);
-			goto nextlock;
+			dummy1 = "";
+			dummy2 = "";
+			dummy3 = "";
+			call rtp57(unlockmode, "", dummy1, lockid, "", dummy2, dummy3);
+			continue;  // lockno
 		}
 
 		// check process records
@@ -108,15 +110,15 @@ function main(in databasecode0 = "", in usercode0 = "") {
 					// could really skip further checking since should not be
 					// any higher processes but lock fail on missing process is infrequent
 					// but does happen when with many eg 10+ processes on diff dbs
-					goto nextlock;
+					continue;  // lockno
 				}
 
 				if (databasecode and process.f(17) != databasecode) {
-					goto nextlock;
+					continue;  // lockno
 				}
 
 				if (usercode and process.f(40, 10) != usercode) {
-					goto nextlock;
+					continue;  // lockno
 				}
 			}
 
@@ -127,7 +129,6 @@ function main(in databasecode0 = "", in usercode0 = "") {
 
 		returndata += 1;
 
-nextlock:;
 	}  // lockno;
 
 	returndata -= 1;

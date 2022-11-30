@@ -12,7 +12,7 @@ libraryinit()
 
 var menuid;
 var taskn;	// num
-var xx;
+//var xx;
 var menun2;
 var compcodex;
 var paramrec;
@@ -96,7 +96,7 @@ readmenu:
 
 			// specifically locked or no legacy menus - only allow if authorised
 			if (oldmenus == "" or ((menun and SECURITY.f(11, taskn).len()))) {
-				if (not authorised(menutask, xx)) {
+				if (not authorised(menutask)) {
 deleteit:
 					if (menus.locate(menu, menun2)) {
 						menus.remover(1, menun2);
@@ -106,7 +106,7 @@ deleteit:
 
 				// not specifically locked - only allow if in legacy menus
 			} else {
-				if (not oldmenus.locate(menu, xx)) {
+				if (not oldmenus.locate(menu)) {
 					goto deleteit;
 				}
 			}
@@ -150,14 +150,13 @@ nextcomp:
 			// /BREAK;
 			if (not compcode)
 				break;
-			// if validcode2(compcode,'','',xx,yy) then compcodes<-1>=compcode
-			// if validcode1(compcode,'','',xx,yy) then compcodes<-1>=compcode
 			// dont use general subroutine in system module
 			var companypositive = "";
-			if (not authorised("COMPANY ACCESS", xx, "")) {
+			var dummy;
+			if (not authorised("COMPANY ACCESS", dummy, "")) {
 				companypositive = "#";
 			}
-			if (authorised(companypositive ^ "COMPANY ACCESS " ^ (compcode.quote()), xx, "")) {
+			if (authorised(companypositive ^ "COMPANY ACCESS " ^ (compcode.quote()), dummy, "")) {
 				compcodes(-1) = compcode;
 			}
 
@@ -197,7 +196,7 @@ nextcomp:
 	// markets is not open in finance only module
 	// readf maincurrcode from markets,defmarketcode,5 else maincurrcode=''
 	var maincurrcode = "";
-	if (xx.open("MARKETS", "")) {
+	if (var().open("MARKETS", "")) {
 		// defmarketcode=agp<37>
 		defmarketcode = SYSTEM.f(137);
 		maincurrcode  = defmarketcode.xlate("MARKETS", 5, "X");

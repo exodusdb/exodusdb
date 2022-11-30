@@ -57,10 +57,9 @@ libraryinit(authorised_job_update)
 #include <authorised.h>
 
 var msg;
-var xx;
-
 function main() {
-	if (authorised("JOB UPDATE", msg, xx, ID)) {
+	var dummy;
+	if (authorised("JOB UPDATE", msg, dummy, ID)) {
 		ANS = 1;
 	} else {
 		ANS = 0;
@@ -109,10 +108,10 @@ libraryinit(authorised_task_create)
 #include <authorised.h>
 
 var msg;
-var xx;
 
 function main() {
-	if (authorised("TASK CREATE", msg, xx, ID)) {
+	var dummy;
+	if (authorised("TASK CREATE", msg, dummy, ID)) {
 		ANS = 1;
 	} else {
 		ANS = 0;

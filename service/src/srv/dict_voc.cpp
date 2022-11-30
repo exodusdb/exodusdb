@@ -93,25 +93,6 @@ function main() {
 libraryexit(c_args)
 
 
-libraryinit(caseratio)
-//--------------------
-function main() {
-	var xx = RECORD;
-	xx.converter("abcdefghijklmnopqrstuvwxyz", "");
-	var yy = RECORD;
-	yy.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
-	let uu = RECORD.len() - yy.len();
-	let ll = RECORD.len() - xx.len();
-	if (uu > ll) {
-		ANS = uu / (ll + 1);
-	} else {
-		ANS = -(ll / (uu + 1));
-	}
-	return ANS;
-}
-libraryexit(caseratio)
-
-
 libraryinit(count)
 //----------------
 function main() {

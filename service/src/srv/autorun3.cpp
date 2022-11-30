@@ -19,7 +19,7 @@ var options;
 var inpath;
 var docn;  // num
 var docid;
-var xx;
+//var xx;
 var forceemail;
 var toaddress;
 var useraddress;
@@ -248,7 +248,7 @@ currdatetime:
 
 				// or specific multiple hours
 			} else {
-				if (not hours.locate(hournow, xx)) {
+				if (not hours.locate(hournow)) {
 					if (logging) {
 						printl("wrong hour");
 					}
@@ -271,7 +271,7 @@ preventsameday:
 
 		// day of month restrictions
 		if (restrictions.f(3)) {
-			if (not restrictions.f(3).locate(date.field("/", 1) + 0, xx)) {
+			if (not restrictions.f(3).locate(date.field("/", 1) + 0)) {
 				if (logging) {
 					printl("wrong day of month");
 				}
@@ -281,7 +281,7 @@ preventsameday:
 
 		// month of year restrictions
 		if (restrictions.f(4)) {
-			if (not restrictions.f(4).locate(date.field("/", 2) + 0, xx)) {
+			if (not restrictions.f(4).locate(date.field("/", 2) + 0)) {
 				if (logging) {
 					printl("wrong month");
 				}
@@ -291,7 +291,7 @@ preventsameday:
 
 		// day of week restrictions
 		if (restrictions.f(5)) {
-			if (not restrictions.f(5).locate((idate - 1).mod(7) + 1, xx)) {
+			if (not restrictions.f(5).locate((idate - 1).mod(7) + 1)) {
 				if (logging) {
 					printl("wrong day of week");
 				}
@@ -301,7 +301,7 @@ preventsameday:
 
 		// date restrictions
 		if (restrictions.f(6)) {
-			if (not restrictions.f(6).locate(idate, xx)) {
+			if (not restrictions.f(6).locate(idate)) {
 				if (logging) {
 					printl("wrong date");
 				}
@@ -520,7 +520,7 @@ nextuser:;
 	connection(3)  = "SERVER";
 	connection(4)  = "";
 	connection(5)  = "";
-	call listen2("BECOMEUSERANDCONNECTION", runasusercode, "", connection, xx);
+	call listen2("BECOMEUSERANDCONNECTION", runasusercode, "", connection);
 
 	// request='EXECUTE':fm:'GENERAL':fm:'GETREPORT':fm:docid
 	// voccmd='GENERALPROXY'
@@ -643,7 +643,6 @@ nextsign:
 			let timetext = elapsedtimetext(start_timestamp, timestamp());
 
 			// if ucase(printfilename[-4,4])='.XLS' then
-			// locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
 			tt = (field2(printfilename, ".", -1)).lcase();
 			if (tt.contains("htm") and srv.document.f(33) != "2") {
 				// insert body from file
@@ -767,7 +766,7 @@ subroutine exec2() {
 
 	// pass the output file in linkfilename2
 	// not good method, pass in system?
-	if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1), xx)) {
+	if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1))) {
 		data_ = linkfilename2;
 	}
 

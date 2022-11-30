@@ -6,7 +6,7 @@ var blockid;
 var blockline;
 var block;
 var ans;
-var xx;
+//var xx;
 var macron;
 //var paramn;	 // num
 var lineparam;

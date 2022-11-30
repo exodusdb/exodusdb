@@ -151,8 +151,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		convertercsv = tt;
 	}
 
-	var xx;
-	if (xx.read(DICT, "AUTHORISED")) {
+	if (var().read(DICT, "AUTHORISED")) {
 		dicthasauthorised = 1;
 	} else {
 		dicthasauthorised = 0;
@@ -284,7 +283,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 nextdict:
 	if (readnext(dictid, MV)) {
 
-		if (notexportable.locateusing(FM, dictid, xx)) {
+		if (notexportable.locateusing(FM, dictid)) {
 			goto nextdict;
 		}
 
@@ -482,7 +481,7 @@ nextrec:
 		if (filters(3, filtern).len()) {
 
 			// if reqvalue then skip if not matching
-			if (not filters(3, filtern).locate(value, xx)) {
+			if (not filters(3, filtern).locate(value)) {
 				goto nextrec;
 			}
 

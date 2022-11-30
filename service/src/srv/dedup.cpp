@@ -2,7 +2,6 @@
 libraryinit()
 
 var list1n;
-var xx;
 
 function main(in /*mode*/, io list1, io list2, in seps) {
 
@@ -26,7 +25,7 @@ function main(in /*mode*/, io list1, io list2, in seps) {
 	// any list1 that are in origlist2 are duplicates - consider as not removed
 	let nlist1 = list1.fcount(FM);
 	for (list1n = nlist1; list1n >= 1; --list1n) {
-		if (alllist2.locateusing(FM, list1.f(list1n), xx)) {
+		if (alllist2.locateusing(FM, list1.f(list1n))) {
 			list1.remover(list1n);
 		}
 	}  // list1n;
