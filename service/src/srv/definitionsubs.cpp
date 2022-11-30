@@ -68,7 +68,7 @@ function main(in mode) {
 		if (systemcodes.locateusing(",", ID)) {
 
 			gosub security2(mode, "SYSTEM CONFIGURATION");
-			if (not(req.valid)) {
+			if (not req.valid) {
 				return 0;
 			}
 		}
@@ -90,7 +90,7 @@ function main(in mode) {
 		if (systemcodes.locateusing(",", ID)) {
 
 			gosub security2(mode, "SYSTEM CONFIGURATION");
-			if (not(req.valid)) {
+			if (not req.valid) {
 				return 0;
 			}
 
@@ -235,7 +235,7 @@ unlockdefinitions:
 			// always allowed to update or delete own records
 			if (RECORD.f(8) != USERNAME) {
 				gosub security2(mode, "BILLING REPORT");
-				if (not(req.valid)) {
+				if (not req.valid) {
 					return 0;
 				}
 			}
@@ -561,7 +561,7 @@ preventupdate:
 		if (systemcodes.locateusing(",", ID)) {
 
 			gosub security2(mode, "SYSTEM CONFIGURATION");
-			if (not(req.valid)) {
+			if (not req.valid) {
 				return 0;
 			}
 
@@ -590,7 +590,7 @@ preventupdate:
 			// always allowed to delete own records
 			if (RECORD.f(8) != USERNAME) {
 				gosub security2(mode, "BILLING REPORT");
-				if (not(req.valid)) {
+				if (not req.valid) {
 					return 0;
 				}
 			}

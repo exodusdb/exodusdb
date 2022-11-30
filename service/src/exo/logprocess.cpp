@@ -61,7 +61,7 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 		if (not(processrec.read(DEFINITIONS, "PROCESS*" ^ processid))) {
 			processrec = "";
 		}
-		if (not(FILEERROR)) {
+		if (not FILEERROR) {
 			processrec(11) = date();
 			processrec(12) = time();
 

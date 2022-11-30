@@ -93,7 +93,7 @@ fileok:
 	} else {
 
 		// check for long filenames too (DOS limit was 8.3)
-		if (not(diroutfile)) {
+		if (not diroutfile) {
 			if (oslistf(outfile)) {
 				goto fileok;
 			}

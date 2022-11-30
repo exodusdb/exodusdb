@@ -323,7 +323,7 @@ function main() {
 				msg = "Software version " ^ dbversion.f(1).oconv("D") ^ " " ^ dbversion.f(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
 				msg = msg.oconv("L#60");
 				// abort since db is advanced
-				if (not(interactive)) {
+				if (not interactive) {
 badversion:
 					msg_ = msg;
 					gosub failsys();

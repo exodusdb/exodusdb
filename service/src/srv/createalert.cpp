@@ -114,7 +114,7 @@ syntax:
 	// GENERAL.ALERTS MEDIA.ALERTS JOB.ALERTS FINANCE.ALERTS
 	tt = module ^ ".ALERTS";
 	// c++ variation
-	if (not(VOLUMES)) {
+	if (not VOLUMES) {
 		tt.lcaser();
 		tt.converter(".", "");
 	}

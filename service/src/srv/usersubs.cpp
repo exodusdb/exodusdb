@@ -237,7 +237,7 @@ function main(in mode) {
 		// verify email domains
 		req.is = RECORD.f(7);
 		call usersubs("VAL.EMAIL");
-		if (not(req.valid)) {
+		if (not req.valid) {
 			gosub unlocksec();
 			return 0;
 		}
@@ -281,7 +281,7 @@ function main(in mode) {
 		}
 
 		let usern = gosub getusern();
-		if (not(req.valid)) {
+		if (not req.valid) {
 			gosub unlocksec();
 			return 0;
 		}

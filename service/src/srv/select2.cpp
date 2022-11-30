@@ -95,7 +95,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
 	sortselect.replacer("%SELECTLIST%", "");
-	if (not(LISTACTIVE)) {
+	if (not LISTACTIVE) {
 		useactivelist = 0;
 	}
 

@@ -149,7 +149,7 @@ function main(in mode) {
 
 			// check guest status
 			gosub gueststatus();
-			if (not(req.valid)) {
+			if (not req.valid) {
 				stop();
 			}
 
@@ -468,7 +468,7 @@ function main(in mode) {
 				// check ALL emails in one pass
 				req.is = RECORD.f(7);
 				call usersubs("VAL.EMAIL");
-				if (not(req.valid)) {
+				if (not req.valid) {
 					return 0;
 				}
 

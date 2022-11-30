@@ -504,7 +504,7 @@ nextpatch:;
 		}
 		var active = request6;
 
-		if (not(VOLUMES)) {
+		if (not VOLUMES) {
 			if (filename == "JOURNALS") {
 				filename = "JOURNALS";
 			}
@@ -623,7 +623,7 @@ getvalues:
 	} else if (request1 == "SELECT") {
 
 		var filename0 = request2;
-		if (not(VOLUMES)) {
+		if (not VOLUMES) {
 			filename0.converter(".", "_");
 			filename0.replacer("MEDIA_TYPE", "JOB_TYPE");
 		}

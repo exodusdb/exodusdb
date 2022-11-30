@@ -80,14 +80,14 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 				if (nsecs != 1) {
 					text ^= "s";
 				}
-			} else if (not(minutes)) {
+			} else if (not minutes) {
 zero:
 				text(-1) = "< 1 ms";
 			} else {
 				text(-1) = "exactly";
 			}
 		} else {
-			if (not(minutes)) {
+			if (not minutes) {
 				goto zero;
 			}
 			text(3) = "exactly";

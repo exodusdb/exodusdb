@@ -19,7 +19,7 @@ function main(in msg0, io time0) {
 
 	if (msg0 == "GETLASTLOG") {
 
-		if (not(VOLUMES)) {
+		if (not VOLUMES) {
 			return "";
 		}
 

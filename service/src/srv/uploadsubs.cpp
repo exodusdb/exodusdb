@@ -181,7 +181,7 @@ postuploadfail:
 				// actually mkdir2 calls md so it is the same thing
 				call shell2("mkdir " ^ fullsubfolder, errors);
 
-				if (not(VOLUMES)) {
+				if (not VOLUMES) {
 					call shell2("chmod a+rwx -R " ^ fullsubfolder);
 				}
 
@@ -465,7 +465,7 @@ nextline:
 			}
 
 			// Determine cols and if is csv from first line col headings
-			if (not(cols)) {
+			if (not cols) {
 
 				//csv = line.index("\",\"");
 				csv = line.index(R"___(",")___");

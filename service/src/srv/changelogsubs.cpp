@@ -298,7 +298,7 @@ function getcurrentversiondatetime() {
 	temp.converter("/", OSSLASH);
 	// temp = temp.xlate("DOS", 1, "X");
 	temp = osread(temp);
-	if (not(VOLUMES)) {
+	if (not VOLUMES) {
 		if (temp == "") {
 			temp = EXECPATH.osfile();
 			// 19:05:55  18 NOV 2020

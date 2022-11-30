@@ -144,7 +144,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	if (hasconverter.f(1)) {
 		tt = "CONVERTER." ^ hasconverter.f(1);
 		// c++ variation
-		if (not(VOLUMES)) {
+		if (not VOLUMES) {
 			tt.lcaser();
 			tt.converter(".", "");
 		}
@@ -487,7 +487,7 @@ nextrec:
 			}
 
 			// no reqvalues means skip if no value present
-		} else if (not(value)) {
+		} else if (not value) {
 			goto nextrec;
 		}
 

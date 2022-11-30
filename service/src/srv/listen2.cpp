@@ -761,7 +761,7 @@ validateexit2:
 					req.valid = 1;
 					req.orec  = RECORD;
 					call usersubs("PREWRITE.RESETPASSWORD");
-					if (not(req.valid)) {
+					if (not req.valid) {
 						msg_.move(request5);
 						return 0;
 					}

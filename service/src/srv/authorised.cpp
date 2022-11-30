@@ -145,7 +145,7 @@ updateprivs:
 			call authorised(newtask, xx);
 			return 1;
 		}
-		if (not(noadd)) {
+		if (not noadd) {
 			// NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
 			noadd = (task.ends(DQ)) or (SECURITY.len() > maxstrsize_ * 2 / 3);
 			// if passed a default lock then add even tasks ending like "XXXXX"
@@ -188,7 +188,7 @@ updateprivs:
 	if (locks == "") {
 
 		// not positive ok
-		if (not(positive)) {
+		if (not positive) {
 			return 1;
 
 			// exodus always ok

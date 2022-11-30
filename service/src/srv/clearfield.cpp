@@ -64,7 +64,7 @@ function main() {
 tryagain:
 		var fn = fns.f(ii);
 		// prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0
-		if (not(fn)) {
+		if (not fn) {
 			call mssg(fn.quote() ^ " field number is not supported");
 			stop();
 		}

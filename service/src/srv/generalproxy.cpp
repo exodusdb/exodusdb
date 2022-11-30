@@ -407,7 +407,7 @@ function main() {
 		// prewrite (locks authorisation file or fails)
 		req.valid = 1;
 		call usersubs("PREWRITE");
-		if (not(req.valid)) {
+		if (not req.valid) {
 			abort();
 		}
 
@@ -596,12 +596,12 @@ badsetcodepage:
 		req.wlocked	  = 0;
 		req.templatex = "SECURITY";
 		call securitysubs("SETUP");
-		if (not(req.valid)) {
+		if (not req.valid) {
 			abort();
 		}
 		// call security.subs('LISTAUTH')
 		call securitysubs(mode);
-		if (not(req.valid)) {
+		if (not req.valid) {
 			abort();
 		}
 		call securitysubs("POSTAPP");
@@ -612,7 +612,7 @@ badsetcodepage:
 
 		req.templatex = "SECURITY";
 		call securitysubs("SETUP");
-		if (not(req.valid)) {
+		if (not req.valid) {
 			abort();
 		}
 
@@ -691,7 +691,7 @@ nextrep:
 				if (RECORD.read(srv.documents, ID)) {
 					req.orec = RECORD;
 					call getsubs("PREDELETE");
-					if (not(req.valid)) {
+					if (not req.valid) {
 						goto exit;
 					}
 
@@ -737,7 +737,7 @@ nextrep:
 		}
 
 		call getsubs("DEF.DOCUMENT.NO");
-		if (not(req.valid)) {
+		if (not req.valid) {
 			abort();
 		}
 

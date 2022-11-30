@@ -37,7 +37,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	let replacedelete = "";
 
 	// fix filenames from PICKOS to EXODUS style
-	if (not(VOLUMES)) {
+	if (not VOLUMES) {
 		filename.converter(".", "_");
 		filename.replacer("MEDIA_TYPE", "JOB_TYPE");
 	}
@@ -121,7 +121,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	}
 
 	// c++ variation
-	if (not(VOLUMES)) {
+	if (not VOLUMES) {
 		for (var ii = 1; ii <= 5; ii += 2) {
 			var tt = triggers.f(ii);
 			tt.lcaser();

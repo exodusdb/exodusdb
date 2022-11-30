@@ -463,7 +463,7 @@ nextprocess:
 		// Warning for 1 day or never
 		// Critical for more
 		backupdrive = backuprequired.f(1, dbasen, 1).ucase();
-//		if (not(VOLUMES)) {
+//		if (not VOLUMES) {
 //			backupdrive = not dbasecode.ends("_test");
 //		}
 		if (backupdrive) {

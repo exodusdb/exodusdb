@@ -69,7 +69,7 @@ nextbuild:
 
 		var deleting = 1;
 		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(req.valid)) {
+		if (not req.valid) {
 			return 0;
 		}
 
@@ -87,13 +87,13 @@ nextbuild:
 
 		var deleting = 1;
 		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(req.valid)) {
+		if (not req.valid) {
 			return 0;
 		}
 
 		deleting = 0;
 		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(req.valid)) {
+		if (not req.valid) {
 			return 0;
 		}
 
@@ -101,13 +101,13 @@ nextbuild:
 
 		deleting = 1;
 		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(req.valid)) {
+		if (not req.valid) {
 			return 0;
 		}
 
 		deleting = 0;
 		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
-		if (not(req.valid)) {
+		if (not req.valid) {
 			return 0;
 		}
 

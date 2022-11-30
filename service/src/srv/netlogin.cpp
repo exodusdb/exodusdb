@@ -220,7 +220,7 @@ chknameandpass:
 		}
 	}
 	// failed login not interactive still works
-	if (not(ok)) {
+	if (not ok) {
 		if (SYSTEM.f(33)) {
 			userx = APPLICATION;
 			ok	  = 1;

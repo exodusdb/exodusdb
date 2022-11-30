@@ -1324,7 +1324,7 @@ function request_init() {
 						logx = "";
 
 						// log <DataIn>
-						if (not(anydata)) {
+						if (not anydata) {
 							anydata = 1;
 							logx ^= _EOL "<DataIn>";
 						}
@@ -1365,7 +1365,7 @@ cannotopenlinkfile2:
 
 	} else {
 
-		if (not(linkfile2size)) {
+		if (not linkfile2size) {
 
 			data_ = "";
 
@@ -2070,7 +2070,7 @@ noupdate:
 
 		req.valid = 1;
 		gosub properlock();
-		if (not(req.valid)) {
+		if (not req.valid) {
 			return;
 		}
 
@@ -2146,7 +2146,7 @@ badwrite:
 				DATA = "";
 			}
 
-			if (not(req.valid)) {
+			if (not req.valid) {
 				gosub properunlock();
 				response_ = msg_;
 				gosub fmtresp();
@@ -2178,7 +2178,7 @@ badwrite:
 				}
 
 				gosub properlock();
-				if (not(req.valid)) {
+				if (not req.valid) {
 					return;
 				}
 			}
@@ -2264,7 +2264,7 @@ badwrite:
 				call systemsubs(triggers.f(2));
 				DATA = "";
 			}
-			if (not(req.valid)) {
+			if (not req.valid) {
 				gosub properunlock();
 				response_ = msg_;
 				gosub fmtresp();

@@ -433,7 +433,7 @@ preventsameday:
 					agp	  = "";
 					call holiday("GETTYPE", idate, usercode, userx, marketcode, market, agp, holidaytype, workdate);
 
-					if (not(holidaytype)) {
+					if (not holidaytype) {
 adduseraddress:
 						if (backwards) {
 							toaddress.inserter(1, useraddress);
@@ -466,7 +466,7 @@ nextuser:;
 		tt = module ^ ".ALERTS";
 
 		// c++ variation
-		if (not(VOLUMES)) {
+		if (not VOLUMES) {
 			tt.lcaser();
 			tt.converter(".", "");
 		}
@@ -651,7 +651,7 @@ nextsign:
 				subject ^= " in " ^ timetext;
 			} else {
 				attachfilename = oscwd();
-				if (not(VOLUMES)) {
+				if (not VOLUMES) {
 					attachfilename ^= OSSLASH;
 				}
 				attachfilename ^= printfilename;
