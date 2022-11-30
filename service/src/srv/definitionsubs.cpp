@@ -612,8 +612,7 @@ preventupdate:
 				var key = ID;
 				key.replacer("*", "%2A");
 				key = "DEFINITIONS*" ^ key;
-				var dummy;
-				if (dummy.read(reports, key)) {
+				if (var().read(reports, key)) {
 					var("%DELETED%").write(reports, key);
 				}
 				// delete reports,key

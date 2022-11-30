@@ -519,8 +519,7 @@ function main(in mode) {
 		// backup copy one per day
 		var temp;
 		if (temp.read(DEFINITIONS, "SECURITY")) {
-			var dummy;
-			if (not dummy.read(DEFINITIONS, "SECURITY." ^ date())) {
+			if (not var().read(DEFINITIONS, "SECURITY." ^ date())) {
 				temp.write(DEFINITIONS, "SECURITY." ^ date());
 			}
 			temp = "";
