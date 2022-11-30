@@ -6,7 +6,6 @@ libraryinit()
 #include <hashpass.h>
 #include <securitysubs2.h>
 #include <sendmail.h>
-#include <singular.h>
 #include <sysmsg.h>
 #include <systemfile.h>
 #include <usersubs.h>
@@ -49,39 +48,40 @@ libraryinit()
 #define origfullrec_        req.registerx(7)
 #define startn_             req.registerx(8)
 #define endn_               req.registerx(9)
-	// clang-format on
 
-	// NB (not any more) valid companies are buffered in userprivs<9>
+// clang-format on
 
-var newpassword;
-var userx;
-var sysrec;
-var passwordfn;	 // num
-var lastfn;		 // num
-var filename;
-var defaultlock;
+// NB (not any more) valid companies are buffered in userprivs<9>
+
+//var newpassword;
+//var userx;
+//var sysrec;
+//var passwordfn;	 // num
+//var lastfn;		 // num
+//var filename;
+//var defaultlock;
 var msg;
 //var usern;	// num
-var xx;
-var ousern;	 // num
-var newtaskn;
-var userfields;
+//var xx;
+//var ousern;	 // num
+//var newtaskn;
+//var userfields;
 //var nuserfields;
-var emailtx;
-var newusers;
-var userrec;
-var origuserrec;
-var isnew;	// num
-var replyto;
-var attachfilename;
-var deletex;
-var errormsg;
-var ok;	 // num
-var encryptx;
-var op;
-var op2;
-var wspos;
-var wsmsg;
+//var emailtx;
+//var newusers;
+//var userrec;
+//var origuserrec;
+//var isnew;	// num
+//var replyto;
+//var attachfilename;
+//var deletex;
+//var errmsg;
+//var ok;	 // num
+//var encryptx;
+//var op;
+//var op2;
+//var wspos;
+//var wsmsg;
 
 function main(in mode) {
 
@@ -97,7 +97,7 @@ function main(in mode) {
 	}
 
 	if (mode == "GENERATEPASSWORD") {
-		gosub generatepassword();
+		let newpassword = gosub generatepassword();
 		req.is = newpassword;
 
 		// only to allow maintenance mode
@@ -105,12 +105,12 @@ function main(in mode) {
 	} else if (mode == "PERP") {
 
 	} else if (mode == "MAKESYSREC") {
-		userx		= req.is.f(1);
-		newpassword = req.is.f(2);
-		sysrec		= "";
-		passwordfn	= 7;
-		lastfn		= 9;
-		gosub makesysrec();
+		let userx			= req.is.f(1);
+		let newpassword		= req.is.f(2);
+		var sysrec			= "";
+//		let passwordfn	= 7;
+//		let lastfn		= 9;
+		gosub makesysrec(sysrec, userx, newpassword);
 		req.is = sysrec;
 
 		// called from DEFINITION.SUBS POSTREAD for key SECURITY
@@ -120,6 +120,8 @@ function main(in mode) {
 		if (req.templatex.unassigned()) {
 			req.templatex = "";
 		}
+		var filename;
+		var defaultlock;
 		if (req.templatex == "SECURITY") {
 			filename	= "AUTHORISATION";
 			defaultlock = "GS";
@@ -282,8 +284,8 @@ function main(in mode) {
 						let nkeys = invisiblekeys.fcount(VM);
 						for (const var keyn : range(1, nkeys)) {
 							let keyx = invisiblekeys.f(1, keyn);
-							if (not(otherkeys.f(1).locate(keyx, xx))) {
-								if (not(visiblekeys.f(1).locate(keyx, xx))) {
+							if (not(otherkeys.f(1).locate(keyx))) {
+								if (not(visiblekeys.f(1).locate(keyx))) {
 									otherkeys ^= VM ^ keyx;
 								}
 							}
@@ -311,9 +313,9 @@ function main(in mode) {
 		let nusers	  = usercodes.fcount(VM);
 		// for (usern = 1; usern <= nusers; ++usern) {
 		for (const var usern : range(1, nusers)) {
-			userx	 = usercodes.f(1, usern);
-			sysrec	 = RECORD.f(4, usern, 2);
-			let pass = userx.xlate("USERS", 4, "X");
+			let userx	 = usercodes.f(1, usern);
+			var sysrec	 = RECORD.f(4, usern, 2);
+			let pass	 = userx.xlate("USERS", 4, "X");
 			if (pass and pass != sysrec.field(TM, 7)) {
 				RECORD(4, usern, 2) = sysrec.fieldstore(TM, 7, 1, pass);
 			}
@@ -403,14 +405,15 @@ function main(in mode) {
 				// recover password
 				if (not interactive) {
 
-					userx = RECORD.f(1, usern);
+					let userx = RECORD.f(1, usern);
 
-					newpassword = RECORD.f(4, usern);
+					let newpassword = RECORD.f(4, usern);
 					if (newpassword and newpassword.len() < 4) {
 						msg = userx.quote() ^ " user password cannot be less than " ^ minpasswordchars_;
 						return invalid(msg);
 					}
 
+					var ousern;
 					if (not(origfullrec_.f(1).locate(userx, ousern))) {
 						ousern = 0;
 					}
@@ -419,7 +422,7 @@ function main(in mode) {
 
 						req.mvx = usern;
 						req.is	= "";
-						gosub changepassx();
+						gosub changepassx(userx, newpassword);
 
 						// remove old password so that changing password TO THE SAME PASSWORD
 						// still triggers update of users file log section
@@ -500,6 +503,7 @@ function main(in mode) {
 			for (const var taskn : range(1, ntasks)) {
 				let task = tasks.f(1, taskn);
 				if (task) {
+					var newtaskn;
 					if (not(req.orec.f(10).locate(task, newtaskn))) {
 						let lockx = locks.f(1, taskn);
 
@@ -515,7 +519,8 @@ function main(in mode) {
 		// backup copy one per day
 		var temp;
 		if (temp.read(DEFINITIONS, "SECURITY")) {
-			if (not(xx.read(DEFINITIONS, "SECURITY." ^ date()))) {
+			var dummy;
+			if (not(dummy.read(DEFINITIONS, "SECURITY." ^ date()))) {
 				temp.write(DEFINITIONS, "SECURITY." ^ date());
 			}
 			temp = "";
@@ -540,7 +545,7 @@ function main(in mode) {
 		}
 
 		// field numbers in users file
-		userfields = "";
+		var userfields = "";
 		// userfields<-1>='Code:0'
 		userfields(-1) = "User Name:1";
 		userfields(-1) = "Email:7";
@@ -550,8 +555,10 @@ function main(in mode) {
 		userfields(-1) = "Keys:41";
 		userfields.converter(":", VM);
 		let nuserfields = userfields.fcount(FM);
-		emailtx			= "";
-		newusers		= "";
+
+		// Will be built up from processesing all users
+		var emailtx	 = "";
+		var newusers = "";
 
 		var users;
 		if (not(users.open("USERS", ""))) {
@@ -565,14 +572,15 @@ function main(in mode) {
 		let nusers		  = usercodes.fcount(VM);
 		// for (usern = 1; usern <= nusers; ++usern) {
 		for (const var usern : range(1, nusers)) {
-			userx = usercodes.f(1, usern);
+			let userx = usercodes.f(1, usern);
 
 			if (not(userx.contains("---"))) {
 
 				// get the original and current system records
-				sysrec = RECORD.f(4, usern, 2);
+				var sysrec = RECORD.f(4, usern, 2);
 				// locate user in orec<1> setting ousern then
 				var menuid = "";
+				var ousern;
 				if (origfullrec_.f(1).locate(userx, ousern)) {
 					// oSYSREC=orec<4,ousern,2>
 					let osysrec = origfullrec_.f(4, ousern, 2);
@@ -597,11 +605,12 @@ function main(in mode) {
 				if (users) {
 
 					// get the current user record
+					var userrec;
 					if (not(userrec.read(users, userx))) {
 						userrec		= "";
 						userrec(34) = menuid;
 					}
-					origuserrec = userrec;
+					let origuserrec = userrec;
 
 					// determine the user department
 					call usersubs("GETUSERDEPT," ^ userx);
@@ -659,9 +668,9 @@ function main(in mode) {
 						mirror(1)	  = userx;
 						mirror.write(users, mirrorkey);
 
-						isnew = origuserrec.f(1) == "";
+						let isnew = origuserrec.f(1) == "";
 						// only warn about new users with emails (ignore creation of groups/testusers)
-						gosub getemailtx(nuserfields);
+						gosub getemailtx(emailtx, newusers, isnew, userx, userrec, origuserrec, userfields, nuserfields);
 					}
 				}
 			}
@@ -674,17 +683,18 @@ function main(in mode) {
 			let nusers	  = usercodes.fcount(VM);
 			// for (usern = 1; usern <= nusers; ++usern) {
 			for (const var usern : range(1, nusers)) {
-				userx = usercodes.f(1, usern);
+				let userx = usercodes.f(1, usern);
 				if (not(userx.contains("---"))) {
 					if (userx and not(userx.contains("EXODUS"))) {
 						if (not(RECORD.f(1).locate(userx, temp))) {
+							var userrec;
 							if (userrec.read(users, userx)) {
 								if (users) {
 									users.deleterecord(userx);
 								}
-								isnew		= -1;
-								origuserrec = "";
-								gosub getemailtx(nuserfields);
+								let isnew			= -1;
+								let origuserrec = "";
+								gosub getemailtx(emailtx, newusers, isnew, userx, userrec, origuserrec, userfields, nuserfields);
 							}
 							if (temp.read(systemfile(), userx)) {
 								if (temp.f(1) == "USER") {
@@ -719,12 +729,7 @@ function main(in mode) {
 				let nn = newusers.fcount(FM);
 				for (const var ii : range(1, nn)) {
 
-					if (USERNAME == "EXODUS") {
-						replyto = "support@neosys.com";
-					} else {
-						replyto = USERNAME.xlate("USERS", 7, "X");
-					}
-
+					let replyto = (USERNAME == "EXODUS") ? "support@neosys.com" : USERNAME.xlate("USERS", 7, "X");
 					let toaddress = newusers.f(ii, 3);
 					var ccaddress = replyto;
 
@@ -786,10 +791,13 @@ function main(in mode) {
 					body.replacer("%DATABASE%", SYSTEM.f(14, 1) ^ " (" ^ SYSTEM.f(17, 1) ^ ")");
 					body.replacer(VM, chr(13));
 
-					call sendmail(toaddress, ccaddress, subject, body, attachfilename, deletex, errormsg, replyto);
+					var dummy;
+					var dummy2;
+					var errmsg;
+					call sendmail(toaddress, ccaddress, subject, body, dummy, dummy2, errmsg, replyto);
 
-					if (errormsg) {
-						call note(errormsg);
+					if (errmsg) {
+						call note(errmsg);
 					}
 
 				}  // ii;
@@ -809,7 +817,7 @@ function main(in mode) {
 			SECURITY = "";
 		}
 		if (interactive) {
-			xx = unlockrecord("", DEFINITIONS, "SECURITY");
+			unlockrecord("", DEFINITIONS, "SECURITY");
 		}
 
 	} else if (mode.field(".", 1) == "LISTAUTH") {
@@ -911,11 +919,7 @@ function main(in mode) {
 		var lasttask = "";
 		for (const var taskn : range(1, ntasks)) {
 			var task = tasks.f(1, taskn);
-			if (authorised(task, xx)) {
-				ok = 1;
-			} else {
-				ok = 0;
-			}
+			var ok = authorised(task);
 			if (disallowed) {
 				ok = not(ok);
 			}
@@ -966,9 +970,9 @@ function main(in mode) {
 	return 0;
 }
 
-subroutine changepassx() {
+subroutine changepassx(in userx, in newpassword) {
 	let datax = RECORD.f(4, req.mvx);
-	sysrec	  = datax.f(1, 1, 2);
+	var sysrec	  = datax.f(1, 1, 2);
 	sysrec.converter(TM ^ ST ^ chr(249), FM ^ VM ^ SM);
 	if (not sysrec) {
 		if (not(sysrec.read(systemfile(), userx))) {
@@ -978,7 +982,7 @@ subroutine changepassx() {
 		}
 	}
 
-	gosub newpass3();
+	gosub newpass3(sysrec, userx, newpassword);
 
 	if (req.valid) {
 		// on screen the password shows as <hidden>
@@ -993,45 +997,44 @@ subroutine changepassx() {
 	return;
 }
 
-subroutine generatepassword() {
+function generatepassword() {
 	var consonants = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	let vowels	   = "AEIOUY";
 	consonants.converter(vowels ^ "QX", "");
-	newpassword = "";
+	var newpassword = "";
 	for (const var ii : range(1, minpasswordchars_ / 2)) {
 		newpassword ^= consonants[consonants.len().rnd() + 1];
 		newpassword ^= vowels[vowels.len().rnd() + 1];
 	}  // ii;
+	return newpassword;
+}
+
+subroutine newpass3(io sysrec, in userx, in newpassword) {
+
+	req.valid  = 0;
+//	let lastfn = 9;
+
+//	var passwordfn;
+//	if (sysrec.f(1) == "USER" or sysrec == "") {
+//		passwordfn = 7;
+//	} else if (sysrec.f(1) == "ACCOUNT") {
+//		passwordfn = 6;
+//	} else {
+//		var dummy;
+//		call note("W123", "", dummy, userx);
+//		return;
+//	}
+
+//	let v12 = 0;
+
+	gosub makesysrec(sysrec, userx, newpassword);
 	return;
 }
 
-subroutine newpass3() {
+subroutine makesysrec(io sysrec, in userx, in newpassword) {
 
-	req.valid = 0;
-	lastfn	  = 9;
-
-	if (sysrec.f(1) == "USER" or sysrec == "") {
-		passwordfn = 7;
-	} else if (sysrec.f(1) == "ACCOUNT") {
-		passwordfn = 6;
-	} else {
-		call note("W123", "", xx, userx);
-		return;
-	}
-
-	let v12 = 0;
-
-	gosub makesysrec();
-	return;
-}
-
-subroutine makesysrec() {
 	if (not(sysrec.f(1))) {
-		if (passwordfn == 7) {
-			sysrec(1) = "USER";
-		} else {
-			sysrec(1) = "ACCOUNT";
-		}
+		sysrec(1) = "USER";
 	}
 	if (not(sysrec.f(2))) {
 		sysrec(2) = APPLICATION;
@@ -1045,8 +1048,11 @@ subroutine makesysrec() {
 	}
 
 	// store the encrypted new password
-	encryptx		   = hashpass(newpassword);
+	var encryptx	   = hashpass(newpassword);
+	let passwordfn	   = 7;
 	sysrec(passwordfn) = encryptx;
+
+	let lastfn = 9;
 
 	encryptx	   = userx ^ FM ^ sysrec.field(FM, 2, lastfn - 2);
 	encryptx	   = hashpass(encryptx);
@@ -1083,7 +1089,7 @@ subroutine cleartemp() {
 	return;
 }
 
-subroutine getemailtx(in nuserfields) {
+subroutine getemailtx(io emailtx, io newusers, in isnew, in userx, in userrec, in origuserrec, in userfields, in nuserfields) {
 	// dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
 	if (userrec.f(7).ucase().contains("@EXODUS.COM") and not SYSTEM.f(17, 1).ends("_test") and not var("exodus.id").osfile()) {
 		return;
