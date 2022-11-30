@@ -13,7 +13,6 @@ libraryinit()
 #include <safeselect.h>
 #include <securitysubs.h>
 #include <sendmail.h>
-#include <singular.h>
 #include <sysmsg.h>
 #include <uploadsubs.h>
 #include <usersubs.h>

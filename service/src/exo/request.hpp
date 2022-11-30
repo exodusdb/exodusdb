@@ -1,6 +1,8 @@
 #ifndef EXO_REQUEST_HPP_
 #define EXO_REQUEST_HPP_
 
+#include <singular.h>
+
 function security(in mode)
 {
 	var op = singular(req.datafile);

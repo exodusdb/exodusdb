@@ -6,8 +6,7 @@ libraryinit()
 #include <collectixvals.h>
 #include <definitionsubs.h>
 #include <securitysubs.h>
-#include <shell2.h>
-#include <singular.h>
+//#include <shell2.h>
 #include <systemsubs.h>
 
 #include <service_common.h>
@@ -17,20 +16,20 @@ libraryinit()
 
 #include <request.hpp>
 
-var xx;
-var op;
+//var xx;
+//var op;
 var msg;
-var backuprec;
-var smtprec;
-var vn;
-var anydataexists;
-var tt;
-var errors;
-var dbdir;
-var newdbcoden;
-var op2;
-var wspos;
-var wsmsg;
+//var backuprec;
+//var smtprec;
+//var vn;
+//var anydataexists;
+//var tt;
+//var errors;
+//var dbdir;
+//var newdbcoden;
+//var op2;
+//var wspos;
+//var wsmsg;
 
 function main(in mode) {
 
@@ -66,10 +65,9 @@ function main(in mode) {
 
 		// system configuration
 		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
-		if (systemcodes.locateusing(",", ID, xx)) {
+		if (systemcodes.locateusing(",", ID)) {
 
-			op = "SYSTEM CONFIGURATION";
-			gosub security2(mode, op);
+			gosub security2(mode, "SYSTEM CONFIGURATION");
 			if (not(req.valid)) {
 				return 0;
 			}
@@ -89,11 +87,9 @@ function main(in mode) {
 		// NB also called from postwrite
 
 		// system configuration
-		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
-		if (systemcodes.locateusing(",", ID, xx)) {
+		if (systemcodes.locateusing(",", ID)) {
 
-			op = "SYSTEM CONFIGURATION";
-			gosub security2(mode, op);
+			gosub security2(mode, "SYSTEM CONFIGURATION");
 			if (not(req.valid)) {
 				return 0;
 			}
@@ -104,6 +100,8 @@ function main(in mode) {
 			smtpkey.replacer("SYSTEM", "SMTP");
 
 			// backup rec on definitions
+			var backuprec;
+			var smtprec;
 			if (ID == "SYSTEM") {
 				if (not(backuprec.read(DEFINITIONS, backupkey))) {
 					backuprec = "";
@@ -212,6 +210,7 @@ nochequeformat:
 			for (const var ii : range(1, nn)) {
 				let val = PSEUDO.f(ii);
 				if (val) {
+					var vn;
 					if (not(RECORD.f(1).locateby("AL", val, vn))) {
 						RECORD.inserter(1, vn, val);
 						RECORD.inserter(2, vn, "");
@@ -229,14 +228,13 @@ nochequeformat:
 			if (not(authorised("BILLING REPORT ACCESS", msg, ""))) {
 unlockdefinitions:
 				req.reset = 5;
-				xx		  = unlockrecord("DEFINITIONS", req.srcfile, ID);
+				unlockrecord("DEFINITIONS", req.srcfile, ID);
 				return invalid(msg);
 			}
 
 			// always allowed to update or delete own records
 			if (RECORD.f(8) != USERNAME) {
-				op = "BILLING REPORT";
-				gosub security2(mode, op);
+				gosub security2(mode, "BILLING REPORT");
 				if (not(req.valid)) {
 					return 0;
 				}
@@ -246,7 +244,7 @@ unlockdefinitions:
 			if ((req.wlocked and RECORD.f(8).contains("EXODUS")) and not(USERNAME.contains("EXODUS"))) {
 preventupdate:
 				req.wlocked = 0;
-				xx			= unlockrecord("DEFINITIONS", req.srcfile, ID);
+				unlockrecord("DEFINITIONS", req.srcfile, ID);
 			}
 
 			return 0;
@@ -255,7 +253,8 @@ preventupdate:
 		if (ID == "AGENCY.PARAMS") {
 
 			// configuration is locked to EXODUS initially
-			if (not(authorised("AGENCY CONFIGURATION UPDATE", xx, "EXODUS"))) {
+			var dummy;
+			if (not(authorised("AGENCY CONFIGURATION UPDATE", dummy, "EXODUS"))) {
 				goto preventupdate;
 			}
 		}
@@ -337,6 +336,7 @@ preventupdate:
 
 			// prevent changing "invno by company" after data is entered
 			if (RECORD.f(48) != req.orec.f(48)) {
+				var anydataexists;
 				call anydata("", anydataexists);
 				if (anydataexists) {
 					RECORD(48) = req.orec.f(48);
@@ -350,7 +350,7 @@ preventupdate:
 			for (const var fn : range(100, 102)) {
 				let usercode = RECORD.f(fn);
 				if (usercode) {
-					if (not(SECURITY.f(1).locate(usercode, xx))) {
+					if (not(SECURITY.f(1).locate(usercode))) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
@@ -411,25 +411,21 @@ preventupdate:
 	} else if (mode == "POSTWRITE") {
 
 		// system configuration
-		if (systemcodes.locateusing(",", ID, xx)) {
+		if (systemcodes.locateusing(",", ID)) {
 
 			// op='SYSTEM CONFIGURATION'
 			// gosub security2
 			// if valid else return
 
-			var backupkey = ID;
-			backupkey.replacer("SYSTEM", "BACKUP");
-			backuprec = RECORD.field(_FM, 71, 29);
+			let backupkey = ID.replace("SYSTEM", "BACKUP");
+			var backuprec = RECORD.field(_FM, 71, 29);
 
-			var smtpkey = ID;
-			smtpkey.replacer("SYSTEM", "SMTP");
-			smtprec = RECORD.field(_FM, 101, 9);
+			var smtpkey = ID.replace("SYSTEM", "SMTP");
+			let smtprec = RECORD.field(_FM, 101, 9);
 
 			// ensure default style is null
-			tt = RECORD.f(46);
-			tt.converter(_VM, "");
-			tt.replacer("Default", "");
-			if (tt == "") {
+			let defstyle = RECORD.f(46).convert(_VM, "").replace("Default", "");
+			if (defstyle == "") {
 				RECORD(46) = "";
 			}
 
@@ -437,10 +433,11 @@ preventupdate:
 			if (ID == "SYSTEM") {
 
 				// get lastbackupdate in unlikely event that it has changed during update
-				if (not(tt.readf(DEFINITIONS, backupkey, 1))) {
-					tt = "";
+				var lastbackupdate;
+				if (not lastbackupdate.readf(DEFINITIONS, backupkey, 1)) {
+					lastbackupdate = "";
 				}
-				backuprec(1) = tt;
+				backuprec(1) = lastbackupdate;
 
 				backuprec.write(DEFINITIONS, backupkey);
 				smtpkey = "SMTP.CFG";
@@ -545,7 +542,7 @@ preventupdate:
 		// Processes restart if system.cfg date/time changes
 		// TODO make it only per database
 		if (USERNAME != "EXODUS") {
-			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",", ID, xx)) {
+			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",", ID)) {
 //				// TODO prevent a write from system configuration file
 //				//call osread(tt, "system.cfg");
 //				if (not osread(tt, "system.cfg"))
@@ -561,11 +558,9 @@ preventupdate:
 	} else if (mode == "PREDELETE") {
 
 		// system configuration
-		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
-		if (systemcodes.locateusing(",", ID, xx)) {
+		if (systemcodes.locateusing(",", ID)) {
 
-			op = "SYSTEM CONFIGURATION";
-			gosub security2(mode, op);
+			gosub security2(mode, "SYSTEM CONFIGURATION");
 			if (not(req.valid)) {
 				return 0;
 			}
@@ -594,8 +589,7 @@ preventupdate:
 
 			// always allowed to delete own records
 			if (RECORD.f(8) != USERNAME) {
-				op = "BILLING REPORT";
-				gosub security2(mode, op);
+				gosub security2(mode, "BILLING REPORT");
 				if (not(req.valid)) {
 					return 0;
 				}
@@ -618,7 +612,8 @@ preventupdate:
 				var key = ID;
 				key.replacer("*", "%2A");
 				key = "DEFINITIONS*" ^ key;
-				if (xx.read(reports, key)) {
+				var dummy;
+				if (dummy.read(reports, key)) {
 					var("%DELETED%").write(reports, key);
 				}
 				// delete reports,key
@@ -646,7 +641,8 @@ subroutine reorderdbs() {
 
 	// read the existing dbdir or silently quit
 	let dbdirfilename = APPLICATION.lcase() ^ ".vol";
-	if (not(dbdir.osread(dbdirfilename))) {
+	var dbdir;
+	if (not dbdir.osread(dbdirfilename)) {
 		return;
 	}
 	let olddbdir = dbdir;
@@ -668,7 +664,8 @@ subroutine reorderdbs() {
 	for (const var dbn : range(1, ndbs)) {
 		let db	   = dblist.f(1, dbn);
 		let dbcode = db.f(1, 1, 2);
-		if (not(newdbcodes.locate(dbcode, newdbcoden))) {
+		var newdbcoden;
+		if (not newdbcodes.locate(dbcode, newdbcoden)) {
 			newdbcodes(1, newdbcoden) = dbcode;
 		}
 		newdblist(1, newdbcoden) = db;

@@ -198,7 +198,7 @@ var handle;
 //var keyorfilename;
 //var fmc; // num
 var msg0;
-var positive;
+//var positive;
 var posmsg;
 var dictfile;
 var compcode;
@@ -3091,11 +3091,7 @@ subroutine filesecurity() {
 	if (keyx.contains("*")) {
 		return;
 	}
-	if (authorised(filetitle2 ^ " " ^ secmode, msg0, "")) {
-		positive = "";
-	} else {
-		positive = "#";
-	}
+	let positive = authorised(filetitle2 ^ " " ^ secmode, msg0, "") ? "" : "#";
 	if (not(authorised(positive ^ filetitle2 ^ " " ^ secmode ^ " " ^ (keyx.quote()), posmsg))) {
 		// !*use the FILENAME ACCESS/DELETE "ID" message because gives clue
 		// !*that they may be allowed to access other records

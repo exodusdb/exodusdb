@@ -3,7 +3,6 @@ libraryinit()
 
 #include <authorised.h>
 #include <shell2.h>
-#include <singular.h>
 #include <sysmsg.h>
 
 #include <service_common.h>
@@ -33,14 +32,14 @@ var line;
 var dictfile;
 //var xx;
 var cell;
-var temp;
+//var temp;
 var nquotes;  // num
 var recordx;
 var allowduplicate;
-var op;
-var op2;
-var wspos;
-var wsmsg;
+//var op;
+//var op2;
+//var wspos;
+//var wsmsg;
 
 function main(in mode) {
 	// doesnt seem to be any limit on number of files per folder
@@ -455,7 +454,7 @@ postuploadfail:
 		while (true) {
 
 nextline:
-			// ///////
+// ///////
 			gosub getline();
 
 			if (eof)
@@ -659,6 +658,7 @@ nextline:
 }
 
 subroutine cleanup() {
+
 	osfile.osclose();
 	//temposfilename83.osremove();
 	if (osfile(temposfilename83) and not temposfilename83.osremove()) {
@@ -673,16 +673,17 @@ subroutine getline() {
 	if (buff.len() < lengthx) {
 
 addbuff:
-		// //////
+// //////
 		//call osbread(temp, osfile, fileptr, lengthx);
-		if (not osbread(temp, osfile, fileptr, lengthx)) {
+		var chunk;
+		if (not osbread(chunk, osfile, fileptr, lengthx)) {
 			abort(lasterror());
 		}
-		temp.converter("\n\f", "\r\r");
-		buff ^= temp;
+		chunk.converter("\n\f", "\r\r");
+		buff ^= chunk;
 
 		// get more if no line ending
-		if (temp.len() and not(buff.contains("\r"))) {
+		if (chunk.len() and not(buff.contains("\r"))) {
 			goto addbuff;
 		}
 

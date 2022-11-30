@@ -1,7 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <singular.h>
 
 #include <req_common.h>
 

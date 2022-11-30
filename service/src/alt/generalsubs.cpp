@@ -5,7 +5,6 @@ libraryinit()
 #include <generalsubs.h>
 #include <getsubs.h>
 #include <nextkey.h>
-#include <singular.h>
 
 #include <req_common.h>
 
@@ -13,24 +12,24 @@ libraryinit()
 
 var mode;
 var datasetparams;
-var msg;
+//var msg;
 var datasetcodes;
 //var xx;
 var usercode;
 //var usern0;	 // num
 //var usern;	 // num
 var depts;
-var reply;
+//var reply;
 //var tt;
 //var no;		 // num
 //var nusers;	 // num
-var deptn;
-var directory;
-var lastbackup;
-var op;
-var op2;
-var wspos;
-var wsmsg;
+//var deptn;
+//var directory;
+//var lastbackup;
+//var op;
+//var op2;
+//var wspos;
+//var wsmsg;
 
 function main(in mode0) {
 
@@ -57,7 +56,7 @@ function main(in mode0) {
 		gosub getdatasets();
 
 		if (not datasetcodes.f(1).locate(req.is)) {
-			msg = req.is.quote() ^ " is not a dataset";
+			let msg = req.is.quote() ^ " is not a dataset";
 			return invalid(msg);
 		}
 
@@ -71,7 +70,7 @@ function main(in mode0) {
 	} else if (mode.field(",", 1) == "GETUSERDEPT") {
 		gosub getuserdept2();
 		if (ANS == "") {
-			msg = usercode.quote() ^ " - USER DOES NOT EXIST";
+			let msg = usercode.quote() ^ " - USER DOES NOT EXIST";
 			return invalid(msg);
 		}
 		return 0;
@@ -169,6 +168,7 @@ subroutine getdatasets() {
 	dospath.converter("/", OSSLASH);
 
 	let dosfilename = APPLICATION ^ ".vol";
+	var directory;
 	if (not directory.osread(dosfilename)) {
 		if (not directory.osread(APPLICATION ^ ".vox")) {
 			call mssg(APPLICATION ^ ".vol is missing");
@@ -216,6 +216,7 @@ subroutine getdatasets() {
 		datasetnames(1, datasetn) = datasetname;
 		var osfilename			  = "../data/" ^ temp.f(1, 1, 2).lcase() ^ "/params2";
 		osfilename.converter("/", OSSLASH);
+		var lastbackup;
 		if (not lastbackup.osread(osfilename)) {
 			lastbackup = "";
 		}

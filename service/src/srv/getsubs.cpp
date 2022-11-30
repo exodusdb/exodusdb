@@ -2,7 +2,6 @@
 libraryinit()
 
 #include <authorised.h>
-#include <singular.h>
 
 #include <service_common.h>
 
@@ -11,15 +10,15 @@ libraryinit()
 
 #include <request.hpp>
 
-	var xx;
-var tt;
-var task;
-var taskprefix;
+//var xx;
+//var tt;
+//var task;
+//var taskprefix;
 var msg;
-var op;
-var op2;
-var wspos;
-var wsmsg;
+//var op;
+//var op2;
+//var wspos;
+//var wsmsg;
 
 function main(in mode) {
 
@@ -44,7 +43,8 @@ function main(in mode) {
 
 		// lock source of document numbers
 		printl("*lock source of document numbers");
-		if (not(lockrecord("DOCUMENTS", srv.documents, "0", xx, 10))) {
+		var dummy;
+		if (not(lockrecord("DOCUMENTS", srv.documents, "0", dummy, 10))) {
 			req.valid = 0;
 			return 0;
 		}
@@ -62,11 +62,7 @@ nextdoc:
 		// call oswrite(nextno,where:'0')
 
 		// build new file name
-		if (USERNAME == "EXODUS") {
-			tt = "NEO";
-		} else {
-			tt = "DOC";
-		}
+		let tt = (USERNAME == "EXODUS") ? "NEO" : "DOC";
 		ID = tt ^ ("00000" ^ nextno).oconv("R#5");
 
 		// skip to next file if already exists
@@ -76,14 +72,15 @@ nextdoc:
 		// end
 
 		// skip if document already exists
-		if (tt.read(srv.documents, ID)) {
+		var doc;
+		if (doc.read(srv.documents, ID)) {
 			goto nextdoc;
 		}
-		if (tt.read(srv.documents, where ^ ID)) {
+		if (doc.read(srv.documents, where ^ ID)) {
 			goto nextdoc;
 		}
 
-		xx = unlockrecord("DOCUMENTS", srv.documents, "0");
+		unlockrecord("DOCUMENTS", srv.documents, "0");
 
 	} else if (mode == "POSTREAD") {
 
@@ -91,8 +88,8 @@ nextdoc:
 			return 0;
 		}
 
-		task = req.orec.f(5);
-		gosub gettaskprefix();
+		let task = req.orec.f(5);
+		let taskprefix = gosub gettaskprefix(task);
 
 		// dont know task at this point
 		// if taskprefix then
@@ -109,7 +106,7 @@ nextdoc:
 			if (taskprefix) {
 				if (not(authorised(taskprefix ^ " UPDATE", msg, ""))) {
 					call mssg(msg);
-					xx			= unlockrecord(req.datafile, req.srcfile, ID);
+					unlockrecord(req.datafile, req.srcfile, ID);
 					req.wlocked = 0;
 				}
 			}
@@ -117,7 +114,7 @@ nextdoc:
 			// always prevent users from editing documents designed by EXODUS
 			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
 				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
-				xx			= unlockrecord(req.datafile, req.srcfile, ID);
+				unlockrecord(req.datafile, req.srcfile, ID);
 				req.wlocked = 0;
 			}
 		}
@@ -132,8 +129,8 @@ nextdoc:
 
 		// check if allowed to create
 		if (req.orec == "") {
-			task = RECORD.f(5);
-			gosub gettaskprefix();
+			let task = RECORD.f(5);
+			let taskprefix = gosub gettaskprefix(task);
 			if (taskprefix) {
 				if (not(authorised(taskprefix ^ " CREATE", msg, ""))) {
 					return invalid(msg);
@@ -172,8 +169,8 @@ nextdoc:
 
 	} else if (mode == "PREDELETE") {
 
-		task = req.orec.f(5);
-		gosub gettaskprefix();
+		let task = req.orec.f(5);
+		let taskprefix = gosub gettaskprefix(task);
 
 		// user can always delete their own reports
 		if (RECORD.f(1) and RECORD.f(1) != USERNAME) {
@@ -201,7 +198,8 @@ nextdoc:
 				var key = ID;
 				key.replacer("*", "%2A");
 				key = "DOCUMENTS*" ^ key;
-				if (xx.read(reports, key)) {
+				var dummy;
+				if (dummy.read(reports, key)) {
 					var("%DELETED%").write(reports, key);
 				}
 				// delete reports,key
@@ -219,19 +217,19 @@ nextdoc:
 	// in get.subs and generalproxy
 }
 
-subroutine gettaskprefix() {
-	taskprefix = "";
-	task	   = task.field(" ", 1);
-	if (task == "ANAL") {
+function gettaskprefix(in task) {
+	var taskprefix = "";
+	var task1	   = task.field(" ", 1);
+	if (task1 == "ANAL") {
 		taskprefix = "BILLING REPORT";
-	} else if (task == "BALANCES") {
+	} else if (task1 == "BALANCES") {
 		taskprefix = "FINANCIAL REPORT";
-	} else if (task == "ANALSCH") {
+	} else if (task1 == "ANALSCH") {
 		taskprefix = "BILLING REPORT";
 	} else {
 		taskprefix = "";
 	}
-	return;
+	return taskprefix;
 }
 
 libraryexit()

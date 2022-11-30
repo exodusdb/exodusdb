@@ -3,8 +3,6 @@ libraryinit()
 
 #include <authorised.h>
 #include <locking.h>
-#include <singular.h>
-
 #include <service_common.h>
 
 #include <srv_common.h>
@@ -12,16 +10,16 @@ libraryinit()
 
 #include <request.hpp>
 
-	var msg;
-var deleting;	 // num
-var validating;	 // num
-var mastercode;
-var vn;
-var op;
-var op2;
-var wspos;
-var wsmsg;
-var xx;
+//var msg;
+//var deleting;	 // num
+//var validating;	 // num
+//var mastercode;
+//var vn;
+//var op;
+//var op2;
+//var wspos;
+//var wsmsg;
+//var xx;
 
 function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist) {
 
@@ -33,7 +31,7 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 
 	if (masterfile.unassigned()) {
 		if (not(masterfile.open(masterfilename, ""))) {
-			msg = masterfilename.quote() ^ " file does not exist";
+			let msg = masterfilename.quote() ^ " file does not exist";
 			return invalid(msg);
 		}
 	}
@@ -57,9 +55,9 @@ nextbuild:
 			if (RECORD.f(subfn) == "") {
 				goto nextbuild;
 			}
-			deleting   = 0;
-			validating = 0;
-			gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+			let deleting   = 0;
+			let validating = 0;
+			gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 			goto nextbuild;
 		}
 
@@ -67,34 +65,34 @@ nextbuild:
 		if (req.orec.f(subfn) == RECORD.f(subfn)) {
 			return 0;
 		}
-		validating = 1;
+		let validating = 1;
 
-		deleting = 1;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		var deleting = 1;
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 		if (not(req.valid)) {
 			return 0;
 		}
 
 		deleting = 0;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 
 	} else if (mode == "PREDELETE") {
-		validating = 1;
-		deleting   = 1;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		let validating = 1;
+		let deleting   = 1;
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 
 	} else if (mode == "WRITE") {
 
-		validating = 1;
+		var validating = 1;
 
-		deleting = 1;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		var deleting = 1;
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 		if (not(req.valid)) {
 			return 0;
 		}
 
 		deleting = 0;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 		if (not(req.valid)) {
 			return 0;
 		}
@@ -102,13 +100,13 @@ nextbuild:
 		validating = 0;
 
 		deleting = 1;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 		if (not(req.valid)) {
 			return 0;
 		}
 
 		deleting = 0;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 		if (not(req.valid)) {
 			return 0;
 		}
@@ -116,13 +114,13 @@ nextbuild:
 		gosub unlockall(locklist);
 
 	} else if (mode == "DELETE") {
-		deleting = 1;
+		let deleting = 1;
 
-		validating = 1;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		var validating = 1;
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 
 		validating = 0;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 
 		gosub unlockall(locklist);
 
@@ -130,40 +128,37 @@ nextbuild:
 		if (req.orec.f(subfn) == RECORD.f(subfn)) {
 			return 0;
 		}
-		validating = 0;
+		let validating = 0;
 
-		deleting = 1;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		var deleting = 1;
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 
 		deleting = 0;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 
 	} else if (mode == "POSTDELETE") {
-		deleting   = 1;
-		validating = 0;
-		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
+		let deleting   = 1;
+		let validating = 0;
+		gosub validateupdate(deleting, validating, subfn, masterfilename, masterfile, masterfn, locklist);
 
 	} else {
-		msg = mode.quote() ^ " invalid mode in xref.subs";
+		let msg = mode.quote() ^ " invalid mode in xref.subs";
 		return invalid(msg);
 	}
 
 	return 0;
 }
 
-subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterfn, io locklist) {
+subroutine validateupdate(in deleting, in validating, in subfn, in masterfilename, in masterfile, in masterfn, io locklist) {
 
-	if (deleting) {
-		mastercode = req.orec.f(subfn);
-	} else {
-		mastercode = RECORD.f(subfn);
-	}
+	let mastercode = deleting ? req.orec.f(subfn) : RECORD.f(subfn);
 	if (mastercode == "") {
 		return;
 	}
 
 	if (validating) {
 
+		var msg;
 		if (not(locking("LOCK", masterfilename, mastercode, "", locklist, 1, msg))) {
 			gosub unlockall(locklist);
 			msg = mastercode.quote() ^ " master record is in use elsewhere|Try again later";
@@ -176,6 +171,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 		var masterrecord;
 		if (masterrecord.read(masterfile, mastercode)) {
 			let origmasterrecord = masterrecord;
+			var vn;
 			if (masterrecord.f(masterfn).locateby("AL", ID, vn)) {
 				if (deleting) {
 					masterrecord.remover(masterfn, vn);
@@ -196,8 +192,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 }
 
 subroutine unlockall(io locklist) {
-
-	call locking("UNLOCKALL", "", "", "", locklist, 0, msg);
+	call locking("UNLOCKALL", "", "", "", locklist, 0);
 	return;
 }
 

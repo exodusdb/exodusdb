@@ -3,7 +3,6 @@ libraryinit()
 
 #include <authorised.h>
 #include <securitysubs.h>
-#include <singular.h>
 #include <sysmsg.h>
 #include <usersubs.h>
 
@@ -15,7 +14,7 @@ libraryinit()
 #include <request.hpp>
 
 var msg;
-var xx;
+//var xx;
 //var usern;	  // num
 var newuser;  // num
 var text;
@@ -23,10 +22,10 @@ var usercode;
 var depts;
 var reply;
 var deptn;
-var op;
-var op2;
-var wspos;
-var wsmsg;
+//var op;
+//var op2;
+//var wspos;
+//var wsmsg;
 
 function main(in mode) {
 
@@ -65,7 +64,7 @@ function main(in mode) {
 
 			// maybe can only update self
 			// if security('AUTHORISATION UPDATE',xx) else
-			if (not(authorised("USER UPDATE", xx))) {
+			if (not(authorised("USER UPDATE"))) {
 				req.srcfile.unlock(ID);
 				req.wlocked = 0;
 			}
@@ -133,7 +132,7 @@ function main(in mode) {
 					var word = sysemails.field(" ", ii);
 					word	 = field2(word, "@", -1);
 					// remove smtp. mailout. etc from smtp host domain
-					if (var("smtp,mail,mailout").locateusing(",", word.field(".", 1), xx)) {
+					if (var("smtp,mail,mailout").locateusing(",", word.field(".", 1))) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);
@@ -155,8 +154,8 @@ function main(in mode) {
 				let email = emails.field(";", ii);
 				if (email) {
 					let emaildomain = email.field("@", 2);
-					if (not(emaildomains.locateusing(" ", emaildomain, xx))) {
-						if (not(emaildomains.locateusing(" ", email, xx))) {
+					if (not(emaildomains.locateusing(" ", emaildomain))) {
+						if (not(emaildomains.locateusing(" ", email))) {
 							msg = "Neither " ^ (emaildomain.quote()) ^ " nor " ^ (email.quote()) ^ "|is in the list of allowed email domains/addresses";
 							return invalid(msg);
 						}
@@ -183,7 +182,8 @@ function main(in mode) {
 			resetpassword = 0;
 		}
 
-		if (not(lockrecord("DEFINITIONS", DEFINITIONS, "SECURITY", xx, 0))) {
+		var dummy;
+		if (not(lockrecord("DEFINITIONS", DEFINITIONS, "SECURITY", dummy, 0))) {
 			if (resetpassword) {
 				resetpassword = 2;
 			} else {
@@ -211,7 +211,7 @@ function main(in mode) {
 		// also name, email and department
 		if (mode == "PREWRITE") {
 			if (req.orec) {
-				if (not(authorised("AUTHORISATION UPDATE", xx))) {
+				if (not(authorised("AUTHORISATION UPDATE"))) {
 					// expiry date
 					if (req.orec.f(35)) {
 						RECORD(35) = req.orec.f(35);

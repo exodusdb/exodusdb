@@ -7,7 +7,6 @@ libraryinit()
 #include <openfile.h>
 #include <quote2.h>
 #include <safeselect.h>
-#include <singular.h>
 
 #include <service_common.h>
 
@@ -16,29 +15,31 @@ libraryinit()
 
 #include <request.hpp>
 
-	var keywords;
-var mode;
-var nkeywords;
-var changelog;
-var currentversiondatetime;
-var tt;
-var versionn;  // num
-var cmd;
-var versionlog;
-var idate;
-var xx;
-var op;
-var op2;
-var msg;
-var wspos;
-var wsmsg;
+//var keywords;
+//var mode;
+//var nkeywords;
+//var changelog;
+//var currentversiondatetime;
+//var tt;
+//var versionn;  // num
+//var cmd;
+//var versionlog;
+//var idate;
+//var xx;
+//var op;
+//var op2;
+//var msg;
+//var wspos;
+//var wsmsg;
 
 function main(in mode0) {
 
-	keywords  = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";
-	mode	  = mode0;
-	nkeywords = keywords.fcount(VM);
+	var mode = mode0;
 
+	let keywords  = "MEDIA" _VM "JOBS" _VM "FINANCE" _VM "TIMESHEETS" _VM "TECHNICAL" _VM "USER INTERFACE";
+	let nkeywords = keywords.fcount(VM);
+
+	var changelog;
 	if (not(openfile("CHANGELOG", changelog))) {
 		call mssg(lasterror());
 		return 0;
@@ -58,14 +59,14 @@ function main(in mode0) {
 		}
 
 		// call changelog.subs('SELECT':fm:data)
-		gosub select0();
+		gosub select0(mode);
 		if (not LISTACTIVE) {
 			call mssg("Error: No records found");
 			return 0;
 		}
 
 		// call changelog.subs('LIST':fm:data)
-		gosub list();
+		gosub list(mode);
 
 		// called from LOGIN.NET. not UI. UI calls SELECTANDLIST
 	} else if (mode.f(1) == "WHATSNEW") {
@@ -114,7 +115,7 @@ function main(in mode0) {
 			return 0;
 		}
 
-		gosub getcurrentversiondatetime();
+		var currentversiondatetime = gosub getcurrentversiondatetime();
 
 		// nothing to see if seen matches (or after?) currentversiondate
 		if (mode.f(3) >= currentversiondatetime) {
@@ -164,7 +165,7 @@ function main(in mode0) {
 		// end
 
 		// find and new items else quit
-		gosub select();
+		gosub select(mode);
 		if (not LISTACTIVE) {
 			ANS = "";
 			return 0;
@@ -176,7 +177,7 @@ function main(in mode0) {
 		SYSTEM(2) = temp;
 
 		// get new items in new filename and return the filename in @ans
-		gosub list();
+		gosub list(mode);
 		ANS = SYSTEM.f(2);
 
 		// actually this is GETINSTALLEDVERSION DATES!
@@ -186,17 +187,17 @@ function main(in mode0) {
 
 	} else if (mode.f(1) == "SELECT") {
 
-		gosub select0();
+		gosub select0(mode);
 
 	} else if (mode.f(1) == "LIST") {
 
-		gosub list();
+		gosub list(mode);
 	}
 
 	return 0;
 }
 
-subroutine select0() {
+subroutine select0(io mode) {
 
 	// get the one date prior (so list is "as at")
 
@@ -209,8 +210,8 @@ subroutine select0() {
 		// get the first installed version date equal to or prior to the selected
 		// locate mode<3> in data by 'AR' using fm setting versionn else
 		// locatebyusing() not available in c++
-		tt = data_;
-		tt.converter(FM, VM);
+		let tt = data_.convert(FM, VM);
+		var versionn;
 		if (not(tt.locateby("AR", mode.f(3), versionn))) {
 			if (versionn > 1) {
 				mode(3) = data_.f(versionn - 1);
@@ -218,17 +219,17 @@ subroutine select0() {
 		}
 	}
 
-	gosub select();
+	gosub select(mode);
 	return;
 }
 
-subroutine select() {
+subroutine select(in mode) {
 	data_ = mode.field(FM, 2, 9999);
 
 	// force all
 	// data<2>=0
 
-	cmd		 = "SELECT CHANGELOG";
+	var cmd	 = "SELECT CHANGELOG";
 	var andx = "";
 	if (data_.f(1)) {
 		cmd ^= " WITH KEYWORD " ^ quote2(data_.f(1));
@@ -250,7 +251,7 @@ subroutine select() {
 	return;
 }
 
-subroutine list() {
+subroutine list(in mode) {
 	// input
 	// data<1>=mv list of topics
 	// data<2>=date from which interested
@@ -258,7 +259,7 @@ subroutine list() {
 
 	data_ = mode.field(FM, 2, 9999);
 
-	cmd = "LIST CHANGELOG ID-SUPP";
+	var cmd = "LIST CHANGELOG ID-SUPP";
 	// cmd:=' KEYWORD TEXT'
 	cmd ^= " DATE";
 	cmd ^= " KEYWORDS TEXT2";
@@ -268,11 +269,12 @@ subroutine list() {
 	cmd ^= " BY NUMBER";
 
 	var	  headingx = "What''s New in EXODUS";
-	gosub getcurrentversiondatetime();
+	var currentversiondatetime = gosub getcurrentversiondatetime();
 	if (data_.f(2)) {
 		// heading:=' version ':data<2> '[DATE,4*]':' -'
-		call daterangetext(data_.f(2), currentversiondatetime, tt, srv.glang);
-		headingx ^= " : " ^ tt;
+		var rangetext;
+		call daterangetext(data_.f(2), currentversiondatetime, rangetext, srv.glang);
+		headingx ^= " : " ^ rangetext;
 	} else {
 		headingx ^= " Version : " ^ oconv(currentversiondatetime, "[DATE,4*]");
 	}
@@ -289,7 +291,7 @@ subroutine list() {
 	return;
 }
 
-subroutine getcurrentversiondatetime() {
+function getcurrentversiondatetime() {
 	// get currently installed version date
 	// temp=xlate('DOS','.\general\version.dat',1,'x')
 	var temp = "./general/version.dat";
@@ -303,14 +305,15 @@ subroutine getcurrentversiondatetime() {
 			temp = temp.f(3).oconv("MTS") ^ " " ^ temp.f(2).oconv("D");
 		}
 	}
-	currentversiondatetime = temp.trim().field(" ", 2, 999).iconv("D");
+	var currentversiondatetime = temp.trim().field(" ", 2, 999).iconv("D");
 	currentversiondatetime ^= "." ^ temp.trim().field(" ", 1).iconv("MT").oconv("R(0)#5");
-	return;
+	return currentversiondatetime;
 }
 
 subroutine getversiondates() {
 	// extract installed version dates from upgrade.cfg
 	//call osread(versionlog, "upgrade.cfg");
+	var versionlog;
 	if (not osread(versionlog, "upgrade.cfg"))
 		loglasterror();
 
@@ -319,11 +322,11 @@ subroutine getversiondates() {
 	let nn			= versionlog.fcount(FM);
 	var versiondata = "";
 	for (const var ii : range(1, nn)) {
-		idate = versionlog.f(ii, 1).field(" ", 2, 3).iconv("D");
+		let idate = versionlog.f(ii, 1).field(" ", 2, 3).iconv("D");
 		if (not idate)
 			continue;
 		// itime=iconv(field(versionlog,' ',1),'MT')
-		if (not(versiondata.locateusing(FM, idate, xx))) {
+		if (not(versiondata.locateusing(FM, idate))) {
 			versiondata(-1) = idate;
 		}
 	}  // ii;
