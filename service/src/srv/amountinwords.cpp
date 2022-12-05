@@ -28,7 +28,7 @@ function main(in amountfmlanguage, in currcode0) {
 
 	comma = "";
 
-	if (SENTENCE.field(" ", 1) == "AMOUNT.IN.WORDS") {
+	if (SENTENCE.field(" ", 1) == "amountinwords") {
 		sentencex = SENTENCE;
 		SENTENCE  = "";
 		printl();

@@ -26,6 +26,8 @@ commoninit(srv, srv_common_no)
 	var glang;
 //	var _definitions;
 	var accounting;
+	var currency_codes;
+	var currency_convs;
 
 commonexit(srv, srv_common_no)
 
