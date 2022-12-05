@@ -25,7 +25,7 @@ commoninit(srv, srv_common_no)
 //	var _security;
 	var glang;
 //	var _definitions;
-	var accounting = "";
+//	var accounting = "";
 	var currency_codes = "";
 	var currency_convs = "";
 
