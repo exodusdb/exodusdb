@@ -11,7 +11,7 @@ commoninit(srv, srv_common_no)
 
 	var address;
 	var addresses;
-	var gcurrcompcode;
+	var gcurrcompcode = "";
 	var alanguage;
 	var company;
 	var companies;
@@ -25,9 +25,9 @@ commoninit(srv, srv_common_no)
 //	var _security;
 	var glang;
 //	var _definitions;
-	var accounting;
-	var currency_codes;
-	var currency_convs;
+	var accounting = "";
+	var currency_codes = "";
+	var currency_convs = "";
 
 commonexit(srv, srv_common_no)
 

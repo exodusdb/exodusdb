@@ -139,14 +139,7 @@ function main() {
 	// equ deleteoldsecs to system<28>
 	// equ suspendwaiting to system<29>
 	// equ maindataset to system<30>
-
 	// equ accounting to system<31> OBSOLETE
-	// accounting<1>=1 for accounting system present
-	// accounting<2>=1 for only stock ledgers
-	// accounting<3> for allocationorder
-	// accounting<4> for mv buffer of currency codes
-	// accounting<5> for mv buffer of fmts for <4>
-
 	// equ getlevel to system<32>;* while performing a print program was system<4>
 	let interactive = false;  //not(SYSTEM.f(33));
 	// equ generalresultcode to system<34>

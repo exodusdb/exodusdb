@@ -11,12 +11,6 @@ function main(in code, out fmtx) {
 		return 0;
 	}
 
-	if (srv.currency_codes.unassigned()) {
-		// clear the currency code buffer
-		srv.currency_codes = "";
-		srv.currency_convs = "";
-	}
-
 	// Locate cached currfmt by currency code
 	// or get the next free cache fmtn
 	var fmtn;  // num
