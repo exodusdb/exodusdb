@@ -20,7 +20,8 @@ function main(io listitems) {
 
 	// merge ranges if consecutive
 	// working backwards deleting merged ranges
-	for (var ii = nn; ii >= 2; --ii) {
+	//for (var ii = nn; ii >= 2; --ii) {
+	for (let ii : reverse_range(2, nn)) {
 		var listitem1 = listitems.f(1, ii - 1, 2);
 		var listitem2 = listitems.f(1, ii, 1);
 		// if (listitem1+0.01)=listitem2 then

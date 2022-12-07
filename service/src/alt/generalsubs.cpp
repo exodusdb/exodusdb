@@ -10,15 +10,15 @@ libraryinit()
 
 #include <request.hpp>
 
-var mode;
-var datasetparams;
+//var mode;
+//var datasetparams;
 //var msg;
-var datasetcodes;
+//var datasetcodes;
 //var xx;
-var usercode;
+//var usercode;
 //var usern0;	 // num
 //var usern;	 // num
-var depts;
+//var depts;
 //var reply;
 //var tt;
 //var no;		 // num
@@ -36,7 +36,7 @@ function main(in mode0) {
 	// nb general.subs can only be called from programs with req_common.h
 	// because msg etc are common variables and must be defined in caller
 
-	mode = mode0;
+	var mode = mode0;
 
 	// use app specific version of generalsubs
 	if (APPLICATION != "EXODUS") {
@@ -44,8 +44,7 @@ function main(in mode0) {
 	}
 
 	if (mode == "GETDATASETS") {
-		gosub getdatasets();
-		ANS = datasetparams;
+		ANS = gosub getdatasets();
 
 	} else if (mode == "VAL.DATASET") {
 
@@ -53,7 +52,7 @@ function main(in mode0) {
 			return 0;
 		}
 
-		gosub getdatasets();
+		let datasetcodes = gosub getdatasets();
 
 		if (not datasetcodes.f(1).locate(req.is)) {
 			let msg = req.is.quote() ^ " is not a dataset";
@@ -62,13 +61,15 @@ function main(in mode0) {
 
 	} else if (mode.field(",", 1) == "GETUSERDEPTX") {
 		// does not popup any errormessage
-		gosub getuserdept2();
+		let usercode = mode.field(",", 2);
+		gosub getuserdept2(usercode);
 		if (ANS == "") {
 			ANS = "Deleted";
 		}
 
 	} else if (mode.field(",", 1) == "GETUSERDEPT") {
-		gosub getuserdept2();
+		let usercode = mode.field(",", 2);
+		gosub getuserdept2(usercode);
 		if (ANS == "") {
 			let msg = usercode.quote() ^ " - USER DOES NOT EXIST";
 			return invalid(msg);
@@ -91,7 +92,7 @@ function main(in mode0) {
 		// Add lower users in group
 		//for (usern = usern0 + 1; usern <= 9999; ++usern) {
 		for (let usern : range(usern0 + 1, 999999)) {
-			usercode = SECURITY.f(1, usern);
+			let usercode = SECURITY.f(1, usern);
 			// /BREAK;
 			if (usercode == "" or usercode == "---")
 				break;
@@ -99,8 +100,9 @@ function main(in mode0) {
 		}  // usern;
 
 		// Add higher users in group
-		for (var usern = usern0 - 1; usern >= 1; --usern) {
-			usercode = SECURITY.f(1, usern);
+		//for (var usern = usern0 - 1; usern >= 1; --usern) {
+		for (let usern : reverse_range(1, usern0 - 1)) {
+			let usercode = SECURITY.f(1, usern);
 			// /BREAK;
 			if (usercode == "---")
 				break;
@@ -161,7 +163,7 @@ next:
 	return 0;
 }
 
-subroutine getdatasets() {
+function getdatasets() {
 
 	var dospath = oscwd().first(2) ^ "../data/";
 	dospath.converter("/", OSSLASH);
@@ -186,7 +188,7 @@ subroutine getdatasets() {
 	directory.converter(" " _FM, _FM " ");
 	let nvols = directory.fcount(FM);
 
-	datasetparams = directory.f(1);
+	var datasetparams = directory.f(1);
 	if (not datasetparams.contains(",")) {
 		// CALL MSG('LINE 1 OF THE DOS FILE ':DOS.FILENAME:' IS INVALID')
 		// STOP
@@ -197,8 +199,8 @@ subroutine getdatasets() {
 	datasetparams = datasetparams.field(" ", 2, 9999);
 	let ndatasets = datasetparams.fcount(VM);
 
-	datasetcodes	 = "";
-	var datasetnames = "";
+	var datasetcodes = "";
+	//var datasetnames = "";
 
 	for (const var datasetn : range(1, ndatasets)) {
 		let temp		= datasetparams.f(1, datasetn);
@@ -212,7 +214,7 @@ subroutine getdatasets() {
 			datasetparams(1, datasetn, 1) = datasetname;
 		//}
 		datasetcodes(1, datasetn) = datasetcode;
-		datasetnames(1, datasetn) = datasetname;
+		//datasetnames(1, datasetn) = datasetname;
 		var osfilename			  = "../data/" ^ temp.f(1, 1, 2).lcase() ^ "/params2";
 		osfilename.converter("/", OSSLASH);
 		var lastbackup;
@@ -223,13 +225,12 @@ subroutine getdatasets() {
 		datasetparams(1, datasetn, 4) = lastbackup.oconv("D");
 	}  // datasetn;
 
-	return;
+	return datasetcodes;
 }
 
-subroutine getuserdept2() {
+subroutine getuserdept2(in usercode) {
 
 	// Locate the user in the table otherwise department is ""
-	let usercode = mode.field(",", 2);
 	var usern0;
 	if (not SECURITY.f(1).locate(usercode, usern0)) {
 

@@ -67,7 +67,8 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 	}  // ii;
 	allchars.converter("0123456789-", "");
 
-	for (var ii = nn; ii >= 1; --ii) {
+	//for (var ii = nn; ii >= 1; --ii) {
+	for (let ii : reverse_range(1, nn)) {
 
 		let rangex = ranges.f(ii);
 
@@ -174,7 +175,7 @@ makekey:
 	}  // ii;
 
 exit:
-	// ///
+// ///
 	if (listid) {
 		if (keys) {
 			// return nlistparts in vnos to indicate success

@@ -111,7 +111,8 @@ function main() {
 	// de-duplicate
 	if (dedup) {
 		var row1 = output.f(nrows);
-		for (var rown = nrows; rown >= 3; --rown) {
+		//for (var rown = nrows; rown >= 3; --rown) {
+		for (let rown : reverse_range(3, nrows)) {
 			var row2	 = row1;
 			row1		 = output.f(rown - 1);
 			var replaced = 0;

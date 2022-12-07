@@ -205,7 +205,8 @@ function main(in mode) {
 			let tasks  = RECORD.f(10);
 			let locks  = RECORD.f(11);
 			let ntasks = tasks.fcount(VM);
-			for (var taskn = ntasks; taskn >= 1; --taskn) {
+			//for (var taskn = ntasks; taskn >= 1; --taskn) {
+			for (let taskn : reverse_range(1, ntasks)) {
 				let task = tasks.f(1, taskn);
 				let temp = task.starts("DOCUMENT: ") ? "#" : "";
 				if (not authorised("!" ^ temp ^ task, msg, "")) {
@@ -826,7 +827,8 @@ function main(in mode) {
 		// remove expired users
 		let expirydates = temprec.f(3);
 		let nn			= expirydates.fcount(VM);
-		for (var ii = nn; ii >= 1; --ii) {
+		//for (var ii = nn; ii >= 1; --ii) {
+		for (let ii : reverse_range(1, nn)) {
 			let expirydate = expirydates.f(1, ii);
 			if (expirydate) {
 				if (expirydate <= date()) {
@@ -844,7 +846,8 @@ function main(in mode) {
 		{
 			let usercodes = temprec.f(1);
 			let nn		  = usercodes.fcount(VM);
-			for (var ii = nn; ii >= 2; --ii) {
+			//for (var ii = nn; ii >= 2; --ii) {
+			for (let ii : reverse_range(2, nn)) {
 				let usercode = usercodes.f(1, ii);
 				if (usercode) {
 					if (temprec.f(8, ii) == "" or temprec.f(7, ii) == "") {

@@ -14,6 +14,23 @@ programinit()
 
 		// all
 		assert(regex_replace("aaa bbb ccc", "b", "Q") eq "aaa QQQ ccc");
+
+		// case insensitive
+		assert(regex_replace("aAa bbb ccc", "a", "Q", "i") eq "QQQ bbb ccc");
+
+		// single-line. ^ only matches beginning of string and not any embedded \n chars
+		assert(regex_replace("aaa\nbbb\nccc\n", "^b.*?$", "QQQ", "s").outputl() eq "aaa\nbbb\nccc\n");
+
+		// multi-line ^ matches beginning of string AND any embedded \n chars
+		assert(regex_replace("aaa\nbbb\nccc\n", "^b.*?$", "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
+		assert(regex_replace("aaa\nbbb\nccc\n", "^b.*?$", "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
+
+		// l - literal - no special regex characters ... but better to use var::replace() for this
+		assert(regex_replace("aaa\n***\nccc\n", "*", "Q", "l").outputl() eq "aaa\nQQQ\nccc\n");
+
+		// lif - literal, case insensitive and first only
+		assert(regex_replace("aaa\nb*b*b\nccc\n", "B*", "Q", "fil").outputl() eq "aaa\nQb*b\nccc\n");
+
 	}
 
 	//match returning what it finds

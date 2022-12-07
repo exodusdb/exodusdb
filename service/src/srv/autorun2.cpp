@@ -142,7 +142,8 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		// check all users exist (even if they dont have emails)
 		if (targetusercodes) {
 			let nusers = targetusercodes.fcount(VM);
-			for (usern = nusers; usern >= 1; --usern) {
+			//for (usern = nusers; usern >= 1; --usern) {
+			for (let usern : reverse_range(1, nusers)) {
 				let usercode = targetusercodes.f(1, usern);
 				var userx;
 				if (not userx.read(users, usercode)) {

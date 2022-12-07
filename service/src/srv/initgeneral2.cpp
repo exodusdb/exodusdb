@@ -11,7 +11,7 @@ libraryinit()
 
 #include <srv_common.h>
 
-var tt;
+//var tt;
 var hosts;
 var vn;
 var conf;
@@ -49,23 +49,22 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*createalert currusers", logtime);
 
-		if (not tt.readf(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1)) {
-			tt = "";
+		var lastrun;
+		if (not lastrun.readf(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1)) {
+			lastrun = "";
 		}
-		if (tt < 17203) {
+		if (lastrun < 17203) {
 
 			// to EXODUS only at the moment
 			let cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} EXODUS (ROS)";
 
 			// run once on first installation
-			tt = cmd;
-			tt.replacer("{}", "7:::::1");
-			perform(tt);
+			let cmd2 = cmd.replace("{}", "7:::::1");
+			perform(cmd2);
 
 			// run every 1st of the month
-			tt = cmd;
-			tt.replacer("{}", "7:1");
-			perform(tt);
+			let cmd3 = cmd.replace("{}", "7:1");
+			perform(cmd3);
 
 			date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
 		}
@@ -82,7 +81,8 @@ function main(in mode, io logtime, in menu) {
 		hosts.replacer("sshd:", "");
 		hosts.converter(" ", "");
 		var nn = hosts.fcount(FM);
-		for (var ln = nn; ln >= 1; --ln) {
+		//for (var ln = nn; ln >= 1; --ln) {
+		for (let ln : reverse_range(1, nn)) {
 			hosts(ln) = hosts.f(ln).field("#", 1);
 		}  // ln;
 
@@ -190,16 +190,17 @@ function main(in mode, io logtime, in menu) {
 		}
 		let nlinks = baselinks.fcount(VM);
 		for (const var linkn : range(1, nlinks)) {
-			tt = baselinks.f(1, linkn);
-			if (tt) {
-				let tt2 = (field2(tt, "/", -1)).lcase();
-				if (tt2.first(4).contains(".htm")) {
-					tt.cutter(-tt2.len());
+			var baselink = baselinks.f(1, linkn);
+			if (baselink) {
+				// TODO This code looks strange, perhaps buggy
+				let lastpart = (field2(baselink, "/", -1)).lcase();
+				if (lastpart.first(4).contains(".htm")) {
+					baselink.cutter(-lastpart.len());
 				}
-				if (not var("\\/").contains(tt[-1])) {
-					tt ^= "/";
+				if (not(baselink.ends("/")) and not(baselink.ends("\\"))) {
+					baselink ^= "/";
 				}
-				baselinks(1, linkn) = tt;
+				baselinks(1, linkn) = baselink;
 			}
 		}  // linkn;
 		SYSTEM(114) = baselinks;
@@ -230,16 +231,15 @@ function main(in mode, io logtime, in menu) {
 		var	 dbcode	  = SYSTEM.f(17);
 		var	 curryear = date().oconv("DY");
 		var	 minyear  = 2000;
-		for (var year = curryear - 2; year >= minyear; --year) {
+		//for (var year = curryear - 2; year >= minyear; --year) {
+		for (let year : reverse_range(minyear, curryear - 2)) {
 
 			// dir='..\logs\':dbcode:'\':year
 			// filenames='..\logs\':dbcode:'\':year:'\*.xml'
 			var filenamesx = "../logs/" ^ dbcode ^ "/" ^ year ^ "/*.xml";
 			filenamesx.converter("/", OSSLASH);
 
-			tt = oslistf(filenamesx);
-			// /BREAK;
-			if (not tt)
+			if (not oslistf(filenamesx))
 				break;
 
 			filenamesx.converter("\\", "/");
@@ -323,9 +323,10 @@ nextuser:
 		call log2("*reorder databases", logtime);
 
 		// only run once per installation
-		if (tt.osread("reorder.cfg")) {
+		if (osfile("reorder.cfg")) {
 			return 0;
 		}
+
 		//var(date()).oswrite("reorder.cfg");
 		if (not var(date()).oswrite("reorder.cfg")) {
 			loglasterror();

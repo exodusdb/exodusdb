@@ -9,7 +9,6 @@ libraryinit()
 
 #include <srv_common.h>
 
-var mode;
 var subject;
 var body;
 var nsent;	// num
@@ -22,7 +21,7 @@ var expirydate;
 var emails;
 var ok;	 // num
 //var xx;
-var nn;
+//var nn;
 var errormsg;
 
 function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
@@ -33,15 +32,11 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	// R = REPLYTO=@username email address if exists
 	// W = Groups by Word eg user with dept MEDIA BUYING matches group MEDIA
 
-	if (mode.unassigned()) {
-		let mod = "";
-	} else {
-		mode = mode0;
-	}
+	let mode = mode0.assigned() ? mode0 : "";
 
 	if (SENTENCE.field(" ", 1) == "EMAILUSERS") {
 
-		mode		= SENTENCE.field(" ", 2);
+		let mode	= SENTENCE.field(" ", 2);
 		let version = SENTENCE.field(" ", 3, 9999);
 		SENTENCE	= "";
 
@@ -90,8 +85,8 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		stop();
 	}
 
-	// init:
-	// ///
+// init:
+// ///
 	// if target and options='' or index(options,'U',1) then
 	// end
 	bool groupword = options.contains("W");
@@ -118,7 +113,6 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 	let usercodes	   = SECURITY.f(1);
 	let nusers		   = usercodes.fcount(VM);
-	var usern		   = 0;
 	emaillog		   = "";
 	var alreadyemailed = "";
 	body.converter(FM ^ VM, chr(13) ^ chr(13));
@@ -141,135 +135,124 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	}
 
 // ///////
-nextuser:
-	// ///////
-	if (esctoexit()) {
-		goto exit;
-	}
+//nextuser:
+// ///////
 
-	usern += 1;
-	if (usern > nusers) {
-		goto exit;
-	}
+	for (let usern : range(1, nusers)) {
 
-	// skip empty users
-	usercode = usercodes.f(1, usern);
-	if (usercode == "") {
-		goto nextuser;
-	}
-
-	// only users on file
-	if (not userx.read(users, usercode)) {
-		goto nextuser;
-	}
-
-	// not expired users
-	expirydate = userx.f(35);
-	if (expirydate and expirydate <= date()) {
-		goto nextuser;
-	}
-
-	// skip users with no email at all
-	// users may have 0 or more email addresses eg xyz@abc.com;123@345.com etc
-	emails = userx.f(7);
-	if (emails == "") {
-		goto nextuser;
-	}
-
-	// always email to self last
-	if (usercode == USERNAME and replyto) {
-		goto nextuser;
-	}
-
-	ok = 0;
-	if (not(ok) and userids) {
-		if (userids.locate(usercode)) {
-			ok = 1;
+		// skip empty users
+		usercode = usercodes.f(1, usern);
+		if (usercode == "") {
+			continue;  // usern
 		}
-		if (not(ok) and not(groupids)) {
-			goto nextuser;
-		}
-	}
 
-	// skip users not of required type (eg FINANCE is ok in FINANCE CONTROLLER)
-	// could determine user type from what menus they can access eg MEDIA
-	if (not(ok) and groupids) {
-		if (groupword) {
-			// == search for MEDIA in user department like MEDIA BUYER
-			for (const var groupn : range(1, ngroups)) {
-				ok = userx.f(5).contains(groupids.f(1, groupn));
-				// /BREAK;
-				if (not not(ok))
-					break;
-			}  // groupn;
-		} else {
-			// exact groups
-			if (groupids.locate(userx.f(21))) {
+		// only users on file
+		if (not userx.read(users, usercode)) {
+			continue;  // usern;
+		}
+
+		// not expired users
+		expirydate = userx.f(35);
+		if (expirydate and expirydate <= date()) {
+			continue;  // usern;
+		}
+
+		// skip users with no email at all
+		// users may have 0 or more email addresses eg xyz@abc.com;123@345.com etc
+		emails = userx.f(7);
+		if (emails == "") {
+			continue;  // usern;
+		}
+
+		// always email to self last
+		if (usercode == USERNAME and replyto) {
+			continue;  // usern;
+		}
+
+		ok = 0;
+		if (not(ok) and userids) {
+			if (userids.locate(usercode)) {
 				ok = 1;
 			}
+			if (not(ok) and not(groupids)) {
+				continue;  // usern;
+			}
 		}
-		if (not ok) {
-			goto nextuser;
-		}
-	}
 
-	// must be last to avoid adding emails to sent list unless actually sent
-	// remove any emails that have already been emailed before
-	emails.converter(" ", "");
-	emails.converter(";", VM);
-	nn = emails.fcount(VM);
-	for (var ii = nn; ii >= 1; --ii) {
-		let email = emails.f(1, ii);
-		if (alreadyemailed.locate(email)) {
-			emails.remover(1, ii);
-		} else {
-			alreadyemailed ^= VM ^ email;
+		// skip users not of required type (eg FINANCE is ok in FINANCE CONTROLLER)
+		// could determine user type from what menus they can access eg MEDIA
+		if (not(ok) and groupids) {
+			if (groupword) {
+				// == search for MEDIA in user department like MEDIA BUYER
+				for (const var groupn : range(1, ngroups)) {
+					ok = userx.f(5).contains(groupids.f(1, groupn));
+					// /BREAK;
+					if (not not(ok))
+						break;
+				}  // groupn;
+			} else {
+				// exact groups
+				if (groupids.locate(userx.f(21))) {
+					ok = 1;
+				}
+			}
+			if (not ok) {
+				continue;  // usern;
+			}
 		}
-	}  // ii;
-	emails.converter(VM, ";");
 
-	// skip users that have already been emailed before
-	if (emails == "") {
-		goto nextuser;
-	}
+		// must be last to avoid adding emails to sent list unless actually sent
+		// remove any emails that have already been emailed before
+		emails.converter(" ", "");
+		emails.converter(";", VM);
+		let nn = emails.fcount(VM);
+		//for (var ii = nn; ii >= 1; --ii) {
+		for (let ii : reverse_range(1, nn)) {
+			let email = emails.f(1, ii);
+			if (alreadyemailed.locate(email)) {
+				emails.remover(1, ii);
+			} else {
+				alreadyemailed ^= VM ^ email;
+			}
+		}  // ii;
+		emails.converter(VM, ";");
+
+		// skip users that have already been emailed before
+		if (emails == "") {
+			continue;  // usern;
+		}
 
 	// userinit:
 	// ///////
-	print(usercode, " ");
+		print(usercode, " ");
 
-	if (currdept and userx.f(5) != currdept) {
-		gosub sendemails(emaillog);
-	}
-	currdept = userx.f(5);
+		if (currdept and userx.f(5) != currdept) {
+			gosub sendemails(emaillog);
+		}
+		currdept = userx.f(5);
 
-	if (toemails == "") {
-		toemails = emails;
+		if (toemails == "") {
+			toemails = emails;
 
-		// sending to users (or groups and users)
-	} else if (userids) {
-		toemails ^= ";" ^ emails;
+			// sending to users (or groups and users)
+		} else if (userids) {
+			toemails ^= ";" ^ emails;
 
-		// sending to groups then to the first and cc the rest
-	} else {
-		ccemails ^= ";" ^ emails;
-	}
+			// sending to groups then to the first and cc the rest
+		} else {
+			ccemails ^= ";" ^ emails;
+		}
 
-	emaillog ^= VM ^ usercode ^ " " ^ emails;
+		emaillog ^= VM ^ usercode ^ " " ^ emails;
 
-	// userexit:
-	// ///////
-	goto nextuser;
+	}  // usern;
 
-exit:
-	// ///
+//exit:
+// ///
+
 	gosub sendemails(emaillog);
 
-	while (true) {
-		// /BREAK;
-		if (not ("." ^ VM ^ FM).contains(emaillog[-1]))
-			break;
-		emaillog.popper();
-	}  // loop;
+	emaillog.trimmerlast("." _VM _FM);
 
 	// always email to self
 	if (nsent and replyto) {
@@ -285,12 +268,7 @@ exit:
 	// emaillog=''
 	// end
 
-	while (true) {
-		// /BREAK;
-		if (not ("." ^ VM ^ FM).contains(emaillog[-1]))
-			break;
-		emaillog.popper();
-	}  // loop;
+	emaillog.trimmerlast("." _VM _FM);
 
 	return 0;
 }

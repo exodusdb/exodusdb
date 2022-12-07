@@ -190,19 +190,20 @@ thread_local std::map<std::string, REGEX> thread_regexes;
 // Caches regex giving very approx 10x speed up
 REGEX& getregex(SV matchstr, SV options) {
 
-	auto key = std::string(matchstr);
-	key.push_back(FM_);
-	key += options;
+	auto cache_key = std::string(matchstr);
+	cache_key.push_back(FM_);
+	cache_key += options;
 
-	auto mapiter = thread_regexes.find(key);
+	auto mapiter = thread_regexes.find(cache_key);
 	if (mapiter != thread_regexes.end())
 		return mapiter->second;
 
 	try {
 		[[maybe_unused]] auto [mapiter, success] = thread_regexes.emplace(
-			key,
+			cache_key,
 			boost::make_u32regex(
 				std::string(matchstr),
+				// Analyse the options requested
 				get_regex_syntax_flags(options)
 			)
 		);
@@ -380,6 +381,8 @@ VARREF var::replacer(SV what, SV with) {
 
 // only here really because boost regex is included here for file matching
 
+// option  f - first occurrence only
+
 // const
 var var::regex_replace(SV regexstr, SV replacementstr, SV options) const& {
 	var nrvo = *this;
@@ -397,6 +400,7 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
+	// Build the regex object with the given options
 	REGEX& regex = getregex(regexstr, options);
 
 	// return regex_match(var_str, expression);

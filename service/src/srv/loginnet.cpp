@@ -86,7 +86,8 @@ readmenu:
 	// reduce the menus to a list of authorised menus
 	var nmenus = menus.fcount(VM);
 	// work backwards because we are deleting
-	for (var menun = nmenus; menun >= 1; --menun) {
+	//for (var menun = nmenus; menun >= 1; --menun) {
+	for (let menun : reverse_range(1, nmenus)) {
 		let menu = menus.f(1, menun).ucase();
 		if (menu) {
 			let menutask = "MENU " ^ menu;

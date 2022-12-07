@@ -28,7 +28,7 @@ var market;
 var agp;
 var holidaytype;
 var workdate;
-var tt;	 // num
+//var tt;	 // num
 var authtasks;
 var title;
 var datax;
@@ -391,7 +391,8 @@ preventsameday:
 		toaddress	  = "";
 		let nusers	  = usercodes.fcount(VM);
 		let backwards = 1;
-		for (var usern = nusers; usern >= 1; --usern) {
+		//for (var usern = nusers; usern >= 1; --usern) {
+		for (let usern : reverse_range(1, nusers)) {
 
 			// get the user record
 			let usercode = usercodes.f(1, usern);
@@ -463,7 +464,7 @@ nextuser:;
 
 	if (module and alerttype) {
 
-		tt = module ^ ".ALERTS";
+		var tt = module ^ ".ALERTS";
 
 		// c++ variation
 		if (not VOLUMES) {
@@ -572,7 +573,7 @@ nextuser:;
 	// and {TODAY+999} to today+999
 	var sign = "-";
 nextsign:
-	tt = data_.index("{TODAY" ^ sign);
+	var tt = data_.index("{TODAY" ^ sign);
 	if (tt) {
 		let t2 = (data_.cut(tt)).field("}", 1);
 		data_.replacer("{" ^ t2 ^ "}", date() + t2.cut(5));
@@ -741,7 +742,7 @@ subroutine exec2() {
 	// will be obtained from the output file name LISTEN2 RESPOND
 	// this could be improved to work
 	printfilename = linkfilename2;
-	tt			  = oscwd();
+	var tt		  = oscwd();
 	tt.cutter(-7);
 	if (printfilename.starts(tt)) {
 		printfilename.paster(1, tt.len(), "../");
@@ -870,7 +871,7 @@ subroutine exit(in lockfilename, io lockfile, in lockkey) {
 subroutine fmtresp() {
 
 	// trim everything after <ESC> (why?)
-	tt = response_.contains("<ESC>");
+	var tt = response_.index("<ESC>");
 	if (tt) {
 		response_ = response_.first(tt - 1);
 	}
@@ -890,9 +891,9 @@ subroutine getdaysago() {
 	var weekend = "67";
 	marketcode	= srv.company.f(30, 1);
 	if (marketcode) {
-		tt = marketcode.xlate("MARKETS", 9, "X");
-		if (tt) {
-			weekend = tt;
+		var marketweekend = marketcode.xlate("MARKETS", 9, "X");
+		if (marketweekend) {
+			weekend = marketweekend;
 		}
 	}
 

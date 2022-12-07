@@ -16,9 +16,9 @@ libraryinit()
 //var newtaskn;
 //var xx;
 var logtime;
-var tn;
-var vn;
-var taskn2;
+//var tn;
+//var vn;
+//var taskn2;
 
 function main(in mode) {
 	// jbase
@@ -162,6 +162,7 @@ function main(in mode) {
 		t10.replacer(VM ^ "ANALYSIS ACCESS", VM ^ "BILLING REPORT ACCESS");
 		t10.replacer("LEDGER RE-OPEN", "LEDGER REOPEN");
 
+		var tn;
 		if (t10.f(1).locate("POSTING", tn)) {
 			if (newuserprivs.f(11, tn) == "") {
 				newuserprivs(11, tn) = "UA";
@@ -202,9 +203,12 @@ function main(in mode) {
 		newuserprivs(10) = t10;
 
 		call log2("*make sure all users have access to company file", logtime);
-		if (newuserprivs.f(10).locate("COMPANY ACCESS", vn)) {
-			if (newuserprivs.f(11, vn) == "AA") {
-				newuserprivs(11, vn) = "";
+		{
+			var taskn;
+			if (newuserprivs.f(10).locate("COMPANY ACCESS", taskn)) {
+				if (newuserprivs.f(11, taskn) == "AA") {
+					newuserprivs(11, taskn) = "";
+				}
 			}
 		}
 
@@ -238,7 +242,8 @@ function main(in mode) {
 		var	 tasks	= newuserprivs.f(10);
 		var	 locks	= newuserprivs.f(11);
 		var	 ntasks = tasks.fcount(VM);
-		for (taskn = ntasks; taskn >= 1; --taskn) {
+		//for (taskn = ntasks; taskn >= 1; --taskn) {
+		for (let taskn : reverse_range(1, ntasks)) {
 			let lockx = locks.f(1, taskn);
 			let task  = tasks.f(1, taskn);
 			if (lockx == "" and (task.ends(DQ))) {
@@ -247,6 +252,7 @@ deletetask:
 				newuserprivs.remover(11, taskn);
 			} else {
 				// delete duplicate tasks
+				var taskn2;
 				if (tasks.f(1).locate(task, taskn2)) {
 					if (taskn2 < taskn) {
 						goto deletetask;
