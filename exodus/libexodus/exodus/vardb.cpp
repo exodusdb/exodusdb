@@ -2533,7 +2533,7 @@ inline var get_fileexpression(CVR mainfilename, CVR filename, CVR keyordata) {
 	// "coalesce(" ^ expression ^", ''::text)";
 }
 
-var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool forsort) {
+var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool& isdatetime, bool forsort) {
 
 	Timer t(262);//get_dictexpression
 
@@ -2648,6 +2648,7 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 
 	bool isdate = conversion.starts("D") || conversion.starts("[DATE");
 	bool istime = !isdate && (conversion.starts("MT") || conversion.starts("[TIME"));
+	isdatetime = isdate || istime;
 
 	var sqlexpression;
 	if (dicttype == "F") {
@@ -2814,9 +2815,10 @@ TRACE: "QQQ"="QQQ"
 				if (arg == "key" or arg == "data") {
 					sqlexpression ^= get_fileexpression(mainfilename, filename, arg);
 				} else {
+					bool isdatetime;
 					sqlexpression ^= get_dictexpression(
 						cursor, filename, filename, dictfilename, dictfile,
-						arg, joins, unnests, selects, ismv, forsort
+						arg, joins, unnests, selects, ismv, isdatetime, forsort
 					);
 				}
 				sqlexpression ^= ", ";
@@ -2914,10 +2916,11 @@ TRACE: "QQQ"="QQQ"
 					var errmsg = xlatetargetdictfilename ^ " cannot be opened for " ^ function_src;
 					throw VarDBException(errmsg);
 				}
+				bool isdatetime;
 				sqlexpression = get_dictexpression(cursor,
 					filename, xlatetargetfilename, xlatetargetdictfilename,
 					xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
-					selects, ismv, forsort);
+					selects, ismv, isdatetime, forsort);
 			}
 
 			// determine the join details
@@ -2940,9 +2943,10 @@ TRACE: "QQQ"="QQQ"
 			// (xlatefromfieldname.starts(FIELD(@ID))
 			else if (xlatefromfieldname.starts("{")) {
 				xlatefromfieldname.cutter(1).popper();
+				bool isdatetime;
 				xlatekeyexpression = get_dictexpression(cursor,
 					filename, filename, dictfilename, dictfile,
-					xlatefromfieldname, joins, unnests, selects, ismv, forsort);
+					xlatefromfieldname, joins, unnests, selects, ismv, isdatetime, forsort);
 
 			} else if (xlatefromfieldname.lcase() == "@id") {
 				xlatekeyexpression = filename ^ ".key";
@@ -3360,6 +3364,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	var unnests = "";
 	var selects = "";
 	bool ismv = false;
+	bool isdatetime = false;
 
 	var maxnrecs = "";
 	var xx; // throwaway return value
@@ -3481,8 +3486,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		else if (ucword == "DISTINCT" && remaining) {
 
 			var distinctfieldname = getword(remaining, xx);
-			var distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, false);
-			var naturalsort_distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, true);
+			var distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, false);
+			var naturalsort_distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, true);
 
 			if (true) {
 				// this produces the right values but in random order
@@ -3507,7 +3512,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// next word must be dictid
 			var dictid = getword(remaining, xx);
 			var dictexpression =
-				get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, dictid, joins, unnests, selects, ismv, true);
+				get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, dictid, joins, unnests, selects, ismv, isdatetime, true);
 
 			// dictexpression.logputl("dictexpression=");
 			// orderclause.logputl("orderclause=");
@@ -3600,7 +3605,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				false;	// because indexes are NOT created sortable (exodus_sort()
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
-							dictfile, word1, joins, unnests, selects, ismv, forsort);
+							dictfile, word1, joins, unnests, selects, ismv, isdatetime, forsort);
 			//var usingnaturalorder = dictexpression.contains("exodus_extract_sort") or dictexpression.contains("exodus_natural");
 			var dictid = word1;
 
@@ -4014,7 +4019,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//doesnt work on multivalued fields - results in:
 				//exodus_tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				//TODO work out better way of determining DATE/TIME that must be tested versus null
-				if (dictexpression.contains("FULLY_") || (!dictexpression.contains("exodus_extract") && dictexpression.contains("_DATE")))
+				//if (isdatetime || dictexpression.contains("FULLY_") || (!dictexpression.contains("exodus_extract") && dictexpression.contains("_DATE")))
+				if (isdatetime)
 					dictexpression ^= " is not null";
 				else
 					dictexpression = "exodus_tobool(" ^ dictexpression ^ ")";
@@ -4277,7 +4283,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				}
 				//horrible hack to allow filtering calculated date fields versus ""
 				//TODO detect FULLY_BOOKED and FULLY_APPROVED as dates automatically
-				else if (dictexpression.contains("FULLY_")) {
+				//else if (isdatetime || dictexpression.contains("FULLY_")) {
+				else if (isdatetime) {
 					if (op == "=")
 						op = "is";
 					else
@@ -5319,9 +5326,10 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	var unnests = ""; // unnests are only created for ORDER BY, not indexing or selecting
 	var selects = "";
 	bool ismv;
+	bool isdatetime;
 	var forsort = false;
 	var dictexpression = get_dictexpression(*this, filename, filename, actualdictfile, actualdictfile,
-									fieldname, joins, unnests, selects, ismv, forsort);
+									fieldname, joins, unnests, selects, ismv, isdatetime, forsort);
 	// dictexpression.logputl("dictexp=");stop();
 
 	//mv fields return in unnests, not dictexpression
