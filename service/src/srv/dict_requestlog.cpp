@@ -9,7 +9,7 @@ function main() {
 		if (ANS < 0) {
 			ANS += 86400;
 		}
-		ANS = (ANS.oconv("MD20P")) + 0;
+		ANS = (ANS.oconv("MD30P")) + 0;
 	} else {
 	// blank if no response time (crashed)
 		ANS = "";
