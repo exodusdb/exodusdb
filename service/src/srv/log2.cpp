@@ -58,7 +58,7 @@ function main(in msg0, io time0) {
 		// entry:=field(time2,'.',2) 'MD20P'
 	}
 	// similar in listen and log2
-	entry ^= THREADNO ^ ": " ^ (time2 - time0).oconv("MD20P");
+	entry ^= THREADNO ^ ": " ^ (time2 - time0).oconv("MD60P");
 	// entry:=sep:sep:sep:sep
 	entry ^= " " ^ msg0;
 
