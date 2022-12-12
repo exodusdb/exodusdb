@@ -421,8 +421,7 @@ ND PUBLIC bool createfile(CVR dbfilename) {
 
 ND PUBLIC bool deletefile(CVR dbfilename_or_var) {
 	//remove options like (S)
-	//var dbfilename2 = dbfilename_or_var.field(" ", 1).trim();
-	var dbfilename2 = dbfilename_or_var.field("(", 1).trim();
+	var dbfilename2 = dbfilename_or_var.field(" ", 1).trim();
 
 	//exodus doesnt automatically create dict files
 	dbfilename2.replacer("DATA ", "").trimmer();
