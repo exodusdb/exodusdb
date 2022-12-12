@@ -231,18 +231,19 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//sqltype
 		var sqltype;
-		if (ioconv.contains("[NUMBER")) {
-			sqltype = "NUMERIC";
-		}
-		else if (ioconv.contains("[DATE")) {
+		//if (ioconv.starts("[DATETIME")) {
+		//	sqltype = "DATE";//TODO
+		//}
+		if (ioconv.starts("[DATE")) {
 			sqltype = "DATE";
             ioconvs(fieldn) = "D";
 		}
-		else if (ioconv.contains("[TIME")) {
+		else if (ioconv.starts("[TIME")) {
 			sqltype = "TIME";//TODO check if works
 		}
-		else if (ioconv.contains("[DATETIME")) {
-			sqltype = "DATE";//TODO
+		// Note that we aslo assume numeric if a filter value is present and is numeric (without quotes)
+		else if (ioconv.starts("[NUMBER") or (ovalue.len() and ovalue.isnum())) {
+			sqltype = "NUMERIC";
 		}
 		else {
 			sqltype = "TEXT";
