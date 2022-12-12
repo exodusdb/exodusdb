@@ -1,7 +1,10 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_
 #define EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_
 
-#ifndef EXODUS_TIMEBANK
+// EXODUS_TIMEBANK must be defined to create functional Timers
+// e.g. cmake . -DEXODUS_TIMEBANK=1
+
+#if EXODUS_TIMEBANK != 1
 	struct Timer{
 		explicit Timer(int){
 		}

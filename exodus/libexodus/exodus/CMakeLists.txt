@@ -16,6 +16,15 @@
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
 #
+# Add TIMEBANK option
+# ###################
+#
+	OPTION(EXODUS_TIMEBANK "Option Debug timers" OFF) # Enabled by default
+	IF(EXODUS_TIMEBANK)
+		ADD_DEFINITIONS(-DEXODUS_TIMEBANK)
+	ENDIF(EXODUS_TIMEBANK)
+
+#
 # Coverage testing
 # ################
 #
