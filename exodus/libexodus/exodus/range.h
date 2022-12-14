@@ -93,10 +93,10 @@ class PUBLIC reverse_range {
 		Iterator(int_t int1, int_t end) : int_(int1), end_(end) {}
 
 		// Return our int (adjusted to be a reverse int)
-		int_t operator*() const { return end_ - int_; }
+		int_t operator*() const { return int_; }
 
-		// Increment our int
-		Iterator& operator++() { int_++; return *this; }
+		// Increment our int (ACTUAL DECREMENT)
+		Iterator& operator++() { int_--; return *this; }
 
 		//Iterator operator++(int_t) { Iterator tmp = *this; ++(*this); return tmp; }
 
@@ -118,7 +118,7 @@ class PUBLIC reverse_range {
 
 	// Construct a reverse_range from two ints
 	// Prevent first > last
-	reverse_range(int_t first, int_t last) : begin_(first <= last ? first : last + 1), end_(last + 1){}
+	reverse_range(int_t first, int_t last) : begin_(first <= last ? last : first), end_(first <= last ? first - 1 : last - 1){}
 
 	// Return our begin int
 	Iterator begin() { return Iterator(begin_, end_); }

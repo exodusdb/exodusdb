@@ -65,6 +65,7 @@ programinit()
 			var count = 0;
 			var str   = "";
 			for (const var ii : reverse_range(1, 10)) {
+				TRACE(ii);
 				tot += ii;
 				count++;
 				str ^= ii ^ " ";;
@@ -75,7 +76,61 @@ programinit()
 			assert(str == "10 9 8 7 6 5 4 3 2 1 ");
 		}
 
-		// reverse_range based for loop - bad range
+		// reverse_range based for loop going negative
+		{
+			var tot	  = 0;
+			var count = 0;
+			var str   = "";
+			for (const var ii : reverse_range(-3, 3)) {
+				TRACE(ii);
+				tot += ii;
+				count++;
+				str ^= ii ^ " ";;
+			}
+			TRACE(tot);
+			assert(tot   eq 0);
+			assert(count eq 7);
+			TRACE(str);
+			assert(str == "3 2 1 0 -1 -2 -3 ");
+		}
+
+		// reverse_range based for loop zero to negative
+		{
+			var tot	  = 0;
+			var count = 0;
+			var str   = "";
+			for (const var ii : reverse_range(-3, 0)) {
+				TRACE(ii);
+				tot += ii;
+				count++;
+				str ^= ii ^ " ";;
+			}
+			TRACE(tot);
+			assert(tot   eq -6);
+			assert(count eq 4);
+			TRACE(str);
+			assert(str == "0 -1 -2 -3 ");
+		}
+
+		// reverse_range based for loop in negative range
+		{
+			var tot	  = 0;
+			var count = 0;
+			var str   = "";
+			for (const var ii : reverse_range(-3, -6)) {
+				TRACE(ii);
+				tot += ii;
+				count++;
+				str ^= ii ^ " ";;
+			}
+			TRACE(tot);
+			assert(tot   eq -18);
+			assert(count eq 4);
+			TRACE(str);
+			assert(str == "-3 -4 -5 -6 ");
+		}
+
+		// reverse_range based for loop - bad range still works
 		{
 			var tot	  = 0;
 			var count = 0;
@@ -83,8 +138,8 @@ programinit()
 				tot += ii;
 				count++;
 			}
-			assert(tot   eq 0);
-			assert(count eq 0);
+			assert(tot   eq 55);
+			assert(count eq 10);
 		}
 	}
 
