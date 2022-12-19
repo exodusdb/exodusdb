@@ -221,7 +221,8 @@ forcedemail:
 	for (const var filen : range(1, 2)) {
 		//call osread(params2, filenamesx.f(1, filen));
 		if (not osread(params2, filenamesx.f(1, filen))) {
-			abort(lasterror());
+			//abort(lasterror());
+			loglasterror();
 		}
 		// cut off after end of file character
 		// params2=field(params2,char(26),1)
