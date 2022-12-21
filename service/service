@@ -9,7 +9,7 @@ set -euxo pipefail
 :
 : 'Environment variable: $APP_CODE Defaults to "exo". Used for prefix on services'
 :
-: 'Output can be active, inactive, failed'
+: 'Output can be active, inactive, fa-iled'
 :
 	APP_CODE=${APP_CODE:-exo}
 :
