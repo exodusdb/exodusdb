@@ -46,7 +46,7 @@ programinit()
 			assert(str == "1 2 3 4 5 6 7 8 9 10 ");
 		}
 
-		// range based for loop - bad range
+		// range based for loop - bad range should not enter loop
 		{
 			var tot	  = 0;
 			var count = 0;
@@ -112,7 +112,7 @@ programinit()
 			assert(str == "0 -1 -2 -3 ");
 		}
 
-		// reverse_range based for loop in negative range
+		// reverse_range based for loop does not enter loop
 		{
 			var tot	  = 0;
 			var count = 0;
@@ -124,13 +124,13 @@ programinit()
 				str ^= ii ^ " ";;
 			}
 			TRACE(tot);
-			assert(tot   eq -18);
-			assert(count eq 4);
+			assert(tot   eq 0);
+			assert(count eq 0);
 			TRACE(str);
-			assert(str == "-3 -4 -5 -6 ");
+			assert(str == "");
 		}
 
-		// reverse_range based for loop - bad range still works
+		// reverse_range based for loop - bad range doesnt enter loop
 		{
 			var tot	  = 0;
 			var count = 0;
@@ -138,8 +138,8 @@ programinit()
 				tot += ii;
 				count++;
 			}
-			assert(tot   eq 55);
-			assert(count eq 10);
+			assert(tot   eq 0);
+			assert(count eq 0);
 		}
 	}
 

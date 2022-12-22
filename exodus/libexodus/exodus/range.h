@@ -117,8 +117,9 @@ class PUBLIC reverse_range {
 	};
 
 	// Construct a reverse_range from two ints
-	// Prevent first > last
-	reverse_range(int_t first, int_t last) : begin_(first <= last ? last : first), end_(first <= last ? first - 1 : last - 1){}
+	// If first > last then prevent entering loop by setting begin == end == 0
+	//reverse_range(int_t first, int_t last) : begin_(first <= last ? last : first), end_(first <= last ? first - 1 : last - 1){}
+	reverse_range(int_t first, int_t last) : begin_(first <= last ? last : 0), end_(first <= last ? first - 1 : 0){}
 
 	// Return our begin int
 	Iterator begin() { return Iterator(begin_, end_); }
