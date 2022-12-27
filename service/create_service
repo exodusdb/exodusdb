@@ -51,6 +51,10 @@ set -euxo pipefail
 	WORK_DIR1=~/hosts/$HOST_DIR/work/
 	WORK_DIR2=~/hosts/%i/work/
 	WORK_DIR3=~/hosts/$HOST_DIR/work/
+:
+    if [ $HOST_DIR = "ptcy" ]; then
+        WORK_DIR2=~/hosts/ptcy/work/
+    fi
 
 :
 : Symbolic link for extra databases that dont match the working directory
