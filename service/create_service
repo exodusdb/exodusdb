@@ -115,8 +115,8 @@ set -euxo pipefail
 		ExecReload=/bin/kill -s HUP \$MAINPID
 		#StandardOutput=append:/var/log/neo/${IDB_CODE}.log
 		#StandardError=append:/var/log/neo/${IDB_CODE}_error.log
-		StandardOutput=syslog
-		StandardError=syslog
+		#StandardOutput=syslog
+		#StandardError=syslog
 		SyslogIdentifier=$SERVICE_CODE@%i
 		#
 		[Install]
