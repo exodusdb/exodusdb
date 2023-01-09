@@ -214,9 +214,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		if (cleanup) {
-			//logfilename.osremove();
+			// logfilename.osremove();
 			if (logfilename.osfile() and not logfilename.osremove()) {
-				abort(lasterror());
+				// abort(lasterror());
+				loglasterror();
 			}
 		}
 
@@ -365,9 +366,10 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 		if (datax.osread(tempfilename2)) {
 			if (cleanup) {
-				//tempfilename2.osremove();
+				// tempfilename2.osremove();
 				if (tempfilename2.osfile() and not tempfilename2.osremove()) {
-					abort(lasterror());
+					// abort(lasterror());
+					loglasterror();
 				}
 
 			}
@@ -410,9 +412,10 @@ badresponse:
 		// from here on the response is ok
 		msg = "";
 		if (cleanup) {
-			//logfilename.osremove();
+			// logfilename.osremove();
 			if (logfilename.osfile() and not logfilename.osremove()) {
-				abort(lasterror());
+				// abort(lasterror());
+				loglasterror();
 			}
 		}
 
@@ -428,9 +431,10 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 
 	if (log.osread(logfilename)) {
 		if (cleanup) {
-			//logfilename.osremove();
+			// logfilename.osremove();
 			if (logfilename.osfile() and not logfilename.osremove()) {
-				abort(lasterror());
+				// abort(lasterror());
+				loglasterror();
 			}
 		}
 		log.converter("\r\n", _FM _FM).trimmer(_FM);
