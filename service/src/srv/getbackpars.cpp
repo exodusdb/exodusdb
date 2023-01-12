@@ -69,7 +69,7 @@ function main(out bakpars, in process0 = var()) {
 	// osread tt from '..\..\backup.cfg' then
 	var configfilename = "../../backup.cfg";
 	configfilename.converter("/", OSSLASH);
-	if (tt.osread(configfilename)) {
+	if (osfile(configfilename) and tt.osread(configfilename)) {
 		for (const var ii : range(1, 99)) {
 			if (tt.f(ii).len()) {
 				bakpars(ii) = tt.f(ii);

@@ -219,6 +219,9 @@ forcedemail:
 	var filenamesx = "smtp.cfg" ^ VM ^ "../../smtp.cfg";
 	filenamesx.converter("/", _OSSLASH);
 	for (const var filen : range(1, 2)) {
+		if (not osfile(filenamesx.f(filen))) {
+			continue;
+		}
 		//call osread(params2, filenamesx.f(1, filen));
 		if (not osread(params2, filenamesx.f(1, filen))) {
 			//abort(lasterror());
