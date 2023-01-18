@@ -35,6 +35,7 @@
             di = dict[++din] = dictrec('NEW_DATABASE_CODE', 'F', 2)
 			exodus_dict_text(di,20);	
             di.required = true
+			di.length = '25'
 			di.validation = 'yield* database_val_newdatabasecode()'
 
             di = dict[++din] = dictrec('NEW_DATABASE_NAME', 'F', 1)
@@ -45,6 +46,7 @@
 			di.lowercase = true
 			//di.maxlength = '25'
 			di.maxlength = '80'
+			di.length = '25'
             di.required = true
 
             return dict
