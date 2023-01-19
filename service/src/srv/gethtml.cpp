@@ -14,7 +14,8 @@ var letterheadcompany;
 var keyx;
 var tt;
 
-function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") {
+//function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") {
+function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 
 	// gethtml may be "perform"ed, "execute"d  or "call"ed
 	//
@@ -58,6 +59,13 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") 
 		if (hascompanies) {
 			compcode = srv.gcurrcompcode;
 		}
+	}
+
+	var qr_text;
+	if (qr_text0.unassigned()) {
+		qr_text = "";
+	} else {
+		qr_text = qr_text0;
 	}
 
 	letterheadcompany = "";
