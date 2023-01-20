@@ -288,8 +288,11 @@ postuploadfail:
 		///////////////////////////////////////
 		if (request_.f(3) == "NEW") {
 			for (let file : uploadfilenames) {
-				if (not osremove(uploadroot ^ relative_path ^ file)) {
-					abort(lasterror());
+				// if (not osremove(uploadroot ^ relative_path ^ file)) {
+				if (osfile(uploadroot ^ relative_path ^ file)) {
+					if (not osremove(uploadroot ^ relative_path ^ file)) {
+						abort(lasterror());
+					}
 				}
 			}
 			return 0;
