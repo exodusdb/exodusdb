@@ -26,8 +26,9 @@ function main() {
 	}
 
 	let update = OPTIONS.contains("U");
+//	const bool raw = rxopts.contains("r");
+	const bool raw = OPTIONS.contains("r");
 	let rxopts = OPTIONS.convert("rU", "");
-	const bool raw = rxopts.contains("r");
 
 	for (in osfilename : COMMAND) {
 

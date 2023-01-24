@@ -307,8 +307,26 @@ programinit()
 
 	{
 		var x;
-		x.unassigned("zxc");
+		x.default_to("zxc");
 		assert(x eq "zxc");
+	}
+
+	{
+		var x = "abc";
+		x.default_to("zxc");
+		assert(x eq "abc");
+	}
+
+	{
+		var x;
+		assert(x.default_from("zxc") eq "zxc");
+		assert(x.unassigned());
+	}
+
+	{
+		var x = "abc";
+		assert(x.default_from("zxc") eq "abc");
+		assert(x eq "abc");
 	}
 
 	{

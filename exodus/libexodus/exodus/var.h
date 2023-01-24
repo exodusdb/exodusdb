@@ -1495,8 +1495,8 @@ class PUBLIC var final {
 
 	ND bool assigned() const;
 	ND bool unassigned() const;
-	VARREF unassigned(CVR defaultvalue);
-	var unassigned(CVR defaultvalue) const;
+	void default_to(CVR defaultvalue);
+	var default_from(CVR defaultvalue) const;
 
 	VARREF move(VARREF destinationvar);
 	// swap is marked as const despite it replaceping the var with var2

@@ -333,13 +333,14 @@ bool var::unassigned() const {
 	return !var_typ;
 }
 
-VARREF var::unassigned(CVR defaultvalue) {
+//VARREF var::default_to(CVR defaultvalue) {
+void var::default_to(CVR defaultvalue) {
 
 	// see explanation above in assigned
 	// assertDefined(function_sig);
 
 
-	THISIS("VARREF var::unassigned(CVR defaultvalue) const")
+	THISIS("VARREF var::default_to(CVR defaultvalue) const")
 	ISASSIGNED(defaultvalue)
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -351,12 +352,12 @@ VARREF var::unassigned(CVR defaultvalue) {
 		// var_typ=VARTYP_STR;
 		*this = defaultvalue;
 	}
-	return *this;
+	return;// *this;
 }
 
-var var::unassigned(CVR defaultvalue) const {
+var var::default_from(CVR defaultvalue) const {
 
-	THISIS("VARREF var::unassigned(CVR defaultvalue)")
+	THISIS("VARREF var::default_from(CVR defaultvalue)")
 	ISASSIGNED(defaultvalue)
 
 	if (this->unassigned())
