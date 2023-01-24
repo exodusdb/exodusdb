@@ -3995,8 +3995,11 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//op = "<>";
 				//value = "''";
 
+				var origdictexpression = dictexpression;
 				//remove conversion to date/number etc
+				//i.e for non-symbolic dicts i.e exodus_extract_date() and not dict_clients_stopped2()
 				to_extract_text(dictexpression);
+				var replacedbyextracttext = dictexpression != origdictexpression;
 
 				//remove conversion to array
 				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
@@ -4020,7 +4023,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//exodus_tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				//TODO work out better way of determining DATE/TIME that must be tested versus null
 				//if (isdatetime || dictexpression.contains("FULLY_") || (!dictexpression.contains("exodus_extract") && dictexpression.contains("_DATE")))
-				if (isdatetime)
+				//if (isdatetime)
+				if (isdatetime and not replacedbyextracttext)
 					dictexpression ^= " is not null";
 				else
 					dictexpression = "exodus_tobool(" ^ dictexpression ^ ")";
