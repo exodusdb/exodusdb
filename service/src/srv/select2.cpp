@@ -78,7 +78,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	// 	} else {
 	// 		nlimitfields = limitfields.fcount(VM);
 	// 	}
-	let nlimitfields = limitfields.unassigned("").fcount(VM);
+	let nlimitfields = limitfields.default_from("").fcount(VM);
 
 	let xml		= options.contains("XML");
 	let rawread = options.contains("RAW");

@@ -62,7 +62,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		selectx = select0;
 	}
 
-	let nfilters = nfilters0.unassigned("").fcount(FM);
+	let nfilters = nfilters0.default_from("").fcount(FM);
 	if (nfilters) {
 		filterfields = filters0.f(1);
 		filtervalues = filters0.f(3);
