@@ -559,12 +559,15 @@ var var::round(const int ndecimals) const {
 	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars
 
-	std::array<char, 24> chars;
+	constexpr int maxchars {48};
+
+	std::array<char, maxchars> chars;
 	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), rounded_double, std::chars_format::fixed, ndecimals >= 0 ? ndecimals : 0);
 
 	// Throw if non-numeric
 	if (ec != std::errc())
-		throw VarNonNumeric("var::round: Cannot convert double to 24 characters");
+		//throw VarNonNumeric("var::round: Cannot convert to 24 characters");
+		throw VarNonNumeric("var::round: Cannot round " ^ var(fromdouble) ^ " ndecs: " ^ ndecimals ^ " to " ^ maxchars ^ " characters");
 
 	// Convert to a string. Hopefully using small string optimisation (SSO)
 	result.var_str = std::string(chars.data(), ptr - chars.data());
