@@ -1267,6 +1267,8 @@ nextreport:
 		// TODO lock/prevent double create with other processes
 		var file;
 		if (not file.open(filename, "")) {
+			if (not createfile(filename ^ " (S)"))
+				loglasterror();
 			//createfile("REVBOOT " ^ filename ^ " (S)");
 			//if (not createfile("REVBOOT " ^ filename ^ " (S)"))
 			//	abort(lasterror());
@@ -1276,9 +1278,8 @@ nextreport:
 			// 				perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
 			// 				perform("ATTACH REVBOOT " ^ filename ^ " (S)");
 			// 			}
-			//if (not file.open(filename, "")) {
+			if (not file.open(filename, ""))
 				call sysmsg(filename.quote() ^ " could not be created by INIT.GENERAL");
-			//}
 		}
 	}  // ii;
 
