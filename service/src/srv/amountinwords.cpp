@@ -20,6 +20,8 @@ var thousands;
 var hundreds;
 var unitsx;	 // num
 var subunitsx;  // num
+var hundredunit;
+var thousandunit;
 var text;
 var cents;
 var tens;  // num
@@ -163,15 +165,15 @@ arabic:
 	// Warning! arguments in replacer are in wrong order due to arabic left to right
 	// example, to replace X with Y, do replacer(Y, X)
 
-	// Get arabic currency name
-    if (amountcurrency) {
-        unitname    = amountcurrency.f(1).field("|", 2);
-        subunitname = amountcurrency.f(2).field("|", 2);
+	// Add arabic currency name to the string in the beginning
+	if (amountcurrency) {
+		unitname    = amountcurrency.f(1).field("|", 2);
+		subunitname = amountcurrency.f(2).field("|", 2);
+		if (words == "") {
+			words ^= " " ^ unitname ^ " ";
+		}
+	}
 
-        if (words == "") {
-            words ^= " " ^ unitname ^ " ";
-        }
-    }
 
     // Add word "million"
     millions = amount.field(".", 1);
@@ -180,20 +182,17 @@ arabic:
         words ^= amountinwords(millions ^ FM ^ language, "" );
 
         if (millions == 2) {
-
-			// Special arabic word for two million
-            words ^= " مليونان ";
-
-			// remove the word two, because مليونان is a special word for "two million"
+			// Add special arabic word for two million
+            words ^= " مليونان";
+			// Replace word "two million" with the special word for it in arabic
             words.replacer("اثنان مليونان" , "مليونان");
             if (words != "")
                 words ^= " و";
 
         } else {
-            // Everything else e.g 3,4 millions
-            words ^= " مليون ";
-
-            // remove "one" from "one million"
+	        // Everything else uses "million"
+            words ^= " مليون";
+			// Replace word "one million" with just "million"
             words.replacer("واحد مليون" , "مليون");
             if (words != "")
                 words ^= " و";
@@ -201,66 +200,82 @@ arabic:
     }
 
     // Add word "thousand"
+	// Get first digit of 1234 i.e. 1
     thousands = ((amount.mod(1000000)) / 1000).floor();
+	// Get other digits of 1234 i.e. 234
+    thousandunit = ((amount.mod(1000000)).mod(1000)).floor();
     if (thousands) {
 
         words ^= amountinwords(thousands ^ FM ^ language);
 
         if (thousands == 2) {
 
-			// Special arabic word for two thousand
-            words ^= " ألفان ";
-
-			// remove the word two, because مليونان is a special word for "two thousand"
-            words.replacer("اثنان ألفان" , "ألفان");
-            if (words != "")
+			// Add special arabic word for two thousand
+			words ^= " ألفان";
+			// Replace word "two thousand" with the special word for it in arabic
+			words.replacer("اثنان ألفان" , "ألفان");
+            //if (words != "")
+			// do not add "and" if thousandunit is 000
+            if (words != "" and thousandunit != "0")
                 words ^= " و";
 
         } else {
 
-            // Everything else e.g 3,4 thousands
-            words ^= " ألف ";
+            // Everything else uses "thousand"
+            words ^= " ألف";
 
-            // remove "one" from "one thousand"
+			// Replace word "one thousand" with just "thousand"
             words.replacer("واحد ألف" , "ألف");
-            if (words != "")
+            //if (words != "")
+			// do not add "and" if thousandunit is 000
+            if (words != "" and thousandunit != "0")
                 words ^= " و";
         }
     }
 
     // Add word "hundred"
-    hundreds = ((amount.mod(1000)) / 100).floor();
-    if (hundreds) {
-        words ^= amountinwords(hundreds ^ FM ^ language);
+	// Get first digit of 123 i.e. 1
+	hundreds = ((amount.mod(1000)) / 100).floor();
+	// Get other digits of 123 i.e. 23
+    hundredunit = ((amount.mod(1000)).mod(100)).floor();
+	if (hundreds) {
+		words ^= amountinwords(hundreds ^ FM ^ language);
 
-        if (hundreds == 2) {
+		if (hundreds == 2) {
 
-			// Special arabic word for two hundred
-            words ^= " مائتان";
+			// Add special arabic word for two hundred
+			words ^= " مائتان";
+			// Replace word "two hundred" with the special word for it in arabic
+			words.replacer("اثنان مائتان" , "مائتان");
+            //if (words != "")
+			// do not add "and" if hundredunit is 00
+			if (words != "" and hundredunit != "0")
+				words ^= " و";
 
-			// remove the word two, because مليونان is a special word for "two hundred"
-            words.replacer("اثنان مائتان" , "مائتان");
-            if (words != "")
-                words ^= " و";
+		} else {
 
-        } else {
+			// Everything else uses "hundred"
+			words ^= " مائة";
 
-            // Everything else e.g 3,4 hundreds
-            words ^= " مائة";
-
-            // remove "one" from "one hundred"
-            words.replacer("واحد مائة" , "مائة");
-            if (words != "")
-                words ^= " و";
-        }
-    }
+			// Replace word "one hundred" with just "hundred"
+			words.replacer("واحد مائة" , "مائة");
+			//if (words != "")
+			// do not add "and" if hundredunit is 00
+			if (words != "" and hundredunit != "0")
+				words ^= " و";
+		}
+	}
 
     // Get units in words
-    unitsx = "00" ^ amount.mod(1000).floor();
+	// This section adds the digits only one by one, words for hundred, thousand and million are added above (in the next iteration)
+    unitsx = "00" ^ amount.mod(100).floor();
     text   = "صفر " _VM "واحد " _VM "اثنان " _VM "ثلاثة " _VM "أربعة " _VM "خمسة " _VM "ستة " _VM "سبعة " _VM "ثمانية " _VM "تسعة " _VM "عشرة " _VM "أحد عشر " _VM "اثنا عشر " _VM "ثلاثة عشر " _VM "أربعة عشر " _VM "خمسة عشر " _VM "ستة عشر " _VM "سبعة عشر " _VM "ثمانية عشر " _VM "تسعة عشر " _VM "عشرين " _VM "ثَلاثين " _VM "أربعين " _VM "خمسين " _VM "ستين " _VM "سبعين " _VM "ثمانين " _VM "تسعين ";
     if (unitsx) {
+		// Use string in 'text' above to find numbers 20 and below
         if (unitsx <= 20) {
             words ^= text.f(1, unitsx + 1);
+		// Build the translation for numbers above 20
+		// ones is done first before tens because in arabic 35 is pronounced as "five and thirty"
         } else {
 
             tens     = unitsx[-2];
@@ -278,39 +293,50 @@ arabic:
                 words ^= text.f(1, 19 + tens);
             }
         }
-        //Currency unit name in Arabic
-        unitname = amountcurrency.f(1).field("|", 2);
-        if (unitname) {
-            // Move dirhams to end of string
-            words.replacer(unitname, "" );
-            words ^= unitname;
-        }
+    }
+
+	// Move currency to end of string every time a new word is added
+    //Currency unit name in Arabic
+    unitname = amountcurrency.f(1).field("|", 2);
+    if (unitname) {
+        words.replacer(unitname, "");
+        words ^= unitname;
     }
 
     // Get subunits in words
+	// In arabic, subunits pronounced in the same way as units
+	// Below condition makes this section run only after the units part is completely built
     if (amount.floor() != amount) {
         subunitsx = amount.field(".", 2);
 
         if (subunitsx.len()) {
 
+			// Use string in 'text' above to find numbers 20 and below
             if (subunitsx <= 20) {
                 // fils will always start with an "and"
                 words ^= "و ";
                 words ^= text.f(1, subunitsx + 1);
 
+			// Build the translation for numbers above 20
+			// ones is done first before tens because in arabic, 135 is pronounced as "hundred and five and thirty"
             } else {
 
+				// three digit sub-units eg: 456
                 if (subunitsx >= 100) {
-                    // tenth
+                    // tenth place, 4
                     hundreds = subunitsx[+1];
-                    // hundredth
+                    // hundredth place, 5
                     tens     = subunitsx[+2];
-                    // thousandth
+                    // thousandth place, 6
                     ones     = subunitsx[+3];
+
+				// two digit sub-units eg: 45
                 } else {
 
                     hundreds = "";
+					// tenth place, 4
                     tens     = subunitsx[+1];
+					// hundredth place, 5
                     ones     = subunitsx[+2];
                 }
 
@@ -336,7 +362,7 @@ arabic:
 
             //Currency sub-unit name in Arabic
             subunitname = amountcurrency.f(2).field("|", 2);
-            //fils
+            //Add subunit currency name to end of string
             words ^= subunitname;
         }
     }
