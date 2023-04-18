@@ -2114,7 +2114,8 @@ bool var::deleterecord(CVR key) const {
 	if (var_str.size() == 3 && (var_str == "dos" || var_str == "DOS")) {
 		//return this->osremove(key2);
 		//use osfilenames unnormalised so we can read and write as is
-		return key.osremove();
+		//return key.osremove();
+		return (key.osfile() and key.osremove());
 	}
 
 	// Parameter array
