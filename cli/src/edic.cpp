@@ -519,7 +519,7 @@ subroutine geteditor(out editor, out linenopattern) {
 	}
 
 	//editor="vi";
-	editor.regex_replacer("^[^ ]*\\bnano\\b", "nano --positionlog --const --suspend +$LINENO");
+	editor.regex_replacer("^[^ ]*\\bnano\\b", "nano --positionlog --const +$LINENO");
 	//editor.replacer("nano ", "nano --positionlog --const --nowrap --autoindent --suspend --speller=compile +$LINENO ");
 
 	if (editor.contains("nano"))

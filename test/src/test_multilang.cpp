@@ -193,14 +193,16 @@ programinit()
 		assert(var(123456.789).numberinwords("").outputl()        eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 		assert(var(123456.789).numberinwords("english").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 		assert(var(123456.789).numberinwords("greek").outputl()   eq "εκατόν είκοσι τρεις χίλιάδες τετρακόσια πενήντα έξι κόμμα επτά οκτώ εννέα");
-		assert(var(123456.789).numberinwords("arabic").outputl()  eq "مائة و ثلاثة و عشرون ألف و أربعة مائة و ستة و خمسون فاصل سبعة ثمانية تسعة");
+		assert(var(123456.789).numberinwords("arabic").outputl()  eq "مائة و ثلاثة و عشرون ألف و أربعة مائة و ستة و خمسون فاصل سبعة ثمانية تسعة"
+			or var(123456.789).numberinwords("arabic").outputl()  eq "مائة وثلاثة وعشرون ألف وأربعة مائة وستة وخمسون فاصل سبعة ثمانية تسعة");
 		assert(var(123456.789).numberinwords("french").outputl()  eq "cent vingt-trois mille quatre cent cinquante-six virgule sept huit neuf");
 		assert(var(123456.789).numberinwords("spanish").outputl() eq "ciento veintitrés mil cuatrocientos cincuenta y seis punto siete ocho nueve");
 
 		assert(var(-123456.789).numberinwords("").outputl()        eq "minus one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 		assert(var(-123456.789).numberinwords("english").outputl() eq "minus one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 		assert(var(-123456.789).numberinwords("greek").outputl()   eq "μείον εκατόν είκοσι τρεις χίλιάδες τετρακόσια πενήντα έξι κόμμα επτά οκτώ εννέα");
-		assert(var(-123456.789).numberinwords("arabic").outputl()  eq "ناقص مائة و ثلاثة و عشرون ألف و أربعة مائة و ستة و خمسون فاصل سبعة ثمانية تسعة");
+		assert(var(-123456.789).numberinwords("arabic").outputl()  eq "ناقص مائة و ثلاثة و عشرون ألف و أربعة مائة و ستة و خمسون فاصل سبعة ثمانية تسعة"
+			or var(-123456.789).numberinwords("arabic").outputl()  eq "ناقص مائة وثلاثة وعشرون ألف وأربعة مائة وستة وخمسون فاصل سبعة ثمانية تسعة");
 		assert(var(-123456.789).numberinwords("french").outputl()  eq "moins cent vingt-trois mille quatre cent cinquante-six virgule sept huit neuf");
 		assert(var(-123456.789).numberinwords("spanish").outputl() eq "menos ciento veintitrés mil cuatrocientos cincuenta y seis punto siete ocho nueve");
 

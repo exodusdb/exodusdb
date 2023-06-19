@@ -85,7 +85,7 @@ set -euxo pipefail
 :
 : Clean all - unless suppressed for speed. Required in case half-built with wrong libs somehow.
 :
-	[ ${NOCLEAN:-} ] || make clean
+	${NO_CLEAN:-} || make clean
 	cmake .
 
 :
@@ -96,7 +96,7 @@ set -euxo pipefail
 :
 : Skip full testing unless FORCE_TEST is set
 :
-	${FORCE_TEST:-} && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` make test
+	${NO_TEST:-} || CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` make test
 
 :
 : Install all exodus lib and cli - Probably into /usr/local ... lib, bin, include/exodus and share/exodus

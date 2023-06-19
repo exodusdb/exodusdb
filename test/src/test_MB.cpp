@@ -11,7 +11,7 @@ function test_ioconv(in ovar, in ivar) {
 	TRACE(ivar)
 	TRACE(ovar.iconv("MB"))
 	TRACE(ivar.oconv("MB").trimfirst("0"))
-	if (not ovar.iconv("MB") eq ivar)
+	if (ovar.iconv("MB") ne ivar)
 		return false;
 	if (len(ivar) and ivar.oconv("MB").trimfirst("0") ne ovar)
 		return false;
