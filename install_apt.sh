@@ -22,7 +22,8 @@ set -euxo pipefail
 :
 : Tested on:
 :
-: "Ubuntu 22.04 Ubuntu Jammy Jellyfish (development branch)"
+: "Ubuntu 23.04 Ubuntu Lunar Lobster"
+: "Ubuntu 22.04 Ubuntu Jammy Jellyfish"
 : "Ubuntu 20.04.3 LTS"
 :
 : No longer tested:
@@ -85,7 +86,7 @@ set -euxo pipefail
 :
 : Clean all - unless suppressed for speed. Required in case half-built with wrong libs somehow.
 :
-	${NO_CLEAN:-} || make clean
+	[ ${NO_CLEAN-x} ] && make clean
 	cmake .
 
 :
@@ -96,7 +97,7 @@ set -euxo pipefail
 :
 : Skip full testing unless FORCE_TEST is set
 :
-	${NO_TEST:-} || CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` make test
+	[ ${NO_TEST-x} ] && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` make test
 
 :
 : Install all exodus lib and cli - Probably into /usr/local ... lib, bin, include/exodus and share/exodus
