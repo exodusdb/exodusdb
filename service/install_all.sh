@@ -140,10 +140,12 @@ set -euxo pipefail
 	#if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
 	if ! curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb; then
 :
-: Fall back to bionic which works on 22.04/jammy, at least on the simple html test below.
+: Fall back to jammy which works on 23.04/lunar, at least on the simple html test below.
 :
-		RELEASE=bionic
-		VERSION=0.12.6-1
+		#RELEASE=bionic
+		#VERSION=0.12.6-1
+		RELEASE=jammy
+		VERSION=0.12.6.1-2
 		curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb
 	fi
 :
