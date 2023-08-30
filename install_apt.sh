@@ -127,7 +127,7 @@ set -euxo pipefail
 : make install again to install pgexodus extension and functions, and exodus user and database
 :
         cd $EXODUSDIR
-        make install
+        sudo make install
 
 :
 : 3. Configuring Exodus for Postgres
