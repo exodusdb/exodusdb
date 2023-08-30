@@ -8,7 +8,7 @@ var yy;
 var secs;	// num
 var time1;	// num
 var time2;	// num
-var nn = 1000;
+var nn = 100000;
 
 function main() {
 	// call savescreenss1, ss2);
@@ -74,11 +74,11 @@ subroutine getspeed(io retval) {
 	secs  = time2 - time1;
 
 	// increase number of loops
-	if (secs < 1) {
-		nn	 = nn * 2;
-		secs = "";
-	}
-	if (secs > 5) {
+//	if (secs < 1) {
+//		nn	 = nn * 2;
+//		secs = "";
+//	}
+	if (secs > 2) {
 		nn	 = nn / 2;
 		secs = "";
 	}
