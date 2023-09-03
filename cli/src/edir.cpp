@@ -199,7 +199,11 @@ function main() {
 	}
 
 	//clean up any temporary file
-	osremove(temposfilename) or true;
+	if (osfile(temposfilename)) {
+		if (not osremove(temposfilename)) {
+			lasterror().errputl();
+		}
+	}
 
 	return 0;
 }

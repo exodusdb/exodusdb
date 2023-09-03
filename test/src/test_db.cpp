@@ -41,11 +41,11 @@ programinit()
 	assert(var().sqlexec("select exodus_extract_date_array(''||chr(29)||'1',0,0,0);", response));
 	TRACE(response.field(RM, 2))
 	assert(response.field(RM, 2) eq "{NULL,1968-01-01}");
-	var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);", response);
+	assert(var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);", response));
 	printl(response);
 	assert(response.field(RM, 2) eq "{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
 
-	var filename = "xo_test_db_temp1";
+	var filename = "xo_test_db_temp";
 
 	printl("test open/read/write/delete on file 'DOS'");
 	var dosfile;
@@ -58,13 +58,14 @@ programinit()
 	assert(not read(RECORD, dosfile, "t_xyz.txt"));
 
 	var trec;
-	deletefile(filename);
+	if (not deletefile(filename)) {};
 	assert(createfile(filename));
 
 	printl("Test rename, and rename back");
-	if (not deletefile(filename ^ "_renamed")) {}
-	assert(renamefile(filename, filename ^ "_renamed") or (loglasterror() and false));
-	assert(renamefile(filename ^ "_renamed", filename) or (loglasterror() and false));
+	let renamed_filename = "renamed_" ^ filename;
+	if (not deletefile(renamed_filename)) {}
+	assert(renamefile(filename, renamed_filename) or (loglasterror() and false));
+	assert(renamefile(renamed_filename, filename) or (loglasterror() and false));
 
 	printl("Test reccount");
 	for (var recn : range(1, 10))
@@ -106,7 +107,7 @@ programinit()
 	assert(LISTACTIVE);
 
 	printl("Test clearfile");
-	clearfile(filename);
+	assert(clearfile(filename));
 	assert(filename.reccount() eq 0);
 
 	printl("select list should still be active despite the above");
@@ -175,14 +176,13 @@ programinit()
 
 	{
 		printl("Create a temp file");
-		var tempfilename = "xo_test_db_deleterecord";
+		var tempfilename = "xo_test_db_deleterecord_temp";
 		var tempfile	 = tempfilename;
-		deletefile(tempfile);
-		if (createfile(tempfile))
-			outputl(tempfile);
+		if (not deletefile(tempfile)) {};
+		assert(createfile(tempfile));
+		assert(not read(RECORD from tempfile, "%RECORDS%"));
 		for (int i = 1; i le 10; ++i)
-			write(i on tempfile, i);
-		tempfile.reccount().outputl("nrecs");
+			assert(write(i on tempfile, i));
 
 		// Check reading magic key %RECORDS% returns all keys in natural order
 		assert(read(RECORD from tempfile, "%RECORDS%"));
@@ -345,7 +345,7 @@ programinit()
 
 	{
 		var conn1;
-		conn1.connect("");
+		assert(conn1.connect(""));
 		conn1.disconnect();
 	}
 
@@ -353,9 +353,9 @@ programinit()
 		//	global connect/disconnect
 		//	locks/unlocks
 		//	createfile/deletefile
-		connect();	// global connection
-		var file = "NANOTABLE";
-		deletefile(file);
+		assert(connect());	// global connection
+		var file = "NANOTABLE_temp";
+		if (not deletefile(file)) {};
 		assert(createfile(file));
 
 		//check 1 can be locked and not relocked
@@ -394,10 +394,10 @@ programinit()
 		//	global connect/disconnect
 		//	locks/unlocks
 		//	createfile/deletefile
-		connect();	// global connection
-		begintrans();
+		assert(connect());	// global connection
+		assert(begintrans());
 		var file = "NANOTABLE";
-		deletefile(file);
+		if (not deletefile(file)) {};
 		assert(createfile(file));
 
 		//check 1 can be locked and CAN BE relocked since in a transaction
@@ -428,7 +428,7 @@ programinit()
 		assert(file.lock("2"));
 
 		assert(deletefile(file));
-		committrans();
+		assert(committrans());
 
 		disconnect();  // global connection
 	}

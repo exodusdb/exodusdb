@@ -1,4 +1,5 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
+#include <cassert>
 #include <exodus/program.h>
 programinit()
 
@@ -27,7 +28,7 @@ programinit()
 	for (var filename : filenames.unique()) {
 		if (filename.contains("xo_")) {
 			printl("Deleting", filename);
-			deletefile(filename);
+			assert(deletefile(filename));
 		}
 	}
 

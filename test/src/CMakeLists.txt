@@ -19,7 +19,7 @@
 # #########################
 #
 #	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result") #switch off nodiscard warnings
-	add_compile_options(-Wno-unused-result) #switch off nodiscard warnings
+	#add_compile_options(-Wno-unused-result) #switch off nodiscard warnings
 	#set(CMAKE_CXX_FLAGS qqqqqqqqq)
 	#add_compile_definitions(-Wno-unused-result) #switch off nodiscard warnings
 	#COMPILE_DEFINITIONS

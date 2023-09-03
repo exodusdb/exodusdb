@@ -190,7 +190,7 @@ programinit()
 		var base_path = osgetenv("GITHUB_WORKSPACE");
 		base_path.outputl("GITHUB_WORKSPACE=");
 		if (base_path)
-			oscwd(base_path ^ "/test/src/");
+			assert(oscwd(base_path ^ "/test/src/"));
 		if (not osread(utftest, utftestfilename)) {
 			abort("test_main must be run in ~/exodus/test/src to have access to " ^ utftestfilename);
 		}
@@ -199,8 +199,8 @@ programinit()
 	assert(len(utftest) eq osfile(utftestfilename).f(1));
 
 	//check invalid utf8 has no change oswrite/osread round trip
-	oswrite(utftest, "t_" ^ utftestfilename);
-	osread(utftest2, "t_" ^ utftestfilename);
+	assert(oswrite(utftest, "t_" ^ utftestfilename));
+	assert(osread(utftest2, "t_" ^ utftestfilename));
 	assert(utftest2 eq utftest);
 
 	//check invalid utf has no change on ucase/lcase round trip
@@ -435,16 +435,16 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		tx ^= chr(ii);
 
 	//output to binary - check roundtrip
-	oswrite(tx, "test_main.$1");
-	osread(tx2, "test_main.$1");
+	assert(oswrite(tx, "test_main.$1"));
+	assert(osread(tx2, "test_main.$1"));
 	assert(tx2 eq tx);
 
 	//read as codepage
 	//oswrite(tx,"test_main.$1","ISO-8859-5");
-	osread(tx2, "test_main.$1", "ISO-8859-5");
+	assert(osread(tx2, "test_main.$1", "ISO-8859-5"));
 	//assert(tx2==tx);
 
-	osremove("test_main.$1") or lasterror().errputl("test_main1:");
+	assert(osremove("test_main.$1"));// or lasterror().errputl("test_main1:");
 
 	//hash
 	var("xyz").hash(1000).outputl("hash(1000) of \"xyz\"=");
@@ -486,12 +486,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		assert(len(data) eq nbinarychars);
 
 		//check can write characters 1-255 out as bytes using C locale
-		oswrite(data, "t_x.txt");
+		assert(oswrite(data, "t_x.txt"));
 		assert(osfile("t_x.txt").f(1) eq nbinarychars);
 
 		//check can read in bytes as characters using C locale
 		var data2;
-		osread(data2, "t_x.txt");
+		assert(osread(data2, "t_x.txt"));
 		assert(data2 eq data);
 	}
 
@@ -518,18 +518,18 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//offset2 is BYTE OFFSET NOT CHARACTER OFFSET!!!
 		var data, offset2;
 		offset2 = 4;
-		data.osbread(tempfile, offset2, 2);
+		assert(not data.osbread(tempfile, offset2, 2));
 		assert(data eq "");
 
 		//reading from middle of utf8 sequence -> invalid data TODO check valid UTF8
 		offset2 = 3;
-		data.osbread(tempfile, offset2, 2);
+		assert(data.osbread(tempfile, offset2, 2));
 		assert(data.oconv("HEX") eq "A3");
 		offset2 = 1;
-		data.osbread(tempfile, offset2, 2);
+		assert(data.osbread(tempfile, offset2, 2));
 		assert(data.oconv("HEX") eq "B3");
 		offset2 = 2;
-		data.osbread(tempfile, offset2, 2);
+		assert(data.osbread(tempfile, offset2, 2));
 		data.oconv("HEX").outputl("test reading from middle of utf8 byte sequence test=");
 		//assert(data.osbread(tempfile,offset2=3,2) eq "");
 
@@ -540,21 +540,21 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//assert(data.osbread(tempfile,offset2=2,1) eq greek2[3]);
 		//assert(data.osbread(tempfile,offset2=3,1) eq greek2[4]);
 		offset2 = 0;
-		data.osbread(tempfile, offset2, 1);
+		assert(data.osbread(tempfile, offset2, 1));
 		assert(data eq greek2[1]);
 		offset2 = 1;
-		data.osbread(tempfile, offset2, 1);
+		assert(data.osbread(tempfile, offset2, 1));
 		assert(data eq greek2[2]);
 		offset2 = 2;
-		data.osbread(tempfile, offset2, 1);
+		assert(data.osbread(tempfile, offset2, 1));
 		assert(data eq greek2[3]);
 		offset2 = 3;
-		data.osbread(tempfile, offset2, 1);
+		assert(data.osbread(tempfile, offset2, 1));
 		assert(data eq greek2[4]);
 
 		//verify utf-8 bytes
 		if (nbinarychars eq 256) {
-			osread(data, tempfilename5, "C");
+			assert(osread(data, tempfilename5, "C"));
 			assert(data     eq "\u00ce\u00b3\u00ce\u00a3");
 		}
 
@@ -716,13 +716,13 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 	//check we can osbwrite to an existent file beyond end of file
 	//oswrite("",tempfilename5,"utf8");
-	oswrite("", tempfilename5);
+	assert(oswrite("", tempfilename5));
 	assert(osopen(tempfilename5, tempfilename5));
 	offset = 2;
 	assert(osbwrite("78", tempfilename5, offset));
 	offset = 2;
 	var v78;
-	v78.osbread(tempfilename5, offset, 2);
+	assert(v78.osbread(tempfilename5, offset, 2));
 	assert(v78 eq "78");
 
 	assert(osread(record5, tempfilename5));
@@ -911,7 +911,7 @@ function test_codepage(in codepage, in lang) {
 	var v256 = "";
 	for (int ii = 0; ii le 255; ++ii)
 		v256 ^= chr(ii);
-	oswrite(v256, "t_codep.bin");
+	assert(oswrite(v256, "t_codep.bin"));
 	assert(osfile("t_codep.bin").f(1) eq 256);
 
 	//convert to utf8

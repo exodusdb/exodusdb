@@ -39,7 +39,7 @@ function main() {
 	var use_transaction = not OPTIONS.count("T");
 
 	if (not open(filename to file)) {
-		createfile(filename);
+		assert(createfile(filename));
 		assert(open(filename to file));
 	}
 

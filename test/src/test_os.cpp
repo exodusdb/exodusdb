@@ -294,7 +294,7 @@ programinit()
 		printl("Check getting whole env is the same as getting all one by one");
 
 		var env;
-		env.osgetenv("");
+		assert(env.osgetenv(""));
 		printl(env);
 		printl();
 		TRACE(env.len())

@@ -98,11 +98,11 @@ AGE IN YEARS Type 'S', Source Code ditto
 
 		// Check our index is present in the list
 		var tt = listindex();
-		tt.dump();
+		tt.dump().outputl();
 		TRACE(tt)
 		TRACE(tt.oconv("HEX"))
 		var tt2 = "xo_users]birthday"_var;
-		tt2.dump();
+		tt2.dump().outputl();
 		TRACE(tt2.oconv("HEX"))
 		TRACE(tt2)
 		var fn;

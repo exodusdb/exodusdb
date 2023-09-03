@@ -58,7 +58,9 @@ function main() {
 				// Diff
 				let tmpfilename = ostempdirpath() ^ osfilename.convert(OSSLASH, "_");
 				oswrite(RECORD on tmpfilename) or abort(lasterror());
-				osshell("diff " ^ osfilename ^ " " ^ tmpfilename ^ " --color=always") or true;//abort(lasterror());
+				if (not osshell("diff " ^ osfilename ^ " " ^ tmpfilename ^ " --color=always")) {
+					lasterror().outputl();
+				};
 				osremove(tmpfilename) or abort(lasterror());
 			}
 		}

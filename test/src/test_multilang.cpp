@@ -24,7 +24,7 @@ programinit()
 	var exodusdir = osgetenv("GITHUB_WORKSPACE");
 	if (exodusdir) {
 		printl(exodusdir);
-		oscwd(exodusdir ^ "/test/src");
+		assert(oscwd(exodusdir ^ "/test/src"));
 	}
 
 	//	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
@@ -70,22 +70,22 @@ programinit()
 
 	//convert write utf8 with code page
 	var EN_RU_UA_file = "t_EN_RU_UA.txt";
-	oswrite(EN_RU_UA_utf8, EN_RU_UA_file, cyrillic_cp);
+	assert(oswrite(EN_RU_UA_utf8, EN_RU_UA_file, cyrillic_cp));
 	printl(osfile(EN_RU_UA_file));
 	assert(osfile(EN_RU_UA_file).f(1) eq 49);
 
 	//convert write cp1251 WITHOUT code page - will go out unchanged
-	oswrite(EN_RU_UA_cp1251, EN_RU_UA_file);
+	assert(oswrite(EN_RU_UA_cp1251, EN_RU_UA_file));
 	assert(osfile(EN_RU_UA_file).f(1) eq 49);
 
 	//read it with code page
 	var EN_RU_UA_txt2;
-	osread(EN_RU_UA_txt2, EN_RU_UA_file, cyrillic_cp);
+	assert(osread(EN_RU_UA_txt2, EN_RU_UA_file, cyrillic_cp));
 	assert(EN_RU_UA_txt2 eq EN_RU_UA_utf8);
 	EN_RU_UA_txt2.outputl("<");
 
 	//read it WITHOUT code page (it will arrive back as NOT UTF8)
-	osread(EN_RU_UA_txt2, EN_RU_UA_file);
+	assert(osread(EN_RU_UA_txt2, EN_RU_UA_file));
 	assert(EN_RU_UA_txt2 eq EN_RU_UA_cp1251);
 	EN_RU_UA_txt2.from_codepage("CP1251").outputl("<");
 
@@ -97,7 +97,7 @@ programinit()
 	var MIXTURE_txt1 = "[English]" ^ "5bd0f3f1f1eae8e95d5bd3eaf0e0bfedf1fceae05d"_var.iconv("HEX") ^ "[Greek Char:\\u03A3][\u03A3]\n";
 	var MIXTURE_txt2;
 	var MIXTURE_file = "t_test_MIXTURE.txt";
-	oswrite(MIXTURE_txt1, MIXTURE_file, "utf8");
+	assert(oswrite(MIXTURE_txt1, MIXTURE_file, "utf8"));
 	MIXTURE_file.osclose();
 	assert(MIXTURE_txt2.osread(MIXTURE_file, "utf8"));
 	MIXTURE_txt1.outputl("Written   text:");
@@ -109,32 +109,40 @@ programinit()
 	//  this code fragment tests positioning in UTF8 files
 	var BUF_0_9, BUF_9_9, BUF_18_12, BUF_19_12, BUF_20_12, BUF_30_23;
 	var position = 0;
-	BUF_0_9.osbread(MIXTURE_file, position, 9);
+	assert(BUF_0_9.osbread(MIXTURE_file, position, 9));
 	position = 9;
-	BUF_9_9.osbread(MIXTURE_file, position, 9);
+	assert(BUF_9_9.osbread(MIXTURE_file, position, 9));
 	position = 18;
-	BUF_18_12.osbread(MIXTURE_file, position, 12);
+	assert(BUF_18_12.osbread(MIXTURE_file, position, 12));
 	position = 19;
-	BUF_19_12.osbread(MIXTURE_file, position, 12);
+	assert(BUF_19_12.osbread(MIXTURE_file, position, 12));
 	position = 20;
-	BUF_20_12.osbread(MIXTURE_file, position, 12);
+	assert(BUF_20_12.osbread(MIXTURE_file, position, 12));
 	position = 30;
-	BUF_30_23.osbread(MIXTURE_file, position, 23);
-	BUF_0_9.outputl("BUF_0_9=");
-	BUF_9_9.outputl("BUF_9_9=");
-	BUF_18_12.outputl("BUF_18_12=");
-	BUF_19_12.outputl("BUF_18_12=");
-	BUF_30_23.outputl("BUF_30_23=");
+	assert(BUF_30_23.osbread(MIXTURE_file, position, 23));
+//	BUF_9_9=[][][Gree
+//	BUF_18_12=k Char:\u03A
+//	BUF_19_12= Char:\u03A3
+//	BUF_30_23=3][Σ]
+	assert(BUF_0_9.outputl("BUF_0_9=") == "[English]");
+	assert(BUF_9_9.outputl("BUF_9_9=") == "[][][Gree");
+	assert(BUF_18_12.outputl("BUF_18_12=") == "k Char:\\u03A");
+	assert(BUF_19_12.outputl("BUF_19_12=") == " Char:\\u03A3");
+	assert(BUF_30_23.outputl("BUF_30_23=") == "3][Σ]\n");//335D5BCEA35D0A
 
 	position = 0;
-	BUF_0_9.osbread(MIXTURE_file, position, 9);
-	BUF_9_9.osbread(MIXTURE_file, position, 9);
-	BUF_18_12.osbread(MIXTURE_file, position, 12);
-	BUF_30_23.osbread(MIXTURE_file, position, 23);
-	BUF_0_9.outputl("BUF_0_9=");
-	BUF_9_9.outputl("BUF_9_9=");
-	BUF_18_12.outputl("BUF_18_12=");
-	BUF_30_23.outputl("BUF_30_23=");
+	assert(BUF_0_9.osbread(MIXTURE_file, position, 9));
+	assert(BUF_9_9.osbread(MIXTURE_file, position, 9));
+	assert(BUF_18_12.osbread(MIXTURE_file, position, 12));
+	assert(BUF_30_23.osbread(MIXTURE_file, position, 23));
+//	BUF_0_9=[English]
+//	BUF_9_9=[][][Gree
+//	BUF_18_12=k Char:\u03A
+//	BUF_30_23=3][Σ]
+	assert(BUF_0_9.outputl("BUF_0_9=") == "[English]");
+	assert(BUF_9_9.outputl("BUF_9_9=") == "[][][Gree");
+	assert(BUF_18_12.outputl("BUF_18_12=") == "k Char:\\u03A");
+	assert(BUF_30_23.outputl("BUF_30_23=") == "3][Σ]\n");
 
 	{
 		var tfilename = "t_test.txt";
@@ -150,7 +158,7 @@ programinit()
 
 	var cpdata		= "d4f0e0e7e020b3e720323220f1e8ece2eeebb3e2"_var.iconv("HEX");
 	var OUTPUT_file = "t_test_OUTPUT_UTF8.txt";
-	oswrite("", OUTPUT_file, "utf8");
+	assert(oswrite("", OUTPUT_file, "utf8"));
 	position = 5;
 	assert(osbwrite(L"1234567890", OUTPUT_file, position));
 	assert(position eq 15);
@@ -168,7 +176,7 @@ programinit()
 
 	// Lets test osbwrite() with position update and default locale (1251)
 	OUTPUT_file = "t_test_OUTPUT_1251.txt";
-	oswrite("", OUTPUT_file, "");
+	assert(oswrite("", OUTPUT_file, ""));
 	position = 5;
 	assert(osbwrite(L"1234567890", OUTPUT_file, position));
 	assert(position eq 15);

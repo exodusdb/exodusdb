@@ -31,7 +31,7 @@ programinit()
 
 		try {
 			var i64 = 0xefffffffffffffff;
-			i64.dump();
+			i64.dump().outputl();
 			TRACE(i64);
 			assert(false);
 		} catch (VarNumOverflow e) {
@@ -44,7 +44,7 @@ programinit()
 			//var i64 = -9223372036854775808L;
 			var i64_min = std::numeric_limits<int64_t>::min();
 			TRACE(i64_min)
-			i64_min.dump();
+			i64_min.dump().outputl();
 			//assert(i64_min.toInt() eq -9223372036854775808);
 			printl("i64_min.toInt() =", i64_min.toInt());
 			//assert(i64_min.toInt()    eq std::numeric_limits<int64_t>::min());
@@ -54,7 +54,7 @@ programinit()
 			try {
 				i64_min--;
 				assert(false and var("i64_min--"));
-				i64_min.dump();
+				i64_min.dump().outputl();
 			} catch (VarNumUnderflow e) {
 				printl("Successfully caught deliberate error", e.description);
 			}
@@ -66,7 +66,7 @@ programinit()
 			//var i32 = -9223372036854775808L;
 			var i32_max = std::numeric_limits<int32_t>::max();
 			TRACE(i32_max)
-			i32_max.dump();
+			i32_max.dump().outputl();
 			assert(i32_max.toInt() eq 2147483647);
 			assert(i32_max.toInt()    eq std::numeric_limits<int32_t>::max());
 			assert(i32_max.toString() eq "2147483647");
@@ -79,7 +79,7 @@ programinit()
 			//var i32 = -9223372036854775808L;
 			var i32_min = std::numeric_limits<int32_t>::min();
 			TRACE(i32_min)
-			i32_min.dump();
+			i32_min.dump().outputl();
 			assert(i32_min.toInt() eq -2147483648);
 			printl("i32_min.toInt() =", i32_min.toInt());
 			assert(i32_min.toInt()    eq std::numeric_limits<int32_t>::min());
@@ -94,7 +94,7 @@ programinit()
 			//var i64 = -9223372036854775808L;
 			var i64_max = std::numeric_limits<int64_t>::max();
 			TRACE(i64_max)
-			i64_max.dump();
+			i64_max.dump().outputl();
 			//assert(i64_max.toInt() eq -9223372036854775808);
 			//assert(i64_max.toInt()    eq std::numeric_limits<int64_t>::max());
 			assert(i64_max.toInt64()    eq std::numeric_limits<int64_t>::max());
@@ -103,7 +103,7 @@ programinit()
 			try {
 				i64_max++;
 				assert(false and var("i64_max++"));
-				i64_max.dump();
+				i64_max.dump().outputl();
 			} catch (VarNumOverflow e) {
 				printl("Successfully caught deliberate error", e.description);
 			}
@@ -112,11 +112,11 @@ programinit()
 		printl();
 		var x = "21112000001";
 		TRACE(x)
-		x.dump();
+		x.dump().outputl();
 		//assert(x.toInt()    eq 21'112'000'001);
 		assert(x.toInt64()    eq 21'112'000'001);
 		assert(x.toString() eq "21112000001");
-		x.dump();
+		x.dump().outputl();
 		TRACE(x.toInt());
 
 		printl();
@@ -125,11 +125,11 @@ programinit()
 		y = 21112;
 		y *= 1000000;
 		y += 1;
-		y.dump();
+		y.dump().outputl();
 		//assert(y.toInt()    eq 21'112'000'001);
 		assert(y.toInt64()    eq 21'112'000'001);
 		assert(y.toString() eq "21112000001");
-		y.dump();
+		y.dump().outputl();
 		TRACE(y);
 
 		printl();
@@ -137,12 +137,12 @@ programinit()
 		TRACE(z)
 		z = z.pwr(4);
 		TRACE(z);
-		z.dump();
+		z.dump().outputl();
 
 		printl();
 		var maxint = 0x7fff'ffff'ffff'ffff;
 		TRACE(maxint.toInt64())
-		maxint.dump();
+		maxint.dump().outputl();
 		assert(maxint.toInt64()    eq 9'223'372'036'854'775'807);
 		assert(maxint.toString() eq "9223372036854775807");
 
@@ -161,46 +161,46 @@ programinit()
 		printl();
 		printl("Check can convert string of largest int '9223372036854775807' to actual integer");
 		var x = "9223372036854775807";
-		x.dump();
+		x.dump().outputl();
 		assert(x.toInt64() eq (9223372036854775000 + 807));
-		x.dump();
+		x.dump().outputl();
 	}
 
 	{
 		printl();
 		printl("Check can convert string of minimum int '9223372036854775807' to actual integer");
 		var x = "-9223372036854775808";
-		x.dump();
+		x.dump().outputl();
 		assert(x.toInt64() eq -9223372036854775000 - 808);
-		x.dump();
+		x.dump().outputl();
 	}
 
 	{
 		printl();
 		printl("Ensure int less than min int is non-numeric");
 		var x = "-9223372036854775809";
-		x.dump();
+		x.dump().outputl();
 		try {
 			assert(x.toInt64());
 			assert(false);	//should not get here
 		} catch (VarNonNumeric e) {
 			printl("OK", e.description);
 		}
-		x.dump();
+		x.dump().outputl();
 	}
 
 	{
 		printl();
 		printl("Ensure int more than max int is non-numeric");
 		var x = "9223372036854775808";
-		x.dump();
+		x.dump().outputl();
 		try {
 			assert(x.toInt64());
 			assert(false);	//should not get here
 		} catch (VarNonNumeric e) {
 			printl("OK", e.description);
 		}
-		x.dump();
+		x.dump().outputl();
 	}
 
 	{

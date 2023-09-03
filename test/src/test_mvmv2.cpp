@@ -368,7 +368,7 @@ programinit()
 	}
 	{
 		var x = "f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212";
-		inserter(x, 1, 3, 1, "xyz").dump();
+		inserter(x, 1, 3, 1, "xyz").dump().outputl();
 		assert(x.convert(_FM _VM _SM, "^]}") eq "f110]f120]xyz}f130]f140^f211]f212");
 	}
 

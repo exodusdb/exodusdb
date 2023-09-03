@@ -419,9 +419,9 @@ programinit()
 	assert(locii eq 2);
 
 	var order = "AR";
-	ascints.convert(VM, SM).locateby(order, 20, locii, 1, 1);
+	assert(ascints.convert(VM, SM).locateby(order, 20, locii, 1, 1));
 	assert(locii eq 5);
-	ascints.convert(VM, SM).locateby("AR", 20, locii, 1, 1);
+	assert(ascints.convert(VM, SM).locateby("AR", 20, locii, 1, 1));
 	assert(locii eq 5);
 
 	assert(ascints.locateby("AR", 20, locii));
@@ -468,10 +468,10 @@ programinit()
 	assert(ascints.locateusing(",", 30));
 	assert(!ascints.locateusing(",", 31));
 
-	ascints.locateusing(",", 30, locii);
+	assert(ascints.locateusing(",", 30, locii));
 	assert(locii eq 6);
 
-	ascints.locateusing(locsep, 30, locii);
+	assert(ascints.locateusing(locsep, 30, locii));
 	assert(locii eq 6);
 
 	converter(ascints, ",", VM);
@@ -479,34 +479,34 @@ programinit()
 
 	assert(locate(10, ascints) eq 1);
 
-	locate(30, ascints, locii);
+	assert(locate(30, ascints, locii));
 	assert(locii eq 6);
 
-	locate(31, ascints, locii);
+	assert(not locate(31, ascints, locii));
 	assert(locii eq 10);
 
-	locate(30, ascints, locii, 1);
+	assert(locate(30, ascints, locii, 1));
 	assert(locii eq 6);
 
-	locate(31, ascints, locii, 1);
+	assert(not locate(31, ascints, locii, 1));
 	assert(locii eq 10);
 
-	locate(31, ascints, locii, 2);
+	assert(not locate(31, ascints, locii, 2));
 	assert(locii eq 1);
 
-	locateby(ar, 21, ascints, locii);
+	assert(not locateby(ar, 21, ascints, locii));
 	assert(locii eq 6);
 
-	locateby("AR", 21, ascints, locii);
+	assert(not locateby("AR", 21, ascints, locii));
 	assert(locii eq 6);
 
-	locateby("AL", 21, ascints, locii);
+	assert(not locateby("AL", 21, ascints, locii));
 	assert(locii eq 3);
 
-	locateby("DR", 21, revints, locii);
+	assert(not locateby("DR", 21, revints, locii));
 	assert(locii eq 5);
 
-	locateby("DL", 21, revints, locii);
+	assert(not locateby("DL", 21, revints, locii));
 	assert(locii eq 2);
 
 	converter(ascints, VM, ",");
@@ -515,10 +515,10 @@ programinit()
 	assert(locateusing(",", 30, ascints) eq 1);
 	assert(locateusing(",", 31, ascints) eq 0);
 
-	locateusing(",", 30, ascints, locii);
+	assert(locateusing(",", 30, ascints, locii));
 	assert(locii eq 6);
 
-	locateusing(locsep, 30, ascints, locii);
+	assert(locateusing(locsep, 30, ascints, locii));
 	assert(locii eq 6);
 
 	printl(elapsedtimetext());

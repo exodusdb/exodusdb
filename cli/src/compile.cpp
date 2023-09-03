@@ -1763,15 +1763,15 @@ function set_environment() {
 				field(line, "=", 1), field(line, "=", 2, 999999));
 		}
 	}
-	osremove(tempfilenamebase ^ ".cmd") or true;
-	osremove(tempfilenamebase ^ ".$$$") or true;
+	if (not osremove(tempfilenamebase ^ ".cmd")) {};
+	if (not osremove(tempfilenamebase ^ ".$$$")) {};
 	if (verbose) {
 		var errtemp;
 		if (osread(errtemp, tempfilenamebase ^ ".$2")) {
 			//printl(errtemp);
 		}
 	}
-	osremove(tempfilenamebase ^ ".$2") or true;
+	if (not osremove(tempfilenamebase ^ ".$2")) {};
 
 	return true;
 }

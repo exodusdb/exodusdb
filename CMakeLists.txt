@@ -132,9 +132,10 @@
 
 		add_compile_options(-Wno-bad-function-cast)
 		add_compile_options(-Wno-uninitialized)
-		add_compile_options(-Wno-unused-value) ## allow things like 'osremove(temposfilename) or true;'
+		#add_compile_options(-Wno-unused-value) ## allow things like 'osremove(temposfilename) or true;'
 		add_compile_options(-Wno-sign-conversion) # We dont care about signed to unsigned?
 		add_compile_options(-Wno-unknown-attributes) # likely unlikely
+		add_compile_options(-Wno-ignored-attributes) # likely unlikely
 		add_compile_options(-Wno-float-conversion) # We dont care about float to bool?
 	endif()
 
