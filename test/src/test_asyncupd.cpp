@@ -1,6 +1,6 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <thread>
+//#include <thread>
 
 #include <exodus/program.h>
 programinit()
@@ -123,15 +123,7 @@ function test(in option) {
 	var cmd		= "";
 	var options = OPTIONS.convert("{}", "") ^ option;
 	for (const var processn : range(1, nprocesses)) {
-		// Hard code path so make test can find it without any installation
-		// /root/bin/test_asyncupd
-		// ./test_asyncupd
-TRACE(EXECPATH)
-TRACE(COMMAND)
-TRACE(oscwd())
-TRACE(osgetenv())
 		//var selfcmd = "./test_asyncupd";
-		//var selfcmd = "/proc/self/exe";
 		var selfcmd = EXECPATH;
 		cmd ^= selfcmd ^ " " ^ processn ^ " {" ^ options ^ "} & ";
 	}
