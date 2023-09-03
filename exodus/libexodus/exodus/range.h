@@ -85,12 +85,12 @@ class PUBLIC reverse_range {
 	// Represent an incrementable and comparable int
 	class Iterator {
 		int int_;
-		int end_;
+		//int end_;
 
 	public:
 
-		// Construct from an int and an end int
-		Iterator(int_t int1, int_t end) : int_(int1), end_(end) {}
+		// Construct from an int /*and an end int*/
+		Iterator(int_t int1, int_t /*end*/) : int_(int1)/*, end_(end)*/ {}
 
 		// Return our int (adjusted to be a reverse int)
 		int_t operator*() const { return int_; }

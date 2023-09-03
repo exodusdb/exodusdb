@@ -16,10 +16,6 @@ class VARTYP {
 
  public:
 
-	// constructor from unsigned int
-	VARTYP(unsigned int rhs)
-		: flags_(rhs){};
-
 	// default constructor
 	VARTYP() = default;
 	//VARTYP() : flags(0) {
@@ -28,15 +24,23 @@ class VARTYP {
 	//};
 
 	// copy constructor
+	// warning: definition of implicit copy assignment operator for 'VARTYP' is deprecated because it has a user-declared copy constructor [-Wdeprecated-copy]
 	VARTYP(const VARTYP& rhs) = default;
-	//VARTYP(const VARTYP& rhs) : flags(rhs.flags) {
+	//VARTYP(const VARTYP& rhs) : flags_(rhs.flags_) {
 	//    std::cout<<"copy ctor "<< rhs.flags
 	//    << std::endl;
 	//};
 
-	// assign
-	VARTYP& operator=(const unsigned int newflags) {
-		flags_ = newflags;
+	// copy assignment
+	VARTYP& operator=(const VARTYP& rhs) = default;
+
+	// constructor from unsigned int
+	VARTYP(const unsigned int rhs)
+		: flags_(rhs){};
+
+	// assign from unsigned int
+	VARTYP& operator=(const unsigned int rhs) {
+		flags_ = rhs;
 		return *this;
 	};
 

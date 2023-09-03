@@ -20,6 +20,8 @@
 //
 // test_main 1> test_main.out
 
+// Create all temporary files ending _temp so that they are deleted on disconnection
+
 programinit()
 
 	function main() {

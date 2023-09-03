@@ -124,7 +124,13 @@ function test(in option) {
 	var options = OPTIONS.convert("{}", "") ^ option;
 	for (const var processn : range(1, nprocesses)) {
 		// Hard code path so make test can find it without any installation
-		cmd ^= "./test_asyncupd " ^ processn ^ " {" ^ options ^ "} & ";
+		// /root/bin/test_asyncupd
+		// ./test_asyncupd
+TRACE(EXECPATH)
+TRACE(COMMAND)
+TRACE(oscwd())
+		var selfcmd = "./test_asyncupd";
+		cmd ^= selfcmd ^ " " ^ processn ^ " {" ^ options ^ "} & ";
 	}
 
 	//osshell("test_asyncupd 1 & test_asyncupd 2 & test_asyncupd 3 & test_asyncupd 4 & test_asyncupd 5 &");
