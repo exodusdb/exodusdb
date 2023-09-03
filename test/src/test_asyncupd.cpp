@@ -129,7 +129,10 @@ function test(in option) {
 TRACE(EXECPATH)
 TRACE(COMMAND)
 TRACE(oscwd())
-		var selfcmd = "./test_asyncupd";
+TRACE(osgetenv())
+		//var selfcmd = "./test_asyncupd";
+		//var selfcmd = "/proc/self/exe";
+		var selfcmd = EXECPATH;
 		cmd ^= selfcmd ^ " " ^ processn ^ " {" ^ options ^ "} & ";
 	}
 

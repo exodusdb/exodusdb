@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 #include <exodus/var.h>
 
@@ -9,10 +11,18 @@ ND PUBLIC var getprocessn() {
 }
 
 ND PUBLIC var getexecpath() {
-	var osenv;
-	if (not osenv.osgetenv("_"))
-		osenv = "";
-	return osenv;
+//	var osenv;
+//	if (not osenv.osgetenv("_"))
+//		osenv = "";
+//	return osenv;
+	var path;
+	try {
+		fs::path p {"/proc/self/exe"};
+		path = fs::read_symlink(p).string();
+	} catch (...) {
+		path = "";
+	};
+	return path;
 }
 
 ND PUBLIC std::string gethostname() {
