@@ -183,3 +183,7 @@ set -euxo pipefail
 : ==============================================================
 :
 :	Apache should now be listening on ipno $IPNO port 443
+:
+:	cd ~/exodus/service
+:	systemctl stop exo_live@exodus
+:	./run exodus
