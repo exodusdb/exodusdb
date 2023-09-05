@@ -942,11 +942,15 @@ nextreport:
 
 	call log2("*get security - also in LISTEN", logtime);
 	if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
-		var temp;
-		if (temp.open("DICT.DEFINITIONS")) {
-			if (SECURITY.read(temp, "SECURITY")) {
+		var dict_definitions;
+		if (dict_definitions.open("DICT.DEFINITIONS")) {
+			if (SECURITY.read(dict_definitions, "SECURITY")) {
 				SECURITY.write(DEFINITIONS, "SECURITY");
+			} else {
+				SECURITY = "";
 			}
+		} else {
+			SECURITY = "";
 		}
 	}
 

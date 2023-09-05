@@ -39,40 +39,40 @@ function main() {
 	//createfile("STATISTICS");
 	//createfile("CHANGELOG");
 
-	if (not createfile("VOC"))
+	if (not open("VOC") and not createfile("VOC"))
 		abort(lasterror());
 
-	if (not createfile("DICT.DEFINITIONS"))
+	if (not open("DICT.DEFINITIONS") and not createfile("DICT.DEFINITIONS"))
 		abort(lasterror());
 
-	if (not createfile("DEFINITIONS"))
+	if (not open("DEFINITIONS") and not createfile("DEFINITIONS"))
 		abort(lasterror());
 
-	if (not createfile("PROCESSES"))
+	if (not open("PROCESSES") and not createfile("PROCESSES"))
 		abort(lasterror());
 
-	if (not createfile("REQUESTLOG"))
+	if (not open("REQUESTLOG") and not createfile("REQUESTLOG"))
 		abort(lasterror());
 
-	if (not createfile("SYS_MESSAGES"))
+	if (not open("SYS_MESSAGES") and not createfile("SYS_MESSAGES"))
 		abort(lasterror());
 
-	if (not createfile("COMPANIES"))
+	if (not open("COMPANIES") and not createfile("COMPANIES"))
 		abort(lasterror());
 
-	if (not createfile("DOCUMENTS"))
+	if (not open("DOCUMENTS") and not createfile("DOCUMENTS"))
 		abort(lasterror());
 
-	if (not createfile("USERS"))
+	if (not open("USERS") and not createfile("USERS"))
 		abort(lasterror());
 
-	if (not createfile("LOCKS"))
+	if (not open("LOCKS") and not createfile("LOCKS"))
 		abort(lasterror());
 
-	if (not createfile("STATISTICS"))
+	if (not open("STATISTICS") and not createfile("STATISTICS"))
 		abort(lasterror());
 
-	if (not createfile("CHANGELOG"))
+	if (not open("CHANGELOG") and not createfile("CHANGELOG"))
 		abort(lasterror());
 
 	SYSTEM(33) = "X";

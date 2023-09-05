@@ -52,7 +52,10 @@ listen:
 
 		} catch (VarError& varerror) {
 			// Similar code in net.cpp and listen.cpp
-			msg_ = varerror.description.default_from("No error message") ^ FM ^ backtrace();
+			//msg_ = varerror.description.default_from("No error message") ^ FM ^ backtrace();
+			msg_ = varerror.description.default_from("No error message") ^ FM ^ varerror.stack();
+			//msg_ = varerror.description.default_from("No error message");
+			//msg_ = var("No error message") ^ " " ^ backtrace();
 		}
 
 	// unlock all

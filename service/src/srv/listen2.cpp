@@ -1072,8 +1072,9 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	userrec = "";
 	var users;
 	if (users.open("USERS", "")) {
-		if (userrec.read(users, USERNAME)) {
-
+		if (not userrec.read(users, USERNAME)) {
+			userrec = "";
+		} else {
 			ucomps = userrec.f(33);
 			gosub switchcompany();
 
