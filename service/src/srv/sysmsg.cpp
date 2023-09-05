@@ -54,9 +54,15 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	msg.replacer(chr(0), "%00");
 	subjectin.replacer(chr(0), "%00");
 
+	// Output to log/screen
 	if (not interactive) {
 		// print msg:', ':subjectin:', ':username
-		printl("sysmsg: ", subjectin, ", ", username, ", ", msg.f(1, 1).field("|", 1).f(1, 1));
+		//printl("sysmsg: ", subjectin, ", ", username, ", ", msg.f(1, 1).field("|", 1).f(1, 1));
+		print("sysmsg:");
+		if (not msg.contains(subjectin))
+			print(" ", subjectin);
+		print(" ", username);
+		printl(msg);
 	}
 
 	if (msg == "" and subjectin) {
